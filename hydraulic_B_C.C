@@ -1,4 +1,3 @@
-// hydraulic_B_C.C
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -122,12 +121,12 @@ static struct HydraulicB_CSyntax
       alist.add ("description", 
 		 "Campbell retention curve model with Burdine theory.");
       Hydraulic::load_syntax (syntax, alist);
-      syntax.add ("h_b", "cm", Check::non_positive (), Syntax::Const,
+      syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 		  "Bubbling pressure.");
       static RangeEI b_range (0.0, 1.0);
       syntax.add ("b", Syntax::None (), b_range, Syntax::Const,
 		  "Campbell parameter.");
-      syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::Const,
+      syntax.add ("K_sat", "cm/h", Check::positive (), Syntax::Const,
 		  "Water conductivity of saturated soil.");
 
       Librarian<Hydraulic>::add_type ("B_C", alist, syntax, &make);

@@ -485,7 +485,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    atts.add (name, get_string ());
 	    // Handle "directory" immediately.
 	    if (&syntax == global_syntax_table && name == "directory")
-	      Path::set_directory (atts.name (name));
+	      if (!Path::set_directory (atts.name (name)))
+		error (string ("Could not set directory '") + atts.name (name)
+		       + "'");
 	    break;
 	  case Syntax::Boolean:
 	    {

@@ -90,6 +90,10 @@ Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("Theta_res", 0.0);
 }
 
+void
+Hydraulic::initialize (const Horizon&)
+{ }
+
 Hydraulic::Hydraulic (const AttributeList& al)
   : name (al.name ("type")),
     Theta_sat (al.number ("Theta_sat")),

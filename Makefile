@@ -251,7 +251,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = pedo_linear.C adsorption_full.C \
+MODELS = hydraulic_Cosby.C pedo_linear.C adsorption_full.C \
 	equil_langmuir.C transform_equil.C condition_weather.C \
 	rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
 	action_repeat.C column_inorganic.C  vegetation_permanent.C \
@@ -641,7 +641,8 @@ action${OBJ}: action.C action.h librarian.h library.h common.h alist.h \
 condition${OBJ}: condition.C condition.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h
 horizon${OBJ}: horizon.C horizon.h librarian.h library.h common.h alist.h \
- syntax.h treelog.h plf.h hydraulic.h mathlib.h tortuosity.h log.h
+ syntax.h treelog.h plf.h hydraulic.h mathlib.h tortuosity.h log.h \
+ check.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h librarian.h library.h common.h \
@@ -707,7 +708,7 @@ ridge${OBJ}: ridge.C ridge.h soil.h horizon.h librarian.h library.h \
  geometry.h plf.h submodel.h mathlib.h log.h soil_water.h macro.h
 soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h hydraulic.h tortuosity.h geometry.h mathlib.h \
- submodel.h log.h message.h
+ submodel.h log.h message.h check.h
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h soil_water.h macro.h soil.h \
  horizon.h hydraulic.h tortuosity.h geometry.h log.h am.h im.h \
@@ -783,7 +784,7 @@ solute${OBJ}: solute.C solute.h adsorption.h librarian.h library.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
  macro.h mathlib.h message.h
 geometry${OBJ}: geometry.C geometry.h common.h syntax.h treelog.h alist.h \
- tmpstream.h mathlib.h message.h
+ tmpstream.h mathlib.h message.h check.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h plf.h parser.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h librarian.h library.h \
@@ -839,6 +840,8 @@ cdaisy${OBJ}: cdaisy.C syntax.h common.h treelog.h alist.h daisy.h \
 common${OBJ}: common.C common.h message.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
+hydraulic_Cosby${OBJ}: hydraulic_Cosby.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h treelog.h horizon.h
 pedo_linear${OBJ}: pedo_linear.C pedo.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
  geometry.h
@@ -1050,7 +1053,7 @@ nitrification_solute${OBJ}: nitrification_solute.C nitrification.h \
  soil_heat.h soil_NH4.h solute.h adsorption.h transport.h mactrans.h \
  soil_NO3.h log.h mathlib.h plf.h
 hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h
+ common.h alist.h syntax.h treelog.h check.h
 uzlr${OBJ}: uzlr.C uzmodel.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
  geometry.h log.h mathlib.h

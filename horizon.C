@@ -74,11 +74,11 @@ struct Horizon::Implementation
   };
   double content[Constituents_End];
   double Theta_pF_high;
-  const Hydraulic* hydraulic;
   void initialize (const Hydraulic&);
   double HeatCapacity ();
-  double DepolationsFactor (const constituents medium, const double alfa);
-  double ThermalConductivity (constituents medium);
+  double DepolationsFactor (const Hydraulic&, 
+			    const constituents medium, const double alfa);
+  double ThermalConductivity (const Hydraulic&, constituents medium);
   const int intervals;
   double rho_soil_particles ();
 
@@ -95,13 +95,11 @@ Horizon::Implementation::heat_capacity[Constituents_End] = // [erg / cm³ / °C]
 { 4.2e7, 1.9e7 * (1.0 / 0.92), 1.25e4, 2.0e7, 2.0e7, 2.5e7 }; 
 
 void 
-Horizon::Implementation::initialize (const Hydraulic& hydro)
+Horizon::Implementation::initialize (const Hydraulic& hydraulic)
 {
-  hydraulic = &hydro;
-
   // Did we specify 'dry_bulk_density'?  Else calculate it now.
   if (dry_bulk_density < 0.0)
-    dry_bulk_density = rho_soil_particles () * (1.0 - hydraulic->porosity ());
+    dry_bulk_density = rho_soil_particles () * (1.0 - hydraulic.porosity ());
 
   // C factor is the specific C content in horizon [g C/cm³]
   const double C_divisor 
@@ -122,30 +120,30 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
     + (fine_sand + coarse_sand) * quarts_in_sand;
 
   // Above this pF heat is mostly tranfered by Air.
-  Theta_pF_high = hydraulic->Theta (pF2h (4.2));
+  Theta_pF_high = hydraulic.Theta (pF2h (4.2));
       
   // Below this pf heat is mostly transfered by Water or Ice.
   const double Theta_pF_low
-    = (hydraulic->Theta (pF2h (2.0)) + Theta_pF_high) / 2.0;
+    = (hydraulic.Theta (pF2h (2.0)) + Theta_pF_high) / 2.0;
 
   // Water that won't freeze.
   const double LiquidWater = Theta_pF_high; 
   
   // Relative content of various constituents in soil.
-  content[Quarts] = quarts * (1.0 - hydraulic->Theta_sat);
+  content[Quarts] = quarts * (1.0 - hydraulic.Theta_sat);
   content[Minerals] = ((clay + silt + fine_sand + coarse_sand) - quarts)
-    * (1.0 - hydraulic->Theta_sat);
-  content[Organic_Matter] = humus * (1.0 - hydraulic->Theta_sat);
+    * (1.0 - hydraulic.Theta_sat);
+  content[Organic_Matter] = humus * (1.0 - hydraulic.Theta_sat);
 
   // Find capasity of dry soil.
-  content[Air] = hydraulic->porosity ();
+  content[Air] = hydraulic.porosity ();
   content[Water] = 0.0;
   content[Ice] = 0.0;
   C_soil = HeatCapacity ();
 
   // We calculate for water between Theta_res and Theta_sat.
-  const int from = (int) floor (intervals * hydraulic->Theta_res);
-  const int to = (int) ceil (intervals * hydraulic->Theta_sat);
+  const int from = (int) floor (intervals * hydraulic.Theta_res);
+  const int to = (int) ceil (intervals * hydraulic.Theta_sat);
   
   assert (0 <= from);
   assert (from < to);
@@ -160,12 +158,12 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
       // Fill out water, ice, and air for pure water system.
       content[Water] = (i + 0.0) / (intervals + 0.0);
       content[Ice] = 0.0;
-      content[Air] = hydraulic->porosity () - content[Water];
+      content[Air] = hydraulic.porosity () - content[Water];
 
       // Calculate termal attributes for this combination.
-      const double K_water_wet = ThermalConductivity (Water);
+      const double K_water_wet = ThermalConductivity (hydraulic, Water);
       const double K_water_dry = continuum_correction_factor
-	* ThermalConductivity (Air);
+	* ThermalConductivity (hydraulic, Air);
       
       // Find actual conductivity in combined water and air system.
       if (content[Water] < Theta_pF_high)
@@ -181,12 +179,12 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
       // Fill out water, ice, and air for pure ice system.
       content[Water] = min (LiquidWater, (i + 0.0) / (intervals + 0.0));
       content[Ice] = max ((i + 0.0) / (intervals + 0.0) - LiquidWater, 0.0);
-      content[Air] = hydraulic->Theta_sat - (content[Water] + content[Ice]);
+      content[Air] = hydraulic.Theta_sat - (content[Water] + content[Ice]);
       
       // Calculate termal attributes for this combination.
-      const double K_ice_wet = ThermalConductivity (Ice);
+      const double K_ice_wet = ThermalConductivity (hydraulic, Ice);
       const double K_ice_dry = continuum_correction_factor 
-	* ThermalConductivity (Air);
+	* ThermalConductivity (hydraulic, Air);
       
       // Find actual conductivity in combined ice and air system.
       if (content[Water] + content[Ice] < Theta_pF_high)
@@ -222,11 +220,12 @@ Horizon::Implementation::HeatCapacity ()
 }
 
 double 
-Horizon::Implementation::DepolationsFactor (const constituents medium, 
+Horizon::Implementation::DepolationsFactor (const Hydraulic& hydraulic,
+					    const constituents medium, 
 					    const double alfa)
 {
   if (medium == Air)
-    return 0.333 - (0.333 - 0.070) * content[Air] / (hydraulic->porosity()
+    return 0.333 - (0.333 - 0.070) * content[Air] / (hydraulic.porosity()
 						     - Theta_pF_high);
 
   const double a = 1 - alfa * alfa;
@@ -245,7 +244,8 @@ Horizon::Implementation::DepolationsFactor (const constituents medium,
 }
 
 double 
-Horizon::Implementation::ThermalConductivity (constituents medium)
+Horizon::Implementation::ThermalConductivity (const Hydraulic& hydraulic,
+					      constituents medium)
 {
   // Thermal conductivity of each medium.
   double thermal_conductivity[Constituents_End] =
@@ -279,7 +279,7 @@ Horizon::Implementation::ThermalConductivity (constituents medium)
 	    case Minerals:
 	    case Air:
 	      {
-		const double g = DepolationsFactor (i, 
+		const double g = DepolationsFactor (hydraulic, i, 
 						    (i == Quarts)
 						    ? quarts_form_factor
 						    : mineral_form_factor);
@@ -356,6 +356,14 @@ Horizon::dry_bulk_density () const
 double 
 Horizon::clay () const 
 { return impl.clay; }
+
+double 
+Horizon::silt () const 
+{ return impl.silt; }
+
+double 
+Horizon::sand () const 
+{ return impl.fine_sand + impl.coarse_sand; }
 
 double 
 Horizon::humus () const 
@@ -450,6 +458,11 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 	     "The physical properties of a particular soil type.");
   syntax.add ("hydraulic", Librarian<Hydraulic>::library (), 
 	      "The hydraulic propeties of the soil.");
+  AttributeList hydraulic_alist;
+  hydraulic_alist.add ("type", "Cosby_et_al");
+  hydraulic_alist.add ("Theta_res", 0.0);
+  hydraulic_alist.add ("Theta_sat", 0.9);
+  alist.add ("hydraulic", hydraulic_alist);
   syntax.add ("tortuosity", Librarian<Tortuosity>::library (), 
 	      "The soil tortuosity.");
   AttributeList& tortuosity = *new AttributeList ();
@@ -484,6 +497,10 @@ By default, this is calculated from the soil constituents.");
   syntax.add ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
 	      Syntax::Const, Syntax::Sequence,
 	      "C/N ratio for each SOM pool in this soil.");
+  vector<double> SOM_C_per_N;
+  SOM_C_per_N.push_back (11.0);
+  SOM_C_per_N.push_back (11.0);
+  alist.add ("SOM_C_per_N", SOM_C_per_N);
   syntax.add_fraction ("SOM_fractions", Syntax::Const, Syntax::Sequence, "\
 Fraction of humus in each SOM pool, from slowest to fastest.");
   syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
@@ -527,6 +544,7 @@ Horizon::Horizon (const AttributeList& al)
     hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
     tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
 { 
+  hydraulic.initialize (*this);
   if (impl.K_water.size () == 0)
     { 
       impl.initialize (hydraulic);
@@ -540,7 +558,11 @@ Horizon::Horizon (const AttributeList& al)
 }
 
 Horizon::~Horizon ()
-{ }
+{ 
+  delete &impl; 
+  delete &hydraulic;
+  delete &tortuosity;
+}
 
 // Create Horizon library.
 EMPTY_TEMPLATE

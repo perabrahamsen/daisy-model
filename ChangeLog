@@ -1,3 +1,34 @@
+2002-02-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.07 released.
+
+2002-02-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C (Implementation::hydraulic): Removed member.
+	(DepolationsFactor): Take it as an argument.
+	(ThermalConductivity): Update caller.
+	(initialize): Update caller.
+
+	* hydraulic_M_C.C (HydraulicM_CSyntax): Better range checking.
+	* hydraulic_B_C.C (HydraulicB_CSyntax): Ditto.
+	* hydraulic_mod_C.C (Hydraulic_mod_CSyntax): Ditto.
+
+	* horizon.C (Horizon): Initialize 'hydraulic' before 'impl'.
+	(~Horizon): Delete 'impl' and 'hydraulic'.
+
+	* parser_file.C (load_list): Give error of 'directory' directive
+	fails. 
+
+2002-02-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic.C (initialize): New virtual function.
+	* horizon.C (Horizon): Call it.
+	(silt, sand): New functions.
+	(load_syntax): Gave SOM_C_per_N a default value (11 11).
+	* hydraulic_Cosby.C: New model.
+	* Makefile (MODELS): Added it.
+	* horizon.C (load_syntax): Make it default.
+
 2002-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.06 released.

@@ -54,9 +54,11 @@ public:
   
   // Texture.
 public:
-  const Tortuosity& tortuosity;
+  Tortuosity& tortuosity;
   double dry_bulk_density () const;
   double clay () const;
+  double silt () const;
+  double sand () const;
   double humus () const;
   double SOM_C (unsigned int pool) const;
   double SOM_C_per_N (unsigned int pool) const;

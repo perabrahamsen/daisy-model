@@ -25,7 +25,8 @@
 
 #include "librarian.h"
 
-struct PLF;
+class PLF;
+class Horizon;
 
 class Hydraulic 
 {
@@ -61,10 +62,8 @@ protected:
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-protected:
-  void initialize ();
+  virtual void initialize (const Horizon&);
   Hydraulic (const AttributeList&);
-public:
   virtual ~Hydraulic ();
 };
 

@@ -12,6 +12,17 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.07 
+
+** New "Cosby_et_al" hydraulic model.
+
+This is a modied Bruce Campell model with parameters derived by
+pedotransfer functions as specified by Cosby et al.
+
+This model is now default, so you don't have to specify hydraulic
+parameters for a horizon (you should, though, the pedotranspher
+functions aren't that reliable.)
+
 * 2.06 
 
 ** You can now specify [m] or [pF] instead of [cm].

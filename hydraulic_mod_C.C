@@ -23,6 +23,7 @@
 // Modified Campbell retention curve model with Burdine theory.
 
 #include "hydraulic.h"
+#include "check.h"
 
 class Hydraulic_mod_C : public Hydraulic
 {
@@ -140,11 +141,11 @@ Hydraulic_mod_CSyntax::Hydraulic_mod_CSyntax ()
   alist.add ("description", "\
 Modified Campbell retention curve model with Burdine theory.");
   Hydraulic::load_syntax (syntax, alist);
-  syntax.add ("h_b", "cm", Syntax::Const,
+  syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 	      "Bubbling pressure.");
-  syntax.add ("b", Syntax::None (), Syntax::Const,
+  syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 	      "Campbell parameter.");
-  syntax.add ("K_sat", "cm/h", Syntax::Const,
+  syntax.add ("K_sat", "cm/h", Check::positive (), Syntax::Const,
 	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("mod_C", alist, syntax,

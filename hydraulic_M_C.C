@@ -122,12 +122,12 @@ static struct HydraulicM_CSyntax
     alist.add ("description", 
 	       "Campbell retention curve model with Mualem theory.");
     Hydraulic::load_syntax (syntax, alist);
-    syntax.add ("h_b", "cm", Check::non_positive (), Syntax::Const,
+    syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 		"Bubbling pressure.");
     static RangeEI b_range (0.0, 1.0);
     syntax.add ("b", Syntax::None (), b_range, Syntax::Const,
 		"Campbell parameter.");
-    syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::Const,
+    syntax.add ("K_sat", "cm/h", Check::positive (), Syntax::Const,
 		"Water conductivity of saturated soil.");
 
     Librarian<Hydraulic>::add_type ("M_C", alist, syntax, &make);
