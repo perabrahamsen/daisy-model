@@ -2,8 +2,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * DOM.
 
-** En enkelt DOM med C + N
-
 ** Udvid OM::fractions med et ekstra medlem -> DOM
 
 ** DOM::turnover_rate + DOM::fractions

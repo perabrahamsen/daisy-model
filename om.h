@@ -39,9 +39,9 @@ public:
   static const double Unspecified;// No initial fraction specified.
   const double initial_fraction; // Relative fraction for this om.
   const double initial_C_per_N;	// Initial value for C/N.
+  /* const */ vector<double> C_per_N_goal; // Prefered C/N value.
   /* const */ PLF heat_factor;
   /* const */ PLF water_factor;
-
   // Content.
 public:
   double top_C;			// Carbon on the ground.
@@ -52,6 +52,7 @@ public:
   const vector <double> efficiency;	// How digestible is this?
   const double maintenance;	// How fast does it eat itself?
   const vector<double> fractions;	// How much is turned into SMB and SOM?
+
   // Simulation.
 public:
   void output (Log&) const;
@@ -73,11 +74,12 @@ public:
 public:
   void tick (unsigned int size, const double* turnover_factor, 
 	     const double* N_soil, double* N_used,
-	     double* CO2, const vector<OM*>& smb, const vector<OM*>&som);
+	     double* CO2, const vector<OM*>& smb, const vector<OM*>&som,
+	     const vector<OM*>& dom);
   void tick (unsigned int size, const double* turnover_factor,
 	     const double* N_soil, double* N_used,
 	     double* CO2, const vector<OM*>& smb, 
-	     double* som_C, double* som_N);
+	     double* som_C, double* som_N, const vector<OM*>& dom);
 private:
   void tock (unsigned int size, const double* rate,
 	     double factor, double efficiency, 
@@ -89,9 +91,8 @@ public:
   static double get_initial_C_per_N (const AttributeList&);
 
   // Create & Destroy.
-private:
-  void grow (unsigned int size);
 public:
+  void grow (unsigned int size);
   static void load_syntax (Syntax&, AttributeList&);
   OM (const AttributeList& al);
 };

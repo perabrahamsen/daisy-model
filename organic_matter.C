@@ -54,6 +54,7 @@ struct OrganicMatter::Implementation
   vector <AM*> am;		// Added Organic Matter.
   const vector<OM*> smb;	// Living Organic Matter.
   const vector<OM*> som;	// Soil Organic Matter.
+  const vector<OM*> dom;	// Dissolved Organic Matter.
   struct Buffer
   {
     vector<double> C;			// Carbon.
@@ -91,13 +92,18 @@ struct OrganicMatter::Implementation
   // Simulation.
   void add (AM&);
   void monthly (const Geometry&);
-  const double* find_abiotic (const OM& om,
-			       const int size, 
-			       const SoilWater& soil_water, 
-			       const SoilHeat& soil_heat,
-			       const vector<double>& default_value,
-			       vector<double>& scratch) const;
-  const double* find_abiotic (const OM& om,
+  const double* find_abiotic (const OM& om, // DOM
+			      const int size, 
+			      const SoilHeat& soil_heat,
+			      const vector<double>& default_value,
+			      vector<double>& scratch) const;
+  const double* find_abiotic (const OM& om, // AOM
+			      const int size, 
+			      const SoilWater& soil_water, 
+			      const SoilHeat& soil_heat,
+			      const vector<double>& default_value,
+			      vector<double>& scratch) const;
+  const double* find_abiotic (const OM& om, // SOM & SMB
 			      const int size, 
 			      const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
@@ -263,6 +269,8 @@ OrganicMatter::Implementation::total_N (const Geometry& geometry) const
     result += smb[i]->total_N (geometry);
   for (unsigned int i = 0; i < som.size (); i++)
     result += som[i]->total_N (geometry);
+  for (unsigned int i = 0; i < dom.size (); i++)
+    result += dom[i]->total_N (geometry);
   for (int i = 0; i < am.size (); i++)
     result += am[i]->total_N (geometry);
   
@@ -278,6 +286,8 @@ OrganicMatter::Implementation::total_C (const Geometry& geometry) const
     result += smb[i]->total_C (geometry);
   for (unsigned int i = 0; i < som.size (); i++)
     result += som[i]->total_C (geometry);
+  for (unsigned int i = 0; i < dom.size (); i++)
+    result += dom[i]->total_C (geometry);
   for (int i = 0; i < am.size (); i++)
     result += am[i]->total_C (geometry);
   
@@ -364,6 +374,11 @@ OrganicMatter::Implementation::output (Log& log,
 	      total_C[i] += som[j]->C[i];
 	      total_N[i] += som[j]->N[i];
 	    }
+	  for (unsigned int j = 0; j < dom.size (); j++)
+	    {
+	      total_C[i] += dom[j]->C[i];
+	      total_N[i] += dom[j]->N[i];
+	    }
 	  for (int j = 0; j < am.size (); j++)
 	    {
 	      total_C[i] += am[j]->C_at (i);
@@ -396,6 +411,7 @@ OrganicMatter::Implementation::output (Log& log,
     }
   output_ordered (smb, "smb", log);
   output_ordered (som, "som", log);
+  output_ordered (dom, "dom", log);
   output_submodule (buffer, "buffer", log);
   output_submodule (bioincorporation, "Bioincorporation", log);
   log.output ("NO3_source", NO3_source);
@@ -477,12 +493,33 @@ OrganicMatter::Implementation::monthly (const Geometry& geometry)
 const double*
 OrganicMatter::Implementation::find_abiotic (const OM& om,
 					     const int size, 
+					     const SoilHeat& soil_heat,
+					     const vector<double>& 
+					     /**/ default_value,
+					     vector<double>& scratch) const
+{				// DOM
+  const bool use_om_heat = (om.heat_factor.size () > 0);
+  
+  if (!use_om_heat)
+    return &default_value[0];
+  
+  for (unsigned int i = 0; i < size; i++)
+    {
+      const double T = soil_heat.T (i);
+      scratch[i] = om.heat_factor (T);
+    }
+  return &scratch[0];
+}
+
+const double*
+OrganicMatter::Implementation::find_abiotic (const OM& om,
+					     const int size, 
 					     const SoilWater& soil_water, 
 					     const SoilHeat& soil_heat,
 					     const vector<double>& 
 					     /**/ default_value,
 					     vector<double>& scratch) const
-{
+{				// AOM
   const bool use_om_heat = (om.heat_factor.size () > 0);
   const bool use_om_water = (om.water_factor.size () > 0);
   
@@ -518,7 +555,7 @@ OrganicMatter::Implementation::find_abiotic (const OM& om,
 					     /**/ default_value,
 					     bool use_clay,
 					     vector<double>& scratch) const
-{
+{				// SOM & SMB
   const bool use_om_heat = (om.heat_factor.size () > 0);
   const bool use_om_water = (om.water_factor.size () > 0);
   const bool use_tillage = (tillage_factor.size () > pool);
@@ -593,6 +630,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   vector<double> N_soil (size);
   vector<double> N_used (size);
+  vector<double> temp_factor (size);
   vector<double> abiotic_factor (size);
   vector<double> clay_factor (size);
   vector<double> tillage_factor (size);
@@ -609,37 +647,44 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       N_soil[i] = NH4 + NO3;
       N_used[i] = 0.0;
 
-      daisy_assert (finite (soil_water.h (i)));
-
-      abiotic_factor[i] 
-	= heat_turnover_factor (soil_heat.T (i)) 
-	* water_turnover_factor (soil_water.h (i));
+      const double h = soil_water.h (i);
+      daisy_assert (finite (h));
+      const double T = soil_heat.T (i);
+      const double heat = heat_turnover_factor (T);
+      const double water = water_turnover_factor (h);
+      temp_factor[i] = heat;
+      abiotic_factor[i] = heat * water;
       clay_factor[i] = abiotic_factor[i] * clay_turnover_factor [i];
     }
   
   // Main processing.
+  for (unsigned int j = 0; j < dom.size (); j++)
+    dom[j]->tick (size, find_abiotic (*dom[j], size, soil_heat, 
+				      temp_factor, tillage_factor),
+		  &N_soil[0], &N_used[0], &CO2[0], smb, dom, dom);
+
   smb[0]->tick (size, find_abiotic (*smb[0], size, soil_water, soil_heat,
 				    smb_tillage_factor, 0,
 				    clay_factor, true, tillage_factor),
-		&N_soil[0], &N_used[0], &CO2[0], smb, som);
+		&N_soil[0], &N_used[0], &CO2[0], smb, som, dom);
   for (unsigned int j = 1; j < smb.size (); j++)
     smb[j]->tick (size, find_abiotic (*smb[j], size, soil_water, soil_heat,
 				      smb_tillage_factor, j,
 				      abiotic_factor, false, tillage_factor),
-		  &N_soil[0], &N_used[0], &CO2[0], smb, som);
+		  &N_soil[0], &N_used[0], &CO2[0], smb, som, dom);
 
   for (unsigned int j = 0; j < som.size (); j++)
     som[j]->tick (size, find_abiotic (*som[j], size, soil_water, soil_heat,
 				      som_tillage_factor, j,
 				      clay_factor, true, tillage_factor),
-		  &N_soil[0], &N_used[0], &CO2[0], smb, som);
+		  &N_soil[0], &N_used[0], &CO2[0], smb, som, dom);
 
   for (unsigned int j = 0; j < added.size (); j++)
     added[j]->tick (size, find_abiotic (*added[j],
 					size, soil_water, soil_heat,
 					abiotic_factor, tillage_factor),
 		    &N_soil[0], &N_used[0], &CO2[0],
-		    smb, &buffer.C[0], &buffer.N[0]);
+		    smb, &buffer.C[0], &buffer.N[0], dom);
 
   // Update buffer.
   for (unsigned int i = 0; i < size; i++)
@@ -728,6 +773,8 @@ OrganicMatter::Implementation::mix (const Geometry& geometry,
     smb[i]->mix (geometry, from, to, penetration);
   for (unsigned int i = 0; i < som.size (); i++)
     som[i]->mix (geometry, from, to, penetration);
+  for (unsigned int i = 0; i < dom.size (); i++)
+    dom[i]->mix (geometry, from, to, penetration);
 
   // Leave CO2 alone.
 
@@ -754,6 +801,8 @@ OrganicMatter::Implementation::swap (const Geometry& geometry,
     smb[i]->swap (geometry, from, middle, to);
   for (unsigned int i = 0; i < som.size (); i++)
     som[i]->swap (geometry, from, middle, to);
+  for (unsigned int i = 0; i < dom.size (); i++)
+    dom[i]->swap (geometry, from, middle, to);
   // Leave CO2 alone.
 }
 
@@ -778,6 +827,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   // Sizes.
   const unsigned int smb_size = smb.size ();
   const unsigned int som_size = som.size ();
+  const unsigned int dom_size = dom.size ();
 
   // Production.
   CO2.insert (CO2.end (), soil.size (), 0.0);
@@ -837,12 +887,15 @@ initial_SOM layer in OrganicMatter ends below the last node");
 	  // Distribute it.
 	  for (unsigned int pool = 0; pool < som_size; pool++)
 	    {
-	      const double fraction = soil.SOM_C (lay, pool) / total_C;
+	      const double SOM_C = soil.SOM_C (lay, pool);
+	      const double SOM_C_per_N = soil.SOM_C_per_N (lay, pool);
+	      const double fraction = SOM_C / total_C;
 	      if (som[pool]->C.size () == lay)
 		som[pool]->C.push_back (total[lay] * fraction);
 	      if (som[pool]->N.size () == lay)
-		som[pool]->N.push_back (som[pool]->C[lay]
-					/ soil.SOM_C_per_N (lay, pool));
+		som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N);
+	      if (som[pool]->C_per_N_goal.size () == lay)
+		som[pool]->C_per_N_goal.push_back (SOM_C_per_N);
 	    }
 	}
     }
@@ -865,11 +918,14 @@ Using humus for remaining entries");
     {
       for (unsigned int pool = 0; pool < som_size; pool++)
 	{
+	  const double SOM_C = soil.SOM_C (lay, pool);
+	  const double SOM_C_per_N = soil.SOM_C_per_N (lay, pool);
 	  if (som[pool]->C.size () == lay)
-	    som[pool]->C.push_back (soil.SOM_C (lay, pool));
+	    som[pool]->C.push_back (SOM_C);
 	  if (som[pool]->N.size () == lay)
-	    som[pool]->N.push_back (som[pool]->C[lay]
-				    / soil.SOM_C_per_N (lay, pool));
+	    som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N);
+	  if (som[pool]->C_per_N_goal.size () == lay)
+	    som[pool]->C_per_N_goal.push_back (SOM_C_per_N);
 	}
     }
 
@@ -952,7 +1008,11 @@ Using initial C per N for remaining entries");
 		/ smb[pool]->initial_C_per_N;
 	      smb[pool]->N.push_back (N_content);
 	    }
-
+	  if (smb[pool]->C_per_N_goal.size () == lay)
+	    {
+	      daisy_assert (smb[pool]->initial_C_per_N > 0);
+	      smb[pool]->C_per_N_goal.push_back (smb[pool]->initial_C_per_N);
+	    }
 	}
       // This will keep C/N for SOM1, but change the total N content.
       daisy_assert (som[0]->C[lay] >= 0.0);
@@ -972,6 +1032,29 @@ Using initial C per N for remaining entries");
 		    approximate (som[0]->C[lay] / som[0]->N[lay], 
 				 old_C_per_N));
     }
+
+  // Initialize DOM.
+  for (unsigned int lay = 0; lay < soil.size (); lay++)
+    {
+      for (unsigned int pool = 0; pool < dom_size; pool++)
+	{	
+	  if (dom[pool]->C.size () == lay)
+	    dom[pool]->C.push_back (0.0);
+	  if (dom[pool]->N.size () == lay)
+	    {
+	      daisy_assert (dom[pool]->initial_C_per_N > 0);
+	      const double N_content = dom[pool]->C[lay]
+		/ dom[pool]->initial_C_per_N;
+	      dom[pool]->N.push_back (N_content);
+	    }
+	  if (dom[pool]->C_per_N_goal.size () == lay)
+	    {
+	      daisy_assert (dom[pool]->initial_C_per_N > 0);
+	      dom[pool]->C_per_N_goal.push_back (dom[pool]->initial_C_per_N);
+	    }
+	}
+    }
+  
   buffer.initialize (soil);
   
   // Biological incorporation.
@@ -992,6 +1075,7 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     am (map_create <AM> (al.alist_sequence ("am"))),
     smb (map_construct<OM> (al.alist_sequence ("smb"))),
     som (map_construct<OM> (al.alist_sequence ("som"))),
+    dom (map_construct<OM> (al.alist_sequence ("dom"))),
     buffer (al.alist ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
@@ -1011,6 +1095,7 @@ OrganicMatter::Implementation::~Implementation ()
   sequence_delete (am.begin (), am.end ());
   sequence_delete (smb.begin (), smb.end ());
   sequence_delete (som.begin (), som.end ());
+  sequence_delete (dom.begin (), dom.end ());
 }
 
 void 
@@ -1082,12 +1167,14 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 	    {
 	      vector<double> fractions
 		= om_alist[i]->number_sequence ("fractions");
-	      if (fractions.size () != impl.smb.size () + 1)
+	      if (fractions.size () != impl.smb.size () + 1 + impl.dom.size ()
+		  && fractions.size () != impl.smb.size () + 1)
 		{
 		  TmpStream tmp;
 		  tmp () << "You have " << fractions.size ()
 			 << " fractions but " << impl.smb.size ()
-			 << " smb and one buffer";
+			 << " smb, 1 buffer and " << impl.dom.size () 
+			 << " dom";
 		  err.entry (tmp.str ());
 		  ok = false;
 		}
@@ -1100,6 +1187,8 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 		  err.entry (tmp.str ());
 		  ok = false;
 		}
+	      if (om_alist[i]->number ("maintenance") != 0.0)
+		err.warning ("maintenance ignored for am");
 	    }
 	  else ok = false;
 	}
@@ -1145,6 +1234,7 @@ check_alist (const AttributeList& al, Treelog& err)
   const vector<AttributeList*>& am_alist = al.alist_sequence ("am");
   const vector<AttributeList*>& smb_alist = al.alist_sequence ("smb");
   const vector<AttributeList*>& som_alist = al.alist_sequence ("som");
+  const vector<AttributeList*>& dom_alist = al.alist_sequence ("dom");
 
   for (unsigned int j = 0; j < am_alist.size(); j++)
     {
@@ -1157,20 +1247,23 @@ check_alist (const AttributeList& al, Treelog& err)
 	  bool om_ok = true;
 	  const vector<AttributeList*>& om_alist
 	    = am_alist[j]->alist_sequence ("om");
-	  for (unsigned int i = 0; i < smb_alist.size(); i++)
+	  for (unsigned int i = 0; i < om_alist.size(); i++)
 	    {
 	      TmpStream tmp;
 	      tmp () << "om[" << i << "]";
 	      Treelog::Open nest (err, tmp.str ());
 	      vector<double> fractions
 		= om_alist[i]->number_sequence ("fractions");
-	      if (fractions.size () != smb_alist.size () + 1)
+	      if (fractions.size ()
+		  != smb_alist.size () + 1 + dom_alist.size ()
+		  && fractions.size () != smb_alist.size () + 1)
 		{
 		  TmpStream tmp;
 		  tmp () << "You have " << fractions.size ()
 			 << " fractions but " << smb_alist.size ()
-			 << " smb and one buffer";
-		  err.entry (tmp.str ());
+			 << " smb, 1 buffer and " << dom_alist.size ()
+			 << " dom";
+		  err.error (tmp.str ());
 		  om_ok = false;
 		}
 	      double sum
@@ -1179,9 +1272,12 @@ check_alist (const AttributeList& al, Treelog& err)
 		{
 		  TmpStream tmp;
 		  tmp () << "The sum of all fractions is " << sum;
-		  err.entry (tmp.str ());
+		  err.error (tmp.str ());
 		  om_ok = false;
 		}
+	      if (om_alist[i]->number ("maintenance") != 0.0)
+		err.warning ("maintenance ignored for am");
+
 	      if (!om_ok)
 		am_ok = false;
 	    }
@@ -1197,13 +1293,14 @@ check_alist (const AttributeList& al, Treelog& err)
       Treelog::Open nest (err, tmp.str ());
       bool om_ok = true;
       vector<double> fractions = smb_alist[i]->number_sequence ("fractions");
-      if (fractions.size () != smb_alist.size () + som_alist.size ())
+      if (fractions.size () 
+	  != smb_alist.size () + som_alist.size () + dom_alist.size ())
 	{
 	  TmpStream tmp;
 	  tmp () << "You have " << fractions.size () << " fractions but " 
-		 << smb_alist.size () << " smb and " << som_alist.size ()
-		 << " som";
-	  err.entry (tmp.str ());
+		 << smb_alist.size () << " smb, " << som_alist.size ()
+		 << " som and " << dom_alist.size () << " dom";
+	  err.error (tmp.str ());
 	  om_ok = false;
 	}
       vector<double> efficiency = smb_alist[i]->number_sequence ("efficiency");
@@ -1212,7 +1309,7 @@ check_alist (const AttributeList& al, Treelog& err)
 	  TmpStream tmp;
 	  tmp () << "You have " << efficiency.size () << " efficiency but " 
 		 << smb_alist.size () << " smb";
-	  err.entry (tmp.str ());
+	  err.error (tmp.str ());
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
@@ -1220,12 +1317,15 @@ check_alist (const AttributeList& al, Treelog& err)
 	{
 	  TmpStream tmp;
 	  tmp () << "The sum of all fractions is " << sum;
-	  err.entry (tmp.str ());
+	  err.error (tmp.str ());
 	  om_ok = false;
 	}
+      if (smb_alist[i]->number ("top_C") != 0.0
+	  || smb_alist[i]->number ("top_N") != 0.0)
+	err.warning ("Surface content ignored");
       if (!(OM::get_initial_C_per_N (*smb_alist[i]) > 0))
 	{
-	  err.entry ("C/N unspecified");
+	  err.error ("C/N unspecified");
 	  om_ok = false;
 	}
 
@@ -1245,17 +1345,18 @@ check_alist (const AttributeList& al, Treelog& err)
 	  TmpStream tmp;
 	  tmp () << "You have " << efficiency.size () << " efficiency but " 
 		 << smb_alist.size () << " smb";
-	  err.entry (tmp.str ());
+	  err.error (tmp.str ());
 	  om_ok = false;
 	}
       vector<double> fractions = som_alist[i]->number_sequence ("fractions");
-      if (fractions.size () != smb_alist.size () + som_alist.size ())
+      if (fractions.size () 
+	  != smb_alist.size () + som_alist.size () + dom_alist.size ())
 	{
 	  TmpStream tmp;
 	  tmp () << "You have " << fractions.size () << " fractions but " 
-		 << smb_alist.size () << " smb and " << som_alist.size ()
-		 << " som";
-	  err.entry (tmp.str ());
+		 << smb_alist.size () << " smb, " << som_alist.size ()
+		 << " som and " << dom_alist.size () << " dom";
+	  err.error (tmp.str ());
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
@@ -1263,7 +1364,60 @@ check_alist (const AttributeList& al, Treelog& err)
 	{
 	  TmpStream tmp;
 	  tmp () << "The sum of all fractions is " << sum;
-	  err.entry (tmp.str ());
+	  err.error (tmp.str ());
+	  om_ok = false;
+	}
+      if (som_alist[i]->number ("maintenance") != 0.0)
+	err.warning ("maintenance ignored for som");
+      if (som_alist[i]->number ("top_C") != 0.0
+	  || som_alist[i]->number ("top_N") != 0.0)
+	err.warning ("Surface content ignored");
+      if (!om_ok)
+	ok = false;
+    }
+  for (unsigned int i = 0; i < dom_alist.size(); i++)
+    {
+      TmpStream tmp;
+      tmp () << "dom[" << i << "]";
+      Treelog::Open nest (err, tmp.str ());
+      bool om_ok = true;
+      
+      vector<double> efficiency = dom_alist[i]->number_sequence ("efficiency");
+      if (efficiency.size () != smb_alist.size ())
+	{
+	  TmpStream tmp;
+	  tmp () << "You have " << efficiency.size () << " efficiency but " 
+		 << smb_alist.size () << " smb";
+	  err.error (tmp.str ());
+	  om_ok = false;
+	}
+      vector<double> fractions = dom_alist[i]->number_sequence ("fractions");
+      if (fractions.size () 
+	  != smb_alist.size () + som_alist.size () + dom_alist.size ())
+	{
+	  TmpStream tmp;
+	  tmp () << "You have " << fractions.size () << " fractions but " 
+		 << smb_alist.size () << " smb, " << som_alist.size ()
+		 << " som and " << dom_alist.size () << " dom";
+	  err.error (tmp.str ());
+	  om_ok = false;
+	}
+      double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
+      if (fabs (sum - 1.0) > 0.0001)
+	{
+	  TmpStream tmp;
+	  tmp () << "The sum of all fractions is " << sum;
+	  err.error (tmp.str ());
+	  om_ok = false;
+	}
+      if (dom_alist[i]->number ("maintenance") != 0.0)
+	err.warning ("maintenance ignored for dom");
+      if (dom_alist[i]->number ("top_C") != 0.0
+	  || dom_alist[i]->number ("top_N") != 0.0)
+	err.warning ("Surface content ignored"); 
+      if (!(OM::get_initial_C_per_N (*dom_alist[i]) > 0))
+	{
+	  err.error ("C/N unspecified");
 	  om_ok = false;
 	}
       if (!om_ok)
@@ -1406,6 +1560,13 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
 	      Syntax::Sequence,
 	      "Layered initialization of soil SOM content.");
+
+  syntax.add_submodule_sequence ("dom", Syntax::State, 
+				 "Dissolved Organic Matter pools.",
+				 OM::load_syntax);
+  vector<AttributeList*> DOM;
+  alist.add ("dom", DOM);
+
   PLF empty;
   syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
 	      "Default heat factor, used if not specified by OM pool.");

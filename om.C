@@ -47,12 +47,12 @@ OM::output (Log& log) const
       daisy_assert (C.size () >= size);
       for (int i = 0; i < size; i++)
 	{
-	  if (N[i] != 0.0)
+	  if (N[i] == 0.0)
 	    C_per_N.push_back (Unspecified);
 	  else
 	    C_per_N.push_back (C[i] / N[i]);
 	}
-      log.output ("C_per_N", N);
+      log.output ("C_per_N", C_per_N);
     }
 }
 
@@ -127,16 +127,8 @@ OM::N_at (unsigned int at) const
 double 
 OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.
 {
-  // Actually, we might want to calcualte this statically.  For SOM,
-  // we have a static horizon dependend parameter, and for SMB we can
-  // use the initial_C_per_N.  This should never be called for AM.
-  // 
-  // Maybe we should change this when implementing goal_C_per_P.
-  daisy_assert (C.size () > at);
-  daisy_assert (N.size () > at);
-  daisy_assert (C[at] > 0.0);
-  daisy_assert (N[at] > 0.0);
-  return C[at] / N[at];
+  daisy_assert (C_per_N_goal.size () > at);
+  return C_per_N_goal[at];
 }
 
 void
@@ -227,8 +219,8 @@ OM::tock (unsigned int end, const double* factor,
       daisy_assert (rate >=0);
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (N[i] >= 0.0);
-      daisy_assert (om.N[i] > 0.0);
-      daisy_assert (om.C[i] > 0.0);
+      daisy_assert (om.N[i] >= 0.0);
+      daisy_assert (om.C[i] >= 0.0);
       const double om_C_per_N_goal = om.goal_C_per_N (i);
       double N_produce = N[i] * rate;
       double N_consume = C[i] * rate * efficiency / om_C_per_N_goal;
@@ -297,7 +289,8 @@ OM::tock (unsigned int end, const double* factor,
 void
 OM::tick (unsigned int end, const double* abiotic_factor, 
 	  const double* N_soil, double* N_used,
-	  double* CO2, const vector<OM*>& smb, const vector<OM*>&som)
+	  double* CO2, const vector<OM*>& smb, const vector<OM*>&som,
+	  const vector<OM*>& dom)
 {
   const unsigned int size = min (C.size (), end);
   daisy_assert (N.size () >= size);
@@ -320,9 +313,11 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	}
     }
 
-  daisy_assert (fractions.size () == smb.size () + som.size ());
-  // Distribute to all biological pools.
   const unsigned int smb_size = smb.size ();
+  const unsigned int som_size = som.size ();
+  const unsigned int dom_size = dom.size ();
+  daisy_assert (fractions.size () == smb_size + som_size + dom_size);
+  // Distribute to all biological pools.
   for (unsigned int j = 0; j < smb_size; j++)
     {
       const double fraction = fractions[j];
@@ -331,13 +326,20 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	      N_soil, N_used, CO2, *smb[j]);
     }
   // Distribute to all soil pools.
-  const unsigned int som_size = som.size ();
   for (unsigned int j = 0; j < som_size; j++)
     {
       const double fraction = fractions[smb_size + j];
       if (fraction > 1e-50)
 	tock (size, abiotic_factor, turnover_rate * fraction, 1.0,
 	      N_soil, N_used, CO2, *som[j]);
+    }
+  // Distribute to all dissolved pools.
+  for (unsigned int j = 0; j < dom_size; j++)
+    {
+      const double fraction = fractions[smb_size + som_size + j];
+      if (fraction > 1e-50)
+	tock (size, abiotic_factor, turnover_rate * fraction, 1.0,
+	      N_soil, N_used, CO2, *dom[j]);
     }
   for (unsigned int i = 0; i < size; i++)
     {
@@ -349,14 +351,18 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 void 
 OM::tick (unsigned int end, const double* abiotic_factor, 
 	  const double* N_soil, double* N_used,
-	  double* CO2, const vector<OM*>& smb, double* som_C, double* som_N)
+	  double* CO2, const vector<OM*>& smb, double* som_C, double* som_N,
+	  const vector<OM*>& dom)
 {
   const unsigned int size = min (C.size (), end);
   daisy_assert (N.size () >= size);
   daisy_assert (maintenance == 0.0);
   
-  // Distribute to all biological pools.
   const unsigned int smb_size = smb.size ();
+  const unsigned int dom_size = dom.size ();
+  daisy_assert (fractions.size () >= smb_size + 1);
+
+  // Distribute to all biological pools.
   for (unsigned int j = 0; j < smb_size; j++)
     {
       const double fraction = fractions[j];
@@ -379,6 +385,19 @@ OM::tick (unsigned int end, const double* abiotic_factor,
       daisy_assert (C[i] >= 0.0);
       daisy_assert (som_C[i] >= 0.0);
       daisy_assert (som_N[i] >= 0.0);
+    }
+
+  if (fractions.size () == smb_size + 1)
+    return;
+  daisy_assert (fractions.size () == smb_size + 1 + dom_size);
+
+  // Distribute to all dissolved pools.
+  for (unsigned int j = 0; j < dom_size; j++)
+    {
+      const double fraction = fractions[smb_size + 1 + j];
+      if (fraction > 1e-50)
+	tock (size, abiotic_factor, turnover_rate * fraction, efficiency[j],
+	      N_soil, N_used, CO2, *dom[j]);
     }
 }
 
@@ -451,7 +470,7 @@ You cannot specify 'C_per_N' for intervals where 'C' is unspecified.");
 	    {
 	      if (C_per_N[i] < 0.0)
 		/* do nothing */;
-	      if (N[i] == 0)
+	      else if (N[i] == 0)
 		bogus = true;
 	      else if (!approximate (C[i] / N[i], C_per_N[i]))
 		bogus = true;
@@ -474,10 +493,10 @@ OM::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "OM");
   alist.add ("description", "\
 Organic matter.  This is a common abstraction for the SMB (Soil\n\
-MicroBiomass), SOM (Soil Organic Matter) and AOM (Added Organic Matter)\n\
-pools.  That is, all the organic matter in the soil.  Some attributes,\n\
-such as 'maintenance', are only meaningful for certain kinds of organic\n\
-matter, in this case the SMB pools.");
+MicroBiomass), SOM (Soil Organic Matter) DOM (Dissolved Organic Matter)\n\
+and AOM (Added Organic Matter) pools.  That is, all the organic matter\n\
+in the soil.  Some attributes, such as 'maintenance', are only meaningful\n\
+for certain kinds of organic matter, in this case the SMB pools.");
   syntax.add ("top_C", "g C/cm^2", Check::non_negative (), Syntax::State,
 	      "Carbon on top of soil.");
   alist.add ("top_C", 0.0);
@@ -487,7 +506,7 @@ matter, in this case the SMB pools.");
   syntax.add ("C", "g C/cm^3", Check::non_negative (),
 	      Syntax::OptionalState, Syntax::Sequence,
 	      "Carbon in each soil interval.");
-  syntax.add ("C_per_N", "(g C/cm^3)/(g N/cm^3)", Check::positive (), 
+  syntax.add ("C_per_N", "(g C/cm^3)/(g N/cm^3)", Check::none (), 
 	      Syntax::OptionalState, Syntax::Sequence, 
 	      "The carbon/nitrogen ratio.");
   syntax.add ("N", "g N/cm^3", Check::non_negative (),

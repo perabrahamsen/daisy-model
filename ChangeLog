@@ -1,5 +1,8 @@
 2002-05-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* organic_matter.C (dom): New member. 
+	(total_N, total_C, output, mix, swap, initialize, load_syntax): Use it.
+
 	* Version 2.32 released.
 
 2002-05-31  Per Abrahamsen  <abraham@dina.kvl.dk>
