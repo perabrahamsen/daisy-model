@@ -1,7 +1,5 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Prøv at få mingw daisy til at køre lige så hurtig som 2.47
-
 * exercises 
 
 ** Konverter til LaTeX
@@ -44,15 +42,13 @@ I den første linie skal "begyndelsesindhold" stå.
 
 Øverste tredjedel af aquitarten.
 
-* Udskriv default værdier i sample referencemanual.
-
 * SH: PowerPoint validation slides på hjemmeside.
-
-* Check let at bruge GUI version of CVS til Windows.
 
 * SH: Ny ref-evap model
 
 * Min & max T i klimafil, udregn average.
+
+* Check let at bruge GUI version of CVS til Windows.
 
 * Partit komponent
 

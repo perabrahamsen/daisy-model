@@ -1,3 +1,19 @@
+2003-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.57 released.
+
+2003-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_std.C (CanopyStructure): Added some consts.
+
+	* action_sow.C (diIt): Added space to message.
+
+2003-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/dwf.tex (chapter{Daisy Weather File Format}): Warn about
+	specifying End a few days before the end of the file.
+	* lib/weather.dwf (End): Ditto
+
 2003-02-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.56 released.
@@ -8,8 +24,9 @@
 	* vcheck.C: Ditto.
 
 	* printer_file.C, printer_file.h (print_string): Exported.
+	* document_LaTeX.C (print_string): New function.
 	* document_LaTeX.C (print_sample_ordered, print_sample_entry)
-	(print_sample_header): Use them.
+	(print_sample_header): Use it.
 
 	* document_LaTeX.C (print_entry_value, print_entry_category)
 	(print_entry_type, print_entry_submodel): Remove redundant arguments. 

@@ -577,8 +577,8 @@ depend: $(SOURCES)
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	c++ -I. $(TKINCLUDE) $(GTKMMINCLUDE)  $(QTINCLUDE) \
-	        -MM $(SOURCES) | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
+	$(CC) -I. $(TKINCLUDE) $(GTKMMINCLUDE)  $(QTINCLUDE) \
+              -MM $(SOURCES) | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
 #
@@ -589,7 +589,7 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
-	$(MAKE) native #cross
+	$(MAKE) native cross
 	mv -f $(WWWINDEX) $(WWWINDEX).old
 	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
 		< $(WWWINDEX).old > $(WWWINDEX)

@@ -109,7 +109,6 @@ CanopyStandard::CanopyStructure (double DS)
   double z0;			// Height of first leaf [0 - 1].
   double z1;			// Min height of the MaxLAD area [0 - 1].
   double z2;			// Max height of the MaxLAD area [0 - 1].
-  double Area;		        // Area spanned by z0, z1, and z2.
 
   daisy_assert (DS > 0.0);
   if (DS <= 1)
@@ -122,7 +121,8 @@ CanopyStandard::CanopyStructure (double DS)
       z0 = LAIDist0[0] + (LAIDist1[0] - LAIDist0[0]) * DS;
       z1 = LAIDist0[1] + (LAIDist1[1] - LAIDist0[1]) * DS;
       z2 = LAIDist0[2] + (LAIDist1[2] - LAIDist0[2]) * DS;
-      Area = (1.0 + z2 - z1 - z0) / 2.0;
+      // Area spanned by z0, z1, and z2.
+      const double Area = (1.0 + z2 - z1 - z0) / 2.0;
       daisy_assert (Area > 0.0);
       daisy_assert (Height > 0.0);
       LADm = CAI / (Area * Height);
@@ -134,8 +134,9 @@ CanopyStandard::CanopyStructure (double DS)
       z0 = LAIDist1[0];
       z1 = LAIDist1[1];
       z2 = LAIDist1[2];
-      double Area = (1.0 + z2 - z1 - z0) / 2.0;
-      double MaxLAD = CAI / (Area * Height);
+      // Area spanned by z0, z1, and z2.
+      const double Area = (1.0 + z2 - z1 - z0) / 2.0;
+      const double MaxLAD = CAI / (Area * Height);
 
       if (MaxLAD > LADm)
 	// After DS = 1 CAI may increase for some time, keeping
@@ -148,11 +149,8 @@ CanopyStandard::CanopyStructure (double DS)
 	  // increasing z1 and z0.
 
 	  // Need is the Area we want after moving z1 and z0.
-	  double Need = CAI / Height / LADm;
-
-	  if (approximate (Area, Need))
-	    Need = Area;
-
+	  daisy_assert (Area * 1.0001 >= CAI / Height / LADm);
+	  const double Need = min (CAI / Height / LADm, Area);
 	  daisy_assert (Need <= Area);
 	  daisy_assert (Need > 0);
 
@@ -173,10 +171,10 @@ CanopyStandard::CanopyStructure (double DS)
 	      // This gives us three equations with three unknown.
 	      // We can solve them to get x0, x1, and y1.
 
-	      double x0 = 1.0 - sqrt (2.0 * Need * (z1 - z2 - z0 + 1.0));
-	      double x1
+	      const double x0 = 1.0 - sqrt (2.0 * Need * (z1 - z2 - z0 + 1.0));
+	      const double x1
 		= 1.0 + (z2 - 1) * sqrt (2.0 * Need / (z1 - z2 - z0 + 1.0));
-	      double y1 = sqrt (2.0 * Need / (z1 - z2 - z0 + 1.0));
+	      const double y1 = sqrt (2.0 * Need / (z1 - z2 - z0 + 1.0));
 
 	      // Check the results.
 	      daisy_assert (approximate (Need, (1.0 - x0) * y1 / 2.0));

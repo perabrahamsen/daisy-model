@@ -42,6 +42,7 @@ struct DocumentLaTeX : public Document
   void print_quoted (std::ostream&, const string&);
 
   // Private functions.
+  void print_string (std::ostream&, const string&);
   bool is_submodel (const Syntax&, const AttributeList&, const string&);
   string find_submodel (const Syntax&, const AttributeList&, const string&);
   void print_index (std::ostream& out, const string& name);
@@ -162,6 +163,14 @@ DocumentLaTeX::print_quoted (std::ostream& out, const string& name)
       default:
 	out << name[i];
       }
+}
+
+void
+DocumentLaTeX::print_string (std::ostream& out, const string& name)
+{
+  TmpStream tmp;
+  PrinterFile::print_string (tmp (), name);
+  print_quoted (out, tmp.str ());
 }
 
 bool 
@@ -645,7 +654,7 @@ DocumentLaTeX::print_sample_ordered (std::ostream& out,
 { 
   ordered = true;
   out << "\\textit{";
-  PrinterFile::print_string (out, name);
+  print_string (out, name);
   out << "}";
   if (sequence)
     out << "\\ldots{}";
@@ -664,7 +673,7 @@ DocumentLaTeX::print_sample_entry (std::ostream& out,
     ordered = true;
       
   out << "(";
-  PrinterFile::print_string (out, name);
+  print_string (out, name);
 
   if (alist.check (name))
     {
@@ -702,7 +711,7 @@ DocumentLaTeX::print_sample_entry (std::ostream& out,
 	      if (value.length () < 20)
 		{
 		  out << "~";
-		  PrinterFile::print_string (out, value);
+		  print_string (out, value);
 		  out << ")";
 		  print_name = false;
 		}
@@ -791,7 +800,7 @@ DocumentLaTeX::print_sample_header (std::ostream& out, const string& name)
   out << "\n\\noindent\n\\begin{tt}\n\\begin{tabular}{lll}\n$<$~";
   if (!submodel)
     {
-      PrinterFile::print_string (out, name);
+      print_string (out, name);
       out << "~";
     }
   out << "&";
