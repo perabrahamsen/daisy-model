@@ -16,6 +16,8 @@ struct Bioclimate;
 struct CSMP;
 struct Library;
 struct Syntax;
+struct SoilWater;
+struct Soil;
 
 class Crop 
 {
@@ -33,8 +35,8 @@ public:
   virtual double EPext () const = 0;
   virtual double IntcpCap () const = 0; // Interception Capacity.
   virtual double EpFac () const = 0; // Convertion to potential evapotransp.
-  
   virtual void CanopyStructure () = 0;
+  virtual double ActualWaterUptake (double Ept, const Soil&, SoilWater&) = 0;
 
   // Simulation.
 public:

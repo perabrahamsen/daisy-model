@@ -19,6 +19,7 @@ public:
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
+  double M (double h) const;
 private:
   double Sr (double h) const;
   
@@ -59,6 +60,15 @@ HorizonB_C::h (const double Theta) const
     return h_b / pow(Theta / Theta_sat, b);
   else
     return h_b;
+}
+
+double 
+HorizonB_C::M (double h) const
+{
+  if (h < h_b)
+    return K_sat * (-h_b / (1 + 3/b)) * pow (h_b / h, 1 + 3/b);
+  else
+    return K_sat * h;
 }
 
 double 

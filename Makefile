@@ -20,7 +20,7 @@ TEST = crop.dai old_crop.chp old_crop.log \
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = uzrichard.h
+REMOVE = none
 
 .SUFFIXES:	.C .o .h
 
@@ -36,6 +36,12 @@ bug.o:	bug.C
 
 wc: $(TEXT)
 	wc -l $(TEXT)
+
+wc-h: $(HEAD)
+	wc -l $(HEAD)
+
+wc-s: $(SRC)
+	wc -l $(SRC)
 
 tags: TAGS
 
@@ -136,8 +142,9 @@ soil.o: soil.C soil.h horizon.h alist.h common.h syntax.h
 mathlib.o: mathlib.C mathlib.h
 bioclimate.o: bioclimate.C bioclimate.h surface.h uzmodel.h weather.h \
  time.h crop.h csmp.h alist.h common.h soil.h horizon.h syntax.h \
- snow.h
-surface.o: surface.C surface.h uzmodel.h
+ snow.h soil_water.h
+surface.o: surface.C surface.h uzmodel.h syntax.h alist.h common.h \
+ log.h
 soil_water.o: soil_water.C soil_water.h log.h alist.h common.h \
  uzmodel.h soil.h horizon.h surface.h groundwater.h time.h syntax.h
 soil_NH4.o: soil_NH4.C soil_NH4.h
@@ -149,8 +156,6 @@ soil_heat.o: soil_heat.C soil_heat.h alist.h common.h bioclimate.h \
  syntax.h
 groundwater.o: groundwater.C groundwater.h time.h uzmodel.h library.h \
  alist.h common.h syntax.h
-uzrichard.o: uzrichard.C uzrichard.h uzmodel.h soil.h horizon.h \
- mathlib.h alist.h common.h syntax.h
 snow.o: snow.C snow.h alist.h common.h syntax.h
 column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h soil.h horizon.h soil_water.h soil_heat.h soil_NH4.h \
@@ -160,6 +165,8 @@ manager_rule.o: manager_rule.C manager.h syntax.h rules.h alist.h \
  common.h
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
  common.h
+uzrichard.o: uzrichard.C uzmodel.h soil.h horizon.h mathlib.h alist.h \
+ common.h syntax.h
 horizon_yolo.o: horizon_yolo.C horizon.h syntax.h alist.h common.h
 horizon_M_vG.o: horizon_M_vG.C horizon.h syntax.h alist.h common.h
 horizon_B_vG.o: horizon_B_vG.C horizon.h syntax.h alist.h common.h

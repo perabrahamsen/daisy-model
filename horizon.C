@@ -4,6 +4,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
+#include "csmp.h"
 #include <vector.h>
 #include <map.h>
 
@@ -15,6 +16,25 @@ bool
 Horizon::compact () const
 {
   return false;
+}
+
+void
+Horizon::K_to_M (CSMP& csmp, const int intervals) const
+{
+  static const double h0 = -20000;
+  const double Ksat = K (0);
+  const double max_change = pow (Ksat / K (h0), 1 / intervals);
+  double step = (0 - h0) / 4;
+
+  double h = h0;
+  while (h < 0)
+    {
+      csmp.add (h, K (h0));
+      step *= 2;
+      while (K (h) / K (h + step) > max_change)
+	step /= 2;
+      h += step;
+    }
 }
 
 const Library&

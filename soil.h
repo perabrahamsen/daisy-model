@@ -42,6 +42,8 @@ public:
   { return horizon_[i]->Theta (h); }
   inline double h (int i, double h) const
   { return horizon_[i]->h (h); }
+  inline double M (int i, double h) const
+  { return horizon_[i]->M (h); }
   inline bool compact (int i) const
   { return horizon_[i]->compact (); }
   

@@ -8,12 +8,14 @@
 #include "bioclimate.h"
 #include "common.h"
 #include "ftable.h"
+#include "ftable.t"
 #include "csmp.h"
 #include "syntax.h"
 #include "alist.h"
 #include "filter.h"
 #include "bioclimate.h"
-#include "ftable.t"
+#include "soil_water.h"
+#include "soil.h"
 
 #include <list.h>
 
@@ -37,34 +39,39 @@ public:
   double IntcpCap () const; // Interception Capacity.
   double EpFac () const; // Convertion to potential evapotransp.
   void CanopyStructure ();
+  double ActualWaterUptake (double Ept, const Soil&, SoilWater&);
   
   // Internal functions.
 protected:
- virtual double SoluteUptake (string /* SoluteID */, double /* PotNUpt */,
-			       double /* I_Mx */, double /* Rad */);
-  virtual double H2OUptake (double PotTransp,
-			    double /* RootRad */, double /* h_wp */);
+  double PotentialWaterUptake (const double h, 
+			       const Soil& soil, const SoilWater& soil_water);
+  double SoluteUptake (string /* SoluteID */, double /* PotNUpt */,
+		       double /* I_Mx */, double /* Rad */);
+#if 0
+  double H2OUptake (double PotTransp, double /* RootRad */, double /* h_wp */);
+#endif
+
 public:				// Used by external development models.
-  virtual void Vernalization (double Ta);
+  void Vernalization (double Ta);
 protected:
-  virtual void Emergence (const Column& column);
-  virtual void DevelopmentStage (const Bioclimate&);
-  virtual double CropHeight ();
-  virtual void InitialLAI ();
-  virtual double CropLAI ();
-  virtual void RootPenetration (const Column& column);
-  virtual double RootDensDistPar (double a);
-  virtual void RootDensity ();
-  virtual void NitContent ();
-  virtual void NitrogenUptake (int Hour);
+  void Emergence (const Column& column);
+  void DevelopmentStage (const Bioclimate&);
+  double CropHeight ();
+  void InitialLAI ();
+  double CropLAI ();
+  void RootPenetration (const Column& column);
+  double RootDensDistPar (double a);
+  void RootDensity ();
+  void NitContent ();
+  void NitrogenUptake (int Hour);
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
-  virtual double CanopyPhotosynthesis (const Bioclimate&);
-  virtual void AssimilatePartitioning (double DS, 
+  double CanopyPhotosynthesis (const Bioclimate&);
+  void AssimilatePartitioning (double DS, 
 				       double& f_Leaf, double& f_Stem,
 				       double& f_Root, double& f_SOrg);
-  virtual double MaintenanceRespiration (double r, double Q10,
+  double MaintenanceRespiration (double r, double Q10,
 					 double w, double T);
-  virtual void NetProduction (const Column&, const Bioclimate&);
+  void NetProduction (const Column&, const Bioclimate&);
 
   // Simulation.
 public:
@@ -77,7 +84,7 @@ private:
   static Crop* make (const AttributeList&);
   CropStandard (const AttributeList& vl);
 public:
-  virtual ~CropStandard ();
+  ~CropStandard ();
 };
 
 // Chemical constants affecting the crop.
@@ -358,15 +365,20 @@ CropStandard::Parameters::pList CropStandard::Parameters::all;
 const CropStandard::Parameters& 
 CropStandard::Parameters::get (const string n, const AttributeList& vl)
 {
+#if 0
   for (pList::iterator i = all.begin (); i != all.end (); i++)
     {
+
       // BUG: We should test that all the parameters (but not
       // variables) are equal!
       if ((*i)->name == n)
 	return *(*i);
     }
+#endif
   const Parameters* p = new Parameters (n, vl);
+#if 0
   all.push_back (p);
+#endif
   return *p;
 }
 
@@ -911,6 +923,7 @@ CropStandard::SoluteUptake (string /* SoluteID */, double PotNUpt,
   return PotNUpt;
 }
 
+#if 0
 double
 CropStandard::H2OUptake (double PotTransp, double /* RootRad */, double /* h_wp */)
 {
@@ -918,6 +931,7 @@ CropStandard::H2OUptake (double PotTransp, double /* RootRad */, double /* h_wp 
 
   return PotTransp;
 }
+#endif
 
 void
 CropStandard::Vernalization (double Ta)
@@ -1100,6 +1114,48 @@ CropStandard::CanopyStructure ()
   LADvsH.add (z2 * Canopy.Height, Canopy.LADm);
   LADvsH.add (     Canopy.Height, 0.0);
   Canopy.LAIvsH = LADvsH.integrate_stupidly ();
+}
+
+double
+CropStandard::ActualWaterUptake (double Ept, const Soil& soil, SoilWater& soil_water)
+{
+  static const double max_error = 0.001;
+  const double EptMin = Ept / (1 + max_error);
+  const double EptMax = Ept * (1 + max_error);
+  double total = 0.0;
+  double h = par.Root.h_wp;
+  double step = -h;
+  
+  while ((total = PotentialWaterUptake (h, soil, soil_water)) > EptMax)
+    {
+      do
+	step /= 2;
+      while ((total = PotentialWaterUptake (h + step, soil, soil_water)) < EptMin);
+      h += step;
+    }
+  return total;
+}
+
+double
+CropStandard::PotentialWaterUptake (const double h, 
+				    const Soil& soil, const SoilWater& soil_water)
+{
+  vector<double>& S = var.RootSys.H2OExtraction;
+  if (S.size () < soil.size () + 0U)
+    S.insert (S.begin (), soil.size () - S.size (), 0.0);
+  double total = 0.0;
+  for (int i = 0; i < soil.size (); i++)
+    {
+      const double L = 42;	// BUG!
+      const double uptake = 
+	L
+	* (soil.Theta (i, h) / soil.Theta (i, 0.0))
+	* (soil.M (i, soil_water.h (i)) - soil.M (i, h))
+	/ (- 0.5 * log (par.Root.Rad * par.Root.Rad  * M_PI * L));
+      S[i] = uptake;
+      total += uptake;
+    }
+  return total;
 }
 
 void 

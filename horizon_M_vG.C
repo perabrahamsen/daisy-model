@@ -4,6 +4,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
+#include "csmp.h"
 
 class HorizonM_vG : public Horizon
 {
@@ -22,6 +23,7 @@ public:
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
+  double M (double h) const;
 private:
   double Se (double h) const;
   
@@ -72,6 +74,20 @@ HorizonM_vG::h (const double Theta) const
 		   + Theta / (Theta_sat - Theta_ref), -1 / m) - 1, 1 / n) / a;
   else
     return 0.0;
+}
+
+double 
+HorizonM_vG::M (double h) const
+{
+  // Use.
+  static CSMP csmp;
+  static bool initialized = false;
+  if (!initialized)
+    {
+      K_to_M (csmp, 500);
+      initialized = true;
+    }
+  return csmp (h);
 }
 
 double 

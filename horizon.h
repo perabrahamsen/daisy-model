@@ -8,6 +8,7 @@
 struct AttributeList;
 struct Library;
 struct Syntax;
+struct CSMP;
 
 class Horizon 
 {
@@ -17,7 +18,11 @@ public:
   virtual double K (double h) const = 0;
   virtual double Cw2 (double h) const = 0;
   virtual double h (double Theta) const = 0;
+  virtual double M (double h) const = 0;
   virtual bool compact () const;
+
+  // Tools for derived classes.
+  void K_to_M (CSMP&, int) const;
 
   // Library.
 public:

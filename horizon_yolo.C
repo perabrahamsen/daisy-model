@@ -4,15 +4,16 @@
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
+#include "csmp.h"
 
 class HorizonYolo : public Horizon
 {
-  // Use.
 public:
   double Theta (double h) const;
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
+  double M (double h) const;
 
   // Create and Destroy.
 private:
@@ -58,6 +59,20 @@ HorizonYolo::h (const double Theta) const
     return -exp(sqrt(sqrt(274.2 / (Theta - 0.124) - 739.)));
   else
     return -1;
+}
+
+double 
+HorizonYolo::M (double h) const
+{
+  // Use.
+  static CSMP csmp;
+  static bool initialized = false;
+  if (!initialized)
+    {
+      K_to_M (csmp, 500);
+      initialized = true;
+    }
+  return csmp (h);
 }
 
 HorizonYolo::HorizonYolo (const AttributeList&)

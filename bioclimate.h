@@ -21,7 +21,7 @@ class Bioclimate
 public:
   // Simulation
   void tick (Surface&, const Weather&, const CropList&, 
-	     const Soil&, const SoilWater&);
+	     const Soil&, SoilWater&);
 
   // Canopy.
 public:
@@ -30,7 +30,6 @@ public:
   double PAR (int) const;
   double AirTemperature () const;
   double DayLength () const;
-  double PotTransPerLAI () const;
 
   // Manager.
 public:

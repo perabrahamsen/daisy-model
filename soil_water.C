@@ -10,11 +10,23 @@
 #include "syntax.h"
 
 void
+SoilWater::clear ()
+{
+  fill (S.begin (), S.end (), 0.0);
+}
+
+void
+SoilWater::add_to_sink (int i, double v)
+{
+  S[i] += v;
+}
+
+void
 SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		 const Soil& soil)
 {
   Theta_old = Theta;
-  h_old = h;
+  h_old = h_;
 
   // Limit for groundwater table.
   int last  = soil.size () - 1;
@@ -27,7 +39,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       for (int i = last + 1; i < soil.size (); i++)
 	{
 	  h_old[i] = groundwater.table () - soil.z (i);
-	  h[i] = groundwater.table () - soil.z (i);
+	  h_[i] = groundwater.table () - soil.z (i);
 	}
     }
 
@@ -37,7 +49,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
     {
       first = 1;
       h_old[0] = surface.ponding ();
-      h[0] = surface.ponding ();
+      h_[0] = surface.ponding ();
     }
 
   if (bottom)
@@ -47,12 +59,12 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		 first, surface, 
 		 bottom_start - 1, *bottom, 
 		 S, h_old, Theta_old,
-		 h, Theta, q);
+		 h_, Theta, q);
       bottom->tick (soil,
 		    bottom_start, *top,
 		    last, groundwater,
 		    S, h_old, Theta_old,
-		    h, Theta, q);
+		    h_, Theta, q);
     }
   else
     {
@@ -61,7 +73,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		 first, surface, 
 		 last, groundwater,
 		 S, h_old, Theta_old,
-		 h, Theta, q);
+		 h_, Theta, q);
     }
 }
 
@@ -76,10 +88,10 @@ SoilWater::check (Log&, unsigned n) const
 	   << " intervals but " << Theta.size () << " Theta values\n";
       ok = false;
     }
-  if (h.size () != n)
+  if (h_.size () != n)
     {
       cerr << "You have " << n 
-	   << " intervals but " << h.size () << " h values\n";
+	   << " intervals but " << h_.size () << " h values\n";
       ok = false;
     }
   if (Xi.size () != n)
@@ -96,7 +108,7 @@ SoilWater::output (Log& log, const Filter* filter) const
 {
   log.output ("S", filter, S);
   log.output ("Theta", filter, Theta);
-  log.output ("h", filter, h);
+  log.output ("h", filter, h_);
   log.output ("Xi", filter, Xi);
   log.output ("q", filter, q);
 }
@@ -104,7 +116,7 @@ SoilWater::output (Log& log, const Filter* filter) const
 double
 SoilWater::MaxExfiltration (const Soil& soil) const
 {
-  return - (soil.K (0, h[0]) / soil.Cw2 (0, h[0])) * (Theta[0] / soil.z(0));
+  return - (soil.K (0, h_[0]) / soil.Cw2 (0, h_[0])) * (Theta[0] / soil.z(0));
 }
 
 void
@@ -139,16 +151,16 @@ SoilWater::SoilWater (const Soil& soil,
     }
   if (al.check ("h"))
     {
-      h = al.array ("h");
-      size = h.size ();
+      h_ = al.array ("h");
+      size = h_.size ();
     }
   if (!al.check ("Theta"))
     for (int i = 0; i < size; i++)
-      Theta.push_back (soil.Theta (i, h[i]));
+      Theta.push_back (soil.Theta (i, h_[i]));
 
   if (!al.check ("h"))
     for (int i = 0; i < size; i++)
-      h.push_back (soil.h (i, Theta[i]));
+      h_.push_back (soil.h (i, Theta[i]));
 
   if (al.check ("Xi"))
     Xi = al.array ("Xi");

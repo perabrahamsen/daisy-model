@@ -22,7 +22,7 @@ class SoilWater
   vector<double> Theta_old;
   vector<double> h_old;
   vector<double> Theta;
-  vector<double> h;
+  vector<double> h_;
   vector<double> Xi;
   vector<double> q;
   UZmodel *const top;
@@ -31,6 +31,10 @@ class SoilWater
 
   // Simulation.
 public:
+  void clear ();
+  void add_to_sink (int, double);
+  double h (int i) const
+  { return h_[i]; }
   void tick (Surface&, Groundwater&, const Soil&);
   bool check (Log&, unsigned n) const;
   void output (Log&, const Filter*) const;

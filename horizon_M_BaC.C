@@ -20,6 +20,7 @@ public:
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
+  double M (double h) const;
 private:
   double Se (double h) const;
   
@@ -60,6 +61,15 @@ HorizonM_BaC::h (const double Theta) const
     return h_b / pow((Theta_rel - Theta) / (Theta_rel - Theta_sat), 1 / lambda);
   else
     return h_b;
+}
+
+double 
+HorizonM_BaC::M (double h) const
+{
+  if (h < h_b)
+    return K_sat * (-h_b / (1 + 2.5*lambda)) * pow (h_b / h, 1 + 2.5*lambda);
+  else
+    return K_sat * h;
 }
 
 double 

@@ -90,7 +90,8 @@ ColumnStandard::tick (const Time& time,
 		      const Weather& weather, Groundwater& groundwater)
 {
   cout << "Column `" << name << "' tick\n"; 
-  
+
+  soil_water.clear ();
   bioclimate.tick (surface, weather, crops, soil, soil_water);
   soil_heat.tick (surface, bioclimate);
   soil_water.tick (surface, groundwater, soil);
@@ -104,16 +105,28 @@ ColumnStandard::output (Log& log, const Filter* filter) const
   log.open (name);
 #if 0
   if (filter->check ("Bioclimate"))
-    bioclimate.output (log, filter->lookup ("Bioclimate"));
+    {
+      log.open ("Bioclimate");
+      bioclimate.output (log, filter->lookup ("Bioclimate"));
+      log.close ();
+    }
 #endif
   if (filter->check ("Surface"))
-    surface.output (log, filter->lookup ("Surface"));
+    {
+      log.open ("Surface");
+      surface.output (log, filter->lookup ("Surface"));
+      log.close ();
+    }
 #if 0
   if (filter->check ("Soil"))
     soil.output (log, filter->lookup ("Soil"));
 #endif
   if (filter->check ("SoilWater"))
-    soil_water.output (log, filter->lookup ("SoilWater"));
+    {
+      log.open ("SoilWater");
+      soil_water.output (log, filter->lookup ("SoilWater"));
+      log.close ();
+    }
 #if 0
   if (filter->check ("SoilHeat"))
     soil_heat.output (log, filter->lookup ("SoilHeat"));

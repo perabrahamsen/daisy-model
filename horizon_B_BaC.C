@@ -20,6 +20,7 @@ public:
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
+  double M (double h) const;
 private:
   double Se (double h) const;
   
@@ -63,6 +64,15 @@ HorizonB_BaC::h (const double Theta) const
 }
 
 double 
+HorizonB_BaC::M (double h) const
+{
+  if (h < h_b)
+    return K_sat * (-h_b / (1 + 3*lambda)) * pow (h_b / h, 1 + 3*lambda);
+  else
+    return K_sat * h;
+}
+
+double 
 HorizonB_BaC::Se (double h) const
 {
   if (h < h_b)
@@ -72,11 +82,11 @@ HorizonB_BaC::Se (double h) const
 }
 
 HorizonB_BaC::HorizonB_BaC (const AttributeList& al)
-     : Theta_sat (al.number ("Theta_sat")),
-       Theta_rel (al.number ("Theta_rel")),
-       lambda (al.number ("lambda")),
-       h_b (al.number ("h_b")),
-       K_sat (al.number ("K_sat"))
+  : Theta_sat (al.number ("Theta_sat")),
+    Theta_rel (al.number ("Theta_rel")),
+    lambda (al.number ("lambda")),
+    h_b (al.number ("h_b")),
+    K_sat (al.number ("K_sat"))
 { }
 
 HorizonB_BaC::~HorizonB_BaC ()
