@@ -1,6 +1,12 @@
-* Permanent Vegetation 
-
 * Organic/N switch-off
+
+** Make old and sold crop models use "root_system".
+
+** Make vegetation use "root_system" for N and water uptake.
+
+** Make default crop not use `organic_matter'.
+
+** Make crops not use soil heat and bioclimate.
 
 * Management:
 

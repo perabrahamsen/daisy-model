@@ -1,3 +1,24 @@
+2000-06-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.29 released.
+
+2000-06-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_crop.C (ActionCropSyntax): Added default empty lists for
+	`fertilize_at', `tillage, and `spray'.
+
+2000-06-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C (load_syntax): Gave default value for `dispersivity'.
+
+2000-06-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/vegetation.dai: New file.
+	(Coniferous): New model.
+
+	* canopy_simple.C (load_syntax): Changed default value for rs_min
+	from 0.0.
+
 2000-06-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.28 released.

@@ -306,7 +306,7 @@ CropSimple::CropSimple (const AttributeList& al)
     WRoot (al.number ("root_DM") * 100.0), // [T DM / ha] -> [g DM / m^2]
     NRoot (al.number ("root_N") * 0.1),	// [kg N / ha] -> [g N / m^2]
     root_am (al.alist_sequence ("root_am")),
-    N_potential (al.number ("potential_N") * 0.1), // [kg N / ha]-> [g N / m^2]
+    N_potential (al.number ("potential_N") * 0.1),	// [kg N / ha] -> [g N / m^2]
     N_demand (0.0),
     N_actual (al.number ("N_actual")),
     N_b (al.number ("N_b") * 0.1),
