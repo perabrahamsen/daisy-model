@@ -340,7 +340,7 @@ struct object_desc
     : comp (other.comp),
       par (other.par)
   { }
-  object_desc (const string c, const string p)
+  object_desc (const string& c, const string& p)
     : comp (c),
       par (p)
   { }

@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.05.03"/>
+    <PROJECT value="daisy.exe"/>
+    <OBJFILES value="action.obj action_activity.obj action_crop.obj action_divide.obj 
+      action_fertilize.obj action_harvest.obj action_heat.obj 
+      action_irrigate.obj action_lisp.obj action_merge.obj action_message.obj 
+      action_repeat.obj action_ridge.obj action_sow.obj action_spray.obj 
+      action_stop.obj action_surface.obj action_tillage.obj action_wait.obj 
+      action_while.obj action_with.obj adsorption.obj adsorption_freundlich.obj 
+      adsorption_langmuir.obj adsorption_linear.obj adsorption_none.obj 
+      adsorption_vS_S.obj alist.obj am.obj average.obj average_arithmetic.obj 
+      average_geometric.obj average_harmonic.obj bioclimate.obj 
+      bioclimate_std.obj bioincorporation.obj canopy_simple.obj canopy_std.obj 
+      chemical.obj chemical_std.obj chemicals.obj column.obj column_base.obj 
+      column_inorganic.obj column_std.obj common.obj condition.obj 
+      condition_crop.obj condition_daisy.obj condition_logic.obj 
+      condition_soil.obj condition_time.obj crop.obj crop_old.obj 
+      crop_simple.obj crop_sold.obj crop_std.obj daisy.obj denitrification.obj 
+      depend.obj document.obj document_LaTeX.obj field.obj geometry.obj 
+      groundwater.obj groundwater_deep.obj groundwater_file.obj 
+      groundwater_fixed.obj groundwater_lysimeter.obj groundwater_pipe.obj 
+      groundwater_static.obj harvest.obj horizon.obj horizon_std.obj 
+      hydraulic.obj hydraulic_B_BaC.obj hydraulic_B_BaC_Bimodal.obj 
+      hydraulic_B_C.obj hydraulic_B_vG.obj hydraulic_M_BaC.obj 
+      hydraulic_M_BaC_Bimodal.obj hydraulic_M_C.obj hydraulic_M_vG.obj 
+      hydraulic_M_vG_compact.obj hydraulic_mod_C.obj hydraulic_yolo.obj im.obj 
+      lexer.obj lexer_data.obj librarian.obj library.obj log.obj log_alist.obj 
+      log_checkpoint.obj log_clone.obj log_extern.obj log_harvest.obj 
+      log_select.obj log_table.obj log_table1.obj macro.obj macro_none.obj 
+      macro_std.obj mactrans.obj mactrans_std.obj main.obj mathlib.obj 
+      message.obj net_radiation.obj nitrification.obj nitrification_soil.obj 
+      nitrification_solute.obj nrutil.obj om.obj options.obj organic_matter.obj 
+      parser.obj parser_file.obj pet.obj pet_makkink.obj pet_PM.obj 
+      pet_weather.obj plf.obj printer.obj printer_file.obj ridge.obj 
+      root_system.obj select.obj select_array.obj select_average.obj 
+      select_content.obj select_date.obj select_flux.obj select_flux_bottom.obj 
+      select_flux_top.obj select_index.obj select_interval.obj select_max.obj 
+      select_min.obj select_number.obj snow.obj soil.obj soil_chemical.obj 
+      soil_chemicals.obj soil_heat.obj soil_NH4.obj soil_NO3.obj soil_water.obj 
+      solute.obj submodel.obj surface.obj svat.obj svat_none.obj svat_pmsw.obj 
+      syntax.obj time.obj tmpstream.obj tortuosity.obj tortuosity_linear.obj 
+      tortuosity_M_Q.obj transport.obj transport_cd.obj transport_convection.obj 
+      transport_none.obj traverse.obj traverse_delete.obj treelog.obj 
+      treelog_stream.obj uzlr.obj uzmodel.obj uznone.obj uzrichard.obj 
+      vegetation.obj vegetation_crops.obj vegetation_permanent.obj weather.obj 
+      weather_none.obj weather_old.obj weather_simple.obj weather_std.obj"/>
+    <RESFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <SPARELIBS value=""/>
+    <PACKAGES value=""/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="tlink32"/>
+    <USERDEFINES value="_DEBUG"/>
+    <SYSDEFINES value="NO_STRICT;_NO_VCL"/>
+    <MAINSOURCE value="daisy.bpf"/>
+    <INCLUDEPATH value="$(BCB)\include;$(BCB)\include\vcl"/>
+    <LIBPATH value="$(BCB)\lib\obj;$(BCB)\lib"/>
+    <WARNINGS value="-w8092 -w8091 -w8090 -w8089 -w8087 -wprc -wuse -wucp -wstv -wstu -wsig 
+      -wpin -wnod -wnak -wdef -w-csu -wcln -wbbf -wasm -wamp -wamb"/>
+  </MACROS>
+  <OPTIONS>
+    <CFLAG1 value="-Od -Vx -Ve -X- -r- -a8 -b- -k -y -v -vi- -Pfoo -tWC -c"/>
+    <PFLAGS value="-$YD -$W -$O- -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zd"/>
+    <LFLAGS value="-D&quot;&quot; -ap -Tpe -x -Gn -v -w-dup -w-dpl"/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0x32.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cw32.lib"/>
+  </LINKER>
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[Excluded Packages]
+$(BCB)\Bin\dclstd50.bpl=Borland Standard Components
+$(BCB)\Bin\dcl31w50.bpl=Delphi 1.0 Compatibility Components
+$(BCB)\Bin\bcbsmp50.bpl=Borland C++ Sample Components
+$(BCB)\Bin\dclocx50.bpl=Borland Sample Imported ActiveX Controls
+
+[HistoryLists\hlIncludePath]
+Count=1
+Item0=$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=1
+Item0=$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=_DEBUG
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+  </IDEOPTIONS>
+</PROJECT>
