@@ -44,12 +44,7 @@ struct LogSelect : public Log
   bool check_derived (symbol field, symbol name, const Library&) const;
   const string description;	// Description of log file.
   Condition& condition;	// Should we print a log now?
-
   vector<Select*> entries;
-  
-  typedef map<symbol, vector<Select*>/**/> symmap_t;
-  symmap_t symmap;
-
   stack<vector<Select*>/**/> active_stack;
 
   // Checking to see if we should log this time step.

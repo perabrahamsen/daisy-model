@@ -27,6 +27,7 @@ bool
 LogSelect::check_member (symbol name) const
 { 
   daisy_assert (is_active);
+  daisy_assert (!active_stack.empty ());
 
   const vector<Select*>& current = active_stack.top ();
   for (unsigned int i = 0; i < current.size (); i++)
@@ -66,6 +67,7 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 void
 LogSelect::done ()
 { 
+  daisy_assert (is_active);
   daisy_assert (active_stack.size () == 1);
   active_stack.pop ();
 }
@@ -91,7 +93,6 @@ LogSelect::open (symbol name)
 void 
 LogSelect::close ()
 { 
-  active_stack.pop ();
   const vector<Select*>& current = active_stack.top ();
 
   for (unsigned int i = 0; i < current.size (); i++)
@@ -99,6 +100,7 @@ LogSelect::close ()
       daisy_assert (current[i]->is_active);
       current[i]->close ();
     }
+  active_stack.pop ();
 }
 
 void 
@@ -230,13 +232,9 @@ LogSelect::LogSelect (const AttributeList& al)
   const double from  = al.number ("from");
   const double to = al.number ("to");
 
-  // Initialize entries and symmap.
+  // Initialize entries.
   for (unsigned int i = 0; i < entries.size (); i++)
-    {
-      entries[i]->initialize (conv_map, from, to, condition.timestep ());
-      symmap[entries[i]->log_name ()].push_back (entries[i]);
-    }
-  daisy_assert (symmap.size () <= entries.size ());
+    entries[i]->initialize (conv_map, from, to, condition.timestep ());
 }
 
   

@@ -85,11 +85,7 @@ LogAll::LogAll (const vector<Log*>& logs)
       {
 	slaves.push_back (log);
 	for (unsigned int j = 0; j < log->entries.size (); j++)
-	  {
-	    Select *const sel = log->entries[j];
-	    entries.push_back (sel);
-	    symmap[sel->log_name ()].push_back (sel);
-	  }
+	  entries.push_back (log->entries[j]);
       }
 }
 

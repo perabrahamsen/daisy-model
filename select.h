@@ -94,23 +94,17 @@ public:
   }
   bool open (symbol name)	// Open one leaf level.
   { 
-    // Remember nesting.
-    current_path_index++;
-    // If previous level wasn't valid, next one won't be either.
-    if (!valid_level)
-      return false;
+    daisy_assert (valid_level);
     // Check if next level is also in path.
     if (!valid (name))
-      {
-	valid_level = false;
 	return false;
-      }
+
     // We may have reached the end of path.
     if (current_path_index == path_size)
-      {
-	valid_level = false;
-	return false;
-      }
+      return false;
+
+    // Remember nesting.
+    current_path_index++;
     // This level is also valid.
     last_valid_path_index++;
     // Direct acces to new head of path.
@@ -120,26 +114,15 @@ public:
   }
   void close ()		// Close one level.
   { 
-    // daisy_assert (valid_level);
+    daisy_assert (valid_level);
     // Decrease nesting.
     current_path_index--;
 
-    // Was it valid?
-    if (valid_level)
-      {
-	// If so, decrease valid level.
-	last_valid_path_index--;
-	// And restore direct access to current path.
-	current_name = path[current_path_index];
-      }
-    else
-      {
-	// If not, check if new level is valid.
-	valid_level = current_path_index == last_valid_path_index;
-	// If so, restore direct access to the path.
-	if (valid_level)
-	  current_name = path[current_path_index];
-      }
+    // Decrease valid level.
+    last_valid_path_index--;
+    // And restore direct access to current path.
+    current_name = path[current_path_index];
+
     daisy_assert (valid_level);
   }
 
