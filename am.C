@@ -641,6 +641,7 @@ static bool check_organic (const AttributeList& al)
 }
 
 #ifdef BORLAND_TEMPLATES
+template class add_submodule<AM::Implementation::Lock>;
 template class add_submodule_sequence<OM>;
 template class add_submodule<IM>;
 #endif

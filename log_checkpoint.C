@@ -13,6 +13,12 @@ struct LogCheckpoint : public Log, public Filter
   bool check_derived (const string&, const Library&) const;
   Filter& lookup (const string&) const;
   Filter& lookup_derived (const string&, const Library&) const;
+  bool check (const Library& lib, int size) const
+    { return Filter::check (lib, size); }
+  bool check (const Syntax& syntax, int size) const
+    { return Filter::check (syntax, size); }
+  bool check (Syntax::type type, int size) const
+    { return Filter::check (type, size); }
 
   // Content.
   const string file;		// Name of file to write checkpoint in.

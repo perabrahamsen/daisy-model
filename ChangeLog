@@ -1,5 +1,14 @@
 1998-12-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 0.56 released.
+
+1998-12-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_checkpoint.C (check): Added wrappers for more Filter::check
+	functions to shut up BCC.
+
+	* am.C: Add another explicit template instanciation for BCC.
+
 	* Version 0.55 released.
 
 1998-12-29  Per Abrahamsen  <abraham@dina.kvl.dk>
