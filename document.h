@@ -46,7 +46,9 @@ protected:
   virtual void print_log_header (ostream&, const string&, int level) = 0;
   virtual void print_log_trailer (ostream&, const string&, int level) = 0;
   virtual void print_sample_ordered (ostream&, const string&, bool seq) = 0;
-  virtual void print_sample_entry (ostream&, const string& name, bool seq) = 0;
+  virtual void print_sample_entry (ostream&, const string& name, 
+				   const Syntax& syntax,
+				   const AttributeList& alist) = 0;
   virtual void print_sample_header (ostream& out, const string& name) = 0;
   virtual void print_sample_trailer (ostream& out, const string&) = 0;
   virtual void print_model_header (ostream&, const string& name) = 0;

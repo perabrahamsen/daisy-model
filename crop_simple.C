@@ -491,6 +491,7 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     alist.add ("root_N", 20.0);
     syntax.add_submodule_sequence ("root_am", Syntax::Const, 
 				   "Root AM parameters.", AOM::load_syntax);
+    syntax.add_check ("root_am", AM::check_om_pools ());
     alist.add ("root_am", AM::default_AM ());
     syntax.add ("potential_N", "kg N/ha", Check::non_negative (), Syntax::Const,
 		"Potential N content at harvest.");

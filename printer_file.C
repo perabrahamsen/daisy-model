@@ -37,8 +37,9 @@ struct PrinterFile::Implementation
   std::ostream& out;
 
   // String utilities.
-  bool is_identifier (const string& name) const;
-  void print_quoted_string (const string& name);
+  static bool is_identifier (const string& name);
+  static void print_quoted_string (std::ostream& out,
+				   const string& name);
 
   // Print entry 'key' in alist.
   void print_entry (const AttributeList& alist, const Syntax&,
@@ -135,7 +136,7 @@ PrinterFile::Implementation::is_complex_object (const AttributeList& value,
 }
 
 bool 
-PrinterFile::Implementation::is_identifier (const string& name) const
+PrinterFile::Implementation::is_identifier (const string& name)
 {
   if (name.size () < 1)
     return false;
@@ -154,7 +155,8 @@ PrinterFile::Implementation::is_identifier (const string& name) const
 }
 
 void 
-PrinterFile::Implementation::print_quoted_string (const string& name)
+PrinterFile::Implementation::print_quoted_string (std::ostream& out,
+						  const string& name)
 {
   out << "\"";
   for (unsigned int i = 0; i < name.size (); i++)
@@ -361,12 +363,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 
 void 
 PrinterFile::Implementation::print_string (const string& value) 
-{ 
-  if (is_identifier (value))
-    out << value; 
-  else
-    print_quoted_string (value);
-}
+{ PrinterFile::print_string (out, value); }
 
 void 
 PrinterFile::Implementation::print_bool (bool value) 
@@ -630,6 +627,16 @@ PrinterFile::Implementation::~Implementation ()
 {
   if (output)
     delete output;
+}
+
+void 
+PrinterFile::print_string (std::ostream& out,
+			   const string& value) 
+{ 
+  if (Implementation::is_identifier (value))
+    out << value; 
+  else
+    Implementation::print_quoted_string (out, value);
 }
 
 void

@@ -48,7 +48,6 @@ struct DocumentLaTeX : public Document
   void print_entry_name (std::ostream& out, const string& name);
   void print_entry_type (std::ostream& out,
 			 const string& name,
-			 const Syntax::type type,
 			 const Syntax& syntax,
 			 const AttributeList& alist);
   void print_entry_size (std::ostream& out, const string&, int size);
@@ -57,20 +56,15 @@ struct DocumentLaTeX : public Document
 				const string& description);
   void print_entry_submodel (std::ostream& out,
 			     const string& name, 
-			     const Syntax::type type, 
-			     int size,
 			     int level,
 			     const Syntax& syntax,
 			     const AttributeList& alist);
   void print_entry_category (std::ostream& out,
 			     const string& name, 
-			     const Syntax::type type, 
 			     const Syntax& syntax,
 			     const AttributeList& alist);
   void print_entry_value (std::ostream& out,
 			  const string& name, 
-			  const Syntax::type type, 
-			  int size,
 			  const Syntax& syntax,
 			  const AttributeList& alist);
 
@@ -85,7 +79,9 @@ struct DocumentLaTeX : public Document
   void print_sample_ordered (std::ostream& out, const string& name, bool seq);
   void print_log_header (std::ostream& out, const string&, int level);
   void print_log_trailer (std::ostream& out, const string&, int level);
-  void print_sample_entry (std::ostream& out, const string& name, bool seq);
+  void print_sample_entry (std::ostream& out, const string& name, 
+			   const Syntax& syntax,
+			   const AttributeList& alist);
   void print_sample_header (std::ostream& out, const string& name);
   void print_sample_trailer (std::ostream& out, const string&);
   void print_model_header (std::ostream& out, const string& name);
@@ -225,10 +221,11 @@ DocumentLaTeX::print_entry_name (std::ostream& out, const string& name)
 void 
 DocumentLaTeX::print_entry_type (std::ostream& out,
 				 const string& name,
-				 const Syntax::type type, 
 				 const Syntax& syntax,
 				 const AttributeList& alist)
 {
+  const Syntax::type type = syntax.lookup (name);
+
   switch (type)
     {
     case Syntax::Number:
@@ -327,12 +324,13 @@ DocumentLaTeX::print_entry_description (std::ostream& out,
 void 
 DocumentLaTeX::print_entry_submodel (std::ostream& out,
 				     const string& name, 
-				     const Syntax::type type, 
-				     int size,
 				     int level,
 				     const Syntax& syntax,
 				     const AttributeList& alist)
 {
+  const Syntax::type type = syntax.lookup (name);
+  const int size = syntax.size (name);
+
   if (type == Syntax::AList)
     {
       submodel = true;		// Affects how the sample header looks.
@@ -354,10 +352,11 @@ DocumentLaTeX::print_entry_submodel (std::ostream& out,
 void 
 DocumentLaTeX::print_entry_category (std::ostream& out,
 				     const string& name, 
-				     const Syntax::type type, 
 				     const Syntax& syntax,
 				     const AttributeList& alist)
 {
+  const Syntax::type type = syntax.lookup (name);
+
   if (type == Syntax::Object)	// Objects and ALists don't have categories.
     {
       if (syntax.is_optional (name))
@@ -399,13 +398,14 @@ DocumentLaTeX::print_entry_category (std::ostream& out,
 void 
 DocumentLaTeX::print_entry_value (std::ostream& out,
 				  const string& name, 
-				  const Syntax::type type, 
-				  int size,
 				  const Syntax& syntax,
 				  const AttributeList& alist)
 {
   if (alist.check (name))
     {
+      const Syntax::type type = syntax.lookup (name);
+      const int size = syntax.size (name);
+
       bool print_default_value = false;
       
       if (size == Syntax::Singleton)
@@ -607,7 +607,7 @@ DocumentLaTeX::print_submodel_entry (std::ostream& out,
   print_index (out, name);
 
   // Print type.
-  print_entry_type (out, name, type, syntax, alist);
+  print_entry_type (out, name, syntax, alist);
 
   // Print size.
   print_entry_size (out, name, size);
@@ -615,10 +615,10 @@ DocumentLaTeX::print_submodel_entry (std::ostream& out,
   if (!syntax.is_log (name))
     {
       // Print category.
-      print_entry_category (out, name, type, syntax, alist);
+      print_entry_category (out, name, syntax, alist);
 
       // Print value.
-      print_entry_value (out, name, type, size, syntax, alist);
+      print_entry_value (out, name, syntax, alist);
     }
 
   // Print description line.
@@ -626,7 +626,7 @@ DocumentLaTeX::print_submodel_entry (std::ostream& out,
   print_entry_description (out, name, description);
 
   // print submodel entries, if applicable
-  print_entry_submodel (out, name, type, size, level + 1, syntax, alist);
+  print_entry_submodel (out, name, level + 1, syntax, alist);
 }
 
 
@@ -645,7 +645,7 @@ DocumentLaTeX::print_sample_ordered (std::ostream& out,
 { 
   ordered = true;
   out << "\\textit{";
-  print_quoted (out, name);
+  PrinterFile::print_string (out, name);
   out << "}";
   if (sequence)
     out << "\\ldots{}";
@@ -654,40 +654,153 @@ DocumentLaTeX::print_sample_ordered (std::ostream& out,
 
 void
 DocumentLaTeX::print_sample_entry (std::ostream& out,
-				   const string& name, bool sequence)
+				   const string& name, 
+				   const Syntax& syntax,
+				   const AttributeList& alist)
 { 
   if (ordered)
-    out << "\\\\\n\\>";
+    out << "\\\\\n&";
   else
     ordered = true;
       
   out << "(";
-  print_quoted (out, name);
-  out << "~\\textit{";
-  print_quoted (out, name);
-  out << "}";
-  if (sequence)
-    out << "\\ldots{}";
-  out << ")~";
+  PrinterFile::print_string (out, name);
+
+  if (alist.check (name))
+    {
+      const Syntax::type type = syntax.lookup (name);
+      const int size = syntax.size (name);
+
+      bool print_name = true;
+      string comment = "Has default value.";
+
+      if (size == Syntax::Singleton)
+	switch (type)
+	  {
+	  case Syntax::Number:
+	    out << "~" << alist.number (name) << ")";
+	    print_name = false;
+	    break;
+	  case Syntax::AList:
+	    {
+	      const bool has_errors
+		= !syntax.syntax (name).check (alist.alist (name), 
+					       Treelog::null ());
+	      if (has_errors)
+		comment = "Has partial value.";
+	    }
+	    break;
+	  case Syntax::PLF:
+	    break;
+	  case Syntax::Boolean:
+	    out << "~" << (alist.flag (name) ? "true" : "false") << ")";
+	    print_name = false;
+	    break;
+	  case Syntax::String:
+	    {
+	      const string& value = alist.name (name);
+	      if (value.length () < 20)
+		{
+		  out << "~";
+		  PrinterFile::print_string (out, value);
+		  out << ")";
+		  print_name = false;
+		}
+	    }
+	    break;
+	  case Syntax::Date:
+	    {
+	      const Time& time = alist.time (name);
+	      out << "~" << time.year () << "~" << time.month () 
+		  << "~" << time.mday () << "~" << time.hour () << ")";
+	      print_name = false;
+	    }
+	    break;
+	  case Syntax::Integer:
+	    out << "~" << alist.integer (name) << ")";
+	    print_name = false;
+	    break;
+	  case Syntax::Object:
+	    {
+	      const AttributeList& object = alist.alist (name);
+	      daisy_assert (object.check ("type"));
+	      const string& type = object.name ("type");
+	      comment = "Default " + type + " value.";
+	    }
+	    break;
+	  case Syntax::Library:
+	  case Syntax::Error:
+	    daisy_assert (false);
+	  }
+      else if (alist.size (name) == 0)
+	{
+	  out << ")";
+	  print_name = false;
+	}
+      else
+	switch (type)
+	  {
+	  case Syntax::Number:
+	    if (alist.size (name) < 5)
+	      {
+		const vector<double>& numbers = alist.number_sequence (name);
+		for (int i = 0; i < numbers.size (); i++)
+		  out << "~" << numbers[i];
+		out << ")";
+		print_name = false;
+	      }
+	    break;
+	  case Syntax::AList:
+	  case Syntax::PLF:
+	  case Syntax::Boolean:
+	  case Syntax::String:
+	  case Syntax::Date:
+	  case Syntax::Integer:
+	  case Syntax::Object:
+	    break;
+	  case Syntax::Library:
+	  case Syntax::Error:
+	    daisy_assert (false);
+	  }
+      if (print_name)
+	{
+	  out << "~" << "\\textit{";
+	  print_quoted (out, name);
+	  out << "}";
+	  if (syntax.size (name) != Syntax::Singleton)
+	    out << "~\\ldots{}";
+	  out << ")&;~";
+	  print_quoted (out, comment);
+	}
+    }
+  else
+    {
+      out << "~" << "\\textit{";
+      print_quoted (out, name);
+      out << "}";
+      if (syntax.size (name) != Syntax::Singleton)
+	out << "~\\ldots{}";
+      out << ")";
+    }
 }
 
 void
 DocumentLaTeX::print_sample_header (std::ostream& out, const string& name)
 { 
   daisy_assert (ordered == false);
-  out << "\n\\noindent\n\\begin{tt}\n\\begin{tabbing}\n$<$~";
+  out << "\n\\noindent\n\\begin{tt}\n\\begin{tabular}{lll}\n$<$~";
   if (!submodel)
     {
-      print_quoted (out, name);
+      PrinterFile::print_string (out, name);
       out << "~";
     }
-  out << "\\=";
+  out << "&";
 }
 
 void
 DocumentLaTeX::print_sample_trailer (std::ostream& out, const string&)
 { 
-  out << "$>$\n\\end{tabbing}\n\\end{tt}";
+  out << "~$>$\n\\end{tabular}\n\\end{tt}";
   ordered = false;
 }
 

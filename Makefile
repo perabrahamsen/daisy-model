@@ -146,8 +146,8 @@ ifeq ($(USE_DYNLIB),true)
 	DYNSEARCH = -R`pwd`
 endif
 
-GCC = gcc-3.2
-CROSSGCC = "gcc-3.2 -b $(TARGETTYPE) -V 3.2"
+GCC = gcc
+CROSSGCC = "$(TARGETTYPE)-gcc"
 
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
@@ -561,9 +561,10 @@ txt/reference.pdf:	txt/components.tex
 	 && makeindex reference \
 	 && pdflatex reference.tex < /dev/null )
 
-txt/components.tex:	daisy
+txt/components.tex:	/usr/local/daisy/$(HOSTTYPE)/daisy
 	(cd txt \
-	 && ../daisy all.dai -p LaTeX > components.tex)
+	 && /usr/local/daisy/$(HOSTTYPE)/daisy all.dai -p LaTeX \
+            > components.tex)
 
 # Remove all the temporary files.
 #
@@ -588,7 +589,7 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
-	$(MAKE) native cross
+	$(MAKE) native #cross
 	mv -f $(WWWINDEX) $(WWWINDEX).old
 	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
 		< $(WWWINDEX).old > $(WWWINDEX)

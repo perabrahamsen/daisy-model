@@ -56,7 +56,10 @@ public:
   // True iff no errors have occured.
   bool good ();
 
-  // Create and Destroy.
+  // Utitlites.
+  static void print_string (std::ostream& out, const string& value);
+
+ // Create and Destroy.
 public:
   PrinterFile (const AttributeList& al);
   PrinterFile (const string& filename);

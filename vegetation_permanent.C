@@ -298,6 +298,7 @@ VegetationPermanentSyntax
 		"Nitrogen in litter this hour.");
     syntax.add_submodule_sequence ("litter_am", Syntax::Const,
 				   "Litter AOM parameters.", AOM::load_syntax);
+    syntax.add_check ("litter_am", AM::check_om_pools ());
     alist.add ("litter_am", AM::default_AM ());
     syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
 			 RootSystem::load_syntax);

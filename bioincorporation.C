@@ -30,6 +30,8 @@
 #include "plf.h"
 #include "time.h"
 #include "aom.h"
+#include "check.h"
+#include "vcheck.h"
 #include "mathlib.h"
 #include <algorithm>
 
@@ -268,24 +270,26 @@ Bioincorporation::load_syntax (Syntax& syntax, AttributeList& alist)
 	     "Biological incorporation of organic matter in soil.");
 
   // Incorporation speed.
-  syntax.add ("R_max", "g DM/m^2/h", Syntax::Const, 
+  syntax.add ("R_max", "g DM/m^2/h", Check::non_negative (), Syntax::Const, 
 	      "Maximal speed of incorporation.");
   alist.add ("R_max", 0.3);
-  syntax.add ("k_half", "g DM/m^2", Syntax::Const, "Halflife constant.");
+  syntax.add ("k_half", "g DM/m^2", Check::positive (), Syntax::Const,
+	      "Halflife constant.");
   alist.add ("k_half", 1.0);
   syntax.add ("speed", "g DM/m^2/h", Syntax::LogOnly, 
 	      "Fraction of litter incorporated this hour.\n\
 The formula is speed = (R_max * litter) / (k_half + litter).");
-  syntax.add ("C_per_N_factor", "(g C/cm^2)/(g N/cm^2)", Syntax::None (),
-	      Syntax::Const, "Limiting factor for high C/N ratio.");
+  syntax.add ("C_per_N_factor", "(g C/cm^2)/(g N/cm^2)", Syntax::None (), 
+	      Check::non_negative (), Syntax::Const, 
+	      "Limiting factor for high C/N ratio.");
   PLF C_per_N_factor;
   C_per_N_factor.add (40.0, 1.0);
   C_per_N_factor.add (50.0, 0.1);
   C_per_N_factor.add (120.0, 0.01);
   
   alist.add ("C_per_N_factor", C_per_N_factor);
-  syntax.add ("T_factor", "dg C", Syntax::None (), Syntax::Const, 
-	      "Limiting factor for low temperature.");
+  syntax.add ("T_factor", "dg C", Syntax::None (), Check::non_negative (), 
+	      Syntax::Const, "Limiting factor for low temperature.");
   PLF T_factor;
   T_factor.add (4.0, 0.0);
   T_factor.add (6.0, 1.0);
@@ -302,8 +306,9 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
   syntax.add ("CO2", "g C/m^2/h", Syntax::LogOnly, "C respirated this hour.");
 
   // Incorporation location.
-  syntax.add ("distribution", "cm", Syntax::None (), Syntax::Const,
-	      "Distribution of incorporated matter in the soil.\
+  syntax.add ("distribution", "cm", Syntax::None (), Check::non_negative (),
+	      Syntax::Const, "\
+Distribution of incorporated matter in the soil.\
 \n(X, Y), where X is the depth (negative numbers), and Y is the relative\n\
 weight in that depth.  To get the fraction in a specific interval [a:b], we\n\
 integrate the plf over that interval, and divide by the integration over\n\
@@ -355,7 +360,10 @@ the whole profile.");
   syntax.add_submodule_sequence ("AOM", Syntax::Const, 
 				 "Incorporated AM parameters.", 
 				 AOM::load_syntax);
+  syntax.add_check ("AOM", AM::check_om_pools ());
   alist.add ("AOM", am);
+  // Check that default value is ok.
+  AM::check_om_pools ().check (syntax, alist, "AOM");
 }
   
 Bioincorporation::Bioincorporation (const AttributeList& al)

@@ -29,6 +29,7 @@
 #include "log.h"
 #include "soil.h"
 #include "check.h"
+#include "vcheck.h"
 #include "tmpstream.h"
 #include "mathlib.h"
 #include <numeric>
@@ -43,6 +44,14 @@ they decompose.";
 
 struct AM::Implementation
 {
+  // Check.
+  struct Check_OM_Pools : public VCheck
+  {
+    // Check that the OM pools are correct for organic fertilizer.
+    void check (const Syntax& syntax, const AttributeList& alist, 
+		const string& key) const throw (string);
+  };
+
   // Content.
   const Time creation;		// When it was created.
   const string name;		// What is was.
@@ -83,6 +92,48 @@ struct AM::Implementation
   Implementation (const Time& c, const string& n, const vector<AOM*>& o);
   ~Implementation ();
 };
+
+void
+AM::Implementation::Check_OM_Pools::check (const Syntax& syntax, 
+					   const AttributeList& alist, 
+					   const string& key) 
+  const throw (string)
+{ 
+  daisy_assert (alist.check (key));
+  daisy_assert (syntax.lookup (key) == Syntax::AList);
+  daisy_assert (!syntax.is_log (key));
+  daisy_assert (syntax.size (key) == Syntax::Sequence);
+
+  const vector<AttributeList*>& om_alist = alist.alist_sequence (key);
+  int missing_initial_fraction = 0;
+  int missing_C_per_N = 0;
+  double total_fractions = 0.0;
+  bool same_unspecified = false;
+  for (unsigned int i = 0; i < om_alist.size (); i++)
+    {
+      if (!om_alist[i]->check ("initial_fraction"))
+	missing_initial_fraction++;
+      else 
+	total_fractions += om_alist[i]->number ("initial_fraction");
+      if (!om_alist[i]->check ("C_per_N"))
+	missing_C_per_N++;
+
+      if (!om_alist[i]->check ("initial_fraction") 
+	  && !om_alist[i]->check ("C_per_N"))
+	same_unspecified = true;
+    }
+  daisy_assert (total_fractions >= 0.0);
+  if (total_fractions < 1e-10 && !same_unspecified)
+    throw string ("you should specify at least one non-zero fraction");
+  if (approximate (total_fractions, 1.0))
+    throw string ("sum of specified fractions should be < 1.0");
+  if (total_fractions > 1.0)
+    throw string ("sum of fractions should be < 1.0");
+  if (missing_initial_fraction != 1)
+    throw string ("you should leave initial_fraction in one om unspecified");
+  if (missing_C_per_N != 1)
+    throw string ("You must leave C/N unspecified in exactly one pool");
+}
 
 struct AM::Implementation::Lock
 { 
@@ -535,6 +586,13 @@ const string
 AM:: crop_part_name () const
 { return impl.crop_part_name (); }
 
+const VCheck& 
+AM::check_om_pools ()
+{ 
+  static Implementation::Check_OM_Pools check;
+  return check;
+}
+
 AM& 
 AM::create (const AttributeList& al1 , const Soil& soil)
 { 
@@ -920,53 +978,7 @@ static struct AM_Syntax
 
     const string syntax = al.name ("syntax");
     daisy_assert (syntax == "organic");
-
-    bool ok = true;
-    const vector<AttributeList*>& om_alist = al.alist_sequence ("om");
-    int missing_initial_fraction = 0;
-    int missing_C_per_N = 0;
-    double total_fractions = 0.0;
-    bool same_unspecified = false;
-    for (unsigned int i = 0; i < om_alist.size (); i++)
-      {
-	if (!om_alist[i]->check ("initial_fraction"))
-	  missing_initial_fraction++;
-	else 
-	  total_fractions += om_alist[i]->number ("initial_fraction");
-	if (!om_alist[i]->check ("C_per_N"))
-	  missing_C_per_N++;
-
-	if (!om_alist[i]->check ("initial_fraction") 
-	    && !om_alist[i]->check ("C_per_N"))
-	  same_unspecified = true;
-      }
-    daisy_assert (total_fractions >= 0.0);
-    if (total_fractions < 1e-10 && !same_unspecified)
-      {
-	err.entry ("you should specify at least one non-zero fraction");
-	ok = false;
-      }
-    if (approximate (total_fractions, 1.0))
-      {
-	err.entry ("sum of specified fractions should be < 1.0");
-	ok = false;
-      }
-    else if (total_fractions > 1.0)
-      {
-	err.entry ("sum of fractions should be < 1.0");
-	ok = false;
-      }
-    if (missing_initial_fraction != 1)
-      {
-	err.entry ("you should leave initial_fraction in one om unspecified");
-	ok = false;
-      }
-    if (missing_C_per_N != 1)
-      {
-	err.entry ("You must leave C/N unspecified in exactly one pool.");
-	ok = false;
-      }
-    return ok;
+    return true;
   }
 
   static bool check_root (const AttributeList& al, Treelog& err)
@@ -1070,6 +1082,7 @@ In Denmark, this is governed by legalisation.");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
 				       AOM::load_syntax);
+	syntax.add_check ("om", AM::check_om_pools ());
 	syntax.add_fraction ("NO3_fraction", Syntax::Const, 
 		    "Nitrate fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be ammonium or organic.");

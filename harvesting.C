@@ -458,20 +458,25 @@ Harvesting::load_syntax (Syntax& syntax, AttributeList& alist)
 
   syntax.add_submodule_sequence ("Stem", Syntax::Const, 
 				 "Stem AM parameters.", AOM::load_syntax);
+  syntax.add_check ("Stem", AM::check_om_pools ());
   alist.add ("Stem", AM::default_AM ());
   syntax.add_submodule_sequence ("Leaf", Syntax::Const,
 				 "Leaf AM parameters.", AOM::load_syntax);
+  syntax.add_check ("Leaf", AM::check_om_pools ());
   alist.add ("Leaf", AM::default_AM ());
   syntax.add_submodule_sequence ("Dead", Syntax::Const,
 				 "Dead leaves AM parameters.",
 				 AOM::load_syntax);
+  syntax.add_check ("Dead", AM::check_om_pools ());
   alist.add ("Dead", AM::default_AM ());
   syntax.add_submodule_sequence ("SOrg", Syntax::Const,
 				 "Storage organ AM parameters.", 
 				 AOM::load_syntax);
+  syntax.add_check ("SOrg", AM::check_om_pools ());
   alist.add ("SOrg", AM::default_AM ());
   syntax.add_submodule_sequence ("Root", Syntax::Const,
 				 "Root AM parameters.", AOM::load_syntax);
+  syntax.add_check ("Root", AM::check_om_pools ());
   alist.add ("Root", AM::default_AM ());
   syntax.add ("EconomicYield_W", Syntax::None (), Syntax::Const, "\
 Valuable fraction of storage organ (DM), e.g. grain or tuber.");

@@ -12,13 +12,28 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.56
+
+** Changes to reference manual.
+
+Simple default values (like numbers) are now printed in "sample"
+sections.
+
+** More parameter checks.
+
+** daisy.exe is fast again
+
+For mysterious reasons, the new compiler started generating very slow
+code, even slower than pre-2.47.  Switching to another computer seem
+to have solved that, so Daisy is up to the speed of 2.47.
+
 * 2.55
 
 ** Removed the obsolete NH4_evaporation fertilizer parameter.
 
-Use 'volatilization' instead.
+Use 'volatilization' instead.  
 
-** Clanups.
+** Cleanups.
 
 * 2.54
 

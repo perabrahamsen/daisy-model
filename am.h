@@ -31,6 +31,7 @@ class Soil;
 class Time;
 class AOM;
 class Treelog;
+class VCheck;
 
 // Use new parameters from Sander et.al., 2002.
 #define SANDER_PARAMS
@@ -78,6 +79,7 @@ public:
 
   // Create and Destroy.
 public:
+  static const VCheck& check_om_pools ();
   // Initialization & Fertilizer.
   static AM& create (const AttributeList&, const Soil&);
   // Crop part.

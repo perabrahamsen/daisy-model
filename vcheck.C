@@ -26,6 +26,7 @@
 #include "tmpstream.h"
 #include "assertion.h"
 #include "mathlib.h"
+#include <algorithm>
 #include <numeric>
 
 using namespace std;

@@ -28,6 +28,8 @@
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
 #include <iostream>
 namespace std { typedef ostream ostream; }
+#elif defined (__GNUC__) && __GNUC__ < 3
+#include <iostream>
 #else
 #include <ostream>
 #endif

@@ -84,7 +84,7 @@ Document::print_submodel (ostream& out, const string& name, int level,
 void 
 Document::print_sample (ostream& out, const string& name,
 			const Syntax& syntax,
-			const AttributeList& /* alist */)
+			const AttributeList& alist)
 {
   print_sample_header (out, name);
 
@@ -101,8 +101,7 @@ Document::print_sample (ostream& out, const string& name,
     if (syntax.order (entries[i]) < 0
 	&& !syntax.is_log (entries[i])
 	&& syntax.lookup (entries[i]) != Syntax::Library)
-      print_sample_entry (out, entries[i], 
-			  syntax.size (entries[i]) == Syntax::Sequence);
+      print_sample_entry (out, entries[i], syntax, alist);
 
   print_sample_trailer (out, name);
 }

@@ -803,12 +803,16 @@ Non-functional lim for N-concentration in roots.");
 	       "Relative increase in straw concentration above normal range.");
   Harvest.add_submodule_sequence ("Stem", Syntax::Const, 
 				 "Stem AM parameters.", AOM::load_syntax);
+  Harvest.add_check ("Stem", AM::check_om_pools ());
   Harvest.add_submodule_sequence ("Leaf", Syntax::Const,
 				 "Leaf AM parameters.", AOM::load_syntax);
+  Harvest.add_check ("Leaf", AM::check_om_pools ());
   Harvest.add_submodule_sequence ("SOrg", Syntax::Const,
 				 "SOrg AM parameters.", AOM::load_syntax);
+  Harvest.add_check ("SOrg", AM::check_om_pools ());
   Harvest.add_submodule_sequence ("Root", Syntax::Const,
 				 "Root AM parameters.", AOM::load_syntax);
+  Harvest.add_check ("Root", AM::check_om_pools ());
   Harvest.add ("C_Stem", Syntax::None (), Syntax::Const,
 	       "C fraction of total weight.");
   Harvest.add ("C_SOrg", Syntax::None (), Syntax::Const,

@@ -1,4 +1,30 @@
+2003-02-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.56 released.
+
+2003-02-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tmpstream.h: Added GCC 2.95 support.
+	* vcheck.C: Ditto.
+
+	* printer_file.C, printer_file.h (print_string): Exported.
+	* document_LaTeX.C (print_sample_ordered, print_sample_entry)
+	(print_sample_header): Use them.
+
+	* document_LaTeX.C (print_entry_value, print_entry_category)
+	(print_entry_type, print_entry_submodel): Remove redundant arguments. 
+	(print_submodel_entry): Update caller.
+	(print_sample_entry): Print simple default value.
+	* document.C (print_sample): Update caller.
+	* txt/introduction.tex (subsection{Sample}): Describe it.
+
 2003-02-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C, am.h (check_om_pools): New function.
+	* am.C (AM_Syntax): Use it.
+	* bioincorporation.C (load_syntax): Use it.
+
+	* bioincorporation.C (load_syntax): Added checks.
 
 	* Version 2.55 released.
 
