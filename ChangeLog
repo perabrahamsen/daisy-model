@@ -1,4 +1,21 @@
+2002-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.21 released.
+
+2002-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* traverse.C, traverse.h (traverse_all_submodels): New function.
+	* submodel.C, submodel.h (registered): New static member function.
+	* xref.C, xref.h: New utility.
+	* Makefile (OTHER): Added it.
+	* document.h (Document): Use it.
+	* document_LaTeX.C, document.h (print_users): New function.
+	* document.C (print_component): Call it.
+	(print_model, print_fixed): Ditto.
+
 2002-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_base.C (check): Remove duplicate declaration of ok.
 
 	* Version 2.20 released.
 

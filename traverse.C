@@ -24,6 +24,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
+#include "submodel.h"
 
 void 
 Traverse::traverse_all_libraries ()
@@ -36,6 +37,23 @@ Traverse::traverse_all_libraries ()
     {
       const string& component = components[i];
       traverse_library (component);
+    }
+}
+
+void 
+Traverse::traverse_all_submodels ()
+  // Traverse through all registered submodels.
+{
+  vector<string> submodels;
+  Submodel::all (submodels);
+
+  for (unsigned int i = 0; i < submodels.size (); i++)
+    {
+      Syntax syntax;
+      AttributeList alist;
+      const string& submodel = submodels[i];
+      Submodel::load_syntax (submodel, syntax, alist);
+      traverse_submodel_default (syntax, alist, submodel);
     }
 }
 
@@ -189,19 +207,18 @@ Traverse::traverse_alist (const Syntax& syntax, AttributeList& alist,
 
   vector<string> parameters;
   syntax.entries (parameters);
-  {for (unsigned int i = 0; i < parameters.size (); i++)
+  for (unsigned int i = 0; i < parameters.size (); i++)
     {
       const string& parameter = parameters[i];
       if (syntax.order (parameter) < 0)
 	traverse_parameter (syntax, alist, default_alist, name, parameter);
-  }}
+  }
 }
 
 void
 Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 			      const AttributeList& default_alist,
-			      const string& name, const string&
-			      parameter)
+			      const string& name, const string& parameter)
   // Traverse through an alist member.  This is most interesting for
   // alist and object members, of course.
 {

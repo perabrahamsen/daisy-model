@@ -24,15 +24,19 @@
 #define DOCUMENT_H
 
 #include "librarian.h"
+#include "xref.h"
 
 class Document
 {
   // Content.
 public:
   static const char *const description;
+private:
+  XRef xref;
 
   // Typeset parts of it.
 protected:
+  virtual void print_users (ostream&, const XRef::Users&) = 0;
   virtual void print_submodel_entry (ostream&, const string&, int level,
 				     const Syntax& syntax,
 				     const AttributeList& alist) = 0;

@@ -35,6 +35,7 @@ class Traverse
   // Major calls.
 public:
   void traverse_all_libraries ();
+  void traverse_all_submodels ();
   void traverse_library (const string& component);
   void traverse_model (const string& component, const string& model);
   void traverse_submodel (const Syntax& syntax, AttributeList& alist,

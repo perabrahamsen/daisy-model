@@ -304,6 +304,11 @@ Harvesting::output (Log& log) const
 void 
 Harvesting::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  // Submodel.
+  alist.add ("submodel", "Harvesting");
+  alist.add ("description", 
+	     "Information about what happens to the crop at harvest and cut.");
+
   syntax.add_submodule_sequence ("Stem", Syntax::Const, 
 				 "Stem AOM parameters.", OM::load_syntax);
   alist.add ("Stem", AM::default_AOM ());

@@ -48,6 +48,10 @@ Submodel::load_syntax (const string& model,
   (*i).second (syntax, alist);
 }
 
+bool
+Submodel::registered (const string& submodel)
+{ return submodel_map->find (submodel) != submodel_map->end (); }
+
 Submodel::Register::Register (const string& name, load_fun fun)
 {
   if (!submodel_map)

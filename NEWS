@@ -12,7 +12,14 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
-* 2.19
+* 2.21
+
+** Added cross references to reference manual.
+
+In particular, add information about where each component, model,
+parameterization and submodel is used.
+
+* 2.20
 
 ** Change the way to specify chemicals for logging.
 

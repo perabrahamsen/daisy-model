@@ -72,6 +72,7 @@ struct DocumentLaTeX : public Document
 			  const AttributeList& alist);
 
   // Document functions.
+  void print_users (ostream&, const XRef::Users&);
   void print_submodel_entry (ostream&, const string&, int level,
 			     const Syntax& syntax,
 			     const AttributeList& alist);
@@ -468,6 +469,58 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	  }
     }
 }
+
+void 
+DocumentLaTeX::print_users (ostream& out, const XRef::Users& users)
+{
+  if (users.models.empty () && users.submodels.empty ())
+    return;
+
+  out << "\nUsed by ";
+
+  for (unsigned int i = 0; i < users.models.size (); i++)
+    {
+      if (i == users.models.size () - 1 && users.submodels.empty ())
+	out << ", and \n";
+      else if (i != 0)
+	out << ",\n";
+      const string component = users.models[i].component;
+      const string model = users.models[i].model;
+      const vector<string>& path = users.models[i].path;
+      print_quoted (out, component);
+      out << " ";
+      print_quoted (out, model);
+      out << " @";
+      for (unsigned int j = 0; j < path.size (); j++)
+	{
+	  out << " ";
+	  print_quoted (out, path[j]);
+	}
+      out << " (see \\ref{model:" << component << "-" << model 
+	  << "}, page \\ref{model:" << component << "-" << model << "}";
+    }
+
+  for (unsigned int i = 0; i < users.submodels.size (); i++)
+    {
+      if (i == users.submodels.size () - 1)
+	out << ", and \n";
+      else if (i != 0  || !users.submodels.empty ())
+	out << ",\n";
+      const string submodel = users.submodels[i].submodel;
+      const vector<string>& path = users.submodels[i].path;
+      print_quoted (out, submodel);
+      out << " @";
+      for (unsigned int j = 0; j < path.size (); j++)
+	{
+	  out << " ";
+	  print_quoted (out, path[j]);
+	}
+      out << " (see \\ref{fixed:" << submodel 
+	  << "}, page \\ref{fixed:" << submodel << "}";
+    }
+  out << ".\n";
+}
+
 void 
 DocumentLaTeX::print_submodel_entry (ostream& out,
 				     const string& name, int level,

@@ -1,5 +1,7 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Viscosity
+
 * NEWS
 
 ** New log parameterizations "Organic Matter" and "AOM Pools".
@@ -40,15 +42,15 @@ Udbyg.
 
 *** Gennemgå referencemanualen og kig efter ting der bør listes.
 
+** Permanent vegetation
+
+** Simple Crop Types
+
 * Irrigation
 
 ** Deficit
 
 Start ved specifik dato.
-
-** Permanent vegetation
-
-** Simple Crop Types
 
 * Parser & Printer.
 
@@ -61,8 +63,8 @@ Start ved specifik dato.
 (output ("N_balance"
          (when daily)
          (to -1 [m])
-         (balance (Ammonium (begin 1965 07 20) (end (2002 03 07)))
-                  (Nitrogen (begin 1965 07 20) (end (2002 03 07)))))
+         (balance (Ammonium (begin 1965 07 20) (end 2002 03 07))
+                  (Nitrogen (begin 1965 07 20) (end 2002 03 07))))
 
 # Ammonium balance for period 20-07-1965 to 07-03-2002
 #

@@ -38,6 +38,7 @@ public:
   
   static void all (vector<string>& entries);
   static void load_syntax (const string& model, Syntax&, AttributeList&);
+  static bool registered (const string& submodel);
 
   class Register
   {

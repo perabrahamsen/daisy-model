@@ -114,6 +114,7 @@ Document::print_model (ostream& out, const string& name,
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);  
 
+  const XRef::ModelUsed used (library.name (), name);
   if (alist.check ("type"))
     {
       const string type = alist.name ("type");
@@ -134,6 +135,7 @@ Document::print_model (ostream& out, const string& name,
 	      || super.name ("description") != description)
 	    print_parameterization_description (out, description);
 	}
+      print_users (out, xref.models[used]);
       print_parameterization_trailer (out, name);
     }
   else
@@ -144,6 +146,7 @@ Document::print_model (ostream& out, const string& name,
       if (alist.check ("description"))
 	print_model_description (out, alist.name ("description"));
 
+      print_users (out, xref.models[used]);
       print_sample (out, name, syntax, alist);
       print_submodel (out, name, 0, syntax, alist);
       print_model_trailer (out, name);
@@ -160,6 +163,8 @@ Document::print_fixed (ostream& out, const string& name,
   // Print description, if any.
   if (alist.check ("description"))
     print_model_description (out, alist.name ("description"));
+
+  print_users (out, xref.submodels[name]);
 
   print_sample (out, name, syntax, alist);
   print_submodel (out, name, 0, syntax, alist);
@@ -224,6 +229,8 @@ Document::print_component (ostream& out, const Library& library)
   const char *const description = library.description ();
   if (description)
     print_component_description (out, description);
+
+  print_users (out, xref.components[name]);
 
   // For all members...
   vector<string> entries;

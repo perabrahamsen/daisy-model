@@ -284,7 +284,6 @@ ColumnBase::check (bool require_weather,
       ok = false;
   }
   {
-    bool ok = true;
     Treelog::Open nest (err, "Transformations");
     for (vector<Transform*>::const_iterator i = transformations.begin ();
 	 i != transformations.end ();
