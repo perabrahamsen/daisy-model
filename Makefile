@@ -28,7 +28,7 @@ SRCONLY = column_std.C  weather_simple.C uzrichard.C \
 	weather_none.C action_fertilize.C weather_file.C action_tillage.C \
 	action_harvest.C hydraulic_old.C $(MIKEONLY) crop_old.C crop_sold.C \
 	action_with.C hydraulic_old2.C nitrification_soil.C \
-	nitrification_solute.C
+	nitrification_solute.C hydraulic_mod_C.C
 OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
 	filter.C csmp.C time.C uzmodel.C parser_file.C hydraulic.C \

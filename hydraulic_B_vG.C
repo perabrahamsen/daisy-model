@@ -58,8 +58,8 @@ double
 HydraulicB_vG::Cw2 (const double h) const
 {
   if (h < 0)
-    return - (  (Theta_sat - Theta_res)
-	      * (m * (  pow (1 / (1 + pow (a * h, n)), m - 1)
+    return - ((Theta_sat - Theta_res)
+	      * (m * (pow (1.0 / (1 + pow (a * h, n)), m - 1)
 		      * (n * (pow (a * h, n - 1) * a))))
 	      / pow (1 + pow(a * h, n), 2));
   else
