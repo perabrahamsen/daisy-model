@@ -1,7 +1,7 @@
 OLDCROPS = beet-old.dai grass-old.dai pea-old.dai potato-old.dai \
 	sbarley-old.dai srape-old.dai wbarley-old.dai wrape-old.dai \
 	wwheat-old.dai 
-NEWCROPS = potato.dai \
+NEWCROPS = ryegrass.dai wclover.dai potato.dai \
 	maize.dai pea.dai rye.dai sbarley.dai sugarbeet.dai srape.dai \
 	swheat.dai wbarley.dai wrape.dai wwheat.dai grass.dai fodderbeet.dai
 

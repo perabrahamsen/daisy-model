@@ -13,5 +13,7 @@
 (input file "wrape.dai")
 (input file "wwheat.dai")
 (input file "grass.dai")
+(input file "ryegrass.dai")
+(input file "wclover.dai")
 
 ;;; crop.dai ends here

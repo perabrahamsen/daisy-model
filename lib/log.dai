@@ -1448,10 +1448,15 @@ the sum of all chemicals."
                    (dimension "g CH2O/m^2/&")
                    (flux true)
                    (factor 1.0))
+           (number (path column "$col" OrganicMatter Bioincorporation CO2)
+                   (tag "Bioinc_CO2")
+                   (flux true)
+                   (dimension "kg C/ha/&")
+                   (factor 10))         ;g/m^2 -> kg/ha
            (interval (path column "$col" OrganicMatter CO2)
-                   (dimension "g CO2/m^2/&")
-                       (flux true)
-                   (factor 1.7272e4)) ;g CO2-C/cm^2 -> CO2/m^2
+                     (dimension "g CO2/m^2/&")
+                     (flux true)
+                     (factor 1.7272e4)) ;g CO2-C/cm^2 -> CO2/m^2
            ))
 
 (deflog "Crop Production" table
@@ -2651,8 +2656,8 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
            (interval (path column "$col" OrganicMatter CO2)
                      (tag "SMB-CO2-total") 
                      (dimension "kg C/ha/&")
-                       (flux true)
-                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
+                     (flux true)
+                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2-C/ha
            (number (path column "$col" OrganicMatter am "*" om "*" top_C)
                    (tag "Surface_C")
                    (dimension "kg C/ha")
