@@ -76,7 +76,6 @@ public:
 public:
   double water_stress;		// Fraction of requested water we didn't got.
   double water_stress_days;	// Accumulated water stress.
-  double nitrogen_stress;	// Fraction of requested nitrogen didn't got.
   double production_stress;	// SVAT induced stress, -1 if not applicable.
  
 private:

@@ -367,7 +367,7 @@ RootSystem::output (Log& log) const
   output_variable (soil_temperature, log);
   output_variable (water_stress, log);
   output_variable (water_stress_days, log);
-  output_variable (nitrogen_stress, log);
+  output_variable (water_stress_days, log);
   output_variable (production_stress, log);
   output_variable (Ept, log);
   output_variable (H2OUpt, log);
@@ -473,9 +473,6 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
 This is the sum of water stress for each hour, multiplied with the\n\
 fraction of the radition of that day that was received that hour.");
   alist.add ("water_stress_days", 0.0);
-  syntax.add ("nitrogen_stress", Syntax::None (), Check::fraction (),
-	      Syntax::LogOnly,
-	       "Nitrogen stress factor.");
   syntax.add ("production_stress", Syntax::None (), Check::fraction (), 
 	      Syntax::LogOnly,
 	       "SVAT induced stress, or -1 if not applicable.");
@@ -521,7 +518,6 @@ RootSystem::RootSystem (const AttributeList& al)
     soil_temperature (al.number ("soil_temperature")),
     water_stress (0.0),
     water_stress_days (al.number ("water_stress_days")),
-    nitrogen_stress (0.0),
     production_stress (-1.0),
     Ept (0.0),
     H2OUpt (0.0),

@@ -1,10 +1,26 @@
 2004-06-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.44 released.
+
+2004-06-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate.C (day_fraction): New function.
+	* root_system.C, root_system.h (nitrogen_stress): Removed.
+	* crpn.C, crpn.h (nitrogen_stress_days, nitrogen_stress): New
+	parameters 
+	* crop_std.C (tick): Update caller.
+	* lib/log.dai ("Crop Production"): Updated user.
+
+	* partition.C, partition.h (nitrogen_stress_limit): New parameter.  
+	(operator ()): Use it.
+	* production.C, production.h (nitrogen_stress_limit) Removed.
+	(tick): Update caller.
+
 	* Version 3.43 released.
 
 2004-06-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* production.C (nitrogen_stress_limit) New parameter.
+	* production.C, production.h (nitrogen_stress_limit) New parameter.
 	(tick): Use it.
 	* crop_std.C (tick): Update caller.
 

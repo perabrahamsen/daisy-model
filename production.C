@@ -31,7 +31,6 @@
 #include "submodel.h"
 #include "tmpstream.h"
 #include "mathlib.h"
-#include "check.h"
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
@@ -187,20 +186,14 @@ Production::tick (const double AirT, const double SoilT,
       // Partition growth.
       double f_Leaf, f_Stem, f_SOrg, f_Root;
 
-      if (nitrogen_stress > nitrogen_stress_limit && DS1 > 1.0)
+      partition (DS, RSR (), nitrogen_stress, 
+                 f_Leaf, f_Stem, f_Root, f_SOrg);
+      if (ReleaseOfRootReserves)
         {
-          f_SOrg = 1.0;
-          f_Leaf = f_Stem = f_Root = 0.0;
+          f_Leaf += f_Root;
+          f_Root = 0.0;
         }
-      else
-        {
-          partition (DS, RSR (), f_Leaf, f_Stem, f_Root, f_SOrg);
-          if (ReleaseOfRootReserves)
-            {
-              f_Leaf += f_Root;
-              f_Root = 0.0;
-            }
-        }
+
       IncWLeaf = E_Leaf * f_Leaf * AssG;
       IncWStem = E_Stem * f_Stem * AssG - ReMobil;
       IncWSOrg = E_SOrg * f_SOrg * AssG;
@@ -574,11 +567,6 @@ Crop production in the default crop model.");
   syntax.add ("LfRtRelRtRes", Syntax::None (), Syntax::Const,
 	      "Max Leaf:Root for the release of root res.");
   alist.add ("LfRtRelRtRes", 0.80);
-  syntax.add ("nitrogen_stress_limit", Syntax::None (), Check::fraction (), 
-              Syntax::Const,
-	      "If nitrogen stress is above this number and DS is above 1,\n\
-allocate all assimilate to the storage organ.");
-  alist.add ("nitrogen_stress_limit", 1.0);
 
   // Variables.
   syntax.add ("CH2OPool", "g CH2O/m^2", Syntax::State, "CH2O Pool.");
@@ -726,7 +714,6 @@ Production::Production (const AttributeList& al)
     EndDSRelRtRes (al.number ("EndDSRelRtRes")),
     RelRateRtRes (al.number ("RelRateRtRes")),
     LfRtRelRtRes (al.number ("LfRtRelRtRes")),
-    nitrogen_stress_limit (al.number ("nitrogen_stress_limit")),
 
     // State.
     CH2OPool (al.number ("CH2OPool")),

@@ -12,6 +12,22 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.44
+
+** nitrogen_stress moved to CrpN submodel.
+
+You must update log.dai to see nitrogen stress.
+
+** New nitrogen_stress_days CrpN parameter.
+
+This is similar to water_stress_days, giving an accumulate impact
+indicater for production loss due to nitrogen stress.
+
+** New nitrogen_stress_limit partition parameter.
+
+Setting this will cause all growth assimilate to go to the storage
+organ when there is nitrogen stress in the repreoductive phase.
+
 * 3.43
 
 ** Preliminary Ryegrass and Wclover crop parameterizations.

@@ -72,6 +72,12 @@ private:
   double NO3_root_min;		// Minimum NO3 conc near roots [g N/cm^3]
   double NH4_root_min;		// Minimum NH4 conc near roots [g N/cm^3]
 
+  // Stress
+public:
+  double nitrogen_stress;	// Fraction of requested nitrogen didn't got.
+private:
+  double nitrogen_stress_days;	// Accumulated nitrogen stress.
+
   // Fixation.
 private:
   const double DS_fixate;	// Fixation of atmospheric N. after this DS
@@ -91,6 +97,7 @@ public:
 	       bool enable_N_stress,
 	       const Soil& soil, const SoilWater& soil_water,
 	       SoilNH4& soil_NH4, SoilNO3& soil_NO3,
+               double day_fraction,
 	       RootSystem& root_system);
   void output (Log& log) const;
 

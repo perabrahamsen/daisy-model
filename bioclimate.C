@@ -33,6 +33,14 @@ and energy provided by the weather component among the crops and soil\n\
 for a given column.";
 
 double 
+Bioclimate::day_fraction () const
+{
+  if (daily_global_radiation () > 0.0)
+    return hourly_global_radiation () / (24.0 * daily_global_radiation ());
+  return 0.0;
+}
+
+double 
 Bioclimate::get_evap_interception () const
 { daisy_assert (false); }
 

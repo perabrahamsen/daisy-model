@@ -290,6 +290,7 @@ CropStandard::tick (const Time& time,
       nitrogen.update (time.hour (), production.NCrop, development.DS,
 		       enable_N_stress,
 		       soil, soil_water, *soil_NH4, *soil_NO3,
+                       bioclimate.day_fraction (),
 		       root_system);
     }
   else
@@ -297,7 +298,7 @@ CropStandard::tick (const Time& time,
       daisy_assert (!soil_NH4);
       production.NCrop = nitrogen.PtNCnt;
     }  
-  const double nitrogen_stress = root_system.nitrogen_stress;
+  const double nitrogen_stress = nitrogen.nitrogen_stress;
   const double water_stress = root_system.water_stress;
 
   if (bioclimate.hourly_global_radiation () > 1e-10)

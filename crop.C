@@ -55,11 +55,13 @@ Crop::kill (const symbol name, const Time& time, const Geometry& geometry,
 	    vector<double>& residuals_N_soil, vector<double>& residuals_C_soil,
 	    Treelog& out)
 { 
-  const Harvest& dummy // MS Visual C++ 2003 sucks.
-        = harvest (name, time, geometry, bioclimate,
-	          0.0, 0.0, 0.0, 0.0, true, residuals, 
-	          residuals_DM, residuals_N_top, residuals_C_top, 
-	          residuals_N_soil, residuals_C_soil, out); 
+#if defined (_MSC_VER)  
+  const Harvest& dummy = // MS Visual C++ 2003 sucks.
+#endif 
+    harvest (name, time, geometry, bioclimate,
+             0.0, 0.0, 0.0, 0.0, true, residuals, 
+             residuals_DM, residuals_N_top, residuals_C_top, 
+             residuals_N_soil, residuals_C_soil, out); 
 }
 
 void 

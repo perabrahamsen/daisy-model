@@ -64,7 +64,8 @@ public:
   virtual double day_length () const = 0;
   virtual double daily_global_radiation () const = 0;
   virtual double hourly_global_radiation () const = 0;
-  
+  double day_fraction () const;   
+
   // Manager.
 public:
   virtual void irrigate_overhead (double flux, double temp) = 0;

@@ -95,6 +95,7 @@ CrpN::update (const int Hour, double& NCrop, const double DS,
 	      const bool enable_N_stress,
 	      const Soil& soil, const SoilWater& soil_water,
 	      SoilNH4& soil_NH4, SoilNO3& soil_NO3,
+              const double day_fraction,
 	      RootSystem& root_system)
 {
   double PotNUpt = (PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
@@ -117,8 +118,9 @@ CrpN::update (const int Hour, double& NCrop, const double DS,
     Fixated = 0.0;
 
   // Updating the nitrogen stress
-  root_system.nitrogen_stress
+  nitrogen_stress 
     = 1.0 - bound (0.0, ((NCrop - NfNCnt) / (CrNCnt - NfNCnt)), 1.0);
+  nitrogen_stress_days += nitrogen_stress * day_fraction;
   
   // Ensure we have enough N for all the crop parts.
   if (!enable_N_stress)
@@ -131,6 +133,8 @@ CrpN::output (Log& log) const
   output_variable (PtNCnt, log);
   output_variable (CrNCnt, log);
   output_variable (NfNCnt, log);
+  output_variable (nitrogen_stress, log);
+  output_variable (nitrogen_stress_days, log);
   output_variable (Fixated, log);
   output_variable (AccFixated, log);
   output_variable (DS_start_fixate, log);
@@ -228,6 +232,17 @@ Minimum nitrate concentration near roots for uptake.");
 Minimum ammonium concentration near roots for uptake.");
   alist.add ("NH4_root_min", 0.0);
 
+  // Stress.
+  syntax.add ("nitrogen_stress", Syntax::None (), Check::fraction (),
+	      Syntax::LogOnly,
+	       "Nitrogen stress factor.");
+  syntax.add ("nitrogen_stress_days", "d", Check::non_negative (),
+	      Syntax::State,
+	       "Number of days production has halted due to nitrogen stress.\n\
+This is the sum of nitrogen stress for each hour, multiplied with the\n\
+fraction of the radition of that day that was received that hour.");
+  alist.add ("nitrogen_stress_days", 0.0);
+
   // Fixation.
   syntax.add ("DS_fixate", Syntax::None (), Syntax::Const,
 	      "DS at which to start fixation of atmospheric N.");
@@ -268,6 +283,8 @@ CrpN::CrpN (const AttributeList& al)
     NfNCnt (0.0),
     NO3_root_min (al.number ("NO3_root_min")),
     NH4_root_min (al.number ("NH4_root_min")),
+    nitrogen_stress (0.0),
+    nitrogen_stress_days (al.number ("nitrogen_stress_days")),
     DS_fixate (al.number ("DS_fixate")),
     DS_cut_fixate (al.number ("DS_cut_fixate")),
     fixate_factor (al.number ("fixate_factor")),

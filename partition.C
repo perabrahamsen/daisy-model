@@ -30,10 +30,17 @@
 #include "common.h"
 
 void
-Partition::operator() (double DS, double current_RSR,
+Partition::operator() (double DS, double current_RSR, double nitrogen_stress,
 		       double& f_Leaf, double& f_Stem,
 		       double& f_Root, double& f_SOrg) const
 {
+  if (nitrogen_stress > nitrogen_stress_limit && DS > 1.0)
+    {
+      f_SOrg = 1.0;
+      f_Leaf = f_Stem = f_Root = 0.0;
+      return;
+    }
+
   if (current_RSR > RSR (DS))
     f_Root = 0.0;
   else
@@ -101,13 +108,19 @@ shoot.");
   syntax.add ("RSR", "DS", Syntax::None (), Check::positive (), Syntax::Const,
 	      "Maximal root/shoot ratio as a function of development state.\n\
 If the root/shoot ratio is above this, the roots will srtart dying.");
+  syntax.add ("nitrogen_stress_limit", Syntax::None (), Check::fraction (), 
+              Syntax::Const,
+	      "If nitrogen stress is above this number and DS is above 1,\n\
+allocate all assimilate to the storage organ.");
+  alist.add ("nitrogen_stress_limit", 1.0);
 }
 
 Partition::Partition (const AttributeList& al)
   : Root (al.plf ("Root")),
     Leaf (al.plf ("Leaf")),
     Stem (al.plf ("Stem")),
-    RSR (al.plf ("RSR"))
+    RSR (al.plf ("RSR")),
+    nitrogen_stress_limit (al.number ("nitrogen_stress_limit"))
 { }
 
 Partition::~Partition ()

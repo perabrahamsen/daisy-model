@@ -70,7 +70,6 @@ private:
   const double EndDSRelRtRes;	// End DS for the release of root reserves
   const double RelRateRtRes;	// Release rate of root reserves
   const double LfRtRelRtRes;	// Max Leaf:Root for the release of root res.
-  const double nitrogen_stress_limit; // Allocate all ass. to SOrg above this.
 
   // State.
 public:

@@ -1704,7 +1704,7 @@ CropSold::tick (const Time& time,
 		OrganicMatter*,
 		const SoilHeat& soil_heat,
 		const SoilWater& soil_water, 
-		SoilNH4* soil_NH4, SoilNO3* soil_NO3,
+		SoilNH4* soil_NH4, SoilNO3* soil_NO3, 
 		double&, double&, double&, vector<double>&, vector<double>&, 
 		double ForcedCAI,
 		Treelog& msg)
