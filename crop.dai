@@ -100,8 +100,7 @@
 	     (CrSOrgCnc (0.00 0.016)
 			(1.00 0.016)
 			(2.00 0.016))))
- (horizon h1 horizon
-	  (compact false))
+ (horizon h1 yolo)
  (column c1 column
 	 (Bioclimate (NoOfIntervals 30))
 	 (Surface)

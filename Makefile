@@ -21,11 +21,11 @@ daisy:	$(OBJ)
 	$(CC) -o daisy $(OBJ) -lm
 
 bug: bug.o
-	$(CC) -v -o bug bug.o
+	$(CC) -o bug bug.o
 	bug
 
 bug.o:	bug.C
-	$(CC) -c bug.C
+	$(CC) -v -c bug.C
 
 wc: $(TEXT)
 	wc -l $(TEXT)

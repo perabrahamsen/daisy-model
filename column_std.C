@@ -126,20 +126,30 @@ ColumnStandard::~ColumnStandard ()
 { }
 
 // Add the Column syntax to the syntax table.
+static Column*
+ColumnStandard_constructor (string name, 
+			    const AttributeList& par, 
+			    const AttributeList& var)
+{
+  return new ColumnStandard (name, par, var);
+}
+
 static struct ColumnSyntax
 {
-  void parameters ();
-  void variables ();
+  const Syntax* parameters ();
+  const Syntax* variables ();
   ColumnSyntax ();
 } column_syntax;
 
 ColumnSyntax::ColumnSyntax ()
 { 
-  parameters ();
-  variables ();
+  Column::add_type ("column",
+		    AttributeList::empty, parameters (),
+		    AttributeList::empty, variables (),
+		    &ColumnStandard_constructor);
 }
 
-void
+const Syntax*
 ColumnSyntax::parameters ()
 { 
   Syntax* par = new Syntax ();
@@ -166,10 +176,11 @@ ColumnSyntax::parameters ()
   par->add ("Nitrification", nitrification);
   Syntax* denitrification = new Syntax ();
   par->add ("Denitrification", denitrification);
-  syntax_table->add ("column", par);
+
+  return par;
 }
 
-void
+const Syntax*
 ColumnSyntax::variables ()
 { 
   Syntax* var = new Syntax ();
@@ -196,5 +207,5 @@ ColumnSyntax::variables ()
   var->add ("Denitrification", denitrification);
   var->add ("crops", Syntax::Crops);
 
-  syntax_table->add ("column/state", var);
+  return var;
 }

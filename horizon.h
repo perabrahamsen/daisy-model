@@ -24,7 +24,7 @@ public:
   virtual double h (double Theta) const = 0;
   virtual bool compact () const;
 
-  // Create and Destroy.
+  // Library.
 public:
   static const Library& library ();
   typedef Horizon* (*constructor) (const AttributeList&);
@@ -32,6 +32,9 @@ public:
 			constructor);
   static void derive_type (string name, const AttributeList&, string super);
   static Horizon& create (string);
+
+  // Create and Destroy.
+public:
   Horizon (const AttributeList&);
   virtual ~Horizon ();
 };

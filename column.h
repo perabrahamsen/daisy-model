@@ -11,6 +11,8 @@ class Time;
 class Log;
 class Weather;
 class Groundwater;
+class AttributeList;
+class Syntax;
 
 class Column
 {
@@ -31,10 +33,34 @@ public:
   virtual double SoilTemperature (double depth) const = 0;
   virtual double MaxRootingDepth () const = 0;
 
+  // Library.
+public:
+  static const Library& par_library ();
+  static const Library& var_library ();
+  typedef Column* (*constructor) (string name, 
+				  const AttributeList& par,
+				  const AttributeList& var);
+  static void add_type (string name, 
+			const AttributeList& parList, const Syntax* parSyntax,
+			const AttributeList& varList, const Syntax* varSyntax,
+			constructor);
+  static void derive_type (string name, const AttributeList& par, string super);
+  static Column* create (string, const AttributeList& var);
+
   // Create and Destroy.
 public:
   Column (string name);
   virtual ~Column ();
 };
+
+// Ensure the Column library is initialized.
+// See TC++PL, 2ed, 10.5.1, for an explanation.
+static class Column_init
+{
+  static int count;
+public:
+  Column_init ();
+  ~Column_init ();
+} Column_init;
 
 #endif COLUMN_H

@@ -7,7 +7,7 @@
 #include "log.h"
 #include "uzmodel.h"
 #include "horizon.h"
-#include "column_std.h"
+#include "column.h"
 #include "crop.h"
 #include "alist.h"
 #include "csmp.h"
@@ -30,7 +30,6 @@ struct Input::Implementation
 {
   Log& log;
   Library crops;
-  Library columns;
   Library managers;
   Weather* weather;
   Groundwater* groundwater;
@@ -132,7 +131,7 @@ Input::Implementation::load ()
       else if (item == "horizon")
 	add_derived (Horizon::library (), &Horizon::derive_type);
       else if (item == "column")
-	load_library (columns);
+	add_derived (Column::par_library (), &Column::derive_type);
       else if (item == "manager")
 	load_library (managers);
       else if (item == "chief")
@@ -408,18 +407,17 @@ Input::Implementation::load_columns (ColumnList& cl)
       skip ("(");
       string name = get_id ();
 
-      if (columns.check (name))
+      if (Column::par_library ().check (name))
 	{
-	  const string root = columns.root (name);
-	  const AttributeList& par = columns.lookup (name);
-	  const Syntax* syntax
-	    = syntax_table->syntax (root + "/state");
-	  AttributeList var;
-	  load_list (&var, syntax);
-	  if (   syntax_table->syntax (root)->check (name, par, log)
-		 && syntax->check (name, var, log))
+	  const Syntax* parSyntax = Column::par_library ().syntax (name);
+	  const AttributeList& parList = Column::par_library ().lookup (name);
+	  const Syntax* varSyntax = Column::var_library ().syntax (name);
+	  AttributeList varList (Column::var_library ().lookup (name));
+	  load_list (&varList, varSyntax);
+	  if (   parSyntax->check (name, parList, log) 
+	      && varSyntax->check (name, varList, log))
 	    {
-	      Column* column = new ColumnStandard(name, par, var);
+	      Column* column = Column::create (name, varList);
 	      if (column->check (log))
 		cl.push_back (column);
 	      else
@@ -838,12 +836,13 @@ Input::Implementation::get_filter_columns ()
     {	
       skip ("(");
       string name = get_id ();
-      if (columns.check (name))
+      if (Column::par_library ().check (name))
 	{
-	  string root = columns.root (name) + "/state";
-	  const Syntax* syntax = syntax_table->syntax (root);
+	  const Syntax* syntax = Column::var_library ().syntax (name);
 	  filter->add (name, get_filter (syntax));
 	}
+      else 
+	error (string ("Unknown column `") + name + "' in filter");
       skip (")");
     }
   return filter;
@@ -872,7 +871,6 @@ Input::Implementation::get_filter_crops ()
 Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
   : log (*new Log ()),
     crops (),
-    columns (),
     chief ("manager"),
     time (0, 1, 1, 0),
     err (e),
