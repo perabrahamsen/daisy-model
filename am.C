@@ -685,9 +685,9 @@ AM::create (const Geometry& /*geometry*/, const Time& time,
 const vector<AttributeList*>&
 AM::default_AM ()
 {
-  static vector<AttributeList*>* am = NULL;
+  static vector<AttributeList*> am;
 
-  if (!am)
+  if (am.size () < 1)
     {
       Syntax aom_syntax;
       AttributeList aom_alist;
@@ -723,11 +723,10 @@ AM::default_AM ()
       fractions2.push_back (1.00);
       fractions2.push_back (0.00);
       AOM2.add ("fractions", fractions2);
-      am = new vector<AttributeList*>;
-      am->push_back (&AOM1);
-      am->push_back (&AOM2);
+      am.push_back (&AOM1);
+      am.push_back (&AOM2);
     }
-  return *am;
+  return am;
 }
 
 const AttributeList& 

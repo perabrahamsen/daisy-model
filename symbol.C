@@ -48,7 +48,11 @@ struct symbol::DB
   { return reverse_map[id]; }
 
   DB ();
+  ~DB ();
 };
+
+symbol::DB::~DB ()
+{ }
 
 symbol::DB::DB ()
   : counter (0)

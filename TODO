@@ -1,8 +1,24 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Weather default: Problem hvis første dag er mapped.
+* SH: Standarddaisykursus?
 
-* Jozef setup
+* SH: Arbejdsplan
+
+** Polish setup
+
+** wp1 vs wp3?
+
+** README file
+
+** .bat fil for windoz
+
+** upload, announce
+
+** ny kartoffel
+
+* stop attribut
+
+Skal bruge wether end som default
 
 * Make it possible to specify texture using different systems
 
@@ -16,7 +32,19 @@ Update hydraulic models.
 
 ** numeric horizon
 
+* Log pF
+
 * Slides til Dina årsmøde
+
+* Ny phenology model 
+
+En liste af stages, hver med sit eget navn og egne parametre.
+
+* Høst af kartofler skal indeholde en mix
+
+Vi skal have et "rodfrugt" flag i planten.  Hvis det er sandt vil en
+høst altid slå planten ihjelv, og betyde en mix.  Evt skal det være en
+dybde, så vi ved hvor langt ned vi skal rode.
 
 * Irrigation
 

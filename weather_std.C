@@ -1082,6 +1082,8 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     next_day (-42.42e42),
     next_hour (-42.42e42),
     next_air_temperature (-42.42e42),
+    next_min_air_temperature (-42.42e42),
+    next_max_air_temperature (-42.42e42),
     next_global_radiation (-42.42e42),
     next_precipitation (42.42e42),
     next_vapor_pressure (-42.42e42),

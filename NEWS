@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.30
+
+** Renamed "Majs" to "Silomajs" and adjusted parameters.
+
+New dk-maize.dai file from Christian Thirup.
+
+** New log model "Soil Water Potential (pF)".
+
+Log water potential in all numeric layers as pF.  
+
 * 3.29
 
 ** Logged Crop N uptake was larger than simulated Crop N uptake.

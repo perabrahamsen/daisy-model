@@ -1,4 +1,20 @@
+2004-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.30 released.
+
+2004-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_pF.C: New model.
+	* Makefile (MODELS): Added it.
+	
 2004-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioincorporation.C (speed): Initialize.
+
+	* weather_std.C (next_min_air_temperature,
+	daily_min_air_temperature_): Initialize.
+
+	* lib/log.dai ("Crop Nitrogen Balance"): New summary.
 
 	* Version 3.29 released.
 

@@ -248,7 +248,8 @@ Bioincorporation::Implementation::Implementation (const AttributeList& al)
     distribution (al.plf ("distribution")), 
     aom_alists (al.alist_sequence ("AOM")),
     C_removed (0.0),
-    N_removed (0.0)
+    N_removed (0.0),
+    speed (-42.42e42)
 { }
 
 void 

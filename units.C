@@ -288,25 +288,26 @@ Units::multiply (const string& one, const string& two)
   return Syntax::Unknown ();
 }
 
-class Convert_pF_cm : public Units::Convert
+// GCC 2.95 requires these to be defined outside a function.
+static class Convert_pF_cm_ : public Units::Convert
 {
   double operator() (double value) const
   { return pF2h (value); }
-};
+} Convert_pF_cm;
 
-class Convert_cm_pF : public Units::Convert
+static class Convert_cm_pF_ : public Units::Convert
 {
   double operator() (double value) const
   { return h2pF (value); }
-};
+} Convert_cm_pF;
 
 void
 Units::standard_conversions ()
 {
   // Parameters.
   add ("m", "cm", 100.0);
-  add ("pF", "cm", *new Convert_pF_cm ());
-  add ("cm", "pF", *new Convert_cm_pF ());
+  add ("pF", "cm", Convert_pF_cm);
+  add ("cm", "pF", Convert_cm_pF);
   add ("d^-1", "h^-1", 1.0/24.0);
   add ("d", "h", 24.0);
   add ("mm/d", "mm/h", 1.0/24.0);
