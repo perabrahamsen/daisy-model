@@ -287,13 +287,14 @@ Vegetation::Implementation::harvest (const string& column_name,
 				     double stem_harvest, double leaf_harvest, 
 				     double sorg_harvest)
 {
+  const bool all = (crop_name == "all");
   vector<const Harvest*> harvest;
   
   // Harvest all crops of this type.
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
-    if ((*crop)->name == crop_name)
+    if (all || (*crop)->name == crop_name)
       harvest.push_back (&(*crop)->harvest (column_name, time, 
 					    geometry, organic_matter,
 					    bioclimate,
@@ -309,7 +310,7 @@ Vegetation::Implementation::harvest (const string& column_name,
       for (CropList::iterator crop = crops.begin();
 	   crop != crops.end();
 	   crop++)
-	if ((*crop)->name == crop_name)
+	if (all || (*crop)->name == crop_name)
 	  {
 	    if (Crop::ds_remove (*crop))
 	      {

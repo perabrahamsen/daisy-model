@@ -1,4 +1,34 @@
+1999-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.05 released.
+
+1999-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.h (output_submodule_log_only): Removed.
+	* bioclimate_std.C (output): Updated caller.
+	* harvest.C (output): Ditto.
+
+	* organic_matter.C (initialize): Survive SOM initialization below
+	lowest node.
+	* geometry.C (initialize_layer): Same for other layered 
+	initializations.
+
+1999-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_crop.C: New model.
+	* Makefile (COMPONENTS): Add it.
+
+	* crop_std.C (harvest): Create dead root pool when killing
+	unemerged crop in a tillage operation.
+
+1999-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation.C (harvest): Obey "all".
+
 1999-12-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_wait.C (ActionWaitSyntax::check_mm_dd): New function.
+	(ActionWaitSyntax::ActionWaitSyntax):: Call it.
 
 	* Version 1.04 released.
 

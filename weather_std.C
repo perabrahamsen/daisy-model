@@ -337,7 +337,10 @@ WeatherStandard::read_line ()
 	  else if (value > data_description[index].max)
 	    lex.error (string ("Column ") 
 		       + data_description[index].name + " value too hight");
-	  assert (next_precipitation >= 0.0);
+	  if (!lex.good ())
+	    throw ("no more climate data");
+	  if (next_precipitation < 0.0)
+	    next_precipitation = 0.0;
 	}
 
       // Update time.
@@ -489,6 +492,10 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     snow_fraction (-42.42e42),
     rain_fraction (-42.42e42)
 {  
+  // Open errors?
+  if (!lex.good ())
+    return;
+
   // Read first line.
   const string type = lex.get_word ();
   if (type != "dwf-0.0")

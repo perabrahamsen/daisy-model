@@ -212,9 +212,9 @@ struct ActionIf : public Action
     { 
 #ifdef CONST_DELETE
       delete &if_c;
+#endif
       delete &then_a;
       delete &else_a;
-#endif
     }
 };
 

@@ -17,7 +17,7 @@ Harvest::output (Log& log) const
   log.output ("leaf_N", leaf_N);
   log.output ("sorg_DM", sorg_DM);
   log.output ("sorg_N", sorg_N);
-  output_submodule_log_only (chemicals, "chemicals", log);
+  output_submodule (chemicals, "chemicals", log);
 }
 
 void 

@@ -92,15 +92,10 @@ Field::Implementation::sow (const AttributeList& crop)
     }
   else 
     {
-      CERR << "on";
       for (ColumnList::iterator i = columns.begin ();
 	   i != columns.end ();
 	   i++)
-	{ 
-	  CERR << " " << (*i)->name;
-	  (*i)->sow (crop);
-	}
-      CERR << "\n";
+	(*i)->sow (crop);
     }
 }
 

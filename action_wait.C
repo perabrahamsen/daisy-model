@@ -102,11 +102,39 @@ struct ActionWaitMMDD : public Action
 static struct ActionWaitSyntax
 {
   static Action& make (const AttributeList& al)
-    { return *new ActionWait (al); }
+  { return *new ActionWait (al); }
   static Action& make_days (const AttributeList& al)
-    { return *new ActionWaitDays (al); }
+  { return *new ActionWaitDays (al); }
   static Action& make_mm_dd (const AttributeList& al)
-    { return *new ActionWaitMMDD (al); }
+  { return *new ActionWaitMMDD (al); }
+
+  static bool check_mm_dd (const AttributeList& alist)
+  {
+    bool ok = true;
+
+    const int mm = alist.integer ("month");
+    const int dd = alist.integer ("day");
+    const int hh = alist.integer ("hour");
+
+    if (mm < 1 || mm > 12)
+      {
+	CERR << "month should be between 1 and 12\n";
+	ok = false;
+      }
+    // don't test for bad month.
+    else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
+      {
+	CERR << "day should be between 1 and " 
+	     << Time::month_length (1, mm) << "\n";
+	ok = false;
+      }
+    if (hh < 0 || hh > 23)
+      {
+	CERR << "hour should be between 0 and 23\n";
+	ok = false;
+      }
+    return ok;
+  }
 
   ActionWaitSyntax ()
     {
@@ -139,6 +167,7 @@ Setting this overrides the `days' and `hours' parameters.");
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
+	syntax.add_check (check_mm_dd);	
 	alist.add ("description", "\
 Wait until a specific month and day in the year.");
 	syntax.add ("month", Syntax::Integer, Syntax::Const, 

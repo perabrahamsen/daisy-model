@@ -2666,24 +2666,23 @@ CropStandard::harvest (const string& column_name,
 	}
 
       // Update and unlock locked AMs.
-      if (var.Prod.AM_root)
-	{
-	  if (geometry.total (density) > 0.0)
-	    var.Prod.AM_root->add (geometry,
-				   WRoot * C_Root * m2_per_cm2,
-				   NRoot * m2_per_cm2,
-				   density);
-	  else
-	    var.Prod.AM_root->add (WRoot * C_Root * m2_per_cm2,
-				   NRoot * m2_per_cm2);
-	  assert (WRoot == 0.0 || NRoot > 0.0);
-	  var.Prod.AM_root->unlock ();
-	  var.Prod.AM_root = NULL;
-          Prod.C_AM += C_Root * WRoot;
-          Prod.N_AM += NRoot;
-	}
+      if (!var.Prod.AM_root)
+	var.Prod.AM_root = &AM::create (geometry, time, par.Harvest.Root,
+					name, "root", AM::Locked);
+
+      if (geometry.total (density) > 0.0)
+	var.Prod.AM_root->add (geometry,
+			       WRoot * C_Root * m2_per_cm2,
+			       NRoot * m2_per_cm2,
+			       density);
       else
-	assert (WRoot == 0.0);
+	var.Prod.AM_root->add (WRoot * C_Root * m2_per_cm2,
+			       NRoot * m2_per_cm2);
+      assert (WRoot == 0.0 || NRoot > 0.0);
+      var.Prod.AM_root->unlock ();
+      var.Prod.AM_root = NULL;
+      Prod.C_AM += C_Root * WRoot;
+      Prod.N_AM += NRoot;
 
       if (var.Prod.AM_leaf)
 	{

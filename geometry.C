@@ -261,12 +261,20 @@ Geometry::initialize_layer (vector<double>& array,
       // Initialize by layers.
       const vector<AttributeList*>& layers = al.alist_sequence (initial);
       array.insert (array.begin (), size (), 0.0);
+      const double soil_end = zplus (size () - 1);
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)
 	{
-	  const double next = layers[i]->number ("end");
+	  double next = layers[i]->number ("end");
 	  assert (next < last);
 	  const double value = layers[i]->number ("value");
+	  if (next < soil_end)
+	    {
+	      CERR << "WARNING: initial_" << name 
+		   << " layer ends below the last node\n";
+	      next = soil_end;
+	      i = layers.size ();
+	    }
 	  add (array, last, next, value * (last - next));
 	  last = next;
 	}

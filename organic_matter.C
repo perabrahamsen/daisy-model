@@ -511,14 +511,23 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
       
       // Find total C in layers.
       vector<double> total (soil.size (), 0.0);
-
+      
+      const double soil_end = soil.zplus (soil.size () - 1);
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)
 	{
-	  const double end = layers[i]->number ("end");
-	  const double weight = layers[i]->number ("weight"); // kg C/m²
+	  double end = layers[i]->number ("end");
+	  double weight = layers[i]->number ("weight"); // kg C/m²
 	  assert (weight > 0);
 	  assert (end < last);
+	  if (end < soil_end)
+	    {
+	      CERR << "WARNING: initial_SOM layer in OrganicMatter ends below "
+		   << "the last node\n";
+	      weight *= (last - soil_end) / (last - end);
+	      end = soil_end;
+	      i = layers.size ();
+	    }
 	  const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
 	  soil.add (total, last, end, C);
 	  last = end;
