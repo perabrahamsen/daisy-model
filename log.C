@@ -80,8 +80,13 @@ void
 Log::done ()
 { }
 
-Log::Log ()
-  : impl (*new Implementation ())
+void
+Log::initialize (const string&)
+{ }
+
+Log::Log (const AttributeList& al)
+  : impl (*new Implementation ()),
+    name (al.name ("type"))
 { }
 
 Log::~Log ()

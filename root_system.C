@@ -408,7 +408,7 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("DptEmr", "cm", Syntax::Const,
 	    "Penetration at emergence.");
   alist.add ("DptEmr", 10.0);
-  syntax.add ("PenPar1", "cm/dg C/h", Syntax::Const,
+  syntax.add ("PenPar1", "cm/dg C/d", Syntax::Const,
 	    "Penetration rate parameter, coefficient.");
   alist.add ("PenPar1", 0.25);
   syntax.add ("PenPar2", "dg C", Syntax::Const,
@@ -416,6 +416,7 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("PenPar2", 4.0);
   syntax.add ("MaxPen", "cm", Syntax::Const,
 	    "Maximum penetration depth.");
+  alist.add ("MaxPen", 100.0);
   syntax.add ("SpRtLength", "m/g", Syntax::Const,
 	    "Specific root length");
   alist.add ("SpRtLength", 100.0);

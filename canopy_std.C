@@ -186,22 +186,21 @@ CanopyStandard::tick (double WLeaf, double WSOrg, double WStem, double DS)
 void
 CanopyStandard::output (Log& log) const
 {
+  CanopySimple::output (log);
+  
   log.output ("InitCAI", InitCAI);
-  log.output ("Height", Height);
   log.output ("Offset", Offset);
-  log.output ("CAI", CAI);
   log.output ("LeafAI", LeafAI);
   log.output ("StemAI", StemAI);
   log.output ("SOrgAI", SOrgAI);
   log.output ("LADm", LADm);
-  log.output ("LAIvsH", LAIvsH);
   log.output ("CAImRat", CAImRat);
 }
 
 void 
 CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  static const PLF empty_plf;
+  CanopySimple::load_syntax (syntax, alist);
 
   // Parameters.
   syntax.add ("DSLAI05", Syntax::None (), Syntax::Const,
@@ -242,40 +241,16 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Relative CAI distribution at DS=0.");
   syntax.add ("LAIDist1", Syntax::None (), Syntax::Const, 3,
 	      "Relative CAI distribution at DS=1.");
-  syntax.add ("PARref", Syntax::None (), Syntax::Const,
-	      "PAR reflectance.");
-  alist.add ("PARref", 0.06);
-  syntax.add ("PARext", Syntax::None (), Syntax::Const,
-	      "PAR extinction coefficient.");
   syntax.add ("PARrel", Syntax::None (), Syntax::Const,
 	      "Relative PAR below the syntax.");
   alist.add ("PARrel", 0.05);
-  syntax.add ("EPext", Syntax::None (), Syntax::Const,
-	      "EP extinction coefficient.");
-  alist.add ("EPext", 0.5);
-  syntax.add ("IntcpCap", "mm", Syntax::Const,
-	      "Interception capacity.");
-  alist.add ("IntcpCap", 0.5);
-  syntax.add ("EpFac", Syntax::None (), Syntax::Const,
-	      "Potential evapotranspiration factor.");
-  alist.add ("EpFac", 1.0);
-  syntax.add ("rs_max", "s/m", Syntax::Const,
-	      "Maximum transpiration resistance.");
-  alist.add ("rs_max", 1.0e5);
-  syntax.add ("rs_min", "s/m", Syntax::Const,
-	      "Minimum transpiration resistance.");
-  alist.add ("rs_min", 0.0);
 
   // Variables.
   syntax.add ("InitCAI", Syntax::Boolean, Syntax::State,
 	      "Initial CAI development.");
   alist.add ("InitCAI", true);
-  syntax.add ("Height", "cm", Syntax::State, "Crop height.");
-  alist.add ("Height", 0.0);
   syntax.add ("Offset", "cm", Syntax::State, "Extra height after harvest.");
   alist.add ("Offset", 0.0);
-  syntax.add ("CAI", "m^2/m^2", Syntax::State, "Crop Area Index.");
-  alist.add ("CAI", 0.0);
   syntax.add ("LeafAI", "m^2/m^2", Syntax::State, "Leaf Area Index.");
   alist.add ("LeafAI", 0.0);
   syntax.add ("StemAI", "m^2/m^2", Syntax::State, "Stem Area Index.");
@@ -285,9 +260,6 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("LADm", "cm^2/cm^3", Syntax::State,
 	      "Maximal Leaf Area Density.");
   alist.add ("LADm", -9999.99);
-  syntax.add ("LAIvsH", "cm", "m^2/m^2", Syntax::State,
-	      "Accumulated Leaf Area Index at Height.");
-  alist.add ("LAIvsH", empty_plf);
 
   // Log Variables.
   syntax.add ("CAImRat", Syntax::None (), Syntax::LogOnly,
@@ -295,7 +267,8 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 CanopyStandard::CanopyStandard (const AttributeList& vl)
-  : DSLAI05 (vl.number ("DSLAI05")),
+  : CanopySimple (vl),
+    DSLAI05 (vl.number ("DSLAI05")),
     SpLAI (vl.number ("SpLAI")),
     LeafAIMod (vl.plf ("LeafAIMod")),
     SpLAIfac (vl.number ("SpLAIfac")),
@@ -308,23 +281,13 @@ CanopyStandard::CanopyStandard (const AttributeList& vl)
     HvsDS (vl.plf ("HvsDS")),
     LAIDist0 (vl.number_sequence ("LAIDist0")),
     LAIDist1 (vl.number_sequence ("LAIDist1")),
-    PARref (vl.number ("PARref")),
-    PARext (vl.number ("PARext")),
     PARrel (vl.number ("PARrel")),
-    EPext (vl.number ("EPext")),
-    IntcpCap (vl.number ("IntcpCap")),
-    EpFac (vl.number ("EpFac")),
-    rs_max (vl.number ("rs_max")),
-    rs_min (vl.number ("rs_min")),
     InitCAI (vl.flag ("InitCAI")),
-    Height (vl.number ("Height")),
     Offset (vl.number ("Offset")),
-    CAI    (vl.number ("CAI")),
     LeafAI (vl.number ("LeafAI")),
     StemAI (vl.number ("StemAI")),
     SOrgAI (vl.number ("SOrgAI")),
     LADm (vl.number ("LADm")),
-    LAIvsH (vl.plf ("LAIvsH")),
     CAImRat (0.0)
 { }
 

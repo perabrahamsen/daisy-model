@@ -1,4 +1,86 @@
+2000-05-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.26 released.
+
+2000-05-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_harvest.C (print_header): New data member.
+	(match, LogHarvest): Use it.
+	(initialize): New member function.
+	
+	* log_table.C (default_description): New static data member.
+	(LogTableSyntax): Use it.
+	(LogTable): Use it.
+
+	* log.h, log.C, log_table.C (initialize): New virtual member
+	function. 
+	* daisy.C (Daisy): Use it.
+	
+	* log_select.C (load_syntax): Fixed `description'.
+
+2000-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (print_header): New member.
+	* log_table.C (LogTable, done): Obey it.
+
+2000-05-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_simple.C: Added support for `LAIvsDay'.
+
+2000-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_simple.C (tick): Inserted missing `else'.
+	(tick): Only demand N after emergence.
+	(CropSimple): Ditto.
+
+	* uzrichard.C (richard): Don't whine if top.h () == 0 for a
+	pressure top.
+
+	* root_system.C (load_syntax): Gave default value for `MaxPen'.
+	* canopy_simple.C (load_syntax): Gave default value for `PARext'.
+	* crop_simple.C (CropSimpleSyntax): Gave default value for
+	`height_max'. 
+	(potential_N): Renamed from `harvest_N'.
+	(CropSimple): Fix initialization of `spring_mm' and `spring_dd'.
+	(harvest): Kill it off.
+
+	* am.C (AM::AM): Added cast in the hope of making BCC 5.02 happy.
+
+2000-05-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_simple.C: New model.
+	* Makefile (MODELS): Add it.
+	* lib/log.dai ("Simple Crop Production"): New log model.
+
+	* main.C (main): Catch standard exceptions.
+
+	* plf.C, plf.h (first_interesting, last_interesting, max_at): New
+	member functions. 
+
+	* daisy.C: Removed `crop.h' include.
+
+	* crop.C, crop.h (default_AOM): New static member function.
+	* crop_std.C (CropStandardSyntax): Use it.
+
+2000-05-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_old.C (CropOldSyntax): Fixed PenPar1 dimension.
+	* crop_sold.C (CropSoldSyntax): Ditto.
+	* root_system.C (load_syntax): Ditto.
+
+	* surface.C (load_syntax): Fixed runoff dimensions.
+	* lib/log.dai ("Surface Water Balance"): Ditto.
+	("Root Zone Water Balance"): Ditto.
+	("N Balance"): Ditto.
+	("Bioclimate"): Ditto.
+
 2000-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_simple.C, canopy_simple.h: New submodel.
+	* Makefile (SUBMODELS):  Add it.
+	* canopy_std.C, canopy_std.h: Use it.
+	
+xb2000-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.25 released.
 

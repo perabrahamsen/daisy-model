@@ -451,7 +451,7 @@ struct LogTable1 : public Log
     { return true; }
 
   LogTable1 (const AttributeList& al)
-    : Log (),
+    : Log (al),
       description (al.name ("description")),
       file (al.name ("where")),
 #ifdef BORLAND_PERMISSIONS

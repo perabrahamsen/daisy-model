@@ -4,6 +4,7 @@
 #include <vector>
 #include <list>
 #include <assert.h>
+#include <stdexcept>
 
 struct PLF::Implementation
 {
@@ -12,6 +13,9 @@ struct PLF::Implementation
 
   double operator () (const double pos) const;
   PLF inverse () const;
+  double first_interesting () const;
+  double last_interesting () const;
+  double max_at () const;
   double integrate (const double from, const double to) const;
   PLF integrate_stupidly () const;
   void clear () 
@@ -76,6 +80,47 @@ PLF::Implementation::inverse () const
       last = y[i];
     }
   return plf;
+}
+
+// Find the x value where the function stop being constant.
+double
+PLF::Implementation::first_interesting () const
+{
+  const int size = x.size ();
+  for (unsigned int i = 1U; i < size; i++)
+    if (y[i] != y[i-1])
+      return x[i-1];
+  throw invalid_argument ("PLF::first_interesting: constant function");
+}
+
+// Find the x value where the function start being constant.
+double
+PLF::Implementation::last_interesting () const
+{
+  const int size = x.size ();
+  for (int i = size-2; i >= 0; i--)
+    if (y[i] != y[i+1])
+      return x[i+1];
+  throw invalid_argument ("PLF::last_interesting: constant function");
+}
+
+// Find an x value where the function reach its maximum value.
+double
+PLF::Implementation::max_at () const
+{
+  const int size = x.size ();
+  if (size < 1)
+    throw invalid_argument ("PLF::max_at: empty function");
+  double max_x = x[0];
+  double max_y = y[0];
+  
+  for (unsigned int i = 1; i < size; i++)
+    if (y[i] > max_y)
+      {
+	max_x = x[i];
+	max_y = y[i];
+      }
+  return max_x;
 }
 
 double
@@ -152,15 +197,23 @@ PLF::Implementation::integrate_stupidly () const
 
 double
 PLF::operator () (const double x) const
-{
-  return impl (x);
-}
+{ return impl (x); }
 
 PLF
 PLF::inverse () const
-{ 
-  return impl.inverse ();
-}
+{ return impl.inverse (); }
+
+double
+PLF::first_interesting () const
+{ return impl.first_interesting (); }
+
+double
+PLF::last_interesting () const
+{ return impl.last_interesting (); }
+
+double
+PLF::max_at () const
+{ return impl.max_at (); }
 
 double
 PLF::integrate (const double from, const double to) const

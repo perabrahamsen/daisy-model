@@ -714,7 +714,7 @@ CropOldSyntax::CropOldSyntax ()
   // RootPar
   Root.add ("DptEmr", "cm", Syntax::Const,
 	    "Penetration at emergence.");
-  Root.add ("PenPar1", "cm/dg C/h", Syntax::Const,
+  Root.add ("PenPar1", "cm/dg C/d", Syntax::Const,
 	    "Penetration rate parameter, coefficient.");
   Root.add ("PenPar2", "dg C", Syntax::Const,
 	    "Penetration rate parameter, threshold.");

@@ -3,10 +3,14 @@
 #include "log_select.h"
 #include "select.h"
 #include "geometry.h"
+#include "version.h"
 #include <fstream.h>
+#include <time.h>
 
 struct LogTable : public LogSelect, public Select::Destination
 {
+  static const char *const default_description;
+
   // File Content.
   string file;			// Filename.
   ofstream out;			// Output stream.
@@ -16,6 +20,7 @@ struct LogTable : public LogSelect, public Select::Destination
   const string error_string;	// String to print on errors.
   const string missing_value;	// String to print for missing values.
   const string array_separator;	// String to print between array entries.
+  bool print_header;		// Set if header should be printed.
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
 
@@ -36,15 +41,25 @@ struct LogTable : public LogSelect, public Select::Destination
   void add (const string& tag, const string& value);
 
   // Create and destroy.
+  void initialize (const string& description);
   LogTable (const AttributeList& al);
   ~LogTable ();
 };
+
+const char *const LogTable::default_description = "\
+Each selected variable is represented by a column in the specified log file.";
 
 void 
 LogTable::done ()
 { 
   if (!is_printing)
     return;
+
+  if (print_header)
+    {
+      out << "--------------------\n";
+      print_header = false;
+    }
 
   if (print_tags)
     {
@@ -207,6 +222,21 @@ LogTable::add (const string&, const string& value)
   dest_name = value;
 }
 
+void 
+LogTable::initialize (const string& description)
+{
+  if (print_header)
+    {
+      out << "\nSIM: ";
+      for (unsigned int i = 0; i < description.size (); i++)
+	if (description[i] != '\n')
+	  out << description[i];
+	else
+	  out << "\nSIM: ";
+      out << "\n";
+    }
+}
+
 LogTable::LogTable (const AttributeList& al)
   : LogSelect (al),
     file (al.name ("where")),
@@ -221,16 +251,41 @@ LogTable::LogTable (const AttributeList& al)
     error_string (al.name ("error_string")),
     missing_value (al.name ("missing_value")),
     array_separator (al.name ("array_separator")),
+    print_header (al.flag ("print_header")),
     print_tags (al.flag ("print_tags")),
     print_dimension (al.flag ("print_dimension")),
-    
     type (Error)
 {
-#if 0      
-  if (description.size () > 0)
-    // Print description in start of file.
-    out << description << "\n";
-#endif
+  if (print_header)
+    {
+      out << "dlf-0.0 -- " << name;
+      if (al.check ("parsed_from_file"))
+	out << " (defined in `" << al.name ("parsed_from_file") << "').";
+      out << "\n";
+      out << "\n";
+      out << "VERSION: " << version  << "\n";
+      out << "FILE: " << file  << "\n";
+      time_t now = time (NULL);
+      out << "RUN: " << ctime (&now);
+      const double from  = al.number ("from");
+      const double to = al.number ("to");
+      if (to < from)
+	out << "INTERVAL: [" << from << ";" << to << "]\n";
+      const vector<string>& conv_vector = al.name_sequence ("set");
+      for (unsigned int i = 0; i < conv_vector.size (); i += 2)
+	out << "SET: " << conv_vector[i] << " = " << conv_vector[i+1] << "\n";
+      if (description != default_description)
+	{
+	  out << "\nLOG: ";
+	  for (unsigned int i = 0; i < description.size (); i++)
+	    if (description[i] != '\n')
+	      out << description[i];
+	    else
+	      out << "\nLOG: ";
+	  out << "\n";
+	}
+    }
+  out.flush ();
 }
 
 LogTable::~LogTable ()
@@ -249,8 +304,12 @@ static struct LogTableSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       LogSelect::load_syntax (syntax, alist);
+      alist.add ("description", LogTable::default_description);
       syntax.add ("where", Syntax::String, Syntax::Const,
 		  "Name of the log file to create.");
+      syntax.add ("print_header", Syntax::Boolean, Syntax::Const,
+		  "Print header section of the file.");
+      alist.add ("print_header", true);
       syntax.add ("print_tags", Syntax::Boolean, Syntax::Const,
 		  "Print a tag line in the file.");
       alist.add ("print_tags", true);
@@ -280,4 +339,3 @@ String to print between array entries.");
       Librarian<Log>::add_type ("table", alist, syntax, &make);
     }
 } LogTable_syntax;
-

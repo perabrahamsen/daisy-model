@@ -29,7 +29,7 @@ LogClone::result ()
 
 LogClone::LogClone (const string& name, 
 		    const Syntax& syntax, const AttributeList& alist)
-  : LogAList ()
+  : LogAList (alist)
 { 
   push (name, syntax, alist);
 }

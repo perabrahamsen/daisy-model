@@ -10,7 +10,6 @@
 #include "nitrification.h"
 #include "bioclimate.h"
 #include "hydraulic.h"
-#include "crop.h"
 #include "field.h"
 #include "harvest.h"
 #include "action.h"
@@ -21,6 +20,9 @@
 #include "common.h"
 #include "column.h"
 #include "submodel.h"
+
+const char *const Daisy::default_description = "\
+The Daisy Crop/Soil/Atmosphere Model.";
 
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
@@ -34,7 +36,13 @@ Daisy::Daisy (const AttributeList& al)
     weather (Librarian<Weather>::create (al.alist ("weather"))), 
     field (*new Field (al.alist_sequence ("column"))),
     harvest (map_construct_const<Harvest> (al.alist_sequence ("harvest")))
-{ }
+{
+  const string description = al.name ("description");
+  
+  if (description != default_description)
+    for (unsigned int i = 0; i < logs.size (); i++)
+      logs[i]->initialize (description);
+}
 
 bool
 Daisy::check ()
@@ -159,7 +167,7 @@ void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("submodel", "Daisy");
-  alist.add ("description", "The Daisy Crop/Soil/Atmosphere Model.");
+  alist.add ("description", Daisy::default_description);
   Library::load_syntax (syntax, alist);
 
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,

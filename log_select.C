@@ -150,7 +150,7 @@ LogSelect::check (const Syntax&) const
 { return true; }
 
 LogSelect::LogSelect (const AttributeList& al)
-  : Log (),
+  : Log (al),
     description (al.name ("description")),
     condition (Librarian<Condition>::create (al.alist ("when"))),
     entries (map_create<Select> (al.alist_sequence ("entries")))
@@ -200,7 +200,7 @@ LogSelect::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("description", Syntax::String, Syntax::Const,
 	      "Description of this log file format.");
   alist.add ("description", "\
-Each selected variable is represented by a column in the log file.");
+Each selected variable is represented by a column in the log.");
   syntax.add ("when", Librarian<Condition>::library (), 
 	      "Add entries to the log file when this condition is true.");
   syntax.add ("entries", Librarian<Select>::library (), 

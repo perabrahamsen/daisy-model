@@ -773,53 +773,21 @@ Non-functional lim for N-concentration in roots.");
   CrpNList.add ("TLRootEff", TLRootEff);
 
   // HarvestPar
-  Syntax om_syntax;
-  AttributeList om_alist;
-  OM::load_syntax (om_syntax, om_alist);
-  AttributeList& AOM1 = *new AttributeList (om_alist);
-  AttributeList& AOM2 = *new AttributeList (om_alist);
-  AOM1.add ("initial_fraction", 0.80);
-  vector<double> CN;
-  CN.push_back (90.0);
-  AOM1.add ("C_per_N", CN);
-  vector<double> efficiency1;
-  efficiency1.push_back (0.50);
-  efficiency1.push_back (0.50);
-  AOM1.add ("efficiency", efficiency1);
-  AOM1.add ("turnover_rate", 2.0e-4);
-  vector<double> fractions1;
-  fractions1.push_back (0.50);
-  fractions1.push_back (0.50);
-  fractions1.push_back (0.00);
-  AOM1.add ("fractions", fractions1);
-  vector<double> efficiency2;
-  efficiency2.push_back (0.50);
-  efficiency2.push_back (0.50);
-  AOM2.add ("efficiency", efficiency2);
-  AOM2.add ("turnover_rate", 2.0e-3);
-  vector<double> fractions2;
-  fractions2.push_back (0.00);
-  fractions2.push_back (1.00);
-  fractions2.push_back (0.00);
-  AOM2.add ("fractions", fractions2);
-  vector<AttributeList*> AOM;
-  AOM.push_back (&AOM1);
-  AOM.push_back (&AOM2);
   add_submodule_sequence<OM> ("Stem", Harvest, Syntax::Const,
 			      "Stem AM parameters.");
-  HarvestList.add ("Stem", AOM);
+  HarvestList.add ("Stem", Crop::default_AOM ());
   add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const,
 			      "Leaf AM parameters.");
-  HarvestList.add ("Leaf", AOM);
+  HarvestList.add ("Leaf", Crop::default_AOM ());
   add_submodule_sequence<OM> ("Dead", Harvest, Syntax::Const,
 			      "Dead leaves AM parameters.");
-  HarvestList.add ("Dead", AOM);
+  HarvestList.add ("Dead", Crop::default_AOM ());
   add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const,
 			      "Storage organ AM parameters.");
-  HarvestList.add ("SOrg", AOM);
+  HarvestList.add ("SOrg", Crop::default_AOM ());
   add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const,
 			      "Root AM parameters.");
-  HarvestList.add ("Root", AOM);
+  HarvestList.add ("Root", Crop::default_AOM ());
   Harvest.add ("EconomicYield_W", Syntax::None (), Syntax::Const, "\
 Valuable fraction of storage organ (DM), e.g. grain or tuber.");
   HarvestList.add ("EconomicYield_W", 1.00);
@@ -1748,8 +1716,8 @@ CropStandard::harvest (const string& column_name,
 void
 CropStandard::output (Log& log) const
 {
-  output_submodule<RootSystem> (root_system, "Root", log);
-  output_submodule<CanopyStandard> (canopy, "Canopy", log);
+  output_submodule (root_system, "Root", log);
+  output_submodule (canopy, "Canopy", log);
   var.output (log);
 }
 

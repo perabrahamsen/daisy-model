@@ -22,6 +22,9 @@ public:
   // Use.
   double operator ()(double x) const;
   PLF inverse () const;
+  double first_interesting () const;
+  double last_interesting () const;
+  double max_at () const;
   double integrate (double from, double to) const;
   PLF integrate_stupidly () const;
   void offset (double offset);	// Add `offset' to all y values.

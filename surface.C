@@ -534,12 +534,12 @@ Amount of ponding the surface can retain.");
   syntax.add ("ReservoirConstant", "h^-1", Syntax::Const, "\
 Fraction of ponding above DetentionCapacity that runoffs each hour.");
   alist.add ("ReservoirConstant", 1.0);
-  syntax.add ("runoff", "mm", Syntax::LogOnly, "\
+  syntax.add ("runoff", "mm/h", Syntax::LogOnly, "\
 Amount of water runoff from ponding this hour.");
   add_submodule<IM> ("IM", syntax, alist, Syntax::State, "\
 Inorganic nitrogen on the surface [g/cm^2].");
   add_submodule<IM> ("IM_runoff", syntax, alist, Syntax::LogOnly, "\
-Inorganic nitrogen on the runoff water this hour [g/cm^2].");
+Inorganic nitrogen on the runoff water this hour [g/cm^2/h].");
   syntax.add ("R_mixing", "h/mm", Syntax::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
   alist.add ("R_mixing", 1.0e9);

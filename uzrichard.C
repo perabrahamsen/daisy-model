@@ -245,7 +245,7 @@ UZRichard::richard (const Soil& soil,
 		  else
 		    {
 		      h_above = top.h () - soil.z (first) + top_water;
-		      if (top.h () <= 0.0)
+		      if (top.h () < 0.0)
 			CERR << "TOP H = " << top.h () << ", H ABOVE = " 
 			     << h_above << "\n";
 		    }

@@ -3,7 +3,9 @@
 #include "log.h"
 #include "daisy.h"
 #include "harvest.h"
+#include "version.h"
 #include <fstream.h>
+#include <time.h>
 
 struct LogHarvest : public Log
 {
@@ -17,10 +19,31 @@ struct LogHarvest : public Log
   unsigned int last_size;
   string file;			// Filename.
   ofstream out;			// Output stream.
+  bool print_header;		// Set if header should be printed.
+  bool print_tags;		// Set if tags should be printed.
+  bool print_dimension;		// Set if dimensions should be printed.
 
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy)
     {
+      if (print_header)
+	{
+	  out << "--------------------\n";
+	  print_header = false;
+	}
+      if (print_tags)
+	{
+	  out << "year\tmonth\tday\tcolumn\tcrop\t"
+	      << "stem_DM\tdead_DM\tleaf_DM\tsorg_DM\t"
+	      << "stem_N\tdead_N\tleaf_N\tsorg_N\n";
+	  print_tags = false;
+	}
+      if (print_dimension)
+	{
+	  out << "\t\t\t\t\t"
+	      << "t/ha\tt/ha\tt/ha\tt/ha\tkg/ha\tkg/ha\tkg/ha\tkg/ha\n";
+	  print_dimension = false;
+	}
       for (; last_size < daisy.harvest.size (); last_size++)
 	{
 	  const Harvest& harvest = *(daisy.harvest[last_size]);
@@ -88,25 +111,41 @@ struct LogHarvest : public Log
   bool check (const Syntax&) const
     { return true; }
 
+  void initialize (const string& description)
+  {
+    if (print_header)
+      {
+	out << "\nSIM: ";
+	for (unsigned int i = 0; i < description.size (); i++)
+	  if (description[i] != '\n')
+	    out << description[i];
+	  else
+	    out << "\nSIM: ";
+	out << "\n";
+      }
+  }
   LogHarvest (const AttributeList& al)
-    : Log (),
+    : Log (al),
       last_size (0),
       file (al.name ("where")),
 #ifdef BORLAND_PERMISSIONS
-      out (file.c_str (), ios::out|ios::trunc, 0666)
+      out (file.c_str (), ios::out|ios::trunc, 0666),
 #else
-      out (file.c_str ())
+      out (file.c_str ()),
 #endif
+      print_header (al.flag ("print_header")),
+      print_tags (al.flag ("print_tags")),
+      print_dimension (al.flag ("print_dimension"))
     {
-      // Tags.
-      if (al.flag ("print_tags"))
-	out << "year\tmonth\tday\tcolumn\tcrop\t"
-	    << "stem_DM\tdead_DM\tleaf_DM\tsorg_DM\t"
-	    << "stem_N\tdead_N\tleaf_N\tsorg_N\n";
-      // Dimensions.
-      if (al.flag ("print_dimension"))
-	out << "\t\t\t\t\t"
-	    << "t/ha\tt/ha\tt/ha\tt/ha\tkg/ha\tkg/ha\tkg/ha\tkg/ha\n";
+      // Header.
+      if (print_header)
+	{
+	  out << "dlf-0.0 -- harvest\n\n";
+	  out << "VERSION: " << version  << "\n";
+	  out << "FILE: " << file  << "\n";
+	  time_t now = time (NULL);
+	  out << "RUN: " << ctime (&now);
+	}
       out.flush ();
     }
 
@@ -130,6 +169,9 @@ static struct LogHarvestSyntax
       syntax.add ("where", Syntax::String, Syntax::Const,
 		  "Name of the log file to create.");
       alist.add ("where", "harvest.tab");
+      syntax.add ("print_header", Syntax::Boolean, Syntax::Const,
+		  "Print header section of the file.");
+      alist.add ("print_header", true);
       syntax.add ("print_tags", Syntax::Boolean, Syntax::Const,
 		  "Print a tag line in the file.");
       alist.add ("print_tags", true);

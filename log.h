@@ -17,6 +17,7 @@ private:
   struct Implementation;
   Implementation& impl;
 public:
+  const string name;
   static const char *const description;
 
   // Filter
@@ -87,8 +88,9 @@ public:
   // Create and Destroy.
 public:
   virtual bool check (const Syntax&) const = 0;
+  virtual void initialize (const string& description);
 protected:
-  Log ();
+  Log (const AttributeList& al);
 public:
   virtual ~Log ();
 };

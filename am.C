@@ -586,11 +586,15 @@ AM::create (const Geometry& /*geometry*/, const Time& time,
   return am;
 }
 
+#ifdef BORLAND_TEMPLATES
+template class map_construct<OM>;
+#endif
+
 AM::AM (const AttributeList& al)
   : impl (*new Implementation 
 	  (al.time ("creation"),
 	   al.name ("name"),
-	   map_construct<OM> (al.alist_sequence ("om")))),
+	   (vector<OM*>&) map_construct<OM> (al.alist_sequence ("om")))),
     alist (al),
     name ("state")
 {

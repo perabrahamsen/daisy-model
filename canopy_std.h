@@ -1,12 +1,8 @@
 // canopy_std.h -- Canopy development for standard crop model.
 
-#include "plf.h"
+#include "canopy_simple.h"
 
-struct Log;
-struct AttributeList;
-struct Syntax;
-
-struct CanopyStandard
+class CanopyStandard : public CanopySimple
 {
   // Paramaters.
 private:
@@ -25,32 +21,19 @@ public:
 private:
   const vector<double>& LAIDist0; // Relative CAI distribution at DS=0
   const vector<double>& LAIDist1; // Relative CAI distribution at DS=1
-public:
-  const double PARref;		// PAR reflectance
-  const double PARext;		// PAR extinction coefficient
-private:
   const double PARrel;		// Relative PAR below the canopy
-public:
-  const double EPext;		// EP extinction coefficient
-  const double IntcpCap;	// 
-  const double EpFac;		// 
-  const double rs_max;		// max transpiration resistance
-  const double rs_min;		// min transpiration resistance
 
   // Variables.
 private:
   bool InitCAI;			// Initial CAI development ?
 public:
-  double Height;		// Crop height [cm]
   double Offset;		// Extra height after harvest [cm]
-  double CAI;	        	// Crop Area Index
 private:
   double LeafAI;		// Leaf Area Index
   double StemAI;		// Stem Area Index
   double SOrgAI;		// Storage organ Area Index
   double LADm;			// Max Leaf Area Density [cm2/cm3]
 public:
-  PLF LAIvsH;			// Accumulated Crop Area Index at Height
   double CAImRat;		// (CAIm - CAI) / CAIm []
 
   // Functions.

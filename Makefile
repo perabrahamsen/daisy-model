@@ -31,8 +31,8 @@ endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-#USE_OPTIMIZE = true
-USE_OPTIMIZE = false
+USE_OPTIMIZE = true
+#USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
@@ -99,7 +99,7 @@ endif
 
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
-		OSFLAGS = -frepo -pipe
+		OSFLAGS = -pipe
 		DEBUG = -g
 	endif
 	ifeq ($(HOSTTYPE),cygwin)
@@ -198,7 +198,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = action_ridge.C groundwater_fixed.C \
+MODELS = crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
 	action_crop.C groundwater_lysimeter.C select_min.C \
 	select_max.C select_average.C action_message.C weather_std.C \
@@ -240,7 +240,7 @@ COMPONENTS = select.C average.C mactrans.C macro.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = canopy_std.C root_system.C \
+SUBMODELS = canopy_simple.C canopy_std.C root_system.C \
 	ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
 	organic_matter.C nitrification.C denitrification.C soil_heat.C \
 	snow.C im.C om.C harvest.C vegetation.C chemicals.C field.C \
@@ -510,7 +510,7 @@ weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h log.h
 crop${OBJ}: crop.C crop.h time.h librarian.h library.h common.h alist.h \
- syntax.h chemicals.h
+ syntax.h chemicals.h om.h
 action${OBJ}: action.C action.h librarian.h library.h common.h alist.h \
  syntax.h
 condition${OBJ}: condition.C condition.h librarian.h library.h common.h \
@@ -542,8 +542,11 @@ pet${OBJ}: pet.C pet.h librarian.h library.h common.h alist.h syntax.h \
 net_radiation${OBJ}: net_radiation.C net_radiation.h librarian.h library.h \
  common.h alist.h syntax.h log.h weather.h im.h
 pt${OBJ}: pt.C pt.h librarian.h library.h common.h alist.h syntax.h log.h
-canopy_std${OBJ}: canopy_std.C canopy_std.h plf.h submodel.h log.h \
- librarian.h library.h common.h alist.h syntax.h mathlib.h
+canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
+ log.h librarian.h library.h common.h alist.h syntax.h
+canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h \
+ submodel.h log.h librarian.h library.h common.h alist.h syntax.h \
+ mathlib.h
 root_system${OBJ}: root_system.C root_system.h submodel.h soil_heat.h \
  soil_NH4.h solute.h adsorption.h librarian.h library.h common.h \
  alist.h syntax.h transport.h mactrans.h soil_NO3.h soil_water.h \
@@ -635,9 +638,8 @@ lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h common.h
 lexer${OBJ}: lexer.C lexer.h common.h
 daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
- log.h parser.h am.h nitrification.h bioclimate.h hydraulic.h crop.h \
- field.h harvest.h chemicals.h action.h condition.h column.h \
- submodel.h
+ log.h parser.h am.h nitrification.h bioclimate.h hydraulic.h field.h \
+ harvest.h chemicals.h action.h condition.h column.h submodel.h
 alist${OBJ}: alist.C plf.h library.h common.h alist.h syntax.h
 syntax${OBJ}: syntax.C syntax.h common.h alist.h library.h
 library${OBJ}: library.C library.h common.h alist.h syntax.h
@@ -654,6 +656,12 @@ common${OBJ}: common.C common.h parser_file.h parser.h librarian.h \
  library.h alist.h syntax.h document.h version.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
+crop_simple${OBJ}: crop_simple.C crop.h time.h librarian.h library.h \
+ common.h alist.h syntax.h root_system.h canopy_simple.h plf.h log.h \
+ bioclimate.h soil_water.h macro.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h om.h organic_matter.h soil_heat.h soil_NH4.h \
+ solute.h adsorption.h transport.h mactrans.h soil_NO3.h am.h \
+ harvest.h chemicals.h mathlib.h
 action_ridge${OBJ}: action_ridge.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h ridge.h
 groundwater_fixed${OBJ}: groundwater_fixed.C groundwater.h uzmodel.h \
@@ -701,9 +709,9 @@ select_date${OBJ}: select_date.C select.h condition.h librarian.h \
 select_array${OBJ}: select_array.C select.h condition.h librarian.h \
  library.h common.h alist.h syntax.h
 log_table${OBJ}: log_table.C log_select.h log.h librarian.h library.h \
- common.h alist.h syntax.h select.h condition.h geometry.h
+ common.h alist.h syntax.h select.h condition.h geometry.h version.h
 log_harvest${OBJ}: log_harvest.C log.h librarian.h library.h common.h \
- alist.h syntax.h daisy.h harvest.h chemicals.h
+ alist.h syntax.h daisy.h harvest.h chemicals.h version.h
 action_while${OBJ}: action_while.C action.h librarian.h library.h common.h \
  alist.h syntax.h log.h
 action_wait${OBJ}: action_wait.C action.h librarian.h library.h common.h \
@@ -756,11 +764,11 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
 horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
  alist.h syntax.h
 crop_std${OBJ}: crop_std.C crop.h time.h librarian.h library.h common.h \
- alist.h syntax.h root_system.h canopy_std.h plf.h log.h bioclimate.h \
- soil_water.h macro.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h om.h organic_matter.h soil_heat.h soil_NH4.h solute.h \
- adsorption.h transport.h mactrans.h soil_NO3.h am.h harvest.h \
- chemicals.h mathlib.h
+ alist.h syntax.h root_system.h canopy_std.h canopy_simple.h plf.h \
+ log.h bioclimate.h soil_water.h macro.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h om.h organic_matter.h soil_heat.h soil_NH4.h \
+ solute.h adsorption.h transport.h mactrans.h soil_NO3.h am.h \
+ harvest.h chemicals.h mathlib.h
 action_sow${OBJ}: action_sow.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h crop.h
 action_stop${OBJ}: action_stop.C action.h librarian.h library.h common.h \

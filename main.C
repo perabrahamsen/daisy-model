@@ -4,6 +4,8 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
+#include <stdexcept>
+#include <typeinfo>
 
 int
 main (int argc, char* argv[])
@@ -52,6 +54,11 @@ main (int argc, char* argv[])
   catch (const char* error)
     {
       CERR << "Exception: " << error << "\n";
+    }
+  catch (const exception& e)
+    {
+      CERR << "Standard exception: " << typeid (e).name ()
+	   << ": " << e.what () << "\n";
     }
   catch (...)
     {

@@ -434,8 +434,8 @@ void
 LogAList::load_syntax (Syntax&, AttributeList&)
 { }
 
-LogAList::LogAList ()
-  : Log (),
+LogAList::LogAList (const AttributeList& al)
+  : Log (al),
     is_active (false),
     nested (0)
 { }

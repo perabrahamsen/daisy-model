@@ -92,7 +92,7 @@ LogCheckpoint::done ()
 }
 
 LogCheckpoint::LogCheckpoint (const AttributeList& al)
-  : LogAList (),
+  : LogAList (al),
     file (al.name ("where")),
     description (al.name ("description")),
     libraries (al.name_sequence ("libraries")),
