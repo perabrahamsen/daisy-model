@@ -1,5 +1,12 @@
 1999-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 0.91 released.
+
+1999-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C, solute.h (S_drain): New sink term.
+	* solute.C (tick): Update it.
+
 	* uzrichard.C (UZRichardSyntax): Fix multiline string.
 
 	* soil_water.h, soil_water.C (S_sum, S_root, S_drain): Split S

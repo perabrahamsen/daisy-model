@@ -41,9 +41,11 @@ Solute::tick (const Soil& soil,
 	      const SoilWater& soil_water, 
 	      double J_in)
 {
+  // Initialize.
   fill (S_p.begin (), S_p.end (), 0.0);
   fill (J_p.begin (), J_p.end (), 0.0);
 
+  // Upper border.
   if (soil_water.q_p (0) < 0.0)
     {
       if (soil_water.q (0) >= 0.0)
@@ -64,6 +66,17 @@ Solute::tick (const Soil& soil,
   else
     J[0] = J_in;
 
+  // Drainage.
+  for (unsigned int i = 0; i < soil.size (); i++)
+    {
+      const double Theta = soil_water.Theta (i);
+      const double fraction = soil_water.S_drain (i) * dt / Theta;
+      
+      S_drain[i] = C_to_M (soil, Theta, i, fraction * C (i));
+      S[i] += S_drain[i];
+    }
+
+  // Flow.
   mactrans.tick (soil, soil_water, C_, S, S_p, J_p);
   transport.tick (soil, soil_water, *this, M_, C_, S, J);
 }
@@ -83,6 +96,7 @@ Solute::output (Log& log) const
   log.output ("M", M_);
   log.output ("S", S);
   log.output ("S_p", S_p);
+  log.output ("S_drain", S_drain);
   log.output ("J", J);
   log.output ("J_p", J_p);
 }
@@ -107,7 +121,9 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term.");
   syntax.add ("S_p", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Source term (macropore trasnport only).");
+	      "Source term (macropore transport only).");
+  syntax.add ("S_drain", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term (soil drainage only).");
   syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Transportation in matrix (positive up).");
   syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
@@ -265,6 +281,7 @@ Solute::initialize (const AttributeList& al,
 
   S.insert (S.begin (), soil.size (), 0.0);
   S_p.insert (S_p.begin (), soil.size (), 0.0);
+  S_drain.insert (S_drain.begin (), soil.size (), 0.0);
   J.insert (J_p.begin (), soil.size () + 1, 0.0);
   J_p.insert (J_p.begin (), soil.size () + 1, 0.0);
 }

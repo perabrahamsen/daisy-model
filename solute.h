@@ -25,6 +25,7 @@ protected:
 protected:
   vector<double> S;		// Combined source term.
   vector<double> S_p;		// Source term for macropores only.
+  vector<double> S_drain;	// Source term for soil drainage only.
   vector<double> J;		// Solute transport log in matrix.
   vector<double> J_p;		// Solute transport log in macropores.
   Transport& transport;		// Solute transport model in matrix.
