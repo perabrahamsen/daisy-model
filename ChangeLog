@@ -1,3 +1,31 @@
+2000-08-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.36 released.
+
+2000-08-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai: Use `daily' instead of `(hour 0)'.
+
+	* condition_time.C (ConditionWeekly): Log sunday.
+	(ConditionMonthly): Log last hour of month.
+	(ConditionYearly): Log last hour of year.
+	(ConditionTimeSyntax): Fix descriptions.
+
+	* time.C (wday_number): Implemented.
+	(wday_name): Ditto.
+	(week): Ditto.
+	(wname): New static const data member.
+	(mname, mlen): Made const.
+	* time.h, time.C (yday2wday): New static member function.
+	(yday2week): Ditto.
+
+2000-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Weather"): Use `daily' log.
+
+	* condition_time.C (ConditionDaily, ConditionWeekly,
+	ConditionMonthly): Log at 23. 
+
 2000-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.35 released.

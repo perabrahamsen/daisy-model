@@ -137,7 +137,8 @@ struct ConditionHourly : public Condition
   const int step;
 public:
   bool match (const Daisy& daisy) const
-  { return ((24 * daisy.time.yday () + daisy.time.hour ()) % step) == 0; }
+  { return ((24 * daisy.time.yday ()
+	     + (daisy.time.hour () + 1)) % step) == 0; }
   void output (Log&) const
   { }
   ConditionHourly (const AttributeList& al)
@@ -153,7 +154,7 @@ struct ConditionDaily : public Condition
   const int step;
 public:
   bool match (const Daisy& daisy) const
-  { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
+  { return daisy.time.hour () == 23 && (daisy.time.yday () % step) == 0; }
   void output (Log&) const
   { }
   ConditionDaily (const AttributeList& al)
@@ -169,12 +170,12 @@ struct ConditionWeekly : public Condition
   const int step;
 public:
   bool match (const Daisy& daisy) const
-  { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
+  { return daisy.time.hour () == 23 && (daisy.time.week () % step) == 0; }
   void output (Log&) const
   { }
   ConditionWeekly (const AttributeList& al)
     : Condition (al),
-      step (7 * al.integer ("step"))
+      step (al.integer ("step"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionWeekly (al); }
@@ -185,12 +186,19 @@ struct ConditionMonthly : public Condition
   const int step;
 public:
   bool match (const Daisy& daisy) const
-  { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
+  { 
+    int month = daisy.time.month ();
+    if (month % step != 0)
+      return false;
+    Time next = daisy.time;
+    next.tick_hour ();
+    return next.month () == month;
+  }
   void output (Log&) const
   { }
   ConditionMonthly (const AttributeList& al)
     : Condition (al),
-      step (30 * al.integer ("step"))
+      step (al.integer ("step"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionMonthly (al); }
@@ -201,12 +209,20 @@ struct ConditionYearly : public Condition
   const int step;
 public:
   bool match (const Daisy& daisy) const
-  { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
+  { 
+    int year = daisy.time.year ();
+    if ((year + 1) % step != 0)
+      return false;
+    Time next = daisy.time;
+    next.tick_hour ();
+    return next.year () == year;
+  }
+
   void output (Log&) const
   { }
   ConditionYearly (const AttributeList& al)
     : Condition (al),
-      step (365 * al.integer ("step"))
+      step (al.integer ("step"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionYearly (al); }
@@ -354,19 +370,24 @@ True, iff the simulation time is after the specified time.");
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist_hour = *new AttributeList ();
-    alist_hour.add ("description", "True every `step' hours.");
+    alist_hour.add ("description", "True every `step' hours.\n\
+Warning, this may be imprecise around new year.");
     AttributeList& alist_day = *new AttributeList ();
     alist_day.add ("description", "True every `step' days.\n\
-Warning, this may be imprecise around new year.");
+Or, more precisely, at 23 hour when the Julian day modulo\n\
+`step' is zero.");
     AttributeList& alist_week = *new AttributeList ();
     alist_week.add ("description", "True every `step' week.\n\
-Warning, this may be imprecise around new year.");
+Or, more precisely, sunday at 23 hour when the week number\n\
+modulo `step' is zero.");
     AttributeList& alist_month = *new AttributeList ();
     alist_month.add ("description", "True every `step' month.\n\
-A month is considered to be 30 days.\n\
-Warning, this may be imprecise around new year.");
+Or, more precisely, the last hour in each month, where\n\
+the month number modulo `step' is 0.");
     AttributeList& alist_year = *new AttributeList ();
-    alist_year.add ("description", "True every `step' year.");
+    alist_year.add ("description", "True every `step' year.\n\
+Or, more precisely, the last hour of each year, where the year\n\
+plus one modulo `step' is 0.");
     syntax.add ("step", Syntax::Integer, Syntax::Const,
 		"Number of time periods between this condition is true.");
     syntax.order ("step");
