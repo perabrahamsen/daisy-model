@@ -57,9 +57,9 @@ int NETRAD(double, double, double, double, double , double, double, double,
 int AVENER(double ,double ,double ,double ,double&, double&);
 int GFLUX(double, double, double, double&);
 int LEHFLUX(double, double, double, double, double, double, double, double,
-            double, double, double, double, double, double, double&, double&,
-            double&, double&,double&, double&, double&, double&, double&, double&,
-            double&, double&);
+            double, double, double, double, double, double, double, double&,
+            double&, double&, double&,double&, double&, double&, double&, double&,
+            double&, double&, double&);
 int LEHFLUXSTAR(double, double, double, double, double, double, double, double,
                 double, double, double, double, double&, double&, double&, double&,
                 double&, double&, double&, double&, double&, double&, double&);
@@ -642,7 +642,7 @@ int NETRAD(double srad,double e_pa,double tair, double relsun, double b1,
   // 1 mb = 0.1 kPa = 100 Pa
   const double sigma=5.67E-8; // Stefan Boltzman constant
 
-  rnetshort=(1-albedo)*srad;
+  rnetshort=(1.0-albedo)*srad;
   rnetlong_brunt=sigma*pow(tair+273.15,4)*(b1-b2*sqrt(e_pa))*
     (b3+b4*relsun);
   rnetrad_brunt=rnetshort - rnetlong_brunt;
@@ -668,10 +668,10 @@ int GFLUX(double tskin, double kh, double temp_0, double &rgflux)
 
 int LEHFLUX(double tair,double tskin,double tcan,double tleaf,double r_aastab1,
             double r_ac,double r_as,double r_sc,double r_sc_js, double e_c_abs,
-            double e_sl_abs, double e_abs,double les,double crop_ea_w,double &rhl,
-            double &rha, double &rhs,double &rlea,double &rlel,double &rhclos,
-            double &rleclos, double &rdtcta,double &rdtltc,double &rdtstc,
-            double &rdtlta,double &rr_sc)
+            double e_sl_abs, double e_abs,double les,double crop_ea_w,
+            double canopy_ea_w,double &rhl,double &rha, double &rhs,double &rlea,
+            double &rlel,double &rhclos,double &rleclos, double &rdtcta,
+            double &rdtltc,double &rdtstc,double &rdtlta,double &rr_sc)
 {
   const double lambda=2450000.0; // L of vaporization at 20 C [J/kg]
   const double rho_a=1.23;
@@ -680,8 +680,9 @@ int LEHFLUX(double tair,double tskin,double tcan,double tleaf,double r_aastab1,
   rha=rho_a*c_p*(tcan-tair)/r_aastab1; // H: source height - reference
   rhl=rho_a*c_p*(tleaf-tcan)/r_ac; // H: leaf - source height
   rhs=rho_a*c_p*(tskin-tcan)/r_as; // H: surface - source height
-  rlea=lambda*(e_c_abs-e_abs)/r_aastab1; // LE: source height - reference
   rlel=lambda*(e_sl_abs-e_c_abs)/(r_sc+r_ac); // LE: leaf - source height
+  // LE: source height - reference plus interception (canopy_ea_w)
+  rlea=lambda*(e_c_abs-e_abs)/r_aastab1 + canopy_ea_w;
 
   rdtcta=tcan-tair;
   rdtltc=tleaf-tcan;
@@ -1636,6 +1637,19 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       e_c_abs=x[4][1];  // e_c in kg/m**3
       e_sl_abs=x[5][1]; // e_sl in kg/m**3
 
+<<<<<<< svat_pmsw.C
+      tcan_prev=tcan; // save tcan for use in RAASTAB()
+
+      LEHFLUX(tair,tskin,tcan,tleaf,r_aastab2,r_ac,r_as,r_sc,r_sc_js,e_c_abs,
+      		  e_sl_abs,e_abs,les,crop_ea_w,canopy_ea_w,hl,ha,hs,lea,lel,hclos,
+              leclos,dtcta,dtltc,dtstc,dtlta,r_sc);
+
+      RSCSTAR (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,rcmax,
+               zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
+               canopy_ea,r_sc,lel,f1_dolman,f_def,f_3,env_lai_factor,f_etep,
+               rcmin_star,pstress,r_sc_js);
+
+=======
       tcan_prev=tcan; // save tcan for use in RAASTAB()
 
       LEHFLUX(tair,tskin,tcan,tleaf,r_aastab2,r_ac,r_as,r_sc,r_sc_js,e_c_abs,
@@ -1647,6 +1661,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
                canopy_ea,r_sc,lel,f1_dolman,f_def,f_3,env_lai_factor,f_etep,
                rcmin_star,pstress,r_sc_js);
 
+>>>>>>> 1.6
       // convert vapor pressure from kg/m**3 to Pa
       EABS2PA(e_c_abs,tcan,e_c);  // at canopy temperature
       EABS2PA(e_sl_abs,tleaf,e_sl); // at leaf temperature
