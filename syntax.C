@@ -4,14 +4,16 @@
 #include "alist.h"
 #include "library.h"
 #include <map>
+#include <algorithm>
 
 const int Syntax::Singleton = -117;
 const int Syntax::Sequence = -3212;
+const int Syntax::Unspecified = -666;
 
 struct Syntax::Implementation
 {
   check_fun checker;
-  list<string> order;
+  vector<string> order;
   typedef map<string, type, less<string> > type_map;
   typedef map<string, category, less<string> > status_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
@@ -24,16 +26,18 @@ struct Syntax::Implementation
   size_map size;
   library_map libraries;
   derive_map derived;
-  bool check (const AttributeList& vl, string name);
-  Syntax::type lookup (string key) const;
+  bool check (const AttributeList& vl, const string& name);
+  Syntax::type lookup (const string& key) const;
+  int order_number (const string& name) const;
   void dump (int indent) const;
+  void entries (vector<string>& result) const;
   Implementation (check_fun c)
     : checker (c)
   { }
 };    
 
 bool 
-Syntax::Implementation::check (const AttributeList& vl, string name)
+Syntax::Implementation::check (const AttributeList& vl, const string& name)
 {
   bool error = false;
 
@@ -53,8 +57,8 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
 	if (size[key] != Singleton)
 	  {
 	    const ::Library& lib = *libraries[key];
-	    const vector<const AttributeList*>& seq = vl.alist_sequence (key);
-	    for (vector<const AttributeList*>::const_iterator j = seq.begin ();
+	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
+	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
 	      {
@@ -83,8 +87,8 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
       else if (types[key] == AList)
 	if (size[key] != Singleton)
 	  {
-	    const vector<const AttributeList*>& seq = vl.alist_sequence (key);
-	    for (vector<const AttributeList*>::const_iterator j = seq.begin ();
+	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
+	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
 	      {
@@ -106,7 +110,7 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
 }
 
 Syntax::type 
-Syntax::Implementation::lookup (string key) const
+Syntax::Implementation::lookup (const string& key) const
 {
   type_map::const_iterator i = types.find (key);
 
@@ -116,13 +120,22 @@ Syntax::Implementation::lookup (string key) const
     return (*i).second;
 }
 
+int
+Syntax::Implementation::order_number (const string& name) const
+{
+  for (unsigned int j = 0; j < order.size (); j++)
+    if (order[j] == name)
+      return j;
+  return -1;
+}
+
 void 
 Syntax::Implementation::dump (int indent) const
 {
   if (order.size ())
     {
       cout << "[order";
-      for (list<string>::const_iterator i = order.begin ();
+      for (vector<string>::const_iterator i = order.begin ();
 	   i != order.end ();
 	   i++)
 	cout << " " << *i;
@@ -183,7 +196,24 @@ Syntax::Implementation::dump (int indent) const
     }
 }
 
-  // Each syntax entry should have an associated type.
+void
+Syntax::Implementation::entries (vector<string>& result) const
+{
+  // All the ordered items first.
+  result = order;
+
+  for (type_map::const_iterator i = types.begin ();
+       i != types.end ();
+       i++)
+    {
+      const string name = (*i).first;
+      
+      if (order_number (name) < 0)
+	result.push_back (name);
+    }
+}
+
+// Each syntax entry should have an associated type.
 const char* 
 Syntax::type_name (type t)
 {
@@ -191,7 +221,7 @@ Syntax::type_name (type t)
   { "Number", "AList", "CSMP", "Boolean", "String",
     "Date", "Integer", "Object", "Library", "Error" };
 
-  assert (sizeof (names) / sizeof  (const char*) == Error);
+  assert (sizeof (names) / sizeof  (const char*) == Error + 1);
   return names[t];
 }
     
@@ -203,47 +233,47 @@ const char* Syntax::category_name (category c)
 }
 
 bool
-Syntax::check (const AttributeList& vl, string name) const
+Syntax::check (const AttributeList& vl, const string& name) const
 {
   return impl.check (vl, name);
 }
 
 Syntax::type 
-Syntax::lookup (string key) const
+Syntax::lookup (const string& key) const
 {
   return impl.lookup (key);
 }
 
 bool
-Syntax::is_const (string key) const
+Syntax::is_const (const string& key) const
 {
   assert (impl.status.find (key) != impl.status.end ());
   return impl.status[key] == Const;
 }
 
 const Syntax&
-Syntax::syntax (string key) const
+Syntax::syntax (const string& key) const
 {
   assert (impl.syntax.find (key) != impl.syntax.end ());
   return *impl.syntax[key];
 }
 
 const ::Library&
-Syntax::library (string key) const
+Syntax::library (const string& key) const
 {
   assert (impl.libraries.find (key) != impl.libraries.end ());
   return *impl.libraries[key];
 }
 
 derive_fun
-Syntax::derive (string key) const
+Syntax::derive (const string& key) const
 {
   assert (impl.derived.find (key) != impl.derived.end ());
   return impl.derived[key];
 }
 
 int
-Syntax::size (string key) const
+Syntax::size (const string& key) const
 {
   Implementation::size_map::const_iterator i = impl.size.find (key);
 
@@ -259,14 +289,20 @@ Syntax::ordered () const
   return impl.order.size () > 0;
 }
 
-const list<string>& 
+const vector<string>& 
 Syntax::order () const
 {
   return impl.order;
 }
 
+int
+Syntax::order (const string& name) const
+{
+  return impl.order_number (name);
+}
+
 void
-Syntax::add (string key, type t, category req, int s)
+Syntax::add (const string& key, type t, category req, int s)
 {
   impl.size[key] = s;
   impl.types[key] = t;
@@ -274,21 +310,21 @@ Syntax::add (string key, type t, category req, int s)
 }
 
 void
-Syntax::add (string key, const Syntax& s, category req, int sz)
+Syntax::add (const string& key, const Syntax& s, category req, int sz)
 {
   add (key, AList, req, sz);
   impl.syntax[key] = &s;
 }
 
 void 
-Syntax::add (string key, const ::Library& l, category req, int s)
+Syntax::add (const string& key, const ::Library& l, category req, int s)
 {
   add (key, Object, req, s);
   impl.libraries[key] = &l;
 }
 
 void 
-Syntax::add_library (string key, const ::Library& l, derive_fun fun)
+Syntax::add_library (const string& key, const ::Library& l, derive_fun fun)
 {
   add (key, Library, Optional);
   impl.libraries[key] = &l;
@@ -296,20 +332,20 @@ Syntax::add_library (string key, const ::Library& l, derive_fun fun)
 }
 
 void 
-Syntax::order (const list<string>& order)
+Syntax::order (const vector<string>& order)
 {
   impl.order = order;
 }
 
 void 
-Syntax::order (string one)
+Syntax::order (const string& one)
 {
   assert (impl.order.size () == 0);
   impl.order.push_back (one);
 }
 
 void 
-Syntax::order (string one, string two)
+Syntax::order (const string& one, const string& two)
 {
   assert (impl.order.size () == 0);
   impl.order.push_back (one);
@@ -317,7 +353,7 @@ Syntax::order (string one, string two)
 }
 
 void 
-Syntax::order (string one, string two, string three)
+Syntax::order (const string& one, const string& two, const string& three)
 {
   assert (impl.order.size () == 0);
   impl.order.push_back (one);
@@ -326,7 +362,8 @@ Syntax::order (string one, string two, string three)
 }
 
 void 
-Syntax::order (string one, string two, string three, string four)
+Syntax::order (const string& one, const string& two, const string& three,
+	       const string& four)
 {
   assert (impl.order.size () == 0);
   impl.order.push_back (one);
@@ -336,7 +373,8 @@ Syntax::order (string one, string two, string three, string four)
 }
 
 void 
-Syntax::order (string one, string two, string three, string four, string five)
+Syntax::order (const string& one, const string& two, const string& three,
+	       const string& four, const string& five)
 {
   assert (impl.order.size () == 0);
   impl.order.push_back (one);
@@ -352,6 +390,12 @@ Syntax::dump (int indent) const
   impl.dump (indent);
 }
 
+void
+Syntax::entries (vector<string>& result) const
+{
+  impl.entries (result);
+}
+
 Syntax::Syntax (check_fun c) : impl (*new Implementation (c))
 { }
 
@@ -361,7 +405,7 @@ Syntax::~Syntax ()
 }
 
 void
-check (const AttributeList& al, string s, bool& ok)
+check (const AttributeList& al, const string& s, bool& ok)
 {
   if (!al.check (s))
     {
@@ -371,7 +415,7 @@ check (const AttributeList& al, string s, bool& ok)
 }
 
 void
-non_negative (double v, string s, bool& ok, int index)
+non_negative (double v, const string& s, bool& ok, int index)
 {
   if (v < 0.0)
     {
@@ -384,7 +428,7 @@ non_negative (double v, string s, bool& ok, int index)
 }
 
 void
-non_positive (double v, string s, bool& ok, int index)
+non_positive (double v, const string& s, bool& ok, int index)
 {
   if (v > 0.0)
     {
@@ -397,7 +441,7 @@ non_positive (double v, string s, bool& ok, int index)
 }
 
 void
-is_fraction (double v, string s, bool& ok, int index)
+is_fraction (double v, const string& s, bool& ok, int index)
 {
   if (v < 0.0 || v > 1.0)
     {

@@ -41,7 +41,10 @@ public:
 
   // Simulation.
 public:
-  void run();
+  void tick_columns ();
+  void tick_logs ();
+  void tick ();
+  void run ();
   bool check (const Syntax&);
 
   // Create and Destroy.

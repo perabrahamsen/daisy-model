@@ -74,10 +74,11 @@ protected:
 public:
   static const Library& library ();
   typedef Crop* (*constructor) (const AttributeList&, int layers);
-  static void add_type (string name, 
-			const AttributeList&, const Syntax&,
+  static void add_type (const string& name, 
+			AttributeList&, const Syntax&,
 			constructor);
-  static void derive_type (string name, const AttributeList& al, string super);
+  static void derive_type (const string& name, AttributeList& al, 
+			   const string& super);
   static Crop* create (const AttributeList&, int layers = -1);
 
   // Create and Destroy.
@@ -90,7 +91,7 @@ public:
 class CropList : public list <Crop*> 
 { 
 public:
-  CropList (const vector<const AttributeList*>&);
+  CropList (const vector<AttributeList*>&);
   ~CropList ();
 };
 

@@ -3,15 +3,12 @@
 #include "am.h"
 #include "om.h"
 #include "im.h"
-#include "library.h"
-#include "alist.h"
 #include "syntax.h"
-#include "common.h"
+#include "alist.h"
 #include "time.h"
 #include "log.h"
 #include "geometry.h"
 #include "mathlib.h"
-#include <map>
 #include <numeric>
 
 static Library* AM_library = NULL;
@@ -52,7 +49,7 @@ struct AM::Implementation
 
 
   // Create and Destroy.
-  Implementation (const Time& c, const string n, vector<OM*>& o)
+  Implementation (const Time& c, const string& n, vector<OM*>& o)
     : creation (c),
       name (n),
       om (o),
@@ -399,7 +396,7 @@ AM::library ()
 }
 
 void 
-AM::derive_type (string name, const AttributeList& al, string super)
+AM::derive_type (const string& name, AttributeList& al, const string& super)
 {
   assert (AM_library);
   AM_library->add (name, al, AM_library->syntax (super));
@@ -420,7 +417,7 @@ AM::create (const AttributeList& al, const Geometry& geometry, const Time& time)
 // Crop part.
 AM& 
 AM::create (const Geometry& geometry, const Time& time,
-	    vector<const AttributeList*> ol,
+	    vector<AttributeList*> ol,
 	    const string name, const string part,
 	    AM::lock_type lock)
 {
@@ -432,7 +429,7 @@ AM::create (const Geometry& geometry, const Time& time,
 }
 
 AM::AM (const Geometry& /* geometry */, const Time& t, 
-	vector<const AttributeList*> ol,
+	vector<AttributeList*> ol,
 	const string sort, const string part)
   : impl (*new Implementation (t, 
 			       sort + "/" + part,
@@ -443,7 +440,7 @@ AM::AM (const Geometry& /* geometry */, const Time& t,
 AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
   : impl (*new Implementation 
 	  (al.check ("creation") ? al.time ("creation") : time,
-	    al.check ("name") ? al.name ("name"): al.name ("type"),
+	    al.name (al.check ("name") ? "name" : "type"),
 	    map_construct<OM> (al.alist_sequence ("om")))),
     name ("state")
 {
@@ -471,10 +468,10 @@ AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
     assert (false);
   else if (syntax == "initial")
     {
-      const vector<const AttributeList*>& oms = al.alist_sequence ("om");
+      const vector<AttributeList*>& oms = al.alist_sequence ("om");
       const vector<OM*>& om = impl.om;
       
-      const vector<const AttributeList*>& layers
+      const vector<AttributeList*>& layers
 	= al.alist_sequence ("layers");
       
       double last = 0.0;
@@ -560,7 +557,7 @@ static bool check_organic (const AttributeList& al)
   ::check (al, "dry_matter_fraction", ok);
   ::check (al, "total_C_fraction", ok);
   ::check (al, "total_N_fraction", ok);
-  const vector<const AttributeList*>& om_alist = al.alist_sequence ("om");
+  const vector<AttributeList*>& om_alist = al.alist_sequence ("om");
   bool has_all_initial_fraction = true;
   bool has_all_C_per_N = true;
   for (unsigned int i = 0; i < om_alist.size(); i++)

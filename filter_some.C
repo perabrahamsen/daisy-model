@@ -178,7 +178,7 @@ FilterSome::FilterSome (const AttributeList& al)
       all = &Librarian<Filter>::create (all_alist);
     }
     
-  const vector<const AttributeList*>& members = al.alist_sequence ("members");
+  const vector<AttributeList*>& members = al.alist_sequence ("members");
   for (unsigned int i = 0; i < members.size (); i++)
     { 
       const string name = members[i]->name ("name");

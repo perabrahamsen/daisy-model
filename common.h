@@ -32,6 +32,11 @@
 // If you can delete const objects.
 #define CONST_DELETE
 
+#ifndef EGCS
+// The g++ 2.7.2 find template doesn't work.
+#define BUGGY_FIND
+#endif
+
 #include <unistd.h>
 #include <strstream.h>
 
@@ -40,7 +45,6 @@
 #define HANDLE_NAMESPACES
 #define BORLAND_TEMPLATES
 #define HANDLE_EXCEPTIONS
-#define BORLAND_C_STR
 #define BORLAND_EOF
 
 // Needed in BCC for `close'.

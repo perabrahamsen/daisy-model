@@ -15,9 +15,9 @@ Column::Column (string n)
 Column::~Column ()
 { }
 
-ColumnList::ColumnList (const vector<const AttributeList*>& sequence)
+ColumnList::ColumnList (const vector<AttributeList*>& sequence)
 {
-  for (vector<const AttributeList*>::const_iterator i = sequence.begin ();
+  for (vector<AttributeList*>::const_iterator i = sequence.begin ();
        i != sequence.end ();
        i++)
     push_back (&Librarian<Column>::create (**i));

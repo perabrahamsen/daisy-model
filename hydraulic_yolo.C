@@ -1,9 +1,6 @@
 // hydraulic_yolo.C
 
 #include "hydraulic.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 #include "csmp.h"
 
 class HydraulicYolo : public Hydraulic
@@ -110,5 +107,5 @@ HydraulicYoloSyntax::HydraulicYoloSyntax ()
   alist.add ("Theta_sat", 0.495);
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
   alist.add ("M_intervals", 500);
-  Hydraulic::add_type ("yolo", alist, syntax, &HydraulicYolo::make);
+  Librarian<Hydraulic>::add_type ("yolo", alist, syntax, &HydraulicYolo::make);
 }

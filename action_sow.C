@@ -31,7 +31,7 @@ public:
   }
   // Create and Destroy.
 private:
-  bool check (Daisy& daisy) const
+  bool check (Daisy&) const
   { 
     const string name = crop.name ("type");
 

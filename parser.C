@@ -1,10 +1,9 @@
 // parser.C
 
 #include "parser.h"
+#include "syntax.h"
 #include "alist.h"
 #include "library.h"
-#include "syntax.h"
-#include "common.h"
 #include <map>
 
 static Library* Parser_library = NULL;
@@ -19,10 +18,10 @@ Parser::library ()
 }
 
 void
-Parser::add_type (const string name, 
-		   const AttributeList& al, 
-		   const Syntax& syntax,
-		   constructor cons)
+Parser::add_type (const string& name, 
+		  AttributeList& al, 
+		  const Syntax& syntax,
+		  constructor cons)
 {
   assert (Parser_library);
   Parser_library->add (name, al, syntax);
@@ -30,7 +29,8 @@ Parser::add_type (const string name,
 }
 
 void 
-Parser::derive_type (string name, const AttributeList& al, string super)
+Parser::derive_type (const string& name, AttributeList& al, 
+		     const string& super)
 {
   add_type (name, al, library ().syntax (super), 
 	    (*Parser_constructors)[super]);

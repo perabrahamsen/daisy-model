@@ -3,9 +3,6 @@
 // Modified Campbell retention curve model with Burdine theory.
 
 #include "hydraulic.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 
 class Hydraulic_mod_C : public Hydraulic
 {
@@ -125,5 +122,6 @@ Hydraulic_mod_CSyntax::Hydraulic_mod_CSyntax ()
   syntax.add ("b", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Hydraulic::add_type ("mod_C", alist, syntax, &Hydraulic_mod_C::make);
+  Librarian<Hydraulic>::add_type ("mod_C", alist, syntax,
+				  &Hydraulic_mod_C::make);
 }

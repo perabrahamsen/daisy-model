@@ -55,28 +55,40 @@ tridia (int from,
     }
 }
 
+inline double pow2 (double x)
+{ return x * x; }
+
+inline double pow3 (double x)
+{ return x * x * x; }
+
 double
 single_positive_root_of_cubic_equation 
 (double a, double b, double c, double d)
 {
-  const double p = 1.0 / 3.0 * ( - 1.0/3.0 * pow (b / a, 2) + c / a);
-  const double q = 1.0 / 2.0 * ( 2.0 / 27.0 * pow (b / a, 3)
-				 - 1.0/3.0 * b * c / pow (a, 2)
+  const double p = 1.0 / 3.0 * ( - 1.0/3.0 * pow2 (b / a) + c / a);
+  const double q = 1.0 / 2.0 * ( 2.0 / 27.0 * pow3 (b / a)
+				 - 1.0/3.0 * b * c / pow2 (a)
 				 + d / a);
-  const double r = pow (q, 2) + pow (p, 3);
+  const double r = pow2 (q) + pow3 (p);
   
   if (r >= 0)
-    return cbrt (-q + sqrt (r)) + cbrt (-q - sqrt (r)) - b / (3 * a);
+    {
+      const double sqrt_r = sqrt (r);
+      return cbrt (-q + sqrt_r) + cbrt (-q - sqrt_r) - b / (3 * a);
+    }
   else
     {
-      const double psi = acos ( -q  / sqrt (pow (-p, 3)));
+      const double psi = acos ( -q  / sqrt (pow3 (-p)));
 
-      const double y1 = 2 * sqrt (-p)
-	* cos (psi / 3.0) - b / (3 * a);
-      const double y2 = - 2 * sqrt (-p)
-	* cos (psi / 3.0 + M_PI / 3.0) - b / (3 * a);
-      const double y3 = - 2 * sqrt (-p)
-	* cos (psi / 3.0 - M_PI / 3.0) - b / (3 * a);
+      // A bit manual common subexpression removal.
+      const double sqrt_mp2 = 2 * sqrt (-p);
+      const double psi_3 = psi / 3.0;
+      const double pi_3 = M_PI / 3.0;
+      const double b_3a = b / (3 * a);
+
+      const double y1 = sqrt_mp2 * cos (psi_3) - b_3a;
+      const double y2 = - sqrt_mp2 * cos (psi_3 + pi_3) - b_3a;
+      const double y3 = - sqrt_mp2 * cos (psi_3 - pi_3) - b_3a;
       
       if (y1 >= 0)
 	{

@@ -2,8 +2,6 @@
 
 #include "hydraulic.h"
 #include "options.h"
-#include "syntax.h"
-#include "alist.h"
 #include "mathlib.h"
 #include "csmp.h"
 #include <fstream.h>
@@ -175,5 +173,5 @@ HydraulicOld2Syntax::HydraulicOld2Syntax ()
   alist.add ("Theta_sat", -42.42e42);
   syntax.add ("file", Syntax::String, Syntax::Const);
   syntax.order ("file");
-  Hydraulic::add_type ("old2", alist, syntax, &HydraulicOld2::make);
+  Librarian<Hydraulic>::add_type ("old2", alist, syntax, &HydraulicOld2::make);
 }

@@ -1,10 +1,9 @@
 // action.C -- Manager actions
 
 #include "action.h"
+#include "syntax.h"
 #include "alist.h"
 #include "library.h"
-#include "syntax.h"
-#include "common.h"
 #include <map>
 
 bool
@@ -25,10 +24,10 @@ Action::library ()
 }
 
 void
-Action::add_type (const string name, 
-		   const AttributeList& al, 
-		   const Syntax& syntax,
-		   constructor cons)
+Action::add_type (const string& name, 
+		  AttributeList& al, 
+		  const Syntax& syntax,
+		  constructor cons)
 {
   assert (Action_library);
   Action_library->add (name, al, syntax);
@@ -36,7 +35,8 @@ Action::add_type (const string name,
 }
 
 void 
-Action::derive_type (string name, const AttributeList& al, string super)
+Action::derive_type (const string& name, AttributeList& al, 
+		     const string& super)
 {
   add_type (name, al, library ().syntax (super), 
 	    (*Action_constructors)[super]);

@@ -4,6 +4,7 @@
 #define LIBRARY_H
 
 #include "common.h"
+#include <vector>
 
 struct Syntax;
 struct AttributeList;
@@ -13,13 +14,14 @@ class Library
   struct Implementation;
   Implementation& impl;
 public:
-  const char* name () const;
-  const AttributeList& lookup (string) const;
+  const string& name () const;
+  AttributeList& lookup (string) const;
   bool check (string) const;
-  void add (string, const AttributeList&, const Syntax&);
+  void add (string, AttributeList&, const Syntax&);
   const Syntax& syntax (string) const;
 
   void dump (int indent) const;
+  void entries (vector<string>&) const;
 private: 
   Library (const Library&);
 public:

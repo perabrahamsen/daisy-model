@@ -3,9 +3,6 @@
 // Campbell retention curve model with Burdine theory.
 
 #include "hydraulic.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 
 class HydraulicB_C : public Hydraulic
 {
@@ -113,5 +110,5 @@ HydraulicB_CSyntax::HydraulicB_CSyntax ()
   syntax.add ("b", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Hydraulic::add_type ("B_C", alist, syntax, &HydraulicB_C::make);
+  Librarian<Hydraulic>::add_type ("B_C", alist, syntax, &HydraulicB_C::make);
 }

@@ -7,22 +7,29 @@
 
 struct Library::Implementation
 {
-  const char *const name;
-  typedef map<string, const AttributeList*, less<string> > alist_map;
+  const string name;
+  typedef map<string, AttributeList*, less<string> > alist_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   alist_map alists;
   syntax_map syntaxen;
-  const AttributeList& lookup (string) const;
+  AttributeList& lookup (string) const;
   bool check (string) const;
-  void add (string, const AttributeList&, const Syntax&);
+  void add (string, AttributeList&, const Syntax&);
   const Syntax& syntax (string) const;
   void dump (int indent) const;
+  void entries (vector<string>&) const;
   Implementation (const char* n) 
     : name (n)
-  { }
+    { 
+      cerr << "Creating library `" << name << "'.\n";
+    }
+  ~Implementation ()
+    {
+      cerr << "Deleting library `" << name << "'.\n";
+    }
 };
 
-const AttributeList&
+AttributeList&
 Library::Implementation::lookup (string key) const
 { 
   alist_map::const_iterator i = alists.find (key);
@@ -30,12 +37,22 @@ Library::Implementation::lookup (string key) const
   if (i == alists.end ())
     THROW (AttributeList::Uninitialized ());
 
+  if (true || name == "crop")
+    {
+      cout << "(get " << name << " " << key << "\n  ";
+      (*i).second->dump (syntax (key), 2);
+      cout << ")\n";
+    }
+  else
+    cerr << "Lookup alist for `" << key << "' in library `" << name << "'.\n";
+
   return *(*i).second;
 }
 
 bool
 Library::Implementation::check (string key) const
 { 
+  cerr << "Check `" << key << "' in library `" << name << "'.\n";
   alist_map::const_iterator i = alists.find (key);
 
   if (i == alists.end ())
@@ -45,8 +62,14 @@ Library::Implementation::check (string key) const
 }
 
 void
-Library::Implementation::add (string key, const AttributeList& value, const Syntax& syntax)
+Library::Implementation::add (string key, AttributeList& value, const Syntax& syntax)
 {
+  if (true || name == "crop")
+    {
+      cout << "(def" << name << " " << key << "\n  ";
+      value.dump (syntax, 2);
+      cerr << ")\n";
+    }
   alists[key] = &value;
   syntaxen[key] = &syntax;
 }
@@ -54,6 +77,7 @@ Library::Implementation::add (string key, const AttributeList& value, const Synt
 const Syntax& 
 Library::Implementation::syntax (string key) const
 { 
+  cerr << "Lookup syntax for `" << key << "' in library `" << name << "'.\n";
   syntax_map::const_iterator i = syntaxen.find (key);
 
   if (i == syntaxen.end ())
@@ -83,13 +107,24 @@ Library::Implementation::dump (int indent) const
     }
 }
 
-const char* 
+void
+Library::Implementation::entries (vector<string>& result) const
+{
+  for (syntax_map::const_iterator i = syntaxen.begin ();
+       i != syntaxen.end ();
+       i++)
+    {
+      result.push_back ((*i).first);
+    }
+}
+
+const string&
 Library:: name () const
 {
   return impl.name;
 }
 
-const AttributeList&
+AttributeList&
 Library::lookup (string key) const
 { 
   return impl.lookup (key);
@@ -102,7 +137,7 @@ Library::check (string key) const
 }
 
 void
-Library::add (string key, const AttributeList& value, const Syntax& syntax)
+Library::add (string key, AttributeList& value, const Syntax& syntax)
 {
   impl.add (key, value, syntax);
 }
@@ -119,10 +154,14 @@ Library::dump (int indent) const
   impl.dump (indent);
 }
 
+void
+Library::entries (vector<string>& result) const
+{
+  impl.entries (result);
+}
+
 Library::Library (const char *const name) : impl (*new Implementation (name))
 { }
 
 Library::~Library ()
-{
-    delete &impl;
-}
+{ delete &impl; }

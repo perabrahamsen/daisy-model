@@ -27,9 +27,9 @@ public:
   static const Library& library ();
   static Action& create (const AttributeList&, const Action *const);
   typedef Action& (*constructor) (const AttributeList&, const Action *const);
-  static void add_type (const string, const AttributeList&, const Syntax&,
+  static void add_type (const string&, AttributeList&, const Syntax&,
 			constructor);
-  static void derive_type (const string, const AttributeList&, string super);
+  static void derive_type (const string&, AttributeList&, const string& super);
  
   // Create and Destroy.
 public: 

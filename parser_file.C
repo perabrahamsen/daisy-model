@@ -159,7 +159,7 @@ ParserFile::Implementation::get_integer ()
 void 
 ParserFile::Implementation::error (string str)
 {
-  cerr << file << ":" << line << ":" << column + 1 << ": " << str << "\n";
+  cerr << file << ":" << line << ":" << (column + 1) << ": " << str << "\n";
 }
 
 void
@@ -302,8 +302,8 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
 void
 ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax)
 { 
-  list<string>::const_iterator current = syntax.order ().begin ();
-  const list<string>::const_iterator end = syntax.order ().end ();
+  vector<string>::const_iterator current = syntax.order ().begin ();
+  const vector<string>::const_iterator end = syntax.order ().end ();
 
   while ( good () && !looking_at (')'))
     {
@@ -427,11 +427,11 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      // We don't support fixed sized object arrays yet.
 	      assert (syntax.size (name) == Syntax::Sequence);
 	      const Library& lib = syntax.library (name);
-	      vector<const AttributeList*>& sequence
-		= *new vector<const AttributeList*> ();
+	      vector<AttributeList*>& sequence
+		= *new vector<AttributeList*> ();
 	      while (!looking_at (')') && good ())
 		{
-		  const AttributeList& al = load_derived (lib, true);
+		  AttributeList& al = load_derived (lib, true);
 		  const string obj = al.name ("type");
 		  lib.syntax (obj).check (al, obj);
 		  sequence.push_back (&al);
@@ -443,8 +443,8 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    {
 	      int size = syntax.size (name);
 	      const Syntax& syn = syntax.syntax (name);
-	      vector<const AttributeList*>& sequence
-		= *new vector<const AttributeList*> ();
+	      vector<AttributeList*>& sequence
+		= *new vector<AttributeList*> ();
 	      bool skipped = false;
 	      if (current != end)
 		{

@@ -7,10 +7,7 @@
 #include "alist.h"
 #include "common.h"
 #include "log.h"
-// Not in BCC.
-// #include <algobase.h>
 #include <fstream.h>
-#include "mike_she.h"
 
 class WeatherFile : public Weather
 {
@@ -18,28 +15,18 @@ class WeatherFile : public Weather
   Time now;
   const string file_name;
   ifstream file;
-  const double T1;
-  const double T2;
   const vector<double>& A;
   const vector<double>& B;
 
-#ifdef MIKE_SHE
-#define MUTABLE mutable
-#else
-#define MUTABLE
-#endif
-
-  MUTABLE double precipitation;
-  MUTABLE double reference_evapotranspiration;
-  mutable double hourly_reference_evapotranspiration;
+  double precipitation;
+  double reference_evapotranspiration;
+  double hourly_reference_evapotranspiration;
   double global_radiation;
-  mutable double hourly_global_radiation;
-  MUTABLE double air_temperature;
-
-  mutable double Prain;
-  mutable double Psnow;
-
+  double hourly_global_radiation;
+  double air_temperature;
+  
   int line;
+
   // Simulation.
 public:
   void tick (const Time&);
@@ -49,8 +36,12 @@ public:
   double DailyRadiation () const;
   double ReferenceEvapotranspiration () const;
   double Precipitation () const;
-  double Rain () const;
-  double Snow () const;
+
+  // Communication with external model.
+  void put_precipitation (double prec);// [mm/d]
+  void put_air_temperature (double T); // [°C]
+  void put_reference_evapotranspiration (double ref); // [mm/d]
+
   // Create and Destroy.
 private:
   friend class WeatherFileSyntax;
@@ -100,13 +91,16 @@ WeatherFile::tick (const Time& time)
       date = Time (year, month, day, 23);
     }
   now = time;
+
+  // Update the hourly values.
+  hourly_global_radiation = DayCycle (now) * 24.0 * global_radiation;
+  put_reference_evapotranspiration (reference_evapotranspiration);
 }
 
 void
 WeatherFile::output (Log& log, Filter& filter) const
 {
-  log.output ("Prain", filter, Prain, true);	
-  log.output ("Psnow", filter, Psnow, true);
+  Weather::output (log, filter);
   log.output ("air_temperature", filter, air_temperature, true);
   log.output ("global_radiation", filter, global_radiation, true);
   log.output ("hourly_global_radiation", filter, 
@@ -118,11 +112,8 @@ WeatherFile::output (Log& log, Filter& filter) const
 }
 
 double
-WeatherFile::AirTemperature (void) const // [C]
+WeatherFile::AirTemperature (void) const // [°C]
 {
-#ifdef MIKE_SHE
-  air_temperature = mike_she->get_air_temperature ();
-#endif
   // BUG: No variation over the day? 
   return air_temperature;
 }
@@ -136,7 +127,6 @@ WeatherFile::DailyRadiation () const // [W/m²]
 double
 WeatherFile::GlobalRadiation () const	// [W/m²]
 {
-  hourly_global_radiation = DayCycle (now) * 24.0 * global_radiation;
   return hourly_global_radiation;
 }
 
@@ -144,52 +134,43 @@ WeatherFile::GlobalRadiation () const	// [W/m²]
 double
 WeatherFile::ReferenceEvapotranspiration () const // [mm/h]
 {
-#ifdef MIKE_SHE
-  reference_evapotranspiration
-    = mike_she->get_reference_evapotranspiration ();
-#endif
-  if (reference_evapotranspiration < -1.0e11)
-    {
-      const double T = 273.16 + AirTemperature ();
-      const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
-      return 1.05e-3 * Delta / (Delta + 66.7) * GlobalRadiation ();
-    }
-
-  hourly_reference_evapotranspiration = 
-    reference_evapotranspiration * DayCycle (now);
-
   return hourly_reference_evapotranspiration;
 }
 
 double
 WeatherFile::Precipitation () const
 {
-
-#ifdef MIKE_SHE
-  precipitation = mike_she->get_precipitation ();
-#endif
   return precipitation / 24.0;
 }
 
-double
-WeatherFile::Rain () const
+void 
+WeatherFile::put_precipitation (double prec)
 {
-  Prain = Precipitation () - Snow ();
-
-  return Prain;
+  precipitation = prec;
+  Weather::distribute (Precipitation ());
 }
 
-double
-WeatherFile::Snow () const
+void 
+WeatherFile::put_air_temperature (double T)
 {
-  if (AirTemperature () < T1)
-    Psnow = Precipitation ();
-  else if (T2 < AirTemperature ())
-    Psnow = 0.0;
-  else
-    Psnow = Precipitation () * (T2 - AirTemperature ()) / (T2 - T1);
+  air_temperature = T;
+}
 
-  return Psnow;
+void 
+WeatherFile::put_reference_evapotranspiration (double ref)
+{
+  reference_evapotranspiration = ref;
+
+  if (reference_evapotranspiration < -1.0e11)
+    {
+      const double T = 273.16 + AirTemperature ();
+      const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
+      hourly_reference_evapotranspiration 
+	= 1.05e-3 * Delta / (Delta + 66.7) * GlobalRadiation ();
+    }
+  else
+    hourly_reference_evapotranspiration 
+      = reference_evapotranspiration * DayCycle (now);
 }
 
 WeatherFile::WeatherFile (const AttributeList& al)
@@ -198,15 +179,11 @@ WeatherFile::WeatherFile (const AttributeList& al)
     now (42, 1, 1, 0),
     file_name (al.name ("file")),
     file (Options::find_file (al.name ("file"))),
-    T1 (al.number ("T1")),
-    T2 (al.number ("T2")),
     A (al.number_sequence ("A")),
     B (al.number_sequence ("B")),
     precipitation (-42.42e42),
     reference_evapotranspiration (-42.42e42),
-    global_radiation (-42.42e42),
-    Prain (-42.42e42),
-    Psnow (-42.42e42)
+    global_radiation (-42.42e42)
 { }
 
 WeatherFile::~WeatherFile ()
@@ -260,10 +237,6 @@ static struct WeatherFileSyntax
     AttributeList& alist = *new AttributeList ();
     Weather::load_syntax (syntax, alist);
     syntax.add ("file", Syntax::String, Syntax::Const);
-    syntax.add ("T1", Syntax::Number, Syntax::Const);
-    alist.add ("T1", -2.0);
-    syntax.add ("T2", Syntax::Number, Syntax::Const);
-    alist.add ("T2", 2.0);
     syntax.add ("A", Syntax::Number, Syntax::Const, 12);
     syntax.add ("B", Syntax::Number, Syntax::Const, 12);
     vector<double>& a = *new vector<double>;
@@ -275,8 +248,6 @@ static struct WeatherFileSyntax
       }
     alist.add ("A", a);
     alist.add ("B", b);
-    syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
-    syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
     syntax.add ("air_temperature", Syntax::Number, Syntax::LogOnly);
     syntax.add ("global_radiation", Syntax::Number, Syntax::LogOnly);
     syntax.add ("hourly_global_radiation", Syntax::Number, Syntax::LogOnly);

@@ -81,31 +81,38 @@ Time::hour () const
 // @ Simulate. 
 
 void 
-Time::tick ()
+Time::tick_hour (int hours)
 {
-  if (impl.hour < 23)
-    impl.hour++;
-  else
-    {
-      impl.hour = 0;
-	    
-      switch (impl.yday)
-	{
-	case 365:
-	  if (leap (impl.year))
-	    {
-	      impl.yday++;
-	      return;
-	    }
-	  /* fallthrough */
-	case 366:
-	  impl.yday = 1;
-	  impl.year++;
-	  break;
-	default:
-	  impl.yday++;
-	}
-    }
+  for (; hours > 0; --hours)
+    if (impl.hour < 23)
+      impl.hour++;
+    else
+      {
+	impl.hour = 0;
+	tick_day (1);
+      }
+}
+
+void 
+Time::tick_day (int days)
+{
+  for (; days > 0; --days)
+    switch (impl.yday)
+      {
+      case 365:
+	if (leap (impl.year))
+	  {
+	    impl.yday++;
+	    return;
+	  }
+	/* fallthrough */
+      case 366:
+	impl.yday = 1;
+	impl.year++;
+	break;
+      default:
+	impl.yday++;
+      }
 }
 
 // @ Convert.
@@ -139,6 +146,7 @@ Time::wday_number (string /* name */)
 {
   // BUG: Weekdays are unimplemented.
   assert (false);
+  return -42;
 }
 
 int

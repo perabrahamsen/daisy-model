@@ -56,13 +56,19 @@ public:
   ~FilterArray () { }
 };
 
+#pragma warn -rvl
 bool 
 FilterArray::check (string, bool) const
-{ assert (false); }
+{ 
+  assert (false); 
+}
 
 Filter& 
 FilterArray::lookup (string) const
-{ assert (false); }
+{ 
+  assert (false); 
+}
+#pragma warn +rvl
 
 bool
 FilterArray::accumulating () const
@@ -191,7 +197,7 @@ FilterArray::make (const AttributeList& al)
 
 FilterArray::FilterArray (const AttributeList& al)
 { 
-  const vector<const AttributeList*>& members = al.alist_sequence ("members");
+  const vector<AttributeList*>& members = al.alist_sequence ("members");
   for (unsigned int i = 0; i < members.size (); i++)
     {
       bool error = false;

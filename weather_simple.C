@@ -6,40 +6,30 @@
 #include "alist.h"
 #include "common.h"
 #include "log.h"
-// Not in BCC 5.01
-// #include <algobase.h>
 
 class WeatherSimple : public Weather
 {
-  const double T1;
-  const double T2;
   const double precipitation;
   const int interval;
-  const double  reference_evapotranspiration;
+  double reference_evapotranspiration;
   Time time;
 
-  // Log.
-  double Prain;
-  double Psnow;
+  // Communication with external model.
+  void put_reference_evapotranspiration (double ref)
+    { reference_evapotranspiration = ref; }
 
   // Simulation.
 public:
   void tick (const Time&);
-  void output (Log&, Filter&) const;
   double AirTemperature () const;
   double GlobalRadiation () const;
   double DailyRadiation () const;
   double ReferenceEvapotranspiration () const;
   double Precipitation () const;
-  double Rain () const;
-  double Snow () const;
 
   // Create and Destroy.
-private:
-  friend class WeatherSimpleSyntax;
-  static Weather& make (const AttributeList&);
-  WeatherSimple (const AttributeList&);
 public:
+  WeatherSimple (const AttributeList&);
   ~WeatherSimple ();
 };
 
@@ -48,21 +38,7 @@ WeatherSimple::tick (const Time& t)
 { 
   time = t;
 
-  if (AirTemperature () < T1)
-    Psnow = Precipitation ();
-  else if (T2 < AirTemperature ())
-    Psnow = 0.0;
-  else
-    Psnow = Precipitation () * (T2 - AirTemperature ()) / (T2 - T1);
-
-  Prain = Precipitation () - Snow ();
-}
-
-void
-WeatherSimple::output (Log& log, Filter& filter) const
-{
-  log.output ("Prain", filter, Prain, true);	
-  log.output ("Psnow", filter, Psnow, true);
+  Weather::distribute (Precipitation ());
 }
 
 double
@@ -127,61 +103,37 @@ WeatherSimple::Precipitation () const
     return 0.0;
 }
 
-double
-WeatherSimple::Rain () const
-{
-  return Prain;
-}
-
-double
-WeatherSimple::Snow () const
-{
-  return Psnow;
-}
-
 WeatherSimple::WeatherSimple (const AttributeList& al)
   : Weather (al),
-    T1 (al.number ("T1")),
-    T2 (al.number ("T2")),
     precipitation (al.number ("precipitation")),
     interval (al.integer ("interval")),
     reference_evapotranspiration (al.number ("reference_evapotranspiration")),
-    time (1, 1, 1, 1),
-    Prain (0.0),
-    Psnow (0.0)
+    time (1, 1, 1, 1)
 { }
 
 WeatherSimple::~WeatherSimple ()
 { }
 
 // Add the WeatherSimple syntax to the syntax table.
-Weather&
-WeatherSimple::make (const AttributeList& al)
-{
-  return *new WeatherSimple (al);
-}
-
 static struct WeatherSimpleSyntax
 {
-  WeatherSimpleSyntax ();
-} WeatherSimple_syntax;
+  static Weather& make (const AttributeList& al)
+    {
+      return *new WeatherSimple (al);
+    }
 
-WeatherSimpleSyntax::WeatherSimpleSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  Weather::load_syntax (syntax, alist);
-  syntax.add ("T1", Syntax::Number, Syntax::Const);
-  alist.add ("T1", -2.0);
-  syntax.add ("T2", Syntax::Number, Syntax::Const);
-  alist.add ("T2", 2.0);
-  syntax.add ("precipitation", Syntax::Number, Syntax::Const);
-  alist.add ("precipitation", 0.0);
-  syntax.add ("interval", Syntax::Integer, Syntax::Const);
-  alist.add ("interval", 1);
-  syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::Const);
-  alist.add ("reference_evapotranspiration", -1.0);
-  syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
-  Librarian<Weather>::add_type ("simple", alist, syntax, &WeatherSimple::make);
-}
+  WeatherSimpleSyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      Weather::load_syntax (syntax, alist);
+      syntax.add ("precipitation", Syntax::Number, Syntax::Const);
+      alist.add ("precipitation", 0.0);
+      syntax.add ("interval", Syntax::Integer, Syntax::Const);
+      alist.add ("interval", 1);
+      syntax.add ("reference_evapotranspiration",
+		  Syntax::Number, Syntax::Const);
+      alist.add ("reference_evapotranspiration", -1.0);
+      Librarian<Weather>::add_type ("simple", alist, syntax, &make);
+    }
+} WeatherSimple_syntax;

@@ -4,8 +4,6 @@
 #define OPTIONS_H
 
 #include "common.h"
-// Doesn't exists in Borland C++ 5.01.
-// #include <osfcn.h>
 
 class Options
 {

@@ -13,6 +13,7 @@
 struct Time;
 struct CSMP;
 struct AttributeList;
+struct Syntax;
 
 class AttributeList
 {
@@ -40,17 +41,19 @@ public:
 #endif HANDLE_EXCEPTIONS
 
   // Use.
-  bool check (string) const 
+  bool check (const string&) const 
        throw0 ();
+  void dump (const Syntax&, int indent = 0) const;
+
   double number (string) const
        throw2 (Invalid, Uninitialized);
-  string name (string) const
+  const string& name (string) const
        throw2 (Invalid, Uninitialized);
   bool flag (string) const
        throw2 (Invalid, Uninitialized);
   const CSMP& csmp (string) const 
        throw2 (Invalid, Uninitialized);
-  const AttributeList& alist (string) const
+  AttributeList& alist (string) const
        throw2 (Invalid, Uninitialized);
   int integer (string) const
        throw2 (Invalid, Uninitialized);
@@ -68,25 +71,25 @@ public:
        throw2 (Invalid, Uninitialized);
   const vector<const CSMP*>& csmp_sequence (string key) const
        throw2 (Invalid, Uninitialized);
-  const vector<const AttributeList*>& alist_sequence (string key) const
+  const vector<AttributeList*>& alist_sequence (string key) const
        throw2 (Invalid, Uninitialized);
 
   // Create and Destroy.
-  void add (string, double);
-  void add (string, const char*);
-  void add (string, string);
-  void add (string, bool);
-  void add (string, int);
-  void add (string, const AttributeList&);
-  void add (string, const CSMP&);
-  void add (string, const Time&);
-  void add (string, const vector<double>&);
-  void add (string, const vector<string>&);
-  void add (string, const vector<bool>&);
-  void add (string, const vector<int>&);
-  void add (string, const vector<const AttributeList*>&);
-  void add (string, const vector<const CSMP*>&);
-  void add (string, const vector<const Time*>&);
+  void add (const string&, double);
+  void add (const string&, const char*);
+  void add (const string&, const string&);
+  void add (const string&, bool);
+  void add (const string&, int);
+  void add (const string&, AttributeList&);
+  void add (const string&, const CSMP&);
+  void add (const string&, const Time&);
+  void add (const string&, const vector<double>&);
+  void add (const string&, const vector<string>&);
+  void add (const string&, const vector<bool>&);
+  void add (const string&, const vector<int>&);
+  void add (const string&, const vector<AttributeList*>&);
+  void add (const string&, const vector<const CSMP*>&);
+  void add (const string&, const vector<const Time*>&);
 
   void operator += (const AttributeList&);
   AttributeList (const AttributeList& old);

@@ -27,21 +27,12 @@ Options::find_file (const string name)
   assert (path.size () > 0);
   if (name[0] == '.' || name[0] == '/')
     {
-      const char *const str = name.c_str ();
-      const int fd = open (str, O_RDONLY);
-#ifndef BORLAND_C_STR
-      delete str;
-#endif
-      return fd;
+      return open (name.c_str (), O_RDONLY);
     }
   for (unsigned int i = 0; i < path.size (); i++)
     {
       const string file = path[i] + "/" + name;
-      const char *const str = file.c_str ();
-      const int fd = open (str, O_RDONLY);
-#ifndef BORLAND_C_STR
-      delete str;
-#endif
+      const int fd = open (file.c_str (), O_RDONLY);
       if (fd >= 0)
 	return fd;
     }

@@ -50,19 +50,19 @@ public:
   // Library.
 public:
   static const Library& library ();
-  static void derive_type (const string, const AttributeList&, string super);
+  static void derive_type (const string&, AttributeList&, const string& super);
   // Initialization.
   static AM& create (const AttributeList&, const Geometry&);
   // Fertilizer.
   static AM& create (const AttributeList&, const Geometry&, const Time&);
   // Crop part.
   static AM& create (const Geometry&, const Time&,
-		     vector<const AttributeList*>,
+		     vector<AttributeList*>,
 		     const string name, const string part,
 		     lock_type lock = Unlocked);
   
 private:
-  AM (const Geometry&, const Time&, vector<const AttributeList*>,
+  AM (const Geometry&, const Time&, vector<AttributeList*>,
       const string name, const string part);
   AM (const AttributeList&, const Geometry&, const Time&);
 public:

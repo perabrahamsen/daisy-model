@@ -3,9 +3,6 @@
 // Campbell retention curve model with Mualem theory.
 
 #include "hydraulic.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 
 class HydraulicM_C : public Hydraulic
 {
@@ -113,5 +110,5 @@ HydraulicM_CSyntax::HydraulicM_CSyntax ()
   syntax.add ("b", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Hydraulic::add_type ("M_C", alist, syntax, &HydraulicM_C::make);
+  Librarian<Hydraulic>::add_type ("M_C", alist, syntax, &HydraulicM_C::make);
 }

@@ -3,11 +3,8 @@
 #ifndef HYDRAULIC_H
 #define HYDRAULIC_H
 
-#include "common.h"
+#include "librarian.h"
 
-struct AttributeList;
-struct Library;
-struct Syntax;
 struct CSMP;
 
 class Hydraulic 
@@ -33,37 +30,16 @@ public:
 protected:
   void K_to_M (CSMP&, int) const;
 
-  // Library.
-public:
-  static const Library& library ();
-  typedef Hydraulic& (*constructor) (const AttributeList&);
-  static void add_type (string name, const AttributeList&, const Syntax&,
-			constructor);
-  static void derive_type (string name, const AttributeList&, string super);
-  static Hydraulic& create (const AttributeList&);
-
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
 protected:
   void initialize ();
   Hydraulic (const AttributeList&);
-#if 0
-private:
-  Hydraulic () { };
-#endif
 public:
   virtual ~Hydraulic ();
 };
 
-// Ensure the Hydraulic library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class Hydraulic_init
-{
-  static int count;
-public:
-  Hydraulic_init ();
-  ~Hydraulic_init ();
-} hydraulic_init;
+static Librarian<Hydraulic> Hydraulic_init ("hydraulic");
 
 #endif HYDRAULIC_H

@@ -133,11 +133,7 @@ LogFile::print (string s)
     return;
   if (!stream)
     {
-      const char* n = name.c_str ();
-      stream = new ofstream (n);
-#ifndef BORLAND_C_STR
-      delete n;
-#endif
+      stream = new ofstream (name.c_str ());
       if (!*stream)
 	cerr << "Failed to open `" << name << "'\n";
     }

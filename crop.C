@@ -1,9 +1,9 @@
  // crop.C
 
 #include "crop.h"
-#include "library.h"
-#include "alist.h"
 #include "syntax.h"
+#include "alist.h"
+#include "library.h"
 #include <map>
 
 const double Crop::DSremove = -5001.0;
@@ -20,8 +20,8 @@ Crop::library ()
 }
 
 void
-Crop::add_type (const string name, 
-		const AttributeList& alist, 
+Crop::add_type (const string& name, 
+		AttributeList& alist, 
 		const Syntax& syntax,
 		constructor cons)
 {
@@ -31,7 +31,7 @@ Crop::add_type (const string name,
 }
 
 void 
-Crop::derive_type (string name, const AttributeList& al, string super)
+Crop::derive_type (const string& name, AttributeList& al, const string& super)
 {
   add_type (name, 
 	    al, library ().syntax (super),
@@ -62,9 +62,9 @@ Crop::Crop (const string n)
 Crop::~Crop ()
 { }
 
-CropList::CropList (const vector<const AttributeList*>& sequence)
+CropList::CropList (const vector<AttributeList*>& sequence)
 {
-  for (vector<const AttributeList*>::const_iterator i = sequence.begin ();
+  for (vector<AttributeList*>::const_iterator i = sequence.begin ();
        i != sequence.end ();
        i++)
     push_back (Crop::create (**i, -1));

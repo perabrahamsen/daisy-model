@@ -226,9 +226,9 @@ struct CropSold::Parameters
     const double beta;		// The root/top concentration relation
     const double At;		// N distribution parameter.
     const double Bt;		// N distribution parameter.
-    const vector<const AttributeList*>& Leaf; // Leaf AM parameters.
-    const vector<const AttributeList*>& SOrg; // SOrg AM parameters.
-    const vector<const AttributeList*>& Root; // Root AM parameters.
+    const vector<AttributeList*>& Leaf; // Leaf AM parameters.
+    const vector<AttributeList*>& SOrg; // SOrg AM parameters.
+    const vector<AttributeList*>& Root; // Root AM parameters.
     const double C_Leaf;	// C fraction of total weight.
     const double C_SOrg;	// C fraction of total weight.
     const double C_Root;	// C fraction of total weight.
@@ -1275,7 +1275,7 @@ CropSold::ActualWaterUptake (double Ept,
 	    assert (next <= total);
 	    if (next >= Ept)
 	      {
-		total = next;
+		// total = next;
 		h_x = h_next;
 	      }
 	    else 
@@ -1412,10 +1412,10 @@ CropSold::RootDensDistPar (double a)
     {
       x1 = 0.3;
       y1 = exp (x1);
-      z1 = 1 + a * x1;
+      // z1 = 1 + a * x1;
       x2 = 1.0;
       y2 = exp (x2);
-      z2 = 1 + a * x2;
+      // z2 = 1 + a * x2;
     }
   else
     {
@@ -1430,13 +1430,13 @@ CropSold::RootDensDistPar (double a)
 	{
 	  x1 = x;
 	  y1 = y;
-	  z1 = z;
+	  // z1 = z;
 	}
       else
 	{
 	  x2 = x;
 	  y2 = y;
-	  z2 = z;
+	  // z2 = z;
 	}
       x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
       y = exp (x);
@@ -1538,7 +1538,7 @@ CropSold::NitrogenUptake (int Hour,
     {
       CrpAux.Fixated = 0.8 * PotNUpt;
       NCrop += CrpAux.Fixated;
-      PotNUpt -= CrpAux.Fixated;
+      // PotNUpt -= CrpAux.Fixated;
     }
   else
     CrpAux.Fixated = 0.0;
@@ -1827,9 +1827,9 @@ CropSold::harvest (const string column_name,
   const double C_SOrg = Hp.C_SOrg;
   const double C_Root = Hp.C_Root;
 
-  const vector<const AttributeList*>& Leaf = Hp.Leaf;
-  const vector<const AttributeList*>& SOrg = Hp.SOrg;
-  const vector<const AttributeList*>& Root = Hp.Root;
+  const vector<AttributeList*>& Leaf = Hp.Leaf;
+  const vector<AttributeList*>& SOrg = Hp.SOrg;
+  const vector<AttributeList*>& Root = Hp.Root;
 
   const vector<double>& density = var.RootSys.Density;
 

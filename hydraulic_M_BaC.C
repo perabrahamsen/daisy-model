@@ -4,9 +4,6 @@
 
 
 #include "hydraulic.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 
 class HydraulicM_BaC : public Hydraulic
 {
@@ -111,5 +108,6 @@ HydraulicM_BaCSyntax::HydraulicM_BaCSyntax ()
   syntax.add ("h_b", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Hydraulic::add_type ("M_BaC", alist, syntax, &HydraulicM_BaC::make);
+  Librarian<Hydraulic>::add_type ("M_BaC", alist, syntax, 
+				  &HydraulicM_BaC::make);
 }

@@ -19,9 +19,9 @@ public:
   static const Library& library ();
   static Parser& create (const Syntax& syntax, const AttributeList&);
   typedef Parser& (*constructor) (const Syntax& syntax, const AttributeList&);
-  static void add_type (const string, const AttributeList&, const Syntax&,
+  static void add_type (const string&, AttributeList&, const Syntax&,
 			constructor);
-  static void derive_type (const string, const AttributeList&, string super);
+  static void derive_type (const string&, AttributeList&, const string& super);
  
   // Create and Destroy.
 protected:

@@ -6,7 +6,6 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
-#include <string>
 #include <map>
 
 class Log;
@@ -44,15 +43,15 @@ public:
     assert (library ().syntax (name).check (al));
     return (content->constructors)[name] (al);
   }
-  static void add_type (const string name, const AttributeList& al,
+  static void add_type (const string& name, AttributeList& al,
 			const Syntax& syntax,
 			constructor cons)
   {
     library ().add (name, al, syntax);
     content->constructors.insert(map_type::value_type (name, cons));
   }
-  static void derive_type (const string name, const AttributeList& al,
-			   string super)
+  static void derive_type (const string& name, AttributeList& al,
+			   const string& super)
   {
     add_type (name, al, library ().syntax (super),
 	      (content->constructors)[super]);
@@ -62,7 +61,7 @@ public:
     assert (content);
     return content->lib;
   }
-  static void add_library (Syntax& syntax, const string name)
+  static void add_library (Syntax& syntax, const string& name)
   {
     syntax.add_library (name, library (), &derive_type);
   }
@@ -93,10 +92,10 @@ template <class T>
 struct map_create
 {
   vector<T*>& t;
-  map_create (const vector<const AttributeList*>& f)
+  map_create (const vector<AttributeList*>& f)
     : t (*new vector<T*> ())
   { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+    for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (&Librarian<T>::create (**i));
@@ -109,10 +108,10 @@ template <class T>
 struct map_create_const
 {
   vector<const T*>& t;
-  map_create_const (const vector<const AttributeList*>& f)
+  map_create_const (const vector<AttributeList*>& f)
     : t (*new vector<const T*> ())
   { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+    for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (&Librarian<T>::create (**i));
@@ -125,10 +124,10 @@ template <class T, class U>
 struct map_create1
 {
   vector<T*>& t;
-  map_create1 (const vector<const AttributeList*>& f, U u)
+  map_create1 (const vector<AttributeList*>& f, U u)
     : t (*new vector<T*> ())
   { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+    for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (&T::create (**i, u));
@@ -141,10 +140,10 @@ template <class T>
 struct map_construct
 {
   vector<T*>& t;
-  map_construct (const vector<const AttributeList*>& f)
+  map_construct (const vector<AttributeList*>& f)
     : t (*new vector<T*> ())
   { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+    for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (new T (**i));
@@ -157,10 +156,10 @@ template <class T, class U>
 struct map_construct1
 {
   vector<T*>& t;
-  map_construct1 (const vector<const AttributeList*>& f, U u)
+  map_construct1 (const vector<AttributeList*>& f, U u)
     : t (*new vector<T*> ())
   { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+    for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (new T (**i, u));
@@ -173,10 +172,10 @@ template <class T>
 struct map_construct_const
 {
   vector<const T*>& t;
-  map_construct_const (const vector<const AttributeList*>& f)
+  map_construct_const (const vector<AttributeList*>& f)
     : t (*new vector<const T*> ())
   { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+    for (vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
       t.push_back (new T (**i));

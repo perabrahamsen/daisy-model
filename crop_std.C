@@ -232,11 +232,11 @@ struct CropStandard::Parameters
     const double CStraw;	// Normal straw concentration
     const double CSOrg;		// Sorg conc. at the end of the normal range
     const double alpha;		// Rel. inc. in straw conc. above normal range
-    const vector<const AttributeList*>& Stem; // Stem AM parameters.
-    const vector<const AttributeList*>& Leaf; // Leaf AM parameters.
-    const vector<const AttributeList*>& Dead; // Dead AM parameters.
-    const vector<const AttributeList*>& SOrg; // SOrg AM parameters.
-    const vector<const AttributeList*>& Root; // Root AM parameters.
+    const vector<AttributeList*>& Stem; // Stem AM parameters.
+    const vector<AttributeList*>& Leaf; // Leaf AM parameters.
+    const vector<AttributeList*>& Dead; // Dead AM parameters.
+    const vector<AttributeList*>& SOrg; // SOrg AM parameters.
+    const vector<AttributeList*>& Root; // Root AM parameters.
     const double C_Stem;	// C fraction of total weight.
     const double C_Leaf;	// C fraction of total weight.
     const double C_Dead;	// C fraction of total weight.
@@ -900,8 +900,6 @@ CropStandardSyntax::CropStandardSyntax ()
   // CrpAux
   Syntax& CrpAux = *new Syntax ();
   AttributeList& vCrpAux = *new AttributeList ();
-  syntax.add ("CrpAux", CrpAux, Syntax::State);
-  alist.add ("CrpAux", vCrpAux);
 
   CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::State);
   vCrpAux.add ("InitLAI", true);
@@ -931,7 +929,18 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpAux.add ("Fixated", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("DS_start_fixate", Syntax::Number, Syntax::LogOnly);
 
+  syntax.add ("CrpAux", CrpAux, Syntax::State);
+  alist.add ("CrpAux", vCrpAux);
+
   Crop::add_type ("default", alist, syntax, &CropStandard::make);
+
+  cout << "(define aux1\n  ";
+  vCrpAux.dump (CrpAux, 2);
+  cerr << ")\n";
+
+  cout << "(define aux2\n  ";
+  alist.alist ("CrpAux").dump (syntax.syntax ("CrpAux"), 2);
+  cerr << ")\n";
 }
 
 double
@@ -1326,7 +1335,7 @@ CropStandard::ActualWaterUptake (double Ept,
 	    assert (next <= total);
 	    if (next >= Ept)
 	      {
-		total = next;
+		// total = next;
 		h_x = h_next;
 	      }
 	    else 
@@ -1468,13 +1477,13 @@ CropStandard::RootDensDistPar (double a)
 	{
 	  x1 = x;
 	  y1 = y;
-	  z1 = z;
+	  // z1 = z;
 	}
       else
 	{
 	  x2 = x;
 	  y2 = y;
-	  z2 = z;
+	  // z2 = z;
 	}
       x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
       y = exp (x);
@@ -1942,9 +1951,9 @@ CropStandard::harvest (const string column_name,
   const double C_SOrg = Hp.C_SOrg;
   const double C_Root = Hp.C_Root;
 
-  const vector<const AttributeList*>& Stem = Hp.Stem;
-  const vector<const AttributeList*>& Leaf = Hp.Leaf;
-  const vector<const AttributeList*>& SOrg = Hp.SOrg;
+  const vector<AttributeList*>& Stem = Hp.Stem;
+  const vector<AttributeList*>& Leaf = Hp.Leaf;
+  const vector<AttributeList*>& SOrg = Hp.SOrg;
 
   const vector<double>& density = var.RootSys.Density;
   const double length = height ();

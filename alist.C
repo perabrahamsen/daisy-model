@@ -1,6 +1,7 @@
 // alist.C
 
 #include "alist.h"
+#include "syntax.h"
 #include "time.h"
 #include "common.h"
 #include <assert.h>
@@ -13,40 +14,59 @@
 class Value
 {
 public:
+  // Utilities.
+  virtual void dump (const Syntax&, const string& key, int indent) = 0;
+
   // Retrieve data (Singletons).
   virtual operator double () const
-       throw1 (AttributeList::Invalid);
-  virtual operator string () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
+  virtual operator const string& () const
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
   virtual operator bool () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
   virtual operator int () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
   virtual operator const CSMP& () const
-       throw1 (AttributeList::Invalid);
-  virtual operator const AttributeList& () const
-       throw1 (AttributeList::Invalid);
-  virtual operator const Time& () const throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
+  virtual operator AttributeList& () const
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
+  virtual operator const Time& () const throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
 
   // Retrieve data (Sequences).
   virtual operator const vector<double>& () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
   virtual operator const vector<string>& () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
   virtual operator const vector<bool>& () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
   virtual operator const vector<int>& () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
   virtual operator const vector<const CSMP*>& () const
-       throw1 (AttributeList::Invalid);
-  virtual operator const vector<const AttributeList*>& () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
+  virtual operator const vector<AttributeList*>& () const
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
   virtual operator const vector<const Time*>& () const
-       throw1 (AttributeList::Invalid);
+       throw1 (AttributeList::Invalid)
+    { THROW (AttributeList::Invalid ()); }
 protected:
-  Value ();
+  Value ()
+    { }
 public:
-  virtual ~Value ();
+  virtual ~Value ()
+    { }
 };
 
 // Specific attribute values.
@@ -57,6 +77,8 @@ class dValue : public Value
 {
   const T& value;
 public:
+  void dump (const Syntax& syntax, const string& key, int indent)
+    { cout << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
   operator const T& () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (const T& v)
@@ -69,6 +91,8 @@ class dValue<double> : public Value
 {
   double value;
 public:
+  void dump (const Syntax& syntax, const string& key, int indent)
+    { cout << value; }
   operator double () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (double v)
@@ -80,6 +104,8 @@ class dValue<int> : public Value
 {
   int value;
 public:
+  void dump (const Syntax& syntax, const string& key, int indent)
+    { cout << value; }
   operator int () const
     throw1 (AttributeList::Invalid)
   { return value; }
@@ -92,6 +118,8 @@ class dValue<bool> : public Value
 {
   bool value;
 public:
+  void dump (const Syntax& syntax, const string& key, int indent)
+    { cout << (value ? "true" : "false"); }
   operator bool () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (bool v)
@@ -103,9 +131,11 @@ class dValue<string> : public Value
 {
   string value;
 public:
-  operator string () const throw1 (AttributeList::Invalid)
+  void dump (const Syntax& syntax, const string& key, int indent)
+    { cout << value; }
+  operator const string& () const throw1 (AttributeList::Invalid)
   { return value; }
-  dValue (string v)
+  dValue (const string& v)
     : value (v)
   { };
 };
@@ -114,6 +144,8 @@ class dValue<Time> : public Value
 {
   const Time& value;
 public:
+  void dump (const Syntax& syntax, const string& key, int indent)
+    { cout << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
   operator const Time& () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (const Time& v)
@@ -121,95 +153,24 @@ public:
   { };
 };
 
-Value::operator double () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator string () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator bool () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator int () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const Time& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const CSMP& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const AttributeList& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const vector<double>& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const vector<string>& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const vector<bool>& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const vector<int>& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const vector<const CSMP*>& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const vector<const AttributeList*>& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::operator const vector<const Time*>& () const
-     throw1 (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-}
-
-Value::Value ()
-{ }
-
-Value::~Value ()
-{ }
+class dValue<AttributeList> : public Value
+{
+  AttributeList& value;
+public:
+  void dump (const Syntax& syntax, const string& key, int indent)
+    { 
+      const Syntax::type type = syntax.lookup (key);
+      if (type == Syntax::AList)
+	value.dump (syntax.syntax (key), indent); 
+      else 
+	cout << "<obj " << Syntax::type_name (type) << ">";
+    }
+  operator AttributeList& () const throw1 (AttributeList::Invalid)
+  { return value; }
+  dValue (AttributeList& v)
+    : value (v)
+  { };
+};
 
 // @ AttributeList
 
@@ -218,12 +179,20 @@ typedef map <string, Value*, less<string> > value_map;
 struct AttributeList::Implementation
 {
   value_map values;
-  const Value* lookup (string key) const throw1 (Uninitialized);
-  void add (string key, Value* value);
+  bool check (const string& key) const throw0 ();
+  Value* lookup (const string& key) const throw1 (Uninitialized);
+  void dump (const Syntax& syntax, int indent) const;
+  void add (const string& key, Value* value);
 };    
 
-const Value* 
-AttributeList::Implementation::lookup (string key) const throw1 (AttributeList::Uninitialized)
+bool
+AttributeList::Implementation::check (const string& key) const throw0 ()
+{ 
+  return values.find (key) != values.end ();
+}
+
+Value* 
+AttributeList::Implementation::lookup (const string& key) const throw1 (AttributeList::Uninitialized)
 { 
   value_map::const_iterator i = values.find (key);
   
@@ -234,7 +203,45 @@ AttributeList::Implementation::lookup (string key) const throw1 (AttributeList::
 }
 
 void
-AttributeList::Implementation::add (string key, Value* value)
+AttributeList::Implementation::dump (const Syntax& syntax, 
+				     int indent) const
+{
+  vector<string> entries;
+  syntax.entries (entries);
+  const vector<string>& order = syntax.order ();
+
+  bool first = true;
+  for (unsigned int i = 0; i < order.size (); i++)
+    {
+      first = false;
+      const string& key = order[i];
+
+      if (check (key))
+	lookup (key)->dump (syntax, key, indent);
+      else
+	cout << " <missing " << key << ">";
+    }
+  
+  for (value_map::const_iterator i = values.begin (); i != values.end (); i++)
+    {
+      const string key = (*i).first;
+
+      if (syntax.order (key) < 0)
+	{
+	  if (first)
+	    first = false;
+	  else
+	    cout << "\n" << string (indent, ' ');
+
+	  cout << "(" << key << " ";
+	  (*i).second->dump (syntax, key, indent + key.length () + 2);
+	  cout << ")";
+	}
+    }
+}
+
+void
+AttributeList::Implementation::add (const string& key, Value* value)
 {
   value_map::iterator i = values.find (key);
 
@@ -252,9 +259,15 @@ AttributeList::Implementation::add (string key, Value* value)
 }
 
 bool
-AttributeList::check (string key) const throw0 ()
+AttributeList::check (const string& key) const throw0 ()
 { 
-  return impl.values.find (key) != impl.values.end ();
+  return impl.check (key);
+}
+
+void
+AttributeList::dump (const Syntax& syntax, int indent) const
+{
+  impl.dump (syntax, indent);
 }
 
 double 
@@ -263,7 +276,7 @@ AttributeList::number (string key) const throw2 (AttributeList::Invalid, Attribu
   return *impl.lookup (key);
 }
 
-string 
+const string& 
 AttributeList::name (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
@@ -293,7 +306,7 @@ AttributeList::csmp (string key) const throw2 (AttributeList::Invalid, Attribute
   return *impl.lookup (key);
 }
 
-const AttributeList& 
+AttributeList& 
 AttributeList::alist (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
@@ -341,7 +354,7 @@ AttributeList::csmp_sequence (string key) const
   return *impl.lookup (key);
 }
 
-const vector<const AttributeList*>& 
+const vector<AttributeList*>& 
 AttributeList::alist_sequence (string key) const
      throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
@@ -349,91 +362,91 @@ AttributeList::alist_sequence (string key) const
 }
 
 void 
-AttributeList::add (string key, double v)
+AttributeList::add (const string& key, double v)
 {
   impl.add (key, new dValue<double> (v));
 }
 
 void 
-AttributeList::add (string key, const char* v)
+AttributeList::add (const string& key, const char* v)
 {
   impl.add (key, new dValue<string> (v));
 }
 
 void 
-AttributeList::add (string key, string v)
+AttributeList::add (const string& key, const string& v)
 {
   impl.add (key, new dValue<string> (v));
 }
 
 void 
-AttributeList::add (string key, bool v)
+AttributeList::add (const string& key, bool v)
 {
   impl.add (key, new dValue<bool> (v));
 }
 
 void 
-AttributeList::add (string key, int v)
+AttributeList::add (const string& key, int v)
 {
   impl.add (key, new dValue<int> (v));
 }
 
 void 
-AttributeList::add (string key, const Time& v)
+AttributeList::add (const string& key, const Time& v)
 {
   impl.add (key, new dValue<Time> (v));
 }
 
 void 
-AttributeList::add (string key, const AttributeList& v)
+AttributeList::add (const string& key, AttributeList& v)
 {
   impl.add (key, new dValue<AttributeList> (v));
 }
 
 void 
-AttributeList::add (string key, const CSMP& v)
+AttributeList::add (const string& key, const CSMP& v)
 {
   impl.add (key, new dValue<CSMP> (v));
 }
 
 void 
-AttributeList::add (string key, const vector<double>& v)
+AttributeList::add (const string& key, const vector<double>& v)
 {
   impl.add (key, new dValue<vector<double>/**/> (v));
 }
 
 void 
-AttributeList::add (string key, const vector<string>& v)
+AttributeList::add (const string& key, const vector<string>& v)
 {
   impl.add (key, new dValue<vector<string>/**/> (v));
 }
 
 void 
-AttributeList::add (string key, const vector<bool>& v)
+AttributeList::add (const string& key, const vector<bool>& v)
 {
   impl.add (key, new dValue<vector<bool>/**/> (v));
 }
 
 void 
-AttributeList::add (string key, const vector<int>& v)
+AttributeList::add (const string& key, const vector<int>& v)
 {
   impl.add (key, new dValue<vector<int>/**/> (v));
 }
 
 void 
-AttributeList::add (string key, const vector<const AttributeList*>& v)
+AttributeList::add (const string& key, const vector<AttributeList*>& v)
 {
-  impl.add (key, new dValue<vector<const AttributeList*>/**/> (v));
+  impl.add (key, new dValue<vector<AttributeList*>/**/> (v));
 }
 
 void 
-AttributeList::add (string key, const vector<const CSMP*>& v)
+AttributeList::add (const string& key, const vector<const CSMP*>& v)
 {
   impl.add (key, new dValue<vector<const CSMP*>/**/> (v));
 }
 
 void 
-AttributeList::add (string key, const vector<const Time*>& v)
+AttributeList::add (const string& key, const vector<const Time*>& v)
 {
   impl.add (key, new dValue<vector<const Time*>/**/> (v));
 }

@@ -3,9 +3,6 @@
 // van Gebuchten retention curve model with Mualem theory.
 
 #include "hydraulic.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 #include "csmp.h"
 
 class HydraulicM_vG : public Hydraulic
@@ -133,5 +130,5 @@ HydraulicM_vGSyntax::HydraulicM_vGSyntax ()
   syntax.add ("n", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Hydraulic::add_type ("M_vG", alist, syntax, &HydraulicM_vG::make);
+  Librarian<Hydraulic>::add_type ("M_vG", alist, syntax, &HydraulicM_vG::make);
 }

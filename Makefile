@@ -1,38 +1,179 @@
-# Makefile -- DAISY 
+# Makefile --- For maintaining the Daisy project.
+#
+# Automatic creation of daisy on multiple platforms.
+#
+# You need GNU Make for using this file.
+#
+# The following envirnoment variables are used:
+#
+# HOSTTYPE
+#	sun4	Create code for Solaris-2 / UltraSPARC.
+#	hp	Create code for HP/UX / HP-PA.
+#	i386	Create code for Win32 / Pentium.
+#
+# USER
+#	jaj0kvl	Setup defaults for use at DHI.
+#
 
+# All makefiles should have these.
+#
 SHELL = /bin/sh
 MAKEFLAGS =
 
-# change these to enable/disable mike she connection
-#FORHOME = /pack/f2c
-#FORHOME = /usr1/jaj0kvl
-#FOROBJ = $(FORTRAN:.f=.o) $(MIKESRC:.c=.o) 
-#FOROBJ = mshe/mshe.a
-#FORLIB =  -L$(FORHOME)/lib -lI77 -lF77 
-#MIKESHE=mike_she.C
-#MIKEONLY=
-#MIKEFLAGS=-I$(FORHOME)/include -DMIKE_SHE
-FOROBJ=
-FORLIB=
-MIKESRC=
-MIKEFLAGS= 
+# HOSTTYPE is not defined in the native win32 Emacs.
+#
+ifeq ($(OS),Windows_NT)
+	HOSTTYPE = i386
+endif
 
-#Uncomment these on SPARC
-SPARCSRC = set_exceptions.S
-SPARCOBJ = set_exceptions.o
-CC = /pack/egcs/bin/c++ -Wall -fno-exceptions -DEGCS -g -pipe $(MIKEFLAGS) -frepo -pg #-O3 -ffast-math -mcpu=ultrasparc
-#CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -pipe $(MIKEFLAGS) -frepo #-O3 -ffast-math -mv8 -pg
-# CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
-MATHLIB = -lm
+# Set USE_OPTIMIZE to `true' if you want a fast executable.
+#
+#USE_OPTIMIZE = true
+USE_OPTIMIZE = false
 
-#Use these on HPUX (repo doesn't work)
-#MATHLLIB = -lM
-#CC = c++ -Wall -Wcast-qual -pipe $(MIKEFLAGS) -O2 
+# Set USE_PROFILE if you want to profile the executable
+#
+#USE_PROFILE = true
+USE_PROFILE = false
 
-#Use these on Borland C++ 5.01
-#CC = /bc5/bin/bcc32 -P -v -WC
+# Set USE_MIKESHE to `true' to enable coupling with Mike/SHE.
+#
+ifeq ($(USER),jaj0kvl)
+	USE_MIKESHE	= true
+else
+	USE_MIKESHE	= false
+#	USE_MIKESHE	= true
+endif
 
-SRCONLY = filter_array.C filter_all.C filter_none.C filter_some.C \
+# Set COMPILER according to which compiler you use.
+#	sun		Use the unbundled sun compiler.
+#	gnu		Use the standard GNU compiler.
+#	egcs		Use the experimental GNU compiler.
+#	borland		Use the Borland compiler.
+ifeq ($(HOSTTYPE),sun4)
+	COMPILER = egcs
+#	COMPILER = gnu
+#	COMPILER = sun	
+endif
+ifeq ($(HOSTTYPE),hp)
+	COMPILER = gnu
+endif
+ifeq ($(HOSTTYPE),i386)
+	COMPILER = borland
+endif
+
+# Check use of Mike/SHE.
+#
+ifeq ($(USE_MIKESHE),true)
+	ifeq ($(USER),jaj0kvl)
+		FORHOME = /usr1/jaj0kvl
+	else
+		FORHOME = /pack/f2c
+	endif
+	FORLIB = mshe/mshe.a -L$(FORHOME)/lib -lI77 -lF77 
+	MIKESHE=mike_she.C
+	MIKEFLAGS=-I$(FORHOME)/include -DMIKE_SHE
+endif
+
+# On SPARC platforms we trap mathematical exception with some assembler code.
+#
+ifeq ($(HOSTTYPE),sun4) 
+	SPARCSRC = set_exceptions.S
+	SPARCOBJ = set_exceptions.o
+endif
+
+# Find the profile flags.
+#
+ifeq ($(USE_PROFILE),true)
+	ifneq ($(COMPILER),borland)
+		PROFILE = -pg
+	endif
+endif
+
+# Find the optimize flags.
+#
+ifeq ($(USE_OPTIMIZE),true)
+	ifeq ($(COMPILER),egcs)
+		ifeq (($HOSTTYPE),sun4)
+			OPTIMIZE = -O3 -ffast-math -mcpu=ultrasparc
+		else
+			OPTIMIZE = -O3 -ffast-math 
+		endif
+	endif
+	ifeq ($(COMPILER),gnu)
+		ifeq (($HOSTTYPE),sun4)
+			OPTIMIZE = -O3 -ffast-math -mv8
+		else
+			OPTIMIZE = -O2
+		endif
+	endif
+endif
+
+# Create the right compile command.
+#
+ifeq ($(COMPILER),egcs)
+	COMPILE = /pack/egcs/bin/c++ -Wall -fno-exceptions -DEGCS -g -pipe -frepo
+endif
+ifeq ($(COMPILER),gnu)
+	ifeq ($(HOSTTYPE),hp)
+		COMPILE = c++ -Wall -pipe	#No repo, no debug.  So sad.
+	else
+		COMPILE = c++ -Wall -g -frepo -pipe
+	endif
+endif
+ifeq ($(COMPILER),sun)
+	COMPILE = /pack/devpro/SUNWspro/bin/CC
+endif
+ifeq ($(COMPILER),borland)
+	COMPILE = /bc5/bin/bcc32 -P -v -WC -wdef -wnod -wamb -w-par -w-hid
+endif
+
+# Construct the compile command.
+#
+CC = $(COMPILE) $(MIKEFLAGS) $(OPTIMIZE) $(PROFILE)
+
+# Find the rigth math library.
+#
+ifeq ($(HOSTTYPE),sun4)
+	MATHLIB = -lm
+endif
+ifeq ($(HOSTTYPE),hp)
+	MATHLIB = -lM
+endif
+ifeq ($(HOSTTYPE),i386)
+	MATHLIB =
+endif
+
+# Locate the tk library.
+#
+TKINCLUDE	= -I/pack/tcl+tk-8/include -I/usr/openwin/include
+TKLIB	  	= -L/pack/tcl+tk-8/lib -L/usr/openwin/lib \
+		  -ltix4.1.8.0 -ltk8.0 -ltcl8.0 -lX11 -lsocket -lnsl -ldl
+
+# Find the right file extension.
+#
+ifeq ($(HOSTTYPE),i386)
+	OBJ = .obj
+	EXT = .exe
+else
+	OBJ = .o
+	EXT =
+endif
+
+# Figure out how to link.
+#
+ifeq ($(COMPILER),borland)
+	LINK = /bc5/bin/bcc32 -P- -v -WC -e
+	NOLINK = -c
+else
+	LINK = $(CC) -o
+	NOLINK = -c
+endif
+
+# Select the C files that doesn't have a corresponding header file.
+# These are all components of some library.
+#
+COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	column_std.C  weather_simple.C uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
 	hydraulic_B_C.C hydraulic_M_BaC.C hydraulic_B_BaC.C \
@@ -44,59 +185,103 @@ SRCONLY = filter_array.C filter_all.C filter_none.C filter_some.C \
 	action_with.C hydraulic_old2.C nitrification_soil.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
 	transport_none.C transport_convection.C
-OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
+
+# Select the C files with a corresponding header file from the library.
+#
+INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
 	filter.C csmp.C time.C uzmodel.C parser_file.C hydraulic.C \
 	soil.C mathlib.C bioclimate.C surface.C soil_water.C \
 	soil_NH4.C soil_NO3.C organic_matter.C nitrification.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
-	am.C im.C om.C harvest.C $(MIKESHE) options.C geometry.C transport.C
-OBJ = $(SRCONLY:.C=.o) $(OBJECTS:.C=.o) $(SPARCOBJ)
-SRC = $(SRCONLY) $(OBJECTS) $(SPARCSRC) 
-HEAD = $(OBJECTS:.C=.h) common.h librarian.h
-TEXT =  Makefile $(HEAD) $(SRC) 
+	am.C im.C om.C harvest.C $(MIKESHE) options.C geometry.C transport.C \
+	librarian.C cdaisy.C
 
-# To be removed by the next cvs update.
-REMOVE = none 
+# Select the C files that are not part of the library.
+#
+MAIN = main.C tkmain.C
 
-.SUFFIXES:	.C .o .h .c
+# The object files used in the daisy library.
+#
+LIBOBJ = $(COMPONENTS:.C=${OBJ}) $(INTERFACES:.C=${OBJ}) $(SPARCOBJ)
 
-daisy:	$(OBJ) $(FOROBJ)
-	$(CC) -o daisy $(OBJ) $(FOROBJ) $(FORLIB) -lm
+# Find all object files, header files, and source files.
+#
+OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ}
+SOURCES = $(COMPONENTS) $(INTERFACES) $(SPARCSRC) $(MAIN) cmain.c
+HEADERS = $(INTERFACES:.C=.h) common.h
 
-#	/bc5/bin/bcc32 -v -WC -edaisy $(OBJ:.o=.OBJ) $(FOROBJ) $(FORLIB) 
+# Find all printable files.
+#
+TEXT =  Makefile $(HEADERS) $(SOURCES) 
 
+# The executables.
+#
+EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT}
 
+# Select files to be removed by the next cvs update.
+#
+REMOVE = main.h 
 
-mshe/mshe.a:
-	(cd mshe; $(MAKE) mshe.a) 
+# These are the file extensions we deal with.
+# 
+.SUFFIXES:	.C ${OBJ} .h .c ${EXT} .a
 
-set_exceptions.o: set_exceptions.S
-	as -o set_exceptions.o set_exceptions.S
+# Create all the executables.
+#
+all:	$(EXECUTABLES)
 
+# Create the main executable.
+#
+daisy${EXT}:	main${OBJ} $(FORLIB) $(LIBOBJ)
+	$(LINK)daisy $^ $(MATHLIB)
+
+# Create executable with embedded tcl/tk.
+#
+tkdaisy${EXT}:	tkmain${OBJ} $(FORLIB) $(LIBOBJ)
+	$(LINK)tkdaisy $^ $(TKLIB) $(MATHLIB)
+
+# Create the C main file.
+#
+cdaisy${EXT}:  cmain${OBJ} $(FORLIB) $(LIBOBJ)
+	$(LINK)cdaisy $^ $(MATHLIB)
+
+# Count the size of daisy.
+#
 wc: $(TEXT)
 	wc -l $(TEXT)
 
-wc-h: $(HEAD)
-	wc -l $(HEAD)
+wc-h: $(HEADERS)
+	wc -l $(HEADERS)
 
-wc-s: $(SRC)
-	wc -l $(SRC)
+wc-s: $(SOURCES)
+	wc -l $(SOURCES)
 
+# Update the TAGS table.
+#
 tags: TAGS
 
-TAGS: $(SRC) $(HEAD)
-	etags $(SRC) $(HEAD)
+TAGS: $(SOURCES) $(HEADERS)
+	etags $(SOURCES) $(HEADERS)
 
+# Fix DOS newline breakage.
+#
 dos2unix:
 	perl -pi.bak -e 's/\r\n$$/\n/' $(TEXT)
 
+# This prints all the text files when called on Solaris 1.
+#
 print:
 	mp -p /home/user_13/fischer/bin/mp.pro.none -a4 $(TEXT) | parr -s | up -n pup | lpr -Pduplex
 
+
+# Print the current syntax for the Daisy input language.
+#
 dump:	daisy
 	daisy -p
 
+# Various test targets.
+#
 test:	crop-test water-test evapo-test
 
 bless:
@@ -117,19 +302,27 @@ balance:	daisy
 check:	daisy
 	(cd exp; make test )
 
-
+# Remove all the temporary files.
+#
 clean:
-	rm $(OBJ) *.rpo daisy *~
+	rm $(OBJECTS) *.rpo $(EXECUTABLES) *.obj *.exe *.o *~
 
-depend: $(SRC) 
+# Update the Makefile when dependencies have changed.
+#
+depend: $(SOURCES) 
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	g++ -DMIKE_SHE -I. -MM $(SRC) >> Makefile
+	c++ -DMIKE_SHE -I. $(TKINCLUDE) -MM $(SOURCES) \
+		| sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
+# Create a ZIP file with all the sources.
+#
 daisy.zip:	$(TEXT)
 	zip daisy.zip $(TEXT)
 
+# Update the CVS repository.
+#
 cvs: $(TEXT)
 	(cd lib; $(MAKE) cvs);
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
@@ -138,198 +331,239 @@ cvs: $(TEXT)
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
 
-.C.o:
-	$(CC) -c $<
+# Create the Mike/SHE FORTRAN library.
+#
+mshe/mshe.a:
+	(cd mshe; $(MAKE) mshe.a) 
 
-#	touch ${<:.C=.o} 
+# How to compile the assembler file.
+#
+set_exceptions${OBJ}: set_exceptions.S
+	as -o set_exceptions${OBJ} set_exceptions.S
 
-.c.o:
-	gcc -I/pack/f2c/include -c $<
+# How to compile a C++ file.
+#
+.C${OBJ}:
+	$(CC) $(NOLINK) $<
+
+# How to compile a C file.
+#
+.c${OBJ}:
+	gcc -I/pack/f2c/include -g -Wall $(OPTIMIZE) $(PROFILE) $(NOLINK) $<
+
+# There is a bug when egcs compile snow.C with optimization.
+#
+ifeq ($(COMPILER),egcs)
+ifeq ($(USE_OPTIMIZE),true)
+
+snow.o: snow.C
+	$(COMPILE) $(MIKEFLAGS) $(PROFILE) $(NOLINK) $<
+
+endif
+endif
+
+# Special rule for tkmain.o
+#
+tkmain${OBJ}: tkmain.C
+	$(CC) $(TKINCLUDE) $(NOLINK) $<
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-filter_array.o: filter_array.C filter.h librarian.h library.h common.h \
+filter_array${OBJ}: filter_array.C filter.h librarian.h library.h common.h \
  alist.h syntax.h geometry.h
-filter_all.o: filter_all.C filter.h librarian.h library.h common.h \
+filter_all${OBJ}: filter_all.C filter.h librarian.h library.h common.h \
  alist.h syntax.h
-filter_none.o: filter_none.C filter.h librarian.h library.h common.h \
+filter_none${OBJ}: filter_none.C filter.h librarian.h library.h common.h \
  alist.h syntax.h
-filter_some.o: filter_some.C filter.h librarian.h library.h common.h \
+filter_some${OBJ}: filter_some.C filter.h librarian.h library.h common.h \
  alist.h syntax.h
-column_std.o: column_std.C column.h librarian.h library.h common.h \
+column_std${OBJ}: column_std.C column.h librarian.h library.h common.h \
  alist.h syntax.h crop.h bioclimate.h surface.h uzmodel.h im.h soil.h \
  horizon.h hydraulic.h geometry.h soil_water.h soil_heat.h soil_NH4.h \
  solute.h soil_NO3.h organic_matter.h nitrification.h \
  denitrification.h log.h filter.h am.h
-weather_simple.o: weather_simple.C weather.h librarian.h library.h \
+weather_simple${OBJ}: weather_simple.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h log.h filter.h
-uzrichard.o: uzrichard.C uzmodel.h librarian.h library.h common.h \
+uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h common.h \
  alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h mathlib.h \
  filter.h log.h
-hydraulic_yolo.o: hydraulic_yolo.C hydraulic.h common.h syntax.h \
- alist.h csmp.h
-hydraulic_M_vG.o: hydraulic_M_vG.C hydraulic.h common.h syntax.h \
- alist.h csmp.h
-hydraulic_B_vG.o: hydraulic_B_vG.C hydraulic.h common.h syntax.h \
- alist.h csmp.h
-hydraulic_M_C.o: hydraulic_M_C.C hydraulic.h common.h syntax.h alist.h
-hydraulic_B_C.o: hydraulic_B_C.C hydraulic.h common.h syntax.h alist.h
-hydraulic_M_BaC.o: hydraulic_M_BaC.C hydraulic.h common.h syntax.h \
- alist.h
-hydraulic_B_BaC.o: hydraulic_B_BaC.C hydraulic.h common.h syntax.h \
- alist.h
-groundwater_static.o: groundwater_static.C groundwater.h uzmodel.h \
- librarian.h library.h common.h alist.h syntax.h
-horizon_std.o: horizon_std.C horizon.h common.h syntax.h alist.h
-crop_std.o: crop_std.C crop.h time.h common.h log.h filter.h \
- librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
- soil_water.h soil.h horizon.h hydraulic.h geometry.h om.h \
- organic_matter.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h \
- harvest.h mathlib.h
-action_sow.o: action_sow.C action.h common.h daisy.h column.h \
- librarian.h library.h alist.h syntax.h crop.h
-action_stop.o: action_stop.C action.h common.h syntax.h alist.h \
- daisy.h
-condition_time.o: condition_time.C condition.h librarian.h library.h \
- common.h alist.h syntax.h daisy.h
-condition_logic.o: condition_logic.C condition.h librarian.h library.h \
+hydraulic_yolo${OBJ}: hydraulic_yolo.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h csmp.h
+hydraulic_M_vG${OBJ}: hydraulic_M_vG.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h csmp.h
+hydraulic_B_vG${OBJ}: hydraulic_B_vG.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h csmp.h
+hydraulic_M_C${OBJ}: hydraulic_M_C.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h
-log_file.o: log_file.C log.h filter.h librarian.h library.h common.h \
- alist.h syntax.h condition.h csmp.h
-action_irrigate.o: action_irrigate.C action.h common.h daisy.h \
- weather.h librarian.h library.h alist.h syntax.h im.h column.h am.h
-action_lisp.o: action_lisp.C action.h common.h daisy.h column.h \
- librarian.h library.h alist.h syntax.h condition.h
-weather_none.o: weather_none.C weather.h librarian.h library.h \
- common.h alist.h syntax.h im.h
-action_fertilize.o: action_fertilize.C action.h common.h daisy.h \
- column.h librarian.h library.h alist.h syntax.h am.h im.h
-weather_file.o: weather_file.C weather.h librarian.h library.h \
- common.h alist.h syntax.h im.h options.h log.h filter.h mike_she.h
-action_tillage.o: action_tillage.C action.h common.h daisy.h weather.h \
- librarian.h library.h alist.h syntax.h im.h column.h
-action_harvest.o: action_harvest.C action.h common.h daisy.h column.h \
- librarian.h library.h alist.h syntax.h
-hydraulic_old.o: hydraulic_old.C hydraulic.h common.h options.h \
- syntax.h alist.h mathlib.h csmp.h
-crop_old.o: crop_old.C crop.h time.h common.h log.h filter.h \
+hydraulic_B_C${OBJ}: hydraulic_B_C.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h
+hydraulic_M_BaC${OBJ}: hydraulic_M_BaC.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h
+hydraulic_B_BaC${OBJ}: hydraulic_B_BaC.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h
+groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
+ librarian.h library.h common.h alist.h syntax.h
+horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
+ alist.h syntax.h
+crop_std${OBJ}: crop_std.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
  soil_water.h soil.h horizon.h hydraulic.h geometry.h om.h \
  organic_matter.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h \
  harvest.h mathlib.h
-crop_sold.o: crop_sold.C crop.h time.h common.h log.h filter.h \
+action_sow${OBJ}: action_sow.C action.h common.h daisy.h column.h \
+ librarian.h library.h alist.h syntax.h crop.h
+action_stop${OBJ}: action_stop.C action.h common.h syntax.h alist.h \
+ daisy.h
+condition_time${OBJ}: condition_time.C condition.h librarian.h library.h \
+ common.h alist.h syntax.h daisy.h
+condition_logic${OBJ}: condition_logic.C condition.h librarian.h library.h \
+ common.h alist.h syntax.h
+log_file${OBJ}: log_file.C log.h filter.h librarian.h library.h common.h \
+ alist.h syntax.h condition.h csmp.h
+action_irrigate${OBJ}: action_irrigate.C action.h common.h daisy.h \
+ weather.h librarian.h library.h alist.h syntax.h im.h column.h am.h
+action_lisp${OBJ}: action_lisp.C action.h common.h daisy.h column.h \
+ librarian.h library.h alist.h syntax.h condition.h
+weather_none${OBJ}: weather_none.C weather.h librarian.h library.h \
+ common.h alist.h syntax.h im.h
+action_fertilize${OBJ}: action_fertilize.C action.h common.h daisy.h \
+ column.h librarian.h library.h alist.h syntax.h am.h im.h
+weather_file${OBJ}: weather_file.C weather.h librarian.h library.h \
+ common.h alist.h syntax.h im.h options.h log.h filter.h
+action_tillage${OBJ}: action_tillage.C action.h common.h daisy.h weather.h \
+ librarian.h library.h alist.h syntax.h im.h column.h
+action_harvest${OBJ}: action_harvest.C action.h common.h daisy.h column.h \
+ librarian.h library.h alist.h syntax.h
+hydraulic_old${OBJ}: hydraulic_old.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h options.h mathlib.h csmp.h
+crop_old${OBJ}: crop_old.C crop.h time.h common.h log.h filter.h \
+ librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
+ soil_water.h soil.h horizon.h hydraulic.h geometry.h om.h \
+ organic_matter.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h \
+ harvest.h mathlib.h
+crop_sold${OBJ}: crop_sold.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
  soil_water.h soil.h horizon.h hydraulic.h geometry.h organic_matter.h \
  om.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h harvest.h \
  mathlib.h
-action_with.o: action_with.C action.h common.h daisy.h syntax.h \
+action_with${OBJ}: action_with.C action.h common.h daisy.h syntax.h \
  alist.h column.h librarian.h library.h
-hydraulic_old2.o: hydraulic_old2.C hydraulic.h common.h options.h \
- syntax.h alist.h mathlib.h csmp.h
-nitrification_soil.o: nitrification_soil.C nitrification.h librarian.h \
+hydraulic_old2${OBJ}: hydraulic_old2.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h options.h mathlib.h csmp.h
+nitrification_soil${OBJ}: nitrification_soil.C nitrification.h librarian.h \
  library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
  geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
  csmp.h mathlib.h log.h filter.h groundwater.h uzmodel.h
-nitrification_solute.o: nitrification_solute.C nitrification.h \
+nitrification_solute${OBJ}: nitrification_solute.C nitrification.h \
  librarian.h library.h common.h alist.h syntax.h soil.h horizon.h \
  hydraulic.h geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h \
  soil_NO3.h csmp.h log.h filter.h mathlib.h groundwater.h uzmodel.h
-hydraulic_mod_C.o: hydraulic_mod_C.C hydraulic.h common.h syntax.h \
- alist.h
-uzlr.o: uzlr.C uzmodel.h librarian.h library.h common.h alist.h \
- syntax.h soil.h horizon.h hydraulic.h geometry.h log.h filter.h
-transport_cd.o: transport_cd.C transport.h librarian.h library.h \
+hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h librarian.h library.h \
+ common.h alist.h syntax.h
+uzlr${OBJ}: uzlr.C uzmodel.h librarian.h library.h common.h alist.h \
+ syntax.h soil.h horizon.h hydraulic.h geometry.h log.h filter.h \
+ mathlib.h
+transport_cd${OBJ}: transport_cd.C transport.h librarian.h library.h \
  common.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
  soil_water.h solute.h log.h filter.h mathlib.h
-transport_none.o: transport_none.C transport.h librarian.h library.h \
+transport_none${OBJ}: transport_none.C transport.h librarian.h library.h \
  common.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
  soil_water.h solute.h log.h filter.h mathlib.h
-transport_convection.o: transport_convection.C transport.h librarian.h \
+transport_convection${OBJ}: transport_convection.C transport.h librarian.h \
  library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
  geometry.h soil_water.h solute.h log.h filter.h mathlib.h
-main.o: main.C daisy.h common.h parser_file.h parser.h syntax.h \
- alist.h
-daisy.o: daisy.C daisy.h common.h weather.h librarian.h library.h \
+daisy${OBJ}: daisy.C daisy.h common.h weather.h librarian.h library.h \
  alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h log.h \
  filter.h parser.h am.h nitrification.h hydraulic.h crop.h column.h \
  harvest.h action.h condition.h mike_she.h
-parser.o: parser.C parser.h common.h alist.h library.h syntax.h
-log.o: log.C log.h filter.h librarian.h library.h common.h alist.h \
+parser${OBJ}: parser.C parser.h common.h syntax.h alist.h library.h
+log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h
-weather.o: weather.C weather.h librarian.h library.h common.h alist.h \
+weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
  syntax.h im.h mathlib.h
-column.o: column.C column.h librarian.h library.h common.h alist.h \
+column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h
-crop.o: crop.C crop.h time.h common.h library.h alist.h syntax.h
-alist.o: alist.C alist.h common.h
-syntax.o: syntax.C syntax.h common.h alist.h library.h
-library.o: library.C library.h common.h alist.h syntax.h
-action.o: action.C action.h common.h alist.h library.h syntax.h
-condition.o: condition.C condition.h librarian.h library.h common.h \
+crop${OBJ}: crop.C crop.h time.h common.h syntax.h alist.h library.h
+alist${OBJ}: alist.C alist.h common.h
+syntax${OBJ}: syntax.C syntax.h common.h alist.h library.h
+library${OBJ}: library.C library.h common.h alist.h syntax.h
+action${OBJ}: action.C action.h common.h syntax.h alist.h library.h
+condition${OBJ}: condition.C condition.h librarian.h library.h common.h \
  alist.h syntax.h
-horizon.o: horizon.C horizon.h common.h library.h alist.h syntax.h \
- csmp.h hydraulic.h mathlib.h
-filter.o: filter.C filter.h librarian.h library.h common.h alist.h \
+horizon${OBJ}: horizon.C horizon.h librarian.h library.h common.h alist.h \
+ syntax.h csmp.h hydraulic.h mathlib.h
+filter${OBJ}: filter.C filter.h librarian.h library.h common.h alist.h \
  syntax.h
-csmp.o: csmp.C csmp.h common.h log.h filter.h librarian.h library.h \
+csmp${OBJ}: csmp.C csmp.h common.h log.h filter.h librarian.h library.h \
  alist.h syntax.h
-time.o: time.C time.h common.h
-uzmodel.o: uzmodel.C uzmodel.h librarian.h library.h common.h alist.h \
+time${OBJ}: time.C time.h common.h
+uzmodel${OBJ}: uzmodel.C uzmodel.h librarian.h library.h common.h alist.h \
  syntax.h
-parser_file.o: parser_file.C parser_file.h parser.h common.h options.h \
+parser_file${OBJ}: parser_file.C parser_file.h parser.h common.h options.h \
  syntax.h alist.h library.h csmp.h log.h filter.h librarian.h
-hydraulic.o: hydraulic.C hydraulic.h common.h library.h alist.h \
- syntax.h csmp.h
-soil.o: soil.C soil.h horizon.h common.h hydraulic.h geometry.h \
- alist.h syntax.h mathlib.h
-mathlib.o: mathlib.C mathlib.h common.h
-bioclimate.o: bioclimate.C bioclimate.h column.h librarian.h library.h \
+hydraulic${OBJ}: hydraulic.C hydraulic.h librarian.h library.h common.h \
+ alist.h syntax.h csmp.h
+soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \
+ syntax.h hydraulic.h geometry.h mathlib.h
+mathlib${OBJ}: mathlib.C mathlib.h common.h
+bioclimate${OBJ}: bioclimate.C bioclimate.h column.h librarian.h library.h \
  common.h alist.h syntax.h surface.h uzmodel.h im.h weather.h crop.h \
  csmp.h soil.h horizon.h hydraulic.h geometry.h snow.h log.h filter.h \
  mike_she.h
-surface.o: surface.C surface.h uzmodel.h librarian.h library.h \
+surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
  common.h alist.h syntax.h im.h soil_water.h log.h filter.h am.h \
  mathlib.h mike_she.h
-soil_water.o: soil_water.C soil_water.h common.h log.h filter.h \
+soil_water${OBJ}: soil_water.C soil_water.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h uzmodel.h soil.h horizon.h \
  hydraulic.h geometry.h surface.h im.h groundwater.h mathlib.h \
  mike_she.h
-soil_NH4.o: soil_NH4.C soil_NH4.h solute.h common.h soil_water.h \
- soil.h horizon.h hydraulic.h geometry.h mathlib.h
-soil_NO3.o: soil_NO3.C soil_NO3.h solute.h common.h soil_water.h \
- soil.h horizon.h hydraulic.h geometry.h mike_she.h
-organic_matter.o: organic_matter.C organic_matter.h syntax.h common.h \
+soil_NH4${OBJ}: soil_NH4.C soil_NH4.h solute.h common.h soil_water.h \
+ soil.h horizon.h librarian.h library.h alist.h syntax.h hydraulic.h \
+ geometry.h mathlib.h
+soil_NO3${OBJ}: soil_NO3.C soil_NO3.h solute.h common.h soil_water.h \
+ soil.h horizon.h librarian.h library.h alist.h syntax.h hydraulic.h \
+ geometry.h mike_she.h
+organic_matter${OBJ}: organic_matter.C organic_matter.h syntax.h common.h \
  alist.h log.h filter.h librarian.h library.h am.h om.h soil.h \
  horizon.h hydraulic.h geometry.h soil_water.h soil_NH4.h solute.h \
  soil_NO3.h soil_heat.h groundwater.h uzmodel.h mathlib.h csmp.h
-nitrification.o: nitrification.C nitrification.h librarian.h library.h \
+nitrification${OBJ}: nitrification.C nitrification.h librarian.h library.h \
  common.h alist.h syntax.h
-denitrification.o: denitrification.C denitrification.h common.h \
- alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h soil_water.h \
- soil_heat.h organic_matter.h soil_NO3.h solute.h groundwater.h \
- uzmodel.h librarian.h library.h csmp.h log.h filter.h
-soil_heat.o: soil_heat.C soil_heat.h alist.h common.h surface.h \
+denitrification${OBJ}: denitrification.C denitrification.h common.h \
+ alist.h syntax.h soil.h horizon.h librarian.h library.h hydraulic.h \
+ geometry.h soil_water.h soil_heat.h organic_matter.h soil_NO3.h \
+ solute.h groundwater.h uzmodel.h csmp.h log.h filter.h
+soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h common.h surface.h \
  uzmodel.h librarian.h library.h syntax.h im.h groundwater.h \
  soil_water.h soil.h horizon.h hydraulic.h geometry.h mathlib.h log.h \
  filter.h
-groundwater.o: groundwater.C groundwater.h uzmodel.h librarian.h \
+groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h \
  library.h common.h alist.h syntax.h
-snow.o: snow.C snow.h alist.h common.h syntax.h log.h filter.h \
+snow${OBJ}: snow.C snow.h alist.h common.h syntax.h log.h filter.h \
  librarian.h library.h soil.h horizon.h hydraulic.h geometry.h \
  soil_water.h soil_heat.h mathlib.h mike_she.h
-solute.o: solute.C solute.h common.h log.h filter.h librarian.h \
+solute${OBJ}: solute.C solute.h common.h log.h filter.h librarian.h \
  library.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
  soil_water.h mathlib.h transport.h
-am.o: am.C am.h common.h om.h im.h library.h alist.h syntax.h log.h \
- filter.h librarian.h geometry.h mathlib.h
-im.o: im.C im.h log.h filter.h librarian.h library.h common.h alist.h \
+am${OBJ}: am.C am.h common.h om.h im.h syntax.h alist.h log.h filter.h \
+ librarian.h library.h geometry.h mathlib.h
+im${OBJ}: im.C im.h log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h
-om.o: om.C om.h common.h syntax.h alist.h geometry.h log.h filter.h \
+om${OBJ}: om.C om.h common.h syntax.h alist.h geometry.h log.h filter.h \
  librarian.h library.h mathlib.h
-harvest.o: harvest.C harvest.h time.h common.h syntax.h log.h filter.h \
+harvest${OBJ}: harvest.C harvest.h time.h common.h syntax.h log.h filter.h \
  librarian.h library.h alist.h
-options.o: options.C options.h common.h
-geometry.o: geometry.C geometry.h common.h syntax.h alist.h mathlib.h
-transport.o: transport.C transport.h librarian.h library.h common.h \
+options${OBJ}: options.C options.h common.h
+geometry${OBJ}: geometry.C geometry.h common.h syntax.h alist.h mathlib.h
+transport${OBJ}: transport.C transport.h librarian.h library.h common.h \
  alist.h syntax.h
-set_exceptions.o: set_exceptions.S
+librarian${OBJ}: librarian.C librarian.h library.h common.h alist.h \
+ syntax.h
+cdaisy${OBJ}: cdaisy.C syntax.h common.h alist.h daisy.h parser_file.h \
+ parser.h column.h librarian.h library.h weather.h im.h action.h \
+ groundwater.h uzmodel.h
+set_exceptions${OBJ}: set_exceptions.S
+main${OBJ}: main.C daisy.h common.h parser_file.h parser.h syntax.h \
+ alist.h
+tkmain${OBJ}: tkmain.C daisy.h common.h syntax.h alist.h library.h
+cmain${OBJ}: cmain.c cdaisy.h

@@ -94,7 +94,9 @@ UZlr::tick (const Soil& soil,
 	    vector<double>& q)
 {
   // Upper border.
-  q_up = q[first] = top.q ();
+  const double K_sat = soil.K (0, 0.0);
+  assert (K_sat > 0.0);
+  q_up = q[first] = max (top.q (), -K_sat);
   const bool ok = top.accept_top (q_up);
   assert (ok);
 

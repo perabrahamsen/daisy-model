@@ -59,10 +59,11 @@ public:
 public:
   static const Library& library ();
   typedef Column* (*constructor) (const AttributeList&);
-  static void add_type (string name, 
+  static void add_type (const string& name, 
 			const AttributeList&, const Syntax&,
 			constructor);
-  static void derive_type (string name, const AttributeList&, string super);
+  static void derive_type (const string& name, const AttributeList&, 
+			   const string& super);
   static Column* create (const AttributeList& al);
 
   // Create and Destroy.
@@ -75,7 +76,7 @@ public:
 class ColumnList : public vector <Column*>
 { 
 public:
-  ColumnList (const vector<const AttributeList*>&);
+  ColumnList (const vector<AttributeList*>&);
   ~ColumnList ();
 };
 

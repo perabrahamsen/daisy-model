@@ -3,11 +3,8 @@
 #ifndef HORIZON_H
 #define HORIZON_H
 
-#include "common.h"
+#include "librarian.h"
 
-struct AttributeList;
-struct Library;
-struct Syntax;
 struct Hydraulic;
 
 class Horizon 
@@ -39,15 +36,6 @@ public:
   double v_planar () const;
   double v_edge () const;
 
-  // Library.
-public:
-  static const Library& library ();
-  typedef Horizon& (*constructor) (const AttributeList&);
-  static void add_type (string name, const AttributeList&, const Syntax&,
-			constructor);
-  static void derive_type (string name, const AttributeList&, string super);
-  static Horizon& create (const AttributeList&);
-
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
@@ -55,14 +43,6 @@ public:
   virtual ~Horizon ();
 };
 
-// Ensure the Horizon library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class Horizon_init
-{
-  static int count;
-public:
-  Horizon_init ();
-  ~Horizon_init ();
-} horizon_init;
+static Librarian<Horizon> Horizon_init ("horizon");
 
 #endif HORIZON_H

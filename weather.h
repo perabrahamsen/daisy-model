@@ -13,7 +13,7 @@ class Weather
   // Content.
 private:
   struct Implementation;
-  const Implementation& impl;
+  Implementation& impl;
 public: 
   const string name;
   
@@ -21,6 +21,8 @@ public:
 public:
   virtual void tick (const Time& time) = 0;
   virtual void output (Log&, Filter&) const;
+protected:
+  void distribute (double precipitation);
 
   // Communication with Biocliamte.
 public:
@@ -28,13 +30,18 @@ public:
   virtual double GlobalRadiation () const = 0;
   virtual double DailyRadiation () const = 0;
   virtual double ReferenceEvapotranspiration () const = 0;
-  virtual double Rain () const = 0;
-  virtual double Snow () const = 0;
+  virtual double Rain () const;
+  virtual double Snow () const;
   virtual IM Deposit () const; // [g [stuff] /cm²/h]
 
   // Light distribution.
   double DayLength (const Time& time) const;
   double DayCycle (const Time& time) const;
+
+  // Communication with external model.
+  virtual void put_precipitation (double prec);// [mm/d]
+  virtual void put_air_temperature (double T); // [°C]
+  virtual void put_reference_evapotranspiration (double ref); // [mm/d]
 
   // Utility.
 public:

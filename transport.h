@@ -20,7 +20,7 @@ public:
   virtual void tick (const Soil&, const SoilWater&, const Solute&,
 		     vector<double>& M, 
 		     vector<double>& C,
-		     vector<double>& S,
+		     const vector<double>& S,
 		     double J_in) = 0;
   virtual void output (Log&, Filter&) const = 0;
 

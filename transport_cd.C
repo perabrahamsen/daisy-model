@@ -19,14 +19,15 @@ public:
   void tick (const Soil&, const SoilWater&, const Solute&,
 	     vector<double>& M, 
 	     vector<double>& C,
-	     vector<double>& S,
+	     const vector<double>& S,
 	     double J_in);
   void output (Log&, Filter&) const;
 
   // Create.
 public:
   TransportCD (const AttributeList& al)
-    : Transport (al.name ("type"))
+    : Transport (al.name ("type")),
+      ddt (dt)
     { }
 };
 
@@ -42,7 +43,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 		   const Solute& solute, 
 		   vector<double>& M, 
 		   vector<double>& C,
-		   vector<double>& S,
+		   const vector<double>& S,
 		   double J_in)
 {
   // Remember old values.

@@ -8,10 +8,6 @@
 #include <vector>
 #include <map>
 
-static Library* Hydraulic_library = NULL;
-typedef map<string, Hydraulic::constructor, less<string> > Hydraulic_map_type;
-static Hydraulic_map_type* Hydraulic_constructors;
-
 bool 
 Hydraulic::compact () const
 {
@@ -40,41 +36,6 @@ Hydraulic::K_to_M (CSMP& csmp, const int intervals) const
   csmp.add (h, sum);
 }
 
-const Library&
-Hydraulic::library ()
-{
-  assert (Hydraulic_library);
-  return *Hydraulic_library;
-}
-
-void
-Hydraulic::add_type (const string name, 
-		   const AttributeList& al, 
-		   const Syntax& syntax,
-		   constructor cons)
-{
-  assert (Hydraulic_library);
-  Hydraulic_library->add (name, al, syntax);
-  Hydraulic_constructors->insert(Hydraulic_map_type::value_type (name, cons));
-}
-
-void 
-Hydraulic::derive_type (string name, const AttributeList& al, string super)
-{
-  add_type (name, al, library ().syntax (super),
-	    (*Hydraulic_constructors)[super]);
-}
-
-Hydraulic&
-Hydraulic::create (const AttributeList& al)
-{
-  assert (al.check ("type"));
-  const string name = al.name ("type");
-  assert (library ().check (name));
-  assert (library ().syntax (name).check (al));
-  return (*Hydraulic_constructors)[name] (al);
-}
-
 void
 Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
@@ -93,26 +54,4 @@ Hydraulic::Hydraulic (const AttributeList& al)
 Hydraulic::~Hydraulic ()
 { }
 
-int Hydraulic_init::count;
-
-Hydraulic_init::Hydraulic_init ()
-{ 
-  if (count++ == 0)
-    {
-      Hydraulic_library = new Library ("hydraulic");
-      Hydraulic_constructors = new Hydraulic_map_type ();
-    }
-  assert (count > 0);
-}
-
-Hydraulic_init::~Hydraulic_init ()
-{ 
-  if (--count == 0)
-    {
-      delete Hydraulic_library;
-      Hydraulic_library = NULL;
-      delete Hydraulic_constructors;
-      Hydraulic_constructors = NULL;
-    }
-  assert (count >= 0);
-}
+Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content = NULL;

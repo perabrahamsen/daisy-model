@@ -92,12 +92,12 @@ struct clause
 template class vector<clause>;
 #endif
 
-vector<clause>& make_clauses (const vector<const AttributeList*>& s, 
+vector<clause>& make_clauses (const vector<AttributeList*>& s, 
 			      const Action *const p)
 {
   vector<clause>& c = *new vector<clause>;
   
-  for (vector<const AttributeList*>::const_iterator i = s.begin ();
+  for (vector<AttributeList*>::const_iterator i = s.begin ();
        i != s.end ();
        i++)
     {

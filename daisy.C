@@ -89,6 +89,40 @@ Daisy::check (const Syntax& syntax)
   return all_ok;
 }
 
+void
+Daisy::tick_columns ()
+{
+  for (unsigned int i = 0; i < columns.size (); i++)
+    columns[i]->tick (time, weather, groundwater);
+}
+
+void
+Daisy::tick_logs ()
+{
+  for (unsigned int i = 0; i < logs.size (); i++)
+    {
+      Log& log = *logs[i];
+      Filter& filter = log.match (*this);
+      log.output ("time", filter, time);
+      output_derived (weather, "weather", log, filter);
+      groundwater.output (log, filter);
+      output_list (columns, "column", log, filter);
+      output_vector (harvest, "harvest", log, filter);
+    }
+}
+
+void 
+Daisy::tick ()
+{ 
+  action.doIt (*this);
+
+  weather.tick (time);
+  groundwater.tick (time);
+  tick_columns ();
+  tick_logs ();
+  time.tick_hour ();
+}
+
 void 
 Daisy::run ()
 { 
@@ -96,9 +130,6 @@ Daisy::run ()
 
   while (running)
     {
-#ifdef MIKE_SHE 
-      mike_she->receive ();
-#endif
       switch (time.hour ())
 	{
 	case 0:
@@ -112,37 +143,7 @@ Daisy::run ()
 	  cout << " " << time.hour () << "\n";
 	  break;
 	}
-      action.doIt (*this);
-
-      weather.tick (time);
-      for (ColumnList::iterator i = columns.begin ();
-	   i != columns.end ();
-	   i++)
-	{
-#ifdef MIKE_SHE 
-	  mike_she->select ((*i)->name);
-#endif
-	  (*i)->tick (time, weather, groundwater);
-	}
-      for (vector<Log*>::const_iterator i = logs.begin ();
-	   i != logs.end ();
-	   i++)
-	{
-	  Log& log = **i;
-	  Filter& filter = log.match (*this);
-	  log.output ("time", filter, time);
-	  output_derived (weather, "weather", log, filter);
-	  groundwater.output (log, filter);
-	  output_list (columns, "column", log, filter);
-	  output_vector (harvest, "harvest", log, filter);
-	}
-      time.tick ();
-#ifdef MIKE_SHE 
-      if (mike_she->done ())
-	running = false;
-      else
-	mike_she->send ();
-#endif
+      tick ();
     }
   if (time.hour () != 0)
     cout << "\n";
@@ -157,9 +158,7 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Libraries.
   syntax.add_library ("defcrop", Crop::library (), &Crop::derive_type);
-  syntax.add_library ("defhorizon", Horizon::library (), 
-		      &Horizon::derive_type);
-  
+  Librarian<Horizon>::add_library (syntax, "defhorizon");
   Librarian<Column>::add_library (syntax, "defcolumn");
   Librarian<Log>::add_library (syntax, "deflog");
   syntax.add_library ("defparser", Parser::library (), &Parser::derive_type);
@@ -170,8 +169,7 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   Librarian<Weather>::add_library (syntax, "defweather");
   Librarian<Groundwater>::add_library (syntax, "defgroundwater");
   Librarian<UZmodel>::add_library (syntax, "defuzmodel");
-  syntax.add_library ("defhydraulic", 
-		      Hydraulic::library (), &Hydraulic::derive_type);
+  Librarian<Hydraulic>::add_library (syntax, "defhydraulic");
   Librarian<Nitrification>::add_library (syntax, "defnitrification");
   Librarian<Filter>::add_library (syntax, "deffilter");
 

@@ -58,7 +58,7 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
   Syntax& layer_syntax = *new Syntax ();
   AttributeList& layer_alist = *new AttributeList ();
   layer_syntax.add ("end", Syntax::Number, Syntax::Const);
-  layer_syntax.add ("horizon", Horizon::library (), Syntax::State);
+  layer_syntax.add ("horizon", Librarian<Horizon>::library (), Syntax::State);
   layer_syntax.order ("end", "horizon");
   syntax.add ("horizons", layer_syntax, Syntax::State, Syntax::Sequence);
   alist.add ("horizons", layer_alist);
@@ -83,8 +83,9 @@ Soil::Soil (const AttributeList& al)
 
   if (layer != end)
     {
-      const Horizon* hor = &Horizon::create ((*layer)->alist ("horizon"));
-      double last = 0.0;
+      const Horizon* hor 
+	= &Librarian<Horizon>::create ((*layer)->alist ("horizon"));
+      // double last = 0.0;
       for (unsigned int i = 0; i < size (); i++)
 	{
 	  double zpls = zplus (i);
@@ -92,10 +93,10 @@ Soil::Soil (const AttributeList& al)
 	    {
 	      layer++;
 	      assert (layer != end);
-	      hor = &Horizon::create ((*layer)->alist ("horizon"));
+	      hor = &Librarian<Horizon>::create ((*layer)->alist ("horizon"));
 	    }
 	  horizon_.push_back (hor);
-	  last = zpls;
+	  // last = zpls;
 	}
       horizon_.push_back (hor);
     }

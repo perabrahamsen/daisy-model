@@ -360,7 +360,7 @@ static struct ColumnStandardSyntax
     AttributeList& alist = *new AttributeList ();
 
     syntax.add ("crops", Crop::library (), Syntax::State, Syntax::Sequence);
-    alist.add ("crops", *new vector<const AttributeList*>);
+    alist.add ("crops", *new vector<AttributeList*>);
 
     add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
     add_submodule<Surface> ("Surface", syntax, alist);

@@ -29,5 +29,6 @@ HorizonStandardSyntax::HorizonStandardSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   Horizon::load_syntax (syntax, alist);
-  Horizon::add_type ("default", alist, syntax, &HorizonStandard::make);
+  Librarian<Horizon>::add_type ("default", alist, syntax,
+				&HorizonStandard::make);
 }

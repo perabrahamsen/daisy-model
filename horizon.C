@@ -12,10 +12,6 @@
 
 static const double rho_particle = 2.65;	// Weigth of soil. [g / cm³]
 
-static Library* Horizon_library = NULL;
-typedef map<string, Horizon::constructor, less<string> > Horizon_map_type;
-static Horizon_map_type* Horizon_constructors;
-
 struct Horizon::Implementation
 {
   // Content.
@@ -356,45 +352,10 @@ Horizon::v_edge () const
   return S_edge * impl.clay * rho_particle * (1 - hydraulic.porosity ()); 
 }
 
-const Library&
-Horizon::library ()
-{
-  assert (Horizon_library);
-  return *Horizon_library;
-}
-
-void
-Horizon::add_type (const string name, 
-		   const AttributeList& al, 
-		   const Syntax& syntax,
-		   constructor cons)
-{
-  assert (Horizon_library);
-  Horizon_library->add (name, al, syntax);
-  Horizon_constructors->insert(Horizon_map_type::value_type (name, cons));
-}
-
-void 
-Horizon::derive_type (string name, const AttributeList& al, string super)
-{
-  add_type (name, al, library ().syntax (super),
-	    (*Horizon_constructors)[super]);
-}
-
-Horizon&
-Horizon::create (const AttributeList& al)
-{
-  assert (al.check ("type"));
-  const string name = al.name ("type");
-  assert (library ().check (name));
-  assert (library ().syntax (name).check (al));
-  return (*Horizon_constructors)[name] (al);
-}
-
 void
 Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("hydraulic", Hydraulic::library (), Syntax::Const);
+  syntax.add ("hydraulic", Librarian<Hydraulic>::library (), Syntax::Const);
   syntax.add ("clay", Syntax::Number, Syntax::Const);
   syntax.add ("silt", Syntax::Number, Syntax::Const);
   syntax.add ("fine_sand", Syntax::Number, Syntax::Const);
@@ -420,7 +381,7 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 
 Horizon::Horizon (const AttributeList& al)
   : impl (*new Implementation (al)),
-    hydraulic (Hydraulic::create (al.alist ("hydraulic")))
+    hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic")))
 { 
   if (impl.K_water.size () == 0)
     {
@@ -431,27 +392,5 @@ Horizon::Horizon (const AttributeList& al)
 Horizon::~Horizon ()
 { }
 
-int Horizon_init::count;
-
-Horizon_init::Horizon_init ()
-{ 
-  if (count++ == 0)
-    {
-      Horizon_library = new Library ("horizon");
-      Horizon_constructors = new Horizon_map_type ();
-    }
-  assert (count > 0);
-}
-
-Horizon_init::~Horizon_init ()
-{ 
-  if (--count == 0)
-    {
-      delete Horizon_library;
-      Horizon_library = NULL;
-      delete Horizon_constructors;
-      Horizon_constructors = NULL;
-    }
-  assert (count >= 0);
-}
-
+// Create Horizon library.
+Librarian<Horizon>::Content* Librarian<Horizon>::content = NULL;

@@ -3,9 +3,6 @@
 // Brooks and Corey retention curve model with Burdine theory.
 
 #include "hydraulic.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 
 class HydraulicB_BaC : public Hydraulic
 {
@@ -110,5 +107,6 @@ HydraulicB_BaCSyntax::HydraulicB_BaCSyntax ()
   syntax.add ("h_b", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Hydraulic::add_type ("B_BaC", alist, syntax, &HydraulicB_BaC::make);
+  Librarian<Hydraulic>::add_type ("B_BaC", alist, syntax, 
+				  &HydraulicB_BaC::make);
 }

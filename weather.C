@@ -2,14 +2,7 @@
 
 #include "weather.h"
 #include "time.h"
-#include "library.h"
-#include "alist.h"
-#include "syntax.h"
 #include "mathlib.h"
-#include "common.h"
-#include <map>
-// Doesn't exist in Borland C++ 5.0.1
-// #include <algobase.h>
 
 Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 
@@ -17,17 +10,51 @@ struct Weather::Implementation
 {
   const double Latitude;
   const IM DryDeposit;
-  const IM SoluteDeposit;
+  const IM WetDeposit;
+  const double T1;
+  const double T2;
+  double Prain;
+  double Psnow;
   Implementation (const AttributeList& al)
     : Latitude (al.number ("Latitude")),
       DryDeposit (al.alist ("DryDeposit")),
-      SoluteDeposit (al.alist ("SoluteDeposit"))
+      WetDeposit (al.alist ("WetDeposit")),
+      T1 (al.number ("T1")),
+      T2 (al.number ("T2")),
+      Prain (0.0),
+      Psnow (0.0)
   { }
 };
+
+double
+Weather::Rain () const
+{
+  return impl.Prain;
+}
+
+double
+Weather::Snow () const
+{
+  return impl.Psnow;
+}
 
 void
 Weather::output (Log&, Filter&) const
 { }
+
+void 
+Weather::distribute (double precipitation)
+{
+  const double T = AirTemperature ();
+  if (T < impl.T1)
+    impl.Psnow = precipitation;
+  else if (impl.T2 < T)
+    impl.Psnow = 0.0;
+  else
+    impl.Psnow = precipitation * (impl.T2 - T) / (impl.T2 - impl.T1);
+
+  impl.Prain = precipitation - Snow ();
+}
 
 double
 Weather::DayLength (const Time& time) const
@@ -61,22 +88,37 @@ Weather::Deposit() const
 {
   const double Precipitation = Rain () + Snow (); // [mm]
   const IM dry (impl.DryDeposit, 0.1/24.0); // [kg/m²/d] -> [g/cm²/h]
-  const IM solute (impl.SoluteDeposit, 0.1); // [kg/m²/mm] -> [g/cm²/mm]
+  const IM wet (impl.WetDeposit, 0.1); // [kg/m²/mm] -> [g/cm²/mm]
 
-  const IM result = dry + solute * Precipitation;
+  const IM result = dry + wet * Precipitation;
 
   assert (approximate (result.NO3, 
 		       impl.DryDeposit.NO3 / 10.0 / 24.0
-		       + Precipitation * impl.SoluteDeposit.NO3 / 10.0));
+		       + Precipitation * impl.WetDeposit.NO3 / 10.0));
   assert (approximate (result.NH4, 
 		       impl.DryDeposit.NH4 / 10.0 / 24.0
-		       + Precipitation * impl.SoluteDeposit.NH4 / 10.0));
+		       + Precipitation * impl.WetDeposit.NH4 / 10.0));
   return result;
 }
+
+void 
+Weather::put_precipitation (double prec)
+{ 
+  distribute (prec / 24.0);
+}
+
+void 
+Weather::put_air_temperature (double)
+{ assert (false); }
+
+void 
+Weather::put_reference_evapotranspiration (double)
+{ assert (false); }
 
 void
 Weather::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  // Where in the world are we?
   syntax.add ("Latitude", Syntax::Number, Syntax::Const);
   alist.add ("Latitude", 56.0);
   // DryDeposit
@@ -90,7 +132,7 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
     syntax.add ("DryDeposit", s, Syntax::Const, Syntax::Singleton);
     alist.add ("DryDeposit", a);
   }
-  // SoluteDeposit
+  // WetDeposit
   {
     Syntax& s = *new Syntax ();
     AttributeList& a = *new AttributeList ();
@@ -98,9 +140,16 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
     // These values change often, and shouldn't have defaults.
     // a.add ("NO3", 0.6e-6); // kg/m²/mm
     // a.add ("NH4", 0.9e-6); // kg/m²/mm
-    syntax.add ("SoluteDeposit", s, Syntax::Const, Syntax::Singleton);
-    alist.add ("SoluteDeposit", a);
+    syntax.add ("WetDeposit", s, Syntax::Const, Syntax::Singleton);
+    alist.add ("WetDeposit", a);
   }
+  // Division between Rain and Snow.
+  syntax.add ("T1", Syntax::Number, Syntax::Const);
+  alist.add ("T1", -2.0);
+  syntax.add ("T2", Syntax::Number, Syntax::Const);
+  alist.add ("T2", 2.0);
+  syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
 }
 
 Weather::Weather (const AttributeList& al)

@@ -3,9 +3,6 @@
 // van Gebuchten retention curve model with Burdine theory.
 
 #include "hydraulic.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 #include "csmp.h"
 
 class HydraulicB_vG : public Hydraulic
@@ -130,5 +127,5 @@ HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
   syntax.add ("n", Syntax::Number, Syntax::Const);
   syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
-  Hydraulic::add_type ("B_vG", alist, syntax, &HydraulicB_vG::make);
+  Librarian<Hydraulic>::add_type ("B_vG", alist, syntax, &HydraulicB_vG::make);
 }

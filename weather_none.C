@@ -7,30 +7,40 @@
 
 class WeatherNone : public Weather
 {
-  const double air_temperature;
+  double air_temperature;
   const double global_radiation;
-  const double reference_evapotranspiration;
-  const double rain;
-  const double snow;
+  double reference_evapotranspiration;
+  double rain;
+  double snow;
 
   // Simulation.
 public:
   void tick (const Time&)
-  { }
-  void output (Log&, Filter&) const
-  { }
+    { }
   double AirTemperature () const
-  { return air_temperature; }
+    { return air_temperature; }
   double GlobalRadiation () const
-  { return global_radiation; }
+    { return global_radiation; }
   double DailyRadiation () const
-  { return global_radiation * 24.0; }
+    { return global_radiation * 24.0; }
   double ReferenceEvapotranspiration () const
-  { return reference_evapotranspiration; }
+    { return reference_evapotranspiration; }
   double Rain () const
-  { return rain; }
+    { return rain; }
   double Snow () const
-  { return snow; }
+    { return snow; }
+
+  // Communication with external model.
+  void put_precipitation (double prec)
+    { 
+      Weather::distribute (prec / 24.0); 
+      rain = Weather::Rain ();
+      snow = Weather::Snow ();
+    }
+  void put_air_temperature (double T)
+    { air_temperature = T; }
+  void put_reference_evapotranspiration (double ref)
+    { reference_evapotranspiration = ref; }
 
   // Create and Destroy.
 private:
