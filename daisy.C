@@ -85,16 +85,6 @@ Daisy::run ()
     }
 }
 
-#if 0
-class Condition;
-bool match (const Condition*) const;
-bool
-Daisy::match (const Condition* c) const
-{
-  return c->match (*this);
-}
-#endif
-
 void
 Daisy::output (Log& log, const Filter* filter) const
 {
@@ -102,21 +92,17 @@ Daisy::output (Log& log, const Filter* filter) const
   log.output ("time", filter, time);
   weather.output ("weather", log, filter);
   if (filter->check ("field"))
-    output_field (log, filter->lookup ("field"));
-  log.close ();
-}
-
-void
-Daisy::output_field (Log&, const Filter* filter) const
-
-{
-  log.open ("field");
-  for (ColumnList::iterator column = columns.begin();
-       column != columns.end();
-       column++)
     {
-      if (filter->check ((*column)->name))
-	(*column)->output (log, filter->lookup ((*column)->name));
+      const Filter* f = filter->lookup ("field");
+      log.open ("field");
+      for (ColumnList::iterator column = columns.begin();
+	   column != columns.end();
+	   column++)
+	{
+	  if (f->check ((*column)->name))
+	    (*column)->output (log, f->lookup ((*column)->name));
+	}
+      log.close ();
     }
   log.close ();
 }

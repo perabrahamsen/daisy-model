@@ -31,7 +31,6 @@ public:
 public:
   void run();
   void output (Log&, const Filter*) const;
-  void output_field (Log&, const Filter*) const;
 
   // Create and Destroy.
 public:
