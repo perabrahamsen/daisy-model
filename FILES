@@ -1,4 +1,5 @@
 2.26: Added: select_value.C
+2.26: Removed: select_flux.C
 2.21: Added: xref.C
 2.18: Added: stream_dual.C
 2.18: Removed: message.C

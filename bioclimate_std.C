@@ -536,12 +536,9 @@ BioclimateStandard::ChemicalDistribution (Surface& surface,
   Chemicals::copy_fraction (snow_chemicals_out, canopy_chemicals_in, cover);
   canopy_chemicals_storage.canopy_update (canopy_chemicals_in, 
 					  canopy_water_storage,
-					  canopy_water_out);
-  canopy_chemicals_storage.canopy_dissipate (canopy_chemicals_dissipate);
-  canopy_chemicals_storage.canopy_out (canopy_chemicals_out,
-				       canopy_water_storage,
-				       canopy_water_out);
-  canopy_chemicals_storage.cleanup (canopy_chemicals_out);
+					  canopy_water_out,
+					  canopy_chemicals_dissipate,
+					  canopy_chemicals_out);
   
   // Surface
   surface_chemicals_in.clear ();

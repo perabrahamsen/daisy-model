@@ -49,11 +49,9 @@ public:
 public:
   void canopy_update (const Chemicals& canopy_chemicals_in, 
 		      double canopy_water_storage,
-		      double canopy_water_out);
-  void canopy_dissipate (Chemicals& canopy_chemicals_dissipate) const;
-  void canopy_out (Chemicals& canopy_chemicals_out,
-		   double canopy_water_storage,
-		   double canopy_water_out) const;
+		      double canopy_water_out,
+		      Chemicals& canopy_chemicals_dissipate,
+		      Chemicals& canopy_chemicals_out);
 
   // Simulation
 public:
@@ -67,7 +65,6 @@ public:
   // Create and Destroy.
 public:
   void clear ();
-  void cleanup (Chemicals& out);
   void operator += (const Chemicals&);
   void operator = (const Chemicals&);
   Chemicals (const Chemicals&);

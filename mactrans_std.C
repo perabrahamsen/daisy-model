@@ -78,7 +78,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	{
 	  // More is going out below of the pore than comming in above.  
 	  // Water enter here from the matrix with the local concentration.
-	  delta_matter = min (-C[i] * delta_water, M[i] + S_m[i] * dt - 1e-8);
+	  delta_matter = min (-C[i] * delta_water, M[i] + S_m[i] * dt - 1e-16);
 	  if (delta_matter < 0.0)
 	    delta_matter = 0.0;
 	}

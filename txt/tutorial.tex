@@ -1,7 +1,7 @@
 %%% tutorial.tex -- A tutorial for the Daisy crop/soil system.
 
 \documentclass[a4paper,11pt]{article}
-
+\usepackage{a4}
 \usepackage{hyperref}
 
 \bibliographystyle{apalike}
@@ -29,7 +29,7 @@
   automatically generated from the \texttt{daisy} executable itself.
   
   If you have questions or suggestions to either the manual or the
-  \daisy{} system itself, feel free to contact the authors at\linebreak{}
+  \daisy{} system itself, feel free to contact the authors at
   \href{mailto:daisy@dina.kvl.dk}{\texttt{$<$daisy@dina.kvl.dk$>$}}.
 \end{abstract}
 
@@ -900,11 +900,11 @@ associated with growing spring barley once, even though we grow spring
 barley twice in the simulation.  We can take this one step further, by
 naming and reusing specific rotations.
 \begin{verbatim}
-  (defaction rotaion_bbgr activity
+  (defaction rotation_bbgr activity
     sbarley sbarley grass rye)
 
   (manager activity
-    rotaion_bbgr rotaion_bbgr rotaion_bbgr rotaion_bbgr rotaion_bbgr)
+    rotation_bbgr rotation_bbgr rotation_bbgr rotation_bbgr rotation_bbgr)
 \end{verbatim}
 Here, we define and name a whole rotation containing four seasons, and
 repeat that rotation five times.  All in all, we have specified
@@ -1457,9 +1457,9 @@ surface by rain or irrigation.
 
 The parameter \texttt{canopy\_dissipation\_rate} indicates how large a
 fraction of the pesticide dissipate from the canopy each hour, while
-\texttt{canopy\_washoff\_coefficient} can (roughly) be thought of as
-the amount of water that must fall off the canopy, in order to wash
-half the pesticide off.
+\linebreak{}\texttt{canopy\_washoff\_coefficient} can (roughly) be
+thought of as the amount of water that must fall off the canopy, in
+order to wash half the pesticide off.
 
 \subsubsection{Soil Surface and Root Uptake}
 
@@ -1487,9 +1487,10 @@ to be decomposed each hour.  This rate is affected by a number of
 factors, listed here:
 \begin{description}
 \item[\texttt{decompose\_heat\_factor},
-  \texttt{decompose\_water\_factor}] Biological decomposition tend to
-  accelerate with increasing heat and moisture.  Unless you specify
-  otherwise, the factors used for mineralization will be reused here.
+  \texttt{decompose\_water\_factor}] Biological
+  decomposition\linebreak{} tend to accelerate with increasing heat
+  and moisture.  Unless you specify otherwise, the factors used for
+  mineralization will be reused here.
 \item[\texttt{decompose\_CO2\_factor}] CO$_2$ production is an
   indicator of an active soil biomass.  By specifying this parameter,
   you can let the general biological activity influence the

@@ -51,11 +51,9 @@ struct Chemicals::Implementation
   // Canopy functions.
   void canopy_update (const Implementation& canopy_chemicals_in, 
 		      double canopy_water_storage,
-		      double canopy_water_out);
-  void canopy_dissipate (Implementation& canopy_chemicals_dissipate) const;
-  void canopy_out (Implementation& canopy_chemicals_out,
-		   double canopy_water_storage,
-		   double canopy_water_out) const;
+		      double canopy_water_out,
+		      Implementation& canopy_chemicals_dissipate,
+		      Implementation& canopy_chemicals_out);
 
   // Simulation
   void output (Log&) const;
@@ -73,7 +71,6 @@ struct Chemicals::Implementation
 
   // Create and Destroy.
   void clear ();
-  void cleanup (Implementation& out);
   void operator += (const Implementation&);
   Implementation ()
     : chemicals ()
@@ -153,7 +150,9 @@ Chemicals::Implementation::copy_fraction (const Implementation& from,
 void
 Chemicals::Implementation::canopy_update (const Implementation& in, 
 					  double water_storage,
-					  double water_out)
+					  double water_out,
+					  Implementation& dissipate,
+					  Implementation& out)
 { 
   // new = (old + in * dt) / (1 + dt (K + water_out / (Kd + new)))
 
@@ -175,11 +174,8 @@ Chemicals::Implementation::canopy_update (const Implementation& in,
       assert (divisor > 0.0);
       (*i).second /= divisor;
     }
-}
-
-void
-Chemicals::Implementation::canopy_dissipate (Implementation& dissipate) const
-{
+  
+  // Dissipitaion.
   dissipate.clear ();
   for (chemical_map::const_iterator i = chemicals.begin ();
        i != chemicals.end ();
@@ -190,13 +186,8 @@ Chemicals::Implementation::canopy_dissipate (Implementation& dissipate) const
       const double K = chemical->canopy_dissipation_rate ();
       dissipate.add (chemical, K * Sm);
     }
-}
 
-void
-Chemicals::Implementation::canopy_out (Implementation& out,
-				       double water_storage,
-				       double water_out) const
-{
+  // Output.
   out.clear ();
   for (chemical_map::const_iterator i = chemicals.begin ();
        i != chemicals.end ();
@@ -206,6 +197,20 @@ Chemicals::Implementation::canopy_out (Implementation& out,
       const double Sm = (*i).second;
       const double Kd = chemical->canopy_washoff_coefficient ();
       out.add (chemical, water_out * Sm / (Kd + water_storage));
+    }
+
+  for (chemical_map::iterator i = chemicals.begin ();
+       i != chemicals.end ();
+       i++)
+    {
+      const Chemical* chemical = (*i).first;
+      const double amount = (*i).second;
+      
+      if (amount > 0.0 && amount < 1.e-18) // Less than one molecule...
+	{
+	  out.add (chemical, amount);
+	  (*i).second = 0.0;
+	}
     }
 }
 
@@ -262,24 +267,6 @@ Chemicals::Implementation::clear ()
 }
 
 void
-Chemicals::Implementation::cleanup (Implementation& out)
-{ 
-  for (chemical_map::iterator i = chemicals.begin ();
-       i != chemicals.end ();
-       i++)
-    {
-      const Chemical* chemical = (*i).first;
-      const double amount = (*i).second;
-      
-      if (amount > 0.0 && amount < 1.e-18) // Less than one molecule...
-	{
-	  out.add (chemical, amount);
-	  (*i).second = 0.0;
-	}
-    }
-}
-
-void
 Chemicals::Implementation::operator += (const Implementation& other)
 { 
   for (chemical_map::const_iterator i = other.chemicals.begin ();
@@ -310,20 +297,13 @@ Chemicals::copy_fraction (const Chemicals& from, Chemicals& to,
 void
 Chemicals::canopy_update (const Chemicals& canopy_chemicals_in, 
 			  double canopy_water_storage,
-			  double canopy_water_out)
+			  double canopy_water_out,
+			  Chemicals& canopy_chemicals_dissipate,
+			  Chemicals& canopy_chemicals_out)
 { impl.canopy_update (canopy_chemicals_in.impl, 
-		      canopy_water_storage, canopy_water_out); }
-
-void
-Chemicals::canopy_dissipate (Chemicals& canopy_chemicals_dissipate) const
-{ impl.canopy_dissipate (canopy_chemicals_dissipate.impl); }
-
-void
-Chemicals::canopy_out (Chemicals& canopy_chemicals_out,
-		       double canopy_water_storage,
-		       double canopy_water_out) const
-{ impl.canopy_out (canopy_chemicals_out.impl, 
-		   canopy_water_storage, canopy_water_out); }
+		      canopy_water_storage, canopy_water_out,
+		      canopy_chemicals_dissipate.impl,
+		      canopy_chemicals_out.impl); }
 
 void
 Chemicals::output (Log& log) const
@@ -348,10 +328,6 @@ Chemicals::find_missing (const string_set& all, string_set& missing) const
 void 
 Chemicals::clear ()
 { impl.clear (); }
-
-void
-Chemicals::cleanup (Chemicals& out)
-{ impl.cleanup (out.impl); }
 
 void 
 Chemicals::operator += (const Chemicals& other)

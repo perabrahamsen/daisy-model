@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.27
+
+** Allow macropores to go below the lowest node.
+
 * 2.26
 
 ** Specifying Soil zplus is now optional.
@@ -24,6 +28,11 @@ default discretitation.
 These log the content of the individual organic matter pools.
 "Organic Matter" logs SOM, SMB and all the AOM's.  "AOM Pools" logs
 all the AOM's, or a specific AOM if "$am" is set.
+
+Example: 
+
+  (output "Organic Matter"
+          ("AOM Pools" (set "$am" "Grass/root")))
 
 ** New spec attribute in select entries of the log table model.
 
@@ -118,7 +127,7 @@ correct from start.
 ** Change the way to specify organic matter for logging.
 
 Update the "Total Soil Content", "N Balance", AOM and Bioincorporation
-log parameterizations.  For AOM, use like (set "$am" "grass/roots") to
+log parameterizations.  For AOM, use like (set "$am" "grass/root") to
 log a specific AOM.  Compared to before, the "?" is missing.
 
 * 2.18

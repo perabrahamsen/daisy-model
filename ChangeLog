@@ -1,3 +1,18 @@
+2002-04-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mactrans_std.C (tick): Allow transport of smaller quantities
+	(pesticides).
+
+2002-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemicals.C, chemicals.h (canopy_dissipate, canopy_out,
+	cleanup): Merged into `canopy_update'.
+	* bioclimate_std.C (ChemicalDistribution): Update caller.
+
+2002-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* macro_std.C (tick): Allow macropores to go below the lowest node.
+
 2002-04-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.26 released.

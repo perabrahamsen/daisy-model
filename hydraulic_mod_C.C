@@ -60,7 +60,7 @@ Hydraulic_mod_C::Theta (const double h) const
 double 
 Hydraulic_mod_C::K (const double h) const
 {
-  return K_sat * pow (Sr (h), (2 + 3 / b) * b);
+  return K_sat * pow (Sr (h), (2 + 3.0 / b) * b);
 }
 
 double 

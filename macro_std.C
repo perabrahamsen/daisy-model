@@ -86,11 +86,17 @@ MacroStandard::tick (const Soil& soil,
   assert (S_p.size () == soil.size ());
   assert (q_p.size () == soil.size () + 1U);
 
+  // Check for macropores outside our soil.
+  if (height_start < soil.z (last))
+    return;
+  const double soil_end = soil.zplus (soil.size () - 1);
+
   // Start and end of macro intervals.
   const unsigned int from = max (((int) soil.interval_plus (height_start)) - 1,
 				 /* not unsigned, or -1 fails */
 				 (int) first);
-  const unsigned int to = min (soil.interval_plus (height_end), last);
+  const unsigned int to 
+    = min (soil.interval_plus (max (height_end, soil_end)), last);
 
   // Check if macropores reach surface, and there is ponding there.
   double q_top = 0.0;

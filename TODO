@@ -1,9 +1,5 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Ændr parameter til canopy chemicals washoff.
-
-Hvad med tema projekt?
-
 * Høst fejl
 
 Ved høst deles planten i tre:
@@ -28,6 +24,20 @@ eftrladte planterester ved både slet og høst.
 
 Dette skal omfatte rodafstødning under simuleringen, samt de efterladt
 rødder ved høst.
+
+* water stress days
+
+* Ændr parameter til canopy chemicals washoff.
+
+Hvad med tema projekt?
+
+* SoilWater macro distribution
+
+Lav checks.  Gør evt. start & end optional.
+
+* assert
+
+Lad assert errors komme i log filen.
 
 * User Manual
 
@@ -66,6 +76,10 @@ Udbyg.
 ** Deficit
 
 Start ved specifik dato.
+
+* Make it possible to specify texture using differnet systems
+
+Different sizes for sand, silt, and clay, plus allow other types.
 
 * Parser & Printer.
 
