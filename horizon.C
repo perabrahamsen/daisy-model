@@ -454,7 +454,7 @@ check_alist (const AttributeList& al, Treelog& err)
       err.entry ("must specify at least one SOM_C_per_N");
       ok = false;
     }
-  assert (al.check ("hydraulic"));
+  daisy_assert (al.check ("hydraulic"));
   const AttributeList& hydraulic =al.alist ("hydraulic");
   if (hydraulic.name ("type") == "hypres"
       && !al.check ("dry_bulk_density"))
