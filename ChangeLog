@@ -1,4 +1,30 @@
+2003-04-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.68 released.
+
+2003-04-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (SOM_limit_where, SOM_limit_lower)
+	(SOM_limit_upper): New parameters to the `init' submodel.
+	(partition, initialize) Use them.
+
+	* organic_matter.C (partition): Try to partition as topsoil if
+	subsoil partitioning does not work.  This may happen if input is
+	too high, so SOM3 becomes negative.
+	
+	* options.C (Options): Fix quote.
+	* treelog_dual.C (init_one): Ditto.
+
+	* hydraulic_hypres.C (initialize): Doc fix.
+
+	* hydraulic.C (check_K_sat): Doc fix.
+
 2003-04-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (AM_Syntax): Changed "weight" dimension from "T w.w./ha"
+	to "Mg w.w./ha".
+	* units.C (standard_conversions): Added "T w.w./ha" as an alias
+	for "Mg w.w./ha".
 
 	* Version 2.67 released.
 

@@ -191,28 +191,35 @@ pedotransfer function");
     + 0.0488 * rho_b * humus;
   l = 10.0 * (exp (l_star) - 1.0) / (1.0 + exp (l_star));
   
-  double K_sat_star 
-    = 7.755 + 0.0352 * silt - 0.967 * rho_b * rho_b - 0.000484 * clay * clay 
-    - 0.000322 * silt * silt + 0.001 / silt - 0.0748 / humus
-    - 0.643 * log (silt) - 0.01398 * rho_b * clay - 0.1673 * rho_b * humus
-    ;
-  if (top_soil)
+  if (K_sat < 0.0 && K_init == NULL)
     {
-      K_sat_star += 0.93;
-      K_sat_star += 0.02986 * clay;
-      K_sat_star -= 0.03305 * silt;
+      double K_sat_star 
+	= 7.755 + 0.0352 * silt - 0.967 * rho_b * rho_b 
+	- 0.000484 * clay * clay 
+	- 0.000322 * silt * silt + 0.001 / silt - 0.0748 / humus
+	- 0.643 * log (silt) - 0.01398 * rho_b * clay - 0.1673 * rho_b * humus
+	;
+      if (top_soil)
+	{
+	  K_sat_star += 0.93;
+	  K_sat_star += 0.02986 * clay;
+	  K_sat_star -= 0.03305 * silt;
+	}
+      K_sat = exp (K_sat_star) / 24.0;
     }
-  K_sat = exp (K_sat_star) / 24.0;
-  daisy_assert (K_sat > 0.0);
   
   a = -alpha;
   m = 1.0 - 1.0 / n;
+
+  Hydraulic::initialize (clay, silt, sand, humus, rho_b, top_soil, msg);
+  daisy_assert (K_sat > 0.0);
+
 
   // Debug messages.
   TmpStream tmp;
   tmp () << "M_vG\n";
   tmp () << "(l " << l << ")\n";
-  tmp () << "(m " << m << ")\n";
+  tmp () << ";; (m " << m << ")\n";
   tmp () << "(n " << n << ")\n";
   tmp () << "(alpha " << alpha << ")\n";
   tmp () << "(K_sat " << K_sat << ")\n";
@@ -244,14 +251,9 @@ HydraulicHypres::make (const AttributeList& al)
 
 static struct HydraulicHypresSyntax
 {
-  static bool check_alist (const AttributeList& al, Treelog& err)
+  static bool check_alist (const AttributeList&, Treelog&)
   {
     bool ok = true;
-    if (al.number ("Theta_sat") != 0.9)
-      {
-	err.entry ("Theta_sat should be unspecified");
-	ok = false;
-      }
     return ok;
   }
   HydraulicHypresSyntax ()
@@ -263,6 +265,7 @@ static struct HydraulicHypresSyntax
 	       "van Genuchten retention curve model with Mualem theory.\n\
 Parameters specified by the HYPRES transfer function.\n\
 See <http://mluri.sari.ac.uk/hypres.html>.");
+    Hydraulic::load_K_sat_optional (syntax, alist);
     Librarian<Hydraulic>::add_type ("hypres", alist, syntax, 
 				    &HydraulicHypres::make);
   }

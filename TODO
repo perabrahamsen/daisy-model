@@ -1,13 +1,5 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Ny hydraulisk parameter "K_at_h".
-
-Den kan erstatte K_sat.  Alle de hydrauliske modeller har formen 
-
-  K (h) = K_sat * f (h)
-
-så hvis vi kender K (h) for et vilkårligt h kan vi regne K_sat ud.  
-
 * OrganicMatter
 
 ** Max og min somfractions i initialisering.

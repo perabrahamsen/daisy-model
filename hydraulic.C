@@ -135,26 +135,45 @@ Hydraulic::load_Theta_res (Syntax& syntax, AttributeList& alist)
 }
 
 static bool
-check_K_sat (const AttributeList& al, Treelog& err)
+check_K_sat_optional (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
-  if (al.check ("K_sat") == al.check ("K_at_h"))
+  if (al.check ("K_sat") && al.check ("K_at_h"))
     {
-      err.error ("You must specify either 'K_sat' or 'K_at_h' but not both.");
+      err.error ("You cannot specify both 'K_sat' and 'K_at_h'");
       ok = false;
     }
   return ok;
 }  
+void
+Hydraulic::load_K_sat_optional (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add_check (check_K_sat_optional);
+  syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::OptionalConst,
+	      "Water conductivity of saturated soil.");
+  syntax.add_submodule ("K_at_h", alist, Syntax::OptionalConst, "\
+Water conductivity at specified pressure.", K_at_h::load_syntax);
+}
+
+static bool
+check_K_sat (const AttributeList& al, Treelog& err)
+{
+  bool ok = true;
+
+  if (!al.check ("K_sat") && !al.check ("K_at_h"))
+    {
+      err.error ("You must specify either 'K_sat' or 'K_at_h'");
+      ok = false;
+    }
+  return ok;
+}
 
 void
 Hydraulic::load_K_sat (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_K_sat);
-  syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::OptionalConst,
-	      "Water conductivity of saturated soil.");
-  syntax.add_submodule ("K_at_h", alist, Syntax::OptionalConst, "\
-Water conductivity as specified pressure.", K_at_h::load_syntax);
+  load_K_sat_optional (syntax, alist);
 }
 
 void
@@ -164,6 +183,7 @@ Hydraulic::initialize (double /* clay */, double /* silt */, double /* sand */,
 {
   if (K_init)
     {
+      daisy_assert (K_sat < 0.0);
       K_sat = 1.0;
       const double K_one = K (K_init->h);
       daisy_assert (K_one > 0.0);
@@ -178,7 +198,7 @@ Hydraulic::Hydraulic (const AttributeList& al)
 	    ? new K_at_h (al.alist ("K_at_h"))
 	    : NULL),
     Theta_sat (al.check ("Theta_sat") ? al.number ("Theta_sat") : -42.42e42),
-    Theta_res (al.check ("Theta_res") ? al.number ("Theta_res") : -42.42e42),
+    Theta_res (al.check ("Theta_res") ? al.number ("Theta_res") : 0.0),
     K_sat (al.check ("K_sat") ? al.number ("K_sat") : -42.42e42)
 { }
 

@@ -179,7 +179,7 @@ Options::Options (int& argc, char**& argv,
 		    }
 		  else
 		    {
-		      out.error (program_name + ": `" + name 
+		      out.error (program_name + ": '" + name 
 				 + "' unknown document type");
 		      argc = -2;
 		    }

@@ -37,7 +37,8 @@ public:
   //
 private:
   struct K_at_h;
-  const K_at_h* K_init;
+protected:
+  const K_at_h *const K_init;
 
   // Standard parameters.
 public:
@@ -68,6 +69,7 @@ protected:
 public:
   static void load_Theta_res (Syntax&, AttributeList&);
   static void load_Theta_sat (Syntax&, AttributeList&);
+  static void load_K_sat_optional (Syntax&, AttributeList&);
   static void load_K_sat (Syntax&, AttributeList&);
   virtual void initialize (double clay, double silt, double sand,
 			   double humus, double rho_b, bool top_soil,

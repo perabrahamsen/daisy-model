@@ -106,7 +106,7 @@ TreelogDual::Implementation::init_one ()
       daisy_assert (one);
       if (!one->good ())
 	{
-	  two << "Problems opening `" << file << "' in '" << directory << "\n";
+	  two << "Problems opening '" << file << "' in '" << directory << "\n";
 	  throw 3;
 	}
     }

@@ -311,6 +311,7 @@ Units::standard_conversions ()
   add ("d", "h", 24.0);
   add ("mm/d", "mm/h", 1.0/24.0);
   add ("m/s", "cm/h", 100.0 * 60.0 * 60.0);
+  add ("T w.w./ha", "Mg w.w./ha", 1.0);
 
   // Weather.
   add ("dgWest", "dgEast", -1.0);

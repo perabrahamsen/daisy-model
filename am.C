@@ -1064,7 +1064,7 @@ Organic fertilizer, typically slurry or manure from animals.");
 		    "Time of application.");
 	alist.add ("creation", Time (1, 1, 1, 1));
 	alist.add ("syntax", "organic");
-	syntax.add ("weight", "T w.w./ha", Check::non_negative (),
+	syntax.add ("weight", "Mg w.w./ha", Check::non_negative (),
 		    Syntax::Const,
 		    "Amount of fertilizer applied.");
 	alist.add ("weight", 0.0);

@@ -12,6 +12,37 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.68
+
+** SOM1 now limited to be between 0.3 and 0.7.
+
+If you let Daisy calculate the initial organic matter partitioning,
+that is, do not specify the SOM_fractions horizon parameter, Daisy
+will no longer come up with SOM1 fractions below 0.3 or above 0.7,
+which is what our simulations have shown SOM1 stay within after change
+in farming practice for typical Danish conditions.
+
+These limits are controlled by three new OrganicMatter init
+parameters, the default values are:
+
+  (OrganicMatter (init (SOM_limit_lower 0.3 0.7 0)
+		       (SOM_limit_upper 0.7 0.3 0)
+		       (SOM_limit_where 0)))
+
+Check the reference manual for a description of each.
+
+** You can now specify K_sat or K_at_h for th hypres hydraulic model.
+
+If you do so, that value will be used instead of the value predicted
+by the HYPRES model.  All other hydraulic parameters will still be
+calculated by HYPRES.
+
+** Allow automatic partitioning for subsoil with low humus content.
+
+Previously, it would result in a negative SOM3 value.  Now we
+repartition it as a top_soil, which mean SOM3 will be zero and SOM1
+will not be in equilibrium.
+
 * 2.67
 
 ** New K_at_h hydraulic parameter in most models.
