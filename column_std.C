@@ -58,6 +58,10 @@ public:
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
 
+  // Conditions.
+  double soil_temperature (double height); // [ cm -> dg C]
+  double soil_water_potential (double height); // [cm -> cm]
+
   // Simulation.
 public:
   void tick (const Time&, const Weather&, Groundwater&);
@@ -184,6 +188,22 @@ ColumnStandard::swap (const Time& time, double from, double middle, double to)
   soil_NO3.swap (soil, soil_water, from, middle, to);
   soil_NH4.swap (soil, soil_water, from, middle, to);
   organic_matter.swap (soil, from, middle, to);
+}
+
+double 
+ColumnStandard::soil_temperature (double height)
+{
+  assert (height < 0);
+  assert (height > soil.z (soil.size () - 1));
+  return soil_heat.T (soil.interval (height));
+  }
+
+double 
+ColumnStandard::soil_water_potential (double height)
+{
+  assert (height < 0);
+  assert (height > soil.z (soil.size () - 1));
+  return soil_water.h (soil.interval (height));
 }
 
 bool

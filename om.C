@@ -411,10 +411,6 @@ OM::tick (const double* abiotic_factor,
     }
 }
 
-void 
-OM::initialize (const Geometry&)
-{ }
-
 OM& 
 OM::create (const AttributeList& al, const Geometry& geometry)
 { return *new OM (al, geometry); }

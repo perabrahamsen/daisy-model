@@ -42,6 +42,11 @@ public:
   virtual void mix (const Time&,
 		    double from, double to, double penetration = 1.0) = 0;
   virtual void swap (const Time&, double from, double middle, double to) = 0;
+
+  // Conditions.
+public:
+  virtual double soil_temperature (double height) = 0; // [ cm -> dg C]
+  virtual double soil_water_potential (double height) = 0; // [cm -> cm]
   
   // Simulation.
   virtual void tick (const Time&, const Weather&, Groundwater&) = 0;

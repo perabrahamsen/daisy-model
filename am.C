@@ -20,37 +20,16 @@ struct AM::Implementation
 {
   // Content.
   const Time creation;		// When it was created.
+  const string name;		// What is was.
   vector<OM*> om;		// Organic matter pool.
 
   // Use this if a living crop is adding to this AM.
-  struct Lock
-  { 
-    string crop;
-    string part;
-    Lock (string c, string p)
-      : crop (c),
-	part (p)
-    { }
-  };
+  struct Lock;
   const Lock* lock;
-  void unlock ()		// Crop died.
-  {
-    assert (lock != NULL);
-    delete lock;
-    lock = NULL;
-  };		
-  bool locked () const		// Test if this AM can be safely removed.
-  { return lock != NULL; }
-  const string crop_name () const	// Name of locked crop.
-  { 
-    assert (lock);
-    return lock->crop;
-  }
-  const string crop_part_name () const // Name of locked crop part.
-  {
-    assert (lock);
-    return lock->part;
-  }
+  void unlock ();		// Crop died.
+  bool locked () const;		// Test if this AM can be safely removed.
+  const string crop_name () const; // Name of locked crop.
+  const string crop_part_name () const; // Name of locked crop part.
 
   // Simulation.
   void output (Log&, Filter&) const;
@@ -67,11 +46,15 @@ struct AM::Implementation
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const vector<double>& density);
+  void add (const Geometry&,	// Add initial dead roots.
+	    double C, /* Fixed C/N */
+	    const vector<double>& density);
 
 
   // Create and Destroy.
-  Implementation (const Time& c, vector<OM*>& o)
+  Implementation (const Time& c, const string n, vector<OM*>& o)
     : creation (c),
+      name (n),
       om (o),
       lock (NULL)
   { }
@@ -79,75 +62,61 @@ struct AM::Implementation
   { sequence_delete (om.begin (), om.end ()); }
 };
 
-static vector<OM*>&
-create_om (const vector<const AttributeList*>& om_alist,
-	   const Geometry& geometry, double C, double N,
-	   const vector<double>& content)
+struct AM::Implementation::Lock
+{ 
+  // Content.
+  string crop;
+  string part;
+
+  // Simulation.
+  void output (Log&, Filter&) const;
+    
+  // Create and Destroy.
+  Lock (string c, string p);
+  Lock (const AttributeList& al);
+};
+
+void 
+AM::Implementation::Lock::output (Log& log, Filter& filter) const
 {
-  // Get initialization parameters.
-  const int size = om_alist.size();
-
-  // Fill out the blanks.
-  int missing_fraction = -1;
-  int missing_C_per_N = -1;
-  vector<double> om_C (size, 0.0);
-  vector<double> om_N (size, 0.0);
+  log.output ("crop", filter, crop);
+  log.output ("part", filter, part);
+}  
   
-  for (int i = 0; i < size; i++)
-    {
-      const double fraction = om_alist[i]->number ("initial_fraction");
-      if (fraction != OM::Unspecified)
-	{
-	  om_C[i] = C * fraction;
-      
-	  if (om_alist[i]->check ("C_per_N"))
-	    {
-	      const vector<double> v = om_alist[i]->number_sequence("C_per_N");
-	      assert (v.size () == 1); // BUG: Should check before!
-	      const double C_per_N = v[0];
-	      om_N[i] = om_C[i] / C_per_N;
-	      assert (om_N[i] >= 0.0);
-	    }
-	  else
-	    missing_C_per_N = i;
-	}
-      else
-	{
-	  missing_fraction = i;
-	  if (!om_alist[i]->check ("C_per_N"))
-	    missing_C_per_N = i;
-	}
-    }
-  om_C[missing_fraction] = C - accumulate (om_C.begin (), om_C.end (), 0.0);
+AM::Implementation::Lock::Lock (string c, string p)
+  : crop (c),
+    part (p)
+{ }
   
-  if (missing_fraction != missing_C_per_N)
-    {
-      const vector<double> v
-	= om_alist[missing_fraction]->number_sequence("C_per_N");
-      assert (v.size () == 1); // BUG: Should check before!
-      const double C_per_N = v[0];
-      assert (C_per_N >= 0.0);
-      om_N[missing_fraction] = om_C[missing_fraction] / C_per_N;
-      assert (om_N[missing_fraction] >= 0.0);
-    }
-  om_N[missing_C_per_N] = N - accumulate (om_N.begin (), om_N.end (), 0.0);
+AM::Implementation::Lock::Lock (const AttributeList& al)
+  : crop (al.name ("crop")),
+    part (al.name ("part"))
+{ }
 
-  // Create the OM's
-  vector<OM*>& om = *new vector<OM*> ();
-  for (int i = 0; i < size; i++)
-    if (i == missing_C_per_N)
-      om.push_back (new OM (*om_alist[i], geometry, om_C[i], om_N[i]));
-    else
-      {
-	om.push_back (new OM (*om_alist[i], geometry));
-	om[i]->top_C = om_C[i];
-      }
+void 
+AM::Implementation::unlock ()
+{
+  assert (lock != NULL);
+  delete lock;
+  lock = NULL;
+};		
 
-  if (content.size ())
-    for (int i = 0; i < size; i++)
-      om[i]->distribute (geometry, content);
+bool 
+AM::Implementation::locked () const
+{ return lock != NULL; }
 
-  return om;
+const string 
+AM::Implementation::crop_name () const
+{ 
+  assert (lock);
+  return lock->crop;
+}
+
+const string 
+AM::Implementation::crop_part_name () const
+{
+  assert (lock);
+  return lock->part;
 }
 
 void
@@ -235,10 +204,40 @@ AM::Implementation::add (const Geometry& geometry,
 	om[i]->add (geometry, om_C[i], om_N[i], density);
       else
 	{
-	  approximate (om_C[i], C_per_N * om_N[i]);
+	  assert (approximate (om_C[i], C_per_N * om_N[i]));
 	  om[i]->add (geometry, om_C[i], density);
 	}
     }
+}
+
+void
+AM::Implementation::add (const Geometry& geometry, 
+			 double C, /* fixed C/N */
+			 const vector<double>& density)
+{
+  // Find the missing fraction.
+  vector<double> om_C (om.size (), 0.0);
+  int missing_fraction = -1;
+  for (unsigned int i = 0; i < om.size (); i++)
+    {
+      const double fraction = om[i]->initial_fraction;
+
+      if (fraction != OM::Unspecified)
+	om_C[i] = C * fraction;
+      else
+	{
+	  assert (missing_fraction < 0);
+	  missing_fraction = i;
+	}
+    }
+  assert (missing_fraction > -1);
+
+  // Calculate C in missing fraction.
+  om_C[missing_fraction] = C - accumulate (om_C.begin (), om_C.end (), 0.0);
+
+  // Distribute to OMs.
+  for (unsigned int i = 0; i < om.size (); i++)
+    om[i]->add (geometry, om_C[i], density);
 }
 
 void 
@@ -252,6 +251,9 @@ void
 AM::Implementation::output (Log& log, Filter& filter) const
 { 
   log.output ("creation", filter, creation);
+  log.output ("name", filter, name);
+  if (lock)
+    output_submodule (*lock, "lock", log, filter);
   output_vector (om, "om", log, filter);
 }
 
@@ -429,13 +431,29 @@ AM::create (const Geometry& geometry, const Time& time,
   return *am;
 }
 
-static vector<OM*>&
-create_om (const AttributeList& al, const Geometry& geometry)
+AM::AM (const Geometry& geometry, const Time& t, 
+	vector<const AttributeList*> ol,
+	const string sort, const string part)
+  : impl (*new Implementation (t, 
+			       sort + "/" + part,
+			       map_construct1<OM, Geometry> (ol, geometry))),
+    name ("state")
+{ }
+
+AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
+  : impl (*new Implementation 
+	  (al.check ("creation") ? al.time ("creation") : time,
+	   al.check ("name") ? al.name ("name"): al.name ("type"),
+	   map_construct1<OM, Geometry> (al.alist_sequence ("om"), geometry))),
+    name ("state")
 {
   const string syntax = al.name ("syntax");
   
   if (syntax == "state")
-    return map_construct1<OM, const Geometry&> (al.alist_sequence ("om"), geometry);
+    {
+      if (al.check ("lock"))
+	impl.lock = new Implementation::Lock (al.alist ("lock"));
+    }
   else if (syntax == "organic")
     {
       // Get initialization parameters.
@@ -445,21 +463,19 @@ create_om (const AttributeList& al, const Geometry& geometry)
       const double C = weight * al.number ("total_C_fraction");
       const double N = weight * IM::N_left (al);
       
-      const vector<const AttributeList*>& oms = al.alist_sequence ("om");
-      vector<double> content;
-	
-      return create_om (oms, geometry, C, N, content);
+      add (C, N);
     }
   else if (syntax == "mineral")
-    assert (0);
+    assert (false);
   else if (syntax == "crop")
-    assert (0);
+    assert (false);
   else if (syntax == "initial")
     {
       const vector<const AttributeList*>& oms = al.alist_sequence ("om");
-      vector<OM*>& om = map_construct1<OM, const Geometry&> (oms, geometry);
+      const vector<OM*>& om = impl.om;
       
-      const vector<const AttributeList*>& layers = al.alist_sequence ("layers");
+      const vector<const AttributeList*>& layers
+	= al.alist_sequence ("layers");
       
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)
@@ -498,14 +514,10 @@ create_om (const AttributeList& al, const Geometry& geometry)
 	  
 	  last = end;
 	}
-      return om;
     }
   else if (syntax == "root")
     {
-      const vector<const AttributeList*>& oms = al.alist_sequence ("om");
-      vector<OM*>& om
-	= map_construct1<OM, const Geometry&> (oms, geometry);
-
+      // Get paramters.
       const double weight = al.number ("weight"); // Kg DM /m²
       const double total_C_fraction = al.number ("total_C_fraction");
       const double C = weight * 1000.0 / (100.0 * 100.0)
@@ -513,57 +525,19 @@ create_om (const AttributeList& al, const Geometry& geometry)
       const double k = M_LN2 / al.number ("dist");
       const double depth = al.number ("depth");
 
-      int missing_number = -1;
-      double missing_fraction = 1.0;
-
-      for (unsigned int j = 0; j < om.size (); j++)
+      // Calculate density.
+      vector<double> density (geometry.size (), 0.0);
+      for (int i = 0; 
+	   i < geometry.size () && geometry.z (i) > -depth;
+	   i++)
 	{
-	  const double fraction = oms[j]->number ("initial_fraction");
-	  if (fraction != OM::Unspecified)
-	    {
-	      missing_fraction -= fraction;
-	      
-	      for (int l = 0; l < geometry.size () && geometry.z (l) > -depth; l++)
-		om[j]->C[l] = (C * fraction * k) * exp (k * geometry.z (l));
-	    }
-	  else if (missing_number != -1)
-	    // Should be catched by syntax check.
-	    cerr << "Missing initial fraction in root am.\n";
-	  else
-	    missing_number = j;
+	  density[i] = k * exp (k * geometry.z (i));
 	}
-      if (missing_number > -1)
-	{
-	  if (missing_fraction < -0.1e-10)
-	    cerr << "Specified over 100% C in om in root am.\n";
-	  else if (missing_fraction > 0.0)
-	    for (int l = 0; l < geometry.size () && geometry.z (l) > -depth; l++)
-	      om[missing_number]->C[l]
-		= (C * missing_fraction * k) * exp (k * geometry.z (l));
-	}
-      else if (missing_fraction < -0.1e-10)
-	cerr << "Specified more than all C in om in root am.\n";
-      else if (missing_fraction > 0.1e-10)
-	cerr << "Specified less than all C in om in root am.\n";
 
-      return om;
+      // Add it.
+      impl.add (geometry, C, density);
     }
-  assert (0);
 }
-
-AM::AM (const Geometry& geometry, const Time& t, vector<const AttributeList*> ol,
-	const string sort, const string part)
-  : impl (*new Implementation (t,
-			       map_create1<OM, Geometry> (ol, geometry))),
-    name (sort + "/" + part)
-{ }
-
-AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
-  :  impl (*new Implementation (al.check ("creation")
-				? al.time ("creation") : time,
-				create_om (al, geometry))),
-     name (al.name ("type"))
-{ }
 
 AM::~AM ()
 { 
@@ -646,6 +620,11 @@ AM_init::AM_init ()
 
 	syntax.add ("creation", Syntax::Date, Syntax::Const);
 	alist.add ("syntax", "state");
+	syntax.add ("name", Syntax::String, Syntax::Const);
+	Syntax& syntax_lock = *new Syntax ();
+	syntax_lock.add ("crop", Syntax::String, Syntax::Const);
+	syntax_lock.add ("name", Syntax::String, Syntax::Const);
+	syntax.add ("lock", syntax_lock, Syntax::Optional);
 	add_submodule<OM> ("om", syntax, alist,
 			   Syntax::Const, Syntax::Sequence);
 	AM_library->add ("state", alist, syntax);

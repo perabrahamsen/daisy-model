@@ -78,7 +78,6 @@ private:
   // Create & Destroy.
 public:
   static OM& create (const AttributeList& al, const Geometry& geometry);
-  void initialize (const Geometry&);
 
   static void load_syntax (Syntax&, AttributeList&);
   OM (const AttributeList& al);
