@@ -65,7 +65,7 @@ public:
   };
 
   map<string, Users, less<string>/**/> submodels;
-  map<ModelUsed, Users> models;
+  map<ModelUsed, Users, less<ModelUsed>/**/> models;
   map<string, Users, less<string>/**/> components;
 
   // Create and Destroy.

@@ -2,6 +2,10 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Viscosity
 
+Make water conductivity depend on teperature.
+
+
+
 * NEWS
 
 ** New log parameterizations "Organic Matter" and "AOM Pools".
