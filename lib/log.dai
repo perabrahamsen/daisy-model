@@ -1186,6 +1186,10 @@
 		   (tag "INC_C")
 		   (dimension "kg C/ha/h")
 		   (factor 10))		;g/m^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter Bioincorporation speed)
+		   (tag "Speed")
+		   (dimension "kg DM/ha/h")
+		   (factor 4.2))		;g DM/m^2 -> kg C/ha
 	   ))
 
 (deflog "Hourly Groundwater" table
