@@ -75,7 +75,7 @@ protected:
   double RootDensDistPar (double a);
   void RootDensity (const Soil& soil);
   void NitContent ();
-  void NitrogenUptake (int Hour, 
+  void NitrogenUptake (int Hour,
 		       const Soil& soil,
 		       const SoilWater& soil_water,
 		       SoilNH4& soil_NH4,
@@ -83,7 +83,7 @@ protected:
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
   double CanopyPhotosynthesis (const Bioclimate&);
   double ReMobilization ();
-  void AssimilatePartitioning (double DS, 
+  void AssimilatePartitioning (double DS,
 			       double& f_Leaf, double& f_Stem,
 			       double& f_Root, double& f_SOrg);
   double MaintenanceRespiration (double r, double w, double T);
@@ -117,7 +117,7 @@ public:
 };
 
 struct CropStandard::Parameters
-{ 
+{
   const struct DevelPar
   {
     double EmrTSum;		// Soil temp sum at emergence
@@ -247,6 +247,7 @@ struct CropStandard::Parameters
     const vector<AttributeList*>& Dead; // Dead AM parameters.
     const vector<AttributeList*>& SOrg; // SOrg AM parameters.
     const vector<AttributeList*>& Root; // Root AM parameters.
+    const double EconomicYield; // Fraction of economic yield in storage organs.
     const double C_Stem;	// C fraction of total weight.
     const double C_Leaf;	// C fraction of total weight.
     const double C_Dead;	// C fraction of total weight.
@@ -501,6 +502,7 @@ CropStandard::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
     Dead (vl.alist_sequence ("Dead")),
     SOrg (vl.alist_sequence ("SOrg")),
     Root (vl.alist_sequence ("Root")),
+    EconomicYield (vl.number ("EconomicYield")),
     C_Stem (vl.number ("C_Stem")),
     C_Leaf (vl.number ("C_Leaf")),
     C_Dead (vl.number ("C_Dead")),
@@ -513,7 +515,7 @@ CropStandard::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
 CropStandard::Parameters::~Parameters ()
 { }
 
-CropStandard::Variables::Variables (const Parameters& par, 
+CropStandard::Variables::Variables (const Parameters& par,
 				    const AttributeList& vl)
   : Phenology (par, vl.alist ("Phenology")),
     Canopy (par, vl.alist ("Canopy")),
@@ -522,7 +524,7 @@ CropStandard::Variables::Variables (const Parameters& par,
     CrpAux (par, vl.alist ("CrpAux"))
 { }
 
-void 
+void
 CropStandard::Variables::output (Log& log, Filter& filter) const
 {
   if (filter.check ("Phenology"))
@@ -570,7 +572,7 @@ CropStandard::Variables::RecCanopy::RecCanopy (const Parameters&,
     LAIvsH (vl.csmp ("LAIvsH"))
 { }
 
-void 
+void
 CropStandard::Variables::RecCanopy::output (Log& log, Filter& filter) const
 {
   log.open ("Canopy");
@@ -595,7 +597,7 @@ CropStandard::Variables::RecRootSys::RecRootSys (const Parameters& par,
     Ept (0.0)
 { }
 
-void 
+void
 CropStandard::Variables::RecRootSys::output (Log& log, Filter& filter) const
 {
   log.open ("RootSys");
@@ -681,7 +683,7 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     DS_start_fixate (par.CrpN.DS_fixate)
 { }
 
-void 
+void
 CropStandard::Variables::RecCrpAux::output (Log& log, Filter& filter) const
 {
   log.open ("CrpAux");
@@ -717,7 +719,7 @@ CropStandard::Variables::~Variables ()
 { }
 
 void
-CropStandard::initialize (const Geometry& geometry, 
+CropStandard::initialize (const Geometry& geometry,
 			  const OrganicMatter& organic_matter)
 {
   unsigned int size = geometry.size ();
@@ -774,7 +776,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Devel.add ("PhotEff1", Syntax::CSMP, Syntax::Const);
   Devel.add ("defined_until_ds", Syntax::Number, Syntax::Const);
   vDevel.add ("defined_until_ds", 2.0);
-    
+
   syntax.add ("Devel", Devel, Syntax::Const);
   alist.add ("Devel", vDevel);
 
@@ -988,6 +990,8 @@ CropStandardSyntax::CropStandardSyntax ()
   HarvestList.add ("SOrg", AOM);
   add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const);
   HarvestList.add ("Root", AOM);
+  Harvest.add ("EconomicYield", Syntax::Number, Syntax::Const);
+  HarvestList.add ("EconomicYield", 1.00);
   Harvest.add ("C_Stem", Syntax::Number, Syntax::Const);
   HarvestList.add ("C_Stem", 0.420);
   Harvest.add ("C_Leaf", Syntax::Number, Syntax::Const);
@@ -1902,7 +1906,7 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
 	{
 	  // We count day hours at the top of the crop.
 	  top_crop = false;
-	  if (bioclimate.PAR (i) > 0.5 * 70.0)
+	  if (bioclimate.PAR (i) > 0.5 * 25.0)
 	    var.Phenology.partial_day_length += 1.0;
 	}
       // Leaf Area index for a given leaf layer
@@ -2393,7 +2397,7 @@ CropStandard::harvest (const string& column_name,
   return *new Harvest (column_name, time, name,
 		       WStem * stem_harvest, NStem * stem_harvest,
 		       WLeaf * leaf_harvest, NLeaf * leaf_harvest,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 
+		       WSOrg * sorg_harvest, NSOrg * sorg_harvest,
 		       chemicals);
 }
 
