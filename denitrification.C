@@ -193,9 +193,9 @@ Denitrification::Denitrification (const AttributeList& al)
   : active_underground (al.flag ("active_underground")),
     active_groundwater (al.flag ("active_groundwater")),
     K (al.number ("K")),
-    K_fast (al.check ("K_fast") ? al.number ("K_fast") : K),
+    K_fast (al.number ("K_fast", K)),
     alpha (al.number ("alpha")),
-    alpha_fast (al.check ("alpha_fast") ? al.number ("alpha_fast") : alpha),
+    alpha_fast (al.number ("alpha_fast", alpha)),
     heat_factor (al.check ("heat_factor") 
 		 ? al.plf ("heat_factor") 
 		 : PLF::empty ()),
@@ -203,9 +203,7 @@ Denitrification::Denitrification (const AttributeList& al)
     water_factor_fast (al.check ("water_factor_fast" )
 		       ? al.plf ("water_factor_fast")
 		       : water_factor),
-    redox_height (al.check ("redox_height") 
-		  ? al.number ("redox_height")
-		  : 1.0)
+    redox_height (al.number ("redox_height", 1.0))
 { }
 
 static Submodel::Register 

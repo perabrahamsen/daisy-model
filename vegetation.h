@@ -102,6 +102,7 @@ public:
 			double leaf_harvest, 
 			double sorg_harvest,
 			vector<const Harvest*>& harvest,
+                        double& min_height,
 			vector<AM*>& residuals,
 			double& harvest_DM, 
 			double& harvest_N, double& harvest_C,

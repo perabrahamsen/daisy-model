@@ -115,8 +115,8 @@ struct NetRadiationBrunt : public NetRadiationParent
   
   NetRadiationBrunt (const AttributeList& al)
     : NetRadiationParent (al),
-      a (al.check ("a") ? al.number ("a") : 0.34),
-      b (al.check ("b") ? al.number ("b") : 0.14)
+      a (al.number ("a", 0.34)),
+      b (al.number ("b", 0.14))
     { }
 };
 

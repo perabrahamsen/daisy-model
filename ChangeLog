@@ -1,3 +1,27 @@
+2004-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.32 released.
+
+2004-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/potato.dai ("Potato"): Mark it as a root fruit.
+	* lib/fodderbeet.dai ("Fodder Beet"): Ditto.
+	* lib/sugarbeet.dai ("Sugar Beet"): Ditto.
+
+	* canopy_std.C (CropHeight): Min height 0.1 mm.
+
+	* vegetation.h, vegetation_crops.C
+	* vegetation_permanent.C (harvest): New min_height argument. 
+	* column_base.C (harvest): Use it.
+
+	* harvesting.h, harvesting.C (sorg_height): New parameter.
+	* crop.h, crop_std.C, crop_simple.C, crop_old.C, crop_sold.C
+	(sorg_height): New virtual member function.
+
+	* alist.C, alist.h (number): Version with default value.
+	* all: Use it.
+	* alist.C: Changed "char*" to "char *const" throughout.
+	
 2004-02-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.31 released.

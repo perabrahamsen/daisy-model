@@ -110,6 +110,7 @@ public:
 	     vector<double>& residuals_N_soil, 
 	     vector<double>& residuals_C_soil,
 	     Treelog&);
+  virtual double sorg_height () const = 0; // [cm]
   virtual void output (Log&) const = 0;
   
   // Queries.

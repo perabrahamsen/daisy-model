@@ -140,7 +140,8 @@ struct VegetationCrops : public Vegetation
 		const Time&, const Geometry&, Bioclimate&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
-		vector<const Harvest*>& harvest, vector<AM*>& residuals,
+		vector<const Harvest*>& harvest, double& min_height,
+                vector<AM*>& residuals,
 		double& harvest_DM, double& harvest_N, double& harvest_C, 
 		double& residuals_DM,
 		double& residuals_N_top, double& residuals_C_top,
@@ -482,6 +483,7 @@ VegetationCrops::harvest (const symbol column_name,
 			  double stem_harvest, double leaf_harvest, 
 			  double sorg_harvest, 
 			  vector<const Harvest*>& harvest,
+                          double& min_height,
 			  vector<AM*>& residuals,
 			  double& harvest_DM, 
 			  double& harvest_N, double& harvest_C,
@@ -500,13 +502,16 @@ VegetationCrops::harvest (const symbol column_name,
        crop++)
     if (all || (*crop)->name == crop_name)
       {
+        const double sorg_height = (*crop)->sorg_height ();
+        const bool root_fruit = (sorg_height < 0.0);
+        min_height = min (min_height, sorg_height);
 	const Harvest& mine = 
 	  (*crop)->harvest (column_name, time, 
 			    geometry, 
 			    bioclimate,
 			    stub_length, stem_harvest,
 			    leaf_harvest, sorg_harvest, 
-			    false, residuals, 
+			    root_fruit, residuals, 
 			    residuals_DM, residuals_N_top, residuals_C_top,
 			    residuals_N_soil, residuals_C_soil, msg);
 

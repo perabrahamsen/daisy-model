@@ -31,7 +31,7 @@ CanopyStandard::CropHeight (double WStem, double DS) const
 {
   const double H1 = HvsDS (DS) + Offset;
   const double H2 = HvsDS (1.0) * HvsWStem (WStem);
-  return min (H1, H2);
+  return max (min (H1, H2), 0.01);
 }
 
 double

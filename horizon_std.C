@@ -118,11 +118,9 @@ static struct HorizonStandardSyntax
   {
     bool ok = true;
 
-    double sand = al.check ("sand") ? al.number ("sand") : -1.0;
-    const double fine_sand 
-      = al.check ("fine_sand") ? al.number ("fine_sand") : -1.0;
-    const double coarse_sand 
-      = al.check ("coarse_sand") ? al.number ("coarse_sand") : -1.0;
+    double sand = al.number ("sand", -1.0);
+    const double fine_sand = al.number ("fine_sand", -1.0);
+    const double coarse_sand =  al.number ("coarse_sand", -1.0);
     if (sand >= 0.0)
       {
         if (fine_sand > sand)

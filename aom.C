@@ -231,9 +231,7 @@ allocated to this pool for AOM.  One pool should be left unspecified.");
 
 AOM::AOM (const AttributeList& al)
   : OM (al),
-    initial_fraction (al.check ("initial_fraction") 
-		      ? al.number ("initial_fraction")
-		      : Unspecified),
+    initial_fraction (al.number ("initial_fraction", Unspecified)),
     top_C (al.number ("top_C")),
     top_N (al.number ("top_N"))
 { }

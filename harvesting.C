@@ -517,6 +517,12 @@ removed by harvest.  By default, there is no delay.");
   alist.add ("cut_delay", no_delay);
   syntax.add_fraction ("cut_stress", Syntax::LogOnly, 
 		       "Stress induced due to last cut.");
+  syntax.add ("sorg_height", "cm", Syntax::OptionalConst, 
+              "Vertical location of storage organ.\n\
+Set this to a negative number for root fruits, this will cause harvesting\n\
+to imply a suitable tillage operation, and guarentee that harvest will kill\n\
+the plant.  By default, the storage organ is assumed to be located somewhere\n\
+above ground.");
 }
 
 Harvesting::Harvesting (const AttributeList& al)
@@ -530,11 +536,12 @@ Harvesting::Harvesting (const AttributeList& al)
                      ? al.number ("EconomicYield_N")
                      : al.number ("EconomicYield_W")),
     DSmax (al.number ("DSmax")),
-    DSnew (al.check ("DSnew") ? al.number ("DSnew") : -44.0),
+    DSnew (al.number ("DSnew", -44.0)),
     last_cut (al.check ("last_cut") ? new Time (al.alist ("last_cut")) : NULL),
     production_delay (al.number ("production_delay")),
     cut_delay (al.plf ("cut_delay")),
-    cut_stress (0.0)
+    cut_stress (0.0),
+    sorg_height (al.number ("sorg_height", 42.42e42))
 { }
 
 Harvesting::~Harvesting ()

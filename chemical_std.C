@@ -141,7 +141,7 @@ ChemicalStandard::ChemicalStandard (const AttributeList& al)
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     solute_alist_ (al.alist ("solute")),
     decompose_rate_ (al.check ("decompose_rate")
-		     ? al.number ("decompose_rate")
+	     ? al.number ("decompose_rate")
 		     : halftime_to_rate (al.number ("decompose_halftime"))),
     decompose_heat_factor_ (al.plf ("decompose_heat_factor")),
     decompose_water_factor_ (al.plf ("decompose_water_factor")),

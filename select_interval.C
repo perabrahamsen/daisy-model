@@ -100,8 +100,8 @@ struct SelectInterval : public Select
   SelectInterval (const AttributeList& al)
     : Select (al),
       density (al.flag ("density")),
-      from (al.check ("from") ? al.number ("from") : 1.0),
-      to (al.check ("to") ? al.number ("to") : 1.0),
+      from (al.number ("from", 1.0)),
+      to (al.number ("to", 1.0)),
       value (al.number ("value"))
   { }
 };

@@ -135,6 +135,8 @@ public:
 			  vector<double>& residuals_N_soil,
 			  vector<double>& residuals_C_soil,
 			  Treelog&);
+  double sorg_height () const 
+  { return 100.0; }
   void output (Log&) const;
 
   double DS () const;

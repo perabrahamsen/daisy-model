@@ -88,15 +88,19 @@ ColumnBase::harvest (const Time& time, const symbol crop_name,
 		     vector<const Harvest*>& harvest, Treelog& msg)
 { 
   vector<AM*> residuals;
+  double min_height = 100.0;
   vegetation.harvest (name, crop_name, time, soil, 
 		      bioclimate,
 		      stub_length, 
 		      stem_harvest, leaf_harvest, sorg_harvest,
-		      harvest, residuals, harvest_DM, harvest_N, harvest_C, 
+		      harvest, min_height, 
+                      residuals, harvest_DM, harvest_N, harvest_C, 
 		      residuals_DM, residuals_N_top, residuals_C_top,
 		      residuals_N_soil, residuals_C_soil,
 		      msg); 
   add_residuals (residuals);
+  if (min_height < 0.0)
+    mix (msg, time, 0.0, min_height, 1.0);
 }
 
 

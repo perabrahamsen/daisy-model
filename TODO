@@ -1,22 +1,26 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Textpad licens:  Giv til institut.
+* Billetter fuglesøcenteret, Niels og Jette.
 
-* SH: Oversæt Daisy under cygwin
+* FertOrgaNic 
 
-* SH: Arbejdsplan
+** Ny dist
 
-** Polish setup
+** gnuplot, check om datoer på x akse virker.
 
-** Italian setup
-
-** .bat fil for windoz
-
-** README file
-
-** upload, announce
+** Fortæl Andreano at den virker med ny fon-soil.dai.
 
 ** ny kartoffel
+
+** lin_int til Polen
+
+** Toves rapport.
+
+** kalibreringsstrategi
+
+** Slovakiske data
+
+* Slides til Dina årsmøde
 
 * Update answers
 
@@ -32,17 +36,9 @@ Update hydraulic models.
 
 ** numeric horizon
 
-* Slides til Dina årsmøde
-
 * Ny phenology model 
 
 En liste af stages, hver med sit eget navn og egne parametre.
-
-* Høst af kartofler skal indeholde en mix
-
-Vi skal have et "rodfrugt" flag i planten.  Hvis det er sandt vil en
-høst altid slå planten ihjelv, og betyde en mix.  Evt skal det være en
-dybde, så vi ved hvor langt ned vi skal rode.
 
 * Irrigation
 
@@ -50,15 +46,15 @@ dybde, så vi ved hvor langt ned vi skal rode.
 
 Start ved specifik dato.
 
+* Partit komponent
+
+Skal kunne være afhængig af kvælstof og temperatur.
+
 * biomod: G+P74 rootdens model hvor a er en parameter
 
 Og Lz (DensRtTip) er en fri variabel.
 
 plus lineær fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
-
-* Partit komponent
-
-Skal kunne være afhængig af kvælstof og temperatur.
 
 * Lav superklimafil
 

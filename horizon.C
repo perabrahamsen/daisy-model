@@ -325,7 +325,7 @@ static const vector<double> empty_sequence;
 
 Horizon::Implementation::Implementation (const AttributeList& al)
   : SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
-    C_per_N (al.check ("C_per_N") ? al.number ("C_per_N") : -42.42e42),
+    C_per_N (al.number ("C_per_N", -42.42e42)),
     SOM_fractions (al.check ("SOM_fractions") 
 		   ? al.number_sequence ("SOM_fractions")
 		   : empty_sequence),

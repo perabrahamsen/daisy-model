@@ -197,9 +197,9 @@ Hydraulic::Hydraulic (const AttributeList& al)
     K_init (al.check ("K_at_h")
 	    ? new K_at_h (al.alist ("K_at_h"))
 	    : NULL),
-    Theta_sat (al.check ("Theta_sat") ? al.number ("Theta_sat") : -42.42e42),
-    Theta_res (al.check ("Theta_res") ? al.number ("Theta_res") : 0.0),
-    K_sat (al.check ("K_sat") ? al.number ("K_sat") : -42.42e42)
+    Theta_sat (al.number ("Theta_sat", -42.42e42)),
+    Theta_res (al.number ("Theta_res", 0.0)),
+    K_sat (al.number ("K_sat", -42.42e42))
 { }
 
 Hydraulic::~Hydraulic ()

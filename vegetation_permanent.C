@@ -142,6 +142,7 @@ struct VegetationPermanent : public Vegetation
 		const Time&, const Geometry&, Bioclimate&,
 		double, double, double, double, 
 		vector<const Harvest*>&,
+                double&,
  		vector<AM*>&, 
 		double&, double&, double&,
 		double&, double&, double&, vector<double>&, vector<double>&,
@@ -348,7 +349,7 @@ VegetationPermanent::VegetationPermanent (const AttributeList& al)
     N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
     DM_per_LAI (al.number ("DM_per_LAI")),
     N_demand (0.0),
-    N_actual (al.check ("N_actual") ? al.number ("N_actual") : -42.42e42),
+    N_actual (al.number ("N_actual", -42.42e42)),
     AM_litter (NULL),
     N_uptake (0.0),
     N_litter (0.0),

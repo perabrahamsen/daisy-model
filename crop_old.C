@@ -116,6 +116,8 @@ public:
 			  vector<double>& residuals_N_soil,
 			  vector<double>& residuals_C_soil,
 			  Treelog&);
+  double sorg_height () const 
+  { return 100.0; }
   void output (Log&) const;
 
   double DS () const;
@@ -484,7 +486,7 @@ CropOld::Variables::output (Log& log) const
 CropOld::Variables::RecPhenology::RecPhenology (const Parameters& par,
 						     const AttributeList& vl)
   : DS (vl.number ("DS")),
-    Vern (vl.check ("Vern") ? vl.number ("Vern") : par.Vernal.TaSum)
+    Vern (vl.number ("Vern", par.Vernal.TaSum))
 { }
 
 void 
@@ -515,7 +517,7 @@ CropOld::Variables::RecCanopy::output (Log& log) const
 
 CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
 						 const AttributeList& vl)
-  : Depth (vl.check ("Depth") ? vl.number ("Depth") : par.Root.DptEmr),
+  : Depth (vl.number ("Depth", par.Root.DptEmr)),
     Density (vl.number_sequence ("Density")),
     H2OExtraction (vl.number_sequence ("H2OExtraction")),
     NH4Extraction (vl.number_sequence ("NH4Extraction")),
@@ -548,7 +550,7 @@ CropOld::Variables::RecProd::RecProd (const Parameters& par,
   : WLeaf (vl.number ("WLeaf")),
     WhiteStubble (vl.number ("WhiteStubble")),
     WRoot (vl.number ("WRoot")),
-    NCrop (vl.check ("NCrop") ? vl.number ("NCrop") : par.CrpN.SeedN)
+    NCrop (vl.number ("NCrop", par.CrpN.SeedN))
 { }
 
 void 
@@ -564,9 +566,7 @@ CropOld::Variables::RecProd::output (Log& log) const
 CropOld::Variables::RecCrpAux::RecCrpAux (const Parameters& par, 
 					       const AttributeList& vl)
   : InitLAI (vl.flag ("InitLAI")),
-    PotRtDpt (  vl.check ("PotRtDpt") 
-	      ? vl.number ("PotRtDpt")
-	      : par.Root.DptEmr),
+    PotRtDpt (vl.number ("PotRtDpt", par.Root.DptEmr)),
     PtNCnt (0.0),
     CrNCnt (0.0),
     NfNCnt (0.0),

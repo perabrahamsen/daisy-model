@@ -995,8 +995,7 @@ AM::initialize (const Soil& soil)
       const double N = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
 	* total_N_fraction; // g C / cm²;
       const double k = M_LN2 / alist.number ("dist");
-      const double depth = alist.check ("depth") 
-	? alist.number ("depth") : soil.MaxRootingDepth ();
+      const double depth = alist.number ("depth", soil.MaxRootingDepth ());
 
       // Calculate density.
       vector<double> density (soil.size (), 0.0);

@@ -43,10 +43,8 @@ public:
 public:
   AdsorptionFreundlich (const AttributeList& al)
     : Adsorption (al),
-      K_clay (al.check ("K_clay") ? al.number ("K_clay") : 0.0),
-      K_OC (al.check ("K_OC") 
-	       ? al.number ("K_OC") 
-	       : al.number ("K_clay")),
+      K_clay (al.number ("K_clay", 0.0)),
+      K_OC (al.number ("K_OC") ? al.number ("K_OC") : al.number ("K_clay")),
       m (al.number ("m"))
     { }
 };

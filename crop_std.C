@@ -126,6 +126,8 @@ public:
 			  vector<double>& residuals_N_soil,
 			  vector<double>& residuals_C_soil,
 			  Treelog&);
+  double sorg_height () const 
+  { return harvesting.sorg_height; }
   void output (Log&) const;
 
   // Queries.

@@ -66,6 +66,10 @@ private:
 public:
   double cut_stress;		// Cut induced stress.
 
+public:
+  const double sorg_height;     // Location above ground of storage organ [cm].
+                                // If this is negative, harvest will kill the
+                                // plant and imply a mix operation.
   // Simulation.
 public:
   const Harvest& operator() (symbol column_name,

@@ -122,16 +122,13 @@ public:
   GroundwaterPipe (const AttributeList& al)
     : Groundwater (al),
       L (al.number ("L")),
-      x (al.check ("x") ? al.number ("x") : L / 2.0),
+      x (al.number ("x", L / 2.0)),
       pipe_position (al.number ("pipe_position")),
-      K_to_pipes_ (al.check ("K_to_pipes") 
-                   ? al.number ("K_to_pipes") : -1.0),
+      K_to_pipes_ (al.number ("K_to_pipes", -1.0)),
       K_aquitard_ (al.number ("K_aquitard")),
       Z_aquitard_ (al.number ("Z_aquitard")),
-      h_aquifer (al.check ("h_aquifer") 
-		 ? al.number ("h_aquifer") 
-		 : Z_aquitard_),
-      height (al.check ("height") ? al.number ("height") : pipe_position)
+      h_aquifer (al.number ("h_aquifer", Z_aquitard_)),
+      height (al.number ("height", pipe_position))
   { }
   ~GroundwaterPipe ()
   { }

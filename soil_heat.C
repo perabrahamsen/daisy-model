@@ -596,7 +596,7 @@ SoilHeat::Implementation::check (unsigned n, Treelog& err) const
 SoilHeat::Implementation::Implementation (const AttributeList& al)
   : h_frozen (al.number ("h_frozen")),
     enable_ice (al.flag ("enable_ice")),
-    T_top (al.check ("T_top") ? al.number ("T_top") : -500.0)
+    T_top (al.number ("T_top", -500.0))
 { 
   if (al.check ("S"))
     S = al.number_sequence ("S");

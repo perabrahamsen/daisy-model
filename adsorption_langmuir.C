@@ -66,7 +66,7 @@ public:
   AdsorptionLangmuir (const AttributeList& al)
     : Adsorption (al),
       K (al.number ("K")),
-      my_max_clay (al.check ("my_max_clay") ? al.number ("my_max_clay") : 0.0),
+      my_max_clay (al.number ("my_max_clay", 0.0)),
       my_max_OC (al.check ("my_max_OC") 
 		    ? al.number ("my_max_OC") 
 		    : al.number ("my_max_clay"))

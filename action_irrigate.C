@@ -115,9 +115,7 @@ Nitrogen content of irrigation water [mg N/l] (default: none).",
       activated (al.check ("end_time")),
       end_time (1, 1, 1, 1),
       flux (al.number ("flux")),
-      temp (al.check ("temperature") 
-	    ? al.number ("temperature")
-	    : at_air_temperature),
+      temp (al.number ("temperature", at_air_temperature)),
       sm (al.alist ("solute"))
   { }
   ~ActionIrrigate ()

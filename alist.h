@@ -56,6 +56,8 @@ public:
   // Extract values.
   double number (const string&) const;
   double number (const char*) const;
+  double number (const string&, double default_value) const;
+  double number (const char*, double default_value) const;
   const string& name (const string&) const;
   const string& name (const char*) const;
   symbol identifier (const string&) const;

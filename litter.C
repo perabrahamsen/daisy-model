@@ -45,7 +45,7 @@ By default, the surface albedo will be used.");
 Litter::Litter (const AttributeList& al)
   : vapor_flux_factor (al.number ("vapor_flux_factor")),
     interception_capacity (al.number ("interception_capacity")),
-    albedo (al.check ("albedo") ? al.number ("albedo") : -1)
+    albedo (al.number ("albedo", -1.0))
 { }
 
 Litter::~Litter ()

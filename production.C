@@ -665,7 +665,7 @@ Production::Production (const AttributeList& al)
     CRoot (0.0),
     CSOrg (0.0),
     CDead (0.0),
-    NCrop (al.check ("NCrop") ? al.number ("NCrop") : -42.42e42),
+    NCrop (al.number ("NCrop", -42.42e42)),
     NLeaf (al.number ("NLeaf")),
     NStem (al.number ("NStem")),
     NRoot (al.number ("NRoot")),

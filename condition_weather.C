@@ -64,7 +64,7 @@ struct ConditionTSum : public Condition
       reset_mday (al.integer ("reset_mday")),
       reset_month (al.integer ("reset_month")),
       TSum_limit (al.number ("TSum_limit")),
-      TSum_now (al.check ("TSum_now") ? al.number ("TSum_now") : -100.0e100)
+      TSum_now (al.number ("TSum_now", -100.0e100))
   { }
 };
 static struct ConditionWeatherSyntax

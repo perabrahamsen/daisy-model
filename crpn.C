@@ -248,7 +248,7 @@ Minimum ammonium concentration near roots for uptake.");
 }
 
 CrpN::CrpN (const AttributeList& al)
-  : SeedN (al.check ("SeedN") ? al.number ("SeedN") : -42.42e42),
+  : SeedN (al.number ("SeedN", -42.42e42)),
     PtLeafCnc (al.plf ("PtLeafCnc")),
     CrLeafCnc (al.plf ("CrLeafCnc")),
     NfLeafCnc (al.plf ("NfLeafCnc")),

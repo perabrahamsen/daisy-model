@@ -534,11 +534,11 @@ OrganicMatter::Implementation::Initialization::
 OrganicMatter::Implementation::Initialization::
 /**/ Initialization (const AttributeList& al, const Soil& soil, 
 		     const vector<SOM*>& som, double T_avg)
-  : input (al.check ("input") ? al.number ("input") : -1.0),
-    end (al.check ("end") ? al.number ("end") : soil.end_of_first_horizon ()),
+  : input (al.number ("input", -1.0)),
+    end (al.number ("end", soil.end_of_first_horizon ())),
     fractions (al.number_sequence ("fractions")),
     efficiency (al.number_sequence ("efficiency")),
-    T (al.check ("T") ? al.number ("T") : T_avg),
+    T (al.number ("T", T_avg)),
     h (al.number ("h")),
     variable_pool (al.check ("variable_pool")
 		   ? al.integer ("variable_pool")
@@ -546,9 +546,8 @@ OrganicMatter::Implementation::Initialization::
     variable_pool_2 (al.check ("variable_pool_2")
 		     ? al.integer ("variable_pool_2")
 		     : find_som_2 (som)),
-    background_mineralization (al.check ("background_mineralization")
-			       ? al.number ("background_mineralization")
-			       : -42.42e42),
+    background_mineralization (al.number ("background_mineralization",
+                                          -42.42e42)),
     SOM_limit_where (al.integer ("SOM_limit_where")),
     SOM_limit_lower (al.number_sequence ("SOM_limit_lower")),
     SOM_limit_upper (al.number_sequence ("SOM_limit_upper")),
