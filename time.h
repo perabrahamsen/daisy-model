@@ -47,12 +47,12 @@ public:
   static int days_between (const Time& first, const Time& last);
   static int hours_between (const Time& first, const Time& last);
 
-  bool operator== (const Time&);
-  bool operator!= (const Time&);
-  bool operator<  (const Time&);
-  bool operator<= (const Time&);
-  bool operator>= (const Time&);
-  bool operator>  (const Time&);
+  bool operator== (const Time&) const;
+  bool operator!= (const Time&) const;
+  bool operator<  (const Time&) const;
+  bool operator<= (const Time&) const;
+  bool operator>= (const Time&) const;
+  bool operator>  (const Time&) const;
 
   // Construct.
 public:
