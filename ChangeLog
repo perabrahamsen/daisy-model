@@ -1,5 +1,13 @@
 2001-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.71 released.
+
+2001-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* svat_pmsw.C (SVAT_PMSWSyntax): Fixed more log variable names.
+
+2001-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* Version 1.70 released.
 
 2001-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>

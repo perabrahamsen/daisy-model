@@ -12,11 +12,11 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
-* 1.71
+* 1.72
 
 No user visible changes.
 
-* 1.70
+* 1.71
 
 Fixed bug in PMSW checkpointing.
 

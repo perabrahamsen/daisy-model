@@ -1916,21 +1916,23 @@ static struct SVAT_PMSWSyntax
                 "Averaged soil water content in upper 50 cm");
     syntax.add ("theta_0_100", "cm3/cm3", Syntax::LogOnly,
                 "Averaged soil water content in upper 100 cm");
-    syntax.add ("f_1", "NA", Syntax::LogOnly,
+    syntax.add ("f_1", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Noilhan) related to solar radiation");
-    syntax.add ("f_2", "NA", Syntax::LogOnly,
+    syntax.add ("f1_dolman", Syntax::None (), Syntax::LogOnly,
+                "???");
+    syntax.add ("f_2", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Noilhan) related to vapor pressure");
-    syntax.add ("f_3", "NA", Syntax::LogOnly,
+    syntax.add ("f_3", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Noilhan) related to air temperature");
-    syntax.add ("f_4", "NA", Syntax::LogOnly,
+    syntax.add ("f_4", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Noilhan) related to soil water content");
-    syntax.add ("f_temp", "NA", Syntax::LogOnly,
+    syntax.add ("f_temp", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Verma) related to air temperature");
-    syntax.add ("f_def", "NA", Syntax::LogOnly,
+    syntax.add ("f_def", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Verma) related to vapor pressure");
-    syntax.add ("f_theta", "NA", Syntax::LogOnly,
+    syntax.add ("f_theta", Syntax::None (), Syntax::LogOnly,
                 "Constraint function (Steward) related to soil water content");
-    syntax.add ("f_etep", "NA", Syntax::LogOnly,
+    syntax.add ("f_etep", Syntax::None (), Syntax::LogOnly,
                 "Constraint function defined by crop_ea/crop_ep");
     syntax.add ("r_sc_js", "s/m", Syntax::LogOnly,
                 "Bulk canopy resistance: f1_dolman*f_def*f3*f4");
@@ -1938,15 +1940,15 @@ static struct SVAT_PMSWSyntax
                 "Bulk canopy resistance: f1_dolman*f_def*f3*f_etep");
     syntax.add ("rcmin_star", "s/m", Syntax::LogOnly,
                 "minimum canopy resistance");
-    syntax.add ("pstress", "NA", Syntax::LogOnly,
+    syntax.add ("pstress", Syntax::None (), Syntax::LogOnly,
                 "crop production stress");
-    syntax.add ("ustar_raa", "NA", Syntax::LogOnly,
+    syntax.add ("ustar_raa", Syntax::None (), Syntax::LogOnly,
                 "friction velocity from RAA()");
-    syntax.add ("ustar_raastab1", "NA", Syntax::LogOnly,
+    syntax.add ("ustar_raastab1", Syntax::None (), Syntax::LogOnly,
                 "friction velocity from RAASTAB1()");
-    syntax.add ("ustar_raastab2", "NA", Syntax::LogOnly,
+    syntax.add ("ustar_raastab2", Syntax::None (), Syntax::LogOnly,
                 "friction velocity from RAASTAB2()");
-    syntax.add ("env_lai_factor", "NA", Syntax::LogOnly,
+    syntax.add ("env_lai_factor", Syntax::None (), Syntax::LogOnly,
                 "LAI*F_i");
     syntax.add ("e_pa","Pa", Syntax::LogOnly,
                 "vapor pressure at 2 m");
@@ -1960,25 +1962,25 @@ static struct SVAT_PMSWSyntax
                 "friction velocity from ??");
     syntax.add ("prec", "mm", Syntax::LogOnly,
                 "precipitation");
-    syntax.add ("albedo", "NA", Syntax::Const,
+    syntax.add ("albedo", Syntax::None (), Syntax::Const,
                 "Bulk albedo");
     alist.add ("albedo", 0.2);
-    syntax.add ("b1", "NA", Syntax::Const,
+    syntax.add ("b1", Syntax::None (), Syntax::Const,
                 "Brunt coefficient 1");
     alist.add ("b1", 0.53);
-    syntax.add ("b2", "NA", Syntax::Const,
+    syntax.add ("b2", Syntax::None (), Syntax::Const,
                 "Brunt coefficient 2");
     alist.add ("b2", 0.0065);
-    syntax.add ("b3", "NA", Syntax::Const,
+    syntax.add ("b3", Syntax::None (), Syntax::Const,
                 "Brunt coefficient 3");
     alist.add ("b3", 0.1);
-    syntax.add ("b4", "NA", Syntax::Const,
+    syntax.add ("b4", Syntax::None (), Syntax::Const,
                 "Brunt coefficient 4");
     alist.add ("b4", 0.9);
-    syntax.add ("ndif", "NA", Syntax::Const,
+    syntax.add ("ndif", Syntax::None (), Syntax::Const,
                 "Eddy diffusivity decay constant in crop");
     alist.add ("ndif", 2.5);
-    syntax.add ("c_d", "NA", Syntax::Const,
+    syntax.add ("c_d", Syntax::None (), Syntax::Const,
                 "Mean drag coefficient for a leaf");
     alist.add ("c_d", 0.05);
     syntax.add ("z_0s", "m", Syntax::Const,
@@ -1990,17 +1992,17 @@ static struct SVAT_PMSWSyntax
     syntax.add ("w", "m", Syntax::Const,
                 "average leaf width");
     alist.add ("w", 0.0025);
-    syntax.add ("alpha_u", "NA", Syntax::Const,
+    syntax.add ("alpha_u", Syntax::None (), Syntax::Const,
                 "attenuation coefficient for wind speed");
     alist.add ("alpha_u", 3.0);
-    syntax.add ("arac", "NA", Syntax::Const,
+    syntax.add ("arac", Syntax::None (), Syntax::Const,
                 "leaf boundary layer resistance coefficient");
     alist.add ("arac", 0.00662);
-    syntax.add ("alpha_k", "NA", Syntax::Const,
+    syntax.add ("alpha_k", Syntax::None (), Syntax::Const,
                 "Att. coefficient of eddy diffusivity through sparse canopy");
     alist.add ("alpha_k", 2.0);
 
-    syntax.add ("alpha_r", "NA", Syntax::Const,
+    syntax.add ("alpha_r", Syntax::None (), Syntax::Const,
                 "Att. coefficient for vegetation in ACOEFF()");
     alist.add ("alpha_r", 0.5);
     syntax.add ("theta_w", "cm3/cm3", Syntax::Const,
@@ -2012,20 +2014,20 @@ static struct SVAT_PMSWSyntax
     syntax.add ("rcmin_const", "s/m", Syntax::Const,
                 "Constant minimum canopy resistance");
     alist.add ("rcmin_const", 30.0);
-    syntax.add ("rcmax", "NA", Syntax::Const,
+    syntax.add ("rcmax", Syntax::None (), Syntax::Const,
                 "Maximum canopy resistance");
     alist.add ("rcmax", 1000.0);
-    syntax.add ("tref", "NA", Syntax::Const,
+    syntax.add ("tref", Syntax::None (), Syntax::Const,
                 "Reference/optimum temperature in temperature dependent "
                 "constraint function");
     alist.add ("tref", 298.0);
-    syntax.add ("zeta", "NA", Syntax::Const,
+    syntax.add ("zeta", Syntax::None (), Syntax::Const,
                 "Coefficient in vapor pressure dependent constraint function");
     alist.add ("zeta", 0.0002);
-    syntax.add ("f3const", "NA", Syntax::Const,
+    syntax.add ("f3const", Syntax::None (), Syntax::Const,
                 "Coefficient in temperature dependent constraint function");
     alist.add ("f3const", 0.0016);
-    syntax.add ("spar", "NA", Syntax::Const,
+    syntax.add ("spar", Syntax::None (), Syntax::Const,
                 "Reference value of photosynthetically active part of Si");
     alist.add ("spar", 100.0);
     syntax.add ("tmin", "dg C", Syntax::Const,
@@ -2034,13 +2036,13 @@ static struct SVAT_PMSWSyntax
     syntax.add ("tmax", "dg C", Syntax::Const,
                 "Maximum temperature for canopy conductance");
     alist.add ("tmax", 55.0);
-    syntax.add ("nu_1", "NA", Syntax::Const,
+    syntax.add ("nu_1", Syntax::None (), Syntax::Const,
                 "coefficient in Jarvis (1976) constraint function f_temp");
     alist.add ("nu_1", 26.5);
-    syntax.add ("nu_2", "NA", Syntax::Const,
+    syntax.add ("nu_2", Syntax::None (), Syntax::Const,
                 "coefficient in Lohammar (1980) constraint function f_def");
     alist.add ("nu_2", 0.57);
-    syntax.add ("nu_3", "NA", Syntax::Const,
+    syntax.add ("nu_3", Syntax::None (), Syntax::Const,
                 "coefficient in Steward (1988) constraint function f_theta");
     alist.add ("nu_3", 0.008);
     syntax.add ("dt1", "dg C", Syntax::Const,
@@ -2049,7 +2051,7 @@ static struct SVAT_PMSWSyntax
     syntax.add ("dt2", "dg C", Syntax::Const,
                 "upper solution limit in Newton-Raphson method");
     alist.add ("dt2", 5.0);
-    syntax.add ("acc", "NA", Syntax::Const,
+    syntax.add ("acc", Syntax::None (), Syntax::Const,
                 "iteration accuracy in Newton-Raphson method");
     alist.add ("acc", 0.01);
 #endif
