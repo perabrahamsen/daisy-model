@@ -1775,8 +1775,12 @@ Setting additional pool to zero");
 				      0.0),
 			total);
 
-      if (SOM_fractions.size () != 0)
-	// Forced SOM fractions, don't retry.
+      // Forced SOM fractions, don't retry.
+      bool SOM_fractions_fully_specified = SOM_fractions.size () != 0;
+      for (unsigned int i = 0; i < SOM_fractions.size (); i++)
+        if (SOM_fractions[i] < 0.0)
+          SOM_fractions_fully_specified = false;
+      if (SOM_fractions_fully_specified)
 	break;
 
       if (!use_humus_equation)

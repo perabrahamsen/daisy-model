@@ -12,6 +12,27 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.05
+
+** You can now specify a single SOM pool.
+
+If you want to specify the amount of inactive humus in a specific
+horizon, and let Daisy figure out the partitioning among the active
+pools itself, you can specify -1 for the active pools in the
+SOM_fractions horizon parameter.  For example
+
+  (defhorizon foo default
+    (SOM_fractions -1 -1 0.05)
+    ;; More parameters.
+  )
+
+will specify that 5% of the humus in the 'foo' horizon is inactive
+(i.e. is in SOM3), and let Daisy figure out how much of the rest is in
+SOM1 and SOM2 by itself.
+
+In general, the special value -1 in SOM_fractions means Daisy should
+figure out the content itself.
+
 * 3.04
 
 ** dk-horizon.dai updated with new and better numbers.

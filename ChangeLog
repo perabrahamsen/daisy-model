@@ -1,3 +1,13 @@
+2003-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.05 released.
+
+2003-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (partition): Handle negative values in
+	'SOM_fractions'. 
+	* horizon.C (load_syntax): Ditto.
+
 2003-08-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.04 released.

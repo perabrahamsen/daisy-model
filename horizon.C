@@ -29,7 +29,7 @@
 #include "mathlib.h"
 #include "tortuosity.h"
 #include "log.h"
-#include "check.h"
+#include "check_range.h"
 #include "vcheck.h"
 #include <vector>
 #include <map>
@@ -595,10 +595,39 @@ pools.  The C/N ration for the SOM pools will then gradually move towards\n\
 the values specified by 'SOM_C_per_N'.\n\
 By default, the values given by 'SOM_C_per_N' will be used for\n\
 initialization.");
-  syntax.add_fraction ("SOM_fractions", 
-		       Syntax::OptionalConst, Syntax::Sequence, "\
-Fraction of humus in each SOM pool, from slowest to fastest.");
-  syntax.add_check ("SOM_fractions", VCheck::sum_equal_1 ());
+  static const BelowOrEqual max_1 (1.0);
+  syntax.add ("SOM_fractions",  Syntax::None (), max_1,
+              Syntax::OptionalConst, Syntax::Sequence, "\
+Fraction of humus in each SOM pool, from slowest to fastest.\n\
+Negative numbers mean unspecified, let Daisy find appropriate values.");
+  static const class SOM_fractions_check_type : public VCheck
+  {
+    void check (const Syntax& syntax, const AttributeList& alist, 
+                const string& key)
+      const throw (string)
+    {
+      daisy_assert (key == "SOM_fractions");
+      daisy_assert (alist.check (key));
+      daisy_assert (syntax.lookup (key) == Syntax::Number);
+      daisy_assert (syntax.size (key) == Syntax::Sequence);
+      vector<double> fractions = alist.number_sequence ("SOM_fractions");
+      bool has_negative = false;
+      double sum = 0.0;
+      for (unsigned int i = 0; i < fractions.size (); i++)
+        {
+          if (fractions[i] < 0)
+            has_negative = true;
+          else
+            sum += fractions[i];
+        }
+      if (!has_negative && !approximate (sum, 1.0))
+        throw string ("sum must be 1.0");
+      if (sum > 1.0)
+        throw string ("sum must be at most 1.0");
+    };
+  } SOM_fractions_check;
+  syntax.add_check ("SOM_fractions", SOM_fractions_check);
+
   syntax.add ("turnover_factor", Syntax::None (), Check::non_negative (),
 	      Syntax::Const, "\
 Factor multiplied to the turnover rate for all organic matter pools in\n\
