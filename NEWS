@@ -12,9 +12,30 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.93
+
+** Groundwater pipe now survives flooding.
+
+The pipe groundwater model does not works for a toally satiated soil
+profile.  To work around this, it will now push water to the surface
+before the first node get satiated.  This approximates some of the
+effects of a groundwater table that lies above the soil surface.  But
+if you log the groundwater table, it will be shown somewhere below the
+surface.
+
+You will get messages aboud flooding beginning and ending when this
+happens.  If this happens a lot in reality, you should suggest the
+farmer to improve his drainage system, it is obviously inadequate.  If
+it only happens in simulations, you should increase either anisotropy
+or K_aquitard, depending on whether you want the excess water in the
+pipes or not.
+
+Anyway, the effect is that the simulations survives in many cases
+where they didn't use to.
+
 * 2.92
 
-** New anisotropy Soil parameter.
+** New anisotropy horizon parameter.
 
 Set this to a number larger than 1.0 to make water flow faster towards
 drain pipes.  
@@ -41,7 +62,7 @@ will print time each our or every second week, respectively.
 
 * 2.90
 
-** Updated dk-horizon.dai with nw conductivity parameters.
+** Updated dk-horizon.dai with new conductivity parameters.
 
 * 2.89
 

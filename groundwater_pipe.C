@@ -57,6 +57,8 @@ class GroundwaterPipe : public Groundwater
   enum GWT_State_Type {Raising, Falling} GWT_State;
   vector<double> S;		// Pipe drainage. [cm^3/cm^3/h]
   vector<double> Percolation;	// [cm^3/cm^2/h]
+  double extra_water_to_surface; // [cm^3/cm^2/h]
+  bool flooding;
   vector<double> ThetaOld;	// [cm^3/cm^3]
 
 
@@ -84,13 +86,15 @@ public:
 #endif
   }
   void update_water (const Soil&, const SoilHeat&,
+		     UZtop& top,
   		     vector<double>& S_sum,
   		     vector<double>& S_drain,
 		     vector<double>& h,
 		     vector<double>& h_ice,
 		     vector<double>& Theta,
 		     vector<double>& q,
-		     vector<double>& q_p);
+		     vector<double>& q_p,
+		     Treelog& msg);
   void output (Log& log) const;
 
 private:
@@ -150,8 +154,12 @@ public:
       pipe_position (al.number ("pipe_position")),
       K_aquitard_ (al.number ("K_aquitard")),
       Z_aquitard_ (al.number ("Z_aquitard")),
-      h_aquifer (al.check ("h_aquifer") ? al.number ("h_aquifer") : Z_aquitard_),
-      height (al.check ("height") ? al.number ("height") : pipe_position)
+      h_aquifer (al.check ("h_aquifer") 
+		 ? al.number ("h_aquifer") 
+		 : Z_aquitard_),
+      height (al.check ("height") ? al.number ("height") : pipe_position),
+      extra_water_to_surface (-42.42e42),
+      flooding (false)
     { }
   ~GroundwaterPipe ()
     { }
@@ -160,20 +168,24 @@ public:
 void
 GroundwaterPipe::update_water (const Soil& soil,
 			       const SoilHeat& soil_heat,
+			       UZtop& top,
 			       vector<double>& S_sum,
 			       vector<double>& S_drain,
 			       vector<double>& h,
 			       vector<double>& h_ice,
 			       vector<double>& Theta,
 			       vector<double>& q,
-			       vector<double>& q_p)
+			       vector<double>& q_p,
+			       Treelog& msg)
 {
+  Treelog::Open nest (msg, "Groundwater " + name);
   fill (S.begin (), S.end (), 0.0);
   for (unsigned int i = 1; i <= i_bottom+1; i++)
     {
        Percolation[i-1] = - q[i] - q_p[i];
        ThetaOld[i-1]    = Theta[i-1];
     }
+  extra_water_to_surface = 0.0;
   int i_sat = i_bottom;
   for (unsigned int i = i_bottom; ; i--)
     {
@@ -234,6 +246,33 @@ GroundwaterPipe::update_water (const Soil& soil,
        daisy_assert (isfinite (q[i]));
        daisy_assert (isfinite (q_p[i]));
     }
+  if (isnormal (extra_water_to_surface))
+    {
+      if (extra_water_to_surface > 0)
+	{
+	  const bool ok = top.accept_top (msg, extra_water_to_surface);
+	  daisy_assert (ok);
+	  q[0] += extra_water_to_surface;
+	  if (!flooding)
+	    {
+	      msg.message ("Flooding begins");
+	      flooding = true;
+	    }
+	}
+      else
+	{
+	  TmpStream tmp;
+	  tmp () << "Extra water " << extra_water_to_surface 
+		 << " should be >= 0.0";
+	  msg.error (tmp.str ());
+	}
+    }
+  else if (flooding)
+    {
+      msg.message ("Flooding ends");
+      flooding = false;
+    }
+  
   daisy_assert(DrainFlow>=0.0);
   height = GWT_new;
   for (unsigned int i = i_GWT; i <= i_bottom; i++)
@@ -405,17 +444,26 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 		 }
 	       else
 		 {
+#if 0
 		   TmpStream tmp;
 		   tmp () << "percolation[" << (j - 1) 
 			  << "] = " << (def / dt) << " (dw < def)";
 		   daisy_bug (tmp.str ());
+#endif
+		   extra_water_to_surface += def / dt;
 		 }
                if (def<=0.0) break;
              }
            break;
          }
        else if (i <= 0)
-         throw ("Tile drain system inadequate. Soil profile saturated");
+	 {
+	   extra_water_to_surface += def/dt;
+	   def = 0.0;
+#if 0
+	   daisy_bug ("Tile drain system inadequate. Soil profile saturated");
+#endif
+	 }
        else
          {
            def = 0.0;
@@ -438,10 +486,13 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 		 }
 	       else
 		 {
+#if 0
 		   TmpStream tmp;
 		   tmp () << "percolation[" << (j - 1) 
 			  << "] = " << (def / dt) << " (dw < def)";
 		   daisy_bug (tmp.str ());
+#endif
+		   extra_water_to_surface += def / dt;
 		 }
                if (def<=0.0) break;
              }

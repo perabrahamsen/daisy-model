@@ -45,14 +45,15 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time& time, Treelog&) = 0;
-  virtual void update_water (const Soil&, const SoilHeat&,
+  virtual void update_water (const Soil&, const SoilHeat&, UZtop&,
 			     vector<double>& S_sum,
 			     vector<double>& S_drain,
 			     vector<double>& h,
 			     vector<double>& h_ice,
 			     vector<double>& Theta,
 			     vector<double>& q,
-			     vector<double>& q_p);
+			     vector<double>& q_p,
+			     Treelog& msg);
   virtual void output (Log&) const;
 
   // Accessors.

@@ -1,5 +1,15 @@
 2003-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.93 released.
+
+2003-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (extra_water_to_surface): New variable.
+	(update_water, RaisingGWT): Use it.
+	* groundwater.h, groundwater.C, groundwater_pipe.C (update_water):
+	Take UZtop and Trelog arguments. 
+	* soil_water.C (tick): Update caller.
+	
 	* Version 2.92 released.
 
 2003-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
