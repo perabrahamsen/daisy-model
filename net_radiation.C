@@ -1,4 +1,4 @@
-// net_radiation.C 
+// net_radiation.C
 
 #include "net_radiation.h"
 #include "log.h"
@@ -36,14 +36,14 @@ struct NetRadiationParent : public NetRadiation
   double net_radiation_;
 
   // Utilities
-  virtual double NetLongwaveRadiation (double Cloudiness, // [MJ/m2/d] 
+  virtual double NetLongwaveRadiation (double Cloudiness, // [MJ/m2/d]
 				       double Temp,
 				       double VapourPressure) const = 0;
   // Simulation.
   double net_radiation () const
     { return net_radiation_; }
-  void tick (double Cloudiness, double Temp, 
-	     double VapourPressure, double Si, 
+  void tick (double Cloudiness, double Temp,
+	     double VapourPressure, double Si,
 	     double Albedo)
     {
       const double Ln
@@ -52,7 +52,8 @@ struct NetRadiationParent : public NetRadiation
     }
   void tick (const Weather& weather, double Albedo)
     { tick (weather.cloudiness (), weather.daily_air_temperature (),
-	    weather.vapor_pressure (), weather.daily_global_radiation (),
+	    weather.vapor_pressure () * 0.001, // Pa -> kPa
+            weather.daily_global_radiation (),
 	    Albedo); }
 
   // Create & Destroy.
@@ -104,16 +105,16 @@ struct NetRadiationIdsoJackson : public NetRadiationParent
 
 struct NetRadiationBrutsaert : public NetRadiationParent
 {
-  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d] 
+  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d]
 			      double Temp,
 			      double VapourPressure) const
     {
-      const double ea = VapourPressure / 10;   /*mb*/
+      const double ea = VapourPressure / 10.0;   /*mb*/
       const double NetEmiss
 	= SurEmiss * (1 - 1.24 * pow (ea / (Temp + 273), 1.0 / 7.0));
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
-  
+
   NetRadiationBrutsaert (const AttributeList& al)
     : NetRadiationParent (al)
     { }
@@ -121,14 +122,14 @@ struct NetRadiationBrutsaert : public NetRadiationParent
 
 struct NetRadiationSwinbank : public NetRadiationParent
 {
-  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d] 
+  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d]
 			      double Temp,
 			      double) const
     {
       const double NetEmiss = SurEmiss * (1 - 0.92e-5 * pow (Temp + 273, 2));
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
-  
+
   NetRadiationSwinbank (const AttributeList& al)
     : NetRadiationParent (al)
     { }
@@ -136,16 +137,16 @@ struct NetRadiationSwinbank : public NetRadiationParent
 
 struct NetRadiationSatterlund : public NetRadiationParent
 {
-  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d] 
+  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d]
 			      double Temp,
 			      double VapourPressure) const
     {
-      const double ea = VapourPressure / 10;   /*mb*/
-      const double NetEmiss 
+      const double ea = VapourPressure / 10.0;   /*mb*/
+      const double NetEmiss
 	= SurEmiss * (1 - 1.08 * (1 - exp (-pow (ea, (Temp + 273) / 2016.0))));
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
-  
+
   NetRadiationSatterlund (const AttributeList& al)
     : NetRadiationParent (al)
     { }
@@ -180,7 +181,7 @@ static struct NetRadiationSyntax
       // We make them optional, so other code doesn't have to set them.
       syntax_brunt.add ("a", Syntax::None (), Syntax::OptionalConst,
 			"Brunt `a' parameter (offset).");
-      syntax_brunt.add ("b", "1/sqrt(Pa)", Syntax::OptionalConst,
+      syntax_brunt.add ("b", "1/sqrt(kPa)", Syntax::OptionalConst,
 			"Brunt `b' parameter (vapor pressure factor).");
       AttributeList& alist_brunt = *new AttributeList ();
       alist_brunt.add ("description", "\

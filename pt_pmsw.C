@@ -605,8 +605,8 @@ int RAC(double u, double h, double LAI, double c_d, double w, double z_0s,
            	   		rd=0.67*h;
            	   		ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
                         	}
-                       }         
-         rr_ac=(alpha_u/(2.0*LAI*arac))*sqrt((w/ru_h)*1/(1-exp(-alpha_u/2)));
+                       }
+         rr_ac=(alpha_u/(2.0*LAI*arac))*sqrt((w/ru_h)*1.0/(1-exp(-alpha_u/2.0)));
 
    	return 0;
    	}

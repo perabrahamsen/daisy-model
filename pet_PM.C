@@ -104,7 +104,7 @@ PetPM::ETaero (double AtmPressure, double Temp, double ea, double ra,
   const double x2 = 86.4 * Weather::AirDensity (AtmPressure, Temp) * 1.013 /
     Weather::LatentHeatVaporization (Temp);
   const double x3 = (Weather::SaturationVapourPressure (Temp) - ea) / ra;
-  return (1 / x1 * x2 * x3);
+  return (1.0 / x1) * x2 * x3;
 }
 
 double 
@@ -173,12 +173,12 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
   // Weather.
   const double Cloudiness = weather.cloudiness ();
   const double Temp = weather.hourly_air_temperature ();
-  const double VaporPressure = weather.vapor_pressure ();
+  const double VaporPressure = 0.001 * weather.vapor_pressure (); // Pa -> kPa
   const double Si = weather.hourly_global_radiation () 
     * (60.0 * 60.0 * 24.0) / 1e6; // W/m^2 -> MJ/m^2/d
   const double U2 = weather.wind ();
   const double AtmPressure = weather.AtmosphericPressure ();
-  
+
   // Albedo.
   const double LAI = crops.LAI ();
   double Albedo;
@@ -196,12 +196,13 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
   const double Rn = net_radiation.net_radiation ();
 
   // Ground heat flux.
-  const double G = soil_heat.top_flux (soil, soil_water);
-  
+  const double G = soil_heat.top_flux (soil, soil_water)
+    * (60.0 * 60.0 * 24.0) / 1e6; // W/m^2 -> MJ/m^2/d
+
 
   if (LAI > 0.0)
     {
-      const double CropHeight = crops.height ();
+      const double CropHeight = 0.01 * crops.height (); //cm -> m
 
       // Dry.
       reference_evapotranspiration_dry 
