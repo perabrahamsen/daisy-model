@@ -158,6 +158,8 @@ public:
   // A check_fun is a function used for extra syntax checking.
   typedef bool (*check_fun)(const AttributeList&);
   typedef bool (*check_list_fun)(const vector<AttributeList*>&);
+  void add_check (check_fun);
+  void add_check (check_list_fun);
 
   Syntax ();
   Syntax (check_fun);
@@ -176,7 +178,7 @@ struct add_submodule
 		 const string& description = Syntax::Unknown ())
   {
     Syntax& s = *new Syntax ();
-    AttributeList& a = *new AttributeList ();
+    AttributeList a;
     T::load_syntax (s, a);
     syntax.add (name, s, cat, Syntax::Singleton, description);
     alist.add (name, a);
@@ -191,7 +193,7 @@ struct add_submodule_sequence
 			  const string& description = Syntax::Unknown ())
   {
     Syntax& s = *new Syntax ();
-    AttributeList& a = *new AttributeList ();
+    AttributeList a;
     T::load_syntax (s, a);
     syntax.add (name, s, a, cat, description);
   }

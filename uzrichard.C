@@ -358,6 +358,7 @@ UZRichard::richard (const Soil& soil,
 	      // This code checks that darcy and the mass preservation
 	      // code gives the same results.
 	      {
+		bool error_found = false;
                 q[first] = delta_top_water / ddt;
 		for (int i = first; i < last; i++)
 		  {
@@ -374,12 +375,18 @@ UZRichard::richard (const Soil& soil,
 		    if (fabs (q[i+1] / darcy - 1.0) > 0.10
                         && fabs (q[i+1] - darcy) > 0.01 / ddt
                         && i<2)
-		      CERR << "q[" << (i + 1) << "] = " << q[i+1]
-			   << ", darcy = " << darcy
-                           << "delta_top_water = " << delta_top_water
-                           << " ddt = " << ddt
-                           << " top.flux() = " << top.flux_top() << "\n";
+		      {
+			error_found = true;
+			CERR << "q[" << (i + 1) << "] = " << q[i+1]
+			     << ", darcy = " << darcy
+			     << "delta_top_water = " << delta_top_water
+			     << " ddt = " << ddt
+			     << " top.flux() = " << top.flux_top() << "\n";
+		      }
 		  }
+		if (error_found)
+		  THROW ("\
+Richard eq. mass balance flux is different than darcy flux");
 	      }
 #endif
 	      top_water += delta_top_water;

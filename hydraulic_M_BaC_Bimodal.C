@@ -38,8 +38,10 @@ HydraulicM_BaC_Bimodal::Theta (const double h) const
 {
   if (h < h_b)
     return Se (h) * (Theta_b - Theta_res) + Theta_res;
-  else
+  else if (h < 0.0)
     return (Theta_sat - Theta_b) / (-h_b) * (h - h_b) + Theta_b;
+  else
+    return Theta_sat;
 }
 
 double

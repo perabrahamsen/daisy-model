@@ -425,7 +425,7 @@ Syntax::add (const string& key, const Syntax& s, const AttributeList& al,
 	     category req, const string& d)
 {
   add (key, s, req, Sequence, d);
-  impl.alists[key] = &al;
+  impl.alists[key] = new AttributeList (al);
 }
 
 void 
@@ -512,6 +512,14 @@ unsigned int
 Syntax::entries () const
 { return impl.types.size (); }
 
+void 
+Syntax::add_check (check_fun)
+{ }
+
+void 
+Syntax::add_check (check_list_fun)
+{ }
+
 Syntax::Syntax () : impl (*new Implementation (NULL, NULL))
 { }
 
@@ -520,7 +528,6 @@ Syntax::Syntax (check_fun c) : impl (*new Implementation (c, NULL))
 
 Syntax::Syntax (check_list_fun c) : impl (*new Implementation (NULL, c))
 { }
-
 Syntax::~Syntax ()
 {
   delete &impl;
