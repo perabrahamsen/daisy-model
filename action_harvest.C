@@ -17,7 +17,6 @@ private:
   const double stem;
   const double leaf;
   const double sorg;
-  const double dead;
 
 public:
   void doIt (Daisy&);
@@ -41,7 +40,7 @@ ActionHarvest::doIt (Daisy& daisy)
       if (!match (**i))
 	continue;
       vector<const Harvest*> entry
-	= (*i)->harvest (daisy.time, name, stub, stem, leaf, sorg, dead);
+	= (*i)->harvest (daisy.time, name, stub, stem, leaf, sorg);
       daisy.harvest.insert (daisy.harvest.end (),
 			    entry.begin (), entry.end ());
       cout << " " << (*i)->name;
@@ -56,8 +55,7 @@ ActionHarvest::ActionHarvest (const AttributeList& al, const Action *const p)
     stub (al.number ("stub")),
     stem (al.number ("stem")),
     leaf (al.number ("leaf")),
-    sorg (al.number ("sorg")),
-    dead (al.number ("dead"))
+    sorg (al.number ("sorg"))
 { }
 
 ActionHarvest::~ActionHarvest ()
@@ -89,8 +87,6 @@ ActionHarvestSyntax::ActionHarvestSyntax ()
   alist.add ("leaf", 1.0);
   syntax.add ("sorg", Syntax::Number, Syntax::Const);
   alist.add ("sorg", 1.0);
-  syntax.add ("dead", Syntax::Number, Syntax::Const);
-  alist.add ("dead", 1.0);
   syntax.order ("name");
   Action::add_type ("harvest", alist, syntax, &ActionHarvest::make);
 }

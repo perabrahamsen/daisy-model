@@ -10,13 +10,22 @@ class AttributeList;
 class Syntax;
 class Log;
 class Filter;
-class Soil;
+class Geometry;
 
 class OM
 { 
+  // Parameters
+public:
+  static const double Unspecified;// No initial fraction specified.
+  double initial_fraction;	// Relative fraction for this om.
+  double initial_C_per_N;	// Initial value for C/N.
+
+public:
+  
   // Content.
 public:
   double top_C;			// Carbon on the ground.
+  double top_N;			// Nitrogen on the ground;
   vector<double> C;		// Carbon in each node.
   /* const */ vector<double> C_per_N;	// Ratio of carbon per nitrogen.
   const double turnover_rate;	// How fast this is it turned over?
@@ -27,12 +36,21 @@ public:
   // Simulation.
 public:
   void output (Log&, Filter&) const;
-  void mix (const Soil&, double from, double to, double penetration = 1.0);
-  void distribute (const Soil&, const vector<double>& density);
-  void swap (const Soil&, double from, double middle, double to);
-  double total_C (const Soil& soil) const;
-  double total_N (const Soil& soil) const;
+  void mix (const Geometry&, double from, double to, double penetration = 1.0);
+  void distribute (const Geometry&, const vector<double>& density);
+  void swap (const Geometry&, double from, double middle, double to);
+  double total_C (const Geometry& geometry) const;
+  double total_N (const Geometry& geometry) const;
   void pour (vector<double>& cc, vector<double>& nn);
+  void add (double C, double N);// Add dead leafs.
+  void add (const Geometry&,	// Add dead roots.
+	    double C, /* Fixed C/N */
+	    const vector<double>& density);
+  void add (const Geometry&,	// Add dead roots.
+	    double C, double N, 
+	    const vector<double>& density);
+
+
 #if 0
 public:
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
@@ -59,10 +77,13 @@ private:
 #endif  
   // Create & Destroy.
 public:
+  static OM& create (const AttributeList& al, const Geometry& geometry);
+  void initialize (const Geometry&);
+
   static void load_syntax (Syntax&, AttributeList&);
   OM (const AttributeList& al);
-  OM (const AttributeList& al, const Soil& soil);
-  OM (const AttributeList& al, const Soil& soil, double C, double N);
+  OM (const AttributeList& al, const Geometry& geometry);
+  OM (const AttributeList& al, const Geometry& geometry, double C, double N);
 };
 
 #endif OM_H

@@ -24,8 +24,6 @@ private:
   const double leaf_N;
   const double sorg_DM;
   const double sorg_N;
-  const double dead_DM;
-  const double dead_N;
 
   // Simulation:
 public:
@@ -36,7 +34,7 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   Harvest (string col, Time t, string crp, 
 	   double sC, double sN, double lC, double lN, 
-	   double oC, double oN, double dC, double dN);
+	   double oC, double oN);
 };      
 
 #endif HARVEST_H

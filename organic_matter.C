@@ -6,6 +6,7 @@
 #include "log.h"
 #include "filter.h"
 #include "am.h"
+#include "om.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_NH4.h"
@@ -57,7 +58,7 @@ struct OrganicMatter::Implementation
 	     SoilNO3&, SoilNH4&);
   void mix (const Soil&, double from, double to, double penetration);
   void swap (const Soil& soil, double from, double middle, double to);
-  void output (Log&, Filter&, const Soil&) const;
+  void output (Log&, Filter&, const Geometry&) const;
   bool check () const;
 
   double heat_turnover_factor (double T) const;
@@ -98,8 +99,8 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
       assert (finite (N_need));
       // Check that we calculated the right rate.
       assert ((N_soil == N_used)
-	      ? (abs (N_need) < 1e-10)
-	      : (abs (1.0 - N_need / (N_soil - N_used)) < 0.01));
+	      ? (fabs (N_need) < 1e-10)
+	      : (fabs (1.0 - N_need / (N_soil - N_used)) < 0.01));
     }
   N_used += N_need;
 
@@ -192,12 +193,12 @@ OrganicMatter::Implementation::Buffer::Buffer (const Soil& soil,
 
 void
 OrganicMatter::Implementation::output (Log& log, Filter& filter,
-				       const Soil& soil) const
+				       const Geometry& geometry) const
 {
   log.output ("CO2", filter, CO2, true);
   if (filter.check ("total_N", true) || filter.check ("total_C", true))
     {
-      const int size = soil.size ();
+      const int size = geometry.size ();
 
       double total_N = 0.0;
       double total_C = 0.0;
@@ -219,18 +220,14 @@ OrganicMatter::Implementation::output (Log& log, Filter& filter,
 	  const int all_am_size = am.size ();
 	  for (int k = 0; k < all_am_size; k++)
 	    {
-	      const int am_size = am[i]->om.size ();
-	      for (int j = 0; j < am_size; j++)
-		{
-		  new_total_C += am[k]->om[j]->C[i];
-		  new_total_N += am[k]->om[j]->C[i] / am[k]->om[j]->C_per_N[i];
-		}
+	      new_total_C += am[k]->total_C (geometry);
+	      new_total_N += am[k]->total_N (geometry);
 	    }
 	  new_total_C += buffer.C[i];
 	  new_total_N += buffer.N[i];
 
-	  total_C += new_total_C * soil.dz (i);
-	  total_N += new_total_N * soil.dz (i);
+	  total_C += new_total_C * geometry.dz (i);
+	  total_N += new_total_N * geometry.dz (i);
 	}
       log.output ("total_N", filter, total_N, true);
       log.output ("total_C", filter, total_C, true);
@@ -257,7 +254,8 @@ OrganicMatter::Implementation::check () const
 
 static bool om_compare (const OM* a, const OM* b)
 {
-  return a->C_per_N[0] < b->C_per_N[0];
+  return (a->C_per_N.size () == 0 ? a->initial_C_per_N : a->C_per_N[0])
+    < (b->C_per_N.size () == 0 ? b->initial_C_per_N : b->C_per_N[0]);
 }
 
 void
@@ -271,8 +269,10 @@ OrganicMatter::Implementation::monthly (const Soil& soil)
   for (int i = 0; i < am_size; i++)
     {
       bool keep;
-
-      if (min_AM_C == 0.0)
+      
+      if (am[i]->locked ())
+	keep = true;
+      else if (min_AM_C == 0.0)
 	if (min_AM_N == 0.0)
 	  // No requirement, keep it.
 	  keep = true;
@@ -288,14 +288,6 @@ OrganicMatter::Implementation::monthly (const Soil& soil)
 	  keep = (am[i]->total_N (soil) * (100.0 * 100.0) > min_AM_N
 		  || am[i]->total_C (soil) * (100.0 * 100.0) > min_AM_C);
       
-      cerr << (keep ? "Keeping " : "Removing ") << am[i]->name 
-	   << " (" << am[i]->creation.year ()
-	   << "-" << am[i]->creation.month () 
-	   << "-" << am[i]->creation.mday () << ") N = " 
-	   << am[i]->total_N (soil) * (100.0 * 100.0) 
-	   << ", C = "  << am[i]->total_C (soil) * (100.0 * 100.0) 
-	   << ".\n";
-
       if (keep)
 	new_am.push_back (am[i]);
       else
@@ -319,11 +311,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   const int all_am_size = am.size ();
   vector<OM*> added;
   for (int i = 0; i < all_am_size; i++)
-    {
-      int am_size = am[i]->om.size ();
-      for (int j = 0; j < am_size; j++)
-	added.push_back (am[i]->om[j]);
-    }
+    am[i]->append_to (added);
   sort (added.begin (), added.end (), om_compare);
   
   // Setup arrays.
@@ -598,7 +586,7 @@ OrganicMatter::check (const AttributeList& al)
 		}
 	      double sum
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
-	      if (abs (sum - 1.0) > 0.0001)
+	      if (fabs (sum - 1.0) > 0.0001)
 		{
 		  cerr << "The sum of all fractions is " << sum << "\n";
 		  om_ok = false;
@@ -641,7 +629,7 @@ OrganicMatter::check (const AttributeList& al)
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
-      if (abs (sum - 1.0) > 0.0001)
+      if (fabs (sum - 1.0) > 0.0001)
 	{
 	  cerr << "The sum of all fractions is " << sum << "\n";
 	  om_ok = false;
@@ -676,7 +664,7 @@ OrganicMatter::check (const AttributeList& al)
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
-      if (abs (sum - 1.0) > 0.0001)
+      if (fabs (sum - 1.0) > 0.0001)
 	{
 	  cerr << "The sum of all fractions is " << sum << "\n";
 	  om_ok = false;
@@ -721,7 +709,7 @@ OrganicMatter::check_am (const AttributeList& am) const
 		}
 	      double sum
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
-	      if (abs (sum - 1.0) > 0.0001)
+	      if (fabs (sum - 1.0) > 0.0001)
 		{
 		  cerr << "The sum of all fractions is " << sum << "\n";
 		  om_ok = false;

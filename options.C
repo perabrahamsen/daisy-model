@@ -2,6 +2,7 @@
 
 #include "options.h"
 #include <vector>
+#include <fcntl.h>
 
 int
 Options::find_file (const string name)

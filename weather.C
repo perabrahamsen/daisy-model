@@ -84,8 +84,9 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
     Syntax& s = *new Syntax ();
     AttributeList& a = *new AttributeList ();
     IM::load_syntax (s, a);
-    a.add ("NH4", 0.6e-6);	// kg/m²/d
-    a.add ("NO3", 0.3e-6);	// kg/m²/d
+    // These values change often, and shouldn't have defaults.
+    // a.add ("NH4", 0.6e-6);	// kg/m²/d
+    // a.add ("NO3", 0.3e-6);	// kg/m²/d
     syntax.add ("DryDeposit", s, Syntax::Const, Syntax::Singleton);
     alist.add ("DryDeposit", a);
   }
@@ -94,8 +95,9 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
     Syntax& s = *new Syntax ();
     AttributeList& a = *new AttributeList ();
     IM::load_syntax (s, a);
-    a.add ("NO3", 0.6e-6); // kg/m²/mm
-    a.add ("NH4", 0.9e-6); // kg/m²/mm
+    // These values change often, and shouldn't have defaults.
+    // a.add ("NO3", 0.6e-6); // kg/m²/mm
+    // a.add ("NH4", 0.9e-6); // kg/m²/mm
     syntax.add ("SoluteDeposit", s, Syntax::Const, Syntax::Singleton);
     alist.add ("SoluteDeposit", a);
   }

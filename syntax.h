@@ -51,7 +51,6 @@ public:
   static const char* category_name (category);
 
   // These functions will check that an alist conform to the syntax.
-  // The first is quite chatty about it.
   bool check (const AttributeList&, string = "<unknown>") const;
 
   // These functions will allow you to lookup information about a
@@ -65,6 +64,9 @@ public:
   int  size (string) const;
   bool ordered () const;
   const list<string>& order () const;
+
+  // Print whole syntax table.
+  void dump (int indent = 0) const;
 
   // Add syntax entries
   void add (string, type, category, int size = Singleton);
@@ -85,7 +87,6 @@ public:
   void order (string, string, string, string, string);
 
   // Create and Destroy.
-  void dump (int indent = 0) const;
 
   // A check_fun is a function used for extra syntax checking.
   typedef bool (*check_fun)(const AttributeList&);

@@ -3,56 +3,68 @@
 #ifndef AM_H
 #define AM_H
 
-#include <string>
+#include "common.h"
 #include <vector>
-#include "time.h"
-#include "om.h"
 
 class AttributeList;
 class Library;
 class Syntax;
 class Log;
 class Filter;
-class Soil;
+class Geometry;
 class Time;
 class OrganicMatter;
+class OM;
 
 class AM
 {
   // Content.
+  struct Implementation;
+  Implementation& impl;
 public:
-  const Time creation;		// When it was created.
-  const string name;		// Name of this kind of am.
-  vector<OM*> om;		// Organic matter pool.
-
+  const string name;
+  void append_to (vector<OM*>& added);
+  
   // Simulation.
 public:
   void output (Log&, Filter&) const;
   bool check () const;
-  void mix (const Soil&, double from, double to, double penetration = 1.0);
-  void swap (const Soil&, double from, double middle, double to);
-  double total_C (const Soil& soil) const;
-  double total_N (const Soil& soil) const;
+  void mix (const Geometry&, double from, double to, double penetration = 1.0);
+  void swap (const Geometry&, double from, double middle, double to);
+  double total_C (const Geometry& geometry) const;
+  double total_N (const Geometry& geometry) const;
   void pour (vector<double>& cc, vector<double>& nn);
+  void add (double C, double N);// Add dead leafs.
+  void add (const Geometry&,	// Add dead roots.
+	    double C, double N, 
+	    const vector<double>& density);
+
+  // Crop Locks.
+  enum lock_type { Unlocked, Locked };
+  void unlock ();		// Crop died.
+  bool locked () const;		// Test if this AM can be safely removed.
+  const string crop_name () const;	// Name of locked crop.
+  const string crop_part_name () const; // Name of locked crop part.
+
 
   // Library.
 public:
   static const Library& library ();
   static void derive_type (const string, const AttributeList&, string super);
   // Initialization.
-  static AM& create (const AttributeList&, const Soil&);
+  static AM& create (const AttributeList&, const Geometry&);
   // Fertilizer.
-  static AM& create (const AttributeList&, const Soil&, const Time&);
+  static AM& create (const AttributeList&, const Geometry&, const Time&);
   // Crop part.
-  static AM& create (const Soil&, const Time&, vector<const AttributeList*>,
-		     const string name, const string part, 
-		     double C, double N, const vector<double>& content);
+  static AM& create (const Geometry&, const Time&,
+		     vector<const AttributeList*>,
+		     const string name, const string part,
+		     lock_type lock = Unlocked);
   
 private:
-  AM (const Soil&, const Time&, vector<const AttributeList*>,
-      const string name, const string part, 
-      double C, double N, const vector<double>& content);
-  AM (const AttributeList&, const Soil&, const Time&);
+  AM (const Geometry&, const Time&, vector<const AttributeList*>,
+      const string name, const string part);
+  AM (const AttributeList&, const Geometry&, const Time&);
 public:
   virtual ~AM ();
 };

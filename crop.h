@@ -18,6 +18,8 @@ struct Library;
 struct Syntax;
 struct SoilWater;
 struct Soil;
+struct Geometry;
+struct OrganicMatter;
 struct SoilHeat;
 struct SoilNH4;
 struct SoilNO3;
@@ -48,16 +50,17 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&,
-		     const SoilHeat&, const SoilWater&,
+		     OrganicMatter&, const SoilHeat&, const SoilWater&,
 		     SoilNH4&, SoilNO3&) = 0;
-  virtual const Harvest& harvest (const Time&, Column&, 
+  virtual const Harvest& harvest (const string column_name,
+				  const Time&, const Geometry&, 
+				  OrganicMatter&,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
 				  double sorg_harvest,
-				  double dead_harvest,
 				  bool kill_off) = 0;
-  void kill (const Time&, Column&);
+  void kill (string, const Time&, const Geometry&, OrganicMatter&);
   virtual void output (Log&, Filter&) const = 0;
   
   // Queries.

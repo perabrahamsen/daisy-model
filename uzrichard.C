@@ -411,7 +411,7 @@ UZRichard::richard (const Soil& soil,
 		      * ((  (h[i - first] - h[i + 1 - first])
 			  / (soil.z (i) - soil.z (i + 1)))
 			 + 1);
-		    if (abs (q[i+1] / darcy - 1.0) > 0.01)
+		    if (fabs (q[i+1] / darcy - 1.0) > 0.01)
 		      cerr << "q[" << i + 1 << "] = " << q[i+1] 
 			   << ", darcy = " << darcy << "\n";
 		  }
@@ -476,10 +476,10 @@ UZRichard::converges (const vector<double>& previous,
 
   for (unsigned int i = 0; i < size; i++)
     {
-      if (   abs (current[i] - previous[i]) > max_absolute_difference ()
+      if (   fabs (current[i] - previous[i]) > max_absolute_difference ()
 	  && (   previous[i] == 0.0
 	      || current[i] == 0.0
-	      || (  abs ((current[i] - previous[i]) / previous[i])
+	      || (  fabs ((current[i] - previous[i]) / previous[i])
 		  > max_relative_difference ())))
 	return false;
     }

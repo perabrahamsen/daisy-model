@@ -49,9 +49,10 @@ Crop::create (const AttributeList& al, int layers)
 }
 
 void
-Crop::kill (const Time& time, Column& column)
+Crop::kill (const string name, const Time& time, const Geometry& geometry,
+	    OrganicMatter& organic_matter)
 {
-  harvest (time, column, 0.0, 0.0, 0.0, 0.0, 0.0, true);
+  harvest (name, time, geometry, organic_matter, 0.0, 0.0, 0.0, 0.0, true);
 }
 
 Crop::Crop (const string n)

@@ -156,7 +156,9 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_library ("defcrop", Crop::library (), &Crop::derive_type);
   syntax.add_library ("defhorizon", Horizon::library (), &Horizon::derive_type);
-  syntax.add_library ("defcolumn", Column::library (), &Column::derive_type);
+  syntax.add_library ("defcolumn",
+		      Librarian<Column>::library (),
+		      &Librarian<Column>::derive_type);
   syntax.add_library ("deflog", 
 		    Librarian<Log>::library (), 
 		    &Librarian<Log>::derive_type);
@@ -188,7 +190,8 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 	      Syntax::Singleton);
   syntax.add ("manager", Action::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::State);
-  syntax.add ("column", Column::library (), Syntax::State, Syntax::Sequence);
+  syntax.add ("column", Librarian<Column>::library (), 
+	      Syntax::State, Syntax::Sequence);
   syntax.add ("weather", Librarian<Weather>::library ());
   syntax.add ("groundwater", Groundwater::library (), Syntax::Const);
   add_submodule<Harvest> ("harvest", syntax, alist,

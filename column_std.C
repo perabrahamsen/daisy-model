@@ -50,18 +50,11 @@ public:
   void fertilize (const AttributeList&, const Time&, double from, double to);
   void fertilize (const IM&);
   void fertilize (const IM&, double from, double to);
-  void fertilize (const Time&, const vector<const AttributeList*>&,
-		  string name, string part, 
-		  double C, double N);
-  void fertilize (const Time&, const vector<const AttributeList*>&,
-		  string name, const vector<double>& density, 
-		  double C, double N);
   vector<const Harvest*> harvest (const Time&, const string name,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
-				  double sorg_harvest,
-				  double dead_harvest);
+				  double sorg_harvest);
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
 
@@ -76,11 +69,8 @@ public:
   void output (Log&, Filter&) const;
 
   // Create and Destroy.
-private:
-  friend class ColumnStandardSyntax;
-  static Column* make (const AttributeList&);
-  ColumnStandard (const AttributeList&);
 public:
+  ColumnStandard (const AttributeList&);
   ~ColumnStandard ();
 };
 
@@ -108,37 +98,11 @@ ColumnStandard::irrigate (double flux, double temp,
   bioclimate.irrigate (flux, temp, from);
 }
 
-void 
-ColumnStandard::fertilize (const Time& time, 
-			   const vector<const AttributeList*>& om, 
-			   string name, string part, 
-			   double C, double N)
-{
-  vector<double> content;
-  organic_matter.add (AM::create (soil, time, om, name, part,
-				  // g/m² -> g/cm²
-				  C * 1e-4, N * 1e-4, content));
-}
-
-void 
-ColumnStandard::fertilize (const Time& time,
-			   const vector<const AttributeList*>& om, 
-			   string name, const vector<double>& density, 
-			   double C, double N)
-{
-  vector<double> content;
-  for (unsigned int i = 0; i < density.size (); i++)
-    content.push_back (density[i] * soil.dz (i));
-		       
-  organic_matter.add (AM::create (soil, time, om, name, "root",
-				  // g/m² -> g/cm²
-				  C * 1e-4, N * 1e-4, content));
-}
-
-void 
+void
 ColumnStandard::fertilize (const AttributeList& al, const Time& time)
 {
-  organic_matter.add (AM::create (al, soil, time));
+  AM& am = AM::create (al, soil, time);
+  organic_matter.add (am);
 }
 
 void 
@@ -170,16 +134,15 @@ vector<const Harvest*>
 ColumnStandard::harvest (const Time& time, const string name,
 			 double stub_length,
 			 double stem_harvest, double leaf_harvest, 
-			 double sorg_harvest, double dead_harvest)
+			 double sorg_harvest)
 {
   vector<const Harvest*> harvest;
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     if ((*crop)->name == name)
       {
-	harvest.push_back (&(*crop)->harvest (time, *this, 
-					      stub_length, 
-					      stem_harvest, leaf_harvest,
-					      sorg_harvest, dead_harvest,
+	harvest.push_back (&(*crop)->harvest (name, time, soil, organic_matter,
+					      stub_length, stem_harvest,
+					      leaf_harvest, sorg_harvest, 
 					      false));
 	if (Crop::ds_remove (*crop))
 	  {
@@ -198,7 +161,7 @@ ColumnStandard::mix (const Time& time,
 {
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     {
-      (*crop)->kill (time, *this);
+      (*crop)->kill (name, time, soil, organic_matter);
       delete *crop;
     }
   crops.erase (crops.begin (), crops.end ());
@@ -275,8 +238,8 @@ ColumnStandard::tick (const Time& time,
 
   // Uptake and convertion of matter.
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
-    (*crop)->tick (time, bioclimate, soil, soil_heat, soil_water, 
-		   soil_NH4, soil_NO3);
+    (*crop)->tick (time, bioclimate, soil, organic_matter, 
+		   soil_heat, soil_water, soil_NH4, soil_NO3);
   organic_matter.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
   nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
   denitrification.tick (soil, soil_water, soil_heat, soil_NO3, organic_matter);
@@ -338,21 +301,6 @@ ColumnStandard::~ColumnStandard ()
   delete &nitrification;
 }
 
-// Add the Column syntax to the syntax table.
-Column*
-ColumnStandard::make (const AttributeList& al)
-{
-  if (check (al))
-    return new ColumnStandard (al);
-  else
-    return NULL;
-}
-
-static struct ColumnStandardSyntax
-{
-  ColumnStandardSyntax ();
-} column_syntax;
-
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<Bioclimate>;
 template class add_submodule<Surface>;
@@ -365,25 +313,34 @@ template class add_submodule<OrganicMatter>;
 template class add_submodule<Denitrification>;
 #endif
 
-ColumnStandardSyntax::ColumnStandardSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
+static struct ColumnStandardSyntax
+{
+  static Column& make (const AttributeList& al)
+  {
+    return *new ColumnStandard (al);
+  }
 
-  syntax.add ("crops", Crop::library (), Syntax::State, Syntax::Sequence);
-  alist.add ("crops", *new vector<const AttributeList*>);
+  ColumnStandardSyntax ()
+  { 
 
-  add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
-  add_submodule<Surface> ("Surface", syntax, alist);
-  add_submodule<Soil> ("Soil", syntax, alist);
-  add_submodule<SoilWater> ("SoilWater", syntax, alist);
-  add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
-  add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
-  add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
-  add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist);
-  syntax.add ("Nitrification", Librarian<Nitrification>::library (),
-	      Syntax::State);
-  add_submodule<Denitrification> ("Denitrification", syntax, alist);
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
 
-  Column::add_type ("default", alist, syntax, &ColumnStandard::make);
-}
+    syntax.add ("crops", Crop::library (), Syntax::State, Syntax::Sequence);
+    alist.add ("crops", *new vector<const AttributeList*>);
+
+    add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
+    add_submodule<Surface> ("Surface", syntax, alist);
+    add_submodule<Soil> ("Soil", syntax, alist);
+    add_submodule<SoilWater> ("SoilWater", syntax, alist);
+    add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
+    add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
+    add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
+    add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist);
+    syntax.add ("Nitrification", Librarian<Nitrification>::library (),
+		Syntax::State);
+    add_submodule<Denitrification> ("Denitrification", syntax, alist);
+
+    Librarian<Column>::add_type ("default", alist, syntax, &make);
+  }
+} column_syntax;

@@ -28,7 +28,6 @@
 // If you can delete const objects.
 #define CONST_DELETE
 
-#include <fcntl.h>
 #include <osfcn.h>
 #include <strstream.h>
 

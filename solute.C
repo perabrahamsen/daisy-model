@@ -91,7 +91,7 @@ Solute::tick (const Soil& soil,
 	(soil_water.Theta (j) + soil_water.Theta (j-1)
 	 + soil_water.Theta_old (j) + soil_water.Theta_old (j-1)) / 4.0;
       // From equation 7-39:
-      D[j] = (lambda * abs (-q / Theta)
+      D[j] = (lambda * fabs (-q / Theta)
 	      + soil.tortuosity_factor (j, Theta) * diffusion_coefficient ())
 	* Theta;
 
@@ -110,7 +110,7 @@ Solute::tick (const Soil& soil,
     const double Theta = 
       (soil_water.Theta (size - 1) + soil_water.Theta_old (size  - 1)) / 2.0;
     // From equation 7-39:
-    D[size] = (lambda * abs (-q / Theta)
+    D[size] = (lambda * fabs (-q / Theta)
 	       + soil.tortuosity_factor (size-1, Theta) 
 	       * diffusion_coefficient ())
       * Theta;
@@ -414,7 +414,7 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
 	}
       else
 	{
-	  if (abs (M_[i] / C_to_M (soil, soil_water.Theta (i), i, C_[i]) 
+	  if (fabs (M_[i] / C_to_M (soil, soil_water.Theta (i), i, C_[i]) 
 		   - 1.0) >= 0.001)
 	    THROW ("Solute C does not match M");
 	}

@@ -12,6 +12,8 @@
 #include "filter.h"
 #include "soil_water.h"
 #include "soil.h"
+#include "om.h"
+#include "organic_matter.h"
 #include "soil_heat.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
@@ -85,14 +87,15 @@ protected:
   // Simulation.
 public:
   void tick (const Time& time, const Bioclimate&, const Soil&,
+	     OrganicMatter&,
 	     const SoilHeat&,
 	     const SoilWater&, 
 	     SoilNH4&,
 	     SoilNO3&);
-  const Harvest& harvest (const Time&, Column&, 
-			  double stub_length,
-			  double stem_harvest, double leaf_harvest, 
-			  double sorg_harvest, double dead_harvest,
+  const Harvest& harvest (const string column_name,
+			  const Time&, const Geometry&, OrganicMatter&,
+			  double stub_length, double stem_harvest,
+			  double leaf_harvest, double sorg_harvest, 
 			  bool kill_off);
   void output (Log&, Filter&) const;
 
@@ -1630,6 +1633,7 @@ void
 CropOld::tick (const Time& time,
 	       const Bioclimate& bioclimate,
 	       const Soil& soil,
+	       OrganicMatter&,
 	       const SoilHeat& soil_heat,
 	       const SoilWater& soil_water, 
 	       SoilNH4& soil_NH4,
@@ -1753,10 +1757,11 @@ CropOld::tick (const Time& time,
 }
 
 const Harvest&
-CropOld::harvest (const Time& time, Column& column, 
+CropOld::harvest (const string column_name,
+		  const Time& time, const Geometry& geometry, 
+		  OrganicMatter& organic_matter,
 		  double stub_length,
-		  double stem_harvest, double, 
-		  double sorg_harvest, double,
+		  double stem_harvest, double, double sorg_harvest, 
 		  bool kill_off)
 {
   const Parameters::HarvestPar& Hp = par.Harvest;
@@ -1811,7 +1816,7 @@ CropOld::harvest (const Time& time, Column& column,
   const double NStub = NStem - NStraw;
 
   if (NLeaf > 0.0)
-    assert (abs (NLeaf / (NStem + NSOrg) - 1.0) < 0.0001);
+    assert (fabs (NLeaf / (NStem + NSOrg) - 1.0) < 0.0001);
   
   const double C_Stem = Hp.C_Stem;
   const double C_SOrg = Hp.C_SOrg;
@@ -1847,21 +1852,30 @@ CropOld::harvest (const Time& time, Column& column,
 
       // Add crop remains to the soil.
       if (stem_harvest < 1.0 && WStem > 0.0)
-	column.fertilize (time, Stem, name, "stem", WStem * C_Stem, NStem);
-      if (sorg_harvest < 1.0 && WSOrg > 0.0 && sorg_harvest < 1.0)
-	column.fertilize (time, SOrg, name, "sorg", 
-			  WSOrg * C_SOrg * (1.0 - sorg_harvest),
-			  NSOrg * (1.0 - sorg_harvest));
+	{
+	  AM& am = AM::create (geometry, time, Stem, name, "stem");
+	  am.add (WStem * C_Stem, NStem);
+	  organic_matter.add (am);
+	}
+      if (sorg_harvest < 1.0 && WSOrg > 0.0)
+	{
+	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
+	  am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest),
+		  NSOrg * (1.0 - sorg_harvest));
+	  organic_matter.add (am);
+	}
       if (WRoot > 0.0)
-	column.fertilize (time, Root, name, density, 
-			  WRoot * C_Root, NRoot);
+	{
+	  AM& am = AM::create (geometry, time, Root, name, "root");
+	  am.add (geometry, WRoot * C_Root, NRoot, density);
+	  organic_matter.add (am);
+	}
     }
 
-  return *new Harvest (column.name, time, name, 
+  return *new Harvest (column_name, time, name, 
 		       WStraw * stem_harvest, NStraw * stem_harvest,
 		       0.0, 0.0,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest,
-		       0.0, 0.0);
+		       WSOrg * sorg_harvest, NSOrg * sorg_harvest);
 }
 
 void

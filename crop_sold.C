@@ -12,6 +12,8 @@
 #include "filter.h"
 #include "soil_water.h"
 #include "soil.h"
+#include "organic_matter.h"
+#include "om.h"
 #include "soil_heat.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
@@ -84,14 +86,15 @@ protected:
   // Simulation.
 public:
   void tick (const Time& time, const Bioclimate&, const Soil&,
+	     OrganicMatter&,
 	     const SoilHeat&,
 	     const SoilWater&, 
 	     SoilNH4&,
 	     SoilNO3&);
-  const Harvest& harvest (const Time&, Column&, 
-			  double stub_length,
-			  double stem_harvest, double leaf_harvest, 
-			  double sorg_harvest, double dead_harvest,
+  const Harvest& harvest (const string column_name, const Time&,
+			  const Geometry& geometry, OrganicMatter&,
+			  double stub_length, double stem_harvest,
+			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off);
   void output (Log&, Filter&) const;
 
@@ -1655,12 +1658,13 @@ CropSold::NetProduction (const Bioclimate& bioclimate,
 
 void 
 CropSold::tick (const Time& time,
-		    const Bioclimate& bioclimate,
-		    const Soil& soil,
-		    const SoilHeat& soil_heat,
-		    const SoilWater& soil_water, 
-		    SoilNH4& soil_NH4,
-		    SoilNO3& soil_NO3)
+		const Bioclimate& bioclimate,
+		const Soil& soil,
+		OrganicMatter&,
+		const SoilHeat& soil_heat,
+		const SoilWater& soil_water, 
+		SoilNH4& soil_NH4,
+		SoilNO3& soil_NO3)
 {
   // Clear log.
   fill (var.RootSys.NO3Extraction.begin (), 
@@ -1776,10 +1780,11 @@ CropSold::tick (const Time& time,
 }
 
 const Harvest&
-CropSold::harvest (const Time& time, Column& column, 
+CropSold::harvest (const string column_name,
+		   const Time& time, const Geometry& geometry,
+		   OrganicMatter& organic_matter,
 		   double,
-		   double, double leaf_harvest, 
-		   double sorg_harvest, double, 
+		   double, double leaf_harvest, double sorg_harvest, 
 		   bool)
 {
   const Parameters::HarvestPar& Hp = par.Harvest;
@@ -1831,22 +1836,30 @@ CropSold::harvest (const Time& time, Column& column,
   var.Phenology.DS = DSremove;
 
   // Add crop remains to the soil.
-  if (leaf_harvest < 1.0)
-    column.fertilize (time, Leaf, name, "leaf", 
-		      (WLeaf * (1.0 - leaf_harvest)) * C_Leaf, 
-		      (NLeaf * (1.0 - leaf_harvest)));
-  if (sorg_harvest < 1.0)
-    column.fertilize (time, SOrg, name, "sorg", 
-		      WSOrg * (1.0 - sorg_harvest) * C_SOrg,
-		      NSOrg * (1.0 - sorg_harvest));
-  column.fertilize (time, Root, name, density, 
-		    WRoot * C_Root, NRoot);
-
-  return *new Harvest (column.name, time, name, 
+  if (leaf_harvest < 1.0 && WLeaf > 0.0)
+    {
+      AM& am = AM::create (geometry, time, Leaf, name, "leaf");
+      am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest), 
+	      NLeaf * (1.0 - leaf_harvest));
+      organic_matter.add (am);
+    }
+  if (sorg_harvest < 1.0 && WSOrg > 0.0)
+    {
+      AM& am = AM::create (geometry, time, SOrg, name, "sorg");
+      am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest),
+	      NSOrg * (1.0 - sorg_harvest));
+      organic_matter.add (am);
+    }
+  if (WRoot > 0.0)
+    {
+      AM& am = AM::create (geometry, time, Root, name, "root");
+      am.add (geometry, WRoot * C_Root, NRoot, density);
+      organic_matter.add (am);
+    }
+  return *new Harvest (column_name, time, name, 
 		       WLeaf * leaf_harvest, NLeaf * leaf_harvest,
 		       0.0, 0.0,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest,
-		       0.0, 0.0);
+		       WSOrg * sorg_harvest, NSOrg * sorg_harvest);
 }
 
 void

@@ -83,6 +83,8 @@
 		   (2.00 0.008))
 	(NfRootCnc (0.00 0.004)
 		   (2.00 0.004))
+	(DdRootCnc (0.00 0.004)
+		   (2.00 0.004))
 	(PtLeafCnc (0.00 0.060)
 		   (1.00 0.040)
 		   (2.00 0.030))
@@ -151,8 +153,8 @@
 		 ((efficiency 0.5 0.5)
 		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
-	   (DSmax 0.0)			;Bogus, made up number for testing.
-	   (DSnew 0.0)			;Bogus, made up number for testing.
+	   (DSmax 0.8)			;Bogus, made up number for testing.
+	   (DSnew 0.2)			;Bogus, made up number for testing.
 	   (C_Stem 0.420)
 	   (C_Leaf 0.420)
 	   (C_SOrg 0.420)

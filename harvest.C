@@ -16,8 +16,6 @@ Harvest::output (Log& log, Filter& filter) const
   log.output ("leaf_N", filter, leaf_N, true);
   log.output ("sorg_DM", filter, sorg_DM, true);
   log.output ("sorg_N", filter, sorg_N, true);
-  log.output ("dead_DM", filter, dead_DM, true);
-  log.output ("dead_N", filter, dead_N, true);
 }
 
 void 
@@ -32,13 +30,11 @@ Harvest::load_syntax (Syntax& syntax, AttributeList&)
   syntax.add ("leaf_N", Syntax::Number, Syntax::LogOnly);
   syntax.add ("sorg_DM", Syntax::Number, Syntax::LogOnly);
   syntax.add ("sorg_N", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("dead_DM", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("dead_N", Syntax::Number, Syntax::LogOnly);
 }
 
 Harvest::Harvest (string col, Time t, string crp, 
 		  double sC, double sN, double lC, double lN, 
-		  double oC, double oN, double dC, double dN)
+		  double oC, double oN)
   : column (col),
     time (t),
     crop (crp),
@@ -47,7 +43,5 @@ Harvest::Harvest (string col, Time t, string crp,
     leaf_DM (lC),
     leaf_N (lN),
     sorg_DM (oC),
-    sorg_N (oN),
-    dead_DM (dC),
-    dead_N (dN)
+    sorg_N (oN)
 { }

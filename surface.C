@@ -42,7 +42,7 @@ Surface::accept_top (double water)
 
   water *= 10.0;			// cm -> mm.
 
-  if (pond + water * dt >= - max (abs (pond), abs (water)) / 100)
+  if (pond + water * dt >= - max (fabs (pond), fabs (water)) / 100)
     {
       if (-water > minimal_matter_flux)
 	{

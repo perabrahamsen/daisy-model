@@ -3,9 +3,7 @@
 #ifndef COLUMN_H
 #define COLUMN_H
 
-#include "common.h"
-#include <list>
-#include <vector>
+#include "librarian.h"
 
 class Library;
 class Filter;
@@ -17,7 +15,6 @@ class AttributeList;
 class Syntax;
 class OrganicMatter;
 class IM;
-class AM;
 class Crop;
 class Harvest;
 
@@ -37,20 +34,11 @@ public:
   virtual void fertilize (const AttributeList&, const Time&) = 0;
   virtual void fertilize (const IM&, double from, double to) = 0; // Mineral.
   virtual void fertilize (const IM&) = 0;
-  virtual void fertilize (const Time&,  // Remains from harvest.
-			  const vector<const AttributeList*>& om,
-			  string name, string part, 
-			  double C, double N) = 0;
-  virtual void fertilize (const Time&, // // Root from harvest.
-			  const vector<const AttributeList*>& om, 
-			  string name, const vector<double>& density, 
-			  double C, double N) = 0;
   virtual vector<const Harvest*> harvest (const Time&, const string name,
 					  double stub_length, 
 					  double stem_harvest, 
 					  double leaf_harvest, 
-					  double sorg_harvest,
-					  double dead_harvest) = 0;
+					  double sorg_harvest) = 0;
   virtual void mix (const Time&,
 		    double from, double to, double penetration = 1.0) = 0;
   virtual void swap (const Time&, double from, double middle, double to) = 0;
@@ -79,21 +67,13 @@ public:
   virtual ~Column ();
 };
 
-class ColumnList : public list <Column*>
+class ColumnList : public vector <Column*>
 { 
 public:
   ColumnList (const vector<const AttributeList*>&);
   ~ColumnList ();
 };
 
-// Ensure the Column library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class Column_init
-{
-  static int count;
-public:
-  Column_init ();
-  ~Column_init ();
-} Column_init;
+static Librarian<Column> Column_init ("column");
 
 #endif COLUMN_H

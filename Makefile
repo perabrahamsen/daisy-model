@@ -154,11 +154,11 @@ filter_none.o: filter_none.C filter.h librarian.h library.h common.h \
  alist.h syntax.h
 filter_some.o: filter_some.C filter.h librarian.h library.h common.h \
  alist.h syntax.h
-column_std.o: column_std.C column.h common.h crop.h bioclimate.h \
- surface.h uzmodel.h im.h soil.h horizon.h hydraulic.h geometry.h \
- soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
- organic_matter.h nitrification.h librarian.h library.h alist.h \
- syntax.h denitrification.h log.h filter.h am.h om.h
+column_std.o: column_std.C column.h librarian.h library.h common.h \
+ alist.h syntax.h crop.h bioclimate.h surface.h uzmodel.h im.h soil.h \
+ horizon.h hydraulic.h geometry.h soil_water.h soil_heat.h soil_NH4.h \
+ solute.h soil_NO3.h organic_matter.h nitrification.h \
+ denitrification.h log.h filter.h am.h
 weather_simple.o: weather_simple.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h log.h filter.h
 uzrichard.o: uzrichard.C uzmodel.h common.h soil.h horizon.h \
@@ -181,10 +181,11 @@ groundwater_static.o: groundwater_static.C groundwater.h time.h \
 horizon_std.o: horizon_std.C horizon.h common.h syntax.h alist.h
 crop_std.o: crop_std.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
- soil_water.h soil.h horizon.h hydraulic.h geometry.h soil_heat.h \
- soil_NH4.h solute.h soil_NO3.h am.h om.h harvest.h mathlib.h
-action_sow.o: action_sow.C action.h common.h daisy.h column.h crop.h \
- syntax.h alist.h
+ soil_water.h soil.h horizon.h hydraulic.h geometry.h om.h \
+ organic_matter.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h \
+ harvest.h mathlib.h
+action_sow.o: action_sow.C action.h common.h daisy.h column.h \
+ librarian.h library.h alist.h syntax.h crop.h
 action_stop.o: action_stop.C action.h common.h syntax.h alist.h \
  daisy.h
 condition_time.o: condition_time.C condition.h librarian.h library.h \
@@ -194,56 +195,58 @@ condition_logic.o: condition_logic.C condition.h librarian.h library.h \
 log_file.o: log_file.C log.h filter.h librarian.h library.h common.h \
  alist.h syntax.h condition.h csmp.h
 action_irrigate.o: action_irrigate.C action.h common.h daisy.h \
- weather.h librarian.h library.h alist.h syntax.h im.h column.h am.h \
- om.h
+ weather.h librarian.h library.h alist.h syntax.h im.h column.h am.h
 action_lisp.o: action_lisp.C action.h common.h daisy.h column.h \
- condition.h librarian.h library.h alist.h syntax.h
+ librarian.h library.h alist.h syntax.h condition.h
 weather_none.o: weather_none.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h
 action_fertilize.o: action_fertilize.C action.h common.h daisy.h \
- column.h syntax.h alist.h am.h om.h im.h library.h
+ column.h librarian.h library.h alist.h syntax.h am.h im.h
 weather_file.o: weather_file.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h options.h log.h filter.h mike_she.h
 action_tillage.o: action_tillage.C action.h common.h daisy.h weather.h \
  librarian.h library.h alist.h syntax.h im.h column.h
 action_harvest.o: action_harvest.C action.h common.h daisy.h column.h \
- syntax.h alist.h library.h
+ librarian.h library.h alist.h syntax.h
 hydraulic_old.o: hydraulic_old.C hydraulic.h common.h options.h \
- syntax.h alist.h csmp.h
+ syntax.h alist.h mathlib.h csmp.h
 crop_old.o: crop_old.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
- soil_water.h soil.h horizon.h hydraulic.h geometry.h soil_heat.h \
- soil_NH4.h solute.h soil_NO3.h am.h om.h harvest.h mathlib.h
+ soil_water.h soil.h horizon.h hydraulic.h geometry.h om.h \
+ organic_matter.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h \
+ harvest.h mathlib.h
 crop_sold.o: crop_sold.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
- soil_water.h soil.h horizon.h hydraulic.h geometry.h soil_heat.h \
- soil_NH4.h solute.h soil_NO3.h am.h om.h harvest.h mathlib.h
+ soil_water.h soil.h horizon.h hydraulic.h geometry.h organic_matter.h \
+ om.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h harvest.h \
+ mathlib.h
 action_with.o: action_with.C action.h common.h daisy.h syntax.h \
- alist.h column.h
+ alist.h column.h librarian.h library.h
 hydraulic_old2.o: hydraulic_old2.C hydraulic.h common.h options.h \
- syntax.h alist.h csmp.h
+ syntax.h alist.h mathlib.h csmp.h
 nitrification_soil.o: nitrification_soil.C nitrification.h librarian.h \
  library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
  geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
- csmp.h log.h filter.h
+ csmp.h mathlib.h log.h filter.h
 nitrification_solute.o: nitrification_solute.C nitrification.h \
  librarian.h library.h common.h alist.h syntax.h soil.h horizon.h \
  hydraulic.h geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h \
- soil_NO3.h csmp.h log.h filter.h
+ soil_NO3.h csmp.h log.h filter.h mathlib.h
 hydraulic_mod_C.o: hydraulic_mod_C.C hydraulic.h common.h syntax.h \
  alist.h
 main.o: main.C daisy.h common.h parser_file.h parser.h syntax.h \
  alist.h
 daisy.o: daisy.C daisy.h common.h weather.h librarian.h library.h \
  alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h log.h \
- filter.h parser.h am.h om.h nitrification.h hydraulic.h crop.h \
- column.h harvest.h action.h condition.h mike_she.h
+ filter.h parser.h am.h nitrification.h hydraulic.h crop.h column.h \
+ harvest.h action.h condition.h mike_she.h
 parser.o: parser.C parser.h common.h alist.h library.h syntax.h
 log.o: log.C log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h
 weather.o: weather.C weather.h librarian.h library.h common.h alist.h \
  syntax.h im.h mathlib.h
-column.o: column.C column.h common.h library.h alist.h syntax.h
+column.o: column.C column.h librarian.h library.h common.h alist.h \
+ syntax.h
 crop.o: crop.C crop.h time.h common.h library.h alist.h syntax.h
 alist.o: alist.C alist.h common.h
 syntax.o: syntax.C syntax.h common.h alist.h library.h
@@ -252,7 +255,7 @@ action.o: action.C action.h common.h alist.h library.h syntax.h
 condition.o: condition.C condition.h librarian.h library.h common.h \
  alist.h syntax.h
 horizon.o: horizon.C horizon.h common.h library.h alist.h syntax.h \
- csmp.h hydraulic.h
+ csmp.h hydraulic.h mathlib.h
 filter.o: filter.C filter.h librarian.h library.h common.h alist.h \
  syntax.h
 csmp.o: csmp.C csmp.h common.h log.h filter.h librarian.h library.h \
@@ -266,12 +269,12 @@ hydraulic.o: hydraulic.C hydraulic.h common.h library.h alist.h \
 soil.o: soil.C soil.h horizon.h common.h hydraulic.h geometry.h \
  alist.h syntax.h mathlib.h
 mathlib.o: mathlib.C mathlib.h common.h
-bioclimate.o: bioclimate.C bioclimate.h column.h common.h surface.h \
- uzmodel.h im.h weather.h librarian.h library.h alist.h syntax.h \
- crop.h csmp.h soil.h horizon.h hydraulic.h geometry.h snow.h log.h \
- filter.h mike_she.h
+bioclimate.o: bioclimate.C bioclimate.h column.h librarian.h library.h \
+ common.h alist.h syntax.h surface.h uzmodel.h im.h weather.h crop.h \
+ csmp.h soil.h horizon.h hydraulic.h geometry.h snow.h log.h filter.h \
+ mike_she.h
 surface.o: surface.C surface.h uzmodel.h common.h im.h syntax.h \
- alist.h soil_water.h log.h filter.h librarian.h library.h am.h om.h \
+ alist.h soil_water.h log.h filter.h librarian.h library.h am.h \
  mathlib.h mike_she.h
 soil_water.o: soil_water.C soil_water.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h uzmodel.h soil.h horizon.h \
@@ -303,13 +306,12 @@ snow.o: snow.C snow.h alist.h common.h syntax.h log.h filter.h \
 solute.o: solute.C solute.h common.h log.h filter.h librarian.h \
  library.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
  soil_water.h mathlib.h
-am.o: am.C am.h time.h common.h om.h im.h library.h alist.h syntax.h \
- log.h filter.h librarian.h soil.h horizon.h hydraulic.h geometry.h \
- mathlib.h
+am.o: am.C am.h common.h om.h im.h library.h alist.h syntax.h log.h \
+ filter.h librarian.h geometry.h mathlib.h
 im.o: im.C im.h log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h
-om.o: om.C om.h common.h syntax.h alist.h soil.h horizon.h hydraulic.h \
- geometry.h log.h filter.h librarian.h library.h mathlib.h
+om.o: om.C om.h common.h syntax.h alist.h geometry.h log.h filter.h \
+ librarian.h library.h mathlib.h
 harvest.o: harvest.C harvest.h time.h common.h syntax.h log.h filter.h \
  librarian.h library.h alist.h
 options.o: options.C options.h common.h

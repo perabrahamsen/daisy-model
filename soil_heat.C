@@ -20,9 +20,9 @@ struct SoilHeat::Implementation
   // BUG:  These should move to groundwater module.
   // Parameters.
   const double average;		// Average temperature at bottom [C]
-  double amplitude;	// Variation in bottom temperature [C]
+  double amplitude;		// Variation in bottom temperature [C]
   const double omega;		// Period length for above [ rad / day]
-  double omega_offset;	// Period start for above [rad]
+  double omega_offset;		// Period start for above [rad]
 
   // Simulation.
   void tick (const Time&, const Soil&, const SoilWater&, 
@@ -44,7 +44,9 @@ SoilHeat::Implementation::tick (const Time& time,
 				const Surface& surface,
 				const Groundwater& groundwater)
 {
+#ifdef WATER_FLUX_HEAT
   const double water_heat_capacity = 4.2; // [J/cm³/K]
+#endif
 
   // Border conditions.
   const double T_bottom = bottom (time);// BUGLET: Should be time - 1 hour.
@@ -122,7 +124,7 @@ SoilHeat::Implementation::tick (const Time& time,
       
       // Computational,
       const double Cx = gradient
-#if 1
+#ifndef WATER_FLUX_HEAT
 	// BUG!
 	;
 #else

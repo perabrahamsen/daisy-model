@@ -166,7 +166,7 @@ LogFile::match (const Daisy& daisy)
   matching = condition.match (daisy);
   
   if (matching || accumulating)
-    return *filter;
+    return filter;
 
   static Filter* none = NULL;
   if (!none)
@@ -308,9 +308,14 @@ LogFile::output (string name, Filter& filter, const vector<double>& value, bool 
       Filter& f = filter.lookup (name);
       const Geometry* g = geometry ();
 
-      if (printing)
+      if (printing ())
 	{
-	  const vector<double> val = g ? f.select (*g, value) : value;
+	  vector<double> val;
+	  
+	  if (g != NULL)
+	    val = f.select (*g, value);
+	  else
+	    val = value;
       
 	  open (name);
 	  bool first = true;
@@ -381,8 +386,10 @@ LogFile::LogFile (const AttributeList& al)
 
 LogFile::~LogFile ()
 {
+#ifdef CONST_DELETE
   delete &condition;
   delete &filter;
+#endif
   assert (offsets.size () == 1);
   if (stream)
     {
