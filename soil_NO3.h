@@ -4,11 +4,13 @@
 #define SOIL_NO3_H
 
 class AttributeList;
+class Syntax;
 
 class SoilNO3
 {
 public:
-  SoilNO3 (const AttributeList& par, const AttributeList& var);
+  static void load_syntax (Syntax&, AttributeList&);
+  SoilNO3 (const AttributeList&);
 };
 
 

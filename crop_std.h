@@ -22,6 +22,8 @@ public:
   double PARext () const;
   double PARref () const;
   double EPext () const;
+  double IntcpCap () const; // Interception Capacity.
+  double EpFac () const; // Convertion to potential evapotransp.
   void CanopyStructure ();
   
   // Internal functions.

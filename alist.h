@@ -72,7 +72,7 @@ public:
        
     // Create and Destroy.
   void add (string, double);
-  void add (string, const AttributeList&);
+  void add (string, AttributeList&);
   void add (string, const Rules*);
   void add (string, const CSMP*);
   void add (string, string);
@@ -83,6 +83,7 @@ public:
   void add (string, const Sequence&);
   void add (string, const Layers&);
 
+  void operator += (const AttributeList&);
   AttributeList (const AttributeList& old);
   AttributeList ();
   ~AttributeList ();

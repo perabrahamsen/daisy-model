@@ -2,9 +2,6 @@
 
 #include "library.h"
 #include "alist.h"
-#ifndef MODERN_LIBRARIES
-#include "syntax.h"
-#endif
 
 struct Library::Implementation
 {

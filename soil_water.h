@@ -36,9 +36,8 @@ public:
   void output (Log&, const Filter*) const;
 
   // Creation.
-  static const Syntax& SoilWater::parameter_syntax ();
-  static const Syntax& SoilWater::variable_syntax ();
-  SoilWater (const Soil&, const AttributeList& par, const AttributeList& var);
+  static void load_syntax (Syntax&, AttributeList&);
+  SoilWater (const Soil&, const AttributeList&);
   ~SoilWater ();
 };
 

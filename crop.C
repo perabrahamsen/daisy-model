@@ -3,6 +3,7 @@
 #include "crop.h"
 #include "library.h"
 #include "alist.h"
+#include "syntax.h"
 #include <map.h>
 
 static Library* Crop_par_library = NULL;
@@ -51,10 +52,13 @@ Crop::derive_type (string name, const AttributeList& al, string super)
 Crop*
 Crop::create (const AttributeList& var)
 {
+  assert (var.check ("type"));
   string name = var.name ("type");
   assert (par_library ().check (name));
-  return (*Crop_constructors)[name]
-    (name, par_library ().lookup (name), var);
+  assert (var_library ().syntax (name).check (var));
+  const AttributeList& par = par_library ().lookup (name);
+  assert (par_library ().syntax (name).check (par));
+  return (*Crop_constructors)[name] (name, par, var);
 }
 
 Crop::Crop (const string n)

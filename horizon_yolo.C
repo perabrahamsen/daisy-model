@@ -1,12 +1,27 @@
 // horizon_yolo.C
 
-#include "horizon_yolo.h"
+#include "horizon.h"
 #include "syntax.h"
 #include "alist.h"
+#include "common.h"
 
-#define exception BUG_exception
-#include <math.h>
-#undef exception
+class HorizonYolo : public Horizon
+{
+  // Use.
+public:
+  double Theta (double h) const;
+  double K (double h) const;
+  double Cw2 (double h) const;
+  double h (double Theta) const;
+
+  // Create and Destroy.
+private:
+  friend class HorizonYoloSyntax;
+  static Horizon& make (AttributeList& al);
+  HorizonYolo (const AttributeList&);
+public:
+  virtual ~HorizonYolo ();
+};
 
 double 
 HorizonYolo::Theta (const double h) const

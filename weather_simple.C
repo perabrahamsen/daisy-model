@@ -1,12 +1,33 @@
 // weather_simple.C
 
-#include "weather_simple.h"
+#include "weather.h"
 #include "syntax.h"
 #include "alist.h"
-#define exception _BUG_EXCPETION
-#include <math.h>
-#undef exception
+#include "common.h"
 #include <algobase.h>
+
+class WeatherSimple : public Weather
+{
+  const double T1;
+  const double T2;
+    // Simulation.
+public:
+  void tick ();
+  double AirTemperature () const;
+  double GlobalRadiation () const;
+  double ReferenceEvapotranspiration () const;
+  double Precipitation () const;
+  double Rain () const;
+  double Snow () const;
+
+    // Create and Destroy.
+private:
+  friend class WeatherSimpleSyntax;
+  static Weather& make (const Time&, const AttributeList&);
+  WeatherSimple (const Time&, const AttributeList&);
+public:
+  ~WeatherSimple ();
+};
 
 void
 WeatherSimple::tick ()
@@ -44,8 +65,41 @@ WeatherSimple::GlobalRadiation () const
   return max (0.0, Si);
 }
 
+double
+WeatherSimple::ReferenceEvapotranspiration () const
+{
+  const double T = 273.16 + AirTemperature ();
+  const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
+  return 0.0245 * Delta / (Delta + 66.7) * GlobalRadiation ();
+}
+
+double
+WeatherSimple::Precipitation () const
+{
+  return 0.0;
+}
+
+double
+WeatherSimple::Rain () const
+{
+  return Precipitation () - Snow ();
+}
+
+double
+WeatherSimple::Snow () const
+{
+  if (AirTemperature () < T1)
+    return Precipitation ();
+  else if (T2 < AirTemperature ())
+    return 0.0;
+  else
+    return Precipitation () * (T2 - AirTemperature ()) / (T2 - T1);
+}
+
 WeatherSimple::WeatherSimple (const Time& t, const AttributeList& al)
-  : Weather (t, al.number ("Latitude"))
+  : Weather (t, al.number ("Latitude")),
+    T1 (al.number ("T1")),
+    T2 (al.number ("T2"))
 { }
 
 WeatherSimple::~WeatherSimple ()
@@ -69,5 +123,9 @@ WeatherSimpleSyntax::WeatherSimpleSyntax ()
   AttributeList& alist = *new AttributeList ();
   syntax.add ("Latitude", Syntax::Number);
   alist.add ("Latitude", 56.0);
+  syntax.add ("T1", Syntax::Number);
+  alist.add ("T1", -2.0);
+  syntax.add ("T2", Syntax::Number);
+  alist.add ("T2", 2.0);
   Weather::add_type ("simple", alist, syntax, &WeatherSimple::make);
 }

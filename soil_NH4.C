@@ -2,6 +2,9 @@
 
 #include "soil_NH4.h"
 
-SoilNH4::SoilNH4 (const AttributeList& /* par */, 
-		  const AttributeList& /* var */)
+void
+SoilNH4::load_syntax (Syntax&, AttributeList&)
+{ }
+
+SoilNH4::SoilNH4 (const AttributeList&)
 { }

@@ -99,7 +99,9 @@
 			(2.00 0.024))
 	     (CrSOrgCnc (0.00 0.016)
 			(1.00 0.016)
-			(2.00 0.016))))
+			(2.00 0.016)))
+       (EpFac 0.5)
+       (IntcpCap 0.5))
  (horizon h1 yolo)
  (column c1 column
 	 (Bioclimate (NoOfIntervals 30))

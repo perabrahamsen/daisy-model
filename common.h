@@ -1,9 +1,15 @@
 // common.h
+//
+// This file should contain compiler specific workarounds for bugs.
 
 #ifndef COMMON_H
 #define COMMON_H
 
 #include <std/typeinfo.h>
+
+#define exception _BUG_EXCPETION
+#include <math.h>
+#undef exception
 
 #ifdef HANDLE_EXCEPTIONS
 #define THROW(x) throw x

@@ -3,6 +3,7 @@
 #include "soil_heat.h"
 #include "alist.h"
 #include "bioclimate.h"
+#include "syntax.h"
 
 void 
 SoilHeat::tick (const Surface&, const Bioclimate& bioclimate)
@@ -24,7 +25,12 @@ SoilHeat::check (Log& /* log */, unsigned n) const
   return ok;
 }
 
-SoilHeat::SoilHeat (const AttributeList& /* par */, 
-		  const AttributeList& var)
-  : T (var.array ("T"))
+void
+SoilHeat::load_syntax (Syntax& syntax, AttributeList&)
+{ 
+  syntax.add ("T", Syntax::Array);
+}
+
+SoilHeat::SoilHeat (const AttributeList& al)
+  : T (al.array ("T"))
 { }

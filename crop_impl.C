@@ -96,6 +96,8 @@ CropStandard::Parameters::Parameters (const string n, const AttributeList& vl)
     Partit (vl.list ("Partit")),
     Resp (vl.list ("Resp")),
     CrpN (vl.list ("CrpN")),
+    IntcpCap (vl.number ("IntcpCap")),
+    EpFac (vl.number ("EpFac")),
     name (n)
 { }
 
@@ -470,6 +472,10 @@ CropStandardSyntax::CropStandardSyntax ()
     CrpN.add ("CrRootCnc", Syntax::CSMP);
     CrpN.add ("PtSOrgCnc", Syntax::CSMP);
     CrpN.add ("CrSOrgCnc", Syntax::CSMP);
+
+    // I don't know where these belong.
+    parSyntax.add ("IntcpCap", Syntax::Number);
+    parSyntax.add ("EpFac", Syntax::Number);
   }
 
   // Variables

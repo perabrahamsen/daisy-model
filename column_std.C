@@ -1,6 +1,17 @@
 // column_std.C
 
-#include "column_std.h"
+#include "column.h"
+#include "crop.h"
+#include "bioclimate.h"
+#include "surface.h"
+#include "soil.h"
+#include "soil_water.h"
+#include "soil_heat.h"
+#include "soil_NH4.h"
+#include "soil_NO3.h"
+#include "organic_matter.h"
+#include "nitrification.h"
+#include "denitrification.h"
 #include "alist.h"
 #include "syntax.h"
 #include "library.h"
@@ -8,10 +19,62 @@
 #include "filter.h"
 #include "crop.h"
 
-void
-ColumnStandard::sow (const AttributeList& crop, Log&)
+class Groundwater;
+
+class ColumnStandard : public Column
 {
-  crops.push_back (Crop::create (crop));
+  // Content.
+private:
+  CropList crops;
+  Bioclimate bioclimate;
+  Surface surface;
+  Soil soil;
+  SoilWater soil_water;
+  SoilHeat soil_heat;
+  SoilNH4 soil_NH4;
+  SoilNO3 soil_NO3;
+  OrganicMatter organic_matter;
+  Nitrification nitrification;
+  Denitrification denitrification;
+
+  // Actions.
+public:
+  void sow (const AttributeList& crop, Log&);
+
+  bool check (Log&) const;
+  void output (Log&, const Filter*) const;
+private:
+  void output_crops (Log& log, const Filter* filter) const;
+
+  // Simulation.
+public:
+  void tick (const Time&, const Weather&, const Groundwater&);
+
+  // Communication with crops.
+public:
+  double SoilTemperature (double depth) const;
+  double MaxRootingDepth () const;
+
+  // Create and Destroy.
+private:
+  friend class ColumnStandardSyntax;
+  static Column* make (const AttributeList&);
+  ColumnStandard (const AttributeList&);
+public:
+  ~ColumnStandard ();
+};
+
+void
+ColumnStandard::sow (const AttributeList& crop, Log& log)
+{
+  string name = crop.name ("type");
+  if (!Crop::par_library ().check (name))
+    log.err () << "Cannot sow unknown crop `" << name << "'\n";
+  else if (!Crop::var_library ().syntax (name).check (name, crop, log)
+	   ||!Crop::par_library ().syntax (name).check (name, Crop::par_library ().lookup (name), log))
+    log.err () << "Cannot sow incomplete crop `" << name << "'\n";
+  else
+    crops.push_back (Crop::create (crop));
 }
 
 bool
@@ -29,7 +92,7 @@ ColumnStandard::tick (const Time& time,
 {
   cout << "Column `" << name << "' tick\n"; 
   
-  bioclimate.tick (surface, weather, crops);
+  bioclimate.tick (surface, weather, crops, soil);
   soil_heat.tick (surface, bioclimate);
   soil_water.tick (surface, groundwater, soil);
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
@@ -95,22 +158,19 @@ ColumnStandard::MaxRootingDepth () const
   return soil.MaxRootingDepth ();
 }
 
-ColumnStandard::ColumnStandard (string n,
-				const AttributeList& par, 
-				const AttributeList& var)
-  : Column (n),
-    crops (var.sequence ("crops")),
-    bioclimate (par.list ("Bioclimate"), var.list ("Bioclimate")),
-    surface (par.list ("Surface"), var.list ("Surface")),
-    soil (par.list ("Soil")),
-    soil_water (soil, par.list ("SoilWater"), var.list ("SoilWater")),
-    soil_heat (par.list ("SoilHeat"), var.list ("SoilHeat")),
-    soil_NH4 (par.list ("SoilNH4"), var.list ("SoilNH4")),
-    soil_NO3 (par.list ("SoilNO3"), var.list ("SoilNO3")),
-    organic_matter (par.list ("OrganicMatter"), var.list ("OrganicMatter")),
-    nitrification (par.list ("Nitrification"), var.list ("Nitrification")),
-    denitrification (par.list ("Denitrification"), 
-		     var.list ("Denitrification"))
+ColumnStandard::ColumnStandard (const AttributeList& al)
+  : Column (al.name ("type")),
+    crops (al.sequence ("crops")),
+    bioclimate (al.list ("Bioclimate")),
+    surface (al.list ("Surface")),
+    soil (al.list ("Soil")),
+    soil_water (soil, al.list ("SoilWater")),
+    soil_heat (al.list ("SoilHeat")),
+    soil_NH4 (al.list ("SoilNH4")),
+    soil_NO3 (al.list ("SoilNO3")),
+    organic_matter (al.list ("OrganicMatter")),
+    nitrification (al.list ("Nitrification")),
+    denitrification (al.list ("Denitrification"))
 { }
 
 ColumnStandard::~ColumnStandard ()
@@ -118,82 +178,33 @@ ColumnStandard::~ColumnStandard ()
 
 // Add the Column syntax to the syntax table.
 Column*
-ColumnStandard::make (string name, 
-		      const AttributeList& par, 
-		      const AttributeList& var)
+ColumnStandard::make (const AttributeList& al)
 {
-  return new ColumnStandard (name, par, var);
+  return new ColumnStandard (al);
 }
 
 static struct ColumnStandardSyntax
 {
-  const Syntax& parameters ();
-  const Syntax& variables ();
   ColumnStandardSyntax ();
 } column_syntax;
 
 ColumnStandardSyntax::ColumnStandardSyntax ()
 { 
-  Column::add_type ("column",
-		    AttributeList::empty, parameters (),
-		    AttributeList::empty, variables (),
-		    &ColumnStandard::make);
-}
+  Syntax& syntax = *new Syntax ();
+  AttributeList& alist = *new AttributeList ();
 
-const Syntax&
-ColumnStandardSyntax::parameters ()
-{ 
-  Syntax& par = *new Syntax ();
+  syntax.add_sequence ("crops", Crop::var_library ());
+  
+  ADD_SUBMODULE (syntax, alist, Bioclimate);
+  ADD_SUBMODULE (syntax, alist, Surface);
+  ADD_SUBMODULE (syntax, alist, Soil);
+  ADD_SUBMODULE (syntax, alist, SoilWater);
+  ADD_SUBMODULE (syntax, alist, SoilHeat);
+  ADD_SUBMODULE (syntax, alist, SoilNH4);
+  ADD_SUBMODULE (syntax, alist, SoilNO3);
+  ADD_SUBMODULE (syntax, alist, OrganicMatter);
+  ADD_SUBMODULE (syntax, alist, Nitrification);
+  ADD_SUBMODULE (syntax, alist, Denitrification);
 
-  par.add_sequence ("crops", Crop::par_library ());
-  Syntax& bioclimate = *new Syntax ();
-  bioclimate.add ("NoOfIntervals", Syntax::Integer);
-  par.add ("Bioclimate", bioclimate);
-  Syntax& surface = *new Syntax ();
-  par.add ("Surface", surface);
-  par.add ("Soil", Soil::parameter_syntax ());
-  par.add ("SoilWater", SoilWater::parameter_syntax ());
-  Syntax& soil_heat = *new Syntax ();
-  par.add ("SoilHeat", soil_heat);
-  Syntax& soil_NH4 = *new Syntax ();
-  par.add ("SoilNH4", soil_NH4);
-  Syntax& soil_NO3 = *new Syntax ();
-  par.add ("SoilNO3", soil_NO3);
-  Syntax& organic_matter = *new Syntax ();
-  par.add ("OrganicMatter", organic_matter);
-  Syntax& nitrification = *new Syntax ();
-  par.add ("Nitrification", nitrification);
-  Syntax& denitrification = *new Syntax ();
-  par.add ("Denitrification", denitrification);
-
-  return par;
-}
-
-const Syntax&
-ColumnStandardSyntax::variables ()
-{ 
-  Syntax& var = *new Syntax ();
-  var.add_sequence ("crops", Crop::var_library ());
-  Syntax& bioclimate = *new Syntax ();
-  var.add ("Bioclimate", bioclimate);
-  Syntax& surface = *new Syntax ();
-  var.add ("Surface", surface);
-  Syntax& soil = *new Syntax ();
-  var.add ("Soil", soil);
-  var.add ("SoilWater", SoilWater::variable_syntax ());
-  Syntax& soil_heat = *new Syntax ();
-  soil_heat.add ("T", Syntax::Array);
-  var.add ("SoilHeat", soil_heat);
-  Syntax& soil_NH4 = *new Syntax ();
-  var.add ("SoilNH4", soil_NH4);
-  Syntax& soil_NO3 = *new Syntax ();
-  var.add ("SoilNO3", soil_NO3);
-  Syntax& organic_matter = *new Syntax ();
-  var.add ("OrganicMatter", organic_matter);
-  Syntax& nitrification = *new Syntax ();
-  var.add ("Nitrification", nitrification);
-  Syntax& denitrification = *new Syntax ();
-  var.add ("Denitrification", denitrification);
-
-  return var;
+  Column::add_type ("column", alist, syntax, &ColumnStandard::make);
 }

@@ -2,20 +2,25 @@
 
 SHELL = /bin/sh
 CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -frepo # -O2 -fhandle-exceptions -pipe -fno-implicit-templates
-OBJ = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
+SRCONLY = column_std.o template.o manager_rule.o weather_simple.o \
+	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
+	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o 
+OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
-	crop_impl.o filter.o csmp.o rules.o time.o column_std.o uzmodel.o \
-	soil.o mathlib.o template.o bioclimate.o surface.o soil_water.o \
+	crop_impl.o filter.o csmp.o rules.o time.o uzmodel.o \
+	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
 	denitrification.o soil_heat.o groundwater.o uzrichard.o \
-	horizon_yolo.o crop_std.o manager_rule.o weather_simple.o \
-	groundwater_static.o common.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o horizon_B_C.o \
-	horizon_M_BaC.o horizon_B_BaC.o 
+	crop_std.o snow.o
+OBJ = $(OBJECTS) $(SRCONLY)
 SRC = $(OBJ:.o=.C)
-HEAD = $(OBJ:.o=.h)
+HEAD = $(OBJECTS:.o=.h) common.h
 TEST = crop.dai old_crop.chp old_crop.log \
 	water.dai old_water.log water.gen water.plot
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
+
+# To be removed by the next cvs update.
+REMOVE = column_std.h common.C template.h
 
 .SUFFIXES:	.C .o .h
 
@@ -79,6 +84,8 @@ depend: $(SRC)
 cvs: $(TEXT) $(TEST)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(TEXT) $(TEST)
+	rm -f $(REMOVE) 
+	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
 
 .C.o:
@@ -87,11 +94,14 @@ cvs: $(TEXT) $(TEST)
 $(OBJ):	daisy.h
 
 pcrop.c: crop.pas
-	../ftp/p2c-1.20/p2c -a $<
+	/pack/p2c/bin/p2c -a $<
 	mv crop.c pcrop.c
 
+fsnow.c: fsnow.f
+	/pack/f2c/bin/f2c $<
+
 pcrop: pcrop.c
-	gcc -L../ftp/p2c-1.20/home -I../ftp/p2c-1.20/home pcrop.c -g -o pcrop -lm -lp2c
+	gcc -L/pack/p2c/lib -I/pack/p2c/include pcrop.c -g -o pcrop -lm -lp2c
 
 ptest: pcrop
 	pcrop < /dev/null
@@ -105,16 +115,17 @@ daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
 input.o: input.C input.h log.h alist.h common.h csmp.h rules.h \
  library.h syntax.h action.h condition.h time.h filter.h crop.h
 log.o: log.C log.h condition.h time.h filter.h csmp.h daisy.h
-weather.o: weather.C weather.h time.h library.h alist.h common.h
-manager.o: manager.C manager.h library.h alist.h common.h
-column.o: column.C column.h library.h alist.h common.h
-crop.o: crop.C crop.h library.h alist.h common.h
+weather.o: weather.C weather.h time.h library.h alist.h common.h \
+ syntax.h
+manager.o: manager.C manager.h library.h alist.h common.h syntax.h
+column.o: column.C column.h library.h alist.h common.h syntax.h
+crop.o: crop.C crop.h library.h alist.h common.h syntax.h
 alist.o: alist.C alist.h common.h action.h condition.h time.h
-syntax.o: syntax.C syntax.h alist.h common.h
-library.o: library.C library.h alist.h common.h syntax.h
+syntax.o: syntax.C syntax.h alist.h common.h log.h
+library.o: library.C library.h alist.h common.h
 action.o: action.C action.h column.h alist.h common.h
 condition.o: condition.C condition.h time.h
-horizon.o: horizon.C horizon.h library.h alist.h common.h
+horizon.o: horizon.C horizon.h library.h alist.h common.h syntax.h
 ftable.o: ftable.C ftable.h
 crop_impl.o: crop_impl.C crop_impl.h crop_std.h crop.h ftable.h csmp.h \
  syntax.h alist.h common.h filter.h log.h bioclimate.h
@@ -122,17 +133,14 @@ filter.o: filter.C filter.h
 csmp.o: csmp.C csmp.h log.h
 rules.o: rules.C rules.h daisy.h time.h action.h
 time.o: time.C time.h
-column_std.o: column_std.C column_std.h column.h crop.h bioclimate.h \
- surface.h uzmodel.h soil.h horizon.h soil_water.h soil_heat.h \
- soil_NH4.h soil_NO3.h organic_matter.h nitrification.h \
- denitrification.h alist.h common.h syntax.h library.h log.h filter.h
-uzmodel.o: uzmodel.C uzmodel.h library.h alist.h common.h
+uzmodel.o: uzmodel.C uzmodel.h library.h alist.h common.h syntax.h
 soil.o: soil.C soil.h horizon.h alist.h common.h syntax.h
 mathlib.o: mathlib.C mathlib.h
 template.o: template.C ftable.h crop_impl.h crop_std.h crop.h csmp.h \
  ftable.t
 bioclimate.o: bioclimate.C bioclimate.h surface.h uzmodel.h weather.h \
- time.h crop.h csmp.h alist.h common.h
+ time.h crop.h csmp.h alist.h common.h soil.h horizon.h syntax.h \
+ snow.h
 surface.o: surface.C surface.h uzmodel.h
 soil_water.o: soil_water.C soil_water.h log.h alist.h common.h \
  uzmodel.h soil.h horizon.h surface.h groundwater.h time.h syntax.h
@@ -141,31 +149,31 @@ soil_NO3.o: soil_NO3.C soil_NO3.h
 organic_matter.o: organic_matter.C organic_matter.h
 nitrification.o: nitrification.C nitrification.h
 denitrification.o: denitrification.C denitrification.h
-soil_heat.o: soil_heat.C soil_heat.h alist.h common.h bioclimate.h
+soil_heat.o: soil_heat.C soil_heat.h alist.h common.h bioclimate.h \
+ syntax.h
 groundwater.o: groundwater.C groundwater.h time.h uzmodel.h library.h \
- alist.h common.h
+ alist.h common.h syntax.h
 uzrichard.o: uzrichard.C uzrichard.h uzmodel.h soil.h horizon.h \
  mathlib.h alist.h common.h syntax.h
-horizon_yolo.o: horizon_yolo.C horizon_yolo.h horizon.h syntax.h \
- alist.h common.h
 crop_std.o: crop_std.C crop_impl.h crop_std.h crop.h ftable.h csmp.h \
- log.h time.h column.h bioclimate.h
-manager_rule.o: manager_rule.C manager_rule.h manager.h syntax.h \
- rules.h alist.h common.h
-weather_simple.o: weather_simple.C weather_simple.h weather.h time.h \
- syntax.h alist.h common.h
-groundwater_static.o: groundwater_static.C groundwater_static.h \
- groundwater.h time.h uzmodel.h syntax.h alist.h common.h
-common.o: common.C common.h
-horizon_M_vG.o: horizon_M_vG.C horizon_M_vG.h horizon.h syntax.h \
- alist.h common.h
-horizon_B_vG.o: horizon_B_vG.C horizon_B_vG.h horizon.h syntax.h \
- alist.h common.h
-horizon_M_C.o: horizon_M_C.C horizon_M_C.h horizon.h syntax.h alist.h \
+ log.h time.h column.h bioclimate.h common.h
+snow.o: snow.C
+column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
+ uzmodel.h soil.h horizon.h soil_water.h soil_heat.h soil_NH4.h \
+ soil_NO3.h organic_matter.h nitrification.h denitrification.h alist.h \
+ common.h syntax.h library.h log.h filter.h
+template.o: template.C ftable.h crop_impl.h crop_std.h crop.h csmp.h \
+ ftable.t
+manager_rule.o: manager_rule.C manager.h syntax.h rules.h alist.h \
  common.h
-horizon_B_C.o: horizon_B_C.C horizon_B_C.h horizon.h syntax.h alist.h \
+weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
  common.h
-horizon_M_BaC.o: horizon_M_BaC.C horizon_M_BaC.h horizon.h syntax.h \
- alist.h common.h
-horizon_B_BaC.o: horizon_B_BaC.C horizon_B_BaC.h horizon.h syntax.h \
- alist.h common.h
+horizon_yolo.o: horizon_yolo.C horizon.h syntax.h alist.h common.h
+horizon_M_vG.o: horizon_M_vG.C horizon.h syntax.h alist.h common.h
+horizon_B_vG.o: horizon_B_vG.C horizon.h syntax.h alist.h common.h
+horizon_M_C.o: horizon_M_C.C horizon.h syntax.h alist.h common.h
+horizon_B_C.o: horizon_B_C.C horizon.h syntax.h alist.h common.h
+horizon_M_BaC.o: horizon_M_BaC.C horizon.h syntax.h alist.h common.h
+horizon_B_BaC.o: horizon_B_BaC.C horizon.h syntax.h alist.h common.h
+groundwater_static.o: groundwater_static.C groundwater.h time.h \
+ uzmodel.h syntax.h alist.h common.h

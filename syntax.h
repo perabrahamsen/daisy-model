@@ -24,6 +24,7 @@ public:
   { Mandatory, Sparse, Optional, LogOnly };
   bool check (string, const AttributeList&, const Log&, 
 	      bool sparse = false) const;
+  bool check (const AttributeList&) const;
   required status (string) const;
   type lookup (string) const;
   const Syntax& syntax (string) const;
@@ -43,5 +44,19 @@ public:
   Syntax ();
   ~Syntax ();
 };
+
+// Ugly ugly UGLY!  Must change!!! 
+#define ADD_SUBMODULE(s, a, m) \
+do \
+  { \
+    Syntax& _s = *new Syntax (); \
+    AttributeList& _a = *new AttributeList (); \
+    m::load_syntax (_s, _a); \
+    s.add (#m, _s); \
+    a.add (#m, _a); \
+  } \
+while (false)
+
+
 
 #endif SYNTAX_H

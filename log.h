@@ -28,7 +28,7 @@ public:
   void output (string, const Filter*, const vector<double>&);
   void output (string, const Filter*, const CSMP&);
   void output_point (double x, double y);
-  ostream& err ();
+  ostream& err () const;
 
 private:
   void print (const char*);

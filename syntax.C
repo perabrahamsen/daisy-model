@@ -2,6 +2,8 @@
 
 #include "syntax.h"
 #include "alist.h"
+#include "log.h"
+#include "library.h"
 #include <map.h>
 
 struct Syntax::Implementation
@@ -23,6 +25,7 @@ struct Syntax::Implementation
   derive_map derived;
   bool check (string name, const AttributeList& vl, const Log& log,
 	      bool sparse);
+  bool check (const AttributeList& vl);
   Syntax::type lookup (string key) const;
 };    
 
@@ -39,21 +42,99 @@ Syntax::Implementation::check (string name, const AttributeList& vl,
     {
       string key = (*i).first;
       required state = status[key];
-      if (!sparse && status[key] == Mandatory && !vl.check (key))
+      if (!sparse && state == Mandatory && !vl.check (key))
 	{
-	  cerr << "Attributte " << key << "\n";
+	  log.err () << "Attributte " << key << " missing\n";
 	  error = true;
 	}
-      else if (   types[key] == List 
-	       && vl.check (key)
+      else if (types[key] == Sequence && vl.check (key))
+	{
+	  const Library& lib = *libraries[key];
+	  const ::Sequence& seq = vl.sequence (key);
+	  for (::Sequence::const_iterator j = seq.begin ();
+	       j != seq.end ();
+	       j++)
+	    {
+	      const AttributeList& al = **j;
+	      if (!al.check ("type"))
+		{
+		  log.err () << "Non object found \n";
+		  error = true;
+		}
+	      else if (!lib.syntax (al.name ("type")).check (key, al, 
+							     log, sparse))
+		error = true;
+	    }
+	}
+      else if (types[key] == Object && vl.check (key))
+	{
+	  const Library& lib = *libraries[key];
+	  const AttributeList& al = vl.list (key);
+	  if (!al.check ("type"))
+	    {
+	      log.err () << "Non object found \n";
+	      error = true;
+	    }
+	  else if (!lib.syntax (al.name ("type")).check (al))
+	    error = true;
+	}
+      else if (types[key] == List && vl.check (key)
 	       && !syntax[key]->check (key, vl.list (key), log,
 				       sparse || (state == Sparse)))
 	error = true;
     }
   if (error)
-    cerr << "missing from " << name << "\n";
+    log.err () << "in " << name << "\n";
 
   return !error;
+}
+
+bool 
+Syntax::Implementation::check (const AttributeList& vl)
+{
+  for (status_map::const_iterator i = status.begin ();
+       i != status.end ();
+       i++)
+    {
+      string key = (*i).first;
+      if (status[key] == Mandatory && !vl.check (key))
+	return false;
+      else if (types[key] == Sequence && vl.check (key))
+	{
+	  const ::Sequence& seq = vl.sequence (key);
+	  for (::Sequence::const_iterator j = seq.begin ();
+	       j != seq.end ();
+	       i++)
+	    if (!syntax[key]->check (**j))
+	      return false;
+	}
+      else if (types[key] == Sequence && vl.check (key))
+	{
+	  const Library& lib = *libraries[key];
+	  const ::Sequence& seq = vl.sequence (key);
+	  for (::Sequence::const_iterator j = seq.begin ();
+	       j != seq.end ();
+	       j++)
+	    {
+	      const AttributeList& al = **j;
+	      if (!al.check ("type")
+		  || !lib.syntax (al.name ("type")).check (al))
+		return false;
+	    }
+	}
+      else if (types[key] == Object && vl.check (key))
+	{
+	  const Library& lib = *libraries[key];
+	  const AttributeList& al = vl.list (key);
+	  if (!al.check ("type") || !lib.syntax (al.name ("type")).check (al))
+	    return false;
+	}
+      else if (types[key] == List
+	       && vl.check (key)
+	       && !syntax[key]->check (vl.list (key)))
+	return false;
+    }
+  return true;
 }
 
 Syntax::type 
@@ -72,6 +153,12 @@ Syntax::check (string name, const AttributeList& vl,
 	       const Log& log, bool sparse) const
 {
   return impl.check (name, vl, log, sparse);
+}
+
+bool
+Syntax::check (const AttributeList& vl) const
+{
+  return impl.check (vl);
 }
 
 Syntax::type 

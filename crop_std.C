@@ -6,9 +6,7 @@
 #include "column.h"
 #include "csmp.h"
 #include "bioclimate.h"
-#define exception _BUG_EXCPETION
-#include <math.h>
-#undef exception 
+#include "common.h"
 
 double
 CropStandard::height () const
@@ -44,6 +42,18 @@ double
 CropStandard::EPext () const
 {
   return par.Canopy.EPext;
+}
+
+double
+CropStandard::IntcpCap () const
+{
+  return par.IntcpCap;
+}
+
+double
+CropStandard::EpFac () const
+{
+  return par.EpFac;
 }
 
 double

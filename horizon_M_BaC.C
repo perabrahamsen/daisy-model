@@ -1,12 +1,36 @@
 // horizon_M_BaC.C
 
-#include "horizon_M_BaC.h"
+#include "horizon.h"
 #include "syntax.h"
 #include "alist.h"
+#include "common.h"
 
-#define exception BUG_exception
-#include <math.h>
-#undef exception
+class HorizonM_BaC : public Horizon
+{
+  // Content.
+  const double Theta_sat;
+  const double Theta_rel;
+  const double lambda;
+  const double h_b;
+  const double K_sat;
+
+  // Use.
+public:
+  double Theta (double h) const;
+  double K (double h) const;
+  double Cw2 (double h) const;
+  double h (double Theta) const;
+private:
+  double Se (double h) const;
+  
+  // Create and Destroy.
+private:
+  friend class HorizonM_BaCSyntax;
+  static Horizon& make (AttributeList& al);
+  HorizonM_BaC (const AttributeList&);
+public:
+  ~HorizonM_BaC ();
+};
 
 double 
 HorizonM_BaC::Theta (const double h) const

@@ -11,11 +11,13 @@ struct Log;
 
 class Soil
 {
-  vector<double> zplus_;	// Lower boundary of each interval.
+  const vector<double> zplus_;	// Lower boundary of each interval.
   vector<double> z_;		// (c) Center of each interval.
   vector<double> dz_;		// (c) Size of each interval.
   vector<const Horizon*> horizon_;
-  int size_;
+  const int size_;
+  const double EpFactor_;
+  const double EpInterchange_;
 public:
   // Geometry.
   inline int size () const
@@ -45,12 +47,14 @@ public:
   
   // Calculations.
   double MaxRootingDepth () const;
+  double EpFactor () const;
+  double EpInterchange () const;
 
   // Simulation.
   bool check (Log& log) const;
 
   // Creation.
-  static const Syntax& parameter_syntax ();
+  static void load_syntax (Syntax&, AttributeList&);
   Soil (const AttributeList&);
   ~Soil ();
 };

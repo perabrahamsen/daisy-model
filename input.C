@@ -41,7 +41,7 @@ struct Parser
   const Layers& load_layers (const Library& lib);
   void load_library (Library& lib);
   void add_derived (const Library&, derive_fun);
-  const AttributeList& load_derived (const Library& lib);
+  AttributeList& load_derived (const Library& lib);
   void load_list (AttributeList&, const Syntax&);
   Time get_time ();
   const Condition* get_condition ();
@@ -318,7 +318,7 @@ Parser::add_derived (const Library& lib, derive_fun derive)
   derive (name, atts, super);
 }
 
-const AttributeList&
+AttributeList&
 Parser::load_derived (const Library& lib)
 {
   const string type = get_id ();
@@ -331,7 +331,7 @@ Parser::load_derived (const Library& lib)
     }
   else
     {
-      error (string ("Unknown chief `") + type + "'");
+      error (string ("Unknown superclass `") + type + "'");
       return *new AttributeList ();
     }
 }
@@ -486,7 +486,7 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	case Syntax::Object:
 	  {
 	    const Library& lib = syntax.library (name);
-	    const AttributeList& al = load_derived (lib);
+	    AttributeList& al = load_derived (lib);
 	    const string obj = al.name ("type");
 	    lib.syntax (obj).check (obj, al, log);
 	    atts.add (name, al);

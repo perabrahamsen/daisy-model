@@ -96,11 +96,11 @@ Daisy::load_syntax (Syntax& syntax)
 {
   syntax.add_class ("crop", Crop::par_library (), &Crop::derive_type);
   syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
-  syntax.add_class ("column", Column::par_library (), &Column::derive_type);
+  syntax.add_class ("column", Column::library (), &Column::derive_type);
   syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
   syntax.add_object ("chief", Manager::library ());
   syntax.add ("time", Syntax::Date);
-  syntax.add_sequence ("field", Column::var_library ());
+  syntax.add_sequence ("field", Column::library ());
   syntax.add_output ("log", syntax, Syntax::Sparse);
   syntax.add_object ("weather", Weather::library ());
   syntax.add_object ("groundwater", Groundwater::library ());

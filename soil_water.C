@@ -101,39 +101,51 @@ SoilWater::output (Log& log, const Filter* filter) const
   log.output ("q", filter, q);
 }
 
+void
+SoilWater::load_syntax (Syntax& syntax, AttributeList&)
+{ 
+  syntax.add_object ("UZtop", UZmodel::library ());
+  syntax.add_object ("UZbottom", UZmodel::library (), Syntax::Optional);
+  syntax.add ("UZborder", Syntax::Integer, Syntax::Optional);
+  syntax.add ("S", Syntax::Array, Syntax::LogOnly);
+  syntax.add ("Theta", Syntax::Array, Syntax::Optional);
+  syntax.add ("h", Syntax::Array, Syntax::Optional);
+  syntax.add ("Xi", Syntax::Array, Syntax::Optional);
+  syntax.add ("q", Syntax::Array, Syntax::LogOnly);
+}
+
 SoilWater::SoilWater (const Soil& soil, 
-		      const AttributeList& par, 
-		      const AttributeList& var)
-  : top (UZmodel::create (par.list ("UZtop"))),
-    bottom (  par.check ("UZbottom") 
-	    ? UZmodel::create (par.list ("UZbottom"))
+		      const AttributeList& al)
+  : top (UZmodel::create (al.list ("UZtop"))),
+    bottom (  al.check ("UZbottom") 
+	    ? UZmodel::create (al.list ("UZbottom"))
 	    : 0),
-    bottom_start (  par.check ("UZborder") 
-		  ? par.integer ("UZborder")
+    bottom_start (  al.check ("UZborder") 
+		  ? al.integer ("UZborder")
 		  : -1)
 { 
   int size = 0;
   
-  if (var.check ("Theta"))
+  if (al.check ("Theta"))
     {
-      Theta = var.array ("Theta");
+      Theta = al.array ("Theta");
       size = Theta.size ();
     }
-  if (var.check ("h"))
+  if (al.check ("h"))
     {
-      h = var.array ("h");
+      h = al.array ("h");
       size = h.size ();
     }
-  if (!var.check ("Theta"))
+  if (!al.check ("Theta"))
     for (int i = 0; i < size; i++)
       Theta.push_back (soil.Theta (i, h[i]));
 
-  if (!var.check ("h"))
+  if (!al.check ("h"))
     for (int i = 0; i < size; i++)
       h.push_back (soil.h (i, Theta[i]));
 
-  if (var.check ("Xi"))
-    Xi = var.array ("Xi");
+  if (al.check ("Xi"))
+    Xi = al.array ("Xi");
   else 
     Xi.insert (Xi.begin (), size, 0.0);
 
@@ -144,26 +156,4 @@ SoilWater::SoilWater (const Soil& soil,
 SoilWater::~SoilWater ()
 {
   delete top;
-}
-
-const Syntax&
-SoilWater::parameter_syntax ()
-{
-  Syntax* syntax = new Syntax (); 
-  syntax->add_object ("UZtop", UZmodel::library ());
-  syntax->add_object ("UZbottom", UZmodel::library (), Syntax::Optional);
-  syntax->add ("UZborder", Syntax::Integer, Syntax::Optional);
-  return *syntax;
-}
-
-const Syntax&
-SoilWater::variable_syntax ()
-{
-  Syntax* syntax = new Syntax ();
-  syntax->add ("S", Syntax::Array, Syntax::LogOnly);
-  syntax->add ("Theta", Syntax::Array, Syntax::Optional);
-  syntax->add ("h", Syntax::Array, Syntax::Optional);
-  syntax->add ("Xi", Syntax::Array, Syntax::Optional);
-  syntax->add ("q", Syntax::Array, Syntax::LogOnly);
-  return *syntax;
 }

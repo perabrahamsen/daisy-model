@@ -3,6 +3,7 @@
 #include "horizon.h"
 #include "library.h"
 #include "alist.h"
+#include "syntax.h"
 #include <vector.h>
 #include <map.h>
 
@@ -44,8 +45,10 @@ Horizon::derive_type (string name, const AttributeList& al, string super)
 Horizon&
 Horizon::create (const AttributeList& al)
 {
+  assert (al.check ("type"));
   const string name = al.name ("type");
   assert (library ().check (name));
+  assert (library ().syntax (name).check (al));
   return (*Horizon_constructors)[name] (library ().lookup (name));
 }
 

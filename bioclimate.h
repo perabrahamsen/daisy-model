@@ -10,6 +10,8 @@ struct Surface;
 struct Weather;
 struct AttributeList;
 struct CropList;
+struct Soil;
+struct Syntax;
 
 class Bioclimate
 { 
@@ -17,7 +19,7 @@ class Bioclimate
   Implementation& impl;
 public:
   // Simulation
-  void tick (Surface&, const Weather&, const CropList&);
+  void tick (Surface&, const Weather&, const CropList&, const Soil&);
 
   // Canopy.
 public:
@@ -26,10 +28,17 @@ public:
   double PAR (int) const;
   double AirTemperature () const;
   double DayLength () const;
+  double PotTransPerLAI () const;
 
+  // Manager.
+public:
+  enum irrigation_from { top_irrigation, surface_irrigation };
+  void Irrigate (double flux, double temp, irrigation_from = top_irrigation);
+  
   // Create.
 public:
-  Bioclimate (const AttributeList& par, const AttributeList& var);
+  static void load_syntax (Syntax&, AttributeList&);
+  Bioclimate (const AttributeList&);
   ~Bioclimate ();
 };
 

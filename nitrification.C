@@ -2,6 +2,9 @@
 
 #include "nitrification.h"
 
-Nitrification::Nitrification (const AttributeList& /* par */, 
-			      const AttributeList& /* var */)
+void
+Nitrification::load_syntax (Syntax&, AttributeList&)
+{ }
+
+Nitrification::Nitrification (const AttributeList&)
 { }

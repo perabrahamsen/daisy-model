@@ -3,6 +3,7 @@
 #include "uzmodel.h"
 #include "library.h"
 #include "alist.h"
+#include "syntax.h"
 #include <map.h>
 
 UZtop::~UZtop ()
@@ -37,7 +38,10 @@ UZmodel*
 UZmodel::create (const AttributeList& al)
 {
   assert (al.check ("type"));
-  return (*UZ_constructors)[al.name ("type")] (al);
+  const string name = al.name ("type");
+  assert (library ().check (name));
+  assert (library ().syntax (name).check (al));
+  return (*UZ_constructors)[name] (al);
 }
 
 UZmodel::~UZmodel ()

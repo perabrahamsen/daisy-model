@@ -19,8 +19,10 @@ public:
   void SoilSurfaceConditions (double Theta, double h);
 
   // Communication with bioclimate.
-  double SurfaceEvaporation (double PotSoilEvaporation, 
-			     double Water, double Snow);
-  Surface (const AttributeList& par, const AttributeList& var);
+  double evaporation (double PotSoilEvaporation, double Water);
+
+  // Create.
+  static void load_syntax (Syntax&, AttributeList&);
+  Surface (const AttributeList& par);
 };
 

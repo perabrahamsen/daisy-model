@@ -3,6 +3,7 @@
 #include "manager.h"
 #include "library.h"
 #include "alist.h"
+#include "syntax.h"
 #include <map.h>
 
 static Library* Manager_library = NULL;
@@ -38,7 +39,10 @@ Manager&
 Manager::create (const AttributeList& al)
 {
   assert (al.check ("type"));
-  return *(*Manager_constructors)[al.name ("type")] (al);
+  const string name = al.name ("type");
+  assert (library ().check (name));
+  assert (library ().syntax (name).check (al));
+  return *(*Manager_constructors)[name] (al);
 }
 
 Manager::Manager ()
@@ -61,6 +65,7 @@ Manager_init::Manager_init ()
 
 Manager_init::~Manager_init ()
 { 
+  assert (count > 0);
   if (--count == 0)
     {
       delete Manager_library;
@@ -68,5 +73,4 @@ Manager_init::~Manager_init ()
       delete Manager_constructors;
       Manager_constructors = NULL;
     }
-  assert (count >= 0);
 }

@@ -6,10 +6,11 @@
 #include "crop.h"
 #include "csmp.h"
 #include "alist.h"
+#include "soil.h"
+#include "common.h"
+#include "syntax.h"
+#include "snow.h"
 
-#define exception BUG_exception
-#include <math.h>
-#undef exception
 
 class Bioclimate::Implementation
 {
@@ -19,29 +20,44 @@ public:
   vector<double> Height;	// Height in cm of each endpoint in c.d.
   vector<double> PAR;		// PAR of each interval of c.d.
   double LAI;			// Total LAI of all crops on this column.
-  void MainCropGrowthModel (Surface&, const Weather&, const CropList&);
+  void RadiationDistribution (const Weather&, const CropList&);
 private:
   void IntensityDistribution (double Rad0, double Ext, 
 			      vector <double>& Rad) const;
+public:
+  double PotTransPerLAI;	// Potential evapotranspiration / total LAI.
+
   // Weather.
 public:
   double temperature;		// Air temperature in canopy.
   double day_length;		// From weather (does not really belong here).
 
+  // Manager.
+  double irrigation;
+  double irrigation_temperature;
+  irrigation_from irrigation_type;
+
+  // Status.
+  double intercepted_water;
+  Snow snow;
+  
   // Construct.
-  Implementation (int);
+  Implementation (const AttributeList& al);
 };
 
-Bioclimate::Implementation::Implementation (int n)
-  : No (n),
-    Height (n),
-    PAR (n)
+Bioclimate::Implementation::Implementation (const AttributeList& al)
+  : No (al.integer ("NoOfIntervals")),
+    Height (al.integer ("NoOfIntervals")),
+    PAR (al.integer ("NoOfIntervals")),
+    irrigation (0.0),
+    irrigation_temperature (0.0),
+    intercepted_water (al.number ("intercepted_water")),
+    snow (al.list ("Snow"))
 { }
 
 void 
-Bioclimate::Implementation::MainCropGrowthModel (Surface& /* face */,
-						 const Weather& weather, 
-						 const CropList& crops)
+Bioclimate::Implementation::RadiationDistribution (const Weather& weather, 
+						   const CropList& crops)
 {
   // Fraction of Photosynthetically Active Radiation in Shortware
   // incomming radiation. 
@@ -105,11 +121,6 @@ Bioclimate::Implementation::MainCropGrowthModel (Surface& /* face */,
 
   double PAR0 = (1 - ACRef) * PARinSi * weather.GlobalRadiation ();
   IntensityDistribution (PAR0, ACExt, PAR);
-
-#if 0
-  IntensityDistribution (PotentialTranspiration (weather),
-			 ARExt, PTr);
-#endif
 }
 
 void
@@ -125,13 +136,91 @@ Bioclimate::Implementation::IntensityDistribution (const double Rad0,
 
 void 
 Bioclimate::tick (Surface& surface, const Weather& weather, 
-		  const CropList& crops)
+		  const CropList& crops, const Soil& soil)
 {
-  // Calculate total canopy, divide it intervalsm, and distribute PAR.
-  impl.MainCropGrowthModel (surface, weather, crops);
-  // Keep weather information.
+  // Keep weather information during time step.
   impl.temperature = weather.AirTemperature ();
   impl.day_length = weather.DayLength ();
+
+  // Calculate total canopy, divide it intervalsm, and distribute PAR.
+  impl.RadiationDistribution (weather, crops);
+
+  // Calculate total interception.
+  double InterceptionCapacity = 0.0;
+  double EpExtinction = 0.0;
+  double EpFactor = 0.0;
+
+  if (impl.LAI > 0.0)
+    {
+      for (CropList::const_iterator crop = crops.begin();
+	   crop != crops.end();
+	   crop++)
+	{
+	  InterceptionCapacity += (*crop)->IntcpCap () * (*crop)->LAI ();
+	  EpExtinction += (*crop)->EPext () * (*crop)->LAI ();
+	  EpFactor += (*crop)->EpFac () * (*crop)->LAI ();
+	}
+      EpExtinction /= impl.LAI;
+      if (impl.LAI > 1.0)
+	EpFactor /= impl.LAI;
+      else
+	EpFactor += (1 - impl.LAI) * soil.EpFactor ();
+    }
+  else
+    EpFactor = soil.EpFactor ();
+
+  double PotSoilEvaporation = 
+      EpFactor
+    * weather.ReferenceEvapotranspiration () 
+    * exp (- EpExtinction * impl.LAI);
+  
+  double PotCanopyEvapotranspiration =
+    EpFactor * weather.ReferenceEvapotranspiration () - PotSoilEvaporation;
+  
+  double WaterFromAbove = weather.Rain ();
+  if (impl.irrigation_type == top_irrigation)
+    WaterFromAbove += impl.irrigation;
+
+  const double Evaporation = min (WaterFromAbove, PotCanopyEvapotranspiration);
+  PotCanopyEvapotranspiration -= Evaporation;
+
+  const double Through_fall = WaterFromAbove - Evaporation
+    - min (WaterFromAbove - Evaporation, 
+	   InterceptionCapacity - impl.intercepted_water);
+
+  impl.intercepted_water += WaterFromAbove - Evaporation - Through_fall;
+
+  double Total_through_fall = Through_fall;
+  
+  if (impl.irrigation_type == surface_irrigation)
+    Total_through_fall += impl.irrigation;
+
+  double temperature;
+  if (Total_through_fall > 0.0)
+    temperature 
+      = (Through_fall * weather.AirTemperature ()
+	 + impl.irrigation * impl.irrigation_temperature) / Total_through_fall;
+  else
+    temperature = weather.AirTemperature ();
+
+  impl.snow.tick (weather.GlobalRadiation (), 0.0,
+		  Total_through_fall, weather.Snow (),
+		  temperature, 
+		  PotSoilEvaporation + PotCanopyEvapotranspiration);
+  
+  if (impl.snow.evaporation () < PotSoilEvaporation)
+    PotSoilEvaporation -= impl.snow.evaporation ();
+  else
+    {
+      PotCanopyEvapotranspiration -= 
+	impl.snow.evaporation () - PotSoilEvaporation;
+      PotSoilEvaporation = 0;
+    }
+  PotSoilEvaporation -= surface.evaporation (PotSoilEvaporation, 
+					     impl.snow.percolation ());
+
+  PotCanopyEvapotranspiration += PotSoilEvaporation * soil.EpInterchange ();
+  impl.PotTransPerLAI = PotCanopyEvapotranspiration / impl.LAI;
 }
 
 int
@@ -164,9 +253,32 @@ Bioclimate::DayLength(void) const
   return impl.day_length;
 }
 
-Bioclimate::Bioclimate (const AttributeList& par, 
-			const AttributeList& /* var */)
-  : impl (*new Implementation (par.integer ("NoOfIntervals")))
+double
+Bioclimate::PotTransPerLAI () const
+{
+  return impl.PotTransPerLAI;
+}
+
+void
+Bioclimate::Irrigate (double flux, double temp, irrigation_from type)
+{
+  impl.irrigation = flux;
+  impl.irrigation_temperature = temp;
+  impl.irrigation_type = type;
+}
+
+void
+Bioclimate::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  
+  syntax.add ("NoOfIntervals", Syntax::Integer);
+  syntax.add ("intercepted_water", Syntax::Number);
+  alist.add ("intercepted_water", 0.0);
+  ADD_SUBMODULE (syntax, alist, Snow);
+}
+
+Bioclimate::Bioclimate (const AttributeList& al)
+  : impl (*new Implementation (al))
 { }
 
 Bioclimate::~Bioclimate ()

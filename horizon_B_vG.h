@@ -33,7 +33,7 @@ private:
   static Horizon& make (AttributeList& al);
   HorizonB_vG (const AttributeList&);
 public:
-  virtual ~HorizonB_vG ();
+  ~HorizonB_vG ();
 };
 
 #endif HORIZON_B_vG_H

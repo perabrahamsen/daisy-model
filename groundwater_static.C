@@ -1,8 +1,33 @@
 // groundwater_static.C
 
-#include "groundwater_static.h"
+#include "groundwater.h"
 #include "syntax.h"
 #include "alist.h"
+
+class GroundwaterStatic : public Groundwater
+{
+  // Content.
+private:
+  const double depth;
+  
+  // UZbottom.
+public:
+  bool flux_bottom () const;
+  bool accept_bottom (double) const;
+
+  // Simulation.
+public:
+  void tick ();
+  double table () const;
+
+  // Create and Destroy.
+private:
+  friend class GroundwaterStaticSyntax;
+  static Groundwater& make (const Time&, const AttributeList&);
+  GroundwaterStatic (const Time&, const AttributeList&);
+public:
+  ~GroundwaterStatic ();
+};
 
 bool
 GroundwaterStatic::flux_bottom () const

@@ -4,11 +4,13 @@
 #define NITRIFICATION_H
 
 class AttributeList;
+class Syntax;
 
 class Nitrification
 {
 public:
-  Nitrification (const AttributeList& par, const AttributeList& var);
+  static void load_syntax (Syntax&, AttributeList&);
+  Nitrification (const AttributeList&);
 };
 
 

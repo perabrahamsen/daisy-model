@@ -20,8 +20,15 @@ protected:
   // Simulation.
 public:
   virtual void tick () = 0;
+
+  // Communication with Biocliamte.
+public:
   virtual double AirTemperature () const = 0;
   virtual double GlobalRadiation () const = 0;
+  virtual double ReferenceEvapotranspiration () const = 0;
+  virtual double Rain () const = 0;
+  virtual double Snow () const = 0;
+  
   double DayLength () const;
 
   // Utility.

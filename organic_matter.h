@@ -4,11 +4,13 @@
 #define ORGANIC_MATTER_H
 
 class AttributeList;
+class Syntax;
 
 class OrganicMatter
 {
 public:
-  OrganicMatter (const AttributeList& par, const AttributeList& var);
+  static void load_syntax (Syntax&, AttributeList&);
+  OrganicMatter (const AttributeList&);
 };
 
 

@@ -10,6 +10,7 @@ class AttributeList;
 class Log;
 class Surface;
 class Bioclimate;
+class Syntax;
 
 class SoilHeat
 {
@@ -19,7 +20,8 @@ public:
   inline double temperature (int i) const
   { return T[i]; }
   bool check (Log& log, unsigned n) const;
-  SoilHeat (const AttributeList& par, const AttributeList& var);
+  static void load_syntax (Syntax&, AttributeList&);
+  SoilHeat (const AttributeList&);
 };
 
 #endif SOIL_HEAT_H

@@ -31,8 +31,11 @@ public:
   virtual double PARext () const = 0;
   virtual double PARref () const = 0;
   virtual double EPext () const = 0;
-  virtual void CanopyStructure () = 0;
+  virtual double IntcpCap () const = 0; // Interception Capacity.
+  virtual double EpFac () const = 0; // Convertion to potential evapotransp.
   
+  virtual void CanopyStructure () = 0;
+
   // Simulation.
 public:
   virtual void tick (const Time& time, const Column&, const Bioclimate&) = 0;

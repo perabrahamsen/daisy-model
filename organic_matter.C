@@ -2,6 +2,9 @@
 
 #include "organic_matter.h"
 
-OrganicMatter::OrganicMatter (const AttributeList& /* par */, 
-			      const AttributeList& /* var */)
+void
+OrganicMatter::load_syntax (Syntax&, AttributeList&)
+{ }
+
+OrganicMatter::OrganicMatter (const AttributeList&)
 { }

@@ -36,6 +36,15 @@ Surface::ponding () const
   return 0.0;
 }
 
-Surface::Surface (const AttributeList& /* par */, 
-		  const AttributeList& /* var */)
+double
+Surface::evaporation (double /* PotSoilEvaporation */, double /* Water */)
+{
+  return 0.0;
+}
+
+void
+Surface::load_syntax (Syntax&, AttributeList&)
+{ }
+
+Surface::Surface (const AttributeList&)
 { }

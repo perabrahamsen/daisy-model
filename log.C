@@ -276,7 +276,7 @@ Log::output_point (double x, double y)
 }
 
 ostream& 
-Log::err ()
+Log::err () const
 {
   return impl.err;
 }
@@ -293,4 +293,3 @@ Log::Log (ostream& s)
 
 Log::~Log ()
 { delete &impl; }
-

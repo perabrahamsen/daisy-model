@@ -4,11 +4,13 @@
 #define DENITRIFICATION_H
 
 class AttributeList;
+class Syntax;
 
 class Denitrification
 {
 public:
-  Denitrification (const AttributeList& par, const AttributeList& var);
+  static void load_syntax (Syntax&, AttributeList&);
+  Denitrification (const AttributeList&);
 };
 
 

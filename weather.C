@@ -3,6 +3,7 @@
 #include "weather.h"
 #include "library.h"
 #include "alist.h"
+#include "syntax.h"
 #include <map.h>
 #include <algobase.h>
 #define exception _BUG_EXCPETION
@@ -42,7 +43,10 @@ Weather&
 Weather::create (const Time& t, const AttributeList& al)
 {
   assert (al.check ("type"));
-  return (*Weather_constructors)[al.name ("type")] (t, al);
+  const string name = al.name ("type");
+  assert (library ().check (name));
+  assert (library ().syntax (name).check (al));
+  return (*Weather_constructors)[name] (t, al);
 }
 
 double

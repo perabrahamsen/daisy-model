@@ -2,6 +2,9 @@
 
 #include "denitrification.h"
 
-Denitrification::Denitrification (const AttributeList& /* par */, 
-				  const AttributeList& /* var */)
+void
+Denitrification::load_syntax (Syntax&, AttributeList&)
+{ }
+
+Denitrification::Denitrification (const AttributeList&)
 { }

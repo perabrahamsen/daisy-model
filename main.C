@@ -17,8 +17,13 @@ main (int argc, char* argv[])
       Syntax syntax;
       Daisy::load_syntax (syntax);
       pair<Log*, const AttributeList*> init = parse (syntax, argc, argv);
-      Daisy daisy (*init.first, *init.second);
-      daisy.run ();
+      const AttributeList& alist = *init.second;
+      Log& log = *init.first;
+      if (syntax.check ("daisy", alist, log))
+	{
+	  Daisy daisy (log, alist);
+	  daisy.run ();
+	}
       delete init.first;
       delete init.second;
 #ifdef HANDLE_EXCEPTIONS

@@ -1,34 +1,41 @@
 // manager_rule.C
 
-#include "manager_rule.h"
+#include "manager.h"
 #include "syntax.h"
 #include "rules.h"
 #include "alist.h"
 
-struct ManagerRule::Implementation
-{ 
+class ManagerRule : public Manager
+{
+  // Content.
+private:
   const Rules& rules;
-  Implementation (const AttributeList& vl);
-};
 
-ManagerRule::Implementation::Implementation (const AttributeList& vl)
-  : rules (vl.rules ("rules"))
-{ }
+    // Simulation.
+public:
+  const Action* action (const Daisy&);
+
+    // Create and Destroy.
+private:
+  friend class ManagerRuleSyntax;
+  static Manager* make (const AttributeList&);
+  ManagerRule (const AttributeList&);
+public:
+  ~ManagerRule ();
+};
 
 const Action*
 ManagerRule::action (const Daisy& daisy)
 {
-  return impl.rules.match (daisy);
+  return rules.match (daisy);
 }
 
 ManagerRule::ManagerRule (const AttributeList& vl)
-  : impl (*new Implementation (vl))
+  : rules (vl.rules ("rules"))
 { }
 
 ManagerRule::~ManagerRule () 
-{
-  delete &impl;
-}
+{ }
 
 // Add the ManagerRule syntax to the syntax table.
 Manager* 
@@ -44,8 +51,8 @@ static struct ManagerRuleSyntax
 
 ManagerRuleSyntax::ManagerRuleSyntax ()
 {
-  Syntax* syntax = new Syntax ();
-  AttributeList* alist = new AttributeList ();
-  syntax->add ("rules", Syntax::Rules);
-  Manager::add_type ("rule", *alist, *syntax, &ManagerRule::make);
+  Syntax& syntax = *new Syntax ();
+  AttributeList& alist = *new AttributeList ();
+  syntax.add ("rules", Syntax::Rules);
+  Manager::add_type ("rule", alist, syntax, &ManagerRule::make);
 }

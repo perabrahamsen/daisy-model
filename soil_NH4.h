@@ -4,11 +4,13 @@
 #define SOIL_NH4_H
 
 class AttributeList;
+class Syntax;
 
 class SoilNH4
 {
 public:
-  SoilNH4 (const AttributeList& par, const AttributeList& var);
+  static void load_syntax (Syntax&, AttributeList&);
+  SoilNH4 (const AttributeList&);
 };
 
 

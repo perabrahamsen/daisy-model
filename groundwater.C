@@ -3,6 +3,7 @@
 #include "groundwater.h"
 #include "library.h"
 #include "alist.h"
+#include "syntax.h"
 #include <map.h>
 
 static Library* Groundwater_library = NULL;
@@ -38,7 +39,10 @@ Groundwater&
 Groundwater::create (const Time& t, const AttributeList& al)
 {
   assert (al.check ("type"));
-  return (*Groundwater_constructors)[al.name ("type")] (t, al);
+  const string name = al.name ("type");
+  assert (library ().check (name));
+  assert (library ().syntax (name).check (al));
+  return (*Groundwater_constructors)[name] (t, al);
 }
 
 Groundwater::Groundwater (const Time& t)
