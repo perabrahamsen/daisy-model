@@ -1,3 +1,19 @@
+1998-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.021 released.
+
+1998-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C: (daisy_daisy_get_column): Added some assertions.
+	(daisy_column_put_water_pressure): Ditto.
+
+	* cdaisy.h: Added more description.
+
+1998-05-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uznone.C: New file.
+	* Makefile (COMPONENTS): Added.
+
 1998-05-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.020 released.

@@ -483,6 +483,8 @@ daisy_column_get_name (const daisy_column* column);
 /* @@@ Soil Geometry.
  *
  * The numeric layers used in the soil.
+ * 
+ * The top layer is numbered `0'.   The bottom layer is `count - 1'.
  */
 
 unsigned int			/* The number of numeric layers. */

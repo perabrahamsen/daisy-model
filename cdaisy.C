@@ -496,7 +496,11 @@ daisy_daisy_count_columns (const Daisy* daisy)
 
 extern "C" Column* EXPORT
 daisy_daisy_get_column (Daisy* daisy, int col)
-{ return daisy->columns[col]; }
+{ 
+  assert (daisy);
+  assert (col >= 0 && col < daisy->columns.size ()); 
+  return daisy->columns[col]; 
+}
 
 extern "C" void EXPORT
 daisy_daisy_append_column (Daisy* /* daisy */, Column* /*column*/)
@@ -581,6 +585,8 @@ daisy_column_get_dz (const Column* column, int lay)
 extern "C" void EXPORT		// [cm]
 daisy_column_put_water_pressure (Column* column, const double h[])
 { 
+  assert (h);
+
   // Convert to vector.
   vector<double> v;
   unsigned int size = column->count_layers ();

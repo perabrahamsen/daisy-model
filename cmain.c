@@ -56,6 +56,10 @@ main (int argc, char* argv[])
 	
 	for (i = 0; i < columns; i++)
 	  {
+	    fprintf (stderr, "Column %d has %d layers", i,
+		     daisy_column_count_layers 
+		     (daisy_daisy_get_column (daisy, i)));
+
 	    /* daisy_column* column = daisy_daisy_get_column (daisy, i); */
 	    daisy_daisy_tick_column (daisy, i);
 	  }
