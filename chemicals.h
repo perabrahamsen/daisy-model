@@ -5,10 +5,12 @@
 
 #include "syntax.h"
 #include <vector>
+#include <set>
 
 class Log;
 class Filter;
 class AttributeList;
+class Chemical;
 
 class Chemicals
 { 
@@ -19,6 +21,7 @@ private:
 
   // Utilities.
 public:
+  static const Chemical& lookup (const string& name);
   static void move_fraction (Chemicals& from, Chemicals& to, double fraction);
   static void copy_fraction (const Chemicals& from, Chemicals& to,
 			     double fraction);
@@ -37,6 +40,9 @@ public:
 public:
   void output (Log&, Filter&) const;
   void add (const string& chemical, double amount); // [g/m^2]
+  double amount (const string& chemical) const; // [g/m^2]
+  typedef set<string, less<string>/**/> string_set;
+  void find_missing (const string_set& all, string_set& missing) const;
 
   // Create and Destroy.
 public:

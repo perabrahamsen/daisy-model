@@ -9,7 +9,7 @@ class SoilNO3 : public Solute
 {
 public:
   // Substance specific constants.
-  double diffusion_coefficient () const; // in free solu. [m² / s]
+  double diffusion_coefficient () const; // in free solu. [cm² / h]
  
 public:
   static void load_syntax (Syntax&, AttributeList&);

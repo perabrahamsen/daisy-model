@@ -1,10 +1,6 @@
 // soil_NH4.C
 
 #include "soil_NH4.h"
-#include "soil_water.h"
-#include "soil.h"
-#include "math.h"
-#include "mathlib.h"
 
 double 
 SoilNH4::diffusion_coefficient () const

@@ -7,7 +7,6 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "mathlib.h"
-#include "transport.h"
 
 void
 Solute::clear ()
@@ -55,6 +54,7 @@ void
 Solute::output (Log& log, Filter& filter) const
 {
   output_derived (transport, "transport", log, filter);
+  output_derived (adsorption, "adsorption", log, filter);
   log.output ("C", filter, C_);
   log.output ("M", filter, M_);
   log.output ("S", filter, S, true);

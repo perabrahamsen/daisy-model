@@ -8,6 +8,8 @@
 #include "soil_heat.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
+
+#include "soil_chemicals.h"
 #include "organic_matter.h"
 #include "nitrification.h"
 #include "denitrification.h"
@@ -35,6 +37,7 @@ private:
   SoilHeat soil_heat;
   SoilNH4 soil_NH4;
   SoilNO3 soil_NO3;
+  SoilChemicals soil_chemicals;
   OrganicMatter organic_matter;
   Nitrification& nitrification;
   Denitrification denitrification;
@@ -212,6 +215,7 @@ ColumnStandard::mix (const Time& time,
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
   soil_heat.set_energy (soil, soil_water, from, to, energy);
+  soil_chemicals.mix (soil, soil_water, from, to);
   soil_NO3.mix (soil, soil_water, from, to);
   soil_NH4.mix (soil, soil_water, from, to);
   organic_matter.mix (soil, from, to, penetration);
@@ -224,6 +228,7 @@ ColumnStandard::swap (const Time& time, double from, double middle, double to)
   mix (time, middle, to, 0.0);
   soil_water.swap (soil, from, middle, to);
   soil_heat.swap (soil, from, middle, to);
+  soil_chemicals.swap (soil, soil_water, from, middle, to);
   soil_NO3.swap (soil, soil_water, from, middle, to);
   soil_NH4.swap (soil, soil_water, from, middle, to);
   organic_matter.swap (soil, from, middle, to);
@@ -255,6 +260,8 @@ ColumnStandard::check () const
     ok = false;
   if (!soil_heat.check (n))
     ok = false;
+  if (!soil_chemicals.check (n))
+    ok = false;
   if (!soil_NO3.check (n))
     ok = false;
   if (!soil_NH4.check (n))
@@ -273,6 +280,7 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
 {
   // Remove old source sink terms. 
   soil_water.clear (soil);
+  soil_chemicals.clear ();
   soil_NO3.clear ();
   soil_NH4.clear ();
   surface.clear ();
@@ -292,6 +300,8 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   // Transport.
   soil_water.tick (surface, groundwater, soil);
   soil_heat.tick (time, soil, soil_water, surface, groundwater, weather);
+  soil_chemicals.tick (soil, soil_water, soil_heat, organic_matter,
+		       bioclimate.chemicals_down ());
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4);
 
@@ -313,6 +323,7 @@ ColumnStandard::output (Log& log, Filter& filter) const
   output_submodule (soil_heat, "SoilHeat", log, filter);
   output_submodule (soil_NH4, "SoilNH4", log, filter);
   output_submodule (soil_NO3, "SoilNO3", log, filter);
+  output_submodule (soil_chemicals, "SoilChemicals", log, filter);
   if (filter.check ("OrganicMatter"))
     {
       log.open ("OrganicMatter");
@@ -336,6 +347,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     soil_heat (al.alist ("SoilHeat")),
     soil_NH4 (al.alist ("SoilNH4")),
     soil_NO3 (al.alist ("SoilNO3")),
+    soil_chemicals (al.alist ("SoilChemicals")),
     organic_matter (al.alist ("OrganicMatter")),
     nitrification (Librarian<Nitrification>::create 
 		   (al.alist ("Nitrification"))),
@@ -349,6 +361,7 @@ void ColumnStandard::initialize (const Time& time, const Weather& weather)
   soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water);
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water);
+  soil_chemicals.initialize (alist.alist ("SoilChemicals"), soil, soil_water);
   organic_matter.initialize (alist.alist ("OrganicMatter"), soil);
   vegetation.initialize (soil, organic_matter);
 }
@@ -366,6 +379,7 @@ template class add_submodule<SoilWater>;
 template class add_submodule<SoilHeat>;
 template class add_submodule<SoilNH4>;
 template class add_submodule<SoilNO3>;
+template class add_submodule<SoilChemicals>;
 template class add_submodule<OrganicMatter>;
 template class add_submodule<Denitrification>;
 #endif
@@ -393,6 +407,7 @@ static struct ColumnStandardSyntax
     add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
     add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
     add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
+    add_submodule<SoilChemicals> ("SoilChemicals", syntax, alist);
     add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist,
 				  Syntax::State, 
 				  "The soil organic matter");

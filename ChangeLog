@@ -1,3 +1,31 @@
+1999-01-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.58 released.
+
+1999-01-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.h, log.C, log_alist.C (open_alist, close_alist): New function.
+	* soil_chemicals.C (output): Use them.
+
+	* Makefile (TEXT): Added `tlink32.ini'.
+	(daisy-src.zip): Removed `tlink32.ini'.
+
+	* action_spray.C (ActionSpraySyntax): Call `check_alist'.
+
+	* chemical_std.C, chemical.h (diffusion_coefficient, solute_alist,
+	decompose_rate, decompose_heat_factor, decompose_water_factor,
+	decompose_CO2_factor): New function.
+	* chemicals.C, chemicals.h (lookup, find_missing): New functions.
+	* soil_chemical.C, soil_chemical.h: New module.
+	* soil_chemicals.C, soil_chemicals.h: New module.
+	* Makefile (INTERFACES): Add them.
+	* column_std.C: Add `SoilChemicals' submodule.
+	* chemicals.C, chemicals.h (amount): New public member function.
+	* bioclimate_std.C, bioclimate.h (chemicals_down): New virtual
+	member function.
+	* soil_NH4.C, soil_NH4.h: Cleanup.
+	* soil_NO3.C, soil_NO3.h: Ditto.
+
 1998-12-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.57 released.

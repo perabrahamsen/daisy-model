@@ -110,6 +110,8 @@ struct BioclimateStandard : public Bioclimate
 	     Vegetation&, const Soil&, SoilWater&, const SoilHeat&);
   void output (Log&, Filter&) const;
 
+  const Chemicals& chemicals_down () const;
+
   // Canopy.
   int NumberOfIntervals () const
     { return No; }
@@ -449,6 +451,10 @@ BioclimateStandard::tick (Surface& surface, const Weather& weather,
   ChemicalDistribution (vegetation);
 }
 
+const Chemicals& 
+BioclimateStandard::chemicals_down () const
+{ return surface_chemicals_out; }
+
 void 
 BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
 {
@@ -484,8 +490,8 @@ BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
   Chemicals::copy_fraction (snow_chemicals_out, surface_chemicals_in, 
 			    1.0 - cover);
   surface_chemicals_in += canopy_chemicals_out;
-  surface_chemicals_storage += surface_chemicals_in;
-  surface_chemicals_out.clear ();
+  surface_chemicals_storage.clear (); // We don't store chemicals on surface.
+  surface_chemicals_out = surface_chemicals_in;
 
   // Reset spray.
   spray_.clear ();

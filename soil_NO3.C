@@ -1,8 +1,6 @@
 // soil_NO3.C
 
 #include "soil_NO3.h"
-#include "soil_water.h"
-#include "soil.h"
 
 double 
 SoilNO3::diffusion_coefficient () const

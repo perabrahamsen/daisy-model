@@ -1,10 +1,22 @@
-* Cloning.
+* Simulation:
 
-** Check af clone af vegetation virker.
+** Macroporer.
 
-** Sørg for at cdaisy bruger de nye funktion til clone of merge.
+** Nedføring af OM i jord.
 
-** Implementer merge.
+** Frost i jord.
+
+* Teknik:
+
+** column::merge 
+
+** Merge små AM til særlig "rest-am" pulje som ikke forsvinder.
+
+** Default parametre til SOM og SMB.
+
+** Speciel Mike/SHE log
+
+** Speciel Mike/SHE input
 
 * Ryd op i Log struktur.
 
@@ -18,7 +30,17 @@
 
 ** Hutig måde at skippe log på i Daisy::output, hvis condition er falsk.
 
-* Indfør kemikalier i jorden.
+* Cloning.
+
+** Giv hver søjle en "size" som bruges ved merge.
+
+** Check af clone af vegetation virker.
+
+** Sørg for at cdaisy bruger de nye funktion til clone of merge.
+
+** Implementer merge.
+
+* Check kemikalier i jorden.
 
 * Check pet_pm sammen med PvdK.
 

@@ -33,6 +33,10 @@ public:
   virtual void open_unnamed () = 0;
   virtual void close_unnamed () = 0;
 
+  // AList singletons variant.
+  virtual void open_alist (const string& name, const AttributeList& alist);
+  virtual void close_alist ();
+
   // Derived objects.
   virtual void open_derived (const string& field, const string& type) = 0;
   virtual void close_derived () = 0;

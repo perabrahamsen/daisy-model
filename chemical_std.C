@@ -1,6 +1,40 @@
 // chemical_std.C
 
 #include "chemical.h"
+#include "mathlib.h"
+#include "csmp.h"
+#include "soil_chemical.h"
+
+static double
+heat_turnover_factor (double T)
+{
+  if (T < 0.0)
+    return 0.0;
+  if (T < 20.0)
+    return 0.1 * T;
+
+  return exp (0.47 - 0.027 * T + 0.00193 * T *T);
+}
+
+static double
+water_turnover_factor (double h)
+{
+  if (h >= 0.0)
+    return 0.6;
+
+  const double pF = h2pF (h);
+
+  if (pF <= 0.0)
+    return 0.6;
+  if (pF <= 1.5)
+    return 0.6 + (1.0 - 0.6) * pF / 1.5;
+  if (pF <= 2.5)
+    return 1.0;
+  if (pF <= 6.5)
+    return 1.0 - (pF - 2.5) / (6.5 - 2.5);
+
+  return 0;
+}
 
 class ChemicalStandard : public Chemical
 {
@@ -9,6 +43,12 @@ private:
   const double crop_uptake_reflection_factor_;
   const double canopy_dissipation_rate_coefficient_;
   const double canopy_washoff_coefficient_;
+  const double diffusion_coefficient_; // [cm^2/h]
+  const AttributeList solute_alist_;
+  const double decompose_rate_;
+  CSMP decompose_heat_factor_;
+  CSMP decompose_water_factor_;
+  CSMP decompose_CO2_factor_;
 
   // Queries.
 public:
@@ -18,6 +58,28 @@ public:
     { return canopy_dissipation_rate_coefficient_; }
   double canopy_washoff_coefficient () const	// [mm]
     { return canopy_washoff_coefficient_; }
+  double diffusion_coefficient () const	// [cm^2/h]
+    { return diffusion_coefficient_; }
+  const AttributeList& solute_alist () const
+    { return solute_alist_; }
+  double decompose_rate () const// [h^-1]
+    { return decompose_rate_; }
+  double decompose_heat_factor (double T) const
+    {
+      if (decompose_heat_factor_.size () < 1)
+	return heat_turnover_factor (T);
+      else
+	return decompose_heat_factor_ (T);
+    }
+  double decompose_water_factor (double h) const
+    { 
+      if (decompose_water_factor_.size () < 1)
+	return water_turnover_factor (h);
+      else
+	return decompose_water_factor_ (h);
+    }
+  double decompose_CO2_factor (double CO2) const
+    { return decompose_CO2_factor_ (CO2); }
 
   // Create.
 public:
@@ -31,9 +93,18 @@ ChemicalStandard::ChemicalStandard (const AttributeList& al)
 crop_uptake_reflection_factor")),
     canopy_dissipation_rate_coefficient_ (al.number ("\
 canopy_dissipation_rate_coefficient")),
-    canopy_washoff_coefficient_ (al.number ("\
-canopy_washoff_coefficient"))
+    canopy_washoff_coefficient_ (al.number ("canopy_washoff_coefficient")),
+    diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
+    solute_alist_ (al.alist ("solute")),
+    decompose_rate_ (al.number ("decompose_rate")),
+    decompose_heat_factor_ (al.csmp ("decompose_heat_factor")),
+    decompose_water_factor_ (al.csmp ("decompose_water_factor")),
+    decompose_CO2_factor_ (al.csmp ("decompose_CO2_factor"))
 { }
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<SoilChemical>;
+#endif BORLAND_TEMPLATES
 
 static struct ChemicalStandardSyntax
 {
@@ -50,6 +121,26 @@ static struct ChemicalStandardSyntax
 		  "How fast does the chemical dissipate on canopy.");
       syntax.add ("canopy_washoff_coefficient", "mm", Syntax::Const,
 		  "How fast is the chemical washed off the canopy.");
+      syntax.add ("diffusion_coefficient", "cm^2/s", Syntax::Const, 
+		  "Diffusion coefficient");
+      add_submodule<SoilChemical> ("solute", syntax, alist, 
+				   Syntax::Const,
+				   "Description of chemical in soil.");
+      syntax.add ("decompose_rate", "h^-1", Syntax::Const,
+		  "Fraction of solute being decomposed each hour");
+      CSMP empty;
+      syntax.add ("decompose_heat_factor", Syntax::CSMP, Syntax::Const,
+		  "Heat factor on decomposition [dg C ->]");
+      alist.add ("decompose_heat_factor", empty);
+      syntax.add ("decompose_water_factor", Syntax::CSMP, Syntax::Const,
+		  "Water potential factor on decomposition [cm ->]");
+      alist.add ("decompose_water_factor", empty);
+      syntax.add ("decompose_CO2_factor", Syntax::CSMP, Syntax::Const,
+		  "CO2 development factor on decomposition [g C/cm³ ->]");
+      CSMP CO2_factor;
+      CO2_factor.add (0.0, 1.0);
+      CO2_factor.add (1.0, 1.0);
+      alist.add ("decompose_CO2_factor", CO2_factor);
       Librarian<Chemical>::add_type ("default", alist, syntax, &make);
     }
 } ChemicalStandard_syntax;

@@ -58,7 +58,7 @@ static struct ActionSpraySyntax
     }
   ActionSpraySyntax ()
   { 
-    Syntax& syntax = *new Syntax ();
+    Syntax& syntax = *new Syntax (check_alist);
     AttributeList& alist = *new AttributeList ();
     syntax.add ("chemical", Syntax::String, Syntax::Const,
 		"Name of pesticide to spray.");

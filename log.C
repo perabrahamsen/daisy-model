@@ -14,6 +14,14 @@ struct Log::Implementation
 };
 
 void 
+Log::open_alist (const string& name, const AttributeList&)
+{ open (name); }
+
+void 
+Log::close_alist ()
+{ close (); }
+
+void 
 Log::open_geometry (const Geometry& g)
 { 
   impl.geometries.push_back (&g);

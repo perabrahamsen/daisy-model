@@ -58,6 +58,10 @@ struct LogAList : public Log, public Filter
   void close ();
   void open_unnamed ();		// Items in a AList sequence.
   void close_unnamed ();	
+  void open_alist (const string& name, // AList singletons variant.
+		   const AttributeList& alist);
+  void close_alist ();
+
   void open_derived (const string& field, // Object singletons.
 		     const string& type); 
   void close_derived ();

@@ -42,6 +42,9 @@ struct Chemicals::Implementation
     { add (lookup (name), amount); }
   void add (const Chemical* chemical, double amount) // [g/m^2]
     { chemicals[chemical] += amount; }
+  double amount (const string& name) const; // [g/m^2]
+  typedef set<string, less<string>/**/> string_set;
+  void find_missing (const string_set& all, string_set& missing) const;
 
   // Create and Destroy.
   void clear ();
@@ -200,6 +203,33 @@ Chemicals::Implementation::output (Log& log, Filter& filter) const
     }
 }
 
+double
+Chemicals::Implementation::amount (const string& name) const
+{
+  const Chemical* chemical = lookup (name);
+
+  chemical_map::const_iterator i = chemicals.find (chemical);
+  
+  if (i == chemicals.end ())
+    return 0.0;
+
+  return  (*i).second;
+}
+
+void 
+Chemicals::Implementation::find_missing (const string_set& all,
+					 string_set& missing) const
+{
+  for (chemical_map::const_iterator i = chemicals.begin ();
+       i != chemicals.end ();
+       i++)
+    {
+      const string name = (*i).first->name;
+      if (all.find (name) == all.end ())
+	missing.insert (name);
+    }
+}
+
 void
 Chemicals::Implementation::clear ()
 { 
@@ -242,6 +272,10 @@ Chemicals::Implementation::Implementation (const vector<AttributeList*>& al)
     add (al[i]->name ("chemical"), al[i]->number ("amount"));
 }
 
+const Chemical&
+Chemicals::lookup (const string& name)
+{ return *Implementation::lookup (name); }
+
 void
 Chemicals::move_fraction (Chemicals& from, Chemicals& to, double fraction)
 { Implementation::move_fraction (from.impl, to.impl, fraction); }
@@ -276,6 +310,14 @@ Chemicals::output (Log& log, Filter& filter) const
 void 
 Chemicals::add (const string& chemical, double amount)
 { impl.add (chemical, amount); }
+
+double
+Chemicals::amount (const string& chemical) const
+{ return impl.amount (chemical); }
+
+void 
+Chemicals::find_missing (const string_set& all, string_set& missing) const
+{ impl.find_missing (all, missing); }
 
 void 
 Chemicals::clear ()

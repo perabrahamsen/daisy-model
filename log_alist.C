@@ -274,11 +274,11 @@ LogAList::close_unnamed ()
 	// From default alist.
 	alist_sequence ().push_back (&old_alist);
       else
-	{
-	  // Replace specified alist.
-	  alist_sequence ()[unnamed ()] = &old_alist;
-	  unnamed_stack[0]++;
-	}
+	// Replace specified alist.
+	alist_sequence ()[unnamed ()] = &old_alist;
+      // Use next entry.
+      if (unnamed () >= 0)
+	unnamed_stack[0]++;
       assert (syntax_stack.size () > 1);
       assert (syntax_stack[1]->lookup (entry ()) == Syntax::AList);
       assert (syntax_stack[1]->size (entry ()) != Syntax::Singleton);
@@ -287,6 +287,34 @@ LogAList::close_unnamed ()
     close_ignore ();
 }
 
+void 
+LogAList::open_alist (const string& name, const AttributeList& alist)
+{
+  if (is_active)
+    {
+      assert (syntax ().lookup (name) == Syntax::AList);
+      assert (syntax ().size (name) == Syntax::Singleton);
+      const Syntax& syn = syntax ().syntax (name);
+      push (name, syn, alist);
+    }
+  else
+    open_ignore ();
+}
+
+void
+LogAList::close_alist ()
+{ 
+  if (is_active)
+    {
+      AttributeList& old_alist = alist ();
+      const string old_entry = entry ();
+      pop ();
+      alist ().add (old_entry, old_alist);
+      delete &old_alist;
+    }
+  else
+    close_ignore (); 
+}
 void
 LogAList::open_derived (const string& field, const string& type)
 { 
