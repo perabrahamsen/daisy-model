@@ -144,17 +144,17 @@ SoilWater::~SoilWater ()
   delete top;
 }
 
-const Syntax*
+const Syntax&
 SoilWater::parameter_syntax ()
 {
   Syntax* syntax = new Syntax (); 
   syntax->add ("UZtop", Syntax::UZmodel);
   syntax->add ("UZbottom", Syntax::UZmodel, Syntax::Optional);
   syntax->add ("UZborder", Syntax::UZmodel, Syntax::Optional);
-  return syntax;
+  return *syntax;
 }
 
-const Syntax*
+const Syntax&
 SoilWater::variable_syntax ()
 {
   Syntax* syntax = new Syntax ();
@@ -163,5 +163,5 @@ SoilWater::variable_syntax ()
   syntax->add ("h", Syntax::Array, Syntax::Optional);
   syntax->add ("Xi", Syntax::Array, Syntax::Optional);
   syntax->add ("q", Syntax::Array, Syntax::LogOnly);
-  return syntax;
+  return *syntax;
 }

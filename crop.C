@@ -1,10 +1,7 @@
 // crop.C
 
 #include "crop.h"
-#include "alist.h"
-#include "syntax.h"
 #include "library.h"
-
 #include <map.h>
 
 static Library* Crop_par_library = NULL;
@@ -29,9 +26,9 @@ Crop::var_library ()
 void
 Crop::add_type (const string name, 
 		const AttributeList& parList, 
-		const Syntax* parSyntax,
+		const Syntax& parSyntax,
 		const AttributeList& varList, 
-		const Syntax* varSyntax,
+		const Syntax& varSyntax,
 		constructor cons)
 {
   assert (Crop_par_library);

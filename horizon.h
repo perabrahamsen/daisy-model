@@ -27,8 +27,8 @@ public:
   // Library.
 public:
   static const Library& library ();
-  typedef Horizon* (*constructor) (const AttributeList&);
-  static void add_type (string name, const AttributeList&, const Syntax*,
+  typedef Horizon& (*constructor) (const AttributeList&);
+  static void add_type (string name, const AttributeList&, const Syntax&,
 			constructor);
   static void derive_type (string name, const AttributeList&, string super);
   static Horizon& create (string);

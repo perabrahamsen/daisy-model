@@ -59,10 +59,10 @@ HorizonYolo::~HorizonYolo ()
 
 // Add the HorizonYolo syntax to the syntax table.
 
-Horizon*
+Horizon&
 HorizonYolo::make (AttributeList& al)
 {
-  return new HorizonYolo (al);
+  return *new HorizonYolo (al);
 }
 
 static struct HorizonYoloSyntax
@@ -74,5 +74,5 @@ HorizonYoloSyntax::HorizonYoloSyntax ()
 { 
   Syntax* syntax = new Syntax ();
   AttributeList* alist = new AttributeList ();
-  Horizon::add_type ("yolo", *alist, syntax, &HorizonYolo::make);
+  Horizon::add_type ("yolo", *alist, *syntax, &HorizonYolo::make);
 }

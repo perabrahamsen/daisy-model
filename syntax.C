@@ -3,25 +3,6 @@
 #include "syntax.h"
 #include "alist.h"
 
-Syntax_init::Syntax_init ()
-{ 
-  if (count++ == 0)
-    syntax_table = new Syntax ();
-  assert (count > 0);
-}
-
-Syntax_init::~Syntax_init ()
-{ 
-  if (--count == 0)
-    {
-      delete syntax_table;
-      syntax_table = NULL;
-    }
-  assert (count >= 0);
-}
-
-int Syntax_init::count;
-
 struct Syntax::Implementation
 {
   // BUG: This should be replaced with STL maps.
@@ -79,12 +60,12 @@ Syntax::status (string key) const
   assert (false);
 }
 
-const Syntax*
+const Syntax&
 Syntax::syntax (string key) const
 {
   for (int i = 0; i < impl.size; i++)
     if (impl.UGLY_key[i] == key)
-      return impl.UGLY_syntax[i];
+      return *impl.UGLY_syntax[i];
   assert (false);
 }
 
@@ -106,16 +87,6 @@ Syntax::size (string key) const
   assert (false);
 }
 
-string
-Syntax::find (const Syntax* syntax) const
-{
-  for (int i = 0; i < impl.size; i++)
-    if (impl.UGLY_syntax[i] == syntax)
-      return impl.UGLY_key[i];
-  assert (false);
-  return "BUG"; // SHUT UP.
-}
-
 void
 Syntax::add (string key, type t, required req)
 {
@@ -133,7 +104,7 @@ void
 Syntax::add (string key, const Syntax* s, required req)
 {
   add (key, List, req);
-  impl.UGLY_syntax[impl.size - 1] = (s);
+  impl.UGLY_syntax[impl.size - 1] = s;
 }
 
 void
@@ -157,5 +128,3 @@ Syntax::~Syntax ()
 {
   delete &impl;
 }
-
-Syntax* syntax_table = NULL;

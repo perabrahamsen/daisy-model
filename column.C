@@ -1,10 +1,7 @@
 // column.C
 
 #include "column.h"
-#include "alist.h"
-#include "syntax.h"
 #include "library.h"
-
 #include <map.h>
 
 static Library* Column_par_library = NULL;
@@ -29,9 +26,9 @@ Column::var_library ()
 void
 Column::add_type (const string name, 
 		  const AttributeList& parList, 
-		  const Syntax* parSyntax,
+		  const Syntax& parSyntax,
 		  const AttributeList& varList, 
-		  const Syntax* varSyntax,
+		  const Syntax& varSyntax,
 		  constructor cons)
 {
   assert (Column_par_library);

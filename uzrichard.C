@@ -455,5 +455,5 @@ UZRichardSyntax::UZRichardSyntax ()
   syntax->add ("max_relative_difference", Syntax::Number);
   alist->add ("max_relative_difference", 0.001);
   
-  UZmodel::add_type ("richards", *alist, syntax, &UZRichard::make);
+  UZmodel::add_type ("richards", *alist, *syntax, &UZRichard::make);
 }

@@ -1,20 +1,13 @@
 // syntax.h
 
+#ifndef SYNTAX_H
+#define SYNTAX_H
+
 #include <std/string.h>
 
 struct FTable;
 struct AttributeList;
 struct Log;
-
-// Ensure the syntax table is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class Syntax_init
-{
-  static int count;
-public:
-  Syntax_init ();
-  ~Syntax_init ();
-} syntax_init;
 
 class Syntax 
 { 
@@ -29,10 +22,9 @@ public:
   bool check (string, const AttributeList&, const Log&) const;
   required status (string) const;
   type lookup (string) const;
-  const Syntax* syntax (string) const;
+  const Syntax& syntax (string) const;
   const FTable* function (string) const;
   int  size (string) const;
-  string find (const Syntax*) const;
   void add (string, type, required = Mandatory);
   void add (string, const Syntax*, required = Mandatory);
   void add (string, const FTable*, required = Mandatory);
@@ -41,4 +33,4 @@ public:
   ~Syntax ();
 };
 
-extern Syntax* syntax_table;
+#endif SYNTAX_H

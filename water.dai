@@ -21,15 +21,14 @@
 	 (OrganicMatter)
 	 (Nitrification)
 	 (Denitrification))
- (groundwater)
- (manager farmer manager
+ (groundwater static)
+ (manager farmer rule
 	  (rules (((after 1990 4 15 3)	;100 hour later.
 		   (stop)))))
  (log ("water.log" (hourly 1)
        time
        (columns (c1 (SoilWater Theta q)))))
- (weather (from 1990 4 11)		;Unused
-	     (file "water.weather"))
+ (weather simple)
  (time 1990 4 11)
  (field (c1 (crops)
 	    (Bioclimate)

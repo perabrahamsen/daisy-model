@@ -63,7 +63,7 @@ public:
   static const Library& library ();
   static UZmodel* create (const AttributeList&);
   typedef UZmodel* (*constructor) (const AttributeList&);
-  static void add_type (const string, const AttributeList&, const Syntax*,
+  static void add_type (const string, const AttributeList&, const Syntax&,
 			constructor);
   static void derive_type (const string, const AttributeList&, string super);
 

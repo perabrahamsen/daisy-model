@@ -1,8 +1,6 @@
 // horizon.C
 
 #include "horizon.h"
-#include "syntax.h"
-#include "alist.h"
 #include "library.h"
 #include <vector.h>
 #include <map.h>
@@ -35,7 +33,7 @@ Horizon::library ()
 void
 Horizon::add_type (const string name, 
 		   const AttributeList& al, 
-		   const Syntax* syntax,
+		   const Syntax& syntax,
 		   constructor cons)
 {
   assert (Horizon_library);
@@ -54,7 +52,7 @@ Horizon&
 Horizon::create (const string name)
 {
   assert (library ().check (name));
-  return *(*Horizon_constructors)[name] (library ().lookup (name));
+  return (*Horizon_constructors)[name] (library ().lookup (name));
 }
 
 Horizon::Horizon (const AttributeList& al)

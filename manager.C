@@ -1,45 +1,72 @@
 // manager.C
 
 #include "manager.h"
-#include "syntax.h"
-#include "rules.h"
+#include "library.h"
 #include "alist.h"
+#include <map.h>
 
-struct Manager::Implementation
-{ 
-    const Rules& rules;
-    Implementation (const AttributeList& vl);
-};
+static Library* Manager_library = NULL;
+typedef map<string, Manager::constructor, less<string> > Manager_map_type;
+static Manager_map_type* Manager_constructors;
 
-Manager::Implementation::Implementation (const AttributeList& vl)
-    : rules (vl.rules ("rules"))
-{ }
-
-const Action*
-Manager::action (const Daisy& daisy)
+const Library&
+Manager::library ()
 {
-    return impl.rules.match (daisy);
+  assert (Manager_library);
+  return *Manager_library;
 }
 
-Manager::Manager (const AttributeList& vl)
-    : impl (*new Implementation (vl))
+void
+Manager::add_type (const string name, 
+		   const AttributeList& al, 
+		   const Syntax& syntax,
+		   constructor cons)
+{
+  assert (Manager_library);
+  Manager_library->add (name, al, syntax);
+  Manager_constructors->insert(Manager_map_type::value_type (name, cons));
+}
+
+void 
+Manager::derive_type (string name, const AttributeList& al, string super)
+{
+  add_type (name, al, library ().syntax (super), 
+	    (*Manager_constructors)[super]);
+}
+
+Manager&
+Manager::create (const AttributeList& al)
+{
+  assert (al.check ("type"));
+  return *(*Manager_constructors)[al.name ("type")] (al);
+}
+
+Manager::Manager ()
 { }
 
 Manager::~Manager () 
-{
-    delete &impl;
+{ }
+
+int Manager_init::count;
+
+Manager_init::Manager_init ()
+{ 
+  if (count++ == 0)
+    {
+      Manager_library = new Library ();
+      Manager_constructors = new Manager_map_type ();
+    }
+  assert (count > 0);
 }
 
-
-// Add the Manager syntax to the syntax table.
-static struct ManagerSyntax
-{
-    ManagerSyntax ();
-} manager_syntax;
-
-ManagerSyntax::ManagerSyntax ()
+Manager_init::~Manager_init ()
 { 
-    Syntax* syntax = new Syntax ();
-    syntax->add ("rules", Syntax::Rules);
-    syntax_table->add ("manager", syntax);
+  if (--count == 0)
+    {
+      delete Manager_library;
+      Manager_library = NULL;
+      delete Manager_constructors;
+      Manager_constructors = NULL;
+    }
+  assert (count >= 0);
 }

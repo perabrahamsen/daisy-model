@@ -20,7 +20,7 @@ public:
   // Create and Destroy.
 private:
   friend class HorizonYoloSyntax;
-  static Horizon* make (AttributeList& al);
+  static Horizon& make (AttributeList& al);
   HorizonYolo (const AttributeList&);
 public:
   virtual ~HorizonYolo ();

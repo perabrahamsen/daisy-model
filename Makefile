@@ -8,7 +8,8 @@ OBJ = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	soil.o mathlib.o template.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
 	denitrification.o soil_heat.o groundwater.o uzrichard.o \
-	horizon_yolo.o crop_std.o
+	horizon_yolo.o crop_std.o manager_rule.o weather_simple.o \
+	groundwater_static.o
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJ:.o=.h)
 TEST = crop.dai old_crop.chp old_crop.log \
@@ -100,17 +101,16 @@ input.o: input.C input.h daisy.h time.h manager.h weather.h \
  groundwater.h uzmodel.h log.h horizon.h column.h crop.h alist.h \
  csmp.h rules.h library.h syntax.h action.h condition.h filter.h
 log.o: log.C log.h condition.h daisy.h time.h filter.h csmp.h
-weather.o: weather.C weather.h time.h syntax.h alist.h daisy.h
-manager.o: manager.C manager.h daisy.h time.h syntax.h rules.h alist.h
-column.o: column.C column.h alist.h daisy.h time.h syntax.h library.h
-crop.o: crop.C crop.h alist.h daisy.h time.h syntax.h library.h
+weather.o: weather.C weather.h time.h library.h alist.h daisy.h
+manager.o: manager.C manager.h library.h alist.h daisy.h time.h
+column.o: column.C column.h library.h
+crop.o: crop.C crop.h library.h
 alist.o: alist.C alist.h daisy.h time.h action.h condition.h
 syntax.o: syntax.C syntax.h alist.h daisy.h time.h
 library.o: library.C library.h alist.h daisy.h time.h syntax.h
 action.o: action.C action.h daisy.h time.h column.h
 condition.o: condition.C condition.h daisy.h time.h
-horizon.o: horizon.C horizon.h syntax.h alist.h daisy.h time.h \
- library.h
+horizon.o: horizon.C horizon.h library.h
 ftable.o: ftable.C ftable.h
 crop_impl.o: crop_impl.C crop_impl.h crop_std.h crop.h ftable.h csmp.h \
  syntax.h alist.h daisy.h time.h filter.h log.h bioclimate.h
@@ -122,8 +122,7 @@ column_std.o: column_std.C column_std.h daisy.h time.h column.h \
  bioclimate.h surface.h uzmodel.h soil.h horizon.h soil_water.h \
  soil_heat.h soil_NH4.h soil_NO3.h organic_matter.h nitrification.h \
  denitrification.h alist.h syntax.h library.h log.h filter.h crop.h
-uzmodel.o: uzmodel.C uzmodel.h library.h syntax.h alist.h daisy.h \
- time.h
+uzmodel.o: uzmodel.C uzmodel.h library.h alist.h daisy.h time.h
 soil.o: soil.C soil.h horizon.h alist.h daisy.h time.h
 mathlib.o: mathlib.C mathlib.h
 template.o: template.C ftable.h crop_impl.h crop_std.h crop.h csmp.h \
@@ -140,10 +139,17 @@ nitrification.o: nitrification.C nitrification.h
 denitrification.o: denitrification.C denitrification.h
 soil_heat.o: soil_heat.C soil_heat.h daisy.h time.h alist.h \
  bioclimate.h
-groundwater.o: groundwater.C groundwater.h uzmodel.h syntax.h
+groundwater.o: groundwater.C groundwater.h time.h uzmodel.h library.h \
+ alist.h daisy.h
 uzrichard.o: uzrichard.C uzrichard.h uzmodel.h soil.h horizon.h \
  mathlib.h alist.h daisy.h time.h syntax.h
 horizon_yolo.o: horizon_yolo.C horizon_yolo.h horizon.h syntax.h \
  alist.h daisy.h time.h
 crop_std.o: crop_std.C crop_impl.h crop_std.h crop.h ftable.h csmp.h \
  log.h time.h column.h bioclimate.h daisy.h
+manager_rule.o: manager_rule.C manager_rule.h manager.h syntax.h \
+ rules.h alist.h daisy.h time.h
+weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
+ daisy.h
+groundwater_static.o: groundwater_static.C groundwater_static.h \
+ groundwater.h time.h uzmodel.h syntax.h alist.h daisy.h

@@ -29,10 +29,6 @@ Library::lookup (string key) const
     for (int i = 0; i < impl.UGLY_MAX_SIZE; i++)
 	if (impl.UGLY_key[i] == key)
 	    return *impl.UGLY_value[i];
-#ifndef MODERN_LIBRARIES
-    if (syntax_table->lookup (key) == Syntax::List)
-	return AttributeList::empty;;
-#endif MODERN_LIBRARIES
     THROW (UninitializedValue ());
 }
 
@@ -43,43 +39,26 @@ Library::check (string key) const
 	if (impl.UGLY_key[i] == key)
 	    return true;
 
-#ifndef MODERN_LIBRARIES
-    if (syntax_table->lookup (key) == Syntax::List)
-	return true;
-#endif MODERN_LIBRARIES
-
     return false;
 }
 
-#ifndef MODERN_LIBRARIES
-string
-Library::root (string key) const
-{
-    return syntax_table->find (syntax (key));
-}
-#endif
-
 void
-Library::add (string key, const AttributeList& value, const Syntax* syntax)
+Library::add (string key, const AttributeList& value, const Syntax& syntax)
 {
     assert (impl.size < impl.UGLY_MAX_SIZE);
     impl.UGLY_key[impl.size] = key;
     impl.UGLY_value[impl.size] = &value;
-    impl.UGLY_syntax[impl.size] = syntax;
+    impl.UGLY_syntax[impl.size] = &syntax;
     impl.size++;
 }
 
-const Syntax* 
+const Syntax& 
 Library::syntax (string key) const
 { 
     
     for (int i = 0; i < impl.UGLY_MAX_SIZE; i++)
 	if (impl.UGLY_key[i] == key)
-	    return impl.UGLY_syntax[i];
-#ifndef MODERN_LIBRARIES
-    if (syntax_table->lookup (key) == Syntax::List)
-	return syntax_table->syntax (key);
-#endif
+	    return *impl.UGLY_syntax[i];
     THROW (UninitializedValue ());    
 }
 

@@ -2,7 +2,6 @@
 
 #include "uzmodel.h"
 #include "library.h"
-#include "syntax.h"
 #include "alist.h"
 #include <map.h>
 
@@ -26,7 +25,7 @@ UZmodel::library ()
 void
 UZmodel::add_type (const string name, 
 		   const AttributeList& al, 
-		   const Syntax* syntax,
+		   const Syntax& syntax,
 		   constructor cons)
 {
   assert (UZ_library);

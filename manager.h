@@ -3,28 +3,44 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
-#include "daisy.h"
+#include <std/string.h>
 
 struct AttributeList;
 struct Action;
+struct Daisy;
+struct Syntax;
+struct Library;
 
 class Manager
 {
-    // Content.
-private:
-    struct Implementation;
-    Implementation& impl;
-
-    // Simulation.
+  // Simulation.
 public:
-    const Action* action (const Daisy&);
+  virtual const Action* action (const Daisy&) = 0;
+
+  // Library.
+public:
+  static const Library& library ();
+  static Manager& create (const AttributeList&);
+  typedef Manager* (*constructor) (const AttributeList&);
+  static void add_type (const string, const AttributeList&, const Syntax&,
+			constructor);
+  static void derive_type (const string, const AttributeList&, string super);
 
     // Create and Destroy.
-private:
-    friend Input; // Only create from Input.
-    Manager (const AttributeList&);
+protected:
+  Manager ();
 public:
-    ~Manager ();
+  virtual ~Manager ();
 };
+
+// Ensure the Manager library is initialized.
+// See TC++PL, 2ed, 10.5.1, for an explanation.
+static class Manager_init
+{
+  static int count;
+public:
+  Manager_init ();
+  ~Manager_init ();
+} Manager_init;
 
 #endif MANAGER_H

@@ -15,9 +15,8 @@ class Library
 public:
   const AttributeList& lookup (string) const;
   bool check (string) const;
-  string root (string) const;
-  void add (string, const AttributeList&, const Syntax*);
-  const Syntax* syntax (string) const;
+  void add (string, const AttributeList&, const Syntax&);
+  const Syntax& syntax (string) const;
   Library ();
   ~Library ();
 };

@@ -98,17 +98,3 @@ Daisy::~Daisy ()
        column++)
     delete *column;
 }
-
-// Add the Daisy syntax to the syntax table.
-static struct DaisySyntax
-{
-  DaisySyntax ();
-} Daisy_syntax;
-
-DaisySyntax::DaisySyntax ()
-{ 
-  Syntax* syntax = new Syntax ();
-  syntax->add ("columns", Syntax::Columns);
-  syntax->add ("time", Syntax::Date);
-  syntax_table->add ("daisy", syntax);
-}

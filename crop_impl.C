@@ -569,6 +569,6 @@ CropStandardSyntax::CropStandardSyntax ()
     CrpAux->add ("NO3Upt", Syntax::Number);
     al->add ("NO3Upt", 0.0);
   }
-  Crop::add_type ("crop", *parList, parSyntax, *varList, varSyntax, 
+  Crop::add_type ("crop", *parList, *parSyntax, *varList, *varSyntax, 
 		  &CropStandard::make);
 }

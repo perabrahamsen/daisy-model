@@ -15,7 +15,7 @@ ColumnStandard::sow (string crop, Log& log)
     {
       const AttributeList& values = Crop::var_library ().lookup (crop);
 	
-      if (Crop::var_library ().syntax (crop)->check (crop, values, log))
+      if (Crop::var_library ().syntax (crop).check (crop, values, log))
 	crops.push_back (Crop::create (crop, values));
       else
 	cerr << "Cannot sow incomplete crop `" << crop << "'\n";
@@ -138,8 +138,8 @@ ColumnStandard::make (string name,
 
 static struct ColumnStandardSyntax
 {
-  const Syntax* parameters ();
-  const Syntax* variables ();
+  const Syntax& parameters ();
+  const Syntax& variables ();
   ColumnStandardSyntax ();
 } column_syntax;
 
@@ -151,7 +151,7 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
 		    &ColumnStandard::make);
 }
 
-const Syntax*
+const Syntax&
 ColumnStandardSyntax::parameters ()
 { 
   Syntax* par = new Syntax ();
@@ -165,7 +165,7 @@ ColumnStandardSyntax::parameters ()
   soil->add ("horizons", Syntax::Soil);
   soil->add ("zplus", Syntax::Array);
   par->add ("Soil", soil);
-  par->add ("SoilWater", SoilWater::parameter_syntax ());
+  par->add ("SoilWater", &SoilWater::parameter_syntax ());
   Syntax* soil_heat = new Syntax ();
   par->add ("SoilHeat", soil_heat);
   Syntax* soil_NH4 = new Syntax ();
@@ -179,10 +179,10 @@ ColumnStandardSyntax::parameters ()
   Syntax* denitrification = new Syntax ();
   par->add ("Denitrification", denitrification);
 
-  return par;
+  return *par;
 }
 
-const Syntax*
+const Syntax&
 ColumnStandardSyntax::variables ()
 { 
   Syntax* var = new Syntax ();
@@ -193,7 +193,7 @@ ColumnStandardSyntax::variables ()
   var->add ("Surface", surface);
   Syntax* soil = new Syntax ();
   var->add ("Soil", soil);
-  var->add ("SoilWater", SoilWater::variable_syntax ());
+  var->add ("SoilWater", &SoilWater::variable_syntax ());
   Syntax* soil_heat = new Syntax ();
   soil_heat->add ("T", Syntax::Array);
   var->add ("SoilHeat", soil_heat);
@@ -209,5 +209,5 @@ ColumnStandardSyntax::variables ()
   var->add ("Denitrification", denitrification);
   var->add ("crops", Syntax::Crops);
 
-  return var;
+  return *var;
 }

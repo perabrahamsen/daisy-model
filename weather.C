@@ -1,65 +1,54 @@
 // weather.C
 
 #include "weather.h"
-#include "syntax.h"
+#include "library.h"
 #include "alist.h"
+#include <map.h>
+#include <algobase.h>
 #define exception _BUG_EXCPETION
 #include <math.h>
 #undef exception
-#include <algobase.h>
 
-struct Weather::Implementation
-{ 
-  double Latitude;
-  Implementation (const AttributeList&);
-};
+static Library* Weather_library = NULL;
+typedef map<string, Weather::constructor, less<string> > Weather_map_type;
+static Weather_map_type* Weather_constructors;
 
-Weather::Implementation::Implementation (const AttributeList& al)
-  : Latitude (al.check ("Latitude") ? al.number ("Latitude") : 56.0)
-{ }
+const Library&
+Weather::library ()
+{
+  assert (Weather_library);
+  return *Weather_library;
+}
 
 void
-Weather::tick ()
+Weather::add_type (const string name, 
+		   const AttributeList& al, 
+		   const Syntax& syntax,
+		   constructor cons)
 {
-  time.tick ();
+  assert (Weather_library);
+  Weather_library->add (name, al, syntax);
+  Weather_constructors->insert(Weather_map_type::value_type (name, cons));
 }
 
-double
-Weather::AirTemperature (void) const
+void 
+Weather::derive_type (string name, const AttributeList& al, string super)
 {
-  double t = 2 * M_PI / 365 * time.yday ();
-  return (7.7 - 7.7 * cos (t) - 3.6 * sin (t));
+  add_type (name, al, library ().syntax (super), 
+	    (*Weather_constructors)[super]);
 }
 
-double
-Weather::GlobalRadiation () const
+Weather&
+Weather::create (const Time& t, const AttributeList& al)
 {
-  /*a function of the weather*/
-  static const double A0[] =
-  { 17.0, 44.0, 94.0, 159.0, 214.0, 247.0, 214.0, 184.0, 115.0, 58.0, 25.0,
-    13.0 };
-  static const double A1[] = 
-  { -31.0, -74.0, -148.0, -232.0, -291.0, -320.0, -279.0, -261.0, -177.0,
-    -96.0, -45.0, -24.0 };
-  static const double B1[] =
-  { -7.0, -20.0, -34.0, -45.0, -53.0, -63.0, -67.0, -52.0, -30.0, -13.0, 
-    -6.0, -4.0 };
-  static const double A2[] = 
-  { 21.0, 42.0, 68.0, 77.0, 67.0, 0.0, 0.0, 75.0, 73.0, 54.0, 32.0, 18.0 };
-  static const double B2[] = 
-  { 11.0, 25.0, 32.0, 29.0, 23.0, 0.0, 0.0, 29.0, 25.0, 15.0, 8.0, 7.0 };
-
-  double t = 2 * M_PI / 24 * time.hour ();
-  int m = time.month () - 1;
-  double Si = (  A0[m] + A1[m] * cos (t) + B1[m] * sin (t)
-		 + A2[m] * cos (2 * t) + B2[m] * sin (2 * t));
-  return max (0.0, Si);
+  assert (al.check ("type"));
+  return (*Weather_constructors)[al.name ("type")] (t, al);
 }
 
 double
 Weather::DayLength () const
 {
-  return DayLength (impl.Latitude, time);
+  return DayLength (Latitude, time);
 }
 
 double
@@ -74,33 +63,34 @@ Weather::DayLength (double Latitude, const Time& time)
 	  * acos (-tan (M_PI / 180 * Dec) * tan (M_PI / 180 * Latitude)));
 }
 
-void 
-Weather::set (const Time& t)
-{
-  time = t;
-}
-
-Weather::Weather (const AttributeList& al)
-  : impl (*new Implementation (al)),
-    time (-999, 1, 1, 0)
+Weather::Weather (const Time& t, double l)
+  : time (t),
+    Latitude (l)
 { }
 
 Weather::~Weather ()
-{
-  delete &impl;
+{ }
+
+int Weather_init::count;
+
+Weather_init::Weather_init ()
+{ 
+  if (count++ == 0)
+    {
+      Weather_library = new Library ();
+      Weather_constructors = new Weather_map_type ();
+    }
+  assert (count > 0);
 }
 
-// Add the Weather syntax to the syntax table.
-static struct WeatherSyntax
-{
-  WeatherSyntax ();
-} Weather_syntax;
-
-WeatherSyntax::WeatherSyntax ()
+Weather_init::~Weather_init ()
 { 
-  Syntax* syntax = new Syntax ();
-  syntax->add ("file", Syntax::String);
-  syntax->add ("from", Syntax::Date);
-  syntax->add ("Latitude", Syntax::Number);
-  syntax_table->add ("weather", syntax);
+  if (--count == 0)
+    {
+      delete Weather_library;
+      Weather_library = NULL;
+      delete Weather_constructors;
+      Weather_constructors = NULL;
+    }
+  assert (count >= 0);
 }

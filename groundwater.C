@@ -1,37 +1,73 @@
 // groundwater.C
 
 #include "groundwater.h"
-#include "syntax.h"
+#include "library.h"
+#include "alist.h"
+#include <map.h>
 
-bool 
-Groundwater::flux_bottom () const
+static Library* Groundwater_library = NULL;
+typedef map<string, Groundwater::constructor, less<string> > Groundwater_map_type;
+static Groundwater_map_type* Groundwater_constructors;
+
+const Library&
+Groundwater::library ()
 {
-  return true;
+  assert (Groundwater_library);
+  return *Groundwater_library;
 }
 
-double 
-Groundwater::table () const
+void
+Groundwater::add_type (const string name, 
+		       const AttributeList& al, 
+		       const Syntax& syntax,
+		       constructor cons)
 {
-  assert (!flux_bottom ());
-  return -10.0;
+  assert (Groundwater_library);
+  Groundwater_library->add (name, al, syntax);
+  Groundwater_constructors->insert(Groundwater_map_type::value_type (name, cons));
 }
 
-bool  
-Groundwater::accept_bottom (double) const
-{ 
-  return true;
+void 
+Groundwater::derive_type (string name, const AttributeList& al, string super)
+{
+  add_type (name, al, library ().syntax (super), 
+	    (*Groundwater_constructors)[super]);
 }
-Groundwater::Groundwater (const AttributeList& /* al */)
+
+Groundwater&
+Groundwater::create (const Time& t, const AttributeList& al)
+{
+  assert (al.check ("type"));
+  return (*Groundwater_constructors)[al.name ("type")] (t, al);
+}
+
+Groundwater::Groundwater (const Time& t)
+  : time (t)
 { }
 
-// Add the Groundwater syntax to the syntax table.
-static struct GroundwaterSyntax
-{
-  GroundwaterSyntax ();
-} Groundwater_syntax;
+Groundwater::~Groundwater ()
+{ }
 
-GroundwaterSyntax::GroundwaterSyntax ()
+int Groundwater_init::count;
+
+Groundwater_init::Groundwater_init ()
 { 
-  Syntax* syntax = new Syntax ();
-  syntax_table->add ("groundwater", syntax);
+  if (count++ == 0)
+    {
+      Groundwater_library = new Library ();
+      Groundwater_constructors = new Groundwater_map_type ();
+    }
+  assert (count > 0);
+}
+
+Groundwater_init::~Groundwater_init ()
+{ 
+  if (--count == 0)
+    {
+      delete Groundwater_library;
+      Groundwater_library = NULL;
+      delete Groundwater_constructors;
+      Groundwater_constructors = NULL;
+    }
+  assert (count >= 0);
 }

@@ -116,8 +116,8 @@
 	 (OrganicMatter)
 	 (Nitrification)
 	 (Denitrification))
- (groundwater)
- (manager farmer manager
+ (groundwater static)
+ (manager farmer rule
 	  (rules (((after 1990 8 16 1)
 		   (stop))
 		  ((at 1990 4 11 1)
@@ -129,8 +129,7 @@
 					 (CrpAux CanopyAss)
 					 (Canopy LAI))))))
       ("crop.chp" (after 1990 8 16 1) *))
- (weather (from 1990 4 11 1)
-	  (file "crop.weather"))
+ (weather simple)
  (time 1990 4 11)
  (field (c1 (crops)
 	    (Bioclimate)

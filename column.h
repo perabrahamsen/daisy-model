@@ -41,8 +41,8 @@ public:
 				  const AttributeList& par,
 				  const AttributeList& var);
   static void add_type (string name, 
-			const AttributeList& parList, const Syntax* parSyntax,
-			const AttributeList& varList, const Syntax* varSyntax,
+			const AttributeList& parList, const Syntax& parSyntax,
+			const AttributeList& varList, const Syntax& varSyntax,
 			constructor);
   static void derive_type (string name, const AttributeList& par, string super);
   static Column* create (string, const AttributeList& var);
