@@ -348,7 +348,7 @@ Note that negative deltas means the amount of water increases."
                    (flux true)
                    (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" crop_ea)
-                   (tag "Transipration")            
+                   (tag "Transpiration")            
                    (flux true)
                    (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" soil_ea)
