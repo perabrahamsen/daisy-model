@@ -1,8 +1,9 @@
 2003-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 2.44 released.
-
-2003-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+	* vcheck.h, vcheck.C (VCheck): New utility.
+	* Makefile (OTHER): Add it.
+	* syntax.C, syntax.h (add_check, check): Support it.
+	* parser_file.C (load_list): Support it.
 
 	* Version 2.44 released.
 

@@ -333,7 +333,7 @@ SPECIALS = om.C select_value.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = assertion.C xref.C treelog_dual.C units.C \
+OTHER = vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
@@ -714,17 +714,17 @@ dom${OBJ}: dom.C dom.h adsorption.h librarian.h library.h common.h alist.h \
 photosynthesis${OBJ}: photosynthesis.C photosynthesis.h bioclimate.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h assertion.h \
  canopy_std.h canopy_simple.h plf.h phenology.h submodel.h mathlib.h \
- tmpstream.h
+ tmpstream.h check.h
 crpn${OBJ}: crpn.C crpn.h production.h root_system.h rootdens.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h assertion.h \
- log.h plf.h mathlib.h submodel.h
+ log.h plf.h mathlib.h submodel.h check.h
 vernalization${OBJ}: vernalization.C vernalization.h submodel.h log.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h assertion.h
 partition${OBJ}: partition.C partition.h plf.h submodel.h syntax.h \
- common.h treelog.h alist.h
+ common.h treelog.h alist.h check.h mathlib.h assertion.h tmpstream.h
 development${OBJ}: development.C development.h production.h \
  vernalization.h plf.h log.h librarian.h library.h common.h alist.h \
- syntax.h treelog.h assertion.h submodel.h
+ syntax.h treelog.h assertion.h submodel.h check.h
 production${OBJ}: production.C production.h crpn.h partition.h plf.h \
  organic_matter.h clayom.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h assertion.h geometry.h am.h log.h submodel.h \
@@ -747,7 +747,7 @@ root_system${OBJ}: root_system.C root_system.h rootdens.h librarian.h \
 ridge${OBJ}: ridge.C ridge.h soil.h horizon.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h assertion.h hydraulic.h \
  tortuosity.h geometry.h plf.h submodel.h mathlib.h log.h soil_water.h \
- macro.h
+ macro.h check.h
 soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h assertion.h hydraulic.h tortuosity.h geometry.h \
  mathlib.h submodel.h log.h check.h plf.h
@@ -851,6 +851,8 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  soil_chemicals.h soil_chemical.h solute.h adsorption.h transport.h \
  mactrans.h plf.h transform.h groundwater.h log.h weather.h im.h \
  vegetation.h
+vcheck${OBJ}: vcheck.C vcheck.h syntax.h common.h treelog.h alist.h \
+ tmpstream.h assertion.h
 assertion${OBJ}: assertion.C assertion.h treelog.h tmpstream.h common.h
 xref${OBJ}: xref.C xref.h traverse.h library.h common.h syntax.h treelog.h \
  alist.h submodel.h assertion.h
@@ -886,7 +888,7 @@ daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
 alist${OBJ}: alist.C plf.h library.h common.h alist.h syntax.h treelog.h \
  assertion.h
 syntax${OBJ}: syntax.C syntax.h common.h treelog.h alist.h library.h \
- tmpstream.h check.h assertion.h
+ tmpstream.h check.h vcheck.h assertion.h
 library${OBJ}: library.C library.h common.h alist.h syntax.h treelog.h \
  tmpstream.h assertion.h
 plf${OBJ}: plf.C plf.h assertion.h
@@ -901,12 +903,15 @@ cdaisy${OBJ}: cdaisy.C syntax.h common.h treelog.h alist.h daisy.h \
 common${OBJ}: common.C common.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h assertion.h
+phenology_TSum${OBJ}: phenology_TSum.C phenology.h librarian.h library.h \
+ common.h alist.h syntax.h treelog.h assertion.h production.h \
+ vernalization.h plf.h
 phenology_std${OBJ}: phenology_std.C phenology.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h assertion.h production.h \
  vernalization.h plf.h
 hydraulic_hypres${OBJ}: hydraulic_hypres.C hydraulic.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h assertion.h plf.h \
- check.h tmpstream.h
+ check.h tmpstream.h mathlib.h
 clayom_biomod${OBJ}: clayom_biomod.C clayom.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h assertion.h check.h smb.h om.h \
  plf.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
@@ -997,7 +1002,7 @@ action_message${OBJ}: action_message.C action.h librarian.h library.h \
  daisy.h
 weather_std${OBJ}: weather_std.C weather.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h assertion.h im.h lexer_data.h lexer.h \
- tmpstream.h mathlib.h units.h
+ tmpstream.h mathlib.h units.h vcheck.h
 select_flux_top${OBJ}: select_flux_top.C select_value.h select.h \
  condition.h librarian.h library.h common.h alist.h syntax.h treelog.h \
  assertion.h geometry.h

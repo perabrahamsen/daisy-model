@@ -30,6 +30,7 @@
 class AttributeList;
 class Library;
 class Check;
+class VCheck;
 
 class Syntax
 { 
@@ -88,6 +89,9 @@ public:
   
   // Check that a numeric value is within the allowed range.
   void check (const string& key, double value) const;
+
+  // Check than an arbitrary alist member is valid.
+  bool check (const AttributeList&, const string& key, Treelog&) const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 
@@ -222,6 +226,8 @@ public:
 			       const string& description,
 			       load_syntax_fun load_syntax);
 		      
+  void add_check (const string& name, const VCheck& vcheck);
+
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user
   // having to specify the names of the entries.  It is recommended

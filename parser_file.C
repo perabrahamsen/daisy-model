@@ -896,6 +896,17 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      skip_to_end ();
 	    }
 	}
+
+      // Value check.
+      if (atts.check (name))
+	{
+	  TmpStream tmp;
+	  TreelogStream treelog (tmp ());
+	  Treelog::Open nest (treelog, name);
+	  if (!syntax.check (atts, name, treelog))
+	    error (tmp.str ());
+	}
+
       if (skipped)
 	skip (")");
       skip ();

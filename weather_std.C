@@ -26,6 +26,7 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 #include "units.h"
+#include "vcheck.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -66,7 +67,7 @@ struct WeatherStandard : public Weather
     static void load_syntax (Syntax&, AttributeList&);
     YearMap (const AttributeList&);
   };
-  const vector<const YearMap*> year_map;
+  const vector<const YearMap*> missing_years;
 
   // Keywords
   struct keyword_description_type
@@ -217,23 +218,9 @@ WeatherStandard::YearMap::YearInterval::check_alist (const AttributeList& al,
 						     Treelog& err)
 {
   bool ok = true;
+
   const int from = al.integer ("from");
   const int to = al.integer ("to");
-  
-  if (!Time::valid (from, 1, 1, 1))
-    {
-      TmpStream tmp;
-      tmp () << "Invalid start year " << from << " in interval";
-      err.error (tmp.str ());
-      ok = false;
-    }
-  if (!Time::valid (to, 1, 1, 1))
-    {
-      TmpStream tmp;
-      tmp () << "Invalid end year " << from << " in interval";
-      err.error (tmp.str ());
-      ok = false;
-    }
   if (from > to)
     {
       TmpStream tmp;
@@ -251,8 +238,10 @@ WeatherStandard::YearMap::YearInterval::load_syntax (Syntax& syntax,
   syntax.add_check (check_alist);
   syntax.add ("from", Syntax::Integer, Syntax::Const,
 	      "First year of interval.");
+  syntax.add_check ("from", VCheck::valid_year ());
   syntax.add ("to", Syntax::Integer, Syntax::Const,
 	      "First year of interval.");
+  syntax.add_check ("to", VCheck::valid_year ());
   syntax.order ("from", "to");
 }
 
@@ -804,6 +793,8 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
   : Weather (al),
     T_rain (al.number ("T_rain")),
     T_snow (al.number ("T_snow")),
+    missing_years (map_construct_const<YearMap> 
+		   (al.alist_sequence ("missing_years"))),
     timestep (0),
     begin (1900, 1, 1, 0),
     end (2100, 1, 1, 0),
@@ -899,6 +890,25 @@ static struct WeatherStandardSyntax
     syntax.add ("where", Syntax::String, Syntax::Const,
 		"File to read weather data from.");
     syntax.order ("where");
+
+    syntax.add_submodule_sequence ("missing_years", Syntax::Const, "\
+How to get data for dates outside the range of the weather file.\n\
+\n\
+The value is a list of maps.  Each map consist of two intervals, and\n\
+indicates that missing data from the first interval should be read\n\
+from the second interval instead.  Each interval consists of two\n\
+years, the first and last year of that interval.\n\
+\n\
+When the simulation requests weather data from a date outside the\n\
+range covered by the weather file, the model will look up each member\n\
+of the list, to see if the year is covered by the first interval.  If\n\
+so, it will use weather data from the same day in the corresponding\n\
+year in the second interval.\n\
+\n\
+If a given year is covered by multiple intervals in the list, the first\n\
+one will be used.",
+				   WeatherStandard::YearMap::load_syntax);
+    alist.add ("missing_years", vector<AttributeList*> ());
 
     // Division between Rain and Snow.
     syntax.add ("T_rain", "dg C", Syntax::Const, 

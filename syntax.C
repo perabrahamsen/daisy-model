@@ -25,6 +25,7 @@
 #include "library.h"
 #include "tmpstream.h"
 #include "check.h"
+#include "vcheck.h"
 #include "assertion.h"
 #include <map>
 #include <algorithm>
@@ -46,6 +47,7 @@ struct Syntax::Implementation
   typedef map<string, string, less<string> > string_map;
   typedef map<string, const AttributeList*, less<string> > alist_map;
   typedef map<string, const Check*, less<string> > check_map;
+  typedef map<string, const VCheck*, less<string> > vcheck_map;
 
   type_map types;
   status_map status;
@@ -55,6 +57,7 @@ struct Syntax::Implementation
   string_map domains;
   string_map dimensions;
   check_map num_checks;
+  vcheck_map val_checks;
   string_map descriptions;
   alist_map alists;
 
@@ -86,18 +89,23 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 	{
 	  if (status[key] == Const || status[key] == State)
 	    {
-	      err.entry (key + " missing");
+	      err.error (key + " missing");
 	      error = true;
 	    }
+	  continue;
 	}
-      else if (types[key] == Number)
+      // We can't do a generic value check here, because we don't have
+      // the Syntax.  Sigh.
+      // vcheck_map::const_iterator i = val_checks.find (key);
+      
+      // Spcial handling of various types.
+      if (types[key] == Number)
 	{
 	  // This should already be checked by the file parse, but you
 	  // never know... better safe than sorry...  don't drink and
 	  // drive...  Well, theoretically the alist could come from
 	  // another source (like one of the many other parser :/), or
 	  // be one of the build in ones.
-	  
 	  check_map::const_iterator i = num_checks.find (key);
 
 	  if (i != num_checks.end ())
@@ -114,7 +122,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		      {
 			TmpStream str;
 			str () << key << "[" << i << "]: " << message;
-			err.entry (str.str ());
+			err.error (str.str ());
 			error = true;
 		      }
 		}
@@ -122,7 +130,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		{ check->check (vl.number (key)); }
 	      catch (const string& message)
 		{
-		  err.entry (key + ": " + message);
+		  err.error (key + ": " + message);
 		  error = true;
 		}
 	    }
@@ -144,20 +152,20 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		if (!al.check ("type"))
 		  {
 		    tmp () << "Non object found";
-		    err.entry (tmp.str ());
+		    err.error (tmp.str ());
 		    error = true;
 		  }
 		else if (al.name ("type") == "error")
 		  {
 		    tmp () << "Error node found";
 		    error = true;
-		    err.entry (tmp.str ());
+		    err.error (tmp.str ());
 		  }
 		else if (!lib.check (al.name ("type")))
 		  {
 		    tmp () << "Unknown library member '"
 			   << al.name ("type") << "'";
-		    err.entry (tmp.str ());
+		    err.error (tmp.str ());
 		    error = true;
 		  }
 		else 
@@ -175,7 +183,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 	    const AttributeList& al = vl.alist (key);
 	    if (!al.check ("type"))
 	      {
-		err.entry (key + "Non object found");
+		err.error (key + "Non object found");
 		error = true;
 	      }
 	    else 
@@ -246,6 +254,7 @@ Syntax::Implementation::check (const string& key, const double value) const
   if (i != num_checks.end ())
     (*i).second->check (value);
 }
+
 
 Syntax::type 
 Syntax::Implementation::lookup (const string& key) const
@@ -346,6 +355,30 @@ Syntax::check (const AttributeList& vl, Treelog& err) const
 void
 Syntax::check (const string& key, const double value) const
 { impl.check (key, value); }
+
+bool 
+Syntax::check (const AttributeList& vl, 
+		    const string& key, Treelog& err) const
+{
+  bool ok = true;
+  Implementation::vcheck_map::const_iterator i = impl.val_checks.find (key);
+
+  if (i != impl.val_checks.end ())
+    {
+      const VCheck *const vcheck = (*i).second;
+
+      try
+	{
+	  vcheck->check (*this, vl, key);
+	}
+      catch (const string& message)
+	{
+	  err.error (message);
+	  ok = false;;
+	}
+    }
+  return ok;
+}
 
 Syntax::type 
 Syntax::lookup (const string& key) const
@@ -633,6 +666,12 @@ Syntax::add_submodule_sequence (const string& name, Syntax::category cat,
       // With default value for sequence members.
       add (name, s, a, cat, Syntax::Sequence, description);
 };
+
+void 
+Syntax::add_check (const string& name, const VCheck& vcheck)
+{ 
+  impl.val_checks[name] = &vcheck;
+}
 
 void 
 Syntax::order (const vector<string>& order)

@@ -102,9 +102,9 @@ lib files.
 
 * 2.43
 
-** "Grass to grain" grass model now regrow after afull cur or after it is ripe.
+** "Grass to grain" grass model now regrow after a full or late cut
 
-I.e., this grass need a tillage operation in order to kill.  
+I.e., this grass needs a tillage operation in order to kill it.  
 
 WARNING: This also affects regrowth after a "normal" cut, ans the
 paramterization is no longer backed by experimental observations.
