@@ -22,6 +22,7 @@
 
 #include "log.h"
 #include "daisy.h"
+#include "tmpstream,h"
 
 EMPTY_TEMPLATE
 Librarian<Log>::Content* Librarian<Log>::content = NULL;

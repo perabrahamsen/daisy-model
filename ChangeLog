@@ -1,3 +1,7 @@
+2002-10-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.C: Include tmpstream.h in order to get ostream.
+
 2002-10-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* assertion.h: Don't use __FUNCTION__ on any Borland version.
