@@ -71,13 +71,14 @@ Pedotransfer::known (const std::string& dim)
 void 
 Pedotransfer::debug_message (const string& name,
                              const vector<double>& value, 
+                             const string& dim,
                              Treelog& msg)
 { 
   TmpStream tmp;
   tmp () << "(" << name;
   for (unsigned int i = 0; i < value.size (); i++)
     tmp () << " " << value[i];
-  tmp () << ")";
+  tmp () << "[" << dim << "])";
   msg.debug (tmp.str ());
 }
 

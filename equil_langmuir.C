@@ -101,7 +101,7 @@ EquilibriumLangmuir::initialize (const Soil& soil, Treelog& err)
       pedo_K->set (soil, K, "g/cm^3");
     else 
       initialize_state = init_failure;
-    Pedotransfer::debug_message ("K", K, err);
+    Pedotransfer::debug_message ("K", K, "g/cm^3", err);
   }
 
   // my_max
@@ -112,7 +112,7 @@ EquilibriumLangmuir::initialize (const Soil& soil, Treelog& err)
       pedo_my_max->set (soil, my_max, "g/cm^3");
     else 
       initialize_state = init_failure;
-    Pedotransfer::debug_message ("my_max", my_max, err);
+    Pedotransfer::debug_message ("my_max", my_max, "g/cm^3", err);
   }
 }
 

@@ -89,7 +89,7 @@ EquilibriumLinear::initialize (const Soil& soil, Treelog& err)
     pedo_K->set (soil, K, Syntax::None ());
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("K", K, err);
+  Pedotransfer::debug_message ("K", K, "", err);
 }
 
 bool 

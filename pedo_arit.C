@@ -290,7 +290,7 @@ static struct PedotransferPowSyntax
 		"The base operand for this function.");
     syntax.add ("exponent", Librarian<Pedotransfer>::library (),
 		"The exponent operand for this function.");
-    syntax.order ("base" "exponent");
+    syntax.order ("base", "exponent");
     Librarian<Pedotransfer>::add_type ("pow", alist, syntax, &make);
   }
 } PedotransferPow_syntax;

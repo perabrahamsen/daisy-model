@@ -20,6 +20,7 @@
 
 
 #include "equil.h"
+#include "soil_water.h"
 #include "pedo.h"
 #include "soil.h"
 #include "treelog.h"
@@ -27,13 +28,19 @@
 #include "mathlib.h"
 #include <memory>
 
+#include "tmpstream.h"
+#include <iostream>
+
 using namespace std;
 
 struct EquilibriumGoal_A : public Equilibrium
 {
   // Parameters.
   /* const */ vector<double> goal_A;
+  const bool A_solute;
   /* const */ vector<double> min_B;
+  const bool B_solute;
+  const int debug_node;
 
   // Simulation.
   void find (const Soil&, const SoilWater&, unsigned int i,
@@ -46,6 +53,9 @@ struct EquilibriumGoal_A : public Equilibrium
   bool check (const Soil&, Treelog& err) const;
   EquilibriumGoal_A (const AttributeList& al)
     : Equilibrium (al),
+      A_solute (al.flag ("A_solute")),
+      B_solute (al.flag ("B_solute")),
+      debug_node (al.integer ("debug_node")),
       initialize_state (uninitialized)
   { }
   ~EquilibriumGoal_A ()
@@ -53,7 +63,8 @@ struct EquilibriumGoal_A : public Equilibrium
 };
 
 void
-EquilibriumGoal_A::find (const Soil&, const SoilWater&, unsigned int i,
+EquilibriumGoal_A::find (const Soil&, const SoilWater& soil_water,
+                         unsigned int i,
                          const double has_A, const double has_B, 
                          double& want_A, double& want_B) const
 {
@@ -66,18 +77,44 @@ EquilibriumGoal_A::find (const Soil&, const SoilWater&, unsigned int i,
   daisy_assert (has_B >= 0.0);
   const double M = has_A + has_B;
 
-  if (has_A > goal_A[i] || has_B > min_B[i])
+  const double Theta = soil_water.Theta (i);
+  daisy_assert (Theta > 0.0);
+  daisy_assert (Theta < 1.0);
+  const double goal_A_dry = goal_A[i] * (A_solute ? Theta : 1.0);
+  const double min_B_dry = min_B[i] * (B_solute ? Theta : 1.0);
+
+  TmpStream tmp;
+
+  if (has_A > goal_A_dry)
     {
-      want_B = max (min_B[i], M - goal_A[i]);
-      want_A = M - want_B;
+      tmp () << "A->B";
+      // We have too much A, convert surplus to B.
+      want_A = goal_A_dry;
+      want_B = M - want_A;
     }
-  else
+  else if (has_B < min_B_dry)
     {
+      tmp () << "min_B";
+      // We have too little A and too little B, do nothing.
       want_A = has_A;
       want_B = has_B;
     }
+  else
+    {
+      tmp () << "B->A";
+      
+      // We have too little A and too much B, convert just enough to fit one.
+      want_B = max (min_B_dry, M - goal_A_dry);
+      want_A = M - want_B;
+    }
+  tmp () << "\t" << has_A << "\t" << goal_A_dry << "\t" << want_A << "\t"
+         << has_B << "\t" << min_B_dry << "\t" << want_B << "\t" << M;
+  if (i == debug_node)
+    cout << tmp.str () << "\n";
+
   daisy_assert (want_A >= 0.0);
   daisy_assert (want_B >= 0.0);
+  daisy_assert (approximate (want_A + want_B, M));
 }
 
 void
@@ -92,7 +129,7 @@ EquilibriumGoal_A::initialize (const Soil& soil, Treelog& err)
     pedo_goal_A->set (soil, goal_A, "g/cm^3");
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("goal_A", goal_A, err);
+  Pedotransfer::debug_message ("goal_A", goal_A, "g/cm^3", err);
 
   auto_ptr<Pedotransfer> pedo_min_B 
     (&Librarian<Pedotransfer>::create (alist.alist ("min_B")));
@@ -100,7 +137,11 @@ EquilibriumGoal_A::initialize (const Soil& soil, Treelog& err)
     pedo_min_B->set (soil, min_B, "g/cm^3");
   else
     initialize_state = init_failure;
-  Pedotransfer::debug_message ("min_B", min_B, err);
+  Pedotransfer::debug_message ("min_B", min_B, "g/cm^3",err);
+
+  if (debug_node >= 0 && debug_node < soil.size ())
+    cout << "type\thas_A\tgoal_A\twant_A\thas_B\tgoal_B\twant_B\ttotal\n"
+         << "\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\tg/cm^3\n";
 }
 
 bool 
@@ -127,115 +168,20 @@ static struct EquilibriumGoal_ASyntax
     alist.add ("description", "Attempt to maintain A at at fixed level.");
     syntax.add ("goal_A", Librarian<Pedotransfer>::library (), Syntax::Const, 
                 Syntax::Singleton, "The desired level of A [g/cm^3].");
+    syntax.add ("A_solute", Syntax::Boolean, Syntax::Const, 
+                "True iff 'goal_A' is in solute (mass per volume water).\n\
+If false, the unit is assumed to be mass per volume space.");
     syntax.add ("min_B", Librarian<Pedotransfer>::library (), Syntax::Const, 
                 Syntax::Singleton, 
                 "Do not convert B to A if B is smaller than this [g/cm^3].");
-
+    syntax.add ("B_solute", Syntax::Boolean, Syntax::Const, 
+                "True iff 'min_B' is in solute (mass per volume water).\n\
+If false, the unit is assumed to be mass per volume space.");
+    syntax.add ("debug_node", Syntax::Integer, Syntax::Const,
+                "Print debug information for this node.\n\
+Set it to a negative number to disable it.");
+    alist.add ("debug_node", -1);
     Librarian<Equilibrium>::add_type ("goal_A", alist, syntax, &make);
   }
 } EquilibriumGoal_A_syntax;
 
-struct EquilibriumGoal_B : public Equilibrium
-{
-  // Parameters.
-  /* const */ vector<double> goal_B;
-  /* const */ vector<double> min_A;
-
-  // Simulation.
-  void find (const Soil&, const SoilWater&, unsigned int i,
-	     double has_A, double has_B, 
-	     double& want_A, double& want_B) const;
-
-  // Create and Destroy.
-  enum { uninitialized, init_succes, init_failure } initialize_state;
-  void initialize (const Soil&, Treelog& err);
-  bool check (const Soil&, Treelog& err) const;
-  EquilibriumGoal_B (const AttributeList& al)
-    : Equilibrium (al),
-      initialize_state (uninitialized)
-  { }
-  ~EquilibriumGoal_B ()
-  { }
-};
-
-void
-EquilibriumGoal_B::find (const Soil&, const SoilWater&, unsigned int i,
-                         const double has_A, const double has_B, 
-                         double& want_A, double& want_B) const
-{
-  daisy_assert (goal_B.size () > i);
-  daisy_assert (goal_B[i] >= 0.0);
-  daisy_assert (min_A.size () > i);
-  daisy_assert (min_A[i] >= 0.0);
-  daisy_assert (has_A >= 0.0);
-  daisy_assert (has_B >= 0.0);
-  const double M = has_A + has_B;
-
-  if (has_B > goal_B[i] || has_A > min_A[i])
-    {
-      want_A = max (min_A[i], M - goal_B[i]);
-      want_B = M - want_A;
-    }
-  else
-    {
-      want_A = has_A;
-      want_B = has_B;
-    }
-  daisy_assert (want_A >= 0.0);
-  daisy_assert (want_B >= 0.0);
-}
-
-void
-EquilibriumGoal_B::initialize (const Soil& soil, Treelog& err)
-{ 
-  daisy_assert (initialize_state == uninitialized);
-  initialize_state = init_succes;
-
-  auto_ptr<Pedotransfer> pedo_goal_B 
-    (&Librarian<Pedotransfer>::create (alist.alist ("goal_B")));
-  if (pedo_goal_B->check (soil, "g/cm^3", err))
-    pedo_goal_B->set (soil, goal_B, "g/cm^3");
-  else
-    initialize_state = init_failure;
-  Pedotransfer::debug_message ("goal_B", goal_B, err);
-
-  auto_ptr<Pedotransfer> pedo_min_A 
-    (&Librarian<Pedotransfer>::create (alist.alist ("min_A")));
-  if (pedo_min_A->check (soil, "g/cm^3", err))
-    pedo_min_A->set (soil, min_A, "g/cm^3");
-  else
-    initialize_state = init_failure;
-  Pedotransfer::debug_message ("min_A", min_A, err);
-}
-
-bool 
-EquilibriumGoal_B::check (const Soil&, Treelog& err) const
-{
-  if (initialize_state == init_succes)
-    return true;
-
-  Treelog::Open nest (err, name);
-  err.error ("Initialize failed");
-  return false;
-}
-
-static struct EquilibriumGoal_BSyntax
-{
-  static Equilibrium& make (const AttributeList& al)
-  { return *new EquilibriumGoal_B (al); }
-
-  EquilibriumGoal_BSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Equilibrium::load_syntax (syntax, alist);
-    alist.add ("description", "Attempt to maintain B at at fixed level.");
-    syntax.add ("goal_B", Librarian<Pedotransfer>::library (), Syntax::Const, 
-                Syntax::Singleton, "The desired level of B [g/cm^3].");
-    syntax.add ("min_A", Librarian<Pedotransfer>::library (), Syntax::Const, 
-                Syntax::Singleton, 
-                "Do not convert A to B if A is smaller than this [g/cm^3].");
-
-    Librarian<Equilibrium>::add_type ("goal_B", alist, syntax, &make);
-  }
-} EquilibriumGoal_B_syntax;

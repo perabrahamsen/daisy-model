@@ -1,3 +1,16 @@
+2004-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.58 released.
+
+2004-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pedo.h, pedo.C (debug_message):  Add dimension argument.
+	* equil_langmuir.C, equil_linear.C, equil_goal.C:
+	* transform_equil.C (initialize):Update callers.
+
+	* equil_goal.C (A_solute, B_solute): New parameters.
+	(goal_B): Removed.
+
 2004-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.57 released.

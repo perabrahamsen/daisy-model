@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.58
+
+** More DOM sorption work.
+
 * 3.57
 
 ** Reorganised chemical transformations.

@@ -119,7 +119,7 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
     else
       initialize_state = init_failure;
 
-    Pedotransfer::debug_message ("k_AB", k_AB, err);
+    Pedotransfer::debug_message ("k_AB", k_AB, "h^-1", err);
   }
   
   // k_BA
@@ -132,7 +132,7 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
         pedo_BA->set (soil, k_BA, "h^-1");
       else
         initialize_state = init_failure;
-      Pedotransfer::debug_message ("k_BA", k_BA, err);
+      Pedotransfer::debug_message ("k_BA", k_BA, "h^-1", err);
     }
   else
     k_BA = k_AB;

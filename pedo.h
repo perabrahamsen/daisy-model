@@ -44,7 +44,8 @@ public:
 public:
   static bool known (const std::string& dim);
   static void debug_message (const std::string& name, 
-                             const std::vector<double>& value, 
+                             const std::vector<double>& value,  
+                             const std::string& dim, 
                              Treelog& msg);
 
   // Create and Destroy.
