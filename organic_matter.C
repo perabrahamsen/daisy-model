@@ -731,15 +731,15 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
     clay_factor (al.plf ("clay_factor")),
-    tillage_age (al.check ("tillage_age") 
-		 ? al.number_sequence ("tillage_age") 
-		 : vector<double> ()),
     smb_tillage_factor (al.plf_sequence ("smb_tillage_factor")),
     som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N")),
     bioincorporation (al.alist ("Bioincorporation"))
-{ }
+{ 
+  if (al.check ("tillage_age"))
+    tillage_age = al.number_sequence ("tillage_age");
+}
 
 void 
 OrganicMatter::monthly (const Geometry& geometry)
