@@ -1293,11 +1293,6 @@ class PT_PMSW : public PT
 
 public:
 
-// I/O files
-// FILE *fp_ebal_pm;
-	FILE *fp_parcheck, *fp_lehflux, *fp_theta, *fp_ebal_dt, *fp_etep;
-   	FILE *fp_solcheck, *fp_axainv, *fp_mat_a, *fp_mat_b; // for gaussj ()
-
 // meteorological- and derived variables
    	double srad,tair,e_abs,e_pa,u,u_ref,relsun,prec; // metinput
         double relsun_day,relsun_last; // daytime- and last daytime value
@@ -1505,49 +1500,6 @@ public:
 	L_pot=L_wet=0.0;
         y_pot=y_wet=0.0;
 
-// temporary output
-  	if ((fp_etep=fopen("etep.out", "w"))==NULL)
-   	{
-   	printf("cannot open output file\n");
-      	exit(1);
-      	}
-  	if ((fp_lehflux=fopen("lehflux.out", "w"))==NULL)
-   	{
-   	printf("cannot open output file\n");
-      	exit(1);
-      	}
-  	if ((fp_theta=fopen("theta.out", "w"))==NULL)
-   	{
-   	printf("cannot open output file\n");
-      	exit(1);
-      	}
-  	if ((fp_ebal_dt=fopen("ebal_dt.out", "w"))==NULL)
-   	{
-   	printf("cannot open output file\n");
-      	exit(1);
-      	}
-
-// control files:
-  	if ((fp_solcheck=fopen("solcheck.out", "w"))==NULL)
-   	{
-   	printf("cannot open output file\n");
-      	exit(1);
-      	}
-  	if ((fp_axainv=fopen("axainv.out", "w"))==NULL)
-   	{
-   	printf("cannot open output file\n");
-      	exit(1);
-      	}
-  	if ((fp_mat_a=fopen("mat_a.out", "w"))==NULL)
-   	{
-   	printf("cannot open output file\n");
-      	exit(1);
-      	}
-      	if ((fp_mat_b=fopen("mat_b.out", "w"))==NULL)
-   	{
-   	printf("cannot open output file\n");
-      	exit(1);
-      	}
 
       	} // end PM_svat() implementation
 
@@ -1882,17 +1834,6 @@ cout << "past RAASTABWET_1()\n";
         a_wet[5][4]=0.0;
         a_wet[5][5]=-1.0;
         a_53_wet=a_wet[5][3];
-// cout << "past matrix_3 coefficients\n";
-
-// write A matrix
-fprintf(fp_mat_a,"%5d\t%5d\t%5d\n"
-	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n"
-	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n"
-   	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n"
-   	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n"
-   	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n\n",
-   	month,day,hour,a_11,a_12,a_13,a_14,a_15,a_21,a_22,a_23,a_24,a_25,a_31,
-        a_32,a_33,a_34,a_35,a_41,a_42,a_43,a_44,a_45,a_51,a_52,a_53,a_54,a_55);
 
 // read in b vector (matrix) ...
         b[1][1]=b_1;
@@ -1901,7 +1842,6 @@ fprintf(fp_mat_a,"%5d\t%5d\t%5d\n"
         b[4][1]=b_4;
         b[5][1]=(tair+273.15)*desta_abs-esta_abs;
 	b_5=b[5][1]; // for the control matrix
-// cout << "past b_1 vector\n";
 
 // ... and read b_pot vector
         b_pot[1][1]=b_1_pot;
@@ -1910,7 +1850,6 @@ fprintf(fp_mat_a,"%5d\t%5d\t%5d\n"
         b_pot[4][1]=b_4_pot;
         b_pot[5][1]=(tair+273.15)*desta_abs-esta_abs;
 	b_5_pot=b_pot[5][1];  // for the control matrix
-// cout << "past b_2 vector\n";
 
 // ... and read b_pot vector
         b_wet[1][1]=b_1_wet;
@@ -1919,14 +1858,7 @@ fprintf(fp_mat_a,"%5d\t%5d\t%5d\n"
         b_wet[4][1]=b_4_wet;
         b_wet[5][1]=(tair+273.15)*desta_abs-esta_abs;
 	b_5_wet=b_wet[5][1]; // for the control matrix
-// cout << "past b_3 vector\n";
 
-// write B vector
-fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
-   	month,day,hour,b_1,b_2,b_3,b_4,b_5);
-
-// save matrices for later testing of results
-// printf("save matrices for later testing of results");
 	for (l=1;l<=n;l++)
         {
 		for (k=1;k<=n;k++)
@@ -1949,36 +1881,6 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
 	gaussj(ai,n,x,m);
       	gaussj(ai_pot,n,x_pot,m);
       	gaussj(ai_wet,n,x_wet,m);
-
-// check inverse
-	for (k=1;k<=n;k++)
-        	{  // for_1
-		for (l=1;l<=n;l++)
-                	{  // for_2
-			um[k][l]=0.0;
-				for (j=1;j<=n;j++)  // for_3
-            			{
-				um[k][l] += (a[k][j]*ai[j][l]);
-               			}
-			}  // end for_2
-   		for (l=1;l<=n;l++) fprintf(fp_axainv,"%12.6f",um[k][l]);
-			fprintf(fp_axainv,"\n");
-			if (k%5==0) fprintf(fp_axainv,"\n");
-		} // end for_1
-
-// check vector solutions */
-		for (l=1;l<=m;l++)
-                {  // for_1
-			for (k=1;k<=n;k++)
-                        {  // for_2
-				t[k][l]=0.0;
-				for (j=1;j<=n;j++)
-					t[k][l] += (a[k][j]*x[j][l]);
-               fprintf(fp_solcheck,"%d\t%d\t%d\t%10.2f\t%10.2f\t%10.2f\n",
-               month,day,hour,b[k][l],t[k][l],b[k][l]-t[k][l]);
-               if (k%5==0) fprintf(fp_solcheck,"\n");
-         		} // end for_2
-        	} // end for_1
 
 // write solution vector for x (stressed conditions)
 	tcan=x[1][1]-273.15;  // in degrees C
@@ -2036,53 +1938,9 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
         tsurf_dt_pot,g_dt_dry,h_dt_dry,h_dt_wet,h_dt_pot,g_dt_wet,g_dt_pot,
         le_dt_dry,le_dt_wet,le_dt_pot,closure_dt_dry,closure_dt_wet,
         closure_dt_pot);
-// cout << "past EBAL_DT()\n";
-
-// print results   // 81 var
-	fprintf(fp_lehflux,"%5d\t"
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
-	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
-        n_hr,
-        tair,tskin,tcan,tleaf,r_aa_dry,r_ac,r_as,r_sc_4,e_c_abs,e_sl_abs, //10
-        e_abs,les,hl,ha,hs,lea,lel,hclos,leclos,dtcta,dtltc,dtstc,dtlta, //23
-        tskin_pot,tcan_pot,tleaf_pot,r_aa_pot,r_ac,r_as,r_sc_min,    //30
-      	e_c_abs_pot,e_sl_abs_pot,e_abs,hl_pot,ha_pot,hs_pot,lea_pot,lel_pot,//38
-      	dtcta_pot,dtltc_pot,dtstc_pot,dtlta_pot,tskin_wet,tcan_wet,tleaf_wet,//45
-        r_aa_wet,r_ac,r_as,e_c_abs_wet,e_sl_abs_wet,e_abs,hl_wet,ha_wet,hs_wet,//54
-        lea_wet,lel_wet,dtcta_wet,dtltc_wet,dtstc_wet,dtlta_wet,les_q,les, // 62
-        evaps_w, soil_ea_w,pond_ea_w,pond_ep_w,epots_w,epotc_w,eact_w, // 69
-        canopy_ea_w,canopy_ep_w,hclos,leclos,hclos_pot,leclos_pot,hclos_wet,//76
-        leclos_wet,z0_aa,d_aa,u); // 80
-
- 	fprintf(fp_ebal_dt,"%5d\t"              // 16 var
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n"
-	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n"
-	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
-        n_hr,
-        tsurf_dt_dry,tsurf_dt_wet,tsurf_dt_pot,g_dt_dry,h_dt_dry,    // 5
-        h_dt_wet,h_dt_pot,g_dt_wet,g_dt_pot,le_dt_dry,le_dt_wet,le_dt_pot, // 12
-        closure_dt_dry,closure_dt_wet,closure_dt_pot);   // 15
-
- 	fprintf(fp_etep,"%5d\t%7.2g\t%7.2g\t%7.2g\n",
-        n_hr,crop_ea_w,crop_ep_w,crop_ea_w/crop_ep_w);
-
-// print soil moisture content for validation in rmse_smc.c
-	fprintf(fp_theta,
-        "%7.4g\t%7.4g\t%7.4g\t%7.4g\t%7.4g\t%7.4g\t%7.4g\t%7.4g\t%7.4g\t%7.4g\n",
-        theta_5,theta_10,theta_15,theta_20,theta_30,theta_40,theta_50,
-        theta_0_20,theta_0_50,theta_0_100);
-
-      	n_hr++;
-
-	} else
+	} else  // i.e. LAI = 0
    		{
-      		if (n_hr % 10000 == 0) ;
+      		if (n_hr % 10000 == 0) n_hr++;  // dummy variable
       		} // end if
          } // end tick()
 
@@ -2145,21 +2003,13 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
 
    ~PT_PMSW() // destructor
    	{
-      fclose(fp_lehflux);
-      fclose(fp_theta);
-      fclose(fp_ebal_dt);
-      fclose(fp_etep);
-      fclose(fp_solcheck);
-      fclose(fp_axainv);
-      fclose(fp_mat_a);
-      fclose(fp_mat_b);
 //    fclose(fp_ebal_pm);
-      free_matrix(t,1,NP,1,MP);
-      free_matrix(x,1,NP,1,MP);
-      free_matrix(b,1,NP,1,MP);
-      free_matrix(um,1,NP,1,NP);
-      free_matrix(ai,1,NP,1,NP);
-      free_matrix(a,1,NP,1,NP);
+       	free_matrix(t,1,NP,1,MP);
+      	free_matrix(x,1,NP,1,MP);
+      	free_matrix(b,1,NP,1,MP);
+      	free_matrix(um,1,NP,1,NP);
+      	free_matrix(ai,1,NP,1,NP);
+      	free_matrix(a,1,NP,1,NP);
 	free_matrix(a_pot,1,NP,1,NP);
 	free_matrix(ai_pot,1,NP,1,NP);
 	free_matrix(um_pot,1,NP,1,NP);
