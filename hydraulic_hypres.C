@@ -40,6 +40,13 @@ class HydraulicHypres : public Hydraulic
   /* const */ double K_sat;
   mutable PLF M_;
 
+  // Prevent changing Theta_sat.
+public:
+  void set_porosity (double)
+  { throw ("Can't change porosity for HYPRES hydraulic model"); }
+  void output (Log&) const
+  { };
+
   // Use.
 public:
   double Theta (double h) const;

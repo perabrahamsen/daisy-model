@@ -14,12 +14,36 @@ release.
 
 * 2.47
 
+** More parentheses required for fetilize action.
+
+Before, you could write 
+
+  (fertilize mineral (weight 80 [kg N/ha]))
+
+Now you must write
+
+  (fertilize (mineral (weight 80 [kg N/ha])))
+
+This fixes an old bug, and makes it consistent with the syntax for
+incorporation where the parentheses have always been necessary:
+
+  (fertilize (mineral (weight 80 [kg N/ha]))
+             (to -20 [cm]))
+
+I apologize for the inconvenience.
+
+** Made checkpoints work with hypres and Cosby_et_al hydraulic models.
+
 ** NH4 lost to volatilization  is now always counted in "fertilized_NH4".
 
 Previously, it was only counted during surface application, not during
 incorporation.
 
-** Bug fixes.
+** Better handle end of weather data.
+
+** Daisy can now be compiled with Intel C++ 7.0.
+
+In my tests, it produces slower and larger code than GCC 3.2.
 
 * 2.46
 

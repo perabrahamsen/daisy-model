@@ -23,7 +23,6 @@
 #ifndef MATHLIB_H
 #define MATHLIB_H
 
-#include "common.h"
 #include "assertion.h"
 #include <vector>
 #include <math.h>
@@ -42,7 +41,7 @@ T max (T a, T b)
 
 #if defined (finite)
 /* do nothing */
-#elif (defined (__GNUC__) && __GNUC__ > 2 && defined (__unix))
+#elif defined (__GNUC__) && __GNUC__ > 2 && defined (__unix)
 /* do nothing */
 #elif defined (__INTEL_COMPILER)
 /* do nothing */
@@ -50,8 +49,9 @@ T max (T a, T b)
 #define finite(x) __finite(x)
 #elif defined (__sparc__)
 #include <ieeefp.h>
-#elif defined (isfinite)
-#define finite(x) isfinite(x)
+// This bugs out Linux -> MingW cross-compilations somehow
+// #elif defined (isfinite)
+// #define finite(x) isfinite(x)
 #else
 inline bool finite (double x)
 { return x <= 0.0 || x >= 0.0; }
@@ -72,11 +72,11 @@ inline bool finite (double x)
 void
 tridia (int from,
 	unsigned int size,
-	const vector<double>& a,
-	const vector<double>& b, 
-	const vector<double>& c,
-	const vector<double>& d,
-	vector<double>::iterator x);
+	const std::vector<double>& a,
+	const std::vector<double>& b, 
+	const std::vector<double>& c,
+	const std::vector<double>& d,
+	std::vector<double>::iterator x);
 
 double
 single_positive_root_of_cubic_equation 

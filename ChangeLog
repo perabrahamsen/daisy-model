@@ -1,3 +1,17 @@
+2003-02-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.47 released.
+
+2003-02-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (load_list): Be more strict with parentheses.
+	* txt/introduction.tex (subsection{Management}): Fixed example.
+
+	* weather_std.C (check): Fixed spelling error. 
+
+	* hydraulic_hypres.C, hydraulic_Cosby.C (set_porosity, output):
+	Prevent Theta_sat from being modified.
+
 2003-02-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* common.h: Cleanup.

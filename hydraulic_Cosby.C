@@ -34,6 +34,13 @@ class Hydraulic_Cosby : public Hydraulic
   /* const */ double b;
   /* const */ double K_sat;
 
+  // Prevent changing Theta_sat.
+public:
+  void set_porosity (double)
+  { throw ("Can't change porosity for Cosby_et_al hydraulic model"); }
+  void output (Log&) const
+  { };
+
   // Use.
 public:
   double Theta (double h) const;

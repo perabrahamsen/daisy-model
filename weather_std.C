@@ -1001,7 +1001,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
   for (unsigned int i = 0; i < missing_years.size (); i++)
     {
       TmpStream tmp;
-      tmp () << "missing_year[" << i << "]";
+      tmp () << "missing_years[" << i << "]";
       Treelog::Open nest (err, tmp.str ());
       const int from_from = missing_years[i]->from.from;
       const int from_to = missing_years[i]->from.to;

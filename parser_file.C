@@ -459,9 +459,6 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  in_order = true;
 	  name = *current;
 	  current++;
-	  // BUG:: We use current != end several places below, where
-	  // we probably should use in_order.  However, fixing this
-	  // would outlaw the (fertilize mineral (weight 10)) action.
 	}
 	
       if (syntax.size (name) == Syntax::Singleton)
@@ -579,11 +576,17 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  case Syntax::Object:
 	    {
 	      const Library& lib = syntax.library (name);
+#ifdef SLOPPY_PARENTHESES
 	      AttributeList& al = (atts.check (name) 
 				   ? load_derived (lib, current != end,
 						   &atts.alist (name))
 				   : load_derived (lib, current != end, NULL));
-						   
+#else // !SLOPPY_PARENTHESES
+	      AttributeList& al = (atts.check (name) 
+				   ? load_derived (lib, in_order, 
+						   &atts.alist (name))
+				   : load_derived (lib, in_order, NULL));
+#endif // !SLOPPY_PARENTHESES						   
 	      if (&lib == &Librarian<Parser>::library ())
 		{
 		  Parser& parser = Librarian<Parser>::create (al);
@@ -598,7 +601,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  const string obj = al.name ("type");
 		  if (obj == "error")
 		    break;
-#if 0
+#ifdef REQUIRE_COMPLETE_OBJECTS
 		  // We can only use complete objects as attribute
 		  // values.
 		  // NO LONGER TRUE with the "original" type.
@@ -613,7 +616,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    warning (string ("Warning for member '") + obj 
 			     + "' in library '" + name + "'\n--- details:\n"
 			     + tmp.str () + "---");
-#endif
+#endif // REQUIRE_COMPLETE_OBJECTS
 		  atts.add (name, al);
 		  delete &al;
 		}
@@ -667,7 +670,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    const string obj = al.name ("type");
 		    if (obj != "error")
 		      {
-#if 0
+#ifdef REQUIRE_COMPLETE_OBJECTS
 			// We can only use complete objects as attribute
 			// values.
 			TmpStream tmp;
@@ -683,7 +686,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			  warning (string ("Warning for member '") + obj 
 				   + "' in library '" + name
 				   + "'\n--- details:\n" + tmp.str () + "---");
-#endif
+#endif // REQUIRE_COMPLETE_OBJECTS
 			sequence.push_back (&al);
 		      }
 		  }
@@ -702,21 +705,12 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  : no_sequence;
 		vector<AttributeList*> sequence;
 		bool skipped = false;
-		// Design bug:  We do not force parentheses around the
-		// alist if it is the last member of an ordered list.
-		// The consequences of this is that there must be *no*
-		// ordered or unordered elements after the alist.
-		//
-		// The correct way to solve this would be to check that
-		// these requirements are really fulfilled, and require
-		// the parentheses otherwise.
-		//
-		// The purpose of this kludge seems to be to allow a
-		// library object to -- in effect -- have an alist
-		// sequence as its syntax.  Maybe I should support that
-		// directly instead.
-		if (current != end)
+		// We do not force parentheses around the alist if it
+		// is the last member of a fully ordered list.
+		if (in_order && (current != end || !syntax.total_order ()))
+		  // in order and (not the last or unordered may follow)
 		  {
+		    daisy_assert (!skipped);
 		    skip ("(");
 		    skipped = true;
 		  }
