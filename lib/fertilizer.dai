@@ -77,7 +77,7 @@ Added by <sha@kvl.dk>, 2000.")
   (total_N_fraction 0.014)
   (total_C_fraction 0.375)
   (NH4_fraction  0.250)
-  (NH4_evaporation  0.000))
+  (volatilization  0.000))
 
 (defam Foulum_slurry slurry
   (description "Parameters provided by DJF in Foulum, 1998.
