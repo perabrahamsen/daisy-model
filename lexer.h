@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-#ifdef BORLAND
+#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
 struct istream;
 #else
 #include <iosfwd>
