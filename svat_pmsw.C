@@ -48,8 +48,8 @@ int RSC(double , double, double, double, double, double, double , double,
         double&, double&, double&, double&);
 int RSCSTAR (double, double, double, double, double, double, double, double,
              double, double, double, double, double, double, double, double,
-             double, double, double, double, double, double, double, double&,
-             double&, double&, double&, double&, double&, double&, double&);
+             double, double, double, double, double, double,
+             double&, double&, double&);
 int EPA2ABS(double, double, double&);
 int EABS2PA(double, double, double&);
 int NETRAD(double, double, double, double, double , double, double, double,
@@ -57,9 +57,8 @@ int NETRAD(double, double, double, double, double , double, double, double,
 int AVENER(double ,double ,double ,double ,double&, double&);
 int GFLUX(double, double, double, double&);
 int LEHFLUX(double, double, double, double, double, double, double, double,
-            double, double, double, double, double, double, double&, double&,
-            double&, double&,double&, double&, double&, double&, double&, double&,
-            double&, double&);
+            double, double, double, double, double, double&, double&, double&, double&,
+            double&, double&, double&, double&, double&, double&, double&, double&);
 int LEHFLUXSTAR(double, double, double, double, double, double, double, double,
                 double, double, double, double, double&, double&, double&, double&,
                 double&, double&, double&, double&, double&, double&, double&);
@@ -432,13 +431,12 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
          double esta, double theta_w, double theta_c, double rcmin,
          double rcmax, double zeta, double f3const, double tref, double spar,
          double tmin, double tmax, double nu_1, double nu_2, double nu_3,
-         double crop_ea_w, double crop_ep_w, double rcmin_star,
-         double &rfpar, double &rf_1,double &rf_2, double &rf_3, double &rf_4,
-         double &rr_sc_1, double &/*rr_tot_1*/,double &rbf_temp, double &rf_temp,
-         double &rf_def, double &rf_theta, double &rf1_dolman, double &rr_sc_2,
-         double &/*rr_tot_2*/,double &rf_etep, double &rr_sc_3,
-         double &/*rr_tot_3*/, double &rr_sc_4,double &/*rr_tot_4*/,
-         double &rr_sc_5, double &/*rr_tot_5*/, double &rr_sc_min,
+         double crop_ea_w, double crop_ep_w, double rcmin_star, double &rfpar,
+         double &rf_1,double &rf_2, double &rf_3, double &rf_4, double &rr_sc_1,
+         double &/*rr_tot_1*/,double &rbf_temp, double &rf_temp, double &rf_def,
+         double &rf_theta, double &rf1_dolman, double &rr_sc_2, double &/*rr_tot_2*/,
+         double &rf_etep, double &rr_sc_3, double &/*rr_tot_3*/, double &rr_sc_4,
+         double &/*rr_tot_4*/, double &rr_sc_5, double &/*rr_tot_5*/, double &rr_sc_min,
          double &rr_sc_js)
 {
   assert (LAI > 0.0);
@@ -535,15 +533,14 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
              double esta, double theta_w, double theta_c, double rcmin,
              double rcmax, double zeta, double f3const, double tref, double spar,
              double tmin, double tmax, double nu_1, double nu_2, double nu_3,
-             double crop_ea_w,double crop_ep_w,double canopy_ea,double r_sc,
-             double lel, double &rf1_dolman,double &rf_def,double &rf_3,
-             double &renv_lai_factor, double &rf_etep, double &rrcmin_star,
-             double &rpstress, double &rr_sc_js)
+             double crop_ea_w,double crop_ep_w,double r_sc_star, double &rf_etep,
+             double &rrcmin_star, double &rpstress)
 {
   assert (LAI > 0.0);
   double tairk,def;
   double rcmin_LAI;
-  double fpar,f_1,f_2,f_4,f_temp,bf_temp,f_theta;
+  double fpar,f_1,f_2,f_3,f_4,f1_dolman,bf_temp,f_def,f_theta;
+  double f_temp;
 
   const double a4=700.0; // parameter in f1_dolman (for oats)
 
@@ -562,7 +559,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   // tref-tairk > 0
   if (tref-tairk <= 0.0) tref=tairk+1.0;
   assert (tref > tairk);
-  rf_3=1-f3const*pow(tref-tairk,2.0); // related to air temperature
+  f_3=1-f3const*pow(tref-tairk,2.0); // related to air temperature
   assert (theta_c != theta_w);
   f_4=(theta_0_20-theta_w)/(theta_c-theta_w); // related to soil moisture
 
@@ -573,7 +570,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   if (srad==0.0) srad=srad+1.0;
   assert (a4 + srad != 0.0);
   assert (1000.0 + a4 != 0.0);
-  rf1_dolman=(srad/(a4+srad))/(1000.0/(1000.0+a4));
+  f1_dolman=(srad/(a4+srad))/(1000.0/(1000.0+a4));
   // constraint functions used in Verma et al.(1993)
   assert (nu_1 != tmin);
   bf_temp=(tmax-nu_1)/(nu_1-tmin); // used in f_temp
@@ -584,34 +581,23 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   f_temp=(tair-tmin)*pow(tmax-tair,bf_temp)/
     ((nu_1-tmin)*pow(tmax-nu_1,bf_temp));  // Jarvis (1976)
   assert (1.0 + nu_2 * def != 0.0);
-  rf_def=1.0/(1.0+nu_2*def); // Lohammar (1980)
+  f_def=1.0/(1.0+nu_2*def); // Lohammar (1980)
 
   // Stewart (1988), Kim & Verma (1991) as referenced in Verma et al. (1993)
   f_theta=1.0-exp(-nu_3*100.0*theta_0_20);
 
-  // calculate r_sc_js with previous 'F4'
-  assert (rf1_dolman != 0.0);
-  rr_sc_js=(200.0/LAI/LAI)/(rf1_dolman*rf_def*rf_3*f_theta);
-
- // calculate contraint function F4 as canopy_ea/canopy_ep
+  // calculate contraint function F4 as canopy_ea/canopy_ep
   assert (crop_ep_w > 0.0);
   rf_etep=crop_ea_w/crop_ep_w;
 
   // calculate rcmin_star from r_sc_star
-  // it follows that no stress means rrcmin_star=r_sc, i.e. LAI*Fi=1.0
-  renv_lai_factor=LAI*/*rf1_dolman*rf_def*rf_3*/rf_etep;
-  rrcmin_star=r_sc*renv_lai_factor;
+  rrcmin_star=r_sc_star*LAI*f1_dolman*f_def*f_3*rf_etep;
 
-  if (rrcmin_star > r_sc) rrcmin_star=r_sc;
+  if (rrcmin_star > r_sc_star) rrcmin_star=r_sc_star;
   // calculate stress factor
-  assert (r_sc != 0.0);
-  // Assume 2 criteria: lel > 25.0 & abs(crop_ea-lel) > 50.0 (noise reduction)
-  // when incepted water evaporates rpstress = 0 (no stress)
-  if (canopy_ea > 0.0 || lel < 25.0 || abs(crop_ea_w-lel) < 50.0) rpstress = 0.0;
-  		else rpstress=1.0-min(1.0,rrcmin_star/r_sc);
-/*
-	rpstress=0.0;
-*/
+  assert (r_sc_star != 0.0);
+  rpstress=min(1.0,rrcmin_star/r_sc_star);
+
   return 0;
 }
 // **************************************************************************
@@ -667,11 +653,11 @@ int GFLUX(double tskin, double kh, double temp_0, double &rgflux)
 // calculation of energy fluxes using SW and SG: stressed conditions
 
 int LEHFLUX(double tair,double tskin,double tcan,double tleaf,double r_aastab1,
-            double r_ac,double r_as,double r_sc,double r_sc_js, double e_c_abs,
-            double e_sl_abs, double e_abs,double les,double crop_ea_w,double &rhl,
-            double &rha, double &rhs,double &rlea,double &rlel,double &rhclos,
-            double &rleclos, double &rdtcta,double &rdtltc,double &rdtstc,
-            double &rdtlta,double &rr_sc)
+            double r_ac,double r_as,double r_sc,double e_c_abs,double e_sl_abs,
+            double e_abs,double les,double crop_ea_w,double &rhl,double &rha,
+            double &rhs,double &rlea,double &rlel,double &rhclos,double &rleclos,
+            double &rdtcta,double &rdtltc,double &rdtstc,double &rdtlta,
+            double &rr_sc_star)
 {
   const double lambda=2450000.0; // L of vaporization at 20 C [J/kg]
   const double rho_a=1.23;
@@ -682,33 +668,26 @@ int LEHFLUX(double tair,double tskin,double tcan,double tleaf,double r_aastab1,
   rhs=rho_a*c_p*(tskin-tcan)/r_as; // H: surface - source height
   rlea=lambda*(e_c_abs-e_abs)/r_aastab1; // LE: source height - reference
   rlel=lambda*(e_sl_abs-e_c_abs)/(r_sc+r_ac); // LE: leaf - source height
-
   rdtcta=tcan-tair;
   rdtltc=tleaf-tcan;
   rdtstc=tskin-tcan;
-
   rdtlta=tleaf-tair;
 
   rhclos=rha-rhl-rhs; // closure for sensible heat fluxes
   rleclos=rlea-rlel-les; // closure for latent heat fluxes
 
   // calculate r_sc_star from crop_ea_w = lel
-  rr_sc=(lambda*(e_sl_abs-e_c_abs)-crop_ea_w*r_ac)/crop_ea_w;
+  rr_sc_star=(lambda*(e_sl_abs-e_c_abs)-crop_ea_w*r_ac)/crop_ea_w;
 
-  // constrain max value for rr_sc
-  if (rr_sc > 1000.0) rr_sc = 1000.0;
-
-  // rr_sc must be positive and not less than 20 s/m
-  if (rr_sc < 50.0) rr_sc = 50.0;
 
   return 0;
 }
 //****************************************************************************
 
 // MODIFIED ******************************************************************
-// not used
+
 int LEHFLUXSTAR(double tair,double tskin,double tcan,double tleaf,
-                double r_aa,double r_ac,double r_as,double r_sc_star,double e_c_abs,
+                double r_aa_dry,double r_ac,double r_as,double r_sc_star,double e_c_abs,
                 double e_sl_abs,double e_abs,double les,double &rhl,double &rha,
                 double &rhs,double &rlea,double &rlel,double &rhclos,double &rleclos,
                 double &rdtcta,double &rdtltc,double &rdtstc,double &rdtlta)
@@ -717,14 +696,10 @@ int LEHFLUXSTAR(double tair,double tskin,double tcan,double tleaf,
   const double rho_a=1.23;
   const double c_p=1010.0;
 
-  rha=rho_a*c_p*(tcan-tair)/r_aa; // H: source height - reference
+  rha=rho_a*c_p*(tcan-tair)/r_aa_dry; // H: source height - reference
   rhl=rho_a*c_p*(tleaf-tcan)/r_ac; // H: leaf - source height
   rhs=rho_a*c_p*(tskin-tcan)/r_as; // H: surface - source height
-  rlea=lambda*(e_c_abs-e_abs)/r_aa; // LE: source height - reference
-
-// TEMPORARILY
-	if (rlea < -1000.0) rlea=-9999.0;
-
+  rlea=lambda*(e_c_abs-e_abs)/r_aa_dry; // LE: source height - reference
   rlel=lambda*(e_sl_abs-e_c_abs)/(r_sc_star+r_ac); // LE: leaf - source height
   rdtcta=tcan-tair;
   rdtltc=tleaf-tcan;
@@ -1162,8 +1137,7 @@ public:
   double r_sc_min; // unstressed canopy resistance in RSC()
   double r_sc_js,f1_dolman; // Jarvis & Steward & Dolman (1993) F1
   double r_tot; // as r_tot_x, x=1..5
-  double r_sc,r_sc_star;
-  double env_lai_factor; // LAI*F_i in RSCSTAR()
+  double r_sc_star;
 
   // friction velocities
   double ustar_raa,ustar_raastab1,ustar_raastab2;
@@ -1176,7 +1150,7 @@ public:
   double tcan_prev; // tcan from previous timestep
   double tcan_init; // initial value for tcan
   double e_c_abs,e_sl_abs; // in kg/m**3: e_c and e_sl in Pa
-  double rcmin_star;
+  double rcmin_star; // initial value
   double pstress; // to be returned from svat_pmsw
 
 // matrix elements in ACOEFF with r_sc_star as argument
@@ -1282,7 +1256,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   const double canopy_ep = divide_ep * crops.cover ();
   const double pond_ep = divide_ep - canopy_ep;
 
-  LAI =1.0*crops.LAI (); // Leaf Areal Index
+  LAI =crops.LAI (); // Leaf Areal Index
   h   =0.01*crops.height (); // max crop height [m]
 
   //cout << "LAI is\t" << LAI << "\n";
@@ -1380,7 +1354,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       // windspeed should not be zero
       if (u==0.0) u=0.1;
 
-      // calculate esta,esta_abs,desta,desta_abs from tair
+      // convert e_pa [Pa] to e_abs [kg/m**3], Oke p.63
       VAPOR(tair, esta, esta_abs, desta, desta_abs);
       // cout << "past VAPOR()\n";
 
@@ -1466,30 +1440,26 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       // aerodynamic resistance between soil surface and mean source height
       RAS(u,h,LAI,z_0s,alpha_k,c_d,k_h,r_as);
 
-/*
       // mean stomatal resistance following Jacquemin & Noilhan (1990) and
       // Verma et al.(1993), return r_sc_js (from f1_dolman, f_def, f_3 and f_etep
       RSC (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,rcmax,
            zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
-           rcmin_star,fpar,f_1,f_2,f_3,f_4,r_sc_1,r_tot_1,bf_temp,
-           f_temp,f_def,f_theta,f1_dolman,r_sc_2,r_tot_2,f_etep,r_sc_3,r_tot_3,
-           r_sc_4,r_tot_4,r_sc_5,r_tot_5,r_sc_min,r_sc_js);
+           rcmin_star,fpar,f_1,f_2,f_3,f_4,r_sc_1,r_tot_1,bf_temp,f_temp,f_def,
+           f_theta,f1_dolman,r_sc_2,r_tot_2,f_etep,r_sc_3,r_tot_3,r_sc_4,r_tot_4,
+           r_sc_5,r_tot_5,r_sc_min,r_sc_js);
 
-*/
       // Net radiation by brunt's equation
       NETRAD(srad,e_pa,tair,relsun,b1,b2,b3,b4,albedo,netlong_brunt,
              netlong_satt,netshort,netrad_brunt,netrad_satt);
 
       // Compute matrix elements for assigning to A matrix and set all others to zero
       // include r_sc_js as defined in RSC()
-/*
       ACOEFF(tair,e_abs,netrad_brunt,LAI,les,temp_0,kh,r_aastab2,r_ac,r_as,
              r_sc_js,alpha_r,a_11,a_12,a_13,b_1,a_24,a_25,b_2,a_31,a_33,a_34,a_35,
              b_3,a_41,a_42,b_4);
-*/
+
       // size n of matrix 5 x 5
       // number of solutions m is 1, i.e. 1 solution vector b for each computation
-/*
       n=5;
       m=1;
 
@@ -1552,100 +1522,92 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       e_sl_abs=x[5][1]; // e_sl in kg/m**3
 
       tcan_prev=tcan; // save tcan for use in RAASTAB()
-*/
+
       // calculate energy balance for sparse crops
       GFLUX(tskin,kh,temp_0,gflux);  // ground heat flux
 
-/*
       LEHFLUX(tair,tskin,tcan,tleaf,r_aastab2,r_ac,r_as,r_sc_js,e_c_abs,e_sl_abs,
               e_abs,les,crop_ea_w,hl,ha,hs,lea,lel,hclos,leclos,dtcta,dtltc,dtstc,dtlta,
               r_sc_star);
 
-*/
-// in RSCSTAR () have r_sc and lel an initial value
       RSCSTAR (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,rcmax,
                zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
-               canopy_ea,r_sc,lel,f1_dolman,f_def,f_3,env_lai_factor,f_etep,
-               rcmin_star,pstress,r_sc_js);
+               r_sc_star,f_etep,rcmin_star,pstress);   
 
       ACOEFF(tair,e_abs,netrad_brunt,LAI,les,temp_0,kh,r_aastab2,r_ac,r_as,
-             r_sc,alpha_r,a_11,a_12,a_13,b_1,a_24,a_25,b_2,a_31,a_33,a_34,a_35,
-             b_3,a_41,a_42,b_4);
+             r_sc_star,alpha_r,astar_11,astar_12,astar_13,bstar_1,astar_24,astar_25,
+             bstar_2,astar_31,astar_33,astar_34,astar_35,bstar_3,astar_41,astar_42,
+             bstar_4);
 
       // size n of matrix 5 x 5
       // number of solutions m is 1, i.e. 1 solution vector b for each computation
-
       n=5;
       m=1;
 
       // Read in matrix elements for stressed conditions...
-      a[1][1]=a_11;
-      a[1][2]=a_12;
-      a[1][3]=a_13;
-      a[1][4]=0.0;
-      a[1][5]=0.0;
-      a[2][1]=0.0;
-      a[2][2]=0.0;
-      a[2][3]=0.0;
-      a[2][4]=a_24;
-      a[2][5]=a_25;
-      a[3][1]=a_31;
-      a[3][2]=0.0;
-      a[3][3]=a_33;
-      a[3][4]=a_34;
-      a[3][5]=a_35;
-      a[4][1]=a_41;
-      a[4][2]=a_42;
-      a[4][3]=0.0;
-      a[4][4]=0.0;
-      a[4][5]=0.0;
-      a[5][1]=0.0;
-      a[5][2]=0.0;
-      a[5][3]=desta_abs;
-      a[5][4]=0.0;
-      a[5][5]=-1.0;
-      a_53=a[5][3]; // is desta_abs
+      astar[1][1]=astar_11;
+      astar[1][2]=astar_12;
+      astar[1][3]=astar_13;
+      astar[1][4]=0.0;
+      astar[1][5]=0.0;
+      astar[2][1]=0.0;
+      astar[2][2]=0.0;
+      astar[2][3]=0.0;
+      astar[2][4]=astar_24;
+      astar[2][5]=astar_25;
+      astar[3][1]=astar_31;
+      astar[3][2]=0.0;
+      astar[3][3]=astar_33;
+      astar[3][4]=astar_34;
+      astar[3][5]=astar_35;
+      astar[4][1]=astar_41;
+      astar[4][2]=astar_42;
+      astar[4][3]=0.0;
+      astar[4][4]=0.0;
+      astar[4][5]=0.0;
+      astar[5][1]=0.0;
+      astar[5][2]=0.0;
+      astar[5][3]=desta_abs;
+      astar[5][4]=0.0;
+      astar[5][5]=-1.0;
+      astar_53=astar[5][3]; // is desta_abs
 
       // read in b vector (matrix) ...
-      b[1][1]=b_1;
-      b[2][1]=b_2;
-      b[3][1]=b_3;
-      b[4][1]=b_4;
-      b[5][1]=(tair+273.15)*desta_abs-esta_abs;
-      b_5=b[5][1]; // for the control matrix
+      bstar[1][1]=bstar_1;
+      bstar[2][1]=bstar_2;
+      bstar[3][1]=bstar_3;
+      bstar[4][1]=bstar_4;
+      bstar[5][1]=(tair+273.15)*desta_abs-esta_abs;
+      bstar_5=bstar[5][1]; // for the control matrix
 
       for (l=1;l<=n;l++)
         {
           for (k=1;k<=n;k++)
             {
-              ai[k][l]=a[k][l]; // save a matrix in ai
+              aistar[k][l]=astar[k][l]; // save a matrix in ai
             }
           for (k=1;k<=m;k++)
             {
-              x[l][k]=b[l][k];  // save b matrix in x
+              xstar[l][k]=bstar[l][k];  // save b matrix in x
             }
         }  // end for
 
       // invert matrix a, a_pot and a_wet
-      gaussj(ai,n,x,m);
+      gaussj(aistar,n,xstar,m);
 
       // write solution vector for x (stressed conditions)
-      tcan=x[1][1]-273.15;  // in degrees C
-      tskin=x[2][1]-273.15; // in degrees C
-      tleaf=x[3][1]-273.15; // in degrees C
-      e_c_abs=x[4][1];  // e_c in kg/m**3
-      e_sl_abs=x[5][1]; // e_sl in kg/m**3
+      tcan_star=xstar[1][1]-273.15;  // in degrees C
+      tskin_star=xstar[2][1]-273.15; // in degrees C
+      tleaf_star=xstar[3][1]-273.15; // in degrees C
+      e_c_abs_star=xstar[4][1];  // e_c in kg/m**3
+      e_sl_abs_star=xstar[5][1]; // e_sl in kg/m**3
 
-      tcan_prev=tcan; // save tcan for use in RAASTAB()
+      tcan_prev_star=tcan_star; // save tcan for use in RAASTAB()
 
-      LEHFLUX(tair,tskin,tcan,tleaf,r_aastab2,r_ac,r_as,r_sc,r_sc_js,e_c_abs,
-      		  e_sl_abs,e_abs,les,crop_ea_w,hl,ha,hs,lea,lel,hclos,leclos,dtcta,
-              dtltc,dtstc,dtlta,r_sc);
-
-      RSCSTAR (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,rcmax,
-               zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
-               canopy_ea,r_sc,lel,f1_dolman,f_def,f_3,env_lai_factor,f_etep,
-               rcmin_star,pstress,r_sc_js);
+      LEHFLUXSTAR(tair,tskin_star,tcan_star,tleaf_star,r_aastab2,r_ac,r_as,
+                  r_sc_star,e_c_abs_star,e_sl_abs_star,e_abs_star,les_star,hl_star,ha_star,
+                  hs_star,lea_star,lel_star,hclos_star,leclos_star,dtcta_star,dtltc_star,
+                  dtstc_star,dtlta_star);
 
       // convert vapor pressure from kg/m**3 to Pa
       EABS2PA(e_c_abs,tcan,e_c);  // at canopy temperature
@@ -1667,11 +1629,11 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       } // end if
 } // end tick()
 
-void
+void 
 SVAT_PMSW::output (Log& log) const
 {                                                 // var 1-4: yy-mm-dd-hh
   SVAT::output (log); // log_only var
-  log.output ("netrad_brunt", netrad_brunt);    // var 5
+  log.output ("netrad_brunt", netrad_brunt);          // var 5
   log.output ("netlong_brunt", netlong_brunt);  // var 6
   log.output ("r_a", r_a);                      // var 7
   log.output ("r_astab", r_astab);              // var 8
@@ -1685,51 +1647,56 @@ SVAT_PMSW::output (Log& log) const
   log.output ("tskin", tskin);                  // var 16
   log.output ("tcan", tcan);                    // var 17
   log.output ("tleaf", tleaf);                  // var 18
-  log.output ("e_c_abs", e_c_abs);              // var 19
-  log.output ("e_sl_abs", e_sl_abs);            // var 20
-  log.output ("ha", ha);                        // var 21
-  log.output ("hl", hl);                        // var 22
-  log.output ("hs", hs);                        // var 23
-  log.output ("lea", lea);                      // var 24
-  log.output ("lel", lel);                      // var 25
-  log.output ("gflux", gflux);                  // var 26
-  log.output ("dtcta", dtcta);                  // var 27
-  log.output ("dtltc", dtltc);                  // var 28
-  log.output ("dtstc", dtstc);                  // var 29
-  log.output ("theta_0_20", theta_0_20);        // var 30
-  log.output ("theta_0_50", theta_0_50);        // var 31
-  log.output ("theta_0_100", theta_0_100);      // var 32
-  log.output ("f_1", f_1);                      // var 33
-  log.output ("f1_dolman", f1_dolman);          // var 34
-  log.output ("f_2", f_2);                      // var 35
-  log.output ("f_3", f_3);                      // var 36
-  log.output ("f_4", f_4);                      // var 37
-  log.output ("f_temp", f_temp);                // var 38
-  log.output ("f_def", f_def);                  // var 39
-  log.output ("f_theta", f_theta);              // var 40
-  log.output ("f_etep", f_etep);                // var 41
-  log.output ("r_sc_js", r_sc_js);              // var 42
-  log.output ("r_sc", r_sc);                    // var 43
-  log.output ("rcmin_star", rcmin_star);        // var 44
-  log.output ("pstress", pstress);              // var 45
-  log.output ("ustar_raa", ustar_raa);          // var 46
-  log.output ("ustar_raastab1", ustar_raastab1);// var 47
-  log.output ("ustar_raastab2", ustar_raastab2);// var 48
-  log.output ("env_lai_factor", env_lai_factor);// var 49
-  log.output ("e_pa", e_pa);                    // var 50
-  log.output ("e_abs", e_abs);                  // var 51
-  log.output ("tair", tair);                    // var 52
-  log.output ("srad", srad);                    // var 53
-  log.output ("u_ref", u_ref);                  // var 54
-  log.output ("prec", prec);                    // var 55
+  log.output ("e_c", e_c);                      // var 19
+  log.output ("e_sl", e_sl);                    // var 20
+  log.output ("tskin_star", tskin_star);        // var 21
+  log.output ("tcan_star", tcan_star);          // var 22
+  log.output ("tleaf_star", tleaf_star);        // var 23
+  log.output ("e_c_star", e_c_star);            // var 24
+  log.output ("e_sl_star", e_sl_star);          // var 25
+  log.output ("ha", ha);                        // var 26
+  log.output ("hl", hl);                        // var 27
+  log.output ("hs", hs);                        // var 28
+  log.output ("lea", lea);                      // var 29
+  log.output ("lel", lel);                      // var 30
+  log.output ("ha_star", ha_star);              // var 31
+  log.output ("hl_star", hl_star);              // var 32
+  log.output ("hs_star", hs_star);              // var 33
+  log.output ("lea_star", lea_star);            // var 34
+  log.output ("lel_star", lel_star);            // var 35
+  log.output ("gflux", gflux);                  // var 36
+  log.output ("dtcta", dtcta);                  // var 37
+  log.output ("dtltc", dtltc);                  // var 38
+  log.output ("dtstc", dtstc);                  // var 39
+  log.output ("dtcta_star", dtcta_star);        // var 40
+  log.output ("dtltc_star", dtltc_star);        // var 41
+  log.output ("dtstc_star", dtstc_star);        // var 42
+  log.output ("theta_0_20", theta_0_20);        // var 43
+  log.output ("theta_0_50", theta_0_50);        // var 44
+  log.output ("theta_0_100", theta_0_100);      // var 45
+  log.output ("f_1", f_1);                      // var 46
+  log.output ("f_2", f_2);                      // var 47
+  log.output ("f_3", f_3);                      // var 48
+  log.output ("f_4", f_4);                      // var 49
+  log.output ("f_temp", f_temp);                // var 50
+  log.output ("f_def", f_def);                  // var 51
+  log.output ("f_theta", f_theta);              // var 52
+  log.output ("f_etep", f_etep);                // var 53
+  log.output ("r_sc_js", r_sc_js);              // var 54
+  log.output ("r_sc_min", r_sc_min);            // var 55
+  log.output ("r_sc_star", r_sc_star);          // var 56
+  log.output ("rcmin_star", rcmin_star);         // var 57
+  log.output ("pstress", pstress);              // var 58
+  log.output ("ustar_raa", ustar_raa);          // var 59
+  log.output ("ustar_raastab1", ustar_raastab1);// var 60
+  log.output ("ustar_raastab2", ustar_raastab2);// var 61
 }
 
+  
 SVAT_PMSW::SVAT_PMSW (const AttributeList& al)
   : SVAT (al)
 #if 1
   ,
-  r_sc (100.0),    // arbitrary (dummy) initial value
-  lel (100.0),     // arbitrary (dummy) initial value
   albedo (al.number ("albedo")),
   b1 (al.number ("b1")),
   b2 (al.number ("b2")),
@@ -1885,6 +1852,16 @@ static struct SVAT_PMSWSyntax
                 "vapor pressure at mean source height");
     syntax.add ("e_sl", "Pa", Syntax::LogOnly,
                 "saturated vapor pressure at leaf surface");
+    syntax.add ("tskin_star", "dg C", Syntax::LogOnly,
+                "corrected soil/skin temperature");
+    syntax.add ("tcan_star", "dg C", Syntax::LogOnly,
+                "corrected canopy temperature at mean source");
+    syntax.add ("tleaf_star", "dg C", Syntax::LogOnly,
+                "corrected leaf temperature");
+    syntax.add ("e_c_star", "Pa", Syntax::LogOnly,
+                "corrected vapor pressure at mean source height");
+    syntax.add ("e_sl_star", "Pa", Syntax::LogOnly,
+                "corrected saturated vapor pressure at leaf surface");
     syntax.add ("ha", "W/m**2", Syntax::LogOnly,
                 "Sensible heat flux from source- to screen height");
     syntax.add ("hl", "W/m**2", Syntax::LogOnly,
@@ -1895,6 +1872,16 @@ static struct SVAT_PMSWSyntax
                 "Latent heat flux from source- to screen height");
     syntax.add ("lel", "W/m**2", Syntax::LogOnly,
                 "Latent heat flux from leaf to mean source");
+    syntax.add ("ha_star", "W/m**2", Syntax::LogOnly,
+                "corrected sensible heat flux from source- to screen height");
+    syntax.add ("hl_star", "W/m**2", Syntax::LogOnly,
+                "corrected sensible heat flux from leaf to mean source");
+    syntax.add ("hs_star", "W/m**2", Syntax::LogOnly,
+                "corrected sensible heat flux from soil to mean source");
+    syntax.add ("lea_star", "W/m**2", Syntax::LogOnly,
+                "corrected latent heat flux from source- to screen height");
+    syntax.add ("lel_star", "W/m**2", Syntax::LogOnly,
+                "corrected latent heat flux from leaf to mean source");
     syntax.add ("gflux", "W/m**2", Syntax::LogOnly,
                 "Ground heat flux");
     syntax.add ("dtcta", "dg C", Syntax::LogOnly,
@@ -1933,10 +1920,12 @@ static struct SVAT_PMSWSyntax
                 "Constraint function defined by crop_ea/crop_ep");
     syntax.add ("r_sc_js", "s/m", Syntax::LogOnly,
                 "Bulk canopy resistance: f1_dolman*f_def*f3*f4");
-    syntax.add ("r_sc", "s/m", Syntax::LogOnly,
-                "Bulk canopy resistance: f1_dolman*f_def*f3*f_etep");
-    syntax.add ("rcmin_star", "s/m", Syntax::LogOnly,
+    syntax.add ("r_sc_min", "s/m", Syntax::LogOnly,
                 "minimum canopy resistance");
+    syntax.add ("r_sc_star", "s/m", Syntax::LogOnly,
+                "corrected canopy resistance");
+    syntax.add ("rcmin_star", "s/m", Syntax::LogOnly,
+                "corrected minimum canopy resistance");
     syntax.add ("pstress", "NA", Syntax::LogOnly,
                 "crop production stress");
     syntax.add ("ustar_raa", "NA", Syntax::LogOnly,
@@ -1945,20 +1934,6 @@ static struct SVAT_PMSWSyntax
                 "friction velocity from RAASTAB1()");
     syntax.add ("ustar_raastab2", "NA", Syntax::LogOnly,
                 "friction velocity from RAASTAB2()");
-    syntax.add ("env_lai_factor", "NA", Syntax::LogOnly,
-                "LAI*F_i");
-    syntax.add ("e_pa","Pa", Syntax::LogOnly,
-                "vapor pressure at 2 m");
-    syntax.add ("e_abs", "kg/m**3", Syntax::LogOnly,
-                "absolute vapor pressure");
-    syntax.add ("tair", "degr.C", Syntax::LogOnly,
-                "air temperature");
-    syntax.add ("srad", "W/m**2", Syntax::LogOnly,
-                "global radiation");
-    syntax.add ("u_ref", "m/s", Syntax::LogOnly,
-                "friction velocity from ??");
-    syntax.add ("prec", "mm", Syntax::LogOnly,
-                "precipitation");
     syntax.add ("albedo", "NA", Syntax::Const,
                 "Bulk albedo");
     alist.add ("albedo", 0.2);
