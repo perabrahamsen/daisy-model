@@ -127,17 +127,11 @@ Weather::day_length (const Time& time) const
 		      + 0.03838 * sin (2 * t) - 0.15870 * cos (3 * t)
 		      + 0.07659 * sin (3 * t) - 0.01021 * cos (4 * t));
   double my_tan 
-    = -tan (M_PI / 180 * Dec) * tan (M_PI / 180 * latitude);
+    = -tan (M_PI / 180.0 * Dec) * tan (M_PI / 180.0 * latitude);
   if (my_tan <= -1.0)
-    {
-      CERR << "BUG: DayLength inaccuracy: my_tan is " << my_tan << "\n";
-      my_tan = -1.0;
-    }
+    my_tan = -1.0;
   else if (my_tan >= 1.0)
-    {
-      CERR << "BUG: DayLength inaccuracy: my_tan is " << my_tan << "\n";
-      my_tan = 1.0;
-    }
+    my_tan = 1.0;
   t = (24 / M_PI * acos (my_tan));
   const double dl = (t < 0) ? t + 24.0 : t;
   assert (dl >= 0.0);

@@ -669,7 +669,6 @@ AM::default_AOM ()
   return *AOM;
 }
 
-
 AM::AM (const AttributeList& al)
   : impl (*new Implementation 
 	  (al.time ("creation"),

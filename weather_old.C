@@ -134,14 +134,24 @@ WeatherOld::~WeatherOld ()
   delete &impl;
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<IM>;
-#endif
+static bool 
+check_alist (const AttributeList& al)
+{
+  bool ok = true;
+  const double latitude = al.number ("Latitude");
+  
+  if (latitude > 66 || latitude < -66)
+    CERR << "Warning, Daisy is untested under arctic conditions (Latitude = "
+	 << latitude << ")\n";
+
+  return ok;
+}
 
 void
 WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Weather::load_syntax (syntax, alist);
+  syntax.add_check (&check_alist);
   // Where in the world are we?
   syntax.add ("Latitude", "dg North", Syntax::Const,
 	      "The position of the weather station on the globe.");
@@ -163,10 +173,12 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("UTM_y", Syntax::Unknown (), Syntax::OptionalConst,
 	      "Y position of weather station."); // Unused.
 
-  add_submodule<IM> ("DryDeposit", syntax, alist, Syntax::Const, "\
-Dry atmospheric deposition of nitrogen [kg N/year/ha].");
-  add_submodule<IM> ("WetDeposit", syntax, alist, Syntax::Const, "\
-Deposition of nitrogen solutes with precipitation [ppm].");
+  syntax.add_submodule ("DryDeposit", alist, Syntax::Const, Syntax::Singleton,
+			"\
+Dry atmospheric deposition of nitrogen [kg N/year/ha].", &IM::load_syntax);
+  syntax.add_submodule ("WetDeposit", alist, Syntax::Const, Syntax::Singleton,
+			"\
+Deposition of nitrogen solutes with precipitation [ppm].", &IM::load_syntax);
 
   // Division between Rain and Snow.
   syntax.add ("T_rain", "dg C", Syntax::Const, 

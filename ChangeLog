@@ -1,4 +1,51 @@
+2000-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.47 released.
+
+2000-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioincorporation.C (tick): Don't incorporate very tiny pools, to
+	avoid numeric errors.
+
+	* action_fertilize.C (struct ActionFertilize): Slightly better
+	output messages.
+
+	* am.C (smb_contribution): New function.
+	* organic_matter.C (initialize): Use it.
+
+	* weather_std.C (keyword_description): Latitude should be in [-90, 90].
+
+	* weather_old.C (check_alist): Added warning about arctic
+	agriculture. 
+	(load_syntax): Don't use `add_submodule' template.
+
+	* weather.C (day_length): Allow for arctic agriculture.
+
+	* common.C (find_file): Also give error message when failing to
+	open file specified by absolute path.
+
+	* organic_matter.C (load_syntax): New default SMB and SOM
+	parameters. 
+	(initialize): Use soil clay content when initializing SMB pools.
+	(initialize): Steal SOM[0] C for initializing SMB pools.
+
 2000-09-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/wwheat.dai ("Winter Wheat; Eest"): Renamed from "Winter
+	Wheat, Eest". 
+	("Winter Wheat; Foulum"): Overwrite `CrpN' parameter.
+
+	* lib/wbarley.dai ("Winter Barley; Koge"): Renamed from "Winter
+	Barley". 
+	("Winter Barley"): New parameterization.
+	("Winter Barley; Foulum"): Ditto.
+
+	* lib/fertilizer.dai (Ammonia): New parameterization.
+	(AmmoniumNitrate): Ditto.
+	(Nitrate): Ditto.
+	(NPK): Ditto.
+	(N25S): Ditto.
+	(Foulum_slurry): Ditto.
 
 	* Version 1.46 released.
 

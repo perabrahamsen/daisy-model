@@ -106,7 +106,7 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     const double top_C = am[i]->top_C ();
 
     // No more worthwhile AOM pools.
-    if (top_C == 0.0)
+    if (top_C < 1e-30)
       break;
     
     // Find how much to take from this AOM.

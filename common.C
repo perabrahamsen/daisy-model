@@ -167,7 +167,12 @@ Options::find_file (const string& name)
 #endif
       )
     {
-      return open (name.c_str (), O_RDONLY);
+      int fd = open (name.c_str (), O_RDONLY);
+      if (fd < 0)
+	{
+	  CERR << "Could not open `" << name << "' for reading\n";
+	  throw ("file error");
+	}
     }
   for (unsigned int i = 0; i < path.size (); i++)
     {

@@ -12,9 +12,22 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
-* 1.45
+* 1.47
+
+** New default SMB and SOM parameters. 
+
+These should have little effect on mineralization, but give a more
+realistic estimate of the size of the SMB pools.
+
+** New fertilizer types in `fertilizer.dai'.
+
+** More work on the winter wheat and winter barley parameterizations.
+
+* 1.46
 
 ** Fixed link order dependency crash (MAYBE).
+
+* 1.45
 
 ** Fixed crash related to the am/cleanup AOM introduced in 1.40.
 
@@ -108,7 +121,7 @@ Read this to keep track of Daisy.
 
 Those log files that contains a header now end with `.dlf' instead of
 `.tab'.  This affects the build-in `harvest' log model, as well as all
-the `table' parametrizations found in `log.dai'.  The `PMSW'
+the `table' parameterizations found in `log.dai'.  The `PMSW'
 parameterization uses the old `table1' log model, doesn't have a
 header, and still output to `pmsw.tab'.
 

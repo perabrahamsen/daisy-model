@@ -613,11 +613,11 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
     }
   for (unsigned int lay = 0; lay < soil.size (); lay++)
     {
+      double stolen = 0.0; // How much C was stolen by the SMB pools?
+ 
       // SMB C should be calculated from equilibrium.
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
-	  double stolen = 0.0; // How much C was stolen by the SMB pools?
- 
 	  if (smb[pool]->C.size () == lay)
 	    {
 	      double in = 0.0;	      // Incomming C.
@@ -626,7 +626,14 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	      // We ignore contributions from higher numbered SMB pools.
 	      // We can do that, because that is the typical direction
 	      // of the flow.
-	      for (unsigned int i = 0; i < pool; i++)
+	      if (pool > 0)
+		in += smb[0]->C[lay] 
+		  * clay_turnover_factor[lay]
+		  * smb[0]->turnover_rate 
+		  * smb[0]->fractions[pool]
+		  * smb[0]->efficiency[pool];
+
+	      for (unsigned int i = 1; i < pool; i++)
 		in += smb[i]->C[lay] 
 		  * smb[i]->turnover_rate 
 		  * smb[i]->fractions[pool]
@@ -635,20 +642,24 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	      // Add contributions from SOM pools
 	      for (unsigned int i = 0; i < som_size; i++)
 		in += som[i]->C[lay] 
+		  * clay_turnover_factor[lay]
 		  * som[i]->turnover_rate 
 		  * som[i]->fractions[pool]
 		  * som[i]->efficiency[pool];
 	      
 	      // Rate of outgoing C. 
-	      const double out_rate = smb[pool]->turnover_rate 
+	      double out_rate = smb[pool]->turnover_rate 
 		+ smb[pool]->maintenance;
-
+	      if (pool == 0)
+		out_rate *= clay_turnover_factor[lay];
+		
 	      // content * out_rate = in  =>  content = in / out_rate;
 	      smb[pool]->C.push_back (in / out_rate);
 	      
 	      stolen += in;
 	    }
-	  // TODO: Take the stolen C from the SOM pools.
+	  som[0]->C[lay] -= stolen;
+	  assert (som[0]->C[lay] >= 0.0);
 	}
     }
   buffer.initialize (soil);
@@ -990,14 +1001,14 @@ Mineralization this time step (negative numbers mean immobilization).");
   vector<AttributeList*> SMB;
   AttributeList& SMB1 = *new AttributeList (om_alist);
   vector<double> SMB1_C_per_N;
-  SMB1_C_per_N.push_back (6.0);
+  SMB1_C_per_N.push_back (6.7);
   SMB1.add ("C_per_N", SMB1_C_per_N);
-  SMB1.add ("turnover_rate", 4.16666666667e-5);
+  SMB1.add ("turnover_rate", 7.708e-6);
   vector<double> SMB1_efficiency;
   SMB1_efficiency.push_back (0.60);
   SMB1_efficiency.push_back (0.60);
   SMB1.add ("efficiency", SMB1_efficiency);
-  SMB1.add ("maintenance", 4.16666666667e-4);
+  SMB1.add ("maintenance", 7.500e-5);
   vector<double> SMB1_fractions;
   SMB1_fractions.push_back (0.0);
   SMB1_fractions.push_back (0.6);
@@ -1007,7 +1018,7 @@ Mineralization this time step (negative numbers mean immobilization).");
   SMB.push_back (&SMB1);
   AttributeList& SMB2 = *new AttributeList (om_alist);
   vector<double> SMB2_C_per_N;
-  SMB2_C_per_N.push_back (10.0);
+  SMB2_C_per_N.push_back (6.7);
   SMB2.add ("C_per_N", SMB2_C_per_N);
   SMB2.add ("turnover_rate", 4.16666666667e-4);
   vector<double> SMB2_efficiency;
@@ -1030,8 +1041,8 @@ Mineralization this time step (negative numbers mean immobilization).");
   AttributeList& SOM1 = *new AttributeList (om_alist);
   SOM1.add ("turnover_rate", 1.125e-7);
   vector<double> SOM1_efficiency;
-  SOM1_efficiency.push_back (0.60);
-  SOM1_efficiency.push_back (0.60);
+  SOM1_efficiency.push_back (0.40);
+  SOM1_efficiency.push_back (0.40);
   SOM1.add ("efficiency", SOM1_efficiency);
   vector<double> SOM1_fractions;
   SOM1_fractions.push_back (1.0);
@@ -1043,8 +1054,8 @@ Mineralization this time step (negative numbers mean immobilization).");
   AttributeList& SOM2 = *new AttributeList (om_alist);
   SOM2.add ("turnover_rate", 5.83333333333e-6);
   vector<double> SOM2_efficiency;
-  SOM2_efficiency.push_back (0.60);
-  SOM2_efficiency.push_back (0.60);
+  SOM2_efficiency.push_back (0.50);
+  SOM2_efficiency.push_back (0.50);
   SOM2.add ("efficiency", SOM2_efficiency);
   vector<double> SOM2_fractions;
   SOM2_fractions.push_back (0.9);

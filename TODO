@@ -1,10 +1,16 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Opdater filer
+* Gødning
 
-sh sbarley, wbarley, wrape, wwheat, fetilizer
+** Fertilizer log.
 
-* Nye SMB parametre fra SH.
+NO3 NH4 Org-N Org-C DM
+
+** second year utilization
+
+new column state variable
+new fertilizer parameter
+new fertilize parameter
 
 * Test Qt.
 
@@ -40,17 +46,10 @@ Vis resultatet af syntax check i vindue.
 
 ** Alle andre views.
 
-* Gødning
+** Interest groups
 
-** Fertilizer log.
-
-NO3 NH4 Org-N Org-C DM
-
-** second year utilization
-
-new column state variable
-new fertilizer parameter
-new fertilize parameter
+libraries, models, parameterizations and parameters should belong to a
+number of "interest groups", which can be use by QDaisy for filtering.
 
 * document LaTeX
 

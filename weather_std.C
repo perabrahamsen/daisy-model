@@ -208,7 +208,7 @@ WeatherStandard::convert_unit (const string& from, const string& to)
 
 const WeatherStandard::keyword_description_type 
 WeatherStandard::keyword_description[] =
-{ { "Latitude", "dgNorth", &WeatherStandard::latitude, -360, 360, true },
+{ { "Latitude", "dgNorth", &WeatherStandard::latitude, -90, 90, true },
   { "Longitude", "dgEast", &WeatherStandard::longitude, -360, 360, true },
   { "Elevation", "m", &WeatherStandard::elevation, 0, 10000, true },
   { "TimeZone", "dgEast", &WeatherStandard::timezone, -360, 360, true },
@@ -750,9 +750,13 @@ WeatherStandard::check (const Time& from, const Time& to) const
       CERR << "Simulation ends after weather data\n";
       ok = false;
     }
+  if (latitude < -66 || latitude > 66)
+    {
+      CERR << "Researching arctic agriculture? (latitude = "
+	   << latitude << ")\n";
+    }
   return ok;
 }
-
 
 static struct WeatherStandardSyntax
 {

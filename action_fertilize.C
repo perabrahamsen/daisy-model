@@ -107,10 +107,10 @@ Height where you want to end measuring (a negative number).");
     const string syntax = am.name ("syntax");
     if (syntax == "mineral")
       COUT << " [Fertilizing " << am.number ("weight") 
-	   << " kg N/ha "<< am.name ("type") << "]\n";
+	   << " kg "<< am.name ("type") << "-N/ha]\n";
     else if (syntax == "organic")
       COUT << " [Fertilizing " << am.number ("weight") 
-	   << " ton DM/ha "<< am.name ("type") << "]\n";
+	   << " ton "<< am.name ("type") << " DM/ha]\n";
     else
       COUT << " [Fertilizing " << am.name ("type") << "]\n";
 
