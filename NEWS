@@ -14,7 +14,7 @@ release.
 
 * 1.45
 
-** Fixed link order dependency crash.
+** Fixed link order dependency crash (MAYBE).
 
 ** Fixed crash related to the am/cleanup AOM introduced in 1.40.
 

@@ -214,7 +214,7 @@ static struct ActionIrrigateSubsoilSyntax
   ActionIrrigateSubsoilSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList (alist);
+    AttributeList& alist = *new AttributeList ();
     syntax.add_check (&check_alist);
     alist.add ("description", "\
 Incorporate irrigation water directly in the soil.\n\

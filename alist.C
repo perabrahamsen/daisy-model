@@ -717,9 +717,10 @@ AttributeList::AttributeList ()
 
 AttributeList::AttributeList (const AttributeList& old)
   : impl (*new Implementation ())
-{ impl.values = old.impl.values; }
+{ 
+  assert (this != &old);
+  impl.values = old.impl.values; 
+}
 
 AttributeList::~AttributeList ()
 { delete &impl; }
-
-const AttributeList AttributeList::empty;
