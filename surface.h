@@ -18,9 +18,9 @@ class Surface : public UZtop
   bool flux;
   double EvapSoilSurface;
   double Eps;
-  vector <const AOM*> aom;
-  InorganicMatter iom;
-  InorganicMatter iom_flux;
+  vector <const AOM*> am;
+  InorganicMatter im;
+  InorganicMatter im_flux;
 
 public:
 

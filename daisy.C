@@ -32,11 +32,14 @@ Daisy::Daisy (const AttributeList& al)
        i != columns.end ();
        i++)
     {
-      if (!(*i)-> check ())
+      if (*i == NULL || !(*i)-> check ())
 	ok = false;
     }
   if (!ok)
     THROW (Initialization ("Malformed column(s)"));
+
+  if (!action.check (*this))
+    THROW (Initialization ("Malformed action(s)"));
 }
 
 void 
@@ -107,7 +110,7 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add_class ("column", Column::library (), &Column::derive_type);
   syntax.add_class ("log", Log::library (), &Log::derive_type);
   syntax.add_class ("parser", Parser::library (), &Parser::derive_type);
-  syntax.add_class ("aom", AOM::library (), &AOM::derive_type);
+  syntax.add_class ("am", AOM::library (), &AOM::derive_type);
   syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
   syntax.add ("input", Parser::library (), Syntax::Optional, 
 	      Syntax::Singleton);

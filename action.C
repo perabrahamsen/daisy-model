@@ -52,6 +52,12 @@ Action::doIt (Daisy&) const
 
 Action Action::null;
 
+bool
+Action::check (Daisy&) const
+{ 
+  return true;
+}
+
 Action::Action ()
 { }
 

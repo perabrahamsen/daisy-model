@@ -27,6 +27,8 @@ public:
   static void derive_type (const string, const AttributeList&, string super);
  
   // Create and Destroy.
+public: 
+  virtual bool check (Daisy&) const;
 protected:
   Action ();
 public:

@@ -4,53 +4,63 @@
 #include "syntax.h"
 #include "alist.h"
 #include "log.h"
-#include "iom.h"
+#include "im.h"
 
 void
 InorganicMatter::output (Log& log, const Filter& filter) const
 {
-  iom.output (log, filter);
+  im.output (log, filter);
 }
 
 void InorganicMatter::clear ()
 { 
-  iom.clear ();
+  im.clear ();
 }
 
 void
 InorganicMatter::operator += (const InorganicMatter& n)
 { 
-  iom += n.iom;
+  im += n.im;
 }
 
 void
 InorganicMatter::operator -= (const InorganicMatter& n)
 { 
-  iom -= n.iom;
+  im -= n.im;
 }
 
 void
 InorganicMatter::operator *= (double n)
 { 
-  iom *= n;
+  im *= n;
 }
 
 void
 InorganicMatter::operator /= (double n)
 { 
-  iom /= n;
+  im /= n;
+}
+
+bool
+InorganicMatter::empty () const
+{
+  return im.empty ();
 }
 
 InorganicMatter::InorganicMatter ()
-  : iom (*new IOM ())
+  : im (*new IM ())
 { }
 
 InorganicMatter::InorganicMatter (const AttributeList& al)
-  : iom (*new IOM (al))
+  : im (*new IM (al))
 { }
 
 InorganicMatter::InorganicMatter (const InorganicMatter& n, double flux)
-  : iom (*new IOM (n.iom, flux))
+  : im (*new IM (n.im, flux))
+{ }
+
+InorganicMatter::InorganicMatter (const SoluteMatter& n, double flux)
+  : im (*new IM (n.im, flux))
 { }
 
 InorganicMatter::~InorganicMatter ()
@@ -59,7 +69,7 @@ InorganicMatter::~InorganicMatter ()
 void 
 InorganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  IOM::load_syntax (syntax, alist);
+  IM::load_syntax (syntax, alist);
 }
 
 InorganicMatter 
@@ -71,7 +81,7 @@ SoluteMatter::operator* (double flux) const
 void 
 SoluteMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  IOM::load_syntax (syntax, alist);
+  IM::load_syntax (syntax, alist);
 }
 
 SoluteMatter::SoluteMatter (const AttributeList& al)

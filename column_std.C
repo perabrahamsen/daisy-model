@@ -18,7 +18,8 @@
 #include "log.h"
 #include "filter.h"
 #include "crop.h"
-#include "iom.h"
+#include "im.h"
+#include "aom.h"
 
 class Groundwater;
 
@@ -43,9 +44,7 @@ public:
   void sow (const AttributeList& crop);
   void irrigate (double flux, double temp, 
 		 const SoluteMatter&, irrigation_from);
-  void fertilize (const OrganicMatter&);
-  void fertilize (const OrganicMatter&, double from, double to);
-  void fertilize (const InorganicMatter&);
+  void fertilize (AOM&, double from, double to);
   void fertilize (const InorganicMatter&, double from, double to);
   void mix (double from, double to);
   void mix_top (double penetration, double to);
@@ -56,6 +55,7 @@ public:
   void tick (const Time&, const Weather&, Groundwater&);
 
   bool check () const;
+  static bool check (const AttributeList&);
   void output (Log&, const Filter&) const;
 
   // Create and Destroy.
@@ -88,29 +88,27 @@ ColumnStandard::irrigate (double flux, double temp,
 }
 
 void 
-ColumnStandard::fertilize (const OrganicMatter&)
+ColumnStandard::fertilize (AOM& aom, 
+			   double from, double to)
 {
-  abort ();
+  if (to < from)
+    aom.mix (soil, from, to);
+  organic_matter.add (aom);
 }
 
 void 
-ColumnStandard::fertilize (const OrganicMatter&, 
-			   double /* from */, double /* to */)
+ColumnStandard::fertilize (const InorganicMatter& im, 
+			   double from, double to)
 {
-  abort ();
-}
-
-void 
-ColumnStandard::fertilize (const InorganicMatter&)
-{
-  abort ();
-}
-
-void 
-ColumnStandard::fertilize (const InorganicMatter&, 
-			   double /* from */, double /* to */)
-{
-  abort ();
+  if (to < from )
+    {
+      soil_NO3.mix (soil, soil_water, im.im.NO3, from, to);
+#if 0
+      soil_NH4.mix (soil, soil_water, im.im.NH4, from, to);
+#endif
+    }
+  else
+    surface.fertilize (im);
 }
 
 void 
@@ -136,9 +134,32 @@ bool
 ColumnStandard::check () const
 {
   int n = soil.size ();
-  bool ok = (soil.check ()
-	     && soil_heat.check (n)
-	     && soil_NO3.check (n));
+  bool ok = true;
+
+  if (!soil.check ())
+    ok = false;
+  if (!soil_heat.check (n))
+    ok = false;
+  if (!soil_NO3.check (n))
+    ok = false;
+  if (!organic_matter.check ())
+    ok = false;
+
+  return ok;
+}
+
+bool
+ColumnStandard::check (const AttributeList& al)
+{
+  bool ok = true;
+
+  const AttributeList& om = al.list ("OrganicMatter");
+  if (!OrganicMatter::check (om))
+    ok = false;
+
+  if (!ok)
+    cerr << "in column[" << al.name ("type") << "]\n";
+  
   return ok;
 }
 
@@ -154,7 +175,7 @@ ColumnStandard::tick (const Time& time,
   soil_water.tick (surface, groundwater, soil);
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     (*crop)->tick (time, bioclimate, soil, soil_heat);
-  soil_NO3.tick (soil, soil_water, surface.matter_flux ().iom.NO3);
+  soil_NO3.tick (soil, soil_water, surface.matter_flux ().im.NO3);
 }
 
 void
@@ -203,7 +224,10 @@ ColumnStandard::~ColumnStandard ()
 Column*
 ColumnStandard::make (const AttributeList& al)
 {
-  return new ColumnStandard (al);
+  if (check (al))
+    return new ColumnStandard (al);
+  else
+    return NULL;
 }
 
 static struct ColumnStandardSyntax

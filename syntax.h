@@ -103,4 +103,7 @@ struct add_submodule
   }
 };
 
+void check (const AttributeList& al, string s, bool& ok);
+void non_negative (double v, string s, bool& ok);
+
 #endif SYNTAX_H

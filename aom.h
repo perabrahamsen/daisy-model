@@ -6,17 +6,19 @@
 #include <string>
 #include <vector>
 #include "time.h"
+#include "inorganic_matter.h"
 
 class AttributeList;
 class Library;
 class Syntax;
 class Log;
 class Filter;
-
+class Soil;
 class Time;
 class OrganicMatter;
 
 struct OM  { 
+  // Content.
   double top_C;			// Carbon on the ground.
   vector<double> C;		// Carbon in each node.
   const double C_per_N;	// Ratio of carbon per nitrogen.
@@ -24,10 +26,15 @@ struct OM  {
   const double efficiency;	// How digestible is this?
   const double maintenance;	// How fast does it eat itself?
   const vector<double> fractions;	// How much is turned into SMB and SOM?
+
+  // Simulation.
   void output (Log&, const Filter&) const;
+  void mix (const Soil&, double from, double to);
+
+  // Create & Destroy.
   static const Syntax& syntax ();
-  static const vector<const AttributeList*>& alists ();
   OM (const AttributeList& al);
+  OM (const AttributeList& al, double C, double N);
 };
 
 class AOM
@@ -36,22 +43,29 @@ class AOM
 public:
   const Time creation;		// When it was created.
   const string name;		// Name of this kind of aom.
-  vector<OM*> om;		// Organic matter dk:puljer.
+  vector<OM*> om;		// Organic matter pool.
 
   // Simulation.
 public:
   void tick (const OrganicMatter&);
   void output (Log&, const Filter&) const;
+  static bool check (const AttributeList&);
+  bool check () const;
+  void mix (const Soil&, double from, double to);
 
   // Library.
 public:
   static const Library& library ();
   static void derive_type (const string, const AttributeList&, string super);
+  static AOM& create (const Time&, const AttributeList&);
 
   // Create and Destroy.
+private: 
+  static vector<OM*>& create_om (const AttributeList&);
 public:
-  AOM (const Time&, const AttributeList& al);
-  AOM (const AttributeList& al);
+  static InorganicMatter im (const AttributeList&);
+  AOM (const Time&, const AttributeList&);
+  AOM (const AttributeList&);
   virtual ~AOM ();
 };
 

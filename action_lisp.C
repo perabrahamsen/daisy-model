@@ -43,6 +43,19 @@ public:
   }
 
   // Create and Destroy.
+public:
+  bool check (Daisy& daisy) const
+  { 
+    bool ok = true;
+    for (vector<const Action*>::const_iterator i = actions.begin ();
+	 i != actions.end ();
+	 i++)
+      {
+	if (!(*i)->check (daisy))
+	  ok = false;
+      }
+    return ok;
+  }
 private:
   friend class ActionLispSyntax;
   static Action& make (const AttributeList& al)
@@ -94,6 +107,19 @@ public:
   }
   
   // Create and Destroy.
+public:
+  bool check (Daisy& daisy) const
+  { 
+    bool ok = true;
+    for (clause_t::const_iterator i = clauses.begin (); 
+	 i != clauses.end ();
+	 i++)
+      {
+	if (!(*i).second->check (daisy))
+	  ok = false;
+      }
+    return ok;
+  }
 private:
   friend class ActionLispSyntax;
   static Action& make (const AttributeList& al)
@@ -131,6 +157,16 @@ public:
   }
 
   // Create and Destroy.
+public:
+  bool check (Daisy& daisy) const
+  { 
+    bool ok = true; 
+    if (!then_a.check (daisy))
+      ok = false;
+    if (!else_a.check (daisy))
+      ok = false;
+    return ok;
+  }
 private:
   friend class ActionLispSyntax;
   static Action& make (const AttributeList& al)

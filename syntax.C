@@ -279,3 +279,23 @@ Syntax::~Syntax ()
 {
   delete &impl;
 }
+
+void
+check (const AttributeList& al, string s, bool& ok)
+{
+  if (!al.check (s))
+    {
+      cerr << "Missing " << s << "\n";
+      ok = false;
+    }
+}
+
+void
+non_negative (double v, string s, bool& ok)
+{
+  if (v < 0.0)
+    {
+      cerr << "Negative " << s << "\n";
+      ok = false;
+    }
+}

@@ -97,7 +97,11 @@ output_list (const T items,
 	   item++)
 	{
 	  if (f.check ((*item)->name))
-	    (*item)->output (log, f.lookup ((*item)->name));
+	    {
+	      log.open ((*item)->name);
+	      (*item)->output (log, f.lookup ((*item)->name));
+	      log.close ();
+	    }
 	}
       log.close ();
     }
@@ -114,7 +118,9 @@ output_vector (T items,
 	   item != items.end();
 	   item++)
 	{
-	  (*item)->output (log, *Filter::all);
+	  log.open ("");
+	  (*item)->output (log, filter.lookup (name));
+	  log.close ();
 	}
       log.close ();
     }

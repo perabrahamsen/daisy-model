@@ -7,14 +7,14 @@ struct AttributeList;
 struct SoluteMatter;
 struct Log;
 struct Filter;
-struct IOM;
+struct IM;
 struct Syntax;
 
 class InorganicMatter
 { 
   // Content.
 public:
-  IOM& iom;
+  IM& im;
 
   // Opertations.
 public:
@@ -24,12 +24,14 @@ public:
   void operator -= (const InorganicMatter&);
   void operator *= (double);
   void operator /= (double);
+  bool empty () const;
 
   // Create & Destroy.
   static void load_syntax (Syntax&, AttributeList&);
   InorganicMatter ();
   InorganicMatter (const AttributeList&);
   InorganicMatter (const InorganicMatter&, double flux);
+  InorganicMatter (const SoluteMatter&, double flux);
   ~InorganicMatter ();
 };
 

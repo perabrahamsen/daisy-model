@@ -18,6 +18,7 @@ class Syntax;
 class OrganicMatter;
 class InorganicMatter;
 class SoluteMatter;
+class AOM;
 
 class Column
 {
@@ -30,9 +31,7 @@ public:
   virtual void sow (const AttributeList& crop) = 0;
   virtual void irrigate (double flux, double temp, 
 			 const SoluteMatter&, irrigation_from) = 0;
-  virtual void fertilize (const OrganicMatter&) = 0;
-  virtual void fertilize (const OrganicMatter&, double from, double to) = 0;
-  virtual void fertilize (const InorganicMatter&) = 0;
+  virtual void fertilize (AOM&, double from, double to) = 0;
   virtual void fertilize (const InorganicMatter&, double from, double to) = 0;
   virtual void mix (double from, double to) = 0;
   virtual void mix_top (double penetration, double to) = 0;

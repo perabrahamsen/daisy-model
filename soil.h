@@ -58,6 +58,7 @@ public:
 
   // Simulation.
   bool check () const;
+  void mix (vector<double>& v, double amount, double from, double to) const;
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

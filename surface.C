@@ -47,10 +47,10 @@ Surface::accept_top (double water)
     {
       if (-water > minimal_matter_flux)
 	{
-	  InorganicMatter delta_matter (iom, (-water * dt) / pond);
-	  iom -= delta_matter;
+	  InorganicMatter delta_matter (im, (-water * dt) / pond);
+	  im -= delta_matter;
 	  delta_matter /= dt;
-	  iom_flux -= delta_matter;
+	  im_flux -= delta_matter;
 	}
       pond += water * dt;
       return true;
@@ -74,13 +74,13 @@ Surface::ponding () const
 void
 Surface::clear ()
 {
-  iom_flux.clear ();
+  im_flux.clear ();
 }
 
 const InorganicMatter& 
 Surface::matter_flux ()
 {
-  return iom_flux;
+  return im_flux;
 }
 
 double
@@ -107,13 +107,13 @@ Surface::evaporation (double PotSoilEvaporation, double water,
 void
 Surface::fertilize (const AOM& om)
 { 
-  aom.push_back (&om);
+  am.push_back (&om);
 }
 
 void 
 Surface::fertilize (const InorganicMatter& n)
 { 
-  iom += n;
+  im += n;
 }
 
 void
@@ -123,7 +123,7 @@ Surface::output (Log& log, const Filter& filter) const
   log.output ("flux", filter, flux);
   log.output ("EvapSoilSurface", filter, EvapSoilSurface, true);
   log.output ("Eps", filter, Eps, true);
-  output_submodule (iom, "InorganicMatter", log, filter);
+  output_submodule (im, "InorganicMatter", log, filter);
 }
 
 void
@@ -139,8 +139,8 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("flux", true);
   syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("aom", AOM::library (), Syntax::State, Syntax::Sequence);
-  alist.add ("aom", *new vector<const AttributeList*> ());
+  syntax.add ("am", AOM::library (), Syntax::State, Syntax::Sequence);
+  alist.add ("am", *new vector<const AttributeList*> ());
   add_submodule<InorganicMatter> ("InorganicMatter", syntax, alist);
 }
 
@@ -151,7 +151,7 @@ Surface::Surface (const AttributeList& al)
     flux (al.flag ("flux")),
     EvapSoilSurface (0.0),
     Eps (0.0),
-    aom (map_construct_const <AOM> (al.list_sequence ("aom"))),
-    iom (al.list ("InorganicMatter")),
-    iom_flux ()
+    am (map_construct_const <AOM> (al.list_sequence ("am"))),
+    im (al.list ("InorganicMatter")),
+    im_flux ()
 { }

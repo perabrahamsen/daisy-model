@@ -1,14 +1,14 @@
-// iom.h
+// im.h
 
-#ifndef IOM_H
-#define IOM_H
+#ifndef IM_H
+#define IM_H
 
 struct Log;
 struct Filter;
 struct Syntax;
 struct AttributeList;
 
-class IOM
+class IM
 {
   // Content.
 public:
@@ -18,17 +18,18 @@ public:
 public:
   void output (Log& log, const Filter& filter) const;
   void clear ();
-  void operator += (const IOM&);
-  void operator -= (const IOM&);
+  void operator += (const IM&);
+  void operator -= (const IM&);
   void operator *= (double);
   void operator /= (double);
+  bool empty () const;
 
   // Create. 
   static void load_syntax (Syntax& syntax, AttributeList& alist);
-  IOM ();
-  IOM (const AttributeList&);
-  IOM (const IOM&, double flux);
-  ~IOM ();
+  IM ();
+  IM (const AttributeList&);
+  IM (const IM&, double flux);
+  ~IM ();
 };
 
-#endif IOM_H
+#endif IM_H

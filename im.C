@@ -1,62 +1,68 @@
-// iom.C
+// im.C
 
-#include "iom.h"
+#include "im.h"
 #include "log.h"
 #include "alist.h"
 #include "syntax.h"
 
 void
-IOM::output (Log& log, const Filter& filter) const
+IM::output (Log& log, const Filter& filter) const
 {
   log.output ("NO3", filter, NO3);
 }
 
-void IOM::clear ()
+void IM::clear ()
 { 
   NO3 = 0.0;
 }
 
 void
-IOM::operator += (const IOM& n)
+IM::operator += (const IM& n)
 { 
   NO3 += n.NO3;
 }
 
 void
-IOM::operator -= (const IOM& n)
+IM::operator -= (const IM& n)
 { 
   NO3 -= n.NO3;
 }
 
 void
-IOM::operator *= (double n)
+IM::operator *= (double n)
 { 
   NO3 *= n;
 }
 
 void
-IOM::operator /= (double n)
+IM::operator /= (double n)
 { 
   *this *= (1.0 / n);
 }
 
-IOM::IOM ()
+bool
+IM::empty () const
+{
+  return NO3 < 1e-20;
+}
+
+IM::IM ()
   : NO3 (0.0)
 { }
 
-IOM::IOM (const AttributeList& al)
+IM::IM (const AttributeList& al)
   : NO3 (al.number ("NO3"))
 { }
 
-IOM::IOM (const IOM& n, double flux)
+IM::IM (const IM& n, double flux)
   : NO3 (n.NO3 * flux)
 { }
 
-IOM::~IOM ()
+IM::~IM ()
 { }
 
 void 
-IOM::load_syntax (Syntax& syntax, AttributeList& alist)
+IM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("NO3", Syntax::Number, Syntax::State);
   alist.add ("NO3", 0.0);

@@ -79,6 +79,22 @@ Soil::check () const
 }
 
 void
+Soil::mix (vector<double>& v, double amount, double from, double to) const
+{
+  while (v.size () < size () + 0U)
+    v.push_back (0.0);
+  const double density = amount / (from - to);
+  double old = 0.0;
+
+  for (unsigned i = 0; i < v.size () && old > to ; i++)
+    {
+      if (zplus_[i] < from)
+	v[i] += density * (min (old, from) - max (zplus_[i], to));
+      old = zplus_[i];
+    }
+}
+
+void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   Syntax& layer = *new Syntax ();

@@ -47,6 +47,8 @@ public:
   void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
   void output (Log&, const Filter&) const;
+  void mix (const Soil&, const SoilWater&,
+	    double amount, double from, double to);
 
   // Create and destroy.
 protected:

@@ -316,6 +316,15 @@ Solute::Solute ()
   : ddt (1.0)
 { }
 
+void 
+Solute::mix (const Soil& soil, const SoilWater& soil_water, 
+	     double amount, double from, double to)
+{ 
+  soil.mix (M, amount, from, to);
+  for (unsigned int i = 0; i < C.size (); i++)
+    C[i] = M_to_C (soil, soil_water, i, M[i]);
+}
+
 void
 Solute::initialize (const Soil& soil, const SoilWater& soil_water,
 		    const AttributeList& al)
