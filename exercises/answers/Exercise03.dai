@@ -1,0 +1,106 @@
+;;  Setting "working directory"
+;;  Daisy writes a Daisy.log-file during execution. 
+;;  This log-file contains any error messages
+;;  If the working directory is set correctly the log-file will be found here
+(directory "C:/DaisySim/W")
+;;  Setting search path for library-files 
+(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
+
+;; Including external library-files
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
+
+;; Weather data
+(weather default "Taastrup6201.dwf")
+
+;;  Description that will occur in all output files
+(description "Spring Barley; Soil: Coarse sand; Weather: Taastrup")
+
+;;  Defining soil horizons of a fine sandy loam
+(defhorizon "Ap C.S." default
+    (dry_bulk_density 1.49 [g/cm^3]) 
+    (clay 0.039 [])
+    (silt 0.072 [])
+    (sand 0.866 [])
+    (humus 0.023 [])
+    (SOM_fractions 0.60 0.40 [])
+    (SOM_C_per_N 11.0 11.0 [g C/g N])
+    (hydraulic M_vG (Theta_res 0.070 [cm^3 H2O/cm^3])
+                    (Theta_sat 0.400 [cm^3 H2O/cm^3])
+                    (alpha 0.0308 [cm^-1])
+                    (n 2.02 [])
+                    (K_sat 21.65 [cm/h]))
+    (description "Data from O.H. Jacobsen (1989)")
+)
+(defhorizon "C C.S." default
+    (dry_bulk_density 1.49 [g/cm^3]) 
+    (clay 0.029 [])
+    (silt 0.023 [])
+    (sand 0.944 [])
+    (humus 0.004 [])
+    (SOM_fractions 0.90 0.10 [])
+    (SOM_C_per_N 11.0 11.0 [g C/g N])
+    (hydraulic M_vG (Theta_res 0.018 [cm^3 H2O/cm^3])
+                    (Theta_sat 0.453 [cm^3 H2O/cm^3])
+                    (alpha 0.0723 [cm^-1])
+                    (n 1.99 [])
+                    (K_sat 39.4 [cm/h]))
+    (description "Data from O.H. Jacobsen (1989)")
+)
+;;  Parameterisation of column (Coarse Sand)
+(defcolumn "Coarse sand" default
+     (Soil
+          (MaxRootingDepth 50 [cm])
+          (horizons (  -30 [cm] "Ap C.S.")
+                    ( -270 [cm] "C C.S."))
+          (zplus -2 -4 -7 -10 -13 -19 -22 -25 -27 -30 -35 -40 -45 -50
+                 -55 -60 -65 -70 -75 -80 -85 -90 -95 -100 -110 -120 -130
+                 -140 -150 -160 -170 -180 -190 -200 -210 -220 -230 
+                 -240 -250 -260 -270 [cm]))
+     (Groundwater deep)
+)
+;; Spring Barley setup.
+(defaction SBarley_management activity
+  (wait_mm_dd 3 20)
+  (plowing)
+  (wait_mm_dd 4 15) 
+  (seed_bed_preparation)
+  (sow "Spring Barley")
+  (wait_mm_dd 4 20) 
+  (fertilize N25S (weight 95 [kg N/ha])) 
+  (wait (or (crop_ds_after "Spring Barley" 2.0) ;Ripe
+            (mm_dd 9 1))) (harvest "Spring Barley"))
+
+;;  Selecting column
+(column "Coarse sand")
+
+;; Start of simulation.
+(time 1993 1 1)
+
+;; Selecting management
+(manager activity
+  SBarley_management
+  (wait_mm_dd 12 31) stop
+)
+;; Selecting output files
+(output Harvest
+        "Crop Production"
+;;      Water balance 0-100 cm  
+        ("Root Zone Water Balance" (to -100 [cm])(when daily)
+          (where "Daily_WB.dlf"))  
+        ("Root Zone Water Balance" (to -100 [cm])(when monthly)  
+          (where "Monthly_WB.dlf"))  
+;;      Nitrogen balance 0-100 cm  
+        ("N Balance" (to -100 [cm])(when daily)
+          (where "Daily_NB.dlf"))  
+        ("N Balance" (to -100 [cm])(when monthly)  
+          (where "Monthly_NB.dlf"))  
+;;      Soil profile data
+        ("Groundwater" (when daily))       
+        ("Soil Water Content" (when daily))
+        ("Soil Water Potential"(when daily))
+        ("Soil NO3 Concentration"(when daily))
+)
+

@@ -1,0 +1,201 @@
+;;  Setting "working directory"
+;;  Daisy writes a Daisy.log-file during execution. 
+;;  This log-file contains any error messages
+;;  If the working directory is set correctly the log-file will be found here
+(directory "C:/DaisySim/W")
+;;  Setting search path for library-files 
+(path "." "C:/Daisy/Lib" "C:/Daisy/Weather" "C:/DaisySim/Workshop")
+
+;; Including external library-files
+(input file "tillage.dai")
+(input file "crop.dai")
+(input file "PioneerMaize.dai")
+(input file "fertilizer.dai")
+(input file "log.dai")
+
+;; Weather data
+(weather default "Taastrup6201.dwf")
+
+;;  Description that will occur in all output files
+(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
+
+;;  Defining soil horizons of a fine sandy loam
+(defhorizon "Ap F.S.L." default
+    (dry_bulk_density 1.51 [g/cm^3]) 
+    (clay 0.113 [])
+    (silt 0.277 [])
+    (fine_sand 0.348 [])
+    (coarse_sand 0.236 [])
+    (humus 0.026 [])
+    (SOM_fractions 0.60 0.40 [])
+    (SOM_C_per_N 11.0 11.0 [g C/g N])
+    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+                    (Theta_sat 0.403 [cm^3 H2O/cm^3])
+                    (alpha 0.0385 [cm^-1])
+                    (n 1.211 [])
+                    (K_sat 7.52 [cm/h]))
+    (description "Data from O.H. Jacobsen (1989)")
+)
+(defhorizon "B F.S.L." default
+    (dry_bulk_density 1.65 [g/cm^3]) 
+    (clay 0.235 [])
+    (silt 0.253 [])
+    (fine_sand 0.364 [])
+    (coarse_sand 0.143 [])
+    (humus 0.005 [])
+    (SOM_fractions 0.90 0.10 [])
+    (SOM_C_per_N 11.0 11.0 [g C/g N])
+    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+                    (Theta_sat 0.421 [cm^3 H2O/cm^3])
+                    (alpha 0.2605 [cm^-1])
+                    (n 1.135 [])
+                    (K_sat 14.5 [cm/h]))
+    (description "Data from O.H. Jacobsen (1989)")
+)
+(defhorizon "C F.S.L." default
+    (dry_bulk_density 1.71 [g/cm^3]) 
+    (clay 0.244 [])
+    (silt 0.283 [])
+    (fine_sand 0.357 [])
+    (coarse_sand 0.113 [])
+    (humus 0.002 [])
+    (SOM_fractions 0.950 0.050)
+    (SOM_C_per_N  11.0  11.0)
+    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+                    (Theta_sat 0.401 [cm^3 H2O/cm^3])
+                    (alpha 0.0570 [cm^-1])
+                    (n 1.131 [])
+                    (K_sat 1.65 [cm/h]))
+    (description "Data from O.H. Jacobsen (1989)")
+)
+(defhorizon "Aquitard" default
+    (clay 0.700)(silt 0.199)(fine_sand 0.05)(coarse_sand 0.05)(humus 0.001)
+    (SOM_fractions 0.950 0.050)(SOM_C_per_N  11.0 11.0)
+    (hydraulic M_vG (Theta_res 0.00)(Theta_sat 0.40)(alpha 0.01)(n 1.11)(K_sat 0.0015 [cm/h]))
+)
+
+;;  Parameterisation of column (Fine sandy loam)
+(defcolumn "Fine sandy loam" default
+     (Soil
+          (MaxRootingDepth 100 [cm])
+          (dispersivity  5 [cm])
+          (horizons (  -30 [cm] "Ap F.S.L.")
+                    (  -80 [cm] "B F.S.L.")
+                    ( -220 [cm] "C F.S.L.")
+                    ( -270 [cm] "Aquitard"))
+          (zplus -2 -4 -7 -10 -13 -19 -22 -25 -27 -30 -35 -40 -45 -50
+                 -55 -60 -65 -70 -75 -80 -85 -90 -95 -100 -110 -120 -130
+                 -140 -150 -160 -170 -180 -190 -200 -210 -220 -230 
+                 -240 -250 -260 -270 [cm]))
+     (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.50 [m])
+          (Z_aquitard 1.70 [m])(K_aquitard 0.0015 [cm/h]))
+)
+;;  Defining Pig Slurry with 5% and 10% volatilization, respectively
+(defam "Slurry05%" pig_slurry (volatilization 0.05))
+(defam "Slurry10%" pig_slurry (volatilization 0.10))
+;; Spring Barley setup.
+(defaction sbarley_P_F_R activity
+  (wait_mm_dd 3 05)
+  (fertilize ("Slurry05%" (weight 30 [T w.w./ha]))(to -5 [cm]))
+  (plowing)
+  (wait_mm_dd 4 05)
+  (seed_bed_preparation)
+  (sow "Spring Barley")
+  (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 09 1)))
+  (harvest "Spring Barley" (stub 8 [cm]))
+)
+;; Winter Barley setup.
+(defaction wbarley_P_F_R activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Barley")
+  (wait_mm_dd 3 25)(fertilize N25S (weight 68 [kg N/ha]))
+  (wait_mm_dd 4 20)(fertilize ("Slurry10%" (weight 20 [T w.w./ha]))(to -5 [cm]))
+  (wait (or (crop_ds_after "Winter Barley" 2.0)(mm_dd 8 9)))
+    (harvest "Winter Barley" (stub 8 [cm]))
+)
+;; Winter Rape setup.
+(defaction wrape_P_F_R activity
+  (wait_mm_dd 8 15)
+  (fertilize ("Slurry05%" (weight 20 [T w.w./ha]))(to -5 [cm]))
+  (plowing)
+  (wait_mm_dd 8 20)(seed_bed_preparation)(sow "Winter Rape")
+  (wait_mm_dd 3 05)(fertilize N25S (weight 024 [kg N/ha]))
+  (wait_mm_dd 3 20)(fertilize ("Slurry10%" (weight 20 [T w.w./ha]))(to -5 [cm]))
+  (wait (or (crop_ds_after "Winter Rape" 2.0)(mm_dd 8 9)))
+    (harvest "Winter Rape" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+;; Winter Wheat setup.
+(defaction wwheat_P_F_R_1 activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Wheat")
+  (wait_mm_dd 4 20)(fertilize ("Slurry10%" (weight 18 [T w.w./ha]))(to -5 [cm]))
+  (wait_mm_dd 5 05)(fertilize N25S (weight 63 [kg N/ha])) 
+  (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
+    (harvest "Winter Wheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+;; Winter Wheat setup.
+(defaction wwheat_P_F_R_2 activity
+  (wait_mm_dd 9 01)(plowing)
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Wheat")
+  (wait_mm_dd 4 05)(fertilize N25S (weight 095 [kg N/ha])) 
+  (wait_mm_dd 4 20)(fertilize ("Slurry10%" (weight 18 [T w.w./ha]))(to -5 [cm]))
+  (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
+    (harvest "Winter Wheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
+)
+;; Unfertilized Winter Wheat 
+(defaction wwheat_0N activity
+  (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Wheat")
+  (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
+    (harvest "Winter Wheat" (stem 1.0)(leaf 1.0))
+  (wait_mm_dd 9 02)(plowing)
+)
+;; Pig Farm Rotation
+(defaction P_F_R activity
+  sbarley_P_F_R
+  wbarley_P_F_R
+  wrape_P_F_R
+  wwheat_P_F_R_1
+  wwheat_P_F_R_2
+)
+;; Maize Growing in 1998
+(defaction Maize98 activity
+  (wait_mm_dd 04 27) (fertilize ("Slurry05%" (weight 50 [T w.w./ha])))(plowing)
+  (wait_mm_dd 05 04) (fertilize AmmoniumNitrate (weight 142.2 [kg N/ha]))
+  (sow "Pioneer Maize (WS)")
+  (wait_mm_dd 11 03) (harvest "Pioneer Maize (WS)" (stub 8 [cm]))
+)
+
+;;  Selecting column
+(column "Fine sandy loam")
+
+;; Start of simulation.
+(time 1993 1 1)
+
+;; Selecting management
+(manager activity
+  P_F_R
+  Maize98
+  (wait_mm_dd 11 30) stop
+)
+;; Output startes med ordren
+(activate_output (after 1998 4 30 23))
+(output Harvest
+        "Crop Production"
+;;      Vandbalance for de øverste 100 cm  
+        ("Root Zone Water Balance" (to -100 [cm])(when daily)
+          (where "Daily_WB.dlf"))  
+        ("Root Zone Water Balance" (to -100 [cm])(when monthly)  
+          (where "Monthly_WB.dlf"))  
+;;      Kvælstofbalance for de øverste 100 cm  
+        ("N Balance" (to -100 [cm])(when daily)
+          (where "Daily_NB.dlf"))  
+        ("N Balance" (to -100 [cm])(when monthly)  
+          (where "Monthly_NB.dlf"))  
+;;      Jordprofil data
+        ("Groundwater" (when daily))       
+        ("Soil Water Content" (when daily))
+        ("Soil Water Potential"(when daily))
+        ("Soil NO3 Concentration"(when daily))
+        (checkpoint (when (at 1998 5 1 1)) (where "MaizeCalib.dai"))
+)
+
