@@ -205,7 +205,7 @@ ifeq ($(COMPILER),borland)
 	NOLINK = -c
 	CRTLIB = C:\BC5\LIB\c0x32.obj
 else
-	LINK = $(CC) $(DYNSEARCH) -g -o
+	LINK = $(CC) $(DYNSEARCH) $(DEBUG) -o
 	NOLINK = -c
 endif
 
