@@ -4,7 +4,6 @@
 #include "daisy.h"
 #include "message.h"
 
-template<>
 Librarian<Log>::Content* Librarian<Log>::content = NULL;
 
 const char *const Log::description = "\

@@ -2,7 +2,6 @@
 
 #include "pet.h"
 #include "weather.h"
-#include "log.h"
 
 struct PetWeather : public Pet
 {
@@ -19,13 +18,6 @@ struct PetWeather : public Pet
       potential_evapotranspiration 
 	= reference_to_potential (crops, surface, 
 				  reference_evapotranspiration);
-    }
-
-  void output (Log& log) const
-    {
-      Pet::output (log);
-      log.output ("reference_evapotranspiration", 
-		  reference_evapotranspiration);
     }
 
   double wet () const

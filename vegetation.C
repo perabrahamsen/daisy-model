@@ -3,7 +3,6 @@
 #include "vegetation.h"
 #include "log.h"
 
-template<>
 Librarian<Vegetation>::Content* Librarian<Vegetation>::content = NULL;
 
 const char *const Vegetation::description = "\

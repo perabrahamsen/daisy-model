@@ -27,7 +27,6 @@ UZmodel::UZmodel (string n)
 UZmodel::~UZmodel ()
 { }
 
-template<>
 Librarian<UZmodel>::Content* Librarian<UZmodel>::content = NULL;
 
 const char *const UZmodel::description = "\

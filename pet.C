@@ -5,7 +5,6 @@
 #include "vegetation.h"
 #include "surface.h"
 
-template<>
 Librarian<Pet>::Content* Librarian<Pet>::content = NULL;
 
 const char *const Pet::description = "\
@@ -47,8 +46,6 @@ Pet::load_syntax (Syntax& syntax, AttributeList&)
 	      "Potential evapotranspiration for a wet system.");
   syntax.add ("dry", "mm/h", Syntax::LogOnly, 
 	      "Potential evapotranspiration for a dry system.");
-  syntax.add ("reference_evapotranspiration", "mm/h", Syntax::LogOnly, 
-	      "Reference evapotranspiration for a dry system.");
 }
 
 Pet::Pet (const AttributeList& al)

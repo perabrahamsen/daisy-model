@@ -250,7 +250,7 @@ ParserFile::Implementation::add_derived (Library& lib)
 AttributeList&
 ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
 {
-  AttributeList* alist;
+  AttributeList* alist = NULL;
   bool skipped = false;
   if (looking_at ('('))
     {

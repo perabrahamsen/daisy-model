@@ -2,7 +2,6 @@
 
 #include "transport.h"
 
-template<>
 Librarian<Transport>::Content* Librarian<Transport>::content = NULL;
 
 const char *const Transport::description = "\

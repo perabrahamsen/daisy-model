@@ -3,7 +3,6 @@
 #include "groundwater.h"
 #include "log.h"
 
-template<>
 Librarian<Groundwater>::Content* Librarian<Groundwater>::content = NULL;
 
 const char *const Groundwater::description = "\

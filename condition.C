@@ -2,7 +2,6 @@
 
 #include "condition.h"
 
-template<>
 Librarian<Condition>::Content* Librarian<Condition>::content = NULL;
 
 const char *const Condition::description = "\

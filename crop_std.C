@@ -284,6 +284,7 @@ struct CropStandard::Variables
     double WRoot;		// Root dry matter weight [g/m2]
     double WSOrg;		// Storage organ dry matter weight [g/m2]
     double WDead;               // Dead plant material [g/m2]
+    double CCrop;		// C stored in dry matter [g/m2]
     double CLeaf;		// Leaf C weight [g/m2]
     double CStem;		// Stem C weight [g/m2]
     double CRoot;		// Root C weight [g/m2]
@@ -505,6 +506,7 @@ CropStandard::Variables::RecProd::RecProd (const Parameters& par,
     WRoot (vl.number ("WRoot")),
     WSOrg (vl.number ("WSOrg")),
     WDead (vl.number ("WDead")),
+    CCrop (0.0),
     CLeaf (0.0),
     CStem (0.0),
     CRoot (0.0),
@@ -532,6 +534,7 @@ CropStandard::Variables::RecProd::output (Log& log) const
   log.output ("WRoot", WRoot);
   log.output ("WSOrg", WSOrg);
   log.output ("WDead", WDead);
+  log.output ("CCrop", CCrop);
   log.output ("CLeaf", CLeaf);
   log.output ("CStem", CStem);
   log.output ("CRoot", CRoot);
@@ -955,6 +958,7 @@ Maximal development stage for which the crop survives harvest.");
   Prod.add ("WDead", "g DM/m^2", Syntax::State,
 	    "Dead leaves dry matter weight.");
   vProd.add ("WDead", 0.000);
+  Prod.add ("CCrop", "g C/m^2", Syntax::LogOnly, "Crop C weight.");
   Prod.add ("CLeaf", "g C/m^2", Syntax::LogOnly, "Leaf C weight.");
   Prod.add ("CStem", "g C/m^2", Syntax::LogOnly, "Stem C weight.");
   Prod.add ("CRoot", "g C/m^2", Syntax::LogOnly, "Root C weight.");
@@ -1553,7 +1557,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   const double C_foli = DM_to_C_factor (par.Prod.E_Leaf) *
                         par.Prod.ExfoliationFac * CrpAux.DeadWLeaf;
-  CrpAux.C_Loss += C_foli;
+  CrpAux.C_Loss = C_foli;
   const double N_foli = par.Prod.ExfoliationFac * CrpAux.DeadNLeaf;
   assert (N_foli >= 0.0);
   if (C_foli < 1e-50)
@@ -1601,6 +1605,8 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   vProd.CSOrg = vProd.WSOrg * DM_to_C_factor (pProd.E_SOrg);
   vProd.CRoot = vProd.WRoot * DM_to_C_factor (pProd.E_Root);
   vProd.CDead = vProd.WDead * DM_to_C_factor (pProd.E_Leaf);
+  vProd.CCrop = vProd.CLeaf + vProd.CStem + vProd.CSOrg +
+                vProd.CRoot + vProd.CDead + vProd.CH2OPool * 12./30.;
 }
 
 void
@@ -1829,10 +1835,15 @@ CropStandard::harvest (const string& column_name,
   const double Dead_W_Yield = stem_harvest_frac * dead_harvest * WDead;
   const double Leaf_W_Yield = leaf_harvest_frac * leaf_harvest * WLeaf;
   const double SOrg_W_Yield = sorg_harvest_frac * sorg_harvest * WSOrg;
+  const double Stem_C_Yield = C_C_Stem * Stem_W_Yield;
+  const double Dead_C_Yield = C_C_Dead * Dead_W_Yield;
+  const double Leaf_C_Yield = C_C_Leaf * Leaf_W_Yield;
+  const double SOrg_C_Yield = C_C_SOrg * SOrg_W_Yield;
   const double Stem_N_Yield = stem_harvest_frac * stem_harvest * NStem;
   const double Dead_N_Yield = stem_harvest_frac * dead_harvest * NDead;
   const double Leaf_N_Yield = leaf_harvest_frac * leaf_harvest * NLeaf;
   const double SOrg_N_Yield = sorg_harvest_frac * sorg_harvest * NSOrg;
+
   // Part of economic yield removed at harvest
   const double WEYRm = Hp.EconomicYield_W * SOrg_W_Yield;
   const double NEYRm = Hp.EconomicYield_N * SOrg_N_Yield;
@@ -1892,7 +1903,7 @@ CropStandard::harvest (const string& column_name,
       SOrg_W_Loss = 0.0;
       SOrg_N_Loss = 0.0;
     }
-
+ 
 #if 0
   const double WBal = WCrop - (Prod.WStem+Prod.WLeaf+Prod.WDead+Prod.WSOrg+Prod.WRoot)
                      - (Stem_W_Yield+Leaf_W_Yield+WEYRm+Dead_W_Yield)

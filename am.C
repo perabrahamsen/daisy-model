@@ -13,7 +13,6 @@
 #include <numeric>
 #include "message.h"
 
-template<>
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
 
 const char *const AM::description = "\

@@ -23,8 +23,6 @@ MAKEFLAGS =
 FTPDIR = /home/ftp/pub/daisy
 WWWINDEX = /home/user_32/daisy/.public_html/index.html
 
-BORLAND = "e:/Program Files/Borland/CBuilder5/"
-
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
 ifeq ($(OS),Windows_NT)
@@ -38,8 +36,8 @@ endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-USE_OPTIMIZE = true
-#USE_OPTIMIZE = false
+#USE_OPTIMIZE = true
+USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
@@ -61,7 +59,7 @@ endif
 ifeq ($(HOSTTYPE),win32)
 	COMPILER = borland
 endif
-ifeq ($(HOSTTYPE),cygwin)
+ifeq ($(OSTYPE),cygwin)
 	COMPILER = gcc
 endif
 ifeq ($(HOSTTYPE),mingw)
@@ -87,16 +85,16 @@ endif
 #
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),gcc)
-		OPTIMIZE = -O2 -ffast-math 
+		OPTIMIZE = -O3 -ffast-math 
 		ifeq ($(HOSTTYPE),sun4)
-			OPTIMIZE = -O2 -ffast-math -mcpu=v8 -mtune=ultrasparc
+			OPTIMIZE = -O3 -ffast-math -fno-inline
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
 		ifeq ($(HOSTTYPE),cygwin)
-		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
 		endif
 		ifeq ($(HOSTTYPE),mingw)
-		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
+		  OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
 		endif
 	endif
 endif
@@ -104,7 +102,7 @@ endif
 # Do we want to create a dynamic library?
 #
 ifeq ($(HOSTTYPE),sun4)
-	USE_DYNLIB = false
+	USE_DYNLIB = true
 endif
 ifeq ($(HOSTTYPE),hp)
 	USE_DYNLIB = true
@@ -141,7 +139,7 @@ ifeq ($(COMPILER),gcc)
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
 		  -Wconversion -Wno-uninitialized -Wmissing-prototypes 
-	COMPILE = "c++" $(WARNING) $(DEBUG) $(OSFLAGS)
+	COMPILE = c++ $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
@@ -149,9 +147,8 @@ ifeq ($(COMPILER),sun)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),borland)
-	WARNFLAGS = -w-csu -wdef -wnod -wamb -w-par -w-hid
-	COMPILE = $(BORLAND)Bin/bcc32 -P -v $(WARNFLAGS)
-	CCOMPILE = $(BORLAND)Bin/bcc32 -P- -v $(WARNFLAGS)
+	COMPILE = /bc5/bin/bcc32 -P -v -wdef -wnod -wamb -w-par -w-hid
+	CCOMPILE = /bc5/bin/bcc32 -P- -v -wdef -wnod -wamb -w-par -w-hid
 endif
 
 # Construct the compile command.
@@ -222,9 +219,10 @@ endif
 # Figure out how to link.
 #
 ifeq ($(COMPILER),borland)
-	LINK = $(BORLAND)Bin/BCC32 -lw-dup -e
-	DLLLINK = $(BORLAND)Bin/BCC32 -WD -lTpd -lw-dup -e
+	LINK =    /bc5/bin/tlink32 /v -Tpe -ap -c -x -e
+	DLLLINK = /bc5/bin/bcc32 -P- -v -lw-dup -WDE -lTpd -lv -e
 	NOLINK = -c
+	CRTLIB = C:\BC5\LIB\c0x32.obj
 else
 	LINK = $(CC) $(DYNSEARCH) $(DEBUG) -o
 	NOLINK = -c
@@ -294,7 +292,7 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = message.C options.C traverse_delete.C \
+OTHER = options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
@@ -348,20 +346,20 @@ all:	#(EXECUTABLES)
 # Create the main executable.
 #
 daisy.exe:	main${OBJ} $(LIBOBJ)
-	$(LINK)daisy.exe $^ $(MATHLIB)
+	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
-daisy:	main${OBJ} $(LIBOBJ) #daisy.so
-	$(LINK)daisy  $^ $(MATHLIB)
+daisy:	main${OBJ} daisy.so
+	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.
 #
 mandaisy${EXT}:	manmain${OBJ} daisy.so
-	$(LINK)mandaisy  $^ $(MATHLIB)
+	$(LINK)mandaisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create bug test executable.
 #
 bugdaisy${EXT}:	bugmain${OBJ} daisy.so
-	$(LINK)bugdaisy  $^ $(MATHLIB)
+	$(LINK)bugdaisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create executable with embedded tcl/tk.
 #
@@ -397,7 +395,8 @@ cdaisy_test${EXT}:  cmain_test${OBJ} daisy.so
 # Create a DLL.
 #
 daisy.dll:	$(LIBOBJ)
-	$(DLLLINK)daisy.dll $^
+#	/bc5/bin/tlink32 /Tpd /v $^, daisy.dll,, cw32i.lib
+	$(DLLLINK)daisy.dll $^ $(MATHLIB)
 
 # Create a shared library.
 #
@@ -417,7 +416,7 @@ dlldaisy${EXT}:	cmain${OBJ} daisy.dll
 # Create the MMM executable.
 
 mmm${EXT}:	$(MOBJECTS)
-	$(LINK)mmm  $^ $(MATHLIB)
+	$(LINK)mmm $(CRTLIB) $^ $(MATHLIB)
 
 # Count the size of daisy.
 #

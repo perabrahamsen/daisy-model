@@ -70,8 +70,6 @@ public:
   void output (Log& log) const
     {
       Pet::output (log);
-      log.output ("reference_evapotranspiration",
-		  reference_evapotranspiration_dry);
       output_derived (net_radiation, "net_radiation", log);
     }
 

@@ -2,7 +2,6 @@
 
 #include "printer.h"
 
-template<>
 Librarian<Printer>::Content* Librarian<Printer>::content = NULL;
 
 const char *const Printer::description = "\

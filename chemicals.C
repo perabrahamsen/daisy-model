@@ -227,8 +227,7 @@ Chemicals::Implementation::find_missing (const string_set& all,
        i++)
     {
       const string name = (*i).first->name;
-      string_set::const_iterator found = all.find (name);
-      if (found == all.end ())
+      if (all.find (name) == all.end ())
 	missing.insert (name);
     }
 }

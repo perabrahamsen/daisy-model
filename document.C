@@ -6,7 +6,6 @@
 #include "submodel.h"
 #include "common.h"
 
-template<>
 Librarian<Document>::Content* Librarian<Document>::content = NULL;
 
 const char *const Document::description = "\

@@ -4,7 +4,6 @@
 #include "log.h"
 #include "weather.h"
 
-template<>
 Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content = NULL;
 
 const char *const NetRadiation::description = "\
