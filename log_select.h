@@ -26,6 +26,8 @@
 #include "log.h"
 #include "select.h"		// Need to be here to ensure proper
 #include "condition.h"		// initialization in derived classes.
+#include <map>
+#include <vector>
 
 struct Select;
 struct Condition;
@@ -43,6 +45,9 @@ struct LogSelect : public Log
   Condition& condition;	// Should we print a log now?
 
   vector<Select*> entries;
+  
+  typedef map<symbol, vector<Select*>/**/> symmap_t;
+  symmap_t symmap;
 
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&);

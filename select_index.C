@@ -28,16 +28,13 @@ struct SelectIndex : public SelectValue
   const int index;
 
   // Output routines.
-  void output_array (symbol name, const vector<double>& array, const Geometry*)
+  void output_array (const vector<double>& array, const Geometry*)
   { 
-    if (valid (name))
-      {
-	if (count == 0)	 
-	  value = array[index];	
-	else
-	  value += array[index];	
-	count++;
-      }
+    if (count == 0)	 
+      value = array[index];	
+    else
+      value += array[index];	
+    count++;
   }
 
   // Create and Destroy.

@@ -22,7 +22,6 @@
 #include "document.h"
 #include "submodel.h"
 #include "common.h"
-
 #include <algorithm>
 
 EMPTY_TEMPLATE
@@ -251,6 +250,7 @@ Document::print_document (ostream& out)
   // For all components...
   vector<symbol> entries;
   Library::all (entries);
+  sort (entries.begin (), entries.end (), symbol::alphabetical);
   for (unsigned int i = 0; i < entries.size (); i++)
     print_component (out, Library::find (entries[i]));
 

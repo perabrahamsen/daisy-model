@@ -29,11 +29,8 @@ struct SelectAverage : public Select
   double value;	
 
   // Output routines.
-  void output_number (symbol name, double number)
+  void output_number (double number)
     { 
-      if (!valid (name))
-	return;
-
       if (count == 0)
 	value = number;
       else

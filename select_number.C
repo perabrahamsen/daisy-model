@@ -25,19 +25,16 @@
 struct SelectNumber : public SelectValue
 {
   // Output routines.
-  void output_number (symbol name, double number)
+  void output_number (double number)
   { 
-    if (!valid (name))
-      return;
-
     if (count == 0)
       value = number;
     else
       value += number;
     count++;
   }
-  void output_integer (symbol name, int integer)
-  { output_number (name, integer); }
+  void output_integer (int integer)
+  { output_number (integer); }
 
   // Create and Destroy.
   SelectNumber (const AttributeList& al)

@@ -34,20 +34,17 @@ struct SelectInterval : public Select
 
   // Output routines.
 
-  void output_array (symbol name, const vector<double>& array, 
+  void output_array (const vector<double>& array, 
 		     const Geometry* geometry)
     { 
-      if (valid (name))
-	{
-	  if (to > 0.0)
-	    to = geometry->zplus (geometry->size () - 1);
+      if (to > 0.0)
+	to = geometry->zplus (geometry->size () - 1);
 
-	  if (count == 0)	 
-	    value = geometry->total (array, from, to);	
-	  else
-	    value += geometry->total (array, from, to);
-	  count++;
-	}
+      if (count == 0)	 
+	value = geometry->total (array, from, to);	
+      else
+	value += geometry->total (array, from, to);
+      count++;
     }
 
   // Print result at end of time step.

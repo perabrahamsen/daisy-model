@@ -76,7 +76,7 @@ PLF::Implementation::operator () (const double pos) const
 	return y[min] 
 	  + (y[max] - y[min]) / (x[max] - x[min]) * (pos - x[min]);
 
-      int guess = (max + min) / 2;
+      const int guess = (max + min) / 2;
 
       if (x[guess] < pos)
 	min = guess;

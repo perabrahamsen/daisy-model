@@ -27,6 +27,7 @@
 #include "librarian.h"
 #include "symbol.h"
 #include <map>
+#include <vector>
 
 struct Geometry;
 struct Daisy;
@@ -47,6 +48,7 @@ public:
   static const char *const description;
   virtual const string& dimension () const;
   virtual const string& tag () const;
+  symbol log_name () const;
   virtual const Geometry* geometry () const; // For array tags.
   virtual int size () const;	// For array tags.
   
@@ -68,24 +70,63 @@ public:
   };
 
   // Nesting.
+private:
+  vector<symbol> path;		// Content of this entry.
+  const unsigned int path_size;	// #entries in path.
+  unsigned int current_path_index;// How nested in open's we are.
+  unsigned int last_valid_path_index;	// Remember the last valid level.
+  symbol current_name;
+  
+  bool valid () const
+  { 
+    // If the current path index is valid.
+    return (current_path_index == last_valid_path_index
+	    && current_path_index < path_size); 
+  }
 public:
-  bool is_active ();		// Active time step.
-  bool valid ();		// Currently path entry is valid.
-  bool valid (symbol next); // Next path entry is valid.
-  bool valid_level;		// Fast, unsafe alternative to valid.
+  bool valid (symbol name) const
+  {
+    static const symbol wildcard ("*");
+    // Is the next path index valid?
+    return current_name == wildcard || name == current_name; 
+  }
+  bool valid_level;
 
-  void open_group (symbol); // Open one group level.
-  void open (symbol);	// Open one leaf level.
-  void close ();		// Close one level.
+  void open (symbol name)	// Open one leaf level.
+  { 
+    if (!valid_level)
+      current_path_index++;
+    else
+      {
+	if (valid (name))
+	  last_valid_path_index++;
+	current_path_index++;
+	valid_level = is_active && valid ();
+	if (valid_level)
+	  current_name = path[current_path_index];
+      }
+  }
+  void close ()		// Close one level.
+  { 
+    if (current_path_index == last_valid_path_index)
+      last_valid_path_index--;
+    current_path_index--;
+    if (!valid_level)
+      valid_level = is_active && valid ();
+    if (valid_level)
+      current_name = path[current_path_index];
+  }
 
   // Output routines.
-  virtual void output_number (symbol name, const double number);
-  virtual void output_integer (symbol name, const int integer);
-  virtual void output_name (symbol name, const string& a_name);
-  virtual void output_array (symbol name, const vector<double>& array,
-			     const Geometry* geometry);
+  virtual void output_number (const double);
+  virtual void output_integer (const int);
+  virtual void output_name (const string&);
+  virtual void output_array (const vector<double>&, const Geometry*);
 
   // Reset at start of time step.
+private:
+  bool is_active;		// Should we be accumulating now?
+public:
   bool match (const Daisy& daisy, Treelog&, bool is_printing);
 
   // Print result at end of time step.

@@ -14,14 +14,14 @@ release.
 
 * 2.76
 
-** Removed the table1 log model.
-
-** Logging is faster.
+** Logging is much faster.
 
 Having multiple log files should now be significantly faster than
 before.  Lots of stuff was changed in order to achieve this speedup,
-so it is likeyl than some features have broken.  Please let me know in
+so it is likely than some features have broken.  Please let me know in
 that case.
+
+** Removed the table1 log model.
 
 * 2.75
 

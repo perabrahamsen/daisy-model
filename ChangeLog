@@ -1,3 +1,7 @@
+2003-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.76 released.
+
 2003-05-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* select.C, select_number.C, select_average.C, select_min.C, 

@@ -29,26 +29,23 @@ struct SelectArray : public Select
   const Geometry* last_geometry; // For printing dimensions;
 
   // Output routines.
-  void output_array (symbol name, const vector<double>& array, 
+  void output_array (const vector<double>& array, 
 		     const Geometry* geometry)
   { 
     if (geometry)
       last_geometry = geometry;
 
-    if (valid (name))
-      {
-	if (array.size () > value.size ())
-	  value.insert (value.end (), 
-			array.size () - value.size (),
-			0.0);
-	if (count == 0)
-	  for (unsigned int i = 0; i < array.size (); i++)
-	    value[i] = convert (array[i]);
-	else
-	  for (unsigned int i = 0; i < array.size (); i++)
-	    value[i] += convert (array[i]);
-	count++;
-      }
+    if (array.size () > value.size ())
+      value.insert (value.end (), 
+		    array.size () - value.size (),
+		    0.0);
+    if (count == 0)
+      for (unsigned int i = 0; i < array.size (); i++)
+	value[i] = convert (array[i]);
+    else
+      for (unsigned int i = 0; i < array.size (); i++)
+	value[i] += convert (array[i]);
+    count++;
   }
 
   // Print result at end of time step.

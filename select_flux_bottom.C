@@ -29,22 +29,19 @@ struct SelectFluxBottom : public SelectValue
   double height;
 
   // Output routines.
-  void output_array (symbol name, const vector<double>& array, 
+  void output_array (const vector<double>& array, 
 		     const Geometry* geometry)
     { 
-      if (valid (name))
-	{
-	  int index = ((height > 0.0) 
-		       ? geometry->size ()
-		       : min (geometry->interval_border (height) + 1,
-			      geometry->size ()));
-	  daisy_assert (array.size () > index);
-	  if (count == 0)	 
-	    value = array[index];	
-	  else
-	    value += array[index];	
-	  count++;
-	}
+      int index = ((height > 0.0) 
+		   ? geometry->size ()
+		   : min (geometry->interval_border (height) + 1,
+			  geometry->size ()));
+      daisy_assert (array.size () > index);
+      if (count == 0)	 
+	value = array[index];	
+      else
+	value += array[index];	
+      count++;
     }
 
   // Create and Destroy.

@@ -30,7 +30,7 @@ LogSelect::check_member (symbol name) const
     return false;
 
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->valid (name))
+    if (entries[i]->valid_level && entries[i]->valid (name))
       return true;
 
   return false;
@@ -70,8 +70,9 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 void 
 LogSelect::open (symbol name)
 { 
+  daisy_assert (is_active);
   for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->open_group (name);
+    entries[i]->open (name);
 }
 
 void 
@@ -139,37 +140,57 @@ LogSelect::output (symbol, const bool)
 void 
 LogSelect::output (symbol name, const double value)
 { 
-  if (is_active)
-    for (unsigned int i = 0; i < entries.size (); i++)
-      if (entries[i]->valid_level)
-	entries[i]->output_number (name, value);
+  daisy_assert (is_active);
+  symmap_t::const_iterator i = symmap.find (name);
+  if (i == symmap.end ())
+    return;
+  const vector<Select*>& sels = (*i).second;
+
+  for (unsigned int i = 0; i < sels.size (); i++)
+    if (sels[i]->valid_level && sels[i]->valid (name))
+	  sels[i]->output_number (value);
 }
 
 void 
 LogSelect::output (symbol name, const int value)
 { 
-  if (is_active)
-    for (unsigned int i = 0; i < entries.size (); i++)
-      if (entries[i]->valid_level)
-	entries[i]->output_integer (name, value);
+  daisy_assert (is_active);
+  symmap_t::const_iterator i = symmap.find (name);
+  if (i == symmap.end ())
+    return;
+  const vector<Select*>& sels = (*i).second;
+
+  for (unsigned int i = 0; i < sels.size (); i++)
+    if (sels[i]->valid_level && sels[i]->valid (name))
+      sels[i]->output_integer (value);
 }
 
 void 
 LogSelect::output (symbol name, const string& value)
 { 
-  if (is_active)
-    for (unsigned int i = 0; i < entries.size (); i++)
-      if (entries[i]->valid_level)
-	entries[i]->output_name (name, value);
+  daisy_assert (is_active);
+  symmap_t::const_iterator i = symmap.find (name);
+  if (i == symmap.end ())
+    return;
+  const vector<Select*>& sels = (*i).second;
+
+  for (unsigned int i = 0; i < sels.size (); i++)
+    if (sels[i]->valid_level && sels[i]->valid (name))
+      sels[i]->output_name (value);
 }
 
 void 
 LogSelect::output (symbol name, const vector<double>& value)
 { 
-  if (is_active)
-    for (unsigned int i = 0; i < entries.size (); i++)
-      if (entries[i]->valid_level)
-	entries[i]->output_array (name, value, geometry ());
+  daisy_assert (is_active);
+  symmap_t::const_iterator i = symmap.find (name);
+  if (i == symmap.end ())
+    return;
+  const vector<Select*>& sels = (*i).second;
+
+  for (unsigned int i = 0; i < sels.size (); i++)
+    if (sels[i]->valid_level && sels[i]->valid (name))
+      sels[i]->output_array (value, geometry ());
 }
 
 void 
@@ -206,9 +227,13 @@ LogSelect::LogSelect (const AttributeList& al)
   const double from  = al.number ("from");
   const double to = al.number ("to");
 
-      // Initialize entries.
+  // Initialize entries and symmap.
   for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->initialize (conv_map, from, to, condition.timestep ());
+    {
+      entries[i]->initialize (conv_map, from, to, condition.timestep ());
+      symmap[entries[i]->log_name ()].push_back (entries[i]);
+    }
+  daisy_assert (symmap.size () <= entries.size ());
 }
 
   

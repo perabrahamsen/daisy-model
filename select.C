@@ -22,6 +22,7 @@
 #include "select.h"
 #include "geometry.h"
 #include "check.h"
+#include "vcheck.h"
 #include "units.h"
 #include "symbol.h"
 #include <numeric>
@@ -54,7 +55,6 @@ struct Select::Implementation
 
   // Content.
   Condition* condition;		// Should we accumulate now?
-  vector<symbol> path;		// Content of this entry.
   const Units::Convert* spec_conv; // Convert value.
   const double factor;		// - || -
   const double offset;		// - || -
@@ -63,22 +63,12 @@ struct Select::Implementation
   string dimension;		// Physical dimension of this entry.
 
   // Intermediate state.
-  unsigned int current_path_index;// How nested in open's we are.
-  unsigned int last_valid_path_index;	// Remember the last valid level.
-  bool is_active;		// Should we be accumulating now?
-  vector<bool> maybies;		// Keep track of which maybies 
-				// have matched.
-  bool valid ();		// If the current path index is valid.
-  bool valid (symbol name); // Is the next path index valid?
-  void open_group (symbol name);
-  void open (symbol name); // Open one leaf level.
-  void close ();		// Close one level.
-
   bool match (const Daisy& daisy, Treelog&, bool is_printing);
 
   // Create and Destroy.
   static string select_get_tag (const AttributeList& al);
-  void initialize (const string_map& conv, const string& spec_dim,
+  void initialize (vector<symbol>& path,
+		   const string_map& conv, const string& spec_dim,
 		   const string& timestep);
   bool check (const string& spec_dim, Treelog& err) const;
   Implementation (const AttributeList& al);
@@ -196,77 +186,17 @@ Select::Implementation::convert (double value) const
   return value * factor + offset; 
 }
 
-bool 
-Select::Implementation::valid ()
-{ 
-  // If the current path index is valid.
-  return (current_path_index == last_valid_path_index
-	  && current_path_index < path.size ()); 
-}
-
-bool 
-Select::Implementation::valid (symbol name)
-{ 
-  static const symbol wildcard ("*");
-  // Is the next path index valid?
-  return valid () && (path[current_path_index] == wildcard 
-		      || name == path[current_path_index]); 
-}
-
-void 
-Select::Implementation::open_group (symbol name)
-{ 
-  // Open one group level.
-  if (valid (name))
-    {
-#if 0
-      if (is_active && last_valid_path_index == path.size () -1)
-	{
-	  names.insert (name);
-	  count++;
-	}
-#endif
-      last_valid_path_index++;
-    }
-  current_path_index++;
-}
-
-void 
-Select::Implementation::open (symbol name) // Open one leaf level.
-{
-  if (valid (name))
-    last_valid_path_index++;
-  current_path_index++;
-}
-
-void 
-Select::Implementation::close ()		// Close one level.
-{
-  if (current_path_index == last_valid_path_index)
-    last_valid_path_index--;
-  current_path_index--;
-}
-
 // Reset at start of time step.
 bool 
 Select::Implementation::match (const Daisy& daisy, Treelog& out,
 			       bool is_printing)
 {
-  daisy_assert (current_path_index == 0U);
-  daisy_assert (last_valid_path_index == 0U);
-
   if (condition)
     {
-#if 1
       condition->tick (daisy, out);
-      is_active = condition->match (daisy);
-#else
-      is_active = true;
-#endif
+      return condition->match (daisy);
     }
-  else
-    is_active = is_printing;
-  return is_active;
+  return is_printing;
 }
 
 string
@@ -285,7 +215,8 @@ Select::Implementation::select_get_tag (const AttributeList& al)
 
 // Create and Destroy.
 void 
-Select::Implementation::initialize (const string_map& conv, 
+Select::Implementation::initialize (vector<symbol>& path,
+				    const string_map& conv, 
 				    const string& spec_dim, 
 				    const string& timestep)
 {
@@ -357,16 +288,12 @@ Select::Implementation::Implementation (const AttributeList& al)
     condition (al.check ("when") 
 	       ? &Librarian<Condition>::create (al.alist ("when"))
 	       : NULL),
-    path (al.identifier_sequence ("path")),
     spec_conv (NULL),
     factor (al.number ("factor")),
     offset (al.number ("offset")),
     tag (select_get_tag (al)),
     dimension (al.check ("dimension")
-	       ? al.name ("dimension") : Syntax::Unknown ()),
-    current_path_index (0U),
-    last_valid_path_index (0U),
-    is_active (false)
+	       ? al.name ("dimension") : Syntax::Unknown ())
 { }
   
 Select::Implementation::~Implementation ()
@@ -389,6 +316,13 @@ const string&
 Select::tag () const
 { return impl.tag; }
 
+symbol 
+Select::log_name () const
+{ 
+  daisy_assert (path.size () > 0);
+  return path[path.size () - 1];
+}
+
 const Geometry* 
 Select::geometry () const
 { return NULL; }
@@ -404,85 +338,33 @@ Select::Destination::Destination ()
 Select::Destination::~Destination ()
 { }
 
-bool
-Select::is_active ()
-{ return impl.is_active; }
-
-bool 
-Select::valid ()
-{ return impl.valid (); }
-
-bool 
-Select::valid (symbol name)
-{ return impl.valid (name); }
-
-void 
-Select::open_group (symbol name) // Open one group level.
-{ 
-  if (!valid_level)
-    impl.current_path_index++;
-  else
-    {
-      impl.open_group (name); 
-      valid_level = is_active () && valid ();
-    }
-}
-
-void 
-Select::open (symbol name)	// Open one leaf level.
-{ 
-  if (!valid_level)
-    impl.current_path_index++;
-  else
-    {
-      impl.open (name); 
-      valid_level = is_active () && valid ();
-    }
-}
-
-void 
-Select::close ()		// Close one level.
-{ 
-  impl.close (); 
-  valid_level = is_active () && valid ();
-}
-
 // Output routines.
 void 
-Select::output_number (symbol name, const double)
-{ 
-  if (valid (name))
-    throw ("This log selection can't log numbers."); 
-}
+Select::output_number (const double)
+{ throw ("This log selection can't log numbers."); }
 
 void 
-Select::output_integer (symbol name, const int)
-{ 
-  if (valid (name))
-    throw ("This log selection can't log integers."); 
-}
+Select::output_integer (const int)
+{ throw ("This log selection can't log integers."); }
 
 void 
-Select::output_name (symbol name, const string&)
-{ 
-  if (valid (name))
-    throw ("This log selection can't log names.");
-}
+Select::output_name (const string&)
+{ throw ("This log selection can't log names."); }
 
 void 
-Select::output_array (symbol name, const vector<double>&,
-		      const Geometry*)
-{ 
-  if (valid (name))
-    throw ("This log selection can't log arrays."); 
-}
+Select::output_array (const vector<double>&, const Geometry*)
+{ throw ("This log selection can't log arrays."); }
 
 // Reset at start of time step.
 bool 
 Select::match (const Daisy& daisy, Treelog& out, bool is_printing)
 { 
-  valid_level = impl.match (daisy, out, is_printing); 
-  return valid_level;
+  daisy_assert (current_path_index == 0U);
+  daisy_assert (last_valid_path_index == 0U);
+  daisy_assert (current_name == path[0]);
+  is_active = impl.match (daisy, out, is_printing); 
+  valid_level = is_active;
+  return is_active;
 }
 
 bool
@@ -543,6 +425,7 @@ level, for example all crops.  This way the path can specify multiple\n\
 values, they will be added before they are printed in the log file.\n\
 All values that start with a \"$\" will work like \"*\".  They are intended\n\
 to be mapped with the 'set' attribute in the 'table' log model.");
+  syntax.add_check ("path", VCheck::min_size_1 ());
   syntax.add_submodule ("spec", alist, Syntax::OptionalConst, "\
 Specification for the attribute to be logged of the form\n\
 \n\
@@ -589,7 +472,8 @@ Select::initialize (const string_map& conv, double, double,
     spec_dim = default_dimension (impl.spec->dimension ());
   else
     spec_dim = Syntax::Unknown ();
-  impl.initialize (conv, spec_dim, timestep); 
+  impl.initialize (path, conv, spec_dim, timestep); 
+  daisy_assert (path.size () == path_size);
 }
 
 bool 
@@ -607,7 +491,13 @@ Select::Select (const AttributeList& al)
   : impl (*new Implementation (al)),
     accumulate (al.flag ("accumulate")),
     count (al.integer ("count")),
-    valid_level (true)
+    path (al.identifier_sequence ("path")),
+    path_size (path.size ()),
+    current_path_index (0U),
+    last_valid_path_index (0U),
+    current_name (path[0]),
+    valid_level (false),
+    is_active (false)
 { }
 
 Select::~Select ()
