@@ -22,7 +22,7 @@ class WeatherSimple : public Weather
   // Simulation.
 public:
   void tick ();
-  void output (const string, Log&, const Filter*) const;
+  void output (const string, Log&, const Filter&) const;
   double AirTemperature () const;
   double GlobalRadiation () const;
   double ReferenceEvapotranspiration () const;
@@ -53,17 +53,17 @@ WeatherSimple::tick ()
 }
 
 void
-WeatherSimple::output (const string name, Log& log, const Filter* filter) const
+WeatherSimple::output (const string name, Log& log, const Filter& filter) const
 {
-  if (filter->check (name))
+  if (filter.check (name))
     {
-      filter = filter->lookup (name);
-      if (filter->check ("simple"))
+      const Filter& f1 = filter.lookup (name);
+      if (f1.check ("simple"))
 	{
-	  filter = filter->lookup ("simple");
+	  const Filter& f2 = f1.lookup ("simple");
 	  log.open (name, "simple");
-	  log.output ("Prain", filter, Prain, true);	
-	  log.output ("Psnow", filter, Psnow, true);
+	  log.output ("Prain", f2, Prain, true);	
+	  log.output ("Psnow", f2, Psnow, true);
 	  log.close ();
 	}
     }

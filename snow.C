@@ -207,7 +207,7 @@ Snow::tick (double Si, double q_h, double Prain,
 }
 
 void 
-Snow::output (Log& log, const Filter* filter) const
+Snow::output (Log& log, const Filter& filter) const
 {
   log.output ("EvapSnowPack", filter, impl.EvapSnowPack, true);
   log.output ("q_s", filter, impl.q_s, true);

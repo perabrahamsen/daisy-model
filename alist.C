@@ -472,15 +472,15 @@ AttributeList::add (string key, AttributeList& v)
 }
 
 void 
-AttributeList::add (string key, const CSMP* v)
+AttributeList::add (string key, const CSMP& v)
 {
-  impl.add (key, new dValue<CSMP> (*v));
+  impl.add (key, new dValue<CSMP> (v));
 }
 
 void 
-AttributeList::add (string key, const Filter* v)
+AttributeList::add (string key, const Filter& v)
 {
-  impl.add (key, new dValue<Filter> (*v));
+  impl.add (key, new dValue<Filter> (v));
 }
 
 void 

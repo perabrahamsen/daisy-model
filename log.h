@@ -24,20 +24,20 @@ public:
 public:
   virtual const Filter& match (const Daisy&) = 0;
 
-  virtual void open (string = "") = 0;
+  virtual void open (string) = 0;
   virtual void open (string field, string type) = 0;
   virtual void close () = 0;
-  virtual void output (string, const Filter*, const Time&,
+  virtual void output (string, const Filter&, const Time&,
 		       bool log_only = false) = 0;
-  virtual void output (string, const Filter*, const bool,
+  virtual void output (string, const Filter&, const bool,
 		       bool log_only = false) = 0;
-  virtual void output (string, const Filter*, const double,
+  virtual void output (string, const Filter&, const double,
 		       bool log_only = false) = 0;
-  virtual void output (string, const Filter*, const int,
+  virtual void output (string, const Filter&, const int,
 		       bool log_only = false) = 0;
-  virtual void output (string, const Filter*, const vector<double>&,
+  virtual void output (string, const Filter&, const vector<double>&,
 		       bool log_only = false) = 0;
-  virtual void output (string, const Filter*, const CSMP&,
+  virtual void output (string, const Filter&, const CSMP&,
 		       bool log_only = false) = 0;
 
   // Used by CSMP.
@@ -71,12 +71,12 @@ public:
 } Log_init;
 
 template <class T> void
-output_submodule (const T& submodule, const char* name, Log& log, const Filter* filter)
+output_submodule (const T& submodule, const char* name, Log& log, const Filter& filter)
 {
-  if (filter->check (name))
+  if (filter.check (name))
     {
       log.open (name);
-      submodule.output (log, filter->lookup (name));
+      submodule.output (log, filter.lookup (name));
       log.close ();
     }
 }

@@ -19,7 +19,7 @@ class Snow
 public:
   void tick (double Si, double q_h, double Prain,
 	     double Psnow, double Tair, double Epot);
-  void output (Log&, const Filter*) const;
+  void output (Log&, const Filter&) const;
   double percolation ();
   double temperature ();
   double evaporation ();

@@ -73,7 +73,7 @@ protected:
   // Simulation.
 public:
   void tick (const Time& time, const Bioclimate&, const Soil&, const SoilHeat&);
-  void output (Log&, const Filter*) const;
+  void output (Log&, const Filter&) const;
 
   // Create and Destroy.
 private:
@@ -211,10 +211,10 @@ public:
 
 struct CropStandard::Variables
 { 
-  void output (Log&, const Filter*) const;
+  void output (Log&, const Filter&) const;
   struct RecPhenology
   {
-    void output (Log&, const Filter*) const;
+    void output (Log&, const Filter&) const;
     double DS;		// Development Stage
     double Vern;		// Vernalization criterium [C d]
   private:
@@ -223,7 +223,7 @@ struct CropStandard::Variables
   } Phenology;
   struct RecCanopy
   {
-    void output (Log&, const Filter*) const;
+    void output (Log&, const Filter&) const;
     double Height;		// Crop height [cm]
     double LAI;		// Leaf Area Index
     double LADm;		// Max Leaf Area Density [cm2/cm3]
@@ -234,7 +234,7 @@ struct CropStandard::Variables
   } Canopy;
   struct RecRootSys
   {
-    void output (Log&, const Filter*) const;
+    void output (Log&, const Filter&) const;
     double Depth;		// Rooting Depth [cm]
     vector<double> Density;	// Root density [cm/cm3] in soil layers
     vector<double> H2OExtraction; // Extraction of H2O in soil layers
@@ -253,7 +253,7 @@ struct CropStandard::Variables
   } RootSys;
   struct RecProd
   {
-    void output (Log&, const Filter*) const;
+    void output (Log&, const Filter&) const;
     double WLeaf;		// Leaf dry matter weight [g/m2]
     double WStem;		// Stem dry matter weight [g/m2]
     double WRoot;		// Root dry matter weight [g/m2]
@@ -266,7 +266,7 @@ struct CropStandard::Variables
   } Prod;
   struct RecCrpAux
   {
-    void output (Log&, const Filter*) const;
+    void output (Log&, const Filter&) const;
     bool InitLAI;		// Initial LAI development ?
     double PotRtDpt;	// Potential Root Penetration Depth [cm]
     double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
@@ -469,18 +469,18 @@ CropStandard::Variables::Variables (const Parameters& par,
 { }
 
 void 
-CropStandard::Variables::output (Log& log, const Filter* filter) const
+CropStandard::Variables::output (Log& log, const Filter& filter) const
 {
-  if (filter->check ("Phenology"))
-    Phenology.output (log, filter->lookup ("Phenology"));
-  if (filter->check ("Canopy"))
-    Canopy.output (log, filter->lookup ("Canopy"));
-  if (filter->check ("RootSys"))
-    RootSys.output (log, filter->lookup ("RootSys"));
-  if (filter->check ("Prod"))
-    Prod.output (log, filter->lookup ("Prod"));
-  if (filter->check ("CrpAux"))
-    CrpAux.output (log, filter->lookup ("CrpAux"));
+  if (filter.check ("Phenology"))
+    Phenology.output (log, filter.lookup ("Phenology"));
+  if (filter.check ("Canopy"))
+    Canopy.output (log, filter.lookup ("Canopy"));
+  if (filter.check ("RootSys"))
+    RootSys.output (log, filter.lookup ("RootSys"));
+  if (filter.check ("Prod"))
+    Prod.output (log, filter.lookup ("Prod"));
+  if (filter.check ("CrpAux"))
+    CrpAux.output (log, filter.lookup ("CrpAux"));
 }
 
 CropStandard::Variables::RecPhenology::RecPhenology (const Parameters& par,
@@ -490,7 +490,7 @@ CropStandard::Variables::RecPhenology::RecPhenology (const Parameters& par,
 { }
 
 void 
-CropStandard::Variables::RecPhenology::output (Log& log, const Filter* filter) const
+CropStandard::Variables::RecPhenology::output (Log& log, const Filter& filter) const
 {
   log.open ("Phenology");
   log.output ("DS", filter, DS);
@@ -507,7 +507,7 @@ CropStandard::Variables::RecCanopy::RecCanopy (const Parameters&,
 { }
 
 void 
-CropStandard::Variables::RecCanopy::output (Log& log, const Filter* filter) const
+CropStandard::Variables::RecCanopy::output (Log& log, const Filter& filter) const
 {
   log.open ("Canopy");
   log.output ("Height", filter, Height);
@@ -544,7 +544,7 @@ CropStandard::Variables::RecRootSys::RecRootSys (const Parameters& par,
 }
 
 void 
-CropStandard::Variables::RecRootSys::output (Log& log, const Filter* filter) const
+CropStandard::Variables::RecRootSys::output (Log& log, const Filter& filter) const
 {
   log.open ("RootSys");
   log.output ("Depth", filter, Depth);
@@ -570,7 +570,7 @@ CropStandard::Variables::RecProd::RecProd (const Parameters& par,
 { }
 
 void 
-CropStandard::Variables::RecProd::output (Log& log, const Filter* filter) const
+CropStandard::Variables::RecProd::output (Log& log, const Filter& filter) const
 {
   log.open ("Prod");
   log.output ("WLeaf", filter, WLeaf);
@@ -604,7 +604,7 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 { }
 
 void 
-CropStandard::Variables::RecCrpAux::output (Log& log, const Filter* filter) const
+CropStandard::Variables::RecCrpAux::output (Log& log, const Filter& filter) const
 {
   log.open ("CrpAux");
   log.output ("InitLAI", filter, InitLAI);
@@ -1604,7 +1604,7 @@ CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
 }
 
 void
-CropStandard::output (Log& log, const Filter* filter) const
+CropStandard::output (Log& log, const Filter& filter) const
 {
   log.open (name);
   var.output (log, filter);

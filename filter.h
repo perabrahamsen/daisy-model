@@ -13,7 +13,7 @@ class Filter
   // Use.
 public:
   virtual bool check (string, bool log_only = false) const = 0;
-  virtual const Filter* lookup (string) const = 0;
+  virtual const Filter& lookup (string) const = 0;
 
     // Content.
 public:
@@ -32,7 +32,7 @@ class FilterAll : public Filter
   // Use.
 public:
   bool check (string, bool log_only = false) const;
-  const Filter* lookup (string) const;
+  const Filter& lookup (string) const;
 
     // Create and Destroy.
 public:
@@ -44,7 +44,7 @@ class FilterNone : public Filter
   // Use.
 public:
   bool check (string, bool log_only = false) const;
-  const Filter* lookup (string) const;
+  const Filter& lookup (string) const;
 
     // Create and Destroy.
 public:
@@ -56,7 +56,7 @@ class FilterSome : public Filter
   // Use.
 public:
   bool check (string, bool log_only = false) const;
-  const Filter* lookup (string) const;
+  const Filter& lookup (string) const;
 
     // Content.
 private:
@@ -68,7 +68,7 @@ public:
   ~FilterSome ();
 private:
   friend class Parser; // Only create from Input.
-  void add (string, const Filter* = Filter::all);
+  void add (string, const Filter& = *Filter::all);
   FilterSome ();
 };
 

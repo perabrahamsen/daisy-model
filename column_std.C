@@ -42,9 +42,9 @@ public:
   void sow (const AttributeList& crop);
 
   bool check () const;
-  void output (Log&, const Filter*) const;
+  void output (Log&, const Filter&) const;
 private:
-  void output_crops (Log& log, const Filter* filter) const;
+  void output_crops (Log& log, const Filter& filter) const;
 
   // Simulation.
 public:
@@ -96,7 +96,7 @@ ColumnStandard::tick (const Time& time,
 }
 
 void
-ColumnStandard::output (Log& log, const Filter* filter) const
+ColumnStandard::output (Log& log, const Filter& filter) const
 {
   log.open (name);
   output_submodule (bioclimate, "Bioclimate", log, filter);
@@ -115,21 +115,21 @@ ColumnStandard::output (Log& log, const Filter* filter) const
   output_submodule (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
 #endif
-  if (filter->check ("crops"))
-    output_crops (log, filter->lookup ("crops"));
+  if (filter.check ("crops"))
+    output_crops (log, filter.lookup ("crops"));
   log.close ();
 }
 
 void
-ColumnStandard::output_crops (Log& log, const Filter* filter) const
+ColumnStandard::output_crops (Log& log, const Filter& filter) const
 {
   log.open ("crops");
   for (CropList::const_iterator crop = crops.begin(); 
        crop != crops.end();
        crop++)
     {
-      if (filter->check ((*crop)->name))
-	(*crop)->output (log, filter->lookup ((*crop)->name));
+      if (filter.check ((*crop)->name))
+	(*crop)->output (log, filter.lookup ((*crop)->name));
     }
   log.close ();
 }

@@ -266,7 +266,7 @@ Bioclimate::tick (Surface& surface, const Weather& weather,
 }
 
 void 
-Bioclimate::output (Log& log, const Filter* filter) const
+Bioclimate::output (Log& log, const Filter& filter) const
 {
   log.output ("intercepted_water", filter, impl.intercepted_water);
   log.output ("EvapInterception", filter, impl.EvapInterception, true);

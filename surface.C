@@ -84,7 +84,7 @@ Surface::evaporation (double PotSoilEvaporation, double water,
 }
 
 void
-Surface::output (Log& log, const Filter* filter) const
+Surface::output (Log& log, const Filter& filter) const
 {
   log.output ("pond", filter, pond);
   log.output ("flux", filter, flux);

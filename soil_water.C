@@ -100,7 +100,7 @@ SoilWater::check (unsigned n) const
 }
 
 void 
-SoilWater::output (Log& log, const Filter* filter) const
+SoilWater::output (Log& log, const Filter& filter) const
 {
   log.output ("S", filter, S, true);
   log.output ("Theta", filter, Theta_);

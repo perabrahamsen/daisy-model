@@ -43,7 +43,7 @@ public:
 public:
   void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
-  void output (Log&, const Filter*) const;
+  void output (Log&, const Filter&) const;
 
   // Create and destroy.
 protected:

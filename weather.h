@@ -21,7 +21,7 @@ protected:
   // Simulation.
 public:
   virtual void tick () = 0;
-  virtual void output (const string, Log&, const Filter*) const;
+  virtual void output (const string, Log&, const Filter&) const;
 
   // Communication with Biocliamte.
 public:

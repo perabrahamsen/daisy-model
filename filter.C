@@ -19,9 +19,9 @@ bool
 FilterAll::check (string, bool log_only) const
 { return !log_only; }
 
-const Filter* 
+const Filter& 
 FilterAll::lookup (string) const
-{ return Filter::all; }
+{ return *all; }
 
 FilterAll::FilterAll ()
 { }
@@ -30,7 +30,7 @@ bool
 FilterNone::check (string, bool) const
 { return false; }
 
-const Filter* 
+const Filter& 
 FilterNone::lookup (string) const
 { 
   assert (false);
@@ -43,18 +43,18 @@ struct FilterSome::Implementation
 {
   typedef map<string, const Filter*, less<string> > filter_map;
   filter_map filters;
-  const Filter* lookup (string) const;
+  const Filter& lookup (string) const;
   bool check (string) const;
-  void add (string, const Filter*);
+  void add (string, const Filter&);
 };
 
-const Filter* 
+const Filter& 
 FilterSome::Implementation::lookup (string key) const
 { 
   filter_map::const_iterator i = filters.find (key);
   
   if (i != filters.end ())
-    return (*i).second;
+    return *(*i).second;
   else
     THROW (UninitializedValue ());
 }
@@ -66,21 +66,21 @@ FilterSome::Implementation::check (string key) const
 }
 
 void
-FilterSome::Implementation::add (string key, const Filter* filter)
+FilterSome::Implementation::add (string key, const Filter& filter)
 {
-  filters[key] = filter;
+  filters[key] = &filter;
 }
 
 bool 
 FilterSome::check (string key, bool) const
 { return impl.check (key); }
 
-const Filter* 
+const Filter& 
 FilterSome::lookup (string key) const
 { return impl.lookup (key); }
 
 void 
-FilterSome::add (string key, const Filter* filter)
+FilterSome::add (string key, const Filter& filter)
 {
   impl.add (key, filter);
 }

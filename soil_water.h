@@ -49,7 +49,7 @@ public:
 public:
   void tick (Surface&, Groundwater&, const Soil&);
   bool check (unsigned n) const;
-  void output (Log&, const Filter*) const;
+  void output (Log&, const Filter&) const;
 
   // Communication with surface.
   double MaxExfiltration (const Soil&) const;

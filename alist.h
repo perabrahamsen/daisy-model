@@ -80,8 +80,8 @@ public:
   void add (string, bool);
   void add (string, int);
   void add (string, AttributeList&);
-  void add (string, const CSMP*);
-  void add (string, const Filter*);
+  void add (string, const CSMP&);
+  void add (string, const Filter&);
   void add (string, const Time&);
   void add (string, const vector<double>&);
   void add (string, const vector<string>&);

@@ -48,7 +48,7 @@ Weather::create (const Time& t, const AttributeList& al)
 }
 
 void
-Weather::output (const string, Log&, const Filter*) const
+Weather::output (const string, Log&, const Filter&) const
 { }
 
 double

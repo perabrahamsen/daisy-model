@@ -73,34 +73,32 @@ Daisy::run ()
 	{
 	  (*i)->tick (time, weather, groundwater);
 	}
-      time.tick ();
       for (vector<Log*>::const_iterator i = logs.begin ();
 	   i != logs.end ();
 	   i++)
 	{
 	  Log& log = **i;
-	  const Filter* filter= &log.match (*this);
-	  if (filter == Filter::none)
+	  const Filter& filter = log.match (*this);
+	  if (&filter == Filter::none)
 	    // Don't waste time with empty filters.
 	    continue;
-	  log.open ();
 	  log.output ("time", filter, time);
 	  weather.output ("weather", log, filter);
-	  if (filter->check ("field"))
+	  if (filter.check ("field"))
 	    {
-	      const Filter* f = filter->lookup ("field");
+	      const Filter& f = filter.lookup ("field");
 	      log.open ("field");
 	      for (ColumnList::iterator column = columns.begin();
 		   column != columns.end();
 		   column++)
 		{
-		  if (f->check ((*column)->name))
-		    (*column)->output (log, f->lookup ((*column)->name));
+		  if (f.check ((*column)->name))
+		    (*column)->output (log, f.lookup ((*column)->name));
 		}
 	      log.close ();
 	    }
-	  log.close ();
 	}
+      time.tick ();
       weather.tick ();
     }
 }

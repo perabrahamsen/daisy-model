@@ -27,7 +27,7 @@ public:
 
   void SoilSurfaceConditions (double Theta, double h);
 
-  void output (Log&, const Filter*) const;
+  void output (Log&, const Filter&) const;
 
   // Communication with bioclimate.
   double evaporation (double PotSoilEvaporation, double Water, 

@@ -14,7 +14,7 @@ UZbottom::~UZbottom ()
 { }
 
 void
-UZmodel::output (const string, Log&, const Filter*) const
+UZmodel::output (const string, Log&, const Filter&) const
 { }
 
 static Library* UZ_library = NULL;

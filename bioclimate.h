@@ -24,7 +24,7 @@ public:
   // Simulation
   void tick (Surface&, const Weather&, const CropList&, 
 	     const Soil&, SoilWater&);
-  void output (Log&, const Filter*) const;
+  void output (Log&, const Filter&) const;
 
   // Canopy.
 public:

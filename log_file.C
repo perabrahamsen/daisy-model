@@ -25,11 +25,11 @@ private:
   {
     bool active;
     const Condition* condition;
-    const Filter* filter;
+    const Filter& filter;
     Entry (const AttributeList& al)
       : active (false),
 	condition (&Condition::create (al.list ("when"))), 
-	filter (&al.filter ("what"))
+	filter (al.filter ("what"))
     { }
     ~Entry ()
     { delete condition; }
@@ -50,17 +50,17 @@ public:
   void open (string = "");
   void open (string field, string type);
   void close ();
-  void output (string, const Filter*, const Time&, bool log_only = false);
-  void output (string, const Filter*, const bool, bool log_only = false);
-  void output (string, const Filter*, const double, bool log_only = false);
-  void output (string, const Filter*, const int, bool log_only = false);
-  void output (string, const Filter*, const vector<double>&, bool log_only = false);
-  void output (string, const Filter*, const CSMP&, bool log_only = false);
+  void output (string, const Filter&, const Time&, bool log_only = false);
+  void output (string, const Filter&, const bool, bool log_only = false);
+  void output (string, const Filter&, const double, bool log_only = false);
+  void output (string, const Filter&, const int, bool log_only = false);
+  void output (string, const Filter&, const vector<double>&, bool log_only = false);
+  void output (string, const Filter&, const CSMP&, bool log_only = false);
   void output_point (double x, double y);
 
   // Filter.
   bool check (string, bool log_only = false) const;
-  const Filter* lookup (string) const;
+  const Filter& lookup (string) const;
 
   // Create and Destroy.
 private:
@@ -180,9 +180,9 @@ LogFile::print (bool v)
 }
 
 void
-LogFile::output (string name, const Filter* filter, const Time& value, bool log_only)
+LogFile::output (string name, const Filter& filter, const Time& value, bool log_only)
 {
-  if (filter->check (name, log_only))
+  if (filter.check (name, log_only))
     {
       open (name);
       print (value.year ());
@@ -197,9 +197,9 @@ LogFile::output (string name, const Filter* filter, const Time& value, bool log_
 }
 
 void
-LogFile::output (string name, const Filter* filter, const bool value, bool log_only)
+LogFile::output (string name, const Filter& filter, const bool value, bool log_only)
 {
-  if (filter->check (name, log_only))
+  if (filter.check (name, log_only))
     {
       open (name);
       print (value);
@@ -208,9 +208,9 @@ LogFile::output (string name, const Filter* filter, const bool value, bool log_o
 }
 
 void
-LogFile::output (string name, const Filter* filter, const double value, bool log_only)
+LogFile::output (string name, const Filter& filter, const double value, bool log_only)
 {
-  if (filter->check (name, log_only))
+  if (filter.check (name, log_only))
     {
       open (name);
       print (value);
@@ -219,9 +219,9 @@ LogFile::output (string name, const Filter* filter, const double value, bool log
 }
 
 void
-LogFile::output (string name, const Filter* filter, const int value, bool log_only)
+LogFile::output (string name, const Filter& filter, const int value, bool log_only)
 {
-  if (filter->check (name, log_only))
+  if (filter.check (name, log_only))
     {
       open (name);
       print (0.0 + value);
@@ -230,9 +230,9 @@ LogFile::output (string name, const Filter* filter, const int value, bool log_on
 }
 
 void
-LogFile::output (string name, const Filter* filter, const vector<double>& value, bool log_only)
+LogFile::output (string name, const Filter& filter, const vector<double>& value, bool log_only)
 {
-  if (filter->check (name, log_only))
+  if (filter.check (name, log_only))
     {
       open (name);
       bool first = true;
@@ -249,9 +249,9 @@ LogFile::output (string name, const Filter* filter, const vector<double>& value,
 }
 
 void
-LogFile::output (string name, const Filter* filter, const CSMP& csmp, bool log_only)
+LogFile::output (string name, const Filter& filter, const CSMP& csmp, bool log_only)
 {
-  if (filter->check (name, log_only))
+  if (filter.check (name, log_only))
     {
       open (name);
       csmp.output (*this);
@@ -276,24 +276,24 @@ LogFile::check (string s, bool log_only) const
        i != entries.end ();
        i++)
     {
-      if ((*i)->active && (*i)->filter->check (s, log_only))
+      if ((*i)->active && (*i)->filter.check (s, log_only))
 	return true;
     }
   return false;
 }
  
-const Filter* 
+const Filter& 
 LogFile::lookup (string s) const
 {
   for (EntryList::const_iterator i = entries.begin ();
        i != entries.end ();
        i++)
     {
-      if ((*i)->active && (*i)->filter->check (s))
-	return (*i)->filter->lookup (s);
+      if ((*i)->active && (*i)->filter.check (s))
+	return (*i)->filter.lookup (s);
     }
   assert (false);
-  return Filter::none;	// Shut up!
+  return *Filter::none;	// Shut up!
 }
 
 LogFile::LogFile (const AttributeList& av)

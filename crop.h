@@ -42,7 +42,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&, const SoilHeat&) = 0;
-  virtual void output (Log&, const Filter*) const = 0;
+  virtual void output (Log&, const Filter&) const = 0;
 
   // Library.
 public:
