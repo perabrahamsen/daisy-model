@@ -1359,19 +1359,22 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   const double Depth = root_system.Depth;
   Variables::RecProd& vProd = var.Prod;
   Variables::RecCrpAux& CrpAux = var.CrpAux;
+  bool ReleaseOfRootReserves = false;
 
   // Remobilization
   const double ReMobil = ReMobilization ();
   var.Prod.CH2OPool += ReMobil;
 
   // Release of root reserves
-  if (DS1 < pProd.IntDSRelRtRes && DS1 > pProd.EndDSRelRtRes)
+  if (DS1 > pProd.IntDSRelRtRes && DS1 < pProd.EndDSRelRtRes)
     {
        if (var.Prod.WLeaf < pProd.LfRtRelRtRes * var.Prod.WRoot)
          {
             double RootRelease = pProd.RelRateRtRes * var.Prod.WRoot / 24.;
             var.Prod.CH2OPool += RootRelease;
             var.Prod.WRoot -= RootRelease;
+            ReleaseOfRootReserves = true;
+            CERR << "Extra CH2O: " << RootRelease << "\n";
          }
     }
   double NetAss = CrpAux.CanopyAss;
@@ -1397,6 +1400,11 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
       var.Prod.CH2OPool -= RM;
       double f_Leaf, f_Stem, f_SOrg, f_Root;
       AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
+      if (ReleaseOfRootReserves)
+        {
+          f_Leaf += f_Root;
+          f_Root = 0.0;
+        }
       const double AssG = pProd.CH2OReleaseRate * var.Prod.CH2OPool;
       CrpAux.IncWLeaf = pProd.E_Leaf * f_Leaf * AssG;
       CrpAux.IncWStem = pProd.E_Stem * f_Stem * AssG - ReMobil;
