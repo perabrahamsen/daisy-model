@@ -688,9 +688,9 @@ parameterization (`Pond').
   (deflog Pond table
     (where "pond.dlf")
     (when daily)
-    (entries (year (path time))
-             (month (path time))
-             (mday (path time))
+    (entries (number (path time year))
+             (number (path time month))
+             (number (path time mday))
              (number (path column "*" Surface pond)
                      (dimension "mm"))))
 \end{verbatim}
