@@ -42,10 +42,11 @@ HydraulicM_vG::Theta (const double h) const
 double 
 HydraulicM_vG::K (const double h) const
 {
-  if (h < 0)
+  if (h < 0.0)
     {
       const double Se_h = Se (h);
-      return K_sat * sqrt (Se_h) * pow (1 - pow (1 - pow (Se_h, 1/m), m), 2);
+      return K_sat * sqrt (Se_h)
+	* pow (1.0 - pow (1.0 - pow (Se_h, 1.0/m), m), 2.0);
     }
   else
     return K_sat;
@@ -54,11 +55,11 @@ HydraulicM_vG::K (const double h) const
 double 
 HydraulicM_vG::Cw2 (const double h) const
 {
-  if (h < 0)
+  if (h < 0.0)
     return - (  (Theta_sat - Theta_res)
-	      * (m * (  pow (1 / (1 + pow (a * h, n)), m - 1)
-		      * (n * (pow (a * h, n - 1) * a))))
-	      / pow (1 + pow(a * h, n), 2));
+	      * (m * (  pow (1.0 / (1.0 + pow (a * h, n)), m - 1.0)
+		      * (n * (pow (a * h, n - 1.0) * a))))
+	      / pow (1.0 + pow(a * h, n), 2.0));
   else
     return 0.0;
 }
@@ -68,7 +69,8 @@ HydraulicM_vG::h (const double Theta) const
 {
   if (Theta < Theta_sat)
     return pow(pow(Theta_res / (Theta_res - Theta_sat) 
-		   + Theta / (Theta_sat - Theta_res), -1 / m) - 1, 1 / n) / a;
+		   + Theta / (Theta_sat - Theta_res), -1.0 / m)
+	       - 1.0, 1.0 / n) / a;
   else
     return 0.0;
 }
@@ -90,8 +92,8 @@ HydraulicM_vG::M (double h) const
 double 
 HydraulicM_vG::Se (double h) const
 {
-  if (h < 0)
-    return pow (1 / (1 + pow (a * h, n)), m);
+  if (h < 0.0)
+    return pow (1.0 / (1.0 + pow (a * h, n)), m);
   else
     return 1.0;
 }

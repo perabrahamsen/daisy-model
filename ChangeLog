@@ -1,3 +1,49 @@
+1999-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.66 released.
+
+1999-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation.C (reset_canopy_structure): Allow up to 1% divergence
+	between `height' and `HvsLAI (LAI)'.
+
+1999-01-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (interval_border): Fix bug which always gave the last
+	node point.
+
+	* parser_file.C (load_derived): Skip to end if superclass is unknown.
+
+	* action_harvest.C, action_sow.C (doIt): Indent message.
+	* crop_std.C (tick): Indent DS messages.
+
+1999-01-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_with.C (doIt): Fix bug which prevented the restriction
+	from taking effect.
+
+	* Version 0.65 released.
+
+1999-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (richard): Update `Theta_new' below groundwater
+	according to `h_new', not `h'.
+	(richard): Fix one-off error for pressure button.
+	(richard): Move update of Theta in groundwater.
+	* soil_water.C (tick): Add it here instead.
+
+
+1999-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (interval_plus, interval): Use `false' instead of 0
+	in assertions. 
+
+	* groundwater.C (load_syntax): New function.
+	* groundwater_static.C (GroundwaterStaticSyntax): Call it.
+	* groundwater.C (output): Log groundwater table.
+	* groundwater_file.C: New file.
+	* lib/log.dai ("Groundwater"): New log.
+
 1999-01-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.64 released.

@@ -57,8 +57,10 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       if (groundwater.table () < soil.z (last))
 	throw ("Groundwater table below lowest node.");
       last = soil.interval (groundwater.table ());
+      if (last >=  soil.size () - 1)
+	assert ("Groundwater too low.");
       // Presure at the last node is equal to the water above it.
-      for (unsigned int i = last; i < soil.size (); i++)
+      for (unsigned int i = last + 1; i < soil.size (); i++)
 	{
 	  h_old[i] = groundwater.table () - soil.z (i);
 	  h_[i] = groundwater.table () - soil.z (i);
@@ -106,8 +108,15 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
     }
 
   // Update flux in groundwater.
-  for (unsigned int i = last + 1; i < soil.size (); i++)
+  for (unsigned int i = last + 1; i <= soil.size (); i++)
     q_[i] = q_[i-1];
+
+  // Update Theta below groundwater table.
+  if (!groundwater.flux_bottom ())
+    {
+      for(unsigned int i = last + 1; i < soil.size (); i++)
+	Theta_[i] = soil.Theta (i, h_[i]);
+    }
 
   // Update surface and groundwater reservoirs.
   const bool top_accepted = surface.accept_top (q_[0] * dt);

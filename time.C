@@ -206,6 +206,33 @@ Time::valid (int year, int month, int mday, int hour)
   return true;
 }
 
+int
+Time::days_between (const Time& first, const Time& last)
+{
+  // Same years, just use the difference between the year numbers.
+  if (first.year () == last.year ())
+    return last.yday () - first.yday ();
+  
+  // Otherwise, we have the number of days covered in the last year ...
+  int days = last.yday ();
+
+  // ... plus the number of days remaining in the current year ...
+  if (leap (first.year ()))
+    days += (366 - first.yday ());
+  else
+    days += (365 - first.yday ());
+
+  // ... plus the days of the intervening years ...
+  for (int year = first.year () + 1; year < last.year (); year++)
+    if (leap (year))
+      days += 366;
+    else
+      days += 365;
+
+  // ... and thats it!
+  return days;
+}
+
 // @ Construct.
 
 const Time& 

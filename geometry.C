@@ -15,7 +15,7 @@ Geometry::interval_plus (double z) const
       if (zplus_[i] <= z)
 	return i;
     }
-  assert (0);
+  assert (false);
   return i;
 }
 
@@ -28,7 +28,7 @@ Geometry::interval (double z) const
       if (z_[i] <= z)
 	return i;
     }
-  assert (0);
+  assert (false);
   return i;
 }
 
@@ -39,7 +39,7 @@ Geometry::interval_border (double z) const
   
   for (unsigned int i = 1; i < size_; i++)
     {
-      double dist = fabs (z - zplus_[0]);
+      double dist = fabs (z - zplus_[i]);
       if (dist > best)
 	return i - 1;
       best = dist;

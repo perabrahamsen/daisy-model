@@ -139,26 +139,25 @@ Solute::initialize (const AttributeList& al,
   if (C_.size () > 0)
     {
       // Fill it up.
-      if (C_.size () < soil.size ())
-	C_.insert (C_.end (), soil.size () - C_.size (), C_[C_.size () - 1]);
-      else if (C_.size () > soil.size ())
+      while (C_.size () < soil.size ())
+	C_.push_back (C_[C_.size () - 1]);
+      if (C_.size () > soil.size ())
 	throw ("To many members of C sequence");
     }
   if (M_.size () > 0)
     {
       // Fill it up.
-      if (M_.size () < soil.size () + 0U)
-	M_.insert (M_.end (), soil.size () - M_.size (), M_[M_.size () - 1]);
-      else if (M_.size () > soil.size ())
+      while (M_.size () < soil.size ())
+	M_.push_back (M_[M_.size () - 1]);
+      if (M_.size () > soil.size ())
 	throw ("To many members of M sequence");
     }
   if (ppm.size () > 0)
     {
       // Fill it up.
-      if (ppm.size () < soil.size () + 0U)
-	ppm.insert (ppm.end (), soil.size () - ppm.size (), 
-		    ppm[ppm.size () - 1]);
-      else if (ppm.size () > soil.size ())
+      while (ppm.size () < soil.size ())
+	ppm.push_back ( ppm[ppm.size () - 1]);
+      if (ppm.size () > soil.size ())
 	throw ("To many members of M sequence");
     }
   if (M_.size () == 0 && C_.size () == 0)

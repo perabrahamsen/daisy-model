@@ -185,30 +185,47 @@ Vegetation::Implementation::reset_canopy_structure ()
 
       // Find H as a function of LAI.
       HvsLAI = LAIvsH.inverse ();
-      assert (approximate (height, HvsLAI (LAI)));
-      assert (HvsLAI (0.0) == 0.0);
-
-      // Other stuff
-      cover =  1.0 - exp (-CanopySum (&Crop::EPext));
-      ACExt = CanopyAverage (&Crop::PARext);
-      ACRef =  CanopyAverage (&Crop::PARref);
-      ARExt = CanopyAverage (&Crop::EPext);
-      EpFactor = CanopyAverage (&Crop::EpFac);
-      albedo = CanopyAverage (&Crop::albedo);
-      interception_capacity = CanopySum (&Crop::IntcpCap);
+      if (!approximate (height, HvsLAI (LAI), 0.01))
+	{
+	  CERR << "BUG: Vegetation: height == " << height
+	       << ", LAI == " << LAI
+	       << ", HvsLAI (LAI) == " << HvsLAI (LAI) << ".\n";
+	  
+	  for (CropList::iterator crop = crops.begin(); 
+	       crop != crops.end(); 
+	       crop++)
+	    {
+	      CERR << (*crop)->name << " has height "
+		   << (*crop)->height () << " and LAI "
+		   << (*crop)->LAI () << ".\n";
+	    }
+	  LAI = 0.0;
+	  height = 0.0;
+	}
+      else
+	{
+	  assert (HvsLAI (0.0) == 0.0);
+	  
+	  // Other stuff
+	  cover =  1.0 - exp (-CanopySum (&Crop::EPext));
+	  ACExt = CanopyAverage (&Crop::PARext);
+	  ACRef =  CanopyAverage (&Crop::PARref);
+	  ARExt = CanopyAverage (&Crop::EPext);
+	  EpFactor = CanopyAverage (&Crop::EpFac);
+	  albedo = CanopyAverage (&Crop::albedo);
+	  interception_capacity = CanopySum (&Crop::IntcpCap);
+	  return;
+	}
     }
-  else
-    {
-      // No vegetation.
-      HvsLAI.clear ();
-      cover = 0.0;
-      ACExt = 0.0;
-      ACRef = 0.0;
-      ARExt = 0.0;
-      EpFactor = 0.0;
-      albedo = 0.0;
-      interception_capacity = 0.0;
-    }
+  // No vegetation.
+  HvsLAI.clear ();
+  cover = 0.0;
+  ACExt = 0.0;
+  ACRef = 0.0;
+  ARExt = 0.0;
+  EpFactor = 0.0;
+  albedo = 0.0;
+  interception_capacity = 0.0;
 }
 
 double

@@ -43,7 +43,6 @@ GroundwaterStatic::tick (const Time&)
 double
 GroundwaterStatic::table () const
 {
-  assert (!flux_bottom ());
   return depth;
 }
 
@@ -65,8 +64,11 @@ static struct GroundwaterStaticSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      syntax.add ("table", Syntax::Number, Syntax::Const);
-      alist.add ("table", 1.0); // Positive number indicates flux bottom.
+      Groundwater::load_syntax (syntax, alist);
+      syntax.add ("table", "cm", Syntax::Const,
+		  "Groundwater level.  \
+Positive numbers indicate free drainage.");
+      alist.add ("table", 1.0);
       Librarian<Groundwater>::add_type ("static", alist, syntax, &make);
     }
 } GroundwaterStatic_syntax;

@@ -87,11 +87,22 @@ void
 Field::Implementation::sow (const AttributeList& crop)
 {
   if (selected)
-    selected->sow (crop);
-  else for (ColumnList::iterator i = columns.begin ();
-	    i != columns.end ();
-	    i++)
-    (*i)->sow (crop);
+    {
+      CERR << "on " << selected->name << "\n";
+      selected->sow (crop);
+    }
+  else 
+    {
+      CERR << "on";
+      for (ColumnList::iterator i = columns.begin ();
+	   i != columns.end ();
+	   i++)
+	{ 
+	  CERR << " " << (*i)->name;
+	  (*i)->sow (crop);
+	}
+      CERR << "\n";
+    }
 }
 
 void 
@@ -132,11 +143,22 @@ void
 Field::Implementation::fertilize (const AttributeList& al)
 {
   if (selected)
-    selected->fertilize (al);
-  else for (ColumnList::iterator i = columns.begin ();
-	    i != columns.end ();
-	    i++)
-    (*i)->fertilize (al);
+    {
+      CERR << "on " << selected->name << "\n";
+      selected->fertilize (al);
+    }
+  else 
+    {
+      CERR << "on";
+      for (ColumnList::iterator i = columns.begin ();
+	   i != columns.end ();
+	   i++)
+	{
+	  CERR << " " << (*i)->name;
+	  (*i)->fertilize (al);
+	}
+      CERR << "\n";
+    }
 }
 
 void 

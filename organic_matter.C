@@ -163,10 +163,11 @@ void
 OrganicMatter::Implementation::Buffer::load_syntax (Syntax& syntax,
 						    AttributeList& alist)
 {
+  const vector<double> empty_vector;
   syntax.add ("C", Syntax::Number, Syntax::State, Syntax::Sequence);
-  alist.add ("C", *new vector<double>);
+  alist.add ("C", empty_vector);
   syntax.add ("N", Syntax::Number, Syntax::State, Syntax::Sequence);
-  alist.add ("N", *new vector<double>);
+  alist.add ("N", empty_vector);
   syntax.add ("turnover_rate", Syntax::Number, Syntax::Const);
   alist.add ("turnover_rate", 1.0);
   syntax.add ("where", Syntax::Integer, Syntax::Const);
@@ -492,12 +493,10 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   // Fill SMB C_per_N array with last value.
   for (unsigned int pool = 0; pool < som_size; pool++)
     {
-      const unsigned int C_per_N_size = smb[pool]->C_per_N.size ();
-      assert (C_per_N_size > 0);
-      if (C_per_N_size < soil.size ())
-	smb[pool]->C_per_N.insert (smb[pool]->C_per_N.begin (),
-				   soil.size () - 	C_per_N_size,
-				   smb[pool]->C_per_N[C_per_N_size - 1]);
+      assert (smb[pool]->C_per_N.size () > 0);
+      while (smb[pool]->C_per_N.size () < soil.size ())
+	smb[pool]->C_per_N.push_back 
+	  (smb[pool]->C_per_N[smb[pool]->C_per_N.size () - 1]);
       assert (smb[pool]->C_per_N.size () == soil.size ());
     }
 

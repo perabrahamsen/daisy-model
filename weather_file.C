@@ -54,7 +54,12 @@ struct WeatherFile : public Weather
       air_temperature (-42.42e42)
     { }
   ~WeatherFile ()
-    { close (file.rdbuf ()->fd ()); }
+    { 
+#if 0
+      // Code guard claims the file handle is bad.
+      close (file.rdbuf ()->fd ()); 
+#endif
+    }
 };
 
 void

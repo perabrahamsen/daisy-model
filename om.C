@@ -227,11 +227,15 @@ OM::add (const Geometry& geometry, // Add dead roots.
   const double old_C = total_C (geometry);
 
   // Make sure C/N is large enough.
-  const int extra_C_per_N = density.size () - C_per_N.size ();
+  int extra_C_per_N = density.size () - C_per_N.size ();
   if (extra_C_per_N > 0)
     {
       assert (initial_C_per_N != Unspecified);
-      C_per_N.insert (C_per_N.end (), extra_C_per_N, initial_C_per_N);
+      while (extra_C_per_N > 0)
+	{
+	  C_per_N.push_back (initial_C_per_N);
+	  extra_C_per_N--;
+	}
       assert (initial_C_per_N > 0.0);
     }
   

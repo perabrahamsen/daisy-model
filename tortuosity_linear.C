@@ -41,9 +41,9 @@ static struct TortuosityLinearSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("a", Syntax::Number,  Syntax::Const);
+    syntax.add ("a", "cm^3/cm^3", Syntax::Const, Syntax::None ());
     alist.add ("a", -42.0);
-    syntax.add ("b", Syntax::Number,  Syntax::Const);
+    syntax.add ("b", Syntax::None (), Syntax::Const, Syntax::None ());
     Librarian<Tortuosity>::add_type ("linear", alist, syntax, &make);
   }
 } TortuosityLinear_syntax;

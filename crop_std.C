@@ -723,18 +723,14 @@ CropStandard::initialize (const Geometry& geometry,
   unsigned int size = geometry.size ();
 
   // Fill rootsys arrays.
-  var.RootSys.Density.insert (var.RootSys.Density.end (),
-			      size - var.RootSys.Density.size (), 
-			      0.0);
-  var.RootSys.H2OExtraction.insert (var.RootSys.H2OExtraction.end (),
-				    size - var.RootSys.H2OExtraction.size (),
-				    0.0);
-  var.RootSys.NH4Extraction.insert (var.RootSys.NH4Extraction.end (),
-				    size - var.RootSys.NH4Extraction.size (),
-				    0.0);
-  var.RootSys.NO3Extraction.insert (var.RootSys.NO3Extraction.end (),
-				    size - var.RootSys.NO3Extraction.size (),
-				    0.0);
+  while (var.RootSys.Density.size () < size)
+    var.RootSys.Density.push_back (0.0);
+  while (var.RootSys.H2OExtraction.size () < size)
+    var.RootSys.H2OExtraction.push_back (0.0);
+  while (var.RootSys.NH4Extraction.size () < size)
+    var.RootSys.NH4Extraction.push_back (0.0);
+  while (var.RootSys.NO3Extraction.size () < size)
+    var.RootSys.NO3Extraction.push_back (0.0);
 
   if (var.Phenology.DS >= 0)
     {
@@ -1309,7 +1305,7 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
       if (par.Vernal.required && Phenology.Vern < 0)
 	Vernalization (Ta);
       if (Phenology.DS >= 1.0)
-	COUT << "[" << name << " is flowering]\n";
+	COUT << " [" << name << " is flowering]\n";
     }
   else
     {
@@ -1318,7 +1314,7 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
       if (Phenology.DS > 2)
 	{
 	  if (not_yet_ripe)
-	    COUT << "[" << name << " is ripe]\n";
+	    COUT << " [" << name << " is ripe]\n";
 	  Phenology.DS = 2.0;
 	}
     }
@@ -2180,7 +2176,7 @@ CropStandard::tick (const Time& time,
       Emergence ();
       if (var.Phenology.DS >= 0)
 	{
-	  COUT << "[" << name << " is emerging]\n";
+	  COUT << " [" << name << " is emerging]\n";
 
 	  InitialLAI ();
 	  var.Canopy.Height = CropHeight ();

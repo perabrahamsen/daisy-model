@@ -55,7 +55,7 @@ main (int argc, char* argv[])
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      CERR << "Unknown exception\n";
     }
   exit (1);
 }

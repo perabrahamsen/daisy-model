@@ -229,12 +229,14 @@ UZRichard::richard (const Soil& soil,
 		  else
 		    {
 		      const double dz_plus = z - soil.z (first + i + 1);
-
+		      //const double bottom_pressure = h[i + 1];
+		      const double bottom_pressure = h_old[first + i + 1];
 		      b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
 						+ Kplus[i] / dz_plus);
 		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 			+ (ddt / dz)
-			* (Kplus[i - 1] - Kplus[i] * (1 - h[i + 1] / dz_plus));
+			* (Kplus[i - 1]
+			   - Kplus[i] * (1.0 -  bottom_pressure/ dz_plus));
 		    }
 		  a[i] = - (ddt / dz) * (Kplus[i - 1] / dz_minus);
 		  c[i] = 0.0;
@@ -386,13 +388,6 @@ Richard eq. mass balance flux is different than darcy flux");
   copy (h.begin (), h.end (), h_new.begin () + first);
   assert (Theta_new.size () >= first + size);
   copy (Theta.begin (), Theta.end (), Theta_new.begin () + first);
-
-  // Update Theta below groundwater table.
-  if (!bottom.flux_bottom ())
-    {
-      for(unsigned int i = last; i < Theta_new.size (); i++)
-	Theta_new[i] = soil.Theta (i, h[i]);
-    }
 
   // Check upper boundary.
   assert (approximate (top.h (), available_water - top_water));

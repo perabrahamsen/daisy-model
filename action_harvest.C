@@ -14,7 +14,7 @@ struct ActionHarvest : public Action
 
   void doIt (Daisy& daisy)
     {
-      COUT << "[Harvesting " << name << "]\n";
+      COUT << " [Harvesting " << name << "]\n";
       vector<const Harvest*> entry
 	= daisy.field.harvest (daisy.time, name, stub, stem, leaf, sorg);
       daisy.harvest.insert (daisy.harvest.end (),

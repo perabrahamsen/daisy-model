@@ -271,25 +271,6 @@ ParserFile::Implementation::eof ()
     error ("Expected end of file");
 }
     
-#ifdef DEADCODE
-void
-ParserFile::Implementation::load_library (Library& lib)
-{ 
-  string name = get_string ();
-  string super = get_string ();
-  if (!lib.check (super))
-    {
-      error (string ("Unknown superclass `") + super + "'");
-      skip_to_end ();
-      return;
-    }
-  const AttributeList& sl = lib.lookup (super);
-  AttributeList& atts = *new AttributeList (sl);
-  load_list (atts, lib.syntax (super));
-  lib.add (name, atts, lib.syntax (super));
-}
-#endif
-
 void
 ParserFile::Implementation::add_derived (Library& lib)
 {
@@ -337,6 +318,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
   else
     {
       error (string ("Unknown superclass `") + type + "'");
+      skip_to_end ();
       alist = new AttributeList ();
       alist->add ("type", "error");
     }
@@ -597,7 +579,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      }
 	    case Syntax::String:
 	      {
-		vector<string>& array = *new vector<string> ();
+		vector<string> array;
 		int count = 0;
 		int size = syntax.size (name);
 

@@ -1,4 +1,4 @@
-// action_sow.C
+// action_with.C --- restrict actions to a specific columns
 
 #include "action.h"
 #include "daisy.h"
@@ -14,7 +14,7 @@ struct ActionWithColumn : public Action
 public:
   void doIt (Daisy& daisy)
     { 
-      Field::Restrict (daisy.field, column);
+      Field::Restrict restriction (daisy.field, column);
       for (vector<Action*>::iterator i = actions.begin ();
 	   i != actions.end ();
 	   i++)

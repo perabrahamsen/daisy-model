@@ -11,7 +11,7 @@ struct ActionSow : public Action
 
   void doIt (Daisy& daisy)
     { 
-      COUT << "[Sowing " << crop.name ("type") << "]\n";      
+      COUT << " [Sowing " << crop.name ("type") << "]\n";      
       daisy.field.sow (crop); 
     }
 

@@ -168,7 +168,7 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
 	pet_makkink.C pet_weather.C pet_PM.C pt_std.C action_spray.C \
-	pt_pmsw.C action_merge.C action_divide.C
+	pt_pmsw.C action_merge.C action_divide.C groundwater_file.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -479,7 +479,7 @@ soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h common.h surface.h \
  soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  mathlib.h log.h filter.h
 groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h \
- library.h common.h alist.h syntax.h
+ library.h common.h alist.h syntax.h log.h filter.h
 snow${OBJ}: snow.C snow.h alist.h common.h syntax.h log.h filter.h \
  librarian.h library.h soil.h horizon.h hydraulic.h tortuosity.h \
  geometry.h soil_water.h soil_heat.h mathlib.h
@@ -723,6 +723,8 @@ action_merge${OBJ}: action_merge.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h
 action_divide${OBJ}: action_divide.C action.h librarian.h library.h \
  common.h alist.h syntax.h daisy.h field.h
+groundwater_file${OBJ}: groundwater_file.C groundwater.h uzmodel.h \
+ librarian.h library.h common.h alist.h syntax.h
 set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h time.h syntax.h common.h alist.h library.h
 tkmain${OBJ}: tkmain.C daisy.h time.h syntax.h common.h alist.h library.h

@@ -13,7 +13,7 @@ private:
   struct Implementation;
   Implementation& impl;
     
-    // Extract.
+  // Extract.
 public:
   int year () const;
   int month () const;
@@ -23,12 +23,12 @@ public:
   int wday () const;
   int hour () const;
 
-    // Simulate. 
+  // Simulate. 
 public:
   void tick_hour (int hours = 1);
   void tick_day (int days = 1);
 
-    // Convert.
+  // Convert.
 public:
   static string month_name (int month);
   static string wday_name (int wday);
@@ -38,12 +38,13 @@ public:
   static int yday2mday (int year, int yday);
   static int yday2month (int year, int yday);
 
-    // Test.
+  // Test.
   static bool leap (int year);
   static int month_length (int year, int month);
   static bool valid (int year, int month, int mday, int hour = 0);
+  static int days_between (const Time& first, const Time& last);
 
-    // Compare.
+  // Compare.
   friend bool operator== (const Time&, const Time&);
   friend bool operator!= (const Time&, const Time&);
   friend bool operator<  (const Time&, const Time&);
@@ -51,7 +52,7 @@ public:
   friend bool operator>= (const Time&, const Time&);
   friend bool operator>  (const Time&, const Time&);
 
-    // Construct.
+  // Construct.
 public:
   const Time& operator= (const Time&);
   Time (int year, int month, int mday, int hour);
