@@ -262,8 +262,8 @@ MacroStandard::tick (const Soil& soil,
     {
       TmpStream tmp;
       tmp () << __FILE__ << ":" <<  __LINE__
-	     << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top) 
-	     << "' second pass";
+	     << ": BUG: Total S_p = " << (soil.total (S_p) - q_top) 
+	     << " extra_water = '" << extra_water;
       msg.error (tmp.str ());
     }
 }

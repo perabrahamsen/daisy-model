@@ -1,3 +1,7 @@
+2002-10-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* macro_std.C (tick): More debug information.
+
 2002-10-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log.C: Include tmpstream.h in order to get ostream.
