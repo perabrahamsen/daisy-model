@@ -731,9 +731,9 @@
 			 CrpAux PotCanopyAss)
 		   (dimension "g CH2O/m^2/h")
 		   (factor 1.0))
-	   (number (path column "$col" OrganicMatter CO2)
-		   (dimension "g CH2O/m^2/h")
-		   (factor 1.7272e4))	;g CO2-C/cm^2/h -> CO2/m^2/h
+	   (interval (path column "$col" OrganicMatter CO2)
+		     (dimension "g CO2/m^2/h")
+		     (factor 1.7272e4))	;g CO2-C/cm^2/h -> CO2/m^2/h
 	   ))
 
 (deflog "Crop Production" table
