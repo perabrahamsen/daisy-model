@@ -1,5 +1,12 @@
 2003-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.06 released.
+
+2003-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (K_aquitard): Changed dfault valu from 1e-4
+	to 1e-3. 
+
 	* Version 3.05 released.
 
 2003-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -523,6 +523,33 @@ Horizon::output (Log& log) const
 { output_derived (hydraulic, "hydraulic", log); }
 
 
+static const class SOM_fractions_check_type : public VCheck
+{
+  void check (const Syntax& syntax, const AttributeList& alist, 
+              const string& key)
+    const throw (string)
+  {
+    daisy_assert (key == "SOM_fractions");
+    daisy_assert (alist.check (key));
+    daisy_assert (syntax.lookup (key) == Syntax::Number);
+    daisy_assert (syntax.size (key) == Syntax::Sequence);
+    vector<double> fractions = alist.number_sequence ("SOM_fractions");
+    bool has_negative = false;
+    double sum = 0.0;
+    for (unsigned int i = 0; i < fractions.size (); i++)
+      {
+        if (fractions[i] < 0)
+          has_negative = true;
+        else
+          sum += fractions[i];
+      }
+    if (!has_negative && !approximate (sum, 1.0))
+      throw string ("sum must be 1.0");
+    if (sum > 1.0)
+      throw string ("sum must be at most 1.0");
+  };
+} SOM_fractions_check;
+
 void
 Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 {
@@ -600,32 +627,6 @@ initialization.");
               Syntax::OptionalConst, Syntax::Sequence, "\
 Fraction of humus in each SOM pool, from slowest to fastest.\n\
 Negative numbers mean unspecified, let Daisy find appropriate values.");
-  static const class SOM_fractions_check_type : public VCheck
-  {
-    void check (const Syntax& syntax, const AttributeList& alist, 
-                const string& key)
-      const throw (string)
-    {
-      daisy_assert (key == "SOM_fractions");
-      daisy_assert (alist.check (key));
-      daisy_assert (syntax.lookup (key) == Syntax::Number);
-      daisy_assert (syntax.size (key) == Syntax::Sequence);
-      vector<double> fractions = alist.number_sequence ("SOM_fractions");
-      bool has_negative = false;
-      double sum = 0.0;
-      for (unsigned int i = 0; i < fractions.size (); i++)
-        {
-          if (fractions[i] < 0)
-            has_negative = true;
-          else
-            sum += fractions[i];
-        }
-      if (!has_negative && !approximate (sum, 1.0))
-        throw string ("sum must be 1.0");
-      if (sum > 1.0)
-        throw string ("sum must be at most 1.0");
-    };
-  } SOM_fractions_check;
   syntax.add_check ("SOM_fractions", SOM_fractions_check);
 
   syntax.add ("turnover_factor", Syntax::None (), Check::non_negative (),

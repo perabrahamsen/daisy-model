@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.06 
+
+** Changed default value for K_aquitard from 1e-4 to 1e-3.
+
+In the groundwater pipe model. 
+
 * 3.05
 
 ** You can now specify a single SOM pool.

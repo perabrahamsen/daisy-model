@@ -285,7 +285,7 @@ By default this is calculated from the horizontal conductivity and the\n\
 anisotropy of the horizon.");
       syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Syntax::Const,
 		  "Conductivity of the aquitard.");
-      alist.add ("K_aquitard", 1e-4);
+      alist.add ("K_aquitard", 1e-3);
       syntax.add ("Z_aquitard", "cm", Check::positive (), Syntax::Const,
 		  "Thickness of the aquitard.\n\
 The aquitard begins below the bottommost soil horizon.");
