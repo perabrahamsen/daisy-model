@@ -19,52 +19,97 @@
   (when hourly)
   (summary "System water balance")
   (entries (number (tag "Precipitation")
+		   (description "\
+Total amount of water entering the system as rain and snow.")
                    (path weather "*" precipitation)
                    (spec weather common precipitation)
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Irrigation")
+		   (description "\
+Total amount of water added to the system from irrigation.")
                    (path column "$col" Bioclimate "*" irrigation_total)
                    (spec bioclimate default irrigation_total)
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Potential evapotranspiration")
+		   (description "\
+There is energy enough to evaporate this amount of water.")
                    (path column "$col" Bioclimate "*" total_ep)
                    (spec bioclimate default total_ep)            
                    (handle sum)
                    (dimension "mm/&"))
            (number (tag "Actual evapotranspiration")
+		   (description "\
+Amount of water removed by evaporation and transpiration.
+
+The evaporation part covers water evaporated from the soil surface,
+the sown pack, or intertercepter water on the canpoy.  The
+transpiration covers water removed from the soil through the root
+system and the stomata on the leafs.
+
+The actual evapotranspiration will be lower than the potential
+evapotranspiration when the available water is insufficient.")
                    (path column "$col" Bioclimate "*" total_ea)
                    (spec bioclimate default total_ea)            
                    (handle sum)
                    (dimension "mm/&"))
            (flux_bottom (tag "Matrix percolation")
+			(description "\
+This is the amount of water leaving the system through the soil bottom.
+It can be negative if there are cabilary raise.")
                         (path column "$col" SoilWater q)
                         (spec column default SoilWater q)
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
            (flux_bottom (tag "Macropore percolation")
+			(description "\
+This is an additional amount of water leaving through macropores.
+Macropores can be eartworm or root tunnels, or other structures in the
+soil allowing satured water flow.
+
+In Daisy, macropores (if any) usually end withing the system, so this
+amount will usually be zero.  However if you have specified the 'to'
+parameter, you may see macropore flow.")
                         (path column "$col" SoilWater q_p)
                         (spec column default SoilWater q_p)
                         (handle sum)
                         (negate true)
                         (dimension "mm/&"))
            (interval (tag "Drain flow")
+		     (description "\
+Amount of water leaving the system to drain pipes.
+
+Note that the total amount of water in the drain pipes may be higher
+than this if you have specified the 'to' parameter, as the whole soil
+profile will contribute to the drain flow, and only the contributions
+from the soil interval being logged is counted here.")
                      (path column "$col" SoilWater S_drain)
                      (spec column default SoilWater S_drain)
                      (handle sum)
                      (dimension "mm/&"))
            (number (tag "Runoff")
+		   (description "\
+Amount of water running of the surface.
+
+This is intended to simulate water runoff from a surface with a slop.
+However, since Daisy is a one dimensional model, the water have
+nowhere go to.  For typical setups, this value will be zero.")
                    (path column "$col" Surface runoff)
                    (spec column default Surface runoff)
                    (handle sum)
                    (dimension "mm/&"))
            (interval (tag "Soil water")
+		     (description "\
+Total water content of the soil.")
                      (path column "$col" SoilWater Theta)
                      (spec column default SoilWater Theta)
                      (dimension "mm"))
            (number (tag "Surface water")
+		   (description "Total water stored on the surface.
+This includes the snow pack, intercepted water, ponding, and water in
+the litter layer.")
                    (path column "$col" surface_water) 
                    (spec column default surface_water)
                    (dimension "mm"))))

@@ -1128,7 +1128,10 @@ ProgramDocument::print_model (const symbol name, const Library& library)
       const std::vector<doc_fun>& doc_funs 
 	= library.doc_funs ();
       for (size_t i = 0; i < doc_funs.size ();i++)
-	doc_funs[i](*format, alist);
+	{
+	  format->soft_linebreak ();
+	  doc_funs[i](*format, alist);
+	}
       if (print_parameterizations)
 	{
 	  TmpStream tmp;

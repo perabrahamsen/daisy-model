@@ -267,7 +267,7 @@ LogSelect::document_entries (Format& format, const AttributeList& alist)
     return;
 
   // At least one interesting description required.
-  const Library& library = Librarian<Log>::library ();
+  const Library& library = Librarian<Select>::library ();
   int interesting = 0;
   for (size_t i = 0; i < entries.size (); i++)
     if (has_interesting_description (library, *entries[i]))
