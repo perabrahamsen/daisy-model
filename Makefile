@@ -287,8 +287,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = program_document.C \
-	format_LaTeX.C program_batch.C program_refdoc.C summary_balance.C \
+MODELS = program_document.C format_LaTeX.C program_batch.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
 	horizon_numeric.C horizon_system.C select_pF.C pet_FAO_PM.C \
@@ -305,7 +304,7 @@ MODELS = program_document.C \
 	select_index.C select_content.C select_interval.C \
 	select_number.C select_array.C log_table.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
-	mactrans_std.C macro_std.C macro_none.C document_LaTeX.C \
+	mactrans_std.C macro_std.C macro_none.C \
 	column_std.C  weather_simple.C uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
 	hydraulic_B_C.C hydraulic_M_BaC.C hydraulic_B_BaC.C \
@@ -335,7 +334,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 COMPONENTS = format.C depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \
-	document.C parser.C log.C weather.C column.C crop.C \
+	parser.C log.C weather.C column.C crop.C \
 	action.C condition.C horizon.C 	uzmodel.C hydraulic.C \
 	bioclimate.C groundwater.C am.C transport.C \
 	adsorption.C tortuosity.C printer.C chemical.C \
@@ -406,7 +405,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = average_arithmetic.C average_harmonic.C average_geometric.C
+REMOVE = document_LaTeX.C document.C program_refdoc.C 
 
 # These are the file extensions we deal with.
 # 
@@ -573,7 +572,7 @@ txt/reference.pdf:	txt/components.tex
 
 txt/components.tex:	/usr/local/daisy/$(HOSTTYPE)/daisy
 	(cd txt \
-	 && /usr/local/daisy/$(HOSTTYPE)/daisy all.dai -p LaTeX \
+	 && /usr/local/daisy/$(HOSTTYPE)/daisy all.dai -p document \
             > components.tex)
 
 # Remove all the temporary files.

@@ -1,3 +1,9 @@
+2005-02-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_refdoc.C: Removed.
+	* document_LaTeX.C, document.C, document.h: Removed.
+	* Makefile (COMPONENTS, MODELS): Updated.
+
 2005-01-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* sample/log-sample.dai ("Sample water content"): New sample.
