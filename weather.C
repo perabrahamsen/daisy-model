@@ -6,6 +6,7 @@
 #include "log.h"
 #include "mathlib.h"
 
+template<>
 Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 
 const char *const Weather::description = "\

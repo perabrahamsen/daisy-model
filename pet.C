@@ -5,6 +5,7 @@
 #include "vegetation.h"
 #include "surface.h"
 
+template<>
 Librarian<Pet>::Content* Librarian<Pet>::content = NULL;
 
 const char *const Pet::description = "\

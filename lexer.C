@@ -13,7 +13,7 @@
 
 using namespace std;
 
-istream& 
+std::istream& 
 Lexer::open_file (const string& name)
 {
   // Absolute filename.
@@ -23,7 +23,7 @@ Lexer::open_file (const string& name)
 #endif
       )
     {
-      return *new ifstream (name.c_str ());
+      return *new std::ifstream (name.c_str ());
     }
 
   // Relative filename, use path.

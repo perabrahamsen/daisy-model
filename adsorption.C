@@ -2,6 +2,7 @@
 
 #include "adsorption.h"
 
+template<>
 Librarian<Adsorption>::Content* Librarian<Adsorption>::content = NULL;
 
 const char *const Adsorption::description = "\

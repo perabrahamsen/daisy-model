@@ -23,6 +23,8 @@ MAKEFLAGS =
 FTPDIR = /home/ftp/pub/daisy
 WWWINDEX = /home/user_32/daisy/.public_html/index.html
 
+BORLAND = "e:/Program Files/Borland/CBuilder5/"
+
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
 ifeq ($(OS),Windows_NT)
@@ -147,8 +149,9 @@ ifeq ($(COMPILER),sun)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),borland)
-	COMPILE = /bc5/bin/bcc32 -P -v -wdef -wnod -wamb -w-par -w-hid
-	CCOMPILE = /bc5/bin/bcc32 -P- -v -wdef -wnod -wamb -w-par -w-hid
+	WARNFLAGS = -w-csu -wdef -wnod -wamb -w-par -w-hid
+	COMPILE = $(BORLAND)Bin/bcc32 -P -v $(WARNFLAGS)
+	CCOMPILE = $(BORLAND)Bin/bcc32 -P- -v $(WARNFLAGS)
 endif
 
 # Construct the compile command.
@@ -219,10 +222,9 @@ endif
 # Figure out how to link.
 #
 ifeq ($(COMPILER),borland)
-	LINK =    /bc5/bin/tlink32 /v -Tpe -ap -c -x -e
-	DLLLINK = /bc5/bin/bcc32 -P- -v -lw-dup -WDE -lTpd -lv -e
+	LINK = $(BORLAND)Bin/BCC32 -lw-dup -e
+	DLLLINK = $(BORLAND)Bin/BCC32 -WD -lTpd -lw-dup -e
 	NOLINK = -c
-	CRTLIB = C:\BC5\LIB\c0x32.obj
 else
 	LINK = $(CC) $(DYNSEARCH) $(DEBUG) -o
 	NOLINK = -c
@@ -346,20 +348,20 @@ all:	#(EXECUTABLES)
 # Create the main executable.
 #
 daisy.exe:	main${OBJ} $(LIBOBJ)
-	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
+	$(LINK)daisy.exe $^ $(MATHLIB)
 
 daisy:	main${OBJ} $(LIBOBJ) #daisy.so
-	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
+	$(LINK)daisy  $^ $(MATHLIB)
 
 # Create manager test executable.
 #
 mandaisy${EXT}:	manmain${OBJ} daisy.so
-	$(LINK)mandaisy $(CRTLIB) $^ $(MATHLIB)
+	$(LINK)mandaisy  $^ $(MATHLIB)
 
 # Create bug test executable.
 #
 bugdaisy${EXT}:	bugmain${OBJ} daisy.so
-	$(LINK)bugdaisy $(CRTLIB) $^ $(MATHLIB)
+	$(LINK)bugdaisy  $^ $(MATHLIB)
 
 # Create executable with embedded tcl/tk.
 #
@@ -395,8 +397,7 @@ cdaisy_test${EXT}:  cmain_test${OBJ} daisy.so
 # Create a DLL.
 #
 daisy.dll:	$(LIBOBJ)
-#	/bc5/bin/tlink32 /Tpd /v $^, daisy.dll,, cw32i.lib
-	$(DLLLINK)daisy.dll $^ $(MATHLIB)
+	$(DLLLINK)daisy.dll $^
 
 # Create a shared library.
 #
@@ -416,7 +417,7 @@ dlldaisy${EXT}:	cmain${OBJ} daisy.dll
 # Create the MMM executable.
 
 mmm${EXT}:	$(MOBJECTS)
-	$(LINK)mmm $(CRTLIB) $^ $(MATHLIB)
+	$(LINK)mmm  $^ $(MATHLIB)
 
 # Count the size of daisy.
 #

@@ -6,6 +6,7 @@
 
 const double Crop::DSremove = -5001.0;
 
+template<>
 Librarian<Crop>::Content* Librarian<Crop>::content = NULL;
 
 const char *const Crop::description = "\
