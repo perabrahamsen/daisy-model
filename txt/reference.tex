@@ -1,0 +1,45 @@
+%%% reference.tex --- Daisy Reference Manual
+
+\documentclass[a4paper]{book}
+%\usepackage{doublespace}
+\usepackage{hyperref}
+
+\usepackage{makeidx}
+\makeindex
+
+\bibliographystyle{apalike}
+\input{macro}
+
+\begin{document}
+
+\include{title}
+
+\tableofcontents
+
+\part{The Simulation}
+\label{part:simulation}
+
+\include{introduction}
+
+\part{The Components}
+\label{part:components}
+
+\include{components}
+
+\appendix{}
+\include{dwf}
+
+\addcontentsline{toc}{chapter}{\numberline{}Bibliography}
+\bibliography{daisy}
+
+\addcontentsline{toc}{chapter}{\numberline{}Index}
+\printindex
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
+
+%%% reference.tex ends here

@@ -1,0 +1,1274 @@
+%%% introduction.tex --- Daisy Reference Manual introduction.
+
+\chapter{Introduction}
+\label{cha:introduction}
+
+Welcome to the Daisy Program Reference Manual.  This manual provides
+you with a reference to the Daisy software.  That is, it describes the
+command line version of Daisy, and the format of the setup files.  As
+a start, let's look at what this manual isn't.
+\begin{itemize}
+\item It is not an introduction to the Daisy simulation model itself.
+  See \cite{daisy-new}, \cite{daisy-def} and \cite{daisy-fertilizer}
+  instead.
+\item It is not a reference manual for the mathematical or physical
+  aspects of the various models in Daisy.  The models are listed
+  together with their parameters, but not described in any detail.
+  Some models are explained in \cite{daisy-new}, \cite{daisy-def} and
+  \cite{daisy-fertilizer}. 
+\item It is not a tutorial for the Daisy software.  The manual is
+  intended as a reference for people who already know the system.  A
+  tutorial can be found in~\cite{daisy-tut}.
+\item It is not a programmers manual.  See \cite{daisy-guide} for how
+  to add new models to Daisy, or \cite{c-api} for a description of how
+  to add Daisy to larger systems.  An overview of the program design
+  can be found in \cite{daisy-ems}.
+\end{itemize}
+
+Enough negative statements, what this manual \emph{does} provide is a
+complete reference to all components and models provided by Daisy at
+the time the manual was generated, as well as all the parameters,
+state variables and log variables supported by these models.  These
+are collected in part~\ref{part:components} of the manual.  The reason
+why we can state with absolute confidence that the listing is
+complete, is that it is generated automatically from the code.  Which
+means, if Daisy accepts a parameter in the setup files, it will also
+be listed in the manual.  It also means that the components, models
+and parameters cannot be organized into logical groups with helpful
+descriptions of each.  Instead they are presented in alphabetical order.
+This manual is generated from the version of Daisy listed at
+page~\pageref{version}.
+
+Part~\ref{part:simulation} of the manual is written by humans though.
+Here, we will try to describe enough of the concepts, format, and
+nomenclature to be able to use part~\ref{part:components} efficiently.
+
+\section{Concepts}
+\label{sec:concepts}
+
+In order to use the Daisy model, as well as this manual, you must
+already possess a fairly good understanding of the agronomical and
+physical processes that are modelled by Daisy.  However, when
+describing the organizing and principles behind the Daisy software, we
+have to introduce some new concepts, which are used throughout this
+manual.  This section is somewhat abstract and dry.  The best way to
+read it might be to read it once, without worrying too much about
+understanding it, then get some experience with the Daisy program and
+the setup files, and then read this section again.
+
+\subsection{Components, Models, and Parameterizations}
+
+The two most significant concepts behind the organization of the
+Daisy, are \emph{components} and \emph{models}.  Typically, a
+component corresponds to some physical process, and a model is a
+particular way to describe (or simulate) the process.  For example,
+water transport in the unsaturated zone is a process, while Richards
+Equation is a particular way to describe that process.  In Daisy,
+water transport is a component (described in
+chapter~\ref{component:uzmodel}), while Richards Equation is a model
+(described in section~\ref{model:uzmodel-richards}).
+
+Just about everything in Daisy are either components or models, not
+just what you naturally think of as physical processes.  For example,
+crops (chapter~\ref{component:crop}), management
+(chapter~\ref{component:action}), and even log files
+(chapter~\ref{component:log}) are all components, each having several
+different models. Which leads us to the next issue, \emph{fixed} vs.\
+\emph{library} components.
+
+The general component/model framework makes it very easy to add new
+models to existing Daisy components.  All that is required is a
+\cplusplus{} file with an implementation of the model.  No other code
+has to be changed.  To activate the model, the user just selects it in
+the setup file.  However, for some components we only support a single
+model.  This makes them slightly simpler, for example the user will
+not have to specify a model in the setup file, as there can only be
+one.  The cost is less flexibility.  We call the first kind of
+components, which can (theoretically) can have many different models,
+for \emph{library components}.  Each library component has its own
+chapter in part~\ref{part:components}, with a section for each model
+of that component.  The second less flexible kind of components is
+called \emph{fixed components}.  All the fixed components are described
+in chapter~\ref{cha:fixed}.
+
+\subsubsection{Parameterizations}
+
+Library components have another important feature, which fixed
+components lack.  They allow the user to save standard
+parameterizations of the model in text files, and refer to these
+parameterizations by name.  Daisy is distributed with a large number
+of such standard parameterizations.  The most obvious example where
+they are useful is parameterization of crop models.  The default crop
+model (\ref{model:crop-default}) is sufficiently generic to be able to
+describe crops ranging from grass to potatoes, but it takes lot of
+parameters to do so.  This is why Daisy comes with already
+parameterized versions of the model, with names like ``Grass'' and
+``Potato''.
+
+All in all, this gives a three layered hierarchy, with library
+components in top.  For each library component, there can be one or
+more models implemented in \cplusplus{}.  For each model, there can be
+one or more named parameterizations.
+
+\subsection{Model Attributes}
+
+A parameterization can set \emph{parameters} (as the name implies) for
+the model, as well as initial values for the models \emph{state
+  variables}.  The parameters are constant during the simulation,
+while state variables can change as the simulation progresses.  A
+typical parameter could be the hydraulic conductivity for saturated
+soil, or the maximum height for a crop.  Typical state variables could
+then be the water content in the soil, or the current height of a
+crop.
+
+\subsubsection{Optional and Default Parameters}
+
+In general, all the parameters and state variables must be specified
+before a given model can be used in the simulation.  There are two
+exceptions to that rule though.  
+
+First, some parameters and state variables are marked \emph{optional}.
+This can mean one of two things.  Sometimes the model will be able to
+infer the value of one variable (or parameter) from the values of
+other variables or parameters.  For example, the `SoilNO3' component
+(section~\ref{fixed:SoilNO3}) has both an `M' state variable,
+indicating the total nitrate content in the soil, and a `C' state
+variable, indicating the nitrate concentration in the soil water.
+Given one of these, and information about the amount of water in the
+soil, the `SoilNO3' component is able to calculate the other.
+
+The other exception is parameters or state variables which have a
+\emph{default value}.  Many models have parameters that the typical
+user will rarely change, because the default value is well
+established, but where the parameter is still provided, for those
+people who want to fiddle with the model.  For state variables, there
+can also be reasonable values provided by default.  For example the
+`crops' vegetation model (section~\ref{model:vegetation-crops}) will
+by default start with an empty list of crops, i.e.\ there will be no
+crops in the field at the start of the simulation.  This is what most
+people will expect.
+
+\subsubsection{Partial Parameterizations}
+
+One can say that the model itself can provide a \emph{partial
+  parameterization} of itself this way, i.e.\ a parameterization of
+some, but not necessarily all, parameters in the model.  The user can
+also create partial parameterizations, which is a third example where
+you don't need to specify all the parameters and state variables.  A
+partial parameterization cannot be used directly in the simulation
+without specifying the missing parameters and state variables, but can
+be used as a \emph{base} for other \emph{specialized}
+parameterizations.  For example, the standard fertilizer library in
+the Daisy distribution includes a partial parameterization named
+`slurry'.  This parameterization is used as the base for two
+specialized parameterizations, namely `pig\_slurry' and
+`cattle\_slurry', and contains the parameters that are common for
+both kinds of slurry.  With partial parameterizations, the user can
+build a hierarchy of parameterizations with the most general on top,
+and the most specialized (complete) parameterizations at the bottom.
+
+\subsubsection{Log Variables}
+
+A model can also support a second kind of variables, namely \emph{log
+  variables}.  Log variables are computed during the simulation, but
+are not part of the model state, i.e.\ they are nor stored between
+time steps.  This also means that it makes no sense to initialize
+them, so they cannot appear in a parameterization of the model.
+However, log variables and state variables can be written to output
+files (or other external media) by the various `log' components
+(chapter~\ref{component:log}).  Thus, we have parameters and state
+variables in the input files, and state variables and log variables in
+the output files.
+
+In the Daisy vocabulary, parameters, state variables, and log
+variables are three different \emph{categories} of model
+\emph{attributes}.  One can think of the attributes in general as the
+users mean to interact with the model, and each of the three
+categories as specifications of how the particular attribute can be
+used, for input, for output, or for both.
+
+\subsection{Attribute Types}
+\label{sec:attribute-types}
+
+Beside having a category, attributes also have a \emph{type} and a
+\emph{size}.
+
+A type is the set of legal values.  For example, an attribute whose
+type is `integer' (see section~\ref{type:integer}) cannot hold a
+string (see section~\ref{type:string}) value.  This prevents you from
+setting the attribute `\texttt{NoOfIntervals}' to `\texttt{"Gnat"}' in
+the input file.  For log variables, the type will give you an idea of
+what kind of values to expect in the output files.  The various types
+are described in section~\ref{sec:types}.
+
+The attribute size specifies the number of values to expect.  If the
+attribute is a \emph{singleton}, only a single value can appear.  If
+the attribute is a \emph{sequence}, any number of values can appear.
+The attribute can also have an integer size, which means exactly that
+number of values should appear.
+
+Each attribute has an associated description, which hopefully will give
+some idea of what the attribute is used for.  Attributes with the type
+`number' (see section~\ref{type:number}) will also have a dimension,
+so you for example will know whether the length should be given in
+millimeter or kilometer.  This can make a difference.  Trust me on
+that one.
+
+\subsubsection{Ordered Attributes}
+
+Finally, some attributes may be \emph{ordered} within the model.  This
+order is used by the `file' parser model
+(section~\ref{model:parser-file}) for parsing the setup files.
+Normally, you will have to specify both the name and the value of the
+attributes in the setup files.  However, ordered attributes are
+identified by the order they appear in the setup file, so you will not
+have to specify their names.  In fact, you are not allowed to specify
+their names.  Ordered attributes are typically used for ``obvious''
+parameters, for example the `file' parser model has a single
+parameter, `where', the name of the file to parse.  That parameter is
+ordered, so you can write
+\begin{verbatim}
+  (input file "filename.dai")         ; Correct.
+\end{verbatim}
+instead of
+\begin{verbatim}
+  (input file (where "filename.dai")) ; Wrong.
+\end{verbatim}
+as you would have had to write, if the `where' attribute had been
+unordered. 
+
+\section{Nomenclature}
+
+Having covered the concepts, it is now possible to explain the
+nomenclature used in part~\ref{part:components} of the manual.  As
+already explained, each library component has its own chapter, while
+all the fixed components are collected in chapter~\ref{cha:fixed}.
+All the library component chapters start with a short explanation of
+the purpose of that component.
+
+Each model (including those models that are part of a fixed component)
+has its own section.  Here, we will explain how to read the content
+of these sections.  This is best done with an example.  Now, keep a
+finger here, and find section~\ref{model:action-fertilize} (that's on
+page~\pageref{model:action-fertilize}).
+Section~\ref{model:action-fertilize} is a description of the
+`fertilize' model, which is part of the action component.  You specify
+this model when you want the manager to fertilize the field.  
+
+\subsection{Name and Description}
+
+The name of the section is `fertilize', which is the name you have to
+specify in the setup file when you want to refer to the model.  The
+text in the start of the section is a brief description of the model
+and what it does.
+
+\subsection{Sample}
+\label{sec:sample}
+
+The third element in the section is a \emph{sample}, which shows the
+format recognized by the file parser model when it reads the setup
+files.  The sample starts with `\texttt{$<$}' and ends with
+`\texttt{$>$}', these should not be included in the setup files, they
+are only there to show the start and end of the sample.  The sample
+text written in a normal typewriter should be included directly in the
+setup files, while the text written in slanted text should be replaced
+with the parameter (or state variable) values, as listed after the
+sample.
+
+All parameters and state variables will be listed in the sample.  Log
+variables will not be listed, since they cannot be set in input files.
+
+Ordered attributes will be listed first, in order, since that is how
+they must appear in the setup files.  In the example (that's
+section~\ref{model:action-fertilize}, your finger should still be
+there!), \texttt{\textit{am}} is such an ordered attribute.  You will
+note that the text \emph{am} only occurs once in the sample, while the
+texts \emph{to} and \emph{from} both occur twice.  This is because you
+only have to specify the value for the `am' component in the setup
+files, since it is ordered, while you have to specify both the name
+and value for the unordered `to' and `from' attributes.
+
+For the unordered attributes, it doesn't matter what order they appear
+in the setup files.  In the sample, they will be shown in alphabetic
+order, `from' will appear before `to'.  However, there is no reason
+(except good taste) why you shouldn't set the `to' parameter before
+the `from' parameter in the setup files.
+
+All three attributes (`am', `from', and `to') are singletons (reread
+section~\ref{sec:attribute-types} if you have forgotten what that
+means).  If any of the attributes had been sequences, they would have
+been followed by the string `\texttt{\textit{\ldots{}}}'.  This does
+not mean you should write `\texttt{...}' in the setup files, but that
+you can write any number of values at that point, separated by
+whitespace.  Section~\ref{model:action-cond} has an example of that.
+
+\subsection{The Attribute List}
+\label{sec:alist-doc}
+
+After the sample comes a list with information about each attribute in
+the model.  The parameters and state variables are listed in the same
+order as in the sample, that is, first the ordered attributes (in the
+specified order), and then the rest of the parameters and state
+variables in alphabetic order.  After that, the log variables are
+listed, if any, in their own section.  The `fertilize' management
+action model doesn't have any log variables, so look at the default
+bioclimate model (section~\ref{model:bioclimate-default}) instead.  It
+has plenty.
+
+The documentation for each attribute is divided in three parts, which
+are explained below.
+
+\subsubsection{The Type Line}
+
+The first line (the line with the bullet) contains the name and the
+type (section~\ref{sec:attribute-types}, remember?) of the attribute.
+The name is written in slanted italic, to match the way it is written
+in the sample (section~\ref{sec:sample}).  Two types are treated
+specially: Numbers have a dimension, which is written in bold in
+square brackets; Components have their name written in bold, and a
+reference to the chapter (or section, for fixed components) in the
+manual where they are described.  Other types (such as integers,
+dates, and strings) have a reference to the subsection of
+section~\ref{sec:types} where they are explained.
+
+\subsubsection{The Category Line}
+
+The second line contains the following information:
+\begin{enumerate}
+\item Whether the attribute is optional.  If so, the line will start
+  with the string `Optional'.
+\item The category of the attribute, that is, whether it is a
+  parameter or a state variable.  The category line is not included
+  for log variables.
+\item The default value, if any.  If the value is something simple
+  (like a number or a very short string), the value will be shown on
+  the line.  Otherwise, the manual will just state that the attribute
+  has a default value, but not what it is.
+\end{enumerate}
+
+Sometimes the category line is left out.  It is never included for log
+variables, since their category it is obvious from context, and they
+never have default values.  The category line is also left out for
+components, unless the component is optional or has a default value.
+This is because components can contain both state and log variables, as
+well as parameters. So the category of a component is not a very
+useful concept.  If a component does a default value or is optional,
+the category line will be printed.  However, instead of `parameter' or
+`state variable', the attribute will be categorized as a `component'.
+
+\subsubsection{The Textual Description}
+
+On the third line (or second, if the category line is missing) there
+is a brief textual description of the attribute.  The description may
+continue on the following lines.
+
+\subsection{Submodels}
+
+Sometimes it is useful to combine attributes in a model into groups.
+One example of this is the `cond' management action model
+(section~\ref{model:action-cond}), where we use the `clauses' group to
+emphasize the strong association between each condition, and the list
+of actions to perform when the condition is true.  Another example is
+the `default' crop model (section~\ref{model:crop-default}), where
+there simply are so many attributes that grouping them logically
+becomes a necessity.
+
+If you have looked at the two examples, you will see the attribute
+groups are categorized and typed as `submodel' in the manual.  After
+the textual description of the submodel follows a sample illustrating
+the formatting of the submodel attributes.  The submodel sample
+follows the same conventions as the model sample, described in
+section~\ref{sec:sample}.  After the sample follows a nested attribute
+list, documenting attributes of the submodel in the exact same way as
+the attributes of the main model are documented, as described in
+section~\ref{sec:alist-doc}.  You can even have submodels nested
+inside submodels, ad infinitum.
+
+\section{The Daisy Component and Named Parameterizations}
+\label{sec:daisy}
+
+Try to look at section~\ref{fixed:Daisy}, which describes a fixed
+component named `Daisy'.  That component is actually the top level
+description of the simulation.  All you need to do in a setup file, is
+to specify values for the six attributes.  Then you will be ready to
+run it.
+
+The main attribute is `column', which describes the physical model
+itself.  To run the model, you also need to specify `time', which is
+the starting time of the simulation, `manager', which specifies what
+management operations should be done to the column, and `weather'
+which provides the weather during the simulation.  Furthermore, the
+`output' attribute should be set to specify what data you want logged
+during the simulation.  You can also use the `input' command to split
+the setup description into multiple files. 
+
+In this section we will describe the individual Daisy attributes in
+more detail.  It helps having an example to look at, the Daisy
+distribution (see section~\ref{sec:distribution}) contains a sample
+setup file named ``\texttt{test.dai}''.  We do change that file from
+time to time, but the content shouldn't be too different from what you
+see here.
+
+\subsection{Input Files}
+\label{sec:daisy-input}
+
+The `input' attribute isn't really an attribute.  It is a command to
+read some more parameterizations or, more rarely, set some of the top
+level attributes.  However, the format is the same as for singleton
+parser components (see
+sections~\ref{component:parser},~\ref{sec:attribute-types}
+and~\ref{type:object}), except that you can have multiple `input'
+statements, all taking effect.
+
+The parser component is supposed to read parameterizations or top
+level attributes from an external source.  The `file' parser model
+(section~\ref{model:parser-file}) does this by reading a file in
+exactly the same format as the main setup file.  It has a single
+(ordered) attribute.  In the example below, we use the input command
+to read files containing parameterizations of management actions
+(tillage), crops, output (log) file formats, and soil types
+(horizons).  The three first contain parameterizations that are used
+in most simulations.
+
+\begin{verbatim}
+  (input file "tillage.dai")
+  (input file "crop.dai")
+  (input file "log.dai")
+  (input file "test-horizons.dai")
+\end{verbatim}
+
+These parameterizations will be used when setting the attributes
+described in the rest of this section.
+
+The file parser will search for files in the directories specified by
+the \texttt{DAISYPATH} environment variable
+(see~\ref{sec:distribution}), or by the `path' attribute
+(section~\ref{fixed:Daisy}. 
+
+\subsection{Simulation Time}
+
+The simplest attribute is `time', which is a state variable holding
+the current time in the simulation.  The value you specify in the
+setup file will be its value at the start of the simulation.
+However, if you output the time attribute value in a log file, you will
+see that time changes constantly during the simulation in steps of one
+hour.
+
+The type of the `time' attribute is a `time value', as described in
+section~\ref{type:date}.  You specify four integer values separated by
+whitespace after the attribute name (time), which indicate the year,
+the month, the day in the month, and the hour (from 0 to 23) in that
+sequence.  
+
+\begin{verbatim}
+  (time 1986 12 1 1)
+\end{verbatim}
+
+
+\subsection{Weather}
+\label{sec:weather}
+
+The type of the `weather' attribute is a singleton library component,
+so the format is the same as for `input'
+(section~\ref{sec:daisy-input}).
+
+There are several weather models, but the main one is named `default',
+and read files containing daily weather data, as described in
+appendix~\ref{cha:dwf}.  The first (ordered) attribute specifies the
+name of the weather file; ``weather.dwf'' is a file distributed
+together with Daisy, containing many years worth of weather data from
+KVL's research farm in Taastrup, near Copenhagen.
+
+\begin{verbatim}
+  (weather file "weather.dwf")
+\end{verbatim}
+
+\subsection{Field}
+\label{sec:column}
+
+The value of the `column' attribute should be a sequence of column
+components.  The `column' component is the main component of Daisy,
+most of the physical processes modelled by the simulation are
+attributes of the `default' column component (see
+section~\ref{model:column-default}).  The `default' column model is
+the only column model implemented at the time of writing.
+
+Conventionally, the columns are specified by first defining a named
+parameterization for the default column, and then using that
+parameterization when setting the `column' attribute.  This is also
+what we do in the example.
+
+First we define a parameterization named `JB1\_Andeby' of the
+`default' column model.  The command `defcolumn' is used for this.
+The first argument to the `defcolumn' is the name of the new
+parameterization (in this case: `JB1\_Andeby'), and the next argument
+is the name of the column model to parameterize (in this case
+`default').  The second argument could also be a name of an existing
+parameterization, which you wanted to change or further refine.  If
+there are no ordered attributes, the optional third argument is a
+documentation string.  Otherwise, the second argument is followed by
+the ordered attributes (the default column model has no ordered
+attributes).  Finally comes the unordered attributes.  All separated
+by whitespace.
+
+\begin{verbatim}
+  (defcolumn JB1_Andeby default
+    "Data for the farm of B.And, Andeby, as collected by F.Guf, 2002."
+    (Groundwater static)
+    (Soil (horizons (-20 top_soil) (-250 bottom_soil))
+          (zplus -2.5 -5 -10 -15 -20
+                 -25 -30 -40 -50 -60 -70
+                 -80 -90 -100 -125 -150 -175
+                 -200 -225 -250)
+          (MaxRootingDepth 60.0)
+          (dispersivity 8.0))
+    (OrganicMatter (initial_SOM (-20  4.86)
+                                (-40  2.92)
+                                (-60  1.46)
+                                (-80  0.49)
+                                (-100 0.16)
+                                (-120 0.03))))
+\end{verbatim}
+
+You can define named parameterizations for all components this way.
+The name of the command to define a new parameterization starts with
+`def', followed by the name of the component.  For example, the
+`defweather' command can be used for defining named weather
+parameterizations.
+
+The default column model has many attributes, namely one for each
+major physical process in the model.  However, only two attributes
+have to be specified in the setup file, the rest have default or
+optional values.
+\begin{itemize}
+\item You need to specify a groundwater model.  In this case we have
+  specified static (unchanging) groundwater conditions with free
+  drainage.
+\item You need to specify the numeric and physical properties of the
+  soil.  
+  \begin{itemize}
+  \item Here we claim that the soil is divided in two horizons, the
+    top horizon reaching down to 20 cm and using the physical
+    properties specified by the `top\_soil' horizon parameterization,
+    and the second reaching from 20 cm down to 250 cm, using the
+    `bottom\_soil' horizon parameterization.  You will usually have to
+    define the horizon parameterizations yourself, the real
+    `\texttt{test.dai}' file should give you an example of how to do
+    that.
+    
+    Technically, the `horizons' attribute is a sequence of submodels,
+    each submodel having two ordered attributes.  The first attribute
+    specifies the endpoint of that horizon (a number), while the second
+    attribute specifies the horizon parameterization to use.
+  \item The `zplus' soil attribute contains a sequence of numbers,
+    each specifying the endpoint of one of the numeric layers.
+  \item The two remaining attributes are physical properties that
+    relate to the soil as a whole, rather than the individual
+    horizons.
+  \end{itemize}  
+\item In the example, we also specify `initial\_SOM' for the
+  `OrganicMatter' fixed component.  The initial SOM is another
+  sequence of submodels with two ordered attributes.  In this case the
+  first number is the depth in cm, and the second number is the soil
+  carbon content in kg/$\mbox{m}^2$.  Each submodel specifies a soil
+  layer, with the first attribute indicating the layer's end point, and
+  the second attribute the layer's carbon content.  If the initial SOM
+  is not explicitly specified, Daisy will use the humus content
+  specified in the horizon to deduce it.
+\end{itemize}
+
+After defining the column parameterization, we can set the column
+attribute itself.
+
+\begin{verbatim}
+  (column JB1_Andeby)
+\end{verbatim}
+
+If we had defined two column parameterizations which we wanted to run
+concurrently, we could have set the column attribute like this:
+
+\begin{verbatim}
+  (column JB1_Andeby JB1_Gaaseroed)
+\end{verbatim}
+
+The most common case is to run a single column though, and at the time
+of writing very few of the standard log component parameterizations
+support logging more than a single column.
+
+\subsection{Management}
+\label{sec:management}
+
+The value of the `manager' attribute should be a single
+parameterization of the `action' library component.  What makes the
+`manager' attribute special, is that the `action' library component
+contains a large number of primitive action models like `sow' or
+`fertilize', and a number of generic models which can be used for
+creating crop rotations out of these primitive actions.
+
+The most common way to specify a manager is to use the `activity' model
+(section~\ref{model:action-activity}).  The `activity' action model has a
+single ordered attribute, whose value is a sequence of actions.  Each
+action will be performed in each time step, until done.  Most actions
+are done after a single time step, but the `wait' action is only done
+when the corresponding condition is true.
+
+A common condition is `at' (section~\ref{model:condition-at}), which
+is fulfilled only when the time of the simulation is equal to the time
+value specified in the condition.  However, in the example we also use
+`crop\_ds\_after' (section~\ref{model:condition-crop_ds_after}), which
+is fulfilled after the specified crop in the field has reached the
+specified development stage.  The value specified here, 2.0, is
+reached when a crop is ripe.  The action we then perform is to
+immediately harvest the crop, which means the condition will only be
+fulfilled once.
+
+\begin{verbatim}
+(manager activity
+  (wait (at 1987 3 20 1))
+  (plowing)
+  (wait (at 1987 4 4 1))
+  (fertilize mineral 
+             (weight 100.0)             ;kg N/ha
+             (NH4_fraction 0.5))
+  (wait (at 1987 4 5 1))
+  (progn 
+    (sow "Grass")
+    (sow "Spring Barley"))
+  (wait (crop_ds_after "Spring Barley" 2.0))
+  (harvest "Spring Barley")
+  (wait (at 1987 10 10 1))
+  (harvest "Grass"
+           (stub 15)                    ;Leave 15 cm stub.
+           (stem 1.00))                 ;Harvest everything above stub.
+  (wait (at 1987 9 8 1))
+  (fertilize mineral
+             (weight 80.0)
+             (NH4_fraction 0.5))
+  (wait (at 1987 10 10 1))
+  (harvest "Grass"
+           (stub 8.)                    ;Leave 08 cm stub.
+           (stem 1.00))                 ;Harvest everything above stub.
+  (wait (at 1988 4 1 1))
+  (stop))
+\end{verbatim}
+
+Read chapter~\ref{component:action} and~\ref{component:condition} to
+learn more about the available action and condition models.
+
+\subsection{Log File Generation}
+
+The value of the `output' attribute should be a sequence of log
+component parameterizations.  Each parameterization should specify
+some state or log variables to be output during the simulation.
+
+The `\texttt{log.dai}' file contains a number of standard log
+parameterizations, for example `Crop Production', which will write
+information about the development and production of any crops in the
+field to a file named `\texttt{crop\_prod.dlf}' located in the
+directory specified by the `directory' attribute, or, by default, the
+directory where daisy was started.  This file will contain a header
+with some meta-information about the simulation, a line of dashes, and
+then a large number of tab separated columns, with each column
+describing one aspect of the crop development (e.g.\ the stem nitrogen
+content), and each row a specific time step.  The two first rows are
+special, the first will contain a label identifying the column (e.g.\ 
+NStem), and the second row the dimension used for the numbers in that
+column (e.g.\ kg~N/ha).
+
+You can obviously also define your own parameterizations.  If you wish
+to do so, the `table' log model (see section~\ref{model:log-table})
+is far the most useful.  In the example, we specify two standard log
+parameterizations (`Crop Production' and `Harvest') and one home-made
+parameterization (`Pond').
+
+\begin{verbatim}
+  (deflog Pond table
+    (where "pond.dlf")
+    (when daily)
+    (entries (year (path time))
+             (month (path time))
+             (mday (path time))
+             (number (path column "*" Surface pond)
+                     (dimension "mm"))))
+\end{verbatim}
+
+The `table' log model has a number of parameters, most of these have
+default values.  The three listed here are `where', which specifies
+the name of the file to log the results in, `when', which specifies
+how often to log the results, and `entries', which specifies what to
+log.  The `entries' attribute is a sequence of `select' (see
+section~\ref{component:select}) models, where each entry specifies one
+column in the log file.  The first entry listed will correspond to the
+first column in the log file.
+
+Each log entry model has a large number of attributes, allowing you
+to accumulate results, extract values from the soil array, specify the
+tag and dimension printed in the two first rows of the column, and
+more.  Most of these have default values, and only the fourth (and
+last) log entry submodel specifies one of these attributes, namely the
+dimension string to print in the second row.
+
+The most important log entry parameter is `path', which specifies the
+state or log variable we want to include in the log file.  The value
+is a sequence of attribute names, which should be read as follows:
+Start with the Daisy fixed component (section~\ref{fixed:Daisy}), and
+select an attribute in that model.  That should be the first name
+listed in the path sequence.
+\begin{itemize}
+\item If the attribute is a time value, as in the three first log
+  entries, you list one of `year', `month', `mday', or `hour' next in
+  the path.  The table log model will then log the selected part of
+  the time value.
+\item If the selected attribute is a component sequence, as in the
+  fourth log entry in the example, you should list the name of the
+  model or parameterization you want to log next in the path list.  In
+  this case `JB1\_Andeby' would do, but instead we use the special
+  value `*', which will match \emph{all} entries in the sequence.
+  However, their values will be accumulated into a single number in
+  the log file, which is why we say most of the standard log models
+  don't work well with multiple columns.
+\item After listing the name of the model or parameterization in the
+  sequence to log, we must list an attribute of the model.  In this
+  case we list the `Surface' fixed component.
+\item As long as the selected attribute itself is a submodel or fixed
+  component, we keep listing a name of an attribute in \emph{that}
+  model next.
+\item In this case, it ends with the `pond' attribute of the `Surface'
+  fixed component.  The value of the `pond' attribute is a single
+  number, which will be logged in the fourth column of the
+  `\texttt{pond.dlf}' log file.
+\end{itemize}
+That is the general strategy for writing log file entry paths.  Keep
+listing names of nested attributes, until you reach a simple value,
+which will then be logged.
+
+\section{Types and Formatting}
+\label{sec:types}
+
+There are a few general rules for the formatting accepted by the
+`file' parser.  
+\begin{enumerate}
+\item Elements are separated by whitespace.
+\item Grouping is done with parentheses.  You can always (but need
+  not) have whitespace before and after parentheses.
+\item Whitespace is linefeeds, spaces, and tabs.  You can have any
+  number (greater than one) of these anywhere you can have whitespace.
+\item Comments start with the character `;' and ends at the end of the
+  line.  Comments are legal anywhere you can have whitespace.
+\item All names (attribute names, component names, model names, and
+  parameterization names) follow the same conventions as string
+  values, described in section~\ref{type:string}.
+\end{enumerate}
+
+In this section, we will describe how each type of attribute values
+should be formatted for each of the attribute types.  The formatting
+does also depend slightly on whether the attribute is a singleton or
+a sequence, and whether the attribute is ordered or not, so we will
+cover that subject first.
+
+\subsection{Order and Size}
+\label{sec:order-size}
+
+Booleans, integers, numbers, and strings have a common format though.
+If \emph{val} denotes the attribute value as described in
+sections~\ref{type:boolean},~\ref{type:integer},~\ref{type:number},
+and~\ref{type:string}, and \emph{name} is the attribute name, then
+the format for the attributes in the setup files depends on whether they
+are ordered or not, and whether they are singletons or sequences, as
+illustrated in table~\ref{tab:simple-types}.
+
+\begin{table}[htbp]
+  \begin{center}
+    \begin{tabular}{|r|l|l|}\hline
+                & singleton           
+                & sequence \\\hline
+      ordered   & \texttt{\emph{val}} 
+                & \texttt{(\emph{val}\ldots{})} \\\hline
+      unordered & \texttt{(\emph{name} \emph{val})}
+                & \texttt{(\emph{name} \emph{val}\ldots{})}\\\hline
+    \end{tabular}
+  \end{center}
+  \caption{Format for booleans, integers, numbers, and strings.}
+  \label{tab:simple-types}
+\end{table}
+
+Time values, PLF's, submodels, and fixed components are different
+though.  Unlike the simpler types described above, these already
+contain several parts that are white space separated.  Therefore, it
+is necessary to mark their start and end with parentheses except for
+unordered singletons, when there can be no ambiguity.  Again,
+\emph{name} is the attribute name, and \emph{value} is the attribute
+value in the format described in sections~\ref{type:date},~q\ref{type:plf}, and~\ref{type:alist}.
+
+\begin{table}[htbp]
+  \begin{center}
+    \begin{tabular}{|r|l|l|} \hline
+                & singleton           
+                & sequence \\\hline
+        ordered & \texttt{(\emph{val})} 
+                & \texttt{((\emph{val})\ldots{})} \\\hline
+      unordered & \texttt{(\emph{name} \emph{val})}
+                & \texttt{(\emph{name} (\emph{val})\ldots{})}\\\hline
+  \end{tabular}
+
+  \end{center}
+\caption{Format for time values, PLF's, submodels, and fixed
+    components.} 
+  \label{tab:complex-types}
+\end{table}
+
+In general, library component values are written using the formatting
+conventions in table~\ref{tab:complex-types}.  However, there are two
+exceptions.
+\begin{enumerate}
+\item If you just specify the name of a complete parameterization, as
+  in section~\ref{sec:column}, you do not need the extra parentheses,
+  and can use the format conventions from
+  table~\ref{tab:simple-types}. 
+\item If there are no unordered attributes, then you do not need to
+  put parentheses around the last attribute in the order.  You can see
+  an example of that in section~\ref{sec:management}.  The action
+  sequence is the last attribute in the `clauses' submodel in the
+  `cond' action model.
+\end{enumerate}
+
+\subsection{Booleans}
+\label{type:boolean}
+
+The simplest attribute type is booleans.  A boolean value can be
+either `\texttt{false}' or `\texttt{true}', spelled exactly that way,
+with small letters.
+
+\subsection{Integers}
+\label{type:integer}
+
+Integers should start with a non-zero digit, and be followed by a
+sequence of digits.  Negative numbers should start with a `\texttt{-}'
+sign, followed immediately with the digits.  No whitespace is allowed.
+The only integer which should start with `\texttt{0}' is the integer
+zero itself, don't use leading zeros for padding.  Use space instead.
+Otherwise, Daisy might misinterpret the integer on some systems.
+
+\subsection{Numbers}
+\label{type:number}
+
+The general format for writing numbers is
+
+\begin{tt}
+  $<$\emph{sign}$>$$<$\emph{integer-part}$>$.$<$\emph{fraction}$>$e$<$\emph{sign}$>$$<$\emph{exponent}$>$
+\end{tt}
+
+All of these can be left out, except for the integer part.  There can
+be no whitespace between any of the parts.
+
+After the number, you may optionally specify the dimension inside
+square brackets, like this \verb|[cm]|.  Fractions and other
+dimensionless numbers are specified as \verb|[]|.  Daisy will check
+that the specified dimension is also the dimension is expects, or a
+simple convertion thereof (like \verb|[m]| instead of \verb|[cm]|).
+If the deimension is listed as ``unknown'' in this manual, Daisy will
+be unable to check or convert it.  It can still be specified for
+informational purposes, but the string must start with a question
+mark, like this \verb|[?cm]|.
+
+For lists of numbers, the dimension applies to all the number before
+it. 
+
+\subsection{Strings}
+\label{type:string}
+
+Daisy accepts two different string formats.  The first format is called
+`identifier'.  Identifiers must start with a letter or an underscore,
+and can be followed by letters, digits or underscores only.  They are
+conventionally used for attribute names.
+
+The other format is called `quoted strings', and are most often used
+for attribute values.  Quoted strings start and begin with a double
+quote (`\texttt{"}').  Any characters in between the two double quote
+signs are part of the string, with these exceptions:
+\begin{itemize}
+\item To include a `\texttt{"}' in the string, you must write
+  `\texttt{\mbox{$\backslash$}"}'.
+\item To include a `\texttt{\mbox{$\backslash$}}', you must write
+  `\texttt{\mbox{$\backslash$}\mbox{$\backslash$}}'.
+\item If you put a backslash as the last character on the line,
+  neither it, nor the following newline character will not be part of
+  the string.
+\item A `\texttt{\mbox{$\backslash$}n}' will be replaced by a newline
+  character. 
+\end{itemize}
+It is an error to put any other character after backslash.  
+
+Case is always significant.
+\subsubsection{File Names}
+
+Under some operating systems,  file names are conventionally written
+like this:
+\begin{verbatim}
+  C:\daisy\lib\log.dai
+\end{verbatim}
+
+However, since `\texttt{\mbox{$\backslash$}}' is treated specially in
+Daisy setup files, you will have to double all the backslashed, like
+this:
+\begin{verbatim}
+  (input file "C:\\daisy\\lib\\test.dai")
+\end{verbatim}
+
+Since this looks rather awkward, Daisy also supports ordinary slashes
+in file names:
+\begin{verbatim}
+  (input file "C:/daisy/lib/test.dai")
+\end{verbatim}
+
+\subsection{Time Values}
+\label{type:date}
+
+A time value is written as four whitespace separated integer values,
+which indicate the year, the month, the day in the month, and the hour
+(from 0 to 23), in that sequence.
+
+\subsection{PLF}
+\label{type:plf}
+
+PLF is the name used in Daisy for piecewise linear functions.  In the
+setup files, such a function is specified as a sequence of
+\texttt{(\emph{x} \emph{y})} pairs, where the \emph{x} value must be
+monotonically increasing.  The value of the PLF for any point in the x
+axis is then calculated by linear interpolation between the two
+closest points.  The value \emph{before} the first specified point
+will be the same as the value \emph{at} the first specified point.
+Similarly, The value \emph{after} the last specified point will be the
+same as the value \emph{at} the last specified point.
+
+An example might help.  If `f' is a unordered singleton PLF, we can
+specify its value like this:
+\begin{verbatim}
+  (f (1.0 1.0) (3.0 2.0) (5.0 4.0))
+\end{verbatim}
+We then get the values in table~\ref{tab:plf}.
+
+\begin{table}[htbp]
+  \begin{center}
+    \begin{tabular}{l|l}
+      $x$ & $f(x)$ \\\hline
+      0.0 & 1.0 \\\hline
+      1.0 & 1.0 \\\hline
+      2.0 & 1.5 \\\hline
+      3.0 & 2.0 \\\hline
+      4.0 & 3.0 \\\hline
+      5.0 & 4.0 \\\hline
+      6.0 & 4.0 
+    \end{tabular}
+    \caption{Interpolated values for f}
+    \label{tab:plf}
+  \end{center}
+\end{table}
+
+\subsection{Submodels and Fixed Components}
+\label{type:alist}
+
+A submodel or fixed component is basically a set of attribute names,
+with a value associated to each value.  Some of the attributes are
+ordered, when specifying the value of a submodel you must specify the
+values for all the ordered attributes separated by whitespace,
+followed by the values for each of those unordered attributes you wish
+to set.  The unordered attributes can, as the name implies, come in
+any order.  How to write the attributes in the file depends on whether
+they are ordered or not, their type, and whether they are sequences or
+singletons.  This is all described in section~\ref{sec:types}, in
+particular~\ref{sec:order-size}.
+
+The fixed components are found in chapter~\ref{cha:fixed}, and the
+submodels are found with their parent models throughout
+part~\ref{part:components}.  In the description of each submodel or
+fixed component, there is a \emph{sample} showing the attributes you
+can specify, and how they should be placed.  The sample is explained in
+section~\ref{sec:sample}. 
+
+\subsection{Library Components}
+\label{type:object}
+
+A library component value should always start with the name of model
+or parameterization.  If you want to overwrite some of the attribute
+values of the model or parameterization you just specified, you should
+write all the values of all the ordered attributes immediately after
+the name of the model or parameterization, separated by whitespace,
+and then the unordered attributes, just like you would for a submodel
+or fixed component (see section~\ref{type:alist}).
+
+Each section of each chapter in part~\ref{part:components} describes a
+specific model.  Part of that description is a \emph{sample}, which
+shows how to specify that model in a setup file, and how to set the
+parameters for that model.
+
+The format for library component values described here is also used
+when defining named parameterizations.  In the setup file, you
+write: 
+
+\begin{tt}
+  (def\emph{component} \emph{name} \emph{value})
+\end{tt}
+
+where \emph{component} is the name of the component you want to define
+a named parameterization for, \emph{name} is the name of the new
+parameterization you want to define, and \emph{value} is a library
+component value as described in this section (\ref{type:object}).
+
+\section{The Daisy Distribution}
+\label{sec:distribution}
+
+In this section we describe the executable files which are part of the
+Daisy distribution, followed by a brief overview of the content of
+each of the standard parameterization files.  Please note that these
+changes frequently, so the information here is unlikely to be
+complete and current.
+
+\subsection{The Daisy Program}
+
+The main Daisy executable is called `\texttt{daisy.exe}' on win32
+systems, or just `\texttt{daisy}' on Unix.  This is the command line
+version of Daisy.  For win32 systems, there is also the
+`\texttt{daisy.dll}' file which allows Daisy to be used as a component of
+another system, and `\texttt{cdaisy.exe}' which uses
+`\texttt{daisy.dll}' to provide most of the functionality of
+`\texttt{daisy.exe}'.
+
+To run a simulation, you should start the daisy executable with a
+setup file as an argument.  A sample setup file named
+`\texttt{test.dai}' is distributed together with the standard
+parameterization libraries.  You run it by typing
+\begin{verbatim}
+  daisy test.dai
+\end{verbatim}
+from the command line.  Please note that you \emph{must} include the
+full name of the file, that is include `\texttt{.dai}' file suffix.
+Setup files can be named anything, the `\texttt{.dai}' is only there
+to make them easier to recognize for the user.
+
+The command above will only work if you are located in the directory
+containing the `\texttt{test.dai}' file, and all the parameterization
+files used by `\texttt{test.dai}'.  However, we recommend that you
+place all the standard parameterization files in one directory, and
+use another for the setup files you create yourself.  The
+\texttt{DAISYPATH} environment variable should then contain a list of
+directories which Daisy will search for directories.  Under win32, the
+directories should be separated by semicolons, while under UNIX they
+should be separated by colons.  How to set the environment variable
+depends on the system, here are some examples:
+\begin{itemize}
+\item Unix, using the C shell, in `\texttt{.cshrc}'.
+\begin{verbatim}
+  setenv DAISYPATH .:$HOME/daisy/lib   #$ (For Daisy)
+\end{verbatim}
+\item Unix, using the Bourne shell, in `\texttt{.profile}'.
+\begin{verbatim}
+  DAISYPATH=.:$HOME/daisy/lib; export DAISYPATH  #$ (For Daisy)
+\end{verbatim}
+\item Windows 95/98, in `\texttt{autoexec.bat}'.
+\begin{verbatim}
+  set DAISYPATH=.;C:\daisy\lib
+\end{verbatim}
+\item Under Windows NT, use \texttt{regedit} to add the environment
+  variable. 
+\end{itemize}
+
+\subsection{\texttt{tillage.dai}}
+
+The `\texttt{tillage.dai}' file contains parameterizations for the
+tillage operations listed below, whose nature should be apparent from
+their names.
+\begin{itemize}
+\item plowing
+\item rotavation
+\item disk\_harrowing
+\item stubble\_cultivation
+\item seed\_bed\_preparation
+\end{itemize}
+
+\subsection{\texttt{crop.dai}}
+
+The `\texttt{crop.dai}' file contains crop parameterizations.
+
+\begin{itemize}
+\item "Grass"
+\item "Maize"
+\item "Pioneer Maize"
+\item "Ikuwala Maize"
+\item "Silage Maize"
+\item "Pea"
+\item "Potato"
+\item "Rye"
+\item "Spring Barley"
+\item "Spring Rape"
+\item "Sugar Beet"
+\item "Spring Wheat"
+\item "Winter Barley"
+\item "Winter Rape"
+\item "Winter Wheat"
+\end{itemize}
+
+The above parameterizations all refer to the default crop model, we
+also have some parameterizations of the old crop model.  Please note
+that these cannot be used with multicrop systems.
+
+\begin{itemize}
+\item "Beet; V1"
+\item "Grass; V1"
+\item "Pea; V1"
+\item "Potato; V1"
+\item "Spring Barley; V1"
+\item "Spring Rape; V1"
+\item "Winter Barley; V1"
+\item "Winter Rape; V1"
+\item "Winter Wheat; V1"
+\end{itemize}
+
+\subsection{\texttt{fertilizer.dai}}
+
+The parameterizations in the `\texttt{fertilizer.dai}' file are mostly
+intended as examples, as the parameters for organic fertilizer vary
+a lot.  
+\begin{itemize}
+\item pig\_slurry
+\item cattle\_slurry
+\item pig\_manure
+\item cattle\_manure
+\item horse\_manure
+\end{itemize}
+The `\texttt{fertilizer.dai}' file does also contain a partial
+parameterization named `slurry', which contains the parameters common
+to the `pig\_slurry' and `cattle\_slurry' parameterizations, and
+partial parameterization named `manure', which contains the parameters
+common to the `pig\_manure', `cattle\_manure' and `horse\_manure'
+parameterizations
+
+\subsection{\texttt{log.dai}}
+
+The `\texttt{log.dai}' file contains a number of standard log file
+descriptions.  With the exception of `Harvest', they only make sense
+for single column fields.  Also with the exception of `Harvest', they
+all use a tabular format, where the name and dimensions of each column
+are written in the two first rows.
+
+\begin{itemize}
+\item "Total Soil Content"\\
+  This log file format will print information about the total soil
+  content at midnight each day. 
+\item "Soil Nitrate Concentration"\\
+  Midnight nitrate concentration in all numeric layers.
+\item "Soil Temperature"\\
+  Midnight soil temperature in all numeric layers.
+\item "Soil Water Potential"\\
+  Midnight water potential in all numeric layers.
+\item "Surface Water Balance"\\
+  Enough information to calculate a daily surface water balance. 
+\item "Root Zone Water Balance"\\
+  Enough information to calculate a daily root zone water balance. 
+\item "N Balance"\\
+  Enough information to calculate a daily nitrogen balance. 
+\item "Soil Chemicals"\\
+  Daily information about the fate of the soil chemicals.
+\item "Surface Chemicals"\\
+  Daily information about the fate of the surface chemicals.
+\item "Crop Production"\\
+  Daily crop development numbers for the default crop model.
+\item "Old Crop Production"\\
+  Daily crop development numbers for the old crop model.
+\item "Bioclimate"\\
+  All the information you ever wanted about the bioclimate, and more. 
+\item "harvest"\\
+  Information about all harvests during the simulation. 
+\end{itemize}
+
+\subsection{Error Messages}
+
+Sometimes the simulation will fail to run for some reason or another.
+In these cases, Daisy will attempt to give an error message, which
+hopefully will give some indication of what went wrong.  There are
+zillions of situations where Daisy might give some error message, in
+the following we describe some of them.
+
+\subsubsection{Parser errors}
+
+If the format of the setup files is wrong, for example if there are
+missing parentheses or unknown attributes, Daisy will give you
+information about which file the error was found, the line number, the
+column number, and what the problem was.
+\begin{verbatim}
+  test.dai:15:6: Unknown attribute `kurt'
+\end{verbatim}
+This is the ``best'' kind of errors, since it will lead you directly
+to the place where the error occurred.  
+
+If you run Daisy with `\texttt{M-x~compile~RET}' inside the Emacs
+text editor, you can go directly to the place the error occurred by
+clicking on the error message with the mouse.
+
+\subsubsection{Completeness checks}
+
+After parsing the setup files, Daisy will check that all the required
+parameters and state variables are defined, and make some very simple
+consistency checks.  Errors during this phase looks as follows:
+\begin{verbatim}
+  Attribute weather missing
+  in daisy
+\end{verbatim}
+
+\subsubsection{Consistency checks}
+
+After checking that all the required attributes are there, Daisy will
+create the simulation objects, and then perform a more throughout
+consistency check.  Errors found during these phases will be reported
+like the one below.
+\begin{verbatim}
+  You have 20 intervals but 26 T values
+  in column `JB1_Richards'
+  Malformed column(s)
+\end{verbatim}
+
+\subsubsection{Runtime exceptions}
+
+Now Daisy is ready to run the simulation.  However, some errors are
+too hard to find before the simulation has started.  If Daisy finds
+one of those during the simulation, it will throw an exception, which
+normally causes the program to exit.  
+\begin{verbatim}
+  Exception: Cannot restrict already restricted field
+\end{verbatim}
+
+\subsubsection{Assertion failures}
+
+During debugging, a lot of `assert' statements have been added to the
+code.  Each of these statements will check if a certain condition is
+true, and if not, exit the program with a message like
+\begin{verbatim}
+  field.C:71: failed assertion `false'
+\end{verbatim}
+A failed assertion message will always print the file name, the line
+number, and the assertion that failed, but the format may vary between
+different platforms.  
+
+The difference between assertion failures and runtime exceptions is
+that the runtime exceptions are normally due to an error in the setup
+files, while the assertion may also be caused by bugs in the program.
+The printed information is a great help for debugging those.  So
+failed assertions should be reported to KVL.
+
+\subsubsection{Program errors}
+
+Sometimes we can get errors that aren't even caught by the assertions,
+they can manifest themselves as "Bus error" or "Segmentation
+violation" errors, or weird pop-up windows under win32.  Or even
+worse, as bogus numbers in the log files.  These can be due to program
+errors, hardware errors, too little memory, or errors in the operating
+system.  They can also be caused by errors in the setup files, but in
+this case it is also a program error, as such errors should be caught
+by one of the mechanisms above.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "reference"
+%%% End: 
+
+%%% introduction.tex ends here
