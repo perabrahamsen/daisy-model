@@ -136,6 +136,24 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
     }
   else
     k_BA = k_AB;
+  
+  if (alist.check ("debug"))
+    {
+      Treelog::Open nest (err, "debug");
+      const vector<AttributeList*> alists = alist.alist_sequence ("debug");
+      for (unsigned int i = 0; i < alists.size (); i++)
+        {
+          vector<double> debug;
+          auto_ptr<Pedotransfer> pedo_debug 
+            (&Librarian<Pedotransfer>::create (*alists[i]));
+          if (pedo_debug->check (soil, pedo_debug->dimension (), err))
+            pedo_debug->set (soil, debug, pedo_debug->dimension ());
+          else
+            initialize_state = init_failure;
+          Pedotransfer::debug_message (pedo_debug->name.name (), 
+                                       debug, pedo_debug->dimension (), err);
+        }
+    }
 }
 
 static struct TransformEquilibriumSyntax
@@ -156,9 +174,12 @@ static struct TransformEquilibriumSyntax
 		Syntax::Const, Syntax::Singleton, 
 		"Tranformation rate from soil component 'A' to 'B' [h^-1].");
     syntax.add ("k_BA", Librarian<Pedotransfer>::library (),
-		Syntax::OptionalConst, Syntax::Sequence,
+		Syntax::OptionalConst, Syntax::Singleton,
 		"Tranformation rate from soil component 'B' to 'A' [h^-1].\n\
 By default, this is identical to 'k_AB'.");
+    syntax.add ("debug", Librarian<Pedotransfer>::library (),
+		Syntax::OptionalConst, Syntax::Sequence, "\
+Extra pedotransfer function to include in 'daisy.log' for debugging.");
     Librarian<Transform>::add_type ("equilibrium", alist, syntax, &make);
   }
 } TransformEquilibrium_syntax;

@@ -332,7 +332,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = domsorp.C chemistry.C \
+COMPONENTS = number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \
 	document.C parser.C log.C weather.C column.C crop.C \
@@ -361,7 +361,7 @@ SPECIALS = log_all.C om.C select_value.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = version.C texture.C destination.C symbol.C \
+OTHER = scope.C version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \

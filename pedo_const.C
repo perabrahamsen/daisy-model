@@ -30,7 +30,7 @@ struct PedotransferConst : public Pedotransfer
 {
   // Parameters.
   const double val;
-  const string& dim;
+  const string dim;
 
   // Simulation.
   double value (const Soil&, int) const
@@ -48,76 +48,72 @@ struct PedotransferConst : public Pedotransfer
   { }
 };
 
-struct PedotransferHumus : public Pedotransfer
+struct PedotransferLeaf : public Pedotransfer
 {
+  // Parameters.
   const string dim;
 
+  // Simulation.
+  const string& dimension () const
+  { return dim; }
+
+  // Create.
+  bool check_nested (const Soil&, Treelog&) const
+  { return true; }
+  PedotransferLeaf (const AttributeList& al)
+    : Pedotransfer (al),
+      dim (al.name ("dimension"))
+  { }
+};
+
+struct PedotransferHumus : public PedotransferLeaf
+{
   // Simulation.
   double value (const Soil& soil, int i) const
   { 
     return Units::convert (Syntax::Fraction (), dimension (), 
                            soil.humus (i)); 
   }
-  const string& dimension () const
-  { return dim; }
 
   // Create.
-  bool check_nested (const Soil&, Treelog&) const
-  { return true; }
   PedotransferHumus (const AttributeList& al)
-    : Pedotransfer (al),
-      dim (al.name ("dimension"))
+    : PedotransferLeaf (al)
   { }
 };
 
-struct PedotransferMineral : public Pedotransfer
+struct PedotransferMineral : public PedotransferLeaf
 {
-  const string dim;
-
   // Simulation.
   double value (const Soil& soil, int i) const
   { 
     return Units::convert (Syntax::Fraction (), dimension (),
                            1.0 - soil.humus (i));
   }
-  const string& dimension () const
-  { return dim; }
 
   // Create.
-  bool check_nested (const Soil&, Treelog&) const
-  { return true; }
   PedotransferMineral (const AttributeList& al)
-    : Pedotransfer (al),
-      dim (al.name ("dimension"))
+    : PedotransferLeaf (al)
   { }
 };
 
-struct PedotransferRho_B : public Pedotransfer
+struct PedotransferRho_B : public PedotransferLeaf
 {
-  const string dim;
-
   // Simulation.
   double value (const Soil& soil, int i) const
   { 
     return Units::convert ("g/cm^3", dimension (), soil.dry_bulk_density (i));
   }
-  const string& dimension () const
-  { return dim; }
 
   // Create.
-  bool check_nested (const Soil&, Treelog&) const
-  { return true; }
   PedotransferRho_B (const AttributeList& al)
-    : Pedotransfer (al),
-      dim (al.name ("dimension"))
+    : PedotransferLeaf (al)
   { }
 };
 
-struct PedotransferBelow : public Pedotransfer
+struct PedotransferBelow : public PedotransferLeaf
 {
   // Parameters.
   const double size;
-  const string dim;
 
   // Simulation.
   double value (const Soil& soil, int i) const
@@ -125,24 +121,18 @@ struct PedotransferBelow : public Pedotransfer
     return Units::convert (Syntax::Fraction (), dimension (),
                            soil.texture_below (i, size));
   }
-  const string& dimension () const
-  { return dim; }
 
   // Create.
-  bool check_nested (const Soil&, Treelog&) const
-  { return true; }
   PedotransferBelow (const AttributeList& al)
-    : Pedotransfer (al),
-      size (al.number ("size")),
-      dim (al.name ("dimension"))
+    : PedotransferLeaf (al),
+      size (al.number ("size"))
   { }
 };
 
-struct PedotransferGet : public Pedotransfer
+struct PedotransferGet : public PedotransferLeaf
 {
   // Parameters.
   const string name;
-  const string dim;
 
   // Simulation.
   double value (const Soil& soil, int i) const
@@ -152,8 +142,6 @@ struct PedotransferGet : public Pedotransfer
     const string got_dim = soil.get_dimension (i, name);
     return Units::convert (got_dim, dim, value);
   }
-  const string& dimension () const
-  { return dim; }
 
   // Create.
   bool check_nested (const Soil& soil, Treelog& err) const
@@ -178,9 +166,8 @@ struct PedotransferGet : public Pedotransfer
   }
 
   PedotransferGet (const AttributeList& al)
-    : Pedotransfer (al),
-      name (al.name ("name")),
-      dim (al.name ("dimension"))
+    : PedotransferLeaf (al),
+      name (al.name ("name"))
   { }
 };
 

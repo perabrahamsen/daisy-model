@@ -1,5 +1,16 @@
 2004-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.59 released.
+
+2004-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pedo_const.C: Cleanup.
+
+	* number.C, number.h: New component.
+
+	* scope.h, scope.C: New utility.
+	* Makefile (OTHER): Added it.
+
 	* Version 3.58 released.
 
 2004-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -1,6 +1,6 @@
 // pedo.C --- Pedotransfer functions based on soil attributes.
 // 
-// Copyright 2002 Per Abrahamsen and KVL.
+// Copyright 2004 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -42,6 +42,8 @@ Pedotransfer::set (const Soil& soil, vector<double>& array,
   for (unsigned int i = 0; i < soil.size (); i++)
     if (known (dim) && known (dimension ()))
       array[i] = Units::convert (dimension (), dim, value (soil, i));
+    else
+      array[i] = value (soil, i);
 }
 
 
@@ -78,7 +80,7 @@ Pedotransfer::debug_message (const string& name,
   tmp () << "(" << name;
   for (unsigned int i = 0; i < value.size (); i++)
     tmp () << " " << value[i];
-  tmp () << "[" << dim << "])";
+  tmp () << " [" << dim << "])";
   msg.debug (tmp.str ());
 }
 
