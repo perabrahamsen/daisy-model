@@ -9,6 +9,7 @@
 #include "daisy.h"
 #include "weather.h"
 #include "crop.h"
+#include "library.h"
 
 void Event::Udfoer(Daisy& daisy,const Time& dato, EventQueue& EQ) {
    // Wrapper to make sure Visit is done
@@ -32,37 +33,41 @@ void Event::Visit(const Time& dato,RelEventList& curr,EventQueue& EQ) {
 }
 
 FertilizeEvent* FertilizeEvent::create(AttributeList &al){
-   if(al.check("WithWhat") &&  al.check("Ammount")&& AM::library().check(al.name("WithWhat"))) {
+   if(al.check("WithWhat") &&  al.check("Ammount") /* && AM::library().check(al.name("WithWhat"))*/ ) {
       string w(al.name("WithWhat"));
       return new FertilizeEvent(w,al.integer("Ammount"));
    }
    return 0;
 }
 
-void FertilizeEvent::Do_It(Daisy& ,const Time& , EventQueue& ){
-	// Fertilize the WORLD
-
-/* TODO
-  AM am;
+void FertilizeEvent::Do_It(Daisy& daisy,const Time&, EventQueue&)
+{
+  // Fertilize the WORLD
+  const AttributeList& am = AM::library ().lookup ("mineral");
+  
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
-     if (!match (**i))
-	     continue;
-     // Add inorganic matter.
-     if (to < from)
-	     (*i)->fertilize (IM (am), from, to);
-     else
-	     (*i)->fertilize (IM (am));
+    if (!match (**i))
+      continue;
+    // Add inorganic matter.
+#if 0
+    if (to < from)
+      (*i)->fertilize (IM (am), from, to);
+    else
+#endif
+      (*i)->fertilize (IM (am));
 
-     // Add organic matter, if any.
-     if (am.name ("syntax") != "mineral"){
-	     if (to < from)
-	        (*i)->fertilize (am, daisy.time, from, to);
-	     else
-	        (*i)->fertilize (am, daisy.time);
-	  }
+    // Add organic matter, if any.
+    if (am.name ("syntax") != "mineral"){
+#if 0
+      if (to < from)
+	(*i)->fertilize (am, daisy.time, from, to);
+      else
+#endif
+	(*i)->fertilize (am, daisy.time);
+    }
   }
-*/
+  cout << "[ (Not really) Fertilizing with " <<fertilizer<<"]\n";
 }
 
 bool FertilizeEvent::KanUdfoeres(Daisy& ,const Time& ){
@@ -91,12 +96,14 @@ void IrrigateEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
 
    ColumnList& cl = daisy.columns;
    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
-      if (match (**i))
+      if (match (**i)) {
 	      (*i)->irrigate (howmuch, t, sm, from);
+         cout << "[(not really) Irrigating]\n";
+      }
    }
 }
 
-bool IrrigateEvent::KanUdfoeres(Daisy& ,const Time& ){
+bool IrrigateEvent::KanUdfoeres(Daisy&,const Time&){
    // Can I Irrigate the WORLD ?
    return true;
 }
@@ -108,7 +115,7 @@ TillageEvent* TillageEvent::create(AttributeList &al){
    }
    return 0;
 }
-void TillageEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
+void TillageEvent::Do_It(Daisy& daisy,const Time&, EventQueue& ){
    bool mix_it=true;
    double middle, depth, penetration = 1.0;
 
@@ -135,6 +142,8 @@ void TillageEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
             (*i)->mix (daisy.time, 0.0, depth, penetration);
 	      else
             (*i)->swap (daisy.time, 0.0, middle, depth);
+         cout << "[Tilling]\n";
+
       }
    }
 }
@@ -153,13 +162,15 @@ HarvestEvent* HarvestEvent::create(AttributeList &al){
    return 0;
 }
 
-void HarvestEvent::Do_It(Daisy& daisy,const Time&, EventQueue& ){
+void HarvestEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
    ColumnList& cl = daisy.columns;
    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
       if (!match (**i))
 	      continue;
       vector<const Harvest*> entry = (*i)->harvest (daisy.time, CropName, Stub, Stem, Leaf, StorageOrgans);
       daisy.harvest.insert (daisy.harvest.end (), entry.begin (), entry.end ());
+      cout << "[Harvesting "<<CropName<<"]\n";
+
    }
 }
 bool HarvestEvent::KanUdfoeres(Daisy& ,const Time& ){
@@ -196,7 +207,9 @@ void SowEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
    ColumnList& cl = daisy.columns;
    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
       if (match (**i)) {
-	    (*i)->sow (CropAttributes);
+	(*i)->sow (CropAttributes); 
+	cout << "[Sowing]\n";
+
        if (harvest)
           harvest->SetCropName(Crop);
        else {
@@ -208,7 +221,7 @@ void SowEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
   }
 }
 
-bool SowEvent::KanUdfoeres(Daisy&,const Time&){
+bool SowEvent::KanUdfoeres(Daisy& ,const Time& ){
    return true;
 }
 
@@ -216,16 +229,19 @@ StartEvent* StartEvent::create(AttributeList &){
    return new StartEvent();
 }
 
-void StartEvent::Do_It(Daisy&,const Time&, EventQueue&){
+void StartEvent::Do_It(Daisy& ,const Time& , EventQueue& ){
+         cout << "[Start]\n";
+
 }
-bool StartEvent::KanUdfoeres(Daisy&,const Time&){
+bool StartEvent::KanUdfoeres(Daisy& ,const Time& ){
    return true;
 }
 
 EndEvent* EndEvent::create(AttributeList &){
    return new EndEvent();
 }
-void EndEvent::Do_It(Daisy& daisy,const Time&, EventQueue&){
+void EndEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
+         cout << "[Stopping]\n";
    daisy.running = false;
 }
 bool EndEvent::KanUdfoeres(Daisy& ,const Time& ){

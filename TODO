@@ -1,4 +1,28 @@
-* Implement HourlyAirTemperature.
+* LogTable
+
+Clear value også når der ikke er nogen match.
+
+* Status rapport med igangværende og fremtidge projekter.
+
+* Ændr Geometry::layers 
+
+Brug `end' i hvert lag i stedet for `size'.
+
+* Standard filtre
+
+** Generaliser Frame.
+
+*** Gør det til et library.
+
+*** Tilføj `name' og `number' queries (med default value)
+
+*** Flyt `column' query til global funktion i column.h eller daisy.h
+
+** OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
+
+** Implementer minidaisy filtre
+
+** Implementer HS filtre.
 
 * Implementer Partit::RSR (RootShootRatio) 
 
@@ -6,16 +30,6 @@ Den skal forhindre at alt assimilatet går til respiration af røderne
 efter et slet af græs.
 
 * Døde blade skal tælle med i lysfordelingen.
-
-* Status rapport med igangværende og fremtidge projekter.
-
-* Standard filtre
-
-** OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
-
-** Implementer minidaisy filtre
-
-** Implementer HS filtre.
 
 * clone column idea:  log + parse!  
 
@@ -41,8 +55,6 @@ variable (samt evt. nyt objekter, specielt AM og Crop, der så skal
 huske deres egen syntax), og så bruge PrinterFile til at udskrive de
 nye alister.  Efter at have udskrevet de objecter der var defineret i
 input filen.
-
-* Check hvad enhed `omega-offset' skal have.
 
 * Remove exception handling.
 

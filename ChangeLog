@@ -1,3 +1,17 @@
+1998-03-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.017 released.
+
+1998-03-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C (load_syntax): Add "description".
+
+	* Weather.C, weather.h, soil_heat.C (max_Ta_yday): Renamed from
+	`omega_offset'. 
+
+	* soil_heat.C (bottom): Expect `omega_offset' in days instead of
+	radians. 
+
 1998-03-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.016 released.

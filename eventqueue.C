@@ -106,11 +106,12 @@ EventsOfDate* EventQueue::Find(const Time& dato){
 }
 
 void EventQueue::TilfoejEvent(const Time& dato,TidsType tid,Event* e){
-
+/*
 	if ( tid == TCirkaDato) {
-      EventsOfDate::FlyttetCirkaDato.push_back(e);
+
       return;
    }
+*/
    EventsOfDate* temp = Find(dato);
    if (!temp) {
  	   temp = new EventsOfDate(dato);
@@ -119,6 +120,10 @@ void EventQueue::TilfoejEvent(const Time& dato,TidsType tid,Event* e){
    switch(tid) {
      	case TFastDato:
          temp->FastDato.push_back(e);
+         break;
+
+      case TFlyttetCirkaDato:
+         EventsOfDate::FlyttetCirkaDato.push_back(e);
          break;
       case TCirkaDato:
          temp->CirkaDato.push_back(e);
@@ -154,7 +159,6 @@ bool EventQueue::DoTick(Daisy& d) {
       return false;
    EventsOfDate *E = TheQueue.top();
    Nu = d.time;
-   cout <<Nu.hour()<<":00 "<< "("<< Nu.year() << "-" << Nu.month() << "-" << Nu.mday() << ")\n";
 
    if (Nu == E->GetDato()) { // har første elemente i køen samme dato så udfør
       E->Udfoer(d,*this);

@@ -20,8 +20,8 @@ struct Weather::Implementation
   double day_cycle;
   const double average;		// Average temperature at bottom [C]
   const double amplitude;	// Variation in bottom temperature [C]
-  const double omega;		// Period length for above [ rad / day]
-  const double omega_offset;	// Period start for above [rad]
+  const double omega;		// Length of year [ rad / yday]
+  const double max_Ta_yday;	// Warmest day in the year [yday]
   Implementation (const AttributeList& al)
     : Latitude (al.number ("Latitude")),
       DryDeposit (al.alist ("DryDeposit")),
@@ -35,7 +35,7 @@ struct Weather::Implementation
       average (al.number ("average")),
       amplitude (al.number ("amplitude")),
       omega (al.number ("omega")),
-      omega_offset (al.number ("omega_offset"))
+      max_Ta_yday (al.number ("max_Ta_yday"))
     { }
 };
 
@@ -197,8 +197,8 @@ Weather::omega () const
 { return impl.omega; }
 
 double
-Weather::omega_offset () const
-{ return impl.omega_offset; }
+Weather::max_Ta_yday () const
+{ return impl.max_Ta_yday; }
 
 
 void
@@ -249,8 +249,8 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("amplitude", 8.5);
   syntax.add ("omega", Syntax::Number, Syntax::Const);
   alist.add ("omega", 2.0 * M_PI / 365.0);
-  syntax.add ("omega_offset", Syntax::Number, Syntax::Const);
-  alist.add ("omega_offset", -209.0);
+  syntax.add ("max_Ta_yday", Syntax::Number, Syntax::Const);
+  alist.add ("max_Ta_yday", 209.0);
 
   // Logs.
   syntax.add ("hourly_air_temperature", Syntax::Number, Syntax::LogOnly);

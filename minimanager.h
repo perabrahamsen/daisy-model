@@ -27,4 +27,5 @@ public:
   ~MiniManager ()
   {if(EQ) delete EQ; }
 };
+
 #endif

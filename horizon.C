@@ -268,11 +268,11 @@ Horizon::Implementation::rho_soil_particles ()
 double 
 Horizon::Implementation::weight (const AttributeList& al, string name)
 {
-  return al.number (name) / (  al.number ("clay")
-			       + al.number ("silt")
-			       + al.number ("fine_sand")
-			       + al.number ("coarse_sand")
-			       + al.number ("humus"));
+  return al.number (name) / (al.number ("clay")
+			     + al.number ("silt")
+			     + al.number ("fine_sand")
+			     + al.number ("coarse_sand")
+			     + al.number ("humus"));
 }
 
 Horizon::Implementation::Implementation (const AttributeList& al)

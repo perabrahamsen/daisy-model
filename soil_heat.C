@@ -219,12 +219,12 @@ SoilHeat::Implementation::bottom (const Time& time,
   const double average = weather.average ();
   const double amplitude = weather.amplitude (); 
   const double omega = weather.omega (); 
-  const double omega_offset = weather.omega_offset (); 
+  const double max_Ta_yday = weather.max_Ta_yday (); 
 
   return average 
     + amplitude 
     * exp (delay)
-    * cos (omega * time.yday () + omega_offset + delay);
+    * cos (omega * (time.yday () - max_Ta_yday) + delay);
 }
 
 bool

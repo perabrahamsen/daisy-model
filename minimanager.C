@@ -3,7 +3,7 @@
 #include "syntax.h"
 #include "minimanager.h"
 
-bool MiniManager::check (Daisy&) const
+bool MiniManager::check (Daisy& ) const
 {
     // Convention: MiniManager::MiniManager will not
     // create an EQ if there is something wrong with
@@ -44,13 +44,15 @@ Event::EventType EventType(const string& s) {
 }
 
 MiniManager::MiniManager (const AttributeList& alist) 
-  : Action (alist.name ("type")){
+  : Action (alist.name ("type"))
+{
   vector<AttributeList*> actions =  alist.alist_sequence ("Action");
   vector<Event *> events(actions.size());
   Event* e;
   bool StartDefined=false, EndDefined=false, error = false;
   Time Start(1,1,1,0), Slut(1,1,1,0);
 
+  EQ = 0;
   for (unsigned int i = 0; i < actions.size () ; i++) events[i] = 0;
     // Define the events
   for (unsigned int i = 0; (i < actions.size ()) && !error ; i++)
@@ -64,7 +66,7 @@ MiniManager::MiniManager (const AttributeList& alist)
         int id = actions[i]->integer("Id");
 
         // events must come in squence
-        if (static_cast <int> (i+1) != id)
+        if (i+1 != id)
            error = true;
         else {
            switch(EventType(type)) {
@@ -73,9 +75,10 @@ MiniManager::MiniManager (const AttributeList& alist)
                     error=true;
                  else {
                     StartDefined=true;
-                    if (0 != (e=(Event*)StartEvent::create(actions[i]->alist("Params"))))
+                    if (0 == (e=(Event*)StartEvent::create(actions[i]->alist("Params")))) {
                        error=true;
-                    else {
+                       // cout << "Error: StartEvent\n";
+                    } else {
                        events[i] = e;
                        if (actions[i]->alist("Time").name("Type") == string("Abs"))
                           Start  = actions[i]->alist("Time").time("Dato");
@@ -89,9 +92,10 @@ MiniManager::MiniManager (const AttributeList& alist)
                     error=true;
                  else {
                     EndDefined=true;
-                    if (0 != (e=(Event*)EndEvent::create(actions[i]->alist("Params"))))
+                    if (0 == (e=(Event*)EndEvent::create(actions[i]->alist("Params")))) {
+                       // cout << "Error: EndEvent\n";
                        error=true;
-                    else
+                    } else
                        events[i] = e;
                        if (actions[i]->alist("Time").name("Type") == string("Abs"))
                           Slut  = actions[i]->alist("Time").time("Dato");
@@ -101,45 +105,58 @@ MiniManager::MiniManager (const AttributeList& alist)
                  break;
               case Event::sow:
                  // TODO: if sowevent has a "Model" add a ModelIrrigate event
-                 if (0 != (e=(Event*)SowEvent::create(actions[i]->alist("Params"))))
+                 if (0 == (e=(Event*)SowEvent::create(actions[i]->alist("Params")))) {
                     error=true;
-                 else
+                    // cout << "Error: SowEvent\n";
+
+                 } else
                     events[i] = e;
                  break;
               case Event::harvest:
-                 if (0 != (e=(Event*)HarvestEvent::create(actions[i]->alist("Params"))))
+                 if (0 == (e=(Event*)HarvestEvent::create(actions[i]->alist("Params")))) {
                     error=true;
-                 else
+                    // cout << "Error: HarvestEvent\n";
+
+                 } else
                     events[i] = e;
                  break;
               case Event::Funcharvest:
-                 if (0 != (e=(Event*)FuncHarvestEvent::create(actions[i]->alist("Params"))))
+                 if (0 == (e=(Event*)FuncHarvestEvent::create(actions[i]->alist("Params")))) {
                     error=true;
-                 else
+                    // cout << "Error: FuncHarvestEvent\n";
+
+                 } else
                     events[i] = e;
                  break;
               case Event::tillage:
-                 if (0 != (e=(Event*)TillageEvent::create(actions[i]->alist("Params"))))
+                 if (0 == (e=(Event*)TillageEvent::create(actions[i]->alist("Params")))) {
                     error=true;
-                 else
+                    // cout << "Error: TillageEvent\n";
+                 } else
                     events[i] = e;
                  break;
               case Event::fertilize:
-                 if (0 != (e=(Event*)FertilizeEvent::create(actions[i]->alist("Params"))))
+                 if (0 == (e=(Event*)FertilizeEvent::create(actions[i]->alist("Params")))) {
                     error=true;
-                 else
+                    // cout << "Error: FertilizeEvent\n";
+
+                 } else
                     events[i] = e;
                  break;
               case Event::irrigate:
-                 if (0 != (e=(Event*)IrrigateEvent::create(actions[i]->alist("Params"))))
+                 if (0 == (e=(Event*)IrrigateEvent::create(actions[i]->alist("Params")))) {
+                    // cout << "Error: IrrigateEvent\n";
+
                     error=true;
-                 else
+                 } else
                     events[i] = e;
                  break;
               case Event::undefined:
-                 error=true;
+                 // cout << "Error: Undefined Event\n";
+		error=true;
                  break;
 	   case Event::modelirrigate:
+	     // TODO
 	     break;
            } // switch
         }
@@ -182,7 +199,9 @@ MiniManager::MiniManager (const AttributeList& alist)
            unsigned id = a.integer("Id");
            // unsigned y  = a.integer("Year");
            // unsigned no = a.integer("NoInYear");
-           assert((id <= actions.size ())&& actions[i]->name("Type")== string("Sowing"));
+           assert(id <= actions.size ());
+           // cout << actions[i]->name("Type") << i << " "<< id-1<<"\n";
+           assert(actions[id-1]->name("Type")== string("Sowing"));
            ((FuncHarvestEvent*)events[i])->SetStage(a.number("DevelopmentStage"));
            ((FuncHarvestEvent*)events[i])->SetSowEvent((SowEvent*)events[id-1]);
            ((SowEvent*)events[id-1])->AddFuncHarvest(events[i]);

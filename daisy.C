@@ -154,6 +154,7 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Library::load_syntax (syntax, alist);
 
+  syntax.add ("description", Syntax::String, Syntax::Optional);
   syntax.add ("output", Librarian<Log>::library (),
 	      Syntax::Const, Syntax::Sequence);
   syntax.add ("input", Librarian<Parser>::library (), Syntax::Optional, 

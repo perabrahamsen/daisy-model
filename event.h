@@ -59,10 +59,10 @@ public:
 class FertilizeEvent : Event {
    string fertilizer;
    int ammount;
-   AttributeList& am;
+   // AttributeList& am;
 
-   FertilizeEvent(string& f,int amm):fertilizer(f),ammount(amm),
-                                     am(AM::library().lookup(f)){};
+   FertilizeEvent(string& f,int amm):fertilizer(f),ammount(amm)/*,
+                                     am(AM::library().lookup(f))*/{};
 public:
    static FertilizeEvent* create(AttributeList &al);
    void Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ);
@@ -145,7 +145,7 @@ class SowEvent : Event {
    EventList* RelativTilUdviklingsTrin;
    HarvestEvent* harvest;
    Event* ModelIrr;
-   SowEvent(string& , string& crop, AttributeList &ca): Crop(crop),CropAttributes(ca){RelativTilUdviklingsTrin = new EventList;};
+   SowEvent(string&, string& crop, AttributeList &ca): Crop(crop),CropAttributes(ca),harvest(0){RelativTilUdviklingsTrin = new EventList;};
 public:
    static SowEvent* create(AttributeList &al);
    void Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ);

@@ -334,6 +334,7 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
+	cp cdaisy.h $(HOME)/.public_ftp/daisy/
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy/
 

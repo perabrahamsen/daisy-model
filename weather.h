@@ -56,7 +56,7 @@ public:
   double average () const;
   double amplitude () const;
   double omega () const;
-  double omega_offset () const;
+  double max_Ta_yday () const;
 
   // Create and Destroy.
 protected:
