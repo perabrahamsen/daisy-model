@@ -208,7 +208,8 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = action_repeat.C column_inorganic.C  vegetation_permanent.C \
+MODELS = action_fertilize.C \
+	action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
 	action_crop.C groundwater_lysimeter.C select_min.C \
@@ -311,7 +312,7 @@ all:	$(EXECUTABLES)
 
 # Create the main executable.
 #
-daisy${EXT}:	main${OBJ} action_fertilize.o daisy.so
+daisy${EXT}:	main${OBJ} daisy.so
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.
