@@ -1575,17 +1575,16 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   vector<AttributeList*> DOM;
   alist.add ("dom", DOM);
 
-  PLF empty;
   syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
 	      Syntax::Const,
 	      "Default heat factor, used if not specified by OM pool.");
-  alist.add ("heat_factor", empty);
+  alist.add ("heat_factor", PLF::empty ());
   syntax.add ("water_factor", "cm", Syntax::None (), Check::non_negative (),
 	      Syntax::Const, "\
 Default water potential factor, used if not specified by OM pool.\n\
 If the PLF is empty, a build-in PLF of pF will be used instead.\n\
 It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
-  alist.add ("water_factor", empty);
+  alist.add ("water_factor", PLF::empty ());
   syntax.add ("ClayOM", Librarian<ClayOM>::library (), "Clay effect model.");
   AttributeList clay_alist;
   clay_alist.add ("type", "old");

@@ -236,14 +236,13 @@ You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
 		Syntax::OptionalConst,
 		"How fast the solute is being decomposed in the soil.\n\
 You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
-    PLF empty;
     syntax.add ("decompose_heat_factor", "dg C", Syntax::None (),
 		Syntax::Const, "Heat factor on decomposition.");
-    alist.add ("decompose_heat_factor", empty);
+    alist.add ("decompose_heat_factor", PLF::empty ());
     syntax.add ("decompose_water_factor", "cm", Syntax::None (),
 		Syntax::Const,
 		"Water potential factor on decomposition.");
-    alist.add ("decompose_water_factor", empty);
+    alist.add ("decompose_water_factor", PLF::empty ());
     syntax.add ("decompose_CO2_factor", "g CO2-C/cm^3", Syntax::None (),
 		Syntax::Const,
 		"CO2 development factor on decomposition.");

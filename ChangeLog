@@ -1,4 +1,32 @@
+2003-02-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h (tick):
+	Merged organic and inorganic versions.
+	* column_inorganic.C,  column_std.C (tick): Update callers.
+
+	* plf.C (empty): New utility.
+	* canopy_simple.C (load_syntax): Use it.
+	* organic_matter.C (load_syntax): Ditto.
+	* nitrification_solute.C (NitrificationSoluteSyntax): 
+	* nitrification_soil.C (NitrificationSoilSyntax): 
+	* denitrification.C (load_syntax): Ditto.
+	* column_std.C (ColumnStandardSyntax): Ditto.
+	* chemical_std.C (ChemicalStandardSyntax): Ditto.
+
+	* plf.C (operator +): Spelling error.
+
+	* vegetation_permanent.C (tick): Add newly created litter.
+
 2003-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* production.C (tick): Make it more robust.
+
+	* syntax.C (type_name): Removed static assertion.
+
+	* lib/wwheat.dai ("Winter Wheat"): Fixed Partit so shoot < 1.0.
+	("Winter Wheat; Eest"): Ditto.
+	* lib/pea.dai ("Pea"): Fix Patit Stem so shoot < 1.0.
+	* lib/maize.dai ("Ikuwala Maize"): Ditto.
 
 	* partition.C (operator()): Added checks.
 

@@ -68,16 +68,9 @@ public:
   // Simulation
 public:
   virtual void tick (const Time&, const Bioclimate&, const Soil&,
-		     OrganicMatter&, const SoilHeat&, const SoilWater&,
+		     OrganicMatter *const, const SoilHeat&, const SoilWater&,
 		     // Allow plants to grow (hourly).
-		     SoilNH4&, SoilNO3&, 
-		     double& residuals_DM,
-		     double& residuals_N_top, double& residuals_C_top,
-		     vector<double>& residuals_N_soil,
-		     vector<double>& residuals_C_soil,
-		     Treelog&) = 0;
-  virtual void tick (const Time&, const Bioclimate&, const Soil&,
-		     const SoilHeat&, const SoilWater&, 
+		     SoilNH4 *const, SoilNO3 *const, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,
 		     vector<double>& residuals_N_soil,

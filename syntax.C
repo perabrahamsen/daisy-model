@@ -313,10 +313,7 @@ static const char * const type_names[] =
 
 const char* 
 Syntax::type_name (type t)
-{
-  daisy_assert (sizeof (type_names) / sizeof  (const char*) == Error + 2);
-  return type_names[t];
-}
+{ return type_names[t]; }
     
 Syntax::type
 Syntax::type_number (const char* name)

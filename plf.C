@@ -382,7 +382,7 @@ PLF::operator += (const PLF& plf)
     }
   if (plf.impl.x.size () == 0)
     {
-      // If theother is empty, use this one.
+      // If the other is empty, use this one.
       return;
     }
 
@@ -419,6 +419,12 @@ PLF::operator += (const PLF& plf)
 
   // We now store the result in this plf.
   impl = result.impl;
+}
+const PLF& 
+PLF::empty ()			// An empty PLF.
+{ 
+  static const PLF none;
+  return none;
 }
 
 void

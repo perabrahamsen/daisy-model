@@ -272,8 +272,13 @@ Production::tick (const double AirT, const double SoilT,
     {
       if (WLeaf > 0.0)
         DdLeafCnc = NLeaf/WLeaf;
-      else
+      else if (WStem > 0.0)
         DdLeafCnc = NStem/WStem;
+      else 
+	{
+	  daisy_assert (DeadWLeaf < 1e-10);
+	  DdLeafCnc = 1.0;
+	}
     }
   else
     {
@@ -281,8 +286,13 @@ Production::tick (const double AirT, const double SoilT,
         DdLeafCnc = (NLeaf / WLeaf 
 		     - nitrogen.NfLeafCnc (DS))
          * ( 1.0 - nitrogen.TLLeafEff (DS)) +  nitrogen.NfLeafCnc (DS);
-      else
+      else if (WStem > 0.0)
         DdLeafCnc = NStem/WStem;
+      else
+	{
+	  daisy_assert (DeadWLeaf < 1e-10);
+	  DdLeafCnc = 1.0;
+	}
     }
 
   daisy_assert (DdLeafCnc >= 0.0);

@@ -191,13 +191,12 @@ Set this to true to enable nitrification in the groundwater.");
 		  "Half saturation constant.");
       syntax.add ("k_10", "g N/cm^3/h", Check::non_negative (), Syntax::Const,
 		  "Max rate.");
-      PLF empty;
       syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
 		  "Heat factor.");
-      alist.add ("heat_factor", empty);
+      alist.add ("heat_factor", PLF::empty ());
       syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
 		  "Water potential factor.");
-      alist.add ("water_factor", empty);
+      alist.add ("water_factor", PLF::empty ());
       Librarian<Nitrification>::add_type ("soil", alist, syntax, &make);
     }
 } NitrificationSoil_syntax;

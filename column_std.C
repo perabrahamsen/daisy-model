@@ -378,8 +378,8 @@ ColumnStandard::tick (Treelog& out,
 
   bioclimate.tick (surface, my_weather, 
 		   vegetation, soil, soil_water, soil_heat, out);
-  vegetation.tick (time, bioclimate, soil, organic_matter, 
-		   soil_heat, soil_water, soil_NH4, soil_NO3, 
+  vegetation.tick (time, bioclimate, soil, &organic_matter, 
+		   soil_heat, soil_water, &soil_NH4, &soil_NO3, 
 		   residuals_DM, residuals_N_top, residuals_C_top, 
 		   residuals_N_soil, residuals_C_soil, out);
   organic_matter.tick (soil, soil_water, soil_heat, 
@@ -533,10 +533,9 @@ The organic matter in the soil and on the surface.",
     nitrification_alist.add ("k", 5.0e-5); // [g N/cm^3]
     nitrification_alist.add ("active_underground", false);
     nitrification_alist.add ("active_groundwater", false);
-    PLF empty;
-    nitrification_alist.add ("heat_factor", empty);
-    nitrification_alist.add ("water_factor", empty);
-    nitrification_alist.add ("clay_factor", empty);
+    nitrification_alist.add ("heat_factor", PLF::empty ());
+    nitrification_alist.add ("water_factor", PLF::empty ());
+    nitrification_alist.add ("clay_factor", PLF::empty ());
 
     alist.add ("Nitrification", nitrification_alist);
     syntax.add_submodule ("Denitrification", alist, Syntax::State, "\

@@ -76,20 +76,10 @@ struct VegetationCrops : public Vegetation
   void tick (const Time& time,
 	     const Bioclimate& bioclimate,
 	     const Soil& soil,
-	     OrganicMatter& organic_matter,
+	     OrganicMatter *const organic_matter,
 	     const SoilHeat& soil_heat,
 	     const SoilWater& soil_water,
-	     SoilNH4& soil_NH4, SoilNO3& soil_NO3, 
-	     double& residuals_DM,
-	     double& residuals_N_top, double& residuals_C_top,
-	     vector<double>& residuals_N_soil,
-	     vector<double>& residuals_C_soil,
-	     Treelog&);
-  void tick (const Time& time,
-	     const Bioclimate& bioclimate,
-	     const Soil& soil,
-	     const SoilHeat& soil_heat,
-	     const SoilWater& soil_water, 
+	     SoilNH4 *const soil_NH4, SoilNO3 *const soil_NO3, 
 	     double& residuals_DM,
 	     double& residuals_N_top, double& residuals_C_top,
 	     vector<double>& residuals_N_soil,
@@ -190,11 +180,10 @@ void
 VegetationCrops::tick (const Time& time,
 		       const Bioclimate& bioclimate,
 		       const Soil& soil,
-		       OrganicMatter& organic_matter,
+		       OrganicMatter *const organic_matter,
 		       const SoilHeat& soil_heat,
 		       const SoilWater& soil_water,
-		       SoilNH4& soil_NH4,
-		       SoilNO3& soil_NO3,
+		       SoilNH4 *const soil_NH4, SoilNO3 *const soil_NO3,
 		       double& residuals_DM,
 		       double& residuals_N_top, double& residuals_C_top,
 		       vector<double>& residuals_N_soil,
@@ -206,42 +195,8 @@ VegetationCrops::tick (const Time& time,
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->tick (time, bioclimate, soil, &organic_matter, 
-		     soil_heat, soil_water, &soil_NH4, &soil_NO3, 
-		     residuals_DM, residuals_N_top, residuals_C_top,
-		     residuals_N_soil, residuals_C_soil, msg);
-    }
-
-  // Make sure the crop which took first this time will be last next.
-  if (crops.size () > 1U)
-    {
-      crops.push_back (crops.front ());
-      crops.pop_front ();
-    }
-
-  // Reset canopy structure.
-  reset_canopy_structure (msg);
-}
-
-void 
-VegetationCrops::tick (const Time& time,
-		       const Bioclimate& bioclimate,
-		       const Soil& soil,
-		       const SoilHeat& soil_heat,
-		       const SoilWater& soil_water,
-		       double& residuals_DM,
-		       double& residuals_N_top, double& residuals_C_top,
-		       vector<double>& residuals_N_soil,
-		       vector<double>& residuals_C_soil,
-		       Treelog& msg)
-{
-  // Uptake and convertion of matter.
-  for (CropList::iterator crop = crops.begin(); 
-       crop != crops.end(); 
-       crop++)
-    {
-      (*crop)->tick (time, bioclimate, soil, NULL, 
-		     soil_heat, soil_water, NULL, NULL, 
+      (*crop)->tick (time, bioclimate, soil, organic_matter, 
+		     soil_heat, soil_water, soil_NH4, soil_NO3, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
 		     residuals_N_soil, residuals_C_soil, msg);
     }

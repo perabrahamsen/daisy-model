@@ -42,8 +42,6 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "CanopySimple");
   alist.add ("description", "Simple canopy model.");
 
-  static const PLF empty_plf;
-
   // Parameters.
   syntax.add ("PARref", Syntax::None (), Syntax::Const,
 	      "PAR reflectance.");
@@ -79,7 +77,7 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("CAI", 0.0);
   syntax.add ("LAIvsH", "cm", "m^2/m^2", Syntax::State,
 	      "Accumulated Leaf Area Index at Height.");
-  alist.add ("LAIvsH", empty_plf);
+  alist.add ("LAIvsH", PLF::empty ());
 }
 
 CanopySimple::CanopySimple (const AttributeList& vl)

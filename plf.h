@@ -68,6 +68,7 @@ public:
   bool operator == (const PLF&) const;
 
   // Create and Destroy.
+  static const PLF& empty ();	// An empty PLF.
   void clear ();
   void add (double, double);
   void operator += (const PLF&);

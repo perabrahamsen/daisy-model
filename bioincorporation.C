@@ -71,15 +71,17 @@ bool
 Bioincorporation::Implementation::am_compare (const AM* a, const AM* b)
 {
   const double a_top_C = a->top_C ();
+  daisy_assert (a_top_C >= 0);
   if (a_top_C > 0)
     {
       const double b_top_C = b->top_C ();
+      daisy_assert (b_top_C >= 0);
       if (b_top_C == 0.0)
 	return true;
       
       const double a_top_N = a->top_N ();
-      const double b_top_N = b->top_N ();
       daisy_assert (a_top_N > 0.0);
+      const double b_top_N = b->top_N ();
       daisy_assert (b_top_N > 0.0);
       return a_top_C / a_top_N < b_top_C / b_top_N;
     }

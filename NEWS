@@ -14,6 +14,10 @@ release.
 
 * 2.44
 
+** Bug fix for permanent vegetation.
+
+The litter was not put back to the system.
+
 ** You can now overwrite individual parameters in lists of submodels
 
 For example, if you want to create a version pig_slurry (form
@@ -37,7 +41,17 @@ The last empty set of parantheses in the definition of my_slurry is
 needed, otherwise you would not have got a copy of the third pool from
 pig_slurry. 
 
+** Fixed assimilate partioning for several crop paramterizations.
+
+Specifically "Winter Wheat" and varieties, "Pea" and "Ikuwala Maize".
+
+This might cause some changes in yields, possibly apart from
+"Ikuwala Maize" these changes should be insignificant.
+
 ** New checks and better descriptions for many parameters.
+
+As these checks found errors in several crops, you need to update your
+lib files.
 
 * 2.43
 

@@ -47,10 +47,10 @@ Partition::operator() (double DS, double current_RSR,
       f_SOrg = 0.0;
     }
   daisy_assert (approximate (f_Root + f_Leaf + f_Stem + f_SOrg, 1.0));
-  daisy_assert (bound (0.0, f_Leaf, 1.0));
-  daisy_assert (bound (0.0, f_Stem, 1.0));
-  daisy_assert (bound (0.0, f_Root, 1.0));
-  daisy_assert (bound (0.0, f_SOrg, 1.0));
+  daisy_assert (0.0 <= f_Leaf && f_Leaf <= 1.0);
+  daisy_assert (0.0 <= f_Stem && f_Stem <= 1.0);
+  daisy_assert (0.0 <= f_Root && f_Root <= 1.0);
+  daisy_assert (0.0 <= f_SOrg && f_SOrg <= 1.0);
 }
 
 static bool check_alist (const AttributeList& al, Treelog& err)
