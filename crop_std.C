@@ -307,25 +307,23 @@ CropStandard::harvest (const string& column_name,
   const double WSOrg = production.WSOrg;
   const double WRoot = production.WRoot;
   const double WDead = production.WDead;
+#if 0
   const double WCrop = WStem + WLeaf + WSOrg + WDead + WRoot;
+#endif
   const double NStem = production.NStem;
   const double NLeaf = production.NLeaf;
   const double NSOrg = production.NSOrg;
   const double NRoot = production.NRoot;
   const double NDead = production.NDead;
+#if 0
   const double NCrop = production.NCrop;
-  double Stem_Conc;
-  double Leaf_Conc;
-  double SOrg_Conc;
-  double Dead_Conc;
-  double Root_Conc;
-  double Crop_Conc;
-  if (WStem > 0.0) Stem_Conc = NStem / WStem; else Stem_Conc = 0.0;
-  if (WLeaf > 0.0) Leaf_Conc = NLeaf / WLeaf; else Leaf_Conc = 0.0;
-  if (WSOrg > 0.0) SOrg_Conc = NSOrg / WSOrg; else SOrg_Conc = 0.0;
-  if (WDead > 0.0) Dead_Conc = NDead / WDead; else Dead_Conc = 0.0;
-  if (WRoot > 0.0) Root_Conc = NRoot / WRoot; else Root_Conc = 0.0;
-  if (WCrop > 0.0) Crop_Conc = NCrop / WCrop; else Crop_Conc = 0.0;
+  const double Stem_Conc = (WStem > 0.0) ? (NStem / WStem) : 0.0;
+  const double Leaf_Conc = (WLeaf > 0.0) ? (NLeaf / WLeaf) : 0.0;
+  const double SOrg_Conc = (WSOrg > 0.0) ? (NSOrg / WSOrg) : 0.0;
+  const double Dead_Conc = (WDead > 0.0) ? (NDead / WDead) : 0.0;
+  const double Root_Conc = (WRoot > 0.0) ? (NRoot / WRoot) : 0.0;
+  const double Crop_Conc = (WCrop > 0.0) ? (NCrop / WCrop) : 0.0;
+#endif
   const double C_C_Stem = DM_to_C_factor (production.E_Stem);
   const double C_C_Leaf = DM_to_C_factor (production.E_Leaf);
   const double C_C_Dead = C_C_Leaf;
@@ -380,11 +378,15 @@ CropStandard::harvest (const string& column_name,
   const double SOrg_N_Yield = sorg_harvest_frac * sorg_harvest * NSOrg;
 
   // Part of economic yield removed at harvest
-  const double WEYRm = harvesting.EconomicYield_W * SOrg_W_Yield; // W is used for both
-  const double NEYRm = harvesting.EconomicYield_N * SOrg_N_Yield; // DM and C.
-  const double CEYRm = harvesting.EconomicYield_W * SOrg_C_Yield;
+  const double WEYRm
+    = harvesting.EconomicYield_W * SOrg_W_Yield; // W is used for both
+  const double NEYRm
+    = harvesting.EconomicYield_N * SOrg_N_Yield; // DM and C.
+  const double CEYRm
+    = harvesting.EconomicYield_W * SOrg_C_Yield;
 
-  const double Crop_N_Yield = Stem_N_Yield + Dead_N_Yield + Leaf_N_Yield + NEYRm;
+  const double Crop_N_Yield
+    = Stem_N_Yield + Dead_N_Yield + Leaf_N_Yield + NEYRm;
 
   double Stem_W_Loss = (1.0 - stem_harvest_frac) * stem_harvest * WStem;
   double Dead_W_Loss = (1.0 - stem_harvest_frac) * dead_harvest * WDead;
@@ -448,37 +450,39 @@ CropStandard::harvest (const string& column_name,
                      - (Stem_N_Yield+Leaf_N_Yield+NEYRm+Dead_N_Yield)
                      - (Stem_N_Loss +Leaf_N_Loss +SOrg_N_Loss +Dead_N_Loss );
   double New_Crop_Conc;
+  double New_Stem_Conc = (production.WStem > 0.0) 
+    ? (production.NStem / production.WStem) : 0.0;
+  double New_Leaf_Conc = (production.WLeaf > 0.0) 
+    ? (production.NLeaf / production.WLeaf) : 0.0;
+  double New_SOrg_Conc = (production.WSOrg > 0.0) 
+    ? (production.NSOrg / production.WSOrg) : 0.0;
+  double New_Dead_Conc = (production.WDead > 0.0) 
+    ? (production.NDead / production.WDead) : 0.0;
+  double New_Root_Conc = (production.WRoot > 0.0) 
+    ? (production.NRoot / production.WRoot) : 0.0;
 #endif
-  double New_Stem_Conc;
-  double New_Leaf_Conc;
-  double New_SOrg_Conc;
-  double New_Dead_Conc;
-  double New_Root_Conc;
-  if (production.WStem > 0.0) New_Stem_Conc = production.NStem / production.WStem;
-    else New_Stem_Conc = 0.0;
-  if (production.WLeaf > 0.0) New_Leaf_Conc = production.NLeaf / production.WLeaf;
-    else New_Leaf_Conc = 0.0;
-  if (production.WSOrg > 0.0) New_SOrg_Conc = production.NSOrg / production.WSOrg;
-    else New_SOrg_Conc = 0.0;
-  if (production.WDead > 0.0) New_Dead_Conc = production.NDead / production.WDead;
-    else New_Dead_Conc = 0.0;
-  if (production.WRoot > 0.0) New_Root_Conc = production.NRoot / production.WRoot;
-    else New_Root_Conc = 0.0;
 
-
+#if 0
   // Part of economic yield left in the field at harvest
-  //const double WEYLf = harvesting.EconomicYield_W * (1 - sorg_harvest_frac) * WSOrg;
+  const double WEYLf = harvesting.EconomicYield_W
+    * (1 - sorg_harvest_frac) * WSOrg;
   // Part of non economic yield removed from the field at harvest
-  //const double WRsRm = (1 - harvesting.EconomicYield_W) * sorg_harvest_frac * WSOrg;
+  const double WRsRm = (1 - harvesting.EconomicYield_W)
+    * sorg_harvest_frac * WSOrg;
   // Part of non economic yield left in the field at harvest
-  //const double WRsLf = (1 - harvesting.EconomicYield_W) * (1 - sorg_harvest_frac) * WSOrg;
+  const double WRsLf = (1 - harvesting.EconomicYield_W) 
+    * (1 - sorg_harvest_frac) * WSOrg;
   // Part of economic yield removed at harvest
   // Part of economic yield left in the field at harvest
-  //const double NEYLf = harvesting.EconomicYield_N * (1 - sorg_harvest_frac) * NSOrg;
+  const double NEYLf = harvesting.EconomicYield_N
+    * (1 - sorg_harvest_frac) * NSOrg;
   // Part of non economic yield removed from the field at harvest
-  //const double NRsRm = (1 - harvesting.EconomicYield_N) * sorg_harvest_frac * NSOrg;
+  const double NRsRm = (1 - harvesting.EconomicYield_N)
+    * sorg_harvest_frac * NSOrg;
   // Part of non economic yield left in the field at harvest
-  //const double NRsLf = (1 - harvesting.EconomicYield_N) * (1 - sorg_harvest_frac) * NSOrg;
+  const double NRsLf = (1 - harvesting.EconomicYield_N)
+    * (1 - sorg_harvest_frac) * NSOrg;
+#endif
 
   if (!kill_off && DS < DSmax && stub_length > 0.0)
     {
@@ -547,6 +551,7 @@ CropStandard::harvest (const string& column_name,
 	  production.AM_leaf = NULL;
 	}
     }
+
   // Add crop remains to the soil.
   if (Stem_W_Loss > 0.0)
     {

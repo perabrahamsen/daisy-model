@@ -145,7 +145,7 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
     rate = min (turnover_rate * abiotic_factor, 0.1);
   double N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
 
-  assert (finite(rate));
+  assert (finite (rate));
   assert (finite (N_need));
   
   if (N_need > N_soil - N_used && N[i] > 0.0)
@@ -170,6 +170,12 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
   C[i] *= (1.0 - rate);
   N[i] *= (1.0 - rate);
 
+  if (som[where]->C[i] < 0.0)
+    {
+      CERR << "C[i] = " << C[i] << "\n"
+	   << "rate = " << rate << "\n"
+	   << "som[where]->C[i]" << som[where]->C[i] << "\n";
+    }
   assert (som[where]->C[i] >= 0.0);
   assert (C[i] >= 0.0);
   assert (N[i] >= 0.0);

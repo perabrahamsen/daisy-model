@@ -281,7 +281,7 @@ COMPONENTS = rootdens.C select.C average.C mactrans.C macro.C \
 # Submodels are combined models and components.
 #
 SUBMODELS = photosynthesis.C crpn.C vernalization.C \
-	partition.C crpaux.C development.C production.C \
+	partition.C development.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
 	ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
 	organic_matter.C nitrification.C denitrification.C soil_heat.C \
@@ -515,6 +515,7 @@ dist:	cvs
 	sed -e 's/version [1-9]\.[0-9][0-9]/version $(TAG)/' \
 		< $(WWWINDEX).old > $(WWWINDEX)
 	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
+foo:
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib; $(MAKE) dist)
@@ -651,8 +652,6 @@ vernalization${OBJ}: vernalization.C vernalization.h submodel.h log.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h
 partition${OBJ}: partition.C partition.h plf.h submodel.h syntax.h \
  common.h treelog.h alist.h
-crpaux${OBJ}: crpaux.C crpaux.h log.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h submodel.h
 development${OBJ}: development.C development.h production.h \
  vernalization.h plf.h log.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h message.h submodel.h

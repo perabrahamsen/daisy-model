@@ -82,8 +82,12 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 		= approximate (delta_water, water_in_above) 
 		? 1.0
 		: delta_water / water_in_above;
-	      assert (water_fraction >= 0.0);
-	      assert (water_fraction <= 1.0);
+	      if (water_fraction < 0.0 || water_fraction > 1.0)
+		{
+		  CERR << "BUG: water fraction from macropore = " 
+		       << water_fraction << "\n";
+		  set_bound (0.0, water_fraction, 1.0);
+		}
 
 	      // Matter stayes with the water.
 	      delta_matter = matter_in_above * water_fraction;

@@ -1,3 +1,9 @@
+2001-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (tick): Added debug information.
+
+	* mactrans_std.C (tick): Changed assertion to warning.
+
 2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.94 released.
