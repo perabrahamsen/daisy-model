@@ -9,11 +9,7 @@
 (input file "log.dai")
 
 ;; Weather data.
-(weather file "weather.clm"
-  (DryDeposit (NO3 1.1)			;[kg/ha/year]
-	      (NH4 2.2))
-  (WetDeposit (NO3 0.6)			;[ppm]
-	      (NH4 0.9)))
+(weather default "weather.dwf")
 
 ;; We have some very sandy soil.
 (defhorizon top default

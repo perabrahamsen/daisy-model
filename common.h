@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string>
 
-#ifndef __CYGWIN__
+#if !defined (__CYGWIN__)
 // Doesn't work under cygwin
 #define pow(x, y) (assert (x > 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))
@@ -21,7 +21,7 @@
 #define HANDLE_NAMESPACES
 
 #ifdef __GNUC__
-// Only egcs has a C++ safe <math.h>.
+// Only gcc has a C++ safe <math.h>.
 #include <math.h>
 #else
 #define exception _BUG_EXCPETION
@@ -39,7 +39,7 @@
 
 #ifdef __GNUC__
 
-// Unix doesn't have DLL keywords.
+// GCC doesn't have DLL keywords.
 #define EXPORT
 #define IMPORT
 
@@ -53,10 +53,6 @@
 
 // GNU doesn't mind unused global constants.
 #define GLOBAL_CONSTANT
-
-// Unix path names.
-#define PATH_SEPARATOR ":"
-#define DIRECTORY_SEPARATOR "/"
 
 #else
 
@@ -87,15 +83,22 @@
 
 #endif
 
-#ifndef __unix
+#if defined (__unix) 
+// Unix path names.
+#define PATH_SEPARATOR ":"
+#define DIRECTORY_SEPARATOR "/"
 
-// WinDOS doesn't have a useful stderr.
-#define USELESS_STDERR
+#else
 
 // WinDOS path names.
 #define PATH_SEPARATOR ";"
 #define DIRECTORY_SEPARATOR "\\"
 
+#endif
+
+#if !defined (__unix) && !defined (__CYGWIN__)
+// When running a pure DOS, don't use stderr.
+#define USELESS_STDERR
 #endif
 
 #include <stdexcept>

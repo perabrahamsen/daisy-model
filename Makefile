@@ -11,6 +11,7 @@
 #	hp	Create code for HP/UX / HP-PA.
 #	win32	Create code for Win32 / Pentium.
 #	cygwin	Create code for Cygwin / Pentium.
+#	mingw	Create code for Mingw / Pentium.
 
 # All makefiles should have these.
 #
@@ -21,17 +22,17 @@ MAKEFLAGS =
 #
 ifeq ($(OS),Windows_NT)
 	ifeq ($(OSTYPE),cygwin)
-		HOSTTYPE = cygwin
+#		HOSTTYPE = cygwin
+		HOSTTYPE = mingw
 	else
-#		HOSTTYPE = win32
-		HOSTTYPE = cygwin
+		HOSTTYPE = win32
 	endif
 endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-USE_OPTIMIZE = true
-#USE_OPTIMIZE = false
+#USE_OPTIMIZE = true
+USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
@@ -56,6 +57,9 @@ endif
 ifeq ($(HOSTTYPE),cygwin)
 	COMPILER = gcc
 endif
+ifeq ($(HOSTTYPE),mingw)
+	COMPILER = gcc
+endif
 
 # On SPARC platforms we trap mathematical exception with some assembler code.
 #
@@ -76,15 +80,16 @@ endif
 #
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),gcc)
+		OPTIMIZE = -O3 -ffast-math 
 		ifeq ($(HOSTTYPE),sun4)
 			OPTIMIZE = -O3 -ffast-math -fno-inline
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
-		else
-		ifeq ($(HOSTTYPE),cygwin)
-		OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
-		else
-		OPTIMIZE = -O3 -ffast-math 
 		endif
+		ifeq ($(HOSTTYPE),cygwin)
+		  OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
+		endif
+		ifeq ($(HOSTTYPE),mingw)
+		  OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
 		endif
 	endif
 endif
@@ -92,18 +97,23 @@ endif
 # Create the right compile command.
 #
 
-ifeq ($(HOSTTYPE),sun4)
-	REPO = -frepo -pipe
-	DEBUG = -g
-else
-#	REPO = -mno-cygwin
-	REPO =
-#	DEBUG = -g
-	DEBUG = 
-endif
-
 ifeq ($(COMPILER),gcc)
-	COMPILE = c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -Wmissing-prototypes $(DEBUG) $(REPO)
+	ifeq ($(HOSTTYPE),sun4)
+		OSFLAGS = -frepo -pipe
+		DEBUG = -g
+	endif
+	ifeq ($(HOSTTYPE),cygwin)
+		OSFLAGS =
+		DEBUG = 
+	endif
+	ifeq ($(HOSTTYPE),mingw)
+		OSFLAGS = -DMINGW -mno-cygwin \
+		          -I/home/mingw/include -L/home/mingw/lib
+		DEBUG =
+	endif
+	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
+		   -Wconversion -Wno-uninitialized -Wmissing-prototypes 
+	COMPILE = c++ $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
@@ -131,6 +141,9 @@ ifeq ($(HOSTTYPE),win32)
 	MATHLIB =
 endif
 ifeq ($(HOSTTYPE),cygwin)
+	MATHLIB =
+endif
+ifeq ($(HOSTTYPE),mingw)
 	MATHLIB =
 endif
 
@@ -162,7 +175,11 @@ else
 	ifeq ($(HOSTTYPE),cygwin)
 		EXT = .exe
 	else
-		EXT =
+		ifeq ($(HOSTTYPE),mingw)
+			EXT = .exe
+		else
+			EXT =
+		endif
 	endif
 endif
 

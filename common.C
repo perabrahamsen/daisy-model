@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <iostream>
 
-#ifdef CYGNUS_NO_CYGWIN
+#ifdef MINGW
 
 extern "C" {
 
