@@ -160,7 +160,7 @@ Time::tick_day (int days)
 
 void
 Time::tick_year (int years)
-{ impl.year += years; }
+{ impl.year += static_cast<short> (years); }
 
 // @ Convert.
 
