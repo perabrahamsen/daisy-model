@@ -191,6 +191,7 @@ USEUNIT("vernalization.C");
 USEUNIT("check.C");
 USEUNIT("check_range.C");
 USEUNIT("rootdens_PLF.C");
+USEUNIT("condition_weather.C");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 
