@@ -1,5 +1,9 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Select::method { current, sum, max, min, average }
+
+Use by summary.
+
 * FertOrgaNic
 
 ** Post excersizes and answers
@@ -187,31 +191,6 @@ Udbyg.
 * Parser & Printer.
 
 ** Don't order attributes when defining paramterizations.
-
-* Log table
-
-** Make it possible to create a small balance or summary
-
-(output ("N_balance"
-         (when daily)
-         (to -1 [m])
-         (balance (Ammonium (begin 1965 07 20) (end 2002 03 07))
-                  (Nitrogen (begin 1965 07 20) (end 2002 03 07))))
-
-# Ammonium balance for period 20-07-1965 to 07-03-2002
-#
-#            Mineralization:   200 kg N/ha
-#             Nitrification:  -120 kg N/ha
-#         Change in content:   -20 kg N/ha
-#              Plant uptake: -1000 kg N/ha
-#                     Input:  1400 kg N/ha
-#                   Leching:  -200 kg N/ha
-#                            -----
-#                   Balance:    60 kg N/ha
-
-Should they be part of log table?  Should they go to the end of the
-log files?  Should they all be written to a single file?  Or to
-standard output?
 
 ** Add long description for each column in a table log file.
 

@@ -564,17 +564,18 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	  tmp () << "No weather data for " << time.year () 
 		 << "-" << time.month ()
 		 << "-" << time.mday () << ":" << time.hour ();
-	  msg.debug (tmp.str ());
-	  msg.flush ();
-	  throw string (tmp.str ());
+	  msg.error (tmp.str ());
 	}
-      TmpStream tmp;
-      tmp () << "Using data from [" << missing_years[active_map]->to.from
-	     << "-" << missing_years[active_map]->to.to << "] for years ["
-	     << missing_years[active_map]->from.from << "-"
-	     << missing_years[active_map]->from.to << "]";
-      msg.message (tmp.str ());
-      initialized = false;
+      else
+	{
+	  TmpStream tmp;
+	  tmp () << "Using data from [" << missing_years[active_map]->to.from
+		 << "-" << missing_years[active_map]->to.to << "] for years ["
+		 << missing_years[active_map]->from.from << "-"
+		 << missing_years[active_map]->from.to << "]";
+	  msg.message (tmp.str ());
+	  initialized = false;
+	}
     }
 
   // Now and tomorrow.

@@ -47,11 +47,13 @@ private:
   const PLF heat_factor;
   const PLF water_factor;
   const PLF water_factor_fast;
+  const double redox_height;	// Chemical denitrification below this depth.
 
   // Log variable.
 private:
   std::vector<double> converted;
   std::vector<double> converted_fast;
+  std::vector<double> converted_redox;
   std::vector<double> potential;
   std::vector<double> potential_fast;
   

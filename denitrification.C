@@ -55,6 +55,7 @@ Denitrification::output (Log& log) const
 {
   output_variable (converted, log);
   output_variable (converted_fast, log);
+  output_variable (converted_redox, log);
   output_variable (potential, log);
   output_variable (potential_fast, log);
 }
@@ -66,6 +67,7 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
 {
   converted.erase (converted.begin (), converted.end ());
   converted_fast.erase (converted_fast.begin (), converted_fast.end ());
+  converted_redox.erase (converted_redox.begin (), converted_redox.end ());
   potential.erase (potential.begin (), potential.end ());
   potential_fast.erase (potential_fast.begin (), potential_fast.end ());
 
@@ -77,18 +79,18 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
 
   for (unsigned int i = 0; i < size; i++)
     {
-      const double CO2 = organic_matter.CO2 (i);
       const double CO2_fast = organic_matter.CO2_fast (i);
+      const double CO2_slow = organic_matter.CO2 (i) - CO2_fast;
       const double Theta = soil_water.Theta (i);
       const double Theta_sat = soil_water.Theta (soil, i, 0.0);
       const double Theta_fraction = Theta / Theta_sat;
-
+      const double NO3 = soil_NO3.M_left (i) / dt;
       const double T = soil_heat.T (i);
-      
+      const double height = soil.z (i);
       const double T_factor = (heat_factor.size () < 1)
 	? f_T (T)
 	: heat_factor (T);
-      const double pot = T_factor * alpha * CO2;
+      const double pot = T_factor * alpha * CO2_slow;
       const double w_factor = water_factor (Theta_fraction);
       const double rate = w_factor * pot;
 
@@ -96,8 +98,17 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
       const double w_factor_fast = water_factor_fast (Theta_fraction);
       const double rate_fast = w_factor_fast * pot_fast;
 
-      const double M = min (rate + rate_fast, K * soil_NO3.M_left (i) / dt);
-      converted.push_back (M);
+      const double M = min (rate + rate_fast, K * NO3);
+      if (redox_height <= 0 && height < redox_height)
+	{
+	  converted.push_back (NO3);
+	  converted_redox.push_back (NO3 - M);
+	}
+      else
+	{
+	  converted.push_back (M);
+	  converted_redox.push_back (0.0);
+	}
       converted_fast.push_back (M > rate ? M - rate : 0.0);
       potential.push_back (pot);
       potential_fast.push_back (pot_fast);
@@ -115,8 +126,8 @@ proportional to the CO2 development, as specified by the parameter\n\
 alpha, with a maximum rate specified by the parameter 'K'.  The\n\
 denitrification is also affected by temperature and water pressure.\n\
 Additional denitrification from CO2 produced from fast OM pools can\n\
-be triggered by alpha_fast.  This additional denitrification is still\n\
-limited by K.");
+be triggered by setting alpha_fast or water_factor_fast different.\n\
+This additional denitrification is still limited by K.");
   syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
 Set this flag to turn on denitrification below the root zone.");
   alist.add ("active_underground", false);
@@ -127,6 +138,8 @@ Clear this flag to turn off denitrification in groundwater.");
 	      "Amount of denitrification.");
   syntax.add ("converted_fast", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Additional denitrification due to turnover in fast pools.");
+  syntax.add ("converted_redox", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Additional denitrification due to chemical redox processes.");
   syntax.add ("potential", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Potential amount of denitrification at anarobic conditions.");
   syntax.add ("potential_fast", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -135,21 +148,23 @@ Clear this flag to turn off denitrification in groundwater.");
 Maximum fraction of nitrate converted at each time step.");
   alist.add ("K", 0.020833);
   syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
-	      Syntax::Const, "Anaerobic denitrification constant.");
+	      Syntax::Const, "\
+Anaerobic denitrification constant for slow pools.");
   alist.add ("alpha", 0.1);
   syntax.add ("alpha_fast", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
-	      Syntax::OptionalConst, "Anaerobic denitrification constant.\n\
+	      Syntax::OptionalConst, "\
+Anaerobic denitrification constant for fast pools.\n\
 This applies to the CO2 produced from turnover of fast OM pools.\n\
 By default, this is identical to alpha.");
-  alist.add ("alpha_fast", 0.0);
   syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
 	      Syntax::OptionalConst, "Heat factor.\n\
 By default, use a build in function valid for temperate climates.");
   syntax.add ("water_factor", Syntax::Fraction (), Syntax::None (), 
 	      Check::non_negative (),
 	      Syntax::OptionalConst,
-	      "Water potential factor, a function of the current\n\
-water content as a fraction of the maximal water content.");
+	      "Water potential factor for slow pools.\n\
+This is a function of the current water content as a fraction of the\n\
+maximal water content.");
   PLF water_factor;
   water_factor.add (0.8, 0.0);
   water_factor.add (0.9, 0.2);
@@ -158,13 +173,13 @@ water content as a fraction of the maximal water content.");
   syntax.add ("water_factor_fast", Syntax::Fraction (), Syntax::None (), 
 	      Check::non_negative (),
 	      Syntax::OptionalConst,
-	      "Water potential factor, a function of the current\n\
-water content as a fraction of the maximal water content.\n\
-This applies to the extra denitrification triggered by fast OM pools.");
-  PLF water_factor_fast;
-  water_factor_fast.add (0.0, 0.0);
-  water_factor_fast.add (1.0, 0.0);
-  alist.add ("water_factor_fast", water_factor_fast);
+	      "Water potential factor for fast pools\n\
+By default, this is identical to the 'water_factor' parameter.");
+  syntax.add  ("redox_height", "cm", Check::non_positive (),
+	       Syntax::OptionalConst,  "\
+Height (a negative number) blow which redox processes start.\n\
+All NO3 below this height will be denitrified immediately.\n\
+By default no redox denitrification occurs.");
 }
 
 Denitrification::Denitrification (const AttributeList& al)
@@ -177,7 +192,12 @@ Denitrification::Denitrification (const AttributeList& al)
 		 ? al.plf ("heat_factor") 
 		 : PLF::empty ()),
     water_factor (al.plf ("water_factor")),
-    water_factor_fast (al.plf ("water_factor_fast"))
+    water_factor_fast (al.check ("water_factor_fast" )
+		       ? al.plf ("water_factor_fast")
+		       : water_factor),
+    redox_height (al.check ("redox_height") 
+		  ? al.number ("redox_height")
+		  : 1.0)
 { }
 
 static Submodel::Register 

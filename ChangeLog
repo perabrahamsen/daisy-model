@@ -1,10 +1,24 @@
+2003-05-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.89 released.
+
+2003-05-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* denitrification.C (alpha_fast, water_factor_fast): Changed.
+	(redox_height): New parameter.
+	(converted_redox): New log variable.
+	* lib/log.dai ("Denitrification"): Use it.
+
+	* weather_std.C (read_new_day): Don't throw an exception on
+	unmappable dates. 
+
 2003-05-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.88 released.
 
 2003-05-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* select_interval.C (output_arry): Use Geometry::total (array) if
+	* select_interval.C (output_array): Use Geometry::total (array) if
 	possible. 
 
 	* hydraulic_M_vGp.C: New model.

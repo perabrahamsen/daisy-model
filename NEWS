@@ -12,6 +12,23 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.89
+
+** Denitrification parameters changed meaning.
+
+The 'alpha' and 'water_factor' parameters now only applies to the slow
+pools.  On the other hand, the 'alpha_fast' and 'water_factor_fast'
+parameters are now by default identical to the non-fast versions, so
+everything should work as usual.
+
+** New 'redox_height' Denitrification parameter.
+
+All NO3 below this depth in the soil will be immediately denitrified
+chemically.  You can log this with the new converted_redox log
+variable, which is also in the Denitrification log parameterization.
+
+By default, no chemical denitrification occurs.
+
 * 2.88
 
 ** New 'M_vGp' hudraulic model by Børgesen et.al..
