@@ -139,7 +139,7 @@ ifeq ($(COMPILER),gcc)
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
 		  -Wconversion -Wno-uninitialized -Wmissing-prototypes 
-	COMPILE = c++ $(WARNING) $(DEBUG) $(OSFLAGS)
+	COMPILE = "c++" $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)

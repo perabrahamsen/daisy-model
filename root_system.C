@@ -346,6 +346,7 @@ RootSystem::tick (const Soil& soil,
       PotRtDpt = min (PotRtDpt + dp, MaxPen);
       /*max depth determined by crop*/
       Depth = min (Depth + dp, MaxPen);
+      PotRtDpt = max (PotRtDpt, Depth);
       /*max depth determined by crop*/
       Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
     }

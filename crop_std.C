@@ -124,17 +124,20 @@ struct CropStandard::Parameters
 {
   const struct DevelPar
   {
-    double EmrTSum;		// Soil temp sum at emergence
-    const PLF& EmrSMF;         // Soil moisture effect on emergence
-    double DS_Emr;		// Development stage (DS) emergence
-    double DSRate1;		// Development rate [C-1 or d-1],
-    				// the vegetative stage
-    double DSRate2;		// Development rate [C-1 or d-1],
-				// the reproductive stage
+    double EmrTSum;			// Soil temp sum at emergence
+    const PLF& EmrSMF;     // Soil moisture effect on emergence
+    double DS_Emr;			// Development stage (DS) emergence
+    double DSRate1;			// Development rate [C-1 or d-1],
+    								// the vegetative stage
+    double DSRate2;			// Development rate [C-1 or d-1],
+									// the reproductive stage
     const PLF& TempEff1;	// Temperature effect, vegetative stage
     const PLF& TempEff2;	// Temperature effect, reproductive stage
     const PLF& PhotEff1;	// Ptotoperiode effect, vegetative stage
-    				// defined limit
+    								// defined limit
+    double DSMature;			// DS at maturation
+    double DSRepeat;			// DS where DS is set back (perennial crops)
+    double DSSetBack; 		// DS set back at DSRepeat
     double defined_until_ds;	// Model invalid after this DS.
   private:
     friend struct CropStandard::Parameters;
@@ -186,6 +189,10 @@ struct CropStandard::Parameters
     const PLF& LfDR;		// Death rate of Leafs
     const PLF& RtDR;		// Death rate of Roots
     const double Large_RtDR;	// Extra death rate for large root/shoot.
+    const double IntDSRelRtRes; // Initial DS for the release of root reserves
+    const double EndDSRelRtRes; // End DS for the release of root reserves
+    const double RelRateRtRes;  // Release rate of root reserves
+    const double LfRtRelRtRes;  // Max Leaf:Root for the release of root res.
   private:
     friend struct CropStandard::Parameters;
     ProdPar (const AttributeList&);
@@ -340,6 +347,9 @@ CropStandard::Parameters::DevelPar::DevelPar (const AttributeList& vl)
     TempEff1 (vl.plf ("TempEff1")),
     TempEff2 (vl.plf ("TempEff2")),
     PhotEff1 (vl.plf ("PhotEff1")),
+    DSMature (vl.number ("DSMature")),
+    DSRepeat (vl.number ("DSRepeat")),
+    DSSetBack (vl.number ("DSSetBack")),
     defined_until_ds (vl.number ("defined_until_ds"))
 { }
 
@@ -381,7 +391,11 @@ CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
     GrowthRateRedFac (vl.number ("GrowthRateRedFac")),
     LfDR (vl.plf ("LfDR")),
     RtDR (vl.plf ("RtDR")),
-    Large_RtDR (vl.number ("Large_RtDR"))
+    Large_RtDR (vl.number ("Large_RtDR")),
+    IntDSRelRtRes (vl.number ("IntDSRelRtRes")),
+    EndDSRelRtRes (vl.number ("EndDSRelRtRes")),
+    RelRateRtRes (vl.number ("RelRateRtRes")),
+    LfRtRelRtRes (vl.number ("LfRtRelRtRes"))
 { }
 
 CropStandard::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
@@ -656,6 +670,7 @@ CropStandardSyntax::CropStandardSyntax ()
   // DevelPar
   Devel.add ("EmrTSum", "dg C d", Syntax::Const,
 	     "Soil temperature sum at emergence.");
+  vDevel.add ("EmrTSum", 100.0);
   Devel.add ("EmrSMF", "cm", "d", Syntax::Const,
 	     "Soil moisture (h-function) effect on emergense.");
   PLF SMF;
@@ -666,6 +681,7 @@ CropStandardSyntax::CropStandardSyntax ()
   vDevel.add("EmrSMF",SMF);
   Devel.add ("DS_Emr", Syntax::None (), Syntax::Const,
 	     "Development stage at emergence.");
+  vDevel.add ("DS_Emr", 0.01);
   Devel.add ("DSRate1", Syntax::None (), Syntax::Const,
 	     "Development rate in the vegetative stage.");
   Devel.add ("DSRate2", Syntax::None (), Syntax::Const,
@@ -676,6 +692,15 @@ CropStandardSyntax::CropStandardSyntax ()
 	     "Temperature effect, reproductive stage.");
   Devel.add ("PhotEff1", "h", Syntax::None (), Syntax::Const,
 	     "Photoperiode effect, vegetative stage.");
+  Devel.add ("DSMature", Syntax::None (), Syntax::Const,
+	     "Development stage at maturation.");
+  vDevel.add ("DSMature", 2.0);
+  Devel.add ("DSRepeat", Syntax::None (), Syntax::Const,
+	     "Development stage when DS set back is activated.");
+  vDevel.add ("DSRepeat", 4.0);
+  Devel.add ("DSSetBack", Syntax::None (), Syntax::Const,
+	     "Development stage set babk at DSRepeat.");
+  vDevel.add ("DSSetBack", 1.7);
   Devel.add ("defined_until_ds", Syntax::None (), Syntax::Const,
 	     "\
 This parameterization is only valid until the specified development state.");
@@ -766,10 +791,23 @@ This parameterization is only valid until the specified development state.");
   Prod.add ("Large_RtDR", "d^-1", Syntax::Const,
 	    "Extra death rate for large root/shoot.");
   vProd.add ("Large_RtDR", 0.05);
+  Prod.add ("IntDSRelRtRes", Syntax::None (), Syntax::Const,
+	    "Initial DS for the release of root reserves.");
+  vProd.add ("IntDSRelRtRes", 0.80);
+  Prod.add ("EndDSRelRtRes", Syntax::None (), Syntax::Const,
+	    "End DS for the release of root reserves.");
+  vProd.add ("EndDSRelRtRes", 0.80);
+  Prod.add ("RelRateRtRes", "d^-1", Syntax::Const,
+	    "Release rate of root reserves.");
+  vProd.add ("RelRateRtRes", 0.05);
+  Prod.add ("LfRtRelRtRes", Syntax::None (), Syntax::Const,
+	    "Max Leaf:Root for the release of root res.");
+  vProd.add ("LfRtRelRtRes", 0.80);
 
   // CrpNPar
   CrpN.add ("SeedN", "g N/m^2", Syntax::Const,
 	    "N-content in seed.");
+  CrpNList.add ("SeedN", 0.5);
   CrpN.add ("DS_fixate", Syntax::None (), Syntax::Const,
             "DS at which to start fixation of atmospheric N.");
   CrpNList.add ("DS_fixate", 42000.0);
@@ -1044,7 +1082,9 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 
   const double Ta = bioclimate.daily_air_temperature ();
 
-  if (Phenology.DS < 1.0)
+  const double DS = fmod (Phenology.DS, 2.0);
+
+  if (DS < 1.0)
     {
       // Only increase DS if assimilate production covers leaf respiration.
       if (var.CrpAux.IncWLeaf +  var.CrpAux.DeadWLeaf
@@ -1060,12 +1100,16 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
   else
     {
       Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
-      if (Phenology.DS > 2)
-	{
-	  COUT << " [" << name << " is ripe]\n";
-	  Phenology.DS = 2.0;
-	  NoProduction ();
-	}
+      if (Phenology.DS > Devel.DSRepeat)
+       {
+         Phenology.DS -= Devel.DSSetBack;
+       }
+      if (Phenology.DS > Devel.DSMature)
+       {
+	      COUT << " [" << name << " is ripe]\n";
+	      Phenology.DS = Devel.DSMature;
+	      NoProduction ();
+	    }
     }
 
   assert (Phenology.DS <= Devel.defined_until_ds);
@@ -1309,16 +1353,27 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 			     const Geometry& geometry,
 			     const SoilHeat& soil_heat)
 {
+  const Parameters::ProdPar& pProd = par.Prod;
+  const double DS = var.Phenology.DS;
+  const double DS1 = fmod (var.Phenology.DS, 2.0);
+  const double Depth = root_system.Depth;
+  Variables::RecProd& vProd = var.Prod;
+  Variables::RecCrpAux& CrpAux = var.CrpAux;
+
   // Remobilization
   const double ReMobil = ReMobilization ();
   var.Prod.CH2OPool += ReMobil;
 
-
-  const Parameters::ProdPar& pProd = par.Prod;
-  const double DS = var.Phenology.DS;
-  const double Depth = root_system.Depth;
-  Variables::RecProd& vProd = var.Prod;
-  Variables::RecCrpAux& CrpAux = var.CrpAux;
+  // Release of root reserves
+  if (DS1 < pProd.IntDSRelRtRes && DS1 > pProd.EndDSRelRtRes)
+    {
+       if (var.Prod.WLeaf < pProd.LfRtRelRtRes * var.Prod.WRoot)
+         {
+            double RootRelease = pProd.RelRateRtRes * var.Prod.WRoot / 24.;
+            var.Prod.CH2OPool += RootRelease;
+            var.Prod.WRoot -= RootRelease;
+         }
+    }
   double NetAss = CrpAux.CanopyAss;
 
   const double AirT = bioclimate.daily_air_temperature ();
