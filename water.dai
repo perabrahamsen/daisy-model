@@ -4,8 +4,7 @@
 ;; `Simulation of Water Flow in the Unsaturated Zone Including the
 ;; Root Zone' by Karsten Høgh Jensen, section 5.3.2.
 
-((horizon h1 horizon
-	  (compact false))
+((horizon h1 yolo)
  (column c1 column
 	 (Bioclimate (NoOfIntervals 30))
 	 (Surface)

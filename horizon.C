@@ -3,109 +3,66 @@
 #include "horizon.h"
 #include "syntax.h"
 #include "alist.h"
+#include "library.h"
 #include <vector.h>
+#include <map.h>
 
-#define exception BUG_exception
-#include <math.h>
-#undef exception
+static Library* Horizon_library = NULL;
+typedef map<string, Horizon::constructor, less<string> > Horizon_map_type;
+static Horizon_map_type* Horizon_constructors;
 
 struct Horizon::Implementation
 {
-  typedef list<const Horizon*> hList;
-  const string name;
-  const bool compact;
-  static hList all;
-  Implementation (string, const AttributeList&);
+  Implementation (const AttributeList&);
 };
 
-Horizon::Implementation::hList Horizon::Implementation::all;
-
-Horizon::Implementation::Implementation (string n, const AttributeList& al)
-  : name (n),
-    compact (al.flag ("compact"))
+Horizon::Implementation::Implementation (const AttributeList&)
 { }
-
-double 
-Horizon::Theta (double h) const
-{
-  if (h < -1.0)
-    return 0.124 + 274.2 / (739.0 + pow (log (-h), 4));
-  else
-    return 0.495;
-}
-
-double 
-Horizon::K (double h) const
-{
-  if (h < -1.0)
-    return 3600 * 1.53e-3 / (124.6 + pow (-h, 1.77));
-  else
-    return 3600 * 1.23e-5;
-}
-
-double
-Horizon::Cw1 (double h) const
-{
-  return Theta (h) - Cw2 (h) * h;
-}
-
-double 
-Horizon::Cw2 (double h) const
-{
-  if (h < -1.0)
-    return - (  (-4 * 274.2 * pow (log (-h), 3))
-	      / (-h * pow (739.0 + pow (log (-h), 4), 2)));
-  else
-    return 0.0;
-}
-
-double 
-Horizon::h (double /* Theta */) const
-{
-  THROW (Unimplemented ("Calculate h from Theta"));
-  return -1;
-}
 
 bool 
 Horizon::compact () const
 {
-  return impl.compact;
+  return false;
 }
 
-const Horizon&
-Horizon::get (string name, const AttributeList& al)
-{ 
-    for (Implementation::hList::iterator i = Implementation::all.begin ();
-	 i != Implementation::all.end (); 
-	 i++)
-	{
-	    if ((*i)->impl.name == name)
-		return *(*i);
-	}
-    const Horizon* h = new Horizon (name, al);
-    Implementation::all.push_back (h);
-    return *h;
+const Library&
+Horizon::library ()
+{
+  assert (Horizon_library);
+  return *Horizon_library;
 }
 
-Horizon::Horizon (string name, const AttributeList& al)
-  : impl (*new Implementation (name, al))
+void
+Horizon::add_type (const string name, 
+		   const AttributeList& al, 
+		   const Syntax* syntax,
+		   constructor cons)
+{
+  assert (Horizon_library);
+  Horizon_library->add (name, al, syntax);
+  Horizon_constructors->insert(Horizon_map_type::value_type (name, cons));
+}
+
+void 
+Horizon::derive_type (string name, const AttributeList& al, string super)
+{
+  add_type (name, al, library ().syntax (super),
+	    (*Horizon_constructors)[super]);
+}
+
+Horizon&
+Horizon::create (const string name)
+{
+  assert (library ().check (name));
+  return *(*Horizon_constructors)[name] (library ().lookup (name));
+}
+
+Horizon::Horizon (const AttributeList& al)
+  : impl (*new Implementation (al))
 { }
 
 Horizon::~Horizon ()
 { }
-
-// Add the Horizon syntax to the syntax table.
-static struct HorizonSyntax
-{
-  HorizonSyntax ();
-} horizon_syntax;
-
-HorizonSyntax::HorizonSyntax ()
-{ 
-  Syntax* syntax = new Syntax ();
-  syntax->add ("compact", Syntax::Boolean);
-  syntax_table->add ("horizon", syntax);
-}
 
 struct HorizonList::Implementation
 {
@@ -140,3 +97,27 @@ HorizonList::HorizonList ()
 
 HorizonList::~HorizonList ()
 { }
+
+int Horizon_init::count;
+
+Horizon_init::Horizon_init ()
+{ 
+  if (count++ == 0)
+    {
+      Horizon_library = new Library ();
+      Horizon_constructors = new Horizon_map_type ();
+    }
+  assert (count > 0);
+}
+
+Horizon_init::~Horizon_init ()
+{ 
+  if (--count == 0)
+    {
+      delete Horizon_library;
+      Horizon_library = NULL;
+      delete Horizon_constructors;
+      Horizon_constructors = NULL;
+    }
+  assert (count >= 0);
+}

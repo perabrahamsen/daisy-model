@@ -30,7 +30,6 @@ struct Input::Implementation
 {
   Log& log;
   Library crops;
-  Library horizons;
   Library columns;
   Library managers;
   Weather* weather;
@@ -58,6 +57,8 @@ struct Input::Implementation
   void load_columns (ColumnList&);
   void load_crops (CropList&);
   void load_library (Library& lib);
+  typedef void (*derive_fun) (string, const AttributeList&, string);
+  void add_derived (const Library&, derive_fun);
   void load_list (AttributeList*, const Syntax*);
   Time get_time ();
   const Condition* get_condition ();
@@ -129,7 +130,7 @@ Input::Implementation::load ()
       if (item == "crop")
 	load_library (crops);
       else if (item == "horizon")
-	load_library (horizons);
+	add_derived (Horizon::library (), &Horizon::derive_type);
       else if (item == "column")
 	load_library (columns);
       else if (item == "manager")
@@ -386,11 +387,11 @@ Input::Implementation::load_soil (HorizonList& sl)
 	error (string ("Ignoring empty horizon `" + name + "'") );
       else if (zplus >= last)
 	error (string ("Ignoring negative horizon `" + name + "'") );
-      else if (!horizons.check (name))
+      else if (!Horizon::library ().check (name))
 	error (string ("Unknown horizon `") + name + "'");
       else
 	{
-	  sl.add (zplus, Horizon::get (name, horizons.lookup (name)));
+	  sl.add (zplus, Horizon::create (name));
 	  last = zplus;
 	}
       skip (")");
@@ -490,6 +491,24 @@ Input::Implementation::load_library (Library& lib)
   AttributeList* atts = new AttributeList (sl);
   load_list (atts, lib.syntax (super));
   lib.add (name, *atts, lib.syntax (super));
+}
+
+void
+Input::Implementation::add_derived (const Library& lib, derive_fun derive)
+{
+
+  const string name = get_id ();
+  const string super = get_id ();
+  if (!lib.check (super))
+    {
+      error (string ("Unknown superclass `") + super + "'");
+      skip_to_end ();
+      return;
+    }
+  const AttributeList& sl = lib.lookup (super);
+  AttributeList* atts = new AttributeList (sl);
+  load_list (atts, lib.syntax (super));
+  derive (name, *atts, super);
 }
 
 void
@@ -853,7 +872,6 @@ Input::Implementation::get_filter_crops ()
 Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
   : log (*new Log ()),
     crops (),
-    horizons (),
     columns (),
     chief ("manager"),
     time (0, 1, 1, 0),

@@ -441,12 +441,6 @@ static struct UZRichardSyntax
 
 UZRichardSyntax::UZRichardSyntax ()
 {
-  UZRichard::registrate ();
-}
-
-void
-UZRichard::registrate ()
-{
   Syntax* syntax = new Syntax ();
   AttributeList* alist = new AttributeList ();
   
@@ -461,5 +455,5 @@ UZRichard::registrate ()
   syntax->add ("max_relative_difference", Syntax::Number);
   alist->add ("max_relative_difference", 0.001);
   
-  add_model ("richards", *alist, syntax, &UZRichard_constructor);
+  UZmodel::add_type ("richards", *alist, syntax, &UZRichard_constructor);
 }

@@ -55,8 +55,6 @@ public:
 	     vector<double>& q);
 
   // Create and Destroy.
-  friend class UZRichardSyntax;
-  static void registrate ();
 public:
   UZRichard (const AttributeList& par);
   ~UZRichard ();

@@ -63,9 +63,9 @@ public:
   static const Library& library ();
   static UZmodel* create (const AttributeList&);
   typedef UZmodel* (*constructor) (const AttributeList&);
-protected:
-  static void add_model (const string, const AttributeList&, const Syntax*,
-			 constructor);
+  static void add_type (const string, const AttributeList&, const Syntax*,
+			constructor);
+  static void derive_type (const string, const AttributeList&, string super);
 
   // Create and Destroy.
 public:
@@ -80,6 +80,6 @@ static class UZ_init
 public:
   UZ_init ();
   ~UZ_init ();
-} UZ_init;
+} uz_init;
 
 #endif UZMODEL_H

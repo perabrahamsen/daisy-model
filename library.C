@@ -2,7 +2,9 @@
 
 #include "library.h"
 #include "alist.h"
+#ifndef MODERN_LIBRARIES
 #include "syntax.h"
+#endif
 
 struct Library::Implementation
 {
@@ -24,32 +26,38 @@ Library::Implementation::Implementation () : size (0)
 const AttributeList&
 Library::lookup (string key) const
 { 
-    if (syntax_table->lookup (key) == Syntax::List)
-	return AttributeList::empty;;
-
     for (int i = 0; i < impl.UGLY_MAX_SIZE; i++)
 	if (impl.UGLY_key[i] == key)
 	    return *impl.UGLY_value[i];
+#ifndef MODERN_LIBRARIES
+    if (syntax_table->lookup (key) == Syntax::List)
+	return AttributeList::empty;;
+#endif MODERN_LIBRARIES
     THROW (UninitializedValue ());
 }
 
 bool
 Library::check (string key) const
 { 
-    if (syntax_table->lookup (key) == Syntax::List)
-	return true;
-
     for (int i = 0; i < impl.UGLY_MAX_SIZE; i++)
 	if (impl.UGLY_key[i] == key)
 	    return true;
+
+#ifndef MODERN_LIBRARIES
+    if (syntax_table->lookup (key) == Syntax::List)
+	return true;
+#endif MODERN_LIBRARIES
+
     return false;
 }
 
+#ifndef MODERN_LIBRARIES
 string
 Library::root (string key) const
 {
     return syntax_table->find (syntax (key));
 }
+#endif
 
 void
 Library::add (string key, const AttributeList& value, const Syntax* syntax)
@@ -64,12 +72,14 @@ Library::add (string key, const AttributeList& value, const Syntax* syntax)
 const Syntax* 
 Library::syntax (string key) const
 { 
-    if (syntax_table->lookup (key) == Syntax::List)
-	return syntax_table->syntax (key);
     
     for (int i = 0; i < impl.UGLY_MAX_SIZE; i++)
 	if (impl.UGLY_key[i] == key)
 	    return impl.UGLY_syntax[i];
+#ifndef MODERN_LIBRARIES
+    if (syntax_table->lookup (key) == Syntax::List)
+	return syntax_table->syntax (key);
+#endif
     THROW (UninitializedValue ());    
 }
 

@@ -7,6 +7,7 @@
 #include <vector.h>
 
 struct AttributeList;
+struct Log;
 
 class Soil
 {
