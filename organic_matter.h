@@ -5,10 +5,14 @@
 
 class AttributeList;
 class Syntax;
+class Log;
+class Filter;
 
 class OrganicMatter
 { 
 public:
+  void output (Log& log, const Filter& filter) const;
+  void operator += (const OrganicMatter&);
   OrganicMatter (const AttributeList&);
   ~OrganicMatter ();
 };

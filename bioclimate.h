@@ -16,7 +16,6 @@ struct Syntax;
 struct SoilWater;
 struct Log;
 struct Filter;
-struct SoluteMatter;
 
 class Bioclimate
 { 
@@ -38,8 +37,7 @@ public:
 
   // Manager.
 public:
-  void Irrigate (double flux, double temp, 
-		 const SoluteMatter& sm,
+  void irrigate (double flux, double temp, 
 		 Column::irrigation_from from);
   
   // Create.

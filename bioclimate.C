@@ -305,8 +305,8 @@ Bioclimate::DayLength(void) const
 }
 
 void
-Bioclimate::Irrigate (double flux, double temp, 
-		      const SoluteMatter&, Column::irrigation_from type)
+Bioclimate::irrigate (double flux, double temp, 
+		      Column::irrigation_from type)
 {
   impl.irrigation = flux;
   impl.irrigation_temperature = temp;

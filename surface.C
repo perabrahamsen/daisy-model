@@ -6,6 +6,8 @@
 #include "soil_water.h"
 #include "log.h"
 #include "common.h"
+#include "matter.h"
+#include "filter.h"
 
 extern double abs (double);
 
@@ -43,6 +45,13 @@ Surface::accept_top (double water)
 
   if (pond + water * dt >= - max (abs (pond), abs (water)) / 100)
     {
+      if (-water > minimal_matter_flux)
+	{
+	  InorganicMatter delta_matter (iom, (water * dt) / pond);
+	  iom -= delta_matter;
+	  delta_matter /= dt;
+	  iom_flux += delta_matter;
+	}
       pond += water * dt;
       return true;
     }
@@ -60,6 +69,19 @@ Surface::ponding () const
     }
   else
     return lake;
+}
+
+void
+Surface::clear ()
+{
+  iom_flux.clear ();
+}
+
+const InorganicMatter& 
+
+Surface::matter_flux ()
+{
+  return iom_flux;
 }
 
 double
@@ -84,17 +106,33 @@ Surface::evaporation (double PotSoilEvaporation, double water,
 }
 
 void
+Surface::fertilize (const OrganicMatter& n)
+{ 
+  om += n;
+}
+
+void 
+Surface::fertilize (const InorganicMatter& n)
+{ 
+  iom += n;
+}
+
+void
 Surface::output (Log& log, const Filter& filter) const
 {
   log.output ("pond", filter, pond);
   log.output ("flux", filter, flux);
   log.output ("EvapSoilSurface", filter, EvapSoilSurface, true);
   log.output ("Eps", filter, Eps, true);
+  output_submodule (om, "OrganicMatter", log, filter);
+  output_submodule (iom, "InorganicMatter", log, filter);
 }
 
 void
 Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add ("minimal_matter_flux", Syntax::Number, Syntax::Const);
+  alist.add ("minimal_matter_flux", 1.0e-10);
   syntax.add ("lake", Syntax::Number, Syntax::Const);
   alist.add ("lake", -1.0);
   syntax.add ("pond", Syntax::Number, Syntax::State);
@@ -103,12 +141,20 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("flux", true);
   syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("OrganicMatter", OrganicMatterSyntax (), Syntax::State);
+  alist.add ("OrganicMatter", OrganicMatterAlist ());
+  syntax.add ("InorganicMatter", InorganicMatterSyntax (), Syntax::State);
+  alist.add ("InorganicMatter", InorganicMatterAlist ());
 }
 
 Surface::Surface (const AttributeList& al)
-  : lake (al.number ("lake")),
+  : minimal_matter_flux (al.number ("minimal_matter_flux")),
+    lake (al.number ("lake")),
     pond (al.number ("pond")),
     flux (al.flag ("flux")),
     EvapSoilSurface (0.0),
-    Eps (0.0)
+    Eps (0.0),
+    om (al.list ("OrganicMatter")),
+    iom (al.list ("InorganicMatter")),
+    iom_flux ()
 { }

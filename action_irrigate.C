@@ -40,8 +40,6 @@ ActionIrrigate::doIt (Daisy& daisy) const
   const double t = ((temp == at_air_temperature) 
 		    ? daisy.weather.AirTemperature ()
 		    : temp);
-  cout << " [Irrigating]";
-  
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {
@@ -75,7 +73,7 @@ ActionIrrigateSyntax::ActionIrrigateSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   syntax.add ("flux", Syntax::Number, Syntax::Const);
-  syntax.order ("flux");
+  syntax.order ("flux", "solute");
   syntax.add ("temperature", Syntax::Number, Syntax::Const);
   alist.add ("temperature", ActionIrrigate::at_air_temperature);
   syntax.add ("solute", SoluteMatterSyntax (), Syntax::Const);

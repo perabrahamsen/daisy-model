@@ -1,6 +1,8 @@
 // surface.h
 
 #include "uzmodel.h"
+#include "inorganic_matter.h"
+#include "organic_matter.h"
 
 struct AttributeList;
 struct Log;
@@ -10,11 +12,16 @@ struct Soil;
 
 class Surface : public UZtop
 {
+  const double minimal_matter_flux;
   const double lake;
   double pond;
   bool flux;
   double EvapSoilSurface;
   double Eps;
+  OrganicMatter om;
+  InorganicMatter iom;
+  InorganicMatter iom_flux;
+
 public:
 
   // Communication with soil.
@@ -25,7 +32,13 @@ public:
   bool accept_top (double);
   double ponding() const;
 
+  void clear ();
+  const InorganicMatter& matter_flux ();
+
   void SoilSurfaceConditions (double Theta, double h);
+
+  void fertilize (const OrganicMatter&);
+  void fertilize (const InorganicMatter&);
 
   void output (Log&, const Filter&) const;
 

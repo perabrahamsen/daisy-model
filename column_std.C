@@ -84,7 +84,8 @@ void
 ColumnStandard::irrigate (double flux, double temp, 
 		 const SoluteMatter& sm, irrigation_from from)
 {
-  bioclimate.Irrigate (flux, temp, sm, from);
+  surface.fertilize (sm * flux);
+  bioclimate.irrigate (flux, temp, from);
 }
 
 void 
@@ -148,12 +149,13 @@ ColumnStandard::tick (const Time& time,
 {
   soil_water.clear ();
   soil_NO3.clear ();
+  surface.clear ();
   bioclimate.tick (surface, weather, crops, soil, soil_water);
   soil_heat.tick (surface, bioclimate);
   soil_water.tick (surface, groundwater, soil);
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     (*crop)->tick (time, bioclimate, soil, soil_heat);
-  soil_NO3.tick (soil, soil_water, 0.0);
+  soil_NO3.tick (soil, soil_water, surface.matter_flux().NO3);
 }
 
 void

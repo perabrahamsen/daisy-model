@@ -5,6 +5,14 @@
 #include "syntax.h"
 #include "alist.h"
 
+void
+OrganicMatter::output (Log&, const Filter&) const
+{ }
+
+void
+OrganicMatter::operator += (const OrganicMatter&)
+{ }
+
 OrganicMatter::OrganicMatter (const AttributeList&)
 { }
 
@@ -27,7 +35,7 @@ const Syntax& OrganicMatterSyntax ()
   return *syntax;
 }
 
-AttributeList& OrganicMatterAttributeList ()
+AttributeList& OrganicMatterAlist ()
 { 
   static AttributeList* alist = 0;
 
