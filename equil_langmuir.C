@@ -32,8 +32,8 @@ class EquilibriumLangmuir : public Equilibrium
   // Parameters.
   /* const */ vector<double> K;
   /* const */ vector<double> my_max;
-  const Pedotransfer *const pedo_K;
-  const Pedotransfer *const pedo_my_max;
+  /* const */ Pedotransfer *const pedo_K;
+  /* const */ Pedotransfer *const pedo_my_max;
 
   // Simulation.
 public:

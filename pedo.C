@@ -32,7 +32,7 @@ Pedotransfer::check (const Soil&, Treelog&) const
 { return true; }
 
 void
-Pedotransfer::initialize (const Soil&) const
+Pedotransfer::initialize (const Soil&)
 { }
 
 void

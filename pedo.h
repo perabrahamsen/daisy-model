@@ -41,7 +41,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&) const;
+  virtual void initialize (const Soil&);
   static void load_syntax (Syntax&, AttributeList&);
 protected:
   Pedotransfer (const AttributeList&);

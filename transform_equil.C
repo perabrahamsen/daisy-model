@@ -38,8 +38,8 @@ struct TransformEquilibrium : public Transform
   /* const */ Equilibrium& equilibrium;
   vector<double> k_AB;
   vector<double> k_BA;
-  const Pedotransfer* pedo_AB;
-  const Pedotransfer* pedo_BA;
+  /* const */ Pedotransfer* pedo_AB;
+  /* const */ Pedotransfer* pedo_BA;
 
   // Log variables.
   vector<double> S_AB;
