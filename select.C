@@ -36,7 +36,7 @@ struct Select::Implementation
 
   void open_maybe (const string& value)
   {
-    static const string question_mark = "?";
+    const string question_mark = "?";
     
     if (valid ()
 	&& path[current_path_index][0] == '?'
