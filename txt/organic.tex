@@ -143,8 +143,8 @@ turnover rates and directions of flow, and made the system much more
 adaptable to new levels of input, another effect which has also been
 observed empirically \cite{dk-humus-change}.
 
-The current model is depicted in~\ref{fig:om2}.  The purpose of the
-\textsc{som3} pool in that figure will be explained later.
+The current model is depicted in figure~\ref{fig:om2}.  The purpose of
+the \textsc{som3} pool in that figure will be explained later.
 
 \begin{figure}[htbp]
   \centering
@@ -211,10 +211,10 @@ initial state, rather than a correct one.
 
 As part of Sander's recalibration work, he also found that the ratio
 between the \textsc{som1} and \textsc{som2} for a system in
-equilibrium will 49\% vs 51\%.  Since \daisy{} after his recalibration
-required users to readjust the partitioning between \textsc{som1} and
-\textsc{som2}, there was a strong tendency that users just picked the
-equilibrium values.
+equilibrium will be 49\% vs 51\%.  Since \daisy{} after his
+recalibration required users to readjust the partitioning between
+\textsc{som1} and \textsc{som2}, there was a strong tendency that
+users just picked the equilibrium values.
 
 \section{Long term simulations}
 
@@ -297,13 +297,14 @@ recalibration (figure~\ref{fig:om2}).  They also depend on site and
 time specific factors, namely the clay content of the soil, the
 temperature, and the water potential.
 
-Some of these factors may be zero, in none of the calibrations
-mentioned we have any carbon going directly from the \textsc{aom}
-pools to \textsc{som1}, so $o$ will always be zero.  We include these
-anyway, because we are trying to solve the initialization problem in a
-way that is robust with regard to changes in the model.  The
-description is also robust with regard to the number of
-pools\footnote{The generalized form used by the \daisy{} program is:
+Some of these factors may be zero, for example in none of the
+calibrations mentioned we have any carbon going directly from the
+\textsc{aom} pools to \textsc{som1}, so $o$ will always be zero.  We
+include these anyway, because we are trying to solve the
+initialization problem in a way that is robust with regard to changes
+in the model.  The description is also robust with regard to the
+number of pools\footnote{The generalized form used by the \daisy{}
+  program is:
   \begin{displaymath}
     \begin{array}{rclcr}
       \Delta\mbox{\textsc{smb}}i &=& \displaystyle
@@ -366,10 +367,10 @@ all but the slowest pool have reached a quasi-equilibrium with respect
 to the input, and the size of the slowest pool.  Since the slowest
 pool is still changing (and the other pools will have to change to
 reflect that), this is not a true equilibrium.
-Figure~\ref{fig:clayom} and~\ref{fig:sandom} shows that the fast pool
-(\textsc{smb2}) does indeed adapt to changes in input much faster than
-the slow pool (\textsc{smb1}), the hump in each graph is due to that
-effect.
+Figure~\ref{fig:clayom} and~\ref{fig:sandom} shows that the fast
+\textsc{som} pool (\textsc{som2}) does indeed adapt to changes in
+input much faster than the slow pool (\textsc{som1}), the hump in each
+graph is due to that effect.
 
 \section{User calibration}
 
@@ -388,7 +389,7 @@ ask them to specify the \emph{background mineralization} ($w$), which
 is the amount of nitrogen the rest of the system gets or loses from
 the soil.  The equation is then
 \begin{displaymath}
-  \frac{\Delta\mbox{\textsc{smb1}}}{{C/N}_{\mbox{\small\textsc{smb1}}}}
+  \frac{\Delta\mbox{\textsc{smb1}}}{{C/N}_{\mbox{\small\textsc {smb1}}}}
   + \frac{\Delta\mbox{\textsc{smb2}}}{{C/N}_{\mbox{\small\textsc{smb2}}}}
   + \frac{\Delta\mbox{\textsc{som1}}}{{C/N}_{\mbox{\small\textsc{som1}}}}
   + \frac{\Delta\mbox{\textsc{som2}}}{{C/N}_{\mbox{\small\textsc{som2}}}}
@@ -402,7 +403,6 @@ case\footnote{Another caveat is that \daisy{} treat the $C/N$ for
   matter entering the \textsc{som} pools independently of the $C/N$
   leaving them.  The equation will only be correct when the two are
   close.}.
-
 
 In conclusion, we can now initialize the soil organic matter system
 from two or three numbers supplied by the user.  The two mandatory
@@ -441,7 +441,7 @@ the \textsc{smb1} pool. $F_{\mbox{\tiny\textsc{smb1}}}^T$,
 $F_{\mbox{\tiny\textsc{smb1}}}^\psi$, and
 $F_{\mbox{\tiny\textsc{smb1}}}^C$ are the abiotic factors for soil
 heat, moisture and clay respectively.  All of these are part of the
-model calibration, and unchanged for all normal use of the model.
+basic model calibration, and unchanged for all normal use of the model.
 
 What does change is the soil temperature ($T$), soil moisture
 ($\psi$), and clay content ($X_c$).  The clay content is constant
@@ -467,14 +467,14 @@ choose values for $T$ and $\psi$ that give the same effect.
 
 The current \daisy{} model calibration is based primarily on
 measurements on agricultural topsoil \cite{daisy-somnew,mueller-smb},
-where all the 
-humus is presumed to be active.  This means the calibration is not
-good for subsoils, nor for some types of humus-rich topsoils.  The
-\textsc{som3} pool you last saw in figure~\ref{fig:om2} exists to
-compensate for these shortcomings.  The \textsc{som3} pool is inert,
-so for the soil organic matter system it is as if it didn't exist.  It
-still affects other aspects of \daisy{}, such as the hydraulic and
-adsorption properties of the soil.
+where all the humus is presumed to be active.  This means the
+calibration is not good for subsoils, nor for some types of humus-rich
+topsoils.  The \textsc{som3} pool you last saw in figure~\ref{fig:om2}
+exists to compensate for these shortcomings.  The \textsc{som3} pool
+is inert, so for the soil organic matter system it is as if the humus
+in the pool didn't exist.  The inert humus still affects other aspects
+of \daisy{}, such as the hydraulic and adsorption properties of the
+soil.
 
 For the subsoil, we by default assume the system is in equilibrium
 with the input, and park enough humus in the \textsc{som3} pool so
@@ -503,8 +503,7 @@ will not yet have had any chance to adopt to the new input level.
 With the current model, the \textsc{som2} pool needs several decades
 to catch up with changes in input.  This means the quasi-equilibrium
 assumption is still suspect in a modern agricultural country like
-Denmark, but it is still better than the equilibrium assumption that
-needs centuries rather than decades.
+Denmark.
 
 A model specific bound on the relative size of \textsc{som1} has been
 introduced.  Our long term simulations has shown that the
