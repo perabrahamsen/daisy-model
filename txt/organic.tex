@@ -463,51 +463,54 @@ logging the product of factors in a realistic simulation, \daisy{} can
 be used to calculate the combined effect.  From that, the user can
 choose values for $T$ and $\psi$ that give the same effect.
 
-
 \section{Inert organic matter}
 
-The current \daisy{} model calibration is based on agriculutural
-topsoil, where all the humus is active.  This means the calibration is
-not good for subsoils, nor for some types of humus-rich topsoils.  The
+The current \daisy{} model calibration is based primarily on
+measurements on agriculutural topsoil (SANDER, XXX), where all the
+humus is presumed to be active.  This means the calibration is not
+good for subsoils, nor for some types of humus-rich topsoils.  The
 \textsc{som3} pool you last saw in figure~\ref{fig:om2} exists to
 compensate for these shortcommings.  The \textsc{som3} pool is inert,
 so for the soil organic matter system it is as if it didn't exist.  It
-still affects other aspects of \daisy{}, such as the hydraulic
-adsorption properties of the soil.  
+still affects other aspects of \daisy{}, such as the hydraulic and
+adsorption properties of the soil.
 
 For the subsoil, we by default assume the system is in equilibrium
-with the input, and park enough humus in the \textsc{som3} so that
-this assumption holds true.  Yes, we earlier argued that the
-equilibrium assumption is wrong.  It still is, also for the subsoil.
-Hwoever, the subsoil contribute relatively little to the total system,
-so we can get away with this assumption.  For topsoil, the user can
-explicitly park some of the humus in the \textsc{som3} pool, if he has
-reason to believe it to be necessary.
+with the input, and park enough humus in the \textsc{som3} pool so
+that this assumption holds true.  The obervant reader will remember
+that we earlier argued that the equilibrium assumption is wrong.  It
+still is, also for the subsoil.  However, the subsoil contribute
+relatively little to the total system (XXX), so we can get away with
+this assumption.  For topsoil, the user can explicitly park some of
+the humus in the \textsc{som3} pool, if he has reason to believe it to
+be necessary.
 
-\section{Limitations}
+\section{Comparisons}
 
 PA: Diskution af fig3 og 4 quasi-eq
 
 PA: Overvej initialisering med ``background mineralization = 0''.
 
+\section{Limitations}
+
 When using the current input levels, the quasi-equilibrium assumption
 will give very poor, even physically impossible estimates right after
-a change in input level.  This is because the \textsc{som2} pool will
-not yeat have had any chance to adopt to the new input level.  With
-the current model, the \textsc{som2} pool needs several decades to
-catch up with changes in input.  This means the quasi-equilibrium
+a large change in input level.  This is because the \textsc{som2} pool
+will not yeat have had any chance to adopt to the new input level.
+With the current model, the \textsc{som2} pool needs several decades
+to catch up with changes in input.  This means the quasi-equilibrium
 assumption is still suspect in a modern agrocultural country like
 Denmark, but it is still better than the equilibrium assumption that
-needs centuries rather than decades.  
+needs centuries rather than decades.
 
 A model specific bound on the relative size of \textsc{som1} has been
-introduced.  Out long term simulations has shown that the
-\textsc{som1} fraction stay within the interval 30\% -- 70\%.  If the
+introduced.  Our long term simulations has shown that the
+\textsc{som1} fraction stay within the interval 30\% --- 70\%.  If the
 quasi-equilibrium give a value outside that interval, the
 \textsc{som1} fraction will be set to that nearest boundary, and the
 intitialization will be redone\footnote{More precisely, if the
   quasi-equilibrium gives a \textsc{som1} higher than 70\%,
-  equation~\ref{eq:dsom2} will be replaced with the new equation 
+  equation~\ref{eq:dsom2} will be replaced with the new equation
   \begin{displaymath}
     \mbox{\textsc{som1}} = 70\%\> (\mbox{\textsc{som1}} + \mbox{\textsc{som2}})
   \end{displaymath}
@@ -515,10 +518,10 @@ intitialization will be redone\footnote{More precisely, if the
 
 While the humus content in especially figure~\ref{fig:sandom}
 fluctates with rotation, season and climate, the simulated
-\textsc{som1} fraction stay stable.  This is because most of the minor
-fluctations happens in the \textsc{aom} and \textsc{smb} pools, the
-slower \textsc{som2} does not have time to adapt.  This also explains
-the relatively noise on the initialisation points, the
+\textsc{som1} fraction stay relatively stable.  This is because most
+of the minor fluctations happens in the \textsc{aom} and \textsc{smb}
+pools, the slower \textsc{som2} does not have time to adapt.  This
+also explains the relatively noise on the initialisation points, the
 quasi-equilibrium assumption over-adapts to such short terms changes.
 
 \addcontentsline{toc}{section}{\numberline{}References}
