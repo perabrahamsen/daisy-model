@@ -1,4 +1,5 @@
 emacs.font: -*-courier-medium-r-normal--18-*-*-*-*-*-*-*
+emacs.toolBar: 0
 
 TODO --- things that needs done with Daisy -*- outline -*-
 

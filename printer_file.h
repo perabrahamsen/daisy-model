@@ -24,6 +24,7 @@
 #define PRINTER_FILE_H
 
 #include "printer.h"
+#include "symbol.h"
 
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
 struct ostream;
@@ -47,7 +48,10 @@ public:
   void print_alist (const AttributeList& alist, const Syntax&,
 		    const AttributeList& super);
   // Print entry in alist.
-  void print_entry (const AttributeList&, const Syntax&, const std::string& key);
+  void print_entry (const AttributeList&, const Syntax&,
+		    const std::string& key);
+  // Print specific parameterization.
+  void print_parameterization (symbol library_name, symbol name);
   // Print all elements in all libraries associated with 'filename'.
   void print_library_file (const std::string& filename);
   // Print a parser input.

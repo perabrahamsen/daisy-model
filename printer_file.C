@@ -69,6 +69,7 @@ struct PrinterFile::Implementation
                      const AttributeList&, int indent);
 
   // Top level print functions.
+  void print_parameterization (symbol library_name, symbol name);
   void print_library_file (const string& filename);
   
   // Testing.
@@ -531,6 +532,42 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
                false);
 }
 
+
+void 
+PrinterFile::Implementation
+/**/::print_parameterization (const symbol library_name, const symbol name)
+{
+  Library& library = Library::find (library_name);
+  const AttributeList& alist = library.lookup (name);
+
+  out << "(def" << library_name << " ";
+  print_symbol (name);
+  out << " ";
+  if (alist.check ("type"))
+    {
+      const symbol super = alist.identifier ("type");
+      print_symbol (super);
+      if (!library.check (super))
+	{
+	  out << " ;; unknown superclass\n ";
+	  print_alist (alist, library.syntax (name), 
+		       empty_alist, 2, true);
+	}
+      else
+	{
+	  print_alist (alist, library.syntax (name), 
+		       library.lookup (super), 2, true);
+	}
+    }
+  else
+    {
+      out << "<unknown>\n  ";
+      print_alist (alist, library.syntax (name), 
+		   empty_alist, 2, true);
+    }
+  out << ")\n";
+}
+
 // We store all matching entries here.
 struct FoundEntry
 {
@@ -592,41 +629,12 @@ PrinterFile::Implementation::print_library_file (const string& filename)
   const AttributeList empty_alist;
   for (unsigned int i = 0; i < found.size (); i++)
     {
-      const symbol library_name = found[i].library_name;
-      const symbol name = found[i].element;
-      Library& library = Library::find (library_name);
-      const AttributeList& alist = library.lookup (name);
-
       if (first)
 	first = false;
       else
 	out << "\n";
-      out << "(def" << library_name << " ";
-      print_symbol (name);
-      out << " ";
-      if (alist.check ("type"))
-	{
-	  const symbol super = alist.identifier ("type");
-	  print_symbol (super);
-	  if (!library.check (super))
-	    {
-	      out << " ;; unknown superclass\n ";
-	      print_alist (alist, library.syntax (name), 
-			   empty_alist, 2, true);
-	    }
-	  else
-	    {
-	      print_alist (alist, library.syntax (name), 
-			   library.lookup (super), 2, true);
-	    }
-	}
-      else
-	{
-	  out << "<unknown>\n  ";
-	  print_alist (alist, library.syntax (name), 
-		       empty_alist, 2, true);
-	}
-      out << ")\n";
+
+      print_parameterization (found[i].library_name, found[i].element);
     }
 }
 

@@ -98,6 +98,8 @@ struct DocumentLaTeX : public Document
   void print_parameterization_no_file (std::ostream& out);
   void print_parameterization_description (std::ostream& out, 
 					   const std::string& description);
+  void print_parameterization_content (std::ostream& out, 
+				       symbol library_name, symbol name);
   void print_parameterization_trailer (std::ostream& out, symbol name);
   void print_fixed_header (std::ostream&, const std::string& name);
   void print_fixed_trailer (std::ostream&, const std::string& name);
@@ -525,10 +527,8 @@ DocumentLaTeX::print_entry_value (std::ostream& out,
       if (print_default_value)
 	{
 	  out << "\n\\begin{verbatim}\n";
-	  TmpStream tmp;
-	  PrinterFile printer (tmp ());
+	  PrinterFile printer (out);
 	  printer.print_entry (alist, syntax, name);
-	  out << tmp.str ();
 	  out << "\\end{verbatim}\nDescription:";
 	}
     }
@@ -898,6 +898,17 @@ void
 DocumentLaTeX::print_parameterization_description (std::ostream& out, 
 						   const std::string& description)
 { print_model_description (out, description); }
+
+void 
+DocumentLaTeX::print_parameterization_content (std::ostream& out, 
+					       const symbol library_nme, 
+					       const symbol name)
+{
+  out << "\n\\begin{verbatim}\n";
+  PrinterFile printer (out);
+  printer.print_parameterization (library_name, name);
+  out << "\\end{verbatim}\n";
+}
 
 void 
 DocumentLaTeX::print_parameterization_trailer (std::ostream&, const symbol)

@@ -66,6 +66,9 @@ protected:
   virtual void print_parameterization_description (std::ostream& out, 
 						   const std::string&
 						   description) = 0;
+  virtual void print_parameterization_content (std::ostream& out, 
+					       symbol library_name,
+					       symbol name) = 0;
   virtual void print_parameterization_trailer (std::ostream& out, 
 					       symbol name) = 0;
   virtual void print_fixed_header (std::ostream&, const std::string& name) = 0;
