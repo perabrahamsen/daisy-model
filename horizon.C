@@ -58,7 +58,7 @@ struct Horizon::Implementation
   const double_map attributes;
   typedef map<string, string, less<string> > string_map;
   const string_map dimensions;
-  /*const*/ Nitrification& nitrification;
+  const auto_ptr<Nitrification> nitrification;
   HorHeat hor_heat;
   
   // Create and Detroy.
@@ -133,15 +133,13 @@ Horizon::Implementation::Implementation (const AttributeList& al)
 { }
 
 Horizon::Implementation::~Implementation ()
-{
-  delete &nitrification;
-}
+{ }
 
 double
 Horizon::dry_bulk_density () const
 { 
-  daisy_assert (impl.dry_bulk_density > 0.0);
-  return impl.dry_bulk_density; 
+  daisy_assert (impl->dry_bulk_density > 0.0);
+  return impl->dry_bulk_density; 
 }
 
 double 
@@ -164,19 +162,19 @@ Horizon::humus_C () const
 
 const std::vector<double>& 
 Horizon::SOM_fractions () const
-{ return impl.SOM_fractions; }
+{ return impl->SOM_fractions; }
 
 const std::vector<double>& 
 Horizon::SOM_C_per_N () const
-{ return impl.SOM_C_per_N; }
+{ return impl->SOM_C_per_N; }
 
 double
 Horizon::C_per_N () const
-{ return impl.C_per_N; }
+{ return impl->C_per_N; }
 
 double
 Horizon::turnover_factor () const
-{ return impl.turnover_factor; }
+{ return impl->turnover_factor; }
 
 double
 Horizon::quartz () const
@@ -191,33 +189,33 @@ Horizon::quartz () const
 
 double
 Horizon::anisotropy () const
-{ return impl.anisotropy; }
+{ return impl->anisotropy; }
 
 double
 Horizon::heat_conductivity (double Theta, double Ice) const
-{ return impl.hor_heat.heat_conductivity (Theta, Ice); }
+{ return impl->hor_heat.heat_conductivity (Theta, Ice); }
 
 double
 Horizon::heat_capacity (double Theta, double Ice) const
-{ return impl.hor_heat.heat_capacity (Theta, Ice); }
+{ return impl->hor_heat.heat_capacity (Theta, Ice); }
 
 bool
 Horizon::has_attribute (const string& name) const
-{ return impl.attributes.find (name) != impl.attributes.end (); }
+{ return impl->attributes.find (name) != impl->attributes.end (); }
 
 double 
 Horizon::get_attribute (const string& name) const
 { 
-  Implementation::double_map::const_iterator i = impl.attributes.find (name);
-  daisy_assert (i != impl.attributes.end ());
+  Implementation::double_map::const_iterator i = impl->attributes.find (name);
+  daisy_assert (i != impl->attributes.end ());
   return (*i).second;
 }
 
 string
 Horizon::get_dimension (const string& name) const
 { 
-  Implementation::string_map::const_iterator i = impl.dimensions.find (name);
-  daisy_assert (i != impl.dimensions.end ());
+  Implementation::string_map::const_iterator i = impl->dimensions.find (name);
+  daisy_assert (i != impl->dimensions.end ());
   return (*i).second;
 }
 
@@ -244,7 +242,7 @@ Horizon::nitrification (const double M, const double C,
                         const double M_left,
                         const double h, const double T,
                         double& NH4, double& N2O, double& NO3) const
-{ impl.nitrification.tick (M, C, M_left, h,  T, NH4, N2O, NO3); }
+{ impl->nitrification->tick (M, C, M_left, h,  T, NH4, N2O, NO3); }
 
 void 
 Horizon::output (Log& log) const
@@ -365,7 +363,7 @@ Intended for use with pedotransfer functions.");
 }
 
 Horizon::Horizon (const AttributeList& al)
-  : impl (*new Implementation (al)),
+  : impl (new Implementation (al)),
     fast_clay (-42.42e42),
     fast_humus (-42.42e42),
     name (al.identifier ("type")),
@@ -382,17 +380,13 @@ Horizon::initialize_base (bool top_soil,
   const double clay_lim = texture_below ( 2.0 /* [um] USDA Clay */);
   fast_clay = texture.mineral () * clay_lim;
   fast_humus = texture.humus;
-  hydraulic.initialize (texture, impl.dry_bulk_density, top_soil, msg);
-  impl.initialize (hydraulic, texture, quartz () * texture.mineral (),
-                   som_size, msg); 
+  hydraulic->initialize (texture, impl->dry_bulk_density, top_soil, msg);
+  impl->initialize (*hydraulic, texture, quartz () * texture.mineral (),
+                    som_size, msg); 
 }
   
 Horizon::~Horizon ()
-{ 
-  delete &impl; 
-  delete &hydraulic;
-  delete &tortuosity;
-}
+{ }
 
 // Create Horizon library.
 EMPTY_TEMPLATE

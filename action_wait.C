@@ -25,19 +25,20 @@
 #include "log.h"
 #include "daisy.h"
 #include "tmpstream.h"
+#include <memory>
 
 struct ActionWait : public Action
 {
-  Condition& condition;
+  std::auto_ptr<Condition> condition;
 
   void tick (const Daisy& daisy, Treelog& out)
-  { condition.tick (daisy, out); }
+  { condition->tick (daisy, out); }
 
   void doIt (Daisy&, Treelog&)
   { }
 
   bool done (const Daisy& daisy) const
-  { return condition.match (daisy); }
+  { return condition->match (daisy); }
 
   void output (Log& log) const
   { output_derived (condition, "condition", log); }
@@ -48,7 +49,7 @@ struct ActionWait : public Action
   { }
 
   ~ActionWait ()
-  { delete &condition; }
+  { }
 };
 
 struct ActionWaitDays : public Action

@@ -22,6 +22,8 @@
 
 #include "parser_file.h"
 #include "lexer.h"
+#include "scope.h"
+#include "number.h"
 #include "plf.h"
 #include "time.h"
 #include "tmpstream.h"
@@ -29,8 +31,9 @@
 #include "path.h"
 #include "units.h"
 #include "mathlib.h"
-
 #include <set>
+#include <memory>
+
 using namespace std;
 
 struct ParserFile::Implementation
@@ -226,15 +229,45 @@ ParserFile::Implementation::get_dimension ()
 double
 ParserFile::Implementation::get_number (const string& syntax_dim)
 {
-  double value = get_number ();
-  Lexer::Position pos = lexer->position ();
+  skip ();
 
-  if (looking_at ('['))
+  // Check for number literals first.
+  if (peek () == '.' || isdigit (peek ()) || peek () == '-')
     {
-      const string read_dim = get_dimension ();
-      if (check_dimension (syntax_dim, read_dim))
-	value = convert (value, syntax_dim, read_dim, pos);
+      double value = get_number ();
+      Lexer::Position pos = lexer->position ();
+
+      if (looking_at ('['))
+        {
+          const string read_dim = get_dimension ();
+          if (check_dimension (syntax_dim, read_dim))
+            value = convert (value, syntax_dim, read_dim, pos);
+        }
+      return value;
     }
+  
+  // Then try a number object.
+  const Library& lib = Librarian<Number>::library ();
+  auto_ptr<AttributeList> al (&load_derived (lib, true, NULL));
+  const symbol obj = al->identifier ("type");
+  static const symbol error_sym ("error");
+  if (obj == error_sym)
+    return -42.42e42;
+  // Check for completness.
+  TmpStream tmp;
+  TreelogStream treelog (tmp ());
+  Treelog::Open nest (treelog, obj);
+  if (!lib.syntax (obj).check (*al, treelog))
+    error ("Bogus number '" + obj + "'\n--- details:\n"
+           + tmp.str () + "---");
+  else if (treelog.count)
+    warning ("Warning for number '" + obj + "'\n--- details:\n"
+             + tmp.str () + "---");
+  auto_ptr<Number> number (Librarian<Number>::create (*al));
+  double value = number->value (Scope::null ());
+  const string read_dim = number->dimension (Scope::null ());
+  if (check_dimension (syntax_dim, read_dim))
+    value = convert (value, syntax_dim, read_dim, lexer->position ());
   return value;
 }
 
@@ -335,7 +368,7 @@ ParserFile::Implementation::skip_token () {
     skip ();
   if (peek () == '"')
     get_string ();
-  else if (peek () == '.' || isdigit (peek ()))
+  else if (peek () == '.' || isdigit (peek ()) || peek () == '-')
     get_number ();
   else if (peek () == '(') 
     {
@@ -343,7 +376,7 @@ ParserFile::Implementation::skip_token () {
       skip_to_end ();
       skip (")");
     }
-  else if (isalnum (peek ()) || peek () == '_' || peek () == '-')
+  else if (isalnum (peek ()) || peek () == '_')
     get_string ();
   else if (peek () == '[')
     get_dimension ();
@@ -354,6 +387,7 @@ ParserFile::Implementation::skip_token () {
 void
 ParserFile::Implementation::skip_to_end ()
 {
+  skip ();
   while (peek () != ')' && good ())
     {
       skip_token ();
@@ -650,11 +684,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 #endif // !SLOPPY_PARENTHESES						   
 	      if (&lib == &Librarian<Parser>::library ())
 		{
-		  Parser& parser = Librarian<Parser>::create (al);
-		  parser.initialize (*global_syntax_table, lexer->err);
-		  parser.load_nested (atts);
-		  lexer->error_count += parser.error_count ();
-		  delete &parser;
+		  auto_ptr<Parser> parser (Librarian<Parser>::create (al));
+		  parser->initialize (*global_syntax_table, lexer->err);
+		  parser->load_nested (atts);
+		  lexer->error_count += parser->error_count ();
 		  inputs.push_back (&al);
 		}
 	      else

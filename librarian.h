@@ -61,13 +61,13 @@ private:
 
   // Functions.
 public:
-  static T& create (const AttributeList& al)
+  static T* create (const AttributeList& al)
   {
     daisy_assert (al.check ("type"));
     const symbol name = al.identifier ("type");
     daisy_assert (library ().check (name));
     daisy_assert (library ().syntax (name).check (al, Treelog::null ()));
-    return (content->constructors)[name] (al);
+    return &(content->constructors)[name] (al);
   }
   static void add_type (const symbol name, AttributeList& al,
 			const Syntax& syntax,
@@ -124,7 +124,7 @@ map_create (const std::vector<AttributeList*>& f)
   for (std::vector<AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
-    t.push_back (&Librarian<T>::create (**i));
+    t.push_back (Librarian<T>::create (**i));
   return t;
 }
 
@@ -136,7 +136,7 @@ map_create_const (const std::vector<AttributeList*>& f)
   for (std::vector<AttributeList*>::const_iterator i = f.begin ();
        i != f.end ();
        i++)
-    t.push_back (&Librarian<T>::create (**i));
+    t.push_back (Librarian<T>::create (**i));
   return t;
 }
 
@@ -175,7 +175,7 @@ struct map_create
     for (std::vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
-      t.push_back (&Librarian<T>::create (**i));
+      t.push_back (Librarian<T>::create (**i));
   }
   operator std::vector<T*> ()
   { return t; }
@@ -190,7 +190,7 @@ struct map_create_const
     for (std::vector<AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
-      t.push_back (&Librarian<T>::create (**i));
+      t.push_back (Librarian<T>::create (**i));
   }
   operator std::vector<const T*> ()
   { return t; }

@@ -61,7 +61,7 @@ struct PedotransferIdentity : public Pedotransfer
   }
   PedotransferIdentity (const AttributeList& al)
     : Pedotransfer (al),
-      child (&Librarian<Pedotransfer>::create (al.alist ("value"))),
+      child (Librarian<Pedotransfer>::create (al.alist ("value"))),
       dim (al.name ("dimension", child->dimension ()))
   { }
 };
@@ -101,7 +101,7 @@ struct PedotransferOperand : public Pedotransfer
   }
   PedotransferOperand (const AttributeList& al)
     : Pedotransfer (al),
-      operand (&Librarian<Pedotransfer>::create (al.alist ("operand")))
+      operand (Librarian<Pedotransfer>::create (al.alist ("operand")))
   { }
 };
 
@@ -270,8 +270,8 @@ struct PedotransferPow : public Pedotransfer
   }
   PedotransferPow (const AttributeList& al)
     : Pedotransfer (al),
-      base (&Librarian<Pedotransfer>::create (al.alist ("base"))),
-      exponent (&Librarian<Pedotransfer>::create (al.alist ("exponent")))
+      base (Librarian<Pedotransfer>::create (al.alist ("base"))),
+      exponent (Librarian<Pedotransfer>::create (al.alist ("exponent")))
   { }
 };
 

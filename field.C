@@ -540,7 +540,7 @@ Field::Implementation::divide (symbol original, symbol copy,
   AttributeList copy_alist (log_clone.result ());
   copy_alist.add ("type", copy.name ());
   copy_alist.add ("size", copy_size);
-  Column* result = &Librarian<Column>::create (copy_alist);
+  Column* result = Librarian<Column>::create (copy_alist);
   result->initialize (time, Treelog::null (), weather);
   columns.push_back (result);
 }

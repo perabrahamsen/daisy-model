@@ -48,15 +48,15 @@ class CropStandard : public Crop
 {
   // Content.
 public:
-  RootSystem& root_system;
-  CanopyStandard& canopy;
-  Harvesting& harvesting;
-  Production& production;
-  Phenology& development;
-  const Partition& partition;
-  Vernalization& vernalization;
-  const Photosynthesis& photosynthesis;
-  CrpN& nitrogen;
+  RootSystem root_system;
+  CanopyStandard canopy;
+  Harvesting harvesting;
+  Production production;
+  auto_ptr<Phenology> development;
+  const Partition partition;
+  Vernalization vernalization;
+  const Photosynthesis photosynthesis;
+  CrpN nitrogen;
   const bool enable_water_stress;
   const bool enable_N_stress;
   const double min_light_fraction;
@@ -96,7 +96,7 @@ public:
   double EpFac () const		// Convertion to potential evapotransp.
   { return canopy.EpFactor (DS ()); }
   void CanopyStructure ()
-  { canopy.CanopyStructure (development.DS); }
+  { canopy.CanopyStructure (development->DS); }
   double ActualWaterUptake (double Ept, 
 			    const Soil& soil, SoilWater& soil_water,
 			    double EvapInterception, double day_fraction, 
@@ -138,7 +138,7 @@ public:
 
   // Queries.
   double DS () const
-  { return development.DS; }
+  { return development->DS; }
   double DM (double height) const;
   double total_N () const
   { return production.total_N (); }
@@ -177,7 +177,7 @@ CropStandard::initialize (Treelog& msg, const Geometry& geometry,
   root_system.initialize (geometry.size ());
   production.initialize (nitrogen.SeedN);
 
-  if (development.DS >= 0)
+  if (development->DS >= 0)
     {
       // Dead organic matter.
       if (organic_matter)
@@ -186,13 +186,13 @@ CropStandard::initialize (Treelog& msg, const Geometry& geometry,
       
       // Update derived state content.
       canopy.tick (production.WLeaf, production.WSOrg, 
-		   production.WStem, development.DS, 
+		   production.WStem, development->DS, 
 		   // We don't save the forced CAI, use simulated CAI
 		   //  until midnight (small error).
 		   -1.0);
       root_system.set_density (msg, 
-			       geometry, production.WRoot, development.DS);
-      nitrogen.content (development.DS, production);
+			       geometry, production.WRoot, development->DS);
+      nitrogen.content (development->DS, production);
     }
 }
 
@@ -225,20 +225,20 @@ CropStandard::tick (const Time& time,
   nitrogen.clear ();
 
   // Emergence.
-  if (time.hour () == 0 && development.DS <= 0)
+  if (time.hour () == 0 && development->DS <= 0)
     {
       daisy_assert (ForcedCAI < 0.0);
 
-      development.emergence (soil.interval_plus (-root_system.Depth/2.),
-			     root_system.soil_temperature);
-      if (development.DS >= 0)
+      development->emergence (soil.interval_plus (-root_system.Depth/2.),
+                              root_system.soil_temperature);
+      if (development->DS >= 0)
 	{
 	  msg.message ("Emerging");
 	  canopy.tick (production.WLeaf, production.WSOrg,
-		       production.WStem, development.DS, -1.0);
-	  nitrogen.content (development.DS, production);
+		       production.WStem, development->DS, -1.0);
+	  nitrogen.content (development->DS, production);
 	  root_system.tick_daily (msg, soil, production.WRoot, 0.0,
-				  development.DS);
+				  development->DS);
 
 	  static const symbol root_symbol ("root");
 	  static const symbol dead_symbol ("dead");
@@ -273,13 +273,13 @@ CropStandard::tick (const Time& time,
 	}
       return;
     }
-  if (development.DS <= 0 || development.DS >= 2)
+  if (development->DS <= 0 || development->DS >= 2)
     return;
 
   if (soil_NO3)
     {
       daisy_assert (soil_NH4);
-      nitrogen.update (time.hour (), production.NCrop, development.DS,
+      nitrogen.update (time.hour (), production.NCrop, development->DS,
 		       enable_N_stress,
 		       soil, soil_water, *soil_NH4, *soil_NO3,
                        bioclimate.day_fraction (),
@@ -305,7 +305,7 @@ CropStandard::tick (const Time& time,
           Ass += photosynthesis (bioclimate.daily_air_temperature (),
                                  PAR, bioclimate.height (),
                                  bioclimate.LAI (),
-                                 canopy, development, msg)
+                                 canopy, *development, msg)
             * bioclimate.shared_light_fraction ();
         }
       if (min_light_fraction > 1e-10)
@@ -319,7 +319,7 @@ CropStandard::tick (const Time& time,
           Ass += photosynthesis (bioclimate.daily_air_temperature (),
                                  PAR, bioclimate.height (),
                                  bioclimate.LAI (),
-                                 canopy, development, msg)
+                                 canopy, *development, msg)
             * min_light_fraction;
         }
 
@@ -339,22 +339,22 @@ CropStandard::tick (const Time& time,
 
   production.tick (bioclimate.daily_air_temperature (),
 		   soil_heat.T (soil.interval_plus (-root_system.Depth / 3.0)),
-		   root_system.Density, soil, development.DS, 
+		   root_system.Density, soil, development->DS, 
 		   canopy.CAImRat, nitrogen, nitrogen_stress, partition, 
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, msg);
-  nitrogen.content (development.DS, production);
+  nitrogen.content (development->DS, production);
   if (time.hour () != 0)
     return;
 
   canopy.tick (production.WLeaf, production.WSOrg,
-	       production.WStem, development.DS, ForcedCAI);
+	       production.WStem, development->DS, ForcedCAI);
 
-  development.tick_daily (bioclimate.daily_air_temperature (), 
+  development->tick_daily (bioclimate.daily_air_temperature (), 
 			  production.WLeaf, production, vernalization,
 			  harvesting.cut_stress, msg);
   root_system.tick_daily (msg, soil, production.WRoot, production.IncWRoot,
-			  development.DS);
+			  development->DS);
 }
 
 const Harvest&
@@ -377,7 +377,7 @@ CropStandard::harvest (const symbol column_name,
   Treelog::Open nest (msg, name + " harvest");
 
   // Update nitrogen content.
-  nitrogen.content (development.DS, production);
+  nitrogen.content (development->DS, production);
 
   // Removed chemicals.
   Chemicals chemicals;
@@ -407,18 +407,18 @@ CropStandard::harvest (const symbol column_name,
   const Harvest& harvest 
     = harvesting (column_name, name, 
 		  root_system.Density,
-		  time, geometry, production, development.DS,
+		  time, geometry, production, development->DS,
 		  stem_harvest, leaf_harvest, chemicals,
 		  stem_harvest_frac, leaf_harvest_frac, sorg_harvest_frac,
 		  kill_off, residuals, residuals_DM,
 		  residuals_N_top, residuals_C_top, 
 		  residuals_N_soil, residuals_C_soil);
 
-  if (development.DS != DSremove)
+  if (development->DS != DSremove)
     {
-      nitrogen.cut (development.DS); // Stop fixation.
+      nitrogen.cut (development->DS); // Stop fixation.
 
-      if (development.DS > 0.0)
+      if (development->DS > 0.0)
 	{
 	  // Revert development.
 	  if (harvesting.DSnew < 0.0)
@@ -427,28 +427,28 @@ CropStandard::harvest (const symbol column_name,
 #if 0
 	      // Negative value means revert to canopy 
 	      if (stub_length < canopy.Height)
-		development.DS = canopy.DS_at_height (stub_length);
+		development->DS = canopy.DS_at_height (stub_length);
 #else
 	      // We want a cut to always put back development, even
 	      // for a crop which is so retarded that it has no stem
 	      // worth speaking about, and hence, no height.
 	      const double DS_height = canopy.DS_at_height (stub_length);
-	      if (development.DS > DS_height)
-		development.DS = DS_height;
+	      if (development->DS > DS_height)
+		development->DS = DS_height;
 #endif
 	      
 	    }
-	  else if (development.DS > harvesting.DSnew)
-	    development.DS = harvesting.DSnew;
+	  else if (development->DS > harvesting.DSnew)
+	    development->DS = harvesting.DSnew;
 	  
 	  // Cut canopy.
-	  canopy.cut (production.WStem, development.DS, stub_length);
+	  canopy.cut (production.WStem, development->DS, stub_length);
 
 	  daisy_assert (approximate (canopy.CropHeight (production.WStem,
-							development.DS), 
+							development->DS), 
 				     canopy.Height));
 	  canopy.CropCAI (production.WLeaf, production.WSOrg,
-			  production.WStem, development.DS);
+			  production.WStem, development->DS);
 	  if (LAI () > 0.0)
 	    CanopyStructure ();
 	  else
@@ -482,34 +482,24 @@ CropStandard::output (Log& log) const
 
 CropStandard::CropStandard (const AttributeList& al)
   : Crop (al),
-    root_system (*new RootSystem (al.alist ("Root"))),
-    canopy (*new CanopyStandard (al.alist ("Canopy"))),
-    harvesting (*new Harvesting (al.alist ("Harvest"))),
-    production (*new Production (al.alist ("Prod"))),
+    root_system (al.alist ("Root")),
+    canopy (al.alist ("Canopy")),
+    harvesting (al.alist ("Harvest")),
+    production (al.alist ("Prod")),
     development (Librarian<Phenology>::create (al.alist ("Devel"))),
-    partition (*new Partition (al.alist ("Partit"))),
-    vernalization (*new Vernalization (al.check ("Vernal") 
-				       ? al.alist ("Vernal")
-				       : Vernalization::no_vernalization ())),
-    photosynthesis (*new Photosynthesis (al.alist ("LeafPhot"))),
-    nitrogen (*new CrpN (al.alist ("CrpN"))),
+    partition (al.alist ("Partit")),
+    vernalization (al.check ("Vernal")
+                   ? al.alist ("Vernal")
+                   : Vernalization::no_vernalization ()),
+    photosynthesis (al.alist ("LeafPhot")),
+    nitrogen (al.alist ("CrpN")),
     enable_water_stress (al.flag ("enable_water_stress")),
     enable_N_stress (al.flag ("enable_N_stress")),
     min_light_fraction (al.number ("min_light_fraction"))
 { }
 
 CropStandard::~CropStandard ()
-{
-  delete &root_system;
-  delete &canopy;
-  delete &harvesting;
-  delete &production;
-  delete &development;
-  delete &partition;
-  delete &vernalization;
-  delete &photosynthesis;
-  delete &nitrogen;
-}
+{ }
 
 static struct CropStandardSyntax
 {

@@ -33,7 +33,7 @@ struct LogCheckpoint : public LogAList
   // Content.
   const string file;		// Name of file to write checkpoint in.
   const string description;	// Comment to go to the start of the file.
-  Condition& condition;		// Should we print a log now?
+  auto_ptr<Condition> condition; // Should we print a log now?
   Time time;			// Time of current checkpoint.
 
   // Start and end of time step.
@@ -59,8 +59,8 @@ bool
 LogCheckpoint::match (const Daisy& daisy, Treelog& out)
 {
   daisy_assert (nested == 0);
-  condition.tick (daisy, out);
-  is_active = condition.match (daisy);
+  condition->tick (daisy, out);
+  is_active = condition->match (daisy);
   if (is_active)
     {
       static const symbol daisy_symbol ("daisy");
@@ -170,7 +170,7 @@ LogCheckpoint::LogCheckpoint (const AttributeList& al)
 { }
 
 LogCheckpoint::~LogCheckpoint ()
-{ delete &condition; }
+{ }
 
 static struct LogCheckpointSyntax
 {

@@ -41,8 +41,8 @@ LogSelect::check_derived (symbol field, symbol /* name */,
 bool 
 LogSelect::match (const Daisy& daisy, Treelog& out)
 {
-  condition.tick (daisy, out);
-  is_printing = condition.match (daisy);
+  condition->tick (daisy, out);
+  is_printing = condition->match (daisy);
   is_active = is_printing;
 
   for (vector<Select*>::const_iterator i = entries.begin (); 
@@ -202,13 +202,12 @@ LogSelect::LogSelect (const AttributeList& al)
 
   // Initialize entries.
   for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->initialize (conv_map, from, to, condition.timestep ());
+    entries[i]->initialize (conv_map, from, to, condition->timestep ());
 }
 
   
 LogSelect::~LogSelect ()
 {
-  delete &condition;
   sequence_delete (entries.begin (), entries.end ());
 }
 

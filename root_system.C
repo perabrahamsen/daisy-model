@@ -344,7 +344,7 @@ RootSystem::tick_daily (Treelog& msg, const Soil& soil,
 void
 RootSystem::set_density (Treelog& msg, const Geometry& geometry, 
 			 const double WRoot, const double DS)
-{ rootdens.set_density (msg, Density, geometry, Depth, PotRtDpt, WRoot, DS); }
+{ rootdens->set_density (msg, Density, geometry, Depth, PotRtDpt, WRoot, DS); }
 
 void
 RootSystem::full_grown (Treelog& msg, const Soil& soil, 
@@ -518,7 +518,7 @@ RootSystem::RootSystem (const AttributeList& al)
 { }
 
 RootSystem::~RootSystem ()
-{ delete &rootdens; }
+{ }
 
 static Submodel::Register 
 root_system_submodel ("RootSystem", RootSystem::load_syntax);

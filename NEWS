@@ -12,6 +12,25 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.60
+
+** You can now give specific numbers symbolic names.
+
+Example: 
+
+  (defnumber max_rooting_depth const 60.0 [cm])
+  
+  (defcolumn Andeby default
+    "The B.And farm, Andeby, 2002."
+    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+  	(MaxRootingDepth max_rooting_depth))
+    (Groundwater deep))
+
+This is useful if the same number is used in several places, and all
+must be updated at the same time.  Or if you are running a number of
+simulation where you always change a few specific parameters, you can
+place these at the beginning of the file for convenience.
+
 * 3.59
 
 ** More DOM sorption work.

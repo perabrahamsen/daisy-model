@@ -124,7 +124,7 @@ EquilibriumGoal_A::initialize (const Soil& soil, Treelog& err)
   initialize_state = init_succes;
 
   auto_ptr<Pedotransfer> pedo_goal_A 
-    (&Librarian<Pedotransfer>::create (alist.alist ("goal_A")));
+    (Librarian<Pedotransfer>::create (alist.alist ("goal_A")));
   if (pedo_goal_A->check (soil, "g/cm^3", err))
     pedo_goal_A->set (soil, goal_A, "g/cm^3");
   else
@@ -132,7 +132,7 @@ EquilibriumGoal_A::initialize (const Soil& soil, Treelog& err)
   Pedotransfer::debug_message ("goal_A", goal_A, "g/cm^3", err);
 
   auto_ptr<Pedotransfer> pedo_min_B 
-    (&Librarian<Pedotransfer>::create (alist.alist ("min_B")));
+    (Librarian<Pedotransfer>::create (alist.alist ("min_B")));
   if (pedo_min_B->check (soil, "g/cm^3", err))
     pedo_min_B->set (soil, min_B, "g/cm^3");
   else

@@ -1,4 +1,32 @@
+2004-10-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.60 released.
+
+2004-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vcheck.C (valid_hour, valid_mday, valid_month): New checks.
+	* condition_time.C, action_crop.C: Use them.
+
+	* librarian.h (create): Return pointer instead of reference.
+	* root_system.h, root_system.C: 
+	* pet_PM.C, pet_FAO_PM.C, organic_matter.C, options.C: 
+	* log_select.C, log_select.h, log_checkpoint.C: 
+	* dom.C, crop_std.C, condition_logic.C, action_wait.C: 
+	* column_base.h, column_base.C, column_inorganic.C, column_std.C: 
+	* action_crop.C, action_lisp.C, action_message.C: Use auto_ptr.
+	* horizon.C, horizon.h: Ditto.
+	* soil.C: Update caller.
+
+	* crop_std.C: Remove extra indirection for submodels.
+
 2004-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* number_const.C: New models.
+	* Makefile (MODELS): Add them.
+
+	* parser_file.C (skip_to_end): Skip whitespace first.
+	(get_number): Support number objects.
+	(skip_token): Hyphens are numbers, not identifiers.
 
 	* Version 3.59 released.
 

@@ -49,7 +49,7 @@ struct TransformEquilibrium : public Transform
   bool check (const Soil&, Treelog& err) const;
   TransformEquilibrium (const AttributeList& al)
     : Transform (al),
-      equilibrium (&Librarian<Equilibrium>::create (al.alist ("equilibrium"))),
+      equilibrium (Librarian<Equilibrium>::create (al.alist ("equilibrium"))),
       initialize_state (uninitialized)
   { }
 };
@@ -113,7 +113,7 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
   {
     Treelog::Open nest (err, "k_AB");
     auto_ptr<Pedotransfer> pedo_AB 
-      (&Librarian<Pedotransfer>::create (alist.alist ("k_AB")));
+      (Librarian<Pedotransfer>::create (alist.alist ("k_AB")));
     if (pedo_AB->check (soil, "h^-1", err))
       pedo_AB->set (soil, k_AB, "h^-1");
     else
@@ -127,7 +127,7 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
     {
       Treelog::Open nest (err, "k_BA");
       auto_ptr<Pedotransfer> pedo_BA 
-        (&Librarian<Pedotransfer>::create (alist.alist ("k_BA")));
+        (Librarian<Pedotransfer>::create (alist.alist ("k_BA")));
       if (pedo_BA->check (soil, "h^-1", err))
         pedo_BA->set (soil, k_BA, "h^-1");
       else
@@ -145,7 +145,7 @@ TransformEquilibrium::initialize (const Soil& soil, Treelog& err)
         {
           vector<double> debug;
           auto_ptr<Pedotransfer> pedo_debug 
-            (&Librarian<Pedotransfer>::create (*alists[i]));
+            (Librarian<Pedotransfer>::create (*alists[i]));
           if (pedo_debug->check (soil, pedo_debug->dimension (), err))
             pedo_debug->set (soil, debug, pedo_debug->dimension ());
           else

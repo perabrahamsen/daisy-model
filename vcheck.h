@@ -39,6 +39,9 @@ public:
   // Integer or Integer sequence.
 public:
   static const VCheck& valid_year ();
+  static const VCheck& valid_month ();
+  static const VCheck& valid_mday ();
+  static const VCheck& valid_hour ();
 
   class IRange;
 

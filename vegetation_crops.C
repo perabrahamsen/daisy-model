@@ -590,18 +590,18 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      OrganicMatter& organic_matter, 
                       double& seed_N, double& seed_C)
 {
-  Crop& crop = Librarian<Crop>::create (al);
-  const symbol name = crop.name;
+  Crop *const crop = Librarian<Crop>::create (al);
+  const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
        i++)
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop.initialize (msg, geometry, &organic_matter);
-  crops.push_back (&crop);
-  seed_N += crop.total_N ();
-  seed_C += crop.total_C ();
+  crop->initialize (msg, geometry, &organic_matter);
+  crops.push_back (crop);
+  seed_N += crop->total_N ();
+  seed_C += crop->total_C ();
   reset_canopy_structure (msg);
 }
 
@@ -609,16 +609,16 @@ void
 VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      const Geometry& geometry)
 {
-  Crop& crop = Librarian<Crop>::create (al);
-  const symbol name = crop.name;
+  Crop *const crop = Librarian<Crop>::create (al);
+  const symbol name = crop->name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
        i++)
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop.initialize (msg, geometry, NULL);
-  crops.push_back (&crop);
+  crop->initialize (msg, geometry, NULL);
+  crops.push_back (crop);
 }
 
 void
@@ -660,7 +660,7 @@ VegetationCrops::VegetationCrops (const AttributeList& al)
        i != sequence.end ();
        i++)
     {
-      crops.push_back (&Librarian<Crop>::create (**i));
+      crops.push_back (Librarian<Crop>::create (**i));
     }
 }
 

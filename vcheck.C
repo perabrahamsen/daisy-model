@@ -219,6 +219,27 @@ VCheck::valid_year ()
 }
 
 const VCheck& 
+VCheck::valid_month ()
+{
+  static IRange valid_month (1, 12);
+  return valid_month;
+}
+
+const VCheck& 
+VCheck::valid_mday ()
+{
+  static IRange valid_mday (1, 31);
+  return valid_mday;
+}
+
+const VCheck& 
+VCheck::valid_hour ()
+{
+  static IRange valid_hour (0, 23);
+  return valid_hour;
+}
+
+const VCheck& 
 VCheck::increasing ()
 {
   static Increasing increasing;

@@ -695,14 +695,14 @@ UZRichard::has_macropores (bool has_them)
 	  static AttributeList geometric;
 	  if (!geometric.check ("type"))
 	    geometric.add ("type", "geometric");
-	  K_average = &Librarian<Average>::create (geometric);
+	  K_average = Librarian<Average>::create (geometric);
 	}
       else
 	{
 	  static AttributeList arithmetic;
 	  if (!arithmetic.check ("type"))
 	    arithmetic.add ("type", "arithmetic");
-	  K_average = &Librarian<Average>::create (arithmetic);
+	  K_average = Librarian<Average>::create (arithmetic);
 	}
     }
 }
@@ -720,7 +720,7 @@ UZRichard::UZRichard (const AttributeList& al)
     max_absolute_difference (al.number ("max_absolute_difference")),
     max_relative_difference (al.number ("max_relative_difference")),
     K_average (al.check ("K_average")
-	       ? &Librarian<Average>::create (al.alist ("K_average"))
+	       ? Librarian<Average>::create (al.alist ("K_average"))
 	       : NULL)
 { }
 

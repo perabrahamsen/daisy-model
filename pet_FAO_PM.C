@@ -31,6 +31,7 @@
 #include "vegetation.h"
 #include "log.h"
 #include "tmpstream.h"
+#include <memory>
 
 class PetFAO_PM : public Pet
 {
@@ -42,7 +43,7 @@ public:
   double potential_evapotranspiration_dry;
 
   // Net radiation.
-  NetRadiation& net_radiation;
+  std::auto_ptr<NetRadiation> net_radiation;
 
   // Simulation.
   void tick (const Time&, const Weather& weather, const Vegetation& crops,
@@ -70,7 +71,7 @@ public:
 		     (al.alist ("net_radiation")))
   { }
   ~PetFAO_PM ()
-  { delete &net_radiation; }
+  { }
 };
 
 void
@@ -92,8 +93,8 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const Vegetation& crops,
   const double Albedo = albedo (crops, surface, soil, soil_water);
 
   // Net Radiation.
-  net_radiation.tick (Cloudiness, Temp, VaporPressure, Si, Albedo, out);
-  const double Rn = net_radiation.net_radiation ();
+  net_radiation->tick (Cloudiness, Temp, VaporPressure, Si, Albedo, out);
+  const double Rn = net_radiation->net_radiation ();
 
   // Ground heat flux.
   const double G = soil_heat.top_flux (soil, soil_water);

@@ -309,7 +309,7 @@ do { \
 #define output_derived(submodule, key, log) \
 do { \
   static const symbol MACRO_name (key); \
-  output_derived_ ((submodule), MACRO_name, (log)); \
+  output_derived_ ((*submodule), MACRO_name, (log)); \
 } while (false)
 
 template <class T> void
@@ -330,7 +330,7 @@ output_derived_ (const T& submodule, const symbol name, Log& log)
 #define output_object(submodule, key, log) \
 do { \
   static const symbol MACRO_name (key); \
-  output_object_ ((submodule), MACRO_name, (log)); \
+  output_object_ ((*submodule), MACRO_name, (log)); \
 } while (false)
 
 template <class T> void

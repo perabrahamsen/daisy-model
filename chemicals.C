@@ -112,7 +112,7 @@ Chemicals::Implementation::lookup (symbol name)
   child.add ("type", name);
 
   // Then add it.
-  const Chemical* chemical = &Librarian<Chemical>::create (child);
+  const Chemical* chemical = Librarian<Chemical>::create (child);
   (*chemistry)[name] = chemical;
   return chemical;
 }

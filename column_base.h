@@ -36,6 +36,7 @@
 #include "weather.h"
 #include "vegetation.h"
 #include "time.h"
+#include <memory>
 
 struct IM;
 struct AM;
@@ -45,15 +46,15 @@ class ColumnBase : public Column
   // Content.
 protected:
   Weather* weather;
-  Vegetation& vegetation;
-  Bioclimate& bioclimate;
+  std::auto_ptr<Vegetation> vegetation;
+  std::auto_ptr<Bioclimate> bioclimate;
   Surface surface;
   Soil soil;
   SoilWater soil_water;
   SoilHeat soil_heat;
   SoilChemicals soil_chemicals;
   std::vector<Chemistry*> chemistry;
-  Groundwater& groundwater;
+  std::auto_ptr<Groundwater> groundwater;
 
   // Log variables.
 private:

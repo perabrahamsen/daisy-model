@@ -23,6 +23,8 @@
 #include "condition.h"
 #include "time.h"
 #include "daisy.h"
+#include "tmpstream.h"
+#include "vcheck.h"
 
 using namespace std;
 
@@ -359,6 +361,23 @@ public:
 
 static struct ConditionTimeSyntax
 {
+  static bool check_mday (const AttributeList& al, Treelog& err)
+  {
+    bool ok = true;
+    const int mm = al.integer ("month");
+    const int dd = al.integer ("day");
+
+    if (dd > Time::month_length (1 /* not a leap year */, mm))
+      {
+        TmpStream tmp;
+        tmp () << "last valid day of " << Time::month_name (mm) << " is "
+               << Time::month_length (1, mm);
+        err.entry (tmp.str ());
+        ok = false;
+      }
+    return ok;
+  }
+  
   ConditionTimeSyntax ();
 } ConditionTime_syntax;
 
@@ -381,11 +400,15 @@ True after specific month, day and hour in the year.");
     after_alist.add ("hour", 8);
     syntax.add ("month", Syntax::Integer, Syntax::Const, 
 		"Month to test for.");
+    syntax.add_check ("month", VCheck::valid_month ());
     syntax.add ("day", Syntax::Integer, Syntax::Const, 
 		"Day in the month to test for.");
+    syntax.add_check ("day", VCheck::valid_mday ());
     syntax.add ("hour", Syntax::Integer, Syntax::Const, 
 		"Hour to test for.");
+    syntax.add_check ("hour", VCheck::valid_hour ());
     syntax.order ("month", "day");
+    syntax.add_check (check_mday);
     Librarian<Condition>::add_type ("mm_dd", at_alist, syntax,
 				    &ConditionMMDD::make);
     Librarian<Condition>::add_type ("before_mm_dd", before_alist, syntax,
@@ -463,30 +486,36 @@ plus one modulo 'step' is 0.");
     alist_hour.add ("description", "True, at the specified hour.");
     syntax_hour.add ("at", Syntax::Integer, Syntax::Const,
 		     "Hour when the condition is true [0-23].");
+    syntax_hour.add_check ("at", VCheck::valid_hour ());
     syntax_hour.order ("at");
     Syntax& syntax_mday = *new Syntax ();
     AttributeList& alist_mday = *new AttributeList ();
     alist_mday.add ("description", "True, at the specified day in the month.");
     syntax_mday.add ("at", Syntax::Integer, Syntax::Const,
 		" when the condition is true [1-31].");
+    syntax_mday.add_check ("at", VCheck::valid_mday ());
     syntax_mday.order ("at");
     Syntax& syntax_yday = *new Syntax ();
     AttributeList& alist_yday = *new AttributeList ();
     alist_yday.add ("description", "True, at the specified julian day.");
     syntax_yday.add ("at", Syntax::Integer, Syntax::Const,
 		"Julian day when the condition is true [1-366].");
+    static VCheck::IRange valid_jday (1, 366);
+    syntax_hour.add_check ("at", valid_jday);
     syntax_yday.order ("at");
     Syntax& syntax_month = *new Syntax ();
     AttributeList& alist_month = *new AttributeList ();
     alist_month.add ("description", "True, at the specified month.");
     syntax_month.add ("at", Syntax::Integer, Syntax::Const,
 		      "Month when the condition is true [1-12].");
+    syntax_mday.add_check ("at", VCheck::valid_mday ());
     syntax_month.order ("at");
     Syntax& syntax_year = *new Syntax ();
     AttributeList& alist_year = *new AttributeList ();
     alist_year.add ("description", "True, at the specified year.");
     syntax_year.add ("at", Syntax::Integer, Syntax::Const,
 		"Year when the condition is true.");
+    syntax_year.add_check ("at", VCheck::valid_year ());
     syntax_year.order ("at");
     Librarian<Condition>::add_type ("hour", alist_hour, syntax_hour,
 				    &ConditionHour::make);

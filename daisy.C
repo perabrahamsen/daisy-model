@@ -75,7 +75,7 @@ Daisy::Daisy (const AttributeList& al)
     stop (al.check ("stop") ? Time (al.alist ("stop")) : Time (9999, 1, 1, 1)),
     action (Librarian<Action>::create (al.alist ("manager"))),
     weather (al.check ("weather") 
-	     ? &Librarian<Weather>::create (al.alist ("weather"))
+	     ? Librarian<Weather>::create (al.alist ("weather"))
 	     : NULL), 
     field (*new Field (al.alist_sequence ("column"))),
     harvest (map_construct_const<Harvest> (al.alist_sequence ("harvest")))
@@ -114,7 +114,7 @@ Daisy::check (Treelog& err)
   // Check actions.
   {
     Treelog::Open nest (err, "manager");
-    if (!action.check (*this, err))
+    if (!action->check (*this, err))
       ok = false;
   }
   return ok;
@@ -127,9 +127,9 @@ Daisy::tick_columns (Treelog& out)
 void
 Daisy::initial_logs (Treelog& out)
 {
-  activate_output.tick (*this, out);
+  activate_output->tick (*this, out);
 
-  if (activate_output.match (*this))
+  if (activate_output->match (*this))
     {
       if (!logging)
 	{
@@ -144,7 +144,7 @@ Daisy::initial_logs (Treelog& out)
 		{
 		  output_submodule (previous, "time", log);
 		  if (weather)
-		    output_derived (*weather, "weather", log);
+		    output_derived (weather, "weather", log);
 		  output_submodule (field, "column", log);
 		  output_vector (harvest, "harvest", log);
 		  output_derived (action, "manager", log);
@@ -173,7 +173,7 @@ Daisy::tick_logs (Treelog& out)
 	    {
 	      output_submodule (time, "time", log);
 	      if (weather)
-		output_derived (*weather, "weather", log);
+		output_derived (weather, "weather", log);
 	      output_submodule (field, "column", log);
 	      output_vector (harvest, "harvest", log);
 	      output_derived (action, "manager", log);
@@ -193,8 +193,8 @@ Daisy::tick (Treelog& out)
   initial_logs (out);
   if (weather)
     weather->tick (time, out);
-  action.tick (*this, out);
-  action.doIt (*this, out);
+  action->tick (*this, out);
+  action->doIt (*this, out);
 
   tick_columns (out);
   tick_logs (out);
@@ -226,14 +226,14 @@ Daisy::run (Treelog& out)
 	    out.message ("Begin simulation");
 	  }
 
-	print_time.tick (*this, out);
-	const bool force_print = print_time.match (*this);
+	print_time->tick (*this, out);
+	const bool force_print = print_time->match (*this);
 
 	tick (out);
 
 	if (!running)
 	  out.message ("End simulation");
-	print_time.tick (*this, out);
+	print_time->tick (*this, out);
 	if (force_print)
 	  out.touch ();
       }
@@ -326,9 +326,6 @@ Daisy::~Daisy ()
 {
   sequence_delete (logs.begin (), logs.end ());
   delete &log_all;
-  delete &activate_output;
-  delete &print_time;
-  delete &action;
   if (weather)
     delete weather;
   delete &field;

@@ -39,7 +39,7 @@ struct ActionRepeat : public Action
 	action = NULL;
       }
     if (action == NULL)
-      action = &Librarian<Action>::create (repeat);
+      action = Librarian<Action>::create (repeat);
     action->doIt (daisy, out);
   }
 
@@ -50,7 +50,7 @@ struct ActionRepeat : public Action
 
   void output (Log& log) const
   { 
-    output_derived (*action, "do", log);
+    output_derived (action, "do", log);
   }
 
   bool check (const Daisy& daisy, Treelog& err) const
@@ -72,7 +72,7 @@ struct ActionRepeat : public Action
   ActionRepeat (const AttributeList& al)
     : Action (add_do (al)),
       repeat (al.alist ("repeat")),
-      action (&Librarian<Action>::create (al.check ("do") 
+      action (Librarian<Action>::create (al.check ("do") 
 					  ? al.alist ("do")
 					  : repeat))
   { }

@@ -28,8 +28,9 @@
 #include "treelog_stream.h"
 #include "version.h"
 #include "path.h"
-
 #include <iostream>
+#include <memory>
+
 using namespace std;
 
 #if defined (__unix) 
@@ -200,10 +201,9 @@ Options::Options (int& argc, char**& argv,
                 Treelog::Open nest (out, name);
                 if (syntax.check (alist, out))
                   {
-                    Document& document = 
-                      Librarian<Document>::create (alist);
-                    document.print_document (cout);
-                    delete &document;
+                    auto_ptr<Document> document 
+                      (Librarian<Document>::create (alist));
+                    document->print_document (cout);
                   }
                 prevent_run = true;
               }

@@ -31,6 +31,7 @@
 #include "check_range.h"
 #include "im.h"
 #include "tmpstream.h"
+#include "vcheck.h"
 
 using namespace std;
 
@@ -150,7 +151,7 @@ struct ActionCrop : public Action
     // Content.
     const int month;
     const int day;
-    Action& operation;
+    auto_ptr<Action> operation;
 
     // Simulation.
     void output (Log&) const;
@@ -281,7 +282,7 @@ ActionCrop::tick (const Daisy& daisy, Treelog& out)
   for (vector<const Tillage*>::const_iterator i = tillage.begin ();
        i != tillage.end ();
        i++)
-    (*i)->operation.tick (daisy, out);
+    (*i)->operation->tick (daisy, out);
 }
 
 void 
@@ -614,13 +615,7 @@ ActionCrop::Tillage::check_alist (const AttributeList& al, Treelog& err)
   const int mm = al.integer ("month");
   const int dd = al.integer ("day");
 
-  if (mm < 1 || mm > 12)
-    {
-      err.entry ("month should be between 1 and 12");
-      ok = false;
-    }
-  // don't test for bad month.
-  else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
+  if (dd > Time::month_length (1 /* not a leap year */, mm))
     {
       TmpStream tmp;
       tmp () << "day should be between 1 and " << Time::month_length (1, mm);
@@ -636,8 +631,10 @@ ActionCrop::Tillage::load_syntax (Syntax& syntax, AttributeList&)
   syntax.add_check (check_alist);
   syntax.add ("month", Syntax::Integer, Syntax::Const, 
 	      "Month in the year.");
+  syntax.add_check ("month", VCheck::valid_month ());
   syntax.add ("day", Syntax::Integer, Syntax::Const, 
 	      "Day in the month.");
+  syntax.add_check ("mday", VCheck::valid_mday ());
   syntax.add ("operation", Librarian<Action>::library (), 
 	      "Tillage operation.");
   syntax.order ("month", "day", "operation");
@@ -650,7 +647,7 @@ ActionCrop::Tillage::Tillage (const AttributeList& al)
 { }
 
 ActionCrop::Tillage::~Tillage ()
-{ delete &operation; }
+{ }
 
 void 
 ActionCrop::Spray::output (Log&) const
@@ -873,7 +870,7 @@ ActionCrop::doIt (Daisy& daisy, Treelog& out)
       && daisy.time.month () == tillage[tillage_index]->month
       && daisy.time.mday () == tillage[tillage_index]->day)
     {
-      tillage[tillage_index]->operation.doIt (daisy, out);
+      tillage[tillage_index]->operation->doIt (daisy, out);
       tillage_index++;
     }
 

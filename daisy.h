@@ -54,13 +54,13 @@ public:
   static const std::vector<Log*> 
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
   const std::vector<Log*> active_logs;
-  Condition& activate_output;
-  Condition& print_time;
+  std::auto_ptr<Condition> activate_output;
+  std::auto_ptr<Condition> print_time;
   Time time;
 private:
   const Time stop;
 public:
-  Action& action;
+  std::auto_ptr<Action> action;
   Weather* weather;
   Field& field;
   std::vector<const Harvest*> harvest;

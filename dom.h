@@ -46,11 +46,11 @@ class DOM
 
   // Transport.
 private:
-  Transport& trans;		// Solute transport model in matrix.
-  Transport& reserve;		// Reserve solute transport model in matrix.
-  Transport& last_resort;       // Last resort solute transport model.
-  Mactrans& mactrans;		// Solute transport model in macropores.
-  Adsorption& adsorption;	// Solute adsorption.
+  std::auto_ptr<Transport> trans; // Solute transport model in matrix.
+  std::auto_ptr<Transport> reserve; // Reserve solute transport model in matr.
+  std::auto_ptr<Transport> last_resort; // Last resort solute transport model.
+  std::auto_ptr<Mactrans> mactrans; // Solute transport model in macropores.
+  std::auto_ptr<Adsorption> adsorption;	// Solute adsorption.
   const double diffusion_coefficient;
 
   // Turnover.

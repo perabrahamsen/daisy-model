@@ -130,13 +130,13 @@ struct ConditionAnd : public Condition
 
 struct ConditionNot : public Condition
 {
-  Condition& condition;
+  auto_ptr<Condition> condition;
 
   bool match (const Daisy& daisy) const
-  { return !condition.match (daisy); }
+  { return !condition->match (daisy); }
 
   void tick (const Daisy& daisy, Treelog& out)
-  { condition.tick (daisy, out); }
+  { condition->tick (daisy, out); }
 
   void output (Log&) const
   { }
@@ -147,31 +147,27 @@ struct ConditionNot : public Condition
   { }
 
   ~ConditionNot ()
-  {
-#ifdef NO_CONST_DELETE
-    delete &condition; 
-#endif
-  }
+  { }
 };
 
 struct ConditionIf : public Condition
 {
-  Condition& if_c;
-  Condition& then_c;
-  Condition& else_c;
+  auto_ptr<Condition> if_c;
+  auto_ptr<Condition> then_c;
+  auto_ptr<Condition> else_c;
 
   void tick (const Daisy& daisy, Treelog& out)
   { 
-    if_c.tick (daisy, out);
-    then_c.tick (daisy, out);
-    else_c.tick (daisy, out);
+    if_c->tick (daisy, out);
+    then_c->tick (daisy, out);
+    else_c->tick (daisy, out);
   }
   bool match (const Daisy& daisy) const
   { 
-    if (if_c.match (daisy))
-      return then_c.match (daisy);
+    if (if_c->match (daisy))
+      return then_c->match (daisy);
     else
-      return else_c.match (daisy); 
+      return else_c->match (daisy); 
   }
   void output (Log&) const
   { }
@@ -184,13 +180,7 @@ struct ConditionIf : public Condition
   { }
 
   ~ConditionIf ()
-  {
-#ifdef NO_CONST_DELETE
-    delete &if_c;
-    delete &then_c;
-    delete &else_c;
-#endif
-  }
+  { }
 };
 
 static struct ConditionLogicSyntax

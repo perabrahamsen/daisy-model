@@ -6,33 +6,19 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 antal timer?  sh vil spørge fredag
 
-* WP5 rapport
-
-* Brug auto_ptr flere steder.
-
 * DOM/SOM equilibrium (bgj)
-
-** tillad solute...
-
-** Snak med bgj
 
 ** Brug i adsorbtion?
 
-** Generaliser til expression med ScopeSoil?
+** Generaliser til Number med ScopeSoil?
 
 * crop simple med nit
 
 * FertOrgaNic 
 
-** Oganiser polske data.
-
-** FertOrgaNic brev.
-
 ** gnuplot
 
 ** lin_int til Polen
-
-** Toves rapport.
 
 ** kalibreringsstrategi
 

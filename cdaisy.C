@@ -524,8 +524,8 @@ daisy_daisy_tick_action (Daisy* daisy)
   try
     {
       TreelogStream treelog (cerr);
-      daisy->action.tick (*daisy, treelog);
-      daisy->action.doIt (*daisy, treelog);
+      daisy->action->tick (*daisy, treelog);
+      daisy->action->doIt (*daisy, treelog);
     }
   catch (const char* error)
     {
@@ -911,7 +911,7 @@ daisy_chemical_find (const char* name)
 {
   const Library& chemlib = Library::find (symbol ("chemical"));
   if (chemlib.check (symbol (name)))
-    return &Librarian<Chemical>::create (chemlib.lookup (symbol (name)));
+    return Librarian<Chemical>::create (chemlib.lookup (symbol (name)));
   return NULL;
 }
 

@@ -447,9 +447,9 @@ SoilWater::Implementation::output (Log& log) const
   output_variable (h_ice, log);
   output_variable (q, log);
   output_variable (q_p, log);
-  output_derived (*top, "UZtop", log);
+  output_derived (top, "UZtop", log);
   if (bottom)
-    output_derived (*bottom, "UZbottom", log);
+    output_derived (bottom, "UZbottom", log);
 }
 
 double
@@ -476,14 +476,14 @@ SoilWater::Implementation::put_h (const Soil& soil,
 
 SoilWater::Implementation::Implementation (const AttributeList& al)
   : S_permanent (al.number_sequence ("S_permanent")),
-    top (&Librarian<UZmodel>::create (al.alist ("UZtop"))),
+    top (Librarian<UZmodel>::create (al.alist ("UZtop"))),
     bottom (  al.check ("UZbottom") 
-	    ? &Librarian<UZmodel>::create (al.alist ("UZbottom"))
+	    ? Librarian<UZmodel>::create (al.alist ("UZbottom"))
 	    : 0),
     bottom_start (  al.check ("UZborder") 
 		  ? al.integer ("UZborder")
 		  : -1),
-    reserve (&Librarian<UZmodel>::create (al.alist ("UZreserve"))),
+    reserve (Librarian<UZmodel>::create (al.alist ("UZreserve"))),
     macro (NULL)
 { }
 
@@ -602,7 +602,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
   h_old = h;
 
   if (al.check ("macro"))
-    macro = &Librarian<Macro>::create (al.alist ("macro"));
+    macro = Librarian<Macro>::create (al.alist ("macro"));
   else if (soil.humus (0) + soil.clay (0) > 0.05)
     // More than 5% clay (and humus) in first horizon.
     {

@@ -25,11 +25,11 @@
 struct ScopeNull : public Scope
 {
   // Use.
-  bool has_number (const std::string)
+  bool has_number (const std::string) const
   { return false; }
-  double number (const std::string&)
+  double number (const std::string&) const
   { daisy_assert (false); }
-  const std::string& dimension (const std::string&)
+  const std::string& dimension (const std::string&) const
   { daisy_assert (false); }
 
   // Create and Destroy.

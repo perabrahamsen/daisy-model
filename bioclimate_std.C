@@ -102,7 +102,7 @@ struct BioclimateStandard : public Bioclimate
   double soil_ea;		// Actual exfiltration. [mm/h]
 
   // Water transpirated through plant roots.
-  SVAT& svat;			// Soil Vegetation Atmosphere model.
+  auto_ptr<SVAT> svat;          // Soil Vegetation Atmosphere model.
   double crop_ep;		// Potential transpiration. [mm/h]
   double crop_ea;		// Actual transpiration. [mm/h]
   double production_stress;	// Stress calculated by SVAT module.
@@ -225,7 +225,7 @@ BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
   AttributeList alist (library.lookup (type));
   alist.add ("type", type);
   daisy_assert (library.syntax (type).check (alist, msg));
-  pet = &Librarian<Pet>::create (alist);
+  pet = Librarian<Pet>::create (alist);
 }
 
 BioclimateStandard::BioclimateStandard (const AttributeList& al)
@@ -236,7 +236,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     PAR_ (No + 1),
     shared_light_fraction_ (1.0),
     pet (al.check ("pet") 
-         ? &Librarian<Pet>::create (al.alist ("pet"))
+         ? Librarian<Pet>::create (al.alist ("pet"))
          : NULL),
     total_ep (0.0),
     total_ea (0.0),
@@ -297,7 +297,6 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
 BioclimateStandard::~BioclimateStandard ()
 { 
   delete pet;
-  delete &svat;
 }
 
 void
@@ -581,10 +580,10 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   daisy_assert (total_ea >= 0.0);
 
   // Production stress
-  svat.tick (weather, vegetation, surface, soil, soil_heat, soil_water, *pet,
-	     canopy_ea, snow_ea, pond_ea + litter_ea,
-             soil_ea, crop_ea, crop_ep);
-  production_stress = svat.production_stress ();
+  svat->tick (weather, vegetation, surface, soil, soil_heat, soil_water, *pet,
+              canopy_ea, snow_ea, pond_ea + litter_ea,
+              soil_ea, crop_ea, crop_ep);
+  production_stress = svat->production_stress ();
   vegetation.force_production_stress (production_stress);
 
   // 8 Reset irrigation
@@ -677,7 +676,7 @@ void
 BioclimateStandard::output (Log& log) const
 {
   daisy_assert (pet != NULL);
-  output_object (*pet, "pet", log);
+  output_object (pet, "pet", log);
   output_variable (total_ep, log);
   output_variable (total_ea, log);
   output_value (irrigation_overhead_old, "irrigation_overhead", log);

@@ -199,7 +199,7 @@ ColumnStandard::NitLog::load_syntax (Syntax& syntax, AttributeList&)
 
 void 
 ColumnStandard::sow (Treelog& msg, const AttributeList& al)
-{ vegetation.sow (msg, al, soil, organic_matter, seed_N, seed_C); }
+{ vegetation->sow (msg, al, soil, organic_matter, seed_N, seed_C); }
 
 // We need to convert from mm * mg N / liter to g N/m^2.
 // mm / liter = 1/m^2
@@ -459,9 +459,9 @@ ColumnStandard::tick (Treelog& out,
   surface.mixture (soil_chemicals);
   soil_water.macro_tick (soil, surface, out);
 
-  bioclimate.tick (time, surface, my_weather, 
-		   vegetation, soil, soil_water, soil_heat, out);
-  vegetation.tick (time, bioclimate, soil, &organic_matter, 
+  bioclimate->tick (time, surface, my_weather, 
+                    *vegetation, soil, soil_water, soil_heat, out);
+  vegetation->tick (time, *bioclimate, soil, &organic_matter, 
 		   soil_heat, soil_water, &soil_NH4, &soil_NO3, 
 		   residuals_DM, residuals_N_top, residuals_C_top, 
 		   residuals_N_soil, residuals_C_soil, out);
@@ -472,11 +472,11 @@ ColumnStandard::tick (Treelog& out,
                       soil, soil_water, soil_heat, soil_NO3, soil_NH4);
   denitrification.tick (active_size, soil, soil_water, soil_heat, soil_NO3, 
 			organic_matter);
-  groundwater.tick (soil, soil_water, surface.h (), soil_heat, time, out);
+  groundwater->tick (soil, soil_water, surface.h (), soil_heat, time, out);
 
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, my_weather);
-  soil_water.tick (soil, soil_heat, surface, groundwater, out);
+  soil_water.tick (soil, soil_heat, surface, *groundwater, out);
   soil_chemicals.tick (soil, soil_water, soil_heat, &organic_matter,
 		       surface.chemicals_down (), out);
   organic_matter.transport (soil, soil_water, out);
@@ -579,14 +579,14 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
     ? weather->average_temperature ()
     : global_weather->average_temperature ();
 
-  soil.initialize (groundwater, organic_matter.som_pools (), err);
+  soil.initialize (*groundwater, organic_matter.som_pools (), err);
   initialize_common (time, err, global_weather);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water, err);
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water, err);
   organic_matter.initialize (alist.alist ("OrganicMatter"), soil, soil_water, 
 			     T_avg, err);
   nitrification.initialize (soil.size ());
-  vegetation.initialize (time, soil, &organic_matter, err);
+  vegetation->initialize (time, soil, &organic_matter, err);
 }
 
 ColumnStandard::~ColumnStandard ()

@@ -34,28 +34,28 @@ void
 ColumnBase::irrigate_overhead (double flux, double temp, const IM&)
 {
   daisy_assert (flux >= 0.0);
-  bioclimate.irrigate_overhead (flux, temp);
+  bioclimate->irrigate_overhead (flux, temp);
 }
 
 void 
 ColumnBase::irrigate_surface (double flux, double temp, const IM&)
 {
   daisy_assert (flux >= 0.0);
-  bioclimate.irrigate_surface (flux, temp);
+  bioclimate->irrigate_surface (flux, temp);
 }
 
 void 
 ColumnBase::irrigate_overhead (double flux, const IM&)
 {
   daisy_assert (flux >= 0.0);
-  bioclimate.irrigate_overhead (flux);
+  bioclimate->irrigate_overhead (flux);
 }
 
 void 
 ColumnBase::irrigate_surface (double flux, const IM&)
 {
   daisy_assert (flux >= 0.0);
-  bioclimate.irrigate_surface (flux);
+  bioclimate->irrigate_surface (flux);
 }
 
 void
@@ -66,7 +66,7 @@ ColumnBase::irrigate_subsoil (double flux, const IM&,
   daisy_assert (from <= 0.0);
   daisy_assert (to <= from); 
   soil_water.incorporate (soil, flux / 10.0 /* mm -> cm */, from, to);
-  bioclimate.irrigate_subsoil (flux);
+  bioclimate->irrigate_subsoil (flux);
 }
 
 void
@@ -77,7 +77,7 @@ ColumnBase::set_subsoil_irrigation (double flux, const IM&,
   daisy_assert (from <= 0.0);
   daisy_assert (to < from);
   soil_water.set_external_source (soil, flux * 0.1 /* mm->cm */, from, to);
-  bioclimate.set_subsoil_irrigation (flux);
+  bioclimate->set_subsoil_irrigation (flux);
 }
 
 void
@@ -90,15 +90,14 @@ ColumnBase::harvest (const Time& time, const symbol crop_name,
 { 
   vector<AM*> residuals;
   double min_height = 100.0;
-  vegetation.harvest (name, crop_name, time, soil, 
-		      bioclimate,
-		      stub_length, 
-		      stem_harvest, leaf_harvest, sorg_harvest,
-		      harvest, min_height, 
-                      residuals, harvest_DM, harvest_N, harvest_C, 
-		      residuals_DM, residuals_N_top, residuals_C_top,
-		      residuals_N_soil, residuals_C_soil,
-		      msg); 
+  vegetation->harvest (name, crop_name, time, soil, *bioclimate,
+                       stub_length, 
+                       stem_harvest, leaf_harvest, sorg_harvest,
+                       harvest, min_height, 
+                       residuals, harvest_DM, harvest_N, harvest_C, 
+                       residuals_DM, residuals_N_top, residuals_C_top,
+                       residuals_N_soil, residuals_C_soil,
+                       msg); 
   add_residuals (residuals);
   if (min_height < 0.0)
     mix (msg, time, 0.0, min_height, 0.0);
@@ -110,9 +109,9 @@ ColumnBase::mix (Treelog& msg, const Time& time,
 		 double from, double to, double)
 {
   vector<AM*> residuals;
-  vegetation.kill_all (name, time, soil, bioclimate, residuals, 
-		       residuals_DM, residuals_N_top, residuals_C_top, 
-		       residuals_N_soil, residuals_C_soil, msg);
+  vegetation->kill_all (name, time, soil, *bioclimate, residuals, 
+                        residuals_DM, residuals_N_top, residuals_C_top, 
+                        residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
@@ -151,7 +150,7 @@ ColumnBase::set_heat_source (double at, double value) // [W/m^2]
 
 void 
 ColumnBase::spray (symbol chemical, double amount) // [g/ha]
-{ bioclimate.spray (chemical, amount / (100.0 * 100.0) /* ha->m^2 */); }
+{ bioclimate->spray (chemical, amount / (100.0 * 100.0) /* ha->m^2 */); }
 
 void 
 ColumnBase::set_surface_detention_capacity (double height) // [mm]
@@ -159,7 +158,7 @@ ColumnBase::set_surface_detention_capacity (double height) // [mm]
 
 double 
 ColumnBase::daily_air_temperature () const
-{ return bioclimate.daily_air_temperature (); }
+{ return bioclimate->daily_air_temperature (); }
 
 double 
 ColumnBase::soil_temperature (double height) const
@@ -188,12 +187,12 @@ ColumnBase::soil_water_content (double from, double to) const
 
 double  
 ColumnBase::crop_ds (const symbol name) const // {[-1:2], Crop::DSremove}
-{ return vegetation.DS_by_name (name); }
+{ return vegetation->DS_by_name (name); }
 
 double 
 ColumnBase::crop_dm (const symbol name, const double height) const
   //[kg/ha], negative when no crop
-{ return vegetation.DM_by_name (name, height); }
+{ return vegetation->DM_by_name (name, height); }
 
 unsigned int 
 ColumnBase::count_layers () const // Number of num. layers.
@@ -213,19 +212,19 @@ ColumnBase::get_water_sink (vector<double>& v) const // [cm^3/cm^3/h]
 
 double 
 ColumnBase::get_evap_interception () const // [mm/h]
-{ return bioclimate.get_evap_interception (); }
+{ return bioclimate->get_evap_interception (); }
 
 double 
 ColumnBase::get_intercepted_water () const // [mm]
-{ return bioclimate.get_intercepted_water (); }
+{ return bioclimate->get_intercepted_water (); }
 
 double 
 ColumnBase::get_net_throughfall () const // [mm/h]
-{ return bioclimate.get_net_throughfall (); }
+{ return bioclimate->get_net_throughfall (); }
 
 double 
 ColumnBase::get_snow_storage () const // [mm]
-{ return bioclimate.get_snow_storage (); }
+{ return bioclimate->get_snow_storage (); }
 
 double 
 ColumnBase::get_exfiltration () const // [mm/h]
@@ -348,7 +347,7 @@ ColumnBase::output (Log& log) const
   Log::Geo geo (log, soil);
   Column::output (log);
   if (weather)
-    output_derived (*weather, "weather", log);
+    output_derived (weather, "weather", log);
   output_object (bioclimate, "Bioclimate", log);
   output_submodule (surface, "Surface", log);
   output_submodule (soil, "Soil", log);
@@ -381,7 +380,7 @@ void
 ColumnBase::output_inner (Log&) const
 { }
 
-static Bioclimate& 
+static Bioclimate*
 get_bioclimate (const AttributeList& al)
 {
   if (al.check ("Bioclimate"))
@@ -396,7 +395,7 @@ get_bioclimate (const AttributeList& al)
 ColumnBase::ColumnBase (const AttributeList& al)
   : Column (al),
     weather (al.check ("weather") 
-	     ? &Librarian<Weather>::create (al.alist ("weather"))
+	     ? Librarian<Weather>::create (al.alist ("weather"))
 	     : NULL), 
     vegetation (Librarian<Vegetation>::create (al.alist ("Vegetation"))),
     bioclimate (get_bioclimate (al)),
@@ -429,10 +428,10 @@ ColumnBase::initialize_common (const Time& time, Treelog& err,
   if (!global_weather && !weather)
     return;
   const Weather& my_weather = *(weather ? weather : global_weather);
-  bioclimate.initialize (my_weather, err);
-  groundwater.initialize (soil, time, err);
+  bioclimate->initialize (my_weather, err);
+  groundwater->initialize (soil, time, err);
   soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, my_weather, err);
-  soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater, err);
+  soil_water.initialize (alist.alist ("SoilWater"), soil, *groundwater, err);
   soil_chemicals.initialize (alist.alist ("SoilChemicals"), soil, soil_water, 
 			     err);
   for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
@@ -445,10 +444,7 @@ ColumnBase::~ColumnBase ()
 { 
   if (weather)
     delete weather;
-  delete &vegetation;
-  delete &bioclimate;
   sequence_delete (chemistry.begin (), chemistry.end ());
-  delete &groundwater;
 }
 
 void

@@ -47,7 +47,7 @@ struct Soil::Implementation
   {
     // Content.
     const double end;
-    Horizon& horizon;
+    auto_ptr<Horizon> horizon;
 
     // Simulation.
     void output (Log& log) const
@@ -69,7 +69,7 @@ A location and content of a soil layer.");
 	horizon (Librarian<Horizon>::create (al.alist ("horizon")))
     { }
     ~Layer ()
-    { delete &horizon; }
+    { }
   };
   /* const */ vector<Layer*> layers;
   const int original_layer_size; // Size before adding aquitard, for logging.
@@ -83,7 +83,7 @@ A location and content of a soil layer.");
   { 
     bool missing = false;
     for (unsigned int i = 0; i < layers.size (); i++)
-      if (!layers[i]->horizon.has_attribute (name))
+      if (!layers[i]->horizon->has_attribute (name))
 	missing = true;
     return !missing;
   }
@@ -121,9 +121,9 @@ Soil::K (int i, double h, double h_ice, double T) const
 
   const double T_factor = viscosity_factor (T);
   if (h < h_ice)
-    return horizon_[i]->hydraulic.K (h) * T_factor; 
+    return horizon_[i]->hydraulic->K (h) * T_factor; 
   else
-    return horizon_[i]->hydraulic.K (h_ice) * T_factor; 
+    return horizon_[i]->hydraulic->K (h_ice) * T_factor; 
 }
 
 double 
@@ -133,7 +133,7 @@ Soil::Cw1 (int i, double h, double h_ice) const
 double
 Soil::Cw2 (int i, double h) const
 { 
-  const double answer = horizon_[i]->hydraulic.Cw2 (h); 
+  const double answer = horizon_[i]->hydraulic->Cw2 (h); 
   if (answer > 0.0)
     return answer;
   // We divide with this.
@@ -143,22 +143,22 @@ Soil::Cw2 (int i, double h) const
 double Soil::Theta (int i, double h, double h_ice) const
 { 
   if (h < h_ice)
-    return horizon_[i]->hydraulic.Theta (h);
+    return horizon_[i]->hydraulic->Theta (h);
   else
-    return horizon_[i]->hydraulic.Theta (h_ice);
+    return horizon_[i]->hydraulic->Theta (h_ice);
 }
 
 double 
 Soil::Theta_res (int i) const
-{ return horizon_[i]->hydraulic.Theta_res; }
+{ return horizon_[i]->hydraulic->Theta_res; }
 
 double 
 Soil::h (int i, double Theta) const
-{ return horizon_[i]->hydraulic.h (Theta); }
+{ return horizon_[i]->hydraulic->h (Theta); }
 
 double 
 Soil::M (int i, double h) const
-{ return horizon_[i]->hydraulic.M (h); }
+{ return horizon_[i]->hydraulic->M (h); }
 
 double 
 Soil::dispersivity (int) const
@@ -166,11 +166,11 @@ Soil::dispersivity (int) const
 
 void
 Soil::set_porosity (int i, double Theta)
-{ horizon_[i]->hydraulic.set_porosity (Theta); }
+{ horizon_[i]->hydraulic->set_porosity (Theta); }
 
 double 
 Soil::tortuosity_factor (int i, double Theta) const
-{ return horizon_[i]->tortuosity.factor (horizon_[i]->hydraulic, Theta); }
+{ return horizon_[i]->tortuosity->factor (*horizon_[i]->hydraulic, Theta); }
 
 double 
 Soil::anisotropy (int i) const
@@ -282,7 +282,7 @@ Soil::check (int som_size, Treelog& err) const
       Treelog::Open nest (err, "horizons");
       for (unsigned int i = 0; i < impl.layers.size (); i++)
 	{
-	  const Horizon& horizon = impl.layers[i]->horizon;
+	  const Horizon& horizon = *impl.layers[i]->horizon;
 	  Treelog::Open nest (err, horizon.name);
 	  const int f_size = horizon.SOM_fractions ().size ();
 	  if (f_size > 0 && f_size != som_size)
@@ -458,7 +458,7 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
 	daisy_assert (current < last);
 
 	const bool top_soil = (layer == begin);
-	(*layer)->horizon.initialize (top_soil, som_size, msg);
+	(*layer)->horizon->initialize (top_soil, som_size, msg);
 
 	// We always have a layer limit at 1 m.
 	if (last > -100.0 && current < -100.0)
@@ -480,7 +480,7 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
 	  layer++;
 	  daisy_assert (layer != end);
 	}
-      horizon_.push_back (&((*layer)->horizon));
+      horizon_.push_back (&*((*layer)->horizon));
     }
 }
 

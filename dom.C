@@ -237,16 +237,16 @@ void
 DOM::mix (const Soil& soil, const SoilWater& soil_water,
 	  double from, double to)
 {
-  C.mix (soil, soil_water, adsorption, from, to);
-  N.mix (soil, soil_water, adsorption, from, to);
+  C.mix (soil, soil_water, *adsorption, from, to);
+  N.mix (soil, soil_water, *adsorption, from, to);
 }
 
 void 
 DOM::swap (const Soil& soil, const SoilWater& soil_water,
 	   double from, double middle, double to)
 {
-  C.swap (soil, soil_water, adsorption, from, middle, to);
-  N.swap (soil, soil_water, adsorption, from, middle, to);
+  C.swap (soil, soil_water, *adsorption, from, middle, to);
+  N.swap (soil, soil_water, *adsorption, from, middle, to);
 }
 
 void
@@ -365,12 +365,12 @@ void
 DOM::transport (const Soil& soil, const SoilWater& soil_water, Treelog& msg)
 {
   C.transport (soil, soil_water, 
-	       trans, reserve, last_resort, mactrans, 
-	       adsorption, diffusion_coefficient,
+	       *trans, *reserve, *last_resort, *mactrans, 
+	       *adsorption, diffusion_coefficient,
 	       msg);
   N.transport (soil, soil_water, 
-	       trans, reserve, last_resort, mactrans, 
-	       adsorption, diffusion_coefficient,
+	       *trans, *reserve, *last_resort, *mactrans, 
+	       *adsorption, diffusion_coefficient,
 	       msg);
 }
 
@@ -440,8 +440,8 @@ Fraction of this pool that ends up in each SMB pools");
 void
 DOM::initialize (const Soil& soil, const SoilWater& soil_water, Treelog& msg)
 { 
-  C.initialize (soil, soil_water, adsorption, msg);
-  N.initialize (soil, soil_water, adsorption, msg);
+  C.initialize (soil, soil_water, *adsorption, msg);
+  N.initialize (soil, soil_water, *adsorption, msg);
 }
 
 DOM::DOM (const AttributeList& al)
@@ -469,11 +469,6 @@ DOM::~DOM ()
 { 
   delete &C;
   delete &N;
-  delete &trans; 
-  delete &reserve; 
-  delete &last_resort;
-  delete &mactrans;
-  delete &adsorption; 
 }
 
 static Submodel::Register dom_submodel ("DOM", DOM::load_syntax);

@@ -64,7 +64,7 @@ struct ChemistryStandard : public Chemistry
     : Chemistry (al),
       name_A (al.identifier ("A")),
       name_B (al.identifier ("B")),
-      transform (&Librarian<Transform>::create (al.alist ("transform")))
+      transform (Librarian<Transform>::create (al.alist ("transform")))
   { }
 };
 

@@ -287,7 +287,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = equil_goal.C pedo_arit.C \
+MODELS = number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
 	horizon_numeric.C horizon_system.C select_pF.C pet_FAO_PM.C \
 	pet_Hargreaves.C hydraulic_M_vGp.C summary_simple.C select_date.C \

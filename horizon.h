@@ -36,7 +36,7 @@ class Horizon
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
   double fast_clay;
   double fast_humus;
 public:
@@ -45,14 +45,14 @@ public:
 
   // Water.
 public:
-  Hydraulic& hydraulic;
+  std::auto_ptr<Hydraulic> hydraulic;
   double anisotropy () const;
   double heat_conductivity (double Theta, double Ice) const; // [erg/cm/h/dg C]
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
   
   // Texture.
 public:
-  Tortuosity& tortuosity;
+  std::auto_ptr<Tortuosity> tortuosity;
   double dry_bulk_density () const;
   virtual double texture_below (double size /* [um] */) const = 0;
   double clay () const;

@@ -29,15 +29,15 @@ using namespace std;
 
 struct ActionAssert : public Action
 {
-  Condition& condition;
+  auto_ptr<Condition> condition;
   const string message;
 
   void tick (const Daisy& daisy, Treelog& out)
-  { condition.tick (daisy, out); }
+  { condition->tick (daisy, out); }
 
   void doIt (Daisy& daisy, Treelog&)
   { 
-    if (!condition.match (daisy))
+    if (!condition->match (daisy))
       throw (message);
   }
 
@@ -51,7 +51,7 @@ struct ActionAssert : public Action
   { }
 
   ~ActionAssert ()
-  { delete &condition; }
+  { }
 };
 
 struct ActionMessage : public Action

@@ -42,7 +42,7 @@ class RootSystem
 {
   // Components.
 private:
-  Rootdens& rootdens;		// Root density calculation.
+  std::auto_ptr<Rootdens> rootdens; // Root density calculation.
 
   // Parameters.
 private:

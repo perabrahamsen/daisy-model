@@ -96,7 +96,7 @@ EquilibriumLangmuir::initialize (const Soil& soil, Treelog& err)
   // K
   {
     auto_ptr<Pedotransfer> pedo_K 
-      (&Librarian<Pedotransfer>::create (alist.alist ("K")));
+      (Librarian<Pedotransfer>::create (alist.alist ("K")));
     if (pedo_K->check (soil, "g/cm^3", err))
       pedo_K->set (soil, K, "g/cm^3");
     else 
@@ -107,7 +107,7 @@ EquilibriumLangmuir::initialize (const Soil& soil, Treelog& err)
   // my_max
   {
     auto_ptr<Pedotransfer> pedo_my_max 
-      (&Librarian<Pedotransfer>::create (alist.alist ("my_max")));
+      (Librarian<Pedotransfer>::create (alist.alist ("my_max")));
     if (pedo_my_max->check (soil, "g/cm^3", err))
       pedo_my_max->set (soil, my_max, "g/cm^3");
     else 

@@ -91,7 +91,7 @@ struct OrganicMatter::Implementation
   } buffer;
   const PLF heat_factor;
   const PLF water_factor;
-  ClayOM& clayom;
+  auto_ptr<ClayOM> clayom;
   vector<double> tillage_age;
   const vector<const PLF*> smb_tillage_factor;
   const vector<const PLF*> som_tillage_factor;
@@ -839,7 +839,7 @@ OrganicMatter::Implementation::check (const Soil& soil, Treelog& err) const
   for (size_t i = 0; i < domsorp.size (); i++)
     if (!domsorp[i]->check (soil, dom.size (), som.size (), err))
       ok = false;
-  if (!clayom.check (smb, err))
+  if (!clayom->check (smb, err))
     ok = false;
   return ok;
 }
@@ -1111,7 +1111,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     }
   for (unsigned int j = 0; j < smb.size (); j++)
     {
-      const bool use_clay = clayom.smb_use_clay (j);
+      const bool use_clay = clayom->smb_use_clay (j);
       const vector<double>& default_factor = 
 	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
@@ -1126,7 +1126,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     }
   for (unsigned int j = 0; j < som.size (); j++)
     {
-      const bool use_clay = clayom.som_use_clay (j);
+      const bool use_clay = clayom->som_use_clay (j);
       const vector<double>& default_factor = 
 	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
@@ -1559,7 +1559,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  for (unsigned int i = 0; i < smb_size; i++)
 	    {
 	      const double abiotic_factor = abiotic (*smb[i], T, h,
-						     clayom.smb_use_clay (i),
+						     clayom->smb_use_clay (i),
 						     lay);
 	      const double out = (i == pool)
 		? ((smb[pool]->turnover_rate + smb[pool]->maintenance)
@@ -1578,7 +1578,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  for (unsigned int i = 0; i < som_size; i++)
 	    {
 	      const double abiotic_factor = abiotic (*som[i], T, h,
-						     clayom.som_use_clay (i),
+						     clayom->som_use_clay (i),
 						     lay);
 	      const double in = som[i]->turnover_rate 
 		* som[i]->fractions[pool]
@@ -1607,7 +1607,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  for (unsigned int i = 0; i < smb_size; i++)
 	    {
 	      const double abiotic_factor = abiotic (*smb[i], T, h,
-						     clayom.smb_use_clay (i),
+						     clayom->smb_use_clay (i),
 						     lay);
 	      const double in = smb[i]->turnover_rate 
 		* smb[i]->fractions[smb_size + pool]
@@ -1621,7 +1621,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  for (unsigned int i = 0; i < som_size; i++)
 	    {
 	      const double abiotic_factor = abiotic (*som[i], T, h,
-						     clayom.som_use_clay (i), 
+						     clayom->som_use_clay (i), 
 						     lay);
 	      const double out = (i == pool)
 		? (som[pool]->turnover_rate * abiotic_factor)
@@ -2320,7 +2320,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   for (unsigned int i = 0; i < soil.size (); i++)
     {
       const double soil_factor = soil.turnover_factor (i);
-      const double clay_factor = clayom.factor (soil.clay (i));
+      const double clay_factor = clayom->factor (soil.clay (i));
       soil_turnover_factor.push_back (soil_factor);
       clay_turnover_factor.push_back (soil_factor * clay_factor);
     }
@@ -2488,7 +2488,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   }
 
   // Clay affect or SMB turnover and mantenance.
-  clayom.set_rates (soil, smb);
+  clayom->set_rates (soil, smb);
 
   // Initialize DOM.
   for (unsigned int pool = 0; pool < dom_size; pool++)
@@ -2573,7 +2573,6 @@ OrganicMatter::Implementation::~Implementation ()
   sequence_delete (som.begin (), som.end ());
   sequence_delete (dom.begin (), dom.end ());
   sequence_delete (domsorp.begin (), domsorp.end ());
-  delete &clayom;
 }
 
 void 

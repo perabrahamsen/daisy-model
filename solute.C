@@ -133,15 +133,15 @@ Solute::tick (const Soil& soil,
 
   // Flow.
   const double old_content = soil.total (M_);
-  mactrans.tick (soil, soil_water, M_, C_, S, S_p, J_p, msg);
+  mactrans->tick (soil, soil_water, M_, C_, S, S_p, J_p, msg);
 
   try
     {
       for (unsigned i = 0; i < soil.size (); i++)
 	daisy_assert (M_left (i) >= 0.0);
-      transport.tick (msg, soil, soil_water, adsorption, 
-		      diffusion_coefficient (), 
-		      M_, C_, S, J);
+      transport->tick (msg, soil, soil_water, *adsorption, 
+                       diffusion_coefficient (), 
+                       M_, C_, S, J);
     }
   catch (const char* error)
     {
@@ -151,8 +151,8 @@ Solute::tick (const Soil& soil,
 	{
 	  for (unsigned i = 0; i < soil.size (); i++)
 	    daisy_assert (M_left (i) >= 0.0);
-	  reserve.tick (msg, soil, soil_water, adsorption, 
-			diffusion_coefficient (), M_, C_, S, J);
+	  reserve->tick (msg, soil, soil_water, *adsorption, 
+                         diffusion_coefficient (), M_, C_, S, J);
 	}
       catch (const char* error)
 	{
@@ -160,8 +160,8 @@ Solute::tick (const Soil& soil,
 			+ ", trying last resort.");
 	  for (unsigned i = 0; i < soil.size (); i++)
 	    daisy_assert (M_left (i) >= 0.0);
-	  last_resort.tick (msg, soil, soil_water, adsorption, 
-			    diffusion_coefficient (), M_, C_, S, J);
+	  last_resort->tick (msg, soil, soil_water, *adsorption, 
+                             diffusion_coefficient (), M_, C_, S, J);
 	}
     }
   const double new_content = soil.total (M_);
@@ -293,11 +293,6 @@ Solute::Solute (const AttributeList& al)
 
 Solute::~Solute ()
 { 
-  delete &transport; 
-  delete &reserve; 
-  delete &last_resort;
-  delete &mactrans;
-  delete &adsorption; 
 }
 
 void 

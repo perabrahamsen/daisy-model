@@ -109,7 +109,7 @@ struct clause
   vector<Action*> actions;
   void output (Log& log) const
   { 
-    output_derived (*condition, "condition", log);
+    output_derived (condition, "condition", log);
     output_list (actions, "actions", log, Librarian<Action>::library ());
   }
   clause (Condition* c, vector<Action*>& a) 
@@ -133,11 +133,11 @@ vector<clause>& make_clauses (const vector<AttributeList*>& s)
        i != s.end ();
        i++)
     {
-      Condition& condition 
+      Condition *const condition 
 	= Librarian<Condition>::create ((*i)->alist ("condition"));
       vector<Action*> actions 
 	= map_create<Action> ((*i)->alist_sequence ("actions"));
-      c.push_back (clause (&condition, actions));
+      c.push_back (clause (condition, actions));
     }
   return c;
 }
@@ -226,23 +226,23 @@ struct ActionCond : public Action
 
 struct ActionIf : public Action
 {
-  Condition& if_c;
-  Action& then_a;
-  Action& else_a;
+  auto_ptr<Condition> if_c;
+  auto_ptr<Action> then_a;
+  auto_ptr<Action> else_a;
 
   void tick (const Daisy& daisy, Treelog& out)
   { 
-    if_c.tick (daisy, out);
-    then_a.tick (daisy, out);
-    else_a.tick (daisy, out);
+    if_c->tick (daisy, out);
+    then_a->tick (daisy, out);
+    else_a->tick (daisy, out);
   }
 
   void doIt (Daisy& daisy, Treelog& out)
   { 
-    if (if_c.match (daisy))
-      then_a.doIt (daisy, out);
+    if (if_c->match (daisy))
+      then_a->doIt (daisy, out);
     else
-      else_a.doIt (daisy, out);
+      else_a->doIt (daisy, out);
   }
 
   void output (Log& log) const
@@ -255,9 +255,9 @@ struct ActionIf : public Action
   bool check (const Daisy& daisy, Treelog& err) const
   { 
     bool ok = true; 
-    if (!then_a.check (daisy, err))
+    if (!then_a->check (daisy, err))
       ok = false;
-    if (!else_a.check (daisy, err))
+    if (!else_a->check (daisy, err))
       ok = false;
     return ok;
   }
@@ -270,11 +270,7 @@ struct ActionIf : public Action
   { }
 
   ~ActionIf ()
-  { 
-    delete &if_c;
-    delete &then_a;
-    delete &else_a;
-  }
+  { }
 };
 
 static struct ActionLispSyntax
