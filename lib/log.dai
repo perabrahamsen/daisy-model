@@ -1098,8 +1098,6 @@
 	    (dimension "cm/h"))
 	   ((path column "$col" Groundwater "*" EqDrnFlow)
 	    (dimension "cm/h"))
-	   ((path column "$col" Groundwater "*" deficit)
-	    (dimension "cm"))
 	   ((path column "$col" SoilWater Theta)
           (from 0)
           (to -190)  
