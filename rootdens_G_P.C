@@ -79,7 +79,7 @@ Rootdens_G_P::set_density (vector<double>& Density,
 	    =  LengthPrArea - MinDens * Depth; // [cm/cm^2]
 #if 1
 	  CERR << "too_low = " << too_low 
-	       << ", NewLengthPrArea = " << NewLengthPrArea
+xb	       << ", NewLengthPrArea = " << NewLengthPrArea
 	       << "MinLengthPrArea = " << MinLengthPrArea << "\n";
 #endif	    
 	  if (too_low > 0.0 && NewLengthPrArea > too_low * DensRtTip * 1.2)
