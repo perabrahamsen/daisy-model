@@ -95,7 +95,7 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     return;
   const double k_total = k_half * surface_to_soil;// [g C/cm^2]
 
-  // Eat from each AM, loowest C/N first.
+  // Eat from each AM, lowest C/N first.
   const unsigned int am_size = am.size ();
   sort (am.begin (), am.end (), am_compare);
   double available = R_total * dt;	// [g C/cm^2]
@@ -113,7 +113,9 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     const double top_N = am[i]->top_N ();
     assert (top_N > 0.0);
     const double C_per_N = top_C / top_N;
-    assert (C_per_N > last_C_per_N);
+    if (C_per_N < last_C_per_N)
+      CERR << "Bug: C/N (" << C_per_N << ") < last C/N ("
+	   << last_C_per_N <<")\n";
     double speed
       = R_total * C_per_N_factor (C_per_N) * top_C / (top_C + k_total);
 

@@ -1,3 +1,23 @@
+2000-02-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.16 released.
+
+2000-02-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): Don't assume total_ep >=
+	total_ea. 
+
+2000-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.C (find_file): Throw error if file is not found.
+
+	* common.h (acos, asin): Check domain.
+
+2000-02-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioincorporation.C (tick): Spelling fix.
+	(tick): AOM pools can have identical C/N.
+
 2000-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.15 released.

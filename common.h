@@ -16,6 +16,8 @@
 #define pow(x, y) (assert (x >= 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))
 #define log(x) (assert (x > 0), (log)(x))
+#define acos(x) (assert (x >= -1 && x <= 1), (acos(x)))
+#define asin(x) (assert (x >= -1 && x <= 1), (asin(x)))
 #endif
 
 #define HANDLE_NAMESPACES

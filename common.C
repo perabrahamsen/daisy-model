@@ -180,6 +180,7 @@ Options::find_file (const string& name)
   for (unsigned int i = 0; i < path.size (); i++)
     CERR << " `" << path[i] << "'";
   CERR << "\n";
+  throw ("file error");
   return -1;
 }
 
