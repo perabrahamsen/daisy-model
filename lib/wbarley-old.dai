@@ -1,6 +1,6 @@
 ;;; wbarley-old.dai
 
-(defcrop WinterBarley old
+(defcrop "Winter Barley; V1" old
   (Devel (EmrTSum 080)
 	 (DSRate1 1.63e-3)
 	 (DSRate2 1.63e-3)

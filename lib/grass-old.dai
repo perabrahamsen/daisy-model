@@ -1,6 +1,6 @@
 ;;; grass-old.dai
 
-(defcrop Grass old
+(defcrop "Grass; V1" old
   (Devel (EmrTSum 125)
 	 (DSRate1 1.45e-3)
 	 (DSRate2 1.45e-3)

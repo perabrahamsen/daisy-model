@@ -1,6 +1,6 @@
 ;;; sbarley-old.dai
 
-(defcrop SpringBarley old
+(defcrop "Spring Barley; V1" old
   (Devel (EmrTSum 160)
 	 (DSRate1 1.29e-3)
 	 (DSRate2 1.29e-3)

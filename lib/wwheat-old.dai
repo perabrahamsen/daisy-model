@@ -1,6 +1,6 @@
 ;;; wwheat-old.dai
 
-(defcrop WinterWheat old
+(defcrop "Winter Wheat; V1" old
   (Devel (EmrTSum 100)
 	 (DSRate1 1.14e-3)	;1/775
 	 (DSRate2 1.14e-3)	;1/775

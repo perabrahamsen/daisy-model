@@ -1,6 +1,6 @@
 ;;; pea-old.dai
 
-(defcrop Pea old
+(defcrop "Pea; V1" old
   (Devel (EmrTSum 125)
 	 (DSRate1 1.37e-3)
 	 (DSRate2 1.37e-3)

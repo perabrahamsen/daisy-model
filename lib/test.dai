@@ -118,17 +118,21 @@
                    (NO3 50.0e-5)        ;[g/cm2] = 50 kg/ha
                    (NH4 50.0e-5)))      ;[g/cm2] = 50 kg/ha
        ((at 1987 4 5 1)
-        (progn (sow Grass)
+        (progn (sow "Cut Grass")
                (sow "Spring Barley")))
        ((at 1987 9 5 1)
-        (harvest "Spring Barley"))
+         (progn (harvest "Spring Barley")
+;                (harvest "Cut Grass"
+;                    (stub 15)              ;Leave 15 cm stub.
+;                    (stem 1.00))
+                                 ))         ;Harvest everything above stub.
        ((at 1987 9 8 1)
         (fertilize mineral
                    (NO3 40.0e-5)        ;[g/cm2] = 40 kg/ha
                    (NH4 40.0e-5)))      ;[g/cm2] = 40 kg/ha
        ((at 1987 10 10 1)
-        (harvest Grass
-                 (stub 10)              ;Leave 10 cm stub.
+        (harvest "Cut Grass"
+                 (stub 8.)              ;Leave 08 cm stub.
                  (stem 1.00)))          ;Harvest everything above stub.
        ((at 1988 4 1 1)
         (stop))))

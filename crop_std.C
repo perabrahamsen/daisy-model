@@ -55,7 +55,7 @@ public:
   
   // Internal functions.
 protected:
-  double PotentialWaterUptake (const double h, 
+  double PotentialWaterUptake (const double h,
 			       const Soil& soil, const SoilWater& soil_water);
   double SoluteUptake (const Soil&,
 		       const SoilWater&,
@@ -156,8 +156,10 @@ struct CropStandard::Parameters
   const struct CanopyPar {
     double InitGrowth;		// Initial growth parameter.
     double DSinit;		// DS at end of initial LAI-Development
+    double DSLAI05;		// DS at LAI=0.5; forced development
     double WLfInit;		// WLeaf at end of initial LAI-Development
     double SpLAI;		// Specific leaf weight [ (m²/m²) / (g/m²) ]
+    double SpLAIfac;            // Factor defining max Specific leaf weight
     const CSMP& HvsDS;	// Crop height as function of DS
     const vector<double>& LAIDist0; // Relative LAI distribution at DS=0
     const vector<double>& LAIDist1; // Relative LAI distribution at DS=1
@@ -414,8 +416,10 @@ CropStandard::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
 CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
   : InitGrowth (vl.number ("InitGrowth")),
     DSinit (vl.number ("DSinit")),
+    DSLAI05 (vl.number ("DSLAI05")),
     WLfInit (vl.number ("WLfInit")),
     SpLAI (vl.number ("SpLAI")),
+    SpLAIfac (vl.number ("SpLAIfac")),
     HvsDS (vl.csmp ("HvsDS")),
     LAIDist0 (vl.number_sequence ("LAIDist0")),
     LAIDist1 (vl.number_sequence ("LAIDist1")),
@@ -540,7 +544,7 @@ CropStandard::Variables::RecPhenology::RecPhenology (const Parameters& par,
 
 { }
 
-void 
+void
 CropStandard::Variables::RecPhenology::output (Log& log, Filter& filter) const
 {
   log.open ("Phenology");
@@ -790,9 +794,13 @@ CropStandardSyntax::CropStandardSyntax ()
 
   Canopy.add ("InitGrowth", Syntax::Number, Syntax::Const);
   Canopy.add ("DSinit", Syntax::Number, Syntax::Const);
+  Canopy.add ("DSLAI05", Syntax::Number, Syntax::Const);
+  vCanopy.add ("DSLAI05", 0.15);
   Canopy.add ("WLfInit", Syntax::Number, Syntax::Const);
   vCanopy.add ("WLfInit", 30.0);
   Canopy.add ("SpLAI", Syntax::Number, Syntax::Const);
+  Canopy.add ("SpLAIfac", Syntax::Number, Syntax::Const);
+  vCanopy.add ("SpLAIfac", 2.0);
   Canopy.add ("HvsDS", Syntax::CSMP, Syntax::Const);
   Canopy.add ("LAIDist0", Syntax::Number, Syntax::Const, 3);
   Canopy.add ("LAIDist1", Syntax::Number, Syntax::Const, 3);
@@ -1281,28 +1289,46 @@ CropStandard::InitialLAI ()
   const double WLeaf = var.Prod.WLeaf;
   double& DS = var.Phenology.DS;
   double& LAI = var.Canopy.LAI;
+  double  LAI2;
   bool& InitLAI = var.CrpAux.InitLAI;
 
-  if (WLeaf >= Canopy.WLfInit)
+//  if (WLeaf >= Canopy.WLfInit)
+//    {
+//      LAI = Canopy.SpLAI * WLeaf;
+//      InitLAI = false;
+//    }
+//  else
+//    {
+//#if 0
+//      if (DS > Canopy.DSinit)
+//	DS = Canopy.DSinit;
+//      LAI = 0.5 * (exp (Canopy.InitGrowth * DS) - 1);
+//#else
+//      LAI = 0.5 * (exp (Canopy.InitGrowth * min (DS, Canopy.DSinit)) - 1);
+//#endif
+//    }
+  const double LAI1 = Canopy.SpLAI * WLeaf;
+  if (DS<0.07)
     {
-      LAI = Canopy.SpLAI * WLeaf;
-      InitLAI = false;
+      LAI2 = 10.;
     }
   else
     {
-#if 0
-      if (DS > Canopy.DSinit)
-	DS = Canopy.DSinit;
-      LAI = 0.5 * (exp (Canopy.InitGrowth * DS) - 1);
-#else
-      LAI = 0.5 * (exp (Canopy.InitGrowth * min (DS, Canopy.DSinit)) - 1);
-#endif
+     LAI2 = max( 0.01, Canopy.SpLAIfac * Canopy.SpLAI * WLeaf);
     }
+  const double LAI3 = min ( LAI2, 1.0/(1.0+exp(-15.0*(DS-Canopy.DSLAI05))));
+  if (LAI1 >= LAI3)
+    {
+      LAI = LAI1;
+      InitLAI = false;
+    }
+  else
+    LAI = LAI3;
 }
 
-double 
+double
 CropStandard::CropLAI ()
-{    
+{
   const Parameters::CanopyPar& Canopy = par.Canopy;
   // const double DS = var.Phenology.DS;
   const double WLeaf = var.Prod.WLeaf;

@@ -1,6 +1,6 @@
 ;;; wrape-old.dai
 
-(defcrop WinterRape old
+(defcrop "Winter Rape; V1" old
   (Devel (EmrTSum 175)
 	 (DSRate1 1.29e-3)
 	 (DSRate2 1.29e-3)

@@ -1,6 +1,6 @@
 ;;; srape-old.dai
 
-(defcrop SpringRape old
+(defcrop "Spring Rape; V1" old
   (Devel (EmrTSum 110)
 	 (DSRate1 1.1e-3)	;1/775
 	 (DSRate2 1.1e-3)	;1/775

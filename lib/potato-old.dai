@@ -1,6 +1,6 @@
 ;;; potato-old.dai
 
-(defcrop Potato sold
+(defcrop "Potato; V1" sold
   (Devel (EmrTSum 485)
 	 (DSRate1 9.09e-4)
 	 (DSRate2 9.09e-4)
