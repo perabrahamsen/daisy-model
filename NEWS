@@ -12,6 +12,20 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.22
+
+** 2% N lost as N2O during nitrification.
+
+This default has been set down from 4%.
+
+** Fixed bug with partial specification of SOM_fractions.
+
+If you specified "inactive humus" only, like in 
+
+  (SOM_fractions -1 -1 0.35 [])
+
+Daisy would ignore the specification is some circumstances.
+
 * 3.21
 
 ** Added "Evapotranspiration" summary to "Surface Water Balance" log.

@@ -202,6 +202,8 @@ struct OrganicMatter::Implementation
 		      double T, double h, const int lay) const;
   double abiotic (const OM& om, double T, double h, 
 		  bool use_clay, int lay) const;
+  static vector<double> SOM_limit_normalize (const vector<double>& limit, 
+                                             const vector<double>& fractions);
   void partition (const vector<double>& am_input, double T, double h, 
 		  int lay, double total_C, 
 		  int variable_pool, int variable_pool_2, 
@@ -1289,6 +1291,58 @@ OrganicMatter::Implementation::abiotic (const OM& om, double T, double h,
        : water_turnover_factor (h))
     * (use_clay ? clay_turnover_factor[lay] : soil_turnover_factor[lay]);
 }
+
+vector<double> 
+OrganicMatter::Implementation::SOM_limit_normalize
+/**/ (const vector<double>& limit, const vector<double>& fractions)
+{
+  // If no fractions are specified, just use limit.
+  bool unspecified = true;
+  for (unsigned int i = 0; i < fractions.size (); i++)
+    if (fractions[i] >= 0.0)
+      unspecified = false;
+  
+  if (unspecified)
+    return limit;
+
+  vector<double> result (limit.size (), -1.0);
+
+  // Set the forced values.
+  double added = 0.0;
+  double removed = 0.0;
+  int missing = 0;
+  for (unsigned int i = 0; i < fractions.size (); i++)
+    if (fractions[i] >= 0.0)
+      {
+        result[i] = fractions[i];
+        added += fractions[i];
+        removed += limit[i];
+      }
+    else
+      missing++;
+
+  if (approximate (removed, 1.0))
+    {
+      // Distribute remaining SOM uniformly.
+      daisy_assert (missing > 0);
+      const double value = (1.0 - added) / (missing + 0.0);
+      for (unsigned int i = 0; i < result.size (); i++)
+        if (result[i] < 0.0)
+          result[i] = value;
+    }
+  else
+    {
+      // Distribute remaining SOM proportionally.
+      const double factor = (1.0 - added) / (1.0 - removed);
+      for (unsigned int i = 0; i < result.size (); i++)
+        if (result[i] < 0.0)
+          result[i] = limit[i] * factor;
+    }
+
+  daisy_assert (approximate (accumulate (result.begin (), result.end (), 0.0),
+                             1.0));
+  return result;
+}
 				     
 void
 OrganicMatter::Implementation::partition (const vector<double>& am_input,
@@ -1833,8 +1887,14 @@ Setting additional pool to zero");
 	{
 	  daisy_assert (SOM_limit_lower.size () == som_size);
 	  daisy_assert (SOM_limit_upper.size () == som_size);
-	  const double upper = SOM_limit_upper[SOM_limit_where];
-	  const double lower = SOM_limit_lower[SOM_limit_where];
+
+          const vector<double> limit_lower 
+            = SOM_limit_normalize (SOM_limit_lower, SOM_fractions);
+          const vector<double> limit_upper 
+            = SOM_limit_normalize (SOM_limit_upper, SOM_fractions);
+          
+	  const double upper = limit_upper[SOM_limit_where];
+	  const double lower = limit_lower[SOM_limit_where];
 	  daisy_assert (upper >= lower);
 	  double total_SOM = 0.0;
 	  for (int pool = 0; pool < som_size; pool++)
@@ -1844,7 +1904,7 @@ Setting additional pool to zero");
 	  if (value < lower)
 	    {
 	      // Too low.
-	      SOM_fractions = SOM_limit_lower;
+	      SOM_fractions = limit_lower;
 	      table_string () << "\tBelow SOM" 
 			      << SOM_limit_where + 1 << " limit\n";
 	      continue;
@@ -1852,7 +1912,7 @@ Setting additional pool to zero");
 	  else if (upper < value)
 	    {
 	      // To high.
-	      SOM_fractions = SOM_limit_upper;
+	      SOM_fractions = limit_upper;
 	      table_string () << "\tAbove SOM"
 			      << SOM_limit_where + 1 << " limit\n";
 	      continue;

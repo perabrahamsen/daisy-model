@@ -43,7 +43,7 @@ Nitrification::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_fraction ("N2O_fraction", Syntax::Const, 
                        "Fraction of ammonium lost as N2O.");
-  alist.add ("N2O_fraction", 0.04);
+  alist.add ("N2O_fraction", 0.02);
   syntax.add ("NH4", 
               "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
               "Amount of ammonium consumed this hour.");

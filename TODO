@@ -1,14 +1,12 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Kig på JKL tal.
-
 * Make it possible to specify texture using different systems
 
 ** New "default" horizon
 
 *** Hydraulic::inititalize should take Texture argument.
 
-Update hydrailic models.
+Update hydraulic models.
 
 ** USDA. FAO, DIN, DS horizon
 
