@@ -30,6 +30,7 @@ public:
   void mix (const Soil&, double from, double to, double penetration = 1.0);
   void distribute (const Soil&, const vector<double>& density);
   void swap (const Soil&, double from, double middle, double to);
+  bool empty () const;
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
 	     double& CO2, const vector<OM*>& smb, const vector<OM*>&som);
   void tick (int i, double turnover_factor, double N_soil, double& N_used,

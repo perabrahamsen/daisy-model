@@ -17,11 +17,13 @@ class Weather
 protected:
   const Time& time;
   const double Latitude;
-
+public: 
+  const string name;
+  
   // Simulation.
 public:
   virtual void tick () = 0;
-  virtual void output (const string, Log&, const Filter&) const;
+  virtual void output (Log&, const Filter&) const;
 
   // Communication with Biocliamte.
 public:
@@ -49,7 +51,7 @@ public:
 
     // Create and Destroy.
 protected:
-  Weather (const Time&, double latitude);
+  Weather (const Time&, double latitude, const string name);
 public:
   virtual ~Weather ();
 };

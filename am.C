@@ -43,6 +43,7 @@ create_om (const vector<const AttributeList*>& om_alist,
 	      assert (v.size () == 1); // BUG: Should check before!
 	      const double C_per_N = v[0];
 	      om_N[i] = om_C[i] / C_per_N;
+	      assert (om_N[i] >= 0.0);
 	    }
 	  else
 	    missing_C_per_N = i;
@@ -62,7 +63,9 @@ create_om (const vector<const AttributeList*>& om_alist,
 	= om_alist[missing_fraction]->number_sequence("C_per_N");
       assert (v.size () == 1); // BUG: Should check before!
       const double C_per_N = v[0];
+      assert (C_per_N >= 0.0);
       om_N[missing_fraction] = om_C[missing_fraction] / C_per_N;
+      assert (om_N[missing_fraction] >= 0.0);
     }
   om_N[missing_C_per_N] = N - accumulate (om_N.begin (), om_N.end (), 0.0);
 
@@ -136,6 +139,15 @@ AM::swap (const Soil& soil, double from, double middle, double to)
 {
   for (unsigned int i = 0; i < om.size (); i++)
     om[i]->swap (soil, from, middle, to);
+}
+
+bool
+AM::empty () const
+{
+  for (unsigned int i = 0; i < om.size (); i++)
+    if (!om.empty ())
+      return false;
+  return true;
 }
 
 const Library&
@@ -383,7 +395,8 @@ AM_init::AM_init ()
 
 	syntax.add ("creation", Syntax::Date, Syntax::Const);
 	alist.add ("syntax", "state");
-	add_sequence<OM> ("om", syntax, alist);
+	add_submodule<OM> ("om", syntax, alist,
+			   Syntax::Const, Syntax::Sequence);
 	AM_library->add ("state", alist, syntax);
       }
       // Organic fertilizer.
@@ -400,7 +413,8 @@ AM_init::AM_init ()
 		    Syntax::Number, Syntax::Const);
 	syntax.add ("total_N_fraction",
 		    Syntax::Number, Syntax::Const);
-	add_sequence<OM> ("om", syntax, alist);
+	add_submodule<OM> ("om", syntax, alist,
+			  Syntax::Const, Syntax::Sequence);
 	add_submodule<IM> ("im", syntax, alist);
 	AM_library->add ("organic", alist, syntax);
       }
@@ -428,7 +442,8 @@ AM_init::AM_init ()
 	layer_syntax.order ("end", "weight");
 	syntax.add ("layers", layer_syntax, Syntax::Const, Syntax::Sequence);
 	alist.add ("layers", layer_alist);
-	add_sequence<OM> ("om", syntax, alist);
+	add_submodule<OM> ("om", syntax, alist,
+			   Syntax::Const, Syntax::Sequence);
 	AM_library->add ("initial", alist, syntax);
       }
       // Root initialization,
@@ -442,7 +457,8 @@ AM_init::AM_init ()
 	syntax.add ("dist", Syntax::Number, Syntax::Const);
 	syntax.add ("weight", Syntax::Number, Syntax::Const); // Tons DM / ha
 	syntax.add ("total_C_fraction", Syntax::Number, Syntax::Const);
-	add_sequence<OM> ("om", syntax, alist);
+	add_submodule<OM> ("om", syntax, alist,
+			   Syntax::Const, Syntax::Sequence);
 	AM_library->add ("root", alist, syntax);
       }
     }

@@ -103,25 +103,14 @@ private:
 template <class T> 
 struct add_submodule
 {
-  add_submodule(const char* name, Syntax& syntax, AttributeList& alist)
+  add_submodule(const char* name, Syntax& syntax, AttributeList& alist,
+		Syntax::category cat = Syntax::State, 
+		int size = Syntax::Singleton)
   {
     Syntax& s = *new Syntax ();
     AttributeList& a = *new AttributeList ();
     T::load_syntax (s, a);
-    syntax.add (name, s);
-    alist.add (name, a);
-  }
-};
-
-template <class T> 
-struct add_sequence
-{
-  add_sequence(const char* name, Syntax& syntax, AttributeList& alist)
-  {
-    Syntax& s = *new Syntax ();
-    AttributeList& a = *new AttributeList ();
-    T::load_syntax (s, a);
-    syntax.add (name, s, Syntax::State, Syntax::Sequence);
+    syntax.add (name, s, cat, size);
     alist.add (name, a);
   }
 };

@@ -96,10 +96,11 @@ bool approximate (const double a, const double b, const double noise)
 }
 
 
-extern "C" int matherr () 
-{
-  abort ();
-}
+// extern "C" int matherr (struct exception *exc) 
+// {
+  
+//   abort ();
+// }
 
 extern "C" set_exceptions ();
 

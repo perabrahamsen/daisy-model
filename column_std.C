@@ -55,12 +55,12 @@ public:
   void fertilize (const Time&, const vector<const AttributeList*>&,
 		  string name, const vector<double>& density, 
 		  double C, double N);
-  vector<const harvest_type*> harvest (const Time&, const string name,
-				       double stub_length,
-				       double stem_harvest,
-				       double leaf_harvest, 
-				       double sorg_harvest,
-				       double dead_harvest);
+  vector<const Harvest*> harvest (const Time&, const string name,
+				  double stub_length,
+				  double stem_harvest,
+				  double leaf_harvest, 
+				  double sorg_harvest,
+				  double dead_harvest);
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
 
@@ -92,7 +92,11 @@ ColumnStandard::sow (const AttributeList& crop)
   else if (!Crop::library ().syntax (name).check (crop, name))
     cerr << "Cannot sow incomplete crop `" << name << "'\n";
   else
-    crops.push_back (Crop::create (crop, soil.size ()));
+    {
+      assert (crops.size () == 0); // Multiple crops not implemented.
+      crops.push_back (Crop::create (crop, soil.size ()));
+      assert (crops.size () == 1); // Multiple crops not implemented.
+    }
 }
 
 void 
@@ -161,20 +165,21 @@ ColumnStandard::fertilize (const IM& im,
   soil_NH4.add (soil, soil_water, im.NH4, from, to);
 }
 
-vector<const harvest_type*>
+vector<const Harvest*>
 ColumnStandard::harvest (const Time& time, const string name,
 			 double stub_length,
 			 double stem_harvest, double leaf_harvest, 
 			 double sorg_harvest, double dead_harvest)
 {
-  vector<const harvest_type*> harvest;
+  vector<const Harvest*> harvest;
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     if ((*crop)->name == name)
       {
 	harvest.push_back (&(*crop)->harvest (time, *this, 
 					      stub_length, 
 					      stem_harvest, leaf_harvest,
-					      sorg_harvest, dead_harvest));
+					      sorg_harvest, dead_harvest,
+					      false));
 	if (Crop::ds_remove (*crop))
 	  {
 	    // BUG? I hope it is allowed to delete members of a list
@@ -183,7 +188,6 @@ ColumnStandard::harvest (const Time& time, const string name,
 	    crops.erase (crop);
 	  }
       }
-
   return harvest;
 }
 
@@ -191,7 +195,13 @@ void
 ColumnStandard::mix (const Time& time,
 		     double from, double to, double penetration)
 {
-  harvest (time, "all", 0.0, 0.0, 0.0, 0.0, 0.0);
+  for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
+    {
+      (*crop)->kill (time, *this);
+      delete *crop;
+    }
+  crops.erase (crops.begin (), crops.end ());
+  assert (crops.size () == 0);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
   soil_heat.set_energy (soil, soil_water, from, to, energy);
@@ -280,7 +290,6 @@ ColumnStandard::tick (const Time& time,
 void
 ColumnStandard::output (Log& log, const Filter& filter) const
 {
-  log.open (name);
   output_submodule (bioclimate, "Bioclimate", log, filter);
   output_submodule (surface, "Surface", log, filter);
 #if 0
@@ -294,7 +303,6 @@ ColumnStandard::output (Log& log, const Filter& filter) const
   output_submodule (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
   output_list (crops, "crops", log, filter);
-  log.close ();
 }
 
 ColumnStandard::ColumnStandard (const AttributeList& al)

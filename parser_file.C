@@ -17,7 +17,6 @@ struct ParserFile::Implementation
   int peek ();
   bool good ();
   string get_string ();
-  string get_id ();
   int get_integer ();
   double get_number ();
   void error (string str);
@@ -79,53 +78,56 @@ ParserFile::Implementation::good ()
 string
 ParserFile::Implementation::get_string ()
 {
-  string str ("");
-  skip ("\"");
-
-  for (int c = get (); good() && c != '"'; c = get ())
+  if (peek () == '"')
     {
-      if (c == '\\')
+      // Get a string.
+      string str ("");
+      skip ("\"");
+
+      for (int c = get (); good() && c != '"'; c = get ())
 	{
-	  c = get ();
-	  switch (c)
+	  if (c == '\\')
 	    {
-	    case '\\':
-	    case '"':
-	      break;
-	    default:
-	      error (string ("Unknown character escape '")
-		     // BUG: SHOULD USE DYNAMIC CAST!
-		     + char (c) + "'");
+	      c = get ();
+	      switch (c)
+		{
+		case '\\':
+		case '"':
+		  break;
+		default:
+		  error (string ("Unknown character escape '")
+			 // BUG: SHOULD USE DYNAMIC CAST!
+			 + char (c) + "'");
+		}
 	    }
+	  str += static_cast<char> (c);
 	}
-      str += static_cast<char> (c);
+      return str;
     }
-  return str;
-}
-
-string
-ParserFile::Implementation::get_id ()
-{
-  skip ();
-  int c = peek ();
-    
-  if (c != '_' && !isalpha (c))
+  else
     {
-      error ("Identifier expected");
-      skip_to_end ();
-      return "error";
-    }
+      // Get an identifier.
+      skip ();
+      int c = peek ();
+  
+      if (c != '_' && c != '-' && !isalpha (c))
+	{
+	  error ("Identifier or string expected");
+	  skip_to_end ();
+	  return "error";
+	}
 
-  string str ("");
-  do
-    {
-      str += c;
-      get ();
-      c = peek ();
-    }
-  while (good() && (c == '_' || isalnum (c)));
+      string str ("");
+      do
+	{
+	  str += c;
+	  get ();
+	  c = peek ();
+	}
+      while (good() && (c == '_' || c == '-' || isalnum (c)));
     
-  return str;
+      return str;
+    }
 }
 
 double
@@ -199,8 +201,8 @@ ParserFile::Implementation::skip_token ()
       skip_to_end ();
       skip (")");
     }
-  else if (isalnum (peek ()) || peek () == '_')
-    get_id ();
+  else if (isalnum (peek ()) || peek () == '_' || peek () == '-')
+    get_string ();
   else
     get ();
 }
@@ -230,8 +232,8 @@ ParserFile::Implementation::eof ()
 void
 ParserFile::Implementation::load_library (Library& lib)
 { 
-  string name = get_id ();
-  string super = get_id ();
+  string name = get_string ();
+  string super = get_string ();
   if (!lib.check (super))
     {
       error (string ("Unknown superclass `") + super + "'");
@@ -248,8 +250,8 @@ void
 ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
 {
 
-  const string name = get_id ();
-  const string super = get_id ();
+  const string name = get_string ();
+  const string super = get_string ();
   if (!lib.check (super))
     {
       error (string ("Unknown superclass `") + super + "'");
@@ -272,7 +274,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
       skip ("(");
       skipped = true;
     }
-  const string type = get_id ();
+  const string type = get_string ();
   if (lib.check (type))
     {
       alist = new AttributeList (lib.lookup (type));
@@ -306,7 +308,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	{
 	  skip ("(");
 	  skipped = true;
-	  name = get_id ();
+	  name = get_string ();
 	}
       else
 	// Ordered tupple, name know.
@@ -356,14 +358,14 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      break;
 	    }
 	  case Syntax::Function:
-	    atts.add (name, get_id ());
+	    atts.add (name, get_string ());
 	    break;
 	  case Syntax::String:
 	    atts.add (name, get_string ());
 	    break;
 	  case Syntax::Boolean:
 	    {
-	      const string flag = get_id ();
+	      const string flag = get_string ();
 
 	      if (flag == "true")
 		atts.add (name, true);
@@ -562,7 +564,7 @@ ParserFile::Implementation::get_filter (const Syntax& syntax)
       if (looking_at ('('))
 	{
 	  skip ("(");
-	  string name = get_id ();
+	  string name = get_string ();
 	  Syntax::type type = syntax.lookup (name);
 	  if (type == Syntax::Error)
 	    {
@@ -594,7 +596,7 @@ ParserFile::Implementation::get_filter (const Syntax& syntax)
 	}
       else 
 	{
-	  string name = get_id ();
+	  string name = get_string ();
 	  if (syntax.lookup (name) == Syntax::Error)
 	    error (string ("Attribute `") + name + "' not known");
 	  else if (syntax.is_const (name))
@@ -614,7 +616,7 @@ ParserFile::Implementation::get_filter_object (const Library& library)
       skip ("*");
       return *Filter::all;
     }  
-  string name = get_id ();
+  string name = get_string ();
   if (library.check (name))
     {
       FilterSome& filter = *new FilterSome ();
@@ -636,7 +638,7 @@ ParserFile::Implementation::get_filter_sequence (const Library& library)
   while (!looking_at (')') && good ())
     {	
       skip ("(");
-      string name = get_id ();
+      string name = get_string ();
       if (library.check (name))
 	filter.add (name, get_filter (library.syntax (name)));
       else 

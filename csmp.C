@@ -104,7 +104,7 @@ CSMP::operator() (const double x) const
 }
 
 // Calculate the inverse function of a CSMP.  
-// We ssume that the original CSMP is monotonously increasing.
+// We assume that the original CSMP is monotonously increasing.
 
 CSMP
 CSMP::inverse () const
@@ -208,6 +208,9 @@ CSMP::operator += (const CSMP& csmp)
     }
   if (csmp.impl.points.size () == 0)
     return;
+
+  // This does not work yet.
+  assert (false);
 
   // Loop variables.
   Implementation::PairVector::iterator i = impl.points.begin ();

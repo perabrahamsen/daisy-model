@@ -7,6 +7,12 @@
 #include "common.h"
 #include <map>
 
+bool
+Action::match (const Column& c) const
+{
+  return parent ? parent->match (c) : true;
+}
+
 static Library* Action_library = NULL;
 typedef map<string, Action::constructor, less<string> > Action_map_type;
 static Action_map_type* Action_constructors;
@@ -37,13 +43,13 @@ Action::derive_type (string name, const AttributeList& al, string super)
 }
 
 Action&
-Action::create (const AttributeList& al)
+Action::create (const AttributeList& al, const Action *const p)
 {
   assert (al.check ("type"));
   const string name = al.name ("type");
   assert (library ().check (name));
   assert (library ().syntax (name).check (al));
-  return (*Action_constructors)[name] (al);
+  return (*Action_constructors)[name] (al, p);
 }
 
 bool
@@ -52,7 +58,8 @@ Action::check (Daisy&) const
   return true;
 }
 
-Action::Action ()
+Action::Action (const Action *const p)
+  : parent (p)
 { }
 
 Action::~Action ()

@@ -7,6 +7,7 @@
 #include <vector>
 
 class Action;
+class Harvest;
 class Weather;
 class Groundwater;
 class Log;
@@ -26,6 +27,7 @@ public:
   Weather& weather;
   Groundwater& groundwater;
   ColumnList& columns;
+  vector<const Harvest*>& harvest;
 
   // Simulation.
 public:

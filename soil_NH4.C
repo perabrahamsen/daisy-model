@@ -7,15 +7,6 @@
 #include "mathlib.h"
 
 double 
-SoilNH4::beta (const Soil& soil, const SoilWater&, int i, double C) const
-{
-  return 0.0;
-  // BUG BUG BUG
-  return soil.v_planar (i) * soil.K_planar (i) / pow (soil.K_planar (i) + C, 2)
-       + soil.v_edge (i)   * soil.K_edge (i)   / pow (soil.K_edge (i) + C, 2);
-}
-
-double 
 SoilNH4::diffusion_coefficient () const
 {
   return 3600 * 1.8e-5; // [cm²/h]

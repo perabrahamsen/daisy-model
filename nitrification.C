@@ -11,7 +11,6 @@
 #include "csmp.h"
 #include "common.h"
 #include "log.h"
-#include "filter.h"
 
 static double f_h (double h)
 {
@@ -70,13 +69,13 @@ void Nitrification::tick (Soil& soil, SoilWater& soil_water,
 
   for (int i = 0; i < soil.size (); i++)
     {
-      const double C = soil_NH4.C (i);
+      const double M = soil_NH4.M (i);
       const double h = soil_water.h (i);
       const double T = soil_heat.T (i);
-      const double rate = k_10 * f_h (h) * f_T (T) * C / (k + C);
+      const double rate = k_10 * f_h (h) * f_T (T) * M / (k + M);
       assert (rate >= 0.0);
-      const double M = min (rate, soil_NH4.M_left (i) / dt);
-      converted.push_back (M);
+      const double M_new = min (rate, soil_NH4.M_left (i) / dt);
+      converted.push_back (M_new);
     }
   soil_NH4.add_to_sink (converted);
   soil_NO3.add_to_source (converted);

@@ -22,16 +22,18 @@ class ActionMix : public Action
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
       {
-	(*i)->mix (daisy.time, 0.0, depth, penetration);
+	if (match (**i))
+	  (*i)->mix (daisy.time, 0.0, depth, penetration);
       }
   }
 
   // Create and Destroy.
   friend class ActionMixSyntax;
-  static Action& make (const AttributeList& al)
-  { return *new ActionMix (al); }
-  ActionMix (const AttributeList& al)
-    : depth (al.number ("depth")),
+  static Action& make (const AttributeList& al, const Action *const p)
+  { return *new ActionMix (al, p); }
+  ActionMix (const AttributeList& al, const Action *const p)
+    : Action (p),
+      depth (al.number ("depth")),
       penetration (al.number ("penetration"))
   { }
 public:
@@ -78,16 +80,18 @@ class ActionSwap : public Action
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
       {
-	(*i)->swap (daisy.time, 0.0, middle, depth);
+	if (match (**i))
+	  (*i)->swap (daisy.time, 0.0, middle, depth);
       }
   }
 
   // Create and Destroy.
   friend class ActionSwapSyntax;
-  static Action& make (const AttributeList& al)
-  { return *new ActionSwap (al); }
-  ActionSwap (const AttributeList& al)
-    : middle (al.number ("middle")),
+  static Action& make (const AttributeList& al, const Action *const p)
+  { return *new ActionSwap (al, p); }
+  ActionSwap (const AttributeList& al, const Action *const p)
+    : Action (p),
+      middle (al.number ("middle")),
       depth (al.number ("depth"))
   { }
 public:

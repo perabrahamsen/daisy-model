@@ -4,7 +4,6 @@
 #include "alist.h"
 #include "syntax.h"
 #include "log.h"
-#include "filter.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -159,7 +158,7 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   double Ssnow_new = Ssnow + (Psnow + Prain - EvapSnowPack - q_s) * dt;
   if (Ssnow_new < 0.0)
     {
-      cerr << "Lost " << -Ssnow_new << " mm from snow pack.\n";
+      // cerr << "Lost " << -Ssnow_new << " mm from snow pack.\n";
       Ssnow_new = 0.0;
     }
   

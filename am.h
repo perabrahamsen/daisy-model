@@ -31,6 +31,7 @@ public:
   bool check () const;
   void mix (const Soil&, double from, double to, double penetration = 1.0);
   void swap (const Soil&, double from, double middle, double to);
+  bool empty () const;
 
   // Library.
 public:

@@ -5,7 +5,6 @@
 #include "alist.h"
 #include "common.h"
 #include "log.h"
-#include "filter.h"
 #include <algobase.h>
 #include <fstream.h>
 #include "mike_she.h"
@@ -40,7 +39,7 @@ class WeatherFile : public Weather
   // Simulation.
 public:
   void tick ();
-  void output (const string, Log&, const Filter&) const;
+  void output (Log&, const Filter&) const;
   double AirTemperature () const;
   double GlobalRadiation () const;
   double ReferenceEvapotranspiration () const;
@@ -96,28 +95,18 @@ WeatherFile::tick ()
 }
 
 void
-WeatherFile::output (const string name, Log& log, const Filter& filter) const
+WeatherFile::output (Log& log, const Filter& filter) const
 {
-  if (filter.check (name))
-    {
-      const Filter& f1 = filter.lookup (name);
-      if (f1.check ("file"))
-	{
-	  const Filter& f2 = f1.lookup ("file");
-	  log.open (name, "file");
-	  log.output ("Prain", f2, Prain, true);	
-	  log.output ("Psnow", f2, Psnow, true);
-	  log.output ("air_temperature", f2, air_temperature, true);
-	  log.output ("global_radiation", f2, global_radiation, true);
-	  log.output ("hourly_global_radiation", f2, 
-		      hourly_global_radiation, true);
-	  log.output ("reference_evapotranspiration", f2, 
-		      reference_evapotranspiration, true);
-	  log.output ("hourly_reference_evapotranspiration", f2, 
-		      hourly_reference_evapotranspiration, true);
-	  log.close ();
-	}
-    }
+  log.output ("Prain", filter, Prain, true);	
+  log.output ("Psnow", filter, Psnow, true);
+  log.output ("air_temperature", filter, air_temperature, true);
+  log.output ("global_radiation", filter, global_radiation, true);
+  log.output ("hourly_global_radiation", filter, 
+	      hourly_global_radiation, true);
+  log.output ("reference_evapotranspiration", filter, 
+	      reference_evapotranspiration, true);
+  log.output ("hourly_reference_evapotranspiration", filter, 
+	      hourly_reference_evapotranspiration, true);
 }
 
 double
@@ -133,26 +122,7 @@ WeatherFile::AirTemperature (void) const // [C]
 double
 WeatherFile::GlobalRadiation () const	// [W/m²]
 {
-  /*a function of the weather*/
-  static const double A0[] =
-  { 17.0, 44.0, 94.0, 159.0, 214.0, 247.0, 214.0, 184.0, 115.0, 58.0, 25.0,
-    13.0 };
-  static const double A1[] = 
-  { -31.0, -74.0, -148.0, -232.0, -291.0, -320.0, -279.0, -261.0, -177.0,
-    -96.0, -45.0, -24.0 };
-  static const double B1[] =
-  { -7.0, -20.0, -34.0, -45.0, -53.0, -63.0, -67.0, -52.0, -30.0, -13.0, 
-    -6.0, -4.0 };
-  static const double A2[] = 
-  { 21.0, 42.0, 68.0, 77.0, 67.0, 0.0, 0.0, 75.0, 73.0, 54.0, 32.0, 18.0 };
-  static const double B2[] = 
-  { 11.0, 25.0, 32.0, 29.0, 23.0, 0.0, 0.0, 29.0, 25.0, 15.0, 8.0, 7.0 };
-
-  double t = 2.0 * M_PI / 24.0 * time.hour ();
-  int m = time.month () - 1;
-  double Si = (  A0[m] + A1[m] * cos (t) + B1[m] * sin (t)
-		 + A2[m] * cos (2 * t) + B2[m] * sin (2 * t));
-  hourly_global_radiation = max (0.0, Si * (global_radiation / A0[m]));
+  hourly_global_radiation = DayCycle () * 24.0 * global_radiation;
   return hourly_global_radiation;
 }
 
@@ -209,7 +179,7 @@ WeatherFile::Snow () const
 }
 
 WeatherFile::WeatherFile (const Time& t, const AttributeList& al)
-  : Weather (t, al.number ("Latitude")),
+  : Weather (t, al.number ("Latitude"), al.name ("type")),
     date (42, 1, 1, 0),
     file_name (al.name ("file")),
     file (al.name ("file").c_str()),

@@ -25,7 +25,7 @@ public:
   bool accept_top (double);
   bool flux_bottom () const;
   bool accept_bottom (double);
-  void output (const string, Log&, const Filter&) const;
+  void output (Log&, const Filter&) const;
 
   // Simulate.
 private:
@@ -606,25 +606,16 @@ UZRichard::tick (const Soil& soil,
 }
 
 void
-UZRichard::output (const string name, Log& log, const Filter& filter) const
+UZRichard::output (Log& log, const Filter& filter) const
 {
-  if (filter.check (name))
-    {
-      const Filter& f1 = filter.lookup (name);
-      if (f1.check ("richards"))
-	{
-	  const Filter& f2 = filter.lookup ("richards");
-	  log.open (name, "richards");
-	  log.output ("q_up", f2, var.q_up);
-	  log.output ("q_down", f2, var.q_down);
-	  log.output ("iterations", f2, var.iterations);
-	  log.close ();
-	}
-    }
+  log.output ("q_up", filter, var.q_up);
+  log.output ("q_down", filter, var.q_down);
+  log.output ("iterations", filter, var.iterations);
 }
 
 UZRichard::UZRichard (const AttributeList& al)
-  : par (*new Parameters (al)),
+  : UZmodel (al.name ("type")),
+    par (*new Parameters (al)),
     var (*new Variables ())
 { }
 

@@ -9,7 +9,6 @@ class SoilNH4 : public Solute
 {
 public:
   // Substance specific constants.
-  double beta (const Soil&, const SoilWater&, int i, double C) const; // dA/dC
   double diffusion_coefficient () const; // in free solu. [m² / s]
   double C_to_A (const Soil&, int i, double C) const;
   double C_to_M (const Soil&, double Theta, int i, double C) const;

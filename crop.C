@@ -49,7 +49,7 @@ Crop::create (const AttributeList& al, int layers)
 void
 Crop::kill (const Time& time, Column& column)
 {
-  harvest (time, column, 0.0, 0.0, 0.0, 0.0, 0.0);
+  harvest (time, column, 0.0, 0.0, 0.0, 0.0, 0.0, true);
 }
 
 Crop::Crop (const string n)

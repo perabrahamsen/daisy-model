@@ -5,7 +5,6 @@
 #include "alist.h"
 #include "common.h"
 #include "log.h"
-#include "filter.h"
 #include <algobase.h>
 
 class WeatherSimple : public Weather
@@ -23,7 +22,7 @@ class WeatherSimple : public Weather
   // Simulation.
 public:
   void tick ();
-  void output (const string, Log&, const Filter&) const;
+  void output (Log&, const Filter&) const;
   double AirTemperature () const;
   double GlobalRadiation () const;
   double ReferenceEvapotranspiration () const;
@@ -54,20 +53,10 @@ WeatherSimple::tick ()
 }
 
 void
-WeatherSimple::output (const string name, Log& log, const Filter& filter) const
+WeatherSimple::output (Log& log, const Filter& filter) const
 {
-  if (filter.check (name))
-    {
-      const Filter& f1 = filter.lookup (name);
-      if (f1.check ("simple"))
-	{
-	  const Filter& f2 = f1.lookup ("simple");
-	  log.open (name, "simple");
-	  log.output ("Prain", f2, Prain, true);	
-	  log.output ("Psnow", f2, Psnow, true);
-	  log.close ();
-	}
-    }
+  log.output ("Prain", filter, Prain, true);	
+  log.output ("Psnow", filter, Psnow, true);
 }
 
 double
@@ -137,7 +126,7 @@ WeatherSimple::Snow () const
 }
 
 WeatherSimple::WeatherSimple (const Time& t, const AttributeList& al)
-  : Weather (t, al.number ("Latitude")),
+  : Weather (t, al.number ("Latitude"), al.name ("type")),
     T1 (al.number ("T1")),
     T2 (al.number ("T2")),
     precipitation (al.number ("precipitation")),

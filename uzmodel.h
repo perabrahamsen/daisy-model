@@ -38,6 +38,10 @@ public:
 
 class UZmodel : public UZtop, public UZbottom
 {
+  // Content.
+public: 
+  const string name;
+
   // UZtop.
 public:
   bool flux_top () const = 0;
@@ -62,7 +66,7 @@ public:
 		     vector<double>& h,
 		     vector<double>& Theta,
 		     vector<double>& q) = 0;
-  virtual void output (const string, Log&, const Filter&) const;
+  virtual void output (Log&, const Filter&) const = 0;
 
   // Library.
 public:
@@ -75,6 +79,7 @@ public:
 
   // Create and Destroy.
 public:
+  UZmodel (string name);
   virtual ~UZmodel ();
 };
 

@@ -33,12 +33,6 @@ SoilNO3::tick (const Soil& soil, const SoilWater& soil_water, double J_in)
 }
 
 double 
-SoilNO3::beta (const Soil&, const SoilWater&, int, double) const
-{
-  return 0.0;
-}
-
-double 
 SoilNO3::diffusion_coefficient () const
 {
   return 3600 * 2.0e-5; // [cm²/h]

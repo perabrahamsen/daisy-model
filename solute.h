@@ -29,9 +29,6 @@ protected:
   // FYI variables.
   double ddt;			// Calculated time step.
 
-  // Substance specific constants.
-  virtual double beta (const Soil&, const SoilWater&,
-		       int i, double C) const = 0; // dA/dC
 public:
   virtual double diffusion_coefficient () const = 0; // in free solu. 
 protected:

@@ -10,6 +10,7 @@
 #include "hydraulic.h"
 #include "crop.h"
 #include "column.h"
+#include "harvest.h"
 #include "action.h"
 #include "filter.h"
 #include "library.h"
@@ -27,10 +28,11 @@ Daisy::Daisy (const AttributeList& al)
   : running (false),
     logs (map_create<Log> (al.list_sequence ("output"))),
     time (al.time ("time")),
-    action (Action::create (al.list ("manager"))),
+    action (Action::create (al.list ("manager"), NULL)),
     weather (Weather::create (time, al.list ("weather"))), 
     groundwater (Groundwater::create (time, al.list ("groundwater"))), 
-    columns (*new ColumnList (al.list_sequence ("column")))
+    columns (*new ColumnList (al.list_sequence ("column"))),
+    harvest (*new vector<const Harvest*>)
 { 
 #ifdef MIKE_SHE
   assert (!mike_she);
@@ -97,20 +99,9 @@ Daisy::run ()
 	    // Don't waste time with empty filters.
 	    continue;
 	  log.output ("time", filter, time);
-	  weather.output ("weather", log, filter);
-	  if (filter.check ("column"))
-	    {
-	      const Filter& f = filter.lookup ("column");
-	      log.open ("column");
-	      for (ColumnList::iterator column = columns.begin();
-		   column != columns.end();
-		   column++)
-		{
-		  if (f.check ((*column)->name))
-		    (*column)->output (log, f.lookup ((*column)->name));
-		}
-	      log.close ();
-	    }
+	  output_derived (weather, "weather", log, filter);
+	  output_list (columns, "column", log, filter);
+	  output_vector (harvest, "harvest", log, filter);
 	}
       time.tick ();
 #ifdef MIKE_SHE 
@@ -152,10 +143,11 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("column", Column::library (), Syntax::State, Syntax::Sequence);
   syntax.add ("weather", Weather::library ());
   syntax.add ("groundwater", Groundwater::library (), Syntax::Const);
+  add_submodule<Harvest> ("harvest", syntax, alist,
+			  Syntax::LogOnly, Syntax::Sequence);
 #ifdef MIKE_SHE
   add_submodule<MikeSHE> ("MikeSHE", syntax, alist);
 #endif
-
 }
 
 Daisy::~Daisy ()
@@ -173,4 +165,5 @@ Daisy::~Daisy ()
 #if 0
   delete &columns;
 #endif
+  delete &harvest;
 }

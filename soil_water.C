@@ -2,6 +2,7 @@
 
 #include "soil_water.h"
 #include "log.h"
+#include "filter.h"
 #include "alist.h"
 #include "uzmodel.h"
 #include "soil.h"
@@ -159,9 +160,9 @@ SoilWater::output (Log& log, const Filter& filter) const
   log.output ("h", filter, h_);
   log.output ("Xi", filter, Xi);
   log.output ("q", filter, q_, true);
-  top->output ("UZtop", log, filter);
+  output_derived (*top, "UZtop", log, filter);
   if (bottom)
-    bottom->output ("UZbottom", log, filter);
+    output_derived (*bottom, "UZbottom", log, filter);
 }
 
 double

@@ -18,9 +18,10 @@ public:
   // Create and Destroy.
 private:
   friend class ActionLispSyntax;
-  static Action& make (const AttributeList& al)
-  { return *new ActionNil (al); }
-  ActionNil (const AttributeList&)
+  static Action& make (const AttributeList& al, const Action *const p)
+  { return *new ActionNil (al, p); }
+  ActionNil (const AttributeList&, const Action *const p)
+    : Action (p)
   { }
 public:
   ~ActionNil ()
@@ -58,10 +59,12 @@ public:
   }
 private:
   friend class ActionLispSyntax;
-  static Action& make (const AttributeList& al)
-  { return *new ActionProgn (al); }
-  ActionProgn (const AttributeList& al)
-    : actions (map_create<Action> (al.list_sequence ("actions")))
+  static Action& make (const AttributeList& al, const Action *const p)
+  { return *new ActionProgn (al, p); }
+  ActionProgn (const AttributeList& al, const Action *const p)
+    : Action (p),
+      actions (map_create1<Action, const Action *const>
+	       (al.list_sequence ("actions"), this))
   { }
 public:
   ~ActionProgn ()
@@ -74,7 +77,8 @@ public:
 class ActionCond : public Action
 {
   typedef vector<pair<const Condition*, Action*>/**/> clause_t;
-  clause_t& make_clauses (const vector<const AttributeList*>& s)
+  clause_t& make_clauses (const vector<const AttributeList*>& s, 
+			  const Action *const p)
   {
     clause_t& c = *new clause_t;
 
@@ -84,7 +88,7 @@ class ActionCond : public Action
       {
 	c.push_back (pair<const Condition*, Action*>
 		     (&Condition::create ((*i)->list ("condition")),
-		      &Action::create ((*i)->list ("action"))));
+		      &Action::create ((*i)->list ("action"), p)));
       }
     return c;
   }
@@ -122,10 +126,11 @@ public:
   }
 private:
   friend class ActionLispSyntax;
-  static Action& make (const AttributeList& al)
-  { return *new ActionCond (al); }
-  ActionCond (const AttributeList& al)
-    : clauses (make_clauses (al.list_sequence ("clauses")))
+  static Action& make (const AttributeList& al, const Action *const p)
+  { return *new ActionCond (al, p); }
+  ActionCond (const AttributeList& al, const Action *const p)
+    : Action (p),
+      clauses (make_clauses (al.list_sequence ("clauses"), this))
   { }
 public:
   ~ActionCond ()
@@ -169,12 +174,13 @@ public:
   }
 private:
   friend class ActionLispSyntax;
-  static Action& make (const AttributeList& al)
-  { return *new ActionIf (al); }
-  ActionIf (const AttributeList& al)
-    : if_c (Condition::create (al.list ("if"))),
-      then_a (Action::create (al.list ("then"))),
-      else_a (Action::create (al.list ("else")))
+  static Action& make (const AttributeList& al, const Action *const p)
+  { return *new ActionIf (al, p); }
+  ActionIf (const AttributeList& al, const Action *const p)
+    : Action (p),
+      if_c (Condition::create (al.list ("if"))),
+      then_a (Action::create (al.list ("then"), this)),
+      else_a (Action::create (al.list ("else"), this))
   { }
 public:
   ~ActionIf ()

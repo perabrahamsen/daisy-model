@@ -25,8 +25,8 @@ public:
   // Create and Destroy.
 private:
   friend class ActionFertilizeSyntax;
-  static Action& make (const AttributeList&);
-  ActionFertilize (const AttributeList&);
+  static Action& make (const AttributeList&, const Action *const p);
+  ActionFertilize (const AttributeList&, const Action *const p);
 public:
   ~ActionFertilize ();
 };
@@ -38,6 +38,8 @@ ActionFertilize::doIt (Daisy& daisy)
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {
+      if (!match (**i))
+	  continue;
       // Add inorganic matter.
       if (to < from)
 	(*i)->fertilize (IM (am), from, to);
@@ -67,8 +69,10 @@ ActionFertilize::check (Daisy& daisy) const
   return true;
 }
 
-ActionFertilize::ActionFertilize (const AttributeList& al)
-  : am (al.list ("am")), 
+ActionFertilize::ActionFertilize (const AttributeList& al,
+				  const Action *const p)
+  : Action (p),
+    am (al.list ("am")), 
     from (al.number ("from")),
     to (al.number ("to"))
 { }
@@ -78,9 +82,9 @@ ActionFertilize::~ActionFertilize ()
 
 // Add the ActionFertilize syntax to the syntax table.
 Action&
-ActionFertilize::make (const AttributeList& al)
+ActionFertilize::make (const AttributeList& al, const Action *const p)
 {
-  return *new ActionFertilize (al);
+  return *new ActionFertilize (al, p);
 }
 
 static struct ActionFertilizeSyntax
@@ -98,7 +102,7 @@ static struct ActionFertilizeSyntax
       }
     if (from < to)
       {
-	cerr << "from must be higher than to in the fertilization area.\n";
+	cerr << "`from' must be higher than `to' in the fertilization area.\n";
 	ok = false;
       }
     return ok;

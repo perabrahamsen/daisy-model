@@ -60,11 +60,9 @@ IM::operator* (double flux) const
 double 
 IM::N_left (const AttributeList& al)
 {
-  const double weight = al.number ("weight") 
-    * al.number ("dry_matter_fraction") ;
-  const double N = weight * al.number ("total_N_fraction");
-  const IM im (al.list ("im"));
-  return N * (1.0 - im.NO3 - im.NH4);
+  const double N = al.number ("total_N_fraction");
+  const AttributeList& im  = al.list ("im");
+  return N * (1.0 - im.number ("NO3") - im.number ("NH4"));
 }
 
 static double IM_get_NO3 (const AttributeList& al)
@@ -102,7 +100,7 @@ static double IM_get_NH4 (const AttributeList& al)
       return N * im.NH4;
     }
   else 
-    return al.number ("NH4");
+    return al.number ("NH4") * (1.0 - al.number ("NH4_evaporation"));
 }
 
 IM::IM ()
@@ -130,4 +128,6 @@ IM::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("NO3", 0.0);
   syntax.add ("NH4", Syntax::Number, Syntax::State);
   alist.add ("NH4", 0.0);
+  syntax.add ("NH4_evaporation", Syntax::Number, Syntax::Const);
+  alist.add ("NH4_evaporation", 0.0);
 }

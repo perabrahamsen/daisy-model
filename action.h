@@ -9,18 +9,24 @@ class Daisy;
 class AttributeList;
 class Library;
 class Syntax;
+class Column;
 
 class Action
 {
+  // Content.
+private:
+  const Action *const parent;
+
   // Simulation.
 public:
   virtual void doIt (Daisy&) = 0;
+  virtual bool match (const Column&) const;
 
   // Library.
 public:
   static const Library& library ();
-  static Action& create (const AttributeList&);
-  typedef Action& (*constructor) (const AttributeList&);
+  static Action& create (const AttributeList&, const Action *const);
+  typedef Action& (*constructor) (const AttributeList&, const Action *const);
   static void add_type (const string, const AttributeList&, const Syntax&,
 			constructor);
   static void derive_type (const string, const AttributeList&, string super);
@@ -29,7 +35,7 @@ public:
 public: 
   virtual bool check (Daisy&) const;
 protected:
-  Action ();
+  Action (const Action *const);
 public:
   virtual ~Action ();
 };

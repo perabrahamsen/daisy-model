@@ -46,6 +46,7 @@ public:
   
   // Log.
   double PotEvapotranspiration;
+  double ActualEvapotranspiration;
   double EvapInterception;
   
   // Construct.
@@ -55,12 +56,13 @@ public:
 Bioclimate::Implementation::Implementation (const AttributeList& al)
   : No (al.integer ("NoOfIntervals")),
     Height (al.integer ("NoOfIntervals")),
-    PAR (al.integer ("NoOfIntervals")),
+    PAR (al.integer ("NoOfIntervals") + 1),
     irrigation (0.0),
     irrigation_temperature (0.0),
     intercepted_water (al.number ("intercepted_water")),
     snow (al.list ("Snow")),
     PotEvapotranspiration (0.0),
+    ActualEvapotranspiration (0.0),
     EvapInterception (0.0)
 { }
 
@@ -112,7 +114,8 @@ Bioclimate::Implementation::RadiationDistribution (const Weather& weather,
        crop++)
     {
       (*crop)->CanopyStructure ();
-      LAIvsH += (*crop)->LAIvsH ();
+      if ((*crop)->LAI () > 0.0)
+	LAIvsH += (*crop)->LAIvsH ();
     }
   // There are no leafs below the ground.
   assert (LAIvsH (0.0) == 0.0);
@@ -139,7 +142,7 @@ Bioclimate::Implementation::IntensityDistribution (const double Rad0,
 {
   double dLAI = (LAI / No);
     
-  for (int i = 0; i < No; i++)
+  for (int i = 0; i <= No; i++)
     Rad[i] = Rad0 * exp (- Ext * dLAI * i);
 }
 
@@ -253,6 +256,9 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 					   soil, soil_water, EvapInterception);
 	}
     }
+  ActualEvapotranspiration = TotalCropUptake + EvapInterception 
+    + EvapSoilSurface + snow.evaporation ();
+
 #ifdef MIKE_SHE
   mike_she->put_evap_interception (EvapInterception);
   mike_she->put_intercepted_water (intercepted_water);
@@ -286,6 +292,8 @@ Bioclimate::output (Log& log, const Filter& filter) const
   log.output ("LAI", filter, impl.LAI, true);
   log.output ("PotEvapotranspiration", filter,
 	      impl.PotEvapotranspiration, true);
+  log.output ("ActualEvapotranspiration", filter,
+	      impl.ActualEvapotranspiration, true);
   output_submodule (impl.snow, "Snow", log, filter);
 }
 
@@ -338,6 +346,7 @@ Bioclimate::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("EvapInterception", Syntax::Number, Syntax::LogOnly);
   syntax.add ("LAI", Syntax::Number, Syntax::LogOnly);
   syntax.add ("PotEvapotranspiration", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("ActualEvapotranspiration", Syntax::Number, Syntax::LogOnly);
   alist.add ("intercepted_water", 0.0);
   add_submodule<Snow> ("Snow", syntax, alist);
 }

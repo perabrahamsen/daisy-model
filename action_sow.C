@@ -14,53 +14,45 @@ class ActionSow : public Action
   const AttributeList& crop;
 
 public:
-  void doIt (Daisy&);
-
+  void doIt (Daisy& daisy)
+  {
+    cout << " [Sowing " << crop.name ("type") << " at";
+    
+    ColumnList& cl = daisy.columns;
+    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
+      { 
+	if (match (**i))
+	  {
+	    (*i)->sow (crop); 
+	    cout << " " << (*i)->name;
+	  }
+      }
+    cout << "]";
+  }
   // Create and Destroy.
 private:
   friend class ActionSowSyntax;
-  static Action& make (const AttributeList&);
-  ActionSow (const AttributeList&);
+  static Action& make (const AttributeList& al, const Action *const p)
+  { return *new ActionSow (al, p); }
+  ActionSow (const AttributeList& al, const Action *const p)
+  : Action (p),
+    crop (al.list ("crop"))
+  { }
 public:
-  ~ActionSow ();
+  ~ActionSow ()
+  { }
 };
 
-void 
-ActionSow::doIt (Daisy& daisy)
-{
-  cout << " [Sowing " << crop.name ("type") << "]";
-
-  ColumnList& cl = daisy.columns;
-  for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-    {
-      (*i)->sow (crop);
-    }
-}
-
-ActionSow::ActionSow (const AttributeList& al)
-  : crop (al.list ("crop"))
-{ }
-
-ActionSow::~ActionSow ()
-{ }
-
 // Add the ActionSow syntax to the syntax table.
-Action&
-ActionSow::make (const AttributeList& al)
-{
-  return *new ActionSow (al);
-}
-
 static struct ActionSowSyntax
 {
-  ActionSowSyntax ();
+  ActionSowSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    syntax.add ("crop", Crop::library (), Syntax::Const);
+    syntax.order ("crop");
+    Action::add_type ("sow", alist, syntax, &ActionSow::make);
+  }
 } ActionSow_syntax;
 
-ActionSowSyntax::ActionSowSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  syntax.add ("crop", Crop::library (), Syntax::Const);
-  syntax.order ("crop");
-  Action::add_type ("sow", alist, syntax, &ActionSow::make);
-}

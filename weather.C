@@ -48,7 +48,7 @@ Weather::create (const Time& t, const AttributeList& al)
 }
 
 void
-Weather::output (const string, Log&, const Filter&) const
+Weather::output (Log&, const Filter&) const
 { }
 
 double
@@ -78,9 +78,10 @@ Weather::DayCycle () const
 	      * cos (M_PI * (time.hour () - 12) / DayLength ()));
 }
 
-Weather::Weather (const Time& t, double l)
+Weather::Weather (const Time& t, double l, const string n)
   : time (t),
-    Latitude (l)
+    Latitude (l), 
+    name (n)
 { }
 
 Weather::~Weather ()

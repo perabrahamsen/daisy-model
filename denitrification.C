@@ -10,7 +10,6 @@
 #include "soil_NO3.h"
 #include "csmp.h"
 #include "log.h"
-#include "filter.h"
 
 static double f_Theta (double x)
 {

@@ -17,7 +17,7 @@ class WeatherNone : public Weather
 public:
   void tick ()
   { }
-  void output (const, Log&, const Filter&) const
+  void output (Log&, const Filter&) const
   { }
   double AirTemperature () const
   { return air_temperature; }
@@ -40,7 +40,7 @@ public:
 };
 
 WeatherNone::WeatherNone (const Time& t, const AttributeList& al)
-  : Weather (t, al.number ("Latitude")),
+  : Weather (t, al.number ("Latitude"), al.name ("type")),
     air_temperature (al.number ("air_temperature")),
     global_radiation (al.number ("global_radiation")),
     reference_evapotranspiration (al.number ("reference_evapotranspiration")),

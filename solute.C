@@ -2,7 +2,6 @@
 
 #include "solute.h"
 #include "log.h"
-#include "filter.h"
 #include "syntax.h"
 #include "alist.h"
 #include "soil.h"
@@ -41,18 +40,10 @@ Solute::add_to_sink (const vector<double>& v)
     }
 }
 
-#define USE_WATER
-
 void 
 Solute::tick (const Soil& soil, 
-#ifdef USE_WATER
 	      const SoilWater& soil_water, 
-	      double J_in
-#else 
-	      const SoilWater& /* soil_water */, 
-	      double /* J_in */
-#endif
-	      )
+	      double J_in)
 {
   // Remember old values.
   vector<double> C_prev = C_;
@@ -61,7 +52,6 @@ Solute::tick (const Soil& soil,
   // Constants.
   const int size = soil.size (); // Number of soil layers.
 
-#ifdef USE_WATER
   // Check that incomming C and M makes sense.
   for (int i = 0; i < size; i++)
     {
@@ -74,9 +64,6 @@ Solute::tick (const Soil& soil,
 			     C_to_M (soil,
 				     soil_water.Theta_old (i), i, C_[i])));
     }
-#else
-  double J_in = 0.0;
-#endif
 
   // Note: q, D, and alpha depth indexes are all [j-½].
 
@@ -88,7 +75,6 @@ Solute::tick (const Soil& soil,
       // Dispersion length [cm]
       const double lambda = soil.lambda (j);
 
-#ifdef USE_WATER
       // Water flux [cm³ /cm² / h]
       const double q = soil_water.q (j);
       
@@ -100,11 +86,7 @@ Solute::tick (const Soil& soil,
       D[j] = (lambda * abs (-q / Theta)
 	      + soil.tortuosity_factor (j, Theta) * diffusion_coefficient ())
 	* Theta;
-#else
-      D[j] = (lambda * abs (-0.15 / 0.3)
-	      + soil.tortuosity_factor (1, 0.3) * diffusion_coefficient ())
-	* 0.3;
-#endif
+
       // Check for NaN.
       assert (finite (D[j]));
     }
@@ -113,7 +95,6 @@ Solute::tick (const Soil& soil,
     // Dispersion length [cm]
     const double lambda = soil.lambda (size-1);
 
-#ifdef USE_WATER
     // Water flux [cm³ /cm² / h]
     const double q = soil_water.q (size);
       
@@ -125,12 +106,6 @@ Solute::tick (const Soil& soil,
 	       + soil.tortuosity_factor (size-1, Theta) 
 	       * diffusion_coefficient ())
       * Theta;
-#else
-    D[size] = (lambda * abs (-0.15 / 0.3)
-	       + soil.tortuosity_factor (1, 0.3) 
-	       * diffusion_coefficient ())
-      * 0.3;
-#endif
 
   }
   // Upper boundary (no dispersion over soil surface).
@@ -142,16 +117,10 @@ Solute::tick (const Soil& soil,
 
   for (int j = 0; j < size + 1; j++)
     {
-#ifdef USE_WATER
       if (soil_water.q (j) < 0.0)
 	alpha[j] = 1.0;
       else
 	alpha[j] = 0.0;
-#elif 1
-      alpha[j] = 1.0;
-#else
-      alpha[j] = 0.5;
-#endif
     }
 
   const double dz_top = 0 - soil.z (0);
@@ -161,21 +130,15 @@ Solute::tick (const Soil& soil,
   double C_top = 0.0;
   if (J_in != 0.0)
     {
-#ifdef USE_WATER
       assert (J_in < 0.0);
       assert (soil_water.q (0) < 0.0);
       C_top = J_in / soil_water.q (0);
-#else
-      C_top = J_in / -0.15;
-#endif
     }
 
   // Find the time step using Courant.
   ddt = 1.0;
-#ifdef USE_WATER
   for (int i = 0; i < size; i++)
     ddt = min (ddt, pow (soil.dz (i), 2) / (2 * D[i + 1]));
-#endif
   // Loop through small time steps.
   for (double old_t = 0.0, t = ddt; 
        old_t != t;
@@ -194,39 +157,23 @@ Solute::tick (const Soil& soil,
       vector<double> Theta_new (size);
       for (int j = 0; j < size; j++)
 	{
-#ifdef USE_WATER
 	  const double Theta_ratio 
 	    = (soil_water.Theta (j) - soil_water.Theta_old (j)) / dt;
 	  Theta_new[j] = soil_water.Theta_old (j) + Theta_ratio * t;
 	  Theta_old[j] = soil_water.Theta_old (j) + Theta_ratio * old_t;
-#else
-	  Theta_old[j] = 0.3;
-	  Theta_new[j] = 0.3;
-#endif
 	  A[j] = M_[j] - C_[j] * Theta_old[j];
 	}
 
       for (int j = 1; j < size; j++)
 	{
-#ifdef USE_WATER
-	  // dA/dC in the present soil water solute.
-	  const double beta = this->beta (soil, soil_water, j, C_[j]);
-#else
-	  const double beta = 0.0;
-#endif
 	  const double dz_minus	// Size of layer above current node.
 	    = soil.z (j-1) - soil.z (j);
 	  const double dz_plus	// Size of layer below current node.
 	    = (j == size - 1) ? dz_minus : (soil.z (j) - soil.z (j+1));
 
 	  const double dz = soil.dz (j); // Size of current node.
-#ifdef USE_WATER
 	  double q_minus = soil_water.q (j); // Flow to above.
 	  const double q_plus = soil_water.q (j+1);	// Flow from below.
-#else
-	  double q_minus = -0.15;
-	  const double q_plus = -0.15;
-#endif
 	  const double alpha_minus = alpha[j]; // Direction above.
 	  const double alpha_plus = alpha[j+1]; // Direction below.
 	  double D_minus = D[j]; // Dispertion above.
@@ -238,14 +185,14 @@ Solute::tick (const Soil& soil,
 
 	  a[j] = - D_minus / (2.0 * dz_minus * dz) 
 	    + (alpha_minus * q_minus) / (2.0 * dz);
-	  b[j] = ((Theta_new[j] + beta) / (t - old_t)
+	  b[j] = (Theta_new[j] / (t - old_t)
 		  + D_minus / (2.0 * dz_minus * dz)
 		  + D_plus / (2.0 * dz_plus * dz)
 		  + ((1 - alpha_minus) * q_minus) / (2.0 * dz)
 		  - (alpha_plus * q_plus) / (2.0 * dz));
 	  c[j] = - D_plus / (2.0 * dz_plus * dz)
 	    - ((1.0 - alpha_plus) * q_plus) / (2.0 * dz);
-	  d[j] = ((Theta_old[j] + beta) * C_[j] / (t - old_t)
+	  d[j] = (Theta_old[j] * C_[j] / (t - old_t)
 		  + S[j]
 		  + ((D_minus * (C_minus - C_[j])) / (2.0 * dz_minus * dz))
 		  - ((D_plus * (C_[j] - C_plus)) / (2.0 * dz_plus * dz))
@@ -262,12 +209,6 @@ Solute::tick (const Soil& soil,
 	}
       // Adjust for upper boundary condition.
       {
-	// dA/dC in the present soil water solute.
-#ifdef USE_WATER
-	const double beta = this->beta (soil, soil_water, 0, C_[0]);
-#else
-	const double beta = 0.0;
-#endif
 	// Size of layer above current node.
 	const double dz_minus = dz_top;
 	// Size of layer below current node.
@@ -276,14 +217,9 @@ Solute::tick (const Soil& soil,
 	// Size of current node.
 	const double dz = soil.dz (0);
 	// Flow to above.
-#ifdef USE_WATER
 	double q_minus = (J_in == 0.0) ? 0.0 : soil_water.q (0);
 	// Flow from below.
 	const double q_plus = soil_water.q (1);
-#else
-	double q_minus = -0.15;
-	const double q_plus = -0.15;
-#endif /* USE_WATER */
 	const double alpha_minus = alpha[0]; // Direction above.
 	const double alpha_plus = alpha[1]; // Direction below.
 	double D_minus = D[0]; // Dispertion above.
@@ -295,14 +231,14 @@ Solute::tick (const Soil& soil,
 
 	a[0] = - D_minus / (2.0 * dz_minus * dz) 
 	  + (alpha_minus * q_minus) / (2.0 * dz);
-	b[0] = ((Theta_new[0] + beta) / (t - old_t)
+	b[0] = (Theta_new[0] / (t - old_t)
 		+ D_minus / (2.0 * dz_minus * dz)
 		+ D_plus / (2.0 * dz_plus * dz)
 		+ ((1 - alpha_minus) * q_minus) / (2.0 * dz)
 		- (alpha_plus * q_plus) / (2.0 * dz));
 	c[0] = - D_plus / (2.0 * dz_plus * dz)
 	  - ((1.0 - alpha_plus) * q_plus) / (2.0 * dz);
-	d[0] = ((Theta_old[0] + beta) * C_[0] / (t - old_t)
+	d[0] = (Theta_old[0] * C_[0] / (t - old_t)
 		+ S[0]
 		+ ((D_minus * (C_minus - C_[0])) / (2.0 * dz_minus * dz))
 		- ((D_plus * (C_[0] - C_plus)) / (2.0 * dz_plus * dz))
@@ -318,11 +254,7 @@ Solute::tick (const Soil& soil,
 	assert (finite (d[0]));
 	if (J_in != 0.0)
 	  {
-#ifdef USE_WATER
 	    const double q0 = soil_water.q (0);
-#else 
-	    const double q0 = -0.15;
-#endif
 	    assert (J_in < 0.0);
 	    assert (q0 < 0.0);
 	    cerr << "J_in == " << J_in << "\n";

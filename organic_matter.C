@@ -224,6 +224,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 				     SoilNO3& soil_NO3,
 				     SoilNH4& soil_NH4)
 {
+  remove_if (am.begin (), am.end (), &AM::empty);
+
   // Create an array of all AM dk:puljer, sorted by their C_per_N.
   const int all_am_size = am.size ();
   vector<OM*> added;
@@ -338,7 +340,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 
       if (N_used > N_soil)
 	{
-	  cerr << "\nBUG: Adding " << N_used - N_soil << " mystery N\n";
+	  // cerr << "\nBUG: Adding " << N_used - N_soil << " mystery N\n";
 	  N_used = N_soil;
 	}
 
@@ -728,8 +730,8 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("CO2", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("am", AM::library (), Syntax::State, Syntax::Sequence);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
-  add_sequence<OM> ("smb", syntax, alist);
-  add_sequence<OM> ("som", syntax, alist);
+  add_submodule<OM> ("smb", syntax, alist, Syntax::State, Syntax::Sequence);
+  add_submodule<OM> ("som", syntax, alist, Syntax::State, Syntax::Sequence);
   syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);
   syntax.add ("water_turnover_factor", Syntax::CSMP, Syntax::Const);
 }

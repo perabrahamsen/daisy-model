@@ -3,17 +3,17 @@
 SHELL = /bin/sh
 MAKEFLAGS =
 
-# change these to enable/disable miek she connection
+# change these to enable/disable mike she connection
 #FOROBJ = $(FORTRAN:.f=.o) $(MIKESRC:.c=.o) 
-#FOROBJ = mshe/mshe.a
-#FORLIB =  -L/pack/f2c/lib -lI77 -lF77 
-#MIKESHE=mike_she.C
-#MIKEONLY=
-#MIKEFLAGS=-I/pack/f2c/include -DMIKE_SHE
-FOROBJ=
-FORLIB=
-MIKESRC=
-MIKEFLAGS= 
+FOROBJ = mshe/mshe.a
+FORLIB =  -L/pack/f2c/lib -lI77 -lF77 
+MIKESHE=mike_she.C
+MIKEONLY=
+MIKEFLAGS=-I/pack/f2c/include -DMIKE_SHE
+#FOROBJ=
+#FORLIB=
+#MIKESRC=
+#MIKEFLAGS= 
 
 CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo -pipe $(MIKEFLAGS) -O2
 # CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
@@ -24,14 +24,15 @@ SRCONLY = column_std.C  weather_simple.C uzrichard.C \
 	crop_std.C action_sow.C action_stop.C condition_time.C \
 	condition_logic.C log_file.C action_irrigate.C action_lisp.C \
 	weather_none.C action_fertilize.C weather_file.C action_tillage.C \
-	action_harvest.C hydraulic_old.C $(MIKEONLY)
+	action_harvest.C hydraulic_old.C $(MIKEONLY) crop_old.C crop_sold.C \
+	action_with.C
 OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C ftable.C \
 	filter.C csmp.C time.C uzmodel.C parser_file.C hydraulic.C \
 	soil.C mathlib.C bioclimate.C surface.C soil_water.C \
 	soil_NH4.C soil_NO3.C organic_matter.C nitrification.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
-	am.C im.C om.C $(MIKESHE)
+	am.C im.C om.C harvest.C $(MIKESHE)
 OBJ = $(OBJECTS:.C=.o) $(SRCONLY:.C=.o) set_exceptions.o 
 SRC = $(OBJECTS) $(SRCONLY) set_exceptions.S
 HEAD = $(OBJECTS:.C=.h) common.h 
@@ -107,7 +108,6 @@ daisy.zip:	$(TEXT)
 cvs: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(TEXT)
-	(cd test ; make cvs )
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"

@@ -85,6 +85,23 @@ output_submodule (const T& submodule,
 }
 
 template <class T> void
+output_derived (const T& submodule,
+		const char* name,
+		Log& log, const Filter& filter)
+{
+  if (filter.check (name))
+    {
+      const Filter& f1 = filter.lookup (name);
+      if (f1.check (submodule.name))
+	{
+	  log.open (name, submodule.name);
+	  submodule.output (log, f1.lookup (submodule.name));
+	  log.close ();
+	}
+    }
+}
+
+template <class T> void
 output_list (T const& items,
 	     const char* name, Log& log, Filter const& filter)
 {
@@ -113,13 +130,14 @@ output_vector (T const& items,
 {
   if (filter.check (name))
     {
+      Filter const& f1 = filter.lookup (name);
       log.open (name);
       for (T::const_iterator item = items.begin();
 	   item != items.end();
 	   item++)
 	{
 	  log.open ("");
-	  (*item)->output (log, filter.lookup (name));
+	  (*item)->output (log, f1);
 	  log.close ();
 	}
       log.close ();

@@ -13,10 +13,6 @@ UZtop::~UZtop ()
 UZbottom::~UZbottom ()
 { }
 
-void
-UZmodel::output (const string, Log&, const Filter&) const
-{ }
-
 static Library* UZ_library = NULL;
 typedef map<string, UZmodel::constructor, less<string> > UZ_map_type;
 static UZ_map_type* UZ_constructors;
@@ -54,6 +50,10 @@ UZmodel::create (const AttributeList& al)
   assert (library ().syntax (name).check (al));
   return (*UZ_constructors)[name] (al);
 }
+
+UZmodel::UZmodel (string n)
+  : name (n)
+{ }
 
 UZmodel::~UZmodel ()
 { }
