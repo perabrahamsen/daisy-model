@@ -258,12 +258,12 @@ MacroStandard::tick (const Soil& soil,
       }
 
   // Check that the sink terms add up.
-  if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
+  if (fabs (soil.total (S_p) - q_top - extra_water) > 1.0e-11)
     {
       TmpStream tmp;
       tmp () << __FILE__ << ":" <<  __LINE__
-	     << ": BUG: Total S_p = " << (soil.total (S_p) - q_top) 
-	     << " extra_water = '" << extra_water;
+	     << ": BUG: Total S_p = " << soil.total (S_p) << ", q_top = " 
+	     << q_top << ", extra_water = " << extra_water;
       msg.error (tmp.str ());
     }
 }
