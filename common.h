@@ -12,7 +12,7 @@
 #include <string>
 
 #if (defined (__GNUC__) && __GNUC__ < 3) \
- || (defined (__BORLAND) && __BORLANDC__ < 0x0550
+	|| (defined (__BORLANDC__) && __BORLANDC__ < 0x0550)
 #define BROKEN_HEADERS
 #endif
 
@@ -98,6 +98,7 @@
 // BC++ 5.01 hasn't <ostream.h>
 #define MISSING_OSTREAM
 
+#endif
 #endif
 
 #if defined (__unix) 
