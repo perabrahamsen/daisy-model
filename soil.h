@@ -24,9 +24,9 @@
 #define SOIL_H
 
 #include "geometry.h"
+#include "horizon.h" // Needed for initialization order.
 
 struct AttributeList;
-struct Horizon;
 struct Log;
 
 class Soil : public Geometry

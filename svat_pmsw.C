@@ -52,6 +52,9 @@
 # define NP 20 // from xgaussj driver program
 # define MP 20 // from xgaussj driver program
 
+#ifdef _MSC_VER
+#pragma warning (disable: 4244)
+#endif
 // prototypes
 int RA(double, double, double, double&);
 int RAA(double, double, double, double, double, double, double, double,
