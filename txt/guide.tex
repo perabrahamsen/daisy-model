@@ -785,7 +785,7 @@ attributes are present when the object is created.
 
 The available types are defined in the enum \code{Syntax::type}, which
 contains these values: \code{Number}, \code{Integer}, \code{Boolean},
-\code{String}, \code{CSMP}, \code{Date}, \code{AList}, \code{Object},
+\code{String}, \code{CSMP}, \code{AList}, \code{Object},
 \code{Library}, and \code{Error}.  In this section is explained how
 these works, and especially what types of values can be specified with
 them.  Additionally, the printed format -- as recognized by the
@@ -1000,30 +1000,6 @@ by parentheses.
 The example above shows a function where $\mbox{foo}\,(0) = 1$ and
 $\mbox{foo}\,(2) = 0$. By linear interpolation we get that
 $\mbox{foo}\,(1) = 0.5.$
-
-\subsection{Date}
-
-The \code{Syntax::Date} type is used for specifying a point in time.
-In \cplusplus{} it is represented by the \code{Time} class, described
-in the file \file{time.h}.
-
-The \code{Syntax::Date} type is just like \code{Syntax::Number},
-except that:
-\begin{itemize}
-\item The \cplusplus{} type is \code{const Time\&}.
-\item The function to extract the value from the attribute list is\\
-  \code{AttributeList::time}. 
-\item The \cplusplus{} representation for a sequences are vectors of
-  pointers to constant \code{Time} objects.
-\end{itemize}
-
-The printed representation is four integers; year, month, day in
-month, and hour, separated by whitespace.
-\begin{center}
-  \begin{tt}
-    (foo 1965 07 20 02)
-  \end{tt}
-\end{center}
 
 \subsection{AList}
 
@@ -1416,7 +1392,7 @@ simulation.
 \item \file{weather.C}, \file{weather.h}:  Implements the
   \code{Weather} library.
   \begin{itemize}
-  \item \file{weather\_file.C}: Reads weather date from a file.
+  \item \file{weather\_file.C}: Reads weather data from a file.
   \item \file{weather\_none.C}: No weather.
   \item \file{weather\_simple.C}: Very simple weather model.
   \end{itemize}
