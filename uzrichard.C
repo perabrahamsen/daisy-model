@@ -211,7 +211,7 @@ UZRichard::richard (Treelog& msg,
       Theta_previous = Theta;
 
       if (!top.flux_top () && !top.soil_top ())
-	h[first] = 0.0;
+	h[first] = top.h () - soil.z (first) + top_water;
 
       do
 	{
@@ -273,7 +273,10 @@ UZRichard::richard (Treelog& msg,
 		    }
 		  else
 		    {
-		      h_above = top.h () - soil.z (first) + top_water;
+		      h_above = h[first];
+                      daisy_assert (approximate (h_above, 
+                                                 top.h () - soil.z (first)
+                                                 + top_water));
 		      if (top.h () < 0.0)
 			{
 			  TmpStream tmp;
