@@ -89,19 +89,19 @@ Bioclimate::RefAerodynamicResistance (double U2)
 
 double 
 Bioclimate::get_evap_interception () const
-{ daisy_assert (false); return 0.0; }
+{ daisy_assert (false); }
 
 double 
 Bioclimate::get_intercepted_water () const
-{ daisy_assert (false); return 0.0; }
+{ daisy_assert (false); }
 
 double 
 Bioclimate::get_net_throughfall () const
-{ daisy_assert (false); return 0.0; }
+{ daisy_assert (false); }
 
 double 
 Bioclimate::get_snow_storage () const
-{ daisy_assert (false); return 0.0; }
+{ daisy_assert (false); }
 
 Bioclimate::Bioclimate (const string& n)
   : name (n)

@@ -161,7 +161,7 @@ Solute::tick (const Soil& soil,
 	     << ": mass balance new - old != source + in - out\n"
 	     << new_content << " - " << old_content << " != " 
 	     << source << " + " << in << " - " << out << " (error "
-	     << delta_content - expected << ")";
+	     << (delta_content - expected) << ")";
       msg.error (tmp.str ());
     }
 }

@@ -30,7 +30,7 @@
 
 bool
 LogClone::match (const Daisy&, Treelog&)
-{ daisy_assert (false); return false; }
+{ daisy_assert (false); }
 
 #ifdef BORLAND_PRAGMA
 #pragma warn +rvl
@@ -38,7 +38,7 @@ LogClone::match (const Daisy&, Treelog&)
 
 bool 
 LogClone::check_member (const string &) const
-{ daisy_assert (false); return false; }
+{ daisy_assert (false); }
 void
 LogClone::done ()
 { daisy_assert (false); }

@@ -39,7 +39,6 @@ Geometry::interval_plus (double z) const
 	return i;
     }
   daisy_assert (false);
-  return i;
 }
 
 unsigned int

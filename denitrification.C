@@ -55,7 +55,6 @@ static double f_T (double T)
     return exp (0.47 - 0.027 * T + 0.00193 * T * T);
 
   daisy_assert (false);
-  return -42.42e42;
 }
 
 void

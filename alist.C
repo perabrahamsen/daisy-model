@@ -292,7 +292,6 @@ Value::subset (const Value& v, const Syntax& syntax,
 	daisy_assert (false);
       }
   // Not reached.
-  return false;
 }
 
 void 

@@ -113,7 +113,6 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     default:
       daisy_assert (false);
     } 
-  return true;
 }
 
 bool 

@@ -240,7 +240,6 @@ Horizon::Implementation::DepolationsFactor (const Hydraulic& hydraulic,
     return (alfa * alfa / sqrt (-a) * (M_PI_2 - atan (sqrt (-1.0 / a))) - 1.0)
       / (2.0 * -a);
   daisy_assert (false);
-  return 42.42e42;
 }
 
 double 
