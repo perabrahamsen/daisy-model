@@ -1,6 +1,6 @@
 ;;; grass.dai
 
-(defcrop Grass default
+(defcrop "Grass to grain" default
   (Devel (EmrTSum 125)
 	 (DS_Emr 0.01)
 	 (DSRate1 0.022)
@@ -123,4 +123,9 @@
 	   (C_SOrg 0.420)
 	   (C_Dead 0.420)
 	   (C_Root 0.420))
+)
+
+(defcrop Grass "Grass to grain"
+  (Devel (PhotEff1 (00 0.10) (10 0.00) (11 0.00) (12 0.75) (13 0.89) (14 1.00)
+		   (15 1.08) (16 1.14) (17 1.18) (24 1.18)))
 )
