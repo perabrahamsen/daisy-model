@@ -4,12 +4,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 ** Delete value.
 
-** Tree
-
-*** command to show all object content in tree for specific object
-
-*** show object superclass in library -> model
-
 ** Filter setup
 
 Only show a few buildin libraries and models.
@@ -55,11 +49,6 @@ Maybe show events in tree, like BCC?
 
 libraries, models, parameterizations and parameters should belong to a
 number of "interest groups", which can be use by QDaisy for filtering.
-
-** repopulate tree
-
-Avoid losing all open/close/selected information when changing tree
-view og loading files.
 
 ** Make drag and drop and "qdaisy file" work.
 

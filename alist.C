@@ -437,6 +437,7 @@ struct AttributeList::Implementation
   bool check (const string& key) const;
   const Value& lookup (const string& key) const;
   void add (const string& key, const Value& value);
+  void remove (const string& key);
   void clear ();
 };    
 
@@ -463,6 +464,14 @@ void
 AttributeList::Implementation::add (const string& key, const Value& value)
 {
   values[key] = value;
+}
+
+void
+AttributeList::Implementation::remove (const string& key)
+{
+  value_map::iterator i = values.find (key);
+  assert (i != values.end ());
+  values.erase (i);
 }
 
 void
@@ -697,7 +706,7 @@ AttributeList::add (const string& key, const Time& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, AttributeList& v)
+AttributeList::add (const string& key, const AttributeList& v)
 { impl.add (key, Value (v)); }
 
 void 
@@ -731,6 +740,10 @@ AttributeList::add (const string& key, const vector<const PLF*>& v)
 void 
 AttributeList::add (const string& key, const vector<const Time*>& v)
 { impl.add (key, Value (v)); }
+
+void 
+AttributeList::remove (const string& key)
+{ impl.remove (key); }
 
 void
 AttributeList::operator += (const AttributeList& al)

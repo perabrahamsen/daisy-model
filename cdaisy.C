@@ -363,7 +363,6 @@ daisy_library_derive (Library* library,
     {
       alist->add ("parsed_from_file", filename);
       alist->add ("parsed_sequence", Library::get_sequence ());
-      // alist->add ("type", super);
     }
   library->add_derived (name, *alist, super);
 }

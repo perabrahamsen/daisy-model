@@ -21,8 +21,7 @@ public:
 			  const AttributeList& default_alist,
 			  const string& name);
   
-  // Internal calls
-private:
+  // Minor calls.
   void traverse_submodel_default (const Syntax& syntax, 
 				  const AttributeList& default_alist,
 				  const string& name);

@@ -14,6 +14,11 @@ release.
 
 * 1.55
 
+** New `density' flag to the `interval' select method for logging.
+
+Set `density' to true to make Daisy log the average (in height)
+content of the interval, rather than the total content.
+
 ** Fixed bad initialization crash.
 
 Found by ML.

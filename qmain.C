@@ -3,7 +3,6 @@
 // Q Frontend includes.
 #include "qmain.h"
 #include "qmain_tree.h"
-#include "qmain_populate.h"
 #include "qmain_busy.h"
 
 // Daisy backend includes.
@@ -55,7 +54,7 @@ main (int argc, char** argv)
 
 MainWindow::MainWindow ()
   : QMainWindow (),
-    view_logonly (true),
+    view_logonly (false),
     view_parameters (true),
     view_filter (0),
     view_empty (false),
@@ -370,9 +369,9 @@ void
 MainWindow::populate_tree ()
 {
   Busy busy (this, "Populating tree...");
-  ::populate_tree (this, check_composite);
   clear_description ();
   clear_selection ();
+  tree->populate (check_composite);
 }
 
 void 
@@ -455,7 +454,10 @@ MainWindow::edit_inherit ()
 
 void
 MainWindow::edit_delete ()
-{ tree->edit_delete (); }
+{
+  if (tree->edit_delete ())
+    populate_tree (); 
+}
 
 void 
 MainWindow::view_selected ()
@@ -468,7 +470,7 @@ MainWindow::view_check ()
 void 
 MainWindow::toggle_view_defaults ()
 {
-  menu_view->setItemChecked (menu_view_empty_id, 
+  menu_view->setItemChecked (menu_view_defaults_id,
 			     tree->toggle_view_defaults ()); 
 }
 

@@ -6,6 +6,7 @@
 struct SelectInterval : public Select
 {
   // Content.
+  const bool density;
   double from;
   double to;
   double value;	
@@ -36,7 +37,9 @@ struct SelectInterval : public Select
     {
       if (count == 0)
 	dest.missing (tag);
-      else 
+      else if (density)
+	dest.add (tag, value * factor / (from - to) + offset);
+      else
 	dest.add (tag, value * factor + offset);
 
       if (!accumulate)
@@ -59,6 +62,7 @@ struct SelectInterval : public Select
     }
   SelectInterval (const AttributeList& al)
     : Select (al),
+      density (al.flag ("density")),
       from (al.check ("from") ? al.number ("from") : 1.0),
       to (al.check ("to") ? al.number ("to") : 1.0),
       value (al.number ("value"))
@@ -77,6 +81,9 @@ static struct SelectIntervalSyntax
       Select::load_syntax (syntax, alist);
       alist.add ("description", "Summarize specified interval.");
 
+      syntax.add ("density", Syntax::Boolean, Syntax::Const, 
+		  "If true, divide value with interval height.");
+      alist.add ("density", false);
       syntax.add ("from", "cm", Syntax::OptionalConst,
 		  "Specify height (negative) to measure from.\n\
 By default, measure from the top.");

@@ -1,3 +1,24 @@
+2000-10-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.56 released.
+
+2000-10-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.C, alist.h (remove): New function.
+	(add): Mark alist argument `const'.
+
+2000-10-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* traverse_delete.h, traverse_delete.C: New files.
+	* Makefile (OTHER): Add them.
+
+	* select_interval.C: New density parameter.
+
+2000-10-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* net_radiation.C, pet_PM.C, svat_pmsw.C: Merged SH changes.
+
+
 2000-10-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.55 released.

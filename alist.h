@@ -32,6 +32,7 @@ public:
 	       const string& key) const;
   int size (const string& key) const;
 
+  // Extract values.
   double number (string) const;
   const string& name (string) const;
   bool flag (string) const;
@@ -53,7 +54,7 @@ public:
   void add (const string&, const string&);
   void add (const string&, bool);
   void add (const string&, int);
-  void add (const string&, AttributeList&);
+  void add (const string&, const AttributeList&);
   void add (const string&, const PLF&);
   void add (const string&, const Time&);
   void add (const string&, const vector<double>&);
@@ -64,6 +65,7 @@ public:
   void add (const string&, const vector<const PLF*>&);
   void add (const string&, const vector<const Time*>&);
 
+  void remove (const string&);
   void operator += (const AttributeList&);
   void operator = (const AttributeList&);
   void clear ();

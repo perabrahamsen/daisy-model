@@ -24,6 +24,7 @@ private:
   deque<TreeItem*> path;
   deque<bool> buildins;
   bool editable;
+  const bool view_defaults;
 
   // Accessors.
 private:
@@ -76,6 +77,7 @@ private:
   // Create and destroy.
 public:
   TraverseQtTree (MainWindow*, bool check_alists);
+  TraverseQtTree (TreeItem* item, bool view_defaults);
   ~TraverseQtTree ();
 };
 
@@ -238,8 +240,7 @@ bool
 TraverseQtTree::enter_submodel_default (const Syntax&, const AttributeList&, 
 					const string&)
 {
-  assert (buildin ());
-  return true; 
+  return buildin ();
 }
 
 void
@@ -351,7 +352,9 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 				 const string&, const string& parameter)
 {
   // Don't print default values.
-  if (!buildin () && alist.subset (default_alist, syntax, parameter))
+  if (!view_defaults
+      && !buildin () 
+      && alist.subset (default_alist, syntax, parameter))
     return false;
 
   // Get the data.
@@ -369,7 +372,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
     {
       if (!main->view_logonly)
 	return false;
-      category_name = "Log variable";
+      category_name = "Log";
       if (order < 0)
 	order = 9999;
     }
@@ -377,13 +380,13 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
     {
       if (!main->view_parameters)
 	return false;
-      category_name = "Parameter";
+      category_name = "Param.";
       if (order < 0)
 	order = 7777;
     }
   else if (syntax.is_state (parameter))
     {
-      category_name = "State variable";
+      category_name = "State";
       if (order < 0)
 	order = 8888;
     }
@@ -391,13 +394,13 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
     assert (false);
 
   if (syntax.is_optional (parameter))
-    category_name += " (optional)";
+    category_name += " (opt)";
 
   // Value specific changes.
   if (has_value && size != Syntax::Singleton)
     {
       value_name = QString::number (alist.size (parameter));
-      value_name += " elements";
+      value_name += " elems";
     }
 
   // Type specific changes.
@@ -489,7 +492,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	{
 	  value_name = "<";
 	  value_name += QString::number (alist.name (parameter).length ());
-	  value_name += " characters>";
+	  value_name += " chars>";
 	}
       break;
     case Syntax::Date:
@@ -519,37 +522,49 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
       type_name += "]";
     }
 
-  // Create it.
-  if (editable 
-      && size == Syntax::Singleton
-      && has_value
+  // Be sure we have a non-shared alist for editing.
+  if (editable
+      && has_value 
       && (type == Syntax::AList || type == Syntax::Object))
     {
-      if (type == Syntax::AList)
-	{
-	  const Syntax& child_syntax = syntax.syntax (parameter);
-	  AttributeList& child_alist = alist.alist (parameter);
-	  const AttributeList& child_default 
-	    = syntax.default_alist (parameter);
-	  enter (new SubmodelItem (child_syntax, child_alist, child_default,
-				   item (), 
-				   parameter_name, type_name, value_name, 
-				   category_name, order));
-	}
+      if (size == Syntax::Singleton)
+	alist.add (parameter, alist.alist (parameter));
       else
-	{
-	  assert (type == Syntax::Object);
-	  const Library& library = syntax.library (parameter);
-	  AttributeList& child_alist = alist.alist (parameter);
-	  assert (child_alist.check ("type"));
-	  const string& type = child_alist.name ("type");
-	  const Syntax& child_syntax = library.syntax (type);
-	  const AttributeList& child_default = library.lookup (type);
-	  enter (new ObjectItem (child_syntax, child_alist, child_default,
-				 item (),
-				 parameter_name, type_name, value_name, 
-				 category_name, order));
-	}
+	alist.add (parameter, alist.alist_sequence (parameter));
+    }	
+
+  // Create it.
+  if (size == Syntax::Singleton && type == Syntax::AList)
+    {
+      const Syntax& child_syntax = syntax.syntax (parameter);
+      const AttributeList& child_default 
+	= default_alist.check (parameter)
+	? default_alist.alist (parameter)
+	: syntax.default_alist (parameter);
+      static AttributeList empty_alist;
+      AttributeList& child_alist 
+	= alist.check (parameter) 
+	? alist.alist (parameter)
+	: empty_alist;
+
+      enter (new SubmodelItem (child_syntax, child_alist, child_default,
+			       item (), 
+			       parameter_name, type_name, value_name, 
+			       category_name, order));
+    }
+  else if (size == Syntax::Singleton && type == Syntax::Object && has_value)
+    {
+      assert (type == Syntax::Object);
+      const Library& library = syntax.library (parameter);
+      AttributeList& child_alist = alist.alist (parameter);
+      assert (child_alist.check ("type"));
+      const string& type = child_alist.name ("type");
+      const Syntax& child_syntax = library.syntax (type);
+      const AttributeList& child_default = library.lookup (type);
+      enter (new ObjectItem (child_syntax, child_alist, child_default,
+			     item (),
+			     parameter_name, type_name, value_name, 
+			     category_name, order));
     }
   else
     enter (new AtomItem (item (), parameter_name, type_name, value_name, 
@@ -566,15 +581,21 @@ TraverseQtTree::leave_parameter ()
 TraverseQtTree::TraverseQtTree (MainWindow* m, bool ca)
   : main (m),
     check_alists (ca),
-    editable (false)
+    editable (false),
+    view_defaults (false)
 { }
 
-TraverseQtTree::~TraverseQtTree ()
+TraverseQtTree::TraverseQtTree (TreeItem* item, bool view_defaults)
+  : main (item->main ()),
+    check_alists (false),
+    editable (item->editable ()),
+    view_defaults (view_defaults)
 { 
-  assert (path.size () == 0); 
-  assert (buildins.size () == 0);
-  assert (!editable);
+  path.push_back (item);
 }
+
+TraverseQtTree::~TraverseQtTree ()
+{ }
 
 void 
 populate_tree (MainWindow* main, bool check_alists)
@@ -583,4 +604,34 @@ populate_tree (MainWindow* main, bool check_alists)
   
   TraverseQtTree build (main, check_alists);
   build.traverse_all_libraries ();
+}
+
+void 
+populate_alist (AListItem* item)
+{
+  // Clear old content.
+  while (item->firstChild ())
+    delete item->firstChild ();
+  
+  // Build new content.
+  TraverseQtTree build (item, item->view_defaults);
+  build.traverse_alist (item->syntax, item->alist, item->default_alist, 
+			item->entry.latin1 ());
+}
+void
+populate_parameter (AListItem* parent, TreeItem* child)
+{
+  assert (parent);
+  assert (child);
+  string name = parent->entry.latin1 ();
+  string parameter = child->entry.latin1 ();
+  bool view_defaults = false;
+  if (SubmodelItem* submodel = dynamic_cast<SubmodelItem*> (child))
+    view_defaults = submodel->view_defaults;
+  else
+    assert (dynamic_cast<AtomItem*> (child));
+
+  TraverseQtTree build (parent, view_defaults);
+  build.traverse_parameter (parent->syntax, parent->alist, 
+			    parent->default_alist, name, parameter);
 }

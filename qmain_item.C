@@ -3,6 +3,7 @@
 #include "qmain_item.h"
 #include "qmain_edit.h"
 #include "qmain_tree.h"
+#include "qmain_populate.h"
 #include "qmain_busy.h"
 #include "qmain.h"
 
@@ -10,6 +11,7 @@
 #include "tmpstream.h"
 #include "treelog_stream.h"
 #include "traverse_depend.h"
+#include "traverse_delete.h"
 
 #include <qmessagebox.h>
 
@@ -50,7 +52,7 @@ void
 TreeItem::edit_edit ()
 { assert (false); }
 
-void 
+bool
 TreeItem::edit_raw ()
 { assert (false); }
 
@@ -70,7 +72,7 @@ void
 TreeItem::edit_inherit ()
 { assert (false); }
 
-void 
+bool
 TreeItem::edit_delete ()
 { assert (false); }
 
@@ -132,20 +134,20 @@ AtomItem::editable () const
   return c->editable ();
 }
 
-void 
+bool
 AtomItem::edit_raw ()
 {
   AListItem* c = dynamic_cast<AListItem*> (parent ());
   assert (c); 
-  c->edit_item (this); 
+  return c->edit_item (this); 
 }
 
-void 
+bool
 AtomItem::edit_delete ()
 { 
   AListItem* c = dynamic_cast<AListItem*> (parent ());
   assert (c); 
-  c->delete_item (this); 
+  return c->delete_item (this); 
 }
 
 void
@@ -179,14 +181,14 @@ AtomItem::AtomItem (TreeItem* i,
 		    const QString& e, const QString& t, 
 		    const QString& v, const QString& c, int o)
   : TreeItem (i, e, t, v, c, o)
-{ }
+{ assert (dynamic_cast<AListItem*> (i)); }
 
 void
 AListItem::set_selected ()
 {
-  main ()->set_selection_checkable (true);
   main ()->set_selection_defaults_shown (view_defaults);
   main ()->set_selection_showable (true);
+  main ()->set_selection_checkable (true);
 }
 
 void 
@@ -207,10 +209,11 @@ bool
 AListItem::toggle_view_defaults ()
 {
   view_defaults = !view_defaults;
+  populate_alist (this);
   return view_defaults;
 }
 
-void 
+bool
 AListItem::edit_item (TreeItem* item)
 { 
   const string parameter = item->entry.latin1 ();
@@ -219,13 +222,25 @@ AListItem::edit_item (TreeItem* item)
   switch (edit_item.exec ())
     {
     case QDialog::Rejected:
-      break;
+      return false;
     case QDialog::Accepted:
-      item->setText (2, edit_item.value ());
-      break;
-    default:
-      assert (false);
+      populate_parameter (this, item);
+      for (QListViewItem* i = firstChild (); i != NULL; i = i->nextSibling ())
+	{
+	  TreeItem* c = dynamic_cast<TreeItem*> (i);
+	  assert (c);
+	  if (c != item && c->entry == item->entry)
+	    c->listView ()->setSelected (c, true);
+	}
+      return true;
     }
+  assert (false);
+}
+
+bool
+AListItem::delete_item (TreeItem*)
+{ 
+  return false;
 }
 
 QString 
@@ -237,10 +252,6 @@ AListItem::description (const QString& par) const
   return "Unknown item.";
 }
 
-void 
-AListItem::delete_item (TreeItem*)
-{ }
-
 AListItem::AListItem (const Syntax& syn, AttributeList& al,
 		      const AttributeList& def_al,
 		      TreeItem* i,
@@ -249,8 +260,9 @@ AListItem::AListItem (const Syntax& syn, AttributeList& al,
   : TreeItem (i, e, t, v, c, o),
     syntax (syn),
     alist (al),
-    default_alist (def_al)
-{ }
+    default_alist (def_al),
+    view_defaults (false)
+{ assert (&al != &def_al); }
 
 bool 
 ModelItem::editable () const
@@ -269,9 +281,9 @@ ModelItem::set_selected ()
     main ()->set_description ("Model with no description.");
 }
 
-void
+bool
 ModelItem::edit_raw ()
-{ }
+{ return false; }
 
 void
 ModelItem::edit_copy ()
@@ -281,9 +293,57 @@ void
 ModelItem::edit_inherit ()
 { }
 
-void
+bool
 ModelItem::edit_delete ()
-{ }
+{ 
+  LibraryItem* par = dynamic_cast<LibraryItem*> (parent ());
+  assert (par);
+  const string& component = par->entry.latin1 ();
+  const string& model = entry.latin1 ();
+  
+  TmpStream deps;
+  TreelogStream treelog (deps ());
+  QString title = QString ("QDaisy: Removing ") + entry;
+  
+  bool found = false;
+  
+  // Check Libraries.
+  {
+    Busy busy (main (), "Checking libraries...");
+    Treelog::Open nest (treelog, "Libraries");
+    if (check_dependencies (component, model, treelog))
+      found = true;
+  }
+  // Check simulation.
+  {
+    Busy busy (main (), "Checking simulation...");
+    if (check_dependencies (component, model, 
+			    main ()->daisy_syntax, main ()->daisy_alist, 
+			    "Daisy", treelog))
+      found = true;
+  }
+  if (found)
+    {
+      switch (QMessageBox::warning (main (), "Deleting parameterization", "\
+There are other object depending on this one.\n\
+Really delete?",
+			   "Yes", "No", 0, 1))
+	{
+	case 0:
+	  break;
+	case 1:
+	  return false;
+	default:
+	  assert (false);
+	}
+    }
+  remove_dependencies (component, model);
+  remove_dependencies (component, model, 
+		       main ()->daisy_syntax, main ()->daisy_alist);
+  Library& library = Library::find (component);
+  library.remove (model);
+  return true;
+}
 
 void 
 ModelItem::view_dependencies ()
@@ -352,20 +412,20 @@ SubmodelItem::set_selected ()
   AListItem::set_selected ();
 }
 
-void 
+bool
 SubmodelItem::edit_raw ()
 {
   AListItem* c = dynamic_cast<AListItem*> (parent ());
   assert (c); 
-  c->edit_item (this); 
+  return c->edit_item (this); 
 }
 
-void 
+bool
 SubmodelItem::edit_delete ()
 { 
   AListItem* c = dynamic_cast<AListItem*> (parent ());
   assert (c); 
-  c->delete_item (this); 
+  return c->delete_item (this); 
 }
 
 SubmodelItem::SubmodelItem (const Syntax& syn, AttributeList& al,
@@ -375,7 +435,7 @@ SubmodelItem::SubmodelItem (const Syntax& syn, AttributeList& al,
 			    const QString& v, const QString& c,
 			    int o)
   : AListItem (syn, al, al_def, i, e, t, v, c, o)
-{ }
+{ assert (dynamic_cast<AListItem*> (i)); }
 
 ObjectItem::ObjectItem (const Syntax& syn, AttributeList& al,
 			const AttributeList& al_def,
@@ -396,17 +456,17 @@ SequenceItem::editable () const
   return cc->editable ();
 }
 
-void 
+bool
 SequenceItem::edit_raw ()
-{ }
+{ return false; }
 
 void
 SequenceItem::edit_after ()
 { }
 
-void
+bool
 SequenceItem::edit_delete ()
-{ }
+{ return false; }
 
 void
 SequenceItem::set_selected ()
