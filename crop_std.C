@@ -907,7 +907,9 @@ CropStandardSyntax::CropStandardSyntax ()
   AttributeList& AOM1 = *new AttributeList (om_alist);
   AttributeList& AOM2 = *new AttributeList (om_alist);
   AOM1.add ("initial_fraction", 0.80);
-  AOM1.add ("C_per_N", 100.0);
+  vector<double> CN;
+  CN.push_back (100.0);
+  AOM1.add ("C_per_N", CN);
   vector<double> efficiency1;
   efficiency1.push_back (0.50);
   efficiency1.push_back (0.50);
