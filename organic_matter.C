@@ -394,11 +394,11 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   // Setup arrays.
   unsigned int size = soil.size ();
   if (!active_underground && soil.zplus (size - 1) < -100.0)
-    size = soil.interval_plus (min (-100.0, soil.MaxRootingDepth ()));
+    size = soil.interval_plus (min (-100.0, soil.MaxRootingDepth ())) + 1;
   if (!active_groundwater)
-    size = soil_water.first_groundwater_node ();
-  assert (size <= soil.size ());
-
+    size = min (soil_water.first_groundwater_node (), size);
+  size = min (size, soil.size ());
+  
   vector<double> N_soil (size);
   vector<double> N_used (size);
   vector<double> abiotic_factor (size);
