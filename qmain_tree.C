@@ -139,8 +139,9 @@ MainTree::edit_delete ()
   TreeItem* old = item ();
   if (old->edit_delete ())
     {
+      const bool model = dynamic_cast<ModelItem*> (old) != NULL;
       delete old;
-      return true;
+      return model;
     }
   return false;
 }

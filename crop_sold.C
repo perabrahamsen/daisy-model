@@ -1055,10 +1055,10 @@ CropSold::SoluteUptake (const Soil& soil,
     {
       const double L = root_density[i];
       if (L > 0  && soil_water.h (i) <= 0.0)
-	uptake[i] = max (0.0, 
-			 min (L * (min (I_zero[i], I_max)
-				   - B_zero[i] * c_root),
-			      solute.M_left (i) - 1e-8));
+	uptake[i] = bound (0.0, 
+			   L * (min (I_zero[i], I_max)
+				- B_zero[i] * c_root),
+			   solute.M_left (i) - 1e-8);
       else
 	uptake[i] = 0.0;
       assert (uptake[i] >= 0.0);
@@ -1655,8 +1655,9 @@ CropSold::NetProduction (const Bioclimate& bioclimate,
   assert (approximate (f_Leaf + f_SOrg + f_Root, 1.0));
 
   const double AssG = CrpAux.CanopyAss 
-    * max (0.0, min (1.0, ((Prod.NCrop - CrpAux.NfNCnt) 
-			   / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+    * bound (0.0, ((Prod.NCrop - CrpAux.NfNCnt) 
+		   / (CrpAux.CrNCnt - CrpAux.NfNCnt)),
+	     1.0);
   
   CrpAux.IncWLeaf = Resp.E_Leaf (DS) * (f_Leaf * AssG - RMLeaf);
   if (CrpAux.IncWLeaf < 0.0)

@@ -8,6 +8,7 @@
 #include "soil_water.h"
 #include "soil.h"
 #include "log.h"
+#include "mathlib.h"
 
 // Dimensional conversion.
 static const double m_per_cm = 0.01;
@@ -35,13 +36,13 @@ RootSystem::potential_water_uptake (const double h_x,
       const double max_uptake
 	= (soil_water.Theta_left (i) - soil_water.Theta (soil, i, h_wp)) / dt;
       const double uptake
-	= max (min (2 * M_PI * L[i]
+	= bound (0.0, 
+		 (2 * M_PI * L[i]
 		    * (soil_water.Theta (soil, i, h) 
 		       / soil_water.Theta (soil, i, 0.0))
 		    * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
-		    / (- 0.5 * log (area * L[i])),
-		    max_uptake),
-	       0.0);
+		  / (- 0.5 * log (area * L[i]))),
+		 max_uptake);
       assert (soil_water.h (i) > h_wp || uptake == 0.0);
       assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
       assert (L[i] >= 0.0);
@@ -238,10 +239,10 @@ RootSystem::solute_uptake (const Soil& soil,
     {
       const double L = Density[i];
       if (solute.M_left (i) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
-	uptake[i] = max (0.0,
-			 min (L * (min (I_zero[i], I_max)
-				   - B_zero[i] * c_root),
-			      solute.M_left (i) - 1e-8));
+	uptake[i] = bound (0.0,
+			   L * (min (I_zero[i], I_max)
+				- B_zero[i] * c_root),
+			   solute.M_left (i) - 1e-8);
       else
 	uptake[i] = 0.0;
       assert (uptake[i] >= 0.0);

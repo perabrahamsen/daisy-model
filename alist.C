@@ -745,6 +745,84 @@ void
 AttributeList::remove (const string& key)
 { impl.remove (key); }
 
+bool
+AttributeList::revert (const string& key, 
+		       const AttributeList& default_alist, 
+		       const Syntax& syntax)
+{
+  if (subset (default_alist, syntax, key))
+    return false;
+
+  if (!default_alist.check (key))
+    {
+      assert (check (key));
+      remove (key);
+      return true;
+    }
+
+  if (syntax.size (key) == Syntax::Singleton)
+    switch (syntax.lookup (key))
+      {
+      case Syntax::Number:
+	add (key, default_alist.number (key));
+        break;
+      case Syntax::Boolean:
+	add (key, default_alist.flag (key));
+        break;
+      case Syntax::Integer:
+	add (key, default_alist.integer (key));
+        break;
+      case Syntax::AList:
+      case Syntax::Object:
+        add (key, default_alist.alist (key));
+        break;
+      case Syntax::PLF:
+	add (key, default_alist.plf (key));
+        break;
+      case Syntax::String:
+	add (key, default_alist.name (key));
+        break;
+      case Syntax::Date:
+	add (key, default_alist.time (key));
+        break;
+      case Syntax::Library:
+      case Syntax::Error:
+      default:
+	assert (false);
+      }
+  else
+    switch (syntax.lookup (key))
+      {
+      case Syntax::Number:
+	add (key, default_alist.number_sequence (key));
+        break;
+      case Syntax::Boolean:
+	add (key, default_alist.flag_sequence (key));
+        break;
+      case Syntax::Integer:
+	add (key, default_alist.integer_sequence (key));
+        break;
+      case Syntax::AList:
+      case Syntax::Object:
+        add (key, default_alist.alist_sequence (key));
+        break;
+      case Syntax::PLF:
+	add (key, default_alist.plf_sequence (key));
+        break;
+      case Syntax::String:
+	add (key, default_alist.name_sequence (key));
+        break;
+      case Syntax::Date:
+	add (key, default_alist.time_sequence (key));
+        break;
+      case Syntax::Library:
+      case Syntax::Error:
+      default:
+	assert (false);
+      }
+  return true;
+}
+
 void
 AttributeList::operator += (const AttributeList& al)
 {

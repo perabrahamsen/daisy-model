@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.57
+
+No user visisble changes.
+
 * 1.55
 
 ** New `density' flag to the `interval' select method for logging.

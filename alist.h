@@ -66,6 +66,7 @@ public:
   void add (const string&, const vector<const Time*>&);
 
   void remove (const string&);
+  bool revert (const string&, const AttributeList&, const Syntax&);
   void operator += (const AttributeList&);
   void operator = (const AttributeList&);
   void clear ();

@@ -578,7 +578,7 @@ GroundwaterPipe::InternalGWTLocation (const Soil& soil, const double theta,
 {
   vector<double> IntWater;
   const double dz = soil.dz (node);
-  const int n = min (100, max (5, int (dz / 1.0)));
+  const int n = static_cast<int> (bound (5.0, dz / 1.0, 100.0));
   IntWater.insert (IntWater.end (), n, 0.0);
   const double dx = dz / n;
   double h_bottom = 0.0;

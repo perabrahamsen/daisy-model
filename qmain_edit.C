@@ -4,7 +4,9 @@
 
 #include "alist.h"
 #include "syntax.h"
+#include "library.h"
 #include "plf.h"
+#include "time.h"
 
 #include <qdialog.h>
 #include <qlayout.h>
@@ -19,6 +21,8 @@
 #include <qcheckbox.h>
 #include <qtooltip.h>
 #include <qlistview.h>
+#include <qapplication.h>
+#include <qcombobox.h>
 
 EditEntry::EditEntry (QWidget* parent, 
 		      const Syntax& syn, AttributeList& al, 
@@ -166,6 +170,149 @@ public:
 };
 
 
+struct ShortLine : public QLineEdit
+{
+  int size;
+
+  ShortLine (QWidget* main, int sz)
+    : QLineEdit (main),
+      size (sz)
+  { }
+
+  /* Stolen from qlinedit.h */
+  QSize sizeHint() const
+  {
+    constPolish();
+    QFontMetrics fm( font() );
+    int h = fm.height();
+    int w = fm.width( 'x' ) * size; // "some"
+    if ( frame() ) {
+      h += 8;
+      if ( style() == WindowsStyle && h < 26 )
+	h = 22;
+      return QSize( w + 8, h ).expandedTo( QApplication::globalStrut() );
+    } else {
+      return QSize( w + 4, h + 4 ).expandedTo( QApplication::globalStrut() );
+    }
+  }
+};
+
+class EditDate : public EditEntry
+{ 
+  // Children.
+  QLineEdit* year;
+  QLineEdit* month;
+  QLineEdit* mday;
+  QLineEdit* hour;
+
+  // Use.
+  void reset ()
+  {
+    Time value (1, 1, 1, 0);
+    if (alist.check (parameter))
+      value = alist.time (parameter);
+    else if (default_alist.check (parameter))
+      value = default_alist.time (parameter);
+
+    year->setText (QString::number (value.year ()));
+    month->setText (QString::number (value.month ()));
+    mday->setText (QString::number (value.mday ()));
+    hour->setText (QString::number (value.hour ()));
+  }    
+  void apply ()
+  { 
+    if (check->isChecked ())
+      {
+	const int yy = year->text ().toInt ();
+	const int mm = month->text ().toInt ();
+	const int dd = mday->text ().toInt ();
+	const int hh = hour->text ().toInt ();
+	Time value (yy, mm, dd, hh);
+	alist.add (parameter, value); 
+      }
+    else if (default_alist.check (parameter))
+      alist.add (parameter, default_alist.time (parameter));
+    else
+      alist.remove (parameter);
+  }
+  bool valid ()
+  { 
+    // Check content.
+    QString value = year->text ();
+    int pos = 0;
+    if (year->validator ()->validate (value, pos) != QValidator::Acceptable)
+      return false;
+    value = month->text ();
+    if (month->validator ()->validate (value, pos) != QValidator::Acceptable)
+      return false;
+    value = mday->text ();
+    if (mday->validator ()->validate (value, pos) != QValidator::Acceptable)
+      return false;
+    value = hour->text ();
+    if (hour->validator ()->validate (value, pos) != QValidator::Acceptable)
+      return false;
+    
+    // Check date.
+    const int yy = year->text ().toInt ();
+    const int mm = month->text ().toInt ();
+    const int dd = mday->text ().toInt ();
+    const int hh = hour->text ().toInt ();
+    if (!Time::valid (yy, mm, dd, hh))
+      return false;
+
+    // Ok.
+    return true;
+  }
+  void change ()
+  { 
+    year->setEnabled (check->isChecked ());
+    month->setEnabled (check->isChecked ());
+    mday->setEnabled (check->isChecked ());
+    hour->setEnabled (check->isChecked ());
+
+    if (check->isChecked ())
+      return;
+
+    Time value (1, 1, 1, 0);
+    if (default_alist.check (parameter))
+      value = default_alist.time (parameter);
+
+    year->setText (QString::number (value.year ()));
+    month->setText (QString::number (value.month ()));
+    mday->setText (QString::number (value.mday ()));
+    hour->setText (QString::number (value.hour ()));
+  }
+
+
+  // Create and Destroy.
+public:
+  EditDate (QWidget* parent, 
+	    const Syntax& syn, AttributeList& al, 
+	    const AttributeList& def_al, 
+	    const string& par)
+    : EditEntry (parent, syn, al, def_al, par)
+  {
+    year = new ShortLine (this, 5);
+    year->setMaxLength (4);
+    new QLabel ("-", this);
+    month = new ShortLine (this, 2);
+    month->setMaxLength (2);
+    new QLabel ("-", this);
+    mday = new ShortLine (this, 2);
+    mday->setMaxLength (2);
+    new QLabel ("T", this);
+    hour = new ShortLine (this, 2);
+    hour->setMaxLength (2);
+
+    reset ();
+    year->setValidator (new QIntValidator (1, 9999, this));
+    month->setValidator (new QIntValidator (1, 12, this));
+    mday->setValidator (new QIntValidator (1, 31, this));
+    hour->setValidator (new QIntValidator (0, 23, this));
+    change ();
+  };
+};
+
 class EditName : public EditEntry
 { 
   // Children.
@@ -220,6 +367,78 @@ public:
     change ();
   };
 };
+
+void
+EditBoolean::refresh ()
+{
+  if (value)
+    state->setText ("true");
+  else
+    state->setText ("false");
+}    
+
+void
+EditBoolean::reset ()
+{
+  if (alist.check (parameter))
+    value = alist.flag (parameter);
+  else if (default_alist.check (parameter))
+    value = default_alist.flag (parameter);
+
+  refresh ();
+}    
+
+void 
+EditBoolean::apply ()
+{ 
+  if (check->isChecked ())
+    alist.add (parameter, value); 
+  else if (default_alist.check (parameter))
+    alist.add (parameter, default_alist.flag (parameter));
+  else
+    alist.remove (parameter);
+}
+
+bool
+EditBoolean::valid ()
+{ return true; }
+
+void 
+EditBoolean::change ()
+{ 
+  toggle->setEnabled (check->isChecked ());
+  state->setEnabled (check->isChecked ());
+
+  if (check->isChecked ())
+    return;
+
+  if (default_alist.check (parameter))
+    value = default_alist.flag (parameter);
+
+  refresh ();
+}
+
+EditBoolean::EditBoolean (QWidget* parent, 
+			  const Syntax& syn, AttributeList& al, 
+			  const AttributeList& def_al, 
+			  const string& par)
+  : EditEntry (parent, syn, al, def_al, par),
+    value (false)
+{
+  toggle = new QPushButton ("Toggle", this);
+  state = new QLabel ("maybe", this);
+  connect (toggle, SIGNAL (clicked ()), this, SLOT (invert ()));
+
+  reset ();
+  change ();
+};
+
+void
+EditBoolean::invert ()
+{ 
+  value = !value;
+  refresh ();
+}
 
 struct PLFItem : public QListViewItem
 {
@@ -326,10 +545,12 @@ EditPLF::EditPLF (QWidget* parent,
   QPushButton* view = new QPushButton ("View", buttons);
   connect (view, SIGNAL (clicked ()), this, SLOT (view ()));
   table = new QListView (vbox);
-  table->addColumn (QString ("X [") + syntax.domain (parameter).c_str () 
-		    + "]");
-  table->addColumn (QString ("Y [") + syntax.range (parameter).c_str () 
-		    + "]");
+  table->addColumn (syntax.domain (parameter).c_str ());
+  table->addColumn (syntax.range (parameter).c_str ());
+  if (table->columnWidth (0) < 40)
+    table->setColumnWidth (0, 40);
+  if (table->columnWidth (1) < 40)
+    table->setColumnWidth (1, 40);
   reset ();
   change ();
 };
@@ -401,6 +622,103 @@ void
 EditPLF::view ()
 { QMessageBox::warning (this, "QDaisy: view", "Not yet implemented."); }
 
+void
+EditObject::refresh ()
+{
+  if (value.check ("type"))
+    {
+      const QString type = value.name ("type").c_str ();
+      
+      bool found = false;
+      for (unsigned int i = 0; i < choice->count (); i++)
+	if (type == choice->text (i))
+	  {
+	    assert (!found);
+	    choice->setCurrentItem (i);
+	    found = true;
+	  }
+      assert (found);
+    }
+  else
+    activate (0);
+}    
+
+void
+EditObject::reset ()
+{
+  if (alist.check (parameter))
+    value = alist.alist (parameter);
+  else if (default_alist.check (parameter))
+    value = default_alist.alist (parameter);
+
+  refresh ();
+}    
+
+void 
+EditObject::apply ()
+{ 
+  if (check->isChecked ())
+    alist.add (parameter, value); 
+  else if (default_alist.check (parameter))
+    alist.add (parameter, default_alist.alist (parameter));
+  else
+    alist.remove (parameter);
+}
+
+bool
+EditObject::valid ()
+{ return value.check ("type"); }
+
+void 
+EditObject::change ()
+{ 
+  button->setEnabled (check->isChecked ());
+  choice->setEnabled (check->isChecked ());
+
+  if (check->isChecked ())
+    return;
+
+  if (default_alist.check (parameter))
+    {
+      value = default_alist.alist (parameter);
+      refresh ();
+    }
+}
+
+EditObject::EditObject (QWidget* parent, 
+			const Syntax& syn, AttributeList& al, 
+			const AttributeList& def_al, 
+			const string& par)
+  : EditEntry (parent, syn, al, def_al, par)
+{
+  button = new QPushButton ("Edit", this);
+  choice = new QComboBox (false, this);
+  connect (button, SIGNAL (clicked ()), this, SLOT (edit ()));
+  connect (choice, SIGNAL (activated (int)), this, SLOT (activate (int)));
+
+  const Library& library = syntax.library (parameter);
+  vector<string> models;
+  library.entries (models);
+  assert (models.size () > 0);
+  for (unsigned int i = 0; i < models.size (); i++)
+    choice->insertItem (models[i].c_str ());
+
+  reset ();
+  change ();
+};
+
+void
+EditObject::edit ()
+{ }
+
+void
+EditObject::activate (int index)
+{ 
+  const string type = choice->text (index).latin1 ();
+  const Library& library = syntax.library (parameter);
+  value = library.lookup (type);
+  value.add ("type", type);
+}
 
 class EditOther : public EditEntry
 { 
@@ -473,11 +791,21 @@ ItemDialog::ItemDialog (QWidget* parent,
 	entry 
 	  = new EditInteger (this, syntax, alist, default_alist, parameter);
 	break;
+      case Syntax::Date:
+	entry = new EditDate (this, syntax, alist, default_alist, parameter);
+	break;
       case Syntax::String:
 	entry = new EditName (this, syntax, alist, default_alist, parameter);
 	break;
       case Syntax::PLF:
 	entry = new EditPLF (this, syntax, alist, default_alist, parameter);
+	break;
+      case Syntax::Boolean:
+	entry 
+	  = new EditBoolean (this, syntax, alist, default_alist, parameter);
+	break;
+      case Syntax::Object:
+	entry = new EditObject (this, syntax, alist, default_alist, parameter);
 	break;
       default:
 	entry = new EditOther (this, syntax, alist, default_alist, parameter);

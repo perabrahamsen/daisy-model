@@ -1,7 +1,7 @@
 /****************************************************************************
 ** EditEntry meta object code from reading C++ file 'qmain_edit.h'
 **
-** Created: Fri Oct 6 18:17:36 2000
+** Created: Tue Oct 10 16:13:54 2000
 **      by: The Qt MOC ($Id$)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -85,6 +85,66 @@ QMetaObject* EditEntry::staticMetaObject()
 }
 
 
+const char *EditBoolean::className() const
+{
+    return "EditBoolean";
+}
+
+QMetaObject *EditBoolean::metaObj = 0;
+
+void EditBoolean::initMetaObject()
+{
+    if ( metaObj )
+	return;
+    if ( qstrcmp(EditEntry::className(), "EditEntry") != 0 )
+	badSuperclassWarning("EditBoolean","EditEntry");
+    (void) staticMetaObject();
+}
+
+#ifndef QT_NO_TRANSLATION
+
+QString EditBoolean::tr(const char* s)
+{
+    return qApp->translate( "EditBoolean", s, 0 );
+}
+
+QString EditBoolean::tr(const char* s, const char * c)
+{
+    return qApp->translate( "EditBoolean", s, c );
+}
+
+#endif // QT_NO_TRANSLATION
+
+QMetaObject* EditBoolean::staticMetaObject()
+{
+    if ( metaObj )
+	return metaObj;
+    (void) EditEntry::staticMetaObject();
+#ifndef QT_NO_PROPERTIES
+#endif // QT_NO_PROPERTIES
+    typedef void(EditBoolean::*m1_t0)();
+    m1_t0 v1_0 = Q_AMPERSAND EditBoolean::invert;
+    QMetaData *slot_tbl = QMetaObject::new_metadata(1);
+    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(1);
+    slot_tbl[0].name = "invert()";
+    slot_tbl[0].ptr = (QMember)v1_0;
+    slot_tbl_access[0] = QMetaData::Public;
+    metaObj = QMetaObject::new_metaobject(
+	"EditBoolean", "EditEntry",
+	slot_tbl, 1,
+	0, 0,
+#ifndef QT_NO_PROPERTIES
+	0, 0,
+	0, 0,
+#endif // QT_NO_PROPERTIES
+	0, 0 );
+    metaObj->set_slot_access( slot_tbl_access );
+#ifndef QT_NO_PROPERTIES
+#endif // QT_NO_PROPERTIES
+    return metaObj;
+}
+
+
 const char *EditPLF::className() const
 {
     return "EditPLF";
@@ -142,6 +202,71 @@ QMetaObject* EditPLF::staticMetaObject()
     metaObj = QMetaObject::new_metaobject(
 	"EditPLF", "EditEntry",
 	slot_tbl, 3,
+	0, 0,
+#ifndef QT_NO_PROPERTIES
+	0, 0,
+	0, 0,
+#endif // QT_NO_PROPERTIES
+	0, 0 );
+    metaObj->set_slot_access( slot_tbl_access );
+#ifndef QT_NO_PROPERTIES
+#endif // QT_NO_PROPERTIES
+    return metaObj;
+}
+
+
+const char *EditObject::className() const
+{
+    return "EditObject";
+}
+
+QMetaObject *EditObject::metaObj = 0;
+
+void EditObject::initMetaObject()
+{
+    if ( metaObj )
+	return;
+    if ( qstrcmp(EditEntry::className(), "EditEntry") != 0 )
+	badSuperclassWarning("EditObject","EditEntry");
+    (void) staticMetaObject();
+}
+
+#ifndef QT_NO_TRANSLATION
+
+QString EditObject::tr(const char* s)
+{
+    return qApp->translate( "EditObject", s, 0 );
+}
+
+QString EditObject::tr(const char* s, const char * c)
+{
+    return qApp->translate( "EditObject", s, c );
+}
+
+#endif // QT_NO_TRANSLATION
+
+QMetaObject* EditObject::staticMetaObject()
+{
+    if ( metaObj )
+	return metaObj;
+    (void) EditEntry::staticMetaObject();
+#ifndef QT_NO_PROPERTIES
+#endif // QT_NO_PROPERTIES
+    typedef void(EditObject::*m1_t0)();
+    typedef void(EditObject::*m1_t1)(int);
+    m1_t0 v1_0 = Q_AMPERSAND EditObject::edit;
+    m1_t1 v1_1 = Q_AMPERSAND EditObject::activate;
+    QMetaData *slot_tbl = QMetaObject::new_metadata(2);
+    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(2);
+    slot_tbl[0].name = "edit()";
+    slot_tbl[0].ptr = (QMember)v1_0;
+    slot_tbl_access[0] = QMetaData::Public;
+    slot_tbl[1].name = "activate(int)";
+    slot_tbl[1].ptr = (QMember)v1_1;
+    slot_tbl_access[1] = QMetaData::Public;
+    metaObj = QMetaObject::new_metaobject(
+	"EditObject", "EditEntry",
+	slot_tbl, 2,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
 	0, 0,

@@ -266,7 +266,7 @@ SUBMODELS = canopy_simple.C canopy_std.C root_system.C \
 SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C column_base.C
 
-# Various utility code that are neither a component or a submodel.
+# Various utility code that are neither a component or a (sub)model.
 #
 OTHER = traverse_delete.C \
 	traverse_depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \

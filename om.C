@@ -61,6 +61,7 @@ OM::set_N (vector<double>& N)
 {
   assert (N.size () == C.size ());
 
+#if 0
   if (initial_C_per_N != Unspecified)
     {
       // Fixed C/N.
@@ -80,6 +81,7 @@ OM::set_N (vector<double>& N)
 	}
     }
   else
+#endif
     {
       // Calculate C/N.
       C_per_N.erase (C_per_N.begin (), C_per_N.end ());

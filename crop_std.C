@@ -1135,8 +1135,9 @@ CropStandard::NitrogenUptake (int Hour,
 
   // Updating the nitrogen stress
   root_system.nitrogen_stress
-    = 1.0 - max (0.0, min (1.0, ((NCrop - var.CrpAux.NfNCnt)
-				 / (var.CrpAux.CrNCnt - var.CrpAux.NfNCnt))));
+    = 1.0 - bound (0.0, ((NCrop - var.CrpAux.NfNCnt)
+			 / (var.CrpAux.CrNCnt - var.CrpAux.NfNCnt)),
+		   1.0);
   
   // Ensure we have enough N for all the crop parts.
   if (!par.enable_N_stress)

@@ -626,7 +626,9 @@ populate_parameter (AListItem* parent, TreeItem* child)
   string name = parent->entry.latin1 ();
   string parameter = child->entry.latin1 ();
   bool view_defaults = false;
-  if (SubmodelItem* submodel = dynamic_cast<SubmodelItem*> (child))
+  if (parent->view_defaults)
+    view_defaults = true;
+  else if (SubmodelItem* submodel = dynamic_cast<SubmodelItem*> (child))
     view_defaults = submodel->view_defaults;
   else
     assert (dynamic_cast<AtomItem*> (child));

@@ -432,10 +432,9 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   const double potential_crop_transpiration = canopy_ep - canopy_ea;
   const double potential_soil_transpiration 
     = (pond_ep - pond_ea - soil_ea) * surface.EpInterchange ();
-  crop_ep = min (max (0.0, 
-		      potential_crop_transpiration
-		      + potential_soil_transpiration),
-		 pet.dry ());
+  crop_ep = bound (0.0, 
+		   potential_crop_transpiration + potential_soil_transpiration,
+		   pet.dry ());
 
   // Actual transpiration
   crop_ea = vegetation.transpiration (crop_ep, canopy_ea, soil, soil_water);

@@ -1,2 +1,3 @@
+1.56: Added: traverse_delete.C
 1.54: Added: traverse.C traverse_depend.C
-1.53: Added: strstream.C treelog.C treelog_stream.C
+1.53: Added: tmpstream.C treelog.C treelog_stream.C

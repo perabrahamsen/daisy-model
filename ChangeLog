@@ -1,3 +1,50 @@
+2000-10-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.57 released.
+
+2000-10-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (set_N): Don't assume fixed C/N ratio.
+
+2000-10-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* qmain_item.C, qmain_item.h: Submodels and model are not raw editable.
+
+	* qmain_edit.C, qmain_edit.h (EditObject): New editor.
+	* qmain_edit.C (ItemDialog): Use it.
+
+	* crop_old.C (SoluteUptake): Use `bound' instead of `min' and `max'.
+	* crop_sold.C (SoluteUptake): Ditto.
+	* root_system.C (potential_water_uptake): Ditto.
+	(solute_uptake): Ditto.
+
+2000-10-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mathlib.h (bound, set_bound): New functions.
+	* bioclimate_std.C (WaterDistribution): Use it.
+	* groundwater_pipe.C (InternalGWTLocation): Ditto.
+	* crop_sold.C (NetProduction): Ditto.
+	* crop_std.C (NitrogenUptake): Ditto.
+	* crop_old.C (NetProduction): Ditto.
+
+	* qmain_tree.C (edit_delete): Only return true if we deleted a
+	model. 
+
+	* qmain_item.C (setSelected): Mark editable items as deletable.
+	* alist.C, alist.h (revert): New function.
+	* qmain_item.C (delete_item): Call it..
+	* qmain_item.h, qmain_item.C (recreate_item): New function.
+	* qmain_item.C (edit_item, delete_item): Call it.
+
+	* qmain_populate.C (populate_parameter): Don't remove parameters
+	if parent has `view_defaults' set.
+
+	* qmain_edit.h, qmain_edit.C (EditBoolean): New editor.
+	* qmain_edit.C (ItemDialog): Use it.
+	
+	* qmain_edit.C (EditDate): New editor.
+	(ItemDialog): Use it.
+
 2000-10-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.56 released.

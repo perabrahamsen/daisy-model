@@ -33,7 +33,9 @@ TreeItem::setSelected (bool s)
 
   if (s)
     {
-      main ()->set_selection_raw_editable (editable ());
+      if (editable ())
+	main ()->set_selection_deletable (true);
+
       set_selected ();
     }
 
@@ -175,6 +177,8 @@ AtomItem::set_selected ()
       assert (c->syntax.size (parameter) != Syntax::Singleton);
       main ()->set_selection_childable (true);
     }
+  else if (editable ())
+    main ()->set_selection_raw_editable (true);
 }
 
 AtomItem::AtomItem (TreeItem* i,
@@ -213,6 +217,29 @@ AListItem::toggle_view_defaults ()
   return view_defaults;
 }
 
+void
+AListItem::recreate_item (TreeItem* item)
+{ 
+  populate_parameter (this, item);
+  for (QListViewItem* i = firstChild (); i != NULL; i = i->nextSibling ())
+    {
+      TreeItem* c = dynamic_cast<TreeItem*> (i);
+      assert (c);
+      if (c != item && c->entry == item->entry)
+	{
+	  if (SubmodelItem* cc = dynamic_cast<SubmodelItem*> (c))
+	    {
+	      SubmodelItem* ii = dynamic_cast<SubmodelItem*> (item);
+	      assert (ii);
+	      cc->view_defaults = ii->view_defaults;
+	    }
+	  c->listView ()->setSelected (c, true);
+	  c->setOpen (item->isOpen ());
+	  break;
+	}
+    }
+}
+
 bool
 AListItem::edit_item (TreeItem* item)
 { 
@@ -224,23 +251,21 @@ AListItem::edit_item (TreeItem* item)
     case QDialog::Rejected:
       return false;
     case QDialog::Accepted:
-      populate_parameter (this, item);
-      for (QListViewItem* i = firstChild (); i != NULL; i = i->nextSibling ())
-	{
-	  TreeItem* c = dynamic_cast<TreeItem*> (i);
-	  assert (c);
-	  if (c != item && c->entry == item->entry)
-	    c->listView ()->setSelected (c, true);
-	}
+      recreate_item (item);
       return true;
     }
   assert (false);
 }
 
 bool
-AListItem::delete_item (TreeItem*)
+AListItem::delete_item (TreeItem* item)
 { 
-  return false;
+  const string parameter = item->entry.latin1 ();
+  if (!alist.revert (parameter, default_alist, syntax))
+    return false;
+  
+  recreate_item (item);
+  return true;
 }
 
 QString 
@@ -273,17 +298,12 @@ ModelItem::set_selected ()
 {
   AListItem::set_selected ();
   main ()->set_selection_depable (true);  
-  main ()->set_selection_deletable (editable ());
   main ()->set_selection_copyable (true);
   if (alist.check ("description"))
     main ()->set_description (alist.name ("description").c_str ());
   else
     main ()->set_description ("Model with no description.");
 }
-
-bool
-ModelItem::edit_raw ()
-{ return false; }
 
 void
 ModelItem::edit_copy ()
@@ -413,14 +433,6 @@ SubmodelItem::set_selected ()
 }
 
 bool
-SubmodelItem::edit_raw ()
-{
-  AListItem* c = dynamic_cast<AListItem*> (parent ());
-  assert (c); 
-  return c->edit_item (this); 
-}
-
-bool
 SubmodelItem::edit_delete ()
 { 
   AListItem* c = dynamic_cast<AListItem*> (parent ());
@@ -436,6 +448,21 @@ SubmodelItem::SubmodelItem (const Syntax& syn, AttributeList& al,
 			    int o)
   : AListItem (syn, al, al_def, i, e, t, v, c, o)
 { assert (dynamic_cast<AListItem*> (i)); }
+
+void
+ObjectItem::set_selected ()
+{
+  if (editable ())
+    main ()->set_selection_raw_editable (true);
+  SubmodelItem::set_selected ();
+}
+bool
+ObjectItem::edit_raw ()
+{
+  AListItem* c = dynamic_cast<AListItem*> (parent ());
+  assert (c); 
+  return c->edit_item (this); 
+}
 
 ObjectItem::ObjectItem (const Syntax& syn, AttributeList& al,
 			const AttributeList& al_def,
@@ -455,10 +482,6 @@ SequenceItem::editable () const
   assert (cc);
   return cc->editable ();
 }
-
-bool
-SequenceItem::edit_raw ()
-{ return false; }
 
 void
 SequenceItem::edit_after ()

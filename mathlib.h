@@ -26,6 +26,25 @@ single_positive_root_of_square_equation
 
 extern bool approximate (double a, double b, double noise = 0.0001);
 
+inline double bound (double a, double x, double b)
+{
+  assert (a <= b);
+  if (x < a)
+    return a;
+  if (x > b)
+    return b;
+  return x;
+}
+
+inline void set_bound (double a, double& x, double b)
+{
+  assert (a <= b);
+  if (x < a)
+    x = a;
+  else if (x > b)
+    x = b;
+}
+
 inline double pF2h (double pF)
 { 
   return -pow (10, pF);
