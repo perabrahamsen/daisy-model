@@ -98,6 +98,8 @@
 // BC++ 5.01 hasn't <ostream.h>
 #define MISSING_OSTREAM
 
+#else
+#define GLOBAL_CONSTANT
 #endif
 #endif
 
