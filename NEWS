@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.04
+
+** dk-horizon.dai updated with new and better numbers.
+
+** Bug fix: K_to_pipes is now optional.
+
 * 3.03
 
 ** 4% N lost as N2O during nitrification.

@@ -278,7 +278,8 @@ By default, this is 1/2 L.");
       syntax.add ("pipe_position", "cm", Check::negative (), Syntax::Const,
 		  "Height pipes are placed in the soil (a negative number).");
       alist.add ("pipe_position", -110.0);
-      syntax.add ("K_to_pipes", "cm/h", Check::non_negative (), Syntax::Const,
+      syntax.add ("K_to_pipes", "cm/h", Check::non_negative (), 
+                  Syntax::OptionalConst,
 		  "Horizontal conductivity in saturated soil.\n\
 By default this is calculated from the horizontal conductivity and the\n\
 anisotropy of the horizon.");

@@ -1,3 +1,14 @@
+2003-08-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.04 released.
+
+2003-08-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (GroundwaterPipeSyntax): Made "K_to_pipes"
+	optional. 
+
+	* lib/dk-horizon.dai: Updated.
+
 2003-08-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.03 released.

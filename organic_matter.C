@@ -1521,7 +1521,9 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	      use_humus_equation = true;
 	    }
 	  else if (variable_pool >= 0
-                   && SOM_fractions.size () > 0)
+                   && SOM_fractions.size () > 0
+                   && (SOM_fractions.size () <= pool
+                       || SOM_fractions[pool] >= 0))
 	    {
 	      // The SOM fractions equations:
 	      // 

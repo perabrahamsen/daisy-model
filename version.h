@@ -1,3 +1,3 @@
 // version.h -- automatically generated file
  
-static const char *const version = "3.03";
+static const char *const version = "3.04";
