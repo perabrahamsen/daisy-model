@@ -1,12 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Select::method { current, sum, max, min, average }
+* Ny dk-horizon.dai
 
-Use by summary.
+* Weather
 
-* FertOrgaNic
-
-** Post excersizes and answers
+** Min & max T i klimafil, udregn average.
 
 * Opdater tutorial
 
@@ -22,15 +20,17 @@ Use by summary.
 
 Til referencemanual?
 
+* Select::method { current, sum, max, min, average }
+
+Use by summary.
+
+* FertOrgaNic
+
+** Post excersizes and answers
+
 * SH: PowerPoint validation slides på hjemmeside.
 
 * SH: Ny ref-evap model
-
-* Weather
-
-**  make "end" two days before specified.
-
-** Min & max T i klimafil, udregn average.
 
 * Check let at bruge GUI version of CVS til Windows.
 
