@@ -159,15 +159,15 @@ struct ConvertLinear : public Units::Convert
 void 
 Units::add (const string& from, const string& to, double factor, double offset)
 { 
-  assert (content);
+  daisy_assert (content);
   content->table[from][to] = new ConvertLinear (factor, offset);
 }
 
 void 
 Units::add (const string& from, const string& to, Convert& convert)
 {
-  assert (content);
-  assert (content->table[from].find (to) == content->table[from].end ());
+  daisy_assert (content);
+  daisy_assert (content->table[from].find (to) == content->table[from].end ());
   content->table[from][to] = &convert;
   
 }
@@ -175,28 +175,28 @@ Units::add (const string& from, const string& to, Convert& convert)
 double 
 Units::convert (const string& from, const string& to, double value)
 { 
-  assert (content);
+  daisy_assert (content);
   return content->convert (from, to, value);
 }
 
 bool
 Units::can_convert (const string& from, const string& to)
 { 
-  assert (content);
+  daisy_assert (content);
   return content->can_convert (from, to);
 }
 
 bool
 Units::can_convert (const string& from, const string& to, double value)
 { 
-  assert (content);
+  daisy_assert (content);
   return content->can_convert (from, to, value);
 }
 
 const Units::Convert&
 Units::get_convertion (const string& from, const string& to)
 {
-  assert (content);
+  daisy_assert (content);
   return content->get_convertion (from, to);
 }
 
@@ -269,12 +269,12 @@ Units::Units ()
 { 
   if (content)
     {
-      assert (count > 0);
+      daisy_assert (count > 0);
       count++;
     }
   else
     {
-      assert (count == 0);
+      daisy_assert (count == 0);
       count = 1;
       content = new Content;
       standard_conversions ();
@@ -283,8 +283,8 @@ Units::Units ()
 
 Units::~Units ()
 {
-  assert (content);
-  assert (count > 0);
+  daisy_assert (content);
+  daisy_assert (count > 0);
   count--;
   if (count < 1)
     {

@@ -78,10 +78,10 @@ CrpN::content (const double DS, Production& production)
     }
   production.NRoot = production.NCrop 
     - production.NLeaf - production.NStem - production.NSOrg;
-  assert (production.NLeaf >= 0.0);
-  assert (production.NStem >= 0.0);
-  assert (production.NSOrg >= 0.0);
-  assert (production.NRoot >= 0.0);
+  daisy_assert (production.NLeaf >= 0.0);
+  daisy_assert (production.NStem >= 0.0);
+  daisy_assert (production.NSOrg >= 0.0);
+  daisy_assert (production.NRoot >= 0.0);
 }
 
 void

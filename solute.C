@@ -43,24 +43,24 @@ Solute::clear ()
 void
 Solute::add_to_source (const vector<double>& v)
 {
-  assert (S.size () >= v.size ());
+  daisy_assert (S.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] += v[i];
-      assert (finite (S[i]));
-      assert (M_left (i) >= 0.0);
+      daisy_assert (finite (S[i]));
+      daisy_assert (M_left (i) >= 0.0);
     }
 }
 
 void
 Solute::add_to_sink (const vector<double>& v)
 {
-  assert (S.size () >= v.size ());
+  daisy_assert (S.size () >= v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] -= v[i];
-      assert (finite (S[i]));
-      assert (M_left (i) >= 0.0);
+      daisy_assert (finite (S[i]));
+      daisy_assert (M_left (i) >= 0.0);
     }
 }
 
@@ -70,7 +70,7 @@ Solute::tick (const Soil& soil,
 	      double J_in, Treelog& msg)
 {
   for (unsigned i = 0; i < soil.size (); i++)
-    assert (M_left (i) >= 0.0);
+    daisy_assert (M_left (i) >= 0.0);
 
   // Initialize.
   fill (S_p.begin (), S_p.end (), 0.0);
@@ -80,7 +80,7 @@ Solute::tick (const Soil& soil,
   for (unsigned int i = 0; i < soil.size (); i++)
     {
       S[i] += S_permanent[i];
-      assert (M_left (i) >= 0.0);
+      daisy_assert (M_left (i) >= 0.0);
       S_external[i] += S_permanent[i];
     }
 
@@ -115,7 +115,7 @@ Solute::tick (const Soil& soil,
     {
       S_drain[i] = -soil_water.S_drain (i) * dt * C (i);
       S[i] += S_drain[i];
-      assert (M_left (i) >= 0.0);
+      daisy_assert (M_left (i) >= 0.0);
     }
 
   // Flow.
@@ -125,7 +125,7 @@ Solute::tick (const Soil& soil,
   try
     {
       for (unsigned i = 0; i < soil.size (); i++)
-	assert (M_left (i) >= 0.0);
+	daisy_assert (M_left (i) >= 0.0);
       transport.tick (msg, soil, soil_water, *this, M_, C_, S, J);
     }
   catch (const char* error)
@@ -135,7 +135,7 @@ Solute::tick (const Soil& soil,
       try
 	{
 	  for (unsigned i = 0; i < soil.size (); i++)
-	    assert (M_left (i) >= 0.0);
+	    daisy_assert (M_left (i) >= 0.0);
 	  reserve.tick (msg, soil, soil_water, *this, M_, C_, S, J);
 	}
       catch (const char* error)
@@ -143,7 +143,7 @@ Solute::tick (const Soil& soil,
 	   msg.warning (string ("Reserve transport problem: ") + error
 			+ ", trying last resort.");
 	  for (unsigned i = 0; i < soil.size (); i++)
-	    assert (M_left (i) >= 0.0);
+	    daisy_assert (M_left (i) >= 0.0);
 	  last_resort.tick (msg, soil, soil_water, *this, M_, C_, S, J);
 	}
     }
@@ -193,8 +193,8 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
-  assert (al.check ("transport"));
-  assert (al.check ("adsorption"));
+  daisy_assert (al.check ("transport"));
+  daisy_assert (al.check ("adsorption"));
 
   if (al.alist ("adsorption").name ("type") == "full"
       && al.alist ("transport").name ("type") != "none")
@@ -322,9 +322,9 @@ Solute::put_M (const Soil& soil, const SoilWater& soil_water,
 	       const vector<double>& v)
 {
   const unsigned int size = soil.size ();
-  assert (M_.size () == size);
-  assert (C_.size () == size);
-  assert (v.size () == size);
+  daisy_assert (M_.size () == size);
+  daisy_assert (C_.size () == size);
+  daisy_assert (v.size () == size);
 
   M_ = v;
 
@@ -386,7 +386,7 @@ Solute::initialize (const AttributeList& al,
     {
       if (soil_ppm.size () != 0)
 	{
-	  assert (soil_ppm.size () == soil.size ());
+	  daisy_assert (soil_ppm.size () == soil.size ());
 
 	  for (unsigned int i = M_.size (); i < soil_ppm.size (); i++)
 	    // ppm -> g / cm^3.
@@ -394,7 +394,7 @@ Solute::initialize (const AttributeList& al,
 	}
       if (solute_ppm.size () != 0)
 	{
-	  assert (solute_ppm.size () == solute_ppm.size ());
+	  daisy_assert (solute_ppm.size () == solute_ppm.size ());
 
 	  for (unsigned int i = M_.size (); i < solute_ppm.size (); i++)
 	    // ppm -> g / cm^3.
@@ -410,8 +410,8 @@ Solute::initialize (const AttributeList& al,
   for (unsigned int i = M_.size (); i < C_.size (); i++)
     M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
 
-  assert (C_.size () == M_.size ());
-  assert (C_.size () == soil.size ());
+  daisy_assert (C_.size () == M_.size ());
+  daisy_assert (C_.size () == soil.size ());
 
   for (unsigned int i = 0; i < soil.size (); i++)
     {

@@ -21,7 +21,7 @@
 
 
 #include "time.h"
-#include <assert.h>
+#include "assertion.h"
 #include <stdexcept>
 
 // @ Content.
@@ -160,14 +160,14 @@ Time::tick_day (int days)
 string
 Time::month_name (int month)
 {
-  assert (month >= 1 && month <= 12);
+  daisy_assert (month >= 1 && month <= 12);
   return Implementation::mname[month];
 }
 
 string
 Time::wday_name (int wday)
 {
-  assert (wday >= 1 && wday <= 7);
+  daisy_assert (wday >= 1 && wday <= 7);
   return Implementation::wname[wday];
 }
 
@@ -312,9 +312,9 @@ Time::operator= (const Time& t)
 Time::Time (int y, int m, int md, int h)
   : impl (*new Implementation (y, mday2yday (y, m, md), h))
 { 
-  assert (m > 0 && m < 13);
-  assert (md > 0 && m == month ());
-  assert (h >= 0 && h < 24);
+  daisy_assert (m > 0 && m < 13);
+  daisy_assert (md > 0 && m == month ());
+  daisy_assert (h >= 0 && h < 24);
 }
     
 Time::Time (const Time&t)

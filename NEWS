@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.30
+
+** Assertion failures are now logged in daisy.log.
+
 * 2.29
 
 ** Made 'height_start' and 'height_end' optional in default macropore model.

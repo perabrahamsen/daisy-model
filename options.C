@@ -40,7 +40,7 @@ const char *const Options::log_name = "DAISY_LOG";
 string
 Options::get_arg (int& argc, char**& argv)
 {
-  assert (argc > 1);
+  daisy_assert (argc > 1);
   const string arg = argv[1];
 
   // Update argc and argv.
@@ -77,7 +77,7 @@ Options::initialize_path ()
       last = next + 1;
     }
   path.push_back (colon_path.substr (last));
-  assert (path.size () > 0);
+  daisy_assert (path.size () > 0);
   Path::set_path (path);
 }
 

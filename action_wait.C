@@ -71,7 +71,7 @@ struct ActionWaitDays : public Action
 
   bool done (const Daisy& daisy) const
   {
-    assert (activated);
+    daisy_assert (activated);
     return daisy.time >= end_time; 
   }
 

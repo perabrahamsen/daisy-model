@@ -65,8 +65,8 @@ void
 TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
 			    SoilChemicals& soil_chemicals, Treelog& out)
 { 
-  assert (k_AB.size () == soil.size ());
-  assert (k_BA.size () == soil.size ());
+  daisy_assert (k_AB.size () == soil.size ());
+  daisy_assert (k_BA.size () == soil.size ());
 
   SoilChemical& A = soil_chemicals.find (soil, soil_water, name_A, out);
   SoilChemical& B = soil_chemicals.find (soil, soil_water, name_B, out);
@@ -78,7 +78,7 @@ TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
       double want_A;
       double want_B;
       equilibrium.find (soil, soil_water, i, has_A, has_B, want_A, want_B);
-      assert (approximate (has_A + has_B, want_A + want_B));
+      daisy_assert (approximate (has_A + has_B, want_A + want_B));
 
       const double convert = (has_A > want_A)
 	? k_AB[i] * (has_A - want_A)
@@ -124,7 +124,7 @@ TransformEquilibrium::initialize (const Soil& soil)
     k_AB.insert (k_AB.end (), soil.size () - k_AB.size (), k_AB.back ());
   else
     {
-      assert (pedo_AB);
+      daisy_assert (pedo_AB);
       pedo_AB->initialize (soil);
       pedo_AB->set (soil, k_AB);
     }

@@ -515,7 +515,7 @@ EditPLF::apply ()
       for (QListViewItem* i = table->firstChild (); i; i = i->nextSibling ())
 	{
 	  PLFItem* ii = dynamic_cast<PLFItem*> (i);
-	  assert (ii);
+	  daisy_assert (ii);
 	  value.add (ii->x, ii->y);
 	}
       alist.add (parameter, value); 
@@ -601,10 +601,10 @@ EditPLF::add ()
   for (QListViewItem* i = table->firstChild (); i; i = i->nextSibling ())
     {
       PLFItem* ii = dynamic_cast<PLFItem*> (i);
-      assert (ii);
+      daisy_assert (ii);
       if (found)
 	{
-	  assert (ii->x > xx);
+	  daisy_assert (ii->x > xx);
 	  value.add (ii->x, ii->y);
 	}
       else if (ii->x > xx)
@@ -620,7 +620,7 @@ EditPLF::add ()
 	}
       else
 	{
-	  assert (ii->x < xx);
+	  daisy_assert (ii->x < xx);
 	  value.add (ii->x, ii->y);
 	}
     }
@@ -655,11 +655,11 @@ EditObject::refresh ()
       for (unsigned int i = 0; i < choice->count (); i++)
 	if (type == choice->text (i))
 	  {
-	    assert (!found);
+	    daisy_assert (!found);
 	    choice->setCurrentItem (i);
 	    found = true;
 	  }
-      assert (found);
+      daisy_assert (found);
     }
   else
     activate (0);
@@ -727,7 +727,7 @@ EditObject::EditObject (QWidget* parent,
   const Library& library = syntax.library (parameter);
   vector<string> models;
   library.entries (models);
-  assert (models.size () > 0);
+  daisy_assert (models.size () > 0);
   for (unsigned int i = 0; i < models.size (); i++)
     if (dependencies[component].find (models[i]) 
 	== dependencies[component].end ())
@@ -817,16 +817,16 @@ EditList::insert (double order)
   for (QListViewItem* i = table->firstChild (); i; i = i->nextSibling ())
     {
       ListItem* ii = dynamic_cast<ListItem*> (i);
-      assert (ii);
+      daisy_assert (ii);
 
       if (ii->order < order)
 	{
-	  assert (!found);
+	  daisy_assert (!found);
 	  items.push_back (i->text (0));
 	}
       else if (ii->order == order)
 	{
-	  assert (!found);
+	  daisy_assert (!found);
 	  items.push_back (edit->text ());
 	  found = true;
 	}
@@ -888,7 +888,7 @@ EditList::remove ()
 void 
 EditList::select (QListViewItem* item)
 {
-  assert (item);
+  daisy_assert (item);
   edit->setText (item->text (0));
 }
 
@@ -1139,7 +1139,7 @@ ItemDialog::ItemDialog (QWidget* parent,
 			const string& parameterization)
   : QDialog (parent, 0, true)
 { 
-  assert (&alist != &default_alist);
+  daisy_assert (&alist != &default_alist);
   const Syntax::type type = syntax.lookup (parameter);
   const int size = syntax.size (parameter);
 

@@ -269,7 +269,7 @@ DocumentLaTeX::print_entry_type (ostream& out,
     case Syntax::Library:
     case Syntax::Error:
     default:
-      assert (false);
+      daisy_assert (false);
     };
 }
 
@@ -354,7 +354,7 @@ DocumentLaTeX::print_entry_category (ostream& out,
       else if (syntax.is_log (name))
 	out << "\\\\\nOptional log variable";
       else 
-	assert (false);
+	daisy_assert (false);
     }
   else
     {
@@ -365,7 +365,7 @@ DocumentLaTeX::print_entry_category (ostream& out,
       else if (syntax.is_log (name))
 	out << "\\\\\nLog variable";
       else 
-	assert (false);
+	daisy_assert (false);
     }
 }
 
@@ -444,7 +444,7 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	    break;
 	  case Syntax::Library:
 	  case Syntax::Error:
-	    assert (false);
+	    daisy_assert (false);
 	  }
       else
 	switch (type)
@@ -465,7 +465,7 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	    break;
 	  case Syntax::Library:
 	  case Syntax::Error:
-	    assert (false);
+	    daisy_assert (false);
 	  }
     }
 }
@@ -611,7 +611,7 @@ DocumentLaTeX::print_sample_entry (ostream& out,
 void
 DocumentLaTeX::print_sample_header (ostream& out, const string& name)
 { 
-  assert (ordered == false);
+  daisy_assert (ordered == false);
   out << "\n\\noindent\n\\begin{tt}\n\\begin{tabbing}\n$<$~";
   if (!submodel)
     {

@@ -113,7 +113,7 @@ TraverseQtTree::leave ()
 TreeItem*
 TraverseQtTree::item () const
 { 
-  assert (path.size () > 0);
+  daisy_assert (path.size () > 0);
   return path.back ();
 }
 
@@ -226,7 +226,7 @@ TraverseQtTree::enter_model (const Syntax& syntax, AttributeList& alist,
     }
   else
     {
-      assert (!editable);
+      daisy_assert (!editable);
       static const AttributeList empty_alist;
       enter (new ModelItem (syntax, alist, empty_alist,
 			    item (), model.c_str (), value, from,
@@ -348,7 +348,7 @@ TraverseQtTree::enter_object_sequence (const Library&, const Syntax& syntax,
 { 
   QString name;
   name.sprintf ("[%d]", index);
-  assert (alist.check ("type"));
+  daisy_assert (alist.check ("type"));
   QString value = QString ("'") + alist.name ("type").c_str () + "'";
   if (check_alists)
     {
@@ -415,7 +415,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	order = 8888;
     }
   else
-    assert (false);
+    daisy_assert (false);
 
   if (syntax.is_optional (parameter))
     category_name += " (opt)";
@@ -532,7 +532,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
       return false;
     case Syntax::Error:
     default:
-      assert (false);
+      daisy_assert (false);
     }
 
   // Size specific changes.
@@ -579,10 +579,10 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
     }
   else if (size == Syntax::Singleton && type == Syntax::Object && has_value)
     {
-      assert (type == Syntax::Object);
+      daisy_assert (type == Syntax::Object);
       const Library& library = syntax.library (parameter);
       AttributeList& child_alist = alist.alist (parameter);
-      assert (child_alist.check ("type"));
+      daisy_assert (child_alist.check ("type"));
       const string& type = child_alist.name ("type");
       const Syntax& child_syntax = library.syntax (type);
       const AttributeList& child_default = library.lookup (type);
@@ -651,9 +651,9 @@ populate_tree (MainWindow* main, bool check_alists,
       QString name;
       name.sprintf ("[%d]", i);
       AttributeList& alist = *inputs[i];
-      assert (alist.check ("type"));
+      daisy_assert (alist.check ("type"));
       string type = alist.name ("type");
-      assert (library.check (type));
+      daisy_assert (library.check (type));
       const Syntax& syntax = library.syntax (type);
       const AttributeList& default_alist = library.lookup (type);
       string where;
@@ -684,8 +684,8 @@ populate_alist (AListItem* item)
 void
 populate_parameter (AListItem* parent, TreeItem* child)
 {
-  assert (parent);
-  assert (child);
+  daisy_assert (parent);
+  daisy_assert (child);
   string name = parent->entry.latin1 ();
   string parameter = child->entry.latin1 ();
   bool view_defaults = false;
@@ -694,7 +694,7 @@ populate_parameter (AListItem* parent, TreeItem* child)
   else if (SubmodelItem* submodel = dynamic_cast<SubmodelItem*> (child))
     view_defaults = submodel->view_defaults;
   else
-    assert (dynamic_cast<AtomItem*> (child));
+    daisy_assert (dynamic_cast<AtomItem*> (child));
 
   TraverseQtTree build (parent, view_defaults);
   build.traverse_parameter (parent->syntax, parent->alist, 

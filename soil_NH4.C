@@ -34,8 +34,8 @@ SoilNH4::diffusion_coefficient () const
 void 
 SoilNH4::default_initialize (const Soil& soil, const SoilWater& soil_water)
 {
-  assert (C_.size () == 0);
-  assert (M_.size () == 0);
+  daisy_assert (C_.size () == 0);
+  daisy_assert (M_.size () == 0);
   // We initialize to approximatey 5% of the N corresponding to the
   // allowed content of NO3 in drinking water.
   // [ 0.05 * 100 mg/l = 0.5e-6 g/cm^3 ]

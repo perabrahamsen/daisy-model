@@ -25,6 +25,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "submodel.h"
+#include "assertion.h"
 
 void 
 Traverse::traverse_all_libraries ()
@@ -282,7 +283,7 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 		if (size == Syntax::Singleton)
 		  {
 		    AttributeList& entry_alist = alist.alist (parameter);
-		    assert (entry_alist.check ("type"));
+		    daisy_assert (entry_alist.check ("type"));
 		    const string& type = entry_alist.name ("type");
 		    const Library& library = syntax.library (parameter);
 		    const AttributeList& entry_default_alist 
@@ -300,7 +301,7 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 		    for (unsigned int i = 0; i < sequence.size (); i++)
 		      {
 			AttributeList& entry_alist = *sequence[i];
-			assert (entry_alist.check ("type"));
+			daisy_assert (entry_alist.check ("type"));
 			const string& type = entry_alist.name ("type");
 			const Library& library = syntax.library (parameter);
 			const AttributeList& entry_default_alist 

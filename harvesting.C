@@ -79,7 +79,7 @@ Harvesting::operator() (const string& column_name,
   const double NRoot = production.NRoot;
   const double NDead = production.NDead;
   const double total_old_N = NStem + NLeaf + NSOrg + NDead  + NRoot;
-  assert (approximate (total_old_N, production.NCrop + NDead));
+  daisy_assert (approximate (total_old_N, production.NCrop + NDead));
 
   // Find C concentrations.
   const double C_C_Stem = DM_to_C_factor (production.E_Stem);
@@ -210,7 +210,7 @@ Harvesting::operator() (const string& column_name,
       const double C = C_C_Stem * Stem_W_Loss;
       const double N = Stem_N_Loss;
       AM_stem.add (C * m2_per_cm2, N * m2_per_cm2);
-      assert (C == 0.0 || N > 0.0);
+      daisy_assert (C == 0.0 || N > 0.0);
       production.C_AM += C;
       production.N_AM += N;
     }
@@ -224,7 +224,7 @@ Harvesting::operator() (const string& column_name,
       const double C = C_C_Dead * Dead_W_Loss;
       const double N = Dead_N_Loss;
       production.AM_leaf->add (C * m2_per_cm2, N * m2_per_cm2);
-      assert (C == 0.0 || N > 0.0);
+      daisy_assert (C == 0.0 || N > 0.0);
       production.C_AM += C;
       production.N_AM += N;
     }
@@ -235,7 +235,7 @@ Harvesting::operator() (const string& column_name,
     {
       const double C = C_C_Leaf * Leaf_W_Loss;
       const double N = Leaf_N_Loss;
-      assert (C == 0.0 || N > 0.0);
+      daisy_assert (C == 0.0 || N > 0.0);
       AM_leaf.add ( C * m2_per_cm2, N * m2_per_cm2);
       production.C_AM += C;
       production.N_AM += N;
@@ -247,7 +247,7 @@ Harvesting::operator() (const string& column_name,
     {
       const double C = C_C_SOrg * SOrg_W_Loss;
       const double N = SOrg_N_Loss;
-      assert (C == 0.0 || N > 0.0);
+      daisy_assert (C == 0.0 || N > 0.0);
       AM_sorg.add ( C * m2_per_cm2, N * m2_per_cm2);
       production.C_AM += C;
       production.N_AM += N;
@@ -256,15 +256,15 @@ Harvesting::operator() (const string& column_name,
   // Check mass balance so far.
   double total_new_W = production.WSOrg + production.WStem
     + production.WLeaf + production.WDead + production.WRoot;
-  assert (approximate (total_old_W, total_new_W + Crop_W_Yield + Crop_W_Loss));
+  daisy_assert (approximate (total_old_W, total_new_W + Crop_W_Yield + Crop_W_Loss));
   double total_new_C = production.WSOrg * C_C_SOrg 
     + production.WStem * C_C_Stem
     + production.WLeaf * C_C_Leaf
     + production.WDead * C_C_Dead
     + production.WRoot * C_C_Root;
-  assert (approximate (total_old_C, total_new_C + Crop_C_Yield + Crop_C_Loss));
+  daisy_assert (approximate (total_old_C, total_new_C + Crop_C_Yield + Crop_C_Loss));
   double total_new_N = production.NCrop + production.NDead;
-  assert (approximate (total_old_N, total_new_N + Crop_N_Yield + Crop_N_Loss));
+  daisy_assert (approximate (total_old_N, total_new_N + Crop_N_Yield + Crop_N_Loss));
 
   // Dead or alive?
   if (!kill_off && DS < DSmax && leaf_harvest < 1.0)
@@ -336,7 +336,7 @@ Harvesting::operator() (const string& column_name,
       SOrg_W_Loss += production.WSOrg;
       SOrg_C_Loss += production.WSOrg * C_C_SOrg;
       SOrg_N_Loss += production.NSOrg;
-      assert (WRoot == 0.0 || NRoot > 0.0);
+      daisy_assert (WRoot == 0.0 || NRoot > 0.0);
       if (accumulate (density.begin (), density.end (), 0.0) > 0.0)
 	{
 	  production.AM_root->add (geometry,
@@ -373,12 +373,12 @@ Harvesting::operator() (const string& column_name,
       total_new_N = 0.0;
 
       // Check mass balance.
-      assert (approximate (total_old_W, 
+      daisy_assert (approximate (total_old_W, 
 			   total_new_W + Crop_W_Yield + Crop_W_Loss));
-      assert (approximate (total_old_C, 
+      daisy_assert (approximate (total_old_C, 
 			   total_new_C + Crop_C_Yield + Crop_C_Loss));
 
-      assert (approximate (total_old_N,
+      daisy_assert (approximate (total_old_N,
 			   total_new_N + Crop_N_Yield + Crop_N_Loss));
 
 
@@ -389,7 +389,7 @@ Harvesting::operator() (const string& column_name,
 	residuals.push_back (production.AM_root);	// No organic matter.
       production.AM_root = NULL;
 
-      assert (production.AM_leaf);
+      daisy_assert (production.AM_leaf);
       if (production.AM_leaf->locked ())
 	production.AM_leaf->unlock (); // Stored in organic matter.
       else
@@ -417,10 +417,10 @@ Harvesting::tick (const Time& time)
     cut_stress = 0.0;
   else
     {
-      assert (last_cut);
+      daisy_assert (last_cut);
       const double days_between 
 	= (0.0 + Time::hours_between (*last_cut, time)) / 24.0;
-      assert (days_between >= 0.0);
+      daisy_assert (days_between >= 0.0);
       
       if (days_between >= production_delay)
 	{
@@ -431,7 +431,7 @@ Harvesting::tick (const Time& time)
 	{
 	  cut_stress = 1.0 - (exp (M_LN2 / production_delay * days_between)
 			      - 1.0);
-	  assert (cut_stress >= 0.0 && cut_stress <= 1.0);
+	  daisy_assert (cut_stress >= 0.0 && cut_stress <= 1.0);
 	}
     }
 }

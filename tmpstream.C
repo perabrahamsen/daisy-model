@@ -23,8 +23,7 @@
 // I'd use "ostringstream", but it isn't in GCC 2.95.2.
 
 #include "tmpstream.h"
-
-#include <assert.h>
+#include "assertion.h"
 
 #if defined (__GNUC__) || defined (VISUALCPP)
 #include <strstream>
@@ -53,7 +52,7 @@ struct TmpStream::Implementation
 ostream& 
 TmpStream::operator () ()
 {
-  assert (!impl.done);
+  daisy_assert (!impl.done);
   return impl.out;
 }
 
@@ -66,7 +65,7 @@ TmpStream::str ()
       impl.out << '\0';
       impl.str = impl.out.str ();
     }
-  assert (impl.str);
+  daisy_assert (impl.str);
   return impl.str;
 }
   

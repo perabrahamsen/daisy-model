@@ -41,7 +41,7 @@ struct ActionWhile : public Action
 
   bool done (const Daisy& daisy) const
   {
-    assert (actions.size () != 0U);
+    daisy_assert (actions.size () != 0U);
     return (actions[0]->done (daisy)); 
   }
 

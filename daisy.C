@@ -63,7 +63,7 @@ Daisy::Daisy (const AttributeList& al)
 bool
 Daisy::check (Treelog& err)
 {
-  assert (syntax);
+  daisy_assert (syntax);
   bool ok = true;
 
   // Check weather.

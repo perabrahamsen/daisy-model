@@ -89,7 +89,7 @@ HydraulicB_BaC_Bimodal::Cw2 (const double h) const
 double
 HydraulicB_BaC_Bimodal::h (const double Theta) const
 {
-  assert (Theta > Theta_res);
+  daisy_assert (Theta > Theta_res);
   if (Theta < Theta_b)
     return h_b / pow((Theta - Theta_res) / (Theta_b - Theta_res), 1.0 / lambda);
   else if (Theta < Theta_sat)

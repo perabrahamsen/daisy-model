@@ -122,10 +122,10 @@ WeatherHourly::tick (const Time& time, Treelog& out)
 
       date = Time (year, month, day, hour);
 
-      assert (global_radiation >= 0 && global_radiation < 1400);
-      assert (air_temperature >= -70 && air_temperature < 60);
-      assert (precipitation >= 0 && precipitation < 300);
-      assert (cloudiness_ >= 0 && cloudiness_ <= 1);
+      daisy_assert (global_radiation >= 0 && global_radiation < 1400);
+      daisy_assert (air_temperature >= -70 && air_temperature < 60);
+      daisy_assert (precipitation >= 0 && precipitation < 300);
+      daisy_assert (cloudiness_ >= 0 && cloudiness_ <= 1);
       if (!approximate (cloudiness_, hourly_cloudiness ()))
 	{
 	  TmpStream tmp;
@@ -133,8 +133,8 @@ WeatherHourly::tick (const Time& time, Treelog& out)
 		 << ") != calculated (" << hourly_cloudiness () << ")";
 	  out.error (tmp.str ());
 	}
-      assert (vapor_pressure_ >= 0 && vapor_pressure_ <= 5000);
-      assert (wind_ >= 0 && wind_ <= 40);
+      daisy_assert (vapor_pressure_ >= 0 && vapor_pressure_ <= 5000);
+      daisy_assert (wind_ >= 0 && wind_ <= 40);
 
       accumulated_global_radiation += global_radiation;
       accumulated_air_temperature += air_temperature;

@@ -28,7 +28,7 @@ class AdsorptionFull : public Adsorption
 public:
   double C_to_M (const Soil&, double, int, const double C) const
   { 
-    assert (fabs (C) < 1.0e-100); 
+    daisy_assert (fabs (C) < 1.0e-100); 
     return 0.0;
   }
   double M_to_C (const Soil&, double, int, double) const

@@ -68,7 +68,7 @@ Development::tick_daily (const string& name,
        }
     }
 
-  assert (DS <= defined_until_ds);
+  daisy_assert (DS <= defined_until_ds);
 }
 
 void

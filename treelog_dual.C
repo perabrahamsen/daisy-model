@@ -21,12 +21,12 @@
 
 
 #include "treelog_dual.h"
+#include "assertion.h"
 // BCC5.01 lack ostream.
 #include <iostream>
 #include <fstream>
 #include <deque>
 // GCC 2.95.2 need a ".h".
-#include <assert.h>
 #ifdef __unix
 #include <unistd.h>
 #else
@@ -62,8 +62,8 @@ struct TreelogDual::Implementation
 	  two << "Wrote '" << file << "' in '" << directory << "'\n";
 	delete one;
       }
-    assert (path.size () == 0);
-    assert (touched.size () == 0);
+    daisy_assert (path.size () == 0);
+    daisy_assert (touched.size () == 0);
   }
 };
 
@@ -75,7 +75,7 @@ TreelogDual::Implementation::entry (const string& text)
       char buffer[256];
       directory = getcwd (buffer, 255);
       one = new ofstream (file.c_str ());
-      assert (one);
+      daisy_assert (one);
       if (!one->good ())
 	two << "Problems opening `" << file << "' in '" << directory << "\n";
     }

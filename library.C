@@ -25,6 +25,7 @@
 #include "syntax.h"
 #include "treelog.h"
 #include "tmpstream.h"
+#include "assertion.h"
 #include <map>
 #include <set>
 
@@ -78,7 +79,7 @@ Library::Implementation::lookup (const string& key) const
   alist_map::const_iterator i = alists.find (key);
 
   if (i == alists.end ())
-    assert (false);
+    daisy_assert (false);
 
   return *(*i).second;
 }
@@ -108,7 +109,7 @@ Library::Implementation::syntax (const string& key) const
   syntax_map::const_iterator i = syntaxen.find (key);
 
   if (i == syntaxen.end ())
-    assert (false);
+    daisy_assert (false);
 
   return *(*i).second;
 }
@@ -142,7 +143,7 @@ Library::Implementation::clear_parsed ()
 	{
 	  string key = (*i).first;
 	  syntax_map::iterator j = syntaxen.find (key);
-	  assert (j != syntaxen.end ());
+	  daisy_assert (j != syntaxen.end ());
 	  syntaxen.erase (j);
 	  alists.erase (i);
 	  delete &alist;
@@ -154,7 +155,7 @@ Library::Implementation::clear_parsed ()
 void
 Library::Implementation::refile_parsed (const string& from, const string& to)
 {
-  assert (from != to);
+  daisy_assert (from != to);
   for (alist_map::iterator i = alists.begin (); i != alists.end (); i++)
     {
       AttributeList& alist = *((*i).second);
@@ -188,7 +189,7 @@ Library::Implementation::Implementation (const char* n, derive_fun d,
 {
   if (all == NULL)
     {
-      assert (all_count == 0);
+      daisy_assert (all_count == 0);
       all = new library_map ();
     }
   all_count++;
@@ -205,7 +206,7 @@ Library::Implementation::~Implementation ()
        i != syntaxen.end ();
        i++)
     {
-      assert ((*i).second);
+      daisy_assert ((*i).second);
       unique.insert ((*i).second);
       (*i).second = NULL;
     }
@@ -216,11 +217,11 @@ Library::Implementation::~Implementation ()
 
   // Delete list of libraries if empty.
   all_count--;
-  assert (all->size () == all_count);
+  daisy_assert (all->size () == all_count);
   if (all_count == 0)
     delete all;
   else
-    assert (all_count > 0);
+    daisy_assert (all_count > 0);
 }
 
 bool
@@ -242,7 +243,7 @@ Library::get_sequence ()
 { 
   Implementation::sequence++;
   // Nobody will ever need more than two billion objects --- Per 1998.
-  assert (Implementation::sequence > 0);
+  daisy_assert (Implementation::sequence > 0);
   return Implementation::sequence;
 }
 
@@ -298,8 +299,8 @@ Library::is_derived_from (const string& a, const string& b) const
   if (type == b)
     return true;
 
-  assert (check (type));
-  assert (type != a);
+  daisy_assert (check (type));
+  daisy_assert (type != a);
 
   return is_derived_from (type, b);
 }
@@ -359,7 +360,7 @@ Library::Library (const char* name, derive_fun derive,
   : impl (*new Implementation (name, derive, description))
 { 
   (*Implementation::all)[name] = this; 
-  assert (Implementation::all->size () == Implementation::all_count);
+  daisy_assert (Implementation::all->size () == Implementation::all_count);
 }
 
 Library::~Library ()

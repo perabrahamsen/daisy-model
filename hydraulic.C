@@ -29,7 +29,7 @@
 void 
 Hydraulic::set_porosity (double Theta)
 { 
-  assert (Theta > Theta_res);
+  daisy_assert (Theta > Theta_res);
   Theta_sat = Theta; 
 }
 

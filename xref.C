@@ -25,7 +25,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "submodel.h"
-
+#include "assertion.h"
 #include <deque>
 
 class TraverseXRef : public Traverse
@@ -96,7 +96,7 @@ private:
 void 
 TraverseXRef::use_submodel (const string& submodel)
 {
-  assert (Submodel::registered (submodel));
+  daisy_assert (Submodel::registered (submodel));
   XRef::Users& moi = xref.submodels[submodel];
   
   switch (type)
@@ -112,7 +112,7 @@ TraverseXRef::use_submodel (const string& submodel)
       break;
     case is_invalid:
     default:
-      assert (false);
+      daisy_assert (false);
     }
   
 }
@@ -136,7 +136,7 @@ TraverseXRef::use_component (const Library& library)
       break;
     case is_invalid:
     default:
-      assert (false);
+      daisy_assert (false);
     }
   
 }
@@ -144,7 +144,7 @@ TraverseXRef::use_component (const Library& library)
 void 
 TraverseXRef::use_model (const Library& library, const string& model)
 {
-  assert (library.check (model));
+  daisy_assert (library.check (model));
   use_component (library);
   const string component = library.name ();
   XRef::Users& moi = xref.models[XRef::ModelUsed (component, model)];
@@ -161,7 +161,7 @@ TraverseXRef::use_model (const Library& library, const string& model)
       break;
     case is_invalid:
     default:
-      assert (false);
+      daisy_assert (false);
     }
   
 }
@@ -169,7 +169,7 @@ TraverseXRef::use_model (const Library& library, const string& model)
 bool
 TraverseXRef::enter_library (Library&, const string& component)
 {
-  assert (type == is_invalid);
+  daisy_assert (type == is_invalid);
   current_component = component;
   return true;
 }
@@ -177,16 +177,16 @@ TraverseXRef::enter_library (Library&, const string& component)
 void
 TraverseXRef::leave_library ()
 { 
-  assert (type == is_invalid);
-  assert (path.empty ());
+  daisy_assert (type == is_invalid);
+  daisy_assert (path.empty ());
 }
 
 bool
 TraverseXRef::enter_model (const Syntax&, AttributeList& alist,
 			   const string& component, const string& name)
 {
-  assert (component == current_component);
-  assert (type == is_invalid);
+  daisy_assert (component == current_component);
+  daisy_assert (type == is_invalid);
   current_model = name;
   if (alist.check ("type"))
     type = is_parameterization;
@@ -198,9 +198,9 @@ TraverseXRef::enter_model (const Syntax&, AttributeList& alist,
 void
 TraverseXRef::leave_model (const string& component, const string& name)
 { 
-  assert (path.empty ());
-  assert (component == current_component);
-  assert (name == current_model);
+  daisy_assert (path.empty ());
+  daisy_assert (component == current_component);
+  daisy_assert (name == current_model);
   type = is_invalid;
 }
 
@@ -221,9 +221,9 @@ TraverseXRef::enter_submodel_default (const Syntax&, const AttributeList& al,
   if (type == is_invalid)
     {
       // We are traversing a top level submodels.
-      assert (al.check ("submodel"));
-      assert (al.name ("submodel") == name);
-      assert (path.empty ());
+      daisy_assert (al.check ("submodel"));
+      daisy_assert (al.name ("submodel") == name);
+      daisy_assert (path.empty ());
       type = is_submodel;
       current_submodel = name;
       return true;
@@ -243,7 +243,7 @@ TraverseXRef::leave_submodel_default ()
   if (path.empty ())
     {
       // Top level submodel.
-      assert (type == is_submodel);
+      daisy_assert (type == is_submodel);
       type = is_invalid;
     }
 }
@@ -275,14 +275,14 @@ TraverseXRef::enter_object (const Library& library,
 			    const AttributeList&,
 			    const string&)
 {
-  assert (alist.check ("type"));
+  daisy_assert (alist.check ("type"));
   use_model (library, alist.name ("type"));
   return false; 
 }
 
 void
 TraverseXRef::leave_object ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TraverseXRef::enter_object_sequence (const Library& library, 
@@ -324,8 +324,8 @@ TraverseXRef::TraverseXRef (XRef& xr)
 
 TraverseXRef::~TraverseXRef ()
 { 
-  assert (type == is_invalid); 
-  assert (path.empty ());
+  daisy_assert (type == is_invalid); 
+  daisy_assert (path.empty ());
 }
 
 XRef::ModelUsed::ModelUsed (const string& comp, const string& mod)

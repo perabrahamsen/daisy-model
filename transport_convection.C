@@ -113,8 +113,8 @@ TransportConvection::tick (Treelog&,
   // We restart from here if anything goes wrong.
   int time_step_reductions = 0;
  try_again:;
-  assert (ddt > 0.0);
-  assert (ddt <= dt);
+  daisy_assert (ddt > 0.0);
+  daisy_assert (ddt <= dt);
 
   // Find number of steps
   unsigned int steps = 1;
@@ -152,7 +152,7 @@ TransportConvection::tick (Treelog&,
 	  C[i] = solute.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 	}
     }
-  assert (approximate (J_in, J[0]));
+  daisy_assert (approximate (J_in, J[0]));
 
   for (unsigned int i = 0; i < size; i++)
     if (M[i] < 0.0)
@@ -168,8 +168,8 @@ TransportConvection::tick (Treelog&,
   
   // Check mass conservation.
   const double new_total = soil.total (M);
-  assert (approximate (old_total - J[0] * dt + J[size] * dt, new_total));
-  assert (approximate (- J[0] * dt + J[size] * dt, new_total - old_total));
+  daisy_assert (approximate (old_total - J[0] * dt + J[size] * dt, new_total));
+  daisy_assert (approximate (- J[0] * dt + J[size] * dt, new_total - old_total));
 }
 
 static struct TransportConvectionSyntax

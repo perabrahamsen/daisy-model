@@ -45,8 +45,8 @@ SoilWater::clear (const Geometry&)
 void
 SoilWater::root_uptake (const vector<double>& v)
 {
-  assert (S_sum_.size () == v.size ());
-  assert (S_root_.size () == v.size ());
+  daisy_assert (S_sum_.size () == v.size ());
+  daisy_assert (S_root_.size () == v.size ());
   for (unsigned i = 0; i < v.size (); i++)
     {
       S_sum_[i] += v[i];
@@ -57,8 +57,8 @@ SoilWater::root_uptake (const vector<double>& v)
 void 
 SoilWater::freeze (const Soil&, const vector<double>& v)
 {
-  assert (v.size () == S_ice_.size ());
-  assert (S_sum_.size () == v.size ());
+  daisy_assert (v.size () == S_ice_.size ());
+  daisy_assert (S_sum_.size () == v.size ());
   for (unsigned int i = 0; i < v.size (); i++)
     {
       S_sum_[i] += v[i];
@@ -166,12 +166,12 @@ SoilWater::tick (const Soil& soil, const SoilHeat& soil_heat,
   int last  = soil.size () - 1;
   if (!groundwater.flux_bottom ())
     {
-      assert (soil.size () > 1);
+      daisy_assert (soil.size () > 1);
       if (groundwater.table () <= soil.zplus (soil.size () - 2))
 	throw ("Groundwater table in or below lowest node.");
       last = soil.interval_plus (groundwater.table ());
       if (last >=  soil.size () - 1)
-	assert ("Groundwater too low.");
+	daisy_assert ("Groundwater too low.");
       // Presure at the last node is equal to the water above it.
       for (unsigned int i = last + 1; i < soil.size (); i++)
 	{
@@ -182,7 +182,7 @@ SoilWater::tick (const Soil& soil, const SoilHeat& soil_heat,
 
   // Limit for ridging.
   const int first = surface.soil_top () ? surface.last_node () : 0;
-  assert (first >= 0);
+  daisy_assert (first >= 0);
   bool ok = true;
 
   // Calculate matrix flow next.
@@ -243,10 +243,10 @@ SoilWater::tick (const Soil& soil, const SoilHeat& soil_heat,
 
   // Update surface and groundwater reservoirs.
   const bool top_accepted = surface.accept_top (msg, q_[0] * dt);
-  assert (top_accepted);
+  daisy_assert (top_accepted);
   const bool bottom_accepted 
     = groundwater.accept_bottom ((q_[last + 1] + q_p_[last + 1]) * dt);
-  assert (bottom_accepted);
+  daisy_assert (bottom_accepted);
 
   // Update flux in surface and groundwater.
   surface.update_water (soil, S_sum_, h_, Theta_, q_, q_p_);
@@ -377,9 +377,9 @@ void
 SoilWater::put_h (const Soil& soil, const vector<double>& v) // [cm]
 {
   const int size = soil.size ();
-  assert (v.size () == size);
-  assert (h_.size () == size);
-  assert (Theta_.size () == size);
+  daisy_assert (v.size () == size);
+  daisy_assert (h_.size () == size);
+  daisy_assert (Theta_.size () == size);
 
   h_ = v;
 
@@ -502,7 +502,7 @@ SoilWater::initialize (const AttributeList& al,
   for (unsigned int i = 0; i < soil.size (); i++)
     {
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
-      assert (Theta_sat >= X_ice_[i]);
+      daisy_assert (Theta_sat >= X_ice_[i]);
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
     }
 
@@ -537,7 +537,7 @@ SoilWater::initialize (const AttributeList& al,
   q_p_.insert (q_p_.begin (), size + 1, 0.0);
   S_ice_.insert (S_ice_.begin (), size, 0.0);
 
-  assert (h_.size () == Theta_.size ());
+  daisy_assert (h_.size () == Theta_.size ());
   if (h_.size () == 0)
     {
       if (groundwater.flux_bottom ())
@@ -560,7 +560,7 @@ SoilWater::initialize (const AttributeList& al,
 	    }
 	}
     }
-  assert (h_.size () == soil.size ());
+  daisy_assert (h_.size () == soil.size ());
 
   // We just assume no changes.
   Theta_old_ = Theta_;
@@ -575,11 +575,11 @@ SoilWater::initialize (const AttributeList& al,
 
 SoilWater::~SoilWater ()
 {
-  assert (top);
+  daisy_assert (top);
   delete top;
   if (bottom)
     delete bottom;
-  assert (reserve);
+  daisy_assert (reserve);
   delete reserve;
   delete &macro;
 }

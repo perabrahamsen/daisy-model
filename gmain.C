@@ -457,7 +457,7 @@ AList_Item::daisy_select ()
 void
 AList_Item::daisy_deselect ()
 { 
-  assert (window);
+  daisy_assert (window);
   window->hide ();
 }
 

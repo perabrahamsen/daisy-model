@@ -104,37 +104,37 @@ struct LogHarvest : public Log
   }
 
   void done ()
-  { assert (false); }
+  { daisy_assert (false); }
 
   // Normal items.
   void open (const string&)
-  { assert (false); }
+  { daisy_assert (false); }
   void close ()
-  { assert (false); }
+  { daisy_assert (false); }
 
   // Unnamed items.
   void open_unnamed ()
-  { assert (false); }
+  { daisy_assert (false); }
   void close_unnamed ()
-  { assert (false); }
+  { daisy_assert (false); }
 
   // Derived items.
   void open_derived (const string&, const string&)
-  { assert (false); }
+  { daisy_assert (false); }
   void close_derived ()
-  { assert (false); }
+  { daisy_assert (false); }
 
   // Derived items in a list.
   void open_entry (const string&, const AttributeList&)
-  { assert (false); }
+  { daisy_assert (false); }
   void close_entry ()
-  { assert (false); }
+  { daisy_assert (false); }
 
   // Named derived items in a list.
   void open_named_entry (const string&, const string&, const AttributeList&)
-  { assert (false); }
+  { daisy_assert (false); }
   void close_named_entry ()
-  { assert (false); }
+  { daisy_assert (false); }
 
   void output (const string&, const Time&)
   { }

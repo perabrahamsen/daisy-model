@@ -56,8 +56,8 @@ Weather::tick_after (const Time& time, Treelog&)
   if (Si > 25.0)
     {
       hourly_cloudiness_ = CloudinessFactor_Humid (time, Si);
-      assert (hourly_cloudiness_ >= 0.0);
-      assert (hourly_cloudiness_ <= 1.0);
+      daisy_assert (hourly_cloudiness_ >= 0.0);
+      daisy_assert (hourly_cloudiness_ <= 1.0);
     }
 
   // Daily claudiness.
@@ -67,14 +67,14 @@ Weather::tick_after (const Time& time, Treelog&)
       if (Si > 25.0)
 	{
 	  daily_cloudiness_ = CloudinessFactor_Humid (time, Si);
-	  assert (daily_cloudiness_ >= 0.0);
-	  assert (daily_cloudiness_ <= 1.0);
+	  daisy_assert (daily_cloudiness_ >= 0.0);
+	  daisy_assert (daily_cloudiness_ <= 1.0);
 	}
     }
 
   // Deposition.
   const double Precipitation = rain () + snow (); // [mm]
-  assert (Precipitation >= 0.0);
+  daisy_assert (Precipitation >= 0.0);
   
   // [kg N/ha/year -> [g/cm²/h]
   const double hours_to_years = 365.2425 * 24.0;
@@ -84,13 +84,13 @@ Weather::tick_after (const Time& time, Treelog&)
   const IM wet (WetDeposit, 1.0e-7); // [ppm] -> [g/cm²/mm]
 
   deposit_ = dry + wet * Precipitation;
-  assert (deposit_.NO3 >= 0.0);
-  assert (deposit_.NH4 >= 0.0);
+  daisy_assert (deposit_.NO3 >= 0.0);
+  daisy_assert (deposit_.NH4 >= 0.0);
 
-  assert (approximate (deposit_.NO3, 
+  daisy_assert (approximate (deposit_.NO3, 
 		       DryDeposit.NO3 * kg_per_ha_to_g_cm2/hours_to_years
 		       + Precipitation * WetDeposit.NO3 * 1e-7));
-  assert (approximate (deposit_.NH4, 
+  daisy_assert (approximate (deposit_.NH4, 
 		       DryDeposit.NH4 * kg_per_ha_to_g_cm2/hours_to_years
 		       + Precipitation * WetDeposit.NH4 * 1e-7));
 }
@@ -126,8 +126,8 @@ Weather::day_cycle (const Time& time) const	// Sum over a day is 1.0.
 {
   // Day length.
   const double dl = day_length (time);
-  assert (dl >= 0.0);
-  assert (dl <= 24.0);
+  daisy_assert (dl >= 0.0);
+  daisy_assert (dl <= 24.0);
   
   const int hour = time.hour ();
 
@@ -137,8 +137,8 @@ Weather::day_cycle (const Time& time) const	// Sum over a day is 1.0.
     dc = 0.0;
   else
     dc = max (0.0, M_PI_2 / dl * cos (M_PI * (hour - 12) / dl));
-  assert (dc >= 0.0);
-  assert (dc <= 1.0);  
+  daisy_assert (dc >= 0.0);
+  daisy_assert (dc <= 1.0);  
 
   return dc;
 }
@@ -160,8 +160,8 @@ Weather::day_length (const Time& time) const
     my_tan = 1.0;
   t = (24 / M_PI * acos (my_tan));
   const double dl = (t < 0) ? t + 24.0 : t;
-  assert (dl >= 0.0);
-  assert (dl <= 24.0);
+  daisy_assert (dl >= 0.0);
+  daisy_assert (dl <= 24.0);
   return dl;
 }
 

@@ -21,7 +21,7 @@
 
 
 #include "mathlib.h"
-#include <assert.h>
+#include "assertion.h"
 #include <math.h>
 
 #if defined (__unix) || defined (__CYGWIN__)
@@ -43,17 +43,17 @@ tridia (int from,
 	const vector<double>& d,
 	vector<double>::iterator x)
 {
-  assert (a.size () >= N);
-  assert (b.size () >= N);
-  assert (c.size () >= N);
-  assert (d.size () >= N);
+  daisy_assert (a.size () >= N);
+  daisy_assert (b.size () >= N);
+  daisy_assert (c.size () >= N);
+  daisy_assert (d.size () >= N);
 
   static vector<double> y;
   static vector<double> beta;
   
   if (y.size() < N)
     {
-      assert (beta.size () == y.size ());
+      daisy_assert (beta.size () == y.size ());
       y.insert (y.end(), from + N - y.size(), 0.0);
       beta.insert (beta.end(), from + N - beta.size(), 0.0);
     }
@@ -110,19 +110,19 @@ single_positive_root_of_cubic_equation (double a, double b, double c, double d)
       
       if (y1 >= 0)
 	{
-	  assert (y2 < 0 && y3 < 0);
+	  daisy_assert (y2 < 0 && y3 < 0);
 	  return y1;
 	}
       if (y2 >= 0)
 	{
-	  assert (y3 < 0);
+	  daisy_assert (y3 < 0);
 	  return y2;
 	}
       if (y3 >= 0)
 	return y3;
       
       
-      assert (y3 >= 0);
+      daisy_assert (y3 >= 0);
       return y3;
     }
 }
@@ -137,7 +137,7 @@ single_positive_root_of_square_equation (double a, double b, double c)
     {
       const double x = -b / (2.0 * a);
       // Must be positive.
-      assert (x >= 0.0);
+      daisy_assert (x >= 0.0);
       return x;
     }
 
@@ -148,12 +148,12 @@ single_positive_root_of_square_equation (double a, double b, double c)
   // Return the positive solution.
   if (x1 > 0.0)
     {
-      assert (x2 <= 0.0);
+      daisy_assert (x2 <= 0.0);
       return x1;
     }
   else
     {
-      assert (x2 >= 0.0);
+      daisy_assert (x2 >= 0.0);
       return x2;
     }
 }
@@ -186,15 +186,15 @@ struct set_gnu99_exceptions
     int rc;
 #ifdef FE_DIVBYZERO
     rc = feenableexcept (FE_DIVBYZERO);
-    assert (rc);
+    daisy_assert (rc);
 #endif
 #ifdef FE_OVERFLOW
     rc = feenableexcept (FE_OVERFLOW);
-    assert (rc);
+    daisy_assert (rc);
 #endif
 #ifdef FE_INVALID
     rc = feenableexcept (FE_INVALID);
-    assert (rc);
+    daisy_assert (rc);
 #endif
   }
 }  set_gnu99_exceptions_dummy;

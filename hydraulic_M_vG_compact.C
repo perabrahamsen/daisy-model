@@ -107,7 +107,7 @@ HydraulicM_vG_compact::Cw2 (const double h) const
 double 
 HydraulicM_vG_compact::h (const double Theta) const
 {
-  assert (Theta_res <= Theta);
+  daisy_assert (Theta_res <= Theta);
   if (Theta < Theta_sat)
     return pow(pow(Theta_res / (Theta_res - Theta_sat) 
 		   + Theta / (Theta_sat - Theta_res), -1.0 / m)
@@ -136,8 +136,8 @@ HydraulicM_vG_compact::Se (double h) const
   if (h < 0.0)
     {
       const double Se_h = pow (1.0 / (1.0 + pow (a * h, n)), m);
-      assert (Se_h >= 0.0);
-      assert (Se_h <= 1.0);
+      daisy_assert (Se_h >= 0.0);
+      daisy_assert (Se_h <= 1.0);
       return Se_h;
     }
   else

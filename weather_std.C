@@ -273,9 +273,9 @@ WeatherStandard::tick (const Time& time, Treelog& out)
       snow_fraction = (T_rain - T) / (T_rain - T_snow);
       rain_fraction = 1.0 - snow_fraction;
     }
-  assert (rain_fraction >= 0 && rain_fraction <= 1);
-  assert (snow_fraction >= 0 && snow_fraction <= 1);
-  assert (approximate (rain_fraction + snow_fraction, 1.0));
+  daisy_assert (rain_fraction >= 0 && rain_fraction <= 1);
+  daisy_assert (snow_fraction >= 0 && snow_fraction <= 1);
+  daisy_assert (approximate (rain_fraction + snow_fraction, 1.0));
 
   Weather::tick_after (time, out);
 }
@@ -283,7 +283,7 @@ WeatherStandard::tick (const Time& time, Treelog& out)
 void 
 WeatherStandard::read_line ()
 {
-  assert (lex);
+  daisy_assert (lex);
 
   // Remember old values.
   last_time = next_time;
@@ -355,7 +355,7 @@ WeatherStandard::read_line ()
 void 
 WeatherStandard::read_new_day (const Time& time)
 { 
-  assert (time.hour () == 0);
+  daisy_assert (time.hour () == 0);
   Time now = time;
   Time tomorrow = time;
   tomorrow.tick_day ();
@@ -429,7 +429,7 @@ WeatherStandard::read_new_day (const Time& time)
 void
 WeatherStandard::initialize (const Time& time, Treelog& err)
 { 
-  assert (lex == NULL);
+  daisy_assert (lex == NULL);
   lex = new LexerData (where, err);
   // Open errors?
   if (!lex->good ())
@@ -450,7 +450,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
     {
       string key = lex->get_word ();
 
-      assert (key.size () > 0);
+      daisy_assert (key.size () > 0);
       if (key[key.size () - 1] != ':')
 	{
 	  lex->error ("Keywords should end in :");
@@ -735,7 +735,7 @@ WeatherStandard::~WeatherStandard ()
 bool
 WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 { 
-  assert (lex);
+  daisy_assert (lex);
   bool ok = true;
   if (lex->error_count > 0)
     {

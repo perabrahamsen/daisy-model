@@ -81,12 +81,12 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
   // Check that incomming C and M makes sense.
   for (unsigned int i = 0; i < size; i++)
     {
-      assert (C[i] >= 0.0);
-      assert (M[i] >= 0.0);
+      daisy_assert (C[i] >= 0.0);
+      daisy_assert (M[i] >= 0.0);
       if (C[i] == 0.0)
-	assert (M[i] == 0.0);
+	daisy_assert (M[i] == 0.0);
       else
-	assert (approximate (M[i], 
+	daisy_assert (approximate (M[i], 
 			     solute.C_to_M (soil,
 					    soil_water.Theta_old (i),
 					    i, C[i])));
@@ -116,7 +116,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	* Theta;
 
       // Check for NaN.
-      assert (finite (D[j]));
+      daisy_assert (finite (D[j]));
     }
   // Lower boundary.
   {
@@ -158,12 +158,12 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
   double C_top = 0.0;
   double S_top = 0.0;
 #ifdef DISABLE_MIXING
-  assert (J_in <= 0.0);
+  daisy_assert (J_in <= 0.0);
 #endif
   if (J_in != 0.0)
     {
 #ifdef DISABLE_MIXING
-      assert (J_in < 0.0);
+      daisy_assert (J_in < 0.0);
 #endif
       if (soil_water.q (0) < 0.0)
 	// Normal condition, stuff is in solute.
@@ -255,10 +255,10 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 		     / (2.0 * dz)));
 
 	  // Check for NaN.
-	  assert (finite (a[j]));
-	  assert (finite (b[j]));
-	  assert (finite (c[j]));
-	  assert (finite (d[j]));
+	  daisy_assert (finite (a[j]));
+	  daisy_assert (finite (b[j]));
+	  daisy_assert (finite (c[j]));
+	  daisy_assert (finite (d[j]));
 	}
       // Adjust for upper boundary condition.
       {
@@ -302,10 +302,10 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 		   / (2.0 * dz)));
 
 	// Check for NaN.
-	assert (finite (a[0]));
-	assert (finite (b[0]));
-	assert (finite (c[0]));
-	assert (finite (d[0]));
+	daisy_assert (finite (a[0]));
+	daisy_assert (finite (b[0]));
+	daisy_assert (finite (c[0]));
+	daisy_assert (finite (d[0]));
 	d[0] -= a[0] * C_top;
       }
       // Adjust for lower boundary condition.
@@ -333,7 +333,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	{
 	  // We use the old absorbed stuff plus the new dissolved stuff.
  	  M[j] = A[j] + Theta_new[j] * C[j];
-	  assert (M[j] >= 0.0);
+	  daisy_assert (M[j] >= 0.0);
 
 	  // We calculate new C by assumining instant absorption.
 	  C[j] = solute.M_to_C (soil, Theta_new[j], j, M[j]);
@@ -347,7 +347,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
   J[0] = J_in - S_top * soil.dz (0);
   for (unsigned int i = 0; i < size; i++)
     {
-      assert (M[i] >= 0.0);
+      daisy_assert (M[i] >= 0.0);
       J[i + 1] = (((M[i] - M_prev[i]) / dt) - S[i]) * soil.dz (i) + J[i];
     }
 }

@@ -56,7 +56,7 @@ TreeState::recreate_list (QListViewItem* firstChild)
   for (QListViewItem* i = firstChild; i != NULL; i = i->nextSibling ())
     {
       TreeItem* ti = dynamic_cast<TreeItem*> (i);
-      assert (ti);
+      daisy_assert (ti);
       if (selected == ti->entry)
 	ti->listView ()->setSelected (ti, true);
       if (children.find (ti->entry) != children.end ())
@@ -81,7 +81,7 @@ TreeState::add_list (QListViewItem* firstChild)
   for (QListViewItem* i = firstChild; i != NULL; i = i->nextSibling ())
     {
       TreeItem* ti = dynamic_cast<TreeItem*> (i);
-      assert (ti);
+      daisy_assert (ti);
       if (ti->isSelected ())
 	selected = ti->entry;
       if (ti->isOpen ())
@@ -110,9 +110,9 @@ TreeItem*
 MainTree::item () const
 {
   QListViewItem* current = currentItem ();
-  assert (current);
+  daisy_assert (current);
   TreeItem* mine = dynamic_cast<TreeItem*> (current);
-  assert (mine);
+  daisy_assert (mine);
   return mine;
 }
 

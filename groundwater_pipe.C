@@ -168,7 +168,7 @@ GroundwaterPipe::update_water (const Soil& soil,
        if (h[i]<=0.0) break;
        i_sat = i;
     }
-  assert (i_sat > 0);
+  daisy_assert (i_sat > 0);
   const double GWT_UZ = soil.zplus (i_sat-1);
   if (height<GWT_UZ) height = GWT_UZ;
   Percolation[i_bottom] = DeepPercolation(soil);
@@ -219,10 +219,10 @@ GroundwaterPipe::update_water (const Soil& soil,
 	 {
 	   q[i] = -Percolation[i-1] - q_p[i];
 	 }
-       assert (finite (q[i]));
-       assert (finite (q_p[i]));
+       daisy_assert (finite (q[i]));
+       daisy_assert (finite (q_p[i]));
     }
-  assert(DrainFlow>=0.0);
+  daisy_assert(DrainFlow>=0.0);
   height = GWT_new;
   for (unsigned int i = i_GWT; i <= i_bottom; i++)
     h[i] = height - soil.z (i);
@@ -273,7 +273,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
 	{
           S[i] = a * soil.K (i, 0.0, 0.0, soil_heat.T (i));
 	}
-      assert (finite (Flow));
+      daisy_assert (finite (Flow));
       for (unsigned int i = i_bottom; i >= i_GWT; i--)
 	{
 	  Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);
@@ -284,7 +284,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
     {
       for (unsigned int i = i_bottom; i >= i_GWT; i--)
 	{
-	  assert (S[i] == 0.0);
+	  daisy_assert (S[i] == 0.0);
 	  Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);
 	}
     }
@@ -380,12 +380,12 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
            def = dw;
            for (int j = i; j >= i_Eql; j--)
              {
-	       assert (j >= 0);
-	       assert (j < WaterDef.size ());
+	       daisy_assert (j >= 0);
+	       daisy_assert (j < WaterDef.size ());
                def -= WaterDef[j];
 	       if (j > 0)
 		 {
-		   assert (j <= Percolation.size ());
+		   daisy_assert (j <= Percolation.size ());
 		   Percolation[j-1] = Percolation[j-1] - def / dt;
 		 }
 	       else
@@ -414,12 +414,12 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
            dw -= def;
            for (int j = i; j >= i_Eql; j--)
              {
-	       assert (j >= 0);
-	       assert (j < WaterDef.size ());
+	       daisy_assert (j >= 0);
+	       daisy_assert (j < WaterDef.size ());
                def -= WaterDef[j];
 	       if (j > 0)
 		 {
-		   assert (j <= Percolation.size ());
+		   daisy_assert (j <= Percolation.size ());
 		   Percolation[j-1] -= def / dt;
 		 }
 	       else
@@ -432,7 +432,7 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 		 }
                if (def<=0.0) break;
              }
-	   assert (i > 0);
+	   daisy_assert (i > 0);
            GWT_new = soil.zplus (i-1);
            Theta[i] = soil.Theta(i,0.0,h_ice[i]);
            Percolation[i-1] -= dw / dt;

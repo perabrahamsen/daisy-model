@@ -52,7 +52,7 @@ Assertion::Register::Register (Treelog& log)
   : treelog (log)
 {
   for (unsigned int i = 0; i < logs.size (); i++)
-    assert (&log != logs[i]);
+    daisy_assert (&log != logs[i]);
 
   logs.push_back (&log);
 }

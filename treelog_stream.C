@@ -21,11 +21,11 @@
 
 
 #include "treelog_stream.h"
+#include "assertion.h"
 // BCC5.01 lack ostream.
 #include <iostream>
 #include <deque>
 // GCC 2.95.2 need a ".h".
-#include <assert.h>
 
 struct TreelogStream::Implementation
 {
@@ -38,8 +38,8 @@ struct TreelogStream::Implementation
   { }
   ~Implementation ()
   {
-    assert (path.size () == 0);
-    assert (touched.size () == 0);
+    daisy_assert (path.size () == 0);
+    daisy_assert (touched.size () == 0);
   }
 };
 

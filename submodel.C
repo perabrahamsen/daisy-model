@@ -22,6 +22,7 @@
 
 #include "submodel.h"
 #include "common.h"
+#include "assertion.h"
 #include <map>
 
 typedef map<string, Submodel::load_fun, less<string>/**/> submodel_map_type;
@@ -44,7 +45,7 @@ Submodel::load_syntax (const string& model,
 		       Syntax& syntax, AttributeList& alist)
 {
   submodel_map_type::const_iterator i = submodel_map->find (model);
-  assert (i != submodel_map->end ());
+  daisy_assert (i != submodel_map->end ());
   (*i).second (syntax, alist);
 }
 

@@ -26,7 +26,7 @@
 #include "syntax.h"
 #include "time.h"
 #include "common.h"
-#include <assert.h>
+#include "assertion.h"
 #include <map>
 
 // @ Value
@@ -191,8 +191,8 @@ bool
 Value::subset (const Value& v, const Syntax& syntax, 
 	       const string& key) const
 {
-  assert (type == v.type);
-  assert (is_sequence == v.is_sequence);
+  daisy_assert (type == v.type);
+  daisy_assert (is_sequence == v.is_sequence);
 
   if (!is_sequence)
     switch (type)
@@ -210,10 +210,10 @@ Value::subset (const Value& v, const Syntax& syntax,
 	  const Syntax::type type = syntax.lookup (key);
 	  if (type == Syntax::AList)
 	    return value.subset (other, syntax.syntax (key));
-	  assert (type == Syntax::Object);
+	  daisy_assert (type == Syntax::Object);
 	  const Library& library = syntax.library (key);
 
-	  assert (value.check ("type"));
+	  daisy_assert (value.check ("type"));
 	  if (!other.check ("type"))
 	    return false;
 	  const string element = value.name ("type");
@@ -233,7 +233,7 @@ Value::subset (const Value& v, const Syntax& syntax,
       case Syntax::Library:
       case Syntax::Error:
       default:
-	assert (false);
+	daisy_assert (false);
       }
   else
     switch (type)
@@ -262,11 +262,11 @@ Value::subset (const Value& v, const Syntax& syntax,
 	      return true;
 		
 	    }
-	  assert (type == Syntax::Object);
+	  daisy_assert (type == Syntax::Object);
 	  const Library& library = syntax.library (key);
 	  for (unsigned int i = 0; i < size; i++)
 	    {
-	      assert (value[i]->check ("type"));
+	      daisy_assert (value[i]->check ("type"));
 	      if (!other[i]->check ("type"))
 		return false;
 	      const string element = value[i]->name ("type");
@@ -289,7 +289,7 @@ Value::subset (const Value& v, const Syntax& syntax,
       case Syntax::Library:
       case Syntax::Error:
       default:
-	assert (false);
+	daisy_assert (false);
       }
   // Not reached.
   return false;
@@ -328,7 +328,7 @@ Value::cleanup ()
 	  case Syntax::Object:
 	  case Syntax::Library:
 	  default:
-	    assert (false);
+	    daisy_assert (false);
 	  }
       else
 	switch (type)
@@ -361,11 +361,11 @@ Value::cleanup ()
 	  case Syntax::Library:
 	  case Syntax::Error:
 	  default:
-	    assert (false);
+	    daisy_assert (false);
 	  }
       break;
     default:
-      assert (*ref_count > 1);
+      daisy_assert (*ref_count > 1);
       (*ref_count)--;
     }
 }
@@ -414,7 +414,7 @@ Value::operator = (const Value& v)
       case Syntax::Library:
       case Syntax::Error:
       default:
-	assert (false);
+	daisy_assert (false);
       }
   else
     switch (type)
@@ -444,7 +444,7 @@ Value::operator = (const Value& v)
       case Syntax::Library:
       case Syntax::Error:
       default:
-	assert (false);
+	daisy_assert (false);
       }
 
   // Return this for further mutilation.
@@ -579,7 +579,7 @@ AttributeList::size (const string& key)	const
     case Syntax::Library:
     case Syntax::Error:
     default:
-      assert (false);
+      daisy_assert (false);
     }
   // Not reached.
   return Syntax::Unspecified;
@@ -589,8 +589,8 @@ double
 AttributeList::number (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Number);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::Number);
+  daisy_assert (!value.is_sequence);
   return value.number;
 }
 
@@ -598,8 +598,8 @@ double
 AttributeList::number (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Number);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::Number);
+  daisy_assert (!value.is_sequence);
   return value.number;
 }
 
@@ -607,8 +607,8 @@ const string&
 AttributeList::name (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::String);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::String);
+  daisy_assert (!value.is_sequence);
   return *value.name;
 }
 
@@ -616,8 +616,8 @@ const string&
 AttributeList::name (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::String);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::String);
+  daisy_assert (!value.is_sequence);
   return *value.name;
 }
 
@@ -625,8 +625,8 @@ bool
 AttributeList::flag (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Boolean);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::Boolean);
+  daisy_assert (!value.is_sequence);
   return value.flag;
 }
 
@@ -634,8 +634,8 @@ bool
 AttributeList::flag (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Boolean);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::Boolean);
+  daisy_assert (!value.is_sequence);
   return value.flag;
 }
 
@@ -643,8 +643,8 @@ const Time&
 AttributeList::time (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Date);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::Date);
+  daisy_assert (!value.is_sequence);
   return *value.time;
 }
 
@@ -652,8 +652,8 @@ const Time&
 AttributeList::time (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Date);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::Date);
+  daisy_assert (!value.is_sequence);
   return *value.time;
 }
 
@@ -661,8 +661,8 @@ int
 AttributeList::integer (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Integer);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::Integer);
+  daisy_assert (!value.is_sequence);
   return value.integer;
 }
 
@@ -670,8 +670,8 @@ int
 AttributeList::integer (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Integer);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::Integer);
+  daisy_assert (!value.is_sequence);
   return value.integer;
 }
 
@@ -679,8 +679,8 @@ const PLF&
 AttributeList::plf (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::PLF);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::PLF);
+  daisy_assert (!value.is_sequence);
   return *value.plf;
 }
 
@@ -688,8 +688,8 @@ const PLF&
 AttributeList::plf (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::PLF);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::PLF);
+  daisy_assert (!value.is_sequence);
   return *value.plf;
 }
 
@@ -697,8 +697,8 @@ AttributeList&
 AttributeList::alist (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::AList);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::AList);
+  daisy_assert (!value.is_sequence);
   return *value.alist;
 }
 
@@ -706,8 +706,8 @@ AttributeList&
 AttributeList::alist (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::AList);
-  assert (!value.is_sequence);
+  daisy_assert (value.type == Syntax::AList);
+  daisy_assert (!value.is_sequence);
   return *value.alist;
 }
 
@@ -715,8 +715,8 @@ const vector<double>&
 AttributeList::number_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Number);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::Number);
+  daisy_assert (value.is_sequence);
   return *value.number_sequence;
 }
 
@@ -724,8 +724,8 @@ const vector<double>&
 AttributeList::number_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Number);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::Number);
+  daisy_assert (value.is_sequence);
   return *value.number_sequence;
 }
 
@@ -733,8 +733,8 @@ const vector<string>&
 AttributeList::name_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::String);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::String);
+  daisy_assert (value.is_sequence);
   return *value.name_sequence;
 }
 
@@ -742,8 +742,8 @@ const vector<string>&
 AttributeList::name_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::String);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::String);
+  daisy_assert (value.is_sequence);
   return *value.name_sequence;
 }
 
@@ -751,8 +751,8 @@ const vector<bool>&
 AttributeList::flag_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Boolean);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::Boolean);
+  daisy_assert (value.is_sequence);
   return *value.flag_sequence;
 }
 
@@ -760,8 +760,8 @@ const vector<bool>&
 AttributeList::flag_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Boolean);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::Boolean);
+  daisy_assert (value.is_sequence);
   return *value.flag_sequence;
 }
 
@@ -769,8 +769,8 @@ const vector<int>&
 AttributeList::integer_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Integer);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::Integer);
+  daisy_assert (value.is_sequence);
   return *value.integer_sequence;
 }
 
@@ -778,8 +778,8 @@ const vector<int>&
 AttributeList::integer_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Integer);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::Integer);
+  daisy_assert (value.is_sequence);
   return *value.integer_sequence;
 }
 
@@ -787,8 +787,8 @@ const vector<const Time*>&
 AttributeList::time_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Date);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::Date);
+  daisy_assert (value.is_sequence);
   return *value.time_sequence;
 }
 
@@ -796,8 +796,8 @@ const vector<const Time*>&
 AttributeList::time_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Date);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::Date);
+  daisy_assert (value.is_sequence);
   return *value.time_sequence;
 }
 
@@ -805,8 +805,8 @@ const vector<const PLF*>&
 AttributeList::plf_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::PLF);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::PLF);
+  daisy_assert (value.is_sequence);
   return *value.plf_sequence;
 }
 
@@ -814,8 +814,8 @@ const vector<const PLF*>&
 AttributeList::plf_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::PLF);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::PLF);
+  daisy_assert (value.is_sequence);
   return *value.plf_sequence;
 }
 
@@ -823,8 +823,8 @@ const vector<AttributeList*>&
 AttributeList::alist_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::AList);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::AList);
+  daisy_assert (value.is_sequence);
   return *value.alist_sequence;
 }
 
@@ -832,8 +832,8 @@ const vector<AttributeList*>&
 AttributeList::alist_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::AList);
-  assert (value.is_sequence);
+  daisy_assert (value.type == Syntax::AList);
+  daisy_assert (value.is_sequence);
   return *value.alist_sequence;
 }
 
@@ -913,7 +913,7 @@ AttributeList::revert (const string& key,
 
   if (!default_alist.check (key))
     {
-      assert (check (key));
+      daisy_assert (check (key));
       remove (key);
       return true;
     }
@@ -946,7 +946,7 @@ AttributeList::revert (const string& key,
       case Syntax::Library:
       case Syntax::Error:
       default:
-	assert (false);
+	daisy_assert (false);
       }
   else
     switch (syntax.lookup (key))
@@ -976,7 +976,7 @@ AttributeList::revert (const string& key,
       case Syntax::Library:
       case Syntax::Error:
       default:
-	assert (false);
+	daisy_assert (false);
       }
   return true;
 }
@@ -993,7 +993,7 @@ AttributeList::operator += (const AttributeList& al)
 void
 AttributeList::operator = (const AttributeList& al)
 {
-  assert (&al != this);
+  daisy_assert (&al != this);
   impl.values = al.impl.values;
 }
 
@@ -1008,7 +1008,7 @@ AttributeList::AttributeList ()
 AttributeList::AttributeList (const AttributeList& old)
   : impl (*new Implementation ())
 { 
-  assert (this != &old);
+  daisy_assert (this != &old);
   impl.values = old.impl.values; 
 }
 

@@ -204,7 +204,7 @@ LogSelect::LogSelect (const AttributeList& al)
   string_map conv_map;
   for (unsigned int i = 0; i < conv_vector.size (); i += 2)
     {
-      assert (i+1 < conv_vector.size ());
+      daisy_assert (i+1 < conv_vector.size ());
       conv_map[conv_vector[i]] = conv_vector[i+1];
     }
 

@@ -116,11 +116,11 @@ Snow::Implementation::tick (Treelog& msg,
   Ssnow += Pond;
   Swater += Pond;
 
-  assert (Si >= 0.0);
-  assert (Prain >= 0.0);
-  assert (Psnow >= 0.0);
-  assert (Epot >= 0.0);
-  assert (T > -374 && T <= 100);
+  daisy_assert (Si >= 0.0);
+  daisy_assert (Prain >= 0.0);
+  daisy_assert (Psnow >= 0.0);
+  daisy_assert (Epot >= 0.0);
+  daisy_assert (T > -374 && T <= 100);
 
   static const double dt = 1.0; // Time step [h].
   static const double f = 1.0;	// Melting factor. [mm H2O / (kg H2O / m²)]
@@ -133,7 +133,7 @@ Snow::Implementation::tick (Treelog& msg,
   
   // Relative amount of snow in percolation.
   const double fs = (P > 0) ? Psnow / P : 0.0;
-  assert (fs >= 0.0);
+  daisy_assert (fs >= 0.0);
 
   // Check if snow has become white.
   if (Prain > 0.0)
@@ -150,9 +150,9 @@ Snow::Implementation::tick (Treelog& msg,
   // We evaporate as much as we can.  
   EvapSnowPack = min (Epot, Ssnow / dt + P);
 
-  assert (EvapSnowPack >= 0.0);
-  assert (EvapSnowPack <= Epot);
-  assert (EvapSnowPack <= (Ssnow / dt + P) * 1.0001);
+  daisy_assert (EvapSnowPack >= 0.0);
+  daisy_assert (EvapSnowPack <= Epot);
+  daisy_assert (EvapSnowPack <= (Ssnow / dt + P) * 1.0001);
 
   // Depth of snow fallen this hour. [m]
   double dZp = 0.0;
@@ -160,10 +160,10 @@ Snow::Implementation::tick (Treelog& msg,
     {
       // Density of snow-rain mixture. [kg/m³]
       const double rho_p = rho_w + (rho_s - rho_w) * Psnow / P;
-      assert (rho_p >= 0.0);
+      daisy_assert (rho_p >= 0.0);
       dZp = P * dt / (f * rho_p);
     }
-  assert (dZp >= 0.0);
+  daisy_assert (dZp >= 0.0);
 
   // Air temperature melting factor. [kg/J]
   const double mt = mtprime * ((T < 0.0) ? min (1.0, (dZs + dZp) * mf) : 1);
@@ -188,11 +188,11 @@ Snow::Implementation::tick (Treelog& msg,
   
   // Water storage capacity of snow [mm]
   const double Scapacity = f_c * Ssnow_old;
-  assert (Scapacity >= 0.0);
+  daisy_assert (Scapacity >= 0.0);
 
   // We can now calculate how much water is leaking.
   q_s = max (0.0, Swater + (Prain - EvapSnowPack + M) * dt - Scapacity) / dt;
-  assert (q_s >= 0.0);
+  daisy_assert (q_s >= 0.0);
   
   // New snow pack storage [mm].
   double Ssnow_new = Ssnow + (Psnow + Prain - EvapSnowPack - q_s) * dt;
@@ -239,7 +239,7 @@ Snow::Implementation::tick (Treelog& msg,
       if (dZs > 0.0)
 	{
 	  // Density of collapsing snow pack [kg/m³]
-	  assert (Scapacity > 0.0);
+	  daisy_assert (Scapacity > 0.0);
 	  const double rho_c
 	    = max (Ssnow_old / (f * dZs), 
 		   rho_s + rho_1 * Swater_new / Scapacity + rho_2 * Ssnow_old);
@@ -248,9 +248,9 @@ Snow::Implementation::tick (Treelog& msg,
 	       << " dZs == " << dZs << " Swater_new == " << Swater_new
 	       << " Scapacity == " << Scapacity << "\n";
 #endif
-	  assert (rho_c > 0.0);
-	  //assert (rho_c < rho_i * 1.01);
-	  assert (approximate (rho_c, Ssnow_old / (f * dZs))
+	  daisy_assert (rho_c > 0.0);
+	  //daisy_assert (rho_c < rho_i * 1.01);
+	  daisy_assert (approximate (rho_c, Ssnow_old / (f * dZs))
 		  || approximate (rho_c, rho_s 
 				  + rho_1 * Swater_new / Scapacity 
 				  + rho_2 * Ssnow_old));
@@ -309,7 +309,7 @@ Snow::Implementation::tick (Treelog& msg,
 	   << " K_snow == " << K_snow << "\n";
 #endif
       T = min (T_calc, 0.0);
-      assert (T > -100.0 && T < 50.0);
+      daisy_assert (T > -100.0 && T < 50.0);
     } 
   temperature = T;
 

@@ -76,8 +76,8 @@ TransportNone::tick (Treelog& msg,
 		 << " (J_in = " << J[0] << ") S[" << i << "] = " << S[i];
 	  msg.error (tmp.str ());
 	}
-      assert (M[i] >= 0.0);
-      assert (C[i] >= 0.0);
+      daisy_assert (M[i] >= 0.0);
+      daisy_assert (C[i] >= 0.0);
     }
   if (nest)
     delete nest;

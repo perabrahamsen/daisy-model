@@ -265,9 +265,9 @@ Production::tick (const double AirT, const double SoilT,
   // Update dead leafs
   DeadWLeaf = LfDR (DS) / 24.0 * WLeaf;
   DeadWLeaf += WLeaf * 0.333 * CAImRat / 24.0;
-  assert (DeadWLeaf >= 0.0);
+  daisy_assert (DeadWLeaf >= 0.0);
   double DdLeafCnc;
-  assert (WLeaf >= 0.0);
+  daisy_assert (WLeaf >= 0.0);
   if (NCrop > 1.05 * nitrogen.PtNCnt)
     {
       if (WLeaf > 0.0)
@@ -285,26 +285,26 @@ Production::tick (const double AirT, const double SoilT,
         DdLeafCnc = NStem/WStem;
     }
 
-  assert (DdLeafCnc >= 0.0);
-  assert (DeadWLeaf >= 0.0);
+  daisy_assert (DdLeafCnc >= 0.0);
+  daisy_assert (DeadWLeaf >= 0.0);
   DeadNLeaf = DdLeafCnc * DeadWLeaf;
-  assert (DeadNLeaf >= 0.0);
+  daisy_assert (DeadNLeaf >= 0.0);
   IncWLeaf -= DeadWLeaf;
-  assert (DeadWLeaf >= 0.0);
+  daisy_assert (DeadWLeaf >= 0.0);
   WDead += (1.0 - ExfoliationFac) * DeadWLeaf;
   NDead += (1.0 - ExfoliationFac) * DeadNLeaf;
-  assert (NDead >= 0.0);
+  daisy_assert (NDead >= 0.0);
 
   const double W_foli = ExfoliationFac * DeadWLeaf;
   const double C_foli = DM_to_C_factor (E_Leaf) * W_foli;
   C_Loss = C_foli;
   const double N_foli = ExfoliationFac * DeadNLeaf;
-  assert (N_foli >= 0.0);
+  daisy_assert (N_foli >= 0.0);
   if (C_foli < 1e-50)
-    assert (N_foli < 1e-40);
+    daisy_assert (N_foli < 1e-40);
   else
     {
-      assert (N_foli > 0.0);
+      daisy_assert (N_foli > 0.0);
       AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
       residuals_DM += W_foli;
       residuals_N_top += N_foli;
@@ -332,7 +332,7 @@ Production::tick (const double AirT, const double SoilT,
   AM_root->add (geometry, C_Root * m2_per_cm2,
 		DeadNRoot * m2_per_cm2,
 		Density);
-  assert (C_Root == 0.0 || DeadNRoot > 0.0);
+  daisy_assert (C_Root == 0.0 || DeadNRoot > 0.0);
   residuals_DM += DeadWRoot;
   geometry.add (residuals_C_soil, Density, C_Root * m2_per_cm2);
   geometry.add (residuals_N_soil, Density, DeadNRoot * m2_per_cm2);
@@ -341,7 +341,7 @@ Production::tick (const double AirT, const double SoilT,
 
   // Update production.
   NCrop -= (DeadNLeaf + DeadNRoot);
-  assert (NCrop > 0.0);
+  daisy_assert (NCrop > 0.0);
   WLeaf += IncWLeaf;
   WStem += IncWStem;
   WSOrg += IncWSOrg;
@@ -593,9 +593,9 @@ Production::initialize (const string& name,
 			OrganicMatter& organic_matter)
 {
   // Hotstart, find pool in organic matter.
-  assert (AM_root == NULL);
+  daisy_assert (AM_root == NULL);
   AM_root = organic_matter.find_am (name, "root");
-  assert (AM_leaf == NULL);
+  daisy_assert (AM_leaf == NULL);
   AM_leaf = organic_matter.find_am (name, "dead");
 
   // If not found, we is planting emerged crops.  Create pools.

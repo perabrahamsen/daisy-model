@@ -18,19 +18,19 @@ other crops.";
 
 double 
 Crop::water_stress () const
-{ assert (false); return -42.42e42; }
+{ daisy_assert (false); return -42.42e42; }
 
 double 
 Crop::nitrogen_stress () const
-{ assert (false); return -42.42e42; }
+{ daisy_assert (false); return -42.42e42; }
 
 double 
 Crop::rs_min () const
-{ assert (false); return -42.42e42; }
+{ daisy_assert (false); return -42.42e42; }
 
 double 
 Crop::rs_max () const
-{ assert (false); return -42.42e42; }
+{ daisy_assert (false); return -42.42e42; }
 
 double 
 Crop::albedo () const

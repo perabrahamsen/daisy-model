@@ -33,8 +33,8 @@ int log_extern_count = 0;
 const LogExternSource& 
 LogExternSource::find (const string& name)
 { 
-  assert (log_extern_map);
-  assert (log_extern_count > 0);
+  daisy_assert (log_extern_map);
+  daisy_assert (log_extern_count > 0);
   return *((*log_extern_map)[name]);
 }
 
@@ -45,7 +45,7 @@ LogExternSource::LogExternSource (const AttributeList& al)
 
   if (!log_extern_map)
     {
-      assert (log_extern_count == 0);
+      daisy_assert (log_extern_count == 0);
       log_extern_map = new log_extern_map_type;
     }
   (*log_extern_map)[name] = this;
@@ -54,7 +54,7 @@ LogExternSource::LogExternSource (const AttributeList& al)
 
 LogExternSource::~LogExternSource ()
 { 
-  assert (log_extern_count > 0);
+  daisy_assert (log_extern_count > 0);
   log_extern_count--;
   if (log_extern_count == 0)
     {
@@ -158,7 +158,7 @@ LogExtern::number (const string& tag) const
 {
   number_map::const_iterator i = numbers.find (tag);
   
-  assert (i != numbers.end ());
+  daisy_assert (i != numbers.end ());
   return (*i).second;
 }
 
@@ -167,7 +167,7 @@ LogExtern::name (const string& tag) const
 { 
   name_map::const_iterator i = names.find (tag);
   
-  assert (i != names.end ());
+  daisy_assert (i != names.end ());
   return (*i).second;
 }
 
@@ -176,7 +176,7 @@ LogExtern::array (const string& tag) const
 { 
   array_map::const_iterator i = arrays.find (tag);
   
-  assert (i != arrays.end ());
+  daisy_assert (i != arrays.end ());
   return *(*i).second;
 }
 

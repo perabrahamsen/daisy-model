@@ -150,11 +150,11 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 					     double N_soil, double& N_used,
 					     const vector<OM*>& som)
 {
-  assert (som[where]->C[i] >= 0.0);
-  assert (C[i] >= 0.0);
-  assert (N[i] >= 0.0);
+  daisy_assert (som[where]->C[i] >= 0.0);
+  daisy_assert (C[i] >= 0.0);
+  daisy_assert (N[i] >= 0.0);
 
-  // assert (N_soil * 1.001 >= N_used);
+  // daisy_assert (N_soil * 1.001 >= N_used);
   // How much can we process?
   double rate;
   if (C[i] < 1e-15)
@@ -163,20 +163,20 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
     rate = min (turnover_rate * abiotic_factor, 0.1);
   double N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
 
-  assert (finite (rate));
-  assert (finite (N_need));
+  daisy_assert (finite (rate));
+  daisy_assert (finite (N_need));
   
   if (N_need > N_soil - N_used && N[i] > 0.0)
     {
       rate = (N_soil - N_used) / (C[i] / som[where]->C_per_N[i] - N[i]);
-      assert (finite (rate));
+      daisy_assert (finite (rate));
       set_bound (0.0, rate, 1.0);
       N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
-      assert (finite (N_need));
+      daisy_assert (finite (N_need));
     }
   // Check for NaN.
-  assert (finite (rate));
-  assert (finite (N_need));
+  daisy_assert (finite (rate));
+  daisy_assert (finite (N_need));
   
   if (rate > 0.0)
     {
@@ -187,9 +187,9 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
       C[i] *= (1.0 - rate);
       N[i] *= (1.0 - rate);
     }
-  assert (som[where]->C[i] >= 0.0);
-  assert (C[i] >= 0.0);
-  assert (N[i] >= 0.0);
+  daisy_assert (som[where]->C[i] >= 0.0);
+  daisy_assert (C[i] >= 0.0);
+  daisy_assert (N[i] >= 0.0);
 }
 
 void 
@@ -406,7 +406,7 @@ void
 OrganicMatter::Implementation::add (AM& om)
 { 
   for (unsigned int i = 0; i < am.size (); i++)
-    assert (&om != am[i]);
+    daisy_assert (&om != am[i]);
   am.push_back (&om); 
 }
 
@@ -426,7 +426,7 @@ OrganicMatter::Implementation::monthly (const Geometry& geometry)
   
   for (int i = 0; i < am_size; i++)
     {
-      assert (am[i]);
+      daisy_assert (am[i]);
 
       bool keep;
       
@@ -589,17 +589,17 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   for (unsigned int i = 0; i < size; i++)
     {
-      assert (soil_NH4.M_left (i) >= 0);
+      daisy_assert (soil_NH4.M_left (i) >= 0);
       const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
 	? 0.0 : soil_NH4.M_left (i) * K_NH4;
-      assert (soil_NO3.M_left (i) >= 0);
+      daisy_assert (soil_NO3.M_left (i) >= 0);
       const double NO3 = (soil_NO3.M_left (i) < 1e-9) // 1 mg/l
 	? 0.0 : soil_NO3.M_left (i) * K_NO3;
 
       N_soil[i] = NH4 + NO3;
       N_used[i] = 0.0;
 
-      assert (finite (soil_water.h (i)));
+      daisy_assert (finite (soil_water.h (i)));
 
       abiotic_factor[i] 
 	= heat_turnover_factor (soil_heat.T (i)) 
@@ -638,18 +638,18 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   // Update source.
   for (unsigned int i = 0; i < size; i++)
     {
-      assert (N_used[i] < soil_NH4.M_left (i) + soil_NO3.M_left (i));
+      daisy_assert (N_used[i] < soil_NH4.M_left (i) + soil_NO3.M_left (i));
 
       const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
 	? 0.0 : soil_NH4.M_left (i) * K_NH4;
-      assert (NH4 >= 0.0);
+      daisy_assert (NH4 >= 0.0);
 
       if (N_used[i] > NH4)
 	{
 	  NH4_source[i] = -NH4 / dt;
 	  NO3_source[i] = (NH4 - N_used[i]) / dt;
-	  assert (NH4_source[i] <= 0.0);
-	  assert (NO3_source[i] <= 0.0);
+	  daisy_assert (NH4_source[i] <= 0.0);
+	  daisy_assert (NO3_source[i] <= 0.0);
 	}
       else
 	{
@@ -701,8 +701,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   // We didn't steal it all?
   for (int i = 0; i < soil.size (); i++)
     {
-      assert (soil_NO3.M_left (i) >= 0.0);
-      assert (soil_NH4.M_left (i) >= 0.0);
+      daisy_assert (soil_NO3.M_left (i) >= 0.0);
+      daisy_assert (soil_NH4.M_left (i) >= 0.0);
     }
 }
       
@@ -785,7 +785,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   // Fill SMB C_per_N array with last value.
   for (unsigned int pool = 0; pool < som_size; pool++)
     {
-      assert (smb[pool]->C_per_N.size () > 0);
+      daisy_assert (smb[pool]->C_per_N.size () > 0);
       if (smb[pool]->C_per_N.size () > 1 
 	  && smb[pool]->C_per_N.size () < soil.size ())
 	err.entry ("smb C_per_N partially initialized.\n\
@@ -793,7 +793,7 @@ Filling out array with last value");
       while (smb[pool]->C_per_N.size () < soil.size ())
 	smb[pool]->C_per_N.push_back 
 	  (smb[pool]->C_per_N[smb[pool]->C_per_N.size () - 1]);
-      assert (smb[pool]->C_per_N.size () == soil.size ());
+      daisy_assert (smb[pool]->C_per_N.size () == soil.size ());
     }
 
   // Initialize AM.
@@ -815,8 +815,8 @@ Filling out array with last value");
 	{
 	  double end = layers[i]->number ("end");
 	  double weight = layers[i]->number ("weight"); // kg C/m²
-	  assert (weight > 0);
-	  assert (end < last);
+	  daisy_assert (weight > 0);
+	  daisy_assert (end < last);
 	  if (end < soil_end)
 	    {
 	      err.entry ("\
@@ -932,7 +932,7 @@ Using equilibrium for remaining entries");
 	    }
 	}
       som[0]->C[lay] -= stolen;
-      assert (som[0]->C[lay] >= 0.0);
+      daisy_assert (som[0]->C[lay] >= 0.0);
     }
   buffer.initialize (soil);
   
@@ -1011,7 +1011,7 @@ OrganicMatter::swap (const Geometry& geometry,
 double
 OrganicMatter::CO2 (unsigned int i) const
 {
-  assert (impl.CO2.size () > i);
+  daisy_assert (impl.CO2.size () > i);
   return impl.CO2[i];
 }
 

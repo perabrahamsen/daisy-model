@@ -34,7 +34,7 @@ for a given column.";
 double 
 Bioclimate::CanopyResistance (double LAI)
 { 
-  assert (LAI > 0.0);
+  daisy_assert (LAI > 0.0);
   return (200 / LAI); 
 }
 
@@ -61,7 +61,7 @@ Bioclimate::AerodynamicResistance (double CropHeight, double ScreenHeight,
   if (U == 0.0)
     U = 0.1;
 
-  assert (U > 0.0);
+  daisy_assert (U > 0.0);
 
   double Zom, Zoh;
 
@@ -82,26 +82,26 @@ Bioclimate::RefAerodynamicResistance (double U2)
   if (U2 == 0.0)
     U2 = 0.1;
 
-  assert (U2 > 0.0);
+  daisy_assert (U2 > 0.0);
 
   return (208 / U2); 
 }
 
 double 
 Bioclimate::get_evap_interception () const
-{ assert (false); return 0.0; }
+{ daisy_assert (false); return 0.0; }
 
 double 
 Bioclimate::get_intercepted_water () const
-{ assert (false); return 0.0; }
+{ daisy_assert (false); return 0.0; }
 
 double 
 Bioclimate::get_net_throughfall () const
-{ assert (false); return 0.0; }
+{ daisy_assert (false); return 0.0; }
 
 double 
 Bioclimate::get_snow_storage () const
-{ assert (false); return 0.0; }
+{ daisy_assert (false); return 0.0; }
 
 Bioclimate::Bioclimate (const string& n)
   : name (n)

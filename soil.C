@@ -241,7 +241,7 @@ Soil::initialize (const Groundwater& groundwater, Treelog& msg)
     = impl.layers.begin ();
   const vector<Implementation::Layer*>::const_iterator end 
     = impl.layers.end ();
-  assert (begin != end);
+  daisy_assert (begin != end);
   vector<Implementation::Layer*>::const_iterator layer;
 
   // Initialize geometry.
@@ -250,7 +250,7 @@ Soil::initialize (const Groundwater& groundwater, Treelog& msg)
   for (layer = begin; layer != end; layer++)
     {
       double current = (*layer)->end;
-      assert (current < last);
+      daisy_assert (current < last);
 
       // We always have a layer limit at 1 m.
       if (last > -100.0 && current < -100.0)
@@ -268,7 +268,7 @@ Soil::initialize (const Groundwater& groundwater, Treelog& msg)
       if (zplus (i) < (*layer)->end)
 	{
 	  layer++;
-	  assert (layer != end);
+	  daisy_assert (layer != end);
 	}
       horizon_.push_back (&((*layer)->horizon));
     }

@@ -51,7 +51,7 @@ LogCheckpoint::check(const string&) const
 bool
 LogCheckpoint::match (const Daisy& daisy, Treelog& out)
 {
-  assert (nested == 0);
+  daisy_assert (nested == 0);
   condition.tick (daisy, out);
   is_active = condition.match (daisy);
   if (is_active)
@@ -68,9 +68,9 @@ LogCheckpoint::done ()
   if (is_active)
     {
       // Check stacks.
-      assert (syntax_stack.size () == 1U);
-      assert (alist_stack.size () == 1U);
-      assert (library_stack.size () == 1U);
+      daisy_assert (syntax_stack.size () == 1U);
+      daisy_assert (alist_stack.size () == 1U);
+      daisy_assert (library_stack.size () == 1U);
 
       // Create file name.
       TmpStream scratch;
@@ -82,7 +82,7 @@ LogCheckpoint::done ()
       const string filename (scratch.str ());
 
       // Start checkpoint from next timestep.
-      assert (alist ().check ("time"));
+      daisy_assert (alist ().check ("time"));
       Time time (alist ().time ("time"));
       time.tick_hour ();
       alist ().add ("time", time);
@@ -133,7 +133,7 @@ LogCheckpoint::done ()
       delete &alist ();
       pop ();
     }
-  assert (nested == 0);
+  daisy_assert (nested == 0);
 }
 
 LogCheckpoint::LogCheckpoint (const AttributeList& al)

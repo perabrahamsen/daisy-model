@@ -33,7 +33,7 @@ void
 SoilChemical::uptake (const Soil& soil, 
 		      const SoilWater& soil_water)
 {
-  assert (uptaken.size () == soil.size ());
+  daisy_assert (uptaken.size () == soil.size ());
 
   const double rate = 1.0 - chemical.crop_uptake_reflection_factor ();
   
@@ -49,7 +49,7 @@ SoilChemical::decompose (const Soil& soil,
 			 const SoilHeat& soil_heat,
 			 const OrganicMatter* organic_matter)
 {
-  assert (decomposed.size () == soil.size ());
+  daisy_assert (decomposed.size () == soil.size ());
 
   const double decompose_rate = chemical.decompose_rate ();
 

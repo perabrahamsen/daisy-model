@@ -54,7 +54,7 @@ static double f_T (double T)
   if (T < 40)
     return exp (0.47 - 0.027 * T + 0.00193 * T * T);
 
-  assert (false);
+  daisy_assert (false);
   return -42.42e42;
 }
 

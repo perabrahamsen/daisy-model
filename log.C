@@ -99,7 +99,7 @@ Log::close_geometry ()
 const Geometry*
 Log::geometry ()
 {
-  assert (!impl.geometries.empty ());
+  daisy_assert (!impl.geometries.empty ());
   return impl.geometries.back ();
 }
 

@@ -79,8 +79,8 @@ Bioincorporation::Implementation::am_compare (const AM* a, const AM* b)
       
       const double a_top_N = a->top_N ();
       const double b_top_N = b->top_N ();
-      assert (a_top_N > 0.0);
-      assert (b_top_N > 0.0);
+      daisy_assert (a_top_N > 0.0);
+      daisy_assert (b_top_N > 0.0);
       return a_top_C / a_top_N < b_top_C / b_top_N;
     }
   return false;
@@ -128,9 +128,9 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     
     // Find how much to take from this AOM.
     const double top_N = am[i]->top_N ();
-    assert (top_N > 0.0);
+    daisy_assert (top_N > 0.0);
     const double C_per_N = top_C / top_N;
-    assert (C_per_N >= last_C_per_N);
+    daisy_assert (C_per_N >= last_C_per_N);
     speed = R_total * C_per_N_factor (C_per_N) * top_C / (top_C + k_total);
 
     // Don't take more than the bioincorporation can handle.
@@ -141,8 +141,8 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
       {
 	// Take all.
 	am[i]->multiply_top (0.0);
-	assert (am[i]->top_C () == 0.0);
-	assert (am[i]->top_N () == 0.0);
+	daisy_assert (am[i]->top_C () == 0.0);
+	daisy_assert (am[i]->top_N () == 0.0);
 	C += top_C * (1.0 - respiration);
 	N += top_N;
       }
@@ -153,8 +153,8 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
 	C += speed * dt * (1.0 - respiration);
 	N += top_N * fraction;
 	am[i]->multiply_top (1.0 - fraction);
-	assert (approximate (am[i]->top_C (), top_C - speed * dt));
-	assert (approximate (am[i]->top_N (), top_N * (1.0 - fraction)));
+	daisy_assert (approximate (am[i]->top_C (), top_C - speed * dt));
+	daisy_assert (approximate (am[i]->top_N (), top_N * (1.0 - fraction)));
       }
 
     // No more available bioincorporation.
@@ -167,7 +167,7 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
   }
 
   // Add bioincorporation to soil.
-  assert (aom);
+  daisy_assert (aom);
   aom->add (geometry, C, N, density);
   
   // Update CO2.
@@ -201,7 +201,7 @@ Bioincorporation::Implementation::initialize (const Soil& soil)
     {
       const double next = soil.zplus (i);
       const double dz = last - next;
-      assert (approximate (dz, soil.dz (i)));
+      daisy_assert (approximate (dz, soil.dz (i)));
       const double total = distribution.integrate (next, last);
       density.push_back (total / dz);
       last = next;

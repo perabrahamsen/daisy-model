@@ -21,9 +21,9 @@
 
 
 #include "plf.h"
+#include "assertion.h"
 #include <vector>
 #include <list>
-#include <assert.h>
 #include <stdexcept>
 
 struct PLF::Implementation
@@ -56,8 +56,8 @@ struct PLF::Implementation
 double 
 PLF::Implementation::operator () (const double pos) const
 {
-  assert (x.size () > 0);
-  assert (x.size () == y.size ());
+  daisy_assert (x.size () > 0);
+  daisy_assert (x.size () == y.size ());
 
   int min = 0;
   int max = x.size () - 1;
@@ -81,7 +81,7 @@ PLF::Implementation::operator () (const double pos) const
 	max = guess;
       else 
 	return y[guess];
-      assert (max > min);
+      daisy_assert (max > min);
     }
 }
 
@@ -96,7 +96,7 @@ PLF::Implementation::inverse () const
   double last = y[0] - 1.0;
   for (int i = 0; i < size; i++)
     {
-      assert (last <= y[i]);
+      daisy_assert (last <= y[i]);
       plf.add (y[i], x[i]);
       last = y[i];
     }
@@ -167,7 +167,7 @@ PLF::Implementation::max_at () const
 double
 PLF::Implementation::integrate (const double from, const double to) const
 {
-  assert (from <= to);
+  daisy_assert (from <= to);
   const int size = x.size ();
 
   // First point.
@@ -186,7 +186,7 @@ PLF::Implementation::integrate (const double from, const double to) const
       last_x = x[i];
       last_y = y[i];
     }
-  assert (last_x <= to);
+  daisy_assert (last_x <= to);
   
   // Last point.
   total += (to - last_x) * (operator ()(to) + last_y) / 2.0;
@@ -228,7 +228,7 @@ PLF::Implementation::integrate_stupidly () const
       else
 	{
 	  // The PLF is discontinues at this point.
-	  assert (x[i] == last_x);
+	  daisy_assert (x[i] == last_x);
 	}
       last_x = x[i];
       last_y = y[i];
@@ -282,7 +282,7 @@ PLF::offset (double offset)	// Add 'offset' to all y values.
 double 
 PLF::find (const vector<double>& x, const vector<double>& y, double value)
 {
-  assert (x.size () == y.size ());
+  daisy_assert (x.size () == y.size ());
 
   for (unsigned int i = 0; i < x.size(); i++)
     {
@@ -320,7 +320,7 @@ void
 PLF::add (double x, double y)
 {
   const int size = impl.x.size ();
-  assert (size == 0 || x >= impl.x[size - 1]);
+  daisy_assert (size == 0 || x >= impl.x[size - 1]);
   impl.x.push_back (x);
   impl.y.push_back (y);
 }

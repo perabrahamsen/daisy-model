@@ -250,8 +250,8 @@ bool
 Select::Implementation::match (const Daisy& daisy, Treelog& out,
 			       bool is_printing)
 {
-  assert (current_path_index == 0U);
-  assert (last_valid_path_index == 0U);
+  daisy_assert (current_path_index == 0U);
+  daisy_assert (last_valid_path_index == 0U);
 
   if (condition)
     {

@@ -54,8 +54,8 @@ EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
 			   const double has_A, const double has_B, 
 			   double& want_A, double& want_B) const
 {
-  assert (has_A >= 0.0);
-  assert (has_B >= 0.0);
+  daisy_assert (has_A >= 0.0);
+  daisy_assert (has_B >= 0.0);
   const double M = has_A + has_B;
 
   // We need to solve the following equation w.r.t. B
@@ -72,8 +72,8 @@ EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
   //
   // So we get a square equation.  We use the positive solution.
 
-  assert (K.size () > i);
-  assert (my_max.size () > i);
+  daisy_assert (K.size () > i);
+  daisy_assert (my_max.size () > i);
 
   const double a = 1.0;
   const double b = my_max[i] + K[i] - M;
@@ -81,7 +81,7 @@ EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
 
   want_B = single_positive_root_of_square_equation (a, b, c);
   want_A = M - want_B;
-  assert (want_A >= 0.0);
+  daisy_assert (want_A >= 0.0);
 }
 
 bool
@@ -110,7 +110,7 @@ EquilibriumLangmuir::initialize (const Soil& soil)
     K.insert (K.end (), soil.size () - K.size (), K.back ());
   else
     {
-      assert (pedo_K);
+      daisy_assert (pedo_K);
       pedo_K->initialize (soil);
       pedo_K->set (soil, K);
     }
@@ -120,7 +120,7 @@ EquilibriumLangmuir::initialize (const Soil& soil)
 		   soil.size () - my_max.size (), my_max.back ());
   else
     {
-      assert (pedo_my_max);
+      daisy_assert (pedo_my_max);
       pedo_my_max->initialize (soil);
       pedo_my_max->set (soil, my_max);
     }

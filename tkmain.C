@@ -103,7 +103,7 @@ TkDaisyEntry::type () const
 {
   if (syntax)
     {
-      assert (!library);
+      daisy_assert (!library);
       return syntax->lookup (name);
     }
   else if (library && library->check (name))
@@ -129,19 +129,19 @@ TkDaisyEntry::list (vector<string>& list) const
     case Syntax::AList:
       if (library)
 	{
-	  assert (!syntax);
+	  daisy_assert (!syntax);
 	  library->syntax (name).entries (list);
 	}
       else
 	{
-	  assert (syntax);
+	  daisy_assert (syntax);
 	  syntax->syntax (name).entries (list);
 	}
       break;
     case Syntax::Library:
     case Syntax::Object:
-      assert (!library);
-      assert (syntax);
+      daisy_assert (!library);
+      daisy_assert (syntax);
       syntax->library (name).entries (list);
       break;
     default:
@@ -187,13 +187,13 @@ TkDaisyEntry::step (const string& element)
       // Directly nested objects.  Just do it.
       if (library)
 	{
-	  assert (!syntax);
+	  daisy_assert (!syntax);
 	  syntax = &library->syntax (name);
 	  library = NULL;
 	}
       else
 	{
-	  assert (syntax);
+	  daisy_assert (syntax);
 	  step_alist ();
 	  syntax = &syntax->syntax (name);
 	}
@@ -202,7 +202,7 @@ TkDaisyEntry::step (const string& element)
       // Reference to an object in a library.
       if (library)
 	{
-	  assert (!syntax);
+	  daisy_assert (!syntax);
 	  // Second step.  Lookup the object in the library.
 	  if (library->check (name))
 	    {
@@ -219,7 +219,7 @@ TkDaisyEntry::step (const string& element)
 	}
       else
 	{
-	  assert (!library);
+	  daisy_assert (!library);
 	  // First step.  Get the library.
 	  step_alist ();
 	  library = &syntax->library (name);
@@ -240,7 +240,7 @@ TkDaisyEntry::step (const string& element)
     }
   name = element;
   // Only syntax of library should be defined.  Never both.
-  assert (!library || !syntax);
+  daisy_assert (!library || !syntax);
 }
 
 void

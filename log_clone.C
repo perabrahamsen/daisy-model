@@ -30,7 +30,7 @@
 
 bool
 LogClone::match (const Daisy&, Treelog&)
-{ assert (false); return false; }
+{ daisy_assert (false); return false; }
 
 #ifdef BORLAND_PRAGMA
 #pragma warn +rvl
@@ -38,10 +38,10 @@ LogClone::match (const Daisy&, Treelog&)
 
 bool 
 LogClone::check (const string &) const
-{ assert (false); return false; }
+{ daisy_assert (false); return false; }
 void
 LogClone::done ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 const AttributeList& 
 LogClone::result ()
@@ -57,12 +57,12 @@ LogClone::LogClone (const string& name,
 LogClone::~LogClone ()
 {
   // Check stacks.
-  assert (syntax_stack.size () == 1U);
-  assert (alist_stack.size () == 1U);
-  assert (library_stack.size () == 1U);
+  daisy_assert (syntax_stack.size () == 1U);
+  daisy_assert (alist_stack.size () == 1U);
+  daisy_assert (library_stack.size () == 1U);
   
   // Cleanup.
   delete &alist ();
   pop ();
-  assert (nested == 0);
+  daisy_assert (nested == 0);
 }

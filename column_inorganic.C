@@ -101,34 +101,34 @@ ColumnInorganic::second_year_utilization () const
 
 void 
 ColumnInorganic::put_no3_m (const vector<double>&) // [g/cm^3]
-{ assert (false); }
+{ daisy_assert (false); }
 
 void 
 ColumnInorganic::get_no3_m (vector<double>&) const // [g/cm^3]
-{ assert (false); }
+{ daisy_assert (false); }
 
 void 
 ColumnInorganic::put_surface_no3 (double) // [g/cm^2]
-{ assert (false); }
+{ daisy_assert (false); }
 
 double 
 ColumnInorganic::get_surface_no3 () const // [g/cm^2]
 {
-  assert (false); 
+  daisy_assert (false); 
   return -42.42e42;
 }
 
 double 
 ColumnInorganic::get_smb_c_at (unsigned int) const //[g C/cm³]
 {
-  assert (false); 
+  daisy_assert (false); 
   return -42.42e42;
 }
 
 double 
 ColumnInorganic::get_co2_production_at (unsigned int) const // [g C/cm³]
 {
-  assert (false); 
+  daisy_assert (false); 
   return -42.42e42;
 }
 
@@ -165,7 +165,7 @@ ColumnInorganic::tick (Treelog& out,
 bool 
 ColumnInorganic::check_am (const AttributeList&, Treelog&) const 
 {
-  assert (false); 
+  daisy_assert (false); 
   return false;
 }
 

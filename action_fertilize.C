@@ -191,7 +191,7 @@ ActionFertilize::ActionFertilize (const AttributeList& al)
 	       ? new Precision (al.alist ("precision"))
 	       : NULL)
 { 
-  assert (am.check ("syntax")); 
+  daisy_assert (am.check ("syntax")); 
   if (al.check ("equivalent_weight"))
     AM::set_utilized_weight (am, al.number ("equivalent_weight"));
 }

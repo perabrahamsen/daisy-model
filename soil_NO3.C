@@ -33,8 +33,8 @@ SoilNO3::diffusion_coefficient () const
 void 
 SoilNO3::default_initialize (const Soil& soil, const SoilWater&)
 {
-  assert (C_.size () == 0);
-  assert (M_.size () == 0);
+  daisy_assert (C_.size () == 0);
+  daisy_assert (M_.size () == 0);
   // We initialize to approximatey half the allowed content in
   // drinking water [ 0.5 * 100 mg NO3/l ~= 5.0e-6 g NO3-N/cm^3 ]
   C_.insert (C_.begin (), soil.size (), 5.0e-6); 

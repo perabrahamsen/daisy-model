@@ -132,7 +132,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
       for (unsigned int i = 1; ; i++)
 	{
 	  // We already know the answer must lie between two points.
-	  assert (i < z.size ());
+	  daisy_assert (i < z.size ());
 	  // New point in the PLF.
 	  const double x1 = z.x (i);
 	  const double z1 = z.y (i);
@@ -214,11 +214,11 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 	      z_pond = z (x_pond);
 
 	      // Check that we got the right result.
-	      assert (x_pond > 0.0);
-	      assert (x_pond < 1.0);
+	      daisy_assert (x_pond > 0.0);
+	      daisy_assert (x_pond < 1.0);
 	      const double total = x_pond * z_pond;
 	      const double this_step = 0.5 * (x_pond - x0) * (z0 + z_pond);
-	      assert (approximate (total - (integral + this_step), 
+	      daisy_assert (approximate (total - (integral + this_step), 
 				   external_ponding));
 	      break;
 	    }
@@ -245,7 +245,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
       // Find maximal infiltration.
       const double Theta_sat = soil.Theta (0, 0.0, 0.0);
       const double available_space = (Theta_sat - Theta) * dz;
-      assert (available_space > 0.0);
+      daisy_assert (available_space > 0.0);
       const double I_max = min (external_ponding, 
 				available_space - 1.0e-8) / dt;
 
@@ -276,7 +276,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
       if (z_pond > z_switch + 1e-5)
 	{
 	  const double wall_width = x_pond - x_switch;
-	  assert (wall_width > 0.0);
+	  daisy_assert (wall_width > 0.0);
 	  const double dz_wall
 	    = z.integrate (x_switch, x_pond) / wall_width + dz;
 #if 0 
@@ -299,7 +299,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
     }
   // Total infiltration.
   I = I_bottom + I_wall;
-  assert (I < external_ponding + 1.0e-8);
+  daisy_assert (I < external_ponding + 1.0e-8);
 
 #if 0
   cerr << "switch = (" << x_switch << ", " << z_switch << "), pond = ("
@@ -315,7 +315,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
     Theta += soil_water.Theta (i) * soil.dz (i);
   Theta /= dz;
   Theta_pre = Theta;
-  assert (Theta < soil.Theta (0, 0.0, 0.0));
+  daisy_assert (Theta < soil.Theta (0, 0.0, 0.0));
   h = soil.h (0, Theta);
 }
 
@@ -342,7 +342,7 @@ Ridge::Implementation::update_water (const Soil& soil,
     Theta += (Theta_[i] - S_[i] * dt) * soil.dz (i);
   Theta /= dz;
   const double Theta_sat = soil.Theta (0, 0.0, 0.0);
-  assert (Theta < Theta_sat);
+  daisy_assert (Theta < Theta_sat);
   h = soil.h (0, Theta);
 
   q[0] = -I;
@@ -354,11 +354,11 @@ Ridge::Implementation::update_water (const Soil& soil,
       h_[i] = h;
       if (!approximate (soil.h (i, Theta), h))
 	{
-	  assert (i > 0);
+	  daisy_assert (i > 0);
 	  throw ("Soil hydraulic paramteres change in ridge area");
 	}
     }
-  assert (approximate (E, -(q[last_node + 1] + q_p[last_node + 1])));
+  daisy_assert (approximate (E, -(q[last_node + 1] + q_p[last_node + 1])));
 }
 
 void 
@@ -404,7 +404,7 @@ Ridge::Implementation::initialize (const Soil& soil, const SoilWater& soil_water
 {
   // Find values depending on soil numerics.
   last_node = soil.interval_plus (lowest);
-  assert (last_node+1 < soil.size ());
+  daisy_assert (last_node+1 < soil.size ());
   dz = 0 - soil.zplus (last_node);
   K_sat_below = soil.K (last_node+1, 0.0, 0.0, 20.0);
 
@@ -414,7 +414,7 @@ Ridge::Implementation::initialize (const Soil& soil, const SoilWater& soil_water
     Theta += soil_water.Theta (i) * soil.dz (i);
   Theta /= dz;
   Theta_pre = Theta;
-  assert (Theta < soil.Theta (0, 0.0, 0.0));
+  daisy_assert (Theta < soil.Theta (0, 0.0, 0.0));
   h = soil.h (0, Theta);
   K = soil.K (0, 0.0, 0.0, 20.0);
 }
@@ -460,7 +460,7 @@ PLF
 Ridge::Implementation::normalize (PLF plf)
 {
   plf.offset (-plf.integrate (0.0, 1.0));
-  assert (fabs (plf.integrate (0.0, 1.0)) < 1e-10);
+  daisy_assert (fabs (plf.integrate (0.0, 1.0)) < 1e-10);
   return plf;
 }
 

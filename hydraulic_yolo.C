@@ -99,7 +99,7 @@ HydraulicYolo::HydraulicYolo (const AttributeList& al)
     M_intervals (al.integer ("M_intervals"))
 { 
   // This is not to be changed.
-  assert (Theta_sat > 0.4949 && Theta_sat < 0.4951);
+  daisy_assert (Theta_sat > 0.4949 && Theta_sat < 0.4951);
 }
 
 HydraulicYolo::~HydraulicYolo ()

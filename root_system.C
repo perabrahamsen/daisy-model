@@ -51,8 +51,8 @@ RootSystem::potential_water_uptake (const double h_x,
 	  continue;
 	}
       const double h = h_x - (1 + Rxylem) * soil.z (i);
-      assert (soil_water.Theta_left (i) >= 0.0);
-      assert (soil_water.Theta (soil, i, h_wp) >= soil.Theta_res (i));
+      daisy_assert (soil_water.Theta_left (i) >= 0.0);
+      daisy_assert (soil_water.Theta (soil, i, h_wp) >= soil.Theta_res (i));
       const double max_uptake
 	= max (0.0, (soil_water.Theta_left (i) 
 		     - soil_water.Theta (soil, i, h_wp)) / dt);
@@ -64,16 +64,16 @@ RootSystem::potential_water_uptake (const double h_x,
 		    * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
 		  / (- 0.5 * log (area * L[i]))),
 		 max_uptake);
-      assert (soil_water.h (i) > h_wp || uptake == 0.0);
-      assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
-      assert (L[i] >= 0.0);
-      assert (soil_water.Theta (soil, i, h) > 0.0);
-      assert (soil_water.Theta (soil, i, 0.0) > 0.0);
-      assert (soil.M (i, soil_water.h (i)) >= 0.0);
-      assert (soil.M (i, h) >= 0.0);
-      assert (area * L[i] > 0.0);
-      assert ((- 0.5 * log (area * L[i])) != 0.0);
-      assert (uptake >= 0.0);
+      daisy_assert (soil_water.h (i) > h_wp || uptake == 0.0);
+      daisy_assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
+      daisy_assert (L[i] >= 0.0);
+      daisy_assert (soil_water.Theta (soil, i, h) > 0.0);
+      daisy_assert (soil_water.Theta (soil, i, 0.0) > 0.0);
+      daisy_assert (soil.M (i, soil_water.h (i)) >= 0.0);
+      daisy_assert (soil.M (i, h) >= 0.0);
+      daisy_assert (area * L[i] > 0.0);
+      daisy_assert ((- 0.5 * log (area * L[i])) != 0.0);
+      daisy_assert (uptake >= 0.0);
       S[i] = uptake;
       total += uptake * soil.dz (i) * 10; // mm/cm.
     }
@@ -88,7 +88,7 @@ RootSystem::water_uptake (double Ept_,
 			  const double day_fraction,
 			  Treelog& msg)
 {
-  assert (EvapInterception >= 0);
+  daisy_assert (EvapInterception >= 0);
   if (Ept_ < 0)
     {
       Treelog::Open nest (msg, "RootSystem water uptake");
@@ -131,10 +131,10 @@ RootSystem::water_uptake (double Ept_,
     h_x = h_wp;
 
   step = min_step;
-  assert (h_x < 0.001);
+  daisy_assert (h_x < 0.001);
   while (total > Ept && h_x < 0.0)
     {
-      assert (h_x < 0.001);
+      daisy_assert (h_x < 0.001);
       const double h_next = min (h_x + step, 0.0);
       const double next = potential_water_uptake (h_next, soil, soil_water);
 
@@ -143,7 +143,7 @@ RootSystem::water_uptake (double Ept_,
 	if (step <= min_step)
 	  {
 	    // We can't get any closer.
-	    assert (next <= total);
+	    daisy_assert (next <= total);
 	    if (next >= Ept)
 	      {
 		// total = next;
@@ -167,13 +167,13 @@ RootSystem::water_uptake (double Ept_,
 
   // We need this to make sure H2OExtraction corresponds to 'h_x'.
   const double total2 = potential_water_uptake (h_x, soil, soil_water);
-  assert (total == total2);
-  assert (h_x >= h_wp);
+  daisy_assert (total == total2);
+  daisy_assert (h_x >= h_wp);
 
   if (total > Ept)
     {
-      assert (h_x < 0.001);
-      assert (total > 0);
+      daisy_assert (h_x < 0.001);
+      daisy_assert (total > 0);
       const double factor = Ept / total;
       for (unsigned int i = 0; i < soil.size (); i++)
 	H2OExtraction[i] *= factor;
@@ -207,7 +207,7 @@ RootSystem::solute_uptake (const Soil& soil,
       return 0.0;
     }
 
-  assert (PotNUpt > 0.0);
+  daisy_assert (PotNUpt > 0.0);
   PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
   const int size = soil.size ();
   vector<double> I_zero (size, 0.0);
@@ -252,8 +252,8 @@ RootSystem::solute_uptake (const Soil& soil,
 		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
 		   - (pow (beta, 2.0 - alpha) - 1.0));
 	    }
-	  assert (finite (I_zero[i]));
-	  assert (finite (B_zero[i]));
+	  daisy_assert (finite (I_zero[i]));
+	  daisy_assert (finite (B_zero[i]));
 	  B += L * soil.dz (i) * B_zero[i];
 	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
 	}
@@ -271,7 +271,7 @@ RootSystem::solute_uptake (const Soil& soil,
 			   max (solute.M_left (i) - 1e-8, 0.0));
       else
 	uptake[i] = 0.0;
-      assert (uptake[i] >= 0.0);
+      daisy_assert (uptake[i] >= 0.0);
     }
   solute.add_to_sink (uptake);
 
@@ -291,8 +291,8 @@ RootSystem::nitrogen_uptake (const Soil& soil,
   NO3Upt = solute_uptake (soil, soil_water, soil_NO3, 
 			  PotNUpt - NH4Upt, NO3Extraction, MxNO3Up);
 
-  assert (NH4Upt >= 0.0);
-  assert (NO3Upt >= 0.0);
+  daisy_assert (NH4Upt >= 0.0);
+  daisy_assert (NO3Upt >= 0.0);
 
   return NH4Upt + NO3Upt;
 }

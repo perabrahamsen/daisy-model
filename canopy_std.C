@@ -36,11 +36,11 @@ CanopyStandard::CropHeight (double WStem, double DS) const
 double
 CanopyStandard::DS_at_height (double height) const
 { 
-  assert (height >= 0.0);
+  daisy_assert (height >= 0.0);
   const PLF DSvsH (HvsDS.inverse_safe ());
   const double DS = DSvsH (height);
-  assert (DS >= 0.0);
-  assert (DS <= 2.0);
+  daisy_assert (DS >= 0.0);
+  daisy_assert (DS <= 2.0);
   return DS;
 }
 
@@ -110,7 +110,7 @@ CanopyStandard::CanopyStructure (double DS)
   double z2;			// Max height of the MaxLAD area [0 - 1].
   double Area;		        // Area spanned by z0, z1, and z2.
 
-  assert (DS > 0.0);
+  daisy_assert (DS > 0.0);
   if (DS <= 1)
     {
       // LAIDist0 is the leaf density at DS = 0, and LAIDist 1
@@ -122,13 +122,13 @@ CanopyStandard::CanopyStructure (double DS)
       z1 = LAIDist0[1] + (LAIDist1[1] - LAIDist0[1]) * DS;
       z2 = LAIDist0[2] + (LAIDist1[2] - LAIDist0[2]) * DS;
       Area = (1.0 + z2 - z1 - z0) / 2.0;
-      assert (Area > 0.0);
-      assert (Height > 0.0);
+      daisy_assert (Area > 0.0);
+      daisy_assert (Height > 0.0);
       LADm = CAI / (Area * Height);
     }
   else
     {
-      assert (DS <= 2);
+      daisy_assert (DS <= 2);
 
       z0 = LAIDist1[0];
       z1 = LAIDist1[1];
@@ -152,7 +152,7 @@ CanopyStandard::CanopyStructure (double DS)
 	  if (approximate (Area, Need))
 	    Need = Area;
 
-	  assert (Need <= Area);
+	  daisy_assert (Need <= Area);
 
 	  if (Area - Need > z2 - z1)
 	    // We have to move z1 beyond z2.
@@ -177,9 +177,9 @@ CanopyStandard::CanopyStructure (double DS)
 	      double y1 = sqrt (2.0 * Need / (z1 - z2 - z0 + 1.0));
 
 	      // Check the results.
-	      assert (approximate (Need, (1.0 - x0) * y1 / 2.0));
-	      assert (approximate ((1.0 - x1) / y1, (1.0 - z2)));
-	      assert (approximate ((x1 - x0) / y1, (z1 - z0)));
+	      daisy_assert (approximate (Need, (1.0 - x0) * y1 / 2.0));
+	      daisy_assert (approximate ((1.0 - x1) / y1, (1.0 - z2)));
+	      daisy_assert (approximate ((x1 - x0) / y1, (z1 - z0)));
 
 	      // Insert this special distribution, and return.
 	      PLF LADvsH;

@@ -97,7 +97,7 @@ static double f_T (double T)
   if (T < 40)
     return exp (0.47 - 0.027 * T + 0.00193 * T * T);
 #endif
-  assert (false);
+  daisy_assert (false);
   return -42.42e42;
 }
 
@@ -132,8 +132,8 @@ NitrificationSolute::tick (const Soil& soil, const SoilWater& soil_water,
 	? f_h (h)
 	: water_factor (h);
       const double rate = k_10 * w_factor * T_factor * C / (k + C);
-      assert (rate >= 0.0);
-      assert (soil_NH4.M_left (i) >= 0.0);
+      daisy_assert (rate >= 0.0);
+      daisy_assert (soil_NH4.M_left (i) >= 0.0);
       const double M_new = min (rate, soil_NH4.M_left (i) / dt - 1e-8);
       if (M_new >= 0.0)
 	converted.push_back (M_new);

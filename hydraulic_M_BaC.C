@@ -100,7 +100,7 @@ HydraulicM_BaC::Se (double h) const
   else
     result = 1;
   
-  assert (result > 0.0);
+  daisy_assert (result > 0.0);
   return result;
 }
 

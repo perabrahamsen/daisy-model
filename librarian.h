@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "treelog.h"
+#include "assertion.h"
 #include <map>
 
 class Log;
@@ -57,10 +58,10 @@ private:
 public:
   static T& create (const AttributeList& al)
   {
-    assert (al.check ("type"));
+    daisy_assert (al.check ("type"));
     const string name = al.name ("type");
-    assert (library ().check (name));
-    assert (library ().syntax (name).check (al, Treelog::null ()));
+    daisy_assert (library ().check (name));
+    daisy_assert (library ().syntax (name).check (al, Treelog::null ()));
     return (content->constructors)[name] (al);
   }
   static void add_type (const string& name, AttributeList& al,
@@ -78,7 +79,7 @@ public:
   }
   static Library& library ()
   {
-    assert (content);
+    daisy_assert (content);
     return content->lib;
   }
 
@@ -93,7 +94,7 @@ public:
   }
   ~Librarian ()
   { 
-    assert (content);
+    daisy_assert (content);
     content->count--;
     if (content->count == 0)
       {
@@ -101,7 +102,7 @@ public:
 	content = 0;
       }
     else
-      assert (content->count > 0);
+      daisy_assert (content->count > 0);
   }
 };
 

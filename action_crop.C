@@ -435,7 +435,7 @@ ActionCrop::Perennial::done (const Daisy& daisy) const
   if (year_of_last_harvest < 0)
     return false;
 
-  assert (daisy.time.year () <= year_of_last_harvest);
+  daisy_assert (daisy.time.year () <= year_of_last_harvest);
   return daisy.time.year () == year_of_last_harvest && end.match (daisy.time);
 }
 
@@ -761,7 +761,7 @@ ActionCrop::doIt (Daisy& daisy, Treelog& out)
   if (harvest_annual && harvest_perennial)
     {
       // We have both annual and perennial crops.
-      assert (secondary);
+      daisy_assert (secondary);
       if (harvest_annual->done)
 	{
 	  // If annual done, do perennial.
@@ -786,7 +786,7 @@ ActionCrop::doIt (Daisy& daisy, Treelog& out)
   else
     { 
       // We have only perennial crops.
-      assert (harvest_perennial);
+      daisy_assert (harvest_perennial);
       if (secondary)
 	{
 	  // If we have two, let them both control.

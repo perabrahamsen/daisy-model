@@ -71,7 +71,7 @@ GroundwaterFile::accept_bottom (double)
 void
 GroundwaterFile::tick (const Time& time, Treelog&)
 {
-  assert (lex);
+  daisy_assert (lex);
   while (next_time < time)
     {
       if (!lex->good ())
@@ -117,8 +117,8 @@ GroundwaterFile::tick (const Time& time, Treelog&)
       next_time = Time (year, month, day, 23);
     }
   // We should be somewhere in the interval.
-  assert (previous_time < time || time == previous_time);
-  assert (time < next_time  || time == next_time);
+  daisy_assert (previous_time < time || time == previous_time);
+  daisy_assert (time < next_time  || time == next_time);
 
   // Interpolate depth values.
   const double total_interval = Time::days_between (previous_time, next_time);
@@ -137,7 +137,7 @@ GroundwaterFile::table () const
 void
 GroundwaterFile::initialize (const Time& time, const Soil&, Treelog& err)
 {
-  assert (lex == NULL);
+  daisy_assert (lex == NULL);
   lex = new LexerData (file_name, err);
   tick (time, err); 
 }

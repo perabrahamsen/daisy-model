@@ -28,20 +28,17 @@
 
 // Portability code.
 
-#include <assert.h>
-#include <string>
-
 #if (defined (__GNUC__) && __GNUC__ < 3) \
 	|| (defined (__BORLANDC__) && __BORLANDC__ < 0x0550)
 #define BROKEN_HEADERS
 #endif
 
 #ifdef __sun__
-#define pow(x, y) (assert (x >= 0), (pow)(x, y))
-#define sqrt(x) (assert (x >= 0), (sqrt)(x))
-#define log(x) (assert (x > 0), (log)(x))
-#define acos(x) (assert (x >= -1 && x <= 1), (acos(x)))
-#define asin(x) (assert (x >= -1 && x <= 1), (asin(x)))
+#define pow(x, y) (daisy_assert (x >= 0), (pow)(x, y))
+#define sqrt(x) (daisy_assert (x >= 0), (sqrt)(x))
+#define log(x) (daisy_assert (x > 0), (log)(x))
+#define acos(x) (daisy_assert (x >= -1 && x <= 1), (acos(x)))
+#define asin(x) (daisy_assert (x >= -1 && x <= 1), (asin(x)))
 #endif
 
 #define WORKING_EXCEPTIONS
@@ -111,7 +108,6 @@
 #define BORLAND_TEMPLATES
 #define BORLAND_EOF
 #define BORLAND_PRAGMA
-#define BORLAND_ASSERT
 
 // #define BORLAND_PERMISSIONS
 

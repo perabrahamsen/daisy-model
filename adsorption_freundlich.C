@@ -81,7 +81,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
   int count = 0;
   while (!approximate (min_M, max_M))
     {
-      assert (count++ < 100);	// 100 iterations should be enough.
+      daisy_assert (count++ < 100);	// 100 iterations should be enough.
       
       const double new_C = (min_C + max_C) / 2.0;
       const double new_M = C_to_M (soil, Theta, i, new_C);

@@ -658,8 +658,8 @@ daisy_daisy_count_columns (const Daisy* daisy)
 extern "C" Column* EXPORT
 daisy_daisy_get_column (Daisy* daisy, int col)
 { 
-  assert (daisy);
-  assert (col >= 0 && col < daisy->field.size ()); 
+  daisy_assert (daisy);
+  daisy_assert (col >= 0 && col < daisy->field.size ()); 
   return daisy->field.find (col); 
 }
 
@@ -750,7 +750,7 @@ daisy_column_get_dz (const Column* column, int lay)
 extern "C" void EXPORT		// [cm]
 daisy_column_put_water_pressure (Column* column, const double h[])
 { 
-  assert (h);
+  daisy_assert (h);
 
   // Convert to vector.
   vector<double> v;
@@ -768,7 +768,7 @@ daisy_column_get_water_sink (const Column* column, double sink[])
   vector<double> v;
   column->get_water_sink (v); 
   unsigned int size = column->count_layers ();
-  assert (v.size () <= size);
+  daisy_assert (v.size () <= size);
 
   // Store v in sink..
   unsigned int i = 0;
@@ -806,7 +806,7 @@ daisy_column_get_no3_m (Column* column, double M[])
   vector<double> v;
   column->get_no3_m (v); 
   unsigned int size = column->count_layers ();
-  assert (v.size () <= size);
+  daisy_assert (v.size () <= size);
 
   // Store NO3 in M.
   unsigned int i = 0;

@@ -127,7 +127,7 @@ Document::print_model (ostream& out, const string& name,
 
       if (alist.check ("description"))
 	{
-	  assert (library.check (type));
+	  daisy_assert (library.check (type));
 	  const AttributeList& super = library.lookup (type);
 	  const string description = alist.name ("description");
 	  
@@ -178,9 +178,9 @@ class ModelCompare
   const string find_next_in_line (const string& root, const string& leaf) const
   {
     // Find the child of root that leaf is descended from.
-    assert (root != leaf);
+    daisy_assert (root != leaf);
     const AttributeList& al = library.lookup (leaf);
-    assert (al.check ("type"));
+    daisy_assert (al.check ("type"));
     const string type = al.name ("type");
     if (type == root)
       return leaf;

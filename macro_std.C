@@ -82,13 +82,13 @@ MacroStandard::tick (const Soil& soil,
 		     Treelog& msg)
 { 
   // Check input.
-  assert (last > first);
-  assert (last < soil.size ()); 
-  assert (h.size () == soil.size ());
-  assert (Theta.size () == soil.size ());
-  assert (S_m.size () == soil.size ());
-  assert (S_p.size () == soil.size ());
-  assert (q_p.size () == soil.size () + 1U);
+  daisy_assert (last > first);
+  daisy_assert (last < soil.size ()); 
+  daisy_assert (h.size () == soil.size ());
+  daisy_assert (Theta.size () == soil.size ());
+  daisy_assert (S_m.size () == soil.size ());
+  daisy_assert (S_p.size () == soil.size ());
+  daisy_assert (q_p.size () == soil.size () + 1U);
 
   // Check for macropores outside our soil.
   if (height_start < soil.z (last))
@@ -111,12 +111,12 @@ MacroStandard::tick (const Soil& soil,
       if (-surface.q () * 10.0 * dt > pond_max)
 	{
 	  q_top = surface.q () + pond_max / 10.0 / dt;
-	  assert (q_top < 0.0);
-	  assert (q_p[0] == 0.0);
-	  assert (from == 0);
+	  daisy_assert (q_top < 0.0);
+	  daisy_assert (q_p[0] == 0.0);
+	  daisy_assert (from == 0);
 	  q_p[0] = q_top;
 	  const bool accepted = surface.accept_top (msg, q_p[0]);
-	  assert (accepted);
+	  daisy_assert (accepted);
 	}
     }
 
@@ -147,9 +147,9 @@ MacroStandard::tick (const Soil& soil,
 	    = distribution (soil.zplus (i)) - distribution (previous_end);
 	  const double rest
 	    = distribution (last_end) - distribution (previous_end);
-	  assert (rest > 0.0);
-	  assert (this_layer >= 0.0);
-	  assert (rest >= this_layer);
+	  daisy_assert (rest > 0.0);
+	  daisy_assert (this_layer >= 0.0);
+	  daisy_assert (rest >= this_layer);
 	  const double fraction = this_layer / rest;
 
 	  // Sutract it from the flow.
@@ -199,14 +199,14 @@ MacroStandard::tick (const Soil& soil,
 	{
 	  // Find the extra water in this layer.
 	  const double delta_water = Theta_new - Theta_sat;
-	  assert (delta_water > 0.0);
+	  daisy_assert (delta_water > 0.0);
 
 	  // Add extra water to sink (thus removing it from the soil).
 	  S_p[i] += delta_water / dt;
 	  extra_water += delta_water * dz;
 
 	  // Check that we got it right.
-	  assert (approximate (Theta[i] - (S_m[i] + S_p[i]) * dt, Theta_sat));
+	  daisy_assert (approximate (Theta[i] - (S_m[i] + S_p[i]) * dt, Theta_sat));
 	}
       else if (extra_water > 0.0)
 	// Try to get rid of the extra water.
@@ -222,7 +222,7 @@ MacroStandard::tick (const Soil& soil,
 	      extra_water = 0.0;
 	      
 	      // Check that we got it right.
-	      assert (Theta[i] - (S_m[i] + S_p[i]) * dt <= Theta_sat);
+	      daisy_assert (Theta[i] - (S_m[i] + S_p[i]) * dt <= Theta_sat);
 	    }
 	  else
 	    // Otherwise, fill it up.
@@ -232,7 +232,7 @@ MacroStandard::tick (const Soil& soil,
 	      extra_water -= delta_water * dz;
 
 	      // Check that we got it right.
-	      assert (approximate (Theta[i] - (S_m[i] + S_p[i]) * dt,
+	      daisy_assert (approximate (Theta[i] - (S_m[i] + S_p[i]) * dt,
 				   Theta_sat));
 	    }
 	}

@@ -48,7 +48,7 @@ Photosynthesis::operator () (const Bioclimate& bioclimate,
   // Temperature effect and development stage effect
   const double Teff = TempEff (Ta) * DSEff (DS);
 
-  // One crop: assert (approximate (canopy.CAI, bioclimate.CAI ()));
+  // One crop: daisy_assert (approximate (canopy.CAI, bioclimate.CAI ()));
   if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
     {
       TmpStream tmp;
@@ -77,7 +77,7 @@ Photosynthesis::operator () (const Bioclimate& bioclimate,
   for (int i = 0; i < No; i++)
     {
       const double height = bioclimate.height (i+1);
-      assert (height < bioclimate.height (i));
+      daisy_assert (height < bioclimate.height (i));
 
       if (top_crop && height <= canopy.Height)
 	{
@@ -88,7 +88,7 @@ Photosynthesis::operator () (const Bioclimate& bioclimate,
 	}
       // Leaf Area index for a given leaf layer
       const double LA = prevLA - LAIvsH (height);
-      assert (LA >= 0.0);
+      daisy_assert (LA >= 0.0);
       if (LA > 0)
 	{
 	  prevLA = LAIvsH (height);
@@ -103,7 +103,7 @@ Photosynthesis::operator () (const Bioclimate& bioclimate,
 	  Ass += LA * F;
 	}
     }
-  assert (approximate (accCAI, canopy.CAI));
+  daisy_assert (approximate (accCAI, canopy.CAI));
 
   return (molWeightCH2O / molWeightCO2) * Teff * Ass;
 }

@@ -40,9 +40,9 @@ MainWindow*
 TreeItem::main () const
 {
   QListView* list_view = listView ();
-  assert (list_view);
+  daisy_assert (list_view);
   MainTree* main_tree = dynamic_cast<MainTree*> (list_view);
-  assert (main_tree);
+  daisy_assert (main_tree);
   return main_tree->main;
 }
 
@@ -72,53 +72,53 @@ bool
 TreeItem::container (string& component, string& parameterization)
 {
   TreeItem* p = dynamic_cast<TreeItem*> (parent ());
-  assert (p);
+  daisy_assert (p);
   return p->container (component, parameterization);
 };
 
 void
 TreeItem::edit_edit ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TreeItem::edit_raw ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TreeItem::edit_after ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TreeItem::edit_child ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TreeItem::edit_copy ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TreeItem::edit_inherit ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TreeItem::edit_delete ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 void
 TreeItem::view_selected ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 void 
 TreeItem::view_check ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool 
 TreeItem::toggle_view_defaults ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 void 
 TreeItem::view_dependencies ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 TreeItem::TreeItem (TreeItem* i,
 		    const QString& e, const QString& t, 
@@ -158,7 +158,7 @@ bool
 AtomItem::editable () const
 {
   const TreeItem* c = dynamic_cast<const TreeItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   return c->editable ();
 }
 
@@ -166,7 +166,7 @@ bool
 AtomItem::edit_raw ()
 {
   AListItem* c = dynamic_cast<AListItem*> (parent ());
-  assert (c); 
+  daisy_assert (c); 
   return c->edit_item (this); 
 }
 
@@ -174,7 +174,7 @@ bool
 AtomItem::edit_delete ()
 { 
   AListItem* c = dynamic_cast<AListItem*> (parent ());
-  assert (c); 
+  daisy_assert (c); 
   return c->delete_item (this); 
 }
 
@@ -189,11 +189,11 @@ AtomItem::set_selected ()
     main ()->set_selection_deletable (true);
 
   const AListItem* c = dynamic_cast<const AListItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   main ()->set_description (c->description (entry));
   const string parameter = entry.latin1 ();
   const Syntax::type type = c->syntax.lookup (parameter);
-  assert (type != Syntax::Error);
+  daisy_assert (type != Syntax::Error);
   if ((type == Syntax::AList || type == Syntax::Object)
       && c->syntax.size (parameter) != Syntax::Singleton)
     {
@@ -207,16 +207,16 @@ bool
 AtomItem::insert_before (int where)
 { 
   const AListItem* c = dynamic_cast<const AListItem*> (parent ());
-  assert (c); 
+  daisy_assert (c); 
   const string parameter = entry.latin1 ();
   const Syntax::type type = c->syntax.lookup (parameter);
-  assert (c->syntax.size (parameter) != Syntax::Singleton);
+  daisy_assert (c->syntax.size (parameter) != Syntax::Singleton);
   vector<AttributeList*> alists = c->alist.alist_sequence (parameter);
   if (type == Syntax::AList)
     {
       AttributeList alist (c->syntax.default_alist (parameter));
       vector<AttributeList*> entry;
-      assert (where <= alists.size ());
+      daisy_assert (where <= alists.size ());
       entry.insert (entry.end (), alists.begin (), &alists[where]);
       entry.push_back (&alist);
       entry.insert (entry.end (), &alists[where], alists.end ());
@@ -224,13 +224,13 @@ AtomItem::insert_before (int where)
     }
   else
     {
-      assert (type == Syntax::Object);
+      daisy_assert (type == Syntax::Object);
       string component;
       string parameterization;
       dep_map dependencies;
       if (container (component, parameterization))
 	{
-	  assert (component.length () > 0);
+	  daisy_assert (component.length () > 0);
 	  find_dependencies (component, parameterization, dependencies);
 	  resequence (component, parameterization, dependencies);
 	}
@@ -239,7 +239,7 @@ AtomItem::insert_before (int where)
       QStringList choices;
       vector<string> models;
       library.entries (models);
-      assert (models.size () > 0);
+      daisy_assert (models.size () > 0);
       for (unsigned int i = 0; i < models.size (); i++)
 	if (dependencies[component].find (models[i]) 
 	    == dependencies[component].end ())
@@ -255,7 +255,7 @@ AtomItem::insert_before (int where)
       AttributeList alist (library.lookup (name));
       alist.add ("type", name);
       vector<AttributeList*> entry;
-      assert (where <= alists.size ());
+      daisy_assert (where <= alists.size ());
       entry.insert (entry.end (), alists.begin (), &alists[where]);
       entry.push_back (&alist);
       entry.insert (entry.end (), &alists[where], alists.end ());
@@ -268,7 +268,7 @@ AtomItem::AtomItem (TreeItem* i,
 		    const QString& e, const QString& t, 
 		    const QString& v, const QString& c, int o)
   : TreeItem (i, e, t, v, c, o)
-{ assert (dynamic_cast<AListItem*> (i)); }
+{ daisy_assert (dynamic_cast<AListItem*> (i)); }
 
 void
 AListItem::set_selected ()
@@ -308,7 +308,7 @@ AListItem::recreate_item (TreeItem* item)
   for (QListViewItem* i = firstChild (); i != NULL; i = i->nextSibling ())
     {
       TreeItem* c = dynamic_cast<TreeItem*> (i);
-      assert (c);
+      daisy_assert (c);
       if (c != item && c->entry == item->entry)
 	{
 	  if (SubmodelItem* cc = dynamic_cast<SubmodelItem*> (c))
@@ -341,7 +341,7 @@ AListItem::edit_item (TreeItem* item)
       recreate_item (item);
       return true;
     }
-  assert (false);
+  daisy_assert (false);
 }
 
 bool
@@ -374,7 +374,7 @@ AListItem::AListItem (const Syntax& syn, AttributeList& al,
     alist (al),
     default_alist (def_al),
     view_defaults (false)
-{ assert (&al != &def_al); }
+{ daisy_assert (&al != &def_al); }
 
 AListItem::AListItem (const Syntax& syn, AttributeList& al,
 		      const AttributeList& al_def,
@@ -384,13 +384,13 @@ AListItem::AListItem (const Syntax& syn, AttributeList& al,
     alist (al),
     default_alist (al_def),
     view_defaults (false)
-{ assert (&al != &al_def); }
+{ daisy_assert (&al != &al_def); }
 
 bool 
 ModelItem::container (string& component, string& parameterization)
 {
   LibraryItem* p = dynamic_cast<LibraryItem*> (parent ());
-  assert (p);
+  daisy_assert (p);
   component = p->entry.latin1 ();
   parameterization = entry.latin1 ();
   return true;
@@ -409,7 +409,7 @@ ModelItem::set_selected ()
   string parameterization;
   container (component, parameterization);
   Library& library = Library::find (component);
-  assert (library.check (parameterization));
+  daisy_assert (library.check (parameterization));
   const AttributeList& alist = library.lookup (parameterization);
 
   if (editable ())
@@ -453,9 +453,9 @@ ModelItem::edit_copy ()
     }
 
   // Find superclass.
-  assert (library.check (parameterization));
+  daisy_assert (library.check (parameterization));
   const AttributeList& alist = library.lookup (parameterization);
-  assert (alist.check ("type"));
+  daisy_assert (alist.check ("type"));
   const string& super = alist.name ("type");
 
   // Create new attribute derived from its superclass.
@@ -512,7 +512,7 @@ bool
 ModelItem::edit_delete ()
 { 
   LibraryItem* par = dynamic_cast<LibraryItem*> (parent ());
-  assert (par);
+  daisy_assert (par);
   const string& component = par->entry.latin1 ();
   const string& model = entry.latin1 ();
   
@@ -546,7 +546,7 @@ Really delete?",
 	case 1:
 	  return false;
 	default:
-	  assert (false);
+	  daisy_assert (false);
 	}
     }
   remove_dependencies (component, model);
@@ -561,7 +561,7 @@ void
 ModelItem::view_dependencies ()
 { 
   LibraryItem* par = dynamic_cast<LibraryItem*> (parent ());
-  assert (par);
+  daisy_assert (par);
   const string& component = par->entry.latin1 ();
   const string& model = entry.latin1 ();
   
@@ -607,7 +607,7 @@ bool
 SubmodelItem::editable () const
 {
   const TreeItem* c = dynamic_cast<const TreeItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   return c->editable ();
 }
 
@@ -618,19 +618,19 @@ SubmodelItem::set_selected ()
   if (editable ())
     main ()->set_selection_deletable (true);
   const AListItem* c = dynamic_cast<const AListItem*> (parent ());
-  assert (c); 
+  daisy_assert (c); 
   main ()->set_description (c->description (entry));
   const string parameter = entry.latin1 ();
   const Syntax::type type = c->syntax.lookup (parameter);
-  assert (type == Syntax::AList || type == Syntax::Object);
-  assert (c->syntax.size (parameter) == Syntax::Singleton);
+  daisy_assert (type == Syntax::AList || type == Syntax::Object);
+  daisy_assert (c->syntax.size (parameter) == Syntax::Singleton);
 }
 
 bool
 SubmodelItem::edit_delete ()
 { 
   AListItem* c = dynamic_cast<AListItem*> (parent ());
-  assert (c); 
+  daisy_assert (c); 
   return c->delete_item (this); 
 }
 
@@ -641,7 +641,7 @@ SubmodelItem::SubmodelItem (const Syntax& syn, AttributeList& al,
 			    const QString& v, const QString& c,
 			    int o)
   : AListItem (syn, al, al_def, i, e, t, v, c, o)
-{ assert (dynamic_cast<AListItem*> (i)); }
+{ daisy_assert (dynamic_cast<AListItem*> (i)); }
 
 SubmodelItem::SubmodelItem (const Syntax& syn, AttributeList& al,
 			    const AttributeList& al_def,
@@ -660,7 +660,7 @@ bool
 ObjectItem::edit_raw ()
 {
   AListItem* c = dynamic_cast<AListItem*> (parent ());
-  assert (c); 
+  daisy_assert (c); 
   return c->edit_item (this); 
 }
 
@@ -686,7 +686,7 @@ SimulationItem::set_selected ()
 
 bool
 SimulationItem::edit_delete ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 QString 
 SimulationItem::key (int, bool) const
@@ -706,33 +706,33 @@ bool
 SequenceItem::editable () const
 {
   const AtomItem* c = dynamic_cast<const AtomItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   const AListItem* cc = dynamic_cast<const AListItem*> (c->parent ());
-  assert (cc);
+  daisy_assert (cc);
   return cc->editable ();
 }
 
 bool
 SequenceItem::edit_after ()
 { 
-  assert (order > 0);
+  daisy_assert (order > 0);
   AtomItem* c = dynamic_cast<AtomItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   return c->insert_before (order);
 }
 
 bool
 SequenceItem::edit_delete ()
 { 
-  assert (order > 0);
+  daisy_assert (order > 0);
   AtomItem* c = dynamic_cast<AtomItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   const string parameter = c->entry.latin1 ();
   const AListItem* cc = dynamic_cast<const AListItem*> (c->parent ());
-  assert (cc);
-  assert (cc->syntax.size (parameter) != Syntax::Singleton);
+  daisy_assert (cc);
+  daisy_assert (cc->syntax.size (parameter) != Syntax::Singleton);
   vector<AttributeList*> alists = cc->alist.alist_sequence (parameter);
-  assert (order <= alists.size ());
+  daisy_assert (order <= alists.size ());
   alists.erase (&alists[order-1]);
   cc->alist.add (parameter, alists);
   return true; 
@@ -743,12 +743,12 @@ SequenceItem::set_selected ()
 {
   AListItem::set_selected ();
   const AtomItem* c = dynamic_cast<const AtomItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   const AListItem* cc = dynamic_cast<const AListItem*> (c->parent ());
-  assert (cc);
+  daisy_assert (cc);
   const string parameter = c->entry.latin1 ();
   Syntax::type type = cc->syntax.lookup (parameter);
-  assert (type == Syntax::AList || type == Syntax::Object);
+  daisy_assert (type == Syntax::AList || type == Syntax::Object);
   if (editable ())
     main ()->set_selection_deletable (true);
   main ()->set_selection_afterable (true);
@@ -816,9 +816,9 @@ InputItem::editable () const
 bool
 InputItem::edit_after ()
 { 
-  assert (order >= 0);
+  daisy_assert (order >= 0);
   InputsItem* c = dynamic_cast<InputsItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   return c->insert_before (order+1);
 }
 
@@ -828,11 +828,11 @@ InputItem::edit_delete ()
   // TODO: Warn if anything depends on objects from this file.
   // TODO: Delete objects from this file.
 
-  assert (order >= 0);
+  daisy_assert (order >= 0);
   InputsItem* c = dynamic_cast<InputsItem*> (parent ());
-  assert (c);
+  daisy_assert (c);
   vector<AttributeList*>& alists = c->inputs;
-  assert (order < alists.size ());
+  daisy_assert (order < alists.size ());
   alists.erase (&alists[order]);
   
   return true; 

@@ -51,21 +51,21 @@ public:
 double 
 Hydraulic_Cosby::Theta (const double h) const
 {
-  assert (Theta_sat >= 0.0);
+  daisy_assert (Theta_sat >= 0.0);
   return Sr (h) * Theta_sat;
 }
 
 double 
 Hydraulic_Cosby::K (const double h) const
 {
-  assert (K_sat > 0.0);
+  daisy_assert (K_sat > 0.0);
   return K_sat * pow (Sr (h), (2 + 3 / b) * b);
 }
 
 double 
 Hydraulic_Cosby::Cw2 (const double h) const
 {
-  assert (Theta_sat >= 0.0);
+  daisy_assert (Theta_sat >= 0.0);
   if (h < 0.0)
     {
       return -(Theta_sat 
@@ -80,7 +80,7 @@ Hydraulic_Cosby::Cw2 (const double h) const
 double 
 Hydraulic_Cosby::h (const double Theta) const
 {
-  assert (Theta_sat >= 0.0);
+  daisy_assert (Theta_sat >= 0.0);
   if (Theta < Theta_sat)
     return h_b * pow (pow (Theta / Theta_sat, -5.0 * b) - 1.0, 1.0/5.0);
   else
@@ -90,7 +90,7 @@ Hydraulic_Cosby::h (const double Theta) const
 double 
 Hydraulic_Cosby::M (double h) const
 {
-  assert (K_sat > 0.0);
+  daisy_assert (K_sat > 0.0);
   if (h <= h_b)
     return K_sat * (-h_b / (1.0 + 3.0 / b)) * pow (h_b / h, 1.0 + 3.0 / b);
   else
@@ -114,15 +114,15 @@ Hydraulic_Cosby::initialize (double clay, double silt, double sand)
   silt *= 100.0;		// [%]
   sand *= 100.0;		// [%]
   b = 3.10 + 0.157 * clay - 0.003 * sand; // []
-  assert (b > 0.0);
+  daisy_assert (b > 0.0);
   h_b   = -pow (10.0, 1.54 - 0.0095 * sand + 0.0063 * silt); // [cm]
-  assert (h_b < 0.0);
+  daisy_assert (h_b < 0.0);
   K_sat = pow (10.0, -0.60 + 0.0126 * sand - 0.0064 * clay)
     * cm_per_inch; // [cm/h]
-  assert (K_sat > 0.0);
+  daisy_assert (K_sat > 0.0);
   Theta_sat = (50.50 - 0.1420 * sand - 0.0370 * clay) * 0.01; // [%]
-  assert (Theta_sat > 0.0);
-  assert (Theta_sat < 1.0);
+  daisy_assert (Theta_sat > 0.0);
+  daisy_assert (Theta_sat < 1.0);
 }
 
 Hydraulic_Cosby::Hydraulic_Cosby (const AttributeList& al)

@@ -27,7 +27,7 @@
 #include "mathlib.h"
 #include "check.h"
 #include "groundwater.h"
-#include <assert.h>
+#include "assertion.h"
 
 unsigned int 
 Geometry::interval_plus (double z) const
@@ -38,7 +38,7 @@ Geometry::interval_plus (double z) const
       if (zplus_[i] <= z)
 	return i;
     }
-  assert (false);
+  daisy_assert (false);
   return i;
 }
 
@@ -127,7 +127,7 @@ Geometry::total (const vector<double>& v, double from, double to) const
 void
 Geometry::add (vector<double>& v, double from, double to, double amount) const
 {
-  assert (to < from);
+  daisy_assert (to < from);
   const double old_total = total (v);
 
   const unsigned int last = interval_plus (to);
@@ -143,7 +143,7 @@ Geometry::add (vector<double>& v, double from, double to, double amount) const
       old = zplus_[i];
     }
 
-  assert (approximate (old_total + amount, total (v)));
+  daisy_assert (approximate (old_total + amount, total (v)));
 }
 
 void
@@ -152,12 +152,12 @@ Geometry::add (vector<double>& v, const vector<double>& density,
 {
   const double old_total = total (v);
   const double total_density = total (density);
-  assert (total_density > 0.0);
+  daisy_assert (total_density > 0.0);
   for (unsigned int i = 0; i <= size (); i++)
     if (density.size () > i)
       v[i] += amount * density[i] / total_density;
 
-  assert (approximate (old_total + amount, total (v)));
+  daisy_assert (approximate (old_total + amount, total (v)));
 }
 
 void
@@ -165,7 +165,7 @@ Geometry::mix (vector<double>& v, double from, double to) const
 {
   const double old_total = total (v);
   add (v, from, to, extract (v, from, to));
-  assert (approximate (old_total, total (v)));
+  daisy_assert (approximate (old_total, total (v)));
 }
 
 double
@@ -188,7 +188,7 @@ Geometry::extract (vector<double>& v, double from, double to) const
 	}
       old = zplus_[i];
     }
-  assert (approximate (old_total, total (v) + amount));
+  daisy_assert (approximate (old_total, total (v) + amount));
   return amount;
 }
 
@@ -229,7 +229,7 @@ Geometry::swap (vector<double>& v, double from, double middle, double to) const
 
   add (v, from, new_middle, bottom_content);
   add (v, new_middle, to, top_content);
-  assert (approximate (old_total, total (v)));
+  daisy_assert (approximate (old_total, total (v)));
 }
 
 static bool 
@@ -283,7 +283,7 @@ Geometry::initialize_layer (vector<double>& array,
 			    const string& name, Treelog& out) const
 {
   const string initial = string ("initial_") + name;
-  assert (array.size () == 0);
+  daisy_assert (array.size () == 0);
   if (al.check (name))
     // Specified by user.
     array = al.number_sequence (name);
@@ -297,7 +297,7 @@ Geometry::initialize_layer (vector<double>& array,
       for (unsigned int i = 0; i < layers.size (); i++)
 	{
 	  double next = layers[i]->number ("end");
-	  assert (next < last);
+	  daisy_assert (next < last);
 	  const double value = layers[i]->number ("value");
 	  if (next < soil_end)
 	    {
@@ -438,7 +438,7 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
       last = 0.0;
       for (unsigned int i = 0; i < zplus_.size (); i++)
 	{
-	  assert (zplus_[i] < last);
+	  daisy_assert (zplus_[i] < last);
 	  last = zplus_[i];
 	}
     }

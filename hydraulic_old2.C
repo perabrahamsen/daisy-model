@@ -85,7 +85,7 @@ HydraulicOld2::Cw2 (const double h) const
 double 
 HydraulicOld2::h (const double Theta) const
 {
-  assert (Theta <= Theta_sat);
+  daisy_assert (Theta <= Theta_sat);
   return -hm_ (-Theta);
 }
 

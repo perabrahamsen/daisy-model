@@ -149,16 +149,16 @@ UZRichard::richard (Treelog& msg,
   // For h bottom.
   if (!bottom.flux_bottom ())
     {
-      assert (last + 1 < soil.size ());
+      daisy_assert (last + 1 < soil.size ());
       K[size] = soil.K (last + 1, 0.0, h_ice[last + 1], 
 			soil_heat.T (last + 1));
     }
   
   // For lysimeter bottom.
-  assert (q.size () > last);
+  daisy_assert (q.size () > last);
   const double q_last = min (0.0, q[last]); // Flux up from bottom node.
   const double h_lim = soil.zplus (last) - soil.z (last);
-  assert (h_lim < 0.0);
+  daisy_assert (h_lim < 0.0);
 
   // Check if we have already switched top once.
   bool switched_top = false;
@@ -495,13 +495,13 @@ Richard eq. mass balance flux is different than darcy flux");
     }
 
   // Make it official.
-  assert (h_new.size () >= first + size);
+  daisy_assert (h_new.size () >= first + size);
   copy (h.begin (), h.end (), h_new.begin () + first);
-  assert (Theta_new.size () >= first + size);
+  daisy_assert (Theta_new.size () >= first + size);
   copy (Theta.begin (), Theta.end (), Theta_new.begin () + first);
 
   // Check upper boundary.
-  assert (top.soil_top () 
+  daisy_assert (top.soil_top () 
 	  || approximate (top.h (), available_water - top_water));
 
 #if 0
@@ -529,7 +529,7 @@ UZRichard::converges (const vector<double>& previous,
 		      const vector<double>& current) const
 {
   unsigned int size = previous.size ();
-  assert (current.size () == size);
+  daisy_assert (current.size () == size);
 
   for (unsigned int i = 0; i < size; i++)
     {
@@ -551,7 +551,7 @@ UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
 		      vector<double>& Kplus) const
 {
   int size = last - first + 1;
-  assert (K_average != NULL);
+  daisy_assert (K_average != NULL);
   for (int i = 0; i < size; i++)
     Kplus[i] = (*K_average)(K[i], K[i + 1]);
   

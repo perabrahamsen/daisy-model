@@ -113,7 +113,7 @@ Field::Implementation::restrict (const string& name)
 void 
 Field::Implementation::unrestrict ()
 {
-  assert (selected);
+  daisy_assert (selected);
   selected = NULL;
 }
 
@@ -586,7 +586,7 @@ Field::Implementation::Implementation (const vector<AttributeList*>& sequence)
 
 Field::Implementation::~Implementation ()
 {
-  assert (selected == NULL);
+  daisy_assert (selected == NULL);
   sequence_delete (columns.begin (), columns.end ()); 
 }
 

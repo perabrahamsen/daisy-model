@@ -89,7 +89,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 {
   if (top.soil_top ())
     {
-      assert (!top.flux_top ());
+      daisy_assert (!top.flux_top ());
       // We have a forced pressure top, in the form of a ridge system.
       // Since LR only works with flux top, we use Darcy to simulate a
       // flux top between the first node (with a forced pressure) and
@@ -115,7 +115,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       // Limit flux by soil capacity.
       const double K_sat = soil.K (first, 0.0, h_ice[first],
 				   soil_heat.T (first));
-      assert (K_sat > 0.0);
+      daisy_assert (K_sat > 0.0);
       q_up = q[first] = max (top.q (), -K_sat);
 
     }
@@ -131,8 +131,8 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       const double Theta_res = soil.Theta_res (i);
       const double Theta_new = Theta_old[i] - q[i] * dt / dz - S[i] * dt;
-      assert (Theta_new >= Theta_res);
-      // assert (Theta_new <= Theta_sat);
+      daisy_assert (Theta_new >= Theta_res);
+      // daisy_assert (Theta_new <= Theta_sat);
       const double h_new = soil.h (i, Theta_new);
       double K_new = soil.K (i, h_new, h_ice[i], soil_heat.T (i));
 
@@ -175,7 +175,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 					      soil_heat.T (i+1)));
 	    }
 
-	  assert (finite (h_new));
+	  daisy_assert (finite (h_new));
 	  const double Theta_fc = soil.Theta (i, h_fc, h_ice[i]);
 	  const double Theta_next = Theta_new - K_new * dt / dz;
 	  
@@ -197,13 +197,13 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	      Theta[i] = Theta_next;
 	      h[i] = soil.h (i, Theta[i]);
 	    }
-	  assert (q[i+1] < 1e-10);
+	  daisy_assert (q[i+1] < 1e-10);
 	}
-      assert (finite (h[i]));
-      assert (finite (Theta[i]));
-      assert (finite (q[i+1]));
-      assert (Theta[i] <= Theta_sat);
-      assert (Theta[i] >= Theta_res);
+      daisy_assert (finite (h[i]));
+      daisy_assert (finite (Theta[i]));
+      daisy_assert (finite (q[i+1]));
+      daisy_assert (Theta[i] <= Theta_sat);
+      daisy_assert (Theta[i] >= Theta_res);
     }
 
   // Lower border.
@@ -220,7 +220,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       total_new += soil.dz (i) * Theta[i];
       total_S += soil.dz (i) * S[i] * dt;
     }
-  assert (approximate (total_old - q_up * dt + q_down * dt - total_S * dt, 
+  daisy_assert (approximate (total_old - q_up * dt + q_down * dt - total_S * dt, 
 		       total_new));
 #endif
   return true;

@@ -1061,8 +1061,8 @@ CropSold::SoluteUptake (const Soil& soil,
 		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
 		   - (pow (beta, 2.0 - alpha) - 1.0));
 	    }
-	  assert (finite (I_zero[i]));
-	  assert (finite (B_zero[i]));
+	  daisy_assert (finite (I_zero[i]));
+	  daisy_assert (finite (B_zero[i]));
 	  B += L * soil.dz (i) * B_zero[i];
 	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
 	}
@@ -1080,7 +1080,7 @@ CropSold::SoluteUptake (const Soil& soil,
 			   max (0.0, solute.M_left (i) - 1e-8));
       else
 	uptake[i] = 0.0;
-      assert (uptake[i] >= 0.0);
+      daisy_assert (uptake[i] >= 0.0);
     }
   solute.add_to_sink (uptake);
 
@@ -1222,7 +1222,7 @@ CropSold::CanopyStructure ()
     }
   else
     {
-      assert (DS <= 2);
+      daisy_assert (DS <= 2);
 
       z0 = CanopyPar.LAIDist1[0];
       z1 = CanopyPar.LAIDist1[1];
@@ -1246,7 +1246,7 @@ CropSold::CanopyStructure ()
 	  if (approximate (Area, Need))
 	    Need = Area;
 
-	  assert (Need <= Area);
+	  daisy_assert (Need <= Area);
 
 	  if (Area - Need > z2 - z1)
 	    // We have to move z1 beyond z2.
@@ -1270,9 +1270,9 @@ CropSold::CanopyStructure ()
 	      double y1 = sqrt (2 * Need / (z1 - z2 - z0 + 1));
 			    
 	      // Check the results.
-	      assert (fabs (Need - (1 - x0) * y1 / 2) < 0.0001);
-	      assert (fabs ((1 - x1) / y1 - (1 - z2)) < 0.0001);
-	      assert (fabs ((x1 - x0) / y1 - (z1 - z0)) < 0.0001);
+	      daisy_assert (fabs (Need - (1 - x0) * y1 / 2) < 0.0001);
+	      daisy_assert (fabs ((1 - x1) / y1 - (1 - z2)) < 0.0001);
+	      daisy_assert (fabs ((x1 - x0) / y1 - (z1 - z0)) < 0.0001);
 
 	      // Insert this special distribution, and return.
 	      PLF LADvsH;
@@ -1311,7 +1311,7 @@ CropSold::ActualWaterUptake (double Ept,
       out.error (tmp.str ());
       Ept = 0.0;
     }
-  assert (EvapInterception >= 0);
+  daisy_assert (EvapInterception >= 0);
   static const double min_step = 1.0;
   const double h_wp = par.Root.h_wp;
   double& h_x = var.RootSys.h_x;
@@ -1347,10 +1347,10 @@ CropSold::ActualWaterUptake (double Ept,
     h_x = h_wp;
 
   step = min_step;
-  assert (h_x < 0.001);
+  daisy_assert (h_x < 0.001);
   while (total > Ept && h_x < 0.0)
     {
-      assert (h_x < 0.001);
+      daisy_assert (h_x < 0.001);
       const double h_next = min (h_x + step, 0.0);
       const double next = PotentialWaterUptake (h_next, soil, soil_water);
 
@@ -1359,7 +1359,7 @@ CropSold::ActualWaterUptake (double Ept,
 	if (step <= min_step)
 	  {
 	    // We can't get any closer.
-	    assert (next <= total);
+	    daisy_assert (next <= total);
 	    if (next >= Ept)
 	      {
 		// total = next;
@@ -1383,13 +1383,13 @@ CropSold::ActualWaterUptake (double Ept,
 
   // We need this to make sure H2OExtraction corresponds to 'h_x'.
   const double total2 = PotentialWaterUptake (h_x, soil, soil_water);
-  assert (total == total2);
+  daisy_assert (total == total2);
 
   vector<double>& H2OExtraction = var.RootSys.H2OExtraction;
   if (total > Ept)
     {
-      assert (h_x < 0.001);
-      assert (total > 0);
+      daisy_assert (h_x < 0.001);
+      daisy_assert (total > 0);
       const double factor = Ept / total;
       for (unsigned int i = 0; i < soil.size (); i++)
 	H2OExtraction[i] *= factor;
@@ -1400,7 +1400,7 @@ CropSold::ActualWaterUptake (double Ept,
   // Update water stress factor
   if (Ept >= 0.010)
     {
-      assert (total <= Ept);
+      daisy_assert (total <= Ept);
 
       var.RootSys.ws_up += (total + EvapInterception);
       var.RootSys.ws_down += (Ept + EvapInterception);
@@ -1436,14 +1436,14 @@ CropSold::PotentialWaterUptake (const double h_x,
 	       * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
 	       / (- 0.5 * log (area * L[i])),
 	       0.0);
-      assert (L[i] >= 0.0);
-      assert (soil_water.Theta (soil, i, h) > 0.0);
-      assert (soil_water.Theta (soil, i, 0.0) > 0.0);
-      assert (soil.M (i, soil_water.h (i)) >= 0.0);
-      assert (soil.M (i, h) >= 0.0);
-      assert (area * L[i] > 0.0);
-      assert ((- 0.5 * log (area * L[i])) != 0.0);
-      assert (uptake >= 0.0);
+      daisy_assert (L[i] >= 0.0);
+      daisy_assert (soil_water.Theta (soil, i, h) > 0.0);
+      daisy_assert (soil_water.Theta (soil, i, 0.0) > 0.0);
+      daisy_assert (soil.M (i, soil_water.h (i)) >= 0.0);
+      daisy_assert (soil.M (i, h) >= 0.0);
+      daisy_assert (area * L[i] > 0.0);
+      daisy_assert ((- 0.5 * log (area * L[i])) != 0.0);
+      daisy_assert (uptake >= 0.0);
       S[i] = uptake;
       total += uptake * soil.dz (i) * 10; // mm/cm.
     }
@@ -1505,7 +1505,7 @@ CropSold::RootDensDistPar (double a)
     }
   else
     {
-      assert (false /* Invalid Root Distribution */);
+      daisy_assert (false /* Invalid Root Distribution */);
     }
   x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
   y = exp (x);
@@ -1556,7 +1556,7 @@ CropSold::RootDensity (const Soil& soil)
   unsigned int i = 0;
   for (; i == 0 || -soil.zplus (i-1) < RootSys.Depth; i++)
     d[i] = L0 * exp (a * soil.z (i));
-  assert (i < soil.size ());
+  daisy_assert (i < soil.size ());
   for (; i < soil.size (); i++)
     d[i] = 0.0;
 }
@@ -1600,7 +1600,7 @@ CropSold::NitrogenUptake (int Hour,
       CrpAux.NH4Upt
 	= SoluteUptake (soil, soil_water, soil_NH4, PotNUpt, 
 			RootSys.NH4Extraction, Root.MxNH4Up, Root.Rad);
-      assert (CrpAux.NH4Upt >= 0.0);
+      daisy_assert (CrpAux.NH4Upt >= 0.0);
 
       NCrop += CrpAux.NH4Upt;
       PotNUpt -= CrpAux.NH4Upt;
@@ -1613,7 +1613,7 @@ CropSold::NitrogenUptake (int Hour,
       CrpAux.NO3Upt
 	= SoluteUptake (soil, soil_water, soil_NO3, PotNUpt,
 			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad); 
-      assert (CrpAux.NO3Upt >= 0.0);
+      daisy_assert (CrpAux.NO3Upt >= 0.0);
       NCrop += CrpAux.NO3Upt;
       PotNUpt -= CrpAux.NO3Upt;
     }
@@ -1674,7 +1674,7 @@ CropSold::NetProduction (const Bioclimate& bioclimate,
 
   double f_Leaf, f_SOrg, f_Root;
   AssimilatePartitioning (DS, f_Leaf, f_SOrg, f_Root);
-  assert (approximate (f_Leaf + f_SOrg + f_Root, 1.0));
+  daisy_assert (approximate (f_Leaf + f_SOrg + f_Root, 1.0));
 
   const double AssG = CrpAux.CanopyAss 
     * bound (0.0, ((Prod.NCrop - CrpAux.NfNCnt) 
@@ -1741,13 +1741,13 @@ CropSold::tick (const Time& time,
     return;
   if (soil_NO3)
     {
-      assert (soil_NH4);
+      daisy_assert (soil_NH4);
       NitrogenUptake (time.hour (), 
 		      soil, soil_water, *soil_NH4, *soil_NO3);
     }
   else
     {
-      assert (!soil_NH4);
+      daisy_assert (!soil_NH4);
       var.Prod.NCrop = var.CrpAux.PtNCnt;
     }
   if (time.hour () != 0)
@@ -1757,7 +1757,7 @@ CropSold::tick (const Time& time,
     water_stress = 1.0 - var.RootSys.ws_up / var.RootSys.ws_down;
   else
     water_stress = 0.0;
-  assert (water_stress >= 0.0 && water_stress <= 1.0);
+  daisy_assert (water_stress >= 0.0 && water_stress <= 1.0);
   var.RootSys.ws_up = 0.0;
   var.RootSys.ws_down = 0.0;
 
@@ -1859,11 +1859,11 @@ CropSold::harvest (const string& column_name,
   const double CSOrg = At + Bt * CLeaf;
   const double NSOrg = CSOrg * WSOrg;
 
-  assert (NLeaf >= 0.0);
-  assert (NSOrg >= 0.0);
-  assert (NRoot >= 0.0);
-  assert (NCrop >= 0.0);
-  assert (approximate (NLeaf + NSOrg + NRoot, NCrop));
+  daisy_assert (NLeaf >= 0.0);
+  daisy_assert (NSOrg >= 0.0);
+  daisy_assert (NRoot >= 0.0);
+  daisy_assert (NCrop >= 0.0);
+  daisy_assert (approximate (NLeaf + NSOrg + NRoot, NCrop));
 
   const double C_Leaf = Hp.C_Leaf;
   const double C_SOrg = Hp.C_SOrg;

@@ -128,14 +128,14 @@ WeatherFile::tick (const Time& time, Treelog& out)
 	}
       date = Time (year, month, day, 23);
 
-      assert (global_radiation >= 0 && global_radiation < 700);
-      assert (air_temperature >= -70 && air_temperature < 60);
-      assert (precipitation >= 0 && precipitation < 1000);
-      assert (reference_evapotranspiration_ <= 20);
+      daisy_assert (global_radiation >= 0 && global_radiation < 700);
+      daisy_assert (air_temperature >= -70 && air_temperature < 60);
+      daisy_assert (precipitation >= 0 && precipitation < 1000);
+      daisy_assert (reference_evapotranspiration_ <= 20);
     }
-  assert (time.year () == date.year ());
-  assert (time.month () == date.month ());
-  assert (time.mday () == date.mday ());
+  daisy_assert (time.year () == date.year ());
+  daisy_assert (time.month () == date.month ());
+  daisy_assert (time.mday () == date.mday ());
 
   // Update the daily values.
   put_global_radiation (global_radiation);

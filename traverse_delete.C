@@ -25,6 +25,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
+#include "assertion.h"
 
 class TraverseDelete : public Traverse
 {
@@ -126,7 +127,7 @@ TraverseDelete::enter_submodel_default (const Syntax&, const AttributeList&,
 
 void
 TraverseDelete::leave_submodel_default ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TraverseDelete::enter_submodel_sequence (const Syntax&,
@@ -147,7 +148,7 @@ TraverseDelete::enter_submodel_sequence_default (const Syntax&,
 
 void
 TraverseDelete::leave_submodel_sequence_default ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TraverseDelete::enter_object (const Library& library, 
@@ -155,7 +156,7 @@ TraverseDelete::enter_object (const Library& library,
 			      const AttributeList&,
 			      const string&)
 {
-  assert (alist.check ("type"));
+  daisy_assert (alist.check ("type"));
   const string super = alist.name ("type");
   if (dep_lib == library.name () && super == dep_par)
     alist.add ("type", dep_super);
@@ -196,11 +197,11 @@ TraverseDelete::TraverseDelete (const string& component,
     found (false)
 { 
   const Library& library = Library::find (component);
-  assert (library.check (parameterization));
+  daisy_assert (library.check (parameterization));
   const AttributeList& alist = library.lookup (parameterization);
-  assert (alist.check ("type"));
+  daisy_assert (alist.check ("type"));
   dep_super = alist.name ("type");
-  assert (parameterization != dep_super);
+  daisy_assert (parameterization != dep_super);
 }
 
 TraverseDelete::~TraverseDelete ()

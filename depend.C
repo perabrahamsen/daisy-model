@@ -27,6 +27,7 @@
 #include "alist.h"
 #include "tmpstream.h"
 #include "treelog.h"
+#include "assertion.h"
 
 #include <algorithm>
 #include <numeric>
@@ -179,7 +180,7 @@ TraverseDepend::enter_submodel_default (const Syntax&, const AttributeList&,
 
 void
 TraverseDepend::leave_submodel_default ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TraverseDepend::enter_submodel_sequence (const Syntax&,
@@ -205,7 +206,7 @@ TraverseDepend::enter_submodel_sequence_default (const Syntax&,
 
 void
 TraverseDepend::leave_submodel_sequence_default ()
-{ assert (false); }
+{ daisy_assert (false); }
 
 bool
 TraverseDepend::enter_object (const Library& library, 
@@ -213,7 +214,7 @@ TraverseDepend::enter_object (const Library& library,
 			      const AttributeList&,
 			      const string& name)
 {
-  assert (alist.check ("type"));
+  daisy_assert (alist.check ("type"));
   const string super = alist.name ("type");
   if (dep_lib == library.name () && super == dep_par)
     { 
@@ -337,7 +338,7 @@ static int
 sequence_number (const string& component, const string& parameterization)
 {
   const Library& library = Library::find (component);
-  assert (library.check (parameterization));
+  daisy_assert (library.check (parameterization));
   const AttributeList& alist = library.lookup (parameterization);
   if (alist.check ("parsed_sequence"))
     return alist.integer ("parsed_sequence");
@@ -405,7 +406,7 @@ resequence (const string& component, const string& parameterization,
       const string& parameterization = deps[i].par;
        
        Library& library = Library::find (component);
-       assert (library.check (parameterization));
+       daisy_assert (library.check (parameterization));
        AttributeList& alist = library.lookup (parameterization);
        alist.add ("parsed_sequence", Library::get_sequence ());
   }}

@@ -149,7 +149,7 @@ SoilHeat::Implementation::update_freezing_points (const Soil& soil,
 	= min (0.0, 273. *  h_melt / (latent_heat_of_fussion /gravity - h_melt));
       T_freezing[i] 
 	= min (T_thawing[i] - 0.01, 273. *  h / (latent_heat_of_fussion / gravity - h));
-      assert (T_freezing[i] <= T_thawing[i]);
+      daisy_assert (T_freezing[i] <= T_thawing[i]);
 
       capacity[i] = soil.heat_capacity (i, Theta, X_ice);
 
@@ -192,7 +192,7 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 
 	      // Check if there are sufficient water.
 	      const double Theta_min = soil.Theta (i, h_frozen - 1000.0, 0.0);
-	      assert (Theta_min >= soil.Theta_res (i));
+	      daisy_assert (Theta_min >= soil.Theta_res (i));
 	      const double available_water = soil_water.Theta (i) - Theta_min;
 	      if (freezing_rate[i] * dt > available_water)
 		freezing_rate[i] = max (0.0, available_water / dt);
@@ -212,7 +212,7 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	    }
 	  else
 	    freezing_rate[i] = 0.0;
-	  assert (-freezing_rate[i] * rho_water / rho_ice
+	  daisy_assert (-freezing_rate[i] * rho_water / rho_ice
 		  <= soil_water.X_ice_total (i));
 	  break;
 	case frozen:
@@ -238,7 +238,7 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	      if (-freezing_rate[i] * dt >= ice_water)
 		{
 		  freezing_rate[i] = -ice_water / dt;
-		  assert (freezing_rate[i] <= 0.0);
+		  daisy_assert (freezing_rate[i] <= 0.0);
 
 		  state[i] = liquid;
 		}
@@ -254,7 +254,7 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	    }
 	  else
 	    freezing_rate[i] = 0.0;
-	  assert (-freezing_rate[i] * rho_water / rho_ice
+	  daisy_assert (-freezing_rate[i] * rho_water / rho_ice
 		  <= soil_water.X_ice_total (i) * 1.0001);
 	  break;
 	case liquid:
@@ -266,7 +266,7 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	    }
 	  break;
 	}
-      assert (-freezing_rate[i] * rho_water / rho_ice
+      daisy_assert (-freezing_rate[i] * rho_water / rho_ice
 	      <= soil_water.X_ice_total (i) * 1.0001);
     }
   return changed;
@@ -470,7 +470,7 @@ SoilHeat::Implementation::solve (const Time& time,
   tridia (0, size, a, b, c, d, T.begin ());
   T_top_old = T_top;
   T_top = T_top_new;
-  assert (T[0] < 50.0);
+  daisy_assert (T[0] < 50.0);
 
   calculate_heat_flux (soil, soil_water);
 }
@@ -643,7 +643,7 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
     }
 
   // We check for this in SoilHeat::check ().
-  assert (T.size () == soil.size ());
+  daisy_assert (T.size () == soil.size ());
 }
 
 
@@ -700,7 +700,7 @@ SoilHeat::set_source (unsigned int i, double value)
 double
 SoilHeat::T (unsigned int i) const
 {
-  assert (i < impl.T.size ());
+  daisy_assert (i < impl.T.size ());
   return impl.T[i]; 
 }
 

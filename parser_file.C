@@ -409,7 +409,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
     }
   if (skipped)
     skip (")");
-  assert (alist != NULL);
+  daisy_assert (alist != NULL);
   return *alist;
 }
 
@@ -567,7 +567,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    skip_to_end ();
 	    break;
 	  default:
-	    assert (false);
+	    daisy_assert (false);
 	  }
       else
 	{
@@ -577,11 +577,11 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  // last of a totally ordered sequence.
 	  if (!in_order)
 	    // Unordered, we already skipped this one
-	    assert (skipped);
+	    daisy_assert (skipped);
 	  else if (current != end || !syntax.total_order ())
 	    // This is not the last element or the order is not total.
 	    {
-	      assert (!skipped);
+	      daisy_assert (!skipped);
 	      skip ("(");
 	      skipped = true;
 	    }
@@ -592,7 +592,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    case Syntax::Object:
 	      {
 		// We don't support fixed sized object arrays yet.
-		assert (syntax.size (name) == Syntax::Sequence);
+		daisy_assert (syntax.size (name) == Syntax::Sequence);
 		const Library& lib = syntax.library (name);
 		vector<AttributeList*> sequence;
 		while (!looking_at (')') && good ())
@@ -754,7 +754,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			    const string read_dim = get_dimension ();
 			    if (check_dimension (syntax_dim, read_dim))
 			      {
-				assert (positions.size () == array.size ());
+				daisy_assert (positions.size () == array.size ());
 				for (unsigned int i = first_unchecked;
 				     i < array.size ();
 				     i++)
@@ -768,7 +768,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			  }
 		      }
 		  }
-		assert (positions.size () == array.size ());
+		daisy_assert (positions.size () == array.size ());
 		for (unsigned int i = 0; i < array.size (); i++)
 		  {
 		    if (positions[i] != Lexer::no_position ())

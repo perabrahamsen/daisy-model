@@ -43,12 +43,12 @@ OM::output (Log& log) const
     {
       vector<double> N;
       unsigned int size = C.size ();
-      assert (C_per_N.size () >= size);
+      daisy_assert (C_per_N.size () >= size);
       for (int i = 0; i < size; i++)
 	{
 	  if (C[i] != 0.0)
 	    {
-	      assert (C_per_N[i] > 0);
+	      daisy_assert (C_per_N[i] > 0);
 	      N.push_back (C[i] / C_per_N[i]);
 	    }
 	}
@@ -67,12 +67,12 @@ OM::output (Log& log) const
 vector<double>
 OM::get_N () const
 {
-  assert (C_per_N.size () >= C.size ());
+  daisy_assert (C_per_N.size () >= C.size ());
   vector<double> N;
   
   for (unsigned i = 0; i < C.size (); i++)
   {
-    assert (C_per_N[i] >= 0.0);
+    daisy_assert (C_per_N[i] >= 0.0);
     N.push_back (C[i] / C_per_N[i]);
   }
   return N;
@@ -81,25 +81,22 @@ OM::get_N () const
 void
 OM::set_N (vector<double>& N) 
 {
-  assert (N.size () == C.size ());
+  daisy_assert (N.size () == C.size ());
 
   // Calculate C/N.
   C_per_N.erase (C_per_N.begin (), C_per_N.end ());
-
-  daisy_assert (true);
-  daisy_assert (false);
 
   for (unsigned i = 0; i < C.size (); i++)
     {
       if (C[i] == 0.0)
 	{
-	  assert (N[i] == 0.0);
+	  daisy_assert (N[i] == 0.0);
 	  C_per_N.push_back (1.0); // Arbitrary.
 	}
       else
 	{
-	  assert (C[i] > 0.0);
-	  assert (N[i] > 0.0);
+	  daisy_assert (C[i] > 0.0);
+	  daisy_assert (N[i] > 0.0);
 	  C_per_N.push_back (C[i] / N[i]);
 	}
     }
@@ -108,10 +105,10 @@ OM::set_N (vector<double>& N)
 void 
 OM::mix (const Geometry& geometry, double from, double to, double penetration)
 {
-  assert (penetration >= 0.0);
-  assert (penetration <= 1.0);
-  assert (top_C >= 0.0);
-  assert (top_N >= 0.0);
+  daisy_assert (penetration >= 0.0);
+  daisy_assert (penetration <= 1.0);
+  daisy_assert (top_C >= 0.0);
+  daisy_assert (top_N >= 0.0);
 
   // Ignore tiny pools.
   if (total_C (geometry) < 1e-20)
@@ -124,13 +121,13 @@ OM::mix (const Geometry& geometry, double from, double to, double penetration)
   geometry.add (C, from, to, top_C * penetration);
   geometry.mix (C, from, to);
   top_C *= (1.0 - penetration);
-  assert (top_C >= 0.0);
+  daisy_assert (top_C >= 0.0);
 
   // Mix N.
   geometry.add (N, from, to, top_N * penetration);
   geometry.mix (N, from, to);
   top_N *= (1.0 - penetration);
-  assert (top_N >= 0.0);
+  daisy_assert (top_N >= 0.0);
 
   // Calculate C/N.
   set_N (N);
@@ -139,8 +136,8 @@ OM::mix (const Geometry& geometry, double from, double to, double penetration)
 void
 OM::swap (const Geometry& geometry, double from, double middle, double to)
 {
-  assert (top_C >= 0.0);
-  assert (top_N >= 0.0);
+  daisy_assert (top_C >= 0.0);
+  daisy_assert (top_N >= 0.0);
 
   // Ignore tiny pools.
   if (total_C (geometry) < 1e-20)
@@ -168,11 +165,11 @@ OM::total_N (const Geometry& geometry) const
 {
   double total = 0.0;
   const unsigned int size = C.size ();
-  assert (C_per_N.size () >= size);
+  daisy_assert (C_per_N.size () >= size);
 
   for (unsigned int i = 0; i < size; i++)
     {
-      assert (C_per_N[i] > 0.0);
+      daisy_assert (C_per_N[i] > 0.0);
       total += (C[i] / C_per_N[i]) * geometry.dz (i);
     }
   return total + top_N;
@@ -191,8 +188,8 @@ OM::N_at (unsigned int at) const
 {
   if (at >= C.size ())
     return 0.0;
-  assert (at < C_per_N.size ());
-  assert ( C_per_N[at] > 0.0);
+  daisy_assert (at < C_per_N.size ());
+  daisy_assert ( C_per_N[at] > 0.0);
   return C[at] / C_per_N[at];
 }
 
@@ -200,13 +197,13 @@ void
 OM::pour (vector<double>& cc, vector<double>& nn)
 {
   const unsigned int size = C.size ();
-  assert (C_per_N.size () >= size);
-  assert (cc.size () >= size);
-  assert (nn.size () >= size);
+  daisy_assert (C_per_N.size () >= size);
+  daisy_assert (cc.size () >= size);
+  daisy_assert (nn.size () >= size);
   for (unsigned int i = 0; i < size; i++)
     {
       cc[i] += C[i];
-      assert (C_per_N[i] > 0.0);
+      daisy_assert (C_per_N[i] > 0.0);
       nn[i] += C[i] / C_per_N[i];
       C[i] = 0.0;
     }
@@ -215,8 +212,8 @@ OM::pour (vector<double>& cc, vector<double>& nn)
 void 
 OM::add (double C, double N)
 {
-  assert (C >= 0.0);
-  assert (N >= 0.0);
+  daisy_assert (C >= 0.0);
+  daisy_assert (N >= 0.0);
   top_C += C;
   top_N += N;
 }
@@ -238,11 +235,11 @@ OM::add (unsigned int at, double to_C, double to_N)
   if (C[at] > 0.0)
     C_per_N[at] = C[at] / new_N;
   else
-    assert (new_N == 0.0);
-  assert (finite (C[at]));
-  assert (C[at] >= 0.0);
-  assert (finite (C_per_N[at]));
-  assert (C_per_N[at] >= 0.0);
+    daisy_assert (new_N == 0.0);
+  daisy_assert (finite (C[at]));
+  daisy_assert (C[at] >= 0.0);
+  daisy_assert (finite (C_per_N[at]));
+  daisy_assert (C_per_N[at] >= 0.0);
 }
 
 void 
@@ -257,18 +254,18 @@ OM::add (const Geometry& geometry, // Add dead roots.
   const double total = geometry.total (density);
   for (unsigned int i = 0; i < density.size (); i++)
     {
-      assert (approximate (C_per_N[i], initial_C_per_N));
+      daisy_assert (approximate (C_per_N[i], initial_C_per_N));
       // We should *not* multiply with dz here.  Reason: We want to
       // divide C on the total depth.  
       C[i] += to_C * density[i] /* * geometry.dz (i) */ / total;
-      assert (density[i] >= 0.0);
-      assert (finite (C[i]));
-      assert (C[i] >= 0.0);
+      daisy_assert (density[i] >= 0.0);
+      daisy_assert (finite (C[i]));
+      daisy_assert (C[i] >= 0.0);
     }
 
   // Check that we computed the correct value.
   const double new_C = total_C (geometry);
-  assert (to_C * 1e9 < old_C
+  daisy_assert (to_C * 1e9 < old_C
 	  ? approximate (old_C + to_C, new_C)
 	  : (approximate (new_C - old_C, to_C)));
 }
@@ -289,26 +286,26 @@ OM::add (const Geometry& geometry, // Add dead roots.
       // We should *not* multiply with dz here.  Reason: We want to
       // divide C on the total depth.  
       const double factor = density[i] /* * geometry.dz (i) */ / total;
-      assert (factor >= 0.0);
+      daisy_assert (factor >= 0.0);
       const double new_N = C[i] / C_per_N[i] + to_N * factor;
       C[i] += to_C * factor;
       if (C[i] > 0.0)
 	C_per_N[i] = C[i] / new_N;
       else
-	assert (new_N == 0.0);
-      assert (finite (C[i]));
-      assert (C[i] >= 0.0);
-      assert (finite (C_per_N[i]));
-      assert (C_per_N[i] >= 0.0);
+	daisy_assert (new_N == 0.0);
+      daisy_assert (finite (C[i]));
+      daisy_assert (C[i] >= 0.0);
+      daisy_assert (finite (C_per_N[i]));
+      daisy_assert (C_per_N[i] >= 0.0);
     }
 
   // Check that we computed the correct value.
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
-  assert (to_C * 1e9 < old_C
+  daisy_assert (to_C * 1e9 < old_C
 	  ? approximate (old_C + to_C, new_C)
 	  : (approximate (new_C - old_C, to_C)));
-  assert (to_N * 1e9 < old_N
+  daisy_assert (to_N * 1e9 < old_N
 	  ? approximate (old_N + to_N, new_N)
 	  : (approximate (new_N - old_N, to_N)));
 }
@@ -319,23 +316,23 @@ OM::tock (unsigned int end, const double* factor,
 	  const double* N_soil, double* N_used, double* CO2, OM& om)
 {
   const unsigned int size = min (C.size (), end);
-  assert (C_per_N.size () >= size);
+  daisy_assert (C_per_N.size () >= size);
 
   // Maintenance.
   for (unsigned int i = 0; i < size; i++)
     {
       const double N_avail = N_soil[i] - N_used[i];
       double rate = min (factor[i] * fraction, 0.1);
-      assert (C[i] >= 0.0);
-      assert (finite (rate));
-      assert (rate >=0);
-      assert (N_soil[i] * 1.001 >= N_used[i]);
-      assert (C_per_N[i] > 0.0);
-      assert (om.C_per_N[i] > 0.0);
+      daisy_assert (C[i] >= 0.0);
+      daisy_assert (finite (rate));
+      daisy_assert (rate >=0);
+      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
+      daisy_assert (C_per_N[i] > 0.0);
+      daisy_assert (om.C_per_N[i] > 0.0);
       double N_produce = C[i] * rate / C_per_N[i];
       double N_consume = C[i] * rate * efficiency / om.C_per_N[i];
-      assert (finite (N_produce));
-      assert (finite (N_consume));
+      daisy_assert (finite (N_produce));
+      daisy_assert (finite (N_consume));
       if (N_consume - N_produce > N_avail)
 	{
 	  if (N_avail < 1e-12) // Less than 1 [ug/l] to use...
@@ -346,7 +343,7 @@ OM::tock (unsigned int end, const double* factor,
 	  // This is what calc tell me:
 	  rate = (N_soil[i] - N_used[i]) 
 	    / (efficiency * C[i] / om.C_per_N[i] - C[i] / C_per_N[i]);
-	  assert (finite (rate));
+	  daisy_assert (finite (rate));
 	  if (rate < 0)
 	    rate = 0;
 
@@ -359,10 +356,10 @@ OM::tock (unsigned int end, const double* factor,
 	  // Update the N values.
 	  N_produce = C[i] * rate / C_per_N[i];
 	  N_consume = C[i] * rate * efficiency / om.C_per_N[i];
-	  assert (finite (N_produce));
-	  assert (finite (N_consume));
+	  daisy_assert (finite (N_produce));
+	  daisy_assert (finite (N_consume));
 	  // Check that we calculated the right rate.
-	  assert (approximate (N_consume - N_produce, N_avail));
+	  daisy_assert (approximate (N_consume - N_produce, N_avail));
 
 	  // Upddate N.
 	  N_used[i] = N_soil[i];
@@ -372,20 +369,20 @@ OM::tock (unsigned int end, const double* factor,
 	N_used[i] += (N_consume - N_produce);
 	
       // Update C.
-      assert (om.C[i] >= 0.0);
+      daisy_assert (om.C[i] >= 0.0);
       const double C_use = C[i] * rate;
       CO2[i] += C_use * (1.0 - efficiency);
       om.C[i] += C_use * efficiency;
       C[i] -= C_use;
-      assert (om.C[i] >= 0.0);
-      assert (C[i] >= 0.0);
+      daisy_assert (om.C[i] >= 0.0);
+      daisy_assert (C[i] >= 0.0);
 
       // Check for NaN.
-      assert (finite (N_used[i]));
-      assert (finite (rate));
-      assert (finite (efficiency));
-      assert (N_soil[i] * 1.001 >= N_used[i]);
-      assert (C[i] >= 0.0);
+      daisy_assert (finite (N_used[i]));
+      daisy_assert (finite (rate));
+      daisy_assert (finite (efficiency));
+      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
+      daisy_assert (C[i] >= 0.0);
     }
 }
 
@@ -395,25 +392,25 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	  double* CO2, const vector<OM*>& smb, const vector<OM*>&som)
 {
   const unsigned int size = min (C.size (), end);
-  assert (C_per_N.size () >= size);
+  daisy_assert (C_per_N.size () >= size);
 
   if (maintenance != 0.0)
     {
       // SMB maintenance.
       for (unsigned int i = 0; i < size; i++)
 	{
-	  assert (C[i] >= 0.0);
-	  assert (N_soil[i] * 1.001 >= N_used[i]);
+	  daisy_assert (C[i] >= 0.0);
+	  daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
 	  // Maintenance.
 	  const double C_use = C[i] * maintenance * abiotic_factor[i];
 	  CO2[i] += C_use;
 	  C[i] -= C_use;
 	  N_used[i] -= C_use / C_per_N[i];
-	  assert (N_soil[i] * 1.001 >= N_used[i]);
+	  daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
 	}
     }
 
-  assert (fractions.size () == smb.size () + som.size ());
+  daisy_assert (fractions.size () == smb.size () + som.size ());
   // Distribute to all biological pools.
   const unsigned int smb_size = smb.size ();
   for (unsigned int j = 0; j < smb_size; j++)
@@ -434,8 +431,8 @@ OM::tick (unsigned int end, const double* abiotic_factor,
     }
   for (unsigned int i = 0; i < size; i++)
     {
-      assert (N_soil[i] * 1.001 >= N_used[i]);
-      assert (C[i] >= 0.0);
+      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
+      daisy_assert (C[i] >= 0.0);
     }
 }
 
@@ -445,14 +442,14 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	  double* CO2, const vector<OM*>& smb, double* som_C, double* som_N)
 {
   const unsigned int size = min (C.size (), end);
-  assert (C_per_N.size () >= size);
+  daisy_assert (C_per_N.size () >= size);
 
-  assert (maintenance == 0.0);
+  daisy_assert (maintenance == 0.0);
 #if 0
   // Maintenance.
   for (unsigned int i = 0; i < size; i++)
     {
-      assert (C[i] >= 0.0);
+      daisy_assert (C[i] >= 0.0);
 
       if (C[i] > 0.0)
 	{
@@ -460,7 +457,7 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	  C[i] *= (1.0 - maintenance);
 	}
     }
-  assert (fractions.size () == smb.size () + 1);
+  daisy_assert (fractions.size () == smb.size () + 1);
 #endif
   
   // Distribute to all biological pools.
@@ -486,15 +483,15 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 #if 0      
       if (C[i] < 1e-9)
 	{
-	  assert (C[i] > -1e9);
+	  daisy_assert (C[i] > -1e9);
 	  som_C[i] += C[i];
 	  som_N[i] += C[i] / C_per_N[i];
 	  C[i] = 0.0;
 	}
 #endif
-      assert (C[i] >= 0.0);
-      assert (som_C[i] >= 0.0);
-      assert (som_N[i] >= 0.0);
+      daisy_assert (C[i] >= 0.0);
+      daisy_assert (som_C[i] >= 0.0);
+      daisy_assert (som_N[i] >= 0.0);
     }
 }
 

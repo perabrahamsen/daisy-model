@@ -113,7 +113,7 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
 			   const double index, const double z_factor, 
 			   const double max_depth)
 { 
-  assert (abs_dens.size () == geometry.size ());
+  daisy_assert (abs_dens.size () == geometry.size ());
 
   // Find entries before and after current index.
   const Entry* before = NULL;
@@ -132,21 +132,21 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
   // Find relative distibution.
   if (before == NULL)
     {				// Current index is after last entry.
-      assert (after != NULL);
+      daisy_assert (after != NULL);
       for (unsigned int i = 0; i < geometry.size (); i++)
 	abs_dens[i] = after->density (geometry.z (i) * z_factor);
     }
   else if (after == NULL)
     {				// Current index is before first entry.
-      assert (before != NULL);
+      daisy_assert (before != NULL);
       for (unsigned int i = 0; i < geometry.size (); i++)
 	abs_dens[i] = before->density (geometry.z (i) * z_factor);
     }
   else
     {				// Current index is between two entries.
-      assert (after != NULL);
-      assert (before != NULL);
-      assert (after->index > before->index);
+      daisy_assert (after != NULL);
+      daisy_assert (before != NULL);
+      daisy_assert (after->index > before->index);
 
       const double rel_dist 
 	= (index - before->index) / (after->index - before->index);
@@ -165,16 +165,16 @@ Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
     }
 
   // Find absolute distribution.
-  assert (WRoot > 0.0);
-  assert (SpRtLength > 0.0);
+  daisy_assert (WRoot > 0.0);
+  daisy_assert (SpRtLength > 0.0);
   static const double m_per_cm = 0.01;
   const double LengthPrArea = m_per_cm * SpRtLength * WRoot; // [cm/cm^2]
   const double sum = geometry.total (abs_dens);
-  assert (sum > 0.0);
+  daisy_assert (sum > 0.0);
   const double factor = LengthPrArea / sum;
   for (unsigned int i = 0; i < abs_dens.size (); i++)
     abs_dens[i] *= factor;
-  assert (approximate (LengthPrArea, geometry.total (abs_dens)));
+  daisy_assert (approximate (LengthPrArea, geometry.total (abs_dens)));
 }
 
 Rootdens_PLF::Rootdens_PLF (const AttributeList& al)
@@ -240,7 +240,7 @@ struct Rootdens_DS_Rel : public Rootdens_PLF
 		    double Depth, double /* PotRtDpt */,
 		    double WRoot, double DS)
   { 
-    assert (Depth > 0.0);
+    daisy_assert (Depth > 0.0);
     get_density (msg, abs_dens, geometry, WRoot, DS, -1.0 / Depth); 
   }
 

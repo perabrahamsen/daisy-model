@@ -247,7 +247,7 @@ CropStandard::tick (const Time& time,
 
   if (soil_NO3)
     {
-      assert (soil_NH4);
+      daisy_assert (soil_NH4);
       nitrogen.update (time.hour (), production.NCrop, development.DS,
 		       enable_N_stress,
 		       soil, soil_water, *soil_NH4, *soil_NO3,
@@ -255,7 +255,7 @@ CropStandard::tick (const Time& time,
     }
   else
     {
-      assert (!soil_NH4);
+      daisy_assert (!soil_NH4);
       production.NCrop = nitrogen.PtNCnt;
     }  
   const double nitrogen_stress = root_system.nitrogen_stress;
@@ -383,7 +383,7 @@ CropStandard::harvest (const string& column_name,
 	  
 	  // Cut canopy.
 	  canopy.cut (development.DS, stub_length);
-	  assert (approximate (canopy.CropHeight (production.WStem,
+	  daisy_assert (approximate (canopy.CropHeight (production.WStem,
 						  development.DS), 
 			       canopy.Height));
 	  canopy.CropCAI (production.WLeaf, production.WSOrg,

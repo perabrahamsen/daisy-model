@@ -59,7 +59,7 @@ main (int argc, char* argv[])
 	  // Do nothing.
 	  break;
 	default:
-	  assert (false);
+	  daisy_assert (false);
 	}
 
       // Check the result.

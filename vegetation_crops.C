@@ -147,7 +147,7 @@ VegetationCrops::CanopySum (CropFun fun) const
 double
 VegetationCrops::CanopyAverage (CropFun fun) const
 {
-  assert (LAI_ > 0.0);
+  daisy_assert (LAI_ > 0.0);
   return CanopySum (fun) / LAI_;
 }
 
@@ -272,8 +272,8 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
   if (LAI_ > 0.0)
     {
       // Check that we calculated LAIvsH right.
-      assert (LAIvsH_ (0.0) == 0.0);
-      assert (approximate (LAI_, LAIvsH_ (height_)));
+      daisy_assert (LAIvsH_ (0.0) == 0.0);
+      daisy_assert (approximate (LAI_, LAIvsH_ (height_)));
 
       // Find H as a function of LAI.
       HvsLAI_ = LAIvsH_.inverse ();
@@ -300,7 +300,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	}
       else
 	{
-	  assert (HvsLAI_ (0.0) == 0.0);
+	  daisy_assert (HvsLAI_ (0.0) == 0.0);
 	  
 	  // Other stuff
 	  cover_ =  1.0 - exp (-CanopySum (&Crop::EPext));
@@ -386,7 +386,7 @@ VegetationCrops::kill_all (const string& name, const Time& time,
       delete *crop;
     }
   crops.erase (crops.begin (), crops.end ());
-  assert (crops.size () == 0);
+  daisy_assert (crops.size () == 0);
   reset_canopy_structure (msg);
 }
 

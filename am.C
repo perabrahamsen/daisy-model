@@ -132,7 +132,7 @@ AM::Implementation::Lock::Lock (const AttributeList& al)
 void 
 AM::Implementation::unlock ()
 {
-  assert (lock != NULL);
+  daisy_assert (lock != NULL);
   delete lock;
   lock = NULL;
 };		
@@ -144,14 +144,14 @@ AM::Implementation::locked () const
 const string 
 AM::Implementation::crop_name () const
 { 
-  assert (lock);
+  daisy_assert (lock);
   return lock->crop;
 }
 
 const string 
 AM::Implementation::crop_part_name () const
 {
-  assert (lock);
+  daisy_assert (lock);
   return lock->part;
 }
 
@@ -159,9 +159,9 @@ void
 AM::Implementation::distribute (double C, vector<double>& om_C, 
 				double N, vector<double>& om_N)
 {
-  assert (C >= 0.0);
-  assert (N >= 0.0);
-  assert (C == 0.0 || N > 0.0);
+  daisy_assert (C >= 0.0);
+  daisy_assert (N >= 0.0);
+  daisy_assert (C == 0.0 || N > 0.0);
 
   // Fill out the blanks.
   int missing_fraction = -1;
@@ -179,27 +179,27 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
 	  if (C_per_N != OM::Unspecified)
 	    {
 	      om_N[i] = om_C[i] / C_per_N;
-	      assert (om_N[i] >= 0.0);
+	      daisy_assert (om_N[i] >= 0.0);
 	    }
 	  else
 	    {
-	      assert (missing_C_per_N < 0);
+	      daisy_assert (missing_C_per_N < 0);
 	      missing_C_per_N = i;
 	    }
 	}
       else
 	{
-	  assert (missing_fraction < 0);
+	  daisy_assert (missing_fraction < 0);
 	  missing_fraction = i;
 	  if (om[i]->initial_C_per_N == OM::Unspecified)
 	    {
-	      assert (missing_C_per_N < 0);
+	      daisy_assert (missing_C_per_N < 0);
 	      missing_C_per_N = i;
 	    }
 	}
     }
-  assert (missing_C_per_N > -1);
-  assert (missing_fraction > -1);
+  daisy_assert (missing_C_per_N > -1);
+  daisy_assert (missing_fraction > -1);
 
   // Calculate C in missing fraction.
   om_C[missing_fraction] = C - accumulate (om_C.begin (), om_C.end (), 0.0);
@@ -208,9 +208,9 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
   if (missing_fraction != missing_C_per_N)
     {
       const double C_per_N = om[missing_fraction]->initial_C_per_N;
-      assert (C_per_N >= 0.0);
+      daisy_assert (C_per_N >= 0.0);
       om_N[missing_fraction] = om_C[missing_fraction] / C_per_N;
-      assert (om_N[missing_fraction] >= 0.0);
+      daisy_assert (om_N[missing_fraction] >= 0.0);
     }
   om_N[missing_C_per_N] = N - accumulate (om_N.begin (), om_N.end (), 0.0);
 
@@ -222,7 +222,7 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
 	  const double fraction = om[i]->initial_fraction;
 	  if (fraction == OM::Unspecified)
 	    {
-	      assert (i == missing_fraction);
+	      daisy_assert (i == missing_fraction);
 	      om_N[i] = 0.0;
 	    }
 	  else
@@ -230,18 +230,18 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
 	}
       om_N[missing_fraction]
 	= N - accumulate (om_N.begin (), om_N.end (), 0.0);
-      assert (om_N[missing_fraction] >= 0.0);
+      daisy_assert (om_N[missing_fraction] >= 0.0);
     }
 
-  assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
-  assert (approximate (N, accumulate (om_N.begin (), om_N.end (), 0.0)));
+  daisy_assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
+  daisy_assert (approximate (N, accumulate (om_N.begin (), om_N.end (), 0.0)));
 }
 
 void
 AM::Implementation::add (double C, double N)
 {
-  assert (C >= 0);
-  assert (N >= 0);
+  daisy_assert (C >= 0);
+  daisy_assert (N >= 0);
   vector<double> om_C (om.size (), 0.0);
   vector<double> om_N (om.size (), 0.0);
 
@@ -255,7 +255,7 @@ void
 AM::Implementation::add (const Geometry& geometry,
 			 AM::Implementation& other)
 {
-  assert (&other != this);
+  daisy_assert (&other != this);
   const double old_C = total_C (geometry) + other.total_C (geometry);
   const double old_N = total_N (geometry) + other.total_N (geometry);
 
@@ -278,8 +278,8 @@ AM::Implementation::add (const Geometry& geometry,
 
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
-  assert (approximate (old_C, new_C));
-  assert (approximate (old_N, new_N));
+  daisy_assert (approximate (old_C, new_C));
+  daisy_assert (approximate (old_N, new_N));
 }
 
 void
@@ -287,8 +287,8 @@ AM::Implementation::add (const Geometry& geometry,
 			 double C, double N,
 			 const vector<double>& density)
 {
-  assert (C >= 0);
-  assert (N >= 0);
+  daisy_assert (C >= 0);
+  daisy_assert (N >= 0);
   const double old_C = total_C (geometry);
   const double old_N = total_N (geometry);
 
@@ -300,8 +300,8 @@ AM::Implementation::add (const Geometry& geometry,
   for (unsigned int i = 0; i < om.size (); i++)
     om[i]->add (geometry, om_C[i], om_N[i], density);
 
-  assert (approximate (old_C + C, total_C (geometry)));
-  assert (approximate (old_N + N, total_N (geometry)));
+  daisy_assert (approximate (old_C + C, total_C (geometry)));
+  daisy_assert (approximate (old_N + N, total_N (geometry)));
 }
 
 void
@@ -309,7 +309,7 @@ AM::Implementation::add (const Geometry& geometry,
 			 double C, /* fixed C/N */
 			 const vector<double>& density)
 {
-  assert (C >= 0);
+  daisy_assert (C >= 0);
   const double old_C = total_C (geometry);
 
   // Find the missing fraction.
@@ -323,22 +323,22 @@ AM::Implementation::add (const Geometry& geometry,
 	om_C[i] = C * fraction;
       else
 	{
-	  assert (missing_fraction < 0);
+	  daisy_assert (missing_fraction < 0);
 	  missing_fraction = i;
 	}
     }
-  assert (missing_fraction > -1);
+  daisy_assert (missing_fraction > -1);
 
   // Calculate C in missing fraction.
   om_C[missing_fraction] = C - accumulate (om_C.begin (), om_C.end (), 0.0);
-  assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
+  daisy_assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
   
   // Distribute to OMs.
   for (unsigned int i = 0; i < om.size (); i++)
     om[i]->add (geometry, om_C[i], density);
 
   const double new_C = total_C (geometry);
-  assert (approximate (new_C, old_C + C));
+  daisy_assert (approximate (new_C, old_C + C));
 }
 
 double
@@ -406,8 +406,8 @@ AM::Implementation::mix (const Geometry& geometry,
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
   
-  assert (approximate (new_C, old_C));
-  assert (approximate (new_N, old_N));
+  daisy_assert (approximate (new_C, old_C));
+  daisy_assert (approximate (new_N, old_N));
 }
 
 void
@@ -423,8 +423,8 @@ AM::Implementation::swap (const Geometry& geometry,
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
   
-  assert (approximate (new_C, old_C));
-  assert (approximate (new_N, old_N));
+  daisy_assert (approximate (new_C, old_C));
+  daisy_assert (approximate (new_N, old_N));
 }
 
 double 
@@ -681,7 +681,7 @@ AM::get_NO3 (const AttributeList& al)
 	  return N * al.number ("NO3_fraction");
 	}
       // Mineral fertilizer.
-      assert (al.name ("syntax") == "mineral");
+      daisy_assert (al.name ("syntax") == "mineral");
       return al.number ("weight")
 	* (1.0 - al.number ("NH4_fraction"))
 	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
@@ -710,14 +710,14 @@ AM::get_NH4 (const AttributeList& al)
 	  return N * al.number ("NH4_fraction") * (1.0 - volatilization);
 	}
       // Mineral fertilizer.
-      assert (al.name ("syntax") == "mineral");
+      daisy_assert (al.name ("syntax") == "mineral");
       
       return al.number ("weight")
 	* al.number ("NH4_fraction") * (1.0 - volatilization)
 	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
     }
   // Other.
-  assert (!al.check ("NH4_evaporation") && !al.check ("volatilization"));
+  daisy_assert (!al.check ("NH4_evaporation") && !al.check ("volatilization"));
   return al.number ("NH4");
 }
 
@@ -741,13 +741,13 @@ AM::get_volatilization (const AttributeList& al)
 	  return N * al.number ("NH4_fraction") * volatilization;
 	}
       // Mineral fertilizer.
-      assert (al.name ("syntax") == "mineral");
+      daisy_assert (al.name ("syntax") == "mineral");
       
       return al.number ("weight")
 	* al.number ("NH4_fraction") * volatilization; 
     }
   // Other.
-  assert (!al.check ("NH4_evaporation") && !al.check ("volatilization"));
+  daisy_assert (!al.check ("NH4_evaporation") && !al.check ("volatilization"));
   return 0.0;
 }
 
@@ -760,10 +760,10 @@ AM::set_utilized_weight (AttributeList& am, const double weight)
     am.add ("weight", weight);
   else
     {
-      assert (syntax == "organic");
-      assert (am.check ("first_year_utilization"));
-      assert (am.check ("total_N_fraction"));
-      assert (am.check ("dry_matter_fraction"));
+      daisy_assert (syntax == "organic");
+      daisy_assert (am.check ("first_year_utilization"));
+      daisy_assert (am.check ("total_N_fraction"));
+      daisy_assert (am.check ("dry_matter_fraction"));
       const double N_fraction = am.number ("total_N_fraction");
       const double utilization = am.number ("first_year_utilization");
       const double dry_matter_fraction = am.number ("dry_matter_fraction");
@@ -847,9 +847,9 @@ AM::initialize (const Soil& soil)
       add (C, N);
     }
   else if (syntax == "mineral")
-    assert (false);
+    daisy_assert (false);
   else if (syntax == "crop")
-    assert (false);
+    daisy_assert (false);
   else if (syntax == "initial")
     {
       const vector<AttributeList*>& oms = alist.alist_sequence ("om");
@@ -898,7 +898,7 @@ AM::initialize (const Soil& soil)
       // Fill C_per_N to match C.
       for (unsigned int i = 0; i < om.size (); i++)
 	{
-	  assert (om[i]->C_per_N.size () > 0);
+	  daisy_assert (om[i]->C_per_N.size () > 0);
 	  while (om[i]->C_per_N.size () < om[i]->C.size ())
 	    om[i]->C_per_N.push_back(om[i]->C_per_N[om[i]->C_per_N.size ()-1]);
 	}
@@ -943,7 +943,7 @@ static bool check_organic (const AttributeList& al, Treelog& err)
     }
 
   const string syntax = al.name ("syntax");
-  assert (syntax == "organic");
+  daisy_assert (syntax == "organic");
 
   static bool warned = false;
   if (al.check ("NH4_evaporation") && !warned)
@@ -967,7 +967,7 @@ static bool check_organic (const AttributeList& al, Treelog& err)
       if (!om_alist[i]->check ("C_per_N"))
 	missing_C_per_N++;
     }
-  assert (total_fractions >= 0.0);
+  daisy_assert (total_fractions >= 0.0);
   if (total_fractions < 1e-10)
     {
       err.entry ("you should specify at least one non-zero fraction");
@@ -998,12 +998,12 @@ static bool check_organic (const AttributeList& al, Treelog& err)
 
 static bool check_root (const AttributeList& al, Treelog& err)
 { 
-  assert (al.name ("syntax") == "root");
+  daisy_assert (al.name ("syntax") == "root");
   
   bool ok = true;
 
   // We need exactly one pool with unspecified OM.
-  assert (al.check ("om"));
+  daisy_assert (al.check ("om"));
   int unspecified = 0;
   const vector<AttributeList*>& om = al.alist_sequence ("om");
   for (unsigned int i = 0; i < om.size (); i++)

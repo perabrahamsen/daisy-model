@@ -214,7 +214,7 @@ LogTable::done ()
 	  }
 	  break;
 	default:
-	  assert (false);
+	  daisy_assert (false);
 	}
     }
   out << record_separator;

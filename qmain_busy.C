@@ -20,19 +20,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "qmain_busy.h"
-
+#include "assertion.h"
 #include <qapplication.h>
 #include <qmainwindow.h>
 #include <qstatusbar.h>
-
-#include <assert.h>
 
 QApplication* Busy::global_app = NULL;
 
 void
 Busy::set_global_app (QApplication* app)
 { 
-  assert (!global_app);
+  daisy_assert (!global_app);
   global_app = app;
 };
 
@@ -42,7 +40,7 @@ Busy::Busy (QMainWindow* w, const QString& m)
 { 
   QApplication::setOverrideCursor (Qt::waitCursor);
   widget->statusBar ()->message (message);
-  assert (global_app);
+  daisy_assert (global_app);
   global_app->processEvents ();
 }
   

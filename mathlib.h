@@ -24,6 +24,7 @@
 #define MATHLIB_H
 
 #include "common.h"
+#include "assertion.h"
 #include <vector>
 #include <math.h>
 
@@ -72,7 +73,7 @@ extern bool approximate (double a, double b, double noise = 0.0001);
 
 inline double bound (double a, double x, double b)
 {
-  assert (a <= b);
+  daisy_assert (a <= b);
   if (x < a)
     return a;
   if (x > b)
@@ -82,7 +83,7 @@ inline double bound (double a, double x, double b)
 
 inline void set_bound (double a, double& x, double b)
 {
-  assert (a <= b);
+  daisy_assert (a <= b);
   if (x < a)
     x = a;
   else if (x > b)

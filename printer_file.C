@@ -106,7 +106,7 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     case Syntax::Library:
     case Syntax::Error:
     default:
-      assert (false);
+      daisy_assert (false);
     } 
   return true;
 }
@@ -115,7 +115,7 @@ bool
 PrinterFile::Implementation::is_complex_object (const AttributeList& value, 
 						const Library& library) const
 {
-  assert (value.check ("type"));
+  daisy_assert (value.check ("type"));
   const string element = value.name ("type");
   if (!library.check (element))
     return false;
@@ -175,7 +175,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 					  const string& key,
 					  int indent, bool need_wrapper)
 { 
-  assert (alist.check (key));
+  daisy_assert (alist.check (key));
   Syntax::type type = syntax.lookup (key);
 
   const bool do_wrap 
@@ -463,7 +463,7 @@ void
 PrinterFile::Implementation::print_object (const AttributeList& value,
 					   const Library& library, int indent)
 {
-  assert (value.check ("type"));
+  daisy_assert (value.check ("type"));
   const string element = value.name ("type");
   if (!library.check (element))
     {
@@ -654,7 +654,7 @@ PrinterFile::print_library_file (const string& filename)
 void
 PrinterFile::print_input (const AttributeList& alist)
 {
-  assert (alist.check ("type"));
+  daisy_assert (alist.check ("type"));
   const string type = alist.name ("type");
   const Syntax& syntax = Librarian<Parser>::library ().syntax (type);
 

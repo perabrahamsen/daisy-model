@@ -242,8 +242,8 @@ struct LogEntry
   // Reset at start of time step.
   bool match (const Daisy& daisy, Treelog& out, bool is_printing)
     {
-      assert (current_path_index == 0U);
-      assert (last_valid_path_index == 0U);
+      daisy_assert (current_path_index == 0U);
+      daisy_assert (last_valid_path_index == 0U);
 
       if (condition)
 	{
@@ -258,8 +258,8 @@ struct LogEntry
   // Print result at end of time step.
   void done (ostream& out)
     {
-      assert (current_path_index == 0U);
-      assert (last_valid_path_index == 0U);
+      daisy_assert (current_path_index == 0U);
+      daisy_assert (last_valid_path_index == 0U);
 
       if (error)
 	out << "!";
@@ -503,7 +503,7 @@ struct LogTable1 : public Log
       string_map conv_map;
       for (unsigned int i = 0; i < conv_vector.size (); i += 2)
 	{
-	  assert (i+1 < conv_vector.size ());
+	  daisy_assert (i+1 < conv_vector.size ());
 	  conv_map[conv_vector[i]] = conv_vector[i+1];
 	}
       for (unsigned int i = 0; i < entries.size (); i++)

@@ -89,14 +89,14 @@ Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
     C = M / (Theta + ve  / Ke + vp / Kp);
   else
     {
-      assert (Theta > 0.0);
+      daisy_assert (Theta > 0.0);
       const double a = Theta;
       const double b = Theta * (Kp + Ke) + vp + ve - M;
       const double c = vp * Ke + ve * Kp - M * (Kp + Ke) + Kp * Ke * Theta;
       const double d = - M * Kp * Ke;
     
       C = single_positive_root_of_cubic_equation (a, b, c, d);
-      assert (approximate (M, C_to_M (soil, Theta, i, C)));
+      daisy_assert (approximate (M, C_to_M (soil, Theta, i, C)));
     }
   return C;
 }

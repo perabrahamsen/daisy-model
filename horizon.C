@@ -145,9 +145,9 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic)
   const int from = (int) floor (intervals * hydraulic.Theta_res);
   const int to = (int) ceil (intervals * hydraulic.Theta_sat);
   
-  assert (0 <= from);
-  assert (from < to);
-  assert (to < intervals);
+  daisy_assert (0 <= from);
+  daisy_assert (from < to);
+  daisy_assert (to < intervals);
 
   // Make room, make room...
   K_water.insert (K_water.end (), intervals, 0.0);
@@ -239,7 +239,7 @@ Horizon::Implementation::DepolationsFactor (const Hydraulic& hydraulic,
   if (alfa > 1.0)
     return (alfa * alfa / sqrt (-a) * (M_PI_2 - atan (sqrt (-1.0 / a))) - 1.0)
       / (2.0 * -a);
-  assert (false);
+  daisy_assert (false);
   return 42.42e42;
 }
 
@@ -399,8 +399,8 @@ double
 Horizon::heat_conductivity (double Theta, double Ice) const
 {
   const int entry = int ((Theta + Ice) * impl.intervals);
-  assert (entry >= 0);
-  assert (entry < impl.intervals);
+  daisy_assert (entry >= 0);
+  daisy_assert (entry < impl.intervals);
   return ((impl.K_ice[entry] * Ice + impl.K_water[entry] * Theta) 
 	  / (Theta + Ice))
     * 3600;			// erg/s / cm / K -> erg/h / cm / K
@@ -421,7 +421,7 @@ Horizon::has_attribute (const string& name) const
 double 
 Horizon::get_attribute (const string& name) const
 { 
-  assert (has_attribute (name));
+  daisy_assert (has_attribute (name));
   return impl.attributes[name];
 }
 

@@ -45,7 +45,7 @@ struct Rootdens_G_P : public Rootdens
 double
 Rootdens_G_P::density_distribution_parameter (double a)
 {
-  assert (a > 1.0);
+  daisy_assert (a > 1.0);
   double x, y, z, x1, y1, z1, x2, y2, z2;
 
   if (1 + a > exp (1.0))
@@ -127,8 +127,8 @@ Rootdens_G_P::set_density (Treelog& msg,
   double extra = 0.0;
   if (MinDens > 0.0 && WRoot > 0.0)
     {
-      assert (L0 > 0.0);
-      assert (a > 0.0);
+      daisy_assert (L0 > 0.0);
+      daisy_assert (a > 0.0);
       const double too_low = -log (MinDens / L0) / a; // [cm]
 
       if (too_low < Depth)
@@ -164,12 +164,12 @@ Rootdens_G_P::set_density (Treelog& msg,
 	}
     }
 
-  assert (Density.size () == geometry.size ());
+  daisy_assert (Density.size () == geometry.size ());
   unsigned int i = 0;
   for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
     Density[i] = extra + L0 * exp (a * geometry.z (i));
 
-  assert (i < geometry.size ());
+  daisy_assert (i < geometry.size ());
   for (; i < geometry.size (); i++)
     Density[i] = 0.0;
 

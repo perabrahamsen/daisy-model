@@ -244,14 +244,14 @@ CropSimple::tick (const Time& time,
 				* exp (- N_c * (T - T_emergence)));
       if (soil_NO3)
 	{
-	  assert (soil_NH4);
+	  daisy_assert (soil_NH4);
 	  N_actual += root_system.nitrogen_uptake (soil, soil_water, 
 						   *soil_NH4, *soil_NO3,
 						   N_demand - N_actual);
 	}
       else
 	{
-	  assert (!soil_NH4);
+	  daisy_assert (!soil_NH4);
 	  N_actual = N_demand;
 	}
     }
@@ -284,7 +284,7 @@ CropSimple::harvest (const string& column_name,
       const double this_far = min (1.0, (T - T_emergence) / T_growth);
 
       AM& am = AM::create (geometry, time, root_am, name, "root");
-      assert (geometry.total (root_system.Density) > 0.0);
+      daisy_assert (geometry.total (root_system.Density) > 0.0);
       am.add (geometry, 
 	      this_far * WRoot * 0.420 * m2_per_cm2,
 	      this_far * NRoot * m2_per_cm2,

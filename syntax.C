@@ -25,6 +25,7 @@
 #include "library.h"
 #include "tmpstream.h"
 #include "check.h"
+#include "assertion.h"
 #include <map>
 #include <algorithm>
 
@@ -187,7 +188,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
       else if (types[key] == AList)
 	if (size[key] != Singleton)
 	  {
-	    assert (vl.size (key) != Syntax::Singleton);
+	    daisy_assert (vl.size (key) != Syntax::Singleton);
 	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
 	    {
 	      Treelog::Open nest (err, key);
@@ -313,7 +314,7 @@ static const char * const type_names[] =
 const char* 
 Syntax::type_name (type t)
 {
-  assert (sizeof (type_names) / sizeof  (const char*) == Error + 2);
+  daisy_assert (sizeof (type_names) / sizeof  (const char*) == Error + 2);
   return type_names[t];
 }
     
@@ -356,7 +357,7 @@ Syntax::lookup (const string& key) const
 bool
 Syntax::is_const (const string& key) const
 {
-  assert (impl.status.find (key) != impl.status.end ());
+  daisy_assert (impl.status.find (key) != impl.status.end ());
   return (impl.status[key] == Const
 	  || impl.status[key] == OptionalConst);
 }
@@ -364,7 +365,7 @@ Syntax::is_const (const string& key) const
 bool
 Syntax::is_state (const string& key) const
 {
-  assert (impl.status.find (key) != impl.status.end ());
+  daisy_assert (impl.status.find (key) != impl.status.end ());
   return (impl.status[key] == State
 	  || impl.status[key] == OptionalState);
 }
@@ -372,7 +373,7 @@ Syntax::is_state (const string& key) const
 bool
 Syntax::is_optional (const string& key) const
 {
-  assert (impl.status.find (key) != impl.status.end ());
+  daisy_assert (impl.status.find (key) != impl.status.end ());
   return (impl.status[key] == OptionalState 
 	  || impl.status[key] == OptionalConst);
 }
@@ -380,21 +381,21 @@ Syntax::is_optional (const string& key) const
 bool
 Syntax::is_log (const string& key) const
 {
-  assert (impl.status.find (key) != impl.status.end ());
+  daisy_assert (impl.status.find (key) != impl.status.end ());
   return impl.status[key] == LogOnly;
 }
 
 const Syntax&
 Syntax::syntax (const string& key) const
 {
-  assert (impl.syntax.find (key) != impl.syntax.end ());
+  daisy_assert (impl.syntax.find (key) != impl.syntax.end ());
   return *impl.syntax[key];
 }
 
 ::Library&
 Syntax::library (const string& key) const
 {
-  assert (impl.libraries.find (key) != impl.libraries.end ());
+  daisy_assert (impl.libraries.find (key) != impl.libraries.end ());
   return *impl.libraries[key];
 }
 
@@ -637,14 +638,14 @@ Syntax::order (const vector<string>& order)
 void 
 Syntax::order (const string& one)
 {
-  assert (impl.order.size () == 0);
+  daisy_assert (impl.order.size () == 0);
   impl.order.push_back (one);
 }
 
 void 
 Syntax::order (const string& one, const string& two)
 {
-  assert (impl.order.size () == 0);
+  daisy_assert (impl.order.size () == 0);
   impl.order.push_back (one);
   impl.order.push_back (two);
 }
@@ -652,7 +653,7 @@ Syntax::order (const string& one, const string& two)
 void 
 Syntax::order (const string& one, const string& two, const string& three)
 {
-  assert (impl.order.size () == 0);
+  daisy_assert (impl.order.size () == 0);
   impl.order.push_back (one);
   impl.order.push_back (two);
   impl.order.push_back (three);
@@ -662,7 +663,7 @@ void
 Syntax::order (const string& one, const string& two, const string& three,
 	       const string& four)
 {
-  assert (impl.order.size () == 0);
+  daisy_assert (impl.order.size () == 0);
   impl.order.push_back (one);
   impl.order.push_back (two);
   impl.order.push_back (three);
@@ -673,7 +674,7 @@ void
 Syntax::order (const string& one, const string& two, const string& three,
 	       const string& four, const string& five)
 {
-  assert (impl.order.size () == 0);
+  daisy_assert (impl.order.size () == 0);
   impl.order.push_back (one);
   impl.order.push_back (two);
   impl.order.push_back (three);

@@ -29,28 +29,28 @@ ColumnBase::ridge (const AttributeList& al)
 void 
 ColumnBase::irrigate_overhead (double flux, double temp, const IM&)
 {
-  assert (flux >= 0.0);
+  daisy_assert (flux >= 0.0);
   bioclimate.irrigate_overhead (flux, temp);
 }
 
 void 
 ColumnBase::irrigate_surface (double flux, double temp, const IM&)
 {
-  assert (flux >= 0.0);
+  daisy_assert (flux >= 0.0);
   bioclimate.irrigate_surface (flux, temp);
 }
 
 void 
 ColumnBase::irrigate_overhead (double flux, const IM&)
 {
-  assert (flux >= 0.0);
+  daisy_assert (flux >= 0.0);
   bioclimate.irrigate_overhead (flux);
 }
 
 void 
 ColumnBase::irrigate_surface (double flux, const IM&)
 {
-  assert (flux >= 0.0);
+  daisy_assert (flux >= 0.0);
   bioclimate.irrigate_surface (flux);
 }
 
@@ -58,9 +58,9 @@ void
 ColumnBase::set_subsoil_irrigation (double flux, const IM&, 
 				    double from, double to)
 {
-  assert (flux >= 0.0);
-  assert (from <= 0.0);
-  assert (to < from);
+  daisy_assert (flux >= 0.0);
+  daisy_assert (from <= 0.0);
+  daisy_assert (to < from);
   soil_water.set_external_source (soil, flux * 0.1 /* mm->cm */, from, to);
 }
 
@@ -144,25 +144,25 @@ ColumnBase::daily_air_temperature () const
 double 
 ColumnBase::soil_temperature (double height) const
 {
-  assert (height < 0);
-  assert (height > soil.z (soil.size () - 1));
+  daisy_assert (height < 0);
+  daisy_assert (height > soil.z (soil.size () - 1));
   return soil_heat.T (soil.interval_plus (height));
 }
 
 double 
 ColumnBase::soil_water_potential (double height) const
 {
-  assert (height < 0);
-  assert (height > soil.z (soil.size () - 1));
+  daisy_assert (height < 0);
+  daisy_assert (height > soil.z (soil.size () - 1));
   return soil_water.h (soil.interval_plus (height));
 }
 
 double 
 ColumnBase::soil_water_content (double from, double to) const
 {
-  assert (to <= from);
-  assert (to <= 0.0);
-  assert (to > soil.z (soil.size () - 1));
+  daisy_assert (to <= from);
+  daisy_assert (to <= 0.0);
+  daisy_assert (to > soil.z (soil.size () - 1));
   return soil_water.content (soil, from, to);
 }
 
@@ -235,7 +235,7 @@ ColumnBase::get_crop_h2o_uptake_at (unsigned int i) const // [cm³/cm³/h]
 { 
   vector<double> v;
   soil_water.get_sink (v);
-  assert (v.size () > i);
+  daisy_assert (v.size () > i);
   return v[i];
 }
 
@@ -423,9 +423,9 @@ ColumnBase::initialize (const Time& time, Treelog& err,
 {
   soil.initialize (groundwater, err);
   residuals_N_soil.insert (residuals_N_soil.begin (), soil.size (), 0.0);
-  assert (residuals_N_soil.size () == soil.size ());
+  daisy_assert (residuals_N_soil.size () == soil.size ());
   residuals_C_soil.insert (residuals_C_soil.begin (), soil.size (), 0.0);
-  assert (residuals_C_soil.size () == soil.size ());
+  daisy_assert (residuals_C_soil.size () == soil.size ());
   if (weather)
     weather->initialize (time, err);
   if (!global_weather && !weather)

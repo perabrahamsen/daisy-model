@@ -102,10 +102,10 @@ Chemicals::Implementation::lookup (const string& name)
 
   // Otherwise, check that it exists and is complate.
   const Library& library = Librarian<Chemical>::library ();
-  assert (library.check (name));
+  daisy_assert (library.check (name));
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
-  assert (syntax.check (alist, Treelog::null ()));
+  daisy_assert (syntax.check (alist, Treelog::null ()));
   AttributeList child (alist);
   child.add ("type", name);
 
@@ -181,7 +181,7 @@ Chemicals::Implementation::canopy_update (const Implementation& in,
 	= old_amount / (1.0 + dt * (k_1 + washoff_fraction));
       const double dissipated = k_1 * new_amount * dt;
       const double washedoff = new_amount * washoff_fraction * dt;
-      assert (approximate (new_amount, old_amount - washedoff - dissipated));
+      daisy_assert (approximate (new_amount, old_amount - washedoff - dissipated));
 
       dissipate.add (chemical, dissipated);
       if (new_amount > 0.0 && new_amount < 1.e-18) // Less than one molecule...

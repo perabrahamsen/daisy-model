@@ -7,6 +7,8 @@
 	* assertion.C, assertion.h: New utility.
 	* Makefile (OTHER): Added it.
 	* main.C (main): Register treelog.
+	* all:  Use `daisy_assert' instead of `assert'.
+
 
 2002-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 

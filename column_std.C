@@ -129,9 +129,9 @@ void
 ColumnStandard::irrigate_overhead (double flux, double temp, const IM& sm)
 {
   ColumnBase::irrigate_overhead (flux, temp, sm);
-  assert (flux >= 0.0);
-  assert (sm.NH4 >= 0.0);
-  assert (sm.NO3 >= 0.0);
+  daisy_assert (flux >= 0.0);
+  daisy_assert (sm.NH4 >= 0.0);
+  daisy_assert (sm.NO3 >= 0.0);
   surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
 }
 
@@ -139,9 +139,9 @@ void
 ColumnStandard::irrigate_surface (double flux, double temp, const IM& sm)
 {
   ColumnBase::irrigate_surface (flux, temp, sm);
-  assert (flux >= 0.0);
-  assert (sm.NH4 >= 0.0);
-  assert (sm.NO3 >= 0.0);
+  daisy_assert (flux >= 0.0);
+  daisy_assert (sm.NH4 >= 0.0);
+  daisy_assert (sm.NO3 >= 0.0);
   surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
 }
 
@@ -149,9 +149,9 @@ void
 ColumnStandard::irrigate_overhead (double flux, const IM& sm)
 {
   ColumnBase::irrigate_overhead (flux, sm);
-  assert (flux >= 0.0);
-  assert (sm.NH4 >= 0.0);
-  assert (sm.NO3 >= 0.0);
+  daisy_assert (flux >= 0.0);
+  daisy_assert (sm.NH4 >= 0.0);
+  daisy_assert (sm.NO3 >= 0.0);
   surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
 }
 
@@ -159,9 +159,9 @@ void
 ColumnStandard::irrigate_surface (double flux, const IM& sm)
 {
   ColumnBase::irrigate_surface (flux, sm);
-  assert (flux >= 0.0);
-  assert (sm.NH4 >= 0.0);
-  assert (sm.NO3 >= 0.0);
+  daisy_assert (flux >= 0.0);
+  daisy_assert (sm.NH4 >= 0.0);
+  daisy_assert (sm.NO3 >= 0.0);
   surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
 }
 
@@ -176,9 +176,9 @@ ColumnStandard::set_subsoil_irrigation (double flux, const IM& sm,
 					double from, double to)
 {
   ColumnBase::set_subsoil_irrigation (flux, sm, from, to);
-  assert (flux >= 0.0);
-  assert (from <= 0.0);
-  assert (to < from);
+  daisy_assert (flux >= 0.0);
+  daisy_assert (from <= 0.0);
+  daisy_assert (to < from);
   soil_NH4.set_external_source (soil, 
 				sm.NH4 * (flux * irrigate_solute_soil_factor), 
 				from, to);
@@ -200,8 +200,8 @@ ColumnStandard::fertilize (const AttributeList& al)
 
   // Add inorganic matter.
   IM im (al);
-  assert (im.NH4 >= 0.0);
-  assert (im.NO3 >= 0.0);
+  daisy_assert (im.NH4 >= 0.0);
+  daisy_assert (im.NO3 >= 0.0);
   surface.fertilize (im);
   fertilized_NO3 += im.NO3 / conv; 
   fertilized_NH4 += im.NH4 / conv;
@@ -221,7 +221,7 @@ ColumnStandard::fertilize (const AttributeList& al)
 void 
 ColumnStandard::fertilize (const AttributeList& al, double from, double to)
 {
-  assert (to < from);
+  daisy_assert (to < from);
   // kg/ha -> g/cm^2
   const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
 
@@ -232,8 +232,8 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
 
   // Add inorganic matter.
   IM im (al);
-  assert (im.NH4 >= 0.0);
-  assert (im.NO3 >= 0.0);
+  daisy_assert (im.NH4 >= 0.0);
+  daisy_assert (im.NO3 >= 0.0);
   soil_NO3.add_external (soil, soil_water, im.NO3, from, to);
   soil_NH4.add_external (soil, soil_water, im.NH4, from, to);
   fertilized_NO3 += im.NO3 / conv; 

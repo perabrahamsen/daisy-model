@@ -99,7 +99,7 @@ Surface::Implementation::ridge (const Soil& soil, const SoilWater& soil_water,
 				const AttributeList& al)
 {
   // No permanent ponding.
-  assert (lake < 0.0);
+  daisy_assert (lake < 0.0);
 
   // Get rid of old ridge system.
   if (ridge_)
@@ -290,7 +290,7 @@ Surface::Implementation::ponding () const
 {
   if (lake < 0.0)
     {
-      // assert (!flux_top ());
+      // daisy_assert (!flux_top ());
       return pond;
     }
   else
@@ -370,9 +370,9 @@ Surface::Implementation::tick (Treelog& msg,
   else
     T = (T * pond + temp * water * dt) / (pond + water * dt);
 
-  assert (T > -100.0 && T < 50.0);
+  daisy_assert (T > -100.0 && T < 50.0);
   pond = pond - EvapSoilSurface * dt + water * dt;
-  assert (EvapSoilSurface < 1000.0);
+  daisy_assert (EvapSoilSurface < 1000.0);
 
   if (ridge_)
     {
@@ -406,7 +406,7 @@ Surface::Implementation::albedo (const Soil& soil,
   if (Theta > Theta_pf_1_7)
     return albedo_wet;
 
-  assert (Theta_pf_1_7 > Theta_pf_3);
+  daisy_assert (Theta_pf_1_7 > Theta_pf_3);
 
   return albedo_dry + (albedo_wet - albedo_dry)
     * (Theta - Theta_pf_3) / (Theta_pf_1_7 - Theta_pf_3);
@@ -419,8 +419,8 @@ Surface::fertilize (const IM& n)
 void 
 Surface::Implementation::fertilize (const IM& n)
 { 
-  assert (n.NO3 >= 0.0);
-  assert (n.NH4 >= 0.0);
+  daisy_assert (n.NO3 >= 0.0);
+  daisy_assert (n.NH4 >= 0.0);
 
   im += n;
 }
@@ -629,8 +629,8 @@ Surface::Implementation::Implementation (const AttributeList& al)
     chemicals_can_enter_soil (al.flag ("chemicals_can_enter_soil")),
     ridge_ (al.check ("ridge") ? new Ridge (al.alist ("ridge")) : NULL)
 {
-  assert (im_flux.NO3 == 0.0);
-  assert (im_flux.NH4 == 0.0);
+  daisy_assert (im_flux.NO3 == 0.0);
+  daisy_assert (im_flux.NH4 == 0.0);
 }
 
 Surface::~Surface ()

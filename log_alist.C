@@ -36,45 +36,45 @@ LogAList::check_derived (const string&,
 const string&
 LogAList::entry () const
 { 
-  assert (entry_stack.size () > 0U);
+  daisy_assert (entry_stack.size () > 0U);
   return entry_stack.front ();
 }
 
 const Library&
 LogAList::library () const
 { 
-  assert (library_stack.size () > 0U);
-  assert (library_stack.front ());
+  daisy_assert (library_stack.size () > 0U);
+  daisy_assert (library_stack.front ());
   return *library_stack.front ();
 }
 
 const Syntax&
 LogAList::syntax () const
 { 
-  assert (syntax_stack.size () > 0U);
-  assert (syntax_stack.front ());
+  daisy_assert (syntax_stack.size () > 0U);
+  daisy_assert (syntax_stack.front ());
   return *syntax_stack.front ();
 }
 
 AttributeList&
 LogAList::alist () const
 {
-  assert (alist_stack.size () > 0U);
-  assert (alist_stack.front ());
+  daisy_assert (alist_stack.size () > 0U);
+  daisy_assert (alist_stack.front ());
   return *alist_stack.front ();
 }
 
 vector<AttributeList*>&
 LogAList::alist_sequence ()
 {
-  assert (alist_sequence_stack.size () > 0U);
+  daisy_assert (alist_sequence_stack.size () > 0U);
   return alist_sequence_stack.front ();
 }
 
 int
 LogAList::unnamed ()
 {
-  assert (unnamed_stack.size () > 0U);
+  daisy_assert (unnamed_stack.size () > 0U);
   return unnamed_stack.front ();
 }
 
@@ -120,13 +120,13 @@ void
 LogAList::pop ()
 {
   // Check.
-  assert (entry_stack.size () > 0);
-  assert (library_stack.size () > 0);
-  assert (syntax_stack.size () > 0);
-  assert (alist_stack.size () > 0);
-  assert (alist_sequence_stack.size () > 0);
-  assert (unnamed_stack.size () > 0);
-  assert (unnamed () < 0 || unnamed () == alist_sequence ().size ());
+  daisy_assert (entry_stack.size () > 0);
+  daisy_assert (library_stack.size () > 0);
+  daisy_assert (syntax_stack.size () > 0);
+  daisy_assert (alist_stack.size () > 0);
+  daisy_assert (alist_sequence_stack.size () > 0);
+  daisy_assert (unnamed_stack.size () > 0);
+  daisy_assert (unnamed () < 0 || unnamed () == alist_sequence ().size ());
 
       // Clear old values.
   entry_stack.pop_front ();
@@ -163,7 +163,7 @@ LogAList::open (const string& name)
 {
   if (is_active)
     {
-      assert (!syntax ().is_const (name));
+      daisy_assert (!syntax ().is_const (name));
       if (syntax ().is_state (name))
 	{
 	  const int size = syntax ().size (name);
@@ -187,13 +187,13 @@ LogAList::open (const string& name)
 		      
 	      break;
 	    case Syntax::Object:
-	      assert (size != Syntax::Singleton);
+	      daisy_assert (size != Syntax::Singleton);
 	      push (name, 
 		    syntax ().library (name), 
 		    syntax ().default_alist (name));
 	      break;
 	    default:
-	      assert (false);
+	      daisy_assert (false);
 	    }
 	  // We know how to handle this, continue.
 	  return;
@@ -219,20 +219,20 @@ LogAList::close ()
       // Assign new value to entry.
       if (entry_stack.size () > 0)
 	{
-	  assert (syntax_stack.front ());
+	  daisy_assert (syntax_stack.front ());
 	  const Syntax::type type = syntax ().lookup (old_entry);
 	  switch (type)
 	    { 
 	    case Syntax::Object:
 	      // Object sequence.
-	      assert (syntax ().size (old_entry) != Syntax::Singleton);
+	      daisy_assert (syntax ().size (old_entry) != Syntax::Singleton);
 	      alist ().add (old_entry, old_alist_sequence);
 	      break;
 	    case Syntax::AList:
 	      // AList sequence or singleton.
 	      if (syntax ().size (old_entry) == Syntax::Singleton)
 		{
-		  assert (old_alist_sequence.size () == 0);
+		  daisy_assert (old_alist_sequence.size () == 0);
 		  alist ().add (old_entry, old_alist);
 		}
 	      else
@@ -240,7 +240,7 @@ LogAList::close ()
 	      delete &old_alist;
 	      break;
 	    default:
-	      assert (false);
+	      daisy_assert (false);
 	    }
 	}
     }
@@ -282,9 +282,9 @@ LogAList::close_unnamed ()
       // Use next entry.
       if (unnamed () >= 0)
 	unnamed_stack[0]++;
-      assert (syntax_stack.size () > 1);
-      assert (syntax_stack[1]->lookup (entry ()) == Syntax::AList);
-      assert (syntax_stack[1]->size (entry ()) != Syntax::Singleton);
+      daisy_assert (syntax_stack.size () > 1);
+      daisy_assert (syntax_stack[1]->lookup (entry ()) == Syntax::AList);
+      daisy_assert (syntax_stack[1]->size (entry ()) != Syntax::Singleton);
     }
   else
     close_ignore ();
@@ -295,8 +295,8 @@ LogAList::open_alist (const string& name, const AttributeList& alist)
 {
   if (is_active)
     {
-      assert (syntax ().lookup (name) == Syntax::AList);
-      assert (syntax ().size (name) == Syntax::Singleton);
+      daisy_assert (syntax ().lookup (name) == Syntax::AList);
+      daisy_assert (syntax ().size (name) == Syntax::Singleton);
       const Syntax& syn = syntax ().syntax (name);
       push (name, syn, alist);
     }
@@ -323,12 +323,12 @@ LogAList::open_derived (const string& field, const string& type)
 { 
   if (is_active)
     {
-      assert (syntax ().lookup (field) == Syntax::Object);
-      assert (syntax ().size (field) == Syntax::Singleton);
+      daisy_assert (syntax ().lookup (field) == Syntax::Object);
+      daisy_assert (syntax ().size (field) == Syntax::Singleton);
       const Library& library = syntax ().library (field);
-      assert (library.check (type));
+      daisy_assert (library.check (type));
       const Syntax& syntax = library.syntax (type);
-      assert (alist ().check (field));
+      daisy_assert (alist ().check (field));
       push (field, syntax, alist ().alist (field));
     }
   else
@@ -386,7 +386,7 @@ LogAList::output (const string& name, const Time& value)
 { 
   if (!is_active)
     return;
-  assert (!syntax ().is_const (name));
+  daisy_assert (!syntax ().is_const (name));
   if (syntax ().is_state (name))
     alist ().add (name, value);
 }
@@ -396,7 +396,7 @@ LogAList::output (const string& name, const bool value)
 { 
   if (!is_active)
     return;
-  assert (!syntax ().is_const (name));
+  daisy_assert (!syntax ().is_const (name));
   if (syntax ().is_state (name))
     alist ().add (name, value);
 }
@@ -406,7 +406,7 @@ LogAList::output (const string& name, const double value)
 { 
   if (!is_active)
     return;
-  assert (!syntax ().is_const (name));
+  daisy_assert (!syntax ().is_const (name));
   if (syntax ().is_state (name))
     alist ().add (name, value);
 }
@@ -416,7 +416,7 @@ LogAList::output (const string& name, const int value)
 { 
   if (!is_active)
     return;
-  assert (!syntax ().is_const (name));
+  daisy_assert (!syntax ().is_const (name));
   if (syntax ().is_state (name))
     alist ().add (name, value);
 }
@@ -426,7 +426,7 @@ LogAList::output (const string& name, const string& value)
 { 
   if (!is_active)
     return;
-  assert (!syntax ().is_const (name));
+  daisy_assert (!syntax ().is_const (name));
   if (syntax ().is_state (name))
     alist ().add (name, value);
 }
@@ -436,7 +436,7 @@ LogAList::output (const string& name, const vector<double>& value)
 { 
   if (!is_active)
     return;
-  assert (!syntax ().is_const (name));
+  daisy_assert (!syntax ().is_const (name));
   if (syntax ().is_state (name))
     alist ().add (name, value);
 }
@@ -446,7 +446,7 @@ LogAList::output (const string& name, const PLF& value)
 { 
   if (!is_active)
     return;
-  assert (!syntax ().is_const (name));
+  daisy_assert (!syntax ().is_const (name));
   if (syntax ().is_state (name))
     alist ().add (name, value);
 }

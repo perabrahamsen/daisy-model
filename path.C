@@ -2,6 +2,7 @@
 
 #include "path.h"
 #include "common.h"
+#include "assertion.h"
 
 // Get chdir.
 #ifdef __BORLANDC__
@@ -49,7 +50,7 @@ Path::open_file (const string& name)
     }
 
   // Look in path.
-  assert (path);		// Must call set_path first.
+  daisy_assert (path);		// Must call set_path first.
   ifstream* in = NULL;
   for (unsigned int i = 0; i < path->size (); i++)
     {
@@ -78,7 +79,7 @@ Path::set_path (const vector<string>& value)
 void
 Path::get_path (vector<string>& value)
 { 
-  assert (path);		// Must call set_path first.
+  daisy_assert (path);		// Must call set_path first.
   value = *path;
 }
 

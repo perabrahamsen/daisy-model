@@ -151,7 +151,7 @@ VegetationPermanent::tick (const Time& time,
   if (N_actual < -1e10)
     N_actual = N_demand;	// Initialization.
   else
-    assert (N_actual >= 0.0);
+    daisy_assert (N_actual >= 0.0);
   N_uptake = root_system.nitrogen_uptake (soil, soil_water, 
 					  soil_NH4, soil_NO3,
 					  N_demand - N_actual);
