@@ -280,7 +280,9 @@ COMPONENTS = rootdens.C select.C average.C mactrans.C macro.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = canopy_simple.C canopy_std.C root_system.C \
+SUBMODELS = photosynthesis.C crpn.C vernalization.C \
+	partition.C crpaux.C development.C production.C \
+	harvesting.C canopy_simple.C canopy_std.C root_system.C \
 	ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
 	organic_matter.C nitrification.C denitrification.C soil_heat.C \
 	snow.C im.C om.C harvest.C chemicals.C field.C \
@@ -638,6 +640,25 @@ svat${OBJ}: svat.C svat.h librarian.h library.h common.h alist.h syntax.h \
  treelog.h log.h
 vegetation${OBJ}: vegetation.C vegetation.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h log.h
+photosynthesis${OBJ}: photosynthesis.C photosynthesis.h plf.h submodel.h \
+ alist.h common.h syntax.h treelog.h
+crpn${OBJ}: crpn.C crpn.h production.h root_system.h rootdens.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h log.h plf.h \
+ mathlib.h submodel.h
+vernalization${OBJ}: vernalization.C vernalization.h submodel.h log.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h
+partition${OBJ}: partition.C partition.h plf.h submodel.h syntax.h \
+ common.h treelog.h alist.h
+crpaux${OBJ}: crpaux.C crpaux.h log.h librarian.h library.h common.h \
+ alist.h syntax.h treelog.h submodel.h
+development${OBJ}: development.C development.h crpaux.h vernalization.h \
+ plf.h log.h librarian.h library.h common.h alist.h syntax.h treelog.h \
+ message.h submodel.h
+production${OBJ}: production.C production.h organic_matter.h common.h am.h \
+ librarian.h library.h alist.h syntax.h treelog.h geometry.h log.h \
+ submodel.h
+harvesting${OBJ}: harvesting.C harvesting.h am.h librarian.h library.h \
+ common.h alist.h syntax.h treelog.h om.h submodel.h
 canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
  log.h librarian.h library.h common.h alist.h syntax.h treelog.h
 canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h \
@@ -781,7 +802,7 @@ cdaisy${OBJ}: cdaisy.C syntax.h common.h treelog.h alist.h daisy.h \
 common${OBJ}: common.C common.h message.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
-rootdens_std${OBJ}: rootdens_std.C rootdens.h librarian.h library.h \
+rootdens_G_P${OBJ}: rootdens_G_P.C rootdens.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h geometry.h
 groundwater_file${OBJ}: groundwater_file.C groundwater.h uzmodel.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h \
@@ -799,18 +820,19 @@ column_inorganic${OBJ}: column_inorganic.C column_base.h column.h \
  mactrans.h plf.h groundwater.h log.h weather.h im.h vegetation.h am.h
 vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h plf.h \
- mathlib.h log.h root_system.h canopy_simple.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h crop.h am.h om.h organic_matter.h
+ mathlib.h log.h root_system.h rootdens.h canopy_simple.h soil.h \
+ horizon.h hydraulic.h tortuosity.h geometry.h crop.h am.h om.h \
+ organic_matter.h
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h crop.h organic_matter.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h plf.h mathlib.h \
  harvest.h chemicals.h log.h message.h
 crop_simple${OBJ}: crop_simple.C crop.h time.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h root_system.h canopy_simple.h \
- plf.h log.h bioclimate.h soil_water.h macro.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h om.h organic_matter.h soil_heat.h \
- soil_NH4.h solute.h adsorption.h transport.h mactrans.h soil_NO3.h \
- am.h harvest.h chemicals.h mathlib.h message.h
+ common.h alist.h syntax.h treelog.h root_system.h rootdens.h \
+ canopy_simple.h plf.h log.h bioclimate.h soil_water.h macro.h soil.h \
+ horizon.h hydraulic.h tortuosity.h geometry.h om.h organic_matter.h \
+ soil_heat.h soil_NH4.h solute.h adsorption.h transport.h mactrans.h \
+ soil_NO3.h am.h harvest.h chemicals.h mathlib.h message.h
 action_ridge${OBJ}: action_ridge.C action.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h daisy.h field.h ridge.h message.h
 groundwater_fixed${OBJ}: groundwater_fixed.C groundwater.h uzmodel.h \
@@ -920,11 +942,13 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
 horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h
 crop_std${OBJ}: crop_std.C crop.h time.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h root_system.h canopy_std.h canopy_simple.h \
- plf.h log.h bioclimate.h soil_water.h macro.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h om.h organic_matter.h soil_heat.h \
- soil_NH4.h solute.h adsorption.h transport.h mactrans.h soil_NO3.h \
- am.h harvest.h chemicals.h mathlib.h message.h
+ alist.h syntax.h treelog.h root_system.h rootdens.h canopy_std.h \
+ canopy_simple.h plf.h harvesting.h production.h development.h \
+ crpaux.h partition.h vernalization.h photosynthesis.h crpn.h log.h \
+ bioclimate.h soil_water.h macro.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h om.h organic_matter.h soil_heat.h soil_NH4.h \
+ solute.h adsorption.h transport.h mactrans.h soil_NO3.h am.h \
+ harvest.h chemicals.h mathlib.h message.h
 action_sow${OBJ}: action_sow.C action.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h daisy.h field.h crop.h message.h
 action_stop${OBJ}: action_stop.C action.h librarian.h library.h common.h \

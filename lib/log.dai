@@ -539,6 +539,9 @@
                      (path column "$col" SoilNO3 M)
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "$col" Vegetation crops crops "*" CrpN Fixated)
+                   (dimension "kg N/ha/&")
+                   (factor 10.0))
            (number (path column "$col" fertilized_Org_N)
                    (when hourly)
                    (tag "Org_N-Fertilizer")
@@ -881,11 +884,11 @@
            (month (path time))
            (mday (path time))
            (number (path column "$col" Vegetation crops crops "$crop"
-                         Phenology DS)
+                         Devel DS)
                    (dimension "none")
                    (factor 1.0))        ;Development stage [-1:2]
            (number (path column "$col" Vegetation crops crops "$crop"
-                         Phenology day_length)
+                         Devel day_length)
                    (dimension "h")
                    (factor 1.0))        ;Light hours previous day.
            (number (path column "$col" Vegetation crops crops "$crop"
@@ -933,7 +936,7 @@
                    (dimension "Ton DM/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
-                         CrpAux AccFixated)
+                         CrpN AccFixated)
                    (dimension "kg N/ha")
                    (factor 10.0))
            (number (path column "$col" Vegetation crops crops "$crop"

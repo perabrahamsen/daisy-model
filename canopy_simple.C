@@ -40,6 +40,8 @@ void
 CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("submodel", "CanopySimple");
+  alist.add ("description", "Simple canopy model.");
+
   static const PLF empty_plf;
 
   // Parameters.
@@ -98,4 +100,4 @@ CanopySimple::~CanopySimple ()
 { }
 
 static Submodel::Register 
-soil_submodel ("CanopySimple", CanopySimple::load_syntax);
+canopy_simple_submodel ("CanopySimple", CanopySimple::load_syntax);

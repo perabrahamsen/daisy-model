@@ -228,6 +228,7 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   CanopySimple::load_syntax (syntax, alist);
   alist.add ("submodel", "CanopyStandard");
+  alist.add ("description", "Standard canopy model.");
 
   // Parameters.
   syntax.add ("DSLAI05", Syntax::None (), Syntax::Const,
@@ -334,4 +335,4 @@ CanopyStandard::~CanopyStandard ()
 { }
 
 static Submodel::Register 
-soil_submodel ("CanopyStandard", CanopyStandard::load_syntax);
+canopy_standard_submodel ("CanopyStandard", CanopyStandard::load_syntax);

@@ -362,6 +362,8 @@ void
 RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("submodel", "RootSystem");
+  alist.add ("description", "Standard root system model.");
+
   static const vector<double> empty_array;
 
   syntax.add ("rootdens", Librarian<Rootdens>::library (),
@@ -468,4 +470,4 @@ RootSystem::~RootSystem ()
 { }
 
 static Submodel::Register 
-soil_submodel ("RootSystem", RootSystem::load_syntax);
+root_system_submodel ("RootSystem", RootSystem::load_syntax);

@@ -1,3 +1,43 @@
+2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("N Balance"): Fixated moved to CrpN.
+	("Crop Production"): AccFixated moved to CrpN.
+
+	* photosynthesis.C, photosynthesis.h: New submodel.
+	* vernalization.C, vernalization.h: New submodel.
+	* crpn.C, crpn.h: New submodel.
+	* Makefile (SUBMODELS): Add them.
+	* crop_std.C: Use them.
+
+	* partition.C, partition.h: New submodel.
+	* Makefile (SUBMODELS): Add it.
+	* crop_std.C: Use it.
+
+	* lib/log.dai ("N Balance"): Added fixation.
+
+2001-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crpaux.C, crpaux.h: New submodel.
+	* Makefile (SUBMODELS): Add it.
+	* crop_std.C: Use it.
+
+	* development.C, development.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* crop_std.C: Use it.
+	* lib/log.dai ("Crop Production"): Update.
+
+	* production.C, production.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* crop_std.C: Use it.
+
+	* lib/fertilizer.dai: Added provider information.
+
+	* harvesting.C, harvesting.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* crop_std.C: Use it.
+
+	* root_system.h: Added include guard.
+
 2001-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.91 released.

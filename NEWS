@@ -12,6 +12,21 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.92
+
+** Log file change.  
+
+Phenology has been merged into Devel in the default crop model.  This
+mean log parameterizations logging DS must be updated.  
+
+A number of log variables have been moved from CrpAux to CrpN in the
+default crop model.  The most likely to be logged are Fixated and
+AccFixated. 
+
+The parameterizations in `log.dai' has been updated.
+
+** "N Balance" now logs fixation.
+
 * 1.91
 
 ** Added description string for fertilizer parameterizations.
