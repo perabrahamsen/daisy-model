@@ -91,29 +91,29 @@ public:
 
   // FAO atmospheric utilities.
 public:
-  static double LatentHeatVaporization (double Temp /* [dg C] */); // [MJ/kg]
-  static double PsychrometricConstant (double AtmPressure /* [kPa] */, 
-				       double Temp /* [dg C] */); // [kPa/K]
-  static double AirDensity (double AtmPressure /* [kPa] */,
+  static double LatentHeatVaporization (double Temp /* [dg C] */); // [J/kg]
+  static double PsychrometricConstant (double AtmPressure /* [Pa] */,
+				       double Temp /* [dg C] */); // [Pa/K]
+  static double AirDensity (double AtmPressure /* [Pa] */,
 			    double Temp /* [dg C] */); // [kg/m3]
-  static double SaturationVapourPressure (double Temp /* [dg C] */); // [kPa]
-  static double SlopeVapourPressureCurve (double Temp /* [dg C] */); // [kPa/K]
-  double AtmosphericPressure () const; // [kPa]
-  double CloudinessFactor_Arid (const Time&, double Si /* [MJ/m2/d] */) const;
-  double CloudinessFactor_Humid (const Time&, double Si /* [MJ/m2/d] */) const;
-  double RefNetRadiation (const Time& time, double Si /* [MJ/m2/d] */, 
-			  double Temp /* [dg C] */, 
-			  double ea /* [kPa] */) const;// [MJ/m2/d]
+  static double SaturationVapourPressure (double Temp /* [dg C] */); // [Pa]
+  static double SlopeVapourPressureCurve (double Temp /* [dg C] */); // [Pa/K]
+  double AtmosphericPressure () const; // [Pa]
+  double CloudinessFactor_Arid (const Time&, double Si /* [W/m2] */) const;
+  double CloudinessFactor_Humid (const Time&, double Si /* [W/m2] */) const;
+  double RefNetRadiation (const Time& time, double Si /* [W/m2] */,
+			  double Temp /* [dg C] */,
+			  double ea /* [Pa] */) const;// [W/m2]
   static double Makkink (double air_temperature /* [dg C] */,
-			 double global_radiation /* [W/m^2] */); /* [mm/h] */
+ 		         double global_radiation /* [W/m^2] */); /* [mm/h] */
 
   // Astronomic utilities.
 public:
   static double SolarDeclination (const Time& time); // [rad]
   static double RelativeSunEarthDistance (const Time& time);
   static double SunsetHourAngle (double Dec, double Lat); // [rad]
-  double ExtraterrestrialRadiation (const Time& time) const; // [MJ/m2/d]
-  double HourlyExtraterrestrialRadiation (const Time& time) const; // [MJ/m2/h]
+  double ExtraterrestrialRadiation (const Time& time) const; // [W/m2]
+  double HourlyExtraterrestrialRadiation (const Time& time) const; // [W/m2]
 
   // Create and Destroy.
 private:

@@ -13,7 +13,9 @@ Meteorological data, as well as the global positioning, are the\n\
 responsibility of the `weather' component, typically be reading the\n\
 data from a file.  The meteorological data are common to all columns.";
 
-void 
+const double SolarConstant = 1366.7; // {W/m2]
+
+void
 Weather::tick (const Time& time)
 {
   // Day length.
@@ -50,21 +52,21 @@ Weather::tick_after (const Time& time)
 
 void
 Weather::output (Log& log) const
-{ 
+{
   log.output ("hourly_air_temperature", hourly_air_temperature ());
   log.output ("daily_air_temperature", daily_air_temperature ());
-  log.output ("hourly_global_radiation", 
+  log.output ("hourly_global_radiation",
 	      hourly_global_radiation ());
-  log.output ("daily_global_radiation", 
+  log.output ("daily_global_radiation",
 	      daily_global_radiation ());
-  log.output ("reference_evapotranspiration", 
+  log.output ("reference_evapotranspiration",
 	      reference_evapotranspiration ());
   log.output ("rain", rain ());
   log.output ("snow", snow ());
   log.output ("hourly_cloudiness", hourly_cloudiness ());
   log.output ("daily_cloudiness", daily_cloudiness ());
   log.output ("vapor_pressure", vapor_pressure ());
-  log.output ("wind", wind ()); 
+  log.output ("wind", wind ());
   log.output ("day_length", day_length ());
   log.output ("day_cycle", day_cycle ());
 }
@@ -121,10 +123,10 @@ double
 Weather::day_length (const Time& time) const
 {
   double t = 2 * M_PI / 365 * time.yday ();
-  
+
   double Dec = (0.3964 - 22.97 * cos (t) + 3.631 * sin (t)
-		- 0.03885 * cos (2 * t) 
-		+ 0.03838 * sin (2 * t) - 0.15870 * cos (3 * t) 
+		- 0.03885 * cos (2 * t)
+		+ 0.03838 * sin (2 * t) - 0.15870 * cos (3 * t)
 		+ 0.07659 * sin (3 * t) - 0.01021 * cos (4 * t));
   t = (24 / M_PI
        * acos (-tan (M_PI / 180 * Dec) * tan (M_PI / 180 * latitude)));
@@ -134,45 +136,45 @@ Weather::day_length (const Time& time) const
   return dl;
 }
 
-double 
+double
+Weather::LatentHeatVaporization (double Temp) // [J/kg]
+{ return ((2.501 - 2.361e-3 * Temp) * 1.0e6); }
+
+double
+Weather::PsychrometricConstant (double AtmPressure, double Temp) // [Pa/K]
+{ return (1.63 * AtmPressure / LatentHeatVaporization (Temp)); }
+
+double
 Weather::T_normal (const Time& time, double delay) const
 {
   const double rad_per_day = 2.0 * M_PI / 365.0;
 
   return T_average
-    + T_amplitude 
+    + T_amplitude
     * exp (delay)
     * cos (rad_per_day * (time.yday () - max_Ta_yday) + delay);
 }
 
 double
-Weather::LatentHeatVaporization (double Temp) // [MJ/kg]
-{ return (2.501 - 2.361e-3 * Temp); }
-
-double 
-Weather::PsychrometricConstant (double AtmPressure, double Temp) // [kPa/K]
-{ return (0.00163 * AtmPressure / LatentHeatVaporization (Temp)); }
-
-double 
 Weather::AirDensity (double AtmPressure, double Temp) // [kg/m3]
 {
   const double Tvirtuel = 1.01 * (Temp + 273);
   return (3.486 * AtmPressure / Tvirtuel);
 }
 
-double 
-Weather::SaturationVapourPressure (double Temp) // [kPa]
-{ return (0.611 * exp (17.27 * Temp / (Temp + 237.3))); }
+double
+Weather::SaturationVapourPressure (double Temp) // [Pa]
+{ return (611.0 * exp (17.27 * Temp / (Temp + 237.3))); }
 
-double 
-Weather::SlopeVapourPressureCurve (double Temp) // [kPa/K]
-{ return (4098 * SaturationVapourPressure (Temp) / pow (Temp + 237.3, 2)); }
+double
+Weather::SlopeVapourPressureCurve (double Temp) // [Pa/K]
+{ return (4.098E6 * SaturationVapourPressure (Temp) / pow (Temp + 237.3, 2)); }
 
-double 
-Weather::AtmosphericPressure ()	const // [kPa]
-{ return (101.3 * pow ((293 - 0.0065 * elevation) / 293, 5.26)); }
+double
+Weather::AtmosphericPressure ()	const // [Pa]
+{ return (101300. * pow ((293 - 0.0065 * elevation) / 293, 5.26)); }
 
-double 
+double
 Weather::CloudinessFactor_Arid (const Time& time, double Si) const
 {
   const double a = 1.35;
@@ -180,7 +182,7 @@ Weather::CloudinessFactor_Arid (const Time& time, double Si) const
   return (a * min (1.0, x) + 1 - a);
 }
 
-double 
+double
 Weather::CloudinessFactor_Humid (const Time& time, double Si) const
 {
   const double a = 1.00;
@@ -189,7 +191,7 @@ Weather::CloudinessFactor_Humid (const Time& time, double Si) const
   return cfh;
 }
 
-double 
+double
 Weather::RefNetRadiation (const Time& time, double Si,
 			  double Temp, double ea) const
 {
@@ -208,32 +210,32 @@ Weather::RefNetRadiation (const Time& time, double Si,
   return net_radiation->net_radiation ();
 }
 
-double 
+double
 Weather::SolarDeclination (const Time& time) // [rad]
 {
   return (0.409 * sin (2.0 * M_PI * time.yday () / 365.0 - 1.39));
 }
 
-double 
+double
 Weather::RelativeSunEarthDistance (const Time& time)
 {
   return (1.0 + 0.033 * cos (2.0 * M_PI * time.yday () / 365.0));
 }
 
-double 
+double
 Weather::SunsetHourAngle (double Dec, double Lat) // [rad]
 {
   return (acos (-tan (Dec) * tan (Lat)));
 }
 
-double 
-Weather::ExtraterrestrialRadiation (const Time& time) const // [MJ/m2/d]
+double
+Weather::ExtraterrestrialRadiation (const Time& time) const // [W/m2]
 {
   const double Dec = SolarDeclination (time);
   const double Lat = M_PI / 180 * latitude;
   const double x1 = SunsetHourAngle (Dec, Lat) * sin (Lat) * sin (Dec);
   const double x2 = cos (Lat) * cos (Dec) * sin (SunsetHourAngle (Dec, Lat));
-  return (37.6 * RelativeSunEarthDistance (time) * (x1 + x2));
+  return (SolarConstant * RelativeSunEarthDistance (time) * (x1 + x2) / M_PI);
 }
 
 double
@@ -243,12 +245,12 @@ Weather::Makkink (double air_temperature /* dg C */,
   // Use Makkink's equation for calculating reference_evapotranspiration.
   const double T = 273.16 + air_temperature; // dg C -> K
   const double Delta = 5362.7 / pow (T, 2.0) * exp (26.042 - 5362.7 / T);
-  return 1.05e-3 
+  return 1.05e-3
     * Delta / (Delta + 66.7) * global_radiation;
 }
 
 double
-Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [MJ/m2/h]
+Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [W/m2]
 {
   static const double EQT0   = 0.002733;
   static const double EQT1[] = {-7.343,-9.470,-0.3289,-0.1955};
@@ -264,8 +266,7 @@ Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [MJ/m2/h]
     }
   EQT /= 60.0;
   const double SunHourAngle = M_PI / 12.0 * (time.hour() + 1 + EQT - timelag);
-  const double SolarConstant = 37.6 / 24.0 * RelativeSunEarthDistance (time);
-  return ( SolarConstant *
+  return ( SolarConstant * RelativeSunEarthDistance (time) *
             (sin(Lat)*sin(Dec) + cos(Lat)*cos(Dec)*cos(SunHourAngle)));
 }
 
@@ -284,7 +285,7 @@ Weather::Weather (const AttributeList& al)
     day_cycle_ (-42.42e42),
     hourly_cloudiness_ (0.0),	// It may be dark at the start.
     daily_cloudiness_ (0.0)
-{ 
+{
   WetDeposit.NO3 = -42.42e42;
   WetDeposit.NH4 = -42.42e42;
   DryDeposit.NO3 = -42.42e42;
@@ -312,6 +313,8 @@ Weather::load_syntax (Syntax& syntax, AttributeList&)
 	      "Average radiation this day.");
   syntax.add ("reference_evapotranspiration", "mm/h", Syntax::LogOnly,
 	      "Reference evapotranspiration this hour");
+  syntax.add ("daily_extraterrastial_radiation", "W/m^2", Syntax::LogOnly,
+	      "Extraterrestrial radiation this day.");
   syntax.add ("rain", "mm/h", Syntax::LogOnly, "Rain this hour.");
   syntax.add ("snow", "mm/h", Syntax::LogOnly, "Snow this hour.");
   syntax.add ("hourly_cloudiness", Syntax::None (), Syntax::LogOnly,

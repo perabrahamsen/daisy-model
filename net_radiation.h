@@ -17,11 +17,11 @@ public:
   // Simulation.
 public:
   virtual void output (Log&) const;
-  virtual double net_radiation () const = 0; // [MJ/m2/d]
+  virtual double net_radiation () const = 0; // [W/m2]
   virtual void tick (double Cloudiness /* [0-1] */,
 		     double Temp /* [dg C] */, 
 		     double VapourPressure /* [kPa] */,
-		     double Si /* [MJ/m2/d] */, 
+		     double Si /* [W/m2] */, 
 		     double Albedo /* [0-1] */) = 0;
   void tick (const Weather& weather, double Albedo);
 

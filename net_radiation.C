@@ -36,7 +36,7 @@ struct NetRadiationParent : public NetRadiation
   double net_radiation_;
 
   // Utilities
-  virtual double NetLongwaveRadiation (double Cloudiness, // [MJ/m2/d]
+  virtual double NetLongwaveRadiation (double Cloudiness, // [W/m2]
 				       double Temp,
 				       double VapourPressure) const = 0;
   // Simulation.
@@ -64,7 +64,7 @@ struct NetRadiationParent : public NetRadiation
 };
 
 const double NetRadiationParent::SurEmiss = 0.98;
-const double NetRadiationParent::SB = 4.90e-9;
+const double NetRadiationParent::SB = 5.67e-8; // [W/m^2/K^4]
 
 // Model classes.
 
@@ -73,7 +73,7 @@ struct NetRadiationBrunt : public NetRadiationParent
   const double a;
   const double b;
 
-  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d] 
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
 			      double Temp,
 			      double VapourPressure) const
     {
@@ -90,7 +90,7 @@ struct NetRadiationBrunt : public NetRadiationParent
 
 struct NetRadiationIdsoJackson : public NetRadiationParent
 {
-  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d] 
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
 			      double Temp,
 			      double) const
     {
@@ -105,7 +105,7 @@ struct NetRadiationIdsoJackson : public NetRadiationParent
 
 struct NetRadiationBrutsaert : public NetRadiationParent
 {
-  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d]
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
 			      double Temp,
 			      double VapourPressure) const
     {
@@ -122,7 +122,7 @@ struct NetRadiationBrutsaert : public NetRadiationParent
 
 struct NetRadiationSwinbank : public NetRadiationParent
 {
-  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d]
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
 			      double Temp,
 			      double) const
     {
@@ -137,7 +137,7 @@ struct NetRadiationSwinbank : public NetRadiationParent
 
 struct NetRadiationSatterlund : public NetRadiationParent
 {
-  double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d]
+  double NetLongwaveRadiation(double Cloudiness, // [W/m2]
 			      double Temp,
 			      double VapourPressure) const
     {
@@ -176,7 +176,7 @@ static struct NetRadiationSyntax
     {
       // Brunt.
       Syntax& syntax_brunt = *new Syntax ();
-      syntax_brunt.add ("net_radiation", "MJ/m^2/d", Syntax::LogOnly,
+      syntax_brunt.add ("net_radiation", "W/m^2", Syntax::LogOnly,
 			"The calculated net radiation.");
       // We make them optional, so other code doesn't have to set them.
       syntax_brunt.add ("a", Syntax::None (), Syntax::OptionalConst,
@@ -195,7 +195,7 @@ FAO recommendation.");
 					 &make_brunt);
       // Others.
       Syntax& syntax = *new Syntax ();
-      syntax.add ("net_radiation", "MJ/m^2/d", Syntax::LogOnly,
+      syntax.add ("net_radiation", "W/m^2", Syntax::LogOnly,
 		  "The calculated net radiation.");
       AttributeList& alist_idso_jackson = *new AttributeList ();
       alist_idso_jackson.add ("description", "Idso and Jackson, 1969");
