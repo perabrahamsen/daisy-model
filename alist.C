@@ -470,8 +470,8 @@ void
 AttributeList::Implementation::remove (const string& key)
 {
   value_map::iterator i = values.find (key);
-  assert (i != values.end ());
-  values.erase (i);
+  if (i != values.end ())
+    values.erase (i);
 }
 
 void

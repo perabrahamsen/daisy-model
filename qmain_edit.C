@@ -673,7 +673,6 @@ EditObject::valid ()
 void 
 EditObject::change ()
 { 
-  button->setEnabled (check->isChecked ());
   choice->setEnabled (check->isChecked ());
 
   if (check->isChecked ())
@@ -694,9 +693,7 @@ EditObject::EditObject (QWidget* parent,
 			const string& parameterization)
   : EditEntry (parent, syn, al, def_al, par)
 {
-  button = new QPushButton ("Edit", this);
   choice = new QComboBox (false, this);
-  connect (button, SIGNAL (clicked ()), this, SLOT (edit ()));
   connect (choice, SIGNAL (activated (int)), this, SLOT (activate (int)));
 
   dep_map dependencies;
@@ -718,10 +715,6 @@ EditObject::EditObject (QWidget* parent,
   reset ();
   change ();
 };
-
-void
-EditObject::edit ()
-{ }
 
 void
 EditObject::activate (int index)

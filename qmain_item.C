@@ -64,7 +64,7 @@ bool
 TreeItem::edit_raw ()
 { assert (false); }
 
-void
+bool
 TreeItem::edit_after ()
 { assert (false); }
 
@@ -160,6 +160,31 @@ AtomItem::edit_delete ()
 
 bool
 AtomItem::edit_child ()
+{ return insert_before (0); }
+  
+void
+AtomItem::set_selected ()
+{
+  if (editable ())
+    main ()->set_selection_deletable (true);
+
+  const AListItem* c = dynamic_cast<const AListItem*> (parent ());
+  assert (c);
+  main ()->set_description (c->description (entry));
+  const string parameter = entry.latin1 ();
+  const Syntax::type type = c->syntax.lookup (parameter);
+  assert (type != Syntax::Error);
+  if ((type == Syntax::AList || type == Syntax::Object)
+      && c->syntax.size (parameter) != Syntax::Singleton)
+    {
+      main ()->set_selection_childable (true);
+    }
+  else if (editable ())
+    main ()->set_selection_raw_editable (true);
+}
+
+bool
+AtomItem::insert_before (int where)
 { 
   const AListItem* c = dynamic_cast<const AListItem*> (parent ());
   assert (c); 
@@ -171,8 +196,10 @@ AtomItem::edit_child ()
     {
       AttributeList alist (c->syntax.default_alist (parameter));
       vector<AttributeList*> entry;
+      assert (where <= alists.size ());
+      entry.insert (entry.end (), alists.begin (), &alists[where]);
       entry.push_back (&alist);
-      entry.insert (entry.end (), alists.begin (), alists.end ());
+      entry.insert (entry.end (), &alists[where], alists.end ());
       c->alist.add (parameter, entry);
     }
   else
@@ -208,32 +235,13 @@ AtomItem::edit_child ()
       AttributeList alist (library.lookup (name));
       alist.add ("type", name);
       vector<AttributeList*> entry;
+      assert (where <= alists.size ());
+      entry.insert (entry.end (), alists.begin (), &alists[where]);
       entry.push_back (&alist);
-      entry.insert (entry.end (), alists.begin (), alists.end ());
+      entry.insert (entry.end (), &alists[where], alists.end ());
       c->alist.add (parameter, entry);
     }
   return true;
-}
-
-void
-AtomItem::set_selected ()
-{
-  if (editable ())
-    main ()->set_selection_deletable (true);
-
-  const AListItem* c = dynamic_cast<const AListItem*> (parent ());
-  assert (c);
-  main ()->set_description (c->description (entry));
-  const string parameter = entry.latin1 ();
-  const Syntax::type type = c->syntax.lookup (parameter);
-  assert (type != Syntax::Error);
-  if (type == Syntax::AList || type == Syntax::Object)
-    {
-      assert (c->syntax.size (parameter) != Syntax::Singleton);
-      main ()->set_selection_childable (true);
-    }
-  else if (editable ())
-    main ()->set_selection_raw_editable (true);
 }
 
 AtomItem::AtomItem (TreeItem* i,
@@ -284,9 +292,8 @@ AListItem::recreate_item (TreeItem* item)
 	{
 	  if (SubmodelItem* cc = dynamic_cast<SubmodelItem*> (c))
 	    {
-	      SubmodelItem* ii = dynamic_cast<SubmodelItem*> (item);
-	      assert (ii);
-	      cc->view_defaults = ii->view_defaults;
+	      if (SubmodelItem* ii = dynamic_cast<SubmodelItem*> (item))
+		cc->view_defaults = ii->view_defaults;
 	    }
 	  c->listView ()->setSelected (c, true);
 	  c->setOpen (item->isOpen ());
@@ -682,17 +689,30 @@ SequenceItem::editable () const
   return cc->editable ();
 }
 
-void
+bool
 SequenceItem::edit_after ()
 { 
-  // TODO
+  assert (order > 0);
+  AtomItem* c = dynamic_cast<AtomItem*> (parent ());
+  assert (c);
+  return c->insert_before (order);
 }
 
 bool
 SequenceItem::edit_delete ()
 { 
-  // TODO
-  return false; 
+  assert (order > 0);
+  AtomItem* c = dynamic_cast<AtomItem*> (parent ());
+  assert (c);
+  const string parameter = c->entry.latin1 ();
+  const AListItem* cc = dynamic_cast<const AListItem*> (c->parent ());
+  assert (cc);
+  assert (cc->syntax.size (parameter) != Syntax::Singleton);
+  vector<AttributeList*> alists = cc->alist.alist_sequence (parameter);
+  assert (order <= alists.size ());
+  alists.erase (&alists[order-1]);
+  cc->alist.add (parameter, alists);
+  return true; 
 }
 
 void
@@ -732,4 +752,33 @@ DefaultItem::DefaultItem (const Syntax& syn, AttributeList& al,
 			  const QString& v, const QString& c,
 			  int o)
   : AListItem (syn, al, al_def, i, e, t, v, c, o)
+{ }
+
+QString 
+InputsItem::key (int, bool) const
+{ return QString ("0") + entry; }
+
+bool 
+InputsItem::editable () const
+{ return false; }
+
+void 
+InputsItem::set_selected ()
+{
+  main ()->set_description ("Externally defined parameterizations.");
+  main ()->set_selection_childable (true);
+}
+
+InputsItem::InputsItem (const vector<AttributeList*>& in, 
+			QListView* i, const QString& e)
+  : TreeItem (i, e, QString::number (in.size ()) + " entries"),
+    inputs (in)
+{ }
+
+InputItem::InputItem (const Syntax& syn, AttributeList& al,
+		      const AttributeList& al_def,
+		      InputsItem* i,
+		      const QString& e, const QString& t, const QString& v,
+		      const QString& c, int o)
+  : SequenceItem (syn, al, al_def, i, e, t, v, c, o)
 { }

@@ -1,4 +1,33 @@
+2000-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.62 released.
+
+2000-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (Implementation): Dumb down `tillage_age'
+	initializaer for BCC5.01
+
+	* qmain_item.C (AListItem::recreate_item): That the new entry is a
+	submodel doesn't imply the old entry was a submodel as well.
+
+	* qmain_edit.h, qmain_edit.C (EditObject): Removed `Edit' button.
+
+	* alist.C (remove): Allow removing non-existing entries (a no-op).
+
 2000-10-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* qmain_item.C (AtomItem::set_selected): Valueless objects can
+	also be atoms. 
+
+	* qmain_item.C (SequenceItem::edit_delete): Implement.
+	* qmain_tree.C (MainTree::edit_delete): Handle SequenceItems
+
+	* qmain_item.C, qmain_item.h  (AtomItem::insert_before): New function.
+	* qmain_item.C (AtomItem::edit_child): Call it.
+	(SequenceItem::edit_after): Ditto.
+	* qmain_tree.C, qmain_tree.h, qmain_item.C, qmain_item.h
+	(edit_after): Made it bool.
+	* qmain.C (edit_after): Populate tree.
 
 	* Version 1.61 released.
 

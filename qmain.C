@@ -442,7 +442,10 @@ MainWindow::edit_raw ()
 
 void
 MainWindow::edit_after ()
-{ tree->edit_after (); }
+{
+  if (tree->edit_after ())
+    populate_tree (); 
+}
 
 void
 MainWindow::edit_child ()

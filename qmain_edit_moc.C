@@ -1,7 +1,7 @@
 /****************************************************************************
 ** EditEntry meta object code from reading C++ file 'qmain_edit.h'
 **
-** Created: Fri Oct 13 15:08:08 2000
+** Created: Mon Oct 30 15:13:25 2000
 **      by: The Qt MOC ($Id$)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -252,21 +252,16 @@ QMetaObject* EditObject::staticMetaObject()
     (void) EditEntry::staticMetaObject();
 #ifndef QT_NO_PROPERTIES
 #endif // QT_NO_PROPERTIES
-    typedef void(EditObject::*m1_t0)();
-    typedef void(EditObject::*m1_t1)(int);
-    m1_t0 v1_0 = Q_AMPERSAND EditObject::edit;
-    m1_t1 v1_1 = Q_AMPERSAND EditObject::activate;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(2);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(2);
-    slot_tbl[0].name = "edit()";
+    typedef void(EditObject::*m1_t0)(int);
+    m1_t0 v1_0 = Q_AMPERSAND EditObject::activate;
+    QMetaData *slot_tbl = QMetaObject::new_metadata(1);
+    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(1);
+    slot_tbl[0].name = "activate(int)";
     slot_tbl[0].ptr = (QMember)v1_0;
     slot_tbl_access[0] = QMetaData::Public;
-    slot_tbl[1].name = "activate(int)";
-    slot_tbl[1].ptr = (QMember)v1_1;
-    slot_tbl_access[1] = QMetaData::Public;
     metaObj = QMetaObject::new_metaobject(
 	"EditObject", "EditEntry",
-	slot_tbl, 2,
+	slot_tbl, 1,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
 	0, 0,

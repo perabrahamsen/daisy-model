@@ -12,7 +12,7 @@
 #include "library.h"
 #include "syntax.h"
 #include "alist.h"
-
+#include "parser.h"
 #include <deque>
 
 class TraverseQtTree : public Traverse
@@ -613,6 +613,36 @@ populate_tree (MainWindow* main, bool check_alists,
   build.enter (new SimulationItem (syntax, alist, default_alist,
 			     main->tree, "Daisy"));
   build.traverse_alist (syntax, alist, default_alist, "Daisy");
+  build.leave ();
+
+  // Add inputs
+  if (!alist.check ("parser_inputs"))
+    alist.add ("parser_inputs", vector<AttributeList*> ());
+  const vector<AttributeList*>& inputs 
+    = alist.alist_sequence ("parser_inputs");
+  InputsItem* item = new InputsItem (inputs, main->tree, "Inputs");
+  build.enter (item);
+  const Library& library = Librarian<Parser>::library ();
+  for (unsigned int i = 0; i < inputs.size (); i++)
+    {
+      QString name;
+      name.sprintf ("[%d]", i);
+      AttributeList& alist = *inputs[i];
+      assert (alist.check ("type"));
+      string type = alist.name ("type");
+      assert (library.check (type));
+      const Syntax& syntax = library.syntax (type);
+      const AttributeList& default_alist = library.lookup (type);
+      string where;
+      if (alist.check ("where"))
+	where = alist.name ("where");
+      build.enter (new InputItem (syntax, alist, default_alist, 
+				  item,
+				  name, type.c_str (), where.c_str (), "",
+				  i));
+      build.traverse_alist (syntax, alist, default_alist, name.latin1 ());
+      build.leave ();
+    }
   build.leave ();
 }
 

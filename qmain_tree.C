@@ -118,9 +118,9 @@ MainTree::edit_raw ()
     delete old; 
 }
 
-void
+bool
 MainTree::edit_after ()
-{ item ()->edit_after (); }
+{ return item ()->edit_after (); }
 
 bool
 MainTree::edit_child ()
@@ -140,9 +140,10 @@ MainTree::edit_delete ()
   TreeItem* old = item ();
   if (old->edit_delete ())
     {
-      const bool model = dynamic_cast<ModelItem*> (old) != NULL;
+      const bool repopulate = ((dynamic_cast<ModelItem*> (old) != NULL)
+			       || dynamic_cast<SequenceItem*> (old) != NULL);
       delete old;
-      return model;
+      return repopulate;
     }
   return false;
 }
