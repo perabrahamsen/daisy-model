@@ -173,6 +173,7 @@ Options::find_file (const string& name)
 	  CERR << "Could not open `" << name << "' for reading\n";
 	  throw ("file error");
 	}
+      return fd;
     }
   for (unsigned int i = 0; i < path.size (); i++)
     {
