@@ -150,7 +150,19 @@ static struct HorizonStandardSyntax
     else
       sand = fine_sand + coarse_sand;
 
-    
+    static bool fine_coarse_warned = false;
+    if (!fine_coarse_warned && (fine_sand >= 0.0 || coarse_sand >= 0.0))
+      {
+        err.entry ("\
+NOTE: A division of sand between 'fine_sand' and 'coarse_sand' is not\n\
+supported by the USDA/FAO texture classification.  Daisy will therefore\n\
+internally treat both as the same.  Please don't use the 'default' horizon\n\
+model, and if you use it anyway, please only specify the total sand\n\
+content, using the fine/coarse division is misleading and confusing.\n\
+Maybe you ment to use the ISSS4 texture clasification, which does\n\
+distinguish between fine and coarse sand?");
+        fine_coarse_warned = true;
+      }
     const double silt =  al.number ("silt");
     const double clay =  al.number ("clay");
     const double total = sand + silt + clay;
@@ -180,10 +192,12 @@ OBSOLETE: Use the USDA or FAO model instead.");
                 "Relative fraction of silt in soil.");
     syntax.add ("fine_sand", Syntax::None (), Check::non_negative (), 
                 Syntax::OptionalConst,
-                "Relative fraction of fine sand in soil.");
+                "Relative fraction of fine sand in soil.\n\
+NOTE: Not a real texture class, use 'sand' instead.");
     syntax.add ("coarse_sand", Syntax::None (), Check::non_negative (), 
                 Syntax::OptionalConst,
-                "Relative fraction of coarse sand in soil.");
+                "Relative fraction of coarse sand in soil.\n\
+NOTE: Not a real texture class, use 'sand' instead.");
     syntax.add ("sand", Syntax::None (), Check::non_negative (), 
                 Syntax::OptionalConst,
                 "Relative fraction of sand in soil.");

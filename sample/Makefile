@@ -1,4 +1,4 @@
-LIBS 	= log-sample.dai \
+LIBS 	= dk-soil.dai log-sample.dai \
 	init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
 SETUPS  = batch.dai sample.dai test.dai
 DATA = taastrup.dwf example.gwt

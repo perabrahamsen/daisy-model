@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.71
+
+** dk-soil.dai move from lib to sample.
+
+Also, minimal Jyndevad and Askov column parameterizations were added.
+
 * 3.70
 
 ** Solute in overhead and surface irrigation was wrong unit.

@@ -52,6 +52,8 @@ private:
   void tick_daily (double Ta, double WLeaf, 
 		   Production&, Vernalization&, double cut_stress, Treelog&);
   void emergence (double h, double T);
+  bool mature () const
+  { return DS >= DSMature; }
 
   // Create.
 public:
@@ -95,7 +97,6 @@ PhenologyStandard::tick_daily (const double Ta, const double WLeaf,
 	 production.none ();
        }
     }
-
   daisy_assert (DS <= defined_until_ds);
 }
 

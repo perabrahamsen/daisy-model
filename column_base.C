@@ -500,31 +500,31 @@ the simulation.  If unspecified, used global weather.");
   alist.add ("Chemistry", empty);
   syntax.add ("Groundwater", Librarian<Groundwater>::library (),
 	      "The groundwater level.");
-  syntax.add ("harvest_DM", "g/m^2", Syntax::LogOnly, 
+  syntax.add ("harvest_DM", "g/m^2/h", Syntax::LogOnly, 
 	      "Amount of DM removed by harvest this hour.");
-  syntax.add ("harvest_N", "g/m^2", Syntax::LogOnly, 
+  syntax.add ("harvest_N", "g/m^2/h", Syntax::LogOnly, 
 	      "Amount of nitrogen removed by harvest this hour.");
-  syntax.add ("harvest_C", "g/m^2", Syntax::LogOnly, 
+  syntax.add ("harvest_C", "g/m^2/h", Syntax::LogOnly, 
 	      "Amount of carbon removed by harvest this hour.");
-  syntax.add ("residuals_DM", "g/m^2", Syntax::LogOnly, "\
+  syntax.add ("residuals_DM", "g/m^2/h", Syntax::LogOnly, "\
 Amount of dry matter removed from crops to surface and soil this hour.\n\
 This includes loss as harvest, as well as loss of old leaves and roots.");
-  syntax.add ("residuals_N_top", "g/m^2", Syntax::LogOnly, 
+  syntax.add ("residuals_N_top", "g/m^2/h", Syntax::LogOnly, 
 	      "Amount of nitrogen removed from crops to soil this hour.\n\
 This includes loss as harvest, as well as loss of old leaves.");
-  syntax.add ("residuals_C_top", "g/m^2", Syntax::LogOnly, 
+  syntax.add ("residuals_C_top", "g/m^2/h", Syntax::LogOnly, 
 	      "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old leaves.");
-  syntax.add ("residuals_N_soil", "g/cm^3", Syntax::LogOnly, Syntax::Sequence, 
+  syntax.add ("residuals_N_soil", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
 	      "Amount of nitrogen removed from crops in soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-  syntax.add ("residuals_C_soil", "g/cm^3", Syntax::LogOnly, Syntax::Sequence, 
+  syntax.add ("residuals_C_soil", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
 	      "Amount of carbon removed from crops in soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-  syntax.add ("residuals_N_root", "g/m^2", Syntax::LogOnly, 
+  syntax.add ("residuals_N_root", "g/m^2/h", Syntax::LogOnly, 
 	      "Amount of nitrogen removed from crops to soil this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
-  syntax.add ("residuals_C_root", "g/m^2", Syntax::LogOnly, 
+  syntax.add ("residuals_C_root", "g/m^2/h", Syntax::LogOnly, 
 	      "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
   syntax.add ("surface_water", "mm", Syntax::LogOnly, 

@@ -274,7 +274,7 @@ CropStandard::tick (const Time& time,
 	}
       return;
     }
-  if (development->DS <= 0 || development->DS >= 2)
+  if (development->DS <= 0 || development->mature ())
     return;
 
   if (soil_NO3)

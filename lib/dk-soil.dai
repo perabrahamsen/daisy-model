@@ -26,6 +26,15 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
   (hydraulic M_vG (Theta_res 0.000)(Theta_sat 0.401)
              (alpha 0.057)(n 1.131)(K_sat 5.0 [cm/h])))
 
+(defcolumn JB6_Askov default
+  "This is a JB6 soil with free drainage macropores."
+  (Groundwater deep)
+  (Soil (MaxRootingDepth 100.00 [cm])
+        (dispersivity  4.00)
+        (horizons (  -27.00 "Askov Ap")
+                  (  -80.00 "Askov B")
+                  ( -250.00 "Askov C"))))
+
 (defhorizon "Jyndevad Ap" default
   "Jyndevad 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
 hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
@@ -43,3 +52,10 @@ hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
   (humus 0.004) (C_per_N 13)
   (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
              (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h])))
+
+(defcolumn Jyndevad default
+  (description "This is a JB1 soil with free drainage")
+  (Groundwater deep)
+  (Soil (MaxRootingDepth 60 [cm])
+        (horizons (  -30.00 "Jyndevad Ap")
+                  ( -250.00 "Jyndevad C"))))

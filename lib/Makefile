@@ -14,7 +14,7 @@ DAISY 	= log-std.dai dk-soil.dai dk-fertilizer.dai \
 	$(OLDCROPS) $(NEWCROPS) $(DKCROPS)
 MSHE	= mshe.dai mshe-standalone.dai
 TEXT	= Makefile  all.dai 
-REMOVE 	=  weather.dlf test.dai
+REMOVE 	=  weather.dwf dk-soil.dai
 
 all:
 	echo Nothing to do here.

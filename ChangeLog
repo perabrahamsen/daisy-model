@@ -1,3 +1,27 @@
+2005-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* phenology_std.C, phenology.h, phenology.C (mature): New member
+	function. 
+	* crop_std.C (tick): Use it.
+
+2005-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* path.C (set_directory): Attempt to create directory if chdir
+	fails. 
+
+2005-03-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon_std.C (HorizonStandardSyntax): Added warning for using
+	fine and coarse sand.
+
+2005-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/dk-soil.dai: Moved here.
+	* sample/Makefile (LIBS): Added.
+	* lib/dk-soil.dai: From here.
+	* lib/Makefile (REMOVE): Added.
+	* sample/dk-soil.dai (Jyndevad, (Askov): New columns.
+	
 2005-02-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.70 released.

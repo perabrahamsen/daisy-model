@@ -13,6 +13,7 @@ extern "C" char *getcwd (char *buf, size_t size);
 #else
 #include <dir.h>
 #endif
+extern "C" int mkdir(const char *pathname, int mode);
 
 #include <fstream>
 #include <iostream>
@@ -104,7 +105,10 @@ Path::open_file (const string& name)
 
 bool 
 Path::set_directory (const string& directory)
-{ return chdir (directory.c_str ()) == 0; }
+{ 
+  const char *const dir = directory.c_str ();
+  return chdir (dir) == 0 || (mkdir (dir, 0777) == 0 && chdir (dir) == 0); 
+}
 
 const std::string 
 Path::get_directory ()

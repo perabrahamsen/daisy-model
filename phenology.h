@@ -51,6 +51,7 @@ public:
 			   double cut_stress, Treelog&) = 0;
   virtual void emergence (double h, double T) = 0;
   void output (Log& log) const;
+  virtual bool mature () const;
 
   // Create and Destroy.
 public:

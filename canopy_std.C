@@ -131,8 +131,6 @@ CanopyStandard::CanopyStructure (double DS)
     }
   else
     {
-      daisy_assert (DS <= 2);
-
       z0 = LAIDist1[0];
       z1 = LAIDist1[1];
       z2 = LAIDist1[2];

@@ -360,6 +360,9 @@ Units::standard_conversions ()
   add ("cm", "mm", 10.0);
   add ("g/cm^2", "kg/ha", 1e5);	// Pesticides.
   add ("g/cm^2", "kg N/ha", 1e5); // Inorganic N.
+  add ("g N/cm^2/h", "kg N/ha/h", 1e5); 
+  add ("g N/m^2", "kg N/ha", 10.0); // Crop N.
+  add ("g/m^2", "kg N/ha", 10.0);
   add ("g/cm^2", "kg C/ha", 1e5); // DOM.
   add ("g N/cm^2", "kg N/ha", 1e5); // Organic N.
   add ("g C/cm^2", "kg C/ha", 1e5);

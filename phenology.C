@@ -40,6 +40,10 @@ Phenology::output (Log& log) const
   output_variable (day_length, log);
 }
 
+bool
+Phenology::mature () const
+{ return DS >= 2.0; }
+
 void 
 Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
 {
