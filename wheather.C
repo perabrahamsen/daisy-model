@@ -1,6 +1,6 @@
 // wheather.C
 
-#include "daisy.h"
+#include "wheather.h"
 
 Wheather::Wheather (Log& l)
     : log(l)

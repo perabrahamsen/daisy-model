@@ -1,6 +1,6 @@
 // log.C
 
-#include "daisy.h"
+#include "log.h"
 
 Log::Log ()
 { }

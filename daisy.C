@@ -1,6 +1,13 @@
 // daisy.C
 
 #include "daisy.h"
+#include "input.h"
+#include "manager.h"
+#include "wheather.h"
+#include "log.h"
+#include "column.h"
+#include "action.h"
+#include "library.h"
 #include <iostream.h>
 
 struct Daisy::Implementation
@@ -12,19 +19,27 @@ struct Daisy::Implementation
 
 Daisy::Daisy (const Input& input)
     : impl (*new Implementation), 
-      log(input.makeLog ()), 
+      log (input.makeLog ()), 
       manager (input.makeManager ()),
-      wheather (input.makeWheather ())
-{ 
-    input.makeColumns (columns);
-}
+      wheather (input.makeWheather ()), 
+      columns (input.makeColumns ()),
+      crops (input.makeCrops ())
+{ }
 
 void 
 Daisy::run ()
 { 
-    while (!manager.stop (impl.day, impl.hour))
+    while (true)
 	{
-	    cout << "Tick " << impl.day << ":" << impl.hour << "\n";
+	    const Action* action
+		= manager.action (columns, wheather, impl.day, impl.hour);
+	    
+	    if (action->stop ())
+		break;
+	    
+	    cout << "Tick " << impl.day << ":" << impl.hour << " ";
+
+	    action->doIt (columns, wheather, crops);
 
 	    ColumnList::iterator prev;
 	    ColumnList::iterator column = columns.end ();
@@ -36,10 +51,9 @@ Daisy::run ()
 		    ColumnList::iterator column = next;
 		    next++;
 
-		    manager.manage(**column, wheather);
 		    (*column)->tick (((prev != columns.end ()) ? *prev : 0),
 				     ((next != columns.end ()) ? *next : 0),
-				     wheather);
+				     wheather, impl.day, impl.hour);
 		}
 
 	    if (++impl.hour > 23)

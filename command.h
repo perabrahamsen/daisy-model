@@ -1,5 +1,0 @@
-// command.h
-
-class Command
-{ };
-
