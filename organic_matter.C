@@ -95,9 +95,16 @@ struct OrganicMatter::Implementation
   public:
     const double T;		// Equilibrium temperature. [dg C]
     const double h;		// Equilibrium pressure. [cm]
+    const vector<int> debug_equations;
+    const bool debug_rows;
+    const bool debug_to_screen;
 
     // Use.
   public:
+    bool print_equations (int lay)
+    { return find (debug_equations.begin (), debug_equations.end (), lay)
+	!=  debug_equations.end (); }
+
     void find_input (vector<double>& destination, const int lay) const;
     
     // Create and Destroy.
@@ -178,7 +185,7 @@ struct OrganicMatter::Implementation
 		  int lay, double total_C, 
 		  const vector<double>& SOM_fractions,
 		  const vector<double>& SOM_C_per_N, Treelog& msg,
-		  bool print_equations, bool print_row);
+		  bool print_equations, bool print_rows, bool debug_to_screen);
   void initialize (const AttributeList&, const Soil&, const SoilWater&,
 		   double T_avg, Treelog& err);
   Implementation (const AttributeList&);
@@ -340,6 +347,16 @@ By default, the yearly average from the weather component will be used.");
   syntax.add ("h", "cm", Check::non_positive (), Syntax::Const, "\
 Pressure used for equilibrium.");
   alist.add ("h", -100.0);
+  syntax.add ("debug_equations", Syntax::Integer, Syntax::Const, 
+	      Syntax::Sequence, "\
+Print equations used for initialization for the specified intervals.");
+  alist.add ("debug_equations", vector<int> ());
+  syntax.add ("debug_rows", Syntax::Boolean, Syntax::Const, "\
+Print summari information for each row.");
+  alist.add ("debug_rows", true);
+  syntax.add ("debug_to_screen", Syntax::Boolean, Syntax::Const, "\
+If true, print debug information to screen, else to the 'daisy.log' file.");
+  alist.add ("debug_to_screen", false);
 }
 
 OrganicMatter::Implementation::Initialization::
@@ -347,7 +364,10 @@ OrganicMatter::Implementation::Initialization::
   : input (al.check ("input") ? al.number ("input") : -1.0),
     fractions (al.number_sequence ("fractions")),
     T (al.check ("T") ? al.number ("T") : T_avg),
-    h (al.number ("h"))
+    h (al.number ("h")),
+    debug_equations (al.integer_sequence ("debug_equations")),
+    debug_rows (al.flag ("debug_rows")),
+    debug_to_screen (al.flag ("debug_to_screen"))
 { 
   if (input < 0)
     return;
@@ -1053,8 +1073,10 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
 					  int lay, double total_C,
 					  const vector<double>& SOM_fractions,
 					  const vector<double>& SOM_C_per_N,
-					  Treelog& msg, bool print_equations,
-					  bool print_row)
+					  Treelog& msg,
+					  const bool print_equations,
+					  const bool print_rows,
+					  const bool debug_to_screen)
 {
   // We know the total humus, the yearly input and has been told the
   // relative sizes of the SOM pools.  We need to calculate the SMB
@@ -1308,10 +1330,12 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
 	      equation_string () << " " << value << " dSOM" << pool + 1;
 	    }
 	}
-      equation_string () << "\n";
     }
   if (print_equations)
-    msg.message (equation_string.str ());
+    if (debug_to_screen)
+      msg.message (equation_string.str ());
+    else
+      msg.debug (equation_string.str ());
 
   // Solve.
   try
@@ -1320,11 +1344,15 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
     }
   catch (const char* error)
     {
+      if (!print_equations)
+	msg.error (equation_string.str ());
       msg.error (error);
       throw ("Organic matter initialization failed");
     }
   catch (const string& error)
     {
+      if (!print_equations)
+	msg.error (equation_string.str ());
       msg.error (error);
       throw ("Organic matter initialization failure");
     }
@@ -1394,7 +1422,7 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
     }
 
   // Messages.
-  if (print_row || error_found)
+  if (print_rows || error_found)
     {
       const double total_input 
 	= accumulate (am_input.begin (), am_input.end (), 0.0);
@@ -1403,20 +1431,47 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
 	= g_per_cm2_to_kg_per_ha * 24.0 * 365.0;
 
       TmpStream tmp;
-      tmp () << total_C * g_per_cm2_to_kg_per_ha << "\t"
+
+      if (lay == 0)
+	{
+	  // Tag line.
+	  tmp () << "lay\thumus\tinput\tinput [%]";
+	  for (unsigned int pool = 0; pool < smb_size; pool++)
+	    tmp () << "\tSMB" << pool + 1;
+	  for (unsigned int pool = 0; pool < som_size; pool++)
+	    tmp () << "\tSOM" << pool + 1;
+	  for (unsigned int pool = 0; pool < smb_size; pool++)
+	    tmp () << "\tdSMB" << pool + 1 << "\tdSMB" << pool + 1;
+	  for (unsigned int pool = 0; pool < som_size; pool++)
+	    tmp () << "\tdSOM" << pool + 1 << "\tdSOM" << pool + 1;
+	  tmp () << "\n";
+	  // Dimension line.
+	  tmp () << "\tkg C/ha/cm\tkg C/ha/cm/y\t%";
+	  for (unsigned int pool = 0; pool < smb_size; pool++)
+	    tmp () << "\t%" << pool + 1;
+	  for (unsigned int pool = 0; pool < som_size; pool++)
+	    tmp () << "\t%" << pool + 1;
+	  for (unsigned int pool = 0; pool < smb_size; pool++)
+	    tmp () << "\tkg C/ha/cm/y\ty^-1";
+	  for (unsigned int pool = 0; pool < som_size; pool++)
+	    tmp () << "\tkg C/ha/cm/y\ty^-1";
+	  tmp () << "\n";
+	}
+      tmp () << lay << "\t"
+	     << total_C * g_per_cm2_to_kg_per_ha << "\t"
 	     << total_input * g_per_cm2_per_h_to_kg_per_ha_per_y << "\t"
 	     << 100.0 * ((total_input * g_per_cm2_per_h_to_kg_per_ha_per_y) 
-			 / (total_C * g_per_cm2_to_kg_per_ha))
-	     << "\t" << lay;
+			 / (total_C * g_per_cm2_to_kg_per_ha));
+      
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
 	  double value = matrix.result (smb_column + pool);
-	  tmp ()  << "\t" << value / total_C;
+	  tmp ()  << "\t" << 100.0 * value / total_C;
 	}
       for (unsigned int pool = 0; pool < som_size; pool++)
 	{
 	  double value = matrix.result (som_column + pool);
-	  tmp ()  << "\t" << value / total_C;
+	  tmp ()  << "\t" << 100.0 * value / total_C;
 	}
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
@@ -1438,6 +1493,8 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
 	}
       if (error_found)
 	msg.error (tmp.str ());
+      else if (debug_to_screen)
+	msg.message (tmp.str ());
       else
 	msg.debug (tmp.str ());
     }
@@ -1567,21 +1624,6 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
       last = zplus;
     }
 
-  // Header for partitioning.
-  TmpStream tmp;
-  tmp () << "humus [kg C/ha/cm]\tinput [kg C/ha/cm/y]\tinput [%]\tlay";
-  for (unsigned int pool = 0; pool < smb_size; pool++)
-    tmp () << "\tSMB" << pool + 1;
-  for (unsigned int pool = 0; pool < som_size; pool++)
-    tmp () << "\tSOM" << pool + 1;
-  for (unsigned int pool = 0; pool < smb_size; pool++)
-    tmp () << "\tdSMB" << pool + 1 << " [kg C/ha/cm/y]"
-	   << "\tdSMB" << pool + 1 << " [y^-1]";
-  for (unsigned int pool = 0; pool < som_size; pool++)
-    tmp () << "\tdSOM" << pool + 1 << " [kg C/ha/cm/y]"
-	   << "\tdSOM" << pool + 1 << " [y^-1]";
-  err.debug (tmp.str ());
-
   // Partitioning.
   Initialization init (al.alist ("init"), soil, T_avg);
 		       
@@ -1596,7 +1638,8 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
       partition (am_input, init.T, init.h, 
 		 lay, total_C[lay], 
 		 soil.SOM_fractions (lay), soil.SOM_C_per_N (lay), err,
-		 false, true);
+		 init.print_equations (lay), init.debug_rows, 
+		 init.debug_to_screen);
     }
 
   //clay affect or SMB turnover and mantenance.

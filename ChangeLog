@@ -1,3 +1,22 @@
+2003-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.49 released.
+
+2003-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+
+	* parser_file.C (load_list): Hande integer sequences.
+	* organic_matter.C (Initialization, partition, initialize): More
+	debug support.
+
+2003-02-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C (check): Made "key" const.
+	* om.C (load_syntax): Make sure "initial_fraction" is a fraction.
+	(check_alist): Removed dead code.
+	* am.C (initialize): Don't assume "initial_fraction" is specified.
+	(AM_Syntax): Ditto.
+
 2003-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.48 released.

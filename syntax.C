@@ -87,7 +87,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
        i != status.end ();
        i++)
     {
-      string key = (*i).first;
+      const string key = (*i).first;
       if (!vl.check (key))
 	{
 	  if (status[key] == Const || status[key] == State)

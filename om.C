@@ -275,16 +275,6 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
-#if 0
-  // Use optional value instead.
-  const double initial_fraction = al.number ("initial_fraction");
-  if (initial_fraction != OM::Unspecified
-      && initial_fraction < 0.0 || initial_fraction > 1.0)
-    {
-      err.entry ("Initial fraction should be unspecified, or between 0 and 1");
-      ok = false;
-    }
-#endif
   if (!al.check ("turnover_rate") && !al.check ("turnover_halftime"))
     {
       err.entry ("\
@@ -369,7 +359,7 @@ thus be the number of SMB pools plus the number of SOM pools.");
   syntax.add ("initial_C_per_N", "g C/g N", Syntax::OptionalState, "\
 The initial C/N ratio when this pool is created.\n\
 Negative numbers mean unspecified.");
-  syntax.add ("initial_fraction", Syntax::None (), Syntax::OptionalConst, "\
+  syntax.add_fraction ("initial_fraction", Syntax::OptionalConst, "\
 The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified.");
   syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::OptionalConst,

@@ -696,7 +696,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      }
 	    case Syntax::AList:
 	      {
-		int size = syntax.size (name);
+		const int size = syntax.size (name);
 		static const vector<AttributeList*> no_sequence;
 		const Syntax& syn = syntax.syntax (name);
 		const vector<AttributeList*>& old_sequence
@@ -744,7 +744,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      {
 		vector<const PLF*> plfs;
 		int total = 0;
-		int size = syntax.size (name);
+		const int size = syntax.size (name);
 		while (good () && !looking_at (')'))
 		  {
 		    skip ("(");
@@ -800,7 +800,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		vector<double> array;
 		vector<Lexer::Position> positions;
 		int count = 0;
-		int size = syntax.size (name);
+		const int size = syntax.size (name);
 		const string syntax_dim = syntax.dimension (name);
 		unsigned int first_unchecked = 0;
 		while (good () && !looking_at (')'))
@@ -879,7 +879,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      {
 		vector<string> array;
 		int count = 0;
-		int size = syntax.size (name);
+		const int size = syntax.size (name);
 
 		while (!looking_at (')') && good ())
 		  {
@@ -900,6 +900,31 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		// Handle "path" immediately.
 		if (&syntax == global_syntax_table && name == "path")
 		  Path::set_path (atts.name_sequence (name));
+		break;
+	      }
+	    case Syntax::Integer:
+	      {
+		vector<int> array;
+		int count = 0;
+		const int size = syntax.size (name);
+
+		while (!looking_at (')') && good ())
+		  {
+		    array.push_back (get_integer ());
+		    count++;
+		  }
+		if (size != Syntax::Sequence && count != size)
+		  {
+		    TmpStream str;
+		    str () << "Got " << count 
+			   << " array members, expected " << size;
+		    error (str.str ());
+
+		    for (;count < size; count++)
+		      array.push_back (-42);
+		  }
+		atts.add (name, array);
+		// Handle "path" immediately.
 		break;
 	      }
 	    case Syntax::Error:

@@ -835,9 +835,11 @@ AM::initialize (const Soil& soil)
 	  double missing_fraction = 1.0;
 	  for (unsigned int j = 0; j < oms.size (); j++)
 	    {
-	      const double fraction = oms[j]->number ("initial_fraction");
-	      if (fraction != OM::Unspecified)
+	      if (oms[j]->check  ("initial_fraction"))
 		{
+		  const double fraction = oms[j]->number ("initial_fraction");
+		  daisy_assert (fraction >= 0.0);
+		  daisy_assert (fraction <= 1.0);
 		  missing_fraction -= fraction;
 		  soil.add (om[j]->C, last, end, C * fraction);
 		}
@@ -941,14 +943,14 @@ static struct AM_Syntax
     bool same_unspecified = false;
     for (unsigned int i = 0; i < om_alist.size (); i++)
       {
-	if (om_alist[i]->number ("initial_fraction") == OM::Unspecified)
+	if (!om_alist[i]->check ("initial_fraction"))
 	  missing_initial_fraction++;
 	else 
 	  total_fractions += om_alist[i]->number ("initial_fraction");
 	if (!om_alist[i]->check ("C_per_N"))
 	  missing_C_per_N++;
 
-	if (om_alist[i]->number ("initial_fraction") == OM::Unspecified
+	if (!om_alist[i]->check ("initial_fraction") 
 	    && !om_alist[i]->check ("C_per_N"))
 	  same_unspecified = true;
       }

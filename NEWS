@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.49
+
+** Fixed bug introduced by 2.48 that prevented use of organic fertilizer.
+
 * 2.48
 
 ** SMB initialization improved.

@@ -1,8 +1,12 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Make dist
-
 * initialiser SOM_fractions fra C_input (== initial AM).
+
+** Check hvor dSOM2 er underlig i Exercise09.dai
+
+** init.mineralization
+
+density = am_input + som_input
 
 ** Tilføj beskrivelse til tutorial.
 
