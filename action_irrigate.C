@@ -245,7 +245,7 @@ static struct ActionIrrigateStopSyntax
   ActionIrrigateStopSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList (alist);
+    AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Stop subsoil irrigation.");
     Librarian<Action>::add_type ("stop_subsoil_irrigation",
 				 alist, syntax, &make);
