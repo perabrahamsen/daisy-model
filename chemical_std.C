@@ -143,6 +143,8 @@ static struct ChemicalStandardSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+		  "Description of this parameterization."); 
       alist.add ("description", "\
 Read chemical properties as normal Daisy parameters.");
       syntax.add_fraction ("crop_uptake_reflection_factor", Syntax::Const, "\

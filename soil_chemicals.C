@@ -47,6 +47,9 @@ struct SoilChemicals::Implementation
   void add_missing (const Soil& soil, 
 		    const SoilWater& soil_water,
 		    const Chemicals& chemicals);
+  SoilChemical& find (const Soil& soil, 
+		      const SoilWater& soil_water,
+		      const string& name);
 
   // Simulation
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
@@ -85,6 +88,17 @@ SoilChemicals::Implementation::add_missing (const Soil& soil,
       solutes[name]->initialize (chemical.solute_alist (), soil, soil_water);
       all.insert (name);
     }
+}
+
+SoilChemical& 
+SoilChemicals::Implementation::find (const Soil& soil, 
+				     const SoilWater& soil_water,
+				     const string& name)
+{
+  const Chemical& chemical = Chemicals::lookup (name);
+  solutes[name] = new SoilChemical (chemical);
+  solutes[name]->initialize (chemical.solute_alist (), soil, soil_water);
+  return *solutes[name];
 }
 
 void 
@@ -263,6 +277,12 @@ SoilChemicals::Implementation::Implementation (const
   
 SoilChemicals::Implementation::~Implementation ()
 { }
+
+SoilChemical& 
+SoilChemicals::find (const Soil& soil, 
+		     const SoilWater& soil_water,
+		     const string& name)
+{ return impl.find (soil, soil_water, name); }
 
 void 
 SoilChemicals::tick (const Soil& soil, const SoilWater& soil_water,

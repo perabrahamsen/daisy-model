@@ -91,7 +91,7 @@ Soil depth in which to test the temperature.");
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Test if the soil is wetter than the specified pressure potential.");
-	syntax.add ("potential", "h", Syntax::Const, "\
+	syntax.add ("potential", "cm", Syntax::Const, "\
 The soil should be wetter than this for the condition to be true.");
 	syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
 Depth at which to example the pressure potential.");

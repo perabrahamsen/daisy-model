@@ -251,7 +251,8 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = condition_weather.C \
+MODELS = adsorption_full.C \
+	equil_langmuir.C transform_equil.C condition_weather.C \
 	rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
 	action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
@@ -288,9 +289,10 @@ MODELS = condition_weather.C \
 DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 
-# A component isa common interface to a number of models.
+# A component is a common interface to a number of models.
 #
-COMPONENTS = rootdens.C select.C average.C mactrans.C macro.C \
+COMPONENTS = equil.C pedo.C \
+	transform.C rootdens.C select.C average.C mactrans.C macro.C \
 	document.C parser.C log.C weather.C column.C crop.C \
 	action.C condition.C horizon.C 	uzmodel.C hydraulic.C \
 	bioclimate.C groundwater.C am.C transport.C \
@@ -605,6 +607,12 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+equil${OBJ}: equil.C equil.h librarian.h library.h common.h alist.h \
+ syntax.h treelog.h
+pedo${OBJ}: pedo.C pedo.h librarian.h library.h common.h alist.h syntax.h \
+ treelog.h
+transform${OBJ}: transform.C transform.h librarian.h library.h common.h \
+ alist.h syntax.h treelog.h
 rootdens${OBJ}: rootdens.C rootdens.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h check.h
 select${OBJ}: select.C select.h condition.h librarian.h library.h common.h \
@@ -785,8 +793,8 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h bioclimate.h surface.h \
  uzmodel.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
- solute.h adsorption.h transport.h mactrans.h plf.h groundwater.h \
- log.h weather.h im.h vegetation.h
+ solute.h adsorption.h transport.h mactrans.h plf.h transform.h \
+ groundwater.h log.h weather.h im.h vegetation.h
 check${OBJ}: check.C check.h
 check_range${OBJ}: check_range.C check_range.h check.h tmpstream.h \
  common.h
@@ -829,6 +837,16 @@ cdaisy${OBJ}: cdaisy.C syntax.h common.h treelog.h alist.h daisy.h \
 common${OBJ}: common.C common.h message.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
+adsorption_full${OBJ}: adsorption_full.C adsorption.h librarian.h \
+ library.h common.h alist.h syntax.h treelog.h
+equil_langmuir${OBJ}: equil_langmuir.C equil.h librarian.h library.h \
+ common.h alist.h syntax.h treelog.h pedo.h soil.h horizon.h \
+ hydraulic.h tortuosity.h geometry.h check.h mathlib.h
+transform_equil${OBJ}: transform_equil.C transform.h librarian.h library.h \
+ common.h alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h soil_water.h macro.h soil_chemicals.h \
+ soil_chemical.h solute.h adsorption.h transport.h mactrans.h plf.h \
+ pedo.h equil.h check.h mathlib.h
 condition_weather${OBJ}: condition_weather.C condition.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h field.h daisy.h check.h \
  log.h tmpstream.h
@@ -850,7 +868,8 @@ column_inorganic${OBJ}: column_inorganic.C column_base.h column.h \
  bioclimate.h surface.h uzmodel.h soil.h horizon.h hydraulic.h \
  tortuosity.h geometry.h soil_water.h macro.h soil_heat.h \
  soil_chemicals.h soil_chemical.h solute.h adsorption.h transport.h \
- mactrans.h plf.h groundwater.h log.h weather.h im.h vegetation.h am.h
+ mactrans.h plf.h transform.h groundwater.h log.h weather.h im.h \
+ vegetation.h am.h
 vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h plf.h \
  mathlib.h log.h root_system.h rootdens.h canopy_simple.h soil.h \
@@ -949,8 +968,8 @@ column_std${OBJ}: column_std.C column_base.h column.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h bioclimate.h surface.h \
  uzmodel.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
- solute.h adsorption.h transport.h mactrans.h plf.h groundwater.h \
- log.h weather.h im.h vegetation.h soil_NH4.h soil_NO3.h \
+ solute.h adsorption.h transport.h mactrans.h plf.h transform.h \
+ groundwater.h log.h weather.h im.h vegetation.h soil_NH4.h soil_NO3.h \
  organic_matter.h nitrification.h denitrification.h am.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h im.h log.h mathlib.h

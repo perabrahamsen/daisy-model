@@ -44,6 +44,9 @@ private:
 
   // Simulation.
 public:
+  SoilChemical& find (const Soil& soil, 
+		      const SoilWater& soil_water,
+		      const string& name);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     const OrganicMatter*, const Chemicals& flux_in);
   void mixture (Chemicals& storage, // [g/m^2]
@@ -52,7 +55,8 @@ public:
 		double rate) const;	// [h/mm]
   void output (Log&) const;
   void mix (const Soil&, const SoilWater&, double from, double to);
-  void swap (const Soil&, const SoilWater&, double from, double middle, double to);
+  void swap (const Soil&, const SoilWater&,
+	     double from, double middle, double to);
 
   // Create & Destroy.
 public:

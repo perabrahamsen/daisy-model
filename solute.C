@@ -137,9 +137,26 @@ Solute::output (Log& log) const
   log.output ("J_p", J_p);
 }
 
+static bool check_alist (const AttributeList& al, Treelog& err)
+{
+  bool ok = true;
+
+  assert (al.check ("transport"));
+  assert (al.check ("adsorption"));
+
+  if (al.alist ("adsorption").name ("type") == "full"
+      && al.alist ("transport").name ("type") != "none")
+    {
+      err.entry ("You can't have any transport with full adsorption");
+      ok = false;
+    }
+  return ok;
+}
+
 void 
 Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add_check (check_alist);
   syntax.add ("transport", Librarian<Transport>::library (), 
 	      "Solute transport model in matrix.");
   AttributeList cd;
@@ -248,7 +265,7 @@ Solute::put_M (const Soil& soil, const SoilWater& soil_water,
 void 
 Solute::default_initialize (const Soil& soil, const SoilWater&)
 { 
-  C_.insert (C_.begin (), soil.size (), 0.0);
+  M_.insert (M_.begin (), soil.size (), 0.0);
 }
 
 void

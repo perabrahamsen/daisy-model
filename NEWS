@@ -12,6 +12,38 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.03
+
+** You can now specify dimensions for numbers in input files.
+
+The dimensions are in brackets, like this:
+
+(defhorizon top default
+  (hydraulic M_vG 
+	     (K_sat 19.3 [cm/h])
+	     (Theta_res 0.05 [cm^3 H2O/cm^3])
+	     (Theta_sat 0.424 [cm^3 H2O/cm^3])
+	     (alpha 0.069 [cm^-1])
+	     (n 1.527 []))
+  (SOM_fractions 0.66 [] 0.34 [])
+  (SOM_C_per_N 11 [g C/g N] 11))
+
+You must write the dimension exactly as is specified in the manual,
+with the convention that ^ is used for superscript.  Also, fractions
+and dimensionless values are both denoted as [].  Some values in Daisy
+have unknown or unbspecified dimensions in the manual.  For these,
+Daisy will accept any dimension in the input files, as long as it
+start with a question mark.
+
+There are no conversions yet, only the dimension used in the manual
+may be specified.  In a furture release, Daisy will be able to make
+some simple conversions, like [m] to [cm], allowing you to use what is
+most convenient in the input file.
+
+For arrays, if you specify the dimension for an entry (like
+SOM_C_per_N in the example), that dimension is assumed to apply to the
+rest as well, until something 
+
 * 2.02
 
 ** You can now check on temperature sums.

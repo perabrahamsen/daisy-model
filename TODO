@@ -1,20 +1,12 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* ConditionTemperatureSum
-
 * Phospher
 
-** Transform component
+** Testcase.
 
-** TransformEquilibrium model
+** Horizon attributes.
 
-** Equilibrium component
-
-** Equilibrium Langmuir model
-
-** Pedotransfer component
-
-* Allow specifying dimensions for numbers in the file parser.
+* Allow to convert dimensions in the file parser.
 
 * Make it possible to log a specific entry in an array of unnamed objects.
 

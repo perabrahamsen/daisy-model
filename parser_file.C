@@ -55,6 +55,10 @@ struct ParserFile::Implementation
   string get_string ();
   int get_integer ();
   double get_number ();
+  string get_dimension ();
+  double get_number (const string& dim);
+  bool check_dimention (const string& syntax, const string& read);
+  double convert (double value, const string& syntax, const string& read);
   void skip (const char*);
   void skip ();
   void skip_to_end ();
@@ -127,6 +131,29 @@ ParserFile::Implementation::get_string ()
     }
 }
 
+int
+ParserFile::Implementation::get_integer ()
+{
+  skip ();
+  string str;
+  int c = peek ();
+
+  while (good () && (isdigit (c) || c == '-' || c == '+'))
+    {
+      str += static_cast<char> (c);
+      get ();
+      c = peek ();
+    }
+  // Empty number?
+  if (str.size () < 1U)
+    {
+      error ("Integer expected");
+      skip_to_end ();
+      return -42;
+    }
+  return atoi (str.c_str ());
+}
+
 double
 ParserFile::Implementation::get_number ()
 {
@@ -159,28 +186,72 @@ ParserFile::Implementation::get_number ()
   return value;
 }
 
-int
-ParserFile::Implementation::get_integer ()
+string
+ParserFile::Implementation::get_dimension ()
 {
-  skip ();
+  skip ("[");
   string str;
   int c = peek ();
 
-  while (good () && (isdigit (c) || c == '-' || c == '+'))
+  while (good () && c != ']' && c != '\n')
     {
       str += static_cast<char> (c);
       get ();
       c = peek ();
     }
-  // Empty number?
-  if (str.size () < 1U)
-    {
-      error ("Integer expected");
-      skip_to_end ();
-      return -42;
-    }
-  return atoi (str.c_str ());
+  skip ("]");
+  return str;
 }
+
+double
+ParserFile::Implementation::get_number (const string& syntax_dim)
+{
+  double value = get_number ();
+
+  if (looking_at ('['))
+    {
+      const string read_dim = get_dimension ();
+      if (check_dimention (syntax_dim, read_dim))
+	value = convert (value, syntax_dim, read_dim);
+    }
+  return value;
+}
+
+bool 
+ParserFile::Implementation::check_dimention (const string& syntax,
+					     const string& read)
+{
+  if (syntax != read)
+    {
+      if (syntax == Syntax::Unknown ())
+	{
+	  if (read.length () == 0 || read[0] != '?')
+	    warning ("you must use [?<dim>] for entries with unknown syntax");
+	}
+      else if (syntax == Syntax::None ()
+	  || syntax == Syntax::Fraction ())
+	{
+	  if (read != "")
+	    {
+	      error (string ("expected [] got [") + read + "]");
+	      return false;
+	    }
+	}
+      else if (syntax != read)
+	{
+	  error (string ("expected [") + syntax + "] got ["
+		 + read + "]");
+	  return false; 
+	}
+    }
+  return true;
+}
+
+double 
+ParserFile::Implementation::convert (double value,
+				     const string& /* syntax */, 
+				     const string& /* read */)
+{ return value; }
 
 void
 ParserFile::Implementation::skip (const char* str)
@@ -228,6 +299,8 @@ ParserFile::Implementation::skip_token () {
     }
   else if (isalnum (peek ()) || peek () == '_' || peek () == '-')
     get_string ();
+  else if (peek () == '[')
+    get_dimension ();
   else
     get ();
 }
@@ -333,7 +406,8 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  {
 	  case Syntax::Number:
 	    {
-	      double value = get_number ();
+	      double value = get_number (syntax.dimension (name));
+
 	      try
 		{
 		  syntax.check (name, value);
@@ -360,17 +434,19 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      PLF plf;
 	      double last_x = -42;
 	      int count = 0;
+	      const string domain = syntax.domain (name);
+	      const string range = syntax.range (name);
 	      while (!looking_at (')') && good ())
 		{
 		  skip ("(");
-		  double x = get_number ();
+		  double x = get_number (domain);
 		  {
 		    if (count > 0 && x <= last_x)
 		      error ("Non increasing x value");
 		    last_x = x;
 		    count++;
 		  }
-		  double y = get_number ();
+		  double y = get_number (range);
 		  skip (")");
 		  plf.add (x, y);
 		}
@@ -558,17 +634,19 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    PLF& plf = *new PLF ();
 		    double last_x = -42;
 		    int count = 0;
+		    const string domain = syntax.domain (name);
+		    const string range = syntax.range (name);
 		    while (!looking_at (')') && good ())
 		      {
 			skip ("(");
-			double x = get_number ();
+			double x = get_number (domain);
 			{
 			  if (count > 0 && x <= last_x)
 			    error ("Non increasing x value");
 			  last_x = x;
 			  count++;
 			}
-			double y = get_number ();
+			double y = get_number (range);
 			skip (")");
 			plf.add (x, y);
 		      }
@@ -598,6 +676,8 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		int count = 0;
 		int size = syntax.size (name);
 		double last = 0.0;
+		const string syntax_dim = syntax.dimension (name);
+		string read_dim = syntax.dimension (name);
 		while (good () && !looking_at (')'))
 		  {
 		    if (looking_at ('*'))
@@ -614,6 +694,15 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    else
 		      {
 			last = get_number ();
+
+			if (looking_at ('['))
+			  {
+			    read_dim = get_dimension ();
+			    if (!check_dimention (syntax_dim, read_dim))
+			      read_dim = syntax_dim;
+			  }			
+			last = convert (last, syntax_dim, read_dim);
+
 			try
 			  {
 			    syntax.check (name, last);

@@ -27,6 +27,7 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "soil_chemicals.h"
+#include "transform.h"
 #include "groundwater.h"
 #include "alist.h"
 #include "syntax.h"
@@ -51,6 +52,7 @@ protected:
   SoilWater soil_water;
   SoilHeat soil_heat;
   SoilChemicals soil_chemicals;
+  vector<Transform*> transformations;
   Groundwater& groundwater;
 
   // Log variables.

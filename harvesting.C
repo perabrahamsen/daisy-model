@@ -342,7 +342,7 @@ Maximal development stage for which the crop survives harvest.");
   alist.add ("production_delay", 0.0);
   syntax.add ("cut_delay", "kg DM/ha", "d", Syntax::Const,
 	      "\
-Production and development delay in days as a function of the shoot DM.\n\
+Production and development delay in days as a function of the shoot DM\n\
 removed by harvest.  By default, there is no delay.");
   PLF no_delay;
   no_delay.add (0.0, 0.0);
