@@ -776,17 +776,17 @@ Note that a negative delta content means that the amount increases."
                      (flux true)
                      (dimension "kg N/ha/&")
                      (factor -1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "$col" Nitrification "*" NH4)
+           (interval (path column "$col" Nitrification NH4)
                      (flux true)
                      (tag "NH4-Nit")
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "$col" Nitrification "*" NO3)
+           (interval (path column "$col" Nitrification NO3)
                      (flux true)
                      (tag "NO3-Nit")
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "$col" Nitrification "*" N2O)
+           (interval (path column "$col" Nitrification N2O)
                      (flux true)
                      (tag "N2O-Nit")
                      (dimension "kg N/ha/&")
@@ -1032,7 +1032,7 @@ Note that a negative delta content means that the amount increases."
                      (flux true)
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
-           (interval (path column "$col" Nitrification "*" N2O)
+           (interval (path column "$col" Nitrification N2O)
                      (flux true)
                      (tag "N2O from Nitrification")
                      (dimension "kg N/ha/&")

@@ -35,7 +35,7 @@ cvs: $(TEXT)
 # Check
 #
 check: new/Cosby-Nitrogen-Balance.sum
-	-@if cmp new/Cosby-Nitrogen-Balance.sum old/Cosby-Nitrogen-Balance.sum ; then echo Cosby Nitrogen Balance unchanged; else echo Cosby Nitrogen Balance changed; wdiff new/Cosby-Nitrogen-Balance.sum old/Cosby-Nitrogen-Balance.sum; fi
+	-@if cmp new/Cosby-Nitrogen-Balance.sum old/Cosby-Nitrogen-Balance.sum ; then echo Cosby Nitrogen Balance unchanged; else echo Cosby Nitrogen Balance changed; wdiff -t new/Cosby-Nitrogen-Balance.sum old/Cosby-Nitrogen-Balance.sum; fi
 
 new/Cosby-Nitrogen-Balance.sum: $(DAISY) test-Cosby.dai
 	$(DAISY) test-Cosby.dai
