@@ -310,50 +310,50 @@ Time::~Time ()
 // @ Operators.
 
 bool 
-operator== (const Time& a, const Time& b)
+Time::operator== (const Time& other)
 {
-  return (a.impl.year == b.impl.year)
-    && (a.impl.yday == b.impl.yday)
-    && (a.impl.hour == b.impl.hour);
+  return (impl.year == other.impl.year)
+    && (impl.yday == other.impl.yday)
+    && (impl.hour == other.impl.hour);
 }
 
 bool
-operator!= (const Time& a, const Time& b)
+Time::operator!= (const Time& other)
 {
-  return !(a == b);
+  return !(*this == other);
 }
     
 bool
-operator<  (const Time& a, const Time& b)
+Time::operator<  (const Time& other)
 {
-  if (a.impl.year < b.impl.year)
+  if (impl.year < other.impl.year)
     return true;
-  if (a.impl.year > b.impl.year)
+  if (impl.year > other.impl.year)
     return false;
-  if (a.impl.yday < b.impl.yday)
+  if (impl.yday < other.impl.yday)
     return true;
-  if (a.impl.yday > b.impl.yday)
+  if (impl.yday > other.impl.yday)
     return false;
-  if (a.impl.hour < b.impl.hour)
+  if (impl.hour < other.impl.hour)
     return true;
   return false;
 
 }
 
 bool
-operator<= (const Time& a, const Time& b)
+Time::operator<= (const Time& other)
 {
-  return a == b || a < b;
+  return *this == other || *this < other;
 }
 
 bool
-operator>= (const Time& a, const Time& b)
+Time::operator>= (const Time& other)
 {
-  return !(a < b);
+  return !(*this < other);
 }
 
 bool
-operator>  (const Time& a, const Time& b)
+Time::operator>  (const Time& other)
 {
-  return !(a <= b);
+  return !(*this <= other);
 }
