@@ -1621,9 +1621,7 @@ void tick (const Weather& weather, const Vegetation& crops,
 	LAI =crops.LAI (); // Leaf Areal Index
     	h   =0.01*crops.height (); // max crop height [m]
 
-cout << "LAI is\t" << LAI << "\n";
-
-cout << "LAI is\t" << LAI << "\n";
+	cout << "LAI is\t" << LAI << "\n";
 
 // READ FROM TEMPORARY RCMIN_WW.DAT OR RCMIN_SB.DAT FILE
 #ifdef USE_FILES
@@ -1642,14 +1640,15 @@ if (LAI > 0.0)
 */
 // ............BARLEY..................
 // test for missing value and for LAI > 0
-if (LAI > 0.0)
+	if (LAI > 0.0)
 	{
 	if (rcmin_sb_ndvi==9999.0) rcmin=200.0/LAI;
    	else rcmin=rcmin_sb_ndvi; // for barley
 	fprintf(fp_rcminsb,"%lf%10.2lf%10.2lf\n",pgtime,200.0/LAI,rcmin_sb_ndvi);
         } else rcmin=rcmin_sb_ndvi; // or another variable=9999
 #else
-        rcmin=200.0/LAI;
+	if (LAI > 0.0)
+	  rcmin=200.0/LAI;
 #endif
 // potential evapotranspiration from surface and canopy, from tick()
 // pot.evap.above crop canopy [cm/hr]
