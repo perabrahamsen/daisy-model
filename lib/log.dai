@@ -42,14 +42,23 @@
 	    (tag "SMB_C")
 	    (dimension "kg C/ha")
 	    (factor 1e5))		;g/cm² -> kg/ha
-	   ((path column "*" OrganicMatter aom "*" om N)
+	   ((path column "*" OrganicMatter am "*" om N)
 	    (tag "AOM_N")
 	    (dimension "kg N/ha")
 	    (factor 1e5))		;g/cm² -> kg/ha
-	   ((path column "*" OrganicMatter aom "*" om C)
+	   ((path column "*" OrganicMatter am "*" om C)
 	    (tag "AOM_C")
 	    (dimension "kg C/ha")
-	    (factor 1e5))))		;g/cm² -> kg/ha
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter buffer N)
+	    (tag "BUFFER_N")
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter buffer C)
+	    (tag "BUFFER_C")
+	    (dimension "kg C/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ))
 
 (deflog "Soil Content 0-10 cm" "Total Soil Content"
   (where "soil_content_00-10.tab")
@@ -356,28 +365,28 @@
 	    (flux_at 0.0)
 	    (dimension "g/ha/d")
 	    (factor -1e8))		;g/cm²/d -> g/ha/d
-	   ((path column "*" SoilChemicals solutes solute transport  "*" J)
-	    (when hourly)
+	   ((path column "*" SoilChemicals solutes solute transport "*" J)
 	    (tag "Leak")
+	    (when hourly)
 	    (flux_at -100.0)
 	    (dimension "g/ha/d")
 	    (factor -1e8))		;g/cm²/d -> g/ha/d
-	   ((tag "Uptake")
+	   ((path column "*" SoilChemicals solutes solute uptaken)
+	    (tag "Uptake")
 	    (when hourly)
-	    (path column "*" SoilChemicals solutes solute uptaken)
 	    (from 0.0)
 	    (to -100.0)
 	    (dimension "g/ha/d")
 	    (factor 1e8))		;g/cm²/d -> g/ha/d
-	   ((tag "Decompose")
+	   ((path column "*" SoilChemicals solutes solute decomposed)
+	    (tag "Decompose")
 	    (when hourly)
-	    (path column "*" SoilChemicals solutes solute decomposed)
 	    (from 0.0)
 	    (to -100.0)
 	    (dimension "g/ha/d")
 	    (factor 1e8))		;g/cm²/d -> g/ha/d
-	   ((tag "Content")
-	    (path column "*" SoilChemicals solutes solute M)
+	   ((path column "*" SoilChemicals solutes solute M)
+	    (tag "Content")
 	    (from 0.0)
 	    (to -100.0)
 	    (dimension "g/ha")
@@ -403,7 +412,7 @@
 
 (deflog "Crop Production" table1
   (where "crop_prod.tab")
-  (when (hour 0))
+  (when (hour 12))			;When the stress is highest.
   (entries ((path time year))
 	   ((path time month))
 	   ((path time mday))
@@ -449,6 +458,8 @@
 	   ((path column "*" Vegetation crops "*" Prod NRoot)
 	    (dimension "kg N/ha")
 	    (factor 10.0))
+	   ((path column "*" Vegetation crops "*" RootSys water_stress))
+	   ((path column "*" Vegetation crops "*" RootSys nitrogen_stress))
 	   ))
 
 (deflog "Old Crop Production" table1
