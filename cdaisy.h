@@ -512,6 +512,7 @@ daisy_column_get_water_sink (const daisy_column* column, double sink[]);
 double				/* [cm^3/cm^3] */
 daisy_column_get_water_content_at (const daisy_column* column, 
 				   unsigned int index);
+
 /* @@@ Soil Nitrate. 
  * 
  * Nitrate solution in the soil.
@@ -608,6 +609,39 @@ daisy_chemical_find (const char* name);
 
 double				/* The crop uptake reflection factor. */
 daisy_chemical_reflection_factor (const daisy_chemical* chemical);
+
+/* @ The daisy_log Type.
+ *
+ * Extract information from the `extern' log model.
+ *
+ * The first argument `log' in each function should match the `where' 
+ * attribute of the `extern' log model you want to extract information
+ * from. 
+ * 
+ * The second parameter `tag' should match the `tag' attribute of the
+ * `entries' log attribute member you want to extract information from.
+ */
+
+typedef enum 
+{
+  daisy_log_error,		/* Error encountered. */
+  daisy_log_missing,		/* No data found. */
+  daisy_log_number,		/* Number found. */
+  daisy_log_name,		/* String found. */
+  daisy_log_array		/* Array of numbers found. */
+} daisy_log_type;
+
+daisy_log_type			/* Determine type of TAG in LOG. */
+daisy_log_lookup (const char* log, const char* tag);
+
+double				/* Get number for TAG in LOG. */
+daisy_log_get_number (const char* log, const char* tag);
+
+const char*			/* Get name for TAG in LOG. */
+daisy_log_get_name (const char* log, const char* tag);
+
+const vector<double>&		/* Get array for TAG in LOG. */
+daisy_log_get_array (const char* log, const char* tag, double value[]);
 
 /* @ Miscellaneous.
  *

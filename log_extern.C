@@ -1,0 +1,186 @@
+// log_extern.C
+
+#include "log_select.h"
+#include "log_extern.h"
+#include "select.h"
+#include <map>
+
+typedef map<string, const LogExternSource*, 
+  less<string>/**/> log_extern_map_type; 
+log_extern_map_type* log_extern_map = NULL;
+int log_extern_count = 0;
+
+const LogExternSource& 
+LogExternSource::find (const string& name)
+{ 
+  assert (log_extern_map);
+  assert (log_extern_count > 0);
+  return *((*log_extern_map)[name]);
+}
+
+LogExternSource::LogExternSource (const AttributeList& al)
+{ 
+  const string name 
+    = al.check ("where") ? al.name ("where") : al.name ("type");
+
+  if (!log_extern_map)
+    {
+      assert (log_extern_count == 0);
+      log_extern_map = new log_extern_map_type;
+    }
+  (*log_extern_map)[name] = this;
+  log_extern_count++;
+}
+
+LogExternSource::~LogExternSource ()
+{ 
+  assert (log_extern_count > 0);
+  log_extern_count--;
+  if (log_extern_count == 0)
+    delete log_extern_map;
+}
+
+
+struct LogExtern : public LogSelect,
+		   public Select::Destination, 
+		   public LogExternSource
+{
+  // Destination Content.
+  typedef map<string, type, less<string>/**/> type_map;
+  typedef map<string, double, less<string>/**/> number_map;
+  typedef map<string, string, less<string>/**/> name_map;
+  typedef map<string, const vector<double>*, less<string>/**/> array_map;
+  type_map types;
+  number_map numbers;
+  name_map names;
+  array_map arrays;
+  
+  // Log.
+  void done ();
+
+  // Select::Destination
+  void error (const string& tag);
+  void missing (const string& tag);
+  void add (const string& tag, const vector<double>& value);
+  void add (const string& tag, double value);
+  void add (const string& tag, const string& value);
+
+  // LogExternSource
+  type lookup (const string& tag) const;
+  double number (const string& tag) const;
+  const string& name (const string& tag) const;
+  const vector<double>& array (const string& tag) const;
+
+  // Create and destroy.
+  LogExtern (const AttributeList& al);
+  ~LogExtern ();
+};
+
+void 
+LogExtern::done ()
+{ 
+  if (!is_printing)
+    return;
+
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->done (*this);
+}
+
+void 
+LogExtern::error (const string& tag)
+{ 
+  types[tag] = Error;
+}
+
+void 
+LogExtern::missing (const string& tag)
+{ 
+  types[tag] = Missing;
+}
+
+void 
+LogExtern::add (const string& tag, const vector<double>& value)
+{ 
+  types[tag] = Array;
+  arrays[tag] = &value;
+}
+
+void 
+LogExtern::add (const string& tag, double value)
+{ 
+  types[tag] = Number;
+  numbers[tag] = value;
+}
+
+void 
+LogExtern::add (const string& tag, const string& value)
+{ 
+  types[tag] = Name;
+  names[tag] = value;
+}
+
+LogExternSource::type 
+LogExtern::lookup (const string& tag) const
+{ 
+  type_map::const_iterator i = types.find (tag);
+  
+  if (i == types.end ())
+    return Error;
+
+  return (*i).second;
+}
+
+double 
+LogExtern::number (const string& tag) const
+{
+  number_map::const_iterator i = numbers.find (tag);
+  
+  assert (i != numbers.end ());
+  return (*i).second;
+}
+
+const string& 
+LogExtern::name (const string& tag) const
+{ 
+  name_map::const_iterator i = names.find (tag);
+  
+  assert (i != names.end ());
+  return (*i).second;
+}
+
+const vector<double>&
+LogExtern::array (const string& tag) const
+{ 
+  array_map::const_iterator i = arrays.find (tag);
+  
+  assert (i != arrays.end ());
+  return *(*i).second;
+}
+
+LogExtern::LogExtern (const AttributeList& al)
+  : LogSelect (al),
+    LogExternSource (al)
+{ }
+
+LogExtern::~LogExtern ()
+{ }
+
+static struct LogExternSyntax
+{
+  static Log& make (const AttributeList& al)
+    { return *new LogExtern (al); }
+
+  LogExternSyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      LogSelect::load_syntax (syntax, alist);
+
+      syntax.add ("where", Syntax::String, Syntax::OptionalConst,
+		  "Name of the extern log to use.\n\
+By default, use the model name.");
+
+      Librarian<Log>::add_type ("extern", alist, syntax, &make);
+    }
+} LogExtern_syntax;
+

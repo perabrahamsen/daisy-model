@@ -11,6 +11,7 @@ struct SelectInterval : public Select
   double value;	
 
   // Output routines.
+
   void output (const string& name, const vector<double>& array, 
 	       const Geometry* geometry)
     { 
@@ -77,7 +78,7 @@ static struct SelectIntervalSyntax
 		  "Specify height (negative) to measure from.");
       alist.add ("from", 0.0);
       syntax.add ("to", "cm", Syntax::OptionalConst,
-		  "Specify height (negative) to measure interval.
+		  "Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.");
       syntax.add ("value", Syntax::Unknown (), Syntax::State,
 		  "The current accumulated value.");

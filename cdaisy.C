@@ -16,6 +16,7 @@
 #include "printer_file.h"
 #include "version.h"
 #include "chemical.h"
+#include "log_extern.h"
 
 #include <fstream.h>
 
@@ -826,10 +827,9 @@ daisy_column_get_surface_chemical (const Column* column,
 { return column->get_surface_chemical (name); }
 
 
-/* @@@ Organic Matter.
- * 
- * The organic content of the soil.
- */
+// @@@ Organic Matter.
+// 
+// The organic content of the soil.
 
 extern "C" double EXPORT	// [g C/cm³]
 daisy_column_get_smb_c_at (Column* column, unsigned int index)
@@ -839,20 +839,18 @@ extern "C" double EXPORT	// [g C/cm³]
 daisy_column_get_co2_at (Column* column, unsigned int index)
 { return column->get_co2_production_at (index); }
 
-/* @@@ Soil Heat.
- * 
- * Temperature of soil.
- */
+// @@@ Soil Heat.
+// 
+// Temperature of soil.
 
 extern "C" double EXPORT	// [°C]
 daisy_column_get_temperature_at (Column* column, unsigned int index)
 { return column->get_temperature_at (index); }
 
 
-/* @@@ Crops.
- *
- * What grows in the column.
- */
+// @@@ Crops.
+//
+// What grows in the column.
 
 extern "C" double EXPORT	// [cm³ H2O/cm³/h]
 daisy_column_get_crop_h2o_uptake_at (Column* column, unsigned int index)
@@ -874,6 +872,30 @@ daisy_chemical_find (const char* name)
 extern "C" double EXPORT	// The crop uptake reflection factor.
 daisy_chemical_reflection_factor (const Chemical* chemical)
 { return chemical->crop_uptake_reflection_factor (); }
+
+// @ The daisy_log Type.
+//
+// Extract information from the `extern' log model.
+
+extern "C" LogExternSource::type EXPORT
+daisy_log_lookup (const char* log, const char* tag)
+{ return LogExternSource::find (log).lookup (tag); }
+
+extern "C" double  EXPORT
+daisy_log_get_number (const char* log, const char* tag)
+{ return LogExternSource::find (log).number (tag); }
+
+extern "C" const char*  EXPORT
+daisy_log_get_name (const char* log, const char* tag)
+{ return LogExternSource::find (log).name (tag).c_str (); }
+
+extern "C" void EXPORT
+daisy_log_get_array (const char* log, const char* tag, double value[])
+{ 
+  const vector<double>& array =  LogExternSource::find (log).array (tag); 
+  
+  copy (array.begin (), array.end (), value);
+}
 
 // @ Miscellaneous.
 //

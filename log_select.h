@@ -1,5 +1,8 @@
 // log_select.h
 
+#ifndef LOG_SELECT_H
+#define LOG_SELECT_H
+
 #include "log.h"
 
 struct Select;
@@ -54,3 +57,4 @@ struct LogSelect : public Log
   ~LogSelect ();
 };
 
+#endif LOG_SELECT_H
