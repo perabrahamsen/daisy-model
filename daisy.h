@@ -3,7 +3,6 @@
 #ifndef DAISY_H
 #define DAISY_H
 
-#include "frame.h"
 #include "time.h"
 #include <vector>
 
@@ -12,7 +11,7 @@ class Harvest;
 class Weather;
 class Log;
 class Filter;
-class ColumnList;
+class Field;
 class Syntax;
 class AttributeList;
 
@@ -26,12 +25,11 @@ public:
   // Content.
 public:
   bool running;
-  Frame frame;
   const vector<Log*>& logs;
   Time time;
   Action& action;
   Weather& weather;
-  ColumnList& columns;
+  Field& field;
   vector<const Harvest*>& harvest;
 
   // Simulation.

@@ -5,7 +5,6 @@
 
 #include "librarian.h"
 
-class Frame;
 class Daisy;
 
 class Action
@@ -15,7 +14,7 @@ class Action
 
   // Simulation.
 public:
-  virtual void doIt (const Frame&, Daisy&) = 0;
+  virtual void doIt (Daisy&) = 0;
 
   // Create and Destroy.
 public: 

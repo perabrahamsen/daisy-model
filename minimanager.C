@@ -10,7 +10,7 @@ bool MiniManager::check (Daisy& ) const
     // so just check that it is created
     return (EQ) ? true : false;
 }
-void MiniManager::doIt (const Frame&, Daisy& d){
+void MiniManager::doIt (Daisy& d){
    EQ->DoTick(d);
 }
 

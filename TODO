@@ -1,14 +1,20 @@
-* Indfør stof i jorden.
+* Check field abstraction for flere søjler.
 
-* Tilføj "Field" abstraction i stil med "Vegetation".
-
-** Lad evt. field kunne "huske" hvilke søjler der er valgt med "with-column".
+* Indfør kemikalier i jorden.
 
 * Check pet_pm sammen med PvdK.
 
 * Gør det muligt at vælge array/entry/string separators.
 
 ** Brug tab (per default) til at skelne array entries.
+
+* Drop gcc 2.7.2 support.
+
+** Ryd op i Makefile.
+
+** Ryd op i common.h
+
+** Fjern HANDLE_EXCEPTIONS.
 
 ======================================================================
 

@@ -7,13 +7,13 @@
 #include "daisy.h"
 #include "parser_file.h"
 #include "time.h"
+#include "field.h"
 #include "column.h"
 #include "weather.h"
 #include "common.h"
 #include "action.h"
 #include "horizon.h"
 #include "printer_file.h"
-#include "frame.h"
 #include "version.h"
 #include "chemical.h"
 
@@ -454,7 +454,7 @@ daisy_daisy_tick (Daisy* daisy)
 
 extern "C" void EXPORT
 daisy_daisy_tick_action (Daisy* daisy)
-{ daisy->action.doIt (daisy->frame, *daisy); }
+{ daisy->action.doIt (*daisy); }
 
 extern "C" void EXPORT
 daisy_daisy_tick_weather (Daisy* daisy)
@@ -468,10 +468,7 @@ daisy_daisy_tick_columns (Daisy* daisy)
 
 extern "C" void EXPORT
 daisy_daisy_tick_column (Daisy* daisy, int col)
-{ 
-  daisy->columns[col]->tick (daisy->time, 
-			     daisy->weather); 
-}
+{ daisy->field.find (col)->tick (daisy->time, daisy->weather); }
 
 extern "C" void EXPORT
 daisy_daisy_tick_logs (Daisy* daisy)
@@ -493,14 +490,14 @@ daisy_daisy_get_weather (Daisy* daisy)
 
 extern "C" unsigned int EXPORT
 daisy_daisy_count_columns (const Daisy* daisy)
-{ return daisy->columns.size (); }
+{ return daisy->field.size (); }
 
 extern "C" Column* EXPORT
 daisy_daisy_get_column (Daisy* daisy, int col)
 { 
   assert (daisy);
-  assert (col >= 0 && col < daisy->columns.size ()); 
-  return daisy->columns[col]; 
+  assert (col >= 0 && col < daisy->field.size ()); 
+  return daisy->field.find (col); 
 }
 
 extern "C" void EXPORT

@@ -2,23 +2,9 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "frame.h"
 #include "syntax.h"
 #include "alist.h"
-#include "column.h"
-
-struct FrameWith : public Frame 
-{
-  const Column *const column_;
-
-  const Column* column () const
-    { return column_; }
-
-  FrameWith (const Frame& p, const Column* c)
-    : Frame (&p),
-      column_ (c)
-    { }
-};
+#include "field.h"
 
 struct ActionWithColumn : public Action
 {
@@ -26,14 +12,14 @@ struct ActionWithColumn : public Action
   vector<Action*>& actions;
 
 public:
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
     { 
-      FrameWith with (frame, daisy.columns.find (column));
+      Field::Restrict (daisy.field, column);
       for (vector<Action*>::iterator i = actions.begin ();
 	   i != actions.end ();
 	   i++)
 	{
-	  (*i)->doIt (with, daisy);
+	  (*i)->doIt (daisy);
 	}
     }
 
@@ -47,7 +33,7 @@ public:
 	  if (!(*i)->check (daisy))
 	    ok = false;
 	}
-      if (!daisy.columns.find (column))
+      if (!daisy.field.find (column))
 	{
 	  CERR << "No column `" << column << "'\n";
 	  ok = false;

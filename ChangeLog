@@ -1,5 +1,13 @@
 1998-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 0.52 released.
+
+1998-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* frame.h, frame.C: Removed.
+	* field.h, field.C: Added.
+	* all: Updated.
+
 	* Version 0.51 released.
 
 1998-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>

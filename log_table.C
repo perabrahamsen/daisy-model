@@ -3,7 +3,6 @@
 #include "log.h"
 #include "condition.h"
 #include "time.h"
-#include "frame.h"
 #include "geometry.h"
 #include <fstream.h>
 #include <numeric>
@@ -219,13 +218,13 @@ struct LogEntry
     }
 
   // Reset at start of time step.
-  bool match (const Frame& frame, const Daisy& daisy, bool is_printing)
+  bool match (const Daisy& daisy, bool is_printing)
     {
       assert (current_path_index == 0U);
       assert (last_valid_path_index == 0U);
 
       if (condition)
-	is_active = condition->match (frame, daisy);
+	is_active = condition->match (daisy);
       else
 	is_active = is_printing;
       return is_active;
@@ -349,13 +348,13 @@ struct LogTable : public Log, public Filter
   const double to;		// to here.
 
   // Checking to see if we should log this time step.
-  Filter& match (const Frame& frame, const Daisy& daisy)
+  Filter& match (const Daisy& daisy)
     {
-      is_printing = condition.match (frame, daisy);
+      is_printing = condition.match (daisy);
       is_active = is_printing;
 
       for (unsigned int i = 0; i < entries.size (); i++)
-	if (entries[i]->match (frame, daisy, is_printing))
+	if (entries[i]->match (daisy, is_printing))
 	  is_active = true;
       
       return *this;

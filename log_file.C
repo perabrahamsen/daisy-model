@@ -40,7 +40,7 @@ private:
 
   // Log.
 public:
-  Filter& match (const Frame&, const Daisy&);
+  Filter& match (const Daisy&);
 
   // Open normal items.
   void open (const string&);
@@ -179,9 +179,9 @@ LogFile::newline ()
 }
 
 Filter&
-LogFile::match (const Frame& frame, const Daisy& daisy)
+LogFile::match (const Daisy& daisy)
 {
-  matching = condition.match (frame, daisy);
+  matching = condition.match (daisy);
   
   if (matching || accumulating)
     return filter;

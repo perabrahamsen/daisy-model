@@ -7,7 +7,7 @@
 
 struct ConditionRunning : public Condition
 {
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { return daisy.running; }
   ConditionRunning (const AttributeList&)
     { }

@@ -24,7 +24,6 @@ public:
 
   // Actions.
 public:
-  enum irrigation_from { top_irrigation, surface_irrigation };
   virtual void sow (const AttributeList& crop) = 0;
   virtual void irrigate_top (double flux, double temp, const IM&) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&) = 0;
@@ -91,14 +90,6 @@ public:
 			   const Weather&) = 0;
 
   virtual ~Column ();
-};
-
-class ColumnList : public vector <Column*>
-{ 
-public:
-  const Column* find (const string& name) const;
-  ColumnList (const vector<AttributeList*>&);
-  ~ColumnList ();
 };
 
 static Librarian<Column> Column_init ("column");

@@ -3,26 +3,18 @@
 // Checking soil state.
 
 #include "condition.h"
-#include "column.h"
+#include "field.h"
 #include "daisy.h"
-#include "frame.h"
 
 struct ConditionSoilTemperature : public Condition
 {
   double temperature;
   double height;
 
-  bool match (const Frame& frame, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { 
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{ 
-	  if (frame.match_column (**i))
-	    {
-	      if ((*i)->soil_temperature (height) > temperature)
-		return true;
-	    }
-	}
+      if (daisy.field.soil_temperature (height) > temperature)
+	return true;
       return false;
     }
 
@@ -37,19 +29,8 @@ struct ConditionSoilPotential : public Condition
   double potential;
   double height;
 
-  bool match (const Frame& frame, const Daisy& daisy) const
-    { 
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{ 
-	  if (frame.match_column (**i))
-	    {
-	      if ((*i)->soil_water_potential (height) > potential)
-		return true;
-	    }
-	}
-      return false;
-    }
+  bool match (const Daisy& daisy) const
+    { return (daisy.field.soil_water_potential (height) > potential); }
 
   ConditionSoilPotential (const AttributeList& al)
     : potential (al.number ("potential")),

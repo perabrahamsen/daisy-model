@@ -2,8 +2,7 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "frame.h"
-#include "column.h"
+#include "field.h"
 
 struct ActionHarvest : public Action
 {
@@ -13,22 +12,13 @@ struct ActionHarvest : public Action
   const double leaf;
   const double sorg;
 
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
     {
-      COUT << " [Harvesting " << name << " at";
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{ 
-	  if (!frame.match_column (**i))
-	    continue;
-	  vector<const Harvest*> entry
-	    = (*i)->harvest (daisy.time, name, stub, stem, leaf, sorg);
-	  daisy.harvest.insert (daisy.harvest.end (),
-				entry.begin (), entry.end ());
-	  COUT << " " << (*i)->name;
-
-	}
-	COUT << "]\n";
+      COUT << "[Harvesting " << name << "]\n";
+      vector<const Harvest*> entry
+	= daisy.field.harvest (daisy.time, name, stub, stem, leaf, sorg);
+      daisy.harvest.insert (daisy.harvest.end (),
+			    entry.begin (), entry.end ());
     }
 
   ActionHarvest (const AttributeList& al)

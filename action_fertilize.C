@@ -2,8 +2,7 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "frame.h"
-#include "column.h"
+#include "field.h"
 #include "am.h"
 #include "im.h"
 
@@ -13,44 +12,32 @@ struct ActionFertilize : public Action
   const double from;
   const double to;
 
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
     {
       COUT << " [Fertilizing " << am.name ("type") << "]\n";
 
-      for (ColumnList::iterator i = daisy.columns.begin (); 
-	   i != daisy.columns.end (); 
-	   i++)
-	{
-	  // Skip unselected columns.
-	  if (!frame.match_column (**i))
-	    continue;
-
-	  // Add inorganic matter.
-	  if (to < from)
-	    (*i)->fertilize (IM (am), from, to);
-	  else 
-	    (*i)->fertilize (IM (am));
+      // Add inorganic matter.
+      if (to < from)
+	daisy.field.fertilize (IM (am), from, to);
+      else 
+	daisy.field.fertilize (IM (am));
       
 	  // Add organic matter, if any.
-	  if (am.name ("syntax") != "mineral")
-	    {
-	      if (to < from)
-		(*i)->fertilize (am, daisy.time, from, to);
-	      else
-		(*i)->fertilize (am, daisy.time);
-	    }
+      if (am.name ("syntax") != "mineral")
+	{
+	  if (to < from)
+	    daisy.field.fertilize (am, daisy.time, from, to);
+	  else
+	    daisy.field.fertilize (am, daisy.time);
 	}
     }
 
   bool check (Daisy& daisy) const
     {
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{
-	  if (am.name ("syntax") != "mineral" && !(*i)->check_am (am))
-	    return false;
-	}
-      return true;
+      bool ok = true;
+      if (am.name ("syntax") != "mineral" && !daisy.field.check_am (am))
+	ok = false;
+      return ok;
     }
 
   ActionFertilize (const AttributeList& al)

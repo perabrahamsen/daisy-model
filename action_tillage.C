@@ -2,8 +2,7 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "frame.h"
-#include "column.h"
+#include "field.h"
 
 struct ActionMix : public Action
 {
@@ -12,15 +11,10 @@ struct ActionMix : public Action
   const double penetration;
 
   // Simulation.
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
     {
       COUT << " [Tillage]\n";
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{
-	  if (frame.match_column (**i))
-	    (*i)->mix (daisy.time, 0.0, depth, penetration);
-	}
+      daisy.field.mix (daisy.time, 0.0, depth, penetration);
     }
 
   ActionMix (const AttributeList& al)
@@ -65,16 +59,10 @@ struct ActionSwap : public Action
   const double depth;
 
   // Simulation.
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
   {
     COUT << " [Plowing]\n";
-
-    ColumnList& cl = daisy.columns;
-    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-      {
-	if (frame.match_column (**i))
-	  (*i)->swap (daisy.time, 0.0, middle, depth);
-      }
+    daisy.field.swap (daisy.time, 0.0, middle, depth);
   }
 
   ActionSwap (const AttributeList& al)

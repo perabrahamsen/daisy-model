@@ -8,13 +8,13 @@ struct ConditionOr : public Condition
 {
   const vector<const Condition*>& conditions;
 
-  bool match (const Frame& frame, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     {
       for (vector<const Condition*>::const_iterator i = conditions.begin ();
 	   i != conditions.end ();
 	   i++)
 	{
-	  if ((*i)->match (frame, daisy))
+	  if ((*i)->match (daisy))
 	    return true;
 	}
       return false;
@@ -37,13 +37,13 @@ struct ConditionAnd : public Condition
 {
   const vector<const Condition*>& conditions;
 
-  bool match (const Frame& frame, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     {
       for (vector<const Condition*>::const_iterator i = conditions.begin ();
 	   i != conditions.end ();
 	   i++)
 	{
-	  if (!(*i)->match (frame, daisy))
+	  if (!(*i)->match (daisy))
 	    return false;
 	}
       return true;
@@ -66,8 +66,8 @@ struct ConditionNot : public Condition
 {
   const Condition& condition;
 
-  bool match (const Frame& frame, const Daisy& daisy) const
-    { return !condition.match (frame, daisy); }
+  bool match (const Daisy& daisy) const
+    { return !condition.match (daisy); }
 
   ConditionNot (const AttributeList& al)
     : condition (Librarian<Condition>::create (al.alist ("operand")))
@@ -87,12 +87,12 @@ struct ConditionIf : public Condition
   const Condition& then_c;
   const Condition& else_c;
 
-  bool match (const Frame& frame, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { 
-      if (if_c.match (frame, daisy))
-	return then_c.match (frame, daisy);
+      if (if_c.match (daisy))
+	return then_c.match (daisy);
       else
-	return else_c.match (frame, daisy); 
+	return else_c.match (daisy); 
     }
 
   ConditionIf (const AttributeList& al)

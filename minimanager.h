@@ -11,7 +11,7 @@ class MiniManager : public Action
 {
   EventQueue *EQ;
 public:
-  void doIt (const Frame&, Daisy& daisy);
+  void doIt (Daisy& daisy);
 
   // Create and Destroy.
 public:

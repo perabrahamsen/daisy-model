@@ -2,13 +2,13 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "column.h"
+#include "field.h"
 // We need to initialize the Condition library.
 #include "condition.h"
 
 struct ActionNil : public Action
 {
-  void doIt (const Frame&, Daisy&)
+  void doIt (Daisy&)
     { }
 
   ActionNil (const AttributeList& al)
@@ -20,13 +20,13 @@ struct ActionProgn : public Action
 {
   vector<Action*>& actions;
 
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
     { 
       for (vector<Action*>::iterator i = actions.begin ();
 	   i != actions.end ();
 	   i++)
 	{
-	  (*i)->doIt (frame, daisy);
+	  (*i)->doIt (daisy);
 	}
     }
 
@@ -93,15 +93,15 @@ struct ActionCond : public Action
 {
   vector<clause>& clauses;
 
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
     { 
       for (vector<clause>::iterator i = clauses.begin (); 
 	   i != clauses.end ();
 	   i++)
 	{
-	  if ((*i).condition->match (frame, daisy))
+	  if ((*i).condition->match (daisy))
 	    {
-	      (*i).action->doIt (frame, daisy);
+	      (*i).action->doIt (daisy);
 	      break;
 	    }
 	}
@@ -146,12 +146,12 @@ struct ActionIf : public Action
   Action& then_a;
   Action& else_a;
 
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
     { 
-      if (if_c.match (frame, daisy))
-	then_a.doIt (frame, daisy);
+      if (if_c.match (daisy))
+	then_a.doIt (daisy);
       else
-	else_a.doIt (frame, daisy);
+	else_a.doIt (daisy);
     }
 
   bool check (Daisy& daisy) const

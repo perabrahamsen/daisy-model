@@ -11,7 +11,7 @@
 #include "bioclimate.h"
 #include "hydraulic.h"
 #include "crop.h"
-#include "column.h"
+#include "field.h"
 #include "harvest.h"
 #include "action.h"
 #include "filter.h"
@@ -19,19 +19,17 @@
 #include "syntax.h"
 #include "condition.h"
 #include "alist.h"
-#include "frame.h"
 #include "common.h"
 
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
     alist (al),
     running (false),
-    frame (NULL),
     logs (map_create<Log> (al.alist_sequence ("output"))),
     time (al.time ("time")),
     action (Librarian<Action>::create (al.alist ("manager"))),
     weather (Librarian<Weather>::create (al.alist ("weather"))), 
-    columns (*new ColumnList (al.alist_sequence ("column"))),
+    field (*new Field (al.alist_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
 { }
 
@@ -41,17 +39,13 @@ Daisy::check ()
   assert (syntax);
   bool all_ok = true;
 
-  // Check columns.
+  // Check field.
   {
     bool ok = true;
     // This was ::const_iterator in g++
-    for (ColumnList::iterator i = columns.begin ();
-	 i != columns.end ();
-	 i++)
-      {
-	if (*i == NULL || !(*i)-> check ())
-	  ok = false;
-      }
+    if (!field.check ())
+      ok = false;
+
     if (!ok)
       {
 	CERR << "Malformed column(s)\n";
@@ -86,10 +80,7 @@ Daisy::check ()
 
 void
 Daisy::tick_columns ()
-{
-  for (unsigned int i = 0; i < columns.size (); i++)
-    columns[i]->tick (time, weather);
-}
+{ field.tick (time, weather); }
 
 void
 Daisy::tick_logs ()
@@ -97,11 +88,10 @@ Daisy::tick_logs ()
   for (unsigned int i = 0; i < logs.size (); i++)
     {
       Log& log = *logs[i];
-      Filter& filter = log.match (frame, *this);
+      Filter& filter = log.match (*this);
       log.output ("time", filter, time);
       output_derived (weather, "weather", log, filter);
-      output_list (columns, "column", log, filter, 
-		   Librarian<Column>::library ());
+      output_submodule (field, "column", log, filter);
       output_vector (harvest, "harvest", log, filter);
       log.done ();
     }
@@ -110,7 +100,7 @@ Daisy::tick_logs ()
 void
 Daisy::tick ()
 { 
-  action.doIt (frame, *this);
+  action.doIt (*this);
   weather.tick (time);
 
   tick_columns ();
@@ -136,12 +126,7 @@ void
 Daisy::initialize (const Syntax& s)
 { 
   syntax = & s; 
-
-  const vector<AttributeList*>& column_alists 
-    = alist.alist_sequence ("column");
-  
-  for (unsigned int i = 0; i < columns.size (); i++)
-    columns[i]->initialize (*column_alists[i], time, weather);
+  field.initialize (alist.alist_sequence ("column"), time, weather);
 }
 
 #ifdef BORLAND_TEMPLATES
@@ -186,7 +171,7 @@ Daisy::~Daisy ()
   delete &action;
   delete &weather;
 #if 0
-  delete &columns;
+  delete &field;
 #endif
   delete &harvest;
 }

@@ -8,7 +8,7 @@ struct ConditionAt : public Condition
 {
   const Time time;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
   { return time == daisy.time; }
   ConditionAt (const AttributeList& al)
     : time (al.time ("time"))
@@ -21,7 +21,7 @@ struct ConditionBefore : public Condition
 {
   const Time time;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
   { return time > daisy.time; }
   ConditionBefore (const AttributeList& al)
     : time (al.time ("time"))
@@ -34,7 +34,7 @@ struct ConditionAfter : public Condition
 {
   const Time time;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
   { return time < daisy.time; }  
   ConditionAfter (const AttributeList& al)
     : time (al.time ("time"))
@@ -49,7 +49,7 @@ struct ConditionHourly : public Condition
 {
   const int step;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
   { return ((24 * daisy.time.yday () + daisy.time.hour ()) % step) == 0; }
   ConditionHourly (const AttributeList& al)
     : step (al.integer ("step"))
@@ -62,7 +62,7 @@ struct ConditionDaily : public Condition
 {
   const int step;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionDaily (const AttributeList& al)
     : step (al.integer ("step"))
@@ -75,7 +75,7 @@ struct ConditionWeekly : public Condition
 {
   const int step;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionWeekly (const AttributeList& al)
     : step (7 * al.integer ("step"))
@@ -88,7 +88,7 @@ struct ConditionMonthly : public Condition
 {
   const int step;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionMonthly (const AttributeList& al)
     : step (30 * al.integer ("step"))
@@ -101,7 +101,7 @@ struct ConditionYearly : public Condition
 {
   const int step;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionYearly (const AttributeList& al)
     : step (365 * al.integer ("step"))
@@ -114,7 +114,7 @@ struct ConditionHour : public Condition
 {
   const int at;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { return daisy.time.hour () == at; }
   ConditionHour (const AttributeList& al)
     : at (al.integer ("at"))
@@ -127,7 +127,7 @@ struct ConditionMDay : public Condition
 {
   const int at;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { return daisy.time.mday () == at; }
   ConditionMDay (const AttributeList& al)
     : at (al.integer ("at"))
@@ -140,7 +140,7 @@ struct ConditionYDay : public Condition
 {
   const int at;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { return daisy.time.yday () == at; }
   ConditionYDay (const AttributeList& al)
     : at (al.integer ("at"))
@@ -153,7 +153,7 @@ struct ConditionMonth : public Condition
 {
   const int at;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { return daisy.time.month () == at; }
   ConditionMonth (const AttributeList& al)
     : at (al.integer ("at"))
@@ -166,7 +166,7 @@ struct ConditionYear : public Condition
 {
   const int at;
 public:
-  bool match (const Frame&, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { return daisy.time.year () == at; }
   ConditionYear (const AttributeList& al)
     : at (al.integer ("at"))

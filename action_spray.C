@@ -2,8 +2,7 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "frame.h"
-#include "column.h"
+#include "field.h"
 #include "chemical.h"
 
 struct ActionSpray : public Action
@@ -11,20 +10,10 @@ struct ActionSpray : public Action
   const string chemical;
   const double amount;
 
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
     {
-      COUT << " [Spraying " << chemical << " at";
-
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{ 
-	  if (frame.match_column (**i))
-	    {
-	      (*i)->spray (chemical, amount); 
-	      COUT << " " << (*i)->name;
-	    }
-	}
-      COUT << "]\n";
+      COUT << "[Spraying " << chemical << "]\n";
+      daisy.field.spray (chemical, amount); 
     }
 
   bool check (Daisy&) const

@@ -2,9 +2,8 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "frame.h"
 #include "weather.h"
-#include "column.h"
+#include "field.h"
 #include "am.h"
 #include "im.h"
 
@@ -16,23 +15,18 @@ struct ActionIrrigate : public Action
   const double temp;
   const IM& sm;
   
-  virtual void irrigate (Column&,
+  virtual void irrigate (Field&,
 			 double flux, double temp, const IM&) const = 0;
 
-  void doIt (const Frame& frame, Daisy& daisy)
+  void doIt (Daisy& daisy)
   {
-    COUT << " [Irrigating]\n";
+    COUT << "[Irrigating]\n";      
     double t = temp;
 
     if (temp == at_air_temperature) 
       t = daisy.weather.hourly_air_temperature ();
 
-    ColumnList& cl = daisy.columns;
-    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-      {
-	if (frame.match_column (**i))
-	  irrigate (**i, flux, t, sm);
-      }
+    irrigate (daisy.field, flux, t, sm);
   }
 
   ActionIrrigate (const AttributeList& al)
@@ -48,8 +42,8 @@ public:
 
 struct ActionIrrigateTop : public ActionIrrigate
 {
-  void irrigate (Column& c, double flux, double temp, const IM& im) const
-    { c.irrigate_top (flux, temp, im); }
+  void irrigate (Field& f, double flux, double temp, const IM& im) const
+    { f.irrigate_top (flux, temp, im); }
   ActionIrrigateTop (const AttributeList& al)
     : ActionIrrigate (al)
     { }
@@ -57,8 +51,8 @@ struct ActionIrrigateTop : public ActionIrrigate
 
 struct ActionIrrigateSurface : public ActionIrrigate
 {
-  void irrigate (Column& c, double flux, double temp, const IM& im) const
-    { c.irrigate_surface (flux, temp, im); }
+  void irrigate (Field& f, double flux, double temp, const IM& im) const
+    { f.irrigate_surface (flux, temp, im); }
   ActionIrrigateSurface (const AttributeList& al)
     : ActionIrrigate (al)
     { }
@@ -91,4 +85,3 @@ static struct ActionIrrigateSyntax
 				   &make_surface);
     }
 } ActionIrrigate_syntax;
-

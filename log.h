@@ -10,7 +10,6 @@ class Daisy;
 class Time;
 class CSMP;
 class Geometry;
-class Frame;
 
 class Log
 {
@@ -22,7 +21,7 @@ private:
   // Use.  
 public:
   // Called at the start of each time step.
-  virtual Filter& match (const Frame&, const Daisy&) = 0;
+  virtual Filter& match (const Daisy&) = 0;
   // Called at the end of each time step.
   virtual void done ();
 

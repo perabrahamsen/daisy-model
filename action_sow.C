@@ -2,28 +2,17 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "frame.h"
-#include "column.h"
+#include "field.h"
 #include "crop.h"
 
 struct ActionSow : public Action
 {
   const AttributeList& crop;
 
-  void doIt (const Frame& frame, Daisy& daisy)
-    {
-      COUT << " [Sowing " << crop.name ("type") << " at";
-
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{ 
-	  if (frame.match_column (**i))
-	    {
-	      (*i)->sow (crop); 
-	      COUT << " " << (*i)->name;
-	    }
-	}
-      COUT << "]\n";
+  void doIt (Daisy& daisy)
+    { 
+      COUT << "[Sowing " << crop.name ("type") << "]\n";      
+      daisy.field.sow (crop); 
     }
 
   bool check (Daisy&) const

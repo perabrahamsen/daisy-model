@@ -39,9 +39,9 @@ struct LogCheckpoint : public Log, public Filter
     }
 
   // Checking to see if we should log this time step.
-  Filter& match (const Frame& frame, const Daisy& daisy)
+  Filter& match (const Daisy& daisy)
     {
-      is_active = condition.match (frame, daisy);
+      is_active = condition.match (daisy);
       if (is_active)
 	{
 	  syntax_stack.push_back (daisy.syntax);

@@ -4,28 +4,19 @@
 
 #include "condition.h"
 #include "crop.h"
-#include "column.h"
+#include "field.h"
 #include "daisy.h"
-#include "frame.h"
 
 struct ConditionDSAfter : public Condition
 {
   const string crop;
   const double ds;
 
-  bool match (const Frame& frame, const Daisy& daisy) const
+  bool match (const Daisy& daisy) const
     { 
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{ 
-	  if (frame.match_column (**i))
-	    {
-	      double crop_ds = (*i)->crop_ds (crop); 
-	      
-	      if (crop_ds != Crop::DSremove && crop_ds > ds)
-		return true;
-	    }
-	}
+      double crop_ds = daisy.field.crop_ds (crop); 
+      if (crop_ds != Crop::DSremove && crop_ds > ds)
+	return true;
       return false;
     }
 
@@ -40,21 +31,8 @@ struct ConditionDMOver : public Condition
   const string crop;
   const double weight;
 
-  bool match (const Frame& frame, const Daisy& daisy) const
-    { 
-      ColumnList& cl = daisy.columns;
-      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-	{ 
-	  if (frame.match_column (**i))
-	    {
-	      double crop_dm = (*i)->crop_dm (crop); 
-	      
-	      if (crop_dm > weight)
-		return true;
-	    }
-	}
-      return false;
-    }
+  bool match (const Daisy& daisy) const
+    { return (daisy.field.crop_dm (crop) > weight); }
 
   ConditionDMOver (const AttributeList& al)
     : crop (al.name ("crop")),

@@ -5,7 +5,7 @@
 
 struct ActionStop : public Action
 {
-  void doIt (const Frame&, Daisy& daisy)
+  void doIt (Daisy& daisy)
     { daisy.running = false; }
 
   ActionStop (const AttributeList& al)

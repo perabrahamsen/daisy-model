@@ -4,7 +4,6 @@
 #define BIOCLIMATE_H
 
 #include "librarian.h"
-#include "column.h"
 
 struct Surface;
 struct Weather;

@@ -3,7 +3,7 @@
 #include "event.h"
 #include "eventqueue.h"
 #include "minimanager.h"
-#include "column.h"
+#include "field.h"
 #include "am.h"
 #include "im.h"
 #include "daisy.h"
@@ -45,28 +45,23 @@ void FertilizeEvent::Do_It(Daisy& daisy,const Time&, EventQueue&)
   // Fertilize the WORLD
   const AttributeList& am = AM::library ().lookup ("mineral");
   
-  ColumnList& cl = daisy.columns;
-  for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
-    if (!match (**i))
-      continue;
     // Add inorganic matter.
 #if 0
     if (to < from)
-      (*i)->fertilize (IM (am), from, to);
+      daisy.field.fertilize (IM (am), from, to);
     else
 #endif
-      (*i)->fertilize (IM (am));
+      daisy.field.fertilize (IM (am));
 
     // Add organic matter, if any.
     if (am.name ("syntax") != "mineral"){
 #if 0
       if (to < from)
-	(*i)->fertilize (am, daisy.time, from, to);
+	daisy.field.fertilize (am, daisy.time, from, to);
       else
 #endif
-	(*i)->fertilize (am, daisy.time);
+	daisy.field.fertilize (am, daisy.time);
     }
-  }
   COUT << "[ (Not really) Fertilizing with " <<fertilizer<<"]\n";
 }
 
@@ -90,17 +85,12 @@ void IrrigateEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
                daisy.weather.hourly_air_temperature () :
                temperature;
 
-   ColumnList& cl = daisy.columns;
-   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
-      if (match (**i)) {
 	if (overheadirrigation)
-	  (*i)->irrigate_top (howmuch, t, sm);
+	  daisy.field.irrigate_top (howmuch, t, sm);
 	else
-	  (*i)->irrigate_surface (howmuch, t, sm);
+	  daisy.field.irrigate_surface (howmuch, t, sm);
 	  
 	COUT << "[(really) Irrigating]\n";
-      }
-   }
 }
 
 bool IrrigateEvent::KanUdfoeres(Daisy&,const Time&){
@@ -135,17 +125,12 @@ void TillageEvent::Do_It(Daisy& daisy,const Time&, EventQueue& ){
    } else
      assert(false);
 
-   ColumnList& cl = daisy.columns;
-   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++) {
-	   if (match (**i)) {
          if (mix_it)
-            (*i)->mix (daisy.time, 0.0, depth, penetration);
+            daisy.field.mix (daisy.time, 0.0, depth, penetration);
 	      else
-            (*i)->swap (daisy.time, 0.0, middle, depth);
+            daisy.field.swap (daisy.time, 0.0, middle, depth);
          COUT << "[Tilling]\n";
 
-      }
-   }
 }
 
 bool TillageEvent::KanUdfoeres(Daisy& ,const Time& ){
@@ -163,15 +148,10 @@ HarvestEvent* HarvestEvent::create(AttributeList &al){
 }
 
 void HarvestEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
-   ColumnList& cl = daisy.columns;
-   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
-      if (!match (**i))
-	      continue;
-      vector<const Harvest*> entry = (*i)->harvest (daisy.time, CropName, Stub, Stem, Leaf, StorageOrgans);
+      vector<const Harvest*> entry = daisy.field.harvest (daisy.time, CropName, Stub, Stem, Leaf, StorageOrgans);
       daisy.harvest.insert (daisy.harvest.end (), entry.begin (), entry.end ());
       COUT << "[Harvesting "<<CropName<<"]\n";
 
-   }
 }
 bool HarvestEvent::KanUdfoeres(Daisy& ,const Time& ){
    return true;
@@ -204,10 +184,7 @@ SowEvent* SowEvent::create(AttributeList &al){
    return 0;
 }
 void SowEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
-   ColumnList& cl = daisy.columns;
-   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
-      if (match (**i)) {
-	(*i)->sow (CropAttributes); 
+	daisy.field.sow (CropAttributes); 
 	COUT << "[Sowing]\n";
 
        if (harvest)
@@ -217,8 +194,6 @@ void SowEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
           temp.tick_day();
           EQ.TilfoejEvent(temp,EventQueue::TRelativ,RelativTilUdviklingsTrin);
        }
-      }
-  }
 }
 
 bool SowEvent::KanUdfoeres(Daisy& ,const Time& ){
