@@ -909,9 +909,12 @@ ActionCrop::output (Log& log) const
 }
 
 #ifdef BORLAND_TEMPLATES
-template class map_construct_const<Fertilize>;
-template class map_construct_const<Tillage>;
-template class map_construct_const<Spray>;
+template vector<const ActionCrop::Fertilize*>&
+map_construct_const<ActionCrop::Fertilize> (const vector<AttributeList*>& f);
+template vector<const ActionCrop::Tillage*>& 
+map_construct_const<ActionCrop::Tillage> (const vector<AttributeList*>& f);
+template vector<const ActionCrop::Spray*>&
+map_construct_const<ActionCrop::Spray> (const vector<AttributeList*>& f);
 #endif
 
 ActionCrop::ActionCrop (const AttributeList& al)
