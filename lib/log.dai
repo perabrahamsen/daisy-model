@@ -514,6 +514,16 @@ flow to drain pipes, and subsoil irrigation."
                    (tag "Harvest_N")
 		   (factor 10); g/m^2 -> kg/ha
                    (dimension "kg N/ha/&"))
+           (number (path column "$col" residuals_N_top)
+                   (when hourly)
+                   (tag "Residuals_N_top")
+		   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
+           (interval (path column "$col" residuals_N_soil)
+		     (when hourly)
+		     (tag "Residuals_N_soil")
+		     (factor 1e5)      ;g/cm^2 -> kg/ha
+		     (dimension "kg N/ha/&"))
            (interval (tag "AOM")
                      (path column "$col" OrganicMatter am "*" om "*" N)
                      (dimension "kg N/ha")
@@ -1902,6 +1912,16 @@ To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
                    (tag "Harvest_C")
 		   (factor 10); g/m^2 -> kg/ha
                    (dimension "kg C/ha/&"))
+           (number (path column "$col" residuals_C_top)
+                   (when hourly)
+                   (tag "Residuals_C_top")
+		   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg C/ha/&"))
+           (interval (path column "$col" residuals_C_soil)
+		     (when hourly)
+		     (tag "Residuals_C_soil")
+		     (factor 1e5)      ;g/cm^2 -> kg/ha
+		     (dimension "kg C/ha/&"))
            ))
 
 (deflog "C Balance 0-100 cm" "Carbon Balance"

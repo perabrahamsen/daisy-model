@@ -641,6 +641,13 @@ standard values for Danish fields.  The aquitard is explained
 in~\cite{daisy-new}, the \texttt{K\_aquitard} parameter is what
 you usually want to calibrate.
 
+\textbf{Note:} When using drained soil, all numerical nodes will
+contribute to the drain sink term, not just the node containing the
+pipe.  This is because the pipe is assumed to be at some distance from
+our node (as specified by the \texttt{x} or \texttt{L} parameter), and
+the sink term is actually the simulated horizontal movement of water
+towards the pipe.
+
 \subsection{Macropores}
 \label{sec:macro}
 
