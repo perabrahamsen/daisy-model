@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.78
+
+** Keep track of C in crop.
+
 * 1.77
 
 ** Ported to GCC 3.0

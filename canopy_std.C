@@ -6,7 +6,7 @@
 #include "mathlib.h"
 
 double
-CanopyStandard::CropHeight (double WStem, double DS)
+CanopyStandard::CropHeight (double /*WStem*/, double DS)
 {
 #if 0
   const double H1 = HvsDS (DS) + Offset;

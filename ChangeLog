@@ -1,5 +1,13 @@
 2001-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.78 released.
+
+2001-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/grass.dai ("Grass to grain"): Removed obsolete parameters. 
+
+	* crop_std.C: SH: Keep track of C in crop.
+
 	* Version 1.77 released.
 
 2001-07-02  Per Abrahamsen  <abraham@dina.kvl.dk>
