@@ -13,40 +13,43 @@ class Column
     // Content.
     struct Implementation;
     Implementation& impl;
-#ifdef COLUMN_INTERNALS
-    struct RecCanStr
-    {
-	vector<double> CanLAD;
-	vector<double> CanPAR;
-	vector<double> CanPTr;
-    } CanStr;
-#endif COLUMN_INTERNALS
+    const Bioclimate& bioclimate;
 public:
     string name;
     CropList crops;
+    struct RecCanStr
+    {
+	long NoCan;
+	double CanLAD[2][30];
+	double CanPAR[2][30];
+	double CanPTr[2][30];
+    } CanStr;
 
-    // Run.
+    // Actions.
 public:
-    virtual void tick (Column* left, Column* rigth, const Bioclimate& wheater, 
-		       const Time&);
     void sow (const Library& croplib, string crop, Log&);
 
     virtual void output (Log&, const Filter*) const;
     void output_crops (Log&, const Filter*) const;
     
-#if 0
     // Simulation.
-    virtual double PotentialTranspiration (const Bioclimate&);
-    virtual double SoilTemperature (double depth);
-    virtual double MaxRootingDepth ();
-    virtual double EvapInterception ();
-#endif
+    virtual double PotentialTranspiration (const Bioclimate&) const;
+    virtual double SoilTemperature (double depth) const;
+    virtual double MaxRootingDepth () const;
+    virtual double EvapInterception () const;
+    virtual void SoilColumnDiscretization (long Nz, double *z_b,
+					   double *z_n, double *dz) const;
+    static void IntensityDistribution (double Rad, double Ext, long NoL,
+				       double (*LAD)[30],
+				       double (*RadDist)[30]);
+    virtual void MainCropGrowthModel ();
+    virtual void tick (const Time&);
 
     // Create and Destroy.
 public:
-    Column (string name, 
-	    const AttributeList& paramenters, const AttributeList& variables, 
-	    const Library& horizons);
+    Column (string name, const Bioclimate&, 
+	    const AttributeList& par, const AttributeList& var,
+	    const Library&);
     virtual ~Column ();
 };
 

@@ -31,6 +31,7 @@ struct Input::Implementation
     Library horizons;
     Library columns;
     Library managers;
+    Bioclimate bioclimate;
     string chief;
     Time time;
     ColumnList field;
@@ -71,6 +72,7 @@ struct Input::Implementation
 const Time& 
 Input::makeTime () const
 {
+    impl.bioclimate.set (impl.time);
     return impl.time;
 }
 Manager& 
@@ -82,7 +84,7 @@ Input::makeManager () const
 Bioclimate& 
 Input::makeBioclimate () const 
 {     
-    return *new Bioclimate ();
+    return impl.bioclimate;
 }
 
 Log& 
@@ -130,6 +132,12 @@ Input::Implementation::load ()
 		load_columns (field);
 	    else if (item == "log")
 		load_log (log);
+	    else if (item == "bioclimate")
+		{
+		    AttributeList atts;
+		    load_list (&atts, syntax_table->syntax ("bioclimate"));
+		    bioclimate.add (atts);
+		}
 	    else
 		{
 		    error (string ("Unknown item `") + item + "'");
@@ -357,8 +365,8 @@ Input::Implementation::load_columns (ColumnList& cl)
 		    if (   syntax_table->syntax (root)->check (name, par, log)
 			&& syntax->check (name, var, log)) 
 			{
-			    cl.push_back (new Column(name, par, var, 
-						     horizons));
+			    cl.push_back (new Column(name, bioclimate, 
+						     par, var, horizons));
 			}
 		    else
 			error (string ("Ignoring incomplete column `") 
@@ -392,7 +400,8 @@ Input::Implementation::load_crops (CropList& cl)
 		    if (   syntax_table->syntax (root)->check (name, par, log)
 			&& syntax->check (name, var, log)) 
 			{
-			    cl.push_back (new Crop (name, par, var));
+			    cl.push_back (new Crop (name, bioclimate, 0,
+						    par, var));
 			}
 		    else
 			error (string ("Ignoring incomplete crop `") 
@@ -488,6 +497,9 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 		case Syntax::Function:
 		    atts->add (name, get_id ());
 		    break;
+		case Syntax::String:
+		    atts->add (name, get_string ());
+		    break;
 		case Syntax::Array:
 		{
 		    vector<double> array;
@@ -547,7 +559,7 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 		    skip_to_end ();
 		    break;
 		default:
-		    assert (0);
+		    assert (false);
 		}
 	    skip (")");
 	}

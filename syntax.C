@@ -75,7 +75,7 @@ Syntax::syntax (string key) const
     for (int i = 0; i < impl.size; i++)
 	if (impl.UGLY_key[i] == key)
 	    return impl.UGLY_syntax[i];
-    assert (0);
+    assert (false);
 }
 
 const FTable*
@@ -84,7 +84,7 @@ Syntax::function (string key) const
     for (int i = 0; i < impl.size; i++)
 	if (impl.UGLY_key[i] == key)
 	    return impl.UGLY_function[i];
-    assert (0);
+    assert (false);
 }
 
 int
@@ -93,7 +93,7 @@ Syntax::size (string key) const
     for (int i = 0; i < impl.size; i++)
 	if (impl.UGLY_key[i] == key)
 	    return impl.UGLY_size[i];
-    assert (0);
+    assert (false);
 }
 
 string
@@ -102,7 +102,8 @@ Syntax::find (const Syntax* syntax) const
     for (int i = 0; i < impl.size; i++)
 	if (impl.UGLY_syntax[i] == syntax)
 	    return impl.UGLY_key[i];
-    assert (0);
+    assert (false);
+    return "BUG"; // SHUT UP.
 }
 
 void

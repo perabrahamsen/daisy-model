@@ -8,7 +8,7 @@
 
 struct CSMP;
 
-typedef void (*CropFun)(const Crop::Parameters&, Crop::Variables&);
+typedef void (*CropFun)(Crop&);
 
 struct Crop::Parameters
 { 
@@ -149,7 +149,8 @@ struct Crop::Variables
 	double Height;		// Crop height [cm]
 	double LAI;		// Leaf Area Index
 	double LADm;		// Max Leaf Area Density [cm2/cm3]
-	vector<double> LADDist;	// LAD vs height
+	vector<double> LADDist0;	// LAD vs height
+	vector<double> LADDist1;	// LAD vs height
     private:
 	friend struct Crop::Variables;
 	RecCanopy (const AttributeList&);

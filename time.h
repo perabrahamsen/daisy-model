@@ -24,7 +24,7 @@ public:
 
     // Simulate. 
 public:
-    void step ();
+    void tick ();
 
     // Convert.
 public:

@@ -170,7 +170,7 @@ Log::output (string name, const Filter* filter, const Time& value)
 	    open (name);
 	    ostrstream scratch;
 	    scratch << value.year () << " " << value.month () << " "
-		    << value.mday () << " " << value.hour ();
+		    << value.mday () << " " << value.hour () << '\0';
 	    print (scratch.str ());
 	    close ();
 	}

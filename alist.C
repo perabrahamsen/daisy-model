@@ -115,59 +115,69 @@ double
 Value::number () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return -1.0; // SHUT UP.
 }
 
 string
 Value::name () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return "BUG"; // SHUT UP.
 }
 
 bool
 Value::flag () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return false; // SHUT UP.
 }
 
 const Time&
 Value::time () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return *((Time*) 0); // SHUT UP.
 }
 
 const
 vector<double>& Value::array () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return *((vector<double>*) 0);
 }
 
 const
 Rules& Value::rules () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return *((Rules*) 0); // SHUT UP.
 }
 
 const
 CSMP& Value::csmp () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return *((CSMP*) 0); // SHUT UP.
 }
 
 
 ColumnList& Value::columns () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return *((ColumnList*) 0); // SHUT UP.
 }
 
 CropList& Value::crops () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return *((CropList*) 0); // SHUT UP.
 }
 
 const
 AttributeList& Value::list () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
+    return *((AttributeList*) 0); // SHUT UP.
 }
 
 Value::Value ()

@@ -43,7 +43,7 @@ ActionSow::ActionSow (string c) : crop (c)
 void 
 ActionStop::doIt (ColumnList&, const Bioclimate&, const Library&, Log&) const
 {
-    assert (0);
+    assert (false);
 }
 
 bool

@@ -45,7 +45,7 @@ FilterSome::Implementation::lookup (string key) const
     for (int i = 0; i < size; i++)
 	if (UGLY_key[i] == key)
 	    return UGLY_filter[i];
-    assert (0);
+    assert (false);
 }
 
 bool

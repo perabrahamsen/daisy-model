@@ -48,7 +48,8 @@ int
 Time::week () const
 {
     // BUG: Weekdays are unimplemented.
-    assert (0);
+    assert (false);
+    return -1; // SHUT UP.
 }
 
 int
@@ -67,7 +68,8 @@ int
 Time::wday () const
 {
     // BUG: Weekdays are unimplemented.
-    assert (0);
+    assert (false);
+    return -1; // SHUT UP.
 }
 
 int
@@ -79,7 +81,7 @@ Time::hour () const
 // @ Simulate. 
 
 void 
-Time::step ()
+Time::tick ()
 {
     if (impl.hour < 23)
 	impl.hour++;
@@ -118,7 +120,8 @@ string
 Time::wday_name (int /* yday */)
 {
     // BUG: Weekdays are unimplemented.
-    assert (0);
+    assert (false);
+    return "yesterday"; // SHUT UP.
 }
 
 int
@@ -135,14 +138,14 @@ int
 Time::wday_number (string /* name */)
 {
     // BUG: Weekdays are unimplemented.
-    assert (0);
+    assert (false);
 }
 
 int
-Time::mday2yday (int year, int month, int day)
+Time::mday2yday (int year, int month, int mday)
 {
     bool ly = leap (year) && (month > 2);
-    return Implementation::mlen[month] + day + ly;
+    return Implementation::mlen[month] + mday + ly;
 }
 
 int

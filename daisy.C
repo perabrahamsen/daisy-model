@@ -33,8 +33,7 @@ Daisy::run ()
 { 
     while (true)
 	{
-	    const Action* action
-		= manager.action (*this);
+	    const Action* action = manager.action (*this);
 	    
 	    if (action->stop ())
 		break;
@@ -44,22 +43,15 @@ Daisy::run ()
 
 	    action->doIt (columns, bioclimate, crops, log);
 
-	    ColumnList::iterator prev;
-	    ColumnList::iterator column = columns.end ();
-	    ColumnList::iterator next = columns.begin ();
-
-	    while (next != columns.end ())
+	    for (ColumnList::iterator column = columns.begin ();
+		 column != columns.end ();
+		 column++)
 		{
-		    prev = column;
-		    ColumnList::iterator column = next;
-		    next++;
-
-		    (*column)->tick (((prev != columns.end ()) ? *prev : 0),
-				     ((next != columns.end ()) ? *next : 0),
-				     bioclimate, time);
+		    (*column)->tick (time);
 		}
 
-	    time.step ();
+	    time.tick ();
+	    bioclimate.tick ();
 	    log.tick (*this);
 	}
 }

@@ -22,7 +22,7 @@ class Syntax
     Implementation& impl;
 public:
     enum type 
-    { Number, List, Rules, CSMP, Function, Array, Boolean, 
+    { Number, List, Rules, CSMP, Function, Array, Boolean, String,
       Date, Crops, Columns, Error };
     bool check (string, const AttributeList&, const Log&) const;
     type lookup (string) const;

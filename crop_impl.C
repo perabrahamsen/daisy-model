@@ -6,6 +6,72 @@
 #include "csmp.h"
 #include "filter.h"
 #include "log.h"
+#include "bioclimate.h"
+
+static void 
+devel_m1 (Crop& crop)
+{
+    const Crop::Parameters::DevelPar& Devel = crop.par.Devel;
+    Crop::Variables::RecPhenology& Phenology = crop.var.Phenology;
+    double Ta = crop.bioclimate.AirTemperature ();
+
+    if (Phenology.DS < 1)
+	{
+	    Phenology.DS += Devel.DSRate1 * Ta;
+	    if (Phenology.Vern < 0)
+		crop.Vernalization (Ta);
+	}
+    else
+	{
+	    Phenology.DS += Devel.DSRate2 * Ta;
+	    if (Phenology.DS > 2)
+		Phenology.DS = 2.0;
+	}
+}
+
+static void 
+devel_m2 (Crop& crop)
+{
+    const Crop::Parameters::DevelPar& Devel = crop.par.Devel;
+    Crop::Variables::RecPhenology& Phenology = crop.var.Phenology;
+    double Ta = crop.bioclimate.AirTemperature ();
+
+    if (Phenology.DS < 1)
+	{
+	    Phenology.DS += Devel.DSRate1 * Devel.TempEff1 (Ta);
+	    if (Phenology.Vern < 0)
+		crop. Vernalization (Ta);
+	}
+    else
+	{
+	    Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
+	    if (Phenology.DS > 2)
+		Phenology.DS = 2.0;
+	}
+}
+
+static void 
+devel_m3 (Crop& crop)
+{
+    const Crop::Parameters::DevelPar& Devel = crop.par.Devel;
+    Crop::Variables::RecPhenology& Phenology = crop.var.Phenology;
+    double Ta = crop.bioclimate.AirTemperature ();
+
+    if (Phenology.DS < 1)
+	{
+	    Phenology.DS += (Devel.DSRate1
+			      * Devel.TempEff1 (Ta)
+			      * Devel.PhotEff1 (crop.bioclimate.DayLength ()));
+	    if (Phenology.Vern < 0)
+		crop.Vernalization (Ta);
+	}
+    else
+	{
+	    Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
+	    if (Phenology.DS > 2)
+		Phenology.DS = 2.0;
+	}
+}
 
 Crop::Parameters::pList Crop::Parameters::all;
 
@@ -174,15 +240,18 @@ Crop::Variables::RecPhenology::output (Log& log, const Filter* filter) const
 
 Crop::Variables::RecCanopy::RecCanopy (const Parameters& /* par */)
     : Height (0.0),
-      LAI (0.0)
-// LADm, LADDist
+      LAI (0.0),
+      LADm (-9999.99), 
+      LADDist0 (), 
+      LADDist1 ()
 { }
 
 Crop::Variables::RecCanopy::RecCanopy (const AttributeList& vl)
     : Height (vl.number ("Height")),
       LAI (vl.number ("LAI")),
       LADm (vl.number ("LADm")),
-      LADDist (vl.array ("LADDist"))
+      LADDist0 (vl.array ("LADDist0")),
+      LADDist1 (vl.array ("LADDist1"))
 { }
 
 void 
@@ -192,7 +261,8 @@ Crop::Variables::RecCanopy::output (Log& log, const Filter* filter) const
     log.output ("Height", filter, Height);
     log.output ("LAI", filter, LAI);
     log.output ("LADm", filter, LADm);
-    log.output ("LADDist", filter, LADDist);
+    log.output ("LADDist0", filter, LADDist0);
+    log.output ("LADDist1", filter, LADDist1);
     log.close();
 }
 
@@ -328,9 +398,9 @@ void CropSyntax::parameters ()
     syntax_table->add ("crop", par);
     
     // DevelPar
-    Crop::Parameters::DevelPar::models.add("m1", (CropFun) 0);
-    Crop::Parameters::DevelPar::models.add("m2", (CropFun) 0);
-    Crop::Parameters::DevelPar::models.add("m3", (CropFun) 0);
+    Crop::Parameters::DevelPar::models.add("m1", &devel_m1);
+    Crop::Parameters::DevelPar::models.add("m2", &devel_m2);
+    Crop::Parameters::DevelPar::models.add("m3", &devel_m3);
     Syntax* Devel = new Syntax ();
     par->add ("Devel", Devel);
 
@@ -455,7 +525,8 @@ void CropSyntax::variables ()
     Canopy->add ("Height", Syntax::Number);
     Canopy->add ("LAI", Syntax::Number);
     Canopy->add ("LADm", Syntax::Number);
-    Canopy->add ("LADDist", Syntax::Array);
+    Canopy->add ("LADDist0", Syntax::Array);
+    Canopy->add ("LADDist1", Syntax::Array);
 
     // RootSys
     Syntax* RootSys = new Syntax ();

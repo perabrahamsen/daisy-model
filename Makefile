@@ -12,7 +12,7 @@ TEXT = ftable.t $(SRC) $(HEAD) Makefile
 .SUFFIXES:	.C .o .h
 
 daisy:	$(OBJ)
-	$(CC) -o daisy $(OBJ)
+	$(CC) -o daisy $(OBJ) -lm
 
 bug: bug.C
 	$(CC) -v -c bug.C
@@ -49,31 +49,44 @@ cvs: $(TEXT)
 
 $(OBJ):	daisy.h
 
+pcrop.c: crop.pas
+	../ftp/p2c-1.20/p2c -a $<
+	mv crop.c pcrop.c
+
+pcrop: pcrop.c
+	gcc -L../ftp/p2c-1.20/home -I../ftp/p2c-1.20/home pcrop.c -g -o pcrop -lm -lp2c
+
+ptest: pcrop
+	pcrop < /dev/null
+
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-main.o: main.C daisy.h input.h column.h
-daisy.o: daisy.C daisy.h input.h column.h manager.h bioclimate.h log.h \
- action.h filter.h library.h syntax.h condition.h time.h
-input.o: input.C input.h column.h daisy.h manager.h bioclimate.h log.h \
- horizon.h crop.h alist.h time.h csmp.h rules.h library.h syntax.h \
- action.h condition.h filter.h
+main.o: main.C daisy.h time.h input.h column.h
+daisy.o: daisy.C daisy.h time.h input.h column.h manager.h \
+ bioclimate.h log.h action.h filter.h library.h syntax.h condition.h
+input.o: input.C input.h column.h daisy.h time.h manager.h \
+ bioclimate.h log.h horizon.h crop.h alist.h csmp.h rules.h library.h \
+ syntax.h action.h condition.h filter.h
 log.o: log.C log.h condition.h daisy.h time.h filter.h
-bioclimate.o: bioclimate.C bioclimate.h daisy.h
-manager.o: manager.C manager.h daisy.h syntax.h rules.h alist.h time.h
-column.o: column.C column.h daisy.h crop.h syntax.h log.h filter.h \
- library.h
-crop.o: crop.C crop_impl.h crop.h daisy.h ftable.h log.h time.h
+bioclimate.o: bioclimate.C bioclimate.h time.h syntax.h alist.h \
+ daisy.h
+manager.o: manager.C manager.h daisy.h time.h syntax.h rules.h alist.h
+column.o: column.C column.h daisy.h time.h crop.h syntax.h log.h \
+ filter.h library.h bioclimate.h crop_impl.h ftable.h alist.h csmp.h
+crop.o: crop.C crop_impl.h crop.h daisy.h time.h ftable.h log.h \
+ column.h csmp.h bioclimate.h
 alist.o: alist.C alist.h daisy.h time.h action.h condition.h
 syntax.o: syntax.C syntax.h alist.h daisy.h time.h
 library.o: library.C library.h alist.h daisy.h time.h syntax.h
-action.o: action.C action.h daisy.h column.h
+action.o: action.C action.h daisy.h time.h column.h
 condition.o: condition.C condition.h daisy.h time.h
-horizon.o: horizon.C horizon.h daisy.h syntax.h
+horizon.o: horizon.C horizon.h daisy.h time.h syntax.h
 ftable.o: ftable.C ftable.h
-crop_impl.o: crop_impl.C crop_impl.h crop.h daisy.h ftable.h syntax.h \
- alist.h time.h csmp.h filter.h log.h
-template.o: template.C ftable.h ftable.t crop_impl.h crop.h daisy.h
+crop_impl.o: crop_impl.C crop_impl.h crop.h daisy.h time.h ftable.h \
+ syntax.h alist.h csmp.h filter.h log.h bioclimate.h
+template.o: template.C ftable.h ftable.t crop_impl.h crop.h daisy.h \
+ time.h
 filter.o: filter.C filter.h
 csmp.o: csmp.C csmp.h
-rules.o: rules.C rules.h daisy.h action.h
+rules.o: rules.C rules.h daisy.h time.h action.h
 time.o: time.C time.h
