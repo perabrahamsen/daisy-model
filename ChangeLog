@@ -1,3 +1,15 @@
+2001-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.73 released.
+
+2001-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C, column_inorganic.C (tick): Don't clear variables
+	here. 
+	* column.h, column_base.C, column_std.C (tick): Do it here.
+	* field.C, field.h (clear): Call it.
+	* daisy.C (tick_logs): Call it.
+
 2001-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.72 released.

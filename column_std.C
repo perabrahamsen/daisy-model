@@ -70,6 +70,7 @@ public:
 
   // Simulation.
 public:
+  void clear ();
   void tick (const Time&, const Weather*);
   void output_inner (Log&) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
@@ -302,19 +303,21 @@ ColumnStandard::get_co2_production_at (unsigned int i) const // [g C/cm³]
 { return organic_matter.CO2 (i); }
 
 void
+ColumnStandard::clear ()
+{ 
+  ColumnBase::clear ();
+
+  soil_NO3.clear ();
+  soil_NH4.clear ();
+}
+
+void
 ColumnStandard::tick (const Time& time, const Weather* global_weather)
 {
   // Weather.
   if (weather)
     weather->tick (time);
   const Weather& my_weather = *(weather ? weather : global_weather);
-
-  // Remove old source sink terms. 
-  soil_water.clear (soil);
-  soil_chemicals.clear ();
-  soil_NO3.clear ();
-  soil_NH4.clear ();
-
 
   // Save logs.
   log_fertilized_NO3 = fertilized_NO3;

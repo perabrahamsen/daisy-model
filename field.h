@@ -72,6 +72,7 @@ public:
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   double crop_dm (const string& crop) const; 
   // Simulation.
+  void clear ();
   void tick (const Time&, const Weather*);
   void output (Log&) const;
 

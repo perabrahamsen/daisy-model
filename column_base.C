@@ -204,6 +204,13 @@ double
 ColumnBase::get_water_content_at (unsigned int i) const // [cm³/cm³]
 { return soil_water.Theta (i); }
 
+void
+ColumnBase::clear ()
+{ 
+  soil_water.clear (soil);
+  soil_chemicals.clear ();
+}
+
 bool
 ColumnBase::check (bool require_weather,
 		   const Time& from, const Time& to, Treelog& err) const

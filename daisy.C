@@ -86,23 +86,27 @@ Daisy::tick_columns ()
 void
 Daisy::tick_logs ()
 {
-  if (!activate_output.match (*this))
-    return;
-
-  for (unsigned int i = 0; i < logs.size (); i++)
+  if (activate_output.match (*this))
     {
-      Log& log = *logs[i];
-      if (log.match (*this))
+      for (unsigned int i = 0; i < logs.size (); i++)
 	{
-	  log.output ("time", time);
-	  if (weather)
-	    output_derived (*weather, "weather", log);
-	  output_submodule (field, "column", log);
-	  output_vector (harvest, "harvest", log);
-	  output_derived (action, "manager", log);
-	  log.done ();
+	  Log& log = *logs[i];
+	  if (log.match (*this))
+	    {
+	      log.output ("time", time);
+	      if (weather)
+		output_derived (*weather, "weather", log);
+	      output_submodule (field, "column", log);
+	      output_vector (harvest, "harvest", log);
+	      output_derived (action, "manager", log);
+	      log.done ();
+	    }
 	}
     }
+
+  // KLUDGE: Clean up field *after* log.
+  // Should be moved to separate function, but consider C interface.
+  field.clear ();
 }
 
 void

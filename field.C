@@ -56,6 +56,7 @@ public:
   double crop_dm (const string& crop) const; 
 
   // Simulation.
+  void clear ();
   void tick (const Time&, const Weather*);
   void output (Log&) const;
 
@@ -383,6 +384,15 @@ Field::Implementation::crop_dm (const string& crop) const
 }
   
 void 
+Field::Implementation::clear ()
+{
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    (*i)->clear ();
+}
+
+void 
 Field::Implementation::tick (const Time& time, const Weather* weather)
 {
   for (ColumnList::const_iterator i = columns.begin ();
@@ -620,6 +630,10 @@ Field::crop_ds (const string& crop) const
 double 
 Field::crop_dm (const string& crop) const
 { return impl.crop_dm (crop); } 
+
+void
+Field::clear ()
+{ impl.clear (); }
 
 void
 Field::tick (const Time& time, const Weather* weather)

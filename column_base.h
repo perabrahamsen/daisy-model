@@ -85,6 +85,7 @@ public:
 public:
   void output (Log&) const;
   virtual void output_inner (Log&) const;
+  void clear ();
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   virtual bool check_inner (Treelog& err) const;

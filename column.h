@@ -62,6 +62,7 @@ public:
   virtual double crop_dm (const string& crop) const = 0; 
   
   // Simulation.
+  virtual void clear () = 0;
   virtual void tick (const Time&, const Weather*) = 0;
 
   virtual bool check (bool require_weather,

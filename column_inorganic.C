@@ -120,10 +120,6 @@ ColumnInorganic::tick (const Time& time, const Weather* global_weather)
     weather->tick (time);
   const Weather& my_weather = *(weather ? weather : global_weather);
 
-  // Remove old source sink terms. 
-  soil_water.clear (soil);
-  soil_chemicals.clear ();
-
   // Early calculation.
   surface.mixture (soil_chemicals);
   soil_water.macro_tick (soil, surface);

@@ -12,9 +12,17 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
-* 1.72
+* 1.74
 
 No user visible changes.
+
+* 1.73
+
+Fixed logging incorporated inorganic matter.
+
+* 1.72
+
+Fixed some dimension strings.
 
 * 1.71
 
