@@ -24,7 +24,9 @@ protected:
   struct Surface
   { enum type { reference, field }; };
   /* const */ Surface::type surface;
-  /* const */ double screen_height;
+  /* const */ double screen_height_;
+public:
+  double screen_height () const; // [m]
 
   // Deposit.
 protected:

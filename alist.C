@@ -741,6 +741,13 @@ AttributeList::operator += (const AttributeList& al)
     impl.add ((*i).first, (*i).second);
 }
 
+void
+AttributeList::operator = (const AttributeList& al)
+{
+  assert (&al != this);
+  impl.values = al.impl.values;
+}
+
 void 
 AttributeList::clear ()
 { impl.clear (); }

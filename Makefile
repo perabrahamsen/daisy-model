@@ -170,6 +170,8 @@ GTKMMDRAWINCLUDE = -I$(HOME)/gtk/include/gtk--draw \
 		   $(GTKMMINCLUDE)
 GTKMMDRAWLIB	= -L$(HOME)/gtk/lib -lgtkmmdraw ${GTKMMLIB}
 
+# Locate the Qt library.
+#
 QTINCLUDE	= -I/pack/qt/include -I/usr/openwin/include
 QTLIB		= -L/pack/qt/lib -R/pack/qt/lib -lqt \
 		  -L/usr/openwin/lib -R/usr/openwin/lib \
@@ -266,20 +268,23 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a submodel.
 #
-OTHER = treelog.C treelog_stream.C tmpstream.C \
+OTHER = traverse_depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
 	submodel.C
 
-# Support for Jeppe and Rino's GUI frontend.
-#
 # Everything that has an interface.
 #
 INTERFACES = $(COMPONENTS) $(SUBMODELS) $(SPECIALS) $(OTHER)
 
+# Select the Qt frontend files.
+QTSOURCES = qmain.C qmain_moc.C qmain_tree.C qmain_item.C qmain_populate.C \
+	qmain_busy.C
+QTOBJECTS = $(QTSOURCES:.C=${OBJ})
+
 # Select the C files that are not part of the library.
 #
-MAIN = main.C tkmain.C gmain.C qmain.C
+MAIN = main.C tkmain.C gmain.C
 
 # The object files used in the daisy library.
 #
@@ -288,8 +293,9 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 # Find all object files, header files, and source files.
 #
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
-SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) cmain.c bugmain.c
-HEADERS = $(INTERFACES:.C=.h) version.h
+SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
+	cmain.c bugmain.c
+HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) version.h
 
 # Find all printable files.
 #
@@ -338,7 +344,7 @@ gdaisy${EXT}:	gmain${OBJ} daisy.so
 
 # Create executable with Qt.
 #
-qdaisy${EXT}:	qmain${OBJ} qmain_moc.o treelog.o daisy.so
+qdaisy${EXT}:	$(QTOBJECTS) daisy.so
 	$(LINK)qdaisy $^ $(QTLIB)
 
 qmain_moc.C:	qmain.h
@@ -535,14 +541,9 @@ tkmain${OBJ}: tkmain.C
 gmain${OBJ}: gmain.C
 	$(CC) $(GTKMMINCLUDE) $(NOLINK) $<
 
-# Special rule for qmain.o
+# Special rule for Qt frontend files.
 #
-qmain${OBJ}: qmain.C
-	$(CC) $(QTINCLUDE) $(NOLINK) $<
-
-# Special rule for qmain.o
-#
-qmain_moc${OBJ}: qmain_moc.C
+$(QTOBJECTS):
 	$(CC) $(QTINCLUDE) $(NOLINK) $<
 
 # Special rule for pmain.o
@@ -708,6 +709,9 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  geometry.h soil_water.h macro.h soil_heat.h soil_chemicals.h \
  soil_chemical.h solute.h adsorption.h transport.h mactrans.h plf.h \
  groundwater.h log.h weather.h im.h vegetation.h
+traverse_depend${OBJ}: traverse_depend.C traverse_depend.h traverse.h \
+ library.h common.h syntax.h alist.h tmpstream.h treelog.h
+traverse${OBJ}: traverse.C traverse.h library.h common.h syntax.h alist.h
 treelog${OBJ}: treelog.C treelog.h
 treelog_stream${OBJ}: treelog_stream.C treelog_stream.h treelog.h
 tmpstream${OBJ}: tmpstream.C tmpstream.h
@@ -1007,8 +1011,18 @@ set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h time.h syntax.h common.h alist.h library.h
 tkmain${OBJ}: tkmain.C daisy.h time.h syntax.h common.h alist.h library.h
 gmain${OBJ}: gmain.C daisy.h time.h syntax.h common.h alist.h library.h
-qmain${OBJ}: qmain.C qmain.h syntax.h common.h alist.h daisy.h library.h \
- version.h plf.h parser_file.h parser.h librarian.h tmpstream.h \
- printer_file.h printer.h treelog_stream.h treelog.h
+qmain${OBJ}: qmain.C qmain.h syntax.h common.h alist.h qmain_tree.h \
+ qmain_populate.h qmain_busy.h daisy.h library.h version.h \
+ parser_file.h parser.h librarian.h tmpstream.h printer_file.h \
+ printer.h
+qmain_moc${OBJ}: qmain_moc.C qmain.h syntax.h common.h alist.h
+qmain_tree${OBJ}: qmain_tree.C qmain_tree.h qmain_item.h
+qmain_item${OBJ}: qmain_item.C qmain_item.h qmain_tree.h qmain_busy.h \
+ qmain.h syntax.h common.h alist.h tmpstream.h treelog_stream.h \
+ treelog.h traverse_depend.h
+qmain_populate${OBJ}: qmain_populate.C qmain_populate.h qmain_tree.h \
+ qmain_item.h qmain.h syntax.h common.h alist.h traverse.h tmpstream.h \
+ plf.h library.h
+qmain_busy${OBJ}: qmain_busy.C qmain_busy.h
 cmain${OBJ}: cmain.c cdaisy.h
 bugmain${OBJ}: bugmain.c cdaisy.h

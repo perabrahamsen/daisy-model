@@ -1,4 +1,51 @@
+2000-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.54 released.
+
+2000-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* qmain_busy.C, qmain_busy.h: New files.
+	* qmain_item.C, qmain_item.h: New files.
+	* qmain_populate.C, qmain_populate.h: New files.
+	* Makefile (QTSOURCES): Add them.
+
+2000-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.h (screen_height): Renamed to `screen_height_'.
+	* weather.C (Weather): Update caller.
+	* weather_old.C (WeatherOld): Ditto.
+	* weather_std.C (keyword_description): Ditto.
+	* weather.h, weather.C (screen_height): New function.
+	* pet_PM.C (PenmanMonteith): Take `ScreenHeight' argument instead
+	of assuming 2.0 m.
+	(tick): Use weather.screen_height () instead of assuming 2 m.
+
+	* traverse_depend.h, traverse_depend.C: New utility.
+	* Makefile (OTHER): Add it.
+	* library.C, library.h (check_dependencies): Removed.
+	* qmain.C (view_dependencies): Adjusted.
+	
+	* traverse.h, traverse.C: New utility.
+	* Makefile (OTHER): Add it.
+
+	* qmain_tree.h, qmain_tree.C: New file.
+	* Makefile (QTSOURCES): New macro.
+	(SOURCES): Use it.
+	(HEADERS): Use it.
+	(QTOBJECTS): New macro.
+	(qdaisy${EXT}): Use it.
+	($(QTOBJECTS)): New target.
+
+	* lib/log.dai ("Crop Production"): Removed duplicate "WDead"
+	entry. 
+
+2000-09-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/grass.dai ("Grass to grain"): New "DSLAI05" value.
+
 2000-09-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.h, alist.C (operator =): New function.
 
 	* Version 1.53 released.
 

@@ -212,7 +212,7 @@ WeatherStandard::keyword_description[] =
   { "Longitude", "dgEast", &WeatherStandard::longitude, -360, 360, true },
   { "Elevation", "m", &WeatherStandard::elevation, 0, 10000, true },
   { "TimeZone", "dgEast", &WeatherStandard::timezone, -360, 360, true },
-  { "ScreenHeight", "m", &WeatherStandard::screen_height, 0, 100, true },
+  { "ScreenHeight", "m", &WeatherStandard::screen_height_, 0, 100, true },
   { "TAverage", "dgC", &WeatherStandard::T_average, -10, 40, true },
   { "TAmplitude", "dgC", &WeatherStandard::T_amplitude, 0, 100, true },
   { "MaxTDay", "yday", &WeatherStandard::max_Ta_yday, 1, 365, true } };

@@ -15,6 +15,10 @@ data from a file.  The meteorological data are common to all columns.";
 
 const double SolarConstant = 1366.7; // {W/m2]
 
+double
+Weather::screen_height () const	// [m];
+{ return screen_height_; }
+
 void
 Weather::tick (const Time& time)
 {
@@ -280,7 +284,7 @@ Weather::Weather (const AttributeList& al)
     elevation (-42.42e42),
     timezone (-42.42e42),
     surface (Surface::reference),
-    screen_height (2.0),
+    screen_height_ (2.0),
     T_average (-42.42e42),
     T_amplitude (-42.42e42),
     max_Ta_yday (-42.42e42),

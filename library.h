@@ -37,11 +37,6 @@ public:
   void entries (vector<string>&) const;
 
   // Dependencies.
-  bool check_dependencies (const string& parameterization,
-			   Treelog& treelog) const;
-  bool check_dependencies (const string& parameterization,
-			   const Syntax& syntax, const AttributeList& alist,
-			   Treelog& treelog) const;
   void remove (const string&);
 
   // File handling.

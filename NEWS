@@ -12,9 +12,15 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
-* 1.53
+* 1.54
 
-No user visible changes.
+** Adjusted DSLAI05 in `Grass' parameterization.
+
+Should give larger initial harvest.
+
+** The ScreenHeight weather parameter is now respected.
+
+This affects the `PM' potential transpiration model.
 
 * 1.51
 

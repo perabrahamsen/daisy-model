@@ -4,17 +4,15 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 ** Tree
 
-*** show alist and object sequences
-
-*** show object content in tree when different from superclass
-
 *** command to show all object content in tree for specific object
 
 *** show object superclass in library -> model
 
-*** show number of parametrizations in library
-
 *** shorten filenames.
+
+** Filter setup
+
+Only show a few buildin libraries and models.
 
 ** Treelog_Qt
 
@@ -46,6 +44,8 @@ Giv alt der afhænger af model nyt sequence number (rekursivt).
 ** View model as text.
 
 ** Menu -> Edit -> Inherit
+
+resequence, suggest among lower numbered.
 
 ** Menu -> File -> Run
 

@@ -1,18 +1,20 @@
 // qmain.C --- Qt interface to Daisy.
 
+// Q Frontend includes.
 #include "qmain.h"
+#include "qmain_tree.h"
+#include "qmain_populate.h"
+#include "qmain_busy.h"
 
+// Daisy backend includes.
 #include "daisy.h"
-#include "syntax.h"
-#include "alist.h"
 #include "library.h"
 #include "version.h"
-#include "plf.h"
 #include "parser_file.h"
 #include "printer_file.h"
 #include "tmpstream.h"
-#include "treelog_stream.h"
 
+// Q Toolkit includes.
 #include <qapplication.h>
 #include <qmenubar.h>
 #include <qvbox.h>
@@ -22,23 +24,17 @@
 #include <qfiledialog.h>
 #include <qstatusbar.h>
 
-QApplication* global_app = NULL;
-
 int 
 main (int argc, char** argv)
 {
   // Application.
   QApplication app (argc, argv);
-  global_app = &app;
+  Busy::set_global_app (&app);
   MainWindow main_window;
   
   // Initialize it.
   main_window.set_nofile ();
   main_window.populate_tree ();
-  main_window.set_description ("No selection", NULL);
-  main_window.set_selection_editable (false);
-  main_window.set_selection_copyable (false);
-  main_window.set_selection_viewable (false);
 
   // View it.
   app.setMainWidget (&main_window);
@@ -46,54 +42,23 @@ main (int argc, char** argv)
   return app.exec ();
 }
 
-class Busy
-{
-  QMainWindow* widget;
-  QString message;
-
-public:
-  Busy (QMainWindow* w, const QString& m)
-    : widget (w),
-      message (m)
-  { 
-    QApplication::setOverrideCursor (Qt::waitCursor);
-    widget->statusBar ()->message (message);
-    assert (global_app);
-    global_app->processEvents ();
-  }
-  ~Busy ()
-  {
-    widget->statusBar ()->message (message + "done", 2000);
-    QApplication::restoreOverrideCursor();
-  }
-};
-
-class NotBusy
-{
-public:
-  NotBusy ()
-  { QApplication::setOverrideCursor (Qt::arrowCursor); }
-  ~NotBusy ()
-  { QApplication::restoreOverrideCursor(); }
-};
-
 MainWindow::MainWindow ()
   : QMainWindow (),
     view_logonly (true),
     view_parameters (true),
     view_filter (0),
-    view_empty (false),
-    errors (NULL)
+    view_empty (false)
 {
   // Daisy.
-  Daisy::load_syntax (daisy_syntax, daisy_alist);
+  Daisy::load_syntax (daisy_syntax, daisy_default_alist);
+  daisy_alist = daisy_default_alist;
 
   // Arrange tree and description.
   QVBox* qmain = new QVBox (this);
   setCentralWidget (qmain);
 
   // The central tree.
-  tree = new QListView (qmain);
+  tree = new MainTree (qmain, this);
   tree->addColumn ("Parameter");
   tree->addColumn ("Type");
   tree->addColumn ("Value");
@@ -116,8 +81,12 @@ MainWindow::MainWindow ()
     = menu_file->insertItem ("&Save", this, SLOT (file_save ()));
   menu_file->insertItem ("S&ave as...", this, SLOT (file_save_as ()));
   menu_file->insertSeparator ();
-  menu_file->insertItem ("&Run", this, SLOT (menu_action ()));
-  menu_file->insertItem ("&Check", this, SLOT (menu_action ()));
+  int menu_file_run_id 
+    = menu_file->insertItem ("&Run", this, SLOT (menu_action ()));
+  menu_file->setItemEnabled (menu_file_run_id, false);
+  int menu_file_check_id 
+    = menu_file->insertItem ("&Check", this, SLOT (menu_action ()));
+  menu_file->setItemEnabled (menu_file_check_id, false);
   menu_file->insertSeparator ();
   menu_file->insertItem ("E&xit",  qApp, SLOT (quit()));
   
@@ -127,17 +96,23 @@ MainWindow::MainWindow ()
   menu_edit_edit_id 
     = menu_edit->insertItem ("&Edit...", this, SLOT (menu_action ()));
   menu_edit_raw_id 
-    = menu_edit->insertItem ("&Raw...", this, SLOT (menu_action ()));
+    = menu_edit->insertItem ("&Raw...", this, SLOT (edit_raw ()));
   menu_edit_copy_id 
     = menu_edit->insertItem ("&Copy...", this, SLOT (menu_action ()));
   menu_edit_inherit_id 
     = menu_edit->insertItem ("In&herit...", this, SLOT (menu_action ()));
   menu_edit_delete_id 
-    = menu_edit->insertItem ("&Delete...", this, SLOT (menu_action ()));
+    = menu_edit->insertItem ("&Delete...", this, SLOT (edit_delete ()));
   menu_edit->insertSeparator ();
-  menu_edit->insertItem ("&Simulation...", this, SLOT (menu_action ()));
-  menu_edit->insertItem ("&Inputs...", this, SLOT (menu_action ()));
-  menu_edit->insertItem ("&Preferences...", this, SLOT (menu_action ()));
+  int menu_edit_simulation_id 
+    = menu_edit->insertItem ("&Simulation...", this, SLOT (menu_action ()));
+  menu_edit->setItemEnabled (menu_edit_simulation_id, false);
+  int menu_edit_inputs_id 
+    = menu_edit->insertItem ("&Inputs...", this, SLOT (menu_action ()));
+  menu_edit->setItemEnabled (menu_edit_inputs_id, false);
+  int menu_edit_preferences_id 
+    = menu_edit->insertItem ("&Preferences...", this, SLOT (menu_action ()));
+  menu_edit->setItemEnabled (menu_edit_preferences_id, false);
   
   // - View menu.
   menu_view = new QPopupMenu (this);
@@ -190,9 +165,7 @@ MainWindow::daisy_clear ()
 { 
   Busy busy (this, "Daisy cleanup...");
   // Clear simulation.
-  daisy_alist.clear ();
-  Syntax dummy;
-  Daisy::load_syntax (dummy, daisy_alist);
+  daisy_alist = daisy_default_alist;
   
   // Clear libraries.
   Library::clear_all_parsed ();
@@ -286,9 +259,20 @@ MainWindow::set_selection_viewable (bool viewable)
 }
 
 void
+MainWindow::set_selection_checkable (bool checkable)
+{
+  menu_view->setItemEnabled (menu_view_check_id, checkable);
+}
+
+void
 MainWindow::set_selection_editable (bool editable)
 {
   menu_edit->setItemEnabled (menu_edit_edit_id, editable);
+}
+
+void
+MainWindow::set_selection_raw_editable (bool editable)
+{
   menu_edit->setItemEnabled (menu_edit_raw_id, editable);
   menu_edit->setItemEnabled (menu_edit_delete_id, editable);
 }
@@ -318,293 +302,22 @@ void
 MainWindow::populate_tree ()
 {
   Busy busy (this, "Populating tree...");
-  repaint ();
-  // Clear old content.
-  tree->clear ();
-
-  // Add new content.
-  vector<string> components;
-  Library::all (components);
-  for (unsigned int i = 0; i < components.size (); i++)
-    {
-      const string& component = components[i];
-      if (!Filter::filters[view_filter]->check (component))
-	continue;
-      const Library& library = Library::find (component);
-      vector<string> models;
-      library.entries (models);
-
-      if (!view_empty)
-	{
-	  for (unsigned int i = 0; i < models.size (); i++)
-	    if (Filter::filters[view_filter]->check (component, models[i]))
-	      goto found;
-	  continue;
-	found:;
-	}
-      MyListViewItem* qcomponent 
-	= new MyListViewItem (this, library.description (), tree,
-			      component.c_str ());
-
-      for (unsigned int i = 0; i < models.size (); i++)
-	{
-	  const string& model = models[i];
-	  if (!Filter::filters[view_filter]->check (component, model))
-	    continue;
-	  const Syntax& syntax = library.syntax (model);
-	  const AttributeList& alist = library.lookup (model);
-	  TmpStream str;
-	  const bool has_errors = !syntax.check (alist, str (), model);
-	  QString value =  has_errors ? "" : "Full";
-	  QString description = "no description";
-	  if (alist.check ("description"))
-	    description = alist.name ("description").c_str ();
-	  QString type;
-	  if (alist.check ("parsed_from_file"))
-	    type = QString ("\"")
-	      + alist.name ("parsed_from_file").c_str () + "\"";
-	  MyListViewItem* qmodel 
-	    = new MyListViewItem (this, description,
-				  has_errors ? new QString (str.str ()) : NULL,
-				  qcomponent, model.c_str (), type, value, "");
-
-	  add_alist_children (qmodel, syntax, alist);
-	}
-    }
+  ::populate_tree (this);
+  clear_description ();
+  set_selection_editable (false);
+  set_selection_raw_editable (false);
+  set_selection_copyable (false);
+  set_selection_viewable (false);
+  set_selection_checkable (false);
 }
 
 void 
-MainWindow::add_alist_children (MyListViewItem* node, 
-				const Syntax& syntax, 
-				const AttributeList& alist)
-{
-  const vector<string>& order = syntax.order ();
-  for (unsigned int i = 0; i < order.size (); i++)
-    add_alist_entry (node, syntax, alist, order[i]);
-
-  vector<string> parameters;
-  syntax.entries (parameters);
-  for (unsigned int i = 0; i < parameters.size (); i++)
-    {
-      const string& parameter = parameters[i];
-      if (syntax.order (parameter) < 0)
-	add_alist_entry (node, syntax, alist, parameter);
-    }
-}
-
-void
-MainWindow::add_alist_entry (MyListViewItem* node, 
-			     const Syntax& syntax, const AttributeList& alist,
-			     const string& entry)
-{
-  // Get the data.
-  QString entry_name =  entry.c_str ();
-  Syntax::type type = syntax.lookup (entry);
-  QString type_name = Syntax::type_name (type);
-  int size = syntax.size (entry);
-  bool has_value = alist.check (entry);
-  QString value_name = has_value ? "<has value>" : "";
-  QString description = syntax.description (entry).c_str ();
-
-  // Set category name and order.
-  QString category_name;
-  int order = syntax.order (entry);
-  if (syntax.is_log (entry))
-    {
-      if (!view_logonly)
-	return;
-      category_name = "Log variable";
-      if (order < 0)
-	order = 9999;
-    }
-  else if (syntax.is_const (entry))
-    {
-      if (!view_parameters)
-	return;
-      category_name = "Parameter";
-      if (order < 0)
-	order = 7777;
-    }
-  else if (syntax.is_state (entry))
-    {
-      category_name = "State variable";
-      if (order < 0)
-	order = 8888;
-    }
-  else
-    assert (false);
-
-  if (syntax.is_optional (entry))
-    category_name += " (optional)";
-
-  // Value specific changes.
-  if (has_value && size != Syntax::Singleton)
-    {
-      value_name = QString::number (alist.size (entry));
-      value_name += " elements";
-    }
-
-  // Type specific changes.
-  bool has_errors = false;
-  QString errors;
-  switch (type)
-    {
-    case Syntax::AList:
-      {
-	const AttributeList& child 
-	  = (alist.check (entry) && size == Syntax::Singleton)
-	  ? alist.alist (entry)
-	  : syntax.default_alist (entry);
-	if (child.check ("submodel"))
-	  {
-	    type_name = "`";
-	    type_name += child.name ("submodel").c_str ();
-	    type_name += "' submodel";
-	  }
-	else
-	  type_name = "Submodel";
-
-	if (child.check ("description"))
-	  {
-	    QString child_description = child.name ("description").c_str ();
-	    if (description != child_description)
-	      {
-		description += "\n--\n";
-		description += child_description;
-	      }
-	  }
-	if (has_value && size == Syntax::Singleton)
-	  {
-	    TmpStream str;
-	    has_errors = !syntax.syntax (entry).check (alist.alist (entry), 
-						       str (), entry);
-	    errors = str.str ();
-	    if (has_errors)
-	      value_name = "Partial";
-	    else
-	      value_name = "Full";
-	  }
-      }
-      break;
-    case Syntax::Object:
-      type_name = "`";
-      type_name += syntax.library (entry).name ().c_str ();
-      type_name += "' component";
-      if (has_value && size == Syntax::Singleton 
-	  && alist.alist (entry).check ("type"))
-	{
-	  string type = alist.alist (entry).name ("type");
-	  value_name = "`";
-	  value_name += type.c_str ();
-	  value_name += "'";
-	  TmpStream str;
-	  has_errors 
-	    = !syntax.library (entry).syntax (type).check (alist.alist (entry),
-							   str (), entry);
-	  errors = str.str ();
-	  if (has_errors)
-	    value_name += " partial";
-	  else
-	    value_name += " full";
-	}
-      break;
-    case Syntax::Number:
-      type_name = syntax.dimension (entry).c_str ();
-      if (size == Syntax::Singleton && has_value)
-	value_name = QString::number (alist.number (entry));
-      break;
-    case Syntax::Integer:
-      if (size == Syntax::Singleton && has_value)
-	value_name = QString::number (alist.integer (entry));
-      break;
-    case Syntax::Boolean:
-      if (size == Syntax::Singleton && has_value)
-	value_name = alist.flag (entry) ? "true" : "false";
-      break;
-    case Syntax::PLF:
-      type_name = "PLF: ";
-      type_name += syntax.range (entry).c_str ();
-      type_name += " -> ";
-      type_name += syntax.domain (entry).c_str ();
-      if (has_value && size == Syntax::Singleton)
-	{
-	  value_name = "<";
-	  value_name += QString::number (alist.plf (entry).size ());
-	  value_name += " points>";
-	}
-      break;
-    case Syntax::String:
-      if (has_value && size == Syntax::Singleton)
-	{
-	  value_name = "<";
-	  value_name += QString::number (alist.name (entry).length ());
-	  value_name += " characters>";
-	}
-      break;
-    case Syntax::Date:
-      if (has_value && size == Syntax::Singleton)
-	{
-	  Time time (alist.time (entry));
-	  value_name.sprintf ("%04d-%02d-%02dT%02d",
-			      time.year (), time.month (), time.mday (), 
-			      time.hour ());
-	}
-      break;
-    case Syntax::Library:
-    case Syntax::Error:
-    default:
-      assert (false);
-    }
-
-  // Size specific changes.
-  if (size == Syntax::Singleton)
-    /* do nothing */;
-  else if (size == Syntax::Sequence)
-    type_name += " sequence";
-  else
-    {
-      type_name += " array [";
-      type_name += QString::number (size);
-      type_name += "]";
-    }
-
-  // Create it.
-  MyListViewItem* item = 
-    new MyListViewItem (this, description, 
-			has_errors ? new QString (errors) : NULL,
-			node,
-			entry_name, type_name, value_name, 
-			category_name, order);
-
-  // Children.
-  switch (type)
-    {
-    case Syntax::AList:
-      {
-	const Syntax& entry_syntax = syntax.syntax (entry);
-	const AttributeList& entry_alist
-	  = (size == Syntax::Singleton && alist.check (entry))
-	  ? alist.alist (entry)
-	  : syntax.default_alist (entry);
-
-	add_alist_children (item, entry_syntax, entry_alist);
-      }
-      break;
-    case Syntax::Object:
-      break;
-    default:
-      /* do nothing */
-      break;
-    }
-}
+MainWindow::set_description (const QString& s)
+{ description->setText (s); }
 
 void 
-MainWindow::set_description (const QString& s, const QString* e)
-{ 
-  description->setText (s); 
-  errors = e;
-  menu_view->setItemEnabled (menu_view_check_id, e != NULL);
-}
+MainWindow::clear_description ()
+{ description->setText (daisy_alist.name ("description").c_str ()); }
 
 void 
 MainWindow::menu_action ()
@@ -655,54 +368,22 @@ MainWindow::file_save_as ()
     }
 }
 
+void
+MainWindow::edit_raw ()
+{ tree->edit_raw (); }
+
+void
+MainWindow::edit_delete ()
+{ tree->edit_delete (); }
+
+
 void 
 MainWindow::view_check ()
-{ 
-  assert (errors);
-  const QListViewItem* current = tree->currentItem ();
-  assert (current);
-  const MyListViewItem* mine = dynamic_cast<const MyListViewItem*> (current);
-  assert (mine);
-  QString title = QString ("QDaisy: Check ") + mine->entry;
-  QMessageBox::information (this, title, *errors);
-}
+{ tree->view_check (); }
 
 void 
 MainWindow::view_dependencies ()
-{ 
-  const QListViewItem* current = tree->currentItem ();
-  assert (current);
-  const MyListViewItem* mine = dynamic_cast<const MyListViewItem*> (current);
-  assert (mine);
-  vector<string> path;
-  mine->find_path (path);
-  assert (path.size () == 2);
-
-  Library& library = Library::find (path[0]);
-  TmpStream errors;
-  TreelogStream treelog (errors ());
-  QString title = QString ("QDaisy: ") + mine->entry + " dependencies";
-
-  bool found = false;
-  
-  // Check Libraries.
-  {
-    Treelog::Open nest (treelog, "Libraries");
-    if (library.check_dependencies (path[1], treelog))
-      found = true;
-  }
-  // Check simulation.
-  {
-    Treelog::Open nest (treelog, "Daisy");
-    if (library.check_dependencies (path[1], 
-				    daisy_syntax, daisy_alist, treelog))
-      found = true;
-  }
-  if (found)
-    QMessageBox::information (this, title, errors.str ());
-  else
-    QMessageBox::information (this, title, "No dependencies found.");
-}
+{ tree->view_dependencies (); }
 
 void 
 MainWindow::toggle_view_logonly ()
@@ -749,82 +430,6 @@ void
 MainWindow::help_aboutQt ()
 { 
   QMessageBox::aboutQt (this, "QDaisy: About Qt");
-}
-
-QString
-MyListViewItem::key (int column, bool ascending) const
-{
-  if (column == 3)
-    {
-      QString tmp;
-      tmp.sprintf ("%04d", order);
-      return tmp;
-    }
-  else
-    return QListViewItem::key (column, ascending);
-}
-
-void
-MyListViewItem::find_path (vector<string>& path) const
-{
-  if (parent ())
-    {
-      const MyListViewItem* myParent
-	= dynamic_cast<const MyListViewItem*> (parent ());
-      assert (myParent);
-
-      myParent->find_path (path);
-    }
-  path.push_back (entry.latin1 ());
-}
-
-
-void
-MyListViewItem::setSelected (bool s)
-{
-  main->set_selection_editable (false);
-  main->set_selection_copyable (false);
-  main->set_selection_viewable (false);
-  
-  vector<string> path;
-  find_path (path);
-  main->set_selection_depable (path.size () == 2);
-
-  if (s)
-    main->set_description (description, errors);
-  else
-    main->set_description ("no selection", NULL);
-  QListViewItem::setSelected (s);
-}
-
-MyListViewItem::MyListViewItem (MainWindow* m, const QString& d,
-				const QString* err,
-				MyListViewItem* i,
-				const QString& e, const QString& t, 
-				const QString& v, const QString& c, 
-				int o)
-  : QListViewItem (i, e, t, v, c),
-    main (m),
-    entry (e),
-    description (d),
-    errors (err),
-    order (o)
-{ }
-
-MyListViewItem::MyListViewItem (MainWindow* m, const QString& d, QListView* i, 
-				const QString& e)
-  : QListViewItem (i, e),
-    main (m),
-    entry (e),
-    description (d),
-    errors (NULL),
-    order (0)
-{ }
-
-MyListViewItem::~MyListViewItem ()
-{
-  if (errors)
-    delete errors;
 }
 
 vector<Filter*> Filter::filters;
@@ -902,4 +507,3 @@ class FilterEverything : public Filter
     return name;
   }
 } filter_everything;  
-

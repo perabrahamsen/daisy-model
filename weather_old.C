@@ -121,7 +121,7 @@ WeatherOld::WeatherOld (const AttributeList& al)
   longitude = al.number ("Longitude");
   elevation = al.number ("Elevation");
   timezone = al.number ("TimeZone");
-  screen_height = al.number ("ScreenHeight");
+  screen_height_ = al.number ("ScreenHeight");
   T_average = al.number ("average");
   T_amplitude = al.number ("amplitude");
   max_Ta_yday = al.number ("max_Ta_yday");

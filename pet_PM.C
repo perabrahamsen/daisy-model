@@ -30,6 +30,7 @@ public:
 		       double ra /* [s/m] */,
 		       double rc); // [kg/m2/s]
   static double PenmanMonteith (double CropHeight /* [m] */,
+				double ScreenHeight /* [m] */,
 				double LAI /* [m^2/m^2] */,
 				double Rn /* [W/m2] */,
 				double G /* [W/m2] */,
@@ -128,11 +129,13 @@ PetPM::ETrad (double AtmPressure, double Temp, double Rn, double G,
 }
 
 double
-PetPM::PenmanMonteith (double CropHeight, double LAI, double Rn,
+PetPM::PenmanMonteith (double CropHeight, double ScreenHeight, 
+		       double LAI, double Rn,
 		       double G, double Temp, double ea, double U2,
 		       double AtmPressure)
 {
-  const double ra = Bioclimate::AerodynamicResistance (CropHeight, 2.0, U2);
+  const double ra = Bioclimate::AerodynamicResistance (CropHeight, 
+						       ScreenHeight, U2);
   const double rc = Bioclimate::CanopyResistance (LAI);
   const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
   const double E2 = ETaero (AtmPressure, Temp, ea, ra, rc);
@@ -199,17 +202,18 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
   if (LAI > 0.0)
     {
       const double CropHeight = 0.01 * crops.height (); //cm -> m
-
+      const double ScreenHeight = weather.screen_height ();
       // Dry.
       reference_evapotranspiration_dry
-	= PenmanMonteith (CropHeight, LAI, Rn, G, Temp, VaporPressure,
+	= PenmanMonteith (CropHeight, ScreenHeight, 
+			  LAI, Rn, G, Temp, VaporPressure,
 			  U2, AtmPressure) * 3600;
       potential_evapotranspiration_dry
 	= max (0.0, reference_evapotranspiration_dry);
 
       // Wet.
       const double ra
-	= Bioclimate::AerodynamicResistance (CropHeight, 2.0, U2);
+	= Bioclimate::AerodynamicResistance (CropHeight, ScreenHeight, U2);
       const double rc = 0.0;
       const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
       const double E2 = ETaero (AtmPressure, Temp, VaporPressure, ra, rc);

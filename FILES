@@ -1,1 +1,2 @@
-1.53: Added: strstream.C, treelog.C, treelog_stream.C
+1.54: Added: traverse.C traverse_depend.C
+1.53: Added: strstream.C treelog.C treelog_stream.C

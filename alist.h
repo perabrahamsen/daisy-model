@@ -65,6 +65,7 @@ public:
   void add (const string&, const vector<const Time*>&);
 
   void operator += (const AttributeList&);
+  void operator = (const AttributeList&);
   void clear ();
   AttributeList (const AttributeList& old);
   AttributeList ();

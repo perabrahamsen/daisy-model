@@ -22,10 +22,8 @@ public:
     Open (Treelog& l, const string& name);
     ~Open ();
   };
-private:
   virtual void open (const string& name) = 0;
   virtual void close () = 0;
-  friend class Open;
   
   // Use.
 public:
