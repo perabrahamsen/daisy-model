@@ -42,6 +42,7 @@ private:
   void pop (const std::string& name);
   
   // List.
+private:
   virtual void list_open () = 0;
   virtual void list_close () = 0;
 public:
@@ -56,6 +57,7 @@ public:
   };
 
   // Item.
+private:
   virtual void item_open (const std::string& name) = 0;
   virtual void item_close () = 0;
 public:
@@ -69,7 +71,38 @@ public:
     ~Item ();  
   };
 
+  // Table.
+private:
+  virtual void table_open (const std::string& format) = 0;
+  virtual void table_close () = 0;
+public:
+  class Table
+  {
+  private:
+    Format& format;
+    Table (const Table&);
+  public:
+    Table (Format&, const std::string& format);
+    ~Table ();  
+  };
+
+  // Typewriter.
+private:
+  virtual void typewriter_open () = 0;
+  virtual void typewriter_close () = 0;
+public:
+  class Typewriter
+  {
+  private:
+    Format& format;
+    Typewriter (const Typewriter&);
+  public:
+    Typewriter (Format&);
+    ~Typewriter ();  
+  };
+
   // Section.
+private:
   virtual void section_open (const std::string& type, const std::string& title,
 			     const std::string& scope, 
 			     const std::string& label) = 0;
@@ -87,6 +120,7 @@ public:
   };
 
   // Document.
+private:
   virtual void document_open () = 0;
   virtual void document_close () = 0;
 public:
@@ -102,10 +136,11 @@ public:
 
   // Use.
 public:
-  virtual void text (const std::string& name) = 0;
-  virtual void bold (const std::string& name) = 0;
-  virtual void italic (const std::string& name) = 0;
-  virtual void verbatim (const std::string& name) = 0;
+  virtual void text (const std::string& text) = 0;
+  virtual void bold (const std::string& text) = 0;
+  virtual void italic (const std::string& text) = 0;
+  virtual void verbatim (const std::string& text) = 0;
+  virtual void raw (const std::string& format, const std::string& text) = 0;
   virtual void special (const std::string& name) = 0;
   virtual void soft_linebreak () = 0;
   virtual void hard_linebreak () = 0;

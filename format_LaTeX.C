@@ -32,6 +32,10 @@ struct FormatLaTeX : public Format
   void list_close ();
   void item_open (const std::string& name);
   void item_close ();
+  void table_open (const std::string& format);
+  void table_close ();
+  void typewriter_open ();
+  void typewriter_close ();
   void section_open (const std::string& type, const std::string& title,
 		     const std::string& scope, 
 		     const std::string& label);
@@ -40,10 +44,11 @@ struct FormatLaTeX : public Format
   void document_close ();
 
   // Use.
-  void text (const std::string& name);
-  void bold (const std::string& name);
-  void italic (const std::string& name);
-  void verbatim (const std::string& name);
+  void text (const std::string& text);
+  void bold (const std::string& text);
+  void italic (const std::string& text);
+  void verbatim (const std::string& text);
+  void raw (const std::string& format, const std::string& text);
   void special (const std::string& name);
   void soft_linebreak ();
   void hard_linebreak ();
@@ -93,6 +98,30 @@ FormatLaTeX::item_close ()
 { }
 
 void 
+FormatLaTeX::table_open (const std::string& format)
+{
+  out () << "\n\\begin{tabular}{" << format << "}";
+}
+
+void 
+FormatLaTeX::table_close ()
+{
+  out () << "\n\\end{tabular}";
+}
+
+void
+FormatLaTeX::typewriter_open ()
+{ 
+  out () << "\n\\begin{tt}";
+}
+
+void
+FormatLaTeX::typewriter_close ()
+{ 
+  out () << "\n\\end{tt}";
+}
+
+void 
 FormatLaTeX::section_open (const std::string& type, const std::string& title,
 			   const std::string& scope, const std::string& label)
 {
@@ -139,28 +168,28 @@ LaTeX manual generated: " << ctime (&now) << "\n\
 }
 
 void
-FormatLaTeX::text (const std::string& name)
+FormatLaTeX::text (const std::string& text)
 {
-  for (unsigned int i = 0; i < name.length (); i++)
-    switch (name[i])
+  for (unsigned int i = 0; i < text.length (); i++)
+    switch (text[i])
       {
       case '^':
-	if (i+1 < name.length () && (isalnum (name[i+1]) || name[i+1] == '-'))
+	if (i+1 < text.length () && (isalnum (text[i+1]) || text[i+1] == '-'))
 	  {
-	    out () << "$" << name[i] << "{";
+	    out () << "$" << text[i] << "{";
 	    do
 	      {
-		out () << name[i+1];
+		out () << text[i+1];
 		i++;
 	      }
-	    while (i+1 < name.length () && isalnum (name[i+1]));
+	    while (i+1 < text.length () && isalnum (text[i+1]));
 	    out () << "}$";
 	  }
 	else
-	  out () << "\\" << name[i] << "{ }";
+	  out () << "\\" << text[i] << "{ }";
 	break;
       case '~':
-	out () << "\\" << name[i] << "{ }";
+	out () << "\\" << text[i] << "{ }";
 	break;
       case '_':
       case '#':
@@ -169,7 +198,7 @@ FormatLaTeX::text (const std::string& name)
       case '&':
       case '{':
       case '}':
-	out () << "\\" << name[i];
+	out () << "\\" << text[i];
 	break;
       case '\\':
 	out () << "\\mbox{$\\backslash$}";
@@ -180,35 +209,42 @@ FormatLaTeX::text (const std::string& name)
       case '=':
       case '<':
       case '>':
-	out () << "\\mbox{$" << name[i] << "$}";
+	out () << "\\mbox{$" << text[i] << "$}";
 	break;
       default:
-	out () << name[i];
+	out () << text[i];
       }
 }
 
 void
-FormatLaTeX::bold (const std::string& name)
+FormatLaTeX::bold (const std::string& text)
 {
   out () << "\\textbf{";
-  text (name);
+  this->text (text);
   out () << "}";
 }
 
 void
-FormatLaTeX::italic (const std::string& name)
+FormatLaTeX::italic (const std::string& text)
 {
   out () << "\\textit{";
-  text (name);
+  this->text (text);
   out () << "}";
 }
 
 void
-FormatLaTeX::verbatim (const std::string& name)
+FormatLaTeX::verbatim (const std::string& text)
 {
   out () << "\\begin{verbatim}\n";
-  text (name);
+  this->text (text);
   out () << "\\end{verbatim}\n";
+}
+
+void
+FormatLaTeX::raw (const std::string& format, const std::string& text)
+{
+  daisy_assert (format == "LaTeX");
+  out () << text;
 }
 
 void

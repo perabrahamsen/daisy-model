@@ -73,9 +73,7 @@ struct ProgramDocument : public Program
   void print_sample_entry (std::ostream& out, const std::string& name, 
 			   const Syntax& syntax,
 			   const AttributeList& alist);
-  void print_sample_header (std::ostream& out, const std::string& name);
   void print_sample_base (std::ostream& out, const symbol, const symbol);
-  void print_sample_trailer (std::ostream& out, const std::string&);
 
   // Print parts of it.
   static void own_entries (const Library& library, const symbol name, 
@@ -525,13 +523,14 @@ ProgramDocument::print_users (const XRef::Users& users)
       std::set<XRef::ModelUser>::const_iterator next = i;
       next++;
 
-      if (i == users.models.begin ())
-	;
-      else if (next == users.models.end () && users.submodels.empty ())
-	format->text (", and ");
-      else 
-	format->text (",");
-      format->soft_linebreak ();
+      if (i != users.models.begin ())
+	{
+	  if (next == users.models.end () && users.submodels.empty ())
+	    format->text (", and ");
+	  else 
+	    format->text (",");
+	  format->soft_linebreak ();
+	}
       const symbol component = (*i).component;
       const symbol model = (*i).model;
       const std::vector<std::string>& path = (*i).path;
@@ -728,19 +727,6 @@ ProgramDocument::print_sample_entry (std::ostream& out,
 }
 
 void
-ProgramDocument::print_sample_header (std::ostream& out, const std::string& name)
-{ 
-  daisy_assert (ordered == false);
-  out << "\n\\noindent\n\\begin{tt}\n\\begin{tabular}{lll}\n$<$~";
-  if (!submodel)
-    {
-      print_string (name);
-      out << "~";
-    }
-  out << "&";
-}
-
-void
 ProgramDocument::print_sample_base (std::ostream& out, 
                                   const symbol component, 
                                   const symbol model)
@@ -752,13 +738,6 @@ ProgramDocument::print_sample_base (std::ostream& out,
   out << "\\multicolumn{2}{l}{;; Shared parameters are described "
       << "in section~\\ref{model:"
       << component << "-" << model << "}}";
-}
-
-void
-ProgramDocument::print_sample_trailer (std::ostream& out, const std::string&)
-{ 
-  out << "~$>$\n\\end{tabular}\n\\end{tt}";
-  ordered = false;
 }
 
 void
@@ -822,7 +801,19 @@ ProgramDocument::print_sample (std::ostream& out, const std::string& name,
 			       const Syntax& syntax,
 			       const AttributeList& alist)
 {
-  print_sample_header (out, name);
+  daisy_assert (ordered == false);
+  format->raw ("LaTeX", "\\noindent\n");
+  Format::Typewriter dummy (*format);
+  Format::Table d2 (*format, "lll");
+  format->soft_linebreak ();
+  format->text ("<");
+  format->special ("nbsp");
+  if (!submodel)
+    {
+      print_string (name);
+      out << "~";
+    }
+  out << "&";
 
   // Ordered members first.
   const std::vector<std::string>& order = syntax.order ();
@@ -836,14 +827,28 @@ ProgramDocument::print_sample (std::ostream& out, const std::string& name,
   print_sample_entries (out, syntax, alist, entries);
 
   // Done.
-  print_sample_trailer (out, name);
+  format->special ("nbsp");
+  format->text (">");
+  ordered = false;
 }
 
 void 
 ProgramDocument::print_sample (std::ostream& out, const symbol name,
 			       const Library& library)
 {
-  print_sample_header (out, name.name ());
+  daisy_assert (ordered == false);
+  format->raw ("LaTeX", "\\noindent\n");
+  Format::Typewriter dummy (*format);
+  Format::Table d2 (*format, "lll");
+  format->soft_linebreak ();
+  format->text ("<");
+  format->special ("nbsp");
+  if (!submodel)
+    {
+      print_string (name.name ());
+      out << "~";
+    }
+  out << "&";
 
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
@@ -870,7 +875,9 @@ ProgramDocument::print_sample (std::ostream& out, const symbol name,
     }
   
   // Done.
-  print_sample_trailer (out, name.name ());
+  format->special ("nbsp");
+  format->text (">");
+  ordered = false;
 }
 
 void
@@ -937,10 +944,9 @@ ProgramDocument::print_submodel_entries (std::ostream& out,
       // Print log variables.
       if (log_count > 0)
 	{
-	  if (level == 0)
-	    out << "\n\\subsection*{Log Variables}\n";
-	  else
-	    out << "\n\\textbf{Log Variables}\n";
+	  format->soft_linebreak ();
+	  format->bold ("Log Variables");
+	  format->soft_linebreak ();
 	  
 	  Format::List dummy (*format);
 	  for (unsigned int i = 0; i < entries.size (); i++)

@@ -75,6 +75,32 @@ Format::Item::~Item ()
   format.item_close (); 
 }
 
+Format::Table::Table (Format& f, const std::string& name)
+  : format (f)
+{ 
+  format.push ("table");
+  format.table_open (name); 
+}
+
+Format::Table::~Table ()
+{ 
+  format.pop ("table");
+  format.table_close (); 
+}
+
+Format::Typewriter::Typewriter (Format& f)
+  : format (f)
+{ 
+  format.push ("typewriter");
+  format.typewriter_open ();
+}
+
+Format::Typewriter::~Typewriter ()
+{ 
+  format.pop ("typewriter");
+  format.typewriter_close (); 
+}
+
 Format::Section::Section (Format& f, 
 			  const std::string& type, const std::string& title,
 			  const std::string& scope, const std::string& label)
