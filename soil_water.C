@@ -68,6 +68,7 @@ struct SoilWater::Implementation
 public:
   void clear (const Geometry&);
   void root_uptake (const vector<double>&);
+  void drain (const vector<double>&);
   void freeze (const Soil&, const vector<double>&);
 
   // Simulation.
@@ -102,6 +103,7 @@ void
 SoilWater::Implementation::clear (const Geometry&)
 {
   fill (S_sum.begin (), S_sum.end (), 0.0);
+  fill (S_drain.begin (), S_drain.end (), 0.0);
   fill (S_root.begin (), S_root.end (), 0.0);
   fill (S_ice.begin (), S_ice.end (), 0.0);
   // We don't clear S_p and S_drain, because they are needed in solute.
@@ -117,6 +119,18 @@ SoilWater::Implementation::root_uptake (const vector<double>& v)
     {
       S_sum[i] += v[i];
       S_root[i] += v[i];
+    }
+}
+
+void
+SoilWater::Implementation::drain (const vector<double>& v)
+{
+  daisy_assert (S_sum.size () == v.size ());
+  daisy_assert (S_root.size () == v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    {
+      S_sum[i] += v[i];
+      S_drain[i] += v[i];
     }
 }
 
@@ -203,7 +217,7 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
 	  X_ice[i] = 0.0;
 	}
 
-      // Update ice presure.
+      // Update ice pressure.
       h_ice[i] = soil.h (i, Theta_sat - X_ice[i]);
     }
 
@@ -217,7 +231,7 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
 
   // Limit for groundwater table.
   int last  = soil.size () - 1;
-  if (!groundwater.flux_bottom ())
+  if (groundwater.type () == UZbottom::pressure)
     {
       daisy_assert (soil.size () > 1);
       if (groundwater.table () <= soil.zplus (soil.size () - 2))
@@ -225,7 +239,7 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
       last = soil.interval_plus (groundwater.table ());
       if (last >=  soil.size () - 1)
 	daisy_assert ("Groundwater too low.");
-      // Presure at the last node is equal to the water above it.
+      // Pressure at the last node is equal to the water above it.
       for (unsigned int i = last + 1; i < soil.size (); i++)
 	{
 	  h_old[i] = groundwater.table () - soil.z (i);
@@ -288,7 +302,7 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
     }
 
   // Update Theta below groundwater table.
-  if (!groundwater.flux_bottom ())
+  if (groundwater.type () == UZbottom::pressure)
     {
       for(unsigned int i = last + 1; i < soil.size (); i++)
 	Theta[i] = soil.Theta (i, h[i], h_ice[i]);
@@ -303,8 +317,33 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
 
   // Update flux in surface and groundwater.
   surface.update_water (soil, S_sum, h, Theta, q, q_p);
+  const double old_in = -(q[0] + q_p[0]);
+  const double old_out = -(q[soil.size ()] + q_p[soil.size ()]);
+  const double old_sink = soil.total (S_sum);
+  const double old_drain = soil.total (S_drain);
+  const double old_total = soil.total (Theta);
+  const double old_balance = old_total + old_in - old_sink - old_out;
   groundwater.update_water (soil, soil_heat, surface,
 			    S_sum, S_drain, h, h_ice, Theta, q, q_p, msg);
+  const double new_in = -(q[0] + q_p[0]);
+  const double new_out = -(q[soil.size ()] + q_p[soil.size ()]);
+  const double new_sink = soil.total (S_sum);
+  const double new_total = soil.total (Theta);
+  const double new_balance = new_total + new_in - new_sink - new_out;
+  if (!approximate (old_balance, new_balance))
+    {
+      Treelog::Open nest (msg, "Groundwater::update_water");
+      TmpStream tmp;
+      tmp () << "old_balance (" << old_balance << ") = old_total ("
+	     << old_total << ") + old_in (" << old_in << ") - old_sink (" 
+	     << old_sink << ") - old_out (" << old_out << "); drain = " 
+	     << old_drain << "\n";
+      tmp () << "new_balance (" << new_balance << ") = new_total ("
+	     << new_total << ") + new_in (" << new_in << ") - new_sink (" 
+	     << new_sink << ") - new_out (" << new_out << "); drain = " 
+	     << soil.total (S_drain);
+      msg.error (tmp.str ());
+    }
 }
 
 void 
@@ -540,7 +579,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
   daisy_assert (h.size () == Theta.size ());
   if (h.size () == 0)
     {
-      if (groundwater.flux_bottom ())
+      if (groundwater.table () > 0.0)
 	{
 	  const double h_pF2 = -100.0; // pF 2.0;
 	  for (unsigned int i = 0; i < soil.size (); i++)
@@ -612,10 +651,13 @@ void
 SoilWater::clear (const Geometry& geometry)
 { impl.clear (geometry); }
 
-
 void
 SoilWater::root_uptake (const vector<double>& v)
 { impl.root_uptake (v); }
+
+void
+SoilWater::drain (const vector<double>& v)
+{ impl.drain (v); }
 
 void 
 SoilWater::freeze (const Soil& soil, const vector<double>& v)

@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.95
+
+** Simplified implementation of the pipe groundwater model.
+
+The new implementation should be more robust.
+
 * 2.94 
 
 ** Fix bug that rendered anisotropy irrelevant.

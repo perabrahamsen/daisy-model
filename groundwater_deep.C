@@ -26,14 +26,14 @@ class GroundwaterDeep : public Groundwater
 {
   // UZbottom.
 public:
-  bool flux_bottom () const
-  { return true; }
+  type_t type() const
+  { return free_drainage; }
   bool accept_bottom (double)
   { return true; }
 
   // Simulation.
 public:
-  void tick (const Time&, Treelog&)
+  void tick (const Soil&, SoilWater&, const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
   { return 42.42e42; }

@@ -50,8 +50,8 @@ public:
     { }
   bool accept_top (Treelog&, double)
     { return true; };
-  bool flux_bottom () const
-    { return true; };
+  type_t type () const
+    { return free_drainage; };
   bool accept_bottom (double)
     { return true; };
   void output (Log&) const;
@@ -78,7 +78,7 @@ public:
 bool
 UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const UZtop& top, 
-	    unsigned int last, const UZbottom& /* bottom */, 
+	    unsigned int last, const UZbottom& bottom, 
 	    const vector<double>& S,
 	    const vector<double>& h_old,
 	    const vector<double>& Theta_old,
@@ -172,19 +172,23 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       else
 	// Gravitational water movement.
 	{
-	  // Geometric average K.
+	  const double Theta_fc = soil.Theta (i, h_fc, h_ice[i]);
+	  double Theta_next;
 	  if (i + 1 < soil.size ())
 	    {
+	      // Geometric average K.
 	      if (h_ice[i+1] < h_fc) // Blocked by ice.
 		K_new = 0.0;
 	      else
 		K_new = sqrt (K_new * soil.K (i+1, h[i+1], h_ice[i+1],
 					      soil_heat.T (i+1)));
+	      Theta_next = Theta_new - K_new * dt / dz;
 	    }
-
-	  daisy_assert (isfinite (h_new));
-	  const double Theta_fc = soil.Theta (i, h_fc, h_ice[i]);
-	  const double Theta_next = Theta_new - K_new * dt / dz;
+	  else if (bottom.type () == UZbottom::forced_flux)
+	    Theta_next = Theta_new - bottom.q_bottom () * dt;
+	  else
+	    // Use previos value for last node.
+	    Theta_next = Theta_new - K_new * dt / dz;
 	  
 	  if (Theta_next < Theta_fc)
 	    {
@@ -216,6 +220,33 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
   // Lower border.
   q_down = q[last + 1];
 
+  if (bottom.type () == UZbottom::forced_flux
+      && !approximate (q_down, bottom.q_bottom ()))
+    {
+      // Ensure forced bottom.
+      double extra_water = (bottom.q_bottom () - q_down) * dt;
+      for (int i = last; isnormal (extra_water); i--)
+	{
+	  q[i+1] += extra_water / dt;
+	  if (i < 0)
+	    // Take it from ponding.
+	    break;
+	  const double dz = soil.dz (i);
+	  const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
+	  Theta[i] += extra_water / dz;
+	  if (Theta[i] <= Theta_sat)
+	    extra_water = 0;
+	  else
+	    {
+	      extra_water = (Theta[i] - Theta_sat) * dz;
+	      Theta[i] = Theta_sat;
+	    }
+	  h[i] = soil.h (i, Theta[i]);
+	}
+      q_up = q[first];
+      q_down = q[last + 1];
+    }
+
   // Check mass conservation.
 #ifndef _NDEBUG
   double total_old = 0.0;
@@ -228,7 +259,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       total_S += soil.dz (i) * S[i] * dt;
     }
   daisy_assert (approximate (total_old - q_up * dt + q_down * dt - total_S * dt, 
-		       total_new));
+			     total_new));
 #endif
   return true;
 }

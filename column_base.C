@@ -430,7 +430,7 @@ ColumnBase::initialize_common (const Time& time, Treelog& err,
   if (!global_weather && !weather)
     return;
   const Weather& my_weather = *(weather ? weather : global_weather);
-  groundwater.initialize (time, soil, err);
+  groundwater.initialize (soil, time, err);
   soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, my_weather, err);
   soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater, err);
   soil_chemicals.initialize (alist.alist ("SoilChemicals"), soil, soil_water, 

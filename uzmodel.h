@@ -49,9 +49,10 @@ public:
 class UZbottom
 {
 public:
-  virtual bool flux_bottom () const = 0;
+  enum type_t { pressure, lysimeter, forced_flux, free_drainage };
+  virtual type_t type () const = 0;
+  virtual double q_bottom () const;
   virtual bool accept_bottom (double) = 0;
-  virtual bool is_lysimeter () const;
   virtual ~UZbottom ();
 };
 
@@ -72,7 +73,7 @@ public:
 
   // UZbottom.
 public:
-  bool flux_bottom () const = 0;
+  type_t type () const = 0;
   bool accept_bottom (double) = 0;
   
   // Simulate.

@@ -28,6 +28,8 @@
 
 class Time;
 class Treelog;
+class Soil;
+class SoilWater;
 class SoilHeat;
 
 class Groundwater : public UZbottom
@@ -44,7 +46,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Time& time, Treelog&) = 0;
+  virtual void tick (const Soil&, SoilWater&, const SoilHeat&, 
+		     const Time&, Treelog&) = 0;
   virtual void update_water (const Soil&, const SoilHeat&, UZtop&,
 			     vector<double>& S_sum,
 			     vector<double>& S_drain,
@@ -63,7 +66,7 @@ public:
     // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const Time& time, const Soil&, Treelog&);
+  virtual void initialize (const Soil&, const Time& time, Treelog&);
 protected:
   Groundwater (const AttributeList& al);
 public:

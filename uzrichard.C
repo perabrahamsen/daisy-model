@@ -59,8 +59,8 @@ public:
     { }
   bool accept_top (Treelog&, double)
     { return true; };
-  bool flux_bottom () const
-    { return true; };
+  type_t type () const
+    { return free_drainage; };
   bool accept_bottom (double)
     { return true; };
   void output (Log&) const;
@@ -147,7 +147,7 @@ UZRichard::richard (Treelog& msg,
   vector<double> Kplus (size);
 
   // For h bottom.
-  if (!bottom.flux_bottom ())
+  if (bottom.type () == UZbottom::pressure)
     {
       daisy_assert (last + 1 < soil.size ());
       K[size] = soil.K (last + 1, 0.0, h_ice[last + 1], 
@@ -156,7 +156,6 @@ UZRichard::richard (Treelog& msg,
   
   // For lysimeter bottom.
   daisy_assert (q.size () > last);
-  const double q_last = min (0.0, q[last]); // Flux up from bottom node.
   const double h_lim = soil.zplus (last) - soil.z (last);
   daisy_assert (h_lim < 0.0);
 
@@ -228,7 +227,7 @@ UZRichard::richard (Treelog& msg,
 				 soil_heat.T (first + i));
 	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2;
 	    }
-	  if (bottom.flux_bottom ())
+	  if (bottom.type () != UZbottom::pressure)
 	    K[size] = K[size - 1];
 
 	  internode (soil, soil_heat, first, last, h_ice, K, Kplus);
@@ -296,11 +295,25 @@ UZRichard::richard (Treelog& msg,
 		  // Calculate lower boundary
 		  const double dz_minus = soil.z (first + i - 1) - z;
 
-		  if (bottom.flux_bottom ())
+		  if (bottom.type () != pressure)
 		    {
-		      const double q_bottom = bottom.is_lysimeter () 
-			? (h[i] > h_lim ? q_last : 0.0)
-			: - Kold[i];
+		      double q_bottom;
+		      if (bottom.type () == UZbottom::lysimeter)
+			{ 
+			  if (h[i] > h_lim)
+			    q_bottom = K[i];
+			  else 
+			    q_bottom = 0.0;
+			}
+		      else if (bottom.type () == UZbottom::forced_flux)
+			q_bottom = bottom.q_bottom ();
+		      else
+			{
+			  daisy_assert (bottom.type ()
+					== UZbottom::free_drainage);
+			  q_bottom = - Kold[i];
+			}
+
 		      b[i] = Cw2 + (ddt / dz) * (Kplus[i - 1] / dz_minus);
 		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 			+ (ddt / dz) * (Kplus[i - 1] + q_bottom);
@@ -371,8 +384,19 @@ UZRichard::richard (Treelog& msg,
 	  double delta_top_water = 88.0e88;
 	  if (!top.flux_top ())
 	    {
-	      q_darcy (soil, first, last, h_previous, h, Theta_previous, Theta,
-		       Kplus, S, ddt, q);
+	      // Find flux.
+	      if (bottom.type () == UZbottom::forced_flux)
+		{
+		  q[last + 1] = bottom.q_bottom ();
+		  for (int i = last; i >= first; i--)
+		    q[i] = - (((Theta[i - first] 
+				- Theta_previous[i-first]) / ddt) + S[i])
+		      * soil.dz (i) + q[i + 1];
+		}
+	      else
+		q_darcy (soil, first, last, h_previous, h, 
+			 Theta_previous, Theta, Kplus, S, ddt, q);
+
 	      // We take water from flux pond first.
 	      delta_top_water = q[first] * ddt;
 

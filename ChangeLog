@@ -1,3 +1,24 @@
+2003-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.95 released.
+
+2003-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzlr.C (tick): Handle forced_flux.
+	* uzrichard.C (richard): Handle forced_flux.
+
+	* uzmodel.h (flux_bottom, is_lysimeter): Removed.
+	(type): Added.
+	* all: Updated callers and implementers.
+
+	* soil_water.C, soil_water.h (drain): New function.
+
+	* groundwater.h, groundwater_deep.C, groundwater_file.C
+	* groundwater_fixed.C, groundwater_lysimeter.C, groundwater_pipe.C
+	* groundwater_static.C (tick): New Soil, SoilWater and SoilHeat
+	arguments. 
+	* column_std.C (tick): Update caller.
+
 2003-05-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.94 released.

@@ -39,8 +39,8 @@ public:
     { }
   bool accept_top (Treelog&, double)
     { return true; }
-  bool flux_bottom () const
-    { return true; }
+  type_t type () const
+    { return free_drainage; }
   bool accept_bottom (double)
     { return true; }
   void output (Log&) const

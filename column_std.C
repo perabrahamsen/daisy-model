@@ -388,7 +388,7 @@ ColumnStandard::tick (Treelog& out,
   nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
   denitrification.tick (soil, soil_water, soil_heat, soil_NO3, 
 			organic_matter);
-  groundwater.tick (time, out);
+  groundwater.tick (soil, soil_water, soil_heat, time, out);
 
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, my_weather);

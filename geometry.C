@@ -338,7 +338,7 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
     {
       Treelog::Open nest (msg, "Geometry");
       const bool volatile_bottom = 
-	groundwater.is_lysimeter () || groundwater.is_pipe ();
+	groundwater.type () == UZbottom::lysimeter || groundwater.is_pipe ();
 
       double last = 0.0;
       for (unsigned int i = 0; i < fixed.size ();)

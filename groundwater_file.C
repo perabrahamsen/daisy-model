@@ -41,25 +41,31 @@ private:
   
   // UZbottom.
 public:
-  bool flux_bottom () const;
+  type_t type () const;
   bool accept_bottom (double);
 
   // Simulation.
 public:
-  void tick (const Time&, Treelog&);
+  void tick (const Soil& soil, SoilWater&, const SoilHeat&,
+	     const Time& time, Treelog& msg)
+  { tick (soil, time, msg); }
+  void tick (const Soil&, const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
 public:
-  void initialize (const Time& time, const Soil&, Treelog&);
+  void initialize (const Soil&, const Time& time, Treelog&);
   GroundwaterFile (const AttributeList&);
   ~GroundwaterFile ();
 };
 
-bool
-GroundwaterFile::flux_bottom () const
+UZbottom::type_t
+GroundwaterFile::type () const
 {
-  return depth > 0;		// Positive numbers indicate flux bottom.
+  if (depth > 0)	     // Positive numbers indicate flux bottom.
+    return free_drainage;
+  else
+    return pressure;
 }
 
 bool
@@ -69,7 +75,7 @@ GroundwaterFile::accept_bottom (double)
 }
 
 void
-GroundwaterFile::tick (const Time& time, Treelog&)
+GroundwaterFile::tick (const Soil&, const Time& time, Treelog&)
 {
   daisy_assert (lex);
   while (next_time < time)
@@ -135,11 +141,12 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Time& time, const Soil&, Treelog& err)
+GroundwaterFile::initialize (const Soil& soil, const Time& time,
+			     Treelog& err)
 {
   daisy_assert (lex == NULL);
   lex = new LexerData (file_name, err);
-  tick (time, err); 
+  tick (soil, time, err); 
 }
 
 GroundwaterFile::GroundwaterFile (const AttributeList& al)

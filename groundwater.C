@@ -77,7 +77,7 @@ Groundwater::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 void
-Groundwater::initialize (const Time&, const Soil&, Treelog&)
+Groundwater::initialize (const Soil&, const Time&, Treelog&)
 { }
 
 Groundwater::Groundwater (const AttributeList& al)

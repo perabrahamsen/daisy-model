@@ -26,8 +26,8 @@ class GroundwaterLysimeter : public Groundwater
 {
   // UZbottom.
 public:
-  bool flux_bottom () const
-  { return true; }
+  type_t type () const
+  { return lysimeter; }
   bool accept_bottom (double)
   { return true; }
   bool is_lysimeter () const
@@ -35,7 +35,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&, Treelog&)
+  void tick (const Soil&, SoilWater&, const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
   { return 1.0; }

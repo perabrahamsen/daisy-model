@@ -28,6 +28,9 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "check.h"
+#ifndef USE_UPDATE_WATER
+#include "soil_water.h"
+#endif // !USE_UPDATE_WATER
 
 class GroundwaterPipe : public Groundwater
 {
@@ -57,6 +60,9 @@ class GroundwaterPipe : public Groundwater
   enum GWT_State_Type {Raising, Falling} GWT_State;
   vector<double> S;		// Pipe drainage. [cm^3/cm^3/h]
   vector<double> Percolation;	// [cm^3/cm^2/h]
+#ifndef USE_UPDATE_WATER
+  double deep_percolation;	// [cm^3/cm^2/h]
+#endif // USE_UPDATE_WATER
   double extra_water_to_surface; // [cm^3/cm^2/h]
   bool flooding;
   vector<double> ThetaOld;	// [cm^3/cm^3]
@@ -64,8 +70,17 @@ class GroundwaterPipe : public Groundwater
 
   // UZbottom.
 public:
-  bool flux_bottom () const
-  { return false; }
+  type_t type () const
+  { 
+#ifdef USE_UPDATE_WATER
+    return pressure; 
+#else // !USE_UPDATE_WATER
+    return forced_flux;
+#endif // !USE_UPDATE_WATER
+  }
+  double q_bottom () const
+  { return -deep_percolation; }
+
   bool accept_bottom (double)
   { return true; }
 
@@ -77,14 +92,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&, Treelog&)
-  {
-#if 0
-    if (time.year () == 1986 && time.month () == 12 && time.mday () == 18 &&
-	time.hour () == 20)
-      out.warning ("it's time - Greetings from pipe drains");
-#endif
-  }
+  void tick (const Soil&, SoilWater&, const SoilHeat&, const Time&, Treelog&);
   void update_water (const Soil&, const SoilHeat&,
 		     UZtop& top,
   		     vector<double>& S_sum,
@@ -120,33 +128,33 @@ private:
   double InternalGWTLocation (const Soil& soil, const double theta,
                     const double h_ice, const int node);
   double table () const
-    { return height; }
+  { return height; }
 
   // Create and Destroy.
 public:
-  void initialize (const Time&, const Soil& soil, Treelog& treelog)
-    {
-      unsigned int size = soil.size ();
-      double largest = 0.0;
-      for (unsigned int i = 0; i < size; i++)
-	if (soil.dz (i) > largest)
-	  largest = soil.dz (i);
-      if (largest > 10.0)
-	{
-	  Treelog::Open nest (treelog, "Groundwater pipe");
-	  TmpStream tmp;
-	  tmp () << "WARNING: drained soil needs soil intervals < 10.0 cm; "
-		 << "largest is " << largest << "";
-	  treelog.warning (tmp.str ());
-	}
+  void initialize (const Soil& soil, const Time&, Treelog& treelog)
+  {
+    unsigned int size = soil.size ();
+    double largest = 0.0;
+    for (unsigned int i = 0; i < size; i++)
+      if (soil.dz (i) > largest)
+	largest = soil.dz (i);
+    if (largest > 10.0)
+      {
+	Treelog::Open nest (treelog, "Groundwater pipe");
+	TmpStream tmp;
+	tmp () << "WARNING: drained soil needs soil intervals < 10.0 cm; "
+	       << "largest is " << largest << "";
+	treelog.warning (tmp.str ());
+      }
 
-      i_bottom = size - 1;
-      i_drain = soil.interval_plus (pipe_position);
+    i_bottom = size - 1;
+    i_drain = soil.interval_plus (pipe_position);
 
-      S.insert (S.end (), size, 0.0);
-      Percolation.insert (Percolation.end (), size, 0.0);
-      ThetaOld.insert (ThetaOld.end (), size, 0.0);
-    }
+    S.insert (S.end (), size, 0.0);
+    Percolation.insert (Percolation.end (), size, 0.0);
+    ThetaOld.insert (ThetaOld.end (), size, 0.0);
+  }
   GroundwaterPipe (const AttributeList& al)
     : Groundwater (al),
       L (al.number ("L")),
@@ -160,10 +168,39 @@ public:
       height (al.check ("height") ? al.number ("height") : pipe_position),
       extra_water_to_surface (-42.42e42),
       flooding (false)
-    { }
+  { }
   ~GroundwaterPipe ()
-    { }
+  { }
 };
+
+void 
+GroundwaterPipe::tick (const Soil& soil, SoilWater& soil_water, 
+		       const SoilHeat& soil_heat, const Time&, Treelog& msg)
+{
+#ifndef USE_UPDATE_WATER
+  Treelog::Open nest (msg, "Groundwater " + name);
+
+  // Empty source.
+  fill (S.begin (), S.end (), 0.0);
+  
+  // Find groundwater height.
+  height = 0.0;
+  for (int i = soil.size () - 1; i >= 0; i--)
+    if (soil_water.h (i) < 0)
+      {
+	height = soil.zplus (i);
+	break;
+      }
+
+  // Find sink term.
+  EqDrnFlow = EquilibriumDrainFlow (soil, soil_heat);
+  DrainFlow= soil.total (S);
+  soil_water.drain (S);
+
+  // Find deep percolation.
+  deep_percolation = DeepPercolation (soil);
+#endif // !USE_UPDATE_WATER
+}
 
 void
 GroundwaterPipe::update_water (const Soil& soil,
@@ -178,6 +215,7 @@ GroundwaterPipe::update_water (const Soil& soil,
 			       const vector<double>& q_p,
 			       Treelog& msg)
 {
+#ifdef USE_UPDATE_WATER
   Treelog::Open nest (msg, "Groundwater " + name);
   fill (S.begin (), S.end (), 0.0);
   for (unsigned int i = 1; i <= i_bottom+1; i++)
@@ -268,6 +306,7 @@ GroundwaterPipe::update_water (const Soil& soil,
   for (unsigned int i = i_GWT; i <= i_bottom; i++)
     h[i] = height - soil.z (i);
   S_drain = S;
+#endif // USE_UPDATE_WATER
 }
 
 double
@@ -320,12 +359,15 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
 	    * soil.anisotropy (i);
 	}
       daisy_assert (isfinite (Flow));
+#ifdef USE_UPDATE_WATER
       for (unsigned int i = i_bottom; i >= i_GWT; i--)
 	{
 	  Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);
 	}
+#endif // USE_UPDATE_WATER
       return Flow;
     }
+#ifdef USE_UPDATE_WATER
   else
     {
       for (unsigned int i = i_bottom; i >= i_GWT; i--)
@@ -334,6 +376,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
 	  Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);
 	}
     }
+#endif // USE_UPDATE_WATER
   return 0.0;
 }
 
@@ -742,7 +785,7 @@ GroundwaterPipe::output (Log& log) const
   Groundwater::output (log);
   output_variable (DrainFlow, log);
   output_variable (EqDrnFlow, log);
-  output_value (Percolation[i_bottom], "DeepPercolation", log);
+  output_value (deep_percolation, "DeepPercolation", log);
   output_variable (S, log);
 }
 

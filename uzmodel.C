@@ -29,9 +29,9 @@ UZtop::soil_top () const
 UZtop::~UZtop ()
 { }
 
-bool 
-UZbottom::is_lysimeter () const
-{ return false; }
+double
+UZbottom::q_bottom () const
+{ daisy_assert (false); }
 
 UZbottom::~UZbottom ()
 { }

@@ -30,12 +30,12 @@ private:
   
   // UZbottom.
 public:
-  bool flux_bottom () const;
+  type_t type () const;
   bool accept_bottom (double);
 
   // Simulation.
 public:
-  void tick (const Time&, Treelog&);
+  void tick (const Soil&, SoilWater&, const SoilHeat&, const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
@@ -44,10 +44,13 @@ public:
   ~GroundwaterStatic ();
 };
 
-bool
-GroundwaterStatic::flux_bottom () const
+UZbottom::type_t 
+GroundwaterStatic::type () const
 {
-  return depth > 0;		// Positive numbers indicate flux bottom.
+  if (depth > 0)	     // Positive numbers indicate flux bottom.
+    return free_drainage;
+  else
+    return pressure;
 }
 
 bool 
@@ -57,7 +60,8 @@ GroundwaterStatic::accept_bottom (double)
 }
 
 void
-GroundwaterStatic::tick (const Time&, Treelog&)
+GroundwaterStatic::tick (const Soil&, SoilWater&, const SoilHeat&,
+			 const Time&, Treelog&)
 { }
 
 double

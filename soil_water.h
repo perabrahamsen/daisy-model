@@ -46,6 +46,7 @@ class SoilWater
 public:
   void clear (const Geometry&);
   void root_uptake (const std::vector<double>&);
+  void drain (const std::vector<double>&);
   void freeze (const Soil&, const std::vector<double>&);
   
   // Queries
