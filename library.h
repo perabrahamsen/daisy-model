@@ -53,6 +53,7 @@ public:
   const char* description () const;
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
+  void add_base (AttributeList&, const Syntax&);
   void add (symbol, AttributeList&, const Syntax&);
   void add_derived (symbol name, AttributeList& al,
 		    symbol super);
@@ -63,11 +64,6 @@ public:
 
   // Dependencies.
   void remove (symbol);
-
-  // Command line parsing.
-  typedef void (*command_fun) (int& argc, char**& argv, Treelog& out);
-  void command (int& argc, char**& argv, Treelog& out) const;
-  void add_command (symbol name, command_fun fun);
 
   // File handling.
   static void clear_all_parsed ();

@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.66
+
+** Shorter reference manual.
+
+The horizon, select and weather chapters now each have a section
+containing the common parameters for all models in that chapter.  This
+saved 40 pages of repetitions.
+
+** initial_Theta should work again.
+
 * 3.65 
 
 Bug fix.
@@ -31,6 +41,8 @@ The 'pF' and the (obsolete) date related models do not obey the new
 
 The 'max', 'min' and 'average' select models have been removed, use
 'number' instead with the relevant handle.
+
+You need to update 'log.dai' because of this change.
 
 ** The interval select model can now log as "fraction of bulk mass".
 

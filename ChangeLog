@@ -1,3 +1,64 @@
+2004-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.66 released.
+
+2004-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program.C, program.h: New component.
+	* Makefile (COMPONENTS): Add it.
+	* options.C: Use it.
+	* program_refdoc.C: New model.
+	* Makefile (MODELS): Add it.
+	* library.C, library.h: Remove support for command line arguments.
+	* am.C (command_table): Made it a program.
+
+	* geometry.C (initialize_layer): Don't fill out array with 0.0.
+	* weather_none.C (snow_value): Give it a default value.
+
+2004-12-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C (negate): New parameter.
+	* summary_balance.C (summarize): New model.
+	* Makefile (MODELS): Add it.
+	* lib/log-std.dai: New parameter file.
+	* lib/Makefile (DAISY): Add it.
+	* lib/all.dai (file): Add it.
+
+2004-12-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* fetch.C: New submodel.
+	* Makefile (SUBMODELS): Add it.
+	* summary_simple.C: Use it.
+
+	* document.C, document_LaTeX.C, document.h (print_submodel_entry):
+	Made it a base class function.
+	(print_submodel_entries): Renamed from 'print_entries'.
+
+	* xref.C (enter_parameter): Ignore inherited values.
+
+2004-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* library.C (base_model): Handle "base_model" attribute.
+	(is_derived_from, ): Ditto.
+	* document.C, document.h, document_LaTeX.C: Ditto.
+	* select.C, horizon.C: Use it.
+
+2004-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (GroundwaterPipeSyntax): Don't call
+	'Groundwater::load_syntax'. 
+	* weather_simple.C (reference_evapotranspiration_value):
+	(precipitation_value): New parameters.
+	(reference_evapotranspiration, precipitation): Don't overwrite.
+	* weather_none.C (reference_evapotranspiration_value, rain_value):
+	(snow_value): New parameters..
+	(reference_evapotranspiration, rain, snow): Don't overwrite.
+	
+	* horizon.C (HorizonSyntax): Mark it as a base model.
+	* librarian.h (add_base): New static member function.
+	* library.C, library.h (add_base): New member function.
+
+
 2004-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* txt/exercises.tex: Don't use 'default' horizon.

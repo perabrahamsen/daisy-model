@@ -266,7 +266,8 @@ discretization parameter, an extra aquitard soil horizon approximately a third\n
 of the size of 'Z_aquitart' will be added.  This will allow the grounwater\n\
 level to sink into the aquitart.  The model cannot handle groundwater levels\n\
 below the last node, or above the soil surface.");
-      Groundwater::load_syntax (syntax, alist);
+      // We define our own "height", so don't load from here.
+      // Groundwater::load_syntax (syntax, alist);
 
       syntax.add ("L", "cm", Check::positive (), Syntax::Const,
 		  "Distance between pipes.");

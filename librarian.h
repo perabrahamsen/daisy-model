@@ -69,6 +69,8 @@ public:
     daisy_assert (library ().syntax (name).check (al, Treelog::null ()));
     return &(content->constructors)[name] (al);
   }
+  static void add_base (AttributeList& al, const Syntax& syntax)
+  { library ().add_base (al, syntax); }
   static void add_type (const symbol name, AttributeList& al,
 			const Syntax& syntax,
 			constructor cons)

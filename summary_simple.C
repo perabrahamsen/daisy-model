@@ -20,11 +20,10 @@
 
 
 #include "summary.h"
-#include "destination.h"
+#include "fetch.h"
 #include "select.h"
 #include "treelog.h"
 #include "tmpstream.h"
-#include "mathlib.h"
 
 #include <fstream>
 #include <string>
@@ -42,262 +41,28 @@ struct SummarySimple : public Summary
 
   // Content.
   const int precision;
-  static int width (double value);
-  static double period_factor (symbol period, int hours);
-    
-  // Fetchers.
-  struct Fetch : public Destination
-  {
-    // Content.
-    const symbol tag;
-    const double factor;
-    const symbol name;
-    string select_dimension;
-
-    // State.
-    enum { NewContent, Content, Flux, Error } type;
-    double initial;
-    double last;
-    double sum;
-
-    // Destination
-    void error ()
-    { type = Error; }
-    void missing ()
-    { 
-      switch (type)
-	{
-	case NewContent:
-          type = Content;
-          initial = last = 0.0;
-          break;
-	case Content:
-          last = 0.0;
-	  break;
-	case Flux:
-	  break;
-	case Error:
-	  break;
-	}
-    }
-    void add (const vector<double>&)
-    { type = Error; }
-    void add (const double value)
-    { 
-      switch (type)
-	{
-	case NewContent:
-	  type = Content;
-	  initial = last = value;
-	  break;
-	case Content:
-	  last = value;
-          break;
-	case Flux:
-	  sum += value;
-	  break;
-	case Error:
-	  break;
-	}
-    }
-    void add (const symbol)
-    { type = Error; }
-
-    // Create and Destroy.
-    void clear ()
-    { 
-      if (type == Content)
-	type = NewContent;
-      else if (type == Flux)
-	sum = 0; 
-    }
-    static void load_syntax (Syntax& syntax, AttributeList& alist)
-    { 
-      alist.add ("description", "A summary file line.");
-      syntax.add ("tag", Syntax::String, Syntax::Const, "\
-The tag of a column in the log file to summarize in this line.");
-      syntax.add ("factor", Syntax::None (), Syntax::Const, "\
-Factor to multiply with to get the sum.\n\
-Typically 1.0 to add this line, or -1.0 to subtract it.");
-      alist.add ("factor", 1.0);
-      syntax.add ("name", Syntax::String, Syntax::OptionalConst, "\
-Name to use for this line.  By default use the tag.");
-      syntax.order ("tag");
-    }
-    Fetch (const AttributeList& al)
-      : tag (al.identifier ("tag")),
-	factor (al.number ("factor")),
-	name (al.check ("name") ? al.identifier ("name") : tag),
-	type (Error),
-	initial (-42.42e42),
-	last (-42.42e42),
-	sum (-42.42e42)
-    { }
-    const string dimension (const symbol period)
-    {
-      if (type != Flux)
-	return select_dimension;
-
-      const size_t size = select_dimension.size ();
-      if (size > 1)
-	{
-	  const char last = select_dimension[size - 1];
-	  const char second_last = select_dimension[size - 2];
-	  if (second_last == '/'
-	      && (last == 'h' || last == 'd' || last == 'w' 
-		  || last == 'm' || last == 'y'))
-	    {
-	      const string strip = select_dimension.substr (0, size - 2);
-	      if (period.name () != "")
-		return strip + "/" + period;
-	      else
-		return strip;
-	    }
-	}
-      if (period.name () == "h")
-	return select_dimension;
-      else if (period.name () == "")
-	return select_dimension + "h";
-      else
-	return select_dimension + "h/" + period;
-    }
-    size_t name_size ()
-    { 
-      if (type == Content)
-	return name.name ().size () + 6;
-      else
-	return name.name ().size ();
-    }
-    int value_size (double& total, const symbol period, const int hours)
-    {
-      double value = 0.0;
-      switch (type)
-	{
-	case Error:
-	case NewContent:
-	  break;
-	case Content:
-	  value = (last - initial) * factor;
-	  break;
-	case Flux:
-	  value = sum * factor * period_factor (period, hours);
-	  break;
-	}
-      total += value;
-      return width (value);
-    }
-    void summarize (ostream& out, const int width, 
-		    const symbol period, const int hours)
-    {
-      if (type == Content)
-	out << "delta ";
-      out << name << " = ";
-      out.width (width);
-      switch (type)
-	{
-	case NewContent:
-	  out << "no data";
-	  break;
-	case Content:
-	  {
-	    const double value = (last - initial) * factor;
-	    out << value;
-	  }
-	  break;
-	case Flux:
-	  {
-	    const double value = sum * factor * period_factor (period, hours);
-	    out << value;
-	  }
-	  break;
-	case Error:
-	  out << "bogus data";
-	  break;
-	}
-      out << " " << "[" << dimension (period) << "]\n";
-    }
-  };
   const vector<Fetch*> fetch;
 
   // Create and Destroy.
   void clear ();
   void initialize (vector<Select*>&, Treelog&);
   explicit SummarySimple (const AttributeList&);
-  void summarize (int hours, Treelog&);
+  ~SummarySimple ();
+  void summarize (int hours, Treelog&) const;
 };
 
 const symbol SummarySimple::default_description ("\
 A simple log file summary model.");
 
-int 
-SummarySimple::width (const double value)
-{
-  if (!isnormal (value))
-    return 0;
-
-  const int absolute = double2int (floor (log10 (fabs (value)))) + 1;
-  if (value < 0)
-    return absolute + 1;
-  else
-    return absolute;
-}
-
-double
-SummarySimple::period_factor (const symbol period, const int hours)
-{ 
-  if (period.name () == "")
-    return 1.0;
-  if (period.name () == "y")
-    return 365.2425 * 24.0 / hours;
-  if (period.name () == "m")
-    return 30.0 * 24.0 / hours;
-  if (period.name () == "w")
-    return 7.0 * 24.0 / hours;
-  if (period.name () == "d")
-    return 24.0 / hours;
-  if (period.name () == "h")
-    return 1.0 / hours;
-  return -42.42e42;
-}
-    
 void
 SummarySimple::clear ()
-{ 
-  for (unsigned int i = 0; i != fetch.size (); i++)
-    fetch[i]->clear ();
-}
+{ Fetch::clear (fetch); }
 
 void
 SummarySimple::initialize (vector<Select*>& select, Treelog& msg)
 { 
   Treelog::Open nest (msg, name);
-
-  for (unsigned int i = 0; i != fetch.size (); i++)
-    {
-      Treelog::Open nest (msg, fetch[i]->tag);
-      bool found = false;
-      
-      for (unsigned int j = 0; j != select.size (); j++)
-	{
-	  Treelog::Open nest (msg, select[j]->tag ());
-	  
-	  if (fetch[i]->tag == select[j]->tag ())
-	    if (found)
-	      msg.warning ("Duplicate tag ignored");
-	    else
-	      {	
-		select[j]->add_dest (fetch[i]);
-		fetch[i]->select_dimension = select[j]->dimension ();
-		fetch[i]->type = ((select[j]->handle != Handle::current)
-                                  && !select[j]->accumulate)
-		  ? Fetch::Flux 
-		  : Fetch::NewContent;
-		found = true;
-	      }
-	}
-      if (!found)
-	msg.warning ("No tag found");
-    }
+  Fetch::initialize (fetch, select, msg);
 }
 
 SummarySimple::SummarySimple (const AttributeList& al)
@@ -312,8 +77,11 @@ SummarySimple::SummarySimple (const AttributeList& al)
     fetch (map_construct<Fetch> (al.alist_sequence ("fetch")))
 { }
 
+SummarySimple::~SummarySimple ()
+{ sequence_delete (fetch.begin (), fetch.end ()); }
+
 void 
-SummarySimple::summarize (const int hours, Treelog& msg)
+SummarySimple::summarize (const int hours, Treelog& msg) const
 {
   Treelog::Open nest (msg, title);
   TmpStream tmp;
@@ -330,7 +98,7 @@ SummarySimple::summarize (const int hours, Treelog& msg)
   int max_digits = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
     max_digits = max (max_digits, fetch[i]->value_size (total, period, hours));
-  max_digits = max (max_digits, width (total));
+  max_digits = max (max_digits, Fetch::width (total));
   const int width = max_digits + (precision > 0 ? 1 : 0) + precision;
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
@@ -395,8 +163,7 @@ By default, use the name of the parameterization.");
 Set this to 'y', 'm', 'w', 'd' or 'h' to get fluxes per time period\n\
 instead of total amount.");
       syntax.add_submodule_sequence ("fetch", Syntax::Const, "\
-List of columns to fetch for the summary.",
-				     SummarySimple::Fetch::load_syntax);
+List of columns to fetch for the summary.", Fetch::load_syntax);
       syntax.add ("precision", Syntax::Integer, Syntax::Const,
 		  "Number of digits to print after decimal point.");
       alist.add ("precision", 2);

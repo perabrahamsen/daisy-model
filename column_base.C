@@ -374,6 +374,11 @@ ColumnBase::output (Log& log) const
   static const symbol C_symbol ("residuals_C_root");
   if (log.check_leaf (C_symbol))
     log.output (C_symbol, soil.total (residuals_C_soil) * cm2_per_m2);
+  static const symbol surface_water_symbol ("surface_water");
+  if (log.check_leaf (surface_water_symbol))
+    log.output (surface_water_symbol, (bioclimate->get_intercepted_water ()
+                                       + bioclimate->get_snow_storage ()
+                                       + surface.ponding ()));
 }
 
 void
@@ -517,4 +522,7 @@ This includes loss as harvest, as well as loss of old roots.");
   syntax.add ("residuals_C_root", "g/m^2", Syntax::LogOnly, 
 	      "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
+  syntax.add ("surface_water", "mm", Syntax::LogOnly, 
+              "Amount of water in the system above ground.\n\
+This include ponded water, intercepted water and the snow pack.");
 }

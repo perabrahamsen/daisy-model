@@ -47,6 +47,8 @@ struct DocumentLaTeX : public Document
   void print_string (std::ostream&, const std::string&);
   bool is_submodel (const Syntax&, const AttributeList&, const std::string&);
   std::string find_submodel (const Syntax&, const AttributeList&, const std::string&);
+
+  // Document functions.
   void print_index (std::ostream& out, const std::string& name);
   void print_index (std::ostream& out, const symbol sym)
   { print_index (out, sym.name ()); }
@@ -73,11 +75,7 @@ struct DocumentLaTeX : public Document
 			  const Syntax& syntax,
 			  const AttributeList& alist);
 
-  // Document functions.
   void print_users (std::ostream&, const XRef::Users&);
-  void print_submodel_entry (std::ostream&, const std::string&, int level,
-			     const Syntax& syntax,
-			     const AttributeList& alist);
   void print_submodel_empty (std::ostream&, const std::string&, int level);
   void print_submodel_header (std::ostream& out, const std::string&, int level);
   void print_submodel_trailer (std::ostream& out, const std::string&, int level);
@@ -88,6 +86,7 @@ struct DocumentLaTeX : public Document
 			   const Syntax& syntax,
 			   const AttributeList& alist);
   void print_sample_header (std::ostream& out, const std::string& name);
+  void print_sample_base (std::ostream& out, const symbol, const symbol);
   void print_sample_trailer (std::ostream& out, const std::string&);
   void print_model_header (std::ostream& out, symbol name);
   void print_model_description (std::ostream& out, const std::string& description);
@@ -600,48 +599,6 @@ DocumentLaTeX::print_users (std::ostream& out, const XRef::Users& users)
   out << ".\n";
 }
 
-void 
-DocumentLaTeX::print_submodel_entry (std::ostream& out,
-				     const std::string& name, int level,
-				     const Syntax& syntax,
-				     const AttributeList& alist)
-{
-  const Syntax::type type = syntax.lookup (name);
-
-  // We ignore libraries.
-  if (type == Syntax::Library)
-    return;
-
-  const int size = syntax.size (name);
-
-  // Print name.
-  print_entry_name (out, name);
-  print_index (out, name);
-
-  // Print type.
-  print_entry_type (out, name, syntax, alist);
-
-  // Print size.
-  print_entry_size (out, name, size);
-
-  if (!syntax.is_log (name))
-    {
-      // Print category.
-      print_entry_category (out, name, syntax, alist);
-
-      // Print value.
-      print_entry_value (out, name, syntax, alist);
-    }
-
-  // Print description line.
-  const std::string& description = syntax.description (name);
-  print_entry_description (out, name, description);
-
-  // print submodel entries, if applicable
-  print_entry_submodel (out, name, level + 1, syntax, alist);
-}
-
-
 void
 DocumentLaTeX::print_submodel_empty (std::ostream& out,
 				     const std::string& name, int)
@@ -799,6 +756,20 @@ DocumentLaTeX::print_sample_header (std::ostream& out, const std::string& name)
       out << "~";
     }
   out << "&";
+}
+
+void
+DocumentLaTeX::print_sample_base (std::ostream& out, 
+                                  const symbol component, 
+                                  const symbol model)
+{ 
+  if (ordered)
+    out << "\\\\\n&";
+  else
+    ordered = true;
+  out << "\\multicolumn{2}{l}{;; Shared parameters are described "
+      << "in section~\\ref{model:"
+      << component << "-" << model << "}}";
 }
 
 void

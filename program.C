@@ -1,6 +1,6 @@
-// summary.h
+// program.C --- Run a program.
 // 
-// Copyright 2003 Per Abrahamsen and KVL.
+// Copyright 2004 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,38 +19,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef SUMMARY_H
-#define SUMMARY_H
+#include "program.h"
 
-#include "librarian.h"
-#include <vector>
-
-struct Select;
-struct Treelog;
-
-class Summary
-{
-  // Content.
-public:
-  const symbol name;
-  static const char *const description;
-
-  // Create and Destroy.
-public:
-  virtual void clear () = 0;
-  virtual void initialize (std::vector<Select*>&, Treelog&) = 0;
-protected:
-  Summary (const AttributeList& al);
-public:
-  virtual void summarize (int hours, Treelog&) const = 0;
-  virtual ~Summary ();
-};
-
-#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
-Librarian<Summary>::Content* Librarian<Summary>::content;
-#endif
+Librarian<Program>::Content* Librarian<Program>::content = NULL;
 
-static Librarian<Summary> Summary_init ("summary");
+const char *const Program::description = "\
+Run a program.";
 
-#endif // SUMMARY_H
+Program::Program (const AttributeList& al)
+  : name (al.identifier ("type"))
+{ }
+
+Program::~Program ()
+{ }

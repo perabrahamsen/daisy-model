@@ -80,9 +80,9 @@ WeatherNone::WeatherNone (const AttributeList& al)
   : WeatherOld (al),
     air_temperature (al.number ("air_temperature")),
     global_radiation (al.number ("global_radiation")),
-    reference_evapotranspiration_ (al.number ("reference_evapotranspiration")),
-    rain_ (al.number ("rain")),
-    snow_ (al.number ("snow"))
+    reference_evapotranspiration_ (al.number ("reference_evapotranspiration_value")),
+    rain_ (al.number ("rain_value")),
+    snow_ (al.number ("snow_value"))
 { }
 
 WeatherNone::~WeatherNone ()
@@ -112,13 +112,13 @@ static struct WeatherNoneSyntax
     alist.add ("global_radiation", 0.0);
     // These must be Syntax::State because they are logged in
     // Weather::output.  Otherwise, we get an error at checkpoins.
-    syntax.add ("reference_evapotranspiration", "mm/h", Syntax::State,
+    syntax.add ("reference_evapotranspiration_value", "mm/h", Syntax::Const,
 		"Constant reference evapotranspiration.");
-    alist.add ("reference_evapotranspiration", 0.0);
-    syntax.add ("rain", "mm/h", Syntax::State, "Constant rain.");
-    alist.add ("rain", 0.0);
-    syntax.add ("snow", "mm/h", Syntax::State, "Constant snow.");
-    alist.add ("snow", 0.0);
+    alist.add ("reference_evapotranspiration_value", 0.0);
+    syntax.add ("rain_value", "mm/h", Syntax::Const, "Constant rain.");
+    alist.add ("rain_value", 0.0);
+    syntax.add ("snow_value", "mm/h", Syntax::Const, "Constant snow.");
+    alist.add ("snow_value", 0.0);
     Librarian<Weather>::add_type ("none", alist, syntax, &WeatherNone::make);
   }
 } WeatherNone_syntax;

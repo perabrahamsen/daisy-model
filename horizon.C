@@ -279,9 +279,12 @@ static const class SOM_fractions_check_type : public VCheck
 void
 Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  alist.add ("base_model", "common");
   syntax.add_check (check_alist);
-  syntax.add ("description", Syntax::String, Syntax::OptionalConst,
-	      "Description of this particular soil type.");
+  syntax.add ("description", Syntax::String, Syntax::OptionalConst, 
+              "Description of this soil type.");
+  alist.add ("description", "\
+This is not a model, but a list of parameters shared by all horizon models.");
   syntax.add ("hydraulic", Librarian<Hydraulic>::library (), 
 	      "The hydraulic propeties of the soil.");
   AttributeList hydraulic_alist;
@@ -396,3 +399,15 @@ const char *const Horizon::description = "\
 A `horizon' is a soil type with specific physical properties.  It is\n\
 the responsibility of the `horizon' component to specify these\n\
 properties.";
+
+static struct HorizonSyntax
+{
+  HorizonSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    Horizon::load_syntax (syntax, alist);
+
+    Librarian<Horizon>::add_base (alist, syntax);
+  }
+} Horizon_syntax;

@@ -51,6 +51,8 @@ public:
   virtual void tick (const Time&, Surface&, const Weather&, Vegetation&, 
 		     const Soil&, SoilWater&, const SoilHeat&, Treelog&) = 0;
   virtual void output (Log&) const = 0;
+  virtual double get_intercepted_water () const = 0; // [mm]
+  virtual double get_snow_storage () const = 0; // [mm]
 
   // Canopy.
 public:
@@ -78,10 +80,8 @@ public:
   virtual void harvest_chemicals (Chemicals& chemicals, double LAI) = 0;
 		       
   // Communication with external model.
-  virtual double get_evap_interception () const; // [mm/h]
-  virtual double get_intercepted_water () const; // [mm]
-  virtual double get_net_throughfall () const; // [mm/h]
-  virtual double get_snow_storage () const; // [mm]
+  virtual double get_evap_interception () const = 0; // [mm/h]
+  virtual double get_net_throughfall () const = 0; // [mm/h]
 
   // Utilities.
 public:

@@ -328,7 +328,6 @@ Geometry::initialize_layer (vector<double>& array,
     {
       // Initialize by layers.
       const vector<AttributeList*>& layers = al.alist_sequence (initial);
-      array.insert (array.begin (), size (), 0.0);
       const double soil_end = zplus (size () - 1);
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)
@@ -347,6 +346,8 @@ Geometry::initialize_layer (vector<double>& array,
 	  last = next;
 	}
     }
+  // We must leave any remaining values unspecified, the
+  // initialization of Theta and h in SoilWater depends on that.
 }
 
 void

@@ -294,6 +294,9 @@ void
 Weather::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Logs.
+  alist.add ("base_model", "common");
+  alist.add ("description", "\
+This is not a model, but a list of parameters shared by all weather models.");
   syntax.add ("hourly_air_temperature", "dg C", Syntax::LogOnly,
 	      "Temperature this hour.");
   syntax.add ("daily_air_temperature", "dg C", Syntax::LogOnly,
@@ -330,3 +333,14 @@ Total atmospheric deposition of nitrogen this hour [g N/cm^2/h].",
 			&IM::load_soil_flux);
 }
 
+static struct WeatherSyntax
+{
+  WeatherSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    Weather::load_syntax (syntax, alist);
+
+    Librarian<Weather>::add_base (alist, syntax);
+  }
+} Weather_syntax;

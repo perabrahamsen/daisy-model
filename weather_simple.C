@@ -126,9 +126,10 @@ WeatherSimple::Precipitation () const
 
 WeatherSimple::WeatherSimple (const AttributeList& al)
   : WeatherOld (al),
-    precipitation (al.number ("precipitation")),
+    precipitation (al.number ("precipitation_value")),
     interval (al.integer ("interval")),
-    reference_evapotranspiration_ (al.number ("reference_evapotranspiration")),
+    reference_evapotranspiration_ 
+       (al.number ("reference_evapotranspiration_value")),
     time (1, 1, 1, 1)
 { }
 
@@ -150,15 +151,15 @@ static struct WeatherSimpleSyntax
       alist.add ("description", "\
 A weather model with precipitation at regular intervals.");
       WeatherOld::load_syntax (syntax, alist);
-      syntax.add ("precipitation", "mm/h", Syntax::Const,
+      syntax.add ("precipitation_value", "mm/h", Syntax::Const,
 		  "Amount of precipitation.");
-      alist.add ("precipitation", 0.0);
+      alist.add ("precipitation_value", 0.0);
       syntax.add ("interval", Syntax::Integer, Syntax::Const,
 		  "Number of hours between each precipitation event.");
       alist.add ("interval", 1);
-      syntax.add ("reference_evapotranspiration", "mm/h", Syntax::Const,
+      syntax.add ("reference_evapotranspiration_value", "mm/h", Syntax::Const,
 		  "Constant reference evapotranspiration.");
-      alist.add ("reference_evapotranspiration", -1.0);
+      alist.add ("reference_evapotranspiration_value", -1.0);
       Librarian<Weather>::add_type ("simple", alist, syntax, &make);
     }
 } WeatherSimple_syntax;

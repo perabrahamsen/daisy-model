@@ -283,6 +283,7 @@ Units::multiply (const string& one, const string& two)
     const char* two;
     const char* result;
   } table[] = { 
+    { "h^-1", "cm", "cm/h" },
     { "cm^3/cm^3", "cm", "cm" },
     { "g/cm^3", "cm", "g/cm^2" },
     { "g C/cm^3", "cm", "g C/cm^2" },
@@ -341,6 +342,8 @@ Units::standard_conversions ()
   add ("", "ppm", 1000000.0);
   add ("", "%", 100.0);
   add (Syntax::None (), "", 1.0);
+  add ("cm^3/cm^3", Syntax::Fraction (), 1.0);
+  add ("cm^3/cm^3", "", 1.0);
   add ("cm^3 H2O/cm^3", Syntax::Fraction (), 1.0);
   add ("cm^3 H2O/cm^3", "", 1.0);
   add ("g/cm^3", Syntax::Fraction (), 1.0);

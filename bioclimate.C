@@ -42,22 +42,6 @@ Bioclimate::day_fraction () const
   return 0.0;
 }
 
-double 
-Bioclimate::get_evap_interception () const
-{ daisy_assert (false); }
-
-double 
-Bioclimate::get_intercepted_water () const
-{ daisy_assert (false); }
-
-double 
-Bioclimate::get_net_throughfall () const
-{ daisy_assert (false); }
-
-double 
-Bioclimate::get_snow_storage () const
-{ daisy_assert (false); }
-
 void
 Bioclimate::radiation_distribution (const int No, const double LAI,
                                     const double Ref,

@@ -22,13 +22,12 @@
 
 #include "options.h"
 #include "parser_file.h"
-#include "document.h"
+#include "program.h"
 #include "syntax.h"
 #include "alist.h"
 #include "treelog_stream.h"
 #include "version.h"
 #include "path.h"
-#include <iostream>
 #include <memory>
 
 using namespace std;
@@ -59,8 +58,20 @@ Options::get_arg (int& argc, char**& argv)
 void
 Options::usage (Treelog& out) const
 {
-  out.error (string ("Usage: ")
-	     + program_name + " [-p type] [-v] [-d dir] [-l lib command args...] file...");
+  string s = "Usage: ";
+  s += program_name;
+  s += " [-v] [-d dir] file... [-p ";
+  const Library& library = Librarian<Program>::library ();
+  vector<symbol> entries;
+  library.entries (entries);
+  for (size_t i = 0; i < entries.size (); i++)
+    {
+      if (i > 0)
+        s += " | ";
+      s += entries[i].name ();
+    }
+  s += "]";
+  out.error (s);
 }
 
 void
@@ -162,26 +173,6 @@ Options::Options (int& argc, char**& argv,
 		// Usage.
 		argc = -2;
               break;
-            case 'l':
-              {
-                if (argc < 2)
-                  {
-                    // We need a library name.
-                    argc = -2;
-                    break;
-                  }
-                const symbol name = symbol (get_arg (argc, argv));
-                if (!Library::exist (name))
-                  {
-                    out.error (program_name + ": '" + name 
-                               + "' unknown library");
-                    argc = -2;
-                    break;
-                  }
-                const Library& library = Library::find (name);
-                library.command (argc, argv, out);
-              }
-              break;
 	    case 'p':
               {
                 if (argc < 2)
@@ -191,12 +182,12 @@ Options::Options (int& argc, char**& argv,
                     break;
                   }
                 const Library& library 
-                  = Librarian<Document>::library ();
+                  = Librarian<Program>::library ();
                 const symbol name = symbol (get_arg (argc, argv));
                 if (!library.check (name))
                   {
                     out.error (program_name + ": '" + name 
-                               + "' unknown document type");
+                               + "' unknown program");
                     argc = -2;
                     break;
                   }
@@ -206,9 +197,9 @@ Options::Options (int& argc, char**& argv,
                 Treelog::Open nest (out, name);
                 if (syntax.check (alist, out))
                   {
-                    auto_ptr<Document> document 
-                      (Librarian<Document>::create (alist));
-                    document->print_document (cout);
+                    auto_ptr<Program> document 
+                      (Librarian<Program>::create (alist));
+                    document->run (out);
                   }
                 prevent_run = true;
               }

@@ -83,6 +83,7 @@ struct Select::Implementation
   const Units::Convert* spec_conv; // Convert value.
   const double factor;		// - || -
   const double offset;		// - || -
+  const bool negate;            // - || -
   double convert (double) const; // - || -
   const symbol tag;		// Name of this entry.
   string dimension;		// Physical dimension of this entry.
@@ -200,9 +201,10 @@ Select::Implementation::Spec::~Spec ()
 double 
 Select::Implementation::convert (double value) const
 { 
-  if (spec_conv)
-    return spec_conv->operator() (value);
-  return value * factor + offset; 
+  const double result = (spec_conv)
+    ? spec_conv->operator() (value)
+    :  value * factor + offset; 
+  return negate ? -result : result;
 }
 
 symbol
@@ -236,6 +238,7 @@ Select::Implementation::Implementation (const AttributeList& al)
     spec_conv (NULL),
     factor (al.number ("factor")),
     offset (al.number ("offset")),
+    negate (al.flag ("negate")),
     tag (select_get_tag (al)),
     dimension (al.check ("dimension")
 	       ? al.name ("dimension") : Syntax::Unknown ())
@@ -326,6 +329,7 @@ void
 Select::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_alist);
+  alist.add ("base_model", "common");
   syntax.add ("tag", Syntax::String, Syntax::OptionalConst,
 	      "Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\
@@ -339,7 +343,7 @@ be interfered from 'spec' if available.");
   syntax.add ("description", Syntax::String, Syntax::Const,
 	      "A description of this column.");
   alist.add ("description", "\
-Each entry represents one column in the log file.");
+This is not a model, but a list of parameters shared by all select models.");
   syntax.add ("path", Syntax::String, Syntax::Const, 
 	      Syntax::Sequence, "\
 Sequence of attribute names leading to the variable you want to log in\n\
@@ -412,6 +416,9 @@ Factor to multiply the calculated value with, before logging.");
   syntax.add ("offset", Syntax::Unknown (), Check::none (), Syntax::Const, "\
 Offset to add to the calculated value, before logging.");
   alist.add ("offset", 0.0);
+  syntax.add ("negate", Syntax::Boolean, Syntax::Const, "\
+Switch sign of value.  I.e. upward fluxes become downward fluxes.");
+  alist.add ("negate", false);
   syntax.add ("accumulate", Syntax::Boolean, Syntax::Const,
 	      "Log accumulated values.");
   alist.add ("accumulate", false);
@@ -525,3 +532,15 @@ Select::Select (const AttributeList& al)
 
 Select::~Select ()
 { delete &impl; }
+
+static struct SelectSyntax
+{
+  SelectSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    Select::load_syntax (syntax, alist);
+
+    Librarian<Select>::add_base (alist, syntax);
+  }
+} Select_syntax;

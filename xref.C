@@ -109,7 +109,7 @@ TraverseXRef::use_submodel (const string& submodel)
       break;
     case is_model:
       moi.models.insert (XRef::ModelUser (current_component, current_model, 
-					     path)); 
+                                          path)); 
       break;
     case is_invalid:
     default:
@@ -133,7 +133,7 @@ TraverseXRef::use_component (const Library& library)
       break;
     case is_model:
       moi.models.insert (XRef::ModelUser (current_component, current_model, 
-					     path)); 
+                                          path)); 
       break;
     case is_invalid:
     default:
@@ -158,7 +158,7 @@ TraverseXRef::use_model (const Library& library, const symbol model)
     case is_parameterization:
     case is_model:
       moi.models.insert (XRef::ModelUser (current_component, current_model, 
-					     path)); 
+                                          path)); 
       break;
     case is_invalid:
     default:
@@ -299,9 +299,33 @@ TraverseXRef::leave_object_sequence ()
 
 bool
 TraverseXRef::enter_parameter (const Syntax& syntax, AttributeList& alist, 
-			       const AttributeList&, 
-			       const string&, const string& name)
+			       const AttributeList& default_alist, 
+			       const string& model, const string& name)
 { 
+  if (type == is_parameterization)
+    {
+      // Ignore inherited values.
+      daisy_assert (alist.check ("type"));
+      daisy_assert (model == current_model.name ());
+      if (alist.subset (default_alist, syntax, name))
+        return false;
+    }
+  else if (type == is_model && alist.check ("base_model"))
+    {
+      // Ignore base parameters.
+      const Library& library = Library::find (current_component);
+      const symbol base_model = alist.identifier ("base_model");
+      if (base_model != current_model)
+        {
+          const Syntax& base_syntax = library.syntax (base_model);
+          if (base_syntax.lookup (name) != Syntax::Error)
+            {
+              const AttributeList& base_alist = library.lookup (base_model);
+              if (alist.subset (base_alist, syntax, name))
+                return false;
+            }
+        }
+    }
   path.push_back (name);
 
   if (syntax.lookup (name) == Syntax::Object && !alist.check (name))

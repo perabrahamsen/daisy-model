@@ -36,25 +36,56 @@ private:
 
   // Typeset parts of it.
 protected:
+  virtual void print_index (std::ostream& out, const std::string& name) = 0;
+  void print_index (std::ostream& out, const symbol sym)
+  { print_index (out, sym.name ()); }
+  virtual void print_entry_name (std::ostream& out, 
+                                 const std::string& name) = 0;
+  virtual void print_entry_type (std::ostream& out,
+                                 const std::string& name,
+                                 const Syntax& syntax,
+                                 const AttributeList& alist) = 0;
+  virtual void print_entry_size (std::ostream& out, 
+                                 const std::string&, int size) = 0;
+  virtual void print_entry_description (std::ostream& out,
+                                        const std::string& name, 
+                                        const std::string& description) = 0;
+  virtual void print_entry_submodel (std::ostream& out,
+                                     const std::string& name, 
+                                     int level,
+                                     const Syntax& syntax,
+                                     const AttributeList& alist) = 0;
+  virtual void print_entry_category (std::ostream& out,
+                                     const std::string& name, 
+                                     const Syntax& syntax,
+                                     const AttributeList& alist) = 0;
+  virtual void print_entry_value (std::ostream& out,
+                                  const std::string& name, 
+                                  const Syntax& syntax,
+                                  const AttributeList& alist) = 0;
   virtual void print_users (std::ostream&, const XRef::Users&) = 0;
-  virtual void print_submodel_entry (std::ostream&, const std::string&, int level,
-				     const Syntax& syntax,
-				     const AttributeList& alist) = 0;
   virtual void print_submodel_empty (std::ostream&, const std::string&,
                                      int level) = 0;
   virtual void print_submodel_header (std::ostream&, const std::string&,
                                       int level) = 0;
   virtual void print_submodel_trailer (std::ostream&, const std::string&,
                                        int level) = 0;
-  virtual void print_log_header (std::ostream&, const std::string&, int level) = 0;
-  virtual void print_log_trailer (std::ostream&, const std::string&, int level) = 0;
+  virtual void print_log_header (std::ostream&,
+                                 const std::string&, int level) = 0;
+  virtual void print_log_trailer (std::ostream&,
+                                  const std::string&, int level) = 0;
   virtual void print_sample_ordered (std::ostream&, const std::string&,
                                      bool seq) = 0;
   virtual void print_sample_entry (std::ostream&, const std::string& name, 
 				   const Syntax& syntax,
 				   const AttributeList& alist) = 0;
-  virtual void print_sample_header (std::ostream& out, const std::string& name) = 0;
-  virtual void print_sample_trailer (std::ostream& out, const std::string&) = 0;
+  virtual void print_sample_header (std::ostream& out,
+                                    const std::string& name) = 0;
+  virtual void print_sample_base (std::ostream& out, 
+                                  const symbol component, 
+                                  const symbol model) = 0;
+  virtual void print_sample_trailer (std::ostream& out,
+                                     const std::string&) = 0;
   virtual void print_model_header (std::ostream&, symbol name) = 0;
   virtual void print_model_description (std::ostream&, const std::string&) = 0;
   virtual void print_model_trailer (std::ostream&, symbol name) = 0;
@@ -82,14 +113,36 @@ protected:
   virtual void print_document_trailer (std::ostream&) = 0;
 
   // Print parts of it.
+private:
+  static void own_entries (const Library& library, const symbol name, 
+                           std::vector<std::string>& entries);
+  static void inherited_entries (const Library& library,
+                                 const symbol name, 
+                                 std::vector<std::string>& entries);
 protected:
-  void print_submodel (std::ostream& out, const std::string& name, int level,
-		       const Syntax& syntax,
-		       const AttributeList& alist);
   void print_sample (std::ostream& out, const std::string& name,
 		     const Syntax& syntax,
 		     const AttributeList& alist);
 private:
+  void print_sample (std::ostream& out, const symbol name,
+		     const Library&);
+  void print_sample_entries (std::ostream& out,
+                             const Syntax& syntax,
+                             const AttributeList& alist,
+                             const std::vector<std::string>& entries);
+protected:
+  void print_submodel (std::ostream& out, const std::string& name, int level,
+		       const Syntax& syntax,
+		       const AttributeList& alist);
+private:
+  void print_submodel_entries (std::ostream& out, 
+                               const std::string& name, int level,
+                               const Syntax& syntax, 
+                               const AttributeList& alist,
+                               const std::vector<std::string>& entries);
+  void print_submodel_entry (std::ostream&, const std::string&, int level,
+                             const Syntax& syntax,
+                             const AttributeList& alist);
   void print_model (std::ostream& out, symbol name, 
 		    const Library& library);
   void print_fixed (std::ostream& out, const std::string& name, 

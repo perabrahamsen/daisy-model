@@ -34,14 +34,148 @@ This component is responsible for printing documentation for all the\n\
 models and components.  Each 'document' model outputs the\n\
 documentation in a form suitable for a specific presentation system.";
 
+void
+Document::own_entries (const Library& library, const symbol name, 
+                       vector<string>& entries)
+{
+  const Syntax& syntax = library.syntax (name);
+  const AttributeList& alist = library.lookup (name);
+
+  syntax.entries (entries);
+
+  if (alist.check ("base_model"))
+    {
+      const symbol base_model = alist.identifier ("base_model");
+          
+      if (base_model != name)
+        {
+          const Syntax& base_syntax = library.syntax (base_model);
+          const AttributeList& base_alist = library.lookup (base_model);
+          vector<string> base_entries;
+          base_syntax.entries (base_entries);
+          for (size_t i = 0; i < base_entries.size (); i++)
+            {
+              const string& key = base_entries[i];
+              if (key == "description"
+                  || alist.subset (base_alist, base_syntax, key))
+                entries.erase (find (entries.begin (), entries.end (), key));
+            }
+        }
+    }
+}
+
+void
+Document::inherited_entries (const Library& library, const symbol name, 
+                             vector<string>& entries)
+{
+  const AttributeList& alist = library.lookup (name);
+
+  if (alist.check ("base_model"))
+    {
+      const symbol base_model = alist.identifier ("base_model");
+          
+      if (base_model != name)
+        {
+          const Syntax& base_syntax = library.syntax (base_model);
+          const AttributeList& base_alist = library.lookup (base_model);
+          base_syntax.entries (entries);
+          for (size_t i = 0; i < entries.size (); i++)
+            {
+              const string& key = entries[i];
+              if (key != "description" 
+                  && !alist.subset (base_alist, base_syntax, key))
+                entries.erase (find (entries.begin (), entries.end (), key));
+            }
+        }
+    }
+}
+
+void 
+Document::print_sample (ostream& out, const string& name,
+			const Syntax& syntax,
+			const AttributeList& alist)
+{
+  print_sample_header (out, name);
+
+  // Ordered members first.
+  const vector<string>& order = syntax.order ();
+  for (unsigned int i = 0; i < order.size (); i++)
+    print_sample_ordered (out, order[i], 
+			  syntax.size (order[i]) == Syntax::Sequence);
+      
+  // Then the remaining members.
+  vector<string> entries;
+  syntax.entries (entries);
+  print_sample_entries (out, syntax, alist, entries);
+
+  // Done.
+  print_sample_trailer (out, name);
+}
+
+void 
+Document::print_sample (ostream& out, const symbol name,
+			const Library& library)
+{
+  print_sample_header (out, name.name ());
+
+  const Syntax& syntax = library.syntax (name);
+  const AttributeList& alist = library.lookup (name);
+
+  // Ordered members first.
+  const vector<string>& order = syntax.order ();
+  for (unsigned int i = 0; i < order.size (); i++)
+    print_sample_ordered (out, order[i], 
+			  syntax.size (order[i]) == Syntax::Sequence);
+  
+  // Then own members.
+  vector<string> entries;
+  own_entries (library, name, entries);
+  print_sample_entries (out, syntax, alist, entries);
+ 
+  // Finally inherited members.
+  vector<string> base_entries;
+  inherited_entries (library, name, base_entries);
+  if (base_entries.size () > 0)
+    {
+      print_sample_base (out, library.name (), 
+                         alist.identifier ("base_model"));
+      print_sample_entries (out, syntax, alist, base_entries);
+    }
+  
+  // Done.
+  print_sample_trailer (out, name.name ());
+}
+
+void
+Document::print_sample_entries (ostream& out, 
+                                const Syntax& syntax,
+                                const AttributeList& alist,
+                                const vector<string>& entries)
+{
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (syntax.order (entries[i]) < 0
+	&& !syntax.is_log (entries[i])
+	&& syntax.lookup (entries[i]) != Syntax::Library)
+      print_sample_entry (out, entries[i], syntax, alist);
+}
+
 void 
 Document::print_submodel (ostream& out, const string& name, int level,
 			  const Syntax& syntax,
 			  const AttributeList& alist)
 {
-  const vector<string>& order = syntax.order ();
   vector<string> entries;
   syntax.entries (entries);
+  print_submodel_entries (out, name, level, syntax, alist, entries);
+}
+
+void 
+Document::print_submodel_entries (ostream& out, const string& name, int level,
+                                  const Syntax& syntax,
+                                  const AttributeList& alist,
+                                  const vector<string>& entries)
+{
+  const vector<string>& order = syntax.order ();
   int log_count = 0;
   for (unsigned int i = 0; i < entries.size (); i++)
     if (syntax.is_log (entries[i]))
@@ -83,29 +217,47 @@ Document::print_submodel (ostream& out, const string& name, int level,
 }
 
 void 
-Document::print_sample (ostream& out, const string& name,
-			const Syntax& syntax,
-			const AttributeList& alist)
+Document::print_submodel_entry (std::ostream& out,
+                                const std::string& name, int level,
+                                const Syntax& syntax,
+                                const AttributeList& alist)
 {
-  print_sample_header (out, name);
+  const Syntax::type type = syntax.lookup (name);
 
-  // Ordered members first.
-  const vector<string>& order = syntax.order ();
-  for (unsigned int i = 0; i < order.size (); i++)
-    print_sample_ordered (out, order[i], 
-			  syntax.size (order[i]) == Syntax::Sequence);
-      
-  // Then the remaining members.
-  vector<string> entries;
-  syntax.entries (entries);
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (syntax.order (entries[i]) < 0
-	&& !syntax.is_log (entries[i])
-	&& syntax.lookup (entries[i]) != Syntax::Library)
-      print_sample_entry (out, entries[i], syntax, alist);
+  // We ignore libraries.
+  if (type == Syntax::Library)
+    return;
 
-  print_sample_trailer (out, name);
+  const int size = syntax.size (name);
+
+  // Print name.
+  print_entry_name (out, name);
+  print_index (out, name);
+
+  // Print type.
+  print_entry_type (out, name, syntax, alist);
+
+  // Print size.
+  print_entry_size (out, name, size);
+
+  if (!syntax.is_log (name))
+    {
+      // Print category.
+      print_entry_category (out, name, syntax, alist);
+
+      // Print value.
+      if (name != "description")
+        print_entry_value (out, name, syntax, alist);
+    }
+
+  // Print description line.
+  const std::string& description = syntax.description (name);
+  print_entry_description (out, name, description);
+
+  // print submodel entries, if applicable
+  print_entry_submodel (out, name, level + 1, syntax, alist);
 }
+
 
 void
 Document::print_model (ostream& out, const symbol name, 
@@ -118,6 +270,7 @@ Document::print_model (ostream& out, const symbol name,
   const XRef::ModelUsed used (library.name (), name);
   if (alist.check ("type"))
     {
+      // This is a parameterization.
       const symbol type = alist.identifier ("type");
       print_parameterization_header (out, name, type);
       
@@ -149,8 +302,14 @@ Document::print_model (ostream& out, const symbol name,
 	print_model_description (out, alist.name ("description"));
 
       print_users (out, xref.models[used]);
-      print_sample (out, name.name (), syntax, alist);
-      print_submodel (out, name.name (), 0, syntax, alist);
+      print_sample (out, name, library);
+      
+      // Print own entries.
+      vector<string> entries;
+      own_entries (library, name, entries);
+      print_submodel_entries (out, name.name (), 0, syntax, alist, entries);
+
+      // Done.
       print_model_trailer (out, name);
     }
 }
@@ -182,8 +341,9 @@ class ModelCompare
     // Find the child of root that leaf is descended from.
     daisy_assert (root != leaf);
     const AttributeList& al = library.lookup (leaf);
-    daisy_assert (al.check ("type"));
-    const symbol type = al.identifier ("type");
+    const symbol type = al.check ("type")
+      ? al.identifier ("type") 
+      : al.identifier ("base_model");
     if (type == root)
       return leaf;
     
