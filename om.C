@@ -124,8 +124,9 @@ OM::turnover (const double from_C, const double from_N,
   // Lower rate to force 
   //   N_consume - N_produce == N_avail
   // This is what calc tell me:
-  N_avail -= 1e-12;		// Leave 1 [ug/l].
-  rate = N_avail / (efficiency * from_C / to_C_per_N - from_N);
+  // We need to introduce a new variable because BCC5 is braindead.
+  const double N_avail2 = N_avail - 1e-12; // Leave 1 [ug/l].
+  rate = N_avail2 / (efficiency * from_C / to_C_per_N - from_N);
   daisy_assert (finite (rate));
   if (rate < 0)
     rate = 0;
@@ -141,7 +142,7 @@ OM::turnover (const double from_C, const double from_N,
   C_use = from_C * rate;
 
   // Check that we calculated the right rate.
-  daisy_assert (approximate (N_consume - N_produce, N_avail));
+  daisy_assert (approximate (N_consume - N_produce, N_avail2));
 }
 
 void
