@@ -35,6 +35,7 @@ public:
   // Actions.
 public:
   void sow (const AttributeList& crop);
+  void ridge (const AttributeList& ridge);
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
   void fertilize (const AttributeList&, double from, double to); // Organic.

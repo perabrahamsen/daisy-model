@@ -30,9 +30,11 @@ struct LogHarvest : public Log
 	      << harvest.column << "\t"
 	      << harvest.crop << "\t"
 	      << harvest.stem_DM * 0.01 << "\t"
+	      << harvest.dead_DM * 0.01 << "\t"
 	      << harvest.leaf_DM * 0.01 << "\t"
 	      << harvest.sorg_DM * 0.01 << "\t"
 	      << harvest.stem_N * 10.0 << "\t"
+	      << harvest.dead_N * 10.0 << "\t"
 	      << harvest.leaf_N * 10.0 << "\t"
 	      << harvest.sorg_N * 10.0 << "\n";
 	  out.flush ();
@@ -99,11 +101,12 @@ struct LogHarvest : public Log
       // Tags.
       if (al.flag ("print_tags"))
 	out << "year\tmonth\tday\tcolumn\tcrop\t"
-	    << "stem_DM\tleaf_DM\tsorg_DM\tstem_N\tleaf_N\tsorg_N\n";
+	    << "stem_DM\tdead_DM\tleaf_DM\tsorg_DM\t"
+	    << "stem_N\tdead_N\tleaf_N\tsorg_N\n";
       // Dimensions.
       if (al.flag ("print_dimension"))
 	out << "\t\t\t\t\t"
-	    << "t/ha\t/ha\tt/ha\tkg/ha\tkg/ha\tkg/ha\n";
+	    << "t/ha\tt/ha\tt/ha\tt/ha\tkg/ha\tkg/ha\tkg/ha\tkg/ha\n";
       out.flush ();
     }
 

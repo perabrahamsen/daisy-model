@@ -13,6 +13,8 @@ Harvest::output (Log& log) const
   log.output ("crop", crop);
   log.output ("stem_DM", stem_DM);
   log.output ("stem_N", stem_N);
+  log.output ("dead_DM", dead_DM);
+  log.output ("dead_N", dead_N);
   log.output ("leaf_DM", leaf_DM);
   log.output ("leaf_N", leaf_N);
   log.output ("sorg_DM", sorg_DM);
@@ -35,6 +37,10 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Total stem dry matter in harvest.");
   syntax.add ("stem_N", "g/m^2", Syntax::State,
 	      "Total stem nitrogen in harvest.");
+  syntax.add ("dead_DM", "g/m^2", Syntax::State,
+	      "Total dead leaf dry matter in harvest.");
+  syntax.add ("dead_N", "g/m^2", Syntax::State,
+	      "Total dead leaf nitrogen in harvest.");
   syntax.add ("leaf_DM", "g/m^2", Syntax::State,
 	      "Total leaf dry matter in harvest.");
   syntax.add ("leaf_N", "g/m^2", Syntax::State,
@@ -53,6 +59,8 @@ Harvest::Harvest (const AttributeList& alist)
     crop (alist.name("crop")),
     stem_DM (alist.number ("stem_DM")),
     stem_N (alist.number ("stem_N")),
+    dead_DM (alist.number ("dead_DM")),
+    dead_N (alist.number ("dead_N")),
     leaf_DM (alist.number ("leaf_DM")),
     leaf_N (alist.number ("leaf_N")),
     sorg_DM (alist.number ("sorg_DM")),
@@ -62,13 +70,16 @@ Harvest::Harvest (const AttributeList& alist)
   
 
 Harvest::Harvest (string col, Time t, string crp, 
-		  double sC, double sN, double lC, double lN, 
+		  double sC, double sN, double dC, double dN, 
+		  double lC, double lN, 
 		  double oC, double oN, const Chemicals& chem)
   : column (col),
     time (t),
     crop (crp),
     stem_DM (sC),
     stem_N (sN),
+    dead_DM (dC),
+    dead_N (dN),
     leaf_DM (lC),
     leaf_N (lN),
     sorg_DM (oC),

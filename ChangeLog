@@ -1,3 +1,33 @@
+2000-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.23 released.
+
+2000-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvest.C, harvest.h: Added `dead_DM' and `dead_N'.
+	* crop_std.C, crop_old.C, crop_sold.C (harvest): Ditto.
+	* log_harvest.C: Ditto.
+	* lib/log.dai ("Crop Production"): Ditto.
+	* crop_std.C (DM): Use `dead_DM'.
+
+2000-03-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C (ridge): New optional state variable.
+	* surface.C, surface.h (unridge): New function.
+	* column_std.C (mix): Call it.
+	* surface.C, surface.h (ridge): New function.	
+	* column_std.C, column.h (ridge): New function.
+	* field.C, field.h (ridge): New function.
+	* ridge.C, ridge.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* action_ridge.C: New model.
+	* Makefile (MODELS): Added it.
+	* soil_water.C, soil_water.h (set_Theta): New function.
+	* surface.C (node_below): New function.
+	* soil_water.C (tick): Use it.
+	* surface.C, surface.h (tick_soil): New function.
+	* column_std.C (tick): Call it.
+
 2000-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.22 released.

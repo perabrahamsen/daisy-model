@@ -39,11 +39,15 @@ public:
   void fertilize (const IM&);
   void spray (const Chemicals& chemicals_in);
   void set_detention_capacity (double);
+  void ridge (const Soil& soil, const SoilWater& soil_water,
+	      const AttributeList&);
+  void unridge ();
 
   // Simulation.
   void output (Log&) const;
   void tick (double PotSoilEvaporation, double Water, double temp,
 	     const Soil&, const SoilWater&);
+  void tick_soil (const Soil&, const SoilWater&);
 
   // Communication with bioclimate.
   double EpFactor () const;

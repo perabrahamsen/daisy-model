@@ -14,6 +14,7 @@
 #include "chemicals.h"
 #include "soil_chemicals.h"
 #include "plf.h"
+#include "ridge.h"
 
 struct Surface::Implementation
 {
@@ -41,9 +42,11 @@ struct Surface::Implementation
   Chemicals chemicals_out;
   Chemicals chemicals_runoff;
   const bool chemicals_can_enter_soil;
-
+  Ridge* ridge_;
 
   // Functions.
+  void ridge (const Soil& soil, const SoilWater& soil_water,
+	      const AttributeList&);
   void mixture (const IM& soil_im /* g/cm^2/mm */,
 		const SoilChemicals& soil_chemicals);
   bool flux_top () const;
@@ -63,6 +66,28 @@ struct Surface::Implementation
   Implementation (const AttributeList& al);
   ~Implementation ();
 };
+
+void 
+Surface::ridge (const Soil& soil, const SoilWater& soil_water, 
+		const AttributeList& al)
+{ impl.ridge (soil, soil_water, al); }
+
+void 
+Surface::Implementation::ridge (const Soil& soil, const SoilWater& soil_water,
+				const AttributeList& al)
+{
+  if (ridge_)
+    delete ridge_;
+  ridge_ = new Ridge (al);
+  ridge_->initialize (soil, soil_water);
+}
+
+void 
+Surface::unridge ()
+{ 
+  delete impl.ridge_;
+  impl.ridge_ = NULL;
+}
 
 void
 Surface::mixture (const IM& soil_im /* g/cm^2/mm */,
@@ -105,13 +130,16 @@ Surface::flux_top () const
 bool 
 Surface::Implementation::flux_top () const
 {
-  return lake < 0.0 && flux;
+  return !ridge_ && lake < 0.0 && flux;
 }
 
 double 
 Surface::q () const
 {
-  return -impl.pond / 10.0;		// mm -> cm.
+  if (impl.ridge_)
+    return -impl.ridge_->h () / dt;
+  else
+    return -impl.pond * 0.1;		// mm -> cm.
 }
   
 void  
@@ -217,7 +245,11 @@ Surface::temperature () const
 
 unsigned int 
 Surface::node_below () const 
-{ return 0; }
+{ 
+  if (impl.ridge_)
+    return impl.ridge_->node_below ();
+  return 0; 
+}
 
 const IM& 
 Surface::matter_flux ()
@@ -280,6 +312,13 @@ Surface::Implementation::tick (double PotSoilEvaporation,
   assert (T > -100.0 && T < 50.0);
   pond = pond - EvapSoilSurface * dt + water * dt;
   assert (EvapSoilSurface < 1000.0);
+}
+
+void 
+Surface::tick_soil (const Soil& soil, const SoilWater& soil_water)
+{ 
+  if (impl.ridge_)
+    impl.ridge_->update_water (soil, soil_water); 
 }
 
 double 
@@ -417,6 +456,7 @@ Surface::get_chemical (const string& name) const // [g/cm^2]
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<IM>;
+template class add_submodule<Ridge>;
 #endif
 
 void
@@ -487,6 +527,9 @@ Resistance to mixing inorganic N between soil and ponding.");
 	      Syntax::Boolean, Syntax::Const, "\
 If this is set to false, the chemicals will stay on the surface.");
   alist.add ("chemicals_can_enter_soil", true);
+  AttributeList dummy;		// No default value...
+  add_submodule<Ridge> ("ridge", syntax, dummy, Syntax::OptionalState, "\
+Active ridge system, if any.");
 }
 
 Surface::Surface (const AttributeList& al)
@@ -516,7 +559,8 @@ Surface::Implementation::Implementation (const AttributeList& al)
     chemicals_storage (al.alist_sequence ("chemicals_storage")),
     chemicals_out (),
     chemicals_runoff (),
-    chemicals_can_enter_soil (al.flag ("chemicals_can_enter_soil"))
+    chemicals_can_enter_soil (al.flag ("chemicals_can_enter_soil")),
+    ridge_ (al.check ("ridge") ? new Ridge (al.alist ("ridge")) : NULL)
 {
   assert (im_flux.NO3 == 0.0);
   assert (im_flux.NH4 == 0.0);
@@ -526,7 +570,10 @@ Surface::~Surface ()
 { delete &impl; }
 
 Surface::Implementation::~Implementation ()
-{ }
+{ 
+  if (ridge_)
+    delete ridge_;
+}
 
 static Submodel::Register 
 surface_submodel ("Surface", Surface::load_syntax);

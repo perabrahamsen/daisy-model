@@ -46,6 +46,8 @@ private:
 public:
   void sow (const AttributeList& al)
   { vegetation.sow (al, soil, organic_matter); }
+  void ridge (const AttributeList& al)
+  { surface.ridge (soil, soil_water, al); }
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
   void fertilize (const AttributeList&);
@@ -225,6 +227,7 @@ ColumnStandard::mix (const Time& time,
   soil_NO3.mix (soil, soil_water, from, to);
   soil_NH4.mix (soil, soil_water, from, to);
   organic_matter.mix (soil, from, to, penetration);
+  surface.unridge ();
 }
 
 void 
@@ -328,11 +331,12 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, weather);
   soil_water.tick (soil, surface, groundwater);
+  surface.tick_soil (soil, soil_water);
   soil_chemicals.tick (soil, soil_water, soil_heat, organic_matter,
 		       surface.chemicals_down ());
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4);
-
+  
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)
     organic_matter.monthly (soil);

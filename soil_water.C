@@ -235,6 +235,18 @@ SoilWater::swap (const Soil& soil, double from, double middle, double to)
     }
 }
   
+void
+SoilWater::set_Theta (const Soil& soil, 
+		      unsigned int from, unsigned int to, double Theta)
+{
+  for (unsigned int i = from; i <= to; i++)
+    {
+      Theta_[i] = Theta;
+      h_[i] = soil.h (i, Theta);
+    }
+}
+
+
 bool 
 SoilWater::check (unsigned n) const
 {

@@ -18,6 +18,7 @@ struct Field::Implementation
 
   // Actions.
   void sow (const AttributeList& crop);
+  void ridge (const AttributeList& ridge);
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
   void fertilize (const AttributeList&, double from, double to);  // Organic.
@@ -99,6 +100,20 @@ Field::Implementation::sow (const AttributeList& crop)
 	   i != columns.end ();
 	   i++)
 	(*i)->sow (crop);
+    }
+}
+
+void 
+Field::Implementation::ridge (const AttributeList& ridge)
+{
+  if (selected)
+    selected->ridge (ridge);
+  else 
+    {
+      for (ColumnList::iterator i = columns.begin ();
+	   i != columns.end ();
+	   i++)
+	(*i)->ridge (ridge);
     }
 }
 
@@ -458,6 +473,10 @@ Field::Restrict::~Restrict ()
 void 
 Field::sow (const AttributeList& crop)
 { impl.sow (crop); }
+
+void 
+Field::ridge (const AttributeList& al)
+{ impl.ridge (al); }
 
 void 
 Field::irrigate_top (double flux, double temp, const IM& im)

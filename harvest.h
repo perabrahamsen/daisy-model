@@ -20,6 +20,8 @@ public:
   const string crop;
   const double stem_DM;
   const double stem_N;
+  const double dead_DM;
+  const double dead_N;
   const double leaf_DM;
   const double leaf_N;
   const double sorg_DM;
@@ -35,8 +37,8 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   Harvest (const AttributeList& al);
   Harvest (string col, Time t, string crp, 
-	   double sC, double sN, double lC, double lN, 
-	   double oC, double oN,
+	   double sC, double sN, double dC, double dN, 
+	   double lC, double lN, double oC, double oN,
 	   const Chemicals& chem);
 };      
 

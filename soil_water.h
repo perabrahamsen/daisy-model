@@ -55,6 +55,7 @@ public:
   double Theta_left (int i) const
   { return Theta_[i] - S_sum_[i]; }
   double Theta_old (int i) const
+
   { return Theta_old_[i]; }
   double q (int i) const
   { return q_[i]; }
@@ -88,6 +89,8 @@ public:
   void tick (const Soil&, Surface&, Groundwater&);
   void mix (const Soil&, double from, double to);
   void swap (const Soil&, double from, double middle, double to);
+  void set_Theta (const Soil& soil, 
+		  unsigned int from, unsigned int to, double Theta);
   bool check (unsigned n) const;
   void output (Log&) const;
 
