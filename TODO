@@ -1,3 +1,5 @@
+* Status rapport med 
+
 * Standard filtre
 
 ** OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
@@ -30,6 +32,8 @@ variable (samt evt. nyt objekter, specielt AM og Crop, der så skal
 huske deres egen syntax), og så bruge PrinterFile til at udskrive de
 nye alister.  Efter at have udskrevet de objecter der var defineret i
 input filen.
+
+* Check hvad enhed `omega-offset' skal have.
 
 * Remove exception handling.
 

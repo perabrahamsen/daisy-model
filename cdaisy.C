@@ -353,6 +353,7 @@ daisy_library_derive (Library* library,
     {
       alist->add ("parsed_from_file", filename);
       alist->add ("parsed_sequence", Library::get_sequence ());
+      alist->add ("type", super);
     }
   library->add_derived (name, *alist, super);
 }
@@ -398,7 +399,7 @@ extern "C" void EXPORT
 daisy_printer_delete (Printer* printer)
 { delete printer; }
 
-extern "C" bool
+extern "C" bool EXPORT
 daisy_printer_good (Printer* printer)
 { return printer->good (); }
 

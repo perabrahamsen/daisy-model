@@ -15,8 +15,8 @@ class WeatherNone : public Weather
 
   // Simulation.
 public:
-  void tick (const Time&)
-    { }
+  void tick (const Time& t)
+    { Weather::tick (t); }
   double AirTemperature () const
     { return air_temperature; }
   double GlobalRadiation () const

@@ -1,8 +1,33 @@
+1998-03-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.012 released.
+
+1998-03-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (struct LogEntry): Check "*" with path, not name.
+	(struct LogTable): [CONST_DELETE] Don't delete members.
+
+	* cdaisy.C (daisy_library_derive): Add "type" attribute.
+
+	* weather.C (output): Log all data.
+	(tick, DayLength, DayCycle): Move calculation of `day_length' and
+	`day_cycle' to `tick'.
+	* weather_simple.C (tick): Call `Weather::tick'.
+	* weather_none.C (tick): Ditto.
+	* weather_file.C (tick): Ditto.
+	* bioclimate_std.C (tick): Don't pass time to `Weather::DayLength'.
+
+
 1998-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (SOURCES, OBJECTS): Added `bugmain.c'.
+
+	* printer_file.C (is_complex): Last item in a total order is never
+	complex. 
+	(struct FoundEntry): Renamed from `Entry' to avoid conflict with
+	`log_table.C'. 
 
 	* Version 0.011 released.
-
-1998-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* printer_file.C (PrinterFile): Delete `impl' after use.
 	(print_library_file): Quote library member names if necessary.
@@ -40,16 +65,12 @@
 
 	* Version 0.010 released.
 
-1998-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
-
 	* column_std.C, column.h (crop_ds): New function.
 	* crop.h (Crop): Make `DS' and `DSremove' public.
 	* condition_crop.C: New file.
 	* condition_soil.C: New file.
 
 	* Version 0.009 released.
-
-1998-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* library.h (derive_function): New typedef.
 	* library.C, library.h (Library): Add `derive' argument.
@@ -102,8 +123,6 @@
 
 	* Version 0.008 released.
 
-1998-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
-
 	* cdaisy.C, cdaisy.h (daisy_version): New function.
 
 	* crop.C, crop.h: Use librarian to manage Crop.
@@ -117,8 +136,6 @@
 1998-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.007 released.
-
-1998-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* parser_file.C (get_number, get_integer): Read one character a
 	time in order to know the column number.
@@ -166,8 +183,6 @@
 	* Makefile (daisy-src.zip): Added `tlink32.ini'.
 
 	* Version 0.006 released.
-
-1998-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* crop_std.C (CanopyPhotosynthesis): Added assertions.
 
@@ -228,8 +243,6 @@
 
 	* Version 0.005 released.
 
-1998-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
-
 	* alist.C: Removed exception handling.
 
 	* filter_some.C (lookup): Replace THROW with assert (false).
@@ -237,8 +250,6 @@
 	(syntax): Ditto.
 
 	* Version 0.004 released.
-
-1998-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* printer_file.C (print_comment): Support multiline comments.
 

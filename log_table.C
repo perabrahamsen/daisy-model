@@ -10,7 +10,7 @@
 #include <algorithm>
 
 // Entries
-struct Entry
+struct LogEntry
 {
   // Content.
   const string tag;		// Name of this entry.
@@ -40,7 +40,8 @@ struct Entry
 
   void open (const string& name) // Open one level.
     {
-      if (valid () && (name == "*" || name == path[current_path_index]))
+      if (valid () && (path[current_path_index] == "*" 
+		       || name == path[current_path_index]))
 	last_valid_path_index++;
       current_path_index++;
     }
@@ -173,14 +174,14 @@ struct Entry
       else if (!count)
 	out << "";
       else
-	out << value * factor + offset;
+	out << (value * factor + offset);
 
       value = 0.0;
       count = 0;
       error = false;
     }
   // Create and Destroy.
-  Entry (const AttributeList& al)
+  LogEntry (const AttributeList& al)
     : tag (al.name ("tag")),
       condition (al.check ("when") 
 		 ? &Librarian<Condition>::create (al.alist ("when"))
@@ -196,7 +197,7 @@ struct Entry
       last_valid_path_index (0U),
       is_active (false)
     { }
-  ~Entry ()
+  ~LogEntry ()
     { delete &condition; }
 };
 
@@ -220,7 +221,10 @@ struct LogTable : public Log, public Filter
   ofstream out;			// Output stream.
   Condition& condition;	// Should we print a log now?
 
-  vector<Entry*> entries;
+  vector<LogEntry*> entries;
+
+  // Display.
+  bool print_tags;		// Show tags on first line?
 
   // Checking to see if we should log this time step.
   Filter& match (const Frame& frame, const Daisy& daisy)
@@ -323,27 +327,33 @@ struct LogTable : public Log, public Filter
       file (al.name ("where")),
       out (file.c_str ()),
       condition (Librarian<Condition>::create (al.alist ("when"))),
-      entries (map_construct<Entry> (al.alist_sequence ("entries")))
+      entries (map_construct<LogEntry> (al.alist_sequence ("entries"))),
+      print_tags (al.flag ("print_tags"))
     {
-      // Print the entry names in the first line of the log file..
-      bool first = true;
-      for (unsigned int i = 0; i < entries.size (); i++)
+      if (print_tags)
 	{
-	  if (first)
-	    first = false;
-	  else
-	    out << "\t";
-	  out << entries[i]->tag;
+	  // Print the entry names in the first line of the log file..
+	  bool first = true;
+	  for (unsigned int i = 0; i < entries.size (); i++)
+	    {
+	      if (first)
+		first = false;
+	      else
+		out << "\t";
+	      out << entries[i]->tag;
+	    }
+	  out << "\n";
 	}
-      out << "\n";
     }
 
   ~LogTable ()
     {
       if (!out.good ())
 	cerr << "Problems writing to `" << file << "'\n";
+#ifdef CONST_DELETE
       delete &condition;
       sequence_delete (entries.begin (), entries.end ());
+#endif
     }
 };
 
@@ -358,7 +368,7 @@ static struct LogTableSyntax
       AttributeList& alist = *new AttributeList ();
       syntax.add ("where", Syntax::String, Syntax::Const);
       syntax.add ("when", Librarian<Condition>::library (), Syntax::Const);
-
+      
       Syntax& entry_syntax = *new Syntax ();
       AttributeList& entry_alist = *new AttributeList ();
       entry_syntax.add ("tag", Syntax::String, Syntax::Const);
@@ -379,6 +389,9 @@ static struct LogTableSyntax
       entry_alist.add ("count", 0);
       syntax.add ("entries", entry_syntax, Syntax::Const, Syntax::Sequence);
       alist.add ("entries", entry_alist);
+      
+      syntax.add ("print_tags", Syntax::Boolean, Syntax::Const);
+      alist.add ("print_tags", true);
 
       Librarian<Log>::add_type ("table1", alist, syntax, &make);
     }

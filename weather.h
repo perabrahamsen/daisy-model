@@ -33,13 +33,13 @@ public:
   virtual double Rain () const;
   virtual double Snow () const;
   virtual IM Deposit () const; // [g [stuff] /cm²/h]
-  virtual double cloudiness () const; // [0-1]
-  virtual double vaporpressure () const; // [Pa]
-  virtual double wind () const;	// [m/s]
+  virtual double Cloudiness () const; // [0-1]
+  virtual double VaporPressure () const; // [Pa]
+  virtual double Wind () const;	// [m/s]
 
   // Light distribution.
-  double DayLength (const Time& time) const;
-  double DayCycle (const Time& time) const;
+  double DayLength () const;
+  double DayCycle () const;
 
   // Communication with external model.
   virtual void put_precipitation (double prec);// [mm/d]

@@ -194,8 +194,8 @@ LIBOBJ = $(COMPONENTS:.C=${OBJ}) $(INTERFACES:.C=${OBJ}) $(SPARCOBJ)
 
 # Find all object files, header files, and source files.
 #
-OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ}
-SOURCES = $(COMPONENTS) $(INTERFACES) $(SPARCSRC) $(MAIN) cmain.c
+OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
+SOURCES = $(COMPONENTS) $(INTERFACES) $(SPARCSRC) $(MAIN) cmain.c bugmain.c
 HEADERS = $(INTERFACES:.C=.h) common.h version.h
 
 # Find all printable files.
@@ -531,7 +531,7 @@ condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
 condition_soil${OBJ}: condition_soil.C condition.h librarian.h library.h \
  common.h alist.h syntax.h column.h daisy.h frame.h
 log_table${OBJ}: log_table.C log.h filter.h librarian.h library.h common.h \
- alist.h syntax.h condition.h frame.h
+ alist.h syntax.h condition.h frame.h geometry.h
 daisy${OBJ}: daisy.C daisy.h frame.h time.h common.h weather.h librarian.h \
  library.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
  log.h filter.h parser.h am.h nitrification.h bioclimate.h column.h \
@@ -541,7 +541,7 @@ parser${OBJ}: parser.C parser.h librarian.h library.h common.h alist.h \
 log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h
 weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
- syntax.h im.h mathlib.h
+ syntax.h im.h log.h filter.h mathlib.h
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h
 crop${OBJ}: crop.C crop.h time.h common.h librarian.h library.h alist.h \
@@ -646,3 +646,4 @@ main${OBJ}: main.C daisy.h frame.h time.h common.h parser_file.h parser.h \
 tkmain${OBJ}: tkmain.C daisy.h frame.h time.h common.h syntax.h alist.h \
  library.h
 cmain${OBJ}: cmain.c cdaisy.h
+bugmain${OBJ}: bugmain.c cdaisy.h

@@ -186,7 +186,7 @@ Time::leap (int year)
 int
 Time::month_length (int year, int month)
 {
-  return Implementation::mlen[month + 1] + Implementation::mlen[month] 
+  return Implementation::mlen[month + 1] - Implementation::mlen[month] 
     + (month == 2 && leap (year));
 }
 

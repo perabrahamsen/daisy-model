@@ -36,8 +36,8 @@ public:
 void
 WeatherSimple::tick (const Time& t)
 { 
+  Weather::tick (t);
   time = t;
-
   Weather::distribute (Precipitation ());
 }
 

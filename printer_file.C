@@ -65,7 +65,19 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
       // or not the last element in the order.
       if (syntax.order (key) + 1U != syntax.order ().size ())
 	return true;
+#if 0
+      // KLUDGE: However, if it is an `Object' or `AList' and the
+      // actual value is a Singleton, then it acts as the default for
+      // the individual members of the list.  Execpt that there aren't
+      // any members, so the value hasn't been initialized.
+      if ((syntax.lookup (key) == Syntax::AList 
+	   || syntax.lookup (key) == Syntax::Object)
+	  && alist.size (key) == Syntax::Singleton)
+	return false;
+#endif
+      return false;
     }
+  // We know it is a singleton here.
 
   switch (syntax.lookup (key))
     {
@@ -470,23 +482,23 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
 }
 
 // We store all matching entries here.
-struct Entry
+struct FoundEntry
 {
   string library_name;
   string element;
   int sequence;
 
-  operator < (const Entry& e) const
+  operator < (const FoundEntry& e) const
     { return sequence < e.sequence; }
 
-  Entry ()
+  FoundEntry ()
     { }
-  Entry (const string& l, const string& e, const int s)
+  FoundEntry (const string& l, const string& e, const int s)
     : library_name (l),
       element (e),
       sequence (s)
     { }
-  Entry (const Entry& e)
+  FoundEntry (const FoundEntry& e)
     : library_name (e.library_name),
       element (e.element),
       sequence (e.sequence)
@@ -496,7 +508,7 @@ struct Entry
 void
 PrinterFile::Implementation::print_library_file (const string& filename)
 {
-  vector<Entry> entries;
+  vector<FoundEntry> found;
   
   // Search all the libraries for matching entries.
   {
@@ -518,23 +530,28 @@ PrinterFile::Implementation::print_library_file (const string& filename)
 	    if (alist.check ("parsed_from_file") 
 		&& alist.name ("parsed_from_file") == filename)
 	      {
+		static unsigned int count = 0;
+		assert (count == found.size ());
+		count++;
 		assert (alist.check ("parsed_sequence"));
-		entries.push_back (Entry (library_name, element, 
-					  alist.integer ("parsed_sequence")));
+		assert (found.begin () <= found.end ());
+		assert (found.size () == (found.end () - found.begin ()));
+		found.push_back (FoundEntry (library_name, element, 
+					     alist.integer ("parsed_sequence")));
 	      }
 	  }
       }
   }
   // Sort the entries.
-  sort (entries.begin (), entries.end ());
+  sort (found.begin (), found.end ());
 
   // Print the entries.
   bool first = true;
 
-  for (unsigned int i = 0; i < entries.size (); i++)
+  for (unsigned int i = 0; i < found.size (); i++)
     {
-      const string library_name = entries[i].library_name;
-      const string name = entries[i].element;
+      const string library_name = found[i].library_name;
+      const string name = found[i].element;
       Library& library = Library::find (library_name);
       const AttributeList& alist = library.lookup (name);
 

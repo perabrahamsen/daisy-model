@@ -1,6 +1,7 @@
 // weather.C
 
 #include "weather.h"
+#include "log.h"
 #include "time.h"
 #include "mathlib.h"
 
@@ -15,6 +16,8 @@ struct Weather::Implementation
   const double T2;
   double Prain;
   double Psnow;
+  double day_length;
+  double day_cycle;
   const double average;		// Average temperature at bottom [C]
   const double amplitude;	// Variation in bottom temperature [C]
   const double omega;		// Period length for above [ rad / day]
@@ -27,12 +30,23 @@ struct Weather::Implementation
       T2 (al.number ("T2")),
       Prain (0.0),
       Psnow (0.0),
+      day_length (-42.42e42),
+      day_cycle (42.42e42),
       average (al.number ("average")),
       amplitude (al.number ("amplitude")),
       omega (al.number ("omega")),
       omega_offset (al.number ("omega_offset"))
     { }
 };
+
+void 
+Weather::tick (const Time& time)
+{
+  impl.day_length = DayLength (impl.Latitude, time);
+
+  impl.day_cycle =max (0.0, M_PI_2 / DayLength ()
+		       * cos (M_PI * (time.hour () - 12) / DayLength ()));
+}
 
 double
 Weather::Rain () const
@@ -47,8 +61,21 @@ Weather::Snow () const
 }
 
 void
-Weather::output (Log&, Filter&) const
-{ }
+Weather::output (Log& log, Filter& filter) const
+{ 
+  log.output ("AirTemperature", filter, AirTemperature (), true);
+  log.output ("GlobalRadiation", filter, GlobalRadiation (), true);
+  log.output ("DailyRadiation", filter, DailyRadiation (), true);
+  log.output ("ReferenceEvapotranspiration", filter, 
+	      ReferenceEvapotranspiration (), true);
+  log.output ("Rain", filter, Rain (), true);
+  log.output ("Snow", filter, Snow (), true);
+  log.output ("Cloudiness", filter, Cloudiness (), true);
+  log.output ("VaporPressure", filter, VaporPressure (), true);
+  log.output ("Wind", filter, Wind (), true);
+  log.output ("DayLength", filter, DayLength (), true);
+  log.output ("DayCycle", filter, DayCycle (), true);
+}
 
 void 
 Weather::distribute (double precipitation)
@@ -65,9 +92,9 @@ Weather::distribute (double precipitation)
 }
 
 double
-Weather::DayLength (const Time& time) const
+Weather::DayLength () const
 {
-  return DayLength (impl.Latitude, time);
+  return impl.day_length;
 }
 
 double
@@ -85,10 +112,9 @@ Weather::DayLength (double Latitude, const Time& time)
 }
 
 double
-Weather::DayCycle (const Time& time) const
+Weather::DayCycle () const
 {
-  return max (0.0, M_PI_2 / DayLength (time)
-	      * cos (M_PI * (time.hour () - 12) / DayLength (time)));
+  return impl.day_cycle;
 }
 
 IM
@@ -110,15 +136,15 @@ Weather::Deposit() const
 }
 
 double 
-Weather::cloudiness () const
+Weather::Cloudiness () const
 { return 0.0; }
 
 double 
-Weather::vaporpressure () const
+Weather::VaporPressure () const
 { return 0.0; }
 
 double 
-Weather::wind () const
+Weather::Wind () const
 { return 0.0; }
 
 void 
@@ -200,6 +226,19 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("omega", 2.0 * M_PI / 365.0);
   syntax.add ("omega_offset", Syntax::Number, Syntax::Const);
   alist.add ("omega_offset", -209.0);
+
+  // Logs.
+  syntax.add ("AirTemperature", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("GlobalRadiation", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("DailyRadiation", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("ReferenceEvapotranspiration", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("Rain", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("Snow", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("Cloudiness", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("VaporPressure", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("Wind", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("DayLength", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("DayCycle", Syntax::Number, Syntax::LogOnly);
 }
 
 Weather::Weather (const AttributeList& al)

@@ -309,13 +309,13 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
 void 
 BioclimateStandard::tick (Surface& surface, const Weather& weather, 
-			  const Time& time,
+			  const Time&,
 			  const CropList& crops, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat& soil_heat)
 {
   // Keep weather information during time step.
   temperature = weather.AirTemperature ();
-  day_length = weather.DayLength (time);
+  day_length = weather.DayLength ();
 
   // Add nitrogen deposit. 
   surface.fertilize (weather.Deposit ());

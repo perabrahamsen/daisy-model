@@ -12,7 +12,6 @@
 class WeatherFile : public Weather
 {
   Time date;
-  Time now;
   const string file_name;
   ifstream file;
   const vector<double>& A;
@@ -54,6 +53,8 @@ public:
 void
 WeatherFile::tick (const Time& time)
 { 
+  Weather::tick (time);
+
   if (!file.good ())
     {
       cerr << file_name << ":" << line << ": file error";
@@ -90,10 +91,9 @@ WeatherFile::tick (const Time& time)
 	}
       date = Time (year, month, day, 23);
     }
-  now = time;
 
   // Update the hourly values.
-  hourly_global_radiation = DayCycle (now) * 24.0 * global_radiation;
+  hourly_global_radiation = DayCycle () * 24.0 * global_radiation;
   put_reference_evapotranspiration (reference_evapotranspiration);
   distribute (Precipitation ());
 }
@@ -171,13 +171,12 @@ WeatherFile::put_reference_evapotranspiration (double ref)
     }
   else
     hourly_reference_evapotranspiration 
-      = reference_evapotranspiration * DayCycle (now);
+      = reference_evapotranspiration * DayCycle ();
 }
 
 WeatherFile::WeatherFile (const AttributeList& al)
   : Weather (al),
     date (42, 1, 1, 0),
-    now (42, 1, 1, 0),
     file_name (al.name ("file")),
     file (Options::find_file (al.name ("file"))),
     A (al.number_sequence ("A")),
