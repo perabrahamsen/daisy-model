@@ -1,3 +1,12 @@
+1998-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.31 released.
+
+1998-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (daisy-hdr.zip): New target.
+	(dist): Use it.
+
 1998-10-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.030 released.

@@ -354,12 +354,16 @@ daisy-src.zip:	$(TEXT)
 	rm -f daisy-src.zip
 	zip daisy-src.zip $(TEXT) daisy.ide tlink32.ini
 
+daisy-hdr.zip:	$(HEADERS)
+	rm -f daisy-hdr.zip
+	zip daisy-hdr.zip $(HEADERS)
+
 # Move it to ftp.
 #
 dist:	cvs
 	cp cdaisy.h $(HOME)/.public_ftp/daisy/
-	$(MAKE) daisy-src.zip
-	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy/
+	$(MAKE) daisy-src.zip daisy-hdr.zip
+	mv -f daisy-src.zip daisy-hdr.zip $(HOME)/.public_ftp/daisy/
 
 # Update the CVS repository.
 #
