@@ -908,15 +908,6 @@ ActionCrop::output (Log& log) const
   log.output ("irrigation_delay", irrigation_delay);
 }
 
-#ifdef BORLAND_TEMPLATES
-template vector<const ActionCrop::Fertilize*>&
-map_construct_const<ActionCrop::Fertilize> (const vector<AttributeList*>& f);
-template vector<const ActionCrop::Tillage*>& 
-map_construct_const<ActionCrop::Tillage> (const vector<AttributeList*>& f);
-template vector<const ActionCrop::Spray*>&
-map_construct_const<ActionCrop::Spray> (const vector<AttributeList*>& f);
-#endif
-
 ActionCrop::ActionCrop (const AttributeList& al)
   : Action (al),
     primary (new Sow (al.alist ("primary"))),

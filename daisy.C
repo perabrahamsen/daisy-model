@@ -24,11 +24,6 @@
 const char *const Daisy::default_description = "\
 The Daisy Crop/Soil/Atmosphere Model.";
 
-#ifdef BORLAND_TEMPLATES
-template vector<const Harvest*>&
-map_construct_const<Harvest> (const vector<AttributeList*>& f);
-#endif
-
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
     alist (al),

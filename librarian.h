@@ -82,7 +82,7 @@ public:
 };
 
 // This cutie will create a vector of objects from a vector of alists.
-#if 1
+#ifndef BORLAND_TEMPLATES
 template <class T> 
 vector<T*>&
 map_create (const vector<AttributeList*>& f)
