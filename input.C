@@ -2,6 +2,7 @@
 
 #include "input.h"
 #include "alist.h"
+#include "log.h"
 #include "csmp.h"
 #include "library.h"
 #include "syntax.h"
@@ -21,7 +22,6 @@ Usage::what () const
 
 struct Parser
 {
-  const AttributeList& load (const Syntax& syntax);
   int get ();
   int peek ();
   bool good ();
@@ -51,21 +51,10 @@ struct Parser
   string file;
   int line;
   int column;
-  Parser (int& argc, char**& argv);
+  const Syntax& global_syntax_table;
+  Parser (int& argc, char**& argv, const Syntax& syntax, AttributeList& alist);
   ~Parser ();
 };
-
-const AttributeList&
-Parser::load (const Syntax& syntax)
-{
-  AttributeList& alist = *new AttributeList ();
-  skip ("(");
-  load_list (alist, syntax);
-  skip (")");
-  eof ();
-  syntax.check (alist, "daisy");
-  return alist;
-}
 
 int
 Parser::get ()
@@ -402,7 +391,10 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	    atts.add (name, get_time ());
 	    break;
 	  case Syntax::Filter:
-	    atts.add (name, get_filter (syntax.syntax (name)));
+	    if (&syntax.syntax (name) == Log::global_syntax_table)
+	      atts.add (name, get_filter (global_syntax_table));
+	    else
+	      atts.add (name, get_filter (syntax.syntax (name)));
 	    break;
 	  case Syntax::Class:
 	    // Handled specially: Put directly in global library.
@@ -663,15 +655,20 @@ Parser::get_filter_sequence (const Library& library)
   return filter;
 }
 
-Parser::Parser (int& argc, char**& argv)
+Parser::Parser (int& argc, char**& argv, const Syntax& syntax, 
+		AttributeList& alist)
   : err (cerr),
     line (1),
-    column (0)
+    column (0), 
+    global_syntax_table (syntax)
 { 
   if (argc != 2)
     THROW (Usage ());
   file = argv[1];
   in = new ifstream (file.data ());
+
+  load_list (alist, syntax);
+  eof ();
 }
 
 Parser::~Parser ()
@@ -682,6 +679,7 @@ Parser::~Parser ()
 const AttributeList&
 parse (const Syntax& syntax, int& argc, char**& argv)
 {
-  Parser parser(argc, argv);
-  return parser.load (syntax);
+  AttributeList& alist = *new AttributeList ();
+  Parser parser(argc, argv, syntax, alist);
+  return alist;
 }

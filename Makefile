@@ -6,7 +6,7 @@ SRCONLY = column_std.o manager_rule.o weather_simple.o uzrichard.o \
 	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
 	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o \
 	crop_std.o action_sow.o action_stop.o condition_time.o \
-	condition_logic.o
+	condition_logic.o log_file.o
 OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o time.o uzmodel.o \
@@ -91,10 +91,9 @@ main.o: main.C daisy.h time.h input.h syntax.h alist.h common.h
 daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
  groundwater.h uzmodel.h common.h horizon.h log.h crop.h column.h \
  action.h filter.h library.h syntax.h condition.h alist.h
-input.o: input.C input.h alist.h common.h csmp.h library.h syntax.h \
- action.h condition.h filter.h crop.h time.h
-log.o: log.C log.h condition.h filter.h csmp.h daisy.h time.h alist.h \
- common.h
+input.o: input.C input.h alist.h common.h log.h csmp.h library.h \
+ syntax.h action.h condition.h filter.h crop.h time.h
+log.o: log.C log.h alist.h common.h library.h syntax.h
 weather.o: weather.C weather.h time.h library.h alist.h common.h \
  syntax.h
 manager.o: manager.C manager.h library.h alist.h common.h syntax.h
@@ -166,3 +165,5 @@ condition_time.o: condition_time.C condition.h time.h syntax.h alist.h \
  common.h daisy.h
 condition_logic.o: condition_logic.C condition.h syntax.h alist.h \
  common.h
+log_file.o: log_file.C log.h condition.h filter.h csmp.h time.h \
+ alist.h common.h syntax.h

@@ -19,7 +19,7 @@
 #include <iostream.h>
 
 Daisy::Daisy (const AttributeList& al)
-  : log (*new Log(al.list_sequence ("log"))), 
+  : logs (map_create<Log> (al.list_sequence ("output"))),
     time (al.time ("time")),
     manager (Manager::create (al.list ("chief"))),
     weather (Weather::create (time, al.list ("weather"))), 
@@ -67,38 +67,42 @@ Daisy::run ()
 	}
       action->doIt (*this);
 
-      for (ColumnList::iterator column = columns.begin ();
-	   column != columns.end ();
-	   column++)
+      for (ColumnList::iterator i = columns.begin ();
+	   i != columns.end ();
+	   i++)
 	{
-	  (*column)->tick (time, weather, groundwater);
+	  (*i)->tick (time, weather, groundwater);
 	}
       time.tick ();
-      log.tick (*this);
+      for (vector<Log*>::const_iterator i = logs.begin ();
+	   i != logs.end ();
+	   i++)
+	{
+	  Log& log = **i;
+	  const Filter* filter= &log.match (*this);
+	  if (filter == Filter::none)
+	    // Don't waste time with empty filters.
+	    continue;
+	  log.open ();
+	  log.output ("time", filter, time);
+	  weather.output ("weather", log, filter);
+	  if (filter->check ("field"))
+	    {
+	      const Filter* f = filter->lookup ("field");
+	      log.open ("field");
+	      for (ColumnList::iterator column = columns.begin();
+		   column != columns.end();
+		   column++)
+		{
+		  if (f->check ((*column)->name))
+		    (*column)->output (log, f->lookup ((*column)->name));
+		}
+	      log.close ();
+	    }
+	  log.close ();
+	}
       weather.tick ();
     }
-}
-
-void
-Daisy::output (Log& log, const Filter* filter) const
-{
-  log.open ();
-  log.output ("time", filter, time);
-  weather.output ("weather", log, filter);
-  if (filter->check ("field"))
-    {
-      const Filter* f = filter->lookup ("field");
-      log.open ("field");
-      for (ColumnList::iterator column = columns.begin();
-	   column != columns.end();
-	   column++)
-	{
-	  if (f->check ((*column)->name))
-	    (*column)->output (log, f->lookup ((*column)->name));
-	}
-      log.close ();
-    }
-  log.close ();
 }
 
 void
@@ -108,22 +112,19 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
   syntax.add_class ("column", Column::library (), &Column::derive_type);
   syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
+  syntax.add_class ("log", Log::library (), &Manager::derive_type);
+  syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
   syntax.add ("chief", Manager::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::InOut);
   syntax.add ("field", Column::library (), Syntax::InOut, Syntax::Sequence);
-  Syntax& log = *new Syntax ();
-  log.add ("where", Syntax::String, Syntax::Const);
-  log.add ("when", Condition::library (), Syntax::Const);
-  log.add_filter ("what", syntax, Syntax::Const);
-  log.order ("where", "when", "what");
-  syntax.add ("log", log, Syntax::Const, Syntax::Sequence);
   syntax.add ("weather", Weather::library ());
   syntax.add ("groundwater", Groundwater::library (), Syntax::Const);
 }
 
 Daisy::~Daisy ()
 {
-  delete &log;
+  sequence_delete (logs.begin (), logs.end ());
+  delete &logs;
   delete &manager;
   delete &weather;
   delete &groundwater;

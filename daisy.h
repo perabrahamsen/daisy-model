@@ -4,6 +4,7 @@
 #define DAISY_H
 
 #include "time.h"
+#include <vector.h>
 
 class Manager;
 class Weather;
@@ -18,7 +19,7 @@ class Daisy
 {
   // Content.
 public:
-  Log& log;
+  const vector<Log*>& logs;
   Time time;
   Manager& manager;
   Weather& weather;
@@ -28,7 +29,6 @@ public:
   // Simulation.
 public:
   void run();
-  void output (Log&, const Filter*) const;
 
   // Create and Destroy.
 public:

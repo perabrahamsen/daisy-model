@@ -11,44 +11,64 @@ class Daisy;
 class Time;
 class CSMP;
 class AttributeList;
+class Library;
+class Syntax;
 
 class Log
 {
+  // Content.
+public:
+  static Syntax* global_syntax_table;
+
   // Use.
 public:
-  void tick (const Daisy&);
+  virtual const Filter& match (const Daisy&) = 0;
 
-  void open (string = "");
-  void open (string field, string type);
-  void close ();
-  void output (string, const Filter*, const Time&, bool log_only = false);
-  void output (string, const Filter*, const bool, bool log_only = false);
-  void output (string, const Filter*, const double, bool log_only = false);
-  void output (string, const Filter*, const int, bool log_only = false);
-  void output (string, const Filter*, const vector<double>&, bool log_only = false);
-  void output (string, const Filter*, const CSMP&, bool log_only = false);
+  virtual void open (string = "") = 0;
+  virtual void open (string field, string type) = 0;
+  virtual void close () = 0;
+  virtual void output (string, const Filter*, const Time&,
+		       bool log_only = false) = 0;
+  virtual void output (string, const Filter*, const bool,
+		       bool log_only = false) = 0;
+  virtual void output (string, const Filter*, const double,
+		       bool log_only = false) = 0;
+  virtual void output (string, const Filter*, const int,
+		       bool log_only = false) = 0;
+  virtual void output (string, const Filter*, const vector<double>&,
+		       bool log_only = false) = 0;
+  virtual void output (string, const Filter*, const CSMP&,
+		       bool log_only = false) = 0;
 
   // Used by CSMP.
 public:
-  void output_point (double x, double y);
+  virtual void output_point (double x, double y) = 0;
 
-private:
-  void print (const char*);
-  void print (string);
-  void print (double);
-  void print (int);
-  void print (bool);
-
-    // Content.
-private:
-  struct Implementation;
-  Implementation& impl;
-
-  // Create and Destroy.
+  // Library.
 public:
-  Log (const vector<const AttributeList*>&);
-  ~Log ();
+  static const Library& library ();
+  static Log& create (const AttributeList&);
+  typedef Log& (*constructor) (const AttributeList&);
+  static void add_type (const string, const AttributeList&, const Syntax&,
+			constructor);
+  static void derive_type (const string, const AttributeList&, string super);
+ 
+  // Create and Destroy.
+protected:
+  Log ();
+public:
+  virtual ~Log ();
 };
+
+// Ensure the Log library is initialized.
+// See TC++PL, 2ed, 10.5.1, for an explanation.
+static class Log_init
+{
+  static int count;
+public:
+  Log_init ();
+  ~Log_init ();
+} Log_init;
 
 template <class T> void
 output_submodule (const T& submodule, const char* name, Log& log, const Filter* filter)

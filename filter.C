@@ -7,6 +7,7 @@
 class Value;
 
 const FilterAll* Filter::all = new FilterAll ();
+const FilterNone* Filter::none = new FilterNone ();
 
 Filter::Filter ()
 { }
@@ -23,6 +24,19 @@ FilterAll::lookup (string) const
 { return Filter::all; }
 
 FilterAll::FilterAll ()
+{ }
+
+bool 
+FilterNone::check (string, bool) const
+{ return false; }
+
+const Filter* 
+FilterNone::lookup (string) const
+{ 
+  assert (false);
+}
+
+FilterNone::FilterNone ()
 { }
 
 struct FilterSome::Implementation
