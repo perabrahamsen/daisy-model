@@ -50,20 +50,23 @@
 #elif defined (_MSC_VER)
 // MS Visual C++.
 
-#pragma warning (disable: 4786 4503)
+// #pragma warning (disable: 4786 4503)
 #pragma warning (3: 4019 4032 4057 4061 4125 4130 4152 4189 4201 4706)
-
+#pragma warning (disable: 4099 4290 4018)
 #define GLOBAL_CONSTANT
 
+double max (double, double);
+double min (double, double);
+
 // Work around broken for-scoping
-#define for if(0);else for
+// #define for if(0);else for
 
 #else
 // GCC & ICC
 
 // GNU doesn't mind unused global constants.
 #define GLOBAL_CONSTANT
-
+#define FORWARD_TEMPLATES
 #endif
 
 // Shared code.

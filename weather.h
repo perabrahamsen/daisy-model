@@ -152,7 +152,7 @@ public:
   virtual ~Weather ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
   EMPTY_TEMPLATE
 Librarian<Weather>::Content* Librarian<Weather>::content;
 #endif
