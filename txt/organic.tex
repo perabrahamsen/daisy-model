@@ -80,8 +80,12 @@ practice, both on the short and the long term.  Thus, we get a system
 with two pools for each of \textsc{som} and \textsc{smb}, and two pools for
 each type fertilizer applied or crop residual left on the field.  The
 original model is depicted in figure~\ref{fig:om1}.
-
-FIG{om1}: The original Daisy OM parameterization.
+\begin{figure}[htbp]
+  \centering
+  
+  \caption{The original Daisy OM parameterization.}
+  \label{fig:om1}
+\end{figure}
 
 PA: turnover rates, fractions, efficiency, maintenance, (abiotic factors).
 
@@ -106,7 +110,12 @@ DJF repport on humus levels).
 The current calibration is depicted in~\ref{fig:om2}.  The purpose of
 the SOM3 pool in that figure will be explained later.
 
-FIG{om2}: Ny model.
+\begin{figure}[htbp]
+  \centering
+  
+  \caption{New parameterization.}
+  \label{fig:om2}
+\end{figure}
 
 Some of the experimental changes affecting soil organic matter that we
 are currently working on, and which may be included in future versions
@@ -175,19 +184,31 @@ system that goes from equilibrium at a high level of carbon input, to
 equilibirum at a low level of carbon input.  Danish farming practice
 has been used, as well as Danish climate and soil.  The soil has a for
 Danish conditions high clay content (10\%).
-Figure~\ref{fig:clayration} shows the \textsc{som1}/\textsc{som2}
+Figure~\ref{fig:clayratio} shows the \textsc{som1}/\textsc{som2}
 ratio, which is can be used for initializing \daisy{}.  Finally,
 figure~\ref{fig:sandratio} shows the ration for simulation on a coarse
 sandy soil going from a low to high input equilibrium.
+\begin{figure}[htbp]
+  \centering
 
-FIG{fig:clayom}: Long term simulation of organic matter content from
-changing from high to low input on a clayish loam.
+  \caption{Long term simulation of organic matter content from
+    changing from high to low input on a clayish loam.}
+  \label{fig:clayom}
+\end{figure}
+\begin{figure}[htbp]
+  \centering
 
-FIG{fig:clayratio}: Long term simulation of \textsc{som1}/\textsc{som2} ratio
-from changing from high to low input on a clayish loam.
-
-FIG{fig:sandratio}: Long term simulation of \textsc{som1}/\textsc{som2} ratio
-from changing from low to high input on a coarse sandy soil
+  \caption{Long term simulation of \textsc{som1}/\textsc{som2} ratio
+    from changing from high to low input on a clayish loam.}
+  \label{fig:clayratio}
+\end{figure}
+\begin{figure}[htbp]
+  \centering
+  
+  \caption{Long term simulation of \textsc{som1}/\textsc{som2} ratio
+    from changing from low to high input on a coarse sandy soil.}
+  \label{fig:sandratio}
+\end{figure}
 
 As can be seen, the time to reach a new equilibirum after a change in
 farming practice is measured in centuries, which makes it safe to
@@ -204,21 +225,53 @@ assumption.
 \section{Equations}
 
 In order to find a better way to initialize the organic matter pools,
-we will start by looking at their internal relationship.
+we will start by looking at their internal relationships.
 \begin{eqnarray}
-  \Delta\mbox{\textsc{smb1}} = a \mbox{\textsc{smb1}} + b
-  \mbox{\textsc{smb2}} + c \mbox{\textsc{som1}} + d
-  \mbox{\textsc{som2}} + e \Delta\mbox{\textsc{aom}}\\
-  \Delta\mbox{\textsc{smb2}} = f \mbox{\textsc{smb1}} + g
-  \mbox{\textsc{smb2}} + h \mbox{\textsc{som1}} + i
-  \mbox{\textsc{som2}} + j \Delta\mbox{\textsc{aom}}\\
-  \Delta\mbox{\textsc{som1}} = k \mbox{\textsc{smb1}} + l
-  \mbox{\textsc{smb2}} + m \mbox{\textsc{som1}} + n
-  \mbox{\textsc{som2}} + o \Delta\mbox{\textsc{aom}}\\
-  \Delta\mbox{\textsc{som2}} = p \mbox{\textsc{smb1}} + q
-  \mbox{\textsc{smb2}} + r \mbox{\textsc{som1}} + s
-  \mbox{\textsc{som2}} + t \Delta\mbox{\textsc{aom}}
+  \Delta\mbox{\textsc{smb1}} &=& a\> \mbox{\textsc{smb1}} + b\>
+  \mbox{\textsc{smb2}} + c\> \mbox{\textsc{som1}} + d\>
+  \mbox{\textsc{som2}} + e\, \Delta\mbox{\textsc{aom}}\\
+  \Delta\mbox{\textsc{smb2}} &=& f\> \mbox{\textsc{smb1}} + g\>
+  \mbox{\textsc{smb2}} + h\> \mbox{\textsc{som1}} + i\>
+  \mbox{\textsc{som2}} + j\, \Delta\mbox{\textsc{aom}}\\
+  \Delta\mbox{\textsc{som1}} &=& k\> \mbox{\textsc{smb1}} + l\>
+  \mbox{\textsc{smb2}} + m\> \mbox{\textsc{som1}} + n\>
+  \mbox{\textsc{som2}} + o\, \Delta\mbox{\textsc{aom}}\\
+  \Delta\mbox{\textsc{som2}} &=& p\> \mbox{\textsc{smb1}} + q\>
+  \mbox{\textsc{smb2}} + r\> \mbox{\textsc{som1}} + s\>
+  \mbox{\textsc{som2}} + t\, \Delta\mbox{\textsc{aom}}
 \end{eqnarray}
+Here, we have excluded the \textsc{aom} pools, except as a source for
+the other pools which we denote $\Delta\mbox{\textsc{aom}}$.
+$\Delta\mbox{\textsc{aom}}$ is the total carbon input to the system.
+The \textsc{aom} pools are special in that they are not feed by any of
+the other pools, but by outside sources such as crop residuals and
+fertilizer.  The other pools are described by content (\textsc{smb1},
+\textsc{smb2}, \textsc{som1}, or \textsc{som2}) and change of content
+($\Delta\mbox{\textsc{smb1}}$, $\Delta\mbox{\textsc{smb2}}$,
+$\Delta\mbox{\textsc{som1}}$, $\Delta\mbox{\textsc{som2}}$).
+
+The factors $a$ to $t$ depend on the base calibration of the model, so
+the factors are different for the original calibration
+(figure~\ref{fig:om1}) and the Sander calibration
+(figure~\ref{fig:om2}).  They also depend on the clay content of the
+soil, the temperature, and the water potential.  
+
+Some of these factors may be zero, in none of the calibrations
+mentioned we have any carbon going directly from the \textsc{aom}
+pools to \textsc{som1}, so $o$ will always be zero.  The reason we
+include these, is that we are trying to solve the initialization
+problem in a way that is robust with regard to changes in the model.
+The description is also robust with regard to the number of pools,
+adding a new pool will just add another equation, and another term in
+all the existing equations.  
+
+\begin{verbatim}
+SH: Genereliseret udtryk? 
+SH: dSMBi = Sigma (a_i,j * SMBj) + Sigma (b_i,k * SOMk) + c_i dAOM
+SH: dSOMi = Sigma (d_i,j * SMBj) + Sigma (e_i,k * SOMk) + f_i dAOM
+\end{verbatim}
+
+The reason we have included all the factors are 
 
 The the sytem of equations.
 
