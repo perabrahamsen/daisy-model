@@ -16,6 +16,19 @@ struct ActionNil : public Action
     { }
 };
 
+struct ActionT : public Action
+{
+  void doIt (Daisy&)
+    { }
+
+  bool done (const Daisy&) const
+    { return false; }
+
+  ActionT (const AttributeList& al)
+    : Action (al)
+    { }
+};
+
 struct ActionProgn : public Action
 {
   vector<Action*>& actions;
@@ -222,6 +235,8 @@ static struct ActionLispSyntax
 {
   static Action& make_nil (const AttributeList& al)
     { return *new ActionNil (al); }
+  static Action& make_t (const AttributeList& al)
+    { return *new ActionT (al); }
   static Action& make_progn (const AttributeList& al)
     { return *new ActionProgn (al); }
   static Action& make_cond (const AttributeList& al)
@@ -237,8 +252,15 @@ ActionLispSyntax::ActionLispSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    alist.add ("description", "This action does nothing.");
+    alist.add ("description", "This action does nothing, always done.");
     Librarian<Action>::add_type ("nil", alist, syntax, &make_nil);
+  }
+  // "t"
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "This action does nothing, never done.");
+    Librarian<Action>::add_type ("t", alist, syntax, &make_nil);
   }
   // "progn"
   {

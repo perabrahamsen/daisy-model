@@ -33,6 +33,7 @@ public:
   double N_at (unsigned int at) const;
   void pour (vector<double>& cc, vector<double>& nn);
   void add (double C, double N);// Add dead leafs.
+  void add (const Geometry& geometry, AM& other); // Merge AOMs.
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const vector<double>& density);
@@ -57,6 +58,7 @@ public:
 		     const string& sort, const string& part,
 		     lock_type lock = Unlocked);
   void initialize (const Geometry&);
+  static const vector<AttributeList*>& default_AOM ();
 private:
   friend class AM_Syntax;
   AM (const AttributeList&);

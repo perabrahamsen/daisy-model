@@ -271,7 +271,7 @@ VegetationPermanentSyntax
 		"Nitrogen in litter this hour.");
     add_submodule_sequence<OM> ("litter_am", syntax, Syntax::Const,
 				"Litter AM parameters.");
-    alist.add ("litter_am", Crop::default_AOM ());
+    alist.add ("litter_am", AM::default_AOM ());
     add_submodule<RootSystem>("Root", syntax, alist,
 			      Syntax::State, "Root system.");
     syntax.add ("root_DM", "T DM/ha", Syntax::Const, 

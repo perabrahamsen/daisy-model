@@ -89,6 +89,7 @@ protected:
 			       double& f_Root, double& f_SOrg);
   double MaintenanceRespiration (double r, double w, double T);
   void NetProduction (const Bioclimate&, const Geometry&, const SoilHeat&);
+  void NoProduction ();
   double RSR () const;
 
   // Simulation.
@@ -787,19 +788,19 @@ Non-functional lim for N-concentration in roots.");
   // HarvestPar
   add_submodule_sequence<OM> ("Stem", Harvest, Syntax::Const,
 			      "Stem AM parameters.");
-  HarvestList.add ("Stem", Crop::default_AOM ());
+  HarvestList.add ("Stem", AM::default_AOM ());
   add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const,
 			      "Leaf AM parameters.");
-  HarvestList.add ("Leaf", Crop::default_AOM ());
+  HarvestList.add ("Leaf", AM::default_AOM ());
   add_submodule_sequence<OM> ("Dead", Harvest, Syntax::Const,
 			      "Dead leaves AM parameters.");
-  HarvestList.add ("Dead", Crop::default_AOM ());
+  HarvestList.add ("Dead", AM::default_AOM ());
   add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const,
 			      "Storage organ AM parameters.");
-  HarvestList.add ("SOrg", Crop::default_AOM ());
+  HarvestList.add ("SOrg", AM::default_AOM ());
   add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const,
 			      "Root AM parameters.");
-  HarvestList.add ("Root", Crop::default_AOM ());
+  HarvestList.add ("Root", AM::default_AOM ());
   Harvest.add ("EconomicYield_W", Syntax::None (), Syntax::Const, "\
 Valuable fraction of storage organ (DM), e.g. grain or tuber.");
   HarvestList.add ("EconomicYield_W", 1.00);
@@ -1026,13 +1027,12 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
     }
   else
     {
-      bool not_yet_ripe = (Phenology.DS < 2.0);
       Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
       if (Phenology.DS > 2)
 	{
-	  if (not_yet_ripe)
-	    COUT << " [" << name << " is ripe]\n";
+	  COUT << " [" << name << " is ripe]\n";
 	  Phenology.DS = 2.0;
+	  NoProduction ();
 	}
     }
 
@@ -1439,6 +1439,21 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   vProd.WRoot += CrpAux.IncWRoot;
 }
 
+void
+CropStandard::NoProduction ()
+{
+  var.CrpAux.IncWLeaf = 0.0;
+  var.CrpAux.IncWStem = 0.0;
+  var.CrpAux.IncWSOrg = 0.0;
+  var.CrpAux.IncWRoot = 0.0;
+  var.CrpAux.NetPhotosynthesis = 0.0;
+  var.CrpAux.RootRespiration = 0.0;
+  var.CrpAux.DeadWLeaf = 0.0;
+  var.CrpAux.DeadNLeaf = 0.0;
+  var.CrpAux.DeadWRoot = 0.0;
+  var.CrpAux.DeadNRoot = 0.0;
+}
+
 double
 CropStandard::RSR () const
 {
@@ -1465,8 +1480,7 @@ CropStandard::tick (const Time& time,
   var.Phenology.soil_h =
     soil_water.h (soil.interval_plus (-root_system.DptEmr/2.));
 
-  if 
-    (time.hour () == 0 && var.Phenology.DS <= 0)
+  if (time.hour () == 0 && var.Phenology.DS <= 0)
     {
       // Calculate average soil temperature.
       var.Phenology.soil_temperature =

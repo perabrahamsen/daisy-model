@@ -47,6 +47,7 @@ struct AM::Implementation
   void distribute (double C, vector<double>& om_C, // Helper for `add' fns.
 		   double N, vector<double>& om_N);
   void add (double C, double N);// Add dead leafs.
+  void add (const Geometry& geometry, AM::Implementation& other);
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const vector<double>& density);
@@ -231,6 +232,51 @@ AM::Implementation::add (double C, double N)
 
   for (unsigned int i = 0; i < om.size (); i++)
     om[i]->add (om_C[i], om_N[i]);
+}
+
+void
+AM::Implementation::add (const Geometry& geometry,
+			 AM::Implementation& other)
+{
+  assert (&other != this);
+  const double old_C = total_C (geometry) + other.total_C (geometry);
+  const double old_N = total_N (geometry) + other.total_N (geometry);
+
+  vector<double> cc (geometry.size (), 0.0);
+  vector<double> nn (geometry.size (), 0.0);
+  other.pour (cc, nn);
+
+  for (unsigned int at = 0; at < geometry.size (); at++)
+    {
+      vector<double> om_C (om.size (), 0.0);
+      vector<double> om_N (om.size (), 0.0);
+
+      distribute (cc[at], om_C, nn[at], om_N);
+
+      for (unsigned int i = 0; i < om.size (); i++)
+	{
+	  const double C_per_N = om[i]->initial_C_per_N;
+	  if (C_per_N == OM::Unspecified)
+	    om[i]->add (at, om_C[i], om_N[i]);
+	  else
+	    {
+	      assert (approximate (om_C[i], C_per_N * om_N[i]));
+	      const double old_N = om[i]->total_N (geometry);
+	      om[i]->add (at, om_C[i]);
+	      const double new_N = om[i]->total_N (geometry);
+	      assert (om_N[i] * 1e9 < old_N
+		      ? approximate (old_N + om_N[i], new_N)
+		      : (approximate (new_N - old_N, om_N[i])));
+	    }
+	}
+    }
+
+  add (other.top_C (), other.top_N ());
+
+  const double new_C = total_C (geometry);
+  const double new_N = total_N (geometry);
+  assert (approximate (old_C, new_C));
+  assert (approximate (old_N, new_N));
 }
 
 void
@@ -523,6 +569,10 @@ AM::add (double C, double N)
 { impl.add (C, N); }
 
 void 
+AM::add (const Geometry& geometry, AM& other)
+{ impl.add (geometry, other.impl); }
+
+void 
 AM::add (const Geometry& geometry,
 	 double C, double N, 
 	 const vector<double>& density)
@@ -589,6 +639,50 @@ AM::create (const Geometry& /*geometry*/, const Time& time,
 #ifdef BORLAND_TEMPLATES
 template class map_construct<OM>;
 #endif
+
+const vector<AttributeList*>&
+AM::default_AOM ()
+{
+  static vector<AttributeList*>* AOM = NULL;
+
+  if (!AOM)
+    {
+      Syntax om_syntax;
+      AttributeList om_alist;
+      OM::load_syntax (om_syntax, om_alist);
+      AttributeList& AOM1 = *new AttributeList (om_alist);
+      AttributeList& AOM2 = *new AttributeList (om_alist);
+      AOM1.add ("initial_fraction", 0.80);
+      vector<double> CN;
+      CN.push_back (90.0);
+      AOM1.add ("C_per_N", CN);
+      vector<double> efficiency1;
+      efficiency1.push_back (0.50);
+      efficiency1.push_back (0.50);
+      AOM1.add ("efficiency", efficiency1);
+      AOM1.add ("turnover_rate", 2.0e-4);
+      vector<double> fractions1;
+      fractions1.push_back (0.50);
+      fractions1.push_back (0.50);
+      fractions1.push_back (0.00);
+      AOM1.add ("fractions", fractions1);
+      vector<double> efficiency2;
+      efficiency2.push_back (0.50);
+      efficiency2.push_back (0.50);
+      AOM2.add ("efficiency", efficiency2);
+      AOM2.add ("turnover_rate", 2.0e-3);
+      vector<double> fractions2;
+      fractions2.push_back (0.00);
+      fractions2.push_back (1.00);
+      fractions2.push_back (0.00);
+      AOM2.add ("fractions", fractions2);
+      AOM = new vector<AttributeList*>;
+      AOM->push_back (&AOM1);
+      AOM->push_back (&AOM2);
+    }
+  return *AOM;
+}
+
 
 AM::AM (const AttributeList& al)
   : impl (*new Implementation 

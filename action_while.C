@@ -74,8 +74,8 @@ static struct ActionWhileSyntax
       syntax.add_check (check_alist);
       alist.add ("description", "\
 Perform all the specified actions in the sequence listed, but in the\n\
-timestep.  The `while' action is done when the first action in the list\n\
-is done.");
+same timestep.  The `while' action is done when the first action in the\n\
+list is done.");
       syntax.add ("actions", Librarian<Action>::library (), Syntax::Sequence,
 		  "List of actions to perform.");
       syntax.order ("actions");

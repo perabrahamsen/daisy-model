@@ -1,10 +1,8 @@
-* Test compilering _med_ cygwin.  Virker exceptions?
+* Test Cygwin compile, specielt høst resultat.
 
 * Test Qt.
 
 * Management:
-
-** `repeat' action til brug ved græsning
 
 ** Gød efter hvor meget N der mangler i jorden 
 
@@ -15,8 +13,6 @@
 * CVS
 
 ** Nyt `misc' katalog med de to dhi scripts.
-
-* Merge små AM til særlig "rest-am" pulje som ikke forsvinder.
 
 * CheckPoint: Sørg for at inkludere `def*' og `input' automatisk.
 

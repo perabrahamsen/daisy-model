@@ -9,34 +9,6 @@
 #include "submodel.h"
 #include <numeric>
 
-static double
-get_initial_C_per_N (const AttributeList& al)
-{
-  if (al.check ("initial_C_per_N"))
-    return al.number ("initial_C_per_N");
-  if (al.check ("C_per_N"))
-    {
-      const vector<double>& C_per_N = al.number_sequence ("C_per_N");
-      if (C_per_N.size () > 0U)
-	return C_per_N[0];
-    }
-  return OM::Unspecified;
-}
-
-OM::OM (const AttributeList& al)
-  : initial_fraction (al.number ("initial_fraction")),
-    initial_C_per_N (get_initial_C_per_N (al)),
-    top_C (al.number ("top_C")),
-    top_N (al.number ("top_N")),
-    turnover_rate (al.number ("turnover_rate")),
-    efficiency (al.number_sequence ("efficiency")),
-    maintenance (al.number ("maintenance")),
-    fractions (al.number_sequence ("fractions"))
-{ 
-  if (al.check ("C_per_N"))
-    C_per_N = al.number_sequence ("C_per_N");
-}
-
 void
 OM::output (Log& log) const
 {
@@ -160,36 +132,6 @@ OM::mix (const Geometry& geometry, double from, double to, double penetration)
   set_N (N);
 }
 
-#if 0
-void 
-OM::distribute (const Geometry& geometry, const vector<double>& content)
-{
-  // Ignore empty pools.
-  if (top_C == 0.0)
-    return;
-
-  // Prepare.
-  assert (C.size () == content.size ());
-  const double total = accumulate (content.begin (), content.end (), 0.0);
-
-  // Calcaluate N.
-  vector<double> N = get_N ();
-
-  // Distribute C.
-  for (unsigned int i = 0; i < content.size (); i++)
-    C[i] += top_C * content[i] / total / geometry.dz (i);
-  top_C = 0;
-
-  // Distribute N.
-  for (unsigned int i = 0; i < content.size (); i++)
-    N[i] += top_N * content[i] / total / geometry.dz (i);
-  top_N = 0;
-
-  // Calculate C/N.
-  set_N (N);
-}
-#endif 
-
 void
 OM::swap (const Geometry& geometry, double from, double middle, double to)
 {
@@ -276,31 +218,36 @@ OM::add (double C, double N)
 }
 
 void 
+OM::add (unsigned int at, double to_C)
+{
+  grow (at+1);
+  C[at] += to_C;
+}
+
+void 
+OM::add (unsigned int at, double to_C, double to_N)
+{
+  grow (at+1);
+
+  const double new_N = C[at] / C_per_N[at] + to_N;
+  C[at] += to_C;
+  if (C[at] > 0.0)
+    C_per_N[at] = C[at] / new_N;
+  else
+    assert (new_N == 0.0);
+  assert (finite (C[at]));
+  assert (C[at] >= 0.0);
+  assert (finite (C_per_N[at]));
+  assert (C_per_N[at] >= 0.0);
+}
+
+void 
 OM::add (const Geometry& geometry, // Add dead roots.
 	 double to_C, /* Fixed C/N */
 	 const vector<double>& density)
 {
   const double old_C = total_C (geometry);
-
-  // Make sure C/N is large enough.
-  int extra_C_per_N = density.size () - C_per_N.size ();
-  if (extra_C_per_N > 0)
-    {
-      assert (initial_C_per_N != Unspecified);
-      while (extra_C_per_N > 0)
-	{
-	  C_per_N.push_back (initial_C_per_N);
-	  extra_C_per_N--;
-	}
-      assert (initial_C_per_N > 0.0);
-    }
-  
-  // Make sure C is large enough.
-  const int extra_C = density.size () - C.size ();
-  if (extra_C > 0)
-    C.insert (C.end (), extra_C, 0.0);
-  
-  assert (approximate (old_C, total_C (geometry)));
+  grow (density.size ());
 
   // Distribute it according to the root density.
   const double total = geometry.total (density);
@@ -328,22 +275,7 @@ OM::add (const Geometry& geometry, // Add dead roots.
 {
   const double old_C = total_C (geometry);
   const double old_N = total_N (geometry);
-
-  // Make sure C/N is large enough.
-  const int extra_C_per_N = density.size () - C_per_N.size ();
-  if (extra_C_per_N > 0)
-    // It doesn't matter what number we use, add C will be 0.
-    C_per_N.insert (C_per_N.end (), extra_C_per_N, 1.0);
-  
-  // Make sure C is large enough.
-  const int extra_C = density.size () - C.size ();
-  if (extra_C > 0)
-    {
-      assert (extra_C_per_N <= extra_C);
-      C.insert (C.end (), extra_C, 0.0);
-    }
-
-  assert (approximate (old_C, total_C (geometry)));
+  grow (density.size ());
 
   // Distribute it according to the root density.
   const double total = geometry.total (density);
@@ -548,6 +480,25 @@ OM::tick (unsigned int end, const double* abiotic_factor,
     }
 }
 
+void 
+OM::grow (unsigned int size)
+{
+  // Make sure C/N is large enough.
+  int extra_C_per_N = size - C_per_N.size ();
+  if (extra_C_per_N > 0)
+    {
+      if (initial_C_per_N == Unspecified)
+	C_per_N.insert (C_per_N.end (), extra_C_per_N, 1.0);
+      else
+	C_per_N.insert (C_per_N.end (), extra_C_per_N, initial_C_per_N);
+    }
+
+  // Make sure C is large enough.
+  const int extra_C = size - C.size ();
+  if (extra_C > 0)
+    C.insert (C.end (), extra_C, 0.0);
+}
+
 const double OM::Unspecified = -1042.42e42;
 
 static bool check_alist (const AttributeList& al)
@@ -648,6 +599,34 @@ The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified\n\
 \(which corresponds to the default value, a large negative number).");
   alist.add ("initial_fraction", Unspecified);
+}
+
+static double
+get_initial_C_per_N (const AttributeList& al)
+{
+  if (al.check ("initial_C_per_N"))
+    return al.number ("initial_C_per_N");
+  if (al.check ("C_per_N"))
+    {
+      const vector<double>& C_per_N = al.number_sequence ("C_per_N");
+      if (C_per_N.size () > 0U)
+	return C_per_N[0];
+    }
+  return OM::Unspecified;
+}
+
+OM::OM (const AttributeList& al)
+  : initial_fraction (al.number ("initial_fraction")),
+    initial_C_per_N (get_initial_C_per_N (al)),
+    top_C (al.number ("top_C")),
+    top_N (al.number ("top_N")),
+    turnover_rate (al.number ("turnover_rate")),
+    efficiency (al.number_sequence ("efficiency")),
+    maintenance (al.number ("maintenance")),
+    fractions (al.number_sequence ("fractions"))
+{ 
+  if (al.check ("C_per_N"))
+    C_per_N = al.number_sequence ("C_per_N");
 }
 
 static Submodel::Register om_submodel ("OM", OM::load_syntax);

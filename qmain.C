@@ -22,9 +22,12 @@ int main( int argc, char **argv )
 
   // QPushButton hello ("Hello world!", 0);
   // hello.resize (100, 30);
-  QListView libs (0, 0);
-  new QListViewItem (&libs, "Libraries");
-  app.setMainWidget (&libs);
-  libs.show ();
+  QListView tree (0, 0);
+  tree.addColumn ("Browser");
+  QListViewItem* libs = new QListViewItem (&tree, "Libraries");
+  new QListViewItem (libs, "a Library");
+  new QListViewItem (libs, "another Library");
+  app.setMainWidget (&tree);
+  tree.show ();
   return app.exec ();
 }

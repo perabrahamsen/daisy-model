@@ -22,8 +22,8 @@ MAKEFLAGS =
 #
 ifeq ($(OS),Windows_NT)
 	ifeq ($(OSTYPE),cygwin)
-		HOSTTYPE = cygwin
-#		HOSTTYPE = mingw
+#		HOSTTYPE = cygwin
+		HOSTTYPE = mingw
 	else
 		HOSTTYPE = win32
 	endif
@@ -31,8 +31,8 @@ endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-USE_OPTIMIZE = true
-#USE_OPTIMIZE = false
+#USE_OPTIMIZE = true
+USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
@@ -203,7 +203,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = column_inorganic.C  vegetation_permanent.C \
+MODELS = action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
 	action_crop.C groundwater_lysimeter.C select_min.C \

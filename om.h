@@ -37,9 +37,6 @@ private:
 public:
   void output (Log&) const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
-#if 0
-  void distribute (const Geometry&, const vector<double>& density);
-#endif
   void swap (const Geometry&, double from, double middle, double to);
   double total_C (const Geometry& geometry) const;
   double total_N (const Geometry& geometry) const;
@@ -47,6 +44,8 @@ public:
   double N_at (unsigned int at) const;
   void pour (vector<double>& cc, vector<double>& nn);
   void add (double C, double N);// Add dead leafs.
+  void add (unsigned int at, double C); // Merge specified.
+  void add (unsigned int at, double C, double N); // Merge unspecified.
   void add (const Geometry&,	// Add dead roots.
 	    double C, /* Fixed C/N */
 	    const vector<double>& density);
@@ -69,6 +68,8 @@ private:
 	     const double* N_soil, double* N_used,
 	     double* CO2, OM& om);
   // Create & Destroy.
+private:
+  void grow (unsigned int size);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   OM (const AttributeList& al);

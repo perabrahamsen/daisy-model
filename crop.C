@@ -51,50 +51,6 @@ bool
 Crop::ds_remove (const Crop* crop)
 { return crop->DS () == Crop::DSremove; }
 
-const vector<AttributeList*>&
-Crop::default_AOM ()
-{
-  static vector<AttributeList*>* AOM = NULL;
-
-  if (!AOM)
-    {
-      Syntax om_syntax;
-      AttributeList om_alist;
-      OM::load_syntax (om_syntax, om_alist);
-      AttributeList& AOM1 = *new AttributeList (om_alist);
-      AttributeList& AOM2 = *new AttributeList (om_alist);
-      AOM1.add ("initial_fraction", 0.80);
-      vector<double> CN;
-      CN.push_back (90.0);
-      AOM1.add ("C_per_N", CN);
-      vector<double> efficiency1;
-      efficiency1.push_back (0.50);
-      efficiency1.push_back (0.50);
-      AOM1.add ("efficiency", efficiency1);
-      AOM1.add ("turnover_rate", 2.0e-4);
-      vector<double> fractions1;
-      fractions1.push_back (0.50);
-      fractions1.push_back (0.50);
-      fractions1.push_back (0.00);
-      AOM1.add ("fractions", fractions1);
-      vector<double> efficiency2;
-      efficiency2.push_back (0.50);
-      efficiency2.push_back (0.50);
-      AOM2.add ("efficiency", efficiency2);
-      AOM2.add ("turnover_rate", 2.0e-3);
-      vector<double> fractions2;
-      fractions2.push_back (0.00);
-      fractions2.push_back (1.00);
-      fractions2.push_back (0.00);
-      AOM2.add ("fractions", fractions2);
-      AOM = new vector<AttributeList*>;
-      AOM->push_back (&AOM1);
-      AOM->push_back (&AOM2);
-    }
-  return *AOM;
-}
-
-
 void
 Crop::initialize (const Geometry& geometry, const OrganicMatter&)
 { initialize (geometry); }

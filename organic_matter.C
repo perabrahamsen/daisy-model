@@ -12,6 +12,7 @@
 #include "soil_NO3.h"
 #include "soil_heat.h"
 #include "bioincorporation.h"
+#include "time.h"
 #include "mathlib.h"
 #include "plf.h"
 #include "common.h"
@@ -313,6 +314,14 @@ OrganicMatter::Implementation::check () const
 void
 OrganicMatter::Implementation::monthly (const Geometry& geometry)
 {
+  AM* remainder = find_am ("am", "cleanup");
+  if (!remainder)
+    {
+      remainder = &AM::create (geometry, Time (1, 1, 1, 1), AM::default_AOM (),
+			       "am", "cleanup", AM::Locked);
+      add (*remainder);
+    }
+
   const int am_size = am.size ();
   vector<AM*> new_am;
   
@@ -342,7 +351,11 @@ OrganicMatter::Implementation::monthly (const Geometry& geometry)
 	new_am.push_back (am[i]);
       else
 	{
+#if 0
 	  am[i]->pour (buffer.C, buffer.N);
+#else
+	  remainder->add (geometry, *am[i]);
+#endif
 	  delete am[i];
 	}
       am[i] = NULL;

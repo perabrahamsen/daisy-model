@@ -78,9 +78,6 @@ public:
   static const double DSremove;
   virtual double DM () const = 0; // Shoot dry matter, [kg/ha].
 
-  // Utilities.
-  static const vector<AttributeList*>& default_AOM ();
-
   // Create and Destroy.
 public:
   virtual void initialize (const Geometry&, const OrganicMatter&);

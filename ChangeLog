@@ -1,3 +1,33 @@
+2000-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.40 released.
+
+2000-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_repeat.C: New file.
+	* Makefile (MODELS): Add it.
+
+	* action_lisp.C (ActionT): New model.
+
+2000-09-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (add): New member function.
+
+	* om.C, om.h (grow): New member function.
+	(add): Call it.
+	(add): Two new member functions.
+
+	* crop_std.C (NoProduction): New member function.
+	(DevelopmentStage): Call it.
+
+	* bioclimate_std.C (WaterDistribution): Don't ignore surface
+	irrigation.
+
+2000-09-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): Allow for larger numeric
+	errors in canopy storage assertion. 
+
 2000-09-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.39 released.
