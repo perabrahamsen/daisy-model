@@ -60,6 +60,7 @@ protected:
 
   // Create and Destroy.
 public:
+  static bool zero_Theta_res (const AttributeList& al, Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (double clay, double silt, double sand);
   Hydraulic (const AttributeList&);

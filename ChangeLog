@@ -1,4 +1,23 @@
+2002-06-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.34 released.
+
+2002-06-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* dom.h, dom.C: Rewrote.
+	* aom.C, organic_matter.C, om.C:  Update callers.
+	* organic_matter.C, organic_matter.h (mix, swap): Take SoilWater
+	argument. 
+	* column_std.C (mix, swap): Update caller.
+	* organic_matter.C, organic_matter.h (initialize): Take SoilWater
+	argument. 
+	* column_std.C (initialize): Update caller.
+
 2002-06-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport.h, transport_cd.C, transport_none.C,
+	transport_convection.C (tick): Avoid Solute argument.
+	* solute.C (tick): Update caller.
 
 	* Version 2.33 released.
 

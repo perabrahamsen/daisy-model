@@ -52,9 +52,11 @@ public:
 	     SoilNO3&, SoilNH4&, Treelog& msg);
   void output (Log&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
-  void mix (const Geometry&, double from, double to, double penetration, 
+  void mix (const Soil&, const SoilWater&,
+	    double from, double to, double penetration, 
 	    const Time& time);
-  void swap (const Geometry&, double from, double middle, double to, 
+  void swap (const Soil&, const SoilWater&, 
+	     double from, double middle, double to, 
 	     const Time& time);
 
   // Communication with external model.
@@ -66,7 +68,8 @@ public:
   void add (AM&);
   AM* find_am (const string& sort, const string& part) const;
 public:
-  void initialize (const AttributeList&, const Soil&, Treelog&);
+  void initialize (const AttributeList&, const Soil&, const SoilWater&, 
+		   Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
   OrganicMatter (const AttributeList&);
   ~OrganicMatter ();

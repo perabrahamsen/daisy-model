@@ -2,17 +2,9 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * DOM.
 
-** Transport skal ikke bruge solute, men adsorbtion.
+** Make OM::tock a static function, takes C and N args.
 
-** matrix transport af C og N seperat
-
-** macro transport af C og N seperat
-
-** adsorbtion af DOM til matrix
-
-* DOM 
-
-** Skal DOM have fixed eller goal C/N?
+** Implement DOM::turnover ()
 
 * User Manual
 

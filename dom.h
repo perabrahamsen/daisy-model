@@ -22,14 +22,66 @@
 #ifndef DOM_H
 #define DOM_H
 
-#include "om.h"
+// These must be included in the header file, for 'load_syntax' to work.
+#include "adsorption.h"
+#include "transport.h"
+#include "mactrans.h"
+#include "plf.h"
+#include "smb.h"
 
-class DOM : public OM
+struct Log;
+struct Syntax;
+struct AttributeList;
+struct Geometry;
+struct Soil;
+struct SoilWater;
+
+class DOM
 { 
+  // Content.
+  class Element;
+  Element& C;
+  Element& N;
+
+  // Transport.
+private:
+  Transport& trans;		// Solute transport model in matrix.
+  Transport& reserve;		// Reserve solute transport model in matrix.
+  Transport& last_resort;       // Last resort solute transport model.
+  Mactrans& mactrans;		// Solute transport model in macropores.
+  Adsorption& adsorption;	// Solute adsorption.
+  const double diffusion_coefficient;
+
+  // Turnover.
+public:
+  /* const */ PLF heat_factor;
+  const double turnover_rate;	// How fast this is it turned over?
+  const vector<double> efficiency;	// How digestible is this?
+  const vector<double> fractions;	// Where does it end up?
+
+  // Simulation.
+public:
+  void output (Log&) const;
+  void mix (const Soil&, const SoilWater&, double from, double to);
+  void swap (const Soil&, const SoilWater& soil_water,
+	     double from, double middle, double to);
+  double add_to_source (unsigned int at, double C, double N);
+  double soil_C (const Geometry& geometry) const;
+  double soil_N (const Geometry& geometry) const;
+  double C_at (unsigned int at) const;
+  double N_at (unsigned int at) const;
+public:
+  void turnover (unsigned int size, const double* turnover_factor, 
+		 const double* N_soil, double* N_used,
+		 double* CO2, const vector<SMB*>& smb);
+  void transport (const Soil&, const SoilWater&, Treelog&);
+
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
+  void initialize (const Soil&, const SoilWater&, Treelog&);
   DOM (const AttributeList& al);
+  ~DOM ();
 };
 
 #endif // DOM_H

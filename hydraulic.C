@@ -61,6 +61,19 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
   plf.add (h, sum);
 }
 
+bool 
+Hydraulic::zero_Theta_res (const AttributeList& al, Treelog& err)
+{
+  bool ok = true;
+  
+  if (al.number ("Theta_res") != 0.0)
+    {
+      err.error ("Theta_res should be zero for this model");
+      ok = false;
+    }
+  return ok;
+}
+
 static bool
 check_alist (const AttributeList& al, Treelog& err)
 {
@@ -71,7 +84,7 @@ check_alist (const AttributeList& al, Treelog& err)
 
   if (Theta_res >= Theta_sat)
     {
-      err.entry ("Theta_sat should be above Theta_res");
+      err.error ("Theta_sat should be above Theta_res");
       ok = false;
     }
   return ok;

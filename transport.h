@@ -27,7 +27,7 @@
 
 class Soil;
 class SoilWater;
-class Solute;
+class Adsorption;
 
 class Transport
 {
@@ -38,7 +38,9 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (Treelog&, const Soil&, const SoilWater&, const Solute&,
+  virtual void tick (Treelog&, const Soil&, const SoilWater&, 
+		     const Adsorption&, 
+		     double diffusion_coefficient,
 		     vector<double>& M, 
 		     vector<double>& C,
 		     const vector<double>& S,

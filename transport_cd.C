@@ -23,7 +23,7 @@
 #include "transport.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "solute.h"
+#include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
 
@@ -39,7 +39,8 @@ private:
   
   // Simulation.
 public:
-  void tick (Treelog&, const Soil&, const SoilWater&, const Solute&,
+  void tick (Treelog&, const Soil&, const SoilWater&, const Adsorption&,
+	     const double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
@@ -63,7 +64,8 @@ TransportCD::output (Log& log) const
 
 void 
 TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
-		   const Solute& solute, 
+		   const Adsorption& adsorption,
+		   const double diffusion_coefficient,
 		   vector<double>& M, 
 		   vector<double>& C,
 		   const vector<double>& S,
@@ -87,9 +89,9 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	daisy_assert (M[i] == 0.0);
       else
 	daisy_assert (approximate (M[i], 
-			     solute.C_to_M (soil,
-					    soil_water.Theta_old (i),
-					    i, C[i])));
+				   adsorption.C_to_M (soil,
+						      soil_water.Theta_old (i),
+						      i, C[i])));
     }
 
   // Note: q, D, and alpha depth indexes are all [j-½].
@@ -112,7 +114,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
       // From equation 7-39:
       D[j] = (lambda * fabs (-q / Theta)
 	      + soil.tortuosity_factor (j, Theta)
-	      * solute.diffusion_coefficient ())
+	      * diffusion_coefficient)
 	* Theta;
 
       // Check for NaN.
@@ -132,7 +134,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
     // From equation 7-39:
     D[size] = (lambda * fabs (-q / Theta)
 	       + soil.tortuosity_factor (size-1, Theta) 
- 	       * solute.diffusion_coefficient ())
+ 	       * diffusion_coefficient)
       * Theta;
 
   }
@@ -336,7 +338,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	  daisy_assert (M[j] >= 0.0);
 
 	  // We calculate new C by assumining instant absorption.
-	  C[j] = solute.M_to_C (soil, Theta_new[j], j, M[j]);
+	  C[j] = adsorption.M_to_C (soil, Theta_new[j], j, M[j]);
 	}
     }
 

@@ -67,7 +67,7 @@ public:
   void tick (unsigned int size, const double* turnover_factor, 
 	     const double* N_soil, double* N_used,
 	     double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
-	     const vector<DOM*>& dom);
+	     const vector<DOM*>& dom); // Used by SMB and SOM, but not AOM.
 protected:
   void tock (unsigned int size, const double* rate,
 	     double factor, double efficiency, 

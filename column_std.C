@@ -273,7 +273,7 @@ ColumnStandard::mix (Treelog& out, const Time& time,
   ColumnBase::mix (out, time, from, to, penetration);
   soil_NO3.mix (soil, soil_water, from, to);
   soil_NH4.mix (soil, soil_water, from, to);
-  organic_matter.mix (soil, from, to, penetration, time);
+  organic_matter.mix (soil, soil_water, from, to, penetration, time);
 }
 
 void 
@@ -283,7 +283,7 @@ ColumnStandard::swap (Treelog& out,
   ColumnBase::swap (out, time, from, middle, to);
   soil_NO3.swap (soil, soil_water, from, middle, to);
   soil_NH4.swap (soil, soil_water, from, middle, to);
-  organic_matter.swap (soil, from, middle, to, time);
+  organic_matter.swap (soil, soil_water, from, middle, to, time);
 }
 
 double				// [kg N/ha]
@@ -490,7 +490,8 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
   ColumnBase::initialize (time, err, global_weather);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water, err);
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water, err);
-  organic_matter.initialize (alist.alist ("OrganicMatter"), soil, err);
+  organic_matter.initialize (alist.alist ("OrganicMatter"), soil, soil_water, 
+			     err);
   vegetation.initialize (err, soil, organic_matter);
 }
 

@@ -23,7 +23,7 @@
 #include "transport.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "solute.h"
+#include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
 #include "tmpstream.h"
@@ -32,7 +32,8 @@ class TransportNone : public Transport
 {
   // Simulation.
 public:
-  void tick (Treelog&, const Soil&, const SoilWater&, const Solute&,
+  void tick (Treelog&, const Soil&, const SoilWater&, const Adsorption&,
+	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
@@ -50,7 +51,8 @@ public:
 void 
 TransportNone::tick (Treelog& msg,
 		     const Soil& soil, const SoilWater& soil_water,
-		     const Solute& solute, 
+		     const Adsorption& adsorption, 
+		     const double,
 		     vector<double>& M, 
 		     vector<double>& C,
 		     const vector<double>& S,
@@ -66,7 +68,7 @@ TransportNone::tick (Treelog& msg,
       else
 	J[i] = 0.0;
 
-      C[i] = solute.M_to_C (soil, soil_water.Theta (i), i, M[i]);
+      C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
       if (!(M[i] >= 0.0))
 	{
 	  if (!nest)

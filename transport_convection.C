@@ -23,7 +23,7 @@
 #include "transport.h"
 #include "soil.h"
 #include "soil_water.h"
-#include "solute.h"
+#include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
 
@@ -40,7 +40,8 @@ private:
   
   // Simulation.
 public:
-  void tick (Treelog&, const Soil&, const SoilWater&, const Solute&,
+  void tick (Treelog&, const Soil&, const SoilWater&, const Adsorption&,
+	     double diffusion_coefficient,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
@@ -65,7 +66,7 @@ TransportConvection::output (Log& log) const
 void 
 TransportConvection::tick (Treelog&, 
 			   const Soil& soil, const SoilWater& soil_water,
-			   const Solute& solute, 
+			   const Adsorption& adsorption, double,
 			   vector<double>& M, 
 			   vector<double>& C,
 			   const vector<double>& S,
@@ -149,7 +150,7 @@ TransportConvection::tick (Treelog&,
 	{
 	  J[i] += dJ[i] * ddt;
 	  M[i] += (-dJ[i] + dJ[i+1]) * ddt / soil.dz (i) + S[i] * ddt;
-	  C[i] = solute.M_to_C (soil, soil_water.Theta (i), i, M[i]);
+	  C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 	}
     }
   daisy_assert (approximate (J_in, J[0]));

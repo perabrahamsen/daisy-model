@@ -126,7 +126,9 @@ Solute::tick (const Soil& soil,
     {
       for (unsigned i = 0; i < soil.size (); i++)
 	daisy_assert (M_left (i) >= 0.0);
-      transport.tick (msg, soil, soil_water, *this, M_, C_, S, J);
+      transport.tick (msg, soil, soil_water, adsorption, 
+		      diffusion_coefficient (), 
+		      M_, C_, S, J);
     }
   catch (const char* error)
     {
@@ -136,7 +138,8 @@ Solute::tick (const Soil& soil,
 	{
 	  for (unsigned i = 0; i < soil.size (); i++)
 	    daisy_assert (M_left (i) >= 0.0);
-	  reserve.tick (msg, soil, soil_water, *this, M_, C_, S, J);
+	  reserve.tick (msg, soil, soil_water, adsorption, 
+			diffusion_coefficient (), M_, C_, S, J);
 	}
       catch (const char* error)
 	{
@@ -144,7 +147,8 @@ Solute::tick (const Soil& soil,
 			+ ", trying last resort.");
 	  for (unsigned i = 0; i < soil.size (); i++)
 	    daisy_assert (M_left (i) >= 0.0);
-	  last_resort.tick (msg, soil, soil_water, *this, M_, C_, S, J);
+	  last_resort.tick (msg, soil, soil_water, adsorption, 
+			    diffusion_coefficient (), M_, C_, S, J);
 	}
     }
   const double new_content = soil.total (M_);

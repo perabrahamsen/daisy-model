@@ -137,9 +137,11 @@ static struct Hydraulic_mod_CSyntax
 Hydraulic_mod_CSyntax::Hydraulic_mod_CSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
+  syntax.add_check (Hydraulic::zero_Theta_res);
   AttributeList& alist = *new AttributeList ();
   alist.add ("description", "\
-Modified Campbell retention curve model with Burdine theory.");
+Modified Campbell retention curve model with Burdine theory.\n\
+Note:  Theta_res must be zero for this model.");
   Hydraulic::load_syntax (syntax, alist);
   syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 	      "Bubbling pressure.");

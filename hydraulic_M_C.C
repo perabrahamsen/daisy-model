@@ -118,9 +118,11 @@ static struct HydraulicM_CSyntax
   HydraulicM_CSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
+    syntax.add_check (Hydraulic::zero_Theta_res);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
-	       "Campbell retention curve model with Mualem theory.");
+	       "Campbell retention curve model with Mualem theory.\n\
+Note:  Theta_res must be zero for this model.");
     Hydraulic::load_syntax (syntax, alist);
     syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 		"Bubbling pressure.");

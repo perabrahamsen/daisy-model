@@ -209,15 +209,6 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	      N_soil, N_used, CO2, *som[j]);
     }
   // Distribute to all dissolved pools.
-#ifdef FIXED_DOM_C_per_N
-  for (unsigned int j = 0; j < dom_size; j++)
-    {
-      const double fraction = fractions[smb_size + som_size + j];
-      if (fraction > 1e-50)
-	tock (size, abiotic_factor, turnover_rate * fraction, 1.0,
-	      N_soil, N_used, CO2, *dom[j]);
-    }
-#else // Variable DOM C/N
   for (unsigned int j = 0; j < dom_size; j++)
     {
       const double factor = turnover_rate * fractions[smb_size + som_size + j];
@@ -228,17 +219,14 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	      const double rate = min (factor * abiotic_factor[i], 0.1);
 	      const double C_use = C[i] * rate;
 	      const double N_use = N[i] * rate;
-	      dom[j]->N[i] += N_use;
-	      dom[j]->C[i] += C_use;
+	      dom[j]->add_to_source (i, C_use, N_use);
 	      C[i] -= C_use;
 	      N[i] -= N_use;
 	      daisy_assert (C[i] >= 0.0);
-	      daisy_assert (dom[j]->C[i] >= 0.0);
-	      daisy_assert (dom[j]->N[i] >= 0.0);
+	      daisy_assert (N[i] >= 0.0);
 	    }
 	}
     }
-#endif // Variable DOM C/N
   for (unsigned int i = 0; i < size; i++)
     {
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
