@@ -12,6 +12,18 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.71
+
+No user visible changes.
+
+* 1.70
+
+Fixed bug in PMSW checkpointing.
+
+* 1.69 
+
+Fixed bug in Penman-Monteith.
+
 * 1.68
 
 NH4 Volatilization is now in the Fertilizer log.

@@ -66,9 +66,14 @@
 #elif defined (VISUALCPP)
 
 #pragma warning (disable: 4786 4503)
+#pragma warning (3: 4019 4032 4057 4061 4125 4130 4152 4189 4201 4706)
+
 #define CONST_DELETE
 #define HAS_TEMPLATE_MEMBERS
 #define GLOBAL_CONSTANT
+
+// Work around broken for-scoping
+#define for if(0);else for
 
 #else /* BORLAND */
 

@@ -1,3 +1,15 @@
+2001-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.70 released.
+
+2001-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* svat_pmsw.C (SVAT_PMSWSyntax): Fixed log variable names.
+
+2001-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.h: Nogle Visual C++ 6.0 hacks.
+
 2001-01-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.69 released.

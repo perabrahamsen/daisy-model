@@ -1882,9 +1882,9 @@ static struct SVAT_PMSWSyntax
                 "canopy temperature at mean source");
     syntax.add ("tleaf", "dg C", Syntax::LogOnly,
                 "Leaf temperature");
-    syntax.add ("e_c", "Pa", Syntax::LogOnly,
+    syntax.add ("e_c_abs", "Pa", Syntax::LogOnly,
                 "vapor pressure at mean source height");
-    syntax.add ("e_sl", "Pa", Syntax::LogOnly,
+    syntax.add ("e_sl_abs", "Pa", Syntax::LogOnly,
                 "saturated vapor pressure at leaf surface");
     syntax.add ("ha", "W/m**2", Syntax::LogOnly,
                 "Sensible heat flux from source- to screen height");
