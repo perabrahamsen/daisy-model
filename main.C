@@ -1,7 +1,7 @@
 // main.C
 
 #include "daisy.h"
-#include "input.h"
+#include "parser_file.h"
 #include "syntax.h"
 #include "alist.h"
 #include <iostream.h>
@@ -9,37 +9,19 @@
 int 
 main (int argc, char* argv[])
 {
-#ifdef HANDLE_EXCEPTIONS
-  try 
+  if (argc != 2)
     {
-#endif HANDLE_EXCEPTIONS
-      Syntax syntax;
-      Daisy::load_syntax (syntax);
-      const AttributeList& alist = parse (syntax, argc, argv);
-      if (syntax.check (alist, "daisy"))
-	{
-	  Daisy daisy (alist);
-	  daisy.run ();
-	}
-      delete &alist;
-#ifdef HANDLE_EXCEPTIONS
-    }
-  catch (const Usage& usage)
-    {
-      cerr << usage.what () << "\n";
+      cerr << "Usage: " << argv[0] << " file\n";
       return 2;
     }
-  catch (const exception& except)
-    {
-      cerr << except.what () << "\n";
-      return 1;
-    }
-  catch (...)
-    { 
-      cerr << "Unexpected exception." << "\n";
-      cerr.flush ();
-      abort ();
-    }
-#endif HANDLE_EXCEPTIONS
+  Syntax syntax;
+  Daisy::load_syntax (syntax);
+  ParserFile parser (syntax, argv[1]);
+  AttributeList alist;
+  parser.load (alist);
+  if (!syntax.check (alist, "daisy"))
+    return 1;
+  Daisy daisy (alist);
+  daisy.run ();
   return 0;
 }

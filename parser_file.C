@@ -1,26 +1,18 @@
-// input.C
+// parser_file.C
 
-#include "input.h"
-#include "alist.h"
-#include "log.h"
-#include "csmp.h"
-#include "library.h"
+#include "parser_file.h"
 #include "syntax.h"
-#include "filter.h"
-#include "crop.h"
+#include "alist.h"
+#include "library.h"
+#include "csmp.h"
 #include "time.h"
+#include "log.h"
+#include "filter.h"
 #include <fstream.h>
 #include <strstream.h>
 
-const char*
-Usage::what () const
+struct ParserFile::Implementation
 {
-  return "Usage: daisy file";
-}
-
-struct Parser
-{
-  void load (AttributeList&);
   int get ();
   int peek ();
   bool good ();
@@ -48,12 +40,12 @@ struct Parser
   int line;
   int column;
   const Syntax& global_syntax_table;
-  Parser (string name, const Syntax& syntax);
-  ~Parser ();
+  Implementation (const Syntax&, string);
+  ~Implementation ();
 };
 
 int
-Parser::get ()
+ParserFile::Implementation::get ()
 {
   int c = in.get ();
 
@@ -73,19 +65,19 @@ Parser::get ()
 }
 
 int
-Parser::peek ()
+ParserFile::Implementation::peek ()
 {
   return in.peek ();
 }
 
 bool
-Parser::good ()
+ParserFile::Implementation::good ()
 {
   return in.good ();
 }
 
 string
-Parser::get_string ()
+ParserFile::Implementation::get_string ()
 {
   string str ("");
   skip ("\"");
@@ -112,7 +104,7 @@ Parser::get_string ()
 }
 
 string
-Parser::get_id ()
+ParserFile::Implementation::get_id ()
 {
   skip ();
   int c = peek ();
@@ -137,7 +129,7 @@ Parser::get_id ()
 }
 
 double
-Parser::get_number ()
+ParserFile::Implementation::get_number ()
 {
   skip ();
   // Cheat... This doesn't give us the right error handling.
@@ -147,7 +139,7 @@ Parser::get_number ()
 }
 
 int
-Parser::get_integer ()
+ParserFile::Implementation::get_integer ()
 {
   skip ();
   // Cheat... This doesn't give us the right error handling.
@@ -157,13 +149,13 @@ Parser::get_integer ()
 }
 
 void 
-Parser::error (string str)
+ParserFile::Implementation::error (string str)
 {
   cerr << file << ":" << line << ":" << column + 1 << ": " << str << "\n";
 }
 
 void
-Parser::skip (const char* str)
+ParserFile::Implementation::skip (const char* str)
 { 
   skip ();
   for (const char* p = str; *p; p++)
@@ -178,7 +170,7 @@ Parser::skip (const char* str)
 }
 
 void
-Parser::skip ()
+ParserFile::Implementation::skip ()
 { 
   while (true)
     if (!good ())
@@ -193,7 +185,7 @@ Parser::skip ()
 }
 
 void
-Parser::skip_token ()
+ParserFile::Implementation::skip_token ()
 {
   if (peek () == ';' || isspace (peek ()))
     skip ();
@@ -214,21 +206,21 @@ Parser::skip_token ()
 }
 
 void
-Parser::skip_to_end ()
+ParserFile::Implementation::skip_to_end ()
 {
   while (peek () != ')' && good ())
     skip_token ();
 }
 
 bool
-Parser::looking_at (char c)
+ParserFile::Implementation::looking_at (char c)
 { 
   skip ();
   return peek () == c;
 }
 
 void
-Parser::eof ()
+ParserFile::Implementation::eof ()
 { 
   skip ();
   if (!in.eof ())
@@ -236,7 +228,7 @@ Parser::eof ()
 }
     
 void
-Parser::load_library (Library& lib)
+ParserFile::Implementation::load_library (Library& lib)
 { 
   string name = get_id ();
   string super = get_id ();
@@ -253,7 +245,7 @@ Parser::load_library (Library& lib)
 }
 
 void
-Parser::add_derived (const Library& lib, derive_fun derive)
+ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
 {
 
   const string name = get_id ();
@@ -271,7 +263,7 @@ Parser::add_derived (const Library& lib, derive_fun derive)
 }
 
 AttributeList&
-Parser::load_derived (const Library& lib, bool in_sequence)
+ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
 {
   AttributeList* alist = NULL;
   bool skipped = false;
@@ -300,7 +292,7 @@ Parser::load_derived (const Library& lib, bool in_sequence)
 }
 
 void
-Parser::load_list (AttributeList& atts, const Syntax& syntax)
+ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax)
 { 
   list<string>::const_iterator current = syntax.order ().begin ();
   const list<string>::const_iterator end = syntax.order ().end ();
@@ -338,7 +330,7 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	    }
 	  case Syntax::CSMP:
 	    {
-	      CSMP* csmp = new CSMP ();
+	      CSMP& csmp = *new CSMP ();
 	      double last_x = -42;
 	      int count = 0;
 	      while (!looking_at (')') && good ())
@@ -353,7 +345,7 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 		  }
 		  double y = get_number ();
 		  skip (")");
-		  csmp->add (x, y);
+		  csmp.add (x, y);
 		}
 	      if (count < 2)
 		error ("Need at least 2 points");
@@ -421,16 +413,30 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	      // We don't support fixed sized object arrays yet.
 	      assert (syntax.size (name) == Syntax::Sequence);
 	      const Library& lib = syntax.library (name);
-	      vector<const AttributeList*>& sequence
-		= *new vector<const AttributeList*> ();
-	      while (!looking_at (')') && good ())
+	      if (&lib == &Parser::library ())
 		{
-		  const AttributeList& al = load_derived (lib, true);
-		  const string obj = al.name ("type");
-		  lib.syntax (obj).check (al, obj);
-		  sequence.push_back (&al);
+		  while (!looking_at (')') && good ())
+		    {
+		      const AttributeList& al = load_derived (lib, true);
+		      Parser& parser 
+			= Parser::create (global_syntax_table, al);
+		      parser.load (atts);
+		      delete &parser;
+		    }
 		}
-	      atts.add (name, sequence);
+	      else
+		{
+		  vector<const AttributeList*>& sequence
+		    = *new vector<const AttributeList*> ();
+		  while (!looking_at (')') && good ())
+		    {
+		      const AttributeList& al = load_derived (lib, true);
+		      const string obj = al.name ("type");
+		      lib.syntax (obj).check (al, obj);
+		      sequence.push_back (&al);
+		    }
+		  atts.add (name, sequence);
+		}
 	      break;
 	    }
 	  case Syntax::List:
@@ -512,7 +518,7 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 }
 
 Time
-Parser::get_time ()
+ParserFile::Implementation::get_time ()
 {
   int year = get_integer ();
   int month = get_integer ();
@@ -532,7 +538,7 @@ Parser::get_time ()
 }
 
 const Filter&
-Parser::get_filter (const Syntax& syntax)
+ParserFile::Implementation::get_filter (const Syntax& syntax)
 {
   if (looking_at ('*'))
     {
@@ -590,7 +596,7 @@ Parser::get_filter (const Syntax& syntax)
 }
 
 const Filter&
-Parser::get_filter_object (const Library& library)
+ParserFile::Implementation::get_filter_object (const Library& library)
 {
   if (looking_at ('*'))
     {
@@ -612,7 +618,7 @@ Parser::get_filter_object (const Library& library)
 }
 
 const Filter&
-Parser::get_filter_sequence (const Library& library)
+ParserFile::Implementation::get_filter_sequence (const Library& library)
 {
   FilterSome& filter = *new FilterSome ();
 
@@ -629,7 +635,7 @@ Parser::get_filter_sequence (const Library& library)
   return filter;
 }
 
-Parser::Parser (string name, const Syntax& syntax)
+ParserFile::Implementation::Implementation (const Syntax& syntax, string name)
   : in (name.data ()),
     file (name),
     line (1),
@@ -637,29 +643,47 @@ Parser::Parser (string name, const Syntax& syntax)
     global_syntax_table (syntax)
 {  }
 
-Parser::~Parser ()
+ParserFile::Implementation::~Implementation ()
 {
   if (in.bad ())
     cerr << "There were trouble parsing `" << file << "'\n";
 }
 
 void
-Parser::load (AttributeList& alist)
+ParserFile::load (AttributeList& alist)
 {
-  load_list (alist, global_syntax_table);
-  eof ();
+  impl.load_list (alist, impl.global_syntax_table);
+  impl.eof ();
 }
 
+ParserFile::ParserFile (const Syntax& syntax, string name)
+  : impl (*new Implementation (syntax, name))
+{  }
 
-const AttributeList&
-parse (const Syntax& syntax, int& argc, char**& argv)
+ParserFile::ParserFile (const Syntax& s, const AttributeList& al)
+  : impl (*new Implementation (s, al.name ("where")))
+{  }
+
+ParserFile::~ParserFile ()
+{ }
+
+// Add the ParserFile syntax to the syntax table.
+Parser&
+ParserFile::make (const Syntax& s, const AttributeList& al)
 {
-  if (argc != 2)
-    THROW (Usage ());
-  string file = argv[1];
+  return *new ParserFile (s, al);
+}
 
+static struct ParserFileSyntax
+{
+  ParserFileSyntax ();
+} ParserFile_syntax;
+
+ParserFileSyntax::ParserFileSyntax ()
+{ 
+  Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  Parser parser(file, syntax);
-  parser.load (alist);
-  return alist;
+  syntax.add ("where", Syntax::String, Syntax::Const);
+  syntax.order ("where");
+  Parser::add_type ("file", alist, syntax, &ParserFile::make);
 }

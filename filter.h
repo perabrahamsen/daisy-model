@@ -66,8 +66,7 @@ private:
   // Create and Destroy.
 public:
   ~FilterSome ();
-private:
-  friend class Parser; // Only create from Input.
+  friend class Parser;
   void add (string, const Filter& = *Filter::all);
   FilterSome ();
 };

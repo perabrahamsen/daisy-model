@@ -6,10 +6,10 @@ SRCONLY = column_std.o manager_rule.o weather_simple.o uzrichard.o \
 	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
 	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o \
 	crop_std.o action_sow.o action_stop.o condition_time.o \
-	condition_logic.o log_file.o
-OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
+	condition_logic.o log_file.o 
+OBJECTS = main.o daisy.o parser.o log.o weather.o manager.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
-	filter.o csmp.o time.o uzmodel.o \
+	filter.o csmp.o time.o uzmodel.o parser_file.o \
 	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
 	denitrification.o soil_heat.o groundwater.o snow.o solute.o
@@ -19,8 +19,7 @@ HEAD = $(OBJECTS:.o=.h) common.h
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = rules.C rules.h
-
+REMOVE = input.C input.h
 
 .SUFFIXES:	.C .o .h
 
@@ -87,12 +86,12 @@ cvs: $(TEXT)
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-main.o: main.C daisy.h time.h input.h syntax.h alist.h common.h
-daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
- groundwater.h uzmodel.h common.h horizon.h log.h crop.h column.h \
- action.h filter.h library.h syntax.h condition.h alist.h
-input.o: input.C input.h alist.h common.h log.h csmp.h library.h \
- syntax.h action.h condition.h filter.h crop.h time.h
+main.o: main.C daisy.h time.h parser_file.h parser.h syntax.h alist.h \
+ common.h
+daisy.o: daisy.C daisy.h time.h manager.h weather.h groundwater.h \
+ uzmodel.h common.h horizon.h log.h parser.h crop.h column.h action.h \
+ filter.h library.h syntax.h condition.h alist.h
+parser.o: parser.C parser.h alist.h common.h library.h syntax.h
 log.o: log.C log.h alist.h common.h library.h syntax.h
 weather.o: weather.C weather.h time.h library.h alist.h common.h \
  syntax.h
@@ -112,6 +111,8 @@ filter.o: filter.C filter.h common.h
 csmp.o: csmp.C csmp.h log.h
 time.o: time.C time.h
 uzmodel.o: uzmodel.C uzmodel.h common.h library.h alist.h syntax.h
+parser_file.o: parser_file.C parser_file.h parser.h syntax.h alist.h \
+ common.h library.h csmp.h time.h log.h filter.h
 soil.o: soil.C soil.h horizon.h alist.h common.h syntax.h
 mathlib.o: mathlib.C mathlib.h
 bioclimate.o: bioclimate.C bioclimate.h surface.h uzmodel.h common.h \

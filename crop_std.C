@@ -792,7 +792,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Canopy.add ("LADm", Syntax::Number, Syntax::InOut);
   vCanopy.add ("LADm", -9999.99);
   Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::InOut);
-  vCanopy.add ("LAIvsH", &empty_csmp);
+  vCanopy.add ("LAIvsH", empty_csmp);
 
     // RootSys
   Syntax& RootSys = *new Syntax ();
