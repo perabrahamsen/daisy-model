@@ -66,20 +66,13 @@ Harvesting::operator() (const symbol column_name,
   const double old_DM = production.DM ();
 
   // Import DM from production.
-  const double WStem = production.WStem;
-  const double WLeaf = production.WLeaf;
-  const double WSOrg = production.WSOrg;
-  const double WRoot = production.WRoot;
-  const double WDead = production.WDead;
-  const double total_old_W = WStem + WLeaf + WSOrg + WDead  + WRoot;
+  const double total_old_W = production.WStem + production.WLeaf
+    + production.WSOrg + production.WDead  + production.WRoot;
   
-  const double NStem = production.NStem;
-  const double NLeaf = production.NLeaf;
-  const double NSOrg = production.NSOrg;
-  const double NRoot = production.NRoot;
-  const double NDead = production.NDead;
-  const double total_old_N = NStem + NLeaf + NSOrg + NDead  + NRoot;
-  daisy_assert (approximate (total_old_N, production.NCrop + NDead));
+  const double total_old_N = production.NStem + production.NLeaf
+    + production.NSOrg + production.NDead  + production.NRoot;
+  daisy_assert (approximate (total_old_N,
+                             production.NCrop + production.NDead));
 
   // Find C concentrations.
   const double C_C_Stem = DM_to_C_factor (production.E_Stem);
@@ -101,18 +94,26 @@ Harvesting::operator() (const symbol column_name,
   const double sorg_harvest = 1.0;
 
   // Harvested yield and losses left in the field at harvest
-  const double Stem_W_Yield = stem_harvest_frac * stem_harvest * WStem;
-  const double Dead_W_Yield = stem_harvest_frac * dead_harvest * WDead;
-  const double Leaf_W_Yield = leaf_harvest_frac * leaf_harvest * WLeaf;
-  const double SOrg_W_Yield = sorg_harvest_frac * sorg_harvest * WSOrg;
+  const double Stem_W_Yield
+    = stem_harvest_frac * stem_harvest * production.WStem;
+  const double Dead_W_Yield
+    = stem_harvest_frac * dead_harvest * production.WDead;
+  const double Leaf_W_Yield
+    = leaf_harvest_frac * leaf_harvest * production.WLeaf;
+  const double SOrg_W_Yield
+    = sorg_harvest_frac * sorg_harvest * production.WSOrg;
   const double Stem_C_Yield = C_C_Stem * Stem_W_Yield;
   const double Dead_C_Yield = C_C_Dead * Dead_W_Yield;
   const double Leaf_C_Yield = C_C_Leaf * Leaf_W_Yield;
   const double SOrg_C_Yield = C_C_SOrg * SOrg_W_Yield;
-  const double Stem_N_Yield = stem_harvest_frac * stem_harvest * NStem;
-  const double Dead_N_Yield = stem_harvest_frac * dead_harvest * NDead;
-  const double Leaf_N_Yield = leaf_harvest_frac * leaf_harvest * NLeaf;
-  const double SOrg_N_Yield = sorg_harvest_frac * sorg_harvest * NSOrg;
+  const double Stem_N_Yield
+    = stem_harvest_frac * stem_harvest * production.NStem;
+  const double Dead_N_Yield
+    = stem_harvest_frac * dead_harvest * production.NDead;
+  const double Leaf_N_Yield
+    = leaf_harvest_frac * leaf_harvest * production.NLeaf;
+  const double SOrg_N_Yield
+    = sorg_harvest_frac * sorg_harvest * production.NSOrg;
 
   // Part of economic yield removed at harvest.
   const double WEYRm
@@ -131,10 +132,14 @@ Harvesting::operator() (const symbol column_name,
     = Stem_N_Yield + Dead_N_Yield + Leaf_N_Yield + NEYRm;
 
   // Find losses.
-  double Stem_W_Loss = (1.0 - stem_harvest_frac) * stem_harvest * WStem;
-  double Dead_W_Loss = (1.0 - stem_harvest_frac) * dead_harvest * WDead;
-  double Leaf_W_Loss = (1.0 - leaf_harvest_frac) * leaf_harvest * WLeaf;
-  double SOrg_W_Loss = (1.0 - sorg_harvest_frac) * sorg_harvest * WSOrg
+  double Stem_W_Loss
+    = (1.0 - stem_harvest_frac) * stem_harvest * production.WStem;
+  double Dead_W_Loss
+    = (1.0 - stem_harvest_frac) * dead_harvest * production.WDead;
+  double Leaf_W_Loss
+    = (1.0 - leaf_harvest_frac) * leaf_harvest * production.WLeaf;
+  double SOrg_W_Loss
+    = (1.0 - sorg_harvest_frac) * sorg_harvest * production.WSOrg
     + (1.0 - EconomicYield_W) * SOrg_W_Yield;
   double Root_W_Loss = 0.0;;
   double Crop_W_Loss 
@@ -146,10 +151,14 @@ Harvesting::operator() (const symbol column_name,
   double Root_C_Loss = 0.0;
   double Crop_C_Loss 
     = Stem_C_Loss + Dead_C_Loss + Leaf_C_Loss + SOrg_C_Loss + Root_C_Loss;
-  double Stem_N_Loss = (1.0 - stem_harvest_frac) * stem_harvest * NStem;
-  double Dead_N_Loss = (1.0 - stem_harvest_frac) * dead_harvest * NDead;
-  double Leaf_N_Loss = (1.0 - leaf_harvest_frac) * leaf_harvest * NLeaf;
-  double SOrg_N_Loss = (1.0 - sorg_harvest_frac) * sorg_harvest * NSOrg 
+  double Stem_N_Loss
+    = (1.0 - stem_harvest_frac) * stem_harvest * production.NStem;
+  double Dead_N_Loss
+    = (1.0 - stem_harvest_frac) * dead_harvest * production.NDead;
+  double Leaf_N_Loss
+    = (1.0 - leaf_harvest_frac) * leaf_harvest * production.NLeaf;
+  double SOrg_N_Loss
+    = (1.0 - sorg_harvest_frac) * sorg_harvest * production.NSOrg 
     + (1.0 - EconomicYield_N) * SOrg_N_Yield;
   double Root_N_Loss = 0.0;
   double Crop_N_Loss 
@@ -311,17 +320,7 @@ Harvesting::operator() (const symbol column_name,
 
 
       // Add crop to residuals.
-#if 0
-      TmpStream tmp;
-      tmp () << "CH2OPool = " << production.CH2OPool << "g CH2O/m^2";
-      Assertion::message (tmp.str ());
-
       double extra_C = production.CH2OPool * (12./30.);
-#else
-      // The CH2O pool is missing.
-      double extra_C = 0.0;
-#endif
-
       double extra_N = 0.0;
       if (production.WStem < 0.1)
 	{
@@ -369,25 +368,21 @@ Harvesting::operator() (const symbol column_name,
       SOrg_C_Loss += production.WSOrg * C_C_SOrg;
       SOrg_N_Loss += production.NSOrg;
 
-      daisy_assert (WRoot == 0.0 || NRoot > 0.0);
-      const double Root_C = (WRoot * C_C_Root + extra_C) * m2_per_cm2;
-      const double Root_N = (NRoot + extra_N) * m2_per_cm2;
+      daisy_assert (production.WRoot == 0.0 || production.NRoot > 0.0);
+      const double Root_C
+        = (production.WRoot * C_C_Root + extra_C) * m2_per_cm2;
+      const double Root_N = (production.NRoot + extra_N) * m2_per_cm2;
       if (accumulate (density.begin (), density.end (), 0.0) > 0.0)
 	{
 	  production.AM_root->add (geometry, Root_C, Root_N, density);
 	  geometry.add (residuals_N_soil, density, Root_N);
 	  geometry.add (residuals_C_soil, density, Root_C);
-#if 0
-          TmpStream tmp;
-          tmp () << "Adding " << extra_C << " g C/cm^2 dead roots to soil";
-          Assertion::message (tmp.str ());
-#endif
 	}
       else
 	{
 	  production.AM_root->add (Root_C, Root_N);
-	  residuals_N_top += NRoot + extra_N;
-	  residuals_C_top += WRoot * C_C_Root + extra_C;
+	  residuals_N_top += production.NRoot + extra_N;
+	  residuals_C_top += production.WRoot * C_C_Root + extra_C;
 	}
       Root_W_Loss = production.WRoot;
       Root_C_Loss = production.WRoot * C_C_Root;
@@ -400,6 +395,8 @@ Harvesting::operator() (const symbol column_name,
 	+ Root_N_Loss;
       production.WStem = production.WDead =  production.WLeaf 
 	= production.WSOrg = production.WRoot = 0.0;
+      production.CStem = production.CDead =  production.CLeaf 
+	= production.CSOrg = production.CRoot = 0.0;
       production.NStem = production.NDead =  production.NLeaf 
 	= production.NSOrg = production.NRoot = 0.0;
       production.NCrop = 0.0;

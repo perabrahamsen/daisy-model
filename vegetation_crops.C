@@ -512,6 +512,10 @@ VegetationCrops::harvest (const symbol column_name,
        crop++)
     if (all || (*crop)->name == crop_name)
       {
+        const double old_crop_C = (*crop)->total_C ();
+        const double old_residulas_C_top = residuals_C_top;
+        const double old_residuals_C_soil
+          = geometry.total (residuals_C_soil) * 10000;
         const double sorg_height = (*crop)->sorg_height ();
         const bool root_fruit = (sorg_height < 0.0);
         min_height = min (min_height, sorg_height);
@@ -524,12 +528,32 @@ VegetationCrops::harvest (const symbol column_name,
 			    root_fruit, residuals, 
 			    residuals_DM, residuals_N_top, residuals_C_top,
 			    residuals_N_soil, residuals_C_soil, msg);
-
 	harvest_DM += mine.total_DM ();
 	harvest_N += mine.total_N ();
 	harvest_C += mine.total_C ();
 
 	harvest.push_back (&mine);
+
+        const double new_crop_C = Crop::ds_remove (*crop) 
+          ? 0.0 
+          : (*crop)->total_C ();
+        const double balance = (new_crop_C - old_crop_C)
+          + ((residuals_C_top + geometry.total (residuals_C_soil) * 10000)
+             - (old_residulas_C_top + old_residuals_C_soil)) * 10
+          + mine.total_C () * 10;
+        if (fabs (balance) > 0.001 /* 1 [g/ha] */)
+          {
+            TmpStream tmp;
+            tmp () << "delta Crop = " << new_crop_C - old_crop_C;
+            tmp () << "\ntop residulas = "
+                   << (residuals_C_top - old_residulas_C_top) * 10
+                   << "\nsoil residulas = "
+                   << (geometry.total (residuals_C_soil) * 10000
+                       - old_residuals_C_soil) * 10
+                   << "\nharvest = " << mine.total_C () * 10
+                   << "\nbalance = " << balance;
+            msg.error (tmp.str ());
+          }
       }
 
   // Remove all dead crops.  There has to be a better way.

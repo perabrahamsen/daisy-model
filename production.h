@@ -62,9 +62,6 @@ private:
   const double r_Stem;		// Maint. resp. coeff., stem
   const double r_SOrg;		// Maint. resp. coeff., stor. org.
   const double ExfoliationFac;	// Exfoliation factor, 0-1
-public:
-  const double GrowthRateRedFac; // Growth rate reduction factor, 0-1
-private:
   const PLF& LfDR;		// Death rate of Leafs
   const PLF& RtDR;		// Death rate of Roots
   const double Large_RtDR;	// Extra death rate for large root/shoot.

@@ -339,8 +339,7 @@ CropStandard::tick (const Time& time,
 	Ass *= (1.0 - nitrogen_stress);
       Ass *= (1.0 - harvesting.cut_stress);
       production.CanopyAss = Ass;
-      const double ProdLim = (1.0 - production.GrowthRateRedFac);
-      production.CH2OPool += ProdLim * Ass;
+      production.CH2OPool += Ass;
     }
   else
       production.CanopyAss = 0.0;

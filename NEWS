@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.42
+
+** Bug fixes.
+
+** New carbon summaries: "Crop Carbon Balance" and "Total Carbon Balance".
+
 * 3.41
 
 ** New "Vinterraps" parameterization by Christian Thirup.
