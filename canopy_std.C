@@ -259,41 +259,49 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 
   // Parameters.
   syntax.add ("DSLAI05", Syntax::None (), Syntax::Const,
-	      "DS at CAI=0.5; forced development.");
+	      "DS at CAI=0.5; initial phase.");
   alist.add ("DSLAI05", 0.15);
   syntax.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      " Specific leaf weight.");
   syntax.add ("LeafAIMod", "DS", Syntax::None (), Syntax::Const,
-	      "Specific leaf weight modifier, to be used af initial CAI.");
+	      "Specific leaf weight modifier.\n\
+Used only after the intital phase.");
   PLF AIDef;
   AIDef.add (0.00, 1.00);
   AIDef.add (2.00, 1.00);
   alist.add ("LeafAIMod", AIDef);
+  syntax.add ("SpLAIfac", "DS",Syntax::None (), Syntax::Const, "\
+Factor defining maximum specific leaf weight.\n\
+Only used during the initial phase.");
   PLF SpLf;
   SpLf.add (0.00, 3.00);
   SpLf.add (0.20, 1.50);
   SpLf.add (0.40, 1.25);
   SpLf.add (0.60, 1.00);
-  syntax.add ("SpLAIfac", "DS",Syntax::None (), Syntax::Const, "\
-Factor defining maximum Specific leaf weight during initial CAI.");
   alist.add ("SpLAIfac", SpLf);
   syntax.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
-	      "Specific storage organ weight.");
+	      "Specific storage organ weight.\n\
+Used only after the intital phase.");
   alist.add ("SpSOrgAI", 0.0);
   syntax.add ("SOrgAIMod", "DS", Syntax::None (), Syntax::Const,
-	      "Specific storage organ weight modifier");
+	      "Specific storage organ weight modifier.\n\
+Used only after the intital phase.");
   alist.add ("SOrgAIMod", AIDef);
   syntax.add ("SOrgPhotEff", Syntax::None (), Syntax::Const,
-	      "Relative photosynthetic efficiency of storage organ.");
+	      "Relative photosynthetic efficiency of storage organ.\n\
+Used only after the intital phase.");
   alist.add ("SOrgPhotEff", 1.0);
   syntax.add ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
-	      "Specific stem weight.");
+	      "Specific stem weight.\n\
+Used only after the intital phase.");
   alist.add ("SpStemAI", 0.0);
   syntax.add ("StemAIMod", "DS", Syntax::None (), Syntax::Const,
-	      "Specific stem weight modifier.");
+	      "Specific stem weight modifier.\n\
+Used only after the intital phase.");
   alist.add ("StemAIMod", AIDef);
   syntax.add ("StemPhotEff", Syntax::None (), Syntax::Const,
-	      "Relative photosynthetic efficiency of stem.");
+	      "Relative photosynthetic efficiency of stem.\n\
+Used only after the intital phase.");
   alist.add ("StemPhotEff", 1.0);
   syntax.add ("HvsDS", Syntax::None (), "cm", Syntax::Const,
 	      "Crop height as function of DS.");
@@ -315,7 +323,7 @@ If the relative PAR get below this, the bottom leaves will start dying.");
 
   // Variables.
   syntax.add ("InitCAI", Syntax::Boolean, Syntax::State,
-	      "Initial CAI development.");
+	      "Initial CAI development phase.");
   alist.add ("InitCAI", true);
   syntax.add ("Offset", "cm", Syntax::State, "Extra height after harvest.");
   alist.add ("Offset", 0.0);
