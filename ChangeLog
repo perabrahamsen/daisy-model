@@ -1,3 +1,26 @@
+1999-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.90 released.
+
+1999-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (initialize): Added warning for
+	large soil intervals.
+
+	* Merged SH changes.
+
+1999-08-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_chemical.h, soil_chemical.C (lag, lag_increment): New
+	members. 
+	* soil_chemical.C (decompose): Use them.
+
+	* chemical_std.C, chemical.h (decompose_conc_factor): New
+	member function. 
+	* soil_chemical.C (decompose): Call it.
+
+	* Merged SH changes.
+
 1999-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* uzrichard.C (richard): Fix memory error.

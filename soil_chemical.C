@@ -37,6 +37,27 @@ SoilChemical::decompose (const Soil& soil,
   if (!chemical.active_groundwater ())
     size = soil_water.first_groundwater_node ();
 
+  // Update lag time.
+  bool found = false;
+  for (unsigned int i = 0; i < size; i++)
+    {
+      lag[i] += lag_increment (C_[i]);
+      
+      if (lag[i] >= 1.0)
+	{
+	  lag[i] = 1.0;
+	  found = true;
+	}
+      else if (lag[i] < 0.0)
+	{
+	  lag[i] = 0.0;
+	}
+    }
+
+  // No decomposition.
+  if (!found)
+    size = 0;
+
   for (unsigned int i = 0; i < size; i++)
     {
       const double heat_factor 
@@ -45,8 +66,11 @@ SoilChemical::decompose (const Soil& soil,
 	= chemical.decompose_water_factor (soil_water.h (i));
       const double CO2_factor 
 	= chemical.decompose_CO2_factor (organic_matter.CO2 (i));
+      const double conc_factor
+	= chemical.decompose_conc_factor (C_[i]);
       const double rate
-	= decompose_rate * heat_factor * water_factor * CO2_factor;
+	= decompose_rate * heat_factor * water_factor * CO2_factor
+	* conc_factor;
       decomposed[i] = M_left (i) * rate;
     }
   for (unsigned int i = size; i < soil.size (); i++)
@@ -80,6 +104,18 @@ SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
   // Use "none" adsorption by default.
   AttributeList& none = *new AttributeList ();
   none.add ("type", "none");
+
+  syntax.add ("lag_increment", Syntax::CSMP, Syntax::Const,
+	      "Increment lag with the value of this CSMP for the current\n\
+concentration each timestep.  When lag in any node reaches 1.0,\n\
+decomposition begins.  It can never be more than 1.0 or less than 0.0.");
+  CSMP no_lag;
+  no_lag.add (0.0, 1.0);
+  no_lag.add (1.0, 1.0);
+  alist.add ("lag_increment", no_lag);
+  syntax.add ("lag", Syntax::None (), Syntax::OptionalState,
+	      "This state variable grows with lag_increment (C) each time step.
+When it reached 1.0, decomposition begins.");
   alist.add ("adsorption", none);
 }
 
@@ -90,12 +126,17 @@ SoilChemical::initialize (const AttributeList& al,
   Solute::initialize (al, soil, soil_water);
   uptaken.insert (uptaken.begin (), soil.size (), 0.0);
   decomposed.insert (decomposed.begin (), soil.size (), 0.0);
+  lag.insert (lag.end (), soil.size () - lag.size (), 0.0);
 }
 
 SoilChemical::SoilChemical (const Chemical& chem, const AttributeList& al)
   : Solute (al),
-    chemical (chem)
-{ }
+    chemical (chem),
+    lag_increment (al.csmp ("lag_increment"))
+{ 
+  if (al.check ("lag"))
+    lag = al.number_sequence ("lag");
+}
 
 SoilChemical::SoilChemical (const Chemical& chem)
   : Solute (chem.solute_alist ()),

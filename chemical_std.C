@@ -49,6 +49,7 @@ private:
   CSMP decompose_heat_factor_;
   CSMP decompose_water_factor_;
   CSMP decompose_CO2_factor_;
+  CSMP decompose_conc_factor_;
   bool active_groundwater_;
 
   // Queries.
@@ -81,6 +82,8 @@ public:
     }
   double decompose_CO2_factor (double CO2) const
     { return decompose_CO2_factor_ (CO2); }
+  double decompose_conc_factor (double conc) const
+    { return decompose_conc_factor_ (conc); }
   bool active_groundwater () const 
     { return active_groundwater_; }
 
@@ -103,6 +106,7 @@ canopy_dissipation_rate_coefficient")),
     decompose_heat_factor_ (al.csmp ("decompose_heat_factor")),
     decompose_water_factor_ (al.csmp ("decompose_water_factor")),
     decompose_CO2_factor_ (al.csmp ("decompose_CO2_factor")),
+    decompose_conc_factor_ (al.csmp ("decompose_conc_factor")),
     active_groundwater_ (al.flag ("active_groundwater"))
 { }
 
@@ -144,10 +148,14 @@ Read chemical properties as normal Daisy parameters.");
       alist.add ("decompose_water_factor", empty);
       syntax.add ("decompose_CO2_factor", Syntax::CSMP, Syntax::Const,
 		  "CO2 development factor on decomposition [g C/cm^3 ->].");
-      CSMP CO2_factor;
-      CO2_factor.add (0.0, 1.0);
-      CO2_factor.add (1.0, 1.0);
-      alist.add ("decompose_CO2_factor", CO2_factor);
+      CSMP no_factor;
+      no_factor.add (0.0, 1.0);
+      no_factor.add (1.0, 1.0);
+      alist.add ("decompose_CO2_factor", no_factor);
+      syntax.add ("decompose_conc_factor", Syntax::CSMP, Syntax::Const,
+		  "\
+Concentration development factor on decomposition [g X/cm^3 H2O ->].");
+      alist.add ("decompose_conc_factor", no_factor);
       syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
 Clear this flag to turn off decomposition in groundwater.");
       alist.add ("active_groundwater", true);

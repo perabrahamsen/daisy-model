@@ -1,4 +1,8 @@
-* Kig på groundwater_pipe.C
+* Ny pesticidomsætning.
+
+* Check sinks vs stoffer.  Specielt crop reflection i soil_chemical.
+
+* Check adsorption vS_S.
 
 * ElectricFence (eller C++ udgave (www.andreasen.com?)
 
@@ -46,8 +50,6 @@
 * Check pet_pm sammen med PvdK.
 
 * Gør det muligt at vælge array/entry/string separators.
-
-** Brug tab (per default) til at skelne array entries.
 
 * Check field abstraction for flere søjler.
 

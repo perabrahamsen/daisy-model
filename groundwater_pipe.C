@@ -84,6 +84,13 @@ public:
   void initialize (const Time&, const Soil& soil)
     {
       unsigned int size = soil.size ();
+      double largest = 0.0;
+      for (unsigned int i = 0; i < size; i++)
+	if (soil.dz (i) > largest)
+	  largest = soil.dz (i);
+      if (largest > 10.0)
+	CERR << "WARNING: drained soil needs soil intervals < 10.0 cm; "
+	     << "largest is " << largest << ".\n";
 
       i_bottom = size - 1;
       i_drain = soil.interval_plus (pipe_position);

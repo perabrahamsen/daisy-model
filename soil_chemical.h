@@ -4,6 +4,7 @@
 #define SOIL_CHEMICAL_H
 
 #include "solute.h"
+#include "csmp.h"
 #include <vector>
 
 struct Chemical;
@@ -22,7 +23,9 @@ public:
 private:
   vector<double> decomposed;
   vector<double> uptaken;
-  
+  vector<double> lag;
+  const CSMP lag_increment;
+
   // Simulation.
 public:
   void uptake (const Soil&, const SoilWater&);
