@@ -296,7 +296,7 @@ OTHER = options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
-	submodel.C
+	submodel.C message.C
 
 # Everything that has an interface.
 #
