@@ -270,12 +270,10 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     soil_heat (soil, soil_water, al.list ("SoilHeat")),
     soil_NH4 (soil, soil_water, al.list ("SoilNH4")),
     soil_NO3 (soil, soil_water, al.list ("SoilNO3")),
-    organic_matter (al.list ("OrganicMatter")),
+    organic_matter (soil, al.list ("OrganicMatter")),
     nitrification (al.list ("Nitrification")),
     denitrification (al.list ("Denitrification"))
-{ 
-  organic_matter.initialize (soil);
-}
+{ }
 
 ColumnStandard::~ColumnStandard ()
 { }

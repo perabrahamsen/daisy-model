@@ -298,8 +298,12 @@ Horizon::C () const
 { return rho_soil * impl.humus * (1 - hydraulic.porosity ()) * 0.587; }
 
 double
+Horizon::N () const
+{ return C () / C_per_N (); }
+
+double
 Horizon::C_per_N () const
-{ return impl.clay; }
+{ return impl.C_per_N; }
 
 
 double

@@ -36,8 +36,7 @@ struct OrganicMatter::Implementation
     void mix (const Soil&, double from, double to);
     void swap (const Soil&, double from, double middle, double to);
     static void load_syntax (Syntax& syntax, AttributeList& alist);
-    void initialize (const Soil& soil);
-    Buffer (const AttributeList& al);
+    Buffer (const Soil&, const AttributeList& al);
   } buffer;
 
   // Simulation.
@@ -55,8 +54,11 @@ struct OrganicMatter::Implementation
   vector<double> clay_turnover_factor;
 
   // Create & Destroy.
-  void initialize (const Soil& soil);
-  Implementation (const AttributeList& al);
+  static vector<OM*>&
+  OrganicMatter::Implementation::create_som (const
+					     vector<const AttributeList*>& al,
+					     const Soil& soil);
+  Implementation (const Soil&, const AttributeList& al);
 };
 
 void
@@ -160,22 +162,19 @@ OrganicMatter::Implementation::water_turnover_factor (double h) const
   return 0;
 }
 
-void
-OrganicMatter::Implementation::Buffer::initialize (const Soil& soil)
-{
+OrganicMatter::Implementation::Buffer::Buffer (const Soil& soil, 
+					       const AttributeList& al)
+  : C (al.number_sequence ("C")),
+    N (al.number_sequence ("N")),
+    turnover_rate (al.number ("turnover_rate")),
+    where (al.integer ("where"))
+{ 
   // Make sure the vectors are large enough.
   while (N.size () < soil.size () +0U)
     N.push_back (0.0);
   while (C.size () < soil.size () +0U)
     C.push_back (0.0);
 }
-
-OrganicMatter::Implementation::Buffer::Buffer (const AttributeList& al)
-  : C (al.number_sequence ("C")),
-    N (al.number_sequence ("N")),
-    turnover_rate (al.number ("turnover_rate")),
-    where (al.integer ("where"))
-{ }
 
 void
 OrganicMatter::Implementation::output (Log& log, const Filter& filter) const
@@ -304,16 +303,93 @@ OrganicMatter::Implementation::swap (const Soil& soil,
   // Leave CO2 alone.
 }
 
-void 
-OrganicMatter::Implementation::initialize (const Soil& soil)
+vector<OM*>&
+OrganicMatter::Implementation::create_som (const
+					   vector<const AttributeList*>& al,
+					   const Soil& soil)
 {
-  buffer.initialize (soil);
+  vector<OM*>& om = map_construct<OM> (al);
+  const int size = al.size();
+
+  // Find the missing kids!
+  bool found_fraction = false;
+  bool missing_fraction = -1;
+  vector<double> om_fraction (size, 0.0);
+  int missing_C_per_N = -1;
+
+  for (int i = 0; i < size; i++)
+    {
+      if (al[i]->check ("initial_fraction"))
+	{
+	  om_fraction[i] = al[i]->number ("initial_fraction");
+	  found_fraction = true;
+	}
+      else
+	missing_fraction = i;
+
+      if (al[i]->check ("C_per_N"))
+	om[i]->initialize (soil);
+      else
+	missing_C_per_N = i;
+    }
+  
+  if (!found_fraction)
+    {
+      // This is a checkpoint, no special intialization needed.
+      assert (missing_C_per_N < 0);
+      for (int i = 0; i < size; i++)
+	om[i]->initialize (soil);
+      return om;
+    }
+
+  // Find the C's and the N's
+  om_fraction[missing_fraction] = 1.0 - accumulate (om_fraction.begin (),
+						    om_fraction.end (),
+						    0.0);
+  for (int l = 0; l < soil.size (); l++)
+    {
+      const double C = soil.initial_C (l);
+      double N = soil.initial_N (l);
+
+      // Fill out the blanks.
+      vector<double> om_N (size, 0.0);
+  
+      for (int i = 0; i < size; i++)
+	{
+	  if (i == missing_C_per_N)
+	    {
+	      assert (om[i]->C.size () == l + 0U);
+	      om[i]->C.push_back (C * om_fraction[i]);
+	    }
+	  else
+	    {
+	      om[i]->C[l] = C * om_fraction[i];
+	      assert (om[i]->C_per_N.size () == soil.size () +0U);
+	      assert (om[i]->C.size () == soil.size () + 0U);
+	      N -= om[i]->C[l] / om[i]->C_per_N[l];
+	    }
+	}
+      assert (om[missing_C_per_N]->C_per_N.size () == l + 0U);
+      om[missing_C_per_N]->C_per_N.push_back (om[missing_C_per_N]->C[l] / N);
+      assert (om[missing_C_per_N]->C_per_N[l] >= 0.0);
+    }
+  return om;  
+}
+
+OrganicMatter::Implementation::Implementation (const Soil& soil, 
+					       const AttributeList& al)
+  : K_NH4 (al.number ("K_NH4")),
+    K_NO3 (al.number ("K_NO3")),
+    am (map_create <AM> (al.list_sequence ("am"))),
+    smb (map_construct <OM> (al.list_sequence ("smb"))),
+    som (create_som (al.list_sequence ("som"), soil)),
+    buffer (soil, al.list ("buffer"))
+{ 
   for (int i = 0; i +0U < am.size (); i++)
     am[i]->initialize (soil);
   for (int i = 0; i +0U < smb.size (); i++)
     smb[i]->initialize (soil);
-  for (int i = 0; i +0U < som.size (); i++)
-    som[i]->initialize (soil);
+
   CO2.insert (CO2.end(), soil.size(), 0.0);
   
   for (int i = 0; i < soil.size (); i++)
@@ -324,15 +400,6 @@ OrganicMatter::Implementation::initialize (const Soil& soil)
       clay_turnover_factor.push_back (1.0 - a * (min (X_c, X_c_prime)));
     }
 }
-
-OrganicMatter::Implementation::Implementation (const AttributeList& al)
-  : K_NH4 (al.number ("K_NH4")),
-    K_NO3 (al.number ("K_NO3")),
-    am (map_create <AM> (al.list_sequence ("am"))),
-    smb (map_construct <OM> (al.list_sequence ("smb"))),
-    som (map_construct <OM> (al.list_sequence ("som"))),
-    buffer (al.list ("buffer"))
-{ }
 
 void 
 OrganicMatter::tick (const Soil& soil, 
@@ -558,14 +625,8 @@ OrganicMatter::add (AM& am)
   impl.add (am);
 }
 
-void 
-OrganicMatter::initialize (const Soil& soil)
-{
-  impl.initialize (soil);
-}
-
-OrganicMatter::OrganicMatter (const AttributeList& al)
-  : impl (*new Implementation (al))
+OrganicMatter::OrganicMatter (const Soil& soil, const AttributeList& al)
+  : impl (*new Implementation (soil, al))
 { }
 
 OrganicMatter::~OrganicMatter ()

@@ -38,8 +38,7 @@ public:
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const Soil& soil);
-  OrganicMatter (const AttributeList&);
+  OrganicMatter (const Soil&, const AttributeList&);
   ~OrganicMatter ();
 };
 

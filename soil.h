@@ -73,7 +73,11 @@ public:
   // Content.
   inline double clay (int i) const
   { return horizon_[i]->clay (); }
-
+  inline double initial_C (int i) const
+  { return horizon_[i]->C (); }
+  inline double initial_N (int i) const
+  { return horizon_[i]->N (); }
+  
   // Calculations.
   double MaxRootingDepth () const;
   double EpFactor () const;

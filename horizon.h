@@ -19,6 +19,7 @@ private:
 public:
   double clay () const;
   double C () const;
+  double N () const;
   double C_per_N () const;
 
   // Water.
