@@ -381,7 +381,7 @@
 		     (when hourly)
 		     (dimension "kg N/ha/d")
 		     (factor 1e5))		;g/cm²/d -> kg N/ha/d
-	   (number (path column "$col" Vegetation crops "*" CrpAux NH4Upt)
+	   (number (path column "$col" Vegetation crops "*" Root NH4Upt)
 		   (when hourly)
 		   (dimension "kg N/ha/d")
 		   (factor 10.0))	;g/m²/d -> kg N/ha/d
@@ -427,7 +427,7 @@
 		     (when hourly)
 		     (dimension "kg N/ha/d")
 		     (factor 1e5))		;g/cm²/d -> kg N/ha/d
-	   (number (path column "$col" Vegetation crops "*" CrpAux NO3Upt)
+	   (number (path column "$col" Vegetation crops "*" Root NO3Upt)
 		   (when hourly)
 		   (dimension "kg N/ha/d")
 		   (factor 10.0))		;g/m²/d -> kg N/ha/d
@@ -765,7 +765,7 @@
 		   (tag "SOrg AI")
 		   (dimension "none")
 		   (factor 1.0))	;Leaf Area Index [0:inf]
-	   (number (path column "$col" Vegetation crops "$crop" RootSys Depth)
+	   (number (path column "$col" Vegetation crops "$crop" Root Depth)
 		   (dimension "cm")
 		   (factor 1.0))	;cm [-inf:0]
 	   (number (path column "$col" Vegetation crops "$crop" Prod WLeaf)
@@ -797,9 +797,9 @@
 		   (dimension "kg N/ha")
 		   (factor 10.0))
 	   (number (path column "$col" Vegetation crops "$crop"
-			 RootSys water_stress))
+			 Root water_stress))
 	   (number (path column "$col" Vegetation crops "$crop"
-			 RootSys nitrogen_stress))
+			 Root nitrogen_stress))
 	   ))
 
 (deflog "Old Crop Production" table
