@@ -28,14 +28,15 @@
 #include "treelog_stream.h"
 #include "version.h"
 #include "message.h"
+#include "path.h"
 
-#ifdef __BORLANDC__
-// Needed in BCC for 'chdir'.
-#include <dir.h>
+#if defined (__unix) 
+#define PATH_SEPARATOR ":"
+#else
+#define PATH_SEPARATOR ";"
 #endif
 
 const char *const Options::log_name = "DAISY_LOG";
-const char *const Options::path_name = "DAISYPATH";
 
 string
 Options::get_arg (int& argc, char**& argv)
@@ -58,6 +59,28 @@ Options::usage () const
   CERR << "Usage: " << program_name << " [-p type] [-v] [-d dir] file...\n";
 }
 
+void 
+Options::initialize_path ()
+{
+  vector<string> path;
+
+  // Initialize path.
+  const string colon_path
+    = getenv ("DAISYPATH") ? getenv ("DAISYPATH") : ".";
+  int last = 0;
+  for (;;)
+    {
+      const int next = colon_path.find (PATH_SEPARATOR, last);
+      if (next < 0)
+	break;
+      path.push_back (colon_path.substr (last, next - last));
+      last = next + 1;
+    }
+  path.push_back (colon_path.substr (last));
+  assert (path.size () > 0);
+  Path::set_path (path);
+}
+
 Options::Options (int& argc, char**& argv,
 		  Syntax& syntax, AttributeList& alist)
   : program_name (argv[0])
@@ -68,6 +91,7 @@ Options::Options (int& argc, char**& argv,
       argc = -2;
       return;
     }
+  initialize_path ();
   bool file_found = false;
   bool options_finished = false;
   int errors_found = 0;
@@ -105,8 +129,8 @@ Options::Options (int& argc, char**& argv,
 		// Change directory.
 		{
 		  const string dir = get_arg (argc, argv);
-		  if (chdir (dir.c_str ()) != 0)
-		    CERR << program_name << ":chdir (" << dir << ") failed\n";
+		  if (!Path::set_directory (dir))
+		    CERR << program_name << ": chdir (" << dir << ") failed\n";
 		}
 	      else
 		// Usage.

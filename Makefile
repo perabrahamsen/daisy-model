@@ -294,7 +294,7 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = message.C options.C traverse_delete.C \
+OTHER = path.C message.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \

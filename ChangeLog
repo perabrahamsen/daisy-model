@@ -1,3 +1,11 @@
+2001-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* path.h, path.C: New utility.
+	* options.h, option.C, common.h: Use it.
+	* lexer.h, lexer.C: Use it.
+	* daisy.C (load_syntax): Add "path" and "directory".
+	* parser_file.C (load_list): Use it.
+
 2001-10-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_harvest.C (LogHarvest): Added missing backslash.

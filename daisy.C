@@ -186,6 +186,13 @@ period.");
   AttributeList true_alist;
   true_alist.add ("type", "true");
   alist.add ("activate_output", true_alist);
+  syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
+	      "Run simulation in this directory.\n\
+This can affect both where input files are found and where log files\n\
+are generated.");
+  syntax.add ("path", Syntax::String, Syntax::OptionalConst, Syntax::Sequence,
+	      "List of directories to search for input files in.\n\
+The special value \".\" means the current directory.");
   syntax.add ("input", Librarian<Parser>::library (), Syntax::OptionalConst, 
 	      Syntax::Singleton,
 	      "Command to add more information about the simulation.");

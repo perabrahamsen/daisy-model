@@ -23,34 +23,19 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include "common.h"
-
-#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
-struct istream;
-#else
-#include <iosfwd>
-#endif
-
+#include <string>
 using namespace std;
-
-#if defined (__BORLANDC__) && __BORLANDC__ == 0x0550
-#define istread std::istream
-#endif
 
 class Treelog;
 
 class Lexer
 {
-  // State.
+  // Content.
 private:
-  static istream& open_file (const string& name);
-  istream& in;
+  struct Implementation;
+  Implementation& impl;
 public:
   Treelog& err;
-private:
-  int line;
-  int column;
-public:
   const string file;
   int error_count;
 
@@ -65,7 +50,7 @@ public:
   // Create and destroy.
 public:
   Lexer (const string&, Treelog&);
-  ~Lexer ();
+  virtual ~Lexer ();
 };
 
 #endif // LEXER_H

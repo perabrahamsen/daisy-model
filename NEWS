@@ -14,7 +14,26 @@ release.
 
 * 1.85
 
-Bug fixes.
+** New top level attributes "directory" and "path".
+
+You can now specify where Daisy shall put log files, and where it
+shall look for input files, directly from the ".dai" file.  The
+following should be put near the top of the dai file:
+
+   (directory "C:/my/daisy/setup/output")
+   (path "." "C:/my/daisy/setup" "C:/daisy/lib")
+
+This will make Daisy run in the directory "/my/daisy/setup/output" (or
+"C:\my\daisy\setup\output"), and also generate its log files there.
+
+It will search for input files first in the directory where it run
+("." means "current directory"), if it doesn't find them there it will
+look in "C:\my\daisy\setup", and if it isn't there either, it will
+finally look in "C:\daisy\lib" before giving up.
+
+PS: Remember to use "/" instead of "\" for file names in ".dai" files.
+
+** Bug fixes.
 
 * 1.83
 

@@ -27,6 +27,7 @@
 #include "tmpstream.h"
 #include "treelog_stream.h"
 #include "message.h"
+#include "path.h"
 
 struct ParserFile::Implementation
 {
@@ -373,6 +374,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    }
 	  case Syntax::String:
 	    atts.add (name, get_string ());
+	    // Handle "directory" immediately.
+	    if (&syntax == global_syntax_table && name == "directory")
+	      Path::set_directory (atts.name (name));
 	    break;
 	  case Syntax::Boolean:
 	    {
@@ -641,6 +645,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		      array.push_back ("<error>");
 		  }
 		atts.add (name, array);
+		// Handle "path" immediately.
+		if (&syntax == global_syntax_table && name == "path")
+		  Path::set_path (atts.name_sequence (name));
 		break;
 	      }
 	    case Syntax::Error:

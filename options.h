@@ -31,9 +31,9 @@ class AttributeList;
 class Options
 {
   static string get_arg (int& argc, char**& argv);
+  static void initialize_path ();
 public: 
   static const char *const log_name;
-  static const char *const path_name;
   const string program_name;
   void usage () const;
   Options (int& argc, char**& argv, 

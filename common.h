@@ -72,6 +72,8 @@
 
 #ifdef __GNUC__
 
+#include <unistd.h>
+
 // GCC doesn't have DLL keywords.
 #define EXPORT
 #define IMPORT
@@ -80,8 +82,6 @@
 #define CONST_DELETE
 
 #define HAS_TEMPLATE_MEMBERS
-
-#include <unistd.h>
 
 // GNU doesn't mind unused global constants.
 #define GLOBAL_CONSTANT
@@ -123,19 +123,6 @@
 #define MISSING_OSTREAM
 
 #endif
-#endif
-
-#if defined (__unix) 
-// Unix path names.
-#define PATH_SEPARATOR ":"
-#define DIRECTORY_SEPARATOR "/"
-
-#else
-
-// WinDOS path names.
-#define PATH_SEPARATOR ";"
-#define DIRECTORY_SEPARATOR "\\"
-
 #endif
 
 #if !defined (__unix) && !defined (__CYGWIN__)
