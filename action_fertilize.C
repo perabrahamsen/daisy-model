@@ -179,10 +179,6 @@ Height where you want to end measuring (a negative number).");
   }
 };
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<ActionFertilize::Precision>;
-#endif
-
 static struct ActionFertilizeSyntax
 {
   static Action& make (const AttributeList& al)
@@ -266,14 +262,13 @@ When fertilizing with organic matter, you may let Daisy calculate the\n\
 amount of dry matter that corresponds to the specified amount of\n\
 nitrogen.  This requires that the fertilizer has specified the\n\
 `first_year_utilization' parameter, but not the `weight' parameter.");
-
-    AttributeList dummy;
-    add_submodule<ActionFertilize::Precision>("precision", syntax, dummy,
-					      Syntax::OptionalConst, "\
+    syntax.add_submodule ("precision", alist, 
+			  Syntax::OptionalConst, Syntax::Singleton, "\
 Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
 The amount of fertilizer will be the specified `target', minus the amount\n\
 already present in the soil zone between `from' and `to'.  If the amount\n\
-of fertilizer is less than `minimum', no fertilizer will be applied.");
+of fertilizer is less than `minimum', no fertilizer will be applied.",
+			  &ActionFertilize::Precision::load_syntax);
 
     syntax.order ("am");
     Librarian<Action>::add_type ("fertilize", alist, syntax, &make);

@@ -587,7 +587,7 @@ Each selected variable is represented by a column in the log file.");
       
       Syntax& entry_syntax = *new Syntax ();
       entry_syntax.add_check (check_entry_alist);
-      AttributeList& entry_alist = *new AttributeList ();
+      AttributeList entry_alist;
       entry_syntax.add ("tag", Syntax::String, Syntax::OptionalConst,
 			"Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\
@@ -681,7 +681,7 @@ The entries are separated with space.");
 Number of times the path has matched a variable since the last log entry.");
       entry_alist.add ("count", 0);
       syntax.add ("entries", entry_syntax, entry_alist, Syntax::State,
-		  "What to log in each column.");
+		  Syntax::Sequence, "What to log in each column.");
       syntax.add ("set", Syntax::String, Syntax::Const, Syntax::Sequence, 
 		  "Map path names in the entries.\n\
 The first entry in the sequence is a symbol from the paths (e.g. $crop),\n\

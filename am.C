@@ -255,6 +255,9 @@ AM::Implementation::add (const Geometry& geometry,
 
       for (unsigned int i = 0; i < om.size (); i++)
 	{
+#if 1
+	  om[i]->add (at, om_C[i], om_N[i]);
+#else
 	  const double C_per_N = om[i]->initial_C_per_N;
 	  if (C_per_N == OM::Unspecified)
 	    om[i]->add (at, om_C[i], om_N[i]);
@@ -264,11 +267,21 @@ AM::Implementation::add (const Geometry& geometry,
 	      const double old_N = om[i]->total_N (geometry);
 	      om[i]->add (at, om_C[i]);
 	      const double new_N = om[i]->total_N (geometry);
-	      assert (om_N[i] * 1e9 < old_N
-		      ? approximate (old_N + om_N[i], new_N)
-		      : (approximate (new_N - old_N, om_N[i])));
+	      if (!(om_N[i] * 1e9 < old_N
+		    ? approximate (old_N + om_N[i], new_N)
+		    : (approximate (new_N - old_N, om_N[i]))))
+		{
+		  CERR << "BUG: Merging " << other.name << " into " << name 
+		       << " at " << at << " for pool " << i 
+		       << " gave old N = " << old_N << ", new N " 
+		       << new_N << " added N " << om_N[i] << "\n"
+		       << "C/N other was " << cc[at]/nn[at] 
+		       << " C/N here is " << C_per_N << "\n";
+		}
 	    }
+#endif
 	}
+
     }
 
   add (other.top_C (), other.top_N ());

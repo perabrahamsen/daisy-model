@@ -2,25 +2,7 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Gødning
 
-** Dist.
-
 ** Fertilizer log.
-
-* Udnyt `default_alist' til at tillade optional submoduler med default værdier.
-
-** Ret syntax
-
-** Ret parser.
-
-** Ret pretty printer
-
-** Ret document_LaTeX.C
-
-** Test med `precision'.
-
-** Fjern "dummy" fra e.g. Ridge.
-
-** Test om "AM" kan have en default_alist.
 
 * crop_std: RSR
 

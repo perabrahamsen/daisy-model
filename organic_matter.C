@@ -1056,13 +1056,14 @@ Mineralization this time step (negative numbers mean immobilization).");
   alist.add ("som", SOM);
   
   Syntax& layer_syntax = *new Syntax ();
-  AttributeList& layer_alist = *new AttributeList ();
+  AttributeList layer_alist;
   layer_syntax.add ("end", "cm", Syntax::Const,
 		    "End point of this layer (a negative number).");
   layer_syntax.add ("weight", "kg C/m^2", Syntax::Const,
 		    "organic carbon content of this layer.");
   layer_syntax.order ("end", "weight");
   syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
+	      Syntax::Sequence,
 	      "Layered initialization of soil SOM content.");
   PLF empty;
   syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,

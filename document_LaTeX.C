@@ -169,14 +169,12 @@ DocumentLaTeX::print_entry_type (ostream& out,
     case Syntax::AList:
       {
 	string submodel = "";
-	if (size != Syntax::Singleton)
+	if (size != Syntax::Singleton || !alist.check (name))
 	  {
 	    const AttributeList& nested = syntax.default_alist (name);
 	    if (nested.check ("submodel"))
 	      submodel = nested.name ("submodel");
 	  }
-	else if (!alist.check (name))
-	  /* do nothing */;
 	else
 	  {
 	    const AttributeList& nested = alist.alist (name);
@@ -271,29 +269,14 @@ DocumentLaTeX::print_entry_submodel (ostream& out,
     {
       submodel = true;		// Affects how the sample header looks.
       const Syntax& child = syntax.syntax (name);
-      if (size != Syntax::Singleton)
+      const AttributeList& nested 
+	= (size != Syntax::Singleton || !alist.check (name))
+	? syntax.default_alist (name)
+	: alist.alist (name);
+      if (!nested.check ("submodel"))
 	{
-	  const AttributeList& nested = syntax.default_alist (name);
-	  if (!nested.check ("submodel"))
-	    {
-	      print_sample (out, name, child, nested);
-	      print_submodel (out, name, level, child, nested);
-	    }
-	}
-      else if (!alist.check (name))
-	{
-	  const AttributeList nested;
 	  print_sample (out, name, child, nested);
 	  print_submodel (out, name, level, child, nested);
-	}
-      else
-	{
-	  const AttributeList& nested = alist.alist (name);
-	  if (!nested.check ("submodel"))
-	    {
-	      print_sample (out, name, child, nested);
-	      print_submodel (out, name, level, child, nested);
-	    }
 	}
       if (level == 1)
 	submodel = false;

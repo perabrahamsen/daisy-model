@@ -12,6 +12,12 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.45
+
+** Fixed crash related to the am/cleanup AOM introduced in 1.40.
+
+** Defaults for the `minimum', `from' and `to' precision fertilize params.
+
 * 1.44
 
 ** New `first_year_utilization' fertilizer parameter.

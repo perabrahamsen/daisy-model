@@ -302,9 +302,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    }
 	  case Syntax::AList: 
 	    {
-	      AttributeList& list = (atts.check (name) 
-				     ? *new AttributeList (atts.alist (name))
-				     : *new AttributeList ());
+	      AttributeList& list 
+		= (atts.check (name) 
+		   ? *new AttributeList (atts.alist (name))
+		   : *new AttributeList (syntax.default_alist (name)));
 	      
 	      load_list (list, syntax.syntax (name));
 	      atts.add (name, list);

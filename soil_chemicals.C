@@ -301,7 +301,7 @@ SoilChemicals::load_syntax (Syntax& syntax, AttributeList& alist)
   add_submodule<SoilChemical> ("solute", entry_syntax, entry_alist, 
 			       Syntax::State, "State of chemical solute.");
   syntax.add ("solutes", entry_syntax, entry_alist, Syntax::State,
-	      "List of chemical solutes in the soil.");
+	      Syntax::Sequence, "List of chemical solutes in the soil.");
   alist.add ("solutes", vector<AttributeList*> ());
 }
   

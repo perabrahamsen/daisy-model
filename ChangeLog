@@ -1,5 +1,22 @@
 2000-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.45 released.
+
+2000-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (add): Don't assume permanent C/N.
+
+	* parser_file.C (load_list): Use `Syntax::default_alist' also for
+	singletons. 
+	* document_LaTeX.C (print_entry_type): Ditto.
+	(print_entry_submodel): Ditto.
+	* printer_file.C (print_entry): Ditto.
+	* syntax.C (add, add_submodule_sequence, add_submodule): Always
+	set `default_alist' for submodels.
+	* soil_chemicals.C (load_syntax): Fix caller.
+	* organic_matter.C (load_syntax): Fix caller.
+	* log_table1.C (LogTable1Syntax): Fix caller.
+
 	* Version 1.44 released.
 
 2000-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -140,7 +140,7 @@ public:
 	    const string& description);
   void add (const string&, const Syntax&, const AttributeList&,	
 	    // Alist sequence with default element.
-	    category, const string& description);
+	    category, int size, const string& description);
 
   void add (const string& key, // Object
 	    ::Library& lib, 
@@ -156,6 +156,11 @@ public:
 
   void add_library (const string&, ::Library&);
 
+  typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
+  void add_submodule (const char* name, AttributeList& alist,
+		      Syntax::category cat, int sz, const string& description,
+		      load_syntax_fun load_syntax);
+		      
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user
   // having to specify the names of the entries.  It is recommended
@@ -190,11 +195,8 @@ struct add_submodule
   add_submodule (const char* name, Syntax& syntax, AttributeList& alist,
 		 Syntax::category cat, const string& description)
   {
-    Syntax& s = *new Syntax ();
-    AttributeList a;
-    T::load_syntax (s, a);
-    syntax.add (name, s, cat, Syntax::Singleton, description);
-    alist.add (name, a);
+    syntax.add_submodule (name, alist, cat, Syntax::Singleton, description, 
+			  &T::load_syntax);
   }
 };
 
@@ -204,10 +206,9 @@ struct add_submodule_sequence
   add_submodule_sequence (const char* name, Syntax& syntax, 
 			  Syntax::category cat, const string& description)
   {
-    Syntax& s = *new Syntax ();
-    AttributeList a;
-    T::load_syntax (s, a);
-    syntax.add (name, s, a, cat, description);
+    AttributeList alist;
+    syntax.add_submodule (name, alist, cat, Syntax::Sequence, description, 
+			  &T::load_syntax);
   }
 };
 

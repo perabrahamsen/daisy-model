@@ -403,7 +403,8 @@ Chemicals::add_syntax (const char* name,
   Syntax& entry_syntax = *new Syntax ();
   AttributeList& entry_alist = *new AttributeList ();
   chemicals_load_syntax (entry_syntax, entry_alist);
-  syntax.add (name, entry_syntax, entry_alist, cat, description);
+  syntax.add (name, entry_syntax, entry_alist,
+	      cat, Syntax::Sequence, description);
   vector<AttributeList*> alist_sequence;
   alist.add (name, alist_sequence);
 // KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.

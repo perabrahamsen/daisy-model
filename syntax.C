@@ -437,9 +437,9 @@ Syntax::add (const string& key, const Syntax& s, category req, int sz,
 
 void
 Syntax::add (const string& key, const Syntax& s, const AttributeList& al,
-	     category req, const string& d)
+	     category req, int sz, const string& d)
 {
-  add (key, s, req, Sequence, d);
+  add (key, s, req, sz, d);
   impl.alists[key] = new AttributeList (al);
 }
 
@@ -457,6 +457,51 @@ Syntax::add_library (const string& key, ::Library& l)
   add (key, Library, OptionalConst, None ());
   impl.libraries[key] = &l;
 }
+
+void 
+Syntax::add_submodule (const char* name, AttributeList& alist,
+		       Syntax::category cat, int sz, const string& description,
+		       load_syntax_fun load_syntax)
+{
+    Syntax& s = *new Syntax ();
+    AttributeList a;
+    (*load_syntax) (s, a);
+
+    // Phew.  There are basically two places one can store the alist
+    // containing the default values for the variables and parameters
+    // of a submodel.  The first place is as an initial value in the
+    // parent alist, the other is as the `default_alist' syntax table
+    // attribute.   Neither solution works well in all cases.  
+    //
+    // Using the initial value will not work for optional singletons,
+    // because if there is an initial value in the parent alist, the
+    // submodel isn't really optional.  The initial value will ensure
+    // that it is alwayes there.  The initial value will not work for
+    // submodel sequences either, because we do not know the the
+    // length of the sequence. 
+    //
+    // However, using the `default_alist' for fully specified
+    // non-optional submodels won't work either.  The problems is if
+    // the user is satisfied with the default value, and don't try to
+    // overwrite anything.  In that case the entry will be empty in
+    // the parent alist after loading, causing an `missing value'
+    // error.  
+    // 
+    // Log variables doesn't have a value, so the problem does not
+    // apply to them.
+    // 
+    // The solution is to treat the three cases separately.
+
+    if (cat == Syntax::LogOnly)
+      add (name, s, cat, sz, description);
+    else if (sz == Singleton && (cat == Syntax::Const || cat == Syntax::State))
+      {
+	add (name, s, cat, sz, description);
+	alist.add (name, a);
+      }
+    else
+      add (name, s, a, cat, sz, description);
+};
 
 void 
 Syntax::order (const vector<string>& order)

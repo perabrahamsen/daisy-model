@@ -156,18 +156,14 @@ LogAList::open (const string& name)
 		      syntax ().syntax (name), 
 		      syntax ().default_alist (name),
 		      alist ().alist_sequence (name));
-	      else if (size != Syntax::Singleton)
+	      else if (size != Syntax::Singleton || !has_value)
 		push (name, 
 		      syntax ().syntax (name), 
 		      syntax ().default_alist (name));
-	      else if (has_value)
+	      else 
 		push (name, 
 		      syntax ().syntax (name), 
 		      alist ().alist (name));
-	      else
-		push (name, 
-		      syntax ().syntax (name), 
-		      AttributeList ());
 		      
 	      break;
 	    case Syntax::Object:

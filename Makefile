@@ -266,7 +266,7 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a submodel.
 #
-OTHER = lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
+OTHER = lexer_data.C lexer.C daisy.C alist.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
 	submodel.C
 
@@ -312,7 +312,7 @@ all:	$(EXECUTABLES)
 
 # Create the main executable.
 #
-daisy${EXT}:	main${OBJ} daisy.so
+daisy${EXT}:	main${OBJ} syntax.o daisy.so
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.
