@@ -85,13 +85,23 @@ main (int argc, char* argv[])
       daisy.run (treelog);
 
       const int time_used = time (NULL) - start_time;
+      const int hours = time_used / 3600;
+      const int minutes = (time_used % 3600) / 60;
+      const int seconds = time_used % 60;
       TmpStream end_msg;
       end_msg () << "Simulation lasted ";
-      if (time_used >= 3600)
-	end_msg () << (time_used / 3600) << " hours, ";
-      if (time_used >= 60)
-	end_msg () << ((time_used % 3600) / 60) << " minutes and ";
-      end_msg () << (time_used % 60) << " seconds.";
+      if (hours == 1)
+	end_msg () << "1 hour, ";
+      else if (hours > 0)
+	end_msg () << hours << " hours, ";
+      if (minutes == 1)
+	end_msg () << " 1 minute and ";
+      else 
+	end_msg () << minutes << " minutes and ";
+      if (seconds == 1)
+	end_msg () << "1 seconds.";
+      else
+	end_msg () << seconds << " seconds.";
       treelog.message (end_msg.str ());
       
       // All is well.
@@ -114,5 +124,5 @@ main (int argc, char* argv[])
     {
       treelog.error ("Unknown exception");
     }
-  exit (1);
-}
+  exit (1);}
+      
