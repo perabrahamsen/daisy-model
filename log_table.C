@@ -8,6 +8,9 @@
 #include <numeric>
 #include <algorithm>
 #include <set>
+#include <map>
+
+typedef map<string, string, less<string>/**/> string_map;
 
 // Entries
 struct LogEntry
@@ -17,7 +20,7 @@ struct LogEntry
 
   // Content.
   Condition* condition;		// Should we accumulate now?
-  const vector<string> path;	// Content of this entry.
+  vector<string> path;		// Content of this entry.
   string tag;			// Name of this entry.
   const string dimension;	// Physical dimension of this entry.
   const string description;	// Description of this entry.
@@ -273,6 +276,18 @@ struct LogEntry
       error = false;
     }
   // Create and Destroy.
+  void initialize (const string_map conv)
+    {
+      // Convert path according to mapping in `conv'.
+      for (unsigned int i = 0; i < path.size (); i++)
+	{
+	  string_map::const_iterator entry = conv.find (path[i]);
+	  if (entry != conv.end ())
+	    path[i] = (*entry).second;
+	  else if (path[i].size () > 0 && path[i][0] == '$')
+	    path[i] = "*";
+	}
+    }
   LogEntry (const AttributeList& al)
     : condition (al.check ("when") 
 		 ? &Librarian<Condition>::create (al.alist ("when"))
@@ -465,6 +480,17 @@ struct LogTable : public Log, public Filter
       from (al.number ("from")),
       to (al.number ("to"))
     {
+      // Create path convertion map.
+      const vector<string>& conv_vector = al.name_sequence ("set");
+      string_map conv_map;
+      for (unsigned int i = 0; i < conv_vector.size (); i += 2)
+	{
+	  assert (i+1 < conv_vector.size ());
+	  conv_map[conv_vector[i]] = conv_vector[i+1];
+	}
+      for (unsigned int i = 0; i < entries.size (); i++)
+	entries[i]->initialize (conv_map);
+
       // You can set the print range from here.
       for (unsigned int i = 0; i < entries.size (); i++)
 	{
@@ -529,6 +555,18 @@ static struct LogTableSyntax
     {
       bool ok = true;
 
+      if ((al.size ("set") % 2) == 1)
+	{
+	  CERR << "`set' should contain an even number of arguments.";
+	  ok = false;
+	}
+
+      return ok;
+    }
+  static bool check_entry_alist (const AttributeList& al)
+    {
+      bool ok = true;
+
       bool specify_content = (al.number ("content_at") <= 0.0);
       bool specify_flux = (al.number ("flux_at") <= 0.0);
       bool specify_interval = !(al.number ("to") > al.number ("from"));
@@ -544,12 +582,14 @@ static struct LogTableSyntax
 	  CERR << "You cannot specify both position and interval\n";
 	  ok = false;
 	}
+
       return ok;
     }
 
   LogTableSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
+      syntax.add_check (check_alist);
       AttributeList& alist = *new AttributeList ();
       syntax.add ("description", Syntax::String, Syntax::Const,
 		  "Description of this log file format.");
@@ -561,7 +601,7 @@ Each selected variable is represented by a column in the log file.");
 		  "Add entries to the log file when this condition is true.");
       
       Syntax& entry_syntax = *new Syntax ();
-      entry_syntax.add_check (check_alist);
+      entry_syntax.add_check (check_entry_alist);
       AttributeList& entry_alist = *new AttributeList ();
       entry_syntax.add ("tag", Syntax::String, Syntax::OptionalConst,
 			"Tag to identify the column.\n\
@@ -599,7 +639,9 @@ logged by this model.\n\
 \n\
 You can use the special value \"*\" to match everything at a given\n\
 level, for example all crops.  This way the path can specify multiple\n\
-values, they will be added before they are printed in the log file.");
+values, they will be added before they are printed in the log file.\n\
+All values that start with a \"$\" will work like \"*\".  They are intended\n\
+to be mapped with the `set' attribute in the `table' log model.");
       entry_syntax.add ("missing_value", Syntax::String, Syntax::Const, "\
 String to print when the path doesn't match anything.\n\
 This can be relevant for example if you are logging a crop, and there are\n\
@@ -655,6 +697,14 @@ Number of times the path has matched a variable since the last log entry.");
       entry_alist.add ("count", 0);
       syntax.add ("entries", entry_syntax, entry_alist, Syntax::State,
 		  "What to log in each column.");
+      syntax.add ("set", Syntax::String, Syntax::Const, Syntax::Sequence, 
+		  "Map path names in the entries.
+The first entry in the sequence is a symbol from the paths (e.g. $crop),
+and the second is the value to replace the symbol with (e.g. Grass).
+The third entry is another symbol to replace, and the fourth is another
+value to replace it with.  And so forth.");
+      const vector<string> empty_string_vector;
+      alist.add ("set", empty_string_vector);
       syntax.add ("print_tags", Syntax::Boolean, Syntax::Const,
 		  "Print a tag line in the file.");
       alist.add ("print_tags", true);

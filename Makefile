@@ -149,7 +149,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all components of some library.
 #
-COMPONENTS = action_while.C action_wait.C action_activity.C \
+COMPONENTS = log_harvest.C action_while.C action_wait.C action_activity.C \
 	average_arithmetic.C average_harmonic.C average_geometric.C \
 	mactrans_std.C macro_std.C macro_none.C document_LaTeX.C \
 	filter_array.C filter_all.C filter_none.C filter_some.C \

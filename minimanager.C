@@ -2,7 +2,7 @@
 #include "syntax.h"
 #include "minimanager.h"
 
-bool MiniManager::check (Daisy& ) const
+bool MiniManager::check (const Daisy&) const
 {
     // Convention: MiniManager::MiniManager will not
     // create an EQ if there is something wrong with

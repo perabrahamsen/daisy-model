@@ -16,7 +16,7 @@ public:
 
   // Create and Destroy.
 public:
-  bool check (Daisy& daisy) const;
+  bool check (const Daisy& daisy) const;
 
   // Create and Destroy.
 // private:

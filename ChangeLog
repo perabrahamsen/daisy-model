@@ -1,4 +1,27 @@
+1999-05-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.74 released.
+
+1999-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvest.h: Made all data members public.
+	* log_harvest.C: New log model.
+
+	* log_table.C (LogEntry::initialize): New function.
+	(string_map): New type.
+	(<map>): New include.
+	(LogTableSyntax): Added `set' attribute, plus check function.
+	(LogTable): Use it.
+	* lib/log.dai: Use it.
+
+	* action_while.C (check): Fix const error.
+
+	* minimanager.h (check): Add const to `Daisy' argument.
+
 1999-04-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/reference/introduction.tex (subsection{Management}): Use
+	`activity' in example, instead of `cond'.
 
 	* Version 0.73 released.
 

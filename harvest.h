@@ -15,7 +15,7 @@ class Filter;
 class Harvest
 {
   // Content:
-private:
+public:
   const string column;
   const Time time;
   const string crop;
