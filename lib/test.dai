@@ -83,32 +83,95 @@
 ;; Simulation start date.
 (time 1986 12 1 1)
 
+;; Our standard fertilizer.
+(defam n50 mineral
+  (NH4_fraction 0.5))
+
+;; Grass cut strategy.
+(defaction cut_grass activity
+  (wait (or (crop_ds_after "Grass" 0.7)
+	    (crop_dm_over "Grass" 4000)))
+  (harvest  "Grass" 
+	    (stub 10.0)			;15 cm stub
+	    (stem 1.0)))
+
+(defaction cut_grass_fertilize activity
+  (cut_grass)
+  (wait_days 1)
+  (fertilize n50 (weight 100.0)))	;kg N/ha
+
+;; Irrigation strategy.
+(defaction irrigate_30 progn
+  (if (and (after_mm_dd 5 1)
+	   (before_mm_dd 9 1)
+	   (not (soil_water_pressure_above (height -30.0)
+					   (potential -1000))))
+      (irrigate_top 30)))
+
 ;; Spring Barley with ley setup.
-(manager cond 
-  ((at 1987 3 20 1)
-   (plowing))
-  ((at 1987 4 4 1)
-  (fertilize mineral 
-	     (weight 100.0)		;kg N/ha
-	     (NH4_fraction 0.5)))
-  ((at 1987 4 5 1)
-   (sow "Cut Grass")
-   (sow "Spring Barley"))
-  ((at 1987 9 5 1)
-   (harvest "Spring Barley")
-   (harvest "Cut Grass"
-	    (stub 15)			;Leave 15 cm stub.
-	    (stem 1.00)))		;Harvest everything above stub.
-  ((at 1987 9 8 1)
-   (fertilize mineral
-	      (weight 80.0)
-	      (NH4_fraction 0.5)))
-  ((at 1987 10 10 1)
-   (harvest "Cut Grass"
-	    (stub 8.)			;Leave 08 cm stub.
-	    (stem 1.00)))		;Harvest everything above stub.
-  ((at 1988 4 1 1)
-   (stop)))
+(defaction sbarley_with_ley activity
+  (wait_mm_dd 3 20)
+  (plowing)
+  (wait_mm_dd 4 10)
+  (fertilize n50 (weight 100.0))		;kg N/ha
+  (wait_mm_dd 4 15)
+  (seed_bed_preparation)
+  (progn 
+   (sow "Spring Barley")
+   (sow "Grass"))
+  (wait (or (crop_ds_after "Spring Barley" 2.0)	;Ripe
+	    (mm_dd 10 1)))
+  (harvest "Spring Barley")
+  (wait_days 10)
+  (fertilize n50 (weight 100.0))	;kg N/ha
+  (while (wait_mm_dd 11 1)
+    (if (or (crop_ds_after "Grass" 0.7)
+	    (crop_dm_over "Grass" 5000))	;kg DM/ha
+	(harvest "Grass" 
+		 (stub 15.0)		;15 cm stub
+		 (stem 1.0))))
+  (wait_mm_dd 4 15)
+  (fertilize n50 (weight 100.0))	;kg N/ha
+  (while (wait_mm_dd 9 1)
+    ;; Max 5 cuts.
+    (activity cut_grass_fertilize cut_grass_fertilize cut_grass_fertilize
+	      cut_grass_fertilize cut_grass_fertilize))
+  (while (wait_mm_dd 11 1)
+    ;; Max 3 cuts.
+    (activity cut_grass cut_grass cut_grass)))
+
+(manager activity
+  (while (sbarley_with_ley)
+    (irrigate_30))
+  (wait_mm_dd 4 1 )
+  (stop))
+
+;; (manager cond 
+;;   ((at 1987 3 20 1)
+;;    (plowing))
+;;   ((at 1987 4 4 1)
+;;   (fertilize mineral 
+;; 		(weight 100.0)		;kg N/ha
+;; 		(NH4_fraction 0.5)))
+;;   ((at 1987 4 5 1)
+;;    (sow "Cut Grass")
+;;    (sow "Spring Barley"))
+;;   ((at 1987 9 5 1)
+;;    (harvest "Spring Barley")
+;;    (harvest "Cut Grass"
+;; 	       (stub 15)			;Leave 15 cm stub.
+;; 	       (stem 1.00)))		;Harvest everything above stub.
+;;   ((at 1987 9 8 1)
+;;    (fertilize mineral
+;; 		 (weight 80.0)
+;; 		 (NH4_fraction 0.5)))
+;;   ((at 1987 10 10 1)
+;;    (harvest "Cut Grass"
+;; 	       (stub 8.)			;Leave 08 cm stub.
+;; 	       (stem 1.00)))		;Harvest everything above stub.
+;;   ((at 1988 4 1 1)
+;;    (stop)))
+;; 
 
 (deflog "pond" table1
   (where "pond.tab")
@@ -120,6 +183,6 @@
 	    (dimension "mm"))))
 
 ;; Create these log files.
-(output pond Harvest)
+(output pond Harvest "Grass Production" "Barley Production")
 
 ;;; test.dai ends here.
