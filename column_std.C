@@ -151,6 +151,9 @@ public:
 void 
 ColumnStandard::irrigate_top (double flux, double temp, const IM& sm)
 {
+  assert (flux >= 0.0);
+  assert (sm.NH4 >= 0.0);
+  assert (sm.NO3 >= 0.0);
   surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
   bioclimate.irrigate_top (flux, temp);
 }
@@ -158,6 +161,9 @@ ColumnStandard::irrigate_top (double flux, double temp, const IM& sm)
 void 
 ColumnStandard::irrigate_surface (double flux, double temp, const IM& sm)
 {
+  assert (flux >= 0.0);
+  assert (sm.NH4 >= 0.0);
+  assert (sm.NO3 >= 0.0);
   surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
   bioclimate.irrigate_surface (flux, temp);
 }
@@ -182,6 +188,8 @@ ColumnStandard::fertilize (const AttributeList& al,
 void 
 ColumnStandard::fertilize (const IM& im)
 {
+  assert (im.NH4 >= 0.0);
+  assert (im.NO3 >= 0.0);
   surface.fertilize (im);
 }
 
@@ -189,6 +197,8 @@ void
 ColumnStandard::fertilize (const IM& im, 
 			   double from, double to)
 {
+  assert (im.NH4 >= 0.0);
+  assert (im.NO3 >= 0.0);
   assert (to < from);
   soil_NO3.add (soil, soil_water, im.NO3, from, to);
   soil_NH4.add (soil, soil_water, im.NH4, from, to);

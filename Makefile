@@ -185,7 +185,7 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
 	pet_makkink.C pet_weather.C pet_PM.C pt_std.C action_spray.C \
-	pt_pmsw.C
+	pt_pmsw.C action_merge.C action_divide.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -198,7 +198,8 @@ INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
 	am.C im.C om.C harvest.C geometry.C transport.C \
 	librarian.C cdaisy.C adsorption.C tortuosity.C event.C eventqueue.C \
 	minimanager.C printer.C printer_file.C chemical.C common.C \
-	pet.C net_radiation.C pt.C vegetation.C chemicals.C nrutil.C field.C
+	pet.C net_radiation.C pt.C vegetation.C chemicals.C nrutil.C field.C \
+	log_alist.C log_clone.C
 
 # Select the C files that are not part of the library.
 #

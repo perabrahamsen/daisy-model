@@ -4,6 +4,7 @@
 #include "column.h"
 #include "log.h"
 #include "filter.h"
+#include "log_clone.h"
 
 struct Field::Implementation
 {
@@ -50,6 +51,11 @@ public:
 
   // Find a specific column.
   Column* find (const string& name) const;
+
+  // Changing the field.
+  void divide (const string& original, const string& copy,
+	       const Time&, const Weather&);
+  void merge (const string& combine, const string& remove, double weight);
 
   // Create and destroy.
   bool check () const;
@@ -307,6 +313,35 @@ Field::Implementation::find (const string& name) const
   return NULL;
 }
 
+void 
+Field::Implementation::divide (const string& original, const string& copy,
+			       const Time& time, const Weather& weather)
+{ 
+  Column* old = find (original);
+  if (!old)
+    THROW ("Attempt to clone non-existing column"); 
+  const Library& library = Librarian<Column>::library ();
+  const Syntax& syntax = library.syntax (old->alist.name ("type"));
+  LogClone log_clone ("column", syntax, old->alist);
+  old->output (log_clone, log_clone);
+  AttributeList& lib_alist = *new AttributeList ();
+  // Remember where we got this object.
+  lib_alist.add ("parsed_from_file", "*clone*");
+  lib_alist.add ("parsed_sequence", Library::get_sequence ());
+  lib_alist.add ("type", original);
+  Librarian<Column>::derive_type (copy, lib_alist, original);
+  AttributeList copy_alist (log_clone.result ());
+  copy_alist.add ("type", copy);
+  Column* result = &Librarian<Column>::create (copy_alist);
+  result->initialize (time, weather);
+  columns.push_back (result);
+}
+  
+void
+Field::Implementation::merge (const string& /*combine*/,
+			      const string& /*remove*/, double /*weight*/)
+{ THROW ("Merge is not yet implemented"); } 
+
 bool 
 Field::Implementation::check () const
 { 
@@ -450,6 +485,15 @@ Field::find (unsigned int pos) const
 unsigned int 
 Field::size () const
 { return impl.columns.size (); }
+
+void 
+Field::divide (const string& original, const string& copy, 
+	       const Time& time, const Weather& weather)
+{ impl.divide (original, copy, time, weather); }
+
+void 
+Field::merge (const string& combine, const string& remove, double weight)
+{ impl.merge (combine, remove, weight); }
 
 bool 
 Field::check () const

@@ -216,10 +216,13 @@ IM
 Weather::deposit () const
 {
   const double Precipitation = rain () + snow (); // [mm]
+  assert (Precipitation >= 0.0);
   const IM dry (impl.DryDeposit, 0.1/24.0); // [kg/m²/d] -> [g/cm²/h]
   const IM wet (impl.WetDeposit, 0.1); // [kg/m²/mm] -> [g/cm²/mm]
 
   const IM result = dry + wet * Precipitation;
+  assert (result.NO3 >= 0.0);
+  assert (result.NH4 >= 0.0);
 
   assert (approximate (result.NO3, 
 		       impl.DryDeposit.NO3 / 10.0 / 24.0

@@ -1,4 +1,31 @@
+1998-12-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.57 released.
+
+1998-12-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* field.C (divide): Mark clones objects.
+	* log_checkpoint.C (done): Print cloned objects.
+
+	* log_checkpoint.C (LogCheckpointSyntax): Don't assume `finished'
+	has been added to the `condition' library yet.
+
+	* weather.C (deposit): Added assertions.
+	* column_std.C (irrigate_top): Ditto.
+	(irrigate_surface): Ditto.
+	(fertilize): Ditto.
+
 1998-12-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_merge.C, action_divide.C: New files.
+	* Makefile (COMPONENTS): Add them.
+	* field.C, field.h (divide, merge): New functions.
+	* log_clone.C, log_clone.C: New files.
+	* Makefile (INTERFACES): Add them.
+
+	* log_alist.C, log_alist.h: New files.
+	* Makefile (INTERFACES): Add them.
+	* log_checkpoint.C: Use them.
 
 	* Version 0.56 released.
 

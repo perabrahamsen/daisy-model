@@ -1,13 +1,16 @@
+* Cloning.
+
+** Check af clone af vegetation virker.
+
+** Sørg for at cdaisy bruger de nye funktion til clone of merge.
+
+** Implementer merge.
+
 * Ryd op i Log struktur.
 
 ** LogCheckpoint
 
 *** Sørg for at inkludere `def*' og `input' automatisk.
-
-** Split LogCheckpoint i LogCheckpoint og LogAList.
-    LogCheckpoint skal være implementeret ovenpå LogAList.  
-
-** Column::clone  skal bruge LogAList.
 
 ** LogHarvest (måske: LogSequence)
 
