@@ -360,6 +360,11 @@
 			(when hourly)
 			(dimension "mm/d")
 			(factor -10))	;cm -> mm
+	   (interval (path column "$col" SoilWater S_permanent)
+		     (tag "External")
+		     (when hourly)
+		     (dimension "mm/d")
+		     (factor 10))
 	   (interval (path column "$col" SoilWater S_drain)
 		     (tag "Drain")
 		     (when hourly)
