@@ -1154,6 +1154,39 @@
 			(factor 1e5))	;g/cm²/d -> kg N/ha/d
 	   ))
 
+(deflog Bioincorporation table
+  (where "bioincorporation.tab")
+  (when (hourly))
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (hour (path time))
+	   (number (path column "$col" OrganicMatter Bioincorporation soil_N)
+		   (tag "SOIL_N")
+		   (dimension "kg N/ha")
+		   (factor 10))		;g/m^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter Bioincorporation soil_C)
+		   (tag "SOIL_C")
+		   (dimension "kg C/ha")
+		   (factor 10))		;g/m^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter am "*" om top_N)
+		   (tag "TOP_N")
+		   (dimension "kg N/ha")
+		   (factor 1e5))	;g/cm^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter am "*" om top_C)
+		   (tag "TOP_C")
+		   (dimension "kg C/ha")
+		   (factor 1e5))	;g/cm^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter Bioincorporation N)
+		   (tag "INC_N")
+		   (dimension "kg N/ha/h")
+		   (factor 10))		;g/m^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter Bioincorporation C)
+		   (tag "INC_C")
+		   (dimension "kg C/ha/h")
+		   (factor 10))		;g/m^2 -> kg/ha
+	   ))
+
 (deflog "Hourly Groundwater" table
   (where "hourly_groundwater.tab")
   (when (hourly))
