@@ -131,16 +131,15 @@
 	   (array (path column "$col" SoilHeat T)
 		  (dimension "dg C"))))
 
-(deflog "Soil Water Potential" table1
+(deflog "Soil Water Potential" table
   (where "soil_water_potential.tab")
   (when hourly)
-  (entries ((path time year))
-	   ((path time month))
-	   ((path time mday))
-	   ((path time hour))
-	   ((path column "$col" SoilWater h)
-	    (full true)			;show value in all nodes.
-	    (dimension "cm"))))
+  (entries (year (path time))
+	     (month (path time))
+	     (mday (path time))
+	     (hour (path time))
+  	     (array (path column "$col" SoilWater h)
+	            (dimension "cm"))))
 
 (deflog "Preferential Water Flux" table1
   (where "pref_flux.tab")
@@ -153,18 +152,30 @@
 	    (full true)			;show value in all nodes.
 	    (factor -10)		;cm->mm
 	    (dimension "cm"))))
+  
+(deflog "Hourly Water Flux" table
+  (where "Hourly_water_flux.tab")
+  (when (hourly))
+;  (array_separator " ")
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (hour (path time))
+	   (array (path column "$col" SoilWater q)
+	          (factor -10)		;cm->mm
+ 	          (dimension "mm/h"))))
 
-(deflog "Water Flux" table1
-  (where "water_flux.tab")
-  (when hourly)
-  (entries ((path time year))
-	   ((path time month))
-	   ((path time mday))
-	   ((path time hour))
-	   ((path column "$col" SoilWater q)
-	    (full true)			;show value in all nodes.
-	    (factor -10)		;cm->mm
-	    (dimension "cm"))))
+(deflog "Daily Water Flux" table
+  (where "Daily_water_flux.tab")
+  (when (hour 0))
+;  (array_separator " ")
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (array (path column "$col" SoilWater q)
+	          (factor -10)		;cm->mm
+                  (when hourly)
+ 	          (dimension "mm/d"))))
 
 (deflog "Preferential NO3 Transport" table1
   (where "pref_NO3.tab")
@@ -1057,16 +1068,58 @@
 
 (deflog "Groundwater" table1
   (where "groundwater.tab")
-  (when (hour 12))
+  (when (hour 0))
   (entries ((path time year))
 	   ((path time month))
 	   ((path time mday))
 	   ((path column "$col" Groundwater "*" height)
 	    (tag "table")
 	    (dimension "cm"))
+	   ((path column "$col" Groundwater "*" DeepPercolation)
+          (when hourly)
+	    (dimension "cm/d"))
 	   ((path column "$col" Groundwater "*" DrainFlow)
-	    (dimension "cm/h"))))
+          (when hourly)
+	    (dimension "cm/d"))))
+
+(deflog "Hourly Groundwater" table1
+  (where "Hourly_groundwater.tab")
+  (when (hourly))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path time hour))
+	   ((path column "$col" Groundwater "*" height)
+	    (tag "table")
+	    (dimension "cm"))
+	   ((path column "$col" Groundwater "*" DeepPercolation)
+	    (dimension "cm/h"))
+	   ((path column "$col" Groundwater "*" DrainFlow)
+	    (dimension "cm/h"))
+	   ((path column "$col" Groundwater "*" deficit)
+	    (dimension "cm"))))
+
+(deflog "Drain Sink" table
+  (where "Drain_Sink.tab")
+  (when (hourly))
+;  (array_separator " ")
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (hour (path time))
+	   (array (path column "$col" Groundwater pipe S)
+ 	          (dimension "cm3/cm3/h"))))
 
 (deflog "Harvest" harvest)
 
 ;;; log.dai ends here
+
+;(deflog "Soil Water Potential" table
+;  (where "soil_water_potential.tab")
+;  (when hourly)
+;  (entries (year (path time))
+;	     (month (path time))
+;	     (mday (path time))
+;	     (hour (path time))
+;  	     (array (path column "$col" SoilWater h)
+;	            (dimension "cm"))))

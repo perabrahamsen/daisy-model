@@ -265,9 +265,7 @@ UZRichard::richard (const Soil& soil,
 		    +  (ddt / dz) * (Kplus[i - 1] - Kplus[i] );
 		}
 	    }
-	  tridia (top.flux_top () ? 0 : 1,
-		  (bottom.flux_bottom () ? size : size - 1),
-		  a, b, c, d, h.begin ());
+	  tridia (top.flux_top () ? 0 : 1, size, a, b, c, d, h.begin ());
 
 	  if (h[0] < -1e9 || h[1] < -1e9 || h[size-1] < -1e9)
 	    {

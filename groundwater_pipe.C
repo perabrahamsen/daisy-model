@@ -19,10 +19,12 @@ class GroundwaterPipe : public Groundwater
 
   // Data.
   double height;		// Groundwater table height above surface. [cm]
+  double deficit;
   double GWT_new;		// Updated GWT
   double DrainFlow;		// Drain flow [cm/h]
   vector<double> S;		// Pipe drainage. [cm^3/cm^3/h]
   vector<double> Percolation;	// [cm^3/cm^2/h]
+  vector<double> ThetaOld;	// [cm^3/cm^3]
 
 
   // UZbottom.
@@ -47,21 +49,23 @@ public:
 
 private:
   double DeepPercolation (const Soil&);
-  double EquilibriumDrainFlow (const Soil&);
+  void EquilibriumDrainFlow (const Soil&);
   void RaisingGWT  (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
                     vector<double>& Theta, vector<double>& q,
                     vector<double>& q_p);
   void FallingGWT1 (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
-                    vector<double>& Theta);
+                    vector<double>& Theta, const double deficit);
   void FallingGWT2 (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
-                    vector<double>& Theta);
+                    vector<double>& Theta, const double deficit);
   void Update_GWT  (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
                     vector<double>& Theta, vector<double>& q,
                     vector<double>& q_p);
+  double EquilibriumDrainage (const int i_drainage, const Soil& soil,
+                    vector<double>& h_ice);
   double table () const
     { return height; }
 
@@ -75,7 +79,8 @@ public:
       i_drain = soil.interval_plus (pipe_position);
 
       S.insert (S.end (), size, 0.0);
-      Percolation.insert (Percolation.end (), size+1u, 0.0);
+      Percolation.insert (Percolation.end (), size, 0.0);
+      ThetaOld.insert (ThetaOld.end (), size, 0.0);
     }
   GroundwaterPipe (const AttributeList& al)
     : Groundwater (al),
@@ -104,10 +109,24 @@ GroundwaterPipe::update_water (const Soil& soil,
   for (unsigned int i = 1; i <= i_bottom+1; i++)
     {
        Percolation[i-1] = - q[i] - q_p[i];
+       ThetaOld[i-1]    = Theta[i-1];
     }
-  Percolation[i_bottom+1] = DeepPercolation(soil);
-  const double EquilibriumFlow = EquilibriumDrainFlow (soil);
+  Percolation[i_bottom] = DeepPercolation(soil);
+  EquilibriumDrainFlow (soil);
   Update_GWT (soil, h, h_ice, Theta, q, q_p);
+  const int i_GWT = soil.interval_plus (GWT_new) + 1;
+  const int i_GWT_old = soil.interval_plus (height) + 1;
+  for (unsigned int i = 1; i <= i_bottom; i++)
+    {
+       const double w = (Theta[i]-ThetaOld[i]) -
+                        (((Percolation[i-1]+q[i]+q_p[i]) -
+                          (Percolation[i]+q[i+1]+q_p[i+1]))
+                         /soil.dz(i) -
+                         S[i])*dt;
+       if (fabs(w)>0.0001)
+         COUT << "BUG: W = " << w << " i_GWT = " << i_GWT << " i = " << i
+              << " i_GWT_old = " << i_GWT_old << "\n";
+    }
   DrainFlow = 0.0;
   for (unsigned int i = 0; i <= i_bottom; i++)
     {
@@ -136,7 +155,10 @@ GroundwaterPipe::update_water (const Soil& soil,
          }
        assert (finite (q[i]));
     }
+  assert(DrainFlow>=0.0);
   height = GWT_new;
+  for (unsigned int i = i_GWT; i <= i_bottom; i++)
+    h[i] = height - soil.z (i);
 }
 
 double
@@ -149,7 +171,7 @@ GroundwaterPipe::DeepPercolation(const Soil& soil)
     return 0;
 }
 
-double
+void
 GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
 {
   const int i_GWT = soil.interval_plus (height) + 1;
@@ -178,24 +200,20 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
 
       // Distribution of drain flow among numeric soil layers
       const double a = Flow / (Ka*Ha + Kb*Hb);
-      for (unsigned int i = 0; i < i_bottom; i++)
+      for (unsigned int i = i_GWT; i <= i_bottom; i++)
 	{
-	  if (i >= i_GWT)
-	    S[i] = a * soil.K (i, 0.0, 0.0);
+          S[i] = a * soil.K (i, 0.0, 0.0);
 	}
       assert (finite (Flow));
-      Percolation[i_bottom+1] = Flow;
-      for (unsigned int i = i_bottom; i >= i_drain; i--)
+      for (unsigned int i = i_bottom; i >= i_GWT; i--)
 	{
-	  Percolation[i] = Percolation[i+1] + S[i] * soil.dz (i);
+	  Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);
 	}
-      return Flow;
     }
   else
     {
-      for (unsigned int i = i_bottom; i >= i_drain; i--)
-	Percolation[i] = Percolation[i+1] + S[i] * soil.dz (i);
-      return 0.0;
+      for (unsigned int i = i_bottom; i >= i_GWT; i--)
+	Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);
     }
 }
 
@@ -205,14 +223,21 @@ GroundwaterPipe::Update_GWT (const Soil& soil,
                              vector<double>& Theta, vector<double>& q,
                              vector<double>& q_p)
 {
-  const double z_drain = soil.zplus (i_drain);
   const int i_GWT = soil.interval_plus (height) + 1;
-  if (-(q[i_drain+1]+q_p[i_drain+1]) > Percolation[i_drain])
+  const double z_drain = soil.zplus (i_drain);
+  deficit = (Percolation[i_GWT-1] + (q[i_GWT]+q_p[i_GWT])) * dt;
+  if (deficit < 0)
     RaisingGWT (soil, h, h_ice, Theta, q, q_p);
-  else if (height<=z_drain)
-    FallingGWT1 (soil, h, h_ice, Theta);
+  else if (height>z_drain)
+    {
+      Percolation[i_GWT-1] =  -(q[i_GWT]+q_p[i_GWT]);
+      FallingGWT1 (soil, h, h_ice, Theta, deficit);
+    }
   else
-    FallingGWT2 (soil, h, h_ice, Theta);
+    {
+      Percolation[i_GWT-1] =  -(q[i_GWT]+q_p[i_GWT]);
+      FallingGWT2 (soil, h, h_ice, Theta, deficit);
+    }
 }
 
 void
@@ -234,80 +259,121 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
            h[i] = soil.h(i,Theta[i]);
            break;
          }
+       else if (i <= 0)
+         throw ("Tile drain system inadequate. Soil profile saturated");
        else
          {
-           if (i>0)
-             GWT_new = soil.zplus (i-1);
-           else
-             throw ("Tile drain system inadequate. Soil profile saturated");
-           Percolation[i-1] -= (ThetaS-Theta[i]) * soil.dz (i) / dt;
+           GWT_new = soil.zplus (i-1);
+           Percolation[i-1] -= (Theta[i]+dTheta-ThetaS) * soil.dz (i) / dt;
            Theta[i] = ThetaS;
-        }
-    }
-  const int i_GWT = soil.interval_plus (GWT_new) + 1;
-  for (unsigned int i = i_GWT; i <= i_bottom; i++)
-    {
-       h[i] = GWT_new - soil.z (i);
+         }
     }
 }
 
+//GWT is above the drain depth
 void
 GroundwaterPipe::FallingGWT1 (const Soil& soil,
                               vector<double>& h, vector<double>& h_ice,
-                              vector<double>& Theta)
+                              vector<double>& Theta,
+                              const double deficit)
 {
+  int i_drainage;
   GWT_new = height;
-  const double z_drain = soil.zplus (i_drain);
   const int i_GWT = soil.interval_plus (height) + 1;
   for (unsigned int i = i_GWT; i <= i_bottom; i++)
     {
-       const double qi = Percolation[i-1];
-       const double qo = Percolation[i];
-       if (i <= i_drain)
-         {
-           const double ThetaS = soil.Theta(i,0.0,h_ice[i]);
-           const double h1 = max ( z_drain - height, -100.0);
-           const double Theta1 = soil.Theta(i,h1,0.0);
-           const double h2 = max (-soil.dz (i) / 2.0, h1);
-           const double Theta2 = soil.Theta(i,h2,0.0);
-           const double W1 = (ThetaS - Theta1) * soil.dz (i) / dt;
-           const double W2 = (ThetaS - Theta2) * soil.dz (i) / dt;
-           if (qo-qi < W2)
-             {
-               h[i] = h2;
-               Theta[i] = Theta2;
-               const double W = (ThetaS - Theta2) * soil.dz (i) / dt + qi - qo;
-               S[i] = W / soil.dz (i);
-               GWT_new = soil.zplus (i);
-               break;
-             }
-           else if (qo-qi < W1)
-             {
-               S[i] = 0.0;
-               Theta[i] = ThetaS + (qi-qo) * dt / soil.dz (i);
-               h[i] = soil.h(i,Theta[i]);
-               GWT_new = soil.zplus (i);
-               break;
-             }
-           else
-             {
-               S[i] = 0.0;
-               Theta[i] = Theta2;
-               h[i] = h2;
-               Percolation[i] = qi + (ThetaS - Theta2) * soil.dz (i) / dt;
-             }
-         }
-       else
-         {
-           // GWT has fallen to the depth of the drain pipes,
-           // and flow to the drains ceases
-           S[i] = 0.0;
-           Percolation[i] = Percolation[i-1];
-           GWT_new = z_drain;
-         }
+       i_drainage = i;
+       const double def = EquilibriumDrainage(i_drainage, soil, h_ice);
+       if (def >= deficit) break;
     }
+  double def = 0.0;
+  for (unsigned int i = i_drainage; i > i_GWT; i--)
+    {
+       def += S[i] * soil.dz (i) * dt;
+       Percolation[i-1] = Percolation[i];
+       S[i] = 0.0;
+    }
+  if (i_drainage > i_drain)
+    for (unsigned int i = i_bottom-1; i >= i_GWT; i--)
+      {
+         def += S[i] * soil.dz (i) * dt;
+         S[i] = 0.0;
+         Percolation[i] = Percolation[i+1];
+      }
+  if (def >= deficit)
+    {
+       const double DrainSink = (def - deficit) /
+                                (soil.zplus (i_GWT-1) - soil.zplus (i_bottom));
+       for (unsigned int i = i_bottom-1; i >= i_GWT; i--)
+         {
+           S[i] = DrainSink;
+           Percolation[i] = Percolation[i+1] + S[i] * soil.dz (i);
+         }
+       const double w = (Percolation[i_GWT-1] - Percolation[i_GWT]) * dt -
+                    S[i_GWT] * soil.dz (i_GWT) * dt;
+       if (fabs(w)>0.0001)
+         COUT << "Falling GWT : BUG: W = " << w << " i_GWT = " << i_GWT
+              << " deficit = " << deficit << "\n";
+       return;
+    }
+  GWT_new = soil.zplus (i_drainage);
+  for (unsigned int i = i_drainage; i > i_GWT; i--)
+    {
+       const double ThetaS = soil.Theta(i,0.0,h_ice[i]);
+       h[i] = -(soil.z(i) - GWT_new);
+       Theta[i] = soil.Theta(i,h[i],h_ice[i]);
+       Percolation[i-1] = Percolation[i] -
+                          (ThetaS - Theta[i]) * soil.dz (i) / dt;
+    }
+  const double dTheta = (Percolation[i_GWT-1] - Percolation[i_GWT])
+                        / soil.dz (i_GWT) * dt;
+  if (dTheta >= 0.0)
+    S[i_GWT] = dTheta / dt;
+  else
+    Theta[i_GWT] += dTheta;
+  if (Theta[i_GWT] > soil.Theta(i_GWT,0.0,h_ice[i_GWT]))
+     CERR << "Theta = " << Theta[i_GWT] << ", Theta_sat = "
+          << soil.Theta(i_GWT,0.0,h_ice[i_GWT]) << "\n";
+
+  h[i_GWT] = soil.h (i_GWT, Theta[i_GWT]);
 }
 
+void
+GroundwaterPipe::FallingGWT2 (const Soil& soil,
+                              vector<double>& h, vector<double>& h_ice,
+                              vector<double>& Theta,
+                              const double deficit)
+{
+  int i_drainage;
+  GWT_new = height;
+  const int i_GWT = soil.interval_plus (height) + 1;
+  for (unsigned int i = i_GWT; i <= i_bottom; i++)
+    {
+       i_drainage = i;
+       const double def = EquilibriumDrainage(i_drainage, soil, h_ice);
+       if (def >= deficit) break;
+    }
+  GWT_new = soil.zplus (i_drainage);
+  for (unsigned int i = i_drainage; i > i_GWT; i--)
+    {
+       const double ThetaS = soil.Theta(i,0.0,h_ice[i]);
+       h[i] = -(soil.z(i) - GWT_new);
+       Theta[i] = soil.Theta(i,h[i],h_ice[i]);
+       Percolation[i-1] = Percolation[i] -
+                          (ThetaS - Theta[i]) * soil.dz (i) / dt;
+    }
+  const double dTheta = (Percolation[i_GWT-1] - Percolation[i_GWT])
+                        / soil.dz (i_GWT) * dt;
+  Theta[i_GWT] += dTheta;
+  if (Theta[i_GWT] > soil.Theta(i_GWT,0.0,h_ice[i_GWT]))
+     CERR << "Theta = " << Theta[i_GWT] << ", Theta_sat = "
+          << soil.Theta(i_GWT,0.0,h_ice[i_GWT]) << "\n";
+
+  h[i_GWT] = soil.h (i_GWT, Theta[i_GWT]);
+}
+
+#if 0
+// GWT is below the drain depth
 void
 GroundwaterPipe::FallingGWT2 (const Soil& soil,
                               vector<double>& h, vector<double>& h_ice,
@@ -327,16 +393,23 @@ GroundwaterPipe::FallingGWT2 (const Soil& soil,
        const double Theta2 = soil.Theta(i,h2,h_ice[i]);
        const double W1 = (ThetaS - Theta1) * soil.dz (i) / dt;
        const double W2 = (ThetaS - Theta2) * soil.dz (i) / dt;
-       if (qo-qi < W2)
+       if (qo-qi < 0)
+         {
+           S[i] = (qi-qo) / soil.dz (i);
+           break;
+         }
+       else if (qo-qi < W2)
          {
            h[i] = h2;
            Theta[i] = Theta2;
+           const double W = (ThetaS - Theta2) * soil.dz (i) / dt + qi - qo;
+           S[i] = W / soil.dz (i);
            GWT_new = soil.zplus (i);
            break;
          }
        else if (qo-qi < W1)
          {
-           Theta[i] = ThetaS + (qi-qo) * dt / soil.dz (i);
+           Theta[i] = ThetaS + (qi-qo) / soil.dz (i) * dt;
            h[i] = soil.h(i,Theta[i]);
            GWT_new = soil.zplus (i);
            break;
@@ -345,10 +418,33 @@ GroundwaterPipe::FallingGWT2 (const Soil& soil,
          {
            Theta[i] = Theta2;
            h[i] = h2;
-           Percolation[i] = qi + (ThetaS - Theta2) * soil.dz (i) / dt;
-           GWT_new = z_bottom;
+           Percolation[i] = qi + (ThetaS-Theta2)/dt * soil.dz (i);
          }
     }
+}
+#endif
+
+double
+GroundwaterPipe::EquilibriumDrainage (const int i_drainage,
+                                      const Soil& soil,
+                                      vector<double>& h_ice)
+{
+  const int i_GWT = soil.interval_plus (height) + 1;
+  double w = 0;
+  for (unsigned int i = i_GWT; i <= i_drainage; i++)
+    {
+       const double ThetaS = soil.Theta(i,0.0,h_ice[i]);
+       const double h = -(soil.z(i) - soil.zplus(i_drainage));
+       const double Theta =  soil.Theta(i,h,h_ice[i]);
+       double Sd = 0;
+       if (i<=i_drain)
+         Sd = S[i] * dt * soil.dz(i);
+       else if (i==i_drain+1)
+         for (unsigned int j = i_drain+1; j <= i_bottom; j++)
+           Sd += S[i] * dt * soil.dz(i);
+       w += (ThetaS - Theta) * soil.dz(i) + Sd;
+    }
+  return w;
 }
 
 void
@@ -356,6 +452,9 @@ GroundwaterPipe::output (Log& log) const
 {
   Groundwater::output (log);
   log.output ("DrainFlow", DrainFlow);
+  log.output ("deficit", deficit);
+  log.output ("DeepPercolation", Percolation[i_bottom]);
+  log.output ("S", S);
 }
 
 static struct GroundwaterPipeSyntax
@@ -394,6 +493,10 @@ By default. this is Z_aquitard.");
 		  "Current groundwater level (a negative number).");
       syntax.add ("DrainFlow", "cm/h", Syntax::LogOnly,
 		  "Drain flow to pipes.");
+      syntax.add ("deficit", "cm", Syntax::LogOnly,
+		  "Deficit.");
+      syntax.add ("DeepPercolation", "cm/h", Syntax::LogOnly,
+		  "Deep percolation to aquifer.");
       syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		  "Pipe drainage.");
       Librarian<Groundwater>::add_type ("pipe", alist, syntax, &make);

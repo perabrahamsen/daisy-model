@@ -176,7 +176,8 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   double Ssnow_new = Ssnow + (Psnow + Prain - EvapSnowPack - q_s) * dt;
   if (Ssnow_new < 0.0)
     {
-      CERR << "Lost " << -Ssnow_new << " mm from snow pack.\n";
+      if (Ssnow_new < -1.0e-7)
+        CERR << "Lost " << -Ssnow_new << " mm from snow pack.\n";
       Ssnow_new = 0.0;
     }
   
@@ -184,12 +185,14 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   double Swater_new = Swater + (Prain - Eprime + M - q_s) * dt;
   if (Swater_new < 0.0)
     {
-      CERR << "Lost " << -Swater_new << " mm water from snow pack.\n";
+      if (Swater_new < -1.0e-7)
+        CERR << "Lost " << -Swater_new << " mm water from snow pack.\n";
       Swater_new = 0.0;
     }
   if (Swater_new > Ssnow_new)
     {
-      CERR << "Removed " << (Swater_new - Ssnow_new) << " mm water.\n";
+      if (Swater_new > Ssnow_new + 1.0e-7)
+        CERR << "Removed " << (Swater_new - Ssnow_new) << " mm water.\n";
       Swater_new = Ssnow_new;
     }
 

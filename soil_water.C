@@ -100,7 +100,9 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 
       if (X_ice_[i] < 0.0)
 	{
-	  CERR << "BUG: X_ice[" << i << "] = " << X_ice_[i] << "\n";
+	  CERR << "BUG: X_ice[" << i << "] = " << X_ice_[i]
+               << " (S[i] = " << S_[i] << ")\n";
+          X_ice_buffer[i] += X_ice_[i];
 	  X_ice_[i] = 0.0;
 	}
 
@@ -116,9 +118,10 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   int last  = soil.size () - 1;
   if (!groundwater.flux_bottom ())
     {
-      if (groundwater.table () < soil.z (last))
-	throw ("Groundwater table below lowest node.");
-      last = soil.interval (groundwater.table ());
+      assert (soil.size () > 1);
+      if (groundwater.table () <= soil.zplus (soil.size () - 2))
+	throw ("Groundwater table in or below lowest node.");
+      last = soil.interval_plus (groundwater.table ());
       if (last >=  soil.size () - 1)
 	assert ("Groundwater too low.");
       // Presure at the last node is equal to the water above it.
@@ -451,7 +454,7 @@ SoilWater::initialize (const AttributeList& al,
 	  
 	  for (unsigned int i = 0; i < soil.size (); i++)
 	    {
-	      h_.push_back (table - soil.z (i));
+	      h_.push_back (max (-100.0, table - soil.z (i)));
 	      Theta_.push_back (soil.Theta (i, h_[i], h_ice_[i]));
 	    }
 	}
