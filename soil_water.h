@@ -35,6 +35,7 @@ class Log;
 class Soil;
 class Syntax;
 class Geometry;
+class SoilHeat;
 
 class SoilWater
 {
@@ -107,7 +108,7 @@ public:
   // Simulation.
 public:
   void macro_tick (const Soil&, Surface&, Treelog&);
-  void tick (const Soil&, Surface&, Groundwater&, Treelog&);
+  void tick (const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
   void mix (const Soil&, double from, double to);
@@ -119,7 +120,7 @@ public:
 
 
   // Communication with surface.
-  double MaxExfiltration (const Soil&) const;
+  double MaxExfiltration (const Soil&, double T) const;
 
   // Communication with external model.
   void put_h (const Soil& soil, const vector<double>& v); // [cm]

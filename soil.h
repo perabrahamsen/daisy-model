@@ -40,7 +40,7 @@ class Soil : public Geometry
 
 public:
   // Water.
-  double K (int i, double h, double h_ice) const;
+  double K (int i, double h, double h_ice, double T) const;
   inline double Cw1 (int i, double h, double h_ice) const
   { return Theta (i, h, h_ice) - Cw2 (i, h) * h; }
   double Cw2 (int i, double h) const;

@@ -387,7 +387,7 @@ ColumnStandard::tick (Treelog& out,
 
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, my_weather);
-  soil_water.tick (soil, surface, groundwater, out);
+  soil_water.tick (soil, soil_heat, surface, groundwater, out);
   soil_chemicals.tick (soil, soil_water, soil_heat, &organic_matter,
 		       surface.chemicals_down (), out);
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3, out);

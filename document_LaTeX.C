@@ -480,9 +480,11 @@ DocumentLaTeX::print_users (ostream& out, const XRef::Users& users)
 
   for (unsigned int i = 0; i < users.models.size (); i++)
     {
-      if (i == users.models.size () - 1 && users.submodels.empty ())
+      if (i == 0)
+	;
+      else if (i == users.models.size () - 1 && users.submodels.empty ())
 	out << ", and \n";
-      else if (i != 0)
+      else 
 	out << ",\n";
       const string component = users.models[i].component;
       const string model = users.models[i].model;
@@ -497,14 +499,16 @@ DocumentLaTeX::print_users (ostream& out, const XRef::Users& users)
 	  print_quoted (out, path[j]);
 	}
       out << " (see \\ref{model:" << component << "-" << model 
-	  << "}, page \\ref{model:" << component << "-" << model << "}";
+	  << "}, page \\pageref{model:" << component << "-" << model << "})";
     }
 
   for (unsigned int i = 0; i < users.submodels.size (); i++)
     {
-      if (i == users.submodels.size () - 1)
+      if (i == 0 && users.models.empty ())
+	;
+      else if (i == users.submodels.size () - 1)
 	out << ", and \n";
-      else if (i != 0  || !users.submodels.empty ())
+      else 
 	out << ",\n";
       const string submodel = users.submodels[i].submodel;
       const vector<string>& path = users.submodels[i].path;
@@ -516,7 +520,7 @@ DocumentLaTeX::print_users (ostream& out, const XRef::Users& users)
 	  print_quoted (out, path[j]);
 	}
       out << " (see \\ref{fixed:" << submodel 
-	  << "}, page \\ref{fixed:" << submodel << "}";
+	  << "}, page \\pageref{fixed:" << submodel << "})";
     }
   out << ".\n";
 }

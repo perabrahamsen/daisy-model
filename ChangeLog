@@ -1,3 +1,35 @@
+2002-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.22 released.
+
+2002-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C, soil.h (K): Take new T argument, and use for
+	manipulating water viscosity.
+	* ridge.C (initialize): Update caller.
+	* soil_water.C (MaxExfiltration): Update caller.
+	* soil_water.C, soil_water.h (MaxExfiltration): Take new T
+	argument. 
+	* surface.C (tick): Update caller.
+	* surface.C, surface.h (tick) Take new soil_T argument.
+	* bioclimate_std.C (WaterDistribution): Update caller.
+	* groundwater_pipe.C (EquilibriumDrainFlow): Update caller.
+	(EquilibriumDrainFlow) Take new soil_heat argument.
+	(update_water): Update caller.
+	* groundwater_pipe.C, groundwater.C, groundwater.h (update_water):
+	Take new soil_heat argument. 
+	* soil_water.C (tick): Update caller.
+	* soil_water.C, soil_water.h (tick): Take new soil_heat argument.
+	* column_inorganic.C, column_std.C (tick): Update callers.
+	* uzrichard.C (richard): Update caller.
+	(richard): Take new soil_heat argument.
+	(internode): Update caller.
+	(internode): Take new soil_heat argument.
+	(tick): Update caller.
+	* uzrichard.C, uznone.C, uzlr.C, uzmodel.h (tick): Take new
+	soil_heat argument. 
+	* soil_water.C (tick): Update caller.
+
 2002-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.21 released.

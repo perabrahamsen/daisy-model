@@ -103,7 +103,8 @@ SoilWater::macro_tick (const Soil& soil, Surface& surface, Treelog& out)
 }
 
 void
-SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater,
+SoilWater::tick (const Soil& soil, const SoilHeat& soil_heat, 
+		 Surface& surface, Groundwater& groundwater,
 		 Treelog& msg)
 {
   Treelog::Open nest (msg, "SoilWater");
@@ -190,13 +191,13 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater,
       if (bottom)
 	{
 	  // We have two UZ models.
-	  ok = top->tick (msg, soil,
+	  ok = top->tick (msg, soil, soil_heat,
 			  first, surface,
 			  bottom_start - 1, *bottom,
 			  S_sum_, h_old, Theta_old_, h_ice_,
 			  h_, Theta_, q_);
 	  if (ok)
-	    ok = bottom->tick (msg, soil,
+	    ok = bottom->tick (msg, soil, soil_heat,
 			       bottom_start, *top,
 			       last, groundwater,
 			       S_sum_, h_old, Theta_old_, h_ice_,
@@ -205,7 +206,7 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater,
       else
 	{
 	  // We have only one UZ model.
-	  ok = top->tick (msg, soil,
+	  ok = top->tick (msg, soil, soil_heat,
 			  first, surface,
 			  last, groundwater,
 			  S_sum_, h_old, Theta_old_, h_ice_,
@@ -220,7 +221,7 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater,
   if (!ok)
     {
       msg.message ("Using reserve uz model.");
-      reserve->tick (msg, soil,
+      reserve->tick (msg, soil, soil_heat,
                      first, surface,
                      last, groundwater,
                      S_sum_, h_old, Theta_old_, h_ice_,
@@ -249,7 +250,7 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater,
 
   // Update flux in surface and groundwater.
   surface.update_water (soil, S_sum_, h_, Theta_, q_, q_p_);
-  groundwater.update_water (soil,
+  groundwater.update_water (soil, soil_heat,
 			    S_sum_, S_drain_, h_, h_ice_, Theta_, q_, q_p_,
 			    msg);
 }
@@ -366,9 +367,9 @@ SoilWater::output (Log& log) const
 }
 
 double
-SoilWater::MaxExfiltration (const Soil& soil) const
+SoilWater::MaxExfiltration (const Soil& soil, double T) const
 {
-  return - ((soil.K (0, h_[0], h_ice_[0]) / soil.Cw2 (0, h_[0])) 
+  return - ((soil.K (0, h_[0], h_ice_[0], T) / soil.Cw2 (0, h_[0])) 
 	    * ((Theta_[0] - soil.Theta_res (0)) / soil.z(0)));
 }
 

@@ -68,7 +68,7 @@ public:
   // Simulation.
   void output (Log&) const;
   void tick (Treelog&, double PotSoilEvaporation, double Water, double temp,
-	     const Soil&, const SoilWater&);
+	     const Soil&, const SoilWater&, double soil_T);
 
   // Communication with bioclimate.
   double EpFactor () const;

@@ -22,6 +22,7 @@
 
 #include "uzmodel.h"
 #include "soil.h"
+#include "soil_heat.h"
 #include "log.h"
 #include "mathlib.h"
 
@@ -57,7 +58,7 @@ public:
 
   // Simulate.
 public:
-  bool tick (Treelog&, const Soil& soil,
+  bool tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	     unsigned int first, const UZtop& top, 
 	     unsigned int last, const UZbottom& bottom, 
 	     const vector<double>& S,
@@ -75,7 +76,7 @@ public:
 };
 
 bool
-UZlr::tick (Treelog&, const Soil& soil,
+UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const UZtop& top, 
 	    unsigned int last, const UZbottom& /* bottom */, 
 	    const vector<double>& S,
@@ -96,8 +97,10 @@ UZlr::tick (Treelog&, const Soil& soil,
       // top from the second node.
       const double dz = soil.z (first) - soil.z (first+1);
       const double dh = (h_old[first] - h_old[first+1]);
-      const double K = min (soil.K (first, h_old[first], h_ice[first]),
-			    soil.K (first, h_old[first+1], h_ice[first+1]));
+      const double K = min (soil.K (first, h_old[first], h_ice[first],
+				    soil_heat.T (first)),
+			    soil.K (first, h_old[first+1], h_ice[first+1],
+				    soil_heat.T (first+1)));
       q_up = -K * (dh/dz + 1.0);
 
       // We can safely ignore S[first], since the ridge system has
@@ -110,7 +113,8 @@ UZlr::tick (Treelog&, const Soil& soil,
   else
     {
       // Limit flux by soil capacity.
-      const double K_sat = soil.K (first, 0.0, h_ice[first]);
+      const double K_sat = soil.K (first, 0.0, h_ice[first],
+				   soil_heat.T (first));
       assert (K_sat > 0.0);
       q_up = q[first] = max (top.q (), -K_sat);
 
@@ -130,7 +134,7 @@ UZlr::tick (Treelog&, const Soil& soil,
       assert (Theta_new >= Theta_res);
       // assert (Theta_new <= Theta_sat);
       const double h_new = soil.h (i, Theta_new);
-      double K_new = soil.K (i, h_new, h_ice[i]);
+      double K_new = soil.K (i, h_new, h_ice[i], soil_heat.T (i));
 
       if (use_darcy && i < to_darcy)
 	// Dry earth, near top.  Use darcy to move water up.
@@ -167,7 +171,8 @@ UZlr::tick (Treelog&, const Soil& soil,
 	      if (h_ice[i+1] < h_fc) // Blocked by ice.
 		K_new = 0.0;
 	      else
-		K_new = sqrt (K_new * soil.K (i+1, h[i+1], h_ice[i+1]));
+		K_new = sqrt (K_new * soil.K (i+1, h[i+1], h_ice[i+1],
+					      soil_heat.T (i+1)));
 	    }
 
 	  assert (finite (h_new));

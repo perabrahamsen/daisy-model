@@ -75,7 +75,7 @@ struct Surface::Implementation
   bool exfiltrate (Treelog&, double water);
   double ponding () const;
   void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
-	     const Soil& soil, const SoilWater& soil_water);
+	     const Soil& soil, const SoilWater& soil_water, double T);
   double albedo (const Soil& soil, const SoilWater& soil_water) const;
   void fertilize (const IM& n);
   void spray (const Chemicals& chemicals_in);
@@ -319,14 +319,15 @@ Surface::chemicals_down () const
 void
 Surface::tick (Treelog& msg,
 	       double PotSoilEvaporation, double water, double temp,
-	       const Soil& soil, const SoilWater& soil_water)
-{ impl.tick (msg, PotSoilEvaporation, water, temp, soil, soil_water); }
+	       const Soil& soil, const SoilWater& soil_water, double soil_T)
+{ impl.tick (msg, PotSoilEvaporation, water, temp, soil, soil_water, soil_T); }
 
 void
 Surface::Implementation::tick (Treelog& msg,
 			       double PotSoilEvaporation,
 			       double water, double temp,
-			       const Soil& soil, const SoilWater& soil_water)
+			       const Soil& soil, const SoilWater& soil_water,
+			       double soil_T)
 {
   if (pond > DetentionCapacity)
     {
@@ -345,7 +346,7 @@ Surface::Implementation::tick (Treelog& msg,
     }
 
   const double MaxExfiltration
-    = soil_water.MaxExfiltration (soil) * 10.0; // cm -> mm.
+    = soil_water.MaxExfiltration (soil, soil_T) * 10.0; // cm -> mm.
 
   Eps = PotSoilEvaporation;
 

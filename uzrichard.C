@@ -22,6 +22,7 @@
 
 #include "uzmodel.h"
 #include "soil.h"
+#include "soil_heat.h"
 #include "mathlib.h"
 #include "alist.h"
 #include "syntax.h"
@@ -66,7 +67,7 @@ public:
 
   // Simulate.
 private:
-  bool richard (Treelog&, const Soil& soil,
+  bool richard (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 		int first, const UZtop& top,
 		int last, const UZbottom& bottom,
 		const vector<double>& S,
@@ -78,7 +79,8 @@ private:
 		vector<double>& q);
   bool converges (const vector<double>& previous,
 		  const vector<double>& current) const;
-  void internode (const Soil& Soil, int first, int last,
+  void internode (const Soil& Soil, const SoilHeat& soil_heat,
+		  int first, int last,
 		  const vector<double>& h_ice,
 		  const vector<double>& K,
 		  vector<double>& Kplus) const;
@@ -93,7 +95,7 @@ private:
 		double ddt,
 		vector<double>& q);
 public:
-  bool tick (Treelog&, const Soil& soil,
+  bool tick (Treelog&, const Soil& soil, const SoilHeat&,
 	     unsigned int first, const UZtop& top,
 	     unsigned int last, const UZbottom& bottom,
 	     const vector<double>& S,
@@ -114,6 +116,7 @@ public:
 bool
 UZRichard::richard (Treelog& msg,
 		    const Soil& soil,
+		    const SoilHeat& soil_heat,
 		    int first, const UZtop& top,
 		    const int last, const UZbottom& bottom,
 		    const vector<double>& S,
@@ -147,7 +150,8 @@ UZRichard::richard (Treelog& msg,
   if (!bottom.flux_bottom ())
     {
       assert (last + 1 < soil.size ());
-      K[size] = soil.K (last + 1, 0.0, h_ice[last + 1]);
+      K[size] = soil.K (last + 1, 0.0, h_ice[last + 1], 
+			soil_heat.T (last + 1));
     }
   
   // For lysimeter bottom.
@@ -174,8 +178,9 @@ UZRichard::richard (Treelog& msg,
       available_water = top.h ();
 
       if (available_water
-	  > soil.K (first, 0.0, h_ice[first]) * dt
-	  + (soil.Theta (first, 0.0, h_ice[first]) - Theta_old[first]) * soil.dz (first))
+	  > soil.K (first, 0.0, h_ice[first], soil_heat.T (first)) * dt
+	  + (soil.Theta (first, 0.0, h_ice[first]) - Theta_old[first])
+	  * soil.dz (first))
 	top.flux_top_off ();
     }
 
@@ -200,7 +205,8 @@ UZRichard::richard (Treelog& msg,
       for (unsigned int i = 0; i < size; i++)
 	{
 	  Ksum[i] = 0.0;
-	  Kold[i] = soil.K (first + i, h[i], h_ice[first + i]);
+	  Kold[i] = soil.K (first + i, h[i], h_ice[first + i], 
+			    soil_heat.T (first + i));
 	}
       h_previous = h;
       Theta_previous = Theta;
@@ -218,13 +224,14 @@ UZRichard::richard (Treelog& msg,
 	  for (unsigned int i = 0; i < size; i++)
 	    {
 
-	      Ksum[i] += soil.K (first + i, h[i], h_ice[first + i]);
+	      Ksum[i] += soil.K (first + i, h[i], h_ice[first + i], 
+				 soil_heat.T (first + i));
 	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2;
 	    }
 	  if (bottom.flux_bottom ())
 	    K[size] = K[size - 1];
 
-	  internode (soil, first, last, h_ice, K, Kplus);
+	  internode (soil, soil_heat, first, last, h_ice, K, Kplus);
 
 	  // Calcualte nodes.
 	  for (unsigned int i = 0; i < size; i++)
@@ -537,7 +544,8 @@ UZRichard::converges (const vector<double>& previous,
 }
 
 void 
-UZRichard::internode (const Soil& soil, int first, int last,
+UZRichard::internode (const Soil& soil, const SoilHeat& soil_heat,
+		      int first, int last,
 		      const vector<double>& h_ice,
 		      const vector<double>& K, 
 		      vector<double>& Kplus) const
@@ -549,7 +557,8 @@ UZRichard::internode (const Soil& soil, int first, int last,
   
   for (int i = 0; i < size; i++)
     {
-      double Ksat = soil.K (first + i, 0.0, h_ice[first + i]);
+      double Ksat = soil.K (first + i, 0.0, h_ice[first + i], 
+			    soil_heat.T (first + i));
       Kplus[i] = min (Ksat, Kplus[i]);
       if (i > 0)
 	Kplus[i - 1] = min (Ksat, Kplus[i - 1]);
@@ -605,7 +614,7 @@ calculating flow with pressure top.");
 }
 
 bool
-UZRichard::tick (Treelog& msg, const Soil& soil,
+UZRichard::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 		 unsigned int first, const UZtop& top, 
 		 unsigned int last, const UZbottom& bottom, 
 		 const vector<double>& S,
@@ -617,7 +626,7 @@ UZRichard::tick (Treelog& msg, const Soil& soil,
 		 vector<double>& q)
 {
   iterations = 0;
-  if (!richard (msg, soil, first, top, last, bottom, 
+  if (!richard (msg, soil, soil_heat, first, top, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q))
     {
 #ifdef WORKING_EXCEPTIONS

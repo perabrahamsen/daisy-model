@@ -27,7 +27,7 @@
 #include "submodel.h"
 #include "log.h"
 #include "check.h"
-#include <assert.h>
+#include "plf.h"
 #include <iomanip.h>
 
 struct Soil::Implementation
@@ -109,12 +109,29 @@ A location and content of a soil layer.");
 };
 
 double 
-Soil::K (int i, double h, double h_ice) const
+Soil::K (int i, double h, double h_ice, double T) const
 { 
+  static struct ViscosityFactor : public PLF
+  {
+    ViscosityFactor ()
+    {
+      add ( 0.0, 1002.0 / 1786.0);
+      add ( 5.0, 1002.0 / 1519.0);
+      add (10.0, 1002.0 / 1307.0);
+      add (15.0, 1002.0 / 1139.0);
+      add (20.0, 1002.0 / 1002.0);
+      add (25.0, 1002.0 /  890.0);
+      add (30.0, 1002.0 /  798.0);
+      add (35.0, 1002.0 /  719.0);
+      add (40.0, 1002.0 /  658.0);
+    }
+  } viscosity_factor;
+
+  const double T_factor = viscosity_factor (T);
   if (h < h_ice)
-    return horizon_[i]->hydraulic.K (h); 
+    return horizon_[i]->hydraulic.K (h) * T_factor; 
   else
-    return horizon_[i]->hydraulic.K (h_ice); 
+    return horizon_[i]->hydraulic.K (h_ice) * T_factor; 
 }
 
 double Soil::Theta (int i, double h, double h_ice) const
@@ -211,7 +228,8 @@ Soil::make_table (int i)
       cout << setw (4) << setprecision (3) << pF << " "
 	   << setw (6) << setprecision (5) << Theta (i, h, 0.0) << " "
 	   << setw (12) << setprecision (11) << Cw2 (i, h) * 100.0 << " "
-	   << setw (12) << setprecision (11) << K (i, h, 0.0) / 3.6e5 << "\n";
+	   << setw (12) << setprecision (11) << K (i, h, 0.0, 20.0) / 3.6e5
+	   << "\n";
     }
 }
 

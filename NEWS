@@ -12,6 +12,14 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.22
+
+** Soil water conductivity is now temperature dependent.
+
+The specified water conductivity (K_sat) is assumed to apply at 
+20 dg C, and scaled according to the water viscosity at the current
+soil temperature.
+
 * 2.21
 
 ** Added cross references to reference manual.

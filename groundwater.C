@@ -31,7 +31,7 @@ The 'groundwater' component is responsible for specifying the\n\
 groundwater table at each timestep.";
 
 void
-Groundwater::update_water (const Soil&,
+Groundwater::update_water (const Soil&, const SoilHeat&,
 			   vector<double>& /* S_sum */,
 			   vector<double>& /* S_drain */,
 			   vector<double>& /* h */,

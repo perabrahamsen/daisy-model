@@ -23,6 +23,7 @@
 #include "groundwater.h"
 #include "log.h"
 #include "soil.h"
+#include "soil_heat.h"
 #include "tmpstream.h"
 #include "treelog.h"
 #include "mathlib.h"
@@ -68,7 +69,7 @@ public:
       out.warning ("it's time - Greetings from pipe drains");
 #endif
   }
-  void update_water (const Soil&,
+  void update_water (const Soil&, const SoilHeat&,
   		     vector<double>& S_sum,
   		     vector<double>& S_drain,
 		     vector<double>& h,
@@ -81,7 +82,7 @@ public:
 
 private:
   double DeepPercolation (const Soil&);
-  double EquilibriumDrainFlow (const Soil&);
+  double EquilibriumDrainFlow (const Soil&, const SoilHeat&);
   void RaisingGWT  (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
                     vector<double>& Theta, const double deficit, Treelog&);
@@ -145,6 +146,7 @@ public:
 
 void
 GroundwaterPipe::update_water (const Soil& soil,
+			       const SoilHeat& soil_heat,
 			       vector<double>& S_sum,
 			       vector<double>& S_drain,
 			       vector<double>& h,
@@ -170,7 +172,7 @@ GroundwaterPipe::update_water (const Soil& soil,
   const double GWT_UZ = soil.zplus (i_sat-1);
   if (height<GWT_UZ) height = GWT_UZ;
   Percolation[i_bottom] = DeepPercolation(soil);
-  EqDrnFlow = EquilibriumDrainFlow (soil);
+  EqDrnFlow = EquilibriumDrainFlow (soil, soil_heat);
   Update_GWT (soil, h, h_ice, Theta, q, q_p, out);
   const int i_GWT_old = soil.interval_plus (height) + 1;
   const int i_GWT = soil.interval_plus (GWT_new) + 1;
@@ -238,7 +240,8 @@ GroundwaterPipe::DeepPercolation(const Soil& soil)
 }
 
 double
-GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
+GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil, 
+				       const SoilHeat& soil_heat)
 {
   const int i_GWT = soil.interval_plus (height) + 1;
   if (height >= soil.zplus(i_drain-1))
@@ -249,7 +252,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
       for (unsigned int i = i_GWT; i <= i_drain; i++)
 	{
 	  Ha += soil.dz (i);
-	  Ka += soil.dz (i) * soil.K (i, 0.0, 0.0);
+	  Ka += soil.dz (i) * soil.K (i, 0.0, 0.0, soil_heat.T (i));
 	}
       Ka /= Ha;
 
@@ -259,7 +262,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
       for (unsigned int i = i_drain+1; i <= i_bottom; i++)
 	{
 	  Hb += soil.dz (i);
-	  Kb += soil.dz (i) * soil.K (i, 0.0, 0.0);
+	  Kb += soil.dz (i) * soil.K (i, 0.0, 0.0, soil_heat.T (i));
 	}
       Kb /= Hb;
       const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
@@ -268,7 +271,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
       const double a = Flow / (Ka*Ha + Kb*Hb);
       for (unsigned int i = i_GWT; i <= i_bottom; i++)
 	{
-          S[i] = a * soil.K (i, 0.0, 0.0);
+          S[i] = a * soil.K (i, 0.0, 0.0, soil_heat.T (i));
 	}
       assert (finite (Flow));
       for (unsigned int i = i_bottom; i >= i_GWT; i--)

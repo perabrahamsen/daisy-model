@@ -28,6 +28,7 @@
 
 class Time;
 class Treelog;
+class SoilHeat;
 
 class Groundwater : public UZbottom
 {
@@ -39,7 +40,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time& time, Treelog&) = 0;
-  virtual void update_water (const Soil&,
+  virtual void update_water (const Soil&, const SoilHeat&,
 			     vector<double>& S_sum,
 			     vector<double>& S_drain,
 			     vector<double>& h,

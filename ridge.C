@@ -1,7 +1,7 @@
 // ridge.C --- Simulate a ridge system.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -42,14 +42,14 @@ struct Ridge::Implementation
   const double z_switch;	// Height where we switch between regimes. [cm]
   const double x_switch;	// Location where we switch between regimes. []
   const double R_crust;		// Resistance in crust. [h]
-  /*const*/ int last_node ; // Last node in ridge system.
+  /*const*/ int last_node ;     // Last node in ridge system.
   /*const*/ double dz;		// Depth of first node below ridge. [cm]
   /*const*/ double K_sat_below; // Saturated conductivity below ridge. [cm/h]
   // Variables.
   double Theta;			// Water in ridge. [cm^3/cm^3]
   double Theta_pre;             // Water in ridge before transport. [cm^3/cm^3]
   double h;			// Pressure in ridge. [cm]
-  double K;			// Saturated conductivity in ridge [cm/h]
+  /*const*/double K;		// Saturated conductivity in ridge [cm/h]
   double z_pond;		// Internal free water level. [cm]
   double x_pond;		// Water to soil point. []
   double internal_ponding;	// Distance from ridge bot. to water surf [cm]
@@ -406,7 +406,7 @@ Ridge::Implementation::initialize (const Soil& soil, const SoilWater& soil_water
   last_node = soil.interval_plus (lowest);
   assert (last_node+1 < soil.size ());
   dz = 0 - soil.zplus (last_node);
-  K_sat_below = soil.K (last_node+1, 0.0, 0.0);
+  K_sat_below = soil.K (last_node+1, 0.0, 0.0, 20.0);
 
   // Initialize water content.
   Theta = 0.0;
@@ -416,7 +416,7 @@ Ridge::Implementation::initialize (const Soil& soil, const SoilWater& soil_water
   Theta_pre = Theta;
   assert (Theta < soil.Theta (0, 0.0, 0.0));
   h = soil.h (0, Theta);
-  K = soil.K (0, 0.0, 0.0);
+  K = soil.K (0, 0.0, 0.0, 20.0);
 }
 
 void

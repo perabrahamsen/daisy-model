@@ -4,7 +4,15 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 Make water conductivity depend on teperature.
 
-
+0    1786
+5    1519
+10   1307
+15   1139
+20   1002 (normal)
+25    890
+30    798
+35    719
+40    658
 
 * NEWS
 

@@ -26,6 +26,7 @@
 #include "librarian.h"
 
 class Soil;
+class SoilHeat;
 class Library;
 class Syntax;
 class AttributeList;
@@ -76,7 +77,7 @@ public:
   
   // Simulate.
 public:
-  virtual bool tick (Treelog&, const Soil& soil,
+  virtual bool tick (Treelog&, const Soil& soil, const SoilHeat&,
 		     unsigned int first, const UZtop& top, 
 		     unsigned int last, const UZbottom& bottom, 
 		     const vector<double>& S,

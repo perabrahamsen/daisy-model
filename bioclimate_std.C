@@ -26,6 +26,7 @@
 #include "plf.h"
 #include "alist.h"
 #include "soil.h"
+#include "soil_heat.h"
 #include "common.h"
 #include "syntax.h"
 #include "snow.h"
@@ -431,7 +432,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   surface.tick (msg, pond_ep, 
 		pond_water_in, pond_water_in_temperature, 
-		soil, soil_water);
+		soil, soil_water, soil_heat.T (0));
   pond_ea = surface.evap_pond (msg);
   assert (pond_ea >= 0.0);
   total_ea += pond_ea;

@@ -47,7 +47,7 @@ public:
     { }
 
 public:
-  bool tick (Treelog&, const Soil& /* soil */,
+  bool tick (Treelog&, const Soil& /* soil */, const SoilHeat&,
 	     unsigned int first, const UZtop& /* top */, 
 	     unsigned int last, const UZbottom& /* bottom */, 
 	     const vector<double>& /* S */,
