@@ -4,7 +4,7 @@
 #include "tmpstream.h"
 #include "treelog.h"
 #include "options.h"
-#include "message.h"
+// #include "message.h"
 
 #include <string>
 #include <vector>
@@ -49,12 +49,12 @@ Lexer::open_file (const string& name)
   for (unsigned int i = 0; i < path.size (); i++)
     {
       const string file = path[i] + DIRECTORY_SEPARATOR + name;
-      CERR << "Trying " << file << "...\n";
+      // CERR << "Trying " << file << "...\n";
       delete in;
       in = new ifstream (file.c_str ());
       if (in->good ())
 	return *in;
-      CERR << "Failed.\n";
+      // CERR << "Failed.\n";
     }
   return *in;
 }

@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-#if 1
+#if defined (BORLAND)
 #include <iosfwd>
 #elif definded (MISSING_OSTREAM)
 #include <iostream.h>
