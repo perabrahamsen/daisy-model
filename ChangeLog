@@ -1,5 +1,8 @@
 2002-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* average.C (description): Doc fix.
+	* crop_sold.C (CropSoldSyntax): Ditto.
+
 	* Version 2.22 released.
 
 2002-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>

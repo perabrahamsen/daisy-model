@@ -1,19 +1,5 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Viscosity
-
-Make water conductivity depend on teperature.
-
-0    1786
-5    1519
-10   1307
-15   1139
-20   1002 (normal)
-25    890
-30    798
-35    719
-40    658
-
 * NEWS
 
 ** New log parameterizations "Organic Matter" and "AOM Pools".
@@ -29,8 +15,6 @@ the AOMS, or a specific AOM if "$am" is set.
 ** Tillage
 
 *** Soil Compaction
-
-Mail til HSV.
 
 ** Pesticides
 

@@ -489,27 +489,27 @@ xtest:	test/test.dai daisy
          && ../daisy test.dai \
 	 && diff -u harvest_weather.log harvest.log)
 
-ps:	txt/reference/reference.ps
+ps:	txt/reference.ps
 
 
-txt/reference/reference.ps:	txt/reference/reference.dvi
-	(cd txt/reference \
+txt/reference.ps:	txt/reference.dvi
+	(cd txt \
 	 && dvips -f reference.dvi > reference.ps)
 
-txt/reference/reference.dvi:	txt/reference/components.tex
-	(cd txt/reference \
+txt/reference.dvi:	txt/components.tex
+	(cd txt \
 	 && makeindex reference \
 	 && latex reference.tex < /dev/null )
 
-pdf:	txt/reference/reference.pdf
+pdf:	txt/reference.pdf
 
-txt/reference/reference.pdf:	txt/reference/components.tex
-	(cd txt/reference \
+txt/reference.pdf:	txt/components.tex
+	(cd txt \
 	 && makeindex reference \
 	 && pdflatex reference.tex < /dev/null )
 
-txt/reference/components.tex:	daisy
-	(cd txt/reference \
+txt/components.tex:	daisy
+	(cd txt \
 	 && ../../daisy all.dai -p LaTeX > components.tex)
 
 # Remove all the temporary files.
@@ -541,11 +541,8 @@ dist:	cvs
 	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
-	(cd lib; $(MAKE) dist)
-	$(MAKE) pdf
-	mv -f txt/reference/reference.pdf $(FTPDIR)/daisy-ref.pdf
-	$(MAKE) ps
-	mv -f txt/reference/reference.ps $(FTPDIR)/daisy-ref.ps
+	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) dist)
+	(cd txt; $(MAKE) FTPDIR=$(FTPDIR) dist)
 	cp daisy $(FTPDIR)/daisy-$(TAG)-$(HOSTTYPE)
 	strip $(FTPDIR)/daisy-$(TAG)-$(HOSTTYPE)
 	rm -f $(FTPDIR)/daisy-$(HOSTTYPE)
@@ -567,6 +564,7 @@ cvs: $(TEXT)
 	echo >> ChangeLog
 	cat ChangeLog.old >> ChangeLog
 	(cd lib; $(MAKE) cvs);
+	(cd txt; $(MAKE) cvs);
 	-cvs add $(TEXT)
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
