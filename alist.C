@@ -614,6 +614,22 @@ const string&
 AttributeList::name (const char *const key) const
 { return identifier (key).name (); }
 
+const string& 
+AttributeList::name (const string& key, const string& default_value) const
+{
+  if (!check (key))
+    return default_value;
+  return identifier (key).name (); 
+}
+
+const string& 
+AttributeList::name (const char *const key, const string& default_value) const
+{ 
+  if (!check (key))
+    return default_value;
+  return identifier (key).name (); 
+}
+
 symbol
 AttributeList::identifier (const string& key) const
 {

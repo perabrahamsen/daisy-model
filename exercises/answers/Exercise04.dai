@@ -2,13 +2,9 @@
 ;;  Daisy writes a Daisy.log-file during execution. 
 ;;  This log-file contains any error messages
 ;;  If the working directory is set correctly the log-file will be found here
-;; (directory "C:/DaisySim/W")
-(directory "/tmp")
+(directory "C:/DaisySim/Exercise/04")
 ;;  Setting search path for library-files 
-;; (path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
-(path "/home/user_2/abraham/daisy/exercises/answers" 
-      "/home/user_2/abraham/daisy/exercises" 
-      "/home/user_2/abraham/daisy/lib")
+(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
 
 ;; Including external library-files
 (input file "tillage.dai")
@@ -75,7 +71,7 @@
   (fertilize (N25S (weight 95 [kg N/ha]))) 
   (wait (or (crop_ds_after "Spring Barley" 2.0) ;Ripe
             (mm_dd 9 1))) (harvest "Spring Barley"))
-            
+
 ;; A tensiometer is placed in 20 cm depth and whenever the soil water potential
 ;; gets below -200 cm the crop is irrigated with 30 mm if we are in the period
 ;; 15. May to 15. June. We always waits 2 dayes before we can irrigate again
@@ -103,7 +99,7 @@
 ;; Selecting management
 (manager activity
   SBarley_irrigation
-  (wait_mm_dd 12 31) stop
+  (wait_mm_dd 1 1) stop
 )
 ;; Selecting output files
 (output Harvest

@@ -461,9 +461,9 @@ static struct CropSimpleSyntax
 		"Description of this parameterization."); 
     alist.add ("description", "Forced growth crop model.");
 
-    syntax.add ("LAIvsTS", "m^2/m^2", "dg C d", Syntax::OptionalConst, 
+    syntax.add ("LAIvsTS", "dg C d", "m^2/m^2", Syntax::OptionalConst, 
 		"LAI as a function of T_sum");
-    syntax.add ("LAIvsDay", "m^2/m^2", "d", Syntax::OptionalConst, 
+    syntax.add ("LAIvsDay", "d", "m^2/m^2", Syntax::OptionalConst, 
 		"LAI as a function of number of days since sowing.");
     syntax.add ("forced_LAI", "m^2/m^2", Check::non_negative (), 
 		Syntax::State, "\

@@ -2,13 +2,9 @@
 ;;  Daisy writes a Daisy.log-file during execution. 
 ;;  This log-file contains any error messages
 ;;  If the working directory is set correctly the log-file will be found here
-;; (directory "C:/DaisySim/W")
-(directory "/tmp")
+(directory "C:/DaisySim/Exercise/08")
 ;;  Setting search path for library-files 
-;; (path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
-(path "/home/user_2/abraham/daisy/exercises/answers" 
-      "/home/user_2/abraham/daisy/exercises" 
-      "/home/user_2/abraham/daisy/lib")
+(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
 
 ;; Including external library-files
 (input file "tillage.dai")
@@ -65,28 +61,16 @@
                     (K_sat 1.65 [cm/h]))
     (description "Data from O.H. Jacobsen (1989)")
 )
-(defhorizon "Aquitard" default
-    (clay 0.700)(silt 0.199)(fine_sand 0.05)(coarse_sand 0.05)(humus 0.001)
-    (C_per_N 11.0 [g C/g N])
-    (hydraulic M_vG (Theta_res 0.00)(Theta_sat 0.40)(alpha 0.01)(n 1.11)(K_sat 0.0015 [cm/h]))
-)
-
 ;;  Parameterisation of column (Fine sandy loam)
 (defcolumn "Fine sandy loam" default
      (Soil
           (MaxRootingDepth 100 [cm])
-          (dispersivity  5 [cm])
           (horizons (  -30 [cm] "Ap F.S.L.")
                     (  -80 [cm] "B F.S.L.")
-                    ( -220 [cm] "C F.S.L.")
-                    ( -270 [cm] "Aquitard"))
-          (zplus -2 -4 -7 -10 -13 -19 -22 -25 -27 -30 -35 -40 -45 -50
-                 -55 -60 -65 -70 -75 -80 -85 -90 -95 -100 -110 -120 -130
-                 -140 -150 -160 -170 -180 -190 -200 -210 -220 -230 
-                 -240 -250 -260 -270 [cm]))
+                    ( -220 [cm] "C F.S.L.")))
      (OrganicMatter (init (input 3000 [kg C/ha/y])))
-     (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.50 [m])
-          (Z_aquitard 1.70 [m])(K_aquitard 0.0015 [cm/h]))
+     (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.00 [m])
+          (Z_aquitard 2.00 [m])(K_aquitard 0.0015 [cm/h]))
 )
 
 ;;  Defining Pig Slurry with 5% and 10% volatilization, respectively
@@ -160,7 +144,7 @@
 (manager activity
   P_F_R
   P_F_R
-  (wait_mm_dd 12 31) stop
+  (wait_mm_dd 1 1) stop
 )
 ;; Selecting output files
 (output Harvest

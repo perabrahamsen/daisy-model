@@ -59,6 +59,8 @@ public:
   void swap (const Geometry&, double from, double middle, double to);
   double soil_C (const Geometry& geometry) const;
   double soil_N (const Geometry& geometry) const;
+  double soil_C (const Geometry& geometry, double from, double to) const;
+  double soil_N (const Geometry& geometry, double from, double to) const;
   double goal_C_per_N (unsigned int at) const; // Desired C/N ratio.
   static void turnover (const double from_C, const double from_N, 
 			const double to_C_per_N, const double N_avail,

@@ -2,13 +2,9 @@
 ;;  Daisy writes a Daisy.log-file during execution. 
 ;;  This log-file contains any error messages
 ;;  If the working directory is set correctly the log-file will be found here
-;; (directory "C:/DaisySim/W")
-(directory "/tmp")
+(directory "C:/DaisySim/Exercise/06")
 ;;  Setting search path for library-files 
-;; (path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
-(path "/home/user_2/abraham/daisy/exercises/answers" 
-      "/home/user_2/abraham/daisy/exercises" 
-      "/home/user_2/abraham/daisy/lib")
+(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
 
 ;; Including external library-files
 (input file "tillage.dai")
@@ -20,7 +16,7 @@
 (weather default "Taastrup6201.dwf")
 
 ;;  Description that will occur in all output files
-(description "Spring Barley; Soil: Fine sandy loam; Weather: Taastrup")
+(description "Arable Farm Rotation; Soil: Fine sandy loam; Weather: Taastrup")
 
 ;;  Defining soil horizons of a fine sandy loam
 (defhorizon "Ap F.S.L." default
@@ -30,12 +26,12 @@
     (sand 0.584 [])
     (humus 0.026 [])
     (C_per_N 11.0 [g C/g N])
-    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
-                    (Theta_sat 0.403 [cm^3 H2O/cm^3])
-                    (alpha 0.0385 [cm^-1])
-                    (n 1.211 [])
-                    (K_sat 7.52 [cm/h]))
-    (description "Data from O.H. Jacobsen (1989)")
+;   (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+;                    (Theta_sat 0.403 [cm^3 H2O/cm^3])
+;                    (alpha 0.0385 [cm^-1])
+;                    (n 1.211 [])
+;                    (K_sat 7.52 [cm/h]))
+;    (description "Data from O.H. Jacobsen (1989)")
 )
 (defhorizon "B F.S.L." default
     (dry_bulk_density 1.51 [g/cm^3]) 
@@ -44,12 +40,12 @@
     (sand 0.507 [])
     (humus 0.005 [])
     (C_per_N 11.0 [g C/g N])
-    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
-                    (Theta_sat 0.421 [cm^3 H2O/cm^3])
-                    (alpha 0.2605 [cm^-1])
-                    (n 1.135 [])
-                    (K_sat 14.5 [cm/h]))
-    (description "Data from O.H. Jacobsen (1989)")
+;    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+;                    (Theta_sat 0.421 [cm^3 H2O/cm^3])
+;                    (alpha 0.2605 [cm^-1])
+;                    (n 1.135 [])
+;                    (K_sat 14.5 [cm/h]))
+;    (description "Data from O.H. Jacobsen (1989)")
 )
 (defhorizon "C F.S.L." default
     (dry_bulk_density 1.57 [g/cm^3]) 
@@ -57,36 +53,25 @@
     (silt 0.283 [])
     (sand 0.471 [])
     (humus 0.002 [])
-    (C_per_N 11.0 [g C/g N])
-    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
-                    (Theta_sat 0.401 [cm^3 H2O/cm^3])
-                    (alpha 0.0570 [cm^-1])
-                    (n 1.131 [])
-                    (K_sat 1.65 [cm/h]))
-    (description "Data from O.H. Jacobsen (1989)")
-)
-(defhorizon "Aquitard" default
-    (clay 0.700)(silt 0.199)(fine_sand 0.05)(coarse_sand 0.05)(humus 0.001)
-    (C_per_N 11.0 [g C/g N])
-    (hydraulic M_vG (Theta_res 0.00)(Theta_sat 0.40)(alpha 0.01)(n 1.11)(K_sat 0.0015 [cm/h]))
+    (C_per_N  11.0)    ; note that the dimention is omittet
+;    (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
+;                    (Theta_sat 0.401 [cm^3 H2O/cm^3])
+;                    (alpha 0.0570 [cm^-1])
+;                    (n 1.131 [])
+;                    (K_sat 1.65 [cm/h]))
+;    (description "Data from O.H. Jacobsen (1989)")
 )
 
 ;;  Parameterisation of column (Fine sandy loam)
 (defcolumn "Fine sandy loam" default
      (Soil
           (MaxRootingDepth 100 [cm])
-          (dispersivity  5 [cm])
           (horizons (  -30 [cm] "Ap F.S.L.")
                     (  -80 [cm] "B F.S.L.")
-                    ( -220 [cm] "C F.S.L.")
-                    ( -270 [cm] "Aquitard"))
-          (zplus -2 -4 -7 -10 -13 -19 -22 -25 -27 -30 -35 -40 -45 -50
-                 -55 -60 -65 -70 -75 -80 -85 -90 -95 -100 -110 -120 -130
-                 -140 -150 -160 -170 -180 -190 -200 -210 -220 -230 
-                 -240 -250 -260 -270 [cm]))
+                    ( -220 [cm] "C F.S.L.")))
      (OrganicMatter (init (input 3000 [kg C/ha/y])))
-     (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.50 [m])
-          (Z_aquitard 1.70 [m])(K_aquitard 0.0015 [cm/h]))
+     (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.00 [m])
+          (Z_aquitard 2.00 [m])(K_aquitard 0.0015 [cm/h]))
 )
 
 ;; Spring Barley setup.
@@ -152,18 +137,23 @@
   A_F_R
   (wait_mm_dd 12 31) stop
 )
+
 ;; Selecting output files
 (output Harvest
         "Crop Production"
 ;;      Water balance 0-100 cm  
         ("Root Zone Water Balance" (to -100 [cm])(when daily)
-          (where "Daily_WB.dlf"))  
-        ("Root Zone Water Balance" (to -100 [cm])(when monthly)  
+          (where "Daily_WB.dlf"))
+          
+;; OBS !!!!  the to statement has been removed             
+;;      Monthly water balance down to the top of the aquitard
+        ("Root Zone Water Balance" (when monthly)  
           (where "Monthly_WB.dlf"))  
 ;;      Nitrogen balance 0-100 cm  
         ("N Balance" (to -100 [cm])(when daily)
           (where "Daily_NB.dlf"))  
-        ("N Balance" (to -100 [cm])(when monthly)  
+ ;;      Monthly nitrigen balance down to the top of the aquitard
+       ("N Balance" (when monthly)  
           (where "Monthly_NB.dlf"))  
 ;;      Soil profile data
         ("Groundwater" (when daily))       

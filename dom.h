@@ -69,6 +69,8 @@ public:
   void add_to_source (unsigned int at, double C, double N);
   double soil_C (const Geometry& geometry) const;
   double soil_N (const Geometry& geometry) const;
+  double soil_C (const Geometry& geometry, double from, double to) const;
+  double soil_N (const Geometry& geometry, double from, double to) const;
   double C_source (const Geometry& geometry) const;
   double N_source (const Geometry& geometry) const;
   double C_at (unsigned int at) const;

@@ -1,10 +1,8 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Update answers
-
 * FertOrgaNic 
 
-** Udregn polske depositionsdata fra dansk standard.
+** OM Summary table.
 
 ** gnuplot, check om datoer på x akse virker.
 
@@ -17,8 +15,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 ** kalibreringsstrategi
 
 ** Slovakiske data
-
-* Slides til Dina årsmøde
 
 * Make it possible to specify texture using different systems
 

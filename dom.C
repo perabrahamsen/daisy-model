@@ -262,6 +262,14 @@ double
 DOM::soil_N (const Geometry& geometry) const
 { return geometry.total (N.M); }
 
+double 
+DOM::soil_C (const Geometry& geometry, double from, double to) const
+{ return geometry.total (C.M, from, to); }
+
+double 
+DOM::soil_N (const Geometry& geometry, double from, double to) const
+{ return geometry.total (N.M, from, to); }
+
 double
 DOM::C_source (const Geometry& geometry) const
 { return geometry.total (C.S); }

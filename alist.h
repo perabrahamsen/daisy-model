@@ -60,6 +60,8 @@ public:
   double number (const char*, double default_value) const;
   const string& name (const string&) const;
   const string& name (const char*) const;
+  const string& name (const string&, const string& default_value) const;
+  const string& name (const char*, const string& default_value) const;
   symbol identifier (const string&) const;
   symbol identifier (const char*) const;
   bool flag (const string&) const;

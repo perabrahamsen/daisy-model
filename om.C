@@ -100,6 +100,14 @@ OM::soil_N (const Geometry& geometry) const
 { return geometry.total (N); }
 
 double 
+OM::soil_C (const Geometry& geometry, double from, double to) const
+{ return geometry.total (C, from, to); }
+
+double 
+OM::soil_N (const Geometry& geometry, double from, double to) const
+{ return geometry.total (N, from, to); }
+
+double 
 OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.
 {
   daisy_assert (C_per_N_goal.size () > at);

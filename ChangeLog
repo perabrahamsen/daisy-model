@@ -1,3 +1,33 @@
+2004-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.34 released.
+
+2004-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (top_summary): New parameter and member
+	function.
+
+	* alist.C, alist.h (name): New versions with default value.
+
+2004-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C, om.h, dom.C, dom.h (soil_C, soil_N): New versions that
+	take an interval argument. 
+
+2004-03-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (initialize): Added alternative deposition
+	specifikation. 
+
+2004-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Soil N Residuals", "Soil C Residuals"): Fix
+	dimension. 
+
+2004-02-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_simple.C (LAIvsTS, LAIvsDay): Fix dimensions.
+
 2004-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.33 released.

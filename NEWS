@@ -12,6 +12,62 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.34
+
+** New way to specify deposition in the default weather model
+
+Instead of specifying deposition with the (NH4|NO3)(Wet|Dry)Dep
+keywords in the .dwf file, you can use this set of keyword:
+
+Deposition: kgN/year
+  Total yearly deposition, given in kgN/year.
+PAverage: mm
+  Total yearly precipitation, given in mm.
+DepDry: % 
+  Dry fraction of total deposition (from air). The remainder will fall
+  with the precipitation. 
+DepDryNH4: %
+  Fraction of NH4 in deposition from air.  The remainder will fall in
+  the form of NO3. 
+DepWetNH4: %
+ Fraction of NH4 in deposition from rain and snow.  The remainder will
+  fall in the form of NO3
+
+You cannot specify both.  If you use the this specification, these
+numbers will be used for calculating the equivalents of the classic
+specification of deposition.  
+
+Example:
+
+Deposition: 16 kgN/year
+PAverage: 493 mm
+DepDry: 40 %
+DepDryNH4: 60 %
+DepWetNH4: 50 %
+
+You do not have to specify DepDry, DepDryNH4, or DepWetNH4.  If you
+don't the numbers above will be used (they are from the _Daisy
+Standardisering_ project).
+
+** Daisy will now write a summary of top soil organic matter initialization
+
+The summary will be written in daisy.log.  If you set the top_summary
+organic matter init parameter like this: 
+  
+  (defcolumn Andeby default
+    "The B.And farm, Andeby, 2002."
+    (OrganicMatter (init (top_summary "topsum.tab")))
+    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+  	  (MaxRootingDepth 60.0 [cm]))
+    (Groundwater deep))
+
+Then the summary will also be written to the specified file for
+further processing.
+  
+** Fixed some dimenesions.
+
+** Updated answers to exercise 1 to 8.
+
 * 3.33
 
 ** Bug fixes
@@ -1102,11 +1158,11 @@ This means it is useful for tall vegetation, like forests.
 
 * 2.61
 
-** No user visisble changes.
+** No user visible changes.
 
 * 2.60
 
-** No user visisble changes.
+** No user visible changes.
 
 * 2.59
 

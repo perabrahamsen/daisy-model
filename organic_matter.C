@@ -46,6 +46,8 @@
 #include "gaussj.h"
 #include <algorithm>
 #include <numeric>
+#include <fstream>
+#include <time.h>
 
 // Convertions
 static const double g_per_cm2_to_kg_per_ha = (10000.0 * 10000.0) / 1000.0;
@@ -115,6 +117,7 @@ struct OrganicMatter::Implementation
     const vector<int> debug_equations;
     const bool debug_rows;
     const bool debug_to_screen;
+    const string top_summary;   // File name to print top summary.
 
     // Use.
   public:
@@ -225,6 +228,7 @@ struct OrganicMatter::Implementation
 		     const double total_C_per_N,
 		     const vector<double>& SOM_C_per_N_goal,
 		     const vector<double>& SMB_results, int lay);
+  string top_summary (const Soil&, const Initialization&) const;
   void initialize (const AttributeList&, const Soil&, const SoilWater&,
 		   double T_avg, Treelog& err);
   Implementation (const AttributeList&);
@@ -482,6 +486,11 @@ Print summari information for each row.");
   syntax.add ("debug_to_screen", Syntax::Boolean, Syntax::Const, "\
 If true, print debug information to screen, else to the 'daisy.log' file.");
   alist.add ("debug_to_screen", false);
+  syntax.add ("top_summary", Syntax::String, Syntax::OptionalConst, "\
+Name of file to print a summary of the organic carbon and nitrogen\n\
+content in the zone down to the 'end' parameter.\n\
+If unspecified, no such file will be generated, but the summary will\n\
+still be found in 'daisy.log'.");
 }
 
 int
@@ -553,7 +562,8 @@ OrganicMatter::Implementation::Initialization::
     SOM_limit_upper (al.number_sequence ("SOM_limit_upper")),
     debug_equations (al.integer_sequence ("debug_equations")),
     debug_rows (al.flag ("debug_rows")),
-    debug_to_screen (al.flag ("debug_to_screen"))
+    debug_to_screen (al.flag ("debug_to_screen")),
+    top_summary (al.name ("top_summary", ""))
 { 
   if (input < 0)
     return;
@@ -1377,12 +1387,6 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
   const double total_input 
     = accumulate (am_input.begin (), am_input.end (), 0.0);
 
-  // Convertion factors.
-  const double g_per_cm2_to_kg_per_ha = (10000.0 * 10000.0) / 1000.0;
-  const double g_per_cm2_per_h_to_kg_per_ha_per_y 
-    = g_per_cm2_to_kg_per_ha * 24.0 * 365.0;
-
-
   // We know the total humus, the yearly input and has been told the
   // relative sizes of the SOM pools.  We need to calculate the SMB
   // fractions.
@@ -1951,6 +1955,143 @@ Setting additional pool to zero");
     }
 }
 
+string
+OrganicMatter::Implementation::top_summary (const Soil& soil,
+                                            const Initialization& init) const
+{
+  TmpStream tmp;
+    
+  // Max number of AOM pools.
+  size_t aom_max_size = 0;
+  for (unsigned int pool = 0; pool < am.size (); pool++)
+    { 
+      vector<AOM*> added;
+      am[pool]->append_to (added);
+      aom_max_size = max (aom_max_size, added.size ());
+    }        
+    
+  // Header line.
+  tmp () << "\t";
+  for (unsigned int pool = 0; pool < som.size (); pool++)
+    tmp () << "SOM" << pool + 1 << "\t";
+  for (unsigned int pool = 0; pool < smb.size (); pool++)
+    tmp () << "SMB" << pool + 1 << "\t";
+  for (unsigned int pool = 0; pool < aom_max_size; pool++)
+    tmp () << "AOM" << pool + 1 << "\t";
+  for (unsigned int pool = 0; pool < dom.size (); pool++)
+    tmp () << "DOM" << pool + 1 << "\t";
+  tmp () << "total\n";
+
+  // C line
+  tmp () << "kg C/ha\t";
+  double total_C = 0.0;
+  for (unsigned int pool = 0; pool < som.size (); pool++)
+    {
+      const double C = som[pool]->soil_C (soil, 0.0, init.end);
+      tmp () << C * g_per_cm2_to_kg_per_ha << "\t";
+      total_C += C;
+    }
+  for (unsigned int pool = 0; pool < smb.size (); pool++)
+    {
+      const double C = smb[pool]->soil_C (soil, 0.0, init.end);
+      tmp () << C * g_per_cm2_to_kg_per_ha << "\t";
+      total_C += C;
+    }
+  for (unsigned int pool = 0; pool < aom_max_size; pool++)
+    { 
+      double C = 0.0;
+      for (unsigned int i = 0; i < am.size (); i++)
+        { 
+          vector<AOM*> added;
+          am[i]->append_to (added);
+          if (pool < added.size ())
+            C += added[pool]->soil_C (soil, 0.0, init.end);
+        }        
+      tmp () << C * g_per_cm2_to_kg_per_ha << "\t";
+      total_C += C;
+    }
+  for (unsigned int pool = 0; pool < dom.size (); pool++)
+    {
+      const double C = dom[pool]->soil_C (soil, 0.0, init.end);
+      tmp () << C * g_per_cm2_to_kg_per_ha << "\t";
+      total_C += C;
+    }
+  tmp () << total_C * g_per_cm2_to_kg_per_ha << "\n";
+
+  // N line
+  tmp () << "kg N/ha\t";
+  double total_N = 0.0;
+  for (unsigned int pool = 0; pool < som.size (); pool++)
+    {
+      const double N = som[pool]->soil_N (soil, 0.0, init.end);
+      tmp () << N * g_per_cm2_to_kg_per_ha << "\t";
+      total_N += N;
+    }
+  for (unsigned int pool = 0; pool < smb.size (); pool++)
+    {
+      const double N = smb[pool]->soil_N (soil, 0.0, init.end);
+      tmp () << N * g_per_cm2_to_kg_per_ha << "\t";
+      total_N += N;
+    }
+  for (unsigned int pool = 0; pool < aom_max_size; pool++)
+    { 
+      double N = 0.0;
+      for (unsigned int i = 0; i < am.size (); i++)
+        { 
+          vector<AOM*> added;
+          am[i]->append_to (added);
+          if (pool < added.size ())
+            N += added[pool]->soil_N (soil, 0.0, init.end);
+        }        
+      tmp () << N * g_per_cm2_to_kg_per_ha << "\t";
+      total_N += N;
+    }
+  for (unsigned int pool = 0; pool < dom.size (); pool++)
+    {
+      const double N = dom[pool]->soil_N (soil, 0.0, init.end);
+      tmp () << N * g_per_cm2_to_kg_per_ha << "\t";
+      total_N += N;
+    }
+  tmp () << total_N * g_per_cm2_to_kg_per_ha << "\n\n";
+    
+  // Parameters.
+  tmp () << "Depth\t" << -init.end << "\tcm\n";
+  tmp () << "T\t" << init.T << "\tdg C\n";
+  tmp () << "h\t" << init.h << "\tcm\n";
+
+  // Clay and input.
+  double clay = 0.0;
+  double input = 0.0;
+  double last = 0.0;
+  for (unsigned int lay = 0; 
+       lay < soil.size () && soil.z (lay) > init.end;
+       lay++)
+    {
+      const double next = max (init.end, soil.zplus (lay));
+      const double dz = last - next;
+      last = next;
+
+      clay += soil.clay (lay) * dz;
+
+      vector<double> am_input (smb.size () + 1);
+      if (init.input >= 0)
+        init.find_input (am_input, lay);
+      else
+        input_from_am (am_input, init.T, init.h, lay);
+      const double total_input 
+        = accumulate (am_input.begin (), am_input.end (), 0.0);
+      input += total_input * dz * g_per_cm2_per_h_to_kg_per_ha_per_y;
+    }
+  clay /= -init.end;
+  tmp () << "Clay\t" << clay * 100 << "\t%\n";
+  tmp () << "Input\t" << input << "\tkg C/ha/y\n";
+
+  // Time.
+  time_t start_time = time (NULL);
+  tmp () << "Time\t" << ctime (&start_time);
+  return tmp.str ();
+}
+
 void
 OrganicMatter::Implementation::update_pools 
 /**/ (const vector<double>& SOM_results,
@@ -2218,9 +2359,28 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   for (unsigned int pool = 0; pool < dom_size; pool++)
     dom[pool]->initialize (soil, soil_water, err);
 
+  // Print top summary.
+  {
+    const string summary = top_summary (soil, init);
+
+    Treelog::Open nest (err, "Top soil summary");
+    if (init.debug_to_screen)
+      err.message (summary);
+    else
+      err.debug (summary);
+    
+    if (init.top_summary != "")
+      {
+        ofstream out (init.top_summary.c_str ());
+        out << summary;
+        if (!out.good ())
+          err.error ("Problems writing to '" + init.top_summary + "'");
+      }
+  }  
+
   // Initialize buffer.
   buffer.initialize (soil);
-  
+
   // Biological incorporation.
   bioincorporation.initialize (soil);
   static const symbol bio_symbol ("bio");

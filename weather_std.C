@@ -791,6 +791,22 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 
   set<string, less<string>/**/> keywords;
 
+  struct Deposition
+  {
+    double total;
+    double dry;
+    double dry_NH4;
+    double wet_NH4;
+    double precipitation;
+    Deposition ()
+      : total (-42.42e42),
+        dry (0.4),
+        dry_NH4 (0.6),
+        wet_NH4 (0.5),
+        precipitation (-42.42e42)
+    { }
+  } deposition;
+
   // Read keywords.
   bool last_was_note = false;
   while (lex->good () && lex->peek () != '-')
@@ -911,6 +927,57 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 		lex->error ("Unreasonable value");
 	      DryDeposit.NO3 = val;
 	    }
+          // Alternative way of specifying deposition.
+	  else if (key == "Deposition")
+	    {
+	      if (Units::can_convert (dim, "kgN/year"))
+		val = Units::convert (dim, "kgN/year", val);
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex->error ("Unreasonable value");
+	      deposition.total = val;
+	    }
+	  else if (key == "DepDry")
+	    {
+	      if (Units::can_convert (dim, "fraction"))
+		val = Units::convert (dim, "fraction", val);
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 1.0)
+		lex->error ("Unreasonable value");
+	      deposition.dry = val;
+	    }
+	  else if (key == "DepDryNH4")
+	    {
+	      if (Units::can_convert (dim, "fraction"))
+		val = Units::convert (dim, "fraction", val);
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 1.0)
+		lex->error ("Unreasonable value");
+	      deposition.dry_NH4 = val;
+	    }
+	  else if (key == "DepWetNH4")
+	    {
+	      if (Units::can_convert (dim, "fraction"))
+		val = Units::convert (dim, "fraction", val);
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 1.0)
+		lex->error ("Unreasonable value");
+	      deposition.wet_NH4 = val;
+	    }
+	  else if (key == "PAverage")
+	    {
+	      if (Units::can_convert (dim, "mm"))
+		val = Units::convert (dim, "mm", val);
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 3000.0)
+		lex->error ("Unreasonable value");
+	      deposition.precipitation = val;
+	    }
 	  else if (key == "Timestep")
 	    {
 	      if (Units::can_convert (dim, "hours"))
@@ -956,13 +1023,74 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
                   + keyword_description[i].name + " missing");
 
   static const string required[] = 
-    { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep", "Station",
-      "Surface", "Begin", "End" };
+    { "Station", "Surface", "Begin", "End" };
   static const int required_size = sizeof (required) / sizeof (string);
   
   for (unsigned int i = 0; i < required_size; i++)
     if (keywords.find (required[i]) == keywords.end ())
       lex->error (string ("Missing keyword '") + required[i] + "'");
+
+  static const string dep1[] = 
+    { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep" };
+  static const int dep1_size = sizeof (dep1) / sizeof (string);
+
+  bool dep1_has_all = true;
+  bool dep1_has_any = false;
+  for (unsigned int i = 0; i < dep1_size; i++)
+    if (keywords.find (dep1[i]) == keywords.end ())
+      dep1_has_all = false;
+    else
+      dep1_has_any = true;
+  daisy_assert (dep1_has_any || !dep1_has_all);
+  
+  static const string dep2[] = 
+    { "Deposition", "PAverage" };
+  static const int dep2_size = sizeof (dep2) / sizeof (string);
+
+  bool dep2_has_all = true;
+  bool dep2_has_any = false;
+  for (unsigned int i = 0; i < dep2_size; i++)
+    if (keywords.find (dep2[i]) == keywords.end ())
+      dep2_has_all = false;
+    else
+      dep2_has_any = true;
+  daisy_assert (dep2_has_any || !dep2_has_all);
+
+  if ((dep1_has_any && dep2_has_any)
+      || (!dep1_has_all && !dep2_has_all))
+    {
+      lex->error ("\
+You must specify either all of 'NH4WetDep', 'NO3WetDep', 'NH4DryDep',\n\
+and 'NO3DryDep'; or alternatively all of 'Deposition' and 'PAverage',\n\
+but not both");
+      DryDeposit.NH4 = DryDeposit.NO3 = 1.0;
+      WetDeposit.NH4 = WetDeposit.NO3 = 1.0;
+    }
+  else if (dep1_has_all)
+    daisy_assert (!dep2_has_any);
+  else
+    {
+      daisy_assert (!dep1_has_any);
+      const double dry = deposition.total * deposition.dry;
+      const double wet = deposition.total * (1.0 - deposition.dry);
+      daisy_assert (approximate (dry + wet, deposition.total));
+      DryDeposit.NH4 = dry * deposition.dry_NH4;
+      DryDeposit.NO3 = dry * (1.0 - deposition.dry_NH4);
+      WetDeposit.NH4 = wet * 100.0 * deposition.wet_NH4 
+        / deposition.precipitation;
+      WetDeposit.NO3 = wet * 100.0 * (1.0 - deposition.wet_NH4)
+        / deposition.precipitation;
+      daisy_assert (approximate (DryDeposit.NH4 + DryDeposit.NO3
+                                 + ((WetDeposit.NH4 + WetDeposit.NO3)
+                                    * deposition.precipitation / 100.0),
+                                 deposition.total));
+      TmpStream tmp;
+      tmp () << "NH4WetDep: " << WetDeposit.NH4 << " ppm\n\
+NH4DryDep: " << DryDeposit.NH4 << " kgN/year\n\
+NO3WetDep: " << WetDeposit.NO3 << " ppm\n\
+NO3DryDep: " << DryDeposit.NO3 << " kgN/year";
+      err.debug (tmp.str ());
+    }
 
   // BC5 sucks // if (begin >= end)
   if (!(begin < end))
