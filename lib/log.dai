@@ -537,9 +537,10 @@
                    (when hourly)
                    (tag "Seed_N")
                    (dimension "kg N/ha/&"))
-           (number (path column "$col" seed_N)
+           (number (path column "$col" harvest_N)
                    (when hourly)
                    (tag "Harvest_N")
+		   (factor 10); g/m^2 -> kg/ha
                    (dimension "kg N/ha/&"))
            (interval (tag "AOM")
                      (path column "$col" OrganicMatter am "*" om N)
@@ -1734,9 +1735,10 @@ This does *not* include deposition or irrigation!")
                    (dimension "g CH2O/m^2/&")
 		       (when hourly)
                    (factor 1.0))
-           (number (path column "$col" seed_N)
+           (number (path column "$col" harvest_C)
                    (when hourly)
                    (tag "Harvest_C")
+		   (factor 10); g/m^2 -> kg/ha
                    (dimension "kg C/ha/&"))
            ))
 (deflog "C Balance 0-100 cm" "Carbon Balance"
