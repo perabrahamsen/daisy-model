@@ -70,20 +70,10 @@
   (wait (at 1988 4 1 1))
   (stop))
 
-;; Define a log file format.
-(deflog "pond" table
-  (where "pond.tab")
-  (when hourly)
-  (entries (year (path time))
-	   (month (path time))
-	   (mday (path time))
-	   (hour (path time))
-	   (number (path column "*" Surface pond)
-		   (when hourly)
-		   (dimension "mm"))))
-
 ;; Create these log files.
-(output pond Harvest
+(output Harvest
+	"N Balance"
+	("Crop Production" (set "$crop" "Spring Barley"))
 	(checkpoint (when (at 1987 8 8 8))))
 
 ;;; test.dai ends here.
