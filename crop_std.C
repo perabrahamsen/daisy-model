@@ -1619,7 +1619,7 @@ CropStandard::RootPenetration (const Soil& soil, const SoilHeat& soil_heat)
   Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
 }
 
-double 
+double
 CropStandard::RootDensDistPar (double a)
 {
   double x, y, z, x1, y1, z1, x2, y2, z2;
@@ -1629,7 +1629,7 @@ CropStandard::RootDensDistPar (double a)
       x1 = 1.0;
       y1 = exp (x1);
       z1 = 1 + a * x1;
-      x2 = 2.0;
+      x2 = 20.0;
       y2 = exp (x2);
       z2 = 1 + a * x2;
       while ((z1 - y1) * (z2 - y2) > 0)
@@ -1688,7 +1688,7 @@ CropStandard::RootDensity (const Soil& soil)
   Variables::RecRootSys& RootSys = var.RootSys;
 
   double LengthPrArea
-    = max (0.01 * Root.SpRtLength * WRoot, 0.05 * PotRtDpt); /*cm/cm2*/
+    = max (0.01 * Root.SpRtLength * WRoot, 0.12 * PotRtDpt); /*cm/cm2*/
   double a = RootDensDistPar (LengthPrArea / (PotRtDpt * Root.DensRtTip));
   double L0 = Root.DensRtTip * exp (a);
   a /= PotRtDpt;
