@@ -1980,6 +1980,7 @@ To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
 
 (deflog "Carbon Balance" table
   (where "C_Bal.dlf")
+  (when hourly)
   (entries Year Month MDay Hour
            (interval (path column "$col" OrganicMatter total_C)
                      (tag "Soil_C")
