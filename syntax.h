@@ -29,7 +29,8 @@ public:
   enum type 
   { Number, List, CSMP, Function, Boolean, String,
     Date, Integer, Filter, Class, Object, Error };
-
+  static const char* type_name (type);
+    
   // The requirements with regard to input and output varies with each
   // syntax entry.
   enum category
@@ -48,6 +49,7 @@ public:
     // and not a part of the simulation state. 
     LogOnly
   };
+  static const char* category_name (category);
 
   // These functions will check that an alist conform to the syntax.
   // The first is quite chatty about it.
@@ -86,6 +88,8 @@ public:
   void order (string, string, string, string, string);
 
   // Create and Destroy.
+  void dump (int indent = 0) const;
+
   Syntax ();
   ~Syntax ();
 };

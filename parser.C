@@ -58,7 +58,7 @@ Parser_init::Parser_init ()
 { 
   if (count++ == 0)
     {
-      Parser_library = new Library ();
+      Parser_library = new Library ("parser");
       Parser_constructors = new Parser_map_type ();
     }
   assert (count > 0);

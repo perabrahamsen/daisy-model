@@ -161,7 +161,7 @@ Time::yday2month (int year, int yday)
   int month;
   bool ly = leap (year);
   for (month = 1;
-       Implementation::mlen[month + 1] + (ly && (month > 2)) < yday;
+       Implementation::mlen[month + 1] + (ly && (month >= 2)) < yday;
        month++)
     ;
   return month;

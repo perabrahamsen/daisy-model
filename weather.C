@@ -83,7 +83,7 @@ Weather_init::Weather_init ()
 { 
   if (count++ == 0)
     {
-      Weather_library = new Library ();
+      Weather_library = new Library ("weather");
       Weather_constructors = new Weather_map_type ();
     }
   assert (count > 0);

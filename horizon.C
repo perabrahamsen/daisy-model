@@ -219,7 +219,7 @@ Horizon::Implementation::ThermalConductivity (constituents medium)
 	{
 	  const double a = thermal_conductivity[i] 
 	    / thermal_conductivity[medium] - 1.0;
-	  double k;
+	  double k = -42.42e42;
 	  switch (i)
 	    {
 	    case Water:
@@ -421,7 +421,7 @@ Horizon_init::Horizon_init ()
 { 
   if (count++ == 0)
     {
-      Horizon_library = new Library ();
+      Horizon_library = new Library ("horizon");
       Horizon_constructors = new Horizon_map_type ();
     }
   assert (count > 0);

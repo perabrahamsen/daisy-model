@@ -73,7 +73,7 @@ Column_init::Column_init ()
 { 
   if (count++ == 0)
     {
-      Column_library = new Library ();
+      Column_library = new Library ("column");
       Column_constructors = new Column_map_type ();
     }
   assert (count > 0);

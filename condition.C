@@ -66,7 +66,7 @@ Condition_init::Condition_init ()
 { 
   if (count++ == 0)
     {
-      Condition_library = new Library ();
+      Condition_library = new Library ("condition");
       Condition_constructors = new Condition_map_type ();
     }
   assert (count > 0);

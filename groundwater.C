@@ -58,7 +58,7 @@ Groundwater_init::Groundwater_init ()
 { 
   if (count++ == 0)
     {
-      Groundwater_library = new Library ();
+      Groundwater_library = new Library ("groundwater");
       Groundwater_constructors = new Groundwater_map_type ();
     }
   assert (count > 0);

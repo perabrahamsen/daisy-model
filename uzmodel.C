@@ -39,6 +39,12 @@ UZmodel::add_type (const string name,
   UZ_constructors->insert(UZ_map_type::value_type (name, cons));
 }
 
+void 
+UZmodel::derive_type (string name, const AttributeList& al, string super)
+{
+  add_type (name, al, library ().syntax (super), (*UZ_constructors)[super]);
+}
+
 UZmodel* 
 UZmodel::create (const AttributeList& al)
 {
@@ -58,7 +64,7 @@ UZ_init::UZ_init ()
 { 
   if (count++ == 0)
     {
-      UZ_library = new Library ();
+      UZ_library = new Library ("uzmodel");
       UZ_constructors = new UZ_map_type ();
     }
   assert (count > 0);

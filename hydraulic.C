@@ -99,7 +99,7 @@ Hydraulic_init::Hydraulic_init ()
 { 
   if (count++ == 0)
     {
-      Hydraulic_library = new Library ();
+      Hydraulic_library = new Library ("hydraulic");
       Hydraulic_constructors = new Hydraulic_map_type ();
     }
   assert (count > 0);

@@ -1,14 +1,14 @@
 # Makefile -- DAISY 
 
 SHELL = /bin/sh
-CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo # -O2 -pipe -fhandle-exceptions -pipe -fno-implicit-templates
+CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo -O2 -pipe # -fhandle-exceptions -pipe -fno-implicit-templates
 SRCONLY = column_std.o  weather_simple.o uzrichard.o \
 	hydraulic_yolo.o hydraulic_M_vG.o hydraulic_B_vG.o hydraulic_M_C.o \
 	hydraulic_B_C.o hydraulic_M_BaC.o hydraulic_B_BaC.o \
 	groundwater_static.o horizon_std.o \
 	crop_std.o action_sow.o action_stop.o condition_time.o \
 	condition_logic.o log_file.o action_irrigate.o action_lisp.o \
-	weather_none.o action_fertilize.o
+	weather_none.o action_fertilize.o weather_file.o
 OBJECTS = main.o daisy.o parser.o log.o weather.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o time.o uzmodel.o parser_file.o hydraulic.o \
@@ -47,6 +47,9 @@ TAGS: $(SRC) $(HEAD)
 
 print:
 	mp -p /home/user_13/fischer/bin/mp.pro.none -a4 $(TEXT) | parr -s | up -n pup | lpr -Pduplex
+
+dump:	daisy
+	daisy -p
 
 test:	crop-test water-test evapo-test
 
@@ -144,7 +147,7 @@ denitrification.o: denitrification.C denitrification.h alist.h \
  soil_heat.h organic_matter.h soil_NO3.h solute.h csmp.h
 soil_heat.o: soil_heat.C soil_heat.h alist.h common.h surface.h \
  uzmodel.h inorganic_matter.h groundwater.h time.h soil_water.h soil.h \
- horizon.h hydraulic.h syntax.h mathlib.h
+ horizon.h hydraulic.h syntax.h mathlib.h log.h
 groundwater.o: groundwater.C groundwater.h time.h uzmodel.h common.h \
  library.h alist.h syntax.h
 snow.o: snow.C snow.h alist.h common.h syntax.h log.h filter.h soil.h \
@@ -156,6 +159,8 @@ inorganic_matter.o: inorganic_matter.C inorganic_matter.h syntax.h \
 aom.o: aom.C aom.h time.h inorganic_matter.h library.h alist.h \
  common.h syntax.h log.h soil.h horizon.h hydraulic.h mathlib.h
 im.o: im.C im.h log.h alist.h common.h syntax.h
+weather_file.o: weather_file.C weather.h time.h syntax.h alist.h \
+ common.h log.h filter.h
 column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h common.h inorganic_matter.h soil.h horizon.h hydraulic.h \
  soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \

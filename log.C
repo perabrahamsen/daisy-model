@@ -61,7 +61,7 @@ Log_init::Log_init ()
   if (count++ == 0)
     {
       Log::global_syntax_table = new Syntax ();
-      Log_library = new Library ();
+      Log_library = new Library ("log");
       Log_constructors = new Log_map_type ();
     }
   assert (count > 0);

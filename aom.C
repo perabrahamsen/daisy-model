@@ -401,7 +401,7 @@ AOM_init::AOM_init ()
 		      Syntax::Sequence);
 
       // AOM Library.
-      AOM_library = new Library ();
+      AOM_library = new Library ("am");
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
 

@@ -24,6 +24,7 @@ struct Syntax::Implementation
   derive_map derived;
   bool check (const AttributeList& vl, string name);
   Syntax::type lookup (string key) const;
+  void dump (int indent) const;
 };    
 
 bool 
@@ -105,6 +106,86 @@ Syntax::Implementation::lookup (string key) const
     return Syntax::Error;
   else
     return (*i).second;
+}
+
+void 
+Syntax::Implementation::dump (int indent) const
+{
+  if (order.size ())
+    {
+      cout << "[order";
+      for (list<string>::const_iterator i = order.begin ();
+	   i != order.end ();
+	   i++)
+	cout << " " << *i;
+      cout << "]\n";
+      for (int j = 0; j < indent; j++)
+	cout << " ";
+    }
+  for (type_map::const_iterator i = types.begin ();
+       i != types.end ();
+       i++)
+    {
+      if (i != types.begin ())
+	{
+	  cout << "\n";
+	  for (int j = 0; j < indent; j++)
+	    cout << " ";
+	}
+      const string name = (*i).first;
+      const type t = (*i).second;
+      cout << "(" << name << " " << type_name (t) << " " 
+	   << category_name ((*status.find (name)).second) << " ";
+      switch ((*size.find (name)).second)
+	{
+	case Singleton:
+	  cout << "Singleton";
+	  break;
+	case Sequence:
+	  cout << "Sequence";
+	  break;
+	default:
+	  cout << "[" << (*size.find (name)).second << "]";
+	}
+      switch (t)
+	{
+	case List:
+	  cout << "\n";
+	  for (unsigned int j = 0; j < indent + name.length () + 2; j++)
+	    cout << " ";
+	  (*syntax.find (name)).second->dump (indent + name.length () + 2);
+	  break;
+	case Class: 
+	  cout << "\n";
+	  for (unsigned int j = 0; j < indent + name.length () + 2; j++)
+	    cout << " ";
+	  (*libraries.find (name)).second->dump (indent + name.length () + 2);
+	  break;
+	case Object:
+	  cout << " " << (*libraries.find (name)).second->name ();
+	  break;
+	default:
+	  break;
+	}
+      cout << ")";
+    }
+}
+
+  // Each syntax entry should have an associated type.
+const char* 
+Syntax::type_name (type t)
+{
+  static const char * const names[] = 
+  { "Number", "List", "CSMP", "Function", "Boolean", "String",
+    "Date", "Integer", "Filter", "Class", "Object", "Error" };
+  return names[t];
+}
+    
+const char* Syntax::category_name (category c)
+{
+  static const char * const names[] = 
+  { "Const", "State", "Optional", "LogOnly" };
+  return names[c];
 }
 
 bool
@@ -270,6 +351,12 @@ Syntax::order (string one, string two, string three, string four, string five)
   impl.order.push_back (three);
   impl.order.push_back (four);
   impl.order.push_back (five);
+}
+
+void 
+Syntax::dump (int indent) const
+{
+  impl.dump (indent);
 }
 
 Syntax::Syntax () : impl (*new Implementation ())

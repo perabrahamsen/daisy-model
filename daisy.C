@@ -7,6 +7,7 @@
 #include "log.h"
 #include "parser.h"
 #include "aom.h"
+#include "hydraulic.h"
 #include "crop.h"
 #include "column.h"
 #include "action.h"
@@ -105,18 +106,29 @@ Daisy::run ()
 void
 Daisy::load_syntax (Syntax& syntax)
 {
-  syntax.add_class ("crop", Crop::library (), &Crop::derive_type);
-  syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
-  syntax.add_class ("column", Column::library (), &Column::derive_type);
-  syntax.add_class ("log", Log::library (), &Log::derive_type);
-  syntax.add_class ("parser", Parser::library (), &Parser::derive_type);
-  syntax.add_class ("am", AOM::library (), &AOM::derive_type);
+  syntax.add_class ("defcrop", Crop::library (), &Crop::derive_type);
+  syntax.add_class ("defhorizon", Horizon::library (), &Horizon::derive_type);
+  syntax.add_class ("defcolumn", Column::library (), &Column::derive_type);
+  syntax.add_class ("deflog", Log::library (), &Log::derive_type);
+  syntax.add_class ("defparser", Parser::library (), &Parser::derive_type);
+  syntax.add_class ("defam", AOM::library (), &AOM::derive_type);
+  // These are mostly for making 
+  syntax.add_class ("defaction", Action::library (), &Action::derive_type);
+  syntax.add_class ("defcondition",
+		    Condition::library (), &Condition::derive_type);
+  syntax.add_class ("defweather", Weather::library (), &Weather::derive_type);
+  syntax.add_class ("defgroundwater",
+		    Groundwater::library (), &Groundwater::derive_type);
+  syntax.add_class ("defuzmodel", UZmodel::library (), &UZmodel::derive_type);
+  syntax.add_class ("defhydraulic",
+		    Hydraulic::library (), &Hydraulic::derive_type);
+  // The actual data.
   syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
   syntax.add ("input", Parser::library (), Syntax::Optional, 
 	      Syntax::Singleton);
   syntax.add ("manager", Action::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::State);
-  syntax.add ("field", Column::library (), Syntax::State, Syntax::Sequence);
+  syntax.add ("column", Column::library (), Syntax::State, Syntax::Sequence);
   syntax.add ("weather", Weather::library ());
   syntax.add ("groundwater", Groundwater::library (), Syntax::Const);
 }

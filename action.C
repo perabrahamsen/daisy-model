@@ -70,7 +70,7 @@ Action_init::Action_init ()
 { 
   if (count++ == 0)
     {
-      Action_library = new Library ();
+      Action_library = new Library ("action");
       Action_constructors = new Action_map_type ();
     }
   assert (count > 0);

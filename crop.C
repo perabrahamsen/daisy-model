@@ -73,7 +73,7 @@ Crop_init::Crop_init ()
 { 
   if (count++ == 0)
     {
-      Crop_library = new Library ();
+      Crop_library = new Library ("crop");
       Crop_constructors = new Crop_map_type ();
     }
   assert (count > 0);
