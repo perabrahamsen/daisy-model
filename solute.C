@@ -45,6 +45,15 @@ Solute::tick (const Soil& soil,
 	      const SoilWater& soil_water, 
 	      double J_in)
 {
+#ifdef MIKE_SHE
+  S[0] -= J_in;
+  for (int i = 0; i < soil.size (); i++)
+    {
+      M_[i] += S[i];
+      C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+      J[i] = -42.42e42;
+    }
+#else
   // Remember old values.
   vector<double> C_prev = C_;
   vector<double> M_prev = M_;
@@ -287,6 +296,7 @@ Solute::tick (const Soil& soil,
       assert (M_[i] >= 0.0);
       J[i + 1] = (((M_[i] - M_prev[i]) / dt) - S[i]) * soil.dz (i) + J[i];
     }
+#endif
 }
 
 bool 

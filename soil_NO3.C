@@ -19,15 +19,8 @@ SoilNO3::clear (const Soil& soil, const SoilWater& soil_water)
 void 
 SoilNO3::tick (const Soil& soil, const SoilWater& soil_water, double J_in)
 {
-#ifndef MIKE_SHE
   Solute::tick (soil, soil_water, J_in);
-#else
-  for (int i = 0; i < soil.size (); i++)
-    {
-      M_[i] += S[i];
-      C_[i] = M_[i] / soil_water.Theta (i);
-      J[i] = -42.42e42;
-    }
+#ifdef MIKE_SHE
   mike_she->put_no3_m (M_);
 #endif
 }

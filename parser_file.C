@@ -78,13 +78,16 @@ ParserFile::Implementation::good ()
 string
 ParserFile::Implementation::get_string ()
 {
-  if (peek () == '"')
+  skip ();
+  int c = peek ();
+  
+  if (c == '"')
     {
       // Get a string.
       string str ("");
       skip ("\"");
 
-      for (int c = get (); good() && c != '"'; c = get ())
+      for (c = get (); good() && c != '"'; c = get ())
 	{
 	  if (c == '\\')
 	    {
@@ -104,19 +107,15 @@ ParserFile::Implementation::get_string ()
 	}
       return str;
     }
+  else if (c != '_' && c != '-' && !isalpha (c))
+    {
+      error ("Identifier or string expected");
+      skip_to_end ();
+      return "error";
+    }
   else
     {
       // Get an identifier.
-      skip ();
-      int c = peek ();
-  
-      if (c != '_' && c != '-' && !isalpha (c))
-	{
-	  error ("Identifier or string expected");
-	  skip_to_end ();
-	  return "error";
-	}
-
       string str ("");
       do
 	{
