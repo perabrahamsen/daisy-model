@@ -36,7 +36,9 @@ typedef void (*derive_fun) (const string& name, AttributeList& al,
 class Library
 {
   // Content.
+public:
   struct Implementation;
+private:
   Implementation& impl;
 
 public:

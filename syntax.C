@@ -648,7 +648,7 @@ Syntax::add_submodule (const string& name, AttributeList& alist,
     else
       // Optional, store as default_alist.
       add (name, s, a, cat, Syntax::Singleton, description);
-};
+}
 
 void 
 Syntax::add_submodule_sequence (const string& name, Syntax::category cat, 
@@ -665,7 +665,7 @@ Syntax::add_submodule_sequence (const string& name, Syntax::category cat,
     else
       // With default value for sequence members.
       add (name, s, a, cat, Syntax::Sequence, description);
-};
+}
 
 void 
 Syntax::add_check (const string& name, const VCheck& vcheck)

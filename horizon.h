@@ -81,6 +81,9 @@ public:
   virtual ~Horizon ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Horizon>::Content* Librarian<Horizon>::content;
+
 static Librarian<Horizon> Horizon_init ("horizon");
 
 #endif // HORIZON_H

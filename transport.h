@@ -54,6 +54,9 @@ public:
   virtual ~Transport ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Transport>::Content* Librarian<Transport>::content;
+
 static Librarian<Transport> Transport_init ("transport");
 
 #endif // TRANSPORT_H

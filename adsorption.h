@@ -47,6 +47,9 @@ public:
   virtual ~Adsorption ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Adsorption>::Content* Librarian<Adsorption>::content;
+
 static Librarian<Adsorption> Adsorption_init ("adsorption");
 
 #endif // ADSORPTION_H

@@ -57,6 +57,9 @@ public:
   virtual ~Printer ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Printer>::Content* Librarian<Printer>::content;
+
 static Librarian<Printer> Printer_init ("printer");
 
 #endif // PRINTER_H

@@ -14,6 +14,11 @@ release.
 
 * 2.47
 
+** NH4 lost to volatilization  is now always counted in "fertilized_NH4".
+
+Previously, it was only counted during surface application, not during
+incorporation.
+
 ** Bug fixes.
 
 * 2.46

@@ -233,7 +233,7 @@ Layered description of the soil properties.",
 Soil::Soil (const AttributeList& al)
   : Geometry (al),
     impl (*new Implementation (al))
-{ };
+{ }
 
 void
 Soil::initialize (const Groundwater& groundwater, Treelog& msg)

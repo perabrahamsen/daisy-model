@@ -101,6 +101,9 @@ public:
   virtual ~Document ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Document>::Content* Librarian<Document>::content;
+
 static Librarian<Document> Document_init ("document");
 
 #endif // DOCUMENT_H

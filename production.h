@@ -133,7 +133,7 @@ public:
   // Simulation.
 private:
   static double maintenance_respiration (double r, double w, double T);
-  static const double GrowthRespCoef (double E);
+  static double GrowthRespCoef (double E);
 public:
   void tick (double AirT, double SoilT,
 	     const vector<double>& Density,

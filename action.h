@@ -51,6 +51,9 @@ public:
   virtual ~Action ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Action>::Content* Librarian<Action>::content;
+
 static Librarian<Action> Action_init ("action");
 
 #endif // ACTION_H

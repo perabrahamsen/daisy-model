@@ -129,6 +129,9 @@ public:
   virtual ~Column ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Column>::Content* Librarian<Column>::content;
+
 static Librarian<Column> Column_init ("column");
 
 #endif // COLUMN_H

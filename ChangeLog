@@ -1,3 +1,27 @@
+2003-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* library.h, chemicals.h (Implementation): Made it public (for icc).
+	* column_std.C (fertilize): Count NH4 lost to volatilization in
+	fertilized_NH4. 
+	* weather_std.C (data_description): Changed manifest constants
+	from integers to doubles (to shut up icc).
+	* units.C (ConvertIdentity): Added default constructor (to silence
+	icc). 
+	* production.h, production.C (GrowthRespCoef): Removed extra const
+	(found by icc)
+	* am.C (unlock): Removed extra ";" (found by icc).
+	* soil.C (Soil): Ditto.
+	* geometry.C (initialize_zplus): Ditto.
+	* assertion.C (message, failure, bug, warning, panic): Ditto.
+	* path.C (Path): Ditto.
+	* syntax.C (add_submodule, add_submodule_sequence): Ditto.
+	* component-headers: Declare content (for icc).
+	* am.h (class AM): Made friends with Implementation (for icc).
+	* plf.h (class PLF): Ditto.
+	* dom.h (class DOM): Made friend with Element (for icc).
+	* librarian.h (class Librarian): Allow nested class access to
+	private types (for icc).
+
 2003-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* weather_std.C (read_line): Extra check for file end.

@@ -98,6 +98,9 @@ public:
   virtual ~UZmodel ();
 };
 
+EMPTY_TEMPLATE
+Librarian<UZmodel>::Content* Librarian<UZmodel>::content;
+
 static Librarian<UZmodel> UZmodel_init ("uzmodel");
 
 #endif // UZMODEL_H

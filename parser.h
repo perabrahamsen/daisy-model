@@ -49,6 +49,9 @@ public:
   virtual ~Parser ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Parser>::Content* Librarian<Parser>::content;
+
 static Librarian<Parser> Parser_init ("parser");
 
 #endif // PARSER_H

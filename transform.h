@@ -53,6 +53,9 @@ public:
   virtual ~Transform ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Transform>::Content* Librarian<Transform>::content;
+
 static Librarian<Transform> Transform_init ("transform");
 
 #endif // TRANSFORM_H

@@ -105,6 +105,9 @@ public:
   virtual ~Select ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Select>::Content* Librarian<Select>::content;
+
 static Librarian<Select> Select_init ("select");
 
 #endif // SELECT_H

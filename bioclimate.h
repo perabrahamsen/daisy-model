@@ -93,6 +93,9 @@ public:
   virtual ~Bioclimate ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content;
+
 static Librarian<Bioclimate> Bioclimate_init ("bioclimate");
 
 #endif // BIOCLIMATE_H

@@ -230,7 +230,8 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
   second_year_utilization_ += AM::second_year_utilization (al);
-  volatilization += AM::get_volatilization (al);
+  const double lost_NH4 = AM::get_volatilization (al);
+  volatilization += lost_NH4;
 
   // Add inorganic matter.
   IM im (al);
@@ -239,7 +240,7 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
   soil_NO3.add_external (soil, soil_water, im.NO3, from, to);
   soil_NH4.add_external (soil, soil_water, im.NH4, from, to);
   fertilized_NO3 += im.NO3 / conv; 
-  fertilized_NH4 += im.NH4 / conv;
+  fertilized_NH4 += im.NH4 / conv + lost_NH4;
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")

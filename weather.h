@@ -154,6 +154,9 @@ public:
   virtual ~Weather ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Weather>::Content* Librarian<Weather>::content;
+
 static Librarian<Weather> Weather_init ("weather");
 
 #endif // WEATHER_H

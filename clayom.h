@@ -55,6 +55,9 @@ public:
   virtual ~ClayOM ();
 };
 
+EMPTY_TEMPLATE
+Librarian<ClayOM>::Content* Librarian<ClayOM>::content;
+
 static Librarian<ClayOM> ClayOM_init ("ClayOM");
 
 #endif // CLAYOM_H

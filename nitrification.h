@@ -51,6 +51,9 @@ public:
   virtual ~Nitrification ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Nitrification>::Content* Librarian<Nitrification>::content;
+
 static Librarian<Nitrification> Nitrification_init ("nitrification");
 
 #endif // NITRIFICATION_H

@@ -455,7 +455,7 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
       z_.push_back (z);
       last = zplus;
     }
-};
+}
 
 Geometry::~Geometry ()
 { }

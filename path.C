@@ -76,7 +76,7 @@ namespace Path
     ~path_handler ()		// Delete memory at exit for leak detectors.
     { delete path; }
   } handle_path;
-};
+}
 
 istream& 
 Path::open_file (const string& name)

@@ -40,6 +40,8 @@ class AM
   // Content.
   struct Implementation;
   Implementation& impl;
+  friend class Implementation;
+
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const string name;
@@ -100,6 +102,9 @@ private:
 public:
   virtual ~AM ();
 };
+
+EMPTY_TEMPLATE
+Librarian<AM>::Content* Librarian<AM>::content;
 
 static Librarian<AM> AM_init ("am");
 

@@ -40,6 +40,7 @@ class DOM
 { 
   // Content.
   class Element;
+  friend class Element;
   Element& C;
   Element& N;
 

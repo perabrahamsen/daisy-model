@@ -43,6 +43,9 @@ public:
   virtual ~Average ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Average>::Content* Librarian<Average>::content;
+
 static Librarian<Average> Average_init ("average");
 
 #endif // AVERAGE_H

@@ -64,6 +64,9 @@ public:
   virtual ~Groundwater ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Groundwater>::Content* Librarian<Groundwater>::content;
+
 static Librarian<Groundwater> Groundwater_init ("groundwater");
 
 #endif // GROUNDWATER_H

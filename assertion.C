@@ -38,7 +38,7 @@ Assertion::message (const string& msg)
       logs[i]->error (msg);
       logs[i]->flush ();
     }
-};
+}
 
 void 
 Assertion::failure (const char* file, int line, const char* fun,
@@ -51,7 +51,7 @@ Assertion::failure (const char* file, int line, const char* fun,
   
   message (tmp.str ());
   exit (3);
-};
+}
 
 void 
 Assertion::bug (const char* file, int line, const char* fun,
@@ -63,7 +63,7 @@ Assertion::bug (const char* file, int line, const char* fun,
     tmp () << " in " << fun;
 
   message (tmp.str ());
-};
+}
 
 void 
 Assertion::warning (const char* file, int line, const char* fun,
@@ -76,7 +76,7 @@ Assertion::warning (const char* file, int line, const char* fun,
   tmp () << "warning: " << msg;
 
   message (tmp.str ());
-};
+}
 
 void 
 Assertion::panic (const char* file, int line, const char* fun,
@@ -84,7 +84,7 @@ Assertion::panic (const char* file, int line, const char* fun,
 {
   bug (file, line, fun, msg);
   exit (3);
-};
+}
 
 Assertion::Register::Register (Treelog& log)
   : treelog (log)

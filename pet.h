@@ -61,6 +61,9 @@ public:
   virtual ~Pet ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Pet>::Content* Librarian<Pet>::content;
+
 static Librarian<Pet> Pet_init ("pet");
 
 #endif // PET_H

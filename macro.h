@@ -56,6 +56,9 @@ public:
   virtual ~Macro ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Macro>::Content* Librarian<Macro>::content;
+
 static Librarian<Macro> Macro_init ("macro");
 
 #endif // MACRO_H

@@ -1,16 +1,67 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Check at daisy kan oversættes med BCC
+* exercises 
 
-* SH: volatilization vs. inkorporation.
+** SH: Læg svar på øvelser på hjemmeside.
 
-* SH: Læg svar på øvelser på hjemmeside.
+** Konverter til LaTeX
+
+** Ret til.
+
+* april: Ret parserfejl (så "fertilize slurry" ikke længere virker)
+
+* april: Enable macropores by default
+
+Hvis ler + humus i den øverste horizont er over 5%.
+
+Makroporerne skal gå ned til min (1.5 m,
+	     drænrørsdybde,
+	     første horizont med ler + humus < 5%)
+
+Generelt skal makroporerne gå lige ned til 80 cm, hvorefter de stopper
+lineært ned til 150 cm.  
+
+** SH: default parametre
+
+* april: ekstra linie i output
+
+I den første linie skal "begyndelsesindhold" stå.
+
+* april: initialiser SOM_fractions fra C_input (== initial AM).
+
+* april: automatisk aquitart horizont
+
+Øverste tredjedel af aquitarten.
 
 * SH: PowerPoint slides på hjemmeside.
 
 * Check let at bruge GUI version of CVS til Windows.
 
 * Soil geometry discretization: max interval 2 * dispersivity
+
+* SH: Ny ref-evap model
+
+* Min & max T i klimafil, udregn average.
+
+* Partit komponent
+
+Skal kunne være afhængig af kvælstof og temperatur.
+
+* Dokumentation for output filer.
+
+* Make it possible to specify texture using differnet systems
+
+Different sizes for sand, silt, and clay, plus allow other types.
+
+* Irrigation
+
+** Deficit
+
+Start ved specifik dato.
+
+* horizon.dai 
+
+Indeholder en standard lerjord, dansjord m.m. ligesom hydros2d
 
 * DOM
 
@@ -96,16 +147,6 @@ Udbyg.
 ** Permanent vegetation
 
 ** Simple Crop Types
-
-* Irrigation
-
-** Deficit
-
-Start ved specifik dato.
-
-* Make it possible to specify texture using differnet systems
-
-Different sizes for sand, silt, and clay, plus allow other types.
 
 * Parser & Printer.
 

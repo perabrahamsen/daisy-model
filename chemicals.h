@@ -34,8 +34,9 @@ class Chemical;
 class Chemicals
 { 
   // Content.
-private:
+public:
   struct Implementation;	// Top secret internal state.
+private:
   Implementation& impl;
 
   // Utilities.

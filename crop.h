@@ -130,6 +130,9 @@ public:
   virtual ~Crop ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Crop>::Content* Librarian<Crop>::content;
+
 static Librarian<Crop> Crop_init ("crop");
 
 #endif // CROP_H

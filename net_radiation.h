@@ -52,6 +52,9 @@ public:
   virtual ~NetRadiation ();
 };
 
+EMPTY_TEMPLATE
+Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content;
+
 static Librarian<NetRadiation> NetRadiation_init ("net_radiation");
 
 #endif // NET_RADIATION_H

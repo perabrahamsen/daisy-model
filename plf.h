@@ -37,6 +37,7 @@ class PLF
 {
   // Content.
   struct Implementation;
+  friend class Implementation;
   Implementation& impl;
 public:
   // Use.

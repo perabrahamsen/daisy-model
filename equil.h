@@ -51,6 +51,9 @@ public:
   virtual ~Equilibrium ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content;
+
 static Librarian<Equilibrium> Equilibrium_init ("equilibrium");
 
 #endif // EQUILIBRIUM_H

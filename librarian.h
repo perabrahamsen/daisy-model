@@ -39,8 +39,11 @@ class Librarian
 private:
   typedef T& (*constructor) (const AttributeList&);
   typedef map<string, constructor, less<string>/**/> map_type;
+
   // Content.
 private:
+  struct Content;
+  friend struct Librarian::Content;
   static struct Content
   {
     Library lib;

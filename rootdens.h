@@ -53,6 +53,9 @@ public:
   virtual ~Rootdens ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Rootdens>::Content* Librarian<Rootdens>::content;
+
 static Librarian<Rootdens> Rootdens_init ("rootdens");
 
 #endif // ROOTDENS_H

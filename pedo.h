@@ -49,6 +49,9 @@ public:
   virtual ~Pedotransfer ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content;
+
 static Librarian<Pedotransfer> Pedotransfer_init ("pedotransfer");
 
 #endif // PEDOTRANSFER_H

@@ -61,6 +61,9 @@ public:
   virtual ~Phenology ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Phenology>::Content* Librarian<Phenology>::content;
+
 static Librarian<Phenology> Phenology_init ("phenology");
 
 #endif // PHENOLOGY_H

@@ -55,6 +55,9 @@ public:
   virtual ~Chemical ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Chemical>::Content* Librarian<Chemical>::content;
+
 static Librarian<Chemical> Chemical_init ("chemical");
 
 #endif // CHEMICAL_H

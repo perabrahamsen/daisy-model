@@ -45,6 +45,9 @@ public:
   virtual ~Tortuosity ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Tortuosity>::Content* Librarian<Tortuosity>::content;
+
 static Librarian<Tortuosity> Tortuosity_init ("tortuosity");
 
 #endif // TORTUOSITY_H

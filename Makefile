@@ -110,6 +110,9 @@ ifeq ($(USE_OPTIMIZE),true)
 		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
 		endif
 	endif
+	ifeq ($(COMPILER),icc)
+		OPTIMIZE = -O2
+	endif
 endif
 
 # Do we want to create a dynamic library?
@@ -164,10 +167,10 @@ ifeq ($(COMPILER),gcc)
 		  -Wconversion -Wmissing-prototypes -Woverloaded-virtual \
 		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
 		  -Wold-style-cast
-#  -Wold-style-cast: triggered by isalpha and friends.
-#  -Wmissing-noreturn: triggered by 
+#  -Wmissing-noreturn: triggered by some virtual functions.
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
+	CPPLIB = -lstdc++
 endif
 ifeq ($(COMPILER),sun)
 	COMPILE = /pack/devpro/SUNWspro/bin/CC
@@ -178,7 +181,12 @@ ifeq ($(COMPILER),borland)
 	COMPILE = $(BORLAND)Bin/bcc32 -P -v $(WARNFLAGS)
 	CCOMPILE = $(BORLAND)Bin/bcc32 -P- -v $(WARNFLAGS)
 endif
+ifeq ($(COMPILER),icc)
+	COMPILE = /opt/intel/compiler70/ia32/bin/icc -D__GNUC__=3 -Xc -x c++ -g -w1
+	CCOMPILE = /opt/intel/compiler70/ia32/bin/icc -D__GNUC__=3 -Xc -x c -g -w1
+# 193: use 0 for undefined preprocessor value (even after an &&)
 
+endif
 # Construct the compile command.
 #
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)
@@ -263,11 +271,14 @@ endif
 ifeq ($(COMPILER),borland)
 	LINK = $(BORLAND)Bin/BCC32 -lw-dup -e
 	DLLLINK = $(BORLAND)Bin/BCC32 -WD -lTpd -lw-dup -e
-	NOLINK = -c
-else
-	LINK = $(CC) $(DYNSEARCH) $(DEBUG) -o
-	NOLINK = -c
 endif
+ifeq ($(COMPILER),gcc)
+	LINK = $(CC) $(DYNSEARCH) $(DEBUG) -o
+endif
+ifeq ($(COMPILER),icc)
+	LINK = /opt/intel/compiler70/ia32/bin/icc -g -o
+endif
+NOLINK = -c
 
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
@@ -399,7 +410,11 @@ daisy.exe:	main${OBJ} $(LIBOBJ)
 	$(LINK)daisy.exe $^ $(MATHLIB)
 
 daisy:	main${OBJ} $(LIBOBJ) #daisy.so
-	$(LINK)daisy $^ -lstdc++ $(MATHLIB)
+	$(LINK)daisy $^ $(CPPLIB) $(MATHLIB)
+
+exp:	
+	(cd $(OBJHOME)/exp \
+         && $(MAKE) VPATH=$(SRCDIR) COMPILER=icc -f $(SRCDIR)/Makefile daisy)
 
 native:	
 	(cd $(OBJHOME)/$(HOSTTYPE) \

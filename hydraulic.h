@@ -70,6 +70,9 @@ public:
   virtual ~Hydraulic ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content;
+
 static Librarian<Hydraulic> Hydraulic_init ("hydraulic");
 
 #endif // HYDRAULIC_H

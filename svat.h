@@ -59,6 +59,9 @@ public:
   virtual ~SVAT ();
 };
 
+EMPTY_TEMPLATE
+Librarian<SVAT>::Content* Librarian<SVAT>::content;
+
 static Librarian<SVAT> SVAT_init ("svat");
 
 #endif // SVAT_H

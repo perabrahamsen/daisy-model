@@ -132,7 +132,7 @@ AM::Implementation::unlock ()
   daisy_assert (lock != NULL);
   delete lock;
   lock = NULL;
-};		
+}
 
 bool 
 AM::Implementation::locked () const

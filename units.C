@@ -133,6 +133,9 @@ static const class ConvertIdentity : public Units::Convert
 {
   double operator() (double value) const
   { return value; }
+public:
+  ConvertIdentity ()
+  { }
 } convert_identity;
 
 const Units::Convert&

@@ -246,6 +246,9 @@ public:
   virtual ~Log ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Log>::Content* Librarian<Log>::content;
+
 static Librarian<Log> Log_init ("log");
 
 // Output an alist.

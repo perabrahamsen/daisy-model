@@ -48,6 +48,9 @@ public:
   virtual ~Condition ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Condition>::Content* Librarian<Condition>::content;
+
 static Librarian<Condition> Condition_init ("condition");
 
 #endif // CONDITION_H

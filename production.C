@@ -103,7 +103,7 @@ Production::maintenance_respiration (double r, double w, double T)
 
 // Based on Penning de Vries et al. 1989, page 63
 // Simple biochemical analysis
-const double
+double
 Production::GrowthRespCoef (double E)
 { return  0.5673 - 0.5327 * E; }
 

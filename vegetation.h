@@ -121,6 +121,9 @@ public:
   virtual ~Vegetation ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Vegetation>::Content* Librarian<Vegetation>::content;
+
 static Librarian<Vegetation> Vegetation_init ("vegetation");
 
 #endif // VEGETATION_H

@@ -54,6 +54,9 @@ public:
   virtual ~Mactrans ();
 };
 
+EMPTY_TEMPLATE
+Librarian<Mactrans>::Content* Librarian<Mactrans>::content;
+
 static Librarian<Mactrans> Mactrans_init ("mactrans");
 
 #endif // MACTRANS_H
