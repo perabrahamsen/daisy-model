@@ -5,16 +5,6 @@
 
 #include "common.h"
 
-#if !defined (BORLAND)
-#include <iosfwd>
-#elif definded (MISSING_OSTREAM)
-#include <iostream.h>
-#elif defined (BROKEN_HEADERS)
-#include <ostream.h>
-#else
-#include <ostream>
-#endif
-
 class Syntax;
 class AttributeList;
 

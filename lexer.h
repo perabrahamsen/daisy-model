@@ -4,7 +4,13 @@
 #define LEXER_H
 
 #include "common.h"
+
+#ifdef BORLAND
+struct istream;
+#else
 #include <iosfwd>
+#endif
+
 using namespace std;
 
 class Treelog;
