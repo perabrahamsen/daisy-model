@@ -899,12 +899,42 @@ CropStandardSyntax::CropStandardSyntax ()
   alist.add ("CrpN", CrpNList);
 
   // HarvestPar
+  Syntax om_syntax;
+  AttributeList om_alist;
+  OM::load_syntax (om_syntax, om_alist);
   Syntax& Harvest = *new Syntax ();
   AttributeList& HarvestList = *new AttributeList ();
-
+  AttributeList& AOM1 = *new AttributeList (om_alist);
+  AttributeList& AOM2 = *new AttributeList (om_alist);
+  AOM1.add ("initial_fraction", 0.80);
+  AOM1.add ("C_per_N", 100.0);
+  vector<double> efficiency1;
+  efficiency1.push_back (0.50);
+  efficiency1.push_back (0.50);
+  AOM1.add ("efficiency", efficiency1);
+  AOM1.add ("turnover_rate", 2.917e-4);
+  vector<double> fractions1;
+  fractions1.push_back (0.50);
+  fractions1.push_back (0.50);
+  fractions1.push_back (0.00);
+  AOM1.add ("fractions", fractions1);
+  vector<double> efficiency2;
+  efficiency2.push_back (0.50);
+  efficiency2.push_back (0.50);
+  AOM2.add ("efficiency", efficiency2);
+  AOM2.add ("turnover_rate", 2.917e-3);
+  vector<double> fractions2;
+  fractions2.push_back (0.00);
+  fractions2.push_back (1.00);
+  fractions2.push_back (0.00);
+  AOM2.add ("fractions", fractions2);
+  vector<AttributeList*> AOM;
+  AOM.push_back (&AOM1);
+  AOM.push_back (&AOM2);
   add_submodule_sequence<OM> ("Stem", Harvest, Syntax::Const);
   add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const);
   add_submodule_sequence<OM> ("Dead", Harvest, Syntax::Const);
+  HarvestList.add ("Dead", AOM);
   add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const);
   add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const);
   Harvest.add ("C_Stem", Syntax::Number, Syntax::Const);
@@ -918,9 +948,9 @@ CropStandardSyntax::CropStandardSyntax ()
   Harvest.add ("C_Root", Syntax::Number, Syntax::Const);
   HarvestList.add ("C_Root", 0.420);
   Harvest.add ("DSmax", Syntax::Number, Syntax::Const);
-  HarvestList.add ("DSmax", 0.0);
+  HarvestList.add ("DSmax", 0.80);
   Harvest.add ("DSnew", Syntax::Number, Syntax::Const);
-  HarvestList.add ("DSnew", 0.0);
+  HarvestList.add ("DSnew", 0.20);
 
   syntax.add ("Harvest", Harvest, Syntax::Const);
   alist.add ("Harvest", HarvestList);
