@@ -368,8 +368,8 @@ struct CropStandard::Variables
     double PotTransp;	        // Potential Transpiration [mm/h]
     double PotCanopyAss;	// Potential Canopy Assimilation [g CH2O/m2/h]
     double CanopyAss;	        // Canopy Assimilation [g CH2O/m2/h]
-    double LogPotCanopyAss;	// The above is hourly accumulated values
-    double LogCanopyAss;	// over the day.  This is last days total.
+    double NetPhotosynthesis;	// Net Photosynthesis [g CO2/m2/h]
+    double RootRespiration;	// Root Respiration [g CO2/m2/h]
     double IncWLeaf;     	// Leaf growth [g DM/m2/d]
     double IncWStem;    	// Stem growth [g DM/m2/d]
     double IncWSOrg;    	// Storage organ growth [g DM/m2/d]
@@ -702,8 +702,8 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     PotTransp (vl.number ("PotTransp")),
     PotCanopyAss (vl.number ("PotCanopyAss")),
     CanopyAss (vl.number ("CanopyAss")),
-    LogPotCanopyAss (0.0),
-    LogCanopyAss (0.0),
+    NetPhotosynthesis (0.0),
+    RootRespiration (0.0),
     IncWLeaf (0.0),
     IncWStem (0.0),
     IncWSOrg (0.0),
@@ -735,8 +735,8 @@ CropStandard::Variables::RecCrpAux::output (Log& log, Filter& filter) const
   log.output ("PotTransp", filter, PotTransp);
   log.output ("PotCanopyAss", filter, PotCanopyAss);
   log.output ("CanopyAss", filter, CanopyAss);
-  log.output ("LogPotCanopyAss", filter, LogPotCanopyAss, true);
-  log.output ("LogCanopyAss", filter, LogCanopyAss, true);
+  log.output ("NetPhotosynthesis", filter, NetPhotosynthesis, true);
+  log.output ("RootRespiration", filter, RootRespiration, true);
   log.output ("IncWLeaf", filter, IncWLeaf, true);
   log.output ("IncWStem", filter, IncWStem, true);
   log.output ("IncWSOrg", filter, IncWSOrg, true);
@@ -1287,10 +1287,10 @@ Maximal development stage for which the crop survives harvest.");
   CrpAux.add ("CanopyAss", "g CH2O/m^2", Syntax::State,
 	      "Canopy assimilation this day until now.");
   vCrpAux.add ("CanopyAss", 0.0);
-  CrpAux.add ("LogPotCanopyAss", "g CH2O/m^2", Syntax::LogOnly,
-	      "Yesterdays total potential canopy assimilation.");
-  CrpAux.add ("LogCanopyAss", "g CH2O/m^2", Syntax::LogOnly,
-	      "Yesterdays total canopy assimilation.");
+  CrpAux.add ("NetPhotosynthesis", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Net Photosynthesis.");
+  CrpAux.add ("RootRespiration", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Root Respiration.");
   CrpAux.add ("IncWLeaf", "g DM/m^2/d", Syntax::LogOnly,
 	      "Leaf growth.");
   CrpAux.add ("IncWStem", "g DM/m^2/d", Syntax::LogOnly,
@@ -2223,6 +2223,10 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   const double Depth = var.RootSys.Depth;
   Variables::RecProd& vProd = var.Prod;
   Variables::RecCrpAux& CrpAux = var.CrpAux;
+  double NetAss = CrpAux.CanopyAss;
+
+  const double ReMobil = ReMobilization ();
+  var.Prod.CH2OPool += ReMobil;
 
   const double AirT = bioclimate.daily_air_temperature ();
   const double SoilT = soil_heat.T (geometry.interval_plus (-Depth / 3));
@@ -2237,6 +2241,8 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   RMLeaf = max (0.0, RMLeaf - CrpAux.PotCanopyAss + CrpAux.CanopyAss);
   const double RM = RMLeaf + RMStem + RMSOrg + RMRoot;
+  NetAss -= RM;
+  double RootResp = RMRoot;
 
   if (var.Prod.CH2OPool >= RM)
     {
@@ -2245,10 +2251,15 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
       AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
       const double AssG = pProd.CH2OReleaseRate * var.Prod.CH2OPool;
       CrpAux.IncWLeaf = pProd.E_Leaf * f_Leaf * AssG;
-      CrpAux.IncWStem = pProd.E_Stem * f_Stem * AssG;
+      CrpAux.IncWStem = pProd.E_Stem * f_Stem * AssG - ReMobil;
       CrpAux.IncWSOrg = pProd.E_SOrg * f_SOrg * AssG;
       CrpAux.IncWRoot = pProd.E_Root * f_Root * AssG;
       var.Prod.CH2OPool -= AssG;
+      NetAss -= (1.0 - pProd.E_Leaf) * f_Leaf * AssG
+        + (1.0 - pProd.E_Stem) * f_Stem * AssG
+        + (1.0 - pProd.E_SOrg) * f_SOrg * AssG
+        + (1.0 - pProd.E_Root) * f_Root * AssG;
+      RootResp += (1.0 - pProd.E_Root) * f_Root * AssG;
     }
   else
     {
@@ -2269,21 +2280,23 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 	}
       else
 	{
-	  CrpAux.IncWSOrg = var.Prod.CH2OPool - RMSOrg;
+	  CrpAux.IncWSOrg = var.Prod.CH2OPool - RMSOrg - ReMobil;
 	  var.Prod.CH2OPool = 0.0;
 	}
       if (RMStem <= var.Prod.CH2OPool)
 	{
-	  CrpAux.IncWStem = 0.0;
+	  CrpAux.IncWStem = -ReMobil;
 	  var.Prod.CH2OPool -= RMStem;
 	}
       else
 	{
-	  CrpAux.IncWStem = var.Prod.CH2OPool - RMStem - CrpAux.IncWSOrg;
-          if (vProd.WStem > CrpAux.IncWStem)
-            CrpAux.IncWSOrg  = 0.0;
-          else
+	  CrpAux.IncWStem = var.Prod.CH2OPool - RMStem - ReMobil;
+          if (vProd.WStem + CrpAux.IncWStem + CrpAux.IncWSOrg >= 0.0
+            && vProd.WStem > vProd.WSOrg)
+            {
             CrpAux.IncWStem += CrpAux.IncWSOrg;
+            CrpAux.IncWSOrg  = 0.0;
+            }
 	  var.Prod.CH2OPool = 0.0;
 	}
       if (RMRoot <= var.Prod.CH2OPool)
@@ -2299,6 +2312,8 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
       if (var.Prod.CH2OPool > 0.0)
 	CERR << "BUG: Extra CH2O: " << var.Prod.CH2OPool << "\n";
     }
+  CrpAux.NetPhotosynthesis = molWeightCO2 / molWeightCH2O * NetAss;
+  CrpAux.RootRespiration = molWeightCO2 / molWeightCH2O * RootResp;
 
   // Update dead leafs
   CrpAux.DeadWLeaf = pProd.LfDR (DS) / 24.0 * vProd.WLeaf;
@@ -2437,9 +2452,6 @@ CropStandard::tick (const Time& time,
       const double ProdLim = (1.0 - par.Prod.GrowthRateRedFac);
       var.Prod.CH2OPool += ProdLim * Ass;
     }
-  const double ReMobil = ReMobilization ();
-  var.Prod.CH2OPool += ReMobil;
-  var.CrpAux.IncWStem -= ReMobil;
   NetProduction (bioclimate, soil, soil_heat);
   if (time.hour () != 0)
     return;
