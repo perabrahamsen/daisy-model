@@ -41,6 +41,12 @@ struct WeatherHourly : public WeatherOld
   double wind () const 
     { return wind_; }
 
+  void put_air_temperature (double T)
+    { air_temperature = T; }
+
+  void put_reference_evapotranspiration (double)
+    { }
+
   WeatherHourly (const AttributeList& al)
     : WeatherOld (al),
       date (42, 1, 1, 0),

@@ -1,3 +1,12 @@
+1999-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.01 released.
+
+1999-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_hourly.C (put_air_temperature,
+	put_reference_evapotranspiration): New member functions.
+
 1999-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.00 released.
