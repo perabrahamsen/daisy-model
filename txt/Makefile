@@ -4,16 +4,16 @@ FIGS = start.fig
 
 REFDOCS = reference.tex introduction.tex title.tex dwf.tex
 
-DOCS = requirements.tex exercises.tex \
+DOCS = notes.tex requirements.tex exercises.tex \
 	litterature.tex c-api.tex guide.tex tutorial.tex $(REFDOCS)
 
 PRESENTATIONS = esa-2004.tex 
 NOTES = 2DDaisy.txt forced_LAI.txt
-FUTURE = crop-lai.tex organic.tex
+FUTURE = organic.tex
 
 TEXT = $(LIBS) $(FIGS) $(DOCS) $(PRESENTATIONS) $(NOTES) $(FUTURE) Makefile
 
-REMOVE = none.tex
+REMOVE = crop-lai.tex
 
 all:
 	echo Please be specific...

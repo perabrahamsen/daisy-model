@@ -1,3 +1,13 @@
+2005-01-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/Makefile (DOCS): Add it.
+
+	* txt/notes.tex: New file.
+
+2005-01-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_std.C (SpLAIfac, SpSOrgAI): Fixed description.
+
 2005-01-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.68 released.

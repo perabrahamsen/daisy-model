@@ -48,40 +48,42 @@ CanopyStandard::DS_at_height (double height) const
 void
 CanopyStandard::InitialCAI (double WLeaf, double DS)
 {
-  double  CAI2;
+  // This is the fixed curve for used right after emergence, when
+  // there is not yet any significant leaf dry matter.
+  const double CAI_fixed = 1.0/(1.0+exp(-15.0*(DS-DSLAI05)));
 
-//  if (WLeaf >= Canopy.WLfInit)
-//    {
-//      CAI = Canopy.SpCAI * WLeaf;
-//      InitCAI = false;
-//    }
-//  else
-//    {
-//#if 0
-//      if (DS > Canopy.DSinit)
-//	DS = Canopy.DSinit;
-//      CAI = 0.5 * (exp (Canopy.InitGrowth * DS) - 1);
-//#else
-//      CAI = 0.5 * (exp (Canopy.InitGrowth * min (DS, Canopy.DSinit)) - 1);
-//#endif
-//    }
-  const double CAI1 = SpLAI * WLeaf;
+  // The is the maximal CAI we will allow in the initialization phase.
+  double CAI_max;
   if (DS<0.07)
     {
-      CAI2 = 10.;
+      // At the very start (when we have no leaf dry matter), we put
+      // no limit on the CAI.  I.e. we use the fixed function as it.
+      CAI_max = 10.;
     }
   else
     {
-     CAI2 = max( 0.01, SpLAIfac (DS) * SpLAI * WLeaf);
+      // After that, we use SpLAIfac, which tell how much thiner the
+      // early leafs may be.  We always allow a LAI of 0.01.
+      CAI_max = max( 0.01, SpLAIfac (DS) * SpLAI * WLeaf);
     }
-  const double CAI3 = min ( CAI2, 1.0/(1.0+exp(-15.0*(DS-DSLAI05))));
-  if (CAI1 >= CAI3)
+
+  // This is then our initial CAI esstimate.
+  const double CAI_init = min (CAI_max, CAI_fixed);
+
+  // If CAI_init is below CAI_exit, we exit will initialization phase.
+  // The idea is that enough leaf DM has been generated to account for
+  // the LAI using the ordinary mechanism, so we no longer need the
+  // fixed initialization curve.
+  const double CAI_exit = SpLAI * WLeaf;
+  if (CAI_exit >= CAI_init)
     {
-      CAI = CAI1;
+      CAI = CAI_exit;
       InitCAI = false;
     }
   else
-    CAI = CAI3;
+    CAI = CAI_init;
+
+  // At the beginning, only the leafs contribute to CAI.
   LeafAI = CAI;
   StemAI = 0.0;
   SOrgAI = 0.0;
@@ -262,7 +264,7 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      " Specific leaf weight.");
   syntax.add ("LeafAIMod", "DS", Syntax::None (), Syntax::Const,
-	      "Specific leaf weight modifier.");
+	      "Specific leaf weight modifier, to be used af initial CAI.");
   PLF AIDef;
   AIDef.add (0.00, 1.00);
   AIDef.add (2.00, 1.00);
@@ -272,8 +274,8 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   SpLf.add (0.20, 1.50);
   SpLf.add (0.40, 1.25);
   SpLf.add (0.60, 1.00);
-  syntax.add ("SpLAIfac", "DS",Syntax::None (), Syntax::Const,
-	      "Factor defining maximum Specific leaf weight.");
+  syntax.add ("SpLAIfac", "DS",Syntax::None (), Syntax::Const, "\
+Factor defining maximum Specific leaf weight during initial CAI.");
   alist.add ("SpLAIfac", SpLf);
   syntax.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      "Specific storage organ weight.");

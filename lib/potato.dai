@@ -131,9 +131,9 @@ It is based on experimental data from SCRI from 1983 and 1984."
           (EPext    0.50)
           (HvsDS   (0.00 1) (1.00 20) (1.25 35)))
 
-  (Root (DptEmr     20)
-        (PenPar1    0.30)
-        (PenPar2     4.0)
+  (Root (DptEmr     20 [cm])
+        (PenPar1    0.30 [cm/dg C/d])
+        (PenPar2     4.0 [dg C])
         (MaxPen       50)
         (Rad        0.05)
         (h_wp       -15000)
