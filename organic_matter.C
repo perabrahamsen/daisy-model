@@ -13,7 +13,7 @@
 #include "soil_heat.h"
 #include "bioincorporation.h"
 #include "mathlib.h"
-#include "csmp.h"
+#include "plf.h"
 #include "common.h"
 #include "submodel.h"
 #include <algorithm>
@@ -46,9 +46,9 @@ struct OrganicMatter::Implementation
     void initialize (const Geometry& geometry);
     Buffer (const AttributeList& al);
   } buffer;
-  const CSMP heat_factor;
-  const CSMP water_factor;
-  const CSMP clay_factor;
+  const PLF heat_factor;
+  const PLF water_factor;
+  const PLF clay_factor;
   const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]
   const double min_AM_N;	// Minimal amount of N in an AM. [g/m²]
   Bioincorporation bioincorporation;
@@ -659,9 +659,9 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     smb (map_construct<OM> (al.alist_sequence ("smb"))),
     som (map_construct<OM> (al.alist_sequence ("som"))),
     buffer (al.alist ("buffer")),
-    heat_factor (al.csmp ("heat_factor")),
-    water_factor (al.csmp ("water_factor")),
-    clay_factor (al.csmp ("clay_factor")),
+    heat_factor (al.plf ("heat_factor")),
+    water_factor (al.plf ("water_factor")),
+    clay_factor (al.plf ("clay_factor")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N")),
     bioincorporation (al.alist ("Bioincorporation"))
@@ -1051,16 +1051,16 @@ Mineralization this time step (negative numbers mean immobilization).");
   layer_syntax.order ("end", "weight");
   syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
 	      "Layered initialization of soil SOM content.");
-  CSMP empty;
-  syntax.add ("heat_factor", Syntax::CSMP, Syntax::Const,
+  PLF empty;
+  syntax.add ("heat_factor", Syntax::PLF, Syntax::Const,
 	      "Heat factor [dg C ->].");
   alist.add ("heat_factor", empty);
-  syntax.add ("water_factor", Syntax::CSMP, Syntax::Const,
+  syntax.add ("water_factor", Syntax::PLF, Syntax::Const,
 	      "Water potential factor [cm ->].");
   alist.add ("water_factor", empty);
-  syntax.add ("clay_factor", Syntax::CSMP, Syntax::Const,
+  syntax.add ("clay_factor", Syntax::PLF, Syntax::Const,
 	      "Clay fraction factor [->].");
-  CSMP clay;
+  PLF clay;
   clay.add (0.00, 1.0);
   clay.add (0.25, 0.5);
   clay.add (1.00, 0.5);

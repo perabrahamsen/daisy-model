@@ -3,7 +3,7 @@
 // van Genuchten retention curve model with Burdine theory.
 
 #include "hydraulic.h"
-#include "csmp.h"
+#include "plf.h"
 
 class HydraulicB_vG : public Hydraulic
 {
@@ -77,14 +77,14 @@ double
 HydraulicB_vG::M (double h) const
 {
   // Use.
-  static CSMP csmp;
+  static PLF plf;
   static bool initialized = false;
   if (!initialized)
     {
-      K_to_M (csmp, 500);
+      K_to_M (plf, 500);
       initialized = true;
     }
-  return csmp (h);
+  return plf (h);
 }
 
 double 

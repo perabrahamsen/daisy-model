@@ -1,7 +1,7 @@
 // printer_file.C -- Print alist in ParserFile format.
 
 #include "printer_file.h"
-#include "csmp.h"
+#include "plf.h"
 #include "time.h"
 #include <fstream.h>
 #include <algorithm>
@@ -30,7 +30,7 @@ struct PrinterFile::Implementation
   void print_string (const string& value); 
   void print_bool (bool); 
   void print_time (const Time&); 
-  void print_csmp (const CSMP&, int indent); 
+  void print_plf (const PLF&, int indent); 
   void print_alist (const AttributeList& alist, const Syntax&,
 		   const AttributeList& super, int indent, bool skip);
   void print_object (const AttributeList&, const Library& library, int indent);
@@ -89,7 +89,7 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     case Syntax::Object:
       return is_complex_object (alist.alist (key), syntax.library (key));
     case Syntax::AList:
-    case Syntax::CSMP:
+    case Syntax::PLF:
       return true;
     case Syntax::Library:
     case Syntax::Error:
@@ -189,8 +189,8 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	    print_alist (alist.alist (key), syntax.syntax (key), 
 			 AttributeList::empty, indent, false); 
 	  break;
-	case Syntax::CSMP:
-	  print_csmp (alist.csmp (key), indent);
+	case Syntax::PLF:
+	  print_plf (alist.plf (key), indent);
 	  break;
 	case Syntax::Boolean:
 	  print_bool (alist.flag (key));
@@ -255,16 +255,16 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::CSMP:
+	case Syntax::PLF:
 	  {
-	    const vector<const CSMP*>& value = alist.csmp_sequence (key);
+	    const vector<const PLF*>& value = alist.plf_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
 		if (i > 0) 
 		  out << "\n" << string (indent, ' ');
 		out << "(";
-		print_csmp (*value[i], indent + 1);
+		print_plf (*value[i], indent + 1);
 		out << ")";
 	      }
 	  }
@@ -378,13 +378,13 @@ PrinterFile::Implementation::print_time (const Time& value)
 }
 
 void 
-PrinterFile::Implementation::print_csmp (const CSMP& csmp, int indent) 
+PrinterFile::Implementation::print_plf (const PLF& plf, int indent) 
 { 
-  for (unsigned int i = 0; i < csmp.size (); i++)
+  for (unsigned int i = 0; i < plf.size (); i++)
     {
       if (i > 0)
 	out << "\n" << string (indent, ' ');
-      out << "(" << csmp.x (i) << " " << csmp.y (i) << ")";
+      out << "(" << plf.x (i) << " " << plf.y (i) << ")";
     }
 }
 

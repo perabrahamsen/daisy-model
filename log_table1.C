@@ -443,7 +443,7 @@ struct LogTable1 : public Log
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value, geometry ());
     }
-  void output (const string&, const CSMP&)
+  void output (const string&, const PLF&)
     { }
 
   // Create and Destroy.

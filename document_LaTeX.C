@@ -194,8 +194,8 @@ DocumentLaTeX::print_entry_type (ostream& out,
 	  out << "submodel (see section~\\ref{type:alist})";
       }
       break;
-    case Syntax::CSMP:
-      out << "csmp (see section~\\ref{type:csmp})";
+    case Syntax::PLF:
+      out << "plf (see section~\\ref{type:plf})";
       break;
     case Syntax::Boolean:
       out << "boolean (see section~\\ref{type:boolean})";
@@ -352,7 +352,7 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	    out << " (default " << alist.number (name) << ")";
 	    break;
 	  case Syntax::AList:
-	  case Syntax::CSMP:
+	  case Syntax::PLF:
 	    out << " (has default value)";
 	    break;
 	  case Syntax::Boolean:
@@ -405,7 +405,7 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	  {
 	  case Syntax::Number:
 	  case Syntax::AList:
-	  case Syntax::CSMP:
+	  case Syntax::PLF:
 	  case Syntax::Boolean:
 	  case Syntax::String:
 	  case Syntax::Date:

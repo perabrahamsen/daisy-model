@@ -2,7 +2,7 @@
 
 #include "vegetation.h"
 #include "crop.h"
-#include "csmp.h"
+#include "plf.h"
 #include "mathlib.h"
 #include "harvest.h"
 #include "log.h"
@@ -22,8 +22,8 @@ struct Vegetation::Implementation
   double LAI;			// Total LAI of all crops on this column [0-]
   double height;		// Max crop height in canopy [cm]
   double cover;			// Fraction of soil covered by crops [0-1]
-  CSMP LAIvsH;			// LAI below given height [f: cm -> R]
-  CSMP HvsLAI;			// Height with LAI below [f: R -> cm]
+  PLF LAIvsH;			// LAI below given height [f: cm -> R]
+  PLF HvsLAI;			// Height with LAI below [f: R -> cm]
 
   // Radiation.
   double ACExt;			// Canopy extinction coefficient
@@ -409,11 +409,11 @@ double
 Vegetation::cover () const
 { return impl.cover; }
 
-const CSMP& 
+const PLF& 
 Vegetation::LAIvsH () const
 { return impl.LAIvsH; }
 
-const CSMP& 
+const PLF& 
 Vegetation::HvsLAI () const
 { return impl.HvsLAI; }
 
@@ -516,9 +516,9 @@ Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)
 		"Max crop height in canopy");
     syntax.add ("cover", "m^2/m^2", Syntax::LogOnly,
 		"Fraction of soil covered by crops");
-    syntax.add ("LAIvsH", Syntax::CSMP, Syntax::LogOnly,
+    syntax.add ("LAIvsH", Syntax::PLF, Syntax::LogOnly,
 		"Total canopy LAI below given height (cm)");
-    syntax.add ("HvsLAI", Syntax::CSMP, Syntax::LogOnly, "\
+    syntax.add ("HvsLAI", Syntax::PLF, Syntax::LogOnly, "\
 Height in which there is a given LAI below in total canopy");
     syntax.add ("ACExt", Syntax::None (), Syntax::LogOnly,
 		"Canopy extinction coefficient \

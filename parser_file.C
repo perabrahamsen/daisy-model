@@ -2,7 +2,7 @@
 
 #include "parser_file.h"
 #include "lexer.h"
-#include "csmp.h"
+#include "plf.h"
 #include "time.h"
 #include "log.h"
 
@@ -310,9 +310,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      atts.add (name, list);
 	      break;
 	    }
-	  case Syntax::CSMP:
+	  case Syntax::PLF:
 	    {
-	      CSMP& csmp = *new CSMP ();
+	      PLF& plf = *new PLF ();
 	      double last_x = -42;
 	      int count = 0;
 	      while (!looking_at (')') && good ())
@@ -327,11 +327,11 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  }
 		  double y = get_number ();
 		  skip (")");
-		  csmp.add (x, y);
+		  plf.add (x, y);
 		}
 	      if (count < 2)
 		error ("Need at least 2 points");
-	      atts.add (name, csmp);
+	      atts.add (name, plf);
 	      break;
 	    }
 	  case Syntax::String:

@@ -2,7 +2,7 @@
 
 #include "macro.h"
 #include "soil.h"
-#include "csmp.h"
+#include "plf.h"
 #include "mathlib.h"
 #include "log.h"
 #include "uzmodel.h"
@@ -12,7 +12,7 @@ struct MacroStandard : public Macro
   // Parameters.
   const double height_start;	// Height macropores start [cm]
   const double height_end;	// Height macropores end [cm]
-  const CSMP distribution;		// Where they end [cm ->]
+  const PLF distribution;		// Where they end [cm ->]
   const double pressure_initiate; // Pressure needed to init pref.flow [cm]
   const double pressure_end;	// Pressure after pref.flow has been init [cm]
   const double pond_max;	// Pond height before activating pref.flow [mm]
@@ -34,7 +34,7 @@ struct MacroStandard : public Macro
     : Macro (al),
       height_start (al.number ("height_start")),
       height_end (al.number ("height_end")),
-      distribution (al.csmp ("distribution")),
+      distribution (al.plf ("distribution")),
       pressure_initiate (al.number ("pressure_initiate")),
       pressure_end (al.number ("pressure_end")),
       pond_max (al.number ("pond_max"))
@@ -235,7 +235,7 @@ to the `distribution' parameter.");
 		  "Macropores starts at this depth (a negative number)");
       syntax.add ("height_end", "cm", Syntax::Const, 
 		  "Macropores ends at this depth (a negative number)");
-      syntax.add ("distribution", Syntax::CSMP, Syntax::Const, "\
+      syntax.add ("distribution", Syntax::PLF, Syntax::Const, "\
 Distribution of macropore end points as a function of height.\n\
 The function should start with `1' at `height_end', and then decrease to\n\
 `0' at `height_start'.  It can be constant, but may never increase.\n\

@@ -3,7 +3,7 @@
 #include "bioclimate.h"
 #include "surface.h"
 #include "weather.h"
-#include "csmp.h"
+#include "plf.h"
 #include "alist.h"
 #include "soil.h"
 #include "common.h"
@@ -217,7 +217,7 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
 {
 
   // Update vegetation state.
-  const CSMP& HvsLAI = vegetation.HvsLAI ();
+  const PLF& HvsLAI = vegetation.HvsLAI ();
   LAI_ = vegetation.LAI ();
   
   // Reset PAR intervals.

@@ -54,7 +54,7 @@ struct LogSelect : public Log
   void output (const string& name, const int value);
   void output (const string& name, const string& value);
   void output (const string& name, const vector<double>& value);
-  void output (const string&, const CSMP&);
+  void output (const string&, const PLF&);
 
   // Create and Destroy.
   bool check (const Syntax&) const;

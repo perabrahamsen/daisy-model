@@ -417,7 +417,7 @@ LogAList::output (const string& name, const vector<double>& value)
 }
 
 void
-LogAList::output (const string& name, const CSMP& value)
+LogAList::output (const string& name, const PLF& value)
 { 
   if (!is_active)
     return;

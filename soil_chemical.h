@@ -4,7 +4,7 @@
 #define SOIL_CHEMICAL_H
 
 #include "solute.h"
-#include "csmp.h"
+#include "plf.h"
 #include <vector>
 
 struct Chemical;
@@ -24,8 +24,8 @@ private:
   vector<double> decomposed;
   vector<double> uptaken;
   vector<double> lag;
-  static CSMP* no_lag;
-  const CSMP& lag_increment;
+  static PLF* no_lag;
+  const PLF& lag_increment;
 
   // Simulation.
 public:

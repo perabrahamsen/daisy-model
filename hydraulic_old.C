@@ -4,17 +4,17 @@
 
 #include "hydraulic.h"
 #include "mathlib.h"
-#include "csmp.h"
+#include "plf.h"
 #include <fstream.h>
 
 class HydraulicOld : public Hydraulic
 {
-  // We cheat and use h_minus instead of h in all the CSMP except M_.
-  CSMP Thetam_;
-  CSMP hm_;
-  CSMP Cw2_;
-  CSMP K_;
-  CSMP M_;
+  // We cheat and use h_minus instead of h in all the PLF except M_.
+  PLF Thetam_;
+  PLF hm_;
+  PLF Cw2_;
+  PLF K_;
+  PLF M_;
 
 public:
   double Theta (double h) const;

@@ -1,7 +1,7 @@
 // hydraulic.C
 
 #include "hydraulic.h"
-#include "csmp.h"
+#include "plf.h"
 #include "log.h"
 
 void 
@@ -18,7 +18,7 @@ Hydraulic::output (Log& log) const
 }
 
 void
-Hydraulic::K_to_M (CSMP& csmp, const int intervals) const
+Hydraulic::K_to_M (PLF& plf, const int intervals) const
 {
   static const double h0 = -20000.0;
   const double Ksat = K (0.0);
@@ -29,14 +29,14 @@ Hydraulic::K_to_M (CSMP& csmp, const int intervals) const
   double sum = 0.0;
   while (h < 0)
     {
-      csmp.add (h, sum);
+      plf.add (h, sum);
       step *= 2;
       while (K (h + step) / K (h) > max_change)
 	step /= 2;
       sum += step * (K (h) + K (h + step)) / 2;
       h += step;
     }
-  csmp.add (h, sum);
+  plf.add (h, sum);
 }
 
 static bool

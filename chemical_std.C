@@ -2,7 +2,7 @@
 
 #include "chemical.h"
 #include "mathlib.h"
-#include "csmp.h"
+#include "plf.h"
 #include "soil_chemical.h"
 
 static double
@@ -46,10 +46,10 @@ private:
   const double diffusion_coefficient_; // [cm^2/h]
   const AttributeList solute_alist_;
   const double decompose_rate_;
-  const CSMP decompose_heat_factor_;
-  const CSMP decompose_water_factor_;
-  const CSMP decompose_CO2_factor_;
-  const CSMP decompose_conc_factor_;
+  const PLF decompose_heat_factor_;
+  const PLF decompose_water_factor_;
+  const PLF decompose_CO2_factor_;
+  const PLF decompose_conc_factor_;
   const bool active_groundwater_;
 
   // Queries.
@@ -103,10 +103,10 @@ canopy_dissipation_rate_coefficient")),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     solute_alist_ (al.alist ("solute")),
     decompose_rate_ (al.number ("decompose_rate")),
-    decompose_heat_factor_ (al.csmp ("decompose_heat_factor")),
-    decompose_water_factor_ (al.csmp ("decompose_water_factor")),
-    decompose_CO2_factor_ (al.csmp ("decompose_CO2_factor")),
-    decompose_conc_factor_ (al.csmp ("decompose_conc_factor")),
+    decompose_heat_factor_ (al.plf ("decompose_heat_factor")),
+    decompose_water_factor_ (al.plf ("decompose_water_factor")),
+    decompose_CO2_factor_ (al.plf ("decompose_CO2_factor")),
+    decompose_conc_factor_ (al.plf ("decompose_conc_factor")),
     active_groundwater_ (al.flag ("active_groundwater"))
 { }
 
@@ -140,20 +140,20 @@ Read chemical properties as normal Daisy parameters.");
 				   "Description of chemical in soil.");
       syntax.add ("decompose_rate", "h^-1", Syntax::Const,
 		  "Fraction of solute being decomposed each hour.");
-      CSMP empty;
-      syntax.add ("decompose_heat_factor", Syntax::CSMP, Syntax::Const,
+      PLF empty;
+      syntax.add ("decompose_heat_factor", Syntax::PLF, Syntax::Const,
 		  "Heat factor on decomposition [dg C ->].");
       alist.add ("decompose_heat_factor", empty);
-      syntax.add ("decompose_water_factor", Syntax::CSMP, Syntax::Const,
+      syntax.add ("decompose_water_factor", Syntax::PLF, Syntax::Const,
 		  "Water potential factor on decomposition [cm ->].");
       alist.add ("decompose_water_factor", empty);
-      syntax.add ("decompose_CO2_factor", Syntax::CSMP, Syntax::Const,
+      syntax.add ("decompose_CO2_factor", Syntax::PLF, Syntax::Const,
 		  "CO2 development factor on decomposition [g C/cm^3 ->].");
-      CSMP no_factor;
+      PLF no_factor;
       no_factor.add (0.0, 1.0);
       no_factor.add (1.0, 1.0);
       alist.add ("decompose_CO2_factor", no_factor);
-      syntax.add ("decompose_conc_factor", Syntax::CSMP, Syntax::Const,
+      syntax.add ("decompose_conc_factor", Syntax::PLF, Syntax::Const,
 		  "\
 Concentration development factor on decomposition [g X/cm^3 H2O ->].");
       alist.add ("decompose_conc_factor", no_factor);

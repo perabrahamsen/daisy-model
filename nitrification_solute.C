@@ -8,7 +8,7 @@
 #include "soil_NO3.h"
 #include "log.h"
 #include "mathlib.h"
-#include "csmp.h"
+#include "plf.h"
 
 class NitrificationSolute : public Nitrification
 {
@@ -18,8 +18,8 @@ private:
   const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double k;
   const double k_10;
-  const CSMP heat_factor;
-  const CSMP water_factor;
+  const PLF heat_factor;
+  const PLF water_factor;
 
   // Log variable.
 private:
@@ -129,8 +129,8 @@ NitrificationSolute::NitrificationSolute (const AttributeList& al)
     active_groundwater (al.flag ("active_groundwater")),
     k (al.number ("k")),
     k_10 (al.number ("k_10")),
-    heat_factor (al.csmp ("heat_factor")),
-    water_factor (al.csmp ("water_factor"))
+    heat_factor (al.plf ("heat_factor")),
+    water_factor (al.plf ("water_factor"))
 { }
 
 static struct NitrificationSoluteSyntax
@@ -160,11 +160,11 @@ Set this to true to enable nitrification in the groundwater.");
 		"Half saturation constant.");
     syntax.add ("k_10", "h^-1", Syntax::Const,
 		"Max rate.");
-    CSMP empty;
-    syntax.add ("heat_factor", Syntax::CSMP, Syntax::Const,
+    PLF empty;
+    syntax.add ("heat_factor", Syntax::PLF, Syntax::Const,
 		"Heat factor [dg C ->].");
     alist.add ("heat_factor", empty);
-    syntax.add ("water_factor", Syntax::CSMP, Syntax::Const,
+    syntax.add ("water_factor", Syntax::PLF, Syntax::Const,
 		"Water potential factor [cm ->].");
     alist.add ("water_factor", empty);
     Librarian<Nitrification>::add_type ("solute", alist, syntax, &make);

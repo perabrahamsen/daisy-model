@@ -31,7 +31,7 @@ public:
 
   // Each syntax entry should have an associated type.
   enum type 
-  { Number, AList, CSMP, Boolean, String,
+  { Number, AList, PLF, Boolean, String,
     Date, Integer, Object, Library, Error };
   static const char* type_name (type);
   static type type_number (const char* name);

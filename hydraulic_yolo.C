@@ -1,7 +1,7 @@
 // hydraulic_yolo.C
 
 #include "hydraulic.h"
-#include "csmp.h"
+#include "plf.h"
 
 class HydraulicYolo : public Hydraulic
 {
@@ -64,14 +64,14 @@ double
 HydraulicYolo::M (double h) const
 {
   // Use.
-  static CSMP csmp;
+  static PLF plf;
   static bool initialized = false;
   if (!initialized)
     {
-      K_to_M (csmp, M_intervals);
+      K_to_M (plf, M_intervals);
       initialized = true;
     }
-  return csmp (h);
+  return plf (h);
 }
 
 HydraulicYolo::HydraulicYolo (const AttributeList& al)

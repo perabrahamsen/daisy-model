@@ -3,7 +3,7 @@
 // van Genuchten retention curve model with Mualem theory and compaction.
 
 #include "hydraulic.h"
-#include "csmp.h"
+#include "plf.h"
 
 class HydraulicM_vG_compact : public Hydraulic
 {
@@ -13,9 +13,9 @@ class HydraulicM_vG_compact : public Hydraulic
   const double ref_K_sat;
   
   // Modifiers.
-  const CSMP mod_alpha;
-  const CSMP mod_n;
-  const CSMP mod_K_sat;
+  const PLF mod_alpha;
+  const PLF mod_n;
+  const PLF mod_K_sat;
 
   // Actual values depending on porosity.
   double alpha;
@@ -100,14 +100,14 @@ double
 HydraulicM_vG_compact::M (double h) const
 {
   // Use.
-  static CSMP csmp;
+  static PLF plf;
   static bool initialized = false;
   if (!initialized)
     {
-      K_to_M (csmp, 500);
+      K_to_M (plf, 500);
       initialized = true;
     }
-  return csmp (h);
+  return plf (h);
 }
 
 double 
@@ -129,9 +129,9 @@ HydraulicM_vG_compact::HydraulicM_vG_compact (const AttributeList& al)
     ref_alpha (al.number ("ref_alpha")),
     ref_n (al.number ("ref_n")),
     ref_K_sat (al.number ("ref_K_sat")),
-    mod_alpha (al.csmp ("mod_alpha")),
-    mod_n (al.csmp ("mod_n")),
-    mod_K_sat (al.csmp ("mod_K_sat"))
+    mod_alpha (al.plf ("mod_alpha")),
+    mod_n (al.plf ("mod_n")),
+    mod_K_sat (al.plf ("mod_K_sat"))
 { set_porosity (Theta_sat); }
 
 HydraulicM_vG_compact::~HydraulicM_vG_compact ()
@@ -157,11 +157,11 @@ and compaction.");
 		"Reference van Genuchten n.");
     syntax.add ("ref_K_sat", "cm/h", Syntax::Const,
 		"Reference water conductivity of saturated soil.");
-    syntax.add ("mod_alpha", Syntax::CSMP, Syntax::Const,
+    syntax.add ("mod_alpha", Syntax::PLF, Syntax::Const,
 		"Porosity modifier for van Genuchten alpha.");
-    syntax.add ("mod_n", Syntax::CSMP, Syntax::Const,
+    syntax.add ("mod_n", Syntax::PLF, Syntax::Const,
 		"Porosity modifier for van Genuchten n.");
-    syntax.add ("mod_K_sat", Syntax::CSMP, Syntax::Const,
+    syntax.add ("mod_K_sat", Syntax::PLF, Syntax::Const,
 		"Porosity modifier for water conductivity of saturated soil.");
 
     Librarian<Hydraulic>::add_type ("M_vG_compact", alist, syntax, &make);

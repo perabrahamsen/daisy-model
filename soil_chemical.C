@@ -9,7 +9,7 @@
 #include "log.h"
 #include "submodel.h"
 
-CSMP* SoilChemical::no_lag = NULL;
+PLF* SoilChemical::no_lag = NULL;
 
 void 
 SoilChemical::uptake (const Soil& soil, 
@@ -107,13 +107,13 @@ SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
   AttributeList& none = *new AttributeList ();
   none.add ("type", "none");
 
-  syntax.add ("lag_increment", Syntax::CSMP, Syntax::Const,
-	      "Increment lag with the value of this CSMP for the current\n\
+  syntax.add ("lag_increment", Syntax::PLF, Syntax::Const,
+	      "Increment lag with the value of this PLF for the current\n\
 concentration each timestep.  When lag in any node reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
   if (!no_lag)
     {
-      no_lag = new CSMP ();
+      no_lag = new PLF ();
       no_lag->add (0.0, 1.0);
       no_lag->add (1.0, 1.0);
     }
@@ -137,7 +137,7 @@ SoilChemical::initialize (const AttributeList& al,
 SoilChemical::SoilChemical (const Chemical& chem, const AttributeList& al)
   : Solute (al),
     chemical (chem),
-    lag_increment (al.csmp ("lag_increment"))
+    lag_increment (al.plf ("lag_increment"))
 { 
   if (al.check ("lag"))
     lag = al.number_sequence ("lag");

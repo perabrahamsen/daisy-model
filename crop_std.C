@@ -3,10 +3,9 @@
 #include "crop.h"
 #include "log.h"
 #include "time.h"
-#include "csmp.h"
 #include "bioclimate.h"
 #include "common.h"
-#include "csmp.h"
+#include "plf.h"
 #include "soil_water.h"
 #include "soil.h"
 #include "om.h"
@@ -46,7 +45,7 @@ public:
   double rs_max () const;	// Maximum transpiration resistance.
   double height () const;	// Crop height [cm]
   double LAI () const;
-  const CSMP& LAIvsH () const;
+  const PLF& LAIvsH () const;
   double PARext () const;
   double PARref () const;
   double EPext () const;
@@ -674,15 +673,15 @@ struct CropStandard::Parameters
   const struct DevelPar
   {
     double EmrTSum;		// Soil temp sum at emergence
-    const CSMP& EmrSMF;         // Soil moisture effect on emergence
+    const PLF& EmrSMF;         // Soil moisture effect on emergence
     double DS_Emr;		// Development stage (DS) emergence
     double DSRate1;		// Development rate [C-1 or d-1],
     				// the vegetative stage
     double DSRate2;		// Development rate [C-1 or d-1],
 				// the reproductive stage
-    const CSMP& TempEff1;	// Temperature effect, vegetative stage
-    const CSMP& TempEff2;	// Temperature effect, reproductive stage
-    const CSMP& PhotEff1;	// Ptotoperiode effect, vegetative stage
+    const PLF& TempEff1;	// Temperature effect, vegetative stage
+    const PLF& TempEff2;	// Temperature effect, reproductive stage
+    const PLF& PhotEff1;	// Ptotoperiode effect, vegetative stage
     				// defined limit
     double defined_until_ds;	// Model invalid after this DS.
   private:
@@ -702,7 +701,7 @@ struct CropStandard::Parameters
   const struct LeafPhotPar {
     double Qeff;		// Quantum efficiency at low light
     double Fm;			// Max assimilation rate
-    const CSMP& TempEff;	// Temperature effect, photosynthesis
+    const PLF& TempEff;	// Temperature effect, photosynthesis
   private:
     friend struct CropStandard::Parameters;
     LeafPhotPar (const AttributeList&);
@@ -710,15 +709,15 @@ struct CropStandard::Parameters
   const struct CanopyPar {
     double DSLAI05;		// DS at CAI=0.5; forced development
     double SpLAI;		// Specific leaf weight [ (m²/m²) / (g/m²) ]
-    const CSMP& LeafAIMod;      // Specific leaf area index modifier
+    const PLF& LeafAIMod;      // Specific leaf area index modifier
     double SpLAIfac;            // Factor defining max Specific leaf weight
     double SpSOrgAI;            // Specific storage organ area index
-    const CSMP& SOrgAIMod;      // Specific storage organ area index modifier
+    const PLF& SOrgAIMod;      // Specific storage organ area index modifier
     double SOrgPhotEff;         // Relative photosynthetic effiency of stor. org.
     double SpStemAI;            // Specific stem area index
-    const CSMP& StemAIMod;      // Specific stem area index modifier
+    const PLF& StemAIMod;      // Specific stem area index modifier
     double StemPhotEff;         // Relative photosynthetic effiency of stem.
-    const CSMP& HvsDS;		// Crop height as function of DS
+    const PLF& HvsDS;		// Crop height as function of DS
     const vector<double>& LAIDist0; // Relative CAI distribution at DS=0
     const vector<double>& LAIDist1; // Relative CAI distribution at DS=1
     double PARref;		// PAR reflectance
@@ -734,10 +733,10 @@ struct CropStandard::Parameters
     CanopyPar (const AttributeList&);
   } Canopy;
   const struct PartitPar {
-    const CSMP& Root;		// Partitioning functions for root
-    const CSMP& Leaf;		//   leaf, and stem as function of DS
-    const CSMP& Stem;
-    const CSMP& RSR;		// Root/Shoot ratio.
+    const PLF& Root;		// Partitioning functions for root
+    const PLF& Leaf;		//   leaf, and stem as function of DS
+    const PLF& Stem;
+    const PLF& RSR;		// Root/Shoot ratio.
   private:
     friend struct CropStandard::Parameters;
     PartitPar (const AttributeList&);
@@ -757,8 +756,8 @@ struct CropStandard::Parameters
     double ReMobilRt;		// Remobilization, release rate
     double ExfoliationFac;      // Exfoliation factor, 0-1
     double GrowthRateRedFac;    // Growth rate reduction factor, 0-1
-    const CSMP& LfDR;		// Death rate of Leafs
-    const CSMP& RtDR;		// Death rate of Roots
+    const PLF& LfDR;		// Death rate of Leafs
+    const PLF& RtDR;		// Death rate of Roots
     const double Large_RtDR;	// Extra death rate for large root/shoot.
   private:
     friend struct CropStandard::Parameters;
@@ -769,20 +768,20 @@ struct CropStandard::Parameters
     double DS_fixate;		// Fixation of atmospheric N. after this DS
     double DS_cut_fixate;	// Restore fixation this DS after cut.
     double fixate_factor;	// Fraction of N need covered by fixation.
-    const CSMP& PtLeafCnc;	// Upper limit for N-conc in leaves
-    const CSMP& CrLeafCnc;	// Critical lim f. N-conc in leaves
-    const CSMP& NfLeafCnc;	// Non-func lim f. N-conc in leaves
-    const CSMP& PtStemCnc;	// Upper limit for N-conc in stems
-    const CSMP& CrStemCnc;	// Critical lim f. N-conc in stems
-    const CSMP& NfStemCnc;	// Non-func lim f. N-conc in stems
-    const CSMP& PtRootCnc;	// Upper limit for N-conc in roots
-    const CSMP& CrRootCnc;	// Critical lim f. N-conc in roots
-    const CSMP& NfRootCnc;	// Non-func lim f. N-conc in roots
-    const CSMP& PtSOrgCnc;	// Upper limit for N-conc in stor org
-    const CSMP& CrSOrgCnc;	// Critical lim f. N-conc in stor org
-    const CSMP& NfSOrgCnc;	// Non-func lim f. N-conc in stor org
-    const CSMP& TLLeafEff;	// Translocation effiency, Leaf.
-    const CSMP& TLRootEff;	// Translocation effiency, Root.
+    const PLF& PtLeafCnc;	// Upper limit for N-conc in leaves
+    const PLF& CrLeafCnc;	// Critical lim f. N-conc in leaves
+    const PLF& NfLeafCnc;	// Non-func lim f. N-conc in leaves
+    const PLF& PtStemCnc;	// Upper limit for N-conc in stems
+    const PLF& CrStemCnc;	// Critical lim f. N-conc in stems
+    const PLF& NfStemCnc;	// Non-func lim f. N-conc in stems
+    const PLF& PtRootCnc;	// Upper limit for N-conc in roots
+    const PLF& CrRootCnc;	// Critical lim f. N-conc in roots
+    const PLF& NfRootCnc;	// Non-func lim f. N-conc in roots
+    const PLF& PtSOrgCnc;	// Upper limit for N-conc in stor org
+    const PLF& CrSOrgCnc;	// Critical lim f. N-conc in stor org
+    const PLF& NfSOrgCnc;	// Non-func lim f. N-conc in stor org
+    const PLF& TLLeafEff;	// Translocation effiency, Leaf.
+    const PLF& TLRootEff;	// Translocation effiency, Root.
   private:
     friend struct CropStandard::Parameters;
     CrpNPar (const AttributeList&);
@@ -845,7 +844,7 @@ struct CropStandard::Variables
     double StemAI;              // Stem Area Index
     double SOrgAI;              // Storage organ Area Index
     double LADm;		// Max Leaf Area Density [cm2/cm3]
-    CSMP LAIvsH;		// Accumulated Crop Area Index at Height
+    PLF LAIvsH;		// Accumulated Crop Area Index at Height
   private:
     friend struct CropStandard::Variables;
     RecCanopy (const Parameters&, const AttributeList&);
@@ -924,13 +923,13 @@ CropStandard::Parameters::Parameters (const AttributeList& vl)
 
 CropStandard::Parameters::DevelPar::DevelPar (const AttributeList& vl)
   : EmrTSum (vl.number ("EmrTSum")),
-    EmrSMF (vl.csmp ("EmrSMF")),
+    EmrSMF (vl.plf ("EmrSMF")),
     DS_Emr (vl.number ("DS_Emr")),
     DSRate1 (vl.number ("DSRate1")),
     DSRate2 (vl.number ("DSRate2")),
-    TempEff1 (vl.csmp ("TempEff1")),
-    TempEff2 (vl.csmp ("TempEff2")),
-    PhotEff1 (vl.csmp ("PhotEff1")),
+    TempEff1 (vl.plf ("TempEff1")),
+    TempEff2 (vl.plf ("TempEff2")),
+    PhotEff1 (vl.plf ("PhotEff1")),
     defined_until_ds (vl.number ("defined_until_ds"))
 { }
 
@@ -944,21 +943,21 @@ CropStandard::Parameters::VernalPar::VernalPar (const AttributeList& vl)
 CropStandard::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
   : Qeff (vl.number ("Qeff")),
     Fm (vl.number ("Fm")),
-    TempEff (vl.csmp ("TempEff"))
+    TempEff (vl.plf ("TempEff"))
 { }
 
 CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
   : DSLAI05 (vl.number ("DSLAI05")),
     SpLAI (vl.number ("SpLAI")),
-    LeafAIMod (vl.csmp ("LeafAIMod")),
+    LeafAIMod (vl.plf ("LeafAIMod")),
     SpLAIfac (vl.number ("SpLAIfac")),
     SpSOrgAI (vl.number ("SpSOrgAI")),
-    SOrgAIMod (vl.csmp ("SOrgAIMod")),
+    SOrgAIMod (vl.plf ("SOrgAIMod")),
     SOrgPhotEff (vl.number ("SOrgPhotEff")),
     SpStemAI (vl.number ("SpStemAI")),
-    StemAIMod (vl.csmp ("StemAIMod")),
+    StemAIMod (vl.plf ("StemAIMod")),
     StemPhotEff (vl.number ("StemPhotEff")),
-    HvsDS (vl.csmp ("HvsDS")),
+    HvsDS (vl.plf ("HvsDS")),
     LAIDist0 (vl.number_sequence ("LAIDist0")),
     LAIDist1 (vl.number_sequence ("LAIDist1")),
     PARref (vl.number ("PARref")),
@@ -972,10 +971,10 @@ CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
 { }
 
 CropStandard::Parameters::PartitPar::PartitPar (const AttributeList& vl)
-  : Root (vl.csmp ("Root")),
-    Leaf (vl.csmp ("Leaf")),
-    Stem (vl.csmp ("Stem")),
-    RSR (vl.csmp ("RSR"))
+  : Root (vl.plf ("Root")),
+    Leaf (vl.plf ("Leaf")),
+    Stem (vl.plf ("Stem")),
+    RSR (vl.plf ("RSR"))
 { }
 
 CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
@@ -993,8 +992,8 @@ CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
     ReMobilRt (vl.number ("ReMobilRt")),
     ExfoliationFac (vl.number ("ExfoliationFac")),
     GrowthRateRedFac (vl.number ("GrowthRateRedFac")),
-    LfDR (vl.csmp ("LfDR")),
-    RtDR (vl.csmp ("RtDR")),
+    LfDR (vl.plf ("LfDR")),
+    RtDR (vl.plf ("RtDR")),
     Large_RtDR (vl.number ("Large_RtDR"))
 { }
 
@@ -1003,20 +1002,20 @@ CropStandard::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
     DS_fixate (vl.number ("DS_fixate")),
     DS_cut_fixate (vl.number ("DS_cut_fixate")),
     fixate_factor (vl.number ("fixate_factor")),
-    PtLeafCnc (vl.csmp ("PtLeafCnc")),
-    CrLeafCnc (vl.csmp ("CrLeafCnc")),
-    NfLeafCnc (vl.csmp ("NfLeafCnc")),
-    PtStemCnc (vl.csmp ("PtStemCnc")),
-    CrStemCnc (vl.csmp ("CrStemCnc")),
-    NfStemCnc (vl.csmp ("NfStemCnc")),
-    PtRootCnc (vl.csmp ("PtRootCnc")),
-    CrRootCnc (vl.csmp ("CrRootCnc")),
-    NfRootCnc (vl.csmp ("NfRootCnc")),
-    PtSOrgCnc (vl.csmp ("PtSOrgCnc")),
-    CrSOrgCnc (vl.csmp ("CrSOrgCnc")),
-    NfSOrgCnc (vl.csmp ("NfSOrgCnc")),
-    TLLeafEff (vl.csmp ("TLLeafEff")),
-    TLRootEff (vl.csmp ("TLRootEff"))
+    PtLeafCnc (vl.plf ("PtLeafCnc")),
+    CrLeafCnc (vl.plf ("CrLeafCnc")),
+    NfLeafCnc (vl.plf ("NfLeafCnc")),
+    PtStemCnc (vl.plf ("PtStemCnc")),
+    CrStemCnc (vl.plf ("CrStemCnc")),
+    NfStemCnc (vl.plf ("NfStemCnc")),
+    PtRootCnc (vl.plf ("PtRootCnc")),
+    CrRootCnc (vl.plf ("CrRootCnc")),
+    NfRootCnc (vl.plf ("NfRootCnc")),
+    PtSOrgCnc (vl.plf ("PtSOrgCnc")),
+    CrSOrgCnc (vl.plf ("CrSOrgCnc")),
+    NfSOrgCnc (vl.plf ("NfSOrgCnc")),
+    TLLeafEff (vl.plf ("TLLeafEff")),
+    TLRootEff (vl.plf ("TLRootEff"))
 { }
 
 CropStandard::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
@@ -1097,7 +1096,7 @@ CropStandard::Variables::RecCanopy::RecCanopy (const Parameters&,
     StemAI (vl.number ("StemAI")),
     SOrgAI (vl.number ("SOrgAI")),
     LADm (vl.number ("LADm")),
-    LAIvsH (vl.csmp ("LAIvsH"))
+    LAIvsH (vl.plf ("LAIvsH"))
 { }
 
 void
@@ -1244,7 +1243,7 @@ template class add_submodule<CropStandard::RootSystem>;
 
 CropStandardSyntax::CropStandardSyntax ()
 {
-  static const CSMP empty_csmp;
+  static const PLF empty_plf;
 
   Syntax& Devel = *new Syntax ();
   AttributeList& vDevel = *new AttributeList ();
@@ -1268,9 +1267,9 @@ CropStandardSyntax::CropStandardSyntax ()
   // DevelPar
   Devel.add ("EmrTSum", "dg C d", Syntax::Const,
 	     "Soil temperature sum at emergence.");
-  Devel.add ("EmrSMF", Syntax::CSMP, Syntax::Const,
+  Devel.add ("EmrSMF", Syntax::PLF, Syntax::Const,
 	     "Soil moisture (h-function) effect on emergense.");
-  CSMP SMF;
+  PLF SMF;
   SMF.add (-1000.0, 0.00);
   SMF.add (-150.0, 1.00);
   SMF.add (-50.00, 1.00);
@@ -1282,11 +1281,11 @@ CropStandardSyntax::CropStandardSyntax ()
 	     "Development rate in the vegetative stage.");
   Devel.add ("DSRate2", Syntax::None (), Syntax::Const,
 	     "Development rate in the reproductive stage.");
-  Devel.add ("TempEff1", Syntax::CSMP, Syntax::Const,
+  Devel.add ("TempEff1", Syntax::PLF, Syntax::Const,
 	     "Temperature effect, vegetative stage [dg C ->].");
-  Devel.add ("TempEff2", Syntax::CSMP, Syntax::Const,
+  Devel.add ("TempEff2", Syntax::PLF, Syntax::Const,
 	     "Temperature effect, reproductive stage [dg C ->].");
-  Devel.add ("PhotEff1", Syntax::CSMP, Syntax::Const,
+  Devel.add ("PhotEff1", Syntax::PLF, Syntax::Const,
 	     "Photoperiode effect, vegetative stage [h ->].");
   Devel.add ("defined_until_ds", Syntax::None (), Syntax::Const,
 	     "\
@@ -1316,7 +1315,7 @@ This parameterization is only valid until the specified development state.");
 		"Quantum efficiency at low light.");
   LeafPhot.add ("Fm", "g CO2/m^2/h", Syntax::Const,
 		"Maximum assimilation rate.");
-  LeafPhot.add ("TempEff", Syntax::CSMP, Syntax::Const,
+  LeafPhot.add ("TempEff", Syntax::PLF, Syntax::Const,
 		"Temperature effect, photosynthesis.");
 
   // Canopy
@@ -1325,9 +1324,9 @@ This parameterization is only valid until the specified development state.");
   vCanopy.add ("DSLAI05", 0.15);
   Canopy.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      " Specific leaf weight.");
-  Canopy.add ("LeafAIMod", Syntax::CSMP, Syntax::Const,
+  Canopy.add ("LeafAIMod", Syntax::PLF, Syntax::Const,
 	      "Specific leaf weight modifier (func. of DS)");
-  CSMP AIDef;
+  PLF AIDef;
   AIDef.add (0.00, 1.00);
   AIDef.add (2.00, 1.00);
   vCanopy.add ("LeafAIMod", AIDef);
@@ -1337,7 +1336,7 @@ This parameterization is only valid until the specified development state.");
   Canopy.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      "Specific storage organ weight.");
   vCanopy.add ("SpSOrgAI", 0.0);
-  Canopy.add ("SOrgAIMod", Syntax::CSMP, Syntax::Const,
+  Canopy.add ("SOrgAIMod", Syntax::PLF, Syntax::Const,
 	      "Specific storage organ weight modifier (func. of DS)");
   vCanopy.add ("SOrgAIMod", AIDef);
   Canopy.add ("SOrgPhotEff", Syntax::None (), Syntax::Const,
@@ -1346,13 +1345,13 @@ This parameterization is only valid until the specified development state.");
   Canopy.add ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      "Specific stem weight.");
   vCanopy.add ("SpStemAI", 0.0);
-  Canopy.add ("StemAIMod", Syntax::CSMP, Syntax::Const,
+  Canopy.add ("StemAIMod", Syntax::PLF, Syntax::Const,
 	      "Specific stem weight modifier (func. of DS)");
   vCanopy.add ("StemAIMod", AIDef);
   Canopy.add ("StemPhotEff", Syntax::None (), Syntax::Const,
 	      "Relative photosynthetic efficiency of stem.");
   vCanopy.add ("StemPhotEff", 1.0);
-  Canopy.add ("HvsDS", Syntax::CSMP, Syntax::Const,
+  Canopy.add ("HvsDS", Syntax::PLF, Syntax::Const,
 	      "Crop height as function of DS [->cm].");
   Canopy.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
 	      "Relative CAI distribution at DS=0.");
@@ -1383,13 +1382,13 @@ This parameterization is only valid until the specified development state.");
   vCanopy.add ("rs_min", 0.0);
 
   // PartitPar
-  Partit.add ("Root", Syntax::CSMP, Syntax::Const,
+  Partit.add ("Root", Syntax::PLF, Syntax::Const,
 	      "Partitioning functions for root [DS ->].");
-  Partit.add ("Leaf", Syntax::CSMP, Syntax::Const,
+  Partit.add ("Leaf", Syntax::PLF, Syntax::Const,
 	      "Partitioning functions for leaves [DS ->].");
-  Partit.add ("Stem", Syntax::CSMP, Syntax::Const,
+  Partit.add ("Stem", Syntax::PLF, Syntax::Const,
 	      "Partitioning functions for stem [DS ->].");
-  Partit.add ("RSR", Syntax::CSMP, Syntax::Const,
+  Partit.add ("RSR", Syntax::PLF, Syntax::Const,
 	      "Root/Shoot ratio as a function of development state.");
 
   // ProdPar
@@ -1431,9 +1430,9 @@ This parameterization is only valid until the specified development state.");
   Prod.add ("GrowthRateRedFac", Syntax::None (), Syntax::Const,
 	    "Growth rate reduction factor, 0-1.");
   vProd.add ("GrowthRateRedFac", 0.0);
-  Prod.add ("LfDR", Syntax::CSMP, Syntax::Const,
+  Prod.add ("LfDR", Syntax::PLF, Syntax::Const,
 	    "Death rate of Leafs [DS -> d^-1].");
-  Prod.add ("RtDR", Syntax::CSMP, Syntax::Const,
+  Prod.add ("RtDR", Syntax::PLF, Syntax::Const,
 	    "Death rate of Roots [DS -> d^-1].");
   Prod.add ("Large_RtDR", "d^-1", Syntax::Const,
 	    "Extra death rate for large root/shoot.");
@@ -1451,39 +1450,39 @@ This parameterization is only valid until the specified development state.");
   CrpN.add ("fixate_factor", Syntax::None (), Syntax::Const,
 	    "Fraction of needed N fixated by day.");
   CrpNList.add ("fixate_factor", 0.8);
-  CrpN.add ("PtLeafCnc", Syntax::CSMP, Syntax::Const,
+  CrpN.add ("PtLeafCnc", Syntax::PLF, Syntax::Const,
 	    "Upper limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("CrLeafCnc", Syntax::CSMP, Syntax::Const,
+  CrpN.add ("CrLeafCnc", Syntax::PLF, Syntax::Const,
 	    "Critical limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("NfLeafCnc", Syntax::CSMP, Syntax::Const, "\
+  CrpN.add ("NfLeafCnc", Syntax::PLF, Syntax::Const, "\
 Non-functional limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("PtStemCnc", Syntax::CSMP, Syntax::Const,
+  CrpN.add ("PtStemCnc", Syntax::PLF, Syntax::Const,
 	    "Upper limit for N-concentration in stem [DS -> g N/g DM].");
-  CrpN.add ("CrStemCnc", Syntax::CSMP, Syntax::Const,
+  CrpN.add ("CrStemCnc", Syntax::PLF, Syntax::Const,
 	    "Critical limit for N-concentration in stem [DS -> g N/g DM].");
-  CrpN.add ("NfStemCnc", Syntax::CSMP, Syntax::Const, "\
+  CrpN.add ("NfStemCnc", Syntax::PLF, Syntax::Const, "\
 Non-functional limit for N-concentration in stem [DS -> g N/g DM].");
-  CrpN.add ("PtSOrgCnc", Syntax::CSMP, Syntax::Const, "\
+  CrpN.add ("PtSOrgCnc", Syntax::PLF, Syntax::Const, "\
 Upper limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("CrSOrgCnc", Syntax::CSMP, Syntax::Const, "\
+  CrpN.add ("CrSOrgCnc", Syntax::PLF, Syntax::Const, "\
 Critical limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("NfSOrgCnc", Syntax::CSMP, Syntax::Const, "\
+  CrpN.add ("NfSOrgCnc", Syntax::PLF, Syntax::Const, "\
 Non-functional limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("PtRootCnc", Syntax::CSMP, Syntax::Const,
+  CrpN.add ("PtRootCnc", Syntax::PLF, Syntax::Const,
 	    "Upper limit for N-concentration in roots [DS -> g N/g DM].");
-  CrpN.add ("CrRootCnc", Syntax::CSMP, Syntax::Const,
+  CrpN.add ("CrRootCnc", Syntax::PLF, Syntax::Const,
 	    "Critical limit for N-concentration in roots [DS -> g N/g DM].");
-  CrpN.add ("NfRootCnc", Syntax::CSMP, Syntax::Const, "\
+  CrpN.add ("NfRootCnc", Syntax::PLF, Syntax::Const, "\
 Non-functional lim for N-concentration in roots [DS -> g N/g DM].");
-  CrpN.add ("TLLeafEff", Syntax::CSMP, Syntax::Const,
+  CrpN.add ("TLLeafEff", Syntax::PLF, Syntax::Const,
 	    "Translocation effiency, Leaf.");
-  CSMP TLLeafEff;
+  PLF TLLeafEff;
   TLLeafEff.add (0.00, 0.90);
   TLLeafEff.add (2.00, 0.90);
   CrpNList.add ("TLLeafEff", TLLeafEff);
-  CrpN.add ("TLRootEff", Syntax::CSMP, Syntax::Const,
+  CrpN.add ("TLRootEff", Syntax::PLF, Syntax::Const,
 	    "Translocation effiency, Root.");
-  CSMP TLRootEff;
+  PLF TLRootEff;
   TLRootEff.add (0.00, 0.10);
   TLRootEff.add (2.00, 0.10);
   CrpNList.add ("TLRootEff", TLRootEff);
@@ -1604,9 +1603,9 @@ Maximal development stage for which the crop survives harvest.");
   Canopy.add ("LADm", "cm^2/cm^3", Syntax::State,
 	      "Maximal Leaf Area Density.");
   vCanopy.add ("LADm", -9999.99);
-  Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::State,
+  Canopy.add ("LAIvsH", Syntax::PLF, Syntax::State,
 	      "Accumulated Leaf Area Index at Height.");
-  vCanopy.add ("LAIvsH", empty_csmp);
+  vCanopy.add ("LAIvsH", empty_plf);
 
   // Prod
   // Warning: Uses same syntax as `ProdPar'.
@@ -1754,7 +1753,7 @@ double CropStandard::height () const // Crop height [cm]
 double CropStandard::LAI () const
 { return var.Canopy.CAI; }
 
-const CSMP& CropStandard::LAIvsH () const
+const PLF& CropStandard::LAIvsH () const
 { return var.Canopy.LAIvsH; }
 
 double CropStandard::PARext () const
@@ -1997,7 +1996,7 @@ CropStandard::CanopyStructure ()
 	      assert (approximate ((x1 - x0) / y1, (z1 - z0)));
 
 	      // Insert this special distribution, and return.
-	      CSMP LADvsH;
+	      PLF LADvsH;
 	      LADvsH.add (x0 * Canopy.Height, 0.0);
 	      LADvsH.add (x1 * Canopy.Height, y1 * Canopy.LADm);
 	      LADvsH.add (     Canopy.Height, 0.0);
@@ -2010,8 +2009,8 @@ CropStandard::CanopyStructure ()
 	}
     }
 
-  // Create CSMP for standard "z0, z1, z2" distribution.
-  CSMP LADvsH;
+  // Create PLF for standard "z0, z1, z2" distribution.
+  PLF LADvsH;
   LADvsH.add (z0 * Canopy.Height, 0.0);
   LADvsH.add (z1 * Canopy.Height, Canopy.LADm);
   LADvsH.add (z2 * Canopy.Height, Canopy.LADm);
@@ -2121,7 +2120,7 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
 {
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const Parameters::LeafPhotPar& LeafPhot = par.LeafPhot;
-  const CSMP& LAIvsH = var.Canopy.LAIvsH;
+  const PLF& LAIvsH = var.Canopy.LAIvsH;
   const double Ta = bioclimate.daily_air_temperature ();
   const double Teff = LeafPhot.TempEff (Ta); // Temperature effect
 

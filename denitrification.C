@@ -8,7 +8,7 @@
 #include "soil_heat.h"
 #include "organic_matter.h"
 #include "soil_NO3.h"
-#include "csmp.h"
+#include "plf.h"
 #include "log.h"
 #include "submodel.h"
 
@@ -102,11 +102,11 @@ Maximum fraction of nitrate converted at each time step.");
   syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Syntax::Const, 
 	      "Anaerobic denitrification constant.");
   alist.add ("alpha", 0.1);
-  CSMP empty;
-  syntax.add ("heat_factor", Syntax::CSMP, Syntax::Const,
+  PLF empty;
+  syntax.add ("heat_factor", Syntax::PLF, Syntax::Const,
 	      "Heat factor [dg C ->].");
   alist.add ("heat_factor", empty);
-  syntax.add ("water_factor", Syntax::CSMP, Syntax::Const,
+  syntax.add ("water_factor", Syntax::PLF, Syntax::Const,
 	      "Water potential factor, a function of the current\n\
 water content as a fraction of the maximal water content. [->].");
   alist.add ("water_factor", empty);
@@ -117,8 +117,8 @@ Denitrification::Denitrification (const AttributeList& al)
     active_groundwater (al.flag ("active_groundwater")),
     K (al.number ("K")),
     alpha (al.number ("alpha")),
-    heat_factor (al.csmp ("heat_factor")),
-    water_factor (al.csmp ("water_factor"))
+    heat_factor (al.plf ("heat_factor")),
+    water_factor (al.plf ("water_factor"))
 { }
 
 static Submodel::Register 

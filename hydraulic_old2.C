@@ -2,14 +2,14 @@
 
 #include "hydraulic.h"
 #include "mathlib.h"
-#include "csmp.h"
+#include "plf.h"
 #include <fstream.h>
 
 class HydraulicOld2 : public Hydraulic
 {
-  // We cheat and use h_minus instead of h in all the CSMP except M_.
+  // We cheat and use h_minus instead of h in all the PLF except M_.
   double Theta_[501];
-  CSMP hm_;
+  PLF hm_;
   double Cw2_[501];
   double K_[501];
   double M_[501];
@@ -98,7 +98,7 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
   double Cw2;
   double K;
 
-  CSMP Thetam_;
+  PLF Thetam_;
 
   for (int i = 0; i <= 500; i++)
     {
@@ -137,7 +137,7 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
 #endif
   hm_ = Thetam_.inverse ();
 
-  CSMP myM;
+  PLF myM;
   K_to_M (myM, M_intervals);
 
   for (int i = 0; i <= 500; i++)

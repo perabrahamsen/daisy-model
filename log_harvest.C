@@ -79,7 +79,7 @@ struct LogHarvest : public Log
     { }
   void output (const string&, const vector<double>&)
     { }
-  void output (const string&, const CSMP&)
+  void output (const string&, const PLF&)
     { }
 
   // Create and Destroy.

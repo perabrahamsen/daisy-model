@@ -4,7 +4,7 @@
 #define DENITRIFICATION_H
 
 #include "common.h"
-#include "csmp.h"
+#include "plf.h"
 #include <vector>
 class AttributeList;
 class Syntax;
@@ -23,8 +23,8 @@ private:
   const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double K;
   const double alpha;
-  const CSMP heat_factor;
-  const CSMP water_factor;
+  const PLF heat_factor;
+  const PLF water_factor;
 
   // Log variable.
 private:

@@ -1,35 +1,35 @@
-// csmp.C
+// plf.C
 
-#include "csmp.h"
+#include "plf.h"
 #include <vector>
 #include <list>
 #include <assert.h>
 
-struct CSMP::Implementation
+struct PLF::Implementation
 {
   vector<double> x;
   vector<double> y;
 
   double operator () (const double pos) const;
-  CSMP inverse () const;
+  PLF inverse () const;
   double integrate (const double from, const double to) const;
-  CSMP integrate_stupidly () const;
+  PLF integrate_stupidly () const;
   void clear () 
     { 
       x.erase (x.begin (), x.end ());
       y.erase (y.begin (), y.end ());
     }
-  void operator = (CSMP::Implementation& impl)
+  void operator = (PLF::Implementation& impl)
   { 
     x = impl.x;
     y = impl.y;
   }
   Implementation () { };
-  Implementation (CSMP::Implementation& impl) : x (impl.x), y (impl.y) { };
+  Implementation (PLF::Implementation& impl) : x (impl.x), y (impl.y) { };
 };
 
 double 
-CSMP::Implementation::operator () (const double pos) const
+PLF::Implementation::operator () (const double pos) const
 {
   assert (x.size () > 0);
   assert (x.size () == y.size ());
@@ -60,27 +60,27 @@ CSMP::Implementation::operator () (const double pos) const
     }
 }
 
-// Calculate the inverse function of a CSMP.  
-// We assume that the original CSMP is monotonously increasing.
-CSMP 
-CSMP::Implementation::inverse () const
+// Calculate the inverse function of a PLF.  
+// We assume that the original PLF is monotonously increasing.
+PLF 
+PLF::Implementation::inverse () const
 {
   const int size = x.size ();
-  CSMP csmp;
+  PLF plf;
 
   double last = -1.0;
   for (int i = 0; i < size; i++)
     if (last != y[i])
       {
 	assert (last <= y[i]);
-	csmp.add (y[i], x[i]);
+	plf.add (y[i], x[i]);
 	last = y[i];
       }
-  return csmp;
+  return plf;
 }
 
 double
-CSMP::Implementation::integrate (const double from, const double to) const
+PLF::Implementation::integrate (const double from, const double to) const
 {
   assert (from < to);
   const int size = x.size ();
@@ -109,21 +109,21 @@ CSMP::Implementation::integrate (const double from, const double to) const
   return total;
 }
 
-// Integrate a CSMP by pretending that line piece is really a constant
+// Integrate a PLF by pretending that line piece is really a constant
 // with the mean value of the line piece.  That way, the result can be
-// described as a CSMP itself.  
-// We assume that the first point of the CSMP is (0.0, 0.0).
-CSMP 
-CSMP::Implementation::integrate_stupidly () const
+// described as a PLF itself.  
+// We assume that the first point of the PLF is (0.0, 0.0).
+PLF 
+PLF::Implementation::integrate_stupidly () const
 {
-  CSMP csmp;
+  PLF plf;
   const unsigned int intervals = 10;
   const unsigned int size = x.size ();
   double sum = 0.0;
   double last_x = 0.0;
   double last_y = 0.0;
   
-  csmp.add (0.0, 0.0);
+  plf.add (0.0, 0.0);
   for (unsigned int i = 0; i < size; i++)
     {
       if (x[i] > last_x)
@@ -134,56 +134,56 @@ CSMP::Implementation::integrate_stupidly () const
 	    {
 	      const double x = last_x + j * dx;
 	      const double y = this->operator ()(x);
-	      csmp.add (x, sum + (last_y + y) * 0.5 * (x - last_x));
+	      plf.add (x, sum + (last_y + y) * 0.5 * (x - last_x));
 	    }
 	  // Add final point.
 	  sum += (last_y + y[i]) * 0.5 * (x[i] - last_x);
-	  csmp.add (x[i], sum);
+	  plf.add (x[i], sum);
 	}
       else
 	{
-	  // The CSMP is discontinues at this point.
+	  // The PLF is discontinues at this point.
 	  assert (x[i] == last_x);
 	}
       last_x = x[i];
       last_y = y[i];
     }
-  return csmp;
+  return plf;
 }
 
 double
-CSMP::operator () (const double x) const
+PLF::operator () (const double x) const
 {
   return impl (x);
 }
 
-CSMP
-CSMP::inverse () const
+PLF
+PLF::inverse () const
 { 
   return impl.inverse ();
 }
 
 double
-CSMP::integrate (const double from, const double to) const
+PLF::integrate (const double from, const double to) const
 {
   return impl.integrate (from, to);
 }
 
-CSMP 
-CSMP::integrate_stupidly () const
+PLF 
+PLF::integrate_stupidly () const
 {
   return impl.integrate_stupidly ();
 }
 
 void
-CSMP::offset (double offset)	// Add `offset' to all y values.
+PLF::offset (double offset)	// Add `offset' to all y values.
 {
   for (unsigned int i = 0; i < impl.y.size(); i++)
     impl.y[i] += offset;
 }
 
 double 
-CSMP::find (const vector<double>& x, const vector<double>& y, double value)
+PLF::find (const vector<double>& x, const vector<double>& y, double value)
 {
   assert (x.size () == y.size ());
 
@@ -204,23 +204,23 @@ CSMP::find (const vector<double>& x, const vector<double>& y, double value)
 }
 
 unsigned int 
-CSMP::size () const
+PLF::size () const
 { return impl.x.size (); }
 
 double 
-CSMP::x (unsigned int i) const
+PLF::x (unsigned int i) const
 { return impl.x[i]; }
 
 double 
-CSMP::y (unsigned int i) const
+PLF::y (unsigned int i) const
 { return impl.y[i]; }
 
 bool 
-CSMP::operator == (const CSMP& other) const
+PLF::operator == (const PLF& other) const
 { return impl.x == other.impl.x && impl.y == other.impl.y; }
 
 void 
-CSMP::add (double x, double y)
+PLF::add (double x, double y)
 {
   const int size = impl.x.size ();
   assert (size == 0 || x >= impl.x[size - 1]);
@@ -228,29 +228,29 @@ CSMP::add (double x, double y)
   impl.y.push_back (y);
 }
 
-// Add two CSMPs a and b giving c so that c (x) == a (x) + b (x).
+// Add two PLFs a and b giving c so that c (x) == a (x) + b (x).
 
 void
-CSMP::operator += (const CSMP& csmp)
+PLF::operator += (const PLF& plf)
 {
-  // We can't calculate with empty CSMPs.  They don't have a defined
+  // We can't calculate with empty PLFs.  They don't have a defined
   // value in any points.  Check for those first.
   if (impl.x.size () == 0)
     {
       // If this is empty, use the other.
-      impl = csmp.impl;
+      impl = plf.impl;
       return;
     }
-  if (csmp.impl.x.size () == 0)
+  if (plf.impl.x.size () == 0)
     {
       // If theother is empty, use this one.
       return;
     }
 
   // I want a vector with all the x points.
-  // First I create two lists containing the x points from each csmp.
+  // First I create two lists containing the x points from each plf.
   list<double> combined (impl.x.begin (), impl.x.end ());
-  list<double> other (csmp.impl.x.begin (), csmp.impl.x.end ());
+  list<double> other (plf.impl.x.begin (), plf.impl.x.end ());
   // Then I merge them and remove duplicates.
   combined.merge (other);
   combined.unique ();
@@ -265,41 +265,41 @@ CSMP::operator += (const CSMP& csmp)
     points.push_back (*i);
 #endif
 
-  // I then add the points to a temporary CSMP.
-  CSMP result;
+  // I then add the points to a temporary PLF.
+  PLF result;
 
   for (unsigned int i = 0; i < points.size (); i++)
     {
-      //  The y value of the combined csmp is at all points the
-      // combined y value of the individual csmps.  And the function
+      //  The y value of the combined plf is at all points the
+      // combined y value of the individual plfs.  And the function
       // is piecewise linear between the x points.
       const double x = points[i];
-      const double y = impl (x) + csmp (x);
+      const double y = impl (x) + plf (x);
       result.add (x, y);
     }
 
-  // We now store the result in this csmp.
+  // We now store the result in this plf.
   impl = result.impl;
 }
 
 void
-CSMP::clear ()
+PLF::clear ()
 { impl.clear (); }
 
 void 
-CSMP::operator = (const CSMP& csmp)
-{ impl = csmp.impl; }
+PLF::operator = (const PLF& plf)
+{ impl = plf.impl; }
 
 
-CSMP::CSMP (const CSMP& csmp)
-  : impl (*new Implementation (csmp.impl))
+PLF::PLF (const PLF& plf)
+  : impl (*new Implementation (plf.impl))
 { }
 
-CSMP::CSMP ()
+PLF::PLF ()
   : impl (*new Implementation ())
 { }
 
-CSMP::~CSMP ()
+PLF::~PLF ()
 {
   delete &impl;
 }

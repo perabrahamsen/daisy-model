@@ -7,7 +7,7 @@
 
 class Daisy;
 class Time;
-class CSMP;
+class PLF;
 class Geometry;
 
 class Log
@@ -78,7 +78,7 @@ public:
   virtual void output (const string&, const int) = 0;
   virtual void output (const string&, const string&) = 0;
   virtual void output (const string&, const vector<double>&) = 0;
-  virtual void output (const string&, const CSMP&) = 0;
+  virtual void output (const string&, const PLF&) = 0;
 
   void open_geometry (const Geometry&);
   void close_geometry ();

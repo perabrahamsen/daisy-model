@@ -224,7 +224,7 @@ Syntax::Fraction ()
 // Each syntax entry should have an associated type.
 
 static const char * const type_names[] = 
-{ "Number", "AList", "CSMP", "Boolean", "String",
+{ "Number", "AList", "PLF", "Boolean", "String",
   "Date", "Integer", "Object", "Library", "Error", NULL };
 
 const char* 

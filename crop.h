@@ -10,7 +10,7 @@ struct Log;
 struct Time;
 struct AttributeList;
 struct Bioclimate;
-struct CSMP;
+struct PLF;
 struct Library;
 struct Syntax;
 struct SoilWater;
@@ -39,7 +39,7 @@ public:
   virtual double rs_max () const; // Maximum transpiration resistance.
   virtual double height () const = 0;
   virtual double LAI () const = 0;
-  virtual const CSMP& LAIvsH () const = 0;
+  virtual const PLF& LAIvsH () const = 0;
   virtual double PARext () const = 0;
   virtual double PARref () const = 0;
   virtual double EPext () const = 0;

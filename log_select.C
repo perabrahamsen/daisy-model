@@ -142,7 +142,7 @@ LogSelect::output (const string& name, const vector<double>& value)
 }
 
 void 
-LogSelect::output (const string&, const CSMP&)
+LogSelect::output (const string&, const PLF&)
 { }
 
 bool 

@@ -1,6 +1,6 @@
 // alist.C
 
-#include "csmp.h"
+#include "plf.h"
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
@@ -20,7 +20,7 @@ struct Value
     double number;
     string* name;
     bool flag;
-    CSMP* csmp;
+    PLF* plf;
     AttributeList* alist;
     int integer;
     Time* time;
@@ -29,7 +29,7 @@ struct Value
     vector<bool>* flag_sequence;
     vector<int>* integer_sequence;
     vector<const Time*>* time_sequence;
-    vector<const CSMP*>* csmp_sequence;
+    vector<const PLF*>* plf_sequence;
     vector<AttributeList*>* alist_sequence;
   };
   Syntax::type type;
@@ -56,9 +56,9 @@ struct Value
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (const CSMP& v)
-    : csmp (new CSMP (v)),
-      type (Syntax::CSMP),
+  Value (const PLF& v)
+    : plf (new PLF (v)),
+      type (Syntax::PLF),
       is_sequence (false),
       ref_count (new int (1))
     { }
@@ -110,9 +110,9 @@ struct Value
       is_sequence (true),
       ref_count (new int (1))
     { }
-  Value (const vector<const CSMP*>& v)
-    : csmp_sequence (new vector<const CSMP*> (v)),
-      type (Syntax::CSMP),
+  Value (const vector<const PLF*>& v)
+    : plf_sequence (new vector<const PLF*> (v)),
+      type (Syntax::PLF),
       is_sequence (true),
       ref_count (new int (1))
     { }
@@ -176,8 +176,8 @@ Value::subset (const Value& v, const Syntax& syntax,
 	    return false;
 	  return value.subset (other, library.syntax (element));
 	}
-      case Syntax::CSMP:
-	return *csmp == *v.csmp;
+      case Syntax::PLF:
+	return *plf == *v.plf;
       case Syntax::String:
 	return *name == *v.name;
       case Syntax::Date:
@@ -232,8 +232,8 @@ Value::subset (const Value& v, const Syntax& syntax,
 	    }
 	  return true;
 	}
-      case Syntax::CSMP:
-	return *csmp_sequence == *v.csmp_sequence;
+      case Syntax::PLF:
+	return *plf_sequence == *v.plf_sequence;
       case Syntax::String:
 	return *name_sequence == *v.name_sequence;
       case Syntax::Date:
@@ -266,8 +266,8 @@ Value::cleanup ()
 	  case Syntax::AList:
 	    delete alist;
 	    break;
-	  case Syntax::CSMP:
-	    delete csmp;
+	  case Syntax::PLF:
+	    delete plf;
 	    break;
 	  case Syntax::String:
 	    delete name;
@@ -299,8 +299,8 @@ Value::cleanup ()
 	    // BUG: Should delete elements also.
 	    delete alist_sequence;
 	    break;
-	  case Syntax::CSMP:
-	    delete csmp_sequence;
+	  case Syntax::PLF:
+	    delete plf_sequence;
 	    break;
 	  case Syntax::String:
 	    delete name_sequence;
@@ -352,8 +352,8 @@ Value::operator = (const Value& v)
       case Syntax::AList:
         alist = v.alist;
         break;
-      case Syntax::CSMP:
-	csmp = v.csmp;
+      case Syntax::PLF:
+	plf = v.plf;
         break;
       case Syntax::String:
 	name = v.name;
@@ -382,8 +382,8 @@ Value::operator = (const Value& v)
       case Syntax::AList:
         alist_sequence = v.alist_sequence;
         break;
-      case Syntax::CSMP:
-	csmp_sequence = v.csmp_sequence;
+      case Syntax::PLF:
+	plf_sequence = v.plf_sequence;
         break;
       case Syntax::String:
 	name_sequence = v.name_sequence;
@@ -495,8 +495,8 @@ AttributeList::size (const string& key)	const
       return value.number_sequence->size ();
     case Syntax::AList:
       return value.alist_sequence->size ();
-    case Syntax::CSMP:
-      return value.csmp_sequence->size ();
+    case Syntax::PLF:
+      return value.plf_sequence->size ();
     case Syntax::Boolean:
       return value.flag_sequence->size ();
     case Syntax::String:
@@ -561,13 +561,13 @@ AttributeList::time (string key) const
   return *value.time;
 }
 
-const CSMP& 
-AttributeList::csmp (string key) const
+const PLF& 
+AttributeList::plf (string key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::CSMP);
+  assert (value.type == Syntax::PLF);
   assert (!value.is_sequence);
-  return *value.csmp;
+  return *value.plf;
 }
 
 AttributeList& 
@@ -624,13 +624,13 @@ AttributeList::time_sequence (string key) const
   return *value.time_sequence;
 }
 
-const vector<const CSMP*>& 
-AttributeList::csmp_sequence (string key) const
+const vector<const PLF*>& 
+AttributeList::plf_sequence (string key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::CSMP);
+  assert (value.type == Syntax::PLF);
   assert (value.is_sequence);
-  return *value.csmp_sequence;
+  return *value.plf_sequence;
 }
 
 const vector<AttributeList*>& 
@@ -671,7 +671,7 @@ AttributeList::add (const string& key, AttributeList& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const CSMP& v)
+AttributeList::add (const string& key, const PLF& v)
 { impl.add (key, Value (v)); }
 
 void 
@@ -695,7 +695,7 @@ AttributeList::add (const string& key, const vector<AttributeList*>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const vector<const CSMP*>& v)
+AttributeList::add (const string& key, const vector<const PLF*>& v)
 { impl.add (key, Value (v)); }
 
 void 

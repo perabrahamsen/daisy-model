@@ -110,7 +110,7 @@ int                             /* Not an array. */
 daisy_size_singleton ();
 
 /* The following types are currently supported: "Number", "AList",
-   "CSMP", "Boolean", "String", "Date", "Integer", "Object",
+   "PLF", "Boolean", "String", "Date", "Integer", "Object",
    "Library", and "Error". */
 
 int                             /* Number used for specific type. */

@@ -69,7 +69,7 @@ struct LogAList : public Log
   void output (const string& name, const int value);
   void output (const string& name, const string& value);
   void output (const string& name, const vector<double>& value);
-  void output (const string& name, const CSMP& value);
+  void output (const string& name, const PLF& value);
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

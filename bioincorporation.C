@@ -7,7 +7,7 @@
 #include "soil.h"
 #include "am.h"
 #include "submodel.h"
-#include "csmp.h"
+#include "plf.h"
 #include "time.h"
 #include "om.h"
 #include "mathlib.h"
@@ -22,10 +22,10 @@ struct Bioincorporation::Implementation
   // Parameters.
   const double R_max;
   const double k_half;
-  const CSMP C_per_N_factor;
-  const CSMP T_factor;
+  const PLF C_per_N_factor;
+  const PLF T_factor;
   const double respiration;
-  const CSMP distribution;
+  const PLF distribution;
   vector<double> density;
   const vector<AttributeList*>& AOM; // Stem AM parameters.
   
@@ -208,10 +208,10 @@ Bioincorporation::Implementation::set_am (AM* am)
 Bioincorporation::Implementation::Implementation (const AttributeList& al)
   : R_max (al.number ("R_max")),
     k_half (al.number ("k_half")),
-    C_per_N_factor (al.csmp ("C_per_N_factor")),
-    T_factor (al.csmp ("T_factor")),
+    C_per_N_factor (al.plf ("C_per_N_factor")),
+    T_factor (al.plf ("T_factor")),
     respiration (al.number ("respiration")),
-    distribution (al.csmp ("distribution")), 
+    distribution (al.plf ("distribution")), 
     AOM (al.alist_sequence ("AOM")),
     C (0.0),
     N (0.0)
@@ -259,18 +259,18 @@ Bioincorporation::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("speed", "g DM/m^2/h", Syntax::LogOnly, 
 	      "Fraction of litter incorporated this hour.\n\
 The formula is speed = (R_max * litter) / (k_half + litter).");
-  syntax.add ("C_per_N_factor", Syntax::CSMP, Syntax::Const, 
+  syntax.add ("C_per_N_factor", Syntax::PLF, Syntax::Const, 
 	      "\
 Limiting factor for high C/N ratio [(g C/cm^2)/(g N/cm^2) -> [0:1]].");
-  CSMP C_per_N_factor;
+  PLF C_per_N_factor;
   C_per_N_factor.add (40.0, 1.0);
   C_per_N_factor.add (50.0, 0.1);
   C_per_N_factor.add (120.0, 0.01);
   
   alist.add ("C_per_N_factor", C_per_N_factor);
-  syntax.add ("T_factor", Syntax::CSMP, Syntax::Const, 
+  syntax.add ("T_factor", Syntax::PLF, Syntax::Const, 
 	      "Limiting factor for low temperature [dg C -> [0:1]].");
-  CSMP T_factor;
+  PLF T_factor;
   T_factor.add (4.0, 0.0);
   T_factor.add (6.0, 1.0);
   alist.add ("T_factor", T_factor);
@@ -286,13 +286,13 @@ Limiting factor for high C/N ratio [(g C/cm^2)/(g N/cm^2) -> [0:1]].");
   syntax.add ("CO2", "g C/m^2/h", Syntax::LogOnly, "C respirated this hour.");
 
   // Incorporation location.
-  syntax.add ("distribution", Syntax::CSMP, Syntax::Const,
+  syntax.add ("distribution", Syntax::PLF, Syntax::Const,
 	      "Distribution of incorporated matter in the soil [cm -> ].\n\
 \(X, Y), where X is the depth (negative numbers), and Y is the relative\n\
 weight in that depth.  To get the fraction in a specific interval [a:b], we\n\
-integrate the csmp over that interval, and divide by the integration over\n\
+integrate the plf over that interval, and divide by the integration over\n\
 the whole profile.");
-  CSMP distribution;
+  PLF distribution;
   distribution.add (-80.0, 0.0);
   distribution.add (-18.0, 100.0);
   distribution.add (0.0, 100.0);

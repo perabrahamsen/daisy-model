@@ -11,7 +11,7 @@
 #include <list>
 
 struct Time;
-struct CSMP;
+struct PLF;
 struct AttributeList;
 struct Syntax;
 
@@ -37,7 +37,7 @@ public:
   double number (string) const;
   const string& name (string) const;
   bool flag (string) const;
-  const CSMP& csmp (string) const;
+  const PLF& plf (string) const;
   AttributeList& alist (string) const;
   int integer (string) const;
   const Time& time (string) const;
@@ -46,7 +46,7 @@ public:
   const vector<bool>& flag_sequence (string key) const;
   const vector<int>& integer_sequence (string key) const;
   const vector<const Time*>& time_sequence (string key) const;
-  const vector<const CSMP*>& csmp_sequence (string key) const;
+  const vector<const PLF*>& plf_sequence (string key) const;
   const vector<AttributeList*>& alist_sequence (string key) const;
 
   // Create and Destroy.
@@ -56,7 +56,7 @@ public:
   void add (const string&, bool);
   void add (const string&, int);
   void add (const string&, AttributeList&);
-  void add (const string&, const CSMP&);
+  void add (const string&, const PLF&);
   void add (const string&, const Time&);
 #if 1
   void add (const string&, const vector<double>&);
@@ -64,7 +64,7 @@ public:
   void add (const string&, const vector<bool>&);
   void add (const string&, const vector<int>&);
   void add (const string&, const vector<AttributeList*>&);
-  void add (const string&, const vector<const CSMP*>&);
+  void add (const string&, const vector<const PLF*>&);
   void add (const string&, const vector<const Time*>&);
 #endif
   void operator += (const AttributeList&);

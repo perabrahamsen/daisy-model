@@ -17,7 +17,7 @@ class SoilWater;
 class SoilNH4;
 class SoilNO3;
 class AttributeList;
-class CSMP;
+class PLF;
 class Harvest;
 class Log;
 class Syntax;
@@ -34,8 +34,8 @@ public:
   double LAI () const;		// Total LAI of all crops on this column [0-]
   double height () const;	// Max crop height in canopy [cm]
   double cover () const;	// Fraction of soil covered by crops [0-1]
-  const CSMP& LAIvsH () const;	// LAI below given height [f: cm -> R]
-  const CSMP& HvsLAI () const;	// Height with LAI below [f: R -> cm]
+  const PLF& LAIvsH () const;	// LAI below given height [f: cm -> R]
+  const PLF& HvsLAI () const;	// Height with LAI below [f: R -> cm]
   double ACExt () const;	// Canopy extinction coefficient
   double ACRef () const;	// Canopy reflection coefficient 
   double ARExt () const;	// Radiation Extinction coefficient

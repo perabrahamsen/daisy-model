@@ -5,7 +5,7 @@
 
 #include "librarian.h"
 
-struct CSMP;
+struct PLF;
 
 class Hydraulic 
 {
@@ -36,7 +36,7 @@ public:
 
   // Tools for derived classes.
 protected:
-  void K_to_M (CSMP&, int) const;
+  void K_to_M (PLF&, int) const;
 
   // Create and Destroy.
 public:
