@@ -35,6 +35,61 @@ Format::out ()
 }
 
 void
+Format::push (const std::string& name)
+{ nest.push (name); }
+
+void
+Format::pop (const std::string& name)
+{
+  daisy_assert (!nest.empty ());
+  daisy_assert (nest.top () == name);
+  nest.pop ();
+}
+
+Format::Item::Item (Format& f, const std::string& name)
+  : format (f)
+{ 
+  format.push ("item");
+  format.item_open (name); 
+}
+
+Format::Item::~Item ()
+{ 
+  format.pop ("item");
+  format.item_close (); 
+}
+
+Format::Section::Section (Format& f, 
+			  const std::string& type, const std::string& title,
+			  const std::string& scope, const std::string& label)
+  : format (f)
+{ 
+  format.push ("section");
+  format.section_open (type, title, scope, label); 
+}
+
+Format::Section::~Section ()
+{ 
+  format.pop ("section");
+  format.section_close (); 
+}
+
+Format::Document::Document (Format& f)
+  : format (f)
+{ 
+  daisy_assert (format.nest.empty ());
+  format.push ("document");
+  format.document_open (); 
+}
+
+Format::Document::~Document ()
+{ 
+  format.pop ("document");
+  format.document_close (); 
+  daisy_assert (format.nest.empty ());
+}
+
+void
 Format::initialize (std::ostream& o)
 { 
   daisy_assert (output == NULL);
@@ -47,4 +102,4 @@ Format::Format (const AttributeList& al)
 { }
 
 Format::~Format ()
-{ }
+{ daisy_assert (nest.empty ()); }

@@ -122,53 +122,8 @@ struct DocumentLaTeX : public Document
 };
 
 void
-DocumentLaTeX::print_quoted (std::ostream& out, const std::string& name)
-{
-  for (unsigned int i = 0; i < name.length (); i++)
-    switch (name[i])
-      {
-      case '^':
-	if (i+1 < name.length () && (isalnum (name[i+1]) || name[i+1] == '-'))
-	  {
-	    out << "$" << name[i] << "{";
-	    do
-	      {
-		out << name[i+1];
-		i++;
-	      }
-	    while (i+1 < name.length () && isalnum (name[i+1]));
-	    out << "}$";
-	  }
-	else
-	  out << "\\" << name[i] << "{ }";
-	break;
-      case '~':
-	out << "\\" << name[i] << "{ }";
-	break;
-      case '_':
-      case '#':
-      case '$':
-      case '%':
-      case '&':
-      case '{':
-      case '}':
-	out << "\\" << name[i];
-	break;
-      case '\\':
-	out << "\\mbox{$\\backslash$}";
-	break;
-      case '[':
-      case ']':
-      case '+':
-      case '=':
-      case '<':
-      case '>':
-	out << "\\mbox{$" << name[i] << "$}";
-	break;
-      default:
-	out << name[i];
-      }
-}
+DocumentLaTeX::print_quoted (std::ostream&, const std::string& name)
+{ format->text (name); }
 
 void
 DocumentLaTeX::print_string (std::ostream& out, const std::string& name)

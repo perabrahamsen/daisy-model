@@ -1,3 +1,12 @@
+2005-01-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (common_done): Time columns now obey
+	'field_separator'. 
+
+2005-01-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_document.C: New model.
+
 2005-01-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* format.C, format.h: New component.

@@ -287,7 +287,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = format_LaTeX.C program_batch.C program_refdoc.C summary_balance.C \
+MODELS = program_document.C \
+	format_LaTeX.C program_batch.C program_refdoc.C summary_balance.C \
 	rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	domsorp_std.C chemistry_std.C equil_linear.C pedo_const.C \
 	horizon_numeric.C horizon_system.C select_pF.C pet_FAO_PM.C \

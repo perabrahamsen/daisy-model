@@ -192,7 +192,7 @@ Options::Options (int& argc, char**& argv,
                     break;
                   }
                 const Syntax& syntax = library.syntax (name);
-                AttributeList alist;
+                AttributeList alist (library.lookup (name));
                 alist.add ("type", name);
                 Treelog::Open nest (out, name);
                 if (syntax.check (alist, out))
