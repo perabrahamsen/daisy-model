@@ -1,5 +1,11 @@
 2000-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.33 released.
+
+2000-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Renamed `pt' component `svat'.
+
 	* action_crop.C (doIt): Don't check for harvest before sowing.
 
 2000-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>

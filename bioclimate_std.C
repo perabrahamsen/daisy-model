@@ -12,7 +12,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "pet.h"
-#include "pt.h"
+#include "svat.h"
 #include "vegetation.h"
 #include "chemicals.h"
 
@@ -68,7 +68,7 @@ struct BioclimateStandard : public Bioclimate
   double soil_ea;		// Actual exfiltration. [mm/h]
 
   // Water transpirated through plant roots.
-  PT& pt;			// Potential transpiration model.
+  SVAT& svat;			// Soil Vegetation Atmosphere model.
   double crop_ep;		// Potential transpiration. [mm/h]
   double crop_ea;		// Actual transpiration. [mm/h]
 
@@ -188,7 +188,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     pond_water_in_temperature (0.0),
     soil_ep (0.0),
     soil_ea (0.0),
-    pt (Librarian<PT>::create (al.alist ("pt"))),
+    svat (Librarian<SVAT>::create (al.alist ("svat"))),
     crop_ep (0.0),
     crop_ea (0.0),
     spray_ (),
@@ -210,7 +210,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
 BioclimateStandard::~BioclimateStandard ()
 { 
   delete &pet;
-  delete &pt;
+  delete &svat;
 }
 
 void
@@ -424,7 +424,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   // 6 Transpiration
 
-#if 0
+#if 1
   // Potential transpiration
   const double potential_crop_transpiration = canopy_ep - canopy_ea;
   const double potential_soil_transpiration 
@@ -443,10 +443,12 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   // Production stress
   svat.tick (weather, vegetation, surface, soil, soil_heat, soil_water, pet,
 	     canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
-  production_stress = svat.production_stress ();
+  const double production_stress = svat.production_stress ();
 
+#if 0
   if (production_stress >= 0.0)
     vegetation.force_production_stress (production_stress);
+#endif
 #else
   // Potential transpiration
   pt.tick (weather, vegetation, surface, soil, soil_heat, soil_water, pet,
@@ -582,7 +584,7 @@ BioclimateStandard::output (Log& log) const
 	      pond_water_in_temperature);
   log.output ("soil_ep", soil_ep);
   log.output ("soil_ea", soil_ea);
-  output_derived (pt, "pt", log);
+  output_derived (svat, "svat", log);
   log.output ("crop_ep", crop_ep);
   log.output ("crop_ea", crop_ea);
 
@@ -709,11 +711,11 @@ Number of vertical intervals in which we partition the canopy.");
 		  "Temperature of water entering pond.");
 
       // Water going through soil surface.
-      syntax.add ("pt", Librarian<PT>::library (), 
-		  "Potential Transpiration component.");
-      AttributeList& pt_alist = *new AttributeList;
-      pt_alist.add ("type", "default");
-      alist.add ("pt", pt_alist);
+      syntax.add ("svat", Librarian<SVAT>::library (), 
+		  "Soil Vegetation Atmosphere component.");
+      AttributeList& svat_alist = *new AttributeList;
+      svat_alist.add ("type", "none");
+      alist.add ("svat", svat_alist);
       syntax.add ("soil_ep", "mm/h", Syntax::LogOnly,
 		  "Potential exfiltration.");
       syntax.add ("soil_ea", "mm/h", Syntax::LogOnly,

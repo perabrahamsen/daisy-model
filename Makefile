@@ -226,8 +226,8 @@ MODELS = vegetation_permanent.C \
 	condition_soil.C log_table1.C log_checkpoint.C weather_hourly.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
-	pet_makkink.C pet_weather.C pt_std.C action_spray.C pet_PM.C \
-	pt_pmsw.C action_merge.C action_divide.C groundwater_file.C \
+	pet_makkink.C pet_weather.C svat_none.C action_spray.C pet_PM.C \
+	svat_pmsw.C action_merge.C action_divide.C groundwater_file.C \
 	action_surface.C
 
 # A component isa common interface to a number of models.
@@ -237,7 +237,7 @@ COMPONENTS = select.C average.C mactrans.C macro.C \
 	action.C condition.C horizon.C 	uzmodel.C hydraulic.C \
 	bioclimate.C groundwater.C am.C transport.C \
 	adsorption.C tortuosity.C printer.C chemical.C \
-	pet.C net_radiation.C pt.C vegetation.C 
+	pet.C net_radiation.C svat.C vegetation.C 
 
 # Submodels are combined models and components.
 #
@@ -289,7 +289,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = csmp.h csmp.C
+REMOVE = pt.C pt.h pt_pmsw.C pt_std.C
 
 # These are the file extensions we deal with.
 # 
@@ -565,7 +565,7 @@ pet${OBJ}: pet.C pet.h librarian.h library.h common.h alist.h syntax.h \
  log.h vegetation.h surface.h uzmodel.h
 net_radiation${OBJ}: net_radiation.C net_radiation.h librarian.h library.h \
  common.h alist.h syntax.h log.h weather.h im.h
-pt${OBJ}: pt.C pt.h librarian.h library.h common.h alist.h syntax.h log.h
+svat${OBJ}: svat.C svat.h librarian.h library.h common.h alist.h syntax.h log.h
 canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
  log.h librarian.h library.h common.h alist.h syntax.h
 canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h \
@@ -879,7 +879,7 @@ adsorption_langmuir${OBJ}: adsorption_langmuir.C adsorption.h librarian.h \
 bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h library.h \
  common.h alist.h syntax.h surface.h uzmodel.h weather.h im.h plf.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h snow.h log.h \
- mathlib.h pet.h pt.h vegetation.h chemicals.h
+ mathlib.h pet.h svat.h vegetation.h chemicals.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
  common.h alist.h syntax.h crop.h field.h daisy.h
 condition_soil${OBJ}: condition_soil.C condition.h librarian.h library.h \
@@ -907,7 +907,7 @@ pet_makkink${OBJ}: pet_makkink.C pet.h librarian.h library.h common.h \
  alist.h syntax.h weather.h im.h
 pet_weather${OBJ}: pet_weather.C pet.h librarian.h library.h common.h \
  alist.h syntax.h weather.h im.h
-pt_std${OBJ}: pt_std.C pt.h librarian.h library.h common.h alist.h \
+svat_none${OBJ}: svat_none.C svat.h librarian.h library.h common.h alist.h \
  syntax.h pet.h vegetation.h surface.h uzmodel.h log.h
 action_spray${OBJ}: action_spray.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h chemical.h
@@ -915,10 +915,10 @@ pet_PM${OBJ}: pet_PM.C pet.h librarian.h library.h common.h alist.h \
  syntax.h weather.h im.h soil.h horizon.h hydraulic.h tortuosity.h \
  geometry.h surface.h uzmodel.h soil_heat.h bioclimate.h \
  net_radiation.h vegetation.h log.h
-pt_pmsw${OBJ}: pt_pmsw.C surface.h uzmodel.h librarian.h library.h \
+svat_pmsw${OBJ}: svat_pmsw.C surface.h uzmodel.h librarian.h library.h \
  common.h alist.h syntax.h weather.h im.h soil.h horizon.h hydraulic.h \
  tortuosity.h geometry.h soil_water.h macro.h soil_heat.h vegetation.h \
- pet.h pt.h log.h nrutil.h
+ pet.h svat.h log.h nrutil.h
 action_merge${OBJ}: action_merge.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h
 action_divide${OBJ}: action_divide.C action.h librarian.h library.h \

@@ -1,7 +1,7 @@
-// pt.h --- Potential transpiration
+// svat.h --- Soil, Vegetation and ATmostphere.
 
-#ifndef PT_H
-#define PT_H
+#ifndef SVAT_H
+#define SVAT_H
 
 #include "librarian.h"
 
@@ -13,7 +13,7 @@ class Vegetation;
 class Surface;
 class Pet;
 
-class PT
+class SVAT
 {
   // Content.
 public:
@@ -28,19 +28,19 @@ public:
 		     double canopy_ea, double snow_ea,
 		     double pond_ea, double soil_ea, double crop_ea,
                      double crop_ep) = 0;
-  virtual double potential_transpiration () const = 0; // [mm/h]
   virtual void output (Log&) const;
+  virtual double production_stress () const = 0; // []
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  PT (const AttributeList&);
+  SVAT (const AttributeList&);
 public:
-  virtual ~PT ();
+  virtual ~SVAT ();
 };
 
-static Librarian<PT> PT_init ("pt");
+static Librarian<SVAT> SVAT_init ("svat");
 
-#endif PT_H
+#endif SVAT_H
 
-// pt.h ends here.
+// svat.h ends here.
