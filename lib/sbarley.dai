@@ -2,27 +2,37 @@
 
 (defcrop SpringBarley default
   (Devel (EmrTSum 150)
-	 (DSRate1 0.001666666666667)	;1/600
-	 (DSRate2 0.00133333333333)	;1/750
+	 (DSRate1 0.032)
+	 (DSRate2 0.021)
 	 (DS_Emr 0.01)
-	 (TempEff1 (0 1) (100 100))
-	 (TempEff2 (0 1) (100 100))
-	 (PhotEff1 (0 1) (1 1)))
+	 (TempEff1 (0 0) (4 0.01) (19 1.0) (24 1.0) (30 0.01))
+	 (TempEff2 (0 0) (16 1) (30 1))
+	 (PhotEff1 (0 0.1) (11 0.1) (16 1.0) (20 1.2) (24 1.2)))
   (Vernal (required false)
 	  (DSLim1 0.0)
 	  (DSLim2 0.0)
-	  (TaLim 0.0)
-	  (TaSum 0.0))
+	  (TaLim  0.0)
+	  (TaSum  0.0))
   (LeafPhot (Qeff 4.0E-2)		; (g/m²/h) / (W/m²)
-	    (Fm 3.5)			; g/m²/h
-	    (TempEff (4.0 0.0) (10.0 1.0))) ;dg C
+	    (Fm   3.5)			; g/m²/h
+	    (TempEff (-20 0.001)
+		     (  0 0.01 ) 
+		     (  5 0.4  )
+		     ( 10 0.7  ) 
+		     ( 15 0.9  ) 
+		     ( 20 1    )
+		     ( 25 1    ) 
+		     ( 30 0.9  ) 
+		     ( 35 0.8  ) 
+		     ( 40 0.5  ) 
+		     ( 45 0    ))) ;°C
   (Canopy (InitGrowth 4.65)
 	  (DSinit 0.07)
 	  (WLfInit 10)			; g/m²
-	  (SpLAI 2.5e-2)		; (m²/m²) / (g/m²)
+	  (SpLAI 3.1e-2)		; (m²/m²) / (g/m²)
 	  (HvsDS (0 001) (1 100) (2 100))
-	  (LAIDist0 0.00 0.00 1.00)
-	  (LAIDist1 0.00 0.20 0.90)
+	  (LAIDist0 0.00 1.00 1.00)
+	  (LAIDist1 0.10 0.80 1.00)
 	  (PARref 0.06)
 	  (PARext 0.60)
 	  (EPext 0.50))
@@ -30,16 +40,18 @@
 	(PenPar1 0.25)
 	(PenPar2 4.0)
 	(MaxPen 120)
-	(SpRtLength 0.1)
+	(SpRtLength 10)
 	(DensRtTip 0.1)
 	(Rad 0.005)
 	(h_wp -15000)
 	(Rxylem 10)
 	(MxNH4Up 2.5e-7)
 	(MxNO3Up 2.5e-8))
-  (Partit (Root (0.00 0.60)
-		(0.95 0.15)
-		(2.00 0.15))
+  (Partit (Root (0.00 0.65)
+		(0.51 0.55)
+		(0.72 0.15)
+		(0.95 0.00)
+		(2.00 0.00))
 	  (Leaf (0.00 0.82)
 		(0.25 0.70)
 		(0.51 0.55)
@@ -55,25 +67,24 @@
 		(0.72 0.77)
 		(0.83 0.99)
 		(0.95 1.00)
-		(1.21 0.00)
+		(1.51 0.00)
 		(2.00 0.00)))
   (Prod (LfDR (0.00 0.00)
-	      (0.60 0.00)
-	      (1.20 5E-3)
-	      (2.00 5E-3))
-	;; RtDR is not implemented yet.
-	(RtDR (0 0) (1 1))
-	(E_Root 0.54)			;SH: 0.69
+	      (0.50 0.00)
+	      (1.20 0.01)
+	      (2.00 0.08))
+	(RtDR (0.00 0.00) (0.60 0.00) (1.20 0.01) (2.00 0.01))
+	(E_Root 0.69)
 	(E_Leaf 0.68)
 	(E_Stem 0.66)
 	(E_SOrg 0.70)
-	(r_Root 0.065)			;SH: 0.015
+	(r_Root 0.015)
 	(r_Leaf 0.03)
 	(r_Stem 0.01)
 	(r_SOrg 0.01)
-	(ShldResC 0.0)			; Capacity of Shielded Reserves
-	(ReMobilDS 0.0)			; Remobilization, Initial DS
-	(ReMobilRt 0.0))		; Remobilization, release rate
+	(ShldResC 0.3)			; Capacity of Shielded Reserves
+	(ReMobilDS 1.0)			; Remobilization, Initial DS
+	(ReMobilRt 0.1))		; Remobilization, release rate
   (CrpN (SeedN 0.2)
 	(PtRootCnc (0.00 0.020)
 		   (1.00 0.012)
