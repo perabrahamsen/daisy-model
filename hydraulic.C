@@ -104,7 +104,9 @@ Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 void
-Hydraulic::initialize (double /* clay */, double /* silt */, double /* sand */)
+Hydraulic::initialize (double /* clay */, double /* silt */, double /* sand */,
+		       double /* humus */, double /* rho_b */,
+		       bool /* top_soil */, Treelog&)
 { }
 
 Hydraulic::Hydraulic (const AttributeList& al)

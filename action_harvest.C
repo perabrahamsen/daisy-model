@@ -34,9 +34,18 @@ struct ActionHarvest : public Action
 
   void doIt (Daisy& daisy, Treelog& out)
   {
-    out.message (string(" [Harvesting ") + name + "]");
+    if (daisy.field.crop_ds (name) < 0.0)
+      {
+	out.warning (string ("Attempting to harvest ") + name 
+		     + " which has not emerged on the field");
+	return;
+      }
     daisy.field.harvest (daisy.time, name, stub, stem, leaf, sorg,
 			 daisy.harvest, out);
+    if (daisy.field.crop_ds (name) < 0.0)
+      out.message (string(" [Harvesting ") + name + "]");
+    else
+      out.message (string(" [Cutting ") + name + "]");
   }
 
   ActionHarvest (const AttributeList& al)

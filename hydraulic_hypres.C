@@ -1,0 +1,276 @@
+// hydraulic_hypres.C
+// 
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002 KVL.
+//
+// This file is part of Daisy.
+// 
+// Daisy is free software; you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation; either version 2.1 of the License, or
+// (at your option) any later version.
+// 
+// Daisy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser Public License
+// along with Daisy; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+// van Genuchten retention curve model with Mualem theory.
+// Parameters specified by the HYPRES transfer function.
+
+#include "hydraulic.h"
+#include "plf.h"
+#include "check.h"
+#include "treelog.h"
+#include "tmpstream.h"
+
+class HydraulicHypres : public Hydraulic
+{
+  // Content.
+  /* const */ double alpha;
+  /* const */ double a;		// - alpha
+  /* const */ double n;
+  /* const */ double m;		// 1 - 1/n
+  /* const */ double l;         // tortuosity parameter
+  /* const */ double K_sat;
+
+  // Use.
+public:
+  double Theta (double h) const;
+  double K (double h) const;
+  double Cw2 (double h) const;
+  double h (double Theta) const;
+  double M (double h) const;
+private:
+  double Se (double h) const;
+  
+  // Create and Destroy.
+private:
+  friend class HydraulicHypresSyntax;
+  static Hydraulic& make (const AttributeList& al);
+  HydraulicHypres (const AttributeList&);
+  void initialize (double clay, double silt, double sand,
+		   double humus, double rho_b, bool top_soil,
+		   Treelog& msg);
+public:
+  ~HydraulicHypres ();
+};
+
+double 
+HydraulicHypres::Theta (const double h) const
+{
+  return Se (h) * (Theta_sat - Theta_res) + Theta_res;
+}
+
+double 
+HydraulicHypres::K (const double h) const
+{
+  if (h < 0.0)
+    {
+      const double Se_h = Se (h);
+      return K_sat * pow (Se_h, l)
+	* pow (1.0 - pow (1.0 - pow (Se_h, 1.0/m), m), 2.0);
+    }
+  else
+    return K_sat;
+}
+
+double 
+HydraulicHypres::Cw2 (const double h) const
+{
+  if (h < 0.0)
+    return - (  (Theta_sat - Theta_res)
+	      * (m * (  pow (1.0 / (1.0 + pow (a * h, n)), m - 1.0)
+		      * (n * (pow (a * h, n - 1.0) * a))))
+	      / pow (1.0 + pow(a * h, n), 2.0));
+  else
+    return 0.0;
+}
+
+double 
+HydraulicHypres::h (const double Theta) const
+{
+  daisy_assert (Theta_res <= Theta);
+  if (Theta < Theta_sat)
+    return pow(pow(Theta_res / (Theta_res - Theta_sat) 
+		   + Theta / (Theta_sat - Theta_res), -1.0 / m)
+	       - 1.0, 1.0 / n) / a;
+  else
+    return 0.0;
+}
+
+double 
+HydraulicHypres::M (double h) const
+{
+  // Use.
+  static PLF plf;
+  static bool initialized = false;
+  if (!initialized)
+    {
+      K_to_M (plf, 500);
+      initialized = true;
+    }
+  return plf (h);
+}
+
+double 
+HydraulicHypres::Se (double h) const
+{
+  if (h < 0.0)
+    {
+      const double Se_h = pow (1.0 / (1.0 + pow (a * h, n)), m);
+      daisy_assert (Se_h >= 0.0);
+      daisy_assert (Se_h <= 1.0);
+      return Se_h;
+    }
+  else
+    return 1.0;
+}
+
+void
+HydraulicHypres::initialize (double clay, double silt, double /*sand*/,
+			     double humus, double rho_b, bool top_soil,
+			     Treelog& msg)
+{
+  Treelog::Open nest (msg, name);
+  if (rho_b <= 0.0)
+    {
+      msg.error ("\
+You must specify dry_bulk_density in order to use the hypres \
+pedotransfer function");
+      rho_b = 1.5;
+    }
+
+  clay *= 100.0;		// [%]
+  silt *= 100.0;		// [%]
+  humus *= 100.0;		// [%]
+
+  Theta_sat = 0.7919 + 0.001691 * clay - 0.29619 * rho_b 
+    - 0.000001491 * silt * silt
+    + 0.0000821 * humus * humus + 0.02427 / clay + 0.01113 / silt
+    + 0.01472 * log (silt) - 0.0000733 * humus * clay - 0.000619 * rho_b * clay
+    - 0.001183 * rho_b * humus;
+  if (top_soil)
+    Theta_sat -= 0.0001664 * silt;
+  daisy_assert (Theta_sat > 0.0);
+  daisy_assert (Theta_sat < 1.0);
+
+  double alpha_star 
+    = -14.96 + 0.03135 * clay  + 0.0351 * silt + 0.646 * humus + 15.29 * rho_b
+    - 4.671 * rho_b * rho_b - 0.000781 * clay * clay - 0.00687 * humus * humus
+    + 0.00449 / humus + 0.0663 * log (silt) + 0.1482 * log (humus)
+    - 0.04546 * rho_b * silt - 0.4852 * rho_b * humus;
+    ;
+  if (top_soil)
+    {
+      alpha_star -= 0.192;
+      alpha_star += 0.00673 * clay;
+    }
+  alpha = exp (alpha_star);
+
+  double n_star 
+    = -25.23 - 0.02195 * clay + 0.0074 * silt - 0.1940 * humus + 45.5 * rho_b
+    - 7.24 * rho_b * rho_b + 0.0003658 * clay * clay + 0.002885 * humus * humus
+    - 12.81 / rho_b - 0.1524 / silt - 0.01958 / humus - 0.2876 * log (silt)
+    - 0.0709 * log (humus) - 44.6 * log (rho_b) - 0.02264 * rho_b * clay
+    + 0.0896 * rho_b * humus;
+  if (top_soil)
+    n_star += 0.00718 * clay;
+  n = exp (n_star) + 1.0;
+
+  double l_star 
+    = 0.0202 + 0.0006193 * clay * clay - 0.001136 * humus * humus
+    - 0.2316 * log (humus) - 0.03544 * rho_b * clay + 0.00283 * rho_b * silt
+    + 0.0488 * rho_b * humus;
+  l = 10.0 * (exp (l_star) - 1.0) / (1.0 + exp (l_star));
+  
+  double K_sat_star 
+    = 7.755 + 0.0352 * silt - 0.967 * rho_b * rho_b - 0.000484 * clay * clay 
+    - 0.000322 * silt * silt + 0.001 / silt - 0.0748 / humus
+    - 0.643 * log (silt) - 0.01398 * rho_b * clay - 0.1673 * rho_b * humus
+    ;
+  if (top_soil)
+    {
+      K_sat_star += 0.93;
+      K_sat_star += 0.02986 * clay;
+      K_sat_star -= 0.03305 * silt;
+    }
+  K_sat = exp (K_sat_star);
+  daisy_assert (K_sat > 0.0);
+  
+  a = -alpha;
+  m = 1.0 - 1.0 / n;
+
+  // Debug messages.
+  TmpStream tmp;
+  tmp () << "l = " << l << "\n";
+  tmp () << "m = " << m << "\n";
+  tmp () << "n = " << n << "\n";
+  tmp () << "alpha = " << alpha << "\n";
+  tmp () << "a = " << a << "\n";
+  tmp () << "K_sat = " << K_sat << "\n";
+  tmp () << "Theta_sat = " << Theta_sat;
+  msg.debug (tmp.str ());
+}
+
+
+HydraulicHypres::HydraulicHypres (const AttributeList& al)
+  : Hydraulic (al),
+    alpha (-42.42e42),
+    a (-42.42e42),
+    n (-42.42e42),
+    m (-42.42e42),
+    l (-42.42e42),
+    K_sat (-42.42e42)
+{ }
+
+HydraulicHypres::~HydraulicHypres ()
+{ }
+
+// Add the HydraulicHypres syntax to the syntax table.
+
+Hydraulic&
+HydraulicHypres::make (const AttributeList& al)
+{
+  return *new HydraulicHypres (al);
+}
+
+static struct HydraulicHypresSyntax
+{
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  {
+    bool ok = true;
+    if (al.number ("Theta_res") != 0.0)
+      {
+	err.entry ("Theta_res should be 0.0");
+	ok = false;
+      }
+    if (al.number ("Theta_sat") != 0.9)
+      {
+	err.entry ("Theta_sat should be unspecified");
+	ok = false;
+      }
+    return ok;
+  }
+  HydraulicHypresSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    syntax.add_check (check_alist);
+    alist.add ("description", 
+	       "van Genuchten retention curve model with Mualem theory.\n\
+Parameters specified by the HYPRES transfer function.\n\
+See <http://mluri.sari.ac.uk/hypres.html>.\n\
+Don't specify 'Theta_sat' or 'Theta_res'.");
+    Hydraulic::load_syntax (syntax, alist);
+    alist.add ("Theta_sat", 0.9);
+    
+    Librarian<Hydraulic>::add_type ("hypres", alist, syntax, 
+				    &HydraulicHypres::make);
+  }
+} hydraulicHypres_syntax;
+

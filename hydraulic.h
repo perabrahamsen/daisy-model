@@ -26,6 +26,7 @@
 #include "librarian.h"
 
 class PLF;
+class Treelog;
 
 class Hydraulic 
 {
@@ -62,7 +63,9 @@ protected:
 public:
   static bool zero_Theta_res (const AttributeList& al, Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (double clay, double silt, double sand);
+  virtual void initialize (double clay, double silt, double sand,
+			   double humus, double rho_b, bool top_soil,
+			   Treelog&);
   Hydraulic (const AttributeList&);
   virtual ~Hydraulic ();
 };

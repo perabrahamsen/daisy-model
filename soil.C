@@ -237,6 +237,8 @@ Soil::Soil (const AttributeList& al)
 void
 Soil::initialize (const Groundwater& groundwater, Treelog& msg)
 {
+  Treelog::Open nest (msg, "Soil");
+
   const vector<Implementation::Layer*>::const_iterator begin
     = impl.layers.begin ();
   const vector<Implementation::Layer*>::const_iterator end 
@@ -246,19 +248,25 @@ Soil::initialize (const Groundwater& groundwater, Treelog& msg)
 
   // Initialize geometry.
   vector<double> fixed;
-  double last = 0.0;
-  for (layer = begin; layer != end; layer++)
-    {
-      double current = (*layer)->end;
-      daisy_assert (current < last);
+  {
+    Treelog::Open nest (msg, "Horizons");
+    double last = 0.0;
+    for (layer = begin; layer != end; layer++)
+      {
+	double current = (*layer)->end;
+	daisy_assert (current < last);
 
-      // We always have a layer limit at 1 m.
-      if (last > -100.0 && current < -100.0)
-	fixed.push_back (-100.0);
+	const bool top_soil = (layer == begin);
+	(*layer)->horizon.initialize (top_soil, msg);
+
+	// We always have a layer limit at 1 m.
+	if (last > -100.0 && current < -100.0)
+	  fixed.push_back (-100.0);
       
-      last = current;
-      fixed.push_back (last);
-    }
+	last = current;
+	fixed.push_back (last);
+      }
+  }
   initialize_zplus (groundwater, fixed, -impl.MaxRootingDepth, msg);
 
   // Initialize horizons.

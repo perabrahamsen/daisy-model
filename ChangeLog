@@ -1,3 +1,46 @@
+2003-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.40 released.
+
+2003-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic.h, hydraulic.C (initialize): New Treelog argument.
+	* hydraulic_hypres.C (initialize): Use it.
+	* hydraulic_Cosby.C (initialize): Ditto.
+	* horizon.C, horizon.h (initialize): Ditto.
+	* soil.C (initialize): Ditto..
+
+	* horizon.C: Allow user to specify "sand" instead of "fine_sand"
+	and "coarse_sand".
+	
+2003-01-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.C (operator): Don't require leaf to survive, as stem
+	may provide photosyntheses. 
+
+	* action_harvest.C (doIt): Better message.
+
+2002-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C (check_alist): Check that dry_bulk_density is
+	specified for hypres.
+
+	* horizon.C, horizon.h (initialize): New function.
+	* soil.C (initialize): Call it.
+
+	* Makefile (MODELS): Added hypres.
+
+2002-12-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic.C, hydraulic.h, hydraulic_Cosby.C (initialize): Take
+	more parameters. 
+
+	* hydraulic_hypres.C: New model.
+	
+
+	* hydraulic_Cosby.C (Hydraulic_CosbySyntax): Check that the user
+	does not set `Theta_sat'.
+
 2002-12-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.39 released.
@@ -6,7 +49,7 @@
 
 	* txt/tutorial.tex (subsection{Horizons}): New description 
 
-	* soil.C (load_syntax): Changed default dispersivity from 5 to 6. 
+	* soil.C (load_syntax): Changed default dispersivity from 6 to 5. 
 
 2002-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 

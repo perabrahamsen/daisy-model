@@ -335,6 +335,7 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 {
   if (zplus_.empty ())
     {
+      Treelog::Open nest (msg, "Geometry");
       const Library& library = Librarian<Groundwater>::library ();
       const string name = groundwater.name;
       const bool volatile_bottom = 
@@ -428,12 +429,11 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 
       // Debug messages.
       TmpStream tmp;
-      tmp () << "Intervals:";
+      tmp () << "(zplus ";
       for (unsigned int i = 0; i < zplus_.size (); i++)
 	tmp () << " " << zplus_[i];
-      tmp () << "\nTotal: " << zplus_.size ();
+      tmp () << ") ; Intervals: " << zplus_.size ();
       msg.debug (tmp.str ());
-
       // Check that zplus is strictly decreasing.
       last = 0.0;
       for (unsigned int i = 0; i < zplus_.size (); i++)

@@ -265,7 +265,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = clayom_biomod.C \
+MODELS = hydraulic_hypres.C clayom_biomod.C \
         clayom_old.C hydraulic_Cosby.C pedo_linear.C adsorption_full.C \
 	equil_langmuir.C transform_equil.C condition_weather.C \
 	rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \

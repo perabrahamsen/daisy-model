@@ -23,6 +23,8 @@
 // Parameters specified by Cosby et al.
 
 #include "hydraulic.h"
+#include "treelog.h"
+#include "tmpstream.h"
 
 class Hydraulic_Cosby : public Hydraulic
 {
@@ -43,7 +45,8 @@ private:
   
   // Create and Destroy.
 public:
-  void initialize (double clay, double silt, double sand);
+  void initialize (double clay, double silt, double sand,
+		   double humus, double rho_b, bool top_soil, Treelog&);
   Hydraulic_Cosby (const AttributeList&);
   ~Hydraulic_Cosby ();
 };
@@ -107,8 +110,12 @@ Hydraulic_Cosby::Sr (double h) const
 }
 
 void
-Hydraulic_Cosby::initialize (double clay, double silt, double sand)
+Hydraulic_Cosby::initialize (double clay, double silt, double sand,
+			     double /* humus */, double /* rho_b */,
+			     bool /* top_soil */, Treelog& msg)
 {
+  Treelog::Open nest (msg, name);
+
   const double cm_per_inch = 2.54;
   clay *= 100.0;		// [%]
   silt *= 100.0;		// [%]
@@ -123,6 +130,14 @@ Hydraulic_Cosby::initialize (double clay, double silt, double sand)
   Theta_sat = (50.50 - 0.1420 * sand - 0.0370 * clay) * 0.01; // [%]
   daisy_assert (Theta_sat > 0.0);
   daisy_assert (Theta_sat < 1.0);
+
+  // Debug messages.
+  TmpStream tmp;
+  tmp () << "b = " << b << "\n";
+  tmp () << "h_b = " << h_b << "\n";
+  tmp () << "K_sat = " << K_sat << "\n";
+  tmp () << "Theta_sat = " << Theta_sat;
+  msg.debug (tmp.str ());
 }
 
 Hydraulic_Cosby::Hydraulic_Cosby (const AttributeList& al)
@@ -147,6 +162,11 @@ static struct Hydraulic_CosbySyntax
     if (al.number ("Theta_res") != 0.0)
       {
 	err.entry ("Theta_res should be 0.0");
+	ok = false;
+      }
+    if (al.number ("Theta_sat") != 0.9)
+      {
+	err.entry ("Theta_sat should be unspecified");
 	ok = false;
       }
     return ok;

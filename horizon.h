@@ -25,8 +25,9 @@
 
 #include "librarian.h"
 
-struct Hydraulic;
-struct Tortuosity;
+class Hydraulic;
+class Tortuosity;
+class Treelog;
 
 // Weigth of mineral particles. [g / cm³]
 GLOBAL_CONSTANT const double rho_mineral = 2.65;	
@@ -76,6 +77,7 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   Horizon (const AttributeList&);
+  void initialize (bool top_soil, Treelog&);
   virtual ~Horizon ();
 };
 

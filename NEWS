@@ -12,6 +12,39 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.40
+
+** You can now just specify "sand" instead of "fine_sand" and "coarse_sand"
+
+In the horizon.
+
+** New default hydraulic model: hypres.
+
+This model replace "Cosby_et_at" as the default hydraulic model.  
+
+"hypres" is a pedotransfer function for estimating parameters for the
+van Genuchten/Mualem equation.  We believe it works better than
+Cosby_at_al for European soil.
+
+"hypres" requires you to specify the dry_bulk_density horizon
+parameter, if you for some reason does not have that value, we suggest
+you go back to the "Cosby_et_al" pedotransfer function, by adding 
+
+    (hydraulic Cosby_at_al)
+
+to your horizons.  Otherwise, add
+
+    (dry_bulk_density 1.5 [g/cm^3])
+
+to the horizon, replacing 1.5 with the measured value.
+
+As usual, all the pedotransfer functions are unreliable, you should
+use measured values for the hydraulic properties when at all possible.
+
+** Don't require leaf to survive harvest, as stem may provide photosyntheses.
+
+** Better messages at harvest.
+
 * 2.39
 
 ** Changed default dispersivity to 5 from 6.
