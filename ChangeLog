@@ -1,5 +1,7 @@
 1999-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* pt_pmsw.C (RSC): Added assertions.
+
 	* Version 1.02 released.
 
 1999-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -665,15 +665,21 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
    	esta=611.0*exp((17.27*tair)/(tair+237.3)); // saturated vapor pressure
    	def=0.001*(esta-e_pa); // vapor deficit in kPa
 	tairk=tair+273.15; // air temperature in K
+	assert (LAI > 0.0);
+	assert (spar > 0.0);
 	rfpar=0.55*2*srad/(spar*LAI); // cpar coefficient in rf_1
 	rcmin_LAI=rcmin;   // read from file or calculate from 200/LAI
 
 // constraint functions used in Dickinson (1984) / Noilhan et al. (1991)
-		rf_1=(rcmin_LAI/rcmax+rfpar)/(1+rfpar); // related to solar radiation
+        assert (rcmax > 0.0);
+	assert (1+rfpar != 0.0);
+	rf_1=(rcmin_LAI/rcmax+rfpar)/(1+rfpar); // related to solar radiation
    	rf_2=1-zeta*(esta-e_pa); // related to vapour pressure deficit
 // tref-tairk > 0
 	if (tref-tairk <= 0.0) tref=tairk+1.0;
-   	rf_3=1-f3const*pow(tref-tairk,2); // related to air temperature
+	assert (tref > tairk);
+   	rf_3=1-f3const*pow(tref-tairk,2.0); // related to air temperature
+	assert (theta_c != theta_w);
    	rf_4=(theta_0_20-theta_w)/(theta_c-theta_w); // related to soil moisture
 
 // rf_4 should not be zero
@@ -681,28 +687,44 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 
 // f1 function Dolman (1991) referenced in Dolman (1993)
 	if (srad==0.0) srad=srad+1.0;
+	assert (a4 + srad != 0.0);
+	assert (1000.0 + a4 != 0.0);
 	rf1_dolman=(srad/(a4+srad))/(1000.0/(1000.0+a4));
 // constraint functions used in Verma et al.(1993)
+	assert (nu_1 != tmin);
    	rbf_temp=(tmax-nu_1)/(nu_1-tmin); // used in f_temp
 	if (tair==tmin) tair=tmin+0.1;
+	assert (tmax > tair);
+	assert (tmax > nu_1);
+	assert (nu_1 != tmin);
    	rf_temp=(tair-tmin)*pow(tmax-tair,rbf_temp)/
    	((nu_1-tmin)*pow(tmax-nu_1,rbf_temp));  // Jarvis (1976)
+	assert (1.0 + nu_2 * def != 0.0);
 	rf_def=1.0/(1.0+nu_2*def); // Lohammar (1980)
 
 // Stewart (1988), Kim & Verma (1991) as referenced in Verma et al. (1993)
-   rf_theta=1.0-exp(-nu_3*100.0*theta_0_20);
+	rf_theta=1.0-exp(-nu_3*100.0*theta_0_20);
 
 // calculate contraint function F4 as canopy_ea/canopy_ep
+	assert (crop_ep_w > 0.0);
 	rf_etep=crop_ea_w/crop_ep_w;
 
 // canopy resistance using Noilhan et al.(1991)...: r_sc_1
-   rr_sc_1=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_4);
+	assert (rf_1 != 0.0);
+	assert (rf_2 != 0.0);
+	assert (rf_3 != 0.0);
+	assert (rf_4 != 0.0);
+	rr_sc_1=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_4);
 
 // ... or using Verma et al. (1993): r_sc_2
+	assert (rf_temp != 0.0);
+	assert (rf_def != 0.0);
+	assert (rf_theta != 0.0);
 	rr_sc_2=(rcmin_LAI/LAI)/(rf_1*rf_temp*rf_def*rf_theta);
 
 // ... or using f_etep: eact/epotc: r_sc_3
-   rr_sc_3=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_etep);
+	assert (rf_etep != 0.0);
+	rr_sc_3=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_etep);
 /*
 // combine f_etep with f_temp, f_def and f_theta (and f_1): r_sc_4
 	rr_sc_4=(rcmin_LAI/LAI)/(rf1_dolman*rf_temp*rf_def*rf_etep);
@@ -713,6 +735,7 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 	rr_sc_5=rcmin_LAI/(rf_1*rf_def*rf_3*rf_4); // No dision by LAI
 
 // Use Jarvis (1976) & Steward (1988) as referenced in Dolman (1993):
+	assert (rf1_dolman != 0.0);
 	rr_sc_js=(rcmin_LAI/LAI)/(rf1_dolman*rf_def*rf_3*rf_4);
 
 // for unstressed canopy resistance r_sc_min is equal to rcmin_LAI
