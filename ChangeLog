@@ -1,5 +1,7 @@
 2005-04-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* lib/Makefile (DAISY): Removed dk-soil.dai.
+
 	* Version 3.71 released.
 
 2005-04-05  Per Abrahamsen  <abraham@dina.kvl.dk>

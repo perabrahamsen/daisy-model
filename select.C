@@ -74,8 +74,8 @@ struct Select::Implementation
     // Use.
     const Syntax& leaf_syntax (Syntax&) const;
     const string& leaf_name () const;
-    const string& dimension () const;
-    const string& description () const;
+    string dimension () const;
+    string description () const;
     void refer (Format&) const;
 
     // Create and Destroy.
@@ -135,7 +135,7 @@ Select::Implementation::Spec::leaf_name () const
   return submodels_and_attribute.back ().name (); 
 }
 
-const string&
+string /* can't return reference because buffer is automatic */
 Select::Implementation::Spec::dimension () const
 {
   Syntax buffer;
@@ -146,7 +146,7 @@ Select::Implementation::Spec::dimension () const
     return Syntax::Unknown ();
 }
 
-const string&
+string /* can't return reference because buffer is automatic */
 Select::Implementation::Spec::description () const
 { 
   Syntax buffer;

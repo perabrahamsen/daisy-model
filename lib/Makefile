@@ -8,7 +8,7 @@ NEWCROPS = ryegrass.dai wclover.dai potato.dai \
 DKCROPS = dk-wrape.dai dk-grass.dai dk-maize.dai dk-pea.dai \
 	dk-rye.dai dk-wwheat.dai dk-wbarley.dai dk-sbarley.dai
 
-DAISY 	= log-std.dai dk-soil.dai dk-fertilizer.dai \
+DAISY 	= log-std.dai dk-fertilizer.dai \
 	dk-crop.dai dk-horizon.dai log-old.dai crop-old.dai vegetation.dai \
 	crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS) $(DKCROPS)
