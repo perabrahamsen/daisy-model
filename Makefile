@@ -21,7 +21,7 @@ MAKEFLAGS =
 # Some non-local files and directories.
 
 FTPDIR = /home/ftp/pub/daisy
-WWWINDEX = /home/user_32/daisy/.public_html/index.html
+WWWINDEX = /home/user_3/daisy/.public_html/index.html
 
 BORLAND = "e:/Program Files/Borland/CBuilder5/"
 

@@ -12,7 +12,13 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
-* 1.81
+* 1.83
+
+** More Borland work.
+
+** Don't log C harvest per default.
+
+* 1.82
 
 The harvest log model now gives information about the carbon content.
 
