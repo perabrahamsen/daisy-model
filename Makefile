@@ -12,14 +12,15 @@ OBJECTS = main.o daisy.o parser.o log.o weather.o column.o crop.o \
 	filter.o csmp.o time.o uzmodel.o parser_file.o \
 	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
-	denitrification.o soil_heat.o groundwater.o snow.o solute.o
+	denitrification.o soil_heat.o groundwater.o snow.o solute.o \
+	matter.o
 OBJ = $(OBJECTS) $(SRCONLY)
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJECTS:.o=.h) common.h
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = manager_rule.C manager.C manager.h
+REMOVE = none
 
 .SUFFIXES:	.C .o .h
 

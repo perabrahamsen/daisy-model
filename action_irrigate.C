@@ -8,6 +8,7 @@
 #include "alist.h"
 #include "common.h"
 #include <iostream.h>
+#include "matter.h"
 
 class ActionIrrigate : public Action
 {
@@ -17,6 +18,7 @@ public:
 private:
   const double flux;
   const double temp;
+  const SoluteMatter& sm;
 
 public:
   void doIt (Daisy&) const;
@@ -43,13 +45,14 @@ ActionIrrigate::doIt (Daisy& daisy) const
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {
-      (*i)->irrigate (flux, t);
+      (*i)->irrigate (flux, t, sm, Column::top_irrigation);
     }
 }
 
 ActionIrrigate::ActionIrrigate (const AttributeList& al)
   : flux (al.number ("flux")),
-    temp (al.number ("temperature"))
+    temp (al.number ("temperature")),
+    sm (MakeSoluteMatter (al.list ("solute")))
 { }
 
 ActionIrrigate::~ActionIrrigate ()
@@ -75,5 +78,7 @@ ActionIrrigateSyntax::ActionIrrigateSyntax ()
   syntax.order ("flux");
   syntax.add ("temperature", Syntax::Number, Syntax::Const);
   alist.add ("temperature", ActionIrrigate::at_air_temperature);
+  syntax.add ("solute", SoluteMatterSyntax (), Syntax::Const);
+  alist.add ("solute", SoluteMatterAlist ());
   Action::add_type ("irrigate", alist, syntax, &ActionIrrigate::make);
 }

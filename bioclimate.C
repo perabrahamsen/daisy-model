@@ -37,7 +37,7 @@ public:
   // Manager.
   double irrigation;
   double irrigation_temperature;
-  irrigation_from irrigation_type;
+  Column::irrigation_from irrigation_type;
 
   // Status.
   double intercepted_water;
@@ -184,7 +184,7 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
     EpFactor * weather.ReferenceEvapotranspiration () - PotSoilEvaporation;
   
   double WaterFromAbove = weather.Rain ();
-  if (irrigation_type == top_irrigation)
+  if (irrigation_type == Column::top_irrigation)
     WaterFromAbove += irrigation;
 
   EvapInterception
@@ -199,7 +199,7 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 
   double Total_through_fall = Through_fall;
   
-  if (irrigation_type == surface_irrigation)
+  if (irrigation_type == Column::surface_irrigation)
     Total_through_fall += irrigation;
 
   double temperature;
@@ -305,7 +305,8 @@ Bioclimate::DayLength(void) const
 }
 
 void
-Bioclimate::Irrigate (double flux, double temp, irrigation_from type)
+Bioclimate::Irrigate (double flux, double temp, 
+		      const SoluteMatter&, Column::irrigation_from type)
 {
   impl.irrigation = flux;
   impl.irrigation_temperature = temp;

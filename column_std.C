@@ -33,14 +33,22 @@ private:
   SoilHeat soil_heat;
   SoilNH4 soil_NH4;
   SoilNO3 soil_NO3;
-  OrganicMatter organic_matter;
+  SoilOrganicMatter soil_organic_matter;
   Nitrification nitrification;
   Denitrification denitrification;
 
   // Actions.
 public:
   void sow (const AttributeList& crop);
-  void irrigate (double flux, double temp);
+  void irrigate (double flux, double temp, 
+		 const SoluteMatter&, irrigation_from);
+  void fertilize (const OrganicMatter&);
+  void fertilize (const OrganicMatter&, double from, double to);
+  void fertilize (const InorganicMatter&);
+  void fertilize (const InorganicMatter&, double from, double to);
+  void mix (double from, double to);
+  void mix_top (double penetration, double to);
+  void swap (double f1, double t1, double f2, double t2);
 
   // Simulation.
 public:
@@ -72,10 +80,56 @@ ColumnStandard::sow (const AttributeList& crop)
     crops.push_back (Crop::create (crop, soil.size ()));
 }
 
-void
-ColumnStandard::irrigate (const double flux, const double temp)
+void 
+ColumnStandard::irrigate (double flux, double temp, 
+		 const SoluteMatter& sm, irrigation_from from)
 {
-  bioclimate.Irrigate (flux, temp);
+  bioclimate.Irrigate (flux, temp, sm, from);
+}
+
+void 
+ColumnStandard::fertilize (const OrganicMatter&)
+{
+  abort ();
+}
+
+void 
+ColumnStandard::fertilize (const OrganicMatter&, 
+			   double /* from */, double /* to */)
+{
+  abort ();
+}
+
+void 
+ColumnStandard::fertilize (const InorganicMatter&)
+{
+  abort ();
+}
+
+void 
+ColumnStandard::fertilize (const InorganicMatter&, 
+			   double /* from */, double /* to */)
+{
+  abort ();
+}
+
+void 
+ColumnStandard::mix (double /* from */, double /* to */)
+{
+  abort ();
+}
+
+void 
+ColumnStandard::mix_top (double /* penetration */, double /* to */)
+{
+  abort ();
+}
+
+void 
+ColumnStandard::swap (double /* f1 */, double /* t1 */,
+		      double /* f2 */, double/* t2 */)
+{
+  abort ();
 }
 
 bool
@@ -118,7 +172,7 @@ ColumnStandard::output (Log& log, const Filter& filter) const
 #endif
   output_submodule (soil_NO3, "SoilNO3", log, filter);
 #if 0
-  output_submodule (organic_matter, "OrganicMatter", log, filter);
+  output_submodule (soil_organic_matter, "SoilOrganicMatter", log, filter);
   output_submodule (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
 #endif
@@ -151,7 +205,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     soil_heat (al.list ("SoilHeat")),
     soil_NH4 (soil, soil_water, al.list ("SoilNH4")),
     soil_NO3 (soil, soil_water, al.list ("SoilNO3")),
-    organic_matter (al.list ("OrganicMatter")),
+    soil_organic_matter (al.list ("SoilOrganicMatter")),
     nitrification (al.list ("Nitrification")),
     denitrification (al.list ("Denitrification"))
 { }
@@ -185,7 +239,7 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
   add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
   add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
-  add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist);
+  add_submodule<SoilOrganicMatter> ("SoilOrganicMatter", syntax, alist);
   add_submodule<Nitrification> ("Nitrification", syntax, alist);
   add_submodule<Denitrification> ("Denitrification", syntax, alist);
 

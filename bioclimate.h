@@ -5,6 +5,7 @@
 
 #include <std/string.h>
 #include <vector.h>
+#include "column.h"
 
 struct Surface;
 struct Weather;
@@ -15,6 +16,7 @@ struct Syntax;
 struct SoilWater;
 struct Log;
 struct Filter;
+struct SoluteMatter;
 
 class Bioclimate
 { 
@@ -36,8 +38,9 @@ public:
 
   // Manager.
 public:
-  enum irrigation_from { top_irrigation, surface_irrigation };
-  void Irrigate (double flux, double temp, irrigation_from = top_irrigation);
+  void Irrigate (double flux, double temp, 
+		 const SoluteMatter& sm,
+		 Column::irrigation_from from);
   
   // Create.
 public:

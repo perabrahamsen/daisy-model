@@ -15,6 +15,9 @@ class Weather;
 class Groundwater;
 class AttributeList;
 class Syntax;
+class OrganicMatter;
+class InorganicMatter;
+class SoluteMatter;
 
 class Column
 {
@@ -23,9 +26,18 @@ public:
 
   // Actions.
 public:
+  enum irrigation_from { top_irrigation, surface_irrigation };
   virtual void sow (const AttributeList& crop) = 0;
-  virtual void irrigate (double flux, double temp) = 0;
-
+  virtual void irrigate (double flux, double temp, 
+			 const SoluteMatter&, irrigation_from) = 0;
+  virtual void fertilize (const OrganicMatter&) = 0;
+  virtual void fertilize (const OrganicMatter&, double from, double to) = 0;
+  virtual void fertilize (const InorganicMatter&) = 0;
+  virtual void fertilize (const InorganicMatter&, double from, double to) = 0;
+  virtual void mix (double from, double to) = 0;
+  virtual void mix_top (double penetration, double to) = 0;
+  virtual void swap (double f1, double t1, double f2, double t2) = 0;
+  
   // Simulation.
   virtual void tick (const Time&, const Weather&, Groundwater&) = 0;
 

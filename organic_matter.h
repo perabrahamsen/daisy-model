@@ -7,10 +7,17 @@ class AttributeList;
 class Syntax;
 
 class OrganicMatter
+{ 
+public:
+  OrganicMatter (const AttributeList&);
+  ~OrganicMatter ();
+};
+
+class SoilOrganicMatter
 {
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  OrganicMatter (const AttributeList&);
+  SoilOrganicMatter (const AttributeList&);
 };
 
 
