@@ -599,7 +599,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   if (rrcmin_star > r_sc_star) rrcmin_star=r_sc_star;
   // calculate stress factor
   assert (r_sc_star != 0.0);
-  rpstress=rrcmin_star/r_sc_star;
+  rpstress=min(1.0,rrcmin_star/r_sc_star);
 
   return 0;
 }
@@ -1259,7 +1259,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   LAI =crops.LAI (); // Leaf Areal Index
   h   =0.01*crops.height (); // max crop height [m]
 
-  //cout << "LAI is\t" << LAI << "\n";
+  // cout << "LAI is\t" << LAI << "\n";
 
   // READ FROM TEMPORARY RCMIN_WW.DAT OR RCMIN_SB.DAT FILE
 #ifdef USE_FILES
@@ -1685,11 +1685,7 @@ SVAT_PMSW::output (Log& log) const
   log.output ("r_sc_js", r_sc_js);              // var 54
   log.output ("r_sc_min", r_sc_min);            // var 55
   log.output ("r_sc_star", r_sc_star);          // var 56
-  log.output ("rcmin_star", rcmin_star);         // var 57
-  log.output ("pstress", pstress);              // var 58
-  log.output ("ustar_raa", ustar_raa);          // var 59
-  log.output ("ustar_raastab1", ustar_raastab1);// var 60
-  log.output ("ustar_raastab2", ustar_raastab2);// var 61
+
 }
 
   
@@ -1924,16 +1920,6 @@ static struct SVAT_PMSWSyntax
                 "minimum canopy resistance");
     syntax.add ("r_sc_star", "s/m", Syntax::LogOnly,
                 "corrected canopy resistance");
-    syntax.add ("rcmin_star", "s/m", Syntax::LogOnly,
-                "corrected minimum canopy resistance");
-    syntax.add ("pstress", "NA", Syntax::LogOnly,
-                "crop production stress");
-    syntax.add ("ustar_raa", "NA", Syntax::LogOnly,
-                "friction velocity from RAA()");
-    syntax.add ("ustar_raastab1", "NA", Syntax::LogOnly,
-                "friction velocity from RAASTAB1()");
-    syntax.add ("ustar_raastab2", "NA", Syntax::LogOnly,
-                "friction velocity from RAASTAB2()");
     syntax.add ("albedo", "NA", Syntax::Const,
                 "Bulk albedo");
     alist.add ("albedo", 0.2);
