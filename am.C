@@ -259,14 +259,20 @@ AM::Implementation::add (const Geometry& geometry,
 	  const double old_N = om[i]->total_N (geometry);
 	  om[i]->add (geometry, om_C[i], density);
 	  const double new_N = om[i]->total_N (geometry);
-	  assert (approximate (new_N - old_N, om_N[i]));
+	  assert (om_N[i] * 1e9 < old_N
+		  ? approximate (old_N + om_N[i], new_N)
+		  : (approximate (new_N - old_N, om_N[i])));
 	}
     }
 
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
-  assert (approximate (new_C - old_C, C));
-  assert (approximate (new_N - old_N, N));
+  assert (C * 1e9 < old_C
+	  ? approximate (old_C + C, new_C)
+	  : (approximate (new_C - old_C, C)));
+  assert (N * 1e9 < old_N
+	  ? approximate (old_N + N, new_N)
+	  : (approximate (new_N - old_N, N)));
 }
 
 void

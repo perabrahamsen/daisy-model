@@ -1,4 +1,24 @@
+2000-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.13 released.
+
+2000-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai (AM): New log model.
+
+	* om.C, am.C (add): Survive when `to_C' much smaller than `old_C'.
+	Ditto, for N.
+
+	* soil_water.C (tick): Ignore tiny numeric errors on ice.
+
+2000-02-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C (open_maybe): Avoid `static const string', it crashed
+	BC++5.0. 
+
 2000-02-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C (maybies): Don't use a stack, use a plain vector.
 
 	* Version 1.12 released.
 

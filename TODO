@@ -1,3 +1,19 @@
+* FÅ DAISY TIL AT COMPILE UNDER BCC IGEN!!!!
+
+* Log 
+
+** Gør det muligt at logge individuelle AM puljer.
+
+*** Check om Bioincorporation::aom kan undværes.
+
+*** Lav en "Log en enkelt aom" log model.
+
+*** Lav en "Log et enkelt kemikalie på overfladen" log model.
+
+*** Lav en "Log et enkelt kemikalie i jorden" log model.
+
+*** Skriv til Mette & Mette.
+
 * Ny `ridging' operation.
 
 ** Nye surface parametre.
@@ -15,12 +31,6 @@
 ** Gød efter hvor meget DM der er høstet fra jorden
 
 * Daisy new user guide.
-
-* Log 
-
-** Gør det muligt at logge individuelle AM puljer.
-
-** Gør det muligt at logge individuelle kemikalier.
 
 * CVS
 

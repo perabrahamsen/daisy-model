@@ -313,7 +313,9 @@ OM::add (const Geometry& geometry, // Add dead roots.
 
   // Check that we computed the correct value.
   const double new_C = total_C (geometry);
-  assert (approximate (new_C - old_C, to_C));
+  assert (to_C * 1e9 < old_C
+	  ? approximate (old_C + to_C, new_C)
+	  : (approximate (new_C - old_C, to_C)));
 }
 
 void 
@@ -363,8 +365,12 @@ OM::add (const Geometry& geometry, // Add dead roots.
   // Check that we computed the correct value.
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
-  assert (approximate (new_C - old_C, to_C));
-  assert (approximate (new_N - old_N, to_N));
+  assert (to_C * 1e9 < old_C
+	  ? approximate (old_C + to_C, new_C)
+	  : (approximate (new_C - old_C, to_C)));
+  assert (to_N * 1e9 < old_N
+	  ? approximate (old_N + to_N, new_N)
+	  : (approximate (new_N - old_N, to_N)));
 }
 
 inline void

@@ -110,8 +110,9 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
 
       if (X_ice_[i] < 0.0)
 	{
-	  CERR << "BUG: X_ice[" << i << "] = " << X_ice_[i]
-               << " (S_sum[i] = " << S_sum_[i] << ")\n";
+	  if (X_ice_[i] < -1e-13)
+	    CERR << "BUG: X_ice[" << i << "] = " << X_ice_[i]
+		 << " (S_sum[i] = " << S_sum_[i] << ")\n";
           X_ice_buffer[i] += X_ice_[i];
 	  X_ice_[i] = 0.0;
 	}

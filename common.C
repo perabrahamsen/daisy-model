@@ -281,8 +281,8 @@ Options::Options (int& argc, char**& argv,
 	      // Print version.
 	      COUT << "Daisy crop/soil simulation version "
 		   << version << ". (" __DATE__ ")\n"
-		"Copyright 1996 - 1998 Per Abrahamsen\n"
-		"Copyright 1996 Søren Hansen\n";
+		"Copyright 1996 - 2000 Per Abrahamsen\n"
+		"Copyright 1996, 1999 Søren Hansen\n";
 	      break;
 	    case '-':
 	      // Finish option list.
