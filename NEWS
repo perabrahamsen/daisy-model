@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.45
+
+** Fixed bug with apparent mass balance errors after tillage operations. 
+
 * 3.44
 
 ** nitrogen_stress moved to CrpN submodel.
@@ -26,7 +30,7 @@ indicater for production loss due to nitrogen stress.
 ** New nitrogen_stress_limit partition parameter.
 
 Setting this will cause all growth assimilate to go to the storage
-organ when there is nitrogen stress in the repreoductive phase.
+organ when there is nitrogen stress in the reproductive phase.
 
 * 3.43
 

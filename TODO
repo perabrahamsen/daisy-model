@@ -1,7 +1,5 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* find ud af hvorfor tillage log er galt
-
 * Check ckeckpoint
 
 * Advarsel hvis "from" eller "to" ikke ligger ved et interval.
@@ -28,8 +26,6 @@ resultat.
 * spec + dimension giver ikke fejl hvis der ikke kan konverteres
 
 * Mindst tre numeriske lag per horizont.
-
-* N stress dage
 
 * Make it possible to specify texture using different systems
 
