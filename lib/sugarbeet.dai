@@ -75,6 +75,6 @@
       (CrSOrgCnc (0.00 0.0080) (1.00 0.0080) (2.00 0.0080))
       (NfSOrgCnc (0.00 0.0050) (1.00 0.0050) (2.00 0.0050))
     )
-(Harvest (DSmax 0.0))
+  (Harvest (DSmax 0.0) (sorg_height -15 [cm]))
 
 )

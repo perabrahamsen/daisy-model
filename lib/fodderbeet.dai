@@ -86,5 +86,5 @@
       (TLLeafEff  (1.09 1.00) (2.00 1.00))
 
   )
-(Harvest (DSmax 0.0))
+  (Harvest (DSmax 0.0)  (sorg_height -15 [cm]))
 )
