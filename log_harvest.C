@@ -98,7 +98,7 @@ struct LogHarvest : public Log
 	      << "\t" << harvest.dead_C * 10.0
 	      << "\t" << harvest.leaf_C * 10.0
 	      << "\t" << harvest.sorg_C * 10.0;
-	out << "n";
+	out << "\n";
 	out.flush ();
       }
     return false;
