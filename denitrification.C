@@ -36,7 +36,7 @@ static double f_T (double T)
 }
 
 void
-Denitrification::output (Log& log, const Filter& filter) const
+Denitrification::output (Log& log, Filter& filter) const
 {
   log.output ("converted", filter, converted, true);
 }

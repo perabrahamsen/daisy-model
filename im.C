@@ -6,7 +6,7 @@
 #include "syntax.h"
 
 void
-IM::output (Log& log, const Filter& filter) const
+IM::output (Log& log, Filter& filter) const
 {
   log.output ("NO3", filter, NO3);
   log.output ("NH4", filter, NH4);

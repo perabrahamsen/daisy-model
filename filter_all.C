@@ -8,8 +8,17 @@ class FilterAll : public Filter
 public:
   bool check (string, bool) const
   { return true; }
-  const Filter& lookup (string) const
-  { return *this; }
+  Filter& lookup (string) const
+  { 
+    static Filter* all = NULL;
+    if (!all)
+      {
+	AttributeList all_alist;
+	all_alist.add ("type", "all");
+	all = &Librarian<Filter>::create (all_alist);
+      }
+    return *all; 
+  }
 
     // Create and Destroy.
 public:

@@ -29,7 +29,7 @@ public:
 		   double from, double to, double energy);
   void swap (const Soil&, double from, double middle, double to);
   double T (int i) const;
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   bool check (unsigned n) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const Soil&, const SoilWater&, const AttributeList&);

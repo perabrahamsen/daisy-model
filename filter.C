@@ -5,8 +5,16 @@
 Librarian<Filter>::Content* Librarian<Filter>::content = NULL;
 
 const vector<double>
-Filter::select (const Geometry&, const vector<double>& value) const
+Filter::select (const Geometry&, const vector<double>& value)
 { return value; }
+
+void
+Filter::accumulate (const Geometry&, const vector<double>&)
+{ }
+
+bool
+Filter::accumulating () const
+{ return false; }
 
 bool
 Filter::check (const Library&, int /* size */) const

@@ -20,7 +20,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time& time) = 0;
-  virtual void output (Log&, const Filter&) const;
+  virtual void output (Log&, Filter&) const;
 
   // Communication with Biocliamte.
 public:

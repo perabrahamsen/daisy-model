@@ -27,7 +27,7 @@ public:
 
   // Simulation.
 public:
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   bool check () const;
   void mix (const Soil&, double from, double to, double penetration = 1.0);
   void swap (const Soil&, double from, double middle, double to);

@@ -29,7 +29,7 @@ private:
 
   // Simulation:
 public:
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
 
   // Create and Destroy.
 public:

@@ -25,7 +25,7 @@ public:
   bool accept_top (double);
   bool flux_bottom () const;
   bool accept_bottom (double);
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
 
   // Simulate.
 private:
@@ -606,7 +606,7 @@ UZRichard::tick (const Soil& soil,
 }
 
 void
-UZRichard::output (Log& log, const Filter& filter) const
+UZRichard::output (Log& log, Filter& filter) const
 {
   log.output ("q_up", filter, var.q_up);
   log.output ("q_down", filter, var.q_down);

@@ -58,7 +58,7 @@ public:
 				  double dead_harvest,
 				  bool kill_off) = 0;
   void kill (const Time&, Column&);
-  virtual void output (Log&, const Filter&) const = 0;
+  virtual void output (Log&, Filter&) const = 0;
   
   // Queries.
 public:

@@ -25,7 +25,7 @@ class WeatherSimple : public Weather
   // Simulation.
 public:
   void tick (const Time&);
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   double AirTemperature () const;
   double GlobalRadiation () const;
   double DailyRadiation () const;
@@ -59,7 +59,7 @@ WeatherSimple::tick (const Time& t)
 }
 
 void
-WeatherSimple::output (Log& log, const Filter& filter) const
+WeatherSimple::output (Log& log, Filter& filter) const
 {
   log.output ("Prain", filter, Prain, true);	
   log.output ("Psnow", filter, Psnow, true);

@@ -12,7 +12,6 @@
 
 struct Time;
 struct CSMP;
-struct Filter;
 struct AttributeList;
 
 class AttributeList
@@ -51,8 +50,6 @@ public:
        throw2 (Invalid, Uninitialized);
   const CSMP& csmp (string) const 
        throw2 (Invalid, Uninitialized);
-  const Filter& filter (string) const 
-       throw2 (Invalid, Uninitialized);
   const AttributeList& list (string) const
        throw2 (Invalid, Uninitialized);
   int integer (string) const
@@ -71,8 +68,6 @@ public:
        throw2 (Invalid, Uninitialized);
   const vector<const CSMP*>& csmp_sequence (string key) const
        throw2 (Invalid, Uninitialized);
-  const vector<const Filter*>& filter_sequence (string key) const
-       throw2 (Invalid, Uninitialized);
   const vector<const AttributeList*>& list_sequence (string key) const
        throw2 (Invalid, Uninitialized);
 
@@ -83,7 +78,6 @@ public:
   void add (string, int);
   void add (string, const AttributeList&);
   void add (string, const CSMP&);
-  void add (string, const Filter&);
   void add (string, const Time&);
   void add (string, const vector<double>&);
   void add (string, const vector<string>&);
@@ -91,7 +85,6 @@ public:
   void add (string, const vector<int>&);
   void add (string, const vector<const AttributeList*>&);
   void add (string, const vector<const CSMP*>&);
-  void add (string, const vector<const Filter*>&);
   void add (string, const vector<const Time*>&);
 
   void operator += (const AttributeList&);

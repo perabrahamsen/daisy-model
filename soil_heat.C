@@ -305,7 +305,7 @@ SoilHeat::T (int i) const
 }
 
 void
-SoilHeat::output (Log& log, const Filter& filter) const
+SoilHeat::output (Log& log, Filter& filter) const
 {
   log.output ("T", filter, impl.T);
 }

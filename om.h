@@ -26,7 +26,7 @@ public:
 
   // Simulation.
 public:
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   void mix (const Soil&, double from, double to, double penetration = 1.0);
   void distribute (const Soil&, const vector<double>& density);
   void swap (const Soil&, double from, double middle, double to);

@@ -253,7 +253,7 @@ Snow::tick (const Soil& soil, const SoilWater& soil_water,
 }
 
 void 
-Snow::output (Log& log, const Filter& filter) const
+Snow::output (Log& log, Filter& filter) const
 {
   log.output ("EvapSnowPack", filter, impl.EvapSnowPack, true);
   log.output ("q_s", filter, impl.q_s, true);

@@ -6,14 +6,18 @@
 class FilterSome : public Filter
 {
   // Content.
-  typedef map<string, const Filter*, less<string> > filter_map;
+  typedef map<string, Filter*, less<string> > filter_map;
   filter_map filters;
+  bool accumulating_;
 
   // Use.
 public:
   bool check (string key, bool) const;
-  const Filter& lookup (string key) const;
-  void add (string key, const Filter& filter);
+  Filter& lookup (string key) const;
+  void add (string key, Filter& filter);
+
+  bool accumulating ()
+  { return accumulating_; }
 
   // Create and Destroy.
 public:
@@ -30,7 +34,7 @@ FilterSome::check (string key, bool) const
   return filters.find (key) != filters.end ();
 }
 
-const Filter& 
+Filter& 
 FilterSome::lookup (string key) const
 { 
   filter_map::const_iterator i = filters.find (key);
@@ -42,7 +46,7 @@ FilterSome::lookup (string key) const
 }
 
 void 
-FilterSome::add (string key, const Filter& filter)
+FilterSome::add (string key, Filter& filter)
 {
   filters[key] = &filter;
 }
@@ -58,7 +62,7 @@ FilterSome::check (const Library& library, int /* size */) const
     {
       bool ok = true;
       const string name = (*i).first;
-      const Filter* filter = (*i).second;
+      Filter* filter = (*i).second;
 
       if (!library.check (name))
 	{
@@ -90,7 +94,7 @@ FilterSome::check (const Syntax& syntax, int /* size */) const
     {
       bool ok = true;
       const string name = (*i).first;
-      const Filter* filter = (*i).second;
+      Filter* filter = (*i).second;
       const Syntax::type type = syntax.lookup (name);
       const int size = syntax.size (name);
 	
@@ -164,18 +168,28 @@ FilterSome::make (const AttributeList& al)
 }
 
 FilterSome::FilterSome (const AttributeList& al)
+  : accumulating_ (false)
 { 
   AttributeList all_alist;
   all_alist.add ("type", "all");
-  const Filter& all = Librarian<Filter>::create (all_alist);
+  Filter& all = Librarian<Filter>::create (all_alist);
     
   const vector<const AttributeList*>& members = al.list_sequence ("members");
   for (unsigned int i = 0; i < members.size (); i++)
-    if (members[i]->check ("filter"))
-      add (members[i]->name ("name"), 
-	   Librarian<Filter>::create (members[i]->list ("filter")));
-    else
-      add (members[i]->name ("name"), all);
+    { 
+      const string name = members[i]->name ("name");
+      
+      if (members[i]->check ("filter"))
+	{
+	  Filter& filter 
+	    = Librarian<Filter>::create (members[i]->list ("filter")); 
+	  add (name, filter);
+	  if (!accumulating_ && filter.accumulating ())
+	    accumulating_ = true;
+	}
+      else
+	add (name, all);
+    }
 }
 
 static struct FilterSomeSyntax

@@ -145,7 +145,7 @@ Surface::fertilize (const IM& n)
 }
 
 void
-Surface::output (Log& log, const Filter& filter) const
+Surface::output (Log& log, Filter& filter) const
 {
   log.output ("pond", filter, pond);
   log.output ("flux", filter, flux);

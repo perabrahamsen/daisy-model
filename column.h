@@ -60,7 +60,7 @@ public:
 
   virtual bool check () const = 0;
   virtual bool check_am (const AttributeList& am) const = 0;
-  virtual void output (Log&, const Filter&) const = 0;
+  virtual void output (Log&, Filter&) const = 0;
 
   // Library.
 public:

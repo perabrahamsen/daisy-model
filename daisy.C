@@ -129,7 +129,7 @@ Daisy::run ()
 	   i++)
 	{
 	  Log& log = **i;
-	  const Filter& filter = log.match (*this);
+	  Filter& filter = log.match (*this);
 	  log.output ("time", filter, time);
 	  output_derived (weather, "weather", log, filter);
 	  output_list (columns, "column", log, filter);

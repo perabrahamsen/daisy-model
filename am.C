@@ -123,7 +123,7 @@ AM::check () const
 }
 
 void
-AM::output (Log& log, const Filter& filter) const
+AM::output (Log& log, Filter& filter) const
 { 
   log.output ("creation", filter, creation);
   output_vector (om, "om", log, filter);

@@ -317,7 +317,7 @@ Solute::check (unsigned) const
 }
 
 void
-Solute::output (Log& log, const Filter& filter) const
+Solute::output (Log& log, Filter& filter) const
 {
   log.output ("C", filter, C_);
   log.output ("M", filter, M_);

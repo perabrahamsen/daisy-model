@@ -5,7 +5,7 @@
 #include "log.h"
 
 void 
-Harvest::output (Log& log, const Filter& filter) const
+Harvest::output (Log& log, Filter& filter) const
 {
   log.output ("column", filter, column, true);
   log.output ("time", filter, time, true);

@@ -55,7 +55,7 @@ protected:
 public:
   virtual void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   void add (const Soil&, const SoilWater&,
 	    double amount, double from, double to);
   void mix (const Soil&, const SoilWater&, double from, double to);

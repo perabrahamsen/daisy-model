@@ -53,7 +53,7 @@ public:
   void mix (const Soil&, double from, double to);
   void swap (const Soil&, double from, double middle, double to);
   bool check (unsigned n) const;
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
 
   // Communication with surface.
   double MaxExfiltration (const Soil&) const;

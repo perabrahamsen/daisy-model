@@ -25,7 +25,7 @@ private:
   
   // Simulation.
 public:
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   void tick (Soil&, SoilWater&, SoilHeat&, SoilNO3&, SoilNH4&);
 
   // Create.
@@ -79,7 +79,7 @@ static double f_T (double T)
 }
 
 void
-NitrificationSolute::output (Log& log, const Filter& filter) const
+NitrificationSolute::output (Log& log, Filter& filter) const
 {
   log.output ("converted", filter, converted, true);
 }

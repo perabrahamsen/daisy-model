@@ -66,7 +66,7 @@ public:
 		     vector<double>& h,
 		     vector<double>& Theta,
 		     vector<double>& q) = 0;
-  virtual void output (Log&, const Filter&) const = 0;
+  virtual void output (Log&, Filter&) const = 0;
 
   // Library.
 public:

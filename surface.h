@@ -41,7 +41,7 @@ public:
   // Manager.
   void fertilize (const IM&);
 
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
 
   // Communication with bioclimate.
   double evaporation (double PotSoilEvaporation, double Water, double temp,

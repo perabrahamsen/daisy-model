@@ -34,7 +34,7 @@ struct OrganicMatter::Implementation
     vector<double> N;			// Nitrogen.
     const double turnover_rate;	// Absorption.
     const int where;		// Which SOM dk:pulje does it end in?
-    void output (Log& log, const Filter& filter) const;
+    void output (Log& log, Filter& filter) const;
     void tick (int i, double abiotic_factor, double N_soil, double& N_used,
 	       const vector<OM*>&);
     void mix (const Soil&, double from, double to);
@@ -57,7 +57,7 @@ struct OrganicMatter::Implementation
 	     SoilNO3&, SoilNH4&);
   void mix (const Soil&, double from, double to, double penetration);
   void swap (const Soil& soil, double from, double middle, double to);
-  void output (Log&, const Filter&, const Soil&) const;
+  void output (Log&, Filter&, const Soil&) const;
   bool check () const;
 
   double heat_turnover_factor (double T) const;
@@ -70,7 +70,7 @@ struct OrganicMatter::Implementation
 
 void
 OrganicMatter::Implementation::Buffer::output (Log& log,
-					       const Filter& filter) const
+					       Filter& filter) const
 {
   log.output ("C", filter, C);
   log.output ("N", filter, N);
@@ -191,7 +191,7 @@ OrganicMatter::Implementation::Buffer::Buffer (const Soil& soil,
 }
 
 void
-OrganicMatter::Implementation::output (Log& log, const Filter& filter,
+OrganicMatter::Implementation::output (Log& log, Filter& filter,
 				       const Soil& soil) const
 {
   log.output ("CO2", filter, CO2, true);
@@ -557,7 +557,7 @@ OrganicMatter::CO2 (int i) const
 }
 
 void 
-OrganicMatter::output (Log& log, const Filter& filter, const Soil& soil) const
+OrganicMatter::output (Log& log, Filter& filter, const Soil& soil) const
 {
   impl.output (log, filter, soil);
 }

@@ -17,7 +17,7 @@ public:
 
   // Operations.
 public:
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   void clear ();
   void operator+= (const IM&);
   void operator-= (const IM&);

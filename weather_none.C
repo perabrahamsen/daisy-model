@@ -17,7 +17,7 @@ class WeatherNone : public Weather
 public:
   void tick (const Time&)
   { }
-  void output (Log&, const Filter&) const
+  void output (Log&, Filter&) const
   { }
   double AirTemperature () const
   { return air_temperature; }

@@ -94,7 +94,7 @@ public:
 			  double stem_harvest, double leaf_harvest, 
 			  double sorg_harvest, double dead_harvest,
 			  bool kill_off);
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
 
   double DS () const;
 
@@ -246,10 +246,10 @@ public:
 
 struct CropOld::Variables
 { 
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   struct RecPhenology
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     double DS;		// Development Stage
     double Vern;		// Vernalization criterium [C d]
   private:
@@ -258,7 +258,7 @@ struct CropOld::Variables
   } Phenology;
   struct RecCanopy
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     double Height;		// Crop height [cm]
     double LAI;		// Leaf Area Index
     double LADm;		// Max Leaf Area Density [cm2/cm3]
@@ -269,7 +269,7 @@ struct CropOld::Variables
   } Canopy;
   struct RecRootSys
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     double Depth;		// Rooting Depth [cm]
     vector<double> Density;	// Root density [cm/cm3] in soil layers
     vector<double> H2OExtraction; // Extraction of H2O in soil layers
@@ -292,7 +292,7 @@ struct CropOld::Variables
   } RootSys;
   struct RecProd
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     double WLeaf;		// Leaf dry matter weight [g/m2]
     double WhiteStubble;	// Old dead leftover from harvest.
     double WRoot;		// Root dry matter weight [g/m2]
@@ -303,7 +303,7 @@ struct CropOld::Variables
   } Prod;
   struct RecCrpAux
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     bool InitLAI;		// Initial LAI development ?
     double PotRtDpt;	// Potential Root Penetration Depth [cm]
     double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
@@ -453,7 +453,7 @@ CropOld::Variables::Variables (const Parameters& par,
 { }
 
 void 
-CropOld::Variables::output (Log& log, const Filter& filter) const
+CropOld::Variables::output (Log& log, Filter& filter) const
 {
   if (filter.check ("Phenology"))
     Phenology.output (log, filter.lookup ("Phenology"));
@@ -474,7 +474,7 @@ CropOld::Variables::RecPhenology::RecPhenology (const Parameters& par,
 { }
 
 void 
-CropOld::Variables::RecPhenology::output (Log& log, const Filter& filter) const
+CropOld::Variables::RecPhenology::output (Log& log, Filter& filter) const
 {
   log.open ("Phenology");
   log.output ("DS", filter, DS);
@@ -491,7 +491,7 @@ CropOld::Variables::RecCanopy::RecCanopy (const Parameters&,
 { }
 
 void 
-CropOld::Variables::RecCanopy::output (Log& log, const Filter& filter) const
+CropOld::Variables::RecCanopy::output (Log& log, Filter& filter) const
 {
   log.open ("Canopy");
   log.output ("Height", filter, Height);
@@ -532,7 +532,7 @@ CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
 }
 
 void 
-CropOld::Variables::RecRootSys::output (Log& log, const Filter& filter) const
+CropOld::Variables::RecRootSys::output (Log& log, Filter& filter) const
 {
   log.open ("RootSys");
   log.output ("Depth", filter, Depth);
@@ -556,7 +556,7 @@ CropOld::Variables::RecProd::RecProd (const Parameters& par,
 { }
 
 void 
-CropOld::Variables::RecProd::output (Log& log, const Filter& filter) const
+CropOld::Variables::RecProd::output (Log& log, Filter& filter) const
 {
   log.open ("Prod");
   log.output ("WLeaf", filter, WLeaf);
@@ -587,7 +587,7 @@ CropOld::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 { }
 
 void 
-CropOld::Variables::RecCrpAux::output (Log& log, const Filter& filter) const
+CropOld::Variables::RecCrpAux::output (Log& log, Filter& filter) const
 {
   log.open ("CrpAux");
   log.output ("InitLAI", filter, InitLAI);
@@ -1865,7 +1865,7 @@ CropOld::harvest (const Time& time, Column& column,
 }
 
 void
-CropOld::output (Log& log, const Filter& filter) const
+CropOld::output (Log& log, Filter& filter) const
 {
   var.output (log, filter);
 }

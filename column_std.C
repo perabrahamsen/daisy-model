@@ -73,7 +73,7 @@ public:
   static bool check (const AttributeList&);
   bool check_am (const AttributeList& am) const 
   { return organic_matter.check_am (am); }
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
 
   // Create and Destroy.
 private:
@@ -293,7 +293,7 @@ ColumnStandard::tick (const Time& time,
 }
 
 void
-ColumnStandard::output (Log& log, const Filter& filter) const
+ColumnStandard::output (Log& log, Filter& filter) const
 {
   log.open_geometry (soil);
   output_submodule (bioclimate, "Bioclimate", log, filter);

@@ -26,7 +26,7 @@ public:
   void monthly (const Soil& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&);
-  void output (Log&, const Filter&, const Soil&) const;
+  void output (Log&, Filter&, const Soil&) const;
   double CO2 (int i) const;
   void mix (const Soil&, double from, double to, double penetration = 1.0);
   void swap (const Soil&, double from, double middle, double to);

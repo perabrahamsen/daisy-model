@@ -93,7 +93,7 @@ public:
 			  double stem_harvest, double leaf_harvest, 
 			  double sorg_harvest, double dead_harvest,
 			  bool kill_off);
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
 
   double DS () const;
 
@@ -248,10 +248,10 @@ public:
 
 struct CropSold::Variables
 { 
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
   struct RecPhenology
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     double DS;		// Development Stage
     double Vern;		// Vernalization criterium [C d]
   private:
@@ -260,7 +260,7 @@ struct CropSold::Variables
   } Phenology;
   struct RecCanopy
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     double Height;		// Crop height [cm]
     double LAI;		// Leaf Area Index
     double LADm;		// Max Leaf Area Density [cm2/cm3]
@@ -271,7 +271,7 @@ struct CropSold::Variables
   } Canopy;
   struct RecRootSys
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     double Depth;		// Rooting Depth [cm]
     vector<double> Density;	// Root density [cm/cm3] in soil layers
     vector<double> H2OExtraction; // Extraction of H2O in soil layers
@@ -294,7 +294,7 @@ struct CropSold::Variables
   } RootSys;
   struct RecProd
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     double WLeaf;		// Leaf dry matter weight [g/m2]
     double WhiteStubble;	// Old dead leftover from harvest.
     double WSOrg;		// Storage organ dry matter weight [g/m2]
@@ -306,7 +306,7 @@ struct CropSold::Variables
   } Prod;
   struct RecCrpAux
   {
-    void output (Log&, const Filter&) const;
+    void output (Log&, Filter&) const;
     bool InitLAI;		// Initial LAI development ?
     double PotRtDpt;	// Potential Root Penetration Depth [cm]
     double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
@@ -460,7 +460,7 @@ CropSold::Variables::Variables (const Parameters& par,
 { }
 
 void 
-CropSold::Variables::output (Log& log, const Filter& filter) const
+CropSold::Variables::output (Log& log, Filter& filter) const
 {
   if (filter.check ("Phenology"))
     Phenology.output (log, filter.lookup ("Phenology"));
@@ -481,7 +481,7 @@ CropSold::Variables::RecPhenology::RecPhenology (const Parameters& par,
 { }
 
 void 
-CropSold::Variables::RecPhenology::output (Log& log, const Filter& filter) const
+CropSold::Variables::RecPhenology::output (Log& log, Filter& filter) const
 {
   log.open ("Phenology");
   log.output ("DS", filter, DS);
@@ -498,7 +498,7 @@ CropSold::Variables::RecCanopy::RecCanopy (const Parameters&,
 { }
 
 void 
-CropSold::Variables::RecCanopy::output (Log& log, const Filter& filter) const
+CropSold::Variables::RecCanopy::output (Log& log, Filter& filter) const
 {
   log.open ("Canopy");
   log.output ("Height", filter, Height);
@@ -535,7 +535,7 @@ CropSold::Variables::RecRootSys::RecRootSys (const Parameters& par,
 }
 
 void 
-CropSold::Variables::RecRootSys::output (Log& log, const Filter& filter) const
+CropSold::Variables::RecRootSys::output (Log& log, Filter& filter) const
 {
   log.open ("RootSys");
   log.output ("Depth", filter, Depth);
@@ -560,7 +560,7 @@ CropSold::Variables::RecProd::RecProd (const Parameters& par,
 { }
 
 void 
-CropSold::Variables::RecProd::output (Log& log, const Filter& filter) const
+CropSold::Variables::RecProd::output (Log& log, Filter& filter) const
 {
   log.open ("Prod");
   log.output ("WLeaf", filter, WLeaf);
@@ -593,7 +593,7 @@ CropSold::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 { }
 
 void 
-CropSold::Variables::RecCrpAux::output (Log& log, const Filter& filter) const
+CropSold::Variables::RecCrpAux::output (Log& log, Filter& filter) const
 {
   log.open ("CrpAux");
   log.output ("InitLAI", filter, InitLAI);
@@ -1846,7 +1846,7 @@ CropSold::harvest (const Time& time, Column& column,
 }
 
 void
-CropSold::output (Log& log, const Filter& filter) const
+CropSold::output (Log& log, Filter& filter) const
 {
   var.output (log, filter);
 }

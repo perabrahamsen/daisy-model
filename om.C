@@ -77,7 +77,7 @@ OM::OM (const AttributeList& al, const Soil& soil,
 }
 
 void
-OM::output (Log& log, const Filter& filter) const
+OM::output (Log& log, Filter& filter) const
 {
   log.output ("top_C", filter, top_C);
   log.output ("C", filter, C);

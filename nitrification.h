@@ -20,7 +20,7 @@ public:
   // Simulation.
 public:
   virtual void tick (Soil&, SoilWater&, SoilHeat&, SoilNO3&, SoilNH4&) = 0;
-  virtual void output (Log&, const Filter&) const = 0;
+  virtual void output (Log&, Filter&) const = 0;
 
   // Create and Destroy.
 protected:

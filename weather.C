@@ -26,7 +26,7 @@ struct Weather::Implementation
 };
 
 void
-Weather::output (Log&, const Filter&) const
+Weather::output (Log&, Filter&) const
 { }
 
 double

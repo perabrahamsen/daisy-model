@@ -27,7 +27,7 @@ public:
   void tick (Surface&, const Weather&, const Time&, 
 	     const CropList&, 
 	     const Soil&, SoilWater&, const SoilHeat&);
-  void output (Log&, const Filter&) const;
+  void output (Log&, Filter&) const;
 
   // Canopy.
 public:

@@ -11,7 +11,7 @@
 #include <list>
 #include <fstream.h>
 
-class LogFile : public Log, public Filter
+class LogFile : public Log
 {
   // Content.
 private:
@@ -20,25 +20,15 @@ private:
   list<int> offsets;
   bool opening;
   int column;
-  struct Entry
-  {
-    bool active;
-    const Condition* condition;
-    const Filter& filter;
-    Entry (const AttributeList& al)
-      : active (false),
-	condition (&Librarian<Condition>::create (al.list ("when"))), 
-	filter (Librarian<Filter>::create (al.list ("what")))
-    { }
-    ~Entry ()
-    {
-#ifdef CONST_DELETE
-      delete condition; 
-#endif
-    }
-  };
-  typedef list<Entry*> EntryList;
-  EntryList entries;
+  const Condition& condition;
+  Filter& filter;
+  const bool compact;
+  const bool accumulating;
+  bool matching;
+  
+  // Printing.
+  void force_open (string = "");
+  void force_close ();
   void print (const char*);
   void print (string);
   void print (double);
@@ -46,25 +36,31 @@ private:
   void print (bool);
   void newline ();
 
+  bool printing () const;
+
   // Log.
 public:
-  const Filter& match (const Daisy&);
+  Filter& match (const Daisy&);
 
+  // Open normal items.
   void open (string = "");
-  void open (string field, string type);
   void close ();
-  void output (string, const Filter&, const Time&, bool log_only = false);
-  void output (string, const Filter&, const bool, bool log_only = false);
-  void output (string, const Filter&, const double, bool log_only = false);
-  void output (string, const Filter&, const int, bool log_only = false);
-  void output (string, const Filter&, const string, bool log_only = false);
-  void output (string, const Filter&, const vector<double>&, bool log_only = false);
-  void output (string, const Filter&, const CSMP&, bool log_only = false);
-  void output_point (double x, double y);
 
-  // Filter.
-  bool check (string, bool log_only = false) const;
-  const Filter& lookup (string) const;
+  // Open derived items.
+  void open (string field, string type);
+
+  // Open derived items in list.
+  void open_entry (string type);
+  void close_entry ();
+
+  void output (string, Filter&, const Time&, bool log_only = false);
+  void output (string, Filter&, const bool, bool log_only = false);
+  void output (string, Filter&, const double, bool log_only = false);
+  void output (string, Filter&, const int, bool log_only = false);
+  void output (string, Filter&, const string, bool log_only = false);
+  void output (string, Filter&, const vector<double>&, bool log_only = false);
+  void output (string, Filter&, const CSMP&, bool log_only = false);
+  void output_point (double x, double y);
 
   // Create and Destroy.
 private:
@@ -76,8 +72,22 @@ public:
 };
 
 void 
-LogFile::open (string name)
+LogFile::force_open (string name)
 {
+  if (!matching)
+    return;
+  if (compact)
+    {
+      column = offsets.back ();
+      newline ();
+      opening = true;
+      if (name == "")
+	print (string ("("));
+      else 
+	print (string ("(") + name + " ");
+      offsets.push_back (column);
+      return;
+    }
   if (!opening)
     {
       newline ();
@@ -91,17 +101,36 @@ LogFile::open (string name)
 }
 
 void 
-LogFile::close ()
+LogFile::force_close ()
 { 
+  if (!matching)
+    return;
+
   print (")");
   opening = false;
   column = offsets.back ();
   offsets.pop_back ();
 }
 
+void 
+LogFile::open (string name)
+{
+  if (!compact)
+    force_open (name);
+}
+
+void 
+LogFile::close ()
+{ 
+  if (!compact)
+    force_close ();
+}
+
 void
 LogFile::print (string s)
 {
+  if (!matching)
+    return;
   if (!stream)
     {
       const char* n = name.c_str ();
@@ -112,6 +141,12 @@ LogFile::print (string s)
       if (!*stream)
 	cerr << "Failed to open `" << name << "'\n";
     }
+  if (compact && !opening)
+    {
+      column = offsets.back ();
+      newline ();
+      opening = true;
+    }
   *stream << s;
   column += s.length ();
 }
@@ -119,30 +154,21 @@ LogFile::print (string s)
 void
 LogFile::newline ()
 {
+  if (!matching)
+    return;
+
   *stream << "\n" << string (column / 8, '\t') << string (column % 8, ' ');
 }
 
-const Filter&
+Filter&
 LogFile::match (const Daisy& daisy)
 {
-  bool found = false;
-  // No const_iterator in BCC.
-  for (EntryList::iterator i = entries.begin ();
-       i != entries.end ();
-       i++)
-    {
-      if ((*i)->condition->match (daisy))
-	{
-	  found = true;
-	  (*i)->active = true;
-	}
-      else
-	(*i)->active = false;
-    }
-  if (found)
-    return *this;
+  matching = condition.match (daisy);
+  
+  if (matching || accumulating)
+    return *filter;
 
-  static const Filter* none = NULL;
+  static Filter* none = NULL;
   if (!none)
     {
       AttributeList none_alist;
@@ -155,11 +181,26 @@ LogFile::match (const Daisy& daisy)
 void 
 LogFile::open (string field, string type)
 {
-  open (field);
-  print (type);
-  print (" ");
+  if (!compact)
+    {
+      open (field);
+      print (type);
+      print (" ");
+    }
 }
 
+void 
+LogFile::open_entry (string type)
+{
+  force_open (type);
+}
+
+void 
+LogFile::close_entry ()
+{
+  force_close ();
+}
+      
 void
 LogFile::print (const char* s)
 {
@@ -197,7 +238,7 @@ LogFile::print (bool v)
 }
 
 void
-LogFile::output (string name, const Filter& filter, const Time& value, bool log_only)
+LogFile::output (string name, Filter& filter, const Time& value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -214,7 +255,7 @@ LogFile::output (string name, const Filter& filter, const Time& value, bool log_
 }
 
 void
-LogFile::output (string name, const Filter& filter, const bool value, bool log_only)
+LogFile::output (string name, Filter& filter, const bool value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -225,7 +266,7 @@ LogFile::output (string name, const Filter& filter, const bool value, bool log_o
 }
 
 void
-LogFile::output (string name, const Filter& filter, const double value, bool log_only)
+LogFile::output (string name, Filter& filter, const double value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -236,7 +277,7 @@ LogFile::output (string name, const Filter& filter, const double value, bool log
 }
 
 void
-LogFile::output (string name, const Filter& filter, const int value, bool log_only)
+LogFile::output (string name, Filter& filter, const int value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -247,7 +288,7 @@ LogFile::output (string name, const Filter& filter, const int value, bool log_on
 }
 
 void
-LogFile::output (string name, const Filter& filter, const string value, bool log_only)
+LogFile::output (string name, Filter& filter, const string value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -260,32 +301,36 @@ LogFile::output (string name, const Filter& filter, const string value, bool log
 }
 
 void
-LogFile::output (string name, const Filter& filter, const vector<double>& value, bool log_only)
+LogFile::output (string name, Filter& filter, const vector<double>& value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
-      const Filter& f = filter.lookup (name);
+      Filter& f = filter.lookup (name);
       const Geometry* g = geometry ();
 
-      
-      const vector<double> val = g ? f.select (*g, value) : value;
-      
-      open (name);
-      bool first = true;
-      for (const double* p = val.begin (); p != val.end (); p++)
+      if (printing)
 	{
-	  if (first)
-	    first = false;
-	  else
-	    print (" ");
-	  print (*p);
+	  const vector<double> val = g ? f.select (*g, value) : value;
+      
+	  open (name);
+	  bool first = true;
+	  for (const double* p = val.begin (); p != val.end (); p++)
+	    {
+	      if (first)
+		first = false;
+	      else
+		print (" ");
+	      print (*p);
+	    }
+	  close ();
 	}
-      close ();
+      else
+	f.accumulate (*g, value);
     }
 }
 
 void
-LogFile::output (string name, const Filter& filter, const CSMP& csmp, bool log_only)
+LogFile::output (string name, Filter& filter, const CSMP& csmp, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -306,68 +351,39 @@ LogFile::output_point (double x, double y)
 }
 
 bool
-LogFile::check (string s, bool log_only) const
-{
-  for (EntryList::const_iterator i = entries.begin ();
-       i != entries.end ();
-       i++)
-    {
-      if ((*i)->active && (*i)->filter.check (s, log_only))
-	return true;
-    }
-  return false;
-}
- 
-const Filter& 
-LogFile::lookup (string s) const
-{
-  for (EntryList::const_iterator i = entries.begin ();
-       i != entries.end ();
-       i++)
-    {
-      if ((*i)->active && (*i)->filter.check (s))
-	return (*i)->filter.lookup (s);
-    }
-  assert (false);
-}
-
+LogFile::printing () const
+{ return matching; }
+  
 bool
 LogFile::check (const Syntax& syntax) const
 {
-  bool ok =true;
-  for (EntryList::const_iterator i = entries.begin ();
-       i != entries.end ();
-       i++)
-    {
-      if (!(*i)->filter.check (syntax, Syntax::Singleton))
-	ok = false;
-    }
+  bool ok = filter.check (syntax, Syntax::Singleton);
+  
   if (!ok)
     cerr << "in log file `" << name << "'\n";
   
   return ok;
 }
 
-LogFile::LogFile (const AttributeList& av)
-  : name (av.name ("where")),
+LogFile::LogFile (const AttributeList& al)
+  : name (al.name ("where")),
     stream (0),
     opening (true),
-    column (0)
+    column (0),
+    condition (Librarian<Condition>::create (al.list ("when"))), 
+    filter (Librarian<Filter>::create (al.list ("what"))),
+    compact (al.flag ("compact")),
+    accumulating (filter.accumulating ()),
+    matching (false)
 { 
-  const vector<const AttributeList*>& ml = av.list_sequence ("matches");
-  
-  for (vector<const AttributeList*>::const_iterator i = ml.begin ();
-       i != ml.end ();
-       i++)
-    {
-      entries.push_back (new Entry (**i));
-    }
-}					    
+  offsets.push_back (0);
+}
 
 LogFile::~LogFile ()
 {
-  sequence_delete (entries.begin (), entries.end ());
-  assert (offsets.size () == 0);
+  delete &condition;
+  delete &filter;
+  assert (offsets.size () == 1);
   if (stream)
     {
       *stream << "\n";
@@ -393,12 +409,11 @@ LogFileSyntax::LogFileSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  Syntax& match = *new Syntax ();
-  match.add ("when", Librarian<Condition>::library (), Syntax::Const);
-  match.add ("what", Librarian<Filter>::library (), Syntax::Const);
-  match.order ("when", "what");
   syntax.add ("where", Syntax::String, Syntax::Const);
-  syntax.add ("matches", match, Syntax::Const, Syntax::Sequence);
-  syntax.order ("where", "matches");
+  syntax.add ("when", Librarian<Condition>::library (), Syntax::Const);
+  syntax.add ("what", Librarian<Filter>::library (), Syntax::Const);
+  syntax.order ("where", "when", "what");
+  syntax.add ("compact", Syntax::Boolean, Syntax::Const);
+  alist.add ("compact", false);
   Librarian<Log>::add_type ("file", alist, syntax, &LogFile::make);
 }
