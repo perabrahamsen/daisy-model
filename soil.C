@@ -33,6 +33,7 @@
 #include "check.h"
 #include "plf.h"
 #include "tmpstream.h"
+#include "mathlib.h"
 #if !(defined (__BORLANDC__) && __BORLANDC__ < 0x0550)
 #include <iomanip>
 #endif
@@ -378,7 +379,7 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
       const double K_aquitard = groundwater.K_aquitard ();
       const double old_end = impl.layers[impl.layers.size () - 1]->end;
       const double Z_horizon
-	= (Z_aquitard > 5.0) ? round (Z_aquitard / 3.0)	: (Z_aquitard / 3.0);
+	= (Z_aquitard > 5.0) ? floor (Z_aquitard / 3.0)	: (Z_aquitard / 3.0);
       const double new_end = old_end - Z_horizon;
       groundwater.set_Z_aquitard (Z_aquitard - Z_horizon);
 

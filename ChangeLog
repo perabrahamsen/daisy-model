@@ -4,6 +4,10 @@
 
 2003-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.74 released.
+
+2003-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* soil_water.C (initialize): Give error if h and Theta does not
 	match, and use h.
 
