@@ -14,7 +14,105 @@ release.
 
 * 2.48
 
-No user visible changes.
+** SMB initialization improved.
+
+The SMB pools are still initialized assuming equilibrium with the rest
+of the system, but the method is now exact rather than an
+approximation.  This will cause small changes in mineralization, less
+if you are using a warming up period.
+
+** Alternative SOM initialization method.
+
+If you do not specify the 'SOM_fractions' horizon parameter, the SOM
+pools will instead be initialized from the total yearly C input, with
+an assumption that SOM2 will be in equilibrium with the rest of the
+system.   You specify the C input with a new 'init' parameter to
+organic matter, like this:
+
+  (OrganicMatter (init (input 1400 [kg C/ha/y])))
+
+If you specify this parameter, it will also be used for initializing
+the SMB pools.  If you do not specify the 'init' 'input' parameter, a
+default value will be calculated from the current input rate of the
+initial AOM content specified by the 'am' parameter to
+'OrganicMatter'.  The default value for the 'am' parameter is
+
+  (OrganicMatter (am (root (weight 1.2 [Mg DM/ha]))))
+
+corresponding to 1.2 tons of dead roots.  This value not likely to
+produce any useful numbers whatsoever.
+
+You can estimate the yearly input by creating a likely crop rotation
+for the rpevious decades, and run it for 10 years with
+
+  (output ("Carbon Balance" (when yearly)))
+
+add the "Fertilizer_C", "Residuals_C_top" and "Residuals_C_soil"
+columns, and take the average yearly value.
+
+Having done that, you will likely want to initialize the 'root'
+parameter to 'init' as well.  The 'root' should be the average
+"Residuals_C_soil".  A full specification for the 'init' parameter
+would be:
+
+  (OrganicMatter (init (input 1400 [kg C/ha/y]) ;Default: use am input.
+                       (end -20 [cm])           ;Default: end of first horizon.
+                       (fractions 0 1 0 [])
+                       (root 480 [kg C/ha/y])
+                       (dist 7 [cm])
+                       (T 7.8 [dg C])           ;Default: from weather file.
+                       (h -100.0 [cm])))
+
+The equilibrium depends on soil clay content, temperature and water
+content.  The clay content will always be taken from the horizons.
+The temperature will be taken from the yearly average specified in the
+weather file, unless overwritten by the 'T' parameter above.  By
+default, the water content is assumed to be at field capacity.
+
+The input is assumed to come from two sources.
+
+1) Old roots whose density will decrease exponentially with the depth
+   as specified by 'dist', for every 'dist' cm you go deeper, the root
+   density will be decrease to half, until it reach the
+   'MaxRootingDepth' soil parameter.
+
+2) (Non-root) crop residuals and organic fertilizer, which will be
+   distributed uniformly into the first horizon, or if specified the
+   value of the 'end' parameter.
+
+Note that 'input' is the total input, including roots.  The default
+values for the 'root' parameter corresponds to 1.2 Mg DM/ha/y.
+
+The 'fractions' parameter determine where the AOM pools will end up,
+the three numbers represent SMB1, SMB2 and SOM2 in that sequence.  By
+default, everything will be eaten by SMB2 as shown in the example.
+
+Most users will only want to set the 'input' and perhaps 'root'
+parameters.
+
+You can see the calculated initial values for the SOM and SMB pools in
+the 'daisy.log' file, and follow their changes with the
+"Organic Matter" log model.
+
+If you specify a very high input for a soil with a very low humus
+content, Daisy will be unable to use this method for initialization,
+and stop with an error.  The amount of SOM2 where the system is in
+balance will be higher than the total amount of C in the soil.  In the
+real world the system will not be in short-term balance either, you
+will see that as a quick build-up of humus in the soil.
+
+In reality, most systems will not be in short-term balance, to reach
+even a short-term balance you need to run with similar input levels
+for decades which is unusual.  Therefore, you should set SOM_fractions
+explicitly if you have any data that will allow you to estimate the
+mineralization.
+
+If you have measured nitrogen content at harvest, you can fit the
+SOM_fractions parameter until the simulated nitrogen content matches
+the measured nitrogen content.  Increase the SOM2 fraction if the
+simulated nitrogen content is too low to speed up mineralization, and
+increase the SOM1 fraction if the simulated nitrogen content is too
+high to slow down mineralization.
 
 * 2.47
 

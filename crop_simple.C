@@ -385,7 +385,7 @@ CropSimple::CropSimple (const AttributeList& al)
     spring_dd (al.integer_sequence ("spring")[1]),
     spring_LAI (al.number ("spring_LAI")),
     root_system (*new RootSystem (al.alist ("Root"))),
-    WRoot (al.number ("root_DM") * 100.0), // [T DM / ha] -> [g DM / m^2]
+    WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     NRoot (al.number ("root_N") * 0.1),	// [kg N / ha] -> [g N / m^2]
     root_am (al.alist_sequence ("root_am")),
     N_potential (al.number ("potential_N") * 0.1),	// [kg N / ha] -> [g N / m^2]
@@ -482,7 +482,7 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     alist.add ("spring_LAI", 0.1);
     syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
 			 RootSystem::load_syntax);
-    syntax.add ("root_DM", "T DM/ha", Check::non_negative (), Syntax::Const, 
+    syntax.add ("root_DM", "Mg DM/ha", Check::non_negative (), Syntax::Const, 
 		"Fully developed root drymatter.");
     alist.add ("root_DM", 2.0);
     syntax.add ("root_N", "kg N/ha", Check::non_negative (), Syntax::Const,

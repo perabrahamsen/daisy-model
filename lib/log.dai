@@ -1011,23 +1011,23 @@ the sum of all chemicals."
                    (factor 1.0))        ;cm [-inf:0]
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod WLeaf)
-                   (dimension "Ton DM/ha")
+                   (dimension "Mg DM/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod WDead)
-                   (dimension "Ton DM/ha")
+                   (dimension "Mg DM/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod WStem)
-                   (dimension "Ton DM/ha")
+                   (dimension "Mg DM/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod WSOrg)
-                   (dimension "Ton DM/ha")
+                   (dimension "Mg DM/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod WRoot)
-                   (dimension "Ton DM/ha")
+                   (dimension "Mg DM/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          CrpN AccFixated)
@@ -1063,35 +1063,35 @@ the sum of all chemicals."
                          Harvest cut_stress))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CLeaf)
-                   (dimension "Ton C/ha")
+                   (dimension "Mg C/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CDead)
-                   (dimension "Ton C/ha")
+                   (dimension "Mg C/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CStem)
-                   (dimension "Ton C/ha")
+                   (dimension "Mg C/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CSOrg)
-                   (dimension "Ton C/ha")
+                   (dimension "Mg C/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CRoot)
-                   (dimension "Ton C/ha")
+                   (dimension "Mg C/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CH2OPool)
-                   (dimension "Ton C/ha")
+                   (dimension "Mg C/ha")
                    (factor 0.004))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod C_Loss)
-                   (dimension "Ton C/ha")
+                   (dimension "Mg C/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod AccNetPhotosynthesis)
-                   (dimension "Ton CO2-C/ha")
+                   (dimension "Mg CO2-C/ha")
                    (factor 0.00272727))
 ;           (number (path column "$col" Vegetation crops crops "$crop"
 ;                         Prod GrowthRespiration)
@@ -1140,7 +1140,7 @@ the sum of all chemicals."
                    (factor 1.0))        ;Leaf Area Index [0:inf]
            (number (path column "$col" Vegetation crops crops "$crop"
                          Prod WLeaf)
-                   (dimension "Ton DM/ha")
+                   (dimension "Mg DM/ha")
                    (factor 0.01))))
 
 (deflog "Simple Crop Production" table
@@ -1196,13 +1196,13 @@ the sum of all chemicals."
                    (dimension "cm")
                    (factor 1.0))        ;cm [-inf:0]
            (number (path column "$col" Vegetation crops crops "*" Prod WLeaf)
-                   (dimension "Ton DM/ha") ;Actually stem + leaf + grain
+                   (dimension "Mg DM/ha") ;Actually stem + leaf + grain
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "*" Prod WSOrg)
-                   (dimension "Ton DM/ha") ;Beet & Potatoes only
+                   (dimension "Mg DM/ha") ;Beet & Potatoes only
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "*" Prod WRoot)
-                   (dimension "Ton DM/ha")
+                   (dimension "Mg DM/ha")
                    (factor 0.01))
            (number (path column "$col" Vegetation crops crops "*"
                          CrpAux Fixated)

@@ -43,7 +43,7 @@ struct VegetationPermanent : public Vegetation
 
   // Nitrogen.
   const double N_per_LAI;	// Pot N content as function of LAI [g N/m^2]
-  const double DM_per_LAI;	// DM as function of LAI [T DM/ha]
+  const double DM_per_LAI;	// DM as function of LAI [Mg DM/ha]
   double N_demand;		// Current potential N content. [g N/m^2]
   double N_actual;		// Current N content. [g N/m^2]
   AM* litter;			// Dead plant matter.
@@ -251,7 +251,7 @@ VegetationPermanent::VegetationPermanent (const AttributeList& al)
     N_litter (0.0),
     litter_am (al.alist_sequence ("litter_am")),
     root_system (*new RootSystem (al.alist ("Root"))),
-    WRoot (al.number ("root_DM") * 100.0), // [T DM / ha] -> [g DM / m^2]
+    WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
     albedo_ (al.number ("Albedo"))
 {
   canopy.Height = al.number ("Height");
@@ -285,7 +285,7 @@ VegetationPermanentSyntax
     syntax.add ("N_per_LAI", "kg N/ha/LAI", Syntax::Const,
 		"N content as function of LAI.");
     alist.add ("N_per_LAI", 10.0);
-    syntax.add ("DM_per_LAI", "t DM/ha/LAI", Syntax::Const,
+    syntax.add ("DM_per_LAI", "Mg DM/ha/LAI", Syntax::Const,
 		"DM as function of LAI.");
     alist.add ("DM_per_LAI", 0.5);
     syntax.add ("N_demand", "g N/m^2", Syntax::LogOnly,
@@ -301,7 +301,7 @@ VegetationPermanentSyntax
     alist.add ("litter_am", AM::default_AM ());
     syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
 			 RootSystem::load_syntax);
-    syntax.add ("root_DM", "T DM/ha", Syntax::Const, 
+    syntax.add ("root_DM", "Mg DM/ha", Syntax::Const, 
 		"Permanent root drymatter.");
     alist.add ("root_DM", 2.0);
     syntax.add ("Albedo", "", Syntax::Const, 

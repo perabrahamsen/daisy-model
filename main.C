@@ -132,5 +132,6 @@ main (int argc, char* argv[])
     {
       treelog.error ("Unknown exception");
     }
-  exit (1);}
+  return 1;
+}
       

@@ -71,7 +71,7 @@ public:
   AM* find_am (const string& sort, const string& part) const;
 public:
   void initialize (const AttributeList&, const Soil&, const SoilWater&, 
-		   Treelog&);
+		   double T_avg, Treelog&);
   static void load_syntax (Syntax&, AttributeList&);
   OrganicMatter (const AttributeList&);
   ~OrganicMatter ();

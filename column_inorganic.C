@@ -55,6 +55,12 @@ public:
 
   // Create and Destroy.
 public:
+void initialize (const Time& time, Treelog& err, 
+		 const Weather* global_weather)
+  {
+    Treelog::Open nest (err, name);
+    ColumnBase::initialize (time, err, global_weather);
+  }
   Column& clone (const string& name) const
   { 
     AttributeList new_alist (alist);

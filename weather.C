@@ -185,6 +185,10 @@ Weather::T_normal (const Time& time, double delay) const
     * cos (rad_per_day * (time.yday () - max_Ta_yday) + delay);
 }
 
+double 
+Weather::average_temperature () const
+{ return T_average; }
+
 double
 Weather::AirDensity (double AtmPressure, double Temp) // [kg/m3]
 {

@@ -1,12 +1,29 @@
+2003-02-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (AM_Syntax): Use Mg instead of T (or t).
+	* vegetation_permanent.C (VegetationPermanentSyntax) Ditto.
+	* crop_simple.C (CropSimpleSyntax): Ditto.
+	* lib/log.dai: Use Mg instead of Ton.
+
 2003-02-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* soil.C (end_of_first_horizon): New function.
 	* gaussj.C, gaussj.h: New utility.
 	* Makefile (OTHER): Add it.
 	* horizon.C, horizon.h, soil.h (SOM_C, SOM_C_per_N): Removed.
 	(humus_C, SOM_C_per_N, SOM_fractions): New functions.
 	* mathlib.C (rate_to_halftime): New function.
 	* organic_matter.C (input_from_am, partition): New functions.
+	(Initialization) New submodel.
 	(initialize): Use them
+	(check_alist): More checks.
+	* weather.C, weather.h (average_temperature): New function.
+	* organic_matter.C (initialize): Take new T_avg argument.
+	* column_std.C (initialize): Update caller.
+
+	* column_std.C, column_base.C (initialize): Move Treelog header to
+	ColumnStandard. 
+	* column_inorganic.C (initialize): New function.
 
 2003-02-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 

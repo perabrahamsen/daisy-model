@@ -61,6 +61,7 @@ struct TreelogDual::Implementation
   
   ~Implementation ()
   {
+    flush ();
     if (one)
       {
 	if (!one->good ())

@@ -1,10 +1,14 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Flyt daisy.ico til hjemmeside.
+* check Borland C++
+
+* Make dist
+
+* initialiser SOM_fractions fra C_input (== initial AM).
+
+** Tilføj beskrivelse til tutorial.
 
 * exercises 
-
-** SH: Læg svar på øvelser på hjemmeside.
 
 ** Konverter til LaTeX
 
@@ -21,13 +25,11 @@ Makroporerne skal gå ned til min (1.5 m,
 Generelt skal makroporerne gå lige ned til 80 cm, hvorefter de stopper
 lineært ned til 150 cm.  
 
-** SH: default parametre
+init = -3 [cm], end = -30 [cm]
 
 * april: ekstra linie i output
 
 I den første linie skal "begyndelsesindhold" stå.
-
-* april: initialiser SOM_fractions fra C_input (== initial AM).
 
 * april: automatisk aquitart horizont
 

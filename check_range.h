@@ -148,4 +148,6 @@ public:
   AboveOrEqual (double lower);
 };
 
+extern const AboveOrEqual Temperature;
+
 #endif // CHECK_RANGE_H

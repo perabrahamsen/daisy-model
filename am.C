@@ -1162,7 +1162,7 @@ By default, the soils maximal rooting depth will be used.");
 	syntax.add ("dist", "cm", Check::positive (), Syntax::Const, "\
 Distance to go down in order to decrease the root density to half the\n\
 original.");
-	syntax.add ("weight", "T DM/ha", Check::non_negative (), Syntax::Const, 
+	syntax.add ("weight", "Mg DM/ha", Check::non_negative (), Syntax::Const, 
 		    "Total weight of old root dry matter.");
 	syntax.add_fraction ("total_C_fraction", Syntax::Const, 
 			     "Carbon fraction of total root dry matter");

@@ -107,6 +107,10 @@ private:
 public:
   double T_normal (const Time&, double delay = 0.0) const;
 
+  // OrganicMatter initialization.
+public:
+  double average_temperature () const;
+
   // Communication with external model.
 public:
   virtual void put_precipitation (double prec) = 0;// [mm/d]

@@ -150,6 +150,13 @@ Soil::MaxRootingDepth () const
   return max (-impl.MaxRootingDepth, z (size () - 1));
 }
 
+double
+Soil::end_of_first_horizon () const
+{ 
+  daisy_assert (impl.layers.size () > 0);
+  return impl.layers[0]->end;
+}
+
 bool 
 Soil::check (int som_size, Treelog& err) const
 {
@@ -163,7 +170,7 @@ Soil::check (int som_size, Treelog& err) const
 	  const Horizon& horizon = impl.layers[i]->horizon;
 	  Treelog::Open nest (err, horizon.name);
 	  const int f_size = horizon.SOM_fractions ().size ();
-	  if (f_size != som_size)
+	  if (f_size > 0 && f_size != som_size)
 	    {
 	      Treelog::Open nest (err, "SOM_fractions");
 	      TmpStream tmp;
@@ -172,7 +179,7 @@ Soil::check (int som_size, Treelog& err) const
 	      ok = false;
 	    }
 	  const int n_size = horizon.SOM_C_per_N ().size ();
-	  if (f_size != som_size)
+	  if (n_size != som_size)
 	    {
 	      Treelog::Open nest (err, "SOM_C_per_N");
 	      TmpStream tmp;

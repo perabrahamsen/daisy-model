@@ -145,3 +145,5 @@ AboveOrEqual::check (const double value) const throw (string)
 AboveOrEqual::AboveOrEqual (const double l)
   : lower (l)
 { }
+
+const AboveOrEqual Temperature (-273.15);

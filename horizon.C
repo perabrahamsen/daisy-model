@@ -336,7 +336,9 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     quarts_in_silt (al.number ("quarts_in_silt")),
     quarts_in_sand (al.number ("quarts_in_sand")),
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
-    SOM_fractions (al.number_sequence ("SOM_fractions")),
+    SOM_fractions (al.check ("SOM_fractions") 
+		   ? al.number_sequence ("SOM_fractions")
+		   : vector<double> ()),
     quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
     intervals (al.integer ("intervals"))

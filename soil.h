@@ -90,6 +90,7 @@ public:
 
   // Calculations.
   double MaxRootingDepth () const;
+  double end_of_first_horizon () const;
 
   // Debug.
   void make_table (int i);
