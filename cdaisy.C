@@ -438,7 +438,26 @@ daisy_daisy_check (Daisy* daisy)
 
 extern "C" void EXPORT	
 daisy_daisy_run (Daisy* daisy)
-{ daisy->run (); }
+{
+#ifdef HANDLE_EXCEPTIONS
+  try
+    {
+#endif
+      daisy->run (); 
+#ifdef HANDLE_EXCEPTIONS
+    }
+  catch (const char* error)
+    {
+      CERR << "Exception: " << error << "\n";
+      exit (1);
+    }
+  catch (...)
+    {
+      CERR << "Unhandled exception\n";
+      exit (1);
+    }
+#endif
+}
 
 extern "C" void EXPORT
 daisy_daisy_start (Daisy* daisy)
@@ -450,33 +469,164 @@ daisy_daisy_is_running (Daisy* daisy)
 
 extern "C" void EXPORT
 daisy_daisy_tick (Daisy* daisy)
-{ daisy->tick (); }
+{
+#ifdef HANDLE_EXCEPTIONS
+  try
+    {
+#endif
+      daisy->tick (); 
+#ifdef HANDLE_EXCEPTIONS
+    }
+  catch (const char* error)
+    {
+      CERR << "Exception: " << error << "\n";
+      exit (1);
+    }
+  catch (...)
+    {
+      CERR << "Unhandled exception\n";
+      exit (1);
+    }
+#endif
+}
 
 extern "C" void EXPORT
 daisy_daisy_tick_action (Daisy* daisy)
-{ daisy->action.doIt (*daisy); }
+{
+#ifdef HANDLE_EXCEPTIONS
+  try
+    {
+#endif
+      daisy->action.doIt (*daisy);
+#ifdef HANDLE_EXCEPTIONS
+    }
+  catch (const char* error)
+    {
+      CERR << "Exception: " << error << "\n";
+      exit (1);
+    }
+  catch (...)
+    {
+      CERR << "Unhandled exception\n";
+      exit (1);
+    }
+#endif
+}
 
 extern "C" void EXPORT
 daisy_daisy_tick_weather (Daisy* daisy)
-{ daisy->weather.tick (daisy->time); }
+{
+#ifdef HANDLE_EXCEPTIONS
+  try
+    {
+#endif
+      daisy->weather.tick (daisy->time); 
+#ifdef HANDLE_EXCEPTIONS
+    }
+  catch (const char* error)
+    {
+      CERR << "Exception: " << error << "\n";
+      exit (1);
+    }
+  catch (...)
+    {
+      CERR << "Unhandled exception\n";
+      exit (1);
+    }
+#endif
+}
 
 extern "C" void EXPORT
 daisy_daisy_tick_columns (Daisy* daisy)
 {
-  daisy->tick_columns ();
+#ifdef HANDLE_EXCEPTIONS
+  try
+    {
+#endif
+      daisy->tick_columns ();
+#ifdef HANDLE_EXCEPTIONS
+    }
+  catch (const char* error)
+    {
+      CERR << "Exception: " << error << "\n";
+      exit (1);
+    }
+  catch (...)
+    {
+      CERR << "Unhandled exception\n";
+      exit (1);
+    }
+#endif
 }
 
 extern "C" void EXPORT
 daisy_daisy_tick_column (Daisy* daisy, int col)
-{ daisy->field.find (col)->tick (daisy->time, daisy->weather); }
+{
+#ifdef HANDLE_EXCEPTIONS
+  try
+    {
+#endif
+      daisy->field.find (col)->tick (daisy->time, daisy->weather);
+#ifdef HANDLE_EXCEPTIONS
+    }
+  catch (const char* error)
+    {
+      CERR << "Exception: " << error << "\n";
+      exit (1);
+    }
+  catch (...)
+    {
+      CERR << "Unhandled exception\n";
+      exit (1);
+    }
+#endif
+}
 
 extern "C" void EXPORT
 daisy_daisy_tick_logs (Daisy* daisy)
-{ daisy->tick_logs (); }
+{
+#ifdef HANDLE_EXCEPTIONS
+  try
+    {
+#endif
+      daisy->tick_logs (); 
+#ifdef HANDLE_EXCEPTIONS
+    }
+  catch (const char* error)
+    {
+      CERR << "Exception: " << error << "\n";
+      exit (1);
+    }
+  catch (...)
+    {
+      CERR << "Unhandled exception\n";
+      exit (1);
+    }
+#endif
+}
 
 extern "C" void EXPORT		// Run time a single time step.
 daisy_daisy_tick_time (Daisy* daisy)
-{ daisy->time.tick_hour (); }
+{
+#ifdef HANDLE_EXCEPTIONS
+  try
+    {
+#endif
+      daisy->time.tick_hour (); 
+#ifdef HANDLE_EXCEPTIONS
+    }
+  catch (const char* error)
+    {
+      CERR << "Exception: " << error << "\n";
+      exit (1);
+    }
+  catch (...)
+    {
+      CERR << "Unhandled exception\n";
+      exit (1);
+    }
+#endif
+}
 
 // @@ Manipulating the simulation.
 

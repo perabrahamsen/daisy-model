@@ -1,3 +1,22 @@
+1999-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.60 released.
+
+1999-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C: SH Update.
+	
+	* cdaisy.C (daisy_daisy_run): Catch exceptions.
+	(daisy_daisy_tick): Ditto.
+	(daisy_daisy_tick_action): Ditto.
+	(daisy_daisy_tick_weather): Ditto.
+	(daisy_daisy_tick_columns): Ditto.
+	(daisy_daisy_tick_column): Ditto.
+	(daisy_daisy_tick_logs): Ditto.
+	(daisy_daisy_tick_time): Ditto.
+
+	* cmain.c (main): Support `-v'.
+
 1999-01-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.59 released.

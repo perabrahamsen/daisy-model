@@ -3,6 +3,7 @@
 #include "cdaisy.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int 
 main (int argc, char* argv[])
@@ -22,6 +23,13 @@ main (int argc, char* argv[])
 
   /* Link and initialize the daisy subsystem. */
   daisy_initialize ();
+
+  /* Check for -v */
+  if (strcmp (argv[1], "-v") == 0)
+    {
+      fprintf (stderr, "Version %s\n", daisy_version ());
+      exit (0);
+    }
 
   /* Initialize syntax and attribute list. */
   syntax = daisy_syntax_create ();
