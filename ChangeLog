@@ -1,4 +1,22 @@
+2003-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.78 released.
+
+2003-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_hypres.C (topsoil): New parameter.
+
+	* select_date.C: Resurrected.
+	* Makefile (MODELS): Added it.
+	* log.h (output): Restored virtual function.
+	* log_alist.C, log_select.C, log_select.h (output): Implement it.
+	* select.C, select.h (output_time): Restored virtual function.
+
 2003-05-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (K_aquitard): Changed default value from 1e-5
+	to 1e-4 [cm/h].
+	* txt/tutorial.tex (subsection{Groundwater and Drainage}): Updated.
 
 	* Version 2.77 released.
 

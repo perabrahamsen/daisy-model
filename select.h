@@ -31,6 +31,7 @@
 
 struct Geometry;
 struct Daisy;
+struct Time;
 
 typedef map<string, string, less<string>/**/> string_map;
 
@@ -112,6 +113,7 @@ public:
   virtual void output_integer (const int);
   virtual void output_name (const string&);
   virtual void output_array (const vector<double>&, const Geometry*);
+  virtual void output_time (const Time&); // Obsolete
 
   // Reset at start of time step.
 public:

@@ -729,7 +729,7 @@ By default, this is 1/2 L.");
       alist.add ("pipe_position", -110.0);
       syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Syntax::Const,
 		  "Conductivity of the aquitard.");
-      alist.add ("K_aquitard", 1.0E-5);
+      alist.add ("K_aquitard", 1e-4);
       syntax.add ("Z_aquitard", "cm", Check::positive (), Syntax::Const,
 		  "Thickness of the aquitard.\n\
 The aquitard begins below the bottommost soil horizon.");

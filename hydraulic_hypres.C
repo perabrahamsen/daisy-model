@@ -31,6 +31,7 @@
 class HydraulicHypres : public Hydraulic
 {
   // Content.
+  enum { top, bottom, unknown } soil_type;
   /* const */ double alpha;
   /* const */ double a;		// - alpha
   /* const */ double n;
@@ -139,6 +140,14 @@ HydraulicHypres::initialize (double clay, double silt, double sand,
 			     Treelog& msg)
 {
   Treelog::Open nest (msg, name);
+
+  if (soil_type == top)
+    top_soil = true;
+  else if (soil_type == bottom)
+    top_soil = false;
+  else
+    daisy_assert (soil_type == unknown);
+
   if (rho_b <= 0.0)
     {
       msg.error ("\
@@ -218,7 +227,8 @@ pedotransfer function");
   // Debug messages.
   TmpStream tmp;
   tmp () << ";; clay = " << clay << ", silt = " << silt << ", sand = "
-	 << sand << ", humus = " << humus << "\n";
+	 << sand << ", humus = " << humus << ", rho_b = " << rho_b 
+	 << (top_soil ? " (topsoil) " : " (subsoil)") << "\n";
   tmp () << "M_vG\n";
   tmp () << "(l " << l << ")\n";
   tmp () << ";; (m " << m << ")\n";
@@ -232,6 +242,9 @@ pedotransfer function");
 
 HydraulicHypres::HydraulicHypres (const AttributeList& al)
   : Hydraulic (al),
+    soil_type (al.check ("topsoil") 
+	       ? (al.flag ("topsoil") ? top : bottom)
+	       : unknown),
     alpha (-42.42e42),
     a (-42.42e42),
     n (-42.42e42),
@@ -268,6 +281,11 @@ static struct HydraulicHypresSyntax
 Parameters specified by the HYPRES transfer function.\n\
 See <http://mluri.sari.ac.uk/hypres.html>.");
     Hydraulic::load_K_sat_optional (syntax, alist);
+    syntax.add ("topsoil", Syntax::Boolean, Syntax::OptionalConst, "\
+If set true this horizon will be initialized as a topsoil (i.e. the\n\
+plowing layer), if set false it will be initialized as a subsoil.\n\
+By default, the horizon will be initialized as a topsoil if and only if\n\
+it is the topmost horison in the soil profile.");
     Librarian<Hydraulic>::add_type ("hypres", alist, syntax, 
 				    &HydraulicHypres::make);
   }

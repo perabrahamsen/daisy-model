@@ -449,6 +449,10 @@ LogAList::output (symbol name, const PLF& value)
     alist ().add (sname, value);
 }
 
+void				// Obsolete.
+LogAList::output (symbol, const Time&)
+{ }
+
 bool
 LogAList::check (const Syntax&, Treelog&) const
 { return true; }

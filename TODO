@@ -1,28 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Hypres
-
-Optional top_soil parameter
-
-Udskriv top_soil og bd i log fil.
-
 * horizon texture
 
 Gør det muligt at give fejl hvis summen er forskellig fra 1.0 (100%).
 
 * Log models
-
-** Kig på GPROF
-
-Check om STL iterator i output_number er hurtigere.
-
-** select: when hourly -> accumulate true
-
-We need a flux_variable instead of impl.consition
-
-We need to inline Select::match for speed!
-
-** Lav distribution.
 
 ** keep total_accumulated
 

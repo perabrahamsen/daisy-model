@@ -335,6 +335,10 @@ void
 Select::output_array (const vector<double>&, const Geometry*)
 { throw ("This log selection can't log arrays."); }
 
+void 
+Select::output_time (const Time&)
+{ throw ("This log selection can't log time values."); }
+
 bool
 Select::prevent_printing ()
 { return false; }

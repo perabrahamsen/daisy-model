@@ -130,6 +130,7 @@ Daisy::tick_logs (Treelog& out)
 	  Log& log = *active_logs[i];
 	  if (log.match (*this, out))
 	    {
+	      output_variable (time, log); // Obsolete.
 	      output_submodule (time, "time", log);
 	      if (weather)
 		output_derived (*weather, "weather", log);

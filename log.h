@@ -29,6 +29,7 @@
 class Daisy;
 class PLF;
 class Geometry;
+class Time;			// Obsolete.
 
 class Log
 {
@@ -212,6 +213,7 @@ public:
   void output (symbol name, symbol value);
   virtual void output (symbol, const vector<double>&) = 0;
   virtual void output (symbol, const PLF&) = 0;
+  virtual void output (symbol, const Time&) = 0; // Obsolete.
 
   // Keep track of geometry for logging arrays.
 public:

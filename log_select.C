@@ -218,6 +218,16 @@ void
 LogSelect::output (symbol, const PLF&)
 { }
 
+void 
+LogSelect::output (symbol name, const Time& value)
+{ 
+  const vector<Select*>& sels = active_stack.top ();
+
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_time (value);
+}
+
 bool 
 LogSelect::check (const Syntax&, Treelog& err) const
 {

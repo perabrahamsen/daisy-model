@@ -12,6 +12,36 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.78
+
+** The old log file syntax is restored.
+
+You can now again begin log file parameterizations with
+
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (hour (path time))
+
+but you will get a warning to shift to the new syntax mentioned in the
+entry for 2.73.
+
+** More control over the 'hypres' hydraulic model.
+
+By default, the top horizon will be initialized by 'hypres' as a
+topsoil, and the rest as subsoil.  You can now control this by
+specifying the topsoil parameter.
+
+(defhorizon Ap default
+  (hydraulic hypres (topsoil true)))
+
+(defhorizon C default
+  (hydraulic hypres (topsoil false)))
+
+** Changed default value for K_aquitard to 1e-4 [cm/h].
+
+This groundwater pipe parameter used to default to 1e-5 [cm/h].
+
 * 2.77
 
 ** A bit more speedups and cleanups to logging.

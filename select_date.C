@@ -29,14 +29,8 @@ struct SelectDate : public Select
   Time value;			// Date.
 
   // Output routines.
-  void output_time (const string& name, const Time& time)
+  void output_time (const Time& time)
     { 
-      if (!is_active ())
-	return;
-
-      if (!valid (name))
-	return;
-
       value = time;
       count++;
     }
@@ -148,11 +142,29 @@ static struct SelectDateSyntax
   static Select& make_wday (const AttributeList& al)
     { return *new SelectWDay (al); }
 
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  {
+    static bool warned = false;
+    bool ok = true;
+    if (!warned)
+      {
+	warned = true;
+	const symbol type = al.identifier ("type");
+	err.warning ("OBSOLETE SYNTAX:\n\
+Instead of writting\n\
+  (" + type + " (path time))\n\
+you should write\n\
+  (number (path time " + type + "))");
+      }
+    return ok;
+  }
+
   SelectDateSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList alist;
       Select::load_syntax (syntax, alist);
+      syntax.add_check (check_alist);
 
       AttributeList& alist_year = *new AttributeList (alist);
       alist_year.add ("description", "Extract specified year.");
@@ -174,24 +186,10 @@ static struct SelectDateSyntax
       alist_yday.add ("description", "Extract specified day in the year.");
       alist_yday.add ("tag", "yday");
 
-#if 0
-      AttributeList& alist_week = *new AttributeList (alist);
-      alist_week.add ("description", "Extract specified week number.");
-      alist_week.add ("tag", "week");
-
-      AttributeList& alist_wday = *new AttributeList (alist);
-      alist_wday.add ("description", "Extract specified day in the week.");
-      alist_wday.add ("tag", "wday");
-#endif
-
       Librarian<Select>::add_type ("year", alist_year, syntax, &make_year);
       Librarian<Select>::add_type ("month", alist_month, syntax, &make_month);
       Librarian<Select>::add_type ("mday", alist_mday, syntax, &make_mday);
       Librarian<Select>::add_type ("hour", alist_hour, syntax, &make_hour);
       Librarian<Select>::add_type ("yday", alist_yday, syntax, &make_yday);
-#if 0 
-      Librarian<Select>::add_type ("week", alist_week, syntax, &make_week);
-      Librarian<Select>::add_type ("wday", alist_wday, syntax, &make_wday);
-#endif
     }
 } Select_syntax;

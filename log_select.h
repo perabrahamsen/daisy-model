@@ -86,6 +86,7 @@ struct LogSelect : public Log
   void output (symbol name, const string& value);
   void output (symbol name, const vector<double>& value);
   void output (symbol name, const PLF&);
+  void output (symbol name, const Time&); // Obsolete.
 
   // Create and Destroy.
   bool check (const Syntax&, Treelog& err) const;
