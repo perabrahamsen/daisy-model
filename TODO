@@ -1,5 +1,15 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Kør 2.49, 2.51 og 2.52 og sammenlign med hastighed.
+
+* exercises 
+
+** Konverter til LaTeX
+
+** Ret til.
+
+* MMM: Test om man kan linke hugin fra Linux.
+
 * april: ekstra linie i output
 
 I den første linie skal "begyndelsesindhold" stå.
@@ -25,11 +35,6 @@ Al mineralisering fra første horizont?
 ** Akademisk bekrivelse?
 
 Til referencemanual?
-* exercises 
-
-** Konverter til LaTeX
-
-** Ret til.
 
 * SH: PowerPoint slides på hjemmeside.
 
@@ -48,6 +53,10 @@ Skal kunne være afhængig af kvælstof og temperatur.
 * Make it possible to specify texture using differnet systems
 
 Different sizes for sand, silt, and clay, plus allow other types.
+
+* SH: ændring af rodoptagelse r_min
+
+* SH: genvækst af græs
 
 * Irrigation
 

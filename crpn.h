@@ -67,6 +67,11 @@ private:
   double CrNCnt;		// Critical Nitrogen Content in Crop [g/m2]
   double NfNCnt;		// Non-func Nitrogen Content in Crop [g/m2]
 
+  // Root uptake.
+private:
+  double NO3_root_min;		// Minimum NO3 conc near roots [g N/cm^3]
+  double NH4_root_min;		// Minimum NH4 conc near roots [g N/cm^3]
+
   // Fixation.
 private:
   const double DS_fixate;	// Fixation of atmospheric N. after this DS

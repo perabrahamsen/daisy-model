@@ -199,7 +199,8 @@ RootSystem::solute_uptake (const Soil& soil,
 			   Solute& solute,
 			   double PotNUpt,
 			   vector<double>& uptake,
-			   double const I_max)
+			   const double I_max,
+			   const double C_root_min)
 {
   if (PotNUpt <= 0.0)
     {
@@ -210,11 +211,12 @@ RootSystem::solute_uptake (const Soil& soil,
   daisy_assert (PotNUpt > 0.0);
   PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
   const int size = soil.size ();
+  // I: Uptake per root length.
+  // I = I_zero - B_zero * C_root
   vector<double> I_zero (size, 0.0);
   vector<double> B_zero (size, 0.0);
-  double U_zero = 0.0;
+  double U_zero = 0.0;		// Total uptake a C_root_min
   double B = 0.0;
-  double c_root = 0.0;
 
   for (int i = 0; i < size; i++)
     {
@@ -255,11 +257,13 @@ RootSystem::solute_uptake (const Soil& soil,
 	  daisy_assert (finite (I_zero[i]));
 	  daisy_assert (finite (B_zero[i]));
 	  B += L * soil.dz (i) * B_zero[i];
-	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
+	  U_zero += L * soil.dz (i) 
+	    * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
 	}
     }
+  double C_root = C_root_min;
   if (U_zero > PotNUpt)
-    c_root = (U_zero - PotNUpt) / B;
+    C_root = max ((U_zero - PotNUpt) / B, C_root_min);
 
   for (int i = 0; i < size; i++)
     {
@@ -267,7 +271,7 @@ RootSystem::solute_uptake (const Soil& soil,
       if (solute.M_left (i) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
 	uptake[i] = bound (0.0,
 			   L * (min (I_zero[i], I_max)
-				- B_zero[i] * c_root),
+				- B_zero[i] * C_root),
 			   max (solute.M_left (i) - 1e-8, 0.0));
       else
 	uptake[i] = 0.0;
@@ -283,13 +287,16 @@ double
 RootSystem::nitrogen_uptake (const Soil& soil,
 			     const SoilWater& soil_water,
 			     SoilNH4& soil_NH4,
+			     const double NH4_root_min,
 			     SoilNO3& soil_NO3,
+			     const double NO3_root_min,
 			     const double PotNUpt)
 {
   NH4Upt = solute_uptake (soil, soil_water, soil_NH4, 
-			  PotNUpt, NH4Extraction, MxNH4Up);
+			  PotNUpt, NH4Extraction, MxNH4Up, NH4_root_min);
   NO3Upt = solute_uptake (soil, soil_water, soil_NO3, 
-			  PotNUpt - NH4Upt, NO3Extraction, MxNO3Up);
+			  PotNUpt - NH4Upt, NO3Extraction, 
+			  MxNO3Up, NO3_root_min);
 
   daisy_assert (NH4Upt >= 0.0);
   daisy_assert (NO3Upt >= 0.0);

@@ -94,7 +94,8 @@ CrpN::update (const int Hour, double& NCrop, const double DS,
   double PotNUpt = (PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
 
   const double NUpt = root_system.nitrogen_uptake (soil, soil_water, 
-						   soil_NH4, soil_NO3,
+						   soil_NH4, NH4_root_min, 
+						   soil_NO3, NO3_root_min,
 						   PotNUpt);
   NCrop += NUpt;
   PotNUpt -= NUpt;
@@ -211,6 +212,16 @@ Non-functional lim for N-concentration in roots.");
   syntax.add ("NfNCnt", "g/m^2", Syntax::LogOnly,
 	      "Non-functional nitrogen content in crop.");
 
+  // Root uptake.
+  syntax.add ("NO3_root_min", "g N/cm^3", Check::non_negative (), 
+	      Syntax::Const, "\
+Minimum nitrate concentration near roots for uptake.");
+  alist.add ("NO3_root_min", 0.0);
+  syntax.add ("NH4_root_min", "g N/cm^3", Check::non_negative (),
+	      Syntax::Const, "\
+Minimum ammonium concentration near roots for uptake.");
+  alist.add ("NH4_root_min", 0.0);
+
   // Fixation.
   syntax.add ("DS_fixate", Syntax::None (), Syntax::Const,
 	      "DS at which to start fixation of atmospheric N.");
@@ -249,6 +260,8 @@ CrpN::CrpN (const AttributeList& al)
     PtNCnt (0.0),
     CrNCnt (0.0),
     NfNCnt (0.0),
+    NO3_root_min (al.number ("NO3_root_min")),
+    NH4_root_min (al.number ("NH4_root_min")),
     DS_fixate (al.number ("DS_fixate")),
     DS_cut_fixate (al.number ("DS_cut_fixate")),
     fixate_factor (al.number ("fixate_factor")),

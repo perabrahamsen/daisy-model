@@ -259,7 +259,8 @@ CropSimple::tick (const Time& time,
 	{
 	  daisy_assert (soil_NH4);
 	  N_actual += root_system.nitrogen_uptake (soil, soil_water, 
-						   *soil_NH4, *soil_NO3,
+						   *soil_NH4, 0.0, 
+						   *soil_NO3, 0.0,
 						   N_demand - N_actual);
 	}
       else

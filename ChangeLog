@@ -1,3 +1,13 @@
+2003-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crpn.C, crpn.h (NO3_root_min, NH4_root_min): New parameters.
+	* root_system.C (solute_uptake): New 'C_root_min' argument.
+	(nitrogen_uptake): Update caller.
+	(nitrogen_uptake): New 'NO3_root_min' and 'NH4_root_min'
+	parameters. 
+	* crop_simple.C (tick): Update caller.
+	* crpn.C (update): Update caller.
+
 2003-02-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.52 released.

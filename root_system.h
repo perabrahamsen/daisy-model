@@ -96,12 +96,14 @@ public:
 private:
   double solute_uptake (const Soil&, const SoilWater&, Solute&,
 			double PotNUpt, vector<double>& uptake,
-			double i_max);
+			double i_max, double C_root_min);
 public:
   double nitrogen_uptake (const Soil& soil,
 			  const SoilWater& soil_water,
 			  SoilNH4& soil_NH4,
+			  double NH4_root_min,
 			  SoilNO3& soil_NO3,
+			  double NO3_root_min,
 			  double PotNUpt);
 
   // Simulation.

@@ -12,6 +12,17 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.53
+
+** You can now specify the minimum concentration for nitrogen uptake.
+
+Example:
+
+(defcrop "MyGrass" "Grass"
+  "Don't assume zero sink for nitrogen uptake."
+  (CrpN (NO3_root_min 1e-8 [g N/cm^3])
+	(NH4_root_min 1e-9 [g N/cm^3])))
+
 * 2.52
 
 ** No changes.
