@@ -25,22 +25,22 @@ extern "C"
 #endif
 
 #ifndef __unix
-// #define MESSAGE_LOG "daisy.msg"
+#define MESSAGE_LOG
 #endif
 
 #ifdef MESSAGE_LOG
 #include <fstream>
-ofstream message_log (MESSAGE_LOG);
+ofstream message_log (getenv ("DAISY_LOG") ? getenv ("DAISY_LOG") : "nul");
 #endif
 
 ostream& 
 Options::message ()
 {
 #ifdef MESSAGE_LOG
-  return message_log;
-#else
-  return cout; 
+  if (getenv ("DAISY_LOG"))
+    return message_log;
 #endif
+  return cout; 
 }
 
 ostream& 
@@ -51,13 +51,14 @@ ostream&
 Options::error ()
 { 
 #ifdef MESSAGE_LOG
-  return message_log;
-#else
+  if (getenv ("DAISY_LOG"))
+    return message_log;
+#endif
+
 #ifdef USELESS_STDERR
   return cout;
 #else
   return cerr; 
-#endif
 #endif
 }
 

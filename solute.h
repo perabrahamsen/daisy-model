@@ -6,6 +6,7 @@
 // These must be included in the header file, for `load_syntax' to work.
 #include "adsorption.h"
 #include "transport.h"
+#include "mactrans.h"
 
 struct Log;
 struct Filter;
@@ -23,10 +24,14 @@ protected:
 
   // Flux variables.
 protected:
-  vector<double> S;		// Sink-source term.
-  Transport& transport;		// Solute transport.
+  vector<double> S;		// Combined source term.
+  vector<double> S_p;		// Source term for macropores only.
+  vector<double> J;		// Solute transport log in matrix.
+  vector<double> J_p;		// Solute transport log in macropores.
+  Transport& transport;		// Solute transport model in matrix.
+  Mactrans& mactrans;		// Solute transport model in macropores.
   Adsorption& adsorption;	// Solute adsorption.
-
+  
 public:
   virtual double diffusion_coefficient () const = 0; // in free solute. 
   double C_to_M (const Soil& soil, double Theta, int i, double C) const

@@ -8,6 +8,7 @@
 #include "common.h"
 #include "filter.h"
 #include "log.h"
+#include "average.h"
 
 class UZRichard : public UZmodel
 {
@@ -23,6 +24,7 @@ private:
   int max_iterations;
   double max_absolute_difference;
   double max_relative_difference;
+  const Average* K_average;
 
   // UZmodel.
 public:
@@ -70,8 +72,8 @@ private:
 		vector<double>& q);
 public:
   void tick (const Soil& soil,
-	     int first, const UZtop& top,
-	     int last, const UZbottom& bottom,
+	     unsigned int first, const UZtop& top,
+	     unsigned int last, const UZbottom& bottom,
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
@@ -81,6 +83,7 @@ public:
 
   // Create and Destroy.
 public:
+  void has_macropores (bool); // Tell UZ that there is macropores.
   UZRichard (const AttributeList& par);
   ~UZRichard ();
 };
@@ -433,11 +436,9 @@ UZRichard::internode (const Soil& soil, int first, int last,
 		      vector<double>& Kplus) const
 {
   int size = last - first + 1;
+  assert (K_average != NULL);
   for (int i = 0; i < size; i++)
-    // Should be a user option. 
-    // Kplus[i] = 2 * K[i] * K[i + 1] / (K[i] + K[i + 1]); // Harmonic.
-    // Kplus[i] = sqrt (K[i] * K[i + 1]); // Geometric.
-    Kplus[i] = 0.5 * (K[i] + K[i + 1]); // Arithmetic.
+    Kplus[i] = (*K_average)(K[i], K[i + 1]);
   
   for (int i = 0; i < size; i++)
     if (!soil.compact (first + i))
@@ -499,8 +500,8 @@ calculating flow with pressure top.");
 
 void 
 UZRichard::tick (const Soil& soil,
-		 int first, const UZtop& top, 
-		 int last, const UZbottom& bottom, 
+		 unsigned int first, const UZtop& top, 
+		 unsigned int last, const UZbottom& bottom, 
 		 const vector<double>& S,
 		 const vector<double>& h_old,
 		 const vector<double>& Theta_old,
@@ -525,6 +526,28 @@ UZRichard::output (Log& log, Filter& filter) const
   log.output ("iterations", filter, iterations, true);
 }
 
+void
+UZRichard::has_macropores (bool has_them)
+{ 
+  if (K_average == NULL)
+    {
+      if (has_them)
+	{
+	  static AttributeList geometric;
+	  if (!geometric.check ("type"))
+	    geometric.add ("type", "geometric");
+	  K_average = &Librarian<Average>::create (geometric);
+	}
+      else
+	{
+	  static AttributeList arithmetic;
+	  if (!arithmetic.check ("type"))
+	    arithmetic.add ("type", "arithmetic");
+	  K_average = &Librarian<Average>::create (arithmetic);
+	}
+    }
+}
+
 UZRichard::UZRichard (const AttributeList& al)
   : UZmodel (al.name ("type")),
     // Variables.
@@ -536,7 +559,10 @@ UZRichard::UZRichard (const AttributeList& al)
     time_step_reduction (al.integer ("time_step_reduction")),
     max_iterations (al.integer ("max_iterations")),
     max_absolute_difference (al.number ("max_absolute_difference")),
-    max_relative_difference (al.number ("max_relative_difference"))
+    max_relative_difference (al.number ("max_relative_difference")),
+    K_average (al.check ("K_average")
+	       ? &Librarian<Average>::create (al.alist ("K_average"))
+	       : NULL)
 { }
 
 UZRichard::~UZRichard ()
@@ -578,6 +604,9 @@ Maximum relative difference in `h' values for convergence.");
 		  "Flux up through the bottom of the last node.");
       syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly,
 		  "Number of iterations used,");
+      syntax.add ("K_average", Librarian<Average>::library (),
+		  Syntax::OptionalConst, Syntax::Singleton,
+		  "Model for calculating average K between nodes.");
 
       Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
     }

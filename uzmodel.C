@@ -8,6 +8,10 @@ UZtop::~UZtop ()
 UZbottom::~UZbottom ()
 { }
 
+void
+UZmodel::has_macropores (bool)
+{ }
+
 UZmodel::UZmodel (string n)
   : name (n)
 { }

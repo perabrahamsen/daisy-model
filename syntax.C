@@ -59,7 +59,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
       if ((status[key] == Const || status[key] == State)
 	       && !vl.check (key))
 	{
-	  CERR << "Attributte " << key << " missing\n";
+	  CERR << "Attribute " << key << " missing\n";
 	  error = true;
 	}
       else if (!(status[key] == Const || status[key] == State)

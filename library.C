@@ -196,4 +196,9 @@ Library::Library (const char* name, derive_fun derive,
 }
 
 Library::~Library ()
-{ delete &impl; }
+{ 
+#if 0
+  // BCC doesn't like this.
+  delete &impl; 
+#endif
+}

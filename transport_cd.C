@@ -11,7 +11,6 @@ class TransportCD : public Transport
 {
   // Log variable.
 private:
-  vector<double> J;
   double ddt;
   
   // Simulation.
@@ -20,7 +19,7 @@ public:
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
-	     double J_in);
+	     vector<double>& J);
   void output (Log&, Filter&) const;
 
   // Create.
@@ -34,7 +33,6 @@ public:
 void
 TransportCD::output (Log& log, Filter& filter) const
 {
-  log.output ("J", filter, J, true);
   log.output ("ddt", filter, ddt, true);
 }
 
@@ -44,8 +42,10 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 		   vector<double>& M, 
 		   vector<double>& C,
 		   const vector<double>& S,
-		   double J_in)
+		   vector<double>& J)
 {
+  double J_in = J[0];
+
   // Remember old values.
   vector<double> C_prev = C;
   vector<double> M_prev = M;
@@ -322,8 +322,6 @@ static struct TransportCDSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
 	       "Solute transport using convection-dispersion.");
-    syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
-		"Transport in this time step.");
     syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
 		"Time step used in the numeric solultion.");
     Librarian<Transport>::add_type ("cd", alist, syntax, &make);

@@ -41,7 +41,31 @@ Solute::tick (const Soil& soil,
 	      const SoilWater& soil_water, 
 	      double J_in)
 {
-  transport.tick (soil, soil_water, *this, M_, C_, S, J_in);
+  fill (S_p.begin (), S_p.end (), 0.0);
+  fill (J_p.begin (), J_p.end (), 0.0);
+
+  if (soil_water.q_p (0) < 0.0)
+    {
+      if (soil_water.q (0) >= 0.0)
+	{
+	  if (soil_water.q (0) > 1.0e-10)
+	    CERR << "BUG: q_p[0] = " << soil_water.q_p (0) 
+		 << " and q[0] = " << soil_water.q (0) << "\n";
+	  J_p[0] = J_in;
+	}
+      else
+	{
+	  const double macro_fraction
+	    = soil_water.q_p (0) / (soil_water.q_p (0) + soil_water.q (0));
+	  J_p[0] = J_in * macro_fraction;
+	  J[0] = J_in - J_p[0];
+	}
+    }
+  else
+    J[0] = J_in;
+
+  mactrans.tick (soil, soil_water, C_, S, S_p, J_p);
+  transport.tick (soil, soil_water, *this, M_, C_, S, J);
 }
 
 bool 
@@ -58,22 +82,36 @@ Solute::output (Log& log, Filter& filter) const
   log.output ("C", filter, C_);
   log.output ("M", filter, M_);
   log.output ("S", filter, S, true);
+  log.output ("S_p", filter, S_p, true);
+  log.output ("J", filter, J, true);
+  log.output ("J_p", filter, J_p, true);
 }
 
 void 
 Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("transport", Librarian<Transport>::library (), 
-	      "Solute transport model.");
-  AttributeList& cd = *new AttributeList ();
+	      "Solute transport model in matrix.");
+  AttributeList cd;
   cd.add ("type", "cd");
   alist.add ("transport", cd);
+  syntax.add ("mactrans", Librarian<Mactrans>::library (), 
+	      "Solute transport model in macropores.");
+  AttributeList mactrans;
+  mactrans.add ("type", "default");
+  alist.add ("mactrans", mactrans);
   syntax.add ("adsorption", Librarian<Adsorption>::library (), 
 	      "Soil adsorption properties.");
   Geometry::add_layer (syntax, "C", "g/cm^3", "Concentration in water.");
   Geometry::add_layer (syntax, "M", "g/cm^3", "Mass in water and soil.");
   syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term.");
+  syntax.add ("S_p", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term (macropore trasnport only).");
+  syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Transportation in matrix (positive up).");
+  syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Transportation in macropores (positive up).");
   Geometry::add_layer (syntax, "soil_ppm", "ppm", "Concentration in water.\n\
 Only for initialization of the `M' parameter.");
   Geometry::add_layer (syntax, "solute_ppm", "ppm", "Mass in water and soil.\n\
@@ -82,12 +120,14 @@ Only used for initialization of the `C' parameter.");
 
 Solute::Solute (const AttributeList& al)
   : transport (Librarian<Transport>::create (al.alist ("transport"))),
+    mactrans  (Librarian<Mactrans>::create (al.alist ("mactrans"))),
     adsorption (Librarian<Adsorption>::create (al.alist ("adsorption")))
 { }
 
 Solute::~Solute ()
 { 
   delete &transport; 
+  delete &mactrans;
   delete &adsorption; 
 }
 
@@ -224,4 +264,7 @@ Solute::initialize (const AttributeList& al,
     }
 
   S.insert (S.begin (), soil.size (), 0.0);
+  S_p.insert (S_p.begin (), soil.size (), 0.0);
+  J.insert (J_p.begin (), soil.size () + 1, 0.0);
+  J_p.insert (J_p.begin (), soil.size () + 1, 0.0);
 }

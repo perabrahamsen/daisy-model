@@ -71,6 +71,12 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   // Limit for ponding.
   const int first = 0;
 
+  // Calculate preferential flow first.
+  fill (S_p_.begin (), S_p_.end (), 0.0);
+  fill (q_p_.begin (), q_p_.end (), 0.0);
+  macro.tick (soil, first, last, surface, h_, Theta_, S_, S_p_, q_p_);
+
+  // Calculate matrix flow next.
   try
     {
       if (bottom)
@@ -110,7 +116,10 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 
   // Update flux in groundwater.
   for (unsigned int i = last + 1; i <= soil.size (); i++)
-    q_[i] = q_[i-1];
+    {
+      q_[i] = q_[i-1];
+      q_p_[i] = q_p_[i-1];
+    }
 
   // Update Theta below groundwater table.
   if (!groundwater.flux_bottom ())
@@ -122,7 +131,8 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   // Update surface and groundwater reservoirs.
   const bool top_accepted = surface.accept_top (q_[0] * dt);
   assert (top_accepted);
-  const bool bottom_accepted = groundwater.accept_bottom (q_[last + 1] *dt);
+  const bool bottom_accepted 
+    = groundwater.accept_bottom ((q_[last + 1] + q_p_[last + 1]) * dt);
   assert (bottom_accepted);
 }
 
@@ -182,10 +192,12 @@ void
 SoilWater::output (Log& log, Filter& filter) const
 {
   log.output ("S", filter, S_, true);
+  log.output ("S_p", filter, S_p_, true);
   log.output ("Theta", filter, Theta_);
   log.output ("h", filter, h_);
   log.output ("Xi", filter, Xi);
   log.output ("q", filter, q_, true);
+  log.output ("q_p", filter, q_p_, true);
   output_derived (*top, "UZtop", log, filter);
   if (bottom)
     output_derived (*bottom, "UZbottom", log, filter);
@@ -245,13 +257,23 @@ will be used from there to the bottom.");
   lr.add ("z_top", -10.0);
   alist.add ("UZreserve", lr);
   syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Water sink (due to root uptake).");
+	      "Water sink (due to root uptake and macropores).");
+  syntax.add ("S_p", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Water sink (due to macropores).");
   Geometry::add_layer (syntax, "Theta", "cm^3/cm^3", "Soil water content.");
   Geometry::add_layer (syntax, "h", "cm", "Soil water pressure.");
   syntax.add ("Xi", Syntax::None (), Syntax::OptionalState, Syntax::Sequence,
 	      "Ice fraction in soil.  Not yet implemented.");
   syntax.add ("q", "cm/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Water flux (positive numbers mean upward).");
+	      "Matrix water flux (positive numbers mean upward).");
+  syntax.add ("q_p", "cm/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Water flux in macro pores (positive numbers mean upward).");
+
+  syntax.add ("macro", Librarian<Macro>::library (),
+	      "Preferential flow model.");
+  AttributeList macro;
+  macro.add ("type", "none");
+  alist.add ("macro", macro);
 }
 
 SoilWater::SoilWater (const AttributeList& al)
@@ -262,7 +284,8 @@ SoilWater::SoilWater (const AttributeList& al)
     bottom_start (  al.check ("UZborder") 
 		  ? al.integer ("UZborder")
 		  : -1),
-    reserve (&Librarian<UZmodel>::create (al.alist ("UZreserve")))
+    reserve (&Librarian<UZmodel>::create (al.alist ("UZreserve"))),
+    macro (Librarian<Macro>::create (al.alist ("macro")))
 { }
 
 void
@@ -302,7 +325,9 @@ SoilWater::initialize (const AttributeList& al,
     Xi.insert (Xi.begin (), size, 0.0);
 
   S_.insert (S_.begin (), size, 0.0);
+  S_p_.insert (S_p_.begin (), size, 0.0);
   q_.insert (q_.begin (), size + 1, 0.0);
+  q_p_.insert (q_p_.begin (), size + 1, 0.0);
 
   assert (h_.size () == Theta_.size ());
   if (h_.size () == 0)
@@ -332,11 +357,18 @@ SoilWater::initialize (const AttributeList& al,
   // We just assume no changes.
   Theta_old_ = Theta_;
   h_old = h_;
+
+  // Let `macro' choose the default method to average K values in `uz'.
+  const bool has_macropores = (al.alist ("macro").name ("type") != "none");
+  top->has_macropores (has_macropores);
+  if (bottom)
+    bottom->has_macropores (has_macropores);
 }
 
 SoilWater::~SoilWater ()
 {
   delete top;
+  delete &macro;
 }
 
 static Submodel::Register 

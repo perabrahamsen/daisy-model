@@ -45,8 +45,8 @@ void FertilizeEvent::Do_It(Daisy& daisy,const Time&, EventQueue&)
   // Fertilize the WORLD
   // const AttributeList& am = AM::library ().lookup ("mineral");
   AttributeList am = AttributeList(Librarian<AM>::library ().lookup ("mineral"));
-  am.add("NO3", 50.0e-5);
-  am.add("NH4", 50.0e-5);
+  am.add("weight", 50.0);
+  am.add("NH4_fraction", 0.5);
     // Add inorganic matter.
 #if 0
     if (to < from)

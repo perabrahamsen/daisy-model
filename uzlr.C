@@ -38,8 +38,8 @@ public:
   // Simulate.
 public:
   void tick (const Soil& soil,
-	     int first, const UZtop& top, 
-	     int last, const UZbottom& bottom, 
+	     unsigned int first, const UZtop& top, 
+	     unsigned int last, const UZbottom& bottom, 
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
@@ -55,8 +55,8 @@ public:
 
 void 
 UZlr::tick (const Soil& soil,
-	    int first, const UZtop& top, 
-	    int last, const UZbottom& /* bottom */, 
+	    unsigned int first, const UZtop& top, 
+	    unsigned int last, const UZbottom& /* bottom */, 
 	    const vector<double>& S,
 	    const vector<double>& h_old,
 	    const vector<double>& Theta_old,
@@ -112,7 +112,7 @@ UZlr::tick (const Soil& soil,
 	    }
 	  else if (Theta_next > Theta_sat)
 	    {
-	      q[i+1] = (Theta_new - Theta_sat) * dz / dt;
+	      q[i+1] = (Theta_sat - Theta_new) * dz / dt;
 	      Theta[i] = Theta_sat;
 	      h[i] = 0.0;
 	    }

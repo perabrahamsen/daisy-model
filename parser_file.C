@@ -445,7 +445,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    }
 	    break;
 	  case Syntax::Error:
-	    error (string("Unknown attribute `") + name + "'");
+	    error (string("Unknown singleton `") + name + "'");
 	    skip_to_end ();
 	    break;
 	  default:
@@ -600,7 +600,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		break;
 	      }
 	    case Syntax::Error:
-	      error (string("Unknown sequence `") + name + "'");
+	      error (string("Unknown attribute `") + name + "'");
 	      skip_to_end ();
 	      break;
 	    default:

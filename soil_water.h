@@ -3,6 +3,7 @@
 #ifndef SOIL_WATER_H
 #define SOIL_WATER_H
 
+#include "macro.h"		// Must be included to intitalize the library.
 #include "common.h"
 #include <vector>
 
@@ -20,16 +21,19 @@ class SoilWater
 {
   // Content.
   vector<double> S_;
+  vector<double> S_p_;
   vector<double> Theta_old_;
   vector<double> h_old;
   vector<double> Theta_;
   vector<double> h_;
   vector<double> Xi;
   vector<double> q_;
+  vector<double> q_p_;
   UZmodel *const top;
   UZmodel *const bottom;
   const int bottom_start;
   UZmodel *const reserve;
+  Macro& macro;
 
   // Sink.
 public:
@@ -50,8 +54,12 @@ public:
   { return Theta_old_[i]; }
   double q (int i) const
   { return q_[i]; }
+  double q_p (int i) const
+  { return q_p_[i]; }
   double S (int i) const
   { return S_[i]; }
+  double S_p (int i) const
+  { return S_p_[i]; }
 
   // Simulation.
 public:

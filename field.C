@@ -69,7 +69,7 @@ void
 Field::Implementation::restrict (const string& name)
 {
   if (selected)
-    throw ("Cannot restrict already restrcited field");
+    throw ("Cannot restrict already restricted field");
   selected = find (name);
 
   if (!selected)

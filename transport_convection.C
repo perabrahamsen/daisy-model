@@ -20,7 +20,7 @@ public:
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
-	     const double J_in);
+	     vector<double>& J);
   void output (Log&, Filter&) const;
 
   // Create.
@@ -34,7 +34,6 @@ public:
 void
 TransportConvection::output (Log& log, Filter& filter) const
 {
-  log.output ("J", filter, J, true);
   log.output ("ddt", filter, ddt, true);
 }
 
@@ -44,17 +43,17 @@ TransportConvection::tick (const Soil& soil, const SoilWater& soil_water,
 			   vector<double>& M, 
 			   vector<double>& C,
 			   const vector<double>& S,
-			   const double J_in)
+			   vector<double>& J)
 {
- // Number of soil layers.
+  const double J_in = J[0];
+
+  // Number of soil layers.
   const unsigned int size = soil.size ();
 
   // Remember old content
   const double old_total = soil.total (M) + soil.total (S) * dt;
 
   // Initialize flux.
-  if (size + 1 > J.size ())	// Make room make room!
-    J.insert (J.begin (), size + 1 - J.size (), 0.0);
   fill (J.begin (), J.end (), 0.0);
 
   // Flux in individual time step.
@@ -137,8 +136,6 @@ static struct TransportConvectionSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Transport using convection alone.");
-    syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
-		"Transport in this time step.");
     syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
 		"Time step used in the numeric solultion.");
     Librarian<Transport>::add_type ("convection", alist, syntax, &make);

@@ -15,7 +15,7 @@ public:
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
-	     const double J_in);
+	     vector<double>& J);
   void output (Log&, Filter&) const
     { }
 
@@ -32,20 +32,22 @@ TransportNone::tick (const Soil& soil, const SoilWater& soil_water,
 		     vector<double>& M, 
 		     vector<double>& C,
 		     const vector<double>& S,
-		     const double J_in)
+		     vector<double>& J)
 {
   for (unsigned int i = 0; i < soil.size (); i++)
     {
       M[i] += S[i];
 
       if (i == 0)
-	M[i] -= J_in / soil.dz (0);
+	M[i] -= J[0] / soil.dz (0);
+      else
+	J[i] = 0.0;
 
       C[i] = solute.M_to_C (soil, soil_water.Theta (i), i, M[i]);
       if (!(M[i] >= 0.0))
 	{
 	  CERR << "BUG: M[" << i << "] = " << M[i] 
-	       << "(J_in = " << J_in << ") S[" << i << "] = " << S[i] << "\n";
+	       << "(J_in = " << J[i] << ") S[" << i << "] = " << S[i] << "\n";
 
 	}
 

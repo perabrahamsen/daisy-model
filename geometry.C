@@ -84,7 +84,6 @@ check_alist (const AttributeList& al)
 double
 Geometry::total (const vector<double>& v) const
 {
-  assert (v.size () <= size ());
   const unsigned int to = min (v.size (), size ());
   double sum = 0.0;
   for (unsigned int i = 0; i < to; i++)

@@ -89,9 +89,6 @@ Surface::accept_top (double water)
 bool  
 Surface::Implementation::accept_top (double water)
 {
-  assert (im_flux.NO3 == 0.0);
-  assert (im_flux.NH4 == 0.0);
-
   if (lake >= 0.0)
     return true;
 

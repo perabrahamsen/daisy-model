@@ -22,7 +22,7 @@ public:
 		     vector<double>& M, 
 		     vector<double>& C,
 		     const vector<double>& S,
-		     double J_in) = 0;
+		     vector<double>& J) = 0;
   virtual void output (Log&, Filter&) const = 0;
 
   // Create and Destroy.

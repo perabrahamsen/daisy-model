@@ -56,8 +56,8 @@ public:
   // Simulate.
 public:
   virtual void tick (const Soil& soil,
-		     int first, const UZtop& top, 
-		     int last, const UZbottom& bottom, 
+		     unsigned int first, const UZtop& top, 
+		     unsigned int last, const UZbottom& bottom, 
 		     const vector<double>& S,
 		     const vector<double>& h_old,
 		     const vector<double>& Theta_old,
@@ -67,6 +67,8 @@ public:
   virtual void output (Log&, Filter&) const = 0;
 
   // Create and Destroy.
+public:
+  virtual void has_macropores (bool); // Tell UZ that there is macropores.
 protected:
   UZmodel (string name);
 public:

@@ -241,7 +241,7 @@ bool
 SoilHeat::Implementation::check (unsigned n) const
 {
   bool ok = true;
-  if (T.size () > n)
+  if (T.size () != n)
     {
       CERR << "You have " << n << " intervals but " 
 	   << T.size () << " T values\n";
@@ -283,7 +283,10 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
       if (T.size () <= i)
 	T.push_back (bottom (time, weather));
     }
+#if 0
+  // We check for this in SoilHeat::check ().
   assert (T.size () == soil.size ());
+#endif
 }
 
 

@@ -1,3 +1,79 @@
+1999-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.72 released.
+
+1999-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.72 released.
+
+1999-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (tick): Let surface solute to follow water in macropores.
+	* mactrans_std.C (tick): Handle this case.
+
+	* surface.C (accept_top): Allow `accept_top' to be called multiple
+	times. 
+
+	* uzlr.C (tick): Fix q for oversaturated soil.
+
+1999-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* average.h, average.C: New components.
+	* average_arithmetic.C, average_harmonic.C, average_geometric.C:
+	New models.
+	* Makefile (COMPONENTS, INTERFACES): Add them.
+	* uzricard.C (K_average): New member.
+	* uzmodel.C, uzmodel.h, uzricard.C (has_macropores): New member.
+	* soil_water.C: Call it.
+
+	* lib/log.dai ("Preferential NH4 Transport", 
+	"Preferential NO3 Transport", "Preferential Water Flux"): 
+	Now log file formats.
+
+	* soil_water.C, soil_water.h: Added `S_p' log variable.
+
+1999-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mactrans.h, mactrans.C: New component.
+	* mactrans_std.C: New model.
+	* Makefile (COMPONENTS, INTERFACES): Add them.
+	* solute.h, solute.C: Add `mactrans' and `J_p' members.
+	* transport_cd.C, transport_convection.C, transport_none.C,
+	transport.h, solute.C: Move `J' to `Solute'.
+	* lib/log.dai ("N Balance", "Soil Chemicals"): Updated logs.
+	
+	* macro_std.C: New file.
+
+1999-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (filecount): New target.
+
+	* soil_water.C, soil_water.h: Added `macro' and `q_p' members.
+
+1999-03-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* macro.C, macro.h: New component.
+	* macro_none.C: New model.
+	* Makefile (COMPONENTS, INTERFACES): Add them.
+
+1999-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C (check): Fixed spelling error in error message.
+
+	* lib/beet-old.dai ("Beet; V1"): Renamed from `Beet'.
+
+	* lib/Makefile (NEWCROPS): Removed `cutgrass'.
+
+	* lib/crop.dai (file): Removed cutgrass.
+
+	* field.C (restrict): Fixed spelling error in message string.
+
+	* soil_heat.C (initialize): Don't assert that T has the right size
+	here.
+
+	* parser_file.C (load_list): Better error message for unknown
+	attributes. 
+
 1999-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.71 released.
