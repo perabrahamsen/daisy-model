@@ -12,9 +12,80 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.80
+
+** Now compiles with Borland C++ 5.5 via the commandoline.
+
+* 1.79
+
+** Log the evapotranspiration used, not just the one in the weather file.
+
+** Bug fix: ignored last root node in some circumstances.
+
+* 1.78
+
+** Keep track of C in crop.
+
+Note: This means the CStem, CDead, CSOrg, CRoot and CLeaf harvest
+parameters of the standard crop module can no longer be set.  Instead
+set the E_Leaf, E_Stem, E_SOrg, E_Root production parameters.  You can
+also log the C content with the CStem, CSOrg, CRoot and CLeaf in
+production. 
+
+* 1.77
+
+** Ported to GCC 3.0
+
+** You can now plant emerged crops.  
+
+Define the crop like below, and use the normal "sow" command.
+
+(defcrop "Maize for Planting" "Maize"
+ (Phenology (DS 0.269081))
+ (Prod (CH2OPool 12.6672)
+       (NCrop 1.41396)
+       (WLeaf 15.7116)
+       (WRoot 26.4654)
+       (WStem 10.9263))
+ (Root (Depth 51.9679)))
+
+* 1.76
+
+Fix logging state for `with-column'.
+
+* 1.75
+
+Fix logging of speed in Bioincorporation.
+
+* 1.74
+
+** More flexible dimensions in logs.
+
+The character & in a dimension string in a log description will be
+replaced by "h" if you use "hourly" (with no arguments) as a log
+condition, "d" if you use "daily" (with no arguments) as a log
+condition, "w" if you use "weekly" (with no arguments) as a log
+condition, "m" if you use "monthly" (with no arguments) as a log
+condition, "y" if you use "yearly" (with no arguments) as a log
+condition, and "dt" otherwise.  All the standard log descriptions
+have been updated to use "&".
+
+This means that if you for example put
+
+  (output ("N Balance" (when weekly)))
+
+in your setup, "N Balance" will be logged weekly, and the flux
+dimensions will be correct.
+
+** Fixed off-by-one error for flux bottom in logs.
+
+* 1.73
+
+Fixed logging incorporated inorganic matter.
+
 * 1.72
 
-No user visible changes.
+Fixed some dimension strings.
 
 * 1.71
 

@@ -3,6 +3,7 @@
 #include "bioclimate.h"
 #include "weather.h"
 
+template<>
 Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content = NULL;
 
 const char *const Bioclimate::description = "\

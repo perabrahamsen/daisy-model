@@ -361,7 +361,6 @@ Horizon::SOM_C_per_N (unsigned int pool) const
     return impl.SOM_C_per_N[impl.SOM_C_per_N.size () - 1];
   // Give up.  Guess.
   throw ("Horizon: SOM: no C_per_N");
-  return 11.0;
 }
 
 double
@@ -487,6 +486,7 @@ Horizon::~Horizon ()
 { }
 
 // Create Horizon library.
+template<>
 Librarian<Horizon>::Content* Librarian<Horizon>::content = NULL;
 
 const char *const Horizon::description = "\

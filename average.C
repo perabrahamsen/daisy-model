@@ -2,6 +2,7 @@
 
 #include "average.h"
 
+template<>
 Librarian<Average>::Content* Librarian<Average>::content = NULL;
 
 const char *const Average::description = "\

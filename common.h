@@ -19,7 +19,7 @@
 #define BROKEN_HEADERS
 #endif
 
-#if !defined (__CYGWIN__) && !defined (MINGW) && !defined (VISUALCPP)
+#if !defined (__CYGWIN__) && !defined (MINGW) && !defined (VISUALCPP) && !defined (BORLAND)
 // Doesn't work under cygwin
 #define pow(x, y) (assert (x >= 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))

@@ -4,6 +4,7 @@
 #include "log.h"
 #include <map>
 
+template<>
 Librarian<Column>::Content* Librarian<Column>::content = NULL;
 
 const char *const Column::description = "\

@@ -2,6 +2,7 @@
 
 #include "tortuosity.h"
 
+template<>
 Librarian<Tortuosity>::Content* Librarian<Tortuosity>::content = NULL;
 
 const char *const Tortuosity::description = "\
