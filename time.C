@@ -359,6 +359,7 @@ Time::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("hour", Syntax::Integer, Syntax::State, "Current hour.");
   static VCheck::IRange hh (0, 23);
   syntax.add_check ("hour", hh);
+  alist.add ("hour", 0);
   syntax.order ("year", "month", "mday", "hour");
   syntax.add ("week", Syntax::Integer, Syntax::LogOnly, "Current week.");
   syntax.add ("yday", Syntax::Integer, Syntax::LogOnly, "Current Julian day.");

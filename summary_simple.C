@@ -323,7 +323,7 @@ SummarySimple::summarize (const int hours, Treelog& msg)
   for (unsigned int i = 0; i < fetch.size (); i++)
     max_digits = max (max_digits, fetch[i]->value_size (total, period, hours));
   max_digits = max (max_digits, width (total));
-  const double width = max_digits + (precision > 0 ? 1 : 0) + precision;
+  const int width = max_digits + (precision > 0 ? 1 : 0) + precision;
   size_t dim_size = 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
     dim_size = max (dim_size, fetch[i]->dimension (period).size ());

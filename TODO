@@ -1,14 +1,6 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* uzlr
-
-** Made the lr water transport model less unrealistic.
-
-The lr model (linked reservoirs) uz model will now not tranport water
-faster than the hydraulic conductivity allows for.  Before it might do
-so if on "reservoirs" got more water from above than it could handle.
-
-q_max udregnet nedefra.
+* SH: Salg af referencemanual på www-siden?
 
 * FertOrgaNic
 

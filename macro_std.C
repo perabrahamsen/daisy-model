@@ -147,7 +147,7 @@ MacroStandard::tick (const Soil& soil,
 	// We might end a macropore here.
 	{
 	  // Find fraction ending in this layer.
-	  const double this_layer 
+	  /* const */ double this_layer 
 	    = distribution (soil.zplus (i)) - distribution (previous_end);
 	  const double rest
 	    = distribution (last_end) - distribution (previous_end);
@@ -155,7 +155,6 @@ MacroStandard::tick (const Soil& soil,
 	  daisy_assert (this_layer >= 0.0);
 	  daisy_assert (rest >= this_layer);
 	  const double fraction = this_layer / rest;
-
 	  // Sutract it from the flow.
 	  flow *= (1.0 - fraction);
 	}

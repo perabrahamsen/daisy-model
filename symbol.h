@@ -50,6 +50,8 @@ private:
 public:
   bool operator== (const symbol& other) const
   { return id == other.id; }
+  bool operator!= (const symbol& other) const
+  { return id != other.id; }
   bool operator< (const symbol& other) const
   { return id < other.id; }
   const std::string& name () const;
@@ -80,7 +82,7 @@ std::string operator+ (const char*, symbol);
 std::string operator+ (symbol, const std::string&);
 std::string operator+ (const std::string&, symbol);
 std::string operator+ (symbol, symbol);
-std::ostream& operator<< (ostream&, symbol);
+std::ostream& operator<< (std::ostream&, symbol);
 
 static const symbol::Init symbol_init;
 

@@ -323,7 +323,7 @@ RootSystem::tick_daily (Treelog& msg, const Soil& soil,
   // Penetration.
   if (IncWRoot > 0)
     {
-      const double i = soil.interval_plus (-Depth);
+      const int i = soil.interval_plus (-Depth);
       double clay_fac = PenClayFac (soil.clay (i));
       double dp = PenPar1 * clay_fac * max (0.0, soil_temperature - PenPar2);
       PotRtDpt = min (PotRtDpt + dp, MaxPen);

@@ -1,4 +1,20 @@
+2003-06-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.98 released.
+
+2003-06-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* plf.C (operator ()): Test for ==.
+
+	* time.C (load_syntax): Gave hour a default value of zero.
+
+	* uzlr.C (tick): Remove previous change.
+
 2003-06-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* symbol.h: Port to GCC 3.3.
+	* summary_simple.C (summarize): Fixed 3.3 warning.
+	* root_system.C (tick_daily): Ditto.
 
 	* Version 2.97 released.
 

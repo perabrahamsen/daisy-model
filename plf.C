@@ -89,7 +89,10 @@ PLF::Implementation::operator () (const double pos) const
 
       if (x[guess] < pos)
 	min = guess;
-      else
+      else if (x[guess] == pos)
+	// We need this case to avoid numeric clutter.
+	return y[guess];
+      else			// x[guess] > pos
 	max = guess;
     }
 }

@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.98
+
+** Bug fixes.
+
 * 2.97
 
 ** New K_fast denitrification parameter.
