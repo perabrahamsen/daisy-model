@@ -153,7 +153,7 @@ ColumnInorganic::tick (Treelog& out,
 		   NULL, NULL,
 		   residuals_DM, residuals_N_top, residuals_C_top,
 		   residuals_N_soil, residuals_C_soil, out);
-  groundwater.tick (soil, soil_water, soil_heat, time, out);
+  groundwater.tick (soil, soil_water, surface.h (), soil_heat, time, out);
 
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, my_weather);

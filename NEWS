@@ -12,6 +12,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.96
+
+** Smother groundwater pipe table curves.  
+
+Groundwater may now be in the middle of a node, or above ground.
+
+** Made UZrichard more robust.
+
 * 2.95
 
 ** Simplified implementation of the pipe groundwater model.

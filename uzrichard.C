@@ -159,8 +159,8 @@ UZRichard::richard (Treelog& msg,
   const double h_lim = soil.zplus (last) - soil.z (last);
   daisy_assert (h_lim < 0.0);
 
-  // Check if we have already switched top once.
-  bool switched_top = false;
+  // Check when we last switched top.
+  double switched_top_last = dt * 2.0;
 
   // Keep track of water going to the top.
   double top_water = 0.0;
@@ -368,9 +368,20 @@ UZRichard::richard (Treelog& msg,
 	  number_of_time_step_reductions++;
 
 	  if (number_of_time_step_reductions > max_time_step_reductions)
-	    return false;
-
-	  ddt /= time_step_reduction;
+	    {
+	      if (approximate (switched_top_last, time_left))
+		return false;
+	      else if (top.flux_top ())
+		top.flux_top_off ();
+	      else
+		top.flux_top_on ();
+		
+	      switched_top_last = time_left;
+	      ddt = time_left;
+	      number_of_time_step_reductions = 0;
+	    }
+	  else
+	    ddt /= time_step_reduction;
 	  h = h_previous;
 	}
       else
@@ -403,8 +414,17 @@ UZRichard::richard (Treelog& msg,
 	      if (available_water + delta_top_water < -1e-30)
 		// We don't have more water in the pressure top.
 		{
-		  if (switched_top)
-		    throw ("Couldn't accept top flux");
+		  if (approximate (switched_top_last, time_left))
+		    {
+#if 0
+		      TmpStream tmp;
+		      tmp () << "available_water = " << available_water 
+			     << ", delta_top_water = " << delta_top_water
+			     << ", time left = " << time_left;
+		      msg.error (tmp.str ());
+#endif
+		      throw ("Couldn't accept top flux");
+		    }
 		  else
 		    {
 		      top.flux_top_on ();
@@ -422,14 +442,14 @@ UZRichard::richard (Treelog& msg,
 	      // We have a saturated soil, with an upward flux.
 	      throw ("Saturated soil with an upward flux");
 	    }
-	  else if (!switched_top)
+	  else if (approximate (switched_top_last, time_left))
+	    throw ("Couldn't drain top flux");
+	  else
 	    // We have saturated soil, make it a pressure top.
 	    {
 	      top.flux_top_off ();
 	      accepted = false;
 	    }
-	  else
-	    throw ("Couldn't drain top flux");
 
 	  if (accepted)
 	    {
@@ -475,7 +495,6 @@ Richard eq. mass balance flux is different than darcy flux");
 #endif
 	      top_water += delta_top_water;
               available_water += delta_top_water;
-	      switched_top = false;
 	      time_left -= ddt;
 	      iterations_with_this_time_step++;
 
@@ -488,7 +507,7 @@ Richard eq. mass balance flux is different than darcy flux");
 	    }
 	  else
 	    {
-	      switched_top = true;
+	      switched_top_last = time_left;
 	      Theta = Theta_previous;
 	      h = h_previous;
 	    }

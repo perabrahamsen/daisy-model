@@ -46,8 +46,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil&, SoilWater&, const SoilHeat&, 
-		     const Time&, Treelog&) = 0;
+  virtual void tick (const Soil&, SoilWater&, double h_surface /* [cm] */,
+		     const SoilHeat&, const Time&, Treelog&) = 0;
   virtual void update_water (const Soil&, const SoilHeat&, UZtop&,
 			     vector<double>& S_sum,
 			     vector<double>& S_drain,

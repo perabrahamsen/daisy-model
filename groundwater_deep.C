@@ -33,7 +33,8 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil&, SoilWater&, const SoilHeat&, const Time&, Treelog&)
+  void tick (const Soil&, SoilWater&, double, 
+	     const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
   { return 42.42e42; }

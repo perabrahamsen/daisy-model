@@ -1,5 +1,17 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* uzlr
+
+q_max udregnet nedefra.
+
+Update h so pressure from water above is incorporated.
+
+* FertOrgaNic
+
+** Post excersizes and answers
+
+* UZmodel top_t and bottom_t
+
 * Weather
 
 ** Min & max T i klimafil, udregn average.
@@ -23,10 +35,6 @@ Til referencemanual?
 * Select::method { current, sum, max, min, average }
 
 Use by summary.
-
-* FertOrgaNic
-
-** Post excersizes and answers
 
 * SH: PowerPoint validation slides på hjemmeside.
 

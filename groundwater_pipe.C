@@ -92,7 +92,8 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil&, SoilWater&, const SoilHeat&, const Time&, Treelog&);
+  void tick (const Soil&, SoilWater&, double,
+	     const SoilHeat&, const Time&, Treelog&);
   void update_water (const Soil&, const SoilHeat&,
 		     UZtop& top,
   		     vector<double>& S_sum,
@@ -175,6 +176,7 @@ public:
 
 void 
 GroundwaterPipe::tick (const Soil& soil, SoilWater& soil_water, 
+		       const double h_surface,
 		       const SoilHeat& soil_heat, const Time&, Treelog& msg)
 {
 #ifndef USE_UPDATE_WATER
@@ -184,13 +186,24 @@ GroundwaterPipe::tick (const Soil& soil, SoilWater& soil_water,
   fill (S.begin (), S.end (), 0.0);
   
   // Find groundwater height.
-  height = 0.0;
+  height = h_surface;
   for (int i = soil.size () - 1; i >= 0; i--)
-    if (soil_water.h (i) < 0)
-      {
-	height = soil.zplus (i);
-	break;
-      }
+    {
+      const double h = soil_water.h (i);
+      if (h < 0)
+	{
+	  const double zplus = soil.zplus (i);
+	  const double z = (i == 0) ? 0.0 : soil.zplus (i-1);
+	  const double zx = z - zplus; 
+	  if (h + zx > 0)
+	    // Groundwater in this node.
+	    height = zplus + h + zx;
+	  else
+	    // Groundwater between nodes.
+	    height = zplus;
+	  break;
+	}
+    }
 
   // Find sink term.
   EqDrnFlow = EquilibriumDrainFlow (soil, soil_heat);
@@ -214,7 +227,7 @@ GroundwaterPipe::update_water (const Soil& soil,
 			       vector<double>& q,
 			       const vector<double>& q_p,
 			       Treelog& msg)
-{
+  {
 #ifdef USE_UPDATE_WATER
   Treelog::Open nest (msg, "Groundwater " + name);
   fill (S.begin (), S.end (), 0.0);

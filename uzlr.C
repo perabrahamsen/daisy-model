@@ -75,6 +75,10 @@ public:
   ~UZlr ();
 };
 
+#if 0
+#include "tmpstream.h"
+#endif
+
 bool
 UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const UZtop& top, 
@@ -87,6 +91,36 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	    vector<double>& Theta,
 	    vector<double>& q)
 {
+  // #define USE_Q_MAX
+#ifdef USE_Q_MAX
+  // Find max fluxes.
+  vector<double> q_max (last + 2);
+  double K_old = soil.K (last, h[last], h_ice[last], soil_heat.T (last));
+  if (bottom.type () == UZbottom::forced_flux)
+    q_max[last+1] = bottom.q_bottom ();
+  else
+    q_max[last+1] = -K_old;
+
+  for (int i = last; i >= int (first); i--)
+    {
+      
+      const double dz = soil.dz (i);
+      // Extra pressure from saturated zone.
+      const double dhdz = h[i] > 0.0 ? h[i] / dz : 0.0;
+      const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
+      const double Theta = Theta_old[i];
+      const double space 
+	= (Theta_sat - Theta) * dz + S[i] * dt - q_max[i+1] * dt;
+      q_max[i] = -min (space, K_old * (1.0 + dhdz));
+      K_old = soil.K (i, h[i], h_ice[i], soil_heat.T (i));
+#if 0
+      TmpStream tmp;
+      tmp () << "q_max[" << i << "] = " << q_max[i] << " first = " << first
+	     << " last = " << last;
+      Assertion::message (tmp.str ());
+#endif
+    }
+#endif
   if (top.soil_top ())
     {
       daisy_assert (!top.flux_top ());
@@ -122,11 +156,18 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 
       if (!top.flux_top ())
 	// It refuses to be a flux, must be a lake.
-	q_up = q[first] = -K_sat;
+	{
+	  const double dz = 0.0 - soil.z (first);
+	  const double dh = top.h () - h_old[first];
+	  q_up = q[first] = -K_sat * (dh/dz + 1.0);
+	}
       else
 	q_up = q[first] = max (top.q (), -K_sat);
     }
-
+#ifdef USE_Q_MAX
+  if (q[first] < q_max[first])
+    q_up = q[first] = q_max[first];
+#endif
   //  Use darcy for upward movement in the top.
   const bool use_darcy = (h_old[first] < h_fc) && (q_up > 0.0);
   const int to_darcy = max (soil.interval_plus (z_top), first + 5);

@@ -46,7 +46,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil& soil, SoilWater&, const SoilHeat&,
+  void tick (const Soil& soil, SoilWater&, double, const SoilHeat&,
 	     const Time& time, Treelog& msg)
   { tick (soil, time, msg); }
   void tick (const Soil&, const Time&, Treelog&);

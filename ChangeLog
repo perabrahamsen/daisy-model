@@ -1,4 +1,16 @@
+2003-06-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.96 released.
+
 2003-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater.h, groundwater_deep.C, groundwater_file.C
+	* groundwater_fixed.C, groundwater_lysimeter.C, groundwater_pipe.C
+	* groundwater_static.C (tick): New h_surface argument.
+	* column_inorganic.C (tick): Update caller.
+	* column_std.C (tick): Ditto.
+
+	* uzlr.C (tick): Better handling of lake top.
 
 	* Version 2.95 released.
 
