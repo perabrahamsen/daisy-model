@@ -20,6 +20,7 @@ public:
   virtual void tick (const Time& time) = 0;
   virtual void update_water (const Soil&,
 			     vector<double>& S_sum,
+			     vector<double>& S_drain,
 			     vector<double>& h,
 			     vector<double>& h_ice,
 			     vector<double>& Theta,

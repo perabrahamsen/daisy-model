@@ -261,7 +261,7 @@ SoilHeat::Implementation::calculate_freezing_rate (const Soil& soil,
   const double dq = q[i] - q[i+1];
   const double dz = soil.dz (i);
   const double S 
-    = soil_water.S (i) - soil_water.S_ice (i) * rho_ice / rho_water;
+    = soil_water.S_sum (i) - soil_water.S_ice (i) * rho_ice / rho_water;
   const double Sh
     = water_heat_capacity * rho_water * S * T_mean;
   return (1.0 / (latent_heat_of_fussion * rho_ice))

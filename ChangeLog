@@ -1,3 +1,24 @@
+1999-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (UZRichardSyntax): Fix multiline string.
+
+	* soil_water.h, soil_water.C (S_sum, S_root, S_drain): Split S
+	into these.  
+	* soil_chemical.C (uptake): Use it.
+	* soil_heat.C (calculate_freezing_rate): Use them.
+	* soil_water.h, soil_water.C (add_to_sink, root_uptake) Renamed
+	`add_to_sink' to `root_uptake'.
+	* crop_std.C, crop_old.C, crop_sold.C: Renamed callers.
+
+1999-09-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* macro_std.C (tick): Added assertions.
+
+	* uzrichard.C (UZRichardSyntax): Added description of default
+	K_average. 
+
+	* Merged SH changes.
+
 1999-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.90 released.

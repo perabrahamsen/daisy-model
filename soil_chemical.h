@@ -24,7 +24,8 @@ private:
   vector<double> decomposed;
   vector<double> uptaken;
   vector<double> lag;
-  const CSMP lag_increment;
+  static CSMP* no_lag;
+  const CSMP& lag_increment;
 
   // Simulation.
 public:

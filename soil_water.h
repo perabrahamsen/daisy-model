@@ -19,7 +19,9 @@ class Geometry;
 class SoilWater
 {
   // Content.
-  vector<double> S_;
+  vector<double> S_sum_;
+  vector<double> S_root_;
+  vector<double> S_drain_;
   vector<double> S_p_;
   vector<double> Theta_old_;
   vector<double> h_old;
@@ -40,8 +42,7 @@ class SoilWater
   // Sink.
 public:
   void clear (const Geometry&);
-  void add_to_sink (const vector<double>&);
-  void add_to_sink (const vector<double>&, const Geometry&);
+  void root_uptake (const vector<double>&);
   void freeze (const Soil&, const vector<double>&);
   
   // Queries
@@ -52,15 +53,19 @@ public:
   double Theta (int i) const
   { return Theta_[i]; }
   double Theta_left (int i) const
-  { return Theta_[i] - S_[i]; }
+  { return Theta_[i] - S_sum_[i]; }
   double Theta_old (int i) const
   { return Theta_old_[i]; }
   double q (int i) const
   { return q_[i]; }
   double q_p (int i) const
   { return q_p_[i]; }
-  double S (int i) const
-  { return S_[i]; }
+  double S_sum (int i) const
+  { return S_sum_[i]; }
+  double S_root (int i) const
+  { return S_root_[i]; }
+  double S_drain (int i) const
+  { return S_drain_[i]; }
   double S_ice (int i) const
   { return S_ice_[i]; }
   double S_p (int i) const
@@ -91,7 +96,7 @@ public:
   // Communication with external model.
   void put_h (const Soil& soil, const vector<double>& v); // [cm]
   void get_sink (vector<double>& v) const // [cm^3/cm^3/h]
-    { v = S_; }
+    { v = S_sum_; }
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

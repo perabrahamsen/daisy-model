@@ -1821,7 +1821,7 @@ CropStandard::ActualWaterUptake (double Ept,
       total = Ept;
     }
   // Update soil water sink term.
-  soil_water.add_to_sink (H2OExtraction);
+  soil_water.root_uptake (H2OExtraction);
   // Update water stress factor
   double& water_stress = var.RootSys.water_stress;
   if (Ept < 0.010)

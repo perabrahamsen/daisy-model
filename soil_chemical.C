@@ -9,6 +9,8 @@
 #include "log.h"
 #include "submodel.h"
 
+CSMP* SoilChemical::no_lag = NULL;
+
 void 
 SoilChemical::uptake (const Soil& soil, 
 		      const SoilWater& soil_water)
@@ -18,7 +20,7 @@ SoilChemical::uptake (const Soil& soil,
   const double rate = 1.0 - chemical.crop_uptake_reflection_factor ();
   
   for (unsigned int i = 0; i < soil.size (); i++)
-      uptaken[i] = C (i) * soil_water.S (i) * rate;
+    uptaken[i] = C (i) * soil_water.S_root (i) * rate;
   
   add_to_sink (uptaken);
 }
@@ -109,10 +111,13 @@ SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Increment lag with the value of this CSMP for the current\n\
 concentration each timestep.  When lag in any node reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
-  CSMP no_lag;
-  no_lag.add (0.0, 1.0);
-  no_lag.add (1.0, 1.0);
-  alist.add ("lag_increment", no_lag);
+  if (!no_lag)
+    {
+      no_lag = new CSMP ();
+      no_lag->add (0.0, 1.0);
+      no_lag->add (1.0, 1.0);
+    }
+  alist.add ("lag_increment", *no_lag);
   syntax.add ("lag", Syntax::None (), Syntax::OptionalState,
 	      "This state variable grows with lag_increment (C) each time step.\n\
 When it reached 1.0, decomposition begins.");
@@ -140,7 +145,8 @@ SoilChemical::SoilChemical (const Chemical& chem, const AttributeList& al)
 
 SoilChemical::SoilChemical (const Chemical& chem)
   : Solute (chem.solute_alist ()),
-    chemical (chem)
+    chemical (chem),
+    lag_increment (*no_lag)
 { }
 
 static Submodel::Register soil_chemical_submodel ("SoilChemical",

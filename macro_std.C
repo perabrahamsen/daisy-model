@@ -106,9 +106,12 @@ MacroStandard::tick (const Soil& soil,
 	{
 	  // Find fraction ending in this layer.
 	  const double this_layer 
-	    = distribution (previous_end) - distribution (soil.zplus (i));
+	    = distribution (soil.zplus (i)) - distribution (previous_end);
 	  const double rest
-	    = distribution (previous_end) - distribution (last_end);
+	    = distribution (last_end) - distribution (previous_end);
+	  assert (rest > 0.0);
+	  assert (this_layer >= 0.0);
+	  assert (rest >= this_layer);
 	  const double fraction = this_layer / rest;
 
 	  // Sutract it from the flow.

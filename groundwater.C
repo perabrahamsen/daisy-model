@@ -12,6 +12,7 @@ groundwater table at each timestep.";
 void
 Groundwater::update_water (const Soil&,
 			   vector<double>& /* S_sum */,
+			   vector<double>& /* S_drain */,
 			   vector<double>& /* h */,
 			   vector<double>& /* h_ice */,
 			   vector<double>& /* Theta */,

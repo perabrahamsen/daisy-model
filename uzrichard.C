@@ -613,7 +613,9 @@ Maximum relative difference in `h' values for convergence.");
 		  "Number of iterations used,");
       syntax.add ("K_average", Librarian<Average>::library (),
 		  Syntax::OptionalConst, Syntax::Singleton,
-		  "Model for calculating average K between nodes.");
+		  "Model for calculating average K between nodes.\n\
+The default model is `geometric' if there are macropores, and\n\
+`arithmetic' otherwise.");
 
       Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
     }

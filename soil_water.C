@@ -14,34 +14,35 @@
 void
 SoilWater::clear (const Geometry&)
 {
-  fill (S_.begin (), S_.end (), 0.0);
+  fill (S_sum_.begin (), S_sum_.end (), 0.0);
+  fill (S_root_.begin (), S_root_.end (), 0.0);
   fill (S_ice_.begin (), S_ice_.end (), 0.0);
+  // We don't clear S_p_ and S_drain_, because they are needed in solute.
 }
+
 
 void
-SoilWater::add_to_sink (const vector<double>& v)
+SoilWater::root_uptake (const vector<double>& v)
 {
-  assert (S_.size () == v.size ());
-  for (unsigned i = 0; i < S_.size (); i++)
-    S_[i] += v[i];
+  assert (S_sum_.size () == v.size ());
+  assert (S_root_.size () == v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    {
+      S_sum_[i] += v[i];
+      S_root_[i] += v[i];
+    }
 }
-
-void
-SoilWater::add_to_sink (const vector<double>& v, const Geometry& geometry)
-{
-  assert (S_.size () == v.size ());
-  for (unsigned i = 0; i < S_.size (); i++)
-    S_[i] += v[i] / geometry.z (i);
-}
-
 
 void 
 SoilWater::freeze (const Soil&, const vector<double>& v)
 {
   assert (v.size () == S_ice_.size ());
-  add_to_sink (v);
-  for (unsigned int i = 0; i < S_ice_.size (); i++)
-    S_ice_[i] -= v[i] * rho_water / rho_ice;
+  assert (S_sum_.size () == v.size ());
+  for (unsigned int i = 0; i < v.size (); i++)
+    {
+      S_sum_[i] += v[i];
+      S_ice_[i] -= v[i] * rho_water / rho_ice;
+    }
 }
 
 double
@@ -78,7 +79,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 
       // Move extra ice to buffer.
       const double available_space
-	= Theta_sat - Theta_[i] - X_ice_[i] + S_[i] * dt;
+	= Theta_sat - Theta_[i] - X_ice_[i] + S_sum_[i] * dt;
       if (available_space < 0.0)
 	{
 	  X_ice_[i] += available_space;
@@ -101,7 +102,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       if (X_ice_[i] < 0.0)
 	{
 	  CERR << "BUG: X_ice[" << i << "] = " << X_ice_[i]
-               << " (S[i] = " << S_[i] << ")\n";
+               << " (S_sum[i] = " << S_sum_[i] << ")\n";
           X_ice_buffer[i] += X_ice_[i];
 	  X_ice_[i] = 0.0;
 	}
@@ -138,7 +139,8 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   // Calculate preferential flow first.
   fill (S_p_.begin (), S_p_.end (), 0.0);
   fill (q_p_.begin (), q_p_.end (), 0.0);
-  macro.tick (soil, first, last, surface, h_ice_, h_, Theta_, S_, S_p_, q_p_);
+  macro.tick (soil, first, last, surface, h_ice_, h_, Theta_,
+	      S_sum_, S_p_, q_p_);
 
   // Calculate matrix flow next.
   try
@@ -149,12 +151,12 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 	  top->tick (soil,
 		     first, surface,
 		     bottom_start - 1, *bottom,
-		     S_, h_old, Theta_old_, h_ice_,
+		     S_sum_, h_old, Theta_old_, h_ice_,
 		     h_, Theta_, q_);
 	  bottom->tick (soil,
 			bottom_start, *top,
 			last, groundwater,
-			S_, h_old, Theta_old_, h_ice_,
+			S_sum_, h_old, Theta_old_, h_ice_,
 			h_, Theta_, q_);
 	}
       else
@@ -163,7 +165,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 	  top->tick (soil,
 		     first, surface,
 		     last, groundwater,
-		     S_, h_old, Theta_old_, h_ice_,
+		     S_sum_, h_old, Theta_old_, h_ice_,
 		     h_, Theta_, q_);
 	}
     }
@@ -174,7 +176,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       reserve->tick (soil,
                      first, surface,
                      last, groundwater,
-                     S_, h_old, Theta_old_, h_ice_,
+                     S_sum_, h_old, Theta_old_, h_ice_,
                      h_, Theta_, q_);
     }
 
@@ -200,7 +202,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 
   // Update flux in groundwater.
   groundwater.update_water (soil,
-			    S_, h_, h_ice_, Theta_, q_, q_p_);
+			    S_sum_, S_drain_, h_, h_ice_, Theta_, q_, q_p_);
 }
 
 void
@@ -264,7 +266,9 @@ SoilWater::check (unsigned n) const
 void 
 SoilWater::output (Log& log) const
 {
-  log.output ("S", S_);
+  log.output ("S_sum", S_sum_);
+  log.output ("S_root", S_root_);
+  log.output ("S_drain", S_drain_);
   log.output ("S_p", S_p_);
   log.output ("Theta", Theta_);
   log.output ("h", h_);
@@ -332,8 +336,12 @@ will be used from there to the bottom.");
   lr.add ("h_fc", -100.0);
   lr.add ("z_top", -10.0);
   alist.add ("UZreserve", lr);
-  syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Water sink (due to root uptake and macropores).");
+  syntax.add ("S_sum", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Total water sink (due to root uptake and macropores).");
+  syntax.add ("S_root", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Water sink due to root uptake.");
+  syntax.add ("S_drain", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Water sink due to soil drainage.");
   syntax.add ("S_p", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink (due to macropores).");
   Geometry::add_layer (syntax, "Theta", "cm^3/cm^3", "Soil water content.");
@@ -430,7 +438,9 @@ SoilWater::initialize (const AttributeList& al,
 	  Theta_.push_back (soil.Theta (i, h_[i], h_ice_[i]));
     }
 
-  S_.insert (S_.begin (), size, 0.0);
+  S_sum_.insert (S_sum_.begin (), size, 0.0);
+  S_root_.insert (S_root_.begin (), size, 0.0);
+  S_drain_.insert (S_drain_.begin (), size, 0.0);
   S_p_.insert (S_p_.begin (), size, 0.0);
   q_.insert (q_.begin (), size + 1, 0.0);
   q_p_.insert (q_p_.begin (), size + 1, 0.0);
