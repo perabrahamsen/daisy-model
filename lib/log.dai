@@ -443,10 +443,46 @@ soil increases."
 	 ("NO3-immobilization" (name "Immobilization") (factor -1.0))
 	 ("NO3-Total" (name "Content") (factor -1.0))))
 	 
+(defsummary "Nitrogen Balance" simple
+  "Total system mass balance for nitrogen.
+
+Note that a negative delta content means that the amount increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch ("NH4-Fertilizer")
+         ("NH4-Volatilization" (factor -1.0))         
+         ("NH4-Deposit")
+         ("NH4-Surface" (factor -1.0))
+	 ("NH4-runoff" (factor -1.0))
+         ("NH4-Leak-Matrix" (factor -1.0))
+         ("NH4-Leak-Macro" (factor -1.0))
+         ("NH4-Drain" (factor -1.0))
+         ("N2O-Nit" (name "Loss during nitrification") (factor -1.0))
+         ("NH4-Total" (name "NH4-Soil") (factor -1.0))
+         ("NO3-Fertilizer")
+         ("NO3-Deposit")
+         ("NO3-Surface" (factor -1.0))
+         ("NO3-Runoff" (factor -1.0))
+         ("NO3-Leak-Matrix" (factor -1.0))
+         ("NO3-Leak-Macro" (factor -1.0))
+         ("NO3-Drain" (factor -1.0))
+         ("Denit" (name "Denitrification") (factor -1.0))
+         ("NO3-Total" (name "NO3-Soil") (factor -1.0))
+         (Fixated)
+         ("Org_N-Fertilizer")
+         ("Seed_N")
+         ("Harvest_N" (factor -1.0))
+         ("AOM" (factor -1.0))
+         ("SOM" (factor -1.0))
+         ("SMB" (factor -1.0))
+         ("Buffer" (factor -1.0))
+         ("AOM-Surface" (factor -1.0))
+         ("Crop-N" (factor -1.0))))
+
 (deflog "N Balance" table
   "Enough information to create a balance for the soil nitrogen."
   (where "N_balance.dlf")
-  (summary "NH4 Soil Balance" "NO3 Soil Balance")
+  (summary "NH4 Soil Balance" "NO3 Soil Balance" "Nitrogen Balance")
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (path column "$col" fertilized_NH4)
@@ -628,7 +664,15 @@ soil increases."
                      (path column "$col" OrganicMatter buffer N)
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           ))
+           (number (tag "AOM-Surface")
+                   (path column "$col" OrganicMatter am "*" om "*" top_N)
+                   (dimension "kg N/ha")
+                   (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (tag "Crop-N")
+                   (path column "$col" Vegetation crops crops "$crop"
+                         Prod NCrop)
+                   (dimension "kg N/ha")
+                   (factor 10.0))))
 
 (deflog "Denitrification" table
   "Detailed information about denitrification."
