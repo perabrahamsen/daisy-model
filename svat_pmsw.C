@@ -1227,7 +1227,6 @@ public:
 
   // Simulation.
   double production_stress () const;
-  { return pstress; }
   void tick (const Weather& weather, const Vegetation& crops,
              const Surface& surface, const Soil& soil,
              const SoilHeat& soil_heat, const SoilWater& soil_water,
