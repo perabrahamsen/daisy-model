@@ -1,5 +1,7 @@
 2001-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* organic_matter.C (Buffer::tick): Remove bogus assertion.
+
 	* Version 1.96 released.
 
 2001-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>

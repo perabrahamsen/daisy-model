@@ -155,10 +155,6 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
       set_bound (0.0, rate, 1.0);
       N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
       assert (finite (N_need));
-      // Check that we calculated the right rate.
-      assert ((N_soil == N_used)
-	      ? (fabs (N_need) < 1e-10)
-	      : (fabs (1.0 - N_need / (N_soil - N_used)) < 0.01));
     }
   // Check for NaN.
   assert (finite (rate));
