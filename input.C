@@ -598,7 +598,7 @@ Parser::get_action ()
   skip ("(");
   string name = get_id ();
   if (name == "sow")
-    action = new ActionSow (load_derived (Crop::var_library ()));
+    action = new ActionSow (load_derived (Crop::library ()));
   else if (name == "stop")
     action = new ActionStop ();
   else

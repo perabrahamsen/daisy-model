@@ -99,13 +99,6 @@ Snow::Implementation::tick (const double Si, const double q_h,
   // Potential snow melting. [mm/h]
   const double Mprime = (mt * Tair + mr * Si + q_h / Lm) * f;
 
-  // Evaporation from snow pack. [mm/h]
-  double Eprime;
-  if (Esnow <= Ssnow / dt + Prain + Mprime)
-    Eprime = Esnow;
-  else
-    Eprime = Swater / dt + Prain + Mprime;
-  
   // Minimal possible melting (all water freezes). [mm/h]
   const double M1 = - (Swater/dt + Prain - Eprime);
   
@@ -115,6 +108,13 @@ Snow::Implementation::tick (const double Si, const double q_h,
   // Actual melting. [mm/h]
   const double M = min (max (M1, Mprime), M2);
 
+  // Evaporation from snow pack. [mm/h]
+  double Eprime;
+  if (Esnow <= Ssnow / dt + Prain + M)
+    Eprime = Esnow;
+  else
+    Eprime = Swater / dt + Prain + M;
+  
   // Water storage capacity of snow [mm]
   const double Scapacity = f_c * (Ssnow + (P - Esnow) / dt);
 

@@ -6,37 +6,25 @@
 #include "syntax.h"
 #include <map.h>
 
-static Library* Crop_par_library = NULL;
-static Library* Crop_var_library = NULL;
+static Library* Crop_library = NULL;
 typedef map<string, Crop::constructor, less<string> > Crop_map_type;
 static Crop_map_type* Crop_constructors;
 
 const Library&
-Crop::par_library ()
+Crop::library ()
 {
-  assert (Crop_par_library);
-  return *Crop_par_library;
-}
-
-const Library&
-Crop::var_library ()
-{
-  assert (Crop_var_library);
-  return *Crop_var_library;
+  assert (Crop_library);
+  return *Crop_library;
 }
 
 void
 Crop::add_type (const string name, 
-		const AttributeList& parList, 
-		const Syntax& parSyntax,
-		const AttributeList& varList, 
-		const Syntax& varSyntax,
+		const AttributeList& alist, 
+		const Syntax& syntax,
 		constructor cons)
 {
-  assert (Crop_par_library);
-  assert (Crop_var_library);
-  Crop_par_library->add (name, parList, parSyntax);
-  Crop_var_library->add (name, varList, varSyntax);
+  assert (Crop_library);
+  Crop_library->add (name, alist, syntax);
   Crop_constructors->insert(Crop_map_type::value_type (name, cons));
 }
 
@@ -44,21 +32,18 @@ void
 Crop::derive_type (string name, const AttributeList& al, string super)
 {
   add_type (name, 
-	    al, par_library ().syntax (super),
-	    var_library ().lookup (super), var_library ().syntax (super),
+	    al, library ().syntax (super),
 	    (*Crop_constructors)[super]);
 }
 
 Crop*
-Crop::create (const AttributeList& var)
+Crop::create (const AttributeList& al)
 {
-  assert (var.check ("type"));
-  string name = var.name ("type");
-  assert (par_library ().check (name));
-  assert (var_library ().syntax (name).check (var));
-  const AttributeList& par = par_library ().lookup (name);
-  assert (par_library ().syntax (name).check (par));
-  return (*Crop_constructors)[name] (name, par, var);
+  assert (al.check ("type"));
+  string name = al.name ("type");
+  assert (library ().check (name));
+  assert (library ().syntax (name).check (al));
+  return (*Crop_constructors)[name] (al);
 }
 
 Crop::Crop (const string n)
@@ -88,8 +73,7 @@ Crop_init::Crop_init ()
 { 
   if (count++ == 0)
     {
-      Crop_par_library = new Library ();
-      Crop_var_library = new Library ();
+      Crop_library = new Library ();
       Crop_constructors = new Crop_map_type ();
     }
   assert (count > 0);
@@ -99,10 +83,8 @@ Crop_init::~Crop_init ()
 { 
   if (--count == 0)
     {
-      delete Crop_par_library;
-      Crop_par_library = NULL;
-      delete Crop_var_library;
-      Crop_var_library = NULL;
+      delete Crop_library;
+      Crop_library = NULL;
       delete Crop_constructors;
       Crop_constructors = NULL;
     }

@@ -68,10 +68,9 @@ void
 ColumnStandard::sow (const AttributeList& crop, Log& log)
 {
   string name = crop.name ("type");
-  if (!Crop::par_library ().check (name))
+  if (!Crop::library ().check (name))
     log.err () << "Cannot sow unknown crop `" << name << "'\n";
-  else if (!Crop::var_library ().syntax (name).check (name, crop, log)
-	   ||!Crop::par_library ().syntax (name).check (name, Crop::par_library ().lookup (name), log))
+  else if (!Crop::library ().syntax (name).check (name, crop, log))
     log.err () << "Cannot sow incomplete crop `" << name << "'\n";
   else
     crops.push_back (Crop::create (crop));
@@ -193,7 +192,7 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
 
-  syntax.add_sequence ("crops", Crop::var_library ());
+  syntax.add_sequence ("crops", Crop::library ());
   
   ADD_SUBMODULE (syntax, alist, Bioclimate);
   ADD_SUBMODULE (syntax, alist, Surface);

@@ -43,16 +43,12 @@ public:
 
   // Library.
 public:
-  static const Library& par_library ();
-  static const Library& var_library ();
-  typedef Crop* (*constructor) (string name, 
-				  const AttributeList& par,
-				  const AttributeList& var);
+  static const Library& library ();
+  typedef Crop* (*constructor) (const AttributeList&);
   static void add_type (string name, 
-			const AttributeList& parList, const Syntax& parSyntax,
-			const AttributeList& varList, const Syntax& varSyntax,
+			const AttributeList&, const Syntax&,
 			constructor);
-  static void derive_type (string name, const AttributeList& par, string super);
+  static void derive_type (string name, const AttributeList& al, string super);
   static Crop* create (const AttributeList& var);
 
   // Create and Destroy.

@@ -94,7 +94,7 @@ Daisy::output_field (Log&, const Filter* filter) const
 void
 Daisy::load_syntax (Syntax& syntax)
 {
-  syntax.add_class ("crop", Crop::par_library (), &Crop::derive_type);
+  syntax.add_class ("crop", Crop::library (), &Crop::derive_type);
   syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
   syntax.add_class ("column", Column::library (), &Column::derive_type);
   syntax.add_class ("manager", Manager::library (), &Manager::derive_type);

@@ -7,7 +7,7 @@ SRCONLY = column_std.o template.o manager_rule.o weather_simple.o \
 	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o 
 OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
-	crop_impl.o filter.o csmp.o rules.o time.o uzmodel.o \
+	filter.o csmp.o rules.o time.o uzmodel.o \
 	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
 	denitrification.o soil_heat.o groundwater.o uzrichard.o \
@@ -20,7 +20,9 @@ TEST = crop.dai old_crop.chp old_crop.log \
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = column_std.h common.C template.h
+REMOVE = crop_impl.C crop_impl.h crop_std.h horizon_yolo.h horizon_M_vG.h \
+	horizon_B_vG.h horizon_M_C.h horizon_B_C.h horizon_M_BaC.h \
+	horizon_B_BaC.h groundwater_static.h weather_simple.h manager_rule.h
 
 .SUFFIXES:	.C .o .h
 
