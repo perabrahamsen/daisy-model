@@ -44,10 +44,14 @@ public:
   void tick (const Geometry&, std::vector <AM*>&, double T, double& CO2);
   void output (Log&) const;
 
+  // Utilities.
+public:
+  void add (const Geometry& geometry, std::vector<double>& input, 
+	    double amount) const;
+
   // Create and Destroy.
 public:
   void initialize (const Soil&);
-  void add_input (const Soil& soil, std::vector<double>& input, double amount);
   AM* create_am (const Geometry&);
   void set_am (AM*);
   static void load_syntax (Syntax&, AttributeList&);

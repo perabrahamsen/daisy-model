@@ -66,6 +66,10 @@ struct Bioincorporation::Implementation
   void tick (const Geometry&, vector <AM*>& am, double T, double& CO2);
   void output (Log&) const;
 
+  // Utitlites.
+  void add (const Geometry& geometry, vector<double>& input, 
+	    double amount) const;
+
   // Create and destroy.
   void initialize (const Soil&);
   AM* create_am (const Geometry& geometry);
@@ -208,6 +212,12 @@ Bioincorporation::Implementation::output (Log& log) const
 }
 
 void 
+Bioincorporation::Implementation::add (const Geometry& geometry,
+				       vector<double>& input,
+				       const double amount) const
+{ geometry.add (input, density, amount /* * (1.0 - respiration) */); }
+
+void 
 Bioincorporation::Implementation::initialize (const Soil& soil)
 { 
   // Calculate distribution density for all nodes.
@@ -266,6 +276,11 @@ Bioincorporation::output (Log& log) const
 {
   impl.output (log);
 }
+
+void 
+Bioincorporation::add (const Geometry& geometry, vector<double>& input,
+		       const double amount) const
+{ add (geometry, input, amount); }
 
 void 
 Bioincorporation::initialize (const Soil& soil)

@@ -623,8 +623,8 @@ OrganicMatter::Implementation::Initialization::
   soil.add (per_lay, density, root * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add bioincorporation
-  bioincorporation.add_input (per_lay,
-                              bioinc * kg_per_ha_per_y_to_g_per_cm2_per_h);
+  bioincorporation.add (soil, per_lay,
+			bioinc * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Mix roots in top.
   soil.mix (per_lay, 0.0, end);
@@ -2447,7 +2447,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
       }
   }
   // Partitioning.
-  Initialization init (al.alist ("init"), soil, som, T_avg);
+  Initialization init (al.alist ("init"), soil, bioincorporation, som, T_avg);
 		       
   double total_delta_C = 0.0;
   double total_delta_N = 0.0;
