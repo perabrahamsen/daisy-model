@@ -1,3 +1,17 @@
+2001-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.84 released.
+
+2001-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* macro_std.C (tick): Handle fully saturated soil.
+
+2001-10-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* COPYING, COPYING.LIB: New files.
+	* Makefile (TEXT): Added them.
+	* all: Added copyright notices.
+
 2001-10-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.83 released.
