@@ -1,3 +1,26 @@
+1998-05-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.020 released.
+
+1998-05-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.h (class SoilWater):  Added functions
+	for communication with external model.
+	* surface.C, surface.h: Ditto.
+	* snow.C (get_h2o): Ditto.
+	* bioclimate_std.C, bioclimate.C, bioclimate.h: Ditto.
+	* colsumn_std.C, column.h: Ditto.  Call them.
+	* cdaisy.C: Call them.
+
+1998-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (get_number): Better error handling.
+	(get_integer): Ditto.
+
+1998-04-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C: Added dummies for unimplemented API functions.
+
 1998-04-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.019 released.

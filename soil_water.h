@@ -59,6 +59,11 @@ public:
   // Communication with surface.
   double MaxExfiltration (const Soil&) const;
 
+  // Communication with external model.
+  void put_h (const Soil& soil, const vector<double>& v); // [cm]
+  void get_sink (vector<double>& v) const // [cm^3/cm^3/h]
+    { v = S; }
+
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);
   SoilWater (const AttributeList&);

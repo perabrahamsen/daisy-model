@@ -50,6 +50,7 @@ public:
   double PotEvapotranspiration;
   double ActualEvapotranspiration;
   double EvapInterception;
+  double net_precipitation;
 
 public:
   // Simulation
@@ -83,6 +84,17 @@ public:
   void irrigate (double flux, double temp, 
 		 Column::irrigation_from from);
   
+  // Communication with external model.
+  double get_evap_interception () const // [mm/h]
+    { return EvapInterception; }
+  double get_intercepted_water () const // [mm]
+    { return intercepted_water; }
+  double get_net_precipitation () const // [mm/h]
+    { return net_precipitation; }
+  double get_snow_height () const // [mm]
+    { return snow.get_h2o (); }
+
+
   // Create.
 public:
   BioclimateStandard (const AttributeList&);
@@ -101,7 +113,8 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     snow (al.alist ("Snow")),
     PotEvapotranspiration (0.0),
     ActualEvapotranspiration (0.0),
-    EvapInterception (0.0)
+    EvapInterception (0.0),
+    net_precipitation (0.0)
 { }
 
 void 
@@ -255,6 +268,9 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   if (irrigation_type == Column::surface_irrigation)
     Total_through_fall += irrigation;
 
+  // Store this for external model.
+  net_precipitation = Total_through_fall - irrigation;
+
   double temperature;
   if (Total_through_fall + irrigation > 0.0)
     temperature 
@@ -334,6 +350,7 @@ BioclimateStandard::output (Log& log, Filter& filter) const
 {
   log.output ("intercepted_water", filter, intercepted_water);
   log.output ("EvapInterception", filter, EvapInterception, true);
+  log.output ("net_precipitation", filter, net_precipitation, true);
   log.output ("LAI", filter, LAI_, true);
   log.output ("PotEvapotranspiration", filter,
 	      PotEvapotranspiration, true);
@@ -369,6 +386,7 @@ static struct BioclimateStandardSyntax
       alist.add ("NoOfIntervals", 30);
       syntax.add ("intercepted_water", Syntax::Number, Syntax::State);
       syntax.add ("EvapInterception", Syntax::Number, Syntax::LogOnly);
+      syntax.add ("net_precipitation", Syntax::Number, Syntax::LogOnly);
       syntax.add ("LAI", Syntax::Number, Syntax::LogOnly);
       syntax.add ("PotEvapotranspiration", Syntax::Number, Syntax::LogOnly);
       syntax.add ("ActualEvapotranspiration", Syntax::Number, Syntax::LogOnly);

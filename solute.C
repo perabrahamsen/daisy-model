@@ -112,6 +112,21 @@ Solute::swap (const Soil& soil, const SoilWater& soil_water,
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
 
+void 
+Solute::put_M (const Soil& soil, const SoilWater& soil_water,
+	       const vector<double>& v)
+{
+  const unsigned int size = soil.size ();
+  assert (M_.size () == size);
+  assert (C_.size () == size);
+  assert (v.size () == size);
+
+  M_ = v;
+
+  for (unsigned int i = 0; i < size; i++)
+    C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+}
+
 void
 Solute::initialize (const AttributeList& al, 
 		    const Soil& soil, const SoilWater& soil_water)

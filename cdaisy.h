@@ -301,7 +301,7 @@ daisy_parser_delete (daisy_parser* parser);
 void				/* Load file. */
 daisy_parser_load (daisy_parser* parser, daisy_alist* alist);
 
-int				/* Return number of errors encountered. */
+unsigned int			/* Return number of errors encountered. */
 daisy_parser_error_count (daisy_parser* parser);
 
 /* @ The daisy_printer Type.
@@ -395,7 +395,7 @@ daisy_daisy_get_time (daisy_daisy* daisy);
 daisy_weather*			/* Extract weather. */
 daisy_daisy_get_weather (const daisy_daisy* daisy);
 
-int				/* Count the number of columns in daisy. */
+unsigned int			/* Count the number of columns in daisy. */
 daisy_daisy_count_columns (const daisy_daisy* daisy);
 
 daisy_column*			/* Extract a column, [0 <= col < size]. */
@@ -485,7 +485,7 @@ daisy_column_get_name (const daisy_column* column);
  * The numeric layers used in the soil.
  */
 
-int				/* The number of numeric layers. */
+unsigned int			/* The number of numeric layers. */
 daisy_column_count_layers (const daisy_column* column);
 
 double				/* Heigh of numeric lay `lay' in cm. */

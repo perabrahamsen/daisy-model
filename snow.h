@@ -28,6 +28,9 @@ public:
   double temperature ();
   double evaporation ();
 
+  // Communication with external model.
+  double get_h2o () const;
+
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);

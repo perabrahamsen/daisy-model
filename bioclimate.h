@@ -44,7 +44,13 @@ public:
 public:
   virtual void irrigate (double flux, double temp, 
 			 Column::irrigation_from from) = 0;
-  
+
+  // Communication with external model.
+  virtual double get_evap_interception () const; // [mm/h]
+  virtual double get_intercepted_water () const; // [mm]
+  virtual double get_net_precipitation () const; // [mm/h]
+  virtual double get_snow_height () const; // [mm]
+
   // Create.
 protected:
   Bioclimate (const string& name);

@@ -384,7 +384,7 @@ extern "C" void EXPORT
 daisy_parser_load (Parser* parser, AttributeList* alist)
 { parser->load (*alist); }
 
-extern "C" int EXPORT
+extern "C" unsigned int EXPORT
 daisy_parser_error_count (Parser* parser)
 { return parser->error_count (); }
 
@@ -490,7 +490,7 @@ extern "C" Weather* EXPORT
 daisy_daisy_get_weather (Daisy* daisy)
 { return &daisy->weather; }
 
-extern "C" int EXPORT
+extern "C" unsigned int EXPORT
 daisy_daisy_count_columns (const Daisy* daisy)
 { return daisy->columns.size (); }
 
@@ -499,10 +499,12 @@ daisy_daisy_get_column (Daisy* daisy, int col)
 { return daisy->columns[col]; }
 
 extern "C" void EXPORT
-daisy_daisy_append_column (Daisy* daisy, Column* column);
+daisy_daisy_append_column (Daisy* /* daisy */, Column* /*column*/)
+{ /* BUG: unimplemented */ }
 
 extern "C" void EXPORT
-daisy_daisy_remove_column (Daisy* daisy, Column* column);
+daisy_daisy_remove_column (Daisy* /*daisy*/, Column* /*column*/)
+{ /* BUG: unimplemented */ }
 
 // @ The daisy_time Type.
 
@@ -549,10 +551,12 @@ daisy_weather_put_reference_evapotranspiration (Weather* weather, double ref)
 // @@ Cloning and merging columns.
 
 extern "C" Column* EXPORT
-daisy_column_clone (const Column* column, const char* name);
+daisy_column_clone (const Column* /*column*/, const char* /*name*/)
+{ /* BUG: unimplemented */ return NULL; }
 
 extern "C" void EXPORT
-daisy_column_merge (Column* column, const Column* other, double weight);
+daisy_column_merge (Column* /*column*/, const Column* /*other*/, double /*weight*/)
+{ /* BUG: unimplemented */ }
 
 // @@ Manipulating the column state.
 
@@ -562,66 +566,123 @@ daisy_column_get_name (const Column* column)
 
 // @@@ Soil Geometry.
 
-extern "C" int EXPORT
-daisy_column_count_layers (const Column* column);
+extern "C" unsigned int EXPORT
+daisy_column_count_layers (const Column* column)
+{ return column->count_layers (); }
 
 extern "C" double EXPORT	// Heigh of numeric lay `lay' in cm.
-daisy_column_get_dz (const Column* column, int lay);
+daisy_column_get_dz (const Column* column, int lay)
+{ return column->get_dz (lay); }
 
 // @@@ Soil Water. 
 //
 // Water content of the soil.
 
 extern "C" void EXPORT		// [cm]
-daisy_column_put_water_pressure (Column* column, const double h[]);
+daisy_column_put_water_pressure (Column* column, const double h[])
+{ 
+  // Convert to vector.
+  vector<double> v;
+  unsigned int size = column->count_layers ();
+  for (unsigned int i = 0; i < size; i++)
+    v.push_back (h[i]);
+  
+  column->put_water_pressure (v); 
+}
 
 extern "C" void EXPORT		// [cm^3/cm^3/h]
-daisy_column_get_water_sink (const Column* column, double sink[]);
+daisy_column_get_water_sink (const Column* column, double sink[])
+{ 
+  // Get sink.
+  vector<double> v;
+  column->get_water_sink (v); 
+  unsigned int size = column->count_layers ();
+  assert (v.size () <= size);
+
+  // Store v in sink..
+  unsigned int i = 0;
+  for (; i < v.size (); i++)
+    sink[i] = v[i];
+  for (; i < size; i++)
+    sink[i] = 0.0;
+}
 
 // @@@ Soil Nitrate. 
 // 
 // Nitrate solution in the soil.
 
 extern "C" void EXPORT		// [g/cm^3]
-daisy_column_put_no3_m (Column* column, const double M[]);
+daisy_column_put_no3_m (Column* column, const double M[])
+{ 
+  // Convert to vector.
+  vector<double> v;
+  unsigned int size = column->count_layers ();
+  for (unsigned int i = 0; i < size; i++)
+    v.push_back (M[i]);
+  
+  column->put_no3_m (v); 
+}
 
 extern "C" void EXPORT		// [g/cm^3]
-daisy_column_get_no3_m (Column* column, double M[]);
+daisy_column_get_no3_m (Column* column, double M[])
+{ 
+  // Get NO3.
+  vector<double> v;
+  column->get_no3_m (v); 
+  unsigned int size = column->count_layers ();
+  assert (v.size () <= size);
+
+  // Store NO3 in M.
+  unsigned int i = 0;
+  for (; i < v.size (); i++)
+    M[i] = v[i];
+  for (; i < size; i++)
+    M[i] = 0.0;
+}
 
 // @@@ Bioclimate. 
 //
 // What happens in the canopy?
 
 extern "C" double EXPORT	// [mm/h]
-daisy_column_get_evap_interception (const Column* column);
+daisy_column_get_evap_interception (const Column* column)
+{ return column->get_evap_interception (); }
 
 extern "C" double EXPORT	// [mm]
-daisy_column_get_intercepted_water (const Column* column);
+daisy_column_get_intercepted_water (const Column* column)
+{ return column->get_intercepted_water (); }
 
 extern "C" double EXPORT	// [mm/h]
-daisy_column_get_net_precipitation (const Column* column);
+daisy_column_get_net_precipitation (const Column* column)
+{ return column->get_net_precipitation (); }
 
 // @@@ Surface.
 // 
 // The surface manages anything that lies on top of the soil.
 
 extern "C" double EXPORT	// [mm/h]
-daisy_column_get_evap_soil_surface (const Column* column);
+daisy_column_get_evap_soil_surface (const Column* column)
+{ return column->get_evap_soil_surface (); }
 
 extern "C" double EXPORT	// [mm/h]
-daisy_column_get_evap_pond (const Column* column);
+daisy_column_get_evap_pond (const Column* column)
+{ return column->get_evap_pond (); }
 
 extern "C" void EXPORT		// [mm]
-daisy_column_put_ponding (Column* column, double pond);
+daisy_column_put_ponding (Column* column, double pond)
+{ column->put_ponding (pond); }
 
 extern "C" void	 EXPORT		// [g/cm^2]
-daisy_column_put_surface_no3 (Column* column, double no3);
+daisy_column_put_surface_no3 (Column* column, double no3)
+{ column->put_surface_no3  (no3); }
 
 extern "C" double EXPORT	// [g/cm^2]
-daisy_column_get_surface_no3 (const Column* column);
+daisy_column_get_surface_no3 (const Column* column)
+{ return column->get_surface_no3 (); }
 
 extern "C" double EXPORT	// [mm]
-daisy_column_get_snow_height (const Column* column);
+daisy_column_get_snow_height (const Column* column)
+{ return column->get_snow_height (); }
 
 // @ Miscellaneous.
 //

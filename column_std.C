@@ -74,6 +74,44 @@ public:
   { return organic_matter.check_am (am); }
   void output (Log&, Filter&) const;
 
+  // Communication with external model.
+  unsigned int count_layers () const // Number of num. layers.
+    { return soil.size (); }
+  double get_dz (unsigned int i) const // Size of layer `i'. [cm]
+    { return soil.dz (i); }
+  void put_water_pressure (const vector<double>& v) // [cm]
+    { soil_water.put_h (soil, v); }
+  void get_water_sink (vector<double>& v) const // [cm^3/cm^3/h]
+    { soil_water.get_sink (v); }
+  void put_no3_m (const vector<double>& v) // [g/cm^3]
+    { soil_NO3.put_M (soil, soil_water, v); }
+  void get_no3_m (vector<double>& v) const // [g/cm^3]
+    { 
+      const unsigned int size = soil.size ();
+
+      v.erase (v.begin (), v.end ());
+      for (unsigned int i = 0; i < size; i++)
+	v.push_back (soil_NO3.M (i));
+    }
+  double get_evap_interception () const // [mm/h]
+    { return bioclimate.get_evap_interception (); }
+  double get_intercepted_water () const // [mm]
+    { return bioclimate.get_intercepted_water (); }
+  double get_net_precipitation () const // [mm/h]
+    { return bioclimate.get_net_precipitation (); }
+  double get_snow_height () const // [mm]
+    { return bioclimate.get_snow_height (); }
+  double get_evap_soil_surface () const // [mm/h]
+    { return surface.get_evap_soil_surface (); }
+  double get_evap_pond () const // [mm/h]
+    { return surface.get_evap_pond (); }
+  void put_ponding (double pond)	// [mm]
+    { surface.put_ponding (pond); }
+  void put_surface_no3 (double no3) // [g/cm^2]
+    { surface.put_no3 (no3); }
+  double get_surface_no3 () const // [g/cm^2]
+    { return surface.get_no3 (); }
+
   // Create and Destroy.
 public:
   Column& clone (const string& name) const

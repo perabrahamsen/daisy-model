@@ -280,6 +280,12 @@ Snow::evaporation ()
   return impl.EvapSnowPack;
 }
 
+double 
+Snow::get_h2o () const
+{
+  return impl.Ssnow;
+}
+
 void
 Snow::load_syntax (Syntax& syntax, AttributeList& alist)
 { 

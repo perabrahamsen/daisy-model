@@ -59,6 +59,23 @@ public:
   virtual bool check_am (const AttributeList& am) const = 0;
   virtual void output (Log&, Filter&) const = 0;
 
+  // Communication with external model.
+  virtual unsigned int count_layers () const = 0; // Number of num. layers.
+  virtual double get_dz (unsigned int i) const = 0; // Size of layer `i'. [cm]
+  virtual void put_water_pressure (const vector<double>& v) = 0; // [cm]
+  virtual void get_water_sink (vector<double>& v) const = 0; // [cm^3/cm^3/h]
+  virtual void put_no3_m (const vector<double>& v) = 0; // [g/cm^3]
+  virtual void get_no3_m (vector<double>& v) const = 0; // [g/cm^3]
+  virtual double get_evap_interception () const = 0; // [mm/h]
+  virtual double get_intercepted_water () const = 0; // [mm]
+  virtual double get_net_precipitation () const = 0; // [mm/h]
+  virtual double get_snow_height () const = 0; // [mm]
+  virtual double get_evap_soil_surface () const = 0; // [mm/h]
+  virtual double get_evap_pond () const = 0; // [mm/h]
+  virtual void put_ponding (double pond) = 0;	// [mm]
+  virtual void put_surface_no3 (double no3) = 0; // [g/cm^2]
+  virtual double get_surface_no3 () const = 0; // [g/cm^2]
+
   // Create and Destroy.
 protected:
   Column (const string& name);

@@ -174,6 +174,20 @@ SoilWater::MaxExfiltration (const Soil& soil) const
 	    * ((Theta_[0] - soil.Theta_res (0)) / soil.z(0)));
 }
 
+void 
+SoilWater::put_h (const Soil& soil, const vector<double>& v) // [cm]
+{
+  const int size = soil.size ();
+  assert (v.size () == size);
+  assert (h_.size () == size);
+  assert (Theta_.size () == size);
+
+  h_ = v;
+
+  for (unsigned int i = 0; i < size; i++)
+    Theta_[i] = soil.Theta (i, h_[i]);
+}
+
 void
 SoilWater::load_syntax (Syntax& syntax, AttributeList&)
 { 

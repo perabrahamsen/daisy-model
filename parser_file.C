@@ -144,15 +144,29 @@ ParserFile::Implementation::get_number ()
   string str;
   int c = peek ();
 
-  while (isdigit (c) 
-	 || c == '.' || c == '-' || c == '+' || 
-	 c == 'e' || c == 'E')
+  while (good () && (isdigit (c) 
+		     || c == '.' || c == '-' || c == '+' 
+		     || c == 'e' || c == 'E'))
     {
       str += static_cast<char> (c);
       get ();
       c = peek ();
     }
-  return atof (str.c_str ());
+  // Empty number?
+  if (str.size () < 1U)
+    {
+      error ("Number expected");
+      skip_to_end ();
+      return -42.42e42;
+    }
+  const char *c_str = str.c_str ();
+  const char *endptr = c_str;
+  const double value = strtod (c_str, (char**) &endptr);
+  
+  if (*endptr != '\0')
+    error (string ("Junk at end of number `") + endptr + "'");
+
+  return value;
 }
 
 int
@@ -167,6 +181,13 @@ ParserFile::Implementation::get_integer ()
       str += static_cast<char> (c);
       get ();
       c = peek ();
+    }
+  // Empty number?
+  if (str.size () < 1U)
+    {
+      error ("Integer expected");
+      skip_to_end ();
+      return -42;
     }
   return atoi (str.c_str ());
 }
@@ -554,7 +575,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		int count = 0;
 		int size = syntax.size (name);
 		double last = 0.0;
-		while (!looking_at (')') && good ())
+		while (good () && !looking_at (')'))
 		  {
 		    if (looking_at ('*'))
 		      {

@@ -59,6 +59,10 @@ public:
   void mix (const Soil&, const SoilWater&, double from, double to);
   void swap (const Soil&, const SoilWater&, double from, double middle, double to);
 
+  // Communication with external model.
+  void put_M (const Soil& soil, const SoilWater& soil_water,
+	      const vector<double>& v);
+
   // Create and destroy.
 protected:
   static void load_syntax (Syntax&, AttributeList&);

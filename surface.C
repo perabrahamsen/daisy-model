@@ -133,6 +133,38 @@ Surface::output (Log& log, Filter& filter) const
   output_submodule (im, "IM", log, filter);
 }
 
+double
+Surface::get_evap_soil_surface () const // [mm/h]
+{
+  // egative pond == amount extracted from soil.
+  if (pond < 0.0)
+    return -pond;
+  else
+    return 0.0;
+}
+
+double
+Surface::get_evap_pond () const // [mm/h]
+{
+  // Negative pond == amount extracted from soil.
+  if (pond < 0.0)
+    return EvapSoilSurface + pond;
+  else 
+    return EvapSoilSurface;
+}
+
+void
+Surface::put_ponding (double p)	// [mm]
+{ pond = p; }
+  
+void
+Surface::put_no3 (double no3) // [g/cm^2]
+{ im.NO3 = no3; }
+
+double
+Surface::get_no3 () const // [g/cm^2]
+{ return im.NO3; }
+
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<IM>;
 #endif
