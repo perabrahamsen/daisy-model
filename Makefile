@@ -25,6 +25,7 @@ FTPDIR = /home/ftp/pub/daisy
 WWWINDEX = /home/user_3/daisy/.public_html/index.html
 
 BORLAND = "e:/Program Files/Borland/CBuilder5/"
+MSTARGET = i586-mingw32msvc
 
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
@@ -136,6 +137,8 @@ ifeq ($(USE_DYNLIB),true)
 	DYNSEARCH = -R`pwd`
 endif
 
+GCC = gcc
+
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
 		OSFLAGS = 
@@ -159,7 +162,7 @@ ifeq ($(COMPILER),gcc)
 		  -Wsign-promo \
 		  -Wundef -Wpointer-arith -Wwrite-strings -Wmissing-noreturn
 #  -Wold-style-cast: triggered by isalpha and friends.
-	COMPILE = "c++" -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
+	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
@@ -392,7 +395,15 @@ daisy.exe:	main${OBJ} $(LIBOBJ)
 	$(LINK)daisy.exe $^ $(MATHLIB)
 
 daisy:	main${OBJ} $(LIBOBJ) #daisy.so
-	$(LINK)daisy  $^ $(MATHLIB)
+	$(LINK)daisy $^ -lstdc++ $(MATHLIB)
+
+native:	
+	(cd $(HOSTTYPE) && $(MAKE) VPATH=.. -f ../Makefile daisy)
+
+cross:
+	(cd $(MSTARGET) \
+         && $(MAKE) GCC="gcc-3.2 -b $(MSTARGET) -V 3.2" VPATH=.. \
+                    -f ../Makefile daisy)
 
 # Create manager test executable.
 #
@@ -554,18 +565,20 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
-	$(MAKE) daisy
+	$(MAKE) native cross
 	mv -f $(WWWINDEX) $(WWWINDEX).old
 	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
 		< $(WWWINDEX).old > $(WWWINDEX)
 	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
-	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) dist)
+	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) TAG_$(TAG) dist)
 	(cd txt; $(MAKE) FTPDIR=$(FTPDIR) dist)
-	strip -o $(FTPDIR)/daisy-$(TAG)-$(HOSTTYPE) daisy 
-	rm -f $(FTPDIR)/daisy-$(HOSTTYPE)
-	(cd $(FTPDIR); ln -s daisy-$(TAG)-$(HOSTTYPE) daisy-$(HOSTTYPE))
+	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
+	rm -f $(FTPDIR)/$(MSTARGET)/daisy-$(TAG).exe
+	strip -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) $(HOSTTYPE)/daisy 
+	strip -o $(FTPDIR)/$(MSTARGET)/daisy-$(TAG).exe $(MSTARGET)/daisy 
+	(cd $(FTPDIR); ln -s $(MSTARGET)/daisy-$(TAG).exe daisy.exe)
 
 # Update the CVS repository.
 #

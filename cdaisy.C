@@ -40,6 +40,7 @@
 #include "log_extern.h"
 #include "treelog_stream.h"
 #include <fstream.h>
+#include <iostream>
 
 typedef int daisy_bool;
 

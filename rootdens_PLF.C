@@ -26,10 +26,9 @@
 #include "check.h"
 #include "mathlib.h"
 
-class Rootdens_PLF : public Rootdens
+struct Rootdens_PLF : public Rootdens
 {
   // Parameters.
-private:
   struct Entry
   {
     // Parameters.
@@ -45,14 +44,12 @@ private:
   vector<const Entry*> entries;
 
   // Simulation.
-protected:
   void get_density (Treelog&, vector<double>& Density,
 		    const Geometry& geometry, 
 		    double WRoot, double value, double z_factor,
 		    double max_depth = 1e100);
 
   // Create.
-protected:
   Rootdens_PLF (const AttributeList&);
   ~Rootdens_PLF ();
 };

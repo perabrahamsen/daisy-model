@@ -5,10 +5,12 @@
 #include "assertion.h"
 
 // Get chdir.
-#ifdef __BORLANDC__
-#include <dir.h>
-#elif defined ( __GNUC__ )
+#if defined (__unix)
 #include <unistd.h>
+#elif defined (__MINGW32__)
+extern "C" int chdir (const char* dir);
+#else
+#include <dir.h>
 #endif
 
 #include <fstream>

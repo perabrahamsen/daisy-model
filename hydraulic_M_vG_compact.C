@@ -44,6 +44,7 @@ class HydraulicM_vG_compact : public Hydraulic
   double m;		// 1 - 1/n
   double K_sat;
   void set_porosity (double Theta);
+  mutable PLF M_;
 
   // Use.
 public:
@@ -119,15 +120,10 @@ HydraulicM_vG_compact::h (const double Theta) const
 double 
 HydraulicM_vG_compact::M (double h) const
 {
-  // Use.
-  static PLF plf;
-  static bool initialized = false;
-  if (!initialized)
-    {
-      K_to_M (plf, 500);
-      initialized = true;
-    }
-  return plf (h);
+  if (M_.size () == 0)
+    K_to_M (M_, 500);
+
+  return M_ (h);
 }
 
 double 
@@ -151,7 +147,8 @@ HydraulicM_vG_compact::HydraulicM_vG_compact (const AttributeList& al)
     ref_K_sat (al.number ("ref_K_sat")),
     mod_alpha (al.plf ("mod_alpha")),
     mod_n (al.plf ("mod_n")),
-    mod_K_sat (al.plf ("mod_K_sat"))
+    mod_K_sat (al.plf ("mod_K_sat")),
+    M_ ()
 { set_porosity (Theta_sat); }
 
 HydraulicM_vG_compact::~HydraulicM_vG_compact ()

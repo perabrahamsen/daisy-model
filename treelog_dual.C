@@ -27,8 +27,10 @@
 #include <fstream>
 #include <deque>
 // GCC 2.95.2 need a ".h".
-#ifdef __unix
+#if defined (__unix)
 #include <unistd.h>
+#elif defined (__MINGW32__)
+extern "C" char* getcwd (char*, int);
 #else
 #include <dir.h>
 #endif

@@ -38,6 +38,7 @@ class HydraulicHypres : public Hydraulic
   /* const */ double m;		// 1 - 1/n
   /* const */ double l;         // tortuosity parameter
   /* const */ double K_sat;
+  mutable PLF M_;
 
   // Use.
 public:
@@ -107,15 +108,10 @@ HydraulicHypres::h (const double Theta) const
 double 
 HydraulicHypres::M (double h) const
 {
-  // Use.
-  static PLF plf;
-  static bool initialized = false;
-  if (!initialized)
-    {
-      K_to_M (plf, 500);
-      initialized = true;
-    }
-  return plf (h);
+  if (M_.size () == 0)
+    K_to_M (M_, 500);
+
+  return M_ (h);
 }
 
 double 
@@ -226,7 +222,8 @@ HydraulicHypres::HydraulicHypres (const AttributeList& al)
     n (-42.42e42),
     m (-42.42e42),
     l (-42.42e42),
-    K_sat (-42.42e42)
+    K_sat (-42.42e42),
+    M_ ()
 { }
 
 HydraulicHypres::~HydraulicHypres ()

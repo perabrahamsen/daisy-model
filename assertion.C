@@ -31,6 +31,16 @@ namespace Assertion
 }
 
 void 
+Assertion::message (const string& msg)
+{
+  for (unsigned int i = 0; i < logs.size (); i++)
+    {
+      logs[i]->error (msg);
+      logs[i]->flush ();
+    }
+};
+
+void 
 Assertion::failure (const char* file, int line, const char* fun,
 		    const char* test)
 {
@@ -39,11 +49,7 @@ Assertion::failure (const char* file, int line, const char* fun,
   if (fun)
     tmp () << " in " << fun;
   
-  for (unsigned int i = 0; i < logs.size (); i++)
-    {
-      logs[i]->error (tmp.str ());
-      logs[i]->flush ();
-    }
+  message (tmp.str ());
   exit (3);
 };
 
@@ -55,12 +61,21 @@ Assertion::bug (const char* file, int line, const char* fun,
   tmp () << file << ":" << line << ": Daisy bug: '" << msg << "'";
   if (fun)
     tmp () << " in " << fun;
-  
-  for (unsigned int i = 0; i < logs.size (); i++)
-    {
-      logs[i]->error (tmp.str ());
-      logs[i]->flush ();
-    }
+
+  message (tmp.str ());
+};
+
+void 
+Assertion::warning (const char* file, int line, const char* fun,
+		    const string& msg)
+{
+  TmpStream tmp;
+  tmp () << file << ":" << line << ": ";
+  if (fun)
+    tmp () << "(" << fun << ") ";
+  tmp () << "warning: " << msg;
+
+  message (tmp.str ());
 };
 
 void 

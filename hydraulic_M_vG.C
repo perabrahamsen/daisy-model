@@ -35,6 +35,7 @@ class HydraulicM_vG : public Hydraulic
   const double m;		// 1 - 1/n
   const double l;               // tortuosity parameter
   const double K_sat;
+  mutable PLF M_;
 
   // Use.
 public:
@@ -101,15 +102,10 @@ HydraulicM_vG::h (const double Theta) const
 double 
 HydraulicM_vG::M (double h) const
 {
-  // Use.
-  static PLF plf;
-  static bool initialized = false;
-  if (!initialized)
-    {
-      K_to_M (plf, 500);
-      initialized = true;
-    }
-  return plf (h);
+  if (M_.size () == 0)
+    K_to_M (M_, 500);
+
+  return M_ (h);
 }
 
 double 
@@ -133,7 +129,8 @@ HydraulicM_vG::HydraulicM_vG (const AttributeList& al)
     n (al.number ("n")),
     m (1 - 1 / n),
     l (al.number ("l")),
-    K_sat (al.number ("K_sat"))
+    K_sat (al.number ("K_sat")),
+    M_ ()
 { }
 
 HydraulicM_vG::~HydraulicM_vG ()

@@ -505,13 +505,17 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      int count = 0;
 	      const string domain = syntax.domain (name);
 	      const string range = syntax.range (name);
+	      bool ok = true;
 	      while (!looking_at (')') && good ())
 		{
 		  skip ("(");
 		  double x = get_number (domain);
 		  {
 		    if (count > 0 && x <= last_x)
-		      error ("Non increasing x value");
+		      {
+			error ("Non increasing x value");
+			ok = false;
+		      }
 		    last_x = x;
 		    count++;
 		  }
@@ -523,13 +527,19 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  catch (const string& message)
 		    {
 		      error (name + ": " + message);
+		      ok = false;
 		    }
 		  skip (")");
-		  plf.add (x, y);
+		  if (ok)
+		    plf.add (x, y);
 		}
 	      if (count < 2)
-		error ("Need at least 2 points");
-	      atts.add (name, plf);
+		{
+		  error ("Need at least 2 points");
+		  ok = false;
+		}
+	      if (ok)
+		atts.add (name, plf);
 	      if (in_order)
 		skip (")");
 	      break;

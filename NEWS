@@ -12,6 +12,21 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.46
+
+** Fix bug with van Genuchten hydraulic models (including hypres).
+
+If you had multiple horizons using the hydraulic model, all used the
+same value for M, affecting root uptake.
+
+** Allow Daisy to run even with very steep hydraulic conductivity curves.
+
+** Switched to from Borland C++ to GCC for building daisy.exe
+
+This seems to cut simulation time to nearly half.
+
+(Technically, I am cross-compiling from Linux to MinGW32 with GCC 3.2.)
+
 * 2.45
 
 ** New missing_years attribute for the default weather model.

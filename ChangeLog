@@ -1,4 +1,19 @@
+2003-02-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.45 released.
+
 2003-02-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* assertion.C (message): New function.
+	(warning): New function.
+	* assertion.h (daisy_warning): Use it.
+
+	* hydraulic.C (K_to_M): Survive very steep conductivity curves.
+
+	* hydraulic_yolo.C, hydraulic_M_vG_compact.C, hydraulic_M_vG.C,
+	hydraulic_B_vG.C (M_): New member variable.
+
+	* parser_file.C (load_list): Don't build or add invalid PLF.
 
 	* weather_std.C: Added assertion about use uninitialized.
 	(tick): Make sure to initialize.

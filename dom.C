@@ -61,6 +61,7 @@ public:
   
   // Create and Destroy.
 public:
+  static Submodel::Register dom_element_submodel;
   static void load_syntax (Syntax&, AttributeList&);
   void initialize (const Soil&, const SoilWater&, Adsorption&, Treelog&);
   Element (const AttributeList& al);
@@ -218,8 +219,8 @@ DOM::Element::Element (const AttributeList& al)
 DOM::Element::~Element ()
 { }
 
-static Submodel::Register dom_element_submodel ("DOM-Element", 
-						DOM::Element::load_syntax);
+Submodel::Register 
+DOM::Element::dom_element_submodel ("DOM-Element", DOM::Element::load_syntax);
 
 void 
 DOM::output (Log& log) const

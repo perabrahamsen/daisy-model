@@ -1059,8 +1059,10 @@ CropOld::SoluteUptake (const Soil& soil,
 		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
 		   - (pow (beta, 2.0 - alpha) - 1.0));
 	    }
+#ifndef __MINGW32__
 	  daisy_assert (finite (I_zero[i]));
 	  daisy_assert (finite (B_zero[i]));
+#endif
 	  B += L * soil.dz (i) * B_zero[i];
 	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
 	}

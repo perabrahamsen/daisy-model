@@ -26,6 +26,7 @@
 class HydraulicYolo : public Hydraulic
 {
   int M_intervals;
+  mutable PLF M_;
 
 public:
   double Theta (double h) const;
@@ -83,20 +84,16 @@ HydraulicYolo::h (const double Theta) const
 double 
 HydraulicYolo::M (double h) const
 {
-  // Use.
-  static PLF plf;
-  static bool initialized = false;
-  if (!initialized)
-    {
-      K_to_M (plf, M_intervals);
-      initialized = true;
-    }
-  return plf (h);
+  if (M_.size () == 0)
+    K_to_M (M_, M_intervals);
+
+  return M_ (h);
 }
 
 HydraulicYolo::HydraulicYolo (const AttributeList& al)
   : Hydraulic (al),
-    M_intervals (al.integer ("M_intervals"))
+    M_intervals (al.integer ("M_intervals")),
+    M_ ()
 { 
   // This is not to be changed.
   daisy_assert (Theta_sat > 0.4949 && Theta_sat < 0.4951);
