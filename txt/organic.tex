@@ -39,41 +39,101 @@ assumption allows the non-expert user to initialize the model.
 
 SH: referencer til vigtigste org.matter modeller.
 
-It is common to divide the organic matter into three fractions.  First
-we have the freshly entered organic matter, which can still be traced
-back to its origin.  For a cultivated soil, this might include orgaic
-fertilizer, crop residuals, including rhizodeposition and dead leaves
-incorporated to the soil by earthworms.  This fraction is
-conventionally called \emph(added organic matter), or \sc(aom).  Then
-we have the soil microbial biomass, or \sc(smb), the living part of
-the organic matter, excluding roots.  Finally we have the humus, the
-soil organic matter (\sc(som)), which can no longer be traced back to
-its origin.
+It is conventional to divide the organic matter in the soil into three
+fractions.  First we have the freshly entered organic matter, which
+can still be traced back to its origin.  For a cultivated soil, this
+might include organic fertilizer, crop residuals, including
+rhizodeposition and dead leaves incorporated to the soil by
+earthworms.  This fraction is conventionally called \emph(added
+organic matter), or \sc(aom).  Then we have the soil microbial
+biomass, or \sc(smb), the living part of the organic matter, excluding
+roots.  Finally we have the humus, the soil organic matter (\sc(som)),
+which can no longer be traced back to its origin.  The dynamics of the
+system consist of input in the form of new added organic matter, and
+turnover in the form the soil biomass eating the other matter (and
+itself) and dying.
 
-Often, these fractions are further divided into smaller pools, the
-content of each pool assumed by the model to have uniform properties.
+In numeric models, these fractions may be further divided into smaller
+pools, the content of each pool assumed by the model to have uniform
+properties, e.g.\ similar turnover rate and the same C/N ratio for
+models that are concern with nitrogen.  Having two \sc{som} and two
+\sc{smb} pools allows a well calibrated model to capture both the
+short term (see XXX) and long term (XXX) dynamics of the system.  If
+you are only interested in accuracy on a single time scale, less pools
+may be needed.  The number \sc{aom} pools needed also depends on what
+you are simulating.  For batch experiments and some long time
+scenarios, a single pool may be enough.  To simulate input sources
+from real farming, two pools per source are in general needed for each
+source.  
 
-Daisy og andre SOM modeller, validering
+PA: sammenligninger, Daisy er bedst!
 
-Daisy software generel
+\section{Evolution of the Daisy model}
 
-Thorsten müllers ændring 
+PA: Daisy kan en masse.
 
-Sanders ændring 
+The purpose of the \daisy{} model is to simulate real farming
+practice, both on the short and the long term.  Thus, we get a system
+with two pools for each of \sc{som} and \sc{smb}, and two pools for
+each type fertilizer applied or crop residual left on the field.  The
+original model is depicted in figure~\ref{fig:om1}.
 
-Fremtidige ændringer DOM, Biomod, P, forrest
+FIG{om1}: The original Daisy OM parameterization.
 
-konklusion: model ændrer sig
+PA: turnover rates, fractions, efficiency, maintenance, (abiotic factors).
+
+The \daisy{} software allows the user to adjust all of these
+parameters.  It also allows the user to specify the number of \sc{som}
+and \sc{smb} pools, as well as the number of \sc{aom} pools for each
+fertilizer application and each crop residual type.  It thus provides
+a good basis for experimentation.
+
+The first such experimental change that made it back into \daisy{} was
+made by Torsten Müller (see XXX 19??), who adjusted the turnover rates
+of the \sc{smb} pools so the biomass content of the soil better
+matched the levels measured at the fields.  The change did not affect
+the long time dynamics of the systen.  The second such change was made
+by Anders Sanders (see XXX 19??).  The was a complete recalibration
+that took into account the carbon input from rhizodepositions.  This
+change was more radical, involving both turnover rates and directions
+of flow, and made the system much more adaptable to new levels of
+input, another effect which has also been observed emperically (see
+DJF repport on humus levels).
+
+Some of the experimental changes affecting soil organic matter that we
+are currently working on, and which may be included in future versions
+of \daisy{}, are dissolved organic matter (see BGJ), a 
+
+PA: Fremtidige ændringer DOM, Biomod, P, forrest
+
+PA: konklusion: model ændrer sig
 
 \section{Expanding user base}
 
-sanders equilibrium
+PA: hvem bruger det?
 
-tove og kresten
+It is common to use an equilibrium assumption for initialising models
+where measurements are not available.  For example, in \daisy{}we
+assume that the soil water in the bottom of the unsaturated zone is in
+equilibrium with the groundwater, as specified by Darcy's equation.
+There are two reasons this is often a good assumption.  For some
+systems, it will be correct most of the time, because they quicly
+reach equilibrium compared to the externaly imposed changes.  In other
+cases, the dynamic of the system quickly dominate over the initial
+condition, so an equilibrium is good for giving a reasonable initial
+state.
 
-the standardization project
+As part of Sander's recalibration work, he also found that the ratio
+between the \sc{som1} and \sc{som2} for a system in equilibrium will
+49\% vs 51\%.   
 
-konklusion: behov for forståelige og model-uafhængige begreber,
+PA: sanders equilibrium
+
+PA: tove og kresten
+
+PA: the standardization project
+
+PA: konklusion: behov for forståelige og model-uafhængige begreber,
 equilibrium assumption uholbar.
 
 \section{Equations}
