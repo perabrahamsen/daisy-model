@@ -599,7 +599,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   if (rrcmin_star > r_sc_star) rrcmin_star=r_sc_star;
   // calculate stress factor
   assert (r_sc_star != 0.0);
-  rpstress=rrcmin_star/r_sc_star;
+  rpstress=min(1.0,rrcmin_star/r_sc_star);
 
   return 0;
 }
@@ -1259,7 +1259,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   LAI =crops.LAI (); // Leaf Areal Index
   h   =0.01*crops.height (); // max crop height [m]
 
-  cout << "LAI is\t" << LAI << "\n";
+  // cout << "LAI is\t" << LAI << "\n";
 
   // READ FROM TEMPORARY RCMIN_WW.DAT OR RCMIN_SB.DAT FILE
 #ifdef USE_FILES
