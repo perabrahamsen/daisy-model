@@ -76,6 +76,8 @@ private:
                     vector<double>& h_ice, vector<double>& Theta);
   double RaisingGWT_FillEq(const int node, const Soil&,
                     vector<double>& h_ice, vector<double>& Theta);
+  double InternalGWTLocation (const Soil& soil, const double theta,
+                    const double h_ice, const int node);
   double table () const
     { return height; }
 
@@ -263,6 +265,8 @@ GroundwaterPipe::Update_GWT (const Soil& soil,
       Percolation[i_GWT-1] =  -(q[i_GWT]+q_p[i_GWT]);
       FallingGWT2 (soil, h, h_ice, Theta, deficit);
     }
+  const int i_UZ = soil.interval_plus (GWT_new);
+  GWT_new += InternalGWTLocation (soil, Theta[i_UZ], h_ice[i_UZ], i_UZ);
 }
 
 void
@@ -496,6 +500,33 @@ GroundwaterPipe::EquilibriumDrainage (const int i_drainage,
        w += (ThetaS - Theta) * soil.dz(i) + Sd;
     }
   return w;
+}
+
+double
+GroundwaterPipe::InternalGWTLocation (const Soil& soil, const double theta,
+                                      const double h_ice, const int node)
+{
+  vector<double> IntWater;
+  const double dz = soil.dz (node);
+  const int n = min (100, max (5, int (dz / 1.0)));
+  IntWater.insert (IntWater.end (), n, 0.0);
+  const double dx = dz / n;
+  double h_bottom = 0.0;
+  double AccWater = 0.0;
+  for (unsigned int i = 0; i < n; i++)
+    {
+       const double h = h_bottom - (i - 0.5) * dx;
+       IntWater[i] = soil.Theta(node,h,h_ice) * dx;
+       AccWater += IntWater[i];
+    }
+  const double WaterCont = theta * dz;
+  for (unsigned int i = 0; i < n; i++)
+    {
+       AccWater += IntWater[0] - IntWater[n-i-1];
+       if (AccWater >= WaterCont) break;
+       h_bottom += dx;
+    }
+  return h_bottom;
 }
 
 void

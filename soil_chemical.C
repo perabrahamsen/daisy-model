@@ -114,7 +114,7 @@ decomposition begins.  It can never be more than 1.0 or less than 0.0.");
   no_lag.add (1.0, 1.0);
   alist.add ("lag_increment", no_lag);
   syntax.add ("lag", Syntax::None (), Syntax::OptionalState,
-	      "This state variable grows with lag_increment (C) each time step.
+	      "This state variable grows with lag_increment (C) each time step.\n\
 When it reached 1.0, decomposition begins.");
   alist.add ("adsorption", none);
 }
