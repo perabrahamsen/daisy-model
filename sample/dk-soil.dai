@@ -26,7 +26,7 @@ hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
   (hydraulic M_vG (Theta_res 0.000)(Theta_sat 0.401)
              (alpha 0.057)(n 1.131)(K_sat 5.0 [cm/h])))
 
-(defcolumn JB6_Askov default
+(defcolumn Askov default
   "This is a JB6 soil with free drainage macropores."
   (Groundwater deep)
   (Soil (MaxRootingDepth 100.00 [cm])
