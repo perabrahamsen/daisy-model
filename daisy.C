@@ -70,6 +70,7 @@ Daisy::Daisy (const AttributeList& al)
     print_time (Librarian<Condition>::create
 		     (al.alist ("print_time"))),
     time (al.alist ("time")),
+    stop (al.check ("stop") ? Time (al.alist ("stop")) : Time (9999, 1, 1, 1)),
     action (Librarian<Action>::create (al.alist ("manager"))),
     weather (al.check ("weather") 
 	     ? &Librarian<Weather>::create (al.alist ("weather"))
@@ -196,6 +197,9 @@ Daisy::tick (Treelog& out)
   tick_columns (out);
   tick_logs (out);
   time.tick_hour ();
+  
+  if (time >= stop)
+    running = false;
 }
 
 void 
@@ -298,6 +302,10 @@ The special value \".\" means the current directory.");
 the simulation.");
   syntax.add_submodule ("time", alist, Syntax::State,
 			"Current time in the simulation.", Time::load_syntax);
+  syntax.add_submodule ("stop", alist, Syntax::OptionalConst,
+			"Latest time where the simulation stops.\n\
+By default, the simulation will run until the manager request it to stop.",
+                        Time::load_syntax);
   syntax.add ("column",
 	      Librarian<Column>::library (), 
 	      Syntax::State, Syntax::Sequence,

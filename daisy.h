@@ -57,6 +57,9 @@ public:
   Condition& activate_output;
   Condition& print_time;
   Time time;
+private:
+  const Time stop;
+public:
   Action& action;
   Weather* weather;
   Field& field;

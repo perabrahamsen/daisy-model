@@ -1,5 +1,11 @@
 2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.46 released.
+
+2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C, daisy.h (stop): New parameter.
+
 	* sample/: New directory.
 	* sample/Makefile: New file.
 	* sample/dk-management.dai: New file.

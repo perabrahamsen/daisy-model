@@ -12,7 +12,24 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
-* 3.46
+* 3.47
+
+** New top level stop command.
+
+If set, this force the simulation to stop when the simulated time
+reach (or exceed) the specified stop time.
+
+For example, if you have this
+
+ (time 2002 4 1 0)
+ (stop 2003 3 31 23)
+
+in your setup, the simulation will at most run one season.
+
+** New "sample" directory.
+
+The new daisy-sample.zip file contain various sample setups and
+parameterizations, for use as inspiration for your own work.
 
 ** Bug fixes.
 
