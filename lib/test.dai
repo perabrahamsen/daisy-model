@@ -13,14 +13,7 @@
 
 ;; We have some very sandy soil.
 (defhorizon top default
-  (hydraulic M_vG 
-	     (K_sat 19.3 [cm/h])
-	     (Theta_res 0.05  [cm^3 H2O/cm^3])
-	     (Theta_sat 0.424 [cm^3 H2O/cm^3])
-	     (alpha 0.069 [cm^-1])
-	     (n 1.527 []))
   (SOM_fractions 0.66 0.34 [])
-  (SOM_C_per_N 11 11 [g C/g N])
   (clay 8.0 [])
   (silt 10.5 [])
   (humus 1.12 [])
@@ -28,14 +21,7 @@
   (fine_sand 16.5 []))
 
 (defhorizon bottom default
-  (hydraulic M_vG 
-	     (K_sat 64.08 [cm/h])
-	     (Theta_res 0.042 [cm^3 H2O/cm^3])
-	     (Theta_sat 0.438 [cm^3 H2O/cm^3])
-	     (alpha 0.054 [cm^-1])
-	     (n 2.416 []))
   (SOM_fractions 0.66 0.34 [])
-  (SOM_C_per_N 11 11 [g C/g N])
   (clay 8.0 [])
   (silt 10.5 [])
   (humus 0.12 [])			;Less humus here.
