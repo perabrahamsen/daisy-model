@@ -29,7 +29,7 @@ public:
   virtual double hourly_air_temperature () const;
   virtual double daily_air_temperature () const = 0;
   virtual double hourly_global_radiation () const;
-  virtual double daily_global_radiation () const = 0;
+  virtual double daily_global_radiation () const;
   virtual double reference_evapotranspiration () const;
   virtual double rain () const;
   virtual double snow () const;
@@ -46,6 +46,7 @@ public:
   virtual void put_precipitation (double prec);// [mm/d]
   virtual void put_air_temperature (double T); // [°C]
   virtual void put_reference_evapotranspiration (double ref); // [mm/d]
+  virtual void put_global_radiation (double radiation); // [W/m²]
 
   // Utility.
 public:
@@ -59,6 +60,8 @@ public:
   double max_Ta_yday () const;
 
   // Create and Destroy.
+private:
+  Weather (const Weather&);
 protected:
   Weather (const AttributeList& al);
 public:

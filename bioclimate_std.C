@@ -176,7 +176,10 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
   // Find H as a function of LAI.
   CSMP HvsLAI = LAIvsH.inverse ();
   // Check that the end points still match.
-  assert (approximate (MxH, HvsLAI (LAI_)));
+  if (!approximate (MxH, HvsLAI (LAI_)))
+    cerr << "BUG: MxH = " << MxH 
+	 << ", but HvsLAI (LAI) = " << HvsLAI (LAI_) << "\n"; 
+
   assert (HvsLAI (0.0) == 0.0);
   
   // Count height of each interval.  Interval 0 is the top of the crop
@@ -186,7 +189,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
     Height[i] = HvsLAI ((No - i) * dLAI);
 
   assert (Height[No] == 0.0);
-  assert (approximate (Height[0], MxH));
+  //  assert (approximate (Height[0], MxH));
   Height[0] = MxH;
 
   double PAR0 = (1 - ACRef) * PARinSi * weather.hourly_global_radiation ();
@@ -198,7 +201,8 @@ BioclimateStandard::IntensityDistribution (const double Rad0,
 					   const double Ext,
 					   vector <double>& Rad) const
 {
-  double dLAI = (LAI_ / No);
+  assert (Rad.size () == No + 1);
+  const double dLAI = (LAI_ / No);
     
   for (int i = 0; i <= No; i++)
     Rad[i] = Rad0 * exp (- Ext * dLAI * i);

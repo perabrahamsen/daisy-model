@@ -1,13 +1,13 @@
-// adsorbtion.h
+// adsorption.h
 
-#ifndef ADSORBTION_H
-#define ADSORBTION_H
+#ifndef ADSORPTION_H
+#define ADSORPTION_H
 
 #include "librarian.h"
 
 class Soil;
 
-class Adsorbtion
+class Adsorption
 {
   // Content.
 public:
@@ -20,11 +20,11 @@ public:
 
   // Create and Destroy.
 protected:
-  Adsorbtion (const string& name);
+  Adsorption (const string& name);
 public:
-  virtual ~Adsorbtion ();
+  virtual ~Adsorption ();
 };
 
-static Librarian<Adsorbtion> Adsorbtion_init ("adsorbtion");
+static Librarian<Adsorption> Adsorption_init ("adsorption");
 
-#endif ADSORBTION_H
+#endif ADSORPTION_H

@@ -22,6 +22,8 @@
 #include "im.h"
 #include "am.h"
 
+#include "weather.h"
+
 class Groundwater;
 
 class ColumnStandard : public Column
@@ -111,6 +113,21 @@ public:
     { surface.put_no3 (no3); }
   double get_surface_no3 () const // [g/cm^2]
     { return surface.get_no3 (); }
+  double get_smb_c_at (unsigned int i) const //[g C/cm³]
+    { return organic_matter.get_smb_c_at (i); }
+  double get_co2_production_at (unsigned int i) const // [g C/cm³]
+    { return organic_matter.CO2 (i); }
+  double get_temperature_at (unsigned int i) const // [°C]
+    { return soil_heat.T (i); }
+  double get_crop_h2o_uptake_at (unsigned int i) const // [cm³/cm³/h]
+    { 
+      vector<double> v;
+      soil_water.get_sink (v);
+      assert (v.size () > i);
+      return v[i];
+    }
+  double get_water_content_at (unsigned int i) const // [cm³/cm³]
+    { return soil_water.Theta (i); }
 
   // Create and Destroy.
 public:

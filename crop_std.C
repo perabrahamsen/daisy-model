@@ -280,6 +280,8 @@ struct CropStandard::Variables
     void output (Log&, Filter&) const;
     double DS;		// Development Stage
     double Vern;		// Vernalization criterium [C d]
+    double partial_day_length;	// Light hours this day until now [0-24 h]
+    double day_length;		// Light hours previous day. [0-24 h]
   private:
     friend struct CropStandard::Variables;
     RecPhenology (const Parameters&, const AttributeList&);
@@ -288,6 +290,7 @@ struct CropStandard::Variables
   {
     void output (Log&, Filter&) const;
     double Height;		// Crop height [cm]
+    double Offset;		// Extra height after harvest [cm]
     double LAI;		// Leaf Area Index
     double LADm;		// Max Leaf Area Density [cm2/cm3]
     CSMP LAIvsH;		// Accumulated Leaf Area Index at Height
@@ -528,7 +531,9 @@ CropStandard::Variables::output (Log& log, Filter& filter) const
 CropStandard::Variables::RecPhenology::RecPhenology (const Parameters& par,
 						     const AttributeList& vl)
   : DS (vl.number ("DS")),
-    Vern (vl.check ("Vern") ? vl.number ("Vern") : par.Vernal.TaSum)
+    Vern (vl.check ("Vern") ? vl.number ("Vern") : par.Vernal.TaSum),
+    partial_day_length (vl.number ("partial_day_length")),
+    day_length (vl.number ("day_length"))
 { }
 
 void 
@@ -537,12 +542,15 @@ CropStandard::Variables::RecPhenology::output (Log& log, Filter& filter) const
   log.open ("Phenology");
   log.output ("DS", filter, DS);
   log.output ("Vern", filter, Vern);
+  log.output ("partial_day_length", filter, partial_day_length);
+  log.output ("day_length", filter, day_length);
   log.close();
 }
 
 CropStandard::Variables::RecCanopy::RecCanopy (const Parameters&,
 					       const AttributeList& vl)
   : Height (vl.number ("Height")),
+    Offset (vl.number ("Offset")),
     LAI (vl.number ("LAI")),
     LADm (vl.number ("LADm")),
     LAIvsH (vl.csmp ("LAIvsH"))
@@ -553,6 +561,7 @@ CropStandard::Variables::RecCanopy::output (Log& log, Filter& filter) const
 {
   log.open ("Canopy");
   log.output ("Height", filter, Height);
+  log.output ("Offset", filter, Offset);
   log.output ("LAI", filter, LAI);
   log.output ("LADm", filter, LADm);
   log.output ("LAIvsH", filter, LAIvsH);
@@ -898,10 +907,16 @@ CropStandardSyntax::CropStandardSyntax ()
   Phenology.add ("DS", Syntax::Number, Syntax::State);
   vPhenology.add ("DS", -1.0);
   Phenology.add ("Vern", Syntax::Number, Syntax::Optional);
+  Phenology.add ("partial_day_length", Syntax::Number, Syntax::State);
+  vPhenology.add ("partial_day_length", 0.0);
+  Phenology.add ("day_length", Syntax::Number, Syntax::State);
+  vPhenology.add ("day_length", 0.0);
 
   // Canopy
   Canopy.add ("Height", Syntax::Number, Syntax::State);
   vCanopy.add ("Height", 0.0);
+  Canopy.add ("Offset", Syntax::Number, Syntax::State);
+  vCanopy.add ("Offset", 0.0);
   Canopy.add ("LAI", Syntax::Number, Syntax::State);
   vCanopy.add ("LAI", 0.0);
   Canopy.add ("LADm", Syntax::Number, Syntax::State);
@@ -1144,7 +1159,7 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 	  >  -var.Prod.WLeaf /1000.0) // It lost 0.1% of its leafs to resp.
 	Phenology.DS += (Devel.DSRate1
 			 * Devel.TempEff1 (Ta)
-			 * Devel.PhotEff1 (bioclimate.day_length ()));
+			 * Devel.PhotEff1 (var.Phenology.day_length));
       if (par.Vernal.required && Phenology.Vern < 0)
 	Vernalization (Ta);
     }
@@ -1163,7 +1178,7 @@ CropStandard::CropHeight ()
   const Parameters::CanopyPar& Canopy = par.Canopy;
   double& DS = var.Phenology.DS;
 
-  return Canopy.HvsDS (DS);
+  return Canopy.HvsDS (DS) + var.Canopy.Offset;
 }
 
 void 
@@ -1661,10 +1676,22 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   const int No = bioclimate.NumberOfIntervals ();
   // LAI in each interval.
   const double dLAI = bioclimate.LAI () / No;
+
+  // True, if we haven't reached the top of the crop yet.
+  bool top_crop = true;
+
   for (int i = 0; i < No; i++)
     {
       const double height = bioclimate.height (i+1);
       assert (height < bioclimate.height (i));
+
+      if (top_crop && height <= var.Canopy.Height)
+	{
+	  // We count day hours at the top of the crop.
+	  top_crop = false;
+	  if (bioclimate.PAR (i) > 0.5 * 70.0)
+	    var.Phenology.partial_day_length += 1.0;
+	}
       // Leaf Area index for a given leaf layer
       const double LA = prevLA - LAIvsH (height);
       assert (LA >= 0.0);
@@ -1920,6 +1947,7 @@ CropStandard::tick (const Time& time,
     }
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
+
   const double water_stress = var.RootSys.water_stress;
   NitrogenUptake (time.hour (), 
 		  soil, soil_water, soil_NH4,soil_NO3);
@@ -1934,6 +1962,11 @@ CropStandard::tick (const Time& time,
     }
   if (time.hour () != 0)
     return;
+
+  // Update final daylength.
+  var.Phenology.day_length = var.Phenology.partial_day_length;
+  var.Phenology.partial_day_length = 0.0;
+
   var.Canopy.Height = CropHeight ();
   if (var.CrpAux.InitLAI)
     InitialLAI ();
@@ -2089,8 +2122,12 @@ CropStandard::harvest (const string& column_name,
 		     + NSOrg * sorg_harvest);
 
       // Adjust canopy for the sake of bioclimate.
-      CropHeight ();
-      CropLAI ();
+      var.Canopy.Height = min (stub_length, var.Canopy.Height);
+      var.Canopy.Offset 
+	= var.Canopy.Height
+	- par.Canopy.HvsDS (var.Phenology.DS) ;
+      assert (approximate (CropHeight (), var.Canopy.Height));
+      var.Canopy.LAI = CropLAI ();
       CanopyStructure ();
     }
   else

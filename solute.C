@@ -67,7 +67,7 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
   AttributeList& cd = *new AttributeList ();
   cd.add ("type", "cd");
   alist.add ("transport", cd);
-  syntax.add ("adsorbtion", Librarian<Adsorbtion>::library (), Syntax::Const);
+  syntax.add ("adsorption", Librarian<Adsorption>::library (), Syntax::Const);
   Geometry::add_layer (syntax, "C");
   Geometry::add_layer (syntax, "M");
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
@@ -76,13 +76,13 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 
 Solute::Solute (const AttributeList& al)
   : transport (Librarian<Transport>::create (al.alist ("transport"))),
-    adsorbtion (Librarian<Adsorbtion>::create (al.alist ("adsorbtion")))
+    adsorption (Librarian<Adsorption>::create (al.alist ("adsorption")))
 { }
 
 Solute::~Solute ()
 { 
   delete &transport; 
-  delete &adsorbtion; 
+  delete &adsorption; 
 }
 
 void 

@@ -1,3 +1,73 @@
+1998-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.029 released.
+
+1998-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil.C (load_syntax): No default max rooting depth.
+
+1998-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C (accept_top): Ignore tiny (< 1e-99) amounts.
+
+1998-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_file.C (tick): Ensure we found the right day.
+	Don't call `put' functions if we haven't read new data.
+
+	* weather.C (Implementation): Initialize `daily_global_radiation'.
+
+	* crop_std.C (Variables::Phenology): Add `day_lenght' and
+	`partial_day_length'. 
+
+1998-08-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.h (Weather::put_global_radiation): New function.
+	* weather.C, weather_file.C, weather_hourly.C, weather_none.C: Use it.
+
+	* chemical.C, chemical.h: New files.
+
+1998-06-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* nitrification_soil.C (tick): Don't take the last.  More assertions.
+	* nitrification_solute.C (tick): Ditto.
+
+1998-06-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport_none.C (tick): Assert non-negative stuff left.
+
+	* crop_old.C (SoluteUptake): Assert we didn't took more than there
+	were left.
+
+1998-06-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* adsorption_vS_S.C (class Adsorption_vS_S): Added units.
+	(K_planar): New number.
+
+	* crop_sold.C (SoluteUptake): Leave at least 1e-8 after uptake.
+	* crop_old.C (SoluteUptake): Ditto.
+
+1998-06-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* adsorption_vS_S.C (M_to_C): Move assertion inside else clause. 
+
+1998-06-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (harvest): Really update height and LAI after
+	harvest. 
+	(Variables): New Canopy member `Offset'.
+
+	* all: Renamed `adsorbtion' to `adsorption'.
+
+1998-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (add): Expand array at end.
+	(add): Don't multiply C with dz in each lay.
+	(load_syntax, output): Add "N" log parameter.
+
+	* om.C (add): Added assertions for mass conservation.
+	* am.C (add, mix, swap, distribute): Ditto.
+
 1998-05-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.028 released.

@@ -75,6 +75,11 @@ public:
   virtual void put_ponding (double pond) = 0;	// [mm]
   virtual void put_surface_no3 (double no3) = 0; // [g/cm^2]
   virtual double get_surface_no3 () const = 0; // [g/cm^2]
+  virtual double get_smb_c_at (unsigned int i) const = 0; // [g C/cm³]
+  virtual double get_co2_production_at (unsigned int i) const = 0; // [g C/cm³]
+  virtual double get_temperature_at (unsigned int i) const = 0; // [°C]
+  virtual double get_crop_h2o_uptake_at (unsigned int i) const = 0; //[cm³/cm³]
+  virtual double get_water_content_at (unsigned int i) const = 0; // [cm³/cm³]
 
   // Create and Destroy.
 protected:

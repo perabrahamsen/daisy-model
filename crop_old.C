@@ -980,12 +980,15 @@ CropOld::SoluteUptake (const Soil& soil,
 	uptake[i] = max (0.0, 
 			 min (L * (min (I_zero[i], I_max)
 				   - B_zero[i] * c_root),
-			      solute.M_left (i)));
+			      solute.M_left (i) - 1e-8));
       else
 	uptake[i] = 0.0;
       assert (uptake[i] >= 0.0);
     }
   solute.add_to_sink (uptake);
+  
+  for (int i = 0; i < size; i++)
+    assert (solute.M_left (i) >= 0.0);
 
   // gN/cm³/h -> gN/m²/h
   return soil.total (uptake) * 1.0e4; 
@@ -1873,6 +1876,13 @@ CropOld::harvest (const string& column_name,
 	  organic_matter.add (am);
 	}
     }
+
+  cerr << "Harvest: " << name 
+       << "\n\tStub N = " << NStub << " W = " << WStub
+       << "\n\tStraw N = " << NStraw << " W = " << WStraw
+       << "\n\tSOrg N = " << NSOrg << " W = " << WSOrg
+       << "\n\tRoot N = " << NRoot << " W = " << WRoot
+       << "\n";
 
   return *new Harvest (column_name, time, name, 
 		       WStraw * stem_harvest, NStraw * stem_harvest,

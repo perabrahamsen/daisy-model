@@ -46,7 +46,6 @@ public:
   const string crop_name () const;	// Name of locked crop.
   const string crop_part_name () const; // Name of locked crop part.
 
-
   // Library.
 public:
   static Library& library ();

@@ -1,10 +1,10 @@
-// adsorbtion_langmuir.C
+// adsorption_langmuir.C
 
-#include "adsorbtion.h"
+#include "adsorption.h"
 #include "soil.h"
 #include "mathlib.h"
 
-class AdsorbtionLangmuir : public Adsorbtion
+class AdsorptionLangmuir : public Adsorption
 {
   // Parameters.
   const double K_clay;
@@ -40,26 +40,26 @@ public:
     }
   // Create.
 public:
-  AdsorbtionLangmuir (const AttributeList& al)
-    : Adsorbtion (al.name ("type")),
+  AdsorptionLangmuir (const AttributeList& al)
+    : Adsorption (al.name ("type")),
       K_clay (al.number ("K_clay")),
       my_max (al.number ("my_max"))
     { }
 };
 
-static struct AdsorbtionLangmuirSyntax
+static struct AdsorptionLangmuirSyntax
 {
-  static Adsorbtion& make (const AttributeList& al)
+  static Adsorption& make (const AttributeList& al)
   {
-    return *new AdsorbtionLangmuir (al);
+    return *new AdsorptionLangmuir (al);
   }
 
-  AdsorbtionLangmuirSyntax ()
+  AdsorptionLangmuirSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     syntax.add ("K_clay", Syntax::Number, Syntax::Const);
     syntax.add ("my_max", Syntax::Number, Syntax::Const);
     AttributeList& alist = *new AttributeList ();
-    Librarian<Adsorbtion>::add_type ("Langmuir", alist, syntax, &make);
+    Librarian<Adsorption>::add_type ("Langmuir", alist, syntax, &make);
   }
-} AdsorbtionLangmuir_syntax;
+} AdsorptionLangmuir_syntax;

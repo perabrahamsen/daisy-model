@@ -21,7 +21,6 @@ struct WeatherFile : public Weather
   double precipitation;
   double reference_evapotranspiration_;
   double hourly_reference_evapotranspiration;
-  double global_radiation;
   double air_temperature;
 
   // Simulation.
@@ -30,8 +29,6 @@ struct WeatherFile : public Weather
   // Communication with Bioclimate.
   double daily_air_temperature (void) const // [°C]
     { return air_temperature; }
-  double daily_global_radiation () const // [W/m²]
-    { return global_radiation; }
   double reference_evapotranspiration () const // [mm/h]
     { return hourly_reference_evapotranspiration; }
 
@@ -52,7 +49,6 @@ struct WeatherFile : public Weather
       precipitation (-42.42e42),
       reference_evapotranspiration_ (-42.42e42),
       hourly_reference_evapotranspiration (-42.42e42),
-      global_radiation (-42.42e42),
       air_temperature (-42.42e42)
     { }
   ~WeatherFile ()
@@ -64,6 +60,9 @@ WeatherFile::tick (const Time& time)
 { 
   Weather::tick (time);
 
+  if (!(date < time))
+    return;
+
   if (!file.good ())
     {
       cerr << file_name << ":" << line << ": file error";
@@ -73,6 +72,8 @@ WeatherFile::tick (const Time& time)
   int month; 
   int day;
   char end;
+
+  double global_radiation;
 
   while (date < time)
     {
@@ -99,7 +100,19 @@ WeatherFile::tick (const Time& time)
 	    /* do nothing */;
 	}
       date = Time (year, month, day, 23);
+
+      assert (global_radiation >= 0 && global_radiation < 700);
+      assert (air_temperature >= -70 && air_temperature < 60);
+      assert (precipitation >= 0 && precipitation < 1000);
+      assert (reference_evapotranspiration_ >= 0
+	      && reference_evapotranspiration_ <= 20);
     }
+  assert (time.year () == date.year ());
+  assert (time.month () == date.month ());
+  assert (time.mday () == date.mday ());
+
+  // Update the daily values.
+  put_global_radiation (global_radiation);
 
   // Update the hourly values.
   put_reference_evapotranspiration (reference_evapotranspiration_);

@@ -91,6 +91,12 @@ NitrificationSoil::tick (const Soil& soil, const SoilWater& soil_water,
 			 SoilNO3& soil_NO3, SoilNH4& soil_NH4,
 			 const Groundwater& groundwater)
 {
+  for (int i = 0; i < soil.size (); i++)
+    {
+      assert (soil_NO3.M_left (i) >= 0.0);
+      assert (soil_NH4.M_left (i) >= 0.0);
+    }
+
   converted.erase (converted.begin (), converted.end ());
 
   unsigned int size = soil.size ();
@@ -106,11 +112,17 @@ NitrificationSoil::tick (const Soil& soil, const SoilWater& soil_water,
       const double T = soil_heat.T (i);
       const double rate = k_10 * f_h (h) * f_T (T) * M / (k + M);
       assert (rate >= 0.0);
-      const double M_new = min (rate, soil_NH4.M_left (i) / dt);
+      const double M_new = min (rate, soil_NH4.M_left (i) / dt  - 1e-8);
       converted.push_back (M_new);
     }
   soil_NH4.add_to_sink (converted);
   soil_NO3.add_to_source (converted);
+
+  for (int i = 0; i < soil.size (); i++)
+    {
+      assert (soil_NO3.M_left (i) >= 0.0);
+      assert (soil_NH4.M_left (i) >= 0.0);
+    }
 }
 
 NitrificationSoil::NitrificationSoil (const AttributeList& al)

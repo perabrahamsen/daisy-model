@@ -1,10 +1,10 @@
-// adsorbtion_freundlich.C
+// adsorption_freundlich.C
 
-#include "adsorbtion.h"
+#include "adsorption.h"
 #include "soil.h"
 #include "mathlib.h"
 
-class AdsorbtionFreundlich : public Adsorbtion
+class AdsorptionFreundlich : public Adsorption
 {
   // Parameters.
   const double K_clay;
@@ -17,15 +17,15 @@ public:
 
   // Create.
 public:
-  AdsorbtionFreundlich (const AttributeList& al)
-    : Adsorbtion (al.name ("type")),
+  AdsorptionFreundlich (const AttributeList& al)
+    : Adsorption (al.name ("type")),
       K_clay (al.number ("K_clay")),
       m (al.number ("m"))
     { }
 };
 
 double 
-AdsorbtionFreundlich::C_to_M (const Soil& soil,
+AdsorptionFreundlich::C_to_M (const Soil& soil,
 			      double Theta, int i, double C) const
 {
   const double S = K_clay * soil.clay (i) * pow (C, m);
@@ -33,7 +33,7 @@ AdsorbtionFreundlich::C_to_M (const Soil& soil,
 }
 
 double 
-AdsorbtionFreundlich::M_to_C (const Soil& soil,
+AdsorptionFreundlich::M_to_C (const Soil& soil,
 			      double Theta, int i, double M) const
 {
   // Guess start boundary.
@@ -71,19 +71,19 @@ AdsorbtionFreundlich::M_to_C (const Soil& soil,
   return (min_C + max_C) / 2.0;
 }
 
-static struct AdsorbtionFreundlichSyntax
+static struct AdsorptionFreundlichSyntax
 {
-  static Adsorbtion& make (const AttributeList& al)
+  static Adsorption& make (const AttributeList& al)
   {
-    return *new AdsorbtionFreundlich (al);
+    return *new AdsorptionFreundlich (al);
   }
 
-  AdsorbtionFreundlichSyntax ()
+  AdsorptionFreundlichSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     syntax.add ("K_clay", Syntax::Number, Syntax::Const);
     syntax.add ("m", Syntax::Number, Syntax::Const);
     AttributeList& alist = *new AttributeList ();
-    Librarian<Adsorbtion>::add_type ("Freundlich", alist, syntax, &make);
+    Librarian<Adsorption>::add_type ("Freundlich", alist, syntax, &make);
   }
-} AdsorbtionFreundlich_syntax;
+} AdsorptionFreundlich_syntax;

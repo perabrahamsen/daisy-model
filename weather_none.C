@@ -8,7 +8,7 @@
 class WeatherNone : public Weather
 {
   double air_temperature;
-  const double global_radiation;
+  double global_radiation;
   double reference_evapotranspiration_;
   double rain_;
   double snow_;
@@ -43,6 +43,8 @@ public:
     { air_temperature = T; }
   void put_reference_evapotranspiration (double ref)
     { reference_evapotranspiration_ = ref; }
+  void put_global_radiation (double rad)
+    { global_radiation = rad; }
 
   // Create and Destroy.
 private:

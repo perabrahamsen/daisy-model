@@ -39,6 +39,21 @@ OM::output (Log& log, Filter& filter) const
   log.output ("top_C", filter, top_C);
   log.output ("top_N", filter, top_N);
   log.output ("C", filter, C);
+  if (filter.check ("N", true))
+    {
+      vector<double> N;
+      unsigned int size = C.size ();
+      assert (C_per_N.size () >= size);
+      for (int i = 0; i < size; i++)
+	{
+	  if (C[i] != 0.0)
+	    {
+	      assert (C_per_N[i] > 0);
+	      N.push_back (C[i] / C_per_N[i]);
+	    }
+	}
+      log.output ("N", filter, N, true);
+    }
   // These are sometimes const and should be read from the AM library.
   log.output ("C_per_N", filter, C_per_N);
 #if 0
@@ -205,28 +220,38 @@ OM::add (const Geometry& geometry, // Add dead roots.
 	 double to_C, /* Fixed C/N */
 	 const vector<double>& density)
 {
+  const double old_C = total_C (geometry);
+
   // Make sure C/N is large enough.
   const int extra_C_per_N = density.size () - C_per_N.size ();
   if (extra_C_per_N > 0)
     {
       assert (initial_C_per_N != Unspecified);
-      C_per_N.insert (C_per_N.begin (), extra_C_per_N, initial_C_per_N);
+      C_per_N.insert (C_per_N.end (), extra_C_per_N, initial_C_per_N);
       assert (initial_C_per_N > 0.0);
     }
   
   // Make sure C is large enough.
   const int extra_C = density.size () - C.size ();
   if (extra_C > 0)
-    C.insert (C.begin (), extra_C, 0.0);
+    C.insert (C.end (), extra_C, 0.0);
   
+  assert (approximate (old_C, total_C (geometry)));
+
   // Distribute it according to the root density.
   const double total = geometry.total (density);
   for (unsigned int i = 0; i < density.size (); i++)
     {
-      C[i] += to_C * density[i] * geometry.dz (i) / total;
+      // We should *not* multiply with dz here.  Reason: We want to
+      // divide C on the total depth.  
+      C[i] += to_C * density[i] /* * geometry.dz (i) */ / total;
       assert (finite (C[i]));
       assert (C[i] >= 0.0);
     }
+
+  // Check that we computed the correct value.
+  const double new_C = total_C (geometry);
+  assert (approximate (new_C, old_C + to_C));
 }
 
 void 
@@ -234,25 +259,32 @@ OM::add (const Geometry& geometry, // Add dead roots.
 	 double to_C, double to_N, 
 	 const vector<double>& density)
 {
+  const double old_C = total_C (geometry);
+  const double old_N = total_N (geometry);
+
   // Make sure C/N is large enough.
   const int extra_C_per_N = density.size () - C_per_N.size ();
   if (extra_C_per_N > 0)
     // It doesn't matter what number we use, add C will be 0.
-    C_per_N.insert (C_per_N.begin (), extra_C_per_N, 1.0);
+    C_per_N.insert (C_per_N.end (), extra_C_per_N, 1.0);
   
   // Make sure C is large enough.
   const int extra_C = density.size () - C.size ();
   if (extra_C > 0)
     {
       assert (extra_C_per_N <= extra_C);
-      C.insert (C.begin (), extra_C, 0.0);
+      C.insert (C.end (), extra_C, 0.0);
     }
+
+  assert (approximate (old_C, total_C (geometry)));
 
   // Distribute it according to the root density.
   const double total = geometry.total (density);
   for (unsigned int i = 0; i < density.size (); i++)
     {
-      const double factor = density[i] * geometry.dz (i) / total;
+      // We should *not* multiply with dz here.  Reason: We want to
+      // divide C on the total depth.  
+      const double factor = density[i] /* * geometry.dz (i) */ / total;
       const double new_N = C[i] / C_per_N[i] + to_N * factor;
       C[i] += to_C * factor;
       if (C[i] > 0.0)
@@ -264,6 +296,12 @@ OM::add (const Geometry& geometry, // Add dead roots.
       assert (finite (C_per_N[i]));
       assert (C_per_N[i] >= 0.0);
     }
+
+  // Check that we computed the correct value.
+  const double new_C = total_C (geometry);
+  const double new_N = total_N (geometry);
+  assert (approximate (new_C, old_C + to_C));
+  assert (approximate (new_N, old_N + to_N));
 }
 
 inline void
@@ -456,6 +494,7 @@ OM::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("C", Syntax::Number, Syntax::Optional, Syntax::Sequence);
   syntax.add ("C_per_N", Syntax::Number, Syntax::Optional,
 	       Syntax::Sequence);
+  syntax.add ("N", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("turnover_rate", Syntax::Number, Syntax::Const);
   syntax.add ("efficiency", Syntax::Number, Syntax::Const,
 	       Syntax::Sequence);

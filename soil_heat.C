@@ -320,7 +320,7 @@ SoilHeat::swap (const Soil& soil, double from, double middle, double to)
 }
   
 double
-SoilHeat::T (int i) const
+SoilHeat::T (unsigned int i) const
 {
   return impl.T[i]; 
 }

@@ -14,10 +14,10 @@ void
 SoilNO3::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   Solute::load_syntax (syntax, alist);
-  // Use "none" adsorbtion by default.
+  // Use "none" adsorption by default.
   AttributeList& none = *new AttributeList ();
   none.add ("type", "none");
-  alist.add ("adsorbtion", none);
+  alist.add ("adsorption", none);
 }
 
 SoilNO3::SoilNO3 (const AttributeList& al)

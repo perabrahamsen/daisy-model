@@ -106,7 +106,7 @@ NitrificationSolute::tick (const Soil& soil, const SoilWater& soil_water,
       const double T = soil_heat.T (i);
       const double rate = k_10 * f_h (h) * f_T (T) * C / (k + C);
       assert (rate >= 0.0);
-      const double M_new = min (rate, soil_NH4.M_left (i) / dt);
+      const double M_new = min (rate, soil_NH4.M_left (i) / dt - 1e-8);
       converted.push_back (M_new);
     }
   soil_NH4.add_to_sink (converted);

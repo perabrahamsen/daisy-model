@@ -27,7 +27,6 @@ struct WeatherHourly : public Weather
   // Accumulated values.
   double accumulated_global_radiation;
   double accumulated_air_temperature;
-  double daily_global_radiation_;
   double daily_air_temperature_;
 
   // Simulation.
@@ -36,8 +35,6 @@ struct WeatherHourly : public Weather
   // Communication with Bioclimate.
   double daily_air_temperature () const
     { return daily_air_temperature_; }
-  double daily_global_radiation () const
-    { return daily_global_radiation_; }
   double hourly_air_temperature () const
     { return air_temperature; }
   double hourly_global_radiation () const
@@ -63,7 +60,6 @@ struct WeatherHourly : public Weather
       wind_ (-42.42e42),
       accumulated_global_radiation (0.0),
       accumulated_air_temperature (0.0),
-      daily_global_radiation_ (-42.42e42),
       daily_air_temperature_ (-42.42e42)
     { }
 
@@ -106,9 +102,16 @@ WeatherHourly::tick (const Time& time)
 
       date = Time (year, month, day, hour);
 
+      assert (global_radiation >= 0 && global_radiation < 1400);
+      assert (air_temperature >= -70 && air_temperature < 60);
+      assert (precipitation >= 0 && precipitation < 300);
+      assert (cloudiness_ >= 0 && cloudiness_ <= 1);
+      assert (vapor_pressure_ >= 0 && vapor_pressure_ <= 5000);
+      assert (wind_ >= 0 && wind_ <= 40);
+
       if (hour == 0)
 	{
-	  daily_global_radiation_ = accumulated_global_radiation / 24.0;
+	  put_global_radiation (accumulated_global_radiation / 24.0);
 	  daily_air_temperature_ = accumulated_air_temperature / 24.0;
 	  accumulated_global_radiation = 0.0;
 	  accumulated_air_temperature = 0.0;

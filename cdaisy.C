@@ -15,6 +15,7 @@
 #include "printer_file.h"
 #include "frame.h"
 #include "version.h"
+#include "chemical.h"
 
 #include <fstream.h>
 
@@ -550,6 +551,10 @@ extern "C" void EXPORT
 daisy_weather_put_reference_evapotranspiration (Weather* weather, double ref)
 { weather->put_reference_evapotranspiration (ref); }
 
+extern "C" void EXPORT
+daisy_weather_put_global_radiation (Weather* weather, double radiation)
+{ weather->put_global_radiation (radiation); }
+
 // @ The daisy_column Type.
 
 // @@ Cloning and merging columns.
@@ -612,6 +617,11 @@ daisy_column_get_water_sink (const Column* column, double sink[])
   for (; i < size; i++)
     sink[i] = 0.0;
 }
+
+extern "C" double EXPORT	// [cm^3/cm^3]
+daisy_column_get_water_content_at (const Column* column, 
+				   unsigned int index)
+{ return column->get_water_content_at (index); }
 
 // @@@ Soil Nitrate. 
 // 
@@ -689,6 +699,55 @@ daisy_column_get_surface_no3 (const Column* column)
 extern "C" double EXPORT	// [mm]
 daisy_column_get_snow_storage (const Column* column)
 { return column->get_snow_storage (); }
+
+/* @@@ Organic Matter.
+ * 
+ * The organic content of the soil.
+ */
+
+extern "C" double EXPORT	// [g C/cm³]
+daisy_column_get_smb_c_at (Column* column, unsigned int index)
+{ return column->get_smb_c_at (index); }
+
+extern "C" double EXPORT	// [g C/cm³]
+daisy_column_get_co2_at (Column* column, unsigned int index)
+{ return column->get_co2_production_at (index); }
+
+/* @@@ Soil Heat.
+ * 
+ * Temperature of soil.
+ */
+
+extern "C" double EXPORT	// [°C]
+daisy_column_get_temperature_at (Column* column, unsigned int index)
+{ return column->get_temperature_at (index); }
+
+
+/* @@@ Crops.
+ *
+ * What grows in the column.
+ */
+
+extern "C" double EXPORT	// [cm³ H2O/cm³/h]
+daisy_column_get_crop_h2o_uptake_at (Column* column, unsigned int index)
+{ return column->get_crop_h2o_uptake_at (index); }
+
+// @ The daisy_chemical Type.
+//
+// Contains information about chemicals known by Daisy.
+
+extern "C" Chemical* EXPORT		// Return the chemical named NAME.
+daisy_chemical_find (const char* name)
+{
+  const Library& chemlib = Library::find ("chemical");
+  if (chemlib.check (name))
+    return &Librarian<Chemical>::create (chemlib.lookup (name));
+  return NULL;
+}
+
+extern "C" double EXPORT	// The crop uptake reflection factor.
+daisy_chemical_reflection_factor (const Chemical* chemical)
+{ return chemical->crop_uptake_reflection_factor (); }
 
 // @ Miscellaneous.
 //

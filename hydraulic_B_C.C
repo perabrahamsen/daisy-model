@@ -63,10 +63,10 @@ HydraulicB_C::h (const double Theta) const
 double 
 HydraulicB_C::M (double h) const
 {
-  if (h < h_b)
+  if (h <= h_b)
     return K_sat * (-h_b / (1 + 3/b)) * pow (h_b / h, 1 + 3/b);
   else
-    return K_sat * h;
+    return M (h_b) + K_sat * (h - h_b);
 }
 
 double 

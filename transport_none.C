@@ -42,6 +42,15 @@ TransportNone::tick (const Soil& soil, const SoilWater& soil_water,
 	M[i] -= J_in / soil.dz (0);
 
       C[i] = solute.M_to_C (soil, soil_water.Theta (i), i, M[i]);
+      if (!(M[i] >= 0.0))
+	{
+	  cerr << "BUG: M[" << i << "] = " << M[i] 
+	       << "(J_in = " << J_in << ") S[" << i << "] = " << S[i] << "\n";
+
+	}
+
+      assert (M[i] >= 0.0);
+      assert (C[i] >= 0.0);
     }
 }
 

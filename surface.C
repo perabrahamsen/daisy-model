@@ -40,16 +40,21 @@ Surface::accept_top (double water)
   if (lake >= 0.0)
     return true;
 
+  if (fabs (water) < 1e-99)
+    return true;
+
   water *= 10.0;			// cm -> mm.
 
-  if (pond + water * dt >= - max (fabs (pond), fabs (water)) / 100)
+  if (pond + water * dt >= - max (fabs (pond), fabs (water)) / 100.0)
     {
+      assert (im.NO3 >= 0.0);
+      assert (im.NH4 >= 0.0);
       if (total_matter_flux)
 	{
 	  IM delta_matter (im, 1.0);
-	  im -= delta_matter;
 	  delta_matter /= dt;
 	  im_flux -= delta_matter;
+	  im.clear ();
 	}
       else if (-water > minimal_matter_flux)
 	{
@@ -58,6 +63,8 @@ Surface::accept_top (double water)
 	  delta_matter /= dt;
 	  im_flux -= delta_matter;
 	}
+      assert (im_flux.NO3 <= 0.0);
+      assert (im_flux.NH4 <= 0.0);
       pond += water * dt;
       return true;
     }
@@ -127,6 +134,9 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
 void 
 Surface::fertilize (const IM& n)
 { 
+  assert (n.NO3 >= 0.0);
+  assert (n.NH4 >= 0.0);
+
   im += n;
 }
 

@@ -112,7 +112,6 @@ void
 Daisy::tick ()
 { 
   action.doIt (frame, *this);
-
   weather.tick (time);
   tick_columns ();
   tick_logs ();

@@ -170,6 +170,9 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
       assert (om_N[missing_fraction] >= 0.0);
     }
   om_N[missing_C_per_N] = N - accumulate (om_N.begin (), om_N.end (), 0.0);
+
+  assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
+  assert (approximate (N, accumulate (om_N.begin (), om_N.end (), 0.0)));
 }
 
 void
@@ -189,6 +192,9 @@ AM::Implementation::add (const Geometry& geometry,
 			 double C, double N,
 			 const vector<double>& density)
 {
+  const double old_C = total_C (geometry);
+  const double old_N = total_N (geometry);
+
   vector<double> om_C (om.size (), 0.0);
   vector<double> om_N (om.size (), 0.0);
 
@@ -205,6 +211,11 @@ AM::Implementation::add (const Geometry& geometry,
 	  om[i]->add (geometry, om_C[i], density);
 	}
     }
+
+  const double new_C = total_C (geometry);
+  const double new_N = total_N (geometry);
+  assert (approximate (new_C, old_C + C));
+  assert (approximate (new_N, old_N + N));
 }
 
 void
@@ -212,6 +223,8 @@ AM::Implementation::add (const Geometry& geometry,
 			 double C, /* fixed C/N */
 			 const vector<double>& density)
 {
+  const double old_C = total_C (geometry);
+
   // Find the missing fraction.
   vector<double> om_C (om.size (), 0.0);
   int missing_fraction = -1;
@@ -231,10 +244,14 @@ AM::Implementation::add (const Geometry& geometry,
 
   // Calculate C in missing fraction.
   om_C[missing_fraction] = C - accumulate (om_C.begin (), om_C.end (), 0.0);
-
+  assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
+  
   // Distribute to OMs.
   for (unsigned int i = 0; i < om.size (); i++)
     om[i]->add (geometry, om_C[i], density);
+
+  const double new_C = total_C (geometry);
+  assert (approximate (new_C, old_C + C));
 }
 
 void 
@@ -291,16 +308,34 @@ void
 AM::Implementation::mix (const Geometry& geometry,
 			 double from, double to, double penetration)
 {
+  const double old_C = total_C (geometry);
+  const double old_N = total_N (geometry);
+
   for (unsigned int i = 0; i < om.size (); i++)
     om[i]->mix (geometry, from, to, penetration);
+
+  const double new_C = total_C (geometry);
+  const double new_N = total_N (geometry);
+  
+  assert (approximate (new_C, old_C));
+  assert (approximate (new_N, old_N));
 }
 
 void
 AM::Implementation::swap (const Geometry& geometry,
 			  double from, double middle, double to)
 {
+  const double old_C = total_C (geometry);
+  const double old_N = total_N (geometry);
+
   for (unsigned int i = 0; i < om.size (); i++)
     om[i]->swap (geometry, from, middle, to);
+
+  const double new_C = total_C (geometry);
+  const double new_N = total_N (geometry);
+  
+  assert (approximate (new_C, old_C));
+  assert (approximate (new_N, old_N));
 }
 
 double 

@@ -33,7 +33,7 @@ main (int argc, char* argv[])
   
   /* Check the result. */
   if (!daisy_syntax_check (syntax, alist, "daisy")
-      || daisy_parser_error_count (parse) > 0)
+      || daisy_parser_error_count (parser) > 0)
     return 1;
 
   /* Create, check and run the simulation. */

@@ -16,10 +16,11 @@ void
 SoilNH4::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Solute::load_syntax (syntax, alist); 
-  // Use van Schouwenburg - Schuffelen adsorbtion by default.
-  AttributeList& vS_S = *new AttributeList ();
-  vS_S.add ("type", "vS_S");
-  alist.add ("adsorbtion", vS_S);
+  // Use linear adsorption by default.
+  AttributeList& linear = *new AttributeList ();
+  linear.add ("type", "linear");
+  linear.add ("K_clay", 117.116);
+  alist.add ("adsorption", linear);
 }
 
 SoilNH4::SoilNH4 (const AttributeList& al)

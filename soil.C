@@ -81,7 +81,7 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("EpInterchange", Syntax::Number, Syntax::Const);
   alist.add ("EpInterchange", 0.6);
   syntax.add ("MaxRootingDepth", Syntax::Number, Syntax::Const);
-  alist.add ("MaxRootingDepth", 100.0);
+  //  alist.add ("MaxRootingDepth", 100.0);
   syntax.add ("dispersivity", Syntax::Number, Syntax::Const);
 }
   

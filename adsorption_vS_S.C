@@ -1,10 +1,10 @@
-// adsorbtion_vS_S.C
+// adsorption_vS_S.C
 
-#include "adsorbtion.h"
+#include "adsorption.h"
 #include "soil.h"
 #include "mathlib.h"
 
-class Adsorbtion_vS_S : public Adsorbtion
+class Adsorption_vS_S : public Adsorption
 {
   // Simulation.
 public:
@@ -14,9 +14,9 @@ public:
 
   // Chemical soil constants.
   double K_planar () const
-    { return 6.3e-4; }
+    { return 6.3e-5; }		// [g/cm³]
   double K_edge () const
-    { return 1.372e-5; }
+    { return 1.372e-5; }	// [g/cm³]
   double v_planar (const Soil& soil, int i) const
     { 
       // Maximum specific absorbtion [g / g clay]
@@ -27,7 +27,7 @@ public:
     }
   double v_edge (const Soil& soil, int i) const
     {
-      const double S_edge = 0.308e-3;	// Same for edges.
+      const double S_edge = 0.308e-3;	// Same for edges. [g / g clay]
       const double porosity = soil.Theta (i, 0.0);
       const double clay = soil.clay (i);
       
@@ -36,26 +36,26 @@ public:
 
   // Create.
 public:
-  Adsorbtion_vS_S (const AttributeList& al)
-    : Adsorbtion (al.name ("type"))
+  Adsorption_vS_S (const AttributeList& al)
+    : Adsorption (al.name ("type"))
     { }
 };
 
 double
-Adsorbtion_vS_S::C_to_A (const Soil& soil, int i, double C) const
+Adsorption_vS_S::C_to_A (const Soil& soil, int i, double C) const
 {
   return (v_planar (soil, i) * C) / (K_planar () + C)
     + (v_edge (soil, i) * C) / (K_edge () + C);
 }
 
 double 
-Adsorbtion_vS_S::C_to_M (const Soil& soil, double Theta, int i, double C) const
+Adsorption_vS_S::C_to_M (const Soil& soil, double Theta, int i, double C) const
 {
   return C_to_A (soil, i, C) + Theta * C;
 }
 
 double 
-Adsorbtion_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
+Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
 {
   const double ve = v_edge (soil, i); 
   const double Ke = K_edge ();
@@ -76,22 +76,22 @@ Adsorbtion_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
       const double d = - M * Kp * Ke;
     
       C = single_positive_root_of_cubic_equation (a, b, c, d);
+      assert (approximate (M, C_to_M (soil, Theta, i, C)));
     }
-  assert (approximate (M, C_to_M (soil, Theta, i, C)));
   return C;
 }
 
-static struct Adsorbtion_vS_SSyntax
+static struct Adsorption_vS_SSyntax
 {
-  static Adsorbtion& make (const AttributeList& al)
+  static Adsorption& make (const AttributeList& al)
   {
-    return *new Adsorbtion_vS_S (al);
+    return *new Adsorption_vS_S (al);
   }
 
-  Adsorbtion_vS_SSyntax ()
+  Adsorption_vS_SSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    Librarian<Adsorbtion>::add_type ("vS_S", alist, syntax, &make);
+    Librarian<Adsorption>::add_type ("vS_S", alist, syntax, &make);
   }
-} Adsorbtion_vS_S_syntax;
+} Adsorption_vS_S_syntax;

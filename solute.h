@@ -3,7 +3,7 @@
 #ifndef SOLUTE_H
 #define SOLUTE_H
 
-#include "adsorbtion.h"
+#include "adsorption.h"
 
 struct Log;
 struct Filter;
@@ -24,14 +24,14 @@ protected:
 protected:
   vector<double> S;		// Sink-source term.
   Transport& transport;		// Solute transport.
-  Adsorbtion& adsorbtion;	// Solute adsorbtion.
+  Adsorption& adsorption;	// Solute adsorption.
 
 public:
   virtual double diffusion_coefficient () const = 0; // in free solute. 
   double C_to_M (const Soil& soil, double Theta, int i, double C) const
-    { return adsorbtion.C_to_M (soil, Theta, i, C); }
+    { return adsorption.C_to_M (soil, Theta, i, C); }
   double M_to_C (const Soil& soil, double Theta, int i, double M) const
-    { return adsorbtion.M_to_C (soil, Theta, i, M); }
+    { return adsorption.M_to_C (soil, Theta, i, M); }
 
 public:
   double M (int i) const

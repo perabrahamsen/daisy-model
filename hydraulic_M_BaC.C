@@ -64,10 +64,10 @@ HydraulicM_BaC::h (const double Theta) const
 double 
 HydraulicM_BaC::M (double h) const
 {
-  if (h < h_b)
+  if (h <= h_b)
     return K_sat * (-h_b / (1 + 2.5*lambda)) * pow (h_b / h, 1 + 2.5*lambda);
   else
-    return K_sat * h;
+    return M (h_b) + K_sat * (h - h_b);
 }
 
 double 

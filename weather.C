@@ -9,33 +9,40 @@ Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 
 struct Weather::Implementation
 {
+  // Parameters.
   const double Latitude;
   const IM DryDeposit;
   const IM WetDeposit;
   const double T1;
   const double T2;
-  double Prain;
-  double Psnow;
-  double day_length;
-  double day_cycle;
   const double average;		// Average temperature at bottom [C]
   const double amplitude;	// Variation in bottom temperature [C]
   const double omega;		// Length of year [ rad / yday]
   const double max_Ta_yday;	// Warmest day in the year [yday]
+
+  // State.
+  double daily_global_radiation; // [W/m²]
+  double Prain;
+  double Psnow;
+  double day_length;
+  double day_cycle;
+
+  // Create and Destroy.
   Implementation (const AttributeList& al)
     : Latitude (al.number ("Latitude")),
       DryDeposit (al.alist ("DryDeposit")),
       WetDeposit (al.alist ("WetDeposit")),
       T1 (al.number ("T1")),
       T2 (al.number ("T2")),
-      Prain (0.0),
-      Psnow (0.0),
-      day_length (-42.42e42),
-      day_cycle (42.42e42),
       average (al.number ("average")),
       amplitude (al.number ("amplitude")),
       omega (al.number ("omega")),
-      max_Ta_yday (al.number ("max_Ta_yday"))
+      max_Ta_yday (al.number ("max_Ta_yday")),
+      daily_global_radiation (-42.42e42),
+      Prain (0.0),
+      Psnow (0.0),
+      day_length (-42.42e42),
+      day_cycle (42.42e42)
     { }
 };
 
@@ -52,6 +59,10 @@ Weather::tick (const Time& time)
 double
 Weather::hourly_global_radiation () const
 { return (day_cycle () * 24.0) * daily_global_radiation (); }
+
+double
+Weather::daily_global_radiation () const
+{ return impl.daily_global_radiation; }
 
 double
 Weather::rain () const
@@ -183,6 +194,10 @@ Weather::put_air_temperature (double)
 void 
 Weather::put_reference_evapotranspiration (double)
 { assert (false); }
+
+void
+Weather::put_global_radiation (double radiation) // [W/m²]
+{ impl.daily_global_radiation = radiation; }
 
 double
 Weather::average () const

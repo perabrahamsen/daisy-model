@@ -30,7 +30,7 @@ public:
   void flux_top_on ();
   void flux_top_off ();
   bool accept_top (double);
-  double ponding() const;
+  double ponding () const;
   double temperature () const;
 
   const IM& matter_flux ();

@@ -69,6 +69,17 @@ struct OrganicMatter::Implementation
   double water_turnover_factor (double h) const;
   vector<double> clay_turnover_factor;
 
+  // Communication with external model.
+  double get_smb_c_at (unsigned int i) const // g C/cm³]
+    {
+      double total = 0.0;
+      for (unsigned int j = 0; j < smb.size (); j++)
+	{
+	  if (smb[j]->C.size () > i)
+	    total += smb[i]->C[i];
+	}
+      return total;
+    }
   // Create & Destroy.
   Implementation (const Soil&, const AttributeList& al);
 };
@@ -350,7 +361,11 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     {
       const double NH4 = soil_NH4.M_left (i) * K_NH4;
       const double NO3 = soil_NO3.M_left (i) * K_NO3;
-      assert (NH4 >= 0.0 && NO3 >= 0.0);
+
+      if (!(NH4 >= 0.0))
+	  cerr << "BUG: NH4[" << i << "] = " << NH4 << "\n";
+      assert (NH4 >= 0.0);
+      assert (NO3 >= 0.0);
 
       N_soil[i] = NH4 + NO3;
       N_used[i] = 0.0;
@@ -617,10 +632,14 @@ OrganicMatter::swap (const Soil& soil, double from, double middle, double to)
 }
 
 double
-OrganicMatter::CO2 (int i) const
+OrganicMatter::CO2 (unsigned int i) const
 {
   return impl.CO2[i];
 }
+
+double 
+OrganicMatter::get_smb_c_at (unsigned int i) const
+{ return impl.get_smb_c_at (i); }
 
 void 
 OrganicMatter::output (Log& log, Filter& filter, const Soil& soil) const

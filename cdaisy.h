@@ -28,6 +28,8 @@ typedef struct daisy_printer daisy_printer;
 typedef struct daisy_time daisy_time;
 typedef struct daisy_column daisy_column;
 typedef struct daisy_weather daisy_weather;
+typedef struct daisy_chemical daisy_chemical;
+
 
 /* @ Utilities.
  *
@@ -443,6 +445,9 @@ void                            /* [mm/d] */
 daisy_weather_put_reference_evapotranspiration (daisy_weather* weather,
                                                 double ref);
 
+void                            /* [W/m²] (daily average) */
+daisy_weather_put_global_radiation (daisy_weather* weather, double radiation);
+
 /* @ The daisy_column Type.
  * 
  * The daisy_column type keeps track of all information within a single
@@ -504,6 +509,9 @@ daisy_column_put_water_pressure (daisy_column* column, const double h[]);
 void                            /* [cm^3/cm^3/h] */
 daisy_column_get_water_sink (const daisy_column* column, double sink[]);
 
+double				/* [cm^3/cm^3] */
+daisy_column_get_water_content_at (const daisy_column* column, 
+				   unsigned int index);
 /* @@@ Soil Nitrate. 
  * 
  * Nitrate solution in the soil.
@@ -551,6 +559,47 @@ daisy_column_get_surface_no3 (const daisy_column* column);
 
 double                          /* [mm] */
 daisy_column_get_snow_storage (const daisy_column* column);
+
+/* @@@ Organic Matter.
+ * 
+ * The organic content of the soil.
+ */
+
+double				/* [g C/cm³] */
+daisy_column_get_smb_c_at (const daisy_column* column, unsigned int index);
+
+double                            /* [g C/cm³] */
+daisy_column_get_co2_at (const daisy_column* column, unsigned int index);
+
+/* @@@ Soil Heat.
+ * 
+ * Temperature of soil.
+ */
+
+double                            /* [°C] */
+daisy_column_get_temperature_at (const daisy_column* column,
+				 unsigned int index);
+
+
+/* @@@ Crops.
+ *
+ * What grows in the column.
+ */
+
+double                            /* [cm³ H2O/cm³/h] */
+daisy_column_get_crop_h2o_uptake_at (const daisy_column* column,
+				     unsigned int index);
+
+/* @ The daisy_chemical Type.
+ *
+ * Contains information about chemicals known by Daisy.
+ */
+
+daisy_chemical*			/* Return the chemical named NAME. */
+daisy_chemical_find (const char* name);
+
+double				/* The crop uptake reflection factor. */
+daisy_chemical_reflection_factor (const daisy_chemical* chemical);
 
 /* @ Miscellaneous.
  *
