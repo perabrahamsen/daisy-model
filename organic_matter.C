@@ -460,13 +460,12 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   for (unsigned int i = 0; i < size; i++)
     {
-      const double NH4 = soil_NH4.M_left (i) * K_NH4;
-      const double NO3 = soil_NO3.M_left (i) * K_NO3;
-
-      if (!(NH4 >= 0.0))
-	  CERR << "BUG: NH4[" << i << "] = " << NH4 << "\n";
-      assert (NH4 >= 0.0);
-      assert (NO3 >= 0.0);
+      assert (soil_NH4.M_left (i) > 0);
+      const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
+	? 0.0 : soil_NH4.M_left (i) * K_NH4;
+      assert (soil_NO3.M_left (i) > 0);
+      const double NO3 = (soil_NO3.M_left (i) < 1e-9) // 1 mg/l
+	? 0.0 : soil_NO3.M_left (i) * K_NO3;
 
       N_soil[i] = NH4 + NO3;
       N_used[i] = 0.0;
@@ -515,14 +514,10 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   // Update source.
   for (unsigned int i = 0; i < size; i++)
     {
-      const double NH4 = soil_NH4.M_left (i) * K_NH4;
-#if 0
-      if (N_used[i] > N_soil[i])
-	{
-	  CERR << "\nBUG: Adding " << N_used[i] - N_soil[i] << " mystery N\n";
-	  N_used[i] = N_soil[i];
-	}
-#endif
+      assert (N_used[i] < soil_NH4.M_left (i) + soil_NO3.M_left (i));
+
+      const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
+	? 0.0 : soil_NH4.M_left (i) * K_NH4;
 
       if (N_used[i] > NH4)
 	{
@@ -569,6 +564,13 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       CERR << "BUG: OrganicMatter: delta_C != soil_CO2 + top_CO2 [g C/cm^2]\n"
 	   << delta_C << " != " 
 	   << soil.total (CO2) << " + " << top_CO2 << "\n";
+    }
+
+  // We didn't steal it all?
+  for (int i = 0; i < soil.size (); i++)
+    {
+      assert (soil_NO3.M_left (i) >= 0.0);
+      assert (soil_NH4.M_left (i) >= 0.0);
     }
 }
       
