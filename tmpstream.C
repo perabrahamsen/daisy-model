@@ -25,11 +25,11 @@
 #include "tmpstream.h"
 #include "assertion.h"
 
-#if defined (__GNUC__) || defined (VISUALCPP)
-#include <strstream>
-#else
+#if defined (__BORLANDC__)
 // Borland C++ 5.01 doesn't spell stream with an m.
 #include <strstrea.h>
+#else
+#include <strstream>
 #endif
 
 struct TmpStream::Implementation

@@ -186,11 +186,10 @@ ifeq ($(COMPILER),borland)
 	CCOMPILE = $(BORLAND)Bin/bcc32 -P- -v $(WARNFLAGS)
 endif
 ifeq ($(COMPILER),icc)
-	COMPILE = /opt/intel/compiler70/ia32/bin/icc -D__GNUC__=3 -Xc -x c++ -g -w1
-	CCOMPILE = /opt/intel/compiler70/ia32/bin/icc -D__GNUC__=3 -Xc -x c -g -w1
-# 193: use 0 for undefined preprocessor value (even after an &&)
-
+	COMPILE = /opt/intel/compiler70/ia32/bin/icc -Xc -x c++ -g -w1
+	CCOMPILE = /opt/intel/compiler70/ia32/bin/icc -Xc -x c -g -w1
 endif
+
 # Construct the compile command.
 #
 CC = $(COMPILE) $(OPTIMIZE) $(PROFILE)

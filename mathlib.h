@@ -28,7 +28,7 @@
 #include <vector>
 #include <math.h>
 
-#ifdef VISUALCPP
+#ifdef _MSC_VER
 
 template <class T>
 T min (T a, T b)
@@ -38,10 +38,13 @@ template <class T>
 T max (T a, T b)
 { return (a > b) ? a : b; }
 
-#endif // VISUALCPP
+#endif // Visual C++
 
-#if defined (finite) \
-    || (defined (__GNUC__) && __GNUC__ > 2 && defined (__unix))
+#if defined (finite)
+/* do nothing */
+#elif (defined (__GNUC__) && __GNUC__ > 2 && defined (__unix))
+/* do nothing */
+#elif defined (__INTEL_COMPILER)
 /* do nothing */
 #elif defined (__finite)
 #define finite(x) __finite(x)

@@ -21,6 +21,7 @@
 
 
 #include "adsorption.h"
+#include <math.h>
 
 class AdsorptionFull : public Adsorption
 {

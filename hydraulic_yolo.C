@@ -22,6 +22,7 @@
 
 #include "hydraulic.h"
 #include "plf.h"
+#include <math.h>
 
 class HydraulicYolo : public Hydraulic
 {

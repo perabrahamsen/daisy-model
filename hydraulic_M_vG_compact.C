@@ -24,6 +24,7 @@
 
 #include "hydraulic.h"
 #include "plf.h"
+#include <math.h>
 
 class HydraulicM_vG_compact : public Hydraulic
 {

@@ -25,6 +25,7 @@
 #include "hydraulic.h"
 #include "treelog.h"
 #include "tmpstream.h"
+#include <math.h>
 
 class Hydraulic_Cosby : public Hydraulic
 {

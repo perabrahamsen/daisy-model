@@ -22,6 +22,7 @@
 
 #include "tortuosity.h"
 #include "hydraulic.h"
+#include <math.h>
 
 class TortuosityM_Q : public Tortuosity
 {

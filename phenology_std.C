@@ -24,6 +24,7 @@
 #include "production.h"
 #include "vernalization.h"
 #include "plf.h"
+#include <math.h>
 
 class PhenologyStandard : public Phenology
 {

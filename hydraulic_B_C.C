@@ -21,6 +21,7 @@
 
 #include "hydraulic.h"
 #include "check.h"
+#include <math.h>
 
 class HydraulicB_C : public Hydraulic
 {

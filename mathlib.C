@@ -22,11 +22,12 @@
 
 #include "mathlib.h"
 #include "assertion.h"
-
 #include <math.h>
 
 #if defined (__INTEL_COMPILER)
+// In header.
 #elif defined (__GNUC__) && __GNUC__ > 2 && defined (__unix)
+// In header.
 #elif defined (__unix) || defined (__CYGWIN__)
 // It is on SunOS 5.8 and Cygwin libc.
 extern "C" double cbrt (double);
