@@ -97,8 +97,8 @@ public:
     { return bioclimate.get_evap_interception (); }
   double get_intercepted_water () const // [mm]
     { return bioclimate.get_intercepted_water (); }
-  double get_net_precipitation () const // [mm/h]
-    { return bioclimate.get_net_precipitation (); }
+  double get_net_throughfall () const // [mm/h]
+    { return bioclimate.get_net_throughfall (); }
   double get_snow_storage () const // [mm]
     { return bioclimate.get_snow_storage (); }
   double get_exfiltration () const // [mm/h]

@@ -527,7 +527,7 @@ double                          /* [mm] */
 daisy_column_get_intercepted_water (const daisy_column* column);
 
 double                          /* [mm/h] */
-daisy_column_get_net_precipitation (const daisy_column* column);
+daisy_column_get_net_throughfall (const daisy_column* column);
 
 /* @@@ Surface.
  * 

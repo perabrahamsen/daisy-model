@@ -659,8 +659,8 @@ daisy_column_get_intercepted_water (const Column* column)
 { return column->get_intercepted_water (); }
 
 extern "C" double EXPORT	// [mm/h]
-daisy_column_get_net_precipitation (const Column* column)
-{ return column->get_net_precipitation (); }
+daisy_column_get_net_throughfall (const Column* column)
+{ return column->get_net_throughfall (); }
 
 // @@@ Surface.
 // 

@@ -542,6 +542,9 @@ bioclimate_PM${OBJ}: bioclimate_PM.C bioclimate.h librarian.h library.h \
  common.h alist.h syntax.h column.h surface.h uzmodel.h im.h weather.h \
  crop.h csmp.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  snow.h log.h filter.h mathlib.h
+uznone${OBJ}: uznone.C uzmodel.h librarian.h library.h common.h alist.h \
+ syntax.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h log.h \
+ filter.h mathlib.h
 daisy${OBJ}: daisy.C daisy.h frame.h time.h common.h weather.h librarian.h \
  library.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
  log.h filter.h parser.h am.h nitrification.h bioclimate.h column.h \

@@ -13,7 +13,7 @@ Bioclimate::get_intercepted_water () const
 { assert (false); return 0.0; }
 
 double 
-Bioclimate::get_net_precipitation () const
+Bioclimate::get_net_throughfall () const
 { assert (false); return 0.0; }
 
 double 

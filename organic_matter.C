@@ -791,8 +791,11 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
   add_submodule<OM> ("smb", syntax, alist, Syntax::State, Syntax::Sequence);
   add_submodule<OM> ("som", syntax, alist, Syntax::State, Syntax::Sequence);
+#if 0
+  // It should be possible to overwrite the default by specifying these.
   syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);
   syntax.add ("water_turnover_factor", Syntax::CSMP, Syntax::Const);
+#endif
   syntax.add ("min_AM_C", Syntax::Number, Syntax::Const);
   alist.add ("min_AM_C", 0.0);
   syntax.add ("min_AM_N", Syntax::Number, Syntax::Const);

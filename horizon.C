@@ -115,8 +115,8 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
   assert (to < intervals);
 
   // Make room, make room...
-  K_water.insert (K_water.end (), to, 0.0);
-  K_ice.insert (K_ice.end (), to, 0.0);
+  K_water.insert (K_water.end (), intervals, 0.0);
+  K_ice.insert (K_ice.end (), intervals, 0.0);
 
   for (int i = from; i < to; i++)
     {
@@ -161,6 +161,16 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
 	  + (K_ice_wet - K_ice_dry)
 	  * (content[Water] + content[Ice] - Theta_pF_high)
 	  / (Theta_pF_low - Theta_pF_high);
+    }
+  for (int i = to; i < intervals; i++)
+    {
+      K_water[i] = K_water[to];
+      K_ice[i] = K_ice[to];
+    }
+  for (int i = 0; i < from; i++)
+    {
+      K_water[i] = K_water[from];
+      K_ice[i] = K_ice[from];
     }
 }
 
@@ -350,6 +360,8 @@ double
 Horizon::heat_conductivity (double Theta, double Ice) const
 {
   const int entry = int (Theta * impl.intervals);
+  assert (entry >= 0);
+  assert (entry < impl.intervals);
   return (impl.K_ice[entry] * Ice + impl.K_water[entry] * (1.0 - Ice))
     * 3600;			// W / cm / K -> J/h / cm / K
 }

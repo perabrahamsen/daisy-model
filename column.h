@@ -68,7 +68,7 @@ public:
   virtual void get_no3_m (vector<double>& v) const = 0; // [g/cm^3]
   virtual double get_evap_interception () const = 0; // [mm/h]
   virtual double get_intercepted_water () const = 0; // [mm]
-  virtual double get_net_precipitation () const = 0; // [mm/h]
+  virtual double get_net_throughfall () const = 0; // [mm/h]
   virtual double get_snow_storage () const = 0; // [mm]
   virtual double get_exfiltration () const = 0; // [mm/h]
   virtual double get_evap_soil_surface () const = 0; // [mm/h]

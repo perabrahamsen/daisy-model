@@ -1427,6 +1427,11 @@ CropStandard::PotentialWaterUptake (const double h_x,
   double total = 0.0;
   for (unsigned int i = 0; i < soil.size () && L[i] > 0.0; i++)
     {
+      if (soil_water.h (i) >= 0.0)
+	{
+	  S[i] = 0.0;
+	  continue;
+	}
       const double h = h_x - (1 + Rxylem) * soil.z (i);
       const double uptake = max (2 * M_PI * L[i] * (soil.Theta (i, h) / soil.Theta (i, 0.0))
 				      * (soil.M (i, soil_water.h (i)) - soil.M (i, h))

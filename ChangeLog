@@ -1,3 +1,17 @@
+1998-05-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.026 released.
+
+1998-05-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C (heat_conductivity): Check that we are inside the
+	arrayes. 
+	(initialize): Fill the K arrays outside the res and sat
+	boundaries. 
+
+	* crop_sold.C, crop_old.C, crop_std.C (PotentialWaterUptake): No
+	uptake at saturated conditions. 
+
 1998-05-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.025 released.
