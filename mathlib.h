@@ -8,9 +8,15 @@
 #include <math.h>
 
 #ifdef VISUALCPP
+
 template <class T>
 T min (T a, T b)
 { return (a < b) ? a : b; }
+
+template <class T>
+T max (T a, T b)
+{ return (a > b) ? a : b; }
+
 #endif // VISUALCPP
 
 #ifndef M_LN2
