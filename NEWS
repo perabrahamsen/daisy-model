@@ -12,6 +12,33 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.03
+
+** 4% N lost as N2O during nitrification.
+
+By default, 4% of the ammonium consumed during the nitrification
+process does now escape as nitrous oxide.  The remaining well be
+converted to nitrate.
+
+The typical effects will be sligtly smaller simulated N harvest or N
+leaching.
+
+The "N Balance" log model has been opdated to log both NH4 consumed,
+and N2O and NO3 produced.  The "Denitrication" log model also log the
+N2O produced, as this is sometimes mistaken for denitrification.
+
+You can control the N2O production with the new "N2O_fraction"
+parameter in the nitrification models.
+
+** New K_to_pipes parameter in the pipe groundwater model.
+
+This parameter indicates how fast water flow to the drainpipes in
+saturated soil.  By default the K_sat and anisotropy parameters of the
+horizon is used.  
+
+You can use it together with K_aquitard to calibrate deep percolation
+and drain flow.
+
 * 3.02
 
 ** You can now supress the line with initial values in the log files.

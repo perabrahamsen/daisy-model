@@ -36,6 +36,7 @@ class GroundwaterPipe : public Groundwater
   const double L;		// Distance between pipes. [cm]
   const double x;		// Distance to nearest pipe. [cm]
   const double pipe_position;	// Height pipes are placed above surface. [cm]
+  const double K_to_pipes_;	// Horizontal sat. conductivity. [cm h^-1]
   const double K_aquitard_;	// Conductivity of the aquitard [cm h^-1]
   /*const*/ double Z_aquitard_;	// Vertical length of the aquitard [cm]
   const double h_aquifer;	// Pressure potential in the aquifer [cm]
@@ -87,6 +88,9 @@ public:
 
 private:
   double DeepPercolation (const Soil&);
+  double K_to_pipes (const unsigned int i, 
+                     const Soil& soil, 
+                     const SoilHeat& soil_heat) const;
   double EquilibriumDrainFlow (const Soil&, const SoilHeat&);
 
   // Accessors.
@@ -120,6 +124,8 @@ public:
       L (al.number ("L")),
       x (al.check ("x") ? al.number ("x") : L / 2.0),
       pipe_position (al.number ("pipe_position")),
+      K_to_pipes_ (al.check ("K_to_pipes") 
+                   ? al.number ("K_to_pipes") : -1.0),
       K_aquitard_ (al.number ("K_aquitard")),
       Z_aquitard_ (al.number ("Z_aquitard")),
       h_aquifer (al.check ("h_aquifer") 
@@ -184,6 +190,17 @@ GroundwaterPipe::DeepPercolation(const Soil& soil)
 }
 
 double
+GroundwaterPipe::K_to_pipes (const unsigned int i, 
+                             const Soil& soil, 
+                             const SoilHeat& soil_heat) const
+{
+  if (K_to_pipes_ < 0)
+    return soil.K (i, 0.0, 0.0, soil_heat.T (i))
+      * soil.anisotropy (i);
+  return K_to_pipes_;
+}
+
+double
 GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil, 
 				       const SoilHeat& soil_heat)
 {
@@ -198,9 +215,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
       for (unsigned int i = i_GWT; i <= i_drain; i++)
 	{
 	  Ha += soil.dz (i);
-	  Ka += soil.dz (i) 
-	    * soil.K (i, 0.0, 0.0, soil_heat.T (i))
-	    * soil.anisotropy (i);
+	  Ka += soil.dz (i) * K_to_pipes (i, soil, soil_heat);
 	}
       Ka /= Ha;
 
@@ -210,9 +225,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
       for (unsigned int i = i_drain+1; i < size; i++)
 	{
 	  Hb += soil.dz (i);
-	  Kb += soil.dz (i) 
-	    * soil.K (i, 0.0, 0.0, soil_heat.T (i))
-	    * soil.anisotropy (i);
+	  Kb += soil.dz (i) * K_to_pipes (i, soil, soil_heat);
 	}
       Kb /= Hb;
       const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
@@ -221,8 +234,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
       const double a = Flow / (Ka*Ha + Kb*Hb);
       for (unsigned int i = i_GWT; i < size; i++)
 	{
-          S[i] = a * soil.K (i, 0.0, 0.0, soil_heat.T (i))
-	    * soil.anisotropy (i);
+          S[i] = a * K_to_pipes (i, soil, soil_heat);
 	}
       daisy_assert (isfinite (Flow));
       return Flow;
@@ -266,6 +278,10 @@ By default, this is 1/2 L.");
       syntax.add ("pipe_position", "cm", Check::negative (), Syntax::Const,
 		  "Height pipes are placed in the soil (a negative number).");
       alist.add ("pipe_position", -110.0);
+      syntax.add ("K_to_pipes", "cm/h", Check::non_negative (), Syntax::Const,
+		  "Horizontal conductivity in saturated soil.\n\
+By default this is calculated from the horizontal conductivity and the\n\
+anisotropy of the horizon.");
       syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Syntax::Const,
 		  "Conductivity of the aquitard.");
       alist.add ("K_aquitard", 1e-4);

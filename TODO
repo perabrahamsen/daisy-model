@@ -1,5 +1,19 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* (SOM_fractions -1 -1 0.4)
+
+* humus i balance med input for forskellige jorde.
+
+* Noter til hvad der er ændret i Daisy siden opgaver
+
+* Hvad kræver Daisy af input
+
+** Minimum
+
+** Anbefalet
+
+** Muligt
+
 * Ny (set foo 3.4) pseudo-attribut.
 
 * SH: Salg af referencemanual på www-siden?

@@ -38,14 +38,25 @@ public:
   const symbol name;
   static const char *const description;
 
+  // Parameters.
+protected:
+  const double N2O_fraction;
+
+  // Log variable.
+protected:
+  vector<double> NH4;
+  vector<double> NO3;
+  vector<double> N2O;
+  
   // Simulation.
 public:
   virtual void tick (const Soil&, const SoilWater&, const SoilHeat&,
 		     SoilNO3&, SoilNH4&) = 0;
-  virtual void output (Log&) const = 0;
+  void output (Log&) const;
 
   // Create and Destroy.
-protected:
+public:
+  static void load_syntax (Syntax&, AttributeList&);
   Nitrification (const AttributeList& al);
 public:
   virtual ~Nitrification ();

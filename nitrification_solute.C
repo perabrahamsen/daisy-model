@@ -26,7 +26,6 @@
 #include "soil_heat.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
-#include "log.h"
 #include "mathlib.h"
 #include "plf.h"
 #include "check.h"
@@ -42,13 +41,8 @@ private:
   const PLF heat_factor;
   const PLF water_factor;
 
-  // Log variable.
-private:
-  vector<double> converted;
-  
   // Simulation.
 public:
-  void output (Log&) const;
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&);
 
@@ -100,24 +94,27 @@ static double f_T (double T)
   daisy_assert (false);
 }
 
-void
-NitrificationSolute::output (Log& log) const
-{
-  output_variable (converted, log);
-}
-
 void 
 NitrificationSolute::tick (const Soil& soil, const SoilWater& soil_water,
 			   const SoilHeat& soil_heat,
 			   SoilNO3& soil_NO3, SoilNH4& soil_NH4)
 {
-  converted.erase (converted.begin (), converted.end ());
-
   unsigned int size = soil.size ();
   if (!active_underground)
     size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
   if (!active_groundwater)
     size = soil_water.first_groundwater_node ();
+
+  if (NH4.size () < size)
+    NH4.insert (NH4.end (), size - NH4.size (), 0.0);
+  if (NO3.size () < size)
+    NO3.insert (NO3.end (), size - NO3.size (), 0.0);
+  if (N2O.size () < size)
+    N2O.insert (N2O.end (), size - N2O.size (), 0.0);
+
+  fill (NH4.begin(), NH4.end (), 0.0);
+  fill (NO3.begin(), NO3.end (), 0.0);
+  fill (N2O.begin(), N2O.end (), 0.0);
 
   for (unsigned int i = 0; i < size; i++)
     {
@@ -134,13 +131,15 @@ NitrificationSolute::tick (const Soil& soil, const SoilWater& soil_water,
       daisy_assert (rate >= 0.0);
       daisy_assert (soil_NH4.M_left (i) >= 0.0);
       const double M_new = min (rate, soil_NH4.M_left (i) / dt - 1e-8);
-      if (M_new >= 0.0)
-	converted.push_back (M_new);
-      else
-	converted.push_back (0.0);
+      if (M_new > 0.0)
+        {
+          NH4[i] = M_new;
+          N2O[i] = M_new * N2O_fraction;
+          NO3[i] = NH4[i] - N2O[i];
+        }
     }
-  soil_NH4.add_to_sink (converted);
-  soil_NO3.add_to_source (converted);
+  soil_NH4.add_to_sink (NH4);
+  soil_NO3.add_to_source (NO3);
 }
 
 NitrificationSolute::NitrificationSolute (const AttributeList& al)
@@ -164,6 +163,8 @@ static struct NitrificationSoluteSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    Nitrification::load_syntax (syntax, alist);
+
     alist.add ("description", 
 	       "k_10 * C / (k + C).  Michaelis-Menten kinetics,\n\
 with nitrification based on ammonium solute.");
@@ -173,9 +174,6 @@ Set this to true to enable nitrification below the root zone.");
     syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
 Set this to true to enable nitrification in the groundwater.");
     alist.add ("active_groundwater", false);
-    syntax.add ("converted", 
-		"g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
-		"Amount of ammonium converted this hour.");
     syntax.add ("k", "g/cm^3", Check::positive (), Syntax::Const, 
 		"Half saturation constant.");
     syntax.add ("k_10", "h^-1", Check::non_negative (),

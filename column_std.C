@@ -551,6 +551,7 @@ The organic matter in the soil and on the surface.",
     nitrification_alist.add ("heat_factor", PLF::empty ());
     nitrification_alist.add ("water_factor", PLF::empty ());
     nitrification_alist.add ("clay_factor", PLF::empty ());
+    nitrification_alist.add ("N2O_fraction", 0.04);
 
     alist.add ("Nitrification", nitrification_alist);
     syntax.add_submodule ("Denitrification", alist, Syntax::State, "\
