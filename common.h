@@ -78,6 +78,9 @@
 #define EXPORT _export
 #define IMPORT _import
 
+// Borland complains about unused global constants unless "extern".
+#define GLOBAL_CONSTANT extern
+
 #if __BORLANDC__ < 0x0550
 // Define these for Borland C++ 5.0.1
 #define BORLAND_TEMPLATES
@@ -92,14 +95,9 @@
 // Needed in BCC for 'chdir'.
 #include <dir.h>
 
-// Borland complains about unused global constants unless "extern".
-#define GLOBAL_CONSTANT extern
-
 // BC++ 5.01 hasn't <ostream.h>
 #define MISSING_OSTREAM
 
-#else
-#define GLOBAL_CONSTANT
 #endif
 #endif
 
