@@ -22,7 +22,7 @@
 #include "photosynthesis.h"
 #include "bioclimate.h"
 #include "canopy_std.h"
-#include "development.h"
+#include "phenology.h"
 #include "plf.h"
 #include "alist.h"
 #include "syntax.h"
@@ -37,7 +37,7 @@ const double molWeightCO2 = 44.0; // [gCO2/mol]
 double
 Photosynthesis::operator () (const Bioclimate& bioclimate, 
 			     CanopyStandard& canopy,
-			     Development& development,
+			     Phenology& development,
 			     Treelog& msg) const
 {
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.

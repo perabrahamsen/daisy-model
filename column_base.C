@@ -257,20 +257,25 @@ ColumnBase::check (bool require_weather,
   const int n = soil.size ();
   bool ok = true;
 
-  if (require_weather && !weather)
-    {
-      err.entry ("Weather unspecified");
-      ok = false;
-    }
-  {
-    Treelog::Open nest (err, "Weather");
-    if (weather && !weather->check (from, to, err))
-      ok = false;
-  }
   {
     Treelog::Open nest (err, "Soil");
     if (!soil.check (err))
       ok = false;
+  }
+  {
+    Treelog::Open nest (err, "Weather");
+    if (weather)
+      {
+	if (!weather->check (from, to, err))
+	  ok = false;
+      }
+
+    else if (require_weather)
+      {
+	err.entry ("Weather unspecified");
+	// The rest is uninitialized, don't check it!
+	return false;
+      }
   }
   {
     Treelog::Open nest (err, "SoilWater");

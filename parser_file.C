@@ -71,7 +71,8 @@ struct ParserFile::Implementation
 
   // Parser.
   void add_derived (Library&);
-  AttributeList& load_derived (const Library& lib, bool in_sequence = false);
+  AttributeList& load_derived (const Library& lib, bool in_sequence,
+			       const AttributeList* original);
   void load_list (AttributeList&, const Syntax&);
   Time get_time ();
   const Syntax* global_syntax_table;
@@ -345,7 +346,10 @@ void
 ParserFile::Implementation::skip_to_end ()
 {
   while (peek () != ')' && good ())
-    skip_token ();
+    {
+      skip_token ();
+      skip ();
+    }
 }
 
 bool
@@ -384,7 +388,8 @@ ParserFile::Implementation::add_derived (Library& lib)
 }
 
 AttributeList&
-ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
+ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
+					  const AttributeList *const original)
 {
   AttributeList* alist;
   bool skipped = false;
@@ -393,17 +398,32 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
       skip ("(");
       skipped = true;
     }
-  const string type = get_string ();
-  if (lib.check (type))
+  string type = get_string ();
+  try
     {
-      alist = new AttributeList (lib.lookup (type));
-      alist->add ("type", type);
+      if (type == "original")
+	{
+	  if (!original)
+	    throw (string ("No original value"));
+	  alist = new AttributeList (*original);
+	  daisy_assert (alist->check ("type"));
+	  type = alist->name ("type");
+	  daisy_assert (lib.check (type));
+	}
+      else
+	{ 
+	  if (!lib.check (type))
+	    throw (string ("Unknown '") + lib.name () + "' model '"
+		   + type + "'");
+	  alist = new AttributeList (lib.lookup (type));
+	  alist->add ("type", type);
+	}
       if (skipped || !in_sequence)
 	load_list (*alist, lib.syntax (type));
     }
-  else
+  catch (const string& msg)
     {
-      error (string ("Unknown '") + lib.name () + "' model '" + type + "'");
+      error (msg);
       skip_to_end ();
       alist = new AttributeList ();
       alist->add ("type", "error");
@@ -530,7 +550,11 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  case Syntax::Object:
 	    {
 	      const Library& lib = syntax.library (name);
-	      AttributeList& al = load_derived (lib, current != end);
+	      AttributeList& al = (atts.check (name) 
+				   ? load_derived (lib, current != end,
+						   &atts.alist (name))
+				   : load_derived (lib, current != end, NULL));
+						   
 	      if (&lib == &Librarian<Parser>::library ())
 		{
 		  Parser& parser = Librarian<Parser>::create (al);
@@ -545,8 +569,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  const string obj = al.name ("type");
 		  if (obj == "error")
 		    break;
+#if 1
 		  // We can only use complete objects as attribute
 		  // values.
+		  // NO LONGER TRUE with the "original" type.
 		  TmpStream tmp;
 		  TreelogStream treelog (tmp ());
 		  Treelog::Open nest (treelog, obj);
@@ -558,6 +584,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    warning (string ("Warning for member '") + obj 
 			     + "' in library '" + name + "'\n--- details:\n"
 			     + tmp.str () + "---");
+#endif
 		  atts.add (name, al);
 		  delete &al;
 		}
@@ -598,7 +625,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		vector<AttributeList*> sequence;
 		while (!looking_at (')') && good ())
 		  {
-		    AttributeList& al = load_derived (lib, true);
+		    AttributeList& al = load_derived (lib, true, NULL);
 		    const string obj = al.name ("type");
 		    if (obj != "error")
 		      {

@@ -24,7 +24,7 @@
 
 class Bioclimate;
 class CanopyStandard;
-class Development;
+class Phenology;
 class AttributeList;
 class Syntax;
 class Log;
@@ -44,7 +44,7 @@ private:
 public:
   double operator () (const Bioclimate& bioclimate, 
 		      CanopyStandard& canopy,
-		      Development& development, Treelog&) const;
+		      Phenology& development, Treelog&) const;
 
   // Create and Destroy.
 public:

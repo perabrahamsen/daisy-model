@@ -109,7 +109,7 @@ Library::Implementation::syntax (const string& key) const
   syntax_map::const_iterator i = syntaxen.find (key);
 
   if (i == syntaxen.end ())
-    daisy_assert (false);
+    daisy_panic (string ("'") + key + "' not found");
 
   return *(*i).second;
 }

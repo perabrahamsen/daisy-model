@@ -1,8 +1,14 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* EU workshow
+* make dist så Michael kan få rettelse.
 
-** Ny phenology model, ren temperatursum.
+* EU workshop
+
+** New "TSum" phenology model.
+
+This models the phenology as a pure temperature sum.
+
+** total irrigation (surface, overhead, subsoil)
 
 ** Kør øvelser igennem.
 

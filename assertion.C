@@ -63,6 +63,14 @@ Assertion::bug (const char* file, int line, const char* fun,
     }
 };
 
+void 
+Assertion::panic (const char* file, int line, const char* fun,
+		  const string& msg)
+{
+  bug (file, line, fun, msg);
+  exit (3);
+};
+
 Assertion::Register::Register (Treelog& log)
   : treelog (log)
 {

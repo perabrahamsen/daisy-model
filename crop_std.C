@@ -25,7 +25,7 @@
 #include "canopy_std.h"
 #include "harvesting.h"
 #include "production.h"
-#include "development.h"
+#include "phenology.h"
 #include "partition.h"
 #include "vernalization.h"
 #include "photosynthesis.h"
@@ -50,7 +50,7 @@ public:
   CanopyStandard& canopy;
   Harvesting& harvesting;
   Production& production;
-  Development& development;
+  Phenology& development;
   const Partition& partition;
   Vernalization& vernalization;
   const Photosynthesis& photosynthesis;
@@ -314,8 +314,10 @@ CropStandard::harvest (const string& column_name,
 		       double& residuals_N_top, double& residuals_C_top,
 		       vector<double>& residuals_N_soil,
 		       vector<double>& residuals_C_soil,
-		       Treelog&)
+		       Treelog& msg)
 {
+  Treelog::Open nest (msg, name + " harvest");
+
   // Update nitrogen content.
   nitrogen.content (development.DS, production);
 
@@ -389,10 +391,12 @@ CropStandard::harvest (const string& column_name,
 				     canopy.Height));
 	  canopy.CropCAI (production.WLeaf, production.WSOrg,
 			  production.WStem, development.DS);
-	  CanopyStructure ();
+	  if (LAI () > 0.0)
+	    CanopyStructure ();
+	  else
+	    msg.warning ("No CAI after harvest");
 	}
     }
-      
   return harvest;
 }
 
@@ -411,7 +415,7 @@ CropStandard::output (Log& log) const
 #else
   output_submodule (production, "Prod", log);
 #endif
-  output_submodule (development, "Devel", log);
+  output_derived (development, "Devel", log);
   if (vernalization.required)	// Test needed for checkpoint.
     output_submodule (vernalization, "Vernal", log);
   output_submodule (nitrogen, "CrpN", log);
@@ -423,7 +427,7 @@ CropStandard::CropStandard (const AttributeList& al)
     canopy (*new CanopyStandard (al.alist ("Canopy"))),
     harvesting (*new Harvesting (al.alist ("Harvest"))),
     production (*new Production (al.alist ("Prod"))),
-    development (*new Development (al.alist ("Devel"))),
+    development (Librarian<Phenology>::create (al.alist ("Devel"))),
     partition (*new Partition (al.alist ("Partit"))),
     vernalization (*new Vernalization (al.check ("Vernal") 
 				       ? al.alist ("Vernal")
@@ -470,9 +474,8 @@ CropStandardSyntax::CropStandardSyntax ()
 			"Harvest parameters.", Harvesting::load_syntax);
   syntax.add_submodule ("Prod", alist, Syntax::State,
 			"Production.", Production::load_syntax);
-  syntax.add_submodule ("Devel", alist, Syntax::State,
-			"Development and phenology.", 
-			Development::load_syntax);
+  syntax.add ("Devel", Librarian<Phenology>::library (), 
+	      "Development and phenology.");
   syntax.add_submodule ("Partit", alist, Syntax::Const,
 			"Assimilate partitioning.", Partition::load_syntax);
   syntax.add_submodule ("Vernal", alist, Syntax::OptionalState, 

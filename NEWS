@@ -12,6 +12,60 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.41
+
+** New "original" pseudo-model.
+
+This keyword allows you to reuse the original paramets of an component
+attribute, when creating a specialization. 
+
+For example, if we have this definition of a foo parameterization:
+
+  (deffoo default "old foo"
+    (bar default (a 1) (b 2)))
+
+and want a new parameterization that is identical, except "b" should
+be 42, we had to write
+
+  (deffoo "new foo" "old foo"
+    (bar default (a 1) (b 42)))
+
+i.e. specify the type and all attributes for "bar" once again.
+
+Now we can change "b" alone
+
+  (deffoo "new foo" "old foo"
+    (bar original (b 42)))
+
+Se next change for a more specific example.
+
+** Change to default crop model.
+
+The value of the "Devel" attribute in the "default" crop model should
+now be a parameterization of the new "phenology" component.
+
+In practice, this means "(Devel " should be replaced with
+"(Devel default" in the crop parameterization files.  This has already
+been done with the files in the daisy-lib.zip file.
+
+For any derived parameterization where you only changed a few
+parameters of the "Devel" submodel compared to the original, you can
+use the new "original" keyword, like this
+
+  (Devel original (EmrTSum  300))
+
+to overwrite the EmrTSum parameter only.
+
+** Total precipitation now in "Weather" log file.
+
+This is just snow + rain.
+
+** New "l" paramter in the "B_vG" and "M_vG" hydraulic models.
+
+You can now specify the "l" parameter to van Genuchten.
+
+** Bug fixes.
+
 * 2.40
 
 ** You can now just specify "sand" instead of "fine_sand" and "coarse_sand"

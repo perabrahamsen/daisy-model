@@ -1,3 +1,49 @@
+2003-01-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.41 released.
+
+2003-01-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.C (operator): If we remove both leaf and stem, kill
+	of the plant.
+
+	* parser_file.C (load_derived): Take original alist as an
+	argument, and use it when "original" is specified as a
+	superclass. 
+	(load_list): Update caller.
+	* lib/grass.dai (Grass): Use it.
+	* lib/wwheat.dai ("Winter Wheat; Eest", "Winter Wheat; Foulum"): Ditto.
+	* lib/sbarley.dai ("Spring Barley; Foulum"): Ditto.
+	* lib/maize.dai ("Ikuwala Maize", "Silage Maize"): Ditto.
+	* txt/introduction.tex (Library Components):
+	Documented it.
+
+	* txt/introduction.tex (Submodels and Fixed Components): Document
+	how the original value is modified rather than overwritten.
+
+2003-01-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* assertion.C, assertion.h (panic): New member function.
+	* assertion.h (daisy_panic): New macro.
+
+	* parser_file.C (skip_to_end): Better error handling.
+
+	* crop_std.C: Use phenology component instead of development
+	submodel.  
+	* photosynthesis.h, photosynthesis.C: Ditto.
+	* lib/log.dai ("Crop Production"): Updated.
+	* lib/*.dai: Fixed default crop parameterizations.
+
+	* weather.C (precipitation): New log variable.
+	* lib/log.dai ("Weather"): Use it.
+
+2003-01-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* phenology.h, phenology.C: New component.
+	* Makefile (COMPONENTS): Add it.
+	* phenology_std.C: New model.
+	* Makefile (MODELS): Add it.
+
 2003-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.40 released.

@@ -108,6 +108,7 @@ Weather::output (Log& log) const
 	      reference_evapotranspiration ());
   log.output ("rain", rain ());
   log.output ("snow", snow ());
+  log.output ("precipitation", rain () + snow ());
   log.output ("hourly_cloudiness", hourly_cloudiness ());
   log.output ("daily_cloudiness", daily_cloudiness ());
   log.output ("vapor_pressure", vapor_pressure ());
@@ -350,6 +351,8 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Extraterrestrial radiation this day.");
   syntax.add ("rain", "mm/h", Syntax::LogOnly, "Rain this hour.");
   syntax.add ("snow", "mm/h", Syntax::LogOnly, "Snow this hour.");
+  syntax.add ("precipitation", "mm/h", Syntax::LogOnly, 
+	      "Precipitation this hour.");
   syntax.add_fraction ("hourly_cloudiness", Syntax::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
   syntax.add_fraction ("daily_cloudiness", Syntax::LogOnly,

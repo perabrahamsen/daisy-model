@@ -643,7 +643,7 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
     }
 
   // We check for this in SoilHeat::check ().
-  daisy_assert (T.size () == soil.size ());
+  // daisy_assert (T.size () == soil.size ());
 }
 
 

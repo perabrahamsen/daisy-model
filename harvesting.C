@@ -267,8 +267,10 @@ Harvesting::operator() (const string& column_name,
   daisy_assert (approximate (total_old_N, total_new_N + Crop_N_Yield + Crop_N_Loss));
 
   // Dead or alive?
-  if (!kill_off && DS < DSmax /* && leaf_harvest < 1.0 */)
-    // Note: Don't require leaf to survive, as stem may provide photosyntheses.
+  if (!kill_off && DS < DSmax
+      // BUG: Grass may actually live even if cut all the way, but we
+      // can't model that yet.
+      && stem_harvest < 0.99)
     {
       // Cut delay.
       const double removed_DM = old_DM - production.DM ();
