@@ -188,8 +188,6 @@ USEUNIT("photosynthesis.C");
 USEUNIT("production.C");
 USEUNIT("harvesting.C");
 USEUNIT("vernalization.C");
-USEUNIT("check_std.C");
-USEUNIT("check.C");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 
