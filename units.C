@@ -340,6 +340,7 @@ Units::standard_conversions ()
   add (Syntax::Fraction (), "", 1.0);
   add ("", "ppm", 1000000.0);
   add ("", "%", 100.0);
+  add (Syntax::None (), "", 1.0);
   add ("cm^3 H2O/cm^3", Syntax::Fraction (), 1.0);
   add ("cm^3 H2O/cm^3", "", 1.0);
   add ("g/cm^3", Syntax::Fraction (), 1.0);
