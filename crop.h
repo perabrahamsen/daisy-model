@@ -86,6 +86,8 @@ static Librarian<Crop> Crop_init ("crop");
 class CropList : public deque <Crop*> 
 { 
 public:
+  double CanopySum (double (Crop::*fun) () const) const;
+  double LAI () const;
   CropList (const vector<AttributeList*>&);
   ~CropList ();
 };

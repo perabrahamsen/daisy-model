@@ -38,6 +38,28 @@ Crop::Crop (const string& n)
 Crop::~Crop ()
 { }
 
+double CropList::CanopySum (double (Crop::*fun) () const) const
+{
+  double value = 0.0;
+
+  for (const_iterator crop = begin(); crop != end(); crop++)
+    {
+      value += ((*crop)->*fun) () * (*crop)->LAI ();
+    }
+  return value;
+}
+
+double CropList::LAI () const
+{
+  double value = 0.0;
+
+  for (const_iterator crop = begin(); crop != end(); crop++)
+    {
+      value += (*crop)->LAI ();
+    }
+  return value;
+}
+
 CropList::CropList (const vector<AttributeList*>& sequence)
 {
   for (vector<AttributeList*>::const_iterator i = sequence.begin ();

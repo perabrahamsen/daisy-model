@@ -14,6 +14,7 @@
 #include "filter.h"
 #include "mathlib.h"
 #include "options.h"
+#include "pet.h"
 
 struct BioclimateNew : public Bioclimate
 { 
@@ -42,6 +43,7 @@ struct BioclimateNew : public Bioclimate
   double daily_air_temperature_; // Air temperature in canopy.
   double day_length_;		// From weather (does not really belong here).
   double daily_global_radiation_; // From weather.
+  Pet& pet;			// Potential Evapotranspiration model.
 
   // Manager.
   double irrigation;
@@ -99,8 +101,7 @@ struct BioclimateNew : public Bioclimate
 
   // Create.
   BioclimateNew (const AttributeList&);
-  ~BioclimateNew ()
-    { }
+  ~BioclimateNew ();
 };
 
 BioclimateNew::BioclimateNew (const AttributeList& al)
@@ -108,6 +109,7 @@ BioclimateNew::BioclimateNew (const AttributeList& al)
     No (al.integer ("NoOfIntervals")),
     Height (al.integer ("NoOfIntervals") + 1),
     PAR_ (al.integer ("NoOfIntervals") + 1),
+    pet (Librarian<Pet>::create (al.alist ("pet"))),
     irrigation (0.0),
     irrigation_temperature (0.0),
     intercepted_water (al.number ("intercepted_water")),
@@ -118,21 +120,18 @@ BioclimateNew::BioclimateNew (const AttributeList& al)
     net_throughfall (0.0)
 { }
 
+BioclimateNew::~BioclimateNew ()
+{ 
+  delete &pet;
+}
+
 double
 BioclimateNew::CanopySum (const CropList& crops, double (Crop::*fun) () const)
 {
   if (LAI_ == 0.0)
     return 0.0;
 
-  double value = 0.0;
-  
-  for (CropList::const_iterator crop = crops.begin();
-       crop != crops.end();
-       crop++)
-    {
-      value += ((*crop)->*fun) () * (*crop)->LAI ();
-    }
-  return value;
+  return crops.CanopySum (fun);
 }
 
 double
@@ -402,8 +401,8 @@ BioclimateNew::output (Log& log, Filter& filter) const
   log.output ("LAI", filter, LAI_, true);
   log.output ("LAIvsH", filter, LAIvsH, true);
   log.output ("HvsLAI", filter, HvsLAI, true);
-  log.output ("PotEvapotranspiration", filter,
-	      PotEvapotranspiration, true);
+  output_derived (pet, "pet", log, filter);
+  log.output ("PotEvapotranspiration", filter, PotEvapotranspiration, true);
   log.output ("ActualEvapotranspiration", filter,
 	      ActualEvapotranspiration, true);
   output_submodule (snow, "Snow", log, filter);
@@ -449,10 +448,12 @@ Number of vertical intervals in which we partition the canopy");
 		  "Total canopy LAI below given height (cm)");
       syntax.add ("HvsLAI", Syntax::CSMP, Syntax::LogOnly, "\
 Height (cm) in which there is a given LAI below in total canopy");
+      syntax.add ("pet", Librarian<Pet>::library (), Syntax::State,
+		  "Potential Evapotranspiration model");
       syntax.add ("PotEvapotranspiration", "mm", Syntax::LogOnly,
-		  "Potential evaoptranspiration");
+		  "Calculated potential evapotranspiration");
       syntax.add ("ActualEvapotranspiration", "mm", Syntax::LogOnly,
-		  "Actual evapotranspiration");
+		  "Simulated actual evapotranspiration");
       add_submodule<Snow> ("Snow", syntax, alist, Syntax::State, 
 			   "Surface snow pack");
 

@@ -1,10 +1,30 @@
+1998-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.40 released.
+
+1998-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Crop Production"): Output N for each crop part.
+
+1998-11-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pet_makkink.C: New file.
+	* Makefile (COMPONENTS): Add it.
+
+	* pet.C, pet.h: New files.
+	* Makefile (INTERFACES): Add them.
+
 1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.39 released.
 
 1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* lib/sugarbeet.dai: Remamed from sbeet.dai.
+
 	* Version 0.38 released.
+
+	* lib/*.dai: Renamed crops.
 
 1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 

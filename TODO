@@ -1,11 +1,12 @@
 * Ændr bioclimate så PM bliver et separat energi-modul.
 
-  PET component (wet, dry) (weather, crops, soil, soil_heat, netto_stråling)
-  - weather
-  - Makkink
-  - PM dry   
+  - Indsæt PET i BioclaimteNew.
 
-  Design mere robust irrigation.
+  - RN (netto raditation) component 
+
+  - Crop::albedo og Soil:albedo parametre.
+
+  - Design mere robust irrigation.
 
 * Plot retentionskurve fra gdaisy.
 
