@@ -1,3 +1,12 @@
+2004-01-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.28 released.
+
+2004-01-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (read_new_day): Initialize before first possible
+	return. 
+
 2004-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.27 released.

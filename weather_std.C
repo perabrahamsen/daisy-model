@@ -630,6 +630,16 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	}
     }
 
+  // Initialize.
+  if (!initialized)
+    {
+      initialized = true;
+      lex->seek (end_of_header);
+      next_time = begin;
+      next_time.tick_hour (-timestep);
+      read_line ();
+    }
+  
   // Now.
   Time now = time;
   if (active_map >= 0)
@@ -660,16 +670,6 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
   Time tomorrow = now;
   tomorrow.tick_day ();
 
-  // Initialize.
-  if (!initialized)
-    {
-      initialized = true;
-      lex->seek (end_of_header);
-      next_time = begin;
-      next_time.tick_hour (-timestep);
-      read_line ();
-    }
-  
   // BC5 sucks // while (next_time <= now)
   while (!(now < next_time))
     read_line ();
