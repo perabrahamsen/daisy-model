@@ -112,8 +112,7 @@ double
 WeatherFile::AirTemperature (void) const // [C]
 {
   // BUG: No variation over the day? 
-  double t = 2.0 * M_PI / 365.0 * time.yday ();
-  return (7.7 - 7.7 * cos (t) - 3.6 * sin (t));
+  return air_temperature;
 }
 
 double
