@@ -327,22 +327,37 @@ sequence_number (const string& component, const string& parameterization)
 
 template pair<string, string>;
 
+struct object_desc
+{
+  const string comp;
+  const string par;
+  object_desc ()
+  { }
+  object_desc (const object_desc& other)
+    : comp (other.comp),
+      par (other.par)
+  { }
+  object_desc (const string c, const string p)
+    : comp (c),
+      par (p)
+  { }
+};
+
+
 static bool
-sort_by_sequence (const pair<string,string>& one,
-		  const pair<string,string>& two)
-{ return sequence_number (one.first, one.second) 
-    < sequence_number (two.first, two.second); }
+sort_by_sequence (object_desc& one, object_desc& two)
+{ return sequence_number (one.comp, one.par) 
+    < sequence_number (two.comp, two.par); }
 
 void
 resequence (const string& component, const string& parameterization, 
 	    const dep_map& dependencies)
 { 
   // Vector with all object to resequence.
-  typedef pair<string,string> spair;
-  vector<spair> deps;
+  vector<object_desc> deps;
 
   // Add parent.
-  deps.push_back (spair (component, parameterization));
+  deps.push_back (object_desc (component, parameterization));
 
   // Add dependencies.
   for (dep_map::const_iterator i = dependencies.begin ();
@@ -354,7 +369,7 @@ resequence (const string& component, const string& parameterization,
       for (string_set::const_iterator j = pars.begin ();
 	   j != pars.end ();
 	   j++)
-	deps.push_back (spair (component, *j));
+	deps.push_back (object_desc (component, *j));
     }
 
   // Sort them.
@@ -363,8 +378,8 @@ resequence (const string& component, const string& parameterization,
   // Resequence them.
   for (unsigned int i = 0; i < deps.size (); i++)
     {
-      const string& component = deps[i].first;
-      const string& parameterization = deps[i].second;
+      const string& component = deps[i].comp;
+      const string& parameterization = deps[i].par;
        
        Library& library = Library::find (component);
        assert (library.check (parameterization));
