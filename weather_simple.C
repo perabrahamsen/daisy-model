@@ -1,13 +1,10 @@
 // weather_simple.C
 
-#include "weather.h"
+#include "weather_old.h"
 #include "time.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 #include "log.h"
 
-class WeatherSimple : public Weather
+class WeatherSimple : public WeatherOld
 {
   const double precipitation;
   const int interval;
@@ -36,9 +33,9 @@ public:
 void
 WeatherSimple::tick (const Time& t)
 { 
-  Weather::tick (t);
+  WeatherOld::tick (t);
   time = t;
-  Weather::distribute (Precipitation ());
+  WeatherOld::distribute (Precipitation ());
 }
 
 double
@@ -85,7 +82,7 @@ double
 WeatherSimple::reference_evapotranspiration () const // [mm/h]
 {
   if (reference_evapotranspiration_ < 0)
-    return Weather::reference_evapotranspiration ();
+    return WeatherOld::reference_evapotranspiration ();
   else
     return reference_evapotranspiration_;
 }
@@ -100,7 +97,7 @@ WeatherSimple::Precipitation () const
 }
 
 WeatherSimple::WeatherSimple (const AttributeList& al)
-  : Weather (al),
+  : WeatherOld (al),
     precipitation (al.number ("precipitation")),
     interval (al.integer ("interval")),
     reference_evapotranspiration_ (al.number ("reference_evapotranspiration")),
@@ -124,7 +121,7 @@ static struct WeatherSimpleSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 A weather model with precipitation at regular intervals.");
-      Weather::load_syntax (syntax, alist);
+      WeatherOld::load_syntax (syntax, alist);
       syntax.add ("precipitation", "mm/h", Syntax::Const,
 		  "Amount of precipitation.");
       alist.add ("precipitation", 0.0);

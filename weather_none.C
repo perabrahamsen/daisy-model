@@ -1,11 +1,8 @@
-// weather_simple.C
+// weather_none.C
 
-#include "weather.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
+#include "weather_old.h"
 
-class WeatherNone : public Weather
+class WeatherNone : public WeatherOld
 {
   double air_temperature;
   double global_radiation;
@@ -16,7 +13,7 @@ class WeatherNone : public Weather
   // Simulation.
 public:
   void tick (const Time& t)
-    { Weather::tick (t); }
+    { WeatherOld::tick (t); }
   double hourly_air_temperature () const
     { return air_temperature; }
   double daily_air_temperature () const
@@ -35,9 +32,9 @@ public:
   // Communication with external model.
   void put_precipitation (double prec)
     { 
-      Weather::distribute (prec / 24.0); 
-      rain_ = Weather::rain ();
-      snow_ = Weather::snow ();
+      WeatherOld::distribute (prec / 24.0); 
+      rain_ = WeatherOld::rain ();
+      snow_ = WeatherOld::snow ();
     }
   void put_air_temperature (double T)
     { air_temperature = T; }
@@ -56,7 +53,7 @@ public:
 };
 
 WeatherNone::WeatherNone (const AttributeList& al)
-  : Weather (al),
+  : WeatherOld (al),
     air_temperature (al.number ("air_temperature")),
     global_radiation (al.number ("global_radiation")),
     reference_evapotranspiration_ (al.number ("reference_evapotranspiration")),
@@ -82,7 +79,7 @@ static struct WeatherNoneSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
 	       "Weather that does not change during the simulation.");
-    Weather::load_syntax (syntax, alist);
+    WeatherOld::load_syntax (syntax, alist);
     syntax.add ("air_temperature", "dg C", Syntax::Const,
 		"Constant air temperature");
     alist.add ("air_temperature", 0.0);

@@ -556,9 +556,9 @@ SoilHeat::Implementation::bottom (const Time& time,
 				  const Weather& weather) const 
 {
   // Fetch average temperatur.
-  const double average = weather.average ();
-  const double amplitude = weather.amplitude (); 
-  const double omega = weather.omega (); 
+  const double average = weather.T_average ();
+  const double amplitude = weather.T_amplitude (); 
+  const double omega = weather.rad_per_day (); 
   const double max_Ta_yday = weather.max_Ta_yday (); 
 
   return average 
@@ -602,7 +602,7 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
   C_apparent.insert (C_apparent.end (), soil.size (), 0.0);
 
   // Fetch average temperatur.
-  const double omega = weather.omega (); 
+  const double omega = weather.rad_per_day (); 
 
   // Fetch initial T.
   soil.initialize_layer (T, al, "T");

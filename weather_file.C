@@ -1,14 +1,11 @@
 // weather_file.C
 
-#include "weather.h"
+#include "weather_old.h"
 #include "time.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 #include "log.h"
 #include <fstream.h>
 
-struct WeatherFile : public Weather
+struct WeatherFile : public WeatherOld
 {
   // Weather file.
   Time date;
@@ -30,13 +27,13 @@ struct WeatherFile : public Weather
   double reference_evapotranspiration () const // [mm/h]
     { 
       if (reference_evapotranspiration_ < -1.0e11)
-	return Weather::reference_evapotranspiration ();
+	return WeatherOld::reference_evapotranspiration ();
       return reference_evapotranspiration_ * day_cycle (); 
     }
 
   // Communication with external model.
   void put_precipitation (double prec)
-    { Weather::distribute (prec / 24.0); }
+    { WeatherOld::distribute (prec / 24.0); }
   void put_air_temperature (double T)
     { air_temperature = T; }
   void put_reference_evapotranspiration (double ref)
@@ -44,7 +41,7 @@ struct WeatherFile : public Weather
 
   // Create and Destroy.
   WeatherFile (const AttributeList& al)
-    : Weather (al),
+    : WeatherOld (al),
       date (42, 1, 1, 0),
       file_name (al.name ("file")),
       file (Options::find_file (al.name ("file"))),
@@ -65,7 +62,7 @@ struct WeatherFile : public Weather
 void
 WeatherFile::tick (const Time& time)
 { 
-  Weather::tick (time);
+  WeatherOld::tick (time);
 
   if (!(date < time))
     return;
@@ -140,7 +137,7 @@ year, month, day, global radiation [W/m^2], air temperature [dg C],\n\
 precipitation [mm/d], and reference evapotranspiration [mm/d].  The\n\
 last field is optional, it is only used if you select the `weather'\n\
 model in the `pet' component");
-      Weather::load_syntax (syntax, alist);
+      WeatherOld::load_syntax (syntax, alist);
       syntax.add ("file", Syntax::String, Syntax::Const,
 		  "File to read weather data from.");
       syntax.order ("file");

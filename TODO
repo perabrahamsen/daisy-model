@@ -1,9 +1,10 @@
+* SH: commit
+
+* SH: Cygnus CD
+
 * Ny klimafil.
 
-* LogExtern
-
-- test api
-- konverter log.dai til ny table log model.
+Check om lexeren fra ParserFile kan gengruges.
 
 * En `forever' aktivitet.  Eller en `until CONDITION activity'.
 

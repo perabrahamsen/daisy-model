@@ -1,14 +1,11 @@
 // weather_hourly.C
 
-#include "weather.h"
+#include "weather_old.h"
 #include "time.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 #include "log.h"
 #include <fstream.h>
 
-struct WeatherHourly : public Weather
+struct WeatherHourly : public WeatherOld
 {
   Time date;
   const string file_name;
@@ -47,7 +44,7 @@ struct WeatherHourly : public Weather
     { return wind_; }
 
   WeatherHourly (const AttributeList& al)
-    : Weather (al),
+    : WeatherOld (al),
       date (42, 1, 1, 0),
       file_name (al.name ("file")),
       file (Options::find_file (al.name ("file"))),
@@ -71,7 +68,7 @@ struct WeatherHourly : public Weather
 void
 WeatherHourly::tick (const Time& time)
 { 
-  Weather::tick (time);
+  WeatherOld::tick (time);
 
   if (!file.good ())
     {
@@ -138,7 +135,7 @@ static struct WeatherHourlySyntax
 Each line should have the following whitespace separated fields:\n\
 year, month, day, hour, global radiation [W/m^2], air temperature [dg C],\n\
 precipitation [mm/h], cloudiness [0-1] and vapor pressure [Pa].");
-      Weather::load_syntax (syntax, alist);
+      WeatherOld::load_syntax (syntax, alist);
       syntax.add ("file", Syntax::String, Syntax::Const,
 		  "File to read weather data from.");
       syntax.order ("file");

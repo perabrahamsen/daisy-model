@@ -1,3 +1,25 @@
+1999-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.94 released.
+
+1999-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Merged SH changes.
+
+	* lexer.C, lexer.h: New files.
+	* Makefile (INTERFACES): Add them.
+	* parser_file.C: Use them.
+
+1999-10-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.h, weather.C: Move most functionality to weather_old.C.
+	* weather_old.h, weather_old.C: New files.
+	* Makefile (INTERFACES): Added it.
+	* weather_file.C: Derive from WeatherOld.
+	* weather_none.C: Ditto.
+	* weather_simple.C: Ditto.
+	* weather_hourly.C: Ditto.
+
 1999-10-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.93 released.
