@@ -107,15 +107,27 @@ static struct LogCheckpointSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
+Create a checkpoint of the entire simulation state, suitable for later\n\
+hot start.");
       LogAList::load_syntax (syntax, alist);
-      syntax.add ("where", Syntax::String, Syntax::Const);
+      syntax.add ("where", Syntax::String, Syntax::Const,
+		  "File name prefix for the generated checkpoint.\n\
+The time will be appended, together with the `.dai' suffix.");
       alist.add ("where", "checkpoint");
-      syntax.add ("description", Syntax::String, Syntax::Const);
-      alist.add ("description", "Automatically generated Daisy checkpoint.");
+      syntax.add ("description", Syntax::String, Syntax::Const,
+		  "Description of this particular checkpoint.");
+      alist.add ("description", "\
+Create a checkpoint of the entire simulation state, suitable for later\n\
+hot start.");
       syntax.add ("libraries", Syntax::String, 
-		  Syntax::Const, Syntax::Sequence);
-      alist.add ("libraries", *new vector<string> ());
-      syntax.add ("when", Librarian<Condition>::library (), Syntax::Const);
+		  Syntax::Const, Syntax::Sequence, "\
+List of loaded files with parameterizations to dump together with the\n\
+checkpoint.");
+      const vector<string> empty_string_vector;
+      alist.add ("libraries", empty_string_vector);
+      syntax.add ("when", Librarian<Condition>::library (),
+		  "Make a checkpoint every time this condition is true.");
       AttributeList finished_alist;
       finished_alist.add ("type", "finished");
       alist.add ("when", finished_alist);

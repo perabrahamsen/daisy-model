@@ -7,19 +7,21 @@ class AdsorptionLinear : public Adsorption
 {
   // Parameters.
   const double K_clay;
-  const double K_humus;
+  const double K_OC;
 
   // Simulation.
 public:
   double C_to_M (const Soil& soil, double Theta, int i, double C) const
     {
-      const double K = soil.clay (i) * K_clay + soil.humus (i) * K_humus;
+      const double K = soil.clay (i) * K_clay
+	+ soil.humus (i) * c_fraction_in_humus * K_OC;
       const double rho = soil.dry_bulk_density (i);
       return C * (K * rho + Theta);
     }
   double M_to_C (const Soil& soil, double Theta, int i, double M) const
     {
-      const double K = soil.clay (i) * K_clay + soil.humus (i) * K_humus;
+      const double K = soil.clay (i) * K_clay 
+	+ soil.humus (i) * c_fraction_in_humus * K_OC;
       const double rho = soil.dry_bulk_density (i);
       return M / (Theta + K * rho);
     }
@@ -28,9 +30,7 @@ public:
   AdsorptionLinear (const AttributeList& al)
     : Adsorption (al.name ("type")),
       K_clay (al.check ("K_clay") ? al.number ("K_clay") : 0.0),
-      K_humus (al.check ("K_humus") 
-	       ? al.number ("K_humus") 
-	       : al.number ("K_clay"))
+      K_OC (al.check ("K_OC") ? al.number ("K_OC") : al.number ("K_clay"))
     { }
 };
 
@@ -46,17 +46,17 @@ static struct AdsorptionLinearSyntax
       bool ok = true;
 
       const bool has_K_clay = al.check ("K_clay");
-      const bool has_K_humus = al.check ("K_humus");
+      const bool has_K_OC = al.check ("K_OC");
       
-      if (!has_K_clay && !has_K_humus)
+      if (!has_K_clay && !has_K_OC)
 	{
-	  CERR << "You must specify either `K_clay' or `K_humus'\n";
+	  CERR << "You must specify either `K_clay' or `K_OC'\n";
 	  ok = false;
 	}
       if (has_K_clay)
 	non_negative (al.number ("K_clay"), "K_clay", ok);
-      if (has_K_humus)
-	non_negative (al.number ("K_humus"), "K_humus", ok);
+      if (has_K_OC)
+	non_negative (al.number ("K_OC"), "K_OC", ok);
       
       if (!ok)
 	CERR << "in `linear' adsorption\n";
@@ -71,11 +71,11 @@ static struct AdsorptionLinearSyntax
     syntax.add ("K_clay", "g/cm^3", Syntax::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
-the `K' factor.  If `K_humus' is specified, `K_clay' defaults to 0.");
-    syntax.add ("K_humus", "g/cm^3", Syntax::OptionalConst, 
+the `K' factor.  If `K_OC' is specified, `K_clay' defaults to 0.");
+    syntax.add ("K_OC", "g/cm^3", Syntax::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
-It is multiplied with the soil humus fraction to get the humus part\n\
-of the `K' factor.  By default, `K_humus' is equal to `K_clay'.");
+It is multiplied with the soil organic carbon fraction to get the\n\
+carbon part of the `K' factor.  By default, `K_OC' is equal to `K_clay'.");
 
     Librarian<Adsorption>::add_type ("linear", alist, syntax, &make);
   }

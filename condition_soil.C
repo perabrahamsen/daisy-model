@@ -61,17 +61,25 @@ static struct ConditionSoilSyntax
       {
 	Syntax& syntax = *new Syntax (&check);
 	AttributeList& alist = *new AttributeList ();
-	syntax.add ("temperature", Syntax::Number, Syntax::Const);
-	syntax.add ("height", Syntax::Number, Syntax::Const);
+	alist.add ("description", "\
+Test if the soil is warmer than the specified temperature.");
+	syntax.add ("temperature", "dg C", Syntax::Const, "\
+Lowest soil temperature for which the condition is true.");
+	syntax.add ("height", "cm", Syntax::Const, "\
+Soil depth in which to test the temperature (a negative number).");
 	Librarian<Condition>::add_type ("soil_temperature_above",
 					alist, syntax, &make_temperature);
       }
       {
 	Syntax& syntax = *new Syntax (&check);
 	AttributeList& alist = *new AttributeList ();
-	syntax.add ("potential", Syntax::Number, Syntax::Const);
-	syntax.add ("height", Syntax::Number, Syntax::Const);
-	Librarian<Condition>::add_type ("soil_water_potential_above",
+	alist.add ("description", "\
+Test if the soil is wetter than the specified pressure potential.");
+	syntax.add ("potential", "h", Syntax::Const, "\
+The soil should be wetter than this for the condition to be true.");
+	syntax.add ("height", "cm", Syntax::Const, "\
+Depth at which to example the pressure potential (a negative number).");
+	Librarian<Condition>::add_type ("soil_water_pressure_above",
 					alist, syntax, &make_potential);
       }
     }

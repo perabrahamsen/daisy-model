@@ -21,6 +21,7 @@
 #include "alist.h"
 #include "common.h"
 #include "column.h"
+#include "submodel.h"
 
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
@@ -31,7 +32,7 @@ Daisy::Daisy (const AttributeList& al)
     action (Librarian<Action>::create (al.alist ("manager"))),
     weather (Librarian<Weather>::create (al.alist ("weather"))), 
     field (*new Field (al.alist_sequence ("column"))),
-    harvest (*new vector<const Harvest*>)
+    harvest (map_construct_const<Harvest> (al.alist_sequence ("harvest")))
 { }
 
 bool
@@ -137,6 +138,8 @@ template class add_submodule_sequence<Harvest>;
 void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  alist.add ("submodel", "Daisy");
+  alist.add ("description", "The Daisy Crop/Soil/Atmosphere Model.");
   Library::load_syntax (syntax, alist);
 
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,
@@ -159,10 +162,12 @@ the simulation.");
 	      "List of columns to use in this simulation.");
   syntax.add ("weather", Librarian<Weather>::library (),
 	      Syntax::State, Syntax::Singleton,
-	      "Weather model for probiding climate information during \
+	      "Weather model for providing climate information during \
 the simulation.");
-  add_submodule_sequence<Harvest> ("harvest", syntax, Syntax::LogOnly, 
+  vector<AttributeList*> empty_alist_sequence;
+  add_submodule_sequence<Harvest> ("harvest", syntax, Syntax::State, 
 				   "Total list of all crop yields.");
+  alist.add ("harvest", empty_alist_sequence);
 }
 
 Daisy::~Daisy ()
@@ -176,3 +181,6 @@ Daisy::~Daisy ()
 #endif
   delete &harvest;
 }
+
+static Submodel::Register 
+daisy_submodel ("Daisy", Daisy::load_syntax);

@@ -135,14 +135,22 @@ static struct NitrificationSoluteSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("active_underground", Syntax::Boolean, Syntax::Const);
+    alist.add ("description", 
+	       "k_10 * C / (k + C).  Michaelis-Menten kinetics,\n\
+with nitrification based on ammonium solute.");
+    syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
+Set this to true to enable nitrification below the root zone.");
     alist.add ("active_underground", false);
-    syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const);
+    syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
+Set this to true to enable nitrification in the groundwater.");
     alist.add ("active_groundwater", false);
-    syntax.add ("converted", Syntax::Number, Syntax::LogOnly, 
-		Syntax::Sequence);
-    syntax.add ("k", Syntax::Number, Syntax::Const);
-    syntax.add ("k_10", Syntax::Number, Syntax::Const);
+    syntax.add ("converted", 
+		"g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
+		"Amount of ammonium converted this hour.");
+    syntax.add ("k", "g/cm^3", Syntax::Const, 
+		"Half saturation constant.");
+    syntax.add ("k_10", "h^-1", Syntax::Const,
+		"Max rate.");
     Librarian<Nitrification>::add_type ("solute", alist, syntax, &make);
   }
 } NitrificationSolute_syntax;

@@ -92,6 +92,7 @@ struct BioclimateStandard : public Bioclimate
   Chemicals surface_chemicals_storage;
   Chemicals surface_chemicals_in;
   Chemicals surface_chemicals_out;
+  const bool chemicals_can_enter_soil;
 
   void ChemicalDistribution (const Vegetation&);
 
@@ -151,7 +152,16 @@ struct BioclimateStandard : public Bioclimate
     { return pond_water_in; }
   double get_snow_storage () const // [mm]
     { return snow.storage (); }
-
+  void put_surface_chemical (const string& name , double amount) // [g/cm^2]
+    {
+      // [g/cm^2] -> [g/m^2]
+      surface_chemicals_storage.set_to (name, amount * 1.0e4);
+    }
+  double get_surface_chemical (const string& name) const // [g/cm^2]
+    { 
+      // [g/m^2] -> [g/cm^2]
+      return surface_chemicals_storage.amount (name) * 1.0e-4;		
+    }
   // Create.
   BioclimateStandard (const AttributeList&);
   ~BioclimateStandard ();
@@ -209,6 +219,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
 			       ("surface_chemicals_storage")),
     surface_chemicals_in (),
     surface_chemicals_out (),
+    chemicals_can_enter_soil (al.flag ("chemicals_can_enter_soil")),
     daily_air_temperature_ (0.0),
     day_length_ (0.0),
     daily_global_radiation_ (0.0)
@@ -490,8 +501,17 @@ BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
   Chemicals::copy_fraction (snow_chemicals_out, surface_chemicals_in, 
 			    1.0 - cover);
   surface_chemicals_in += canopy_chemicals_out;
-  surface_chemicals_storage.clear (); // We don't store chemicals on surface.
-  surface_chemicals_out = surface_chemicals_in;
+  if (chemicals_can_enter_soil)
+    {
+      // We don't store chemicals on surface.
+      surface_chemicals_storage.clear ();
+      surface_chemicals_out = surface_chemicals_in;
+    }
+  else
+    {
+      surface_chemicals_storage += surface_chemicals_in;
+      surface_chemicals_out.clear ();
+    }
 
   // Reset spray.
   spray_.clear ();
@@ -716,6 +736,11 @@ Number of vertical intervals in which we partition the canopy.");
       Chemicals::add_syntax  ("surface_chemicals_out",
 			      syntax, alist, Syntax::LogOnly,
 			      "Chemicals entering the soil.");
+      syntax.add ("chemicals_can_enter_soil",
+		  Syntax::Boolean, Syntax::Const, "\
+If this is set to false, the chemicals will stay on the surface.");
+      alist.add ("chemicals_can_enter_soil", true);
+
       // Add to library.
       Librarian<Bioclimate>::add_type ("default", alist, syntax, &make);
     }

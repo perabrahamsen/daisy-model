@@ -11,6 +11,7 @@
 #include "am.h"
 #include "im.h"
 #include "mathlib.h"
+#include "submodel.h"
 
 struct Surface::Implementation
 {
@@ -298,8 +299,10 @@ template class add_submodule<IM>;
 void
 Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  alist.add ("submodel", "Surface");
+  alist.add ("description", "Keep track of things on the soil surface.");
   syntax.add ("EpFactor", Syntax::None (), Syntax::Const,
-	      "Convertion of reference evapotranspiration to \
+	      "Convertion of reference evapotranspiration to \n\
 potential evaporation for bare soil.");
   alist.add ("EpFactor", 0.8);
   syntax.add ("EpInterchange", Syntax::None (), Syntax::Const,
@@ -312,20 +315,32 @@ Canopy adsorbtion fraction of unreached potential soil evaporation.");
   syntax.add ("albedo_wet", Syntax::None (), Syntax::Const,
 	      "Albedo of wet soil (pf <= 1.7)");
   alist.add ("albedo_wet", 0.08);
-  syntax.add ("minimal_matter_flux", Syntax::Number, Syntax::Const);
+  syntax.add ("minimal_matter_flux", "mm", Syntax::Const, "\
+Minimal amount of of precipitation in order for inorganic N\n\
+to enter the soil.");
   alist.add ("minimal_matter_flux", 1.0e-10);
-  syntax.add ("total_matter_flux", Syntax::Boolean, Syntax::Const);
+  syntax.add ("total_matter_flux", Syntax::Boolean, Syntax::Const, "\
+Set this to true to force all inorganic N on the surface to enter the\n\
+soil immediately, even when there is no precipitation.");
   alist.add ("total_matter_flux", false);
-  syntax.add ("lake", Syntax::Number, Syntax::Const);
+  syntax.add ("lake", "mm", Syntax::Const, "\
+Set this to a positive number to force a permanent pressure top.");
   alist.add ("lake", -1.0);
-  syntax.add ("pond", Syntax::Number, Syntax::State);
+  syntax.add ("pond", "mm", Syntax::State, "\
+Amount of ponding on the surface.\n\
+Negative numbers indicate soil exfiltration.");
   alist.add ("pond", 0.0);
-  syntax.add ("flux", Syntax::Boolean, Syntax::State);
+  syntax.add ("flux", Syntax::Boolean, Syntax::State, "\
+True, iff the surface is currently a flux top for water transport.");
   alist.add ("flux", true);
-  syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("T", Syntax::Number, Syntax::LogOnly);
-  add_submodule<IM> ("IM", syntax, alist);
+  syntax.add ("EvapSoilSurface", "mm", Syntax::LogOnly, "\
+Water evaporated from the surface, including the pond and exfiltration.");
+  syntax.add ("Eps", "mm", Syntax::LogOnly, "\
+Potential evaporation from the surface.");
+  syntax.add ("T", "dg C", Syntax::LogOnly, "\
+Temperature of water or air directly above the surface.");
+  add_submodule<IM> ("IM", syntax, alist, Syntax::State, "\
+Inorganic nitrogen on the surface.");
 }
 
 Surface::Surface (const AttributeList& al)
@@ -357,3 +372,6 @@ Surface::~Surface ()
 
 Surface::Implementation::~Implementation ()
 { }
+
+static Submodel::Register 
+surface_submodel ("Surface", Surface::load_syntax);

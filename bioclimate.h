@@ -64,6 +64,8 @@ public:
   virtual double get_intercepted_water () const; // [mm]
   virtual double get_net_throughfall () const; // [mm/h]
   virtual double get_snow_storage () const; // [mm]
+  virtual void put_surface_chemical (const string&, double) = 0; // [g/cm^2]
+  virtual double get_surface_chemical (const string&) const = 0; // [g/cm^2]
 
   // Create.
 protected:

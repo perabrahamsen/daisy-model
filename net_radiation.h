@@ -26,7 +26,6 @@ public:
   void tick (const Weather& weather, double Albedo);
 
   // Create and Destroy.
-  static void load_syntax (Syntax&, AttributeList&);
 protected:
   NetRadiation (const AttributeList&);
 public:

@@ -25,7 +25,7 @@ public:
 public:
   TortuosityLinear (const AttributeList& al)
     : Tortuosity (al.name ("type")),
-      a_maybe (al.number ("a")),
+      a_maybe (al.check ("a") ? al.number ("a") : -42.0),
       b (al.number ("b"))
     { }
 };
@@ -41,9 +41,10 @@ static struct TortuosityLinearSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("a", "cm^3/cm^3", Syntax::Const, Syntax::None ());
-    alist.add ("a", -42.0);
-    syntax.add ("b", Syntax::None (), Syntax::Const, Syntax::None ());
+    alist.add ("description", "Linear Impedance factor.  a + b Theta.");
+    syntax.add ("a", "cm^3/cm^3", Syntax::OptionalConst, "\
+Theta offset.  By default, this corresponds to the wilting point.");
+    syntax.add ("b", Syntax::None (), Syntax::Const, "Theta factor.");
     Librarian<Tortuosity>::add_type ("linear", alist, syntax, &make);
   }
 } TortuosityLinear_syntax;

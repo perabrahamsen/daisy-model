@@ -18,13 +18,6 @@ NetRadiation::output (Log& log, Filter& filter) const
   log.output ("net_radiation", filter, net_radiation (), true);
 }
 
-void 
-NetRadiation::load_syntax (Syntax& syntax, AttributeList& alist)
-{
-  syntax.add ("net_radiation", Syntax::Number, Syntax::LogOnly);
-  alist.add ("type", "brunt");
-}
-
 NetRadiation::NetRadiation (const AttributeList& al)
   : name (al.name ("type"))
 { }
@@ -76,6 +69,9 @@ const double NetRadiationParent::SB = 4.90e-9;
 
 struct NetRadiationBrunt : public NetRadiationParent
 {
+  const double a;
+  const double b;
+
   double NetLongwaveRadiation(double Cloudiness, // [MJ/m2/d] 
 			      double Temp,
 			      double VapourPressure) const
@@ -85,7 +81,9 @@ struct NetRadiationBrunt : public NetRadiationParent
     }
   
   NetRadiationBrunt (const AttributeList& al)
-    : NetRadiationParent (al)
+    : NetRadiationParent (al),
+      a (al.check ("a") ? al.number ("a") : 0.34),
+      b (al.check ("b") ? al.number ("b") : 0.14)
     { }
 };
 
@@ -112,7 +110,7 @@ struct NetRadiationBrutsaert : public NetRadiationParent
     {
       const double ea = VapourPressure / 10;   /*mb*/
       const double NetEmiss
-	= SurEmiss * (1 - 1.24 * pow (ea / (Temp + 273), 1.0 / 7));
+	= SurEmiss * (1 - 1.24 * pow (ea / (Temp + 273), 1.0 / 7.0));
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
   
@@ -144,7 +142,7 @@ struct NetRadiationSatterlund : public NetRadiationParent
     {
       const double ea = VapourPressure / 10;   /*mb*/
       const double NetEmiss 
-	= SurEmiss * (1 - 1.08 * (1 - exp (-pow (ea, (Temp + 273) / 2016))));
+	= SurEmiss * (1 - 1.08 * (1 - exp (-pow (ea, (Temp + 273) / 2016.0))));
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
   
@@ -175,19 +173,50 @@ static struct NetRadiationSyntax
 
   NetRadiationSyntax ()
     {
+      // Brunt.
+      Syntax& syntax_brunt = *new Syntax ();
+      syntax_brunt.add ("net_radiation", "MJ/m^2/d", Syntax::LogOnly,
+			"The calculated net radiation.");
+      // We make them optional, so other code doesn't have to set them.
+      syntax_brunt.add ("a", Syntax::None (), Syntax::OptionalConst,
+			"Brunt `a' parameter (offset).");
+      syntax_brunt.add ("b", "1/sqrt(Pa)", Syntax::OptionalConst,
+			"Brunt `b' parameter (vapor pressure factor).");
+      AttributeList& alist_brunt = *new AttributeList ();
+      alist_brunt.add ("description", "\
+Brunt, 1932.  Default parametrization by Jensen et.al., 1990.\n\
+FAO recommendation.");
+      // We add the values here so they appear in the manual.
+      alist_brunt.add ("a", 0.34);
+      alist_brunt.add ("b", 0.14);
+      Librarian<NetRadiation>::add_type ("brunt",
+					 alist_brunt, syntax_brunt,
+					 &make_brunt);
+      // Others.
       Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      NetRadiation::load_syntax (syntax, alist);
-      Librarian<NetRadiation>::add_type ("brunt", alist, syntax, &make_brunt);
-      Librarian<NetRadiation>::add_type ("idso_jackson", alist, syntax,
-				&make_idso_jackson);
-      Librarian<NetRadiation>::add_type ("brutsaert", alist, syntax,
+      syntax.add ("net_radiation", "MJ/m^2/d", Syntax::LogOnly,
+		  "The calculated net radiation.");
+      AttributeList& alist_idso_jackson = *new AttributeList ();
+      alist_idso_jackson.add ("description", "Idso and Jackson, 1969");
+      AttributeList& alist_brutsaert = *new AttributeList ();
+      alist_brutsaert.add ("description", "Brutsaert, 1975");
+      AttributeList& alist_swinbank = *new AttributeList ();
+      alist_swinbank.add ("description", "Swinbank, 1963");
+      AttributeList& alist_satterlund = *new AttributeList ();
+      alist_satterlund.add ("description", "Satterlund, 1979");
+      Librarian<NetRadiation>::add_type ("idso_jackson",
+					 alist_idso_jackson, syntax,
+					 &make_idso_jackson);
+      Librarian<NetRadiation>::add_type ("brutsaert",
+					 alist_brutsaert, syntax,
 					 &make_brutsaert);
-      Librarian<NetRadiation>::add_type ("swinbank", alist, syntax,
+      Librarian<NetRadiation>::add_type ("swinbank",
+					 alist_swinbank, syntax,
 					 &make_swinbank);
-      Librarian<NetRadiation>::add_type ("satterlund", alist, syntax,
+      Librarian<NetRadiation>::add_type ("satterlund", 
+					 alist_satterlund, syntax,
 					 &make_satterlund);
     }
-} PetMakkink_syntax;
+} NetRadiation_syntax;
 
 // net_radiation.C ends here

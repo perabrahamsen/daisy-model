@@ -39,7 +39,8 @@ public:
   double total (const vector<double>& v, double from, double to) const;
 
   // Layers -- Support initializing soil arrays layer by layer.
-  static void add_layer (Syntax& syntax, const string& name);
+  static void add_layer (Syntax& syntax, const string& name,
+			 const string& dimension, const string& description);
   void initialize_layer (vector<double>& value, 
 			 const AttributeList& al, 
 			 const string& name) const;

@@ -523,9 +523,9 @@ How this pool is divided into other pools.\n\
 The first numbers corresponds to each of the SMB pools, the remaining\n\
 numbers corresponds to the SOM pools.  The length of the sequence should\n\
 thus be the number of SMB pools plus the number of SOM pools.");
-  syntax.add ("initial_C_per_N", Syntax::Number, Syntax::OptionalState, "\
+  syntax.add ("initial_C_per_N", "g C/g N", Syntax::OptionalState, "\
 The initial C/N ratio when this pool is created.");
-  syntax.add ("initial_fraction", Syntax::Number, Syntax::Const, "\
+  syntax.add ("initial_fraction", Syntax::None (), Syntax::Const, "\
 The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified\n\
 \(which corresponds to the default value, a large negative number).");

@@ -185,49 +185,102 @@ ConditionTimeSyntax::ConditionTimeSyntax ()
   // At, before, or after a given time.
   {
     Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add ("time", Syntax::Date, Syntax::Const);
+    AttributeList& alist_at = *new AttributeList ();
+    alist_at.add ("description", "\
+True, iff the simulation time is at the specified time.");
+    AttributeList& alist_before = *new AttributeList ();
+    alist_before.add ("description", "\
+True, iff the simulation time is before the specified time.");
+    AttributeList& alist_after = *new AttributeList ();
+    alist_after.add ("description", "\
+True, iff the simulation time is after the specified time.");
+    syntax.add ("time", Syntax::Date, Syntax::Const,
+		"Fixed time to test for.");
     syntax.order ("time");
-    Librarian<Condition>::add_type ("at", alist, syntax,
+    Librarian<Condition>::add_type ("at", alist_at, syntax,
 				    &ConditionAt::make);
-    Librarian<Condition>::add_type ("before", alist, syntax, 
+    Librarian<Condition>::add_type ("before", alist_before, syntax, 
 				    &ConditionBefore::make);
-    Librarian<Condition>::add_type ("after", alist, syntax,
+    Librarian<Condition>::add_type ("after", alist_after, syntax,
 				    &ConditionAfter::make);
   }
   // Every nth something.
   {
     Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add ("step", Syntax::Integer, Syntax::Const);
+    AttributeList& alist_hour = *new AttributeList ();
+    alist_hour.add ("description", "True every `step' hours.");
+    AttributeList& alist_day = *new AttributeList ();
+    alist_day.add ("description", "True every `step' days.\n\
+Warning, this may be imprecise around new year.");
+    AttributeList& alist_week = *new AttributeList ();
+    alist_week.add ("description", "True every `step' week.\n\
+Warning, this may be imprecise around new year.");
+    AttributeList& alist_month = *new AttributeList ();
+    alist_month.add ("description", "True every `step' month.\n\
+A month is concidered to be 30 days.\n\
+Warning, this may be imprecise around new year.");
+    AttributeList& alist_year = *new AttributeList ();
+    alist_year.add ("description", "True every `step' year.");
+    syntax.add ("step", Syntax::Integer, Syntax::Const,
+		"Number of time periods between this condition is true.");
     syntax.order ("step");
-    alist.add ("step", 1);
-    Librarian<Condition>::add_type ("hourly", alist, syntax,
+    alist_hour.add ("step", 1);
+    alist_day.add ("step", 1);
+    alist_week.add ("step", 1);
+    alist_month.add ("step", 1);
+    alist_year.add ("step", 1);
+    Librarian<Condition>::add_type ("hourly", alist_hour, syntax,
 				    &ConditionHourly::make);
-    Librarian<Condition>::add_type ("daily", alist, syntax,
+    Librarian<Condition>::add_type ("daily", alist_day, syntax,
 				    &ConditionDaily::make);
-    Librarian<Condition>::add_type ("weekly", alist, syntax,
+    Librarian<Condition>::add_type ("weekly", alist_week, syntax,
 				    &ConditionWeekly::make);
-    Librarian<Condition>::add_type ("monthly", alist, syntax,
+    Librarian<Condition>::add_type ("monthly", alist_month, syntax,
 				    &ConditionMonthly::make);
-    Librarian<Condition>::add_type ("yearly", alist, syntax,
+    Librarian<Condition>::add_type ("yearly", alist_year, syntax,
 				    &ConditionYearly::make);
   }
   // At a specific hour/mday/yday/year.
   {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add ("at", Syntax::Integer, Syntax::Const);
-    syntax.order ("at");
-    Librarian<Condition>::add_type ("hour", alist, syntax,
+    Syntax& syntax_hour = *new Syntax ();
+    AttributeList& alist_hour = *new AttributeList ();
+    alist_hour.add ("description", "True, at the specified hour.");
+    syntax_hour.add ("at", Syntax::Integer, Syntax::Const,
+		     "Hour when the condition is true [0-23].");
+    syntax_hour.order ("at");
+    Syntax& syntax_mday = *new Syntax ();
+    AttributeList& alist_mday = *new AttributeList ();
+    alist_mday.add ("description", "True, at the specified day in the month.");
+    syntax_mday.add ("at", Syntax::Integer, Syntax::Const,
+		" when the condition is true [1-31].");
+    syntax_mday.order ("at");
+    Syntax& syntax_yday = *new Syntax ();
+    AttributeList& alist_yday = *new AttributeList ();
+    alist_yday.add ("description", "True, at the specified julian day.");
+    syntax_yday.add ("at", Syntax::Integer, Syntax::Const,
+		"Julian day when the condition is true [1-366].");
+    syntax_yday.order ("at");
+    Syntax& syntax_month = *new Syntax ();
+    AttributeList& alist_month = *new AttributeList ();
+    alist_month.add ("description", "True, at the specified month.");
+    syntax_month.add ("at", Syntax::Integer, Syntax::Const,
+		      "Month when the condition is true [1-12].");
+    syntax_month.order ("at");
+    Syntax& syntax_year = *new Syntax ();
+    AttributeList& alist_year = *new AttributeList ();
+    alist_year.add ("description", "True, at the specified year.");
+    syntax_year.add ("at", Syntax::Integer, Syntax::Const,
+		"Year when the condition is true.");
+    syntax_year.order ("at");
+    Librarian<Condition>::add_type ("hour", alist_hour, syntax_hour,
 				    &ConditionHour::make);
-    Librarian<Condition>::add_type ("mday", alist, syntax,
+    Librarian<Condition>::add_type ("mday", alist_mday, syntax_mday,
 				    &ConditionMDay::make);
-    Librarian<Condition>::add_type ("yday", alist, syntax,
+    Librarian<Condition>::add_type ("yday", alist_yday, syntax_yday,
 				    &ConditionYDay::make);
-    Librarian<Condition>::add_type ("month", alist, syntax,
+    Librarian<Condition>::add_type ("month", alist_month, syntax_month,
 				    &ConditionMonth::make);
-    Librarian<Condition>::add_type ("year", alist, syntax,
+    Librarian<Condition>::add_type ("year", alist_year, syntax_year,
 				    &ConditionYear::make);
   }
 }

@@ -10,6 +10,7 @@
 #include "groundwater.h"
 #include "syntax.h"
 #include "mathlib.h"
+#include "submodel.h"
 
 void
 SoilWater::clear (const Geometry&)
@@ -214,7 +215,11 @@ SoilWater::put_h (const Soil& soil, const vector<double>& v) // [cm]
 void
 SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add ("UZtop", Librarian<UZmodel>::library ());
+  alist.add ("submodel", "SoilWater");
+  alist.add ("description", "Water content of soil.");
+
+  syntax.add ("UZtop", Librarian<UZmodel>::library (),
+	      "Main water transport model in unsaturated zone.");
   AttributeList richard;
   richard.add ("type", "richards");
   richard.add ("max_time_step_reductions", 4);
@@ -225,20 +230,28 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("UZtop", richard);
 
   syntax.add ("UZbottom", Librarian<UZmodel>::library (),
-	      Syntax::OptionalState);
-  syntax.add ("UZborder", Syntax::Integer, Syntax::OptionalConst);
-  syntax.add ("UZreserve", Librarian<UZmodel>::library ());
+	      Syntax::OptionalState, Syntax::Singleton, "\
+Water transport model for the bottom of the unsaturated zone.\n\
+If this is given, `UZtop' will be used down to `UZborder', and `UZbottom'\n\
+will be used from there to the bottom.");
+  syntax.add ("UZborder", Syntax::Integer, Syntax::OptionalConst,
+	      "Top node to use `UZbottom' in.");
+  syntax.add ("UZreserve", Librarian<UZmodel>::library (),
+	      "Reserve transport model if UZtop fails.");
   // Use lr as UZreserve by default.
   AttributeList lr;
   lr.add ("type", "lr");
   lr.add ("h_fc", -100.0);
   lr.add ("z_top", -10.0);
   alist.add ("UZreserve", lr);
-  syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  Geometry::add_layer (syntax, "Theta");
-  Geometry::add_layer (syntax, "h");
-  syntax.add ("Xi", Syntax::Number, Syntax::OptionalState, Syntax::Sequence);
-  syntax.add ("q", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
+  syntax.add ("S", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Water sink (due to root uptake).");
+  Geometry::add_layer (syntax, "Theta", "cm^3/cm^3", "Soil water content.");
+  Geometry::add_layer (syntax, "h", "cm", "Soil water pressure.");
+  syntax.add ("Xi", Syntax::None (), Syntax::OptionalState, Syntax::Sequence,
+	      "Ice fraction in soil.  Not yet implemented.");
+  syntax.add ("q", "cm/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Water flux (positive numbers mean upward).");
 }
 
 SoilWater::SoilWater (const AttributeList& al)
@@ -325,3 +338,6 @@ SoilWater::~SoilWater ()
 {
   delete top;
 }
+
+static Submodel::Register 
+soil_water_submodel ("SoilWater", SoilWater::load_syntax);

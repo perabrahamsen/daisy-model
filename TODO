@@ -1,16 +1,8 @@
-* Ny daisy.exe samt daisy-lib.zip til Mette.
-
-* Implementer put/get DLL funktioner til overflade kemi.
-
-Vi skal have et bioklima flag der forhindrer kemikalier i at forlade
-overfladen.  På den måde vil der aldrig blive oprettet nogen
-soil_chemicals! 
+* Kig på jespers kode.
 
 * Document 
 
-** Log variable for sig selv til sidst.
-
-** Udskrift af komplekse værdier.
+Tilføj Daisy versionsnummer til manualen.
 
 ** Dimensioner, Beskrivelse af attributer og Beskrivelse af modeler.
 
@@ -19,6 +11,8 @@ soil_chemicals!
 ** Syntax & Typer.
 
 ** Daisy attributter.
+
+** Udskrift af komplekse værdier.
 
 * Simulation:
 

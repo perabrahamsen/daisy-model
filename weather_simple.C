@@ -122,13 +122,17 @@ static struct WeatherSimpleSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
+A weather model with precipitation at regular intervals.");
       Weather::load_syntax (syntax, alist);
-      syntax.add ("precipitation", Syntax::Number, Syntax::Const);
+      syntax.add ("precipitation", "mm/h", Syntax::Const,
+		  "Amount of precipitation.");
       alist.add ("precipitation", 0.0);
-      syntax.add ("interval", Syntax::Integer, Syntax::Const);
+      syntax.add ("interval", Syntax::Integer, Syntax::Const,
+		  "Number of hours between each precipitation event.");
       alist.add ("interval", 1);
-      syntax.add ("reference_evapotranspiration",
-		  Syntax::Number, Syntax::Const);
+      syntax.add ("reference_evapotranspiration", "mm/h", Syntax::Const,
+		  "Constant reference evapotranspiration.");
       alist.add ("reference_evapotranspiration", -1.0);
       Librarian<Weather>::add_type ("simple", alist, syntax, &make);
     }

@@ -21,7 +21,8 @@ PT::output (Log& log, Filter& filter) const
 void 
 PT::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("potential_transpiration", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("potential_transpiration", "mm/h", Syntax::LogOnly,
+	      "Potential transpiration calculated this hour.");
 }
 
 PT::PT (const AttributeList& al)

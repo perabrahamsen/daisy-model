@@ -2,7 +2,9 @@
 
 #include "document.h"
 #include "time.h"
+#include "version.h"
 #include <ctype.h>
+#include <time.h>
 
 struct DocumentLaTeX : public Document
 {
@@ -37,8 +39,7 @@ struct DocumentLaTeX : public Document
 			     const string& name, 
 			     const Syntax::type type, 
 			     const Syntax& syntax,
-			     const AttributeList& alist,
-			     bool& printed_category_line);
+			     const AttributeList& alist);
   void print_entry_value (ostream& out,
 			  const string& name, 
 			  const Syntax::type type, 
@@ -53,6 +54,8 @@ struct DocumentLaTeX : public Document
   void print_submodel_header (ostream& out, const string&, int level);
   void print_submodel_trailer (ostream& out, const string&, int level);
   void print_sample_ordered (ostream& out, const string& name, bool seq);
+  void print_log_header (ostream& out, const string&, int level);
+  void print_log_trailer (ostream& out, const string&, int level);
   void print_sample_entry (ostream& out, const string& name, bool seq);
   void print_sample_header (ostream& out, const string& name);
   void print_sample_trailer (ostream& out, const string&);
@@ -87,10 +90,16 @@ DocumentLaTeX::print_quoted (ostream& out, const string& name)
     switch (name[i])
       {
       case '^':
-	if (i+1 < name.length () && isdigit (name[i+1]))
+	if (i+1 < name.length () && (isalnum (name[i+1]) || name[i+1] == '-'))
 	  {
-	    out << "$" << name[i] << "{" << name[i+1] << "}$";
-	    i++;
+	    out << "$" << name[i] << "{";
+	    do
+	      {
+		out << name[i+1];
+		i++;
+	      }
+	    while (i+1 < name.length () && isalnum (name[i+1]));
+	    out << "}$";
 	  }
 	else
 	  out << "\\" << name[i] << "{ }";
@@ -287,8 +296,7 @@ DocumentLaTeX::print_entry_category (ostream& out,
 				     const string& name, 
 				     const Syntax::type type, 
 				     const Syntax& syntax,
-				     const AttributeList& alist,
-				     bool& printed_category_line)
+				     const AttributeList& alist)
 {
   if (type == Syntax::Object)	// Objects and ALists don't have categories.
     {
@@ -296,8 +304,6 @@ DocumentLaTeX::print_entry_category (ostream& out,
 	out << "\\\\\nOptional component";
       else if (alist.check (name))
 	out << "\\\\\nComponent";
-      else
-	printed_category_line = false;
     }
   else if (type == Syntax::AList)
     {
@@ -305,8 +311,6 @@ DocumentLaTeX::print_entry_category (ostream& out,
 	out << "\\\\\nOptional submodel";
       else if (alist.check (name))
 	out << "\\\\\nSubmodel";
-      else
-	printed_category_line = false;
     }
   else if (syntax.is_optional (name))
     {
@@ -442,12 +446,14 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
   // Print size.
   print_entry_size (out, name, size);
 
-  // Print category.
-  bool printed_category_line = true;
-  print_entry_category (out, name, type, syntax, alist, printed_category_line);
+  if (!syntax.is_log (name))
+    {
+      // Print category.
+      print_entry_category (out, name, type, syntax, alist);
 
-  // Print value.
-  print_entry_value (out, name, type, size, alist);
+      // Print value.
+      print_entry_value (out, name, type, size, alist);
+    }
 
   // Print description line.
   const string& description = syntax.description (name);
@@ -540,6 +546,21 @@ DocumentLaTeX::print_submodel_trailer (ostream& out,
 }
 
 void
+DocumentLaTeX::print_log_header (ostream& out, const string& name, int level)
+{ 
+  if (level == 0)
+    out << "\n\\subsection*{Log Variables}\n";
+  else
+    out << "\n\\textbf{Log Variables}\n";
+    
+  print_submodel_header (out, name, level);
+}
+
+void
+DocumentLaTeX::print_log_trailer (ostream& out, const string& name, int level)
+{  print_submodel_trailer (out, name, level); }
+
+void
 DocumentLaTeX::print_model_header (ostream& out, const string& name)
 { 
   out << "\n\\section{";
@@ -601,7 +622,7 @@ DocumentLaTeX::print_fixed_all_header (ostream& out)
 { 
   out << "\
 \\chapter{Fixed Components}\n\
-\\label{chp:fixed}\n\
+\\label{cha:fixed}\n\
 \n\
 Fixed components are similar to ordinary component, with the exceptions\n\
 that there can only be one model, that is, only a single implementation\n\
@@ -624,7 +645,16 @@ DocumentLaTeX::print_document_header (ostream& out)
 void
 DocumentLaTeX::print_document_trailer (ostream& out)
 { 
+  time_t now = time (NULL);
   out << "\
+\n\
+\\chapter*{Version}\n\
+\\label{version}\n\
+\\addcontentsline{toc}{chapter}{\\numberline{}Version}\n\
+\n\
+Daisy version " << version << ".\\\\\n\
+LaTeX manual generated: " << ctime (&now) << "\n\
+\n\
 %%% Local Variables:\n\
 %%% mode: latex\n\
 %%% TeX-master: \"reference\"\n\
@@ -642,6 +672,7 @@ static struct DocumentLaTeXSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "Output Daisy components and LaTeX chapters.");
       Librarian<Document>::add_type ("LaTeX", alist, syntax, &make);
     }
 } DocumentLaTeX_syntax;

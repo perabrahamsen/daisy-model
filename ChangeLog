@@ -1,3 +1,124 @@
+1999-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.70 released.
+
+1999-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_old.C, crop_sold.C (molWeightCH2O, molWeightCO2): Removed.
+
+	* syntax.h (add): Removed compatibility variants.
+	* all: Updated callers.
+	
+	* crop_old.C: Removed `Q10' parameter.
+	* crop_sold.C: Ditto.
+
+1999-02-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C: Made DS_start_fixate a state variable.
+
+	* crop_old.C, crop_sold.C: Removed `LeafPhotPar::Qeff' and
+	`LeafPhotPar::LFm'.
+	(CanopyPhotosynthesis): Removed.
+
+	* crop_old.C, crop_sold.C, crop_std.C: Added dimensions and
+	descriptions.
+
+1999-02-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C: SH changes.
+
+	* tortuosity_linear.C, tortuosity_M_Q.C: Added dimensions and
+	descriptions.
+	* uzlr.C, uznone.C, uzricard.C: Ditto.
+	* weather.C, weather_file.C, weather_hourly.C, weather_none.C,
+	weather_simple.C: Ditto.
+	* filter_all.C, filter_array.C, filter_checkpoint.C,
+	filter_none.C, filter_some.C: Ditto.
+
+1999-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* net_radiation.C (NetRadiationBrunt): Made `a' and `b'
+	parameters. 
+
+	* net_radiation.C (load_syntax): Don't choose brunt here.
+	* pet_PM.C (PetPMSyntax): Explicitly choose `brunt'.
+	* weather.C (RefNetRadiation): Ditto.
+
+	* condition_soil.C, condition_logic.C, condition_time.C,
+	condition_crop.C, condition_daisy.C: Added dimensions and
+	descriptions. 
+	* document_LaTeX.C: Ditto.
+	* groundwater_file.C, groundwater_static.C: Ditto.
+	* horizon.C: Ditto.
+	* hydraulic.C, hydraulic_B_BaC.C, hydraulic_B_BaC_Bimodal.C,
+	hydraulic_B_C.C, hydraulic_B_vG.C, hydraulic_M_BaC.C,
+	hydraulic_M_BaC_Bimodal.C, hydraulic_M_C.C, hydraulic_M_vG.C,
+	hydraulic_mod_C.C, hydraulic_old.C, hydraulic_old2.C,
+	hydraulic_yolo.C: Ditto.
+	* log_checkpoint.C, log_file.C, log_table.C: Ditto.
+	* net_radiation.C: Ditto.
+	* nitrogen_soil.C, nitrogen_solute.C: Ditto.
+	* parser_file.C: Ditto.
+	* pet.C, pet_PM.C, pet_makkink.C, pet_weather.C: Ditto.
+	* printer_file.C: Ditto.
+	* pt.C, pt_pmsw.C, pt_std.C: Ditto.
+	* transport_cd.C, transport_convection.C, transport_none.C: Ditto. 
+
+
+1999-02-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C (load_syntax): Made `harvest' a state parameter.
+	* harvest.C (load_syntax): Made all members state parameters.
+
+1999-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C, denitrification.C, organic_matter.C, soil.C,
+	soil_chemicals.C, soil_heat.C, soil_NH4.C, soil_NO3.C,
+	soil_water.C, surface.C, vegetation.C: Made them submodels and
+	added descriptions and dimensions.
+
+	* geometry.C, geometry.h (add_layer): Take `dimension' and
+	`description' parameters.
+	(initialize_layer): Multiply value with layer height.
+	* soil_water.C, soil_heat.C, solute.C: Updated callers.
+
+	* solute.C: Added dimensions and descripions.
+
+	* solute.C: Split `ppm' in `soil_ppm' and `solute_ppm'.
+
+1999-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* document_LaTeX.C (print_quoted): More advanced superscript
+	handling. 
+
+	* soil_chemical.C (load_syntax): Made it a submodel.
+	Added dimensions and descriptions.
+	
+	* document.C (print_submodel): Print log variables separately.
+	* document_LaTeX.C, document.h (print_log_header,
+	print_log_trailer):  New member functions.
+	(print_submodel_entry): Don't print category line for log
+	variables. 
+	(print_entry_category): Removed `printed_category_line' function
+	parameter. 
+
+	* weather.C (deposit, load_syntax): Changed dimensions for deposit. 
+
+	* adsorption_linear.C, adsorption_freundlich.C,
+	adsorption_langmuir.C: Use `K_OC' instead of `K_humus'.
+
+	* crop_std.C, lib/*.dai: SH update.
+	
+	* cdaisy.C, chdaisy.h (daisy_column_put_surface_chemical,
+	daisy_column_get_surface_chemical): New member functions.
+	* column_std.C, column.h (put_surface_chemical,
+	get_surface_chemical): New member functions.
+	* bioclimate_std.C, bioclimate.h (put_surface_chemical,
+	get_surface_chemical): New member functions.
+	* chemicals.C, chemicals.h (set): New member function.
+
+	* bioclimate_std.C (chemicals_can_enter_soil): New parameter.
+
 1999-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.69 released.

@@ -262,13 +262,27 @@ static struct FilterArraySyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Summarize number sequences.");
     Syntax& entry_syntax = *new Syntax ();
-    entry_syntax.add ("accumulator", Syntax::String, Syntax::Const);
-    entry_syntax.add ("selector", Syntax::String, Syntax::Const);
-    entry_syntax.add ("pos", Syntax::Number, Syntax::Const);
-    entry_syntax.add ("end", Syntax::Number, Syntax::OptionalConst);
+    entry_syntax.add ("accumulator", Syntax::String, Syntax::Const,
+		      "How to accumulate the value.  Possible values are:\n\
+Now: Log the latest value.\n\
+Average: Log the average value since last entry.\n\
+Sum: Log the sum since last entry.\n\
+Accumulate: Log the accumulated value since the start of the simulation.");
+    entry_syntax.add ("selector", Syntax::String, Syntax::Const, 
+		      "How to select from the array.  Possible values are:\n\
+At: Log the value at `pos'.\n\
+Density: Log the average density between `pos' and `end'.\n\
+Content: Log the total content between `pos' and `end'.");
+    entry_syntax.add ("pos", "cm", Syntax::Const, 
+		      "Depth to start logging (a negative number).");
+    entry_syntax.add ("end", "cm", Syntax::OptionalConst,
+		      "Depth to end logging (a negative number).\n\
+Is not used together the `At' selected.");
     entry_syntax.order ("accumulator", "selector", "pos", "end");
-    syntax.add ("members", entry_syntax, Syntax::Const, Syntax::Sequence);
+    syntax.add ("members", entry_syntax, Syntax::Const, Syntax::Sequence,
+		"Each member describe an entry in the log.");
     syntax.order ("members");
     Librarian<Filter>::add_type ("array", alist, syntax, &FilterArray::make);
   }

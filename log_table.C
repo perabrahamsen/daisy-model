@@ -551,62 +551,123 @@ static struct LogTableSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      syntax.add ("description", Syntax::String, Syntax::Const);
+      syntax.add ("description", Syntax::String, Syntax::Const,
+		  "Description of this log file format.");
       alist.add ("description", "\
 Each selected variable is represented by a column in the log file.");
-      syntax.add ("where", Syntax::String, Syntax::Const);
-      syntax.add ("when", Librarian<Condition>::library (), Syntax::Const);
+      syntax.add ("where", Syntax::String, Syntax::Const,
+		  "Name of the log file to create.");
+      syntax.add ("when", Librarian<Condition>::library (), 
+		  "Add entries to the log file when this condition is true.");
       
       Syntax& entry_syntax = *new Syntax (check_alist);
       AttributeList& entry_alist = *new AttributeList ();
-      entry_syntax.add ("tag", Syntax::String, Syntax::OptionalConst);
-      entry_syntax.add ("dimension", Syntax::String, Syntax::Const);
+      entry_syntax.add ("tag", Syntax::String, Syntax::OptionalConst,
+			"Tag to identify the column.\n\
+These will be printed in the first line of the log file.\n\
+The default tag is the last element in the path.");
+      entry_syntax.add ("dimension", Syntax::String, Syntax::Const,
+			"The unit for numbers in this column.\n\
+These will be printed in the second line of the log file.");
       entry_alist.add ("dimension", "");
-      entry_syntax.add ("description", Syntax::String, Syntax::Const);
+      entry_syntax.add ("description", Syntax::String, Syntax::Const,
+			"A description of this column.");
       entry_alist.add ("description", "\
 Each entry represents one column in the log file.");
       entry_syntax.add ("path", Syntax::String, Syntax::Const, 
-			Syntax::Sequence);
-      entry_syntax.add ("missing_value", Syntax::String, Syntax::Const);
+			Syntax::Sequence, "\
+Sequence of attribute names leading to the variable you want to log in\n\
+this column.  The first name should be one of the attributes of the\n\
+daisy component itself.  What to specify as the next name depends on\n\
+the type of the attribute you selected before.\n\
+\n\
+If the value of that attribute itself is a fixed component, you should\n\
+specify the name of an attribute in that component as the second name.\n\
+\n\
+If the value is a library component, you should specify the name of\n\
+the model or parameterization you are interested in, and then the name\n\
+of the attribute inside the model you want to log.\n\
+\n\
+If the attribute is a date, you should specify `year', `month',\n\
+`mday', or `hour'.  These are all integer values.  If you don't specify\n\
+any of these, a special ever increasing `gnuplot' value will be calculated.\n\
+\n\
+The last attribute in the patch should be a number, a number sequence,\n\
+a string, or an integer.  These are the only values which can be\n\
+logged by this model.\n\
+\n\
+You can use the special value \"*\" to match everything at a given\n\
+level, for example all crops.  This way the path can specify multiple\n\
+values, they will be added before they are printed in the log file.");
+      entry_syntax.add ("missing_value", Syntax::String, Syntax::Const, "\
+String to print when the path doesn't match anything.\n\
+This can be relevant for example if you are logging a crop, and there are\n\
+no crops on the field.");
       entry_alist.add ("missing_value", "00.00");
       entry_syntax.add ("when", 
 			Librarian<Condition>::library (),
-			Syntax::OptionalConst);
-      entry_syntax.add ("start_year", Syntax::Integer, Syntax::Const);
+			Syntax::OptionalConst, Syntax::Singleton,
+			"\
+When to calculate the values in this column.\n\
+By default, the values will be calculated once, when the a new log entry\n\
+is written.  If you calculate the values more often, they will be\n\
+accumulated.  This is useful if you for example want to summarize the\n\
+hourly percolation into a daily log.");
+      entry_syntax.add ("start_year", Syntax::Integer, Syntax::Const,
+			"Start year for gnuplot dates.");
       entry_alist.add ("start_year", 0);
-      entry_syntax.add ("factor", Syntax::Number, Syntax::Const);
+      entry_syntax.add ("factor", Syntax::None (), Syntax::Const, "\
+Factor to multiply the calculated value with, before logging.");
       entry_alist.add ("factor", 1.0);
-      entry_syntax.add ("offset", Syntax::Number, Syntax::Const);
+      entry_syntax.add ("offset", Syntax::Unknown (), Syntax::Const, "\
+Offset to add to the calculated value, before logging.");
       entry_alist.add ("offset", 0.0);
-      entry_syntax.add ("from", Syntax::Number, Syntax::Const);
+      entry_syntax.add ("from", "cm", Syntax::Const, "\
+Summarize soil content of numeric array between `from' and `to' with\n\
+regard to the current geomerty.  A negative number, or `0.0' at the\n\
+surface.");
       entry_alist.add ("from", 0.0);
-      entry_syntax.add ("to", Syntax::Number, Syntax::Const);
+      entry_syntax.add ("to", "cm", Syntax::Const, "\
+Summarize soil content of numeric array between `from' and `to' with\n\
+regard to the current geomerty.  Should be below `from' to indicate the\n\
+of the layer, or above to summarize over the entire soil.");
       entry_alist.add ("to", 1.0);
-      entry_syntax.add ("content_at", Syntax::Number, Syntax::Const);
+      entry_syntax.add ("content_at", "cm", Syntax::Const, "\
+Give the content of interval at the specified depth, if negative.");
       entry_alist.add ("content_at", 1.0);
       entry_syntax.add ("flux_at", "cm", Syntax::Const,
 			"Specify position to measure flux.  \
-The closest interval border will be used.");
+The closest interval border will be used.  Ignore if not-negative.");
       entry_alist.add ("flux_at", 1.0);
-      entry_syntax.add ("accumulate", Syntax::Boolean, Syntax::Const);
+      entry_syntax.add ("accumulate", Syntax::Boolean, Syntax::Const,
+			"Log accumulated values.");
       entry_alist.add ("accumulate", false);
-      entry_syntax.add ("full", Syntax::Boolean, Syntax::Const);
+      entry_syntax.add ("full", Syntax::Boolean, Syntax::Const,
+			"Log the full content of the array.\n\
+The entries are separated with space.");
       entry_alist.add ("full", false);
-      entry_syntax.add ("value", Syntax::Number, Syntax::State);
+      entry_syntax.add ("value", Syntax::Unknown (), Syntax::State,
+			"The current accumulated value.");
       entry_alist.add ("value", 0.0);
-      entry_syntax.add ("count", Syntax::Integer, Syntax::State);
+      entry_syntax.add ("count", Syntax::Integer, Syntax::State, "\
+Number of times the path has matched a variable since the last log entry.");
       entry_alist.add ("count", 0);
-      syntax.add ("entries", entry_syntax, entry_alist, Syntax::Const);
-      
-      syntax.add ("print_tags", Syntax::Boolean, Syntax::Const);
+      syntax.add ("entries", entry_syntax, entry_alist, Syntax::State,
+		  "What to log in each column.");
+      syntax.add ("print_tags", Syntax::Boolean, Syntax::Const,
+		  "Print a tag line in the file.");
       alist.add ("print_tags", true);
-      syntax.add ("print_dimension", Syntax::Boolean, Syntax::Const);
+      syntax.add ("print_dimension", Syntax::Boolean, Syntax::Const,
+		  "Print a line with units after the tag line.");
       alist.add ("print_dimension", true);
-      syntax.add ("flush", Syntax::Boolean, Syntax::Const);
+      syntax.add ("flush", Syntax::Boolean, Syntax::Const,
+		  "Flush to disk after each entry (for debugging).");
       alist.add ("flush", false);
-      syntax.add ("from", Syntax::Number, Syntax::Const);
+      syntax.add ("from", "cm", Syntax::Const,
+		  "Default `from' value for all entries.");
       alist.add ("from", 0.0);
-      syntax.add ("to", Syntax::Number, Syntax::Const);
+      syntax.add ("to", "cm", Syntax::Const,
+		  "Default `to' value for all entries.");
       alist.add ("to", 1.0);
 
       Librarian<Log>::add_type ("table1", alist, syntax, &make);

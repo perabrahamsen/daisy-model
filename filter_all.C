@@ -40,6 +40,7 @@ static struct FilterAllSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Match all variables.");
     Librarian<Filter>::add_type ("all", alist, syntax, &FilterAll::make);
   }
 } FilterAll_syntax;

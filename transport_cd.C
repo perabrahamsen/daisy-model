@@ -320,8 +320,12 @@ static struct TransportCDSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("J", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-    syntax.add ("ddt", Syntax::Number, Syntax::LogOnly, Syntax::Singleton);
+    alist.add ("description", 
+	       "Solute transport using convection-dispersion.");
+    syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
+		"Transport in this time step.");
+    syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
+		"Time step used in the numeric solultion.");
     Librarian<Transport>::add_type ("cd", alist, syntax, &make);
   }
 } TransportCD_syntax;

@@ -656,7 +656,10 @@ static struct PrinterFileSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      syntax.add ("where", Syntax::String, Syntax::Const);
+      alist.add ("description", 
+		 "Print internal daisy structures with lots of parentheses.");
+      syntax.add ("where", Syntax::String, Syntax::Const,
+		  "File to print in.");
       syntax.order ("where");
       Librarian<Printer>::add_type ("file", alist, syntax, &make);
     }

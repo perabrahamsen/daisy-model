@@ -31,6 +31,7 @@ static struct TortuosityM_QSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Millington-Quirk.  Theta^(7/3) / Theta_sat^2.");
     Librarian<Tortuosity>::add_type ("M_Q", alist, syntax, &make);
   }
 } TortuosityM_Q_syntax;

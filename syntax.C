@@ -409,7 +409,7 @@ Syntax::add (const string& key, ::Library& l, category req, int s,
 void 
 Syntax::add_library (const string& key, ::Library& l)
 {
-  add (key, Library, OptionalConst);
+  add (key, Library, OptionalConst, None ());
   impl.libraries[key] = &l;
 }
 

@@ -102,9 +102,11 @@ HydraulicYoloSyntax::HydraulicYoloSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  alist.add ("description", "Yolo soil.  Haverkamp et.al., 1977.");
   Hydraulic::load_syntax (syntax, alist);
   alist.add ("Theta_sat", 0.495);
-  syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
+  syntax.add ("M_intervals", Syntax::Integer, Syntax::Const,
+	      "Number of intervals for numeric integration of K.");
   alist.add ("M_intervals", 500);
   Librarian<Hydraulic>::add_type ("yolo", alist, syntax, &HydraulicYolo::make);
 }

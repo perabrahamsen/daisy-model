@@ -98,9 +98,6 @@ public:
 	    category cat,
 	    const string& description)
     { add (key, t, cat, Singleton, description); }
-  void add (const string& key,  // Compatibility, remove.
-	    type t, category cat, int size = Singleton)
-    { add (key, t, cat, size, Unknown ()); }
 
   void add (const string& key, // Number.
 	    const string& dim,
@@ -122,12 +119,12 @@ public:
 	    const Syntax& syntax,
 	    const string& description)
     { add (key, syntax, State, Singleton, description); }
-  void add (const string&, const Syntax&, // Compatibility, remove.
-	    category = State, int size = Singleton, 
-	    const string& description = Unknown ());
+  void add (const string&, const Syntax&,
+	    category cat, int size, 
+	    const string& description);
   void add (const string&, const Syntax&, const AttributeList&,	
 	    // Alist sequence with default element.
-	    category = State, const string& description = Unknown ());
+	    category, const string& description);
 
   void add (const string& key, // Object
 	    ::Library& lib, 
@@ -138,9 +135,8 @@ public:
 	    ::Library& lib, 
 	    const string& description)
     { add (key, lib, State, Singleton, description); }
-  void add (const string&, ::Library&, // Compatibility, remove.
-	    category = State, int size = Singleton, 
-	    const string& description = Unknown ());
+  void add (const string&, ::Library&,
+	    category, int size, const string& description);
 
   void add_library (const string&, ::Library&);
 

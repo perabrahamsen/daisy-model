@@ -63,15 +63,21 @@ Solute::output (Log& log, Filter& filter) const
 void 
 Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add ("transport", Librarian<Transport>::library (), Syntax::State);
+  syntax.add ("transport", Librarian<Transport>::library (), 
+	      "Solute transport model.");
   AttributeList& cd = *new AttributeList ();
   cd.add ("type", "cd");
   alist.add ("transport", cd);
-  syntax.add ("adsorption", Librarian<Adsorption>::library (), Syntax::Const);
-  Geometry::add_layer (syntax, "C");
-  Geometry::add_layer (syntax, "M");
-  syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  Geometry::add_layer (syntax, "ppm");
+  syntax.add ("adsorption", Librarian<Adsorption>::library (), 
+	      "Soil adsorption properties.");
+  Geometry::add_layer (syntax, "C", "g/cm^3", "Concentration in water.");
+  Geometry::add_layer (syntax, "M", "g/cm^3", "Mass in water and soil.");
+  syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term.");
+  Geometry::add_layer (syntax, "soil_ppm", "ppm", "Concentration in water.\n\
+Only for initialization of the `M' parameter.");
+  Geometry::add_layer (syntax, "solute_ppm", "ppm", "Mass in water and soil.\n\
+Only used for initialization of the `C' parameter.");
 }
 
 Solute::Solute (const AttributeList& al)
@@ -131,10 +137,12 @@ void
 Solute::initialize (const AttributeList& al, 
 		    const Soil& soil, const SoilWater& soil_water)
 {
-  vector<double> ppm;
+  vector<double> soil_ppm;
+  vector<double> solute_ppm;
   soil.initialize_layer (C_, al, "C");
   soil.initialize_layer (M_, al, "M");
-  soil.initialize_layer (ppm, al, "ppm");
+  soil.initialize_layer (soil_ppm, al, "soil_ppm");
+  soil.initialize_layer (solute_ppm, al, "solute_ppm");
 
   if (C_.size () > 0)
     {
@@ -152,25 +160,41 @@ Solute::initialize (const AttributeList& al,
       if (M_.size () > soil.size ())
 	throw ("To many members of M sequence");
     }
-  if (ppm.size () > 0)
+  if (soil_ppm.size () > 0)
     {
       // Fill it up.
-      while (ppm.size () < soil.size ())
-	ppm.push_back ( ppm[ppm.size () - 1]);
-      if (ppm.size () > soil.size ())
+      while (soil_ppm.size () < soil.size ())
+	soil_ppm.push_back ( soil_ppm[soil_ppm.size () - 1]);
+      if (soil_ppm.size () > soil.size ())
+	throw ("To many members of M sequence");
+    }
+  if (solute_ppm.size () > 0)
+    {
+      // Fill it up.
+      while (solute_ppm.size () < soil.size ())
+	solute_ppm.push_back ( solute_ppm[solute_ppm.size () - 1]);
+      if (solute_ppm.size () > soil.size ())
 	throw ("To many members of M sequence");
     }
   if (M_.size () == 0 && C_.size () == 0)
     {
-      if (ppm.size () != 0)
+      if (soil_ppm.size () != 0)
 	{
-	  assert (ppm.size () == soil.size ());
+	  assert (soil_ppm.size () == soil.size ());
 
-	  for (unsigned int i = M_.size (); i < ppm.size (); i++)
+	  for (unsigned int i = M_.size (); i < soil_ppm.size (); i++)
 	    // ppm -> g / cm^3.
-	    M_.push_back (1.0e-6 * ppm[i] * soil.dry_bulk_density (i));
+	    M_.push_back (1.0e-6 * soil_ppm[i] * soil.dry_bulk_density (i));
 	}
-      else
+      if (solute_ppm.size () != 0)
+	{
+	  assert (solute_ppm.size () == solute_ppm.size ());
+
+	  for (unsigned int i = M_.size (); i < solute_ppm.size (); i++)
+	    // ppm -> g / cm^3.
+	    C_.push_back (1.0e-6 * solute_ppm[i]);
+	}
+      if (M_.size () == 0 && C_.size () == 0)
 	{
 	  C_.insert (C_.begin (), soil.size (), 0.0);
 	  M_.insert (M_.begin (), soil.size (), 0.0);

@@ -43,6 +43,10 @@ struct Chemicals::Implementation
     { add (lookup (name), amount); }
   void add (const Chemical* chemical, double amount) // [g/m^2]
     { chemicals[chemical] += amount; }
+  void set_to (const string& name, double amount) // [g/m^2]
+    { set_to (lookup (name), amount); }
+  void set_to (const Chemical* chemical, double amount) // [g/m^2]
+    { chemicals[chemical] = amount; }
   double amount (const string& name) const; // [g/m^2]
   typedef set<string, less<string>/**/> string_set;
   void find_missing (const string_set& all, string_set& missing) const;
@@ -311,6 +315,10 @@ Chemicals::output (Log& log, Filter& filter) const
 void 
 Chemicals::add (const string& chemical, double amount)
 { impl.add (chemical, amount); }
+
+void 
+Chemicals::set_to (const string& chemical, double amount)
+{ impl.set_to (chemical, amount); }
 
 double
 Chemicals::amount (const string& chemical) const

@@ -70,10 +70,8 @@ protected:
 		       SoilNH4& soil_NH4,
 		       SoilNO3& soil_NO3);
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
-  double CanopyPhotosynthesis (const Bioclimate&);
   void AssimilatePartitioning (double DS, double& f_Leaf, double& f_Root);
-  double MaintenanceRespiration (double r, double Q10,
-					 double w, double T);
+  double MaintenanceRespiration (double r, double w, double T);
   void NetProduction (const Bioclimate&, const Soil&, const SoilHeat&);
 
   // Simulation.
@@ -102,11 +100,6 @@ public:
   ~CropOld ();
 };
 
-// Chemical constants affecting the crop.
-
-const double molWeightCH2O = 30.0; // [gCH2O/mol]
-const double molWeightCO2 = 44.0; // [gCO2/mol]
-
 typedef void (*CropFun)(const Bioclimate&, CropOld&);
 
 struct CropOld::Parameters
@@ -122,7 +115,7 @@ struct CropOld::Parameters
     // the reproductive stage
     const CSMP& TempEff1;   // Temperature effect, vegetative stage
     const CSMP& TempEff2;   // Temperature effect, reproductive stage
-    const CSMP& PhotEff1;   // Ptotoperiode effect, vegetative stage
+    const CSMP& PhotEff1;   // Photoperiode effect, vegetative stage
   private:
     friend struct CropOld::Parameters;
     DevelPar (const AttributeList&);
@@ -138,8 +131,6 @@ struct CropOld::Parameters
     VernalPar (const AttributeList&);
   } Vernal;
   const struct LeafPhotPar {
-    double Qeff;		// Quantum efficiency at low light
-    double Fm;		// Max assimilation rate
     double TLim1;		// Lowest temp for photosynthesis
     double TLim2;		// Lowest temp for unrestricted phot.
   private:
@@ -191,7 +182,6 @@ struct CropOld::Parameters
     const CSMP& E_Leaf;		// Conversion efficiency, leaf
     const CSMP& r_Root;		// Maint. resp. coeff., root
     const CSMP& r_Leaf;		// Maint. resp. coeff., leaf
-    double Q10;		// Maint. resp. Q10-value
   private:
     friend struct CropOld::Parameters;
     RespPar (const AttributeList&);
@@ -224,7 +214,7 @@ struct CropOld::Parameters
     const double C_Root;	// C fraction of total weight.
     const double DSmax;		// Maximal development stage for which
 				// the crop survives harvest.
-    const double DSnew;		// Maximal development stage after harvest.
+    const double DSnew;		// New development stage after harvest.
   private:
     friend struct CropOld::Parameters;
     HarvestPar (const AttributeList&);
@@ -273,7 +263,7 @@ struct CropOld::Variables
     // [cm³/cm³/h]
     vector<double> NH4Extraction; // Extraction of NH4-N in soil layers
     // [gN/cm³/h]
-    vector<double> NO3Extraction; // Extraction of NH4-N in soil layers
+    vector<double> NO3Extraction; // Extraction of NO3-N in soil layers
     // [gN/cm³/h]
     double h_x;			// Root extraction at surface.
     double water_stress;	// Fraction of requested water we got.
@@ -362,8 +352,7 @@ CropOld::Parameters::VernalPar::VernalPar (const AttributeList& vl)
 { }
 
 CropOld::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
-  : Qeff (vl.number ("Qeff")),
-    Fm (vl.number ("Fm")),
+  : 
     TLim1 (vl.number ("TLim1")),
     TLim2 (vl.number ("TLim2"))
 { }
@@ -406,8 +395,7 @@ CropOld::Parameters::RespPar::RespPar (const AttributeList& vl)
   : E_Root (vl.csmp ("E_Root")),
     E_Leaf (vl.csmp ("E_Leaf")),
     r_Root (vl.csmp ("r_Root")),
-    r_Leaf (vl.csmp ("r_Leaf")),
-    Q10 (vl.number ("Q10"))     
+    r_Leaf (vl.csmp ("r_Leaf"))
 { }
 
 CropOld::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
@@ -632,232 +620,318 @@ CropOldSyntax::CropOldSyntax ()
   static const vector<double> empty_array;
   static const CSMP empty_csmp;
 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-
-  // Canopy
+  // Submodels.
   Syntax& Canopy = *new Syntax ();
   AttributeList& vCanopy = *new AttributeList ();
-
-  // CropPar
-
-  // DevelPar
   Syntax& Devel = *new Syntax ();
-  syntax.add ("Devel", Devel, Syntax::Const);
-
-  Devel.add ("EmrTSum", Syntax::Number, Syntax::Const);
-  Devel.add ("DS_Emr", Syntax::Number, Syntax::Const);
-  Devel.add ("DS_reset", Syntax::Boolean, Syntax::Const);
-  Devel.add ("DSRate1", Syntax::Number, Syntax::Const);
-  Devel.add ("DSRate2", Syntax::Number, Syntax::Const);
-  Devel.add ("TempEff1", Syntax::CSMP, Syntax::Const);
-  Devel.add ("TempEff2", Syntax::CSMP, Syntax::Const);
-  Devel.add ("PhotEff1", Syntax::CSMP, Syntax::Const);
-    
-  // VernalPar
   Syntax& Vernal = *new Syntax ();
-  syntax.add ("Vernal", Vernal, Syntax::Const);
-
-  Vernal.add ("required", Syntax::Boolean, Syntax::Const);
-  Vernal.add ("DSLim1", Syntax::Number, Syntax::Const);
-  Vernal.add ("DSLim2", Syntax::Number, Syntax::Const);
-  Vernal.add ("TaLim", Syntax::Number, Syntax::Const);
-  Vernal.add ("TaSum", Syntax::Number, Syntax::Const);
-
-  // LeafPhotPar
   Syntax& LeafPhot = *new Syntax ();
-  syntax.add ("LeafPhot", LeafPhot, Syntax::Const);
-
-  LeafPhot.add ("Qeff", Syntax::Number, Syntax::Const);
-  LeafPhot.add ("Fm", Syntax::Number, Syntax::Const);
-  LeafPhot.add ("TLim1", Syntax::Number, Syntax::Const);
-  LeafPhot.add ("TLim2", Syntax::Number, Syntax::Const);
-
-  Canopy.add ("InitGrowth", Syntax::Number, Syntax::Const);
-  Canopy.add ("DSinit", Syntax::Number, Syntax::Const);
-  Canopy.add ("WLfInit", Syntax::Number, Syntax::Const);
-  Canopy.add ("DS1", Syntax::Number, Syntax::Const);
-  Canopy.add ("alpha", Syntax::Number, Syntax::Const);
-  Canopy.add ("beta", Syntax::Number, Syntax::Const);
-  Canopy.add ("SpLAI", Syntax::Number, Syntax::Const);
-  Canopy.add ("HvsDS", Syntax::CSMP, Syntax::Const);
-  Canopy.add ("LAIDist0", Syntax::Number, Syntax::Const, 3);
-  Canopy.add ("LAIDist1", Syntax::Number, Syntax::Const, 3);
-  Canopy.add ("PARref", Syntax::Number, Syntax::Const);
-  Canopy.add ("PARext", Syntax::Number, Syntax::Const);
-  Canopy.add ("EPext", Syntax::Number, Syntax::Const);
-
-  // RootPar
   Syntax& Root = *new Syntax ();
-  syntax.add ("Root", Root, Syntax::Const);
-
-  Root.add ("DptEmr", Syntax::Number, Syntax::Const);
-  Root.add ("PenPar1", Syntax::Number, Syntax::Const);
-  Root.add ("PenPar2", Syntax::Number, Syntax::Const);
-  Root.add ("MaxPen", Syntax::Number, Syntax::Const);
-  Root.add ("SpRtLength", Syntax::Number, Syntax::Const);
-  Root.add ("DensRtTip", Syntax::Number, Syntax::Const);
-  Root.add ("Rad", Syntax::Number, Syntax::Const);
-  Root.add ("h_wp", Syntax::Number, Syntax::Const);
-  Root.add ("MxNH4Up", Syntax::Number, Syntax::Const);
-  Root.add ("MxNO3Up", Syntax::Number, Syntax::Const);
-  Root.add ("Rxylem", Syntax::Number, Syntax::Const);
-
-    // PartitPar
   Syntax& Partit = *new Syntax ();
-  syntax.add ("Partit", Partit, Syntax::Const);
-
-  Partit.add ("Root", Syntax::CSMP, Syntax::Const);
-
-  // RespPar
   Syntax& Resp = *new Syntax ();
-  syntax.add ("Resp", Resp, Syntax::Const);
-
-  Resp.add ("E_Root", Syntax::CSMP, Syntax::Const);
-  Resp.add ("E_Leaf", Syntax::CSMP, Syntax::Const);
-  Resp.add ("r_Root", Syntax::CSMP, Syntax::Const);
-  Resp.add ("r_Leaf", Syntax::CSMP, Syntax::Const);
-  Resp.add ("Q10", Syntax::Number, Syntax::Const);
-
-  // CrpNPar
   Syntax& CrpN = *new Syntax ();
   AttributeList& CrpNList = *new AttributeList ();
-
-  CrpN.add ("SeedN", Syntax::Number, Syntax::Const);
-  CrpN.add ("DS_fixate", Syntax::Number, Syntax::Const);
-  CrpNList.add ("DS_fixate", 42000.0);
-  CrpN.add ("PtLeafCnc", Syntax::CSMP, Syntax::Const);
-  CrpN.add ("CrLeafCnc", Syntax::CSMP, Syntax::Const);
-  CrpN.add ("NfLeafCnc", Syntax::CSMP, Syntax::Const);
-  CrpN.add ("PtRootCnc", Syntax::CSMP, Syntax::Const);
-  CrpN.add ("CrRootCnc", Syntax::CSMP, Syntax::Const);
-  CrpN.add ("NfRootCnc", Syntax::CSMP, Syntax::Const);
-
-  syntax.add ("CrpN", CrpN, Syntax::Const);
-  alist.add ("CrpN", CrpNList);
-
-  // HarvestPar
   Syntax& Harvest = *new Syntax ();
   AttributeList& HarvestList = *new AttributeList ();
-
-  Harvest.add ("index", Syntax::Number, Syntax::Const);
-  Harvest.add ("beta", Syntax::Number, Syntax::Const);
-  Harvest.add ("CStem", Syntax::Number, Syntax::Const);
-  Harvest.add ("CSOrg", Syntax::Number, Syntax::Const);
-  Harvest.add ("alpha", Syntax::Number, Syntax::Const);
-  add_submodule_sequence<OM> ("Stem", Harvest, Syntax::Const);
-  add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const);
-  add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const);
-  add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const);
-  Harvest.add ("C_Stem", Syntax::Number, Syntax::Const);
-  Harvest.add ("C_SOrg", Syntax::Number, Syntax::Const);
-  Harvest.add ("C_Root", Syntax::Number, Syntax::Const);
-  Harvest.add ("DSmax", Syntax::Number, Syntax::Const);
-  HarvestList.add ("DSmax", 0.0);
-  Harvest.add ("DSnew", Syntax::Number, Syntax::Const);
-  HarvestList.add ("DSnew", 0.0);
-
-  syntax.add ("Harvest", Harvest, Syntax::Const);
-  alist.add ("Harvest", HarvestList);
-
-   // I don't know where these belong.
-  syntax.add ("IntcpCap", Syntax::Number, Syntax::Const);
-  syntax.add ("EpFac", Syntax::Number, Syntax::Const);
-  syntax.add ("enable_water_stress", Syntax::Boolean, Syntax::Const);
-  alist.add ("enable_water_stress", true);
-  syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::Const);
-  alist.add ("enable_N_stress", true);
-
-  // Variables.
-
-  // Phenology
   Syntax& Phenology = *new Syntax ();
   AttributeList& vPhenology = *new AttributeList ();
-
-  Phenology.add ("DS", Syntax::Number, Syntax::State);
-  vPhenology.add ("DS", -1.0);
-  Phenology.add ("Vern", Syntax::Number, Syntax::OptionalState);
-
-  syntax.add ("Phenology", Phenology, Syntax::State);
-  alist.add ("Phenology", vPhenology);
-
-  // Canopy
-  Canopy.add ("Height", Syntax::Number, Syntax::State);
-  vCanopy.add ("Height", 0.0);
-  Canopy.add ("LAI", Syntax::Number, Syntax::State);
-  vCanopy.add ("LAI", 0.0);
-  Canopy.add ("LADm", Syntax::Number, Syntax::State);
-  vCanopy.add ("LADm", -9999.99);
-  Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::State);
-  vCanopy.add ("LAIvsH", empty_csmp);
-
-  syntax.add ("Canopy", Canopy, Syntax::State);
-  alist.add ("Canopy", vCanopy);
-
-    // RootSys
   Syntax& RootSys = *new Syntax ();
   AttributeList& vRootSys = *new AttributeList ();
-
-  RootSys.add ("Depth", Syntax::Number, Syntax::OptionalState);
-  RootSys.add ("Density", Syntax::Number, Syntax::State, Syntax::Sequence);
-  vRootSys.add ("Density", empty_array);
-  RootSys.add ("H2OExtraction", Syntax::Number, Syntax::State, Syntax::Sequence);
-  vRootSys.add ("H2OExtraction", empty_array);
-  RootSys.add ("NH4Extraction", Syntax::Number, Syntax::State, Syntax::Sequence);
-  vRootSys.add ("NH4Extraction", empty_array);
-  RootSys.add ("NO3Extraction", Syntax::Number, Syntax::State, Syntax::Sequence);
-  vRootSys.add ("NO3Extraction", empty_array);
-  RootSys.add ("h_x", Syntax::Number, Syntax::State);
-  vRootSys.add ("h_x", 0.0);
-  RootSys.add ("water_stress", Syntax::Number, Syntax::LogOnly);
-  RootSys.add ("transpiration", Syntax::Number, Syntax::LogOnly);
-  RootSys.add ("Ept", Syntax::Number, Syntax::LogOnly);
-
-  syntax.add ("RootSys", RootSys, Syntax::State);
-  alist.add ("RootSys", vRootSys);
-
-  // Prod
   Syntax& Prod = *new Syntax ();
   AttributeList& vProd = *new AttributeList ();
-
-  Prod.add ("WLeaf", Syntax::Number, Syntax::State);
-  vProd.add ("WLeaf", 0.001);
-  Prod.add ("WhiteStubble", Syntax::Number, Syntax::State);
-  vProd.add ("WhiteStubble", 0.0);
-  Prod.add ("WRoot", Syntax::Number, Syntax::State);
-  vProd.add ("WRoot", 0.001);
-  Prod.add ("NCrop", Syntax::Number, Syntax::OptionalState);
-
-  syntax.add ("Prod", Prod, Syntax::State);
-  alist.add ("Prod", vProd);
-
-  // CrpAux
   Syntax& CrpAux = *new Syntax ();
   AttributeList& vCrpAux = *new AttributeList ();
 
-  CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::State);
-  vCrpAux.add ("InitLAI", true);
-  CrpAux.add ("PotRtDpt", Syntax::Number, Syntax::OptionalState);
-  CrpAux.add ("PtNCnt", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("CrNCnt", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("NfNCnt", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("PotTransp", Syntax::Number, Syntax::State);
-  vCrpAux.add ("PotTransp", 0.0);
-  CrpAux.add ("PotCanopyAss", Syntax::Number, Syntax::State);
-  vCrpAux.add ("PotCanopyAss", 0.0);
-  CrpAux.add ("CanopyAss", Syntax::Number, Syntax::State);
-  vCrpAux.add ("CanopyAss", 0.0);
-  CrpAux.add ("LogPotCanopyAss", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("LogCanopyAss", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("IncWLeaf", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("IncWRoot", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("H2OUpt", Syntax::Number, Syntax::State);
-  vCrpAux.add ("H2OUpt", 0.0);
-  CrpAux.add ("NH4Upt", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("NO3Upt", Syntax::Number, Syntax::LogOnly);
-  CrpAux.add ("Fixated", Syntax::Number, Syntax::LogOnly);
+  // DevelPar
+  Devel.add ("EmrTSum", "dg C d", Syntax::Const,
+	     "Soil temperature sum at emergence.");
+  Devel.add ("DS_Emr", Syntax::None (), Syntax::Const,
+	     "Development stage at emergence.");
+  Devel.add ("DS_reset", Syntax::Boolean, Syntax::Const,
+	     "True for winther crops.");
+  Devel.add ("DSRate1", Syntax::None (), Syntax::Const,
+	     "Development rate in the vegetative stage.");
+  Devel.add ("DSRate2", Syntax::None (), Syntax::Const,
+	     "Development rate in the reproductive stage.");
+  Devel.add ("TempEff1", Syntax::CSMP, Syntax::Const,
+	     "Temperature effect, vegetative stage [dg C ->].");
+  Devel.add ("TempEff2", Syntax::CSMP, Syntax::Const,
+	     "Temperature effect, reproductive stage [dg C ->].");
+  Devel.add ("PhotEff1", Syntax::CSMP, Syntax::Const,
+	     "Photoperiode effect, vegetative stage [h ->].");
+    
+  // VernalPar
+  Vernal.add ("required", Syntax::Boolean, Syntax::Const,
+	      "True, iff the crop requires vernalization.");
+  Vernal.add ("DSLim1", Syntax::None (), Syntax::Const,
+	      "DS at beginning of vernalization.");
+  Vernal.add ("DSLim2", Syntax::None (), Syntax::Const,
+	      "DS at end of vernalization.");
+  Vernal.add ("TaLim", "dg C", Syntax::Const,
+	      "Vernalization temperature threshold.");
+  Vernal.add ("TaSum", "dg C d", Syntax::Const,
+	      "Vernalization temperature-sum requirement.");
 
-  syntax.add ("CrpAux", CrpAux, Syntax::State);
+  // LeafPhotPar
+#if 0
+  LeafPhot.add ("Qeff", Syntax::Unknown (), Syntax::Const,
+		"Unused, for compatibility only.");
+  LeafPhot.add ("Fm", Syntax::Unknown (), Syntax::Const,
+		"Unused, for compatibility only.");
+#endif
+  LeafPhot.add ("TLim1", "dg C", Syntax::Const,
+		"Lowest temperature for photosynthesis.");
+  LeafPhot.add ("TLim2", "dg C", Syntax::Const,
+		"Lowest temperature for unrestricted photosynthesis.");
+
+  // CanopyPar
+  Canopy.add ("InitGrowth", Syntax::None (), Syntax::Const,
+	      "Initial growth parameter.");
+  Canopy.add ("DSinit", Syntax::None (), Syntax::Const,
+	      "DS at end of initial LAI-Development.");
+  Canopy.add ("WLfInit", "g DM/m^2", Syntax::Const,
+	      "WLeaf at end of initial LAI-Development.");
+  Canopy.add ("DS1", Syntax::None (), Syntax::Const,
+	      "DS state at start of leaf recession.");
+  Canopy.add ("alpha", Syntax::None (), Syntax::Const,
+	      "Leaf recession parameter.");
+  Canopy.add ("beta", Syntax::None (), Syntax::Const,
+	      "Leaf recession parameter.");
+  Canopy.add ("SpLAI", "(m^2/m^2)/(g/m^2)", Syntax::Const,
+	      "Specific leaf weight.");
+  Canopy.add ("HvsDS", Syntax::CSMP, Syntax::Const,
+	      "Crop height as function of DS [->cm].");
+  Canopy.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
+	      "Relative LAI distribution at DS=0.");
+  Canopy.add ("LAIDist1", Syntax::None (), Syntax::Const, 3,
+	      "Relative LAI distribution at DS=1.");
+  Canopy.add ("PARref", Syntax::None (), Syntax::Const,
+	      "PAR reflectance.");
+  Canopy.add ("PARext", Syntax::None (), Syntax::Const,
+	      "PAR extinction coefficient.");
+  Canopy.add ("EPext", Syntax::None (), Syntax::Const,
+	      "EP extinction coefficient.");
+
+  // RootPar
+  Root.add ("DptEmr", "cm", Syntax::Const,
+	    "Penetration at emergence.");
+  Root.add ("PenPar1", "cm/dg C/h", Syntax::Const,
+	    "Penetration rate parameter, coefficient.");
+  Root.add ("PenPar2", "dg C", Syntax::Const,
+	    "Penetration rate parameter, threshold.");
+  Root.add ("MaxPen", "cm", Syntax::Const,
+	    "Maximum penetration depth.");
+  Root.add ("SpRtLength", "km/g", Syntax::Const,
+	    "Specific root length.");
+  Root.add ("DensRtTip", "cm/cm^3", Syntax::Const,
+	    "Root density at (potential) penetration depth.");
+  Root.add ("Rad", "cm", Syntax::Const,
+	    "Root radius.");
+  Root.add ("h_wp", "cm", Syntax::Const,
+	    "Matrix potential at wilting point.");
+  Root.add ("MxNH4Up", "g/cm/h", Syntax::Const,
+	    "Maximum NH4 uptake per unit root length.");
+  Root.add ("MxNO3Up", "g/cm/h", Syntax::Const,
+	    "Maximum NO3 uptake per unit root length.");
+  Root.add ("Rxylem", Syntax::None (), Syntax::Const,
+	    "Transport resistence in xyleme.");
+
+  // PartitPar
+  Partit.add ("Root", Syntax::CSMP, Syntax::Const,
+	      "Partitioning functions for root.");
+
+  // RespPar
+  Resp.add ("E_Root", Syntax::CSMP, Syntax::Const,
+	    "Conversion efficiency, root.");
+  Resp.add ("E_Leaf", Syntax::CSMP, Syntax::Const,
+	    "Conversion efficiency, leaf.");
+  Resp.add ("r_Root", Syntax::CSMP, Syntax::Const,
+	    "Maintenance respiration coefficient, root.");
+  Resp.add ("r_Leaf", Syntax::CSMP, Syntax::Const,
+	    "Maintenance respiration coefficient, leaf.");
+
+  // CrpNPar
+  CrpN.add ("SeedN", "g N/m^2", Syntax::Const,
+	    "N-content in seed.");
+  CrpN.add ("DS_fixate", Syntax::None (), Syntax::Const,
+            "DS at which to start fixation of atmospheric N.");
+  CrpNList.add ("DS_fixate", 42000.0);
+  CrpN.add ("PtLeafCnc", Syntax::CSMP, Syntax::Const,
+	    "Upper limit for N-concentration in leaves [DS -> g N/g DM].");
+  CrpN.add ("CrLeafCnc", Syntax::CSMP, Syntax::Const,
+	    "Critical limit for N-concentration in leaves [DS -> g N/g DM].");
+  CrpN.add ("NfLeafCnc", Syntax::CSMP, Syntax::Const, "\
+Non-functional limit for N-concentration in leaves [DS -> g N/g DM].");
+  CrpN.add ("PtRootCnc", Syntax::CSMP, Syntax::Const,
+	    "Upper limit for N-concentration in roots [DS -> g N/g DM].");
+  CrpN.add ("CrRootCnc", Syntax::CSMP, Syntax::Const,
+	    "Critical limit for N-concentration in roots [DS -> g N/g DM].");
+  CrpN.add ("NfRootCnc", Syntax::CSMP, Syntax::Const, "\
+Non-functional lim for N-concentration in roots [DS -> g N/g DM].");
+
+
+  // HarvestPar
+  Harvest.add ("index", Syntax::None (), Syntax::Const,
+	       "Fraction of leaf that are storage organ.");
+  Harvest.add ("beta", Syntax::None (), Syntax::Const,
+	       "The root/top concentration relation.");
+  Harvest.add ("CStem", "g N/g DM", Syntax::Const,
+	       "Normal straw concentration.");
+  Harvest.add ("CSOrg", "g N/g DM", Syntax::Const,
+	       "Sorg concentration at the end of the normal range.");
+  Harvest.add ("alpha", Syntax::None (), Syntax::Const,
+	       "Relative increase in straw concentration above normal range.");
+  add_submodule_sequence<OM> ("Stem", Harvest, Syntax::Const,
+			      "Stem AM parameters.");
+  add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const,
+			      "Leaf AM parameters.");
+  add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const,
+			      "SOrg AM parameters.");
+  add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const,
+			      "Root AM parameters.");
+  Harvest.add ("C_Stem", Syntax::None (), Syntax::Const,
+	       "C fraction of total weight.");
+  Harvest.add ("C_SOrg", Syntax::None (), Syntax::Const,
+	       "C fraction of total weight.");
+  Harvest.add ("C_Root", Syntax::None (), Syntax::Const,
+	       "C fraction of total weight.");
+  Harvest.add ("DSmax", Syntax::None (), Syntax::Const, "\
+Maximal development stage for which the crop survives harvest.");
+  HarvestList.add ("DSmax", 0.0);
+  Harvest.add ("DSnew", Syntax::None (), Syntax::Const,
+	       "New development stage after harvest.");
+  HarvestList.add ("DSnew", 0.0);
+
+
+  // Phenology
+  Phenology.add ("DS", Syntax::None (), Syntax::State,
+		 "Development Stage.");
+  vPhenology.add ("DS", -1.0);
+  Phenology.add ("Vern", "dg C d", Syntax::OptionalState,
+		 "Vernalization criterium.");
+
+  // Canopy
+  Canopy.add ("Height", "cm", Syntax::State,
+	      "Crop height.");
+  vCanopy.add ("Height", 0.0);
+  Canopy.add ("LAI", "m^2/m^2", Syntax::State,
+	      "Leaf Area Index.");
+  vCanopy.add ("LAI", 0.0);
+  Canopy.add ("LADm", "cm^2/cm^3", Syntax::State,
+	      "Maximal Leaf Area Density.");
+  vCanopy.add ("LADm", -9999.99);
+  Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::State,
+	      "Accumulated Leaf Area Index at Height.");
+  vCanopy.add ("LAIvsH", empty_csmp);
+
+    // RootSys
+  RootSys.add ("Depth", "cm", Syntax::OptionalState,
+	       "Rooting Depth.");
+  RootSys.add ("Density", "cm/cm3", Syntax::State, Syntax::Sequence,
+	       "Root density in soil layers.");
+  vRootSys.add ("Density", empty_array);
+  RootSys.add ("H2OExtraction", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
+	       "Extraction of H2O in soil layers.");
+  vRootSys.add ("H2OExtraction", empty_array);
+  RootSys.add ("NH4Extraction", "g N/cm^3/h", Syntax::State, Syntax::Sequence,
+	       "Extraction of NH4-N in soil layers.");
+  vRootSys.add ("NH4Extraction", empty_array);
+  RootSys.add ("NO3Extraction", "g N/cm^3/h", Syntax::State, Syntax::Sequence,
+	       "Extraction of NO3-N in soil layers.");
+  vRootSys.add ("NO3Extraction", empty_array);
+  RootSys.add ("h_x", "cm", Syntax::State,
+	       "Root extraction at surface.");
+  vRootSys.add ("h_x", 0.0);
+  RootSys.add ("water_stress", Syntax::None (), Syntax::LogOnly,
+	       "Fraction of requested water we got.");
+  RootSys.add ("transpiration", "mm/h", Syntax::LogOnly,
+	       "Total water uptake.");
+  RootSys.add ("Ept", "mm/h", Syntax::LogOnly,
+	       "Potential transpiration.");
+
+  // Prod
+  Prod.add ("WLeaf", "g DM/m^2", Syntax::State,
+	    "Leaf dry matter weight.");
+  vProd.add ("WLeaf", 0.001);
+  Prod.add ("WhiteStubble", "g DM/m^2", Syntax::State,
+	    "Old dead leftover from harvest.");
+  vProd.add ("WhiteStubble", 0.0);
+  Prod.add ("WRoot", "g DM/m^2", Syntax::State,
+	    "Root dry matter weight.");
+  vProd.add ("WRoot", 0.001);
+  Prod.add ("NCrop", "g N/m^2", Syntax::OptionalState,
+	    "Nitrogen stored in dry matter.");
+
+  // CrpAux
+  CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::State,
+	      "Initial LAI development.");
+  vCrpAux.add ("InitLAI", true);
+  CrpAux.add ("PotRtDpt", "cm", Syntax::OptionalState,
+	      "Potential root penetration depth.");
+  CrpAux.add ("PtNCnt", "g/m^2", Syntax::LogOnly,
+	      "Potential nitrogen content in crop.");
+  CrpAux.add ("CrNCnt", "g/m^2", Syntax::LogOnly,
+	      "Critical nitrogen content in crop.");
+  CrpAux.add ("NfNCnt", "g/m^2", Syntax::LogOnly,
+	      "Non-functional nitrogen content in crop.");
+  CrpAux.add ("PotTransp", "mm/h", Syntax::State,
+	      "Potential transpiration.");
+  vCrpAux.add ("PotTransp", 0.0);
+  CrpAux.add ("PotCanopyAss", "g CH2O/m^2", Syntax::State,
+	      "Potential canopy assimilation this day until now.");
+  vCrpAux.add ("PotCanopyAss", 0.0);
+  CrpAux.add ("CanopyAss", "g CH2O/m^2", Syntax::State,
+	      "Canopy assimilation this day until now.");
+  vCrpAux.add ("CanopyAss", 0.0);
+  CrpAux.add ("LogPotCanopyAss", "g CH2O/m^2", Syntax::LogOnly,
+	      "Yesterdays total potential canopy assimilation.");
+  CrpAux.add ("LogCanopyAss", "g CH2O/m^2", Syntax::LogOnly,
+	      "Yesterdays total canopy assimilation.");
+  CrpAux.add ("IncWLeaf", "g DM/m^2/d", Syntax::LogOnly, "Leaf growth.");
+  CrpAux.add ("IncWRoot", "g DM/m^2/d", Syntax::LogOnly, "Root growth.");
+  CrpAux.add ("H2OUpt", "mm/h", Syntax::State, "H2O uptake.");
+  vCrpAux.add ("H2OUpt", 0.0);
+  CrpAux.add ("NH4Upt", "g N/m^2/h", Syntax::LogOnly, "NH4-N uptake.");
+  CrpAux.add ("NO3Upt", "g N/m^2/h", Syntax::LogOnly, "NO3-N uptake.");
+  CrpAux.add ("Fixated", "g N/m^2/h", Syntax::LogOnly, " fixation from air.");
+
+  // Model.
+  Syntax& syntax = *new Syntax ();
+  AttributeList& alist = *new AttributeList ();
+  alist.add ("description", "\
+Daisy v1 crop model, for crops with storage organ in the shoot.");
+
+  syntax.add ("IntcpCap", "mm", Syntax::Const,
+	      "Interception capacity.");
+  syntax.add ("EpFac", Syntax::None (), Syntax::Const,
+	      "Potential evapotranspiration factor.");
+  syntax.add ("enable_water_stress", Syntax::Boolean, Syntax::Const,
+	      "True, if water stress can limit crop growth.");
+  alist.add ("enable_water_stress", true);
+  syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::Const,
+	      "True, if nitrogen stress can limit crop growth.");
+  alist.add ("enable_N_stress", true);
+
+  // Add subcomponents.
+  syntax.add ("Devel", Devel, "Crop development.");
+  syntax.add ("Vernal", Vernal, "Vernalization.");
+  syntax.add ("LeafPhot", LeafPhot, "Leaf photosynthesis.");
+  syntax.add ("Root", Root, "The root system.");
+  syntax.add ("Partit", Partit, "Assimilate partitioning.");
+  syntax.add ("Resp", Resp, "Respiration.");
+  syntax.add ("CrpN", CrpN, "Nitrogen content in the crop.");
+  alist.add ("CrpN", CrpNList);
+  syntax.add ("Harvest", Harvest, "Harvest parameters.");
+  alist.add ("Harvest", HarvestList);
+  syntax.add ("Phenology", Phenology, "Crop development.");
+  alist.add ("Phenology", vPhenology);
+  syntax.add ("Canopy", Canopy, "Canopy structure.");
+  alist.add ("Canopy", vCanopy);
+  syntax.add ("RootSys", RootSys, "Root system state.");
+  alist.add ("RootSys", vRootSys);
+  syntax.add ("Prod", Prod, "Crop production.");
+  alist.add ("Prod", vProd);
+  syntax.add ("CrpAux", CrpAux, "Miscellaneous crop state variables.");
   alist.add ("CrpAux", vCrpAux);
 
   Librarian<Crop>::add_type ("old", alist, syntax, &make);
@@ -1445,9 +1519,9 @@ CropOld::RootDensity (const Soil& soil)
   const double WRoot = var.Prod.WRoot;
   const double PotRtDpt = var.CrpAux.PotRtDpt;
   Variables::RecRootSys& RootSys = var.RootSys;
-
-  double LengthPrArea
-    = max (10 * Root.SpRtLength * WRoot, 3 * PotRtDpt); /*cm/cm2*/
+  const double m2_per_km_cm = 10.0; // [m^2/(km cm)]
+  const double LengthPrArea
+    = max (m2_per_km_cm * Root.SpRtLength * WRoot, 0.12 * PotRtDpt); /*cm/cm2*/
   double a = RootDensDistPar (LengthPrArea / (PotRtDpt * Root.DensRtTip));
   double L0 = Root.DensRtTip * exp (a);
   a /= PotRtDpt;
@@ -1537,52 +1611,6 @@ CropOld::NitrogenUptake (int Hour,
     CrpAux.Fixated = 0.0;
 }
 
-double 
-CropOld::CanopyPhotosynthesis (const Bioclimate& bioclimate)
-{
-  // sugar production [gCH2O/m2/h] by canopy photosynthesis.
-  const Parameters::LeafPhotPar& LeafPhot = par.LeafPhot;
-  const CSMP& LAIvsH = var.Canopy.LAIvsH;
-
-  double Teff;			// Temperature effect
-  double F;			// Leaf Photosynthesis [gCO2/m2/h]
-  double prevLA = 0.0;		// LAI below the current leaf layer.
-  double Ass = 0.0;		// Assimilate produced by canopy photosynthesis
-  double Ta = bioclimate.daily_air_temperature ();
-  
-  if (Ta < LeafPhot.TLim1)
-    Teff = 0.0;
-  else
-    {
-      if (Ta > LeafPhot.TLim2)
-	Teff = 1.0;
-      else
-	Teff =   (Ta - LeafPhot.TLim1)
-	  / (LeafPhot.TLim2 - LeafPhot.TLim1);
-    }
-
-  double LA, dPAR;
-
-  int No = bioclimate.NumberOfIntervals ();
-  for (int i = 0; i < No; i++)
-    {
-      const double height = bioclimate.height (i);
-      // Leaf Area index for a given leaf layer
-      LA = LAIvsH (height) - prevLA;
-      prevLA = LAIvsH (height);
-      if (LA > 0)
-	{
-	  dPAR = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / LA;
-
-	  F = LeafPhot.Fm * (1.0 
-			     - exp (- (LeafPhot.Qeff * dPAR / LeafPhot.Fm)));
-
-	  Ass += LA * F;
-	}
-    }
-  return (molWeightCH2O / molWeightCO2) * Teff * Ass;
-}
-
 void 
 CropOld::AssimilatePartitioning (double DS, double& f_Leaf, double& f_Root)
 {
@@ -1593,14 +1621,12 @@ CropOld::AssimilatePartitioning (double DS, double& f_Leaf, double& f_Root)
 }
 
 double 
-CropOld::MaintenanceRespiration (double r, double /* Q10 */, 
-				 double w, double T)
+CropOld::MaintenanceRespiration (double r, double w, double T)
 {
   if (w > 0)
     return r * max (0.0, 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
 				   - exp (0.57 - 0.042 * T - 0.0051 * T * T)))
       * w;
-  // return r * exp ((T - 20.0) / 10.0 * log (Q10)) * w;
   else
     return 0.0;
 }
@@ -1616,10 +1642,10 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
   Variables::RecCrpAux& CrpAux = var.CrpAux;
 
   const double RMLeaf
-    = MaintenanceRespiration (Resp.r_Leaf (DS), Resp.Q10, Prod.WLeaf, 
+    = MaintenanceRespiration (Resp.r_Leaf (DS), Prod.WLeaf, 
 			      bioclimate.daily_air_temperature ());
   const double RMRoot
-    = MaintenanceRespiration (Resp.r_Root (DS), Resp.Q10, Prod.WRoot, 
+    = MaintenanceRespiration (Resp.r_Root (DS), Prod.WRoot, 
 			      soil_heat.T (soil.interval_plus (-Depth / 3)));
   double AssG, f_Leaf, f_Root;
     

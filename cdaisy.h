@@ -560,6 +560,14 @@ daisy_column_get_surface_no3 (const daisy_column* column);
 double                          /* [mm] */
 daisy_column_get_snow_storage (const daisy_column* column);
 
+void                            /* [g/cm^2] */
+daisy_column_put_surface_chemical (daisy_column* column, 
+				   const char* name, double amount);
+
+double                          /* [g/cm^2] */
+daisy_column_get_surface_chemical (const daisy_column* column,
+				   const char* name);
+
 /* @@@ Organic Matter.
  * 
  * The organic content of the soil.

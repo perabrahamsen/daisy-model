@@ -39,12 +39,12 @@ daisy_syntax_check (const Syntax* syntax, const AttributeList* alist,
 extern "C" void EXPORT
 daisy_syntax_add (Syntax* syntax, const char* name,
 		  Syntax::category cat, Syntax::type type, int size)
-{ syntax->add (name, type, cat, size); }
+{ syntax->add (name, type, cat, size, "added from C API"); }
 
 extern "C" void EXPORT
 daisy_syntax_add_alist (Syntax* syntax, const char* name,
 			Syntax::category cat, Syntax* nested, int size)
-{ syntax->add (name, *nested, cat, size); }
+{ syntax->add (name, *nested, cat, size, "added from C API"); }
 
 extern "C" int EXPORT
 daisy_category_number (const char* name)
@@ -814,6 +814,17 @@ daisy_column_get_surface_no3 (const Column* column)
 extern "C" double EXPORT	// [mm]
 daisy_column_get_snow_storage (const Column* column)
 { return column->get_snow_storage (); }
+
+extern "C" void EXPORT		// [g/cm^2]
+daisy_column_put_surface_chemical (Column* column, 
+				   const char* name, double amount)
+{ column->put_surface_chemical (name, amount); }
+
+extern "C" double EXPORT	// [g/cm^2]
+daisy_column_get_surface_chemical (const Column* column,
+				   const char* name)
+{ return column->get_surface_chemical (name); }
+
 
 /* @@@ Organic Matter.
  * 

@@ -1,4 +1,6 @@
 // hydraulic_old.C
+//
+// Read hydraulic parameters from file.
 
 #include "hydraulic.h"
 #include "mathlib.h"
@@ -130,11 +132,17 @@ HydraulicOldSyntax::HydraulicOldSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  alist.add ("description", "\
+Reads a file of lines in the format < pF Theta Cw2 K >, where pF is the\n\
+water pressure, Theta is the water content at that  pressure, cw2 is\n\
+dTheta/dh at that pressure [m^-1], and K is the water conductivity at\n\
+that pressure [m/s].");
   Hydraulic::load_syntax (syntax, alist);
-  syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
+  syntax.add ("M_intervals", Syntax::Integer, Syntax::Const,
+	      "Number of intervals for numeric integration of K.");
   alist.add ("M_intervals", 500);
   alist.add ("Theta_sat", -42.42e42);
-  syntax.add ("file", Syntax::String, Syntax::Const);
+  syntax.add ("file", Syntax::String, Syntax::Const, "The file to read.");
   syntax.order ("file");
   Librarian<Hydraulic>::add_type ("old", alist, syntax, &HydraulicOld::make);
 }

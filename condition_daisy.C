@@ -32,10 +32,15 @@ static struct ConditionDaisySyntax
   ConditionDaisySyntax ()
     {
       Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
+      AttributeList& alist_running = *new AttributeList ();
+      alist_running.add ("description", 
+			 "True iff the simulation is still running.");
+      AttributeList& alist_finished = *new AttributeList ();
+      alist_finished.add ("description", 
+			  "True iff the simulation has finsihed.");
       Librarian<Condition>::add_type ("running",
-				      alist, syntax, &make_running);
+				      alist_running, syntax, &make_running);
       Librarian<Condition>::add_type ("finished",
-				      alist, syntax, &make_finished);
+				      alist_finished, syntax, &make_finished);
     }
 } ConditionDaisy_syntax;

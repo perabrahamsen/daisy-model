@@ -130,11 +130,13 @@ static struct GroundwaterFileSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "Read groundwater table from a file.");
       Groundwater::load_syntax (syntax, alist);
       syntax.add ("file", Syntax::String, Syntax::Const,
-		  "Name of file to read data from.  \
-The format of each line in the file is `YEAR MONTH DAY HEIGHT', \
-where HEIGHT should in cm above ground (i.e. a negative number).");
+		  "Name of file to read data from.\n\
+The format of each line in the file is `YEAR MONTH DAY HEIGHT',\n\
+where HEIGHT should in cm above ground (i.e. a negative number).\n\
+Linear interpolation is used between the datapoints.");
       syntax.order ("file");
       Librarian<Groundwater>::add_type ("file", alist, syntax, &make);
     }

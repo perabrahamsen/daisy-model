@@ -134,9 +134,13 @@ static struct WeatherHourlySyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "Read weather data from a file.\n\
+Each line should have the following whitespace separated fields:\n\
+year, month, day, hour, global radiation [W/m^2], air temperature [dg C],\n\
+precipitation [mm/h], cloudiness [0-1] and vapor pressure [Pa].");
       Weather::load_syntax (syntax, alist);
-      syntax.add ("file", Syntax::String, Syntax::Const);
-      syntax.order ("file");
+      syntax.add ("file", Syntax::String, Syntax::Const,
+		  "File to read weather data from.");
       Librarian<Weather>::add_type ("hourly", alist, syntax, &make);
     }
 } WeatherHourly_syntax;

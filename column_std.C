@@ -121,6 +121,10 @@ public:
     { surface.put_no3 (no3); }
   double get_surface_no3 () const // [g/cm^2]
     { return surface.get_no3 (); }
+  void put_surface_chemical (const string& name, double amount) // [g/cm^2]
+    { bioclimate.put_surface_chemical (name, amount); }
+  double get_surface_chemical (const string& name) const // [g/cm^2]
+    { return bioclimate.get_surface_chemical (name); }
   double get_smb_c_at (unsigned int i) const //[g C/cm³]
     { return organic_matter.get_smb_c_at (i); }
   double get_co2_production_at (unsigned int i) const // [g C/cm³]
@@ -398,24 +402,33 @@ static struct ColumnStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     Column::load_syntax (syntax, alist);
-
-    syntax.add ("description", Syntax::String, Syntax::OptionalConst); 
-    add_submodule<Vegetation> ("Vegetation", syntax, alist);
+    syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+		"Description of this column."); 
+    alist.add ("description", "Hansen et.al. 1990.");
+    add_submodule<Vegetation> ("Vegetation", syntax, alist, Syntax::State,
+			       "The crops on the field.");
     syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
-		Syntax::State);
-    add_submodule<Surface> ("Surface", syntax, alist);
+		"The water and energy distribution among the crops.");
+    add_submodule<Surface> ("Surface", syntax, alist, Syntax::State,
+			    "The upper border of the soil.");
     add_submodule<Soil> ("Soil", syntax, alist, Syntax::Const, 
-			 "The soil model");
-    add_submodule<SoilWater> ("SoilWater", syntax, alist);
-    add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
-    add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
-    add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
-    add_submodule<SoilChemicals> ("SoilChemicals", syntax, alist);
+			 "The numeric and physical soil properties.");
+    add_submodule<SoilWater> ("SoilWater", syntax, alist, Syntax::State,
+			      "Soil water content and transportaion.");
+    add_submodule<SoilHeat> ("SoilHeat", syntax, alist, Syntax::State,
+			     "Soil heat and flux.");
+    add_submodule<SoilNH4> ("SoilNH4", syntax, alist, Syntax::State,
+			    "Ammonium transport and adsorption in soil.");
+    add_submodule<SoilNO3> ("SoilNO3", syntax, alist, Syntax::State,
+			    "Nitrate transport in soil.");
+    add_submodule<SoilChemicals> ("SoilChemicals", syntax, alist, 
+				  Syntax::State,
+				  "Chemicals in the soil.");
     add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist,
-				  Syntax::State, 
-				  "The soil organic matter");
+				  Syntax::State, "\
+The organic matter in the soil and on the surface.");
     syntax.add ("Nitrification", Librarian<Nitrification>::library (),
-		Syntax::State);
+		"The soil nitrification process.");
     AttributeList nitrification_alist;
     nitrification_alist.add ("type", "soil");
     nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-5/24 [1/h]
@@ -423,9 +436,11 @@ static struct ColumnStandardSyntax
     nitrification_alist.add ("active_underground", false);
     nitrification_alist.add ("active_groundwater", false);
     alist.add ("Nitrification", nitrification_alist);
-    add_submodule<Denitrification> ("Denitrification", syntax, alist);
+    add_submodule<Denitrification> ("Denitrification", syntax, alist,
+				    Syntax::State, "\
+The denitrification process.");
     syntax.add ("Groundwater", Librarian<Groundwater>::library (),
-		Syntax::State);
+		"The groundwater level.");
     
     Librarian<Column>::add_type ("default", alist, syntax, &make);
   }

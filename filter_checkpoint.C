@@ -34,6 +34,7 @@ static struct FilterCheckpointSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "Match all state variables.");
       Librarian<Filter>::add_type ("checkpoint", alist, syntax,
 				   &FilterCheckpoint::make);
     }

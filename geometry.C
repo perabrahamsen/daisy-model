@@ -224,19 +224,26 @@ check_layers (const vector<AttributeList*>& layers)
 }
 
 void 
-Geometry::add_layer (Syntax& syntax, const string& name)
+Geometry::add_layer (Syntax& syntax, const string& name,
+		     const string& dimension, const string& description)
 {
-  static Syntax& layer = *new Syntax (check_layers);
+  Syntax& layer = *new Syntax (check_layers);
   if (!layer.ordered ())
     {
       // Initialize as first call.
-      layer.add ("end", Syntax::Number, Syntax::Const);
-      layer.add ("value", Syntax::Number, Syntax::Const);
+      layer.add ("end", "cm", Syntax::Const, 
+		 "End point of this layer (a negative number).");
+      layer.add ("value", dimension, Syntax::Const, description);
       layer.order ("end", "value");
     }
   syntax.add (string ("initial_") + name, layer,
-	      Syntax::OptionalConst, Syntax::Sequence);
-  syntax.add (name, Syntax::Number, Syntax::OptionalState, Syntax::Sequence);
+	      Syntax::OptionalConst, Syntax::Sequence, 
+	      string ("Initial value of the `") + name + "' parameter.\n\
+The initial value is given as a sequence of (END VALUE) pairs, starting\n\
+from the top and going down.  The parameter will be initializated to\n\
+VALUE from the END of the previous layer, to the END of the current layer.");
+  syntax.add (name, dimension, Syntax::OptionalState, Syntax::Sequence, 
+	      description);
 }
 
 void 
@@ -260,7 +267,7 @@ Geometry::initialize_layer (vector<double>& array,
 	  const double next = layers[i]->number ("end");
 	  assert (next < last);
 	  const double value = layers[i]->number ("value");
-	  add (array, last, next, value);
+	  add (array, last, next, value * (last - next));
 	  last = next;
 	}
     }
@@ -270,7 +277,9 @@ void
 Geometry::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("zplus", Syntax::Number, Syntax::Const, Syntax::Sequence);
+  syntax.add ("zplus", "cm", Syntax::Const, Syntax::Sequence,
+	      "Depth of each numeric layer (a negative number).\n\
+The end points are listed descending from the surface to the bottom.");
 }
   
 Geometry::Geometry (const AttributeList& al)

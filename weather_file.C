@@ -134,8 +134,15 @@ static struct WeatherFileSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "Read weather data from a file.\n\
+Each line should have the following whitespace separated fields:\n\
+year, month, day, global radiation [W/m^2], air temperature [dg C],\n\
+precipitation [mm/d], and reference evapotranspiration [mm/d].  The\n\
+last field is optional, it is only used if you select the `weather'\n\
+model in the `pet' component");
       Weather::load_syntax (syntax, alist);
-      syntax.add ("file", Syntax::String, Syntax::Const);
+      syntax.add ("file", Syntax::String, Syntax::Const,
+		  "File to read weather data from.");
       syntax.order ("file");
       Librarian<Weather>::add_type ("file", alist, syntax, &make);
     }

@@ -401,36 +401,64 @@ void
 Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_alist);
-  syntax.add ("description", Syntax::String, Syntax::OptionalConst);
-  syntax.add ("hydraulic", Librarian<Hydraulic>::library (), Syntax::Const);
-  syntax.add ("tortuosity", Librarian<Tortuosity>::library (), Syntax::Const);
+  syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+	      "Description of this particular soil type.");
+  alist.add ("description",
+	     "The physical properties of a particular soil type.");
+  syntax.add ("hydraulic", Librarian<Hydraulic>::library (), 
+	      "The hydraulic propeties of the soil.");
+  syntax.add ("tortuosity", Librarian<Tortuosity>::library (), 
+	      "The soil tortuosity.");
   AttributeList& tortuosity = *new AttributeList ();
   tortuosity.add ("type", "M_Q");
   alist.add ("tortuosity", tortuosity);
-  syntax.add ("clay", Syntax::Number, Syntax::Const);
-  syntax.add ("silt", Syntax::Number, Syntax::Const);
-  syntax.add ("fine_sand", Syntax::Number, Syntax::Const);
-  syntax.add ("coarse_sand", Syntax::Number, Syntax::Const);
-  syntax.add ("humus", Syntax::Number, Syntax::Const);
-  syntax.add ("quarts_in_clay", Syntax::Number, Syntax::Const);
+  syntax.add ("clay", Syntax::None (), Syntax::Const,
+	      "Relative fraction of clay in soil.");
+  syntax.add ("silt", Syntax::None (), Syntax::Const,
+	      "Relative fraction of silt in soil.");
+  syntax.add ("fine_sand", Syntax::None (), Syntax::Const,
+	      "Relative fraction of fine sand in soil.");
+  syntax.add ("coarse_sand", Syntax::None (), Syntax::Const,
+	      "Relative fraction of coarse sand in soil.");
+  syntax.add ("humus", Syntax::None (), Syntax::Const,
+	      "Relative fraction of humus in soil.");
+  syntax.add ("quarts_in_clay", Syntax::None (), Syntax::Const,
+	      "Quarts fraction in clay.");
   alist.add ("quarts_in_clay", 0.05);
-  syntax.add ("quarts_in_silt", Syntax::Number, Syntax::Const);
+  syntax.add ("quarts_in_silt", Syntax::None (), Syntax::Const,
+	      "Quarts fraction in silt.");
   alist.add ("quarts_in_silt", 0.20);
-  syntax.add ("quarts_in_sand", Syntax::Number, Syntax::Const);
+  syntax.add ("quarts_in_sand", Syntax::None (), Syntax::Const,
+	      "Quarts fraction in sand.");
   alist.add ("quarts_in_sand", 0.60);
-  syntax.add ("dry_bulk_density", Syntax::Number, Syntax::OptionalConst);
-  syntax.add ("SOM_C_per_N", Syntax::Number, Syntax::Const, Syntax::Sequence);
+  syntax.add ("dry_bulk_density", "g/cm^3", Syntax::OptionalConst,
+	      "The soils dry bulk density.\n\
+By default, this is calculated from the soil constituents.");
+  syntax.add ("SOM_C_per_N", Syntax::None (), Syntax::Const, Syntax::Sequence,
+	      "C/N ratio for each SOM pool in this soil.");
   syntax.add ("SOM_fractions",
-	      Syntax::Number, Syntax::Const, Syntax::Sequence);
-  syntax.add ("quarts_form_factor", Syntax::Number, Syntax::Const);
+	      Syntax::None (), Syntax::Const, Syntax::Sequence,
+	      "Fraction of humus in each SOM pool, from fastest to slowest.");
+  syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
+	      "Gemetry factor used for conductivity calculation.");
   alist.add ("quarts_form_factor", 3.5);
-  syntax.add ("mineral_form_factor", Syntax::Number, Syntax::Const);
+  syntax.add ("mineral_form_factor", Syntax::None (), Syntax::Const,
+	      "Gemetry factor used for conductivity calculation.");
   alist.add ("mineral_form_factor", 3.5);
-  syntax.add ("intervals", Syntax::Integer, Syntax::Const);
+  syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
+Number of numeric intervals to use in the heat coductivity table.");
   alist.add ("intervals", 100);
-  syntax.add ("C_soil", Syntax::Number, Syntax::OptionalConst);
-  syntax.add ("K_water", Syntax::Number, Syntax::OptionalConst, Syntax::Sequence);
-  syntax.add ("K_ice", Syntax::Number, Syntax::OptionalConst, Syntax::Sequence);
+  syntax.add ("C_soil", "J/cm^3/K", Syntax::OptionalConst,
+	      "The soils heat capacity.\n\
+By default, this is calculated from the soil constituents.");
+  syntax.add ("K_water",
+	      "W/cm/K", Syntax::OptionalConst, Syntax::Sequence,
+	      "Heat conductivity table for water in soil.\n\
+By default, this is calculated from the soil constituents.");
+  syntax.add ("K_ice",
+	      "W/cm/K", Syntax::OptionalConst, Syntax::Sequence,
+	      "Heat conductivity table for solid frozen soil.\n\
+By default, this is calculated from the soil constituents.");
 }
 
 Horizon::Horizon (const AttributeList& al)

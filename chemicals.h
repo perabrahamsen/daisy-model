@@ -40,6 +40,7 @@ public:
 public:
   void output (Log&, Filter&) const;
   void add (const string& chemical, double amount); // [g/m^2]
+  void set_to (const string& chemical, double amount); // [g/m^2]
   double amount (const string& chemical) const; // [g/m^2]
   typedef set<string, less<string>/**/> string_set;
   void find_missing (const string_set& all, string_set& missing) const;

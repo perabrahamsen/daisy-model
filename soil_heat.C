@@ -11,6 +11,7 @@
 #include "time.h"
 #include "mathlib.h"
 #include "log.h"
+#include "submodel.h"
 
 struct SoilHeat::Implementation
 {
@@ -250,7 +251,7 @@ SoilHeat::Implementation::check (unsigned n) const
 }
 
 SoilHeat::Implementation::Implementation (const AttributeList& al)
-  : T_top (al.number ("T_top"))
+  : T_top (al.check ("T_top") ? al.number ("T_top") : -500.0)
 { }
 
 void
@@ -352,9 +353,11 @@ SoilHeat::check (unsigned n) const
 void
 SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  Geometry::add_layer (syntax, "T");
-  syntax.add ("T_top", Syntax::Number, Syntax::State);
-  alist.add ("T_top", -500.0);	// Use surface temperature.
+  alist.add ("submodel", "SoilHeat");
+  alist.add ("description", "Temperature and heat flux in soil.");
+  Geometry::add_layer (syntax, "T", "dg C", "Soil temperature.");
+  syntax.add ("T_top", "dg C", Syntax::OptionalState, 
+	      "Surface temperature at previous time step.");
 }
 
 SoilHeat::SoilHeat (const AttributeList& al)
@@ -372,3 +375,6 @@ SoilHeat::~SoilHeat ()
 {
   delete &impl;
 }
+
+static Submodel::Register 
+soil_heat_submodel ("SoilHeat", SoilHeat::load_syntax);

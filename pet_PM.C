@@ -247,12 +247,14 @@ static struct PetPMSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", 
+		 "Potential evopotranspiration using Penman-Monteith.");
       Pet::load_syntax (syntax, alist);
       Syntax Rn_syntax;
       AttributeList Rn_alist;
-      NetRadiation::load_syntax (Rn_syntax, Rn_alist);
+      Rn_alist.add ("type", "brunt");
       syntax.add ("net_radiation", Librarian<NetRadiation>::library (), 
-		  Syntax::State);
+		  "Net radiation.");
       alist.add ("net_radiation", Rn_alist);
       Librarian<Pet>::add_type ("PM", alist, syntax, &make);
     }

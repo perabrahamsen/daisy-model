@@ -554,20 +554,30 @@ static struct UZRichardSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-
-      syntax.add ("max_time_step_reductions", Syntax::Integer, Syntax::Const);
+      alist.add ("description", "A numerical solution to Richard's Equation.");
+      syntax.add ("max_time_step_reductions",
+		  Syntax::Integer, Syntax::Const, "\
+Number of times we may reduce the time step before giving up");
       alist.add ("max_time_step_reductions", 4);
-      syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const);
+      syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const, 
+		  "Divide the time step with this at each reduction.");
       alist.add ("time_step_reduction", 4);
-      syntax.add ("max_iterations", Syntax::Integer, Syntax::Const);
+      syntax.add ("max_iterations", Syntax::Integer, Syntax::Const, "\
+Maximum number of iterations when seeking convergence before reducing\n\
+the time step.");
       alist.add ("max_iterations", 25);
-      syntax.add ("max_absolute_difference", Syntax::Number, Syntax::Const);
+      syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
+Maximum absolute difference in `h' values for convergence.");
       alist.add ("max_absolute_difference", 0.02);
-      syntax.add ("max_relative_difference", Syntax::Number, Syntax::Const);
+      syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
+Maximum relative difference in `h' values for convergence.");
       alist.add ("max_relative_difference", 0.001);
-      syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
-      syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);
-      syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly);
+      syntax.add ("q_up", "mm/h", Syntax::LogOnly, 
+		  "Flux up through the surface.");
+      syntax.add ("q_down", "mm/h", Syntax::LogOnly,
+		  "Flux up through the bottom of the last node.");
+      syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly,
+		  "Number of iterations used,");
 
       Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
     }

@@ -22,7 +22,7 @@ Column::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("size", Syntax::Unknown (), Syntax::State,
 	      "Area covered by this column, for use by the `merge' action.\n\
-The unit is up to you, as long as all columns use the same unit.");
+The dimension is up to you, as long as all columns use the same unit.");
   alist.add ("size", 1.0);
 }
 

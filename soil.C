@@ -4,6 +4,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
+#include "submodel.h"
 #include <assert.h>
 #include <iomanip.h>
 
@@ -92,20 +93,27 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   Geometry::load_syntax (syntax, alist);
   syntax.add_check (check_alist);
+  alist.add ("submodel", "Soil");
+  alist.add ("description", "\
+The soil component provides the numeric and physical properties of the soil.");
   Syntax& layer_syntax = *new Syntax ();
 #if 0
   AttributeList& layer_alist = *new AttributeList ();
 #endif
-  layer_syntax.add ("end", Syntax::Number, Syntax::Const);
-  layer_syntax.add ("horizon", Librarian<Horizon>::library (), Syntax::State);
+  layer_syntax.add ("end", "cm", Syntax::Const,
+		    "End point of this layer (a negative number).");
+  layer_syntax.add ("horizon", Librarian<Horizon>::library (), 
+		    "Soil properties of this layer.");
   layer_syntax.order ("end", "horizon");
-  syntax.add ("horizons", layer_syntax, Syntax::State, Syntax::Sequence);
+  syntax.add ("horizons", layer_syntax, Syntax::Sequence,
+	      "Layered description of the soil properties.");
 #if 0
   alist.add ("horizons", layer_alist);
 #endif
-  syntax.add ("MaxRootingDepth", Syntax::Number, Syntax::Const);
+  syntax.add ("MaxRootingDepth", "cm", Syntax::Const,
+	      "Depth at the end of the root zone (a positive number).");
   //  alist.add ("MaxRootingDepth", 100.0);
-  syntax.add ("dispersivity", Syntax::Number, Syntax::Const);
+  syntax.add ("dispersivity", "cm", Syntax::Const, "Dispersion length.");
 }
   
 Soil::Soil (const AttributeList& al)
@@ -142,3 +150,5 @@ Soil::Soil (const AttributeList& al)
 Soil::~Soil ()
 { }
 
+static Submodel::Register 
+soil_submodel ("Soil", Soil::load_syntax);

@@ -169,15 +169,22 @@ static struct UZlrSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-
+      alist.add ("description", "\
+Use gravitational water movement for wet soil, where h < h_fc.\n\
+There are no water movement when h > h_fc, except at the layers down\n\
+to z_top, where there can be darcy movement.");
+      
       // Variables.
-      syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
-      syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);
+      syntax.add ("q_up", "mm/h", Syntax::LogOnly, 
+		  "Flux up through the surface.");
+      syntax.add ("q_down", "mm/h", Syntax::LogOnly,
+		  "Flux up through the bottom of the last node.");
 
       // Parameters.
-      syntax.add ("h_fc", Syntax::Number, Syntax::Const);
+      syntax.add ("h_fc", "cm", Syntax::Const, "Field capacity.");
       alist.add ("h_fc", -100.0);
-      syntax.add ("z_top", Syntax::Number, Syntax::Const);
+      syntax.add ("z_top", "cm", Syntax::Const, 
+		  "Depth of layer where upward water movement is possible.");
       alist.add ("z_top", -10.0);
 
       Librarian<UZmodel>::add_type ("lr", alist, syntax, &make);

@@ -67,7 +67,7 @@ endif
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),egcs)
 		ifeq ($(HOSTTYPE),sun4)
-			OPTIMIZE = -O3 -ffast-math 
+			OPTIMIZE = -O2 -ffast-math -fno-inline
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with egcs 1.1.
 		else
 			OPTIMIZE = -O3 -ffast-math 
@@ -302,25 +302,14 @@ dump:	daisy
 # Various test targets.
 #
 xtest:	test/test.dai daisy
-	(cd test; ../daisy test.dai)
+	(cd test \
+         && ../daisy test.dai \
+	 && diff -u harvest_weather.log harvest.log)
 
-bless:
-	(cd test; make bless )
-
-water-test:	daisy 
-	(cd test; make water-test )
-
-crop-test:	daisy 
-	(cd test; make crop-test )
-
-evapo-test:	daisy 
-	(cd test; make evapo-test )
-
-balance:	daisy
-	(cd test; make balance)
-
-check:	daisy
-	(cd karup; make check )
+reference:	daisy
+	(cd txt/reference \
+	 && ../../daisy -p LaTeX > components.tex \
+	 && latex reference.tex < /dev/null )
 
 # Remove all the temporary files.
 #

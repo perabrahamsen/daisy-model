@@ -31,6 +31,7 @@ static struct FilterNoneSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Matches nothing.");
     Librarian<Filter>::add_type ("none", alist, syntax, &FilterNone::make);
   }
 } FilterNone_syntax;

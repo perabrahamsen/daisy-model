@@ -1,7 +1,7 @@
 // hydraulic_B_BaC_Bimodal.C
 //
 // Brooks and Corey retention curve model with Mualem theory.
-// Bimodal hydraulic conductivity curve
+// Bimodal hydraulic conductivity curve.
 
 #include "hydraulic.h"
 
@@ -123,12 +123,20 @@ HydraulicM_BaC_BimodalSyntax::HydraulicM_BaC_BimodalSyntax ()
 {
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  alist.add ("description", 
+	     "Brooks and Corey retention curve model with Mualem theory.\n\
+Bimodal hydraulic conductivity curve.");
   Hydraulic::load_syntax (syntax, alist);
-  syntax.add ("lambda", Syntax::Number, Syntax::Const);
-  syntax.add ("h_b", Syntax::Number, Syntax::Const);
-  syntax.add ("Theta_b", Syntax::Number, Syntax::Const);
-  syntax.add ("K_b", Syntax::Number, Syntax::Const);
-  syntax.add ("K_sat", Syntax::Number, Syntax::Const);
+  syntax.add ("lambda", Syntax::None (), Syntax::Const,
+	      "Pore size index.");
+  syntax.add ("h_b", "cm", Syntax::Const,
+	      "Bubling pressure.");
+  syntax.add ("Theta_b", Syntax::None (), Syntax::Const,
+	      "Water content at `h_b'.");
+  syntax.add ("K_b", "cm/h", Syntax::Const,
+	      "Water conductivity at `h_b'.");
+  syntax.add ("K_sat", "cm/h", Syntax::Const,
+	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("M_BaC_Bimodal", alist, syntax,
 				  &HydraulicM_BaC_Bimodal::make);

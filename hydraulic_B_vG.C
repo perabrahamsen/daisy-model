@@ -1,6 +1,6 @@
 // hydraulic_B_vG.C
 //
-// van Gebuchten retention curve model with Burdine theory.
+// van Genuchten retention curve model with Burdine theory.
 
 #include "hydraulic.h"
 #include "csmp.h"
@@ -122,10 +122,15 @@ HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  alist.add ("description", 
+	     "van Genuchten retention curve model with Burdine theory.");
   Hydraulic::load_syntax (syntax, alist);
-  syntax.add ("alpha", Syntax::Number, Syntax::Const);
-  syntax.add ("n", Syntax::Number, Syntax::Const);
-  syntax.add ("K_sat", Syntax::Number, Syntax::Const);
+  syntax.add ("alpha", "cm^-1", Syntax::Const,
+	      "van Genuchten alpha.");
+  syntax.add ("n", Syntax::None (), Syntax::Const,
+	      "van Genuchten n.");
+  syntax.add ("K_sat", "cm/h", Syntax::Const,
+	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("B_vG", alist, syntax, &HydraulicB_vG::make);
 }

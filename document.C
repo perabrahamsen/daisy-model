@@ -21,23 +21,43 @@ Document::print_submodel (ostream& out, const string& name, int level,
   const vector<string>& order = syntax.order ();
   vector<string> entries;
   syntax.entries (entries);
+  int log_count = 0;
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (syntax.is_log (entries[i]))
+      log_count++;
 
   if (entries.size () == 0)
     print_submodel_empty (out, name, level);
   else
     {
-      print_submodel_header (out, name, level);
+      // Print normal attributes.
+      if (log_count < entries.size ())
+	{
+	  print_submodel_header (out, name, level);
 
-      // Ordered members first.
-      for (unsigned int i = 0; i < order.size (); i++)
-	print_submodel_entry (out, order[i], level, syntax, alist);
+	  // Ordered members first.
+	  for (unsigned int i = 0; i < order.size (); i++)
+	    print_submodel_entry (out, order[i], level, syntax, alist);
       
-      // Then the remaining members.
-      for (unsigned int i = 0; i < entries.size (); i++)
-	if (syntax.order (entries[i]) < 0)
-	  print_submodel_entry (out, entries[i], level, syntax, alist);
+	  // Then the remaining members, except log variables.
+	  for (unsigned int i = 0; i < entries.size (); i++)
+	    if (syntax.order (entries[i]) < 0 && !syntax.is_log (entries[i]))
+	      print_submodel_entry (out, entries[i], level, syntax, alist);
 
-      print_submodel_trailer (out, name, level);
+	  print_submodel_trailer (out, name, level);
+	}
+
+      // Print log variables.
+      if (log_count > 0)
+	{
+	  print_log_header (out, name, level);
+
+	  for (unsigned int i = 0; i < entries.size (); i++)
+	    if (syntax.is_log (entries[i]))
+	      print_submodel_entry (out, entries[i], level, syntax, alist);
+
+	  print_log_trailer (out, name, level);
+	}
     }
 }
 
@@ -58,7 +78,9 @@ Document::print_sample (ostream& out, const string& name,
   vector<string> entries;
   syntax.entries (entries);
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (syntax.order (entries[i]) < 0 && !syntax.is_log (entries[i]))
+    if (syntax.order (entries[i]) < 0
+	&& !syntax.is_log (entries[i])
+	&& syntax.lookup (entries[i]) != Syntax::Library)
       print_sample_entry (out, entries[i],
 			  syntax.size (entries[i]) == Syntax::Sequence);
 

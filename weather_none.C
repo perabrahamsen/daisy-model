@@ -80,16 +80,21 @@ static struct WeatherNoneSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", 
+	       "Weather that does not change during the simulation.");
     Weather::load_syntax (syntax, alist);
-    syntax.add ("air_temperature", Syntax::Number, Syntax::Const);
+    syntax.add ("air_temperature", "dg C", Syntax::Const,
+		"Constant air temperature");
     alist.add ("air_temperature", 0.0);
-    syntax.add ("global_radiation", Syntax::Number, Syntax::Const);
+    syntax.add ("global_radiation", "W/m^2", Syntax::Const,
+		"Constant global radiation.");
     alist.add ("global_radiation", 0.0);
-    syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::Const);
+    syntax.add ("reference_evapotranspiration", "mm/h", Syntax::Const,
+		"Constant reference evapotranspiration.");
     alist.add ("reference_evapotranspiration", 0.0);
-    syntax.add ("rain", Syntax::Number, Syntax::Const);
+    syntax.add ("rain", "mm/h", Syntax::Const, "Constant rain.");
     alist.add ("rain", 0.0);
-    syntax.add ("snow", Syntax::Number, Syntax::Const);
+    syntax.add ("snow", "mm/h", Syntax::Const, "Constant snow.");
     alist.add ("snow", 0.0);
     Librarian<Weather>::add_type ("none", alist, syntax, &WeatherNone::make);
   }

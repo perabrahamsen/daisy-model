@@ -3,6 +3,7 @@
 #include "harvest.h"
 #include "syntax.h"
 #include "log.h"
+#include "submodel.h"
 
 void 
 Harvest::output (Log& log, Filter& filter) const
@@ -22,28 +23,43 @@ Harvest::output (Log& log, Filter& filter) const
 void 
 Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("column", Syntax::String, Syntax::LogOnly,
-	      "Name of column where the harvest were harvested.");
-  syntax.add ("time", Syntax::Date, Syntax::LogOnly,
+  alist.add ("submodel", "Harvest");
+  alist.add ("description", "Log of all harvests during the simulation.");
+  syntax.add ("column", Syntax::String, Syntax::State,
+	      "Name of column where the yield were harvested.");
+  syntax.add ("time", Syntax::Date, Syntax::State,
 	      "Time of the harvest operation.");
-  syntax.add ("crop", Syntax::String, Syntax::LogOnly,
+  syntax.add ("crop", Syntax::String, Syntax::State,
 	      "Name of crop that was harvested.");
-  syntax.add ("stem_DM", "g/m²", Syntax::LogOnly,
+  syntax.add ("stem_DM", "g/m^2", Syntax::State,
 	      "Total stem dry matter in harvest.");
-  syntax.add ("stem_N", "g/m²", Syntax::LogOnly,
+  syntax.add ("stem_N", "g/m^2", Syntax::State,
 	      "Total stem nitrogen in harvest.");
-  syntax.add ("leaf_DM", "g/m²", Syntax::LogOnly,
+  syntax.add ("leaf_DM", "g/m^2", Syntax::State,
 	      "Total leaf dry matter in harvest.");
-  syntax.add ("leaf_N", "g/m²", Syntax::LogOnly,
+  syntax.add ("leaf_N", "g/m^2", Syntax::State,
 	      "Total leaf nitrogen in harvest.");
-  syntax.add ("sorg_DM", "g/m²", Syntax::LogOnly,
+  syntax.add ("sorg_DM", "g/m^2", Syntax::State,
 	      "Total storage organ dry matter in harvest.");
-  syntax.add ("sorg_N", "g/m²", Syntax::LogOnly,
+  syntax.add ("sorg_N", "g/m^2", Syntax::State,
 	      "Total storage organ nitrogen in harvest.");
-  Chemicals::add_syntax  ("chemicals",
-			  syntax, alist, Syntax::LogOnly,
+  Chemicals::add_syntax  ("chemicals", syntax, alist, Syntax::State,
 			  "Chemicals in harvest.");
 }
+
+Harvest::Harvest (const AttributeList& alist)
+  : column (alist.name ("column")),
+    time (alist.time ("time")),
+    crop (alist.name("crop")),
+    stem_DM (alist.number ("stem_DM")),
+    stem_N (alist.number ("stem_N")),
+    leaf_DM (alist.number ("leaf_DM")),
+    leaf_N (alist.number ("leaf_N")),
+    sorg_DM (alist.number ("sorg_DM")),
+    sorg_N (alist.number ("sorg_N")),
+    chemicals (alist.alist_sequence ("chemicals"))
+{ }
+  
 
 Harvest::Harvest (string col, Time t, string crp, 
 		  double sC, double sN, double lC, double lN, 
@@ -59,3 +75,6 @@ Harvest::Harvest (string col, Time t, string crp,
     sorg_N (oN),
     chemicals (chem)
 { }
+
+static Submodel::Register 
+harvest_submodel ("Harvest", Harvest::load_syntax);

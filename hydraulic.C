@@ -39,8 +39,10 @@ Hydraulic::K_to_M (CSMP& csmp, const int intervals) const
 void
 Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
-  syntax.add ("Theta_res", Syntax::Number, Syntax::Const);
+  syntax.add ("Theta_sat", "cm^3 H2O/cm^3", Syntax::Const,
+	      "Saturation point.");
+  syntax.add ("Theta_res", "cm^3 H2O/cm^3", Syntax::Const,
+	      "Soil residual water.");
   alist.add ("Theta_res", 0.0);
 }
 

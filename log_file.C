@@ -437,11 +437,16 @@ LogFileSyntax::LogFileSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("where", Syntax::String, Syntax::Const);
-  syntax.add ("when", Librarian<Condition>::library (), Syntax::Const);
-  syntax.add ("what", Librarian<Filter>::library (), Syntax::Const);
+  alist.add ("description", "Create a log file with lots of parentheses.");
+  syntax.add ("where", Syntax::String, Syntax::Const,
+	      "Name of log file to generate.");
+  syntax.add ("when", Librarian<Condition>::library (), "\
+Generate an entry in the log file when this condition is true.");
+  syntax.add ("what", Librarian<Filter>::library (), "\
+Specify what subset of the state should be logged.");
   syntax.order ("where", "when", "what");
-  syntax.add ("compact", Syntax::Boolean, Syntax::Const);
+  syntax.add ("compact", Syntax::Boolean, Syntax::Const, "\
+generate a more compact log file, by leaving out the attribute names.");
   alist.add ("compact", false);
   Librarian<Log>::add_type ("file", alist, syntax, &LogFile::make);
 }

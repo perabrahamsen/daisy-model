@@ -38,6 +38,8 @@ static struct PetWeatherSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", 
+		 "Potential evopotranspiration using weather data.");
       Pet::load_syntax (syntax, alist);
       Librarian<Pet>::add_type ("weather", alist, syntax, &make);
     }

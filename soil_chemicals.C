@@ -11,6 +11,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "soil_chemical.h"
+#include "submodel.h"
 #include <map>
 #include <set>
 
@@ -239,15 +240,16 @@ template class add_submodule<SoilChemical>;
 void 
 SoilChemicals::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  alist.add ("submodel", "SoilChemicals");
+  alist.add ("description", "List of chemicals in the soil.");
   Syntax& entry_syntax = *new Syntax ();
   AttributeList entry_alist;
-
   entry_syntax.add ("chemical", Syntax::String, Syntax::State,
-		    "Name of chemical in solute");
+		    "Name of chemical in solute.");
   add_submodule<SoilChemical> ("solute", entry_syntax, entry_alist, 
-			       Syntax::State, "State of chemical solute");
+			       Syntax::State, "State of chemical solute.");
   syntax.add ("solutes", entry_syntax, entry_alist, Syntax::State,
-	      "List of chemical solutes in the soil");
+	      "List of chemical solutes in the soil.");
   alist.add ("solutes", vector<AttributeList*> ());
 }
   
@@ -257,3 +259,6 @@ SoilChemicals::SoilChemicals (const AttributeList& al)
   
 SoilChemicals::~SoilChemicals ()
 { delete &impl; }
+
+static Submodel::Register 
+soil_chemicals_submodel ("SoilChemicals", SoilChemicals::load_syntax);

@@ -222,19 +222,24 @@ Weather::deposit () const
 {
   const double Precipitation = rain () + snow (); // [mm]
   assert (Precipitation >= 0.0);
-  const IM dry (impl.DryDeposit, 0.1/24.0); // [kg/m²/d] -> [g/cm²/h]
-  const IM wet (impl.WetDeposit, 0.1); // [kg/m²/mm] -> [g/cm²/mm]
+  
+  // [kg N/ha/year -> [g/cm²/h]
+  const double hours_to_years = 365.2425 * 24.0;
+  const double kg_per_ha_to_g_cm2 
+    = 1000.0 / ((100.0 * 100.0) * (100.0 * 100.0));
+  const IM dry (impl.DryDeposit, kg_per_ha_to_g_cm2 / hours_to_years);
+  const IM wet (impl.WetDeposit, 1.0e-7); // [ppm] -> [g/cm²/mm]
 
   const IM result = dry + wet * Precipitation;
   assert (result.NO3 >= 0.0);
   assert (result.NH4 >= 0.0);
 
   assert (approximate (result.NO3, 
-		       impl.DryDeposit.NO3 / 10.0 / 24.0
-		       + Precipitation * impl.WetDeposit.NO3 / 10.0));
+		       impl.DryDeposit.NO3 * kg_per_ha_to_g_cm2/hours_to_years
+		       + Precipitation * impl.WetDeposit.NO3 * 1e-7));
   assert (approximate (result.NH4, 
-		       impl.DryDeposit.NH4 / 10.0 / 24.0
-		       + Precipitation * impl.WetDeposit.NH4 / 10.0));
+		       impl.DryDeposit.NH4 * kg_per_ha_to_g_cm2/hours_to_years
+		       + Precipitation * impl.WetDeposit.NH4 * 1e-7));
   return result;
 }
 
@@ -346,7 +351,7 @@ Weather::RefNetRadiation (const Time& time, double Si,
     {
       Syntax syntax;
       AttributeList alist;
-      NetRadiation::load_syntax (syntax, alist);
+      alist.add ("type", "brunt");
       net_radiation = &Librarian<NetRadiation>::create (alist);
     }
 
@@ -356,74 +361,78 @@ Weather::RefNetRadiation (const Time& time, double Si,
   return net_radiation->net_radiation ();
 }
 
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<IM>;
+#endif
+
 void
 Weather::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Where in the world are we?
-  syntax.add ("Latitude", Syntax::Number, Syntax::Const);
+  syntax.add ("Latitude", "dg", Syntax::Const,
+	      "The position of the weather station on the globe.");
   alist.add ("Latitude", 56.0);
 
   syntax.add ("Elevation", "m", Syntax::Const,
 	      "Heigh above sea level.");
   alist.add ("Elevation", 0.0);
-  syntax.add ("UTM_x", Syntax::Number, Syntax::OptionalConst); // Unused.
-  syntax.add ("UTM_y", Syntax::Number, Syntax::OptionalConst); // Unused.
+  syntax.add ("UTM_x", Syntax::Unknown (), Syntax::OptionalConst,
+	      "X position of weather station."); // Unused.
+  syntax.add ("UTM_y", Syntax::Unknown (), Syntax::OptionalConst,
+	      "Y position of weather station."); // Unused.
 
-  // DryDeposit
-  {
-    Syntax& s = *new Syntax ();
-    AttributeList& a = *new AttributeList ();
-    IM::load_syntax (s, a);
-    // These values change often, and shouldn't have defaults.
-    // a.add ("NH4", 0.6e-6);	// kg/m²/d
-    // a.add ("NO3", 0.3e-6);	// kg/m²/d
-    syntax.add ("DryDeposit", s, Syntax::Const, Syntax::Singleton);
-    alist.add ("DryDeposit", a);
-  }
-  // WetDeposit
-  {
-    Syntax& s = *new Syntax ();
-    AttributeList& a = *new AttributeList ();
-    IM::load_syntax (s, a);
-    // These values change often, and shouldn't have defaults.
-    // a.add ("NO3", 0.6e-6); // kg/m²/mm
-    // a.add ("NH4", 0.9e-6); // kg/m²/mm
-    syntax.add ("WetDeposit", s, Syntax::Const, Syntax::Singleton);
-    alist.add ("WetDeposit", a);
-  }
+  add_submodule<IM> ("DryDeposit", syntax, alist, Syntax::Const, "\
+Dry atmospheric deposition of nitrogen [kg N/year/ha].");
+  add_submodule<IM> ("WetDeposit", syntax, alist, Syntax::Const, "\
+Deposition of nitrogen solutes with precipitation [ppm].");
+
   // Division between Rain and Snow.
-  syntax.add ("T1", Syntax::Number, Syntax::Const);
+  syntax.add ("T1", "dg C", Syntax::Const,
+	      "Below this air temperature all precipitation is snow.");
   alist.add ("T1", -2.0);
-  syntax.add ("T2", Syntax::Number, Syntax::Const);
+  syntax.add ("T2", "dg C", Syntax::Const, 
+	      "Above this air temperature all precipitation is rain.");
   alist.add ("T2", 2.0);
-  syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
 
   // Yearly average temperatures.
-  syntax.add ("average", Syntax::Number, Syntax::Const);
+  syntax.add ("average", "dg C", Syntax::Const,
+	      "Average temperature at this location.");
   alist.add ("average", 7.8);
-  syntax.add ("amplitude", Syntax::Number, Syntax::Const);
+  syntax.add ("amplitude", "dg C", Syntax::Const,
+	      "How much the temperature change during the year.");
   alist.add ("amplitude", 8.5);
-  syntax.add ("omega", Syntax::Number, Syntax::Const);
+  syntax.add ("omega", "d^-1", Syntax::Const,
+	      "Fraction of a full yearly cyclus (2 pi) covered in a day.\n\
+The default value corresponds to Earths orbit around the Sun.\n\
+Martian take note: You must change this for your home planet.");
   alist.add ("omega", 2.0 * M_PI / 365.0);
-  syntax.add ("max_Ta_yday", Syntax::Number, Syntax::Const);
+  syntax.add ("max_Ta_yday", "d", Syntax::Const,
+	      "Julian day where the highest temperature is expected.");
   alist.add ("max_Ta_yday", 209.0);
 
   // Logs.
-  syntax.add ("hourly_air_temperature", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("daily_air_temperature", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("hourly_global_radiation", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("daily_global_radiation", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("daily_extraterrastial_radiation",
-	      Syntax::Number, Syntax::LogOnly);
-  syntax.add ("rain", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("snow", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("cloudiness", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("vapor_pressure", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("wind", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("day_length", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("day_cycle", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("hourly_air_temperature", "dg C", Syntax::LogOnly,
+	      "Temperature this hour.");
+  syntax.add ("daily_air_temperature", "dg C", Syntax::LogOnly,
+	      "Average temperatures this day.");
+  syntax.add ("hourly_global_radiation", "W/m^2", Syntax::LogOnly,
+	      "Global radiation this hour.");
+  syntax.add ("daily_global_radiation", "W/m^2", Syntax::LogOnly,
+	      "Average radiation this day.");
+  syntax.add ("reference_evapotranspiration", "mm/h", Syntax::LogOnly,
+	      "Reference evapotranspiration this hour");
+  syntax.add ("daily_extraterrastial_radiation", "MJ/m^2/d", Syntax::LogOnly,
+	      "Extraterrestrial radiation this day.");
+  syntax.add ("rain", "mm/h", Syntax::LogOnly, "Rain this hour.");
+  syntax.add ("snow", "mm/h", Syntax::LogOnly, "Snow this hour.");
+  syntax.add ("cloudiness", Syntax::None (), Syntax::LogOnly,
+	      "Fraction of sky covered by clouds [0-1].");
+  syntax.add ("vapor_pressure", "Pa", Syntax::LogOnly, "Humidity.");
+  syntax.add ("wind", "m/s", Syntax::LogOnly, "Wind speed.");
+  syntax.add ("day_length", "h", Syntax::LogOnly,
+	      "Number of light hours this day.");
+  syntax.add ("day_cycle", Syntax::None (), Syntax::LogOnly, 
+	      "Fraction of daily radiation received this hour.");
 }
 
 Weather::Weather (const AttributeList& al)

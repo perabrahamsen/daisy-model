@@ -21,6 +21,8 @@ protected:
   virtual void print_submodel_empty (ostream&, const string&, int level) = 0;
   virtual void print_submodel_header (ostream&, const string&, int level) = 0;
   virtual void print_submodel_trailer (ostream&, const string&, int level) = 0;
+  virtual void print_log_header (ostream&, const string&, int level) = 0;
+  virtual void print_log_trailer (ostream&, const string&, int level) = 0;
   virtual void print_sample_ordered (ostream&, const string&, bool seq) = 0;
   virtual void print_sample_entry (ostream&, const string& name, bool seq) = 0;
   virtual void print_sample_header (ostream& out, const string& name) = 0;

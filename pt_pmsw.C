@@ -1439,28 +1439,28 @@ public:
        b2 (al.number ("b2")),
        b3 (al.number ("b3")),
        b4 (al.number ("b4")),
+       alpha_r (al.number ("alpha_r")),
        ndif (al.number ("ndif")),
        c_d (al.number ("c_d")),
        z_0s (al.number ("z_0s")),
        z0_def (al.number ("z0_def")),
        w (al.number ("w")),
        alpha_u (al.number ("alpha_u")),
+       arac (al.number ("arac")),
        alpha_k (al.number ("alpha_k")),
-       alpha_r (al.number ("alpha_r")),
        theta_w (al.number ("theta_w")),
        theta_c (al.number ("theta_c")),
-       rcmin_const (al.number ("rcmin_const")),
-       rcmax (al.number ("rcmax")),
-       tref (al.number ("tref")),
-       zeta (al.number ("zeta")),
-       arac (al.number ("arac")),
-       f3const (al.number ("f3const")),
-       spar (al.number ("spar")),
        tmin (al.number ("tmin")),
        tmax (al.number ("tmax")),
        nu_1 (al.number ("nu_1")),
        nu_2 (al.number ("nu_2")),
        nu_3 (al.number ("nu_3")),
+       rcmin_const (al.number ("rcmin_const")),
+       rcmax (al.number ("rcmax")),
+       tref (al.number ("tref")),
+       zeta (al.number ("zeta")),
+       f3const (al.number ("f3const")),
+       spar (al.number ("spar")),
        dt1 (al.number ("dt1")),
        dt2 (al.number ("dt2")),
        acc (al.number ("acc"))
@@ -2133,6 +2133,7 @@ static struct PT_PMSWSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "Penman-Monteith and Shuttleworth-Wallace");
       PT::load_syntax (syntax, alist);
 #if 1
 syntax.add ("netrad_brunt", "W/m**2", Syntax::LogOnly,

@@ -698,7 +698,10 @@ static struct ParserFileSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      syntax.add ("where", Syntax::String, Syntax::Const);
+      alist.add ("description", 
+		 "Read Daisy a setup file containing lots of parentheses.");
+      syntax.add ("where", Syntax::String, Syntax::Const,
+		  "File to read from.");
       syntax.order ("where");
       Librarian<Parser>::add_type ("file", alist, syntax, &make);
     }

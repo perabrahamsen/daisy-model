@@ -7,6 +7,7 @@
 #include "harvest.h"
 #include "log.h"
 #include "filter.h"
+#include "submodel.h"
 #include <deque>
 
 struct Vegetation::Implementation
@@ -503,6 +504,8 @@ Vegetation::initialize (const Geometry& geometry,
 void
 Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+    alist.add ("submodel", "Vegetation");
+    alist.add ("description", "Keep track of all crops on the field.");
     syntax.add ("crops", Librarian<Crop>::library (), 
 		Syntax::Sequence,
 		"List of crops growing in the field");
@@ -540,3 +543,6 @@ Vegetation::Vegetation (const AttributeList& al)
 
 Vegetation::~Vegetation ()
 { delete &impl; }
+
+static Submodel::Register vegetation_submodel ("Vegetation", 
+					       Vegetation::load_syntax);

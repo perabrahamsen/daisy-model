@@ -16,6 +16,7 @@
 #include "mathlib.h"
 #include "csmp.h"
 #include "common.h"
+#include "submodel.h"
 
 // G++ 2.7.2 has `accumulate' here.
 #include <algorithm>
@@ -168,13 +169,19 @@ OrganicMatter::Implementation::Buffer::load_syntax (Syntax& syntax,
 						    AttributeList& alist)
 {
   const vector<double> empty_vector;
-  syntax.add ("C", Syntax::Number, Syntax::State, Syntax::Sequence);
+  syntax.add ("C", "g C/cm^3", Syntax::State, Syntax::Sequence,
+	      "Buffer carbon content.");
   alist.add ("C", empty_vector);
-  syntax.add ("N", Syntax::Number, Syntax::State, Syntax::Sequence);
+  syntax.add ("N", "g N/cm^3", Syntax::State, Syntax::Sequence,
+	      "Buffer nitrogen content.");
   alist.add ("N", empty_vector);
-  syntax.add ("turnover_rate", Syntax::Number, Syntax::Const);
+  syntax.add ("turnover_rate", "h^-1", Syntax::Const,
+	      "Turover rate from buffer into SOM.");
   alist.add ("turnover_rate", 1.0);
-  syntax.add ("where", Syntax::Integer, Syntax::Const);
+  syntax.add ("where", Syntax::Integer, Syntax::Const,
+	      "The SOM pool to move the buffer content into.\n\
+The first and slow SOM pool is numbered `0', the second and faster\n\
+is numbered `1'.");
   alist.add ("where", 1);
 }
 
@@ -887,32 +894,47 @@ template class add_submodule_sequence<OM>;
 void
 OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  alist.add ("submodel", "OrganicMatter");
+  alist.add ("description", "\
+Mineralization and immobilization in soil.  Hansen et.al. 1991.");
   syntax.add_check (check_alist);
-  syntax.add ("active_underground", Syntax::Boolean, Syntax::Const);
+  syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
+Set this flag to turn on mineralization below the root zone.");
   alist.add ("active_underground", false);
-  syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const);
+  syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
+Clear this flag to turn off mineralization in groundwater.");
   alist.add ("active_groundwater", true);
-  syntax.add ("K_NH4", Syntax::Number, Syntax::Const);
+  syntax.add ("K_NH4", "h^-1", Syntax::Const, 
+	      "Maximal immobilization rate for ammonium.");
   alist.add ("K_NH4", 0.020833); // 0.5 / 24.
-  syntax.add ("K_NO3", Syntax::Number, Syntax::Const);
+  syntax.add ("K_NO3", "h^-1", Syntax::Const, 
+	      "Maximal immobilization rate for nitrate.");
   alist.add ("K_NO3", 0.020833); // 0.5 / 24.
-  syntax.add ("NO3_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  syntax.add ("NH4_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  syntax.add ("total_C", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("total_N", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("CO2", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  syntax.add ("am", Librarian<AM>::library (),
-	      Syntax::State, Syntax::Sequence);
+  syntax.add ("NO3_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
+Mineralization this time step (negative numbers mean immobilization).");
+  syntax.add ("NH4_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
+Mineralization this time step (negative numbers mean immobilization).");
+  syntax.add ("total_C", "g C/cm^2", Syntax::LogOnly,
+	      "Total organic C in the soil.");
+  syntax.add ("total_N", "g N/cm^2", Syntax::LogOnly,
+	      "Total organic N in the soil.");
+  syntax.add ("CO2", "g CO2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "CO2 evolution.");
+  syntax.add ("am", Librarian<AM>::library (), Syntax::Sequence, 
+	      "Added organic matter pools.");
   vector<AttributeList*> am_sequence;
   alist.add ("am", am_sequence);
-  add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
+  add_submodule<Implementation::Buffer> ("buffer", syntax, alist,
+					 Syntax::State,
+					 "Buffer between AOM pools and SOM.");
 
   // Create defaults for som and smb.
   Syntax om_syntax;
   AttributeList om_alist;
   OM::load_syntax (om_syntax, om_alist);
 
-  add_submodule_sequence<OM> ("smb", syntax, Syntax::State);
+  add_submodule_sequence<OM> ("smb", syntax, Syntax::State,
+			      "Soil microbiomass pools.");
   vector<AttributeList*> SMB;
   AttributeList& SMB1 = *new AttributeList (om_alist);
   vector<double> SMB1_C_per_N;
@@ -982,8 +1004,10 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   
   Syntax& layer_syntax = *new Syntax ();
   AttributeList& layer_alist = *new AttributeList ();
-  layer_syntax.add ("end", Syntax::Number, Syntax::Const);
-  layer_syntax.add ("weight", Syntax::Number, Syntax::Const); // Kg C/m²
+  layer_syntax.add ("end", "cm", Syntax::Const,
+		    "End point of this layer (a negative number).");
+  layer_syntax.add ("weight", "kg C/m^2", Syntax::Const,
+		    "organic carbon content of this layer.");
   layer_syntax.order ("end", "weight");
   syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
 	      "Layered initialization of soil SOM content.");
@@ -992,10 +1016,15 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);
   syntax.add ("water_turnover_factor", Syntax::CSMP, Syntax::Const);
 #endif
-  syntax.add ("min_AM_C", Syntax::Number, Syntax::Const);
+  syntax.add ("min_AM_C", "g C/m^2", Syntax::Const, 
+	      "Minimal amount of carbon in AOM ensuring it is not removed.");
   alist.add ("min_AM_C", 0.5);
   //  We require 5 kg C / Ha in order to keep an AM dk:pulje.
-  syntax.add ("min_AM_N", Syntax::Number, Syntax::Const);
+  syntax.add ("min_AM_N", "g N/m^2", Syntax::Const, 
+	      "Minimal amount of nitrogen in AOM ensuring it is not removed.");
   // We require ½ kg N / Ha in order to keep an AM dk:pulje.
   alist.add ("min_AM_N", 0.05);
 }
+
+static Submodel::Register 
+organic_matter_submodel ("OrganicMatter", OrganicMatter::load_syntax);

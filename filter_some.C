@@ -205,12 +205,14 @@ static struct FilterSomeSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     Syntax& entry_syntax = *new Syntax ();
-    entry_syntax.add ("name", Syntax::String, Syntax::Const);
-    entry_syntax.add ("filter", 
-		      Librarian<Filter>::library (), 
-		      Syntax::OptionalConst);
+    entry_syntax.add ("name", Syntax::String, Syntax::Const,
+		      "Name of attribute to include.");
+    entry_syntax.add ("filter", Librarian<Filter>::library (),
+		      Syntax::OptionalConst, Syntax::Singleton,
+		      "Filter to use for the attribute.");
     entry_syntax.order ("name", "filter");
-    syntax.add ("members", entry_syntax, Syntax::Const, Syntax::Sequence);
+    syntax.add ("members", entry_syntax, Syntax::Const, Syntax::Sequence,
+		"Selects which attributes to log.");
     syntax.order ("members");
     Librarian<Filter>::add_type ("some", alist, syntax, &FilterSome::make);
   }

@@ -107,10 +107,15 @@ HydraulicM_BaCSyntax::HydraulicM_BaCSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
+  alist.add ("description", 
+	     "Brooks and Corey retention curve model with Mualem theory.");
   Hydraulic::load_syntax (syntax, alist);
-  syntax.add ("lambda", Syntax::Number, Syntax::Const);
-  syntax.add ("h_b", Syntax::Number, Syntax::Const);
-  syntax.add ("K_sat", Syntax::Number, Syntax::Const);
+  syntax.add ("lambda", Syntax::None (), Syntax::Const,
+	      "Pore size index.");
+  syntax.add ("h_b", "cm", Syntax::Const,
+	      "Bubling pressure.");
+  syntax.add ("K_sat", "cm/h", Syntax::Const,
+	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("M_BaC", alist, syntax, 
 				  &HydraulicM_BaC::make);

@@ -52,8 +52,12 @@ static struct ConditionCropSyntax
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
-	syntax.add ("crop", Syntax::String, Syntax::Const);
-	syntax.add ("ds", Syntax::Number, Syntax::Const);
+	alist.add ("description", "\
+True iff the crop has reached development stage `ds'.");
+	syntax.add ("crop", Syntax::String, Syntax::Const,
+		    "Name of crop on the field to test.");
+	syntax.add ("ds", Syntax::None (), Syntax::Const,
+		    "Development stage [-1.0:2.0].");
 	syntax.order ("crop", "ds");
 	Librarian<Condition>::add_type ("crop_ds_after",
 					alist, syntax, &make_ds);
@@ -61,8 +65,13 @@ static struct ConditionCropSyntax
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
-	syntax.add ("crop", Syntax::String, Syntax::Const);
-	syntax.add ("weight", Syntax::Number, Syntax::Const);
+	alist.add ("description", "\
+True iff the crop has reached the specified amount of dry matter.");
+	syntax.add ("crop", Syntax::String, Syntax::Const,
+		    "Name of crop on the field to test.");
+	syntax.add ("weight", "kg DM/ha", Syntax::Const,
+		    "\
+Amount of non-root dry-matter required for the condition to be true.");
 	syntax.order ("crop", "weight");
 	Librarian<Condition>::add_type ("crop_dm_over",
 					alist, syntax, &make_dm);

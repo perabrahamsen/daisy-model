@@ -7,6 +7,7 @@
 #include "soil_water.h"
 #include "organic_matter.h"
 #include "log.h"
+#include "submodel.h"
 
 void 
 SoilChemical::uptake (const Soil& soil, 
@@ -63,6 +64,8 @@ void
 SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Solute::load_syntax (syntax, alist); 
+  alist.add ("submodel", "SoilChemical");
+  alist.add ("description", "Chemical solute in soil.");
   syntax.add ("uptaken", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Amount uptaken by crops in this time step.");
   syntax.add ("decomposed", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -91,3 +94,6 @@ SoilChemical::SoilChemical (const Chemical& chem)
   : Solute (chem.solute_alist ()),
     chemical (chem)
 { }
+
+static Submodel::Register soil_chemical_submodel ("SoilChemical",
+						  SoilChemical::load_syntax);

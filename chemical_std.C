@@ -117,7 +117,8 @@ static struct ChemicalStandardSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Read chemical properties as normal Daisy parameters.");
-      syntax.add ("crop_uptake_reflection_factor", "[0-1]", Syntax::Const,
+      syntax.add ("crop_uptake_reflection_factor", 
+		  Syntax::None (), Syntax::Const,
 		  "How much of the chemical is reflexted at crop uptake.");
       syntax.add ("canopy_dissipation_rate_coefficient", "h^-1", Syntax::Const,
 		  "How fast does the chemical dissipate on canopy.");

@@ -34,6 +34,7 @@ public:
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
+  Harvest (const AttributeList& al);
   Harvest (string col, Time t, string crp, 
 	   double sC, double sN, double lC, double lN, 
 	   double oC, double oN,

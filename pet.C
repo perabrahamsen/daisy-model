@@ -42,8 +42,10 @@ Pet::output (Log& log, Filter& filter) const
 void 
 Pet::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("wet", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("dry", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("wet", "mm/h", Syntax::LogOnly, 
+	      "Potential evapotranspiration for a wet system.");
+  syntax.add ("dry", "mm/h", Syntax::LogOnly, 
+	      "Potential evapotranspiration for a dry system.");
 }
 
 Pet::Pet (const AttributeList& al)
