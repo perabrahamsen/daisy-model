@@ -356,7 +356,6 @@ endif
 
 daisy${EXT}:	main${OBJ} $(DAISYSO)
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
-endif
 
 # Create manager test executable.
 #
