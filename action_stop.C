@@ -3,12 +3,12 @@
 #include "action.h"
 #include "syntax.h"
 #include "alist.h"
+#include "daisy.h"
 
 class ActionStop : public Action
 {
 public:
     void doIt (Daisy&) const;
-    bool stop () const;
 
   // Create and Destroy.
 private:
@@ -20,15 +20,9 @@ public:
 };
 
 void 
-ActionStop::doIt (Daisy&) const
+ActionStop::doIt (Daisy& daisy) const
 {
-  assert (false);
-}
-
-bool
-ActionStop::stop () const
-{ 
-  return true;
+  daisy.running = false;
 }
 
 ActionStop::ActionStop (const AttributeList&)

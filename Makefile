@@ -2,12 +2,12 @@
 
 SHELL = /bin/sh
 CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -frepo -pipe # -O2 -fhandle-exceptions -pipe -fno-implicit-templates
-SRCONLY = column_std.o manager_rule.o weather_simple.o uzrichard.o \
+SRCONLY = column_std.o  weather_simple.o uzrichard.o \
 	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
 	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o \
 	crop_std.o action_sow.o action_stop.o condition_time.o \
-	condition_logic.o log_file.o 
-OBJECTS = main.o daisy.o parser.o log.o weather.o manager.o column.o crop.o \
+	condition_logic.o log_file.o action_irrigate.o action_lisp.o
+OBJECTS = main.o daisy.o parser.o log.o weather.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o time.o uzmodel.o parser_file.o \
 	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
@@ -19,7 +19,7 @@ HEAD = $(OBJECTS:.o=.h) common.h
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = input.C input.h
+REMOVE = input.C input.h manager_rule.o manager.o 
 
 .SUFFIXES:	.C .o .h
 
@@ -161,10 +161,15 @@ crop_std.o: crop_std.C crop.h log.h time.h csmp.h bioclimate.h \
  soil.h horizon.h soil_heat.h
 action_sow.o: action_sow.C action.h daisy.h time.h column.h crop.h \
  syntax.h alist.h common.h
-action_stop.o: action_stop.C action.h syntax.h alist.h common.h
+action_stop.o: action_stop.C action.h syntax.h alist.h common.h \
+ daisy.h time.h
 condition_time.o: condition_time.C condition.h time.h syntax.h alist.h \
  common.h daisy.h
 condition_logic.o: condition_logic.C condition.h syntax.h alist.h \
  common.h
 log_file.o: log_file.C log.h condition.h filter.h csmp.h time.h \
  alist.h common.h syntax.h
+action_irrigate.o: action_irrigate.C action.h daisy.h time.h weather.h \
+ column.h syntax.h alist.h common.h
+action_lisp.o: action_lisp.C action.h daisy.h time.h column.h \
+ condition.h syntax.h alist.h common.h

@@ -6,7 +6,7 @@
 #include "time.h"
 #include <vector.h>
 
-class Manager;
+class Action;
 class Weather;
 class Groundwater;
 class Log;
@@ -19,9 +19,10 @@ class Daisy
 {
   // Content.
 public:
+  bool running;
   const vector<Log*>& logs;
   Time time;
-  Manager& manager;
+  Action& action;
   Weather& weather;
   Groundwater& groundwater;
   ColumnList& columns;

@@ -40,15 +40,16 @@ private:
   // Actions.
 public:
   void sow (const AttributeList& crop);
+  void irrigate (double flux, double temp);
+
+  // Simulation.
+public:
+  void tick (const Time&, const Weather&, Groundwater&);
 
   bool check () const;
   void output (Log&, const Filter&) const;
 private:
   void output_crops (Log& log, const Filter& filter) const;
-
-  // Simulation.
-public:
-  void tick (const Time&, const Weather&, Groundwater&);
 
   // Create and Destroy.
 private:
@@ -69,6 +70,12 @@ ColumnStandard::sow (const AttributeList& crop)
     cerr << "Cannot sow incomplete crop `" << name << "'\n";
   else
     crops.push_back (Crop::create (crop, soil.size ()));
+}
+
+void
+ColumnStandard::irrigate (const double flux, const double temp)
+{
+  bioclimate.Irrigate (flux, temp);
 }
 
 bool

@@ -24,12 +24,13 @@ public:
   // Actions.
 public:
   virtual void sow (const AttributeList& crop) = 0;
-
-  virtual bool check () const = 0;
-  virtual void output (Log&, const Filter&) const = 0;
+  virtual void irrigate (double flux, double temp) = 0;
 
   // Simulation.
   virtual void tick (const Time&, const Weather&, Groundwater&) = 0;
+
+  virtual bool check () const = 0;
+  virtual void output (Log&, const Filter&) const = 0;
 
   // Library.
 public:

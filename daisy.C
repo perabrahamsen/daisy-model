@@ -1,7 +1,6 @@
 // daisy.C
 
 #include "daisy.h"
-#include "manager.h"
 #include "weather.h"
 #include "groundwater.h"
 #include "horizon.h"
@@ -19,9 +18,10 @@
 #include <iostream.h>
 
 Daisy::Daisy (const AttributeList& al)
-  : logs (map_create<Log> (al.list_sequence ("output"))),
+  : running (false),
+    logs (map_create<Log> (al.list_sequence ("output"))),
     time (al.time ("time")),
-    manager (Manager::create (al.list ("chief"))),
+    action (Action::create (al.list ("manager"))),
     weather (Weather::create (time, al.list ("weather"))), 
     groundwater (Groundwater::create (time, al.list ("groundwater"))), 
     columns (*new ColumnList (al.list_sequence ("field")))
@@ -41,17 +41,10 @@ Daisy::Daisy (const AttributeList& al)
 void 
 Daisy::run ()
 { 
-  while (true)
+  running = true;
+
+  while (running)
     {
-      const Action* action = manager.action (*this);
-	    
-      if (action->stop ())
-	{
-	  if (time.hour () != 0)
-	    cout << "\n";
-	  break;
-	}
-	    
       switch (time.hour ())
 	{
 	case 0:
@@ -65,7 +58,7 @@ Daisy::run ()
 	  cout << " " << time.hour () << "\n";
 	  break;
 	}
-      action->doIt (*this);
+      action.doIt (*this);
 
       weather.tick ();
       for (ColumnList::iterator i = columns.begin ();
@@ -101,6 +94,8 @@ Daisy::run ()
 	}
       time.tick ();
     }
+  if (time.hour () != 0)
+    cout << "\n";
 }
 
 void
@@ -109,13 +104,12 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add_class ("crop", Crop::library (), &Crop::derive_type);
   syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
   syntax.add_class ("column", Column::library (), &Column::derive_type);
-  syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
-  syntax.add_class ("log", Log::library (), &Manager::derive_type);
-  syntax.add_class ("parser", Parser::library (), &Manager::derive_type);
+  syntax.add_class ("log", Log::library (), &Log::derive_type);
+  syntax.add_class ("parser", Parser::library (), &Parser::derive_type);
   syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
   syntax.add ("input", Parser::library (), Syntax::Optional, 
 	      Syntax::Singleton);
-  syntax.add ("chief", Manager::library (), Syntax::Const);
+  syntax.add ("manager", Action::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::State);
   syntax.add ("field", Column::library (), Syntax::State, Syntax::Sequence);
   syntax.add ("weather", Weather::library ());
@@ -126,7 +120,7 @@ Daisy::~Daisy ()
 {
   sequence_delete (logs.begin (), logs.end ());
   delete &logs;
-  delete &manager;
+  delete &action;
   delete &weather;
   delete &groundwater;
   delete &columns;

@@ -50,12 +50,6 @@ void
 Action::doIt (Daisy&) const
 { }
 
-bool
-Action::stop () const
-{ 
-  return false;
-}
-
 Action Action::null;
 
 Action::Action ()

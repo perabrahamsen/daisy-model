@@ -132,7 +132,7 @@ ConditionLogicSyntax::ConditionLogicSyntax ()
     syntax.add ("if", Condition::library (), Syntax::Const);
     syntax.add ("then", Condition::library (), Syntax::Const);
     syntax.add ("else", Condition::library (), Syntax::Const);
-    syntax.order ("if");
+    syntax.order ("if", "then", "else");
     Condition::add_type ("if", alist, syntax, &ConditionIf::make);
   }
 }

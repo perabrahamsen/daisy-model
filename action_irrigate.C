@@ -1,0 +1,79 @@
+// action_irrigate.C
+
+#include "action.h"
+#include "daisy.h"
+#include "weather.h"
+#include "column.h"
+#include "syntax.h"
+#include "alist.h"
+#include "common.h"
+#include <iostream.h>
+
+class ActionIrrigate : public Action
+{
+public:
+  static const double at_air_temperature = -500;
+
+private:
+  const double flux;
+  const double temp;
+
+public:
+  void doIt (Daisy&) const;
+
+  // Create and Destroy.
+private:
+  friend class ActionIrrigateSyntax;
+  static Action& make (const AttributeList&);
+  ActionIrrigate (const AttributeList&);
+public:
+  ~ActionIrrigate ();
+};
+
+const double ActionIrrigate::at_air_temperature;
+
+void 
+ActionIrrigate::doIt (Daisy& daisy) const
+{
+  const double t = ((temp == at_air_temperature) 
+		    ? daisy.weather.AirTemperature ()
+		    : temp);
+  cout << " [Irrigating]";
+  
+  ColumnList& cl = daisy.columns;
+  for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
+    {
+      (*i)->irrigate (flux, t);
+    }
+}
+
+ActionIrrigate::ActionIrrigate (const AttributeList& al)
+  : flux (al.number ("flux")),
+    temp (al.number ("temperature"))
+{ }
+
+ActionIrrigate::~ActionIrrigate ()
+{ }
+
+// Add the ActionIrrigate syntax to the syntax table.
+Action&
+ActionIrrigate::make (const AttributeList& al)
+{
+  return *new ActionIrrigate (al);
+}
+
+static struct ActionIrrigateSyntax
+{
+  ActionIrrigateSyntax ();
+} ActionIrrigate_syntax;
+
+ActionIrrigateSyntax::ActionIrrigateSyntax ()
+{ 
+  Syntax& syntax = *new Syntax ();
+  AttributeList& alist = *new AttributeList ();
+  syntax.add ("flux", Syntax::Number, Syntax::Const);
+  syntax.order ("flux");
+  syntax.add ("temperature", Syntax::Number, Syntax::Const);
+  alist.add ("temperature", ActionIrrigate::at_air_temperature);
+  Action::add_type ("irrigate", alist, syntax, &ActionIrrigate::make);
+}

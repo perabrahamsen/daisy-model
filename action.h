@@ -15,7 +15,6 @@ class Action
   // Simulation.
 public:
   virtual void doIt (Daisy&) const;
-  virtual bool stop () const;
   static Action null;
 
   // Library.
