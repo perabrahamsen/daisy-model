@@ -1,4 +1,5 @@
-(defcrop "S.Beet" default
+(defcrop "Sugar Beet" default
+    (description "Køge Project")
   (Devel (EmrTSum  125)
       (DS_Emr   0.01)
       (DSRate1  0.007)
@@ -10,7 +11,7 @@
   )
       (DSRate2  0.007)
       (TempEff2 
-            (0.00  1.000)      )
+            (0.00  1.000)      (30.00 1.000))
   )
   (LeafPhot (Fm 3.80)
       (Qeff   0.0560)
@@ -20,8 +21,8 @@
    )
   (Canopy (InitGrowth 4.00)
       (DSinit   0.25)
-      (WLfInit     1)
-      (SpLAI    15.000)
+      (WLfInit    30)
+      (SpLAI     0.015)
       (LAIDist0 0.00 1.00 1.00)
       (LAIDist1 0.10 0.80 1.00)
       (PARref   0.06)
