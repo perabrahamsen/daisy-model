@@ -32,7 +32,8 @@ main (int argc, char* argv[])
   daisy_parser_load (parser, alist);
   
   /* Check the result. */
-  if (!daisy_syntax_check (syntax, alist, "daisy"))
+  if (!daisy_syntax_check (syntax, alist, "daisy")
+      || daisy_parser_error_count (parse) > 0)
     return 1;
 
   /* Create, check and run the simulation. */

@@ -171,8 +171,8 @@ UZlr::tick (const Soil& soil,
 void
 UZlr::output (Log& log, Filter& filter) const
 {
-  log.output ("q_up", filter, q_up);
-  log.output ("q_down", filter, q_down);
+  log.output ("q_up", filter, q_up, true);
+  log.output ("q_down", filter, q_down, true);
 }
 
 UZlr::UZlr (const AttributeList& al)

@@ -318,7 +318,7 @@ UZRichard::richard (const Soil& soil,
 		  assert (real_top_q < 0);
 
 		  if (delta_top_water > - real_top_q * ddt * 1.001)
-		    // We can't retrieve water this fast fromthe flux top.
+		    // We can't retrieve water this fast from the flux top.
 		    {
 		      top.flux_top_on ();
 		      accepted = false;
@@ -546,9 +546,9 @@ UZRichard::tick (const Soil& soil,
 void
 UZRichard::output (Log& log, Filter& filter) const
 {
-  log.output ("q_up", filter, q_up);
-  log.output ("q_down", filter, q_down);
-  log.output ("iterations", filter, iterations);
+  log.output ("q_up", filter, q_up, true);
+  log.output ("q_down", filter, q_down, true);
+  log.output ("iterations", filter, iterations, true);
 }
 
 UZRichard::UZRichard (const AttributeList& al)

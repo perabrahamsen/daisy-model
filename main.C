@@ -44,7 +44,7 @@ main (int argc, char* argv[])
   parser.load (alist);
 
   // Check the result.
-  if (!syntax.check (alist, "daisy"))
+  if (!syntax.check (alist, "daisy") || parser.error_count () > 0)
     return 1;
 
   // Create, check and run the simulation.

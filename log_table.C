@@ -16,21 +16,25 @@ struct LogEntry
   Condition* condition;		// Should we accumulate now?
   const vector<string> path;	// Content of this entry.
   string tag;			// Name of this entry.
+  const string dimension;	// Physical dimension of this entry.
+  const string description;	// Description of this entry.
   const string missing_value;	// What to print on missing values.
 
   // Calculation parameters.
   const int start_year;		// For gnuplot time.
   const double factor;		// Convert value.
   const double offset;		// - || -
-  const double from;		// Restrict interval of array.
-  const double to;
+  /* const */ double from;	// Restrict interval of array.
+  /* const */ double to;
   const double at;		// Specific position in array.
   const bool accumulate;	// Accumulate numbers over time.
+  const bool full;		// Print out total array.
 
   // Permanent state.
-  double value;		// Total accumulated value.
+  double value;		        // Total accumulated value.
   int count;			// Number of accumulated values.
   bool error;			// If an error occured.
+  vector<double> full_value;	// Total array.
 
   // Intermediate state.
   unsigned int current_path_index;// How nested in open's we are.
@@ -139,7 +143,21 @@ struct LogEntry
       open (name);
       if (current_path_index == last_valid_path_index)
 	{
-	  if (geometry)
+	  if (full)
+	    {
+	      if (count == 0)
+		full_value = array;
+	      else 
+		{
+		  if (array.size () > full_value.size ())
+		    full_value.insert (full_value.end (), 
+				       full_value.size () - array.size (),
+				       0.0);
+		  for (unsigned int i = 0; i < array.size (); i++)
+		    full_value[i] += array[i];
+		}
+	    }
+	  else if (geometry)
 	    {
 	      if (at <= 0)
 		value += array[geometry->interval_plus (at)];
@@ -186,11 +204,23 @@ struct LogEntry
 	out << "!";
       else if (count == 0)
 	out << missing_value;
+      else if (full)
+	{
+	  for (unsigned int i = 0; i < full_value.size (); i++)
+	    {
+	      if (i != 0)
+		out << " ";
+	      out << (full_value[i] * factor + offset);
+	    }
+	  if (!accumulate)
+	    fill (full_value.begin (), full_value.end (), 0.0);
+	}
       else
-	out << (value * factor + offset);
-
-      if (!accumulate)
-	value = 0.0;
+	{
+	  out << (value * factor + offset);
+	  if (!accumulate)
+	    value = 0.0;
+	}
       count = 0;
       error = false;
     }
@@ -200,6 +230,8 @@ struct LogEntry
 		 ? &Librarian<Condition>::create (al.alist ("when"))
 		 : NULL),
       path (al.name_sequence ("path")),
+      dimension (al.name ("dimension")),
+      description (al.name ("description")),
       missing_value (al.name ("missing_value")),
       start_year (al.integer ("start_year")),
       factor (al.number ("factor")),
@@ -208,6 +240,7 @@ struct LogEntry
       to (al.number ("to")),
       at (al.number ("at")),
       accumulate (al.flag ("accumulate")),
+      full (al.flag ("full")),
       value (al.number ("value")),
       count (al.integer ("count")),
       error (false),
@@ -242,6 +275,7 @@ struct LogTable : public Log, public Filter
     }
 
   // Content.
+  const string description;	// Description of table.
   string file;			// Filename.
   ofstream out;			// Output stream.
   Condition& condition;	// Should we print a log now?
@@ -249,8 +283,13 @@ struct LogTable : public Log, public Filter
   vector<LogEntry*> entries;
 
   // Display.
-  bool print_tags;		// Show tags on first line?
-  bool flush;			// Flush after each time step.
+  const bool print_tags;	// Show tags on first line?
+  const bool print_dimension;	// Show dimensions in next line?
+  const bool flush;		// Flush after each time step.
+
+  // Default Range.
+  const double from;		// Sum arrays from here...
+  const double to;		// to here.
 
   // Checking to see if we should log this time step.
   Filter& match (const Frame& frame, const Daisy& daisy)
@@ -351,6 +390,7 @@ struct LogTable : public Log, public Filter
 
   LogTable (const AttributeList& al)
     : Log (),
+      description (al.name ("description")),
       file (al.name ("where")),
 #ifdef BORLAND_PERMISSIONS
       out (file.c_str (), ios::out|ios::trunc, 0666),
@@ -360,8 +400,24 @@ struct LogTable : public Log, public Filter
       condition (Librarian<Condition>::create (al.alist ("when"))),
       entries (map_construct<LogEntry> (al.alist_sequence ("entries"))),
       print_tags (al.flag ("print_tags")),
-      flush (al.flag ("flush"))
+      print_dimension (al.flag ("print_dimension")),
+      flush (al.flag ("flush")),
+      from (al.number ("from")),
+      to (al.number ("to"))
     {
+      // You can set the print range from here.
+      for (unsigned int i = 0; i < entries.size (); i++)
+	{
+	  if (from <= 0.0 && entries[i]->from > 0.0)
+	    entries[i]->from = from;
+	  if (to <= 0.0 && entries[i]->to > 0.0)
+	    entries[i]->to = to;
+	}
+      
+      if (description.size () > 0)
+	// Print description in start of file.
+	out << description << "\n";
+
       if (print_tags)
 	{
 	  // Print the entry names in the first line of the log file..
@@ -376,6 +432,21 @@ struct LogTable : public Log, public Filter
 	    }
 	  out << "\n";
 	}
+      if (print_dimension)
+	{
+	  // Print the entry names in the first line of the log file..
+	  bool first = true;
+	  for (unsigned int i = 0; i < entries.size (); i++)
+	    {
+	      if (first)
+		first = false;
+	      else
+		out << "\t";
+	      out << entries[i]->dimension;
+	    }
+	  out << "\n";
+	}
+	
     }
 
   ~LogTable ()
@@ -398,12 +469,18 @@ static struct LogTableSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      syntax.add ("description", Syntax::String, Syntax::Const);
+      alist.add ("description", "");
       syntax.add ("where", Syntax::String, Syntax::Const);
       syntax.add ("when", Librarian<Condition>::library (), Syntax::Const);
       
       Syntax& entry_syntax = *new Syntax ();
       AttributeList& entry_alist = *new AttributeList ();
       entry_syntax.add ("tag", Syntax::String, Syntax::Optional);
+      entry_syntax.add ("dimension", Syntax::String, Syntax::Const);
+      entry_alist.add ("dimension", "");
+      entry_syntax.add ("description", Syntax::String, Syntax::Const);
+      entry_alist.add ("description", "");
       entry_syntax.add ("path", Syntax::String, Syntax::Const, 
 			Syntax::Sequence);
       entry_syntax.add ("missing_value", Syntax::String, Syntax::Const);
@@ -424,6 +501,8 @@ static struct LogTableSyntax
       entry_alist.add ("at", 1.0);
       entry_syntax.add ("accumulate", Syntax::Boolean, Syntax::Const);
       entry_alist.add ("accumulate", false);
+      entry_syntax.add ("full", Syntax::Boolean, Syntax::Const);
+      entry_alist.add ("full", false);
       entry_syntax.add ("value", Syntax::Number, Syntax::State);
       entry_alist.add ("value", 0.0);
       entry_syntax.add ("count", Syntax::Integer, Syntax::State);
@@ -433,8 +512,14 @@ static struct LogTableSyntax
       
       syntax.add ("print_tags", Syntax::Boolean, Syntax::Const);
       alist.add ("print_tags", true);
+      syntax.add ("print_dimension", Syntax::Boolean, Syntax::Const);
+      alist.add ("print_dimension", true);
       syntax.add ("flush", Syntax::Boolean, Syntax::Const);
       alist.add ("flush", false);
+      syntax.add ("from", Syntax::Number, Syntax::Const);
+      alist.add ("from", 0.0);
+      syntax.add ("to", Syntax::Number, Syntax::Const);
+      alist.add ("to", 1.0);
 
       Librarian<Log>::add_type ("table1", alist, syntax, &make);
     }

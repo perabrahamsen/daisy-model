@@ -170,7 +170,7 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	adsorbtion_freundlich.C adsorbtion_linear.C adsorbtion_langmuir.C \
 	filter_checkpoint.C bioclimate_std.C condition_crop.C \
 	condition_soil.C log_table.C log_checkpoint.C weather_hourly.C \
-	bioclimate_PM.C uznone.C
+	bioclimate_PM.C uznone.C condition_daisy.C
 
 # Select the C files with a corresponding header file from the library.
 #

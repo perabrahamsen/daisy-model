@@ -339,6 +339,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
     {
       error (string ("Unknown superclass `") + type + "'");
       alist = new AttributeList ();
+      alist->add ("type", "error");
     }
   if (skipped)
     skip (")");
@@ -499,7 +500,8 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		  {
 		    AttributeList& al = load_derived (lib, true);
 		    const string obj = al.name ("type");
-		    lib.syntax (obj).check (al, obj);
+		    if (obj != "error")
+		      lib.syntax (obj).check (al, obj);
 		    sequence.push_back (&al);
 		  }
 		atts.add (name, sequence);

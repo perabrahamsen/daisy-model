@@ -1,3 +1,46 @@
+1998-05-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.027 released.
+
+1998-05-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* main.C (main): Don't try to create Daisy if there were parser
+	errors. 
+	* cmain.c (main): Ditto.
+
+	* surface.C (load_syntax): Define `total_matter_flux'.
+	(accept_top): Use it.
+	(Surface): Initialize it.
+	* surface.h (class Surface): Define it.
+	* uznone.C (tick): Call `top.accept_top'.
+	* transport_cd.C (tick): Support stuff flux without water flux.
+
+	* uzrichard.C (output): Mark output as log only.
+	* uzlr.C (output): Ditto.
+
+	* log_table.C: Added `dimension' and `description' parameters.
+
+	* log_table.C (struct LogEntry): Made `from' and `to' non-const.
+	(struct LogTable): Add `from' and `to' parameters.
+	(LogTable::LogTable): Overwrite `from' and `to' for entries if
+	specified. 
+	(LogTableSyntax): Add `from' and `to' parameters.
+
+	* log_table.C (LogEntry::full): New member.
+	(LogEntry::full_value): Ditto.
+	(LogEntry::output): Update it.
+	(LogEntry::done): Print it.
+	(LogEntry::LogEntry): Initialize it.
+	(LogTableSyntax): Define it.
+
+	* parser_file.C (load_derived): Add "error" type if the superclass
+	is not found.
+	(load_list): Check for "error" type.
+	* syntax.C (check): Ditto.
+
+	* condition_daisy.C: New file.
+	* Makefile (COMPONENTS): Added.
+
 1998-05-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.026 released.

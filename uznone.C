@@ -28,7 +28,7 @@ public:
 
 public:
   void tick (const Soil& /* soil */,
-	     int first, UZtop& /* top */, 
+	     int first, UZtop& top, 
 	     int last, UZbottom& bottom, 
 	     const vector<double>& /* S */,
 	     const vector<double>& h_old,
@@ -37,6 +37,10 @@ public:
 	     vector<double>& Theta,
 	     vector<double>& q)
     {
+      // We need to call this to get stuff incorporated from surface.
+      const bool ok = top.accept_top (0.0);
+      assert (ok);
+
       for (int i = first; i <= last; i++)
 	{
 	  q[i] = 0.0;

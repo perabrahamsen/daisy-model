@@ -12,6 +12,7 @@ struct Soil;
 class Surface : public UZtop
 {
   const double minimal_matter_flux;
+  const bool total_matter_flux;
   const double lake;
   double pond;
   bool flux;

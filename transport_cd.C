@@ -131,6 +131,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   // Or: soil.z (0) - soil.z(1)
 
   double C_top = 0.0;
+  double S_top = 0.0;
   if (J_in > 0.0)
     {
       cerr << "\nBug: Positive J_in (" << J_in << ")\n";
@@ -139,8 +140,13 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   if (J_in != 0.0)
     {
       assert (J_in < 0.0);
-      assert (soil_water.q (0) < 0.0);
-      C_top = J_in / soil_water.q (0);
+
+      if (soil_water.q (0) < 0.0)
+	// Normal condition, stuff is in solute.
+	C_top = J_in / soil_water.q (0);
+      else			
+	// This should only happen if Surface::total_matter_flux.
+	S_top = -J_in / soil.dz (0);
     }
 
   // Find the time step using Courant.
@@ -248,7 +254,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 	c[0] = - D_plus / (2.0 * dz_plus * dz)
 	  - ((1.0 - alpha_plus) * q_plus) / (2.0 * dz);
 	d[0] = (Theta_old[0] * C[0] / (t - old_t)
-		+ S[0]
+		+ S[0] + S_top
 		+ ((D_minus * (C_minus - C[0])) / (2.0 * dz_minus * dz))
 		- ((D_plus * (C[0] - C_plus)) / (2.0 * dz_plus * dz))
 		- (q_minus * (alpha_minus * C_minus
@@ -262,14 +268,6 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 	assert (finite (b[0]));
 	assert (finite (c[0]));
 	assert (finite (d[0]));
-	if (J_in != 0.0)
-	  {
-	    const double q0 = soil_water.q (0);
-	    assert (J_in < 0.0);
-	    assert (q0 < 0.0);
-	    // cerr << "J_in == " << J_in << "\n";
-	    // cerr << "C_in == " << J_in / q0 << "\n";
-	  }
 	d[0] -= a[0] * C_top;
       }
       // Adjust for lower boundary condition.
@@ -303,6 +301,9 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   J[0] = J_in;
   for (unsigned int i = 0; i < size; i++)
     {
+      double S_term = S[i];
+      if (i == 0)
+	S_term += S_top;
       assert (M[i] >= 0.0);
       J[i + 1] = (((M[i] - M_prev[i]) / dt) - S[i]) * soil.dz (i) + J[i];
     }

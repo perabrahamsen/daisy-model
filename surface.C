@@ -44,7 +44,14 @@ Surface::accept_top (double water)
 
   if (pond + water * dt >= - max (fabs (pond), fabs (water)) / 100)
     {
-      if (-water > minimal_matter_flux)
+      if (total_matter_flux)
+	{
+	  IM delta_matter (im, 1.0);
+	  im -= delta_matter;
+	  delta_matter /= dt;
+	  im_flux -= delta_matter;
+	}
+      else if (-water > minimal_matter_flux)
 	{
 	  IM delta_matter (im, (-water * dt) / pond);
 	  im -= delta_matter;
@@ -168,6 +175,8 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("minimal_matter_flux", Syntax::Number, Syntax::Const);
   alist.add ("minimal_matter_flux", 1.0e-10);
+  syntax.add ("total_matter_flux", Syntax::Boolean, Syntax::Const);
+  alist.add ("total_matter_flux", false);
   syntax.add ("lake", Syntax::Number, Syntax::Const);
   alist.add ("lake", -1.0);
   syntax.add ("pond", Syntax::Number, Syntax::State);
@@ -182,6 +191,7 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 
 Surface::Surface (const AttributeList& al)
   : minimal_matter_flux (al.number ("minimal_matter_flux")),
+    total_matter_flux (al.flag ("total_matter_flux")),
     lake (al.number ("lake")),
     pond (al.number ("pond")),
     flux (al.flag ("flux")),

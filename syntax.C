@@ -66,6 +66,11 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 		    cerr << "Non object found \n";
 		    error = true;
 		  }
+		else if (al.name ("type") == "error")
+		  {
+		    cerr << "Error node found \n";
+		    error = true;
+		  }
 		else if (!lib.syntax (al.name ("type")) .check (al, key))
 		  error = true;
 	      }
