@@ -12,6 +12,18 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.96
+
+** New `cut_stress' factor in the standard crop model.
+
+After a cut production may be delayed for some days, depending on how
+large a fraction that was removed.
+
+(defcrop "Grass with Cut Delay" Grass 
+  (Harvest (cut_delay (0.4 7) (0.8 28))))
+
+** Bug fixes.
+
 * 1.95
 
 ** Bug fixes.

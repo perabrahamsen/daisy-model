@@ -25,6 +25,8 @@
 #include "om.h"
 #include "crop.h"		// for Crop::DSremove.
 #include "harvest.h"
+#include "log.h"
+#include "mathlib.h"
 #include "submodel.h"
 
 #include <numeric>
@@ -67,6 +69,7 @@ Harvesting::operator() (const string& column_name,
   const double NSOrg = production.NSOrg;
   const double NRoot = production.NRoot;
   const double NDead = production.NDead;
+  const double old_DM = production.DM ();
   
   // Find C concentrations.
   const double C_C_Stem = DM_to_C_factor (production.E_Stem);
@@ -118,7 +121,6 @@ Harvesting::operator() (const string& column_name,
   const double Crop_N_Loss 
     = Stem_N_Loss + Dead_N_Loss + Leaf_N_Loss + SOrg_N_Loss;
 
-  // Update crop content.
   production.WStem -= (Stem_W_Yield + Stem_W_Loss);
   production.WDead -= (Dead_W_Yield + Dead_W_Loss);
   production.WLeaf -= (Leaf_W_Yield + Leaf_W_Loss);
@@ -216,6 +218,15 @@ Harvesting::operator() (const string& column_name,
     {
       if (DS > DSnew)
 	DS = DSnew;
+
+      // Cut delay.
+      const double new_DM = production.DM ();
+      const double removed_fraction = 1.0 - new_DM / old_DM;
+      production_delay = cut_delay (removed_fraction);
+      if (!last_cut)
+	last_cut = new Time (time);
+      else
+	*last_cut = time;
     }
   else
     {
@@ -257,9 +268,40 @@ Harvesting::operator() (const string& column_name,
 		       WEYRm, NEYRm, CEYRm, chemicals);
 }
 
+void
+Harvesting::tick (const Time& time)
+{ 
+  if (production_delay < 0.01)
+    cut_stress = 0.0;
+  else
+    {
+      assert (last_cut);
+      const double days_between 
+	= (0.0 + Time::hours_between (*last_cut, time)) / 24.0;
+      assert (days_between >= 0.0);
+      
+      if (days_between >= production_delay)
+	{
+	  cut_stress = 0.0;
+	  production_delay = 0.0;
+	}
+      else
+	{
+	  cut_stress = 1.0 - (exp (M_LN2 / production_delay * days_between)
+			      - 1.0);
+	  assert (cut_stress >= 0.0 && cut_stress <= 1.0);
+	}
+    }
+}
+
 void 
-Harvesting::output (Log&) const
-{ }
+Harvesting::output (Log& log) const
+{ 
+  if (last_cut)
+    log.output ("last_cut", *last_cut);
+  log.output ("production_delay", production_delay);
+  log.output ("cut_stress", cut_stress);
+}
 
 void 
 Harvesting::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -291,6 +333,21 @@ Maximal development stage for which the crop survives harvest.");
   syntax.add ("DSnew", Syntax::None (), Syntax::Const,
 	       "New development stage after harvest.");
   alist.add ("DSnew", 0.20);
+  syntax.add ("last_cut", Syntax::Date, Syntax::OptionalState,
+	      "Date of last cut.  Used for calculating cut delay.");
+  syntax.add ("production_delay", "d", Syntax::State,
+	      "production delay caused by last cut");
+  alist.add ("production_delay", 0.0);
+  syntax.add ("cut_delay", Syntax::Fraction (), "d", Syntax::Const,
+	      "\
+Production delay in days as a function of the fraction of the shoot\n\
+removed by harvest.  By default, there is no production delay.");
+  PLF no_delay;
+  no_delay.add (0.0, 0.0);
+  no_delay.add (1.0, 0.0);
+  alist.add ("cut_delay", no_delay);
+  syntax.add ("cut_stress", Syntax::Fraction (), Syntax::LogOnly,
+	      "Stress induced due to last cut.");
 }
 
 Harvesting::Harvesting (const AttributeList& al)
@@ -304,11 +361,18 @@ Harvesting::Harvesting (const AttributeList& al)
                      ? al.number ("EconomicYield_N")
                      : al.number ("EconomicYield_W")),
     DSmax (al.number ("DSmax")),
-    DSnew (al.number ("DSnew"))
+    DSnew (al.number ("DSnew")),
+    last_cut (al.check ("last_cut") ? new Time (al.time ("last_cut")) : NULL),
+    production_delay (al.number ("production_delay")),
+    cut_delay (al.plf ("cut_delay")),
+    cut_stress (0.0)
 { }
 
 Harvesting::~Harvesting ()
-{ }
+{ 
+  if (last_cut)
+    delete last_cut;
+}
 
 static Submodel::Register 
 soil_submodel ("Harvesting", Harvesting::load_syntax);

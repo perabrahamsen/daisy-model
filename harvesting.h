@@ -22,6 +22,9 @@
 #ifndef HARVESTING_H
 #define HARVESTING_H
 
+#include "time.h"
+#include "plf.h"
+
 #include <vector>
 #include <string>
 using namespace std;
@@ -54,6 +57,11 @@ private:
   const double DSmax;		// Maximal development stage for which
 				// the crop survives harvest.
   const double DSnew;		// Maximal development stage after harvest.
+  Time* last_cut;		// Date of last cut.
+  double production_delay;	// Production delay after cut [d]
+  const PLF cut_delay;		// -||- as function of removed fraction.
+public:
+  double cut_stress;		// Cut induced stress.
 
   // Simulation.
 public:
@@ -72,6 +80,7 @@ public:
 			     const double sorg_harvest_frac,
 			     const bool kill_off,
 			     vector<AM*>& residuals);
+  void tick (const Time& time);
   void output (Log& log) const;
 
   // Create and Destroy.

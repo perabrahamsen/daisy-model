@@ -55,14 +55,6 @@ for weather std, file, hourly, and for hydraulic old, old2
 
 - Automatisk up-to-date med seneste daisy version.
 
-* Checkpoint
-
-Få det til at virke.
-
-* crop_std: RSR
-
-* Test Cygwin compile, specielt høst resultat.
-
 * Daisy new user guide.
 
 * CVS
@@ -119,8 +111,6 @@ Input as well to be consistent.
 
 Consider how this fits into the desired ability to add rules to a
 Manager. 
-
-* Split Crop in submodules the same way as is done with Soil.
 
 * Make CSMP::find use binary search.
 

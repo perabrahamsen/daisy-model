@@ -657,9 +657,9 @@ development${OBJ}: development.C development.h production.h \
 production${OBJ}: production.C production.h crpn.h partition.h \
  organic_matter.h common.h am.h librarian.h library.h alist.h syntax.h \
  treelog.h log.h plf.h message.h submodel.h
-harvesting${OBJ}: harvesting.C harvesting.h production.h am.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h om.h crop.h harvest.h \
- chemicals.h submodel.h
+harvesting${OBJ}: harvesting.C harvesting.h time.h plf.h production.h am.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h om.h crop.h \
+ harvest.h chemicals.h log.h mathlib.h submodel.h
 canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
  log.h librarian.h library.h common.h alist.h syntax.h treelog.h
 canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h \

@@ -1,3 +1,23 @@
+2001-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.96 released.
+
+2001-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (Buffer::tick): Max rate is 1.0.
+
+	* lib/log.dai ("Crop Production"): Log `cut_stress'.
+	* crop_std.C (tick): Use `cut_stress'.
+	* harvesting.C (operator): Set `production_delay' and `last_cut'.
+
+2001-11-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.h, harvesting.C (last_cut): New state variable.
+	(production_delay): New state variable.
+	(cut_delay): New parameter.
+	(cut_stress): New log variable.
+	(tick): New member function.
+	
 2001-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.95 released.
@@ -7,7 +27,7 @@
 	* crop_std.C (harvest): Moved most to `harvesting.C'.
 	* harvesting.C, harvesting.h (operator()): New function.
 
-	* organic_matter.C (tick): Don't apply negative rate.
+	* organic_matter.C (Buffer::tick): Don't apply negative rate.
 
 	* harvesting.C (load_syntax): Removed duplicate definition of
 	"Stem" syntax. 

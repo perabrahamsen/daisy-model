@@ -168,6 +168,9 @@ CropStandard::tick (const Time& time,
 		    SoilNH4* soil_NH4,
 		    SoilNO3* soil_NO3)
 {
+  // Update cut stress.
+  harvesting.tick (time);
+
   // Update partial_soil_temperature and pressure potential.
   development.partial_soil_temperature +=
     soil_heat.T (soil.interval_plus (-root_system.DptEmr));
@@ -248,6 +251,7 @@ CropStandard::tick (const Time& time,
 	Ass *= (1.0 - water_stress);
       if (enable_N_stress)
 	Ass *= (1.0 - nitrogen_stress);
+      Ass *= (1.0 - harvesting.cut_stress);
       production.CanopyAss = Ass;
       const double ProdLim = (1.0 - production.GrowthRateRedFac);
       production.CH2OPool += ProdLim * Ass;
