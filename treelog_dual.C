@@ -34,26 +34,26 @@ extern "C" char* getcwd (char*, int);
 #else
 #include <dir.h>
 #endif
-using namespace std;
 
 struct TreelogDual::Implementation
 {
-  const string file;
-  string directory;
-  ostream* one;
-  ostream& two;
-  deque<string> path;
-  deque<bool> touched_one;
-  deque<bool> touched_two;
+  const std::string file;
+  std::string directory;
+  std::ostream* one;
+  std::ostream& two;
+  std::deque<std::string> path;
+  std::deque<bool> touched_one;
+  std::deque<bool> touched_two;
 
-  void print (ostream& out, deque<bool>& touched, const string& text);
+  void print (std::ostream& out, std::deque<bool>& touched,
+	      const std::string& text);
   void init_one ();
-  void debug (const string& text);
-  void entry (const string& text);
+  void debug (const std::string& text);
+  void entry (const std::string& text);
 
   void flush ();
 
-  Implementation (const string& filename, ostream& second)
+  Implementation (const std::string& filename, std::ostream& second)
     : file (filename),
       one (NULL),
       two (second)
@@ -77,8 +77,9 @@ struct TreelogDual::Implementation
 };
 
 void
-TreelogDual::Implementation::print (ostream& out, deque<bool>& touched, 
-				    const string& text)
+TreelogDual::Implementation::print (std::ostream& out,
+				    std::deque<bool>& touched, 
+				    const std::string& text)
 {
   for (unsigned int i = 0; i < touched.size (); i++)
     {
@@ -109,14 +110,14 @@ TreelogDual::Implementation::init_one ()
 }
 
 void
-TreelogDual::Implementation::debug (const string& text)
+TreelogDual::Implementation::debug (const std::string& text)
 { 
   init_one ();
   print (*one, touched_one, text); 
 }
 
 void
-TreelogDual::Implementation::entry (const string& text)
+TreelogDual::Implementation::entry (const std::string& text)
 {
   print (two, touched_two, text);
   init_one ();
@@ -132,7 +133,7 @@ TreelogDual::Implementation::flush ()
 }
 
 void
-TreelogDual::open (const string& name)
+TreelogDual::open (const std::string& name)
 { 
   impl.path.push_back (name); 
   impl.touched_one.push_back (false); 
@@ -148,14 +149,14 @@ TreelogDual::close ()
 }
 
 void
-TreelogDual::debug (const string& text)
+TreelogDual::debug (const std::string& text)
 {
   impl.debug (text);
   Treelog::debug (text);
 }
 
 void
-TreelogDual::entry (const string& text)
+TreelogDual::entry (const std::string& text)
 {
   impl.entry (text);
   Treelog::entry (text);
@@ -165,7 +166,7 @@ void
 TreelogDual::flush ()
 { impl.flush (); }
 
-TreelogDual::TreelogDual (const string& file, ostream& two)
+TreelogDual::TreelogDual (const std::string& file, std::ostream& two)
   : impl (*new Implementation (file, two))
 { }
 
