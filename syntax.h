@@ -88,6 +88,7 @@ public:
   // *not* to use this in general, as it makes it more difficult to
   // add new entries.
   void order (const list<string>&);
+  void order (string);
   void order (string, string);
   void order (string, string, string);
   void order (string, string, string, string);

@@ -11,6 +11,7 @@
 #include "condition.h"
 #include "filter.h"
 #include "crop.h"
+#include "time.h"
 #include <fstream.h>
 #include <strstream.h>
 
@@ -554,72 +555,23 @@ Parser::get_time ()
 const Condition*
 Parser::get_condition ()
 { 
-  Condition* condition = &Condition::null;
+  const Library& lib = Condition::library ();
   skip ("(");
-  string name = get_id ();
-  if (name == "at")
-    { 
-      condition = new ConditionAt (get_time ());
-    }
-  else if (name == "before")
-    { 
-      condition = new ConditionBefore (get_time ());
-    }
-  else if (name == "after")
-    { 
-      condition = new ConditionAfter (get_time ());
-    }
-  else if (name == "hourly")
-    { 
-      int step = looking_at (')') ? 1 : get_integer ();
-      condition = new ConditionHourly (step);
-    }
-  else if (name == "daily")
-    { 
-      int step = looking_at (')') ? 1 : get_integer ();
-      condition = new ConditionDaily (step);
-    }
-  else if (name == "weekly")
-    { 
-      int step = looking_at (')') ? 1 : get_integer ();
-      condition = new ConditionWeekly (step);
-    }
-  else if (name == "monthly")
-    { 
-      int step = looking_at (')') ? 1 : get_integer ();
-      condition = new ConditionMonthly (step);
-    }
-  else if (name == "yearly")
-    { 
-      int step = looking_at (')') ? 1 : get_integer ();
-      condition = new ConditionYearly (step);
-    }
-  else
-    {
-      error (string("Unknown condition `") + name + "'");
-      skip_to_end ();
-    }
+  const AttributeList& atts = load_derived (lib);
+  const Condition& condition = Condition::create (atts);
   skip (")");
-  return condition;
+  return &condition;
 }
 
 const Action*
 Parser::get_action ()
 {
-  Action* action = &Action::null;
+  const Library& lib = Action::library ();
   skip ("(");
-  string name = get_id ();
-  if (name == "sow")
-    action = new ActionSow (load_derived (Crop::library ()));
-  else if (name == "stop")
-    action = new ActionStop ();
-  else
-    {
-      error (string ("Unknown action `") + name + "'");
-      skip_to_end ();
-    }
+  const AttributeList& atts = load_derived (lib);
+  const Action& action = Action::create (atts);
   skip (")");
-  return action;
+  return &action;
 }
 
 const Filter*

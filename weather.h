@@ -6,7 +6,6 @@
 #include "time.h"
 
 class AttributeList;
-class Input;
 class Library;
 class Syntax;
 class Log;

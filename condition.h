@@ -1,83 +1,43 @@
 // condition.h -- Logic expressions
 
-#include "time.h"
-
-struct ColumnList;
-struct Weather;
-struct Time;
+class ColumnList;
+class Weather;
+class Time;
+class Log;
+class AttributeList;
+class Library;
+class Syntax;
+#include <std/string.h>
 
 class Condition
 {  
+  // Simulation.
 public:
-    virtual bool match (ColumnList&, const Weather&, const Time&) const;
-    static Condition null;
+  virtual bool match (ColumnList&, const Weather&, const Time&) const;
+  static Condition null;
+
+  // Library.
+public:
+  static const Library& library ();
+  static Condition& create (const AttributeList&);
+  typedef Condition& (*constructor) (const AttributeList&);
+  static void add_type (const string, const AttributeList&, const Syntax&,
+			constructor);
+  static void derive_type (const string, const AttributeList&, string super);
+
+  // Create & Destroy.
 protected:
-    Condition ();
+  Condition ();
 public:
-    virtual ~Condition ();
+  virtual ~Condition ();
 };
 
-class ConditionAt : public Condition
+// Ensure the Condition library is initialized.
+// See TC++PL, 2ed, 10.5.1, for an explanation.
+static class Condition_init
 {
-    const Time time;
+  static int count;
 public:
-    bool match (ColumnList&, const Weather&, const Time&) const;
-    ConditionAt (const Time&);
-};
-
-class ConditionBefore : public Condition
-{
-    const Time time;
-public:
-    bool match (ColumnList&, const Weather&, const Time&) const;
-    ConditionBefore (const Time&);
-};
-
-class ConditionAfter : public Condition
-{
-    const Time time;
-public:
-    bool match (ColumnList&, const Weather&, const Time&) const;
-    ConditionAfter (const Time&);
-};
-
-class ConditionHourly : public Condition
-{
-    const int step;
-public:
-    bool match (ColumnList&, const Weather&, const Time&) const;
-    ConditionHourly (int);
-};
-
-class ConditionDaily : public Condition
-{
-    const int step;
-public:
-    bool match (ColumnList&, const Weather&, const Time&) const;
-    ConditionDaily (int);
-};
-
-class ConditionWeekly : public Condition
-{
-    const int step;
-public:
-    bool match (ColumnList&, const Weather&, const Time&) const;
-    ConditionWeekly (int);
-};
-
-class ConditionMonthly : public Condition
-{
-    const int step;
-public:
-    bool match (ColumnList&, const Weather&, const Time&) const;
-    ConditionMonthly (int);
-};
-
-class ConditionYearly : public Condition
-{
-    const int step;
-public:
-    bool match (ColumnList&, const Weather&, const Time&) const;
-    ConditionYearly (int);
-};
-
+  Condition_init ();
+  ~Condition_init ();
+} Condition_init;

@@ -175,7 +175,7 @@ Value::operator int () const
      throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
-  return false; // SHUT UP.
+  return 0; // SHUT UP.
 }
 
 Value::operator const Time& () const

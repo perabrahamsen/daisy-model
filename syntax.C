@@ -302,6 +302,13 @@ Syntax::order (const list<string>& order)
 }
 
 void 
+Syntax::order (string one)
+{
+  assert (impl.order.size () == 0);
+  impl.order.push_back (one);
+}
+
+void 
 Syntax::order (string one, string two)
 {
   assert (impl.order.size () == 0);

@@ -1,11 +1,56 @@
 // condition.C -- Logic expressions
 
 #include "condition.h"
+#include "alist.h"
+#include "library.h"
+#include "syntax.h"
+#include "common.h"
+#include <map.h>
+#include <algobase.h>
+
+static Library* Condition_library = NULL;
+typedef map<string, Condition::constructor, less<string> > Condition_map_type;
+static Condition_map_type* Condition_constructors;
+
+const Library&
+Condition::library ()
+{
+  assert (Condition_library);
+  return *Condition_library;
+}
+
+void
+Condition::add_type (const string name, 
+		     const AttributeList& al, 
+		     const Syntax& syntax,
+		     constructor cons)
+{
+  assert (Condition_library);
+  Condition_library->add (name, al, syntax);
+  Condition_constructors->insert(Condition_map_type::value_type (name, cons));
+}
+
+void 
+Condition::derive_type (string name, const AttributeList& al, string super)
+{
+  add_type (name, al, library ().syntax (super), 
+	    (*Condition_constructors)[super]);
+}
+
+Condition&
+Condition::create (const AttributeList& al)
+{
+  assert (al.check ("type"));
+  const string name = al.name ("type");
+  assert (library ().check (name));
+  assert (library ().syntax (name).check (al));
+  return (*Condition_constructors)[name] (al);
+}
 
 bool
 Condition::match (ColumnList&, const Weather&, const Time&) const
 {
-    return true;
+  return true;
 }
 
 Condition Condition::null;
@@ -16,87 +61,26 @@ Condition::Condition ()
 Condition::~Condition ()
 { }
 
-bool
-ConditionAt::match (ColumnList&, const Weather&, const Time& t) const
-{
-    return time == t;
+int Condition_init::count;
+
+Condition_init::Condition_init ()
+{ 
+  if (count++ == 0)
+    {
+      Condition_library = new Library ();
+      Condition_constructors = new Condition_map_type ();
+    }
+  assert (count > 0);
 }
 
-ConditionAt::ConditionAt (const Time& t) 
-    : time (t)
-{ }
-
-bool
-ConditionBefore::match (ColumnList&, const Weather&, const Time& t) const
-{
-    return time > t;
+Condition_init::~Condition_init ()
+{ 
+  if (--count == 0)
+    {
+      delete Condition_library;
+      Condition_library = NULL;
+      delete Condition_constructors;
+      Condition_constructors = NULL;
+    }
+  assert (count >= 0);
 }
-
-ConditionBefore::ConditionBefore (const Time& t)
-    : time (t)
-{ }
-
-bool
-ConditionAfter::match (ColumnList&, const Weather&, const Time& t) const
-{
-    return time < t;
-}
-
-ConditionAfter::ConditionAfter (const Time& t)
-    : time (t)
-{ }
-
-bool
-ConditionHourly::match (ColumnList&, const Weather&, const Time& t) const
-{
-    // BUG:  Behave strangely around new year.
-    return ((24 * t.yday () + t.hour ()) % step) == 0;
-}
-
-ConditionHourly::ConditionHourly (int s)
-    : step (s)
-{ }
-
-bool
-ConditionDaily::match (ColumnList&, const Weather&, const Time& t) const
-{
-    // BUG:  Behave strangely around new year.
-    return t.hour () == 0 && (t.yday () % step) == 0;
-}
-
-ConditionDaily::ConditionDaily (int s)
-    : step (s)
-{ }
-
-bool
-ConditionWeekly::match (ColumnList&, const Weather&, const Time& t) const
-{
-    // BUG:  Behave strangely around new year.
-    return t.hour () == 0 && (t.yday () % step) == 0;
-}
-
-ConditionWeekly::ConditionWeekly (int s)
-    : step (7 * s)
-{ }
-
-bool
-ConditionMonthly::match (ColumnList&, const Weather&, const Time& t) const
-{
-    // BUG:  Behave strangely around new year.
-    return t.hour () == 0 && (t.yday () % step) == 0;
-}
-
-ConditionMonthly::ConditionMonthly (int s)
-    : step (30 * s)
-{ }
-
-bool
-ConditionYearly::match (ColumnList&, const Weather&, const Time& t) const
-{
-    // BUG:  Behave strangely around new year.
-    return t.hour () == 0 && (t.yday () % step) == 0;
-}
-
-ConditionYearly::ConditionYearly (int s)
-    : step (365 * s)
-{ }

@@ -5,36 +5,45 @@
 
 #include <std/string.h>
 
-struct ColumnList;
-struct Weather;
-struct Log;
-struct AttributeList;
+class ColumnList;
+class Weather;
+class Log;
+class AttributeList;
+class Library;
+class Syntax;
 
 class Action
 {
+  // Simulation.
 public:
-    virtual void doIt(ColumnList&, const Weather&, Log&) const;
-    virtual bool stop () const;
-    static Action null;
+  virtual void doIt(ColumnList&, const Weather&, Log&) const;
+  virtual bool stop () const;
+  static Action null;
+
+  // Library.
+public:
+  static const Library& library ();
+  static Action& create (const AttributeList&);
+  typedef Action& (*constructor) (const AttributeList&);
+  static void add_type (const string, const AttributeList&, const Syntax&,
+			constructor);
+  static void derive_type (const string, const AttributeList&, string super);
+ 
+  // Create and Destroy.
 protected:
-    Action ();
+  Action ();
 public:
-    virtual ~Action ();
+  virtual ~Action ();
 };
 
-class ActionSow : public Action
+// Ensure the Action library is initialized.
+// See TC++PL, 2ed, 10.5.1, for an explanation.
+static class Action_init
 {
-    const AttributeList& crop;
+  static int count;
 public:
-    void doIt (ColumnList&, const Weather&, Log&) const;
-    ActionSow (const AttributeList&);
-};
-
-class ActionStop : public Action
-{
-public:
-    void doIt (ColumnList&, const Weather&, Log&) const;
-    bool stop () const;
-};
+  Action_init ();
+  ~Action_init ();
+} Action_init;
 
 #endif ACTION_H

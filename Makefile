@@ -5,7 +5,7 @@ CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -frepo # -O2 -fhandle-exceptions -pipe -fn
 SRCONLY = column_std.o manager_rule.o weather_simple.o uzrichard.o \
 	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
 	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o \
-	crop_std.o 
+	crop_std.o action_sow.o action_stop.o condition_time.o
 OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o rules.o time.o uzmodel.o \
@@ -100,8 +100,8 @@ daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
  groundwater.h uzmodel.h common.h horizon.h log.h crop.h column.h \
  action.h filter.h library.h syntax.h condition.h alist.h
 input.o: input.C input.h log.h alist.h common.h csmp.h rules.h \
- library.h syntax.h action.h condition.h time.h filter.h crop.h
-log.o: log.C log.h condition.h time.h filter.h csmp.h daisy.h
+ library.h syntax.h action.h condition.h filter.h crop.h time.h
+log.o: log.C log.h condition.h filter.h csmp.h daisy.h time.h
 weather.o: weather.C weather.h time.h library.h alist.h common.h \
  syntax.h
 manager.o: manager.C manager.h library.h alist.h common.h syntax.h
@@ -110,8 +110,9 @@ crop.o: crop.C crop.h library.h alist.h common.h syntax.h
 alist.o: alist.C alist.h common.h time.h
 syntax.o: syntax.C syntax.h alist.h common.h log.h library.h
 library.o: library.C library.h alist.h common.h
-action.o: action.C action.h column.h alist.h common.h
-condition.o: condition.C condition.h time.h
+action.o: action.C action.h alist.h common.h library.h syntax.h
+condition.o: condition.C condition.h alist.h common.h library.h \
+ syntax.h
 horizon.o: horizon.C horizon.h library.h alist.h common.h syntax.h \
  csmp.h
 ftable.o: ftable.C ftable.h
@@ -166,3 +167,8 @@ groundwater_static.o: groundwater_static.C groundwater.h time.h \
 crop_std.o: crop_std.C crop.h log.h time.h csmp.h bioclimate.h \
  common.h ftable.h ftable.t syntax.h alist.h filter.h soil_water.h \
  soil.h horizon.h soil_heat.h
+action_sow.o: action_sow.C action.h column.h crop.h syntax.h alist.h \
+ common.h
+action_stop.o: action_stop.C action.h syntax.h alist.h common.h
+condition_time.o: condition_time.C condition.h time.h syntax.h alist.h \
+ common.h

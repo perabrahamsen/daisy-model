@@ -1,10 +1,51 @@
 // action.C -- Manager actions
 
 #include "action.h"
-#include "column.h"
 #include "alist.h"
+#include "library.h"
+#include "syntax.h"
+#include "common.h"
+#include <map.h>
+#include <algobase.h>
 
-#include <iostream.h>
+static Library* Action_library = NULL;
+typedef map<string, Action::constructor, less<string> > Action_map_type;
+static Action_map_type* Action_constructors;
+
+const Library&
+Action::library ()
+{
+  assert (Action_library);
+  return *Action_library;
+}
+
+void
+Action::add_type (const string name, 
+		   const AttributeList& al, 
+		   const Syntax& syntax,
+		   constructor cons)
+{
+  assert (Action_library);
+  Action_library->add (name, al, syntax);
+  Action_constructors->insert(Action_map_type::value_type (name, cons));
+}
+
+void 
+Action::derive_type (string name, const AttributeList& al, string super)
+{
+  add_type (name, al, library ().syntax (super), 
+	    (*Action_constructors)[super]);
+}
+
+Action&
+Action::create (const AttributeList& al)
+{
+  assert (al.check ("type"));
+  const string name = al.name ("type");
+  assert (library ().check (name));
+  assert (library ().syntax (name).check (al));
+  return (*Action_constructors)[name] (al);
+}
 
 void 
 Action::doIt (ColumnList&, const Weather&, Log&) const
@@ -24,30 +65,26 @@ Action::Action ()
 Action::~Action ()
 { }
 
-void 
-ActionSow::doIt (ColumnList& cl, const Weather&, Log& log) const
-{
-  cout << " [Sowing " << crop.name ("type") << "]";
+int Action_init::count;
 
-  for (ColumnList::iterator i = cl.begin ();
-       i != cl.end ();
-       i++)
-    {
-      (*i)->sow (crop, log);
-    }
-}
-
-ActionSow::ActionSow (const AttributeList& al) : crop (al)
-{ }
-
-void 
-ActionStop::doIt (ColumnList&, const Weather&, Log&) const
-{
-  assert (false);
-}
-
-bool
-ActionStop::stop () const
+Action_init::Action_init ()
 { 
-  return true;
+  if (count++ == 0)
+    {
+      Action_library = new Library ();
+      Action_constructors = new Action_map_type ();
+    }
+  assert (count > 0);
+}
+
+Action_init::~Action_init ()
+{ 
+  if (--count == 0)
+    {
+      delete Action_library;
+      Action_library = NULL;
+      delete Action_constructors;
+      Action_constructors = NULL;
+    }
+  assert (count >= 0);
 }
