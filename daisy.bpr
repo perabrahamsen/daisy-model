@@ -31,12 +31,12 @@
       log_checkpoint.obj log_clone.obj log_extern.obj log_harvest.obj 
       log_select.obj log_table.obj log_table1.obj macro.obj macro_none.obj 
       macro_std.obj mactrans.obj mactrans_std.obj main.obj mathlib.obj 
-      message.obj net_radiation.obj nitrification.obj nitrification_soil.obj 
+      net_radiation.obj nitrification.obj nitrification_soil.obj 
       nitrification_solute.obj nrutil.obj om.obj options.obj organic_matter.obj 
       parser.obj parser_file.obj pet.obj pet_makkink.obj pet_PM.obj 
       pet_weather.obj plf.obj printer.obj printer_file.obj ridge.obj 
       root_system.obj select.obj select_array.obj select_average.obj 
-      select_content.obj select_date.obj select_flux.obj select_flux_bottom.obj 
+      select_content.obj select_date.obj select_flux_bottom.obj 
       select_flux_top.obj select_index.obj select_interval.obj select_max.obj 
       select_min.obj select_number.obj snow.obj soil.obj soil_chemical.obj 
       soil_chemicals.obj soil_heat.obj soil_NH4.obj soil_NO3.obj soil_water.obj 
@@ -51,7 +51,9 @@
       partition.obj photosynthesis.obj production.obj harvesting.obj 
       vernalization.obj check.obj check_range.obj rootdens_PLF.obj 
       condition_weather.obj transform_equil.obj equil.obj equil_langmuir.obj 
-      pedo.obj pedo_linear.obj transform.obj units.obj hydraulic_Cosby.obj"/>
+      pedo.obj pedo_linear.obj transform.obj units.obj hydraulic_Cosby.obj 
+      assertion.obj select_value.obj clayom_old.obj clayom.obj clayom_biomod.obj 
+      aom.obj dom.obj smb.obj som.obj xref.obj treelog_dual.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
@@ -66,7 +68,7 @@
     <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
     <RELEASELIBPATH value="$(BCB)\lib\release"/>
     <LINKER value="tlink32"/>
-    <USERDEFINES value="_DEBUG"/>
+    <USERDEFINES value=""/>
     <SYSDEFINES value="NO_STRICT;_NO_VCL"/>
     <MAINSOURCE value="daisy.bpf"/>
     <INCLUDEPATH value="$(BCB)\include;$(BCB)\include\vcl"/>
@@ -75,11 +77,11 @@
       -wpin -wnod -wnak -wdef -w-csu -wcln -wbbf -wasm -wamp -wamb"/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-O2 -Vx -Ve -X- -r- -a8 -6 -b- -k -y -v -vi- -Pfoo -tWC -c"/>
-    <PFLAGS value="-$YD -$W -$O- -v -JPHNE -M"/>
+    <CFLAG1 value="-O2 -Vx -Ve -X- -a8 -6 -b- -k- -vi -Pfoo -tWC -c"/>
+    <PFLAGS value="-$Y- -$L- -$D- -v -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mx /w2 /zd"/>
-    <LFLAGS value="-D&quot;&quot; -ap -Tpe -x -Gn -w-dup -v"/>
+    <LFLAGS value="-dup -dup -dup -D&quot;&quot; -ap -Tpe -x -Gn -w-dup"/>
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="c0x32.obj $(OBJFILES)"/>

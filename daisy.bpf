@@ -105,7 +105,6 @@ USEUNIT("mactrans.C");
 USEUNIT("mactrans_std.C");
 USEUNIT("main.C");
 USEUNIT("mathlib.C");
-USEUNIT("message.C");
 USEUNIT("net_radiation.C");
 USEUNIT("nitrification.C");
 USEUNIT("nitrification_soil.C");
@@ -130,7 +129,6 @@ USEUNIT("select_array.C");
 USEUNIT("select_average.C");
 USEUNIT("select_content.C");
 USEUNIT("select_date.C");
-USEUNIT("select_flux.C");
 USEUNIT("select_flux_bottom.C");
 USEUNIT("select_flux_top.C");
 USEUNIT("select_index.C");
@@ -200,6 +198,17 @@ USEUNIT("pedo_linear.C");
 USEUNIT("transform.C");
 USEUNIT("units.C");
 USEUNIT("hydraulic_Cosby.C");
+USEUNIT("assertion.C");
+USEUNIT("select_value.C");
+USEUNIT("clayom_old.C");
+USEUNIT("clayom.C");
+USEUNIT("clayom_biomod.C");
+USEUNIT("aom.C");
+USEUNIT("dom.C");
+USEUNIT("smb.C");
+USEUNIT("som.C");
+USEUNIT("xref.C");
+USEUNIT("treelog_dual.C");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 

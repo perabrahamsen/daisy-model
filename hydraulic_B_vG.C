@@ -32,6 +32,7 @@ class HydraulicB_vG : public Hydraulic
   const double a;		// - alpha
   const double n;
   const double m;		// 1 - 2/n
+  const double l;               // tortuosity parameter
   const double K_sat;
 
   // Use.
@@ -65,7 +66,7 @@ HydraulicB_vG::K (const double h) const
   if (h < 0)
     {
       const double Se_h = Se (h);
-      return K_sat * pow (Se_h, 2) * (1 - pow (1 - pow (Se_h, 1/m), m));
+      return K_sat * pow (Se_h, l) * (1 - pow (1 - pow (Se_h, 1/m), m));
     }
   else
     return K_sat;
@@ -119,6 +120,7 @@ HydraulicB_vG::HydraulicB_vG (const AttributeList& al)
     a (-alpha),
     n (al.number ("n")),
     m (1 - 2 / n),
+    l (al.number ("l")),
     K_sat (al.number ("K_sat"))
 { }
 
@@ -149,6 +151,9 @@ HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
 	      "van Genuchten alpha.");
   syntax.add ("n", Syntax::None (), Syntax::Const,
 	      "van Genuchten n.");
+  syntax.add ("l", Syntax::None (), Syntax::Const,
+	      "tortuosity parameter.");
+  alist.add ("l", 2.0);
   syntax.add ("K_sat", "cm/h", Syntax::Const,
 	      "Water conductivity of saturated soil.");
 
