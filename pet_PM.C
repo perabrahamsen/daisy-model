@@ -103,7 +103,7 @@ PetPM::ETaero (double AtmPressure, double Temp, double ea, double ra,
   const double x2 = Weather::AirDensity (AtmPressure, Temp) * 1.013 /
     Weather::LatentHeatVaporization (Temp);
   const double x3 = (Weather::SaturationVapourPressure (Temp) - ea) / ra;
-  return (1.0 / x1) * x2 * x3;
+  return (1.0 / x1) * x2 * x3;   // [kg/m2/s]
 }
 
 double

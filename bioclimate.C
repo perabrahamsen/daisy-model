@@ -23,15 +23,15 @@ Bioclimate::RefCanopyResistance (void)
 
 double 
 Bioclimate::ZeroPlaneDisplacement (double CropHeight)
-{ return (0.66 * CropHeight); }
+{ return (0.66 * CropHeight / 100.0); }
 
 double 
 Bioclimate::RoughnessHeight_Momentum (double CropHeight)
-{ return (0.123 * CropHeight); }
+{ return (0.123 * CropHeight / 100.0); }
 
 double
 Bioclimate:: RoughnessHeight_Heat (double CropHeight)
-{ return (0.0123 * CropHeight); }
+{ return (0.0123 * CropHeight / 100.0); }
 
 double 
 Bioclimate::AerodynamicResistance (double CropHeight, double ScreenHeight,
