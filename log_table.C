@@ -46,6 +46,7 @@ struct LogTable : public LogSelect, public Destination
   bool print_header;		// Set if header should be printed.
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
+  const bool print_initial;     // Set if initial values should be printed.
   const bool time_columns;	// Add year, month, day and hour columns.
   const vector<Summary*> summary; // Summarize this log file.
   Time begin;			// First log entry.
@@ -281,6 +282,13 @@ LogTable::initial_done (const Time& time)
 { 
   LogSelect::initial_done (time);
 
+  if (!print_initial)
+    {
+      for (unsigned int i = 0; i < entries.size (); i++)
+        entries[i]->done ();
+      return;
+    }
+
   for (unsigned int i = 0; i < entries.size (); i++)
     if (entries[i]->prevent_printing ())
       return;
@@ -367,6 +375,7 @@ LogTable::LogTable (const AttributeList& al)
     print_header (al.flag ("print_header")),
     print_tags (al.flag ("print_tags")),
     print_dimension (al.flag ("print_dimension")),
+    print_initial (al.flag ("print_initial")),
     time_columns (!contain_time_columns (entries)),
     summary (map_create<Summary> (al.alist_sequence ("summary"))),
     begin (1, 1, 1, 1),
@@ -460,6 +469,9 @@ static struct LogTableSyntax
       syntax.add ("print_dimension", Syntax::Boolean, Syntax::Const,
 		  "Print a line with units after the tag line.");
       alist.add ("print_dimension", true);
+      syntax.add ("print_initial", Syntax::Boolean, Syntax::Const,
+		  "Print a line with initial values when logging starts.");
+      alist.add ("print_initial", true);
       syntax.add ("flush", Syntax::Boolean, Syntax::Const,
 		  "Flush to disk after each entry (for debugging).");
       alist.add ("flush", false);

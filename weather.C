@@ -246,7 +246,7 @@ Weather::Weather (const AttributeList& al)
     timezone (-42.42e42),
     surface (Surface::reference),
     screen_height_ (2.0),
-    T_average (-42.42e42),
+    T_average (10.0),           // May be used before Weather::check.
     T_amplitude (-42.42e42),
     max_Ta_yday (-42.42e42),
     day_length_ (-42.42e42),

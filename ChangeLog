@@ -1,3 +1,24 @@
+2003-07-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.02 released.
+
+2003-07-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Root Zone Water Balance"): Fix spelling error.
+	Thanks Christian Thirup.
+
+	* log_table.C (print_initial) New flag.
+	(initial_done): Use it.
+
+2003-07-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* denitrification.C (load_syntax): Made denitrification faster.
+
+2003-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C (Weather): Initialize T_average to 10 dg C, to
+	increase chance to get Weather::check called.
+
 2003-07-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.01 released.

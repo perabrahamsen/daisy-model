@@ -1,18 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Træk bioincorporation-respiration-C fra total-C-input.
-
-Log vertikal distribution?  Skal det fungere ligesom rødder?
-
-* Find gcc-2.95 mingw32
+* Ny (set foo 3.4) pseudo-attribut.
 
 * SH: Salg af referencemanual på www-siden?
 
-* FertOrgaNic
-
-** Post excersizes and answers
-
-* UZmodel top_t and bottom_t
+* UZmodel top_t
 
 * Weather
 

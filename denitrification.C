@@ -169,8 +169,7 @@ By default, use a build in function valid for temperate climates.");
 This is a function of the current water content as a fraction of the\n\
 maximal water content.");
   PLF water_factor;
-  water_factor.add (0.8, 0.0);
-  water_factor.add (0.9, 0.2);
+  water_factor.add (0.7, 0.0);
   water_factor.add (1.0, 1.0);
   alist.add ("water_factor", water_factor);
   syntax.add ("water_factor_fast", Syntax::Fraction (), Syntax::None (), 

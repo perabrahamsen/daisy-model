@@ -12,6 +12,23 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.02
+
+** You can now supress the line with initial values in the log files.
+
+Set the flag "print_initial" to "false" when you specify what log
+files to generate.
+
+Example:
+
+  (output ("N Balance" (print_initial false)))
+
+** Faster denitrification.
+
+Denitrication has been recalibrated, and is significantly faster now. 
+
+** Better error message when weather file is missing.
+
 * 3.01
 
 ** daisy.exe should be fast again.
