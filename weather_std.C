@@ -180,23 +180,50 @@ struct WeatherStandard : public Weather
 
   // Communication with Bioclimate.
   double hourly_air_temperature () const // [dg C]
-    { return air_temperature_[hour]; }
+    { 
+      daisy_assert (initialized);
+      return air_temperature_[hour]; 
+    }
   double daily_air_temperature () const // [dg C]
-    { return daily_air_temperature_; }
+    { 
+      daisy_assert (initialized);
+      return daily_air_temperature_; 
+    }
   double hourly_global_radiation () const // [W/m2]
-    { return global_radiation_[hour]; }
+    { 
+      daisy_assert (initialized);
+      return global_radiation_[hour]; 
+    }
   double daily_global_radiation () const // [W/m2]
-    { return daily_global_radiation_; }
+    { 
+      daisy_assert (initialized);
+      return daily_global_radiation_; 
+    }
   double reference_evapotranspiration () const // [mm/h]
-    { return reference_evapotranspiration_[hour]; }
+    { 
+      daisy_assert (initialized);
+      return reference_evapotranspiration_[hour]; 
+    }
   double rain () const	// [mm/h]
-    { return precipitation_[hour] * rain_fraction; }
+    { 
+      daisy_assert (initialized);
+      return precipitation_[hour] * rain_fraction; 
+    }
   double snow () const	// [mm/h]
-    { return precipitation_[hour] * snow_fraction; }
+    { 
+      daisy_assert (initialized);
+      return precipitation_[hour] * snow_fraction; 
+    }
   double vapor_pressure () const // [Pa]
-    { return vapor_pressure_[hour]; }
+    { 
+      daisy_assert (initialized);
+      return vapor_pressure_[hour]; 
+    }
   double wind () const	// [m/s]
-    { return wind_speed_[hour]; }
+    { 
+      daisy_assert (initialized);
+      return wind_speed_[hour]; 
+    }
 
   // Communication with external model.
   void put_precipitation (double prec) // [mm/d]
@@ -388,6 +415,11 @@ WeatherStandard::tick (const Time& time, Treelog& msg)
   
   if (hour == 0)
     read_new_day (time, msg);
+  else if (!initialized)
+    {
+      Time midnight (time.year (), time.month (), time.mday (), 0);
+      read_new_day (midnight, msg);
+    }
 
   // Snow and rain fractions.
   const double T = hourly_air_temperature ();
