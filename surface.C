@@ -145,7 +145,7 @@ Surface::Implementation::ponding () const
 {
   if (lake < 0.0)
     {
-      assert (!flux_top ());
+      // assert (!flux_top ());
       return pond;
     }
   else
@@ -190,6 +190,12 @@ Surface::Implementation::tick (double PotSoilEvaporation,
 
   if (pond < 1e-6)
     T = temp;
+  else if (water < 0.0)
+    {
+      if (pond - EvapSoilSurface * dt + water * dt < 1e-6)
+	T = temp;
+      // else use old temperature.
+    }
   else
     T = (T * pond + temp * water * dt) / (pond + water * dt);
 
@@ -249,6 +255,7 @@ Surface::output (Log& log) const
 void
 Surface::Implementation::output (Log& log) const
 {
+  log.output ("T", T);
   log.output ("pond", pond);
   log.output ("flux", flux);
   log.output ("EvapSoilSurface", EvapSoilSurface);

@@ -15,7 +15,7 @@ void
 SoilWater::clear (const Geometry&)
 {
   fill (S_.begin (), S_.end (), 0.0);
-  fill (S_ice.begin (), S_ice.end (), 0.0);
+  fill (S_ice_.begin (), S_ice_.end (), 0.0);
 }
 
 void
@@ -38,10 +38,10 @@ SoilWater::add_to_sink (const vector<double>& v, const Geometry& geometry)
 void 
 SoilWater::freeze (const Soil&, const vector<double>& v)
 {
-  assert (v.size () == X_ice_.size ());
+  assert (v.size () == S_ice_.size ());
   add_to_sink (v);
-  for (unsigned int i = 0; i < X_ice_.size (); i++)
-    S_ice[i] -= v[i] * rho_water / rho_ice;
+  for (unsigned int i = 0; i < S_ice_.size (); i++)
+    S_ice_[i] -= v[i] * rho_water / rho_ice;
 }
 
 double
@@ -64,16 +64,38 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   // Ice first.
   for (unsigned int i = 0; i < soil.size (); i++)
     {
-      X_ice_[i] -= S_ice[i];
+      X_ice_[i] -= S_ice_[i];
+      const double Theta_sat = soil.Theta (i, 0.0, 0.0);
+
+      // Move extra ice to buffer.
+      const double available_space
+	= Theta_sat - Theta_[i] - X_ice_[i] + S_[i] * dt;
+      if (available_space < 0.0)
+	{
+	  X_ice_[i] += available_space;
+	  X_ice_buffer[i] -= available_space;
+	}
+      else if (X_ice_buffer[i] > 0.0)
+	{
+	  if (X_ice_buffer[i] < available_space)
+	    { 
+	      X_ice_[i] += X_ice_buffer[i];
+	      X_ice_buffer[i] = 0.0;
+	    }
+	  else
+	    {
+	      X_ice_[i] += available_space;
+	      X_ice_buffer[i] -= available_space;
+	    }
+	}
+
       if (X_ice_[i] < 0.0)
 	{
 	  CERR << "BUG: X_ice[" << i << "] = " << X_ice_[i] << "\n";
 	  X_ice_[i] = 0.0;
 	}
 
-      const double Theta_sat = soil.Theta (i, 0.0, 0.0);
-      const double Theta_res = soil.Theta_res (i);
-      assert (Theta_sat - Theta_res >= X_ice_[i]);
+      // Update ice presure.
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
     }
 
@@ -169,22 +191,15 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 void
 SoilWater::mix (const Soil& soil, double from, double to)
 {
-  soil.mix (X_ice_, from, to);
   soil.mix (Theta_, from, to);
   for (unsigned int i = 0; i < soil.size(); i++)
-    {
-      h_[i] = soil.h (i, Theta_[i]);
-      const double Theta_sat = soil.Theta (i, 0.0, 0.0);
-      assert (Theta_sat >= X_ice_[i]);
-      h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
-    }
+    h_[i] = soil.h (i, Theta_[i]);
 }
 
 void
 SoilWater::swap (const Soil& soil, double from, double middle, double to)
 {
   soil.swap (Theta_, from, middle, to);
-  soil.swap (X_ice_, from, middle, to);
 
   for (unsigned int i = 0; i < soil.size(); i++)
     {
@@ -196,8 +211,6 @@ SoilWater::swap (const Soil& soil, double from, double middle, double to)
 	  Theta_[i] = Theta_sat;
 	}
       h_[i] = soil.h (i, Theta_[i]);
-      assert (Theta_sat >= X_ice_[i]);
-      h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
     }
 }
   
@@ -224,6 +237,12 @@ SoilWater::check (unsigned n) const
 	   << " intervals but " << X_ice_.size () << " X_ice values\n";
       ok = false;
     }
+  if (X_ice_buffer.size () != n)
+    {
+      CERR << "You have " << n 
+	   << " intervals but " << X_ice_buffer.size () << " X_ice_buffer values\n";
+      ok = false;
+    }
   return ok;
 }
 
@@ -234,8 +253,9 @@ SoilWater::output (Log& log) const
   log.output ("S_p", S_p_);
   log.output ("Theta", Theta_);
   log.output ("h", h_);
-  log.output ("S_ice", S_ice);
+  log.output ("S_ice", S_ice_);
   log.output ("X_ice", X_ice_);
+  log.output ("X_ice_buffer", X_ice_buffer);
   log.output ("h_ice", h_ice_);
   log.output ("q", q_);
   log.output ("q_p", q_p_);
@@ -308,6 +328,9 @@ will be used from there to the bottom.");
   syntax.add ("X_ice", Syntax::None (), 
 	      Syntax::OptionalState, Syntax::Sequence,
 	      "Ice volume fraction in soil.");
+  syntax.add ("X_ice_buffer", Syntax::None (), 
+	      Syntax::OptionalState, Syntax::Sequence,
+	      "Ice volume that didn't fit the soil durin freezing.");
   syntax.add ("h_ice", Syntax::None (), Syntax::LogOnly, Syntax::Sequence,
 	      "Pressure at which all air is out of the matrix.\n\
 When there are no ice, this is 0.0.  When there are ice, the ice is\n\
@@ -353,6 +376,17 @@ SoilWater::initialize (const AttributeList& al,
   else 
     X_ice_.insert (X_ice_.begin (), size, 0.0);
 
+  if (al.check ("X_ice_buffer"))
+    {
+      X_ice_buffer = al.number_sequence ("X_ice_buffer");
+      if (X_ice_buffer.size () == 0)
+	X_ice_buffer.push_back (0.0);
+      while (X_ice_buffer.size () < size)
+	X_ice_buffer.push_back (X_ice_buffer[X_ice_buffer.size () - 1]);
+    }
+  else 
+    X_ice_buffer.insert (X_ice_buffer.begin (), size, 0.0);
+
   h_ice_.insert (h_ice_.begin (), size, 0.0);
   for (unsigned int i = 0; i < soil.size (); i++)
     {
@@ -385,7 +419,7 @@ SoilWater::initialize (const AttributeList& al,
   S_p_.insert (S_p_.begin (), size, 0.0);
   q_.insert (q_.begin (), size + 1, 0.0);
   q_p_.insert (q_p_.begin (), size + 1, 0.0);
-  S_ice.insert (S_ice.begin (), size, 0.0);
+  S_ice_.insert (S_ice_.begin (), size, 0.0);
 
   assert (h_.size () == Theta_.size ());
   if (h_.size () == 0)

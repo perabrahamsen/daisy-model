@@ -25,8 +25,9 @@ class SoilWater
   vector<double> h_old;
   vector<double> Theta_;
   vector<double> h_;
-  vector<double> S_ice;
+  vector<double> S_ice_;
   vector<double> X_ice_;
+  vector<double> X_ice_buffer;
   vector<double> h_ice_;
   vector<double> q_;
   vector<double> q_p_;
@@ -60,12 +61,16 @@ public:
   { return q_p_[i]; }
   double S (int i) const
   { return S_[i]; }
+  double S_ice (int i) const
+  { return S_ice_[i]; }
   double S_p (int i) const
   { return S_p_[i]; }
   double h_ice (int i) const
   { return h_ice_[i]; }
   double X_ice (int i) const
   { return X_ice_[i]; }
+  double X_ice_total (int i) const
+  { return X_ice_[i] + X_ice_buffer[i]; }
 
   // Ice modified lookups.
   double Theta (const Soil&, int i, double h) const;

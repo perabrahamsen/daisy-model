@@ -67,6 +67,7 @@ HydraulicM_vG::Cw2 (const double h) const
 double 
 HydraulicM_vG::h (const double Theta) const
 {
+  assert (Theta_res <= Theta);
   if (Theta < Theta_sat)
     return pow(pow(Theta_res / (Theta_res - Theta_sat) 
 		   + Theta / (Theta_sat - Theta_res), -1.0 / m)

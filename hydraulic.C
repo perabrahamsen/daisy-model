@@ -36,9 +36,35 @@ Hydraulic::K_to_M (CSMP& csmp, const int intervals) const
   csmp.add (h, sum);
 }
 
+static bool
+check_alist (const AttributeList& al)
+{
+  bool ok = true;
+
+  const double Theta_res = al.number ("Theta_res");
+  const double Theta_sat = al.number ("Theta_sat");
+
+  non_negative (Theta_res, "Theta_res", ok);
+
+  if (Theta_sat >= 0.9)
+    {
+      CERR << "Theta_sat should be below 0.9 (is " << Theta_sat << ")\n";
+      ok = false;
+    }
+
+  if (Theta_res >= Theta_sat)
+    {
+      CERR << "Theta_sat should be above Theta_res\n";
+      ok = false;
+    }
+  return ok;
+}  
+
+
 void
 Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add_check (check_alist);
   syntax.add ("Theta_sat", "cm^3 H2O/cm^3", Syntax::Const,
 	      "Saturation point.");
   syntax.add ("Theta_res", "cm^3 H2O/cm^3", Syntax::Const,

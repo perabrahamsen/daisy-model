@@ -21,7 +21,7 @@ class Snow
 public:
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
 	     double Si, double q_h, double Prain,
-	     double Psnow, double T, double Epot);
+	     double Psnow, double Pond, double T, double Epot);
   void output (Log&) const;
 
   // Queries.

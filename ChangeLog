@@ -1,4 +1,46 @@
+1999-07-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.83 released.
+
+1999-07-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+
+	* groundwater.C, groundwater.h (Groundwater): Take alist argument.
+	* groundwater_static.C (GroundwaterStatic): Updated caller.
+	* groundwater_file.C (GroundwaterFile): Updated caller.
+
+1999-07-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzlr.C (tick): Didn't work when flux was too large.
+
+	* soil_water.h, soil_water.C (X_ice_buffer): New member.
+	(X_ice_total): New member function.
+
+1999-07-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* snow.C, snow.h (tick): Add `Pond' argument.
+	* bioclimate_std.C (WaterDistribution): Update caller.
+
+	* snow.C (tick): `Swater' was set to `Ssnow_new'.
+
+	* hydraulic.C (check_alist): New function.
+	(load_syntax): Use it.
+
+	* crop_sold.C (CropSoldSyntax): Removed `Stem'.
+
+1999-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.C (calculate_heat_flux): New member function.
+	(tick): Call it.
+	(T_top_old, T_top_bottom): New member.
+	(tick): Set them.
+	(q): New member.
+	(output): Log it.
+	(load_syntax): Define it.
+
 1999-06-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (NitrogenUptake): At least CrNCnt if !enable_N_stress.
 
 	* Version 0.82 released.
 

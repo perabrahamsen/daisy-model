@@ -101,7 +101,7 @@ GroundwaterFile::initialize (const Time& time)
 { tick (time); }
 
 GroundwaterFile::GroundwaterFile (const AttributeList& al)
-  : Groundwater (al.name ("type")),
+  : Groundwater (al),
     previous_time (42, 1, 1, 0),
     next_time (42, 1, 1, 0),
     previous_depth (-42.42e42),

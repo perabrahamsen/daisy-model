@@ -47,7 +47,7 @@ GroundwaterStatic::table () const
 }
 
 GroundwaterStatic::GroundwaterStatic (const AttributeList& al)
-  : Groundwater (al.name ("type")),
+  : Groundwater (al),
     depth (al.number ("table"))
 { }
 

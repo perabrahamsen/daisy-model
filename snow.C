@@ -39,13 +39,13 @@ struct Snow::Implementation
   const double fsa;		// Relative amount of snow required
 				// for snow to become new.
   const double K_snow_factor;	// Factor related to thermal conductivity
-				// for snow water mix [W m^4 / Kg²]
+				// for snow water mix [W m^5/kg^2/dg C]
 
   void output (Log& log) const;
   void tick (const Soil& soil, const SoilWater& soil_water,
 	     const SoilHeat& soil_heat,
 	     double Si, double q_h, double Prain,
-	     double Psnow, double T, double Epot);
+	     double Psnow, double Pond, double T, double Epot);
   Implementation (const AttributeList& al);
 };
 
@@ -86,8 +86,14 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    const double Si, const double q_h,
 			    const double Prain, const double Psnow,
+			    double Pond,
 			    double T, const double Epot)
 { 
+  const double Ssnow_old = Ssnow;
+  Pond = max (Pond, 0.0);
+  Ssnow += Pond;
+  Swater += Pond;
+
   assert (Si >= 0.0);
   assert (Prain >= 0.0);
   assert (Psnow >= 0.0);
@@ -97,9 +103,10 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   static const double dt = 1.0; // Time step [h].
   static const double f = 1.0;	// Melting factor. [mm H2O / (kg H2O / m²)]
   static const double rho_w = 1.0e3; // Density of water. [kg / m³]
+  static const double rho_i = 0.917e3; // Density of ice. [kg / m³]
   static const double Lm = 3.34e5; // Snow melting heat factor. [J/kg]
 
-  // Total precpitation. [mm/h]
+  // Total precipitation. [mm/h]
   const double P = Psnow + Prain;
   
   // Relative amount of snow in percolation.
@@ -118,12 +125,8 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 	age = 0;
     }
 
-  // We evaporate as much of the water as we can.  If we can evaporate
-  // more than that, evaporate all the snow too.
-  if (Epot <= Swater / dt + P)
-    EvapSnowPack = Epot;
-  else 
-    EvapSnowPack = Ssnow / dt + P;
+  // We evaporate as much as we can.  
+  EvapSnowPack = min (Epot, Ssnow / dt + P);
 
   assert (EvapSnowPack >= 0.0);
   assert (EvapSnowPack <= Epot);
@@ -158,17 +161,11 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   // Actual melting. [mm/h]
   const double M = min (max (M1, Mprime), M2);
 
-  // Evaporation from snow pack. [mm/h]
-  double Eprime;
-  if (EvapSnowPack <= Ssnow / dt + Prain + M)
-    Eprime = EvapSnowPack;
-  else
-    Eprime = Swater / dt + Prain + M;
-  assert (Eprime >= 0.0);
-  assert (Eprime <= EvapSnowPack);
+  // Evaporation from snow pack water. [mm/h]
+  double Eprime = min (Swater / dt + Prain + M, EvapSnowPack);
   
   // Water storage capacity of snow [mm]
-  const double Scapacity = f_c * Ssnow;
+  const double Scapacity = f_c * Ssnow_old;
   assert (Scapacity >= 0.0);
 
   // We can now calculate how much water is leaking.
@@ -179,7 +176,7 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   double Ssnow_new = Ssnow + (Psnow + Prain - EvapSnowPack - q_s) * dt;
   if (Ssnow_new < 0.0)
     {
-      // CERR << "Lost " << -Ssnow_new << " mm from snow pack.\n";
+      CERR << "Lost " << -Ssnow_new << " mm from snow pack.\n";
       Ssnow_new = 0.0;
     }
   
@@ -187,12 +184,12 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   double Swater_new = Swater + (Prain - Eprime + M - q_s) * dt;
   if (Swater_new < 0.0)
     {
-      // CERR << "Lost " << -Swater_new << " mm water from snow pack.\n";
+      CERR << "Lost " << -Swater_new << " mm water from snow pack.\n";
       Swater_new = 0.0;
     }
   if (Swater_new > Ssnow_new)
     {
-      // CERR << "Removed " << Swater_new - Ssnow_new << " mm water.\n";
+      CERR << "Removed " << Swater_new - Ssnow_new << " mm water.\n";
       Swater_new = Ssnow_new;
     }
 
@@ -204,18 +201,28 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 	  // Density of collapsing snow pack [kg/m³]
 	  assert (Scapacity > 0.0);
 	  const double rho_c
-	    = max (Ssnow / (f * dZs), 
-		   rho_s + rho_1 * Swater_new / Scapacity + rho_2 * Ssnow);
+	    = max (Ssnow_old / (f * dZs), 
+		   rho_s + rho_1 * Swater_new / Scapacity + rho_2 * Ssnow_old);
+#if 0
+	  CERR << "rho_c == " << rho_c << " Ssnow _old== " << Ssnow_old
+	       << " dZs == " << dZs << " Swater_new == " << Swater_new
+	       << " Scapacity == " << Scapacity << "\n";
+#endif
 	  assert (rho_c > 0.0);
-	  assert (approximate (rho_c, Ssnow / (f * dZs))
+	  //assert (rho_c < rho_i * 1.01);
+	  assert (approximate (rho_c, Ssnow_old / (f * dZs))
 		  || approximate (rho_c, rho_s 
 				  + rho_1 * Swater_new / Scapacity 
-				  + rho_2 * Ssnow));
+				  + rho_2 * Ssnow_old));
 	  // Size of collapsed snow pack [m]
-	  const double dZc = Ssnow / (f * rho_c) + dZp;
+	  const double dZc = Ssnow_old / (f * rho_c) + dZp;
 
 	  // Factor in collapsing from passing melting water.
-	  dZs = dZc * Ssnow_new / (Ssnow_new + q_s * dt);
+	  if (q_s > Pond)
+	    dZs = dZc * Ssnow_new / (Ssnow_new + (q_s - Pond) * dt);
+	  else
+	    dZs = dZc;
+
 	}
       else
 	dZs = dZp;
@@ -224,10 +231,11 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
     dZs = 0.0;
 
   dZs = min (dZs, Ssnow_new / rho_s);
+  dZs = max (dZs, Ssnow_new / rho_i);
 
   // Update snow storage.
   Ssnow = Ssnow_new;
-  Swater = Ssnow_new;
+  Swater = Swater_new;
 
   // Update snow age.
   if (Ssnow > 0.0)
@@ -244,30 +252,39 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
       const double K_soil 
 	= soil.heat_conductivity (0, soil_water.Theta (0),
 				  soil_water.X_ice (0)) 
-	* 1e-7 * 3600.0 / 100.0; // [erg/cm/h/dg C] -> [W/m/dg C]
-      const double Z = soil.z (0);
-      const double T_soil = soil_heat.T (0);
+	* 1e-7 * 100.0 / 3600.0; // [erg/cm/h/dg C] -> [W/m/dg C]
+      const double Z = -soil.z (0) / 100.0; // [cm] -> [m]
+      const double T_soil = soil_heat.T (0); // [dg C]
 
       // Density and conductivity of snowpack.
-      const double rho = rho_w * Ssnow / dZs; // Bug?
-      const double K_snow = K_snow_factor * rho * rho;
+      const double rho = Ssnow / dZs; // [kg/m^3]
+      const double K_snow = K_snow_factor * rho * rho; // [W/m^2]
       
-      T = min ((K_soil / Z * T_soil + K_snow / dZs * T) 
-	       / (K_soil / Z + K_snow / dZs),	       
-	       0.0);
+      const double T_calc = (K_soil / Z * T_soil + K_snow / dZs * T) 
+	/ (K_soil / Z + K_snow / dZs);
+#if 0
+      CERR << "Snow T_calc == " << T_calc << " Ssnow == " << Ssnow 
+	   << " Swater == " << Swater << " M == " << M << " T == " << T
+	   << " T_soil == " << T_soil << " K_soil == " << K_soil 
+	   << " K_snow == " << K_snow << "\n";
+#endif
+      T = min (T_calc, 0.0);
       assert (T > -100.0 && T < 50.0);
     } 
   temperature = T;
+
+  q_s -= Pond;
 }
   
 void 
 Snow::tick (const Soil& soil, const SoilWater& soil_water,
 	    const SoilHeat& soil_heat,
 	    double Si, double q_h, double Prain,
-	    double Psnow, double T, double Epot)
+	    double Psnow, double Pond, double T, double Epot)
 {
   if (impl.Ssnow > 0.0 || Psnow > 0.0)
-    impl.tick (soil, soil_water, soil_heat, Si, q_h, Prain, Psnow, T, Epot);
+    impl.tick (soil, soil_water, soil_heat, Si, q_h,
+	       Prain, Psnow, Pond, T, Epot);
   else
     {
       impl.EvapSnowPack = 0.0;
@@ -364,9 +381,9 @@ _Snow Hydrology_, U.S. Corps of Engineers, 1956.");
   syntax.add ("fsa", Syntax::None (), Syntax::Const, 
 	      "Relative amount of snow required for snow to become new.");
   alist.add ("fsa", 0.9);
-  syntax.add ("K_snow_factor", "W m^4 / Kg^2", Syntax::Const,
+  syntax.add ("K_snow_factor", "W m^5/kg^2/dg C", Syntax::Const,
 	      "Factor related to thermal conductivity for snow water mix.");
-  alist.add ("K_snow_factor", 2.86e6);
+  alist.add ("K_snow_factor", 2.86e-6);
 }
   
 Snow::Snow (const AttributeList& al)

@@ -79,30 +79,53 @@ UZlr::tick (const Soil& soil,
   for (int i = first; i <= last; i++)
     {
       const double dz = soil.dz (i);
+      const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
+      const double Theta_res = soil.Theta_res (i);
       const double Theta_new = Theta_old[i] - q[i] * dt / dz - S[i] * dt;
+      assert (Theta_new >= Theta_res);
+      // assert (Theta_new <= Theta_sat);
       const double h_new = soil.h (i, Theta_new);
-      const double K_new = soil.K (i, h_new, h_ice[i]);
+      double K_new = soil.K (i, h_new, h_ice[i]);
 
       if (use_darcy && i < to_darcy)
 	// Dry earth, near top.  Use darcy to move water up.
 	{
 	  const double dist = soil.z (i) - soil.z (i+1);
 	  q[i+1] = max (K_new * ((h_old[i+1] - h_new) / dist - 1.0), 0.0);
+	  if (Theta_new + q[i+1] * dt / dz + 0.00001 > Theta_sat)
+	    q[i+1] = (Theta_sat -  Theta_new - 0.00001) * dz / dt;
 	  Theta[i] = Theta_new + q[i+1] * dt / dz;
 	  h[i] = soil.h (i, Theta[i]);
 	}
       else if (h_new < h_fc)
 	// Dry earth, no water movement.
 	{
-	  q[i+1] = 0.0;
-	  Theta[i] = Theta_new;
-	  h[i] = h_new;
+	  if (Theta_new > Theta_sat)
+	    {
+	      q[i+1] = (Theta_sat - Theta_new) * dz / dt;
+	      Theta[i] = Theta_sat;
+	      h[i] = 0.0;
+	    }
+	  else
+	    {
+	      q[i+1] = 0.0;
+	      Theta[i] = Theta_new;
+	      h[i] = h_new;
+	    }
 	}
       else
 	// Gravitational water movement.
 	{
+	  // Geometric average K.
+	  if (i + 1 < soil.size ())
+	    {
+	      if (h_ice[i+1] < h_fc) // Blocked by ice.
+		K_new = 0.0;
+	      else
+		K_new = sqrt (K_new * soil.K (i+1, h[i+1], h_ice[i+1]));
+	    }
+
 	  assert (finite (h_new));
-	  const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
 	  const double Theta_fc = soil.Theta (i, h_fc, h_ice[i]);
 	  const double Theta_next = Theta_new - K_new * dt / dz;
 	  
@@ -129,6 +152,8 @@ UZlr::tick (const Soil& soil,
       assert (finite (h[i]));
       assert (finite (Theta[i]));
       assert (finite (q[i+1]));
+      assert (Theta[i] <= Theta_sat);
+      assert (Theta[i] >= Theta_res);
     }
 
   // Lower border.

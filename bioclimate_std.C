@@ -348,6 +348,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   snow.tick (soil, soil_water, soil_heat, 
 	     weather.hourly_global_radiation (), 0.0,
 	     snow_water_in, weather.snow (),
+	     surface.ponding (),
 	     snow_water_in_temperature, snow_ep);
   snow_ea = snow.evaporation ();
   total_ea += snow_ea;
@@ -358,8 +359,16 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   const double canopy_water_capacity = vegetation.interception_capacity ();
   canopy_ep = (total_ep - snow_ea) * vegetation.cover ();
-  canopy_water_in = snow_water_out * vegetation.cover ();
-  canopy_water_bypass = snow_water_out - canopy_water_in;
+  if (snow_water_out < 0.0)
+    {
+      canopy_water_in = 0.0;
+      canopy_water_bypass = snow_water_out;
+    }
+  else
+    {
+      canopy_water_in = snow_water_out * vegetation.cover ();
+      canopy_water_bypass = snow_water_out - canopy_water_in;
+    }
   
   if (canopy_water_in > 0.01)
     canopy_water_temperature 

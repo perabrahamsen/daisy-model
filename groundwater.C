@@ -26,8 +26,8 @@ void
 Groundwater::initialize (const Time&)
 { }
 
-Groundwater::Groundwater (const string& n)
-  : name (n)
+Groundwater::Groundwater (const AttributeList& al)
+  : name (al.name ("type"))
 { }
 
 Groundwater::~Groundwater ()

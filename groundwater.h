@@ -29,7 +29,7 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (const Time& time);
 protected:
-  Groundwater (const string&);
+  Groundwater (const AttributeList& al);
 public:
   virtual ~Groundwater ();
 };

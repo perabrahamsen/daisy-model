@@ -2091,11 +2091,15 @@ CropStandard::NitrogenUptake (int Hour,
     }
   else
     CrpAux.Fixated = 0.0;
+
   // Updating the nitrogen stress
   RootSys.nitrogen_stress
 	  = max (0.0, min (1.0, ((NCrop - CrpAux.NfNCnt)
 				 / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
-
+  
+  // Ensure we have enough N for all the crop parts.
+  if (!par.enable_N_stress)
+    NCrop = max (NCrop, CrpAux.CrNCnt);
 }
 
 double

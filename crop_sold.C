@@ -789,8 +789,6 @@ Non-functional lim for N-concentration in roots [DS -> g N/g DM].");
 	       "N partitioning at harvest parameter.");
   Harvest.add ("Bt", Syntax::None (), Syntax::Const,
 	       "N partitioning at harvest parameter.");
-  add_submodule_sequence<OM> ("Stem", Harvest, Syntax::Const,
-			      "Stem AM parameters.");
   add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const,
 			      "Leaf AM parameters.");
   add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const,
