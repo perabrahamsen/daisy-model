@@ -60,4 +60,4 @@ public:
   ~Chemicals ();
 };
 
-#endif CHEMICALS_H
+#endif // CHEMICALS_H

@@ -75,6 +75,6 @@ public:
   ~AttributeList ();
 };
 
-#endif ALIST_H
+#endif // ALIST_H
 
 // alist.h ends here

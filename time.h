@@ -72,4 +72,4 @@ bool operator<= (const Time&, const Time&);
 bool operator>= (const Time&, const Time&);
 bool operator>  (const Time&, const Time&);
 
-#endif TIME_H
+#endif // TIME_H

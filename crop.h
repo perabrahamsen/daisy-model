@@ -90,4 +90,4 @@ public:
 
 static Librarian<Crop> Crop_init ("crop");
 
-#endif CROP_H
+#endif // CROP_H

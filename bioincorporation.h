@@ -35,4 +35,4 @@ public:
   ~Bioincorporation ();
 };
 
-#endif BIOINCORPORATION_H
+#endif // BIOINCORPORATION_H

@@ -18,4 +18,4 @@ public:
   SoilNH4 (const AttributeList&);
 };
 
-#endif SOIL_NH4_H
+#endif // SOIL_NH4_H

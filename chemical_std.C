@@ -112,7 +112,7 @@ canopy_dissipation_rate_coefficient")),
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<SoilChemical>;
-#endif BORLAND_TEMPLATES
+#endif // BORLAND_TEMPLATES
 
 static struct ChemicalStandardSyntax
 {

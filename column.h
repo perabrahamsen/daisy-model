@@ -106,4 +106,4 @@ public:
 
 static Librarian<Column> Column_init ("column");
 
-#endif COLUMN_H
+#endif // COLUMN_H

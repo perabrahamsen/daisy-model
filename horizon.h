@@ -53,4 +53,4 @@ public:
 
 static Librarian<Horizon> Horizon_init ("horizon");
 
-#endif HORIZON_H
+#endif // HORIZON_H

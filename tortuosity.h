@@ -27,4 +27,4 @@ public:
 
 static Librarian<Tortuosity> Tortuosity_init ("tortuosity");
 
-#endif TORTUOSITY_H
+#endif // TORTUOSITY_H

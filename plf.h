@@ -54,4 +54,4 @@ public:
   ~PLF ();
 };
 
-#endif PLF_H
+#endif // PLF_H

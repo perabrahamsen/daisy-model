@@ -27,5 +27,5 @@ public:
   virtual ~LogExternSource ();
 };
 
-#endif LOG_EXTERN_H
+#endif // LOG_EXTERN_H
 

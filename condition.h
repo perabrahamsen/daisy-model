@@ -28,4 +28,4 @@ public:
 
 static Librarian<Condition> Condition_init ("condition");
 
-#endif CONDITION_H
+#endif // CONDITION_H

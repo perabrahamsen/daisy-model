@@ -96,4 +96,4 @@ protected:
   virtual ~Traverse ();
 };
 
-#endif TRAVERSE_H
+#endif // TRAVERSE_H

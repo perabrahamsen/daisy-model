@@ -51,4 +51,4 @@ public:
   virtual ~Geometry ();
 };
 
-#endif GEOMETRY_H
+#endif // GEOMETRY_H

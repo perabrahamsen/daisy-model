@@ -54,4 +54,4 @@ inline double h2pF (double h)
 {
   return log10 (-h);
 }
-#endif MATHLIB_H
+#endif // MATHLIB_H

@@ -25,4 +25,4 @@ public:
 
 static Librarian<Average> Average_init ("average");
 
-#endif AVERAGE_H
+#endif // AVERAGE_H

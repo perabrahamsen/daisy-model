@@ -75,4 +75,4 @@ public:
   OM (const AttributeList& al);
 };
 
-#endif OM_H
+#endif // OM_H

@@ -221,4 +221,4 @@ void non_positive (double v, const string& s, bool& ok, ostream& err,
 void is_fraction (double v, const string& s, bool& ok, ostream& err,
 		  int index = -1);
 
-#endif SYNTAX_H
+#endif // SYNTAX_H

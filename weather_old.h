@@ -44,4 +44,4 @@ public:
   ~WeatherOld ();
 };
 
-#endif WEATHER_OLD_H
+#endif // WEATHER_OLD_H

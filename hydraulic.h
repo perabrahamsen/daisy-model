@@ -50,4 +50,4 @@ public:
 
 static Librarian<Hydraulic> Hydraulic_init ("hydraulic");
 
-#endif HYDRAULIC_H
+#endif // HYDRAULIC_H

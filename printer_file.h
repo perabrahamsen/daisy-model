@@ -33,4 +33,4 @@ public:
   ~PrinterFile ();
 };
 
-#endif PRINTER_FILE_H
+#endif // PRINTER_FILE_H

@@ -42,4 +42,4 @@ public:
 	   const Chemicals& chem);
 };      
 
-#endif HARVEST_H
+#endif // HARVEST_H

@@ -43,4 +43,4 @@ public:
 
 static Librarian<Pet> Pet_init ("pet");
 
-#endif PET_H
+#endif // PET_H

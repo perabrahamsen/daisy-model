@@ -86,4 +86,4 @@ public:
   virtual ~Solute ();
 };
 
-#endif SOLUTE_H
+#endif // SOLUTE_H

@@ -74,4 +74,4 @@ public:
 
 static Librarian<Bioclimate> Bioclimate_init ("bioclimate");
 
-#endif BIOCLIMATE_H
+#endif // BIOCLIMATE_H

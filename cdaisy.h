@@ -668,7 +668,7 @@ daisy_version (void);
 }
 #endif
 
-#endif CDAISY_H
+#endif // CDAISY_H
 
 /* @ Emacs Information.
  *

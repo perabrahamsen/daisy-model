@@ -51,4 +51,4 @@ public:
   ~OrganicMatter ();
 };
 
-#endif ORGANIC_MATTER_H
+#endif // ORGANIC_MATTER_H

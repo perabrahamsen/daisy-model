@@ -769,16 +769,64 @@ InputsItem::set_selected ()
   main ()->set_selection_childable (true);
 }
 
+bool
+InputsItem::edit_child ()
+{ return insert_before (0); }
+
+bool
+InputsItem::insert_before (int /* where */)
+{ 
+  // TODO.
+  return false;
+}
+
 InputsItem::InputsItem (const vector<AttributeList*>& in, 
 			QListView* i, const QString& e)
   : TreeItem (i, e, QString::number (in.size ()) + " entries"),
     inputs (in)
 { }
 
+bool
+InputItem::editable () const
+{ return false; }
+
+bool
+InputItem::edit_after ()
+{ 
+  assert (order >= 0);
+  InputsItem* c = dynamic_cast<InputsItem*> (parent ());
+  assert (c);
+  return c->insert_before (order+1);
+}
+
+bool
+InputItem::edit_delete ()
+{ 
+  // TODO: Warn if anything depends on objects from this file.
+  // TODO: Delete objects from this file.
+
+  assert (order >= 0);
+  InputsItem* c = dynamic_cast<InputsItem*> (parent ());
+  assert (c);
+  vector<AttributeList*>& alists = c->inputs;
+  assert (order < alists.size ());
+  alists.erase (&alists[order]);
+  
+  return true; 
+}
+
+void
+InputItem::set_selected ()
+{
+  main ()->set_selection_deletable (true);
+  main ()->set_selection_afterable (true);
+  main ()->set_description ("Externally defined parameterization.");
+}
+
 InputItem::InputItem (const Syntax& syn, AttributeList& al,
 		      const AttributeList& al_def,
 		      InputsItem* i,
 		      const QString& e, const QString& t, const QString& v,
 		      const QString& c, int o)
-  : SequenceItem (syn, al, al_def, i, e, t, v, c, o)
+  : AListItem (syn, al, al_def, i, e, t, v, c, o)
 { }

@@ -37,4 +37,4 @@ public:
   ~Ridge ();
 };
 
-#endif RIDGE_H
+#endif // RIDGE_H

@@ -26,4 +26,4 @@ public:
   ~LogClone ();
 };
 
-#endif LOG_CLONE_H
+#endif // LOG_CLONE_H

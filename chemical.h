@@ -35,4 +35,4 @@ public:
 
 static Librarian<Chemical> Chemical_init ("chemical");
 
-#endif CHEMICAL_H
+#endif // CHEMICAL_H

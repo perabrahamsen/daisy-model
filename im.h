@@ -36,4 +36,4 @@ public:
   ~IM ();
 };
 
-#endif IM_H
+#endif // IM_H

@@ -614,7 +614,7 @@ BioclimateStandard::irrigate_surface (double flux)
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<Snow>;
-#endif BORLAND_TEMPLATES
+#endif // BORLAND_TEMPLATES
 
 static struct BioclimateStandardSyntax
 {

@@ -32,4 +32,4 @@ public:
 
 static Librarian<Action> Action_init ("action");
 
-#endif ACTION_H
+#endif // ACTION_H

@@ -44,4 +44,4 @@ public:
   ~SoilChemicals ();
 };
 
-#endif SOIL_CHEMICALS_H
+#endif // SOIL_CHEMICALS_H

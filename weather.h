@@ -133,4 +133,4 @@ public:
 
 static Librarian<Weather> Weather_init ("weather");
 
-#endif WEATHER_H
+#endif // WEATHER_H

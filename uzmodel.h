@@ -79,4 +79,4 @@ public:
 
 static Librarian<UZmodel> UZmodel_init ("uzmodel");
 
-#endif UZMODEL_H
+#endif // UZMODEL_H

@@ -75,4 +75,4 @@ public:
 
 static Librarian<AM> AM_init ("am");
 
-#endif AM_H
+#endif // AM_H

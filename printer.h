@@ -35,4 +35,4 @@ public:
 
 static Librarian<Printer> Printer_init ("printer");
 
-#endif PRINTER_H
+#endif // PRINTER_H

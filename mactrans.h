@@ -35,4 +35,4 @@ public:
 
 static Librarian<Mactrans> Mactrans_init ("mactrans");
 
-#endif MACTRANS_H
+#endif // MACTRANS_H

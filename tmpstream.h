@@ -5,7 +5,7 @@
 #ifndef TMPSTREAM_H
 #define TMPSTREAM_H
 
-struct ostream;
+#include "common.h"
 
 class TmpStream
 {
@@ -24,4 +24,4 @@ public:
   ~TmpStream ();
 };
 
-#endif TMPSTREAM_H
+#endif // TMPSTREAM_H

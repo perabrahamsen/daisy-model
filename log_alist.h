@@ -78,4 +78,4 @@ struct LogAList : public Log
   ~LogAList ();
 };
 
-#endif LOG_ALIST_H
+#endif // LOG_ALIST_H

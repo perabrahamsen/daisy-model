@@ -29,4 +29,4 @@ public:
 
 static Librarian<Adsorption> Adsorption_init ("adsorption");
 
-#endif ADSORPTION_H
+#endif // ADSORPTION_H

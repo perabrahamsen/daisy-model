@@ -63,4 +63,4 @@ struct LogSelect : public Log
   ~LogSelect ();
 };
 
-#endif LOG_SELECT_H
+#endif // LOG_SELECT_H

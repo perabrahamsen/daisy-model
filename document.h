@@ -5,8 +5,6 @@
 
 #include "librarian.h"
 
-struct ostream;
-
 class Document
 {
   // Content.
@@ -71,4 +69,4 @@ public:
 
 static Librarian<Document> Document_init ("document");
 
-#endif DOCUMENT_H
+#endif // DOCUMENT_H

@@ -48,4 +48,4 @@ private:
   SoilChemical (const SoilChemical&);
 };
 
-#endif SOIL_CHEMICAL_H
+#endif // SOIL_CHEMICAL_H

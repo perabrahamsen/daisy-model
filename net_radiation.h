@@ -34,4 +34,4 @@ public:
 
 static Librarian<NetRadiation> NetRadiation_init ("net_radiation");
 
-#endif NET_RADIATION_H
+#endif // NET_RADIATION_H

@@ -29,4 +29,4 @@ public:
 
 static Librarian<Parser> Parser_init ("parser");
 
-#endif PARSER_H
+#endif // PARSER_H

@@ -4,8 +4,7 @@
 #define TREELOG_STREAM_H
 
 #include "treelog.h"
-
-struct ostream;
+#include "common.h"
 
 class TreelogStream : public Treelog
 {
@@ -29,4 +28,4 @@ public:
   ~TreelogStream ();
 };
 
-#endif TREELOG_STREAM_H
+#endif // TREELOG_STREAM_H

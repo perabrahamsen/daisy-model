@@ -82,4 +82,4 @@ public:
 
 static Librarian<Select> Select_init ("select");
 
-#endif SELECT_H
+#endif // SELECT_H

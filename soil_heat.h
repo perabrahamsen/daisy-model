@@ -40,4 +40,4 @@ public:
   ~SoilHeat ();
 };
 
-#endif SOIL_HEAT_H
+#endif // SOIL_HEAT_H

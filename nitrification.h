@@ -33,4 +33,4 @@ public:
 
 static Librarian<Nitrification> Nitrification_init ("nitrification");
 
-#endif NITRIFICATION_H
+#endif // NITRIFICATION_H

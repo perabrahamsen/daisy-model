@@ -36,8 +36,8 @@ endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-#USE_OPTIMIZE = true
-USE_OPTIMIZE = false
+USE_OPTIMIZE = true
+#USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
@@ -117,7 +117,7 @@ ifeq ($(COMPILER),gcc)
 		DEBUG =
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
-		   -Wconversion -Wno-uninitialized -Wmissing-prototypes 
+		  -Wconversion -Wno-uninitialized -Wmissing-prototypes 
 	COMPILE = c++ $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif

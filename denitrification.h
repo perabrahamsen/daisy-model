@@ -43,4 +43,4 @@ public:
 };
 
 
-#endif DENITRIFICATION_H
+#endif // DENITRIFICATION_H

@@ -186,4 +186,4 @@ output_vector (T const& items, const char* name, Log& log)
     }
 }
 
-#endif LOG_H
+#endif // LOG_H

@@ -30,4 +30,4 @@ public:
   ~Submodel ();
 };
 
-#endif SUBMODEL_H
+#endif // SUBMODEL_H

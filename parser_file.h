@@ -26,4 +26,4 @@ public:
   ~ParserFile ();
 };
 
-#endif PARSER_FILE_H
+#endif // PARSER_FILE_H

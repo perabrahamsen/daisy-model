@@ -34,4 +34,4 @@ public:
   ~Lexer ();
 };
 
-#endif LEXER_H
+#endif // LEXER_H

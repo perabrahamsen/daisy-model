@@ -622,7 +622,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	  else 
 	    last = total[lay];
 	}
-#endif  
+#endif
       // Distribute C in pools.
       for (unsigned int lay = 0; lay < soil.size (); lay++)
 	{

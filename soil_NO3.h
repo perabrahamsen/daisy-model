@@ -18,4 +18,4 @@ public:
   SoilNO3 (const AttributeList&);
 };
 
-#endif SOIL_NO3_H
+#endif // SOIL_NO3_H

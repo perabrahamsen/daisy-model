@@ -38,4 +38,4 @@ public:
   ~Snow ();
 };
 
-#endif SNOW_H
+#endif // SNOW_H

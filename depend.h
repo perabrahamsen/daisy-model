@@ -39,4 +39,4 @@ resequence (const string& component, const string& parameterization,
 	    const dep_map& dependencies);
 
 
-#endif DEPEND_H
+#endif // DEPEND_H

@@ -85,4 +85,4 @@ public:
 
 static Librarian<Vegetation> Vegetation_init ("vegetation");
 
-#endif VEGETATION_H
+#endif // VEGETATION_H

@@ -41,6 +41,6 @@ public:
 
 static Librarian<SVAT> SVAT_init ("svat");
 
-#endif SVAT_H
+#endif // SVAT_H
 
 // svat.h ends here.

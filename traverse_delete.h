@@ -16,4 +16,4 @@ void
 remove_dependencies (const string& component, const string& parameterization, 
 		     const Syntax& syntax, AttributeList& alist);
 
-#endif TRAVERSE_DELETE_H
+#endif // TRAVERSE_DELETE_H

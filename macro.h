@@ -38,4 +38,4 @@ public:
 
 static Librarian<Macro> Macro_init ("macro");
 
-#endif MACRO_H
+#endif // MACRO_H

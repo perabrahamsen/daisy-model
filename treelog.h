@@ -36,4 +36,4 @@ public:
   virtual ~Treelog ();
 };
 
-#endif TREELOG_H
+#endif // TREELOG_H

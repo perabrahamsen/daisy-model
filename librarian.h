@@ -147,4 +147,4 @@ struct map_construct_const
   { return t; }
 };
 
-#endif LIBRARIAN_H
+#endif // LIBRARIAN_H

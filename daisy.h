@@ -50,5 +50,5 @@ public:
   ~Daisy ();
 };
 
-#endif DAISY_H
+#endif // DAISY_H
 
