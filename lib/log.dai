@@ -766,6 +766,12 @@
                    (dimension "mm/&"))
            (number (when hourly)
                    (path weather "*" reference_evapotranspiration)
+		   (tag "RefEvap-file")
+                   (dimension "mm/&"))
+           (number (path column "$col" Bioclimate "*" 
+			 pet "*" reference_evapotranspiration)
+		   (tag "RefEvap-used")
+		   (when hourly)
                    (dimension "mm/&"))
            (number (path weather "*" daily_global_radiation)
                    (dimension "W/m^2"))
@@ -1096,7 +1102,8 @@
                    (dimension "W/m2"))
            (number (path weather "*" daily_global_radiation)
                    (dimension "W/m2"))
-           (number (path weather "*" reference_evapotranspiration)
+           (number (path column "$col" Bioclimate "*" 
+			 pet "*" reference_evapotranspiration)
 		   (when hourly)
                    (dimension "mm/&"))
            (number (path weather "*" rain)
