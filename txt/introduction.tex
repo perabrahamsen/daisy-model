@@ -330,9 +330,9 @@ in the sample (section~\ref{sec:sample}).  Two types are treated
 specially: Numbers have a dimension, which is written in bold in
 square brackets; Components have their name written in bold, and a
 reference to the chapter (or section, for fixed components) in the
-manual where they are described.  Other types (such as integers and
-strings) have a reference to the subsection of section~\ref{sec:types}
-where they are explained.
+manual where they are described.  Other types (such as integers,
+dates, and strings) have a reference to the subsection of
+section~\ref{sec:types} where they are explained.
 
 \subsubsection{The Category Line}
 
@@ -457,11 +457,11 @@ However, if you output the time attribute value in a log file, you will
 see that time changes constantly during the simulation in steps of one
 hour.
 
-The type of the `time' attribute is a Time fixed component, as
-described in section~\ref{fixed:Time}.  You specify four integer
-values separated by whitespace after the attribute name (time), which
-indicate the year, the month, the day in the month, and the hour (from
-0 to 23) in that sequence.
+The type of the `time' attribute is a `time value', as described in
+section~\ref{type:date}.  You specify four integer values separated by
+whitespace after the attribute name (time), which indicate the year,
+the month, the day in the month, and the hour (from 0 to 23) in that
+sequence.  
 
 \begin{verbatim}
   (time 1986 12 1 1)
@@ -795,13 +795,13 @@ illustrated in table~\ref{tab:simple-types}.
   \label{tab:simple-types}
 \end{table}
 
-PLF's, submodels and fixed components are different though.  Unlike
-the simpler types described above, these already contain several parts
-that are white space separated.  Therefore, it is necessary to mark
-their start and end with parentheses except for unordered singletons,
-when there can be no ambiguity.  Again, \emph{name} is the attribute
-name, and \emph{value} is the attribute value in the format described
-in sections~\ref{type:plf} and~\ref{type:alist}.
+Time values, PLF's, submodels, and fixed components are different
+though.  Unlike the simpler types described above, these already
+contain several parts that are white space separated.  Therefore, it
+is necessary to mark their start and end with parentheses except for
+unordered singletons, when there can be no ambiguity.  Again,
+\emph{name} is the attribute name, and \emph{value} is the attribute
+value in the format described in sections~\ref{type:date},~q\ref{type:plf}, and~\ref{type:alist}.
 
 \begin{table}[htbp]
   \begin{center}
@@ -923,6 +923,13 @@ in file names:
 \begin{verbatim}
   (input file "C:/daisy/lib/test.dai")
 \end{verbatim}
+
+\subsection{Time Values}
+\label{type:date}
+
+A time value is written as four whitespace separated integer values,
+which indicate the year, the month, the day in the month, and the hour
+(from 0 to 23), in that sequence.
 
 \subsection{PLF}
 \label{type:plf}
