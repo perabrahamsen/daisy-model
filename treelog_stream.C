@@ -4,6 +4,7 @@
 // BCC5.01 lack ostream.
 #include <iostream>
 #include <deque>
+#include <assert>
 
 struct TreelogStream::Implementation
 {
