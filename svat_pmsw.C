@@ -551,7 +551,7 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 
 // Modified *****************************************************************
 int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_20,
-             double esta, double theta_w, double theta_c, double rcmin,
+             double esta, double theta_w, double theta_c, double /*rcmin*/,
              double rcmax, double /*zeta*/, double f3const, double tref, double spar,
              double tmin, double tmax, double nu_1, double nu_2, double nu_3,
              double crop_ea_w,double crop_ep_w,double canopy_ea,double r_sc,
@@ -561,11 +561,11 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
 {
   daisy_assert (LAI > 0.0);
   double tairk,def;
-  double rcmin_LAI;
-  double fpar,bf_temp,f_theta;
+  double fpar,f_theta;
 #ifdef UNUSED
   //Commented out unused code. -- abraham 2003-02-03
-  double f_1, f_2, f_4, f_temp;
+  double rcmin_LAI;
+  double f_1, bf_temp, f_2, f_4, f_temp;
 #endif
 
   const double a4=700.0; // parameter in f1_dolman (for oats)
@@ -575,7 +575,9 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   tairk=tair+273.15; // air temperature in K
   daisy_assert (spar > 0.0);
   fpar=0.55*2*srad/(spar*LAI); // cpar coefficient in f_1
+#ifdef UNUSED
   rcmin_LAI=rcmin;
+#endif
 
   // constraint functions used in Dickinson (1984) / Noilhan et al. (1991)
   daisy_assert (rcmax > 0.0);
@@ -602,7 +604,9 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   rf1_dolman=(srad/(a4+srad))/(1000.0/(1000.0+a4));
   // constraint functions used in Verma et al.(1993)
   daisy_assert (nu_1 != tmin);
+#ifdef UNUSED
   bf_temp=(tmax-nu_1)/(nu_1-tmin); // used in f_temp
+#endif
   if (tair==tmin) tair=tmin+0.1;
   daisy_assert (tmax > tair);
   daisy_assert (tmax > nu_1);
