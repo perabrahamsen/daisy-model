@@ -106,6 +106,10 @@ Weather::output (Log& log) const
 {
   output_value (hourly_air_temperature (), "hourly_air_temperature", log);
   output_value (daily_air_temperature (), "daily_air_temperature", log);
+  output_value (daily_min_air_temperature (),
+                "daily_min_air_temperature", log);
+  output_value (daily_max_air_temperature (), 
+                "daily_max_air_temperature", log);
   output_value (hourly_global_radiation (), "hourly_global_radiation", log);
   output_value (daily_global_radiation (), "daily_global_radiation", log);
   output_value (reference_evapotranspiration (), 
@@ -274,7 +278,11 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("hourly_air_temperature", "dg C", Syntax::LogOnly,
 	      "Temperature this hour.");
   syntax.add ("daily_air_temperature", "dg C", Syntax::LogOnly,
-	      "Average temperatures this day.");
+	      "Average temperature this day.");
+  syntax.add ("daily_min_air_temperature", "dg C", Syntax::LogOnly,
+	      "Minumum temperature this day.");
+  syntax.add ("daily_max_air_temperature", "dg C", Syntax::LogOnly,
+	      "Maximum temperature this day.");
   syntax.add ("hourly_global_radiation", "W/m^2", Syntax::LogOnly,
 	      "Global radiation this hour.");
   syntax.add ("daily_global_radiation", "W/m^2", Syntax::LogOnly,

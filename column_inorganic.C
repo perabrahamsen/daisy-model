@@ -147,7 +147,7 @@ ColumnInorganic::tick (Treelog& out,
   surface.mixture (soil_chemicals);
   soil_water.macro_tick (soil, surface, out);
 
-  bioclimate.tick (surface, my_weather, 
+  bioclimate.tick (time, surface, my_weather, 
 		   vegetation, soil, soil_water, soil_heat, out);
   vegetation.tick (time, bioclimate, soil, NULL, soil_heat, soil_water,
 		   NULL, NULL,

@@ -1,4 +1,33 @@
+2003-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.12 released.
+
+2003-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioincorporation.C (tick): Don't stop after first empty pool.
+	(output): Fix calculation of CO2.
+
+2003-10-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pet.h, pet_PM.C, pet_weather.C, pet_makkink.C (tick): Added time
+	argument. 
+	* bioclimate_std.C (WaterDistribution, tick): Ditto.
+	* bioclimate.h (tick): Ditto.
+	* column_inorganic.C, column_std.C (tick): Update caller.
+	* pet_Hargreaves.C: New model.
+	* Makefile (MODELS): Add it.
+	
+	* main.C (main): Don't sync with stdio.
+
 2003-10-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C: Add support for T_min and T_max.
+	* weather.C (output): Log them.
+	* weather_none.C: Reindent.
+	* weather_hourly.C (tick): Update daily max and min air
+	temperatures. 
+
+	* weather_std.C (initialize): Check for empty keywords.
 
 	* Version 3.11 released.
 

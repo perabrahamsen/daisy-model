@@ -31,6 +31,7 @@ class SoilWater;
 class Weather;
 class Vegetation;
 class Surface;
+class Time;
 
 class Pet
 {
@@ -46,7 +47,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Weather&, const Vegetation&,
+  virtual void tick (const Time&, const Weather&, const Vegetation&,
 		     const Surface&, const Soil&, const SoilHeat&, 
 		     const SoilWater&, Treelog&) = 0;
   virtual double wet () const = 0; // [mm/h]

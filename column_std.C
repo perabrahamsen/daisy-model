@@ -377,7 +377,7 @@ ColumnStandard::tick (Treelog& out,
   surface.mixture (soil_chemicals);
   soil_water.macro_tick (soil, surface, out);
 
-  bioclimate.tick (surface, my_weather, 
+  bioclimate.tick (time, surface, my_weather, 
 		   vegetation, soil, soil_water, soil_heat, out);
   vegetation.tick (time, bioclimate, soil, &organic_matter, 
 		   soil_heat, soil_water, &soil_NH4, &soil_NO3, 

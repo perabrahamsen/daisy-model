@@ -24,6 +24,7 @@
 #include "fao.h"
 #include "lexer_data.h"
 #include "time.h"
+#include "plf.h"
 #include "tmpstream.h"
 #include "mathlib.h"
 #include "units.h"
@@ -115,6 +116,8 @@ struct WeatherStandard : public Weather
   bool has_date;
   bool has_hour;
   bool has_temperature;
+  bool has_min_temperature;
+  bool has_max_temperature;
   bool has_vapor_pressure;
   bool has_relative_humidity;
   bool has_wind_speed;
@@ -122,6 +125,8 @@ struct WeatherStandard : public Weather
 
   // Convertion.
   string air_temperature_read;
+  string min_air_temperature_read;
+  string max_air_temperature_read;
   string global_radiation_read;
   string precipitation_read;
   string vapor_pressure_read;
@@ -137,12 +142,17 @@ struct WeatherStandard : public Weather
   // These are the last read values for today.
   Time last_time;
   double last_air_temperature;
+  double last_min_air_temperature;
+  double last_max_air_temperature;
   double last_global_radiation;
   double last_precipitation;
   double last_vapor_pressure;
   double last_relative_humidity;
   double last_wind_speed;
   double last_reference_evapotranspiration;
+
+  // And for yesterday.
+  double yesterday_T_max;
 
   // These are the first values after today.
   bool initialized;
@@ -152,6 +162,8 @@ struct WeatherStandard : public Weather
   double next_day;
   double next_hour;
   double next_air_temperature;
+  double next_min_air_temperature;
+  double next_max_air_temperature;
   double next_global_radiation;
   double next_precipitation;
   double next_vapor_pressure;
@@ -388,6 +400,12 @@ WeatherStandard::data_description[] =
   { "AirTemp", "dgC", &WeatherStandard::next_air_temperature,
     &WeatherStandard::air_temperature_read,
     -70, 60, false },
+  { "T_min", "dgC", &WeatherStandard::next_min_air_temperature,
+    &WeatherStandard::min_air_temperature_read,
+    -70, 60, false },
+  { "T_max", "dgC", &WeatherStandard::next_max_air_temperature,
+    &WeatherStandard::max_air_temperature_read,
+    -70, 60, false },
   { "Precip", "mm/h", &WeatherStandard::next_precipitation,
     &WeatherStandard::precipitation_read,
     0, 300, true },
@@ -476,6 +494,8 @@ WeatherStandard::read_line ()
   // Remember old values.
   last_time = next_time;
   last_air_temperature = next_air_temperature;
+  last_min_air_temperature = next_min_air_temperature;
+  last_max_air_temperature = next_max_air_temperature;
   last_global_radiation = next_global_radiation;
   last_precipitation = next_precipitation;
   last_vapor_pressure = next_vapor_pressure;
@@ -537,6 +557,17 @@ WeatherStandard::read_line ()
 	}
       break;
     }
+
+  if (has_min_temperature && has_max_temperature
+      && next_min_air_temperature > next_max_air_temperature)
+    lex->warning ("T_min > T_max");
+  if (has_min_temperature && has_temperature
+      && next_min_air_temperature > next_air_temperature)
+    lex->warning ("T_min > AirTemp");
+  if (has_temperature && has_max_temperature
+      && next_air_temperature > next_max_air_temperature)
+    lex->warning ("AirTemp > T_max");
+  
   lex->next_line ();
 
   if (!lex->good ())
@@ -616,17 +647,43 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
   while (!(now < next_time))
     read_line ();
 
+  bool long_timestep;
   while (true)
     {
       Time end = (next_time < tomorrow) ? next_time : tomorrow;
 
-      bool long_timestep = (Time::hours_between (last_time, next_time) > 12);
+      const int hours = Time::hours_between (last_time, next_time);
+      long_timestep = (hours > 12);
       for (;now < end; now.tick_hour ())
 	{
 	  int hour = now.hour ();
-	  if (has_temperature)
+	  if (has_min_temperature && has_max_temperature)
+            {
+              if (long_timestep)
+                {
+                  if (yesterday_T_max < -400.0)
+                    // First time.
+                    yesterday_T_max = last_max_air_temperature;
+
+                  const double t_min = 12.0 - day_length ();
+                  const double t_max = 15.0;
+                  PLF T;
+                  T.add (15 - 24.0, yesterday_T_max);
+                  T.add (t_min, last_min_air_temperature);
+                  T.add (t_max, last_max_air_temperature);
+                  T.add (24.0 + t_min, next_min_air_temperature);
+                  air_temperature_[hour] = T (hour);
+                  yesterday_T_max = last_max_air_temperature;
+                }
+              else if (has_temperature)
+                air_temperature_[hour] = last_air_temperature;
+              else
+                air_temperature_[hour] = (last_min_air_temperature 
+                                          + last_max_air_temperature) / 2.0;
+            }
+	  else if (has_temperature)
 	    air_temperature_[hour] = last_air_temperature;
-	  else
+          else 
 	    air_temperature_[hour] = T_normal (now);
 	  global_radiation_[hour] = last_global_radiation;
 	  if (long_timestep)
@@ -660,20 +717,26 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
     }
 
   daily_global_radiation_ 
-    = accumulate (&global_radiation_[0], &global_radiation_[24], 0.0) / 24.0;
+    = long_timestep
+    ? last_global_radiation
+    : accumulate (&global_radiation_[0], &global_radiation_[24], 0.0) / 24.0;
   daily_air_temperature_
-    = accumulate (&air_temperature_[0], &air_temperature_[24], 0.0) / 24.0;
+    = (long_timestep && has_temperature)
+    ? last_air_temperature
+    : accumulate (&air_temperature_[0], &air_temperature_[24], 0.0) / 24.0;
   daily_max_air_temperature_
-    = *max_element (&air_temperature_[0], &air_temperature_[24]);
+    = has_max_temperature 
+    ? last_max_air_temperature
+    : *max_element (&air_temperature_[0], &air_temperature_[24]);
   daily_min_air_temperature_
-    = *min_element (&air_temperature_[0], &air_temperature_[24]);
+    = has_min_temperature 
+    ? last_min_air_temperature
+    : *min_element (&air_temperature_[0], &air_temperature_[24]);
 
   if (!has_vapor_pressure && !has_relative_humidity)
     {
-      double T_min = *min_element (&air_temperature_[0],
-				   &air_temperature_[24]);
-      double T_max = *max_element (&air_temperature_[0],
-				   &air_temperature_[24]);
+      double T_min = daily_min_air_temperature_;
+      const double T_max = daily_max_air_temperature_;
       if (T_min == T_max)
 	T_min -= 5.0;
       for (int hour = 0; hour < 24; hour++)
@@ -707,7 +770,13 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
     {
       string key = lex->get_word ();
 
-      daisy_assert (key.size () > 0);
+      if (key.size () < 1)
+        {
+	  lex->error ("Empty keyword");
+	  lex->skip_line ();
+	  lex->next_line ();
+	  continue;
+        }
       if (key[key.size () - 1] != ':')
 	{
 	  lex->error ("Keywords should end in :");
@@ -904,6 +973,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
   if (timestep < 1 && !has_date)
     lex->error ("You must specify either a timestep or date");
   has_temperature = has_data ("AirTemp");
+  has_min_temperature = has_data ("T_min");
+  has_max_temperature = has_data ("T_max");
   has_vapor_pressure = has_data ("VapPres");
   has_relative_humidity = has_data ("RelHum");
   if (has_relative_humidity && has_vapor_pressure)
@@ -956,6 +1027,8 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     has_date (false),
     has_hour (false),
     has_temperature (false),
+    has_min_temperature (false),
+    has_max_temperature (false),
     has_vapor_pressure (false),
     has_relative_humidity (false),
     has_wind_speed (false),
@@ -965,12 +1038,15 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     end_of_header (Lexer::no_position ()),
     last_time (end),
     last_air_temperature (-42.42e42),
+    last_min_air_temperature (-42.42e42),
+    last_max_air_temperature (-42.42e42),
     last_global_radiation (-42.42e42),
     last_precipitation (-42.42e42),
     last_vapor_pressure (-42.42e42),
     last_relative_humidity (-42.42e42),
     last_wind_speed (-42.42e42),
     last_reference_evapotranspiration (-42.42e42),
+    yesterday_T_max (-42.42e42),
     initialized (false),
     next_time (begin),
     next_year (-42.42e42),

@@ -35,6 +35,9 @@
 int
 main (int argc, char* argv[])
 {
+  // We don't use stdio.
+  ios::sync_with_stdio(false);
+
   time_t start_time = time (NULL);
   TreelogDual treelog ("daisy.log", cerr);
   Assertion::Register reg (treelog);

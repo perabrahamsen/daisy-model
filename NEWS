@@ -12,6 +12,50 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.12
+
+** You can now specify daily max and min temperature.
+
+There are two new fields in the ".dwf" files: T_min and T_max.  These
+sepcify the minimum and maximum daily temperature.  
+
+If you specify T_min and T_max, Daisy will create an hourly air
+temperature variation by assuming T_min is reached at sunrise, and
+that T_max is reached at 15:00, and interpret linearly in between.  No
+attempt is made to make the generated hourly values average to the
+value specified in AirTemp.  Models that rely on daily average
+temperature rather than hourly temperature will still get the number
+specified by AirTemp.  Also, in the rare cases where T_min for a given
+day is larger than T_max for the preceding day, some of the hourly
+temperatures will be outside the [T_min;T_max] interval.
+
+If the above limitations are not acceptable, supply hourly values for
+AirTemp, and let Daisy find T_min and T_max from these.
+
+** New "Hargreaves" potential evapotranspiration (pet) model.
+
+This model estimates potential evapotranspiration based on the daily
+temperature variation, i.e. the T_min and T_max described above.
+
+** Fixed bug that prevented bioincorporation in some cases.
+
+** "Grass to grain" will now survive cut at height 0 and after ripeness.
+
+It used to be that only "Grass" would survive that.  The NEWS entry
+for 2.43 got it wrong.
+
+If you want to undo these changes, use
+
+(defcrop "MyCrop" "Grass to grain"
+  "This grass don't survive cut as well."
+  (Prod (IntDSRelRtRes 0.80))
+  (Harvest (DSmax 0.99)))
+
+** New Danish crop kalibrations.
+
+Majs, Aert and Graes are now available from dk-crops.dai, kalibrated
+to average Danish yield.
+
 * 3.11
 
 ** Updated the biomod clayom model.

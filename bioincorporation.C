@@ -130,9 +130,9 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
   {
     const double top_C = am[i]->top_C ();
 
-    // No more worthwhile AOM pools.
+    // Not a worthwhile AOM..
     if (top_C < 1e-30)
-      break;
+      continue;
     
     // Find how much to take from this AOM.
     const double top_N = am[i]->top_N ();
@@ -196,7 +196,7 @@ Bioincorporation::Implementation::output (Log& log) const
 { 
   static const symbol CO2_symbol ("CO2");
   if (log.check_leaf (CO2_symbol))
-    output_value (respiration * C_removed / (1.0 - respiration), "CO2", log);
+    output_value (respiration * C_removed, "CO2", log);
   output_value (C_removed * C_to_DM, "DM", log);
   output_variable (C_removed, log);
   output_variable (N_removed, log);

@@ -1,7 +1,6 @@
-// pet_makkink.C -- Potential evopotranspiration using Makkink's Equation.
+// pet_Hargreaves.C -- Potential evopotransp. using Samani and Hargreaves.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2003 Per Abrahamsen KVL.
 //
 // This file is part of Daisy.
 // 
@@ -24,21 +23,38 @@
 #include "weather.h"
 #include "fao.h"
 #include "log.h"
+#include "mathlib.h"
 
-struct PetMakkink : public Pet
+struct PetHargreaves : public Pet
 {
   // State.
   double reference_evapotranspiration;
   double potential_evapotranspiration;
 
   // Simulation.
-  void tick (const Time&, const Weather& weather, const Vegetation& crops,
+  void tick (const Time& time, const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil&, const SoilHeat&,
 	     const SoilWater&, Treelog&)
     {
+      const double K_hs = 0.0023;
+      const double T_avg = weather.daily_air_temperature ();
+      const double T_diff = max (weather.daily_max_air_temperature () 
+                                 - weather.daily_min_air_temperature (),
+                                 0.0);
+      static const double s_per_d = 60.0 * 60.0 * 24.0; // [W] -> [J/d]
+      const double latent_heat_of_vaporation = 
+        FAO::LatentHeatVaporization (T_avg); // [J/kg] 
+      static const double W_per_m2_to_mm_per_d = s_per_d 
+        / latent_heat_of_vaporation;
+      // Note: andr. uses 0.4081633.  What are his units?
+      double Ra = weather.ExtraterrestrialRadiation (time)
+        * weather.day_cycle (time) // [d^-1] -> [h^-1]
+        * W_per_m2_to_mm_per_d; // [mm/h]
+      
+
       reference_evapotranspiration 
-	= FAO::Makkink (weather.hourly_air_temperature (),
-			weather.hourly_global_radiation ());
+        = K_hs * (T_avg + 17.8) * sqrt (T_diff) * Ra;
+
       potential_evapotranspiration 
 	= reference_to_potential (crops, surface, 
 				  reference_evapotranspiration);
@@ -55,23 +71,31 @@ struct PetMakkink : public Pet
     { return potential_evapotranspiration; }
 
   // Create.
-  PetMakkink (const AttributeList& al)
+  PetHargreaves (const AttributeList& al)
     : Pet (al)
     { }
 };
 
-static struct PetMakkinkSyntax
+static struct PetHargreavesSyntax
 {
   static Pet&
   make (const AttributeList& al)
-    { return *new PetMakkink (al); }
-  PetMakkinkSyntax ()
+    { return *new PetHargreaves (al); }
+  PetHargreavesSyntax ()
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", 
-		 "Potential evopotranspiration using Makkink's Equation.");
+		 "Potential evopotranspiration using Samani and Hargreaves.\n\
+\n\
+Hargreaves, G.H., and Samani, Z.A. (1982) Estimating potential\n\
+evapotranspiration. Tech. Note, J. Irrig. and Drain. Engrg., ASCE,\n\
+108(3):225-230.\n\
+\n\
+Hargreaves, G.H., and Samani, Z.A. (1985) Reference crop\n\
+evapotranspiration from temperature. Appl. Engrg. in Agric.,\n\
+1(2):96-99.");
       Pet::load_syntax (syntax, alist);
-      Librarian<Pet>::add_type ("makkink", alist, syntax, &make);
+      Librarian<Pet>::add_type ("Hargreaves", alist, syntax, &make);
     }
-} PetMakkink_syntax;
+} PetHargreaves_syntax;

@@ -36,6 +36,7 @@ struct SoilWater;
 struct SoilHeat;
 struct Log;
 struct Chemicals;
+struct Time;
 
 class Bioclimate
 { 
@@ -46,7 +47,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (Surface&, const Weather&, Vegetation&, 
+  virtual void tick (const Time&, Surface&, const Weather&, Vegetation&, 
 		     const Soil&, SoilWater&, const SoilHeat&, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 

@@ -95,7 +95,8 @@ struct BioclimateStandard : public Bioclimate
   double crop_ea;		// Actual transpiration. [mm/h]
   double production_stress;	// Stress calculated by SVAT module.
 
-  void WaterDistribution (Surface& surface, const Weather& weather, 
+  void WaterDistribution (const Time&,
+                          Surface& surface, const Weather& weather, 
 			  Vegetation& vegetation, const Soil& soil,
 			  SoilWater& soil_water, const SoilHeat&, Treelog&);
 
@@ -126,7 +127,7 @@ struct BioclimateStandard : public Bioclimate
   double daily_global_radiation_; // From weather [W/m2].
 
   // Simulation
-  void tick (Surface&, const Weather&, 
+  void tick (const Time&, Surface&, const Weather&, 
 	     Vegetation&, const Soil&, SoilWater&, const SoilHeat&, Treelog&);
   void output (Log&) const;
 
@@ -310,7 +311,7 @@ BioclimateStandard::IntensityDistribution (const double Rad0,
 }
 
 void
-BioclimateStandard::WaterDistribution (Surface& surface,
+BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 				       const Weather& weather, 
 				       Vegetation& vegetation,
 				       const Soil& soil, 
@@ -332,7 +333,8 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   // 1 External water sinks and sources. 
 
   // 1.1 Evapotranspiration
-  pet.tick (weather, vegetation, surface, soil, soil_heat, soil_water, msg);
+  pet.tick (time, 
+            weather, vegetation, surface, soil, soil_heat, soil_water, msg);
   total_ep = pet.wet ();
   daisy_assert (total_ep >= 0.0);
   total_ea = 0.0;		// To be calculated.
@@ -491,7 +493,8 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 }  
 
 void 
-BioclimateStandard::tick (Surface& surface, const Weather& weather, 
+BioclimateStandard::tick (const Time& time, 
+                          Surface& surface, const Weather& weather,  
 			  Vegetation& vegetation, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat& soil_heat,
 			  Treelog& msg)
@@ -512,7 +515,7 @@ BioclimateStandard::tick (Surface& surface, const Weather& weather,
   RadiationDistribution (weather, vegetation);
 
   // Distribute water among canopy, snow, and soil.
-  WaterDistribution (surface, weather, vegetation,
+  WaterDistribution (time, surface, weather, vegetation,
 		     soil, soil_water, soil_heat, msg);
 
   // Let the chemicals follow the water.

@@ -1,16 +1,27 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Ny claymod fra Bjørn
+* Fertorganic eksempel
 
-* Tove eksempler.
+** Massebalance i Toves kørsel
+
+Vi er nødt til at skelne mellem inkorporeret gødning og udbragt
+gødning. 
+
+** Lav zip fil og post den
+
+** Send brev
 
 * Noter til hvad der er ændret i Daisy siden opgaver
 
-* Weather
+* irrigate_subsoil (hours)
 
-** Min & max T i klimafil, udregn average.
+* crop_ds_above new height parameter
 
-* SH: Ny ref-evap model
+* Lav klimafil
+
+** SH: forklaring
+
+* SH: Ret Hourly ExtraterrestrialRadiation
 
 * Opdater tutorial
 
@@ -26,6 +37,8 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 Til referencemanual?
 
+* min, max og average log select models skal opføre sig som fluxe.
+
 * Ny (set foo 3.4) pseudo-attribut.
 
 * SH: Salg af referencemanual på www-siden?
@@ -40,9 +53,13 @@ Inputs, Outputs og Pool changes
 
 Balance = Input - Output - Pool changes
 
+* Carbon balance.
+
 * Select::method { current, sum, max, min, average }
 
 Use by summary.
+
+* Vælg pet automatisk?
 
 * SH: PowerPoint validation slides på hjemmeside.
 
@@ -371,4 +388,6 @@ Manager.
 
 This will allow us to ship Condition and Action as part of the Daisy
 independent library.
+
+* Flyt astronomic utilities til seperat fil.
 

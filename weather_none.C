@@ -33,39 +33,39 @@ class WeatherNone : public WeatherOld
   // Simulation.
 public:
   void tick (const Time& t, Treelog& o)
-    { WeatherOld::tick (t, o); Weather::tick_after (t, o); }
+  { WeatherOld::tick (t, o); Weather::tick_after (t, o); }
   double hourly_air_temperature () const
-    { return air_temperature; }
+  { return air_temperature; }
   double daily_air_temperature () const
-    { return air_temperature; }
+  { return air_temperature; }
   double daily_max_air_temperature () const
   { return air_temperature; }
   double daily_min_air_temperature () const
   { return air_temperature; }
   double hourly_global_radiation () const
-    { return global_radiation; }
+  { return global_radiation; }
   double daily_global_radiation () const
-    { return global_radiation; }
+  { return global_radiation; }
   double reference_evapotranspiration () const
-    { return reference_evapotranspiration_; }
+  { return reference_evapotranspiration_; }
   double rain () const
-    { return rain_; }
+  { return rain_; }
   double snow () const
-    { return snow_; }
+  { return snow_; }
 
   // Communication with external model.
   void put_precipitation (double prec)
-    { 
-      WeatherOld::distribute (prec / 24.0); 
-      rain_ = WeatherOld::rain ();
-      snow_ = WeatherOld::snow ();
-    }
+  { 
+    WeatherOld::distribute (prec / 24.0); 
+    rain_ = WeatherOld::rain ();
+    snow_ = WeatherOld::snow ();
+  }
   void put_air_temperature (double T)
-    { air_temperature = T; }
+  { air_temperature = T; }
   void put_reference_evapotranspiration (double ref)
-    { reference_evapotranspiration_ = ref; }
+  { reference_evapotranspiration_ = ref; }
   void put_global_radiation (double rad)
-    { global_radiation = rad; }
+  { global_radiation = rad; }
 
   // Create and Destroy.
 private:

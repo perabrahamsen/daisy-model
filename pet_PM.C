@@ -45,7 +45,7 @@ public:
   NetRadiation& net_radiation;
 
   // Simulation.
-  void tick (const Weather& weather, const Vegetation& crops,
+  void tick (const Time&, const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil& soil,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water, Treelog&);
 
@@ -80,7 +80,7 @@ public:
 };
 
 void
-PetPM::tick (const Weather& weather, const Vegetation& crops,
+PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil& soil,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water,
 	     Treelog& out)

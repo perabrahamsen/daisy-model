@@ -92,8 +92,8 @@ struct WeatherHourly : public WeatherOld
       accumulated_min_air_temperature (1000.0),
       accumulated_count (0),
       daily_air_temperature_ (-42.42e42)
-      daily_air_max_temperature_ (-42.42e42)
-      daily_air_min_temperature_ (42.42e42)
+      daily_max_air_temperature_ (-42.42e42)
+      daily_min_air_temperature_ (42.42e42)
     { }
 
   ~WeatherHourly ()
@@ -163,6 +163,8 @@ WeatherHourly::tick (const Time& time, Treelog& out)
 				/ accumulated_count);
 	  daily_air_temperature_ 
 	    = accumulated_air_temperature / accumulated_count;
+          daily_min_air_temperature_ = accumulated_min_air_temperature;
+          daily_max_air_temperature_ = accumulated_max_air_temperature;
 	  accumulated_global_radiation = 0.0;
 	  accumulated_air_temperature = 0.0;
 	  accumulated_max_air_temperature = -1000.0;
