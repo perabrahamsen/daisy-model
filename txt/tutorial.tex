@@ -926,7 +926,7 @@ specific crop, as in the example below.
     (wait_mm_dd 3 20)
     (plowing)
     (wait_mm_dd 4 10)
-    (fertilize (pig_slurry (weight 100.0 [T w.w./ha])))
+    (fertilize (pig_slurry (weight 100.0 [Mg w.w./ha])))
     (wait_mm_dd 4 15)
     (seed_bed_preparation)
     (sow "Spring Barley")
@@ -1331,7 +1331,7 @@ from neighbors.
 Use the \texttt{from} and \texttt{to} fertilize parameters to specify
 incorporation, as below:
 \begin{verbatim}
-  (fertilize (pig_slurry (weight 100.0 [T w.w./ha]))
+  (fertilize (pig_slurry (weight 100.0 [Mg w.w./ha]))
              (from -5 [cm]) (to -20 [cm]))
 \end{verbatim}
 Again, note the extra set of parentheses that binds \texttt{weight} to

@@ -765,7 +765,7 @@ information see \daisyref{} and \daisytut{}.
 ;; Spring Barley setup for a pig farm rotation.
 (defaction sbarley_P_F_R activity
   (wait_mm_dd 3 05)
-  (fertilize ("Slurry_Vol05%" (weight 30 [T w.w./ha]))(to --5 [cm]))
+  (fertilize ("Slurry_Vol05%" (weight 30 [Mg w.w./ha]))(to --5 [cm]))
   (plowing)
   (wait_mm_dd 4 05)
   (seed_bed_preparation)
