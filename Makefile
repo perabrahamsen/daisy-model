@@ -21,11 +21,13 @@ MAKEFLAGS =
 
 # Some non-local files and directories.
 
+SRCDIR = $(HOME)/daisy
+OBJHOME = /usr/local/daisy
 FTPDIR = /home/ftp/pub/daisy
 WWWINDEX = /home/user_3/daisy/.public_html/index.html
 
 BORLAND = "e:/Program Files/Borland/CBuilder5/"
-MSTARGET = i586-mingw32msvc
+TARGETTYPE = i586-mingw32msvc
 
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
@@ -137,7 +139,8 @@ ifeq ($(USE_DYNLIB),true)
 	DYNSEARCH = -R`pwd`
 endif
 
-GCC = gcc
+GCC = gcc-3.2
+CROSSGCC = "gcc-3.2 -b $(TARGETTYPE) -V 3.2"
 
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
@@ -159,9 +162,10 @@ ifeq ($(COMPILER),gcc)
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
 		  -Wconversion -Wmissing-prototypes -Woverloaded-virtual \
-		  -Wsign-promo \
-		  -Wundef -Wpointer-arith -Wwrite-strings -Wmissing-noreturn
+		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
+		  -Wold-style-cast
 #  -Wold-style-cast: triggered by isalpha and friends.
+#  -Wmissing-noreturn: triggered by 
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
@@ -398,12 +402,13 @@ daisy:	main${OBJ} $(LIBOBJ) #daisy.so
 	$(LINK)daisy $^ -lstdc++ $(MATHLIB)
 
 native:	
-	(cd $(HOSTTYPE) && $(MAKE) VPATH=.. -f ../Makefile daisy)
+	(cd $(OBJHOME)/$(HOSTTYPE) \
+         && $(MAKE) VPATH=$(SRCDIR) -f $(SRCDIR)/Makefile daisy)
 
 cross:
-	(cd $(MSTARGET) \
-         && $(MAKE) GCC="gcc-3.2 -b $(MSTARGET) -V 3.2" VPATH=.. \
-                    -f ../Makefile daisy)
+	(cd $(OBJHOME)/$(TARGETTYPE) \
+         && $(MAKE) GCC=$(CROSSGCC) VPATH=$(SRCDIR) \
+                    -f $(SRCDIR)/Makefile daisy)
 
 # Create manager test executable.
 #
@@ -572,13 +577,13 @@ dist:	cvs
 	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
-	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) TAG_$(TAG) dist)
+	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
 	(cd txt; $(MAKE) FTPDIR=$(FTPDIR) dist)
 	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
-	rm -f $(FTPDIR)/$(MSTARGET)/daisy-$(TAG).exe
-	strip -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) $(HOSTTYPE)/daisy 
-	strip -o $(FTPDIR)/$(MSTARGET)/daisy-$(TAG).exe $(MSTARGET)/daisy 
-	(cd $(FTPDIR); ln -s $(MSTARGET)/daisy-$(TAG).exe daisy.exe)
+	rm -f $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe
+	strip -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) $(OBJHOME)/$(HOSTTYPE)/daisy
+	strip -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe $(OBJHOME)/$(TARGETTYPE)/daisy
+	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
 
 # Update the CVS repository.
 #

@@ -23,7 +23,7 @@
 #include "hydraulic.h"
 #include "mathlib.h"
 #include "plf.h"
-#include <fstream.h>
+#include <fstream>
 
 class HydraulicOld2 : public Hydraulic
 {

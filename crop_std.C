@@ -60,6 +60,7 @@ public:
 
   // Communication with Bioclimate.
 public:
+#if 0
   double water_stress () const // [0-1] (0 = full production)
   { return root_system.water_stress; }
   double nitrogen_stress () const // [0-1] (1 = no production)
@@ -68,6 +69,7 @@ public:
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
   { return canopy.rs_max; }
+#endif
   double height () const	// Crop height [cm]
   { return canopy.Height; }
   double LAI () const

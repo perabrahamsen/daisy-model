@@ -40,7 +40,8 @@ T max (T a, T b)
 
 #endif // VISUALCPP
 
-#if defined (finite)
+#if defined (finite) \
+    || (defined (__GNUC__) && __GNUC__ > 2 && defined (__unix))
 /* do nothing */
 #elif defined (__finite)
 #define finite(x) __finite(x)

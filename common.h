@@ -33,6 +33,12 @@
 #define BROKEN_HEADERS
 #endif
 
+#if (defined (__GNUC__) && __GNUC__ > 2)
+#define NORETURN __attribute__ ((noreturn))
+#else
+#define NORETURN
+#endif
+
 #ifdef __sun__
 #define pow(x, y) (daisy_assert (x >= 0), (pow)(x, y))
 #define sqrt(x) (daisy_assert (x >= 0), (sqrt)(x))

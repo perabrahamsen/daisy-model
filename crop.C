@@ -16,6 +16,7 @@ interest is water and nitrogen uptake at different depths, and the\n\
 vertical leaf area distribution, which are used for competition with\n\
 other crops.";
 
+#if 0
 double 
 Crop::water_stress () const
 { daisy_assert (false); }
@@ -31,6 +32,7 @@ Crop::rs_min () const
 double 
 Crop::rs_max () const
 { daisy_assert (false); }
+#endif
 
 double 
 Crop::SimLAI () const

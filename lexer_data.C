@@ -23,6 +23,7 @@
 #include "lexer_data.h"
 #include "time.h"
 #include "mathlib.h"
+#include <ctype.h>
 
 string
 LexerData::get_word ()

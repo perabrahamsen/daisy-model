@@ -22,12 +22,15 @@
 
 #include "mathlib.h"
 #include "assertion.h"
-#include <math.h>
 
-#if defined (__unix) || defined (__CYGWIN__)
+#if defined (__GNUC__) && __GNUC__ > 2 && defined (__unix)
+#include <math.h>
+#elif defined (__unix) || defined (__CYGWIN__)
+#include <math.h>
 // It is on SunOS 5.8 and Cygwin libc.
 extern "C" double cbrt (double);
 #else
+#include <math.h>
 // But apparently not on Borland C++ 5.0 or 5.5.
 static double cbrt (double x) 
 { return pow (x, 1.0/3.0); }

@@ -26,7 +26,7 @@
 // description of functions
 # include "surface.h"
 # include <math.h>
-# include <fstream.h>
+# include <fstream>
 # include <stdio.h>
 # include <stdlib.h>
 # include "weather.h"

@@ -28,7 +28,8 @@
 #include "log.h"
 #include "check.h"
 #include "plf.h"
-#include <iomanip.h>
+#include <iomanip>
+#include <iostream>
 
 struct Soil::Implementation
 {

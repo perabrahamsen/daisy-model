@@ -23,7 +23,7 @@
 #include "groundwater.h"
 #include "lexer_data.h"
 #include "time.h"
-#include <fstream.h>
+#include <fstream>
 
 class GroundwaterFile : public Groundwater
 {

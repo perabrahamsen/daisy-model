@@ -35,6 +35,7 @@ daisy-lib.zip:	$(DAISY) $(CLIMATE) $(TEXT) $(MSHE)
 # Move it to ftp.
 #
 dist:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	$(MAKE) daisy-lib.zip
 	mv -f daisy-lib.zip $(FTPDIR)/daisy-lib/daisy-lib-$(TAG).zip
 	rm -f $(FTPDIR)/daisy-lib.zip

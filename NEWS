@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.47
+
+** Bug fixes.
+
 * 2.46
 
 ** Fix bug with van Genuchten hydraulic models (including hypres).
@@ -23,9 +27,12 @@ same value for M, affecting root uptake.
 
 ** Switched to from Borland C++ to GCC for building daisy.exe
 
-This seems to cut simulation time to nearly half.
+This seems to cut nearly half of the simulation time, and the size of
+the executable to less than half the old size.
 
-(Technically, I am cross-compiling from Linux to MinGW32 with GCC 3.2.)
+Technically, the new version is created by cross-compiling from Linux
+to MinGW32 with GCC 3.2, while the old version was compiled natively
+with Borland C++ 5.0.1.
 
 * 2.45
 

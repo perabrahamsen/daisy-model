@@ -24,6 +24,8 @@
 #ifndef ASSERTION_H
 #define ASSERTION_H
 
+#include "common.h"
+
 #include <string>
 using namespace std;
 
@@ -32,11 +34,13 @@ class Treelog;
 namespace Assertion
 {
   void message (const string&);
-  void failure (const char* file, int line, const char* fun, const char* test);
+  void failure (const char* file, int line, const char* fun,
+		const char* test) NORETURN;
   void bug (const char* file, int line, const char* fun, const string& msg);
   void warning (const char* file, int line, const char* fun, 
 		const string& msg);
-  void panic (const char* file, int line, const char* fun, const string& msg);
+  void panic (const char* file, int line, const char* fun,
+	      const string& msg) NORETURN;
 
   class Register
   {

@@ -522,6 +522,12 @@ WeatherStandard::read_line ()
     }
   lex->next_line ();
 
+  if (!lex->good ())
+    {
+      lex->error ("End of climate data, reusing last values");
+      return;
+    }
+
   // Precipitation correction.
   const int month = double2int (next_time.month ());
   next_precipitation *= precipitation_correction[month-1];

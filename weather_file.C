@@ -23,7 +23,7 @@
 #include "weather_old.h"
 #include "time.h"
 #include "log.h"
-#include <fstream.h>
+#include <fstream>
 
 struct WeatherFile : public WeatherOld
 {

@@ -24,7 +24,7 @@
 #define LOG_ALIST_H
 
 #include "log.h"
-#include <deque.h>
+#include <deque>
 
 struct LogAList : public Log
 {

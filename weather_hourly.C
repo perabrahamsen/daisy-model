@@ -24,7 +24,7 @@
 #include "time.h"
 #include "log.h"
 #include "mathlib.h"
-#include <fstream.h>
+#include <fstream>
 
 struct WeatherHourly : public WeatherOld
 {
