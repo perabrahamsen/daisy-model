@@ -30,6 +30,8 @@
 #include "mathlib.h"
 #include <map>
 
+using namespace std;
+
 struct Chemicals::Implementation
 { 
   // Types.

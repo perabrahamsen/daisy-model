@@ -126,6 +126,7 @@ inline double h2pF (double h)
   return log10 (-h);
 }
 
-extern double halftime_to_rate (double rate);
+extern double halftime_to_rate (double halftime);
+extern double rate_to_halftime (double rate);
 
 #endif // MATHLIB_H

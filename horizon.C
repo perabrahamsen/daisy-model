@@ -30,6 +30,7 @@
 #include "tortuosity.h"
 #include "log.h"
 #include "check.h"
+#include "vcheck.h"
 #include <vector>
 #include <map>
 #include <numeric>
@@ -51,7 +52,6 @@ struct Horizon::Implementation
   // Organic matter.
   const vector<double> SOM_C_per_N;
   const vector<double> SOM_fractions;
-  double C_factor;
 
   // Strange things.
   const double quarts_form_factor;
@@ -101,16 +101,6 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic)
   // Did we specify 'dry_bulk_density'?  Else calculate it now.
   if (dry_bulk_density < 0.0)
     dry_bulk_density = rho_soil_particles () * (1.0 - hydraulic.porosity ());
-
-  // C factor is the specific C content in horizon [g C/cm³]
-  const double C_divisor 
-    = accumulate (SOM_fractions.begin (), SOM_fractions.end (), 0.0);
-  
-  C_factor = dry_bulk_density * humus * c_fraction_in_humus;
-  if (C_divisor > 0.0)
-    C_factor /= C_divisor;
-  else
-    throw ("Horizon: No C fractions given");
 
   // The particles are not in a real continuous medium.  Try to correct.
   const double continuum_correction_factor = 1.25;
@@ -383,9 +373,23 @@ double
 Horizon::humus () const 
 { return impl.humus; }
 
+double
+Horizon::humus_C () const
+{ return impl.dry_bulk_density * impl.humus * c_fraction_in_humus; }
+
+#if 0
 double 
 Horizon::SOM_C (unsigned int pool) const
 {
+  // C factor is the specific C content in horizon [g C/cm³]
+  const double C_divisor 
+    = accumulate (SOM_fractions.begin (), SOM_fractions.end (), 0.0);
+  
+  double C_factor = dry_bulk_density * humus * c_fraction_in_humus;
+  if (C_divisor > 0.0)
+    C_factor /= C_divisor;
+  else
+    throw ("Horizon: No C fractions given");
   if (pool < impl.SOM_fractions.size ())
     // Specified, cool.
     return impl.SOM_fractions[pool] * impl.C_factor;
@@ -408,6 +412,15 @@ Horizon::SOM_C_per_N (unsigned int pool) const
   // Give up.  Guess.
   throw ("Horizon: SOM: no C_per_N");
 }
+#endif
+
+const std::vector<double>& 
+Horizon::SOM_fractions () const
+{ return impl.SOM_fractions; }
+
+const std::vector<double>& 
+Horizon::SOM_C_per_N () const
+{ return impl.SOM_C_per_N; }
 
 double
 Horizon::heat_conductivity (double Theta, double Ice) const
@@ -556,8 +569,10 @@ By default, this is calculated from the soil constituents.");
   SOM_C_per_N.push_back (11.0);
   SOM_C_per_N.push_back (11.0);
   alist.add ("SOM_C_per_N", SOM_C_per_N);
-  syntax.add_fraction ("SOM_fractions", Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("SOM_fractions", 
+		       Syntax::OptionalConst, Syntax::Sequence, "\
 Fraction of humus in each SOM pool, from slowest to fastest.");
+  syntax.add_check ("SOM_fractions", VCheck::sum_equal_1 ());
   syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("quarts_form_factor", 2.0);

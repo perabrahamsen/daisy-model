@@ -42,6 +42,14 @@
 #include <fstream>
 #include <iostream>
 
+#ifdef __BORLANDC__
+#define EXPORT _export
+#define IMPORT _import
+#else
+#define EXPORT
+#define IMPORT
+#endif
+
 typedef int daisy_bool;
 
 // @ The daisy_syntax Type.

@@ -22,6 +22,8 @@
 
 #include "treelog.h"
 
+using namespace std;
+
 Treelog::Open::Open (Treelog& l, const string& name)
   : log (l)
 { log.open (name); }

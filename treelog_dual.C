@@ -34,6 +34,7 @@ extern "C" char* getcwd (char*, int);
 #else
 #include <dir.h>
 #endif
+using namespace std;
 
 struct TreelogDual::Implementation
 {

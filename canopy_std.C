@@ -24,6 +24,7 @@
 #include "submodel.h"
 #include "log.h"
 #include "mathlib.h"
+using namespace std;
 
 double
 CanopyStandard::CropHeight (double WStem, double DS) const

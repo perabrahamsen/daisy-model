@@ -27,6 +27,7 @@ using namespace std;
 
 class AttributeList;
 class Syntax;
+class PLF;
 
 class VCheck
 { 
@@ -35,10 +36,19 @@ public:
   virtual void check (const Syntax&, const AttributeList&, const string& key)
     const throw (string) = 0;
 
-  // Utilities.
+  // Integer or Integer sequence.
 public:
   static const VCheck& valid_year ();
 
+  // PLF or Integer sequence.
+public:
+  static const VCheck& increasing ();
+  static const VCheck& non_decreasing ();
+  static const VCheck& non_increasing ();
+  static const VCheck& decreasing ();
+  static const VCheck& sum_equal_0 ();
+  static const VCheck& sum_equal_1 ();
+  
   // Create and Destroy.
 private:
   VCheck (VCheck&);
@@ -47,6 +57,24 @@ protected:
   VCheck ();
 public:
   virtual ~VCheck ();
+};
+
+class SumEqual : public VCheck
+{
+  // Parameters.
+private:
+  const double sum;
+
+  // Use.
+private:
+  void validate (double value) const throw (string);
+  void validate (const PLF& value) const throw (string);
+  virtual void check (const Syntax&, const AttributeList&, const string& key)
+    const throw (string);
+
+  // Create and Destroy.
+public:
+  SumEqual (double value);
 };
 
 #endif // VCHECK_H

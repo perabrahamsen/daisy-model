@@ -29,7 +29,6 @@
 #define PLF_H
 
 #include <vector>
-using namespace std;
 
 class Log;
 
@@ -54,7 +53,8 @@ public:
   void offset (double offset);	// Add 'offset' to all y values.
 
   // Utilities.
-  static double find (const vector<double>& x, const vector<double>& y,
+  static double find (const std::vector<double>& x, 
+		      const std::vector<double>& y,
 		      double value);
 
   // Simulation.

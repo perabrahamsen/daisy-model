@@ -28,6 +28,7 @@
 #include "log.h"
 #include "check.h"
 #include "plf.h"
+#include "tmpstream.h"
 #include <iomanip>
 #include <iostream>
 
@@ -150,9 +151,37 @@ Soil::MaxRootingDepth () const
 }
 
 bool 
-Soil::check (Treelog& err) const
+Soil::check (int som_size, Treelog& err) const
 {
   bool ok = Geometry::check (err);
+
+  if (som_size >= 0)
+    {
+      Treelog::Open nest (err, "horizons");
+      for (unsigned int i = 0; i < impl.layers.size (); i++)
+	{
+	  const Horizon& horizon = impl.layers[i]->horizon;
+	  Treelog::Open nest (err, horizon.name);
+	  const int f_size = horizon.SOM_fractions ().size ();
+	  if (f_size != som_size)
+	    {
+	      Treelog::Open nest (err, "SOM_fractions");
+	      TmpStream tmp;
+	      tmp () << "Need " << som_size << " fractions, got " << f_size;
+	      err.error (tmp.str ());
+	      ok = false;
+	    }
+	  const int n_size = horizon.SOM_C_per_N ().size ();
+	  if (f_size != som_size)
+	    {
+	      Treelog::Open nest (err, "SOM_C_per_N");
+	      TmpStream tmp;
+	      tmp () << "Need " << som_size << " C/N numbers, got " << n_size;
+	      err.error (tmp.str ());
+	      ok = false;
+	    }
+	}
+    }
   return ok;
 }
 

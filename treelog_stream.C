@@ -26,6 +26,7 @@
 #include <iostream>
 #include <deque>
 // GCC 2.95.2 need a ".h".
+using namespace std;
 
 struct TreelogStream::Implementation
 {

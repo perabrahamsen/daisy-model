@@ -24,7 +24,12 @@
 #define TREELOG_DUAL_H
 
 #include "treelog.h"
-#include "common.h"
+
+#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
+#include <iostream>
+#else
+#include <iosfwd>
+#endif
 
 class TreelogDual : public Treelog
 {
@@ -35,18 +40,18 @@ private:
 
   // Nesting.
 public:
-  void open (const string& name);
+  void open (const std::string& name);
   void close ();
 
   // Use.
 public:
-  void debug (const string&);
-  void entry (const string&);
+  void debug (const std::string&);
+  void entry (const std::string&);
   void flush ();
 
   // Create and Destroy.
 public:
-  TreelogDual (const string& file, ostream&);
+  TreelogDual (const std::string& file, std::ostream&);
   ~TreelogDual ();
 };
 

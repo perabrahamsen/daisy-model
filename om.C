@@ -27,12 +27,14 @@
 #include "syntax.h"
 #include "alist.h"
 #include "check.h"
+#include "vcheck.h"
 #include "geometry.h"
 #include "log.h"
 #include "mathlib.h"
 #include "tmpstream.h"
 #include "assertion.h"
 #include <numeric>
+using namespace std;
 
 void
 OM::output (Log& log) const
@@ -273,13 +275,8 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
-  const vector<double>& fractions = al.number_sequence ("fractions");
-  if (!approximate (accumulate (fractions.begin (), fractions.end (), 0.0),
-		    1.0))
-    {
-      err.entry ("Sum of 'fractions' must be 1.0");
-      ok = false;
-    }
+#if 0
+  // Use optional value instead.
   const double initial_fraction = al.number ("initial_fraction");
   if (initial_fraction != OM::Unspecified
       && initial_fraction < 0.0 || initial_fraction > 1.0)
@@ -287,6 +284,7 @@ static bool check_alist (const AttributeList& al, Treelog& err)
       err.entry ("Initial fraction should be unspecified, or between 0 and 1");
       ok = false;
     }
+#endif
   if (!al.check ("turnover_rate") && !al.check ("turnover_halftime"))
     {
       err.entry ("\
@@ -329,7 +327,7 @@ You cannot specify 'C_per_N' for intervals where 'C' is unspecified.");
 	    }
 	  if (bogus)
 	    {
-	      err.entry ("'C' / 'N' is inconsitent with 'C_per_N'");
+	      err.entry ("'C' / 'N' is inconsistent with 'C_per_N'");
 	      ok = false;
 	    }
 	}
@@ -367,14 +365,13 @@ How this pool is divided into other pools.\n\
 The first numbers corresponds to each of the SMB pools, the remaining\n\
 numbers corresponds to the SOM pools.  The length of the sequence should\n\
 thus be the number of SMB pools plus the number of SOM pools.");
+  syntax.add_check ("fractions", VCheck::sum_equal_1 ());
   syntax.add ("initial_C_per_N", "g C/g N", Syntax::OptionalState, "\
 The initial C/N ratio when this pool is created.\n\
 Negative numbers mean unspecified.");
-  syntax.add ("initial_fraction", Syntax::None (), Syntax::Const, "\
+  syntax.add ("initial_fraction", Syntax::None (), Syntax::OptionalConst, "\
 The initial fraction of the total available carbon\n\
-allocated to this pool for AOM.  One pool should be left unspecified\
-\n(which corresponds to the default value, a large negative number).");
-  alist.add ("initial_fraction", Unspecified);
+allocated to this pool for AOM.  One pool should be left unspecified.");
   syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
   syntax.add ("water_factor", "cm", Syntax::None (), Syntax::OptionalConst, "\
@@ -407,7 +404,9 @@ OM::get_initial_C_per_N (const AttributeList& al)
 }
 
 OM::OM (const AttributeList& al)
-  : initial_fraction (al.number ("initial_fraction")),
+  : initial_fraction (al.check ("initial_fraction") 
+		      ? al.number ("initial_fraction")
+		      : Unspecified),
     initial_C_per_N (get_initial_C_per_N (al)),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")

@@ -39,22 +39,23 @@ public:
   double full_N (const Geometry& geometry) const;
   double C_at (unsigned int at) const;
   double N_at (unsigned int at) const;
-  void pour (vector<double>& cc, vector<double>& nn);
+  void pour (std::vector<double>& cc, std::vector<double>& nn);
   void add (unsigned int at, double C, double N);
   void add (double C, double N);// Add dead leafs.
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
-	    const vector<double>& density);
+	    const std::vector<double>& density);
   void tick (unsigned int size, const double* turnover_factor,
 	     const double* N_soil, double* N_used,
-	     double* CO2, const vector<SMB*>& smb, 
-	     double* som_C, double* som_N, const vector<DOM*>& dom);
+	     double* CO2, const std::vector<SMB*>& smb, 
+	     double* som_C, double* som_N, const std::vector<DOM*>& dom);
 private:
   // Disallow this OM function.
   void tick (unsigned int size, const double* turnover_factor, 
 	     const double* N_soil, double* N_used,
-	     double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
-	     const vector<DOM*>& dom);
+	     double* CO2, 
+	     const std::vector<SMB*>& smb, const std::vector<SOM*>&som,
+	     const std::vector<DOM*>& dom);
 
   // Create & Destroy.
 public:

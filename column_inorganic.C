@@ -51,6 +51,7 @@ public:
 public:
   void tick (Treelog&, const Time&, const Weather*);
   bool check_am (const AttributeList& am, Treelog& err) const;
+  bool check_inner (Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -158,6 +159,17 @@ bool
 ColumnInorganic::check_am (const AttributeList&, Treelog&) const 
 { daisy_assert (false); }
 
+bool
+ColumnInorganic::check_inner (Treelog& err) const
+{
+  bool ok = true;
+  {
+    Treelog::Open nest (err, "Soil");
+    if (!soil.check (-1, err))
+      ok = false;
+  }
+  return ok;
+}
 static struct ColumnInorganicSyntax
 {
   static Column& make (const AttributeList& al)

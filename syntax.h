@@ -23,9 +23,9 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
 
-#include "common.h"
 #include "treelog.h"
 #include <vector>
+#include <string>
 
 class AttributeList;
 class Library;
@@ -48,9 +48,9 @@ public:
   static const int Unspecified;
 
   // A syntax may have a dimension associated.
-  static const string& Unknown ();
-  static const string& None ();
-  static const string& Fraction ();
+  static const std::string& Unknown ();
+  static const std::string& None ();
+  static const std::string& Fraction ();
 
   // Each syntax entry should have an associated type.
   enum type 
@@ -88,164 +88,167 @@ public:
   bool check (const AttributeList&, Treelog& err) const;
   
   // Check that a numeric value is within the allowed range.
-  void check (const string& key, double value) const;
+  void check (const std::string& key, double value) const;
 
   // Check than an arbitrary alist member is valid.
-  bool check (const AttributeList&, const string& key, Treelog&) const;
+  bool check (const AttributeList&, const std::string& key, Treelog&) const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 
-  bool is_const (const string&) const;
-  bool is_optional (const string&) const;
-  bool is_log (const string&) const;
-  bool is_state (const string&) const;
+  bool is_const (const std::string&) const;
+  bool is_optional (const std::string&) const;
+  bool is_log (const std::string&) const;
+  bool is_state (const std::string&) const;
 
-  type lookup (const string&) const;
-  const Syntax& syntax (const string&) const;
+  type lookup (const std::string&) const;
+  const Syntax& syntax (const std::string&) const;
 public:
-  ::Library& library (const string&) const;
-  int  size (const string&) const;
-  const string& dimension (const string&) const;
-  const string& domain (const string&) const;
-  const string& range (const string&) const;
-  const string& description (const string&) const;
+  ::Library& library (const std::string&) const;
+  int  size (const std::string&) const;
+  const std::string& dimension (const std::string&) const;
+  const std::string& domain (const std::string&) const;
+  const std::string& range (const std::string&) const;
+  const std::string& description (const std::string&) const;
   bool ordered () const;
-  const vector<string>& order () const;
-  int order (const string& name) const;	// Return index in order, or -1.
+  const std::vector<std::string>& order () const;
+  int order (const std::string& name) const;	// Return index in order, or -1
   bool total_order () const;	// True iff all members are ordered.
-  const AttributeList& default_alist (const string&) const;
+  const AttributeList& default_alist (const std::string&) const;
 
   // Get a list of all entries.
-  void entries (vector<string>&) const;
+  void entries (std::vector<std::string>&) const;
   unsigned int entries () const;
 
   // Add syntax entries
-  void add (const string& key,	// Generic.
+  void add (const std::string& key,	// Generic.
 	    type t, 
 	    category cat,
 	    int size,
-	    const string& description);
-  void add (const string& key,
+	    const std::string& description);
+  void add (const std::string& key,
 	    type t, 
 	    category cat,
-	    const string& description)
+	    const std::string& description)
   { add (key, t, cat, Singleton, description); }
 
-  void add (const string& key, // Number.
-	    const string& dim,
+  void add (const std::string& key, // Number.
+	    const std::string& dim,
 	    category cat,
 	    int size,
-	    const string& description);
-  void add (const string& key, 
-	    const string& dim,
+	    const std::string& description);
+  void add (const std::string& key, 
+	    const std::string& dim,
 	    category cat,
-	    const string& description)
+	    const std::string& description)
   { add (key, dim, cat, Singleton, description); } 
-  void add (const string& key,
-	    const string& dim,
+  void add (const std::string& key,
+	    const std::string& dim,
 	    const Check& check,
 	    category cat,
 	    int size,
-	    const string& description);
-  void add (const string& key, 
-	    const string& dim,
+	    const std::string& description);
+  void add (const std::string& key, 
+	    const std::string& dim,
 	    const Check& check,
 	    category cat,
-	    const string& description)
+	    const std::string& description)
   { add (key, dim, check, cat, Singleton, description); } 
-  void add_fraction (const string& key, 
+  void add_fraction (const std::string& key, 
 		     category cat,
 		     int size,
-		     const string& description);
-  void add_fraction (const string& key, 
+		     const std::string& description);
+  void add_fraction (const std::string& key, 
 		     category cat,
-		     const string& description);
+		     const std::string& description);
 
-  void add (const string& key, // PLF.
-	    const string& domain,
-	    const string& range,
+  void add (const std::string& key, // PLF.
+	    const std::string& domain,
+	    const std::string& range,
 	    category cat,
 	    int size,
-	    const string& description);
-  void add (const string& key, 
-	    const string& domain,
-	    const string& range,
+	    const std::string& description);
+  void add (const std::string& key, 
+	    const std::string& domain,
+	    const std::string& range,
 	    category cat,
-	    const string& description)
+	    const std::string& description)
   { add (key, domain, range, cat, Singleton, description); } 
-  void add (const string& key,
-	    const string& domain,
-	    const string& range,
+  void add (const std::string& key,
+	    const std::string& domain,
+	    const std::string& range,
 	    const Check& check,
 	    category cat,
 	    int size,
-	    const string& description);
-  void add (const string& key, 
-	    const string& domain,
-	    const string& range,
+	    const std::string& description);
+  void add (const std::string& key, 
+	    const std::string& domain,
+	    const std::string& range,
 	    const Check& check,
 	    category cat,
-	    const string& description)
+	    const std::string& description)
   { add (key, domain, range, check, cat, Singleton, description); } 
 
-  void add (const string& key,  // AList
+  void add (const std::string& key,  // AList
 	    const Syntax& syntax,
 	    int size,
-	    const string& description)
+	    const std::string& description)
   { add (key, syntax, State, size, description); }
-  void add (const string& key,  // AList
+  void add (const std::string& key,  // AList
 	    const Syntax& syntax,
-	    const string& description)
+	    const std::string& description)
   { add (key, syntax, State, Singleton, description); }
-  void add (const string&, const Syntax&,
+  void add (const std::string&, const Syntax&,
 	    category cat, int size, 
-	    const string& description);
-  void add (const string&, const Syntax&, const AttributeList&,	
+	    const std::string& description);
+  void add (const std::string&, const Syntax&, const AttributeList&,	
 	    // Alist sequence with default element.
-	    category, int size, const string& description);
+	    category, int size, const std::string& description);
 
-  void add (const string& key, // Object
+  void add (const std::string& key, // Object
 	    ::Library& lib, 
 	    int size,
-	    const string& description)
+	    const std::string& description)
   { add (key, lib, State, size, description); }
-  void add (const string& key,
+  void add (const std::string& key,
 	    ::Library& lib, 
-	    const string& description)
+	    const std::string& description)
   { add (key, lib, State, Singleton, description); }
-  void add (const string&, ::Library&,
-	    category, int size, const string& description);
+  void add (const std::string&, ::Library&,
+	    category, int size, const std::string& description);
 
-  void add_library (const string&, ::Library&);
+  void add_library (const std::string&, ::Library&);
 
   typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
-  void add_submodule (const string& name, AttributeList& alist,
-		      Syntax::category cat, const string& description,
+  void add_submodule (const std::string& name, AttributeList& alist,
+		      Syntax::category cat, const std::string& description,
 		      load_syntax_fun load_syntax);
-  void add_submodule_sequence (const string& name, Syntax::category cat, 
-			       const string& description,
+  void add_submodule_sequence (const std::string& name, Syntax::category cat, 
+			       const std::string& description,
 			       load_syntax_fun load_syntax);
 		      
-  void add_check (const string& name, const VCheck& vcheck);
+  void add_check (const std::string& name, const VCheck& vcheck);
 
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user
   // having to specify the names of the entries.  It is recommended
   // *not* to use this in general, as it makes it more difficult to
   // add new entries.
-  void order (const vector<string>&);
-  void order (const string&);
-  void order (const string&, const string&);
-  void order (const string&, const string&, const string&);
-  void order (const string&, const string&, const string&, const string&);
-  void order (const string&, const string&, const string&, const string&,
-	      const string&);
+  void order (const std::vector<std::string>&);
+  void order (const std::string&);
+  void order (const std::string&, const std::string&);
+  void order (const std::string&, const std::string&, const std::string&);
+  void order (const std::string&, const std::string&, const std::string&,
+	      const std::string&);
+  void order (const std::string&, const std::string&, const std::string&,
+	      const std::string&,
+	      const std::string&);
 
   // Create and Destroy.
 
   // A check_fun is a function used for extra syntax checking.
   typedef bool (*check_fun)(const AttributeList&, Treelog& err);
-  typedef bool (*check_list_fun)(const vector<AttributeList*>&, Treelog& err);
+  typedef bool (*check_list_fun)(const std::vector<AttributeList*>&,
+				 Treelog& err);
   void add_check (check_fun);
   void add_check (check_list_fun);
 

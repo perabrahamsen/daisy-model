@@ -24,6 +24,7 @@
 #define HORIZON_H
 
 #include "librarian.h"
+#include <vector>
 
 class Hydraulic;
 class Tortuosity;
@@ -61,13 +62,14 @@ public:
   double silt () const;
   double sand () const;
   double humus () const;
-  double SOM_C (unsigned int pool) const;
-  double SOM_C_per_N (unsigned int pool) const;
+  double humus_C () const;
+  const std::vector<double>& SOM_fractions () const;
+  const std::vector<double>& SOM_C_per_N () const;
 
   // Chemistry.
 public:
-  bool has_attribute (const string& name) const;
-  double get_attribute (const string& name) const;
+  bool has_attribute (const std::string& name) const;
+  double get_attribute (const std::string& name) const;
 
   // Simulation.
 public:

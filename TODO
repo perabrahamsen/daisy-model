@@ -65,6 +65,10 @@ Indeholder en standard lerjord, dansjord m.m. ligesom hydros2d
 
 * stop kommando.
 
+* split common.h op i sysdeps.h, stlutils.h og timestep.h
+
+* saml check.? og check_range.?
+
 * DOM
 
 ** Testkørsel

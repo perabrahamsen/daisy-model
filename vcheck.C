@@ -22,9 +22,13 @@
 #include "syntax.h"
 #include "alist.h"
 #include "time.h"
+#include "plf.h"
 #include "tmpstream.h"
 #include "assertion.h"
-#include <algorithm>
+#include "mathlib.h"
+#include <numeric>
+
+using namespace std;
 
 // GCC 2.95 -O2 dislike declaring these classes local.
 struct ValidYear : public VCheck
@@ -52,20 +56,117 @@ struct ValidYear : public VCheck
       {
 	const vector<int> years = alist.integer_sequence (key);
 	for_each (years.begin (), years.end (), validate);
-#if 0
-	for (unsigned int i = 0; i < years.size (); i++)
-	  {
-	    const int year = years[i];
-	    if (!Time::valid (year, 1, 1, 1))
-	      {
-		TmpStream tmp;
-		tmp () << year << " is not a valid year";
-		throw string (tmp.str ());
-	      }
-	  }
-#endif
       }
-}
+  }
+};
+
+struct LocalOrder : public VCheck
+{
+  virtual void validate (double last, double next) const throw (string) = 0;
+
+  void validate_plf (const PLF& plf) const throw (string)
+  {
+    const int end = plf.size () - 1;
+    daisy_assert (end >= 0);
+    double last = plf.y (0);
+
+    for (int i = 1; i < end; i++)
+      {
+	const double next = plf.y (i);
+	validate (last, next);
+	last = next;
+      }
+  }
+
+  void check (const Syntax& syntax, const AttributeList& alist, 
+	      const string& key) const throw (string)
+  { 
+    daisy_assert (alist.check (key));
+    daisy_assert (!syntax.is_log (key));
+  
+    switch (syntax.lookup (key))
+      {
+      case Syntax::Number:
+	{
+	  daisy_assert (syntax.size (key) != Syntax::Singleton);
+	  const vector<double>& numbers = alist.number_sequence (key);
+	  if (numbers.size () < 2)
+	    return;
+	  double last = numbers[0];
+	  for (int i = 1; i < numbers.size (); i++)
+	    {
+	      const double next = numbers[i];
+	      validate (last, next);
+	      last = next;
+	    }
+	}
+	break;
+      case Syntax::PLF:
+	if (syntax.size (key) == Syntax::Singleton)
+	  validate_plf (alist.plf (key));
+	else
+	  {
+	    const vector<const PLF*>& plfs = alist.plf_sequence (key);
+	    for (unsigned int i = 0; i < plfs.size (); i++)
+	      validate_plf (*plfs[i]);
+	  }
+	break;
+      default:
+	daisy_assert (false);
+      }
+  }
+};
+
+struct Increasing : public LocalOrder
+{
+  void validate (double last, double next) const throw (string)
+  {
+    if (last >= next)
+      {
+	TmpStream tmp;
+	tmp () << last << " >= " << next << ", must be increasing";
+	throw string (tmp.str ());
+      }
+  }
+};
+
+struct NonDecreasing : public LocalOrder
+{
+  void validate (double last, double next) const throw (string)
+  {
+    if (last > next)
+      {
+	TmpStream tmp;
+	tmp () << last << " > " << next << ", must be non-decreasing";
+	throw string (tmp.str ());
+      }
+  }
+};
+
+struct NonIncreasing : public LocalOrder
+{
+  void validate (double last, double next) const throw (string)
+  {
+    if (last < next)
+      {
+	TmpStream tmp;
+	tmp () << last << " < " << next << ", must be non-increasing";
+	throw string (tmp.str ());
+      }
+  }
+};
+
+struct Decreasing : public LocalOrder
+{
+  void validate (double last, double next) const throw (string)
+  {
+    if (last <= next)
+      {
+	TmpStream tmp;
+	tmp () << last << " <= " << next << ", must be decreasing";
+	throw string (tmp.str ());
+      }
+  }
 };
 
 const VCheck& 
@@ -75,8 +176,108 @@ VCheck::valid_year ()
   return valid_year;
 }
 
+const VCheck& 
+VCheck::increasing ()
+{
+  static Increasing increasing;
+  return increasing;
+}
+
+const VCheck& 
+VCheck::non_decreasing ()
+{
+  static NonDecreasing non_decreasing;
+  return non_decreasing;
+}
+
+const VCheck& 
+VCheck::non_increasing ()
+{
+  static NonIncreasing non_increasing;
+  return non_increasing;
+}
+
+const VCheck& 
+VCheck::decreasing ()
+{
+  static Decreasing decreasing;
+  return decreasing;
+}
+
+const VCheck& 
+VCheck::sum_equal_0 ()
+{
+  static SumEqual sum_equal (0.0);
+  return sum_equal;
+}
+
+const VCheck& 
+VCheck::sum_equal_1 ()
+{
+  static SumEqual sum_equal (1.0);
+  return sum_equal;
+}
+
 VCheck::VCheck ()
 { }
 
 VCheck::~VCheck ()
+{ }
+
+void 
+SumEqual::validate (double value) const throw (string)
+{
+  if (!approximate (value, sum))
+    {
+      TmpStream tmp;
+      tmp () << "Sum is " << value << " but should be " << sum;
+      throw string (tmp.str ());
+    }
+}
+
+void 
+SumEqual::validate (const PLF& plf) const throw (string)
+{
+  const int end = plf.size () - 1;
+  daisy_assert (end >= 0);
+  if (plf.y (0) != 0.0)
+    throw (string ("Value at start of PLF should be 0.0"));
+  if (plf.y (end) != 0.0)
+    throw (string ("Value at end of PLF should be 0.0"));
+  validate (plf.integrate (plf.x (0), plf.x (end)));
+}
+
+void
+SumEqual::check (const Syntax& syntax, const AttributeList& alist, 
+		 const string& key) const throw (string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  
+  switch (syntax.lookup (key))
+    {
+    case Syntax::Number:
+      {
+	daisy_assert (syntax.size (key) != Syntax::Singleton);
+	const vector<double>& numbers = alist.number_sequence (key);
+	validate (accumulate (numbers.begin (), numbers.end (), 0.0));
+      }
+      break;
+    case Syntax::PLF:
+      if (syntax.size (key) == Syntax::Singleton)
+	validate (alist.plf (key));
+      else
+	{
+	  const vector<int> plfs = alist.integer_sequence (key);
+	  for (unsigned int i = 0; i < plfs.size (); i++)
+	    validate (plfs[i]);
+	}
+      break;
+    default:
+      daisy_assert (false);
+    }
+}
+
+SumEqual::SumEqual (double value)
+  : sum (value)
 { }

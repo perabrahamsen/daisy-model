@@ -41,7 +41,7 @@ private:
 
   // Utilities.
 public:
-  static const Chemical& lookup (const string& name);
+  static const Chemical& lookup (const std::string& name);
   static void move_fraction (Chemicals& from, Chemicals& to, double fraction);
   static void copy_fraction (const Chemicals& from, Chemicals& to,
 			     double fraction);
@@ -57,10 +57,10 @@ public:
   // Simulation
 public:
   void output (Log&) const;
-  void add (const string& chemical, double amount); // [g/m^2]
-  void set_to (const string& chemical, double amount); // [g/m^2]
-  double amount (const string& chemical) const; // [g/m^2]
-  typedef set<string, less<string>/**/> string_set;
+  void add (const std::string& chemical, double amount); // [g/m^2]
+  void set_to (const std::string& chemical, double amount); // [g/m^2]
+  double amount (const std::string& chemical) const; // [g/m^2]
+  typedef std::set<std::string, std::less<std::string>/**/> string_set;
   void find_missing (const string_set& all, string_set& missing) const;
 
   // Create and Destroy.
@@ -72,9 +72,9 @@ public:
   static void add_syntax (const char* name, Syntax& syntax, 
 			  AttributeList& alist,
 			  Syntax::category cat, 
-			  const string& description);
+			  const std::string& description);
   Chemicals ();
-  Chemicals (const vector<AttributeList*>&);
+  Chemicals (const std::vector<AttributeList*>&);
   ~Chemicals ();
 };
 

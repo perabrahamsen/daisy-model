@@ -23,6 +23,7 @@
 #include "time.h"
 #include "assertion.h"
 #include <stdexcept>
+using namespace std;
 
 // @ Content.
 

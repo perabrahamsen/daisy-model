@@ -23,6 +23,7 @@
 #define PHENOLOGY_H
 
 #include "librarian.h"
+#include <string>
 
 class Log;
 class PLF;
@@ -33,7 +34,7 @@ class Phenology
 {
   // Content.
 public:
-  const string name;
+  const std::string name;
   static const char *const description;
 
   // State.

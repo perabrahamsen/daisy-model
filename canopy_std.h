@@ -21,6 +21,7 @@
 
 
 #include "canopy_simple.h"
+#include <vector>
 
 class CanopyStandard : public CanopySimple
 {
@@ -38,8 +39,8 @@ private:
   const double StemPhotEff;	// Relative photosynthetic effiency of stem.
   const PLF& HvsDS;		// Crop height as function of DS
   const PLF& HvsWStem;		// Relative Crop height as fun. of stem weight
-  const vector<double>& LAIDist0; // Relative CAI distribution at DS=0
-  const vector<double>& LAIDist1; // Relative CAI distribution at DS=1
+  const std::vector<double>& LAIDist0; // Relative CAI distribution at DS=0
+  const std::vector<double>& LAIDist1; // Relative CAI distribution at DS=1
   const double PARrel;		// Relative PAR below the canopy
 
   // Variables.

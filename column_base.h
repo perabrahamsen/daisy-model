@@ -135,7 +135,7 @@ public:
   void clear ();
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
-  virtual bool check_inner (Treelog& err) const;
+  virtual bool check_inner (Treelog& err) const = 0;
 
   // Create and Destroy.
 public:

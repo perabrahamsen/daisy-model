@@ -23,11 +23,13 @@
 #ifndef LIBRARIAN_H
 #define LIBRARIAN_H
 
+#include "common.h"		// For BORLAND TEMPLATES and EMPTY_TEMPLATE
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
 #include "treelog.h"
 #include "assertion.h"
+#include <string>
 #include <map>
 
 class Log;
@@ -38,7 +40,7 @@ class Librarian
   // Types.
 private:
   typedef T& (*constructor) (const AttributeList&);
-  typedef map<string, constructor, less<string>/**/> map_type;
+  typedef std::map<std::string, constructor, less<std::string>/**/> map_type;
 
   // Content.
 private:
@@ -62,20 +64,20 @@ public:
   static T& create (const AttributeList& al)
   {
     daisy_assert (al.check ("type"));
-    const string name = al.name ("type");
+    const std::string name = al.name ("type");
     daisy_assert (library ().check (name));
     daisy_assert (library ().syntax (name).check (al, Treelog::null ()));
     return (content->constructors)[name] (al);
   }
-  static void add_type (const string& name, AttributeList& al,
+  static void add_type (const std::string& name, AttributeList& al,
 			const Syntax& syntax,
 			constructor cons)
   {
     library ().add (name, al, syntax);
     content->constructors.insert(make_pair (name, cons));
   }
-  static void derive_type (const string& name, AttributeList& al,
-			   const string& super)
+  static void derive_type (const std::string& name, AttributeList& al,
+			   const std::string& super)
   {
     add_type (name, al, library ().syntax (super),
 	      (content->constructors)[super]);

@@ -23,7 +23,6 @@
 #ifndef OM_H
 #define OM_H
 
-#include "common.h"
 #include "plf.h"
 #include <vector>
 
@@ -42,17 +41,17 @@ public:
   static const double Unspecified;// No initial fraction specified.
   const double initial_fraction; // Relative fraction for this om.
   const double initial_C_per_N;	// Initial value for C/N.
-  /* const */ vector<double> C_per_N_goal; // Prefered C/N value.
+  /* const */ std::vector<double> C_per_N_goal; // Prefered C/N value.
   /* const */ PLF heat_factor;
   /* const */ PLF water_factor;
 
   // Content.
 public:
-  vector<double> C;		// Carbon in each node.
-  vector<double> N;		// Nitrogen in each node.
+  std::vector<double> C;		// Carbon in each node.
+  std::vector<double> N;		// Nitrogen in each node.
   const double turnover_rate;	// How fast this is it turned over?
-  const vector<double> efficiency;	// How digestible is this?
-  const vector<double> fractions;	// How much is turned into SMB and SOM?
+  const std::vector<double> efficiency;	// How digestible is this?
+  const std::vector<double> fractions;	// How much is turned into SMB and SOM?
 
   // Simulation.
 public:
@@ -76,9 +75,9 @@ protected:
 
 public:
   void tick (unsigned int size, const double* turnover_factor, 
-	     const double* N_soil, double* N_used,
-	     double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
-	     const vector<DOM*>& dom); // Used by SMB and SOM, but not AOM.
+	     const double* N_soil, double* N_used, double* CO2, 
+	     const std::vector<SMB*>& smb, const std::vector<SOM*>&som,
+	     const std::vector<DOM*>& dom); // Used by SMB and SOM, but not AOM
 
   // Utilities.
 public:

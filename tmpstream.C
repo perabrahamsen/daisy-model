@@ -32,6 +32,8 @@
 #include <strstream>
 #endif
 
+using namespace std;
+
 struct TmpStream::Implementation
 {
   ostrstream out;

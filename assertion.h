@@ -1,6 +1,6 @@
 // assertion.h -- Managed assertions.
 // 
-// Copyright 2002 Per Abrahamsen and KVL.
+// Copyright 2002, 2003 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -24,23 +24,27 @@
 #ifndef ASSERTION_H
 #define ASSERTION_H
 
-#include "common.h"
-
 #include <string>
-using namespace std;
 
 class Treelog;
 
+#if (defined (__GNUC__) && __GNUC__ > 2)
+#define NORETURN __attribute__ ((noreturn))
+#else
+#define NORETURN
+#endif
+
 namespace Assertion
 {
-  void message (const string&);
+  void message (const std::string&);
   void failure (const char* file, int line, const char* fun,
 		const char* test) NORETURN;
-  void bug (const char* file, int line, const char* fun, const string& msg);
+  void bug (const char* file, int line, const char* fun, 
+	    const std::string& msg);
   void warning (const char* file, int line, const char* fun, 
-		const string& msg);
+		const std::string& msg);
   void panic (const char* file, int line, const char* fun,
-	      const string& msg) NORETURN;
+	      const std::string& msg) NORETURN;
 
   class Register
   {

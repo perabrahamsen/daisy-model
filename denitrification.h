@@ -23,9 +23,9 @@
 #ifndef DENITRIFICATION_H
 #define DENITRIFICATION_H
 
-#include "common.h"
 #include "plf.h"
 #include <vector>
+
 class AttributeList;
 class Syntax;
 class Soil;
@@ -48,7 +48,7 @@ private:
 
   // Log variable.
 private:
-  vector<double> converted;
+  std::vector<double> converted;
   
   // Simulation.
 public:

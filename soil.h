@@ -36,7 +36,7 @@ class Soil : public Geometry
   struct Implementation;
   Implementation& impl;
   // Cache for fast inline access.
-  /* const */ vector<Horizon*> horizon_;
+  /* const */ std::vector<Horizon*> horizon_;
 
 public:
   // Water.
@@ -64,10 +64,12 @@ public:
   { return horizon_[i]->clay (); }
   inline double humus (int i) const
   { return horizon_[i]->humus (); }
-  inline double SOM_C (int i, unsigned int pool) const
-  { return horizon_[i]->SOM_C (pool); }
-  inline double SOM_C_per_N (int i, unsigned int pool) const
-  { return horizon_[i]->SOM_C_per_N (pool); }
+  inline double humus_C (int i) const
+  { return horizon_[i]->humus_C (); }
+  inline const std::vector<double>& SOM_fractions (int i) const
+  { return horizon_[i]->SOM_fractions (); }
+  inline const std::vector<double>& SOM_C_per_N (int i) const
+  { return horizon_[i]->SOM_C_per_N (); }
 
   // Thermic.
   double heat_conductivity (int i, double Theta, double Ice) const
@@ -76,10 +78,10 @@ public:
   { return horizon_[i]->heat_capacity (Theta, Ice); }
   
   // Chemistry.
-  bool has_attribute (const string& name) const;
-  bool has_attribute (int i, const string& name) const
+  bool has_attribute (const std::string& name) const;
+  bool has_attribute (int i, const std::string& name) const
   { return horizon_[i]->has_attribute (name); }
-  double get_attribute (int i, const string& name) const
+  double get_attribute (int i, const std::string& name) const
   { return horizon_[i]->get_attribute (name); }
 
   // Simulation.
@@ -93,7 +95,7 @@ public:
   void make_table (int i);
 
   // Creation.
-  bool check (Treelog&) const;
+  bool check (int som_size, Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);
   Soil (const AttributeList&);
   void initialize (const Groundwater&, Treelog&);

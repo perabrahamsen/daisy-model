@@ -22,6 +22,7 @@
 #include "units.h"
 #include "syntax.h"
 #include "mathlib.h"
+#include "common.h"
 #include <map>
 
 struct Units::Content

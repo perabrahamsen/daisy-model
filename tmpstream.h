@@ -29,7 +29,6 @@
 #include <iostream>
 #else
 #include <ostream>
-using namespace std;
 #endif
 
 class TmpStream
@@ -40,7 +39,7 @@ class TmpStream
   
   // Use.
 public:
-  ostream& operator () ();
+  std::ostream& operator () ();
   const char* str ();
   
   // Create and Destroy.

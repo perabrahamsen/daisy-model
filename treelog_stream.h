@@ -24,7 +24,12 @@
 #define TREELOG_STREAM_H
 
 #include "treelog.h"
-#include "common.h"
+
+#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
+#include <iostream>
+#else
+#include <iosfwd>
+#endif
 
 class TreelogStream : public Treelog
 {
@@ -35,17 +40,17 @@ private:
 
   // Nesting.
 public:
-  void open (const string& name);
+  void open (const std::string& name);
   void close ();
 
   // Use.
 public:
-  void entry (const string&);
+  void entry (const std::string&);
   void flush ();
 
   // Create and Destroy.
 public:
-  TreelogStream (ostream&);
+  TreelogStream (std::ostream&);
   ~TreelogStream ();
 };
 

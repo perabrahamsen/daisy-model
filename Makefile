@@ -354,7 +354,7 @@ SPECIALS = om.C select_value.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = vcheck.C assertion.C xref.C treelog_dual.C units.C \
+OTHER = gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
@@ -596,8 +596,6 @@ dist:	cvs
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
-
-foo:
 	(cd txt; $(MAKE) FTPDIR=$(FTPDIR) dist)
 	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
 	rm -f $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe

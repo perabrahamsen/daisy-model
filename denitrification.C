@@ -34,6 +34,8 @@
 #include "check.h"
 #include <math.h>
 
+using namespace std;
+
 static double f_Theta (double x)
 {
   if (x < 0.8)

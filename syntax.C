@@ -27,8 +27,11 @@
 #include "check.h"
 #include "vcheck.h"
 #include "assertion.h"
+#include "common.h"
 #include <map>
 #include <algorithm>
+
+using namespace std;
 
 const int Syntax::Singleton = -117;
 const int Syntax::Sequence = -3212;

@@ -47,13 +47,13 @@ public:
   // Content.
 public:
   bool running;
-  const vector<Log*> logs;
+  const std::vector<Log*> logs;
   Condition& activate_output;
   Time time;
   Action& action;
   Weather* weather;
   Field& field;
-  vector<const Harvest*> harvest;
+  std::vector<const Harvest*> harvest;
 
   // Simulation.
 public:

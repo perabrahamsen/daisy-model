@@ -24,7 +24,6 @@
 #define TREELOG_H
 
 #include <string>
-using namespace std;
 
 class Treelog
 {
@@ -39,19 +38,19 @@ public:
   private:
     Treelog& log;
   public:
-    Open (Treelog& l, const string& name);
+    Open (Treelog& l, const std::string& name);
     ~Open ();
   };
-  virtual void open (const string& name) = 0;
+  virtual void open (const std::string& name) = 0;
   virtual void close () = 0;
   
   // Use.
 public:
-  virtual void debug (const string&);
-  virtual void entry (const string&);
-  virtual void message (const string&);
-  virtual void warning (const string&);
-  virtual void error (const string&);
+  virtual void debug (const std::string&);
+  virtual void entry (const std::string&);
+  virtual void message (const std::string&);
+  virtual void warning (const std::string&);
+  virtual void error (const std::string&);
   virtual void flush () = 0;
   
   // Create and Destroy.

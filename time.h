@@ -24,7 +24,6 @@
 #define TIME_H
 
 #include <string>
-using namespace std;
 
 class Time
 {
@@ -51,10 +50,10 @@ public:
 
   // Convert.
 public:
-  static string month_name (int month);
-  static string wday_name (int wday);
-  static int month_number (string name);
-  static int wday_number (string day);
+  static std::string month_name (int month);
+  static std::string wday_name (int wday);
+  static int month_number (std::string name);
+  static int wday_number (std::string day);
   static int mday2yday (int year, int month, int mday);
   static int yday2mday (int year, int yday);
   static int yday2wday (int year, int yday); // 0=monday, 6=sunday.

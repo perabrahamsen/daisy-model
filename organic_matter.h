@@ -64,6 +64,7 @@ public:
   double get_smb_c_at (unsigned int i) const; // [g C/cm³]
 
   // Create and Destroy.
+  int som_pools () const;
   bool check (Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);

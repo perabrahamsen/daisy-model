@@ -35,9 +35,9 @@ class Harvest
 {
   // Content:
 public:
-  const string column;
+  const std::string column;
   const Time time;
-  const string crop;
+  const std::string crop;
   const double stem_DM;
   const double stem_N;
   const double stem_C;
@@ -63,7 +63,7 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   Harvest (const AttributeList& al);
-  Harvest (string col, Time t, string crp, 
+  Harvest (std::string col, Time t, std::string crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,
 	   double lDM, double lN, double lC, double oDM, double oN, double oC,
 	   const Chemicals& chem);

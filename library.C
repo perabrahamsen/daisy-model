@@ -26,6 +26,7 @@
 #include "treelog.h"
 #include "tmpstream.h"
 #include "assertion.h"
+#include "common.h"
 #include <map>
 #include <set>
 

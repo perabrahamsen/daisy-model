@@ -21,9 +21,9 @@
 #include "assertion.h"
 #include "treelog.h"
 #include "tmpstream.h"
-
 #include <vector>
 #include <algorithm>
+using namespace std;
 
 namespace Assertion
 {
@@ -35,7 +35,7 @@ Assertion::message (const string& msg)
 {
   for (unsigned int i = 0; i < logs.size (); i++)
     {
-      logs[i]->error (msg);
+      logs[i]->entry (msg);
       logs[i]->flush ();
     }
 }

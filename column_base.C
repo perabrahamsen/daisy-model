@@ -255,14 +255,8 @@ bool
 ColumnBase::check (bool require_weather,
 		   const Time& from, const Time& to, Treelog& err) const
 {
-  const int n = soil.size ();
   bool ok = true;
-
-  {
-    Treelog::Open nest (err, "Soil");
-    if (!soil.check (err))
-      ok = false;
-  }
+  const int n = soil.size ();
   {
     Treelog::Open nest (err, "Weather");
     if (weather)
@@ -309,10 +303,6 @@ ColumnBase::check (bool require_weather,
     ok = false;
   return ok;
 }
-
-bool
-ColumnBase::check_inner (Treelog&) const
-{ return true; }
 
 void
 ColumnBase::tick_base (Treelog& msg)
