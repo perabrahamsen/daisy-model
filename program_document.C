@@ -37,13 +37,9 @@ struct ProgramDocument : public Program
   std::auto_ptr<Format> format;
   // remember this for models.
   symbol current_component;
-  bool ordered;
   bool submodel;
 
   // LaTeX functions.
-  void print_quoted (const std::string&);
-  void print_quoted (const symbol sym)
-  { print_quoted (sym.name ()); }
   void print_description (const std::string& description);
 
   // Private functions.
@@ -56,8 +52,7 @@ struct ProgramDocument : public Program
   void print_entry_type (const std::string& name,
 			 const Syntax& syntax,
 			 const AttributeList& alist);
-  void print_entry_submodel (std::ostream& out,
-			     const std::string& name, 
+  void print_entry_submodel (const std::string& name, 
 			     int level,
 			     const Syntax& syntax,
 			     const AttributeList& alist);
@@ -69,10 +64,10 @@ struct ProgramDocument : public Program
 			  const AttributeList& alist);
 
   void print_users (const XRef::Users&);
-  void print_sample_ordered (const std::string& name, bool seq);
-  void print_sample_entry (std::ostream& out, const std::string& name, 
+  void print_sample_entry (const std::string& name, 
 			   const Syntax& syntax,
-			   const AttributeList& alist);
+			   const AttributeList& alist,
+			   bool last);
 
   // Print parts of it.
   static void own_entries (const Library& library, const symbol name, 
@@ -80,42 +75,43 @@ struct ProgramDocument : public Program
   static void inherited_entries (const Library& library,
                                  const symbol name, 
                                  std::vector<std::string>& entries);
-  void print_sample (std::ostream& out, const std::string& name,
-		     const Syntax& syntax,
-		     const AttributeList& alist);
-  void print_sample (std::ostream& out, const symbol name,
-		     const Library&);
-  void print_sample_entries (std::ostream& out, const std::string& name,
+  void print_sample (const std::string& name,
+		     const Syntax& syntax, const AttributeList& alist);
+  void print_sample (const symbol name, const Library&);
+  void print_sample_name (const std::string& name);
+  void print_sample_end ();
+  void print_sample_entries (const std::string& name,
                              const Syntax& syntax,
                              const AttributeList& alist,
                              const std::vector<std::string>& order,
                              const std::vector<std::string>& own_entries,
                              const std::string& lib_name,
                              const std::vector<std::string>& base_entries);
-  void print_submodel (std::ostream& out, const std::string& name, int level,
+  void print_submodel (const std::string& name, int level,
 		       const Syntax& syntax,
 		       const AttributeList& alist);
-  void print_submodel_entries (std::ostream& out, 
-                               const std::string& name, int level,
+  void print_submodel_entries (const std::string& name, int level,
                                const Syntax& syntax, 
                                const AttributeList& alist,
                                const std::vector<std::string>& entries);
-  void print_submodel_entry (std::ostream&, const std::string&, int level,
+  void print_submodel_entry (const std::string&, int level,
                              const Syntax& syntax,
-                             const AttributeList& alist);
-  void print_model (std::ostream& out, symbol name, 
-		    const Library& library);
-  void print_fixed (std::ostream& out, const std::string& name, 
+                             const AttributeList& alist, bool& first);
+  void print_model (symbol name, const Library& library);
+  void print_fixed (const std::string& name, 
 		    const Syntax& syntax,
 		    const AttributeList& alist);
-  void print_component (std::ostream& out, const Library& library);
+  void print_component (const Library& library);
 
   // Print it.
-  void print_document (std::ostream& out);
+  void print_document ();
 
   // Program.
   void run (Treelog&)
-  { print_document (std::cout); }
+  {
+    format->initialize (std::cout);
+    print_document (); 
+  }
 
   // Create and Destroy.
   void initialize (const Syntax*, const AttributeList*, Treelog&)
@@ -131,15 +127,11 @@ struct ProgramDocument : public Program
 };
 
 void
-ProgramDocument::print_quoted (const std::string& name)
-{ format->text (name); }
-
-void
 ProgramDocument::print_string (const std::string& name)
 {
   TmpStream tmp;
   PrinterFile::print_string (tmp (), name);
-  print_quoted (tmp.str ());
+  format->text (tmp.str ());
 }
 
 void
@@ -267,8 +259,7 @@ ProgramDocument::print_entry_type (const std::string& name,
 }
 
 void 
-ProgramDocument::print_entry_submodel (std::ostream& out,
-				       const std::string& name, 
+ProgramDocument::print_entry_submodel (const std::string& name, 
 				       const int level,
 				       const Syntax& syntax,
 				       const AttributeList& alist)
@@ -286,8 +277,8 @@ ProgramDocument::print_entry_submodel (std::ostream& out,
 	: alist.alist (name);
       if (!nested.check ("submodel"))
 	{
-	  print_sample (out, name, child, nested);
-	  print_submodel (out, name, level, child, nested);
+	  print_sample (name, child, nested);
+	  print_submodel (name, level, child, nested);
 	}
       if (level == 1)
 	submodel = false;
@@ -561,7 +552,7 @@ ProgramDocument::print_users (const XRef::Users& users)
 	}
       else 
 	{
-	  format->text (",\n");
+	  format->text (",");
 	  format->soft_linebreak ();
 	}
       const std::string submodel = (*i).submodel;
@@ -577,159 +568,161 @@ ProgramDocument::print_users (const XRef::Users& users)
 }
 
 void
-ProgramDocument::print_sample_ordered (const std::string& name, bool sequence)
-{ 
-  ordered = true;
-  format->italic (name);
-  if (sequence)
-    format->special ("...");
-  format->special ("nbsp");
-}
-
-void
-ProgramDocument::print_sample_entry (std::ostream& out,
-				     const std::string& name, 
+ProgramDocument::print_sample_entry (const std::string& name, 
 				     const Syntax& syntax,
-				     const AttributeList& alist)
+				     const AttributeList& alist,
+				     const bool last)
 { 
-  if (ordered)
-    out << "\\\\\n&";
-  else
-    ordered = true;
-      
-  format->text ("(");
-  print_string (name);
+  std::string comment;
+  {
+    Format::TableCell dummy (*format);
+    format->text ("(");
+    print_string (name);
 
-  if (alist.check (name))
-    {
-      const Syntax::type type = syntax.lookup (name);
-      const int size = syntax.size (name);
+    if (alist.check (name))
+      {
+	const Syntax::type type = syntax.lookup (name);
+	const int size = syntax.size (name);
 
-      bool print_name = true;
-      std::string comment = "Has default value.";
+	bool print_name = true;
+	comment = "Has default value.";
 
-      if (size == Syntax::Singleton)
-	switch (type)
-	  {
-	  case Syntax::Number:
+	if (size == Syntax::Singleton)
+	  switch (type)
 	    {
-	      format->special ("nbsp");
-	      TmpStream tmp;
-	      tmp () << alist.number (name) << ")";
-	      format->text (tmp.str ());
-	      print_name = false;
-	    }
-	    break;
-	  case Syntax::AList:
-	    {
-	      const bool has_errors
-		= !syntax.syntax (name).check (alist.alist (name), 
-					       Treelog::null ());
-	      if (has_errors)
-		comment = "Has partial value.";
-	    }
-	    break;
-	  case Syntax::PLF:
-	    break;
-	  case Syntax::Boolean:
-	    format->special ("nbsp");
-	    format->text (alist.flag (name) ? "true" : "false");
-	    format->text (")");
-	    print_name = false;
-	    break;
-	  case Syntax::String:
-	    {
-	      const std::string& value = alist.name (name);
-	      if (value.length () < 20)
-		{
-		  format->special ("nbsp");
-		  format->text (value + ")");
-		  print_name = false;
-		}
-	    }
-	    break;
-	  case Syntax::Integer:
-	    {
-	      format->special ("nbsp");
-	      TmpStream tmp;
-	      tmp () << alist.integer (name) << ")";
-	      format->text (tmp.str ());
-	      print_name = false;
-	    }
-	    break;
-	  case Syntax::Object:
-	    {
-	      const AttributeList& object = alist.alist (name);
-	      daisy_assert (object.check ("type"));
-	      const std::string& type = object.name ("type");
-	      comment = "Default " + type + " value.";
-	    }
-	    break;
-	  case Syntax::Library:
-	  case Syntax::Error:
-	    daisy_assert (false);
-	  }
-      else if (alist.size (name) == 0)
-	{
-	  format->text (")");
-	  print_name = false;
-	}
-      else
-	switch (type)
-	  {
-	  case Syntax::Number:
-	    if (alist.size (name) < 5)
+	    case Syntax::Number:
 	      {
-		const std::vector<double>& numbers
-                  = alist.number_sequence (name);
-		for (int i = 0; i < numbers.size (); i++)
-		  {
-		    format->special ("nbsp");
-		    TmpStream tmp;
-		    tmp () << numbers[i];
-		    format->text (tmp.str ());
-		  }
-		format->text (")");
+		format->special ("nbsp");
+		TmpStream tmp;
+		tmp () << alist.number (name) << ")";
+		format->text (tmp.str ());
 		print_name = false;
 	      }
-	    break;
-	  case Syntax::AList:
-	  case Syntax::PLF:
-	  case Syntax::Boolean:
-	  case Syntax::String:
-	  case Syntax::Integer:
-	  case Syntax::Object:
-	    break;
-	  case Syntax::Library:
-	  case Syntax::Error:
-	    daisy_assert (false);
-	  }
-      if (print_name)
-	{
-	  format->special ("nbsp");
-	  format->italic (name);
-	  if (syntax.size (name) != Syntax::Singleton)
-	    {
+	      break;
+	    case Syntax::AList:
+	      {
+		const bool has_errors
+		  = !syntax.syntax (name).check (alist.alist (name), 
+						 Treelog::null ());
+		if (has_errors)
+		  comment = "Has partial value.";
+	      }
+	      break;
+	    case Syntax::PLF:
+	      break;
+	    case Syntax::Boolean:
 	      format->special ("nbsp");
-	      format->special ("...");
+	      format->text (alist.flag (name) ? "true" : "false");
+	      format->text (")");
+	      print_name = false;
+	      break;
+	    case Syntax::String:
+	      {
+		const std::string& value = alist.name (name);
+		if (value.length () < 20)
+		  {
+		    format->special ("nbsp");
+		    print_string (value);
+		    format->text (")");
+		    print_name = false;
+		  }
+	      }
+	      break;
+	    case Syntax::Integer:
+	      {
+		format->special ("nbsp");
+		TmpStream tmp;
+		tmp () << alist.integer (name) << ")";
+		format->text (tmp.str ());
+		print_name = false;
+	      }
+	      break;
+	    case Syntax::Object:
+	      {
+		const AttributeList& object = alist.alist (name);
+		daisy_assert (object.check ("type"));
+		const std::string& type = object.name ("type");
+		comment = "Default " + type + " value.";
+	      }
+	      break;
+	    case Syntax::Library:
+	    case Syntax::Error:
+	      daisy_assert (false);
 	    }
-	  out << ")&;~";
-	  print_quoted (comment);
-	}
-    }
-  else
+	else if (alist.size (name) == 0)
+	  {
+	    format->text (")");
+	    print_name = false;
+	  }
+	else
+	  switch (type)
+	    {
+	    case Syntax::Number:
+	      if (alist.size (name) < 5)
+		{
+		  const std::vector<double>& numbers
+		    = alist.number_sequence (name);
+		  for (int i = 0; i < numbers.size (); i++)
+		    {
+		      format->special ("nbsp");
+		      TmpStream tmp;
+		      tmp () << numbers[i];
+		      format->text (tmp.str ());
+		    }
+		  format->text (")");
+		  print_name = false;
+		}
+	      break;
+	    case Syntax::AList:
+	    case Syntax::PLF:
+	    case Syntax::Boolean:
+	    case Syntax::String:
+	    case Syntax::Integer:
+	    case Syntax::Object:
+	      break;
+	    case Syntax::Library:
+	    case Syntax::Error:
+	      daisy_assert (false);
+	    }
+	if (print_name)
+	  {
+	    format->special ("nbsp");
+	    format->italic (name);
+	    if (syntax.size (name) != Syntax::Singleton)
+	      {
+		format->special ("nbsp");
+		format->special ("...");
+	      }
+	    format->text (")");
+	  }
+	else
+	  comment = "";
+      }
+    else
+      {
+	format->special ("nbsp");
+	format->italic (name);
+	if (syntax.size (name) != Syntax::Singleton)
+	  {
+	    format->special ("nbsp");
+	    format->special ("...");
+	  }
+	format->text (")");
+
+      }
+    if (last && comment.size () < 1)
+      print_sample_end ();
+  }
+  if (comment.size () > 0)
     {
+      Format::TableCell dummy (*format);
+      format->text (";");
       format->special ("nbsp");
-      format->italic (name);
-      if (syntax.size (name) != Syntax::Singleton)
-	{
-	  format->special ("nbsp");
-	  format->special ("...");
-	}
-      format->text (")");
+      format->text (comment);
+      if (last)
+	print_sample_end ();
     }
 }
-
 void
 ProgramDocument::own_entries (const Library& library, const symbol name, 
 			      std::vector<std::string>& entries)
@@ -788,7 +781,7 @@ ProgramDocument::inherited_entries (const Library& library, const symbol name,
 }
 
 void 
-ProgramDocument::print_sample (std::ostream& out, const std::string& name,
+ProgramDocument::print_sample (const std::string& name,
 			       const Syntax& syntax,
 			       const AttributeList& alist)
 {
@@ -796,12 +789,11 @@ ProgramDocument::print_sample (std::ostream& out, const std::string& name,
   std::vector<std::string> own;
   syntax.entries (own);
   const std::vector<std::string> base;
-  print_sample_entries (out, name, syntax, alist, order, own, "dummy", base);
+  print_sample_entries (name, syntax, alist, order, own, "dummy", base);
 }
 
 void 
-ProgramDocument::print_sample (std::ostream& out, const symbol name,
-			       const Library& library)
+ProgramDocument::print_sample (const symbol name, const Library& library)
 {
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
@@ -812,13 +804,32 @@ ProgramDocument::print_sample (std::ostream& out, const symbol name,
   std::vector<std::string> base;
   inherited_entries (library, name, base);
 
-  print_sample_entries (out, name.name (), syntax, alist, order, own, 
+  print_sample_entries (name.name (), syntax, alist, order, own, 
                         library.name ().name (), base);
 }
 
 void 
-ProgramDocument::print_sample_entries (std::ostream& out, 
-                                       const std::string& name,
+ProgramDocument::print_sample_name (const std::string& name)
+{
+  Format::TableCell dummy (*format);
+  format->text ("<");
+  format->special ("nbsp");
+  if (!submodel)
+    {
+      print_string (name);
+      format->special ("nbsp");
+    }
+}
+
+void 
+ProgramDocument::print_sample_end ()
+{
+  format->special ("nbsp");
+  format->text (">");
+}
+
+void 
+ProgramDocument::print_sample_entries (const std::string& name,
                                        const Syntax& syntax,
                                        const AttributeList& alist,
                                        const std::vector<std::string>& 
@@ -844,70 +855,96 @@ ProgramDocument::print_sample_entries (std::ostream& out,
       base.push_back (base_entries[i]);
 
   // Count entries.
-  
+  const size_t count = order.size () + own.size () + base.size ();
+  size_t left = count;
 
-  daisy_assert (ordered == false);
   format->soft_linebreak ();
   format->raw ("LaTeX", "\\noindent\n");
   Format::Typewriter dummy (*format);
   Format::Table d2 (*format, "lll");
-  Format::TableRow row (*format);
-  {
+
+  // Empty models.
+  if (count == 0)
     {
+      Format::TableRow d3 (*format);
+      print_sample_name (name);
       Format::TableCell d4 (*format);
-      format->text ("<");
-      format->special ("nbsp");
-      if (!submodel)
-	{
-	  print_string (name);
-	  out << "~";
+      print_sample_end ();
+    }
+
+  // Ordered members first.
+  if (order.size () > 0)
+    {
+      Format::TableRow d3 (*format);
+      print_sample_name (name);
+      Format::TableCell d4 (*format);
+      for (unsigned int i = 0; i < order.size (); i++)
+	{ 
+	  format->italic (order[i]);
+	  if (syntax.size (order[i]) == Syntax::Sequence)
+	    format->special ("...");
+	  format->special ("nbsp");
+	  left--;
+	  if (left == 0)
+	    print_sample_end ();
 	}
     }
-    // Ordered members first.
-    Format::TableCell d4 (*format);
-    for (unsigned int i = 0; i < order.size (); i++)
-      print_sample_ordered (order[i], 
-			    syntax.size (order[i]) == Syntax::Sequence);
-  }
   
   // Then own members.
   for (unsigned int i = 0; i < own.size (); i++)
-    print_sample_entry (out, own[i], syntax, alist);
+    {
+      Format::TableRow row (*format);
+      if (left == count)
+	print_sample_name (name);
+      else
+	Format::TableCell empty (*format);
+	  
+      print_sample_entry (own[i], syntax, alist, left == 1);
+      left--;
+    }
  
   // Finally inherited members.
   if (base.size () > 0)
     {
-      if (ordered)
-	out << "\\\\\n&";
-      else
-	ordered = true;
-      out << "\\multicolumn{2}{l}{;; Shared parameters are described "
-	  << "in section~\\ref{model:"
-	  << lib_name << "-" << alist.identifier ("base_model") << "}}";
+      {
+	Format::TableRow row (*format);
+	
+	if (left == count)
+	  print_sample_name (name);
+	else
+	  { Format::TableCell empty (*format); }
+	
+	{
+	  Format::TableMultiCell dummy (*format, 2, "l");
+	  format->text (";; Shared parameters are described in section");
+	  format->special ("nbsp");
+	  format->ref ("model", 
+		       lib_name + "-" + alist.identifier ("base_model"));
+	}
+      }
       for (unsigned int i = 0; i < base.size (); i++)
-        print_sample_entry (out, base[i], syntax, alist);
+	{
+	  Format::TableRow row (*format);
+	  { Format::TableCell empty (*format); }
+	  print_sample_entry (base[i], syntax, alist, left == 1);
+	  left--;
+	}
     }
-  
-  // Done.
-  format->special ("nbsp");
-  format->text (">");
-  ordered = false;
+  daisy_assert (left == 0);
 }
 
 void 
-ProgramDocument::print_submodel (std::ostream& out,
-				 const std::string& name, int level,
+ProgramDocument::print_submodel (const std::string& name, int level,
 				 const Syntax& syntax,
 				 const AttributeList& alist)
 {
   std::vector<std::string> entries;
   syntax.entries (entries);
-  print_submodel_entries (out, name, level, syntax, alist, entries);
+  print_submodel_entries (name, level, syntax, alist, entries);
 }
 
 void 
-ProgramDocument::print_submodel_entries (std::ostream& out,
-					 const std::string& name, int level,
+ProgramDocument::print_submodel_entries (const std::string& name, int level,
 					 const Syntax& syntax,
 					 const AttributeList& alist,
 					 const std::vector<std::string>&
@@ -921,7 +958,7 @@ ProgramDocument::print_submodel_entries (std::ostream& out,
 
   if (entries.size () == 0)
     { 
-      format->new_paragraph ();
+      format->soft_linebreak ();
       format->text (name + " has no members");
       format->soft_linebreak ();
     }
@@ -931,38 +968,51 @@ ProgramDocument::print_submodel_entries (std::ostream& out,
       if (log_count < entries.size ())
 	{
 	  Format::List dummy (*format);
-
+	  bool first = true;
 	  // Ordered members first.
 	  for (unsigned int i = 0; i < order.size (); i++)
-	    print_submodel_entry (out, order[i], level, syntax, alist);
+	    {
+	      print_submodel_entry (order[i], level, syntax, alist, first);
+	    }
       
 	  // Then the remaining members, except log variables.
 	  for (unsigned int i = 0; i < entries.size (); i++)
 	    if (syntax.order (entries[i]) < 0 && !syntax.is_log (entries[i]))
-	      print_submodel_entry (out, entries[i], level, syntax, alist);
+	      print_submodel_entry (entries[i], level, syntax, alist, first);
 	}
+
+      if (log_count < entries.size () && log_count > 0)
+	format->soft_linebreak ();
 
       // Print log variables.
       if (log_count > 0)
 	{
+	  if (format->formatp ("LaTeX") && level == 0)
+	    format->raw ("LaTeX", "\\subsection*{Log Variables}");
+	  else 
+	    format->bold ("Log Variables");
 	  format->soft_linebreak ();
-	  format->bold ("Log Variables");
 	  format->soft_linebreak ();
 	  
 	  Format::List dummy (*format);
+	  bool first = true;
 	  for (unsigned int i = 0; i < entries.size (); i++)
 	    if (syntax.is_log (entries[i]))
-	      print_submodel_entry (out, entries[i], level, syntax, alist);
+	      print_submodel_entry (entries[i], level, syntax, alist, first);
 	}
     }
 }
 
 void 
-ProgramDocument::print_submodel_entry (std::ostream& out,
-				       const std::string& name, int level,
+ProgramDocument::print_submodel_entry (const std::string& name, int level,
 				       const Syntax& syntax,
-				       const AttributeList& alist)
+				       const AttributeList& alist, bool& first)
 {
+  if (first)
+    first = false;
+  else
+    format->soft_linebreak ();
+
   const Syntax::type type = syntax.lookup (name);
 
   // We ignore libraries.
@@ -1010,13 +1060,12 @@ ProgramDocument::print_submodel_entry (std::ostream& out,
     }
 
   // print submodel entries, if applicable
-  print_entry_submodel (out, name, level + 1, syntax, alist);
+  print_entry_submodel (name, level + 1, syntax, alist);
 }
 
 
 void
-ProgramDocument::print_model (std::ostream& out, const symbol name, 
-			      const Library& library)
+ProgramDocument::print_model (const symbol name, const Library& library)
 {
   
   const Syntax& syntax = library.syntax (name);
@@ -1074,17 +1123,17 @@ ProgramDocument::print_model (std::ostream& out, const symbol name,
 	print_description (alist.name ("description"));
 
       print_users (xref.models[used]);
-      print_sample (out, name, library);
+      print_sample (name, library);
       
       // Print own entries.
       std::vector<std::string> entries;
       own_entries (library, name, entries);
-      print_submodel_entries (out, name.name (), 0, syntax, alist, entries);
+      print_submodel_entries (name.name (), 0, syntax, alist, entries);
     }
 }
 
 void
-ProgramDocument::print_fixed (std::ostream& out, const std::string& name, 
+ProgramDocument::print_fixed (const std::string& name, 
 			      const Syntax& syntax,
 			      const AttributeList& alist)
 {
@@ -1098,8 +1147,8 @@ ProgramDocument::print_fixed (std::ostream& out, const std::string& name,
 
   print_users (xref.submodels[name]);
 
-  print_sample (out, name, syntax, alist);
-  print_submodel (out, name, 0, syntax, alist);
+  print_sample (name, syntax, alist);
+  print_submodel (name, 0, syntax, alist);
 }
 
 class ModelCompare
@@ -1152,7 +1201,7 @@ public:
 };
 
 void
-ProgramDocument::print_component (std::ostream& out, const Library& library)
+ProgramDocument::print_component (const Library& library)
 {
 
   const symbol name = library.name ();
@@ -1174,16 +1223,15 @@ ProgramDocument::print_component (std::ostream& out, const Library& library)
   ModelCompare model_compare (library);
   sort (entries.begin (), entries.end (), model_compare);
   for (unsigned int i = 0; i < entries.size (); i++)
-    print_model (out, entries[i], library);
+    print_model (entries[i], library);
 
   static const symbol Daisy_symbol ("Daisy");
   current_component = Daisy_symbol;
 }
 
 void
-ProgramDocument::print_document (std::ostream& out)
+ProgramDocument::print_document ()
 {
-  format->initialize (out);
   Format::Document dummy (*format);
 
   // For all components...
@@ -1191,7 +1239,7 @@ ProgramDocument::print_document (std::ostream& out)
   Library::all (entries);
   sort (entries.begin (), entries.end (), symbol::alphabetical);
   for (unsigned int i = 0; i < entries.size (); i++)
-    print_component (out, Library::find (entries[i]));
+    print_component (Library::find (entries[i]));
 
   // Fixed components.
   Format::Section d2 (*format, "chapter", "Fixed Components", "cha", "fixed");
@@ -1208,7 +1256,7 @@ standard parameterizations for the model.");
       Syntax syntax;
       AttributeList alist;
       Submodel::load_syntax (name, syntax, alist);
-      print_fixed (out, name, syntax, alist);
+      print_fixed (name, syntax, alist);
   }
 }
 

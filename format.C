@@ -114,6 +114,20 @@ Format::TableCell::~TableCell ()
   format.table_cell_close (); 
 }
 
+Format::TableMultiCell::TableMultiCell (Format& f,
+					int cells, const std::string& form)
+  : format (f)
+{ 
+  format.push ("table_cell");
+  format.table_multi_cell_open (cells, form);
+}
+
+Format::TableMultiCell::~TableMultiCell ()
+{ 
+  format.pop ("table_cell");
+  format.table_multi_cell_close (); 
+}
+
 Format::Typewriter::Typewriter (Format& f)
   : format (f)
 { 

@@ -32,13 +32,16 @@ struct FormatLaTeX : public Format
   void list_close ();
   void item_open (const std::string& name);
   void item_close ();
-  std::stack<bool> table_first_column;
   void table_open (const std::string& format);
   void table_close ();
+  std::stack<bool> table_first_row;
   void table_row_open ();
   void table_row_close ();
+  std::stack<bool> table_first_column;
   void table_cell_open ();
   void table_cell_close ();
+  void table_multi_cell_open (const int cells, const std::string& format);
+  void table_multi_cell_close ();
   void typewriter_open ();
   void typewriter_close ();
   void section_open (const std::string& type, const std::string& title,
@@ -54,11 +57,13 @@ struct FormatLaTeX : public Format
   void italic (const std::string& text);
   void verbatim (const std::string& text);
   void raw (const std::string& format, const std::string& text);
+  bool formatp (const std::string& format);
   void special (const std::string& name);
   void soft_linebreak ();
   void hard_linebreak ();
   void new_paragraph ();
   void index (const std::string& name);
+  void ref (const std::string& scope, const std::string& id);
   void see (const std::string& type,
 	    const std::string& scope, const std::string& id);
   void see_page (const std::string& scope, const std::string& id);
@@ -93,7 +98,7 @@ FormatLaTeX::list_close ()
 void 
 FormatLaTeX::item_open (const std::string& name)
 {
-  out () << "\n\\item ";
+  out () << "\\item ";
   italic (name);
   text (": ");
 }
@@ -106,17 +111,25 @@ void
 FormatLaTeX::table_open (const std::string& format)
 {
   out () << "\\begin{tabular}{" << format << "}\n";
+  table_first_row.push (true);
 }
 
 void 
 FormatLaTeX::table_close ()
 {
-  out () << "\\end{tabular}\n";
+  out () << "\n\\end{tabular}\n";
+  daisy_assert (!table_first_row.empty ());
+  table_first_row.pop ();
 }
 
 void 
 FormatLaTeX::table_row_open ()
 { 
+  if (table_first_row.top ())
+    table_first_row.top () = false;
+  else
+    out () << "\\\\\n";
+
   table_first_column.push (true);
 }
 
@@ -125,7 +138,6 @@ FormatLaTeX::table_row_close ()
 {
   daisy_assert (!table_first_column.empty ());
   table_first_column.pop ();
-  out () << "\\\\\n";
 }
 
 void 
@@ -140,6 +152,17 @@ FormatLaTeX::table_cell_open ()
 void 
 FormatLaTeX::table_cell_close ()
 { }
+
+void 
+FormatLaTeX::table_multi_cell_open (const int cells, const std::string& format)
+{ 
+  table_cell_open ();
+  out () << "\\multicolumn{" << cells << "}{" << format <<"}{"; 
+}
+
+void
+FormatLaTeX::table_multi_cell_close ()
+{ out () << "}"; }
 
 void
 FormatLaTeX::typewriter_open ()
@@ -266,9 +289,13 @@ void
 FormatLaTeX::verbatim (const std::string& text)
 {
   out () << "\\begin{verbatim}\n";
-  this->text (text);
+  out () << text;
   out () << "\\end{verbatim}\n";
 }
+
+bool
+FormatLaTeX::formatp (const std::string& format)
+{ return format == "LaTeX"; }
 
 void
 FormatLaTeX::raw (const std::string& format, const std::string& text)
@@ -314,6 +341,10 @@ FormatLaTeX::index (const std::string& name)
   text (name);
   out () << "}";
 }
+
+void
+FormatLaTeX::ref (const std::string& scope, const std::string& id)
+{ out () << "\\ref{" << scope << ":" << id << "}"; }
 
 void
 FormatLaTeX::see (const std::string& type,

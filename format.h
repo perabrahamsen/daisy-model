@@ -116,6 +116,22 @@ public:
     ~TableCell ();  
   };
 
+  // MultiCell
+private:
+  virtual void table_multi_cell_open (int cells, 
+				      const std::string& format) = 0;
+  virtual void table_multi_cell_close () = 0;
+public:
+  class TableMultiCell
+  {
+  private:
+    Format& format;
+    TableMultiCell (const TableMultiCell&);
+  public:
+    TableMultiCell (Format&, int cells, const std::string& format);
+    ~TableMultiCell ();  
+  };
+
   // Typewriter.
 private:
   virtual void typewriter_open () = 0;
@@ -171,11 +187,13 @@ public:
   virtual void italic (const std::string& text) = 0;
   virtual void verbatim (const std::string& text) = 0;
   virtual void raw (const std::string& format, const std::string& text) = 0;
+  virtual bool formatp (const std::string& format) = 0;
   virtual void special (const std::string& name) = 0;
   virtual void soft_linebreak () = 0;
   virtual void hard_linebreak () = 0;
   virtual void new_paragraph () = 0;
   virtual void index (const std::string& name) = 0;
+  virtual void ref (const std::string& scope, const std::string& id) = 0;
   virtual void see (const std::string& type,
 		    const std::string& scope, const std::string& id) = 0;
   virtual void see_page (const std::string& scope, const std::string& id) = 0;
