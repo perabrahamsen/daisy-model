@@ -3,7 +3,6 @@
 #include "groundwater.h"
 #include "log.h"
 #include "soil.h"
-#include "soil_water.h"
 #include "mathlib.h"
 
 class GroundwaterPipe : public Groundwater
@@ -40,16 +39,13 @@ public:
   void update_water (const Soil&,
   		     vector<double>& S_sum,
 		     vector<double>& h,
+		     vector<double>& h_ice,
 		     vector<double>& Theta,
 		     vector<double>& q,
 		     vector<double>& q_p);
   void output (Log& log) const;
 
 private:
-  void update_water (const Soil& soil, vector<double>& S_sum,
-		    vector<double>& h, vector<double>& h_ice,
-		    vector<double>& Theta, vector<double>& q,
-		    vector<double>& q_p);
   double DeepPercolation (const Soil&);
   double EquilibriumDrainFlow (const Soil&);
   void RaisingGWT  (const Soil&,

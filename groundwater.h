@@ -6,8 +6,6 @@
 #include "uzmodel.h"
 #include "librarian.h"
 
-struct SoilWater;
-
 struct Time;
 
 class Groundwater : public UZbottom
@@ -20,7 +18,13 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time& time) = 0;
-  virtual void update_water (const Soil&, const SoilWater&);
+  virtual void update_water (const Soil&,
+			     vector<double>& S_sum,
+			     vector<double>& h,
+			     vector<double>& h_ice,
+			     vector<double>& Theta,
+			     vector<double>& q,
+			     vector<double>& q_p);
   virtual void output (Log&) const;
 
   // Accessors.

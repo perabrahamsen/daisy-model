@@ -175,9 +175,6 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
                      h_, Theta_, q_);
     }
 
-  // Update flux in groundwater.
-  groundwater.update_water (soil, *this);
-
   for (unsigned int i = last + 1; i <= soil.size (); i++)
     {
       q_[i] = q_[i-1];
@@ -197,6 +194,10 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   const bool bottom_accepted 
     = groundwater.accept_bottom ((q_[last + 1] + q_p_[last + 1]) * dt);
   assert (bottom_accepted);
+
+  // Update flux in groundwater.
+  groundwater.update_water (soil,
+			    S_, h_, h_ice_, Theta_, q_, q_p_);
 }
 
 void

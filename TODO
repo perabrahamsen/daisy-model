@@ -13,13 +13,9 @@
 
 * Simulation:
 
-** Macroporer.
-
 ** Stof chemicals ned i jord via macropores.
 
 ** Nedføring af OM i jord.
-
-** Frost i jord.
 
 * Teknik:
 
@@ -27,17 +23,11 @@
 
 ** Merge små AM til særlig "rest-am" pulje som ikke forsvinder.
 
-** Speciel Mike/SHE log
-
-** Speciel Mike/SHE input
-
 * Ryd op i Log struktur.
 
 ** LogCheckpoint
 
 *** Sørg for at inkludere `def*' og `input' automatisk.
-
-** Fjern `Filter' samt `LogFile'.
 
 ** Hutig måde at skippe log på i Daisy::output, hvis condition er falsk.
 
