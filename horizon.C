@@ -50,8 +50,8 @@ struct Horizon::Implementation
   double dry_bulk_density;
 
   // Organic matter.
-  const vector<double> SOM_C_per_N;
-  const vector<double> SOM_fractions;
+  /* const */ vector<double> SOM_C_per_N;
+  /* const */ vector<double> SOM_fractions;
 
   // Strange things.
   const double quarts_form_factor;
@@ -75,7 +75,7 @@ struct Horizon::Implementation
   };
   double content[Constituents_End];
   double Theta_pF_high;
-  void initialize (const Hydraulic&);
+  void initialize (const Hydraulic&, int som_size);
   double HeatCapacity ();
   double DepolationsFactor (const Hydraulic&, 
 			    const constituents medium, const double alfa);
@@ -96,8 +96,25 @@ Horizon::Implementation::heat_capacity[Constituents_End] = // [erg / cm³ / °C]
 { 4.2e7, 1.9e7 * (1.0 / 0.92), 1.25e4, 2.0e7, 2.0e7, 2.5e7 }; 
 
 void 
-Horizon::Implementation::initialize (const Hydraulic& hydraulic)
+Horizon::Implementation::initialize (const Hydraulic& hydraulic, int som_size)
 {
+  if (som_size > 0)
+    {
+      // Fill out SOM_fractions and SOM_C_per_N.
+      if (SOM_C_per_N.size () > 0 && SOM_C_per_N.size () < som_size)
+	SOM_C_per_N.insert (SOM_C_per_N.end (),
+			    som_size - SOM_C_per_N.size (), 
+			    SOM_C_per_N.back ());
+      if (SOM_fractions.size () > 0 && SOM_fractions.size () < som_size)
+	SOM_fractions.insert (SOM_fractions.end (),
+			      som_size - SOM_fractions.size (), 
+			      0.0);
+    }
+
+  // Already initialized.
+  if (K_water.size () != 0)
+    return;
+
   // Did we specify 'dry_bulk_density'?  Else calculate it now.
   if (dry_bulk_density < 0.0)
     dry_bulk_density = rho_soil_particles () * (1.0 - hydraulic.porosity ());
@@ -572,6 +589,7 @@ By default, this is calculated from the soil constituents.");
   vector<double> SOM_C_per_N;
   SOM_C_per_N.push_back (11.0);
   SOM_C_per_N.push_back (11.0);
+  SOM_C_per_N.push_back (11.0);
   alist.add ("SOM_C_per_N", SOM_C_per_N);
   syntax.add_fraction ("SOM_fractions", 
 		       Syntax::OptionalConst, Syntax::Sequence, "\
@@ -627,16 +645,12 @@ Horizon::Horizon (const AttributeList& al)
 }
 
 void
-Horizon::initialize (bool top_soil, Treelog& msg)
+Horizon::initialize (bool top_soil, int som_size, Treelog& msg)
 {
   Treelog::Open nest (msg, name);
   hydraulic.initialize (clay (), silt (), sand (), humus (),
 			dry_bulk_density (), top_soil, msg);
-
-  if (impl.K_water.size () == 0)
-    { 
-      impl.initialize (hydraulic);
-    }
+  impl.initialize (hydraulic, som_size);
 }
 
 Horizon::~Horizon ()

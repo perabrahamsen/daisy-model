@@ -55,11 +55,12 @@ public:
 
   // Create and Destroy.
 public:
-void initialize (const Time& time, Treelog& err, 
-		 const Weather* global_weather)
+  void initialize (const Time& time, Treelog& err, 
+		   const Weather* global_weather)
   {
+    soil.initialize (groundwater, -1, err);
     Treelog::Open nest (err, name);
-    ColumnBase::initialize (time, err, global_weather);
+    initialize_common (time, err, global_weather);
   }
   Column& clone (const string& name) const
   { 

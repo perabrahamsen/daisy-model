@@ -99,7 +99,7 @@ public:
   bool check (int som_size, Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);
   Soil (const AttributeList&);
-  void initialize (const Groundwater&, Treelog&);
+  void initialize (const Groundwater&, int som_size, Treelog&);
   ~Soil ();
 };
 

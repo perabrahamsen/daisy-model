@@ -12,6 +12,39 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.64
+
+** There is now an inert SOM3 pool by default.
+
+You can use this to "park" part of the humus so it will not contribute
+to the mineralization by specifying a third number to the
+SOM_fractions horizon parameter.  E.g if you instead of 
+
+  (SOM_fractions 0.6 0.4)
+
+write 
+
+  (SOM_fractions 0.3 0.2 0.5)
+
+half the humus in the system will be inactive, cutting 50% off the net
+mineralization.
+
+If you do not specify the third number, it will be assumed to be zero.
+In effect, the current behavior (with no SOM3 pool) will be
+maintained.
+
+** Default organic matter initialization of subsoil changed.
+
+If you do not specify SOM_fractions for a subsoil horizon, Daisy will
+automatically park sufficient humus in the inactive SOM3 pool to get a
+zero net mineralization.
+
+** The AOM pools are now considered part of the humus for initialization.
+
+The effect of this is that the SMB and SOM pools will be
+correspondingly smaller, and you will get a slightly smaller
+mineralization.
+
 * 2.63
 
 ** New PenClayFac parameter for root penetration.
@@ -28,7 +61,7 @@ penetration speed is valid for soil with 10% clay.
 ** Use average daily temperature for root penetration.
 
 We used to to use the temperature at midnight.  This fix might affect
-simulation results slightly but not significantly.
+simulation results slightly.
 
 * 2.62
 

@@ -79,7 +79,7 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   Horizon (const AttributeList&);
-  void initialize (bool top_soil, Treelog&);
+  void initialize (bool top_soil, int som_size, Treelog&);
   virtual ~Horizon ();
 };
 

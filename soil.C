@@ -276,7 +276,7 @@ Soil::Soil (const AttributeList& al)
 { }
 
 void
-Soil::initialize (const Groundwater& groundwater, Treelog& msg)
+Soil::initialize (const Groundwater& groundwater, int som_size, Treelog& msg)
 {
   Treelog::Open nest (msg, "Soil");
 
@@ -298,7 +298,7 @@ Soil::initialize (const Groundwater& groundwater, Treelog& msg)
 	daisy_assert (current < last);
 
 	const bool top_soil = (layer == begin);
-	(*layer)->horizon.initialize (top_soil, msg);
+	(*layer)->horizon.initialize (top_soil, som_size, msg);
 
 	// We always have a layer limit at 1 m.
 	if (last > -100.0 && current < -100.0)

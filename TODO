@@ -1,20 +1,18 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* soil_h & soil_temperature
+
+Flyt fra phenology til root_system (slet evt. soil_h).
+
 * OrganicMatter
 
 ** Max og min somfractions i initialisering.
 
-** Gør den robust hvis SOMn = 0 (fra init) eller (SOM_fractions 0.4 0.6 0).
-
-** Tilføj SOM3
-
-SOM3 = 0 i øverste horizont.
-
-dSOM1 = 0 under øverste horizont.
-
 ** init.mineralization
 
 Al mineralisering fra første horizont.
+
+SH: Brutto, netto, eller valgfrit?
 
 ** Ny horizon->turnover_factor singleton parameter
 

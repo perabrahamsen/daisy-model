@@ -1,5 +1,31 @@
 2003-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.64 released.
+
+2003-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (partition): Count initial aom content as part
+	of the humus.
+
+	* organic_matter.C (load_syntax): Added default SOM3 pool.
+	(Initialization::end): Made it a real member.
+	(partition): New 'top_soil' parameter.
+	(initialize): Update caller.
+	* soil.C (check): Allow 'SOM_fractions' to be smaller than
+	'som.size ()'.
+	* horizon.C, horizon.h (initialize): Ditto.
+	* column_base.C, column_base.h (initialize_common): Renamed from
+	'initialize'.
+	* column_inorganic.C, column_std.C (initialize): Update caller.
+
+	* organic_matter.C (partition): Made it const.
+	(update_pools): New member function.
+	(initialize): Update caller.
+
+	* organic_matter.C (Initialization::variable_pool): New member.
+	(partition): Use it.
+	(initialize): Update caller.
+
 	* Version 2.63 released.
 
 2003-04-08  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -89,12 +89,14 @@ struct OrganicMatter::Implementation
     // Parameters.
   public:
     const double input;		// Total C input. [kg C/ha/y]
+    const double end;		// End of plowing layer. [cm]
   private:
     const vector<double> fractions; // C destiations. []
-    vector<double> per_lay;	// C input in numeric intervals [g C/cm^3/h]
+    vector<double> per_lay;	// C input in numeric intervals. [g C/cm^3/h]
   public:
     const double T;		// Equilibrium temperature. [dg C]
     const double h;		// Equilibrium pressure. [cm]
+    const int variable_pool;	// Pool not in equilibrium.
     const vector<int> debug_equations;
     const bool debug_rows;
     const bool debug_to_screen;
@@ -182,10 +184,17 @@ struct OrganicMatter::Implementation
   double abiotic (const OM& om, double T, double h, 
 		  bool use_clay, int lay) const;
   void partition (const vector<double>& am_input, double T, double h, 
-		  int lay, double total_C, 
+		  int lay, double total_C, int variable_pool,
+		  bool top_soil,
 		  const vector<double>& SOM_fractions,
-		  const vector<double>& SOM_C_per_N, Treelog& msg,
-		  bool print_equations, bool print_rows, bool debug_to_screen);
+		  vector<double>& SOM_results,
+		  vector<double>& SMB_results,
+		  Treelog& msg,
+		  bool print_equations, bool print_rows,
+		  bool debug_to_screen) const;
+  void update_pools (const vector<double>& SOM_results,
+		     const vector<double>& SOM_C_per_N,
+		     const vector<double>& SMB_results, int lay);
   void initialize (const AttributeList&, const Soil&, const SoilWater&,
 		   double T_avg, Treelog& err);
   Implementation (const AttributeList&);
@@ -356,6 +365,14 @@ By default, the yearly average from the weather component will be used.");
   syntax.add ("h", "cm", Check::non_positive (), Syntax::Const, "\
 Pressure used for equilibrium.");
   alist.add ("h", -100.0);
+  syntax.add ("variable_pool", Syntax::Integer, Syntax::Const, "\
+If neither the C content nor 'SOM_fractions' are specified, equilibrium is\n\
+assumed for all SOM pools except the one specified by this parameter.\n\
+If you set this to -1 (or any number nor corresponding to a SOM pool),\n\
+equilibrium will be assumed for all pools, and instead the humus content\n\
+specified by the horizon will be ignored.\n\
+Note, the numbering is zero-based, so '0' specifies SOM1.");
+  alist.add ("variable_pool", 0);
   syntax.add ("debug_equations", Syntax::Integer, Syntax::Const, 
 	      Syntax::Sequence, "\
 Print equations used for initialization for the specified intervals.");
@@ -371,9 +388,11 @@ If true, print debug information to screen, else to the 'daisy.log' file.");
 OrganicMatter::Implementation::Initialization::
 /**/ Initialization (const AttributeList& al, const Soil& soil, double T_avg)
   : input (al.check ("input") ? al.number ("input") : -1.0),
+    end (al.check ("end") ? al.number ("end") : soil.end_of_first_horizon ()),
     fractions (al.number_sequence ("fractions")),
     T (al.check ("T") ? al.number ("T") : T_avg),
     h (al.number ("h")),
+    variable_pool (al.integer ("variable_pool")),
     debug_equations (al.integer_sequence ("debug_equations")),
     debug_rows (al.flag ("debug_rows")),
     debug_to_screen (al.flag ("debug_to_screen"))
@@ -394,9 +413,6 @@ OrganicMatter::Implementation::Initialization::
 
   // Parameters.
   const double root = al.number ("root");
-  const double end = al.check ("end")
-    ? al.number ("end") 
-    : soil.end_of_first_horizon ();
 
   // Add top.
   daisy_assert (input >= root);
@@ -1087,16 +1103,24 @@ OrganicMatter::Implementation::abiotic (const OM& om, double T, double h,
 }
 				     
 void
-OrganicMatter::Implementation::partition (const vector<double>& am_input, 
+OrganicMatter::Implementation::partition (const vector<double>& am_input,
 					  const double T, const double h,
 					  const int lay, const double total_C,
+					  const int variable_pool,
+					  const bool top_soil,
 					  const vector<double>& SOM_fractions,
-					  const vector<double>& SOM_C_per_N,
+					  vector<double>& SOM_results,
+					  vector<double>& SMB_results,
 					  Treelog& msg,
 					  const bool print_equations,
 					  const bool print_rows,
-					  const bool debug_to_screen)
+					  const bool debug_to_screen) const
 {
+  // Find AOM values.
+  double total_am = 0.0;
+  for (unsigned int i = 0; i < am.size (); i++)
+    total_am += am[i]->C_at (lay);
+
   // We know the total humus, the yearly input and has been told the
   // relative sizes of the SOM pools.  We need to calculate the SMB
   // fractions.
@@ -1230,7 +1254,8 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
     }
 
   // Additional SOM equations.
-  bool use_humus_equation = false; // Remember whether we conserve humus.
+  bool use_humus_equation = false;
+  bool inert_pool_found = false;
   for (unsigned int pool = 0; pool < som_size; pool++)
     {
       if (som[pool]->C.size () > lay)
@@ -1240,13 +1265,14 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  matrix.set_value (equation, som[pool]->C[lay]);
 	  matrix.set_entry (equation, som_column + pool, 1.0);
 	}
-      else if (pool == 0)
+      else if (pool == variable_pool)
 	{
 	  // The humus equation:
 	  //
-	  // humus = SMB1 + SMB2 + SOM1 + SOM2
+	  //    humus = SMB1 + SMB2 + SOM1 + SOM2 + AOM
+	  // => humus - AOM = SMB1 + SMB2 + SOM1 + SOM2
 	  //
-	  matrix.set_value (equation, total_C);
+	  matrix.set_value (equation, total_C - total_am);
 	  for (unsigned int i = 0; i < smb_size; i++)
 	    matrix.set_entry (equation, smb_column + i, 1.0);
 	  for (unsigned int i = 0; i < som_size; i++)
@@ -1278,13 +1304,42 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 		matrix.set_entry (equation, som_column + i, fraction);
 	    }
 	}
-      else
+      else if (som[pool]->turnover_rate > 1e-100)
 	{
 	  // The SOM equilibrium equations
 	  // 
 	  // 0 = dSOMn
 	  // matrix.set_value (equation, 0.0);
 	  matrix.set_entry (equation, dsom_column + pool, 1.0);
+	}
+      else if (top_soil)
+	{
+	  // No inert humus in the plowing layer.
+	  //
+	  // 0 = SOMn
+	  // matrix.set_value (equation, 0.0);
+	  matrix.set_entry (equation, som_column + pool, 1.0);
+	}
+      else if (inert_pool_found)
+	{
+	  // We have no heuristic for partioning between multiple inert pools.
+	  msg.warning ("Cannot partition between multiple inert SOM pools.\n\
+Setting additional pool to zero");
+	  // 0 = SOMn
+	  // matrix.set_value (equation, 0.0);
+	  matrix.set_entry (equation, som_column + pool, 1.0);
+	}
+      else
+	{
+	  // No net mineralization below the plowing layer.
+	  //
+	  // 0 = dSMB1 + dSMB2 + dSOM1 + dSOM2
+	  // matrix.set_value (equation, 0.0);
+	  for (unsigned int i = 0; i < smb_size; i++)
+	    matrix.set_entry (equation, dsmb_column + i, 1.0);
+	  for (unsigned int i = 0; i < som_size; i++)
+	    matrix.set_entry (equation, dsom_column + i, 1.0);
+	  inert_pool_found = true;
 	}
       equation++;
     }
@@ -1378,85 +1433,26 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
     }
 
   
-  // Check.
-  double total = 0.0;
+  // Check mass balance.
+  double total = total_am;
   for (unsigned int i = 0; i < smb_size + som_size; i++)
     total += matrix.result (i);
   daisy_assert (!use_humus_equation || approximate (total, total_C));
 
-  bool error_found = false;
-
-  // Update SMB pools.
+  // Store results.
   for (unsigned int pool = 0; pool < smb_size; pool++)
-    {
-      const double value = matrix.result (smb_column + pool);
-      if (value < 0)
-	{
-	  error_found = true;
-	  continue;
-	}
-      if (smb[pool]->C.size () > lay)
-	{
-	  if (!approximate (smb[pool]->C[lay], value))
-	    {
-	      TmpStream tmp;
-	      tmp () << "smb[" << pool << "]: (old) " << smb[pool]->C[lay]
-		     << " != " << value << " (new)";
-	      msg.error (tmp.str ());
-	      error_found = true;
-	    }
-	}
-      else
-	{
-	  daisy_assert (smb[pool]->C.size () == lay);
-	  smb[pool]->C.push_back (value);
-	}
-      if (smb[pool]->N.size () == lay)
-	{
-	  daisy_assert (smb[pool]->initial_C_per_N > 0);
-	  const double N_content = smb[pool]->C[lay]
-	    / smb[pool]->initial_C_per_N;
-	  smb[pool]->N.push_back (N_content);
-	}
-      if (smb[pool]->C_per_N_goal.size () == lay)
-	{
-	  daisy_assert (smb[pool]->initial_C_per_N > 0);
-	  smb[pool]->C_per_N_goal.push_back (smb[pool]->initial_C_per_N);
-	}
-    }
-  
-  // Update SOM pools.
-  daisy_assert (SOM_C_per_N.size () == som_size);
-  
+    SMB_results[pool] = max (0.0, matrix.result (smb_column + pool));
   for (unsigned int pool = 0; pool < som_size; pool++)
-    {
-      const double value = matrix.result (som_column + pool);
-      if (value < 0)
-	{
-	  error_found = true;
-	  continue;
-	}
-      if (som[pool]->C.size () > lay)
-	{
-	  if (!approximate (som[pool]->C[lay], value))
-	    {
-	      TmpStream tmp;
-	      tmp () << "som[" << pool << "]: (old) " << som[pool]->C[lay]
-		     << " != " << value << " (new)";
-	      msg.error (tmp.str ());
-	      error_found = true;
-	    }
-	}
-      else
-	{
-	  daisy_assert (som[pool]->C.size () == lay);
-	  som[pool]->C.push_back (value);
-	}
-      if (som[pool]->N.size () == lay)
-	som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N[pool]);
-      if (som[pool]->C_per_N_goal.size () == lay)
-	som[pool]->C_per_N_goal.push_back (SOM_C_per_N[pool]);
-    }
+    SOM_results[pool] = max (0.0, matrix.result (som_column + pool));
+
+  // Check mass balance again, this time ignoring negative values.
+  const bool error_found 
+    = !approximate (total_am 
+		    + accumulate (SMB_results.begin (), SMB_results.end (),
+				  0.0)
+		    + accumulate (SOM_results.begin (), SOM_results.end (), 
+				  0.0),
+		    total);
 
   // Messages.
   if (print_rows || error_found)
@@ -1472,7 +1468,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
       if (lay == 0)
 	{
 	  // Tag line.
-	  tmp () << "lay\thumus\tinput\tinput [%]";
+	  tmp () << "lay\thumus\tinput\tinput\tAOM";
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
 	    tmp () << "\tSMB" << (pool + 1);
 	  for (unsigned int pool = 0; pool < som_size; pool++)
@@ -1483,11 +1479,11 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	    tmp () << "\tdSOM" << (pool + 1) << "\tdSOM" << (pool + 1);
 	  tmp () << "\n";
 	  // Dimension line.
-	  tmp () << "\tkg C/ha/cm\tkg C/ha/cm/y\t%";
+	  tmp () << "\tkg C/ha/cm\tkg C/ha/cm/y\t%\t%";
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
-	    tmp () << "\t%" << (pool + 1);
+	    tmp () << "\t%";
 	  for (unsigned int pool = 0; pool < som_size; pool++)
-	    tmp () << "\t%" << (pool + 1);
+	    tmp () << "\t%";
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
 	    tmp () << "\tkg C/ha/cm/y\ty^-1";
 	  for (unsigned int pool = 0; pool < som_size; pool++)
@@ -1498,7 +1494,8 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	     << total_C * g_per_cm2_to_kg_per_ha << "\t"
 	     << total_input * g_per_cm2_per_h_to_kg_per_ha_per_y << "\t"
 	     << 100.0 * ((total_input * g_per_cm2_per_h_to_kg_per_ha_per_y) 
-			 / (total_C * g_per_cm2_to_kg_per_ha));
+			 / (total_C * g_per_cm2_to_kg_per_ha)) << "\t"
+	     << 100.0 * total_am / total_C;
       
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
@@ -1544,9 +1541,60 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
       tmp () << "Can't initialize organic matter from input in layer " << lay;
       throw (string (tmp.str ()));
     }
-
-
 }
+
+void
+OrganicMatter::Implementation::update_pools 
+/**/ (const vector<double>& SOM_results,
+      const vector<double>& SOM_C_per_N,
+      const vector<double>& SMB_results, 
+      int lay)
+{
+  // Update SMB pools.
+  for (unsigned int pool = 0; pool < smb.size (); pool++)
+    {
+      const double value = SMB_results[pool];
+      if (smb[pool]->C.size () > lay)
+	daisy_assert (approximate (smb[pool]->C[lay], value));
+      else
+	{
+	  daisy_assert (smb[pool]->C.size () == lay);
+	  smb[pool]->C.push_back (value);
+	}
+      if (smb[pool]->N.size () == lay)
+	{
+	  daisy_assert (smb[pool]->initial_C_per_N > 0);
+	  const double N_content = smb[pool]->C[lay]
+	    / smb[pool]->initial_C_per_N;
+	  smb[pool]->N.push_back (N_content);
+	}
+      if (smb[pool]->C_per_N_goal.size () == lay)
+	{
+	  daisy_assert (smb[pool]->initial_C_per_N > 0);
+	  smb[pool]->C_per_N_goal.push_back (smb[pool]->initial_C_per_N);
+	}
+    }
+  
+  // Update SOM pools.
+  daisy_assert (SOM_C_per_N.size () == som.size ());
+  
+  for (unsigned int pool = 0; pool < som.size (); pool++)
+    {
+      const double value = SOM_results[pool];
+      if (som[pool]->C.size () > lay)
+	daisy_assert (approximate (som[pool]->C[lay], value));
+      else
+	{
+	  daisy_assert (som[pool]->C.size () == lay);
+	  som[pool]->C.push_back (value);
+	}
+      if (som[pool]->N.size () == lay)
+	som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N[pool]);
+      if (som[pool]->C_per_N_goal.size () == lay)
+	som[pool]->C_per_N_goal.push_back (SOM_C_per_N[pool]);
+    }
+}
+
 void
 OrganicMatter::Implementation::initialize (const AttributeList& al,
 					   const Soil& soil, 
@@ -1664,6 +1712,9 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   // Partitioning.
   Initialization init (al.alist ("init"), soil, T_avg);
 		       
+  vector<double> SOM_results (som_size, 0.0);
+  vector<double> SMB_results (smb_size, 0.0);
+
   for (unsigned int lay = 0; lay < soil.size (); lay++)
     {
       vector<double> am_input (smb.size () + 1);
@@ -1673,10 +1724,15 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 	input_from_am (am_input, init.T, init.h, lay);
       
       partition (am_input, init.T, init.h, 
-		 lay, total_C[lay], 
-		 soil.SOM_fractions (lay), soil.SOM_C_per_N (lay), err,
+		 lay, total_C[lay], init.variable_pool, 
+		 soil.z (lay) > init.end,
+		 soil.SOM_fractions (lay), 
+		 SOM_results, SMB_results,
+		 err,
 		 init.print_equations (lay), init.debug_rows, 
 		 init.debug_to_screen);
+
+      update_pools (SOM_results, soil.SOM_C_per_N (lay), SMB_results, lay);
     }
 
   //clay affect or SMB turnover and mantenance.
@@ -2139,6 +2195,7 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   SMB1_fractions.push_back (0.6);
   SMB1_fractions.push_back (0.0);
   SMB1_fractions.push_back (0.4);
+  SMB1_fractions.push_back (0.0);
   SMB1.add ("fractions", SMB1_fractions);
   SMB.push_back (&SMB1);
   AttributeList SMB2 (smb_alist);
@@ -2156,6 +2213,7 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   SMB2_fractions.push_back (0.4);
   SMB2_fractions.push_back (0.0);
   SMB2_fractions.push_back (0.6);
+  SMB2_fractions.push_back (0.0);
   SMB2.add ("fractions", SMB2_fractions);
   SMB.push_back (&SMB2);
   alist.add ("smb", SMB);
@@ -2174,36 +2232,43 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   SOM1.add ("turnover_rate", 2.7e-6 / 24.0 /* 1.125e-7 */);
 #endif
   vector<double> SOM1_efficiency;
-  SOM1_efficiency.push_back (0.40);
-  SOM1_efficiency.push_back (0.40);
+  SOM1_efficiency.push_back (0.40); // SMB1
+  SOM1_efficiency.push_back (0.40); // SMB2
   SOM1.add ("efficiency", SOM1_efficiency);
   vector<double> SOM1_fractions;
-  SOM1_fractions.push_back (1.0);
-  SOM1_fractions.push_back (0.0);
-  SOM1_fractions.push_back (0.0);
-  SOM1_fractions.push_back (0.0);
+  SOM1_fractions.push_back (1.0); // SMB1
+  SOM1_fractions.push_back (0.0); // SMB2
+  SOM1_fractions.push_back (0.0); // SOM1
+  SOM1_fractions.push_back (0.0); // SOM2
+  SOM1_fractions.push_back (0.0); // SOM3
   SOM1.add ("fractions", SOM1_fractions);
   SOM.push_back (&SOM1);
   AttributeList SOM2 (som_alist);
   SOM2.add ("turnover_rate", 1.4e-4 / 24.0 /* 5.83333333333e-6 */);
   vector<double> SOM2_efficiency;
-  SOM2_efficiency.push_back (0.50);
-  SOM2_efficiency.push_back (0.50);
+  SOM2_efficiency.push_back (0.50); // SMB1
+  SOM2_efficiency.push_back (0.50); // SMB2
   SOM2.add ("efficiency", SOM2_efficiency);
   vector<double> SOM2_fractions;
 #if 1 // SANDER_PARAMS
-  SOM2_fractions.push_back (0.7);
-  SOM2_fractions.push_back (0.0);
-  SOM2_fractions.push_back (0.3);
-  SOM2_fractions.push_back (0.0);
+  SOM2_fractions.push_back (0.7); // SMB1
+  SOM2_fractions.push_back (0.0); // SMB2
+  SOM2_fractions.push_back (0.3); // SOM1
+  SOM2_fractions.push_back (0.0); // SOM2
 #else
-  SOM2_fractions.push_back (0.9);
-  SOM2_fractions.push_back (0.0);
-  SOM2_fractions.push_back (0.1);
-  SOM2_fractions.push_back (0.0);
+  SOM2_fractions.push_back (0.9); // SMB1
+  SOM2_fractions.push_back (0.0); // SMB2
+  SOM2_fractions.push_back (0.1); // SOM1
+  SOM2_fractions.push_back (0.0); // SOM2
 #endif
+  SOM2_fractions.push_back (0.0); // SOM3
   SOM2.add ("fractions", SOM2_fractions);
   SOM.push_back (&SOM2);
+  AttributeList SOM3 (som_alist);
+  SOM3.add ("turnover_rate", 0.0);
+  SOM3.add ("efficiency", SOM2_efficiency); // Doesn't matter.
+  SOM3.add ("fractions", SOM2_fractions); // Doesn't matter.
+  SOM.push_back (&SOM3);
   alist.add ("som", SOM);
   
   Syntax& layer_syntax = *new Syntax ();

@@ -501,7 +501,8 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
     ? weather->average_temperature ()
     : global_weather->average_temperature ();
 
-  ColumnBase::initialize (time, err, global_weather);
+  soil.initialize (groundwater, organic_matter.som_pools (), err);
+  initialize_common (time, err, global_weather);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water, err);
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water, err);
   organic_matter.initialize (alist.alist ("OrganicMatter"), soil, soil_water, 
