@@ -14,7 +14,8 @@ class WeatherSimple : public Weather
   const double T2;
   const double precipitation;
   const int interval;
-  
+  const double  reference_evapotranspiration;
+
   // Log.
   double Prain;
   double Psnow;
@@ -104,9 +105,14 @@ WeatherSimple::GlobalRadiation () const	// [W/m^2]
 double
 WeatherSimple::ReferenceEvapotranspiration () const // [mm/h]
 {
-  const double T = 273.16 + AirTemperature ();
-  const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
-  return 1.05e-3 * Delta / (Delta + 66.7) * GlobalRadiation ();
+  if (reference_evapotranspiration < 0)
+    {
+      const double T = 273.16 + AirTemperature ();
+      const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
+      return 1.05e-3 * Delta / (Delta + 66.7) * GlobalRadiation ();
+    }
+  else
+    return reference_evapotranspiration;
 }
 
 double
@@ -136,6 +142,7 @@ WeatherSimple::WeatherSimple (const Time& t, const AttributeList& al)
     T2 (al.number ("T2")),
     precipitation (al.number ("precipitation")),
     interval (al.integer ("interval")),
+    reference_evapotranspiration (al.number ("reference_evapotranspiration")),
     Prain (0.0),
     Psnow (0.0)
 { }
@@ -169,6 +176,8 @@ WeatherSimpleSyntax::WeatherSimpleSyntax ()
   alist.add ("precipitation", 0.0);
   syntax.add ("interval", Syntax::Integer, Syntax::Const);
   alist.add ("interval", 1);
+  syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::Const);
+  alist.add ("reference_evapotranspiration", -1.0);
   syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
   Weather::add_type ("simple", alist, syntax, &WeatherSimple::make);

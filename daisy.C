@@ -67,6 +67,7 @@ Daisy::run ()
 	}
       action->doIt (*this);
 
+      weather.tick ();
       for (ColumnList::iterator i = columns.begin ();
 	   i != columns.end ();
 	   i++)
@@ -99,7 +100,6 @@ Daisy::run ()
 	    }
 	}
       time.tick ();
-      weather.tick ();
     }
 }
 

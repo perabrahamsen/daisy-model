@@ -395,6 +395,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      if (&lib == &Parser::library ())
 		{
 		  Parser& parser = Parser::create (global_syntax_table, al);
+		  delete &al;
 		  parser.load (atts);
 		  delete &parser;
 		}

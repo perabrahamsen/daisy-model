@@ -27,23 +27,34 @@ Solute::add_to_source (const vector<double>& v)
 void 
 Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 {
+  for (unsigned int i = 0; i < C.size(); i++)
+    {
+      if (C[i] == 0.0)
+	assert (M[i] == 0.0);
+      else
+	assert (abs (M[i] / (C[i] * soil_water.Theta_old (i)) - 1.0) < 0.001);
+    }
   // Note: q, D, and alpha depth indexes are all [j-1/2].
   
   // Constants.
   const int size = soil.size (); // Number of soil layers.
-  const double D_l = diffusion_coefficient (); // in free solution [cm^2 / s]
+  const double D_l = diffusion_coefficient (); // in free solution [cm^2 / h]
 
   // Dispersion coefficient [cm^2 /s]
   vector<double> D (size + 1);
+
+#ifdef CALCULATE_FLUX_FLOW
+  vector<double> Jf (size, 0.0);
+#endif
 
   for (int j = 0; j < size; j++)
     {
       const int prev = (j < 1) ? 0 : j - 1;
 
-      // Dispersion length [m]
+      // Dispersion length [cm]
       const double lambda = soil.lambda (j);
 
-      // Water flux [m^3 /m^2 / s]
+      // Water flux [cm^3 /cm^2 / h]
       const double q = soil_water.q (j);
       
       // Porosity []
@@ -58,7 +69,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       const double f_l = pow (Theta, 10.0 / 3.0) / (n * n);
 
       // From equation 7-39:
-      D[j] = lambda * abs (-q / Theta) + D_l * f_l;
+      D[j] = (lambda * abs (-q / Theta) + D_l * f_l) * Theta;
     }
   D[size] = D[size-1];
 
@@ -78,15 +89,11 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 #endif
     }
 
-#if 1
-      const vector<double> C_old = C;
-#endif
-
   // Find the time step using Courant.
   ddt = 1.0;
   for (int i = 0; i < size; i++)
     ddt = min (ddt, pow (soil.dz (i), 2) / (2 * D[i + 1]));
-      
+  
   // Loop through small time steps.
   for (double old_t = 0.0, t = ddt; 
        old_t != t;
@@ -157,7 +164,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       d[0] -= a[0] * d_in;
       b[0] += a[0] * b_in;
       a[0] = 42.42e42;
-#elif 1
+#elif 0
       const double dz_x = - 2.0 * soil.z (0);
       const double d_x = 4 * J_in + 2 * D[0] / dz_x * C[0] 
 	- soil_water.q (0) * C[0];
@@ -201,31 +208,42 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       b[size - 1] += c[size - 1];
       c[size - 1] = -42.42e42;
 
+#ifdef CALCULATE_FLUX_FLOW
+      const vector<double> C_old = C;
+#endif
+
       // Calculate new concentration.
       tridia (0, size, a, b, c, d, C.begin ());
+
+#ifdef CALCULATE_FLUX_FLOW
+      Jf[0] += J_in * (t - old_t);
+      for (int i = 0; i < size - 1; i++)
+	{
+	  const double C_minus = (C[i] + C_old[i]) / 2.0;
+	  const double C_plus = (C[i+1] + C_old[i+1]) / 2.0;
+	  const double dz_plus = soil.z (i) - soil.z (i+1);
+	  const double q_plus = soil_water.q (i + 1);
+	  const double alpha_plus = alpha[i+1];
+	  const double D_plus = D[i+1];
+	  Jf[i + 1] += ((D_plus * (C_plus - C_minus) / dz_plus 
+			 + q_plus
+			 * (alpha_plus * C_minus + (1 - alpha_plus) * C_plus)) 
+			* (t - old_t));
+	}
+#endif
+
     }
   // Calculate flux with mass conservation.
   J[0] = J_in;
   for (int i = 0; i < size; i++)
     {
       const double M_old = M[i];
+      assert (S[i] == 0.0);
       M[i] = C_to_M (soil, soil_water, i, C[i]);
       J[i + 1] = (((M[i] - M_old) / dt) - S[i]) * soil.dz (i) + J[i];
     }
-
-#if 1
-  S[0] = J_in;
-  for (int i = 0; i < size - 1; i++)
-    {
-      const double C_minus = (C[i] + C_old[i]) / 2.0;
-      const double C_plus = (C[i+1] + C_old[i+1]) / 2.0;
-      const double dz_plus = soil.z (i) - soil.z (i+1);
-      const double q_plus = soil_water.q (i + 1);
-      const double alpha_plus = alpha[i+1];
-      const double D_plus = D[i+1];
-      S[i + 1] = D_plus * (C_plus - C_minus) / dz_plus 
-	+ q_plus * (alpha_plus * C_minus + (1 - alpha_plus) * C_plus);
-    }
+#ifdef CALCULATE_FLUX_FLOW
+  S = Jf;
 #endif
 }
 
@@ -289,6 +307,8 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
       M = al.number_sequence ("M");
       size = M.size ();
     }
+  assert (size > 0);
+
   if (!al.check ("C"))
     for (int i = 0; i < size; i++)
       C.push_back (M_to_C (soil, soil_water, i, M[i]));
@@ -296,7 +316,14 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
   if (!al.check ("M"))
     for (int i = 0; i < size; i++)
       M.push_back (C_to_M (soil, soil_water, i, C[i]));
-  
+
+  for (int i = 0; i < size; i++)
+    {
+      if (C[i] == 0.0)
+	assert (M[i] == 0.0);
+      else
+	assert (abs (M[i] / (C[i] * soil_water.Theta (i)) - 1.0) < 0.001);
+    }
   S.insert (S.begin (), size, 0.0);
   J.insert (J.begin (), size + 1, 0.0);
 }
