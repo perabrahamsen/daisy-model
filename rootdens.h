@@ -40,8 +40,8 @@ protected:
 public:
   virtual void set_density (vector<double>& Density,
 			    const Geometry& geometry, 
-			    const double Depth, const double PotRtDpt,
-			    const double WRoot) = 0;
+			    double Depth, double PotRtDpt,
+			    double WRoot, double DS) = 0;
 
   // Create and Destroy.
 public:

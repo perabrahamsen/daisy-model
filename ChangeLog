@@ -1,3 +1,13 @@
+2001-11-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens_G_P.C (Rootdens_G_P): Made it a struct.
+
+	* rootdens_G_P.C, rootdens.h (set_density): Take DS argument.
+	* root_system.C (full_grown, tick, full_grown): Update callers.
+	* root_system.C, root_system.h (tick, full_grown): Take DS arguments.
+	* crop_std.C (initialize, tick): Update callers.
+	* crop_simple.C (tick): Ditto.
+
 2001-11-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.99 released.

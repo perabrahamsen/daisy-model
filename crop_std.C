@@ -143,7 +143,7 @@ CropStandard::initialize (const Geometry& geometry,
       // Update derived state content.
       canopy.tick (production.WLeaf, production.WSOrg, 
 		   production.WStem, development.DS);
-      root_system.set_density (geometry, production.WRoot);
+      root_system.set_density (geometry, production.WRoot, development.DS);
       nitrogen.content (development.DS, production);
     }
 }
@@ -192,7 +192,8 @@ CropStandard::tick (const Time& time,
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development.DS);
 	  nitrogen.content (development.DS, production);
-	  root_system.tick (soil, soil_heat, production.WRoot, 0.0);
+	  root_system.tick (soil, soil_heat, 
+			    production.WRoot, 0.0, development.DS);
 
 	  if (organic_matter)
 	    {
@@ -273,7 +274,8 @@ CropStandard::tick (const Time& time,
   development.tick_daily (name, bioclimate.daily_air_temperature (), 
 			  production.WLeaf, production, vernalization,
 			  harvesting.cut_stress);
-  root_system.tick (soil, soil_heat, production.WRoot, production.IncWRoot);
+  root_system.tick (soil, soil_heat, 
+		    production.WRoot, production.IncWRoot, development.DS);
 }
 
 const Harvest&

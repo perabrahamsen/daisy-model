@@ -25,23 +25,20 @@
 #include "check.h"
 #include "message.h"
 
-class Rootdens_G_P : public Rootdens
+struct Rootdens_G_P : public Rootdens
 {
   // Parameters.
-private: 
   const double SpRtLength;	// Specific root length [m/g]
   const double DensRtTip;	// Root density at (pot) pen. depth [cm/cm^3]
   const double MinDens;		// Minimal root density [cm/cm^3]
 
   // Simulation.
-public:
   void set_density (vector<double>& Density,
 		    const Geometry& geometry, 
-		    const double Depth, const double PotRtDpt,
-		    const double WRoot);
+		    double Depth, double PotRtDpt,
+		    double WRoot, double DS);
 
   // Create.
-public:
   Rootdens_G_P (const AttributeList&);
 };
 
@@ -49,7 +46,7 @@ void
 Rootdens_G_P::set_density (vector<double>& Density,
 			   const Geometry& geometry, 
 			   const double Depth, const double PotRtDpt,
-			   const double WRoot)
+			   const double WRoot, const double)
 {
   // Dimensional conversion.
   static const double m_per_cm = 0.01;

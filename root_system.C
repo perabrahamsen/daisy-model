@@ -296,7 +296,8 @@ void
 RootSystem::tick (const Soil& soil, 
 		  const SoilHeat& soil_heat, 
 		  const double WRoot,
-		  const double IncWRoot)
+		  const double IncWRoot,
+		  const double DS)
 {
   // Penetration.
   if (IncWRoot > 0)
@@ -310,13 +311,13 @@ RootSystem::tick (const Soil& soil,
       /*max depth determined by crop*/
       Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
     }
-  set_density (soil, WRoot);
+  set_density (soil, WRoot, DS);
 }
 
 void
 RootSystem::set_density (const Geometry& geometry, 
-			 const double WRoot)
-{ rootdens.set_density (Density, geometry, Depth, PotRtDpt, WRoot); }
+			 const double WRoot, const double DS)
+{ rootdens.set_density (Density, geometry, Depth, PotRtDpt, WRoot, DS); }
 
 void
 RootSystem::full_grown (const Soil& soil, 
@@ -324,7 +325,7 @@ RootSystem::full_grown (const Soil& soil,
 {
   PotRtDpt = MaxPen;
   Depth = min (MaxPen, -soil.MaxRootingDepth ());
-  set_density (soil, WRoot);
+  set_density (soil, WRoot, 1.0);
 }
 
 void

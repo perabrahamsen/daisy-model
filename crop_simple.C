@@ -212,14 +212,15 @@ CropSimple::tick (const Time& time,
 	  const double this_far = (T - T_emergence) / T_growth;
 	  
 	  canopy.Height = height_max * this_far;
-	  root_system.tick (soil, soil_heat, WRoot * this_far, WRoot * step);
+	  root_system.tick (soil, soil_heat, WRoot * this_far, WRoot * step, 
+			    DS ());
 	}
       else if (old_T < T_flowering)
 	{
 	  COUT << " [" << name << " is flowering]\n";
 	  canopy.Height = height_max;
 	  root_system.tick (soil, soil_heat, WRoot,
-			    WRoot * (1.0 - old_T / T_flowering));
+			    WRoot * (1.0 - old_T / T_flowering), DS ());
 	}
       else if (T < T_ripe)
 	/* do nothing */;

@@ -106,9 +106,10 @@ public:
 private:
   static double density_distribution_parameter (double a);
 public:
-  void tick (const Soil&, const SoilHeat&, double WRoot, double IncWRoot);
-  void set_density (const Geometry& geometry, const double WRoot);
-  void full_grown (const Soil& soil, const double WRoot);
+  void tick (const Soil&, const SoilHeat&, 
+	     double WRoot, double IncWRoot, double DS);
+  void set_density (const Geometry& geometry, double WRoot, double DS);
+  void full_grown (const Soil& soil, double WRoot);
   void output (Log& log) const;
 
   // Create and Destroy
