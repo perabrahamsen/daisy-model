@@ -43,7 +43,6 @@ struct Surface::Implementation
   const double minimal_matter_flux;
   const bool total_matter_flux;
   const double EpFactor;
-  const double EpInterchange;
   const double albedo_wet;
   const double albedo_dry;
   const double lake;
@@ -385,10 +384,6 @@ Surface::EpFactor () const
 { return impl.EpFactor; }
 
 double
-Surface::EpInterchange () const
-{ return impl.EpInterchange; }
-
-double
 Surface::albedo (const Soil& soil, const SoilWater& soil_water) const
 { return impl.albedo (soil, soil_water); }
 
@@ -530,9 +525,6 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Convertion of reference evapotranspiration to\n\
 potential evaporation for bare soil.");
   alist.add ("EpFactor", 1.0);
-  syntax.add_fraction ("EpInterchange", Syntax::Const, "\
-Canopy adsorbtion fraction of unreached potential soil evaporation.");
-  alist.add ("EpInterchange", 0.6);
   syntax.add ("albedo_dry", Syntax::None (), Check::non_negative (),
 	      Syntax::Const,
 	      "Albedo of dry soil (pF >= 3)");
@@ -606,7 +598,6 @@ Surface::Implementation::Implementation (const AttributeList& al)
   : minimal_matter_flux (al.number ("minimal_matter_flux")),
     total_matter_flux (al.flag ("total_matter_flux")),
     EpFactor (al.number ("EpFactor")),
-    EpInterchange (al.number ("EpInterchange")),
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),
     lake (al.number ("lake")),

@@ -72,7 +72,6 @@ public:
 
   // Communication with bioclimate.
   double EpFactor () const;
-  double EpInterchange () const;
   double albedo (const Soil& soil, const SoilWater& soil_water) const;
   double exfiltration () const; // [mm/h]
   double evap_soil_surface () const; // [mm/h]

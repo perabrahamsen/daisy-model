@@ -49,6 +49,24 @@ Pet::reference_to_potential (const Vegetation& crops,
   return EpFactor * max (0.0, ref);
 }
 
+double 
+Pet::albedo (const Vegetation& crops, const Surface& surface, 
+             const Soil& soil, const SoilWater& soil_water)
+{
+  const double litter_albedo = crops.litter_albedo ();
+  const double surface_albedo = (litter_albedo < 0.0) 
+    ? surface.albedo (soil, soil_water)
+    : litter_albedo;
+
+  const double LAI = crops.LAI ();
+  if (LAI <= 0.0)
+    return surface_albedo;
+
+  const double crop_cover = crops.cover ();
+  return crops.albedo () * crop_cover
+    + surface_albedo * (1.0 - crop_cover);
+}
+
 double
 Pet::dry () const 
 { return wet (); }

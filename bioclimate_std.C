@@ -82,11 +82,17 @@ struct BioclimateStandard : public Bioclimate
   double canopy_water_out;	// Canopy drip throughfall [mm/h]
   double canopy_water_bypass;	// Water from above bypassing the canopy [mm/h]
   
+  // Water intercepted on litter.
+  double litter_ep;		// Potential litter evaporation [mm/h]
+  double litter_ea;		// Actual litter evaporation [mm/h]
+  double litter_water_storage;	// Intercepted water in litter [mm]
+  double litter_water_temperature; // Temperature of water in litter [dg C]
+  double litter_water_in;	// Water entering litter [mm/h]
+  double litter_water_out;	// Water leaving litter [mm/h]
+
   // Water in pond.
   double pond_ep;		// Potential evaporation from pond [mm/h]
   double pond_ea;		// Actual evaporation from pond [mm/h]
-  double pond_water_in;		// Water entering pond [mm/h]
-  double pond_water_in_temperature; // Temperature of water entering [dg C]
 
   // Water going through soil surface.
   double soil_ep;		// Potential exfiltration. [mm/h]
@@ -174,7 +180,7 @@ struct BioclimateStandard : public Bioclimate
   double get_intercepted_water () const // [mm]
     { return canopy_water_storage; }
   double get_net_throughfall () const // [mm/h]
-    { return pond_water_in; }
+    { return litter_water_out; }
   double get_snow_storage () const // [mm]
     { return snow.storage (); }
   // Create.
@@ -252,10 +258,14 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     canopy_water_in (0.0),
     canopy_water_out (0.0),
     canopy_water_bypass (0.0),
+    litter_ep (0.0),
+    litter_ea (0.0),
+    litter_water_storage (al.number ("litter_water_storage")),
+    litter_water_temperature (0.0),
+    litter_water_in (0.0),
+    litter_water_out (0.0),
     pond_ep (0.0),
     pond_ea (0.0),
-    pond_water_in (0.0),
-    pond_water_in_temperature (0.0),
     soil_ep (0.0),
     soil_ea (0.0),
     svat (Librarian<SVAT>::create (al.alist ("svat"))),
@@ -434,7 +444,6 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
       canopy_water_in = snow_water_out * vegetation.cover ();
       canopy_water_bypass = snow_water_out - canopy_water_in;
     }
-
   daisy_assert (canopy_water_in >= 0.0);
 
   if (canopy_water_in > 0.01)
@@ -468,40 +477,81 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     }
   daisy_assert (canopy_water_out >= 0.0);
 
-  // 4 Ponding
+  // 4 Water intercepted by litter
 
-  pond_ep = (total_ep - snow_ea) * (1.0 - vegetation.cover ());
+  litter_ep = (total_ep - snow_ea) * (1.0 - vegetation.cover ());
   daisy_assert (snow_ea <= total_ep);
-  if (pond_ep < 0.0)
+  if (litter_ep < 0.0)
     {
       TmpStream tmp;
-      tmp () << "BUG:\npond_ep = " << pond_ep << "\n"
+      tmp () << "BUG:\nlitter_ep = " << litter_ep << "\n"
              << "total_ep = " << total_ep << "\n"
              << "snow_ea = " << snow_ea << "\n"
              << "cover  = " << vegetation.cover ();
       msg.error (tmp.str ());
+      litter_ep = 0.0;
+    }
+
+  litter_water_in 
+    = canopy_water_out + canopy_water_bypass + irrigation_surface;
+
+  if (litter_water_in > 0.01)
+    litter_water_temperature 
+      = (litter_water_storage * air_temperature
+         + canopy_water_bypass * snow_water_out_temperature
+	 + canopy_water_out * canopy_water_temperature
+	 + irrigation_surface * irrigation_surface_temperature)
+      / (litter_water_in + litter_water_storage);
+  else
+    litter_water_temperature = air_temperature;
+
+  daisy_assert (litter_water_storage >= 0.0);
+  litter_ea = max (min (litter_ep,
+                        litter_water_storage / dt + litter_water_in),
+                   0.0);
+  total_ea += litter_ea;
+  daisy_assert (total_ea >= 0.0);
+  
+  const double litter_water_capacity = vegetation.litter_water_capacity ();
+  litter_water_storage += (litter_water_in - litter_ea) * dt;
+  if (litter_water_storage < 0.0)
+    {
+      daisy_assert (litter_water_storage > -1e-8);
+      litter_water_out = litter_water_storage;
+      litter_water_storage = 0.0;
+    }
+  else if (litter_water_storage > litter_water_capacity + 1e-8)
+    {
+      litter_water_out = litter_water_storage - litter_water_capacity;
+      litter_water_storage = litter_water_capacity;
+    }
+  else
+    litter_water_out = 0.0;
+
+  // 5 Ponding
+
+  pond_ep = (litter_ep - litter_ea) * vegetation.litter_Es_reduction_factor();
+  daisy_assert (litter_ea <= litter_ep);
+  if (pond_ep < 0.0)
+    {
+      TmpStream tmp;
+      tmp () << "BUG:\npond_ep = " << pond_ep << "\n"
+             << "litter_ep = " << litter_ep << "\n"
+             << "litter_ea = " << litter_ea << "\n"
+             << "litter_factor = " << vegetation.litter_Es_reduction_factor ();
+      msg.error (tmp.str ());
       pond_ep = 0.0;
     }
 
-  pond_water_in = canopy_water_out + canopy_water_bypass + irrigation_surface;
-  if (pond_water_in > 0.01)
-    pond_water_in_temperature 
-      = (canopy_water_bypass * snow_water_out_temperature
-	 + canopy_water_out * canopy_water_temperature
-	 + irrigation_surface * irrigation_surface_temperature)
-      / pond_water_in;
-  else
-    pond_water_in_temperature = air_temperature;
-
   surface.tick (msg, pond_ep, 
-		pond_water_in, pond_water_in_temperature, 
+		litter_water_out, litter_water_temperature, 
 		soil, soil_water, soil_heat.T (0));
   pond_ea = surface.evap_pond (msg);
   daisy_assert (pond_ea >= 0.0);
   total_ea += pond_ea;
   daisy_assert (total_ea >= 0.0);
 
-  // 5 Soil
+  // 6 Soil
 
   soil_ep = pond_ep - pond_ea;
   daisy_assert (soil_ep >= 0.0);
@@ -510,12 +560,12 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   total_ea += soil_ea;
   daisy_assert (total_ea >= 0.0);
 
-  // 6 Transpiration
+  // 7 Transpiration
 
   // Potential transpiration
   const double potential_crop_transpiration = canopy_ep - canopy_ea;
   const double potential_soil_transpiration 
-    = (pond_ep - pond_ea - soil_ea) * surface.EpInterchange ();
+    = (pond_ep - pond_ea - soil_ea) * vegetation.EpInterchange ();
   crop_ep = bound (0.0, 
 		   potential_crop_transpiration + potential_soil_transpiration,
 		   max (0.0, pet->dry ()));
@@ -533,11 +583,12 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   // Production stress
   svat.tick (weather, vegetation, surface, soil, soil_heat, soil_water, *pet,
-	     canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
+	     canopy_ea, snow_ea, pond_ea + litter_ea,
+             soil_ea, crop_ea, crop_ep);
   production_stress = svat.production_stress ();
   vegetation.force_production_stress (production_stress);
 
-  // 7 Reset irrigation
+  // 8 Reset irrigation
   irrigation_overhead_old = irrigation_overhead;
   irrigation_overhead = 0.0;
   irrigation_surface_old = irrigation_surface;
@@ -545,11 +596,11 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   irrigation_subsoil_old = irrigation_subsoil;
   irrigation_subsoil = 0.0;
   
-  // 8 Check
+  // 9 Check
   // Note: total_ea can be larger than total_ep, as PMSW uses a
   // different method for calculating PET.
   daisy_assert (approximate (total_ea,
-                             snow_ea + canopy_ea 
+                             snow_ea + canopy_ea + litter_ea
                              + pond_ea + soil_ea + crop_ea));
 }  
 
@@ -656,11 +707,14 @@ BioclimateStandard::output (Log& log) const
   output_variable (canopy_water_in, log);
   output_variable (canopy_water_out, log);
   output_variable (canopy_water_bypass, log);
+  output_variable (litter_ep, log);
+  output_variable (litter_ea, log);
+  output_variable (litter_water_storage, log);
+  output_variable (litter_water_temperature, log);
+  output_variable (litter_water_in, log);
+  output_variable (litter_water_out, log);
   output_variable (pond_ep, log);
   output_variable (pond_ea, log);
-  output_variable (pond_water_in, log);
-  output_value (pond_water_in_temperature, 
-	      "pond_water_in_temperature", log);
   output_variable (soil_ep, log);
   output_variable (soil_ea, log);
   output_derived (svat, "svat", log);
@@ -742,8 +796,7 @@ By default, choose depending on available climate date.\n\
 If reference evaporation is available in the climate data, Daisy will\n\
 use these (the weather pet model).\n\
 \n\
-If vapor pressure and wind are available, it will use Penman-Monteith\n\
-(PM).\n\
+If vapor pressure and wind are available, it will use Penman-Monteith (PM).\n\
 \n\
 If the timestep is larger than 12, and daily minimum and maximum\n\
 temperature are available,  Samani and Hargreaves (Hargreaves).\n\
@@ -803,15 +856,26 @@ As a last resort,  Makkink (makkink) will be used.");
       syntax.add ("canopy_water_bypass", "mm/h", Syntax::LogOnly,
 		  "Water from above bypassing the canopy.");
   
+      // Water intercepted by litter.
+      syntax.add ("litter_ep", "mm/h", Syntax::LogOnly,
+		  "Potential evaporation litter.");
+      syntax.add ("litter_ea", "mm/h", Syntax::LogOnly,
+		  "Actual litter evaporation.");
+      syntax.add ("litter_water_storage", "mm", Syntax::State,
+		  "Intercepted water on litter.");
+      alist.add ("litter_water_storage", 0.0);
+      syntax.add ("litter_water_temperature", "dg C", Syntax::LogOnly,
+		  "Temperature of incoming water.");
+      syntax.add ("litter_water_in", "mm/h", Syntax::LogOnly,
+		  "Water entering litter.");
+      syntax.add ("litter_water_out", "mm/h", Syntax::LogOnly,
+		  "Litter drip throughfall.");
+  
       // Water in pond.
       syntax.add ("pond_ep", "mm/h", Syntax::LogOnly,
 		  "Potential evaporation from pond.");
       syntax.add ("pond_ea", "mm/h", Syntax::LogOnly,
 		  "Actual evaporation from pond.");
-      syntax.add ("pond_water_in", "mm/h", Syntax::LogOnly,
-		  "Water entering pond.");
-      syntax.add ("pond_water_in_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of water entering pond.");
 
       // Water going through soil surface.
       syntax.add ("svat", Librarian<SVAT>::library (), 

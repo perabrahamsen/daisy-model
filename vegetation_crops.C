@@ -152,6 +152,13 @@ struct VegetationCrops : public Vegetation
   void sow (Treelog& msg, const AttributeList& al, const Geometry&);
   void output (Log&) const;
 
+  double litter_Es_reduction_factor () const
+  { return 1.0; }
+  double litter_water_capacity () const
+  { return 0.0; }
+  double litter_albedo () const
+  { return -1.0; }
+
   // Create and destroy.
   void initialize (const Time&, const Soil& soil, OrganicMatter *const,
                    Treelog& msg);

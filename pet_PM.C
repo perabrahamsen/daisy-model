@@ -95,16 +95,7 @@ PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
   const double AtmPressure = FAO::AtmosphericPressure (elevation);
 
   // Albedo.
-  const double LAI = crops.LAI ();
-  double Albedo;
-  if (LAI > 0.0)
-    {
-      const double crop_cover = crops.cover ();
-      Albedo = crops.albedo () * crop_cover
-	+ surface.albedo (soil, soil_water) * (1.0 - crop_cover);
-    }
-  else
-    Albedo =  surface.albedo (soil, soil_water);
+  const double Albedo = albedo (crops, surface, soil, soil_water);
 
   // Net Radiation.
   net_radiation.tick (Cloudiness, Temp, VaporPressure, Si, Albedo, out);
@@ -113,7 +104,7 @@ PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
   // Ground heat flux.
   const double G = soil_heat.top_flux (soil, soil_water);
 
-
+  const double LAI = crops.LAI ();
   if (LAI > 0.0)
     {
       const double CropHeight = 0.01 * crops.height (); //cm -> m

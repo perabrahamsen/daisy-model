@@ -45,6 +45,7 @@ class Vegetation
 public:
   const symbol name;
   static const char *const description;
+  const double EpInterchange_;  // Soil to canopy pot-.evap. interchange.
 
   // Canopy queries.
 public:
@@ -59,6 +60,7 @@ public:
   virtual double ACRef () const = 0;	// Canopy reflection coefficient 
   virtual double ARExt () const = 0;	// Radiation Extinction coefficient
   virtual double EpFactor () const = 0;	// Reference to pot. evapotransp
+  double EpInterchange () const; // Soil to canopy exchange rate.
   virtual double albedo () const = 0;	// Another reflection factor
   virtual double interception_capacity () const = 0;// Canopy water cap. [mm]
 
@@ -83,7 +85,7 @@ public:
 				double canopy_evaporation,
 				const Soil& soil, SoilWater& soil_water,
 				double day_fraction, Treelog&) = 0;
-  virtual void force_production_stress  (double pstress);
+  virtual void force_production_stress  (double pstress) = 0;
   virtual void kill_all (symbol, const Time&, const Geometry&,
 			 Bioclimate&, vector<AM*>& residuals, 
 			 double& residuals_DM,
@@ -115,6 +117,11 @@ public:
 		    const Geometry&) = 0;
   virtual void output (Log&) const;
   
+  // Litter
+  virtual double litter_Es_reduction_factor () const = 0;
+  virtual double litter_water_capacity () const = 0;  
+  virtual double litter_albedo () const = 0;  
+
   // Create and Destroy.
 public:
   virtual void initialize (const Time&, const Soil& soil, OrganicMatter *const,

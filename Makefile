@@ -342,7 +342,7 @@ COMPONENTS = summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = time.C \
+SUBMODELS = litter.C time.C \
 	som.C smb.C aom.C dom.C photosynthesis.C crpn.C vernalization.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
@@ -627,6 +627,7 @@ cvs: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	rm -f version.C
 	$(MAKE) version.C
+	cp ChangeLog ChangeLog.old
 	echo `date "+%Y-%m-%d "` \
 	     " Per Abrahamsen  <abraham@dina.kvl.dk>" > ChangeLog
 	echo >> ChangeLog
@@ -758,6 +759,8 @@ svat${OBJ}: svat.C svat.h librarian.h common.h library.h symbol.h alist.h \
   syntax.h treelog.h assertion.h log.h
 vegetation${OBJ}: vegetation.C vegetation.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h log.h
+litter${OBJ}: litter.C litter.h submodel.h syntax.h treelog.h symbol.h \
+  alist.h check.h
 time${OBJ}: time.C time.h assertion.h log.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h vcheck.h submodel.h
 som${OBJ}: som.C som.h om.h plf.h submodel.h alist.h symbol.h
@@ -906,6 +909,7 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h common.h \
   soil_chemicals.h soil_chemical.h solute.h adsorption.h transport.h \
   mactrans.h plf.h transform.h groundwater.h log.h weather.h im.h \
   vegetation.h
+version${OBJ}: version.C
 texture${OBJ}: texture.C texture.h plf.h assertion.h mathlib.h
 destination${OBJ}: destination.C destination.h symbol.h
 symbol${OBJ}: symbol.C symbol.h assertion.h tmpstream.h
@@ -1031,9 +1035,9 @@ column_inorganic${OBJ}: column_inorganic.C column_base.h column.h librarian.h \
   im.h vegetation.h am.h
 vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h librarian.h \
   common.h library.h symbol.h alist.h syntax.h treelog.h assertion.h \
-  plf.h mathlib.h log.h root_system.h rootdens.h canopy_simple.h soil.h \
-  geometry.h crop.h am.h aom.h om.h organic_matter.h clayom.h check.h \
-  tmpstream.h
+  plf.h mathlib.h log.h litter.h root_system.h rootdens.h canopy_simple.h \
+  soil.h geometry.h crop.h am.h aom.h om.h organic_matter.h clayom.h \
+  check.h tmpstream.h
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h crop.h \
   organic_matter.h clayom.h soil.h geometry.h plf.h mathlib.h harvest.h \

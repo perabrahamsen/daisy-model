@@ -12,6 +12,42 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.24
+
+** EpInterchange moved from Surface to Vegetation.
+
+** New Litter submodel of permanent vegetaion.
+
+Here you can set 
+
+*** EpFactor
+
+This controls reduction of potential evaporation below litter.  The
+default value is 1.0, meaning the litter does not block potential
+evaporation at all.
+
+*** interception_capacity
+
+The water storage capacity of the litter layer.  By default, zero.
+
+*** albedo
+
+The albedo of the litter layer.  By default it will use the albedo of
+the soil surface.
+
+Example:
+
+  (Vegetation Hardwood         
+              (Litter (Es_reduction_factor 0.9 [])
+                      (interception_capacity 2 [mm])
+                      (Albedo 0.3)))
+
+** "Bioclimate" and "Surface Water Balance" updated with litter.
+
+This affects even runs without litter.  In particular, litter_ea will
+include evaporation of rain "as it falls", which mean that pond_ea now
+only included evaporation of ponded water.
+
 * 3.22
 
 ** 2% N lost as N2O during nitrification.

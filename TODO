@@ -1,5 +1,7 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Implement litter_albedo
+
 * Make it possible to specify texture using different systems
 
 ** New "default" horizon

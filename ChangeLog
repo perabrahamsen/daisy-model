@@ -1,7 +1,50 @@
+2004-01-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.24 released.
+
+2004-01-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation_permanent.C (root_system, canopy): Made them inline
+	members instead of references.
+
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h
+	(litter_Es_reduction_factor, litter_water_capacity)
+	(litter_albedo): New functions.
+	* bioclimate_std.C (litter_ep, litter_ea): New log variables.
+	(litter_water_storage): New state variable.
+	(litter_water_temperature, litter_water_in, litter_water_out): New
+	log variables.
+	(WaterDistribution): Use them.
+	(output): Output them.
+	(pond_water_in, pond_water_in_temperature): Removed.
+	* lib/log.dai ("Bioclimate", "Surface Water Balance"): Use them.
+	("Evapotranspiration"): Ditto.
+
+	* litter.C: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* vegetation_permanent.C (Litter): New submodel.
+
+	* vegetation.C, vegetation.h (EpInterchange): Added.
+	* surface.C, surface.h (EpInterchange): Removed.
+	* bioclimate_std.C (WaterDistribution): Update caller.
+	* vegetation_permanent.C (force_production_stress): Added.
+	* vegetation.C, vegetation.h: (force_production_stress): Removed.
+
 2004-01-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.23 released.
 
+2004-01-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (SOM_limit_normalize): New function.
+	(partition): Use it.
+
+	* nitrification.C (N2O_fraction): Changed default from 4% to 2%.
+
+	* Version 3.22 released.
+
+	Lost changed changlogs from here to 3.18 due to bug in Makefile.
+	
 2003-12-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* pet_FAO_PM.C: New model.

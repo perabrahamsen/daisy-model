@@ -23,6 +23,7 @@
 #include "plf.h"
 #include "mathlib.h"
 #include "log.h"
+#include "litter.h"
 #include "root_system.h"
 #include "canopy_simple.h"
 #include "time.h"
@@ -52,7 +53,7 @@ struct VegetationPermanent : public Vegetation
     YearlyLAI (const vector<AttributeList*>& als);
   } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
-  CanopySimple& canopy;
+  CanopySimple canopy;
   double cover_;		// Fraction of soil covered by crops [0-1]
   PLF HvsLAI_;			// Height with LAI below [f: R -> cm]
 
@@ -61,16 +62,19 @@ struct VegetationPermanent : public Vegetation
   const double DM_per_LAI;	// DM as function of LAI [Mg DM/ha]
   double N_demand;		// Current potential N content. [g N/m^2]
   double N_actual;		// Current N content. [g N/m^2]
-  AM* litter;			// Dead plant matter.
+  AM* AM_litter;                // Dead plant matter.
   double N_uptake;		// N uptake this hour. [g N/m^2/h]
   double N_litter;		// N litter this hour. [g N/m^2/h]
   const vector<AttributeList*>& litter_am; // Litter AM parameters.
   // Root.
-  RootSystem& root_system;
+  RootSystem root_system;
   const double WRoot;		// Root dry matter weight [g DM/m^2]
 
   // Radiation.
   const double albedo_;		// Another reflection factor.
+
+  // Litter.
+  Litter litter;
 
   // Queries.
   double rs_min () const	// Minimum transpiration resistance.
@@ -128,6 +132,8 @@ struct VegetationPermanent : public Vegetation
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water, 
 			double day_fraction, Treelog&);
+  void force_production_stress  (double)
+  { }
   void kill_all (symbol, const Time&, const Geometry&, Bioclimate&,
 		 vector<AM*>&, double&, double&, double&, 
 		 vector<double>&, vector<double>&, Treelog&)
@@ -146,6 +152,13 @@ struct VegetationPermanent : public Vegetation
   void sow (Treelog&, const AttributeList&, const Geometry&)
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
+
+  double litter_Es_reduction_factor () const
+  { return litter.Es_reduction_factor; }
+  double litter_water_capacity () const
+  { return litter.interception_capacity; }
+  double litter_albedo () const
+  { return litter.albedo; }
 
   // Create and destroy.
   void initialize (const Time& time, const Soil& soil, OrganicMatter *const, 
@@ -260,18 +273,18 @@ VegetationPermanent::tick (const Time& time,
       if (organic_matter)
 	{
 	  N_litter = N_actual * (dLAI / old_LAI);
-	  if (!litter)
+	  if (!AM_litter)
 	    {
 	      static const symbol vegetation_symbol ("vegetation");
 	      static const symbol dead_symbol ("dead");
 	      
-	      litter = &AM::create (soil, time, litter_am,
+	      AM_litter = &AM::create (soil, time, litter_am,
 				    vegetation_symbol, dead_symbol,
 				    AM::Locked);
-	      organic_matter->add (*litter);
+	      organic_matter->add (*AM_litter);
 
 	    }
-	  litter->add (C * m2_per_cm2, N_litter * m2_per_cm2);
+	  AM_litter->add (C * m2_per_cm2, N_litter * m2_per_cm2);
 	  residuals_N_top += N_litter;
 	}
       residuals_DM += DM;
@@ -322,7 +335,7 @@ VegetationPermanent::initialize (const Time& time, const Soil& soil,
     {
       static const symbol vegetation_symbol ("vegetation");
       static const symbol litter_symbol ("litter");
-      litter = organic_matter->find_am (vegetation_symbol, litter_symbol);
+      AM_litter = organic_matter->find_am (vegetation_symbol, litter_symbol);
     }
 }
 
@@ -330,28 +343,26 @@ VegetationPermanent::VegetationPermanent (const AttributeList& al)
   : Vegetation (al),
     yearly_LAI (al.alist_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
-    canopy (*new CanopySimple (al.alist ("Canopy"))),
+    canopy (al.alist ("Canopy")),
     cover_ (-42.42e42),
     N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
     DM_per_LAI (al.number ("DM_per_LAI")),
     N_demand (0.0),
     N_actual (al.check ("N_actual") ? al.number ("N_actual") : -42.42e42),
-    litter (NULL),
+    AM_litter (NULL),
     N_uptake (0.0),
     N_litter (0.0),
     litter_am (al.alist_sequence ("litter_am")),
-    root_system (*new RootSystem (al.alist ("Root"))),
+    root_system (al.alist ("Root")),
     WRoot (al.number ("root_DM") * 100.0), // [Mg DM / ha] -> [g DM / m^2]
-    albedo_ (al.number ("Albedo"))
+    albedo_ (al.number ("Albedo")),
+    litter (al.alist ("Litter"))
 {
   canopy.Height = al.number ("Height");
 }
 
 VegetationPermanent::~VegetationPermanent ()
-{ 
-  delete &canopy;
-  delete &root_system;
-}
+{ }
 
 static struct
 VegetationPermanentSyntax
@@ -406,6 +417,9 @@ Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
     syntax.add ("Albedo", Syntax::None (), Check::positive (), Syntax::Const, 
 		"Reflection factor.");
     alist.add ("Albedo", 0.2);
+    syntax.add_submodule("Litter", alist, Syntax::State, "Dead stuff.",
+			 Litter::load_syntax);
+    
     Librarian<Vegetation>::add_type ("permanent", alist, syntax, &make);
   }
 } VegetationPermanent_syntax;

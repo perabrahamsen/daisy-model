@@ -29,9 +29,9 @@ Librarian<Vegetation>::Content* Librarian<Vegetation>::content = NULL;
 const char *const Vegetation::description = "\
 That green stuff.";
 
-void 
-Vegetation::force_production_stress  (double)
-{ }
+double
+Vegetation::EpInterchange () const
+{ return EpInterchange_; }
 
 void
 Vegetation::output (Log& log) const
@@ -51,7 +51,7 @@ Vegetation::output (Log& log) const
 }
 
 void
-Vegetation::load_syntax (Syntax& syntax, AttributeList&)
+Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 	      "Description of this vegetation.");
@@ -75,6 +75,9 @@ Height in which there is a given LAI below in total canopy");
 \n(like ACExt, but for all radiation, not just light)");
   syntax.add ("EpFactor", Syntax::None (), Syntax::LogOnly,
 	      "Reference to potential evapotranspiration");
+  syntax.add_fraction ("EpInterchange", Syntax::Const, "\
+Canopy adsorbtion fraction of unreached potential soil evaporation.");
+  alist.add ("EpInterchange", 0.6);
   syntax.add ("albedo", Syntax::None (), Syntax::LogOnly,
 	      "Another reflection factor");
   syntax.add ("interception_capacity", "mm", Syntax::LogOnly,
@@ -82,7 +85,8 @@ Height in which there is a given LAI below in total canopy");
 }
 
 Vegetation::Vegetation (const AttributeList& al)
-  : name (al.identifier ("type"))
+  : name (al.identifier ("type")),
+    EpInterchange_ (al.number ("EpInterchange"))
 { }
 
 Vegetation::~Vegetation ()
