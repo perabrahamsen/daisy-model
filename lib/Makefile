@@ -13,9 +13,8 @@ DAISY 	= dk-soil.dai dk-fertilizer.dai \
 	crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS) $(DKCROPS)
 MSHE	= mshe.dai mshe-standalone.dai
-TEXT	= Makefile test.dai all.dai 
-CLIMATE = weather.dwf
-REMOVE 	=  cutgrass.dai 
+TEXT	= Makefile  all.dai 
+REMOVE 	=  weather.dlf test.dai
 
 all:
 	echo Nothing to do here.
@@ -32,9 +31,9 @@ stdref.dai:	mini.dai $(NEWCROPS) log.dai
 
 # Create a ZIP file with all the sources.
 #
-daisy-lib.zip:	$(DAISY) $(CLIMATE) $(TEXT) $(MSHE)
+daisy-lib.zip:	$(DAISY) $(TEXT) $(MSHE)
 	rm -f daisy-lib.zip
-	zip daisy-lib.zip $(DAISY) $(CLIMATE) $(TEXT) $(MSHE)
+	zip daisy-lib.zip $(DAISY) $(TEXT) $(MSHE)
 
 # Move it to ftp.
 #
@@ -47,9 +46,9 @@ dist:
 
 # Update the CVS repository.
 #
-cvs: $(DAISY) $(TEXT) $(MSHE) $(CLIMATE)
+cvs: $(DAISY) $(TEXT) $(MSHE)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-cvs add $(DAISY) $(TEXT) $(MSHE) $(CLIMATE)
+	-cvs add $(DAISY) $(TEXT) $(MSHE)
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"

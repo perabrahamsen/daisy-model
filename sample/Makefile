@@ -1,6 +1,7 @@
 LIBS 	= pedo-soil.dai irrigation.dai dk-management.dai
-SETUPS  = sample.dai
-TEXT	= Makefile README $(SETUPS) $(LIBS)
+SETUPS  = sample.dai test.dai
+DATA = taastrup.dwf example.gwt
+TEXT	= Makefile README $(SETUPS) $(DATA) $(LIBS)
 REMOVE 	=  NOTHING
 
 DAISY   = /usr/local/daisy/$(HOSTTYPE)/daisy

@@ -915,13 +915,13 @@ However, since `\texttt{\mbox{$\backslash$}}' is treated specially in
 Daisy setup files, you will have to double all the backslashed, like
 this:
 \begin{verbatim}
-  (input file "C:\\daisy\\lib\\test.dai")
+  (input file "C:\\daisy\\sample\\test.dai")
 \end{verbatim}
 
 Since this looks rather awkward, Daisy also supports ordinary slashes
 in file names:
 \begin{verbatim}
-  (input file "C:/daisy/lib/test.dai")
+  (input file "C:/daisy/sample/test.dai")
 \end{verbatim}
 
 \subsection{PLF}
@@ -1035,16 +1035,12 @@ complete and current.
 
 The main Daisy executable is called `\texttt{daisy.exe}' on win32
 systems, or just `\texttt{daisy}' on Unix.  This is the command line
-version of Daisy.  For win32 systems, there is also the
-`\texttt{daisy.dll}' file which allows Daisy to be used as a component of
-another system, and `\texttt{cdaisy.exe}' which uses
-`\texttt{daisy.dll}' to provide most of the functionality of
-`\texttt{daisy.exe}'.
+version of Daisy.  
 
 To run a simulation, you should start the daisy executable with a
 setup file as an argument.  A sample setup file named
-`\texttt{test.dai}' is distributed together with the standard
-parameterization libraries.  You run it by typing
+`\texttt{test.dai}' is distributed together with the sample
+parameterizations.  You run it by typing
 \begin{verbatim}
   daisy test.dai
 \end{verbatim}
@@ -1066,19 +1062,34 @@ depends on the system, here are some examples:
 \begin{itemize}
 \item Unix, using the C shell, in `\texttt{.cshrc}'.
 \begin{verbatim}
-  setenv DAISYPATH .:$HOME/daisy/lib   #$ (For Daisy)
+  setenv DAISYPATH .:$HOME/daisy/sample:$HOME/daisy/lib
 \end{verbatim}
 \item Unix, using the Bourne shell, in `\texttt{.profile}'.
 \begin{verbatim}
-  DAISYPATH=.:$HOME/daisy/lib; export DAISYPATH  #$ (For Daisy)
+  DAISYPATH=.:$HOME/daisy/sample:$HOME/daisy/lib; export DAISYPATH
 \end{verbatim}
 \item Windows 95/98, in `\texttt{autoexec.bat}'.
 \begin{verbatim}
-  set DAISYPATH=.;C:\daisy\lib
+  set DAISYPATH=.;C:\daisy\sample;C:\daisy\lib
 \end{verbatim}
 \item Under Windows NT, use \texttt{regedit} to add the environment
   variable. 
 \end{itemize}
+
+Alternatively, you can specify both where to run the executable (and
+thus, where to create output files) and the path for searching for
+files directly in the beginning of the setup file, with the
+\emph{directory} and \emph{path} commands, like this:
+\begin{verbatim}
+  (directory "C:/daisy/jsmith/sim1")
+  (path "." "C:/daisy/sample" "C:/daisy/lib")
+\end{verbatim}
+Here we specify that all files generated must be put in the ``sim1''
+directory, and that \daisy{} should look for files there first,
+followed by the ``sample'' and then the ``lib'' directories.  Note
+that you must use slash (/) and not backslash (\mbox{$\backslash$}) to
+separate directory components. 
+
 
 \subsection{\texttt{tillage.dai}}
 

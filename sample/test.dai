@@ -32,6 +32,9 @@
   (OrganicMatter (init (input 1400 [kg C/ha/y])
                        (root 480 [kg C/ha/y])
                        (end -20 [cm])))
+  ;; Measured numbers for groundwater table can be read from a file, like this:
+  ;; (Groundwater file "example.gwt")
+  ;; But here we assume free drainage.
   (Groundwater deep))
 
 ;; Use it.
