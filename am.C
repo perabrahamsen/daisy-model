@@ -27,7 +27,7 @@
 #include "alist.h"
 #include "time.h"
 #include "log.h"
-#include "geometry.h"
+#include "soil.h"
 #include "tmpstream.h"
 #include "mathlib.h"
 #include <numeric>
@@ -589,14 +589,14 @@ AM:: crop_part_name () const
 { return impl.crop_part_name (); }
 
 AM& 
-AM::create (const AttributeList& al1 , const Geometry& geometry)
+AM::create (const AttributeList& al1 , const Soil& soil)
 { 
   AttributeList al2 (al1);
   al2.add ("type", "state");
   if (!al2.check ("name"))
     al2.add ("name", al1.name ("type"));
   AM& am = *new AM (al2); 
-  am.initialize (geometry);
+  am.initialize (soil);
   return am;
 }
 
@@ -663,6 +663,26 @@ AM::default_AOM ()
       AOM->push_back (&AOM2);
     }
   return *AOM;
+}
+
+const AttributeList& 
+AM::default_root ()
+{
+  static AttributeList root;
+  
+  if (!root.check ("syntax"))
+    {
+      root.add ("type", "root");
+      root.add ("description", "Initialization of old root remains.");
+      root.add ("creation", Time (1, 1, 1, 1));
+      root.add ("syntax", "root");
+      root.add ("dist", 7.0);
+      root.add ("weight", 1.2);
+      root.add ("total_C_fraction", 0.40);
+      root.add ("total_N_fraction", 0.01);
+      root.add ("om", AM::default_AOM ());
+    }
+  return root;
 }
 
 double
@@ -823,7 +843,7 @@ AM::AM (const AttributeList& al)
  }
 
 void
-AM::initialize (const Geometry& geometry)
+AM::initialize (const Soil& soil)
 {
   const string syntax = alist.name ("syntax");
   
@@ -871,7 +891,7 @@ AM::initialize (const Geometry& geometry)
 	      if (fraction != OM::Unspecified)
 		{
 		  missing_fraction -= fraction;
-		  geometry.add (om[j]->C, last, end, C * fraction);
+		  soil.add (om[j]->C, last, end, C * fraction);
 		}
 	      else if (missing_number != -1)
 		// Should be catched by syntax check.
@@ -884,7 +904,7 @@ AM::initialize (const Geometry& geometry)
 	      if (missing_fraction < -0.1e-10)
 		throw ("Specified over 100% C in om in initial am");
 	      else if (missing_fraction > 0.0)
-		geometry.add (om[missing_number]->C, 
+		soil.add (om[missing_number]->C, 
 			  last, end, C * missing_fraction);
 	    }
 	  else if (missing_fraction < -0.1e-10)
@@ -907,22 +927,26 @@ AM::initialize (const Geometry& geometry)
       // Get paramters.
       const double weight = alist.number ("weight"); // T DM / ha
       const double total_C_fraction = alist.number ("total_C_fraction");
+      const double total_N_fraction = alist.number ("total_N_fraction");
       const double C = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
 	* total_C_fraction; // g C / cm²;
+      const double N = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
+	* total_N_fraction; // g C / cm²;
       const double k = M_LN2 / alist.number ("dist");
-      const double depth = alist.number ("depth");
+      const double depth = alist.check ("depth") 
+	? alist.number ("depth") : soil.MaxRootingDepth ();
 
       // Calculate density.
-      vector<double> density (geometry.size (), 0.0);
+      vector<double> density (soil.size (), 0.0);
       for (unsigned int i = 0; 
-	   i < geometry.size () && geometry.z (i) > depth;
+	   i < soil.size () && soil.z (i) > depth;
 	   i++)
 	{
-	  density[i] = k * exp (k * geometry.z (i));
+	  density[i] = k * exp (k * soil.z (i));
 	}
 
       // Add it.
-      impl.add (geometry, C, density);
+      impl.add (soil, C, N, density);
     }
 }
 
@@ -1001,7 +1025,8 @@ static bool check_root (const AttributeList& al, Treelog& err)
   
   bool ok = true;
 
-  non_positive (al.number ("depth"), "depth", ok, err);
+  if (al.check ("depth"))
+    non_positive (al.number ("depth"), "depth", ok, err);
   non_negative (al.number ("dist"), "dist", ok, err);
   non_negative (al.number ("weight"), "weight", ok, err);
 
@@ -1145,15 +1170,13 @@ uniformly distributed in each layer.");
       // Root initialization,
       {
 	Syntax& syntax = *new Syntax ();
+	AttributeList& alist = *new AttributeList (AM::default_root ());
 	syntax.add_check (check_root);
-	AttributeList& alist = *new AttributeList ();
-	alist.add ("description", "Initialization of old root remains.");
 	syntax.add ("creation", Syntax::Date, Syntax::State,
 		    "Start of simulation.");
-	alist.add ("creation", Time (1, 1, 1, 1));
-	alist.add ("syntax", "root");
-	syntax.add ("depth", "cm", Syntax::Const, "\
-How far down does the old root reach? (a negative number)");
+	syntax.add ("depth", "cm", Syntax::OptionalConst, "\
+How far down does the old root reach? (a negative number)\n\
+By default, the soils maximal rooting depth will be used.");
 	syntax.add ("dist", "cm", Syntax::Const, "\
 Distance to go down in order to decrease the root density to half the\n\
 original.");
@@ -1161,6 +1184,8 @@ original.");
 		    "Total weight of old root dry matter.");
 	syntax.add ("total_C_fraction", Syntax::Fraction (), Syntax::Const, 
 		    "Carbon fraction of total root dry matter");
+	syntax.add ("total_N_fraction", Syntax::Fraction (), Syntax::Const, 
+		    "Nitrogen fraction of total root dry matter");
 	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
 				    "The individual AOM pools.");
 	Librarian<AM>::add_type ("root", alist, syntax, &make);

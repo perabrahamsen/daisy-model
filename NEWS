@@ -12,6 +12,22 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.86
+
+** Count initial AOM when estimating initial SMB.
+
+** By default, assume 1.2 t DM/ha old root residuals at initialization.
+
+To disable, specify an empty value for "am" in OrganicMatter.
+
+The effect if the above two changes is a much reduced need for a
+"warming period" at the start of the simulation. 
+
+** The syntax for "root" AM has changed, everything has default values.
+
+Typically, you would just override the "weight" variable with your own
+estiimate.
+
 * 1.85
 
 ** New top level attributes "directory" and "path".

@@ -1,3 +1,22 @@
+2001-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.86 released.
+
+2001-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Crop Photosynthesis"): Fix CO2-C to CO2 factor.
+
+	* am.h, am.C (default_root): New function.
+	(initialize, create): Take soil instead of geometry argument.
+	* organic_matter.C (load_syntax): Use it.
+	* am.C (AM_Syntax): Add default values for "root", and a new
+	"total_N_fraction". 
+	(initialize, check_root): Use it.
+
+	* organic_matter.C (initialize): Count input from AM pools when
+	initializing SMB.
+	* organic_matter.C (load_syntax): Document initialization of SMB.
+
 2001-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.85 released.

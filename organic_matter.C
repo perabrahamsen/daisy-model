@@ -571,7 +571,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 { 
   // Sizes.
   const unsigned int smb_size = smb.size ();
-  const unsigned int som_size = smb.size ();
+  const unsigned int som_size = som.size ();
 
   // Production.
   CO2.insert (CO2.end (), soil.size (), 0.0);
@@ -710,7 +710,17 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 		  * som[i]->turnover_rate 
 		  * som[i]->fractions[pool]
 		  * som[i]->efficiency[pool];
-	      
+
+	      // Add contributions from AM pools
+	      vector<OM*> added;
+	      for (unsigned int i = 0; i < am.size (); i++)
+		am[i]->append_to (added);
+	      for (unsigned int i = 0; i < added.size (); i++)
+		in += added[i]->C[lay] 
+		  * added[i]->turnover_rate 
+		  * added[i]->fractions[pool]
+		  * added[i]->efficiency[pool];
+
 	      // Rate of outgoing C. 
 	      double out_rate = smb[pool]->turnover_rate 
 		+ smb[pool]->maintenance;
@@ -1065,13 +1075,16 @@ Mineralization this time step (negative numbers mean immobilization).");
 	      "Total organic C in the soil layer.");
   syntax.add ("total_N", "g N/cm^2", Syntax::LogOnly, Syntax::Sequence,
 	      "Total organic N in the soil layer.");
-  syntax.add ("CO2", "g CO2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("CO2", "g CO_2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "CO2 evolution in soil.");
-  syntax.add ("top_CO2", "g CO2-C/cm^2/h", Syntax::LogOnly,
+  syntax.add ("top_CO2", "g CO_2-C/cm^2/h", Syntax::LogOnly,
 	      "CO2 evolution at surface.");
   syntax.add ("am", Librarian<AM>::library (), Syntax::Sequence, 
 	      "Added organic matter pools.");
-  alist.add ("am", vector<AttributeList*> ());
+  vector<AttributeList*> am;
+  AttributeList root (AM::default_root ());
+  am.push_back (&root);
+  alist.add ("am", am);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist,
 					 Syntax::State,
 					 "Buffer between AOM pools and SOM.");
@@ -1082,7 +1095,8 @@ Mineralization this time step (negative numbers mean immobilization).");
   OM::load_syntax (om_syntax, om_alist);
 
   add_submodule_sequence<OM> ("smb", syntax, Syntax::State,
-			      "Soil MicroBiomass pools.");
+			      "Soil MicroBiomass pools.\n\
+Initial value will be estimated based on equilibrium with AM and SOM pools.");
   vector<AttributeList*> SMB;
   AttributeList SMB1 (om_alist);
   vector<double> SMB1_C_per_N;

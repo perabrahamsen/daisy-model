@@ -27,6 +27,7 @@
 #include <vector>
 
 class Geometry;
+class Soil;
 class Time;
 class OM;
 class Treelog;
@@ -72,14 +73,15 @@ public:
   // Create and Destroy.
 public:
   // Initialization & Fertilizer.
-  static AM& create (const AttributeList&, const Geometry&);
+  static AM& create (const AttributeList&, const Soil&);
   // Crop part.
   static AM& create (const Geometry&, const Time&,
 		     const vector<AttributeList*>&,
 		     const string& sort, const string& part,
 		     lock_type lock = Unlocked);
-  void initialize (const Geometry&);
+  void initialize (const Soil&);
   static const vector<AttributeList*>& default_AOM ();
+  static const AttributeList& default_root ();
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]
   static double get_volatilization (const AttributeList&);	// [kg N/ha]
