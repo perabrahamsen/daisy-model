@@ -50,7 +50,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	  delta_matter = C[i] * delta_water;
 	  assert (delta_water <= 0.0);
 	}
-      else if (delta_water > 1.0e30)
+      else if (delta_water > 1.0e-30)
 	// Water enters the layer.
 	{
 	  // Fraction of water entering the layer through the
