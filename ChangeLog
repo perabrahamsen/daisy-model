@@ -1,5 +1,12 @@
 2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.93 released.
+
+2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C, photosynthesis.C, photosynthesis.h, production.C,
+	production.h, crpaux.C, crpaux.h:  Moved code to submodel. 
+
 	* Version 1.92 released.
 
 2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>

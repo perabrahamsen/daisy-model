@@ -44,7 +44,7 @@ public:
 public:
   void operator () (double DS, double current_RSR,
 		    double& f_Leaf, double& f_Stem,
-		    double& f_Root, double& f_SOrg);
+		    double& f_Root, double& f_SOrg) const;
 
   // Create and Destroy.
 public:

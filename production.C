@@ -28,6 +28,27 @@
 #include "submodel.h"
 
 double
+Production::remobilization (const double DS)
+{
+  if (DS < ReMobilDS)
+    {
+      StemRes = 0.0;
+      return 0.0;
+    }
+  else if (StemRes < 1.0e-9)
+    {
+      StemRes = ShldResC * WStem;
+      return 0.0;
+    }
+  else
+    {
+      const double ReMobilization = ReMobilRt / 24. * StemRes;
+      StemRes -= ReMobilization;
+      return ReMobilization;
+    }
+}
+
+double
 Production::RSR () const
 {
   const double shoot = WStem + WSOrg + WLeaf;
@@ -54,6 +75,7 @@ Production::total_N () const
 void 
 Production::output (Log& log) const
 {
+  log.output ("StemRes", StemRes);
   log.output ("CH2OPool", CH2OPool);
   log.output ("WLeaf", WLeaf);
   log.output ("WStem", WStem);
@@ -83,6 +105,20 @@ Production::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "\
 Crop production in the default crop model.");
 
+  // Remobilization.
+  syntax.add ("ShldResC", Syntax::None (), Syntax::Const,
+	      "Capacity of shielded reserves (fraction of stem DM).");
+  alist.add ("ShldResC", 0.0);
+  syntax.add ("ReMobilDS", Syntax::None (), Syntax::Const,
+	      "Remobilization, Initial DS.");
+  alist.add ("ReMobilDS", 1.20);
+  syntax.add ("ReMobilRt", "d^-1", Syntax::Const,
+	      "Remobilization, release rate.");
+  alist.add ("ReMobilRt", 0.1);
+  syntax.add ("StemRes", "g DM/m^2", Syntax::State,
+	      "Shielded reserves in stems.");
+  alist.add ("StemRes", 0.0);
+
   // Parameters.
   syntax.add ("CH2OReleaseRate", Syntax::None (), Syntax::Const,
 	      "CH2O Release Rate constant.");
@@ -107,15 +143,6 @@ Crop production in the default crop model.");
 	      "Maintenance respiration coefficient, stem.");
   syntax.add ("r_SOrg", Syntax::None (), Syntax::Const,
 	      "Maintenance respiration coefficient, storage organ.");
-  syntax.add ("ShldResC", Syntax::None (), Syntax::Const,
-	      "Capacity of shielded reserves (fraction of stem DM).");
-  alist.add ("ShldResC", 0.0);
-  syntax.add ("ReMobilDS", Syntax::None (), Syntax::Const,
-	      "Remobilization, Initial DS.");
-  alist.add ("ReMobilDS", 1.20);
-  syntax.add ("ReMobilRt", "d^-1", Syntax::Const,
-	      "Remobilization, release rate.");
-  alist.add ("ReMobilRt", 0.1);
   syntax.add ("ExfoliationFac", Syntax::None (), Syntax::Const,
 	      "Exfoliation factor, 0-1.");
   alist.add ("ExfoliationFac", 1.0);
@@ -224,8 +251,12 @@ Production::initialize (const string& name,
 }
 
 Production::Production (const AttributeList& al)
-  // Parameters.
-  : CH2OReleaseRate (al.number ("CH2OReleaseRate")),
+  : ShldResC (al.number ("ShldResC")),
+    ReMobilDS (al.number ("ReMobilDS")),
+    ReMobilRt (al.number ("ReMobilRt")),
+    StemRes (al.number ("StemRes")),
+    // Parameters.
+    CH2OReleaseRate (al.number ("CH2OReleaseRate")),
     E_Root (al.number ("E_Root")),
     E_Leaf (al.number ("E_Leaf")),
     E_Stem (al.number ("E_Stem")),
@@ -234,9 +265,6 @@ Production::Production (const AttributeList& al)
     r_Leaf (al.number ("r_Leaf")),
     r_Stem (al.number ("r_Stem")),
     r_SOrg (al.number ("r_SOrg")),
-    ShldResC (al.number ("ShldResC")),
-    ReMobilDS (al.number ("ReMobilDS")),
-    ReMobilRt (al.number ("ReMobilRt")),
     ExfoliationFac (al.number ("ExfoliationFac")),
     GrowthRateRedFac (al.number ("GrowthRateRedFac")),
     LfDR (al.plf ("LfDR")),

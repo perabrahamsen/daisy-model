@@ -30,7 +30,6 @@ class AM;
 struct CrpAux
 {
   // Content.
-  double StemRes;		// Shielded Reserves in Stems
   double PotTransp;	        // Potential Transpiration [mm/h]
   double PotCanopyAss;		// Potential Canopy Assimilation [g CH2O/m2/h]
   double CanopyAss;	        // Canopy Assimilation [g CH2O/m2/h]

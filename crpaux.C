@@ -46,7 +46,6 @@ CrpAux::no_production ()
 void
 CrpAux::output (Log& log) const
 {
-  log.output ("StemRes", StemRes);
   log.output ("PotTransp", PotTransp);
   log.output ("PotCanopyAss", PotCanopyAss);
   log.output ("CanopyAss", CanopyAss);
@@ -74,9 +73,6 @@ CrpAux::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "\
 Auxiliary data for the default crop model.");
 
-  syntax.add ("StemRes", "g DM/m^2", Syntax::State,
-	      "Shielded reserves in stems.");
-  alist.add ("StemRes", 0.0);
   syntax.add ("PotTransp", "mm/h", Syntax::State,
 	      "Potential transpiration.");
   alist.add ("PotTransp", 0.0);
@@ -119,8 +115,7 @@ Auxiliary data for the default crop model.");
 }
 
 CrpAux::CrpAux (const AttributeList& al)
-  : StemRes (al.number ("StemRes")),
-    PotTransp (al.number ("PotTransp")),
+  : PotTransp (al.number ("PotTransp")),
     PotCanopyAss (al.number ("PotCanopyAss")),
     CanopyAss (al.number ("CanopyAss")),
     NetPhotosynthesis (0.0),

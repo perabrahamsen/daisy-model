@@ -28,6 +28,10 @@
 #include "submodel.h"
 
 void
+Development::light_hour ()
+{ partial_day_length += 1.0; }
+
+void
 Development::tick_daily (const string& name, 
 			 const double Ta, const double WLeaf, 
 			 CrpAux& auxiliary, Vernalization& vernalization)

@@ -12,6 +12,12 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.93
+
+** Log file change.  
+
+StemRes was moved from CrpAux to Prod in the standard crop model.
+
 * 1.92
 
 ** Log file change.  

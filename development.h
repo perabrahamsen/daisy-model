@@ -63,6 +63,7 @@ public:
 
   // Simulation.
 public:
+  void light_hour ();
   void tick_daily (const string& name, double Ta, double WLeaf, 
 		   CrpAux&, Vernalization&);
   void emergence ();

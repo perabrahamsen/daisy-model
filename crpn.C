@@ -31,6 +31,13 @@
 #include "submodel.h"
 
 void
+CrpN::cut (const double DS)
+{
+  if (DS > DS_start_fixate)
+    DS_start_fixate = DS_cut_fixate;
+}
+
+void
 CrpN::content (const double DS, Production& production)
 {
   PtNCnt = PtLeafCnc (DS) * production.WLeaf
@@ -114,12 +121,12 @@ CrpN::update (const int Hour, double& NCrop, const double DS,
 void
 CrpN::output (Log& log) const
 {
-  log.output ("Fixated", Fixated);
-  log.output ("AccFixated", AccFixated);
-  log.output ("DS_start_fixate", DS_start_fixate);
   log.output ("PtNCnt", PtNCnt);
   log.output ("CrNCnt", CrNCnt);
   log.output ("NfNCnt", NfNCnt);
+  log.output ("Fixated", Fixated);
+  log.output ("AccFixated", AccFixated);
+  log.output ("DS_start_fixate", DS_start_fixate);
 }
 
 bool 
@@ -141,19 +148,12 @@ CrpN::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "\
 Default crop nitrogen parameters.");
 
-  // Parameters.
+  // Obsolete.
   syntax.add ("SeedN", "g N/m^2", Syntax::OptionalConst,
 	      "N-content in seed.\n\
 Obsolete: Use 'Prod NCrop' instead.");
-  syntax.add ("DS_fixate", Syntax::None (), Syntax::Const,
-	      "DS at which to start fixation of atmospheric N.");
-  alist.add ("DS_fixate", 42000.0);
-  syntax.add ("DS_cut_fixate", Syntax::None (), Syntax::Const,
-	      "Restore fixation this DS after cut.");
-  alist.add ("DS_cut_fixate", 0.0);
-  syntax.add ("fixate_factor", Syntax::None (), Syntax::Const,
-	      "Fraction of needed N fixated by day.");
-  alist.add ("fixate_factor", 0.8);
+
+  // Content.
   syntax.add ("PtLeafCnc", "DS", " g N/g DM", Syntax::Const,
 	      "Upper limit for N-concentration in leaves.");
   syntax.add ("CrLeafCnc", "DS", " g N/g DM", Syntax::Const,
@@ -190,8 +190,23 @@ Non-functional lim for N-concentration in roots.");
   TLRootEff.add (0.00, 0.10);
   TLRootEff.add (2.00, 0.10);
   alist.add ("TLRootEff", TLRootEff);
+  syntax.add ("PtNCnt", "g/m^2", Syntax::LogOnly,
+	      "Potential nitrogen content in crop.");
+  syntax.add ("CrNCnt", "g/m^2", Syntax::LogOnly,
+	      "Critical nitrogen content in crop.");
+  syntax.add ("NfNCnt", "g/m^2", Syntax::LogOnly,
+	      "Non-functional nitrogen content in crop.");
 
-  // State variable.
+  // Fixation.
+  syntax.add ("DS_fixate", Syntax::None (), Syntax::Const,
+	      "DS at which to start fixation of atmospheric N.");
+  alist.add ("DS_fixate", 42000.0);
+  syntax.add ("DS_cut_fixate", Syntax::None (), Syntax::Const,
+	      "Restore fixation this DS after cut.");
+  alist.add ("DS_cut_fixate", 0.0);
+  syntax.add ("fixate_factor", Syntax::None (), Syntax::Const,
+	      "Fraction of needed N fixated by day.");
+  alist.add ("fixate_factor", 0.8);
   syntax.add ("Fixated", "g N/m^2/h", Syntax::LogOnly,
 	      "N fixation from air.");
   syntax.add ("AccFixated", "g N/m^2", Syntax::LogOnly, 
@@ -199,21 +214,10 @@ Non-functional lim for N-concentration in roots.");
   alist.add ("AccFixated", 0.0);
   syntax.add ("DS_start_fixate", Syntax::None (), Syntax::OptionalState,
 	      "Development stage at which to restart fixation after a cut.");
-
-  // Log variable.
-  syntax.add ("PtNCnt", "g/m^2", Syntax::LogOnly,
-	      "Potential nitrogen content in crop.");
-  syntax.add ("CrNCnt", "g/m^2", Syntax::LogOnly,
-	      "Critical nitrogen content in crop.");
-  syntax.add ("NfNCnt", "g/m^2", Syntax::LogOnly,
-	      "Non-functional nitrogen content in crop.");
 }
 
 CrpN::CrpN (const AttributeList& al)
   : SeedN (al.check ("SeedN") ? al.number ("SeedN") : -42.42e42),
-    DS_fixate (al.number ("DS_fixate")),
-    DS_cut_fixate (al.number ("DS_cut_fixate")),
-    fixate_factor (al.number ("fixate_factor")),
     PtLeafCnc (al.plf ("PtLeafCnc")),
     CrLeafCnc (al.plf ("CrLeafCnc")),
     NfLeafCnc (al.plf ("NfLeafCnc")),
@@ -228,14 +232,17 @@ CrpN::CrpN (const AttributeList& al)
     NfSOrgCnc (al.plf ("NfSOrgCnc")),
     TLLeafEff (al.plf ("TLLeafEff")),
     TLRootEff (al.plf ("TLRootEff")),
+    PtNCnt (0.0),
+    CrNCnt (0.0),
+    NfNCnt (0.0),
+    DS_fixate (al.number ("DS_fixate")),
+    DS_cut_fixate (al.number ("DS_cut_fixate")),
+    fixate_factor (al.number ("fixate_factor")),
     Fixated (0.0),
     AccFixated (al.number ("AccFixated")),
     DS_start_fixate (al.check ("DS_start_fixate")
 		     ? al.number ("DS_start_fixate")
-		     : al.number ("DS_fixate")),
-    PtNCnt (0.0),
-    CrNCnt (0.0),
-    NfNCnt (0.0)
+		     : al.number ("DS_fixate"))
 { }
 
 CrpN::~CrpN ()

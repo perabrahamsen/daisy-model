@@ -28,7 +28,7 @@
 void
 Partition::operator () (double DS, double current_RSR,
 			double& f_Leaf, double& f_Stem,
-			double& f_Root, double& f_SOrg)
+			double& f_Root, double& f_SOrg) const
 {
   if (current_RSR > RSR (DS))
     f_Root = 0.0;

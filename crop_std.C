@@ -76,9 +76,9 @@ public:
   Production& production;
   Development& development;
   CrpAux& auxiliary;
-  Partition& partition;
+  const Partition& partition;
   Vernalization& vernalization;
-  Photosynthesis& photosynthesis;
+  const Photosynthesis& photosynthesis;
   CrpN& nitrogen;
   const bool enable_water_stress;
   const bool enable_N_stress;
@@ -121,8 +121,6 @@ public:
   // Internal functions.
 protected:
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
-  double CanopyPhotosynthesis (const Bioclimate&);
-  double ReMobilization ();
   double MaintenanceRespiration (double r, double w, double T);
   void NetProduction (const Bioclimate&, const Geometry&, const SoilHeat&);
 
@@ -191,100 +189,6 @@ CropStandard::initialize (const Geometry& geometry)
 }
 
 double
-CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
-{
-  // sugar production [gCH2O/m2/h] by canopy photosynthesis.
-  const PLF& LAIvsH = canopy.LAIvsH;
-  const double Ta = bioclimate.daily_air_temperature ();
-  const double DS = development.DS;
-  // Temperature effect and development stage effect
-  const double Teff = photosynthesis.TempEff (Ta) * photosynthesis.DSEff (DS);
-
-  // One crop: assert (approximate (canopy.CAI, bioclimate.CAI ()));
-  if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
-    {
-      CERR << "Bug: CAI below top: " << LAIvsH (canopy.Height)
-	   << " Total CAI: " << canopy.CAI << "\n";
-      CanopyStructure ();
-      CERR << "Adjusted: CAI below top: " << LAIvsH (canopy.Height)
-	   << " Total CAI: " << canopy.CAI << "\n";
-    }
-
- // CAI below the current leaf layer.
-  double prevLA = LAIvsH (bioclimate.height (0));
-  // Assimilate produced by canopy photosynthesis
-  double Ass = 0.0;
-  // Accumulated CAI, for testing purposes.
-  double accCAI =0.0;
-  // Number of computational intervals in the canopy.
-  const int No = bioclimate.NumberOfIntervals ();
-  // CAI in each interval.
-  const double dCAI = bioclimate.LAI () / No;
-
-  // True, if we haven't reached the top of the crop yet.
-  bool top_crop = true;
-
-  for (int i = 0; i < No; i++)
-    {
-      const double height = bioclimate.height (i+1);
-      assert (height < bioclimate.height (i));
-
-      if (top_crop && height <= canopy.Height)
-	{
-	  // We count day hours at the top of the crop.
-	  top_crop = false;
-	  if (bioclimate.PAR (i) > 0.5 * 25.0)
-	    development.partial_day_length += 1.0;
-	}
-      // Leaf Area index for a given leaf layer
-      const double LA = prevLA - LAIvsH (height);
-      assert (LA >= 0.0);
-      if (LA > 0)
-	{
-	  prevLA = LAIvsH (height);
-	  accCAI += LA;
-
-	  const double dPAR
-	    = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / dCAI;
-
-	  // Leaf Photosynthesis [gCO2/m2/h]
-	  const double F = photosynthesis.Fm *
-	    (1.0 - exp (- (photosynthesis.Qeff * dPAR / photosynthesis.Fm)));
-
-	  Ass += LA * F;
-	}
-    }
-  assert (approximate (accCAI, canopy.CAI));
-
-  return (molWeightCH2O / molWeightCO2) * Teff * Ass;
-}
-
-double
-CropStandard::ReMobilization ()
-{
-  const double DS = development.DS;
-  const double WStem = production.WStem;
-  double& StemRes = auxiliary.StemRes;
-
-  if (DS < production.ReMobilDS)
-    {
-      StemRes = 0.0;
-      return 0.0;
-    }
-  else if (StemRes < 1.0e-9)
-    {
-      StemRes = production.ShldResC * WStem;
-      return 0.0;
-    }
-  else
-    {
-      const double ReMobilization = production.ReMobilRt / 24. * StemRes;
-      StemRes -= ReMobilization;
-      return ReMobilization;
-    }
-}
-
-double
 CropStandard::MaintenanceRespiration (double r, double w, double T)
 {
   if (w <= 0.0)
@@ -310,7 +214,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   bool ReleaseOfRootReserves = false;
 
   // Remobilization
-  const double ReMobil = ReMobilization ();
+  const double ReMobil = production.remobilization (development.DS);
   const double CH2OReMobil = ReMobil * DM_to_C_factor (production.E_Stem) * 30.0/12.0;
   const double ReMobilResp = CH2OReMobil - ReMobil;
   production.CH2OPool += CH2OReMobil;
@@ -601,7 +505,7 @@ CropStandard::tick (const Time& time,
 
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
-      double Ass = CanopyPhotosynthesis (bioclimate);
+      double Ass = photosynthesis (bioclimate, canopy, development);
       auxiliary.PotCanopyAss = Ass;
       if (root_system.production_stress >= 0.0)
 	Ass *= (1.0 - root_system.production_stress);
@@ -832,8 +736,7 @@ CropStandard::harvest (const string& column_name,
 	development.DS = DSnew;
 
       // Stop fixation after cut.
-      if (DS > nitrogen.DS_start_fixate)
-	nitrogen.DS_start_fixate = nitrogen.DS_cut_fixate;
+      nitrogen.cut (DS);
 
       if (DS > 0.0)
 	{

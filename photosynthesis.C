@@ -20,10 +20,90 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "photosynthesis.h"
+#include "bioclimate.h"
+#include "canopy_std.h"
+#include "development.h"
 #include "plf.h"
-#include "submodel.h"
 #include "alist.h"
 #include "syntax.h"
+#include "message.h"
+#include "submodel.h"
+#include "mathlib.h"
+
+// Chemical constants affecting the crop.
+const double molWeightCH2O = 30.0; // [gCH2O/mol]
+const double molWeightCO2 = 44.0; // [gCO2/mol]
+
+double
+Photosynthesis::operator () (const Bioclimate& bioclimate, 
+			     CanopyStandard& canopy,
+			     Development& development) const
+{
+  // sugar production [gCH2O/m2/h] by canopy photosynthesis.
+  const PLF& LAIvsH = canopy.LAIvsH;
+  const double Ta = bioclimate.daily_air_temperature ();
+  const double DS = development.DS;
+
+  // Temperature effect and development stage effect
+  const double Teff = TempEff (Ta) * DSEff (DS);
+
+  // One crop: assert (approximate (canopy.CAI, bioclimate.CAI ()));
+  if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
+    {
+      CERR << "Bug: CAI below top: " << LAIvsH (canopy.Height)
+	   << " Total CAI: " << canopy.CAI << "\n";
+      canopy.CanopyStructure (DS);
+      CERR << "Adjusted: CAI below top: " << LAIvsH (canopy.Height)
+	   << " Total CAI: " << canopy.CAI << "\n";
+    }
+
+ // CAI below the current leaf layer.
+  double prevLA = LAIvsH (bioclimate.height (0));
+  // Assimilate produced by canopy photosynthesis
+  double Ass = 0.0;
+  // Accumulated CAI, for testing purposes.
+  double accCAI =0.0;
+  // Number of computational intervals in the canopy.
+  const int No = bioclimate.NumberOfIntervals ();
+  // CAI in each interval.
+  const double dCAI = bioclimate.LAI () / No;
+
+  // True, if we haven't reached the top of the crop yet.
+  bool top_crop = true;
+
+  for (int i = 0; i < No; i++)
+    {
+      const double height = bioclimate.height (i+1);
+      assert (height < bioclimate.height (i));
+
+      if (top_crop && height <= canopy.Height)
+	{
+	  // We count day hours at the top of the crop.
+	  top_crop = false;
+	  if (bioclimate.PAR (i) > 0.5 * 25.0)
+	    development.light_hour ();
+	}
+      // Leaf Area index for a given leaf layer
+      const double LA = prevLA - LAIvsH (height);
+      assert (LA >= 0.0);
+      if (LA > 0)
+	{
+	  prevLA = LAIvsH (height);
+	  accCAI += LA;
+
+	  const double dPAR
+	    = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / dCAI;
+
+	  // Leaf Photosynthesis [gCO2/m2/h]
+	  const double F = Fm * (1.0 - exp (- (Qeff * dPAR / Fm)));
+
+	  Ass += LA * F;
+	}
+    }
+  assert (approximate (accCAI, canopy.CAI));
+
+  return (molWeightCH2O / molWeightCO2) * Teff * Ass;
+}
 
 void 
 Photosynthesis::load_syntax (Syntax& syntax, AttributeList& alist)

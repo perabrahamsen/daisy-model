@@ -36,43 +36,50 @@ class Treelog;
 
 class CrpN 
 {
-  // Parameters.
+  // Obsolete.
 public:
   const double SeedN;		// N-content in seed [ g N/m^2 ]
-  const double DS_fixate;	// Fixation of atmospheric N. after this DS
-  const double DS_cut_fixate;	// Restore fixation this DS after cut.
-  const double fixate_factor;	// Fraction of N need covered by fixation.
+
+  // Content.
+private:
   const PLF& PtLeafCnc;		// Upper limit for N-conc in leaves
   const PLF& CrLeafCnc;		// Critical lim f. N-conc in leaves
+public:
   const PLF& NfLeafCnc;		// Non-func lim f. N-conc in leaves
+private:
   const PLF& PtStemCnc;		// Upper limit for N-conc in stems
   const PLF& CrStemCnc;		// Critical lim f. N-conc in stems
   const PLF& NfStemCnc;		// Non-func lim f. N-conc in stems
   const PLF& PtRootCnc;		// Upper limit for N-conc in roots
   const PLF& CrRootCnc;		// Critical lim f. N-conc in roots
+public:
   const PLF& NfRootCnc;		// Non-func lim f. N-conc in roots
+private:
   const PLF& PtSOrgCnc;		// Upper limit for N-conc in stor org
   const PLF& CrSOrgCnc;		// Critical lim f. N-conc in stor org
   const PLF& NfSOrgCnc;		// Non-func lim f. N-conc in stor org
+public:
   const PLF& TLLeafEff;		// Translocation effiency, Leaf.
   const PLF& TLRootEff;		// Translocation effiency, Root.
-
-  // State variable.
-private:
-  double Fixated;		// N fixation from air. [g/m2/h]
-  double AccFixated;		// Accumulated N fixation from air. [g/m2]
-public:
-  double DS_start_fixate;	// Start fixation at this DS.
-
-  // Log variable.
 public:
   double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
 private:
   double CrNCnt;		// Critical Nitrogen Content in Crop [g/m2]
   double NfNCnt;		// Non-func Nitrogen Content in Crop [g/m2]
 
+  // Fixation.
+private:
+  const double DS_fixate;	// Fixation of atmospheric N. after this DS
+  const double DS_cut_fixate;	// Restore fixation this DS after cut.
+  const double fixate_factor;	// Fraction of N need covered by fixation.
+  double Fixated;		// N fixation from air. [g/m2/h]
+  double AccFixated;		// Accumulated N fixation from air. [g/m2]
+  double DS_start_fixate;	// Start fixation at this DS.
+
+
   // Simulation.
 public:
+  void cut (double DS);
   void content (const double DS, Production& production);
   void update (int Hour, double& NCrop, double DS,
 	       bool enable_N_stress,

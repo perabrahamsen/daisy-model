@@ -22,6 +22,9 @@
 #ifndef PHOTOSYNTHESIS_H
 #define PHOTOSYNTHESIS_H
 
+class Bioclimate;
+class CanopyStandard;
+class Development;
 class AttributeList;
 class Syntax;
 class Log;
@@ -30,11 +33,17 @@ class PLF;
 class Photosynthesis 
 {
   // Parameters.
-public:
+private:
     double Qeff;	// Quantum efficiency at low light
     double Fm;		// Max assimilation rate
     const PLF& TempEff;	// Temperature effect, photosynthesis
     const PLF& DSEff;	// Development stage effect, photosynthesis
+
+  // Simulation.
+public:
+  double operator () (const Bioclimate& bioclimate, 
+		      CanopyStandard& canopy,
+		      Development& development) const;
 
   // Create and Destroy.
 public:
