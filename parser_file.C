@@ -679,6 +679,7 @@ ParserFile::Implementation::~Implementation ()
 void
 ParserFile::load (AttributeList& alist)
 {
+  impl.skip ();
   impl.load_list (alist, *impl.global_syntax_table);
   impl.eof ();
 }
