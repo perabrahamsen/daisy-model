@@ -1,6 +1,7 @@
 // frame.C
 
 #include "frame.h"
+#include "common.h"
 
 const Column* 
 Frame::column () const

@@ -56,9 +56,16 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
   if (alist.subset (super, syntax, key))
     return false;
 
-  // Sequences are always complex.
+  // Sequences are complex...
   if (syntax.size (key) != Syntax::Singleton)
-    return true;
+    {
+      // when they are not part of a total order...
+      if (!syntax.total_order ())
+	return true;
+      // or not the last element in the order.
+      if (syntax.order (key) + 1U != syntax.order ().size ())
+	return true;
+    }
 
   switch (syntax.lookup (key))
     {
@@ -535,11 +542,13 @@ PrinterFile::Implementation::print_library_file (const string& filename)
 	first = false;
       else
 	out << "\n";
-      out << "(def" << library_name << " " << name << " ";
+      out << "(def" << library_name << " ";
+      print_string (name);
+      out << " ";
       if (alist.check ("type"))
 	{
 	  const string super = alist.name ("type");
-	  out << super;
+	  print_string (super);
 	  if (!library.check (super))
 	    {
 	      out << " ;; unknown superclass\n ";
@@ -618,7 +627,7 @@ PrinterFile::PrinterFile (const AttributeList& al)
 { }
     
 PrinterFile::~PrinterFile ()
-{ }
+{ delete &impl; }
 
 static struct PrinterFileSyntax
 {

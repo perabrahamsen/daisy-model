@@ -25,6 +25,7 @@
 
 Daisy::Daisy (const AttributeList& al)
   : running (false),
+    frame (NULL),
     logs (map_create<Log> (al.alist_sequence ("output"))),
     time (al.time ("time")),
     action (Librarian<Action>::create (al.alist ("manager"))),
@@ -99,19 +100,20 @@ Daisy::tick_logs ()
   for (unsigned int i = 0; i < logs.size (); i++)
     {
       Log& log = *logs[i];
-      Filter& filter = log.match (*this);
+      Filter& filter = log.match (frame, *this);
       log.output ("time", filter, time);
       output_derived (weather, "weather", log, filter);
       output_list (columns, "column", log, filter, 
 		   Librarian<Column>::library ());
       output_vector (harvest, "harvest", log, filter);
+      log.done ();
     }
 }
 
 void 
 Daisy::tick ()
 { 
-  action.doIt (Frame (), *this);
+  action.doIt (frame, *this);
 
   weather.tick (time);
   tick_columns ();

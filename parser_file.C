@@ -332,6 +332,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
   while ( good () && !looking_at (')'))
     {
       bool skipped = false;
+      bool in_order = false;
       string name;
       if (current == end)
 	// Unordered association list, get name.
@@ -343,6 +344,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
       else
 	// Ordered tupple, name know.
 	{
+	  in_order = true;
 	  name = *current;
 	  current++;
 	}
@@ -444,137 +446,178 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    assert (false);
 	  }
       else
-	// Support for sequences not really finished yet.
-	switch (syntax.lookup (name))
-	  {
-	  case Syntax::Object:
+	{
+	  // If this is part of an order, expect parentheses arund the
+	  // list, EXCEPT when there cannot possible be any more
+	  // elements after this one.  I.e. when the element is the
+	  // last of a totally ordered sequence.
+	  if (!in_order)
+	    // Unordered, we already skipped this one
+	    assert (skipped);
+	  else if (current != end || !syntax.total_order ())
+	    // This is not the last element or the order is not total.
 	    {
-	      // We don't support fixed sized object arrays yet.
-	      assert (syntax.size (name) == Syntax::Sequence);
-	      const Library& lib = syntax.library (name);
-	      vector<AttributeList*>& sequence
-		= *new vector<AttributeList*> ();
-	      while (!looking_at (')') && good ())
-		{
-		  AttributeList& al = load_derived (lib, true);
-		  const string obj = al.name ("type");
-		  lib.syntax (obj).check (al, obj);
-		  sequence.push_back (&al);
-		}
-	      atts.add (name, sequence);
-	      break;
+	      assert (!skipped);
+	      skip ("(");
+	      skipped = true;
 	    }
-	  case Syntax::AList:
-	    {
-	      int size = syntax.size (name);
-	      const Syntax& syn = syntax.syntax (name);
-	      vector<AttributeList*>& sequence
-		= *new vector<AttributeList*> ();
-	      bool skipped = false;
-	      // Design bug:  We do not force parentheses around the
-	      // alist if it is the last member of an ordered list.
-	      // The consequences of this is that there must be *no*
-	      // ordered or unordered elements after the alist.
-	      //
-	      // The correct way to solve this would be to check that
-	      // these requirements are really fulfilled, and require
-	      // the parentheses otherwise.
-	      //
-	      // The purpose of this kludge seems to be to allow a
-	      // library object to -- in effect -- have an alist
-	      // sequence as its syntax.  Maybe I should support that
-	      // directly instead.
-	      if (current != end)
-		{
-		  skip ("(");
-		  skipped = true;
-		}
-	      while (!looking_at (')') && good ())
-		{
-		  skip ("(");
-		  // Design bug: This is a bit weird.  I want to
-		  // provide a default value for each member of the
-		  // sequence.  This is done by specifying a single
-		  // alist in the superclass, and use that as a
-		  // default for each alist in the derived objects
-		  // alist_sequence.  This has two problems: 
-		  // 1) If an alist is specified in the superclass,
-		  // the derived object _must_ overwrite it.  2) If an
-		  // alist is not specified, the derived object
-		  // _must_not_ overwrite it.
-		  //
-		  // The correct way to solve the problem is to as the
-		  // alist whether the superclass specified a
-		  // singleton or a sequence.  But the alist API does
-		  // not currently allow that.
-		  AttributeList& al = (atts.check (name) 
-				       ? *new AttributeList (atts.alist (name))
-				       : *new AttributeList ());
 
-		  load_list (al, syn);
-		  sequence.push_back (&al);
+	  // Support for sequences not really finished yet.
+	  switch (syntax.lookup (name))
+	    {
+	    case Syntax::Object:
+	      {
+		// We don't support fixed sized object arrays yet.
+		assert (syntax.size (name) == Syntax::Sequence);
+		const Library& lib = syntax.library (name);
+		vector<AttributeList*>& sequence
+		  = *new vector<AttributeList*> ();
+		while (!looking_at (')') && good ())
+		  {
+		    AttributeList& al = load_derived (lib, true);
+		    const string obj = al.name ("type");
+		    lib.syntax (obj).check (al, obj);
+		    sequence.push_back (&al);
+		  }
+		atts.add (name, sequence);
+		break;
+	      }
+	    case Syntax::AList:
+	      {
+		int size = syntax.size (name);
+		const Syntax& syn = syntax.syntax (name);
+		vector<AttributeList*>& sequence
+		  = *new vector<AttributeList*> ();
+		bool skipped = false;
+		// Design bug:  We do not force parentheses around the
+		// alist if it is the last member of an ordered list.
+		// The consequences of this is that there must be *no*
+		// ordered or unordered elements after the alist.
+		//
+		// The correct way to solve this would be to check that
+		// these requirements are really fulfilled, and require
+		// the parentheses otherwise.
+		//
+		// The purpose of this kludge seems to be to allow a
+		// library object to -- in effect -- have an alist
+		// sequence as its syntax.  Maybe I should support that
+		// directly instead.
+		if (current != end)
+		  {
+		    skip ("(");
+		    skipped = true;
+		  }
+		while (!looking_at (')') && good ())
+		  {
+		    skip ("(");
+		    // Design bug: This is a bit weird.  I want to
+		    // provide a default value for each member of the
+		    // sequence.  This is done by specifying a single
+		    // alist in the superclass, and use that as a
+		    // default for each alist in the derived objects
+		    // alist_sequence.  This has two problems: 
+		    // 1) If an alist is specified in the superclass,
+		    // the derived object _must_ overwrite it.  2) If an
+		    // alist is not specified, the derived object
+		    // _must_not_ overwrite it.
+		    //
+		    // The correct way to solve the problem is to as the
+		    // alist whether the superclass specified a
+		    // singleton or a sequence.  But the alist API does
+		    // not currently allow that.
+		    AttributeList& al = (atts.check (name) 
+					 ? *new AttributeList (atts.alist (name))
+					 : *new AttributeList ());
+
+		    load_list (al, syn);
+		    sequence.push_back (&al);
+		    skip (")");
+		  }
+		if (skipped)
 		  skip (")");
-		}
-	      if (skipped)
-		skip (")");
-	      if (size != Syntax::Sequence 
-		  && (int) sequence.size () != size)
-		{
-		  ostrstream str;
-		  str << "Got " << sequence.size ()
-		      << " array members, expected " << size << '\0';
-		  error (str.str ());
-		}
-	      atts.add (name, sequence);
-	      break;
-	    }
-	  case Syntax::Number:
-	    {
-	      vector<double>& array = *new vector<double> ();
-	      int count = 0;
-	      int size = syntax.size (name);
-	      double last = 0.0;
-	      while (!looking_at (')') && good ())
-		{
-		  if (looking_at ('*'))
-		    {
-		      skip ("*");
-		      int same = get_integer ();
-		      // Append same - 1 copies of last value.
-		      for (int i = 1; i < same; i++)
-			{
-			  array.push_back (last);
-			  count++;
-			}
-		    }
-		  else
-		    {
-		      last = get_number ();
-		      array.push_back (last);
-		      count++;
-		    }
-		}
-	      if (size != Syntax::Sequence && count != size)
-		{
-		  ostrstream str;
-		  str << "Got " << count 
-		      << " array members, expected " << size << '\0';
-		  error (str.str ());
+		if (size != Syntax::Sequence 
+		    && (int) sequence.size () != size)
+		  {
+		    ostrstream str;
+		    str << "Got " << sequence.size ()
+			<< " array members, expected " << size << '\0';
+		    error (str.str ());
+		  }
+		atts.add (name, sequence);
+		break;
+	      }
+	    case Syntax::Number:
+	      {
+		vector<double>& array = *new vector<double> ();
+		int count = 0;
+		int size = syntax.size (name);
+		double last = 0.0;
+		while (!looking_at (')') && good ())
+		  {
+		    if (looking_at ('*'))
+		      {
+			skip ("*");
+			int same = get_integer ();
+			// Append same - 1 copies of last value.
+			for (int i = 1; i < same; i++)
+			  {
+			    array.push_back (last);
+			    count++;
+			  }
+		      }
+		    else
+		      {
+			last = get_number ();
+			array.push_back (last);
+			count++;
+		      }
+		  }
+		if (size != Syntax::Sequence && count != size)
+		  {
+		    ostrstream str;
+		    str << "Got " << count 
+			<< " array members, expected " << size << '\0';
+		    error (str.str ());
 
-		  for (;count < size; count++)
-		    array.push_back (-1.0);
-		}
-	      atts.add (name, array);
+		    for (;count < size; count++)
+		      array.push_back (-1.0);
+		  }
+		atts.add (name, array);
+		break;
+	      }
+	    case Syntax::String:
+	      {
+		vector<string>& array = *new vector<string> ();
+		int count = 0;
+		int size = syntax.size (name);
+
+		while (!looking_at (')') && good ())
+		  {
+		    array.push_back (get_string ());
+		    count++;
+		  }
+		if (size != Syntax::Sequence && count != size)
+		  {
+		    ostrstream str;
+		    str << "Got " << count 
+			<< " array members, expected " << size << '\0';
+		    error (str.str ());
+
+		    for (;count < size; count++)
+		      array.push_back ("<error>");
+		  }
+		atts.add (name, array);
+		break;
+	      }
+	    case Syntax::Error:
+	      error (string("Unknown sequence `") + name + "'");
+	      skip_to_end ();
 	      break;
+	    default:
+	      error (string("Unsupported sequence `") + name + "'");
+	      skip_to_end ();
 	    }
-	  case Syntax::Error:
-	    error (string("Unknown sequence `") + name + "'");
-	    skip_to_end ();
-	    break;
-	  default:
-	    error (string("Unsupported sequence `") + name + "'");
-	    skip_to_end ();
-	  }
+	}
       if (skipped)
 	skip (")");
       skip ();

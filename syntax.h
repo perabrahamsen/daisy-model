@@ -66,7 +66,8 @@ public:
   bool ordered () const;
   const vector<string>& order () const;
   int order (const string& name) const;	// Return index in order, or -1.
-
+  bool total_order () const;	// True iff all members are ordered.
+  
   // Print whole syntax table.
   void dump (int indent = 0) const;
 

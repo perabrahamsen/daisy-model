@@ -7,7 +7,6 @@
 #include "time.h"
 #include "alist.h"
 #include "syntax.h"
-#include "frame.h"
 #include "common.h"
 #include <list>
 #include <fstream.h>
@@ -28,10 +27,10 @@ private:
   bool matching;
   
   // Printing.
-  void force_open (string = "");
+  void force_open (const string& = "");
   void force_close ();
   void print (const char*);
-  void print (string);
+  void print (const string&);
   void print (double);
   void print (int);
   void print (bool);
@@ -41,26 +40,31 @@ private:
 
   // Log.
 public:
-  Filter& match (const Daisy&);
+  Filter& match (const Frame&, const Daisy&);
 
   // Open normal items.
-  void open (string = "");
+  void open (const string&);
   void close ();
 
+  // Open unnamed alists.
+  void open_unnamed ();
+  void close_unnamed ();
+
   // Open derived items.
-  void open (string field, string type);
+  void open_derived (const string& field, const string& type);
+  void close_derived ();
 
   // Open derived items in list.
-  void open_entry (string type);
+  void open_entry (const string& type);
   void close_entry ();
 
-  void output (string, Filter&, const Time&, bool log_only = false);
-  void output (string, Filter&, const bool, bool log_only = false);
-  void output (string, Filter&, const double, bool log_only = false);
-  void output (string, Filter&, const int, bool log_only = false);
-  void output (string, Filter&, const string, bool log_only = false);
-  void output (string, Filter&, const vector<double>&, bool log_only = false);
-  void output (string, Filter&, const CSMP&, bool log_only = false);
+  void output (const string&, Filter&, const Time&, bool log_only = false);
+  void output (const string&, Filter&, const bool, bool log_only = false);
+  void output (const string&, Filter&, const double, bool log_only = false);
+  void output (const string&, Filter&, const int, bool log_only = false);
+  void output (const string&, Filter&, const string&, bool log_only = false);
+  void output (const string&, Filter&, const vector<double>&, bool log_only = false);
+  void output (const string&, Filter&, const CSMP&, bool log_only = false);
 
   // Create and Destroy.
 private:
@@ -72,7 +76,7 @@ public:
 };
 
 void 
-LogFile::force_open (string name)
+LogFile::force_open (const string& name)
 {
   if (!matching)
     return;
@@ -113,7 +117,7 @@ LogFile::force_close ()
 }
 
 void 
-LogFile::open (string name)
+LogFile::open (const string& name)
 {
   if (!compact)
     force_open (name);
@@ -126,8 +130,22 @@ LogFile::close ()
     force_close ();
 }
 
+void 
+LogFile::open_unnamed ()
+{
+  if (!compact)
+    force_open ("");
+}
+
+void 
+LogFile::close_unnamed ()
+{ 
+  if (!compact)
+    force_close ();
+}
+
 void
-LogFile::print (string s)
+LogFile::print (const string& s)
 {
   if (!matching)
     return;
@@ -157,9 +175,9 @@ LogFile::newline ()
 }
 
 Filter&
-LogFile::match (const Daisy& daisy)
+LogFile::match (const Frame& frame, const Daisy& daisy)
 {
-  matching = condition.match (Frame (), daisy);
+  matching = condition.match (frame, daisy);
   
   if (matching || accumulating)
     return filter;
@@ -175,7 +193,7 @@ LogFile::match (const Daisy& daisy)
 }
 
 void 
-LogFile::open (string field, string type)
+LogFile::open_derived (const string& field, const string& type)
 {
   if (!compact)
     {
@@ -185,8 +203,14 @@ LogFile::open (string field, string type)
     }
 }
 
+void
+LogFile::close_derived ()
+{
+  close ();
+}
+
 void 
-LogFile::open_entry (string type)
+LogFile::open_entry (const string& type)
 {
   force_open (type);
 }
@@ -234,7 +258,7 @@ LogFile::print (bool v)
 }
 
 void
-LogFile::output (string name, Filter& filter, const Time& value, bool log_only)
+LogFile::output (const string& name, Filter& filter, const Time& value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -251,7 +275,7 @@ LogFile::output (string name, Filter& filter, const Time& value, bool log_only)
 }
 
 void
-LogFile::output (string name, Filter& filter, const bool value, bool log_only)
+LogFile::output (const string& name, Filter& filter, const bool value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -262,7 +286,7 @@ LogFile::output (string name, Filter& filter, const bool value, bool log_only)
 }
 
 void
-LogFile::output (string name, Filter& filter, const double value, bool log_only)
+LogFile::output (const string& name, Filter& filter, const double value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -273,7 +297,7 @@ LogFile::output (string name, Filter& filter, const double value, bool log_only)
 }
 
 void
-LogFile::output (string name, Filter& filter, const int value, bool log_only)
+LogFile::output (const string& name, Filter& filter, const int value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -284,7 +308,7 @@ LogFile::output (string name, Filter& filter, const int value, bool log_only)
 }
 
 void
-LogFile::output (string name, Filter& filter, const string value, bool log_only)
+LogFile::output (const string& name, Filter& filter, const string& value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -297,7 +321,7 @@ LogFile::output (string name, Filter& filter, const string value, bool log_only)
 }
 
 void
-LogFile::output (string name, Filter& filter, const vector<double>& value, bool log_only)
+LogFile::output (const string& name, Filter& filter, const vector<double>& value, bool log_only)
 {
   if (filter.check (name, log_only))
     {
@@ -331,18 +355,18 @@ LogFile::output (string name, Filter& filter, const vector<double>& value, bool 
 }
 
 void
-LogFile::output (string name, Filter& filter, const CSMP& csmp, bool log_only)
+LogFile::output (const string& name, Filter& filter, const CSMP& csmp, bool log_only)
 {
   if (filter.check (name, log_only))
     {
       open (name);
       for (unsigned int i = 0; i < csmp.size (); i++)
 	{
-	  open ();
+	  open_unnamed ();
 	  print (csmp.x (i));
 	  print (" ");
 	  print (csmp.y (i));
-	  close ();
+	  close_unnamed ();
 	} 
       close ();
     }

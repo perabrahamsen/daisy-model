@@ -85,14 +85,26 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
       else if (types[key] == AList)
 	if (size[key] != Singleton)
 	  {
-	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
-	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
-		 j != seq.end ();
-		 j++)
+	    if (vl.size (key) == Syntax::Singleton)
+	      // Design bug:  An single alist where a sequence is
+	      // expected means the sequence is empty.  The alist is
+	      // intended to work as a "default" for the individual
+	      // members of the sequence.
 	      {
-		const AttributeList& al = **j;
-		if (!syntax[key]->check (al, key))
-		  error = true;
+		cerr << "AList sequence " << key << " missing\n";
+		error = true;
+	      }
+	    else 
+	      {
+		const vector<AttributeList*>& seq = vl.alist_sequence (key);
+		for (vector<AttributeList*>::const_iterator j = seq.begin ();
+		     j != seq.end ();
+		     j++)
+		  {
+		    const AttributeList& al = **j;
+		    if (!syntax[key]->check (al, key))
+		      error = true;
+		  }
 	      }
 	  }
 	else if (!syntax[key]->check (vl.alist (key), key))
@@ -316,6 +328,10 @@ Syntax::order (const string& name) const
 {
   return impl.order_number (name);
 }
+
+bool
+Syntax::total_order () const
+{ return impl.order.size () == impl.types.size (); }
 
 void
 Syntax::add (const string& key, type t, category req, int s)

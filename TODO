@@ -1,5 +1,3 @@
-* Condition: ds_after ("grass", 0.8)
-
 * Standard filtre
 
 ** OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
@@ -10,7 +8,7 @@
 
 * clone column idea:  log + parse!  
 
-* System til rename af dupplicate object ved parsing.
+* System til rename af duplicate object ved parsing.
 
 * daisy_alist_check skal ikke altid skrive fejl ud på cout.
 
@@ -23,6 +21,15 @@
 * Implement in parser and pretty printer:
 
 	(define LIBRARY ELEMENT SUPER (NAME VALUE)...)
+
+* Create `log_checkpoint.C' og slet `filter*.[Ch]'.
+
+LogCheckpoint skal gå ud fra et kopi af den syntax/alist som startede
+simularingen,  lade Daisy::output tilføje nye værdier for state
+variable (samt evt. nyt objekter, specielt AM og Crop, der så skal
+huske deres egen syntax), og så bruge PrinterFile til at udskrive de
+nye alister.  Efter at have udskrevet de objecter der var defineret i
+input filen.
 
 * Remove exception handling.
 

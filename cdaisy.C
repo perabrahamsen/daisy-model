@@ -354,17 +354,7 @@ daisy_library_derive (Library* library,
       alist->add ("parsed_from_file", filename);
       alist->add ("parsed_sequence", Library::get_sequence ());
     }
-
-  if (library == &Librarian<Horizon>::library ())
-    Librarian<Horizon>::derive_type (name, *alist, super);
-  else if (library == &Librarian<Column>::library ())
-    Librarian<Column>::derive_type (name, *alist, super);
-  else if (library == &Librarian<Action>::library ())
-    Librarian<Action>::derive_type (name, *alist, super);
-  else if (library == &Librarian<Weather>::library ())
-    Librarian<Weather>::derive_type (name, *alist, super);
-  else 
-    abort ();
+  library->add_derived (name, *alist, super);
 }
 
 extern "C" void EXPORT
@@ -446,7 +436,7 @@ daisy_daisy_tick (Daisy* daisy)
 
 extern "C" void EXPORT
 daisy_daisy_tick_action (Daisy* daisy)
-{ daisy->action.doIt (Frame (), *daisy); }
+{ daisy->action.doIt (daisy->frame, *daisy); }
 
 extern "C" void EXPORT
 daisy_daisy_tick_weather (Daisy* daisy)

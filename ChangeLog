@@ -1,3 +1,41 @@
+1998-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.011 released.
+
+1998-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* printer_file.C (PrinterFile): Delete `impl' after use.
+	(print_library_file): Quote library member names if necessary.
+
+1998-03-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C: New file.
+	* Makefile (COMPONENTS): Add it.
+
+	* log_file.C, log.h: Pass strings by reference.
+
+	* log_file.C, log.h (open_unnamed): New function.
+	(close_unnamed): New function.
+	* log.h (output_vector): Use it.
+	* log_file.C, log.h (open_derived): Renamed from `open'.
+	(close_derived): New function.
+	* log.h (output_derived): Use it.
+
+	* syntax.C, syntax.h (total_order): New function.
+	* parser_file.C (load_list): Use it.
+	* printer_file.C (is_complex): Ditto.
+
+	* log.C (done): New function.
+	* daisy.C (tick_logs): Call it.
+
+	* syntax.C (check): Handle missing alist sequence.
+	* parser_file.C (load_list): Support string sequences.
+
+	* frame.h (class Frame): No default parent.
+	* log_file.C, log.h (match): Add `frame' parameter.
+	* daisy.h (class Daisy): New `frame' member.
+	* daisy.C (tick_logs): Use it.
+
 1998-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.010 released.

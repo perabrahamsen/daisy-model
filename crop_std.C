@@ -1618,7 +1618,7 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   const double Ta = bioclimate.AirTemperature ();
   const double Teff = LeafPhot.TempEff (Ta); // Temperature effect
 
-  assert (approximate (var.Canopy.LAI, bioclimate.LAI ()));
+  // One crop: assert (approximate (var.Canopy.LAI, bioclimate.LAI ()));
   assert (approximate (LAIvsH (var.Canopy.Height), var.Canopy.LAI));
 
  // LAI below the current leaf layer.

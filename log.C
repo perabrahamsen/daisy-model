@@ -31,6 +31,10 @@ Log::geometry ()
   return impl.geometries.back ();
 }
 
+void 
+Log::done ()
+{ }
+
 Log::Log ()
   : impl (*new Implementation ())
 { }

@@ -170,7 +170,7 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	adsorbtion_none.C tortuosity_M_Q.C tortuosity_linear.C \
 	adsorbtion_freundlich.C adsorbtion_linear.C adsorbtion_langmuir.C \
 	filter_checkpoint.C bioclimate_std.C condition_crop.C \
-	condition_soil.C
+	condition_soil.C log_table.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -437,18 +437,18 @@ crop_std${OBJ}: crop_std.C crop.h time.h common.h librarian.h library.h \
 action_sow${OBJ}: action_sow.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h frame.h column.h crop.h
 action_stop${OBJ}: action_stop.C action.h librarian.h library.h common.h \
- alist.h syntax.h daisy.h
+ alist.h syntax.h daisy.h frame.h
 condition_time${OBJ}: condition_time.C condition.h librarian.h library.h \
- common.h alist.h syntax.h daisy.h
+ common.h alist.h syntax.h daisy.h frame.h
 condition_logic${OBJ}: condition_logic.C condition.h librarian.h library.h \
  common.h alist.h syntax.h
 log_file${OBJ}: log_file.C log.h filter.h librarian.h library.h common.h \
- alist.h syntax.h condition.h csmp.h frame.h
+ alist.h syntax.h condition.h csmp.h
 action_irrigate${OBJ}: action_irrigate.C action.h librarian.h library.h \
  common.h alist.h syntax.h daisy.h frame.h weather.h im.h column.h \
  am.h
 action_lisp${OBJ}: action_lisp.C action.h librarian.h library.h common.h \
- alist.h syntax.h daisy.h column.h condition.h
+ alist.h syntax.h daisy.h frame.h column.h condition.h
 weather_none${OBJ}: weather_none.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h
 action_fertilize${OBJ}: action_fertilize.C action.h librarian.h library.h \
@@ -526,10 +526,16 @@ bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h library.h \
  common.h alist.h syntax.h column.h surface.h uzmodel.h im.h weather.h \
  crop.h csmp.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  snow.h log.h filter.h mathlib.h
-daisy${OBJ}: daisy.C daisy.h common.h weather.h librarian.h library.h \
- alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h log.h \
- filter.h parser.h am.h nitrification.h bioclimate.h column.h \
- hydraulic.h crop.h harvest.h action.h condition.h frame.h
+condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
+ common.h alist.h syntax.h crop.h column.h daisy.h frame.h
+condition_soil${OBJ}: condition_soil.C condition.h librarian.h library.h \
+ common.h alist.h syntax.h column.h daisy.h frame.h
+log_table${OBJ}: log_table.C log.h filter.h librarian.h library.h common.h \
+ alist.h syntax.h condition.h frame.h
+daisy${OBJ}: daisy.C daisy.h frame.h time.h common.h weather.h librarian.h \
+ library.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
+ log.h filter.h parser.h am.h nitrification.h bioclimate.h column.h \
+ hydraulic.h crop.h harvest.h action.h condition.h
 parser${OBJ}: parser.C parser.h librarian.h library.h common.h alist.h \
  syntax.h
 log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
@@ -615,18 +621,18 @@ transport${OBJ}: transport.C transport.h librarian.h library.h common.h \
  alist.h syntax.h
 librarian${OBJ}: librarian.C librarian.h library.h common.h alist.h \
  syntax.h
-cdaisy${OBJ}: cdaisy.C syntax.h common.h alist.h daisy.h parser_file.h \
- parser.h librarian.h library.h column.h weather.h im.h action.h \
- horizon.h printer_file.h printer.h frame.h version.h
+cdaisy${OBJ}: cdaisy.C syntax.h common.h alist.h daisy.h frame.h \
+ parser_file.h parser.h librarian.h library.h column.h weather.h im.h \
+ action.h horizon.h printer_file.h printer.h version.h
 adsorbtion${OBJ}: adsorbtion.C adsorbtion.h librarian.h library.h common.h \
  alist.h syntax.h
 tortuosity${OBJ}: tortuosity.C tortuosity.h librarian.h library.h common.h \
  alist.h syntax.h
 event${OBJ}: event.C alist.h common.h event.h am.h library.h eventqueue.h \
  minimanager.h action.h librarian.h syntax.h column.h im.h daisy.h \
- weather.h crop.h
+ frame.h weather.h crop.h
 eventqueue${OBJ}: eventqueue.C common.h event.h alist.h am.h library.h \
- eventqueue.h daisy.h
+ eventqueue.h daisy.h frame.h
 minimanager${OBJ}: minimanager.C syntax.h common.h minimanager.h action.h \
  librarian.h library.h alist.h event.h am.h eventqueue.h
 printer${OBJ}: printer.C printer.h librarian.h library.h common.h alist.h \
@@ -635,7 +641,8 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
  library.h common.h alist.h syntax.h csmp.h options.h
 frame${OBJ}: frame.C frame.h common.h
 set_exceptions${OBJ}: set_exceptions.S
-main${OBJ}: main.C daisy.h common.h parser_file.h parser.h librarian.h \
- library.h alist.h syntax.h version.h
-tkmain${OBJ}: tkmain.C daisy.h common.h syntax.h alist.h library.h
+main${OBJ}: main.C daisy.h frame.h time.h common.h parser_file.h parser.h \
+ librarian.h library.h alist.h syntax.h version.h
+tkmain${OBJ}: tkmain.C daisy.h frame.h time.h common.h syntax.h alist.h \
+ library.h
 cmain${OBJ}: cmain.c cdaisy.h

@@ -3,8 +3,6 @@
 #ifndef FRAME_H
 #define FRAME_H
 
-#include "common.h"
-
 struct Column;
 
 class Frame
@@ -20,7 +18,7 @@ public:
 
   // Create and Destroy.
 public:
-  Frame (const Frame* = NULL);
+  Frame (const Frame*);
   virtual ~Frame ();
 };
 

@@ -3,7 +3,7 @@
 #ifndef DAISY_H
 #define DAISY_H
 
-#include "common.h"
+#include "frame.h"
 #include "time.h"
 #include <vector>
 
@@ -21,6 +21,7 @@ class Daisy
   // Content.
 public:
   bool running;
+  Frame frame;
   const vector<Log*>& logs;
   Time time;
   Action& action;
