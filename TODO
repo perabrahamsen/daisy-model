@@ -1,18 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Tove eksempler.
-
-* Jozef fejl.
-
 * Ny claymod fra Bjørn
 
+* Tove eksempler.
+
 * Noter til hvad der er ændret i Daisy siden opgaver
-
-* Ny (set foo 3.4) pseudo-attribut.
-
-* SH: Salg af referencemanual på www-siden?
-
-* UZmodel top_t
 
 * Weather
 
@@ -33,6 +25,20 @@ TODO --- things that needs done with Daisy -*- outline -*-
 ** Akademisk bekrivelse?
 
 Til referencemanual?
+
+* Ny (set foo 3.4) pseudo-attribut.
+
+* SH: Salg af referencemanual på www-siden?
+
+* UZmodel top_t
+
+* Ny summary model
+
+Opdel den i tre
+
+Inputs, Outputs og Pool changes
+
+Balance = Input - Output - Pool changes
 
 * Select::method { current, sum, max, min, average }
 

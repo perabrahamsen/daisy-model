@@ -12,6 +12,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.11
+
+** Updated the biomod clayom model.
+
+It should now correspond to the article _CN-SIM - a model for the
+turnover of soil organic matter._ by Bjørn M. Petersen et al,
+submitted to Soil Biology & Biochemistry, 2003.
+
 * 3.10
 
 ** New parameterizations and parameter files.

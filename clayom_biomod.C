@@ -31,7 +31,11 @@ class ClayOMBiomod : public ClayOM
 {
   // Content.
   const double a;		// Maintenance ratio parameter.
+#ifdef OLD_VERSION
   const double alpha;		// Speed parameter.
+#else // !OLD_VERSION
+  PLF factor_;
+#endif // !OLD_VERSION
   const double E_SMB;		// Efficiency.
   const double f_SMB1;		// AOM fraction going to SMB1.
 
@@ -89,7 +93,6 @@ ClayOMBiomod::set_rates (const Soil& soil, const vector<SMB*>& smb) const
   const double r_SMB1 = smb[0]->turnover_rate / t_SMB1;
   const double r_SMB2 = smb[1]->turnover_rate / t_SMB2;
 
-
   for (unsigned int i  = 0; i < soil.size (); i++)
     {
       // Find modifier.
@@ -119,8 +122,12 @@ ClayOMBiomod::set_rates (const Soil& soil, const vector<SMB*>& smb) const
 double
 ClayOMBiomod::factor (const double clay) const 
 { 
+#ifdef OLD_VERSION
   const double b = (0.1 + alpha) / alpha;
   return alpha * b / (clay + alpha);
+#else // !OLD_VERSION
+  return factor_ (clay); 
+#endif // !OLD_VERSION
 }
 
 bool 
@@ -153,38 +160,73 @@ You must have exactly two SMB pool with the 'biomod' clay model");
   const double r_SMB1 = smb[0]->turnover_rate / t_SMB1;
   const double r_SMB2 = smb[1]->turnover_rate / t_SMB2;
 
+#ifdef OLD_VERSION
   // The ratio modifier at 0.1 clay.
   const double f = find_f (r_SMB1, r_SMB2, 0.1);
-
   if (!approximate (f, 1.0, 0.01))
     {
       TmpStream tmp;
       tmp () << "\
-The biomod clay model is calibrates so f (0.1) must be 1.0, that is,\n\
+The biomod clay model is calibrated so f (0.1) must be 1.0, that is,\n\
 the turnover and maintenance parameters are normalized for 10% clay content.\n\
 However, f (0.1) is " << f << ", which mean any results produced are bogus";
       err.warning (tmp.str ());
     }
+#else // !OLD_VERSION
+  // The ratio modifier at 0.0 clay.
+  const double f = find_f (r_SMB1, r_SMB2, 0.0);
+  if (!approximate (f, 1.0, 0.01))
+    {
+      TmpStream tmp;
+      tmp () << "\
+The biomod clay model is calibrated so f (0.0) must be 1.0, that is,\n\
+the turnover and maintenance parameters are normalized zero clay content.\n\
+However, f (0.0) is " << f << ", which mean any results produced are bogus";
+      err.warning (tmp.str ());
+    }
+#endif // !OLD_VERSION
 
+#ifdef OLD_VERSION
   // The overall modfier at 0.1 clay.
   const double g = factor (0.1);
   if (!approximate (g, 1.0, 0.01))
     {
       TmpStream tmp;
       tmp () << "\
-The biomod clay model is calibrates so g (0.1) must be 1.0, that is,\n\
+The biomod clay model is calibrated so g (0.1) must be 1.0, that is,\n\
 the turnover and maintenance parameters are normalized for 10% clay content.\n\
 However, g (0.1) is " << g << ", which mean any results produced are bogus";
       err.warning (tmp.str ());
     }
+#endif // OLD_VERSION
 
+  // Check efficiencies.
+  for (unsigned int pool = 0; pool < smb.size (); pool++)
+    for (unsigned int target = 0;
+         target < smb[pool]->efficiency.size (); 
+         target++)
+      if (!approximate (smb[pool]->efficiency[target], E_SMB))
+        {
+          TmpStream tmp;
+          tmp () << "\
+The efficiency specified for the biomod clay model (E_SMB) must be the\n\
+same as specified for the SMB pools.  However, E_SMB is " << E_SMB << "\n\
+and SMB[" << pool << "].efficiency[" << target << "] is "
+                 << smb[pool]->efficiency[target];
+          err.warning (tmp.str ());
+        }
+  
   return true;
 }
 
 ClayOMBiomod::ClayOMBiomod (const AttributeList& al)
   : ClayOM (al),
     a (al.number ("a")),
+#ifdef OLD_VERSION
     alpha (al.number ("alpha")),
+#else  // !OLD_VERSION
+    factor_ (al.plf ("factor")),
+#endif // !OLD_VERSION
     E_SMB (al.number ("E_SMB")),
     f_SMB1 (al.number ("f_SMB1"))
 { }
@@ -208,8 +250,20 @@ All SMB pools are affected, but not the SOM pools.  Additionally, the\n\
 ration between maintenance and turnover is also clay dependent.");
     syntax.add ("a", Syntax::None (), Check::positive (), Syntax::Const,
 		"Maintenance parameter.");
+#ifdef OLD_VERSION
     syntax.add ("alpha", Syntax::None (), Check::positive (), Syntax::Const,
 		"Speed parameter.");
+#else // !OLD_VERSION
+    syntax.add ("factor", Syntax::Fraction (), Syntax::None (),
+		Syntax::Const, "\
+Function of clay content, multiplied to the maintenance and turnover rates\n\
+of the SMB pools.");
+    PLF factor;
+    factor.add (0.00, 1.0);
+    factor.add (0.25, 0.5);
+    factor.add (1.00, 0.5);
+    alist.add ("factor", factor);
+#endif // !OLD_VERSION
     syntax.add_fraction ("E_SMB", Syntax::Const,
 			 "SMB efficiency in processing organic matter.\n\
 Note that you must set the 'efficiency' parameter for all OM pools to\n\
