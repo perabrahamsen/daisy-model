@@ -85,7 +85,7 @@ public:
   double IntcpCap () const	// Interception Capacity.
   { return canopy.IntcpCap; }
   double EpFac () const		// Convertion to potential evapotransp.
-  { return canopy.EpFac; }
+  { return canopy.EpFactor (DS ()); }
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
 			    double EvapInterception);

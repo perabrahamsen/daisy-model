@@ -212,9 +212,7 @@ Daisy::~Daisy ()
   delete &action;
   if (weather)
     delete weather;
-#if 0
   delete &field;
-#endif
   delete &harvest;
 }
 

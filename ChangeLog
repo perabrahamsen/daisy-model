@@ -1,3 +1,27 @@
+2000-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.60 released.
+
+2000-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation.C (load_syntax): Make it possible to specify a
+	`description' for a given vegetation.
+
+	* lib/log.dai ("Vegetation"): Fix so it works on named
+	vegetations. 
+
+	* canopy_simple.h, canopy_simple.C (EpFacDS): New parameter.
+	(EpFactor): New function.
+	* crop_std.C (EpFac): Call it.
+	* crop_simple.C (EpFac): Ditto.
+	* vegetation_permanent.C (EpFactor): Ditto.
+
+2000-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_activity.C (ActionActivitySyntax): Allow empty list.
+
+	* parser_file.C (load_list): Fix memory leaks.
+
 2000-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.59 released.

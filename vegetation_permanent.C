@@ -56,7 +56,7 @@ struct VegetationPermanent : public Vegetation
   double ARExt () const
   { return canopy.EPext; }
   double EpFactor () const
-  { return canopy.EpFac; }
+  { return canopy.EpFactor (1.0 /* arbitrary */); }
   double albedo () const
   { return albedo_; }
   double interception_capacity () const

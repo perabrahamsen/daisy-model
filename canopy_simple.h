@@ -13,8 +13,11 @@ public:
   const double PARref;		// PAR reflectance
   const double PARext;		// PAR extinction coefficient
   const double EPext;		// EP extinction coefficient
-  const double IntcpCap;	// 
-  const double EpFac;		// 
+  const double IntcpCap;	// Interception capacity [mm]
+private:
+  const double EpFac;		// Crop modification for pot.evapotransp.
+  const PLF EpFacDS;		// DS modification for EpFac.
+public:
   const double rs_max;		// max transpiration resistance
   const double rs_min;		// min transpiration resistance
 
@@ -26,6 +29,7 @@ public:
 
   // Simulation.
 public:
+  double EpFactor (double DS) const; // Crop modification for pot.evapotransp.
   void output (Log&) const;
 
   // Create and Destroy.

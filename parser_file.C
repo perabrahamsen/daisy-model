@@ -318,10 +318,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    }
 	  case Syntax::AList: 
 	    {
-	      AttributeList& list 
-		= (atts.check (name) 
-		   ? *new AttributeList (atts.alist (name))
-		   : *new AttributeList (syntax.default_alist (name)));
+	      AttributeList list (atts.check (name) 
+				  ? atts.alist (name)
+				  : syntax.default_alist (name));
 	      
 	      load_list (list, syntax.syntax (name));
 	      atts.add (name, list);
@@ -329,7 +328,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    }
 	  case Syntax::PLF:
 	    {
-	      PLF& plf = *new PLF ();
+	      PLF plf;
 	      double last_x = -42;
 	      int count = 0;
 	      while (!looking_at (')') && good ())
@@ -436,8 +435,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		// We don't support fixed sized object arrays yet.
 		assert (syntax.size (name) == Syntax::Sequence);
 		const Library& lib = syntax.library (name);
-		vector<AttributeList*>& sequence
-		  = *new vector<AttributeList*> ();
+		vector<AttributeList*> sequence;
 		while (!looking_at (')') && good ())
 		  {
 		    AttributeList& al = load_derived (lib, true);
@@ -454,8 +452,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      {
 		int size = syntax.size (name);
 		const Syntax& syn = syntax.syntax (name);
-		vector<AttributeList*>& sequence
-		  = *new vector<AttributeList*> ();
+		vector<AttributeList*> sequence;
 		bool skipped = false;
 		// Design bug:  We do not force parentheses around the
 		// alist if it is the last member of an ordered list.
@@ -545,7 +542,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      }
 	    case Syntax::Number:
 	      {
-		vector<double>& array = *new vector<double> ();
+		vector<double> array;
 		int count = 0;
 		int size = syntax.size (name);
 		double last = 0.0;

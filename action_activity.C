@@ -71,6 +71,7 @@ action is performed until done.  At most one action can be performed\n\
 at each time step.");
       syntax.add ("actions", Librarian<Action>::library (), Syntax::Sequence,
 		  "Sequence of actions to perform.");
+      alist.add ("actions", vector<AttributeList*> ());
       syntax.order ("actions");
       Librarian<Action>::add_type ("activity", alist, syntax, &make);
     }

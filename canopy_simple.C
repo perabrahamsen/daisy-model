@@ -4,6 +4,10 @@
 #include "submodel.h"
 #include "log.h"
 
+double
+CanopySimple::EpFactor (double DS) const
+{ return EpFac * EpFacDS (DS); }
+
 void
 CanopySimple::output (Log& log) const
 {
@@ -34,6 +38,11 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("EpFac", Syntax::None (), Syntax::Const,
 	      "Potential evapotranspiration factor.");
   alist.add ("EpFac", 1.0);
+  syntax.add ("EpFacDS", "DS", Syntax::None (), Syntax::Const,
+	      "DS dependent potential evapotranspiration factor.");
+  PLF EpFacDS;
+  EpFacDS.add (1.0, 1.0);
+  alist.add ("EpFacDS", EpFacDS);
   syntax.add ("rs_max", "s/m", Syntax::Const,
 	      "Maximum transpiration resistance.");
   alist.add ("rs_max", 1.0e5);
@@ -57,6 +66,7 @@ CanopySimple::CanopySimple (const AttributeList& vl)
     EPext (vl.number ("EPext")),
     IntcpCap (vl.number ("IntcpCap")),
     EpFac (vl.number ("EpFac")),
+    EpFacDS (vl.plf ("EpFacDS")),
     rs_max (vl.number ("rs_max")),
     rs_min (vl.number ("rs_min")),
     Height (vl.number ("Height")),

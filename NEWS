@@ -12,6 +12,13 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.60
+
+** New `EpFacDS' Canopy parameter.
+
+This PLF allow the crops potential evapotranspiration adjustment to
+depend on the development stage of the crop.
+
 * 1.59
 
 ** Checkpoints should work now.
