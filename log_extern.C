@@ -58,7 +58,7 @@ LogExternSource::~LogExternSource ()
   log_extern_count--;
   if (log_extern_count == 0)
     {
-      map_delete (log_extern_map->begin (), log_extern_map->end ());
+      // BUG: map_delete (log_extern_map->begin (), log_extern_map->end ());
       delete log_extern_map;
     }
 }
