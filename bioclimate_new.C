@@ -448,8 +448,11 @@ Number of vertical intervals in which we partition the canopy");
 		  "Total canopy LAI below given height (cm)");
       syntax.add ("HvsLAI", Syntax::CSMP, Syntax::LogOnly, "\
 Height (cm) in which there is a given LAI below in total canopy");
-      syntax.add ("pet", Librarian<Pet>::library (), Syntax::State,
-		  "Potential Evapotranspiration model");
+      syntax.add ("pet", Librarian<Pet>::library (), 
+		  "Potential Evapotranspiration component");
+      AttributeList& pet_alist = *new AttributeList;
+      pet_alist.add ("type", "makkink");
+      alist.add ("pet", pet_alist);
       syntax.add ("PotEvapotranspiration", "mm", Syntax::LogOnly,
 		  "Calculated potential evapotranspiration");
       syntax.add ("ActualEvapotranspiration", "mm", Syntax::LogOnly,

@@ -1,3 +1,13 @@
+1998-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.43 released.
+
+1998-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/Makefile (DAISY): Removed `crop-old.dai'.
+
+	* All: SH update.
+
 1998-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.42 released.

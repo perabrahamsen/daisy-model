@@ -53,6 +53,6 @@ static struct PetMakkinkSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       Pet::load_syntax (syntax, alist);
-      Librarian<Pet>::add_type ("soil", alist, syntax, &make);
+      Librarian<Pet>::add_type ("makkink", alist, syntax, &make);
     }
 } PetMakkink_syntax;
