@@ -95,10 +95,6 @@ Date: vent på SH
 
 * Try out "SWIFT"
 
-* Try out gtk--
-
-* Få "union" valeret AList til at virke.
-
 * Implement in parser and pretty printer:
 
 	(define LIBRARY ELEMENT SUPER (NAME VALUE)...)
@@ -111,8 +107,6 @@ variable (samt evt. nyt objekter, specielt AM og Crop, der så skal
 huske deres egen syntax), og så bruge PrinterFile til at udskrive de
 nye alister.  Efter at have udskrevet de objecter der var defineret i
 input filen.
-
-* Remove exception handling.
 
 * tkdaisy:
 
@@ -152,12 +146,6 @@ Input as well to be consistent.
 
 Consider how this fits into the desired ability to add rules to a
 Manager. 
-
-* add text to syntax
-
-Each syntax should have an associated static const table with text
-strings giving a name, short description, long description, and unit
-of each parameter.
 
 * Split Crop in submodules the same way as is done with Soil.
 

@@ -23,7 +23,7 @@ struct Surface::Implementation
   const double albedo_dry;
   const double lake;
   double pond;
-  bool flux;
+  mutable bool flux;
   IM im_flux;
   double EvapSoilSurface;
   double Eps;
@@ -32,7 +32,7 @@ struct Surface::Implementation
 
   // Functions.
   bool flux_top () const;
-  void  flux_top_on ();
+  void  flux_top_on () const;
   bool accept_top (double water);
   double ponding () const;
   void tick (double PotSoilEvaporation, double water, double temp,
@@ -66,17 +66,17 @@ Surface::q () const
 }
   
 void  
-Surface::flux_top_on ()
+Surface::flux_top_on () const
 { impl.flux_top_on (); }
 
 void  
-Surface::Implementation::flux_top_on ()
+Surface::Implementation::flux_top_on () const
 { 
   flux = true;
 }
 
 void  
-Surface::flux_top_off ()
+Surface::flux_top_off () const
 { 
   impl.flux = false;
 }

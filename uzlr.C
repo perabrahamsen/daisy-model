@@ -19,19 +19,27 @@ private:
 
   // UZmodel.
 public:
-  bool flux_top () const;
-  double q () const;
-  void flux_top_on ();
-  void flux_top_off ();
-  bool accept_top (double);
-  bool flux_bottom () const;
-  bool accept_bottom (double);
+  bool flux_top () const
+    { return true; };
+  double q () const
+    { return q_down; }
+  void flux_top_on () const
+    { }
+  void flux_top_off () const
+    { }
+  bool accept_top (double)
+    { return true; };
+  bool flux_bottom () const
+    { return true; };
+  bool accept_bottom (double)
+    { return true; };
   void output (Log&, Filter&) const;
 
+  // Simulate.
 public:
   void tick (const Soil& soil,
-	     int first, UZtop& top, 
-	     int last, UZbottom& bottom, 
+	     int first, const UZtop& top, 
+	     int last, const UZbottom& bottom, 
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
@@ -45,47 +53,10 @@ public:
   ~UZlr ();
 };
 
-bool 
-UZlr::flux_top () const
-{
-  return true;
-}
-
-double 
-UZlr::q () const
-{
-  return q_down;
-}
-void  
-UZlr::flux_top_on ()
-{ }
-
-void  
-UZlr::flux_top_off ()
-{ }
-
-bool  
-UZlr::accept_top (double)
-{ 
-  return true;
-}
-
-bool 
-UZlr::flux_bottom () const
-{
-  return true;
-}
-
-bool  
-UZlr::accept_bottom (double)
-{ 
-  return true;
-}
-
 void 
 UZlr::tick (const Soil& soil,
-	    int first, UZtop& top, 
-	    int last, UZbottom& bottom, 
+	    int first, const UZtop& top, 
+	    int last, const UZbottom& /* bottom */, 
 	    const vector<double>& S,
 	    const vector<double>& h_old,
 	    const vector<double>& Theta_old,
@@ -97,8 +68,6 @@ UZlr::tick (const Soil& soil,
   const double K_sat = soil.K (0, 0.0);
   assert (K_sat > 0.0);
   q_up = q[first] = max (top.q (), -K_sat);
-  const bool ok = top.accept_top (q_up);
-  assert (ok);
 
   // Use darcy for upward movement in the top.
   const bool use_darcy = (h_old[0] < h_fc) && (q_up > 0.0);
@@ -162,8 +131,6 @@ UZlr::tick (const Soil& soil,
 
   // Lower border.
   q_down = q[last + 1];
-  const bool accepted = bottom.accept_bottom (q[last + 1]);
-  assert (accepted);
 
   // Check mass conservation.
   assert (approximate (soil.total (Theta_old)

@@ -11,6 +11,8 @@
 #include <assert.h>
 #include <string>
 
+#define pow(x, y) (assert (x > 0), (pow)(x, y))
+
 #define HANDLE_NAMESPACES
 
 #ifdef EGCS

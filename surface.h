@@ -19,8 +19,8 @@ public:
   // Communication with soil.
   bool flux_top () const;	// From UZtop.
   double q () const;
-  void flux_top_on ();
-  void flux_top_off ();
+  void flux_top_on () const;
+  void flux_top_off () const;
   bool accept_top (double);
   double ponding () const;
   double temperature () const;

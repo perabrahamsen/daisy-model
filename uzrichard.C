@@ -26,20 +26,27 @@ private:
 
   // UZmodel.
 public:
-  bool flux_top () const;
-  double q () const;
-  void flux_top_on ();
-  void flux_top_off ();
-  bool accept_top (double);
-  bool flux_bottom () const;
-  bool accept_bottom (double);
+  bool flux_top () const
+    { return true; };
+  double q () const
+    { return q_down; }
+  void flux_top_on () const
+    { }
+  void flux_top_off () const
+    { }
+  bool accept_top (double)
+    { return true; };
+  bool flux_bottom () const
+    { return true; };
+  bool accept_bottom (double)
+    { return true; };
   void output (Log&, Filter&) const;
 
   // Simulate.
 private:
   bool richard (const Soil& soil,
-		int first, UZtop& top,
-		int last, UZbottom& bottom,
+		int first, const UZtop& top,
+		int last, const UZbottom& bottom,
 		const vector<double>& S,
 		const vector<double>& h_old,
 		const vector<double>& Theta_old,
@@ -63,8 +70,8 @@ private:
 		vector<double>& q);
 public:
   void tick (const Soil& soil,
-	     int first, UZtop& top,
-	     int last, UZbottom& bottom,
+	     int first, const UZtop& top,
+	     int last, const UZbottom& bottom,
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
@@ -79,46 +86,9 @@ public:
 };
 
 bool
-UZRichard::flux_top () const
-{
-  return true;
-}
-
-double
-UZRichard::q () const
-{
-  return q_down;
-}
-void
-UZRichard::flux_top_on ()
-{ }
-
-void
-UZRichard::flux_top_off ()
-{ }
-
-bool
-UZRichard::accept_top (double)
-{ 
-  return true;
-}
-
-bool 
-UZRichard::flux_bottom () const
-{
-  return true;
-}
-
-bool
-UZRichard::accept_bottom (double)
-{
-  return true;
-}
-
-bool
 UZRichard::richard (const Soil& soil,
-		    int first, UZtop& top,
-		    int last, UZbottom& bottom,
+		    int first, const UZtop& top,
+		    int last, const UZbottom& bottom,
 		    const vector<double>& S,
 		    const vector<double>& h_old,
 		    const vector<double>& Theta_old,
@@ -424,10 +394,8 @@ Richard eq. mass balance flux is different than darcy flux");
 	Theta_new[i] = soil.Theta (i, h[i]);
     }
 
-  // Update upper boundary.
+  // Check upper boundary.
   assert (approximate (top.h (), available_water - top_water));
-  const bool ok = top.accept_top (top_water);
-  assert (ok);
 
 #if 0
   q_darcy (soil, first, last, h_old, h_new, Theta_old, Theta_new,
@@ -536,8 +504,8 @@ calculating flow with pressure top.");
 
 void 
 UZRichard::tick (const Soil& soil,
-		 int first, UZtop& top, 
-		 int last, UZbottom& bottom, 
+		 int first, const UZtop& top, 
+		 int last, const UZbottom& bottom, 
 		 const vector<double>& S,
 		 const vector<double>& h_old,
 		 const vector<double>& Theta_old,
@@ -550,9 +518,6 @@ UZRichard::tick (const Soil& soil,
 		S, h_old, Theta_old, h, Theta, q))
     throw ("Richard's Equation doesn't converge.");
     
-  const bool accepted = bottom.accept_bottom (q[last + 1]);
-  assert (accepted);
-
   q_up = q[first];
   q_down = q[last + 1];
 }
