@@ -535,6 +535,7 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
+	$(MAKE) daisy
 	mv -f $(WWWINDEX) $(WWWINDEX).old
 	sed -e 's/version [1-9]\.[0-9][0-9]/version $(TAG)/' \
 		< $(WWWINDEX).old > $(WWWINDEX)
