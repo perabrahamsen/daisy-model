@@ -710,6 +710,11 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+format${OBJ}: format.C format.h librarian.h common.h library.h symbol.h \
+  alist.h syntax.h treelog.h assertion.h
+depth${OBJ}: depth.C depth.h librarian.h common.h library.h symbol.h alist.h \
+  syntax.h treelog.h assertion.h plf.h lexer_data.h lexer.h check.h \
+  vcheck.h
 wse${OBJ}: wse.C wse.h librarian.h common.h library.h symbol.h alist.h \
   syntax.h treelog.h assertion.h program.h tmpstream.h mathlib.h
 program${OBJ}: program.C program.h librarian.h common.h library.h symbol.h \
@@ -743,13 +748,13 @@ select${OBJ}: select.C select.h destination.h symbol.h condition.h \
   librarian.h common.h library.h alist.h syntax.h treelog.h assertion.h \
   units.h geometry.h check.h vcheck.h
 average${OBJ}: average.C average.h librarian.h common.h library.h symbol.h \
-  alist.h syntax.h treelog.h assertion.h
+  alist.h syntax.h treelog.h assertion.h mathlib.h
 mactrans${OBJ}: mactrans.C mactrans.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h
 macro${OBJ}: macro.C macro.h librarian.h common.h library.h symbol.h alist.h \
   syntax.h treelog.h assertion.h
 document${OBJ}: document.C document.h librarian.h common.h library.h symbol.h \
-  alist.h syntax.h treelog.h assertion.h xref.h submodel.h
+  alist.h syntax.h treelog.h assertion.h xref.h format.h submodel.h
 parser${OBJ}: parser.C parser.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h
 log${OBJ}: log.C log.h librarian.h common.h library.h symbol.h alist.h \
@@ -1016,11 +1021,16 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h program.h \
 common${OBJ}: common.C common.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h assertion.h
+program_document${OBJ}: program_document.C program.h librarian.h common.h \
+  library.h symbol.h alist.h syntax.h treelog.h assertion.h submodel.h \
+  printer_file.h printer.h xref.h plf.h format.h tmpstream.h
+format_LaTeX${OBJ}: format_LaTeX.C format.h librarian.h common.h library.h \
+  symbol.h alist.h syntax.h treelog.h assertion.h version.h
 program_batch${OBJ}: program_batch.C program.h librarian.h common.h library.h \
-  symbol.h alist.h syntax.h treelog.h assertion.h
+  symbol.h alist.h syntax.h treelog.h assertion.h path.h
 program_refdoc${OBJ}: program_refdoc.C program.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h document.h \
-  xref.h
+  xref.h format.h
 summary_balance${OBJ}: summary_balance.C summary.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h fetch.h \
   destination.h select.h condition.h units.h tmpstream.h
@@ -1179,7 +1189,7 @@ select_flux_bottom${OBJ}: select_flux_bottom.C select_value.h select.h \
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h uzmodel.h \
   librarian.h common.h library.h symbol.h alist.h syntax.h treelog.h \
   assertion.h log.h soil.h geometry.h horizon.h soil_heat.h soil_water.h \
-  macro.h tmpstream.h mathlib.h check.h
+  macro.h depth.h tmpstream.h mathlib.h check.h
 select_index${OBJ}: select_index.C select_value.h select.h destination.h \
   symbol.h condition.h librarian.h common.h library.h alist.h syntax.h \
   treelog.h assertion.h units.h
@@ -1210,12 +1220,6 @@ action_wait${OBJ}: action_wait.C action.h librarian.h common.h library.h \
   daisy.h program.h tmpstream.h
 action_activity${OBJ}: action_activity.C action.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h log.h
-average_arithmetic${OBJ}: average_arithmetic.C average.h librarian.h common.h \
-  library.h symbol.h alist.h syntax.h treelog.h assertion.h
-average_harmonic${OBJ}: average_harmonic.C average.h librarian.h common.h \
-  library.h symbol.h alist.h syntax.h treelog.h assertion.h
-average_geometric${OBJ}: average_geometric.C average.h librarian.h common.h \
-  library.h symbol.h alist.h syntax.h treelog.h assertion.h mathlib.h
 mactrans_std${OBJ}: mactrans_std.C mactrans.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h soil_water.h macro.h \
   soil.h geometry.h horizon.h plf.h mathlib.h tmpstream.h
@@ -1225,8 +1229,9 @@ macro_std${OBJ}: macro_std.C macro.h librarian.h common.h library.h symbol.h \
 macro_none${OBJ}: macro_none.C macro.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h
 document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h common.h \
-  library.h symbol.h alist.h syntax.h treelog.h assertion.h xref.h plf.h \
-  tmpstream.h version.h printer_file.h printer.h submodel.h
+  library.h symbol.h alist.h syntax.h treelog.h assertion.h xref.h \
+  format.h plf.h tmpstream.h version.h printer_file.h printer.h \
+  submodel.h
 column_std${OBJ}: column_std.C column_base.h column.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h bioclimate.h \
   surface.h uzmodel.h soil.h geometry.h horizon.h soil_water.h macro.h \
