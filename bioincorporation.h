@@ -23,8 +23,8 @@
 #ifndef BIOINCORPORATION_H
 #define BIOINCORPORATION_H
 
-#include "common.h"
 #include <vector>
+using namespace std;
 
 class AttributeList;
 class Syntax;

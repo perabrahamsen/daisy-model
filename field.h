@@ -23,8 +23,9 @@
 #ifndef FIELD_H
 #define FIELD_H
 
-#include "common.h"
 #include <vector>
+#include <string>
+using namespace std;
 
 class Column;
 class AttributeList;

@@ -26,6 +26,7 @@
 #include "log.h"
 #include "submodel.h"
 #include "check.h"
+#include <math.h>
 
 void
 Development::light_hour ()

@@ -32,6 +32,7 @@
 #include "log.h"
 #include "submodel.h"
 #include "check.h"
+#include <math.h>
 
 static double f_Theta (double x)
 {

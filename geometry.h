@@ -23,8 +23,9 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "common.h"
 #include <vector>
+#include <string>
+using namespace std;
 
 class AttributeList;
 class Syntax;

@@ -30,6 +30,7 @@
 #include "plf.h"
 #include "submodel.h"
 #include "tmpstream.h"
+#include <math.h>
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;

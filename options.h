@@ -23,7 +23,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include "common.h"
+#include <string>
 
 class Syntax;
 class AttributeList;
@@ -31,11 +31,11 @@ class Treelog;
 
 class Options
 {
-  static string get_arg (int& argc, char**& argv);
+  static std::string get_arg (int& argc, char**& argv);
 public: 
   static void initialize_path ();
   static const char *const log_name;
-  const string program_name;
+  const std::string program_name;
   void usage (Treelog&) const;
   static void copyright (Treelog&);
   Options (int& argc, char**& argv, 
