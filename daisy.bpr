@@ -49,8 +49,7 @@
       weather_none.obj weather_old.obj weather_simple.obj weather_std.obj 
       path.obj rootdens.obj rootdens_G_P.obj development.obj crpn.obj 
       partition.obj photosynthesis.obj production.obj harvesting.obj 
-      vernalization.obj check.obj check_range.obj rootdens_PLF.obj 
-      condition_weather.obj"/>
+      vernalization.obj check.obj check_range.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
