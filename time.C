@@ -310,7 +310,7 @@ Time::~Time ()
 // @ Operators.
 
 bool 
-Time::operator== (const Time& other)
+Time::operator== (const Time& other) const
 {
   return (impl.year == other.impl.year)
     && (impl.yday == other.impl.yday)
@@ -318,13 +318,13 @@ Time::operator== (const Time& other)
 }
 
 bool
-Time::operator!= (const Time& other)
+Time::operator!= (const Time& other) const
 {
   return !(*this == other);
 }
     
 bool
-Time::operator<  (const Time& other)
+Time::operator<  (const Time& other) const
 {
   if (impl.year < other.impl.year)
     return true;
@@ -341,19 +341,19 @@ Time::operator<  (const Time& other)
 }
 
 bool
-Time::operator<= (const Time& other)
+Time::operator<= (const Time& other) const
 {
   return *this == other || *this < other;
 }
 
 bool
-Time::operator>= (const Time& other)
+Time::operator>= (const Time& other) const
 {
   return !(*this < other);
 }
 
 bool
-Time::operator>  (const Time& other)
+Time::operator>  (const Time& other) const
 {
   return !(*this <= other);
 }
