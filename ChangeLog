@@ -1,4 +1,21 @@
+2002-08-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.36 released.
+
+2002-07-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (add_derived): Better error message.
+
+	* lib/log.dai ("DOM-N", "DOM-C"): New log models.
+
+2002-07-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (AM_Syntax): Handle single OM pool.
+
 2002-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (standard_conversions): Added "MJ/d/m^2".
+	(standard_conversions): Added "m/s".
 
 	* Version 2.35 released.
 

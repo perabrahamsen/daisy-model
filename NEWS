@@ -12,6 +12,72 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.36
+
+** Daisy can now handle dissolved organic matter.
+
+You can have any number of DOM pools, they are specified as a "dom"
+attribute of organic matter.  For each DOM pool you must add an extra
+fraction to the end of the SOM and SMB fractions.  You _can_ add extra
+fractions to AOM pools, in order to direct fertlizer directly to the
+DOM pools.
+
+The DOM pools are eaten by the SMB, and tranported with the water
+unless adsorbed to the soil.
+
+By default, Daisy has no DOM pools.
+
+Here is an example of OrganicMatter with one pool:
+
+	  (OrganicMatter (smb ((C_per_N 6.7)
+			       (efficiency 0.6 0.6)
+			       (fractions 0 0.6 0 0.4 0.0)
+			       (maintenance 7.5e-05)
+			       (turnover_rate 7.708e-06))
+			      ((C_per_N 6.7)
+			       (efficiency 0.6 0.6)
+			       (fractions 0 0.4 0 0.6 0.0)
+			       (maintenance 0.000416667)
+			       (turnover_rate 0.000416667)))
+			 (som ((efficiency 0.4 0.4)
+			       (fractions 1 0 0 0 0)
+			       (turnover_rate 1.125e-07))
+			      ((efficiency 0.5 0.5)
+			       (fractions 0.9 0 0.1 0 0)
+			       (turnover_rate 5.83333e-06)))
+			 (dom ((C (M 0.0 [g/cm^3]))
+			       (N (M 0.0 [g/cm^3]))
+			       (adsorption none)
+			       (diffusion_coefficient 4.6e-6 [cm^2/s])
+			       (efficiency 0.0 0.4)
+			       (fractions 1 0)
+			       (turnover_rate 0 [h^-1]))))
+
+And here is an example of an AOM pool that goes directly to DOM:
+
+(defam C_N_high organic
+  (om ((turnover_rate 1.0)
+       (efficiency 1.0)
+       (fractions 0 0 0 1)))
+  (dry_matter_fraction 1.0)
+  (total_N_fraction 0.1)
+  (total_C_fraction 0.4))
+
+*** New "DOM Pools", "DOM-C" and "DOM-N" log models.
+
+The first give a summary of two DOM pools in the specified interval.
+The two later give the carbon and nitrogen content in the DOM pools of
+all layers.  You can get the content of a specific DOM pool with the
+"$pool" option, otherwise you will get the content of all of them.
+
+** You can now specify global radiation in [MJ/m^2/d] in the weather file.
+
+** You can now specify speed in [m/s] instead of [cm/h].
+
+** Accept fertilizer with only a single OM pool.
+
+** Better error message when using undefined parameterizations.
+
 * 2.35
 
 ** fertilized NH4 in log files now include NH4 lost to volatilization.

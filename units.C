@@ -306,10 +306,15 @@ Units::standard_conversions ()
   add ("d^-1", "h^-1", 1.0/24.0);
   add ("d", "h", 24.0);
   add ("mm/d", "mm/h", 1.0/24.0);
+  add ("m/s", "cm/h", 100.0 * 60.0 * 60.0);
+
   // Weather.
   add ("dgWest", "dgEast", -1.0);
   add ("dgSouth", "dgNorth", -1.0);
   add ("%", "fraction", 0.01);
+  add ("MJ/d/m^2", "W/m^2", 1e6 / (24.0 * 60.0 * 60.0));
+  add ("MJ/m^2/d", "W/m^2", 1e6 / (24.0 * 60.0 * 60.0));
+
   // Log.
   add ("cm", "mm", 10.0);
   add ("g/cm^2", "kg/ha", 1e5);	// Pesticides.

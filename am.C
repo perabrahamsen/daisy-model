@@ -933,7 +933,8 @@ static struct AM_Syntax
     int missing_initial_fraction = 0;
     int missing_C_per_N = 0;
     double total_fractions = 0.0;
-    for (unsigned int i = 0; i < om_alist.size(); i++)
+    bool same_unspecified = false;
+    for (unsigned int i = 0; i < om_alist.size (); i++)
       {
 	if (om_alist[i]->number ("initial_fraction") == OM::Unspecified)
 	  missing_initial_fraction++;
@@ -941,9 +942,13 @@ static struct AM_Syntax
 	  total_fractions += om_alist[i]->number ("initial_fraction");
 	if (!om_alist[i]->check ("C_per_N"))
 	  missing_C_per_N++;
+
+	if (om_alist[i]->number ("initial_fraction") == OM::Unspecified
+	    && !om_alist[i]->check ("C_per_N"))
+	  same_unspecified = true;
       }
     daisy_assert (total_fractions >= 0.0);
-    if (total_fractions < 1e-10)
+    if (total_fractions < 1e-10 && !same_unspecified)
       {
 	err.entry ("you should specify at least one non-zero fraction");
 	ok = false;

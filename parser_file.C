@@ -363,7 +363,7 @@ ParserFile::Implementation::add_derived (Library& lib)
   const string super = get_string ();
   if (!lib.check (super))
     {
-      error (string ("Unknown superclass '") + super + "'");
+      error (string ("Unknown '") + lib.name () + "' model '" + super + "'");
       skip_to_end ();
       return;
     }
@@ -403,7 +403,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
     }
   else
     {
-      error (string ("Unknown superclass '") + type + "'");
+      error (string ("Unknown '") + lib.name () + "' model '" + type + "'");
       skip_to_end ();
       alist = new AttributeList ();
       alist->add ("type", "error");

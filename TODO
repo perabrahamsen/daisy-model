@@ -2,9 +2,29 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * DOM
 
+** Root Zone Water Balance
+
+Hvorfor bliver Drain ikke akkumuleret, men Roots gør, når man logger
+årligt?
+
+
 ** Testkørsel
 
-** Test mange DOM med forskellig C/N mod en DOM med snit C/N
+Homogen jord, konstant klima.
+
+Log samlet C, N og C/N for hvert lag, og for hvert tidsskridt.
+
+*** Forsøg et.
+
+**** Dag 1: Tilsæt C/N: 200/21
+
+**** Dag 2: Tilsæt C/N: 200/21
+
+*** Forsøg to.
+
+**** Dag 1: Tilsæt C/N: 200/21
+
+**** Dag 2: Tilsæt C/N: 100/1 + 100/20
 
 ** Snak P med Birgitte
 
