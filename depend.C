@@ -325,6 +325,8 @@ sequence_number (const string& component, const string& parameterization)
   return -1;
 }
 
+template pair<string, string>;
+
 static bool
 sort_by_sequence (const pair<string,string>& one,
 		  const pair<string,string>& two)
