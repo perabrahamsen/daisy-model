@@ -151,7 +151,10 @@ Time::tick_day (int days)
     else
       {
 	impl.year--;
-	impl.yday = leap (impl.year) ? 366 : 365;
+	if (leap (impl.year))
+	  impl.yday = 366;
+	else
+	  impl.yday = 365;
       }
 }
 

@@ -1,8 +1,6 @@
 2003-02-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 2.45 released.
-
-2003-02-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+	* time.C (tick_day): Remove BCC warning.
 
 	* Version 2.45 released.
 
