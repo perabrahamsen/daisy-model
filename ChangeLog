@@ -1,5 +1,15 @@
 2004-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.54 released.
+
+2004-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/Makefile (reference.pdf): Make it twice, to get toc right.
+
+	* horheat.C, horheat.h: New submodel.
+	* Makefile (SUBMODELS): Add it.
+	* horizon.C: Use it.
+
 	* Version 3.53 released.
 
 2004-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>

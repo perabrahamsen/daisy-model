@@ -1,10 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Tilføj øvrige textursystemer.
-
 * Øvelser til PC.
 
 * Birgitte + SH EU ark
+
+* DOM/SOM equilibrium (bgj)
 
 * crop simple med nit
 
@@ -31,8 +31,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 * Ny phenology model 
 
 En liste af stages, hver med sit eget navn og egne parametre.
-
-* SOM equilibrium (bgj)
 
 * Irrigation
 
@@ -61,7 +59,6 @@ plus lineær fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
 Til referencemanual?
 
 * Make "daisy" a program model.
-
 
 ** create a new "program" component.
 
