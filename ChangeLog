@@ -1,4 +1,42 @@
+2003-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.17 released.
+
+2003-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation_permanent.C (YearlyLAI): New parameter.
+	(VegetationPermanentSyntax): Added checks.
+
+	* bioclimate_std.C (WaterDistribution): Changes assert to warning.
+
+	* vegetation_permanent.C (tick): Added assertion.
+	* vegetation_crops.C (reset_canopy_structure): Ditto.
+
+	* log_table.C (LogTable): Delete summary.  Thanks valgrind.
+	* soil_water.C (Implementation): Initialize `macro'.  Thanks
+	valgrind. 
+
+	* weather_std.C (check): Add file name to error message.
+
+	* bioclimate_std.C (initialize): Call library::check instead of
+	Librarian::exist.
+
+2003-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* adsorption_freundlich.C (M_to_C): Added assertions.
+
 2003-11-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* texture.C, texture.h: New utility.
+	* Makefile (OTHER): Added it.
+	* horizon.C, horizon.h, horizon_std.C (texture_below): New virtual
+	member function.
+	* horizon.C, horizon.h (silt, sand): Removed.
+	(initialize): Updated caller.
+	* soil.C (clay): Updated caller.
+
+	* units.C (standard_conversions): Added [mm/h] and [mm/d] to
+	[cm/h] conversions.
 
 	* Version 3.16 released.
 

@@ -475,7 +475,8 @@ SoilWater::Implementation::Implementation (const AttributeList& al)
     bottom_start (  al.check ("UZborder") 
 		  ? al.integer ("UZborder")
 		  : -1),
-    reserve (&Librarian<UZmodel>::create (al.alist ("UZreserve")))
+    reserve (&Librarian<UZmodel>::create (al.alist ("UZreserve"))),
+    macro (NULL)
 { }
 
 void

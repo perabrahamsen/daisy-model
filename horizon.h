@@ -1,7 +1,7 @@
 // horizon.h
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2001, 2003 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2001, 2003 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -28,6 +28,7 @@
 
 class Hydraulic;
 class Tortuosity;
+class Texture;
 class Treelog;
 
 class Horizon 
@@ -36,6 +37,8 @@ class Horizon
 private:
   struct Implementation;
   Implementation& impl;
+  double fast_clay;
+  double fast_humus;
 public:
   const symbol name;
   static const char *const description;
@@ -51,15 +54,15 @@ public:
 public:
   Tortuosity& tortuosity;
   double dry_bulk_density () const;
+  virtual double texture_below (double size /* [um] */) const = 0;
   double clay () const;
-  double silt () const;
-  double sand () const;
   double humus () const;
   double humus_C () const;
   const std::vector<double>& SOM_fractions () const;
   const std::vector<double>& SOM_C_per_N () const;
   double C_per_N () const;
   double turnover_factor () const;
+  virtual double quartz () const; // Quartz fraction of minerals [0;1].
 
   // Chemistry.
 public:
@@ -72,9 +75,14 @@ public:
 
   // Create and Destroy.
 public:
+  static bool check_alist (const AttributeList& al, Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
   Horizon (const AttributeList&);
-  void initialize (bool top_soil, int som_size, Treelog&);
+  virtual void initialize (bool top_soil, int som_size, Treelog&) = 0;
+protected:
+  void initialize_base (bool top_soil, int som_size, const Texture& texture, 
+                        Treelog&);
+public:
   virtual ~Horizon ();
 };
 

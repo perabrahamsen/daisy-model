@@ -12,6 +12,31 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.17
+
+** New parameter yearlyLAI in permanent vegetation.
+
+Use this parameter if you have LAI measurements for specific years.
+The syntax is similar to "ForcedLAI" in the crops vegetation model.
+
+(defcolumn Andeby default
+  "The B.And farm, Andeby, 2003."
+  (Vegetation Hardwood
+              (YearlyLAI (1987 ((100 2.0) (200 4.0)))
+                         (1988 ((100 0.0) (150 1.5) (200 5.0)))))
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (MaxRootingDepth 60.0 [cm]))
+  (Groundwater deep))
+
+** [mm/h] and [mm/d] can now be used instead of [cm/h]
+
+** The quarts_in_clay, quarts_in_silt and quarts_in_sand removed.
+
+These where horizon parameters.  Let us know if you needed them, and
+we will restore them.
+
+** Bug fixes.
+
 * 3.16
 
 ** Automatic choice of pet model
@@ -1223,8 +1248,8 @@ interception capacity).  Here is an example:
 (defcolumn Andeby default
   "The B.And farm, Andeby, 2003."
   (Vegetation crops
-              (ForcedLAI (1987 (100 2.0) (200 4.0))
-                         (1988 (100 0.0) (150 1.5) (200 5.0))))
+              (ForcedLAI (1987 ((100 2.0) (200 4.0)))
+                         (1988 ((100 0.0) (150 1.5) (200 5.0)))))
   (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
         (MaxRootingDepth 60.0 [cm]))
   (Groundwater deep))

@@ -31,12 +31,26 @@
 #include "am.h"
 #include "aom.h"
 #include "organic_matter.h"
+#include "check.h"
 #include "tmpstream.h"
 #include <deque>
 
 struct VegetationPermanent : public Vegetation
 {
   // Canopy.
+  class YearlyLAI
+  {
+    /* const */ vector<int> years;
+    /* const */ vector<PLF> LAIvsDAY;
+
+    // use.
+  public:
+    double operator() (int year, int yday);
+    
+    // Create;
+    static void load_syntax (Syntax&, AttributeList&);
+    YearlyLAI (const vector<AttributeList*>& als);
+  } yearly_LAI;
   const PLF LAIvsDAY;		// LAI as a function of time.
   CanopySimple& canopy;
   double cover_;		// Fraction of soil covered by crops [0-1]
@@ -131,6 +145,48 @@ struct VegetationPermanent : public Vegetation
   ~VegetationPermanent ();
 };
 
+double 
+VegetationPermanent::YearlyLAI::operator() (int year, int yday)
+{
+  for (unsigned int i = 0; i < years.size (); i++)
+    {
+      if (years[i] == year)
+	{
+	  if (yday < LAIvsDAY[i].x (0))
+	    return -1.0;
+
+	  if (yday > LAIvsDAY[i].x (LAIvsDAY[i].size () - 1))
+	    return -1.0;
+
+	  return LAIvsDAY[i](yday);
+	}
+    }
+  return -1.0;
+}
+    
+void 
+VegetationPermanent::YearlyLAI::load_syntax (Syntax& syntax, AttributeList&)
+{
+  syntax.add ("year", Syntax::Integer, Syntax::Const, "\
+Year for which to use yearly LAI measurements.");
+  syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Syntax::OptionalConst, 
+		"LAI as a function of Julian day.\n\
+\n\
+The default LAI will be used before the first day you specify and\n\
+after the last specified day.  Default LAI will also be used\n\
+whenever 'LAIvsDAY' becomes negative.");
+  syntax.order ("year", "LAIvsDAY");
+}
+
+VegetationPermanent::YearlyLAI::YearlyLAI (const vector<AttributeList*>& als)
+{
+  for (unsigned int i = 0; i < als.size (); i++)
+    {
+      years.push_back (als[i]->integer ("year"));
+      LAIvsDAY.push_back (als[i]->plf ("LAIvsDAY"));
+    }
+}
+
 void
 VegetationPermanent::tick (const Time& time,
 			   const Bioclimate&,
@@ -148,8 +204,12 @@ VegetationPermanent::tick (const Time& time,
 {
   // Canopy.
   const double old_LAI = canopy.CAI;
-  canopy.CAI = LAIvsDAY (time.yday ());
+  canopy.CAI = yearly_LAI (time.year (), time.yday ());
+  if (canopy.CAI < 0.0)
+    canopy.CAI = LAIvsDAY (time.yday ());
   cover_ =  1.0 - exp (-(canopy.EPext * canopy.CAI));
+  daisy_assert (cover_ >= 0.0);
+  daisy_assert (cover_ <= 1.0);
   canopy.LAIvsH.clear ();
   canopy.LAIvsH.add (0.0, 0.0);
   canopy.LAIvsH.add (canopy.Height, canopy.CAI);
@@ -249,6 +309,7 @@ VegetationPermanent::initialize (Treelog& msg, const Soil& soil,
 
 VegetationPermanent::VegetationPermanent (const AttributeList& al)
   : Vegetation (al),
+    yearly_LAI (al.alist_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
     canopy (*new CanopySimple (al.alist ("Canopy"))),
     N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
@@ -284,17 +345,25 @@ VegetationPermanentSyntax
     AttributeList& alist = *new AttributeList ();
     Vegetation::load_syntax (syntax, alist);
     alist.add ("description", "Permanent (non-crop) vegetation.");
-    syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Syntax::Const, 
-		"LAI as a function of Julian day.");
+    syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Check::non_negative (),
+                Syntax::Const, 
+		"LAI as a function of Julian day.\n\
+These numbers are used when there are no yearly numbers (YearlyLAI).");
+    syntax.add_submodule_sequence("YearlyLAI", Syntax::Const, "\
+Yearly LAI measurements.", VegetationPermanent::YearlyLAI::load_syntax);
+    alist.add ("YearlyLAI", vector<AttributeList*> ());
+
+
     syntax.add_submodule("Canopy", alist, Syntax::State, "Canopy.",
 			 CanopySimple::load_syntax);
-    syntax.add ("Height", "cm", Syntax::Const, 
+    syntax.add ("Height", "cm", Check::positive (), Syntax::Const, 
 		"permanent height of vegetation.");
     alist.add ("Height", 80.0);
-    syntax.add ("N_per_LAI", "kg N/ha/LAI", Syntax::Const,
+    syntax.add ("N_per_LAI", "kg N/ha/LAI", Check::positive (), Syntax::Const,
 		"N content as function of LAI.");
     alist.add ("N_per_LAI", 10.0);
-    syntax.add ("DM_per_LAI", "Mg DM/ha/LAI", Syntax::Const,
+    syntax.add ("DM_per_LAI", "Mg DM/ha/LAI", Check::positive (), 
+                Syntax::Const,
 		"DM as function of LAI.");
     alist.add ("DM_per_LAI", 0.5);
     syntax.add ("N_demand", "g N/m^2", Syntax::LogOnly,
@@ -311,10 +380,10 @@ VegetationPermanentSyntax
     alist.add ("litter_am", AM::default_AM ());
     syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
 			 RootSystem::load_syntax);
-    syntax.add ("root_DM", "Mg DM/ha", Syntax::Const, 
+    syntax.add ("root_DM", "Mg DM/ha", Check::positive (), Syntax::Const, 
 		"Permanent root drymatter.");
     alist.add ("root_DM", 2.0);
-    syntax.add ("Albedo", "", Syntax::Const, 
+    syntax.add ("Albedo", Syntax::None (), Check::positive (), Syntax::Const, 
 		"Reflection factor.");
     alist.add ("Albedo", 0.2);
     Librarian<Vegetation>::add_type ("permanent", alist, syntax, &make);

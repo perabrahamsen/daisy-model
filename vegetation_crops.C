@@ -372,6 +372,8 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	  
 	  // Other stuff
 	  cover_ =  1.0 - exp (-CanopySum (&Crop::EPext));
+          daisy_assert (cover_ <= 1.0);
+          daisy_assert (cover_ >= 0.0);
 	  ACExt_ = CanopyAverage (&Crop::PARext);
 	  ACRef_ =  CanopyAverage (&Crop::PARref);
 	  ARExt_ = CanopyAverage (&Crop::EPext);
@@ -633,7 +635,7 @@ corresponding to their simulated LAI.\n\
 'ForcedLAI' can be useful if you have measured the total LAI on the\n\
 field, and want to force the model to confirm to the measurements.  \n\
 \n\
-'LAIvsDAY' will not affect the LAI for crops that have not yet\n\
+'ForcedDAY' will not affect the LAI for crops that have not yet\n\
 emerged.  If no crops have emerged on the field, it will be ignored.",
 				  VegetationCrops::ForcedLAI::load_syntax);
     alist.add ("ForcedLAI", vector<AttributeList*> ());

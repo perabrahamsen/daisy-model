@@ -76,6 +76,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
   while (max_M < M)
     {
       max_C *= 2;
+      daisy_assert (max_C > 0.0); // Overlow detection.
       max_M = C_to_M (soil, Theta, i, max_C);
     }
 
@@ -97,6 +98,7 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
 	  max_C = new_C;
 	  max_M = new_M;
 	}
+      daisy_assert (min_M > 0.0);
     }
   return (min_C + max_C) / 2.0;
 }

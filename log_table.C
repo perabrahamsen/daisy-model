@@ -443,6 +443,7 @@ LogTable::summarize (Treelog& msg)
 
 LogTable::~LogTable ()
 {
+  sequence_delete (summary.begin (), summary.end ());
   if (!out.good ())
     throw (string ("Problems writing to '") + file + "'");
 }

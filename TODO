@@ -1,8 +1,42 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* RNP:  Forced LAI for permanent vegetation
+
+For det tilfælde at man har målinger for nogen år.
+
+* Lav nyt release.
+
+* Anders Søgaard
+
+** skriv: Fejl ikke fundet, men den kører her, vejrfil?
+
+* Eva Bøgh
+
+** skriv: Fejl ikke fundet, men workaround lavet.
+
+* Søren Hansen:  Spørg efter interception capacity vs LAI
+
 * Make it possible to specify texture using different systems
 
-Different sizes for sand, silt, and clay, plus allow other types.
+** New "default" horizon
+
+*** fast_clay, fast_humus in horizon
+
+*** Hydraulic::inititalize should take Texture argument.
+
+Update hydrailic models.
+
+*** Horizon::inititalize pure virutal 
+
+split out Horizon::inititalize_base
+
+create HorizonStandard::inititalize
+
+** USDA. FAO, DIN, DS horizon
+
+** numeric horizon
+
+* Slides til Dina årsmøde
 
 * Irrigation
 
@@ -14,7 +48,7 @@ Start ved specifik dato.
 
 Og Lz (DensRtTip) er en fri variabel.
 
-plus line;r fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
+plus lineær fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
 
 * Partit komponent
 

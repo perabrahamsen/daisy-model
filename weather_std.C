@@ -1096,7 +1096,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
   bool ok = true;
   if (!lex->good ())
     {
-      err.error ("file error");
+      err.error ("file error for '" + lex->file +"'");
       return false;
     }
   if (lex->error_count > 0)

@@ -36,6 +36,7 @@
 #include "svat.h"
 #include "vegetation.h"
 #include "chemicals.h"
+#include "tmpstream.h"
 
 struct BioclimateStandard : public Bioclimate
 { 
@@ -201,15 +202,15 @@ BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
   else
     type = symbol ("makkink");
 
+  msg.debug ("Pet choosen: " + type);
+
   const Library& library = Librarian<Pet>::library ();
-  daisy_assert (library.exist (type));
+  daisy_assert (library.check (type));
   
   AttributeList alist (library.lookup (type));
   alist.add ("type", type);
   daisy_assert (library.syntax (type).check (alist, msg));
   pet = &Librarian<Pet>::create (alist);
-
-  msg.debug ("Pet choosen: " + type);
 }
 
 BioclimateStandard::BioclimateStandard (const AttributeList& al)
@@ -463,7 +464,18 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // 4 Ponding
 
   pond_ep = (total_ep - snow_ea) * (1.0 - vegetation.cover ());
-  daisy_assert (pond_ep >= 0.0);
+  daisy_assert (snow_ea <= total_ep);
+  if (pond_ep < 0.0)
+    {
+      TmpStream tmp;
+      tmp () << "BUG:\npond_ep = " << pond_ep << "\n"
+             << "total_ep = " << total_ep << "\n"
+             << "snow_ea = " << snow_ea << "\n"
+             << "cover  = " << vegetation.cover ();
+      msg.error (tmp.str ());
+      pond_ep = 0.0;
+    }
+
   pond_water_in = canopy_water_out + canopy_water_bypass + irrigation_surface;
   if (pond_water_in > 0.01)
     pond_water_in_temperature 

@@ -359,7 +359,7 @@ SPECIALS = log_all.C om.C select_value.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = destination.C symbol.C \
+OTHER = texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
@@ -723,7 +723,7 @@ condition${OBJ}: condition.C condition.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h
 horizon${OBJ}: horizon.C horizon.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h plf.h hydraulic.h mathlib.h \
-  tortuosity.h log.h check_range.h check.h vcheck.h
+  tortuosity.h texture.h log.h check_range.h check.h vcheck.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h librarian.h common.h library.h \
@@ -904,6 +904,7 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h common.h \
   soil_chemicals.h soil_chemical.h solute.h adsorption.h transport.h \
   mactrans.h plf.h transform.h groundwater.h log.h weather.h im.h \
   vegetation.h
+texture${OBJ}: texture.C texture.h
 destination${OBJ}: destination.C destination.h symbol.h
 symbol${OBJ}: symbol.C symbol.h assertion.h tmpstream.h
 fao${OBJ}: fao.C fao.h net_radiation.h librarian.h common.h library.h \
@@ -1025,7 +1026,7 @@ column_inorganic${OBJ}: column_inorganic.C column_base.h column.h librarian.h \
 vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h librarian.h \
   common.h library.h symbol.h alist.h syntax.h treelog.h assertion.h \
   plf.h mathlib.h log.h root_system.h rootdens.h canopy_simple.h soil.h \
-  geometry.h crop.h am.h aom.h om.h organic_matter.h clayom.h
+  geometry.h crop.h am.h aom.h om.h organic_matter.h clayom.h tmpstream.h
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h crop.h \
   organic_matter.h clayom.h soil.h geometry.h plf.h mathlib.h harvest.h \
@@ -1162,7 +1163,8 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
   librarian.h common.h library.h symbol.h alist.h syntax.h treelog.h \
   assertion.h
 horizon_std${OBJ}: horizon_std.C horizon.h librarian.h common.h library.h \
-  symbol.h alist.h syntax.h treelog.h assertion.h
+  symbol.h alist.h syntax.h treelog.h assertion.h texture.h check.h \
+  mathlib.h
 crop_std${OBJ}: crop_std.C crop.h time.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h chemicals.h \
   root_system.h rootdens.h plf.h canopy_std.h canopy_simple.h \
@@ -1255,7 +1257,7 @@ bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h common.h \
   log.h mathlib.h pet.h svat.h vegetation.h chemicals.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h crop.h \
-  field.h daisy.h
+  field.h daisy.h check_range.h check.h
 condition_soil${OBJ}: condition_soil.C condition.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h field.h \
   daisy.h check.h

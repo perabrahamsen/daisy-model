@@ -28,17 +28,16 @@
 #include "hydraulic.h"
 #include "mathlib.h"
 #include "tortuosity.h"
+#include "texture.h"
 #include "log.h"
 #include "check_range.h"
 #include "vcheck.h"
+#include "tmpstream.h"
 #include <vector>
 #include <map>
 #include <numeric>
 
-// Weigth of mineral particles. [g/cm^3]
-static const double rho_mineral = 2.65;	
 // Weight of humus. [g/cm^3]
-static const double rho_humus = 1.3; 
 static const double rho_water = 1.0; // [g/cm^3]
 static const double rho_ice = 0.917; // [g/cm^3]
 static const double c_fraction_in_humus = 0.587;
@@ -46,15 +45,6 @@ static const double c_fraction_in_humus = 0.587;
 struct Horizon::Implementation
 {
   // Content.
-  const double clay;
-  const double silt;
-  const double sand;
-  const double fine_sand;
-  const double coarse_sand;
-  const double humus;
-  const double quarts_in_clay;
-  const double quarts_in_silt;
-  const double quarts_in_sand;
   double dry_bulk_density;
 
   // Organic matter.
@@ -86,18 +76,17 @@ struct Horizon::Implementation
   };
   double content[Constituents_End];
   double Theta_pF_high;
-  void initialize (const Hydraulic&, int som_size);
+  void initialize (const Hydraulic&, const Texture& texture, double quarts, 
+                   int som_size, Treelog& msg);
   double HeatCapacity ();
   double DepolationsFactor (const Hydraulic&, 
 			    const constituents medium, const double alfa);
   double ThermalConductivity (const Hydraulic&, constituents medium);
   const int intervals;
-  double rho_soil_particles ();
 
   static const double heat_capacity[Constituents_End];
   
   // Create.
-  static double weight (const AttributeList& al, string name);
   Implementation (const AttributeList& al);
 };
 
@@ -107,7 +96,11 @@ Horizon::Implementation::heat_capacity[Constituents_End] = // [erg / cm³ / °C]
 { 4.2e7, 1.9e7 * (1.0 / 0.92), 1.25e4, 2.0e7, 2.0e7, 2.5e7 }; 
 
 void 
-Horizon::Implementation::initialize (const Hydraulic& hydraulic, int som_size)
+Horizon::Implementation::initialize (const Hydraulic& hydraulic,
+                                     const Texture& texture, 
+                                     const double quarts,
+                                     int som_size,
+                                     Treelog& msg)
 {
   if (som_size > 0)
     {
@@ -128,16 +121,12 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic, int som_size)
 
   // Did we specify 'dry_bulk_density'?  Else calculate it now.
   if (dry_bulk_density < 0.0)
-    dry_bulk_density = rho_soil_particles () * (1.0 - hydraulic.porosity ());
+    dry_bulk_density = texture.rho_soil_particles () 
+      * (1.0 - hydraulic.porosity ());
 
   // The particles are not in a real continuous medium.  Try to correct.
   const double continuum_correction_factor = 1.25;
       
-  // Quarts content in soil.
-  const double quarts = clay * quarts_in_clay
-    + silt * quarts_in_silt
-    + sand * quarts_in_sand;
-
   // Above this pF heat is mostly tranfered by Air.
   Theta_pF_high = hydraulic.Theta (pF2h (4.2));
       
@@ -148,11 +137,16 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic, int som_size)
   // Water that won't freeze.
   const double LiquidWater = Theta_pF_high; 
   
+  // Quarts content in soil.
+  TmpStream tmp;
+  tmp () << "Quartz = " << quarts << " []";
+  msg.debug (tmp.str ());
+
   // Relative content of various constituents in soil.
   content[Quarts] = quarts * (1.0 - hydraulic.Theta_sat);
-  content[Minerals] = ((clay + silt + sand) - quarts)
+  content[Minerals] = (texture.mineral () - quarts) 
     * (1.0 - hydraulic.Theta_sat);
-  content[Organic_Matter] = humus * (1.0 - hydraulic.Theta_sat);
+  content[Organic_Matter] = texture.humus * (1.0 - hydraulic.Theta_sat);
 
   // Find capasity of dry soil.
   content[Air] = hydraulic.porosity ();
@@ -231,6 +225,10 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic, int som_size)
 double 
 Horizon::Implementation::HeatCapacity ()
 {
+  daisy_assert (approximate (accumulate (&content[0], 
+                                         &content[Constituents_End],
+                                         0.0),
+                             1.0));
   double C = 0.0;
   for (int i = 0; i < Constituents_End; i++)
     C += heat_capacity[i] * content[i];
@@ -323,49 +321,10 @@ Horizon::Implementation::ThermalConductivity (const Hydraulic& hydraulic,
   return S1 / S2;
 }
 
-double
-Horizon::Implementation::rho_soil_particles ()
-{ 
-  return (clay + silt + sand) * rho_mineral + humus * rho_humus; 
-}
-
-double 
-Horizon::Implementation::weight (const AttributeList& al, string name)
-{
-  daisy_assert (al.check ("sand") || 
-		(al.check ("fine_sand") && al.check ("coarse_sand")));
-  const double sand = al.check ("sand") 
-    ? al.number ("sand") 
-    : (al.number ("fine_sand")
-       + al.number ("coarse_sand"));
-  const double total = (al.number ("clay") + al.number ("silt")
-			+ sand + al.number ("humus"));
-  
-  if (name == "sand")
-    return sand / total;
-
-  if (name == "fine_sand" && !al.check (name))
-    return -42.42e42;
-
-  if (name == "coarse_sand" && !al.check (name))
-    return -42.42e42;
-  
-  return al.number (name) / total;
-}
-
 static const vector<double> empty_sequence;
 
 Horizon::Implementation::Implementation (const AttributeList& al)
-  : clay (weight (al, "clay")),
-    silt (weight (al, "silt")),
-    sand (weight (al, "sand")),
-    fine_sand (weight (al, "fine_sand")),
-    coarse_sand (weight (al, "coarse_sand")),
-    humus (weight (al, "humus")),
-    quarts_in_clay (al.number ("quarts_in_clay")),
-    quarts_in_silt (al.number ("quarts_in_silt")),
-    quarts_in_sand (al.number ("quarts_in_sand")),
-    SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
+  : SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
     C_per_N (al.check ("C_per_N") ? al.number ("C_per_N") : -42.42e42),
     SOM_fractions (al.check ("SOM_fractions") 
 		   ? al.number_sequence ("SOM_fractions")
@@ -390,27 +349,28 @@ Horizon::Implementation::Implementation (const AttributeList& al)
 
 double
 Horizon::dry_bulk_density () const
-{ return impl.dry_bulk_density; }
+{ 
+  daisy_assert (impl.dry_bulk_density > 0.0);
+  return impl.dry_bulk_density; 
+}
 
 double 
-Horizon::clay () const 
-{ return impl.clay; }
+Horizon::clay () const
+{ 
+  daisy_assert (fast_clay >= 0.0);
+  return fast_clay; 
+}
 
 double 
-Horizon::silt () const 
-{ return impl.silt; }
-
-double 
-Horizon::sand () const 
-{ return impl.sand; }
-
-double 
-Horizon::humus () const 
-{ return impl.humus; }
+Horizon::humus () const
+{
+  daisy_assert (fast_humus >= 0.0);
+  return fast_humus; 
+}
 
 double
 Horizon::humus_C () const
-{ return impl.dry_bulk_density * impl.humus * c_fraction_in_humus; }
+{ return dry_bulk_density () * humus () * c_fraction_in_humus; }
 
 const std::vector<double>& 
 Horizon::SOM_fractions () const
@@ -427,6 +387,17 @@ Horizon::C_per_N () const
 double
 Horizon::turnover_factor () const
 { return impl.turnover_factor; }
+
+double
+Horizon::quartz () const
+{ 
+  const double clay = texture_below ( 2.0 /*[um]*/);
+  const double silt = texture_below (20.0 /*[um]*/) - clay;
+  const double sand = 1.0 - clay - silt;
+
+  // Data adopted from Møberg et al. 1988 (Tinglev & Roskilde Soil)
+  return clay * 0.15 + silt * 0.6 + sand * 0.7;
+}
 
 double
 Horizon::anisotropy () const
@@ -462,21 +433,11 @@ Horizon::get_attribute (const string& name) const
   return impl.attributes[name];
 }
 
-static bool
-check_alist (const AttributeList& al, Treelog& err)
+bool
+Horizon::check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
-  if (!(al.number ("humus") > 0.0))
-    {
-      err.entry ("humus must be a positive number");
-      ok = false;
-    }
-  if (al.size ("SOM_C_per_N") < 1)
-    {
-      err.entry ("must specify at least one SOM_C_per_N");
-      ok = false;
-    }
   daisy_assert (al.check ("hydraulic"));
   const AttributeList& hydraulic =al.alist ("hydraulic");
   if (hydraulic.name ("type") == "hypres"
@@ -486,35 +447,7 @@ check_alist (const AttributeList& al, Treelog& err)
 hydraulic model");
       ok = false;
     }
-  const double sand = al.check ("sand") ? al.number ("sand") : -1.0;
-  const double fine_sand 
-    = al.check ("fine_sand") ? al.number ("fine_sand") : -1.0;
-  const double coarse_sand 
-    = al.check ("coarse_sand") ? al.number ("coarse_sand") : -1.0;
-  if (sand >= 0.0)
-    {
-      if (fine_sand > sand)
-	{
-	  err.entry ("You can't have more fine sand than sand");
-	  ok = false;
-	}
-      if (coarse_sand >= sand)
-	{
-	  err.entry ("You can't have more coarse sand than sand");
-	  ok = false;
-	}
-      if (fine_sand >= 0.0 && coarse_sand >= 0.0
-	  && !approximate (fine_sand + coarse_sand, sand))
-	{
-	  err.entry ("Sand is either fine or coarse");
-	  ok = false;
-	}
-    }
-  else if (fine_sand < 0.0 || coarse_sand < 0.0)
-    {
-      err.entry ("You must specify the total amount of sand");
-      ok = false;
-    }
+
   return ok;
 }
 
@@ -545,7 +478,7 @@ static const class SOM_fractions_check_type : public VCheck
       }
     if (!has_negative && !approximate (sum, 1.0))
       throw string ("sum must be 1.0");
-    if (sum > 1.0)
+    if (sum > 1.0 && !approximate (sum, 1.0))
       throw string ("sum must be at most 1.0");
   };
 } SOM_fractions_check;
@@ -556,8 +489,6 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_check (check_alist);
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 	      "Description of this particular soil type.");
-  alist.add ("description",
-	     "The physical properties of a particular soil type.");
   syntax.add ("hydraulic", Librarian<Hydraulic>::library (), 
 	      "The hydraulic propeties of the soil.");
   AttributeList hydraulic_alist;
@@ -574,32 +505,6 @@ Horizontal saturated water conductivity relative to vertical saturated\n\
 water conductivity.  The higher this value, the faster the water will\n\
 move towards drain pipes.");
   alist.add ("anisotropy", 1.0);
-  syntax.add ("clay", Syntax::None (), Check::non_negative (), Syntax::Const,
-	      "Relative fraction of clay in soil.");
-  syntax.add ("silt", Syntax::None (), Check::non_negative (), Syntax::Const,
-	      "Relative fraction of silt in soil.");
-  syntax.add ("fine_sand", Syntax::None (), Check::non_negative (), 
-	      Syntax::OptionalConst,
-	      "Relative fraction of fine sand in soil.");
-  syntax.add ("coarse_sand", Syntax::None (), Check::non_negative (), 
-	      Syntax::OptionalConst,
-	      "Relative fraction of coarse sand in soil.");
-  syntax.add ("sand", Syntax::None (), Check::non_negative (), 
-	      Syntax::OptionalConst,
-	      "Relative fraction of sand in soil.");
-  syntax.add ("humus", Syntax::None (), Check::non_negative (), 
-	      Syntax::Const,
-	      "Relative fraction of humus in soil.");
-  // Data adopted from Møberg et al. 1988 (Tinglev & Roskilde Soil)
-  syntax.add_fraction ("quarts_in_clay", Syntax::Const,
-		       "Quarts fraction in clay.");
-  alist.add ("quarts_in_clay", 0.15);
-  syntax.add_fraction ("quarts_in_silt", Syntax::Const,
-		       "Quarts fraction in silt.");
-  alist.add ("quarts_in_silt", 0.60);
-  syntax.add_fraction ("quarts_in_sand", Syntax::Const,
-		       "Quarts fraction in sand.");
-  alist.add ("quarts_in_sand", 0.70);
   syntax.add ("dry_bulk_density", "g/cm^3", Syntax::OptionalConst,
 	      "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");
@@ -622,6 +527,8 @@ pools.  The C/N ration for the SOM pools will then gradually move towards\n\
 the values specified by 'SOM_C_per_N'.\n\
 By default, the values given by 'SOM_C_per_N' will be used for\n\
 initialization.");
+  syntax.add_check ("SOM_C_per_N", VCheck::min_size_1 ());
+  
   static const BelowOrEqual max_1 (1.0);
   syntax.add ("SOM_fractions",  Syntax::None (), max_1,
               Syntax::OptionalConst, Syntax::Sequence, "\
@@ -671,6 +578,8 @@ Intended for use with pedotransfer functions.");
 
 Horizon::Horizon (const AttributeList& al)
   : impl (*new Implementation (al)),
+    fast_clay (-42.42e42),
+    fast_humus (-42.42e42),
     name (al.identifier ("type")),
     hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
     tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
@@ -683,15 +592,29 @@ Horizon::Horizon (const AttributeList& al)
     }
 }
 
-void
-Horizon::initialize (bool top_soil, int som_size, Treelog& msg)
-{
+void 
+Horizon::initialize_base (bool top_soil,
+                          int som_size, const Texture& texture, 
+                          Treelog& msg)
+{ 
   Treelog::Open nest (msg, name);
-  hydraulic.initialize (clay (), silt (), sand (), humus (),
-			dry_bulk_density (), top_soil, msg);
-  impl.initialize (hydraulic, som_size);
+  const double clay_lim = texture_below ( 2.0 /* [um] USDA Clay */);
+  fast_clay = texture.mineral () * clay_lim;
+  fast_humus = texture.humus;
+  const double silt_lim = texture_below (50.0 /* [um] USDA Silt */);
+  daisy_assert (clay_lim >= 0.0);
+  daisy_assert (silt_lim >= clay_lim);
+  daisy_assert (silt_lim <= 1.0);
+  const double mineral = texture.mineral ();
+  hydraulic.initialize (mineral * clay_lim, 
+                        mineral * (silt_lim - clay_lim), 
+                        mineral * (1.0 - silt_lim),
+                        texture.humus,
+			impl.dry_bulk_density, top_soil, msg);
+  impl.initialize (hydraulic, texture, quartz () * texture.mineral (),
+                   som_size, msg); 
 }
-
+  
 Horizon::~Horizon ()
 { 
   delete &impl; 
@@ -704,6 +627,6 @@ EMPTY_TEMPLATE
 Librarian<Horizon>::Content* Librarian<Horizon>::content = NULL;
 
 const char *const Horizon::description = "\
-A 'horizon' is a soil type with specific physical properties.  It is\n\
-the responsibility of the 'horizon' component to specify these\n\
+A `horizon' is a soil type with specific physical properties.  It is\n\
+the responsibility of the `horizon' component to specify these\n\
 properties.";
