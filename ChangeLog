@@ -1,3 +1,30 @@
+2000-08-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.37 released.
+
+2000-08-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/Makefile (DAISY): Added `vegetation.dai'.
+
+	* lib/log.dai ("PMSW"): Change `pt' to `svat'.
+
+2000-08-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_inorganic.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* column_base.C, column_base.h: New files.
+	* column_std.C: Use them.
+	* Makefile (SPECIALS): Add it.
+
+2000-08-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C, solute.h (S_external): New log variable.
+	(add_external): Renamed from `add'.
+	* column_std.C (fertilize): Update caller.
+	* lib/log.dai ("N Balance"): Log it.
+	("Soil Chemicals"): Ditto.
+
 2000-08-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.36 released.

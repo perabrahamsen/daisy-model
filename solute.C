@@ -12,6 +12,7 @@ void
 Solute::clear ()
 {
   fill (S.begin (), S.end (), 0.0);
+  fill (S_external.begin (), S_external.end (), 0.0);
 }
 
 void
@@ -97,6 +98,7 @@ Solute::output (Log& log) const
   log.output ("S", S);
   log.output ("S_p", S_p);
   log.output ("S_drain", S_drain);
+  log.output ("S_external", S_external);
   log.output ("J", J);
   log.output ("J_p", J_p);
 }
@@ -124,6 +126,8 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Source term (macropore transport only).");
   syntax.add ("S_drain", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term (soil drainage only).");
+  syntax.add ("S_external", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "External source, such as incorporated fertilizer.");
   syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Transportation in matrix (positive up).");
   syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
@@ -148,6 +152,21 @@ Solute::~Solute ()
 }
 
 void 
+Solute::add_external (const Soil& soil, const SoilWater& soil_water, 
+		      double amount, double from, double to)
+{ 
+  vector<double> added (M_.size (), 0.0);
+  soil.add (added, from, to, amount);
+  for (unsigned int i = 0; i < C_.size (); i++)
+    {
+      M_[i] += added[i];
+      S_external[i] += added[i];
+      C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+    }
+}
+
+#if 0
+void 
 Solute::add (const Soil& soil, const SoilWater& soil_water, 
 	     double amount, double from, double to)
 { 
@@ -155,6 +174,7 @@ Solute::add (const Soil& soil, const SoilWater& soil_water,
   for (unsigned int i = 0; i < C_.size (); i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
+#endif
 
 void 
 Solute::mix (const Soil& soil, const SoilWater& soil_water, 
@@ -282,6 +302,7 @@ Solute::initialize (const AttributeList& al,
   S.insert (S.begin (), soil.size (), 0.0);
   S_p.insert (S_p.begin (), soil.size (), 0.0);
   S_drain.insert (S_drain.begin (), soil.size (), 0.0);
+  S_external.insert (S_external.begin (), soil.size (), 0.0);
   J.insert (J_p.begin (), soil.size () + 1, 0.0);
   J_p.insert (J_p.begin (), soil.size () + 1, 0.0);
 }
