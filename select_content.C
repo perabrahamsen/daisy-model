@@ -21,7 +21,7 @@
 
 
 #include "select_value.h"
-#include "geometry.h"
+#include "soil.h"
 
 struct SelectContent : public SelectValue
 {
@@ -30,12 +30,12 @@ struct SelectContent : public SelectValue
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geometry, Treelog&)
+		     const Soil* soil, Treelog&)
     { 
       if (count == 0)	 
-	value = array[geometry->interval_plus (height)];	
+	value = array[soil->interval_plus (height)];	
       else
-	value += array[geometry->interval_plus (height)];	
+	value += array[soil->interval_plus (height)];	
       count++;
     }
 

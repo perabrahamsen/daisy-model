@@ -239,7 +239,7 @@ LogAll::output (symbol name, const vector<double>& value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_array (value, geometry (), *msg);
+      (*i)->output_array (value, soil (), *msg);
 }
 
 void 

@@ -30,17 +30,17 @@ struct SelectPF : public Select
   // Content.
   const double max_h;
   vector<double> value;		// Total array.
-  const Geometry* last_geometry; // For printing dimensions;
+  const Soil* last_soil; // For printing dimensions;
 
   double cm2pF (double cm)
   { return h2pF (min (cm, max_h)); }
     
   // Output routines.
   void output_array (const vector<double>& array, 
-		     const Geometry* geometry, Treelog&)
+		     const Soil* soil, Treelog&)
   { 
-    if (geometry)
-      last_geometry = geometry;
+    if (soil)
+      last_soil = soil;
 
     if (array.size () > value.size ())
       value.insert (value.end (), 
@@ -70,8 +70,8 @@ struct SelectPF : public Select
   bool prevent_printing ()
   { return count == 0; }
 
-  const Geometry* geometry () const
-  { return last_geometry; }
+  const Soil* soil () const
+  { return last_soil; }
 
   int size () const
   { return value.size (); }
@@ -81,7 +81,7 @@ struct SelectPF : public Select
     : Select (al),
       max_h (al.number ("max_h")),
       value (al.number_sequence ("value")),
-      last_geometry (NULL)
+      last_soil (NULL)
   { }
 };
 

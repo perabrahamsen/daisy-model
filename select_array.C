@@ -28,14 +28,14 @@ struct SelectArray : public Select
 {
   // Content.
   vector<double> value;		// Total array.
-  const Geometry* last_geometry; // For printing dimensions;
+  const Soil* last_soil; // For printing dimensions;
 
   // Output routines.
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geometry, Treelog&)
+		     const Soil* soil, Treelog&)
   { 
-    if (geometry)
-      last_geometry = geometry;
+    if (soil)
+      last_soil = soil;
 
     if (array.size () > value.size ())
       value.insert (value.end (), 
@@ -65,8 +65,8 @@ struct SelectArray : public Select
   bool prevent_printing ()
   { return count == 0; }
 
-  const Geometry* geometry () const
-  { return last_geometry; }
+  const Soil* soil () const
+  { return last_soil; }
 
   int size () const
   { return value.size (); }
@@ -75,7 +75,7 @@ struct SelectArray : public Select
   SelectArray (const AttributeList& al)
     : Select (al),
       value (al.number_sequence ("value")),
-      last_geometry (NULL)
+      last_soil (NULL)
   { }
 };
 

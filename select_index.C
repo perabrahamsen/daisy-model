@@ -29,7 +29,7 @@ struct SelectIndex : public SelectValue
 
   // Output routines.
   void output_array (const std::vector<double>& array,
-                     const Geometry*, Treelog&)
+                     const Soil*, Treelog&)
   { 
     if (count == 0)	 
       value = array[index];	

@@ -21,7 +21,7 @@
 
 
 #include "select.h"
-#include "geometry.h"
+#include "soil.h"
 #include "units.h"
 #include "mathlib.h"
 
@@ -36,21 +36,21 @@ struct SelectInterval : public Select
   // Output routines.
 
   void output_array (const std::vector<double>& array, 
-		     const Geometry* geometry, Treelog&)
+		     const Soil* soil, Treelog&)
   { 
     double result;
     if (to > 0.0)
       {
 	if (!isnormal (from))
-	  result = geometry->total (array);
+	  result = soil->total (array);
 	else
 	  {
-	    to = geometry->zplus (geometry->size () - 1);
-	    result = geometry->total (array, from, to);
+	    to = soil->zplus (soil->size () - 1);
+	    result = soil->total (array, from, to);
 	  }
       }
     else 
-      result = geometry->total (array, from, to);
+      result = soil->total (array, from, to);
 
     if (count == 0)	 
       value = result;

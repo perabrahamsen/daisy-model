@@ -1,3 +1,13 @@
+2004-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (check): Call LogSelect::check.
+
+	* log.C, log.h, log_all.C, log_table.C:
+	* select_array.C, select.C, select_content.C:
+	* select_flux_bottom.C, select_flux_top.C, select.h:
+	* select_index.C, select_interval.C, select_pF.C:
+	Changed geometry to soil. 
+
 2004-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* hydraulic_hypres.C (initialize): Give error message instead of

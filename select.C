@@ -261,11 +261,8 @@ Select::Implementation::check (const string& spec_dim, Treelog& err) const
 {
   bool ok = true;
   if (spec && !spec_conv && spec->dimension () != Syntax::Unknown ())
-    {
-      Treelog::Open nest (err, tag);
-      err.warning (string ("Don't know how to convert [") + spec_dim
-		   + "] to [" + dimension + "]");
-    }
+    err.warning (string ("Don't know how to convert [") + spec_dim
+                 + "] to [" + dimension + "]");
   return ok;
 }
   
@@ -304,8 +301,8 @@ Select::log_name () const
   return path[path.size () - 1];
 }
 
-const Geometry* 
-Select::geometry () const
+const Soil* 
+Select::soil () const
 { return NULL; }
 
 int 
@@ -329,7 +326,7 @@ Select::output_name (const symbol)
 { throw ("This log selection can't log names."); }
 
 void 
-Select::output_array (const vector<double>&, const Geometry*, Treelog&)
+Select::output_array (const vector<double>&, const Soil*, Treelog&)
 { throw ("This log selection can't log arrays."); }
 
 void 

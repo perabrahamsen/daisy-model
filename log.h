@@ -1,7 +1,7 @@
-// log.h
+// log.h -- Saving information about the simulation.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2001, 2004 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2001, 2004 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -29,7 +29,7 @@
 
 class Daisy;
 class PLF;
-class Geometry;
+class Soil;
 class Time;
 class Treelog;
 
@@ -249,18 +249,18 @@ public:
   private:
     Log& ll;
   public:
-    Geo (Log& l, const Geometry& geo)
+    Geo (Log& l, const Soil& geo)
       : ll (l)
-    { ll.open_geometry (geo); }
+    { ll.open_soil (geo); }
     ~Geo ()
-    { ll.close_geometry (); }
+    { ll.close_soil (); }
   };
 private:
-  void open_geometry (const Geometry&);
-  void close_geometry ();
+  void open_soil (const Soil&);
+  void close_soil ();
   friend struct Log::Geo;
 public:
-  const Geometry* geometry ();
+  const Soil* soil ();
 
   // Utilities
 public:

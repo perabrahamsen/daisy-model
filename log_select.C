@@ -175,11 +175,15 @@ LogSelect::output (symbol, const Time&)
 bool 
 LogSelect::check (const Syntax&, Treelog& err) const
 {
-  Treelog::Open nest (err, name);
   bool ok = true;
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (!entries[i]->check (err))
-      ok = false;
+    {
+      TmpStream tmp;
+      tmp () << "entries [" << i << "]: " << entries[i]->tag ();
+      Treelog::Open nest (err, tmp.str ());
+      if (!entries[i]->check (err))
+        ok = false;
+    }
   return ok; 
 }
 

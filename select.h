@@ -30,7 +30,7 @@
 #include <map>
 #include <vector>
 
-class Geometry;
+class Soil;
 class Daisy;
 class Time;
 class Treelog;
@@ -57,7 +57,7 @@ public:
   virtual const std::string& dimension () const;
   virtual symbol tag () const;
   symbol log_name () const;
-  virtual const Geometry* geometry () const; // For array tags.
+  virtual const Soil* soil () const; // For array tags.
   virtual int size () const;	// For array tags.
 
   // Nesting.
@@ -91,7 +91,7 @@ public:
   virtual void output_integer (int);
   virtual void output_name (symbol);
   virtual void output_array (const std::vector<double>&,
-                             const Geometry*, Treelog&);
+                             const Soil*, Treelog&);
   virtual void output_time (const Time&); // Obsolete
 
   // Reset at start of time step.

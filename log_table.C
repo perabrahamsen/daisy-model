@@ -23,7 +23,7 @@
 #include "log_select.h"
 #include "select.h"
 #include "summary.h"
-#include "geometry.h"
+#include "soil.h"
 #include "version.h"
 #include "daisy.h"
 #include "tmpstream.h"
@@ -115,14 +115,14 @@ LogTable::common_done (const Time& time)
 	  if (i != 0)
 	    out << field_separator;
 
-	  const Geometry* geometry = entries[i]->geometry ();
+	  const Soil* soil = entries[i]->soil ();
 	  const int size = entries[i]->size ();
 	  const symbol tag = entries[i]->tag ();
 	  static const symbol empty_symbol ("");
 
-	  if (geometry && size >= 0)
+	  if (soil && size >= 0)
 	    {
-	      if (geometry->size () == size)
+	      if (soil->size () == size)
 		{
 		  // Content.
 		  for (unsigned j = 0; j < size; j++)
@@ -131,10 +131,10 @@ LogTable::common_done (const Time& time)
 			out << array_separator;
 		      if (tag != empty_symbol)
 			out << tag << " @ ";
-		      out << geometry->z (j);
+		      out << soil->z (j);
 		    }
 		}
-	      else if (geometry->size () + 1 == size)
+	      else if (soil->size () + 1 == size)
 		{
 		  // Flux
 		  double last = 0.0;
@@ -146,8 +146,8 @@ LogTable::common_done (const Time& time)
 		      if (tag != empty_symbol)
 			out << tag << " @ ";
 		      out << last;
-		      if (j <  geometry->size ())
-			last = geometry->zplus (j);
+		      if (j <  soil->size ())
+			last = soil->zplus (j);
 		    }
 		}
 	      else
@@ -178,7 +178,7 @@ LogTable::common_done (const Time& time)
 	  if (i != 0)
 	    out << field_separator;
 
-	  const Geometry* geometry = entries[i]->geometry ();
+	  const Soil* soil = entries[i]->soil ();
 	  const int size = entries[i]->size ();
 	  string dimension = entries[i]->dimension ();
 	  if (dimension == Syntax::None () 
@@ -186,7 +186,7 @@ LogTable::common_done (const Time& time)
 	      || dimension == Syntax::Fraction ())
 	    dimension = "";
 
-	  if (geometry && size >= 0)
+	  if (soil && size >= 0)
 	    {
 	      for (unsigned j = 0; j < size; j++)
 		{
@@ -332,10 +332,10 @@ LogTable::add (const symbol value)
   dest_name = value;
 }
 
-bool LogTable::check (const Syntax&, Treelog& msg) const
+bool LogTable::check (const Syntax& syntax, Treelog& msg) const
 { 
   Treelog::Open nest (msg, name);
-  bool ok = true;
+  bool ok = LogSelect::check (syntax, msg);
   if (!out.good ())
     {
       TmpStream tmp;

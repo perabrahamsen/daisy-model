@@ -21,7 +21,7 @@
 
 
 #include "select_value.h"
-#include "geometry.h"
+#include "soil.h"
 #include "mathlib.h"
 #include "tmpstream.h"
 #include "treelog.h"
@@ -32,26 +32,26 @@ struct SelectFluxTop : public SelectValue
 {
   // Content.
   double height;
-  const Geometry* last;
+  const Soil* last;
   int index;
 
   // Output routines.
   void output_array (const vector<double>& array, 
-		     const Geometry* geometry, Treelog& msg)
+		     const Soil* soil, Treelog& msg)
     { 
-    if (geometry != last)
+    if (soil != last)
       {
-        last = geometry;
-        index = geometry->interval_border (height);
+        last = soil;
+        index = soil->interval_border (height);
 
         if ((index == 0 && height < -1e-8)
-            || !approximate (height, geometry->zplus (index-1)))
+            || !approximate (height, soil->zplus (index-1)))
           {
             TmpStream tmp;
             tmp () << "Log column " << name 
                    << ": No interval near from = " << height 
                    << " [cm]; closest match is " 
-                   << ((index == 0) ? 0 : geometry->zplus (index-1))
+                   << ((index == 0) ? 0 : soil->zplus (index-1))
                    << " [cm]";
             msg.warning (tmp.str ());
           }
