@@ -83,6 +83,7 @@
 		   (dimension "mm"))))
 
 ;; Create these log files.
-(output pond Harvest)
+(output pond Harvest
+	(checkpoint (when (at 1987 8 8 8))))
 
 ;;; test.dai ends here.
