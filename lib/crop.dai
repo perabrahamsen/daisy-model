@@ -1,5 +1,21 @@
 ;;; crop.dai -*- lisp -*-
 
-(input file "wwheat.dai")
+(input file "maize.dai")
+(input file "pea.dai")
+(input file "rye.dai")
 (input file "sbarley.dai")
-(input file "grass.dai")
+(input file "sbeet.dai")
+(input file "srape.dai")
+(input file "swheat.dai")
+(input file "wbarley.dai")
+(input file "wrape.dai")
+(input file "wwheat.dai")
+(input file "grass2.dai")
+
+;; Compatibility, remove.
+(defcrop SpringBarley "S.Barley"
+  (Canopy (WLfInit 30)))
+(defcrop Grass "Grass, DS=2"
+  (Canopy (WLfInit 30)))
+
+;;; crop.dai ends here

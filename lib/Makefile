@@ -1,10 +1,14 @@
-DAISY = beet-old.dai crop-old.dai fertilizer.dai grass-old.dai \
-	pea-old.dai potato-old.dai sbarley-old.dai sbarley.dai \
-	srape-old.dai tillage.dai wbarley-old.dai wrape-old.dai \
-	wwheat-old.dai crop.dai wwheat.dai grass.dai log.dai
+OLDCROPS = beet-old.dai grass-old.dai pea-old.dai potato-old.dai \
+	sbarley-old.dai srape-old.dai wbarley-old.dai wrape-old.dai \
+	wwheat-old.dai 
+NEWCROPS = maize.dai pea.dai rye.dai sbarley.dai sbeet.dai srape.dai \
+	swheat.dai wbarley.dai wrape.dai wwheat.dai grass2.dai
+
+DAISY = crop-old.dai crop.dai fertilizer.dai tillage.dai log.dai \
+	$(OLDCROPS) $(NEWCROPS)
 TEXT	= Makefile test.dai
 CLIMATE = weather.clm
-REMOVE = none
+REMOVE = grass.dai
 
 all:
 	echo Nothing to do here.
