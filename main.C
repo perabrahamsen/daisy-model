@@ -15,7 +15,8 @@ main (int argc, char* argv[])
       return 2;
     }
   Syntax syntax;
-  Daisy::load_syntax (syntax);
+  AttributeList alist;
+  Daisy::load_syntax (syntax, alist);
   
   if (strcmp (argv[1], "-p") == 0)
     {
@@ -23,7 +24,6 @@ main (int argc, char* argv[])
       return 0;
     }
   ParserFile parser (syntax, argv[1]);
-  AttributeList alist;
   parser.load (alist);
   if (!syntax.check (alist, "daisy"))
     return 1;

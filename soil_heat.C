@@ -243,6 +243,10 @@ SoilHeat::Implementation::Implementation (const Soil& soil,
   double k = 0;
   double C = 0;
   
+  assert (T.size () > 0);
+  while (T.size () < soil.size () +0U)
+    T.push_back (T[T.size () - 1]);
+
   for (int i = 0; i < soil.size (); i++)
     {
       const double Theta_pF_2_0 = soil.Theta (i, pF_2_0);

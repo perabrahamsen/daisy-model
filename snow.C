@@ -9,6 +9,7 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "mathlib.h"
+#include "mike_she.h"
 
 struct Snow::Implementation
 { 
@@ -247,6 +248,9 @@ Snow::tick (const Soil& soil, const SoilWater& soil_water,
       impl.EvapSnowPack = 0.0;
       impl.q_s = Prain;
     }
+#ifdef MIKE_SHE
+  mike_she->put_snow_height (impl.Ssnow);
+#endif
 }
 
 void 

@@ -12,15 +12,14 @@
 #include "log.h"
 #include "filter.h"
 
-static double f_Theta (double Theta)
+static double f_Theta (double x)
 {
-  // BUG:  Shouldn't this be Theta / Theta_sat?
-  if (Theta < 0.8)
+  if (x < 0.8)
     return 0.0;
-  if (Theta < 0.9)
-    return 2.0 * (Theta - 0.8);
+  if (x < 0.9)
+    return 2.0 * (x - 0.8);
   
-  return 0.2 + 8.0 * (Theta - 0.9);
+  return 0.2 + 8.0 * (x - 0.9);
 }
 
 static double f_T (double T)
@@ -54,7 +53,8 @@ void Denitrification::tick (Soil& soil, SoilWater& soil_water,
       const double CO2 = organic_matter.CO2 (i);
       const double Theta = soil_water.Theta (i);
       const double T = soil_heat.T (i);
-      const double rate = f_Theta (Theta) * f_T (T) * alpha * CO2 ;
+      const double rate = f_Theta (Theta / soil.Theta (i, 0.0)) 
+	* f_T (T) * alpha * CO2 ;
       const double M = min (rate, K * soil_NO3.M_left (i) / dt);
       converted.push_back (M);
     }

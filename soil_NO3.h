@@ -15,8 +15,9 @@ public:
   double M_to_C (const Soil&, double Theta, int i, double M) const;
 
   // Communication.
-  
-  
+  void clear (const Soil&, const SoilWater&);
+  void tick (const Soil&, const SoilWater&, double J_in);
+ 
 public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilNO3 (const Soil&, const SoilWater&, const AttributeList&);

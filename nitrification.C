@@ -15,6 +15,9 @@
 
 static double f_h (double h)
 {
+  if (h >= 0.0)
+    return 0.6;
+
   const double pF = log10 (-h);
 
   if (pF <= 0.0)
@@ -31,6 +34,7 @@ static double f_h (double h)
       
 static double f_T (double T)
 {
+#if 1
   if (T < 2.0)
     return 0.0;
   if (T < 6.0)
@@ -39,7 +43,16 @@ static double f_T (double T)
     return 0.10 * T;
   if (T < 40)
     return exp (0.47 - 0.027 * T + 0.00193 * T * T);
-
+#else
+  if (T < 1.0)
+    return 0.0;
+  if (T < 5.0)
+    return 0.125 * (T - 1.0);
+  if (T < 20.0)
+    return 0.10 * T;
+  if (T < 40)
+    return exp (0.47 - 0.027 * T + 0.00193 * T * T);
+#endif
   assert (0);
 }
 
@@ -62,7 +75,7 @@ void Nitrification::tick (Soil& soil, SoilWater& soil_water,
       const double T = soil_heat.T (i);
       const double rate = k_10 * f_h (h) * f_T (T) * C / (k + C);
       assert (rate >= 0.0);
-      const double M = min (soil_NH4.M (i) * rate, soil_NH4.M_left (i) / dt);
+      const double M = min (rate, soil_NH4.M_left (i) / dt);
       converted.push_back (M);
     }
   soil_NH4.add_to_sink (converted);

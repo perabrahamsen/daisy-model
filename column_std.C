@@ -256,7 +256,7 @@ ColumnStandard::tick (const Time& time,
 {
   // Remove old source sink terms. 
   soil_water.clear ();
-  soil_NO3.clear ();
+  soil_NO3.clear (soil, soil_water);
   soil_NH4.clear ();
   surface.clear ();
   

@@ -12,6 +12,7 @@
 #include "snow.h"
 #include "log.h"
 #include "filter.h"
+#include "mike_she.h"
 
 class Bioclimate::Implementation
 {
@@ -183,6 +184,7 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
   double PotSoilEvaporation = PotEvapotranspiration
     * exp (- EpExtinction * LAI);
   
+  assert (PotSoilEvaporation < 1000.0);
   double PotCanopyEvapotranspiration =
     EpFactor * ref_evapo - PotSoilEvaporation;
   
@@ -218,7 +220,7 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 	     Total_through_fall, weather.Snow (),
 	     temperature, 
 	     PotSoilEvaporation + PotCanopyEvapotranspiration);
-  
+  assert (PotSoilEvaporation < 1000.0);
   if (snow.evaporation () < PotSoilEvaporation)
     PotSoilEvaporation -= snow.evaporation ();
   else
@@ -227,11 +229,11 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 	snow.evaporation () - PotSoilEvaporation;
       PotSoilEvaporation = 0;
     }
-  PotSoilEvaporation -= 
-    surface.evaporation (PotSoilEvaporation, 
-			 snow.percolation (), 
-			 temperature,
-			 soil, soil_water);
+  const double EvapSoilSurface = surface.evaporation (PotSoilEvaporation, 
+						      snow.percolation (), 
+						      temperature,
+						      soil, soil_water);
+  PotSoilEvaporation -= EvapSoilSurface;
 
   PotCanopyEvapotranspiration += PotSoilEvaporation * soil.EpInterchange ();
 
@@ -251,6 +253,11 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 					   soil, soil_water, EvapInterception);
 	}
     }
+#ifdef MIKE_SHE
+  mike_she->put_evap_interception (EvapInterception);
+  mike_she->put_intercepted_water (intercepted_water);
+  mike_she->put_net_precipitation (Total_through_fall);
+#endif
 }
 
 void 

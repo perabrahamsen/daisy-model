@@ -155,6 +155,9 @@ OrganicMatter::Implementation::heat_turnover_factor (double T) const
 double
 OrganicMatter::Implementation::water_turnover_factor (double h) const
 {
+  if (h >= 0.0)
+    return 0.6;
+
   const double pF = log10 (-h);
 
   if (pF <= 0.0)
@@ -273,6 +276,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 
       double N_used = 0.0;
 
+      assert (finite (soil_water.h (i)));
+
       const double abiotic_factor 
 	= heat_turnover_factor (soil_heat.T (i)) 
 	* water_turnover_factor (soil_water.h (i));
@@ -331,13 +336,11 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 	     << C_lost << "\n";
 #endif
 
-#ifdef CHECK_N_USAGE 
       if (N_used > N_soil)
 	{
 	  cerr << "\nBUG: Adding " << N_used - N_soil << " mystery N\n";
 	  N_used = N_soil;
 	}
-#endif
 
       // Update soil solutes.
       if (N_used > NH4)

@@ -332,7 +332,7 @@ Horizon::tortuosity_factor (double Water) const
 double 
 Horizon::K_planar () const
 {
-  return 6.3e-5;
+  return 6.3e-4;
 }
 
 double 
@@ -344,15 +344,15 @@ Horizon::K_edge () const
 double 
 Horizon::v_planar () const
 { 
-  const double S_planar = 5.964; // Maximum specific absorbtion [g / g clay]
-  return S_planar * impl.clay * rho_particle; 
+  const double S_planar = 5.964e-3; // Maximum specific absorbtion [g / g clay]
+  return S_planar * impl.clay * rho_particle * (1 - hydraulic.porosity ()); 
 }
 
 double 
 Horizon::v_edge () const
 {
-  const double S_edge = 0.308;	// Same for edges.
-  return S_edge * impl.clay * rho_particle; 
+  const double S_edge = 0.308e-3;	// Same for edges.
+  return S_edge * impl.clay * rho_particle * (1 - hydraulic.porosity ()); 
 }
 
 const Library&

@@ -1680,9 +1680,22 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   double RM = RMLeaf + RMStem + RMSOrg + RMRoot;
   double AssG, Stress, f_Leaf, f_Stem, f_SOrg, f_Root, DeadRate, DeadLeaf;
     
+#if 1
+  // HSV: Simmulate old daisy where there is no sharing
+  AssG = CrpAux.CanopyAss 
+    * max (0.0, min (1.0, (  (Prod.NCrop - CrpAux.NfNCnt) 
+				      / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+  AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
+  CrpAux.IncWLeaf = Resp.E_Leaf * f_Leaf * AssG - RMLeaf;
+  CrpAux.IncWStem = Resp.E_Stem * f_Stem * AssG - RMStem;
+  CrpAux.IncWSOrg = Resp.E_SOrg * f_SOrg * AssG - RMSOrg;
+  CrpAux.IncWRoot = Resp.E_Root * f_Root * AssG - RMRoot;
+#else
+  // SH: New daisy gives maintenance first.
   if (CrpAux.CanopyAss >= RM)
     {
       AssG = CrpAux.CanopyAss - RM;
+      // SH's original code only has N stress limit growth.
       Stress = max (0.0, min (1.0, (  (Prod.NCrop - CrpAux.NfNCnt) 
 				      / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
       AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
@@ -1734,6 +1747,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 	  AssG = 0.0;
 	}
     }
+#endif
   DeadRate = Partit.LfDR (DS) * bioclimate.AirTemperature ();
   DeadLeaf = DeadRate * Prod.WLeaf;
   CrpAux.IncWLeaf -= DeadLeaf;

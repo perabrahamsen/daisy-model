@@ -8,6 +8,7 @@
 #include "filter.h"
 #include <algobase.h>
 #include <fstream.h>
+#include "mike_she.h"
 
 class WeatherFile : public Weather
 {
@@ -19,15 +20,21 @@ class WeatherFile : public Weather
   const vector<double>& A;
   const vector<double>& B;
 
-  double precipitation;
-  double reference_evapotranspiration;
+#ifdef MIKE_SHE
+#define MUTABLE mutable
+#else
+#define MUTABLE
+#endif
+
+  MUTABLE double precipitation;
+  MUTABLE double reference_evapotranspiration;
   mutable double hourly_reference_evapotranspiration;
   double global_radiation;
   mutable double hourly_global_radiation;
-  double air_temperature;
+  MUTABLE double air_temperature;
 
-  double Prain;
-  double Psnow;
+  mutable double Prain;
+  mutable double Psnow;
 
   int line;
   // Simulation.
@@ -72,6 +79,9 @@ WeatherFile::tick ()
       while (file.good () && strchr ("\n \t", end))
 	file >> end;
       
+      if (!file.good ())
+	THROW ("No more climate data.");
+
       if (end == '\n')
 	reference_evapotranspiration = -42.42e42;
       else
@@ -83,15 +93,6 @@ WeatherFile::tick ()
 	}
       date = Time (year, month, day, 23);
     }
-    
-  if (AirTemperature () < T1)
-    Psnow = Precipitation ();
-  else if (T2 < AirTemperature ())
-    Psnow = 0.0;
-  else
-    Psnow = Precipitation () * (T2 - AirTemperature ()) / (T2 - T1);
-
-  Prain = Precipitation () - Snow ();
 }
 
 void
@@ -122,6 +123,9 @@ WeatherFile::output (const string name, Log& log, const Filter& filter) const
 double
 WeatherFile::AirTemperature (void) const // [C]
 {
+#ifdef MIKE_SHE
+  air_temperature = mike_she->get_air_temperature ();
+#endif
   // BUG: No variation over the day? 
   return air_temperature;
 }
@@ -152,9 +156,14 @@ WeatherFile::GlobalRadiation () const	// [W/m²]
   return hourly_global_radiation;
 }
 
+
 double
 WeatherFile::ReferenceEvapotranspiration () const // [mm/h]
 {
+#ifdef MIKE_SHE
+  reference_evapotranspiration
+    = mike_she->get_reference_evapotranspiration ();
+#endif
   if (reference_evapotranspiration < -1.0e11)
     {
       const double T = 273.16 + AirTemperature ();
@@ -171,18 +180,31 @@ WeatherFile::ReferenceEvapotranspiration () const // [mm/h]
 double
 WeatherFile::Precipitation () const
 {
+
+#ifdef MIKE_SHE
+  precipitation = mike_she->get_precipitation ();
+#endif
   return precipitation / 24.0;
 }
 
 double
 WeatherFile::Rain () const
 {
+  Prain = Precipitation () - Snow ();
+
   return Prain;
 }
 
 double
 WeatherFile::Snow () const
 {
+  if (AirTemperature () < T1)
+    Psnow = Precipitation ();
+  else if (T2 < AirTemperature ())
+    Psnow = 0.0;
+  else
+    Psnow = Precipitation () * (T2 - AirTemperature ()) / (T2 - T1);
+
   return Psnow;
 }
 

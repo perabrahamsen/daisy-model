@@ -33,7 +33,7 @@ public:
 
   // Create and Destroy.
 public:
-  static void load_syntax (Syntax&);
+  static void load_syntax (Syntax&, AttributeList&);
   Daisy (const AttributeList&);
   ~Daisy ();
 };

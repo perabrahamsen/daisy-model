@@ -108,7 +108,6 @@ struct set_sparc_exceptions
   set_sparc_exceptions ()
   {
     set_exceptions(FSR_TEM_DZ);
-    1.0 / 0.0;
   }
 }  set_sparc_exceptions_dummy;
 

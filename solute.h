@@ -16,9 +16,8 @@ struct SoilWater;
 
 class Solute
 {
-  // Content.
   // State variables.
-private:
+protected:
   vector<double> M_;		// Concentration in soil [g / cm³]
   vector<double> C_;		// Concentration in soil solution [g / cm³]
 
@@ -57,7 +56,7 @@ public:
 protected:
   
 public:
-  void tick (const Soil&, const SoilWater&, double J_in);
+  virtual void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
   void output (Log&, const Filter&) const;
   void add (const Soil&, const SoilWater&,

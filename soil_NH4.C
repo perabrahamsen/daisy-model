@@ -9,6 +9,8 @@
 double 
 SoilNH4::beta (const Soil& soil, const SoilWater&, int i, double C) const
 {
+  return 0.0;
+  // BUG BUG BUG
   return soil.v_planar (i) * soil.K_planar (i) / pow (soil.K_planar (i) + C, 2)
        + soil.v_edge (i)   * soil.K_edge (i)   / pow (soil.K_edge (i) + C, 2);
 }
@@ -40,16 +42,23 @@ SoilNH4::M_to_C (const Soil& soil, double Theta, int i, double M) const
   const double vp = soil.v_planar (i);
   const double Kp = soil.K_planar (i);
 
+  double C;
+
   if (M < 1e-6 * min (Ke, Kp))
     // There are numerical problems in the general solution for small M. 
-    return M / (Theta + ve  / Ke + vp / Kp);
-
-  const double a = Theta;
-  const double b = Theta * (Kp + Ke) + vp + ve - M;
-  const double c = vp * Ke + ve * Kp - M * (Kp + Ke) + Kp * Ke * Theta;
-  const double d = - M * Kp * Ke;
+    C = M / (Theta + ve  / Ke + vp / Kp);
+  else
+    {
+      assert (Theta > 0.0);
+      const double a = Theta;
+      const double b = Theta * (Kp + Ke) + vp + ve - M;
+      const double c = vp * Ke + ve * Kp - M * (Kp + Ke) + Kp * Ke * Theta;
+      const double d = - M * Kp * Ke;
     
-  return single_positive_root_of_cubic_equation (a, b, c, d);
+      C = single_positive_root_of_cubic_equation (a, b, c, d);
+    }
+  assert (approximate (M, C_to_M (soil, Theta, i, C)));
+  return C;
 }
 
 void

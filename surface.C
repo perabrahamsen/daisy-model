@@ -8,9 +8,8 @@
 #include "common.h"
 #include "filter.h"
 #include "am.h"
-
-extern double abs (double);
-
+#include "mathlib.h"
+#include "mike_she.h"
 bool 
 Surface::flux_top () const
 {
@@ -81,6 +80,9 @@ void
 Surface::clear ()
 {
   im_flux.clear ();
+#ifdef MIKE_SHE
+  im.NO3 = mike_she->get_surface_no3 ();
+#endif
 }
 
 const IM& 
@@ -99,6 +101,10 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
 
   Eps = PotSoilEvaporation;
 
+#ifdef MIKE_SHE
+  pond = mike_she->get_ponding ();
+#endif
+
   if (pond + water * dt < Eps * dt)
     flux_top_on ();
 
@@ -107,6 +113,20 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
   else
     EvapSoilSurface = Eps;
 
+#ifdef MIKE_SHE
+  if (EvapSoilSurface > pond + water * dt)
+    {
+      mike_she->put_evap_soil_surface (EvapSoilSurface - (pond + water * dt));
+      mike_she->put_evap_pond (pond + water * dt);
+    }
+  else
+    {
+      mike_she->put_evap_soil_surface (0.0);
+      mike_she->put_evap_pond (EvapSoilSurface);
+    }
+  mike_she->put_surface_no3 (im.NO3);
+#endif
+
   if (pond < 1e-6)
     T = temp;
   else
@@ -114,6 +134,7 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
 
   assert (T > -100.0 && T < 50.0);
   pond = pond - EvapSoilSurface * dt + water * dt;
+  assert (EvapSoilSurface < 1000.0);
   return EvapSoilSurface;
 }
 

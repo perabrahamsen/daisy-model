@@ -122,7 +122,7 @@ OM::tick (int i, double abiotic_factor, double N_soil, double& N_used,
   for (int j = 0; j < smb_size; j++)
     tock (i, turnover_rate * abiotic_factor * fractions[j], efficiency[j],
 	  N_soil, N_used, CO2, *smb[j]);
-return;
+#if 1 /* BUG: WHY WHY WHY IS THIS UNCOMMENTED? */
   // Distribute to all soil dk:puljer.
   const int som_size = som.size ();
   for (int j = 0; j < som_size; j++)
@@ -130,6 +130,7 @@ return;
 	  N_soil, N_used, CO2, *som[j]);
   // assert (N_soil * 1.001 >= N_used);
   assert (C[i] >= 0.0);
+#endif
 }
 
 void 
@@ -164,6 +165,7 @@ OM::tock (int i, double rate, double efficiency,
 {
   assert (C[i] >= 0.0);
   assert (finite (rate));
+  assert (rate >=0);
   assert (C_per_N.size () > 0U);
   // assert (N_soil * 1.001 >= N_used);
 
@@ -174,7 +176,7 @@ OM::tock (int i, double rate, double efficiency,
 
   if (N_consume - N_produce > N_soil - N_used
       // && N_soil * 1.001 >= N_used
-      && (N_consume - N_produce) - (N_soil - N_used) > 1.0e-10 // Lose 1 g / m³ / year
+      && (N_consume - N_produce) - (N_soil - N_used) > 1.0e-10 // Lose 1 g / ha / year
       && rate > 0.0)
     {
       // Lower rate to force 
@@ -183,6 +185,8 @@ OM::tock (int i, double rate, double efficiency,
       rate = (N_soil - N_used) 
 	/ (efficiency * C[i] / om.C_per_N[i] - C[i] / C_per_N[i]);
       assert (finite (rate));
+      if (rate < 0)
+	rate = 0;
 
       // Aside: We could also have solved the equation by decresing the 
       // efficiency.
@@ -196,16 +200,21 @@ OM::tock (int i, double rate, double efficiency,
       assert (finite (N_produce));
       assert (finite (N_consume));
       // Check that we calculated the right rate.
-      assert ((N_soil == N_used)
-	      ? (abs (N_consume - N_produce) < 1e-10)
-	      : (abs (1.0 - (N_consume - N_produce) / (N_soil - N_used))
-		 < 0.01));
+      assert ((rate == 0)
+	      ? true 
+	      : ((N_soil == N_used)
+		 ? (abs (N_consume - N_produce) < 1e-10)
+		 : (abs (1.0 - (N_consume - N_produce) / (N_soil - N_used))
+		    < 0.01)));
     }
   // Update.
   const double C_use = C[i] * rate;
   CO2 += C_use * (1.0 - efficiency);
   om.C[i] += C_use * efficiency;
   C[i] -= C_use;
+  assert (om.C[i] >= 0.0);
+  assert (C[i] >= 0.0);
+
   N_used += (N_consume - N_produce);
 
   // Check for NaN.

@@ -9,10 +9,15 @@
 #include "groundwater.h"
 #include "syntax.h"
 #include "mathlib.h"
+#include "mike_she.h"
 
 void
 SoilWater::clear ()
 {
+#ifdef MIKE_SHE
+  mike_she->put_water_sink (S);
+#endif
+
   fill (S.begin (), S.end (), 0.0);
 }
 
@@ -49,6 +54,17 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   Theta_old_ = Theta_;
   h_old = h_;
 
+#ifdef MIKE_SHE
+  mike_she->get_water_pressure (h_);
+  
+  // Update Theta.
+  for(unsigned int i = 0; i < Theta_.size (); i++)
+    Theta_[i] = soil.Theta (i, h_[i]);
+
+  // Flux is unknown.
+  for (unsigned int i = 0; i <= q_.size (); i++)
+    q_[i] = -42.42e42;
+#else
   // Limit for groundwater table.
   int last  = soil.size () - 1;
   if (!groundwater.flux_bottom ())
@@ -90,6 +106,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		 S, h_old, Theta_old_,
 		 h_, Theta_, q_);
     }
+#endif
 }
 
 void 
@@ -177,28 +194,43 @@ SoilWater::SoilWater (const Soil& soil,
 		  ? al.integer ("UZborder")
 		  : -1)
 { 
-  int size = 0;
-  
+  const unsigned int size = soil.size ();
+
   if (al.check ("Theta"))
     {
       Theta_ = al.number_sequence ("Theta");
-      size = Theta_.size ();
+      assert (Theta_.size () > 0);
+      while (Theta_.size () < size)
+	Theta_.push_back (Theta_[Theta_.size () - 1]);
     }
   if (al.check ("h"))
     {
       h_ = al.number_sequence ("h");
-      size = h_.size ();
+      assert (h_.size () > 0);
+      while (h_.size () < size)
+	h_.push_back (h_[h_.size () - 1]);
     }
   if (!al.check ("Theta"))
-    for (int i = 0; i < size; i++)
-      Theta_.push_back (soil.Theta (i, h_[i]));
+    {
+      assert (h_.size () == size);
+      for (unsigned int i = 0; i < size; i++)
+	Theta_.push_back (soil.Theta (i, h_[i]));
+    }
 
   if (!al.check ("h"))
-    for (int i = 0; i < size; i++)
-      h_.push_back (soil.h (i, Theta_[i]));
-
+    {
+      assert (Theta_.size () == size);
+      for (unsigned int i = 0; i < size; i++)
+	h_.push_back (soil.h (i, Theta_[i]));
+    }
   if (al.check ("Xi"))
-    Xi = al.number_sequence ("Xi");
+    {
+      Xi = al.number_sequence ("Xi");
+      if (Xi.size () == 0)
+	Xi.push_back (0.0);
+      while (Xi.size () < size)
+	Xi.push_back (Xi[Xi.size () - 1]);
+    }
   else 
     Xi.insert (Xi.begin (), size, 0.0);
 
