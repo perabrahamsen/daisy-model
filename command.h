@@ -1,0 +1,5 @@
+// command.h
+
+class Command
+{ };
+
