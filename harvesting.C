@@ -479,7 +479,8 @@ Valuable fraction of storage organ (DM), e.g. grain or tuber.");
   syntax.add ("EconomicYield_N", Syntax::None (), Syntax::OptionalConst,
                "Valuable fraction of storage organ (N).\n\
 By default the value for DM is used.");
-  syntax.add ("DSmax", Syntax::None (), Check::positive (), Syntax::Const, "\
+  syntax.add ("DSmax", Syntax::None (), Check::non_negative (), 
+	      Syntax::Const, "\
 Maximal development stage for which the crop survives harvest.");
   alist.add ("DSmax", 0.80);
   static const RangeII range_new (0.0, 1.0);
