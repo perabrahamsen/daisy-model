@@ -1,4 +1,15 @@
+2004-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.50 released.
+
+2004-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (tick): Also zero PotCanopyAss.
+
 2004-09-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (richard): Complain if there is less than 2
+	numerical layers.
 
 	* Version 3.49 released.
 

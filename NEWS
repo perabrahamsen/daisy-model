@@ -12,6 +12,18 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.50
+
+** All crops give lower yields!
+
+A bug in the code caused an underestimation of the leaf respiration.
+You can expect 1 to 5 percent reduction of yields for all existing
+crop parameterizations.
+
+** The file groundwater model give better error message.
+
+This happens if the water table move too high. 
+
 * 3.49
 
 ** test.dai moved to daisy-sample.zip

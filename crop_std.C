@@ -343,7 +343,7 @@ CropStandard::tick (const Time& time,
       production.CH2OPool += Ass;
     }
   else
-      production.CanopyAss = 0.0;
+    production.PotCanopyAss = production.CanopyAss = 0.0;
 
   production.tick (bioclimate.daily_air_temperature (),
 		   soil_heat.T (soil.interval_plus (-root_system.Depth / 3.0)),

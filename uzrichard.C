@@ -130,6 +130,8 @@ UZRichard::richard (Treelog& msg,
   Treelog::Open nest (msg, "UZ Richard");
   // Input variables for solving a tridiagonal matrix.
   const unsigned int size = last - first + 1;
+  if (size < 2)
+    throw ("Richard's equation need at least two numerical layers");
   vector<double> a (size);
   vector<double> b (size);
   vector<double> c (size);
