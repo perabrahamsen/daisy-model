@@ -325,8 +325,6 @@ sequence_number (const string& component, const string& parameterization)
   return -1;
 }
 
-template pair<string, string>;
-
 struct object_desc
 {
   string comp;
