@@ -645,6 +645,15 @@ AttributeList::alist (const string& key) const
   return *value.alist;
 }
 
+AttributeList& 
+AttributeList::alist (const char* key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::AList);
+  assert (!value.is_sequence);
+  return *value.alist;
+}
+
 const vector<double>& 
 AttributeList::number_sequence (const string& key) const
 {
@@ -701,6 +710,15 @@ AttributeList::plf_sequence (const string& key) const
 
 const vector<AttributeList*>& 
 AttributeList::alist_sequence (const string& key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::AList);
+  assert (value.is_sequence);
+  return *value.alist_sequence;
+}
+
+const vector<AttributeList*>& 
+AttributeList::alist_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::AList);

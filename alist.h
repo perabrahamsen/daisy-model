@@ -58,6 +58,7 @@ public:
   bool flag (const string&) const;
   const PLF& plf (const string&) const;
   AttributeList& alist (const string&) const;
+  AttributeList& alist (const char*) const;
   int integer (const string&) const;
   const Time& time (const string&) const;
   const vector<double>& number_sequence (const string&) const;
@@ -67,6 +68,7 @@ public:
   const vector<const Time*>& time_sequence (const string& key) const;
   const vector<const PLF*>& plf_sequence (const string& key) const;
   const vector<AttributeList*>& alist_sequence (const string& key) const;
+  const vector<AttributeList*>& alist_sequence (const char* key) const;
 
   // Create and Destroy.
   void add (const string&, double);
