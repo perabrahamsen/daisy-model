@@ -95,7 +95,6 @@ OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.
   return C_per_N_goal[at];
 }
 
-#if 1
 void
 OM::turnover (const double from_C, const double from_N, 
 	      const double to_C_per_N, const double N_avail,
@@ -145,16 +144,18 @@ OM::turnover (const double from_C, const double from_N,
 }
 
 void
-OM::tock (unsigned int end, const double* factor,
-	  double fraction, double efficiency,
-	  const double* N_soil, double* N_used, double* CO2, OM& om)
+OM::turnover_pool (unsigned int end, const double* factor,
+		   double fraction, double efficiency,
+		   const double* N_soil, double* N_used, double* CO2, OM& om)
 {
   const unsigned int size = min (C.size (), end);
   daisy_assert (N.size () >= size);
-  // Maintenance.
+
+  const double speed = turnover_rate * fraction;
+
   for (unsigned int i = 0; i < size; i++)
     {
-      double rate = min (factor[i] * fraction, 0.1);
+      const double rate = min (factor[i] * speed, 0.1);
       daisy_assert (C[i] >= 0.0);
       daisy_assert (finite (rate));
       daisy_assert (rate >=0);
@@ -167,8 +168,7 @@ OM::tock (unsigned int end, const double* factor,
       double N_consume;
       
       turnover (C[i], N[i], om.goal_C_per_N (i), N_soil[i] - N_used[i],
-		min (factor[i] * fraction, 0.1), efficiency,
-		C_use, N_produce, N_consume);
+		rate, efficiency, C_use, N_produce, N_consume);
 
       // Update C.
       daisy_assert (om.C[i] >= 0.0);
@@ -189,92 +189,24 @@ OM::tock (unsigned int end, const double* factor,
       daisy_assert (N[i] >= 0.0);
     }
 }
-#else
 
 void
-OM::tock (unsigned int end, const double* factor,
-	  double fraction, double efficiency,
-	  const double* N_soil, double* N_used, double* CO2, OM& om)
+OM::turnover_dom (unsigned int size, const double* factor,
+		  double fraction, DOM& dom)
 {
-  const unsigned int size = min (C.size (), end);
-  daisy_assert (N.size () >= size);
-  // Maintenance.
+  const double speed = turnover_rate * fraction;
   for (unsigned int i = 0; i < size; i++)
     {
-      const double N_avail = N_soil[i] - N_used[i];
-      double rate = min (factor[i] * fraction, 0.1);
-      daisy_assert (C[i] >= 0.0);
-      daisy_assert (finite (rate));
-      daisy_assert (rate >=0);
-      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
-      daisy_assert (N[i] >= 0.0);
-      daisy_assert (om.N[i] >= 0.0);
-      daisy_assert (om.C[i] >= 0.0);
-      const double om_C_per_N_goal = om.goal_C_per_N (i);
-      double N_produce = N[i] * rate;
-      double N_consume = C[i] * rate * efficiency / om_C_per_N_goal;
-      daisy_assert (finite (N_produce));
-      daisy_assert (finite (N_consume));
-      if (N_consume - N_produce > N_avail)
-	{
-	  if (N_avail < 1e-12) // Less than 1 [ug/l] to use...
-	    continue;
-
-	  // Lower rate to force 
-	  //   N_consume - N_produce == N_soil - N_used 
-	  // This is what calc tell me:
-	  rate = N_avail / (efficiency * C[i] / om_C_per_N_goal - N[i]);
-	  daisy_assert (finite (rate));
-	  if (rate < 0)
-	    rate = 0;
-
-	  // Aside: We could also have solved the equation by decreasing the 
-	  // efficiency.
-	  //   efficiency = ((N_soil - N_used) + rate * N[i])
-	  //     * om_C_per_N_goal / rate * C[i];
-	  // But we don't
-
-	  // Update the N values.
-	  N_produce = N[i] * rate;
-	  N_consume = C[i] * rate * efficiency / om_C_per_N_goal;
-	  daisy_assert (finite (N_produce));
-	  daisy_assert (finite (N_consume));
-	  // Check that we calculated the right rate.
-	  daisy_assert (approximate (N_consume - N_produce, N_avail));
-
-	  // Upddate N.
-	  N_used[i] = N_soil[i];
-	}
-      else
-	// Upddate N.
-	N_used[i] += (N_consume - N_produce);
-	
-      // Update C.
-      daisy_assert (om.C[i] >= 0.0);
+      const double rate = min (speed * factor[i], 0.1);
       const double C_use = C[i] * rate;
-      CO2[i] += C_use * (1.0 - efficiency);
-      om.C[i] += C_use * efficiency;
+      const double N_use = N[i] * rate;
+      dom.add_to_source (i, C_use, N_use);
       C[i] -= C_use;
-      daisy_assert (om.C[i] >= 0.0);
+      N[i] -= N_use;
       daisy_assert (C[i] >= 0.0);
-
-      // Update N.
-      daisy_assert (om.N[i] >= 0.0);
       daisy_assert (N[i] >= 0.0);
-      om.N[i] += N_consume;
-      N[i] -= N_produce;
-      daisy_assert (om.N[i] >= 0.0);
-      daisy_assert (N[i] >= 0.0);
-      
-      // Check for NaN.
-      daisy_assert (finite (N_used[i]));
-      daisy_assert (finite (rate));
-      daisy_assert (finite (efficiency));
-      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
     }
 }
-
-#endif
 
 void
 OM::tick (unsigned int end, const double* abiotic_factor, 
@@ -294,35 +226,23 @@ OM::tick (unsigned int end, const double* abiotic_factor,
     {
       const double fraction = fractions[j];
       if (fraction > 1e-50)
-	tock (size, abiotic_factor, turnover_rate * fraction, efficiency[j],
-	      N_soil, N_used, CO2, *smb[j]);
+	turnover_pool (size, abiotic_factor, fraction, efficiency[j],
+		       N_soil, N_used, CO2, *smb[j]);
     }
   // Distribute to all soil pools.
   for (unsigned int j = 0; j < som_size; j++)
     {
       const double fraction = fractions[smb_size + j];
       if (fraction > 1e-50)
-	tock (size, abiotic_factor, turnover_rate * fraction, 1.0,
-	      N_soil, N_used, CO2, *som[j]);
+	turnover_pool (size, abiotic_factor, fraction, 1.0,
+		       N_soil, N_used, CO2, *som[j]);
     }
   // Distribute to all dissolved pools.
   for (unsigned int j = 0; j < dom_size; j++)
     {
-      const double factor = turnover_rate * fractions[smb_size + som_size + j];
-      if (factor > 1e-50)
-	{
-	  for (unsigned int i = 0; i < size; i++)
-	    {
-	      const double rate = min (factor * abiotic_factor[i], 0.1);
-	      const double C_use = C[i] * rate;
-	      const double N_use = N[i] * rate;
-	      dom[j]->add_to_source (i, C_use, N_use);
-	      C[i] -= C_use;
-	      N[i] -= N_use;
-	      daisy_assert (C[i] >= 0.0);
-	      daisy_assert (N[i] >= 0.0);
-	    }
-	}
+      const double fraction = fractions[smb_size + som_size + j];
+      if (fraction > 1e-50)
+	turnover_dom (size, abiotic_factor, fraction, *dom[j]);
     }
   for (unsigned int i = 0; i < size; i++)
     {

@@ -24,16 +24,28 @@
 
 #include "om.h"
 
+#include <vector>
+using namespace std;
+
 class SMB : public OM
 { 
   // Content.
 public:
   const double maintenance;	// How fast does it eat itself?
+  vector<double> clay_turnover;	// Clay dependent turnover rate.
+  vector<double> clay_maintenance; // Clay dependent turnover rate.
 
   // Simulation.
 public:
   void maintain (unsigned int end, const double* abiotic_factor, 
 		 double* N_used, double* CO2);
+private:
+  void turnover_pool (unsigned int end, const double* factor,
+		      double fraction, double efficiency,
+		      const double* N_soil, double* N_used, 
+		      double* CO2, OM& om);
+  void turnover_dom (unsigned int size, const double* factor,
+		     double fraction, DOM& dom);
 
   // Create & Destroy.
 public:

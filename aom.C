@@ -170,8 +170,8 @@ AOM::tick (unsigned int end, const double* abiotic_factor,
     {
       const double fraction = fractions[j];
       if (fraction > 1e-50)
-	tock (size, abiotic_factor, turnover_rate * fraction, efficiency[j],
-	      N_soil, N_used, CO2, *smb[j]);
+	turnover_pool (size, abiotic_factor, fraction, efficiency[j],
+		       N_soil, N_used, CO2, *smb[j]);
     }
 
   // Distribute to soil buffer.
@@ -197,21 +197,9 @@ AOM::tick (unsigned int end, const double* abiotic_factor,
   // Distribute to all dissolved pools.
   for (unsigned int j = 0; j < dom_size; j++)
     {
-      const double factor = turnover_rate * fractions[smb_size + 1 + j];
-      if (factor > 1e-50)
-	{
-	  for (unsigned int i = 0; i < size; i++)
-	    {
-	      const double rate = min (factor * abiotic_factor[i], 0.1);
-	      const double C_use = C[i] * rate;
-	      const double N_use = N[i] * rate;
-	      dom[j]->add_to_source (i, C_use, N_use);
-	      C[i] -= C_use;
-	      N[i] -= N_use;
-	      daisy_assert (C[i] >= 0.0);
-	      daisy_assert (N[i] >= 0.0);
-	    }
-	}
+      const double fraction = fractions[smb_size + 1 + j];
+      if (fraction > 1e-50)
+	turnover_dom (size, abiotic_factor, fraction, *dom[j]);
     }
 }
 

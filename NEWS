@@ -12,6 +12,18 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.37
+
+** (OrganicMatter (clay_factor ...)) renamed.
+
+It is now a component.  To get the old behaviour, use
+
+(OrganicMatter (ClayOM old (factor ...)))
+
+** New biomod clayom model.
+
+This is still very experimental.
+
 * 2.36
 
 ** Daisy can now handle dissolved organic matter.

@@ -19,7 +19,6 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #include "organic_matter.h"
 #include "syntax.h"
 #include "alist.h"
@@ -76,7 +75,7 @@ struct OrganicMatter::Implementation
   } buffer;
   const PLF heat_factor;
   const PLF water_factor;
-  const PLF clay_factor;
+  const ClayOM& clayom;
   vector<double> tillage_age;
   const vector<const PLF*> smb_tillage_factor;
   const vector<const PLF*> som_tillage_factor;
@@ -167,7 +166,6 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
   if (C[i] == 0.0)
     return;
 
-#if 1
   double rate;
   if (C[i] < 1e-15)
     rate = 1.0;
@@ -192,50 +190,6 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
   som[where]->N[i] += N_consume;
   N[i] -= N_produce;
   daisy_assert (N[i] >= 0.0);
-#else		     
-  daisy_assert (som[where]->C[i] >= 0.0);
-  daisy_assert (C[i] >= 0.0);
-  daisy_assert (N[i] >= 0.0);
-  const double om_C_per_N_goal = som[where]->goal_C_per_N (i);
-
-  // daisy_assert (N_soil * 1.001 >= N_used);
-  // How much can we process?
-  double rate;
-  if (C[i] < 1e-15)
-    rate = 1.0;
-  else 
-    rate = min (turnover_rate * abiotic_factor, 0.1);
-  double N_need = C[i] * rate / om_C_per_N_goal  - N[i] * rate;
-
-  daisy_assert (finite (rate));
-  daisy_assert (finite (N_need));
-  
-  if (N_need > N_soil - N_used && N[i] > 0.0)
-    {
-      rate = (N_soil - N_used) / (C[i] / om_C_per_N_goal - N[i]);
-      daisy_assert (finite (rate));
-      set_bound (0.0, rate, 1.0);
-      N_need = C[i] * rate / om_C_per_N_goal  - N[i] * rate;
-      daisy_assert (finite (N_need));
-    }
-  // Check for NaN.
-  daisy_assert (finite (rate));
-  daisy_assert (finite (N_need));
-  
-  if (rate > 0.0)
-    {
-      N_used += N_need;
-
-      // Update it.
-      som[where]->C[i] += C[i] * rate;
-      som[where]->N[i] += C[i] * rate / om_C_per_N_goal;
-      C[i] *= (1.0 - rate);
-      N[i] *= (1.0 - rate);
-    }
-  daisy_assert (som[where]->C[i] >= 0.0);
-  daisy_assert (C[i] >= 0.0);
-  daisy_assert (N[i] >= 0.0);
-#endif
 }
 
 void 
@@ -459,10 +413,14 @@ OrganicMatter::Implementation::output (Log& log,
 bool
 OrganicMatter::Implementation::check (Treelog& err) const
 {
+  Treelog::Open nest (err, "OrganicMatter");
+
   bool ok = true;
   for (unsigned int i = 0; i < am.size (); i++)
     if (!am[i]->check (err))
       ok = false;
+  if (!clayom.check (smb, err))
+    ok = false;
   return ok;
 }
 
@@ -516,11 +474,7 @@ OrganicMatter::Implementation::monthly (const Geometry& geometry)
 	new_am.push_back (am[i]);
       else
 	{
-#if 0
-	  am[i]->pour (buffer.C, buffer.N);
-#else
 	  remainder->add (geometry, *am[i]);
-#endif
 	  delete am[i];
 	}
       am[i] = NULL;
@@ -702,33 +656,33 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   for (unsigned int j = 0; j < dom.size (); j++)
       dom[j]->turnover (size,
 			find_abiotic (*dom[j], size, soil_heat, 
-					    temp_factor, tillage_factor),
+				      temp_factor, tillage_factor),
 			&N_soil[0], &N_used[0], &CO2[0], smb);
 
-  { 
-    const double *const abiotic 
-      = find_abiotic (*smb[0], size, soil_water, soil_heat,
-		      smb_tillage_factor, 0,
-		      clay_factor, true, tillage_factor);
-    smb[0]->maintain (size, abiotic, &N_used[0], &CO2[0]);
-    smb[0]->tick (size, abiotic, &N_soil[0], &N_used[0], &CO2[0],
-		  smb, som, dom);
-  }
-  for (unsigned int j = 1; j < smb.size (); j++)
+  for (unsigned int j = 0; j < smb.size (); j++)
     {
+      const bool use_clay = clayom.smb_use_clay (j);
+      const vector<double>& default_factor = 
+	use_clay ? clay_factor : abiotic_factor;
       const double *const abiotic 
 	= find_abiotic (*smb[j], size, soil_water, soil_heat,
 			smb_tillage_factor, j,
-			abiotic_factor, false, tillage_factor);
+			default_factor, use_clay, tillage_factor);
       smb[j]->maintain (size, abiotic, &N_used[0], &CO2[0]);
       smb[j]->tick (size, abiotic, &N_soil[0], &N_used[0], &CO2[0],
 		    smb, som, dom);
     }
   for (unsigned int j = 0; j < som.size (); j++)
-    som[j]->tick (size, find_abiotic (*som[j], size, soil_water, soil_heat,
-				      som_tillage_factor, j,
-				      clay_factor, true, tillage_factor),
-		  &N_soil[0], &N_used[0], &CO2[0], smb, som, dom);
+    {
+      const bool use_clay = clayom.som_use_clay (j);
+      const vector<double>& default_factor = 
+	use_clay ? clay_factor : abiotic_factor;
+      som[j]->tick (size, find_abiotic (*som[j], size, soil_water, soil_heat,
+					som_tillage_factor, j,
+					default_factor, use_clay, 
+					tillage_factor),
+		    &N_soil[0], &N_used[0], &CO2[0], smb, som, dom);
+    }
 
   for (unsigned int j = 0; j < added.size (); j++)
     added[j]->tick (size, find_abiotic (*added[j],
@@ -909,8 +863,8 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 
   // Clay.
   for (unsigned int i = 0; i < soil.size (); i++)
-    clay_turnover_factor.push_back (clay_factor (soil.clay (i)));
-  
+    clay_turnover_factor.push_back (clayom.factor (soil.clay (i)));
+
   // Tillage.
   tillage_age.insert (tillage_age.end (), 
 		      soil.size () - tillage_age.size (), 1000000.0);
@@ -1106,6 +1060,9 @@ Using initial C per N for remaining entries");
 				 old_C_per_N));
     }
 
+  //clay affect or SMB turnover and mantenance.
+  clayom.set_rates (soil, smb);
+
   // Initialize DOM.
   for (unsigned int pool = 0; pool < dom_size; pool++)
     dom[pool]->initialize (soil, soil_water, err);
@@ -1135,7 +1092,7 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     buffer (al.alist ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
-    clay_factor (al.plf ("clay_factor")),
+    clayom (Librarian<ClayOM>::create (al.alist ("ClayOM"))),
     smb_tillage_factor (al.plf_sequence ("smb_tillage_factor")),
     som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
     min_AM_C (al.number ("min_AM_C")),
@@ -1152,6 +1109,7 @@ OrganicMatter::Implementation::~Implementation ()
   sequence_delete (smb.begin (), smb.end ());
   sequence_delete (som.begin (), som.end ());
   sequence_delete (dom.begin (), dom.end ());
+  delete &clayom;
 }
 
 void 
@@ -1607,13 +1565,15 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const, "\
 Default water potential factor, used if not specified by OM pool.");
   alist.add ("water_factor", empty);
-  syntax.add ("clay_factor", Syntax::Fraction (), Syntax::None (), 
-	      Syntax::Const, "Clay fraction factor.");
-  PLF clay;
-  clay.add (0.00, 1.0);
-  clay.add (0.25, 0.5);
-  clay.add (1.00, 0.5);
-  alist.add ("clay_factor", clay);
+  syntax.add ("ClayOM", Librarian<ClayOM>::library (), "Clay effect model.");
+  AttributeList clay_alist;
+  clay_alist.add ("type", "old");
+  PLF clay_factor;
+  clay_factor.add (0.00, 1.0);
+  clay_factor.add (0.25, 0.5);
+  clay_factor.add (1.00, 0.5);
+  clay_alist.add ("factor", clay_factor);
+  alist.add ("ClayOM", clay_alist);
   syntax.add ("tillage_age", "days", Syntax::OptionalState, Syntax::Sequence,
 	      "Time since the latest tillage operation was performed."); 
   syntax.add ("smb_tillage_factor", "days", Syntax::None (), 

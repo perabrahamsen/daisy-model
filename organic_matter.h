@@ -23,7 +23,7 @@
 #ifndef ORGANIC_MATTER_H
 #define ORGANIC_MATTER_H
 
-#include "common.h"
+#include "clayom.h" // Must be included here to ensure correct initialization.
 
 class AttributeList;
 class Syntax;

@@ -67,10 +67,13 @@ public:
 			double rate, const double efficiency,
 			double& C_use, double& N_produce, double& N_consume);
 protected:
-  void tock (unsigned int size, const double* rate,
-	     double factor, double efficiency, 
-	     const double* N_soil, double* N_used,
-	     double* CO2, OM& om);
+  virtual void turnover_pool (unsigned int end, const double* factor,
+			      double fraction, double efficiency,
+			      const double* N_soil, double* N_used, 
+			      double* CO2, OM& om);
+  virtual void turnover_dom (unsigned int size, const double* factor,
+			     double fraction, DOM& dom);
+
 public:
   void tick (unsigned int size, const double* turnover_factor, 
 	     const double* N_soil, double* N_used,
@@ -87,7 +90,7 @@ public:
 protected:
   static void load_syntax (Syntax&, AttributeList&);
   OM (const AttributeList& al);
-  ~OM ();
+  virtual ~OM ();
 };
 
 #endif // OM_H
