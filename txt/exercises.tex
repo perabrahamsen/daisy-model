@@ -674,7 +674,7 @@ build as illustrated in box~\ref{box:rotation}.
 ;; Spring Barley setup for an arable farm rotation.
 (defaction sbarley_A_F_R activity
   (wait_mm_dd 3 20)(plowing)
-  (wait_mm_dd 4 05)(fertilize N25S (weight 121 [kg N/ha])) 
+  (wait_mm_dd 4 05)(fertilize (N25S (weight 121 [kg N/ha])))
   (seed_bed_preparation)(sow "Spring Barley")
   (wait (or (crop_ds_after "Spring Barley" 2.0)(mm_dd 08 30)))
   (harvest "Spring Barley" (stub 8 [cm])(stem 1.0 [])(leaf 1.0 [])))
@@ -771,7 +771,9 @@ information see \daisyref{} and \daisytut{}.
 \begin{verbatim}
 ;; Defining a pig slurry where 5% of the ammonium content is lost at 
 ;; pplication (defam = defining added matter)
-(defam "Slurry_Vol05%" pig_slurry ldotsldotsldotsldotsldots)
+(defam "Slurry_Vol05%" pig_slurry 
+  ;; Other parameters.
+)
 
 ;; Spring Barley setup for a pig farm rotation.
 (defaction sbarley_P_F_R activity
@@ -804,9 +806,9 @@ initial conditions.
 
 Repeat the simulation of exercise~\ref{ex:organic} with the
 modification that a warm-up period is inserted in front of the
-simulation (1993--1997). It is a rule of thump to select one rotation
+simulation (1994--1998). It is a rule of thump to select one rotation
 or at least 4 years of simulation as a warm-up period. Hence in the
-present case the simulation should begin January 1$^{st}$ 1988. Be
+present case the simulation should begin January 1$^{st}$ 1989. Be
 sure to repeat the rotation; an example can be found in
 section~\ref{tut-sec:rotations} of \daisytut{}.
 
@@ -829,8 +831,8 @@ often give a reasonable initializatin and hence a reasonable
 N-mineralization.  However this can be fine tuned by introducing the
 \texttt{background\_mineralization} init parameter, like this:
 \begin{verbatim}
-       (OrganicMatter (init (input 3000 [kg C/ha/y]))
-                      (background_mineralization 30 [kg N/ha/y]))
+       (OrganicMatter (init (input 3000 [kg C/ha/y])
+                            (background_mineralization 30 [kg N/ha/y])))
 \end{verbatim}
 Daisy will then attempt to initialize the organic matter pools so the
 total mineralization is 30 kg N/ha/y higher than the amount of organic

@@ -70,14 +70,6 @@ for them:
 \item[Note] You can have any number of these, but they must come in
   sequence.  That is, no other keywords between two notes.  You can
   have any text after the keyword. 
-\item[NH4WetDep] NH$_4$ deposition in precipitation, given in
-  \texttt{[ppm]}.
-\item[NH4DryDep] NH$_4$ deposition from air, given in
-  \texttt{[kgN/year]}. 
-\item[NO3WetDep] NO$_3$ deposition in precipitation, given in
-  \texttt{[ppm]}. 
-\item[NO3DryDep] NO$_3$ deposition from air, given in
-  \texttt{[kgN/year]}. 
 \item[TAverage] Average temperature for the location, given in
   \texttt{[dgC]}. 
 \item[TAmplitude] Amplitude of yearly temperature variation, given in
@@ -85,6 +77,32 @@ for them:
 \item[MaxTDay] The Julian day with the highest temperature (on
   average), given in \texttt{[yday]}.
 \end{description}
+There are two wayes of specifying deposition.  Directly
+\begin{description}
+\item[NH4WetDep] NH$_4$ deposition in precipitation, given in
+  \texttt{[ppm]}.
+\item[NH4DryDep] NH$_4$ deposition from air, given in
+  \texttt{[kgN/year]}.
+\item[NO3WetDep] NO$_3$ deposition in precipitation, given in
+  \texttt{[ppm]}.
+\item[NO3DryDep] NO$_3$ deposition from air, given in
+  \texttt{[kgN/year]}.
+\end{description}
+Or alternatively, indirectly
+\begin{description}
+\item[Deposition] Total yearly deposition, given in \texttt{[kgN/year]}.
+\item[PAverage] Total yearly precipitation, given in \texttt{[mm]}.
+\item[DepDry] Dry fraction of total deposition (from air).  By
+  default 40\%.  The remainder will fall with the precipitation.
+\item[DepDryNH4] Fraction of NH$_4$ in deposition from air.  By
+  default 60\%.  The remainder will fall in the form of NO$_3$.
+\item[DepWetNH4] Fraction of NH$_4$ in deposition from rain and
+  snow.  By default 50\%.  The remainder will fall in the form of
+  NO$_3$.
+\end{description}
+You cannot specify both.  If you use the indirect specification,
+these numbers will be used for calculating the equivalents of the
+direct specification of deposition.
 
 After the keywords there should be a line consisting solely of
 hyphens.  It marks the beginning of the data section.  The lines in
