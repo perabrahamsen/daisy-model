@@ -1439,6 +1439,48 @@
 		  (dimension "cm3/cm3"))))
 
 
+(deflog "Fertilizer" table
+  (description "Track applied fertilizer.
+This does *not* include deposition or irrigation!")
+  (entries (year (path time))
+	   (month (path time))
+	   (number (path column "$col" fertilized_NO3)
+		   (when hourly)
+		   (tag "NO3")
+		   (dimension "kg N/ha"))
+	   (number (path column "$col" fertilized_NH4)
+		   (when hourly)
+		   (tag "NH4")
+		   (dimension "kg N/ha"))
+	   (number (path column "$col" fertilized_Org_N)
+		   (when hourly)
+		   (tag "Org_N")
+		   (dimension "kg N/ha"))
+	   (number (path column "$col" fertilized_Org_C)
+		   (when hourly)
+		   (tag "Org_C")
+		   (dimension "kg C/ha"))
+	   (number (path column "$col" fertilized_DM)
+		   (when hourly)
+		   (tag "DM")
+		   (dimension "ton DM/ha"))
+	   (number (path column "$col" first_year_utilization)
+		   (when hourly)
+		   (tag "1stYear")
+		   (dimension "kg N/ha"))
+	   (number (path column "$col" second_year_utilization)
+		   (tag "2ndYear")
+		   (dimension "kg N/ha"))))
+
+(deflog "Fertilizer Monthly" "Fertilizer"
+  (where "fertilizer_monthly.dlf")
+  (when monthly))
+
+(deflog "Fertilizer Yearly" "Fertilizer"
+  (where "fertilizer_yearly.dlf")
+  (when yearly))
+
+
 (deflog "Harvest" harvest)
 
 ;;; log.dai ends here
