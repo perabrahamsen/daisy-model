@@ -74,10 +74,19 @@ HydraulicM_BaC::M (double h) const
 double 
 HydraulicM_BaC::Se (double h) const
 {
+  double result;
+
   if (h < h_b)
-    return pow (h_b / h, lambda);
+    result = pow (h_b / h, lambda);
   else
-    return 1;
+    result = 1;
+  
+  if (result <= 0.0)
+    {
+      CERR << "Se (" << h << ") = " << result << "; lambda = " << lambda
+	   << "; h_b = " << h_b << "\n;";
+    }
+  return result;
 }
 
 HydraulicM_BaC::HydraulicM_BaC (const AttributeList& al)
