@@ -7,10 +7,12 @@
 #include <string>
 
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
+struct istream;
+struct ostream;
 namespace std 
 { 
-  struct istream;
-  struct ostream;
+  typedef istream istream;
+  typedef ostream ostream;
 }
 #else
 #include <iosfwd>
