@@ -1,5 +1,7 @@
 ;;; test.dai -- Sample file using the Daisy libraries.
 
+(description "Simulation for use in tutorial.")
+
 ;; Use standard parameterizations.
 (input file "tillage.dai")
 (input file "crop.dai")
@@ -9,7 +11,7 @@
 (weather default "weather.dwf")
 
 ;; We have some very sandy soil.
-(defhorizon top default
+(defhorizon Ap default
   (clay 8.0 [])
   (silt 10.5 [])
   (coarse_sand 63.4 [])
@@ -17,18 +19,19 @@
   (humus 1.12 [])
   (SOM_fractions 0.66 0.34 []))
 
-(defhorizon bottom top
-  (humus 0.12 [])			;Less humus.
-  (SOM_fractions 0.80 0.20 []))		;Slower background mineralization.
+(defhorizon C Ap
+  (humus 0.12 [])                     ;Less humus.
+  (SOM_fractions 0.80 0.20 []))       ;Slower background mineralization.
 
 ;; We build the column from the horizons.
 (defcolumn Andeby default
-  (Soil (horizons (-20 [cm] top) (-2.5 [m] bottom))
-	(zplus -2.5 -5 -10 -15 -20
-	       -25 -30 -40 -50 -60 -70
-	       -80 -90 -100 -125 -150 -175
-	       -200 -225 -250 [cm])
-	(MaxRootingDepth 60.0 [cm]))
+  "The B.And farm, Andeby, 2002."
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (zplus -2.5 -5 -10 -15 -20
+               -25 -30 -40 -50 -60 -70
+               -80 -90 -100 -125 -150 -175
+               -200 -225 -250 [cm])
+        (MaxRootingDepth 60.0 [cm]))
   (Groundwater deep))
 
 ;; Use it.
@@ -41,31 +44,34 @@
   (wait (at 1987 3 20 1))
   (plowing)
   (wait (at 1987 4 4 1))
-  (fertilize mineral 
-	     (weight 100.0 [kg N/ha])
-	     (NH4_fraction 0.5 []))
+  (fertilize mineral
+             (weight 100.0 [kg N/ha])
+             (NH4_fraction 0.5 []))
   (wait (at 1987 4 5 1))
-  (progn 
+  (progn
     (sow "Grass")
     (sow "Spring Barley"))
   (wait (or (crop_ds_after "Spring Barley" 2.0)
-	    (at 1987 9 5 1)))
+            (at 1987 9 5 1)))
   (harvest "Spring Barley")
   (wait (at 1987 9 8 1))
   (fertilize mineral
-	     (weight 80.0 [kg N/ha])
-	     (NH4_fraction 0.5 []))
+             (weight 80.0 [kg N/ha])
+             (NH4_fraction 0.5 []))
   (wait (at 1987 10 10 1))
   (harvest "Grass"
-	   (stub 8.0 [cm])		;Leave 8 cm stub.
-	   (stem 1.00 []))	       ;Harvest everything above stub.
+           (stub 8.0 [cm])              ;Leave 8 cm stub.
+           (stem 1.00 []))             ;Harvest everything above stub.
   (wait (at 1988 4 1 1))
   (stop))
 
 ;; Create these log files.
-(output Harvest
-	"N Balance"
-	("Crop Production" (set "$crop" "Spring Barley"))
-	(checkpoint (when (at 1987 8 8 8))))
+(output harvest
+        ("N Balance" (when monthly)
+                     (from 0 [m]) (to -1 [m]))
+        ("Crop Production"
+         (set "$crop" "Spring Barley")
+         (where "sbarley.dlf"))
+        (checkpoint (when (at 1987 8 7 6))))
 
 ;;; test.dai ends here.

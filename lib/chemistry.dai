@@ -46,4 +46,12 @@
   (diffusion_coefficient 4.6e-6)	; (cm2/s)
   (solute (adsorption linear (K_OC 20)))) ; (ml/g) (koc=20)
 
+(defchemical Pendimethalin default
+  (canopy_dissipation_rate_coefficient 0.0083) ; (h-1)
+  (canopy_washoff_coefficient 100.0)	; (mm-1)??
+  (crop_uptake_reflection_factor 1)	; (-)
+  (decompose_rate 0.0004)		; 
+  (diffusion_coefficient 4.6e-6)	; (cm2/s)
+  (solute (adsorption linear (K_OC 16000))))
+
 ;;; chemestry.dai ends here.

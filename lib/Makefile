@@ -1,14 +1,15 @@
 OLDCROPS = beet-old.dai grass-old.dai pea-old.dai potato-old.dai \
 	sbarley-old.dai srape-old.dai wbarley-old.dai wrape-old.dai \
 	wwheat-old.dai 
-NEWCROPS = maize.dai pea.dai rye.dai sbarley.dai sugarbeet.dai srape.dai \
+NEWCROPS = potato.dai \
+	maize.dai pea.dai rye.dai sbarley.dai sugarbeet.dai srape.dai \
 	swheat.dai wbarley.dai wrape.dai wwheat.dai grass.dai fodderbeet.dai
 
-DAISY 	= vegetation.dai \
+DAISY 	= log-old.dai crop-old.dai vegetation.dai \
 	crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS)
 MSHE	= mshe.dai mshe-standalone.dai
-TEXT	= Makefile test.dai
+TEXT	= Makefile test.dai all.dai 
 CLIMATE = weather.dwf
 REMOVE 	=  cutgrass.dai 
 

@@ -1,0 +1,61 @@
+;;; log-old.dai --- Old log file parameterizations.
+;;
+;; This file contains log parameterizations we no longer want to
+;; present to new users, but nonetheles may still be in use by old
+;; setups.
+;;
+;; Use it if fixing the setups is too much work.
+
+(input file "log.dai")
+
+(deflog "Soil Content 0-10 cm" "Total Soil Content"
+  (where "soil_content_00-10.dlf")
+  (from   0)
+  (to   -10))
+
+(deflog "Soil Content 10-20 cm" "Total Soil Content"
+  (where "soil_content_10-20.dlf")
+  (from -10)
+  (to   -20))
+
+(deflog "Soil Content 20-30 cm" "Total Soil Content"
+  (where "soil_content_20-30.dlf")
+  (from -20)
+  (to   -30))
+
+(deflog "Soil Content 30-40 cm" "Total Soil Content"
+  (where "soil_content_30-40.dlf")
+  (from -30)
+  (to   -40))
+
+(deflog "Soil Content 40-50 cm" "Total Soil Content"
+  (where "soil_content_40-50.dlf")
+  (from -40)
+  (to   -50))
+
+(deflog "Soil Content 50-60 cm" "Total Soil Content"
+  (where "soil_content_50-60.dlf")
+  (from -50)
+  (to   -60))
+
+(deflog "Soil Content 60-70 cm" "Total Soil Content"
+  (where "soil_content_60-70.dlf")
+  (from -60)
+  (to   -70))
+
+(deflog "Soil Content 70-80 cm" "Total Soil Content"
+  (where "soil_content_70-80.dlf")
+  (from -70)
+  (to   -80))
+
+(deflog "Soil Content 80-90 cm" "Total Soil Content"
+  (where "soil_content_80-90.dlf")
+  (from -80)
+  (to   -90))
+
+(deflog "Soil Content 90-100 cm" "Total Soil Content"
+  (where "soil_content_90-100.dlf")
+  (from -90)
+  (to  -100))
+
+;;; log-old.dai ends here.

@@ -1,0 +1,13 @@
+;;; all.dai --- Include all standard Daisy parameterizations.
+
+(input file "crop.dai")
+(input file "crop-old.dai")
+(input file "log.dai")
+(input file "fertilizer.dai")
+(input file "tillage.dai")
+(input file "chemistry.dai")
+(input file "vegetation.dai")
+
+;;; all.dai ends here.
+
+
