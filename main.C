@@ -18,6 +18,8 @@ main (int argc, char* argv[])
       pair<Log*, const AttributeList*> init = parse (syntax, argc, argv);
       Daisy daisy (*init.first, *init.second);
       daisy.run ();
+      delete init.first;
+      delete init.second;
 #ifdef HANDLE_EXCEPTIONS
     }
   catch (const Usage& usage)
