@@ -307,11 +307,29 @@ Select::Implementation::initialize (const string_map& conv,
       new_dim += timestep;
     else
       new_dim += dimension[i];
-  dimension = new_dim;
 
   // Attempt to find convertion with new dimension.
-  if (spec && !spec_conv && Units::can_convert (spec_dim, dimension))
-    spec_conv = &Units::get_convertion (spec_dim, dimension);
+  if (spec && !spec_conv)
+    {
+      if (Units::can_convert (spec_dim, new_dim))
+	spec_conv = &Units::get_convertion (spec_dim, new_dim);
+      else
+	{
+	  // Try with 'h' for timestep.
+	  string hour_dim;
+	  for (unsigned int i = 0; i < dimension.length (); i++)
+	    if (dimension[i] == '&')
+	      hour_dim += "h";
+	    else
+	      hour_dim += dimension[i];
+
+	  if (Units::can_convert (spec_dim, hour_dim))
+	    spec_conv = &Units::get_convertion (spec_dim, hour_dim);
+	}
+    }
+
+  // Use new dimension.
+  dimension = new_dim;
 }
 
 bool 

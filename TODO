@@ -1,10 +1,43 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* DOM.
+* DOM
 
-** Make OM::tock a static function, takes C and N args.
+** Testkørsel
 
-** Implement DOM::turnover ()
+** Test mange DOM med forskellig C/N mod en DOM med snit C/N
+
+** Snak P med Birgitte
+
+** Fosfat PO4---
+
+* Check af PLF'er.
+
+** LeafAIMod skal altid være > 0.0
+
+* Biomod
+
+** Fordel C/N mellem AOM1 og AOM2 som func. af N/C forhold.
+
+C/N skal være ens i begge puljer.
+
+** Lav AM om til et rigtigt komponent?  Planterest model?
+
+** To stk lerfunktioner.
+
+Den "normale" lerfunktion skal påvirke begge smb puljer.
+
+Den anden ser sådan her ud:
+
+  f1 * r_s = r
+
+  m + d = c
+  d / (m + d) = r
+
+f1 er lerfunktionen.
+r_s er en konstant
+c er en konstant.
+m er maintenance
+d er death rate (== turnover rate)
 
 * User Manual
 

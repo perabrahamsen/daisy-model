@@ -382,10 +382,11 @@ CropStandard::harvest (const string& column_name,
 	    development.DS = harvesting.DSnew;
 	  
 	  // Cut canopy.
-	  canopy.cut (development.DS, stub_length);
+	  canopy.cut (production.WStem, development.DS, stub_length);
+
 	  daisy_assert (approximate (canopy.CropHeight (production.WStem,
-						  development.DS), 
-			       canopy.Height));
+							development.DS), 
+				     canopy.Height));
 	  canopy.CropCAI (production.WLeaf, production.WSOrg,
 			  production.WStem, development.DS);
 	  CanopyStructure ();

@@ -68,6 +68,18 @@ public:
 };
 
 void 
+DOM::Element::output (Log& log) const
+{
+  log.output ("M", M);
+  log.output ("C", C);
+  log.output ("S", S);
+  log.output ("S_p", S_p);
+  log.output ("S_drain", S_drain);
+  log.output ("J", J);
+  log.output ("J_p", J_p);
+}
+
+void 
 DOM::Element::mix (const Soil& soil, const SoilWater& soil_water, 
 		   Adsorption& adsorption,
 		   double from, double to)
@@ -85,18 +97,6 @@ DOM::Element::swap (const Soil& soil, const SoilWater& soil_water,
   soil.swap (M, from, middle, to);
   for (unsigned int i = 0; i < C.size (); i++)
     C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
-}
-
-void 
-DOM::Element::output (Log& log) const
-{
-  log.output ("M", M);
-  log.output ("C", C);
-  log.output ("S", S);
-  log.output ("S_p", S_p);
-  log.output ("S_drain", S_drain);
-  log.output ("J", J);
-  log.output ("J_p", J_p);
 }
 
 void 
@@ -181,7 +181,7 @@ A single element in a Dissolved Organic Matter pool.");
   syntax.add ("C", "g/cm^3", Syntax::LogOnly, Syntax::Sequence,
 	      "Concentration in water.");
   syntax.add ("S", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "Source term.");
+	      "Combined source term.");
   syntax.add ("S_p", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Source term (macropore transport only).");
   syntax.add ("S_drain", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -246,7 +246,7 @@ DOM::swap (const Soil& soil, const SoilWater& soil_water,
   N.swap (soil, soil_water, adsorption, from, middle, to);
 }
 
-double 
+void
 DOM::add_to_source (unsigned int at, double to_C, double to_N)
 {
   C.S[at] += to_C;
@@ -261,6 +261,14 @@ double
 DOM::soil_N (const Geometry& geometry) const
 { return geometry.total (N.M); }
 
+double
+DOM::C_source (const Geometry& geometry) const
+{ return geometry.total (C.S); }
+
+double
+DOM::N_source (const Geometry& geometry) const
+{ return geometry.total (N.S); }
+
 double 
 DOM::C_at (unsigned int at) const
 { return C.M[at]; }
@@ -269,12 +277,77 @@ double
 DOM::N_at (unsigned int at) const
 { return N.M[at]; }
 
+void
+DOM::clear ()
+{
+  // Clear sources.
+  fill (C.S.begin (), C.S.end (), 0.0);
+  fill (N.S.begin (), N.S.end (), 0.0);
+}
+
 void 
-DOM::turnover (unsigned int size, const double* turnover_factor, 
+DOM::turnover (unsigned int end, const double* turnover_factor, 
 	       const double* N_soil, double* N_used,
 	       double* CO2, const vector<SMB*>& smb)
 {
-  
+  // Find size.
+  const unsigned int size = min (C.M.size (), end);
+  daisy_assert (N.M.size () >= size);
+  const unsigned int smb_size = smb.size ();
+  daisy_assert (fractions.size () == smb_size);
+  // Distribute to all biological pools.
+  for (unsigned int j = 0; j < smb_size; j++)
+    {
+      const double fraction = fractions[j];
+      if (fraction > 1e-50)
+	tock (size, turnover_factor, turnover_rate * fraction, efficiency[j],
+	      N_soil, N_used, CO2, *smb[j]);
+    }
+}
+
+void
+DOM::tock (unsigned int end, 
+	   const double* factor, double fraction, double efficiency,
+	   const double* N_soil, double* N_used, double* CO2, OM& om)
+{
+  const unsigned int size = min (C.M.size (), end);
+  daisy_assert (N.M.size () >= size);
+
+  for (unsigned int i = 0; i < size; i++)
+    {
+      double rate = min (factor[i] * fraction, 0.1);
+      daisy_assert (C.M[i] >= 0.0);
+      daisy_assert (finite (rate));
+      daisy_assert (rate >=0);
+      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
+      daisy_assert (N.M[i] >= 0.0);
+      daisy_assert (om.N[i] >= 0.0);
+      daisy_assert (om.C[i] >= 0.0);
+      double C_use;
+      double N_produce;
+      double N_consume;
+      
+      OM::turnover (C.M[i], N.M[i], om.goal_C_per_N (i), N_soil[i] - N_used[i],
+		    min (factor[i] * fraction, 0.1), efficiency,
+		    C_use, N_produce, N_consume);
+      add_to_source (i, -C_use, -N_produce);
+
+      // Update C.
+      daisy_assert (om.C[i] >= 0.0);
+      CO2[i] += C_use * (1.0 - efficiency);
+      om.C[i] += C_use * efficiency;
+      daisy_assert (om.C[i] >= 0.0);
+      daisy_assert (C.M[i] >= 0.0);
+
+      // Update N.
+      N_used[i] += (N_consume - N_produce);
+      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
+      daisy_assert (om.N[i] >= 0.0);
+      daisy_assert (N.M[i] >= 0.0);
+      om.N[i] += N_consume;
+      daisy_assert (om.N[i] >= 0.0);
+      daisy_assert (N.M[i] >= 0.0);
+    }
 }
 
 void 

@@ -95,6 +95,102 @@ OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.
   return C_per_N_goal[at];
 }
 
+#if 1
+void
+OM::turnover (const double from_C, const double from_N, 
+	      const double to_C_per_N, const double N_avail,
+	      double rate, const double efficiency,
+	      double& C_use, double& N_produce, double& N_consume)
+{
+  // Full turnover.
+  N_produce = from_N * rate;
+  N_consume = from_C * rate * efficiency / to_C_per_N;
+
+  // Is there enough N?
+  if (N_consume - N_produce < N_avail)
+    {
+      // Yes.  We are done.
+      C_use = from_C * rate;
+      return;
+    }
+  
+  // Is there any N?
+  if (N_avail < 1e-12) // Less than 1 [ug/l] to use...
+    {
+      // Nope.  Prevent turnover entirely.
+      N_produce = N_consume = C_use = 0;
+      return;
+    }
+
+  // Lower rate to force 
+  //   N_consume - N_produce == N_avail
+  // This is what calc tell me:
+  rate = N_avail / (efficiency * from_C / to_C_per_N - from_N);
+  daisy_assert (finite (rate));
+  if (rate < 0)
+    rate = 0;
+
+  // Aside: We could also have solved the equation by decreasing the 
+  // efficiency.
+  //   efficiency = (N_avail + rate * from_N) * to_C_per_N / rate * from_C;
+  // But we don't
+
+  // Update the N and C fluxes.
+  N_produce = from_N * rate;
+  N_consume = from_C * rate * efficiency / to_C_per_N;
+  C_use = from_C * rate;
+
+  // Check that we calculated the right rate.
+  daisy_assert (approximate (N_consume - N_produce, N_avail));
+}
+
+void
+OM::tock (unsigned int end, const double* factor,
+	  double fraction, double efficiency,
+	  const double* N_soil, double* N_used, double* CO2, OM& om)
+{
+  const unsigned int size = min (C.size (), end);
+  daisy_assert (N.size () >= size);
+  // Maintenance.
+  for (unsigned int i = 0; i < size; i++)
+    {
+      double rate = min (factor[i] * fraction, 0.1);
+      daisy_assert (C[i] >= 0.0);
+      daisy_assert (finite (rate));
+      daisy_assert (rate >=0);
+      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
+      daisy_assert (N[i] >= 0.0);
+      daisy_assert (om.N[i] >= 0.0);
+      daisy_assert (om.C[i] >= 0.0);
+      double C_use;
+      double N_produce;
+      double N_consume;
+      
+      turnover (C[i], N[i], om.goal_C_per_N (i), N_soil[i] - N_used[i],
+		min (factor[i] * fraction, 0.1), efficiency,
+		C_use, N_produce, N_consume);
+
+      // Update C.
+      daisy_assert (om.C[i] >= 0.0);
+      CO2[i] += C_use * (1.0 - efficiency);
+      om.C[i] += C_use * efficiency;
+      C[i] -= C_use;
+      daisy_assert (om.C[i] >= 0.0);
+      daisy_assert (C[i] >= 0.0);
+
+      // Update N.
+      N_used[i] += (N_consume - N_produce);
+      daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
+      daisy_assert (om.N[i] >= 0.0);
+      daisy_assert (N[i] >= 0.0);
+      om.N[i] += N_consume;
+      N[i] -= N_produce;
+      daisy_assert (om.N[i] >= 0.0);
+      daisy_assert (N[i] >= 0.0);
+    }
+}
+#else
+
 void
 OM::tock (unsigned int end, const double* factor,
 	  double fraction, double efficiency,
@@ -127,8 +223,7 @@ OM::tock (unsigned int end, const double* factor,
 	  // Lower rate to force 
 	  //   N_consume - N_produce == N_soil - N_used 
 	  // This is what calc tell me:
-	  rate = (N_soil[i] - N_used[i]) 
-	    / (efficiency * C[i] / om_C_per_N_goal - N[i]);
+	  rate = N_avail / (efficiency * C[i] / om_C_per_N_goal - N[i]);
 	  daisy_assert (finite (rate));
 	  if (rate < 0)
 	    rate = 0;
@@ -178,6 +273,8 @@ OM::tock (unsigned int end, const double* factor,
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
     }
 }
+
+#endif
 
 void
 OM::tick (unsigned int end, const double* abiotic_factor, 

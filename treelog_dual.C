@@ -61,7 +61,7 @@ struct TreelogDual::Implementation
     if (one)
       {
 	if (!one->good ())
-	  two << "Problems writing `" << file << "' in '" << directory << "\n";
+	  two << "Problems writing '" << file << "' in '" << directory << "\n";
 	else
 	  two << "Wrote '" << file << "' in '" << directory << "'\n";
 	delete one;

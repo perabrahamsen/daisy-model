@@ -29,6 +29,9 @@ struct Units::Content
   typedef map<string, Convert*, less<string>/**/> to_type;
   typedef map<string, to_type, less<string>/**/> table_type;
   table_type table;
+
+  static bool time_match (const string& from, const string& to);
+  static const string crop_time (const string&);
   
   double convert (const string& from, const string& to, double value) const;
   bool can_convert (const string& from, const string& to) const;
@@ -39,6 +42,41 @@ struct Units::Content
   ~Content ();
 };  
 
+bool				// True iff FROM and TO have same time unit.
+Units::Content::time_match (const string& from, const string& to)
+{
+  const int from_size = from.size ();
+  const int to_size = to.size ();
+
+  for (int i = 1; true; i++)
+    {
+      if (i > from_size || i > to_size)
+	return false;
+
+      const char from_c = from[from_size - i];
+      const char to_c = to[to_size - i];
+      
+      if (from_c != to_c)
+	return false;
+      
+      if (from_c == '/')
+	return true;
+    }
+}
+
+const string			// Return DIM without time.
+Units::Content::crop_time (const string& dim)
+{
+  daisy_assert (dim.size () > 0);
+  int end = dim.size () - 1;
+  for (end = dim.size () - 1; dim[end] != '/'; end--)
+    daisy_assert (end > 0);
+  string result;
+  for (int i = 0; i < end; i++)
+    result += dim[i];
+  return result;
+}
+
 double 
 Units::Content::convert (const string& from, const string& to, 
 			 double value) const
@@ -46,16 +84,12 @@ Units::Content::convert (const string& from, const string& to,
   if (from == to)
     return value;
 
-  table_type::const_iterator i = table.find (from);
-  if (i == table.end ())
-    throw string ("'") + from + "' unknown dimension, expected '" + to + "'";
-  to_type::const_iterator j = (*i).second.find (to);
-  if (j == (*i).second.end ())
-    throw string ("Cannot convert '") + from + "' to '" + to + "'";
-  if (!(*j).second->valid (value))
+  const Units::Convert& conv = get_convertion (from, to);
+
+  if (!conv.valid (value))
     throw string ("invalid value");
 
-  return (*j).second->operator() (value);
+  return conv (value);
 }
 
 bool 
@@ -64,13 +98,14 @@ Units::Content::can_convert (const string& from, const string& to) const
   if (from == to)
     return true;
 
-  table_type::const_iterator i = table.find (from);
-  if (i == table.end ())
-    return false;
-  to_type::const_iterator j = (*i).second.find (to);
-  if (j == (*i).second.end ())
-    return false;
-
+  try 
+    {
+      get_convertion (from, to);
+    }
+  catch (...)
+    {
+      return false;
+    }
   return true;
 }
 
@@ -81,15 +116,16 @@ Units::Content::can_convert (const string& from, const string& to,
   if (from == to)
     return true;
 
-  table_type::const_iterator i = table.find (from);
-  if (i == table.end ())
-    return false;
-  to_type::const_iterator j = (*i).second.find (to);
-  if (j == (*i).second.end ())
-    return false;
-  if (!(*j).second->valid (value))
-    return false;
-
+  try 
+    {
+      const Units::Convert& conv = get_convertion (from, to);
+      if (!conv.valid (value))
+	return false;
+    }
+  catch (...)
+    {
+      return false;
+    }
   return true;
 }
 
@@ -107,7 +143,22 @@ Units::Content::get_convertion (const string& from, const string& to) const
 
   table_type::const_iterator i = table.find (from);
   if (i == table.end ())
-    throw string ("'") + from + "' unknown dimension, expected '" + to + "'";
+    {
+      // We check if we can convert without time.
+      if (time_match (from, to))
+	{
+	  const string from_c = crop_time (from);
+	  table_type::const_iterator i_c = table.find (from_c);
+	  if (i_c != table.end ())
+	    {
+	      const string to_c = crop_time (to);
+	      to_type::const_iterator j_c = (*i_c).second.find (to_c);
+	      if (j_c != (*i_c).second.end ())
+		return *(*j_c).second;
+	    }
+	}
+      throw string ("'") + from + "' unknown dimension, expected '" + to + "'";
+    }
   to_type::const_iterator j = (*i).second.find (to);
   if (j == (*i).second.end ())
     throw string ("Cannot convert '") + from + "' to '" + to + "'";
@@ -220,6 +271,9 @@ Units::multiply (const string& one, const string& two)
     { "g/cm^3", "cm", "g/cm^2" },
     { "g C/cm^3", "cm", "g C/cm^2" },
     { "g N/cm^3", "cm", "g N/cm^2" },
+    { "g/cm^3/h", "cm", "g/cm^2/h" },
+    { "g C/cm^3/h", "cm", "g C/cm^2/h" },
+    { "g N/cm^3/h", "cm", "g N/cm^2/h" },
   };
   
   for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)
@@ -260,6 +314,7 @@ Units::standard_conversions ()
   add ("cm", "mm", 10.0);
   add ("g/cm^2", "kg/ha", 1e5);	// Pesticides.
   add ("g/cm^2", "kg N/ha", 1e5); // Inorganic N.
+  add ("g/cm^2", "kg C/ha", 1e5); // DOM.
   add ("g N/cm^2", "kg N/ha", 1e5); // Organic N.
   add ("g C/cm^2", "kg C/ha", 1e5);
   add ("g/cm^3", "mg/l", 1e6);

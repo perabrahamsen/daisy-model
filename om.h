@@ -62,17 +62,20 @@ public:
   double soil_C (const Geometry& geometry) const;
   double soil_N (const Geometry& geometry) const;
   double goal_C_per_N (unsigned int at) const; // Desired C/N ratio.
-
-public:
-  void tick (unsigned int size, const double* turnover_factor, 
-	     const double* N_soil, double* N_used,
-	     double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
-	     const vector<DOM*>& dom); // Used by SMB and SOM, but not AOM.
+  static void turnover (const double from_C, const double from_N, 
+			const double to_C_per_N, const double N_avail,
+			double rate, const double efficiency,
+			double& C_use, double& N_produce, double& N_consume);
 protected:
   void tock (unsigned int size, const double* rate,
 	     double factor, double efficiency, 
 	     const double* N_soil, double* N_used,
 	     double* CO2, OM& om);
+public:
+  void tick (unsigned int size, const double* turnover_factor, 
+	     const double* N_soil, double* N_used,
+	     double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
+	     const vector<DOM*>& dom); // Used by SMB and SOM, but not AOM.
 
   // Utilities.
 public:

@@ -55,7 +55,7 @@ public:
 
   // Functions.
 public:
-  double CropHeight (double Wstem, double DS) const;
+  double CropHeight (double WStem, double DS) const;
   double DS_at_height (double height) const;
 private:
   void InitialCAI (double WLeaf, double DS);
@@ -65,7 +65,7 @@ public:
 
   // Simulation.
 public:
-  void cut (double DS, double stub_length);
+  void cut (double WStem, double DS, double stub_length);
   void tick (double WLeaf, double WSOrg, double WStem, double DS);
   void output (Log&) const;
 

@@ -12,9 +12,13 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.35
+
+** fertilized NH4 in log files now include NH4 lost to volatilization.
+
 * 2.33
 
-** More internal changes in organic matter... beware
+** More internal changes in organic matter... beware.
 
 * 2.32
 

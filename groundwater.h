@@ -47,8 +47,7 @@ public:
 			     vector<double>& h_ice,
 			     vector<double>& Theta,
 			     vector<double>& q,
-			     vector<double>& q_p,
-			     Treelog&);
+			     vector<double>& q_p);
   virtual void output (Log&) const;
 
   // Accessors.

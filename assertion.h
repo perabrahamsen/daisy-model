@@ -24,11 +24,15 @@
 #ifndef ASSERTION_H
 #define ASSERTION_H
 
+#include <string>
+using namespace std;
+
 class Treelog;
 
 namespace Assertion
 {
   void failure (const char* file, int line, const char* fun, const char* test);
+  void bug (const char* file, int line, const char* fun, const string& msg);
   class Register
   {
     Treelog& treelog;
@@ -42,10 +46,12 @@ namespace Assertion
 #define daisy_assert(condition) \
   while (!(condition)) \
     Assertion::failure (__FILE__, __LINE__, NULL, #condition)
+#define daisy_bug(msg) Assertion::bug (__FILE__, __LINE__, NULL, msg)
 #else
 #define daisy_assert(condition) \
   while (!(condition)) \
     Assertion::failure (__FILE__, __LINE__, __FUNCTION__, #condition)
+#define daisy_bug(msg) Assertion::bug (__FILE__, __LINE__, __FUNCTION__, msg)
 #endif
 
 #endif // ASSERTION_H

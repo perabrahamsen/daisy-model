@@ -1,3 +1,54 @@
+2002-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.35 released.
+
+2002-07-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_std.C (cut): Take WStem parameter.
+	* crop_std.C (harvest): Update caller.
+
+	* hydraulic_B_C.C, hydraulic_M_C.C (b): Fixed range.
+
+2002-06-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/pea.dai, lib/srape.dai (LeafAIMod): Comment out.
+
+	* dom.C, dom.h (C_source, N_source): New functions.
+	(C_drain, N_drain): Removed.
+	* organic_matter.C (tick): Use them
+	* organic_matter.C (tick): Removed DOM transport.
+	* organic_matter.C, organic_matter.h (transport): New function.
+	* column_std.C (tick): Call it.
+
+2002-06-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* assertion.C, assertion.h (bug): New member function.
+	* assertion.h (daisy_bug): New macro.
+	* groundwater_pipe.C: Use them.
+	* groundwater.C, groundwater.h (update_water): Don't take Treelog
+	argument. 
+	* soil_water.C (tick): Update caller.
+
+2002-06-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* dom.C: More work.
+	* organic_matter.C (tick): Fix caller.
+
+	* units.C: Allow conversions to ignore identical timestep.
+	* select.C (initialize): Try conversion with 'h' as timestep.
+
+	* lib/log.dai ("DOM Pools"): New log model.
+
+2002-06-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Organic Matter"): Removed DOM.
+
+2002-06-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* dom.C (tock): New function.
+	(turnover): Call it.  Take new soil and soil water arguments.
+	* organic_matter.C (tick): Update caller.
+
 2002-06-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.34 released.

@@ -1,3 +1,4 @@
+// hydraulic_B_C.C -- Campbell retention curve model with Burdine theory.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -18,11 +19,8 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-//
-// Campbell retention curve model with Burdine theory.
-
 #include "hydraulic.h"
-#include "check_range.h"
+#include "check.h"
 
 class HydraulicB_C : public Hydraulic
 {
@@ -125,8 +123,7 @@ Note:  Theta_res must be zero for this model.");
       Hydraulic::load_syntax (syntax, alist);
       syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 		  "Bubbling pressure.");
-      static RangeEI b_range (0.0, 1.0);
-      syntax.add ("b", Syntax::None (), b_range, Syntax::Const,
+      syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 		  "Campbell parameter.");
       syntax.add ("K_sat", "cm/h", Check::positive (), Syntax::Const,
 		  "Water conductivity of saturated soil.");

@@ -38,7 +38,6 @@ Assertion::failure (const char* file, int line, const char* fun,
   tmp () << file << ":" << line << ": assertion '" << test << "' failed";
   if (fun)
     tmp () << " in " << fun;
-  tmp () << "\n";
   
   for (unsigned int i = 0; i < logs.size (); i++)
     {
@@ -46,6 +45,22 @@ Assertion::failure (const char* file, int line, const char* fun,
       logs[i]->flush ();
     }
   exit (3);
+};
+
+void 
+Assertion::bug (const char* file, int line, const char* fun,
+		const string& msg)
+{
+  TmpStream tmp;
+  tmp () << file << ":" << line << ": Daisy bug: '" << msg << "'";
+  if (fun)
+    tmp () << " in " << fun;
+  
+  for (unsigned int i = 0; i < logs.size (); i++)
+    {
+      logs[i]->error (tmp.str ());
+      logs[i]->flush ();
+    }
 };
 
 Assertion::Register::Register (Treelog& log)

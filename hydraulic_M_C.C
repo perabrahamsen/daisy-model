@@ -23,7 +23,7 @@
 // Campbell retention curve model with Mualem theory.
 
 #include "hydraulic.h"
-#include "check_range.h"
+#include "check.h"
 
 class HydraulicM_C : public Hydraulic
 {
@@ -126,8 +126,7 @@ Note:  Theta_res must be zero for this model.");
     Hydraulic::load_syntax (syntax, alist);
     syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 		"Bubbling pressure.");
-    static RangeEI b_range (0.0, 1.0);
-    syntax.add ("b", Syntax::None (), b_range, Syntax::Const,
+    syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 		"Campbell parameter.");
     syntax.add ("K_sat", "cm/h", Check::positive (), Syntax::Const,
 		"Water conductivity of saturated soil.");

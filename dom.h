@@ -65,15 +65,23 @@ public:
   void mix (const Soil&, const SoilWater&, double from, double to);
   void swap (const Soil&, const SoilWater& soil_water,
 	     double from, double middle, double to);
-  double add_to_source (unsigned int at, double C, double N);
+  void add_to_source (unsigned int at, double C, double N);
   double soil_C (const Geometry& geometry) const;
   double soil_N (const Geometry& geometry) const;
+  double C_source (const Geometry& geometry) const;
+  double N_source (const Geometry& geometry) const;
   double C_at (unsigned int at) const;
   double N_at (unsigned int at) const;
 public:
+  void clear ();
   void turnover (unsigned int size, const double* turnover_factor, 
 		 const double* N_soil, double* N_used,
 		 double* CO2, const vector<SMB*>& smb);
+private:
+  void tock (unsigned int end,
+	     const double* factor, double fraction, double efficiency,
+	     const double* N_soil, double* N_used, double* CO2, OM& om);
+public:
   void transport (const Soil&, const SoilWater&, Treelog&);
 
   // Create & Destroy.

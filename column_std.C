@@ -196,7 +196,9 @@ ColumnStandard::fertilize (const AttributeList& al)
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
   second_year_utilization_ += AM::second_year_utilization (al);
-  volatilization += AM::get_volatilization (al);
+  const double lost_NH4 = AM::get_volatilization (al);
+  volatilization += lost_NH4;
+  
 
   // Add inorganic matter.
   IM im (al);
@@ -204,7 +206,7 @@ ColumnStandard::fertilize (const AttributeList& al)
   daisy_assert (im.NO3 >= 0.0);
   surface.fertilize (im);
   fertilized_NO3 += im.NO3 / conv; 
-  fertilized_NH4 += im.NH4 / conv;
+  fertilized_NH4 += im.NH4 / conv + lost_NH4;
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
@@ -392,6 +394,7 @@ ColumnStandard::tick (Treelog& out,
   soil_water.tick (soil, soil_heat, surface, groundwater, out);
   soil_chemicals.tick (soil, soil_water, soil_heat, &organic_matter,
 		       surface.chemicals_down (), out);
+  organic_matter.transport (soil, soil_water, out);
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3, out);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4, out);
   
@@ -549,7 +552,8 @@ The denitrification process.",
     syntax.add ("fertilized_NO3", "kg N/ha", Syntax::LogOnly,
 		"Amount of nitrate applied this time step.");
     syntax.add ("fertilized_NH4", "kg N/ha", Syntax::LogOnly,
-		"Amount of ammonium applied this time step.");
+		"Amount of ammonium applied this time step.\n\
+This included ammonium lost due to volatilization.");
     syntax.add ("fertilized_Org_N", "kg N/ha", Syntax::LogOnly,
 		"Amount of organic bound nitrogen applied this time step.");
     syntax.add ("fertilized_Org_C", "kg C/ha", Syntax::LogOnly,

@@ -251,8 +251,7 @@ SoilWater::tick (const Soil& soil, const SoilHeat& soil_heat,
   // Update flux in surface and groundwater.
   surface.update_water (soil, S_sum_, h_, Theta_, q_, q_p_);
   groundwater.update_water (soil, soil_heat,
-			    S_sum_, S_drain_, h_, h_ice_, Theta_, q_, q_p_,
-			    msg);
+			    S_sum_, S_drain_, h_, h_ice_, Theta_, q_, q_p_);
 }
 
 void 

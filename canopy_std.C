@@ -153,6 +153,7 @@ CanopyStandard::CanopyStructure (double DS)
 	    Need = Area;
 
 	  daisy_assert (Need <= Area);
+	  daisy_assert (Need > 0);
 
 	  if (Area - Need > z2 - z1)
 	    // We have to move z1 beyond z2.
@@ -207,10 +208,10 @@ CanopyStandard::CanopyStructure (double DS)
 }
 
 void
-CanopyStandard::cut (double DS, double stub_length)
+CanopyStandard::cut (double WStem, double DS, double stub_length)
 {
-  Height = min (stub_length, Height);
-  Offset = Height - HvsDS (DS);
+  Offset = min (stub_length, Height) - HvsDS (DS);
+  Height = CropHeight (WStem, DS);
 }
 
 void

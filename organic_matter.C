@@ -118,6 +118,7 @@ struct OrganicMatter::Implementation
 			      vector<double>& scratch) const;
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
 	     SoilNO3&, SoilNH4&, Treelog& msg);
+  void transport (const Soil&, const SoilWater&, Treelog&);
   void mix (const Soil&, const SoilWater&, 
 	    double from, double to, double penetration, 
 	    const Time& time);
@@ -163,6 +164,35 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 					     double N_soil, double& N_used,
 					     const vector<SOM*>& som)
 {
+  if (C[i] == 0.0)
+    return;
+
+#if 1
+  double rate;
+  if (C[i] < 1e-15)
+    rate = 1.0;
+  else 
+    rate = min (turnover_rate * abiotic_factor, 0.1);
+  
+  double C_use;
+  double N_produce;
+  double N_consume;
+
+  OM::turnover (C[i], N[i], som[where]->goal_C_per_N (i),
+		N_soil - N_used, rate, 1.0,
+		C_use, N_produce, N_consume);
+
+  // Update C.
+  som[where]->C[i] += C_use;
+  C[i] -= C_use;
+  daisy_assert (C[i] >= 0.0);
+  
+  // Update N.
+  N_used += (N_consume - N_produce);
+  som[where]->N[i] += N_consume;
+  N[i] -= N_produce;
+  daisy_assert (N[i] >= 0.0);
+#else		     
   daisy_assert (som[where]->C[i] >= 0.0);
   daisy_assert (C[i] >= 0.0);
   daisy_assert (N[i] >= 0.0);
@@ -205,6 +235,7 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
   daisy_assert (som[where]->C[i] >= 0.0);
   daisy_assert (C[i] >= 0.0);
   daisy_assert (N[i] >= 0.0);
+#endif
 }
 
 void 
@@ -627,6 +658,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   fill (NO3_source.begin (), NO3_source.end (), 0.0);
   fill (NH4_source.begin (), NH4_source.end (), 0.0);
   top_CO2 = 0.0;
+  for (unsigned int j = 0; j < dom.size (); j++)
+    dom[j]->clear ();
 
   // Setup arrays.
   unsigned int size = soil.size ();
@@ -667,12 +700,11 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   // Main processing.
   for (unsigned int j = 0; j < dom.size (); j++)
-    {
-      dom[j]->turnover (size, find_abiotic (*dom[j], size, soil_heat, 
+      dom[j]->turnover (size,
+			find_abiotic (*dom[j], size, soil_heat, 
 					    temp_factor, tillage_factor),
 			&N_soil[0], &N_used[0], &CO2[0], smb);
-      dom[j]->transport (soil, soil_water, msg);
-    }
+
   { 
     const double *const abiotic 
       = find_abiotic (*smb[0], size, soil_water, soil_heat,
@@ -744,25 +776,34 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     tillage_age[i] += 1.0/24.0;
 
   // Mass balance.
-  const double new_N = total_N (soil);
+  double N_to_DOM = 0.0;
+  for (int j = 0; j < dom.size (); j++)
+    N_to_DOM += dom[j]->N_source (soil) * dt;
+  const double new_N = total_N (soil) + N_to_DOM;
   const double delta_N = old_N - new_N;
   const double N_source = soil.total (NO3_source) + soil.total (NH4_source);
-  if (!approximate (delta_N, N_source) && !approximate (old_N, new_N, 1e-10))
+
+  if (!approximate (delta_N, N_source)
+      && !approximate (old_N, new_N, 1e-10))
     {
       TmpStream tmp;
-      tmp () << "BUG: OrganicMatter: delta_N != NO3 + NH4 [g N/cm^2]\n"
+      tmp () << "BUG: OrganicMatter: delta_N != NO3 + NH4[g N/cm^2]\n"
 	     << delta_N << " != " << soil.total (NO3_source)
 	     << " + " << soil.total (NH4_source);
       if (N_source != 0.0)
 	tmp () << " (error " 
-	       << fabs (delta_N / N_source - 1.0) * 100.0 << "%)";
+	       << fabs (delta_N / (N_source) - 1.0) * 100.0 << "%)";
       msg.error (tmp.str ());
     }
-  const double new_C = total_C (soil);
+  double C_to_DOM = 0.0;
+  for (int j = 0; j < dom.size (); j++)
+    C_to_DOM += dom[j]->C_source (soil) * dt;
+  const double new_C = total_C (soil) + C_to_DOM;
   const double delta_C = old_C - new_C;
   const double C_source = soil.total (CO2) + top_CO2;
   
-  if (!approximate (delta_C, C_source) && !approximate (old_C, new_C, 1e-10))
+  if (!approximate (delta_C, C_source)
+      && !approximate (old_C, new_C, 1e-10))
     {
       TmpStream tmp;
       tmp () << "BUG: OrganicMatter: "
@@ -780,6 +821,15 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     }
 }
       
+void 
+OrganicMatter::Implementation::transport (const Soil& soil, 
+					  const SoilWater& soil_water, 
+					  Treelog& msg)
+{
+  for (unsigned int j = 0; j < dom.size (); j++)
+    dom[j]->transport (soil, soil_water, msg);
+}
+
 void 
 OrganicMatter::Implementation::mix (const Soil& soil,
 				    const SoilWater& soil_water,
@@ -1106,9 +1156,7 @@ OrganicMatter::Implementation::~Implementation ()
 
 void 
 OrganicMatter::monthly (const Geometry& geometry)
-{
-  impl.monthly (geometry); 
-}
+{ impl.monthly (geometry); }
 
 void 
 OrganicMatter::tick (const Soil& soil, 
@@ -1117,27 +1165,27 @@ OrganicMatter::tick (const Soil& soil,
 		     SoilNO3& soil_NO3,
 		     SoilNH4& soil_NH4,
 		     Treelog& msg)
-{
-  impl.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg);
-}
+{ impl.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg); }
+
+void 
+OrganicMatter::transport (const Soil& soil, 
+			  const SoilWater& soil_water, 
+			  Treelog& msg)
+{ impl.transport (soil, soil_water, msg); }
 
 void 
 OrganicMatter::mix (const Soil& soil,
 		    const SoilWater& soil_water,
 		    double from, double to, double penetration, 
 		    const Time& time)
-{
-  impl.mix (soil, soil_water, from, to, penetration, time);
-}
+{ impl.mix (soil, soil_water, from, to, penetration, time); }
 
 void 
 OrganicMatter::swap (const Soil& soil,
 		     const SoilWater& soil_water,
 		     double from, double middle, double to, 
 		     const Time& time)
-{
-  impl.swap (soil, soil_water, from, middle, to, time);
-}
+{ impl.swap (soil, soil_water, from, middle, to, time); }
 
 double
 OrganicMatter::CO2 (unsigned int i) const
@@ -1152,9 +1200,7 @@ OrganicMatter::get_smb_c_at (unsigned int i) const
 
 void 
 OrganicMatter::output (Log& log, const Geometry& geometry) const
-{
-  impl.output (log, geometry);
-}
+{ impl.output (log, geometry); }
 
 bool
 OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
