@@ -560,9 +560,9 @@ AM::initialize (const Geometry& geometry)
   else if (syntax == "root")
     {
       // Get paramters.
-      const double weight = alist.number ("weight"); // Kg DM /m²
+      const double weight = alist.number ("weight"); // T DM / ha
       const double total_C_fraction = alist.number ("total_C_fraction");
-      const double C = weight * 1000.0 / (100.0 * 100.0)
+      const double C = weight * 1000.0*1000.0 / (100.0*100.0*100.0*100.0)
 	* total_C_fraction; // g C / cm²;
       const double k = M_LN2 / alist.number ("dist");
       const double depth = alist.number ("depth");
@@ -570,7 +570,7 @@ AM::initialize (const Geometry& geometry)
       // Calculate density.
       vector<double> density (geometry.size (), 0.0);
       for (unsigned int i = 0; 
-	   i < geometry.size () && geometry.z (i) > -depth;
+	   i < geometry.size () && geometry.z (i) > depth;
 	   i++)
 	{
 	  density[i] = k * exp (k * geometry.z (i));
@@ -644,6 +644,20 @@ static bool check_organic (const AttributeList& al)
   if (!ok)
     CERR << "in am\n";
   
+  return ok;
+}
+
+static bool check_root (const AttributeList& al)
+{ 
+  assert (al.name ("syntax") == "root");
+  
+  bool ok = true;
+
+  non_positive (al.number ("depth"), "depth", ok);
+  non_negative (al.number ("dist"), "dist", ok);
+  non_negative (al.number ("weight"), "weight", ok);
+  is_fraction (al.number ("total_C_fraction"), "total_C_fraction", ok);
+
   return ok;
 }
 
@@ -762,6 +776,7 @@ uniformly distributed in each layer.");
       // Root initialization,
       {
 	Syntax& syntax = *new Syntax ();
+	syntax.add_check (check_root);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "Initialization of old root remains.");
 	syntax.add ("creation", Syntax::Date, Syntax::State,

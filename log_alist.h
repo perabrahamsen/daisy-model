@@ -10,7 +10,8 @@ struct LogAList : public Log
 {
   // Filter functions.
   bool check (const string&, bool) const;
-  bool check_derived (const string&, const Library&) const;
+  bool check_entry (const string&, const Library&) const;
+  bool check_derived (const string&, const string&, const Library&) const;
 
   // Content.
   bool is_active;		// ... store the answer here.

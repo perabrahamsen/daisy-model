@@ -149,7 +149,9 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all components of some library.
 #
-COMPONENTS = log_harvest.C action_while.C action_wait.C action_activity.C \
+COMPONENTS = select_content.C select_interval.C select_flux.C \
+	select_number.C select_date.C select_array.C log_table.C \
+	log_harvest.C action_while.C action_wait.C action_activity.C \
 	average_arithmetic.C average_harmonic.C average_geometric.C \
 	mactrans_std.C macro_std.C macro_none.C document_LaTeX.C \
 	column_std.C  weather_simple.C uzrichard.C \
@@ -166,7 +168,7 @@ COMPONENTS = log_harvest.C action_while.C action_wait.C action_activity.C \
 	adsorption_none.C tortuosity_M_Q.C tortuosity_linear.C \
 	adsorption_freundlich.C adsorption_linear.C adsorption_langmuir.C \
 	bioclimate_std.C condition_crop.C \
-	condition_soil.C log_table.C log_checkpoint.C weather_hourly.C \
+	condition_soil.C log_table1.C log_checkpoint.C weather_hourly.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
 	pet_makkink.C pet_weather.C pet_PM.C pt_std.C action_spray.C \
@@ -174,7 +176,7 @@ COMPONENTS = log_harvest.C action_while.C action_wait.C action_activity.C \
 
 # Select the C files with a corresponding header file from the library.
 #
-INTERFACES = average.C mactrans.C macro.C \
+INTERFACES = log_select.C select.C average.C mactrans.C macro.C \
 	document.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
 	csmp.C time.C uzmodel.C parser_file.C hydraulic.C \
@@ -410,6 +412,10 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+log_select${OBJ}: log_select.C log_select.h log.h librarian.h library.h \
+ common.h alist.h syntax.h select.h condition.h
+select${OBJ}: select.C select.h librarian.h library.h common.h alist.h \
+ syntax.h condition.h geometry.h
 average${OBJ}: average.C average.h librarian.h library.h common.h alist.h \
  syntax.h
 mactrans${OBJ}: mactrans.C mactrans.h librarian.h library.h common.h \
@@ -554,6 +560,20 @@ soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  organic_matter.h chemical.h chemicals.h log.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h submodel.h
 submodel${OBJ}: submodel.C submodel.h common.h
+select_content${OBJ}: select_content.C select.h librarian.h library.h \
+ common.h alist.h syntax.h geometry.h
+select_interval${OBJ}: select_interval.C select.h librarian.h library.h \
+ common.h alist.h syntax.h geometry.h
+select_flux${OBJ}: select_flux.C select.h librarian.h library.h common.h \
+ alist.h syntax.h geometry.h
+select_number${OBJ}: select_number.C select.h librarian.h library.h \
+ common.h alist.h syntax.h
+select_date${OBJ}: select_date.C select.h librarian.h library.h common.h \
+ alist.h syntax.h
+select_array${OBJ}: select_array.C select.h librarian.h library.h common.h \
+ alist.h syntax.h
+log_table${OBJ}: log_table.C log_select.h log.h librarian.h library.h \
+ common.h alist.h syntax.h select.h
 log_harvest${OBJ}: log_harvest.C log.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h harvest.h chemicals.h
 action_while${OBJ}: action_while.C action.h librarian.h library.h common.h \
@@ -705,8 +725,8 @@ condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
  common.h alist.h syntax.h crop.h field.h daisy.h
 condition_soil${OBJ}: condition_soil.C condition.h librarian.h library.h \
  common.h alist.h syntax.h field.h daisy.h
-log_table${OBJ}: log_table.C log.h librarian.h library.h common.h alist.h \
- syntax.h condition.h geometry.h
+log_table1${OBJ}: log_table1.C log.h librarian.h library.h common.h \
+ alist.h syntax.h condition.h geometry.h
 log_checkpoint${OBJ}: log_checkpoint.C log_alist.h log.h librarian.h \
  library.h common.h alist.h syntax.h condition.h daisy.h \
  printer_file.h printer.h

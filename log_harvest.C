@@ -10,6 +10,8 @@ struct LogHarvest : public Log
   // Filter function.
   bool check (const string&) const
     { return false; }
+  bool check_derived (const string&, const string&, const Library&) const
+    { return false; }
 
   // Content.
   unsigned int last_size;

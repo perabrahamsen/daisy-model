@@ -509,6 +509,10 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
       assert (smb[pool]->C_per_N.size () == soil.size ());
     }
 
+  // Initialize AM.
+  for (unsigned int i = 0; i < am.size (); i++)
+    am[i]->initialize (soil);
+
   // Initialize SOM.
   if (al.check ("initial_SOM"))
     {

@@ -1,6 +1,13 @@
-* Opdater manual med `activity' action.
+* LogExtern
 
-* Nye `crop', `column' og `chemical' log_table attributer.
+lav log_extern.C
+lav cdaisy API
+skriv til Jesper
+
+konverter log.dai til ny table log model.
+opdater manual.
+
+* En `forever' aktivitet.  Eller en `until CONDITION activity'.
 
 * Ny klimafil.
 
@@ -29,8 +36,6 @@
 ** LogCheckpoint
 
 *** Sørg for at inkludere `def*' og `input' automatisk.
-
-** LogHarvest (måske: LogSequence)
 
 ** Fjern `Filter' samt `LogFile'.
 

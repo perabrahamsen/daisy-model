@@ -20,7 +20,7 @@ struct Log::Implementation
 };
 
 bool
-Log::check_derived (const string& name, const Library& library) const
+Log::check_entry (const string& name, const Library& library) const
 {
   const string* type = &name;
   bool looking = true;

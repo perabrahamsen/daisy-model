@@ -1,3 +1,46 @@
+1999-06-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.76 released.
+
+1999-06-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (initialize): Fixed units.
+
+1999-06-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (initialize): Initialize am.
+
+	* am.C (initialize): Root depth should be negative.
+	(check_root): New check.
+	(AM_Syntax): Add it.
+
+1999-06-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_content.C, select_interval.C, select_flux.C,
+	select_date.C, select_array.C, select_number.C: New models. 
+	* Makefile (COMPONENTS): Added them.
+
+1999-05-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C: New model.
+	* Makefile (COMPONENTS): Added it.
+
+1999-05-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table1.C: Ranamed it...
+	* log_table.C: from this.
+	* Makefile (COMPONENTS): Ditto.
+
+	* Makefile (INTERFACES): Moved `log_select.C' to here.
+	(COMPONENTS): From here.
+	
+1999-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C, select.h: New component.
+	* Makefile (INTERFACES): Add it.
+	* log_select.C: New model.
+	* Makefile (COMPONENTS): Add it.
+
 1999-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.75 released.

@@ -22,7 +22,9 @@ public:
   // Filter
 public:
   virtual bool check (const string&) const = 0;
-  virtual bool check_derived (const string&, const Library& library) const;
+  virtual bool check_entry (const string&, const Library& library) const;
+  virtual bool check_derived (const string& field, const string& name, 
+			      const Library& library) const = 0;
 
   // Use.  
 public:
@@ -103,16 +105,13 @@ output_submodule_log_only (const T& submodule, const char* name, Log& log)
 template <class T> void
 output_derived (const T& submodule, const char* name, Log& log)
 {
-  if (log.check (name))
-    {
-      const Library& library = Librarian<T>::library ();
+  const Library& library = Librarian<T>::library ();
 
-      if (log.check_derived (submodule.name, library))
-	{
-	  log.open_derived (name, submodule.name);
-	  submodule.output (log);
-	  log.close_derived ();
-	}
+  if (log.check_derived (name, submodule.name, library))
+    {
+      log.open_derived (name, submodule.name);
+      submodule.output (log);
+      log.close_derived ();
     }
 }
 
@@ -129,7 +128,7 @@ output_list (T const& items, const char* name, Log& log,
 	   item != items.end();
 	   item++)
 	{
-	  if (log.check_derived ((*item)->name, library))
+	  if (log.check_entry ((*item)->name, library))
 	    {
 	      log.open_entry ((*item)->name, (*item)->alist);
 	      (*item)->output (log);

@@ -312,7 +312,7 @@ Field::Implementation::output (Log& log) const
        i != columns.end ();
        i++)
     {
-      if (log.check_derived ((*i)->name, library))
+      if (log.check_entry ((*i)->name, library))
 	{
 	  log.open_entry ((*i)->name, (*i)->alist);
 	  (*i)->output (log);

@@ -1,0 +1,211 @@
+// log_select.C
+
+#include "log_select.h"
+#include "select.h"
+#include "condition.h"
+
+bool 
+LogSelect::check (const string& name) const
+{ 
+  if (!is_active)
+    return false;
+
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->valid (name))
+      return true;
+
+  return false;
+}
+
+bool 
+LogSelect::check_derived (const string& field, const string& /* name */,
+			  const Library& /* library */) const
+{ 
+  if (!check (field))
+    return false;
+
+#if 0
+  open (field);
+  bool ok = check_entry (name, library);
+  close (field);
+  return ok;
+#else
+  return true;
+#endif
+}
+
+bool 
+LogSelect::match (const Daisy& daisy)
+{
+  is_printing = condition.match (daisy);
+  is_active = is_printing;
+
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->match (daisy, is_printing))
+      is_active = true;
+
+  return is_active;
+}
+
+void 
+LogSelect::open (const string& name)
+{ 
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->open_group (name);
+}
+
+void 
+LogSelect::close ()
+{ 
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->close ();
+}
+
+void 
+LogSelect::open_unnamed ()
+{ }
+
+void 
+LogSelect::close_unnamed ()
+{ }
+
+void 
+LogSelect::open_derived (const string& field, const string& type)
+{ open (field); open (type); }
+
+void 
+LogSelect::close_derived ()
+{ close (); close (); }
+
+void 
+LogSelect::open_entry (const string& type, const AttributeList&)
+{ open (type); }
+
+void 
+LogSelect::close_entry ()
+{ close (); }
+
+void 
+LogSelect::output (const string& name, const Time& value)
+{ 
+  if (is_active)
+    for (unsigned int i = 0; i < entries.size (); i++)
+      entries[i]->output (name, value);
+}
+
+void 
+LogSelect::output (const string&, const bool)
+{ }
+
+void 
+LogSelect::output (const string& name, const double value)
+{ 
+  if (is_active)
+    for (unsigned int i = 0; i < entries.size (); i++)
+      entries[i]->output (name, value);
+}
+
+void 
+LogSelect::output (const string& name, const int value)
+{ 
+  if (is_active)
+    for (unsigned int i = 0; i < entries.size (); i++)
+      entries[i]->output (name, value);
+}
+
+void 
+LogSelect::output (const string& name, const string& value)
+{ 
+  if (is_active)
+    for (unsigned int i = 0; i < entries.size (); i++)
+      entries[i]->output (name, value);
+}
+
+void 
+LogSelect::output (const string& name, const vector<double>& value)
+{ 
+  if (is_active)
+    for (unsigned int i = 0; i < entries.size (); i++)
+      entries[i]->output (name, value, geometry ());
+}
+
+void 
+LogSelect::output (const string&, const CSMP&)
+{ }
+
+bool 
+LogSelect::check (const Syntax&) const
+{ return true; }
+
+LogSelect::LogSelect (const AttributeList& al)
+  : Log (),
+    description (al.name ("description")),
+    condition (Librarian<Condition>::create (al.alist ("when"))),
+    entries (map_create<Select> (al.alist_sequence ("entries")))
+{
+  // Create path convertion map.
+  const vector<string>& conv_vector = al.name_sequence ("set");
+  string_map conv_map;
+  for (unsigned int i = 0; i < conv_vector.size (); i += 2)
+    {
+      assert (i+1 < conv_vector.size ());
+      conv_map[conv_vector[i]] = conv_vector[i+1];
+    }
+
+  // Find default range.
+  const double from  = al.number ("from");
+  const double to = al.number ("to");
+
+      // Initialize entries.
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->initialize (conv_map, from, to);
+}
+
+  
+LogSelect::~LogSelect ()
+{
+  delete &condition;
+  sequence_delete (entries.begin (), entries.end ());
+}
+
+static bool check_alist (const AttributeList& al)
+{
+  bool ok = true;
+
+  if ((al.size ("set") % 2) == 1)
+    {
+      CERR << "`set' should contain an even number of arguments.\n";
+      ok = false;
+    }
+
+  return ok;
+}
+
+void 
+LogSelect::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add_check (check_alist);
+  syntax.add ("description", Syntax::String, Syntax::Const,
+	      "Description of this log file format.");
+  alist.add ("description", "\
+Each selected variable is represented by a column in the log file.");
+  syntax.add ("when", Librarian<Condition>::library (), 
+	      "Add entries to the log file when this condition is true.");
+  syntax.add ("entries", Librarian<Select>::library (), 
+	      Syntax::Sequence,
+	      "What to log in each column.");
+  syntax.add ("set", Syntax::String, Syntax::Const, Syntax::Sequence, 
+	      "Map path names in the entries.\n\
+The first entry in the sequence is a symbol from the paths (e.g. $crop),\n\
+and the second is the value to replace the symbol with (e.g. Grass).\n\
+The third entry is another symbol to replace, and the fourth is another\n\
+value to replace it with.  And so forth.");
+  const vector<string> empty_string_vector;
+  alist.add ("set", empty_string_vector);
+  syntax.add ("from", "cm", Syntax::Const,
+	      "Default `from' value for all entries.");
+  alist.add ("from", 0.0);
+  syntax.add ("to", "cm", Syntax::Const,
+	      "Default `to' value for all entries.");
+  alist.add ("to", 1.0);
+}
