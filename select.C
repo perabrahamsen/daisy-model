@@ -20,7 +20,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "select.h"
-#include "time.h"
 #include "geometry.h"
 #include "check.h"
 #include "units.h"
@@ -421,14 +420,7 @@ void
 Select::close ()		// Close one level.
 { impl.close (); }
 
-  // Output routines.
-void 
-Select::output_time (const string& name, const Time&)
-{ 
-  if (is_active () && valid (name))
-    throw ("This log selection can't log dates."); 
-}
-
+// Output routines.
 void 
 Select::output_number (const string& name, const double)
 { 
@@ -511,10 +503,6 @@ specify the name of an attribute in that component as the second name.\n\
 If the value is a library component, you should specify the name of\n\
 the model or parameterization you are interested in, and then the name\n\
 of the attribute inside the model you want to log.\n\
-\n\
-If the attribute is a date, you should specify 'year', 'month',\n\
-'mday', or 'hour'.  These are all integer values.  If you don't specify\n\
-any of these, a special ever increasing 'gnuplot' value will be calculated.\n\
 \n\
 The last attribute in the patch should be a number, a number sequence,\n\
 a string, or an integer.  These are the only values which can be\n\

@@ -22,7 +22,6 @@
 
 #include "log.h"
 #include "condition.h"
-#include "time.h"
 #include "geometry.h"
 #include "tmpstream.h"
 #include <fstream>
@@ -105,6 +104,7 @@ struct LogEntry
       current_path_index--;
     }
 
+#if 0
   // Output routines.
   void output (const string& name, const Time& time)
     {
@@ -148,6 +148,7 @@ struct LogEntry
 	}
       close ();
     }
+#endif
 
   void output (const string& name, const double number)
     { 
@@ -443,12 +444,14 @@ struct LogTable1 : public Log
   void close_named_entry ()
     { close (); }
 
+#if 0
   void output (const string& name, const Time& value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
+#endif
   void output (const string&, const bool)
     { }
   void output (const string& name, const double value)

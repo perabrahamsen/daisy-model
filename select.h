@@ -77,7 +77,6 @@ public:
   void close ();		// Close one level.
 
   // Output routines.
-  virtual void output_time (const string& name, const Time& time);
   virtual void output_number (const string& name, const double number);
   virtual void output_integer (const string& name, const int integer);
   virtual void output_name (const string& name, const string& a_name);

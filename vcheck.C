@@ -61,6 +61,46 @@ struct ValidYear : public VCheck
   }
 };
 
+void 
+VCheck::IRange::validate (const int value) const throw (string)
+{
+  if (value < min)
+    {
+      TmpStream tmp;
+      tmp () << "Value is " << value << " but should be >= " << min;
+      throw string (tmp.str ());
+    }
+  if (value > max)
+    {
+      TmpStream tmp;
+      tmp () << "Value is " << value << " but should be <= " << max;
+      throw string (tmp.str ());
+    }
+}
+
+void
+VCheck::IRange::check (const Syntax& syntax, const AttributeList& alist, 
+		       const string& key) const throw (string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  daisy_assert (syntax.lookup (key) == Syntax::Integer);
+
+  if (syntax.size (key) == Syntax::Singleton)
+    validate (alist.integer (key));
+  else
+    {
+      const vector<int> integers = alist.integer_sequence (key);
+      for (unsigned int i = 0; i < integers.size (); i++)
+	validate (integers[i]);
+    }
+}
+
+VCheck::IRange::IRange (const int min_, const int max_)
+  : min (min_),
+    max (max_)
+{ }
+
 struct LocalOrder : public VCheck
 {
   virtual void validate (double last, double next) const throw (string) = 0;

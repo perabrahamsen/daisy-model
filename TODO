@@ -8,21 +8,15 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 Til referencemanual?
 
+* april: automatisk aquitart horizont
+
+Øverste tredjedel af aquitarten.
+
 * dk-horizon.dai med Sørens tal for Jb jorde.
 
 * april: ekstra linie i output
 
 I den første linie skal "begyndelsesindhold" stå.
-
-* april: automatisk aquitart horizont
-
-Øverste tredjedel af aquitarten.
-
-* biomod: G+P74 rootdens model hvor a er en parameter
-
-Og Lz (DensRtTip) er en fri variabel.
-
-* biomod: Gør RootPen afhængig af lerindhold.
 
 * SH: PowerPoint validation slides på hjemmeside.
 
@@ -43,7 +37,11 @@ or use them everywhere.
 
 (deffoo sub super
   ;; Undo the setting of bar.
-  (bar #default))
+  (bar #undef))
+
+* biomod: G+P74 rootdens model hvor a er en parameter
+
+Og Lz (DensRtTip) er en fri variabel.
 
 * Partit komponent
 
@@ -55,9 +53,13 @@ Skal kunne være afhængig af kvælstof og temperatur.
 
 Different sizes for sand, silt, and clay, plus allow other types.
 
-* SH: ændring af rodoptagelse r_min
-
 * SH: genvækst af græs
+
+* WWW: make seperate page for programmers.
+
+Move cvs, dll, cdaisy, api, programmers guide, header, source.
+
+Explain about different compilers, and making me update.
 
 * Irrigation
 

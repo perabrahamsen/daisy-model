@@ -8,15 +8,38 @@ number of the binary with the command 'daisy -v', or 'cdaisy -v' for
 the daisy DLL.
 
 When you upgrade Daisy, it is recommended that you read at least the
-headlines af the changes since the last version.  For more detailed
+headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
+
+* 2.73
+
+** Log file syntax changed.
+
+To write year, month, day of month and hour to the log file, instead
+of 
+
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (hour (path time))
+
+the syntax is now
+
+  (entries (number (path time year))
+           (number (path time month))
+           (number (path time mday))
+           (number (path time hour))
+
+The log parameterizations in log.dai have been updated.
+
+** The "Organic Matter" log model now log SOM3 as well.
 
 * 2.72
 
 ** New 'C_per_N' horizon parameter.
 
-The intent of this parameter is to represent the measured C/N ration
+The intent of this parameter is to represent the measured C/N ratio
 of the soil in the horizon.  Use it like this:
 
 (defhorizon Ap default
@@ -27,15 +50,15 @@ Note that the effect of setting this parameter is entirely unproven,
 so use it with great caution.
 
 The idea is that the varlues in the old 'SOM_C_per_N' parameter now
-represent the "goal" C/N for the SOM pools, but not necessarily the
+represents the "goal" C/N for the SOM pools, but not necessarily the
 initial value.  The idea is that the farmland always end up with a C/N
-ration of 11, but that newly cultivated land may have a different
+ratio of 11, but that newly cultivated land may have a different
 ratio.  We model this by saying that C/N entering the pool will always
-have the ration given in 'SOM_C_per_N', but C/N leaves the pool with
+have the ratio given in 'SOM_C_per_N', but C/N leaves the pool with
 the current ratio, initially very close to the value specified by
 'C_per_N'.
 
-Note that the initial C/N ration will not be identical to the number
+Note that the initial C/N ratio will not be identical to the number
 spcified by the 'C_per_N' parameter, as 'C_per_N' represent the
 average of all initial pools, including the AOM and the SMB pools.
 The SOM pools will get what is left after the AOM and SMB pools have
@@ -43,7 +66,7 @@ been initialized.  This number will usually be very close to 'C_per_N'
 though, as the SOM pools tend to much larger than the other pools.
 
 Setting 'C_per_N' instead of 'SOM_C_per_N' for a soil with a high
-measured C/N ration will give significantly less mineralization, as
+measured C/N ratio will give significantly less mineralization, as
 add organic matter will no longer for forced to have the same high C/N
 ratio as the original content.
 
@@ -95,8 +118,8 @@ These limits are controlled by three new OrganicMatter init
 parameters, the default values are:
 
   (OrganicMatter (init (SOM_limit_lower 0.3 0.7 0)
-		       (SOM_limit_upper 0.7 0.3 0)
-		       (SOM_limit_where 0)))
+                       (SOM_limit_upper 0.7 0.3 0)
+                       (SOM_limit_where 0)))
 
 Check the reference manual for a description of each.
 
@@ -283,7 +306,7 @@ Example:
 (defcrop "MyGrass" "Grass"
   "Don't assume zero sink for nitrogen uptake."
   (CrpN (NO3_root_min 1e-8 [g N/cm^3])
-	(NH4_root_min 1e-9 [g N/cm^3])))
+        (NH4_root_min 1e-9 [g N/cm^3])))
 
 * 2.52
 

@@ -54,7 +54,6 @@ struct PrinterFile::Implementation
   // Print support for specific types.
   void print_string (const string& value); 
   void print_bool (bool); 
-  void print_time (const Time&); 
   void print_plf (const PLF&, int indent); 
   void print_alist (const AttributeList& alist, const Syntax&,
 		   const AttributeList& super, int indent, bool skip);
@@ -101,7 +100,6 @@ PrinterFile::Implementation::is_complex (const AttributeList& alist,
     case Syntax::Integer:
     case Syntax::Boolean:
     case Syntax::String:
-    case Syntax::Date:
       return false;
     case Syntax::Object:
       return syntax.order (key) >= 0
@@ -216,9 +214,6 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	case Syntax::String:
 	  print_string (alist.name (key));
 	  break;
-	case Syntax::Date:
-	  print_time (alist.time (key));
-	  break;
 	case Syntax::Integer:
 	  out << alist.integer (key);
 	  break;
@@ -302,20 +297,6 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	      }
 	  }
 	  break;
-	case Syntax::Date:
-	  {
-	    const vector<const Time*>& value = alist.time_sequence (key);
-	    
-	    for (unsigned int i = 0; i < value.size (); i++)
-	      {
-		if (i > 0) 
-		  out << "\n" << string (indent, ' ');
-		out << "(";
-		print_time (*value[i]);
-		out << ")";
-	      }
-	  }
-	  break;
 	case Syntax::Integer:
 	  {
 	    const vector<int>& value = alist.integer_sequence (key);
@@ -372,13 +353,6 @@ PrinterFile::Implementation::print_bool (bool value)
     out << "true";
   else
     out << "false";
-}
-
-void 
-PrinterFile::Implementation::print_time (const Time& value) 
-{ 
-  out << value.year () << " " << value.month () << " " 
-      << value.mday () << " " << value.hour (); 
 }
 
 void 

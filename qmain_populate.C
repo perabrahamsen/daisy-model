@@ -519,15 +519,6 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	  value_name += " chars>";
 	}
       break;
-    case Syntax::Date:
-      if (has_value && size == Syntax::Singleton)
-	{
-	  Time time (alist.time (parameter));
-	  value_name.sprintf ("%04d-%02d-%02dT%02d",
-			      time.year (), time.month (), time.mday (), 
-			      time.hour ());
-	}
-      break;
     case Syntax::Library:
       return false;
     case Syntax::Error:

@@ -38,6 +38,7 @@ struct ParserFile::Implementation
   // Lexer.
   string file;
   Lexer* lexer;
+  Treelog::Open* nest;
 
   int get ()
   { return lexer->get (); }
@@ -481,15 +482,25 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    }
 	  case Syntax::AList: 
 	    {
+	      bool alist_skipped = false;
 	      if (in_order)
-		skip ("(");
+		{
+		  // Last elelement of a total order does not need '('.
+		  if (looking_at ('(') 
+		      || current != end 
+		      || !syntax.total_order ())
+		    {
+		      alist_skipped = true;
+		      skip ("(");
+		    }
+		}
 	      AttributeList list (atts.check (name) 
 				  ? atts.alist (name)
 				  : syntax.default_alist (name));
 	      
 	      load_list (list, syntax.syntax (name));
 	      atts.add (name, list);
-	      if (in_order)
+	      if (alist_skipped)
 		skip (")");
 	      break;
 	    }
@@ -565,9 +576,6 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    }
 	  case Syntax::Integer:
 	    atts.add (name, get_integer ());
-	    break;
-	  case Syntax::Date:
-	    atts.add (name, get_time ());
 	    break;
 	  case Syntax::Library:
 	    // Handled specially: Put directly in global library.
@@ -978,16 +986,21 @@ ParserFile::Implementation::initialize (const Syntax& syntax, Treelog& out)
 { 
   global_syntax_table = &syntax; 
   lexer = new Lexer (file, out);
+  nest = new Treelog::Open (out, file);
 }
 
 ParserFile::Implementation::Implementation (const string& name)
-  : file (name)
+  : file (name),
+    lexer (NULL),
+    nest (NULL)
 { }
 
 ParserFile::Implementation::~Implementation ()
 { 
   sequence_delete (inputs.begin (), inputs.end ());
+  daisy_assert (lexer != NULL);
   delete lexer; 
+  delete nest;
 }
 
 void

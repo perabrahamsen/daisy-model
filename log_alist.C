@@ -382,16 +382,6 @@ LogAList::close_named_entry ()
 { close_entry (); }
 
 void
-LogAList::output (const string& name, const Time& value)
-{ 
-  if (!is_active)
-    return;
-  daisy_assert (!syntax ().is_const (name));
-  if (syntax ().is_state (name))
-    alist ().add (name, value);
-}
-
-void
 LogAList::output (const string& name, const bool value)
 { 
   if (!is_active)

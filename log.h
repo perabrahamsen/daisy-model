@@ -26,7 +26,6 @@
 #include "librarian.h"
 
 class Daisy;
-class Time;
 class PLF;
 class Geometry;
 
@@ -205,7 +204,6 @@ private:
 
   // The data.
 public:
-  virtual void output (const string&, const Time&) = 0;
   virtual void output (const string&, const bool) = 0;
   virtual void output (const string&, const double) = 0;
   virtual void output (const string&, const int) = 0;

@@ -393,7 +393,8 @@ AM::Implementation::append_to (vector<AOM*>& added)
 void
 AM::Implementation::output (Log& log) const
 { 
-  log.output ("creation", creation);
+  if (creation != Time (1, 1, 1, 1))
+    output_submodule (creation, "creation", log);
   log.output ("name", name);
   if (lock)
     output_submodule (*lock, "lock", log);
@@ -617,7 +618,12 @@ AM::create (const Geometry& /*geometry*/, const Time& time,
 {
   AttributeList al;
   al.add ("type", "state");
-  al.add ("creation", time);
+  AttributeList new_time;
+  new_time.add ("year", time.year ());
+  new_time.add ("month", time.month ());
+  new_time.add ("mday", time.mday ());
+  new_time.add ("hour", time.hour ());
+  al.add ("creation", new_time);
   al.add ("name", sort + "/" + part);
   al.add ("om", ol);
   AM& am = *new AM (al);
@@ -683,7 +689,6 @@ AM::default_root ()
     {
       root.add ("type", "root");
       root.add ("description", "Initialization of old root remains.");
-      root.add ("creation", Time (1, 1, 1, 1));
       root.add ("syntax", "root");
       root.add ("dist", 7.0);
       root.add ("weight", 1.2);
@@ -835,7 +840,9 @@ AM::second_year_utilization (const AttributeList& am)
 
 AM::AM (const AttributeList& al)
   : impl (*new Implementation 
-	  (al.time ("creation"),
+	  (al.check ("creation")
+	   ? Time (al.alist ("creation"))
+	   : Time (1, 1, 1, 1),
 	   al.name ("name"),
 	   map_construct<AOM> (al.alist_sequence ("om")))),
     alist (al),
@@ -1038,8 +1045,8 @@ to this generic model after creation, so this is what you will see in a\n\
 checkpoint.  This model contains a number (typically 2) of separate\n\
 pools, each of which have their own turnover rate.");
 
-	syntax.add ("creation", Syntax::Date, Syntax::State, 
-		    "Time this AM was created.");
+	syntax.add_submodule ("creation", alist, Syntax::OptionalState, 
+			      "Time this AM was created.", Time::load_syntax);
 	alist.add ("syntax", "state");
 	syntax.add ("name", Syntax::String, Syntax::State, "\
 A name given to this AOM so you can identify it in for example log files.");
@@ -1060,9 +1067,8 @@ This AM belongs to a still living plant",
 		    "Description of this fertilizer type."); 
 	alist.add ("description", "\
 Organic fertilizer, typically slurry or manure from animals.");
-	syntax.add ("creation", Syntax::Date, Syntax::State, 
-		    "Time of application.");
-	alist.add ("creation", Time (1, 1, 1, 1));
+	syntax.add_submodule ("creation", alist, Syntax::OptionalState, 
+			      "Time of application.", Time::load_syntax);
 	alist.add ("syntax", "organic");
 	syntax.add ("weight", "Mg w.w./ha", Check::non_negative (),
 		    Syntax::Const,
@@ -1106,9 +1112,8 @@ Fraction of NH4 that evaporates on application.");
 	syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 		    "Description of this fertilizer type."); 
 	alist.add ("description", "Mineral fertilizer.");
-	syntax.add ("creation", Syntax::Date, Syntax::State, 
-		    "Time of application.");
-	alist.add ("creation", Time (1, 1, 1, 1));
+	syntax.add_submodule ("creation", alist, Syntax::OptionalState, 
+			      "Time of application.", Time::load_syntax);
 	syntax.add ("weight", "kg N/ha", Check::non_negative (), Syntax::Const,
 		    "Amount of fertilizer applied.");
 	alist.add ("weight", 0.0);
@@ -1128,9 +1133,8 @@ Fraction of NH4 that evaporates on application.");
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Initial added organic matter at the start of the simulation.");
-	syntax.add ("creation", Syntax::Date, Syntax::State,
-		    "Start of simulation.");
-	alist.add ("creation", Time (1, 1, 1, 1));
+	syntax.add_submodule ("creation", alist, Syntax::OptionalState,
+			      "Start of simulation.", Time::load_syntax);
 	alist.add ("syntax", "initial");
 	Syntax& layer_syntax = *new Syntax ();
 	layer_syntax.add ("end", "cm", Check::negative (), Syntax::Const,
@@ -1153,8 +1157,8 @@ uniformly distributed in each layer.");
 	syntax.add_check (check_root);
 	AttributeList& alist = *new AttributeList (AM::default_root ());
 	alist.remove ("type");
-	syntax.add ("creation", Syntax::Date, Syntax::State,
-		    "Start of simulation.");
+	syntax.add_submodule ("creation", alist, Syntax::OptionalState,
+			      "Start of simulation.", Time::load_syntax);
 	syntax.add ("depth", "cm", Check::negative (), 
 		    Syntax::OptionalConst, "\
 How far down does the old root reach? (a negative number)\n\

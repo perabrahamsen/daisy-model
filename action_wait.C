@@ -78,7 +78,7 @@ struct ActionWaitDays : public Action
   void output (Log& log) const
   { 
     if (activated)
-      log.output ("end_time", end_time);
+      output_submodule (end_time, "end_time", log);
   }
 
   ActionWaitDays (const AttributeList& al)
@@ -89,7 +89,7 @@ struct ActionWaitDays : public Action
       end_time (1, 1, 1, 1)
   { 
     if (activated)
-      end_time = al.time ("end_time");
+      end_time = Time (al.alist ("end_time"));
   }
 
   ~ActionWaitDays ()
@@ -183,9 +183,9 @@ Wait the specified number of days.");
       syntax.add ("hours", Syntax::Integer, Syntax::Const, 
 		  "Wait this number of days.");
       alist.add ("hours", 0);
-      syntax.add ("end_time", Syntax::Date, Syntax::OptionalState,
+      syntax.add_submodule ("end_time", alist, Syntax::OptionalState,
 		  "Wait until this date.\
-Setting this overrides the 'days' and 'hours' parameters.");
+Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.order ("days");
       Librarian<Action>::add_type ("wait_days", alist, syntax, &make_days);
     }

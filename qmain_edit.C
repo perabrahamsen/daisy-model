@@ -219,6 +219,7 @@ struct ShortLine : public QLineEdit
   }
 };
 
+#if 0
 class EditDate : public EditEntry
 { 
   // Children.
@@ -334,6 +335,7 @@ public:
     change ();
   };
 };
+#endif 
 
 class EditName : public EditEntry
 { 
@@ -1156,9 +1158,6 @@ ItemDialog::ItemDialog (QWidget* parent,
       case Syntax::Integer:
 	entry 
 	  = new EditInteger (this, syntax, alist, default_alist, parameter);
-	break;
-      case Syntax::Date:
-	entry = new EditDate (this, syntax, alist, default_alist, parameter);
 	break;
       case Syntax::String:
 	entry = new EditName (this, syntax, alist, default_alist, parameter);

@@ -77,7 +77,6 @@ struct LogSelect : public Log
 			 const AttributeList&);
   void close_named_entry ();
 
-  void output (const string& name, const Time& value);
   void output (const string&, const bool);
   void output (const string& name, const double value);
   void output (const string& name, const int value);

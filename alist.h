@@ -30,7 +30,6 @@
 
 using namespace std;
 
-class Time;
 class PLF;
 class AttributeList;
 class Syntax;
@@ -66,8 +65,6 @@ public:
   AttributeList& alist (const char*) const;
   int integer (const string&) const;
   int integer (const char*) const;
-  const Time& time (const string&) const;
-  const Time& time (const char*) const;
   const vector<double>& number_sequence (const string&) const;
   const vector<double>& number_sequence (const char*) const;
   const vector<string>& name_sequence (const string& key) const;
@@ -76,8 +73,6 @@ public:
   const vector<bool>& flag_sequence (const char* key) const;
   const vector<int>& integer_sequence (const string& key) const;
   const vector<int>& integer_sequence (const char* key) const;
-  const vector<const Time*>& time_sequence (const string& key) const;
-  const vector<const Time*>& time_sequence (const char* key) const;
   const vector<const PLF*>& plf_sequence (const string& key) const;
   const vector<const PLF*>& plf_sequence (const char* key) const;
   const vector<AttributeList*>& alist_sequence (const string& key) const;
@@ -91,14 +86,12 @@ public:
   void add (const string&, int);
   void add (const string&, const AttributeList&);
   void add (const string&, const PLF&);
-  void add (const string&, const Time&);
   void add (const string&, const vector<double>&);
   void add (const string&, const vector<string>&);
   void add (const string&, const vector<bool>&);
   void add (const string&, const vector<int>&);
   void add (const string&, const vector<AttributeList*>&);
   void add (const string&, const vector<const PLF*>&);
-  void add (const string&, const vector<const Time*>&);
 
   void remove (const string&);
   bool revert (const string&, const AttributeList&, const Syntax&);

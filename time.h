@@ -25,6 +25,10 @@
 
 #include <string>
 
+class AttributeList;
+class Syntax;
+class Log;
+
 class Time
 {
   // Content.
@@ -44,6 +48,7 @@ public:
 
   // Simulate. 
 public:
+  void output (Log&) const;
   void tick_hour (int hours = 1);
   void tick_day (int days = 1);
   void tick_year (int years = 1);
@@ -74,6 +79,11 @@ public:
   bool operator>= (const Time&) const;
   bool operator>  (const Time&) const;
   bool between (const Time&, const Time&) const;
+
+  // Create.
+public:
+  static void load_syntax (Syntax&, AttributeList&);
+  Time (const AttributeList&);
 
   // Construct.
 public:

@@ -112,7 +112,7 @@ public:
   { }
   ConditionAt (const AttributeList& al)
     : Condition (al),
-      time (al.time ("time"))
+      time (al.alist ("time"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionAt (al); }
@@ -128,7 +128,7 @@ public:
   { }
   ConditionBefore (const AttributeList& al)
     : Condition (al),
-      time (al.time ("time"))
+      time (al.alist ("time"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionBefore (al); }
@@ -144,7 +144,7 @@ public:
   { }
   ConditionAfter (const AttributeList& al)
     : Condition (al),
-      time (al.time ("time"))
+      time (al.alist ("time"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionAfter (al); }
@@ -403,8 +403,8 @@ True, iff the simulation time is before the specified time.");
     AttributeList& alist_after = *new AttributeList ();
     alist_after.add ("description", "\
 True, iff the simulation time is after the specified time.");
-    syntax.add ("time", Syntax::Date, Syntax::Const,
-		"Fixed time to test for.");
+    syntax.add_submodule ("time", alist_at, Syntax::Const,
+			  "Fixed time to test for.", Time::load_syntax);
     syntax.order ("time");
     Librarian<Condition>::add_type ("at", alist_at, syntax,
 				    &ConditionAt::make);

@@ -300,7 +300,7 @@ MODELS = phenology_TSum.C phenology_std.C hydraulic_hypres.C clayom_biomod.C \
 	select_max.C select_average.C action_message.C weather_std.C \
 	select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
 	select_index.C select_content.C select_interval.C \
-	select_number.C select_date.C select_array.C log_table.C \
+	select_number.C select_array.C log_table.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
 	average_arithmetic.C average_harmonic.C average_geometric.C \
 	mactrans_std.C macro_std.C macro_none.C document_LaTeX.C \
@@ -929,7 +929,8 @@ syntax${OBJ}: syntax.C syntax.h treelog.h alist.h library.h tmpstream.h \
 library${OBJ}: library.C library.h alist.h syntax.h treelog.h tmpstream.h \
  assertion.h common.h
 plf${OBJ}: plf.C plf.h assertion.h
-time${OBJ}: time.C time.h assertion.h
+time${OBJ}: time.C time.h assertion.h log.h librarian.h common.h library.h \
+ alist.h syntax.h treelog.h vcheck.h submodel.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 librarian${OBJ}: librarian.C librarian.h common.h library.h alist.h \
  syntax.h treelog.h assertion.h
@@ -1055,8 +1056,6 @@ select_interval${OBJ}: select_interval.C select.h condition.h librarian.h \
  units.h
 select_number${OBJ}: select_number.C select_value.h select.h condition.h \
  librarian.h common.h library.h alist.h syntax.h treelog.h assertion.h
-select_date${OBJ}: select_date.C select.h condition.h librarian.h common.h \
- library.h alist.h syntax.h treelog.h assertion.h
 select_array${OBJ}: select_array.C select.h condition.h librarian.h \
  common.h library.h alist.h syntax.h treelog.h assertion.h
 log_table${OBJ}: log_table.C log_select.h log.h librarian.h common.h \

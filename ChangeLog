@@ -1,3 +1,46 @@
+2003-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.73 released.
+
+2003-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Organic Matter"): Added SOM3.
+
+2003-04-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* time.C, time.h: Made it a submodel.
+	* daisy.C (time): Use it.
+	* condition_time.C (time): Ditto.
+	* action_wait.C (end_time): Ditto.
+	* harvest.C (time): Ditto.
+	* harvesting.C (last_cut): Ditto.
+	* am.C (creation): Ditto.
+	* action_fertilize.C (doIt): Update caller.
+	* syntax.C, syntax.h (Syntax::Date): Removed.
+	* alist.h, alist.C: Removed support for Time values.
+	* document_LaTeX.C: Ditto.
+	* parser_file.C: Ditto.
+	* printer_file.C: Ditto.
+	* qmain_edit.C: Ditto.
+	* qmain_populate.C (enter_parameter): Ditto.
+	* select.C, select.h (output_time): Removed.
+	* select.C (load_syntax): Remeved reference to date types.
+	* log.h, log_select.C, log_select.h, log_alist.h, log_alist.C
+	* olog_table1.C (output): Cannot log time values. 
+	* Makefile (MODELS): Removed 'select_date.C'.
+	* lib/log.dai: Updated callers.
+	* cdaisy.C, cdaisy.h (daisy_alist_get_time): Removed.
+	(daisy_alist_set_time): Ditto.
+	* txt/guide.tex (subsection{Date}): Removed.
+	* txt/introduction.tex: Removed references to at date type.
+	* parser_file.C (load_list): Don't force parentheses in alist in order.
+	* select_number.C (output_integer): New member function.
+
+	* parser_file.C (nest): Specify filename in treelog.
+	* options.C (Options): Don't specify filename here.
+
+	* txt/guide.tex (subsection{Files}): Fixed typo.
+
 2003-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.72 released.

@@ -153,9 +153,6 @@ daisy_alist_get_string (const daisy_alist* alist, const char* name);
 daisy_bool                      /* Get bool NAME from ALIST. */
 daisy_alist_get_flag (const daisy_alist* alist, const char* name);
 
-daisy_time*                     /* Get time NAME from ALIST. */
-daisy_alist_get_time (const daisy_alist* alist, const char* name);
-
 const daisy_alist*              /* Get alist NAME from ALIST. */
 daisy_alist_get_alist (const daisy_alist* alist, const char* name);
 
@@ -174,10 +171,6 @@ daisy_alist_set_string (daisy_alist* alist, const char* name,
 void                            /* Set bool NAME from ALIST to VALUE. */
 daisy_alist_set_flag (daisy_alist* alist, const char* name,
                       daisy_bool value);
-
-void                            /* Set time NAME from ALIST to VALUE. */
-daisy_alist_set_time (daisy_alist* alist, const char* name,
-                      daisy_time* value);
 
 void                            /* Set alist NAME from ALIST to VALUE. */
 daisy_alist_set_alist (daisy_alist* alist, const char* name,

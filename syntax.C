@@ -307,7 +307,7 @@ Syntax::Fraction ()
 
 static const char * const type_names[] = 
 { "Number", "AList", "PLF", "Boolean", "String",
-  "Date", "Integer", "Object", "Library", "Error", NULL };
+  "Integer", "Object", "Library", "Error", NULL };
 
 const char* 
 Syntax::type_name (type t)
@@ -486,7 +486,17 @@ Syntax::order (const string& name) const
 
 bool
 Syntax::total_order () const
-{ return impl.order.size () == impl.types.size (); }
+{ 
+  int non_logs = 0;
+  for (Implementation::status_map::iterator i = impl.status.begin ();
+       i != impl.status.end ();
+       i++)
+    {
+      if ((*i).second != LogOnly)
+	non_logs++;
+    }
+  return impl.order.size () == non_logs; 
+}
 
 const AttributeList& 
 Syntax::default_alist (const string& key) const

@@ -284,9 +284,6 @@ DocumentLaTeX::print_entry_type (std::ostream& out,
     case Syntax::String:
       out << "string (see section~\\ref{type:string})";
       break;
-    case Syntax::Date:
-      out << "time value (see section~\\ref{type:date})";
-      break;
     case Syntax::Integer:
       out << "integer";
       break;
@@ -475,14 +472,6 @@ DocumentLaTeX::print_entry_value (std::ostream& out,
 		}
 	    }
 	    break;
-	  case Syntax::Date:
-	    {
-	      const Time& time = alist.time (name);
-	      out << " (default " << time.year () << " "
-		  << time.month () << " " << time.mday () << " "
-		  << time.hour () << ")";
-	    }
-	    break;
 	  case Syntax::Integer:
 	    out << " (default " << alist.integer (name) << ")";
 	    break;
@@ -513,7 +502,6 @@ DocumentLaTeX::print_entry_value (std::ostream& out,
 	  case Syntax::PLF:
 	  case Syntax::Boolean:
 	  case Syntax::String:
-	  case Syntax::Date:
 	  case Syntax::Integer:
 	  case Syntax::Object:
 	    if (alist.size (name) == 0)
@@ -717,14 +705,6 @@ DocumentLaTeX::print_sample_entry (std::ostream& out,
 		}
 	    }
 	    break;
-	  case Syntax::Date:
-	    {
-	      const Time& time = alist.time (name);
-	      out << "~" << time.year () << "~" << time.month () 
-		  << "~" << time.mday () << "~" << time.hour () << ")";
-	      print_name = false;
-	    }
-	    break;
 	  case Syntax::Integer:
 	    out << "~" << alist.integer (name) << ")";
 	    print_name = false;
@@ -763,7 +743,6 @@ DocumentLaTeX::print_sample_entry (std::ostream& out,
 	  case Syntax::PLF:
 	  case Syntax::Boolean:
 	  case Syntax::String:
-	  case Syntax::Date:
 	  case Syntax::Integer:
 	  case Syntax::Object:
 	    break;

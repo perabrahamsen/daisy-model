@@ -83,9 +83,14 @@ LogCheckpoint::done ()
 
       // Start checkpoint from next timestep.
       daisy_assert (alist ().check ("time"));
-      Time time (alist ().time ("time"));
+      Time time (alist ().alist ("time"));
       time.tick_hour ();
-      alist ().add ("time", time);
+      AttributeList new_time;
+      new_time.add ("year", time.year ());
+      new_time.add ("month", time.month ());
+      new_time.add ("mday", time.mday ());
+      new_time.add ("hour", time.hour ());
+      alist ().add ("time", new_time);
 
       // Open log file.
       PrinterFile printer (filename);

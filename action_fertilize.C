@@ -163,7 +163,14 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
     tmp () << " [Fertilizing " << am.name ("type") << "]";
   out.message (tmp.str ());
   if (syntax != "mineral")
-    am.add ("creation", daisy.time);
+    {
+      AttributeList new_time;
+      new_time.add ("year", daisy.time.year ());
+      new_time.add ("month", daisy.time.month ());
+      new_time.add ("mday", daisy.time.mday ());
+      new_time.add ("hour", daisy.time.hour ());
+      am.add ("creation", new_time);
+    }
 
   if (to < from)
     daisy.field.fertilize (am, from, to);

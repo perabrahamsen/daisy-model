@@ -574,7 +574,6 @@ SoilWater::Implementation::initialize (const AttributeList& al,
     }
 
   // Let 'macro' choose the default method to average K values in 'uz'.
-  // Bug: If you (defmacro foo none) and (macro foo): has_macropores == true
   const bool has_macropores = (macro && !macro->none ());
   top->has_macropores (has_macropores);
   if (bottom)

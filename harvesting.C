@@ -443,7 +443,7 @@ void
 Harvesting::output (Log& log) const
 { 
   if (last_cut)
-    log.output ("last_cut", *last_cut);
+    output_submodule (*last_cut, "last_cut", log);
   log.output ("production_delay", production_delay);
   log.output ("cut_stress", cut_stress);
 }
@@ -493,8 +493,9 @@ Maximal development stage for which the crop survives harvest.");
 	       "New development stage after harvest.\n\
 If not specified, use the DS where the crop first reached the height\n\
 it now has after the cut.");
-  syntax.add ("last_cut", Syntax::Date, Syntax::OptionalState,
-	      "Date of last cut.  Used for calculating cut delay.");
+  syntax.add_submodule ("last_cut", alist, Syntax::OptionalState,
+			"Date of last cut.  Used for calculating cut delay.",
+			Time::load_syntax);
   syntax.add ("production_delay", "d", Syntax::State,
 	      "production delay caused by last cut");
   alist.add ("production_delay", 0.0);
@@ -522,7 +523,7 @@ Harvesting::Harvesting (const AttributeList& al)
                      : al.number ("EconomicYield_W")),
     DSmax (al.number ("DSmax")),
     DSnew (al.check ("DSnew") ? al.number ("DSnew") : -44.0),
-    last_cut (al.check ("last_cut") ? new Time (al.time ("last_cut")) : NULL),
+    last_cut (al.check ("last_cut") ? new Time (al.alist ("last_cut")) : NULL),
     production_delay (al.number ("production_delay")),
     cut_delay (al.plf ("cut_delay")),
     cut_stress (0.0)

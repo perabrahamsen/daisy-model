@@ -87,7 +87,6 @@ struct LogAList : public Log
   void close_named_entry ();
 
   // Logging.
-  void output (const string& name, const Time& value);
   void output (const string& name, const bool value);
   void output (const string& name, const double value);
   void output (const string& name, const int value);

@@ -42,7 +42,7 @@ void
 Harvest::output (Log& log) const
 {
   log.output ("column", column);
-  log.output ("time", time);
+  output_submodule (time, "time", log);
   log.output ("crop", crop);
   log.output ("stem_DM", stem_DM);
   log.output ("stem_N", stem_N);
@@ -66,8 +66,8 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "Log of all harvests during the simulation.");
   syntax.add ("column", Syntax::String, Syntax::State,
 	      "Name of column where the yield were harvested.");
-  syntax.add ("time", Syntax::Date, Syntax::State,
-	      "Time of the harvest operation.");
+  syntax.add_submodule ("time", alist, Syntax::State,
+			"Time of the harvest operation.", Time::load_syntax);
   syntax.add ("crop", Syntax::String, Syntax::State,
 	      "Name of crop that was harvested.");
   syntax.add ("stem_DM", "g/m^2", Syntax::State,
@@ -100,7 +100,7 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 
 Harvest::Harvest (const AttributeList& alist)
   : column (alist.name ("column")),
-    time (alist.time ("time")),
+    time (alist.alist ("time")),
     crop (alist.name("crop")),
     stem_DM (alist.number ("stem_DM")),
     stem_N (alist.number ("stem_N")),

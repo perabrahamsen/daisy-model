@@ -347,6 +347,7 @@ OrganicMatter::Implementation::Initialization::
     }
   return ok;
 }
+
 void
 OrganicMatter::Implementation::Initialization::
 /**/ load_syntax (Syntax& syntax, AttributeList& alist)
@@ -2643,7 +2644,7 @@ It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
   clay_factor.add (1.00, 0.5);
   clay_alist.add ("factor", clay_factor);
   alist.add ("ClayOM", clay_alist);
-  syntax.add ("tillage_age", "days", Syntax::OptionalState, Syntax::Sequence,
+  syntax.add ("tillage_age", "d", Syntax::OptionalState, Syntax::Sequence,
 	      "Time since the latest tillage operation was performed."); 
   syntax.add ("smb_tillage_factor", "d", Syntax::None (), 
 	      Check::non_negative (), Syntax::Const, Syntax::Sequence,

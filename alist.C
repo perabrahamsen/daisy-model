@@ -43,12 +43,10 @@ struct Value
     PLF* plf;
     AttributeList* alist;
     int integer;
-    Time* time;
     vector<double>* number_sequence;
     vector<string>* name_sequence;
     vector<bool>* flag_sequence;
     vector<int>* integer_sequence;
-    vector<const Time*>* time_sequence;
     vector<const PLF*>* plf_sequence;
     vector<AttributeList*>* alist_sequence;
   };
@@ -100,12 +98,6 @@ struct Value
       is_sequence (false),
       ref_count (new int (1))
     { }
-  Value (const Time& v)
-    : time (new Time (v)),
-      type (Syntax::Date),
-      is_sequence (false),
-      ref_count (new int (1))
-    { }
   Value (const vector<double>& v)
     : number_sequence (new vector<double> (v)),
       type (Syntax::Number),
@@ -127,19 +119,6 @@ struct Value
   Value (const vector<int>& v)
     : integer_sequence (new vector<int> (v)),
       type (Syntax::Integer),
-      is_sequence (true),
-      ref_count (new int (1))
-    { }
-  vector<const Time*>* copy_times (const vector<const Time*>& org)
-  {
-    vector<const Time*>* copy = new vector<const Time*> ();
-    for (unsigned int i = 0; i < org.size (); i++)
-      copy->push_back (new Time (*org[i]));
-    return copy;
-  }
-  Value (const vector<const Time*>& v)
-    : time_sequence (copy_times (v)),
-      type (Syntax::Date),
       is_sequence (true),
       ref_count (new int (1))
     { }
@@ -227,8 +206,6 @@ Value::subset (const Value& v, const Syntax& syntax,
 	return *plf == *v.plf;
       case Syntax::String:
 	return *name == *v.name;
-      case Syntax::Date:
-	return *time == *v.time;
       case Syntax::Object:
       case Syntax::Library:
       case Syntax::Error:
@@ -283,8 +260,6 @@ Value::subset (const Value& v, const Syntax& syntax,
 	return *plf_sequence == *v.plf_sequence;
       case Syntax::String:
 	return *name_sequence == *v.name_sequence;
-      case Syntax::Date:
-	return *time_sequence == *v.time_sequence;
       case Syntax::Object:
       case Syntax::Library:
       case Syntax::Error:
@@ -318,9 +293,6 @@ Value::cleanup ()
 	  case Syntax::String:
 	    delete name;
 	    break;
-	  case Syntax::Date:
-	    delete time;
-	    break;
 	  case Syntax::Error:
 	    // Empty (dummy) value.
 	    break;
@@ -351,10 +323,6 @@ Value::cleanup ()
 	    break;
 	  case Syntax::String:
 	    delete name_sequence;
-	    break;
-	  case Syntax::Date:
-	    sequence_delete (time_sequence->begin (), time_sequence->end ());
-	    delete time_sequence;
 	    break;
 	  case Syntax::Object:
 	  case Syntax::Library:
@@ -406,9 +374,6 @@ Value::operator = (const Value& v)
       case Syntax::String:
 	name = v.name;
         break;
-      case Syntax::Date:
-	time = v.time;
-        break;
       case Syntax::Object:
       case Syntax::Library:
       case Syntax::Error:
@@ -435,9 +400,6 @@ Value::operator = (const Value& v)
         break;
       case Syntax::String:
 	name_sequence = v.name_sequence;
-        break;
-      case Syntax::Date:
-	time_sequence = v.time_sequence;
         break;
       case Syntax::Object:
       case Syntax::Library:
@@ -569,8 +531,6 @@ AttributeList::size (const string& key)	const
       return value.flag_sequence->size ();
     case Syntax::String:
       return value.name_sequence->size ();
-    case Syntax::Date:
-      return value.time_sequence->size ();
     case Syntax::Integer:
       return value.integer_sequence->size ();
     case Syntax::Object:
@@ -635,24 +595,6 @@ AttributeList::flag (const char* key) const
   daisy_assert (value.type == Syntax::Boolean);
   daisy_assert (!value.is_sequence);
   return value.flag;
-}
-
-const Time&
-AttributeList::time (const char* key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Date);
-  daisy_assert (!value.is_sequence);
-  return *value.time;
-}
-
-const Time&
-AttributeList::time (const string& key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Date);
-  daisy_assert (!value.is_sequence);
-  return *value.time;
 }
 
 int
@@ -781,24 +723,6 @@ AttributeList::integer_sequence (const char* key) const
   return *value.integer_sequence;
 }
 
-const vector<const Time*>& 
-AttributeList::time_sequence (const string& key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Date);
-  daisy_assert (value.is_sequence);
-  return *value.time_sequence;
-}
-
-const vector<const Time*>& 
-AttributeList::time_sequence (const char* key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Date);
-  daisy_assert (value.is_sequence);
-  return *value.time_sequence;
-}
-
 const vector<const PLF*>& 
 AttributeList::plf_sequence (const string& key) const
 {
@@ -858,10 +782,6 @@ AttributeList::add (const string& key, int v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const Time& v)
-{ impl.add (key, Value (v)); }
-
-void 
 AttributeList::add (const string& key, const AttributeList& v)
 { impl.add (key, Value (v)); }
 
@@ -891,10 +811,6 @@ AttributeList::add (const string& key, const vector<AttributeList*>& v)
 
 void 
 AttributeList::add (const string& key, const vector<const PLF*>& v)
-{ impl.add (key, Value (v)); }
-
-void 
-AttributeList::add (const string& key, const vector<const Time*>& v)
 { impl.add (key, Value (v)); }
 
 void 
@@ -938,9 +854,6 @@ AttributeList::revert (const string& key,
       case Syntax::String:
 	add (key, default_alist.name (key));
         break;
-      case Syntax::Date:
-	add (key, default_alist.time (key));
-        break;
       case Syntax::Library:
       case Syntax::Error:
       default:
@@ -967,9 +880,6 @@ AttributeList::revert (const string& key,
         break;
       case Syntax::String:
 	add (key, default_alist.name_sequence (key));
-        break;
-      case Syntax::Date:
-	add (key, default_alist.time_sequence (key));
         break;
       case Syntax::Library:
       case Syntax::Error:

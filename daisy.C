@@ -50,7 +50,7 @@ Daisy::Daisy (const AttributeList& al)
     logs (map_create<Log> (al.alist_sequence ("output"))),
     activate_output (Librarian<Condition>::create
 		     (al.alist ("activate_output"))),
-    time (al.time ("time")),
+    time (al.alist ("time")),
     action (Librarian<Action>::create (al.alist ("manager"))),
     weather (al.check ("weather") 
 	     ? &Librarian<Weather>::create (al.alist ("weather"))
@@ -114,7 +114,7 @@ Daisy::tick_logs (Treelog& out)
 	  Log& log = *logs[i];
 	  if (log.match (*this, out))
 	    {
-	      log.output ("time", time);
+	      output_submodule (time, "time", log);
 	      if (weather)
 		output_derived (*weather, "weather", log);
 	      output_submodule (field, "column", log);
@@ -202,8 +202,8 @@ The special value \".\" means the current directory.");
 	      Syntax::Singleton,
 	      "Specify the management operations to perform during\n\
 the simulation.");
-  syntax.add ("time", Syntax::Date, Syntax::State,
-	      "Current time in the simulation.");
+  syntax.add_submodule ("time", alist, Syntax::State,
+			"Current time in the simulation.", Time::load_syntax);
   syntax.add ("column",
 	      Librarian<Column>::library (), 
 	      Syntax::State, Syntax::Sequence,

@@ -41,6 +41,8 @@ public:
 public:
   static const VCheck& valid_year ();
 
+  class IRange;
+
   // PLF or Number sequence.
 public:
   static const VCheck& increasing ();
@@ -71,6 +73,24 @@ protected:
   VCheck ();
 public:
   virtual ~VCheck ();
+};
+
+class VCheck::IRange : public VCheck
+{
+  // Parameters.
+private:
+  const int min;
+  const int max;
+
+  // Use.
+private:
+  void validate (int value) const throw (string);
+  virtual void check (const Syntax&, const AttributeList&, const string& key)
+    const throw (string);
+
+  // Create and Destroy.
+public:
+  IRange (int min, int max);
 };
 
 class VCheck::SumEqual : public VCheck

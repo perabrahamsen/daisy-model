@@ -39,6 +39,8 @@ struct SelectNumber : public SelectValue
       value += number;
     count++;
   }
+  void output_integer (const string& name, int integer)
+  { output_number (name, integer); }
 
   // Create and Destroy.
   SelectNumber (const AttributeList& al)

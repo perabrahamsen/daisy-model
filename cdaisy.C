@@ -150,12 +150,6 @@ daisy_alist_get_flag (const AttributeList* alist, const char* name)
   return alist->flag (name);
 }
 
-extern "C" const Time* EXPORT
-daisy_alist_get_time (const AttributeList* alist, const char* name)
-{
-  return &alist->time(name);
-}
-
 extern "C" const AttributeList* EXPORT
 daisy_alist_get_alist (const AttributeList* alist, const char* name)
 { 
@@ -188,13 +182,6 @@ daisy_alist_set_flag (AttributeList* alist, const char* name,
 		      daisy_bool value)
 { 
   alist->add (name, bool (value));
-}
-
-extern "C" void EXPORT
-daisy_alist_set_time (AttributeList* alist, const char* name,
-		      Time* value)
-{
-  alist->add (name, *value);
 }
 
 extern "C" void EXPORT

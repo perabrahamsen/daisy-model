@@ -135,14 +135,6 @@ LogSelect::close_named_entry ()
 { close (); }
 
 void 
-LogSelect::output (const string& name, const Time& value)
-{ 
-  if (is_active)
-    for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output_time (name, value);
-}
-
-void 
 LogSelect::output (const string&, const bool)
 { }
 
