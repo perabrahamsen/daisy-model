@@ -109,6 +109,11 @@ OM::set_N (vector<double>& N)
 void 
 OM::mix (const Geometry& geometry, double from, double to, double penetration)
 {
+  assert (penetration >= 0.0);
+  assert (penetration <= 1.0);
+  assert (top_C >= 0.0);
+  assert (top_N >= 0.0);
+
   // Ignore tiny pools.
   if (total_C (geometry) < 1e-20)
     return;
@@ -130,6 +135,7 @@ OM::mix (const Geometry& geometry, double from, double to, double penetration)
   set_N (N);
 }
 
+#if 0
 void 
 OM::distribute (const Geometry& geometry, const vector<double>& content)
 {
@@ -157,10 +163,14 @@ OM::distribute (const Geometry& geometry, const vector<double>& content)
   // Calculate C/N.
   set_N (N);
 }
+#endif 
 
 void
 OM::swap (const Geometry& geometry, double from, double middle, double to)
 {
+  assert (top_C >= 0.0);
+  assert (top_N >= 0.0);
+
   // Ignore tiny pools.
   if (total_C (geometry) < 1e-20)
     return;
@@ -272,6 +282,7 @@ OM::add (const Geometry& geometry, // Add dead roots.
       // We should *not* multiply with dz here.  Reason: We want to
       // divide C on the total depth.  
       C[i] += to_C * density[i] /* * geometry.dz (i) */ / total;
+      assert (density[i] >= 0.0);
       assert (finite (C[i]));
       assert (C[i] >= 0.0);
     }
@@ -312,6 +323,7 @@ OM::add (const Geometry& geometry, // Add dead roots.
       // We should *not* multiply with dz here.  Reason: We want to
       // divide C on the total depth.  
       const double factor = density[i] /* * geometry.dz (i) */ / total;
+      assert (factor >= 0.0);
       const double new_N = C[i] / C_per_N[i] + to_N * factor;
       C[i] += to_C * factor;
       if (C[i] > 0.0)

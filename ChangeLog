@@ -1,4 +1,13 @@
+1999-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.03 released.
+
 1999-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (add): Added assertions.
+
+	* om.C (swap): Added assertions.
+	(mix): Ditto.
 
 	* pt_pmsw.C (RSC): Added assertions.
 	(tick): Initialize rcmin to LAI/200.

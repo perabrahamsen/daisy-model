@@ -196,6 +196,8 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
 void
 AM::Implementation::add (double C, double N)
 {
+  assert (C >= 0);
+  assert (N >= 0);
   vector<double> om_C (om.size (), 0.0);
   vector<double> om_N (om.size (), 0.0);
 
@@ -210,6 +212,8 @@ AM::Implementation::add (const Geometry& geometry,
 			 double C, double N,
 			 const vector<double>& density)
 {
+  assert (C >= 0);
+  assert (N >= 0);
   const double old_C = total_C (geometry);
   const double old_N = total_N (geometry);
 
@@ -241,6 +245,7 @@ AM::Implementation::add (const Geometry& geometry,
 			 double C, /* fixed C/N */
 			 const vector<double>& density)
 {
+  assert (C >= 0);
   const double old_C = total_C (geometry);
 
   // Find the missing fraction.

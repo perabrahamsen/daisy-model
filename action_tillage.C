@@ -121,4 +121,3 @@ The end of the second layer to swap (a negative number).");
       Librarian<Action>::add_type ("swap", alist, syntax, &make);
     }
 } ActionSwap_syntax;
-

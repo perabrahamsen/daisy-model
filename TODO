@@ -1,8 +1,10 @@
-* Check om "mixing" giver forkerte resultater når man disabler transport.
-
-* Kør DHI Setup
+* Læg opdateret daisy.exe ud til Mette Lægdsmand.
 
 * Lysimeter Grundvand rand
+
+* Lav "Crop" Manager.
+
+* Earthworms and AM
 
 * Stof chemicals ned i jord via macropores.
 
@@ -18,13 +20,13 @@
 
 6. Implementer mixture.  sammenlign resultat.
 
-* Lav "Crop" Manager.
-
 * Transpiration/Water Uptake component
 
-* Nyt `misc' katalog med de to dhi scripts.
+* CVS
 
-* Earthworms and AM
+** Nyt `misc' katalog med de to dhi scripts.
+
+** Slet DaisyAll
 
 * Merge små AM til særlig "rest-am" pulje som ikke forsvinder.
 
@@ -42,15 +44,19 @@
 
 * Døde blade skal tælle med i lysfordelingen.
 
-* System til rename af duplicate object ved parsing.
+* Daisy som subsystem
 
-* daisy_alist_check skal ikke altid skrive fejl ud på cout.
+** System til rename af duplicate object ved parsing.
 
-* Try out "SWIFT"
+** daisy_alist_check skal ikke altid skrive fejl ud på cout.
 
-* Plot retentionskurve fra gdaisy.
+* Native GUI 
 
-* tkdaisy:
+** Try out "SWIFT"
+
+** Plot retentionskurve fra gdaisy.
+
+** tkdaisy:
 
   Create pseudo TkDaisyEntry top level as an syntax+alist containing a
   single "daisy" element.  Use this make the step function always
@@ -78,8 +84,6 @@ Consider how this fits into the desired ability to add rules to a
 Manager. 
 
 * Split Crop in submodules the same way as is done with Soil.
-
-* Use reference counting.
 
 * Make CSMP::find use binary search.
 

@@ -37,7 +37,9 @@ private:
 public:
   void output (Log&) const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
+#if 0
   void distribute (const Geometry&, const vector<double>& density);
+#endif
   void swap (const Geometry&, double from, double middle, double to);
   double total_C (const Geometry& geometry) const;
   double total_N (const Geometry& geometry) const;
