@@ -5,7 +5,7 @@
 bool 
 Surface::flux_top () const
 {
-  return false;
+  return true;
 }
 
 double 

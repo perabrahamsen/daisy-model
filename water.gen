@@ -34,7 +34,7 @@ while (<>)
     if (/\(q ([^\)]+)\)/)
     {
 	@q = split (" ", $1);
-	$acc += $q[0];
+	$acc += $q[52];
 	printf Q ("%s %s\n", $time, $acc);
 	$time++;
     }

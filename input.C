@@ -270,7 +270,10 @@ Parser::load_layers (const Library& lib)
 	error ("Ignoring negative layer");
       else
 	{
-	  layers.push_back (make_pair (zplus, &load_derived (lib)));
+	  const AttributeList& al = load_derived (lib);
+	  const string name = al.name ("type");
+	  lib.syntax (name).check (name, al, log);
+	  layers.push_back (make_pair (zplus, &al));
 	  last = zplus;
 	}
       skip (")");
@@ -481,15 +484,25 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	  add_derived (syntax.library (name), syntax.derive (name));
 	  break;
 	case Syntax::Object:
-	  atts.add (name, load_derived (syntax.library (name)));
+	  {
+	    const Library& lib = syntax.library (name);
+	    const AttributeList& al = load_derived (lib);
+	    const string obj = al.name ("type");
+	    lib.syntax (obj).check (obj, al, log);
+	    atts.add (name, al);
+	  }
 	  break;
 	case Syntax::Sequence:
 	  {
+	    const Library& lib = syntax.library (name);
 	    Sequence& sequence = *new Sequence ();
 	    while (!looking_at (')') && good ())
 	      {
 		skip ("(");
-		sequence.push_back (&load_derived (syntax.library (name)));
+		const AttributeList& al = load_derived (lib);
+		const string obj = al.name ("type");
+		lib.syntax (obj).check (obj, al, log);
+		sequence.push_back (&al);
 		skip (")");
 	      }
 	    atts.add (name, sequence);

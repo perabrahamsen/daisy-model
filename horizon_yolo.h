@@ -13,7 +13,6 @@ class HorizonYolo : public Horizon
 public:
   double Theta (double h) const;
   double K (double h) const;
-  double Cw1 (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
 

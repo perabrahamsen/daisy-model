@@ -3,7 +3,8 @@
 #include "daisy.h"
 #include "input.h"
 #include "syntax.h"
-
+#include "log.h"
+#include "alist.h"
 #include <iostream.h>
 
 int 

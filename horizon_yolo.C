@@ -3,14 +3,13 @@
 #include "horizon_yolo.h"
 #include "syntax.h"
 #include "alist.h"
-#include <vector.h>
 
 #define exception BUG_exception
 #include <math.h>
 #undef exception
 
 double 
-HorizonYolo::Theta (double h) const
+HorizonYolo::Theta (const double h) const
 {
   if (h < -1.0)
     return 0.124 + 274.2 / (739.0 + pow (log (-h), 4));
@@ -19,7 +18,7 @@ HorizonYolo::Theta (double h) const
 }
 
 double 
-HorizonYolo::K (double h) const
+HorizonYolo::K (const double h) const
 {
   if (h < -1.0)
     return 3600 * 1.53e-3 / (124.6 + pow (-h, 1.77));
@@ -27,14 +26,8 @@ HorizonYolo::K (double h) const
     return 3600 * 1.23e-5;
 }
 
-double
-HorizonYolo::Cw1 (double h) const
-{
-  return Theta (h) - Cw2 (h) * h;
-}
-
 double 
-HorizonYolo::Cw2 (double h) const
+HorizonYolo::Cw2 (const double h) const
 {
   if (h < -1.0)
     return - (  (-4 * 274.2 * pow (log (-h), 3))
@@ -44,14 +37,15 @@ HorizonYolo::Cw2 (double h) const
 }
 
 double 
-HorizonYolo::h (double /* Theta */) const
+HorizonYolo::h (const double Theta) const
 {
-  THROW (Unimplemented ("Calculate h from Theta"));
-  return -1;
+  if (Theta < 0.495)
+    return -exp(sqrt(sqrt(274.2 / (Theta - 0.124) - 739.)));
+  else
+    return -1;
 }
 
-HorizonYolo::HorizonYolo (const AttributeList& al)
-  : Horizon (al)
+HorizonYolo::HorizonYolo (const AttributeList&)
 { }
 
 HorizonYolo::~HorizonYolo ()

@@ -11,15 +11,10 @@ struct Syntax;
 
 class Horizon 
 {
-  // Content.
-  struct Implementation;
-  Implementation& impl;
-
   // Use.
 public:
   virtual double Theta (double h) const = 0;
   virtual double K (double h) const = 0;
-  virtual double Cw1 (double h) const = 0;
   virtual double Cw2 (double h) const = 0;
   virtual double h (double Theta) const = 0;
   virtual bool compact () const;
@@ -35,7 +30,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Horizon (const AttributeList&);
+  Horizon ();
 public:
   virtual ~Horizon ();
 };

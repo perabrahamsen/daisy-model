@@ -10,14 +10,6 @@ static Library* Horizon_library = NULL;
 typedef map<string, Horizon::constructor, less<string> > Horizon_map_type;
 static Horizon_map_type* Horizon_constructors;
 
-struct Horizon::Implementation
-{
-  Implementation (const AttributeList&);
-};
-
-Horizon::Implementation::Implementation (const AttributeList&)
-{ }
-
 bool 
 Horizon::compact () const
 {
@@ -57,8 +49,7 @@ Horizon::create (const AttributeList& al)
   return (*Horizon_constructors)[name] (library ().lookup (name));
 }
 
-Horizon::Horizon (const AttributeList& al)
-  : impl (*new Implementation (al))
+Horizon::Horizon ()
 { }
 
 Horizon::~Horizon ()

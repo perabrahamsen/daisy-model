@@ -33,7 +33,7 @@ public:
   inline double K (int i, double h) const
   { return horizon_[i]->K (h); }
   inline double Cw1 (int i, double h) const
-  { return horizon_[i]->Cw1 (h); }
+  { return Theta (i, h) - Cw2 (i, h) * h; }
   inline double Cw2 (int i, double h) const
   { return horizon_[i]->Cw2 (h); }
   inline double Theta (int i, double h) const

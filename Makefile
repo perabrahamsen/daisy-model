@@ -9,7 +9,8 @@ OBJ = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
 	denitrification.o soil_heat.o groundwater.o uzrichard.o \
 	horizon_yolo.o crop_std.o manager_rule.o weather_simple.o \
-	groundwater_static.o common.o
+	groundwater_static.o common.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o horizon_B_C.o \
+	horizon_M_BaC.o horizon_B_BaC.o 
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJ:.o=.h)
 TEST = crop.dai old_crop.chp old_crop.log \
@@ -59,6 +60,9 @@ crop-test:	crop.log crop.chp
 water-test:	water.log
 	diff old_water.log water.log
 
+check:	daisy test.dai
+	daisy test.dai
+
 # diff old_water.chp water.chp
 
 test:	crop-test water-test
@@ -94,7 +98,7 @@ ptest: pcrop
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-main.o: main.C daisy.h time.h input.h syntax.h
+main.o: main.C daisy.h time.h input.h syntax.h log.h alist.h common.h
 daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
  groundwater.h uzmodel.h horizon.h log.h crop.h column.h action.h \
  filter.h library.h syntax.h condition.h alist.h common.h
@@ -153,3 +157,15 @@ weather_simple.o: weather_simple.C weather_simple.h weather.h time.h \
 groundwater_static.o: groundwater_static.C groundwater_static.h \
  groundwater.h time.h uzmodel.h syntax.h alist.h common.h
 common.o: common.C common.h
+horizon_M_vG.o: horizon_M_vG.C horizon_M_vG.h horizon.h syntax.h \
+ alist.h common.h
+horizon_B_vG.o: horizon_B_vG.C horizon_B_vG.h horizon.h syntax.h \
+ alist.h common.h
+horizon_M_C.o: horizon_M_C.C horizon_M_C.h horizon.h syntax.h alist.h \
+ common.h
+horizon_B_C.o: horizon_B_C.C horizon_B_C.h horizon.h syntax.h alist.h \
+ common.h
+horizon_M_BaC.o: horizon_M_BaC.C horizon_M_BaC.h horizon.h syntax.h \
+ alist.h common.h
+horizon_B_BaC.o: horizon_B_BaC.C horizon_B_BaC.h horizon.h syntax.h \
+ alist.h common.h
