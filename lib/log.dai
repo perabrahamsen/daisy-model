@@ -820,7 +820,7 @@
            (interval (path column "$col" OrganicMatter CO2)
                      (dimension "g CO2/m^2/&")
 		     (when hourly)
-                     (factor 1.7272e4)) ;g CO2-C/cm^2 -> CO2/m^2
+                     (factor 3.666666666667e4)) ;g CO2-C/cm^2 -> CO2/m^2
            ))
 
 (deflog "Crop Production" table
