@@ -293,7 +293,7 @@ dlldaisy${EXT}:	cmain${OBJ} daisy.dll
 # Count the size of daisy.
 #
 wc: $(HEADERS) $(SOURCES) 
-	wc -l $(TEXT) | sort -nr
+	wc -l $(HEADERS) $(SOURCES) | sort -nr
 
 wc-h: $(HEADERS)
 	wc -l $(HEADERS)
@@ -588,7 +588,7 @@ soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  solute.h adsorption.h transport.h mactrans.h csmp.h submodel.h
 submodel${OBJ}: submodel.C submodel.h common.h
 weather_std${OBJ}: weather_std.C weather.h librarian.h library.h common.h \
- alist.h syntax.h im.h lexer_data.h lexer.h
+ alist.h syntax.h im.h lexer_data.h lexer.h mathlib.h
 select_flux_top${OBJ}: select_flux_top.C select.h condition.h librarian.h \
  library.h common.h alist.h syntax.h geometry.h
 select_flux_bottom${OBJ}: select_flux_bottom.C select.h condition.h \

@@ -14,8 +14,8 @@ struct WeatherStandard : public Weather
   // Units.
   struct unit_type
   {
-    string from;
-    string to;
+    const char* from;
+    const char* to;
     double factor;
   };
   static const unit_type unit_table[];
@@ -30,8 +30,8 @@ struct WeatherStandard : public Weather
   // Keywords
   struct keyword_description_type
   {
-    string name;
-    string dim;
+    const char* name;
+    const char* dim;
     double WeatherStandard::* value;
     double min;
     double max;
@@ -46,8 +46,8 @@ struct WeatherStandard : public Weather
   // Data.
   struct data_description_type
   {
-    string name;
-    string dim;
+    const char* name;
+    const char* dim;
     double WeatherStandard::* value;
     double WeatherStandard::* factor;
     double min;
@@ -57,11 +57,12 @@ struct WeatherStandard : public Weather
   static const data_description_type data_description[];
   static const int data_description_size;
   vector<int> data_index;
-  bool has_data (const char* name);
+  bool has_data (const string& name);
   bool has_date;
   bool has_hour;
   bool has_temperature;
   bool has_vapor_pressure;
+  bool has_relative_humidity;
   bool has_wind_speed;
   bool has_reference_evapotranspiration;
 
@@ -70,6 +71,7 @@ struct WeatherStandard : public Weather
   double global_radiation_factor;
   double precipitation_factor;
   double vapor_pressure_factor;
+  double relative_humidity_factor;
   double wind_speed_factor;
   double reference_evapotranspiration_factor;
 
@@ -82,6 +84,7 @@ struct WeatherStandard : public Weather
   double last_global_radiation;
   double last_precipitation;
   double last_vapor_pressure;
+  double last_relative_humidity;
   double last_wind_speed;
   double last_reference_evapotranspiration;
 
@@ -95,6 +98,7 @@ struct WeatherStandard : public Weather
   double next_global_radiation;
   double next_precipitation;
   double next_vapor_pressure;
+  double next_relative_humidity;
   double next_wind_speed;
   double next_reference_evapotranspiration;
 
@@ -168,7 +172,8 @@ const WeatherStandard::unit_type
 WeatherStandard::unit_table[] = 
 { { "mm/d", "mm/h", 0.0416666667 },
   { "dgWest", "dgEast", -1},
-  { "dgSouth", "dgNorth", -1} };
+  { "dgSouth", "dgNorth", -1},
+  { "%", "fraction", 0.01 } };
   
 const int 
 WeatherStandard::unit_table_size = 
@@ -241,6 +246,9 @@ WeatherStandard::data_description[] =
   { "VapPres", "Pa", &WeatherStandard::next_vapor_pressure,
     &WeatherStandard::vapor_pressure_factor,
     0, 5000, false },
+  { "RelHum", "fraction", &WeatherStandard::next_relative_humidity,
+    &WeatherStandard::relative_humidity_factor,
+    0, 5000, false },
   { "Wind", "m/s", &WeatherStandard::next_wind_speed,
     &WeatherStandard::wind_speed_factor,
     0, 40, false } };
@@ -251,12 +259,12 @@ WeatherStandard::data_description_size
   /**/ / sizeof (data_description_type);
 
 bool
-WeatherStandard::has_data (const char* name)
+WeatherStandard::has_data (const string& name)
 {
   for (unsigned int i = 0; i < data_index.size (); i++)
     {
       int index = data_index[i];
-      if (index >= 0 && data_description[index].name == name)
+      if (index >= 0 && name == data_description[index].name)
 	return true;
     }
   return false;
@@ -305,6 +313,7 @@ WeatherStandard::read_line ()
   last_global_radiation = next_global_radiation;
   last_precipitation = next_precipitation;
   last_vapor_pressure = next_vapor_pressure;
+  last_relative_humidity = next_relative_humidity;
   last_wind_speed = next_wind_speed;
   last_reference_evapotranspiration = next_reference_evapotranspiration;
 
@@ -322,9 +331,11 @@ WeatherStandard::read_line ()
 	  const double value =  factor * lex.get_number ();
 	  this->*(data_description[index].value) = value;
 	  if (value < data_description[index].min)
-	    lex.error (data_description[index].name + " value too low");
+	    lex.error (string ("Column ") 
+		       + data_description[index].name + " value too low");
 	  else if (value > data_description[index].max)
-	    lex.error (data_description[index].name + " value too hight");
+	    lex.error (string ("Column ") 
+		       + data_description[index].name + " value too hight");
 	  assert (next_precipitation >= 0.0);
 	}
 
@@ -384,6 +395,10 @@ WeatherStandard::read_new_day (const Time& time)
 	  precipitation_[hour] = last_precipitation;
 	  if (has_vapor_pressure)
 	    vapor_pressure_[hour] = last_vapor_pressure;
+	  else if (has_relative_humidity)
+	    vapor_pressure_[hour] 
+	      = SaturationVapourPressure (air_temperature_[hour])
+	      * last_relative_humidity;
 	  if (has_wind_speed)
 	    wind_speed_[hour] = last_wind_speed;
 	  else
@@ -410,7 +425,7 @@ WeatherStandard::read_new_day (const Time& time)
   daily_air_temperature_
     = accumulate (&air_temperature_[0], &air_temperature_[24], 0.0) / 24.0;
 
-  if (!has_vapor_pressure)
+  if (!has_vapor_pressure && !has_relative_humidity)
     {
       double T_min = *min_element (&air_temperature_[0],
 				   &air_temperature_[24]);
@@ -434,12 +449,14 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     has_hour (false),
     has_temperature (false),
     has_vapor_pressure (false),
+    has_relative_humidity (false),
     has_wind_speed (false),
     has_reference_evapotranspiration (false),
     air_temperature_factor (1.0),
     global_radiation_factor (1.0),
     precipitation_factor (1.0),
     vapor_pressure_factor (1.0),
+    relative_humidity_factor (1.0),
     wind_speed_factor (1.0),
     reference_evapotranspiration_factor (1.0),
     lex (al.name ("where")),
@@ -448,6 +465,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     last_global_radiation (-42.42e42),
     last_precipitation (-42.42e42),
     last_vapor_pressure (-42.42e42),
+    last_relative_humidity (-42.42e42),
     last_wind_speed (-42.42e42),
     last_reference_evapotranspiration (-42.42e42),
     next_time (begin),
@@ -459,6 +477,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     next_global_radiation (-42.42e42),
     next_precipitation (42.42e42),
     next_vapor_pressure (-42.42e42),
+    next_relative_humidity (-42.42e42),
     next_wind_speed (-42.42e42),
     next_reference_evapotranspiration (-42.42e42),
     hour (-42),
@@ -616,7 +635,8 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
   for (unsigned int i = 0; i < keyword_description_size; i++)
     if (keyword_description[i].required 
 	&& keywords.find (keyword_description[i].name) == keywords.end ())
-      lex.error (keyword_description[i].name + " missing");
+      lex.error (string ("Keyword ") 
+		 + keyword_description[i].name + " missing");
 
   static const string required[] = 
   { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep", "Station",
@@ -664,8 +684,15 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     lex.error ("You must specify either a timestep or date");
   has_temperature = has_data ("AirTemp");
   has_vapor_pressure = has_data ("VapPres");
+  has_relative_humidity = has_data ("RelHum");
+  if (has_relative_humidity && has_vapor_pressure)
+    lex.error ("You should only specify one of VapPres or RelHum");
   has_wind_speed = has_data ("Wind");
   has_reference_evapotranspiration = has_data ("RefEvap");
+  for (unsigned int j = 0; j < data_description_size; j++)
+    if (data_description[j].required && !has_data (data_description[j].name))
+      lex.error (string ("Required data column `") 
+		 + data_description[j].name + "' missing");
 
   // Dimensions.
   for (unsigned int i = 0; i < data_index.size (); i++)

@@ -1,5 +1,11 @@
 1999-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* weather_std.C: Added `RelHum' data type.
+
+	* Merged SH changes.
+
+	* hydraulic_M_vG.C (Se): Added assertions.
+
 	* Version 0.97 released.
 
 1999-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>

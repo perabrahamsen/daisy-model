@@ -94,7 +94,12 @@ double
 HydraulicM_vG::Se (double h) const
 {
   if (h < 0.0)
-    return pow (1.0 / (1.0 + pow (a * h, n)), m);
+    {
+      const double Se_h = pow (1.0 / (1.0 + pow (a * h, n)), m);
+      assert (Se_h >= 0.0);
+      assert (Se_h <= 1.0);
+      return Se_h;
+    }
   else
     return 1.0;
 }
