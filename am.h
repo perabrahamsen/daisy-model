@@ -29,7 +29,7 @@
 class Geometry;
 class Soil;
 class Time;
-class OM;
+class AOM;
 class Treelog;
 
 class AM
@@ -41,7 +41,7 @@ public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const string name;
   static const char *const description;
-  void append_to (vector<OM*>& added);
+  void append_to (vector<AOM*>& added);
   const string& real_name () const;
 
   // Simulation.
@@ -81,7 +81,7 @@ public:
 		     const string& sort, const string& part,
 		     lock_type lock = Unlocked);
   void initialize (const Soil&);
-  static const vector<AttributeList*>& default_AOM ();
+  static const vector<AttributeList*>& default_AM ();
   static const AttributeList& default_root ();
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]

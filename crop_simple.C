@@ -30,7 +30,7 @@
 #include "plf.h"
 #include "soil_water.h"
 #include "soil.h"
-#include "om.h"
+#include "aom.h"
 #include "organic_matter.h"
 #include "soil_heat.h"
 #include "soil_NH4.h"
@@ -476,8 +476,8 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
 		"Fully developed root N content.");
     alist.add ("root_N", 20.0);
     syntax.add_submodule_sequence ("root_am", Syntax::Const, 
-				   "Root AM parameters.", OM::load_syntax);
-    alist.add ("root_am", AM::default_AOM ());
+				   "Root AM parameters.", AOM::load_syntax);
+    alist.add ("root_am", AM::default_AM ());
     syntax.add ("potential_N", "kg N/ha", Check::non_negative (), Syntax::Const,
 		"Potential N content at harvest.");
     syntax.add ("N_demand", "g N/m^2", Syntax::LogOnly,

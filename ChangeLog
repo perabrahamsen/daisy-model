@@ -1,3 +1,31 @@
+2002-06-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.33 released.
+
+2002-06-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C, am.h (default_AM): Renamed from default_AOM.
+	* som.C, som.h, smb.C, smb.h, aom.C, aom.h, dom.C, dom.h: New
+	submodels.
+	* Makefile (SUBMODELS): Add it.
+	(SPECIALS): Moved om.C here.
+	* om.C, om.h (tick): Update callers.
+	* am.C, organic_matter.C: Update users.
+	* vegetation_permanent.C, bioincorporation.C: Update callers.
+	* crop_old.C, crop_sold.C, crop_simple.C: Ditto.
+	* harvesting.C: Ditto.
+
+2002-06-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Organic Matter"): Added DOM.
+
+	* om.C (goal_C_per_N): New variable.
+	* organic_matter.C (initialize): Initialize it.
+	* om.C (find_abiotic): New overloaded function.
+	(tick): Call it.  Take dom arguments.
+	* organic_matter.C (tick): dom turnover.
+	(check_alist): Require dom C/N to be specified.
+	
 2002-05-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* organic_matter.C (dom): New member. 

@@ -29,7 +29,7 @@
 #include "soil_water.h"
 #include "soil.h"
 #include "organic_matter.h"
-#include "om.h"
+#include "aom.h"
 #include "soil_heat.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
@@ -809,11 +809,11 @@ Non-functional lim for N-concentration in roots.");
   Harvest.add ("Bt", Syntax::None (), Syntax::Const,
 	       "N partitioning at harvest parameter.");
   Harvest.add_submodule_sequence ("Leaf", Syntax::Const, 
-				 "Leaf AM parameters.", OM::load_syntax);
+				 "Leaf AM parameters.", AOM::load_syntax);
   Harvest.add_submodule_sequence ("SOrg", Syntax::Const,
-				 "SOrg AM parameters.", OM::load_syntax);
+				 "SOrg AM parameters.", AOM::load_syntax);
   Harvest.add_submodule_sequence ("Root", Syntax::Const,
-				 "Root AM parameters.", OM::load_syntax);
+				 "Root AM parameters.", AOM::load_syntax);
   Harvest.add ("C_Leaf", Syntax::None (), Syntax::Const,
 	       "C fraction of total weight.");
   Harvest.add ("C_SOrg", Syntax::None (), Syntax::Const,

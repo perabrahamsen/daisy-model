@@ -22,7 +22,7 @@
 #include "harvesting.h"
 #include "production.h"
 #include "am.h"
-#include "om.h"
+#include "aom.h"
 #include "crop.h"		// for Crop::DSremove.
 #include "harvest.h"
 #include "geometry.h"
@@ -454,22 +454,22 @@ Harvesting::load_syntax (Syntax& syntax, AttributeList& alist)
 	     "Information about what happens to the crop at harvest and cut.");
 
   syntax.add_submodule_sequence ("Stem", Syntax::Const, 
-				 "Stem AOM parameters.", OM::load_syntax);
-  alist.add ("Stem", AM::default_AOM ());
+				 "Stem AOM parameters.", AOM::load_syntax);
+  alist.add ("Stem", AM::default_AM ());
   syntax.add_submodule_sequence ("Leaf", Syntax::Const,
-				 "Leaf AM parameters.", OM::load_syntax);
-  alist.add ("Leaf", AM::default_AOM ());
+				 "Leaf AM parameters.", AOM::load_syntax);
+  alist.add ("Leaf", AM::default_AM ());
   syntax.add_submodule_sequence ("Dead", Syntax::Const,
 				 "Dead leaves AM parameters.",
-				 OM::load_syntax);
-  alist.add ("Dead", AM::default_AOM ());
+				 AOM::load_syntax);
+  alist.add ("Dead", AM::default_AM ());
   syntax.add_submodule_sequence ("SOrg", Syntax::Const,
 				 "Storage organ AM parameters.", 
-				 OM::load_syntax);
-  alist.add ("SOrg", AM::default_AOM ());
+				 AOM::load_syntax);
+  alist.add ("SOrg", AM::default_AM ());
   syntax.add_submodule_sequence ("Root", Syntax::Const,
-				 "Root AM parameters.", OM::load_syntax);
-  alist.add ("Root", AM::default_AOM ());
+				 "Root AM parameters.", AOM::load_syntax);
+  alist.add ("Root", AM::default_AM ());
   syntax.add ("EconomicYield_W", Syntax::None (), Syntax::Const, "\
 Valuable fraction of storage organ (DM), e.g. grain or tuber.");
   alist.add ("EconomicYield_W", 1.00);

@@ -1,7 +1,7 @@
-// om.C
+// om.C -- A single unspecified organic matter pool.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -21,6 +21,9 @@
 
 
 #include "om.h"
+#include "som.h"
+#include "smb.h"
+#include "dom.h"
 #include "syntax.h"
 #include "alist.h"
 #include "check.h"
@@ -28,7 +31,6 @@
 #include "log.h"
 #include "mathlib.h"
 #include "tmpstream.h"
-#include "submodel.h"
 #include "assertion.h"
 #include <numeric>
 
@@ -36,8 +38,6 @@ void
 OM::output (Log& log) const
 {
   log.output ("initial_C_per_N", initial_C_per_N); // For checkpoint
-  log.output ("top_C", top_C);
-  log.output ("top_N", top_N);
   log.output ("C", C);
   log.output ("N", N);
   if (log.check_member ("C_per_N"))
@@ -57,38 +57,22 @@ OM::output (Log& log) const
 }
 
 void 
-OM::mix (const Geometry& geometry, double from, double to, double penetration)
+OM::mix (const Geometry& geometry, double from, double to)
 {
-  daisy_assert (penetration >= 0.0);
-  daisy_assert (penetration <= 1.0);
-  daisy_assert (top_C >= 0.0);
-  daisy_assert (top_N >= 0.0);
-
   // Ignore tiny pools.
-  if (total_C (geometry) < 1e-20)
+  if (soil_C (geometry) < 1e-20)
     return;
 
-  // Mix C.
-  geometry.add (C, from, to, top_C * penetration);
+  // Mix.
   geometry.mix (C, from, to);
-  top_C *= (1.0 - penetration);
-  daisy_assert (top_C >= 0.0);
-
-  // Mix N.
-  geometry.add (N, from, to, top_N * penetration);
   geometry.mix (N, from, to);
-  top_N *= (1.0 - penetration);
-  daisy_assert (top_N >= 0.0);
 }
 
 void
 OM::swap (const Geometry& geometry, double from, double middle, double to)
 {
-  daisy_assert (top_C >= 0.0);
-  daisy_assert (top_N >= 0.0);
-
   // Ignore tiny pools.
-  if (total_C (geometry) < 1e-20)
+  if (soil_C (geometry) < 1e-20)
     return;
 
   // Swap.
@@ -97,32 +81,12 @@ OM::swap (const Geometry& geometry, double from, double middle, double to)
 }
 
 double 
-OM::total_C (const Geometry& geometry) const
-{
-  return geometry.total (C) + top_C;
-}
+OM::soil_C (const Geometry& geometry) const
+{ return geometry.total (C); }
 
 double 
-OM::total_N (const Geometry& geometry) const
-{
-  return geometry.total (N) + top_N;
-}
-
-double 
-OM::C_at (unsigned int at) const
-{
-  if (at >= C.size ())
-    return 0.0;
-  return C[at];
-}
-
-double 
-OM::N_at (unsigned int at) const
-{
-  if (at >= N.size ())
-    return 0.0;
-  return N[at];
-}
+OM::soil_N (const Geometry& geometry) const
+{ return geometry.total (N); }
 
 double 
 OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.
@@ -132,77 +96,6 @@ OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.
 }
 
 void
-OM::pour (vector<double>& cc, vector<double>& nn)
-{
-  const unsigned int size = C.size ();
-  daisy_assert (N.size () >= size);
-  daisy_assert (cc.size () >= size);
-  daisy_assert (nn.size () >= size);
-  for (unsigned int i = 0; i < size; i++)
-    {
-      cc[i] += C[i];
-      C[i] = 0.0;
-      nn[i] += N[i];
-      N[i] = 0.0;
-    }
-}
-
-void 
-OM::add (double C, double N)
-{
-  daisy_assert (C >= 0.0);
-  daisy_assert (N >= 0.0);
-  top_C += C;
-  top_N += N;
-}
-
-void 
-OM::add (unsigned int at, double to_C, double to_N)
-{
-  grow (at+1);
-  C[at] += to_C;
-  N[at] += to_N;
-  daisy_assert (finite (C[at]));
-  daisy_assert (finite (N[at]));
-}
-
-void 
-OM::add (const Geometry& geometry, // Add dead roots.
-	 double to_C, double to_N, 
-	 const vector<double>& density)
-{
-  const double old_C = total_C (geometry);
-  const double old_N = total_N (geometry);
-  grow (density.size ());
-
-  // Distribute it according to the root density.
-  const double total = geometry.total (density);
-  for (unsigned int i = 0; i < density.size (); i++)
-    {
-      // We should *not* multiply with dz here.  Reason: We want to
-      // divide C on the total depth.  
-      const double factor = density[i] /* * geometry.dz (i) */ / total;
-      daisy_assert (factor >= 0.0);
-      N[i] += to_N * factor;
-      C[i] += to_C * factor;
-      daisy_assert (finite (C[i]));
-      daisy_assert (C[i] >= 0.0);
-      daisy_assert (finite (N[i]));
-      daisy_assert (N[i] >= 0.0);
-    }
-
-  // Check that we computed the correct value.
-  const double new_C = total_C (geometry);
-  const double new_N = total_N (geometry);
-  daisy_assert (to_C * 1e9 < old_C
-	  ? approximate (old_C + to_C, new_C)
-	  : (approximate (new_C - old_C, to_C)));
-  daisy_assert (to_N * 1e9 < old_N
-	  ? approximate (old_N + to_N, new_N)
-	  : (approximate (new_N - old_N, to_N)));
-}
-
-inline void
 OM::tock (unsigned int end, const double* factor,
 	  double fraction, double efficiency,
 	  const double* N_soil, double* N_used, double* CO2, OM& om)
@@ -289,29 +182,11 @@ OM::tock (unsigned int end, const double* factor,
 void
 OM::tick (unsigned int end, const double* abiotic_factor, 
 	  const double* N_soil, double* N_used,
-	  double* CO2, const vector<OM*>& smb, const vector<OM*>&som,
-	  const vector<OM*>& dom)
+	  double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
+	  const vector<DOM*>& dom)
 {
   const unsigned int size = min (C.size (), end);
   daisy_assert (N.size () >= size);
-
-  if (maintenance != 0.0)
-    {
-      // SMB maintenance.
-      for (unsigned int i = 0; i < size; i++)
-	{
-	  daisy_assert (C[i] >= 0.0);
-	  daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
-	  // Maintenance.
-	  const double C_use = C[i] * maintenance * abiotic_factor[i];
-	  const double N_use = N[i] * maintenance * abiotic_factor[i];
-	  CO2[i] += C_use;
-	  C[i] -= C_use;
-	  N[i] -= N_use;
-	  N_used[i] -= N_use;
-	  daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
-	}
-    }
 
   const unsigned int smb_size = smb.size ();
   const unsigned int som_size = som.size ();
@@ -334,6 +209,7 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	      N_soil, N_used, CO2, *som[j]);
     }
   // Distribute to all dissolved pools.
+#ifdef FIXED_DOM_C_per_N
   for (unsigned int j = 0; j < dom_size; j++)
     {
       const double fraction = fractions[smb_size + som_size + j];
@@ -341,63 +217,32 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	tock (size, abiotic_factor, turnover_rate * fraction, 1.0,
 	      N_soil, N_used, CO2, *dom[j]);
     }
+#else // Variable DOM C/N
+  for (unsigned int j = 0; j < dom_size; j++)
+    {
+      const double factor = turnover_rate * fractions[smb_size + som_size + j];
+      if (factor > 1e-50)
+	{
+	  for (unsigned int i = 0; i < size; i++)
+	    {
+	      const double rate = min (factor * abiotic_factor[i], 0.1);
+	      const double C_use = C[i] * rate;
+	      const double N_use = N[i] * rate;
+	      dom[j]->N[i] += N_use;
+	      dom[j]->C[i] += C_use;
+	      C[i] -= C_use;
+	      N[i] -= N_use;
+	      daisy_assert (C[i] >= 0.0);
+	      daisy_assert (dom[j]->C[i] >= 0.0);
+	      daisy_assert (dom[j]->N[i] >= 0.0);
+	    }
+	}
+    }
+#endif // Variable DOM C/N
   for (unsigned int i = 0; i < size; i++)
     {
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (C[i] >= 0.0);
-    }
-}
-
-void 
-OM::tick (unsigned int end, const double* abiotic_factor, 
-	  const double* N_soil, double* N_used,
-	  double* CO2, const vector<OM*>& smb, double* som_C, double* som_N,
-	  const vector<OM*>& dom)
-{
-  const unsigned int size = min (C.size (), end);
-  daisy_assert (N.size () >= size);
-  daisy_assert (maintenance == 0.0);
-  
-  const unsigned int smb_size = smb.size ();
-  const unsigned int dom_size = dom.size ();
-  daisy_assert (fractions.size () >= smb_size + 1);
-
-  // Distribute to all biological pools.
-  for (unsigned int j = 0; j < smb_size; j++)
-    {
-      const double fraction = fractions[j];
-      if (fraction > 1e-50)
-	tock (size, abiotic_factor, turnover_rate * fraction, efficiency[j],
-	      N_soil, N_used, CO2, *smb[j]);
-    }
-
-  // Distribute to soil buffer.
-  const double factor = turnover_rate * fractions[smb_size];
-  for (unsigned int i = 0; i < size; i++)
-    {
-      const double rate = min (factor * abiotic_factor[i], 0.1);
-      const double C_use = C[i] * rate;
-      const double N_use = N[i] * rate;
-      som_N[i] += N_use;
-      som_C[i] += C_use;
-      C[i] -= C_use;
-      N[i] -= N_use;
-      daisy_assert (C[i] >= 0.0);
-      daisy_assert (som_C[i] >= 0.0);
-      daisy_assert (som_N[i] >= 0.0);
-    }
-
-  if (fractions.size () == smb_size + 1)
-    return;
-  daisy_assert (fractions.size () == smb_size + 1 + dom_size);
-
-  // Distribute to all dissolved pools.
-  for (unsigned int j = 0; j < dom_size; j++)
-    {
-      const double fraction = fractions[smb_size + 1 + j];
-      if (fraction > 1e-50)
-	tock (size, abiotic_factor, turnover_rate * fraction, efficiency[j],
-	      N_soil, N_used, CO2, *dom[j]);
     }
 }
 
@@ -491,18 +336,6 @@ OM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_alist);
   alist.add ("submodel", "OM");
-  alist.add ("description", "\
-Organic matter.  This is a common abstraction for the SMB (Soil\n\
-MicroBiomass), SOM (Soil Organic Matter) DOM (Dissolved Organic Matter)\n\
-and AOM (Added Organic Matter) pools.  That is, all the organic matter\n\
-in the soil.  Some attributes, such as 'maintenance', are only meaningful\n\
-for certain kinds of organic matter, in this case the SMB pools.");
-  syntax.add ("top_C", "g C/cm^2", Check::non_negative (), Syntax::State,
-	      "Carbon on top of soil.");
-  alist.add ("top_C", 0.0);
-  syntax.add ("top_N", "g N/cm^2", Check::non_negative (), Syntax::State,
-	      "Nitrogen on top of soil.");
-  alist.add ("top_N", 0.0);
   syntax.add ("C", "g C/cm^3", Check::non_negative (),
 	      Syntax::OptionalState, Syntax::Sequence,
 	      "Carbon in each soil interval.");
@@ -522,9 +355,6 @@ You must specify either this or 'turnover_halftime'.");
 You must specify either this or 'turnover_rate'.");
   syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
 the efficiency this pool can be digested by each of the SMB pools.");
-  syntax.add ("maintenance", "h^-1", Check::fraction (), Syntax::Const, "\
-The fraction used for staying alive each hour.");
-  alist.add ("maintenance", 0.0);
   syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
 How this pool is divided into other pools.\n\
 The first numbers corresponds to each of the SMB pools, the remaining\n\
@@ -572,13 +402,10 @@ OM::get_initial_C_per_N (const AttributeList& al)
 OM::OM (const AttributeList& al)
   : initial_fraction (al.number ("initial_fraction")),
     initial_C_per_N (get_initial_C_per_N (al)),
-    top_C (al.number ("top_C")),
-    top_N (al.number ("top_N")),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")
 		   : halftime_to_rate (al.number ("turnover_halftime"))),
     efficiency (al.number_sequence ("efficiency")),
-    maintenance (al.number ("maintenance")),
     fractions (al.number_sequence ("fractions"))
 { 
   if (al.check ("heat_factor"))
@@ -607,4 +434,6 @@ OM::OM (const AttributeList& al)
     }
 }
 
-static Submodel::Register om_submodel ("OM", OM::load_syntax);
+OM::~OM ()
+{ }
+

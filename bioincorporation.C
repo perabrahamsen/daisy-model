@@ -29,7 +29,7 @@
 #include "submodel.h"
 #include "plf.h"
 #include "time.h"
-#include "om.h"
+#include "aom.h"
 #include "mathlib.h"
 #include <algorithm>
 
@@ -43,7 +43,7 @@ struct Bioincorporation::Implementation
   const double respiration;
   const PLF distribution;
   vector<double> density;
-  const vector<AttributeList*>& AOM; // Stem AM parameters.
+  const vector<AttributeList*>& aom_alists; // Stem AM parameters.
   
   // Content.
   AM* aom;
@@ -211,7 +211,7 @@ Bioincorporation::Implementation::initialize (const Soil& soil)
 AM*
 Bioincorporation::Implementation::create_am (const Geometry& geometry)
 { 
-  aom = &AM::create (geometry, Time (1, 1, 1, 1), AOM,
+  aom = &AM::create (geometry, Time (1, 1, 1, 1), aom_alists,
 		     "bio", "incorporation", AM::Locked); 
   return aom;
 }
@@ -227,7 +227,7 @@ Bioincorporation::Implementation::Implementation (const AttributeList& al)
     T_factor (al.plf ("T_factor")),
     respiration (al.number ("respiration")),
     distribution (al.plf ("distribution")), 
-    AOM (al.alist_sequence ("AOM")),
+    aom_alists (al.alist_sequence ("AOM")),
     C (0.0),
     N (0.0)
 { }
@@ -313,11 +313,11 @@ the whole profile.");
   alist.add ("distribution", distribution);
 
   // Incorporated AM parameters.
-  Syntax om_syntax;
-  AttributeList om_alist;
-  OM::load_syntax (om_syntax, om_alist);
-  AttributeList AOM1 (om_alist);
-  AttributeList AOM2 (om_alist);
+  Syntax aom_syntax;
+  AttributeList aom_alist;
+  AOM::load_syntax (aom_syntax, aom_alist);
+  AttributeList AOM1 (aom_alist);
+  AttributeList AOM2 (aom_alist);
   AOM1.add ("initial_fraction", 0.80);
   vector<double> CN;
   CN.push_back (60.0);
@@ -342,13 +342,13 @@ the whole profile.");
   fractions2.push_back (1.00);
   fractions2.push_back (0.00);
   AOM2.add ("fractions", fractions2);
-  vector<AttributeList*> AOM;
-  AOM.push_back (&AOM1);
-  AOM.push_back (&AOM2);
+  vector<AttributeList*> am;
+  am.push_back (&AOM1);
+  am.push_back (&AOM2);
   syntax.add_submodule_sequence ("AOM", Syntax::Const, 
 				 "Incorporated AM parameters.", 
-				 OM::load_syntax);
-  alist.add ("AOM", AOM);
+				 AOM::load_syntax);
+  alist.add ("AOM", am);
 }
   
 Bioincorporation::Bioincorporation (const AttributeList& al)

@@ -2,15 +2,17 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * DOM.
 
-** Udvid OM::fractions med et ekstra medlem -> DOM
-
-** DOM::turnover_rate + DOM::fractions
+** Transport skal ikke bruge solute, men adsorbtion.
 
 ** matrix transport af C og N seperat
 
 ** macro transport af C og N seperat
 
 ** adsorbtion af DOM til matrix
+
+* DOM 
+
+** Skal DOM have fixed eller goal C/N?
 
 * User Manual
 

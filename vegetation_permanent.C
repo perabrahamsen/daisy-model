@@ -10,7 +10,7 @@
 #include "soil.h"
 #include "crop.h"
 #include "am.h"
-#include "om.h"
+#include "aom.h"
 #include "organic_matter.h"
 #include <deque>
 
@@ -310,8 +310,8 @@ VegetationPermanentSyntax
     syntax.add ("N_litter", "g N/m^2/h", Syntax::LogOnly,
 		"Nitrogen in litter this hour.");
     syntax.add_submodule_sequence ("litter_am", Syntax::Const,
-				   "Litter AOM parameters.", OM::load_syntax);
-    alist.add ("litter_am", AM::default_AOM ());
+				   "Litter AOM parameters.", AOM::load_syntax);
+    alist.add ("litter_am", AM::default_AM ());
     syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
 			 RootSystem::load_syntax);
     syntax.add ("root_DM", "T DM/ha", Syntax::Const, 

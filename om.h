@@ -31,6 +31,9 @@ class AttributeList;
 class Syntax;
 class Log;
 class Geometry;
+class SOM;
+class SMB;
+class DOM;
 
 class OM
 { 
@@ -42,45 +45,30 @@ public:
   /* const */ vector<double> C_per_N_goal; // Prefered C/N value.
   /* const */ PLF heat_factor;
   /* const */ PLF water_factor;
+
   // Content.
 public:
-  double top_C;			// Carbon on the ground.
-  double top_N;			// Nitrogen on the ground;
   vector<double> C;		// Carbon in each node.
   vector<double> N;		// Nitrogen in each node.
   const double turnover_rate;	// How fast this is it turned over?
-  const vector <double> efficiency;	// How digestible is this?
-  const double maintenance;	// How fast does it eat itself?
+  const vector<double> efficiency;	// How digestible is this?
   const vector<double> fractions;	// How much is turned into SMB and SOM?
 
   // Simulation.
 public:
   void output (Log&) const;
-  void mix (const Geometry&, double from, double to, double penetration = 1.0);
+  void mix (const Geometry&, double from, double to);
   void swap (const Geometry&, double from, double middle, double to);
-  double total_C (const Geometry& geometry) const;
-  double total_N (const Geometry& geometry) const;
-  double C_at (unsigned int at) const;
-  double N_at (unsigned int at) const;
+  double soil_C (const Geometry& geometry) const;
+  double soil_N (const Geometry& geometry) const;
   double goal_C_per_N (unsigned int at) const; // Desired C/N ratio.
-  void pour (vector<double>& cc, vector<double>& nn);
-  void add (double C, double N);// Add dead leafs.
-  void add (unsigned int at, double C, double N); // Merge unspecified.
-  void add (const Geometry&,	// Add dead roots.
-	    double C, double N, 
-	    const vector<double>& density);
-
 
 public:
   void tick (unsigned int size, const double* turnover_factor, 
 	     const double* N_soil, double* N_used,
-	     double* CO2, const vector<OM*>& smb, const vector<OM*>&som,
-	     const vector<OM*>& dom);
-  void tick (unsigned int size, const double* turnover_factor,
-	     const double* N_soil, double* N_used,
-	     double* CO2, const vector<OM*>& smb, 
-	     double* som_C, double* som_N, const vector<OM*>& dom);
-private:
+	     double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
+	     const vector<DOM*>& dom);
+protected:
   void tock (unsigned int size, const double* rate,
 	     double factor, double efficiency, 
 	     const double* N_soil, double* N_used,
@@ -93,8 +81,10 @@ public:
   // Create & Destroy.
 public:
   void grow (unsigned int size);
+protected:
   static void load_syntax (Syntax&, AttributeList&);
   OM (const AttributeList& al);
+  ~OM ();
 };
 
 #endif // OM_H

@@ -1,4 +1,4 @@
-// crop_old.C
+// crop_old.C -- Old model of crop.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -28,7 +28,7 @@
 #include "plf.h"
 #include "soil_water.h"
 #include "soil.h"
-#include "om.h"
+#include "aom.h"
 #include "organic_matter.h"
 #include "soil_heat.h"
 #include "soil_NH4.h"
@@ -802,13 +802,13 @@ Non-functional lim for N-concentration in roots.");
   Harvest.add ("alpha", Syntax::None (), Syntax::Const,
 	       "Relative increase in straw concentration above normal range.");
   Harvest.add_submodule_sequence ("Stem", Syntax::Const, 
-				 "Stem AM parameters.", OM::load_syntax);
+				 "Stem AM parameters.", AOM::load_syntax);
   Harvest.add_submodule_sequence ("Leaf", Syntax::Const,
-				 "Leaf AM parameters.", OM::load_syntax);
+				 "Leaf AM parameters.", AOM::load_syntax);
   Harvest.add_submodule_sequence ("SOrg", Syntax::Const,
-				 "SOrg AM parameters.", OM::load_syntax);
+				 "SOrg AM parameters.", AOM::load_syntax);
   Harvest.add_submodule_sequence ("Root", Syntax::Const,
-				 "Root AM parameters.", OM::load_syntax);
+				 "Root AM parameters.", AOM::load_syntax);
   Harvest.add ("C_Stem", Syntax::None (), Syntax::Const,
 	       "C fraction of total weight.");
   Harvest.add ("C_SOrg", Syntax::None (), Syntax::Const,

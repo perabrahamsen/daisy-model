@@ -1,7 +1,7 @@
-// am.C
+// am.C -- Added Matter, i.e. fertilizer and residuals.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2000-2002 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -21,7 +21,7 @@
 
 
 #include "am.h"
-#include "om.h"
+#include "aom.h"
 #include "im.h"
 #include "syntax.h"
 #include "alist.h"
@@ -46,7 +46,7 @@ struct AM::Implementation
   // Content.
   const Time creation;		// When it was created.
   const string name;		// What is was.
-  const vector<OM*> om;		// Organic matter pool.
+  const vector<AOM*> om;		// Organic matter pool.
 
   // Use this if a living crop is adding to this AM.
   struct Lock;
@@ -66,7 +66,7 @@ struct AM::Implementation
   double C_at (unsigned int at) const;
   double N_at (unsigned int at) const;
   void pour (vector<double>& cc, vector<double>& nn); // Move content to cc&nn.
-  void append_to (vector<OM*>& added); // Add OM's to added.
+  void append_to (vector<AOM*>& added); // Add OM's to added.
   void distribute (double C, vector<double>& om_C, // Helper for 'add' fns.
 		   double N, vector<double>& om_N);
   void add (double C, double N);// Add dead leafs.
@@ -80,7 +80,7 @@ struct AM::Implementation
 
 
   // Create and Destroy.
-  Implementation (const Time& c, const string& n, const vector<OM*>& o);
+  Implementation (const Time& c, const string& n, const vector<AOM*>& o);
   ~Implementation ();
 };
 
@@ -330,7 +330,7 @@ AM::Implementation::multiply_top (double fraction)
 }
 
 void 
-AM::Implementation::append_to (vector<OM*>& added)
+AM::Implementation::append_to (vector<AOM*>& added)
 {
   for (unsigned i = 0; i < om.size (); i++)
     added.push_back (om[i]);
@@ -361,8 +361,10 @@ AM::Implementation::mix (const Geometry& geometry,
   const double old_N = total_N (geometry);
 
   for (unsigned int i = 0; i < om.size (); i++)
-    om[i]->mix (geometry, from, to, penetration);
-
+    {
+      om[i]->penetrate (geometry, from, to, penetration);
+      om[i]->mix (geometry, from, to);
+    }
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
   
@@ -392,7 +394,7 @@ AM::Implementation::total_C (const Geometry& geometry) const
 {
   double total = 0.0;
   for (unsigned int i = 0; i < om.size (); i++)
-    total += om[i]->total_C (geometry);
+    total += om[i]->full_C (geometry);
   return total;
 }
 
@@ -401,7 +403,7 @@ AM::Implementation::total_N (const Geometry& geometry) const
 {
   double total = 0.0;
   for (unsigned int i = 0; i < om.size (); i++)
-    total += om[i]->total_N (geometry);
+    total += om[i]->full_N (geometry);
   return total;
 }
 
@@ -431,7 +433,7 @@ AM::Implementation::pour (vector<double>& cc, vector<double>& nn)
 }
 
 AM::Implementation::Implementation (const Time& c, const string& n,
-				    const vector<OM*>& o)
+				    const vector<AOM*>& o)
   : creation (c),
     name (n),
     om (o),
@@ -454,7 +456,7 @@ AM::output (Log& log) const
 { impl.output (log); }
 
 void 
-AM::append_to (vector<OM*>& added)
+AM::append_to (vector<AOM*>& added)
 { impl.append_to (added); }
 
 bool 
@@ -564,17 +566,17 @@ AM::create (const Geometry& /*geometry*/, const Time& time,
 }
 
 const vector<AttributeList*>&
-AM::default_AOM ()
+AM::default_AM ()
 {
-  static vector<AttributeList*>* AOM = NULL;
+  static vector<AttributeList*>* am = NULL;
 
-  if (!AOM)
+  if (!am)
     {
-      Syntax om_syntax;
-      AttributeList om_alist;
-      OM::load_syntax (om_syntax, om_alist);
-      AttributeList& AOM1 = *new AttributeList (om_alist);
-      AttributeList& AOM2 = *new AttributeList (om_alist);
+      Syntax aom_syntax;
+      AttributeList aom_alist;
+      AOM::load_syntax (aom_syntax, aom_alist);
+      AttributeList& AOM1 = *new AttributeList (aom_alist);
+      AttributeList& AOM2 = *new AttributeList (aom_alist);
       AOM1.add ("initial_fraction", 0.80);
       vector<double> CN;
       CN.push_back (90.0);
@@ -599,11 +601,11 @@ AM::default_AOM ()
       fractions2.push_back (1.00);
       fractions2.push_back (0.00);
       AOM2.add ("fractions", fractions2);
-      AOM = new vector<AttributeList*>;
-      AOM->push_back (&AOM1);
-      AOM->push_back (&AOM2);
+      am = new vector<AttributeList*>;
+      am->push_back (&AOM1);
+      am->push_back (&AOM2);
     }
-  return *AOM;
+  return *am;
 }
 
 const AttributeList& 
@@ -621,7 +623,7 @@ AM::default_root ()
       root.add ("weight", 1.2);
       root.add ("total_C_fraction", 0.40);
       root.add ("total_N_fraction", 0.01);
-      root.add ("om", AM::default_AOM ());
+      root.add ("om", AM::default_AM ());
     }
   return root;
 }
@@ -775,7 +777,7 @@ AM::AM (const AttributeList& al)
   : impl (*new Implementation 
 	  (al.time ("creation"),
 	   al.name ("name"),
-	   map_construct<OM> (al.alist_sequence ("om")))),
+	   map_construct<AOM> (al.alist_sequence ("om")))),
     alist (al),
     name ("state")
 {
@@ -813,7 +815,7 @@ AM::initialize (const Soil& soil)
   else if (syntax == "initial")
     {
       const vector<AttributeList*>& oms = alist.alist_sequence ("om");
-      const vector<OM*>& om = impl.om;
+      const vector<AOM*>& om = impl.om;
       
       const vector<AttributeList*>& layers
 	= alist.alist_sequence ("layers");
@@ -1033,7 +1035,7 @@ This AM belongs to a still living plant",
 			      AM::Implementation::Lock::load_syntax);
 	syntax.add_submodule_sequence ("om", Syntax::State, 
 				       "The individual AOM pools.",
-				       OM::load_syntax);
+				       AOM::load_syntax);
 	Librarian<AM>::add_type ("state", alist, syntax, &make);
       }
       // Organic fertilizer.
@@ -1069,7 +1071,7 @@ In Denmark, this is governed by legalisation.");
 			     "Nitrogen fraction of dry matter.");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
-				       OM::load_syntax);
+				       AOM::load_syntax);
 	syntax.add_fraction ("NO3_fraction", Syntax::Const, 
 		    "Nitrate fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be ammonium or organic.");
@@ -1132,7 +1134,7 @@ Carbon content in different soil layers.  The carbon is assumed to be\n\
 uniformly distributed in each layer.");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
-				       OM::load_syntax);
+				       AOM::load_syntax);
 	Librarian<AM>::add_type ("initial", alist, syntax, &make);
       }
       // Root initialization,
@@ -1158,7 +1160,7 @@ original.");
 			     "Nitrogen fraction of total root dry matter");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
-				       OM::load_syntax);
+				       AOM::load_syntax);
 	Librarian<AM>::add_type ("root", alist, syntax, &make);
       }
     }

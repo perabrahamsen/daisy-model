@@ -401,7 +401,15 @@ CropStandard::output (Log& log) const
   output_submodule (root_system, "Root", log);
   output_submodule (canopy, "Canopy", log);
   output_submodule (harvesting, "Harvest", log);
+#if 1
+  if (log.check_member ("Prod"))
+    {
+      Log::Open open (log, "Prod");
+      production.output (log);
+    }
+#else
   output_submodule (production, "Prod", log);
+#endif
   output_submodule (development, "Devel", log);
   if (vernalization.required)	// Test needed for checkpoint.
     output_submodule (vernalization, "Vernal", log);
