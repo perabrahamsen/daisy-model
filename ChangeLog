@@ -1,3 +1,30 @@
+1999-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.07 released.
+
+1999-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_chemicals.C, soil_chemicals.h (mixture): New member function.
+	* surface.C, surface.h (mixture): Take `SoilChemicals' argument.
+	* column_std.C (tick): Update caller.
+
+	* soil_chemicals.C (Implementation::add_missing): New function.
+	(Implementation::tick): Call it.
+
+	* macro_std.C (pond_max): New parameter.
+
+1999-12-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.C (lookup): Give better error message when looking up a
+	missing key.
+
+	* bioclimate_std.C, bioclimate.h, surface.C, surface.h: Move
+	surface chemicals from bioclimate to surface.
+	* column_std.C (put_surface_chemical, get_surface_chemical, tick):
+	Update caller.
+
+	* lib/log.dai ("Surface Chemicals"): Update logger.
+
 1999-12-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.06 released.

@@ -23,6 +23,10 @@ private:
 public:
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     const OrganicMatter&, const Chemicals& flux_in);
+  void mixture (Chemicals& storage, // [g/m^2]
+		Chemicals& up,	// [g/m^2/h]
+		double pond,	// [mm]
+		double rate) const;	// [h/mm]
   void output (Log&) const;
   void mix (const Soil&, const SoilWater&, double from, double to);
   void swap (const Soil&, const SoilWater&, double from, double middle, double to);

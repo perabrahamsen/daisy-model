@@ -121,9 +121,9 @@ public:
   double get_surface_no3 () const // [g/cm^2]
     { return surface.get_no3 (); }
   void put_surface_chemical (const string& name, double amount) // [g/cm^2]
-    { bioclimate.put_surface_chemical (name, amount); }
+    { surface.put_chemical (name, amount); }
   double get_surface_chemical (const string& name) const // [g/cm^2]
-    { return bioclimate.get_surface_chemical (name); }
+    { return surface.get_chemical (name); }
   double get_smb_c_at (unsigned int i) const //[g C/cm³]
     { return organic_matter.get_smb_c_at (i); }
   double get_co2_production_at (unsigned int i) const // [g C/cm³]
@@ -291,7 +291,7 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   IM soil_top_conc;
   soil_top_conc.NO3 = soil_NO3.C (0) / 10.0; // [g/cm^3] -> [g/cm^2/mm]
   soil_top_conc.NH4 = soil_NH4.C (0) / 10.0; // [g/cm^3] -> [g/cm^2/mm]
-  surface.mixture (soil_top_conc);
+  surface.mixture (soil_top_conc, soil_chemicals);
   soil_water.macro_tick (soil, surface);
 
   bioclimate.tick (surface, weather, 
@@ -309,7 +309,7 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   soil_heat.tick (time, soil, soil_water, surface, weather);
   soil_water.tick (soil, surface, groundwater);
   soil_chemicals.tick (soil, soil_water, soil_heat, organic_matter,
-		       bioclimate.chemicals_down ());
+		       surface.chemicals_down ());
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4);
 

@@ -11,6 +11,8 @@
 #include "im.h"
 #include "mathlib.h"
 #include "submodel.h"
+#include "chemicals.h"
+#include "soil_chemicals.h"
 
 struct Surface::Implementation
 {
@@ -34,9 +36,15 @@ struct Surface::Implementation
   double runoff;
   IM im_runoff;
   const double R_mixing;
+  Chemicals chemicals_storage;
+  Chemicals chemicals_out;
+  Chemicals chemicals_runoff;
+  const bool chemicals_can_enter_soil;
+
 
   // Functions.
-  void mixture (const IM& soil_im /* g/cm^2/mm */);
+  void mixture (const IM& soil_im /* g/cm^2/mm */,
+		const SoilChemicals& soil_chemicals);
   bool flux_top () const;
   void  flux_top_on () const;
   bool accept_top (double water);
@@ -45,6 +53,7 @@ struct Surface::Implementation
 	     const Soil& soil, const SoilWater& soil_water);
   double albedo (const Soil& soil, const SoilWater& soil_water) const;
   void fertilize (const IM& n);
+  void spray (const Chemicals& chemicals_in);
   void output (Log& log) const;
   double exfiltration () const; // [mm/h]
   
@@ -55,14 +64,17 @@ struct Surface::Implementation
 };
 
 void
-Surface::mixture (const IM& soil_im /* g/cm^2/mm */)
+Surface::mixture (const IM& soil_im /* g/cm^2/mm */,
+		  const SoilChemicals& soil_chemicals)
 {
-  impl.mixture (soil_im);
+  impl.mixture (soil_im, soil_chemicals);
 }
 
 void
-Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
+Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */,
+				  const SoilChemicals& soil_chemicals)
 {
+  // Nitrogen.
   if (!total_matter_flux && pond > 1e-6 && R_mixing > 0.0)
     {
       // [g/cm^2/h] = ([g/cm^2/mm] - [g/cm^2] / [mm]) / [h/mm]
@@ -74,6 +86,15 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
     }
   else
     im_flux.clear ();
+
+  // Chemicals.
+  if (chemicals_can_enter_soil)
+    {
+      chemicals_out.clear ();
+
+      soil_chemicals.mixture (chemicals_storage, chemicals_out,
+			      pond, R_mixing);
+    }
 }
 
 bool 
@@ -123,11 +144,14 @@ Surface::Implementation::accept_top (double water)
 
   water *= 10.0;		// cm -> mm.
 
-  if (water >= 0)		// Exfiltration.
+  // Exfiltration.
+  if (water >= 0)
     {
-      pond += water;
+      pond += water * dt;
       return true;
     }
+
+  // Infiltration.
   if (pond + water * dt >= - max (fabs (pond), fabs (water)) / 100.0)
     {
       if (im.NO3 < 0.0)
@@ -146,6 +170,11 @@ Surface::Implementation::accept_top (double water)
 	  delta_matter /= dt;
 	  im_flux -= delta_matter;
 	  im.clear ();
+	  if (chemicals_can_enter_soil)
+	    {
+	      chemicals_out += chemicals_storage;
+	      chemicals_storage.clear ();
+	    }
 	}
       else if (-water > minimal_matter_flux)
 	{
@@ -153,11 +182,11 @@ Surface::Implementation::accept_top (double water)
 	  im -= delta_matter;
 	  delta_matter /= dt;
 	  im_flux -= delta_matter;
+	  if (chemicals_can_enter_soil)
+	    Chemicals::move_fraction (chemicals_storage, chemicals_out,
+				      (-water * dt) / pond);
 	}
-#ifdef DISABLE_MIXING
-      assert (im_flux.NO3 <= 0.0);
-      assert (im_flux.NH4 <= 0.0);
-#endif 
+
       pond += water * dt;
       return true;
     }
@@ -189,6 +218,10 @@ const IM&
 Surface::matter_flux ()
 { return impl.im_flux; }
 
+const Chemicals& 
+Surface::chemicals_down () const
+{ return impl.chemicals_out; }
+
 void
 Surface::tick (double PotSoilEvaporation, double water, double temp,
 	       const Soil& soil, const SoilWater& soil_water)
@@ -202,13 +235,16 @@ Surface::Implementation::tick (double PotSoilEvaporation,
   if (pond > DetentionCapacity)
     {
       runoff = (pond - DetentionCapacity) * ReservoirConstant;
+      Chemicals::move_fraction (chemicals_storage, chemicals_runoff, 
+				runoff / pond);
       im_runoff = im * (runoff / pond);
       pond -= runoff;
       im -= im_runoff;
     }
   else
     {
-      im_runoff = IM ();
+      im_runoff.clear ();
+      chemicals_runoff.clear ();
       runoff = 0.0;
     }
 
@@ -286,6 +322,16 @@ Surface::Implementation::fertilize (const IM& n)
 }
 
 void
+Surface::spray (const Chemicals& chemicals_in)
+{ impl.spray (chemicals_in); }
+
+void
+Surface::Implementation::spray (const Chemicals& chemicals_in)
+{
+  chemicals_storage += chemicals_in;
+}
+
+void
 Surface::output (Log& log) const
 { impl.output (log); }
 
@@ -300,6 +346,9 @@ Surface::Implementation::output (Log& log) const
   log.output ("runoff", runoff);
   output_submodule (im, "IM", log);
   output_submodule (im_runoff, "IM_runoff", log);
+  output_submodule (chemicals_storage, "chemicals_storage", log);
+  output_submodule (chemicals_out, "chemicals_out", log);
+  output_submodule (chemicals_runoff, "chemicals_runoff", log);
 }
 
 double
@@ -342,6 +391,20 @@ Surface::put_no3 (double no3) // [g/cm^2]
 double
 Surface::get_no3 () const // [g/cm^2]
 { return impl.im.NO3; }
+
+void 
+Surface::put_chemical (const string& name , double amount) // [g/cm^2]
+{
+  // [g/cm^2] -> [g/m^2]
+  impl.chemicals_storage.set_to (name, amount * 1.0e4);
+}
+
+double 
+Surface::get_chemical (const string& name) const // [g/cm^2]
+{ 
+  // [g/m^2] -> [g/cm^2]
+  return impl.chemicals_storage.amount (name) * 1.0e-4;		
+}
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<IM>;
@@ -405,6 +468,16 @@ Inorganic nitrogen on the runoff water this hour [g/cm^2].");
   syntax.add ("R_mixing", "h/mm", Syntax::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
   alist.add ("R_mixing", 1.0e9);
+  Chemicals::add_syntax  ("chemicals_storage", syntax, alist, Syntax::State,
+			  "Chemicals on the soil surface.");
+  Chemicals::add_syntax  ("chemicals_out", syntax, alist, Syntax::LogOnly,
+			  "Chemicals entering the soil.");
+  Chemicals::add_syntax  ("chemicals_runoff", syntax, alist, Syntax::LogOnly,
+			  "Chemicals in the runoff water this hour.");
+  syntax.add ("chemicals_can_enter_soil",
+	      Syntax::Boolean, Syntax::Const, "\
+If this is set to false, the chemicals will stay on the surface.");
+  alist.add ("chemicals_can_enter_soil", true);
 }
 
 Surface::Surface (const AttributeList& al)
@@ -430,8 +503,11 @@ Surface::Implementation::Implementation (const AttributeList& al)
     ReservoirConstant (al.number ("ReservoirConstant")),
     runoff (0.0),
     im_runoff (),
-    R_mixing (al.number ("R_mixing"))
-  
+    R_mixing (al.number ("R_mixing")),
+    chemicals_storage (al.alist_sequence ("chemicals_storage")),
+    chemicals_out (),
+    chemicals_runoff (),
+    chemicals_can_enter_soil (al.flag ("chemicals_can_enter_soil"))
 {
   assert (im_flux.NO3 == 0.0);
   assert (im_flux.NH4 == 0.0);

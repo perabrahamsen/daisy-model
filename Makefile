@@ -553,7 +553,7 @@ soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
  common.h alist.h syntax.h soil_water.h macro.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h log.h am.h im.h mathlib.h \
- submodel.h
+ submodel.h chemicals.h soil_chemicals.h
 soil_water${OBJ}: soil_water.C soil_water.h macro.h librarian.h library.h \
  common.h alist.h syntax.h log.h uzmodel.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h surface.h groundwater.h mathlib.h \
@@ -605,8 +605,9 @@ soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  organic_matter.h chemical.h chemicals.h log.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h csmp.h submodel.h
 bioincorporation${OBJ}: bioincorporation.C bioincorporation.h common.h \
- alist.h syntax.h log.h librarian.h library.h geometry.h am.h \
- submodel.h csmp.h om.h mathlib.h
+ alist.h syntax.h log.h librarian.h library.h soil.h horizon.h \
+ hydraulic.h tortuosity.h geometry.h am.h submodel.h csmp.h om.h \
+ mathlib.h
 weather_old${OBJ}: weather_old.C weather_old.h weather.h librarian.h \
  library.h common.h alist.h syntax.h im.h
 log_extern${OBJ}: log_extern.C log_select.h log.h librarian.h library.h \

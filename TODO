@@ -1,18 +1,10 @@
 * Stof chemicals ned i jord via macropores.
 
-1. Lav setup + log for surface chemicals.  gem resultat af kørsel.
-
-2. Flyt surface chemcials fra bioclimate til surface.
-
-3. opdater log, check at resultat er det samme.
-
-4. Implementer matrix indtrænging.  sammenlign resultat.
-
-5. Implementer macro indtrænging. sammenlign resultat.
-
-6. Implementer mixture.  sammenlign resultat.
+Check mixing, runoff, matrix og macro indtrængning.
 
 * Transpiration/Water Uptake component
+
+* Daisy new user guide.
 
 * CVS
 

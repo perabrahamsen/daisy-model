@@ -88,12 +88,9 @@ struct BioclimateStandard : public Bioclimate
   Chemicals canopy_chemicals_dissipate;
   Chemicals canopy_chemicals_out;
 
-  Chemicals surface_chemicals_storage;
   Chemicals surface_chemicals_in;
-  Chemicals surface_chemicals_out;
-  const bool chemicals_can_enter_soil;
 
-  void ChemicalDistribution (const Vegetation&);
+  void ChemicalDistribution (Surface& surface, const Vegetation&);
 
   // Radiation.
   void RadiationDistribution (const Weather&, const Vegetation&);
@@ -109,8 +106,6 @@ struct BioclimateStandard : public Bioclimate
   void tick (Surface&, const Weather&, 
 	     Vegetation&, const Soil&, SoilWater&, const SoilHeat&);
   void output (Log&) const;
-
-  const Chemicals& chemicals_down () const;
 
   // Canopy.
   int NumberOfIntervals () const
@@ -151,16 +146,6 @@ struct BioclimateStandard : public Bioclimate
     { return pond_water_in; }
   double get_snow_storage () const // [mm]
     { return snow.storage (); }
-  void put_surface_chemical (const string& name , double amount) // [g/cm^2]
-    {
-      // [g/cm^2] -> [g/m^2]
-      surface_chemicals_storage.set_to (name, amount * 1.0e4);
-    }
-  double get_surface_chemical (const string& name) const // [g/cm^2]
-    { 
-      // [g/m^2] -> [g/cm^2]
-      return surface_chemicals_storage.amount (name) * 1.0e-4;		
-    }
   // Create.
   BioclimateStandard (const AttributeList&);
   ~BioclimateStandard ();
@@ -214,11 +199,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     canopy_chemicals_dissipate (),
     canopy_chemicals_out (),
 
-    surface_chemicals_storage (al.alist_sequence
-			       ("surface_chemicals_storage")),
     surface_chemicals_in (),
-    surface_chemicals_out (),
-    chemicals_can_enter_soil (al.flag ("chemicals_can_enter_soil")),
     daily_air_temperature_ (0.0),
     day_length_ (0.0),
     daily_global_radiation_ (0.0)
@@ -302,11 +283,11 @@ BioclimateStandard::IntensityDistribution (const double Rad0,
 
 void
 BioclimateStandard::WaterDistribution (Surface& surface,
-				  const Weather& weather, 
-				  Vegetation& vegetation,
-				  const Soil& soil, 
-				  SoilWater& soil_water,
-				  const SoilHeat& soil_heat)
+				       const Weather& weather, 
+				       Vegetation& vegetation,
+				       const Soil& soil, 
+				       SoilWater& soil_water,
+				       const SoilHeat& soil_heat)
 {
   // Overview.
   //
@@ -492,15 +473,12 @@ BioclimateStandard::tick (Surface& surface, const Weather& weather,
 		     soil, soil_water, soil_heat);
 
   // Let the chemicals follow the water.
-  ChemicalDistribution (vegetation);
+  ChemicalDistribution (surface, vegetation);
 }
 
-const Chemicals& 
-BioclimateStandard::chemicals_down () const
-{ return surface_chemicals_out; }
-
 void 
-BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
+BioclimateStandard::ChemicalDistribution (Surface& surface, 
+					  const Vegetation& vegetation)
 {
   const double cover = vegetation.cover ();
 
@@ -534,17 +512,7 @@ BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
   Chemicals::copy_fraction (snow_chemicals_out, surface_chemicals_in, 
 			    1.0 - cover);
   surface_chemicals_in += canopy_chemicals_out;
-  if (chemicals_can_enter_soil)
-    {
-      // We don't store chemicals on surface.
-      surface_chemicals_storage.clear ();
-      surface_chemicals_out = surface_chemicals_in;
-    }
-  else
-    {
-      surface_chemicals_storage += surface_chemicals_in;
-      surface_chemicals_out.clear ();
-    }
+  surface.spray (surface_chemicals_in);
 
   // Reset spray.
   spray_.clear ();
@@ -600,10 +568,7 @@ BioclimateStandard::output (Log& log) const
   output_submodule (canopy_chemicals_dissipate, "canopy_chemicals_dissipate",
 		    log);
   output_submodule (canopy_chemicals_out, "canopy_chemicals_out", log);
-  output_submodule (surface_chemicals_storage, "surface_chemicals_storage",
-		    log);
   output_submodule (surface_chemicals_in, "surface_chemicals_in", log);
-  output_submodule (surface_chemicals_out, "surface_chemicals_out", log);
 }
 
 void
@@ -750,19 +715,9 @@ Number of vertical intervals in which we partition the canopy.");
 			      syntax, alist, Syntax::LogOnly,
 			      "Chemicals falling through canopy.");
 
-      Chemicals::add_syntax  ("surface_chemicals_storage",
-			      syntax, alist, Syntax::State,
-			      "Chemicals on the soil surface.");
       Chemicals::add_syntax  ("surface_chemicals_in",
 			      syntax, alist, Syntax::LogOnly,
 			      "Chemicals entering soil surface.");
-      Chemicals::add_syntax  ("surface_chemicals_out",
-			      syntax, alist, Syntax::LogOnly,
-			      "Chemicals entering the soil.");
-      syntax.add ("chemicals_can_enter_soil",
-		  Syntax::Boolean, Syntax::Const, "\
-If this is set to false, the chemicals will stay on the surface.");
-      alist.add ("chemicals_can_enter_soil", true);
 
       // Add to library.
       Librarian<Bioclimate>::add_type ("default", alist, syntax, &make);

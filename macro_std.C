@@ -15,6 +15,7 @@ struct MacroStandard : public Macro
   const CSMP distribution;		// Where they end [cm ->]
   const double pressure_initiate; // Pressure needed to init pref.flow [cm]
   const double pressure_end;	// Pressure after pref.flow has been init [cm]
+  const double pond_max;	// Pond height before activating pref.flow [mm]
 
   // Simulation.
  void tick (const Soil& soil, unsigned int first, unsigned int last,
@@ -35,7 +36,8 @@ struct MacroStandard : public Macro
       height_end (al.number ("height_end")),
       distribution (al.csmp ("distribution")),
       pressure_initiate (al.number ("pressure_initiate")),
-      pressure_end (al.number ("pressure_end"))
+      pressure_end (al.number ("pressure_end")),
+      pond_max (al.number ("pond_max"))
     { }
   ~MacroStandard ()
     { }
@@ -73,13 +75,16 @@ MacroStandard::tick (const Soil& soil,
     {
       // Empty it.
       surface.flux_top_on ();
-      q_top = surface.q ();
-      assert (q_top < 0.0);
-      assert (q_p[0] == 0.0);
-      assert (from == 0);
-      q_p[0] = q_top;
-      const bool accepted = surface.accept_top (q_p[0]);
-      assert (accepted);
+      if (-surface.q () * 10.0 * dt > pond_max)
+	{
+	  q_top = surface.q () + pond_max / 10.0 / dt;
+	  assert (q_top < 0.0);
+	  assert (q_p[0] == 0.0);
+	  assert (from == 0);
+	  q_p[0] = q_top;
+	  const bool accepted = surface.accept_top (q_p[0]);
+	  assert (accepted);
+	}
     }
 
   // End point of layer above.
@@ -242,6 +247,10 @@ where all macropores is assumed to start at the top.");
 		  "Pressure after pref.flow has been init");
       syntax.add ("S_p", "h-1", Syntax::LogOnly,
 		  "Macropore sink term.");
+      syntax.add ("pond_max", "mm", Syntax::Const, "\
+Maximum height of ponding before spilling into macropores.\n\
+After macropores are activated pond will havethis height.");
+      alist.add ("pond_max", 0.5);
       Librarian<Macro>::add_type ("default", alist, syntax, &make);
     }
 } MacroStandard_syntax;

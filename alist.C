@@ -427,7 +427,11 @@ AttributeList::Implementation::lookup (const string& key) const
 { 
   value_map::const_iterator i = values.find (key);
   
-  assert (i != values.end ());
+  if (i == values.end ())
+    {
+      CERR << "Missing key `" << key << "'\n";
+      assert (false);
+    }
   return (*i).second;
 }
 

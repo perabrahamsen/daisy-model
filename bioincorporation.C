@@ -268,7 +268,7 @@ Limiting factor for high C/N ratio [(g C/cm^2)/(g N/cm^2) -> [0:1]].");
   CSMP C_per_N_factor;
   C_per_N_factor.add (40.0, 1.0);
   C_per_N_factor.add (50.0, 0.1);
-  C_per_N_factor.add (110.0, 0.0);
+  C_per_N_factor.add (120.0, 0.01);
   
   alist.add ("C_per_N_factor", C_per_N_factor);
   syntax.add ("T_factor", Syntax::CSMP, Syntax::Const, 

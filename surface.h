@@ -7,6 +7,8 @@ struct AttributeList;
 struct Log;
 struct SoilWater;
 struct Soil;
+struct Chemicals;
+struct SoilChemicals;
 
 class Surface : public UZtop
 {
@@ -25,13 +27,16 @@ public:
   double temperature () const;
 
   const IM& matter_flux ();
+  const Chemicals&  chemicals_down () const;
 
   void SoilSurfaceConditions (double Theta, double h);
 
-  void mixture (const IM& soil_im /* g/cm^2/mm */);
+  void mixture (const IM& soil_im /* g/cm^2/mm */,
+		const SoilChemicals& soil_chemicals);
 
   // Manager.
   void fertilize (const IM&);
+  void spray (const Chemicals& chemicals_in);
 
   // Simulation.
   void output (Log&) const;
@@ -50,6 +55,8 @@ public:
   void put_ponding (double pond);	// [mm]
   void put_no3 (double no3); // [g/cm^2]
   double get_no3 () const; // [g/cm^2]
+  void put_chemical (const string&, double); // [g/cm^2]
+  double get_chemical (const string&) const; // [g/cm^2]
 
   // Create.
   static void load_syntax (Syntax&, AttributeList&);
