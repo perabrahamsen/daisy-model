@@ -881,21 +881,29 @@ CropStandardSyntax::CropStandardSyntax ()
   AttributeList& vProd = *new AttributeList ();
 
   Prod.add ("E_Root", Syntax::Number, Syntax::Const);
+  vProd.add ("E_Root", 0.69);
   Prod.add ("E_Leaf", Syntax::Number, Syntax::Const);
+  vProd.add ("E_Leaf", 0.68);
   Prod.add ("E_Stem", Syntax::Number, Syntax::Const);
+  vProd.add ("E_Stem", 0.66);
   Prod.add ("E_SOrg", Syntax::Number, Syntax::Const);
   Prod.add ("r_Root", Syntax::Number, Syntax::Const);
+  vProd.add ("r_Root", 0.015);
   Prod.add ("r_Leaf", Syntax::Number, Syntax::Const);
   Prod.add ("r_Stem", Syntax::Number, Syntax::Const);
   Prod.add ("r_SOrg", Syntax::Number, Syntax::Const);
   Prod.add ("ShldResC", Syntax::Number, Syntax::Const);
+  vProd.add ("ShldResC", 0.0);
   Prod.add ("ReMobilDS", Syntax::Number, Syntax::Const);
+  vProd.add ("ReMobilDS", 1.20);
   Prod.add ("ReMobilRt", Syntax::Number, Syntax::Const);
+  vProd.add ("ReMobilRt", 0.1);
   Prod.add ("ExfoliationFac", Syntax::Number, Syntax::Const);
   vProd.add ("ExfoliationFac", 1.0);
   Prod.add ("LfDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("RtDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("Large_RtDR", Syntax::Number, Syntax::Const);
+  vProd.add ("Large_RtDR", 0.05);
 
   // CrpNPar
   Syntax& CrpN = *new Syntax ();
