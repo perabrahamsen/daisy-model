@@ -554,7 +554,8 @@ Note that a negative delta content means that the amount increases."
          ("Bioinc_N-Soil")
          ("Residuals_N_root" (factor -1.0))
          ("Residuals_N_soil")
-         ("Crop-N" (factor -1.0))))
+         ("Crop" (factor -1.0))
+         ("Dead leaves" (factor -1.0))))
 
 (defsummary "Crop Nitrogen Balance" simple
   "Total system mass balance for nitrogen i crops.
@@ -569,7 +570,8 @@ Note that a negative delta content means that the amount increases."
          ("Harvest_N" (factor -1.0))
          ("Residuals_N_root" (factor -1.0))
          ("Residuals_N_top" (factor -1.0))
-         ("Crop-N" (factor -1.0))))
+         ("Crop" (factor -1.0))
+         ("Dead leaves" (factor -1.0))))
 
 (defsummary "Nitrogen Balance" simple
   "Total system mass balance for nitrogen.
@@ -614,7 +616,8 @@ Note that a negative delta content means that the amount increases."
          ("Bioinc_N-Soil")
          ("Residuals_N_root" (factor -1.0))
          ("Residuals_N_soil")
-         ("Crop-N" (factor -1.0))
+         ("Crop" (factor -1.0))
+         ("Dead leaves" (factor -1.0))
 	 ("NO3-Crop" (name "NO3 Root uptake (full)"))
 	 ("NO3-Root" (name "NO3 Root uptake (interval)") (factor -1.0))
 	 ("NH4-Crop" (name "NH4 Root uptake (full)"))
@@ -851,9 +854,14 @@ Note that a negative delta content means that the amount increases."
                    (path column "$col" OrganicMatter am "*" om "*" top_N)
                    (dimension "kg N/ha")
                    (factor 1e5))      ;g/cm^2 -> kg/ha
-           (number (tag "Crop-N")
+           (number (tag "Crop")
                    (path column "$col" Vegetation crops crops "$crop"
                          Prod NCrop)
+                   (dimension "kg N/ha")
+                   (factor 10.0))
+           (number (tag "Dead leaves")
+                   (path column "$col" Vegetation crops crops "$crop"
+                         Prod NDead)
                    (dimension "kg N/ha")
                    (factor 10.0))))
 

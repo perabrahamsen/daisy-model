@@ -540,6 +540,7 @@ The last action, \texttt{stop}, is simply a command to stop the
 simulation.
 
 \subsection{Output}
+\label{ex:output}
 
 Now \daisy{} know everything it needs to know in order to run the
 simulation.  We just need to tell it what information about the
@@ -604,6 +605,60 @@ You can also browse it with a text editor to get detailed information
 about the state of the simulation at that point in time.
 
 See section~\ref{sec:output} for more information about log models.
+
+
+\section{Weather}
+\label{sec:weather}
+
+It is common not to have sufficient weather data, either because there
+is no access to data from a nearby weather station, or because you are
+running a predictive simulating, and the data isn't available yet.
+\Daisy{} has two features for handling such cases with available
+data.  
+
+\subsection{Scaled precipitation}
+
+Precipitation is very locale dependent, it may vary even within a
+region with similar temperature and radiation.  If you know the
+general monthly difference between a specific locale, and a regional
+weather station, you can use the \texttt{PrecipScale} attribute:
+\begin{verbatim}
+  (weather default "weather.dwf"
+    (PrecipScale 1.1 1.1 1.1 1.2 1.2 1.2 1.2 1.2 1.2 1.2 1.2 1.2))
+\end{verbatim}
+The \texttt{PrecipScale} needs 12 numbers, which will be multiplied to
+all precipitation the corresponding month.  In this example, we use
+the data from ``weather.dwf'', but with 10\% more precipitation from
+January to March, and 20\% more the remaining 9 months.
+
+\subsection{Missing years}
+
+The \texttt{missing\_years} attribute allows you to reuse the weather
+data for additional years.  For example, if you have weather data for
+1991 to 2000 in a file named ``weather.dlf'', but want to run a
+simulation from 1987 to 2001, you can specify the weather model like
+this.
+\begin{verbatim}
+  (weather default "weather.dwf"
+           (missing_years ((1987 1990) (1993 1996))
+                          ((2001 2001) (1991 1991))))
+\end{verbatim}
+This should be read as an order to Daisy to, in the period from 1987
+to 1990, use the weather data from 1993 to 1996, and for 2001 use the
+weather data from 1991.
+
+This is particularly useful for running Daisy with a ``warming up''
+period where we don't have actual measurements, and for predictive
+simulations, where you can run a crop rotation with many different
+weather combinations.
+
+In the example above we map two periods (1987--1990 and 2001), but you
+can have as many periods as you like, so you can e.g.\ run a 100 year
+simulation with just 10 years worth of climate data.
+
+Note that Daisy will always use the actual data when available, so if
+you in the example above have some data from 2001 but not all, Daisy
+will not switch to 1991 data before it have used up the real data.
 
 \section{Column}
 \label{sec:column}
@@ -1106,7 +1161,11 @@ management for 20 years in two lines.
 
 This is how I in general recommend writing management specifications.
 Break it down into management specifications for individual crops,
-then combine the crops into rotations.  In the next sections I will
+then combine the crops into rotations.  To make sure the initial state
+of \daisy{} is reasonable, it is a good idea to run at least one
+rotation before the period you are interested in simulating.  
+
+In the next sections I will
 present more specific examples of common management operations.
 
 \subsection{Tillage}
@@ -1779,7 +1838,10 @@ We use all of them in this example:
                        (from 0 [m]) (to -1 [m])))
 \end{verbatim}
 
-Note that writing a log file tend to be as slow as running the
+\subsection{Activating output}
+\label{sec:actout}
+
+Since writing a log file tend to be as slow as running the
 simulation itself, and if you specify many log files \daisy{} will
 become very slow indeed.  It also depend on the log file, as a general
 rule, large log files are much more time consuming than small log
@@ -1789,6 +1851,23 @@ using \daisy{} interactively, don't specify a log file just because
 you \emph{may} need the information.  If you later discover that you
 need the information in that log file, you can rerun the simulation
 specifying log file only.
+
+You can also limit the period where log file is kept, both to speed up
+the simulation, and to avoid uninteresting data.  This is
+especially useful in conjunction with a warmup period.  You do this by
+setting \texttt{activate\_output} at the top level, like this:
+\begin{verbatim}
+  (activate_output (after 1997 3 31 23))
+\end{verbatim}
+This will activate the log files from April 1st, 1997 and to the end
+of the simulation.  You can specify all the same kind of conditions as
+in management.  To limit the period in both ends, you can use
+\begin{verbatim}
+  (activate_output (and (after 1997 3 31 23) 
+                        (before 1998 4 1 0)))
+\end{verbatim}
+which will give you log files containing data from the hydraulic year
+1997. 
 
 \subsection{Log models}
 \label{sec:log-models}
