@@ -1005,7 +1005,7 @@ ProgramDocument::print_submodel_entry (const std::string& name, int level,
 
   // Print name.
   Format::Item dummy (*format, name);
-  format->label ("parameter", aref);
+  format->label ("parameter", aref + "-" + name);
   format->index (name);
   
   // Print type.

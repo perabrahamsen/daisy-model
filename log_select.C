@@ -234,6 +234,17 @@ LogSelect::document_entries (Format& format, const AttributeList& alist)
   Syntax syntax;
   AttributeList dummy_alist;
   LogSelect::load_syntax (syntax, dummy_alist);
+
+  const Library& log_lib = Librarian<Log>::library ();
+  if (alist.check ("type"))
+    {
+      const symbol parent = alist.identifier ("type");
+      if (log_lib.check (parent)
+          && alist.subset (log_lib.lookup (parent), log_lib.syntax (parent),
+                           "entries"))
+        return;
+    }
+
   if (!syntax.check (alist, Treelog::null ()))
     {
       // Incomplete log.
