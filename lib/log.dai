@@ -1133,6 +1133,15 @@
                    (when hourly)
                    (factor 10.0))))
 
+(deflog "Root Density" table
+  (where "rootdens.dlf")
+  (when daily)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (array (path column "$col" Vegetation crops crops "$crop" 
+			Root Density)
+                  (dimension "cm/cm^3"))))
 
 (deflog "Surface Chemicals" table
   (where "surface_chemicals.dlf")
@@ -1708,28 +1717,36 @@
 		       (when hourly)
                    (dimension "kg C/ha/&")
                    (factor 10))         ;g/m^2 -> kg/ha
-           (number (path column "$col" Vegetation crops crops "$crop" Prod CLeaf)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod CLeaf)
                    (dimension "kg C/ha")
                    (factor 10))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod CDead)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod CDead)
                    (dimension "kg C/ha")
                    (factor 10))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod CStem)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod CStem)
                    (dimension "kg C/ha")
                    (factor 10))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod CSOrg)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod CSOrg)
                    (dimension "kg C/ha")
                    (factor 10))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod CRoot)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod CRoot)
                    (dimension "kg C/ha")
                    (factor 10))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod CH2OPool)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod CH2OPool)
                    (dimension "kg C/ha")
                    (factor 4))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod C_Loss)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod C_Loss)
                    (dimension "kg C/ha")
                    (factor 10))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod NetPhotosynthesis)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod NetPhotosynthesis)
                    (dimension "kg C/ha/&")
 		   (when hourly)
                    (factor 4.0))
@@ -1737,11 +1754,13 @@
                    (when hourly)
                    (tag "Fertilizer_C")
                    (dimension "kg C/ha/&"))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod GrowthRespiration)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod GrowthRespiration)
                    (dimension "g CH2O/m^2/&")
                    (when hourly)
                    (factor 1.0))
-           (number (path column "$col" Vegetation crops crops "$crop" Prod MaintRespiration)
+           (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod MaintRespiration)
                    (dimension "g CH2O/m^2/&")
 		       (when hourly)
                    (factor 1.0))
@@ -1751,6 +1770,7 @@
 		   (factor 10); g/m^2 -> kg/ha
                    (dimension "kg C/ha/&"))
            ))
+
 (deflog "C Balance 0-100 cm" "Carbon Balance"
   (from 0) (to 100)
   (where "C_Bal_100cm.dlf"))

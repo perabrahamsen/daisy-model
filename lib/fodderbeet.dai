@@ -19,8 +19,8 @@
   (Canopy
       (DSLAI05   0.17)
       (SpLAI    0.011)
-      (LAIDist0 0.00 1.00 1.00)
-      (LAIDist1 0.10 0.80 1.00)
+      (LAIDist0 0.00 0.00 1.00)
+      (LAIDist1 0.00 0.20 0.90)
       (PARref   0.06)
       (PARext   0.67)
       (EPext    0.50)
