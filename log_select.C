@@ -30,7 +30,7 @@ LogSelect::check_member (symbol name) const
 
   const vector<Select*>& current = active_stack.top ();
   for (unsigned int i = 0; i < current.size (); i++)
-    if (current[i]->valid_level && current[i]->valid (name))
+    if (current[i]->valid (name))
       return true;
 
   return false;
@@ -55,7 +55,6 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
       {
 	is_active = true;
 	current.push_back (entries[i]);
-	daisy_assert (entries[i]->valid_level);
       }
 
   if (is_active)
@@ -84,9 +83,7 @@ LogSelect::open (symbol name)
   
   for (unsigned int i = 0; i < current.size (); i++)
     {
-      daisy_assert (current[i]->valid_level);
-      current[i]->open (name);
-      if (current[i]->valid_level)
+      if (current[i]->open (name))
 	next.push_back (current[i]);
     }
 }
