@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string>
 
-#if !defined (__CYGWIN__)
+#if !defined (__CYGWIN__) && !defined (MINGW)
 // Doesn't work under cygwin
 #define pow(x, y) (assert (x >= 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))
