@@ -1,3 +1,30 @@
+2000-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.22 released.
+
+2000-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (print): Removed target.
+
+	* syntax.C, syntax.h (domain, range): New member functions.
+	(add): Support them.
+	* document_LaTeX.C (print_entry_type): Use them.
+	* bioincorporation.C (load_syntax): Specify them.
+	* crop_std.C (CropStandardSyntax): Ditto.
+	* crop_sold.C (CropSoldSyntax): Ditto.
+	* crop_old.C (CropOldSyntax): Ditto.
+	* chemical_std.C (ChemicalStandardSyntax): Ditto.
+	* denitrification.C (load_syntax): Ditto.
+	* soil_chemical.C (load_syntax): Ditto.
+	* nitrification_solute.C (NitrificationSoluteSyntax): Ditto.
+	* organic_matter.C (load_syntax): Ditto.
+	* nitrification_soil.C (NitrificationSoilSyntax): Ditto.
+	* macro_std.C (MacroStandardSyntax): Ditto.
+	* hydraulic_M_vG_compact.C (HydraulicM_vG_compactSyntax): Ditto.
+	* vegetation.C (load_syntax): Ditto.
+
+	* action_message.C (ActionMessageSyntax): Fix order.
+
 2000-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.21 released.

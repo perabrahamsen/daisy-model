@@ -28,6 +28,7 @@ struct Syntax::Implementation
   syntax_map syntax;
   size_map size;
   library_map libraries;
+  string_map domains;
   string_map dimensions;
   string_map descriptions;
   alist_map alists;
@@ -338,6 +339,21 @@ Syntax::dimension (const string& key) const
 }
 
 const string&
+Syntax::domain (const string& key) const
+{
+  Implementation::string_map::const_iterator i = impl.domains.find (key);
+
+  if (i == impl.domains.end ())
+    return Unknown ();
+  else
+    return (*i).second;
+}
+
+const string&
+Syntax::range (const string& key) const
+{ return dimension (key); }
+
+const string&
 Syntax::description (const string& key) const
 {
   Implementation::string_map::const_iterator i = impl.descriptions.find (key);
@@ -398,6 +414,17 @@ Syntax::add (const string& key, const string& dim, category req, int sz,
   add (key, Number, req, sz, d);
   if (d != Unknown ())
     impl.dimensions[key] = dim;
+}
+
+void
+Syntax::add (const string& key, const string& dom, const string& ran,
+	     category req, int sz, const string& d)
+{
+  add (key, PLF, req, sz, d);
+  if (dom != Unknown ())
+    impl.domains[key] = dom;
+  if (ran != Unknown ())
+    impl.dimensions[key] = ran;
 }
 
 void

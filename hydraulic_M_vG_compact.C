@@ -157,11 +157,13 @@ and compaction.");
 		"Reference van Genuchten n.");
     syntax.add ("ref_K_sat", "cm/h", Syntax::Const,
 		"Reference water conductivity of saturated soil.");
-    syntax.add ("mod_alpha", Syntax::PLF, Syntax::Const,
+    syntax.add ("mod_alpha", Syntax::Fraction (), Syntax::None (), 
+		Syntax::Const,
 		"Porosity modifier for van Genuchten alpha.");
-    syntax.add ("mod_n", Syntax::PLF, Syntax::Const,
+    syntax.add ("mod_n", Syntax::Fraction (), Syntax::None (), Syntax::Const,
 		"Porosity modifier for van Genuchten n.");
-    syntax.add ("mod_K_sat", Syntax::PLF, Syntax::Const,
+    syntax.add ("mod_K_sat", Syntax::Fraction (), Syntax::None (),
+		Syntax::Const,
 		"Porosity modifier for water conductivity of saturated soil.");
 
     Librarian<Hydraulic>::add_type ("M_vG_compact", alist, syntax, &make);

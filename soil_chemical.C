@@ -107,7 +107,7 @@ SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
   AttributeList& none = *new AttributeList ();
   none.add ("type", "none");
 
-  syntax.add ("lag_increment", Syntax::PLF, Syntax::Const,
+  syntax.add ("lag_increment", "g/cm^3", Syntax::Fraction (), Syntax::Const,
 	      "Increment lag with the value of this PLF for the current\n\
 concentration each timestep.  When lag in any node reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");

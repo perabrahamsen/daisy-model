@@ -236,7 +236,7 @@ Options::Options (int& argc, char**& argv,
 	  file_found = true;
 	  errors_found += parser.error_count ();
 	}
-      else if (arg.size () != 1)
+      else if (arg.size () < 1)
 	{
 	  argc = -2;
 	  return;

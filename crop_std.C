@@ -1267,7 +1267,7 @@ CropStandardSyntax::CropStandardSyntax ()
   // DevelPar
   Devel.add ("EmrTSum", "dg C d", Syntax::Const,
 	     "Soil temperature sum at emergence.");
-  Devel.add ("EmrSMF", Syntax::PLF, Syntax::Const,
+  Devel.add ("EmrSMF", "cm", "d", Syntax::Const,
 	     "Soil moisture (h-function) effect on emergense.");
   PLF SMF;
   SMF.add (-1000.0, 0.00);
@@ -1281,12 +1281,12 @@ CropStandardSyntax::CropStandardSyntax ()
 	     "Development rate in the vegetative stage.");
   Devel.add ("DSRate2", Syntax::None (), Syntax::Const,
 	     "Development rate in the reproductive stage.");
-  Devel.add ("TempEff1", Syntax::PLF, Syntax::Const,
-	     "Temperature effect, vegetative stage [dg C ->].");
-  Devel.add ("TempEff2", Syntax::PLF, Syntax::Const,
-	     "Temperature effect, reproductive stage [dg C ->].");
-  Devel.add ("PhotEff1", Syntax::PLF, Syntax::Const,
-	     "Photoperiode effect, vegetative stage [h ->].");
+  Devel.add ("TempEff1", "dg C", Syntax::None (), Syntax::Const,
+	     "Temperature effect, vegetative stage.");
+  Devel.add ("TempEff2", "dg C", Syntax::None (), Syntax::Const,
+	     "Temperature effect, reproductive stage.");
+  Devel.add ("PhotEff1", "h", Syntax::None (), Syntax::Const,
+	     "Photoperiode effect, vegetative stage.");
   Devel.add ("defined_until_ds", Syntax::None (), Syntax::Const,
 	     "\
 This parameterization is only valid until the specified development state.");
@@ -1315,7 +1315,7 @@ This parameterization is only valid until the specified development state.");
 		"Quantum efficiency at low light.");
   LeafPhot.add ("Fm", "g CO2/m^2/h", Syntax::Const,
 		"Maximum assimilation rate.");
-  LeafPhot.add ("TempEff", Syntax::PLF, Syntax::Const,
+  LeafPhot.add ("TempEff", "dg C", Syntax::None (), Syntax::Const,
 		"Temperature effect, photosynthesis.");
 
   // Canopy
@@ -1324,8 +1324,8 @@ This parameterization is only valid until the specified development state.");
   vCanopy.add ("DSLAI05", 0.15);
   Canopy.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      " Specific leaf weight.");
-  Canopy.add ("LeafAIMod", Syntax::PLF, Syntax::Const,
-	      "Specific leaf weight modifier (func. of DS)");
+  Canopy.add ("LeafAIMod", "DS", Syntax::None (), Syntax::Const,
+	      "Specific leaf weight modifier.");
   PLF AIDef;
   AIDef.add (0.00, 1.00);
   AIDef.add (2.00, 1.00);
@@ -1336,8 +1336,8 @@ This parameterization is only valid until the specified development state.");
   Canopy.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      "Specific storage organ weight.");
   vCanopy.add ("SpSOrgAI", 0.0);
-  Canopy.add ("SOrgAIMod", Syntax::PLF, Syntax::Const,
-	      "Specific storage organ weight modifier (func. of DS)");
+  Canopy.add ("SOrgAIMod", "DS", Syntax::None (), Syntax::Const,
+	      "Specific storage organ weight modifier");
   vCanopy.add ("SOrgAIMod", AIDef);
   Canopy.add ("SOrgPhotEff", Syntax::None (), Syntax::Const,
 	      "Relative photosynthetic efficiency of storage organ.");
@@ -1345,14 +1345,14 @@ This parameterization is only valid until the specified development state.");
   Canopy.add ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      "Specific stem weight.");
   vCanopy.add ("SpStemAI", 0.0);
-  Canopy.add ("StemAIMod", Syntax::PLF, Syntax::Const,
-	      "Specific stem weight modifier (func. of DS)");
+  Canopy.add ("StemAIMod", "DS", Syntax::None (), Syntax::Const,
+	      "Specific stem weight modifier.");
   vCanopy.add ("StemAIMod", AIDef);
   Canopy.add ("StemPhotEff", Syntax::None (), Syntax::Const,
 	      "Relative photosynthetic efficiency of stem.");
   vCanopy.add ("StemPhotEff", 1.0);
-  Canopy.add ("HvsDS", Syntax::PLF, Syntax::Const,
-	      "Crop height as function of DS [->cm].");
+  Canopy.add ("HvsDS", Syntax::None (), "cm", Syntax::Const,
+	      "Crop height as function of DS.");
   Canopy.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
 	      "Relative CAI distribution at DS=0.");
   Canopy.add ("LAIDist1", Syntax::None (), Syntax::Const, 3,
@@ -1382,13 +1382,13 @@ This parameterization is only valid until the specified development state.");
   vCanopy.add ("rs_min", 0.0);
 
   // PartitPar
-  Partit.add ("Root", Syntax::PLF, Syntax::Const,
-	      "Partitioning functions for root [DS ->].");
-  Partit.add ("Leaf", Syntax::PLF, Syntax::Const,
-	      "Partitioning functions for leaves [DS ->].");
-  Partit.add ("Stem", Syntax::PLF, Syntax::Const,
-	      "Partitioning functions for stem [DS ->].");
-  Partit.add ("RSR", Syntax::PLF, Syntax::Const,
+  Partit.add ("Root", "DS", Syntax::None (), Syntax::Const,
+	      "Partitioning functions for root.");
+  Partit.add ("Leaf", "DS", Syntax::None (), Syntax::Const,
+	      "Partitioning functions for leaves.");
+  Partit.add ("Stem", "DS", Syntax::None (), Syntax::Const,
+	      "Partitioning functions for stem.");
+  Partit.add ("RSR", "DS", Syntax::None (), Syntax::Const,
 	      "Root/Shoot ratio as a function of development state.");
 
   // ProdPar
@@ -1430,10 +1430,10 @@ This parameterization is only valid until the specified development state.");
   Prod.add ("GrowthRateRedFac", Syntax::None (), Syntax::Const,
 	    "Growth rate reduction factor, 0-1.");
   vProd.add ("GrowthRateRedFac", 0.0);
-  Prod.add ("LfDR", Syntax::PLF, Syntax::Const,
-	    "Death rate of Leafs [DS -> d^-1].");
-  Prod.add ("RtDR", Syntax::PLF, Syntax::Const,
-	    "Death rate of Roots [DS -> d^-1].");
+  Prod.add ("LfDR", "DS", " d^-1", Syntax::Const,
+	    "Death rate of Leafs.");
+  Prod.add ("RtDR", "DS", " d^-1", Syntax::Const,
+	    "Death rate of Roots.");
   Prod.add ("Large_RtDR", "d^-1", Syntax::Const,
 	    "Extra death rate for large root/shoot.");
   vProd.add ("Large_RtDR", 0.05);
@@ -1450,37 +1450,37 @@ This parameterization is only valid until the specified development state.");
   CrpN.add ("fixate_factor", Syntax::None (), Syntax::Const,
 	    "Fraction of needed N fixated by day.");
   CrpNList.add ("fixate_factor", 0.8);
-  CrpN.add ("PtLeafCnc", Syntax::PLF, Syntax::Const,
-	    "Upper limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("CrLeafCnc", Syntax::PLF, Syntax::Const,
-	    "Critical limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("NfLeafCnc", Syntax::PLF, Syntax::Const, "\
-Non-functional limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("PtStemCnc", Syntax::PLF, Syntax::Const,
-	    "Upper limit for N-concentration in stem [DS -> g N/g DM].");
-  CrpN.add ("CrStemCnc", Syntax::PLF, Syntax::Const,
-	    "Critical limit for N-concentration in stem [DS -> g N/g DM].");
-  CrpN.add ("NfStemCnc", Syntax::PLF, Syntax::Const, "\
-Non-functional limit for N-concentration in stem [DS -> g N/g DM].");
-  CrpN.add ("PtSOrgCnc", Syntax::PLF, Syntax::Const, "\
-Upper limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("CrSOrgCnc", Syntax::PLF, Syntax::Const, "\
-Critical limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("NfSOrgCnc", Syntax::PLF, Syntax::Const, "\
-Non-functional limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("PtRootCnc", Syntax::PLF, Syntax::Const,
-	    "Upper limit for N-concentration in roots [DS -> g N/g DM].");
-  CrpN.add ("CrRootCnc", Syntax::PLF, Syntax::Const,
-	    "Critical limit for N-concentration in roots [DS -> g N/g DM].");
-  CrpN.add ("NfRootCnc", Syntax::PLF, Syntax::Const, "\
-Non-functional lim for N-concentration in roots [DS -> g N/g DM].");
-  CrpN.add ("TLLeafEff", Syntax::PLF, Syntax::Const,
+  CrpN.add ("PtLeafCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Upper limit for N-concentration in leaves.");
+  CrpN.add ("CrLeafCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Critical limit for N-concentration in leaves.");
+  CrpN.add ("NfLeafCnc", "DS", " g N/g DM", Syntax::Const, "\
+Non-functional limit for N-concentration in leaves.");
+  CrpN.add ("PtStemCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Upper limit for N-concentration in stem.");
+  CrpN.add ("CrStemCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Critical limit for N-concentration in stem.");
+  CrpN.add ("NfStemCnc", "DS", " g N/g DM", Syntax::Const, "\
+Non-functional limit for N-concentration in stem.");
+  CrpN.add ("PtSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+Upper limit for N-concentration in storage organ.");
+  CrpN.add ("CrSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+Critical limit for N-concentration in storage organ.");
+  CrpN.add ("NfSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+Non-functional limit for N-concentration in storage organ.");
+  CrpN.add ("PtRootCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Upper limit for N-concentration in roots.");
+  CrpN.add ("CrRootCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Critical limit for N-concentration in roots.");
+  CrpN.add ("NfRootCnc", "DS", " g N/g DM", Syntax::Const, "\
+Non-functional lim for N-concentration in roots.");
+  CrpN.add ("TLLeafEff", "DS", Syntax::Fraction (), Syntax::Const,
 	    "Translocation effiency, Leaf.");
   PLF TLLeafEff;
   TLLeafEff.add (0.00, 0.90);
   TLLeafEff.add (2.00, 0.90);
   CrpNList.add ("TLLeafEff", TLLeafEff);
-  CrpN.add ("TLRootEff", Syntax::PLF, Syntax::Const,
+  CrpN.add ("TLRootEff", "DS", Syntax::Fraction (), Syntax::Const,
 	    "Translocation effiency, Root.");
   PLF TLRootEff;
   TLRootEff.add (0.00, 0.10);
@@ -1603,7 +1603,7 @@ Maximal development stage for which the crop survives harvest.");
   Canopy.add ("LADm", "cm^2/cm^3", Syntax::State,
 	      "Maximal Leaf Area Density.");
   vCanopy.add ("LADm", -9999.99);
-  Canopy.add ("LAIvsH", Syntax::PLF, Syntax::State,
+  Canopy.add ("LAIvsH", "cm", "m^2/m^2", Syntax::State,
 	      "Accumulated Leaf Area Index at Height.");
   vCanopy.add ("LAIvsH", empty_plf);
 

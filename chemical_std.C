@@ -141,21 +141,23 @@ Read chemical properties as normal Daisy parameters.");
       syntax.add ("decompose_rate", "h^-1", Syntax::Const,
 		  "Fraction of solute being decomposed each hour.");
       PLF empty;
-      syntax.add ("decompose_heat_factor", Syntax::PLF, Syntax::Const,
-		  "Heat factor on decomposition [dg C ->].");
+      syntax.add ("decompose_heat_factor", "dg C", Syntax::None (), 
+		  Syntax::Const, "Heat factor on decomposition.");
       alist.add ("decompose_heat_factor", empty);
-      syntax.add ("decompose_water_factor", Syntax::PLF, Syntax::Const,
-		  "Water potential factor on decomposition [cm ->].");
+      syntax.add ("decompose_water_factor", "cm", Syntax::None (), 
+		  Syntax::Const,
+		  "Water potential factor on decomposition.");
       alist.add ("decompose_water_factor", empty);
-      syntax.add ("decompose_CO2_factor", Syntax::PLF, Syntax::Const,
-		  "CO2 development factor on decomposition [g C/cm^3 ->].");
+      syntax.add ("decompose_CO2_factor", "g C/cm^3", Syntax::None (), 
+		  Syntax::Const,
+		  "CO2 development factor on decomposition.");
       PLF no_factor;
       no_factor.add (0.0, 1.0);
       no_factor.add (1.0, 1.0);
       alist.add ("decompose_CO2_factor", no_factor);
-      syntax.add ("decompose_conc_factor", Syntax::PLF, Syntax::Const,
-		  "\
-Concentration development factor on decomposition [g X/cm^3 H2O ->].");
+      syntax.add ("decompose_conc_factor", "g X/cm^3 H2O", Syntax::None (),
+		  Syntax::Const,
+		  "Concentration development factor on decomposition.");
       alist.add ("decompose_conc_factor", no_factor);
       syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
 Clear this flag to turn off decomposition in groundwater.");

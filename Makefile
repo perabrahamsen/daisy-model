@@ -381,12 +381,6 @@ TAGS: $(SOURCES) $(HEADERS)
 dos2unix:
 	perl -pi.bak -e 's/\r\n$$/\n/' $(TEXT)
 
-# This prints all the text files when called on Solaris 1.
-#
-print:
-	mp -p /home/user_13/fischer/bin/mp.pro.none -a4 $(TEXT) | parr -s | up -n pup | lpr -Pduplex
-
-
 # Print the current syntax for the Daisy input language.
 #
 dump:	daisy

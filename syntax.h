@@ -77,6 +77,8 @@ public:
   ::Library& library (const string&) const;
   int  size (const string&) const;
   const string& dimension (const string&) const;
+  const string& domain (const string&) const;
+  const string& range (const string&) const;
   const string& description (const string&) const;
   bool ordered () const;
   const vector<string>& order () const;
@@ -110,6 +112,19 @@ public:
 	    category cat,
 	    const string& description)
     { add (key, dim, cat, Singleton, description); } 
+
+  void add (const string& key, // PLF.
+	    const string& domain,
+	    const string& range,
+	    category cat,
+	    int size,
+	    const string& description);
+  void add (const string& key, 
+	    const string& domain,
+	    const string& range,
+	    category cat,
+	    const string& description)
+    { add (key, domain, range, cat, Singleton, description); } 
 
   void add (const string& key,  // AList
 	    const Syntax& syntax,

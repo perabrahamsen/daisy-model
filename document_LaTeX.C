@@ -195,6 +195,17 @@ DocumentLaTeX::print_entry_type (ostream& out,
       }
       break;
     case Syntax::PLF:
+      {
+	out << "plf ";
+	const string& domain = syntax.domain (name);
+	const string& range = syntax.range (name);
+	out << "\\textbf{$[$";
+	print_quoted (out, domain);
+	out << "} $\\rightarrow $ \\textbf{";
+	print_quoted (out, range);
+	out << "$]$}";
+      }
+      break;
       out << "plf (see section~\\ref{type:plf})";
       break;
     case Syntax::Boolean:

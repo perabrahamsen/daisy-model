@@ -516,9 +516,9 @@ Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)
 		"Max crop height in canopy");
     syntax.add ("cover", "m^2/m^2", Syntax::LogOnly,
 		"Fraction of soil covered by crops");
-    syntax.add ("LAIvsH", Syntax::PLF, Syntax::LogOnly,
-		"Total canopy LAI below given height (cm)");
-    syntax.add ("HvsLAI", Syntax::PLF, Syntax::LogOnly, "\
+    syntax.add ("LAIvsH", "m^2/m^2", "cm", Syntax::LogOnly,
+		"Total canopy LAI below given height");
+    syntax.add ("HvsLAI", "cm", "m^2/m^2", Syntax::LogOnly, "\
 Height in which there is a given LAI below in total canopy");
     syntax.add ("ACExt", Syntax::None (), Syntax::LogOnly,
 		"Canopy extinction coefficient \

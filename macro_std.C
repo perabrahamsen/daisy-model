@@ -235,7 +235,7 @@ to the `distribution' parameter.");
 		  "Macropores starts at this depth (a negative number)");
       syntax.add ("height_end", "cm", Syntax::Const, 
 		  "Macropores ends at this depth (a negative number)");
-      syntax.add ("distribution", Syntax::PLF, Syntax::Const, "\
+      syntax.add ("distribution", "cm", Syntax::Fraction (), Syntax::Const, "\
 Distribution of macropore end points as a function of height.\n\
 The function should start with `1' at `height_end', and then decrease to\n\
 `0' at `height_start'.  It can be constant, but may never increase.\n\

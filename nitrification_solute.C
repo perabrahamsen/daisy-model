@@ -161,11 +161,11 @@ Set this to true to enable nitrification in the groundwater.");
     syntax.add ("k_10", "h^-1", Syntax::Const,
 		"Max rate.");
     PLF empty;
-    syntax.add ("heat_factor", Syntax::PLF, Syntax::Const,
-		"Heat factor [dg C ->].");
+    syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
+		"Heat factor.");
     alist.add ("heat_factor", empty);
-    syntax.add ("water_factor", Syntax::PLF, Syntax::Const,
-		"Water potential factor [cm ->].");
+    syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
+		"Water potential factor.");
     alist.add ("water_factor", empty);
     Librarian<Nitrification>::add_type ("solute", alist, syntax, &make);
   }

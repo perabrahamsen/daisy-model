@@ -125,7 +125,7 @@ Write a message to the user.");
 Write a warning to the user.");
 	syntax.add ("message", Syntax::String, Syntax::Const,
 		    "Warning to give to the user.");
-	syntax.order ("warning");
+	syntax.order ("message");
 
 	Librarian<Action>::add_type ("warning", alist, syntax, &make_warning);
       }

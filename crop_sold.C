@@ -653,12 +653,12 @@ CropSoldSyntax::CropSoldSyntax ()
 	     "Development rate in the vegetative stage.");
   Devel.add ("DSRate2", Syntax::None (), Syntax::Const,
 	     "Development rate in the reproductive stage.");
-  Devel.add ("TempEff1", Syntax::PLF, Syntax::Const,
-	     "Temperature effect, vegetative stage [dg C ->].");
-  Devel.add ("TempEff2", Syntax::PLF, Syntax::Const,
-	     "Temperature effect, reproductive stage [dg C ->].");
-  Devel.add ("PhotEff1", Syntax::PLF, Syntax::Const,
-	     "Photoperiode effect, vegetative stage [h ->].");
+  Devel.add ("TempEff1", "dg C", Syntax::None (), Syntax::Const,
+	     "Temperature effect, vegetative stage.");
+  Devel.add ("TempEff2", "dg C", Syntax::None (), Syntax::Const,
+	     "Temperature effect, reproductive stage.");
+  Devel.add ("PhotEff1", "h", Syntax::None (), Syntax::Const,
+	     "Photoperiode effect, vegetative stage.");
     
   // VernalPar
   Vernal.add ("required", Syntax::Boolean, Syntax::Const,
@@ -699,8 +699,8 @@ CropSoldSyntax::CropSoldSyntax ()
 	      "Leaf recession parameter.");
   Canopy.add ("SpLAI", "(m^2/m^2)/(g/m^2)", Syntax::Const,
 	      "Specific leaf weight.");
-  Canopy.add ("HvsDS", Syntax::PLF, Syntax::Const,
-	      "Crop height as function of DS [->cm].");
+  Canopy.add ("HvsDS", "DS", "cm", Syntax::Const,
+	      "Crop height as function of DS.");
   Canopy.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
 	      "Relative LAI distribution at DS=0.");
   Canopy.add ("LAIDist1", Syntax::None (), Syntax::Const, 3,
@@ -737,23 +737,23 @@ CropSoldSyntax::CropSoldSyntax ()
 	    "Transport resistance in xyleme.");
 
   // PartitPar
-  Partit.add ("Root", Syntax::PLF, Syntax::Const,
+  Partit.add ("Root", "DS", Syntax::Unknown (), Syntax::Const,
 	      "Partitioning functions for root.");
-  Partit.add ("SOrg", Syntax::PLF, Syntax::Const,
+  Partit.add ("SOrg", "DS", Syntax::Unknown (), Syntax::Const,
 	      "Partitioning functions for storage organ.");
 
   // RespPar
-  Resp.add ("E_Root", Syntax::PLF, Syntax::Const,
+  Resp.add ("E_Root", "DS", Syntax::Unknown (), Syntax::Const,
 	    "Conversion efficiency, root.");
-  Resp.add ("E_SOrg", Syntax::PLF, Syntax::Const,
+  Resp.add ("E_SOrg", "DS", Syntax::Unknown (), Syntax::Const,
 	    "Conversion efficiency, storage organ.");
-  Resp.add ("E_Leaf", Syntax::PLF, Syntax::Const,
+  Resp.add ("E_Leaf", "DS", Syntax::Unknown (), Syntax::Const,
 	    "Conversion efficiency, leaf.");
-  Resp.add ("r_Root", Syntax::PLF, Syntax::Const,
+  Resp.add ("r_Root", "DS", Syntax::Unknown (), Syntax::Const,
 	    "Maintenance respiration coefficient, root.");
-  Resp.add ("r_SOrg", Syntax::PLF, Syntax::Const,
+  Resp.add ("r_SOrg", "DS", Syntax::Unknown (), Syntax::Const,
 	    "Maintenance respiration coefficient, root.");
-  Resp.add ("r_Leaf", Syntax::PLF, Syntax::Const,
+  Resp.add ("r_Leaf", "DS", Syntax::Unknown (), Syntax::Const,
 	    "Maintenance respiration coefficient, leaf.");
 
   // CrpNPar
@@ -762,24 +762,24 @@ CropSoldSyntax::CropSoldSyntax ()
   CrpN.add ("DS_fixate", Syntax::None (), Syntax::Const,
             "DS at which to start fixation of atmospheric N.");
   CrpNList.add ("DS_fixate", 42000.0);
-  CrpN.add ("PtLeafCnc", Syntax::PLF, Syntax::Const,
-	    "Upper limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("CrLeafCnc", Syntax::PLF, Syntax::Const,
-	    "Critical limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("NfLeafCnc", Syntax::PLF, Syntax::Const, "\
-Non-functional limit for N-concentration in leaves [DS -> g N/g DM].");
-  CrpN.add ("PtSOrgCnc", Syntax::PLF, Syntax::Const, "\
-Upper limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("CrSOrgCnc", Syntax::PLF, Syntax::Const, "\
-Critical limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("NfSOrgCnc", Syntax::PLF, Syntax::Const, "\
-Non-functional limit for N-concentration in storage organ [DS -> g N/g DM].");
-  CrpN.add ("PtRootCnc", Syntax::PLF, Syntax::Const,
-	    "Upper limit for N-concentration in roots [DS -> g N/g DM].");
-  CrpN.add ("CrRootCnc", Syntax::PLF, Syntax::Const,
-	    "Critical limit for N-concentration in roots [DS -> g N/g DM].");
-  CrpN.add ("NfRootCnc", Syntax::PLF, Syntax::Const, "\
-Non-functional lim for N-concentration in roots [DS -> g N/g DM].");
+  CrpN.add ("PtLeafCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Upper limit for N-concentration in leaves.");
+  CrpN.add ("CrLeafCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Critical limit for N-concentration in leaves.");
+  CrpN.add ("NfLeafCnc", "DS", " g N/g DM", Syntax::Const, "\
+Non-functional limit for N-concentration in leaves.");
+  CrpN.add ("PtSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+Upper limit for N-concentration in storage organ.");
+  CrpN.add ("CrSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+Critical limit for N-concentration in storage organ.");
+  CrpN.add ("NfSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+Non-functional limit for N-concentration in storage organ.");
+  CrpN.add ("PtRootCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Upper limit for N-concentration in roots.");
+  CrpN.add ("CrRootCnc", "DS", " g N/g DM", Syntax::Const,
+	    "Critical limit for N-concentration in roots.");
+  CrpN.add ("NfRootCnc", "DS", " g N/g DM", Syntax::Const, "\
+Non-functional lim for N-concentration in roots.");
 
   // HarvestPar
   Harvest.add ("beta", "sqrt ((g N/m^2)/(g DM/m^2))", Syntax::Const,
@@ -824,7 +824,7 @@ Maximal development stage for which the crop survives harvest.");
   Canopy.add ("LADm", "cm^2/cm^3", Syntax::State,
 	      "Maximal Leaf Area Density.");
   vCanopy.add ("LADm", -9999.99);
-  Canopy.add ("LAIvsH", Syntax::PLF, Syntax::State,
+  Canopy.add ("LAIvsH", "cm", "m^2/m^2", Syntax::State,
 	      "Accumulated Leaf Area Index at Height.");
   vCanopy.add ("LAIvsH", empty_plf);
 

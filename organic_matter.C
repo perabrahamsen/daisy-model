@@ -1052,14 +1052,14 @@ Mineralization this time step (negative numbers mean immobilization).");
   syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
 	      "Layered initialization of soil SOM content.");
   PLF empty;
-  syntax.add ("heat_factor", Syntax::PLF, Syntax::Const,
-	      "Heat factor [dg C ->].");
+  syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
+	      "Heat factor.");
   alist.add ("heat_factor", empty);
-  syntax.add ("water_factor", Syntax::PLF, Syntax::Const,
-	      "Water potential factor [cm ->].");
+  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
+	      "Water potential factor.");
   alist.add ("water_factor", empty);
-  syntax.add ("clay_factor", Syntax::PLF, Syntax::Const,
-	      "Clay fraction factor [->].");
+  syntax.add ("clay_factor", Syntax::Fraction (), Syntax::None (), 
+	      Syntax::Const, "Clay fraction factor.");
   PLF clay;
   clay.add (0.00, 1.0);
   clay.add (0.25, 0.5);
