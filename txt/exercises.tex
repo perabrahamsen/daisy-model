@@ -169,7 +169,7 @@ going to be used by the simulation, as shown in box~\ref{box:header}.
     \label{box:header}
 \begin{verbatim}
 ;; Setting "working directory", note that `/' is used and not `\'
-(directory "C:/DaisySim/Workshop/Exer01")
+(directory "C:/DaisySim/Exercise/01")
 ;; Setting search path for library-files
 (path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
 
@@ -211,11 +211,7 @@ weather format or \texttt{dwf}). This format shall be explained later.
 
 Basic soil horizon information is given in table~\ref{tab:basic}. This
 information is transferred to the internal library of the model using
-defhorizon as shown in box~\ref{box:horizon}. It is noted that the
-model, as a part of its minimum requirement, requires additional
-information pertaining to the MIT component, viz.
-\texttt{SOM\_fractions} and \texttt{SOM\_C\_per\_N}. These parameters
-shall be dealt with in exercise~\ref{ex:warmup}.
+defhorizon as shown in box~\ref{box:horizon}. 
 
 \begin{table}[!htbp]
   %\centering
@@ -243,8 +239,7 @@ shall be dealt with in exercise~\ref{ex:warmup}.
   (silt 0.277 [])
   (sand 0.584 [])
   (humus 0.026 [])
-  (SOM_fractions 0.50 0.50 [])
-  (SOM_C_per_N 11.0 11.0 []))
+  (C_per_N 11.0 [g C/g N]))
 \end{verbatim}
   \end{boxedminipage}
 \end{figure}
@@ -273,10 +268,11 @@ based on minimum requirements is shown in box~\ref{box:column}.
 \begin{verbatim}
 ;;  Parameterisation of column (Fine sandy loam)
 (defcolumn "Fine sandy loam" default
-   (Soil (MaxRootingDepth 100 [cm])
-         (horizons (  -30 [cm] "Ap F.S.L.")
-                   (  -80 [cm] "B F.S.L.")
-                   ( -400 [cm] "C F.S.L.")))
+     (Soil (MaxRootingDepth 100 [cm])
+           (horizons (  -30 [cm] "Ap F.S.L.")
+                     (  -80 [cm] "B F.S.L.")
+                     ( -400 [cm] "C F.S.L.")))
+     (OrganicMatter (init (input 3000 [kg C/ha/y])))
      (Groundwater deep))
 \end{verbatim}
   \end{boxedminipage}
@@ -289,12 +285,23 @@ information on the maximum rooting depth in the soil and the soil
 horizons of the profile. The A-horizon extends down to 30 cm depth,
 the B-horizon is found in the interval 30-80 cm and C-horizon starts
 at 80 cm depth and continues down to at least 400 cm depth, where the
-calculations stop. The groundwater section tells that the position of
-the groundwater table is located deep below the 400 cm limit of the
-calculations. This means that a free drainage can be selected for the
-soil water dynamics calculations. Again, when only this minimum
-information is supplied then the model makes extensive use of default
-parameterisation.
+calculations stop. 
+
+The organic matter section gives information used in initialization of
+the MIT-model
+(\textit{M}ineralization-\textit{I}mmobilization-\textit{T}urnover
+model).  The figure 3000 kg C/ha/y indicated the average annual input
+of organic carbon in the soil in the decade before the start of the
+simulation.  The carbon input comprises carbon in organic fertilizer,
+plant residuals, and rhizodeposition.  The model contains a procedure
+taht automatically parameterize the MIT-model based on this
+information. 
+
+The groundwater section tells that the position of the groundwater
+table is located deep below the 400 cm limit of the calculations. This
+means that a free drainage can be selected for the soil water dynamics
+calculations. Again, when only this minimum information is supplied
+then the model makes extensive use of default parameterisation.
 
 The next step is to define a list of actions performed in order to
 grow spring barley; in this case the list is named
@@ -587,25 +594,29 @@ calibration of the interface to the groundwater.
 How tile drains can be introduced in the simulation is described in
 \daisytut{}, section~\ref{tut-sec:groundwater}. The soil and the
 management are characterised as in exercise~\ref{ex:hydraulic}.  We
-know the distance between the drainpipes are 18 m and that the pipes
-are located at 110 cm depth.  Assume further that an aquitard of
-thickness 2.20 m is located at 2.20 -- 4.40 m depth and that the
-aquitard is overlaying an aquifer, which is characterised by a
-pressure potential of 250 cm at the top of the aquifer (the interface
-between the aquitard and the aquifer).  Measurement shows that
-approximately 2/3 of the net precipitation in 1993 was lost through
-the drainpipes.  Calibrate the hydraulic conductivity of the aquitard
-so that the simulated value matches the measured value.
+know the distance between the drainpipes are 18 m (default value) and
+that the pipes are located at 110 cm depth (default value.  Assume
+further that an aquitard of thickness 2 m (default value) is located
+at 2.20 -- 4.20 m depth and that the aquitard is overlaying an aquifer,
+which is characterised by a pressure potential of 200 cm at the top of
+the aquifer (the interface between the aquitard and the aquifer).
+Measurement shows that approximately 2/3 of the net precipitation in
+1993 was lost through the drainpipes.  Calibrate the hydraulic
+conductivity of the aquitard so that the simulated value matches the
+measured value.
 
-The model code assumes that the aquitard always is saturated. Hence if
-the groundwater table falls below the top of the aquitard then the
-model stops. In dry years this might happen. However, by introducing
-an extra soil horizon with the same characteristics as the aquitard we
-may be able to overcome this problem. In the present case one might
-introduce an aquifer horizon of the thickness of 50 cm and reduce the
-aquitard as defined in the lower boundary condition by 50 cm so that
-the new thickness will be only 1.70 m (\texttt{z\_aquitard} 1.7 [m]).
-Hint: include ``\texttt{Groundwater}'' among the output files.
+In the present case the lowest soil horizon ends at 2.2 m depth (i.e.\
+the top of the aquitard).  The new lower boundary condition is
+introduced by entering 
+\begin{verbatim}
+  (Groundwater pipe (K_aquitard 0.01 [cm/h]))
+\end{verbatim}
+instead of 
+\begin{verbatim}
+  (Groundwater deep)
+\end{verbatim}
+The numerical value assigned to \texttt{K\_aquitard} is the value used
+for the calibration. 
 
 \section{Rotations}
 \label{ex:rotation}
@@ -807,29 +818,35 @@ Did the warm-up period improve the credibility of the simulation?
 The objective of this exercise is to calibrate the MIT-model
 (Mineralization-Immobilization Turnover).
 
-In box~\ref{box:horizon} humus, \texttt{SOM\_fractions}, and
-\texttt{SOM\_C\_per\_N} were defined. The total carbon content of the
-soil is calculated from the humus content.  The two Soil Organic
-Matter pools (SOM1 and SOM2) contain far the most of the C-content in
-the soil. By introducing a warm-up period as described in
-exercise~\ref{ex:warmup} the system will attain a sort of equilibrium
-with the agricultural system except for the distribution of C between
-SOM1 and SOM2, that is Added Organic Matter pools (AOM) and the Soil
-Microbial Biomass pools (SMB) attain a sort of equilibrium with the
-agricultural system (AOM inputs) and the SOM-pools. The C distribution
-between the SOM-pools is defined by \texttt{SOM\_fractions}. The
-\texttt{SOM\_fractions} takes two parameters, viz.\ the C-fractions
-allocated to SOM1 and SOM2, respectively. The \texttt{SOM\_fractions}
-are considered the main calibration parameters of the MIT-model,
-defining the C mineralization level of the system. However, we are
-often more interested in the N mineralization of the system.
-Accepting the default C/N of the SMB-pools and that the AOM-pools are
-well described, then we only lack to assert the N content of the
-SOM-pools.  \texttt{SOM\_C\_per\_N} that takes two parameters, 
-viz.\ the C/N of SOM1 and SOM2, respectively, defines the N content of the
-SOM-pools.  It is common to assume a common C/N based on measurement
-of total soil N.
- 
+In box~\ref{box:column} organic matter section was introduced. The
+total carbon content of the soil is calculated from the humus
+contentwhich was defined in the horizon section
+(box~\ref{box:horizon}).  The MIT model comproses several organic
+matter pools and the toal carbon content is distributed among these
+pools by the initialization procedure that makes use of anual input of
+organic carbon.  This, in combination with a warm-up period, will
+often give a reasonable initializatin and hence a reasonable
+N-mineralization.  However this can be fine tuned by introducing the
+\texttt{background\_mineralization} init parameter, like this:
+\begin{verbatim}
+       (OrganicMatter (init (input 3000 [kg C/ha/y]))
+                      (background_mineralization 30 [kg N/ha/y]))
+\end{verbatim}
+Daisy will then attempt to initialize the organic matter pools so the
+total mineralization is 30 kg N/ha/y higher than the amount of organic
+bound nitrogen added to the system together with the 3000 kg C/ha/y we
+specified above.  In other words, at the time we start the simulation
+the amount of organic bound nitrogen in the soil is expected to
+decrease (be released) at a rate of 30 kg N/ha/y.
+
+In certain cases the model may not be able to initialize itself, and
+it may be necessary to park some of the soil organic carbon  in an
+inactive pool.  This is done be entreing the following parameter in
+the \texttt{defhorizon} section
+\begin{verbatim}
+  (SOM_fractions -1 -1 xxx)
+\end{verbatim}
+where \emph{xxx} is the inactive fraction of the soil organic carbon.
 
 A way to estimate the N mineralization level of the system is to grow
 an unfertilized plot and measure the nitrogen content of the crop at
@@ -839,7 +856,8 @@ winter wheat. The above ground part of the crop was harvested in the
 two years and the biomass was analyzed for its N content. The
 harvested nitrogen was 102 kg N/ha and 60 kg N/ha in 1993 and 1994,
 respectively. Use this information to calibrate the MIT model by
-modifying the \texttt{SOM\_fractions} parameter.
+modifying the background mineralization parameter, and if necessary,
+the texttt{SOM\_fractions} parameter.
 
 \section{Building a Weather File}
 \label{ex:weather}
