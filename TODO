@@ -1,3 +1,9 @@
+* Check om "mixing" giver forkerte resultater når man disabler transport.
+
+* Kør DHI Setup
+
+* Lysimeter Grundvand rand
+
 * Stof chemicals ned i jord via macropores.
 
 1. Lav setup + log for surface chemicals.  gem resultat af kørsel.
@@ -11,6 +17,8 @@
 5. Implementer macro indtrænging. sammenlign resultat.
 
 6. Implementer mixture.  sammenlign resultat.
+
+* Lav "Crop" Manager.
 
 * Transpiration/Water Uptake component
 

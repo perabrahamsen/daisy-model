@@ -63,7 +63,7 @@ Surface::mixture (const IM& soil_im /* g/cm^2/mm */)
 void
 Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
 {
-  if (pond > 1e-6 && R_mixing > 0.0)
+  if (!total_matter_flux && pond > 1e-6 && R_mixing > 0.0)
     {
       // [g/cm^2/h] = ([g/cm^2/mm] - [g/cm^2] / [mm]) / [h/mm]
       im_flux.NO3 = max (-im.NO3 / dt,

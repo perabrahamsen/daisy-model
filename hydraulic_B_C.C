@@ -22,11 +22,8 @@ private:
   double Sr (double h) const;
   
   // Create and Destroy.
-private:
-  friend class HydraulicB_CSyntax;
-  static Hydraulic& make (const AttributeList& al);
-  HydraulicB_C (const AttributeList&);
 public:
+  HydraulicB_C (const AttributeList&);
   ~HydraulicB_C ();
 };
 
@@ -90,30 +87,40 @@ HydraulicB_C::~HydraulicB_C ()
 
 // Add the HydraulicB_C syntax to the syntax table.
 
-Hydraulic&
-HydraulicB_C::make (const AttributeList& al)
-{
-  return *new HydraulicB_C (al);
-}
-
 static struct HydraulicB_CSyntax
 {
-  HydraulicB_CSyntax ();
+  static Hydraulic& make (const AttributeList& al)
+    {
+      return *new HydraulicB_C (al);
+    }
+
+  static bool check (const AttributeList& al)
+    { 
+      bool ok = true;
+
+      non_positive (al.number ("h_b"), "h_b", ok);
+      is_fraction (al.number ("b"), "b", ok);
+      non_negative (al.number ("K_sat"), "K_sat", ok);
+
+      return ok;
+    }
+
+  HydraulicB_CSyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add_check (check);
+      alist.add ("description", 
+		 "Campbell retention curve model with Burdine theory.");
+      Hydraulic::load_syntax (syntax, alist);
+      syntax.add ("h_b", "cm", Syntax::Const,
+		  "Bubbling pressure.");
+      syntax.add ("b", Syntax::None (), Syntax::Const,
+		  "Campbell parameter.");
+      syntax.add ("K_sat", "cm/h", Syntax::Const,
+		  "Water conductivity of saturated soil.");
+
+      Librarian<Hydraulic>::add_type ("B_C", alist, syntax, &make);
+    }
 } hydraulicB_C_syntax;
 
-HydraulicB_CSyntax::HydraulicB_CSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  alist.add ("description", 
-	     "Campbell retention curve model with Burdine theory.");
-  Hydraulic::load_syntax (syntax, alist);
-  syntax.add ("h_b", "cm", Syntax::Const,
-	      "Bubbling pressure.");
-  syntax.add ("b", Syntax::None (), Syntax::Const,
-	      "Campbell parameter.");
-  syntax.add ("K_sat", "cm/h", Syntax::Const,
-	      "Water conductivity of saturated soil.");
-
-  Librarian<Hydraulic>::add_type ("B_C", alist, syntax, &HydraulicB_C::make);
-}

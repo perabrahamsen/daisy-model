@@ -1,3 +1,23 @@
+1999-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.02 released.
+
+1999-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C (mixture): No mixing when `total_matter_flux' is
+	enabled. 
+
+1999-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_M_C.C (HydraulicM_CSyntax::check): New function.
+	(HydraulicM_CSyntax::HydraulicM_CSyntax): Use it.
+	* hydraulic_B_C.C (HydraulicB_CSyntax::check): New function.
+	(HydraulicB_CSyntax::HydraulicB_CSyntax): Use it.
+
+1999-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Crop Photosynthesis"): Fixed OM CO2.
+
 1999-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.01 released.
