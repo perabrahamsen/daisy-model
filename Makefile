@@ -104,6 +104,7 @@ endif
 
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
+		DYNSEARCH = -R`pwd`
 		OSFLAGS = 
 		DEBUG = -g
 	endif
@@ -122,6 +123,7 @@ ifeq ($(COMPILER),gcc)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
+	DYNSEARCH = -R`pwd`
 	COMPILE = /pack/devpro/SUNWspro/bin/CC
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
@@ -203,7 +205,7 @@ ifeq ($(COMPILER),borland)
 	NOLINK = -c
 	CRTLIB = C:\BC5\LIB\c0x32.obj
 else
-	LINK = $(CC) -R`pwd` -g -o
+	LINK = $(CC) $(DYNSEARCH) -g -o
 	NOLINK = -c
 endif
 
