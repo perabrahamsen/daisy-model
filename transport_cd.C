@@ -118,7 +118,7 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	* Theta;
 
       // Check for NaN.
-      daisy_assert (finite (D[j]));
+      daisy_assert (isfinite (D[j]));
     }
   // Lower boundary.
   {
@@ -257,10 +257,10 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 		     / (2.0 * dz)));
 
 	  // Check for NaN.
-	  daisy_assert (finite (a[j]));
-	  daisy_assert (finite (b[j]));
-	  daisy_assert (finite (c[j]));
-	  daisy_assert (finite (d[j]));
+	  daisy_assert (isfinite (a[j]));
+	  daisy_assert (isfinite (b[j]));
+	  daisy_assert (isfinite (c[j]));
+	  daisy_assert (isfinite (d[j]));
 	}
       // Adjust for upper boundary condition.
       {
@@ -304,10 +304,10 @@ TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 		   / (2.0 * dz)));
 
 	// Check for NaN.
-	daisy_assert (finite (a[0]));
-	daisy_assert (finite (b[0]));
-	daisy_assert (finite (c[0]));
-	daisy_assert (finite (d[0]));
+	daisy_assert (isfinite (a[0]));
+	daisy_assert (isfinite (b[0]));
+	daisy_assert (isfinite (c[0]));
+	daisy_assert (isfinite (d[0]));
 	d[0] -= a[0] * C_top;
       }
       // Adjust for lower boundary condition.

@@ -47,7 +47,7 @@ Solute::add_to_source (const vector<double>& v)
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] += v[i];
-      daisy_assert (finite (S[i]));
+      daisy_assert (isfinite (S[i]));
       daisy_assert (M_left (i) >= 0.0);
     }
 }
@@ -59,7 +59,7 @@ Solute::add_to_sink (const vector<double>& v)
   for (unsigned i = 0; i < v.size (); i++)
     {
       S[i] -= v[i];
-      daisy_assert (finite (S[i]));
+      daisy_assert (isfinite (S[i]));
       daisy_assert (M_left (i) >= 0.0);
     }
 }

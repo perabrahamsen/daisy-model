@@ -111,6 +111,7 @@ OM::turnover (const double from_C, const double from_N,
 	      double rate, const double efficiency,
 	      double& C_use, double& N_produce, double& N_consume)
 {
+  daisy_assert (rate >= 0.0);
   if (rate < 1e-200)
     {
       N_produce = N_consume = C_use = 0;
@@ -143,7 +144,7 @@ OM::turnover (const double from_C, const double from_N,
   // We need to introduce a new variable because BCC5 is braindead.
   const double N_avail2 = N_avail - 1e-12; // Leave 1 [ug/l].
   rate = N_avail2 / (efficiency * from_C / to_C_per_N - from_N);
-  daisy_assert (finite (rate));
+  daisy_assert (isfinite (rate));
   if (rate < 0)
     rate = 0;
 
@@ -177,7 +178,7 @@ OM::turnover_pool (unsigned int end, const double* factor,
 	continue;
 
       const double rate = min (factor[i] * speed, 0.1);
-      daisy_assert (finite (rate));
+      daisy_assert (isfinite (rate));
       daisy_assert (rate >=0);
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (N[i] >= 0.0);

@@ -24,7 +24,7 @@
 #include "geometry.h"
 #include "check.h"
 #include "tmpstream.h"
-#include <math.h>
+#include "mathlib.h"
 
 struct Rootdens_G_P : public Rootdens
 {

@@ -318,7 +318,7 @@ DOM::tock (unsigned int end,
     {
       double rate = min (factor[i] * fraction, 0.1);
       daisy_assert (C.M[i] >= 0.0);
-      daisy_assert (finite (rate));
+      daisy_assert (isfinite (rate));
       daisy_assert (rate >=0);
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (N.M[i] >= 0.0);

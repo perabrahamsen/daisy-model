@@ -25,7 +25,7 @@
 #include "assertion.h"
 #include "treelog.h"
 #include "tmpstream.h"
-#include <math.h>
+#include "mathlib.h"
 
 double 
 FAO::CanopyResistance (double LAI)

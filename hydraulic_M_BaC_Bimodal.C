@@ -24,7 +24,7 @@
 // Bimodal hydraulic conductivity curve.
 
 #include "hydraulic.h"
-#include <math.h>
+#include "mathlib.h"
 
 class HydraulicM_BaC_Bimodal : public Hydraulic
 {

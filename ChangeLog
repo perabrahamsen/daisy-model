@@ -1,3 +1,33 @@
+2003-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.63 released.
+
+2003-04-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C, root_system.h (tick): Take T parameter instead of
+	'soil_heat'. 
+	* crop_std.C (tick): Update caller.
+	* crop_simple.C (tick): Ditto.
+
+	* root_system.C, root_syste.h (DptEmr): Removed parameter.
+	* crop_std.C (tick): Use 'Depth' instead of 'DptEmr'.
+
+	* root_system.C, root_system.h (PenClayFac): New parameter.
+	* root_system.C (tick): use it.
+
+	* Makefile (REMOVE): Added development.C and development.h.
+	(SUBMODELS): Removed them.
+
+2003-04-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (turnover): Added assertion.
+
+2003-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mathlib.h (safe_pow, safe_sqrt, safe_log, safe_acos, safe_asin):
+	New functions.
+	(pow, sqrt, log, acos, asin): Use them.
+
 2003-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.62 released.

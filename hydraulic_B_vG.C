@@ -24,7 +24,7 @@
 
 #include "hydraulic.h"
 #include "plf.h"
-#include <math.h>
+#include "mathlib.h"
 
 class HydraulicB_vG : public Hydraulic
 {

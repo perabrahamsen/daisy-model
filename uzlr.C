@@ -175,7 +175,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 					      soil_heat.T (i+1)));
 	    }
 
-	  daisy_assert (finite (h_new));
+	  daisy_assert (isfinite (h_new));
 	  const double Theta_fc = soil.Theta (i, h_fc, h_ice[i]);
 	  const double Theta_next = Theta_new - K_new * dt / dz;
 	  
@@ -199,9 +199,9 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	    }
 	  daisy_assert (q[i+1] < 1e-10);
 	}
-      daisy_assert (finite (h[i]));
-      daisy_assert (finite (Theta[i]));
-      daisy_assert (finite (q[i+1]));
+      daisy_assert (isfinite (h[i]));
+      daisy_assert (isfinite (Theta[i]));
+      daisy_assert (isfinite (q[i+1]));
       daisy_assert (Theta[i] <= Theta_sat);
       daisy_assert (Theta[i] >= Theta_res);
     }

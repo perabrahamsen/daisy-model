@@ -834,7 +834,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       N_used[i] = 0.0;
 
       const double h = soil_water.h (i);
-      daisy_assert (finite (h));
+      daisy_assert (isfinite (h));
       const double T = soil_heat.T (i);
       const double heat = heat_turnover_factor (T);
       const double water = water_turnover_factor (h);
@@ -2168,7 +2168,7 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   SOM::load_syntax (som_syntax, som_alist);
   vector<AttributeList*> SOM;
   AttributeList SOM1 (som_alist);
-#ifdef SANDER_PARAMS
+#if 1 // SANDER_PARAMS
   SOM1.add ("turnover_rate", 4.3e-5 / 24.0 /* 1.7916667e-6 */);
 #else
   SOM1.add ("turnover_rate", 2.7e-6 / 24.0 /* 1.125e-7 */);
@@ -2191,7 +2191,7 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   SOM2_efficiency.push_back (0.50);
   SOM2.add ("efficiency", SOM2_efficiency);
   vector<double> SOM2_fractions;
-#ifdef SANDER_PARAMS
+#if 1 // SANDER_PARAMS
   SOM2_fractions.push_back (0.7);
   SOM2_fractions.push_back (0.0);
   SOM2_fractions.push_back (0.3);

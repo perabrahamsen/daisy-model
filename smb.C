@@ -62,7 +62,7 @@ SMB::turnover_pool (unsigned int end, const double* factor,
     {
       const double rate = min (factor[i] * clay_turnover[i] * fraction, 0.1);
       daisy_assert (C[i] >= 0.0);
-      daisy_assert (finite (rate));
+      daisy_assert (isfinite (rate));
       daisy_assert (rate >=0);
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (N[i] >= 0.0);

@@ -12,9 +12,31 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.63
+
+** New PenClayFac parameter for root penetration.
+
+Example:
+
+    (sow "Spring Barley"
+         (Root (PenClayFac (0.0 0.8) (0.1 1.0) (0.3 1.1))))
+
+This mean root penetration will be 20% slower with zero clay content
+and 10% faster with 30% clay in the soil.  The default root
+penetration speed is valid for soil with 10% clay.
+
+** Use average daily temperature for root penetration.
+
+We used to to use the temperature at midnight.  This fix might affect
+simulation results slightly but not significantly.
+
 * 2.62
 
 ** Bug fixes and cleanups.
+
+** svat PMSW now obeys the screen height climate parameter.
+
+This means it is useful for tall vegetation, like forests.
 
 * 2.61
 

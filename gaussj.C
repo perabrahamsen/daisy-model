@@ -98,7 +98,7 @@ GaussJordan::solve ()
       if (entry == 0.0)
 	throw ("GaussJordan: zero solution");
 #ifdef DEBUG_MESSAGES
-      if (!finite (entry) || !finite (value[i]) || !finite (sum))
+      if (!isfinite (entry) || !isfinite (value[i]) || !isfinite (sum))
 	throw ("GaussJordan: non-finite number");
       if (fabs (entry) < 1e-100)
 	{

@@ -52,11 +52,6 @@
 # define NP 20 // from xgaussj driver program
 # define MP 20 // from xgaussj driver program
 
-#if !defined (isnormal)
-inline bool isnormal (double x)
-{ return finite (x) && x != 0.0; }
-#endif
-
 // prototypes
 int RA(double, double, double, double&);
 int RAA(double, double, double, double, double, double, double, double,
@@ -388,7 +383,7 @@ int RAC(double z_ref,
         double alpha_u, double arac, double &rd, double &rX, double &rz_0,
         double &ru_h, double &rr_ac)
 {
-  daisy_assert (finite (u));
+  daisy_assert (isfinite (u));
   daisy_assert (u >= 0.0);
   daisy_assert (isnormal (LAI));
   daisy_assert (LAI > 0.0);
@@ -1447,7 +1442,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       tair = weather.hourly_air_temperature (); // [C]
       srad = weather.hourly_global_radiation (); // [W/m^2]
       u_ref = weather.wind (); // u_ref from reference plane [m/s]
-      daisy_assert (finite (u_ref));
+      daisy_assert (isfinite (u_ref));
       daisy_assert (u_ref >= 0.0);
       relsun_day = weather.hourly_cloudiness ();  // [-]
       prec = 1.10*weather.rain(); // [mm] corrected by 10 %
@@ -1462,7 +1457,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       // convert from u_ref_2m at reference plane (h=0.12 m, FAO) to u_2m_ww at
       // winter wheat field: use eq.26 FAO, p.10, and d=0.27*h and z0=0.123*h
       u=0.205*u_ref*log((z_ref-0.67*h)/(0.123*h));
-      daisy_assert (finite (u));
+      daisy_assert (isfinite (u));
       daisy_assert (u >= 0.0);
       //  cout << "u and u_ref are:\t" << u << "\t" << u_ref << "\n";
 

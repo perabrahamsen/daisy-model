@@ -199,19 +199,22 @@ CropStandard::tick (const Time& time,
   // Update cut stress.
   harvesting.tick (time);
 
-  // Update partial_soil_temperature and pressure potential.
+  // Update average soil temperature and pressure potential.
   development.partial_soil_temperature +=
-    soil_heat.T (soil.interval_plus (-root_system.DptEmr));
-  development.soil_h =
-    soil_water.h (soil.interval_plus (-root_system.DptEmr/2.));
-
-  if (time.hour () == 0 && development.DS <= 0)
+    soil_heat.T (soil.interval_plus (-root_system.Depth));
+  if (time.hour () == 0)
     {
-      daisy_assert (ForcedCAI < 0.0);
       // Calculate average soil temperature.
       development.soil_temperature =
 	development.partial_soil_temperature / 24.0;
       development.partial_soil_temperature = 0.0;
+    }
+  development.soil_h =
+    soil_water.h (soil.interval_plus (-root_system.Depth/2.));
+
+  if (time.hour () == 0 && development.DS <= 0)
+    {
+      daisy_assert (ForcedCAI < 0.0);
 
       development.emergence ();
       if (development.DS >= 0)
@@ -220,7 +223,7 @@ CropStandard::tick (const Time& time,
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development.DS, -1.0);
 	  nitrogen.content (development.DS, production);
-	  root_system.tick (msg, soil, soil_heat, 
+	  root_system.tick (msg, soil, development.soil_temperature, 
 			    production.WRoot, 0.0, development.DS);
 
 	  if (organic_matter)
@@ -307,7 +310,7 @@ CropStandard::tick (const Time& time,
   development.tick_daily (bioclimate.daily_air_temperature (), 
 			  production.WLeaf, production, vernalization,
 			  harvesting.cut_stress, msg);
-  root_system.tick (msg, soil, soil_heat, 
+  root_system.tick (msg, soil, development.soil_temperature, 
 		    production.WRoot, production.IncWRoot, development.DS);
 }
 

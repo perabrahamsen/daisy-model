@@ -135,7 +135,7 @@ Assertion::non_negative (const char* file, int line, const char* fun,
 			 const std::vector<double>& v)
 {
   for (unsigned int i = 0; i < v.size (); i++)
-    if (v[i] < 0 || !finite (v[i]))
+    if (v[i] < 0 || !isfinite (v[i]))
       {
 	TmpStream tmp;
 	tmp () << "v[" << i << "] >= 0";

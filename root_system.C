@@ -254,8 +254,8 @@ RootSystem::solute_uptake (const Soil& soil,
 		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
 		   - (pow (beta, 2.0 - alpha) - 1.0));
 	    }
-	  daisy_assert (finite (I_zero[i]));
-	  daisy_assert (finite (B_zero[i]));
+	  daisy_assert (isfinite (I_zero[i]));
+	  daisy_assert (isfinite (B_zero[i]));
 	  B += L * soil.dz (i) * B_zero[i];
 	  U_zero += L * soil.dz (i) 
 	    * bound (0.0, I_zero[i] - B_zero[i] * C_root_min, I_max);
@@ -306,7 +306,7 @@ RootSystem::nitrogen_uptake (const Soil& soil,
 
 void
 RootSystem::tick (Treelog& msg, const Soil& soil, 
-		  const SoilHeat& soil_heat, 
+		  const double Ts, 
 		  const double WRoot,
 		  const double IncWRoot,
 		  const double DS)
@@ -314,8 +314,9 @@ RootSystem::tick (Treelog& msg, const Soil& soil,
   // Penetration.
   if (IncWRoot > 0)
     {
-      double Ts = soil_heat.T (soil.interval_plus (-Depth));
-      double dp = PenPar1 * max (0.0, Ts - PenPar2);
+      const double i = soil.interval_plus (-Depth);
+      double clay_fac = PenClayFac (soil.clay (i));
+      double dp = PenPar1 * clay_fac * max (0.0, Ts - PenPar2);
       PotRtDpt = min (PotRtDpt + dp, MaxPen);
       /*max depth determined by crop*/
       Depth = min (Depth + dp, MaxPen);
@@ -394,6 +395,13 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("PenPar2", "dg C", Check::none (), Syntax::Const,
 	    "Penetration rate parameter, threshold.");
   alist.add ("PenPar2", 4.0);
+  syntax.add ("PenClayFac", Syntax::Fraction (), Syntax::None (),
+	      Check::non_negative (), Syntax::Const, 
+	      "Clay dependent factor to multiply 'PenPar1' with.");
+  PLF clay;
+  clay.add (0.0, 1.0);
+  clay.add (1.0, 1.0);
+  alist.add ("PenClayFac", clay);
   syntax.add ("MaxPen", "cm", Check::positive (), Syntax::Const,
 	    "Maximum penetration depth.");
   alist.add ("MaxPen", 100.0);
@@ -473,9 +481,9 @@ get_PotRtDpt (const AttributeList& al)
 
 RootSystem::RootSystem (const AttributeList& al)
   : rootdens (Librarian<Rootdens>::create (al.alist ("rootdens"))),
-    DptEmr (al.number ("DptEmr")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
+    PenClayFac (al.plf ("PenClayFac")),
     MaxPen (al.number ("MaxPen")),
     Rad (al.number ("Rad")),
     h_wp (al.number ("h_wp")),

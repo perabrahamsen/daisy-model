@@ -23,6 +23,7 @@
 #define ROOT_SYSTEM_H
 
 #include "rootdens.h"
+#include "plf.h"
 
 #include <vector>
 using namespace std;
@@ -33,7 +34,6 @@ struct SoilWater;
 struct Solute;
 struct SoilNO3;
 struct SoilNH4;
-struct SoilHeat;
 
 struct Log;
 struct AttributeList;
@@ -46,17 +46,16 @@ private:
   Rootdens& rootdens;		// Root density calculation.
 
   // Parameters.
-public:
-  double DptEmr;		// Penetration at emergence
 private:
-  double PenPar1;		// Penetration rate parameter, coefficient
-  double PenPar2;		// Penetration rate parameter, threshold
-  double MaxPen;		// Max penetration depth
-  double Rad;			// Root radius [cm]
-  double h_wp;			// Matrix potential at wilting
-  double MxNH4Up;		// Max NH4 uptake per unit root length
-  double MxNO3Up;		// Max NO3 uptake per unit root length
-  double Rxylem;		// Transport resistence in xyleme
+  const double PenPar1;		// Penetration rate parameter, coefficient
+  const double PenPar2;		// Penetration rate parameter, threshold
+  const PLF PenClayFac;		// Clay influence on penetration, factor.
+  const double MaxPen;		// Max penetration depth
+  const double Rad;		// Root radius [cm]
+  const double h_wp;		// Matrix potential at wilting
+  const double MxNH4Up;		// Max NH4 uptake per unit root length
+  const double MxNO3Up;		// Max NO3 uptake per unit root length
+  const double Rxylem;		// Transport resistence in xyleme
 
   // State.
 private:
@@ -110,7 +109,7 @@ public:
 private:
   static double density_distribution_parameter (double a);
 public:
-  void tick (Treelog&, const Soil&, const SoilHeat&, 
+  void tick (Treelog&, const Soil&, const double T, 
 	     double WRoot, double IncWRoot, double DS);
   void set_density (Treelog&,
 		    const Geometry& geometry, double WRoot, double DS);

@@ -1,20 +1,8 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Spørg Søren om plantehøjde i PMSW.
-
-* Brug isfinite, isnormal and isnan.
-
-* FertOrgaNic
-
-** Upload exercises.
-
-* Hjemmeside
-
-** weather header fra sørens mail.
-
-* MMM: Test om man kan linke hugin fra Linux.
-
 * OrganicMatter
+
+** Max og min somfractions i initialisering.
 
 ** Gør den robust hvis SOMn = 0 (fra init) eller (SOM_fractions 0.4 0.6 0).
 
@@ -51,6 +39,12 @@ I den første linie skal "begyndelsesindhold" stå.
 * april: automatisk aquitart horizont
 
 Øverste tredjedel af aquitarten.
+
+* biomod: G+P74 rootdens model hvor a er en parameter
+
+Og Lz (DensRtTip) er en fri variabel.
+
+* biomod: Gør RootPen afhængig af lerindhold.
 
 * SH: PowerPoint validation slides på hjemmeside.
 

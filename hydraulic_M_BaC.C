@@ -23,7 +23,7 @@
 // Brooks and Corey retention curve model with Mualem theory.
 
 #include "hydraulic.h"
-#include <math.h>
+#include "mathlib.h"
 
 class HydraulicM_BaC : public Hydraulic
 {

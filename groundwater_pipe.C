@@ -223,8 +223,8 @@ GroundwaterPipe::update_water (const Soil& soil,
 	 {
 	   q[i] = -Percolation[i-1] - q_p[i];
 	 }
-       daisy_assert (finite (q[i]));
-       daisy_assert (finite (q_p[i]));
+       daisy_assert (isfinite (q[i]));
+       daisy_assert (isfinite (q_p[i]));
     }
   daisy_assert(DrainFlow>=0.0);
   height = GWT_new;
@@ -277,7 +277,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
 	{
           S[i] = a * soil.K (i, 0.0, 0.0, soil_heat.T (i));
 	}
-      daisy_assert (finite (Flow));
+      daisy_assert (isfinite (Flow));
       for (unsigned int i = i_bottom; i >= i_GWT; i--)
 	{
 	  Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);

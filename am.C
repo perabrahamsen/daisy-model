@@ -648,7 +648,7 @@ AM::default_AM ()
       AOM1.add ("efficiency", efficiency1);
       AOM1.add ("turnover_rate", 2.0e-4);
       vector<double> fractions1;
-#ifdef SANDER_PARAMS
+#if 1 // SANDER_PARAMS
       fractions1.push_back (0.00);
       fractions1.push_back (1.00);
 #else

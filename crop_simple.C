@@ -176,7 +176,7 @@ CropSimple::tick (const Time& time,
 		  const Bioclimate& bioclimate,
 		  const Soil& soil,
 		  OrganicMatter* /* organic_matter */,
-		  const SoilHeat& soil_heat,
+		  const SoilHeat& /* soil_heat */,
 		  const SoilWater& soil_water,
 		  SoilNH4* soil_NH4, SoilNO3* soil_NO3, 
 		  double&, double&, double&, vector<double>&, vector<double>&,
@@ -234,14 +234,14 @@ CropSimple::tick (const Time& time,
 	  const double this_far = (T - T_emergence) / T_growth;
 	  
 	  canopy.Height = height_max * this_far;
-	  root_system.tick (msg, soil, soil_heat,
+	  root_system.tick (msg, soil, T_air,
 			    WRoot * this_far, WRoot * step, 
 			    DS ());
 	}
       else if (old_T < T_flowering)
 	{
 	  msg.message ("==> flowering");
-	  root_system.tick (msg, soil, soil_heat, WRoot,
+	  root_system.tick (msg, soil, T_air, WRoot,
 			    WRoot * (1.0 - old_T / T_flowering), DS ());
 	}
       else if (T < T_ripe)

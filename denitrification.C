@@ -32,7 +32,7 @@
 #include "log.h"
 #include "submodel.h"
 #include "check.h"
-#include <math.h>
+#include "mathlib.h"
 
 using namespace std;
 

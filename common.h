@@ -28,14 +28,6 @@
 
 // Portability code.
 
-#ifdef __sun__
-#define pow(x, y) (daisy_assert (x >= 0), (pow)(x, y))
-#define sqrt(x) (daisy_assert (x >= 0), (sqrt)(x))
-#define log(x) (daisy_assert (x > 0), (log)(x))
-#define acos(x) (daisy_assert (x >= -1 && x <= 1), (acos(x)))
-#define asin(x) (daisy_assert (x >= -1 && x <= 1), (asin(x)))
-#endif
-
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
 #define EMPTY_TEMPLATE
 #else

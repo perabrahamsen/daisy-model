@@ -22,19 +22,11 @@
 
 #include "mathlib.h"
 #include "assertion.h"
-#include <math.h>
 using namespace std;
 
-#if defined (__INTEL_COMPILER)
-// In header.
-#elif defined (__GNUC__) && __GNUC__ > 2
-// In header.
-#elif defined (__unix) || defined (__CYGWIN__)
-// It is on SunOS 5.8 and Cygwin libc.
-extern "C" double cbrt (double);
-#else
-// But apparently not on Borland C++ 5.0 or 5.5.
-static double cbrt (double x) 
+#if !defined (__unix)
+// Apparently not provided on Borland C++ 5.0 or 5.5.
+double cbrt (double x) 
 { return pow (x, 1.0/3.0); }
 #endif
 

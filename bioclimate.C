@@ -22,7 +22,7 @@
 
 #include "bioclimate.h"
 #include "weather.h"
-#include <math.h>
+#include "mathlib.h"
 
 EMPTY_TEMPLATE
 Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content = NULL;
