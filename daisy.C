@@ -26,7 +26,7 @@ Daisy::Daisy (const AttributeList& al)
     action (Action::create (al.list ("manager"))),
     weather (Weather::create (time, al.list ("weather"))), 
     groundwater (Groundwater::create (time, al.list ("groundwater"))), 
-    columns (*new ColumnList (al.list_sequence ("field")))
+    columns (*new ColumnList (al.list_sequence ("column")))
 { 
   bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();
@@ -83,10 +83,10 @@ Daisy::run ()
 	    continue;
 	  log.output ("time", filter, time);
 	  weather.output ("weather", log, filter);
-	  if (filter.check ("field"))
+	  if (filter.check ("column"))
 	    {
-	      const Filter& f = filter.lookup ("field");
-	      log.open ("field");
+	      const Filter& f = filter.lookup ("column");
+	      log.open ("column");
 	      for (ColumnList::iterator column = columns.begin();
 		   column != columns.end();
 		   column++)
