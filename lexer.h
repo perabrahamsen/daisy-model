@@ -13,6 +13,10 @@ struct istream;
 
 using namespace std;
 
+#if defined (__BORLANDC__) && __BORLANDC__ == 0x0550
+#define istread std::istream
+#endif
+
 class Treelog;
 
 class Lexer
