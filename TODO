@@ -1,16 +1,14 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Billetter fuglesøcenteret, Niels og Jette.
+* Update answers
 
 * FertOrgaNic 
 
-** Ny dist
+** Udregn polske depositionsdata fra dansk standard.
 
 ** gnuplot, check om datoer på x akse virker.
 
 ** Fortæl Andreano at den virker med ny fon-soil.dai.
-
-** ny kartoffel
 
 ** lin_int til Polen
 
@@ -21,8 +19,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 ** Slovakiske data
 
 * Slides til Dina årsmøde
-
-* Update answers
 
 * Make it possible to specify texture using different systems
 

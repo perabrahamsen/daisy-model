@@ -100,7 +100,7 @@ ColumnBase::harvest (const Time& time, const symbol crop_name,
 		      msg); 
   add_residuals (residuals);
   if (min_height < 0.0)
-    mix (msg, time, 0.0, min_height, 1.0);
+    mix (msg, time, 0.0, min_height, 0.0);
 }
 
 

@@ -516,7 +516,17 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   litter_water_storage += (litter_water_in - litter_ea) * dt;
   if (litter_water_storage < 0.0)
     {
-      daisy_assert (litter_water_storage > -1e-8);
+      if (litter_water_storage < -1e-8)
+        {
+          TmpStream tmp;
+          tmp () << "BUG:\n"
+                 << "litter_water_storage = " << litter_water_storage << "\n"
+                 << "litter_water_capacity = " << litter_water_capacity << "\n"
+                 << "litter_water_in = " << litter_water_in << "\n"
+                 << "litter_ea = " << litter_ea << "\n"
+                 << "litter_ep = " << litter_ep;
+          msg.error (tmp.str ());
+        }
       litter_water_out = litter_water_storage;
       litter_water_storage = 0.0;
     }

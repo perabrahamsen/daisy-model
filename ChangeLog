@@ -1,3 +1,21 @@
+2004-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.33 released.
+
+2004-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): Change assertion to
+	error. 
+
+2004-02-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Soil N Residuals"): New log model.
+	("Soil C Residuals"): New log model.
+
+2004-02-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_base.C (harvest): No penetration for mix.
+
 2004-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.32 released.
