@@ -157,7 +157,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
       TmpStream tmp;
       tmp () << __FILE__ << ":" <<  __LINE__
 	     << ": BUG: Total S_p = '"
-	     << soil.total (S_p) + J_p[0]  - J_p[soil.size ()]
+	     << (soil.total (S_p) + J_p[0]  - J_p[soil.size ()])
 	     << "' solute\n";
       out.error (tmp.str ());
     }

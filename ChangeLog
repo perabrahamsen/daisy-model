@@ -1,7 +1,52 @@
+2002-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.27 released.
+
+2002-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C, options.h: Initialize path.
+
+	* Makefile, qmain_edit.h, qmain_edit.C, qmain.h, qmain_tree.h,
+	qmain_busy.h, qmain_moc.C, qmain_populate.h, qmain_item.h,
+	qmain_item.C, qmain_populate.C, qmain_edit_moc.C, qmain.C: Port to
+	new Qt and GCC and GNU/Linux.
+
+2002-05-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (add): New function overload.
+
+2002-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("N Balance", "Carbon Balance"): Added residuals.
+	* column_base.h, column_base.C (residuals_DM, residuals_N_top,
+	residuals_C_top, residuals_N_soil, residuals_C_soil): New log
+	variables. 
+	* crop_sold.C, crop_old.C, crop_std.C, crop_simple.C, crop.h
+	(harvest): Take residuals arguments.
+	* harvesting.C (operator ()): Ditto.
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h
+	(harvest): Ditto.
+	* column_base.C (harvest): Ditto.
+	* production.C, production.h (tick): Ditto.
+	* crop_sold.C, crop_old.C, crop_std.C, crop_simple.C, crop.h
+	(tick): Ditto. 
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h
+	(tick): Ditto.
+	* column_inorganic.C, column_std.C (tick): Ditto.
+	* crop.C (kill): Ditto.
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h
+	(kill_all): Ditto. 
+
+
+	* harvesting.C (operator ()): Add stub to residuals after
+	harvest. 
+	Add some mass balance checks.
+
 2002-04-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* mactrans_std.C (tick): Allow transport of smaller quantities
 	(pesticides).
+	(tick): Fix BCC warning.
 
 2002-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 

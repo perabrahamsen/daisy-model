@@ -95,10 +95,10 @@ main (int argc, char* argv[])
         daisy_daisy_tick_time (daisy);
 
         if (daisy_time_get_hour (time) == 0)
-          printf ("%04d-%02d-%02d.\n", 
-                  daisy_time_get_year (time),
-                  daisy_time_get_month (time),
-                  daisy_time_get_mday (time));
+	  printf ("%04d-%02d-%02d\n", 
+		  daisy_time_get_year (time),
+		  daisy_time_get_month (time),
+		  daisy_time_get_mday (time));
       }
     printf ("Simulation end.\n");
   }

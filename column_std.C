@@ -377,7 +377,9 @@ ColumnStandard::tick (Treelog& out,
   bioclimate.tick (surface, my_weather, 
 		   vegetation, soil, soil_water, soil_heat, out);
   vegetation.tick (time, bioclimate, soil, organic_matter, 
-		   soil_heat, soil_water, soil_NH4, soil_NO3, out);
+		   soil_heat, soil_water, soil_NH4, soil_NO3, 
+		   residuals_DM, residuals_N_top, residuals_C_top, 
+		   residuals_N_soil, residuals_C_soil, out);
   organic_matter.tick (soil, soil_water, soil_heat, 
 		       soil_NO3, soil_NH4, out);
   nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);

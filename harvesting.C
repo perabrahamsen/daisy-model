@@ -25,6 +25,7 @@
 #include "om.h"
 #include "crop.h"		// for Crop::DSremove.
 #include "harvest.h"
+#include "geometry.h"
 #include "log.h"
 #include "mathlib.h"
 #include "submodel.h"
@@ -56,8 +57,13 @@ Harvesting::operator() (const string& column_name,
 			const double leaf_harvest_frac,
 			const double sorg_harvest_frac,
 			const bool kill_off,
-			vector<AM*>& residuals)
+			vector<AM*>& residuals,
+			double& residuals_DM,
+			double& residuals_N_top, double& residuals_C_top,
+			vector<double>& residuals_N_soil,
+			vector<double>& residuals_C_soil)
 {
+  const double old_DM = production.DM ();
 
   // Import DM from production.
   const double WStem = production.WStem;
@@ -65,20 +71,28 @@ Harvesting::operator() (const string& column_name,
   const double WSOrg = production.WSOrg;
   const double WRoot = production.WRoot;
   const double WDead = production.WDead;
+  const double total_old_W = WStem + WLeaf + WSOrg + WDead  + WRoot;
+  
   const double NStem = production.NStem;
   const double NLeaf = production.NLeaf;
   const double NSOrg = production.NSOrg;
   const double NRoot = production.NRoot;
   const double NDead = production.NDead;
-  const double old_DM = production.DM ();
-  
+  const double total_old_N = NStem + NLeaf + NSOrg + NDead  + NRoot;
+  assert (approximate (total_old_N, production.NCrop + NDead));
+
   // Find C concentrations.
   const double C_C_Stem = DM_to_C_factor (production.E_Stem);
   const double C_C_Leaf = DM_to_C_factor (production.E_Leaf);
   const double C_C_Dead = C_C_Leaf;
   const double C_C_SOrg = DM_to_C_factor (production.E_SOrg);
   const double C_C_Root = DM_to_C_factor (production.E_Root);
-
+  const double total_old_C = production.WSOrg * C_C_SOrg
+    + production.WStem * C_C_Stem
+    + production.WLeaf * C_C_Leaf
+    + production.WDead * C_C_Dead
+    + production.WRoot * C_C_Root;
+  
   // Part of crop we attempt to harvest.
   const double dead_harvest = 1.0;
   const double sorg_harvest = 1.0;
@@ -97,14 +111,19 @@ Harvesting::operator() (const string& column_name,
   const double Leaf_N_Yield = leaf_harvest_frac * leaf_harvest * NLeaf;
   const double SOrg_N_Yield = sorg_harvest_frac * sorg_harvest * NSOrg;
 
-  // Part of economic yield removed at harvest
+  // Part of economic yield removed at harvest.
   const double WEYRm
     = EconomicYield_W * SOrg_W_Yield; 
   const double NEYRm
     = EconomicYield_N * SOrg_N_Yield; 
   const double CEYRm		// EY_W is used for both DM and C.
     = EconomicYield_W * SOrg_C_Yield;
-
+  
+  // The uneconomic yield is assumed to stay on field as loss. 
+  const double Crop_W_Yield
+    = Stem_W_Yield + Dead_W_Yield + Leaf_W_Yield + WEYRm;
+  const double Crop_C_Yield
+    = Stem_C_Yield + Dead_C_Yield + Leaf_C_Yield + CEYRm;
   const double Crop_N_Yield
     = Stem_N_Yield + Dead_N_Yield + Leaf_N_Yield + NEYRm;
 
@@ -114,13 +133,24 @@ Harvesting::operator() (const string& column_name,
   double Leaf_W_Loss = (1.0 - leaf_harvest_frac) * leaf_harvest * WLeaf;
   double SOrg_W_Loss = (1.0 - sorg_harvest_frac) * sorg_harvest * WSOrg
     + (1.0 - EconomicYield_W) * SOrg_W_Yield;
+  double Root_W_Loss = 0.0;;
+  double Crop_W_Loss 
+    = Stem_W_Loss + Dead_W_Loss + Leaf_W_Loss + SOrg_W_Loss + Root_W_Loss;
+  double Stem_C_Loss = Stem_W_Loss * C_C_Stem;
+  double Dead_C_Loss = Dead_W_Loss * C_C_Dead;
+  double Leaf_C_Loss = Leaf_W_Loss * C_C_Leaf;
+  double SOrg_C_Loss = SOrg_W_Loss * C_C_SOrg;
+  double Root_C_Loss = 0.0;
+  double Crop_C_Loss 
+    = Stem_C_Loss + Dead_C_Loss + Leaf_C_Loss + SOrg_C_Loss + Root_C_Loss;
   double Stem_N_Loss = (1.0 - stem_harvest_frac) * stem_harvest * NStem;
   double Dead_N_Loss = (1.0 - stem_harvest_frac) * dead_harvest * NDead;
   double Leaf_N_Loss = (1.0 - leaf_harvest_frac) * leaf_harvest * NLeaf;
   double SOrg_N_Loss = (1.0 - sorg_harvest_frac) * sorg_harvest * NSOrg 
     + (1.0 - EconomicYield_N) * SOrg_N_Yield;
-  const double Crop_N_Loss 
-    = Stem_N_Loss + Dead_N_Loss + Leaf_N_Loss + SOrg_N_Loss;
+  double Root_N_Loss = 0.0;
+  double Crop_N_Loss 
+    = Stem_N_Loss + Dead_N_Loss + Leaf_N_Loss + SOrg_N_Loss + Root_N_Loss;
 
   production.WStem -= (Stem_W_Yield + Stem_W_Loss);
   production.WDead -= (Dead_W_Yield + Dead_W_Loss);
@@ -147,79 +177,100 @@ Harvesting::operator() (const string& column_name,
   if (Dead_W_Loss < 0.1)
     {
       Stem_W_Loss += Dead_W_Loss;
+      Stem_C_Loss += Dead_C_Loss;
       Stem_N_Loss += Dead_N_Loss;
       Dead_W_Loss = 0.0;
+      Dead_C_Loss = 0.0;
       Dead_N_Loss = 0.0;
     }
   if (Leaf_W_Loss < 0.1)
     {
       Stem_W_Loss += Leaf_W_Loss;
+      Stem_C_Loss += Leaf_C_Loss;
       Stem_N_Loss += Leaf_N_Loss;
       Leaf_W_Loss = 0.0;
+      Leaf_C_Loss = 0.0;
       Leaf_N_Loss = 0.0;
     }
   if (SOrg_W_Loss < 0.1)
     {
       Stem_W_Loss += SOrg_W_Loss;
+      Stem_C_Loss += SOrg_C_Loss;
       Stem_N_Loss += SOrg_N_Loss;
       SOrg_W_Loss = 0.0;
+      SOrg_C_Loss = 0.0;
       SOrg_N_Loss = 0.0;
     }
 
   // Add crop remains to the soil.
+  AM& AM_stem = AM::create (geometry, time, Stem, crop_name, "stem");
+  residuals.push_back (&AM_stem);
   if (Stem_W_Loss > 0.0)
     {
       const double C = C_C_Stem * Stem_W_Loss;
       const double N = Stem_N_Loss;
-      AM& am = AM::create (geometry, time, Stem, crop_name, "stem");
-      am.add (C * m2_per_cm2, N * m2_per_cm2);
+      AM_stem.add (C * m2_per_cm2, N * m2_per_cm2);
       assert (C == 0.0 || N > 0.0);
-      residuals.push_back (&am);
       production.C_AM += C;
       production.N_AM += N;
     }
- if (Dead_W_Loss > 0.0)
-   {
-     const double C = C_C_Dead * Dead_W_Loss;
-     const double N = Dead_N_Loss;
-     if (!production.AM_leaf)
-        production.AM_leaf
-	  = &AM::create (geometry, time, Dead, crop_name, "dead", 
-			 AM::Unlocked);
-     production.AM_leaf->add (C * m2_per_cm2, N * m2_per_cm2);
-     assert (C == 0.0 || N > 0.0);
-     production.C_AM += C;
-     production.N_AM += N;
-   }
- if (Leaf_W_Loss > 0.0)
-   {
-     const double C = C_C_Leaf * Leaf_W_Loss;
-     const double N = Leaf_N_Loss;
-     AM& am = AM::create (geometry, time, Leaf, crop_name, "leaf");
-     assert (C == 0.0 || N > 0.0);
-     am.add ( C * m2_per_cm2, N * m2_per_cm2);
-     residuals.push_back (&am);
-     production.C_AM += C;
-     production.N_AM += N;
-   }
- if (SOrg_W_Loss > 0.0)
-   {
-     const double C = C_C_SOrg * SOrg_W_Loss;
-     const double N = SOrg_N_Loss;
-     AM& am = AM::create (geometry, time, SOrg, crop_name, "sorg");
-     assert (C == 0.0 || N > 0.0);
-     am.add ( C * m2_per_cm2, N * m2_per_cm2);
-     residuals.push_back (&am);
-     production.C_AM += C;
-     production.N_AM += N;
-   }
+
+  if (!production.AM_leaf)
+    production.AM_leaf
+      = &AM::create (geometry, time, Dead, crop_name, "dead", 
+		     AM::Unlocked /* no organic matter */);
+  if (Dead_W_Loss > 0.0)
+    {
+      const double C = C_C_Dead * Dead_W_Loss;
+      const double N = Dead_N_Loss;
+      production.AM_leaf->add (C * m2_per_cm2, N * m2_per_cm2);
+      assert (C == 0.0 || N > 0.0);
+      production.C_AM += C;
+      production.N_AM += N;
+    }
+
+  AM& AM_leaf = AM::create (geometry, time, Leaf, crop_name, "leaf");
+  residuals.push_back (&AM_leaf);
+  if (Leaf_W_Loss > 0.0)
+    {
+      const double C = C_C_Leaf * Leaf_W_Loss;
+      const double N = Leaf_N_Loss;
+      assert (C == 0.0 || N > 0.0);
+      AM_leaf.add ( C * m2_per_cm2, N * m2_per_cm2);
+      production.C_AM += C;
+      production.N_AM += N;
+    }
+
+  AM& AM_sorg = AM::create (geometry, time, SOrg, crop_name, "sorg");
+  residuals.push_back (&AM_sorg);
+  if (SOrg_W_Loss > 0.0)
+    {
+      const double C = C_C_SOrg * SOrg_W_Loss;
+      const double N = SOrg_N_Loss;
+      assert (C == 0.0 || N > 0.0);
+      AM_sorg.add ( C * m2_per_cm2, N * m2_per_cm2);
+      production.C_AM += C;
+      production.N_AM += N;
+    }
+
+  // Check mass balance so far.
+  double total_new_W = production.WSOrg + production.WStem
+    + production.WLeaf + production.WDead + production.WRoot;
+  assert (approximate (total_old_W, total_new_W + Crop_W_Yield + Crop_W_Loss));
+  double total_new_C = production.WSOrg * C_C_SOrg 
+    + production.WStem * C_C_Stem
+    + production.WLeaf * C_C_Leaf
+    + production.WDead * C_C_Dead
+    + production.WRoot * C_C_Root;
+  assert (approximate (total_old_C, total_new_C + Crop_C_Yield + Crop_C_Loss));
+  double total_new_N = production.NCrop + production.NDead;
+  assert (approximate (total_old_N, total_new_N + Crop_N_Yield + Crop_N_Loss));
 
   // Dead or alive?
   if (!kill_off && DS < DSmax && leaf_harvest < 1.0)
     {
       // Cut delay.
-      const double new_DM = production.DM ();
-      const double removed_DM = old_DM - new_DM;
+      const double removed_DM = old_DM - production.DM ();
       production_delay = cut_delay (removed_DM);
       if (!last_cut)
 	last_cut = new Time (time);
@@ -230,35 +281,128 @@ Harvesting::operator() (const string& column_name,
     {
       DS = Crop::DSremove;
 
-     // Update and unlock locked AMs.
+      // Create root AM if missing.
       if (!production.AM_root)
 	production.AM_root = &AM::create (geometry, time, Root,
-					crop_name, "root", AM::Unlocked);
-      if (accumulate (density.begin (), density.end (), 0.0) > 0.0)
-	production.AM_root->add (geometry,
-			       WRoot * C_C_Root * m2_per_cm2,
-			       NRoot * m2_per_cm2,
-			       density);
+					  crop_name, "root", 
+					  AM::Unlocked /* inorganic */);
+
+
+      // Add crop to residuals.
+      double extra_C = 0.0;
+      double extra_N = 0.0;
+      if (production.WStem < 0.1)
+	{
+	  extra_C += C_C_Stem * production.WStem;
+	  extra_N += production.NStem;
+	}
       else
-	production.AM_root->add (WRoot * C_C_Root * m2_per_cm2,
-			       NRoot * m2_per_cm2);
+	AM_stem.add (C_C_Stem * production.WStem * m2_per_cm2, 
+		     production.NStem * m2_per_cm2);
+      Stem_W_Loss += production.WStem;
+      Stem_C_Loss += production.WStem * C_C_Stem;
+      Stem_N_Loss += production.NStem;
+
+      if (production.WDead < 0.1)
+	{
+	  extra_C += C_C_Dead * production.WDead;
+	  extra_N += production.NDead;
+	}
+      else
+	production.AM_leaf->add (C_C_Dead * production.WDead * m2_per_cm2, 
+				 production.NDead * m2_per_cm2);
+      Dead_W_Loss += production.WDead;
+      Dead_C_Loss += production.WDead * C_C_Dead;
+      Dead_N_Loss += production.NDead;
+      if (production.WLeaf < 0.1)
+	{
+	  extra_C = C_C_Leaf * production.WLeaf;
+	  extra_N = production.NLeaf;
+	}
+      else
+	AM_leaf.add (C_C_Leaf * production.WLeaf * m2_per_cm2, 
+		     production.NLeaf * m2_per_cm2);
+      Leaf_W_Loss += production.WLeaf;
+      Leaf_C_Loss += production.WLeaf * C_C_Leaf;
+      Leaf_N_Loss += production.NLeaf;
+      if (production.WSOrg < 0.1)
+	{
+	  extra_C = C_C_SOrg * production.WSOrg;
+	  extra_N = production.NSOrg;
+	}
+      else
+	AM_sorg.add (C_C_SOrg * production.WSOrg * m2_per_cm2, 
+		     production.NSOrg * m2_per_cm2);
+      SOrg_W_Loss += production.WSOrg;
+      SOrg_C_Loss += production.WSOrg * C_C_SOrg;
+      SOrg_N_Loss += production.NSOrg;
       assert (WRoot == 0.0 || NRoot > 0.0);
+      if (accumulate (density.begin (), density.end (), 0.0) > 0.0)
+	{
+	  production.AM_root->add (geometry,
+				   (WRoot * C_C_Root + extra_C) * m2_per_cm2,
+				   (NRoot + extra_N) * m2_per_cm2,
+				   density);
+	  geometry.add (residuals_N_soil, density, NRoot * m2_per_cm2);
+	  geometry.add (residuals_C_soil, density, 
+			WRoot * C_C_Root * m2_per_cm2);
+	}
+      else
+	{
+	  production.AM_root->add ((WRoot * C_C_Root + extra_C) * m2_per_cm2,
+				   (NRoot + extra_N) * m2_per_cm2);
+	  residuals_N_top += NRoot;
+	  residuals_C_top += WRoot * C_C_Root;
+	}
+      Root_W_Loss = production.WRoot;
+      Root_C_Loss = production.WRoot * C_C_Root;
+      Root_N_Loss = production.NRoot;
+      Crop_W_Loss = Stem_W_Loss + Dead_W_Loss + Leaf_W_Loss + SOrg_W_Loss
+	+ Root_W_Loss;
+      Crop_C_Loss = Stem_C_Loss + Dead_C_Loss + Leaf_C_Loss + SOrg_C_Loss
+	+ Root_C_Loss;
+      Crop_N_Loss = Stem_N_Loss + Dead_N_Loss + Leaf_N_Loss + SOrg_N_Loss
+	+ Root_N_Loss;
+      production.WStem = production.WDead =  production.WLeaf 
+	= production.WSOrg = production.WRoot = 0.0;
+      production.NStem = production.NDead =  production.NLeaf 
+	= production.NSOrg = production.NRoot = 0.0;
+      production.NCrop = 0.0;
+      total_new_W = 0.0;
+      total_new_C = 0.0;
+      total_new_N = 0.0;
+
+      // Check mass balance.
+      assert (approximate (total_old_W, 
+			   total_new_W + Crop_W_Yield + Crop_W_Loss));
+      assert (approximate (total_old_C, 
+			   total_new_C + Crop_C_Yield + Crop_C_Loss));
+
+      assert (approximate (total_old_N,
+			   total_new_N + Crop_N_Yield + Crop_N_Loss));
+
+
+      // Unlock and remove locked AM's.
       if (production.AM_root->locked ())
 	production.AM_root->unlock (); // Stored in organic matter.
       else
 	residuals.push_back (production.AM_root);	// No organic matter.
       production.AM_root = NULL;
 
-      if (production.AM_leaf)
-	{
-	  if (production.AM_leaf->locked ())
-	    production.AM_leaf->unlock (); // Stored in organic matter.
-	  else
-	    residuals.push_back (production.AM_leaf);// No organic matter.
-	  production.AM_leaf = NULL;
-	}
+      assert (production.AM_leaf);
+      if (production.AM_leaf->locked ())
+	production.AM_leaf->unlock (); // Stored in organic matter.
+      else
+	residuals.push_back (production.AM_leaf);// No organic matter.
+      production.AM_leaf = NULL;
     }
 
+  // Note: We can't check losses, as some go directy to organic matter.
+  residuals_DM += Crop_W_Loss;
+  residuals_N_top += Crop_N_Loss - Root_N_Loss;	// Root already added.
+  residuals_C_top += Crop_C_Loss - Root_C_Loss;
+  
+  // Return harvest.
   return *new Harvest (column_name, time, crop_name,
 		       Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
 		       Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,

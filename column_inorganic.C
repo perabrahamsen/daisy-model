@@ -150,7 +150,9 @@ ColumnInorganic::tick (Treelog& out,
 
   bioclimate.tick (surface, my_weather, 
 		   vegetation, soil, soil_water, soil_heat, out);
-  vegetation.tick (time, bioclimate, soil, soil_heat, soil_water, out);
+  vegetation.tick (time, bioclimate, soil, soil_heat, soil_water, 
+		   residuals_DM, residuals_N_top, residuals_C_top,
+		   residuals_N_soil, residuals_C_soil, out);
   groundwater.tick (time, out);
 
   // Transport.

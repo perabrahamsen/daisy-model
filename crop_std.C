@@ -101,14 +101,24 @@ public:
 	     const SoilHeat&,
 	     const SoilWater&,
 	     SoilNH4*,
-	     SoilNO3*, Treelog&);
+	     SoilNO3*, 
+	     double& residuals_DM,
+	     double& residuals_N_top, double& residuals_C_top,
+	     vector<double>& residuals_N_soil,
+	     vector<double>& residuals_C_soil,
+	     Treelog&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off,
-			  vector<AM*>& residuals, Treelog&);
+			  vector<AM*>& residuals,
+			  double& residuals_DM,
+			  double& residuals_N_top, double& residuals_C_top,
+			  vector<double>& residuals_N_soil,
+			  vector<double>& residuals_C_soil,
+			  Treelog&);
   void output (Log&) const;
 
   // Queries.
@@ -167,7 +177,12 @@ CropStandard::tick (const Time& time,
 		    const SoilHeat& soil_heat,
 		    const SoilWater& soil_water,
 		    SoilNH4* soil_NH4,
-		    SoilNO3* soil_NO3, Treelog& msg)
+		    SoilNO3* soil_NO3, 
+		    double& residuals_DM,
+		    double& residuals_N_top, double& residuals_C_top,
+		    vector<double>& residuals_N_soil,
+		    vector<double>& residuals_C_soil,
+		    Treelog& msg)
 {
   // Update cut stress.
   harvesting.tick (time);
@@ -263,7 +278,9 @@ CropStandard::tick (const Time& time,
   production.tick (bioclimate.daily_air_temperature (),
 		   soil_heat.T (soil.interval_plus (-root_system.Depth / 3.0)),
 		   root_system.Density, soil, development.DS, 
-		   canopy.CAImRat, nitrogen, partition, msg);
+		   canopy.CAImRat, nitrogen, partition, 
+		   residuals_DM, residuals_N_top, residuals_C_top,
+		   residuals_N_soil, residuals_C_soil, msg);
   nitrogen.content (development.DS, production);
   if (time.hour () != 0)
     return;
@@ -288,7 +305,12 @@ CropStandard::harvest (const string& column_name,
 		       double leaf_harvest_frac,
 		       double sorg_harvest_frac,
 		       bool kill_off,
-		       vector<AM*>& residuals, Treelog&)
+		       vector<AM*>& residuals,
+		       double& residuals_DM,
+		       double& residuals_N_top, double& residuals_C_top,
+		       vector<double>& residuals_N_soil,
+		       vector<double>& residuals_C_soil,
+		       Treelog&)
 {
   // Update nitrogen content.
   nitrogen.content (development.DS, production);
@@ -324,7 +346,9 @@ CropStandard::harvest (const string& column_name,
 		  time, geometry, production, development.DS,
 		  stem_harvest, leaf_harvest, chemicals,
 		  stem_harvest_frac, leaf_harvest_frac, sorg_harvest_frac,
-		  kill_off, residuals);
+		  kill_off, residuals, residuals_DM,
+		  residuals_N_top, residuals_C_top, 
+		  residuals_N_soil, residuals_C_soil);
 
   if (development.DS != DSremove)
     {

@@ -78,6 +78,8 @@ ColumnBase::harvest (const Time& time, const string& crop_name,
 		      stub_length, 
 		      stem_harvest, leaf_harvest, sorg_harvest,
 		      harvest, residuals, harvest_DM, harvest_N, harvest_C, 
+		      residuals_DM, residuals_N_top, residuals_C_top,
+		      residuals_N_soil, residuals_C_soil,
 		      msg); 
   add_residuals (residuals);
 }
@@ -88,7 +90,9 @@ ColumnBase::mix (Treelog& msg, const Time& time,
 		 double from, double to, double)
 {
   vector<AM*> residuals;
-  vegetation.kill_all (name, time, soil, bioclimate, residuals, msg);
+  vegetation.kill_all (name, time, soil, bioclimate, residuals, 
+		       residuals_DM, residuals_N_top, residuals_C_top, 
+		       residuals_N_soil, residuals_C_soil, msg);
   add_residuals (residuals);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
@@ -318,6 +322,16 @@ ColumnBase::tick_base (Treelog& msg)
   harvest_DM = 0.0;
   harvest_N = 0.0;
   harvest_C = 0.0;
+  log_residuals_DM = residuals_DM;
+  log_residuals_N_top = residuals_N_top;
+  log_residuals_C_top = residuals_C_top;
+  log_residuals_N_soil = residuals_N_soil;
+  log_residuals_C_soil = residuals_C_soil;
+  residuals_DM = 0.0;
+  residuals_N_top = 0.0;
+  residuals_C_top = 0.0;
+  fill (residuals_N_soil.begin (), residuals_N_soil.end (), 0.0);
+  fill (residuals_C_soil.begin (), residuals_C_soil.end (), 0.0);
 }
 
 void
@@ -341,6 +355,11 @@ ColumnBase::output (Log& log) const
   log.output ("harvest_DM", log_harvest_DM);
   log.output ("harvest_N", log_harvest_N);
   log.output ("harvest_C", log_harvest_C);
+  log.output ("residuals_DM", log_residuals_DM);
+  log.output ("residuals_N_top", log_residuals_N_top);
+  log.output ("residuals_C_top", log_residuals_C_top);
+  log.output ("residuals_N_soil", log_residuals_N_soil);
+  log.output ("residuals_C_soil", log_residuals_C_soil);
 }
 
 void
@@ -389,7 +408,13 @@ ColumnBase::ColumnBase (const AttributeList& al)
     log_harvest_C (0.0),
     harvest_DM (0.0),
     harvest_N (0.0),
-    harvest_C (0.0)
+    harvest_C (0.0),
+    log_residuals_DM (0.0),
+    log_residuals_N_top (0.0),
+    log_residuals_C_top (0.0),
+    residuals_DM (0.0),
+    residuals_N_top (0.0),
+    residuals_C_top (0.0)
 { }
 
 void 
@@ -397,6 +422,10 @@ ColumnBase::initialize (const Time& time, Treelog& err,
 			const Weather* global_weather)
 {
   soil.initialize (groundwater, err);
+  residuals_N_soil.insert (residuals_N_soil.begin (), soil.size (), 0.0);
+  assert (residuals_N_soil.size () == soil.size ());
+  residuals_C_soil.insert (residuals_C_soil.begin (), soil.size (), 0.0);
+  assert (residuals_C_soil.size () == soil.size ());
   if (weather)
     weather->initialize (time, err);
   if (!global_weather && !weather)
@@ -470,5 +499,19 @@ the simulation.  If unspecified, used global weather.");
 	      "Amount of nitrogen removed by harvest this hour.");
   syntax.add ("harvest_C", "g/m^2", Syntax::LogOnly, 
 	      "Amount of carbon removed by harvest this hour.");
-  
+  syntax.add ("residuals_DM", "g/m^2", Syntax::LogOnly, "\
+Amount of dry matter removed from crops to surface and soil this hour.\n\
+This includes loss as harvest, as well as loss of old leaves and roots.");
+  syntax.add ("residuals_N_top", "g/m^2", Syntax::LogOnly, 
+	      "Amount of nitrogen removed from crops to soil this hour.\n\
+This includes loss as harvest, as well as loss of old leaves.");
+  syntax.add ("residuals_C_top", "g/m^2", Syntax::LogOnly, 
+	      "Amount of carbon removed from crops to surface this hour.\n\
+This includes loss as harvest, as well as loss of old leaves.");
+  syntax.add ("residuals_N_soil", "g/cm^3", Syntax::LogOnly, Syntax::Sequence, 
+	      "Amount of nitrogen removed from crops in soil this hour.\n\
+This includes loss as harvest, as well as loss of old roots.");
+  syntax.add ("residuals_C_soil", "g/cm^3", Syntax::LogOnly, Syntax::Sequence, 
+	      "Amount of carbon removed from crops in soil this hour.\n\
+This includes loss as harvest, as well as loss of old roots.");
 }

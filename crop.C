@@ -38,10 +38,16 @@ Crop::albedo () const
 
 void
 Crop::kill (const string& name, const Time& time, const Geometry& geometry,
-	    Bioclimate& bioclimate, vector<AM*>& residuals, Treelog& out)
+	    Bioclimate& bioclimate, vector<AM*>& residuals,
+	    double& residuals_DM,
+	    double& residuals_N_top, double& residuals_C_top,
+	    vector<double>& residuals_N_soil, vector<double>& residuals_C_soil,
+	    Treelog& out)
 { 
   harvest (name, time, geometry, bioclimate,
-	   0.0, 0.0, 0.0, 0.0, true, residuals, out); 
+	   0.0, 0.0, 0.0, 0.0, true, residuals, 
+	   residuals_DM, residuals_N_top, residuals_C_top, 
+	   residuals_N_soil, residuals_C_soil, out); 
 }
 
 void 

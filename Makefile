@@ -194,6 +194,7 @@ ifeq ($(HOSTTYPE),mingw)
 	MATHLIB =
 endif
 
+ifeq ($(HOSTTYPE),sun4)
 # Locate the tk library.
 #
 TKINCLUDE	= -I/pack/tcl+tk-8/include -I/usr/openwin/include
@@ -218,6 +219,16 @@ QTINCLUDE	= -I/pack/qt/include -I/usr/openwin/include
 QTLIB		= -L/pack/qt/lib -R/pack/qt/lib -lqt \
 		  -L/usr/openwin/lib -R/usr/openwin/lib \
 		  -lXext -lX11 -lsocket -lnsl -lm
+MOC		= /pack/qt/bin/moc
+endif
+
+ifeq ($(HOSTTYPE),i386-linux)
+# Locate the Qt library.
+#
+QTINCLUDE	= -I/usr/include/qt
+QTLIB		= -lqt -L/usr/X11R6/lib -lX11 -lm
+MOC		= moc
+endif
 
 # Find the right file extension.
 #
@@ -402,18 +413,18 @@ gdaisy${EXT}:	gmain${OBJ} daisy.so
 # Create executable with Qt.
 #
 qdaisy${EXT}:	$(QTOBJECTS) daisy.so
-	$(LINK)qdaisy $^ $(QTLIB)
+	$(LINK)qdaisy $(QTOBJECTS) `pwd`/daisy.so $(QTLIB)
 
 qmain_moc.C:	qmain.h
-	/pack/qt/bin/moc $^ > qmain_moc.C
+	$(MOC) $^ > qmain_moc.C
 
 qmain_edit_moc.C:	qmain_edit.h
-	/pack/qt/bin/moc $^ > qmain_edit_moc.C
+	$(MOC) $^ > qmain_edit_moc.C
 
 # Create the C main executable.
 #
 cdaisy${EXT}:  cmain${OBJ} daisy.so
-	$(LINK)cdaisy $^ $(MATHLIB)
+	$(LINK)cdaisy cmain${OBJ} `pwd`/daisy.so $(MATHLIB)
 
 # Create the C main executable for testing.
 #
@@ -619,7 +630,7 @@ transform${OBJ}: transform.C transform.h librarian.h library.h common.h \
 rootdens${OBJ}: rootdens.C rootdens.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h check.h
 select${OBJ}: select.C select.h condition.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h geometry.h check.h
+ alist.h syntax.h treelog.h geometry.h check.h units.h
 average${OBJ}: average.C average.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h
 mactrans${OBJ}: mactrans.C mactrans.h librarian.h library.h common.h \
@@ -717,7 +728,7 @@ surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
  horizon.h hydraulic.h tortuosity.h geometry.h log.h am.h im.h \
  mathlib.h submodel.h chemicals.h soil_chemicals.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h plf.h ridge.h \
- tmpstream.h
+ tmpstream.h check.h
 soil_water${OBJ}: soil_water.C soil_water.h macro.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h log.h uzmodel.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h surface.h groundwater.h mathlib.h \
@@ -733,14 +744,15 @@ organic_matter${OBJ}: organic_matter.C organic_matter.h common.h syntax.h \
  treelog.h alist.h log.h librarian.h library.h am.h om.h soil.h \
  horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h macro.h \
  soil_NH4.h solute.h adsorption.h transport.h mactrans.h soil_NO3.h \
- soil_heat.h bioincorporation.h mathlib.h plf.h tmpstream.h submodel.h
+ soil_heat.h bioincorporation.h mathlib.h plf.h tmpstream.h submodel.h \
+ check.h
 nitrification${OBJ}: nitrification.C nitrification.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h
 denitrification${OBJ}: denitrification.C denitrification.h common.h plf.h \
  alist.h syntax.h treelog.h soil.h horizon.h librarian.h library.h \
  hydraulic.h tortuosity.h geometry.h soil_water.h macro.h soil_heat.h \
  organic_matter.h soil_NO3.h solute.h adsorption.h transport.h \
- mactrans.h log.h submodel.h
+ mactrans.h log.h submodel.h check.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h common.h surface.h \
  uzmodel.h librarian.h library.h syntax.h treelog.h weather.h im.h \
  soil_water.h macro.h soil.h horizon.h hydraulic.h tortuosity.h \
@@ -773,6 +785,8 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h common.h \
  alist.h syntax.h treelog.h log.h librarian.h library.h soil.h \
  horizon.h hydraulic.h tortuosity.h geometry.h am.h submodel.h plf.h \
  om.h mathlib.h
+select_value${OBJ}: select_value.C select_value.h select.h condition.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h
 weather_old${OBJ}: weather_old.C weather_old.h weather.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h im.h tmpstream.h
 log_extern${OBJ}: log_extern.C log_select.h log.h librarian.h library.h \
@@ -787,7 +801,8 @@ solute${OBJ}: solute.C solute.h adsorption.h librarian.h library.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
  macro.h mathlib.h tmpstream.h
 geometry${OBJ}: geometry.C geometry.h common.h syntax.h treelog.h alist.h \
- tmpstream.h mathlib.h check.h
+ tmpstream.h mathlib.h check.h groundwater.h uzmodel.h librarian.h \
+ library.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h plf.h parser.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h librarian.h library.h \
@@ -803,7 +818,7 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
 xref${OBJ}: xref.C xref.h traverse.h library.h common.h syntax.h treelog.h \
  alist.h submodel.h
 treelog_dual${OBJ}: treelog_dual.C treelog_dual.h treelog.h common.h
-units${OBJ}: units.C units.h mathlib.h common.h
+units${OBJ}: units.C units.h syntax.h common.h treelog.h mathlib.h
 check${OBJ}: check.C check.h
 check_range${OBJ}: check_range.C check_range.h check.h tmpstream.h \
  common.h
@@ -912,10 +927,10 @@ action_crop${OBJ}: action_crop.C action.h librarian.h library.h common.h \
  harvest.h chemicals.h check_range.h check.h im.h tmpstream.h
 groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h \
  uzmodel.h librarian.h library.h common.h alist.h syntax.h treelog.h
-select_min${OBJ}: select_min.C select.h condition.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h
-select_max${OBJ}: select_max.C select.h condition.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h
+select_min${OBJ}: select_min.C select_value.h select.h condition.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h
+select_max${OBJ}: select_max.C select_value.h select.h condition.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h
 select_average${OBJ}: select_average.C select.h condition.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h
 action_message${OBJ}: action_message.C action.h librarian.h library.h \
@@ -923,24 +938,24 @@ action_message${OBJ}: action_message.C action.h librarian.h library.h \
 weather_std${OBJ}: weather_std.C weather.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h im.h lexer_data.h lexer.h tmpstream.h \
  mathlib.h units.h
-select_flux_top${OBJ}: select_flux_top.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h geometry.h
-select_flux_bottom${OBJ}: select_flux_bottom.C select.h condition.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h geometry.h
+select_flux_top${OBJ}: select_flux_top.C select_value.h select.h \
+ condition.h librarian.h library.h common.h alist.h syntax.h treelog.h \
+ geometry.h
+select_flux_bottom${OBJ}: select_flux_bottom.C select_value.h select.h \
+ condition.h librarian.h library.h common.h alist.h syntax.h treelog.h \
+ geometry.h
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h uzmodel.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h log.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h soil_heat.h \
  tmpstream.h mathlib.h check.h
-select_index${OBJ}: select_index.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h
-select_content${OBJ}: select_content.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h geometry.h
+select_index${OBJ}: select_index.C select_value.h select.h condition.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h
+select_content${OBJ}: select_content.C select_value.h select.h condition.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h geometry.h
 select_interval${OBJ}: select_interval.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h geometry.h
-select_flux${OBJ}: select_flux.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h geometry.h
-select_number${OBJ}: select_number.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h
+ library.h common.h alist.h syntax.h treelog.h geometry.h units.h
+select_number${OBJ}: select_number.C select_value.h select.h condition.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h
 select_date${OBJ}: select_date.C select.h condition.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h
 select_array${OBJ}: select_array.C select.h condition.h librarian.h \

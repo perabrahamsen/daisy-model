@@ -1,29 +1,23 @@
 /****************************************************************************
 ** EditEntry meta object code from reading C++ file 'qmain_edit.h'
 **
-** Created: Fri Oct 19 13:32:00 2001
+** Created: Fri May 3 12:09:47 2002
 **      by: The Qt MOC ($Id$)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#define Q_MOC_EditEntry
-#if !defined(Q_MOC_OUTPUT_REVISION)
-#define Q_MOC_OUTPUT_REVISION 9
-#elif Q_MOC_OUTPUT_REVISION != 9
-#error "Moc format conflict - please regenerate all moc files"
-#endif
-
+#undef QT_NO_COMPAT
 #include "qmain_edit.h"
 #include <qmetaobject.h>
 #include <qapplication.h>
 
-#if defined(Q_SPARCWORKS_FUNCP_BUG)
-#define Q_AMPERSAND
-#else
-#define Q_AMPERSAND &
+#include <private/qucomextra_p.h>
+#if !defined(Q_MOC_OUTPUT_REVISION) || (Q_MOC_OUTPUT_REVISION != 19)
+#error "This file was generated using the moc from 3.0.3. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
 #endif
-
 
 const char *EditEntry::className() const
 {
@@ -31,27 +25,25 @@ const char *EditEntry::className() const
 }
 
 QMetaObject *EditEntry::metaObj = 0;
-
-void EditEntry::initMetaObject()
-{
-    if ( metaObj )
-	return;
-    if ( qstrcmp(QHGroupBox::className(), "QHGroupBox") != 0 )
-	badSuperclassWarning("EditEntry","QHGroupBox");
-    (void) staticMetaObject();
-}
+static QMetaObjectCleanUp cleanUp_EditEntry;
 
 #ifndef QT_NO_TRANSLATION
-
-QString EditEntry::tr(const char* s)
+QString EditEntry::tr( const char *s, const char *c )
 {
-    return qApp->translate( "EditEntry", s, 0 );
+    if ( qApp )
+	return qApp->translate( "EditEntry", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
 }
-
-QString EditEntry::tr(const char* s, const char * c)
+#ifndef QT_NO_TRANSLATION_UTF8
+QString EditEntry::trUtf8( const char *s, const char *c )
 {
-    return qApp->translate( "EditEntry", s, c );
+    if ( qApp )
+	return qApp->translate( "EditEntry", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
 }
+#endif // QT_NO_TRANSLATION_UTF8
 
 #endif // QT_NO_TRANSLATION
 
@@ -59,18 +51,13 @@ QMetaObject* EditEntry::staticMetaObject()
 {
     if ( metaObj )
 	return metaObj;
-    (void) QHGroupBox::staticMetaObject();
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
-    typedef void(EditEntry::*m1_t0)();
-    m1_t0 v1_0 = Q_AMPERSAND EditEntry::change;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(1);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(1);
-    slot_tbl[0].name = "change()";
-    slot_tbl[0].ptr = (QMember)v1_0;
-    slot_tbl_access[0] = QMetaData::Public;
+    QMetaObject* parentObject = QHGroupBox::staticMetaObject();
+    static const QUMethod slot_0 = {"change", 0, 0 };
+    static const QMetaData slot_tbl[] = {
+	{ "change()", &slot_0, QMetaData::Public }
+    };
     metaObj = QMetaObject::new_metaobject(
-	"EditEntry", "QHGroupBox",
+	"EditEntry", parentObject,
 	slot_tbl, 1,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
@@ -78,11 +65,37 @@ QMetaObject* EditEntry::staticMetaObject()
 	0, 0,
 #endif // QT_NO_PROPERTIES
 	0, 0 );
-    metaObj->set_slot_access( slot_tbl_access );
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
+    cleanUp_EditEntry.setMetaObject( metaObj );
     return metaObj;
 }
+
+void* EditEntry::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "EditEntry" ) ) return (EditEntry*)this;
+    return QHGroupBox::qt_cast( clname );
+}
+
+bool EditEntry::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: change(); break;
+    default:
+	return QHGroupBox::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool EditEntry::qt_emit( int _id, QUObject* _o )
+{
+    return QHGroupBox::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool EditEntry::qt_property( int _id, int _f, QVariant* _v)
+{
+    return QHGroupBox::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES
 
 
 const char *EditBoolean::className() const
@@ -91,27 +104,25 @@ const char *EditBoolean::className() const
 }
 
 QMetaObject *EditBoolean::metaObj = 0;
-
-void EditBoolean::initMetaObject()
-{
-    if ( metaObj )
-	return;
-    if ( qstrcmp(EditEntry::className(), "EditEntry") != 0 )
-	badSuperclassWarning("EditBoolean","EditEntry");
-    (void) staticMetaObject();
-}
+static QMetaObjectCleanUp cleanUp_EditBoolean;
 
 #ifndef QT_NO_TRANSLATION
-
-QString EditBoolean::tr(const char* s)
+QString EditBoolean::tr( const char *s, const char *c )
 {
-    return qApp->translate( "EditBoolean", s, 0 );
+    if ( qApp )
+	return qApp->translate( "EditBoolean", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
 }
-
-QString EditBoolean::tr(const char* s, const char * c)
+#ifndef QT_NO_TRANSLATION_UTF8
+QString EditBoolean::trUtf8( const char *s, const char *c )
 {
-    return qApp->translate( "EditBoolean", s, c );
+    if ( qApp )
+	return qApp->translate( "EditBoolean", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
 }
+#endif // QT_NO_TRANSLATION_UTF8
 
 #endif // QT_NO_TRANSLATION
 
@@ -119,18 +130,13 @@ QMetaObject* EditBoolean::staticMetaObject()
 {
     if ( metaObj )
 	return metaObj;
-    (void) EditEntry::staticMetaObject();
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
-    typedef void(EditBoolean::*m1_t0)();
-    m1_t0 v1_0 = Q_AMPERSAND EditBoolean::invert;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(1);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(1);
-    slot_tbl[0].name = "invert()";
-    slot_tbl[0].ptr = (QMember)v1_0;
-    slot_tbl_access[0] = QMetaData::Public;
+    QMetaObject* parentObject = EditEntry::staticMetaObject();
+    static const QUMethod slot_0 = {"invert", 0, 0 };
+    static const QMetaData slot_tbl[] = {
+	{ "invert()", &slot_0, QMetaData::Public }
+    };
     metaObj = QMetaObject::new_metaobject(
-	"EditBoolean", "EditEntry",
+	"EditBoolean", parentObject,
 	slot_tbl, 1,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
@@ -138,11 +144,37 @@ QMetaObject* EditBoolean::staticMetaObject()
 	0, 0,
 #endif // QT_NO_PROPERTIES
 	0, 0 );
-    metaObj->set_slot_access( slot_tbl_access );
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
+    cleanUp_EditBoolean.setMetaObject( metaObj );
     return metaObj;
 }
+
+void* EditBoolean::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "EditBoolean" ) ) return (EditBoolean*)this;
+    return EditEntry::qt_cast( clname );
+}
+
+bool EditBoolean::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: invert(); break;
+    default:
+	return EditEntry::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool EditBoolean::qt_emit( int _id, QUObject* _o )
+{
+    return EditEntry::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool EditBoolean::qt_property( int _id, int _f, QVariant* _v)
+{
+    return EditEntry::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES
 
 
 const char *EditPLF::className() const
@@ -151,27 +183,25 @@ const char *EditPLF::className() const
 }
 
 QMetaObject *EditPLF::metaObj = 0;
-
-void EditPLF::initMetaObject()
-{
-    if ( metaObj )
-	return;
-    if ( qstrcmp(EditEntry::className(), "EditEntry") != 0 )
-	badSuperclassWarning("EditPLF","EditEntry");
-    (void) staticMetaObject();
-}
+static QMetaObjectCleanUp cleanUp_EditPLF;
 
 #ifndef QT_NO_TRANSLATION
-
-QString EditPLF::tr(const char* s)
+QString EditPLF::tr( const char *s, const char *c )
 {
-    return qApp->translate( "EditPLF", s, 0 );
+    if ( qApp )
+	return qApp->translate( "EditPLF", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
 }
-
-QString EditPLF::tr(const char* s, const char * c)
+#ifndef QT_NO_TRANSLATION_UTF8
+QString EditPLF::trUtf8( const char *s, const char *c )
 {
-    return qApp->translate( "EditPLF", s, c );
+    if ( qApp )
+	return qApp->translate( "EditPLF", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
 }
+#endif // QT_NO_TRANSLATION_UTF8
 
 #endif // QT_NO_TRANSLATION
 
@@ -179,28 +209,17 @@ QMetaObject* EditPLF::staticMetaObject()
 {
     if ( metaObj )
 	return metaObj;
-    (void) EditEntry::staticMetaObject();
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
-    typedef void(EditPLF::*m1_t0)();
-    typedef void(EditPLF::*m1_t1)();
-    typedef void(EditPLF::*m1_t2)();
-    m1_t0 v1_0 = Q_AMPERSAND EditPLF::add;
-    m1_t1 v1_1 = Q_AMPERSAND EditPLF::remove;
-    m1_t2 v1_2 = Q_AMPERSAND EditPLF::view;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(3);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(3);
-    slot_tbl[0].name = "add()";
-    slot_tbl[0].ptr = (QMember)v1_0;
-    slot_tbl_access[0] = QMetaData::Public;
-    slot_tbl[1].name = "remove()";
-    slot_tbl[1].ptr = (QMember)v1_1;
-    slot_tbl_access[1] = QMetaData::Public;
-    slot_tbl[2].name = "view()";
-    slot_tbl[2].ptr = (QMember)v1_2;
-    slot_tbl_access[2] = QMetaData::Public;
+    QMetaObject* parentObject = EditEntry::staticMetaObject();
+    static const QUMethod slot_0 = {"add", 0, 0 };
+    static const QUMethod slot_1 = {"remove", 0, 0 };
+    static const QUMethod slot_2 = {"view", 0, 0 };
+    static const QMetaData slot_tbl[] = {
+	{ "add()", &slot_0, QMetaData::Public },
+	{ "remove()", &slot_1, QMetaData::Public },
+	{ "view()", &slot_2, QMetaData::Public }
+    };
     metaObj = QMetaObject::new_metaobject(
-	"EditPLF", "EditEntry",
+	"EditPLF", parentObject,
 	slot_tbl, 3,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
@@ -208,11 +227,39 @@ QMetaObject* EditPLF::staticMetaObject()
 	0, 0,
 #endif // QT_NO_PROPERTIES
 	0, 0 );
-    metaObj->set_slot_access( slot_tbl_access );
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
+    cleanUp_EditPLF.setMetaObject( metaObj );
     return metaObj;
 }
+
+void* EditPLF::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "EditPLF" ) ) return (EditPLF*)this;
+    return EditEntry::qt_cast( clname );
+}
+
+bool EditPLF::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: add(); break;
+    case 1: remove(); break;
+    case 2: view(); break;
+    default:
+	return EditEntry::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool EditPLF::qt_emit( int _id, QUObject* _o )
+{
+    return EditEntry::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool EditPLF::qt_property( int _id, int _f, QVariant* _v)
+{
+    return EditEntry::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES
 
 
 const char *EditObject::className() const
@@ -221,27 +268,25 @@ const char *EditObject::className() const
 }
 
 QMetaObject *EditObject::metaObj = 0;
-
-void EditObject::initMetaObject()
-{
-    if ( metaObj )
-	return;
-    if ( qstrcmp(EditEntry::className(), "EditEntry") != 0 )
-	badSuperclassWarning("EditObject","EditEntry");
-    (void) staticMetaObject();
-}
+static QMetaObjectCleanUp cleanUp_EditObject;
 
 #ifndef QT_NO_TRANSLATION
-
-QString EditObject::tr(const char* s)
+QString EditObject::tr( const char *s, const char *c )
 {
-    return qApp->translate( "EditObject", s, 0 );
+    if ( qApp )
+	return qApp->translate( "EditObject", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
 }
-
-QString EditObject::tr(const char* s, const char * c)
+#ifndef QT_NO_TRANSLATION_UTF8
+QString EditObject::trUtf8( const char *s, const char *c )
 {
-    return qApp->translate( "EditObject", s, c );
+    if ( qApp )
+	return qApp->translate( "EditObject", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
 }
+#endif // QT_NO_TRANSLATION_UTF8
 
 #endif // QT_NO_TRANSLATION
 
@@ -249,18 +294,16 @@ QMetaObject* EditObject::staticMetaObject()
 {
     if ( metaObj )
 	return metaObj;
-    (void) EditEntry::staticMetaObject();
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
-    typedef void(EditObject::*m1_t0)(int);
-    m1_t0 v1_0 = Q_AMPERSAND EditObject::activate;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(1);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(1);
-    slot_tbl[0].name = "activate(int)";
-    slot_tbl[0].ptr = (QMember)v1_0;
-    slot_tbl_access[0] = QMetaData::Public;
+    QMetaObject* parentObject = EditEntry::staticMetaObject();
+    static const QUParameter param_slot_0[] = {
+	{ 0, &static_QUType_int, 0, QUParameter::In }
+    };
+    static const QUMethod slot_0 = {"activate", 1, param_slot_0 };
+    static const QMetaData slot_tbl[] = {
+	{ "activate(int)", &slot_0, QMetaData::Public }
+    };
     metaObj = QMetaObject::new_metaobject(
-	"EditObject", "EditEntry",
+	"EditObject", parentObject,
 	slot_tbl, 1,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
@@ -268,11 +311,37 @@ QMetaObject* EditObject::staticMetaObject()
 	0, 0,
 #endif // QT_NO_PROPERTIES
 	0, 0 );
-    metaObj->set_slot_access( slot_tbl_access );
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
+    cleanUp_EditObject.setMetaObject( metaObj );
     return metaObj;
 }
+
+void* EditObject::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "EditObject" ) ) return (EditObject*)this;
+    return EditEntry::qt_cast( clname );
+}
+
+bool EditObject::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: activate(static_QUType_int.get(_o+1)); break;
+    default:
+	return EditEntry::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool EditObject::qt_emit( int _id, QUObject* _o )
+{
+    return EditEntry::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool EditObject::qt_property( int _id, int _f, QVariant* _v)
+{
+    return EditEntry::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES
 
 
 const char *EditList::className() const
@@ -281,27 +350,25 @@ const char *EditList::className() const
 }
 
 QMetaObject *EditList::metaObj = 0;
-
-void EditList::initMetaObject()
-{
-    if ( metaObj )
-	return;
-    if ( qstrcmp(EditEntry::className(), "EditEntry") != 0 )
-	badSuperclassWarning("EditList","EditEntry");
-    (void) staticMetaObject();
-}
+static QMetaObjectCleanUp cleanUp_EditList;
 
 #ifndef QT_NO_TRANSLATION
-
-QString EditList::tr(const char* s)
+QString EditList::tr( const char *s, const char *c )
 {
-    return qApp->translate( "EditList", s, 0 );
+    if ( qApp )
+	return qApp->translate( "EditList", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
 }
-
-QString EditList::tr(const char* s, const char * c)
+#ifndef QT_NO_TRANSLATION_UTF8
+QString EditList::trUtf8( const char *s, const char *c )
 {
-    return qApp->translate( "EditList", s, c );
+    if ( qApp )
+	return qApp->translate( "EditList", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
 }
+#endif // QT_NO_TRANSLATION_UTF8
 
 #endif // QT_NO_TRANSLATION
 
@@ -309,38 +376,24 @@ QMetaObject* EditList::staticMetaObject()
 {
     if ( metaObj )
 	return metaObj;
-    (void) EditEntry::staticMetaObject();
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
-    typedef void(EditList::*m1_t0)();
-    typedef void(EditList::*m1_t1)();
-    typedef void(EditList::*m1_t2)();
-    typedef void(EditList::*m1_t3)();
-    typedef void(EditList::*m1_t4)(QListViewItem*);
-    m1_t0 v1_0 = Q_AMPERSAND EditList::before;
-    m1_t1 v1_1 = Q_AMPERSAND EditList::at;
-    m1_t2 v1_2 = Q_AMPERSAND EditList::after;
-    m1_t3 v1_3 = Q_AMPERSAND EditList::remove;
-    m1_t4 v1_4 = Q_AMPERSAND EditList::select;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(5);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(5);
-    slot_tbl[0].name = "before()";
-    slot_tbl[0].ptr = (QMember)v1_0;
-    slot_tbl_access[0] = QMetaData::Public;
-    slot_tbl[1].name = "at()";
-    slot_tbl[1].ptr = (QMember)v1_1;
-    slot_tbl_access[1] = QMetaData::Public;
-    slot_tbl[2].name = "after()";
-    slot_tbl[2].ptr = (QMember)v1_2;
-    slot_tbl_access[2] = QMetaData::Public;
-    slot_tbl[3].name = "remove()";
-    slot_tbl[3].ptr = (QMember)v1_3;
-    slot_tbl_access[3] = QMetaData::Public;
-    slot_tbl[4].name = "select(QListViewItem*)";
-    slot_tbl[4].ptr = (QMember)v1_4;
-    slot_tbl_access[4] = QMetaData::Public;
+    QMetaObject* parentObject = EditEntry::staticMetaObject();
+    static const QUMethod slot_0 = {"before", 0, 0 };
+    static const QUMethod slot_1 = {"at", 0, 0 };
+    static const QUMethod slot_2 = {"after", 0, 0 };
+    static const QUMethod slot_3 = {"remove", 0, 0 };
+    static const QUParameter param_slot_4[] = {
+	{ 0, &static_QUType_ptr, "QListViewItem", QUParameter::In }
+    };
+    static const QUMethod slot_4 = {"select", 1, param_slot_4 };
+    static const QMetaData slot_tbl[] = {
+	{ "before()", &slot_0, QMetaData::Public },
+	{ "at()", &slot_1, QMetaData::Public },
+	{ "after()", &slot_2, QMetaData::Public },
+	{ "remove()", &slot_3, QMetaData::Public },
+	{ "select(QListViewItem*)", &slot_4, QMetaData::Public }
+    };
     metaObj = QMetaObject::new_metaobject(
-	"EditList", "EditEntry",
+	"EditList", parentObject,
 	slot_tbl, 5,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
@@ -348,11 +401,41 @@ QMetaObject* EditList::staticMetaObject()
 	0, 0,
 #endif // QT_NO_PROPERTIES
 	0, 0 );
-    metaObj->set_slot_access( slot_tbl_access );
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
+    cleanUp_EditList.setMetaObject( metaObj );
     return metaObj;
 }
+
+void* EditList::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "EditList" ) ) return (EditList*)this;
+    return EditEntry::qt_cast( clname );
+}
+
+bool EditList::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: before(); break;
+    case 1: at(); break;
+    case 2: after(); break;
+    case 3: remove(); break;
+    case 4: select((QListViewItem*)static_QUType_ptr.get(_o+1)); break;
+    default:
+	return EditEntry::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool EditList::qt_emit( int _id, QUObject* _o )
+{
+    return EditEntry::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool EditList::qt_property( int _id, int _f, QVariant* _v)
+{
+    return EditEntry::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES
 
 
 const char *ItemDialog::className() const
@@ -361,27 +444,25 @@ const char *ItemDialog::className() const
 }
 
 QMetaObject *ItemDialog::metaObj = 0;
-
-void ItemDialog::initMetaObject()
-{
-    if ( metaObj )
-	return;
-    if ( qstrcmp(QDialog::className(), "QDialog") != 0 )
-	badSuperclassWarning("ItemDialog","QDialog");
-    (void) staticMetaObject();
-}
+static QMetaObjectCleanUp cleanUp_ItemDialog;
 
 #ifndef QT_NO_TRANSLATION
-
-QString ItemDialog::tr(const char* s)
+QString ItemDialog::tr( const char *s, const char *c )
 {
-    return qApp->translate( "ItemDialog", s, 0 );
+    if ( qApp )
+	return qApp->translate( "ItemDialog", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
 }
-
-QString ItemDialog::tr(const char* s, const char * c)
+#ifndef QT_NO_TRANSLATION_UTF8
+QString ItemDialog::trUtf8( const char *s, const char *c )
 {
-    return qApp->translate( "ItemDialog", s, c );
+    if ( qApp )
+	return qApp->translate( "ItemDialog", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
 }
+#endif // QT_NO_TRANSLATION_UTF8
 
 #endif // QT_NO_TRANSLATION
 
@@ -389,28 +470,17 @@ QMetaObject* ItemDialog::staticMetaObject()
 {
     if ( metaObj )
 	return metaObj;
-    (void) QDialog::staticMetaObject();
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
-    typedef void(ItemDialog::*m1_t0)();
-    typedef void(ItemDialog::*m1_t1)();
-    typedef void(ItemDialog::*m1_t2)();
-    m1_t0 v1_0 = Q_AMPERSAND ItemDialog::apply;
-    m1_t1 v1_1 = Q_AMPERSAND ItemDialog::reset;
-    m1_t2 v1_2 = Q_AMPERSAND ItemDialog::cancel;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(3);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(3);
-    slot_tbl[0].name = "apply()";
-    slot_tbl[0].ptr = (QMember)v1_0;
-    slot_tbl_access[0] = QMetaData::Public;
-    slot_tbl[1].name = "reset()";
-    slot_tbl[1].ptr = (QMember)v1_1;
-    slot_tbl_access[1] = QMetaData::Public;
-    slot_tbl[2].name = "cancel()";
-    slot_tbl[2].ptr = (QMember)v1_2;
-    slot_tbl_access[2] = QMetaData::Public;
+    QMetaObject* parentObject = QDialog::staticMetaObject();
+    static const QUMethod slot_0 = {"apply", 0, 0 };
+    static const QUMethod slot_1 = {"reset", 0, 0 };
+    static const QUMethod slot_2 = {"cancel", 0, 0 };
+    static const QMetaData slot_tbl[] = {
+	{ "apply()", &slot_0, QMetaData::Public },
+	{ "reset()", &slot_1, QMetaData::Public },
+	{ "cancel()", &slot_2, QMetaData::Public }
+    };
     metaObj = QMetaObject::new_metaobject(
-	"ItemDialog", "QDialog",
+	"ItemDialog", parentObject,
 	slot_tbl, 3,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
@@ -418,8 +488,36 @@ QMetaObject* ItemDialog::staticMetaObject()
 	0, 0,
 #endif // QT_NO_PROPERTIES
 	0, 0 );
-    metaObj->set_slot_access( slot_tbl_access );
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
+    cleanUp_ItemDialog.setMetaObject( metaObj );
     return metaObj;
 }
+
+void* ItemDialog::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "ItemDialog" ) ) return (ItemDialog*)this;
+    return QDialog::qt_cast( clname );
+}
+
+bool ItemDialog::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: apply(); break;
+    case 1: reset(); break;
+    case 2: cancel(); break;
+    default:
+	return QDialog::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool ItemDialog::qt_emit( int _id, QUObject* _o )
+{
+    return QDialog::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool ItemDialog::qt_property( int _id, int _f, QVariant* _v)
+{
+    return QDialog::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES

@@ -98,18 +98,23 @@ protected:
   // Simulation.
 public:
   void tick (const Time& time, const Bioclimate&, const Soil&,
-	     OrganicMatter*,
-	     const SoilHeat&,
-	     const SoilWater&, 
-	     SoilNH4*,
-	     SoilNO3*, Treelog&);
+	     OrganicMatter*, const SoilHeat&, const SoilWater&, 
+	     SoilNH4*, SoilNO3*, 
+	     double&, double&, double&, vector<double>&, vector<double>&,
+	     Treelog&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest, 
 			  bool kill_off,
-			  vector<AM*>& residuals, Treelog&);
+			  vector<AM*>& residuals,
+			  double& residuals_DM,
+			  double& residuals_N_top,
+			  double& residuals_C_top,
+			  vector<double>& residuals_N_soil,
+			  vector<double>& residuals_C_soil,
+			  Treelog&);
   void output (Log&) const;
 
   double DS () const;
@@ -1694,8 +1699,9 @@ CropOld::tick (const Time& time,
 	       OrganicMatter*,
 	       const SoilHeat& soil_heat,
 	       const SoilWater& soil_water, 
-	       SoilNH4* soil_NH4,
-	       SoilNO3* soil_NO3, Treelog&)
+	       SoilNH4* soil_NH4, SoilNO3* soil_NO3,
+	       double&, double&, double&, vector<double>&, vector<double>&,
+	       Treelog&)
 {
   // Clear log.
   fill (var.RootSys.NO3Extraction.begin (), 
@@ -1817,7 +1823,13 @@ CropOld::harvest (const string& column_name,
 		  double stub_length,
 		  double stem_harvest, double, double sorg_harvest, 
 		  bool kill_off,
-		  vector<AM*>& residuals, Treelog& out)
+		  vector<AM*>& residuals, 
+		  double& residuals_DM,
+		  double& residuals_N_top,
+		  double& residuals_C_top,
+		  vector<double>& residuals_N_soil,
+		  vector<double>& residuals_C_soil,
+		  Treelog& out)
 {
   const Parameters::HarvestPar& Hp = par.Harvest;
   Variables::RecProd& Prod = var.Prod;
@@ -1914,6 +1926,9 @@ CropOld::harvest (const string& column_name,
 	  am.add (WStem * C_Stem * m2_per_cm2,
 		  NStem * m2_per_cm2);
 	  residuals.push_back (&am);
+	  residuals_DM += WStem;
+	  residuals_N_top += NStem;
+	  residuals_C_top += WStem * C_Stem;
 	}
       if (sorg_harvest < 1.0 && WSOrg > 0.0)
 	{
@@ -1921,6 +1936,9 @@ CropOld::harvest (const string& column_name,
 	  am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
 		  NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
 	  residuals.push_back (&am);
+	  residuals_DM += WSOrg * (1.0 - sorg_harvest);
+	  residuals_N_top += NSOrg * (1.0 - sorg_harvest);
+	  residuals_C_top += WSOrg * C_SOrg * (1.0 - sorg_harvest);
 	}
       if (WRoot > 0.0)
 	{
@@ -1934,6 +1952,11 @@ CropOld::harvest (const string& column_name,
 	    am.add (WRoot * C_Root * m2_per_cm2,
 		    NRoot * m2_per_cm2);
 	  residuals.push_back (&am);
+	  residuals_DM += WRoot;
+	  geometry.add (residuals_N_soil, density, 
+			NRoot * m2_per_cm2);
+	  geometry.add (residuals_C_soil, density, 
+			WRoot * C_Root * m2_per_cm2);
 	}
     }
   TmpStream tmp;

@@ -26,6 +26,7 @@
 
 #include "traverse.h"
 #include "tmpstream.h"
+#include "treelog_stream.h"
 #include "plf.h"
 #include "time.h"
 #include "library.h"
@@ -174,7 +175,8 @@ TraverseQtTree::enter_model (const Syntax& syntax, AttributeList& alist,
   if (check_alists)
     {
       TmpStream errors;
-      const bool has_errors = !syntax.check (alist, errors (), model);
+      TreelogStream err (errors ());
+      const bool has_errors = !syntax.check (alist, err);
       value +=  has_errors ? " partial" : " full";
     }
   
@@ -279,7 +281,8 @@ TraverseQtTree::enter_submodel_sequence (const Syntax& syntax,
   if (check_alists)
     {
       TmpStream errors;
-      const bool has_errors = !syntax.check (alist, errors (), name.latin1 ());
+      TreelogStream err (errors ());
+      const bool has_errors = !syntax.check (alist, err);
       value = has_errors ? "Partial" : "Full";
     }
   enter (new SequenceItem (syntax, alist, default_alist,
@@ -308,8 +311,8 @@ TraverseQtTree::enter_submodel_sequence_default (const Syntax& syntax,
   if (check_alists)
     {
       TmpStream errors;
-      const bool has_errors = !syntax.check (default_alist, errors (),
-					     "default");
+      TreelogStream err (errors ());
+      const bool has_errors = !syntax.check (default_alist, err);
       value = has_errors ? "Partial" : "Full";
     }
   static const AttributeList empty;
@@ -350,7 +353,8 @@ TraverseQtTree::enter_object_sequence (const Library&, const Syntax& syntax,
   if (check_alists)
     {
       TmpStream errors;
-      const bool has_errors = !syntax.check (alist, errors (), name.latin1 ());
+      TreelogStream err (errors ());
+      const bool has_errors = !syntax.check (alist, err);
       value += (has_errors ? " partial" : " full");
     }
   enter (new SequenceItem (syntax, alist, default_alist, 
@@ -445,9 +449,9 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	if (has_value && size == Syntax::Singleton && check_alists)
 	  {
 	    TmpStream str;
+	    TreelogStream err (str ());
 	    const bool has_errors = 
-	      !syntax.syntax (parameter).check (alist.alist (parameter), 
-						str (), parameter);
+	      !syntax.syntax (parameter).check (alist.alist (parameter), err);
 	    errors = str.str ();
 	    if (has_errors)
 	      value_name = "Partial";
@@ -470,10 +474,10 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	  if (check_alists)
 	    {
 	      TmpStream str;
+	      TreelogStream err (str ());
 	      const bool has_errors 
 		= (!syntax.library (parameter)
-		   .syntax (type).check (alist.alist (parameter),
-					 str (), parameter));
+		   .syntax (type).check (alist.alist (parameter), err));
 	      errors = str.str ();
 	      if (has_errors)
 		value_name += " partial";

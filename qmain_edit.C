@@ -208,8 +208,10 @@ struct ShortLine : public QLineEdit
     int w = fm.width( 'x' ) * size; // "some"
     if ( frame() ) {
       h += 8;
+#if 0
       if ( style() == WindowsStyle && h < 26 )
 	h = 22;
+#endif
       return QSize( w + 8, h ).expandedTo( QApplication::globalStrut() );
     } else {
       return QSize( w + 4, h + 4 ).expandedTo( QApplication::globalStrut() );

@@ -14,6 +14,8 @@ release.
 
 * 2.27
 
+** Residuals are now logged in "N Balance" and "Carbon Balance".
+
 ** Allow macropores to go below the lowest node.
 
 * 2.26
@@ -789,7 +791,7 @@ depend on the development stage of the crop.
 ** Tillage can now affect background mineralization.
 
 See the 'som_tillage_factor', 'smb_tillage_factor' and 'tillage_age'
-xbparameters to 'OrganicMatter'.
+parameters to 'OrganicMatter'.
 
 * 1.55
 

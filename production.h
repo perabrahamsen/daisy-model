@@ -140,7 +140,12 @@ public:
 	     const Geometry& geometry,
 	     double DS, double CAImRat,
 	     const CrpN& nitrogen,
-	     const Partition& partition, Treelog&);
+	     const Partition& partition,
+	     double& residuals_DM, 
+	     double& residuals_N_top, double& residuals_C_top,
+	     vector<double>& residuals_N_soil,
+	     vector<double>& residuals_C_soil,
+	     Treelog&);
   void none ();
   void output (Log& log) const;
 

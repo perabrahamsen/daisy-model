@@ -77,7 +77,12 @@ public:
 public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&,
 		     OrganicMatter*, const SoilHeat&, const SoilWater&,
-		     SoilNH4*, SoilNO3*, Treelog&) = 0;
+		     SoilNH4*, SoilNO3*, 
+		     double& residuals_DM,
+		     double& residuals_N_top, double& residuals_C_top,
+		     vector<double>& residuals_N_soil, 
+		     vector<double>& residuals_C_soil,
+		     Treelog&) = 0;
   virtual const Harvest& harvest (const string& column_name,
 				  const Time&, const Geometry&, 
 				  Bioclimate& bioclimate,
@@ -86,9 +91,20 @@ public:
 				  double leaf_harvest, 
 				  double sorg_harvest,
 				  bool kill_off,
-				  vector<AM*>& residuals, Treelog&) = 0;
+				  vector<AM*>& residuals,
+				  double& residuals_DM,
+				  double& residuals_N_top,
+				  double& residuals_C_top,
+				  vector<double>& residuals_N_soil,
+				  vector<double>& residuals_C_soil,
+				  Treelog&) = 0;
   void kill (const string&, const Time&, const Geometry&, Bioclimate&,
-	     vector<AM*>&, Treelog&);
+	     vector<AM*>& residuals, 
+	     double& residuals_DM, 
+	     double& residuals_N_top, double& residuals_C_top,
+	     vector<double>& residuals_N_soil, 
+	     vector<double>& residuals_C_soil,
+	     Treelog&);
   virtual void output (Log&) const = 0;
   
   // Queries.

@@ -136,12 +136,26 @@ Geometry::add (vector<double>& v, double from, double to, double amount) const
   const double density = amount / (from - to);
   double old = 0.0;
 
-  for (unsigned i = 0; i <= last; i++)
+  for (unsigned int i = 0; i <= last; i++)
     {
       if (zplus_[i] < from)
 	v[i] += density * (min (old, from) - max (zplus_[i], to)) / dz_[i];
       old = zplus_[i];
     }
+
+  assert (approximate (old_total + amount, total (v)));
+}
+
+void
+Geometry::add (vector<double>& v, const vector<double>& density,
+	       double amount) const
+{
+  const double old_total = total (v);
+  const double total_density = total (density);
+  assert (total_density > 0.0);
+  for (unsigned int i = 0; i <= size (); i++)
+    if (density.size () > i)
+      v[i] += amount * density[i] / total_density;
 
   assert (approximate (old_total + amount, total (v)));
 }

@@ -1,29 +1,23 @@
 /****************************************************************************
 ** MainWindow meta object code from reading C++ file 'qmain.h'
 **
-** Created: Fri Oct 19 13:32:00 2001
+** Created: Fri May 3 11:24:33 2002
 **      by: The Qt MOC ($Id$)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#define Q_MOC_MainWindow
-#if !defined(Q_MOC_OUTPUT_REVISION)
-#define Q_MOC_OUTPUT_REVISION 9
-#elif Q_MOC_OUTPUT_REVISION != 9
-#error "Moc format conflict - please regenerate all moc files"
-#endif
-
+#undef QT_NO_COMPAT
 #include "qmain.h"
 #include <qmetaobject.h>
 #include <qapplication.h>
 
-#if defined(Q_SPARCWORKS_FUNCP_BUG)
-#define Q_AMPERSAND
-#else
-#define Q_AMPERSAND &
+#include <private/qucomextra_p.h>
+#if !defined(Q_MOC_OUTPUT_REVISION) || (Q_MOC_OUTPUT_REVISION != 19)
+#error "This file was generated using the moc from 3.0.3. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
 #endif
-
 
 const char *MainWindow::className() const
 {
@@ -31,27 +25,25 @@ const char *MainWindow::className() const
 }
 
 QMetaObject *MainWindow::metaObj = 0;
-
-void MainWindow::initMetaObject()
-{
-    if ( metaObj )
-	return;
-    if ( qstrcmp(QMainWindow::className(), "QMainWindow") != 0 )
-	badSuperclassWarning("MainWindow","QMainWindow");
-    (void) staticMetaObject();
-}
+static QMetaObjectCleanUp cleanUp_MainWindow;
 
 #ifndef QT_NO_TRANSLATION
-
-QString MainWindow::tr(const char* s)
+QString MainWindow::tr( const char *s, const char *c )
 {
-    return qApp->translate( "MainWindow", s, 0 );
+    if ( qApp )
+	return qApp->translate( "MainWindow", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
 }
-
-QString MainWindow::tr(const char* s, const char * c)
+#ifndef QT_NO_TRANSLATION_UTF8
+QString MainWindow::trUtf8( const char *s, const char *c )
 {
-    return qApp->translate( "MainWindow", s, c );
+    if ( qApp )
+	return qApp->translate( "MainWindow", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
 }
+#endif // QT_NO_TRANSLATION_UTF8
 
 #endif // QT_NO_TRANSLATION
 
@@ -59,128 +51,60 @@ QMetaObject* MainWindow::staticMetaObject()
 {
     if ( metaObj )
 	return metaObj;
-    (void) QMainWindow::staticMetaObject();
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
-    typedef void(MainWindow::*m1_t0)();
-    typedef void(MainWindow::*m1_t1)();
-    typedef void(MainWindow::*m1_t2)();
-    typedef void(MainWindow::*m1_t3)();
-    typedef void(MainWindow::*m1_t4)();
-    typedef void(MainWindow::*m1_t5)();
-    typedef void(MainWindow::*m1_t6)();
-    typedef void(MainWindow::*m1_t7)();
-    typedef void(MainWindow::*m1_t8)();
-    typedef void(MainWindow::*m1_t9)();
-    typedef void(MainWindow::*m1_t10)();
-    typedef void(MainWindow::*m1_t11)();
-    typedef void(MainWindow::*m1_t12)();
-    typedef void(MainWindow::*m1_t13)();
-    typedef void(MainWindow::*m1_t14)();
-    typedef void(MainWindow::*m1_t15)();
-    typedef void(MainWindow::*m1_t16)();
-    typedef void(MainWindow::*m1_t17)();
-    typedef void(MainWindow::*m1_t18)();
-    typedef void(MainWindow::*m1_t19)();
-    typedef void(MainWindow::*m1_t20)(unsigned int);
-    typedef void(MainWindow::*m1_t21)();
-    typedef void(MainWindow::*m1_t22)();
-    m1_t0 v1_0 = Q_AMPERSAND MainWindow::menu_action;
-    m1_t1 v1_1 = Q_AMPERSAND MainWindow::file_new;
-    m1_t2 v1_2 = Q_AMPERSAND MainWindow::file_open;
-    m1_t3 v1_3 = Q_AMPERSAND MainWindow::file_save;
-    m1_t4 v1_4 = Q_AMPERSAND MainWindow::file_save_as;
-    m1_t5 v1_5 = Q_AMPERSAND MainWindow::edit_edit;
-    m1_t6 v1_6 = Q_AMPERSAND MainWindow::edit_raw;
-    m1_t7 v1_7 = Q_AMPERSAND MainWindow::edit_after;
-    m1_t8 v1_8 = Q_AMPERSAND MainWindow::edit_child;
-    m1_t9 v1_9 = Q_AMPERSAND MainWindow::edit_copy;
-    m1_t10 v1_10 = Q_AMPERSAND MainWindow::edit_inherit;
-    m1_t11 v1_11 = Q_AMPERSAND MainWindow::edit_delete;
-    m1_t12 v1_12 = Q_AMPERSAND MainWindow::view_selected;
-    m1_t13 v1_13 = Q_AMPERSAND MainWindow::view_check;
-    m1_t14 v1_14 = Q_AMPERSAND MainWindow::toggle_view_defaults;
-    m1_t15 v1_15 = Q_AMPERSAND MainWindow::view_dependencies;
-    m1_t16 v1_16 = Q_AMPERSAND MainWindow::toggle_view_logonly;
-    m1_t17 v1_17 = Q_AMPERSAND MainWindow::toggle_view_parameters;
-    m1_t18 v1_18 = Q_AMPERSAND MainWindow::toggle_view_empty;
-    m1_t19 v1_19 = Q_AMPERSAND MainWindow::toggle_check_composite;
-    m1_t20 v1_20 = Q_AMPERSAND MainWindow::select_view_filter;
-    m1_t21 v1_21 = Q_AMPERSAND MainWindow::help_about;
-    m1_t22 v1_22 = Q_AMPERSAND MainWindow::help_aboutQt;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(23);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(23);
-    slot_tbl[0].name = "menu_action()";
-    slot_tbl[0].ptr = (QMember)v1_0;
-    slot_tbl_access[0] = QMetaData::Public;
-    slot_tbl[1].name = "file_new()";
-    slot_tbl[1].ptr = (QMember)v1_1;
-    slot_tbl_access[1] = QMetaData::Public;
-    slot_tbl[2].name = "file_open()";
-    slot_tbl[2].ptr = (QMember)v1_2;
-    slot_tbl_access[2] = QMetaData::Public;
-    slot_tbl[3].name = "file_save()";
-    slot_tbl[3].ptr = (QMember)v1_3;
-    slot_tbl_access[3] = QMetaData::Public;
-    slot_tbl[4].name = "file_save_as()";
-    slot_tbl[4].ptr = (QMember)v1_4;
-    slot_tbl_access[4] = QMetaData::Public;
-    slot_tbl[5].name = "edit_edit()";
-    slot_tbl[5].ptr = (QMember)v1_5;
-    slot_tbl_access[5] = QMetaData::Public;
-    slot_tbl[6].name = "edit_raw()";
-    slot_tbl[6].ptr = (QMember)v1_6;
-    slot_tbl_access[6] = QMetaData::Public;
-    slot_tbl[7].name = "edit_after()";
-    slot_tbl[7].ptr = (QMember)v1_7;
-    slot_tbl_access[7] = QMetaData::Public;
-    slot_tbl[8].name = "edit_child()";
-    slot_tbl[8].ptr = (QMember)v1_8;
-    slot_tbl_access[8] = QMetaData::Public;
-    slot_tbl[9].name = "edit_copy()";
-    slot_tbl[9].ptr = (QMember)v1_9;
-    slot_tbl_access[9] = QMetaData::Public;
-    slot_tbl[10].name = "edit_inherit()";
-    slot_tbl[10].ptr = (QMember)v1_10;
-    slot_tbl_access[10] = QMetaData::Public;
-    slot_tbl[11].name = "edit_delete()";
-    slot_tbl[11].ptr = (QMember)v1_11;
-    slot_tbl_access[11] = QMetaData::Public;
-    slot_tbl[12].name = "view_selected()";
-    slot_tbl[12].ptr = (QMember)v1_12;
-    slot_tbl_access[12] = QMetaData::Public;
-    slot_tbl[13].name = "view_check()";
-    slot_tbl[13].ptr = (QMember)v1_13;
-    slot_tbl_access[13] = QMetaData::Public;
-    slot_tbl[14].name = "toggle_view_defaults()";
-    slot_tbl[14].ptr = (QMember)v1_14;
-    slot_tbl_access[14] = QMetaData::Public;
-    slot_tbl[15].name = "view_dependencies()";
-    slot_tbl[15].ptr = (QMember)v1_15;
-    slot_tbl_access[15] = QMetaData::Public;
-    slot_tbl[16].name = "toggle_view_logonly()";
-    slot_tbl[16].ptr = (QMember)v1_16;
-    slot_tbl_access[16] = QMetaData::Public;
-    slot_tbl[17].name = "toggle_view_parameters()";
-    slot_tbl[17].ptr = (QMember)v1_17;
-    slot_tbl_access[17] = QMetaData::Public;
-    slot_tbl[18].name = "toggle_view_empty()";
-    slot_tbl[18].ptr = (QMember)v1_18;
-    slot_tbl_access[18] = QMetaData::Public;
-    slot_tbl[19].name = "toggle_check_composite()";
-    slot_tbl[19].ptr = (QMember)v1_19;
-    slot_tbl_access[19] = QMetaData::Public;
-    slot_tbl[20].name = "select_view_filter(unsigned int)";
-    slot_tbl[20].ptr = (QMember)v1_20;
-    slot_tbl_access[20] = QMetaData::Public;
-    slot_tbl[21].name = "help_about()";
-    slot_tbl[21].ptr = (QMember)v1_21;
-    slot_tbl_access[21] = QMetaData::Public;
-    slot_tbl[22].name = "help_aboutQt()";
-    slot_tbl[22].ptr = (QMember)v1_22;
-    slot_tbl_access[22] = QMetaData::Public;
+    QMetaObject* parentObject = QMainWindow::staticMetaObject();
+    static const QUMethod slot_0 = {"menu_action", 0, 0 };
+    static const QUMethod slot_1 = {"file_new", 0, 0 };
+    static const QUMethod slot_2 = {"file_open", 0, 0 };
+    static const QUMethod slot_3 = {"file_save", 0, 0 };
+    static const QUMethod slot_4 = {"file_save_as", 0, 0 };
+    static const QUMethod slot_5 = {"edit_edit", 0, 0 };
+    static const QUMethod slot_6 = {"edit_raw", 0, 0 };
+    static const QUMethod slot_7 = {"edit_after", 0, 0 };
+    static const QUMethod slot_8 = {"edit_child", 0, 0 };
+    static const QUMethod slot_9 = {"edit_copy", 0, 0 };
+    static const QUMethod slot_10 = {"edit_inherit", 0, 0 };
+    static const QUMethod slot_11 = {"edit_delete", 0, 0 };
+    static const QUMethod slot_12 = {"view_selected", 0, 0 };
+    static const QUMethod slot_13 = {"view_check", 0, 0 };
+    static const QUMethod slot_14 = {"toggle_view_defaults", 0, 0 };
+    static const QUMethod slot_15 = {"view_dependencies", 0, 0 };
+    static const QUMethod slot_16 = {"toggle_view_logonly", 0, 0 };
+    static const QUMethod slot_17 = {"toggle_view_parameters", 0, 0 };
+    static const QUMethod slot_18 = {"toggle_view_empty", 0, 0 };
+    static const QUMethod slot_19 = {"toggle_check_composite", 0, 0 };
+    static const QUParameter param_slot_20[] = {
+	{ "i", &static_QUType_ptr, "unsigned int", QUParameter::In }
+    };
+    static const QUMethod slot_20 = {"select_view_filter", 1, param_slot_20 };
+    static const QUMethod slot_21 = {"help_about", 0, 0 };
+    static const QUMethod slot_22 = {"help_aboutQt", 0, 0 };
+    static const QMetaData slot_tbl[] = {
+	{ "menu_action()", &slot_0, QMetaData::Public },
+	{ "file_new()", &slot_1, QMetaData::Public },
+	{ "file_open()", &slot_2, QMetaData::Public },
+	{ "file_save()", &slot_3, QMetaData::Public },
+	{ "file_save_as()", &slot_4, QMetaData::Public },
+	{ "edit_edit()", &slot_5, QMetaData::Public },
+	{ "edit_raw()", &slot_6, QMetaData::Public },
+	{ "edit_after()", &slot_7, QMetaData::Public },
+	{ "edit_child()", &slot_8, QMetaData::Public },
+	{ "edit_copy()", &slot_9, QMetaData::Public },
+	{ "edit_inherit()", &slot_10, QMetaData::Public },
+	{ "edit_delete()", &slot_11, QMetaData::Public },
+	{ "view_selected()", &slot_12, QMetaData::Public },
+	{ "view_check()", &slot_13, QMetaData::Public },
+	{ "toggle_view_defaults()", &slot_14, QMetaData::Public },
+	{ "view_dependencies()", &slot_15, QMetaData::Public },
+	{ "toggle_view_logonly()", &slot_16, QMetaData::Public },
+	{ "toggle_view_parameters()", &slot_17, QMetaData::Public },
+	{ "toggle_view_empty()", &slot_18, QMetaData::Public },
+	{ "toggle_check_composite()", &slot_19, QMetaData::Public },
+	{ "select_view_filter(unsigned int)", &slot_20, QMetaData::Public },
+	{ "help_about()", &slot_21, QMetaData::Public },
+	{ "help_aboutQt()", &slot_22, QMetaData::Public }
+    };
     metaObj = QMetaObject::new_metaobject(
-	"MainWindow", "QMainWindow",
+	"MainWindow", parentObject,
 	slot_tbl, 23,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
@@ -188,11 +112,59 @@ QMetaObject* MainWindow::staticMetaObject()
 	0, 0,
 #endif // QT_NO_PROPERTIES
 	0, 0 );
-    metaObj->set_slot_access( slot_tbl_access );
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
+    cleanUp_MainWindow.setMetaObject( metaObj );
     return metaObj;
 }
+
+void* MainWindow::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "MainWindow" ) ) return (MainWindow*)this;
+    return QMainWindow::qt_cast( clname );
+}
+
+bool MainWindow::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: menu_action(); break;
+    case 1: file_new(); break;
+    case 2: file_open(); break;
+    case 3: file_save(); break;
+    case 4: file_save_as(); break;
+    case 5: edit_edit(); break;
+    case 6: edit_raw(); break;
+    case 7: edit_after(); break;
+    case 8: edit_child(); break;
+    case 9: edit_copy(); break;
+    case 10: edit_inherit(); break;
+    case 11: edit_delete(); break;
+    case 12: view_selected(); break;
+    case 13: view_check(); break;
+    case 14: toggle_view_defaults(); break;
+    case 15: view_dependencies(); break;
+    case 16: toggle_view_logonly(); break;
+    case 17: toggle_view_parameters(); break;
+    case 18: toggle_view_empty(); break;
+    case 19: toggle_check_composite(); break;
+    case 20: select_view_filter(*((unsigned int*)static_QUType_ptr.get(_o+1))); break;
+    case 21: help_about(); break;
+    case 22: help_aboutQt(); break;
+    default:
+	return QMainWindow::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool MainWindow::qt_emit( int _id, QUObject* _o )
+{
+    return QMainWindow::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool MainWindow::qt_property( int _id, int _f, QVariant* _v)
+{
+    return QMainWindow::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES
 
 
 const char *Filter::className() const
@@ -201,27 +173,25 @@ const char *Filter::className() const
 }
 
 QMetaObject *Filter::metaObj = 0;
-
-void Filter::initMetaObject()
-{
-    if ( metaObj )
-	return;
-    if ( qstrcmp(QObject::className(), "QObject") != 0 )
-	badSuperclassWarning("Filter","QObject");
-    (void) staticMetaObject();
-}
+static QMetaObjectCleanUp cleanUp_Filter;
 
 #ifndef QT_NO_TRANSLATION
-
-QString Filter::tr(const char* s)
+QString Filter::tr( const char *s, const char *c )
 {
-    return qApp->translate( "Filter", s, 0 );
+    if ( qApp )
+	return qApp->translate( "Filter", s, c, QApplication::DefaultCodec );
+    else
+	return QString::fromLatin1( s );
 }
-
-QString Filter::tr(const char* s, const char * c)
+#ifndef QT_NO_TRANSLATION_UTF8
+QString Filter::trUtf8( const char *s, const char *c )
 {
-    return qApp->translate( "Filter", s, c );
+    if ( qApp )
+	return qApp->translate( "Filter", s, c, QApplication::UnicodeUTF8 );
+    else
+	return QString::fromUtf8( s );
 }
+#endif // QT_NO_TRANSLATION_UTF8
 
 #endif // QT_NO_TRANSLATION
 
@@ -229,18 +199,13 @@ QMetaObject* Filter::staticMetaObject()
 {
     if ( metaObj )
 	return metaObj;
-    (void) QObject::staticMetaObject();
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
-    typedef void(Filter::*m1_t0)();
-    m1_t0 v1_0 = Q_AMPERSAND Filter::select_filter;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(1);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(1);
-    slot_tbl[0].name = "select_filter()";
-    slot_tbl[0].ptr = (QMember)v1_0;
-    slot_tbl_access[0] = QMetaData::Public;
+    QMetaObject* parentObject = QObject::staticMetaObject();
+    static const QUMethod slot_0 = {"select_filter", 0, 0 };
+    static const QMetaData slot_tbl[] = {
+	{ "select_filter()", &slot_0, QMetaData::Public }
+    };
     metaObj = QMetaObject::new_metaobject(
-	"Filter", "QObject",
+	"Filter", parentObject,
 	slot_tbl, 1,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
@@ -248,8 +213,34 @@ QMetaObject* Filter::staticMetaObject()
 	0, 0,
 #endif // QT_NO_PROPERTIES
 	0, 0 );
-    metaObj->set_slot_access( slot_tbl_access );
-#ifndef QT_NO_PROPERTIES
-#endif // QT_NO_PROPERTIES
+    cleanUp_Filter.setMetaObject( metaObj );
     return metaObj;
 }
+
+void* Filter::qt_cast( const char* clname )
+{
+    if ( !qstrcmp( clname, "Filter" ) ) return (Filter*)this;
+    return QObject::qt_cast( clname );
+}
+
+bool Filter::qt_invoke( int _id, QUObject* _o )
+{
+    switch ( _id - staticMetaObject()->slotOffset() ) {
+    case 0: select_filter(); break;
+    default:
+	return QObject::qt_invoke( _id, _o );
+    }
+    return TRUE;
+}
+
+bool Filter::qt_emit( int _id, QUObject* _o )
+{
+    return QObject::qt_emit(_id,_o);
+}
+#ifndef QT_NO_PROPERTIES
+
+bool Filter::qt_property( int _id, int _f, QVariant* _v)
+{
+    return QObject::qt_property( _id, _f, _v);
+}
+#endif // QT_NO_PROPERTIES

@@ -31,6 +31,7 @@
 #include "parser_file.h"
 #include "printer_file.h"
 #include "tmpstream.h"
+#include "treelog_stream.h"
 
 // Q Toolkit includes.
 #include <qapplication.h>
@@ -51,6 +52,8 @@ main (int argc, char** argv)
   MainWindow main_window;
   
   // Initialize it.
+  daisy_initialize ();
+
   switch (argc)
     {
     case 0:
@@ -65,6 +68,7 @@ main (int argc, char** argv)
       cerr << "Usage: " << argv[0] << " [ file ]\n";
       return 2;
     }
+
   // View it.
   app.setMainWidget (&main_window);
   main_window.show ();
@@ -244,7 +248,8 @@ MainWindow::open_file (QString name)
   // Load new content.
   Busy busy (this, "Parsing file...");
   TmpStream errors;
-  ParserFile parser (daisy_syntax, name.latin1 (), errors ());
+  TreelogStream err (errors ());
+  ParserFile parser (daisy_syntax, name.latin1 (), err);
   parser.load (daisy_alist);
   NotBusy notbusy;
   if (parser.error_count ())

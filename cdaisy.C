@@ -35,6 +35,7 @@
 #include "horizon.h"
 #include "printer_file.h"
 #include "version.h"
+#include "options.h"
 #include "chemical.h"
 #include "log_extern.h"
 #include "treelog_stream.h"
@@ -954,6 +955,8 @@ daisy_load (Syntax* syntax, AttributeList* alist)
 extern "C" void EXPORT
 daisy_initialize ()
 {
+  Options::initialize_path ();
+
 #ifdef __unix
   // We should do the appropriate magic on Unix.
 #else

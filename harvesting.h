@@ -81,7 +81,11 @@ public:
 			     const double leaf_harvest_frac,
 			     const double sorg_harvest_frac,
 			     const bool kill_off,
-			     vector<AM*>& residuals);
+			     vector<AM*>& residuals,
+			     double& residuals_DM,
+			     double& residuals_N_top, double& residuals_C_top,
+			     vector<double>& residuals_N_soil,
+			     vector<double>& residuals_C_soil);
   void tick (const Time& time);
   void output (Log& log) const;
 

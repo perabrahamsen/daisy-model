@@ -70,9 +70,19 @@ public:
   virtual void tick (const Time&, const Bioclimate&, const Soil&,
 		     OrganicMatter&, const SoilHeat&, const SoilWater&,
 		     // Allow plants to grow (hourly).
-		     SoilNH4&, SoilNO3&, Treelog&) = 0;
+		     SoilNH4&, SoilNO3&, 
+		     double& residuals_DM,
+		     double& residuals_N_top, double& residuals_C_top,
+		     vector<double>& residuals_N_soil,
+		     vector<double>& residuals_C_soil,
+		     Treelog&) = 0;
   virtual void tick (const Time&, const Bioclimate&, const Soil&,
-		     const SoilHeat&, const SoilWater&, Treelog&) = 0;
+		     const SoilHeat&, const SoilWater&, 
+		     double& residuals_DM,
+		     double& residuals_N_top, double& residuals_C_top,
+		     vector<double>& residuals_N_soil,
+		     vector<double>& residuals_C_soil,
+		     Treelog&) = 0;
   virtual double transpiration (// Actual trans. [mm/h]
 				double potential_transpiration,	
 				double canopy_evaporation,
@@ -80,7 +90,12 @@ public:
 				Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
   virtual void kill_all (const string&, const Time&, const Geometry&,
-			 Bioclimate&, vector<AM*>& residuals, Treelog&) = 0;
+			 Bioclimate&, vector<AM*>& residuals, 
+			 double& residuals_DM,
+			 double& residuals_N_top, double& residuals_C_top,
+			 vector<double>& residuals_N_soil,
+			 vector<double>& residuals_C_soil,
+			 Treelog&) = 0;
   virtual void harvest (const string& column_name,
 			const string& crop_name,
 			const Time&, const Geometry&, 
@@ -93,6 +108,10 @@ public:
 			vector<AM*>& residuals,
 			double& harvest_DM, 
 			double& harvest_N, double& harvest_C,
+			double& residuals_DM,
+			double& residuals_N_top, double& residuals_C_top,
+			vector<double>& residuals_N_soil,
+			vector<double>& residuals_C_soil,
 			Treelog&) = 0;
   virtual double sow (Treelog& msg, 
 		      const AttributeList& al, // Return kg N/ha in seed.
@@ -100,7 +119,7 @@ public:
   virtual void sow (Treelog& msg, const AttributeList& al,
 		    const Geometry&) = 0;
   virtual void output (Log&) const;
-
+  
   // Create and Destroy.
 public:
   virtual void initialize (Treelog&, const Soil& soil, OrganicMatter&) = 0;

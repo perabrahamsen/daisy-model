@@ -23,6 +23,7 @@
 #include "crpn.h"
 #include "partition.h"
 #include "organic_matter.h"
+#include "geometry.h"
 #include "am.h"
 #include "log.h"
 #include "time.h"
@@ -113,6 +114,10 @@ Production::tick (const double AirT, const double SoilT,
 		  const double DS, const double CAImRat,
 		  const CrpN& nitrogen,
 		  const Partition& partition,
+		  double& residuals_DM,
+		  double& residuals_N_top, double& residuals_C_top,
+		  vector<double>& residuals_N_soil,
+		  vector<double>& residuals_C_soil,
 		  Treelog& msg)
 {
   const double LeafGrowthRespCoef = GrowthRespCoef (E_Leaf);
@@ -290,8 +295,8 @@ Production::tick (const double AirT, const double SoilT,
   NDead += (1.0 - ExfoliationFac) * DeadNLeaf;
   assert (NDead >= 0.0);
 
-  const double C_foli = DM_to_C_factor (E_Leaf) *
-                        ExfoliationFac * DeadWLeaf;
+  const double W_foli = ExfoliationFac * DeadWLeaf;
+  const double C_foli = DM_to_C_factor (E_Leaf) * W_foli;
   C_Loss = C_foli;
   const double N_foli = ExfoliationFac * DeadNLeaf;
   assert (N_foli >= 0.0);
@@ -301,6 +306,9 @@ Production::tick (const double AirT, const double SoilT,
     {
       assert (N_foli > 0.0);
       AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
+      residuals_DM += W_foli;
+      residuals_N_top += N_foli;
+      residuals_C_top += C_foli;
       C_AM += C_foli;
       N_AM += N_foli;
     }
@@ -325,6 +333,9 @@ Production::tick (const double AirT, const double SoilT,
 		DeadNRoot * m2_per_cm2,
 		Density);
   assert (C_Root == 0.0 || DeadNRoot > 0.0);
+  residuals_DM += DeadWRoot;
+  geometry.add (residuals_C_soil, Density, C_Root * m2_per_cm2);
+  geometry.add (residuals_N_soil, Density, DeadNRoot * m2_per_cm2);
   C_AM += C_Root;
   N_AM += DeadNRoot;
 

@@ -78,23 +78,36 @@ struct VegetationPermanent : public Vegetation
 	     const SoilWater& soil_water,
 	     SoilNH4& soil_NH4,
 	     SoilNO3& soil_NO3,
+	     double& residuals_DM,
+	     double& residuals_N_top, double& residuals_C_top,
+	     vector<double>& residuals_N_soil,
+	     vector<double>& residuals_C_soil,
 	     Treelog&);
   void tick (const Time& time,
 	     const Bioclimate& bioclimate,
 	     const Soil& soil,
 	     const SoilHeat& soil_heat,
-	     const SoilWater& soil_water, Treelog&);
+	     const SoilWater& soil_water, 
+	     double& residuals_DM,
+	     double& residuals_N_top, double& residuals_C_top,
+	     vector<double>& residuals_N_soil,
+	     vector<double>& residuals_C_soil,
+	     Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water, Treelog&);
   void kill_all (const string&, const Time&, const Geometry&, Bioclimate&,
-		 vector<AM*>&, Treelog&)
+		 vector<AM*>&, double&, double&, double&, 
+		 vector<double>&, vector<double>&, Treelog&)
   { }
   void harvest (const string&, const string&,
 		const Time&, const Geometry&, Bioclimate&,
 		double, double, double, double, 
 		vector<const Harvest*>&,
- 		vector<AM*>&, double&, double&, double&, Treelog&)
+ 		vector<AM*>&, 
+		double&, double&, double&,
+		double&, double&, double&, vector<double>&, vector<double>&,
+		Treelog&)
   { }
   double sow (Treelog&, const AttributeList&, const Geometry&, OrganicMatter&)
   { throw "Can't sow on permanent vegetation"; }
@@ -117,6 +130,10 @@ VegetationPermanent::tick (const Time& time,
 			   const SoilWater& soil_water,
 			   SoilNH4& soil_NH4,
 			   SoilNO3& soil_NO3,
+			   double& residuals_DM,
+			   double& residuals_N_top, double& residuals_C_top,
+			   vector<double>& /* residuals_N_soil */,
+			   vector<double>& /* residuals_C_soil */,
 			   Treelog&)
 {
   // Canopy.
@@ -145,12 +162,16 @@ VegetationPermanent::tick (const Time& time,
       static const double m2_per_cm2 = 1.0e-4;
       
       const double dLAI = old_LAI - canopy.CAI;
-      const double C = dLAI * DM_per_LAI * C_per_DM * ha_per_cm2;
+      const double DM = dLAI * DM_per_LAI * ha_per_cm2 / m2_per_cm2;
+      const double C = DM * C_per_DM;
       N_litter = N_actual * (dLAI / old_LAI);
       if (!litter)
 	litter = &AM::create (soil, time, litter_am,
 			      "vegetation", "dead", AM::Locked);
-      litter->add (C, N_litter * m2_per_cm2);
+      litter->add (C * m2_per_cm2, N_litter * m2_per_cm2);
+      residuals_DM += DM;
+      residuals_N_top += N_litter;
+      residuals_C_top += C;
     }
   else 
     N_litter = 0.0;
@@ -164,14 +185,34 @@ VegetationPermanent::tick (const Time& time,
 			   const Soil&,
 			   const SoilHeat&,
 			   const SoilWater&,
+			   double& residuals_DM,
+			   double& /*residuals_N_top */,
+			   double& residuals_C_top,
+			   vector<double>& /* residuals_N_soil */,
+			   vector<double>& /* residuals_C_soil */,
 			   Treelog&)
 {
+  const double old_LAI = canopy.CAI;
   canopy.CAI = LAIvsDAY (time.yday ());
   cover_ =  1.0 - exp (-(canopy.EPext * canopy.CAI));
   canopy.LAIvsH.clear ();
   canopy.LAIvsH.add (0.0, 0.0);
   canopy.LAIvsH.add (canopy.Height, canopy.CAI);
   HvsLAI_ = canopy.LAIvsH.inverse ();
+
+  if (canopy.CAI < old_LAI)
+    {
+      // Litter.
+      static const double C_per_DM = 0.420;
+      static const double ha_per_cm2 = 1.0e-8;
+      static const double m2_per_cm2 = 1.0e-4;
+      
+      const double dLAI = old_LAI - canopy.CAI;
+      const double DM = dLAI * DM_per_LAI * ha_per_cm2 / m2_per_cm2;
+      const double C = DM * C_per_DM;
+      residuals_DM += DM;
+      residuals_C_top += C;
+    }
 }
   
 double

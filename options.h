@@ -32,8 +32,8 @@ class Treelog;
 class Options
 {
   static string get_arg (int& argc, char**& argv);
-  static void initialize_path ();
 public: 
+  static void initialize_path ();
   static const char *const log_name;
   const string program_name;
   void usage (Treelog&) const;

@@ -1,4 +1,4 @@
- // vegetation_crops.C
+// vegetation_crops.C
 
 #include "vegetation.h"
 #include "crop.h"
@@ -79,26 +79,44 @@ struct VegetationCrops : public Vegetation
 	     OrganicMatter& organic_matter,
 	     const SoilHeat& soil_heat,
 	     const SoilWater& soil_water,
-	     SoilNH4& soil_NH4,
-	     SoilNO3& soil_NO3, Treelog&);
+	     SoilNH4& soil_NH4, SoilNO3& soil_NO3, 
+	     double& residuals_DM,
+	     double& residuals_N_top, double& residuals_C_top,
+	     vector<double>& residuals_N_soil,
+	     vector<double>& residuals_C_soil,
+	     Treelog&);
   void tick (const Time& time,
 	     const Bioclimate& bioclimate,
 	     const Soil& soil,
 	     const SoilHeat& soil_heat,
-	     const SoilWater& soil_water, Treelog&);
+	     const SoilWater& soil_water, 
+	     double& residuals_DM,
+	     double& residuals_N_top, double& residuals_C_top,
+	     vector<double>& residuals_N_soil,
+	     vector<double>& residuals_C_soil,
+	     Treelog&);
   void reset_canopy_structure (Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water, Treelog&);
   void force_production_stress  (double pstress);
   void kill_all (const string&, const Time&, const Geometry&, 
-		 Bioclimate&, vector<AM*>& residuals, Treelog&);
+		 Bioclimate&, vector<AM*>& residuals, 			 
+		 double& residuals_DM,
+		 double& residuals_N_top, double& residuals_C_top,
+		 vector<double>& residuals_N_soil,
+		 vector<double>& residuals_C_soil,
+		 Treelog&);
   void harvest (const string& column_name, const string& crop_name,
 		const Time&, const Geometry&, Bioclimate&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
 		vector<const Harvest*>& harvest, vector<AM*>& residuals,
 		double& harvest_DM, double& harvest_N, double& harvest_C, 
+		double& residuals_DM,
+		double& residuals_N_top, double& residuals_C_top,
+		vector<double>& residuals_N_soil,
+		vector<double>& residuals_C_soil,
 		Treelog&);
   double sow (Treelog& msg, 
 	      const AttributeList& al, const Geometry&, OrganicMatter&);
@@ -164,6 +182,10 @@ VegetationCrops::tick (const Time& time,
 		       const SoilWater& soil_water,
 		       SoilNH4& soil_NH4,
 		       SoilNO3& soil_NO3,
+		       double& residuals_DM,
+		       double& residuals_N_top, double& residuals_C_top,
+		       vector<double>& residuals_N_soil,
+		       vector<double>& residuals_C_soil,
 		       Treelog& msg)
 {
   // Uptake and convertion of matter.
@@ -172,7 +194,9 @@ VegetationCrops::tick (const Time& time,
        crop++)
     {
       (*crop)->tick (time, bioclimate, soil, &organic_matter, 
-		     soil_heat, soil_water, &soil_NH4, &soil_NO3, msg);
+		     soil_heat, soil_water, &soil_NH4, &soil_NO3, 
+		     residuals_DM, residuals_N_top, residuals_C_top,
+		     residuals_N_soil, residuals_C_soil, msg);
     }
 
   // Make sure the crop which took first this time will be last next.
@@ -191,7 +215,12 @@ VegetationCrops::tick (const Time& time,
 		       const Bioclimate& bioclimate,
 		       const Soil& soil,
 		       const SoilHeat& soil_heat,
-		       const SoilWater& soil_water, Treelog& msg)
+		       const SoilWater& soil_water,
+		       double& residuals_DM,
+		       double& residuals_N_top, double& residuals_C_top,
+		       vector<double>& residuals_N_soil,
+		       vector<double>& residuals_C_soil,
+		       Treelog& msg)
 {
   // Uptake and convertion of matter.
   for (CropList::iterator crop = crops.begin(); 
@@ -199,7 +228,9 @@ VegetationCrops::tick (const Time& time,
        crop++)
     {
       (*crop)->tick (time, bioclimate, soil, NULL, 
-		     soil_heat, soil_water, NULL, NULL, msg);
+		     soil_heat, soil_water, NULL, NULL, 
+		     residuals_DM, residuals_N_top, residuals_C_top,
+		     residuals_N_soil, residuals_C_soil, msg);
     }
 
   // Make sure the crop which took first this time will be last next.
@@ -336,13 +367,19 @@ void
 VegetationCrops::kill_all (const string& name, const Time& time, 
 			   const Geometry& geometry, 
 			   Bioclimate& bioclimate, vector<AM*>& residuals,
+			   double& residuals_DM,
+			   double& residuals_N_top, double& residuals_C_top,
+			   vector<double>& residuals_N_soil,
+			   vector<double>& residuals_C_soil,
 			   Treelog& msg)
 {
   for (CropList::iterator crop = crops.begin(); 
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->kill (name, time, geometry, bioclimate, residuals, msg);
+      (*crop)->kill (name, time, geometry, bioclimate, residuals, 
+		     residuals_DM, residuals_N_top, residuals_C_top,
+		     residuals_N_soil, residuals_C_soil, msg);
       delete *crop;
     }
   crops.erase (crops.begin (), crops.end ());
@@ -362,7 +399,12 @@ VegetationCrops::harvest (const string& column_name,
 			  vector<const Harvest*>& harvest,
 			  vector<AM*>& residuals,
 			  double& harvest_DM, 
-			  double& harvest_N, double& harvest_C, Treelog& msg)
+			  double& harvest_N, double& harvest_C,
+			  double& residuals_DM, 
+			  double& residuals_N_top, double& residuals_C_top,
+			  vector<double>& residuals_N_soil,
+			  vector<double>& residuals_C_soil,
+			  Treelog& msg)
 {
   const bool all = (crop_name == "all");
 
@@ -378,7 +420,9 @@ VegetationCrops::harvest (const string& column_name,
 			    bioclimate,
 			    stub_length, stem_harvest,
 			    leaf_harvest, sorg_harvest, 
-			    false, residuals, msg);
+			    false, residuals, 
+			    residuals_DM, residuals_N_top, residuals_C_top,
+			    residuals_N_soil, residuals_C_soil, msg);
 
 	harvest_DM += mine.total_DM ();
 	harvest_N += mine.total_N ();

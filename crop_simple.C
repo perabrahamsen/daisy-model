@@ -116,15 +116,21 @@ public:
 public:
   void tick (const Time& time, const Bioclimate&, const Soil&,
 	     OrganicMatter*,
-	     const SoilHeat&,
-	     const SoilWater&,
-	     SoilNH4*, SoilNO3*, Treelog&);
+	     const SoilHeat&, const SoilWater&, SoilNH4*, SoilNO3*, 
+	     double&, double&, double&, vector<double>&, vector<double>&,
+	     Treelog&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&, 
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
-			  bool kill_off, vector<AM*>& residuals, Treelog&);
+			  bool kill_off, vector<AM*>& residuals,
+			  double& residuals_DM,
+			  double& residuals_N_top,
+			  double& residuals_C_top,
+			  vector<double>& residuals_N_soil,
+			  vector<double>& residuals_C_soil,
+			  Treelog&);
   void output (Log&) const;
 
   double DS () const;
@@ -167,8 +173,9 @@ CropSimple::tick (const Time& time,
 		  OrganicMatter* /* organic_matter */,
 		  const SoilHeat& soil_heat,
 		  const SoilWater& soil_water,
-		  SoilNH4* soil_NH4,
-		  SoilNO3* soil_NO3, Treelog& msg)
+		  SoilNH4* soil_NH4, SoilNO3* soil_NO3, 
+		  double&, double&, double&, vector<double>&, vector<double>&,
+		  Treelog& msg)
 {
   // Growth
   if (time.month () == spring_mm
@@ -258,7 +265,13 @@ CropSimple::harvest (const string& column_name,
 		     double /* leaf_harvest */,
 		     double /* sorg_harvest */,
 		     bool /* kill_off */,
-		     vector<AM*>& residuals, Treelog&)
+		     vector<AM*>& residuals,
+		     double& residuals_DM,
+		     double& /* residuals_N_top */,
+		     double& /* residuals_C_top */,
+		     vector<double>& residuals_N_soil,
+		     vector<double>& residuals_C_soil,
+		     Treelog&)
 {
   dead = true;
 
@@ -275,6 +288,11 @@ CropSimple::harvest (const string& column_name,
 	      this_far * NRoot * m2_per_cm2,
 	      root_system.Density);
       residuals.push_back (&am);
+      residuals_DM += this_far * WRoot;
+      geometry.add (residuals_N_soil, root_system.Density,
+		    this_far * NRoot * m2_per_cm2);
+      geometry.add (residuals_C_soil, root_system.Density, 
+		    this_far * WRoot * 0.420 * m2_per_cm2);
     }
 
   // Yield.

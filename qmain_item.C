@@ -34,6 +34,7 @@
 
 #include <qmessagebox.h>
 #include <qinputdialog.h>
+#include <qstringlist.h>
 
 MainWindow* 
 TreeItem::main () const
@@ -282,7 +283,8 @@ AListItem::view_check ()
 { 
   QString title = QString ("QDaisy: Check ") + entry;
   TmpStream errors;
-  const bool ok = syntax.check (alist, errors (), entry.latin1 ());
+  TreelogStream err (errors ());
+  const bool ok = syntax.check (alist, err);
   if (strlen (errors.str ()) > 0)
     QMessageBox::information (main (), title, errors.str ());
   else if (ok)
@@ -366,7 +368,7 @@ AListItem::AListItem (const Syntax& syn, AttributeList& al,
 		      const AttributeList& def_al,
 		      TreeItem* i,
 		      const QString& e, const QString& t, const QString& v,
-		      const QString& c, int o = 0)
+		      const QString& c, int o)
   : TreeItem (i, e, t, v, c, o),
     syntax (syn),
     alist (al),
@@ -434,6 +436,7 @@ ModelItem::edit_copy ()
   bool ok;
   QString name = QInputDialog::getText ("QDaisy: Inherit model", 
 					"Name of new parameterization",
+					QLineEdit::Normal,
 					entry, &ok, main ());
   if (!ok || name.isEmpty ())
     return false;
@@ -478,6 +481,7 @@ ModelItem::edit_inherit ()
   bool ok;
   QString name = QInputDialog::getText ("QDaisy: Inherit model", 
 					"Name of new parameterization",
+					QLineEdit::Normal,
 					entry, &ok, main ());
   if (!ok || name.isEmpty ())
     return false;
