@@ -396,7 +396,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = message.h
+REMOVE = mmain.C
 
 # These are the file extensions we deal with.
 # 
