@@ -1,8 +1,6 @@
 // log_select.C
 
 #include "log_select.h"
-#include "select.h"
-#include "condition.h"
 
 bool 
 LogSelect::check (const string& name) const

@@ -4,6 +4,8 @@
 #define LOG_SELECT_H
 
 #include "log.h"
+#include "select.h"		// Need to be here to ensure proper
+#include "condition.h"		// initialization in derived classes.
 
 struct Select;
 struct Condition;
