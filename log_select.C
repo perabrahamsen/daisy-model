@@ -186,7 +186,7 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 
   if ((al.size ("set") % 2) == 1)
     {
-      err.entry ("`set' should contain an even number of arguments");
+      err.entry ("'set' should contain an even number of arguments");
       ok = false;
     }
 
@@ -215,9 +215,9 @@ value to replace it with.  And so forth.");
   const vector<string> empty_string_vector;
   alist.add ("set", empty_string_vector);
   syntax.add ("from", "cm", Syntax::Const,
-	      "Default `from' value for all entries.");
+	      "Default 'from' value for all entries.");
   alist.add ("from", 0.0);
   syntax.add ("to", "cm", Syntax::Const,
-	      "Default `to' value for all entries.");
+	      "Default 'to' value for all entries.");
   alist.add ("to", 1.0);
 }

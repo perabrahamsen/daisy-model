@@ -6,7 +6,7 @@
 Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content = NULL;
 
 const char *const Bioclimate::description = "\
-The `bioclimate' component is responsible for distributing the water\n\
+The 'bioclimate' component is responsible for distributing the water\n\
 and energy provided by the weather component among the crops and soil\n\
 for a given column.";
 

@@ -7,8 +7,8 @@
 #include "treelog.h"
 #include <vector>
 
-struct AttributeList;
-struct Library;
+class AttributeList;
+class Library;
 
 class Syntax
 { 
@@ -18,8 +18,8 @@ class Syntax
 public:
   // A syntax entry has an associated size.  If the size is a positive
   // integer, the syntax entry specifies an array of that size.  The
-  // default size `Singleton' indicating that the syntax entry match a
-  // single item of the specified type, while the `Sequence' used for
+  // default size 'Singleton' indicating that the syntax entry match a
+  // single item of the specified type, while the 'Sequence' used for
   // entries that contain an array of unspecified length. 
   static const int Singleton;	
   static const int Sequence;

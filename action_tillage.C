@@ -103,8 +103,8 @@ static struct ActionSwapSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Swap two soil layers.  The top layer start at the surface and goes down to\n\
-`middle', and the second layer starts with `middle' and goes down to\n\
- `depth'.  After the operation, the content (such as heat, water, and\n\
+'middle', and the second layer starts with 'middle' and goes down to\n\
+ 'depth'.  After the operation, the content (such as heat, water, and\n\
 organic matter) will be averaged in each layer, and the bottom layer will\n\
 be placed on top of what used to be the top layer.");
       syntax.add ("middle", "cm", Syntax::Const, "\

@@ -68,7 +68,7 @@ static struct AdsorptionLangmuirSyntax
       
       if (!has_my_max_clay && !has_my_max_OC)
 	{
-	  err.entry ("You must specify either `my_max_clay' or `my_max_OC'");
+	  err.entry ("You must specify either 'my_max_clay' or 'my_max_OC'");
 	  ok = false;
 	}
       if (has_my_max_clay)
@@ -90,11 +90,11 @@ static struct AdsorptionLangmuirSyntax
     syntax.add ("my_max_clay", "g/cm^3", Syntax::OptionalConst,
 		"Max adsorption capacity (clay).\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
-`my_max'.  If `my_max_OC' is specified, `my_max_clay' defaults to 0.");
+'my_max'.  If 'my_max_OC' is specified, 'my_max_clay' defaults to 0.");
     syntax.add ("my_max_OC", "g/cm^3", Syntax::OptionalConst,
 		"Max adsorption capacity (humus).\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
-carbon part of `my_max'.  By default, `my_max_OC' is equal to `my_max_clay'.");
+carbon part of 'my_max'.  By default, 'my_max_OC' is equal to 'my_max_clay'.");
     Librarian<Adsorption>::add_type ("Langmuir", alist, syntax, &make);
   }
 } AdsorptionLangmuir_syntax;

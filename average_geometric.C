@@ -24,7 +24,7 @@ static struct AverageGeometricSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Geometric average `sqrt(a*b)'.");
+      alist.add ("description", "Geometric average 'sqrt(a*b)'.");
       Librarian<Average>::add_type ("geometric", alist, syntax, &make);
     }
 } AverageGeometric_syntax;

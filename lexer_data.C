@@ -37,7 +37,7 @@ LexerData::get_number ()
   const double value = strtod (c_str, (char**) &endptr);
   
   if (*endptr != '\0')
-    error (string ("Junk at end of number `") + endptr + "'");
+    error (string ("Junk at end of number '") + endptr + "'");
 
   return value;
 }
@@ -89,7 +89,7 @@ LexerData::skip (const char* str)
   for (const char* p = str; *p; p++)
     if (*p != peek ())
       {
-	error (string("Expected `") + str + "'");
+	error (string("Expected '") + str + "'");
 	break;
       }
     else

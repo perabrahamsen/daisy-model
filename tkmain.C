@@ -6,7 +6,7 @@
 #include "library.h"
 
 extern "C" {
-#define Time DAISY_X_Time	// Hack around X definition of `Time'.
+#define Time DAISY_X_Time	// Hack around X definition of 'Time'.
 #include <tix.h>
 #undef Time
 
@@ -314,7 +314,7 @@ tkdaisy_cmd (ClientData cd, Tcl_Interp* interp, int argc, char** argv)
   if (argc == 3)
     entry.traverse (argv[2]);
 
-  // Handle the `type' subcommand.
+  // Handle the 'type' subcommand.
   if (strcmp (argv[1], "type") == 0)
     {
       Tcl_AppendResult (interp, 
@@ -330,7 +330,7 @@ tkdaisy_cmd (ClientData cd, Tcl_Interp* interp, int argc, char** argv)
       return TCL_ERROR;
     }
 
-  // Handle the `size' subcommand.
+  // Handle the 'size' subcommand.
   if (strcmp (argv[1], "size") == 0)
     {
       const int size = entry.size ();
@@ -345,14 +345,14 @@ tkdaisy_cmd (ClientData cd, Tcl_Interp* interp, int argc, char** argv)
       return TCL_OK;
     }
 
-  // Handle the `value' subcommand.
+  // Handle the 'value' subcommand.
   if (strcmp (argv[1], "value") == 0)
     {
       Tcl_SetResult (interp, (char*) entry.value ().c_str (), TCL_VOLATILE);
       return TCL_OK;
     }
     
-  // Handle the `list' subcommand.
+  // Handle the 'list' subcommand.
   if (strcmp (argv[1], "list") == 0)
     {
       vector<string> list;
@@ -366,7 +366,7 @@ tkdaisy_cmd (ClientData cd, Tcl_Interp* interp, int argc, char** argv)
     }
 
   // No command found.
-  Tcl_AppendResult (interp, "unkown arg `", argv[1], "'", (char*) NULL);
+  Tcl_AppendResult (interp, "unkown arg '", argv[1], "'", (char*) NULL);
   return TCL_ERROR;
 }
 
@@ -385,7 +385,7 @@ Tcl_AppInit (Tcl_Interp *interp)
   // Create the global state.
   TkDaisyState* state = new TkDaisyState ();
 
-  // The `daisy' command.
+  // The 'daisy' command.
   Tcl_CreateCommand (interp, "daisy", &tkdaisy_cmd, 
 		     (ClientData) state, (Tcl_CmdDeleteProc *) NULL);
 

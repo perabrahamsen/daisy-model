@@ -250,7 +250,7 @@ LogTable::LogTable (const AttributeList& al)
     {
       out << "dlf-0.0 -- " << name;
       if (al.check ("parsed_from_file"))
-	out << " (defined in `" << al.name ("parsed_from_file") << "').";
+	out << " (defined in '" << al.name ("parsed_from_file") << "').";
       out << "\n";
       out << "\n";
       out << "VERSION: " << version  << "\n";
@@ -282,7 +282,7 @@ LogTable::LogTable (const AttributeList& al)
 LogTable::~LogTable ()
 {
   if (!out.good ())
-    CERR << "Problems writing to `" << file << "'\n";
+    CERR << "Problems writing to '" << file << "'\n";
 }
 
 static struct LogTableSyntax

@@ -150,9 +150,9 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Transportation in macropores (positive up).");
   Geometry::add_layer (syntax, "soil_ppm", "ppm", "Concentration in water.\n\
-Only for initialization of the `M' parameter.");
+Only for initialization of the 'M' parameter.");
   Geometry::add_layer (syntax, "solute_ppm", "ppm", "Mass in water and soil.\n\
-Only used for initialization of the `C' parameter.");
+Only used for initialization of the 'C' parameter.");
 }
 
 Solute::Solute (const AttributeList& al)

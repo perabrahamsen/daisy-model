@@ -61,7 +61,7 @@ ActionFertilize::Precision::check_alist (const AttributeList& al, Treelog& err)
     }
   if (from < to)
     {
-      err.entry ("`from' must be higher than `to' in"
+      err.entry ("'from' must be higher than 'to' in"
 		 " the measurement area");
       ok = false;
     }
@@ -197,7 +197,7 @@ static struct ActionFertilizeSyntax
       }
     if (from < to)
       {
-	err.entry ("`from' must be higher than `to' in"
+	err.entry ("'from' must be higher than 'to' in"
 		   " the fertilization area");
 	ok = false;
       }
@@ -211,14 +211,14 @@ static struct ActionFertilizeSyntax
 
     if (second_year_compensation && precision)
       {
-	err.entry ("You cannot use `second_year_compensation' "
-		   "with `precision'");
+	err.entry ("You cannot use 'second_year_compensation' "
+		   "with 'precision'");
 	ok = false;
       }
     if (fertilizer_weight + equivalent_weight + precision != 1)
       {
-	err.entry ("You must specify exactly one of `weight', "
-		   "`equivalent_weight' and `precision'");
+	err.entry ("You must specify exactly one of 'weight', "
+		   "'equivalent_weight' and 'precision'");
 	ok = false;
       }
 
@@ -229,14 +229,14 @@ static struct ActionFertilizeSyntax
 	  {
 	    if (!am.check ("first_year_utilization"))
 	      {
-		err.entry ("You must specify `first_year_utilization' for "
+		err.entry ("You must specify 'first_year_utilization' for "
 			   "the organic fertilizer");
 		ok = false;
 	      }
 	    if (!am.check ("weight") || !am.check ("total_N_fraction"))
 	      {
 		TmpStream tmp;
-		tmp () << "You cannot use `equivalent_weight' with "
+		tmp () << "You cannot use 'equivalent_weight' with "
 		       << syntax << " fertilizer";
 		err.entry (tmp.str ());
 	      }
@@ -253,7 +253,7 @@ static struct ActionFertilizeSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Apply fertilizer to the soil.\n\
 If you want to incorporate the fertilizer directly in the soil, specify\n\
-the `from' and `to' parameters.  By default, the fertilizer will be\n\
+the 'from' and 'to' parameters.  By default, the fertilizer will be\n\
 left on the surface.");
     syntax.add ("am", Librarian<AM>::library (), "\
 The fertilizer you want to apply.");
@@ -268,19 +268,19 @@ Height where you want to end the incorporation (a negative number).");
 When fertilizing with organic matter, you may let Daisy calculate the\n\
 amount of dry matter that corresponds to the specified amount of\n\
 nitrogen.  This requires that the fertilizer has specified the\n\
-`first_year_utilization' parameter, but not the `weight' parameter.");
+'first_year_utilization' parameter, but not the 'weight' parameter.");
     syntax.add ("minimum_weight", "kg N/ha", Syntax::Const,
 		"Minimum amount of nitrogen to fertilize with.");
     alist.add ("minimum_weight", 0.0);
     syntax.add_submodule ("precision", alist, 
 			  Syntax::OptionalConst, Syntax::Singleton, "\
 Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
-The amount of fertilizer will be the specified `target', minus the amount\n\
-already present in the soil zone between `from' and `to'.",
+The amount of fertilizer will be the specified 'target', minus the amount\n\
+already present in the soil zone between 'from' and 'to'.",
 			  &ActionFertilize::Precision::load_syntax);
     syntax.add ("second_year_compensation", Syntax::Boolean, Syntax::Const, "\
 Compensate for the second year effect of previous fertilizations.\n\
-The second year effect is solely governed by the `second_year_utilization'\n\
+The second year effect is solely governed by the 'second_year_utilization'\n\
 organic fertilizer parameter.  The second year effect does not fade with\n\
 time, but is zeroed once you fertilize with this flag set.");
     alist.add ("second_year_compensation", false);

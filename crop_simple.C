@@ -351,12 +351,12 @@ static struct CropSimpleSyntax
     bool ok = true;
     if (!al.check ("LAIvsTS") && !al.check ("LAIvsDay"))
       {
-	err.entry ("Must specify either `LAIvsTS' or `LAIvsDay'");
+	err.entry ("Must specify either 'LAIvsTS' or 'LAIvsDay'");
 	ok = false;
       }
     else if (al.check ("LAIvsTS") && al.check ("LAIvsDay"))
       {
-	err.entry ("Cannot specify both `LAIvsTS' or `LAIvsDay'");
+	err.entry ("Cannot specify both 'LAIvsTS' or 'LAIvsDay'");
 	ok = false;
       }
     else
@@ -371,7 +371,7 @@ static struct CropSimpleSyntax
 	  }
 	catch (...)
 	  {
-	    err.entry (string ("`")
+	    err.entry (string ("'")
 		       + (al.check ("LAIvsTS") ? "LAIvsTS" : "LAIvsDay")
 		       + "' has bogus value");
 	    ok = false;
@@ -406,7 +406,7 @@ static struct CropSimpleSyntax
     syntax.add ("LAIvsDay", "m^2/m^2", "d", Syntax::OptionalConst, 
 		"LAI as a function of number of days since sowing.");
     syntax.add ("forced_LAI", "m^2/m^2", Syntax::State, "\
-Minimum LAI, automatically cleared when exceeded by `LAIvsTS'.");
+Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     alist.add ("forced_LAI", 0.0);
     add_submodule<CanopySimple>("Canopy", syntax, alist,
 				Syntax::State, "Canopy.");
@@ -420,13 +420,13 @@ Minimum LAI, automatically cleared when exceeded by `LAIvsTS'.");
 		"Number of days since sowing (or spring).");
     alist.add ("day", 0.0);
     syntax.add ("spring", Syntax::Integer, Syntax::Const, 2,
-		"Zero `T_sum' at this month and day.");
+		"Zero 'T_sum' at this month and day.");
     vector<int> spring_time;
     spring_time.push_back (3);
     spring_time.push_back (1);
     alist.add ("spring", spring_time);
     syntax.add ("spring_LAI", "m^2/m^2", Syntax::Const, 
-		"Set `forced_LAI' to this after spring clearence of `T_sum'.");
+		"Set 'forced_LAI' to this after spring clearence of 'T_sum'.");
     alist.add ("spring_LAI", 0.1);
     add_submodule<RootSystem>("Root", syntax, alist,
 			      Syntax::State, "Root system.");

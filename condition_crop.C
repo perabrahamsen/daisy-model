@@ -59,7 +59,7 @@ static struct ConditionCropSyntax
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
-True iff the crop has reached development stage `ds'.");
+True iff the crop has reached development stage 'ds'.");
 	syntax.add ("crop", Syntax::String, Syntax::Const,
 		    "Name of crop on the field to test.");
 	syntax.add ("ds", Syntax::None (), Syntax::Const,

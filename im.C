@@ -96,7 +96,7 @@ IM::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "IM");
   alist.add ("description", "\
 Inorganic matter, or more precisely, mineral nitrogen.\n\
-The dimensions depend on which model the `IM' fixed component is used in.");
+The dimensions depend on which model the 'IM' fixed component is used in.");
   syntax.add ("NH4", Syntax::Unknown (), Syntax::State,
 	      "Ammonium content.");
   alist.add ("NH4", 0.0);

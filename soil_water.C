@@ -371,10 +371,10 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("UZbottom", Librarian<UZmodel>::library (),
 	      Syntax::OptionalState, Syntax::Singleton, "\
 Water transport model for the bottom of the unsaturated zone.\n\
-If this is given, `UZtop' will be used down to `UZborder', and `UZbottom'\n\
+If this is given, 'UZtop' will be used down to 'UZborder', and 'UZbottom'\n\
 will be used from there to the bottom.");
   syntax.add ("UZborder", Syntax::Integer, Syntax::OptionalConst,
-	      "Top node to use `UZbottom' in.");
+	      "Top node to use 'UZbottom' in.");
   syntax.add ("UZreserve", Librarian<UZmodel>::library (),
 	      "Reserve transport model if UZtop fails.");
   // Use lr as UZreserve by default.
@@ -530,7 +530,7 @@ SoilWater::initialize (const AttributeList& al,
   Theta_old_ = Theta_;
   h_old = h_;
 
-  // Let `macro' choose the default method to average K values in `uz'.
+  // Let 'macro' choose the default method to average K values in 'uz'.
   const bool has_macropores = (al.alist ("macro").name ("type") != "none");
   top->has_macropores (has_macropores);
   if (bottom)

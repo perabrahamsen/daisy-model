@@ -6,9 +6,9 @@
 #include "common.h"
 #include <vector>
 
-struct Syntax;
-struct AttributeList;
-struct Treelog;
+class Syntax;
+class AttributeList;
+class Treelog;
 
 typedef void (*derive_fun) (const string& name, AttributeList& al,
 			    const string& super);

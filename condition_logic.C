@@ -222,9 +222,9 @@ else return the value of the third condition.");
     syntax.add ("if", Librarian<Condition>::library (), 
 		"Condition to test for.");
     syntax.add ("then", Librarian<Condition>::library (), 
-		"Condition to use of the `if' test was true.");
+		"Condition to use of the 'if' test was true.");
     syntax.add ("else", Librarian<Condition>::library (), 
-		"Condition to use if the `if' test was false.");
+		"Condition to use if the 'if' test was false.");
     syntax.order ("if", "then", "else");
     Librarian<Condition>::add_type ("if", alist, syntax, &make_if);
   }

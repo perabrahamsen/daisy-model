@@ -11,7 +11,7 @@
 #include <vector>
 using namespace std;
 
-struct Log;
+class Log;
 
 class PLF
 {
@@ -27,7 +27,7 @@ public:
   double max_at () const;
   double integrate (double from, double to) const;
   PLF integrate_stupidly () const;
-  void offset (double offset);	// Add `offset' to all y values.
+  void offset (double offset);	// Add 'offset' to all y values.
 
   // Utilities.
   static double find (const vector<double>& x, const vector<double>& y,

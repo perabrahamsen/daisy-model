@@ -134,9 +134,9 @@ Bimodal hydraulic conductivity curve.");
   syntax.add ("h_b", "cm", Syntax::Const,
 	      "Bubbling pressure.");
   syntax.add ("Theta_b", Syntax::None (), Syntax::Const,
-	      "Water content at `h_b'.");
+	      "Water content at 'h_b'.");
   syntax.add ("K_b", "cm/h", Syntax::Const,
-	      "Water conductivity at `h_b'.");
+	      "Water conductivity at 'h_b'.");
   syntax.add ("K_sat", "cm/h", Syntax::Const,
 	      "Water conductivity of saturated soil.");
 

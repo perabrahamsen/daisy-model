@@ -13,8 +13,8 @@
 #include <ostream>
 #endif
 
-struct Syntax;
-struct AttributeList;
+class Syntax;
+class AttributeList;
 
 class Options
 {

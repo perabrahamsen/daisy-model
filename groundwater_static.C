@@ -66,9 +66,9 @@ static struct GroundwaterStaticSyntax
     if (warned)
       return true;
     else if (al.number ("table") > 0)
-      err.entry ("OBSOLETE: Use `deep' instead `table' groundwater");
+      err.entry ("OBSOLETE: Use 'deep' instead 'table' groundwater");
     else
-      err.entry ("OBSOLETE: Use `fixed' instead `table' groundwater");
+      err.entry ("OBSOLETE: Use 'fixed' instead 'table' groundwater");
     warned = true;
     return true;
   }
@@ -78,7 +78,7 @@ static struct GroundwaterStaticSyntax
     AttributeList& alist = *new AttributeList ();
     syntax.add_check (check_alist);
     alist.add ("description", "Static groundwater level.\n\
-Provided for backward compatibility, use `deep' or `fixed' instead.");
+Provided for backward compatibility, use 'deep' or 'fixed' instead.");
     Groundwater::load_syntax (syntax, alist);
     syntax.add ("table", "cm", Syntax::Const,
 		"Groundwater level.\n\

@@ -4,7 +4,7 @@
 #include "plf.h"
 #include "time.h"
 #include "parser.h"
-#include <fstream.h>
+#include <fstream>
 #include <algorithm>
 #include <numeric>
 
@@ -17,12 +17,12 @@ struct PrinterFile::Implementation
   bool is_identifier (const string& name) const;
   void print_quoted_string (const string& name);
 
-  // Print entry `key' in alist.
+  // Print entry 'key' in alist.
   void print_entry (const AttributeList& alist, const Syntax&,
 		    const AttributeList& super, const string& key,
 		    int indent, bool need_wrapper);
 
-  // Check if entry `key' need a line for itself.
+  // Check if entry 'key' need a line for itself.
   bool is_complex (const AttributeList& alist, const Syntax& syntax,
 		   const AttributeList& super, const string& key) const;
   bool is_complex_object (const AttributeList&, const Library&) const;
@@ -414,7 +414,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
   vector<string> entries;
   syntax.entries (entries);
 
-  for (unsigned int i = 0; i < entries.size (); i++)
+  {for (unsigned int i = 0; i < entries.size (); i++)
     {
       const string key = entries[i];
       
@@ -436,7 +436,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
       print_entry (alist, syntax, super, key, 
 		   indent + key.length () + 2, false);
       out << ")";
-    }
+  }}
 }
 
 void 

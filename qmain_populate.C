@@ -147,7 +147,7 @@ TraverseQtTree::enter_model (const Syntax& syntax, AttributeList& alist,
   // We use the base model as value.
   QString value;
   if (alist.check ("type"))
-    value = QString ("`") + alist.name ("type").c_str () + "'";
+    value = QString ("'") + alist.name ("type").c_str () + "'";
   else 
     value = "buildin";
 
@@ -327,7 +327,7 @@ TraverseQtTree::enter_object_sequence (const Library&, const Syntax& syntax,
   QString name;
   name.sprintf ("[%d]", index);
   assert (alist.check ("type"));
-  QString value = QString ("`") + alist.name ("type").c_str () + "'";
+  QString value = QString ("'") + alist.name ("type").c_str () + "'";
   if (check_alists)
     {
       TmpStream errors;
@@ -416,7 +416,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	  : syntax.default_alist (parameter);
 	if (child.check ("submodel"))
 	  {
-	    type_name = "`";
+	    type_name = "'";
 	    type_name += child.name ("submodel").c_str ();
 	    type_name += "' submodel";
 	  }
@@ -438,14 +438,14 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
       }
       break;
     case Syntax::Object:
-      type_name = "`";
+      type_name = "'";
       type_name += syntax.library (parameter).name ().c_str ();
       type_name += "' component";
       if (has_value && size == Syntax::Singleton 
 	  && alist.alist (parameter).check ("type"))
 	{
 	  string type = alist.alist (parameter).name ("type");
-	  value_name = "`";
+	  value_name = "'";
 	  value_name += type.c_str ();
 	  value_name += "'";
 	  if (check_alists)

@@ -49,10 +49,10 @@ tridia (int from,
     }
   // Backward substitution.
   x[N - 1] = y[N - 1] / beta[N - 1];
-  for (int i = N - 2; i >= from; i--)
+  {for (int i = N - 2; i >= from; i--)
     {
       x[i] = (y[i] - c[i] * x[i + 1]) / beta[i];
-    }
+  }}
 }
 
 inline double pow2 (double x)

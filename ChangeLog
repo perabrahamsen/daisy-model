@@ -1,3 +1,29 @@
+2000-12-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.67 released.
+
+2000-12-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (get_NH4): Also respect volatilization for organiz
+	fertilizer. 
+
+2000-11-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Change `quotation' to 'quotation'.
+
+2000-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.C, alist.h, common.C, common.h, depend.C, depend.h,
+	document.C, document.h, document_LaTeX.C, lexer.C, lexer.h,
+	lexer_data.C, lexer_data.h, librarian.C, librarian.h, library.C,
+	library.h, mathlib.C, mathlib.h, nrutil.C, nrutil.h, options.h,
+	parser.C, parser.h, parser_file.C, parser_file.h, plf.C, plf.h,
+	printer.C, printer.h, printer_file.C, printer_file.h, submodel.C,
+	submodel.h, syntax.C, syntax.h, time.C, time.h, tmpstream.C,
+	tmpstream.h, traverse.C, traverse.h, traverse_delete.C,
+	traverse_delete.h, treelog.C, treelog.h, treelog_stream.C,
+	treelog_stream.h: Visual C++ 6.0 support.
+
 2000-11-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.66 released.

@@ -161,7 +161,7 @@ Traverse::traverse_alist (const Syntax& syntax, AttributeList& alist,
 			  const string& name)
   // Generic code to traverse through any kind of alist.
   // This is only a helper function for the more specific traversals,
-  // such as `traverse_model'.
+  // such as 'traverse_model'.
 {
   const vector<string>& order = syntax.order ();
   for (unsigned int i = 0; i < order.size (); i++)
@@ -169,12 +169,12 @@ Traverse::traverse_alist (const Syntax& syntax, AttributeList& alist,
 
   vector<string> parameters;
   syntax.entries (parameters);
-  for (unsigned int i = 0; i < parameters.size (); i++)
+  {for (unsigned int i = 0; i < parameters.size (); i++)
     {
       const string& parameter = parameters[i];
       if (syntax.order (parameter) < 0)
 	traverse_parameter (syntax, alist, default_alist, name, parameter);
-    }
+  }}
 }
 
 void

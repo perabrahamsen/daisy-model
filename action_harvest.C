@@ -43,7 +43,7 @@ ActionHarvestSyntax::ActionHarvestSyntax ()
   alist.add ("description", "Harvest a crop.");
   syntax.add ("name", Syntax::String, Syntax::Const, 
 	      "Name of the crop to harvest.\n\
-If you specify `all', all crops will be harvested.\n\
+If you specify 'all', all crops will be harvested.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
   alist.add ("name", "all");

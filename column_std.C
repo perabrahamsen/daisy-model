@@ -78,7 +78,7 @@ public:
   Column& clone (const string& name) const
   { 
     AttributeList new_alist (alist);
-    // BUG: TODO: Log state of `this' to new_alist.
+    // BUG: TODO: Log state of 'this' to new_alist.
     new_alist.add ("type", name);
     return *new ColumnStandard (new_alist); 
   }

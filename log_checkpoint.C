@@ -84,7 +84,7 @@ LogCheckpoint::done ()
       if (alist ().check ("parser_files"))
 	{
 	  const vector<string> files (alist ().name_sequence ("parser_files"));
-	  const string lib_start = "From file `";
+	  const string lib_start = "From file '";
 	  const string lib_end = "':";
 	  for (unsigned int i = 0; i < files.size (); i++)
 	    {
@@ -135,7 +135,7 @@ hot start.");
       LogAList::load_syntax (syntax, alist);
       syntax.add ("where", Syntax::String, Syntax::Const,
 		  "File name prefix for the generated checkpoint.\n\
-The time will be appended, together with the `.dai' suffix.");
+The time will be appended, together with the '.dai' suffix.");
       alist.add ("where", "checkpoint");
       syntax.add ("description", Syntax::String, Syntax::Const,
 		  "Description of this particular checkpoint.");

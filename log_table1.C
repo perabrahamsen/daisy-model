@@ -277,7 +277,7 @@ struct LogEntry
   // Create and Destroy.
   void initialize (const string_map conv)
     {
-      // Convert path according to mapping in `conv'.
+      // Convert path according to mapping in 'conv'.
       for (unsigned int i = 0; i < path.size (); i++)
 	{
 	  string_map::const_iterator entry = conv.find (path[i]);
@@ -525,7 +525,7 @@ struct LogTable1 : public Log
   ~LogTable1 ()
     {
       if (!out.good ())
-	CERR << "Problems writing to `" << file << "'\n";
+	CERR << "Problems writing to '" << file << "'\n";
       delete &condition;
       sequence_delete (entries.begin (), entries.end ());
     }
@@ -542,7 +542,7 @@ static struct LogTable1Syntax
 
       if ((al.size ("set") % 2) == 1)
 	{
-	  err.entry ("`set' should contain an even number of arguments");
+	  err.entry ("'set' should contain an even number of arguments");
 	  ok = false;
 	}
 
@@ -559,7 +559,7 @@ static struct LogTable1Syntax
 
       if (specify_content && specify_flux)
 	{
-	  err.entry ("You cannot specify both `content_at' and `flux_at'");
+	  err.entry ("You cannot specify both 'content_at' and 'flux_at'");
 	  ok = false;
 	}
       if ((specify_content || specify_flux) && specify_interval)
@@ -614,9 +614,9 @@ If the value is a library component, you should specify the name of\n\
 the model or parameterization you are interested in, and then the name\n\
 of the attribute inside the model you want to log.\n\
 \n\
-If the attribute is a date, you should specify `year', `month',\n\
-`mday', or `hour'.  These are all integer values.  If you don't specify\n\
-any of these, a special ever increasing `gnuplot' value will be calculated.\n\
+If the attribute is a date, you should specify 'year', 'month',\n\
+'mday', or 'hour'.  These are all integer values.  If you don't specify\n\
+any of these, a special ever increasing 'gnuplot' value will be calculated.\n\
 \n\
 The last attribute in the patch should be a number, a number sequence,\n\
 a string, or an integer.  These are the only values which can be\n\
@@ -626,7 +626,7 @@ You can use the special value \"*\" to match everything at a given\n\
 level, for example all crops.  This way the path can specify multiple\n\
 values, they will be added before they are printed in the log file.\n\
 All values that start with a \"$\" will work like \"*\".  They are intended\n\
-to be mapped with the `set' attribute in the `table' log model.");
+to be mapped with the 'set' attribute in the 'table' log model.");
       entry_syntax.add ("missing_value", Syntax::String, Syntax::Const, "\
 String to print when the path doesn't match anything.\n\
 This can be relevant for example if you are logging a crop, and there are\n\
@@ -651,13 +651,13 @@ Factor to multiply the calculated value with, before logging.");
 Offset to add to the calculated value, before logging.");
       entry_alist.add ("offset", 0.0);
       entry_syntax.add ("from", "cm", Syntax::Const, "\
-Summarize soil content of numeric array between `from' and `to' with\n\
-regard to the current geomerty.  A negative number, or `0.0' at the\n\
+Summarize soil content of numeric array between 'from' and 'to' with\n\
+regard to the current geomerty.  A negative number, or '0.0' at the\n\
 surface.");
       entry_alist.add ("from", 0.0);
       entry_syntax.add ("to", "cm", Syntax::Const, "\
-Summarize soil content of numeric array between `from' and `to' with\n\
-regard to the current geomerty.  Should be below `from' to indicate the\n\
+Summarize soil content of numeric array between 'from' and 'to' with\n\
+regard to the current geomerty.  Should be below 'from' to indicate the\n\
 of the layer, or above to summarize over the entire soil.");
       entry_alist.add ("to", 1.0);
       entry_syntax.add ("content_at", "cm", Syntax::Const, "\
@@ -700,10 +700,10 @@ value to replace it with.  And so forth.");
 		  "Flush to disk after each entry (for debugging).");
       alist.add ("flush", false);
       syntax.add ("from", "cm", Syntax::Const,
-		  "Default `from' value for all entries.");
+		  "Default 'from' value for all entries.");
       alist.add ("from", 0.0);
       syntax.add ("to", "cm", Syntax::Const,
-		  "Default `to' value for all entries.");
+		  "Default 'to' value for all entries.");
       alist.add ("to", 1.0);
 
       Librarian<Log>::add_type ("table1", alist, syntax, &make);

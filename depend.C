@@ -379,7 +379,7 @@ resequence (const string& component, const string& parameterization,
   sort (deps.begin (), deps.end (), sort_by_sequence);
 
   // Resequence them.
-  for (unsigned int i = 0; i < deps.size (); i++)
+  {for (unsigned int i = 0; i < deps.size (); i++)
     {
       const string& component = deps[i].comp;
       const string& parameterization = deps[i].par;
@@ -388,5 +388,5 @@ resequence (const string& component, const string& parameterization,
        assert (library.check (parameterization));
        AttributeList& alist = library.lookup (parameterization);
        alist.add ("parsed_sequence", Library::get_sequence ());
-    }
+  }}
 }

@@ -65,7 +65,7 @@
 
 #elif defined (VISUALCPP)
 
-#pragma warning (disable: 4099 4786)
+#pragma warning (disable: 4786 4503)
 #define CONST_DELETE
 #define HAS_TEMPLATE_MEMBERS
 #define GLOBAL_CONSTANT
@@ -84,9 +84,9 @@
 
 // #define BORLAND_PERMISSIONS
 
-// Needed in BCC for `close'.
+// Needed in BCC for 'close'.
 #include <io.h>
-// Needed in BCC for `chdir'.
+// Needed in BCC for 'chdir'.
 #include <dir.h>
 
 // Borland complains about unused global constants unless "extern".

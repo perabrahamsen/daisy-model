@@ -7,8 +7,8 @@ Librarian<Log>::Content* Librarian<Log>::content = NULL;
 
 const char *const Log::description = "\
 Running a simulation is uninteresting, unless you can get access to\n\
-the results in one way or another.  The purpose of the `log' component\n\
-is to provide this access.  Most `log' models does this by writing a\n\
+the results in one way or another.  The purpose of the 'log' component\n\
+is to provide this access.  Most 'log' models does this by writing a\n\
 summary of the state to a log file.";
 
 struct Log::Implementation

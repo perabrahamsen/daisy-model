@@ -673,10 +673,10 @@ Maximum number of iterations when seeking convergence before reducing\n\
 the time step.");
       alist.add ("max_iterations", 25);
       syntax.add ("max_absolute_difference", "cm", Syntax::Const, "\
-Maximum absolute difference in `h' values for convergence.");
+Maximum absolute difference in 'h' values for convergence.");
       alist.add ("max_absolute_difference", 0.02);
       syntax.add ("max_relative_difference", Syntax::None (), Syntax::Const, "\
-Maximum relative difference in `h' values for convergence.");
+Maximum relative difference in 'h' values for convergence.");
       alist.add ("max_relative_difference", 0.001);
       syntax.add ("q_up", "mm/h", Syntax::LogOnly, 
 		  "Flux up through the surface.");
@@ -687,8 +687,8 @@ Maximum relative difference in `h' values for convergence.");
       syntax.add ("K_average", Librarian<Average>::library (),
 		  Syntax::OptionalConst, Syntax::Singleton,
 		  "Model for calculating average K between nodes.\n\
-The default model is `geometric' if there are macropores, and\n\
-`arithmetic' otherwise.");
+The default model is 'geometric' if there are macropores, and\n\
+'arithmetic' otherwise.");
 
       Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
     }

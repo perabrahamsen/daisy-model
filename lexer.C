@@ -118,12 +118,11 @@ Lexer::Lexer (const string& name, Treelog& out)
     error_count (0)
 {  
   if (!open_file (in, name))
-    err.entry (string ("Open `") + file + "' failed");
+    err.entry (string ("Open '") + file + "' failed");
 }
 
 Lexer::~Lexer ()
 {
   if (in.bad ())
-    err.entry (string ("There were trouble parsing `") + file  + "'");
-  close (in.rdbuf ()->fd ());
+    err.entry (string ("There were trouble parsing '") + file  + "'");
 }

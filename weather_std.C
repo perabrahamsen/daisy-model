@@ -486,7 +486,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
       if (keywords.find (key) == keywords.end ())
 	keywords.insert (key);
       else if (key != "Note")
-	lex->error (string ("Duplicate keyword `") + key + "'");
+	lex->error (string ("Duplicate keyword '") + key + "'");
       else if (!last_was_note)
 	lex->error ("Only one Note: block allowed");
       
@@ -597,7 +597,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 		    }
 		}
 	      if (!found)
-		lex->error (string ("Unknown keyword: `") + key + "'");
+		lex->error (string ("Unknown keyword: '") + key + "'");
 	    }
 	}
       lex->next_line ();
@@ -617,7 +617,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
   
   for (unsigned int i = 0; i < required_size; i++)
     if (keywords.find (required[i]) == keywords.end ())
-      lex->error (string ("Missing keyword `") + required[i] + "'");
+      lex->error (string ("Missing keyword '") + required[i] + "'");
 
   // BC5 sucks // if (begin >= end)
   if (!(begin < end))
@@ -664,7 +664,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
   has_reference_evapotranspiration = has_data ("RefEvap");
   for (unsigned int j = 0; j < data_description_size; j++)
     if (data_description[j].required && !has_data (data_description[j].name))
-      lex->error (string ("Required data column `") 
+      lex->error (string ("Required data column '") 
 		 + data_description[j].name + "' missing");
 
   // Dimensions.

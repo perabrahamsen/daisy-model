@@ -10,10 +10,10 @@
 #include <vector>
 #include <list>
 
-struct Time;
-struct PLF;
-struct AttributeList;
-struct Syntax;
+class Time;
+class PLF;
+class AttributeList;
+class Syntax;
 
 class AttributeList
 {
@@ -23,11 +23,11 @@ public:				// EGCS require this to be public...
   Implementation& impl;
 
 public:
-  // Is `key' an element of this alist?
+  // Is 'key' an element of this alist?
   bool check (const string& key) const;
-  // Is this alist a subset of `other'?
+  // Is this alist a subset of 'other'?
   bool subset (const AttributeList& other, const Syntax& syntax) const;
-  // Is the element `key' in this alist a subset of the correspi
+  // Is the element 'key' in this alist a subset of the correspi
   bool subset (const AttributeList& other, const Syntax& syntax,
 	       const string& key) const;
   int size (const string& key) const;

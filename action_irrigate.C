@@ -174,7 +174,7 @@ static struct ActionIrrigateTopSyntax
     if (warned)
       return true;
     warned = true;
-    err.entry ("OBSOLETE: Use `irrigate_overhead' instead of `irrigate_top'");
+    err.entry ("OBSOLETE: Use 'irrigate_overhead' instead of 'irrigate_top'");
     return true;
   }
   ActionIrrigateTopSyntax ()
@@ -184,7 +184,7 @@ static struct ActionIrrigateTopSyntax
     ActionIrrigate::load_syntax (syntax, alist);
     syntax.add_check (&check_alist);
     alist.add ("description", "\
-OBSOLETE.  Use `irrigate_overhead' instead.");
+OBSOLETE.  Use 'irrigate_overhead' instead.");
     Librarian<Action>::add_type ("irrigate_top", alist, syntax, &make);
   }
 } ActionIrrigateTop_syntax;
@@ -204,7 +204,7 @@ static struct ActionIrrigateSubsoilSyntax
     non_positive (to, "to", ok, err);
     if (from <= to)
       {
-	err.entry ("`from' must be higher than `to' in"
+	err.entry ("'from' must be higher than 'to' in"
 		   " the subsoilirrigation zone");
 	ok = false;
       }

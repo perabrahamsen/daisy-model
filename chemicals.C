@@ -356,7 +356,7 @@ check_alist_entry (const AttributeList& al, Treelog& err)
 
   if (!library.check (chemical))
     {
-      err.entry (string ("Unknown chemical `") + chemical + "'");
+      err.entry (string ("Unknown chemical '") + chemical + "'");
       ok = false;
     }
   else
@@ -374,7 +374,7 @@ check_alist_entry (const AttributeList& al, Treelog& err)
   return ok;
 }
 
-// KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.
+// KLUDGE: Ugly hack to be able to use the standard 'load_syntax' form.
 static Syntax::category chemicals_default_category = Syntax::State;
 
 static void chemicals_load_syntax (Syntax& syntax, AttributeList& alist)
@@ -395,7 +395,7 @@ Chemicals::add_syntax (const char* name,
 		       Syntax::category cat, 
 		       const string& description)
 {
-  // KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.
+  // KLUDGE: Ugly hack to be able to use the standard 'load_syntax' form.
   chemicals_default_category = cat;
   Syntax& entry_syntax = *new Syntax ();
   AttributeList& entry_alist = *new AttributeList ();
@@ -403,7 +403,7 @@ Chemicals::add_syntax (const char* name,
   syntax.add (name, entry_syntax, entry_alist,
 	      cat, Syntax::Sequence, description);
   alist.add (name, vector<AttributeList*> ());
-  // KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.
+  // KLUDGE: Ugly hack to be able to use the standard 'load_syntax' form.
   chemicals_default_category = Syntax::State;
 }
   

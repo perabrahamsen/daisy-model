@@ -6,8 +6,8 @@
 #include <string>
 using namespace std;
 
-struct Syntax;
-struct AttributeList;
+class Syntax;
+class AttributeList;
 
 void
 remove_dependencies (const string& component, const string& parameterization);

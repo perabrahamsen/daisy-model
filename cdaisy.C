@@ -1,6 +1,6 @@
 // @ cdaisy.C --- C interface to daisy.
 //
-// See `cdaisy.h' for more documentation.
+// See 'cdaisy.h' for more documentation.
 
 #include "syntax.h"
 #include "alist.h"
@@ -711,7 +711,7 @@ extern "C" unsigned int EXPORT
 daisy_column_count_layers (const Column* column)
 { return column->count_layers (); }
 
-extern "C" double EXPORT	// Heigh of numeric lay `lay' in cm.
+extern "C" double EXPORT	// Heigh of numeric lay 'lay' in cm.
 daisy_column_get_dz (const Column* column, int lay)
 { return column->get_dz (lay); }
 
@@ -891,7 +891,7 @@ daisy_chemical_reflection_factor (const Chemical* chemical)
 
 // @ The daisy_log Type.
 //
-// Extract information from the `extern' log model.
+// Extract information from the 'extern' log model.
 
 extern "C" LogExternSource::type EXPORT
 daisy_log_lookup (const char* log, const char* tag)

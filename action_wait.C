@@ -162,7 +162,7 @@ Wait the specified number of days.");
 	alist.add ("hours", 0);
 	syntax.add ("end_time", Syntax::Date, Syntax::OptionalState,
 		    "Wait until this date.\
-Setting this overrides the `days' and `hours' parameters.");
+Setting this overrides the 'days' and 'hours' parameters.");
 	syntax.order ("days");
 	Librarian<Action>::add_type ("wait_days", alist, syntax, &make_days);
       }

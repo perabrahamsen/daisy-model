@@ -84,7 +84,7 @@ Field::Implementation::restrict (const string& name)
   selected = find (name);
 
   if (!selected)
-    throw (string ("Restricting to non-existing column `") + name + "'");
+    throw (string ("Restricting to non-existing column '") + name + "'");
 }
 
 void 
@@ -466,7 +466,7 @@ Field::Implementation::check (bool require_weather,
        i != columns.end ();
        i++)
     {
-      Treelog::Open nest (err, (*i) ? (*i)->name : "error");
+      Treelog::Open nest (err, (*i) ? (*i)->name.c_str () : "error");
       if ((*i) == NULL || !(*i)->check (require_weather, from, to, err))
 	ok = false;
     }

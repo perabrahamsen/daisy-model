@@ -3,7 +3,7 @@
 #ifndef SOIL_CHEMICALS_H
 #define SOIL_CHEMICALS_H
 
-// These must be included in the header file, for `load_syntax' to work.
+// These must be included in the header file, for 'load_syntax' to work.
 #include "soil_chemical.h"
 
 struct Soil;

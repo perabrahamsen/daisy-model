@@ -24,7 +24,7 @@ static struct AverageHarmonicSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Harmonic average `2ab/(a+b)'.");
+      alist.add ("description", "Harmonic average '2ab/(a+b)'.");
       Librarian<Average>::add_type ("harmonic", alist, syntax, &make);
     }
 } AverageHarmonic_syntax;

@@ -4,7 +4,8 @@
 #define LEXER_H
 
 #include "common.h"
-#include <fstream.h>
+#include <fstream>
+using namespace std;
 
 class Treelog;
 

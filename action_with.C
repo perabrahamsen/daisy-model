@@ -35,7 +35,7 @@ public:
 	}
       if (!daisy.field.find (column))
 	{
-	  err.entry (string ("No column `") + column + "'");
+	  err.entry (string ("No column '") + column + "'");
 	  ok = false;
 	}
       return ok;

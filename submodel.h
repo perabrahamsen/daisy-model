@@ -8,8 +8,8 @@
 
 using namespace std;
 
-struct Syntax;
-struct AttributeList;
+class Syntax;
+class AttributeList;
 
 class Submodel
 {

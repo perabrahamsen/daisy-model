@@ -139,7 +139,7 @@ struct LogHarvest : public Log
   ~LogHarvest ()
     {
       if (!out.good ())
-	CERR << "Problems writing to `" << file << "'\n";
+	CERR << "Problems writing to '" << file << "'\n";
     }
 };
 

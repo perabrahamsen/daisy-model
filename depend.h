@@ -8,9 +8,9 @@
 #include <map>
 using namespace std;
 
-struct Treelog;
-struct Syntax;
-struct AttributeList;
+class Treelog;
+class Syntax;
+class AttributeList;
 
 typedef set<string, less<string>/**/> string_set;
 typedef map<string, string_set, less<string>/**/> dep_map;

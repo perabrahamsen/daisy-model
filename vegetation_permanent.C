@@ -264,7 +264,7 @@ VegetationPermanentSyntax
     syntax.add ("N_demand", "g N/m^2", Syntax::LogOnly,
 		"Current potential N content.");
     syntax.add ("N_actual", "g N/m^2", Syntax::OptionalState,
-		"N uptake until now (default: `N_demand').");
+		"N uptake until now (default: 'N_demand').");
     syntax.add ("N_uptake", "g N/m^2/h", Syntax::LogOnly,
 		"Nitrogen uptake this hour.");
     syntax.add ("N_litter", "g N/m^2/h", Syntax::LogOnly,

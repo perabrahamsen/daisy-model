@@ -86,7 +86,7 @@ Denitrification::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "Denitrification in soil (conversion\n\
 of nitrate to atmospheric nitrogen).  In this model, it is made\n\
 proportional to the CO2 development, as specified by the parameter\n\
-alpha, with a maximum rate specified by the parameter `K'.  The\n\
+alpha, with a maximum rate specified by the parameter 'K'.  The\n\
 denitrification is also affected by temperature and water pressure.");
   syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
 Set this flag to turn on denitrification below the root zone.");

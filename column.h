@@ -72,7 +72,7 @@ public:
 
   // Communication with external model.
   virtual unsigned int count_layers () const = 0; // Number of num. layers.
-  virtual double get_dz (unsigned int i) const = 0; // Size of layer `i'. [cm]
+  virtual double get_dz (unsigned int i) const = 0; // Size of layer 'i'. [cm]
   virtual void put_water_pressure (const vector<double>& v) = 0; // [cm]
   virtual void get_water_sink (vector<double>& v) const = 0; // [cm^3/cm^3/h]
   virtual void put_no3_m (const vector<double>& v) = 0; // [g/cm^3]

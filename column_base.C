@@ -140,7 +140,7 @@ ColumnBase::count_layers () const // Number of num. layers.
 { return soil.size (); }
 
 double 
-ColumnBase::get_dz (unsigned int i) const // Size of layer `i'. [cm]
+ColumnBase::get_dz (unsigned int i) const // Size of layer 'i'. [cm]
 { return soil.dz (i); }
 
 void 

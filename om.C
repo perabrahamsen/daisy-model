@@ -515,7 +515,7 @@ static bool check_alist (const AttributeList& al, Treelog& err)
   if (!approximate (accumulate (fractions.begin (), fractions.end (), 0.0),
 		    1.0))
     {
-      err.entry ("Sum of `fractions' must be 1.0");
+      err.entry ("Sum of 'fractions' must be 1.0");
       ok = false;
     }
   const double initial_fraction = al.number ("initial_fraction");
@@ -537,7 +537,7 @@ OM::load_syntax (Syntax& syntax, AttributeList& alist)
 Organic matter.  This is a common abstraction for the SMB (Soil\n\
 MicroBiomass), SOM (Soil Organic Matter) and AOM (Added Organic Matter)\n\
 pools.  That is, all the organic matter in the soil.  Some attributes,\n\
-such as `maintenance', are only meaningful for certain kinds of organic\n\
+such as 'maintenance', are only meaningful for certain kinds of organic\n\
 matter, in this case the SMB pools.");
   syntax.add ("top_C", "g C/cm^2", Syntax::State,
 	      "Carbon on top of soil.");

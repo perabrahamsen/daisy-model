@@ -188,8 +188,8 @@ OrganicMatter::Implementation::Buffer::load_syntax (Syntax& syntax,
   alist.add ("turnover_rate", 1.0);
   syntax.add ("where", Syntax::Integer, Syntax::Const,
 	      "The SOM pool to move the buffer content into.\n\
-The first and slow SOM pool is numbered `0', the second and faster\n\
-is numbered `1'.");
+The first and slow SOM pool is numbered '0', the second and faster\n\
+is numbered '1'.");
   alist.add ("where", 1);
 }
 

@@ -34,7 +34,7 @@ static struct ActionDivideSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Divide an existing column into two, thus creating a new column.\n\
-The `size' argument specifies the size of the new column, which must be\n\
+The 'size' argument specifies the size of the new column, which must be\n\
 smaller than the size of the original column.");
       syntax.add ("original", Syntax::String, Syntax::Const,
 		  "Column to divide");

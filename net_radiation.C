@@ -194,9 +194,9 @@ static struct NetRadiationSyntax
 			"The calculated net radiation.");
       // We make them optional, so other code doesn't have to set them.
       syntax_brunt.add ("a", Syntax::None (), Syntax::OptionalConst,
-			"Brunt `a' parameter (offset).");
+			"Brunt 'a' parameter (offset).");
       syntax_brunt.add ("b", "1/sqrt(kPa)", Syntax::OptionalConst,
-			"Brunt `b' parameter (vapor pressure factor).");
+			"Brunt 'b' parameter (vapor pressure factor).");
       AttributeList& alist_brunt = *new AttributeList ();
       alist_brunt.add ("description", "\
 Brunt, 1932.  Default parametrization by Jensen et.al., 1990.\n\

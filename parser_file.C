@@ -130,7 +130,7 @@ ParserFile::Implementation::get_number ()
   const double value = strtod (c_str, (char**) &endptr);
   
   if (*endptr != '\0')
-    error (string ("Junk at end of number `") + endptr + "'");
+    error (string ("Junk at end of number '") + endptr + "'");
 
   return value;
 }
@@ -165,7 +165,7 @@ ParserFile::Implementation::skip (const char* str)
   for (const char* p = str; *p; p++)
     if (*p != peek ())
       {
-	error (string("Expected `") + str + "'");
+	error (string("Expected '") + str + "'");
 	skip_token ();
 	break;
       }
@@ -230,7 +230,7 @@ ParserFile::Implementation::add_derived (Library& lib)
   const string super = get_string ();
   if (!lib.check (super))
     {
-      error (string ("Unknown superclass `") + super + "'");
+      error (string ("Unknown superclass '") + super + "'");
       skip_to_end ();
       return;
     }
@@ -266,7 +266,7 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
     }
   else
     {
-      error (string ("Unknown superclass `") + type + "'");
+      error (string ("Unknown superclass '") + type + "'");
       skip_to_end ();
       alist = new AttributeList ();
       alist->add ("type", "error");
@@ -363,7 +363,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		{
 		  atts.add (name, false);
 		  if (flag != "false")
-		    error ("Expected `true' or `false'");
+		    error ("Expected 'true' or 'false'");
 		}
 	      break;
 	    }
@@ -401,8 +401,8 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  TreelogStream treelog (tmp ());
 		  Treelog::Open nest (treelog, obj);
 		  if (!lib.syntax (obj).check (al, treelog))
-		    error (string ("Error for member `") + obj 
-			   + "' in library `" + name + "'\n--- details:\n"
+		    error (string ("Error for member '") + obj 
+			   + "' in library '" + name + "'\n--- details:\n"
 			   + tmp.str () + "---");
 		  atts.add (name, al);
 		  delete &al;
@@ -410,7 +410,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    }
 	    break;
 	  case Syntax::Error:
-	    error (string("Unknown singleton `") + name + "'");
+	    error (string("Unknown singleton '") + name + "'");
 	    skip_to_end ();
 	    break;
 	  default:
@@ -454,8 +454,8 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			TreelogStream treelog (tmp ());
 			Treelog::Open nest (treelog, obj);
 			if (!lib.syntax (obj).check (al, treelog))
-			  error (string ("Error for member `") + obj 
-				 + "' in library `" + name
+			  error (string ("Error for member '") + obj 
+				 + "' in library '" + name
 				 + "'\n--- details:\n" + tmp.str () + "---");
 		      }
 		    sequence.push_back (&al);
@@ -623,11 +623,11 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		break;
 	      }
 	    case Syntax::Error:
-	      error (string("Unknown attribute `") + name + "'");
+	      error (string("Unknown attribute '") + name + "'");
 	      skip_to_end ();
 	      break;
 	    default:
-	      error (string("Unsupported sequence `") + name + "'");
+	      error (string("Unsupported sequence '") + name + "'");
 	      skip_to_end ();
 	    }
 	}

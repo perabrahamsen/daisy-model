@@ -3,7 +3,7 @@
 #ifndef SOLUTE_H
 #define SOLUTE_H
 
-// These must be included in the header file, for `load_syntax' to work.
+// These must be included in the header file, for 'load_syntax' to work.
 #include "adsorption.h"
 #include "transport.h"
 #include "mactrans.h"

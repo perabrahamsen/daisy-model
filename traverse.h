@@ -6,9 +6,9 @@
 #include <string>
 using namespace std;
 
-struct Library;
-struct Syntax;
-struct AttributeList;
+class Library;
+class Syntax;
+class AttributeList;
 
 class Traverse
 {

@@ -93,7 +93,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		  }
 		else if (!lib.check (al.name ("type")))
 		  {
-		    tmp () << "Unknown library member `"
+		    tmp () << "Unknown library member '"
 			   << al.name ("type") + "'";
 		    err.entry (tmp.str ());
 		    error = true;
@@ -484,7 +484,7 @@ Syntax::add_submodule (const char* name, AttributeList& alist,
     // Phew.  There are basically two places one can store the alist
     // containing the default values for the variables and parameters
     // of a submodel.  The first place is as an initial value in the
-    // parent alist, the other is as the `default_alist' syntax table
+    // parent alist, the other is as the 'default_alist' syntax table
     // attribute.   Neither solution works well in all cases.  
     //
     // Using the initial value will not work for optional singletons,
@@ -494,11 +494,11 @@ Syntax::add_submodule (const char* name, AttributeList& alist,
     // submodel sequences either, because we do not know the the
     // length of the sequence. 
     //
-    // However, using the `default_alist' for fully specified
+    // However, using the 'default_alist' for fully specified
     // non-optional submodels won't work either.  The problems is if
     // the user is satisfied with the default value, and don't try to
     // overwrite anything.  In that case the entry will be empty in
-    // the parent alist after loading, causing an `missing value'
+    // the parent alist after loading, causing an 'missing value'
     // error.  
     // 
     // Log variables doesn't have a value, so the problem does not

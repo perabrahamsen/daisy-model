@@ -611,7 +611,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& Devel = *new Syntax ();
   AttributeList& vDevel = *new AttributeList ();
   Syntax& Vernal = *new Syntax ();
-  // WARNING: Don't add an Vernal alist, or the `Optional' idea is lost.
+  // WARNING: Don't add an Vernal alist, or the 'Optional' idea is lost.
   Syntax& LeafPhot = *new Syntax ();
   Syntax& Partit = *new Syntax ();
   Syntax& Prod = *new Syntax ();
@@ -854,7 +854,7 @@ Maximal development stage for which the crop survives harvest.");
   vPhenology.add ("soil_h", -100.0);
 
   // Prod
-  // Warning: Uses same syntax as `ProdPar'.
+  // Warning: Uses same syntax as 'ProdPar'.
   Prod.add ("CH2OPool", "g DM/m^2", Syntax::State, "CH2O Pool.");
   vProd.add ("CH2OPool", 0.001);
   Prod.add ("WLeaf", "g DM/m^2", Syntax::State, "Leaf dry matter weight.");

@@ -370,24 +370,24 @@ True, iff the simulation time is after the specified time.");
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist_hour = *new AttributeList ();
-    alist_hour.add ("description", "True every `step' hours.\n\
+    alist_hour.add ("description", "True every 'step' hours.\n\
 Warning, this may be imprecise around new year.");
     AttributeList& alist_day = *new AttributeList ();
-    alist_day.add ("description", "True every `step' days.\n\
+    alist_day.add ("description", "True every 'step' days.\n\
 Or, more precisely, at 23 hour when the Julian day modulo\n\
-`step' is zero.");
+'step' is zero.");
     AttributeList& alist_week = *new AttributeList ();
-    alist_week.add ("description", "True every `step' week.\n\
+    alist_week.add ("description", "True every 'step' week.\n\
 Or, more precisely, sunday at 23 hour when the week number\n\
-modulo `step' is zero.");
+modulo 'step' is zero.");
     AttributeList& alist_month = *new AttributeList ();
-    alist_month.add ("description", "True every `step' month.\n\
+    alist_month.add ("description", "True every 'step' month.\n\
 Or, more precisely, the last hour in each month, where\n\
-the month number modulo `step' is 0.");
+the month number modulo 'step' is 0.");
     AttributeList& alist_year = *new AttributeList ();
-    alist_year.add ("description", "True every `step' year.\n\
+    alist_year.add ("description", "True every 'step' year.\n\
 Or, more precisely, the last hour of each year, where the year\n\
-plus one modulo `step' is 0.");
+plus one modulo 'step' is 0.");
     syntax.add ("step", Syntax::Integer, Syntax::Const,
 		"Number of time periods between this condition is true.");
     syntax.order ("step");

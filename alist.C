@@ -454,7 +454,7 @@ AttributeList::Implementation::lookup (const string& key) const
   
   if (i == values.end ())
     {
-      CERR << "Missing key `" << key << "'\n";
+      CERR << "Missing key '" << key << "'\n";
       assert (false);
     }
   return (*i).second;

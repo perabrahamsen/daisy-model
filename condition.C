@@ -5,9 +5,9 @@
 Librarian<Condition>::Content* Librarian<Condition>::content = NULL;
 
 const char *const Condition::description = "\
-A `condition' component tests the state of the simulation, like\n\
+A 'condition' component tests the state of the simulation, like\n\
 whether the water pressure in a specific depth is above a given\n\
-threshold.  Logic conditions like `and' and `or' can be used for\n\
+threshold.  Logic conditions like 'and' and 'or' can be used for\n\
 testing whether multiple conditions are fulfilled simultaneously.";
 
 Condition::Condition (const AttributeList& al)

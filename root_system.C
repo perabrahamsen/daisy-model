@@ -140,7 +140,7 @@ RootSystem::water_uptake (double Ept_,
       step *= 2;
     }
 
-  // We need this to make sure H2OExtraction corresponds to `h_x'.
+  // We need this to make sure H2OExtraction corresponds to 'h_x'.
   const double total2 = potential_water_uptake (h_x, soil, soil_water);
   assert (total == total2);
   assert (h_x >= h_wp);

@@ -142,7 +142,7 @@ MacroStandard::tick (const Soil& soil,
 
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
-    CERR << "BUG: Total S_p = `" << (soil.total (S_p) - q_top)
+    CERR << "BUG: Total S_p = '" << (soil.total (S_p) - q_top)
 	 << "' first pass\n";
 
   // Now check for saturated conditions.
@@ -211,7 +211,7 @@ MacroStandard::tick (const Soil& soil,
 
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
-    CERR << "BUG: Total S_p = `" << (soil.total (S_p) - q_top) 
+    CERR << "BUG: Total S_p = '" << (soil.total (S_p) - q_top) 
 	 << "' second pass\n";
 }
 
@@ -225,11 +225,11 @@ static struct MacroStandardSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
-The area between `height_start' and `height_end' contains macropores,\n\
-which are initiated when the water potential reach `pressure_initiate',\n\
-and then immediately emptied down to `pressure_end'.  The water entering\n\
+The area between 'height_start' and 'height_end' contains macropores,\n\
+which are initiated when the water potential reach 'pressure_initiate',\n\
+and then immediately emptied down to 'pressure_end'.  The water entering\n\
 the macropore is distributed in soil below as a source term, according\n\
-to the `distribution' parameter.");
+to the 'distribution' parameter.");
 
       syntax.add ("height_start", "cm", Syntax::Const, 
 		  "Macropores starts at this depth (a negative number)");
@@ -237,8 +237,8 @@ to the `distribution' parameter.");
 		  "Macropores ends at this depth (a negative number)");
       syntax.add ("distribution", "cm", Syntax::Fraction (), Syntax::Const, "\
 Distribution of macropore end points as a function of height.\n\
-The function should start with `1' at `height_end', and then decrease to\n\
-`0' at `height_start'.  It can be constant, but may never increase.\n\
+The function should start with '1' at 'height_end', and then decrease to\n\
+'0' at 'height_start'.  It can be constant, but may never increase.\n\
 The value indicates the fraction of macropores which ends at the given\n\
 where all macropores is assumed to start at the top.");
       syntax.add ("pressure_initiate", "cm", Syntax::Const, 

@@ -1363,7 +1363,7 @@ CropOld::ActualWaterUptake (double Ept,
       step *= 2;
     }
 
-  // We need this to make sure H2OExtraction corresponds to `h_x'.
+  // We need this to make sure H2OExtraction corresponds to 'h_x'.
   const double total2 = PotentialWaterUptake (h_x, soil, soil_water);
   assert (total == total2);
 

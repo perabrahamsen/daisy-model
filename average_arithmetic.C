@@ -24,7 +24,7 @@ static struct AverageArithmeticSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Arithmetic average `(a+b)/2'.");
+      alist.add ("description", "Arithmetic average '(a+b)/2'.");
       Librarian<Average>::add_type ("arithmetic", alist, syntax, &make);
     }
 } AverageArithmetic_syntax;

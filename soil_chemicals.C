@@ -74,7 +74,7 @@ SoilChemicals::Implementation::tick (const Soil& soil,
 				     const OrganicMatter* organic_matter,
 				     const Chemicals& flux_in)
 { 
-  // Allow `flux_in' to create new solutes.
+  // Allow 'flux_in' to create new solutes.
   add_missing (soil, soil_water, flux_in);
 
   // Crop Uptake.

@@ -83,8 +83,8 @@ void                            /* Add alist type to syntax table. */
 daisy_syntax_add_alist (daisy_syntax* syntax, const char* name,
                         int cat, daisy_syntax* nested, int size);
 
-/* The following functions return "magic" values used by the `cat',
-   `type', and `size' arguments to `daisy_syntax_add'.
+/* The following functions return "magic" values used by the 'cat',
+   'type', and 'size' arguments to 'daisy_syntax_add'.
 
    These will not change within a simulation, so you can safely cache
    the values.  The values may change in future versions of the daisy
@@ -100,7 +100,7 @@ daisy_category_number (const char* name);
 const char*                     /* Name used for specific category. */
 daisy_category_name (int number);
 
-/* Some negative sizes have "magic" meanings for the `size'
+/* Some negative sizes have "magic" meanings for the 'size'
    parameter. Positive numbers indicate a fixed size array. */
 
 int                             /* An array of unknown size. */
@@ -185,7 +185,7 @@ daisy_alist_set_alist (daisy_alist* alist, const char* name,
 
 /* The following functions are for manipulating array members of an alist.
    It is an error to call them if the member is not an array.  The
-   array will grow automatically if you `set' values outside its upper
+   array will grow automatically if you 'set' values outside its upper
    bound. The lower array bound is zero. */
 
 #ifdef UNINPLEMENTED
@@ -353,9 +353,9 @@ daisy_daisy_check (const daisy_daisy* daisy);
  * There are three basic ways to run the simulation.  Run the entire
  * simulation to end, run a the entire simulation for a single time
  * step, or manually run each component of the simulation.  Running
- * the `action', `weather', `columns', `logs', and `time' tick
+ * the 'action', 'weather', 'columns', 'logs', and 'time' tick
  * functions in that sequence is equivalent to running the  main daisy
- * `tick' function.   
+ * 'tick' function.   
  */
 
 void                            /* Run the Daisy simulation to the end. */
@@ -467,7 +467,7 @@ daisy_weather_put_global_radiation (daisy_weather* weather, double radiation);
  * columns when you judge that the difference between them is
  * sufficiently small.  The result is an "average" column.  If one
  * daisy column actually represent a larger field area than the other,
- * you can specify this by giving a weight.  A weight of `0.9' means
+ * you can specify this by giving a weight.  A weight of '0.9' means
  * that the first column represents the conditions on 90% of the area,
  * and the second column the remaining 10%. 
  */
@@ -475,7 +475,7 @@ daisy_weather_put_global_radiation (daisy_weather* weather, double radiation);
 daisy_column*                   /* Create new column by cloning. */
 daisy_column_clone (const daisy_column* column, const char* name);
 
-void                            /* Merge `other' into `column'. */
+void                            /* Merge 'other' into 'column'. */
 daisy_column_merge (daisy_column* column, const daisy_column* other, 
                     double weight);
 
@@ -492,13 +492,13 @@ daisy_column_get_name (const daisy_column* column);
  *
  * The numeric layers used in the soil.
  * 
- * The top layer is numbered `0'.   The bottom layer is `count - 1'.
+ * The top layer is numbered '0'.   The bottom layer is 'count - 1'.
  */
 
 unsigned int                    /* The number of numeric layers. */
 daisy_column_count_layers (const daisy_column* column);
 
-double                          /* Heigh of numeric lay `lay' in cm. */
+double                          /* Heigh of numeric lay 'lay' in cm. */
 daisy_column_get_dz (const daisy_column* column, int lay);
 
 /* @@@ Soil Water. 
@@ -615,14 +615,14 @@ daisy_chemical_reflection_factor (const daisy_chemical* chemical);
 
 /* @ The daisy_log Type.
  *
- * Extract information from the `extern' log model.
+ * Extract information from the 'extern' log model.
  *
- * The first argument `log' in each function should match the `where' 
- * attribute of the `extern' log model you want to extract information
+ * The first argument 'log' in each function should match the 'where' 
+ * attribute of the 'extern' log model you want to extract information
  * from. 
  * 
- * The second parameter `tag' should match the `tag' attribute of the
- * `entries' log attribute member you want to extract information from.
+ * The second parameter 'tag' should match the 'tag' attribute of the
+ * 'entries' log attribute member you want to extract information from.
  */
 
 typedef enum 

@@ -5,7 +5,7 @@
 
 #include "lexer.h"
 
-struct Time;
+class Time;
 
 class LexerData : public Lexer
 {

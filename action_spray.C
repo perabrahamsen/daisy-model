@@ -38,7 +38,7 @@ static struct ActionSpraySyntax
       const Library& library = Librarian<Chemical>::library ();
       if (!library.check (chemical))
 	{
-	  err.entry (string ("Unknown chemical `") + chemical + "'");
+	  err.entry (string ("Unknown chemical '") + chemical + "'");
 	  ok = false;
 	}
       else
@@ -47,7 +47,7 @@ static struct ActionSpraySyntax
 	  const AttributeList& alist = library.lookup (chemical);
 	  if (!syntax.check (alist, err))
 	    {
-	      err.entry (string ("Incomplete chemical `") + chemical + "'");
+	      err.entry (string ("Incomplete chemical '") + chemical + "'");
 	      ok = false;
 	    }
 	}

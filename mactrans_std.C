@@ -88,7 +88,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
   
     // Check that the sink terms add up.
   if (fabs (soil.total (S_p) + J_p[0]) > 1.0e-11)
-    CERR << "BUG: Total S_p = `" << (soil.total (S_p) + J_p[0])
+    CERR << "BUG: Total S_p = '" << (soil.total (S_p) + J_p[0])
 	 << "' solute\n";
 }
 

@@ -75,7 +75,7 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
 {
   hydraulic = &hydro;
 
-  // Did we specify `dry_bulk_density'?  Else calculate it now.
+  // Did we specify 'dry_bulk_density'?  Else calculate it now.
   if (dry_bulk_density < 0.0)
     dry_bulk_density = rho_soil_particles () * (1.0 - hydraulic->porosity ());
 
@@ -490,6 +490,6 @@ Horizon::~Horizon ()
 Librarian<Horizon>::Content* Librarian<Horizon>::content = NULL;
 
 const char *const Horizon::description = "\
-A `horizon' is a soil type with specific physical properties.  It is\n\
-the responsibility of the `horizon' component to specify these\n\
+A 'horizon' is a soil type with specific physical properties.  It is\n\
+the responsibility of the 'horizon' component to specify these\n\
 properties.";

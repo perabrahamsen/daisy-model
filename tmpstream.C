@@ -6,8 +6,8 @@
 
 #include <assert.h>
 
-#ifdef __GNUC__
-#include <strstream.h>
+#if defined (__GNUC__) || defined (VISUALCPP)
+#include <strstream>
 #else
 // Borland C++ 5.01 doesn't spell stream with an m.
 #include <strstrea.h>
@@ -17,7 +17,7 @@ struct TmpStream::Implementation
 {
   ostrstream out;
   bool done;
-  const char* str;
+  char* str;
 
   Implementation ()
     : done (false),

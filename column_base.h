@@ -65,7 +65,7 @@ public:
   // Communication with external model.
 public:
   unsigned int count_layers () const; // Number of num. layers.
-  double get_dz (unsigned int i) const; // Size of layer `i'. [cm]
+  double get_dz (unsigned int i) const; // Size of layer 'i'. [cm]
   void put_water_pressure (const vector<double>& v); // [cm]
   void get_water_sink (vector<double>& v) const; // [cm^3/cm^3/h]
   double get_evap_interception () const; // [mm/h]

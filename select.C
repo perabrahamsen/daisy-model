@@ -108,7 +108,7 @@ struct Select::Implementation
   // Create and Destroy.
   void initialize (const string_map conv)
   {
-    // Convert path according to mapping in `conv'.
+    // Convert path according to mapping in 'conv'.
     for (unsigned int i = 0; i < path.size (); i++)
       {
 	string_map::const_iterator entry = conv.find (path[i]);
@@ -250,9 +250,9 @@ If the value is a library component, you should specify the name of\n\
 the model or parameterization you are interested in, and then the name\n\
 of the attribute inside the model you want to log.\n\
 \n\
-If the attribute is a date, you should specify `year', `month',\n\
-`mday', or `hour'.  These are all integer values.  If you don't specify\n\
-any of these, a special ever increasing `gnuplot' value will be calculated.\n\
+If the attribute is a date, you should specify 'year', 'month',\n\
+'mday', or 'hour'.  These are all integer values.  If you don't specify\n\
+any of these, a special ever increasing 'gnuplot' value will be calculated.\n\
 \n\
 The last attribute in the patch should be a number, a number sequence,\n\
 a string, or an integer.  These are the only values which can be\n\
@@ -262,7 +262,7 @@ You can use the special value \"*\" to match everything at a given\n\
 level, for example all crops.  This way the path can specify multiple\n\
 values, they will be added before they are printed in the log file.\n\
 All values that start with a \"$\" will work like \"*\".  They are intended\n\
-to be mapped with the `set' attribute in the `table' log model.");
+to be mapped with the 'set' attribute in the 'table' log model.");
   syntax.add ("when", 
 	      Librarian<Condition>::library (),
 	      Syntax::OptionalConst, Syntax::Singleton,
