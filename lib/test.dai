@@ -84,31 +84,31 @@
 (time 1986 12 1 1)
 
 ;; Spring Barley with ley setup.
-(manager
- (cond ((at 1987 3 20 1)
-        (plowing))
-       ((at 1987 4 4 1)
-        (fertilize mineral 
-		   (weight 100.0)	;kg N/ha
-                   (NH4_fraction 0.5)))
-       ((at 1987 4 5 1)
-        (sow "Cut Grass")
-	(sow "Spring Barley"))
-       ((at 1987 9 5 1)
-        (harvest "Spring Barley")
-	(harvest "Cut Grass"
-		 (stub 15)              ;Leave 15 cm stub.
-		 (stem 1.00)))         ;Harvest everything above stub.
-       ((at 1987 9 8 1)
-        (fertilize mineral
-		   (weight 80.0)
-		   (NH4_fraction 0.5)))
-       ((at 1987 10 10 1)
-        (harvest "Cut Grass"
-                 (stub 8.)              ;Leave 08 cm stub.
-                 (stem 1.00)))          ;Harvest everything above stub.
-       ((at 1988 4 1 1)
-        (stop))))
+(manager cond 
+  ((at 1987 3 20 1)
+   (plowing))
+  ((at 1987 4 4 1)
+  (fertilize mineral 
+	     (weight 100.0)		;kg N/ha
+	     (NH4_fraction 0.5)))
+  ((at 1987 4 5 1)
+   (sow "Cut Grass")
+   (sow "Spring Barley"))
+  ((at 1987 9 5 1)
+   (harvest "Spring Barley")
+   (harvest "Cut Grass"
+	    (stub 15)			;Leave 15 cm stub.
+	    (stem 1.00)))		;Harvest everything above stub.
+  ((at 1987 9 8 1)
+   (fertilize mineral
+	      (weight 80.0)
+	      (NH4_fraction 0.5)))
+  ((at 1987 10 10 1)
+   (harvest "Cut Grass"
+	    (stub 8.)			;Leave 08 cm stub.
+	    (stem 1.00)))		;Harvest everything above stub.
+  ((at 1988 4 1 1)
+   (stop)))
 
 (deflog "pond" table1
   (where "pond.tab")

@@ -133,13 +133,54 @@
 
 (deflog "Soil Water Potential" table1
   (where "soil_water_potential.tab")
-  (when (hour 0))
+  (when hourly)
   (entries ((path time year))
 	   ((path time month))
 	   ((path time mday))
+	   ((path time hour))
 	   ((path column "*" SoilWater h)
 	    (full true)			;show value in all nodes.
 	    (dimension "cm"))))
+
+(deflog "Preferential Water Flux" table1
+  (where "pref_flux.tab")
+  (when hourly)
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path time hour))
+	   ((path column "*" SoilWater q_p)
+	    (full true)			;show value in all nodes.
+	    (factor -10)		;cm->mm
+	    (dimension "cm"))))
+
+(deflog "Preferential NO3 Transport" table1
+  (where "pref_NO3.tab")
+  (when hourly)
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path time hour))
+	   ((path column "*" SoilNO3 J_p)
+	    (tag "NO3-J_p")
+	    (full true)			;show value in all nodes.
+	    (dimension "kg N/ha/d")
+	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
+	   ))
+
+(deflog "Preferential NH4 Transport" table1
+  (where "pref_NH4.tab")
+  (when hourly)
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path time hour))
+	   ((path column "*" SoilNH4 J_p)
+	    (tag "NH4-J_p")
+	    (full true)			;show value in all nodes.
+	    (dimension "kg N/ha/d")
+	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
+	   ))
 
 (deflog "Surface Water Balance" table1
   (where "surface_water_balance.tab")
@@ -181,7 +222,13 @@
 	    (when hourly)
 	    (dimension "mm"))
 	   ((path column "*" SoilWater q)
-	    (tag "Infiltration")
+	    (tag "Matrix-Inf")
+	    (when hourly)
+	    (flux_at 0.0)
+	    (dimension "mm")
+	    (factor -10))		;cm -> mm
+	   ((path column "*" SoilWater q_p)
+	    (tag "MacroInf")
 	    (when hourly)
 	    (flux_at 0.0)
 	    (dimension "mm")
@@ -232,13 +279,25 @@
 	    (when hourly)
 	    (dimension "mm"))
 	   ((path column "*" SoilWater q)
-	    (tag "Infilt")
+	    (tag "Matrix-Inf")
+	    (when hourly)
+	    (flux_at 0.0)
+	    (dimension "mm")
+	    (factor -10))		;cm -> mm
+	   ((path column "*" SoilWater q_p)
+	    (tag "Macro-Inf")
 	    (when hourly)
 	    (flux_at 0.0)
 	    (dimension "mm")
 	    (factor -10))		;cm -> mm
 	   ((path column "*" SoilWater q)
-	    (tag "Percolation")
+	    (tag "Matrix-perc")
+	    (when hourly)
+	    (flux_at -100.0)
+	    (dimension "mm")
+	    (factor -10))		;cm -> mm
+	   ((path column "*" SoilWater q_p)
+	    (tag "Pref-perc")
 	    (when hourly)
 	    (flux_at -100.0)
 	    (dimension "mm")
@@ -260,15 +319,21 @@
 	    (tag "NH4-Surface")
 	    (dimension "kg N/ha")
 	    (factor 1e5))		;g/cm² -> kg/ha
-	   ((path column "*" SoilNH4 transport  "*" J)
+	   ((path column "*" SoilNH4 J)
 	    (tag "NH4-In")
 	    (when hourly)
 	    (flux_at 0.0)
 	    (dimension "kg N/ha/d")
 	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
-	   ((path column "*" SoilNH4 transport  "*" J)
+	   ((path column "*" SoilNH4 J)
 	    (when hourly)
-	    (tag "NH4-Leak")
+	    (tag "NH4-Leak-Matrix")
+	    (flux_at -100.0)
+	    (dimension "kg N/ha/d")
+	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" SoilNH4 J_p)
+	    (when hourly)
+	    (tag "NH4-Leak-Macro")
 	    (flux_at -100.0)
 	    (dimension "kg N/ha/d")
 	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
@@ -299,14 +364,20 @@
 	    (tag "NO3-Surface")
 	    (dimension "kg N/ha")
 	    (factor 1e5))		;g/cm² -> kg/ha
-	   ((path column "*" SoilNO3 transport "*" J)
+	   ((path column "*" SoilNO3 J)
 	    (when hourly)
 	    (tag "NO3-In")
 	    (flux_at 0.0)
 	    (dimension "kg N/ha/d")
 	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
-	   ((path column "*" SoilNO3 transport  "*" J)
-	    (tag "NO3-Leak")
+	   ((path column "*" SoilNO3 J)
+	    (tag "NO3-Leak-Matrix")
+	    (when hourly)
+	    (flux_at -100.0)
+	    (dimension "kg N/ha/d")
+	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" SoilNO3 J_p)
+	    (tag "NO3-Leak-Macro")
 	    (when hourly)
 	    (flux_at -100.0)
 	    (dimension "kg N/ha/d")
@@ -359,14 +430,20 @@
   (entries ((path time year))
 	   ((path time month))
 	   ((path time mday))
-	   ((path column "*" SoilChemicals solutes solute transport "*" J)
+	   ((path column "*" SoilChemicals solutes solute J)
 	    (tag "In")
 	    (when hourly)
 	    (flux_at 0.0)
 	    (dimension "g/ha/d")
 	    (factor -1e8))		;g/cm²/d -> g/ha/d
-	   ((path column "*" SoilChemicals solutes solute transport "*" J)
-	    (tag "Leak")
+	   ((path column "*" SoilChemicals solutes solute J)
+	    (tag "Leak-Matrix")
+	    (when hourly)
+	    (flux_at -100.0)
+	    (dimension "g/ha/d")
+	    (factor -1e8))		;g/cm²/d -> g/ha/d
+	   ((path column "*" SoilChemicals solutes solute J_p)
+	    (tag "Leak-Macro")
 	    (when hourly)
 	    (flux_at -100.0)
 	    (dimension "g/ha/d")

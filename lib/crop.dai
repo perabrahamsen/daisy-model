@@ -11,7 +11,6 @@
 (input file "wrape.dai")
 (input file "wwheat.dai")
 (input file "grass.dai")
-(input file "cutgrass.dai")
 (input file "wwheat-old.dai")
 (input file "sbarley-old.dai")
 (input file "wbarley-old.dai")

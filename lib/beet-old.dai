@@ -1,6 +1,6 @@
 ;;; beet-old.dai
 
-(defcrop Beet sold
+(defcrop "Beet; V1" sold
   (Devel (EmrTSum 385)
 	 (DSRate1 8.70e-4)
 	 (DSRate2 8.70e-4)
