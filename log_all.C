@@ -23,6 +23,22 @@
 #include "assertion.h"
 
 bool 
+LogAll::check_member (symbol name) const
+{ 
+  daisy_assert (is_active);
+  daisy_assert (!active_stack.empty ());
+
+  const vector<Select*>& current = active_stack.top ();
+  for (vector<Select*>::const_iterator i = current.begin (); 
+       i < current.end (); 
+       i++)
+    if ((*i)->valid (name))
+      return true;
+
+  return false;
+}
+
+bool 
 LogAll::match (const Daisy& daisy, Treelog& msg)
 {
   is_active = false;
@@ -86,6 +102,95 @@ LogAll::initial_done ()
       slaves[i]->initial_done ();
 
   active_stack.pop ();
+}
+
+void 
+LogAll::open (symbol name)
+{ 
+  daisy_assert (is_active);
+  daisy_assert (!active_stack.empty ());
+
+  const vector<Select*>& current = active_stack.top ();
+  daisy_assert (&current == &active_stack.top ());
+  active_stack.push (vector<Select*> ());
+  vector<Select*>& next = active_stack.top ();
+  
+  for (vector<Select*>::const_iterator i = current.begin (); 
+       i < current.end (); 
+       i++)
+    if ((*i)->open (name))
+      next.push_back ((*i));
+}
+
+void 
+LogAll::close ()
+{ 
+  const vector<Select*>& current = active_stack.top ();
+
+  for (vector<Select*>::const_iterator i = current.begin (); 
+       i < current.end (); 
+       i++)
+    (*i)->close ();
+
+  active_stack.pop ();
+}
+
+void 
+LogAll::output (symbol, const bool)
+{ }
+
+void 
+LogAll::output (symbol name, const double value)
+{ 
+  const vector<Select*>& sels = active_stack.top ();
+
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_number (value);
+}
+
+void 
+LogAll::output (symbol name, const int value)
+{ 
+  const vector<Select*>& sels = active_stack.top ();
+
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_integer (value);
+}
+
+void 
+LogAll::output (symbol name, const string& value)
+{ 
+  const vector<Select*>& sels = active_stack.top ();
+
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_name (value);
+}
+
+void 
+LogAll::output (symbol name, const vector<double>& value)
+{ 
+  const vector<Select*>& sels = active_stack.top ();
+
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_array (value, geometry ());
+}
+
+void 
+LogAll::output (symbol, const PLF&)
+{ }
+
+void 
+LogAll::output (symbol name, const Time& value)
+{ 
+  const vector<Select*>& sels = active_stack.top ();
+
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_time (value);
 }
 
 const AttributeList& 

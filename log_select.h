@@ -45,7 +45,6 @@ struct LogSelect : public Log
   const string description;	// Description of log file.
   Condition& condition;	// Should we print a log now?
   vector<Select*> entries;
-  stack<vector<Select*>/**/> active_stack;
 
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&);

@@ -31,6 +31,7 @@ struct PLF::Implementation
 {
   vector<double> x;
   vector<double> y;
+  vector<double> slope;
 
   double operator () (const double pos) const;
   PLF inverse () const;
@@ -46,14 +47,22 @@ struct PLF::Implementation
     { 
       x.erase (x.begin (), x.end ());
       y.erase (y.begin (), y.end ());
+      slope.erase (slope.begin (), slope.end ());
+      
     }
+  void add (double x, double y);
   void operator = (PLF::Implementation& impl)
   { 
     x = impl.x;
     y = impl.y;
+    slope = impl.slope;
   }
   Implementation () { };
-  Implementation (PLF::Implementation& impl) : x (impl.x), y (impl.y) { };
+  Implementation (PLF::Implementation& impl)
+    : x (impl.x),
+      y (impl.y), 
+      slope (impl.slope)
+  { };
 };
 
 double 
@@ -61,9 +70,10 @@ PLF::Implementation::operator () (const double pos) const
 {
   daisy_assert (x.size () > 0);
   daisy_assert (x.size () == y.size ());
+  daisy_assert (x.size () == slope.size () + 1);
 
-  int min = 0;
-  int max = x.size () - 1;
+  unsigned int min = 0;
+  unsigned int max = x.size () - 1;
 
   if (pos <= x[min])
     return y[min];
@@ -73,18 +83,14 @@ PLF::Implementation::operator () (const double pos) const
   while (true)
     {
       if (max - min == 1)
-	return y[min] 
-	  + (y[max] - y[min]) / (x[max] - x[min]) * (pos - x[min]);
+	return y[min] + slope[min] * (pos - x[min]);
 
-      const int guess = (max + min) / 2;
+      const unsigned int guess = (max + min) / 2;
 
       if (x[guess] < pos)
 	min = guess;
-      else if (x[guess] > pos)
+      else
 	max = guess;
-      else 
-	return y[guess];
-      daisy_assert (max > min);
     }
 }
 
@@ -271,6 +277,20 @@ PLF::Implementation::integrate_stupidly () const
   return plf;
 }
 
+void 
+PLF::Implementation::add (double x_, double y_)
+{
+  const int size = x.size ();
+  daisy_assert (size == 0 || x_ >= x[size - 1]);
+  x.push_back (x_);
+  y.push_back (y_);
+
+  if (size > 0)
+    slope.push_back ((y[size] - y[size-1]) / (x[size] - x[size-1]));
+
+  daisy_assert (slope.size () == size);
+}
+
 double
 PLF::operator () (const double x) const
 { return impl (x); }
@@ -361,12 +381,7 @@ PLF::operator == (const PLF& other) const
 
 void 
 PLF::add (double x, double y)
-{
-  const int size = impl.x.size ();
-  daisy_assert (size == 0 || x >= impl.x[size - 1]);
-  impl.x.push_back (x);
-  impl.y.push_back (y);
-}
+{ impl.add (x, y); }
 
 // Add two PLFs a and b giving c so that c (x) == a (x) + b (x).
 

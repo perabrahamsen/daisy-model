@@ -2,7 +2,11 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Log models
 
-** Move 
+** New Log_Select::time_columns parameter
+
+If true, automatically print four time columns.
+
+By default, it is false iff Select:path[0] == "time" for any select.
 
 ** keep total_accumulated
 

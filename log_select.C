@@ -24,20 +24,8 @@
 #include "tmpstream.h"
 
 bool 
-LogSelect::check_member (symbol name) const
-{ 
-  daisy_assert (is_active);
-  daisy_assert (!active_stack.empty ());
-
-  const vector<Select*>& current = active_stack.top ();
-  for (vector<Select*>::const_iterator i = current.begin (); 
-       i < current.end (); 
-       i++)
-    if ((*i)->valid (name))
-      return true;
-
-  return false;
-}
+LogSelect::check_member (symbol) const
+{ daisy_assert (false); }
 
 bool 
 LogSelect::check_derived (symbol field, symbol /* name */,
@@ -51,114 +39,45 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
   is_printing = condition.match (daisy);
   is_active = is_printing;
 
-#ifdef NO_LOG_ALL
-  // If we don't have log_all.C, we keep track of the active_stack in
-  // each indidual log file.
-  vector<Select*> current;
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->match (daisy, out, is_printing))
-      {
-	is_active = true;
-	current.push_back (entries[i]);
-      }
-
-  if (is_active)
-    active_stack.push (current);
-#else //!NO_LOG_ALL
-  // If we have log_all.C, we let it keep track of the active_stack.
-  daisy_assert (active_stack.empty ());
   for (vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
     if ((*i)->match (is_printing))
       is_active = true;
-#endif
 
   return is_active;
 }
 
 void
 LogSelect::done ()
-{ 
-#ifdef NO_LOG_ALL
-  // No log_all.C file, keep track of active_stack here.
-  daisy_assert (is_active);
-  daisy_assert (active_stack.size () == 1);
-  active_stack.pop ();
-#endif
-}
+{ }
 
 bool
 LogSelect::initial_match (const Daisy&, Treelog&)
 {
   is_active = false;
-#ifdef NO_LOG_ALL
-  // If we don't have log_all.C, we keep track of the active_stack in
-  // each indidual log file.
-  vector<Select*> current;
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->initial_match ())
-      {
-	if (entries[i]->interesting_content)
-	  is_active = true;
-	current.push_back (entries[i]);
-      }
-  if (is_active)
-      active_stack.push (current);
-#else //!NO_LOG_ALL
-  // If we have log_all.C, we let it keep track of the active_stack.
-  daisy_assert (active_stack.empty ());
+
   for (vector<Select*>::const_iterator i = entries.begin (); 
        i < entries.end (); 
        i++)
     if ((*i)->initial_match ())
       is_active = true;
-#endif
+
   is_printing = is_active;
   return is_active;
 }
 
 void
 LogSelect::initial_done ()
-{ 
-#ifdef NO_LOG_ALL
-  // No log_all.C file, keep track of active_stack here.
-  daisy_assert (is_active);
-  daisy_assert (active_stack.size () == 1);
-  active_stack.pop ();
-#endif
-}
+{ }
 
 void 
-LogSelect::open (symbol name)
-{ 
-  daisy_assert (is_active);
-  daisy_assert (!active_stack.empty ());
-
-  const vector<Select*>& current = active_stack.top ();
-  daisy_assert (&current == &active_stack.top ());
-  active_stack.push (vector<Select*> ());
-  vector<Select*>& next = active_stack.top ();
-  
-  for (vector<Select*>::const_iterator i = current.begin (); 
-       i < current.end (); 
-       i++)
-    if ((*i)->open (name))
-	next.push_back ((*i));
-}
+LogSelect::open (symbol)
+{ daisy_assert (false); }
 
 void 
 LogSelect::close ()
-{ 
-  const vector<Select*>& current = active_stack.top ();
-
-  for (vector<Select*>::const_iterator i = current.begin (); 
-       i < current.end (); 
-       i++)
-    (*i)->close ();
-
-  active_stack.pop ();
-}
+{ daisy_assert (false); }
 
 void 
 LogSelect::open_unnamed ()
@@ -213,61 +132,31 @@ LogSelect::close_named_entry ()
 
 void 
 LogSelect::output (symbol, const bool)
-{ }
+{ daisy_assert (false); }
 
 void 
-LogSelect::output (symbol name, const double value)
-{ 
-  const vector<Select*>& sels = active_stack.top ();
-
-  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
-      (*i)->output_number (value);
-}
+LogSelect::output (symbol, const double)
+{ daisy_assert (false); }
 
 void 
-LogSelect::output (symbol name, const int value)
-{ 
-  const vector<Select*>& sels = active_stack.top ();
-
-  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
-      (*i)->output_integer (value);
-}
+LogSelect::output (symbol, const int)
+{ daisy_assert (false); }
 
 void 
-LogSelect::output (symbol name, const string& value)
-{ 
-  const vector<Select*>& sels = active_stack.top ();
-
-  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
-      (*i)->output_name (value);
-}
+LogSelect::output (symbol, const string&)
+{ daisy_assert (false); }
 
 void 
-LogSelect::output (symbol name, const vector<double>& value)
-{ 
-  const vector<Select*>& sels = active_stack.top ();
-
-  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
-      (*i)->output_array (value, geometry ());
-}
+LogSelect::output (symbol, const vector<double>&)
+{ daisy_assert (false); }
 
 void 
 LogSelect::output (symbol, const PLF&)
-{ }
+{ daisy_assert (false); }
 
 void 
-LogSelect::output (symbol name, const Time& value)
-{ 
-  const vector<Select*>& sels = active_stack.top ();
-
-  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
-      (*i)->output_time (value);
-}
+LogSelect::output (symbol, const Time&)
+{ daisy_assert (false); }
 
 bool 
 LogSelect::check (const Syntax&, Treelog& err) const

@@ -29,6 +29,10 @@ class LogAll : public LogSelect
   // Content.
 private:
   vector<LogSelect*> slaves;
+  stack<vector<Select*>/**/> active_stack;
+
+  // Filter functions.
+  bool check_member (symbol) const;
 
   // Use.
 public:
@@ -38,6 +42,18 @@ public:
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
   void initial_done ();
+
+  // Open normal items.
+  void open (symbol name);
+  void close ();
+
+  void output (symbol name, const bool);
+  void output (symbol name, const double value);
+  void output (symbol name, const int value);
+  void output (symbol name, const string& value);
+  void output (symbol name, const vector<double>& value);
+  void output (symbol name, const PLF&);
+  void output (symbol name, const Time&); // Obsolete.
 
   // Create and destroy.
 private:
