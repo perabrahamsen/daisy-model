@@ -1,5 +1,12 @@
 2002-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.29 released.
+
+2002-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C, om.h (water_factor, heat_factor): Fixed initialization
+	bug. 
+
 	* macro_std.C (height_start, height_end): Made them optional.
 	(check_alist): New checks.
 

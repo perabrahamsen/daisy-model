@@ -57,10 +57,10 @@ struct MacroStandard : public Macro
       distribution (al.plf ("distribution")),
       height_start (al.check ("height_start") 
 		    ? al.number ("height_start")
-		    : distribution.y (distribution.size () - 1)),
+		    : distribution.x (distribution.size () - 1)),
       height_end (al.check ("height_end")
 		  ? al.number ("height_end")
-		  : distribution.y (0)),
+		  : distribution.x (0)),
       pressure_initiate (al.number ("pressure_initiate")),
       pressure_end (al.number ("pressure_end")),
       pond_max (al.number ("pond_max"))
@@ -293,7 +293,7 @@ static struct MacroStandardSyntax
 	  }
       }
     else
-      height_start = distribution.y (size - 1);
+      height_start = distribution.x (size - 1);
 
     double height_end;
     if (al.check ("height_end"))
@@ -306,7 +306,7 @@ static struct MacroStandardSyntax
 	  }
       }
     else
-      height_end = distribution.y (0);
+      height_end = distribution.x (0);
 
     if (height_end >= height_start)
       {
