@@ -234,6 +234,14 @@ Production::tick (const double AirT, const double SoilT,
 	  IncWRoot = CH2OPool - RMRoot;
 	  CH2OPool = 0.0;
 	}
+      if (ReMobilResp <= CH2OPool)
+	{
+	  CH2OPool -= ReMobilResp;
+	}
+      else
+	{
+	  CH2OPool = 0.0;
+	}
       if (CH2OPool > 0.0)
 	CERR << "BUG: Extra CH2O: " << CH2OPool << "\n";
     }
