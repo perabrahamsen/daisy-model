@@ -12,12 +12,28 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.48
+
+** Fix `monthly' and `yearly' conditions.
+
+Used to match every hour in the month or year, except the last.
+Reversed that.
+
+** You can now log applied fertilizer.
+
+Use the new `Fertilizer' log model, defined in `log.dai'.
+
+** Fix loading global files (bug introduced in 1.47).
+
 * 1.47
 
 ** New default SMB and SOM parameters. 
 
 These should have little effect on mineralization, but give a more
 realistic estimate of the size of the SMB pools.
+
+It *will* have a large effect if you are running without a starting
+period, and have large initial AOM pools.
 
 ** New fertilizer types in `fertilizer.dai'.
 

@@ -46,6 +46,7 @@ public:
   void fertilize (const AttributeList&);
   void fertilize (const IM&, double from, double to); // Mineral.
   void fertilize (const IM&);
+  void clear_second_year_utilization ();
   void harvest (const Time&, const string& name,
 		double stub_length, 
 		double stem_harvest, 
@@ -65,6 +66,7 @@ public:
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
+  double second_year_utilization () const;// [kg N/ha]
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   double crop_ds (const string& crop) const; 

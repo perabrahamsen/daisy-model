@@ -18,6 +18,22 @@ private:
   OrganicMatter organic_matter;
   Nitrification& nitrification;
   Denitrification denitrification;
+  double second_year_utilization_;
+
+  // Log variables.
+private:
+  double log_fertilized_NO3;
+  double log_fertilized_NH4;
+  double log_fertilized_Org_N;
+  double log_fertilized_Org_C;
+  double log_fertilized_DM;
+  double log_first_year_utilization;
+  double fertilized_NO3;
+  double fertilized_NH4;
+  double fertilized_Org_N;
+  double fertilized_Org_C;
+  double fertilized_DM;
+  double first_year_utilization;
 
   // Actions.
 public:
@@ -32,6 +48,8 @@ public:
   void fertilize (const AttributeList&, double from, double to);
   void fertilize (const IM&);
   void fertilize (const IM&, double from, double to);
+  void clear_second_year_utilization ();
+
   void add_residuals (vector<AM*>& residuals);
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
@@ -39,6 +57,7 @@ public:
   // Conditions.
 public:
   double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
+  double second_year_utilization () const;// [kg N/ha]
 
   // Communication with external model.
 public:
@@ -146,7 +165,17 @@ ColumnStandard::set_subsoil_irrigation (double flux, const IM& sm,
 void
 ColumnStandard::fertilize (const AttributeList& al)
 {
+  first_year_utilization += AM::utilized_weight (al);
+  second_year_utilization_ += AM::second_year_utilization (al);
   AM& am = AM::create (al, soil);
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+  fertilized_Org_N += am.total_N (soil) / conv; 
+  fertilized_Org_C += am.total_C (soil) / conv;
+
+  if (al.check ("weight"))
+    fertilized_DM += al.number ("weight");
+
   organic_matter.add (am);
 }
 
@@ -154,7 +183,18 @@ void
 ColumnStandard::fertilize (const AttributeList& al, double from, double to)
 {
   assert (to < from);
+  first_year_utilization += AM::utilized_weight (al);
+  second_year_utilization_ += AM::second_year_utilization (al);
   AM& am = AM::create (al, soil);
+
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+  fertilized_Org_N += am.total_N (soil) / conv; 
+  fertilized_Org_C += am.total_C (soil) / conv;
+
+  if (al.check ("weight"))
+    fertilized_DM += al.number ("weight");
+
   am.mix (soil, from, to);
   organic_matter.add (am);
 }
@@ -162,9 +202,15 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
 void 
 ColumnStandard::fertilize (const IM& im)
 {
+
   assert (im.NH4 >= 0.0);
   assert (im.NO3 >= 0.0);
   surface.fertilize (im);
+
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+  fertilized_NO3 += im.NO3 / conv; 
+  fertilized_NH4 += im.NH4 / conv;
 }
 
 void 
@@ -175,7 +221,16 @@ ColumnStandard::fertilize (const IM& im, double from, double to)
   assert (to < from);
   soil_NO3.add_external (soil, soil_water, im.NO3, from, to);
   soil_NH4.add_external (soil, soil_water, im.NH4, from, to);
+
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+  fertilized_NO3 += im.NO3 / conv; 
+  fertilized_NH4 += im.NH4 / conv;
 }
+
+void 
+ColumnStandard::clear_second_year_utilization ()
+{ second_year_utilization_ = 0.0; }
 
 void
 ColumnStandard::add_residuals (vector<AM*>& residuals)
@@ -212,6 +267,10 @@ ColumnStandard::soil_inorganic_nitrogen (double from, double to) const
   return (soil_NH4.total (soil, from, to) 
 	  + soil_NO3.total (soil, from, to)) * 1.0e5; // g N/cm^2 -> kg N/ha
 }  
+
+double				// [kg N/ha]
+ColumnStandard::second_year_utilization () const
+{ return second_year_utilization_; }
 
 void 
 ColumnStandard::put_no3_m (const vector<double>& v) // [g/cm^3]
@@ -256,6 +315,21 @@ ColumnStandard::tick (const Time& time, const Weather* global_weather)
   soil_chemicals.clear ();
   soil_NO3.clear ();
   soil_NH4.clear ();
+
+
+  // Save logs.
+  log_fertilized_NO3 = fertilized_NO3;
+  log_fertilized_NH4 = fertilized_NH4;
+  log_fertilized_Org_N = fertilized_Org_N;
+  log_fertilized_Org_C = fertilized_Org_C;
+  log_fertilized_DM = fertilized_DM;
+  log_first_year_utilization = first_year_utilization;
+  fertilized_NO3 = 0.0;
+  fertilized_NH4 = 0.0;
+  fertilized_Org_N = 0.0;
+  fertilized_Org_C = 0.0;
+  fertilized_DM = 0.0;
+  first_year_utilization = 0.0;
 
   // Early calculation.
   IM soil_top_conc;
@@ -302,6 +376,13 @@ ColumnStandard::output_inner (Log& log) const
     }
   output_derived (nitrification, "Nitrification", log);
   output_submodule (denitrification, "Denitrification", log);
+  log.output ("second_year_utilization", second_year_utilization_);
+  log.output ("fertilized_NO3", log_fertilized_NO3);
+  log.output ("fertilized_NH4", log_fertilized_NH4);
+  log.output ("fertilized_Org_N", log_fertilized_Org_N);
+  log.output ("fertilized_Org_C", log_fertilized_Org_C);
+  log.output ("fertilized_DM", log_fertilized_DM);
+  log.output ("first_year_utilization", log_first_year_utilization);
 }
 
 bool 
@@ -328,7 +409,20 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     organic_matter (al.alist ("OrganicMatter")),
     nitrification (Librarian<Nitrification>::create 
 		   (al.alist ("Nitrification"))),
-    denitrification (al.alist ("Denitrification"))
+    denitrification (al.alist ("Denitrification")),
+    second_year_utilization_ (al.number ("second_year_utilization")),
+    log_fertilized_NO3 (0.0),
+    log_fertilized_NH4 (0.0),
+    log_fertilized_Org_N (0.0),
+    log_fertilized_Org_C (0.0),
+    log_fertilized_DM (0.0),
+    log_first_year_utilization (0.0),
+    fertilized_NO3 (0.0),
+    fertilized_NH4 (0.0),
+    fertilized_Org_N (0.0),
+    fertilized_Org_C (0.0),
+    fertilized_DM (0.0),
+    first_year_utilization (0.0)
 { }
 
 void 
@@ -394,5 +488,20 @@ The organic matter in the soil and on the surface.");
     add_submodule<Denitrification> ("Denitrification", syntax, alist,
 				    Syntax::State, "\
 The denitrification process.");
+    syntax.add ("second_year_utilization", "kg N/ha", Syntax::State,
+		"Estimated accumulated second year fertilizer effect.");
+    alist.add ("second_year_utilization", 0.0);
+    syntax.add ("fertilized_NO3", "kg N/ha", Syntax::LogOnly,
+		"Amount of nitrate applied this time step.");
+    syntax.add ("fertilized_NH4", "kg N/ha", Syntax::LogOnly,
+		"Amount of ammonium applied this time step.");
+    syntax.add ("fertilized_Org_N", "kg N/ha", Syntax::LogOnly,
+		"Amount of organic bound nitrogen applied this time step.");
+    syntax.add ("fertilized_Org_C", "kg C/ha", Syntax::LogOnly,
+		"Amount of organic bound carbon applied this time step.");
+    syntax.add ("fertilized_DM", "ton DM/ha", Syntax::LogOnly,
+		"Amount of dry matter applied this time step.");
+    syntax.add ("first_year_utilization", "kg N/ha", Syntax::LogOnly,
+		"Estimated first year fertilizer effect.");
   }
 } column_syntax;

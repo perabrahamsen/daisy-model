@@ -2,15 +2,7 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Gødning
 
-** Fertilizer log.
-
-NO3 NH4 Org-N Org-C DM
-
-** second year utilization
-
-new column state variable
-new fertilizer parameter
-new fertilize parameter
+** Get rid of inorganic variants of field/column::feritlize
 
 * Test Qt.
 

@@ -192,7 +192,7 @@ public:
       return false;
     Time next = daisy.time;
     next.tick_hour ();
-    return next.month () == month;
+    return next.month () != month;
   }
   void output (Log&) const
   { }
@@ -215,7 +215,7 @@ public:
       return false;
     Time next = daisy.time;
     next.tick_hour ();
-    return next.year () == year;
+    return next.year () != year;
   }
 
   void output (Log&) const

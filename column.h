@@ -34,6 +34,7 @@ public:
   virtual void fertilize (const AttributeList&) = 0;
   virtual void fertilize (const IM&, double from, double to) = 0; // Mineral.
   virtual void fertilize (const IM&) = 0;
+  virtual void clear_second_year_utilization () = 0;
   virtual void harvest (const Time&, const string& name,
 			double stub_length, 
 			double stem_harvest, 
@@ -54,6 +55,7 @@ public:
   virtual double soil_water_potential (double height) const = 0; // [cm -> cm]
   virtual double soil_inorganic_nitrogen (double from, // [kg N/ha]
 					  double to) const = 0; 
+  virtual double second_year_utilization () const = 0;
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   virtual double crop_ds (const string& crop) const = 0; 

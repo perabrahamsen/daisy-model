@@ -12,11 +12,13 @@ public:
   void fertilize (const AttributeList&, double from, double to);
   void fertilize (const IM&);
   void fertilize (const IM&, double from, double to);
+  void clear_second_year_utilization ();
   void add_residuals (vector<AM*>& residuals);
 
   // Conditions.
 public:
   double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
+  double second_year_utilization () const;// [kg N/ha]
 
   // Communication with external model.
 public:
@@ -69,6 +71,10 @@ void
 ColumnInorganic::fertilize (const IM&, double, double)
 { }
 
+void 
+ColumnInorganic::clear_second_year_utilization ()
+{ }
+
 void
 ColumnInorganic::add_residuals (vector<AM*>& residuals)
 {
@@ -77,6 +83,10 @@ ColumnInorganic::add_residuals (vector<AM*>& residuals)
 
 double
 ColumnInorganic::soil_inorganic_nitrogen (double, double) const
+{ return 0.0; }
+
+double				// [kg N/ha]
+ColumnInorganic::second_year_utilization () const
 { return 0.0; }
 
 void 

@@ -27,8 +27,8 @@ public:
   bool check () const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
   void swap (const Geometry&, double from, double middle, double to);
-  double total_C (const Geometry& geometry) const;
-  double total_N (const Geometry& geometry) const;
+  double total_C (const Geometry& geometry) const; // [g C/cm^2]
+  double total_N (const Geometry& geometry) const; // [g N/cm^2]
   double C_at (unsigned int at) const;
   double N_at (unsigned int at) const;
   void pour (vector<double>& cc, vector<double>& nn);
@@ -37,8 +37,8 @@ public:
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const vector<double>& density);
-  double top_C () const;
-  double top_N () const;
+  double top_C () const;	// [g C/cm^2]
+  double top_N () const;	// [g N/cm^2]
   void multiply_top (double fraction);
 
   // Crop Locks.
@@ -59,6 +59,13 @@ public:
 		     lock_type lock = Unlocked);
   void initialize (const Geometry&);
   static const vector<AttributeList*>& default_AOM ();
+  static double get_NO3 (const AttributeList&);	// [g N/cm^2]
+  static double get_NH4 (const AttributeList&);	// [g N/cm^2]
+  static void set_utilized_weight (AttributeList& am,
+				   const double weight /* [kg N/ha] */);
+  static double utilized_weight (const AttributeList& am); // [kg N/ha]
+  static double second_year_utilization (const AttributeList& am); // [kg N/ha]
+
 private:
   friend class AM_Syntax;
   AM (const AttributeList&);

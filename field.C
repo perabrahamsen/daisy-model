@@ -29,6 +29,7 @@ struct Field::Implementation
   void fertilize (const AttributeList&);
   void fertilize (const IM&, double from, double to); // Mineral.
   void fertilize (const IM&);
+  void clear_second_year_utilization ();
   void harvest (const Time&, const string& name,
 		double stub_length, 
 		double stem_harvest, 
@@ -48,6 +49,7 @@ public:
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
+  double second_year_utilization () const;// [kg N/ha]
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   double crop_ds (const string& crop) const; 
@@ -235,6 +237,17 @@ Field::Implementation::fertilize (const IM& im)
     (*i)->fertilize (im);
 }
 
+void 
+Field::Implementation::clear_second_year_utilization ()
+{
+  if (selected)
+    selected->clear_second_year_utilization ();
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->clear_second_year_utilization ();
+}
+
 void
 Field::Implementation::harvest (const Time& time, const string& name,
 				double stub_length, 
@@ -357,6 +370,17 @@ Field::Implementation::soil_inorganic_nitrogen (double from,  // [kg N/ha]
     throw ("Cannot find inorganic nitrogen in multiple columns");
 
   return columns[0]->soil_inorganic_nitrogen (from, to);
+}
+
+double 
+Field::Implementation::second_year_utilization () const
+{
+  if (selected)
+    return selected->second_year_utilization (); 
+  if (columns.size () != 1)
+    throw ("Cannot find second year utilization in multiple columns");
+
+  return columns[0]->second_year_utilization ();
 }
 
 double 
@@ -562,6 +586,10 @@ void
 Field::fertilize (const IM& im)
 { impl.fertilize (im); }
 
+void 
+Field::clear_second_year_utilization ()
+{ impl.clear_second_year_utilization (); }
+
 void
 Field::harvest (const Time& time, const string& name,
 		double stub_length, 
@@ -609,6 +637,10 @@ Field::soil_water_potential (double height) const // [cm -> cm]
 double
 Field::soil_inorganic_nitrogen (double from, double to) const // [kg N/ha]
 { return impl.soil_inorganic_nitrogen (from, to); }
+
+double
+Field::second_year_utilization () const // [kg N/ha]
+{ return impl.second_year_utilization (); }
 
 double 
 Field::crop_ds (const string& crop) const

@@ -669,6 +669,120 @@ AM::default_AOM ()
   return *AOM;
 }
 
+double
+AM::get_NO3 (const AttributeList& al)
+{
+  if (al.check ("weight"))
+    {
+      if (al.name ("syntax") == "organic")
+	{
+	  // Organic fertilizer.
+	  const double weight = al.number ("weight") 
+	    * al.number ("dry_matter_fraction") 
+	    * 0.01;			// T w.w. / ha --> g / cm²
+	  const double N = weight * al.number ("total_N_fraction");
+	  return N * al.number ("NO3_fraction");
+	}
+      // Mineral fertilizer.
+      assert (al.name ("syntax") == "mineral");
+      return al.number ("weight")
+	* (1.0 - al.number ("NH4_fraction"))
+	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
+    }
+  // Other.
+  return al.number ("NO3");
+}
+
+double
+AM::get_NH4 (const AttributeList& al)
+{
+  if (al.check ("weight"))
+    {
+      if (al.name ("syntax") == "organic")
+	{
+	  // Organic fertilizer.
+	  const double weight = al.number ("weight") 
+	    * al.number ("dry_matter_fraction") 
+	    * 0.01;			// T w.w. / ha --> g / cm²
+	  const double N = weight * al.number ("total_N_fraction");
+	  return N * al.number ("NH4_fraction");
+	}
+      // Mineral fertilizer.
+      assert (al.name ("syntax") == "mineral");
+      const double volatilization 
+	= al.check ("NH4_evaporation") 
+	? al.number ("NH4_evaporation")
+	: al.number ("volatilization");
+      
+      return al.number ("weight")
+	* al.number ("NH4_fraction") * (1.0 - volatilization)
+	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
+    }
+  // Other.
+  assert (!al.check ("NH4_evaporation") && !al.check ("volatilization"));
+  return al.number ("NH4");
+}
+
+void
+AM::set_utilized_weight (AttributeList& am, const double weight)
+{
+  const string syntax = am.name ("syntax");
+    
+  if (syntax == "mineral")
+    am.add ("weight", weight);
+  else
+    {
+      assert (syntax == "organic");
+      assert (am.check ("first_year_utilization"));
+      assert (am.check ("total_N_fraction"));
+      assert (am.check ("dry_matter_fraction"));
+      const double N_fraction = am.number ("total_N_fraction");
+      const double utilization = am.number ("first_year_utilization");
+      const double dry_matter_fraction = am.number ("dry_matter_fraction");
+      const double kg_per_ton = 1000.0;
+      am.add ("weight", weight 
+	      / (dry_matter_fraction *N_fraction * utilization * kg_per_ton));
+    }
+}
+
+double
+AM::utilized_weight (const AttributeList& am)
+{
+  if (am.check ("first_year_utilization")
+      && am.check ("dry_matter_fraction")
+      && am.check ("total_N_fraction")
+      && am.check ("weight"))
+    {
+       const double kg_per_ton = 1000.0;
+       return am.number ("weight")
+	 * am.number ("dry_matter_fraction")
+	 * am.number ("total_N_fraction")
+	 * am.number ("first_year_utilization")
+	 * kg_per_ton;
+    }
+  else if (am.name ("syntax") == "mineral")
+    return am.number ("weight");
+
+  return 0.0;
+}
+double
+AM::second_year_utilization (const AttributeList& am)
+{
+  if (am.check ("second_year_utilization")
+      && am.check ("dry_matter_fraction")
+      && am.check ("total_N_fraction")
+      && am.check ("weight"))
+    {
+       const double kg_per_ton = 1000.0;
+       return am.number ("weight")
+	 * am.number ("dry_matter_fraction")
+	 * am.number ("total_N_fraction")
+	 * am.number ("second_year_utilization")
+	 * kg_per_ton;
+    }
+  return 0.0;
+}
+
 AM::AM (const AttributeList& al)
   : impl (*new Implementation 
 	  (al.time ("creation"),
@@ -929,6 +1043,10 @@ Organic fertilizer, typically slurry or manure from animals.");
 	syntax.add ("first_year_utilization", 
 		    Syntax::Fraction (), Syntax::OptionalConst, 
 		    "Estimated useful N fraction for the first year.\n\
+In Denmark, this is governed by legalisation.");
+	syntax.add ("second_year_utilization", 
+		    Syntax::Fraction (), Syntax::OptionalConst, 
+		    "Estimated useful N fraction for the second year.\n\
 In Denmark, this is governed by legalisation.");
 	syntax.add ("dry_matter_fraction", Syntax::Fraction (), Syntax::Const,
 		    "Dry matter fraction of total weight.");

@@ -1,6 +1,7 @@
 // im.C
 
 #include "im.h"
+#include "am.h"
 #include "log.h"
 #include "alist.h"
 #include "syntax.h"
@@ -66,58 +67,6 @@ IM::operator+ (const IM& im) const
   return result;
 }
 
-static double IM_get_NO3 (const AttributeList& al)
-{
-  if (al.check ("weight"))
-    {
-      if (al.name ("syntax") == "organic")
-	{
-	  // Organic fertilizer.
-	  const double weight = al.number ("weight") 
-	    * al.number ("dry_matter_fraction") 
-	    * 0.01;			// T w.w. / ha --> g / cm²
-	  const double N = weight * al.number ("total_N_fraction");
-	  return N * al.number ("NO3_fraction");
-	}
-      // Mineral fertilizer.
-      assert (al.name ("syntax") == "mineral");
-      return al.number ("weight")
-	* (1.0 - al.number ("NH4_fraction"))
-	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
-    }
-  // Other.
-  return al.number ("NO3");
-}
-
-static double IM_get_NH4 (const AttributeList& al)
-{
-  if (al.check ("weight"))
-    {
-      if (al.name ("syntax") == "organic")
-	{
-	  // Organic fertilizer.
-	  const double weight = al.number ("weight") 
-	    * al.number ("dry_matter_fraction") 
-	    * 0.01;			// T w.w. / ha --> g / cm²
-	  const double N = weight * al.number ("total_N_fraction");
-	  return N * al.number ("NH4_fraction");
-	}
-      // Mineral fertilizer.
-      assert (al.name ("syntax") == "mineral");
-      const double volatilization 
-	= al.check ("NH4_evaporation") 
-	? al.number ("NH4_evaporation")
-	: al.number ("volatilization");
-      
-      return al.number ("weight")
-	* al.number ("NH4_fraction") * (1.0 - volatilization)
-	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
-    }
-  // Other.
-  assert (!al.check ("NH4_evaporation") && !al.check ("volatilization"));
-  return al.number ("NH4");
-}
-
 IM::IM ()
   : NH4 (0.0),
     NO3 (0.0)
@@ -129,8 +78,8 @@ IM::IM (const IM& im)
 { }
 
 IM::IM (const AttributeList& al)
-  : NH4 (IM_get_NH4 (al)),
-    NO3 (IM_get_NO3 (al))
+  : NH4 (AM::get_NH4 (al)),
+    NO3 (AM::get_NO3 (al))
 { }
 
 IM::IM (const IM& n, double flux)

@@ -1,4 +1,43 @@
+2000-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.48 released.
+
+2000-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_fertilize.C (second_year_compensation): New parameter.
+	* am.C, am.h (second_year_utilization): New function.
+	* column_std.C (fertilize): Use it.
+	* column_std.C (second_year_utilization): New state variable.
+	* am.C (second_year_utilization): New parameter for organic
+	fertilizer. 
+	* field.h, field.C, column.h, column_std.C,
+	column_inorganic.C (second_year_utilization,
+	clear_second_year_utilization):  New function.
+	* action_fertilize.C (tick): Use them.
+
+	* action_fertilize.C (minimum_weight): New paramemter
+
+	* am.C, am.h (set_utilized_weight): Moved to here.
+	* action_fertilize.C (set_weight): Moved from here.
+	(ActionFertilize, doIt): Updated caller.
+	* am.C, am.h (utilized_weight): New function.
+
+	* condition_time.C (ConditionMonthly::match): Used to match every
+	hour in the month, except the last.  Reversed that.
+	* condition_time.C (ConditionYearly::match): As above.
+
+
 2000-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C (fertilized_NO3, fertilized_NH4, fertilized_Org_N,
+	fertilized_Org_C, fertilized_DM): New log variables.
+	* lib/log.dai ("Fertilizer"): New log model.
+
+	* im.C (IM_get_NO3, IM_get_NH4): Moved and renamed.
+	* am.C, am.h (get_NO3, get_NH4): To here.
+	* im.C (IM): Update caller.
+
+	* common.C (find_file): Fix previous fix (missing return fd).
 
 	* Version 1.47 released.
 
@@ -113,7 +152,7 @@
 	* action_fertilize.C (equivalent_weight): New parameter.
 	* am.C (weight): Gave default value `0.0' for mineral and
 	organic weight.
-	(utilization): New parameter for organic fertilizer. 
+	(first_year_utilization): New parameter for organic fertilizer. 
 
 	* root_system.C (load_syntax): Made it a submodel.
 	* canopy_std.C (load_syntax): Ditto.
