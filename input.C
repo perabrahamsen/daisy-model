@@ -6,8 +6,6 @@
 #include "csmp.h"
 #include "library.h"
 #include "syntax.h"
-#include "action.h"
-#include "condition.h"
 #include "filter.h"
 #include "crop.h"
 #include "time.h"
@@ -41,13 +39,10 @@ struct Parser
   AttributeList& load_derived (const Library& lib, bool in_sequence = false);
   void load_list (AttributeList&, const Syntax&);
   Time get_time ();
-  const Condition* get_condition ();
-  const Action* get_action ();
   const Filter& get_filter (const Syntax&);
   const Filter& get_filter_object (const Library&);
   const Filter& get_filter_sequence (const Library&);
   istream* in;
-  ostream& err;
   string file;
   int line;
   int column;
@@ -163,7 +158,7 @@ Parser::get_integer ()
 void 
 Parser::error (string str)
 {
-  err << file << ":" << line << ":" << column + 1 << ": " << str << "\n";
+  cerr << file << ":" << line << ":" << column + 1 << ": " << str << "\n";
 }
 
 void
@@ -535,28 +530,6 @@ Parser::get_time ()
   return Time (-999, 1, 1, 0);
 }
 
-const Condition*
-Parser::get_condition ()
-{ 
-  const Library& lib = Condition::library ();
-  skip ("(");
-  const AttributeList& atts = load_derived (lib);
-  const Condition& condition = Condition::create (atts);
-  skip (")");
-  return &condition;
-}
-
-const Action*
-Parser::get_action ()
-{
-  const Library& lib = Action::library ();
-  skip ("(");
-  const AttributeList& atts = load_derived (lib);
-  const Action& action = Action::create (atts);
-  skip (")");
-  return &action;
-}
-
 const Filter&
 Parser::get_filter (const Syntax& syntax)
 {
@@ -657,8 +630,7 @@ Parser::get_filter_sequence (const Library& library)
 
 Parser::Parser (int& argc, char**& argv, const Syntax& syntax, 
 		AttributeList& alist)
-  : err (cerr),
-    line (1),
+  : line (1),
     column (0), 
     global_syntax_table (syntax)
 { 
