@@ -73,15 +73,23 @@ main (int argc, char* argv[])
       }
       // Create, check and run the simulation.
       Options::copyright (treelog);
-      const string when = string ("Simulation started ") + ctime (&start_time);
-      TmpStream start_msg;
-      start_msg () << when.substr (0, when.size () - 1);
-      start_msg () << ", " << (time (NULL) - start_time) << " seconds ago.";
-      treelog.message (start_msg.str ());
       Daisy daisy (alist);
       daisy.initialize (syntax, treelog);
       if (!daisy.check (treelog))
 	return 1;
+
+      const string when = string ("Simulation started ") + ctime (&start_time);
+      TmpStream start_msg;
+      start_msg () << when.substr (0, when.size () - 1);
+      const int time_ago = time (NULL) - start_time;
+      if (time_ago == 0)
+	start_msg () << ".";
+      if (time_ago == 1)
+	start_msg () << ", 1 second ago.";
+      else
+	start_msg () << ", " << time_ago << " seconds ago.";
+      treelog.message (start_msg.str ());
+
       daisy.run (treelog);
 
       const int time_used = time (NULL) - start_time;
@@ -89,7 +97,7 @@ main (int argc, char* argv[])
       const int minutes = (time_used % 3600) / 60;
       const int seconds = time_used % 60;
       TmpStream end_msg;
-      end_msg () << "Simulation lasted ";
+      end_msg () << "Simulation done after ";
       if (hours == 1)
 	end_msg () << "1 hour, ";
       else if (hours > 0)
