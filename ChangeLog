@@ -1,5 +1,9 @@
 2001-11-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.97 released.
+
+2001-11-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* check.C, check.h, check_std.C, check_std.h: New utility.
 	* Makefile (OTHER): Add them.
 	* syntax.C, syntax.h (check, add): Support them.
