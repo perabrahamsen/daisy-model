@@ -1,3 +1,26 @@
+2000-02-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.14 released.
+
+2000-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+
+	* am.h (class AM): Make constructor private.
+	* am.C (create): Be sure to create as "state".
+	(AM_Syntax::make): Ditto.
+
+	* om.C (output): Don't log unspecified `initial_C_per_N'.
+
+	* bioincorporation.C, bioincorporation.h (output): Don't take
+	geometry parameter.
+	* organic_matter.C (output): Updated caller.
+	* bioincorporation.C (load_syntax, output): Removed `soil_N' and
+	`soil_C'. 
+	* lib/log.dai (Bioincorporation): Updated log model.
+	(AOM): Renamed from (AM).  Updated tags.
+
+	* om.C (set_N): Use CERR instead of assert.
+
 2000-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.13 released.

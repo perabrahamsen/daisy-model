@@ -40,7 +40,8 @@ OM::OM (const AttributeList& al)
 void
 OM::output (Log& log) const
 {
-  log.output ("initial_C_per_N", initial_C_per_N); // For checkpoint
+  if (initial_C_per_N != Unspecified)
+    log.output ("initial_C_per_N", initial_C_per_N); // For checkpoint
   log.output ("top_C", top_C);
   log.output ("top_N", top_N);
   log.output ("C", C);

@@ -23,7 +23,7 @@ private:
   // Simulation.
 public:
   void tick (const Geometry&, vector <AM*>&, double T, double& CO2);
-  void output (Log&, const Geometry&) const;
+  void output (Log&) const;
 
   // Create and Destroy.
 public:

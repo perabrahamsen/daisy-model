@@ -549,9 +549,13 @@ AM:: crop_part_name () const
 { return impl.crop_part_name (); }
 
 AM& 
-AM::create (const AttributeList& al , const Geometry& geometry)
+AM::create (const AttributeList& al1 , const Geometry& geometry)
 { 
-  AM& am = *new AM (al); 
+  AttributeList al2 (al1);
+  al2.add ("type", "state");
+  if (!al2.check ("name"))
+    al2.add ("name", al1.name ("type"));
+  AM& am = *new AM (al2); 
   am.initialize (geometry);
   return am;
 }
@@ -577,7 +581,7 @@ AM::create (const Geometry& /*geometry*/, const Time& time,
 AM::AM (const AttributeList& al)
   : impl (*new Implementation 
 	  (al.time ("creation"),
-	   al.name (al.check ("name") ? "name" : "type"),
+	   al.name ("name"),
 	   map_construct<OM> (al.alist_sequence ("om")))),
     alist (al),
     name ("state")
@@ -779,8 +783,14 @@ template class add_submodule<IM>;
 static struct AM_Syntax
 {
   static AM&
-  make (const AttributeList& al)
-    { return *new AM (al); }
+  make (const AttributeList& al1)
+  { 
+    AttributeList al2 (al1);
+    al2.add ("type", "state");
+    if (!al2.check ("name"))
+      al2.add ("name", al1.name ("type"));
+    return *new AM (al2); 
+  }
   AM_Syntax ()
     {
       // State.

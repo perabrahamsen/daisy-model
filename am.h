@@ -57,7 +57,10 @@ public:
 		     const string& sort, const string& part,
 		     lock_type lock = Unlocked);
   void initialize (const Geometry&);
+private:
+  friend class AM_Syntax;
   AM (const AttributeList&);
+public:
   virtual ~AM ();
 };
 

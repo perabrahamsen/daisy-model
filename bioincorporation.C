@@ -41,7 +41,7 @@ struct Bioincorporation::Implementation
 
   // Simulation.
   void tick (const Geometry&, vector <AM*>& am, double T, double& CO2);
-  void output (Log&, const Geometry&) const;
+  void output (Log&) const;
 
   // Create and destroy.
   void initialize (const Soil&);
@@ -163,8 +163,7 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
 }
   
 void 
-Bioincorporation::Implementation::output (Log& log, 
-					  const Geometry& geometry) const
+Bioincorporation::Implementation::output (Log& log) const
 { 
   if (log.check ("CO2"))
     log.output ("CO2", respiration * C / (1.0 - respiration));
@@ -172,10 +171,6 @@ Bioincorporation::Implementation::output (Log& log,
     log.output ("DM", C * C_to_DM);
   log.output ("C", C);
   log.output ("N", N);
-  if (log.check ("soil_C"))
-    log.output ("soil_C", aom->total_C (geometry) * cm2_per_m2);
-  if (log.check ("soil_N"))
-    log.output ("soil_N", aom->total_N (geometry) * cm2_per_m2);
 }
 
 void 
@@ -228,9 +223,9 @@ Bioincorporation::tick (const Geometry& geometry, vector <AM*>& am, double T,
 }
 
 void 
-Bioincorporation::output (Log& log, const Geometry& geometry) const
+Bioincorporation::output (Log& log) const
 {
-  impl.output (log, geometry);
+  impl.output (log);
 }
 
 void 
@@ -287,10 +282,6 @@ Limiting factor for high C/N ratio [(g C/cm^2)/(g N/cm^2) -> [0:1]].");
   syntax.add ("C", "g C/m^2/h", Syntax::LogOnly, "C incorporated this hour.");
   syntax.add ("N", "g N/m^2/h", Syntax::LogOnly, "N incorporated this hour.");
   syntax.add ("CO2", "g C/m^2/h", Syntax::LogOnly, "C respirated this hour.");
-  syntax.add ("soil_C", "g C/m^2/h", Syntax::LogOnly,
-	      "Incorporated C left in soil pool.");
-  syntax.add ("soil_N", "g N/m^2/h", Syntax::LogOnly,
-	      "Incorporated N left in soil pool.");
 
   // Incorporation location.
   syntax.add ("distribution", Syntax::CSMP, Syntax::Const,

@@ -291,7 +291,7 @@ OrganicMatter::Implementation::output (Log& log,
   if (log.check ("Bioincorporation"))
     {
       log.open ("Bioincorporation");
-      bioincorporation.output (log, geometry);
+      bioincorporation.output (log);
       log.close ();
     }
   log.output ("NO3_source", NO3_source);
