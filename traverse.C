@@ -1,4 +1,4 @@
-// traverse.C --- Base class to traverse the Daisy data structures.
+// traverse.C --- Base class to traverse the data structures.
 
 #include "traverse.h"
 #include "library.h"

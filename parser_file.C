@@ -36,7 +36,7 @@ struct ParserFile::Implementation
   void skip_token ();
   bool looking_at (char);
 
-  // Daisy parser.
+  // Parser.
   void add_derived (Library&);
   AttributeList& load_derived (const Library& lib, bool in_sequence = false);
   void load_list (AttributeList&, const Syntax&);
@@ -719,7 +719,7 @@ static struct ParserFileSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
-	       "Read Daisy a setup file containing lots of parentheses.");
+	       "Read a setup file containing lots of parentheses.");
     syntax.add ("where", Syntax::String, Syntax::Const,
 		"File to read from.");
     syntax.order ("where");

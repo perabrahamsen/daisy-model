@@ -1,4 +1,4 @@
-// traverse.h --- Base class to traverse the Daisy data structures.
+// traverse.h --- Base class to traverse the data structures.
 
 #ifndef TRAVERSE_H
 #define TRAVERSE_H

@@ -1,4 +1,4 @@
-// depend.h -- Check dependencies in Daisy datastructures.
+// depend.h -- Check dependencies in datastructures.
 
 #ifndef DEPEND_H
 #define DEPEND_H

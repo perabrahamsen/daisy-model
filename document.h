@@ -1,4 +1,4 @@
-// document.h --- Create documentation for Daisy.
+// document.h --- Create documentation.
 
 #ifndef DOCUMENT_H
 #define DOCUMENT_H

@@ -1,4 +1,4 @@
-// submodel.h  --- A registry of submodels used in Daisy.
+// submodel.h  --- A registry of submodels.
 
 #ifndef SUBMODEL_H
 #define SUBMODEL_H

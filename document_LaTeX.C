@@ -681,7 +681,7 @@ static struct DocumentLaTeXSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Output Daisy components and LaTeX chapters.");
+      alist.add ("description", "Output Daisy components as LaTeX chapters.");
       Librarian<Document>::add_type ("LaTeX", alist, syntax, &make);
     }
 } DocumentLaTeX_syntax;

@@ -657,7 +657,7 @@ static struct PrinterFileSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", 
-		 "Print internal daisy structures with lots of parentheses.");
+		 "Print internal datastructures with lots of parentheses.");
       syntax.add ("where", Syntax::String, Syntax::Const,
 		  "File to print in.");
       syntax.order ("where");

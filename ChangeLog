@@ -1,3 +1,37 @@
+2000-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.64 released.
+
+2000-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* depend.C depend.h document.C document.h lexer.h lexer_data.h
+	parser.C parser_file.C printer.C printer_file.C submodel.C
+	submodel.h traverse.C traverse.h traverse_delete.C
+	traverse_delete.h: Removed Daisy references.
+
+	* document_LaTeX.C (DocumentLaTeXSyntax): Fix type in string.
+
+2000-11-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C (load_syntax): Remove call to `Library::load_syntax'. 
+
+2000-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mactrans_std.C (tick): Fixed some numeric problems.
+
+2000-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (snow.o): Remove special rule.
+
+	* common.C: Removed `MINGW' ctype defs.
+
+	* weather_simple.C: Include `mathlib.h' for `M_PI'.
+
+	* Makefile (DYNSEARCH): New macro.
+	(LINK): Use it.
+	(USE_DYNLIB): New macro.
+	(daisy${EXT}): Use it.
+
 2000-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.63 released.

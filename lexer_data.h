@@ -1,4 +1,4 @@
-// lexer_data.h --- Daisy lexical analysis for data files.
+// lexer_data.h --- Lexical analysis for data files.
 
 #ifndef LEXER_DATA_H
 #define LEXER_DATA_H

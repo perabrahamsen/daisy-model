@@ -336,7 +336,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = traverse_depend.C
+REMOVE = traverse_depend.h
 
 # These are the file extensions we deal with.
 # 
@@ -344,7 +344,8 @@ REMOVE = traverse_depend.C
 
 # Create all the executables.
 #
-all:	$(EXECUTABLES)
+all:	#(EXECUTABLES)
+	@echo Please be specific.
 
 # Create the main executable.
 #
@@ -559,17 +560,6 @@ set_exceptions${OBJ}: set_exceptions.S
 #
 .c${OBJ}:
 	$(CCOMPILE) $(OPTIMIZE) $(PROFILE) $(NOLINK) $<
-
-# There is a bug when gcc compile snow.C with optimization.
-#
-ifeq ($(COMPILER),gcc)
-ifeq ($(USE_OPTIMIZE),true)
-
-snow.o: snow.C
-	$(COMPILE) $(PROFILE) $(NOLINK) $<
-
-endif
-endif
 
 # Special rule for tkmain.o
 #

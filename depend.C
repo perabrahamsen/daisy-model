@@ -1,4 +1,4 @@
-// depend.C -- Find dependencies in Daisy datastructures.
+// depend.C -- Find dependencies in datastructures.
 
 #include "depend.h"
 #include "traverse.h"

@@ -1,4 +1,4 @@
-// submodel.C  --- A registry of submodels used in Daisy.
+// submodel.C  --- A registry of submodels.
 
 #include "submodel.h"
 #include "common.h"

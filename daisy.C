@@ -168,7 +168,6 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("submodel", "Daisy");
   alist.add ("description", Daisy::default_description);
-  Library::load_syntax (syntax, alist);
 
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 	      "Description of this simulation setup.");

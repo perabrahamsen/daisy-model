@@ -1,6 +1,6 @@
 // document.C
 // 
-// Create documentation for Daisy.
+// Create documentation.
 
 #include "document.h"
 #include "submodel.h"
@@ -10,7 +10,7 @@ Librarian<Document>::Content* Librarian<Document>::content = NULL;
 
 const char *const Document::description = "\
 This component is responsible for printing documentation for all the\n\
-models and components in Daisy.  Each `document' model outputs the\n\
+models and components.  Each `document' model outputs the\n\
 documentation in a form suitable for a specific presentation system.";
 
 void 

@@ -1,4 +1,4 @@
-// lexer.h --- Daisy lexical analysis
+// lexer.h --- Lexical analysis
 
 #ifndef LEXER_H
 #define LEXER_H
