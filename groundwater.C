@@ -68,6 +68,10 @@ void
 Groundwater::initialize (const Soil&, const Time&, Treelog&)
 { }
 
+bool
+Groundwater::check (Treelog&) const
+{ return true; }
+
 Groundwater::Groundwater (const AttributeList& al)
   : name (al.identifier ("type"))
 { }

@@ -24,7 +24,7 @@
 #include "select.h"
 #include "treelog.h"
 #include "tmpstream.h"
-
+#include <algorithm>
 #include <fstream>
 #include <string>
 using namespace std;

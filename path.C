@@ -9,6 +9,7 @@
 #include <unistd.h>
 #elif defined (__MINGW32__) || defined (_MSC_VER)
 extern "C" int chdir (const char* dir);
+extern "C" char *getcwd (char *buf, size_t size);
 #else
 #include <dir.h>
 #endif
@@ -105,6 +106,17 @@ bool
 Path::set_directory (const string& directory)
 { return chdir (directory.c_str ()) == 0; }
 
+const std::string 
+Path::get_directory ()
+{ 
+  const size_t BUFFER_SIZE = 10000;
+  char buffer[BUFFER_SIZE];
+  char *wd = getcwd (buffer, BUFFER_SIZE);
+  if (!wd)
+    return "Current directory path is too long";
+  return wd; 
+}
+
 void 
 Path::set_path (const vector<string>& value)
 { 
@@ -120,5 +132,17 @@ Path::get_path (vector<string>& value)
   daisy_assert (path);		// Must call set_path first.
   value = *path;
 }
+
+Path::InDirectory::InDirectory (const std::string& to)
+  : from (get_directory ()),
+    ok (set_directory (to))
+{ }
+
+bool 
+Path::InDirectory::check () const
+{ return ok; }
+
+Path::InDirectory::~InDirectory ()
+{ set_directory (from); }
 
 // path.C ends here

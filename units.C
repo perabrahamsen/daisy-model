@@ -354,6 +354,7 @@ Units::standard_conversions ()
   add ("%", "fraction", 0.01);
   add ("MJ/d/m^2", "W/m^2", 1e6 / (24.0 * 60.0 * 60.0));
   add ("MJ/m^2/d", "W/m^2", 1e6 / (24.0 * 60.0 * 60.0));
+  add ("kgN/year", "kgN/ha/year", 1.0); // Bug compatibility.
 
   // Log.
   add ("cm", "mm", 10.0);

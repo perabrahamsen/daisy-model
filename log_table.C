@@ -37,7 +37,8 @@ struct LogTable : public LogSelect, public Destination
   static const char *const default_description;
 
   // File Content.
-  string file;			// Filename.
+  const string parsed_from_file; // Defined in...
+  const string file;            // Filename.
   ofstream out;			// Output stream.
   const bool flush;		// Flush after each time step.
   const string record_separator; // String to print on records (time steps).
@@ -360,42 +361,13 @@ LogTable::contain_time_columns (const vector<Select*>& entries)
 void
 LogTable::initialize (Treelog& msg)
 {
-  Treelog::Open nest (msg, name);
-  for (unsigned int i = 0; i < summary.size (); i++)
-    summary[i]->initialize (entries, msg);
-}
-
-LogTable::LogTable (const AttributeList& al)
-  : LogSelect (al),
-    file (al.name ("where")),
-    out (file.c_str ()),
-    flush (al.flag ("flush")),
-    record_separator (al.name ("record_separator")),
-    field_separator (al.name ("field_separator")),
-    error_string (al.name ("error_string")),
-    missing_value (al.name ("missing_value")),
-    array_separator (al.name ("array_separator")),
-    print_header (al.flag ("print_header")),
-    print_tags (al.flag ("print_tags")),
-    print_dimension (al.flag ("print_dimension")),
-    print_initial (al.flag ("print_initial")),
-    time_columns (!contain_time_columns (entries)),
-    summary (map_create<Summary> (al.alist_sequence ("summary"))),
-    begin (1, 1, 1, 1),
-    end (1, 1, 1, 1),
-    type (Error),
-    dest_number (-42.42e42),
-    dest_name ("Daisy bug"),
-    dest_array (NULL)
-{
-  for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->add_dest (this);
+  out.open (file.c_str ());
 
   if (print_header)
     {
       out << "dlf-0.0 -- " << name;
-      if (al.check ("parsed_from_file"))
-	out << " (defined in '" << al.name ("parsed_from_file") << "').";
+      if (parsed_from_file != "")
+	out << " (defined in '" << parsed_from_file << "').";
       out << "\n";
       out << "\n";
       out << "VERSION: " << version  << "\n";
@@ -419,6 +391,37 @@ LogTable::LogTable (const AttributeList& al)
       out << "\n";
     }
   out.flush ();
+
+  Treelog::Open nest (msg, name);
+  for (unsigned int i = 0; i < summary.size (); i++)
+    summary[i]->initialize (entries, msg);
+}
+
+LogTable::LogTable (const AttributeList& al)
+  : LogSelect (al),
+    parsed_from_file (al.name ("parsed_from_file", "")),
+    file (al.name ("where")),
+    flush (al.flag ("flush")),
+    record_separator (al.name ("record_separator")),
+    field_separator (al.name ("field_separator")),
+    error_string (al.name ("error_string")),
+    missing_value (al.name ("missing_value")),
+    array_separator (al.name ("array_separator")),
+    print_header (al.flag ("print_header")),
+    print_tags (al.flag ("print_tags")),
+    print_dimension (al.flag ("print_dimension")),
+    print_initial (al.flag ("print_initial")),
+    time_columns (!contain_time_columns (entries)),
+    summary (map_create<Summary> (al.alist_sequence ("summary"))),
+    begin (1, 1, 1, 1),
+    end (1, 1, 1, 1),
+    type (Error),
+    dest_number (-42.42e42),
+    dest_name ("Daisy bug"),
+    dest_array (NULL)
+{
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->add_dest (this);
 }
 
 void

@@ -327,6 +327,11 @@ ColumnBase::check (bool require_weather,
 	  ok = false;
       }
   }
+  {
+    Treelog::Open nest (err, "Groundwater");
+    if (!groundwater->check (err))
+      ok = false;
+  }
   if (!check_inner (err))
     ok = false;
   return ok;

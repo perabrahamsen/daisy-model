@@ -42,7 +42,7 @@ struct LogHarvest : public Log
 
   // Content.
   unsigned int last_size;
-  string file;			// Filename.
+  const string file;            // Filename.
   ofstream out;			// Output stream.
   bool print_header;		// Set if header should be printed.
   bool print_tags;		// Set if tags should be printed.
@@ -164,7 +164,20 @@ struct LogHarvest : public Log
 
   // Create and Destroy.
   void initialize (Treelog&)
-  { }
+  { 
+    out.open (file.c_str ()); 
+
+    // Header.
+    if (print_header)
+      {
+	out << "dlf-0.0 -- harvest\n\n";
+	out << "VERSION: " << version  << "\n";
+	out << "FILE: " << file  << "\n";
+	time_t now = time (NULL);
+	out << "RUN: " << ctime (&now) << "\n";
+      }
+    out.flush ();
+  }
 
   bool check (Treelog& msg) const
   { 
@@ -184,24 +197,12 @@ struct LogHarvest : public Log
     : Log (al),
       last_size (0),
       file (al.name ("where")),
-      out (file.c_str ()),
       print_header (al.flag ("print_header")),
       print_tags (al.flag ("print_tags")),
       print_dimension (al.flag ("print_dimension")),
       print_N (al.flag ("print_N")),
       print_C (al.flag ("print_C"))
-  {
-    // Header.
-    if (print_header)
-      {
-	out << "dlf-0.0 -- harvest\n\n";
-	out << "VERSION: " << version  << "\n";
-	out << "FILE: " << file  << "\n";
-	time_t now = time (NULL);
-	out << "RUN: " << ctime (&now) << "\n";
-      }
-    out.flush ();
-  }
+  { }
 
   ~LogHarvest ()
   {

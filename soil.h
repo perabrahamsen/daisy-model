@@ -72,8 +72,6 @@ public:
   double get_attribute (int i, const std::string& name) const;
   std::string get_dimension (int i, const std::string& name) const;
 
-  // 
-
   // Simulation.
 public:
   void output (Log&) const;

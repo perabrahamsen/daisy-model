@@ -12,13 +12,56 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.68
+
+** h_aquifer for drained soil may now vary with time.
+
+There is a new 'pressure_table' parameter that is an alternative way
+to specify 'h_aquifer'.  The variable indicate the virtual grounwater
+table that corresponds to the pressure in the aquifer.  This table may
+be different from the actual table, because of the aquitard.  If you
+drilled a hole through the aquitart down to the aquifer,
+pressure_table is the height (from the surface) the water would level
+in that hole.
+
+There are three different ways to specify the pressure table:
+
+  (Groundwater pipe (pressure_table const -250 [cm]))
+
+This indicates a constant pressure in the aquifer.
+
+  (Groundwater pipe (pressure_table file "example.gwt"))
+
+Here, "example.gwt" should be a file indicating the pressure table in
+the same format at used by the "file" groundwater model.  That is,
+lines of year, month, day of month and height seperated by
+whitespace.  The level between the specified days will be found by
+linear interpolation.
+
+  (Groundwater pipe (pressure_table PLF
+                                    ((1986  1  1 23) -200   [cm])
+                                    ((1987  9  9 23) -100   [cm])
+                                    ((1988  1  1 23) -150.5 [cm])
+                                    ((1999 10 10 23) -200   [cm])))
+  
+Here we specify the depth over time directly in the setup, rather than
+in an external file.
+
+** The 'batch' program now take a 'directory' paramter.
+
+This is usueful to make the Daisy place log files for different
+simulations in a batch run in different directories.  See batch.dai in
+daisy-sample.zip for an example.
+
+** Bug fixes.
+
 * 3.67
 
 ** You can now control the effect of water stress on crop growth.
 
-In the default crop mode, the new "water_stress_effect" controls how
-the assimilate production is affected by water stress.  There are
-thress different "wse" models that can be used:
+In the default crop model, the new "water_stress_effect" controls how
+the assimilate production is affected by water stress.  There are thre
+different such "wse" models that can be used:
 
 none: No effect, similar to setting the now obsolete
   "enable_water_stress" flag to false.
@@ -39,7 +82,7 @@ To see a table linking the water stress with the effect on assimilate
 production without running a simulation, you can add this to your
 setup file (at top level):
 
-(run wse (partial (y_half 0.67)))
+  (run wse (partial (y_half 0.67)))
 
 ** Daisy can now run multiple simulations sequentially.
 
@@ -56,7 +99,7 @@ has the following build-in programs:
 Daisy: Run a Daisy simulation.  If you use this, you must specify a
   Daisy parameterisation, as top level parameters will be ignored.
 
-batch: Run mupltiple program in sequence.
+batch: Run multiple programs in sequence.
 
 LaTeX: Produce the "components" part of the reference manual in LaTeX
   format. 
@@ -87,7 +130,7 @@ Bug fix.
 The new 'handle' parameter to the select models take five values,
 'average', 'min', 'max', 'sum' and 'current'.
 
-The two later curresponds to '(flux true)' and '(flux false)', which mean
+The two later corresponds to '(flux true)' and '(flux false)', which mean
 the 'flux' parameter is now obsolete.  Use 'handle' instead.
 
 The 'pF' and the (obsolete) date related models do not obey the new

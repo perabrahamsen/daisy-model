@@ -1,3 +1,46 @@
+2005-01-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.68 released.
+
+2005-01-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C: Use depth component for aquifer.
+	* lib/log.dai ("Groundwater"): Update caller.
+
+2005-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* depth.C: New component.
+	* Makefile (COMPONENTS): Add it.
+
+	* average_harmonic.C, average_geometric.C, average_arithmetic.C:
+	Removed. 
+	* Makefile (MODELS, REMOVE): Ditto.
+	* average.C: Added models here.
+
+2005-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C, log_harvest.C: Delay open file to initialization point.
+
+	* path.C, path.h (get_directory): New function.
+	* path.h (InDirectory): New class.
+	* program_batch.C (check, run, initialize): Use it.
+
+	* weather_std.C: Changed "kgN/year" to "kgN/ha/year".
+	* units.C (standard_conversions): Convert old value to new.
+	* txt/dwf.tex: Doc fix.
+	Reported by Charlotte Tofteng <cto@kvl.dk>.
+
+2005-01-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_hypres.C (HydraulicHypresSyntax): Fixed web
+	reference. 
+	Reported by Peter van der Keur <pke@geus.DK>.
+
+2005-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/batch.dai: New setup.
+	* sample/Makefile (SETUPS): Add it.
+
 2004-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.67 released.

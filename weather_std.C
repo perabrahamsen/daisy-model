@@ -901,8 +901,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	    }
 	  else if (key == "NH4DryDep")
 	    {
-	      if (Units::can_convert (dim, "kgN/year"))
-		val = Units::convert (dim, "kgN/year", val);
+	      if (Units::can_convert (dim, "kgN/ha/year"))
+		val = Units::convert (dim, "kgN/ha/year", val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -921,8 +921,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	    }
 	  else if (key == "NO3DryDep")
 	    {
-	      if (Units::can_convert (dim, "kgN/year"))
-		val = Units::convert (dim, "kgN/year", val);
+	      if (Units::can_convert (dim, "kgN/ha/year"))
+		val = Units::convert (dim, "kgN/ha/year", val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -932,8 +932,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
           // Alternative way of specifying deposition.
 	  else if (key == "Deposition")
 	    {
-	      if (Units::can_convert (dim, "kgN/year"))
-		val = Units::convert (dim, "kgN/year", val);
+	      if (Units::can_convert (dim, "kgN/ha/year"))
+		val = Units::convert (dim, "kgN/ha/year", val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -1088,9 +1088,9 @@ but not both");
                                  deposition.total));
       TmpStream tmp;
       tmp () << "NH4WetDep: " << WetDeposit.NH4 << " ppm\n\
-NH4DryDep: " << DryDeposit.NH4 << " kgN/year\n\
+NH4DryDep: " << DryDeposit.NH4 << " kgN/ha/year\n\
 NO3WetDep: " << WetDeposit.NO3 << " ppm\n\
-NO3DryDep: " << DryDeposit.NO3 << " kgN/year";
+NO3DryDep: " << DryDeposit.NO3 << " kgN/ha/year";
       err.debug (tmp.str ());
     }
 

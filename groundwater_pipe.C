@@ -25,12 +25,12 @@
 #include "soil.h"
 #include "soil_heat.h"
 #include "soil_water.h"
+#include "depth.h"
 #include "tmpstream.h"
 #include "treelog.h"
 #include "mathlib.h"
 #include "check.h"
-
-using namespace std;
+#include <memory>
 
 class GroundwaterPipe : public Groundwater
 {
@@ -39,9 +39,9 @@ class GroundwaterPipe : public Groundwater
   const double x;		// Distance to nearest pipe. [cm]
   const double pipe_position;	// Height pipes are placed above surface. [cm]
   const double K_to_pipes_;	// Horizontal sat. conductivity. [cm h^-1]
-  const double K_aquitard_;	// Conductivity of the aquitard [cm h^-1]
-  /*const*/ double Z_aquitard_;	// Vertical length of the aquitard [cm]
-  const double h_aquifer;	// Pressure potential in the aquifer [cm]
+  const double K_aquitard_;	// Conductivity of the aquitard. [cm h^-1]
+  /*const*/ double Z_aquitard_;	// Vertical length of the aquitard. [cm]
+  std::auto_ptr<Depth> pressure_table; // Virtual groundwater height. [cm]
   int i_drain;			// Node, drain
 
   // Accessors.
@@ -56,8 +56,9 @@ class GroundwaterPipe : public Groundwater
   double height;		// Groundwater table height above surface. [cm]
   double EqDrnFlow;
   double DrainFlow;		// Drain flow [cm/h]
-  vector<double> S;		// Pipe drainage. [cm^3/cm^3/h]
+  std::vector<double> S;        // Pipe drainage. [cm^3/cm^3/h]
   double deep_percolation;	// [cm^3/cm^2/h]
+  double h_aquifer;          // Pressure potential in the aquifer [cm]
 
 
   // UZbottom.
@@ -89,6 +90,12 @@ public:
   void output (Log& log) const;
 
 private:
+  void set_h_aquifer (const Soil& soil, const Time& time)
+  {
+    const size_t size = soil.size ();
+    const double aquitart_bottom = soil.zplus (size-1) - Z_aquitard_;
+    h_aquifer = pressure_table->operator()(time) - aquitart_bottom;
+  }
   double DeepPercolation (const Soil&);
   double K_to_pipes (const unsigned int i, 
                      const Soil& soil, 
@@ -101,7 +108,7 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Soil& soil, const Time&, Treelog& treelog)
+  void initialize (const Soil& soil, const Time& time, Treelog& msg)
   {
     const int size = soil.size ();
     double largest = 0.0;
@@ -110,17 +117,32 @@ public:
 	largest = soil.dz (i);
     if (largest > 10.0)
       {
-	Treelog::Open nest (treelog, "Groundwater pipe");
+	Treelog::Open nest (msg, "Groundwater pipe");
 	TmpStream tmp;
 	tmp () << "WARNING: drained soil needs soil intervals < 10.0 cm; "
 	       << "largest is " << largest << "";
-	treelog.warning (tmp.str ());
+	msg.warning (tmp.str ());
       }
 
     i_drain = soil.interval_plus (pipe_position);
     daisy_assert (i_drain > 0);
     S.insert (S.end (), size, 0.0);
+
+    if (!pressure_table.get ())
+      {
+        // GCC 2.95 need the extra variable for the assignment.
+        std::auto_ptr<Depth> depth (Depth::create ((soil.zplus (size-1)
+                                                    - Z_aquitard_)
+                                                   + h_aquifer));
+        pressure_table = depth;
+      }
+    pressure_table->initialize (msg);
+    // Pressure below aquitard.
+    if (pressure_table->check (msg))
+      set_h_aquifer (soil, time);
   }
+  bool check (Treelog& msg) const
+  { return pressure_table->check (msg); }
   GroundwaterPipe (const AttributeList& al)
     : Groundwater (al),
       L (al.number ("L")),
@@ -129,9 +151,17 @@ public:
       K_to_pipes_ (al.number ("K_to_pipes", -1.0)),
       K_aquitard_ (al.number ("K_aquitard")),
       Z_aquitard_ (al.number ("Z_aquitard")),
-      h_aquifer (al.number ("h_aquifer", Z_aquitard_)),
-      height (al.number ("height", pipe_position))
-  { }
+      height (al.number ("height", pipe_position)),
+      h_aquifer (al.number ("h_aquifer", Z_aquitard_))
+  {
+    if (al.check ("pressure_table"))
+      {
+        // GCC 2.95 needs the extra variable for the asignment.
+        std::auto_ptr<Depth> depth
+          (Librarian<Depth>::create (al.alist ("pressure_table")));
+        pressure_table = depth;
+      }
+  }
   ~GroundwaterPipe ()
   { }
 };
@@ -139,16 +169,20 @@ public:
 void 
 GroundwaterPipe::tick (const Soil& soil, SoilWater& soil_water, 
 		       const double h_surface,
-		       const SoilHeat& soil_heat, const Time&, Treelog& msg)
+		       const SoilHeat& soil_heat, const Time& time,
+                       Treelog&)
 {
-  Treelog::Open nest (msg, "Groundwater " + name);
+  const size_t size = soil.size ();
 
   // Empty source.
   fill (S.begin (), S.end (), 0.0);
   
+  // Virtual pressure table.
+  set_h_aquifer (soil, time);
+
   // Find groundwater height.
   height = h_surface;
-  for (int i = soil.size () - 1; i >= 0; i--)
+  for (int i = size - 1; i >= 0; i--)
     {
       const double h = soil_water.h (i);
       if (h < 0)
@@ -248,6 +282,7 @@ GroundwaterPipe::output (Log& log) const
   output_variable (EqDrnFlow, log);
   output_value (deep_percolation, "DeepPercolation", log);
   output_variable (S, log);
+  output_variable (h_aquifer, log);
 }
 
 static struct GroundwaterPipeSyntax
@@ -290,10 +325,20 @@ anisotropy of the horizon.");
 		  "Thickness of the aquitard.\n\
 The aquitard begins below the bottommost soil horizon.");
       alist.add ("Z_aquitard", 200.0);
-      syntax.add ("h_aquifer", "cm", Check::positive (), Syntax::OptionalConst,
+      syntax.add ("h_aquifer", "cm", Check::positive (), Syntax::OptionalState,
 		  "Pressure potential in the aquifer below the aquitard.\n\
-By default. this is Z_aquitard.");
-
+By default. this is Z_aquitard.\n\
+You can alternatively specify the pressure as a virtual groundwater level.\n\
+See 'pressure_table'.");
+      syntax.add ("pressure_table", Librarian<Depth>::library (),
+                  Syntax::OptionalConst, Syntax::Singleton, "\
+Height of groundwater the corresponds to the pressure in the aquifer.  \n\
+\n\
+If you drilled a well down to the aquifer, this is number what the\n\
+water level in the well would be as height above ground (a negative\n\
+number).  This is different from the actual groundwater table, because\n\
+the aquitart block the water, and the pipes lead the water away.\n\
+You can alternatively specify the pressure directly, with 'h_aquifer'.");
       syntax.add ("height", "cm", Check::non_positive (), 
 		  Syntax::OptionalState,
 		  "Current groundwater level (a negative number).");

@@ -311,7 +311,7 @@ static struct HydraulicHypresSyntax
     alist.add ("description", 
 	       "van Genuchten retention curve model with Mualem theory.\n\
 Parameters specified by the HYPRES transfer function.\n\
-See <http://mluri.sari.ac.uk/hypres.html>.");
+See <http://www.macaulay.ac.uk/hypres/>.");
     Hydraulic::load_K_sat_optional (syntax, alist);
     syntax.add ("topsoil", Syntax::Boolean, Syntax::OptionalConst, "\
 If set true this horizon will be initialized as a topsoil (i.e. the\n\

@@ -58,6 +58,7 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (const Soil&, const Time& time, Treelog&);
+  virtual bool check (Treelog&) const;
 protected:
   Groundwater (const AttributeList& al);
 public:

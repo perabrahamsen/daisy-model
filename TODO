@@ -1,9 +1,42 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* batch.dai: Eksempel på batch program.
+* Depth
 
-Skal være i sample.
-Skal bruge eksisterende filer i sample.
+** Brug i groundwater pipe
+
+** Send brev til Jeppe Rølmer
+
+* PT data
+
+** Omorganiser Jose setup
+
+** Lav nye log filer 
+
+** Excel data til fornuftigt format
+
+** gnuplot generation af sammenligning
+
+** skabelon til rapport
+
+** vandsammenligning
+
+** n soil
+
+** crop ds
+
+** crop dm & lai
+
+** crop n
+
+* Læg ny ståbi på hjemmeside.
+
+* Prag
+
+** Veksle penge!
+
+** WP5 status (10 minutter).
+
+* DK data
 
 * Fertorganic status (hjemmeside)
 
@@ -51,10 +84,6 @@ prøv at køre ler med sandsædskifte, og sand med lersædskift.
 ** Find referencer.
 
 ** Publicer.
-
-* ny vandstressmodel.
-
-stress = a + b * Ea/Ep (a og b forskellige for veg & rep fase)
 
 * (Soil (borders -35 -45))
 

@@ -48,6 +48,7 @@ public:
   const AttributeList* global_alist;
 
   // Content.
+  const std::string directory;  // Initialize, check and run here.
 public:
   bool running;
   bool logging;

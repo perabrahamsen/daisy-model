@@ -21,16 +21,20 @@
 
 #include "program.h"
 #include "treelog.h"
+#include "path.h"
 #include <vector>
 
 struct ProgramBatch : public Program
 {
   // Content.
+  const std::string directory;
   std::vector<Program*> program;
 
   // Use.
   void run (Treelog& msg)
   { 
+    Path::InDirectory cwd (directory);
+
     for (size_t i = 0; i < program.size (); i++)
       {
         Treelog::Open nest (msg, program[i]->name);
@@ -42,6 +46,8 @@ struct ProgramBatch : public Program
   void initialize (const Syntax *const gs, const AttributeList *const gal,
                    Treelog& msg)
   { 
+    Path::InDirectory cwd (directory);
+
     for (size_t i = 0; i < program.size (); i++)
       {
         Treelog::Open nest (msg, program[i]->name);
@@ -50,17 +56,27 @@ struct ProgramBatch : public Program
   }
   bool check (Treelog& msg)
   { 
+    bool ok = true;
+
+    Path::InDirectory cwd (directory);
+    if (!cwd.check ())
+      {
+        msg.error ("Could not change to directory '" + directory + "'");
+        ok = false;
+      }
+
     for (size_t i = 0; i < program.size (); i++)
       {
         Treelog::Open nest (msg, program[i]->name);
         if (!program[i]->check (msg))
-          return false;
+          ok = false;
       }
-    return true;
+    return ok;
   }
 
   ProgramBatch (const AttributeList& al)
     : Program (al),
+      directory (al.name ("directory")),
       program (map_create<Program> (al.alist_sequence ("run")))
   { }
   ~ProgramBatch ()
@@ -79,6 +95,9 @@ static struct ProgramBatchSyntax
     syntax.add ("description", Syntax::String, Syntax::Const, 
                 "Description of this batch program.");
     alist.add ("description", "Run a sequence of programs."); 
+    syntax.add ("directory", Syntax::String, Syntax::Const, "\
+Directory in which to initialize, check and run the programs.");
+    alist.add ("directory", ".");
     syntax.add ("run", Librarian<Program>::library (), 
                 Syntax::State, Syntax::Sequence, "\
 List of programs to run.  The programs will be run in the sequence listed.");

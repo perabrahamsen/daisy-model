@@ -304,7 +304,6 @@ MODELS = program_batch.C program_refdoc.C summary_balance.C \
 	select_index.C select_content.C select_interval.C \
 	select_number.C select_array.C log_table.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
-	average_arithmetic.C average_harmonic.C average_geometric.C \
 	mactrans_std.C macro_std.C macro_none.C document_LaTeX.C \
 	column_std.C  weather_simple.C uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
@@ -332,7 +331,7 @@ DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 # A component is a common interface to a number of models.
 #
-COMPONENTS = wse.C program.C number.C domsorp.C chemistry.C \
+COMPONENTS = depth.C wse.C program.C number.C domsorp.C chemistry.C \
 	summary.C nitrification.C phenology.C clayom.C equil.C pedo.C \
 	transform.C rootdens.C select.C average.C mactrans.C macro.C \
 	document.C parser.C log.C weather.C column.C crop.C \
@@ -406,7 +405,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = select_min.C select_max.C select_average.C FILES 
+REMOVE = average_arithmetic.C average_harmonic.C average_geometric.C
 
 # These are the file extensions we deal with.
 # 
@@ -599,6 +598,27 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
+	$(MAKE) native cross
+	mv -f $(WWWINDEX) $(WWWINDEX).old
+	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
+		< $(WWWINDEX).old > $(WWWINDEX)
+	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
+	$(MAKE) daisy-src.zip
+	mv -f daisy-src.zip $(FTPDIR)
+	(cd lib && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
+	(cd sample && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
+	(cd txt && $(MAKE) FTPDIR=$(FTPDIR) dist)
+	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
+	rm -f $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
+	$(STRIP) -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) \
+		$(OBJHOME)/$(HOSTTYPE)/daisy
+	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe
+	$(CROSSSTRIP) -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe \
+		$(OBJHOME)/$(TARGETTYPE)/daisy
+	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
+	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
+
+retry:
 	$(MAKE) native cross
 	mv -f $(WWWINDEX) $(WWWINDEX).old
 	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
