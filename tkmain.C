@@ -34,6 +34,7 @@ public:
       alist (*new AttributeList)
     { 
       Daisy::load_syntax (syntax, alist);
+      Library::load_syntax (syntax, alist);
     }
   ~TkDaisyState ()
     {

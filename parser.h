@@ -3,41 +3,28 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "common.h"
-
-class AttributeList;
-class Library;
-class Syntax;
+#include "librarian.h"
 
 class Parser
 {
+  // Content.
+public:
+  const string name;
+
+  // Interface.
 public:
   virtual void load (AttributeList&) = 0;
 
-  // Library.
-public:
-  static const Library& library ();
-  static Parser& create (const Syntax& syntax, const AttributeList&);
-  typedef Parser& (*constructor) (const Syntax& syntax, const AttributeList&);
-  static void add_type (const string&, AttributeList&, const Syntax&,
-			constructor);
-  static void derive_type (const string&, AttributeList&, const string& super);
  
   // Create and Destroy.
+public:
+  virtual void initialize (const Syntax&) = 0;
 protected:
-  Parser ();
+  Parser (const string& name);
 public:
   virtual ~Parser ();
 };
 
-// Ensure the Parser library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class Parser_init
-{
-  static int count;
-public:
-  Parser_init ();
-  ~Parser_init ();
-} Parser_init;
+static Librarian<Parser> Parser_init ("parser");
 
 #endif PARSER_H

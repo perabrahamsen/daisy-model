@@ -6,12 +6,13 @@
 #include "librarian.h"
 
 class Daisy;
+class Frame;
 
 class Condition
 {  
   // Simulation.
 public:
-  virtual bool match (const Daisy&) const = 0;
+  virtual bool match (const Frame&, const Daisy&) const = 0;
 
   // Create & Destroy.
 protected:

@@ -18,7 +18,6 @@ class Librarian
 private:
   typedef T& (*constructor) (const AttributeList&);
   typedef map<string, constructor, less<string>/**/> map_type;
-
   // Content.
 private:
   static struct Content
@@ -26,8 +25,8 @@ private:
     Library lib;
     map_type constructors;
     int count;
-    Content (const char *const name)
-      : lib (name),
+    Content (const char *const name, derive_fun derive)
+      : lib (name, derive),
 	constructors (),
 	count (1)
     { }
@@ -61,10 +60,6 @@ public:
     assert (content);
     return content->lib;
   }
-  static void add_library (Syntax& syntax, const string& name)
-  {
-    syntax.add_library (name, library (), &derive_type);
-  }
 
   // Create and Destroy.
 public:
@@ -73,7 +68,7 @@ public:
     if (content)
       content->count++;
     else 
-      content = new Content (name);
+      content = new Content (name, &derive_type);
   }
   ~Librarian ()
   { 

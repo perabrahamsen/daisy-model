@@ -2,15 +2,13 @@
 
 #include "condition.h"
 #include "time.h"
-#include "syntax.h"
-#include "alist.h"
 #include "daisy.h"
 
-class ConditionAt : public Condition
+struct ConditionAt : public Condition
 {
   const Time time;
 public:
-  bool match (const Daisy& daisy) const
+  bool match (const Frame&, const Daisy& daisy) const
   { return time == daisy.time; }
   ConditionAt (const AttributeList& al)
     : time (al.time ("time"))
@@ -19,11 +17,11 @@ public:
   { return *new ConditionAt (al); }
 };
 
-class ConditionBefore : public Condition
+struct ConditionBefore : public Condition
 {
   const Time time;
 public:
-  bool match (const Daisy& daisy) const
+  bool match (const Frame&, const Daisy& daisy) const
   { return time > daisy.time; }
   ConditionBefore (const AttributeList& al)
     : time (al.time ("time"))
@@ -32,11 +30,11 @@ public:
   { return *new ConditionBefore (al); }
 };
 
-class ConditionAfter : public Condition
+struct ConditionAfter : public Condition
 {
   const Time time;
 public:
-  bool match (const Daisy& daisy) const
+  bool match (const Frame&, const Daisy& daisy) const
   { return time < daisy.time; }  
   ConditionAfter (const AttributeList& al)
     : time (al.time ("time"))
@@ -47,11 +45,11 @@ public:
 
 // BUG: The following classes behave strangely around new year.
 
-class ConditionHourly : public Condition
+struct ConditionHourly : public Condition
 {
   const int step;
 public:
-  bool match (const Daisy& daisy) const
+  bool match (const Frame&, const Daisy& daisy) const
   { return ((24 * daisy.time.yday () + daisy.time.hour ()) % step) == 0; }
   ConditionHourly (const AttributeList& al)
     : step (al.integer ("step"))
@@ -60,11 +58,11 @@ public:
   { return *new ConditionHourly (al); }
 };
 
-class ConditionDaily : public Condition
+struct ConditionDaily : public Condition
 {
   const int step;
 public:
-  bool match (const Daisy& daisy) const
+  bool match (const Frame&, const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionDaily (const AttributeList& al)
     : step (al.integer ("step"))
@@ -73,11 +71,11 @@ public:
   { return *new ConditionDaily (al); }
 };
 
-class ConditionWeekly : public Condition
+struct ConditionWeekly : public Condition
 {
   const int step;
 public:
-  bool match (const Daisy& daisy) const
+  bool match (const Frame&, const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionWeekly (const AttributeList& al)
     : step (7 * al.integer ("step"))
@@ -86,11 +84,11 @@ public:
   { return *new ConditionWeekly (al); }
 };
 
-class ConditionMonthly : public Condition
+struct ConditionMonthly : public Condition
 {
   const int step;
 public:
-  bool match (const Daisy& daisy) const
+  bool match (const Frame&, const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionMonthly (const AttributeList& al)
     : step (30 * al.integer ("step"))
@@ -99,11 +97,11 @@ public:
   { return *new ConditionMonthly (al); }
 };
 
-class ConditionYearly : public Condition
+struct ConditionYearly : public Condition
 {
   const int step;
 public:
-  bool match (const Daisy& daisy) const
+  bool match (const Frame&, const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionYearly (const AttributeList& al)
     : step (365 * al.integer ("step"))

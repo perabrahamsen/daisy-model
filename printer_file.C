@@ -608,9 +608,29 @@ PrinterFile::good () const
 { return impl.good (); }
   
 PrinterFile::PrinterFile (const string& filename)
-  : Printer (filename),
+  : Printer ("file"),
     impl (*new Implementation (filename))
+{ }
+    
+PrinterFile::PrinterFile (const AttributeList& al)
+  : Printer (al.name ("type")),
+    impl (*new Implementation (al.name ("where")))
 { }
     
 PrinterFile::~PrinterFile ()
 { }
+
+static struct PrinterFileSyntax
+{
+  static Printer& make (const AttributeList& al)
+    { return *new PrinterFile (al); }
+
+  PrinterFileSyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add ("where", Syntax::String, Syntax::Const);
+      syntax.order ("where");
+      Librarian<Printer>::add_type ("file", alist, syntax, &make);
+    }
+} PrinterFile_syntax;

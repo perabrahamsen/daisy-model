@@ -13,6 +13,7 @@
 #include "action.h"
 #include "horizon.h"
 #include "printer_file.h"
+#include "frame.h"
 #include "version.h"
 
 #include <fstream.h>
@@ -358,8 +359,8 @@ daisy_library_derive (Library* library,
     Librarian<Horizon>::derive_type (name, *alist, super);
   else if (library == &Librarian<Column>::library ())
     Librarian<Column>::derive_type (name, *alist, super);
-  else if (library == &Action::library ())
-    Action::derive_type (name, *alist, super);
+  else if (library == &Librarian<Action>::library ())
+    Librarian<Action>::derive_type (name, *alist, super);
   else if (library == &Librarian<Weather>::library ())
     Librarian<Weather>::derive_type (name, *alist, super);
   else 
@@ -445,7 +446,7 @@ daisy_daisy_tick (Daisy* daisy)
 
 extern "C" void EXPORT
 daisy_daisy_tick_action (Daisy* daisy)
-{ daisy->action.doIt (*daisy); }
+{ daisy->action.doIt (Frame (), *daisy); }
 
 extern "C" void EXPORT
 daisy_daisy_tick_weather (Daisy* daisy)
@@ -618,7 +619,10 @@ daisy_column_get_snow_height (const Column* column);
 
 extern "C" void EXPORT
 daisy_load (Syntax* syntax, AttributeList* alist)
-{ Daisy::load_syntax (*syntax, *alist); }
+{ 
+  Daisy::load_syntax (*syntax, *alist); 
+  Library::load_syntax (*syntax, *alist); 
+}
 
 extern "C" void EXPORT
 daisy_initialize ()

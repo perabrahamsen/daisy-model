@@ -26,6 +26,7 @@ public:
 
   // Create and Destroy.
 public:
+  PrinterFile (const AttributeList& al);
   PrinterFile (const string& filename);
   ~PrinterFile ();
 };

@@ -2,111 +2,90 @@
 
 #include "action.h"
 #include "daisy.h"
+#include "frame.h"
 #include "column.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
 #include "am.h"
 #include "im.h"
-#include "library.h"
-#include <iostream.h>
 
-class ActionFertilize : public Action
+struct ActionFertilize : public Action
 {
-private:
   const AttributeList& am;
   const double from;
   const double to;
 
-public:
-  void doIt (Daisy&);
-  bool check (Daisy&) const;
-
-  // Create and Destroy.
-private:
-  friend class ActionFertilizeSyntax;
-  static Action& make (const AttributeList&, const Action *const p);
-  ActionFertilize (const AttributeList&, const Action *const p);
-public:
-  ~ActionFertilize ();
-};
-
-void 
-ActionFertilize::doIt (Daisy& daisy)
-{
-  cout << " [Fertilizing " << am.name ("type") << "]\n";
-  ColumnList& cl = daisy.columns;
-  for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
+  void doIt (const Frame& frame, Daisy& daisy)
     {
-      if (!match (**i))
-	  continue;
-      // Add inorganic matter.
-      if (to < from)
-	(*i)->fertilize (IM (am), from, to);
-      else 
-	(*i)->fertilize (IM (am));
-      
-      // Add organic matter, if any.
-      if (am.name ("syntax") != "mineral")
+      cout << " [Fertilizing " << am.name ("type") << "]\n";
+
+      for (ColumnList::iterator i = daisy.columns.begin (); 
+	   i != daisy.columns.end (); 
+	   i++)
 	{
+	  // Skip unselected columns.
+	  if (!frame.match_column (**i))
+	    continue;
+
+	  // Add inorganic matter.
 	  if (to < from)
-	    (*i)->fertilize (am, daisy.time, from, to);
-	  else
-	    (*i)->fertilize (am, daisy.time);
+	    (*i)->fertilize (IM (am), from, to);
+	  else 
+	    (*i)->fertilize (IM (am));
+      
+	  // Add organic matter, if any.
+	  if (am.name ("syntax") != "mineral")
+	    {
+	      if (to < from)
+		(*i)->fertilize (am, daisy.time, from, to);
+	      else
+		(*i)->fertilize (am, daisy.time);
+	    }
 	}
     }
-}
 
-bool
-ActionFertilize::check (Daisy& daisy) const
-{
-  ColumnList& cl = daisy.columns;
-  for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
+  bool check (Daisy& daisy) const
     {
-      if (am.name ("syntax") != "mineral" && !(*i)->check_am (am))
-	return false;
+      ColumnList& cl = daisy.columns;
+      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
+	{
+	  if (am.name ("syntax") != "mineral" && !(*i)->check_am (am))
+	    return false;
+	}
+      return true;
     }
-  return true;
-}
 
-ActionFertilize::ActionFertilize (const AttributeList& al,
-				  const Action *const p)
-  : Action (p),
-    am (al.alist ("am")), 
-    from (al.number ("from")),
-    to (al.number ("to"))
-{ }
-
-ActionFertilize::~ActionFertilize ()
-{ }
-
-// Add the ActionFertilize syntax to the syntax table.
-Action&
-ActionFertilize::make (const AttributeList& al, const Action *const p)
-{
-  return *new ActionFertilize (al, p);
-}
+  ActionFertilize (const AttributeList& al)
+    : Action (al.name ("type")),
+      am (al.alist ("am")), 
+      from (al.number ("from")),
+      to (al.number ("to"))
+    { }
+};
 
 static struct ActionFertilizeSyntax
 {
-  static bool check (const AttributeList& al)
-  { 
-    bool ok = true;
-    const double from = al.number ("from");
-    const double to = al.number ("to");
+  static Action& make (const AttributeList& al)
+    { return *new ActionFertilize (al); }
 
-    if (from > 0.0 || to > 0.0)
-      {
-	cerr << "You can only fertilize on or below the ground.\n";
-	ok = false;
-      }
-    if (from < to)
-      {
-	cerr << "`from' must be higher than `to' in the fertilization area.\n";
-	ok = false;
-      }
-    return ok;
-  }
+  static bool check (const AttributeList& al)
+    { 
+      bool ok = true;
+      const double from = al.number ("from");
+      const double to = al.number ("to");
+
+      if (from > 0.0 || to > 0.0)
+	{
+	  cerr << "You can only fertilize on or below the ground.\n";
+	  ok = false;
+	}
+      if (from < to)
+	{
+	  cerr << "`from' must be higher than `to' in"
+	       << " the fertilization area.\n";
+	  ok = false;
+	}
+      return ok;
+    }
+
   ActionFertilizeSyntax ()
   { 
     Syntax& syntax = *new Syntax (check);
@@ -117,6 +96,6 @@ static struct ActionFertilizeSyntax
     syntax.add ("to", Syntax::Number, Syntax::Const);
     alist.add ("to", 0.0);
     syntax.order ("am");
-    Action::add_type ("fertilize", alist, syntax, &ActionFertilize::make);
+    Librarian<Action>::add_type ("fertilize", alist, syntax, &make);
   }
 } ActionFertilize_syntax;

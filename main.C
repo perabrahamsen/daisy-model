@@ -21,7 +21,8 @@ main (int argc, char* argv[])
   Syntax syntax;
   AttributeList alist;
   Daisy::load_syntax (syntax, alist);
-  
+  Library::load_syntax (syntax, alist);
+
   // Dump syntax, if specified.
   if (strcmp (argv[1], "-p") == 0)
     {

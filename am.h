@@ -49,7 +49,7 @@ public:
 
   // Library.
 public:
-  static const Library& library ();
+  static Library& library ();
   static void derive_type (const string&, AttributeList&, const string& super);
   // Initialization.
   static AM& create (const AttributeList&, const Geometry&);

@@ -18,14 +18,12 @@ struct Syntax::Implementation
   typedef map<string, category, less<string> > status_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   typedef map<string, int, less<string> > size_map;
-  typedef map<string, const ::Library*, less<string> > library_map;
-  typedef map<string, derive_fun, less<string> > derive_map;
+  typedef map<string, ::Library*, less<string> > library_map;
   type_map types;
   status_map status;
   syntax_map syntax;
   size_map size;
   library_map libraries;
-  derive_map derived;
   bool check (const AttributeList& vl, const string& name);
   Syntax::type lookup (const string& key) const;
   int order_number (const string& name) const;
@@ -283,18 +281,11 @@ Syntax::syntax (const string& key) const
   return *impl.syntax[key];
 }
 
-const ::Library&
+::Library&
 Syntax::library (const string& key) const
 {
   assert (impl.libraries.find (key) != impl.libraries.end ());
   return *impl.libraries[key];
-}
-
-derive_fun
-Syntax::derive (const string& key) const
-{
-  assert (impl.derived.find (key) != impl.derived.end ());
-  return impl.derived[key];
 }
 
 int
@@ -342,18 +333,17 @@ Syntax::add (const string& key, const Syntax& s, category req, int sz)
 }
 
 void 
-Syntax::add (const string& key, const ::Library& l, category req, int s)
+Syntax::add (const string& key, ::Library& l, category req, int s)
 {
   add (key, Object, req, s);
   impl.libraries[key] = &l;
 }
 
 void 
-Syntax::add_library (const string& key, const ::Library& l, derive_fun fun)
+Syntax::add_library (const string& key, ::Library& l)
 {
   add (key, Library, Optional);
   impl.libraries[key] = &l;
-  impl.derived[key] = fun;
 }
 
 void 

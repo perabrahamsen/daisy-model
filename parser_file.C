@@ -2,9 +2,6 @@
 
 #include "parser_file.h"
 #include "options.h"
-#include "syntax.h"
-#include "alist.h"
-#include "library.h"
 #include "csmp.h"
 #include "time.h"
 #include "log.h"
@@ -29,7 +26,7 @@ struct ParserFile::Implementation
 #ifdef DEADCODE
   void load_library (Library& lib);
 #endif
-  void add_derived (const Library&, derive_fun);
+  void add_derived (Library&);
   AttributeList& load_derived (const Library& lib, bool in_sequence = false);
   void load_list (AttributeList&, const Syntax&);
   Time get_time ();
@@ -37,8 +34,9 @@ struct ParserFile::Implementation
   string file;
   int line;
   int column;
-  const Syntax& global_syntax_table;
-  Implementation (const Syntax&, const string&);
+  const Syntax* global_syntax_table;
+  void initialize (const Syntax&);
+  Implementation (const string&);
   ~Implementation ();
 };
 
@@ -271,7 +269,7 @@ ParserFile::Implementation::load_library (Library& lib)
 #endif
 
 void
-ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
+ParserFile::Implementation::add_derived (Library& lib)
 {
   // Get the name of the class and the existing superclass to derive from.
   const string name = get_string ();
@@ -293,7 +291,7 @@ ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
   // Add separate attributes for this object.
   load_list (atts, lib.syntax (super));
   // Add new object to library.
-  derive (name, atts, super);
+  lib.add_derived (name, atts, super);
 }
 
 AttributeList&
@@ -414,15 +412,16 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    break;
 	  case Syntax::Library:
 	    // Handled specially: Put directly in global library.
-	    add_derived (syntax.library (name), syntax.derive (name));
+	    add_derived (syntax.library (name));
 	    break;
 	  case Syntax::Object:
 	    {
 	      const Library& lib = syntax.library (name);
 	      AttributeList& al = load_derived (lib, current != end);
-	      if (&lib == &Parser::library ())
+	      if (&lib == &Librarian<Parser>::library ())
 		{
-		  Parser& parser = Parser::create (global_syntax_table, al);
+		  Parser& parser = Librarian<Parser>::create (al);
+		  parser.initialize (*global_syntax_table);
 		  delete &al;
 		  parser.load (atts);
 		  delete &parser;
@@ -602,13 +601,15 @@ ParserFile::Implementation::get_time ()
   return Time (-999, 1, 1, 0);
 }
 
-ParserFile::Implementation::Implementation (const Syntax& syntax, 
-					    const string& name)
+void
+ParserFile::Implementation::initialize (const Syntax& syntax)
+{ global_syntax_table = &syntax; }
+
+ParserFile::Implementation::Implementation (const string& name)
   : in (Options::find_file (name)),
     file (name),
     line (1),
-    column (0), 
-    global_syntax_table (syntax)
+    column (0)
 {  
   if (!in.good ())
     cerr << "Open `" << file << "' failed\n";
@@ -625,38 +626,38 @@ ParserFile::Implementation::~Implementation ()
 void
 ParserFile::load (AttributeList& alist)
 {
-  impl.load_list (alist, impl.global_syntax_table);
+  impl.load_list (alist, *impl.global_syntax_table);
   impl.eof ();
 }
 
-ParserFile::ParserFile (const Syntax& syntax, const string& name)
-  : impl (*new Implementation (syntax, name))
-{  }
+void
+ParserFile::initialize (const Syntax& syntax)
+{ impl.initialize (syntax); }
 
-ParserFile::ParserFile (const Syntax& s, const AttributeList& al)
-  : impl (*new Implementation (s, al.name ("where")))
+ParserFile::ParserFile (const Syntax& syntax, const string& name)
+  : Parser ("file"),
+    impl (*new Implementation (name))
+{ initialize (syntax); }
+
+ParserFile::ParserFile (const AttributeList& al)
+  : Parser (al.name ("type")),
+    impl (*new Implementation (al.name ("where")))
 {  }
 
 ParserFile::~ParserFile ()
 { }
 
-// Add the ParserFile syntax to the syntax table.
-Parser&
-ParserFile::make (const Syntax& s, const AttributeList& al)
-{
-  return *new ParserFile (s, al);
-}
-
 static struct ParserFileSyntax
 {
-  ParserFileSyntax ();
-} ParserFile_syntax;
+  static Parser& make (const AttributeList& al)
+    { return *new ParserFile (al); }
 
-ParserFileSyntax::ParserFileSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  syntax.add ("where", Syntax::String, Syntax::Const);
-  syntax.order ("where");
-  Parser::add_type ("file", alist, syntax, &ParserFile::make);
-}
+  ParserFileSyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add ("where", Syntax::String, Syntax::Const);
+      syntax.order ("where");
+      Librarian<Parser>::add_type ("file", alist, syntax, &make);
+    }
+} ParserFile_syntax;

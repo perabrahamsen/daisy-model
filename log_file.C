@@ -7,6 +7,7 @@
 #include "time.h"
 #include "alist.h"
 #include "syntax.h"
+#include "frame.h"
 #include "common.h"
 #include <list>
 #include <fstream.h>
@@ -158,7 +159,7 @@ LogFile::newline ()
 Filter&
 LogFile::match (const Daisy& daisy)
 {
-  matching = condition.match (daisy);
+  matching = condition.match (Frame (), daisy);
   
   if (matching || accumulating)
     return filter;

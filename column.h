@@ -68,6 +68,7 @@ public:
 class ColumnList : public vector <Column*>
 { 
 public:
+  const Column* find (const string& name) const;
   ColumnList (const vector<AttributeList*>&);
   ~ColumnList ();
 };

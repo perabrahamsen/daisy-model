@@ -1,7 +1,6 @@
 // printer.C
 
 #include "printer.h"
-#include "alist.h"
 
 Librarian<Printer>::Content* Librarian<Printer>::content = NULL;
 

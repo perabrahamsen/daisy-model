@@ -11,7 +11,7 @@ class MiniManager : public Action
 {
   EventQueue *EQ;
 public:
-  void doIt (Daisy& daisy);
+  void doIt (const Frame&, Daisy& daisy);
 
   // Create and Destroy.
 public:
@@ -20,12 +20,11 @@ public:
   // Create and Destroy.
 // private:
   friend class MiniManagerSyntax;
-  static Action& make (const AttributeList& al, const Action *const p)
-  { return *new MiniManager (al, p); }
-  MiniManager (const AttributeList&, const Action *const p);
+  static Action& make (const AttributeList& al)
+  { return *new MiniManager (al); }
+  MiniManager (const AttributeList&);
 public:
   ~MiniManager ()
   {if(EQ) delete EQ; }
 };
-
 #endif

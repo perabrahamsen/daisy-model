@@ -1,7 +1,5 @@
 * Condition: ds_after ("grass", 0.8)
 
-* Implementer SWAT interface
-
 * Standard filtre
 
 ** OrganicMatter output Total C/N of AM, SOM, and SMB respectively.

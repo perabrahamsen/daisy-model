@@ -17,11 +17,9 @@ public:
   void load (AttributeList&);
 
   // Create and Destroy.
-private:
-  friend class ParserFileSyntax;
-  static Parser& make (const Syntax& syntax, const AttributeList&);
-  ParserFile (const Syntax& syntax, const AttributeList&);
 public:
+  void initialize (const Syntax&);
+  ParserFile (const AttributeList&);
   ParserFile (const Syntax& syntax, const string& n);
   ~ParserFile ();
 };

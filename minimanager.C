@@ -3,7 +3,7 @@
 #include "syntax.h"
 #include "minimanager.h"
 
-bool MiniManager::check (Daisy& daisy) const
+bool MiniManager::check (Daisy&) const
 {
     // Convention: MiniManager::MiniManager will not
     // create an EQ if there is something wrong with
@@ -11,7 +11,7 @@ bool MiniManager::check (Daisy& daisy) const
     // so just check that it is created
     return (EQ) ? true : false;
 }
-void MiniManager::doIt (Daisy& d){
+void MiniManager::doIt (const Frame&, Daisy& d){
    EQ->DoTick(d);
 }
 
@@ -43,7 +43,8 @@ Event::EventType EventType(const string& s) {
    return Event::undefined;
 }
 
-MiniManager::MiniManager (const AttributeList& alist, const Action *const p) : Action (p){
+MiniManager::MiniManager (const AttributeList& alist) 
+  : Action (alist.name ("type")){
   vector<AttributeList*> actions =  alist.alist_sequence ("Action");
   vector<Event *> events(actions.size());
   Event* e;
@@ -63,7 +64,7 @@ MiniManager::MiniManager (const AttributeList& alist, const Action *const p) : A
         int id = actions[i]->integer("Id");
 
         // events must come in squence
-        if (i+1 != id)
+        if (static_cast <int> (i+1) != id)
            error = true;
         else {
            switch(EventType(type)) {
@@ -138,6 +139,8 @@ MiniManager::MiniManager (const AttributeList& alist, const Action *const p) : A
               case Event::undefined:
                  error=true;
                  break;
+	   case Event::modelirrigate:
+	     break;
            } // switch
         }
      } else
@@ -274,6 +277,6 @@ MiniManagerSyntax::MiniManagerSyntax ()
   actions.add("Action", action, Syntax::Const, Syntax::Sequence);
   actions.order("Action");
   AttributeList& alist = *new AttributeList ();
-  Action::add_type ("mini", alist, actions, &MiniManager::make);
+  Librarian<Action>::add_type ("mini", alist, actions, &MiniManager::make);
 }
 

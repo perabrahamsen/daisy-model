@@ -388,7 +388,7 @@ const string
 AM:: crop_part_name () const
 { return impl.crop_part_name (); }
 
-const Library&
+Library&
 AM::library ()
 {
   assert (AM_library);
@@ -621,7 +621,7 @@ AM_init::AM_init ()
   if (count++ == 0)
     {
       // Library.
-      AM_library = new Library ("am");
+      AM_library = new Library ("am", &AM::derive_type);
 
       // State.
       {

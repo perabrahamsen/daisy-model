@@ -208,27 +208,27 @@ void SowEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
   }
 }
 
-bool SowEvent::KanUdfoeres(Daisy& daisy,const Time& dato){
+bool SowEvent::KanUdfoeres(Daisy&,const Time&){
    return true;
 }
 
-StartEvent* StartEvent::create(AttributeList &al){
+StartEvent* StartEvent::create(AttributeList &){
    return new StartEvent();
 }
 
-void StartEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
+void StartEvent::Do_It(Daisy&,const Time&, EventQueue&){
 }
-bool StartEvent::KanUdfoeres(Daisy& daisy,const Time& dato){
+bool StartEvent::KanUdfoeres(Daisy&,const Time&){
    return true;
 }
 
-EndEvent* EndEvent::create(AttributeList &al){
+EndEvent* EndEvent::create(AttributeList &){
    return new EndEvent();
 }
-void EndEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
+void EndEvent::Do_It(Daisy& daisy,const Time&, EventQueue&){
    daisy.running = false;
 }
-bool EndEvent::KanUdfoeres(Daisy& daisy,const Time& dato){
+bool EndEvent::KanUdfoeres(Daisy& ,const Time& ){
    return true;
 }
 

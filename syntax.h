@@ -9,8 +9,6 @@
 struct AttributeList;
 struct Library;
 
-typedef void (*derive_fun) (const string&, AttributeList&, const string&);
-
 class Syntax
 { 
   struct Implementation;
@@ -63,8 +61,7 @@ public:
   type lookup (const string&) const;
   const Syntax& syntax (const string&) const;
 public:
-  const ::Library& library (const string&) const;
-  derive_fun derive (const string&) const;
+  ::Library& library (const string&) const;
   int  size (const string&) const;
   bool ordered () const;
   const vector<string>& order () const;
@@ -80,9 +77,9 @@ public:
   void add (const string&, type, category, int size = Singleton);
   void add (const string&, const Syntax&, 
 	    category = State, int size = Singleton);
-  void add (const string&, const ::Library&, 
+  void add (const string&, ::Library&, 
 	    category = State, int size = Singleton);
-  void add_library (const string&, const ::Library&, derive_fun);
+  void add_library (const string&, ::Library&);
 
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user

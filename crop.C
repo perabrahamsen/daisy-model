@@ -8,19 +8,19 @@ Librarian<Crop>::Content* Librarian<Crop>::content = NULL;
 
 double 
 Crop::water_stress () const
-{ assert (false); }
+{ assert (false); return -42.42e42; }
 
 double 
 Crop::nitrogen_stress () const
-{ assert (false); }
+{ assert (false); return -42.42e42; }
 
 double 
 Crop::rs_min () const
-{ assert (false); }
+{ assert (false); return -42.42e42; }
 
 double 
 Crop::rs_max () const
-{ assert (false); }
+{ assert (false); return -42.42e42; }
 
 void
 Crop::kill (const string& name, const Time& time, const Geometry& geometry,

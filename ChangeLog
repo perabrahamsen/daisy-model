@@ -1,4 +1,57 @@
+1998-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.009 released.
+
+1998-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* library.h (derive_function): New typedef.
+	* library.C, library.h (Library): Add `derive' argument.
+	(load_syntax): New function.
+	* cdaisy.C (daisy_load): Call it.
+	* main.C (main): Ditto.
+	* tkmain.C (class TkDaisyState): Ditto.
+	* daisy.C (load_syntax): Don't load library syntax here.
+	* library.h (Implementation): Store it here.
+	* librarian.h (class Librarian::Librarian): Pass `derive_type' to
+	`Content'.
+	(class Librarian::Content::Content): Pass `derive' to `Library'. 
+	* am.C (AM_init): Pass `derive_type' to `Library'.
+	* organic_matter.C (output): Use `AM::library' instead of creating
+	a dummy library.
+	* syntax.C, syntax.h (derive, derive_fun): Removed.
+	(add_library): Don't take derive argument.
+	* parser_file.C (load_list): Don't call `Syntax::derive'.
+	* library.C, library.h (add_derived): New function.
+	* parser_file.C (add_derived): Call it.
+	* librarian.h (Librarian::add_library): Removed.
+
+	* printer_file.C (PrinterFileSyntax): Add `PrinterFile' to
+	`Printer' library.
+
+	* Parser.C, parser.h: Use `Librarian' to manage.
+	* parser_file.C, parser_file.h: Change derived.
+	* daisy.C (load_syntax): Change callers.
+
+	* printer.C: Don't include "alist.h".
+
 1998-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* event.C: Removed warnings.
+
+	* frame.C, frame.h (class Frame): New files.
+	* Makefile (INTERFACES): Added them.
+	* condition.C, condition.h: Use it.
+	* action.C, action.h: Use it.  Convert to standard library.
+	* minimanager.h, minimanager.C: Adjusted.
+	* cdaisy.C (daisy_library_derive): Adjusted.
+	(daisy_daisy_tick_action): Pass dummy `Frame' to `Action::doIt'.
+	* log_file.C (match): Pass dummy `Frame' to `condition::match'.
+	* action_fertilize.C, action_harvest.C, action_irrigate.C,
+	action_lisp.C, action_sow.C, action_stop.C, action_tillage.C,
+	action_with.C, condition_logic.C, condition_time.C: Adjusted
+	derived objects.
+
+	* condition_logic.C (class ConditionAnd): Fixed logic.
 
 	* Version 0.008 released.
 

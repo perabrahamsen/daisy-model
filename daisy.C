@@ -19,6 +19,7 @@
 #include "syntax.h"
 #include "condition.h"
 #include "alist.h"
+#include "frame.h"
 #include "common.h"
 #include <iostream.h>
 
@@ -26,7 +27,7 @@ Daisy::Daisy (const AttributeList& al)
   : running (false),
     logs (map_create<Log> (al.alist_sequence ("output"))),
     time (al.time ("time")),
-    action (Action::create (al.alist ("manager"), NULL)),
+    action (Librarian<Action>::create (al.alist ("manager"))),
     weather (Librarian<Weather>::create (al.alist ("weather"))), 
     columns (*new ColumnList (al.alist_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
@@ -110,7 +111,7 @@ Daisy::tick_logs ()
 void 
 Daisy::tick ()
 { 
-  action.doIt (*this);
+  action.doIt (Frame (), *this);
 
   weather.tick (time);
   tick_columns ();
@@ -139,30 +140,13 @@ template class add_submodule<Harvest>;
 void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  // Libraries.
-  Librarian<Crop>::add_library (syntax, "defcrop");
-  Librarian<Horizon>::add_library (syntax, "defhorizon");
-  Librarian<Column>::add_library (syntax, "defcolumn");
-  Librarian<Log>::add_library (syntax, "deflog");
-  syntax.add_library ("defparser", Parser::library (), &Parser::derive_type);
-  syntax.add_library ("defam", AM::library (), &AM::derive_type);
+  Library::load_syntax (syntax, alist);
 
-  syntax.add_library ("defaction", Action::library (), &Action::derive_type);
-  Librarian<Condition>::add_library (syntax, "defcondition");
-  Librarian<Weather>::add_library (syntax, "defweather");
-  Librarian<Groundwater>::add_library (syntax, "defgroundwater");
-  Librarian<UZmodel>::add_library (syntax, "defuzmodel");
-  Librarian<Hydraulic>::add_library (syntax, "defhydraulic");
-  Librarian<Nitrification>::add_library (syntax, "defnitrification");
-  Librarian<Filter>::add_library (syntax, "deffilter");
-  Librarian<Bioclimate>::add_library (syntax, "defbioclimate");
-
-  // The actual data.
   syntax.add ("output", Librarian<Log>::library (),
 	      Syntax::Const, Syntax::Sequence);
-  syntax.add ("input", Parser::library (), Syntax::Optional, 
+  syntax.add ("input", Librarian<Parser>::library (), Syntax::Optional, 
 	      Syntax::Singleton);
-  syntax.add ("manager", Action::library (), Syntax::Const);
+  syntax.add ("manager", Librarian<Action>::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::State);
   syntax.add ("column",
 	      Librarian<Column>::library (), 

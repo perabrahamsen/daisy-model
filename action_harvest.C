@@ -2,74 +2,49 @@
 
 #include "action.h"
 #include "daisy.h"
+#include "frame.h"
 #include "column.h"
-#include "syntax.h"
-#include "alist.h"
-#include "common.h"
-#include <iostream.h>
-#include "library.h"
 
-class ActionHarvest : public Action
+struct ActionHarvest : public Action
 {
-private:
   const string name;
   const double stub;
   const double stem;
   const double leaf;
   const double sorg;
 
-public:
-  void doIt (Daisy&);
+  void doIt (const Frame& frame, Daisy& daisy)
+    {
+      cout << " [Harvesting " << name << "at";
+      ColumnList& cl = daisy.columns;
+      for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
+	{ 
+	  if (!frame.match_column (**i))
+	    continue;
+	  vector<const Harvest*> entry
+	    = (*i)->harvest (daisy.time, name, stub, stem, leaf, sorg);
+	  daisy.harvest.insert (daisy.harvest.end (),
+				entry.begin (), entry.end ());
+	  cout << " " << (*i)->name;
 
-  // Create and Destroy.
-private:
-  friend class ActionHarvestSyntax;
-  static Action& make (const AttributeList&, const Action *const p);
-  ActionHarvest (const AttributeList&, const Action *const p);
-public:
-  ~ActionHarvest ();
-};
-
-void 
-ActionHarvest::doIt (Daisy& daisy)
-{
-  cout << " [Harvesting " << name << "at";
-  ColumnList& cl = daisy.columns;
-  for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
-    { 
-      if (!match (**i))
-	continue;
-      vector<const Harvest*> entry
-	= (*i)->harvest (daisy.time, name, stub, stem, leaf, sorg);
-      daisy.harvest.insert (daisy.harvest.end (),
-			    entry.begin (), entry.end ());
-      cout << " " << (*i)->name;
-
+	}
+	cout << "]\n";
     }
-    cout << "]\n";
-}
 
-ActionHarvest::ActionHarvest (const AttributeList& al, const Action *const p)
-  : Action (p),
-    name (al.name ("name")), 
-    stub (al.number ("stub")),
-    stem (al.number ("stem")),
-    leaf (al.number ("leaf")),
-    sorg (al.number ("sorg"))
-{ }
-
-ActionHarvest::~ActionHarvest ()
-{ }
-
-// Add the ActionHarvest syntax to the syntax table.
-Action&
-ActionHarvest::make (const AttributeList& al, const Action *const p)
-{
-  return *new ActionHarvest (al, p);
-}
+  ActionHarvest (const AttributeList& al)
+    : Action (al.name ("type")),
+      name (al.name ("name")), 
+      stub (al.number ("stub")),
+      stem (al.number ("stem")),
+      leaf (al.number ("leaf")),
+      sorg (al.number ("sorg"))
+    { }
+};
 
 static struct ActionHarvestSyntax
 {
+  static Action& make (const AttributeList& al)
+    { return *new ActionHarvest (al); }
   ActionHarvestSyntax ();
 } ActionHarvest_syntax;
 
@@ -88,5 +63,5 @@ ActionHarvestSyntax::ActionHarvestSyntax ()
   syntax.add ("sorg", Syntax::Number, Syntax::Const);
   alist.add ("sorg", 1.0);
   syntax.order ("name");
-  Action::add_type ("harvest", alist, syntax, &ActionHarvest::make);
+  Librarian<Action>::add_type ("harvest", alist, syntax, &make);
 }

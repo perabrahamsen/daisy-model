@@ -7,12 +7,14 @@
 
 struct Library::Implementation
 {
-  static map<string, Library*, less<string>/**/>* all;
+  typedef map<string, Library*, less<string>/**/> library_map;
+  static library_map* all;
 
   // We give each parsed object an increasing sequence number.
   static int sequence;
 
   const string name;
+  derive_fun derive;
   typedef map<string, AttributeList*, less<string> > alist_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   alist_map alists;
@@ -25,8 +27,10 @@ struct Library::Implementation
   const Syntax& syntax (const string&) const;
   void dump (int indent) const;
   void entries (vector<string>&) const;
-  Implementation (const char* n) 
-    : name (n)
+  static void load_syntax (Syntax&, AttributeList&);
+  Implementation (const char* n, derive_fun d) 
+    : name (n),
+      derive (d)
     { }
   ~Implementation ()
     { all->erase (all->find (name)); }
@@ -38,7 +42,7 @@ int Library::Implementation::sequence;
 void
 Library::Implementation::all_entries (vector<string>& libraries)
 { 
-  for (map<string, Library*, less<string> >::const_iterator i = all->begin (); 
+  for (library_map::const_iterator i = all->begin (); 
        i != all->end ();
        i++)
     libraries.push_back ((*i).first); 
@@ -124,6 +128,20 @@ Library::Implementation::entries (vector<string>& result) const
     }
 }
 
+void
+Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
+{
+  const string def = "def";
+  for (library_map::const_iterator i = all->begin (); 
+       i != all->end ();
+       i++)
+    { 
+      const string& name = (*i).first;
+      Library& library = *((*i).second);
+      syntax.add_library (def + name, library);
+    }
+}
+
 Library& 
 Library::find (const string& name)
 { return *(*Implementation::all)[name]; }
@@ -159,6 +177,11 @@ void
 Library::add (const string& key, AttributeList& value, const Syntax& syntax)
 { impl.add (key, value, syntax); }
 
+void 
+Library::add_derived (const string& name, AttributeList& al,
+		      const string& super)
+{ impl.derive (name, al, super); }
+
 void
 Library::remove (const string& key)
 { impl.remove (key); }
@@ -175,7 +198,12 @@ void
 Library::entries (vector<string>& result) const
 { impl.entries (result); }
 
-Library::Library (const char *const name) : impl (*new Implementation (name))
+void 
+Library::load_syntax (Syntax& syntax, AttributeList& alist)
+{ Implementation::load_syntax (syntax, alist); }
+
+Library::Library (const char *const name, derive_fun derive) 
+  : impl (*new Implementation (name, derive))
 { 
   if (Implementation::all == NULL)
     // Buglet: we never delete this.
