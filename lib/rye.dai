@@ -1,4 +1,5 @@
 (defcrop "Rye" default
+    (description "K›ge Project")
   (Devel (EmrTSum  200)
       (DS_Emr   0.01)
       (DSRate1  0.025)
@@ -25,8 +26,8 @@
    )
   (Canopy (InitGrowth 4.50)
       (DSinit   0.20)
-      (WLfInit     1)
-      (SpLAI    22.000)
+      (WLfInit    30)
+      (SpLAI     0.022)
       (LAIDist0 0.00 1.00 1.00)
       (LAIDist1 0.10 0.80 1.00)
       (PARref   0.06)
