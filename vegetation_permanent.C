@@ -153,8 +153,8 @@ struct VegetationPermanent : public Vegetation
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
 
-  double litter_Es_reduction_factor () const
-  { return litter.Es_reduction_factor; }
+  double litter_vapor_flux_factor () const
+  { return litter.vapor_flux_factor; }
   double litter_water_capacity () const
   { return litter.interception_capacity; }
   double litter_albedo () const

@@ -530,7 +530,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   // 5 Ponding
 
-  pond_ep = (litter_ep - litter_ea) * vegetation.litter_Es_reduction_factor();
+  pond_ep = (litter_ep - litter_ea) * vegetation.litter_vapor_flux_factor();
   daisy_assert (litter_ea <= litter_ep);
   if (pond_ep < 0.0)
     {
@@ -538,7 +538,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
       tmp () << "BUG:\npond_ep = " << pond_ep << "\n"
              << "litter_ep = " << litter_ep << "\n"
              << "litter_ea = " << litter_ea << "\n"
-             << "litter_factor = " << vegetation.litter_Es_reduction_factor ();
+             << "litter_factor = " << vegetation.litter_vapor_flux_factor ();
       msg.error (tmp.str ());
       pond_ep = 0.0;
     }

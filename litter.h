@@ -29,7 +29,7 @@ class Litter
 {
   // Content.
 public:
-  const double Es_reduction_factor;
+  const double vapor_flux_factor;
   const double interception_capacity;
   const double albedo;
 

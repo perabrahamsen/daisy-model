@@ -152,7 +152,7 @@ struct VegetationCrops : public Vegetation
   void sow (Treelog& msg, const AttributeList& al, const Geometry&);
   void output (Log&) const;
 
-  double litter_Es_reduction_factor () const
+  double litter_vapor_flux_factor () const
   { return 1.0; }
   double litter_water_capacity () const
   { return 0.0; }

@@ -1,3 +1,14 @@
+2004-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.25 released.
+
+2004-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Renamed Es_reduction_factor to vapor_flux_factor.
+
+	* adsorption_freundlich.C (M_to_C): Changed assertions to make it
+	more rubust. 
+
 2004-01-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.24 released.

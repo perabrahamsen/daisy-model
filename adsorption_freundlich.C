@@ -55,6 +55,8 @@ double
 AdsorptionFreundlich::C_to_M (const Soil& soil,
 			      double Theta, int i, double C) const
 {
+  daisy_assert (C >= 0.0);
+  daisy_assert (Theta >= 0.0); 
   const double K = soil.clay (i) * K_clay 
     + soil.humus (i) * c_fraction_in_humus * K_OC;
   const double rho = soil.dry_bulk_density (i);
@@ -66,6 +68,10 @@ double
 AdsorptionFreundlich::M_to_C (const Soil& soil,
 			      double Theta, int i, double M) const
 {
+  // Check for zero.
+  if (!isnormal (M))
+    return 0.0;
+
   // Guess start boundary.
   double min_C = 0.0;
   double min_M = C_to_M (soil, Theta, i, min_C);
@@ -81,24 +87,22 @@ AdsorptionFreundlich::M_to_C (const Soil& soil,
     }
 
   // Guess by middling the C value.
-  int count = 0;
   while (!approximate (min_M, max_M))
     {
-      daisy_assert (count++ < 100);	// 100 iterations should be enough.
-      
       const double new_C = (min_C + max_C) / 2.0;
       const double new_M = C_to_M (soil, Theta, i, new_C);
       if (new_M < M)
 	{
+          daisy_assert (min_C < new_C);
 	  min_C = new_C;
 	  min_M = new_M;
 	}
       else
 	{
+          daisy_assert (max_C > new_C);
 	  max_C = new_C;
 	  max_M = new_M;
 	}
-      daisy_assert (min_M > 0.0);
     }
   return (min_C + max_C) / 2.0;
 }

@@ -31,9 +31,9 @@ Litter::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Litter");
   alist.add ("description", "\
 Properties of litter below permanent vegetation.");
-  syntax.add_fraction ("Es_reduction_factor", Syntax::Const, "\
+  syntax.add_fraction ("vapor_flux_factor", Syntax::Const, "\
 Reduction factor for potential evaporation below litter.");
-  alist.add ("Es_reduction_factor", 1.0);
+  alist.add ("vapor_flux_factor", 1.0);
   syntax.add ("interception_capacity", "mm", Syntax::Const,
 	      "Storage capacity of litter.");
   alist.add ("interception_capacity", 0.0);
@@ -43,7 +43,7 @@ By default, the surface albedo will be used.");
 }
 
 Litter::Litter (const AttributeList& al)
-  : Es_reduction_factor (al.number ("Es_reduction_factor")),
+  : vapor_flux_factor (al.number ("vapor_flux_factor")),
     interception_capacity (al.number ("interception_capacity")),
     albedo (al.check ("albedo") ? al.number ("albedo") : -1)
 { }

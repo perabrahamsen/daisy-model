@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.25
+
+** Fixed bug in Freundlich adsorbtion model.
+
+** Renamed Es_reduction_factor to vapor_flux_factor.
+
 * 3.24
 
 ** EpInterchange moved from Surface to Vegetation.
@@ -20,7 +26,7 @@ release.
 
 Here you can set 
 
-*** EpFactor
+*** vapor_flux_factor
 
 This controls reduction of potential evaporation below litter.  The
 default value is 1.0, meaning the litter does not block potential
@@ -38,7 +44,7 @@ the soil surface.
 Example:
 
   (Vegetation Hardwood         
-              (Litter (Es_reduction_factor 0.9 [])
+              (Litter (vapor_flux_factor 0.9 [])
                       (interception_capacity 2 [mm])
                       (Albedo 0.3)))
 
