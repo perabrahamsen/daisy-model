@@ -61,7 +61,11 @@ items:
   standard parameterizations of e.g.\ crops.  You will need this.  You
   will also need a program to unzip the file, download it from a place
   like \url{http://www.tucows.com/} if you haven't already got it.
-  Search for unzip.
+  Search for unzip.  Windows XP already knows how to unzip a file,
+  just open it.
+\item[sample parameterizations] This is another zip file containing
+  parameterizations that are not intended to use as-is, but to serve
+  as inspiration for your own setup files.
 \item[weather file] The weather file contains observations from the KVL
   research station in Taastrup, Denmark.  Most likely, you will
   eventually want weather data from closer to home, but this file will
@@ -73,13 +77,21 @@ items:
   the data.
 \end{description}
 
-Store all the files in the same directory, unzip the parameter library
-and the sample files, open a shell or command prompt, change directory
-to the where the parameter library files were stored, and run the
-command \texttt{daisy ../sample/test.dai} to check that everything works.  It
-should start printing dates to show the progress of the simulation.
-After simulation has finished, you can browse the `\texttt{daisy.log}'
-file to see the output again.
+W suggest you create a \texttt{daisy} directory near the root, for
+example (under MS Windows\footnote{Unix users can use
+  ``\texttt{$\tilde{ }$/daisy}})``\texttt{C:$\backslash$daisy}'', with
+the subdirectories ``bin'' (for the \texttt{.exe} files), ``doc'' (for
+the \texttt{.doc} and \texttt{.pdf} files), ``lib'' (for the files in
+\texttt{daisy-lib.zip} and ``sample'' (for the files in
+\texttt{daisy-sample.zip}).
+
+MS Windows users should then install and configure TextPad as
+described on the \daisy{} home page, and open the \texttt{test.dai}
+file in the \texttt{sample} directory.  You can now start \daisy{}
+from the \texttt{Tools} menu.  If you do that, you will get a window
+with error messages, basically telling you that \daisy{} could not
+find the files it need.  In section~\ref{sec:daisypath} you will find
+information about how to tell \daisy{} where the files are.
 
 \section{Example}
 
@@ -801,16 +813,14 @@ found in the reference manual~\cite{dina81}.
 
 Here is an example where we specify the van Genuchten retention curve
 model with Mualem theory
-
 \begin{verbatim}
   (defhorizon B default
     (clay 8.0) (silt 10.5) (coarse_sand 63.4) (fine_sand 16.5)
     (humus 1.12)
-    (SOM_fractions 0.70 0.30)
     (hydraulic M_vG
                (K_sat 10 [cm/h])
-               (Theta_res 0.05 [cm^3 H2O/cm^3])
-               (Theta_sat 0.424 [cm^3 H2O/cm^3])
+               (Theta_res 5 [%])
+               (Theta_sat 42.4 [%])
                (alpha 0.069 [cm^-1])
                (n 1.527)))
 \end{verbatim}
@@ -1073,6 +1083,85 @@ groundwater level.
 A hard rule is that numeric layers may not cross horizon boundaries,
 which mean the end points in the horizon list must also be somewhere
 in the zplus list.
+
+\subsection{Initialization of soil content}
+\label{sec:init}
+
+\Daisy{} will be default initialize the content of the soil with
+``reasonable'' values, which are most likely wrong.  So if you have
+actual measurements you should use those instead.  
+
+\subsubsection{Soil water}
+
+You can initialize the soil water content or the soil water potential,
+but not both.  The ``other one'' will be automatically initialized
+from the values you provided, and the soils hydraulic properties
+(section~\ref{sec:hydraulic}).  To specify intial water content, use
+this: 
+\begin{verbatim}
+  (defcolumn Andeby default
+    (SoilWater (initial_Theta (-100 [cm] 20 [%])
+                              (-150 [cm] 0.1 [])))
+    ;; More parameters...
+\end{verbatim}
+Here we specify that there are 20\% water in the first meter, and
+10\% water in the next 50 cm.  The empty dimension \verb|[]| means
+``fraction''.  Here we divided the soil in two layers, but yopu can
+divide it into as many layers as you want.  
+
+Soil water pressure is initialized like this:
+\begin{verbatim}
+    (SoilWater (initial_h ( -50 [cm]  -10 [kPa])
+                          (-100 [cm] -100 [cm])
+                          (-1.5 [m]     2 [pF])))
+\end{verbatim}
+Here we specify field capacity all the way, using three different
+units. 
+
+\subsubsection{Soil nitrogen}
+
+There are three different ways to specify mineral nitrogen in the
+soil.  The first is per dry soil mater.  
+\begin{verbatim}
+  (defcolumn Andeby default
+    (SoilNO3 (initial_Ms (-30 [cm] 10 [ppm])
+                         (-70 [cm] 5  [ppm])))
+    ;; More parameters...
+\end{verbatim}
+Here we specify the weight of nitrate nitrogen (i.e.\ we ignore the
+weight of the oxygen atoms) in the system (both soil and water), as a
+fraction of the dry soil weight.  The idea is that you first extract
+the nitrate fra a measured soil sample, then weight it, compensate for
+the oxygen, dry the soil sample, and weight that.  That will give you
+the nitrate nitrogen fraction of the soil.  
+
+The second method is per soil water.
+\begin{verbatim}
+  (defcolumn Andeby default 
+    (SoilNH4 (initial_C (-100 [cm] 1 [ppm]))))
+    ;; More parameters...
+\end{verbatim}
+Here the idea is that we extract a sample of water from the soil, and
+measure the ammonium nitrogen concentration in that sample.  This will
+\emph{not} give you the total amount of ammonium nitrate in the soil,
+as some of is is adsorbed to the soil.  That fraction will be found be
+assuming the adsorbed and solved phases are in equilibrium.
+
+The third method is to specify the total content per volumne, counting
+both soil, water and air. This number give a content that is
+independent of the dry bulk matter density and the water content. 
+\begin{verbatim}
+    (SoilNO3 (initial_M (-100 [cm] 50 [g/cm^3])))
+\end{verbatim}
+
+\subsubsection{Soil temperature}
+
+You can also initialize the initial temperature of the soil.
+\begin{verbatim}
+  (defcolumn Andeby default 
+    (SoilHeat (initial_T (-100 [cm] 1 [dg C]))))
+    ;; More parameters...
+\end{verbatim}
 
 \section{Management}
 \label{sec:management}
