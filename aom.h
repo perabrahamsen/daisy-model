@@ -26,6 +26,10 @@
 
 class AOM : public OM
 { 
+  // Parameters.
+public:
+  const double initial_fraction; // Relative fraction for this om.
+
   // Content.
 public:
   double top_C;			// Carbon on the ground.

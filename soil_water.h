@@ -25,7 +25,6 @@
 
 #include "macro.h"		// Must be initialized.
 #include <vector>
-using namespace std;
 
 class AttributeList;
 class Surface;
@@ -46,8 +45,8 @@ class SoilWater
   // Sink.
 public:
   void clear (const Geometry&);
-  void root_uptake (const vector<double>&);
-  void freeze (const Soil&, const vector<double>&);
+  void root_uptake (const std::vector<double>&);
+  void freeze (const Soil&, const std::vector<double>&);
   
   // Queries
 public:
@@ -91,8 +90,8 @@ public:
   double MaxExfiltration (const Soil&, double T) const;
 
   // Communication with external model.
-  void put_h (const Soil& soil, const vector<double>& v); // [cm]
-  void get_sink (vector<double>& v) const; // [cm^3/cm^3/h]
+  void put_h (const Soil& soil, const std::vector<double>& v); // [cm]
+  void get_sink (std::vector<double>& v) const; // [cm^3/cm^3/h]
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

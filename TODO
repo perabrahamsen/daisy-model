@@ -1,6 +1,6 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Kør 2.49, 2.51 og 2.52 og sammenlign med hastighed.
+* Prøv at få mingw daisy til at køre lige så hurtig som 2.47
 
 * exercises 
 
@@ -10,23 +10,23 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * MMM: Test om man kan linke hugin fra Linux.
 
-* april: ekstra linie i output
-
-I den første linie skal "begyndelsesindhold" stå.
-
-* april: automatisk aquitart horizont
-
-Øverste tredjedel af aquitarten.
-
 * OrganicMatter
+
+** Gør den robust hvis SOMn = 0 (fra init) eller (SOM_fractions 0.4 0.6 0).
+
+** Tilføj SOM3
+
+SOM3 = 0 i øverste horizont.
+
+dSOM1 = 0 under øverste horizont.
 
 ** init.mineralization
 
-Al mineralisering fra første horizont?
+Al mineralisering fra første horizont.
 
-** Inaktiv SOM pulje SOM3 / SOM0?
+** Ny horizon->turnover_factor singleton parameter
 
-** turnover rates afhængig af horizont?
+Påvirker alle puljer.
 
 ** Split SOM C/N i to:  Målt og mål.
 
@@ -35,6 +35,16 @@ Al mineralisering fra første horizont?
 ** Akademisk bekrivelse?
 
 Til referencemanual?
+
+* april: ekstra linie i output
+
+I den første linie skal "begyndelsesindhold" stå.
+
+* april: automatisk aquitart horizont
+
+Øverste tredjedel af aquitarten.
+
+* Udskriv default værdier i sample referencemanual.
 
 * SH: PowerPoint slides på hjemmeside.
 

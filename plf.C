@@ -408,7 +408,7 @@ PLF::operator += (const PLF& plf)
   // I then add the points to a temporary PLF.
   PLF result;
 
-  {for (unsigned int i = 0; i < points.size (); i++)
+  for (unsigned int i = 0; i < points.size (); i++)
     {
       //  The y value of the combined plf is at all points the
       // combined y value of the individual plfs.  And the function
@@ -416,7 +416,7 @@ PLF::operator += (const PLF& plf)
       const double x = points[i];
       const double y = impl (x) + plf (x);
       result.add (x, y);
-  }}
+  }
 
   // We now store the result in this plf.
   impl = result.impl;

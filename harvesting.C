@@ -457,7 +457,7 @@ Harvesting::load_syntax (Syntax& syntax, AttributeList& alist)
 	     "Information about what happens to the crop at harvest and cut.");
 
   syntax.add_submodule_sequence ("Stem", Syntax::Const, 
-				 "Stem AOM parameters.", AOM::load_syntax);
+				 "Stem AM parameters.", AOM::load_syntax);
   alist.add ("Stem", AM::default_AM ());
   syntax.add_submodule_sequence ("Leaf", Syntax::Const,
 				 "Leaf AM parameters.", AOM::load_syntax);

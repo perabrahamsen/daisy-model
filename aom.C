@@ -210,6 +210,9 @@ AOM::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "AOM");
   alist.add ("description", "\
 A single Added Organic Matter pool.");
+  syntax.add_fraction ("initial_fraction", Syntax::OptionalConst, "\
+The initial fraction of the total available carbon\n\
+allocated to this pool for AOM.  One pool should be left unspecified.");
   syntax.add ("top_C", "g C/cm^2", Check::non_negative (), Syntax::State,
 	      "Carbon on top of soil.");
   alist.add ("top_C", 0.0);
@@ -220,6 +223,9 @@ A single Added Organic Matter pool.");
 
 AOM::AOM (const AttributeList& al)
   : OM (al),
+    initial_fraction (al.check ("initial_fraction") 
+		      ? al.number ("initial_fraction")
+		      : Unspecified),
     top_C (al.number ("top_C")),
     top_N (al.number ("top_N"))
 { }

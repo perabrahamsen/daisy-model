@@ -454,7 +454,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
   vector<string> entries;
   syntax.entries (entries);
 
-  {for (unsigned int i = 0; i < entries.size (); i++)
+  for (unsigned int i = 0; i < entries.size (); i++)
     {
       const string key = entries[i];
       
@@ -476,7 +476,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
       print_entry (alist, syntax, super, key, 
 		   indent + key.length () + 2, false);
       out << ")";
-  }}
+    }
 }
 
 void 

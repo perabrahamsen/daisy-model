@@ -1,3 +1,31 @@
+2003-02-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.55 released.
+
+2003-02-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/fertilizer.dai (horse_manure): Change 'NH4_evaporation' to
+	'volatilization'. 
+
+	* am.C (get_NH4, get_volatilization, check_organic, AM_Syntax):
+	Removed the obsolete NH4_evaporation parameter.
+
+	* harvesting.C (load_syntax): Clarify doc string.
+
+	* document.C (print_submodel, print_document, print_sample):
+	Removed MS-for hack. 
+	* printer_file.C (print_alist): Ditto.
+	* plf.C (operator +): Ditto.
+	* document.C (print_submodel, print_document): Ditto.
+	* depend.C (resequence): Ditto.
+
+	* om.h, om.C, aom.h, aom.C (initial_fraction): Moved parameter
+	from OM to AOM. 
+
+	* clayom_biomod.C (set_rates): Added checks.
+
+	* soil_water.h: Undid last change.
+
 2003-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.54 released.

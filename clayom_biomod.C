@@ -98,10 +98,14 @@ ClayOMBiomod::set_rates (const Soil& soil, const vector<SMB*>& smb) const
 
       // Update turnover rate and maintence.
       const double clay_rate1 = smb[0]->turnover_rate * f;
+      daisy_assert (clay_rate1 < 1.0);
       smb[0]->clay_turnover.push_back (clay_rate1);
+      daisy_assert (t_SMB1 >= clay_rate1);
       smb[0]->clay_maintenance.push_back (t_SMB1 - clay_rate1);
       const double clay_rate2 = smb[1]->turnover_rate * f;
+      daisy_assert (clay_rate2 < 1.0);
       smb[1]->clay_turnover.push_back (clay_rate2);
+      daisy_assert (t_SMB2 >= clay_rate2);
       smb[1]->clay_maintenance.push_back (t_SMB2 - clay_rate2);
     }
 

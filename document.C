@@ -60,9 +60,9 @@ Document::print_submodel (ostream& out, const string& name, int level,
 	    print_submodel_entry (out, order[i], level, syntax, alist);
       
 	  // Then the remaining members, except log variables.
-	  {for (unsigned int i = 0; i < entries.size (); i++)
+	  for (unsigned int i = 0; i < entries.size (); i++)
 	    if (syntax.order (entries[i]) < 0 && !syntax.is_log (entries[i]))
-	      print_submodel_entry (out, entries[i], level, syntax, alist);}
+	      print_submodel_entry (out, entries[i], level, syntax, alist);
 
 	  print_submodel_trailer (out, name, level);
 	}
@@ -97,11 +97,12 @@ Document::print_sample (ostream& out, const string& name,
   // Then the remaining members.
   vector<string> entries;
   syntax.entries (entries);
-  {for (unsigned int i = 0; i < entries.size (); i++)
+  for (unsigned int i = 0; i < entries.size (); i++)
     if (syntax.order (entries[i]) < 0
 	&& !syntax.is_log (entries[i])
 	&& syntax.lookup (entries[i]) != Syntax::Library)
-      print_sample_entry (out, entries[i], syntax.size (entries[i]) == Syntax::Sequence);}
+      print_sample_entry (out, entries[i], 
+			  syntax.size (entries[i]) == Syntax::Sequence);
 
   print_sample_trailer (out, name);
 }
@@ -259,14 +260,14 @@ Document::print_document (ostream& out)
   // Fixed components.
   vector<string> fixed;
   Submodel::all (fixed);
-  {for (unsigned int i = 0; i < fixed.size (); i++)
+  for (unsigned int i = 0; i < fixed.size (); i++)
     {
       const string& name = fixed[i];
       Syntax syntax;
       AttributeList alist;
       Submodel::load_syntax (name, syntax, alist);
       print_fixed (out, name, syntax, alist);
-  }}
+  }
   print_fixed_all_trailer (out);
 
   print_document_trailer (out);

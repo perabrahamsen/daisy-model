@@ -359,9 +359,6 @@ thus be the number of SMB pools plus the number of SOM pools.");
   syntax.add ("initial_C_per_N", "g C/g N", Syntax::OptionalState, "\
 The initial C/N ratio when this pool is created.\n\
 Negative numbers mean unspecified.");
-  syntax.add_fraction ("initial_fraction", Syntax::OptionalConst, "\
-The initial fraction of the total available carbon\n\
-allocated to this pool for AOM.  One pool should be left unspecified.");
   syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
   syntax.add ("water_factor", "cm", Syntax::None (), Syntax::OptionalConst, "\
@@ -394,10 +391,7 @@ OM::get_initial_C_per_N (const AttributeList& al)
 }
 
 OM::OM (const AttributeList& al)
-  : initial_fraction (al.check ("initial_fraction") 
-		      ? al.number ("initial_fraction")
-		      : Unspecified),
-    initial_C_per_N (get_initial_C_per_N (al)),
+  : initial_C_per_N (get_initial_C_per_N (al)),
     turnover_rate (al.check ("turnover_rate")
 		   ? al.number ("turnover_rate")
 		   : halftime_to_rate (al.number ("turnover_halftime"))),

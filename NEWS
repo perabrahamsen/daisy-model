@@ -12,6 +12,14 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.55
+
+** Removed the obsolete NH4_evaporation fertilizer parameter.
+
+Use 'volatilization' instead.
+
+** Clanups.
+
 * 2.54
 
 ** No user visible changes.

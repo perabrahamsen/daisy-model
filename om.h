@@ -39,7 +39,6 @@ class OM
   // Parameters
 public:
   static const double Unspecified;// No initial fraction specified.
-  const double initial_fraction; // Relative fraction for this om.
   const double initial_C_per_N;	// Initial value for C/N.
   /* const */ std::vector<double> C_per_N_goal; // Prefered C/N value.
   /* const */ PLF heat_factor;
