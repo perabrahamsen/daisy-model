@@ -80,7 +80,10 @@ HydraulicYolo::M (double h) const
 HydraulicYolo::HydraulicYolo (const AttributeList& al)
   : Hydraulic (al),
     M_intervals (al.integer ("M_intervals"))
-{ }
+{ 
+  // This is not to be changed.
+  assert (Theta_sat > 0.4949 && Theta_sat < 0.4951);
+}
 
 HydraulicYolo::~HydraulicYolo ()
 { }
@@ -103,6 +106,8 @@ HydraulicYoloSyntax::HydraulicYoloSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   Hydraulic::load_syntax (syntax, alist);
+  alist.add ("lambda", 4.0);
+  alist.add ("Theta_sat", 0.495);
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
   alist.add ("M_intervals", 500);
   Hydraulic::add_type ("yolo", alist, syntax, &HydraulicYolo::make);

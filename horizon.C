@@ -106,8 +106,6 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
   assert (from < to);
   assert (to < intervals);
 
-  cerr << "from " << from << " to " << to << "\n";
-  
   // Make room, make room...
   K_water.insert (K_water.end (), to, 0.0);
   K_ice.insert (K_ice.end (), to, 0.0);
@@ -373,7 +371,7 @@ Horizon::create (const AttributeList& al)
   const string name = al.name ("type");
   assert (library ().check (name));
   assert (library ().syntax (name).check (al));
-  return (*Horizon_constructors)[name] (library ().lookup (name));
+  return (*Horizon_constructors)[name] (al);
 }
 
 void

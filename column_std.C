@@ -130,10 +130,10 @@ ColumnStandard::swap (double from, double middle, double to)
 {
   mix (from, middle, 1.0);
   mix (middle, to, 0.0);
-  soil_NO3.swap (soil, from, middle, to);
-  soil_NH4.swap (soil, from, middle, to);
-  soil_heat.swap (soil, from, middle, to);
   soil_water.swap (soil, from, middle, to);
+  soil_NO3.swap (soil, soil_water, from, middle, to);
+  soil_NH4.swap (soil, soil_water, from, middle, to);
+  soil_heat.swap (soil, from, middle, to);
   organic_matter.swap (soil, from, middle, to);
 }
 
@@ -153,6 +153,9 @@ ColumnStandard::check () const
     ok = false;
   if (!organic_matter.check ())
     ok = false;
+
+  if (!ok)
+    cerr << "in column `" << name << "'\n";
 
   return ok;
 }
@@ -228,7 +231,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     surface (al.list ("Surface")),
     soil (al.list ("Soil")),
     soil_water (soil, al.list ("SoilWater")),
-    soil_heat (al.list ("SoilHeat")),
+    soil_heat (soil, soil_water, al.list ("SoilHeat")),
     soil_NH4 (soil, soil_water, al.list ("SoilNH4")),
     soil_NO3 (soil, soil_water, al.list ("SoilNO3")),
     organic_matter (al.list ("OrganicMatter")),

@@ -20,9 +20,9 @@ struct SoilHeat::Implementation
   // BUG:  These should move to groundwater module.
   // Parameters.
   const double average;		// Average temperature at bottom [C]
-  const double amplitude;	// Variation in bottom temperature [C]
+  double amplitude;	// Variation in bottom temperature [C]
   const double omega;		// Period length for above [ rad / day]
-  const double omega_offset;	// Period start for above [rad]
+  double omega_offset;	// Period start for above [rad]
 
   // Simulation.
   void tick (const Time&, const Soil&, const SoilWater&, 
@@ -34,7 +34,7 @@ struct SoilHeat::Implementation
 
   // Create & Destroy.
   bool check (unsigned n) const;
-  Implementation (const AttributeList&);
+  Implementation (const Soil&, const SoilWater&, const AttributeList&);
 };
 
 void
@@ -225,14 +225,35 @@ SoilHeat::Implementation::check (unsigned n) const
   return ok;
 }
 
-SoilHeat::Implementation::Implementation (const AttributeList& al)
+SoilHeat::Implementation::Implementation (const Soil& soil,
+					  const SoilWater&,
+					  const AttributeList& al)
   : T (al.number_sequence ("T")),
     T_top (al.number ("T_top")),
     average (al.number ("average")),
     amplitude (al.number ("amplitude")),
     omega (al.number ("omega")),
     omega_offset (al.number ("omega_offset"))
-{ }
+{ 
+  const double depth = - soil.zplus (soil.size () - 1);
+  const double pF_2_0 = log (-100.0 * -2);
+  double k = 0;
+  double C = 0;
+  
+  for (int i = 0; i < soil.size (); i++)
+    {
+      const double Theta_pF_2_0 = soil.Theta (i, pF_2_0);
+      k += soil.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0);
+      C += soil.dz (i) * soil.heat_capacity (i, Theta_pF_2_0);
+    }
+  const double a = k / C;
+  const double d = sqrt (2.0 * a / omega);
+  
+  // Delay heating.
+  omega_offset -= depth / d;
+  // Decrease(?) amplitude.
+  amplitude *= exp (-depth / d);
+}
 
 void 
 SoilHeat::tick (const Time& time, 
@@ -263,6 +284,10 @@ SoilHeat::set_energy (const Soil& soil,
 void
 SoilHeat::swap (const Soil& soil, double from, double middle, double to)
 {
+  // This will only work right if the water is also swaped.
+  // There *might* be a small error on the top and bottom nodes, but I
+  // believe it should work as long as the energy is directly
+  // proportional with the water content.
   soil.swap (impl.T, from, middle, to);
 }
   
@@ -285,19 +310,23 @@ SoilHeat::check (unsigned n) const
 }
 
 void
-SoilHeat::load_syntax (Syntax& syntax, AttributeList&)
+SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("T", Syntax::Number, Syntax::State, Syntax::Sequence);
   syntax.add ("T_top", Syntax::Number, Syntax::State);
   syntax.add ("average", Syntax::Number, Syntax::Const);
+  alist.add ("average", 7.8);
   syntax.add ("amplitude", Syntax::Number, Syntax::Const);
+  alist.add ("amplitude", 8.5);
   syntax.add ("omega", Syntax::Number, Syntax::Const);
+  alist.add ("omega", 2.0 * M_PI / 365.0);
   syntax.add ("omega_offset", Syntax::Number, Syntax::Const);
-  
+  alist.add ("omega_offset", -209.0);
 }
 
-SoilHeat::SoilHeat (const AttributeList& al)
-  : impl (*new Implementation (al))
+SoilHeat::SoilHeat (const Soil& soil, const SoilWater& soil_water,
+		    const AttributeList& al)
+  : impl (*new Implementation (soil, soil_water, al))
 { }
 
 SoilHeat::~SoilHeat ()

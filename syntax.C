@@ -389,3 +389,16 @@ non_negative (double v, string s, bool& ok, int index)
       ok = false;
     }
 }
+
+void
+is_fraction (double v, string s, bool& ok, int index)
+{
+  if (v < 0.0 || v > 1.0)
+    {
+      cerr << "fraction " << s << " must be between 0 and 1";
+      if (index >= 0)
+	cerr << "[" << index << "]";
+      cerr << "\n";
+      ok = false;
+    }
+}

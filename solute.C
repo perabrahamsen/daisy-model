@@ -298,23 +298,9 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 }
 
 bool 
-Solute::check (unsigned n) const
+Solute::check (unsigned) const
 {
-  bool ok = true;
-
-  if (C_.size () != n)
-    {
-      cerr << "You have " << n 
-	   << " intervals but " << C_.size () << " C values\n";
-      ok = false;
-    }
-  if (M_.size () != n)
-    {
-      cerr << "You have " << n 
-	   << " intervals but " << M_.size () << " M values\n";
-      ok = false;
-    }
-  return ok;
+  return true;
 }
 
 void
@@ -360,52 +346,69 @@ Solute::mix (const Soil& soil, const SoilWater& soil_water,
 }
 
 void 
-Solute::swap (const Soil& soil, double from, double middle, double to)
+Solute::swap (const Soil& soil, const SoilWater& soil_water,
+	      double from, double middle, double to)
 { 
-  // Do not ever attempt to call this, without also swaping the water. 
   soil.swap (M_, from, middle, to);
-  soil.swap (C_, from, middle, to);
+  for (unsigned int i = 0; i < C_.size (); i++)
+    C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
 
 void
 Solute::initialize (const Soil& soil, const SoilWater& soil_water,
 		    const AttributeList& al)
 {
-  int size = 0;
-  
   if (al.check ("C"))
     {
       C_ = al.number_sequence ("C");
-      size = C_.size ();
+      if (C_.size () == 0U)
+	C_.push_back (0.0);
+      // Fill it up.
+      if (C_.size () < soil.size () +0U)
+	C_.insert (C_.end (), soil.size () - C_.size (), C_[C_.size () - 1]);
+      else if (C_.size () > soil.size () +0U)
+	THROW ("To many members of C sequence");
     }
   if (al.check ("M"))
     {
       M_ = al.number_sequence ("M");
-      size = M_.size ();
+      if (M_.size () == 0U)
+	M_.push_back (0.0);
+      // Fill it up.
+      if (M_.size () < soil.size () + 0U)
+	M_.insert (M_.end (), soil.size () - M_.size (), M_[M_.size () - 1]);
+      else if (M_.size () > soil.size () + 0U)
+	THROW ("To many members of M sequence");
     }
-  if (size == 0)
-    // This is an initialization error.  It will be catched when the
-    // `check' member function is called.
-    return;
-
-  if (!al.check ("C"))
-    for (int i = 0; i < size; i++)
+  if (!al.check ("C") && !al.check ("M"))
+    {
+      C_.insert (C_.begin (), soil.size (), 0.0);
+      M_.insert (M_.begin (), soil.size (), 0.0);
+    }
+  else if (!al.check ("C"))
+    for (int i = 0; i < soil.size (); i++)
       C_.push_back (M_to_C (soil, soil_water.Theta (i), i, M_[i]));
-
-  if (!al.check ("M"))
-    for (int i = 0; i < size; i++)
+  else if (!al.check ("M"))
+    for (int i = 0; i < soil.size (); i++)
       M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
 
-  for (int i = 0; i < size; i++)
+  for (int i = 0; i < soil.size (); i++)
     {
       if (C_[i] == 0.0)
-	assert (M_[i] == 0.0);
+	{
+	  if (M_[i] != 0.0)
+	    THROW ("C & M mismatch in solute");
+	}
       else
-	assert (abs (M_[i] / C_to_M (soil, soil_water.Theta (i), i, C_[i]) 
-		     - 1.0) < 0.001);
+	{
+	  if (abs (M_[i] / C_to_M (soil, soil_water.Theta (i), i, C_[i]) 
+		   - 1.0) >= 0.001)
+	    THROW ("Solute C does not match M");
+	}
     }
-  S.insert (S.begin (), size, 0.0);
-  J.insert (J.begin (), size + 1, 0.0);
+
+  S.insert (S.begin (), soil.size (), 0.0);
+  J.insert (J.begin (), soil.size () + 1, 0.0);
 }
 
 Solute::~Solute ()

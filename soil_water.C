@@ -96,9 +96,8 @@ void
 SoilWater::swap (const Soil& soil, double from, double middle, double to)
 {
   soil.swap (Theta_, from, middle, to);
-  // If the line below doesn't work, 
-  // the Solute and SoilHeat modules are broken too.
-  soil.swap (h_, from, middle, to);
+  for (int i = 0; i < soil.size(); i++)
+    h_[i] = soil.h (i, Theta_[i]);
 }
   
 bool 

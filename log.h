@@ -90,7 +90,7 @@ output_list (T const& items,
 {
   if (filter.check (name))
     {
-      const Filter& f = filter.lookup ("name");
+      const Filter& f = filter.lookup (name);
       log.open (name);
       for (T::const_iterator item = items.begin(); 
 	   item != items.end();

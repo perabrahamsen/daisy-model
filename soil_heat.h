@@ -32,7 +32,7 @@ public:
   void output (Log&, const Filter&) const;
   bool check (unsigned n) const;
   static void load_syntax (Syntax&, AttributeList&);
-  SoilHeat (const AttributeList&);
+  SoilHeat (const Soil&, const SoilWater&, const AttributeList&);
   ~SoilHeat ();
 };
 

@@ -18,6 +18,7 @@
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include <list>
+#include <algo.h>
 
 class CropStandard : public Crop
 {
@@ -202,12 +203,16 @@ struct CropStandard::Parameters
     double SeedN;		// N-content in seed
     const CSMP& PtLeafCnc;	// Upper limit for N-conc in leaves
     const CSMP& CrLeafCnc;	// Critical lim f. N-conc in leaves
+    const CSMP& NfLeafCnc;	// Non-func lim f. N-conc in leaves
     const CSMP& PtStemCnc;	// Upper limit for N-conc in stems
     const CSMP& CrStemCnc;	// Critical lim f. N-conc in stems
+    const CSMP& NfStemCnc;	// Non-func lim f. N-conc in stems
     const CSMP& PtRootCnc;	// Upper limit for N-conc in roots
     const CSMP& CrRootCnc;	// Critical lim f. N-conc in roots
+    const CSMP& NfRootCnc;	// Non-func lim f. N-conc in roots
     const CSMP& PtSOrgCnc;	// Upper limit for N-conc in stor org
     const CSMP& CrSOrgCnc;	// Critical lim f. N-conc in stor org
+    const CSMP& NfSOrgCnc;	// Non-func lim f. N-conc in stor org
   private:
     friend struct CropStandard::Parameters;
     CrpNPar (const AttributeList&);
@@ -284,6 +289,7 @@ struct CropStandard::Variables
     double PotRtDpt;	// Potential Root Penetration Depth [cm]
     double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
     double CrNCnt;		// Critical Nitrogen Content in Crop [g/m2]
+    double NfNCnt;		// Non-func Nitrogen Content in Crop [g/m2]
     double PotTransp;	// Potential Transpiration [mm/h]
     double PotCanopyAss;	// Potential Canopy Assimilation [g CH2O/m2/h]
     double CanopyAss;	// Canopy Assimilation [g CH2O/m2/h]
@@ -460,12 +466,16 @@ CropStandard::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
   : SeedN (vl.number ("SeedN")),
     PtLeafCnc (vl.csmp ("PtLeafCnc")),
     CrLeafCnc (vl.csmp ("CrLeafCnc")),
+    NfLeafCnc (vl.csmp ("NfLeafCnc")),
     PtStemCnc (vl.csmp ("PtStemCnc")),
     CrStemCnc (vl.csmp ("CrStemCnc")),
+    NfStemCnc (vl.csmp ("NfStemCnc")),
     PtRootCnc (vl.csmp ("PtRootCnc")),
     CrRootCnc (vl.csmp ("CrRootCnc")),
+    NfRootCnc (vl.csmp ("NfRootCnc")),
     PtSOrgCnc (vl.csmp ("PtSOrgCnc")),
-    CrSOrgCnc (vl.csmp ("CrSOrgCnc"))
+    CrSOrgCnc (vl.csmp ("CrSOrgCnc")),
+    NfSOrgCnc (vl.csmp ("NfSOrgCnc"))
 { }
 
 CropStandard::Parameters::~Parameters ()
@@ -771,12 +781,16 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpN.add ("SeedN", Syntax::Number, Syntax::Const);
   CrpN.add ("PtLeafCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("CrLeafCnc", Syntax::CSMP, Syntax::Const);
+  CrpN.add ("NfLeafCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("PtStemCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("CrStemCnc", Syntax::CSMP, Syntax::Const);
+  CrpN.add ("NfStemCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("PtRootCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("CrRootCnc", Syntax::CSMP, Syntax::Const);
+  CrpN.add ("NfRootCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("PtSOrgCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("CrSOrgCnc", Syntax::CSMP, Syntax::Const);
+  CrpN.add ("NfSOrgCnc", Syntax::CSMP, Syntax::Const);
 
   // I don't know where these belong.
   syntax.add ("IntcpCap", Syntax::Number, Syntax::Const);
@@ -858,6 +872,8 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpAux.add ("PtNCnt", Syntax::Number, Syntax::Optional);
   CrpAux.add ("CrNCnt", Syntax::Number, Syntax::State);
   vCrpAux.add ("CrNCnt", 0.0);
+  CrpAux.add ("NfNCnt", Syntax::Number, Syntax::State);
+  vCrpAux.add ("NfNCnt", 0.0);
   CrpAux.add ("PotTransp", Syntax::Number, Syntax::State);
   vCrpAux.add ("PotTransp", 0.0);
   CrpAux.add ("PotCanopyAss", Syntax::Number, Syntax::State);
@@ -952,37 +968,42 @@ CropStandard::SoluteUptake (const Soil& soil,
       const double C_l = solute.C (i);
       const double Theta = soil_water.Theta_old (i);
       const double L = root_density[i];
-      const double q_r = S[i] / L;
-      const double D = solute.diffusion_coefficient ()
-	* soil.tortuosity_factor (i, Theta)
-	* Theta;
-      const double alpha = q_r / ( 2 * M_PI * D);
-      const double beta = 1.0 / (r_root * sqrt (M_PI * L));
-      const double beta_squared = beta * beta;
-      if (alpha == 0.0)
+      if (L > 0)
 	{
-	  B_zero[i] = 4.0 * M_PI * D 
-	    / (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
-	  I_zero[i] = B_zero[i] * C_l;
+	  const double q_r = S[i] / L;
+	  const double D = solute.diffusion_coefficient ()
+	    * soil.tortuosity_factor (i, Theta)
+	    * Theta;
+	  const double alpha = q_r / ( 2 * M_PI * D);
+	  const double beta = 1.0 / (r_root * sqrt (M_PI * L));
+	  const double beta_squared = beta * beta;
+	  if (alpha == 0.0)
+	    {
+	      B_zero[i] = 4.0 * M_PI * D 
+		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
+	      I_zero[i] = B_zero[i] * C_l;
+	    }
+	  else if (alpha == 2.0)
+	    {
+	      B_zero[i] = q_r * log (beta_squared) 
+		/ ((beta_squared - 1.0) - log (beta_squared));
+	      I_zero[i] = q_r * (beta_squared - 1.0) * C_l 
+		/ ((beta_squared - 1.0) - log (beta_squared));
+	    }
+	  else
+	    {
+	      B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
+		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+		   - (pow (beta, 2.0 - alpha) - 1.0));
+	      I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha) * C_l
+		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+		   - (pow (beta, 2.0 - alpha) - 1.0));
+	    }
+	  assert (I_zero[i] <= 0.0 || I_zero[i] >= 0.0);
+	  assert (B_zero[i] <= 0.0 || B_zero[i] >= 0.0);
+	  B += B_zero[i];
+	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
 	}
-      else if (alpha == 2.0)
-	{
-	  B_zero[i] = q_r * log (beta_squared) 
-	    / ((beta_squared - 1.0) - log (beta_squared));
-	  I_zero[i] = q_r * (beta_squared - 1.0) * C_l 
-	    / ((beta_squared - 1.0) - log (beta_squared));
-	}
-      else
-	{
-	  B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
-	    / ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-	       - (pow (beta, 2.0 - alpha) - 1.0));
-	  I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha) * C_l
-	    / ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-	       - (pow (beta, 2.0 - alpha) - 1.0));
-	}
-      B += B_zero[i];
-      U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
     }
   if (U_zero > PotNUpt)
     c_root = (U_zero - PotNUpt) / B;
@@ -990,11 +1011,15 @@ CropStandard::SoluteUptake (const Soil& soil,
   for (int i = 0; i < size; i++)
     {
       const double L = root_density[i];
-      uptake[i] = min (L * (min (I_zero[i], I_max) - B_zero[i] * c_root),
-		       solute.M_left (i));
+      if (L > 0)
+	uptake[i] = min (L * (min (I_zero[i], I_max) - B_zero[i] * c_root),
+			 solute.M_left (i));
+      else
+	uptake[i] = 0.0;
+      assert (uptake[i] <= 0.0 || uptake[i] >= 0.0);
     }
   solute.add_to_sink (uptake);
-  return PotNUpt;
+  return accumulate (uptake.begin (), uptake.end (), 0.0);
 }
 
 void
@@ -1427,20 +1452,21 @@ CropStandard::NitContent ()
   const Parameters::CrpNPar& CrpN = par.CrpN;
   const double DS = var.Phenology.DS;
   const Variables::RecProd& Prod = var.Prod;
-  double& PtNCnt = var.CrpAux.PtNCnt;
-  double& CrNCnt = var.CrpAux.CrNCnt;
 
-  double NLeaf = CrpN.PtLeafCnc (DS) * Prod.WLeaf;
-  double NStem = CrpN.PtStemCnc (DS) * Prod.WStem;
-  double NSOrg = CrpN.PtSOrgCnc (DS) * Prod.WSOrg;
-  double NRoot = CrpN.PtRootCnc (DS) * Prod.WRoot;
-  PtNCnt = NLeaf + NStem + NSOrg + NRoot;
+  var.CrpAux.PtNCnt = CrpN.PtLeafCnc (DS) * Prod.WLeaf
+    + CrpN.PtStemCnc (DS) * Prod.WStem
+    + CrpN.PtSOrgCnc (DS) * Prod.WSOrg
+    + CrpN.PtRootCnc (DS) * Prod.WRoot;
 
-  NLeaf = CrpN.CrLeafCnc (DS) * Prod.WLeaf;
-  NStem = CrpN.CrStemCnc (DS) * Prod.WStem;
-  NSOrg = CrpN.CrSOrgCnc (DS) * Prod.WSOrg;
-  NRoot = CrpN.CrRootCnc (DS) * Prod.WRoot;
-  CrNCnt = NLeaf + NStem + NSOrg + NRoot;
+  var.CrpAux.CrNCnt = CrpN.CrLeafCnc (DS) * Prod.WLeaf
+    + CrpN.CrStemCnc (DS) * Prod.WStem
+    + CrpN.CrSOrgCnc (DS) * Prod.WSOrg
+    + CrpN.CrRootCnc (DS) * Prod.WRoot;
+
+  var.CrpAux.NfNCnt = CrpN.NfLeafCnc (DS) * Prod.WLeaf
+    + CrpN.NfStemCnc (DS) * Prod.WStem
+    + CrpN.NfSOrgCnc (DS) * Prod.WSOrg
+    + CrpN.NfRootCnc (DS) * Prod.WRoot;
 }
 
 void
@@ -1475,7 +1501,6 @@ CropStandard::NitrogenUptake (int Hour,
     }
   else
     CrpAux.NO3Upt = 0.0;
-  NCrop = max (NCrop, CrpAux.PtNCnt);
 }
 
 double 
@@ -1569,7 +1594,8 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   if (CrpAux.CanopyAss >= RM)
     {
       AssG = CrpAux.CanopyAss - RM;
-      Stress = min (1.0, Prod.NCrop / CrpAux.CrNCnt);
+      Stress = min (1.0, (  (Prod.NCrop - CrpAux.NfNCnt) 
+			  / (CrpAux.CrNCnt - CrpAux.NfNCnt)));
       AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
       CrpAux.IncWLeaf = Stress * Resp.E_Leaf * f_Leaf * AssG;
       CrpAux.IncWStem = Stress * Resp.E_Stem * f_Stem * AssG;

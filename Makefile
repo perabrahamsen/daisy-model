@@ -1,14 +1,15 @@
 # Makefile -- DAISY 
 
 SHELL = /bin/sh
-CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo -O2 -pipe # -fhandle-exceptions -pipe -fno-implicit-templates
+MAKEFLAGS =
+CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo -pipe # -fhandle-exceptions -pipe -fno-implicit-templates
 SRCONLY = column_std.o  weather_simple.o uzrichard.o \
 	hydraulic_yolo.o hydraulic_M_vG.o hydraulic_B_vG.o hydraulic_M_C.o \
 	hydraulic_B_C.o hydraulic_M_BaC.o hydraulic_B_BaC.o \
 	groundwater_static.o horizon_std.o \
 	crop_std.o action_sow.o action_stop.o condition_time.o \
 	condition_logic.o log_file.o action_irrigate.o action_lisp.o \
-	weather_none.o action_fertilize.o weather_file.o
+	weather_none.o action_fertilize.o weather_file.o action_tillage.o
 OBJECTS = main.o daisy.o parser.o log.o weather.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o time.o uzmodel.o parser_file.o hydraulic.o \
@@ -95,8 +96,9 @@ cvs: $(TEXT)
 main.o: main.C daisy.h time.h parser_file.h parser.h syntax.h alist.h \
  common.h
 daisy.o: daisy.C daisy.h time.h weather.h groundwater.h uzmodel.h \
- common.h horizon.h log.h parser.h aom.h inorganic_matter.h crop.h \
- column.h action.h filter.h library.h syntax.h condition.h alist.h
+ common.h horizon.h log.h parser.h aom.h inorganic_matter.h \
+ hydraulic.h crop.h column.h action.h filter.h library.h syntax.h \
+ condition.h alist.h
 parser.o: parser.C parser.h alist.h common.h library.h syntax.h
 log.o: log.C log.h alist.h common.h library.h syntax.h
 weather.o: weather.C weather.h time.h library.h alist.h common.h \
@@ -105,7 +107,7 @@ column.o: column.C column.h library.h alist.h common.h syntax.h
 crop.o: crop.C crop.h library.h alist.h common.h syntax.h
 alist.o: alist.C alist.h common.h time.h
 syntax.o: syntax.C syntax.h alist.h common.h library.h
-library.o: library.C library.h alist.h common.h
+library.o: library.C library.h alist.h common.h syntax.h
 action.o: action.C action.h alist.h common.h library.h syntax.h
 condition.o: condition.C condition.h alist.h common.h library.h \
  syntax.h
@@ -157,8 +159,6 @@ inorganic_matter.o: inorganic_matter.C inorganic_matter.h syntax.h \
 aom.o: aom.C aom.h time.h inorganic_matter.h library.h alist.h \
  common.h syntax.h log.h soil.h horizon.h hydraulic.h mathlib.h
 im.o: im.C im.h log.h alist.h common.h syntax.h
-weather_file.o: weather_file.C weather.h time.h syntax.h alist.h \
- common.h log.h filter.h
 column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h common.h inorganic_matter.h soil.h horizon.h hydraulic.h \
  soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
@@ -206,3 +206,7 @@ weather_none.o: weather_none.C weather.h time.h syntax.h alist.h \
 action_fertilize.o: action_fertilize.C action.h daisy.h time.h \
  weather.h column.h syntax.h alist.h common.h aom.h inorganic_matter.h \
  library.h
+weather_file.o: weather_file.C weather.h time.h syntax.h alist.h \
+ common.h log.h filter.h
+action_tillage.o: action_tillage.C action.h daisy.h time.h weather.h \
+ column.h syntax.h alist.h common.h
