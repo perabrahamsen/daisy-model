@@ -156,7 +156,7 @@ void
 WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Weather::load_syntax (syntax, alist);
-  syntax.add_check (&check_alist);
+  syntax.add_check (check_alist);
   // Where in the world are we?
   syntax.add ("Latitude", "dg North", Syntax::Const,
 	      "The position of the weather station on the globe.");

@@ -94,7 +94,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		else if (!lib.check (al.name ("type")))
 		  {
 		    tmp () << "Unknown library member '"
-			   << al.name ("type") + "'";
+			   << al.name ("type") << "'";
 		    err.entry (tmp.str ());
 		    error = true;
 		  }
