@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.07
+
+** Handle high temeperature soil.
+
+Daisy used to give an error when the soil temperature got over 
+40 dg C because the heat factor for various processes were not defined
+above that level.  Now the heat factor max out at 37 dg C, and
+gradually decrese down to 0 (no activity) at 60 dg C, as suggested by
+J.A. van Veen and M.J.Frissel. 
+
 * 3.06 
 
 ** Changed default value for K_aquitard from 1e-4 to 1e-3.
@@ -603,7 +613,7 @@ Expect significant changes in simulation results.
 
 You can change it back to 1.0 with
 
-    (sow "Spring Barley" (Canopy (EpFac 1.0)))
+    (sow ("Spring Barley" (Canopy (EpFac 1.0))))
 
 in order to reproduce older results.
 
@@ -675,8 +685,8 @@ mineralization.
 
 Example:
 
-    (sow "Spring Barley"
-         (Root (PenClayFac (0.0 0.8) (0.1 1.0) (0.3 1.1))))
+    (sow ("Spring Barley"
+          (Root (PenClayFac (0.0 0.8) (0.1 1.0) (0.3 1.1)))))
 
 This mean root penetration will be 20% slower with zero clay content
 and 10% faster with 30% clay in the soil.  The default root
@@ -1828,11 +1838,11 @@ days.  By default, it is reset March 1 every year.
 
 Example:
 
-    (sow "Spring Barley"
-         (Root (rootdens "DS_Depth" 
-                         (entries (0.0 (0.0 1.0) (10.0 0.0))
-                                  (1.0 (0.0 1.0) (50.0 0.0))
-                                  (2.0 (0.0 1.0) (40.0 1.0) (50.0 0.0))))))
+    (sow ("Spring Barley"
+          (Root (rootdens "DS_Depth" 
+                          (entries (0.0 (0.0 1.0) (10.0 0.0))
+                                   (1.0 (0.0 1.0) (50.0 0.0))
+                                   (2.0 (0.0 1.0) (40.0 1.0) (50.0 0.0)))))))
 
 This specifies the root distribution at DS 0.0 (emergence), 1.0
 (flowering) and 2.0 (ripe) respectively.  At all times, the highest
@@ -1848,11 +1858,11 @@ Daisy will interpolate between these three development stages.
 
 Example:
 
-    (sow "Spring Barley"
-         (Root (rootdens "DS_Rel" 
-                         (entries (0.0 (0.0 1.0) (1.0 0.0))
-                                  (1.0 (0.0 1.0) (1.0 0.0))
-                                  (2.0 (0.0 1.0) (0.8 1.0) (1.0 0.0))))))
+    (sow ("Spring Barley"
+          (Root (rootdens "DS_Rel" 
+                          (entries (0.0 (0.0 1.0) (1.0 0.0))
+                                   (1.0 (0.0 1.0) (1.0 0.0))
+                                   (2.0 (0.0 1.0) (0.8 1.0) (1.0 0.0)))))))
 
 This works like DS_Depth, except that instead of using absolute
 numbers for soil depth, we now use numbers relative to the current
@@ -1861,11 +1871,11 @@ DS_Depth, the calculated root depth is ignored.
 
 *** Depth_Depth
 
-    (sow "Spring Barley"
-         (Root (rootdens "Depth_Depth" 
-                         (entries (00.0 (0.0 1.0) (10.0 0.0))
-                                  (50.0 (0.0 1.0) (50.0 0.0))
-                                  (75.0 (0.0 1.0) (40.0 1.0) (75.0 0.0))))))
+    (sow ("Spring Barley"
+          (Root (rootdens "Depth_Depth" 
+                          (entries (00.0 (0.0 1.0) (10.0 0.0))
+                                   (50.0 (0.0 1.0) (50.0 0.0))
+                                   (75.0 (0.0 1.0) (40.0 1.0) (75.0 0.0)))))))
 
 This works like DS_Depth, except that instead of using the development
 stage as index, we now use the calculated root depth.  Obviously, this

@@ -19,7 +19,6 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #include "chemical.h"
 #include "mathlib.h"
 #include "plf.h"
@@ -33,8 +32,16 @@ heat_turnover_factor (double T)
     return 0.0;
   if (T < 20.0)
     return 0.1 * T;
+  if (T < 37.0)
+    return exp (0.47 - 0.027 * T + 0.00193 * T *T);
 
-  return exp (0.47 - 0.027 * T + 0.00193 * T *T);
+  if (T < 60.0)
+    {
+      // J.A. van Veen and M.J.Frissel.
+      const double max_val = exp (0.47 - 0.027 * T + 0.00193 * T * T);
+      return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
+    }
+  return 0.0;
 }
 
 static double

@@ -1,20 +1,18 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* (SOM_fractions -1 -1 0.4)
+* Requirements paper.
 
-* humus i balance med input for forskellige jorde.
+** Sørens ændringer
+
+** Til EU.
+
+* Ny claymod fra Bjørn
+
+* Tilføj std-fertilizer til lib (fra Sørens mail).
+
+* Fertilizer tabel til Søren
 
 * Noter til hvad der er ændret i Daisy siden opgaver
-
-* Hvad kræver Daisy af input
-
-** Minimum
-
-** Anbefalet
-
-** Muligt
-
-* Tilføg std-fertilizer til lib (fra Sørens mail).
 
 * Ny (set foo 3.4) pseudo-attribut.
 

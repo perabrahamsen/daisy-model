@@ -44,10 +44,15 @@ static double f_T (double T)
     return 0.15 * (T - 2.0);
   if (T < 20.0)
     return 0.10 * T;
-  if (T < 40)
+  if (T < 37.0)
     return exp (0.47 - 0.027 * T + 0.00193 * T * T);
-
-  daisy_assert (false);
+  if (T < 60.0)
+    {
+      // J.A. van Veen and M.J.Frissel.
+      const double max_val = exp (0.47 - 0.027 * T + 0.00193 * T * T);
+      return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
+    }
+  return 0.0;
 }
 
 void
