@@ -54,7 +54,6 @@ public:
   double dispersivity (int) const;
   void set_porosity (int i, double Theta)
   { horizon_[i]->hydraulic.set_porosity (Theta); }
-
   
   // Texture.
   inline double tortuosity_factor (int i, double Theta) const
@@ -76,6 +75,13 @@ public:
   double heat_capacity (int i, double Theta, double Ice) const
   { return horizon_[i]->heat_capacity (Theta, Ice); }
   
+  // Chemistry.
+  bool has_attribute (int i, const string& name)
+  { return horizon_[i]->has_attribute (name); }
+    
+  double get_attribute (int i, const string& name)
+  { return horizon_[i]->get_attribute (name); }
+
   // Simulation.
 public:
   void output (Log&) const;

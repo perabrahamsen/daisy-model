@@ -65,6 +65,8 @@ EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
   //     M = (my_max B) / (K + B) + B
   // ==>
   //     M (K + B) = my_max B + B (K + B)
+  // ==>
+  //     M K + B M = my_max B + B K + B^2
   // ==> 
   //     0 = B^2 + (my_max + K - M) B - M K
   //

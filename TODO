@@ -1,14 +1,22 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Phospher
-
-** Testcase.
-
-** Horizon attributes.
+* linear pedotranfer model
 
 * Allow to convert dimensions in the file parser.
 
 * Make it possible to log a specific entry in an array of unnamed objects.
+
+* Organic Matter
+
+** Add DOM pool
+
+Dissolved Organic Matter, feed by all the OM pool transformations.
+
+** Separate abiotic factors for each OM pool transformation
+
+** Phosphor
+
+** Pesticides
 
 * Check dræn + makro porer, specielt makroporer ned i grundvand.
 
@@ -116,7 +124,7 @@ Input as well to be consistent.
 Consider how this fits into the desired ability to add rules to a
 Manager. 
 
-* Make CSMP::find use binary search.
+* Make PLF::find use binary search.
 
 * Rename Daisy to Simulation.
 

@@ -27,6 +27,7 @@
 #include "pedo.h"
 #include "equil.h"
 #include "check.h"
+#include "log.h"
 #include "mathlib.h"
 
 struct TransformEquilibrium : public Transform
@@ -40,6 +41,10 @@ struct TransformEquilibrium : public Transform
   const Pedotransfer* pedo_AB;
   const Pedotransfer* pedo_BA;
 
+  // Log variables.
+  vector<double> S_AB;
+  void output (Log&) const;
+
   // Simulation.
   void tick (const Soil&, const SoilWater&, SoilChemicals&);
 
@@ -48,6 +53,12 @@ struct TransformEquilibrium : public Transform
   void initialize (const Soil&);
   TransformEquilibrium (const AttributeList& al);
 };
+
+void
+TransformEquilibrium::output (Log& log) const
+{ 
+  log.output ("S_AB", S_AB);
+}
 
 void 
 TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
@@ -59,7 +70,6 @@ TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
   SoilChemical& A = soil_chemicals.find (soil, soil_water, name_A);
   SoilChemical& B = soil_chemicals.find (soil, soil_water, name_B);
 
-  vector<double> S;
   for (unsigned int i = 0; i < soil.size (); i++)
     { 
       const double has_A = A.M (i);
@@ -73,11 +83,11 @@ TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
 	? k_AB[i] * (has_A - want_A)
 	: -k_BA[i] * (has_B - want_B);
       
-      S.push_back (convert);
+      S_AB[i] = convert;
 	
     }
-  A.add_to_sink (S);
-  B.add_to_source (S);
+  A.add_to_sink (S_AB);
+  B.add_to_source (S_AB);
 }
 
 bool
@@ -127,7 +137,8 @@ TransformEquilibrium::initialize (const Soil& soil)
     }
   else
     k_BA = k_AB;
-  
+
+  S_AB.insert (S_AB.end (), soil.size (), 0.0);
 }
 
 TransformEquilibrium::TransformEquilibrium (const AttributeList& al)
@@ -190,6 +201,8 @@ static struct TransformEquilibriumSyntax
 		Syntax::OptionalConst, Syntax::Singleton,
 		"Function to calculate 'k_BA' if not specified.\n\
 If neither this, nor 'k_BA' are specified, 'k_AB' will be used.");
+    syntax.add ("S_AB", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+		"Converted from A to B this timestep (may be negative).");
 
     syntax.order ("A", "B");
     Librarian<Transform>::add_type ("equilibrium", alist, syntax, &make);

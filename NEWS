@@ -12,6 +12,52 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.04
+
+** Transformations.
+
+You can now create arbitrary transformations between soil chemicals. 
+
+Example:
+
+(defcolumn test default
+  (Transformations (equilibrium "Phosphor Solute" "Phosphor Solid"
+				(equilibrium Langmuir
+					     (K 1e-5 [g/cm^3])
+					     (my_max 1e-2 [g/cm^3]))
+				(k_AB 1e-2 [h^-1])))
+  ...)
+
+Right now, "equilibrium" is the only implemented transform model.  It
+transforms towards an equilibrium, using k_AB (and k_BA) as speed.
+k_BA are by default the same as k_AB.
+
+Langmuir is the only implemented equilibrium model.  
+
+All the numeric parameters (K, my_max, k_AB, k_BA) are arrays, so they
+can differ for each soil interval.  There are "pedo_" versions
+(pedo_K, etc.) of them all, making it possible to specify them using
+pedotransfer functions.  No pedotransfer functions are currently
+implemented. 
+
+** New "full" adsorbtion model
+
+Use it with "none" transport to get non-solute soil chemicals.
+
+** New "solid" standard chemical parameterization.
+
+It uses the full adsorbtion model together with the "none" transport. 
+
+** New "Soil Chemical" log parameterization.
+
+These allows you to log a single soil chemical.
+
+** New "Transform" log parameterizations.
+
+This allows you to log transformations.
+
+** Bug fixes.
+
 * 2.03
 
 ** You can now specify dimensions for numbers in input files.

@@ -59,6 +59,9 @@ struct Horizon::Implementation
   double C_soil;
   vector<double> K_water;
   vector<double> K_ice;
+
+  // Chemistry.
+  /* const */map<string, double, less<string>/**/> attributes;
   
   // Initialize.
   // Note:  These variables are really not used after initialization.
@@ -402,6 +405,17 @@ Horizon::heat_capacity (double Theta, double Ice) const
     + impl.heat_capacity[Implementation::Ice] * Ice;
 }
 
+bool
+Horizon::has_attribute (const string& name)
+{ return impl.attributes.find (name) != impl.attributes.end (); }
+
+double 
+Horizon::get_attribute (const string& name)
+{ 
+  assert (has_attribute (name));
+  return impl.attributes[name];
+}
+
 static bool
 check_alist (const AttributeList& al, Treelog& err)
 {
@@ -487,6 +501,16 @@ By default, this is calculated from the soil constituents.");
 	      "erg/s/cm/dg C", Syntax::OptionalConst, Syntax::Sequence,
 	      "Heat conductivity table for solid frozen soil.\n\
 By default, this is calculated from the soil constituents.");
+
+  Syntax& attSyntax = *new Syntax ();
+  attSyntax.add ("key", Syntax::String, Syntax::Const,
+		 "Name of attribute.");
+  attSyntax.add ("value", Syntax::Unknown (), Syntax::Const,
+		 "Value of attribute.");
+  attSyntax.order ("key", "value");
+  syntax.add ("attributes", attSyntax, Syntax::OptionalConst, Syntax::Sequence,
+	      "List of additional attributes for this horizon.\n\
+Intended for use with pedotransfer functions.");
 }
 
 Horizon::Horizon (const AttributeList& al)
@@ -496,8 +520,14 @@ Horizon::Horizon (const AttributeList& al)
     tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
 { 
   if (impl.K_water.size () == 0)
-    {
+    { 
       impl.initialize (hydraulic);
+    }
+  if (al.check ("attributes"))
+    {
+      const vector<AttributeList*>& alists = al.alist_sequence ("attributes");
+      for (unsigned int i = 0; i < alists.size (); i++)
+	impl.attributes[alists[i]->name ("key")] = alists[i]->number ("value");
     }
 }
 

@@ -95,9 +95,12 @@ SoilChemicals::Implementation::find (const Soil& soil,
 				     const SoilWater& soil_water,
 				     const string& name)
 {
-  const Chemical& chemical = Chemicals::lookup (name);
-  solutes[name] = new SoilChemical (chemical);
-  solutes[name]->initialize (chemical.solute_alist (), soil, soil_water);
+  if (solutes.find (name) == solutes.end ())
+    {
+      const Chemical& chemical = Chemicals::lookup (name);
+      solutes[name] = new SoilChemical (chemical);
+      solutes[name]->initialize (chemical.solute_alist (), soil, soil_water);
+    }
   return *solutes[name];
 }
 

@@ -61,7 +61,13 @@ public:
   double SOM_C (unsigned int pool) const;
   double SOM_C_per_N (unsigned int pool) const;
 
+  // Chemistry.
+public:
+  bool has_attribute (const string& name);
+  double get_attribute (const string& name);
+
   // Simulation.
+public:
   void output (Log&) const;
 
   // Create and Destroy.

@@ -130,7 +130,7 @@ single_positive_root_of_cubic_equation (double a, double b, double c, double d)
 double 
 single_positive_root_of_square_equation (double a, double b, double c)
 {
-  const double D = sqrt (pow2 (b) + 4.0 * a * c);
+  const double D = sqrt (pow2 (b) - 4.0 * a * c);
   
   // One solution.
   if (D == 0.0)

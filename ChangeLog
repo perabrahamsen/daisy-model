@@ -1,3 +1,21 @@
+2002-01-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.04 released.
+
+2002-01-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("N Balance"): Accumulate fixation.
+
+2002-01-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transform_equil.C (S_AB): New log variable.
+
+	* soil.h, horizon.h, horizon.C (get_attribute, has_attribute): New
+	member functions. 
+
+	* mathlib.C (single_positive_root_of_square_equation): Fix error
+	in caculating discriminant.
+
 2002-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.03 released.
