@@ -38,8 +38,8 @@ public:
   struct Convert
   {
     // Use.
-    virtual double operator()(double value) = 0;
-    virtual bool valid (double value);
+    virtual double operator()(double value) const = 0;
+    virtual bool valid (double value) const;
 
     // Create and destroy.
     Convert ();
@@ -54,6 +54,8 @@ public:
   static double convert (const string& from, const string& to, double value);
   static bool can_convert (const string& from, const string& to);
   static bool can_convert (const string& from, const string& to, double value);
+  static const Convert& get_convertion (const string& from, const string& to);
+  static string multiply (const string&, const string&);
 
   // Create and destroy.
 private:

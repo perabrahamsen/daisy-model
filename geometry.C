@@ -26,6 +26,7 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 #include "check.h"
+#include "groundwater.h"
 #include <assert.h>
 
 unsigned int 
@@ -67,27 +68,30 @@ static bool
 check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
-  const vector<double> zplus = al.number_sequence ("zplus");
+  if (al.check ("zplus"))
+    {
+      const vector<double> zplus = al.number_sequence ("zplus");
   
-  if (zplus.size () < 1)
-    {
-      err.entry ("You need at least one interval");
-      ok = false;
-    }
-  double last = 0.0;
-  for (unsigned int i = 0; i < zplus.size (); i++)
-    {
-      if (zplus[i] >= last)
+      if (zplus.size () < 1)
 	{
-	  TmpStream tmp;
-	  tmp () << "Intervals should be monotonically decreasing, but "
-		 << zplus[i] << " > " << last;
-	  err.entry (tmp.str ());
+	  err.entry ("You need at least one interval");
 	  ok = false;
-	  break;
 	}
-      else 
-	last = zplus[i];
+      double last = 0.0;
+      for (unsigned int i = 0; i < zplus.size (); i++)
+	{
+	  if (zplus[i] >= last)
+	    {
+	      TmpStream tmp;
+	      tmp () << "Intervals should be monotonically decreasing, but "
+		     << zplus[i] << " > " << last;
+	      err.entry (tmp.str ());
+	      ok = false;
+	      break;
+	    }
+	  else 
+	    last = zplus[i];
+	}
     }
   return ok;
 }
@@ -298,15 +302,135 @@ void
 Geometry::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("zplus", "cm", Check::negative (), Syntax::Const, Syntax::Sequence,
+  syntax.add ("zplus", "cm", Check::negative (), 
+	      Syntax::OptionalConst, Syntax::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
 }
   
 Geometry::Geometry (const AttributeList& al)
-  : zplus_ (al.number_sequence ("zplus")),
-    size_ (zplus_.size ())
+{ 
+  if (al.check ("zplus"))
+    zplus_ = al.number_sequence ("zplus");
+}
+
+void
+Geometry::initialize_zplus (const Groundwater& groundwater,
+			    const vector<double>& fixed,
+			    const double max_rooting_depth,
+			    Treelog& msg)
 {
+  if (zplus_.empty ())
+    {
+      const Library& library = Librarian<Groundwater>::library ();
+      const string name = groundwater.name;
+      const bool volatile_bottom = 
+	library.is_derived_from (name, "lysimeter")
+	|| library.is_derived_from (name, "pipe");
+
+      double last = 0.0;
+      for (unsigned int i = 0; i < fixed.size ();)
+	{
+	  const double current = fixed[i];
+
+	  // We divide the soil into zones with desired interval sizes.
+	  double zone_end;
+	  double zone_size;
+	  bool do_round = true;
+	  
+	  if (last > -5.0)
+	    {
+	      zone_end = -5.0;
+	      zone_size = 2.5;
+	      do_round = true;
+	    }
+	  else if (volatile_bottom)
+	    {
+	      zone_end = current;
+	      zone_size = 5.0;
+	    }
+	  else if (last > -10.0)
+	    {
+	      zone_end = -10.0;
+	      zone_size = 5.0;
+	    }
+	  else if (last > max_rooting_depth - 50.0)
+	    {
+	      zone_end = max_rooting_depth - 50.0;
+	      zone_size = 10.0;
+	    }
+	  else
+	    {
+	      zone_end = current;
+	      zone_size = 20.0;
+	    }
+
+	  if (current < zone_end - zone_size)
+	    // The zone ends before the next fixed interval limit.
+	    while (last > zone_end)
+	      // Just add intervals to the end of the zone.
+	      {
+		last -= zone_size;
+		zplus_.push_back (last);
+	      }
+	  else
+	    // The next fixed interval limit is before the end of the zone.
+	    {
+	      // Find approximate number of intervals until fixed limit.
+	      const int intervals = (int) rint ((last - current) / zone_size);
+	      if (intervals > 1)
+		{
+		  // Add interior intervals.
+		  const double step = (last - current) / (double) intervals;
+		  const double first = last;
+		  for (int j = 1; j < intervals; j++)
+		    {
+		      const double next = first - step * j;
+		      if (do_round)
+			{
+			  if (!approximate (rint (next), last))
+			    {
+			      last = rint (next);
+			      zplus_.push_back (last);
+			    }
+			}
+		      else
+			{
+			  last = next;
+			  zplus_.push_back (last);
+			}
+		    }
+		}
+	      // Add fixed limit.
+	      if (!approximate (last, current))
+		{
+		  last = current;
+		  zplus_.push_back (current);
+		}
+	      // Next fixed limit.
+	      i++;
+	    }
+	}
+
+      // Debug messages.
+      TmpStream tmp;
+      tmp () << "Intervals:";
+      for (unsigned int i = 0; i < zplus_.size (); i++)
+	tmp () << " " << zplus_[i];
+      tmp () << "\nTotal: " << zplus_.size ();
+      msg.entry (tmp.str ());
+
+      // Check that zplus is strictly decreasing.
+      last = 0.0;
+      for (unsigned int i = 0; i < zplus_.size (); i++)
+	{
+	  assert (zplus_[i] < last);
+	  last = zplus_[i];
+	}
+    }
+
+  // Update z and dz from zplus.
+  size_ = zplus_.size ();
   double last = 0.0;
   for (unsigned int i = 0; i < size_; i++)
     {

@@ -40,13 +40,12 @@ private:
   Implementation& impl;
 protected:
   const bool accumulate;	// Accumulate numbers over time.
-  const double factor;		// Convert value.
-  const double offset;		// - || -
+  double convert (double) const; // Convert value.
   int count;			// Number of accumulated values.
 public:
   static const char *const description;
-  const string tag;		// Name of this entry.
-  string dimension;		// Physical dimension of this entry.
+  virtual const string& dimension () const;
+  virtual const string& tag () const;
   virtual const Geometry* geometry () const; // For array tags.
   virtual int size () const;	// For array tags.
   
@@ -93,10 +92,16 @@ public:
   virtual bool prevent_printing ();
 
   // Create and Destroy.
+protected:
+  virtual const string default_dimension (const string& spec_dim) const;
+public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (const string_map& conv, double from, double to,
 			   const string& timestep);
+  virtual bool check (Treelog& err) const;
+protected:
   Select (const AttributeList& al);
+public:
   virtual ~Select ();
 };
 

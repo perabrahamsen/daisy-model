@@ -36,7 +36,7 @@ class Soil : public Geometry
   struct Implementation;
   Implementation& impl;
   // Cache for fast inline access.
-  const vector<Horizon*> horizon_;
+  /* const */ vector<Horizon*> horizon_;
 
 public:
   // Water.
@@ -96,6 +96,7 @@ public:
   bool check (Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);
   Soil (const AttributeList&);
+  void initialize (const Groundwater&, Treelog&);
   ~Soil ();
 };
 

@@ -1,15 +1,5 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* NEWS
-
-** New log parameterizations "Organic Matter" and "AOM Pools".
-
-These log the content of the individual organic matter pools.
-"Organic Matter" logs SOM, SMB and all the AOM's.  "AOM Pools" log all
-the AOMS, or a specific AOM if "$am" is set.
-
-* Få Søren til at se på groundwater pipe fejl.
-
 * User Manual
 
 ** Tillage
@@ -31,6 +21,8 @@ SH: Streiby.
 ** Log parameterizations.
 
 Udbyg.
+
+*** Transform
 
 ** Appendix listing features not mentioned otherwise.
 
@@ -81,10 +73,6 @@ I.e. a new select parameter named "description", plus a table option
 of whether to add it to preamble of the dlf file.
 
 ** Use new log table spec parameter
-
-*** Get default dimension
-
-*** Automatic convertion 
 
 *** Default descriptions in ref-doc.
 

@@ -260,7 +260,7 @@ MODELS = hydraulic_Cosby.C pedo_linear.C adsorption_full.C \
 	action_crop.C groundwater_lysimeter.C select_min.C \
 	select_max.C select_average.C action_message.C weather_std.C \
 	select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
-	select_index.C select_content.C select_interval.C select_flux.C \
+	select_index.C select_content.C select_interval.C \
 	select_number.C select_date.C select_array.C log_table.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
 	average_arithmetic.C average_harmonic.C average_geometric.C \
@@ -312,7 +312,8 @@ SUBMODELS = photosynthesis.C crpn.C vernalization.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
+SPECIALS = select_value.C \
+	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C column_base.C
 
 # Various utility code that are neither a component or a (sub)model.
@@ -359,7 +360,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = message.C 
+REMOVE = select_flux.C
 
 # These are the file extensions we deal with.
 # 

@@ -1,7 +1,7 @@
 // select_max.C --- Select a state variable.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,13 +20,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "select.h"
+#include "select_value.h"
 
-struct SelectMax : public Select
+struct SelectMax : public SelectValue
 {
-  // Content.
-  double value;	
-
   // Output routines.
   void output_number (const string& name, double number)
     { 
@@ -43,21 +40,9 @@ struct SelectMax : public Select
       count++;
     }
 
-  // Print result at end of time step.
-  void done (Destination& dest)
-    {
-      if (count == 0)
-	dest.missing (tag);
-      else 
-	dest.add (tag, value * factor + offset);
-
-      if (!accumulate)
-	count = 0;
-    }
   // Create and Destroy.
   SelectMax (const AttributeList& al)
-    : Select (al),
-      value (al.number ("value"))
+    : SelectValue (al)
     { }
 };
 
@@ -70,12 +55,8 @@ static struct SelectMaxSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      Select::load_syntax (syntax, alist);
+      SelectValue::load_syntax (syntax, alist);
       alist.add ("description", "Extract maximum value.");
-
-      syntax.add ("value", Syntax::Unknown (), Syntax::State,
-		  "The current accumulated value.");
-      alist.add ("value", 0.0);
 
       Librarian<Select>::add_type ("max", alist, syntax, &make);
     }

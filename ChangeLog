@@ -1,3 +1,48 @@
+2002-04-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.26 released.
+
+2002-04-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (total_C, total_N): Fix dimensions.
+	* units.C (multiply): Added entries.
+	(standard_conversions): Ditto.
+	* lib/log.dai ("Total Soil Content"): Added more specs.
+	("Soil NO3-N Concentration"): Ditto.
+	("Soil Temperature"): Ditto.
+	("Soil Water Potential"): Ditto.
+	("Soil Water Sink"): Ditto.
+
+2002-04-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C, geometry.h (initialize_zplus): New function.
+	* soil.C, soil.h (initialize): New function.
+	* column_base.C (initialize): Call it.
+	* geometry.C (zplus): Made it optional.
+	
+2002-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* library.C (is_derived_from): Return true if a == b.
+
+2002-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C, units.h (get_convertion, multiply): New functions.
+	* select.h, select.C, select_interval.C (default_dimension): New
+	virtual member function.
+	* select_value.C, select_value.h: New helper class.
+	* select_number.C: Use it.
+	* select_min.C: Use it.
+	* select_max.C: Use it.
+	* select_index.C: Use it.
+	* select_flux_top.C: Use it.
+	* select_flux_bottom.C: Use it.
+	* select_content.C: Use it.
+	* Makefile (MODELS, REMOVE): Removed select_flux.C.
+	* select.C, select.h (convert): New function.
+	(dimension, tag): Ditto.
+	* select.C, select.h (dimension, tag): Moved parameters to impl.
+	(factor, offset): Ditto.
+
 2002-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* alist.C (check): New char* variant for the sake of BCC 5.0.

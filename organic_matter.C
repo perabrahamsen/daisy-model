@@ -1151,9 +1151,9 @@ Biological incorporation of litter.",
 Mineralization this time step (negative numbers mean immobilization).");
   syntax.add ("NH4_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
 Mineralization this time step (negative numbers mean immobilization).");
-  syntax.add ("total_C", "g C/cm^2", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("total_C", "g C/cm^3", Syntax::LogOnly, Syntax::Sequence,
 	      "Total organic C in the soil layer.");
-  syntax.add ("total_N", "g N/cm^2", Syntax::LogOnly, Syntax::Sequence,
+  syntax.add ("total_N", "g N/cm^3", Syntax::LogOnly, Syntax::Sequence,
 	      "Total organic N in the soil layer.");
   syntax.add ("CO2", "g CO_2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "CO2 evolution in soil.");

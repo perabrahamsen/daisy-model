@@ -29,13 +29,15 @@
 class AttributeList;
 class Syntax;
 class Treelog;
+class Groundwater;
 
 class Geometry
 {
-  const vector<double> zplus_;	// Lower boundary of each interval.
-  vector<double> z_;		// (c) Center of each interval.
-  vector<double> dz_;		// (c) Size of each interval.
-  const unsigned int size_;
+  // Parameters.
+  vector<double> zplus_;	// Lower boundary of each interval.
+  vector<double> z_;		// Center of each interval.
+  vector<double> dz_;		// Size of each interval.
+  unsigned int size_;		// Number of intervals.
 public:
   // Accessors.
   inline unsigned int size () const
@@ -67,8 +69,13 @@ public:
 
   // Creation.
   bool check (Treelog&) const;
+protected:
   static void load_syntax (Syntax&, AttributeList&);
   Geometry (const AttributeList&);
+  void initialize_zplus (const Groundwater& groundwater,
+			 const vector<double>& fixed,
+			 const double max_rooting_depth,
+			 Treelog& msg);
   virtual ~Geometry ();
 };
 

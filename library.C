@@ -285,6 +285,9 @@ Library::entries (vector<string>& result) const
 bool 
 Library::is_derived_from (const string& a, const string& b) const
 {
+  if (a == b)
+    return true;
+
   const AttributeList& al = lookup (a);
 
   if (!al.check ("type"))

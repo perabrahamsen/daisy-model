@@ -45,9 +45,9 @@ struct SelectDate : public Select
   void done (Destination& dest)
     {
       if (count == 0)
-	dest.missing (tag);
+	dest.missing (tag ());
       else 
-	dest.add (tag, extract_date_component ());
+	dest.add (tag (), extract_date_component ());
 
       if (!accumulate)
 	count = 0;

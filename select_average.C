@@ -47,9 +47,9 @@ struct SelectAverage : public Select
   void done (Destination& dest)
     {
       if (count == 0)
-	dest.missing (tag);
+	dest.missing (tag ());
       else 
-	dest.add (tag, (value/(double) count) * factor + offset);
+	dest.add (tag (), convert (value/(double) count));
 
       if (!accumulate)
 	count = 0;

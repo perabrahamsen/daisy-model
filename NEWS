@@ -12,6 +12,40 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.26
+
+** Specifying Soil zplus is now optional.
+
+If you do not specify it, Daisy will attempt to create a reasonable
+default discretitation.
+
+** New log parameterizations "Organic Matter" and "AOM Pools".
+
+These log the content of the individual organic matter pools.
+"Organic Matter" logs SOM, SMB and all the AOM's.  "AOM Pools" logs
+all the AOM's, or a specific AOM if "$am" is set.
+
+** New spec attribute in select entries of the log table model.
+
+A "spec" is a suplement to "path" for specifying which daisy attribute
+should be logged.  If you specify "spec", Daisy will be able to either
+find the dimension itself, or if you specify the dimension, attempt to
+convert from the dimension used internally.
+
+Example:
+
+  (interval (path column "$col" SoilWater Theta)
+            (spec column default SoilWater Theta)
+            (tag "Water")
+            (dimension "mm"))
+
+The advantage of doing it this way is that Daisy will be able to
+detect any errors.
+
+The feature is still experimental, and will only work in few cases.
+You will get an error for the cases where Daisy cannot convertion the
+dimensions.
+
 * 2.25
 
 ** Changed the equilibrium tranformation model.
@@ -25,7 +59,7 @@ This is an alternative to 'turnover_rate'.
 
 ** Changes to the default chemical model.
 
-*** decompose log increment for pesticided moved from solute t chemical.
+*** decompose log increment for pesticided moved from solute to chemical.
 
 So now write 
 

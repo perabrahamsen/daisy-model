@@ -396,6 +396,7 @@ void
 ColumnBase::initialize (const Time& time, Treelog& err, 
 			const Weather* global_weather)
 {
+  soil.initialize (groundwater, err);
   if (weather)
     weather->initialize (time, err);
   if (!global_weather && !weather)

@@ -20,6 +20,7 @@
 
 
 #include "units.h"
+#include "syntax.h"
 #include "mathlib.h"
 #include <map>
 
@@ -32,6 +33,7 @@ struct Units::Content
   double convert (const string& from, const string& to, double value) const;
   bool can_convert (const string& from, const string& to) const;
   bool can_convert (const string& from, const string& to, double value) const;
+  const Convert& get_convertion (const string& from, const string& to) const;
 
   Content ();
   ~Content ();
@@ -91,6 +93,28 @@ Units::Content::can_convert (const string& from, const string& to,
   return true;
 }
 
+static const class ConvertIdentity : public Units::Convert
+{
+  double operator() (double value) const
+  { return value; }
+} convert_identity;
+
+const Units::Convert&
+Units::Content::get_convertion (const string& from, const string& to) const
+{ 
+  if (from == to)
+    return convert_identity;
+
+  table_type::const_iterator i = table.find (from);
+  if (i == table.end ())
+    throw string ("'") + from + "' unknown dimension, expected '" + to + "'";
+  to_type::const_iterator j = (*i).second.find (to);
+  if (j == (*i).second.end ())
+    throw string ("Cannot convert '") + from + "' to '" + to + "'";
+
+  return *(*j).second;
+}
+
 Units::Content::Content ()
 { }
   
@@ -109,7 +133,7 @@ Units::Content* Units::content = NULL;
 int Units::count = 0;
 
 bool
-Units::Convert::valid (double)
+Units::Convert::valid (double) const
 { return true; }
 
 Units::Convert::Convert ()
@@ -123,7 +147,7 @@ struct ConvertLinear : public Units::Convert
   const double factor;
   const double offset;
     
-  double operator() (double value)
+  double operator() (double value) const
   { return value * factor + offset; }
 
   ConvertLinear (double f, double o)
@@ -169,31 +193,76 @@ Units::can_convert (const string& from, const string& to, double value)
   return content->can_convert (from, to, value);
 }
 
+const Units::Convert&
+Units::get_convertion (const string& from, const string& to)
+{
+  assert (content);
+  return content->get_convertion (from, to);
+}
+
+string
+Units::multiply (const string& one, const string& two)
+{ 
+  if (one == Syntax::None () || one == Syntax::Fraction ())
+    return two;
+  if (two == Syntax::None () || two == Syntax::Fraction ())
+    return one;
+  if (one == Syntax::Unknown () || two == Syntax::Unknown ())
+    return Syntax::Unknown ();
+
+  static const struct multiply_table
+  { 
+    const char* one;
+    const char* two;
+    const char* result;
+  } table[] = { 
+    { "cm^3/cm^3", "cm", "cm" },
+    { "g/cm^3", "cm", "g/cm^2" },
+    { "g C/cm^3", "cm", "g C/cm^2" },
+    { "g N/cm^3", "cm", "g N/cm^2" },
+  };
+  
+  for (unsigned int i = 0; i < sizeof (table) / sizeof (multiply_table); i++)
+    if ((one == table[i].one && two == table[i].two)
+	|| (two == table[i].one && one == table[i].two))
+      return table[i].result;
+
+  return Syntax::Unknown ();
+}
 
 class Convert_pF_cm : public Units::Convert
 {
-  double operator() (double value)
+  double operator() (double value) const
   { return pF2h (value); }
 };
 
 class Convert_cm_pF : public Units::Convert
 {
-  double operator() (double value)
+  double operator() (double value) const
   { return h2pF (value); }
 };
 
 void
 Units::standard_conversions ()
 {
+  // Parameters.
   add ("m", "cm", 100.0);
   add ("pF", "cm", *new Convert_pF_cm ());
   add ("cm", "pF", *new Convert_cm_pF ());
   add ("d^-1", "h^-1", 1.0/24.0);
   add ("d", "h", 24.0);
   add ("mm/d", "mm/h", 1.0/24.0);
+  // Weather.
   add ("dgWest", "dgEast", -1.0);
   add ("dgSouth", "dgNorth", -1.0);
   add ("%", "fraction", 0.01);
+  // Log.
+  add ("cm", "mm", 10.0);
+  add ("g/cm^2", "kg/ha", 1e5);	// Pesticides.
+  add ("g/cm^2", "kg N/ha", 1e5); // Inorganic N.
+  add ("g N/cm^2", "kg N/ha", 1e5); // Organic N.
+  add ("g C/cm^2", "kg C/ha", 1e5);
+  add ("g/cm^3", "mg/l", 1e6);
 }
 
 Units::Units ()

@@ -1,7 +1,7 @@
 // select_index.C --- Select a state variable.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,71 +20,55 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "select.h"
+#include "select_value.h"
 
-struct SelectIndex : public Select
+struct SelectIndex : public SelectValue
 {
   // Index.
   const int index;
-  double value;	
 
   // Output routines.
   void output_array (const string& name, const vector<double>& array, 
 		     const Geometry*)
-    { output (name, array); }
+  { output (name, array); }
+
   void output (const string& name, const vector<double>& array)
-    { 
-      if (!is_active ())
-	return;
+  { 
+    if (!is_active ())
+      return;
 
-      if (valid (name))
-	{
-	  if (count == 0)	 
-	    value = array[index];	
-	  else
-	    value += array[index];	
-	  count++;
-	}
-    }
-
-  // Print result at end of time step.
-  void done (Destination& dest)
-    {
-      if (count == 0)
-	dest.missing (tag);
-      else 
-	dest.add (tag, value * factor + offset);
-
-      if (!accumulate)
-	count = 0;
-    }
+    if (valid (name))
+      {
+	if (count == 0)	 
+	  value = array[index];	
+	else
+	  value += array[index];	
+	count++;
+      }
+  }
 
   // Create and Destroy.
   SelectIndex (const AttributeList& al)
-    : Select (al),
-      index (al.integer ("index")),
-      value (al.number ("value"))
-    { }
+    : SelectValue (al),
+      index (al.integer ("index"))
+  { }
 };
 
 static struct SelectIndexSyntax
 {
   static Select& make (const AttributeList& al)
-    { return *new SelectIndex (al); }
+  { return *new SelectIndex (al); }
 
   SelectIndexSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      Select::load_syntax (syntax, alist);
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    SelectValue::load_syntax (syntax, alist);
 
-      alist.add ("description", "Extract content at specified array index.");
-      syntax.add ("index", Syntax::Integer, Syntax::Const,
-		  "Specify array index to select.");
-      syntax.add ("value", Syntax::Unknown (), Syntax::State,
-		  "The current accumulated value.");
-      alist.add ("value", 0.0);
+    alist.add ("description", "Extract content at specified array index.");
+    syntax.add ("index", Syntax::Integer, Syntax::Const,
+		"Specify array index to select.");
 
-      Librarian<Select>::add_type ("index", alist, syntax, &make);
-    }
+    Librarian<Select>::add_type ("index", alist, syntax, &make);
+  }
 } Select_syntax;

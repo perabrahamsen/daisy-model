@@ -46,10 +46,10 @@ struct SelectArray : public Select
 			0.0);
 	if (count == 0)
 	  for (unsigned int i = 0; i < array.size (); i++)
-	    value[i] = array[i] * factor + offset;
+	    value[i] = convert (array[i]);
 	else
 	  for (unsigned int i = 0; i < array.size (); i++)
-	    value[i] += array[i] * factor + offset;
+	    value[i] += convert (array[i]);
 	count++;
       }
   }
@@ -58,9 +58,9 @@ struct SelectArray : public Select
   void done (Destination& dest)
   {
     if (count == 0)
-      dest.missing (tag);
+      dest.missing (tag ());
     else 
-      dest.add (tag, value);
+      dest.add (tag (), value);
 
     if (!accumulate)
       count = 0;

@@ -63,26 +63,6 @@ A location and content of a soil layer.");
   };
   const vector<Layer*> layers;
 
-  vector<Horizon*> make_horizons (const Geometry& geometry)
-  {
-    vector<Horizon*> result;
-
-    vector<Layer*>::const_iterator layer = layers.begin ();
-    const vector<Layer*>::const_iterator end = layers.end ();
-
-    assert (layer != end);
-    for (unsigned int i = 0; i < geometry.size (); i++)
-      {
-	if (geometry.zplus (i) < (*layer)->end)
-	  {
-	    layer++;
-	    assert (layer != end);
-	  }
-	result.push_back (&((*layer)->horizon));
-      }
-    return result;
-  }
-  
   // Parameters
   const double MaxRootingDepth;
   const double dispersivity;
@@ -103,9 +83,7 @@ A location and content of a soil layer.");
       dispersivity (al.number ("dispersivity"))
   { }
   ~Implementation ()
-  { 
-    sequence_delete (layers.begin (), layers.end ()); 
-  }
+  { sequence_delete (layers.begin (), layers.end ()); }
 };
 
 double 
@@ -203,7 +181,7 @@ check_alist (const AttributeList& al, Treelog& err)
       last = end;
     }
 
-  if (ok)
+  if (ok && al.check ("zplus"))
     {
       // This check is only meaningful if zplus and layers are ok.
       const vector<double> zplus = al.number_sequence ("zplus");
@@ -246,7 +224,6 @@ Layered description of the soil properties.",
 				 Implementation::Layer::load_syntax);
   syntax.add ("MaxRootingDepth", "cm", Check::positive (), Syntax::Const,
 	      "Depth at the end of the root zone (a positive number).");
-  //  alist.add ("MaxRootingDepth", 100.0);
   syntax.add ("dispersivity", "cm", Check::positive (), 
 	      Syntax::Const, "Dispersion length.");
   alist.add ("dispersivity", 6.0);
@@ -254,9 +231,48 @@ Layered description of the soil properties.",
   
 Soil::Soil (const AttributeList& al)
   : Geometry (al),
-    impl (*new Implementation (al)),
-    horizon_ (impl.make_horizons (*this))
+    impl (*new Implementation (al))
 { };
+
+void
+Soil::initialize (const Groundwater& groundwater, Treelog& msg)
+{
+  const vector<Implementation::Layer*>::const_iterator begin
+    = impl.layers.begin ();
+  const vector<Implementation::Layer*>::const_iterator end 
+    = impl.layers.end ();
+  assert (begin != end);
+  vector<Implementation::Layer*>::const_iterator layer;
+
+  // Initialize geometry.
+  vector<double> fixed;
+  double last = 0.0;
+  for (layer = begin; layer != end; layer++)
+    {
+      double current = (*layer)->end;
+      assert (current < last);
+
+      // We always have a layer limit at 1 m.
+      if (last > -100.0 && current < -100.0)
+	fixed.push_back (-100.0);
+      
+      last = current;
+      fixed.push_back (last);
+    }
+  initialize_zplus (groundwater, fixed, -impl.MaxRootingDepth, msg);
+
+  // Initialize horizons.
+  layer = begin;
+  for (unsigned int i = 0; i < size (); i++)
+    {
+      if (zplus (i) < (*layer)->end)
+	{
+	  layer++;
+	  assert (layer != end);
+	}
+      horizon_.push_back (&((*layer)->horizon));
+    }
+}
 
 Soil::~Soil ()
 { delete &impl; }

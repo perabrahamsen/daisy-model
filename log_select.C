@@ -183,8 +183,15 @@ LogSelect::output (const string&, const PLF&)
 { }
 
 bool 
-LogSelect::check (const Syntax&, Treelog&) const
-{ return true; }
+LogSelect::check (const Syntax&, Treelog& err) const
+{
+  Treelog::Open nest (err, name);
+  bool ok = true;
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (!entries[i]->check (err))
+      ok = false;
+  return ok; 
+}
 
 LogSelect::LogSelect (const AttributeList& al)
   : Log (al),

@@ -1,7 +1,7 @@
 // select.C --- Select a state variable.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -23,6 +23,7 @@
 #include "time.h"
 #include "geometry.h"
 #include "check.h"
+#include "units.h"
 #include <numeric>
 #include <set>
 
@@ -41,6 +42,9 @@ struct Select::Implementation
     const string model_name;
     const vector<string> submodels_and_attribute;
     
+    // Use.
+    const string& dimension () const;
+
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog& err);
     static void load_syntax (Syntax& syntax, AttributeList&);
@@ -51,6 +55,12 @@ struct Select::Implementation
   // Content.
   Condition* condition;		// Should we accumulate now?
   vector<string> path;		// Content of this entry.
+  const Units::Convert* spec_conv; // Convert value.
+  const double factor;		// - || -
+  const double offset;		// - || -
+  double convert (double) const; // - || -
+  const string tag;		// Name of this entry.
+  string dimension;		// Physical dimension of this entry.
 
   // Intermediate state.
   unsigned int current_path_index;// How nested in open's we are.
@@ -67,11 +77,31 @@ struct Select::Implementation
   bool match (const Daisy& daisy, Treelog&, bool is_printing);
 
   // Create and Destroy.
-  void initialize (const string_map& conv, const string& timestep, 
-		   string& dimension);
+  static string select_get_tag (const AttributeList& al);
+  void initialize (const string_map& conv, const string& spec_dim,
+		   const string& timestep);
+  bool check (const string& spec_dim, Treelog& err) const;
   Implementation (const AttributeList& al);
   ~Implementation ();
 };
+
+const string&
+Select::Implementation::Spec::dimension () const
+{
+  const Library& library = Library::find (library_name);
+  const Syntax* syntax = &library.syntax (model_name);
+
+  for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
+    syntax = &syntax->syntax (submodels_and_attribute[i]);
+  
+  const string& attribute_name = submodels_and_attribute.back ();
+  const Syntax::type type = syntax->lookup (attribute_name);
+
+  if (type == Syntax::Number)
+    return syntax->dimension (attribute_name);
+  else
+    return Syntax::Unknown ();
+}
 
 bool 
 Select::Implementation::Spec::check_alist (const AttributeList& al,
@@ -157,6 +187,14 @@ Select::Implementation::Spec::Spec (const AttributeList& al)
 Select::Implementation::Spec::~Spec ()
 { }
 
+double 
+Select::Implementation::convert (double value) const
+{ 
+  if (spec_conv)
+    return spec_conv->operator() (value);
+  return value * factor + offset; 
+}
+
 bool 
 Select::Implementation::valid ()
 { 
@@ -225,10 +263,25 @@ Select::Implementation::match (const Daisy& daisy, Treelog& out,
   return is_active;
 }
 
+string
+Select::Implementation::select_get_tag (const AttributeList& al)
+{
+  if (al.check ("tag"))
+    return al.name ("tag");
+
+  vector<string> path  = al.name_sequence ("path");
+  
+  if (path.size () > 0)
+    return path[path.size () - 1];
+
+  return "<none>";
+}
+
 // Create and Destroy.
 void 
-Select::Implementation::initialize (const string_map& conv, const string& timestep, 
-				    string& dimension)
+Select::Implementation::initialize (const string_map& conv, 
+				    const string& spec_dim, 
+				    const string& timestep)
 {
   // Convert path according to mapping in 'conv'.
   for (unsigned int i = 0; i < path.size (); i++)
@@ -239,6 +292,14 @@ Select::Implementation::initialize (const string_map& conv, const string& timest
       else if (path[i].size () > 0 && path[i][0] == '$')
 	path[i] = "*";
     }
+
+  if (dimension == Syntax::Unknown ())
+    dimension = spec_dim;
+
+  // Attempt to find convertion with original dimension.
+  if (spec && Units::can_convert (spec_dim, dimension))
+    spec_conv = &Units::get_convertion (spec_dim, dimension);
+
   // Replace '&' with timestep.
   string new_dim;
   for (unsigned int i = 0; i < dimension.length (); i++)
@@ -247,8 +308,24 @@ Select::Implementation::initialize (const string_map& conv, const string& timest
     else
       new_dim += dimension[i];
   dimension = new_dim;
+
+  // Attempt to find convertion with new dimension.
+  if (spec && !spec_conv && Units::can_convert (spec_dim, dimension))
+    spec_conv = &Units::get_convertion (spec_dim, dimension);
 }
 
+bool 
+Select::Implementation::check (const string& spec_dim, Treelog& err) const
+{
+  bool ok = true;
+  if (spec && !spec_conv && spec->dimension () != Syntax::Unknown ())
+    {
+      Treelog::Open nest (err, tag);
+      err.warning (string ("Don't know how to convert [") + spec_dim
+		   + "] to [" + dimension + "]");
+    }
+  return ok;
+}
   
 Select::Implementation::Implementation (const AttributeList& al)
   : spec (al.check ("spec") ? new Spec (al.alist ("spec")) : NULL),
@@ -256,6 +333,12 @@ Select::Implementation::Implementation (const AttributeList& al)
 	       ? &Librarian<Condition>::create (al.alist ("when"))
 	       : NULL),
     path (al.name_sequence ("path")),
+    spec_conv (NULL),
+    factor (al.number ("factor")),
+    offset (al.number ("offset")),
+    tag (select_get_tag (al)),
+    dimension (al.check ("dimension")
+	       ? al.name ("dimension") : Syntax::Unknown ()),
     current_path_index (0U),
     last_valid_path_index (0U),
     is_active (false)
@@ -269,6 +352,17 @@ Select::Implementation::~Implementation ()
     delete condition; 
 }
 
+double 
+Select::convert (double value) const
+{ return impl.convert (value); }
+
+const string& 
+Select::dimension () const
+{ return impl.dimension; }
+
+const string& 
+Select::tag () const
+{ return impl.tag; }
 
 const Geometry* 
 Select::geometry () const
@@ -355,18 +449,33 @@ bool
 Select::prevent_printing ()
 { return false; }
 
+static bool check_alist (const AttributeList& al, Treelog& err)
+{
+  bool ok = true;
+  if (al.check ("spec"))
+    {
+      if (al.number ("factor") != 1.0)
+	err.warning ("Specifying both 'spec' and 'factor' may conflict");
+      else if (al.number ("offset") != 0.0)
+	err.warning ("Specifying both 'spec' and 'offset' may conflict");
+    }
+  return ok;
+}
+
 void 
 Select::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add_check (check_alist);
   syntax.add ("tag", Syntax::String, Syntax::OptionalConst,
 	      "Tag to identify the column.\n\
 These will be printed in the first line of the log file.\n\
 The default tag is the last element in the path.");
-  syntax.add ("dimension", Syntax::String, Syntax::Const,
+  syntax.add ("dimension", Syntax::String, Syntax::OptionalConst,
 	      "The unit for numbers in this column.\n\
 These will be printed in the second line of the log file.\n\
-The character '&' will be replaced with the log timestep.");
-  alist.add ("dimension", "");
+The character '&' will be replaced with the log timestep.\n\
+If you do not specify the dimension explicitly, a value will\n\
+be interfered from 'spec' if available.");
   syntax.add ("description", Syntax::String, Syntax::Const,
 	      "A description of this column.");
   alist.add ("description", "\
@@ -431,33 +540,37 @@ Number of times the path has matched a variable since the last log entry.");
   alist.add ("count", 0);
 }
 
+const string
+Select::default_dimension (const string& spec_dim) const
+{ return spec_dim; }
+
 void 
 Select::initialize (const string_map& conv, double, double, 
 		    const string& timestep)
-{ impl.initialize (conv, timestep, dimension); }
+{ 
+  string spec_dim;
+  if (impl.spec)
+    spec_dim = default_dimension (impl.spec->dimension ());
+  else
+    spec_dim = Syntax::Unknown ();
+  impl.initialize (conv, spec_dim, timestep); 
+}
 
-static string
-select_get_tag (const AttributeList& al)
+bool 
+Select::check (Treelog& err) const
 {
-  if (al.check ("tag"))
-    return al.name ("tag");
-
-  vector<string> path  = al.name_sequence ("path");
-  
-  if (path.size () > 0)
-    return path[path.size () - 1];
-
-  return "<none>";
+  string spec_dim;
+  if (impl.spec)
+    spec_dim = default_dimension (impl.spec->dimension ());
+  else
+    spec_dim = Syntax::Unknown ();
+  return impl.check (spec_dim, err); 
 }
 
 Select::Select (const AttributeList& al)
   : impl (*new Implementation (al)),
     accumulate (al.flag ("accumulate")),
-    factor (al.number ("factor")),
-    offset (al.number ("offset")),
-    count (al.integer ("count")),
-    tag (select_get_tag (al)),
-    dimension (al.name ("dimension"))
+    count (al.integer ("count"))
 { }
 
 Select::~Select ()

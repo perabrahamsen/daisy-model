@@ -100,7 +100,7 @@ LogTable::done ()
 
 	  const Geometry* geometry = entries[i]->geometry ();
 	  const int size = entries[i]->size ();
-	  const string tag = entries[i]->tag;
+	  const string tag = entries[i]->tag ();
 
 	  if (geometry && size >= 0)
 	    {
@@ -144,7 +144,7 @@ LogTable::done ()
 		}
 	    }
 	  else
-	    out << entries[i]->tag;
+	    out << entries[i]->tag ();
 	}
       out << record_separator;
       print_tags = false;
@@ -159,7 +159,11 @@ LogTable::done ()
 
 	  const Geometry* geometry = entries[i]->geometry ();
 	  const int size = entries[i]->size ();
-	  const string dimension = entries[i]->dimension;
+	  string dimension = entries[i]->dimension ();
+	  if (dimension == Syntax::None () 
+	      || dimension == Syntax::Unknown ()
+	      || dimension == Syntax::Fraction ())
+	    dimension = "";
 
 	  if (geometry && size >= 0)
 	    {
@@ -171,7 +175,7 @@ LogTable::done ()
 		}
 	    }
 	  else
-	    out << entries[i]->dimension;
+	    out << dimension;
 	}
       out << record_separator;
       print_dimension = false;

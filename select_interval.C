@@ -22,6 +22,7 @@
 
 #include "select.h"
 #include "geometry.h"
+#include "units.h"
 
 struct SelectInterval : public Select
 {
@@ -56,16 +57,25 @@ struct SelectInterval : public Select
   void done (Destination& dest)
     {
       if (count == 0)
-	dest.missing (tag);
+	dest.missing (tag ());
       else if (density)
-	dest.add (tag, value * factor / (from - to) + offset);
+	dest.add (tag (), convert (value / (from - to)));
       else
-	dest.add (tag, value * factor + offset);
+	dest.add (tag (), convert (value));
 
       if (!accumulate)
 	count = 0;
     }
+
   // Create and Destroy.
+  const string default_dimension (const string& spec_dim) const
+  { 
+    if (density)
+      return spec_dim;
+    
+    return Units::multiply (spec_dim, "cm");
+  }
+
   void initialize (const string_map& conv, 
 		   double default_from, double default_to, 
 		   const string& timestep)
