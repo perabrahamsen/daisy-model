@@ -119,6 +119,7 @@ public:
 	     OrganicMatter*,
 	     const SoilHeat&, const SoilWater&, SoilNH4*, SoilNO3*, 
 	     double&, double&, double&, vector<double>&, vector<double>&,
+	     double ForcedCAI,
 	     Treelog&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&, 
@@ -177,8 +178,18 @@ CropSimple::tick (const Time& time,
 		  const SoilWater& soil_water,
 		  SoilNH4* soil_NH4, SoilNO3* soil_NO3, 
 		  double&, double&, double&, vector<double>&, vector<double>&,
+		  double ForcedCAI,
 		  Treelog& msg)
 {
+  Treelog::Open nest (msg, name);
+
+  static bool ForcedCAI_warned = false;
+  if (!ForcedCAI_warned && ForcedCAI >= 0.0)
+    {
+      ForcedCAI_warned = true;
+      msg.warning ("ForcedLAI does not work with the 'simple' crop model");
+    }
+
   // Growth
   if (time.month () == spring_mm
       && time.mday () == spring_dd 
@@ -214,7 +225,8 @@ CropSimple::tick (const Time& time,
       else if (T < T_flowering)
 	{
 	  if (old_T < T_emergence)
-	    msg.message (string (" [") + name + " is emerging]");
+	    msg.message ("==> emerging");
+
 	  const double T_growth = T_flowering - T_emergence;
 	  const double step = T_air / T_growth;
 	  const double this_far = (T - T_emergence) / T_growth;
@@ -226,15 +238,14 @@ CropSimple::tick (const Time& time,
 	}
       else if (old_T < T_flowering)
 	{
-	  msg.message (string (" [") + name + " is flowering]");
-	  canopy.Height = height_max;
+	  msg.message ("==> flowering");
 	  root_system.tick (msg, soil, soil_heat, WRoot,
 			    WRoot * (1.0 - old_T / T_flowering), DS ());
 	}
       else if (T < T_ripe)
 	/* do nothing */;
       else if (old_T < T_ripe)
-	msg.message (string (" [") + name + " is ripe]");
+	msg.message ("==> ripe");
     }
 
   // Nitrogen uptake.

@@ -473,6 +473,7 @@ the simulation.  If unspecified, used global weather.");
   AttributeList vegetation_alist;
   vegetation_alist.add ("type", "crops");
   vegetation_alist.add ("crops", vector<AttributeList*> ());
+  vegetation_alist.add ("ForcedLAI", vector<AttributeList*> ());
   alist.add ("Vegetation", vegetation_alist);
 
   syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 

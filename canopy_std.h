@@ -50,7 +50,9 @@ private:
   double StemAI;		// Stem Area Index
   double SOrgAI;		// Storage organ Area Index
   double LADm;			// Max Leaf Area Density [cm^2/cm^3]
+  double ForcedCAI;		// CAI forced upon us from vegetation module.
 public:
+  double SimCAI;		// CAI simulated by default crop model.
   double CAImRat;		// (CAIm - CAI) / CAIm []
 
   // Functions.
@@ -66,7 +68,8 @@ public:
   // Simulation.
 public:
   void cut (double WStem, double DS, double stub_length);
-  void tick (double WLeaf, double WSOrg, double WStem, double DS);
+  void tick (double WLeaf, double WSOrg, double WStem, double DS, 
+	     double CAI_force);
   void output (Log&) const;
 
   // Create and Destroy.

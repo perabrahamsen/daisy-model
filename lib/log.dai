@@ -1110,6 +1110,39 @@ the sum of all chemicals."
 ;                   (factor 1.0))
            ))
 
+(deflog "Forced LAI" table
+  (where "forced_lai.dlf")
+  (when (hour 12))                      ;When the stress is highest.
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (number (path column "$col" Vegetation crops crops "$crop"
+                         Devel "*" DS)
+                   (dimension "none")
+                   (factor 1.0))        ;Development stage [-1:2]
+           (number (path column "$col" Vegetation crops crops "$crop"
+                         Canopy Height)
+                   (dimension "cm"))
+           (number (path column "$col" Vegetation crops crops "$crop"
+                         Canopy CAI)
+                   (tag "Used CAI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "$col" Vegetation crops crops "$crop"
+                         Canopy SimCAI)
+                   (tag "Simulated CAI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "$col" Vegetation crops crops "$crop"
+                         Canopy ForcedCAI)
+                   (tag "Forced CAI")
+                   (dimension "none")
+                   (factor 1.0))        ;Leaf Area Index [0:inf]
+           (number (path column "$col" Vegetation crops crops "$crop"
+                         Prod WLeaf)
+                   (dimension "Ton DM/ha")
+                   (factor 0.01))))
+
 (deflog "Simple Crop Production" table
   (where "simple_crop_prod.dlf")
   (when (hour 12))

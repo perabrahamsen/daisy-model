@@ -37,6 +37,37 @@ struct WeatherStandard : public Weather
   const double T_rain;
   const double T_snow;
 
+  // Missing years.
+  struct YearMap
+  {
+    // Types.
+    struct YearInterval
+    {
+      // Parameters.
+      const int from;
+      const int to;
+
+      // Use.
+      int size () const
+      { return to - from + 1; }
+
+      // Create and Destroy.
+      static bool check_alist (const AttributeList& al, Treelog&);
+      static void load_syntax (Syntax&, AttributeList&);
+      YearInterval (const AttributeList&);
+    };
+
+    // Parameters.
+    const YearInterval from;
+    const YearInterval to;
+    
+    // Create and Destroy.
+    static bool check_alist (const AttributeList& al, Treelog&);
+    static void load_syntax (Syntax&, AttributeList&);
+    YearMap (const AttributeList&);
+  };
+  const vector<const YearMap*> year_map;
+
   // Keywords
   struct keyword_description_type
   {
@@ -54,7 +85,7 @@ struct WeatherStandard : public Weather
   Time end;
   vector<double> precipitation_correction;
 
-  // Data.
+  // Data description.
   struct data_description_type
   {
     const char* name;
@@ -180,6 +211,90 @@ struct WeatherStandard : public Weather
   ~WeatherStandard ();
   bool check (const Time& from, const Time& to, Treelog& err) const;
 };
+
+bool
+WeatherStandard::YearMap::YearInterval::check_alist (const AttributeList& al,
+						     Treelog& err)
+{
+  bool ok = true;
+  const int from = al.integer ("from");
+  const int to = al.integer ("to");
+  
+  if (!Time::valid (from, 1, 1, 1))
+    {
+      TmpStream tmp;
+      tmp () << "Invalid start year " << from << " in interval";
+      err.error (tmp.str ());
+      ok = false;
+    }
+  if (!Time::valid (to, 1, 1, 1))
+    {
+      TmpStream tmp;
+      tmp () << "Invalid end year " << from << " in interval";
+      err.error (tmp.str ());
+      ok = false;
+    }
+  if (from > to)
+    {
+      TmpStream tmp;
+      tmp () << "Start year " << from << " comes after end year " << to;
+      err.error (tmp.str ());
+      ok = false;
+    }
+  return ok;
+}
+
+void 
+WeatherStandard::YearMap::YearInterval::load_syntax (Syntax& syntax, 
+						     AttributeList&)
+{
+  syntax.add_check (check_alist);
+  syntax.add ("from", Syntax::Integer, Syntax::Const,
+	      "First year of interval.");
+  syntax.add ("to", Syntax::Integer, Syntax::Const,
+	      "First year of interval.");
+  syntax.order ("from", "to");
+}
+
+WeatherStandard::YearMap::YearInterval::YearInterval (const AttributeList& al)
+  : from (al.integer ("from")),
+    to (al.integer ("to"))
+{ }
+    
+bool
+WeatherStandard::YearMap::check_alist (const AttributeList& al, Treelog& msg)
+{
+  bool ok = true;
+  const YearInterval from (al.alist ("from"));
+  const YearInterval to (al.alist ("to"));
+  
+  if (from.size () != to.size ())
+    {
+      TmpStream tmp;
+      tmp () << "You cannot map " << from.size () << " years to "
+	     << to.size () << " years";
+      msg.error (tmp.str ());
+      ok = false;
+    }
+  return ok;
+}
+
+void 
+WeatherStandard::YearMap::load_syntax (Syntax& syntax, AttributeList& alist)
+{ 
+  syntax.add_check (check_alist);
+  syntax.add_submodule ("from", alist, Syntax::Const, 
+			"Interval of years to map from.",
+			YearInterval::load_syntax);
+  syntax.add_submodule ("to", alist, Syntax::Const, 
+			"Interval of years to map to.",
+			YearInterval::load_syntax);
+}
+
+WeatherStandard::YearMap::YearMap (const AttributeList& al)
+  : from (al.alist ("from")),
+    to (al.alist ("to"))
+{ }
 
 WeatherStandard::keyword_description_type 
 WeatherStandard::keyword_description[] =

@@ -61,6 +61,7 @@ public:
   virtual double rs_max () const; // Maximum transpiration resistance.
   virtual double height () const = 0;
   virtual double LAI () const = 0;
+  virtual double SimLAI () const;
   virtual const PLF& LAIvsH () const = 0;
   virtual double PARext () const = 0;
   virtual double PARref () const = 0;
@@ -83,6 +84,7 @@ public:
 		     double& residuals_N_top, double& residuals_C_top,
 		     vector<double>& residuals_N_soil, 
 		     vector<double>& residuals_C_soil,
+		     double ForcedCAI,
 		     Treelog&) = 0;
   virtual const Harvest& harvest (const string& column_name,
 				  const Time&, const Geometry&, 

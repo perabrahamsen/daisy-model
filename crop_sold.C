@@ -102,6 +102,7 @@ public:
 	     OrganicMatter*,
 	     const SoilHeat&, const SoilWater&, SoilNH4*, SoilNO3*,
 	     double&, double&, double&, vector<double>&, vector<double>&, 
+	     double ForcedCAI,
 	     Treelog&);
   const Harvest& harvest (const string& column_name, const Time&,
 			  const Geometry& geometry, 
@@ -1704,8 +1705,18 @@ CropSold::tick (const Time& time,
 		const SoilWater& soil_water, 
 		SoilNH4* soil_NH4, SoilNO3* soil_NO3,
 		double&, double&, double&, vector<double>&, vector<double>&, 
-		Treelog&)
+		double ForcedCAI,
+		Treelog& msg)
 {
+  Treelog::Open nest (msg, name);
+
+  static bool ForcedCAI_warned = false;
+  if (!ForcedCAI_warned && ForcedCAI >= 0.0)
+    {
+      ForcedCAI_warned = true;
+      msg.warning ("ForcedLAI does not work with the 'sold' crop model");
+    }
+
   // Clear log.
   fill (var.RootSys.NO3Extraction.begin (), 
 	var.RootSys.NO3Extraction.end (),

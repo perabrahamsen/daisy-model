@@ -33,6 +33,10 @@ Crop::rs_max () const
 { daisy_assert (false); }
 
 double 
+Crop::SimLAI () const
+{ return LAI (); }
+
+double 
 Crop::albedo () const
 { return 0.20; }
 

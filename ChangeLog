@@ -1,21 +1,38 @@
+2003-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.44 released.
+
 2003-02-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Forced LAI"): New log model.
+
+	* canopy_std.C, canopy_std.h (tick): New force_CAI argument.
+	* crop_std.C (tick): Obey forced CAI.
+	* crop.h, crop_simple.C, crop_old.C, crop_sold.C (tick): Warn
+	about forced CAI.
+	* crop.C, crop.h, crop_std.C (SimLAI): New virtual member function.
+	* canopy_std.C, canopy_std.h (ForcedCAI, SimCAI): New log
+	variables. 
+	* canopy_std.C, canopy_std.h (tick): 
 
 	* vegetation_crops.C, vegetation_permanent.C, vegetation.h (tick):
 	Merged organic and inorganic versions.
-	* column_inorganic.C,  column_std.C (tick): Update callers.
+	* column_inorganic.C, column_std.C (tick): Update callers.
 
 	* plf.C (empty): New utility.
 	* canopy_simple.C (load_syntax): Use it.
 	* organic_matter.C (load_syntax): Ditto.
-	* nitrification_solute.C (NitrificationSoluteSyntax): 
-	* nitrification_soil.C (NitrificationSoilSyntax): 
+	* nitrification_solute.C (NitrificationSoluteSyntax): Ditto.
+	* nitrification_soil.C (NitrificationSoilSyntax): Ditto.
 	* denitrification.C (load_syntax): Ditto.
 	* column_std.C (ColumnStandardSyntax): Ditto.
 	* chemical_std.C (ChemicalStandardSyntax): Ditto.
 
-	* plf.C (operator +): Spelling error.
+	* plf.C (operator +): Fixed spelling error in comment.
 
 	* vegetation_permanent.C (tick): Add newly created litter.
+
+	* crop_simple.C (tick): Updated messages.
 
 2003-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 

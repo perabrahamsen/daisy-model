@@ -1,4 +1,23 @@
 // vegetation_crops.C
+// 
+// Copyright 1996-2003 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2003 KVL.
+//
+// This file is part of Daisy.
+// 
+// Daisy is free software; you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation; either version 2.1 of the License, or
+// (at your option) any later version.
+// 
+// Daisy is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser Public License
+// along with Daisy; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "vegetation.h"
 #include "crop.h"
@@ -19,6 +38,21 @@ struct VegetationCrops : public Vegetation
 
   // Crops.
   CropList crops;		// The crops themselves.
+
+  // Forced LAI
+  class ForcedLAI
+  {
+    /* const */ vector<int> years;
+    /* const */ vector<PLF> LAIvsDAY;
+
+    // use.
+  public:
+    double operator() (int year, int yday);
+    
+    // Create;
+    static void load_syntax (Syntax&, AttributeList&);
+    ForcedLAI (const vector<AttributeList*>& als);
+  } forced_LAI;
 
   // Canopy structure.
   double LAI_;			// Total LAI of all crops on this column [0-]
@@ -121,6 +155,47 @@ struct VegetationCrops : public Vegetation
 };
 
 double 
+VegetationCrops::ForcedLAI::operator() (int year, int yday)
+{
+  for (unsigned int i = 0; i < years.size (); i++)
+    {
+      if (years[i] == year)
+	{
+	  if (yday < LAIvsDAY[i].x (0))
+	    return -1.0;
+
+	  if (yday > LAIvsDAY[i].x (LAIvsDAY[i].size () - 1))
+	    return -1.0;
+
+	  return LAIvsDAY[i](yday);
+	}
+    }
+  return -1.0;
+}
+    
+void VegetationCrops::ForcedLAI::load_syntax (Syntax& syntax, AttributeList&)
+{
+  syntax.add ("year", Syntax::Integer, Syntax::Const, "\
+Year for which to use forced LAI.");
+  syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Syntax::OptionalConst, 
+		"LAI as a function of Julian day.\n\
+\n\
+The simulated LAI will be used before the first day you specify and\n\
+after the last specified day.  Simulated LAI will also be used\n\
+whenever 'LAIvsDAY' becomes negative.");
+  syntax.order ("year", "LAIvsDAY");
+}
+
+VegetationCrops::ForcedLAI::ForcedLAI (const vector<AttributeList*>& als)
+{
+  for (unsigned int i = 0; i < als.size (); i++)
+    {
+      years.push_back (als[i]->integer ("year"));
+      LAIvsDAY.push_back (als[i]->plf ("LAIvsDAY"));
+    }
+}
+
+double 
 VegetationCrops::CanopySum (CropFun fun) const
 {
   double value = 0.0;
@@ -190,15 +265,40 @@ VegetationCrops::tick (const Time& time,
 		       vector<double>& residuals_C_soil,
 		       Treelog& msg)
 {
+  // Forced LAI_
+  double ForcedLAI = forced_LAI (time.year (), time.yday ());
+  double SimLAI = 0.0;
+  if (ForcedLAI >= 0)
+    {
+      for (CropList::iterator crop = crops.begin(); 
+	   crop != crops.end(); 
+	   crop++)
+	{
+	  const double MyLAI = (*crop)->SimLAI ();
+	  if (MyLAI > 0.0)
+	    SimLAI += MyLAI;
+	}
+      
+      if (SimLAI < 1e-10)
+	ForcedLAI = -1.0;
+    }
+  
+
   // Uptake and convertion of matter.
   for (CropList::iterator crop = crops.begin(); 
        crop != crops.end(); 
        crop++)
     {
+      // Relative forced LAI.
+      const double MyLAI = (*crop)->SimLAI ();
+      const bool use_force = (ForcedLAI >= 0.0 && MyLAI > 0.0);
+      const double my_force = use_force ? (MyLAI / SimLAI) * ForcedLAI : -1.0;
+      
+      // Tick.
       (*crop)->tick (time, bioclimate, soil, organic_matter, 
 		     soil_heat, soil_water, soil_NH4, soil_NO3, 
 		     residuals_DM, residuals_N_top, residuals_C_top,
-		     residuals_N_soil, residuals_C_soil, msg);
+		     residuals_N_soil, residuals_C_soil, my_force, msg);
     }
 
   // Make sure the crop which took first this time will be last next.
@@ -480,6 +580,7 @@ VegetationCrops::initialize (Treelog& msg, const Soil& soil,
 VegetationCrops::VegetationCrops (const AttributeList& al)
   : Vegetation (al),
     crops (),			// deque, so we can't use map_create.
+    forced_LAI (al.alist_sequence ("ForcedLAI")),
     LAI_ (0.0),
     height_ (0.0),
     cover_ (0.0),
@@ -520,6 +621,20 @@ VegetationCropsSyntax
     AttributeList& alist = *new AttributeList ();
     Vegetation::load_syntax (syntax, alist);
     alist.add ("description", "Keep track of all crops on the field.");
+    syntax.add_submodule_sequence("ForcedLAI", Syntax::Const, "\
+By default, the total LAI for the vegetation will be the sum of the\n\
+simulated LAI for the individual crops.  However, you can force the\n\
+model to use a different values for LAI by setting this attribute.\n\
+The specified LAI will be distributed among the crops on the field\n\
+corresponding to their simulated LAI.\n\
+\n\
+'ForcedLAI' can be useful if you have measured the total LAI on the\n\
+field, and want to force the model to confirm to the measurements.  \n\
+\n\
+'LAIvsDAY' will not affect the LAI for crops that have not yet\n\
+emerged.  If no crops have emerged on the field, it will be ignored.",
+				  VegetationCrops::ForcedLAI::load_syntax);
+    alist.add ("ForcedLAI", vector<AttributeList*> ());
     syntax.add ("crops", Librarian<Crop>::library (), 
 		Syntax::Sequence,
 		"List of crops growing in the field");

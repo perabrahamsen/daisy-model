@@ -1918,6 +1918,58 @@ parameterization:
   \texttt{ridge.dlf}.
 \end{description}
 
+\subsection{Forced LAI}
+
+You can force the CAI to have a specific value for part of the year.
+This is useful if you have measured the total CAI and want Daisy to
+use those values for photosyntheses and transpiration (and
+interception capacity).  Here is an example:
+\begin{verbatim}
+  (defcolumn Andeby default
+    "The B.And farm, Andeby, 2003."
+    (Vegetation crops
+                (ForcedLAI (1987 (100 2.0) (200 4.0))
+                           (1988 (100 0.0) (150 1.5) (200 5.0))))
+    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+          (MaxRootingDepth 60.0 [cm]))
+    (Groundwater deep))
+\end{verbatim}
+The code above should be read: In 1987 we start using forced CAI day
+100 where it is 2.0 and end forced CAI in day 200 where it is 5.0.  We
+use liniear interpolation between these two points, so in day 150 it
+will be 4.0.  Before day 100 and after day 200 we use the simulated
+CAI values.  In 1988 we start day 100 at CAI 0.0, increase linearly to
+1.5 day 150, and from there again linearly to 5.0 day 200, where we
+switch back to using simulated CAI.  All other years we use simulated
+LAI.
+
+Only paramterizations of the \texttt{default} crop model will be
+affected by the \texttt{ForcedLAI} attribute.
+
+If there are mulitple crops, the forced CAI will be distributed among
+them corresponding to the relative size of their simulated CAI.  When
+forced CAI is active, this is the only use of the simulated CAI.  
+
+\subsubsection{Log models}
+
+The simulated CAI will be calculated anyway and can be logged.  Most
+log files will only log the CAI actually used which, when Forced LAI
+is in effect, will not be the sum of Leaf, Stem and SOrg AI.  The new
+"Forced LAI" log model will log both the used, forced and simulated
+CAI.  By default, it will log the sum of all crops, set
+\verb|$crop|%$
+to log a particular crop alone as below:
+
+\begin{verbatim}
+  (output "Forced LAI"
+          ("Forced LAI"
+           (set "$crop" "Spring Barley")
+           (where "sbarley.dlf"))
+          ("Forced LAI"
+           (set "$crop" "Grass to grain")
+           (where "grass.dlf")))
+\end{verbatim}
+
 \section{\texttt{test.dai}}
 \label{app:test}
 

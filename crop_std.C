@@ -72,6 +72,8 @@ public:
   { return canopy.Height; }
   double LAI () const
   { return canopy.CAI; }
+  double SimLAI () const
+  { return canopy.SimCAI; }
   const PLF& LAIvsH () const
   { return canopy.LAIvsH; }
   double PARext () const
@@ -107,6 +109,7 @@ public:
 	     double& residuals_N_top, double& residuals_C_top,
 	     vector<double>& residuals_N_soil,
 	     vector<double>& residuals_C_soil,
+	     double ForcedCAI,
 	     Treelog&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&,
@@ -153,7 +156,10 @@ CropStandard::initialize_organic (Treelog& msg, const Geometry& geometry,
       
       // Update derived state content.
       canopy.tick (production.WLeaf, production.WSOrg, 
-		   production.WStem, development.DS);
+		   production.WStem, development.DS, 
+		   // We don't save the forced CAI, use simulated CAI
+		   //  until midnight (small error).
+		   -1.0);
       root_system.set_density (msg, 
 			       geometry, production.WRoot, development.DS);
       nitrogen.content (development.DS, production);
@@ -183,6 +189,7 @@ CropStandard::tick (const Time& time,
 		    double& residuals_N_top, double& residuals_C_top,
 		    vector<double>& residuals_N_soil,
 		    vector<double>& residuals_C_soil,
+		    double ForcedCAI,
 		    Treelog& msg)
 {
   Treelog::Open nest (msg, name);
@@ -198,6 +205,7 @@ CropStandard::tick (const Time& time,
 
   if (time.hour () == 0 && development.DS <= 0)
     {
+      daisy_assert (ForcedCAI < 0.0);
       // Calculate average soil temperature.
       development.soil_temperature =
 	development.partial_soil_temperature / 24.0;
@@ -208,7 +216,7 @@ CropStandard::tick (const Time& time,
 	{
 	  msg.message ("==> emerging");
 	  canopy.tick (production.WLeaf, production.WSOrg,
-		       production.WStem, development.DS);
+		       production.WStem, development.DS, -1.0);
 	  nitrogen.content (development.DS, production);
 	  root_system.tick (msg, soil, soil_heat, 
 			    production.WRoot, 0.0, development.DS);
@@ -292,7 +300,7 @@ CropStandard::tick (const Time& time,
     return;
 
   canopy.tick (production.WLeaf, production.WSOrg,
-	       production.WStem, development.DS);
+	       production.WStem, development.DS, ForcedCAI);
 
   development.tick_daily (bioclimate.daily_air_temperature (), 
 			  production.WLeaf, production, vernalization,

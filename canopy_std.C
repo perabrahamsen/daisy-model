@@ -215,13 +215,20 @@ CanopyStandard::cut (double WStem, double DS, double stub_length)
 }
 
 void
-CanopyStandard::tick (double WLeaf, double WSOrg, double WStem, double DS)
+CanopyStandard::tick (double WLeaf, double WSOrg, double WStem, double DS,
+		      double force_CAI)
 {
   Height = CropHeight (WStem, DS);
   if (InitCAI)
     InitialCAI (WLeaf, DS);
   else
     CropCAI (WLeaf, WSOrg, WStem, DS);
+
+  // Forced CAI.
+  ForcedCAI = force_CAI;
+  SimCAI = CAI;
+  if (force_CAI >= 0.0)
+    CAI = force_CAI;
 }
 
 void
@@ -235,6 +242,10 @@ CanopyStandard::output (Log& log) const
   log.output ("StemAI", StemAI);
   log.output ("SOrgAI", SOrgAI);
   log.output ("LADm", LADm);
+  if (ForcedCAI >= 0.0)
+    log.output ("ForcedCAI", ForcedCAI);
+  if (SimCAI >= 0.0)
+    log.output ("SimCAI", SimCAI);
   log.output ("CAImRat", CAImRat);
 }
 
@@ -317,6 +328,10 @@ By default, it needs 200 g DM/m^2 to reach full height.");
   alist.add ("LADm", -9999.99);
 
   // Log Variables.
+  syntax.add ("ForcedCAI", "m^2/m^2", Syntax::LogOnly,
+	      "CAI forced upon us by vegetation module.");
+  syntax.add ("SimCAI", "m^2/m^2", Syntax::LogOnly,
+	      "CAI simulated by crop model.");
   syntax.add ("CAImRat", Syntax::None (), Syntax::LogOnly,
 	      "(CAIm - CAI) / CAIm.");
 }
@@ -344,6 +359,8 @@ CanopyStandard::CanopyStandard (const AttributeList& vl)
     StemAI (vl.number ("StemAI")),
     SOrgAI (vl.number ("SOrgAI")),
     LADm (vl.number ("LADm")),
+    ForcedCAI (-1.0),
+    SimCAI (-1.0),
     CAImRat (0.0)
 { }
 
