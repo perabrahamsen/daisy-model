@@ -52,9 +52,11 @@ AOM::penetrate (const Geometry& geometry, double from, double to,
 
   // Penetrate.
   geometry.add (C, from, to, top_C * penetration);
+  assert_non_negative (C);
   top_C *= (1.0 - penetration);
   daisy_assert (top_C >= 0.0);
   geometry.add (N, from, to, top_N * penetration);
+  assert_non_negative (N);
   top_N *= (1.0 - penetration);
   daisy_assert (top_N >= 0.0);
 }
@@ -97,6 +99,8 @@ AOM::pour (vector<double>& cc, vector<double>& nn)
       nn[i] += N[i];
       N[i] = 0.0;
     }
+  assert_non_negative (cc);
+  assert_non_negative (nn);
 }
 
 void 
@@ -178,20 +182,21 @@ AOM::tick (unsigned int end, const double* abiotic_factor,
 
   // Distribute to soil buffer.
   const double factor = turnover_rate * fractions[smb_size];
-  for (unsigned int i = 0; i < size; i++)
-    {
-      const double rate = min (factor * abiotic_factor[i], 0.1);
-      const double C_use = C[i] * rate;
-      const double N_use = N[i] * rate;
-      som_N[i] += N_use;
-      som_C[i] += C_use;
-      C[i] -= C_use;
-      N[i] -= N_use;
-      daisy_assert (C[i] >= 0.0);
-      daisy_assert (N[i] >= 0.0);
-      daisy_assert (som_C[i] >= 0.0);
-      daisy_assert (som_N[i] >= 0.0);
-    }
+  if (factor > 1e-200)
+    for (unsigned int i = 0; i < size; i++)
+      {
+	const double rate = min (factor * abiotic_factor[i], 0.1);
+	const double C_use = C[i] * rate;
+	const double N_use = N[i] * rate;
+	som_N[i] += N_use;
+	som_C[i] += C_use;
+	C[i] -= C_use;
+	N[i] -= N_use;
+	daisy_assert (C[i] >= 0.0);
+	daisy_assert (N[i] >= 0.0);
+	daisy_assert (som_C[i] >= 0.0);
+	daisy_assert (som_N[i] >= 0.0);
+      }
 
   if (fractions.size () == smb_size + 1)
     return;

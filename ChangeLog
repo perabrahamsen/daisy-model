@@ -1,5 +1,21 @@
 2003-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.60 released.
+
+2003-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (turnover_pool): Don't process tiny pools.
+	(turnover): Ignore very slow rates.
+	* aom.C (tick): Ignore small som fraction.
+
+	* geometry.C (add): Added checks.
+	(extract): Made it more numerically stable.
+
+	* assertion.C, assertion.h (non_negative): Nw member function.
+	* assertion.h (assert_non_negative): New macro.
+	* om.C: Added checks.
+	* organic_matter.C: Ditto.
+
 	* Version 2.59 released.
 
 2003-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>

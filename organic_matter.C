@@ -238,8 +238,12 @@ void
 OrganicMatter::Implementation::Buffer::mix (const Geometry& geometry, 
 					    double from, double to)
 {
+  assert_non_negative (C);
   geometry.mix (C, from, to);
+  assert_non_negative (C);
+  assert_non_negative (N);
   geometry.mix (N, from, to);
+  assert_non_negative (N);
 }
 
 void
@@ -248,8 +252,12 @@ OrganicMatter::Implementation::Buffer::swap (const Geometry& geometry,
 					     double middle, 
 					     double to)
 {
+  assert_non_negative (C);
   geometry.swap (C, from, middle, to);
+  assert_non_negative (C);
+  assert_non_negative (N);
   geometry.swap (N, from, middle, to);
+  assert_non_negative (N);
 }
 
 void
@@ -285,6 +293,7 @@ void OrganicMatter::Implementation::Initialization::
   daisy_assert (destination.size () == fractions.size ());
   for (unsigned int i = 0; i < destination.size (); i++)
     destination[i] = per_lay[lay] * fractions[i];
+  assert_non_negative (destination);
 }
 
 bool 
@@ -408,6 +417,8 @@ OrganicMatter::Implementation::Initialization::
 
   // Mix roots in top.
   soil.mix (per_lay, 0.0, end);
+  
+  assert_non_negative (per_lay);
 }
 
 OrganicMatter::Implementation::Initialization::~Initialization ()
@@ -505,8 +516,10 @@ OrganicMatter::Implementation::Buffer::initialize (const Geometry& geometry)
   // Make sure the vectors are large enough.
   while (N.size () < size)
     N.push_back (0.0);
+  assert_non_negative (N);
   while (C.size () < size)
     C.push_back (0.0);
+  assert_non_negative (C);
 }
 
 OrganicMatter::Implementation::Buffer::Buffer (const AttributeList& al)
@@ -516,7 +529,12 @@ OrganicMatter::Implementation::Buffer::Buffer (const AttributeList& al)
 		   ? halftime_to_rate (al.number ("turnover_halftime"))
 		   : al.number ("turnover_rate")),
     where (al.integer ("where"))
-{ }
+{
+  assert_non_negative (N);
+  assert_non_negative (C);
+  daisy_assert (turnover_rate >= 0.0);
+  daisy_assert (turnover_rate <= 1.0);
+}
 
 void
 OrganicMatter::Implementation::output (Log& log,

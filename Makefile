@@ -428,7 +428,7 @@ native:
 
 cross:
 	(cd $(OBJHOME)/$(TARGETTYPE) \
-         && $(MAKE) GCC=$(CROSSGCC) VPATH=$(SRCDIR) \
+         && $(MAKE) GCC=$(CROSSGCC) DEBUG= VPATH=$(SRCDIR) \
                     -f $(SRCDIR)/Makefile daisy)
 
 # Create manager test executable.

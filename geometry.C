@@ -138,7 +138,12 @@ Geometry::add (vector<double>& v, double from, double to, double amount) const
   for (unsigned int i = 0; i <= last; i++)
     {
       if (zplus_[i] < from)
-	v[i] += density * (min (old, from) - max (zplus_[i], to)) / dz_[i];
+	{
+	  const double top = min (old, from);
+	  const double bottom = max (zplus_[i], to);
+	  daisy_assert (top > bottom);
+	  v[i] += density * (top - bottom) / dz_[i];
+	}
       old = zplus_[i];
     }
 
@@ -179,11 +184,18 @@ Geometry::extract (vector<double>& v, double from, double to) const
 
   for (unsigned i = 0; i <= last; i++)
     {
+      daisy_assert (approximate (old - zplus_[i], dz_[i]));
       if (zplus_[i] < from)
 	{
-	  const double height = (min (old, from) - max (zplus_[i], to));
+	  const double top = min (old, from);
+	  const double bottom = max (zplus_[i], to);
+	  daisy_assert (top > bottom);
+	  const double height = top - bottom;
 	  amount += v[i] * height;
-	  v[i] -= v[i] * height / (old - zplus_[i]);
+	  if (approximate (height, old - zplus_[i]))
+	    v[i] = 0;
+	  else
+	    v[i] -= v[i] * height / dz_[i];
 	}
       old = zplus_[i];
     }

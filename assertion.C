@@ -21,6 +21,7 @@
 #include "assertion.h"
 #include "treelog.h"
 #include "tmpstream.h"
+#include "mathlib.h"
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -127,6 +128,19 @@ Assertion::panic (const char* file, int line, const char* fun,
 {
   bug (file, line, fun, msg);
   throw 3;
+}
+
+void 
+Assertion::non_negative (const char* file, int line, const char* fun,
+			 const std::vector<double>& v)
+{
+  for (unsigned int i = 0; i < v.size (); i++)
+    if (v[i] < 0 || !finite (v[i]))
+      {
+	TmpStream tmp;
+	tmp () << "v[" << i << "] >= 0";
+	Assertion::failure (file, line, fun, tmp.str ());
+      }
 }
 
 Assertion::Register::Register (Treelog& log)

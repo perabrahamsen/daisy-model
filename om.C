@@ -66,8 +66,12 @@ OM::mix (const Geometry& geometry, double from, double to)
     return;
 
   // Mix.
+  assert_non_negative (C);
   geometry.mix (C, from, to);
+  assert_non_negative (C);
+  assert_non_negative (N);
   geometry.mix (N, from, to);
+  assert_non_negative (N);
 }
 
 void
@@ -78,8 +82,12 @@ OM::swap (const Geometry& geometry, double from, double middle, double to)
     return;
 
   // Swap.
+  assert_non_negative (C);
   geometry.swap (C, from, middle, to);
+  assert_non_negative (C);
+  assert_non_negative (N);
   geometry.swap (N, from, middle, to);
+  assert_non_negative (N);
 }
 
 double 
@@ -103,6 +111,12 @@ OM::turnover (const double from_C, const double from_N,
 	      double rate, const double efficiency,
 	      double& C_use, double& N_produce, double& N_consume)
 {
+  if (rate < 1e-200)
+    {
+      N_produce = N_consume = C_use = 0;
+      return;
+    }
+
   // Full turnover.
   N_produce = from_N * rate;
   N_consume = from_C * rate * efficiency / to_C_per_N;
@@ -159,12 +173,15 @@ OM::turnover_pool (unsigned int end, const double* factor,
 
   for (unsigned int i = 0; i < size; i++)
     {
+      if (C[i] < 1.0e-20)
+	continue;
+
       const double rate = min (factor[i] * speed, 0.1);
-      daisy_assert (C[i] >= 0.0);
       daisy_assert (finite (rate));
       daisy_assert (rate >=0);
       daisy_assert (N_soil[i] * 1.001 >= N_used[i]);
       daisy_assert (N[i] >= 0.0);
+      daisy_assert (C[i] >= 0.0);
       daisy_assert (om.N[i] >= 0.0);
       daisy_assert (om.C[i] >= 0.0);
       double C_use;
@@ -199,6 +216,7 @@ OM::turnover_dom (unsigned int size, const double* factor,
 		  double fraction, DOM& dom)
 {
   const double speed = turnover_rate * fraction;
+
   for (unsigned int i = 0; i < size; i++)
     {
       const double rate = min (speed * factor[i], 0.1);
@@ -218,6 +236,9 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	  double* CO2, const vector<SMB*>& smb, const vector<SOM*>&som,
 	  const vector<DOM*>& dom)
 {
+  if (turnover_rate < 1e-200)
+    return;
+
   const unsigned int size = min (C.size (), end);
   daisy_assert (N.size () >= size);
 

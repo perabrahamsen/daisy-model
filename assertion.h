@@ -25,6 +25,7 @@
 #define ASSERTION_H
 
 #include <string>
+#include <vector>
 
 class Treelog;
 
@@ -48,6 +49,8 @@ namespace Assertion
 		const std::string& msg);
   void panic (const char* file, int line, const char* fun,
 	      const std::string& msg) NORETURN;
+  void non_negative (const char* file, int line, const char* fun,
+		     const std::vector<double>& v);
 
   class Register
   {
@@ -65,6 +68,8 @@ namespace Assertion
 #define daisy_bug(msg) Assertion::bug (__FILE__, __LINE__, NULL, msg)
 #define daisy_warning(msg) Assertion::warning (__FILE__, __LINE__, NULL, msg)
 #define daisy_panic(msg) Assertion::panic (__FILE__, __LINE__, NULL, msg)
+#define assert_non_negative(v) \
+  Assertion::non_negative (__FILE__, __LINE__, NULL, v)
 #else
 #define daisy_assert(condition) \
   while (!(condition)) \
@@ -72,7 +77,10 @@ namespace Assertion
 #define daisy_bug(msg) Assertion::bug (__FILE__, __LINE__, __FUNCTION__, msg)
 #define daisy_warning(msg) \
   Assertion::warning (__FILE__, __LINE__, __FUNCTION__, msg)
-#define daisy_panic(msg) Assertion::panic (__FILE__, __LINE__, __FUNCTION__, msg)
+#define daisy_panic(msg) \
+  Assertion::panic (__FILE__, __LINE__, __FUNCTION__, msg)
+#define assert_non_negative(v) \
+  Assertion::non_negative (__FILE__, __LINE__, __FUNCTION__, v)
 #endif
 
 #endif // ASSERTION_H
