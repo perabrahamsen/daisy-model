@@ -206,6 +206,7 @@ struct CropStandard::Parameters
     PartitPar (const AttributeList&);
   } Partit;
   struct ProdPar {
+    double CH2OReleaseRate;     // CH2O Release Rate [h-1]
     double E_Root;		// Conversion efficiency, root
     double E_Leaf;		// Conversion efficiency, leaf
     double E_Stem;		// Conversion efficiency, stem
@@ -334,6 +335,7 @@ struct CropStandard::Variables
   struct RecProd
   {
     void output (Log&, Filter&) const;
+    double CH2OPool;            // Carbonhydrate pool [g/m2]
     double WLeaf;		// Leaf dry matter weight [g/m2]
     double WStem;		// Stem dry matter weight [g/m2]
     double WRoot;		// Root dry matter weight [g/m2]
@@ -478,7 +480,8 @@ CropStandard::Parameters::PartitPar::PartitPar (const AttributeList& vl)
 { }
 
 CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
-  : E_Root (vl.number ("E_Root")),
+  : CH2OReleaseRate (vl.number ("CH2OReleaseRate")),
+    E_Root (vl.number ("E_Root")),
     E_Leaf (vl.number ("E_Leaf")),
     E_Stem (vl.number ("E_Stem")),
     E_SOrg (vl.number ("E_SOrg")),
@@ -647,7 +650,8 @@ CropStandard::Variables::RecRootSys::output (Log& log, Filter& filter) const
 
 CropStandard::Variables::RecProd::RecProd (const Parameters& par,
 					   const AttributeList& vl)
-  : WLeaf (vl.number ("WLeaf")),
+  : CH2OPool (vl.number ("CH2OPool")),
+    WLeaf (vl.number ("WLeaf")),
     WStem (vl.number ("WStem")),
     WRoot (vl.number ("WRoot")),
     WSOrg (vl.number ("WSOrg")),
@@ -668,6 +672,7 @@ void
 CropStandard::Variables::RecProd::output (Log& log, Filter& filter) const
 {
   log.open ("Prod");
+  log.output ("CH2OPool", filter, CH2OPool);
   log.output ("WLeaf", filter, WLeaf);
   log.output ("WStem", filter, WStem);
   log.output ("WRoot", filter, WRoot);
@@ -979,6 +984,9 @@ This parameterization is only valid until the specified development state.");
 	      "Root/Shoot ratio as a function of development state.");
 
   // ProdPar
+  Prod.add ("CH2OReleaseRate", Syntax::None (), Syntax::Const,
+	    "CH2O Release Rate constant.");
+  vProd.add ("CH2OReleaseRate", 0.02);
   Prod.add ("E_Root", Syntax::None (), Syntax::Const,
 	    "Conversion efficiency, root.");
   vProd.add ("E_Root", 0.69);
@@ -1217,6 +1225,8 @@ Maximal development stage for which the crop survives harvest.");
 
   // Prod
   // Warning: Uses same syntax as `ProdPar'.
+  Prod.add ("CH2OPool", "g DM/m^2", Syntax::State, "CH2O Pool.");
+  vProd.add ("CH2OPool", 0.001);
   Prod.add ("WLeaf", "g DM/m^2", Syntax::State, "Leaf dry matter weight.");
   vProd.add ("WLeaf", 0.001);
   Prod.add ("WStem", "g DM/m^2", Syntax::State, "Stem dry matter weight.");
@@ -2070,6 +2080,11 @@ CropStandard::NitrogenUptake (int Hour,
     }
   else
     CrpAux.Fixated = 0.0;
+  // Updating the nitrogen stress
+  RootSys.nitrogen_stress
+	  = max (0.0, min (1.0, ((NCrop - CrpAux.NfNCnt)
+				 / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+
 }
 
 double
@@ -2129,7 +2144,7 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
 	    = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / dCAI;
 
 	  // Leaf Photosynthesis [gCO2/m2/h]
-	  const double F = LeafPhot.Fm * 
+	  const double F = LeafPhot.Fm *
 	    (1.0 - exp (- (LeafPhot.Qeff * dPAR / LeafPhot.Fm)));
 
 	  Ass += LA * F;
@@ -2150,7 +2165,7 @@ CropStandard::ReMobilization ()
 
   if (DS < Prod.ReMobilDS)
     {
-      StemRes = 0.0; 
+      StemRes = 0.0;
       return 0.0;
     }
   else if (StemRes < 1.0e-9)
@@ -2160,19 +2175,19 @@ CropStandard::ReMobilization ()
     }
   else
     {
-      const double ReMobilization = Prod.ReMobilRt * StemRes;
+      const double ReMobilization = Prod.ReMobilRt / 24. * StemRes;
       StemRes -= ReMobilization;
       return ReMobilization;
     }
 }
 
 void
-CropStandard::AssimilatePartitioning (double DS, 
+CropStandard::AssimilatePartitioning (double DS,
 			      double& f_Leaf, double& f_Stem,
 			      double& f_Root, double& f_SOrg)
 {
   const Parameters::PartitPar& Partit = par.Partit;
-    
+
   if (RSR () > Partit.RSR (DS))
     f_Root = 0.0;
   else
@@ -2194,7 +2209,7 @@ CropStandard::MaintenanceRespiration (double r, double w, double T)
     return 0.0;
 
   return (molWeightCH2O / molWeightCO2)
-    * r * max (0.0, 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
+    * r / 24. * max (0.0, 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
 			      - exp (0.57 - 0.042 * T - 0.0051 * T * T))) * w;
 }
 
@@ -2220,83 +2235,68 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   const double RMRoot
     = MaintenanceRespiration (pProd.r_Root, vProd.WRoot, SoilT);
 
-  const double ReMobil = ReMobilization ();
-  CrpAux.CanopyAss += ReMobil;
-
   RMLeaf = max (0.0, RMLeaf - CrpAux.PotCanopyAss + CrpAux.CanopyAss);
   const double RM = RMLeaf + RMStem + RMSOrg + RMRoot;
 
-  double& Stress = var.RootSys.nitrogen_stress;
-
-  if (CrpAux.CanopyAss >= RM)
+  if (var.Prod.CH2OPool >= RM)
     {
-      const double AssG = CrpAux.CanopyAss - RM;
-      if (par.enable_N_stress)
-	Stress
-	  = max (0.0, min (1.0, ((vProd.NCrop - CrpAux.NfNCnt)
-				 / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
-      else
-	Stress = 1.0;
-
-      const double PLim = Stress  * (1.0 - par.Prod.GrowthRateRedFac);
+      var.Prod.CH2OPool -= RM;
       double f_Leaf, f_Stem, f_SOrg, f_Root;
       AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
-      CrpAux.IncWLeaf = PLim * pProd.E_Leaf * f_Leaf * AssG;
-      CrpAux.IncWStem = PLim * pProd.E_Stem * f_Stem * AssG - ReMobil;
-      CrpAux.IncWSOrg = PLim * pProd.E_SOrg * f_SOrg * AssG;
-      CrpAux.IncWRoot = PLim * pProd.E_Root * f_Root * AssG;
+      const double AssG = pProd.CH2OReleaseRate * var.Prod.CH2OPool;
+      CrpAux.IncWLeaf = pProd.E_Leaf * f_Leaf * AssG;
+      CrpAux.IncWStem = pProd.E_Stem * f_Stem * AssG;
+      CrpAux.IncWSOrg = pProd.E_SOrg * f_SOrg * AssG;
+      CrpAux.IncWRoot = pProd.E_Root * f_Root * AssG;
     }
   else
     {
-      Stress = 1.0;
-      double AssG;
-
-      if (RMLeaf <= CrpAux.CanopyAss)
+      if (RMLeaf <= var.Prod.CH2OPool)
 	{
 	  CrpAux.IncWLeaf = 0.0;
-	  AssG = CrpAux.CanopyAss - RMLeaf;
+	  var.Prod.CH2OPool -= RMLeaf;
 	}
       else
 	{
-	  CrpAux.IncWLeaf = CrpAux.CanopyAss - RMLeaf;
-	  AssG = 0.0;
+	  CrpAux.IncWLeaf = var.Prod.CH2OPool - RMLeaf;
+	  var.Prod.CH2OPool = 0.0;
 	}
-      if (RMSOrg <= AssG)
+      if (RMSOrg <= var.Prod.CH2OPool)
 	{
 	  CrpAux.IncWSOrg = 0.0;
-	  AssG -= RMSOrg;
+	  var.Prod.CH2OPool -= RMSOrg;
 	}
       else
 	{
-	  CrpAux.IncWSOrg = AssG - RMSOrg;
-	  AssG = 0.0;
+	  CrpAux.IncWSOrg = var.Prod.CH2OPool - RMSOrg;
+	  var.Prod.CH2OPool = 0.0;
 	}
-      if (RMStem <= AssG)
+      if (RMStem <= var.Prod.CH2OPool)
 	{
 	  CrpAux.IncWStem = 0.0;
-	  AssG -= RMStem;
+	  var.Prod.CH2OPool -= RMStem;
 	}
       else
 	{
-	  CrpAux.IncWStem = AssG - RMStem - CrpAux.IncWSOrg;
+	  CrpAux.IncWStem = var.Prod.CH2OPool - RMStem - CrpAux.IncWSOrg;
           if (vProd.WStem > CrpAux.IncWStem)
             CrpAux.IncWSOrg  = 0.0;
           else
             CrpAux.IncWStem += CrpAux.IncWSOrg;
-	  AssG = 0.0;
+	  var.Prod.CH2OPool = 0.0;
 	}
-      if (RMRoot <= AssG)
+      if (RMRoot <= var.Prod.CH2OPool)
 	{
 	  CrpAux.IncWRoot = 0.0;
-	  AssG -= RMRoot;
+	  var.Prod.CH2OPool -= RMRoot;
 	}
       else
 	{
-	  CrpAux.IncWRoot = AssG - RMRoot;
-	  AssG = 0.0;
+	  CrpAux.IncWRoot = var.Prod.CH2OPool - RMRoot;
+	  var.Prod.CH2OPool = 0.0;
 	}
-      if (AssG > 0.0)
-	CERR << "BUG: Extra AssG: " << AssG << "\n";
+      if (var.Prod.CH2OPool > 0.0)
+	CERR << "BUG: Extra CH2O: " << var.Prod.CH2OPool << "\n";
     }
 
   // Update dead leafs
@@ -2423,15 +2423,23 @@ CropStandard::tick (const Time& time,
   const double water_stress = var.RootSys.water_stress;
   NitrogenUptake (time.hour (),
 		  soil, soil_water, soil_NH4,soil_NO3);
+  const double nitrogen_stress = var.RootSys.nitrogen_stress;
+
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
       double Ass = CanopyPhotosynthesis (bioclimate);
-      var.CrpAux.PotCanopyAss += Ass;
+      var.CrpAux.PotCanopyAss = Ass;
       if (par.enable_water_stress)
-	var.CrpAux.CanopyAss += water_stress * Ass;
-      else
-	var.CrpAux.CanopyAss += Ass;
+	Ass *= water_stress;
+      if (par.enable_N_stress)
+	Ass *= nitrogen_stress;
+      const double ProdLim = (1.0 - par.Prod.GrowthRateRedFac);
+      var.Prod.CH2OPool += ProdLim * Ass;
     }
+  const double ReMobil = ReMobilization ();
+  var.Prod.CH2OPool += ReMobil;
+  var.CrpAux.IncWStem -= ReMobil;
+  NetProduction (bioclimate, soil, soil_heat);
   if (time.hour () != 0)
     return;
 
@@ -2444,16 +2452,10 @@ CropStandard::tick (const Time& time,
     InitialCAI ();
   else
     var.Canopy.CAI = CropCAI ();
-  NetProduction (bioclimate, soil, soil_heat);
   DevelopmentStage (bioclimate);
   RootPenetration (soil, soil_heat);
   RootDensity (soil);
   NitContent ();
-
-  var.CrpAux.LogPotCanopyAss = var.CrpAux.PotCanopyAss;
-  var.CrpAux.LogCanopyAss = var.CrpAux.CanopyAss;
-  var.CrpAux.PotCanopyAss = 0.0;
-  var.CrpAux.CanopyAss = 0.0;
 }
 
 const Harvest&
