@@ -170,7 +170,7 @@
            (array (path column "$col" SoilWater q_p)
                   (factor -10)          ;cm->mm
                   (dimension "cm"))))
-  
+
 (deflog "Hourly Water Flux" table
   (where "hourly_water_flux.dlf")
   (when (hourly))
@@ -540,6 +540,7 @@
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
            (number (path column "$col" Vegetation crops crops "*" CrpN Fixated)
+		   (when hourly)
                    (dimension "kg N/ha/&")
                    (factor 10.0))
            (number (path column "$col" fertilized_Org_N)
@@ -871,6 +872,32 @@
   (from    0 [cm])
   (to   -100 [cm]))
 
+(deflog "Chemical" table
+  (where "chemical.dlf")
+  (when hourly)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (hour (path time))
+           (array (path column "$col" SoilChemicals solutes "$chem" solute M)
+		  (when hourly)
+                  (dimension "g/ha/&")
+                  (factor 1e8))        ;g/cm^2 -> g/ha
+           ))
+
+(deflog "Transform" table
+  (where "transform.dlf")
+  (when hourly)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (hour (path time))
+           (array (path column "$col" Transformations "$trans" S_AB)
+		  (when hourly)
+                  (dimension "g/ha/&")
+                  (factor 1e8))        ;g/cm^2 -> g/ha
+           ))
+
 (deflog "Weather" table
   (where "weather.dlf")
   (when daily)
@@ -956,6 +983,9 @@
                          Devel day_length)
                    (dimension "h")
                    (factor 1.0))        ;Light hours previous day.
+           (number (path column "$col" Vegetation crops crops "$crop"
+                         Canopy Height)
+                   (dimension "cm"))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Canopy CAI)
                    (tag "Crop AI")
@@ -1636,7 +1666,7 @@
                    (dimension "cm/&"))
            (interval (path column "$col" SoilWater Theta)
                      (dimension "cm"))))
-         
+
 (deflog "Drain Sink" table
   (where "drain_sink.dlf")
   (when (hourly))
