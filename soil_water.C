@@ -206,7 +206,7 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("UZtop", Librarian<UZmodel>::library ());
   AttributeList richard;
-  richard.add ("type", "richard");
+  richard.add ("type", "richards");
   richard.add ("max_time_step_reductions", 4);
   richard.add ("time_step_reduction", 4);
   richard.add ("max_iterations", 25);

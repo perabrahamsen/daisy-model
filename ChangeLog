@@ -1,3 +1,17 @@
+1999-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.61 released.
+
+1999-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/mini.dai ("mini"): Don't set parameters, use default values.
+
+	* soil_water.C (load_syntax): The model implementing Richards
+	Equation is named `ricards', not `richard'.
+
+	* syntax.C (check): Check that element is in a library, before
+	querying for its syntax.
+
 1999-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.60 released.

@@ -78,12 +78,18 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 		const AttributeList& al = **j;
 		if (!al.check ("type"))
 		  {
-		    CERR << "Non object found \n";
+		    CERR << "Non object found\n";
 		    error = true;
 		  }
 		else if (al.name ("type") == "error")
 		  {
-		    CERR << "Error node found \n";
+		    CERR << "Error node found\n";
+		    error = true;
+		  }
+		else if (!lib.check (al.name ("type")))
+		  {
+		    CERR << "Unknown library member `" << al.name ("type")
+			 << "'\n";
 		    error = true;
 		  }
 		else if (!lib.syntax (al.name ("type")) .check (al, key))
