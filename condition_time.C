@@ -4,13 +4,14 @@
 #include "time.h"
 #include "syntax.h"
 #include "alist.h"
+#include "daisy.h"
 
 class ConditionAt : public Condition
 {
   const Time time;
 public:
-  bool match (ColumnList&, const Weather&, const Time& t) const
-  { return time == t; }
+  bool match (const Daisy& daisy) const
+  { return time == daisy.time; }
   ConditionAt (const AttributeList& al)
     : time (al.time ("time"))
   { }
@@ -22,8 +23,8 @@ class ConditionBefore : public Condition
 {
   const Time time;
 public:
-  bool match (ColumnList&, const Weather&, const Time& t) const
-  { return time > t; }
+  bool match (const Daisy& daisy) const
+  { return time > daisy.time; }
   ConditionBefore (const AttributeList& al)
     : time (al.time ("time"))
   { }
@@ -35,8 +36,8 @@ class ConditionAfter : public Condition
 {
   const Time time;
 public:
-  bool match (ColumnList&, const Weather&, const Time& t) const
-  { return time < t; }  
+  bool match (const Daisy& daisy) const
+  { return time < daisy.time; }  
   ConditionAfter (const AttributeList& al)
     : time (al.time ("time"))
   { }
@@ -50,8 +51,8 @@ class ConditionHourly : public Condition
 {
   const int step;
 public:
-  bool match (ColumnList&, const Weather&, const Time& t) const
-  { return ((24 * t.yday () + t.hour ()) % step) == 0; }
+  bool match (const Daisy& daisy) const
+  { return ((24 * daisy.time.yday () + daisy.time.hour ()) % step) == 0; }
   ConditionHourly (const AttributeList& al)
     : step (al.integer ("step"))
   { }
@@ -63,8 +64,8 @@ class ConditionDaily : public Condition
 {
   const int step;
 public:
-  bool match (ColumnList&, const Weather&, const Time& t) const
-  { return t.hour () == 0 && (t.yday () % step) == 0; }
+  bool match (const Daisy& daisy) const
+  { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionDaily (const AttributeList& al)
     : step (al.integer ("step"))
   { }
@@ -76,8 +77,8 @@ class ConditionWeekly : public Condition
 {
   const int step;
 public:
-  bool match (ColumnList&, const Weather&, const Time& t) const
-  { return t.hour () == 0 && (t.yday () % step) == 0; }
+  bool match (const Daisy& daisy) const
+  { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionWeekly (const AttributeList& al)
     : step (7 * al.integer ("step"))
   { }
@@ -89,8 +90,8 @@ class ConditionMonthly : public Condition
 {
   const int step;
 public:
-  bool match (ColumnList&, const Weather&, const Time& t) const
-  { return t.hour () == 0 && (t.yday () % step) == 0; }
+  bool match (const Daisy& daisy) const
+  { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionMonthly (const AttributeList& al)
     : step (30 * al.integer ("step"))
   { }
@@ -102,8 +103,8 @@ class ConditionYearly : public Condition
 {
   const int step;
 public:
-  bool match (ColumnList&, const Weather&, const Time& t) const
-  { return t.hour () == 0 && (t.yday () % step) == 0; }
+  bool match (const Daisy& daisy) const
+  { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
   ConditionYearly (const AttributeList& al)
     : step (365 * al.integer ("step"))
   { }

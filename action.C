@@ -6,7 +6,6 @@
 #include "syntax.h"
 #include "common.h"
 #include <map.h>
-#include <algobase.h>
 
 static Library* Action_library = NULL;
 typedef map<string, Action::constructor, less<string> > Action_map_type;
@@ -48,7 +47,7 @@ Action::create (const AttributeList& al)
 }
 
 void 
-Action::doIt (ColumnList&, const Weather&, Log&) const
+Action::doIt (Daisy&) const
 { }
 
 bool

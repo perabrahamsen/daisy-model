@@ -48,7 +48,7 @@ public:
   // Simulation.
 public:
   void tick (Surface&, Groundwater&, const Soil&);
-  bool check (Log&, unsigned n) const;
+  bool check (unsigned n) const;
   void output (Log&, const Filter*) const;
 
   // Communication with surface.

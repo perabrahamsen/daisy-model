@@ -148,7 +148,7 @@ Log::tick (const Daisy& daisy)
        i != impl.entries.end ();
        i++)
     {
-      if (daisy.match ((*i)->condition))
+      if ((*i)->condition->match (daisy))
 	{
 	  impl.select (i);
 	  daisy.output (*this, (*i)->filter);

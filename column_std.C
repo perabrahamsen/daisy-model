@@ -39,9 +39,9 @@ private:
 
   // Actions.
 public:
-  void sow (const AttributeList& crop, Log&);
+  void sow (const AttributeList& crop);
 
-  bool check (Log&) const;
+  bool check () const;
   void output (Log&, const Filter*) const;
 private:
   void output_crops (Log& log, const Filter* filter) const;
@@ -60,7 +60,7 @@ public:
 };
 
 void
-ColumnStandard::sow (const AttributeList& crop, Log&)
+ColumnStandard::sow (const AttributeList& crop)
 {
   string name = crop.name ("type");
   if (!Crop::library ().check (name))
@@ -72,12 +72,12 @@ ColumnStandard::sow (const AttributeList& crop, Log&)
 }
 
 bool
-ColumnStandard::check (Log& log) const
+ColumnStandard::check () const
 {
   int n = soil.size ();
-  bool ok = (soil.check (log)
-	     && soil_heat.check (log, n)
-	     && soil_NO3.check (log, n));
+  bool ok = (soil.check ()
+	     && soil_heat.check (n)
+	     && soil_NO3.check (n));
   return ok;
 }
 

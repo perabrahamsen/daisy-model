@@ -1,8 +1,9 @@
 // action_sow.C
 
 #include "action.h"
+#include "daisy.h"
 #include "column.h"
-#include "crop.h"
+#include "crop.h"		// We need to initialize the Crop library.
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
@@ -13,7 +14,7 @@ class ActionSow : public Action
   const AttributeList& crop;
 
 public:
-  void doIt (ColumnList&, const Weather&, Log&) const;
+  void doIt (Daisy&) const;
 
   // Create and Destroy.
 private:
@@ -25,13 +26,14 @@ public:
 };
 
 void 
-ActionSow::doIt (ColumnList& cl, const Weather&, Log& log) const
+ActionSow::doIt (Daisy& daisy) const
 {
   cout << " [Sowing " << crop.name ("type") << "]";
 
+  ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {
-      (*i)->sow (crop, log);
+      (*i)->sow (crop);
     }
 }
 

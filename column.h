@@ -23,9 +23,9 @@ public:
 
   // Actions.
 public:
-  virtual void sow (const AttributeList& crop, Log&) = 0;
+  virtual void sow (const AttributeList& crop) = 0;
 
-  virtual bool check (Log&) const = 0;
+  virtual bool check () const = 0;
   virtual void output (Log&, const Filter*) const = 0;
 
   // Simulation.

@@ -5,9 +5,7 @@
 
 #include <std/string.h>
 
-class ColumnList;
-class Weather;
-class Log;
+class Daisy;
 class AttributeList;
 class Library;
 class Syntax;
@@ -16,7 +14,7 @@ class Action
 {
   // Simulation.
 public:
-  virtual void doIt(ColumnList&, const Weather&, Log&) const;
+  virtual void doIt (Daisy&) const;
   virtual bool stop () const;
   static Action null;
 

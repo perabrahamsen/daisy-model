@@ -213,7 +213,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 }
 
 bool 
-Solute::check (Log&, unsigned n) const
+Solute::check (unsigned n) const
 {
   bool ok = true;
 

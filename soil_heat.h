@@ -19,7 +19,7 @@ public:
   void tick (const Surface&, const Bioclimate&);
   inline double temperature (int i) const
   { return T[i]; }
-  bool check (Log& log, unsigned n) const;
+  bool check (unsigned n) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const AttributeList&);
 };

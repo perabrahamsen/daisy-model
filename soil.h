@@ -57,7 +57,7 @@ public:
   double EpInterchange () const;
 
   // Simulation.
-  bool check (Log& log) const;
+  bool check () const;
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

@@ -9,7 +9,6 @@ class Manager;
 class Weather;
 class Groundwater;
 class Log;
-class Condition;
 class Filter;
 class ColumnList;
 class Syntax;
@@ -31,7 +30,6 @@ public:
   // Simulation.
 public:
   void run();
-  bool match (const Condition*) const;
   void output (Log&, const Filter*) const;
   void output_field (Log&, const Filter*) const;
 

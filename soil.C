@@ -50,7 +50,7 @@ Soil::EpInterchange () const
 }
 
 bool 
-Soil::check (Log& /* log */) const
+Soil::check () const
 {
   bool ok = true;
   if (zplus_.size () < 1)

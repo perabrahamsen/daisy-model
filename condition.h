@@ -1,19 +1,20 @@
 // condition.h -- Logic expressions
 
-class ColumnList;
-class Weather;
-class Time;
-class Log;
+#ifndef CONDITION_H
+#define CONDITION_H
+
+class Daisy;
 class AttributeList;
 class Library;
 class Syntax;
+
 #include <std/string.h>
 
 class Condition
 {  
   // Simulation.
 public:
-  virtual bool match (ColumnList&, const Weather&, const Time&) const;
+  virtual bool match (const Daisy&) const;
   static Condition null;
 
   // Library.
@@ -41,3 +42,5 @@ public:
   Condition_init ();
   ~Condition_init ();
 } Condition_init;
+
+#endif CONDITION_H

@@ -6,7 +6,6 @@
 #include "syntax.h"
 #include "common.h"
 #include <map.h>
-#include <algobase.h>
 
 static Library* Condition_library = NULL;
 typedef map<string, Condition::constructor, less<string> > Condition_map_type;
@@ -48,7 +47,7 @@ Condition::create (const AttributeList& al)
 }
 
 bool
-Condition::match (ColumnList&, const Weather&, const Time&) const
+Condition::match (const Daisy&) const
 {
   return true;
 }

@@ -42,7 +42,7 @@ public:
   // Simulation.
 public:
   void tick (const Soil&, const SoilWater&, double J_in);
-  bool check (Log&, unsigned n) const;
+  bool check (unsigned n) const;
   void output (Log&, const Filter*) const;
 
   // Create and destroy.

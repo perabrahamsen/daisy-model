@@ -74,7 +74,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 }
 
 bool 
-SoilWater::check (Log&, unsigned n) const
+SoilWater::check (unsigned n) const
 {
   bool ok = true;
 

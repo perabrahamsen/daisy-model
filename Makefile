@@ -99,16 +99,17 @@ main.o: main.C daisy.h time.h input.h syntax.h log.h alist.h common.h
 daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
  groundwater.h uzmodel.h common.h horizon.h log.h crop.h column.h \
  action.h filter.h library.h syntax.h condition.h alist.h
-input.o: input.C input.h log.h alist.h common.h csmp.h library.h \
- syntax.h action.h condition.h filter.h crop.h time.h
-log.o: log.C log.h condition.h filter.h csmp.h daisy.h time.h
+input.o: input.C input.h alist.h common.h csmp.h library.h syntax.h \
+ action.h condition.h filter.h crop.h time.h
+log.o: log.C log.h condition.h filter.h csmp.h daisy.h time.h alist.h \
+ common.h
 weather.o: weather.C weather.h time.h library.h alist.h common.h \
  syntax.h
 manager.o: manager.C manager.h library.h alist.h common.h syntax.h
 column.o: column.C column.h library.h alist.h common.h syntax.h
 crop.o: crop.C crop.h library.h alist.h common.h syntax.h
 alist.o: alist.C alist.h common.h time.h
-syntax.o: syntax.C syntax.h alist.h common.h log.h library.h
+syntax.o: syntax.C syntax.h alist.h common.h library.h
 library.o: library.C library.h alist.h common.h
 action.o: action.C action.h alist.h common.h library.h syntax.h
 condition.o: condition.C condition.h alist.h common.h library.h \
@@ -166,8 +167,8 @@ groundwater_static.o: groundwater_static.C groundwater.h time.h \
 crop_std.o: crop_std.C crop.h log.h time.h csmp.h bioclimate.h \
  common.h ftable.h ftable.t syntax.h alist.h filter.h soil_water.h \
  soil.h horizon.h soil_heat.h
-action_sow.o: action_sow.C action.h column.h crop.h syntax.h alist.h \
- common.h
+action_sow.o: action_sow.C action.h daisy.h time.h column.h crop.h \
+ syntax.h alist.h common.h
 action_stop.o: action_stop.C action.h syntax.h alist.h common.h
 condition_time.o: condition_time.C condition.h time.h syntax.h alist.h \
- common.h
+ common.h daisy.h

@@ -7,7 +7,7 @@
 class ActionStop : public Action
 {
 public:
-    void doIt (ColumnList&, const Weather&, Log&) const;
+    void doIt (Daisy&) const;
     bool stop () const;
 
   // Create and Destroy.
@@ -20,7 +20,7 @@ public:
 };
 
 void 
-ActionStop::doIt (ColumnList&, const Weather&, Log&) const
+ActionStop::doIt (Daisy&) const
 {
   assert (false);
 }

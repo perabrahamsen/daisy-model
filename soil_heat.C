@@ -12,7 +12,7 @@ SoilHeat::tick (const Surface&, const Bioclimate& bioclimate)
 }
 
 bool
-SoilHeat::check (Log& /* log */, unsigned n) const
+SoilHeat::check (unsigned n) const
 {
   bool ok = true;
   if (T.size () != n)

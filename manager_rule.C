@@ -40,7 +40,7 @@ Rules::match (const Daisy& daisy) const
        i != rules.end ();
        i++)
     {
-      if (daisy.match ((*i)->condition))
+      if ((*i)->condition->match (daisy))
 	return (*i)->action;
     }
   return &Action::null;

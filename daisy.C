@@ -37,7 +37,7 @@ Daisy::Daisy (Log& l, const AttributeList& al)
        i != columns.end ();
        i++)
     {
-      if (!(*i)-> check (log))
+      if (!(*i)-> check ())
 	ok = false;
     }
   if (!ok)
@@ -71,7 +71,7 @@ Daisy::run ()
 	  cout << " " << time.hour () << "\n";
 	  break;
 	}
-      action->doIt (columns, weather, log);
+      action->doIt (*this);
 
       for (ColumnList::iterator column = columns.begin ();
 	   column != columns.end ();
@@ -85,11 +85,15 @@ Daisy::run ()
     }
 }
 
+#if 0
+class Condition;
+bool match (const Condition*) const;
 bool
 Daisy::match (const Condition* c) const
 {
-  return c->match (columns, weather, time);
+  return c->match (*this);
 }
+#endif
 
 void
 Daisy::output (Log& log, const Filter* filter) const
