@@ -1659,6 +1659,22 @@ To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
                      (tag "SMB2-C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter dom "0" N)
+                     (tag "DOM1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter dom "0" C)
+                     (tag "DOM1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter dom "1" N)
+                     (tag "DOM2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter dom "1" C)
+                     (tag "DOM2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter am "*" om "0" N)
                      (tag "AOM1-N")
                      (dimension "kg N/ha")
