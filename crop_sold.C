@@ -947,7 +947,7 @@ Daisy v1 crop model, for crops with storage organ in the soil.");
   alist.add ("RootSys", vRootSys);
   syntax.add ("Prod", Prod, "Crop production.");
   alist.add ("Prod", vProd);
-  syntax.add ("CrpAux", CrpAux, "Miscellaneous crop state variables..");
+  syntax.add ("CrpAux", CrpAux, "Miscellaneous crop state variables.");
   alist.add ("CrpAux", vCrpAux);
 
   Librarian<Crop>::add_type ("sold", alist, syntax, &make);

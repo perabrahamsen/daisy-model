@@ -1,5 +1,11 @@
 2002-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.23 released.
+
+2002-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt: Added directory to cvs. 
+
 	* average.C (description): Doc fix.
 	* crop_sold.C (CropSoldSyntax): Ditto.
 
