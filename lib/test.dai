@@ -94,12 +94,9 @@
   (progn 
     (sow "Grass")
     (sow "Spring Barley"))
-  (wait (crop_ds_after "Spring Barley" 2.0))
+  (wait (or (crop_ds_after "Spring Barley" 2.0)
+	    (at 1987 9 5 1)))
   (harvest "Spring Barley")
-  (wait (at 1987 10 10 1))
-  (harvest "Grass"
-	   (stub 15)			;Leave 15 cm stub.
-	   (stem 1.00))			;Harvest everything above stub.
   (wait (at 1987 9 8 1))
   (fertilize mineral
 	     (weight 80.0)
