@@ -1,0 +1,1430 @@
+\documentclass{article}
+
+\newcommand{\cplusplus}%
+{{\leavevmode{\rm{\hbox{C\hskip -0.1ex\raise 0.5ex\hbox{\tiny ++}}}}}}
+\newcommand{\Cplusplus}{\cplusplus}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{#1}}
+\newcommand{\todo}[1]{\textsc{Todo}: \textit{#1}}
+\newcommand{\ammonium}{\mbox{$NH_4^+$}}
+\newcommand{\nitrate}{\mbox{$NO_3^-$}}
+\usepackage{url}
+
+\usepackage{epsf}
+%%% From now on print figures at 70% of original size
+\def    \epsfsize#1#2{0.70#1}
+
+\begin{document}
+
+\begin{center}
+  \section*{Daisy Programmers Guide}
+\end{center}
+
+\begin{abstract}
+  The Daisy computer simulation of the soil/crop system is designed
+  for flexibility, both for users and programmers.  This paper will
+  provide information useful for programmers wishing to modify or
+  extend Daisy.  First the generic simulation framework is explained,
+  including how to add new components into that framework.  Then the
+  Daisy specific components, and their internal relations, are
+  described.  The Daisy model itself is not described, only the
+  implementation of it.
+\end{abstract}
+
+\begin{center}
+  \begin{it}
+    Per Abrahamsen, KVL, \today{}.
+  \end{it}
+\end{center}
+
+\pagebreak{}
+\tableofcontents{}
+\pagebreak{}
+
+\section{Introduction}
+
+The Daisy computer program consists of a number of \emph{components},
+each with a well defined interface to the rest of the system.  Some of
+these components are organized in \emph{libraries}.  Each library
+contains a number of components that all have the same interface, but
+different implementations.  Adding a new component to such a library
+can be done without modifying or recompiling any other file in Daisy.
+If you have daisy installed as a library, you can simply link a new
+file contianing the new component with the library, and the new
+component will automatically be available to the users.
+
+The primary purpose of this paper is to explain how to add new
+components to an existing libraries.  Since most Daisy is organized
+around these libraries, this will simultaneously serve as an overview
+of how Daisy itself is organized. 
+
+You need to be familiar with \cplusplus{} to understand this paper.
+
+\section{Code Conventions}
+
+This section should give you an overview of the style conventions used
+for the program source, including how it is organized into files.
+
+\subsection{Language}
+
+Daisy is implemented in \cplusplus{}, and relies heavily on features
+such as virtual function calls and templates.  It also uses types from
+the standard library such as \code{string} and \code{vector} wherever
+possible, instead of the C equivalents (\code{char*} and arrays).  
+
+The goal has been to write code as close to the upcoming \cplusplus{}
+standard as possible, without giving up the ability to compile code
+with the present compilers.  Since the main development has been done
+with {\rm{\hbox{g\hskip -0.1ex\raise 0.5ex\hbox{\tiny ++}}}}~2.7, the
+state of that compiler have defined the limits of what features have
+been used.  At present, the code should also compile with
+Borland~\cplusplus{}~5.0.
+
+\subsection{Components}
+
+The source files have a \file{.C} extension\footnote{This convention
+  was used by the original \textsc{cfront} from Bell Labs.}, while the
+header files use a \file{.h} extension.  Library components are
+contained entirely in a \file{.C} file, they communicate with the rest
+of the system by registering themselves in the library\footnote{This
+  is done from a constructor for a static object in the \file{.C}
+  file}.  All members of a library share the same interface, described
+in the library's own header file.  The \file{common.h} file is used
+mainly for portability, and should be included directly or indirectly
+in all other files.  It also contains a few global constants, such as
+the simulation timestep (\code{dt}).  There is no corresponding
+\file{common.C} file.
+
+With this exception, all other components of Daisy have both a
+\file{.C} file containing the implementation of the component, and a
+similarly named \file{.h} file containing the interface to the
+component.  If you replace or change the implementation without
+touching the interface, you should be able to use the rest of the
+program without modifications.
+
+Most Daisy files implements a single abstraction, usually in form of a
+class with some assorted helper functions and templates.  An exception
+is \file{mathlib}, which implements a number of general purpose
+mathematical functions, used by other components.
+
+All files use the indentation style recommended by the GNU Project
+(See \url{http://www.gnu.org/}).
+
+\subsection{Header Files}
+
+Header files are supposed to be `stand-alone', in that the programmer
+should never be required to include some other header file before
+using a specific header file.  If a header file depends on types
+defined in another header file, it must include that other header file
+itself.  Since there is at least one source file corresponding to each
+header file (except \file{common.h}), the convention is ensured by
+having the source file include its own header file first.
+
+All header files are encapsulated in preprocessor code of the form
+shown on figure~\ref{fig:header} with \code{COMMON\_H} changed
+according to the name of the header file.  This has two effects.
+First and foremost, it means that there is no bad effects of including
+the file twice.  This is important since header files can include
+other header files, and it therefore can be hard to know exactly which
+files are included.  Also, the GNU compiler recognizes this format,
+and avoids reading the file the second time it is included.  This
+speeds up compilation significantly.
+
+\begin{figure}[htbp]
+\begin{verbatim}
+  #ifndef COMMON_H
+  #define COMMON_H
+    /* content goes here */
+  #endif COMMON_H
+\end{verbatim}
+  \caption{Header File Encapsulation}
+  \label{fig:header}
+\end{figure}
+
+\subsection{Programming Environment}
+
+The standard GNU tools Make and CVS are used for building and testing
+Daisy, as well as keeping track of old versions.  They can be used
+directly from the command line, or within an integrated environment in
+Emacs.  The same environment is used under both Unix and NT.
+
+The main variables in \file{Makefile} are
+\begin{itemize}
+\item \code{SRCONLY}, which lists all library members, and
+\item \code{OBJECTS}, which lists all other components.
+\end{itemize}
+If you add any new components, you should edit one of the two, and
+type \texttt{make depend} to update the dependencies.
+
+To build the stand-alone daisy executable, edit the Makefile and type
+\texttt{make daisy}.  This will compile all files that need
+recompilation. 
+
+When you feel ready to check in your changes, type \texttt{make cvs
+  TAG="\textit{comment}"}, where \texttt{\textit{comment}} is a short
+comment describing the changes you have made.  If you have removed any
+files since the last time, you should add the removed files to the
+\code{REMOVE} variable in the \file{Makefile}.  New files will
+automatically be added.
+
+There are several makefile targets for checking the code, but they
+change too often to list here.
+
+\subsection{Files}
+
+\begin{itemize}
+\item \file{common.h}: Portability code and global constants.
+\item \file{mathlib.C}, \file{mathlib.h}: Generic mathematic
+  functions.  
+\item \file{Makefile}: Rules for building and testing Daisy.
+\item \file{CVS}: Directory containing version control information.
+\end{itemize}
+
+\section{Starting Daisy}
+
+Beginning with the beginning, a description of how to start the
+simulation also reveals information about the life cycle of the
+individual components.  An overview of the top level processes can be
+seen in figure~\ref{fig:start}.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \epsffile{start.eps}
+  \end{center}
+  \caption{Starting the simulation}
+  \label{fig:start}
+\end{figure}
+
+\begin{samepage}
+  The input to the parser consists of
+  \begin{itemize}
+  \item An attribute list (or \emph{alist}) containing default values
+    for part of the information needed to create the simulation object.
+  \item An abstract \emph{syntax} describing what kind information is
+    needed to create the simulation object.
+  \item A file containing the specific information for this run of the
+    simulation. 
+  \end{itemize}
+\end{samepage}
+
+The output is an attribute list with the additional information that
+was parsed from the input file.  The attribute list is then be checked
+for completeness (i.e. all mandatory elements specified in the
+abstract syntax table is present).  If successful, the main simulation
+object (\code{daisy}) can be created from the information in the
+attribute list.  
+
+Th simulation object is then checked for internal consistency, and if
+successful the simulation is started.  The simulation may write data
+to a number of log files, as specified in the input.  The code on
+figure~\ref{fig:start-code} shows how all this is implemented in
+\cplusplus{}.
+
+\begin{figure}[htbp]
+\begin{verbatim}
+  // Initialize syntax and attribute list.
+  Syntax syntax;
+  AttributeList alist;
+  Daisy::load_syntax (syntax, alist);
+  Library::load_syntax (syntax, alist);
+
+  // Parse the file.
+  ParserFile parser (syntax, argv[1]);
+  parser.load (alist);
+
+  // Check the result.
+  if (!syntax.check (alist, "daisy"))
+    return 1;
+
+  // Create, check and run the simulation.
+  Daisy daisy (alist);
+  daisy.initialize (syntax);
+  if (!daisy.check ())
+    return 1;
+  daisy.run ();
+\end{verbatim}
+  \caption{Start Code}
+  \label{fig:start-code}
+\end{figure}
+
+The \code{daisy} object have some similarities to the remaining
+components in Daisy.  It has a static member \code{load\_syntax},
+which create the syntax for the object, as well as the the default
+values (if any).  It has a constructor for creating itself from an
+attribute list.  It has a \code{check} function for checking
+consistency.  The \code{run} function is unusual though, most other
+components have instead a \code{output} function for writing the state
+variables to a \emph{log}, and a \code{tick} function for performing
+the components duties in a single time step in the simulation.
+
+\subsection{Files}
+
+\begin{itemize}
+\item \file{main.C}, \file{main.h}: The command line parser for
+  the stand-alone daisy executable.
+\end{itemize}
+\pagebreak[0]{}
+
+\section{Adding a Component}
+\label{sec:add-component}
+
+The usual way to add a new component to a library is to copy an
+existing component, rename the file and classes, and edit the code to
+match the new functionality.  In this section will be explained how to
+add a new component from scratch. 
+
+\subsection{Overview}
+
+The short version is, you just need to define two classes, and a static
+variable.
+\begin{itemize}
+\item The first class implements the component.  It should be derived
+  from the main library class (to ensure it has the same interface as
+  the rest of the members of the library) and overwrite those virtual
+  functions whose implementation you want to change.
+\item The second class is responsible for registering the new
+  component.  It should define a static function for creating objects
+  of the component class and define an abstract syntax for that class.
+  The class constructor should register these in the library.
+\item The static variable should be of the second class.  The
+  \cplusplus{} language guarantees that global objects will be fully
+  constructed before the \code{main} function is called.  Since the
+  constructor registers the component in the library, all components
+  will be available at the time \code{main} is
+  called.\footnote{A separate problem is how to ensure the library
+  itself is properly constructed before any component tries to
+  register itself.  See \ref{new-libraries} for how this has been
+  solved.} 
+\end{itemize}
+
+In the following, a slightly simplified\footnote{The code for
+  implementing the nitrification has been left out, so only
+  administrative code remains.} version of the \code{solute} component
+of the \code{nitrogen} library will be dissected.
+
+\subsection{Include Files}
+
+The solute component is quite simple.  It is implemented in a single
+file, which contains some include statements, and then the two class
+definitions.  The include statements are shown in
+figure~\ref{fig:component-header}. 
+
+\begin{figure}[htbp]
+\begin{verbatim}
+  // nitrification_solute.C
+  
+  #include "nitrification.h"
+  #include "syntax.h"
+  #include "alist.h"
+  #include "log.h"
+\end{verbatim}
+  \caption{Component Header}
+  \label{fig:component-header}
+\end{figure}
+
+The \file{nitrification.h} file contains the \code{Nitrification} class,
+which all members of the nitrification library are derived from.  This
+ensures that all the components have the same interface to the rest of
+the system, and thus can be used interchangeably.  The
+\file{nitrification.h} file also contains code that ensures the
+library is initialized before the component is added.  The components
+of all libraries start by including the main header file for the
+library this way.
+
+The next three files are also common for most, if not all, libraries.
+\begin{itemize}
+\item \file{syntax.h} defines the \code{Syntax} class, which the
+  component uses to tell the parser which parameters it expects.
+\item \file{alist.h} defines the \code{AttributeList}, which the
+  parser uses to pass the parameter values back to the component. 
+\item \file{log.h} defines the interface to the log, where the
+  component write information about its state during the simulation.
+\end{itemize}
+
+Apart from these four include files, most components also include the
+header files for those other components of the simulation which it
+needs to communicate directly with.  In this case, the real
+nitrification solute component would include \file{soil.h},
+\file{soil\_water.h}, \file{soil\_heat.h}, \file{soil\_no3.h}, and
+\file{soil\_nh4.h}, since the \code{tick} function
+(see~figure\ref{fig:component-class}) uses these five components.
+
+\subsection{The Component Class}
+
+The component should derive a new class from the interface class
+defined in the library header file.  Figure~\ref{fig:component-class}
+shows how this is done. 
+
+\begin{figure}[htbp]
+\begin{verbatim}
+  class NitrificationSolute : public Nitrification
+  {
+    // Parameters.
+  private: 
+    const double k;
+    const double k_10;
+  
+    // Log variable.
+  private:
+    vector<double> converted;
+    
+    // Simulation.
+  public:
+    void output (Log& log, Filter& filter) const
+    { log.output ("converted", filter, converted, true); }
+    void tick (Soil&, SoilWater&, SoilHeat&, SoilNO3&, SoilNH4&);
+    { /* Details deleted */ }
+  
+    // Create.
+  public:
+    NitrificationSolute (const AttributeList& al)
+      : Nitrification ("solute"),
+        k (al.number ("k")),
+        k_10 (al.number ("k_10"))
+    { };
+  };
+\end{verbatim}
+  \caption{Component Class}
+  \label{fig:component-class}
+\end{figure}
+
+The main function is \code{tick}.  This is the function which performs
+the actual nitrification.  It is defined as a pure virtual function in
+\file{nitrification.h}, so it \emph{must} be defined in the component
+class.  In this case, the real tick function would convert \ammonium{}
+(from \code{SoilNO4}) to \nitrate{} (in \code{SoilNO3}).  The rate
+depends on the soils water content (found in \code{SoilWater}) and
+temperature (found in \code{SoilHeat}), as well as the two parameters
+\code{k} and \code{k\_10} which are specific to this component.  
+
+The amount converted nitrogen is stored in \code{converted}.  After
+each timestep, the \code{output} function will be called.  The two
+arguments are:
+\begin{itemize}
+\item \code{log}, which specify a destination and format for the
+  output.  Usually this is a log file full of parentheses.
+\item \code{filter}, which specifies which variables should be written
+  to the log.
+\end{itemize}
+The function \code{Log::output} will lookup \code{"converted"} in
+\code{filter}.  If it finds it, \code{Log::output} will write the
+(filtered) content of \code{converted} to \code{log}.  The fourth
+argument \code{true} specifies that the \code{converted} variable is
+for logging purpose only.  Some filters will use that information to
+decide whether a variables should be written to the log or not.
+
+Apart from parameters and log variables, there is a third kind of
+variables called \emph{state variables}.  These contains information
+that is carried over between timesteps.  The solute component doesn't
+need any of these, the nitrification depends solely on the state of
+the soil, not how much nitrogen has been converted earlier.  But e.g.
+the \code{SoilWater} component keeps information about the amount of
+water in the soil between time steps in a state variable, and
+\code{SoilHeat} keeps similar information about the soil temperature.
+State variables are a kind of hybrid.  They are initialized from the
+input just like the parameters, and can be written to the log just
+like the log variables.
+
+Speaking of initialization, this is done from the constructor.  The
+constructor is handed an attribute list with the information read by
+the parser, and initializes the parameters and state variables by
+looking up the values in the attribute list.  In this case, the
+constructor passes the name of the component to the super class,
+\code{Nitrification}.  The name is primarily used by filters, which
+can use it to decide whether this kind of nitrification is worth
+logging. 
+
+\subsection{The Syntax Class}
+
+The last problem is telling the library (and thus the world) that this
+wonderful new component is available, and what parameters it needs.
+The function which does this is called
+\code{Librarian<Nitrification>::add\_type}.  The function takes four
+arguments:
+\begin{itemize}
+\item A \emph{name} for the library component.
+\item An \emph{attribute list} containing default values for
+  parameters and state variables, if any.
+\item A \emph{syntax table} containing information about which
+  parameters, state variables, and log variables are used by the
+  component. 
+\item A \emph{creator} function, which takes an attribute list as an
+  argument, and returns a reference to a newly created object that
+  match (is derived from) the \code{Nitrification} class.
+\end{itemize}
+The problem is how to call this function?  The solution is to create a
+class with a constructor that calls
+\code{Librarian<Nitrification>::add\_type}, and declare a global
+variable of that type.  Figure~\ref{fig:component-syntax} shows how
+this is done.
+
+\begin{figure}[htbp]
+\begin{verbatim}
+  static struct NitrificationSoluteSyntax
+  {
+    static Nitrification& make (const AttributeList&)
+    { return *new NitrificationSolute (al); }
+    NitrificationSoluteSyntax ()
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add ("converted", Syntax::Number, Syntax::LogOnly, 
+                  Syntax::Sequence);
+      syntax.add ("k", Syntax::Number, Syntax::Const);
+      syntax.add ("k_10", Syntax::Number, Syntax::Const);
+      Librarian<Nitrification>::add_type ("solute", alist, syntax,
+                                          &NitrificationSoluteSyntax::make);
+    }
+  } NitrificationSolute_syntax;
+\end{verbatim}
+  \caption{Component Syntax}
+  \label{fig:component-syntax}
+\end{figure}
+
+The \code{NitrificationSoluteSyntax::NitrificationSoluteSyntax}
+constructor will call \code{Librarian<Nitrification>::add\_type}, and
+declare a global after creating a syntax table and attribute list to
+feed it.  \code{Nitrification\-Solute\-Syntax::make} is created to have a
+proper creator function.  It is not possible to use
+\code{Nitrification\-Solute::Nitrification\-Solute} directly, since it
+doesn't have the right return type.
+
+The constructor is called when the global variable
+\code{Nitrification\-Solute\_syn\-tax} is initialized.  The initialization
+of global variables is done automatically by the \cplusplus{}
+runtime.  
+
+The attribute list that is passed to
+\code{Librarian<Nitrification>::add\_type} is empty, because this
+nitrification model doesn't have any default values.  The user must
+specify them all in the input.  The syntax table is initialized by the
+three calls to \code{Syntax::add}.  The valid parameters to these
+calls are described in detail in section~\ref{sec:syntax}.
+The symbolic constants used in this code are:
+\begin{itemize}
+\item \code{Syntax::Number}: The value of this variable is a real
+  number.
+\item \code{Syntax::Sequence}: The value of this variables ia a
+  sequence.\footnote{Combined with \code{Syntax::Number}: The value of
+  this variable is a sequence of real numbers.}
+\item \code{Syntax::Const}: This variable is a parameter, i.e. its
+  value will not change during the simulation.  This tells the parser
+  that the variable can not be written to a log.
+\item \code{Syntax::LogOnly}: This variable is for logging purpose
+  only.  It can not appear in the input, except as part of a filter
+  specification. 
+\end{itemize}
+
+As might be apparent now, to create a new component you need to master
+both the syntax table and attribute list abstractions.  These will be
+described in the next sections.
+
+\subsection{Files}
+
+\begin{itemize}
+\item \file{librarian.h}: Implements the \code{Librarian} template.
+  This template contains code that makes it easier to create new
+  library members.
+\end{itemize}
+
+\section{Syntax Table}
+\label{sec:syntax}
+
+You can create an empty syntax table simply by calling
+\code{new~Syntax~()} as shown on figure~\ref{fig:component-syntax}.
+
+\subsection{Adding Information}
+\label{sec:syntax-add}
+
+Once you have created the syntax table object, you can specify the
+component parameters by calling \code{Syntax::add} repeatedly.  The
+normal form for \code{add} is:
+\begin{tt}
+  \begin{tabbing}
+    void Syntax::add (\=string \textit{name},\\
+                     \>Syntax::type, Syntax::category,\\
+                     \>int \textit{size} = Syntax::Singleton)
+  \end{tabbing}
+\end{tt}
+The four parameters are:
+\begin{enumerate}
+\item The \texttt{\emph{name}} of the parameter to add to the syntax
+  table. 
+\item The \code{type} of the parameter.  This could e.g. be
+  \code{Syntax::Number} for a floating point number, or
+  \code{Syntax::String} for a text string.  All the possible types are
+  described in section~\ref{sec:types}.
+\item The \code{category} of the parameter.  The following categories
+  are defined:
+  \begin{itemize}
+  \item \code{Syntax::Const}:
+    This is a constant parameter, i.e. its value doesn't change during
+    the compilation, and it cannot be written to the log.    
+  \item \code{Syntax::State}:
+    This a state variable, it must be provided at initialization
+    and can be written to the log.
+  \item \code{Syntax::Optional}:
+    This parameter is optional, i.e. it can be calculated from some of
+    the other parameters if not specified.  It can be used both for
+    state variables and constant parameters.
+  \item \code{Syntax::LogOnly}:
+    This is a variable that is only computed for logging purposes
+    and not a part of the simulation state. 
+  \end{itemize}
+\item The \texttt{\textit{size}} of the parameter.  This is by default
+  \code{Syntax::Singleton} meaning that it is a normal parameter with
+  only a single value.  It can also be a positive integer, meaning
+  that the value should be a fixed sized array with the specified
+  number of elements, or is can be \code{Syntax::Sequence} to specify
+  that it can be an array of any size.
+\end{enumerate}
+
+\subsection{Ordering Information}
+
+You can order the elements to allow a more compact (but less
+flexible) format in the parser.  For example, specification of the
+denitrification process usually looks like
+\begin{verbatim}
+  (Denitrification (K 0.0417)
+                   (alpha 0.1))
+\end{verbatim}
+If you ordered the two parameters \code{K} and \code{alpha} with a call to
+order like
+\begin{verbatim}
+  syntax.order ("K", "alpha");
+\end{verbatim}
+would reduce the denitrification description to
+\begin{verbatim}
+  (Denitrification 0.0417 0.1)
+\end{verbatim}
+This is not generally recommend, since you no longer can leave out one
+of the arguments, and the input is less self-explaining this way.
+
+There exist five \code{Syntax::order} functions, taking from one to
+five strings as arguments.  Any remaining unordered parameters can
+still be entered in the input file after the ordered ones.
+
+\subsection{Syntax Checking}
+
+The parser will ordinarily warn about unknown attributes or values of
+the wrong type.  The additional function 
+\code{bool Syntax::check (const AttributeList\&) const} will check
+that all the attributes specified in the syntax table have a value in
+the attribute list, except those declared \code{Syntax::Optional}.  If
+everything is ok, the function will return true.
+
+You can ask that further testing should be done, by specifying a check
+function when creating the syntax table.  This is done by specifying
+the functional as an argument to the \code{Syntax::Syntax}
+constructor.  The function should take a \code{const AttributeList\&}
+as an argument, and return a \code{bool}, with true indicating that no
+errors were found.  The function will then be called if no errors were
+found by the normal checking routine.  The function is allowed to write
+information about why the check failed to \code{cerr}.
+
+There are also some global functions, which can help you write such a
+checking routine:
+\begin{itemize}
+\item \code{void check (const AttributeList\& \textit{al},
+    string \textit{s}, bool\& \textit{ok})}\\
+  Check that \texttt{\textit{s}} is a member of \texttt{\textit{al}}. 
+\item \code{void non\_negative (double \textit{v},
+    string \textit{s}, bool\& \textit{ok}, int \textit{i} = -1)}\\
+  Check that $\texttt{\textit{v}}\geq{}0$.
+\item \code{void non\_positive (double \textit{v},
+    string \textit{s}, bool\& \textit{ok}, int \textit{i} = -1)}\\
+  Check that $\texttt{\textit{v}}\leq{}0$.
+\item \code{void is\_fraction (double \textit{v},
+    string \textit{s}, bool\& \textit{ok}, int \textit{i} = -1)}\\
+  Check that $0\leq{}\texttt{\textit{v}}\leq{}1$.
+\end{itemize}
+
+All the functions take an argument \texttt{\textit{s}}, which should
+be the name of the parameter to check, and a reference to boolean
+\texttt{\textit{ok}}.  If the check fails, the functions will write an
+error message to \code{cerr}, and set \texttt{\textit{ok}} to false.
+The optional argument \texttt{\textit{i}} specifies that the value is
+part of an array if \texttt{\textit{i}} is not negative, and what
+position in the array it has.  The index will be written as part of an
+error message.
+
+\subsection{Looking Up Information }
+
+There is no need to look up information in a syntax table when
+creating a new component, this is all done automatically by the
+parser.  However, it can be needed on other occasions.  
+
+The following \code{Syntax} member functions are available for looking
+up general information.
+\begin{itemize}
+\item \code{type lookup (string \textit{name}) const}\\
+  Return the type of the \texttt{\textit{name}} parameter.
+  \code{Syntax::type} is an enumeration, the possible values are
+  discussed in section~\ref{sec:types}.  The special value
+  \code{Syntax::Error} is returned if \texttt{\textit{name}} is not in
+  this syntax table.
+\item \code{bool is\_const (string \textit{name}) const}\\
+  Return true iff \texttt{\textit{name}} is the name of a constant
+  parameter. I.e. it \code{Syntax::Const} was specified as the
+  category when \texttt{\textit{name}} was added to the table.
+\item \code{int size (string \textit{name}) const}\\
+  Return the value of the \texttt{\textit{size}} that was specified
+  when \texttt{\textit{name}} was added to the table.
+\item \code{bool ordered () const}\\
+  Return true iff some members of the table are ordered.
+\item \code{const list<string>\& order () const}\\
+  Return a ordered list with the names of the ordered members, the
+  first member first in the list.
+\end{itemize}
+
+You should normally call \code{Syntax::lookup} before any of the other
+functions, to be certain the name is valid in the syntax table.  If
+you call the other functions with an invalid name, you will get a
+fatal run-time error.
+
+There are a few extra query function that are only defined for
+specific types.  These will be discussed in section~\ref{sec:types}. 
+
+\subsection{Files}
+
+\begin{itemize}
+\item \file{syntax.C}, \file{syntax.h}: Implements the
+  \code{Syntax} class.  A syntax table specifies the valid parameters
+  for an attribute list. 
+\end{itemize}
+
+\section{Attribute List}
+\label{sec:alist}
+
+You can create an empty attribute list simply by calling
+\code{new~AttributeList~()} as shown on
+figure~\ref{fig:component-syntax}.  Once you have created the
+attribute list object, you can specify default values for the
+component parameters by calling \code{AttributeList::add}. That
+functions takes two arguments:
+\begin{enumerate}
+\item The \texttt{\emph{name}} of the parameter to give a default
+  value. 
+\item The default \texttt{\emph{value}} for that parameter.  The
+  \texttt{\emph{value}} should be of the type that corresponds to the
+  type in the syntax table.  For example, if the type in the syntax
+  type is \code{Syntax::Number}, the default \texttt{\emph{value}}
+  should have the type \code{double}.  Section~\ref{sec:types}
+  specifies what \cplusplus{} type that corresponds to each of the
+  possible syntax types.
+\end{enumerate}
+
+\subsection{Creating Vectors}
+
+There are a number of templates intended to help create sequences of
+objects from attribute lists.
+\begin{itemize}
+\item \code{map\_create}: Create a vector of pointers to objects from
+  a vector of pointers to attribute lists.  The objects should be
+  members of a library.  Example:
+\begin{verbatim}
+  map_create<Log> (al.alist_sequence ("output"))
+\end{verbatim}
+
+\item \code{map\_create\_const}: Like \code{map\_create}, but the
+  created vector will contain pointers to constant objects instead.
+
+\item \code{map\_create1}: Like \code{map\_create}, but pass an extra
+  argument to the creator function.  Example:
+\begin{verbatim}
+    map_create1 <AM, const Soil&> (al.alist_sequence ("am"), soil)
+\end{verbatim}
+
+\item \code{map\_construct}: Like \code{map\_create}, but instead of
+  looking in a library, it will construct the specified type
+  directly.   
+
+\item \code{map\_construct1}:  Like \code{map\_construct}, but pass an
+  extra argument to the constructor.  Example:
+\begin{verbatim}
+    map_construct1<OM, const Soil&> (oms, soil)
+\end{verbatim}
+
+\item \code{map\_construct\_const}: Like \code{map\_construct}, but
+  the created vector will contain pointers to constant objects
+  instead.
+
+\end{itemize}
+Using them is not strictly necessary, but they can save some work.
+
+\subsection{Looking up Information}
+
+The \code{alist\_sequence} calls in the previous section are an
+example of how to look up information in the attribute list.  There
+are separate functions for lookup up attributes of each syntactical
+type, since each syntax type is represented by a separate \cplusplus{}
+type.  The functions are listed in section \ref{sec:types}.  There are
+also separate variants of the calls for looking up
+\code{Syntax::Singleton} attributes and attributes which can hold a
+sequence of values.  In general, the later return a vector of the
+appropriate \cplusplus{} type, and have appended \code{\_sequence} to
+the name.
+
+The function \code{bool AttributeList::check (string \textit{name})}
+will return \code{true} iff \texttt{\textit{name}} is defined in the
+attribute list.  For \code{Syntax::Optional} attributes, you will have
+to call this function before looking up the value.  Attempting to look
+up the value for a non-existing attribute will cause a fatal run-time
+error.  For all other categories of attributes (than those declared
+\code{Syntax::Optional}), the system will guarantee that the
+attributes are present when the object is created.
+
+\begin{itemize}
+\item \file{alist.C}, \file{alist.h}: Implements the
+  \code{AttributeList} class.  An attribute list contains a map from
+  attribute names to attribute values.
+\end{itemize}
+
+\section{Types}
+\label{sec:types}
+
+The available types are defined in the enum \code{Syntax::type}, which
+contains these values: \code{Number}, \code{Integer}, \code{Boolean},
+\code{String}, \code{CSMP}, \code{Date}, \code{AList}, \code{Object},
+\code{Library}, and \code{Error}.  In this section is explained how
+these works, and especially what types of values can be specified with
+them.  Additionally, the printed format -- as recognized by the
+\code{ParserFile} and generated by \code{LogFile} components -- is
+shown.  In the following subsection the \code{Syntax::Number} type
+will be described in detail, and the remaining types will be compared
+to that.
+
+\subsection{Number}
+
+The \textsc{api} for working with single values is quite different
+from the \textsc{api} for working with multiple values.  In the the
+following will be shown first an example where a parameter
+\texttt{\textit{foo}} has the number \texttt{\textit{0.0}} as the
+default value, then an example where \texttt{\textit{foo}} has the
+number sequence (\texttt{\textit{0.0}, \textit{1.0}}) as the default
+value.
+
+\subsubsection{Singleton}
+
+The \cplusplus{} representation of a single \code{Syntax::Number}
+value is \code{double}.
+
+To add \texttt{\textit{foo}} to the syntax table
+\texttt{\textit{syntax}}, call \code{Syntax::add} with
+\code{Syntax::Number} as the second category.
+\begin{center}
+  \begin{tt}
+    \textit{syntax}.add ("\textit{foo}", Syntax::Number, \textit{cat});
+  \end{tt}
+\end{center}
+The \code{Syntax::add} function and the \texttt{\textit{cat}}
+argument are discussed in section~\ref{sec:syntax-add}.
+
+To add \texttt{\textit{0.0}} as the default value for the parameter
+\texttt{\textit{foo}} in the attribute list \texttt{\textit{alist}},
+call \code{AttributeList::add} like this:
+\begin{center}
+  \begin{tt}
+    \textit{alist}.add ("\textit{foo}", \textit{0.0});
+  \end{tt}
+\end{center}
+The \code{AttributeList::add} function is 
+discussed further in section~\ref{sec:alist}.
+
+To store the value of the parameter \texttt{\textit{foo}} from the
+attribute list \texttt{\textit{alist}} in the variable
+\texttt{\textit{val}}, call \code{AttributeList::number} like this:
+\begin{center}
+  \begin{tt}
+    double \textit{val} = \textit{alist}.number ("\textit{foo}");
+  \end{tt}
+\end{center}
+
+The printed representation of the attribute, using either the 
+\code{ParserFile} or \code{LogFile} components, is:
+\begin{center}
+  \begin{tt}
+    (\textit{foo} \textit{0.0})
+  \end{tt}
+\end{center}
+
+To print the attribute value in a log from a component, call
+\code{Log::output} like this:
+\begin{center}
+  \begin{tt}
+    \textit{log}.output ("\textit{foo}", \textit{filter}, \textit{val})
+  \end{tt}
+\end{center}
+where \texttt{\textit{log}} and \texttt{\textit{filter}} are the
+arguments passed to the components own \code{output} function, and
+\texttt{\textit{val}} is the variable containing the state of
+\texttt{\textit{foo}}.
+
+\subsubsection{Vector}
+
+Sequences of attribute values are implemented in \cplusplus{} with the
+\textsc{stl} \code{vector} template.  A number sequence is thus a
+\code{vector<double>} in \cplusplus{}.
+
+To specify that the \texttt{\textit{foo}} parameter should hold a
+sequence, the fourth \texttt{\textit{size}} parameter must be
+specified in the call to \code{Syntax::add}.
+\begin{center}
+  \begin{tt}
+    \textit{syntax}.add ("\textit{foo}", Syntax::Number, 
+    \textit{cat}, \textit{size});
+  \end{tt}
+\end{center}
+The \texttt{\textit{size}} parameter can be an integer specifying the
+number of elements in the sequence, or \code{Syntax::Sequence}
+specifying that any number of elements are accepted.
+
+To add a default value, it is necessary to create a
+\code{vector<double>} object and initialize it, as shown on
+figure~\ref{fig:number-vector}.
+\pagebreak{}
+
+\begin{figure}[htbp]
+  \begin{tt}
+    vector<double>\& \textit{val} = *new vector<double> ();\\
+    \textit{val}.push\_back (0.0);\\
+    \textit{val}.push\_back (1.0);\\
+    \textit{alist}.add ("\textit{foo}", \textit{val});
+  \end{tt}
+  \caption{Adding a vector of doubles}
+  \label{fig:number-vector}
+\end{figure}
+You \emph{must} create the vector on the heap, it is the
+responsibility of \code{AttributeList} to delete it when it is not
+needed more.
+
+To extract the value, call \code{AttributeList::number\_sequence}.
+\begin{center}
+  \begin{tt}
+    vector<double> \textit{val} = \textit{alist}.number\_sequence
+    ("\textit{foo}");
+  \end{tt}
+\end{center}
+In general, you just add \code{\_sequence} to extract a sequence
+instead of a single value.
+
+In the printed representation, the values are simply separated by
+whitespace. 
+\begin{center}
+  \begin{tt}
+    (\textit{foo} \textit{0.0} \textit{1.0})
+  \end{tt}
+\end{center}
+This is true for all sequences.
+
+Sequences of values are printed to a log the same way as singleton
+values are.
+
+\subsection{Integer}
+
+The \code{Syntax::Integer} type is just like \code{Syntax::Number},
+except that:
+\begin{itemize}
+\item The \cplusplus{} type is \code{int}.
+\item The function to extract the value from the attribute list is\\
+  \code{AttributeList::integer}. 
+\end{itemize}
+
+\subsection{Boolean}
+
+The \code{Syntax::Boolean} type is just like \code{Syntax::Number},
+except that:
+\begin{itemize}
+\item The \cplusplus{} type is \code{bool}.
+\item The function to extract the value from the attribute list is\\
+  \code{AttributeList::flag}. 
+\end{itemize}
+
+The printed representation is for an \code{Syntax::Boolean} attribute
+named \texttt{\textit{foo}} is \texttt{(\textit{foo} false)} and
+\texttt{(\textit{foo true})} depending on its value.
+
+\subsection{String}
+
+The \code{Syntax::String} type is just like \code{Syntax::Number},
+except that:
+\begin{itemize}
+\item The \cplusplus{} type is \code{string} from the standard
+  \cplusplus{} library.
+\item The function to extract the value from the attribute list is\\
+  \code{AttributeList::name}. 
+\end{itemize}
+
+The printed representation has two forms
+\begin{center}
+  \begin{tt}
+    (\textit{foo} \textit{bar})\\
+    (\textit{foo} "\textit{some text}")
+  \end{tt}
+\end{center}
+
+In the first form, \texttt{\textit{bar}} must be a traditional
+identifier.  The first character must be a letter, while the remaining
+can be letters, digits, or underscores.
+
+In the second form, some text can contain any characters, with two
+caveats.  Any double quotes (`\texttt{"}') or backslashes
+(`\texttt{$\backslash{}$}') must be escaped with a backslash.
+
+\subsection{CSMP}
+
+A \emph{\textsc{csmp}} is a piecewise linear function, defined by a
+number of points.  The \textsc{csmp} will assume the function is
+linear between the points.  In Daisy, a \textsc{csmp} is implemented
+in the \code{CSMP} class.  See the file \file{csmp.h} for information
+about how to use this class.
+
+The \code{Syntax::CSMP} type is just like \code{Syntax::Number},
+except that:
+\begin{itemize}
+\item The \cplusplus{} type is \code{const CSMP\&}.
+\item The function to extract the value from the attribute list is\\
+  \code{AttributeList::csmp}. 
+\item The \cplusplus{} representation for a sequences are vectors of
+  pointers to constant \code{CSMP} objects.
+\end{itemize}
+
+The printed representation is a whitespace separated list of points,
+each point consisting of two whitespace separated numbers, surrounded
+by parentheses.
+\begin{center}
+  \begin{tt}
+    (\textit{foo} (\textit{0.0} \textit{1.0}) (\textit{2.0} \textit{0.0}))
+  \end{tt}
+\end{center}
+The example above shows a function where $\mbox{foo}\,(0) = 1$ and
+$\mbox{foo}\,(2) = 0$. By linear interpolation we get that
+$\mbox{foo}\,(1) = 0.5.$
+
+\subsection{Date}
+
+The \code{Syntax::Date} type is used for specifying a point in time.
+In \cplusplus{} it is represented by the \code{Time} class, described
+in the file \file{time.h}.
+
+The \code{Syntax::Date} type is just like \code{Syntax::Number},
+except that:
+\begin{itemize}
+\item The \cplusplus{} type is \code{const Time\&}.
+\item The function to extract the value from the attribute list is\\
+  \code{AttributeList::time}. 
+\item The \cplusplus{} representation for a sequences are vectors of
+  pointers to constant \code{Time} objects.
+\end{itemize}
+
+The printed representation is four integers; year, month, day in
+month, and hour, separated by whitespace.
+\begin{center}
+  \begin{tt}
+    (foo 1965 07 20 02)
+  \end{tt}
+\end{center}
+
+\subsection{AList}
+
+Attribute lists can be nested within other attribute lists.  This is
+what the \code{Syntax::Alist} type specifies.  How to work with
+attribute lists is what is being described in this section, as well as
+the two previous sections.  
+
+To specify a nested attribute list in a syntax table, call
+\code{Syntax::add} with a syntax as the second element.
+\begin{center}
+  \begin{tt}
+    \textit{syntax}.add ("\textit{foo}", 
+                         \textit{nested\_syntax}, \textit{cat})
+  \end{tt}
+\end{center}
+The syntax you pass as the second argument will specify the valid
+attributes for the attribute table.  The syntax can be retrieved again
+by calling \code{Syntax::syntax}.
+\begin{center}
+  \begin{tt}
+    const Syntax\& \textit{nested\_syntax}
+      = \textit{syntax}.syntax ("\textit{foo}")
+  \end{tt}
+\end{center}
+
+You can extract the nested attribute list by calling
+\code{Attribute::alist}.
+\begin{center}
+  \begin{tt}
+    const AttributeList\& \textit{nested\_alist} 
+      = \textit{alist}.alist ("\textit{foo}")
+  \end{tt}
+\end{center}
+
+The \code{add\_submodule} template will add the nested syntax table
+and default value for a nested (non-library) component.  The class
+implementing the nested component must define a static
+\code{load\_syntax} function, taking a syntax and an attribute list as
+an argument, and add information about its parameters.
+\begin{center}
+  \begin{tt}
+    add\_submodule<\textit{Foo}> ("\textit{foo}",
+                                 \textit{syntax}, \textit{alist});
+  \end{tt}
+\end{center}
+Here, \texttt{\textit{Foo}} is the name of the class implementing the
+nested component, \texttt{\textit{foo}} is the name the nested
+component will have in the component currently being defined, and
+\texttt{\textit{syntax}} and \texttt{\textit{alist}} are the syntax
+table and attribute list for the component currently being defined. 
+
+The \code{output\_submodule} template will write the nested component
+to a log.  Example:
+\begin{center}
+  \begin{tt}
+    output\_submodule (\textit{val}, "\textit{foo}", 
+                       \textit{log}, \textit{filter});
+  \end{tt}
+\end{center}
+where \texttt{\textit{val}} is the variable holding the nested
+component, and the remaining parameters are defined as for
+\texttt{Syntax::Number}. 
+
+The printed representation can look like
+\begin{center}
+  \begin{tt}
+    (\textit{foo} (\textit{bar} \textit{0.0}) (\textit{baz} \textit{1.0}))
+  \end{tt}
+\end{center}
+if \texttt{\textit{foo}} for e.g.\ has two members of type
+\code{Syntax::Number} named \texttt{\textit{bar}} and
+\texttt{\textit{baz}}. 
+
+\subsection{Object}
+
+The value for a \code{Syntax::Object} parameter in the attribute list
+is also an attribute list, but the attribute list can match the syntax
+of any component in a specific library.  It is this way you specify
+that a parameters value should be an object of a particular library.
+
+To specify a library object in a syntax table, call
+\code{Syntax::add} with the library as the second element.
+\begin{center}
+  \begin{tt}
+    \textit{syntax}.add ("\textit{foo}", 
+                         Librarian<\textit{Foo}>::library (),
+                         \textit{cat})
+  \end{tt}
+\end{center}
+The library can be retrieved again
+by calling \code{Syntax::syntax}.
+\begin{center}
+  \begin{tt}
+    const Library\& \textit{library}
+      = \textit{syntax}.library ("\textit{foo}")
+  \end{tt}
+\end{center}
+
+You can extract the value (a nested attribute list) as for
+\code{Syntax::Alist}.  The nested attribute list will always have an
+extra \code{"type"} parameter (not mentioned in the syntax) of type
+\code{Syntax::String}.  The value will be the name of the library
+component the user specified.
+
+The normal way to use the attribute list is to pass it to the
+library's \code{create} function, like this:
+\begin{center}
+  \begin{tt}
+    \textit{Foo}\& \textit{foo}
+      = Librarian<\textit{Foo}>::create (al.alist ("\textit{foo}")
+  \end{tt}
+\end{center}
+This will create a new \code{Foo} object.  It is your duty to delete
+the object after use.
+
+The \code{output\_derived} template will write the object to a log.
+Example: 
+\begin{center}
+  \begin{tt}
+    output\_derived (\textit{val}, "\textit{foo}", 
+                     \textit{log}, \textit{filter});
+  \end{tt}
+\end{center}
+where \texttt{\textit{val}} is the variable holding the nested
+component, and the remaining parameters are defined as for
+\texttt{Syntax::Number}. 
+
+The printed representation will look like
+\begin{center}
+  \begin{tt}
+    (\textit{foo} \textit{xyzzy} 
+      (\textit{bar} \textit{0.0}) (\textit{baz} \textit{1.0}))
+  \end{tt}
+\end{center}
+if the value of the parameter \texttt{\textit{foo}} is the component
+\texttt{\textit{xyzzy}}, which itself has two members of type
+\code{Syntax::Number} named \texttt{\textit{bar}} and
+\texttt{\textit{baz}}.
+
+\subsection{Library}
+
+The \code{Syntax::Library} type doesn't correspond to any value in the
+attribute list.  It is used for telling the parser that the user is
+allowed define new members of a specific library at this position.  In
+Daisy, it is only used for the top level syntax, which means that the
+user can not define new library members inside the definition of
+another object.
+
+The main function is \code{Syntax::add\_library}, which is called like
+this:
+\begin{center}
+  \begin{tt}
+    \begin{tabbing}
+      \textit{syntax}.add\_library (\="\textit{deffoo}",\\
+                                   \>Librarian<\textit{Foo>}::library ())
+    \end{tabbing}
+  \end{tt}
+\end{center}
+This will allow the user to define objects of type
+\texttt{\textit{Foo}} within \texttt{\textit{syntax}} in the input
+file.  
+
+The parameters are
+\begin{enumerate}
+\item The name the user should write when defining new members of the
+  library.
+\item The library.
+\end{enumerate}
+
+However, normally this is done automatically for all libraries
+with the call to \texttt{Library::load\_syntax}, as shown on
+figure~\ref{fig:start-code}. 
+
+In the parser, a definition of a new \texttt{\textit{foo}} object
+could look like this:
+\begin{center}
+  \begin{tt}
+    (deffoo \textit{new} \textit{xyzzy} 
+      (\textit{bar} \textit{0.0}) (\textit{baz} \textit{1.0}))
+  \end{tt}
+\end{center}
+where \textit{new} is the name of the new member,
+\texttt{\textit{xyzzy}} is the name of an existing member, which has
+(at least) two parameters of type \code{Syntax::Number} named
+\texttt{\textit{bar}} and \texttt{\textit{baz}}.
+\subsection{Error}
+
+No value.  Used by \code{Syntax::lookup} to indicate that the name
+isn't defined in the syntax table.
+
+\subsection{Files}
+
+\begin{itemize}
+\item \file{csmp.C}, \file{csmp.h}: Implements the \code{CSMP} class.
+  Allows easy definition of a piecewise linear function.
+\item \file{time.C}, \file{time.h}: Implements the \code{Time} class.
+  Remembers a date and an hour.
+\end{itemize}
+
+\section{Creating New Libraries}
+\label{new-libraries}
+
+\todo{This section should explain how you create a new library.}
+
+\subsection{Files}
+
+\begin{itemize}
+\item \file{library.C}, \file{library.h}: Implements the
+  \code{Library} class.  Each library manages a collection of
+  different objects with an identical interface.
+\end{itemize}
+
+\section{Generic Libraries}
+
+This section describes the libraries that are not specific for the
+Daisy model.
+
+\subsection{Parser}
+
+A parser reads information from someplace external to the simulation.
+It does this according to an abstract syntax, and stores the
+information in an attribute list.  The parser decide where the
+information should be read from, and what format it should be in.
+
+\todo{List parsers.}
+
+\subsection{Log}
+
+A log stores information in somewhere external to the simulation.  The
+log decides where the information should be stored, and in what
+format.
+
+\todo{List logs.}
+
+\subsection{Filters}
+
+Filters control the output the same way the syntax tables control the
+output.  A filter doesn't decide \emph{how} or \emph{where} the
+information should be presented.  But it does decide \emph{what}
+information should be presented.
+
+\todo{List filters.}
+
+\subsection{Files}
+
+\begin{itemize}
+\item \file{parser.C}, \file{parser.h}: Implements the \code{Parser}
+  library.
+  \begin{itemize}
+  \item \file{parser\_file.C}, \file{parser\_file.h}:  Parses a file
+    with many parentheses.
+  \end{itemize}
+\item file{log.C}, \file{log.h}: Implements the \code{Log} library.
+  \begin{itemize}
+  \item \file{log\_file.C}:  Writes a file with many parentheses.
+  \end{itemize}
+\item \file{filter.C}, \file{filter.h}: Implements the \code{Filter}
+  library. 
+  \begin{itemize}
+  \item \file{filter\_all.C}: Passes everything to the log. 
+  \item \file{filter\_checkpoint.C}: Passes what is needed for a
+    checkpoint to the log.
+  \item \file{filter\_some.C}: Passes only the specified attributes to
+    the log.
+  \item \file{filter\_none.C}: Passes nothing to the log.
+  \item \file{filter\_array.C}: Select and accumulate information from
+    the array before passing it to the log.
+  \end{itemize}
+\end{itemize}
+
+\section{Daisy}
+\label{daisy}
+
+This section describes the components that are specific for the Daisy
+simulation.
+
+\todo{This section should actually do two things.  List all the Daisy
+  libraries along with theit standard members, and explain how the
+  components are related (nested within each other) within Daisy.  It
+  might be best to split them in two sections.}
+
+\subsection{Files}
+
+\todo{These should be organized logically, not alphabetically.}
+
+\begin{itemize}
+\item \file{action.C}, \file{action.h}: Implements the \code{Action}
+  library.  An action is some external change to the soil/crop system
+  made during the simulation, typically made by a farmer.
+  \begin{itemize}
+  \item \file{action\_fertilize.C}: Fertilize.
+  \item \file{action\_harvest.C}: Harvest one or all crops.
+  \item \file{action\_irrigate.C}: Irrigate.
+  \item \file{action\_sow.C}: Sow a crop.
+  \item \file{action\_tillage.C}: Tillage.
+  \item \file{action\_stop.C}: Stop the simulation.
+  \item \file{action\_lisp.C}: Control structures for selecting between
+    actions.
+  \item \file{action\_with.C}: Limit nested action to a particular
+    column.
+  \end{itemize}
+\item \file{am.C}, \file{am.h}: Mixure of organic and inorganic
+  matter that are or can be added to the soil.
+\item \file{bioclimate.C}, \file{bioclimate.h}: The microclimate near
+  the crops.
+\item \file{column.C}, \file{column.h}:  Implemenmts the column
+  library.  A column is an one dimensional model soil/crop system.
+  \begin{itemize}
+  \item \file{column\_std.C}: The standard implementation.
+  \end{itemize}    
+\item \file{condition.C}, \file{condition.h}:  Implements the
+  \code{Condition} library.  A condition is a logic statement which
+  depends on the state of the simulation.
+  \begin{itemize}
+  \item \file{condition\_logic.C}: Implements logic functions on nested
+    conditions.
+  \item \file{condition\_time.C}: Conditions based on the current time.
+  \end{itemize}
+\item \file{crop.C}, \file{crop.h}:  Implements the \code{Crop}
+  library. 
+  \begin{itemize}
+  \item \file{crop\_std.C}: The standard crop model.
+  \item \file{crop\_sold.C}: An approximation to the old crop model
+    for potatoes and beet.
+  \item \file{crop\_old.C}: An approximation to the old crop model for
+    other crops.
+  \end{itemize}
+\item \file{daisy.C}, \file{daisy.h}:
+\item \file{denitrification.C}, \file{denitrification.h}:
+\item \file{geometry.C}, \file{geometry.h}:
+\item \file{groundwater.C}, \file{groundwater.h}:  Implements the
+  \code{groundwater} library.
+  \begin{itemize}
+  \item \file{groundwater\_static.C}: Static groundwater table.
+  \end{itemize}
+\item \file{harvest.C}, \file{harvest.h}:
+\item \file{horizon.C}, \file{horizon.h}: Implements the
+  \code{Horizon} library.  A horizon describes a particular soil
+  type.  There can be several horizons in the same column in different
+  depth.
+  \begin{itemize}
+  \item \file{horizon\_std.C}:
+  \end{itemize}
+\item \file{hydraulic.C}, \file{hydraulic.h}: Implements the
+  \code{Hydraulic} library.  These components determine the soils
+  hydraulic paramters.
+  \begin{itemize}
+  \item \file{hydraulic\_B\_BaC.C}:
+  \item \file{hydraulic\_B\_C.C}:
+  \item \file{hydraulic\_B\_vG.C}:
+  \item \file{hydraulic\_M\_BaC.C}:
+  \item \file{hydraulic\_M\_C.C}:
+  \item \file{hydraulic\_M\_vG.C}:
+  \item \file{hydraulic\_mod\_C.C}:
+  \item \file{hydraulic\_old.C}:
+  \item \file{hydraulic\_old2.C}:
+  \item \file{hydraulic\_yolo.C}:
+  \end{itemize}
+\item \file{im.C}, \file{im.h}:
+\item \file{mike\_she.C}, \file{mike\_she.h}:  Interface to
+  \textsc{dhi}'s \textsc{mike/she} model.
+\item \file{nitrification.C}, \file{nitrification.h}: Implements the
+  \code{Nitrification} library.  Nitrification turns ammonium into
+  nitrate.
+  \begin{itemize}
+  \item \file{nitrification\_soil.C}:  Rate is based on soil content
+    of ammonium.
+  \item \file{nitrification\_solute.C}: Rate is based on solute content
+    of ammonium.
+  \end{itemize}
+\item \file{om.C}, \file{om.h}:
+\item \file{options.C}, \file{options.h}:
+\item \file{organic\_matter.C}, \file{organic\_matter.h}:
+\item \file{snow.C}, \file{snow.h}:
+\item \file{soil.C}, \file{soil.h}:
+\item \file{soil\_NH4.C}, \file{soil\_NH4.h}:
+\item \file{soil\_NO3.C}, \file{soil\_NO3.h}:
+\item \file{soil\_heat.C}, \file{soil\_heat.h}:
+\item \file{soil\_water.C}, \file{soil\_water.h}:
+\item \file{solute.C}, \file{solute.h}:
+\item \file{surface.C}, \file{surface.h}:
+\item \file{uzmodel.C}, \file{uzmodel.h}:  Implements the
+  \code{UZmodel} library.  An \textsc{uz} model controls how we
+  calculate water transport.
+  \begin{itemize}
+  \item \file{uzrichard.C}: Solve Richard's Equation for water
+    transport. 
+  \end{itemize}
+\item \file{weather.C}, \file{weather.h}:  Implements the
+  \code{Weather} library.
+  \begin{itemize}
+  \item \file{weather\_file.C}: Reads weather date from a file.
+  \item \file{weather\_none.C}: No weather.
+  \item \file{weather\_simple.C}: Very simple weather model.
+  \end{itemize}
+\end{itemize}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

@@ -1,0 +1,1807 @@
+%%% tutorial.tex -- A tutorial for the Daisy crop/soil system.
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{hyperref}
+
+\bibliographystyle{apalike}
+
+\input{macro}
+
+\begin{document}
+
+\section*{\Daisy{} Tutorial}
+
+\begin{abstract}
+  Welcome to the \daisy{} tutorial.  This document is intended to
+  teach the use of \daisy{} by example.  It is not by any stretch of
+  the imagination a reference to all the features of \daisy{}, for
+  that see~\cite{dina81}.  It also does not attempt to explain the
+  mathematical and physical models implemented by the \daisy{}
+  software, for that see~\cite{daisy-def} and~\cite{daisy-new}.
+  
+  I hope that you will able to get started with \daisy{} from these
+  examples, and when you need to go beyond will be familiar enough
+  with the system to make good use of the reference manual.  \Daisy{}
+  has an amazing number of adjustable dials and wheels, only a tiny
+  fraction of which are explained here.  However, they are all at
+  least mentioned in the reference manual, which is mostly
+  automatically generated from the \texttt{daisy} executable itself.
+  
+  If you have questions or suggestions to either the manual or the
+  \daisy{} system itself, feel free to contact the authors at\linebreak{}
+  \href{mailto:daisy@dina.kvl.dk}{\texttt{$<$daisy@dina.kvl.dk$>$}}.
+\end{abstract}
+
+Per Abrahamsen, \today{}.
+
+\tableofcontents
+
+\section{Retrieving and installing the files}
+\label{sec:install}
+
+We start by retrieving the files.  With a web browser, go to the
+address~\url{http://www.dina.kvl.dk/~daisy/}, the home page of the
+\daisy{} project.  From there, you should download the following
+items:
+\begin{description}
+\item[Daisy Description] For information about the mathematical and
+  physical models in \daisy{}.
+\item[Daisy Tutorial] You already got this, but if you are reading
+  this from an old printout, you might want to get a newer version.
+\item[Daisy Program Reference Manual] Sooner or later, you will need
+  the reference manual.  I suggest that you get the \textsc{pdf}
+  version (see under the ``Distribution'' header), which is both
+  properly formatted (unlike the \textsc{html} version), easy to
+  browse, and easy to print.
+\item[command line executable] Download the version for the platform
+  you use.  If you don't know what I mean by this, you are most likely
+  using ``win32''.
+\item[parameter library] This is a zip file containing containing
+  standard parameterizations of e.g.\ crops.  You will need this.  You
+  will also need a program to unzip the file, download it from a place
+  like \url{http://www.tucows.com/} if you haven't already got it.
+  Search for unzip.
+\item[weather file] The weather file contain observations from the KVL
+  research station in Taastrup, Denmark.  Most likely, you will
+  eventually want weather data from closer to home, but this file will
+  get you started.
+\item[log file viewer] \Daisy{} stores the results of its simulations
+  in log files (with the extension \texttt{.dlf}).
+  \texttt{ShowDaisyOutput.exe} is a win32 program that will show the
+  content of these log files graphically, it can even animate some of
+  the data.
+\end{description}
+
+Store all the files in the same directory, unzip the parameter
+library, open a shell or command prompt, and run the command
+\texttt{daisy test.dai} to check that everything works.  It should
+start printing dates to show the progress of the simulation.  After
+simulation has finished, you can browse the `\texttt{daisy.log}' file
+to see the output again.
+
+\section{Example}
+
+The \texttt{test.dai} file contain all the information about the
+simulation.  We call such a file a \daisy{} setup file, or a
+\texttt{.dai} file for short.  By convention, we give such files the
+\texttt{.dai} extension, even though \daisy{} doesn't care.  Teaching
+you to write \daisy{} setup files is the main purpose of this
+tutorial.
+
+First, let's examine line by line the content of the \texttt{test.dai}
+file (see appendix~\ref{app:test} for the full version).  The first
+lines are
+
+\begin{verbatim}
+  ;;; test.dai -- Sample file using the Daisy libraries.
+
+  (description "Simulation for use in tutorial.")
+\end{verbatim}
+
+Semicolons are used for comments, everything from the semicolon to the
+end of the line is ignored by \daisy{}.  This can (and should!) be
+used to put information about the simulation there for the person
+reading the file.  That person may very well be you, who some month
+(or years) later have forgotten about the purpose of this particular
+simulation.
+
+For the same reason, providing a description as above is also a good
+idea.  The description will be written to the log files produced by
+\daisy{}, allowing you to later see what log files come from what
+simulation.
+
+\subsection{Input files}
+\label{sec:ex-input}
+
+\begin{verbatim}
+  ;; Use standard parameterizations.
+  (input file "tillage.dai")
+  (input file "crop.dai")
+  (input file "log.dai")
+\end{verbatim}
+
+Here, we tell \daisy{} to read three additional files:
+\texttt{tillage.dai} containing descriptions of various standard
+tillage operations, such as plowing and seed bed preparation;
+\texttt{crop.dai} which contains descriptions of crops like spring
+barley or rye; and \texttt{log.dai} with directives for \daisy{} to
+produce files with information about various aspects of the
+simulation, such as the nitrogen or water balance.  You can read more
+about input files in section~\ref{sec:files}.
+
+\subsection{Weather}
+
+\Daisy{} need to know what the weather is during the simulation.  This
+is usually read from a file.
+
+\begin{verbatim}
+  ;; Weather data.
+  (weather default "weather.dwf")
+\end{verbatim}
+
+Here we specify where \daisy{} should find the weather data.  \Daisy{}
+can read weather data in several different formats, the
+\texttt{default} format is \texttt{.dwf}, short for \emph{D}aisy
+\emph{W}eather \emph{F}ormat.  The format is specified in an appendix
+ of \cite{dina81}.
+
+\subsection{Horizons}
+\label{sec:ex-hor}
+
+Now we get to main part of the simulation, namely the soil profile, or
+\emph{column}.  In \daisy{}, the column is a one dimensional
+description of an agricultural system, with the weather at the top and
+the groundwater at the bottom.  Before coming to that, we need to
+define two horizons.  A horizon is a vertical layer of soil with
+similar chemical and physical properties.  If you make a vertical cut
+in the soil, their is usually a clear visual distinction between the
+horizons.
+
+\begin{verbatim}
+  ;; We have some very sandy soil.
+  (defhorizon Ap default
+    (clay 8.0 [])
+    (silt 10.5 [])
+    (coarse_sand 63.4 [])
+    (fine_sand 16.5 [])
+    (humus 1.12 [])
+    (SOM_fractions 0.66 0.34 []))
+\end{verbatim}
+
+Here, we define a horizon named \texttt{Ap} (\texttt{defhorizon} is
+short for ``define horizon'').  Like the place where we specified the
+weather, the \texttt{default} keyword means that we use the default
+model for specifying horizons.  At this point it is our only choice,
+but that will soon change.
+
+The first four parameters, \texttt{clay}, \texttt{silt},
+\texttt{coarse\_sand}, and \texttt{fine\_sand} together define the
+soil texture.  The texture affects many aspects of the simulation, for
+example will the ammonium adsorption depend on the clay content, and
+if not otherwise specified, the hydraulic parameters such as soil
+water retention characteristics are also estimated from the texture, a
+sandy soil is less capable of storing water than a clay soil.
+
+The fifth soil constituent is the humus, which among other thing
+creates the background mineralization, thus providing the soil with
+nitrogen.  The numbers given for the five soil constituents are
+relative, that is they are weighted to the total.  So you can specify
+them as fractions or percentage or whatever, as you wish.
+
+The last parameter, \texttt{SOM\_fractions}, divides the humus into a
+slow and a fast pool.  This affects background mineralization.  In
+general, the longer time the soil have been used for agriculture, the
+larger a fraction is in the slow pool.  Use of organic fertilizer
+increases the amount in the fast pool, and the top horizon tend to have
+more humus in the fast pool than the lower horizons.
+
+Note that all the parameters end with a \verb|[]|.  This is the
+dimension surrounded by square brackets.  Since fractions are
+dimnesionsless, there is nothing in the brackets.  More interesting
+dimensions will occur later.
+
+The next horizon is simpler.
+
+\begin{verbatim}
+  (defhorizon C Ap
+    (humus 0.12 [])                     ;Less humus.
+    (SOM_fractions 0.80 0.20 []))       ;Slower background mineralization.
+\end{verbatim}
+
+Here, instead of \texttt{default}, we write \texttt{Ap}.  This is the
+name of the horizon we just defined, and will cause \daisy{} to reuse
+the parameter values in the new horizon named \texttt{C} we
+define here.  In particular, we give it the same texture as the
+\texttt{Ap} horizon.  However, since the horizon is intended to
+describe lower soil, we specify less humus, and put more of the humus
+in the slow pool.  This will cause a much lower background
+mineralization.
+
+\subsection{Column}
+\label{ex:column}
+
+Now we have described two horizons, we can describe a column.
+
+\begin{verbatim}
+  ;; We build the column from the horizons.
+  (defcolumn Andeby default
+    "Data collected by F.Guf at the B.And farm, Andeby, 2002."
+    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+          (zplus -2.5 -5 -10 -15 -20
+                 -25 -30 -40 -50 -60 -70
+                 -80 -90 -100 -125 -150 -175
+                 -200 -225 -250 [cm])
+          (MaxRootingDepth 60.0 [cm]))
+    (Groundwater deep))
+\end{verbatim}
+
+Here, we name the column \texttt{Andeby}, and use the \texttt{default}
+model for \daisy{} columns\footnote{An alternative at this point would
+  be to use the \texttt{inorganic} column model, which does not
+  perform any calculations regarding organic matter, thus saving
+  time.}.  The string following the \texttt{default} serves as a
+description, it is a good place to note who collected the date, from
+where, and when.
+
+In \daisy{}, a column consist of many separate subsystems.  Most of
+these have default values, and does thus not need to be specified.
+However, we need a description of the soil, and we need to tell
+\daisy{} where the groundwater is.  See section~\ref{sec:column} for
+other examples of other subsystems.
+
+\begin{verbatim}
+    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+\end{verbatim}
+The first soil parameter, \texttt{horizons}, specify that the soil is
+divided into two horizons, the first span the top 20 cm of the soil,
+and the second span the soil from there down to 2.5 meters depth.
+There can be as many horizons as you wish, if you had a third it might
+be described as below.
+
+\begin{verbatim}
+  (horizons (-20 [cm] Ap) (-1 [m] B) (-2.5 [m] C))
+\end{verbatim}
+
+The B horizon would then span the depth from 20 cm to 1
+meter.
+
+You may note that we specify the depth in \verb|[cm]| for the first
+depth, and \verb|[m]| for the next.  If you don't specify a dimension,
+\daisy{} will expect numbers to be in centimeters, however if you
+specify the dimension as \verb|[m]| knows how to convert.  It is good
+idea always to specify the dimension, as this will allow \daisy{} to
+check that dimension really is what you think it is.
+Misunderstandings about dimensions are a very common source of errors.
+
+Next we specify the a numeric discretization of the soil with the
+\texttt{zplus}, used by \daisy{} for storing and calculating the state
+of the soil at various depth.  Like for the horizons, we list the
+endpoints of each numeric layer (or \emph{node}) from the top to the
+bottom.  The \verb|[cm]| at the end of the list indicates that all the
+previous numbers are given in cm.
+
+Choosing a discretization is an art.  A fine discretization causes more
+exact results, but slows down the simulation, and very fine
+discretization may cause numeric problems.  A good rule of thump is to
+use small intervals at the top (one or two cm) where most of the
+action is, and use larger steps (dozens of cm) near the bottom, where
+things are more quiet, at least with a fixed groundwater level.
+
+A hard rule is that numeric layers may not cross horizon boundaries,
+which mean the end points in the horizon list must also be somewhere
+in the zplus list.
+
+The final mandatory soil parameter is \texttt{MaxRootingDepth}.  This
+is a soil imposed barrier for the roots, they will not penetrate below
+that depth.  To make writing \daisy{} setup files fun, as well as to
+keep you alert, this number is specified as positive depth, unlike the
+layer endpoints which were specified as negative heights.  \Daisy{}
+will tell you if you get it wrong.
+
+After specifying the Soil, we must tell \daisy{} the location of the
+groundwater.  Here, we specify that the groundwater is located so deep
+that it does not directly affect the simulation.  Other options
+include a constant groundwater table, field drainage, and a variable
+groundwater table specified in a file.  See
+section~\ref{sec:groundwater} for examples.  Apart from soil and
+groundwater, there are many more submodels you can specify here,
+see section~\ref{sec:column} for more examples.
+
+We have now specified a column, and given it the name \texttt{Andeby}.
+Now we just need to tell \daisy{} to use this column for the
+simulation.
+
+\begin{verbatim}
+  ;; Use it.
+  (column Andeby)
+\end{verbatim}
+
+\subsection{Time}
+
+After specifying the most complex \daisy{} parameter, the column, we
+relax with the simplest parameter.
+
+\begin{verbatim}
+  ;; Simulation start date.
+  (time 1986 12 1 1)
+\end{verbatim}
+
+As the comment say, that time we start the simulation.  The four
+numbers given are year, month, day and hour in that sequence.
+
+\subsection{Management}
+\label{sec:ex-man}
+
+Back to the complex stuff.  \Daisy{} now knows about the piece of land
+we want to simulate, the weather during the simulation, and when we
+start.  However, since this is an agricultural system, we also need to
+tell \daisy{} about the what management operations the farmer perform
+during the simulation.
+
+How to approach this problem depends on whether we are simulating a
+real, already performed, experiment, or if we want to simulate a
+hypothetical situation.  The difference is that in the first case, we
+(hopefully) \emph{know} what the manager did, and when.  In the second
+case, we need to build in some intelligence in the system, so the
+actions of the hypothetical manager depend on the state of the system.
+E.g. the manager is likely to wait for a crop to become ripe before
+harvesting it.
+
+In this example, we do both.
+
+\begin{verbatim}
+  (manager activity
+    (wait (at 1987 3 20 1))
+    (plowing)
+    (wait (at 1987 4 4 1))
+    (fertilize mineral
+               (weight 100.0 [kg N/ha])
+               (NH4_fraction 0.5 []))
+    (wait (at 1987 4 5 1))
+    (progn
+      (sow "Grass")
+      (sow "Spring Barley"))
+    (wait (or (crop_ds_after "Spring Barley" 2.0)
+              (at 1987 9 5 1)))
+    (harvest "Spring Barley")
+    (wait (at 1987 9 8 1))
+    (fertilize mineral
+               (weight 80.0 [kg N/ha])
+               (NH4_fraction 0.5 []))
+    (wait (at 1987 10 10 1))
+    (harvest "Grass"
+             (stub 8.0 [cm])              ;Leave 8 cm stub.
+             (stem 1.00 []))             ;Harvest everything above stub.
+    (wait (at 1988 4 1 1))
+    (stop))
+\end{verbatim}
+
+First, \texttt{activity} is an order to perform the specified actions
+in sequence.  When one action is done, we start the next.  Half of out
+actions consist of waiting for some condition to come true.  The most
+common condition is that we have reached a specific point in time.
+For examples, the first line
+
+\begin{verbatim}
+    (wait (at 1987 3 20 1))
+\end{verbatim}
+
+mean wait until the simulation time is exactly 1:00~AM, March the
+20th, 1987.  Our specific action is \texttt{wait} and the condition is
+\texttt{at}.
+
+The next action is \texttt{plowing}.  This happens one hour later, so
+our poor farmer is out in the field plowing at 2:00~AM.  This activity
+last (in the simulation) exactly one hour, after which he can go to
+the next activity, which involves waiting once again.
+
+I'll describe the actions used for this sample manager here, more
+examples of management actions can be found in
+section~\ref{sec:management}.
+
+\begin{verbatim}
+    (fertilize mineral
+               (weight 100.0 [kg N/ha])
+               (NH4_fraction 0.5 []))
+\end{verbatim}
+
+This is an order to fertilize.  The fertilization type is
+\texttt{mineral}, and the amount of nitrogen is specified with the
+\texttt{weight} parameter.  The nitrogen can be in the form of
+ammonium (NH$_4^+$) or nitrate (NO$_3^-$).  We specify with the
+\texttt{NH4\_fraction } parameter that half the nitrogen is ammonium,
+and the rest is nitrate.  Read more about fertilizer types in
+section~\ref{sec:fertilizer}.
+
+\begin{verbatim}
+    (progn
+      (sow "Grass")
+      (sow "Spring Barley"))
+\end{verbatim}
+
+Remember that \texttt{activity} was a directive to perform a list of
+actions in sequence?  Well, \texttt{progn} is a directive to perform a
+list of actions in parallel.  Here we sow two crops at once.  The
+crops, \texttt{Grass} and \texttt{Spring Barley} are defined in the
+file \texttt{crops.dai}, which we included in
+section~\ref{sec:ex-input}.
+
+\begin{verbatim}
+    (wait (or (crop_ds_after "Spring Barley" 2.0)
+              (at 1987 9 5 1)))
+\end{verbatim}
+
+This is the only place we wait for a condition more complex than a
+specific point in time.  Actually, there are three conditions here.
+
+\begin{verbatim}
+              (at 1987 9 5 1)
+\end{verbatim}
+
+is just a point in time, as you have seen before, however
+
+\begin{verbatim}
+              (crop_ds_after "Spring Barley" 2.0)
+\end{verbatim}
+
+is new.  It is true when the development stage of a crop named
+``\texttt{Spring Barley}'' is 2.0 or above.  The development stage, or
+DS, is a key concept in describing the state of a crop.  It starts at
+-1.0 when sowed, and increase with time.  When it reached 0.0, the
+crop emerges.  At 1.0 it flowers, and at 2.0 it is ripe.   So this
+condition is true when there is a ripe spring barley on the field.
+
+The third conditions is named \texttt{or}.
+
+\begin{verbatim}
+          (or (crop_ds_after "Spring Barley" 2.0)
+              (at 1987 9 5 1))
+\end{verbatim}
+
+It is true when any of the specified conditions are true.  I.e. it is
+true when there is a ripe spring barley on the field, or when the
+simulation has reached 1:00~AM, September the 5'th, 1987.
+
+In effect, we wait for the spring barley to get ripe, but if it isn't
+ripe at the specified date, we stop waiting anyway
+
+\begin{verbatim}
+    (harvest "Spring Barley")
+\end{verbatim}
+
+and harvest it.  This harvest is pretty brutal, we remove everything
+above the soil, and leave only the roots to rot in the soil.  When we
+later cut the grass, we are more gentle.
+
+\begin{verbatim}
+    (harvest "Grass"
+             (stub 8.0 [cm])              ;Leave 8 cm stub.
+             (stem 1.00 []))             ;Harvest everything above stub.
+\end{verbatim}
+
+Here, we leave 8 cm stub.  We still remove all the stem above that
+height, the parameter to \texttt{stem} is the fraction to remove.  If
+we remove a smaller fraction, the remainder will stay on top of the
+soil as plant residuals, which will be incorporated into the soil
+either gradually by earth worms and other insects, or at once by a
+tillage operation.
+
+The grass will most likely survive this cut, unlike the spring barley.
+
+The last action, \texttt{stop}, is simply a command to stop the
+simulation.
+
+\subsection{Output}
+
+Now \daisy{} know everything it needs to know in order to run the
+simulation.  We just need to tell it what information about the
+simulation is should save for later processing.
+
+\begin{verbatim}
+  ;; Create these log files.
+  (output harvest
+          ("N Balance" (when monthly)
+                       (from 0 [m]) (to -1 [m]))
+          ("Crop Production"
+           (set "$crop" "Spring Barley")
+           (where "sbarley.dlf"))
+          (checkpoint (when (at 1987 8 7 6))))
+
+  ;;; test.dai ends here.
+\end{verbatim}
+%$
+
+The first entry in the list, \texttt{harvest}, produces a
+\texttt{harvest.dlf} file containing information about everything that
+has been harvested during the simulation.  The \emph{D}aisy \emph{L}og
+\emph{F}ormat (\texttt{.dlf}) is understood by the
+\texttt{ShowDaisyOutput.exe} program, but you can also view it with an
+editor or load it into a spreadsheet.  The \texttt{harvest.dlf} file,
+in particular, is best viewed as plain text.
+
+Our next log model, \texttt{N~Balance}, will write enough information
+about the nitrogen content of the soil to calculate a balance, in a
+file name \texttt{n\_balance.dlf}.  By default, it will write this
+information once a day, but by specifying \texttt{monthly} we reduce
+this to once a month.  We also specify the soil layer to log to be the
+top meter of the soil.  By default, it will log the nitrogen content
+of all the soil down to and including the last numeric layer.
+
+We have two crops simultaneously on the soil.  By default,
+\texttt{Crop~Production} will add the content of both crops together,
+and log it in a \texttt{crop\_prod.dlf} file.  The weird looking
+
+\begin{verbatim}
+           (set "$crop" "Spring Barley")
+\end{verbatim}%$
+
+line tells \daisy{} to only log information about the spring barley,
+and by specifying a \texttt{where} parameter we tell it to store the
+information in a file named \texttt{sbarley.dlf} instead.
+
+Note that writing these log files tend to be much slower than actually
+running the simulation, to the more information you tell \daisy{} to
+log, the slower the simulation will run.
+
+Finally, we tell \daisy{} To create a checkpoint file at 6:00~AM,
+August the 7'th, 1987.  This file will be named
+\texttt{checkpoint-1987-8-7+6.dai}.  As the extension hints, this is
+not a log file, but a setup file containing all information about the
+current state of the simulation.  In fact, you can restart the
+simulation by typing
+\begin{verbatim}
+  daisy checkpoint-1987-8-7+6.dai
+\end{verbatim}
+You can also browse it with a text editor to get detailed information
+about the state of the simulation at that point in time.
+
+See section~\ref{sec:output} for more information about log models.
+
+\section{Column}
+\label{sec:column}
+
+In this section we give examples of common customization of the
+various subsystems of the column.
+
+\subsection{Hydraulic properties}
+\label{sec:hydraulic}
+
+In section~\ref{sec:ex-hor}, we let \daisy{} guess the hydraulic
+properties from the texture.  This kind of estimates (wild guessing)
+are unreliable at best, and since the hydraulic properties are the key
+most other aspects of the simulation depend on, getting them right
+should be a priority.  \Daisy{} supports a number of models for
+hydraulic properties, the most important are listed here, more can be
+found in the reference manual~\cite{dina81}.
+
+\begin{description}
+\item[\texttt{B\_BaC}] Brooks and Corey retention curve model with
+  Burdine theory.
+\item[\texttt{B\_C}] Campbell retention curve model with Burdine
+  theory.
+\item[\texttt{B\_vG}] van Genuchten retention curve model with Burdine
+  theory.
+\item[\texttt{M\_BaC}] Brooks and Corey retention curve model with
+  Mualem theory.
+\item[\texttt{M\_C}] Campbell retention curve model with Mualem
+  theory.
+\item[\texttt{M\_vG}] van Genuchten retention curve model with Mualem
+  theory.
+\end{description}
+
+Here is an example where we specify the van Genuchten retention curve
+model with Mualem theory
+
+\begin{verbatim}
+  (defhorizon B default
+    (clay 8.0) (silt 10.5) (coarse_sand 63.4) (fine_sand 16.5)
+    (humus 1.12)
+    (SOM_fractions 0.70 0.30)
+    (hydraulic M_vG
+               (K_sat 10 [cm/h])
+               (Theta_res 0.05 [cm^3 H2O/cm^3])
+               (Theta_sat 0.424 [cm^3 H2O/cm^3])
+               (alpha 0.069 [cm^-1])
+               (n 1.527)))
+\end{verbatim}
+
+The three parameters
+\begin{description}
+\item[\texttt{K\_sat}] Water conductivity of saturated soil.
+\item[\texttt{Theta\_sat}] Saturation point (a.k.a.\ soil porosity).
+\item[\texttt{Theta\_res}] Soil residual water.
+\end{description}
+are shared by all the models, except that \texttt{Theta\_res} must be
+zero for Campbell.  The other parameters are model specific.
+
+\subsection{Groundwater and Drainage}
+\label{sec:groundwater}
+
+Obviously, the groundwater is not always located ``far below'' the
+root zone, as specified by
+\begin{verbatim}
+  (defcolumn Andeby default
+    (Groundwater deep)
+    ;; Other parameters...
+\end{verbatim}
+in the example.  We can therefore also specify a fixed groundwater
+table as in
+\begin{verbatim}
+    (Groundwater fixed -100 [cm])
+\end{verbatim}
+where we specify groundwater in one meters depth.  Note that if we
+specify a fixed groundwater table, it must be higher than our lowest
+node.  A third common case is soil drainage
+\begin{verbatim}
+    (Groundwater pipe)
+\end{verbatim}
+which is often enough for drained soil.  A full specification would be
+\begin{verbatim}
+    (Groundwater pipe
+                 (L 18 [m])
+                 (x  9 [m])
+                 (pipe_position -1.1 [m])
+                 (K_aquitard 1.0e-5 [cm/h])
+                 (Z_aquitard 2 [m])
+                 (h_aquifer  2 [m]))
+\end{verbatim}
+where
+\begin{description}
+\item[\texttt{L}] Distance between pipes.
+\item[\texttt{x}] Horizontal distance to nearest pipe. By default,
+  this is $1/2 \mathtt{L}$, i.e.\ in the middle between the pipes.
+\item[\texttt{pipe\_position}] Height pipes are placed in the soil.
+\item[\texttt{K\_aquitard}] Conductivity of the aquitard.
+\item[\texttt{Z\_aquitard}] Height of the aquitard.
+\item[\texttt{h\_aquifer}] Pressure potential in the aquifer below the
+  aquitard. By default. this is equal to \texttt{Z\_aquitard}.
+\end{description}
+The above numbers are the default values, i.e.\ what you get if you
+don't specify anything.  \texttt{L} and \texttt{pipe\_position} are
+standard values for Danish fields.  The aquitard is explained
+in~\cite{daisy-new}, the \texttt{K\_aquitard} parameter is what
+you usually want to calibrate.
+
+\subsection{Macropores}
+\label{sec:macro}
+
+By default, \daisy{} will only calculate water flow through the
+matrix, not through macropores.  This is usually adequate, since the
+vast amount of water travel through the matrix.  However, when
+calculating leaching of nitrogen and especially pesticides, water flow
+through macropores become important, because it provides a must faster
+route to the groundwater.
+
+Here is an example where we specify macropores:
+\begin{verbatim}
+  (defcolumn Andeby default
+    (SoilWater (macro default
+                      (height_start 0 [cm])
+                      (height_end -200 [cm])
+                      (distribution (-200 1) (-80 0.1) (0 0))
+                      (pressure_initiate -5 [cm])
+                      (pressure_end -30 [cm])
+                      (pond_max 0.5 [mm])))
+    ;; Other parameters...
+\end{verbatim}
+
+We specify that the macropores start at the soil surface, and end in 2
+meters depth with \texttt{height\_start} and \texttt{height\_end}.  All
+macropores are assumed to start at \texttt{height\_start}, but their
+endpoints are distributed as specified by the \texttt{distribution}
+parameter.  Here, we specify that all the macropores have ended at 2
+meters depth, 10\% of the macropores end above 80 cm depth, and none
+end above the surface (doh!).  We use linear interpolation between
+these points, so we can conclude that 5\% of the macropores end above
+40 cm depth.
+
+The macropores can be activated in two different ways.  Macropores
+that, like here, reach the surface, can be activated by ponding.  The
+parameter \texttt{pond\_max} specifies that the macropores will be
+activated when we have half a millimeter water on the soil surface.
+Once activated, the macropores will empty the pond.  The other way
+macropores can be activated is if the water pressure in any node
+within the region with macropores reaches above
+\texttt{pressure\_initiate}.  In that case, it will be drained
+immediately down to \texttt{pressure\_end}.
+
+The water, and any solutes in it will be distributed according to
+where the macropores end.  I.e.\ if the macropores was activated by
+ponding, 10\% of the ponded water would have entered the matrix at 80
+cm depth, and all the ponded water would have entered the matrix at 2
+meters depth.
+
+\subsubsection{Log models}
+
+The following log models are useful when dealing with macropores:
+\begin{description}
+\item[\texttt{Preferential Water Flux}] The preferential water flux
+  between all numeric soil layers.  File: \texttt{pref\_flux.dlf}.
+\item[\texttt{Preferential NO3 Transport}] The preferential nitrogen
+  transport between all numeric soil layers.  File:
+  \texttt{pref\_NO3.dlf}.
+\item[\texttt{Preferential NH4 Transport}] The preferential ammonium
+  transport between all numeric soil layers.  File:
+  \texttt{pref\_NH4.dlf}.
+\end{description}
+See section~\ref{sec:output} for more information about log models. 
+
+\subsection{Evapotranspiration}
+\label{sec:bioclimate}
+
+By default, Makkink is used for finding the reference
+evapotranspiration.  It is a simple model, but adequate for simple
+simulations.  It is specified as
+\begin{verbatim}
+  (defcolumn Andeby default
+    (Bioclimate default (pet makkink))
+    ;; Other parameters...
+\end{verbatim}
+except that you don't have to, since it is default.
+
+Sometimes you have access to reference evapotranspiration data in the
+weather file, in order to make \daisy{} use these you should specify
+pet like
+\begin{verbatim}
+    (Bioclimate default (pet weather))
+\end{verbatim}
+\textbf{Important:}  If you specify reference evapotranspiration in
+the weather file, but leave out the above line in the \daisy{} setup
+file, \daisy{} will ignore the data in the weather file, and continue
+to use Makkink for reference evapotranspiration.
+
+\Daisy{} also support the more advanced model Penman-Monteith
+\begin{verbatim}
+    (Bioclimate default (pet PM))
+\end{verbatim}
+If you have reliable information about vapor pressure and wind, it is
+much preferable to use Penman-Monteith over Makkink.  If the data are
+missing of poor quality, the simple Makkink are more robust.
+
+It is possible to use Penman-Monteith together with
+Shuttleworth-Wallace for the most accurate model of the bioclimate
+supported by \daisy{}.  Enable it with
+\begin{verbatim}
+    (Bioclimate default (pet PM) (svat PMSW))
+\end{verbatim}
+This requires hourly weather data to be useful.  
+
+\subsubsection{Potential and Reference Evapotranspiration}
+
+You may also want to change how potential evapotranspiration is
+calculated from reference evapotranspiration.  Both the soil surface
+and crops influence this, depending on how much of the soil is covered
+by crops.  To change the soil surface factor, specify
+\texttt{EpFactor} like this:
+\begin{verbatim}
+  (defcolumn Foulum default
+    (Surface (EpFactor 1.0))
+\end{verbatim}
+The default value is 0.8.
+
+For crops, derive new crop types like
+\begin{verbatim}
+  (defcrop "Andeby Spring Barley" "Spring Barley"
+    "Spring Barley with modified EpFac as measured
+  in Andeby, 2002, for the SuperGrow(TM) cooperation."
+    (Canopy (EpFac 1.2)))
+\end{verbatim}
+overwriting the default \texttt{EpFac} of 1.0.  Remember that you need
+to sow and harvest \texttt{Andeby Spring Barley} instead of
+\texttt{Spring Barley}.  Or alternatively, overwrite the parameter at
+the time of sowing, like this:
+\begin{verbatim}
+   (sow ("Spring Barley"
+         (Canopy (EpFac 1.2))))
+\end{verbatim}
+If you want \texttt{EpFac} to depend on the development stage, specify
+it like
+\begin{verbatim}
+   (sow ("Spring Barley"
+        (Canopy (EpFacDS (0.0 1.0) (1.0 1.2) (2.0 1.0)))))
+\end{verbatim}
+Here, \texttt{EpFac} will be 1.0 at emergence (DS 0.0), gradually rise
+to 1.2 at flowering (DS 1.0), and then fall towards 1.0 at ripeness (DS
+2.0).
+
+\section{Management}
+\label{sec:management}
+
+Writing management specifications that behave both semi-intelligently
+and robustly to the simulation state is an endless source of fun.
+However, specifying each and every little management operation for a
+30 year run can get both tedious and error prone.
+
+In this section, we will therefore start by introducing you to a way
+to organize your manager in ``crops'' and ``rotations'', which will
+save you much work, and then continue to give examples of various
+common management operations.
+
+\subsection{Crop Managements}
+\label{sec:crop-man}
+
+Our first hint is to collect all management information about a
+specific crop, as in the example below.
+\begin{verbatim}
+  ;; Spring Barley management.
+  (defaction sbarley activity
+    (wait_mm_dd 3 20)
+    (plowing)
+    (wait_mm_dd 4 10)
+    (fertilize pig_slurry (weight 100.0 [T w.w./ha]))
+    (wait_mm_dd 4 15)
+    (seed_bed_preparation)
+    (sow "Spring Barley")
+    (wait_mm_dd 7 1)
+    (wait (or (crop_ds_after "Spring Barley" 2.0 [])      ;Ripe
+              (mm_dd 10 1)))
+    (harvest "Spring Barley"))
+\end{verbatim}
+Here, we define a new management operation (or \emph{action}) named
+\texttt{sbarley}, which can be used like any other management
+operation, e.g.\ plowing, it just last a bit longer.  Specifically, it
+last the good part of a year.
+
+We define \texttt{sbarley} as an \texttt{activity}, just like in the
+example in section~\ref{sec:ex-man}.  The trick is to give it a name
+(\texttt{sbarley}), and specify it in a way so it can be used any
+year.  The key to the later is to use
+\begin{verbatim}
+    (wait_mm_dd 3 20)
+\end{verbatim}
+which, unlike (from the example)
+\begin{verbatim}
+    (wait (at 1987 3 20 1))
+\end{verbatim}
+does not specify a year\footnote{The observant reader will notice that
+  the hour isn't specified either.  You can specify the hour,
+  see~\cite{dina81}, but usually the default of 8:00~AM is fine.  It
+  is certainly less stressful to the farmer than the 1:00~AM we send
+  him plowing earlier.}.  It matches the 20'th of March every year,
+allowing us to use in any year.  Later, when waiting for the crop to
+become ripe, we similarity use an \texttt{mm\_dd} condition, which
+become true at 8:00~AM October the 1'st every year, instead of waiting
+testing for a more specific date as in the example.
+
+\subsubsection{Rotations}
+\label{sec:rotations}
+
+If we have defined crop management actions as in the previous section
+for spring barley, rye, and grass, we can use them in a
+manager specification like this
+\begin{verbatim}
+  (mananger activity
+    sbarley sbarley grass rye)
+\end{verbatim}
+
+As you see, we only have to specify the management operations
+associated with growing spring barley once, even though we grow spring
+barley twice in the simulation.  We can take this one step further, by
+naming and reusing specific rotations.
+\begin{verbatim}
+  (defaction rotaion_bbgr activity
+    sbarley sbarley grass rye)
+
+  (manager activity
+    rotaion_bbgr rotaion_bbgr rotaion_bbgr rotaion_bbgr rotaion_bbgr)
+\end{verbatim}
+Here, we define and name a whole rotation containing four seasons, and
+repeat that rotation five times.  All in all, we have specified
+management for 20 years in two lines.
+
+This is how I in general recommend writing management specifications.
+Break it down into management specifications for individual crops,
+then combine the crops into rotations.  In the next sections I will
+present more specific examples of common management operations.
+
+\subsection{Tillage}
+\label{sec:tillage}
+
+The tillage operations defined in \texttt{tillage.dai} are
+\texttt{plowing}, \texttt{rotavation}, \texttt{disk\_harrowing},
+\texttt{stubble\_cultivation} and \texttt{seed\_bed\_preparation}.
+You use them all like \texttt{plowing} in the example.
+
+All the tillage operations kill any crops on the soil, and homogenize
+the top soil content (be it water, organic or inorganic matter,
+pesticides, or heat).  Plowing will additionally swap the content of
+the top and bottom of the plowing layer.  The content on the soil
+surface will be incorporated into the soil, for
+\texttt{disk\_harrowing} and \texttt{stubble\_cultivation} this
+incorporation will only be partial.
+
+\subsubsection{Trafficability}
+\label{sec:trafficable}
+
+A real farmer might want to delay some operations if the soil is too
+wet, or frozen.  The \texttt{trafficable} condition will test for
+this.  You can use it like
+\begin{verbatim}
+  (wait trafficable)
+  (plowing)
+\end{verbatim}
+but it might be a good idea to add a timeout for robustness.
+\begin{verbatim}
+  (wait (or trafficable (mm_dd 04 01)))
+  (plowing)
+\end{verbatim}
+Here we wait until the soil is trafficable, or we have reached the
+first of April.  This is important if we use it in a crop management
+description like in section~\ref{sec:crop-man}.  Imagine we have the
+following piece of management activity:
+\begin{verbatim}
+  (wait trafficable)
+  (plowing)
+  (wait_mm_dd 4 10)
+\end{verbatim}
+If the conditions doesn't get trafficable before the 10'th of April,
+we will plow after the 10'th of April and then continue to wait for
+the 10'th of April \emph{next year}.  If we only run a short
+simulation, this might be OK, we can then discard the results and
+investigate what went wrong.  However, if we are simulating a 30 year
+period, it will be highly annoying to have to rerun because a single
+year had an unusually later winter or wet spring.  For the sake of
+such long simulations, it is a good idea to get get in the habit of
+adding timeouts to such conditions.
+
+\subsection{Sowing and Harvesting}
+\label{sec:sow}
+
+By including the \texttt{crops.dai} file, you get access to the
+following crop types: \texttt{Fodder Beet}, \texttt{Grass},
+\texttt{Maize}, \texttt{Pea}, \texttt{Potato}, \texttt{Rye},
+\texttt{Spring Barley}, \texttt{Spring Rape}, \texttt{Sugar Beet},
+\texttt{Spring Wheat}, \texttt{Winter Barley}, \texttt{Winter Rape}
+and \texttt{Winter Wheat}.
+
+In general, creating parameterizations for new crops requires field
+experiments where you carefully measure the nitrogen content during
+the development with different fertilization levels.  However, making
+small modifications for specific purposes is feasible, as
+demonstrated in section~\ref{sec:bioclimate}.
+
+\subsubsection{Crop Residuals}
+
+In general, we harvest when the crop is ripe, and kill the crops in
+the process. The main decision is whether to remove the crop
+residuals, or leave them as litter on the field.  Here is an example
+where we remove the crop residuals
+\begin{verbatim}
+  (harvest "Spring Barley"
+           (stub 8 [cm]))
+\end{verbatim}
+and one where we leave them as litter on the field.
+\begin{verbatim}
+  (harvest "Spring Barley"
+           (stub 8 [cm])
+           (stem 0.0 [])
+           (leaf 0.0 []))
+\end{verbatim}
+In both cases, we leave the stub and roots on the field, and remove
+the storage organ (that is, the grains).
+
+\subsubsection{Multiple Cuts}
+\label{sec:cuts}
+
+For some crops, like grass, we will want to harvest or cut them
+multiple times.  In such cases, the stub is essential, as that
+determine how much leaf area there will be left to start regrowth.  If
+you don't leave any stub (the default!), the plant will be unlikely to
+recover.
+
+Writing the generic management specification for grass is a lot more
+complex than for barley, because we do not know in advance how many
+times we are going to cut it.  It depends on how fast it grows.
+Therefore, we start by defining two simpler actions.
+\begin{verbatim}
+  (defaction cut_grass activity
+    (wait (or (crop_ds_after "Grass" 0.7 [])
+              (crop_dm_over "Grass" 4000 [kg DM/ha])))
+    (harvest "Grass"
+             (stub 10.0 [cm])))
+\end{verbatim}
+Here, we define a \texttt{cut\_grass} operation which wait for the
+grass to grow old or big enough, and then cut it.
+
+\begin{verbatim}
+  (defaction cut_grass_fertilize activity
+    (cut_grass)
+    (wait_days 1)
+    (fertilize N25S (weight 100.0 [kg N/ha])))
+\end{verbatim}
+Here, we extend the \texttt{cut\_grass} operation by fertilizing after
+the cut.
+
+Now we can define our grass management action:
+\begin{verbatim}
+  (defaction grass activity
+    (wait_mm_dd 3 20)
+    (wait trafficable)
+    (plowing)
+    (wait_mm_dd 4 10)
+    (fertilize N25S (weight 100.0 [kg N/ha]))
+    (wait_mm_dd 4 15)
+    (seed_bed_preparation)
+    (sow "Grass")
+    (while (wait_mm_dd 9 1)
+      (activity
+        ;; Max 5 fertilized cuts.
+        cut_grass_fertilize cut_grass_fertilize cut_grass_fertilize
+        cut_grass_fertilize cut_grass_fertilize
+        ;; As many unfertilized cuts as we want.
+        (repeat cut_grass)))
+    (while (wait_mm_dd 11 1)
+      ;; Additional unfertilized cuts.
+      (repeat cut_grass)))
+\end{verbatim}
+The initial part is quite conventional, as seen in
+sections~\ref{sec:ex-man} and~\ref{sec:crop-man}, until the two
+\texttt{while} actions.  A \texttt{while} action take two other
+actions, and perform them both in parallel, until the first action is
+done.  It does not matter whether the second action finish or not.
+
+In the example above, the first action is (in both cases), a
+\texttt{wait\_mm\_dd} operation.  This means that the \texttt{while}
+will simply continue until we reach the specified date.  While we are
+waiting for that date, it will do as specified by the second action.
+This means that until the 1'st of September, we may see up to 5 cuts
+followed by fertilization.  We might see less that that, if the grass
+does not grow fast enough, but never more.  After the 5 fertilized
+cuts, assuming it is not yet September, we may see any number of
+unfertilized cuts.  The \texttt{repeat} action will perform the
+specified operation over and over forever, which means it is only
+useful inside a \texttt{while}, otherwise it will never break out of
+the loop.
+
+After that, we start a new round of unfertilized cuts, which last
+until November.  You may wonder why we didn't just used a single
+\texttt{while}, which waited until November.  What is the difference?
+I'm glad you asked.  With the description above, we get a manager that
+will apply fertilizer at most six times (including the initial
+fertilization the 10'th of April), thus staying below a possibly
+politically induced upper limit.  \emph{And}, this is the trick, never
+apply fertilizer after August.  Even if we have only had, say, three
+fertilized cuts before September, and later cuts will be unfertilized.
+The idea being that we do not believe the grass will grow enough that
+late in the year to justify the additional fertilization.
+
+Read more about fertilization in the next section.
+
+\subsection{Fertilization}
+\label{sec:fertilizer}
+
+We have two basic types of fertilizer, \emph{mineral} and
+\emph{organic}.  These will be described in the two next sections,
+followed by examples of some more advanced types of fertilization. 
+
+\subsubsection{Mineral Fertilizer}
+
+In section~\ref{sec:ex-man} we used mineral fertilizer, as below:
+\begin{verbatim}
+    (fertilize mineral
+               (weight 100.0 [kg N/ha])
+               (NH4_fraction 0.5 []))
+\end{verbatim}
+If we used this fertilizer type often, it might be nice to give it a
+name.  We could do this with the following definition:
+\begin{verbatim}
+  (defam SuperGrow mineral
+    (NH4_fraction 0.5 []))
+\end{verbatim}
+To use it, we would write:
+\begin{verbatim}
+  (fertilize SuperGrow (weight 100.0 [kg N/ha]))
+\end{verbatim}
+It only saves one line, but the producers of SuperGrow\texttrademark{}
+will be eternally grateful.  The \texttt{fertilizer.dai} file already
+contain the following mineral fertilizers:
+\begin{description}
+\item[\texttt{Ammonia}] Pure NH$_4^+$.
+\item[\texttt{AmmoniumNitrate}] A 50-50 mix of NH$_4^+$ and NO$_3^-$.
+\item[\texttt{Nitrate}] Pure NO$_3^-$.
+\item[\texttt{N25S}] 50.8\% NH$_4^+$.
+\end{description}
+
+\subsubsection{Organic Fertilizer}
+
+We used organic fertilizer, specifically pig slurry, in the example in
+section~\ref{sec:crop-man}.  The obvious difference is that the weight
+is given in metric tons of wet weight, rather than kg nitrogen.  The
+\texttt{fertilizer.dai} file contains the following ready to use
+definitions of pig slurry (named \texttt{pig\_slurry}), cattle slurry
+(\texttt{cattle\_slurry}), pig manure (\texttt{pig\_manure}), cattle
+manure (\texttt{cattle\_manure}), and horse manure
+(\texttt{horse\_manure}).
+
+For purely hypothetical scenarios, using the predefined organic
+fertilizer specifications are adequate, however, if you know more
+about the system being simulated, getting a better description of the
+slurry or manure being applied is important, as the quality varies a
+lot.  You can define a new slurry like this:
+\begin{verbatim}
+  (defam Andeby_pig_slurry slurry
+    "Data collected by F. Guf, 2002 at the B. And farm, Andeby."
+    (dry_matter_fraction 0.073)
+    (total_C_fraction 0.323)
+    (total_N_fraction 0.0863)
+    (NH4_fraction 0.7)
+    (NO3_fraction 0.0)
+    (volatilization 0.15))
+\end{verbatim}
+where
+\begin{description}
+\item[\texttt{dry\_matter\_fraction}] Dry matter fraction of total
+  (wet) weight.
+\item[\texttt{total\_C\_fraction}] Carbon fraction of dry matter.
+\item[\texttt{total\_N\_fraction}] Nitrogen fraction of dry matter
+\item[\texttt{NH4\_fraction}] Ammonium fraction of total N in
+  fertilizer.
+\item[\texttt{NO3\_fraction}] Nitrate fraction of total N in
+  fertilizer, by default zero.
+\item[\texttt{volatilization}] Fraction of NH$_4^+$ that evaporates on
+  application.
+\end{description}
+The organic nitrogen is what is left having removed the two inorganic
+fractions.
+
+It is possible to specify other parameters such as the turnover rate
+and efficiency for the organic fertilizer, but these require
+specialized knowledge of both the fertilizer itself, and the organic
+matter model in \daisy{} (see~\cite{daisy-new}).
+
+\subsubsection{First and Second Year Utilization}
+
+Sometimes organic fertilization plans are made from estimated first
+and second year utilization of the nitrogen.  In Denmark, this even
+have legal force.  None of the fertilizers in \texttt{fertilizer.dai}
+contain such estimates, as they varies both in time and jurisdiction,
+but you can specify them yourself, as below.
+\begin{verbatim}
+  (defam "Andeby Pig Slurry" pig_slurry
+    (first_year_utilization 0.40)
+    (second_year_utilization 0.15))
+\end{verbatim}
+Here, we estimate that 40\% of the nitrogen (organic or mineral) is
+utilized the first year, and 15\% the second year.  The rest is
+presumably lost.  Note again, that these estimates have absolutely no
+effect on how much will actually be utilized during the simulation.
+
+To use this information, we can write the following
+\begin{verbatim}
+  (fertilize ("Andeby Pig Slurry")
+             (equivalent_weight 100.0 [kg N/ha]))
+\end{verbatim}
+in our management specification.  We let \daisy{} calculate the amount
+of wet weight to apply, to get a first year utilization of 100 kg
+N/ha.  Note the parentheses around the \texttt{"Andeby Pig Slurry"}.
+When we specify \texttt{weight} directly, these should not be there,
+but here, they must, for reasons to embarrassing to mention
+here\footnote{Well, not really.  The \texttt{weight} parameter is a
+  property of the fertilizer itself, while \texttt{equivalent\_weight}
+  is a property of the fertilize action.  Thus, the difference.}.
+
+To use the \texttt{second\_year\_utilization} parameter, we should let
+one harvest operation (usually the first) the next year have the form
+\begin{verbatim}
+  (fertilize ("Andeby Pig Slurry")
+             (second_year_compensation true)
+             (minimum_weight 50.0 [kg N/ha])
+             (equivalent_weight 150.0 [kg N/ha]))
+\end{verbatim}
+The \texttt{second\_year\_compensation} directive means that \daisy{}
+should subtract any second year effect accumulated from fertilizations
+the previous year from \texttt{equivalent\_weight} before calculating
+the amount of fertilizer to apply.  By specifying
+\texttt{minimum\_weight} we put a minimum on the amount of fertilizer
+we will bother applying.  That is, if the accumulated second year
+effect is more than 100 kg N/ha, we won't fertilize at all.
+
+\subsubsection{Precision Fertilization}
+
+Precision fertilization allows you to let the amount of fertilizer you
+apply depend on the nitrogen content of the soil in a specified zone.
+
+\begin{verbatim}
+  (fertilize (N25S)
+             (precision 150.0 [kg N/ha] (from 0.0 [cm]) (to -100.0 [cm]))
+             (minimum_weight 50.0 [kg N/ha]))
+\end{verbatim}
+
+Daisy will measure the amount of fertilizer in the specified zone (from
+the soil surface to 1 m depth, which is also the default), and supply
+enough extra nitrogen to reach the specified target (150 kg N/ha).  If
+less than the specified minimum (50 kg N/ha) nitrogen is needed in
+order to reach the target, no fertilizer will be applied.
+
+You can use the \texttt{precision} parameter with organic fertilizer
+as well, in that case you must also specify the
+\texttt{first\_year\_utilization} fertilizer parameter.
+
+
+\subsubsection{Incorporation}
+
+By default, fertilizer will be applied directly on the soil surface.
+There, organic fertilizer will be incorporated gardually by bioloical
+means (earth worms and the like), or suddenly by machanical means,
+i.e. by a tillage operation.  Inorganic fertilizer will penetrate the
+soil along with the rain or irrigation water.
+
+However, if a farmer has the equipment for it, he will prefer
+incorporating the fertilizer directly into the soil.  It in general
+increase utilization, and decrease complaints about pig slurry smell
+from neighbors.
+
+Use the \texttt{from} and \texttt{to} fertilize parameters to specify
+incorporation, as below:
+\begin{verbatim}
+  (fertilize (pig_slurry (weight 100.0 [T w.w./ha]))
+             (from -5 [cm]) (to -20 [cm]))
+\end{verbatim}
+Again, note the extra set of parentheses that binds \texttt{weight} to
+\texttt{pig\_slurry}.  Unlike \texttt{from} and \texttt{to},
+\texttt{weight} is a property of the \texttt{pig\_slurry}, not of the
+\texttt{fertilize} operation.
+
+\subsection{Irrigation}
+\label{sec:irrigation}
+
+Irrigation can be applied overhead the canopy (e.g.\ in the form of
+sprinklers), on the soil surface, or incorporated directly into the
+soil. 
+
+To specify overhead irrigation, write
+\begin{verbatim}
+  (irrigate_overhead 30 [mm/h])
+\end{verbatim}
+This will irrigate with 30 mm/h for one hour, giving a total of 30 mm.
+The water will first hit the canopy, where some will stay until it
+eventually evaporate, and some may wash down any pesticides on the
+canopy.
+
+To specify surface irrigation, write
+\begin{verbatim}
+  (irrigate_surface 30 [mm/h] (temperature 10.0 [dg C]))
+\end{verbatim}
+Again, this will give a total of 30 mm.  The water will bypass the
+canopy, and directly hit the soil surface where it might create a pond
+that slowly evaporates or enter the soil.
+
+If you don't specify the temperature parameter, as in the
+\texttt{irrigate\_overhead} case, the air temperature will be used.
+
+The syntax for incorporating the water directly into the soil is
+quite different, here is an example:
+\begin{verbatim}
+  (set_subsoil_irrigation 1 [mm/h] (from -5.0 [cm]) (to -10.0 [cm])
+                          (solute (NH4 0.1 [?mg N/l]) (NO3 0.7 [?mg N/l])))
+  (wait_days 1 (hours 6))
+  (stop_subsoil_irrigation)
+\end{verbatim}
+Here we specify subsoil irrigation with 1 mm/h for 30 hours, giving us
+a total of 30 mm.  It will be incorporated into the soil between 5 and
+10 cm's depth.  We also specify a content of inorganic nitrogen in the
+water, something we can also do for overhead and surface irrigation.
+We do not and cannot specify the water temperature for subsoil
+irrigation, it is assumed to be the same temperature as the soil
+itself.
+
+\subsubsection{Conditions}
+
+If we know exactly when the irrigation is to be done, we can simply
+wait for the date, as here
+\begin{verbatim}
+  (wait_mm_dd 07 15)
+  (irrigate_overhead 30 [mm/h])
+\end{verbatim}
+
+However, when writing generic crop managements as in
+section~\ref{sec:crop-man}, we can't use that technique.  It might
+rain the first two weeks of July for all we know, which will make
+irrigating rather wasteful.  \Daisy{} therefore provides ways to test
+for the soil water content.
+\begin{verbatim}
+  (wait (not (soil_water_pressure_above (height -30.0 [cm])
+                                        (potential -1000 [cm]))))
+  (irrigate_overhead 30 [mm/h])
+\end{verbatim}
+Here, we emulate a tensiometer placed in the field at 30 cm depth,
+triggering irrigation when the potential gets below -1000 cm.
+
+
+An alternative condition would be
+\begin{verbatim}
+  (wait (not (soil_water_content_above 200.0 [mm] 
+                                       (from 0 [m]) (to 1 [m]))))
+\end{verbatim}
+where we wait until there is less than 200 mm water in the top meter
+of the soil. 
+
+%% TODO: water deficit condition
+
+\subsubsection{Strategies}
+
+However, conditions like these are not enough, since we cannot know in
+advance how many times it gets necessary to irrigate, if any.  This
+problem is similar to the problem of multiple cuts we had in
+section~\ref{sec:cuts}, and the solution also build on our ``parallel
+processing'' directive, \texttt{while}.  Imagine we already have a
+crop management description, like \texttt{sbarley} in
+section~\ref{sec:crop-man}.  We can then add an irrigation strategy
+like this:
+\begin{verbatim}
+  (defaction irrigate_30 activity 
+    (wait (not (soil_water_pressure_above (height -30.0 [cm])
+                                          (potential -1000 [cm]))))
+    (irrigate_overhead 30 [mm/h]))
+
+  (manager activity
+    (while sbarley
+      (repeat irrigate_30))
+    (stop))
+\end{verbatim}
+
+Here, we define a management action named \texttt{irrigate\_30}, which
+consists of waiting for the the soil to dry out, and then irrigating
+with 30 mm.  Our management specification says that as long as we are
+managing our spring barley (as defined in \texttt{sbarley}), we will
+repeatedly run \texttt{irrigate\_30}, that is, wait for the soil to
+dry, and then irrigate.
+
+An advantage of implementing our irrigation strategy like this is
+that we can apply the strategy on any crop.  There are, however, two
+problems we need to solve before it gets useful.  First, we should only
+irrigate in the growth season, even if the soil somehow dries out
+during the winter.  The second is that irrigation takes one hour, but
+the water may very well take longer to reach the tensiometer.  This
+means that the tensiometer will keep triggering irrigation several
+time, until the water finally reaches it.
+
+We solve the first problem by adding an ``in season'' test to the wait
+conditions, and the second problem by adding a delay after
+irrigation. 
+\begin{verbatim}
+  (defaction irrigate_30 activity 
+    (wait (and (after_mm_dd 5 1)
+               (before_mm_dd 9 1)
+               (not (soil_water_pressure_above (height -30.0 [cm])
+                                               (potential -1000 [cm])))))
+    (irrigate_overhead 30 [mm/h])
+    (wait_days 2))
+\end{verbatim}
+
+If there are limits on the total amount of water we are allowed to use
+for irrigation, we can limit the macimal number of times we irrigate,
+like below.
+\begin{verbatim}
+  (manager activity
+    (while sbarley
+      (activity irrigate_30 irrigate_30 irrigate_30 irrigate_30))
+    (stop))
+\end{verbatim}
+Here, we will at most irrigate four times.
+
+\subsection{Pesticides}
+\label{sec:pesticides}
+
+Pesticides have no effect in \daisy{} (i.e. \daisy{} crops are immune
+to everything, and weeds are something that happens to other models).
+Nonetheless, \daisy{} allows you to apply them to the field.  \Daisy{}
+will then keep track on them, as the are transported with the water
+through the system, or are removed from the system by either
+decomposition, root uptake, or leaching to the groundwater.
+
+The command to apply pesticides is
+\begin{verbatim}
+  (spray Bentazon 1000 [g/ha])
+\end{verbatim}
+with \texttt{Bentazon} being the name of the pesticide.  The currently
+available pesticide parameterizations are \texttt{Atrazine},
+\texttt{Bentazon}, \texttt{IPU}, \texttt{MCPP},
+\texttt{Pendimethalin}.  To use them, you must add
+\begin{verbatim}
+  (input file "chemistry.dai")
+\end{verbatim}
+to the start of the setup file.
+
+% TODO: Define new pesticides.
+
+% TODO: Transformations.
+
+\subsubsection{Log models}
+
+Here are some log models that are useful when dealing with pesticides:
+\begin{description}
+\item[\texttt{Surface Chemicals}] Summary information about chemicals
+  on the soil surface. File: \texttt{surface\_chemicals.dlf}.
+\item[\texttt{Soil Chemical}] Summary information about chemicals in
+  the soil.  File: \texttt{soil\_chemical.dlf}. 
+\item[\texttt{Chemical}] Amount of chemicals in each numeric soil
+  layer.  Note that nothing will appear in the log file until the
+  chemichals have entered the soil.  Not even zeros.  File:
+  \texttt{chemical.dlf}.
+\end{description}
+
+In general, you will get the sum of all chemicals.  To log the content
+of a specific pesticide, such as 'Atrazine', specify the \verb|$chem|%$
+parameter, as in:
+\begin{verbatim}
+    ("Soil Chemical" (set "$chem" Atrazine))
+\end{verbatim}%$
+
+\section{Log Files}
+\label{sec:output}
+
+In this section I list some useful log models not listed elsewhere,
+but first lets refresh the general useful parameters.  The following
+two parameters can be used for almost all log models:
+\begin{description}
+\item[\texttt{when}] Indicates how often to log.  In theory, you can
+  use any condition, like e.g.\ \texttt{crop\_dm\_over}, but in
+  practice \texttt{hourly}, \texttt{daily}, \texttt{weekly},
+  \texttt{monthly} and \texttt{yearly} are the most useful ones.  The
+  log models will automatically accumulate flux values between time
+  steps.  When not otherwise indicated, log models log every hour.
+\item[\texttt{where}] Select the file in which to log the results.
+\end{description}
+
+As explained in~\ref{ex:column}, the soil is split into a large number
+of numeric layers for computational purposes.  Some log models, such
+as \texttt{Soil Temperature}, will log the content of a single state
+variable for each of these layers.  Other log models will log many
+state variables by integrating the content of the variable in for all
+layers in some interval, or for flux variables, use the values at the
+top or bottom of the interval.  \texttt{N Balance} is an example of
+such a log model.  You can control what interval to summarize by
+setting the \texttt{from} and \texttt{to} parameters.
+
+We use all of them in this example:
+\begin{verbatim}
+  (output ("N Balance" (when monthly)
+                       (where "nitrogen-balance.dlf")
+                       (from 0 [m]) (to -1 [m])))
+\end{verbatim}
+
+Note that writing a log file tend to be as slow as running the
+simulation itself, and if you specify many log files \daisy{} will
+become very slow indeed.  It also depend on the log file, as a general
+rule, large log files are much more time consuming than small log
+files.  So don't ask for hourly values of daily or even monthly values
+will do.  But the `harvest' log model is nearly free.  And if you are
+using \daisy{} interactively, don't specify a log file just because
+you \emph{may} need the information.  If you later discover that you
+need the information in that log file, you can rerun the simulation
+specifying log file only.
+
+\subsection{Log models}
+\label{sec:log-models}
+
+Here are some useful log models, you can find more in the
+\texttt{log.dai} file, and scattered around this manual.
+\begin{description}
+\item[\texttt{Total Soil Content}] Information about the water, carbon
+  and nitrogen content of the soil.  File: \texttt{soil\_content.dlf}.
+\item[\texttt{Soil NO3 Concentration}] Amount of nitrate in all
+  numeric soil layers.  This include both the nitrogen and oxygen
+  atoms of the nitrate.  File: \texttt{soil\_NO3.dlf}.
+\item[\texttt{Soil NO3-N Concentration}] Amount of nitrate nitrogen in
+  all numeric soil layers.  This include only nitrogen atoms of the
+  nitrate.  File: \texttt{soil\_NO3-N.dlf}.
+\item[\texttt{Soil Temperature}] Temperature in all numeric soil
+  layers. File: \texttt{soil\_temperature.dlf}.
+\item[\texttt{Soil Water Potential}] Water potential in all numeric
+  soil layers.  File: \texttt{soil\_water\_potential.dlf}.
+\item[\texttt{Soil Water Sink}] The water sink in all numeric soil
+  layers.  The water sink is an aggregate of root uptake, preferential
+  flow, flow to drain pipes, and subsoil irrigation.  File:
+  \texttt{soil\_water\_sink.dlf}.
+\item[\texttt{Matrix Water Flux}] The matrix water flux between all
+  numeric soil layers.  File: \texttt{matrix\_water\_flux.dlf}.
+\item[\texttt{Surface Water Balance}] Enough information to create a
+  water balance for the soil surface.  File:
+  \texttt{surface\_water\_balance.dlf}.
+\item[\texttt{Root Zone Water Balance}] Enough information to create a
+  water balance for the root zone.  File:
+  \texttt{root\_zone\_water\_balance.dlf}. 
+\item[\texttt{N Balance}] Enough information to create a balance for
+  the soil nitrogen.  File: \texttt{N\_balance.dlf}.
+\item[\texttt{Soil Heat Balance}] All available information about the
+  soil heat subsystem.  File: \texttt{soil\_heat\_balance.dlf}.
+\item[\texttt{Snow}] All available information about the snow
+  subsystem.  File: \texttt{snow.dlf}.
+% TODO: \item[\texttt{}]   File: \texttt{}.
+\end{description}
+
+\section{Organizing Your Parameterizations}
+\label{sec:files}
+
+If you follow the advice in this tutorial, you will create a number of
+parameterizations for things like horizons, columns, fertilizer types,
+and crop management strategies.  Most likely, many of these
+parameterizations will be generically useful, that is, useful in many
+different simulations.  My advice is that you from the start create a
+\emph{library} of such parameterizations, for later use.  This library
+should be kept separate from both the standard library that comes with
+\daisy{}, and from the files that are specific to your current
+simulation.  By separate, I mean that you should keep the files in
+three or more different directories.
+\begin{itemize}
+\item A directory containing the parameterization files distributed by
+  \textsc{kvl}, i.e.\ the content of \texttt{daisy-lib.zip}.  You
+  should never change these files, and never add new files yourself.
+  If you want to add anything there, send your additions to
+  \href{mailto:daisy@dina.kvl.dk}{\texttt{$<$daisy@dina.kvl.dk$>$}},
+  and let me do it.  The advantage of this is that it will be easy to
+  upgrade your \daisy{} installation when a new and improved version
+  with new and improved features, and new and improved bugs, arrives.
+  You just delete the old content of the directory, and install the
+  new files instead.  Or better, rename the old directory so you can
+  backup in case anything is horrible wrong with the new version.
+\item A directory containing files with those parameterizations that
+  are not specific to a single simulation.  In that directory you can
+  organize the parameterizations by locations (e.g. put all horizon
+  and column parameterizations containing data measured in Andeby in a
+  single \texttt{andeby.dai} file) or by type (e.g. put all crop
+  management specifications in a single \texttt{crop-man.dai} file) or
+  both, depending on taste.
+\item A directory for each simulation, containing a setup file, extra
+  files with simulation specific parameterizations or other data, and
+  all the output (\texttt{.dlf}) files produced by the simulation run.
+\end{itemize}
+From experience, such an organization saves time in the long run.  
+
+\subsection{Don't Copy, Derive}
+
+A related hint for your own parameterizations: Don't copy, derive.
+For example, if you want a slightly different grass than the one
+provided by the standard \daisy{} library, don't just copy the
+definition from \texttt{grass.dai} and edit the parameter you want to
+change.  And certainly don't change the \texttt{grass.dai} directly.
+Instead, create a derived parameterization as we did in
+section~\ref{sec:bioclimate}:
+\begin{verbatim}
+  (defcrop "Andeby Spring Barley" "Spring Barley"
+    "Spring Barley with modified EpFac as measured
+  in Andeby, 2002, for the SuperGrow(TM) cooperation."
+    (Canopy (EpFac 1.2)))
+\end{verbatim}
+The advantage of doing it this way twofold.  First, if we fix or
+improve the grass parameterization in \texttt{grass.dai}, you will
+derived version will automatically get the improvements when you
+install the updated \daisy{} version.  Furthermore, we may make
+changes to the default crop model that requires corresponding changes
+to the parameterizations.  Of course, we do that for the standard
+parameterizations right away.  But if you have made a copy of the
+parameterizations, it will break when you install the new version.
+
+\subsection{\textsc{Daisypath}}
+\label{sec:daisypath}
+
+Now that you have followed my advice, and spread your files over three
+directories, how do we tell \daisy{} where to find it?  Well, \daisy{}
+uses two sources to find the files:
+\begin{itemize}
+\item A \emph{path} containing information about which directories to
+  look, and
+\item the \emph{current directory}, which is also the place it will
+  put any log files. 
+\end{itemize}
+
+The preferred way to tell \daisy{} what path to use is through the
+\textsc{daisypath} environment variable.  Unfortunately, how to set
+this depend on what operating system you are using.  Under Unix
+(including Linux), it has the same syntax as the \textsc{path}
+environment variable, and is set the same place, i.e.\ your
+\texttt{.bashrc} or \texttt{.cshrc} file, depending on your shell. 
+
+On MS Windows, it still have the same syntax as
+\textsc{path}\footnote{With the disclaimer that the syntax for
+  \textsc{path} is different on Unix and MS Windows.}, and is set the
+same way.  If you are one of the rare MS Windows users who know how to
+do that, go ahead and do it.  It does depend on which exact version of
+MS Windows you use, though.  
+
+In \cite{dina81} there are some examples of how to set
+\textsc{daisypath} on various systems.  However, you may prefer the
+alternative of putting this information in the setup files themselves.
+Insert
+\begin{verbatim}
+  ;; Search file files these places.
+  (path "." "c:/My Files/daisy/lib/" "c:/Program Files/daisy/lib/")
+\end{verbatim}
+assuming you installed the \daisy{} standard parameter files
+in\linebreak[4] ``\verb|c:\Program Files\daisy\lib|'' and your own
+parameter files in\linebreak[4] ``\verb|c:\My Files\daisy\lib|''.
+Note that ``\texttt{.}'' means ``look in the current directory'' and
+that you should use forward slashes (\verb|/|) instead of backslashes
+(\verb|\|) in the path names.
+
+If you start \daisy{} from the command line, as in
+section~\ref{sec:install}, the current directory will be the directory
+where you run the command.  However, you can also specify it
+explicitly in the setup file, like this:
+\begin{verbatim}
+  ;; Run program here.
+  (directory "c:/My Files/Andeby/sim01")
+\end{verbatim}
+An advantage of doing it this way, is that you can start the simulation
+by dragging the setup file to the \texttt{daisy.exe} icon in the file
+manager.  If you don't specify \texttt{directory}, it will run the
+program somewhere silly.
+
+The reason I recommend the \textsc{daisypath} route, is that the setup
+files become location independent.  That is, if you send it to someone
+else who have installed \daisy{} in another location, he can still run
+the setup file unchanged.  If you specify \texttt{path} in the setup
+file, he has to change one line.  If you specify \texttt{directory},
+he has to change two lines.  What I don't recommend is neither
+specifying \textsc{daisypath}, nor setting \texttt{path}, but using
+absolute file names.  E.g.
+\begin{verbatim}
+  (input file "c:/Program Files/daisy/lib/fertilizer.dai")
+\end{verbatim}
+It works, but gives a lot of lines that must be changed when moving
+the files.
+
+\appendix
+
+\section{Experimental features}
+\label{sec:exp}
+
+These features are still experimental, and should not be used for
+``normal'' simulations.  Use them for simulations where the main
+purpose is to examine the effect of each feature.
+
+\subsection{Ice}
+\label{sec:ice}
+
+% TODO
+
+\subsection{Soil Compaction}
+\label{sec:compact}
+
+% TODO
+
+\subsection{Phosphor}
+\label{sec:phosphor}
+
+% TODO: not supported, strongly adsorbed, solid, transformations.
+
+\subsection{Ridging}
+
+A special tillage operation is ridging.  Ridging is common in tropical
+agriculture, where it has various beneficial effects, such as
+preventing erosion, controlling the soil water, and increasing the
+effective rooting depth, depending on the situation.  It is also used
+under temperate conditions, for example for potato farming in Denmark,
+where ridging provide better growing conditions in the soil,
+especially with regard to heat.
+
+In \daisy{}, ridges only affects the flow of soil and surface water,
+and a hard-to-penetrate crust is assumed, making it less relevant to
+Danish potato farming.
+
+You can specify that the field should contain ridges with the
+\texttt{ridge} operation.
+\begin{verbatim}
+  (ridge (z (0.0 0.0) (0.4 0.0) (0.6 50) (1.0 50.0))
+         (R_crust 50 [h]))
+\end{verbatim}
+where
+\begin{description}
+\item[\texttt{z}] The ridge height, formulated as $z (x)$, where $x$
+  is the relative distance from the middle of the ridge.  $x = 0.0$ is
+  in the middle of a ridge, while $x = 1.0$ is at the maximal
+  distance.  The ridge is assumed to be symmetric.  $z (x)$ is
+  measured in centimeter above the unridged soil surface, which means
+  it is in the same reference system as the rest of the model.
+\item[\texttt{R\_crust}] Resistance in crust.  Adjust this to control
+  the rate in which water infiltrate.
+\end{description}
+The ridge must not be taller than the top horizon, as there should be
+uniform hydraulic properties throughout the ridge.
+
+To remove the ridges, specify any other tillage operation.
+
+Technically, the ridge operation creates a special subsystem within
+\daisy{} where water flow sideways into the ridge wall or down through
+the ridge bottom.  You can log this subsystem with the following log
+parameterization:
+\begin{description}
+\item[\texttt{Ridge}] Information about the Ridge subsystem.  File:
+  \texttt{ridge.dlf}.
+\end{description}
+
+\section{\texttt{test.dai}}
+\label{app:test}
+
+\begin{verbatim}
+  ;;; test.dai -- Sample file using the Daisy libraries.
+
+  (description "Simulation for use in tutorial.")
+
+  ;; Use standard parameterizations.
+  (input file "tillage.dai")
+  (input file "crop.dai")
+  (input file "log.dai")
+
+  ;; Weather data.
+  (weather default "weather.dwf")
+
+  ;; We have some very sandy soil.
+  (defhorizon Ap default
+    (clay 8.0 [])
+    (silt 10.5 [])
+    (coarse_sand 63.4 [])
+    (fine_sand 16.5 [])
+    (humus 1.12 [])
+    (SOM_fractions 0.66 0.34 []))
+
+  (defhorizon C Ap
+    (humus 0.12 [])                     ;Less humus.
+    (SOM_fractions 0.80 0.20 []))       ;Slower background mineralization.
+
+  ;; We build the column from the horizons.
+  (defcolumn Andeby default
+    "The B.And farm, Andeby, 2002."
+    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+          (zplus -2.5 -5 -10 -15 -20
+                 -25 -30 -40 -50 -60 -70
+                 -80 -90 -100 -125 -150 -175
+                 -200 -225 -250 [cm])
+          (MaxRootingDepth 60.0 [cm]))
+    (Groundwater deep))
+
+  ;; Use it.
+  (column Andeby)
+
+  ;; Simulation start date.
+  (time 1986 12 1 1)
+
+  (manager activity
+    (wait (at 1987 3 20 1))
+    (plowing)
+    (wait (at 1987 4 4 1))
+    (fertilize mineral
+               (weight 100.0 [kg N/ha])
+               (NH4_fraction 0.5 []))
+    (wait (at 1987 4 5 1))
+    (progn
+      (sow "Grass")
+      (sow "Spring Barley"))
+    (wait (or (crop_ds_after "Spring Barley" 2.0)
+              (at 1987 9 5 1)))
+    (harvest "Spring Barley")
+    (wait (at 1987 9 8 1))
+    (fertilize mineral
+               (weight 80.0 [kg N/ha])
+               (NH4_fraction 0.5 []))
+    (wait (at 1987 10 10 1))
+    (harvest "Grass"
+             (stub 8.0 [cm])              ;Leave 8 cm stub.
+             (stem 1.00 []))             ;Harvest everything above stub.
+    (wait (at 1988 4 1 1))
+    (stop))
+
+  ;; Create these log files.
+  (output harvest
+          ("N Balance" (when monthly)
+                       (from 0 [m]) (to -1 [m]))
+          ("Crop Production"
+           (set "$crop" "Spring Barley")
+           (where "sbarley.dlf"))
+          (checkpoint (when (at 1987 8 7 6))))
+
+  ;;; test.dai ends here.
+\end{verbatim}
+%$
+
+\section{Bibliography}
+\bibliography{daisy}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
