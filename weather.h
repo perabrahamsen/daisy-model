@@ -20,6 +20,8 @@ protected:
   /* const */ double latitude;
   /* const */ double longitude;
   /* const */ double elevation;
+  /* const */ double timezone;
+  /* const */ double screen_height;
 
   // Temperature.
 protected:

@@ -1,5 +1,8 @@
 1999-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* weather.h (timezone, screen_height): New data members.
+	* weather_old.C (WeatherOld, WeatherOldSyntax): Initialize them.
+
 	* Version 0.94 released.
 
 1999-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>

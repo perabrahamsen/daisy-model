@@ -177,6 +177,8 @@ WeatherOld::WeatherOld (const AttributeList& al)
   latitude = al.number ("Latitude");
   longitude = al.number ("Longitude");
   elevation = al.number ("Elevation");
+  timezone = al.number ("TimeZone");
+  screen_height = al.number ("ScreenHeight");
   T_average_ = al.number ("average");
   T_amplitude_ = al.number ("amplitude");
   rad_per_day_ = al.number ("omega");
@@ -206,6 +208,12 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("Elevation", "m", Syntax::Const,
 	      "Height above sea level.");
   alist.add ("Elevation", 0.0);
+  syntax.add ("TimeZone", "dg East", Syntax::Const,
+	      "Time zone in effect (no DST).");
+  alist.add ("TimeZone", 15.0);
+  syntax.add ("ScreenHeight", "m", Syntax::Const,
+	      "Measurement height above ground.");
+  alist.add ("ScreenHeight", 2.0);
   syntax.add ("UTM_x", Syntax::Unknown (), Syntax::OptionalConst,
 	      "X position of weather station."); // Unused.
   syntax.add ("UTM_y", Syntax::Unknown (), Syntax::OptionalConst,
