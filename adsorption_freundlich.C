@@ -29,7 +29,7 @@ AdsorptionFreundlich::C_to_M (const Soil& soil,
 			      double Theta, int i, double C) const
 {
   const double S = K_clay * soil.clay (i) * pow (C, m);
-  return rho_mineral * S + Theta * C;
+  return soil.dry_bulk_density (i) * S + Theta * C;
 }
 
 double 
@@ -81,8 +81,10 @@ static struct AdsorptionFreundlichSyntax
   AdsorptionFreundlichSyntax ()
   {
     Syntax& syntax = *new Syntax ();
-    syntax.add ("K_clay", Syntax::Number, Syntax::Const);
-    syntax.add ("m", Syntax::Number, Syntax::Const);
+    syntax.add ("K_clay", "g/cm^3/g clay", Syntax::Const, 
+		"Clay dependent distribution parameter");
+    syntax.add ("m", Syntax::None (), Syntax::Const,
+		"Freundlich parameter");
     AttributeList& alist = *new AttributeList ();
     Librarian<Adsorption>::add_type ("Freundlich", alist, syntax, &make);
   }

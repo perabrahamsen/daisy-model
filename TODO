@@ -1,3 +1,22 @@
+* Fix em+s.dai overhead for presentation.
+
+* Skriv tekst til hver overhead.
+
+* Find fejl i minidaisy dai filer.
+
+* PDaisy: limits
+
+* Log of flux at specific depth gives problems, since flux only
+happens at numeric intervals.  Find a solution.
+
+* Dynamic N partitioning in crop.
+
+* GodeGuard errors
+
+* Daisy: Create an alist::default_alist entry for alist sequences.
+
+======================================================================
+
 * Chemical (+ API udvidelse og hjælpefunktioner)
 
 * log.dai

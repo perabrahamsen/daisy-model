@@ -88,6 +88,7 @@ Geometry::total (const vector<double>& v, double from, double to) const
 void
 Geometry::add (vector<double>& v, double from, double to, double amount) const
 {
+  assert (to < from);
   const double old_total = total (v);
 
   const unsigned int last = interval_plus (to);
@@ -178,9 +179,29 @@ Geometry::swap (vector<double>& v, double from, double middle, double to) const
   assert (approximate (old_total, total (v)));
 }
 
-void Geometry::add_layer (Syntax& syntax, const string& name)
+static bool 
+check_layers (const vector<AttributeList*>& layers)
 {
-  static Syntax& layer = *new Syntax ();
+  double last = 0.0;
+  for (unsigned int i = 0; i < layers.size (); i++)
+    {
+      const double next = layers[i]->number ("end");
+      if (next < last)
+	last = next;
+      else
+	{
+	  cerr << "Layer ending at " << next 
+	       << " should be below " << last << "\n";
+	  return false;
+	}
+    }
+  return true;
+}
+
+void 
+Geometry::add_layer (Syntax& syntax, const string& name)
+{
+  static Syntax& layer = *new Syntax (check_layers);
   if (!layer.ordered ())
     {
       // Initialize as first call.
@@ -193,9 +214,10 @@ void Geometry::add_layer (Syntax& syntax, const string& name)
   syntax.add (name, Syntax::Number, Syntax::Optional, Syntax::Sequence);
 }
 
-void Geometry::initialize_layer (vector<double>& array, 
-				 const AttributeList& al, 
-				 const string& name) const
+void 
+Geometry::initialize_layer (vector<double>& array, 
+			    const AttributeList& al, 
+			    const string& name) const
 {
   const string initial = string ("initial_") + name;
   assert (array.size () == 0);
@@ -211,6 +233,7 @@ void Geometry::initialize_layer (vector<double>& array,
       for (unsigned int i = 0; i < layers.size (); i++)
 	{
 	  const double next = layers[i]->number ("end");
+	  assert (next < last);
 	  const double value = layers[i]->number ("value");
 	  add (array, last, next, value);
 	  last = next;

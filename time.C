@@ -1,6 +1,7 @@
 // @ time.C
 
 #include "time.h"
+#include <assert.h>
 
 // @ Content.
 

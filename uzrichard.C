@@ -364,6 +364,7 @@ UZRichard::richard (const Soil& soil,
 
 	  if (accepted)
 	    {
+
 #if 0
 	      // This code checks that darcy and the mass preservation
 	      // code gives the same results.
@@ -590,9 +591,9 @@ static struct UZRichardSyntax
       syntax.add ("max_iterations", Syntax::Integer, Syntax::Const);
       alist.add ("max_iterations", 25);
       syntax.add ("max_absolute_difference", Syntax::Number, Syntax::Const);
-      alist.add ("max_absolute_difference", 0.002);
+      alist.add ("max_absolute_difference", 0.0002);
       syntax.add ("max_relative_difference", Syntax::Number, Syntax::Const);
-      alist.add ("max_relative_difference", 0.001);
+      alist.add ("max_relative_difference", 0.0001);
       syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
       syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);
       syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly);

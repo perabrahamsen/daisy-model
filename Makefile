@@ -86,7 +86,7 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-	COMPILE = /pack/egcs-1.0.2/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
+	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
 	#COMPILE = /pack/gcc-2.8.1/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
@@ -128,6 +128,18 @@ endif
 TKINCLUDE	= -I/pack/tcl+tk-8/include -I/usr/openwin/include
 TKLIB	  	= -L/pack/tcl+tk-8/lib -L/usr/openwin/lib \
 		  -ltix4.1.8.0 -ltk8.0 -ltcl8.0 -lX11 -lsocket -lnsl -ldl
+
+# Locate the Gtk-- library.
+#
+GTKMMINCLUDE	= -I/home/user_32/abraham/gtk/lib/Gtk--/include \
+		  -I/home/user_32/abraham/gtk/lib/glib/include \
+		  -I/home/user_32/abraham/gtk/include -I/usr/openwin/include
+GTKMMLIB	= -L/home/user_32/abraham/gtk/lib -lgtkmm \
+		  -L/usr/openwin/lib -R/usr/openwin/lib \
+		  -lgtk -lgdk -lglib -lXext -lX11 -lsocket -lnsl -lm
+GTKMMDRAWINCLUDE = -I/home/user_32/abraham/gtk/include/gtk--draw \
+		   $(GTKMMINCLUDE)
+GTKMMDRAWLIB	= -L/home/user_32/abraham/gtk/lib -lgtkmmdraw ${GTKMMLIB}
 
 # Find the right file extension.
 #
@@ -186,7 +198,7 @@ INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
 
 # Select the C files that are not part of the library.
 #
-MAIN = main.C tkmain.C
+MAIN = main.C tkmain.C gmain.C
 
 # The object files used in the daisy library.
 #
@@ -204,7 +216,7 @@ TEXT =  Makefile ChangeLog TODO $(HEADERS) $(SOURCES)
 
 # The executables.
 #
-EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT}
+EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
@@ -239,7 +251,12 @@ bugdaisy${EXT}:	bugmain${OBJ} $(FORLIB) $(LIBOBJ)
 tkdaisy${EXT}:	tkmain${OBJ} $(FORLIB) $(LIBOBJ)
 	$(LINK)tkdaisy $^ $(TKLIB) $(MATHLIB)
 
-# Create the C main file.
+# Create executable with Gtk--.
+#
+gdaisy${EXT}:	gmain${OBJ} $(FORLIB) $(LIBOBJ)
+	$(LINK)gdaisy $^ $(GTKMMLIB) $(MATHLIB)
+
+# Create the C main executable.
 #
 cdaisy${EXT}:  cmain${OBJ} $(FORLIB) $(LIBOBJ)
 	$(LINK)cdaisy $^ $(MATHLIB)
@@ -249,6 +266,11 @@ cdaisy${EXT}:  cmain${OBJ} $(FORLIB) $(LIBOBJ)
 daisy.dll:	$(LIBOBJ)
 #	/bc5/bin/tlink32 /Tpd /v $^, daisy.dll,, cw32i.lib
 	$(DLLLINK)daisy.dll $^ $(MATHLIB)
+
+# Create daisy plot executable.
+#
+pdaisy${EXT}: pmain${OBJ} time.o
+	$(LINK)pdaisy $^ $(GTKMMDRAWLIB) $(MATHLIB)
 
 
 dlldaisy${EXT}:	cmain${OBJ} daisy.dll
@@ -323,8 +345,8 @@ depend: $(SOURCES)
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	/pack/egcs/bin/c++ -DEGCS -I. $(TKINCLUDE) -MM $(SOURCES) \
-		| sed -e 's/\.o:/$${OBJ}:/' >> Makefile
+	/pack/egcs/bin/c++ -DEGCS -I. $(TKINCLUDE) $(GTKMMINCLUDE) \
+	        -MM $(SOURCES) | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
 #
@@ -392,6 +414,16 @@ endif
 tkmain${OBJ}: tkmain.C
 	$(CC) $(TKINCLUDE) $(NOLINK) $<
 
+# Special rule for gmain.o
+#
+gmain${OBJ}: gmain.C
+	$(CC) $(GTKMMINCLUDE) $(NOLINK) $<
+
+# Special rule for pmain.o
+#
+pmain${OBJ}: pmain.C
+	$(CC) $(GTKMMDRAWINCLUDE) $(NOLINK) $<
+
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
 filter_array${OBJ}: filter_array.C filter.h librarian.h library.h common.h \
@@ -407,7 +439,7 @@ column_std${OBJ}: column_std.C column.h librarian.h library.h common.h \
  horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
  soil_heat.h soil_NH4.h solute.h adsorption.h soil_NO3.h \
  organic_matter.h nitrification.h denitrification.h groundwater.h \
- log.h filter.h am.h
+ log.h filter.h am.h weather.h
 weather_simple${OBJ}: weather_simple.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h log.h filter.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h common.h \
@@ -431,7 +463,7 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
  librarian.h library.h common.h alist.h syntax.h
 horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
  alist.h syntax.h
-crop_std${OBJ}: crop_std.C crop.h time.h common.h librarian.h library.h \
+crop_std${OBJ}: crop_std.C crop.h time.h librarian.h library.h common.h \
  alist.h syntax.h log.h filter.h csmp.h bioclimate.h column.h \
  soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  om.h organic_matter.h soil_heat.h soil_NH4.h solute.h adsorption.h \
@@ -463,12 +495,12 @@ action_harvest${OBJ}: action_harvest.C action.h librarian.h library.h \
  common.h alist.h syntax.h daisy.h frame.h column.h
 hydraulic_old${OBJ}: hydraulic_old.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h options.h mathlib.h csmp.h
-crop_old${OBJ}: crop_old.C crop.h time.h common.h librarian.h library.h \
+crop_old${OBJ}: crop_old.C crop.h time.h librarian.h library.h common.h \
  alist.h syntax.h log.h filter.h csmp.h bioclimate.h column.h \
  soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  om.h organic_matter.h soil_heat.h soil_NH4.h solute.h adsorption.h \
  soil_NO3.h am.h harvest.h mathlib.h
-crop_sold${OBJ}: crop_sold.C crop.h time.h common.h librarian.h library.h \
+crop_sold${OBJ}: crop_sold.C crop.h time.h librarian.h library.h common.h \
  alist.h syntax.h log.h filter.h csmp.h bioclimate.h column.h \
  soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  organic_matter.h om.h soil_heat.h soil_NH4.h solute.h adsorption.h \
@@ -480,13 +512,13 @@ hydraulic_old2${OBJ}: hydraulic_old2.C hydraulic.h librarian.h library.h \
 nitrification_soil${OBJ}: nitrification_soil.C nitrification.h librarian.h \
  library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
  tortuosity.h geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h \
- adsorption.h soil_NO3.h csmp.h mathlib.h log.h filter.h groundwater.h \
+ adsorption.h soil_NO3.h mathlib.h log.h filter.h groundwater.h \
  uzmodel.h
 nitrification_solute${OBJ}: nitrification_solute.C nitrification.h \
  librarian.h library.h common.h alist.h syntax.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h soil_water.h soil_heat.h \
- soil_NH4.h solute.h adsorption.h soil_NO3.h csmp.h log.h filter.h \
- mathlib.h groundwater.h uzmodel.h
+ soil_NH4.h solute.h adsorption.h soil_NO3.h log.h filter.h mathlib.h \
+ groundwater.h uzmodel.h
 hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h
 uzlr${OBJ}: uzlr.C uzmodel.h librarian.h library.h common.h alist.h \
@@ -550,10 +582,10 @@ condition_daisy${OBJ}: condition_daisy.C condition.h librarian.h library.h \
  common.h alist.h syntax.h daisy.h frame.h
 chemical_std${OBJ}: chemical_std.C chemical.h librarian.h library.h \
  common.h alist.h syntax.h
-daisy${OBJ}: daisy.C daisy.h frame.h time.h common.h weather.h librarian.h \
- library.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
- log.h filter.h parser.h am.h nitrification.h bioclimate.h column.h \
- hydraulic.h crop.h harvest.h action.h condition.h
+daisy${OBJ}: daisy.C daisy.h frame.h time.h weather.h librarian.h \
+ library.h common.h alist.h syntax.h im.h groundwater.h uzmodel.h \
+ horizon.h log.h filter.h parser.h am.h nitrification.h bioclimate.h \
+ column.h hydraulic.h crop.h harvest.h action.h condition.h
 parser${OBJ}: parser.C parser.h librarian.h library.h common.h alist.h \
  syntax.h
 log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
@@ -562,7 +594,7 @@ weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
  syntax.h im.h log.h filter.h mathlib.h
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h
-crop${OBJ}: crop.C crop.h time.h common.h librarian.h library.h alist.h \
+crop${OBJ}: crop.C crop.h time.h librarian.h library.h common.h alist.h \
  syntax.h
 alist${OBJ}: alist.C csmp.h library.h common.h alist.h syntax.h
 syntax${OBJ}: syntax.C syntax.h common.h alist.h library.h
@@ -576,7 +608,7 @@ horizon${OBJ}: horizon.C horizon.h librarian.h library.h common.h alist.h \
 filter${OBJ}: filter.C filter.h librarian.h library.h common.h alist.h \
  syntax.h
 csmp${OBJ}: csmp.C csmp.h
-time${OBJ}: time.C time.h common.h
+time${OBJ}: time.C time.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h librarian.h library.h common.h alist.h \
  syntax.h
 parser_file${OBJ}: parser_file.C parser_file.h parser.h librarian.h \
@@ -631,7 +663,7 @@ im${OBJ}: im.C im.h log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h
 om${OBJ}: om.C om.h common.h syntax.h alist.h geometry.h log.h filter.h \
  librarian.h library.h mathlib.h
-harvest${OBJ}: harvest.C harvest.h time.h common.h syntax.h log.h filter.h \
+harvest${OBJ}: harvest.C harvest.h time.h syntax.h common.h log.h filter.h \
  librarian.h library.h alist.h
 options${OBJ}: options.C options.h common.h
 geometry${OBJ}: geometry.C geometry.h common.h syntax.h alist.h mathlib.h
@@ -661,9 +693,11 @@ frame${OBJ}: frame.C frame.h common.h
 chemical${OBJ}: chemical.C chemical.h librarian.h library.h common.h \
  alist.h syntax.h
 set_exceptions${OBJ}: set_exceptions.S
-main${OBJ}: main.C daisy.h frame.h time.h common.h parser_file.h parser.h \
- librarian.h library.h alist.h syntax.h version.h
-tkmain${OBJ}: tkmain.C daisy.h frame.h time.h common.h syntax.h alist.h \
+main${OBJ}: main.C daisy.h frame.h time.h parser_file.h parser.h \
+ librarian.h library.h common.h alist.h syntax.h version.h
+tkmain${OBJ}: tkmain.C daisy.h frame.h time.h syntax.h common.h alist.h \
+ library.h
+gmain${OBJ}: gmain.C daisy.h frame.h time.h syntax.h common.h alist.h \
  library.h
 cmain${OBJ}: cmain.c cdaisy.h
 bugmain${OBJ}: bugmain.c cdaisy.h

@@ -640,9 +640,9 @@ CropSoldSyntax::CropSoldSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
 
-    // Canopy
+  // Canopy
   Syntax& Canopy = *new Syntax ();
-  syntax.add ("Canopy", Canopy, Syntax::State);
+  AttributeList& vCanopy = *new AttributeList ();
 
   // CropPar
 
@@ -731,9 +731,6 @@ CropSoldSyntax::CropSoldSyntax ()
   Syntax& CrpN = *new Syntax ();
   AttributeList& CrpNList = *new AttributeList ();
 
-  syntax.add ("CrpN", CrpN, Syntax::Const);
-  alist.add ("CrpN", CrpNList);
-
   CrpN.add ("SeedN", Syntax::Number, Syntax::Const);
   CrpN.add ("DS_fixate", Syntax::Number, Syntax::Const);
   CrpNList.add ("DS_fixate", 42000.0);
@@ -747,12 +744,12 @@ CropSoldSyntax::CropSoldSyntax ()
   CrpN.add ("CrRootCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("NfRootCnc", Syntax::CSMP, Syntax::Const);
 
+  syntax.add ("CrpN", CrpN, Syntax::Const);
+  alist.add ("CrpN", CrpNList);
+
   // HarvestPar
   Syntax& Harvest = *new Syntax ();
   AttributeList& HarvestList = *new AttributeList ();
-
-  syntax.add ("Harvest", Harvest, Syntax::Const);
-  alist.add ("Harvest", HarvestList);
 
   Harvest.add ("beta", Syntax::Number, Syntax::Const);
   Harvest.add ("At", Syntax::Number, Syntax::Const);
@@ -771,6 +768,9 @@ CropSoldSyntax::CropSoldSyntax ()
   Harvest.add ("DSnew", Syntax::Number, Syntax::Const);
   HarvestList.add ("DSnew", 0.0);
 
+  syntax.add ("Harvest", Harvest, Syntax::Const);
+  alist.add ("Harvest", HarvestList);
+
    // I don't know where these belong.
   syntax.add ("IntcpCap", Syntax::Number, Syntax::Const);
   syntax.add ("EpFac", Syntax::Number, Syntax::Const);
@@ -780,17 +780,15 @@ CropSoldSyntax::CropSoldSyntax ()
   // Phenology
   Syntax& Phenology = *new Syntax ();
   AttributeList& vPhenology = *new AttributeList ();
-  syntax.add ("Phenology", Phenology, Syntax::State);
-  alist.add ("Phenology", vPhenology);
 
   Phenology.add ("DS", Syntax::Number, Syntax::State);
   vPhenology.add ("DS", -1.0);
   Phenology.add ("Vern", Syntax::Number, Syntax::Optional);
 
-  // Canopy
-  AttributeList& vCanopy = *new AttributeList ();
-  alist.add ("Canopy", vCanopy);
+  syntax.add ("Phenology", Phenology, Syntax::State);
+  alist.add ("Phenology", vPhenology);
 
+  // Canopy
   Canopy.add ("Height", Syntax::Number, Syntax::State);
   vCanopy.add ("Height", 0.0);
   Canopy.add ("LAI", Syntax::Number, Syntax::State);
@@ -800,11 +798,12 @@ CropSoldSyntax::CropSoldSyntax ()
   Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::State);
   vCanopy.add ("LAIvsH", empty_csmp);
 
+  syntax.add ("Canopy", Canopy, Syntax::State);
+  alist.add ("Canopy", vCanopy);
+
     // RootSys
   Syntax& RootSys = *new Syntax ();
   AttributeList& vRootSys = *new AttributeList ();
-  syntax.add ("RootSys", RootSys, Syntax::State);
-  alist.add ("RootSys", vRootSys);
 
   RootSys.add ("Depth", Syntax::Number, Syntax::Optional);
   RootSys.add ("Density", Syntax::Number, Syntax::State, Syntax::Sequence);
@@ -821,11 +820,12 @@ CropSoldSyntax::CropSoldSyntax ()
   RootSys.add ("transpiration", Syntax::Number, Syntax::LogOnly);
   RootSys.add ("Ept", Syntax::Number, Syntax::LogOnly);
 
+  syntax.add ("RootSys", RootSys, Syntax::State);
+  alist.add ("RootSys", vRootSys);
+
   // Prod
   Syntax& Prod = *new Syntax ();
   AttributeList& vProd = *new AttributeList ();
-  syntax.add ("Prod", Prod, Syntax::State);
-  alist.add ("Prod", vProd);
 
   Prod.add ("WLeaf", Syntax::Number, Syntax::State);
   vProd.add ("WLeaf", 0.001);
@@ -837,11 +837,12 @@ CropSoldSyntax::CropSoldSyntax ()
   vProd.add ("WRoot", 0.001);
   Prod.add ("NCrop", Syntax::Number, Syntax::Optional);
 
+  syntax.add ("Prod", Prod, Syntax::State);
+  alist.add ("Prod", vProd);
+
   // CrpAux
   Syntax& CrpAux = *new Syntax ();
   AttributeList& vCrpAux = *new AttributeList ();
-  syntax.add ("CrpAux", CrpAux, Syntax::State);
-  alist.add ("CrpAux", vCrpAux);
 
   CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::State);
   vCrpAux.add ("InitLAI", true);
@@ -865,6 +866,9 @@ CropSoldSyntax::CropSoldSyntax ()
   CrpAux.add ("NH4Upt", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("NO3Upt", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("Fixated", Syntax::Number, Syntax::LogOnly);
+
+  syntax.add ("CrpAux", CrpAux, Syntax::State);
+  alist.add ("CrpAux", vCrpAux);
 
   Librarian<Crop>::add_type ("sold", alist, syntax, &make);
 }

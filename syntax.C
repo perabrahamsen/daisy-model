@@ -13,24 +13,31 @@ const int Syntax::Unspecified = -666;
 struct Syntax::Implementation
 {
   check_fun checker;
+  check_list_fun list_checker;
   vector<string> order;
   typedef map<string, type, less<string> > type_map;
   typedef map<string, category, less<string> > status_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   typedef map<string, int, less<string> > size_map;
   typedef map<string, ::Library*, less<string> > library_map;
+  typedef map<string, string, less<string> > string_map;
+
   type_map types;
   status_map status;
   syntax_map syntax;
   size_map size;
   library_map libraries;
+  string_map dimensions;
+  string_map descriptions;
+
   bool check (const AttributeList& vl, const string& name);
   Syntax::type lookup (const string& key) const;
   int order_number (const string& name) const;
   void dump (int indent) const;
   void entries (vector<string>& result) const;
-  Implementation (check_fun c)
-    : checker (c)
+  Implementation (check_fun c1, check_list_fun c2)
+    : checker (c1),
+      list_checker (c2)
   { }
 };    
 
@@ -44,13 +51,16 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
        i++)
     {
       string key = (*i).first;
-      if(status[key] != Const && status[key] != State)
-	/* Do nothing */;
-      else if (!vl.check (key))
+
+      if ((status[key] == Const || status[key] == State)
+	       && !vl.check (key))
 	{
-	      cerr << "Attributte " << key << " missing\n";
-	      error = true;
+	  cerr << "Attributte " << key << " missing\n";
+	  error = true;
 	}
+      else if (!(status[key] == Const || status[key] == State)
+	  && !vl.check (key))
+	/* Missing optional or log, ignore */;
       else if (types[key] == Object)
 	if (size[key] != Singleton)
 	  {
@@ -96,12 +106,22 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 	      // intended to work as a "default" for the individual
 	      // members of the sequence.
 	      {
-		cerr << "AList sequence " << key << " missing\n";
-		error = true;
+		if (status[key] == Const || status[key] == State)
+		  {
+		    cerr << "AList sequence " << key << " missing\n";
+		    error = true;
+		  }
 	      }
 	    else 
 	      {
 		const vector<AttributeList*>& seq = vl.alist_sequence (key);
+		if (syntax[key]->impl.list_checker)
+		  if (!syntax[key]->impl.list_checker (seq))
+		    {
+		      error = true;
+		      cerr << "in " << key << "\n";
+		    }
+		
 		for (vector<AttributeList*>::const_iterator j = seq.begin ();
 		     j != seq.end ();
 		     j++)
@@ -228,6 +248,20 @@ Syntax::Implementation::entries (vector<string>& result) const
     }
 }
 
+const string&
+Syntax::Unknown ()
+{
+  static const string unknown = "<unknown>";
+  return unknown;
+}
+
+const string&
+Syntax::None ()
+{
+  static const string none = "<none>";
+  return none;
+}
+
 // Each syntax entry should have an associated type.
 
 static const char * const type_names[] = 
@@ -316,6 +350,28 @@ Syntax::size (const string& key) const
     return (*i).second;
 }
 
+const string&
+Syntax::dimension (const string& key) const
+{
+  Implementation::string_map::const_iterator i = impl.dimensions.find (key);
+
+  if (i == impl.dimensions.end ())
+    return Unknown ();
+  else
+    return (*i).second;
+}
+
+const string&
+Syntax::description (const string& key) const
+{
+  Implementation::string_map::const_iterator i = impl.descriptions.find (key);
+
+  if (i == impl.descriptions.end ())
+    return Unknown ();
+  else
+    return (*i).second;
+}
+
 bool 
 Syntax::ordered () const
 {
@@ -339,24 +395,37 @@ Syntax::total_order () const
 { return impl.order.size () == impl.types.size (); }
 
 void
-Syntax::add (const string& key, type t, category req, int s)
+Syntax::add (const string& key, type t, category req, int s, const string& d)
 {
   impl.size[key] = s;
   impl.types[key] = t;
   impl.status[key] = req;
+  if (d != Unknown ())
+    impl.descriptions[key] = d;
 }
 
 void
-Syntax::add (const string& key, const Syntax& s, category req, int sz)
+Syntax::add (const string& key, const string& dim, category req, int sz,
+	     const string& d)
 {
-  add (key, AList, req, sz);
+  add (key, Number, req, sz, d);
+  if (d != Unknown ())
+    impl.dimensions[key] = dim;
+}
+
+void
+Syntax::add (const string& key, const Syntax& s, category req, int sz,
+	     const string& d)
+{
+  add (key, AList, req, sz, d);
   impl.syntax[key] = &s;
 }
 
 void 
-Syntax::add (const string& key, ::Library& l, category req, int s)
+Syntax::add (const string& key, ::Library& l, category req, int s,
+	     const string& d)
 {
-  add (key, Object, req, s);
+  add (key, Object, req, s, d);
   impl.libraries[key] = &l;
 }
 
@@ -432,7 +501,17 @@ Syntax::entries (vector<string>& result) const
   impl.entries (result);
 }
 
-Syntax::Syntax (check_fun c) : impl (*new Implementation (c))
+unsigned int
+Syntax::entries () const
+{ return impl.types.size (); }
+
+Syntax::Syntax () : impl (*new Implementation (NULL, NULL))
+{ }
+
+Syntax::Syntax (check_fun c) : impl (*new Implementation (c, NULL))
+{ }
+
+Syntax::Syntax (check_list_fun c) : impl (*new Implementation (NULL, c))
 { }
 
 Syntax::~Syntax ()

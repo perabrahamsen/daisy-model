@@ -32,7 +32,7 @@ public:
   // Is the element `key' in this alist a subset of the correspi
   bool subset (const AttributeList& other, const Syntax& syntax,
 	       const string& key) const;
-  int size (const string& key) const; // BUG: UNIMPLEMENTED.
+  int size (const string& key) const;
 
   double number (string) const;
   const string& name (string) const;

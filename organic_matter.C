@@ -494,7 +494,7 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
     }
 
   // Initialize SOM.
-  if (al.check ("initial_SOM") && al.size ("initial_SOM") == Syntax::Sequence)
+  if (al.check ("initial_SOM") && al.size ("initial_SOM") != Syntax::Singleton)
     {
       const vector<AttributeList*>& layers
 	= al.alist_sequence ("initial_SOM");

@@ -21,15 +21,24 @@ Harvest::output (Log& log, Filter& filter) const
 void 
 Harvest::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add ("column", Syntax::String, Syntax::LogOnly);
-  syntax.add ("time", Syntax::Date, Syntax::LogOnly);
-  syntax.add ("crop", Syntax::String, Syntax::LogOnly);
-  syntax.add ("stem_DM", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("stem_N", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("leaf_DM", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("leaf_N", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("sorg_DM", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("sorg_N", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("column", Syntax::String, Syntax::LogOnly,
+	      "Name of column where the harvest were harvested.");
+  syntax.add ("time", Syntax::Date, Syntax::LogOnly,
+	      "Time of the harvest operation.");
+  syntax.add ("crop", Syntax::String, Syntax::LogOnly,
+	      "Name of crop that was harvested.");
+  syntax.add ("stem_DM", "g/m²", Syntax::LogOnly,
+	      "Total stem dry matter in harvest.");
+  syntax.add ("stem_N", "g/m²", Syntax::LogOnly,
+	      "Total stem nitrogen in harvest.");
+  syntax.add ("leaf_DM", "g/m²", Syntax::LogOnly,
+	      "Total leaf dry matter in harvest.");
+  syntax.add ("leaf_N", "g/m²", Syntax::LogOnly,
+	      "Total leaf nitrogen in harvest.");
+  syntax.add ("sorg_DM", "g/m²", Syntax::LogOnly,
+	      "Total storage organ dry matter in harvest.");
+  syntax.add ("sorg_N", "g/m²", Syntax::LogOnly,
+	      "Total storage organ nitrogen in harvest.");
 }
 
 Harvest::Harvest (string col, Time t, string crp, 

@@ -167,7 +167,7 @@ Solute::initialize (const AttributeList& al,
 	{
 	  assert (ppm.size () == soil.size ());
 
-	  for (unsigned int i = M_.size (); i < C_.size (); i++)
+	  for (unsigned int i = M_.size (); i < ppm.size (); i++)
 	    // ppm -> g / cm^3.
 	    M_.push_back (1.0e-6 * ppm[i] * soil.dry_bulk_density (i));
 	}

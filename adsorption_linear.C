@@ -14,14 +14,16 @@ public:
     {
       const double porosity = soil.Theta (i, 0.0);
       const double clay = soil.clay (i);
-      const double W_clay = clay * rho_mineral * (1.0 - porosity);
+      const double W_clay = clay * soil.dry_bulk_density (i)
+	* (1.0 - porosity);
       return C * (K_clay * W_clay + Theta);
     }
   double M_to_C (const Soil& soil, double Theta, int i, double M) const
     {
       const double porosity = soil.Theta (i, 0.0);
       const double clay = soil.clay (i);
-      const double W_clay = clay * rho_mineral * (1.0 - porosity);
+      const double W_clay = clay * soil.dry_bulk_density (i)
+	* (1.0 - porosity);
       return M / (Theta + K_clay * W_clay);
     }
   // Create.

@@ -130,9 +130,10 @@ UZlr::tick (const Soil& soil,
       else
 	// Gravitational water movement.
 	{
+	  assert (finite (h_new));
 	  const double Theta_sat = soil.Theta (i, 0.0);
 	  const double Theta_fc = soil.Theta (i, h_fc);
-	  const double Theta_next =Theta_new - K_new * dt / dz;
+	  const double Theta_next = Theta_new - K_new * dt / dz;
 	  
 	  if (Theta_next < Theta_fc)
 	    {
@@ -154,6 +155,9 @@ UZlr::tick (const Soil& soil,
 	    }
 	  assert (q[i+1] < 1e-10);
 	}
+      assert (finite (h[i]));
+      assert (finite (Theta[i]));
+      assert (finite (q[i+1]));
     }
 
   // Lower border.

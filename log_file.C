@@ -238,7 +238,7 @@ LogFile::print (double v)
   scratch << v << '\0';
   const char* s = scratch.str ();
   print (s);
-  delete s;
+  delete [] s;
 }
 
 void
@@ -248,7 +248,7 @@ LogFile::print (int v)
   scratch << v << '\0';
   const char* s = scratch.str ();
   print (s);
-  delete s;
+  delete [] s;
 }
 
 void
@@ -258,7 +258,7 @@ LogFile::print (bool v)
   scratch << v << '\0';
   const char* s = scratch.str ();
   print (s);
-  delete s;
+  delete [] s;
 }
 
 void

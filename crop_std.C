@@ -66,7 +66,7 @@ protected:
 public:				// Used by external development models.
   void Vernalization (double Ta);
 protected:
-  void Emergence (const Soil&, const SoilHeat&);
+  void Emergence ();
   void DevelopmentStage (const Bioclimate&);
   double CropHeight ();
   void InitialLAI ();
@@ -114,8 +114,6 @@ public:
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
-
-typedef void (*CropFun)(const Bioclimate&, CropStandard&);
 
 struct CropStandard::Parameters
 { 
@@ -282,6 +280,8 @@ struct CropStandard::Variables
     double Vern;		// Vernalization criterium [C d]
     double partial_day_length;	// Light hours this day until now [0-24 h]
     double day_length;		// Light hours previous day. [0-24 h]
+    double partial_soil_temperature; // Accumaleted soil temperature. [°C]
+    double soil_temperature;	// Soil temperature previous day. [°C]
   private:
     friend struct CropStandard::Variables;
     RecPhenology (const Parameters&, const AttributeList&);
@@ -533,7 +533,10 @@ CropStandard::Variables::RecPhenology::RecPhenology (const Parameters& par,
   : DS (vl.number ("DS")),
     Vern (vl.check ("Vern") ? vl.number ("Vern") : par.Vernal.TaSum),
     partial_day_length (vl.number ("partial_day_length")),
-    day_length (vl.number ("day_length"))
+    day_length (vl.number ("day_length")),
+    partial_soil_temperature (vl.number ("partial_soil_temperature")),
+    soil_temperature (vl.number ("soil_temperature"))
+  
 { }
 
 void 
@@ -544,6 +547,8 @@ CropStandard::Variables::RecPhenology::output (Log& log, Filter& filter) const
   log.output ("Vern", filter, Vern);
   log.output ("partial_day_length", filter, partial_day_length);
   log.output ("day_length", filter, day_length);
+  log.output ("partial_soil_temperature", filter, partial_soil_temperature);
+  log.output ("soil_temperature", filter, soil_temperature);
   log.close();
 }
 
@@ -723,19 +728,9 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
 
-  // Canopy
-  Syntax& Canopy = *new Syntax ();
-  syntax.add ("Canopy", Canopy, Syntax::State);
-  AttributeList& vCanopy = *new AttributeList ();
-  alist.add ("Canopy", vCanopy);
-
-  // CropPar
-
   // DevelPar
   Syntax& Devel = *new Syntax ();
-  syntax.add ("Devel", Devel, Syntax::Const);
   AttributeList& vDevel = *new AttributeList ();
-  alist.add ("Devel", vDevel);
 
   Devel.add ("EmrTSum", Syntax::Number, Syntax::Const);
   Devel.add ("DS_Emr", Syntax::Number, Syntax::Const);
@@ -747,15 +742,19 @@ CropStandardSyntax::CropStandardSyntax ()
   Devel.add ("defined_until_ds", Syntax::Number, Syntax::Const);
   vDevel.add ("defined_until_ds", 2.0);
     
+  syntax.add ("Devel", Devel, Syntax::Const);
+  alist.add ("Devel", vDevel);
+
   // VernalPar
   Syntax& Vernal = *new Syntax ();
-  syntax.add ("Vernal", Vernal, Syntax::Optional);
   // WARNING: Don't add an alist here, or the `Optional' idea is lost.
 
   Vernal.add ("required", Syntax::Boolean, Syntax::Optional);
   Vernal.add ("DSLim", Syntax::Number, Syntax::Const);
   Vernal.add ("TaLim", Syntax::Number, Syntax::Const);
   Vernal.add ("TaSum", Syntax::Number, Syntax::Const);
+
+  syntax.add ("Vernal", Vernal, Syntax::Optional);
 
   // Initialize "no vernalization"
   AttributeList& noVernal = *new AttributeList ();
@@ -767,11 +766,16 @@ CropStandardSyntax::CropStandardSyntax ()
 
   // LeafPhotPar
   Syntax& LeafPhot = *new Syntax ();
-  syntax.add ("LeafPhot", LeafPhot, Syntax::Const);
 
   LeafPhot.add ("Qeff", Syntax::Number, Syntax::Const);
   LeafPhot.add ("Fm", Syntax::Number, Syntax::Const);
   LeafPhot.add ("TempEff", Syntax::CSMP, Syntax::Const);
+
+  syntax.add ("LeafPhot", LeafPhot, Syntax::Const);
+
+  // Canopy
+  Syntax& Canopy = *new Syntax ();
+  AttributeList& vCanopy = *new AttributeList ();
 
   Canopy.add ("InitGrowth", Syntax::Number, Syntax::Const);
   Canopy.add ("DSinit", Syntax::Number, Syntax::Const);
@@ -790,7 +794,6 @@ CropStandardSyntax::CropStandardSyntax ()
 
   // RootPar
   Syntax& Root = *new Syntax ();
-  syntax.add ("Root", Root, Syntax::Const);
 
   Root.add ("DptEmr", Syntax::Number, Syntax::Const);
   Root.add ("PenPar1", Syntax::Number, Syntax::Const);
@@ -804,18 +807,21 @@ CropStandardSyntax::CropStandardSyntax ()
   Root.add ("MxNO3Up", Syntax::Number, Syntax::Const);
   Root.add ("Rxylem", Syntax::Number, Syntax::Const);
 
-    // PartitPar
+  syntax.add ("Root", Root, Syntax::Const);
+  
+  // PartitPar
   Syntax& Partit = *new Syntax ();
-  syntax.add ("Partit", Partit, Syntax::Const);
 
   Partit.add ("Root", Syntax::CSMP, Syntax::Const);
   Partit.add ("Leaf", Syntax::CSMP, Syntax::Const);
   Partit.add ("Stem", Syntax::CSMP, Syntax::Const);
   Partit.add ("RSR", Syntax::CSMP, Syntax::Const);
 
+  syntax.add ("Partit", Partit, Syntax::Const);
+
   // ProdPar
   Syntax& Prod = *new Syntax ();
-  syntax.add ("Prod", Prod, Syntax::State);
+  AttributeList& vProd = *new AttributeList ();
 
   Prod.add ("E_Root", Syntax::Number, Syntax::Const);
   Prod.add ("E_Leaf", Syntax::Number, Syntax::Const);
@@ -835,8 +841,6 @@ CropStandardSyntax::CropStandardSyntax ()
   // CrpNPar
   Syntax& CrpN = *new Syntax ();
   AttributeList& CrpNList = *new AttributeList ();
-  syntax.add ("CrpN", CrpN, Syntax::Const);
-  alist.add ("CrpN", CrpNList);
 
   CrpN.add ("SeedN", Syntax::Number, Syntax::Const);
   CrpN.add ("DS_fixate", Syntax::Number, Syntax::Const);
@@ -857,12 +861,12 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpN.add ("NfSOrgCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("DdRootCnc", Syntax::CSMP, Syntax::Const);
 
+  syntax.add ("CrpN", CrpN, Syntax::Const);
+  alist.add ("CrpN", CrpNList);
+
   // HarvestPar
   Syntax& Harvest = *new Syntax ();
   AttributeList& HarvestList = *new AttributeList ();
-
-  syntax.add ("Harvest", Harvest, Syntax::Const);
-  alist.add ("Harvest", HarvestList);
 
   Harvest.add ("beta", Syntax::Number, Syntax::Const);
   Harvest.add ("CStraw", Syntax::Number, Syntax::Const);
@@ -888,6 +892,9 @@ CropStandardSyntax::CropStandardSyntax ()
   Harvest.add ("DSnew", Syntax::Number, Syntax::Const);
   HarvestList.add ("DSnew", 0.0);
 
+  syntax.add ("Harvest", Harvest, Syntax::Const);
+  alist.add ("Harvest", HarvestList);
+
    // I don't know where these belong.
   syntax.add ("IntcpCap", Syntax::Number, Syntax::Const);
   syntax.add ("EpFac", Syntax::Number, Syntax::Const);
@@ -901,8 +908,6 @@ CropStandardSyntax::CropStandardSyntax ()
   // Phenology
   Syntax& Phenology = *new Syntax ();
   AttributeList& vPhenology = *new AttributeList ();
-  syntax.add ("Phenology", Phenology, Syntax::State);
-  alist.add ("Phenology", vPhenology);
 
   Phenology.add ("DS", Syntax::Number, Syntax::State);
   vPhenology.add ("DS", -1.0);
@@ -911,6 +916,13 @@ CropStandardSyntax::CropStandardSyntax ()
   vPhenology.add ("partial_day_length", 0.0);
   Phenology.add ("day_length", Syntax::Number, Syntax::State);
   vPhenology.add ("day_length", 0.0);
+  Phenology.add ("partial_soil_temperature", Syntax::Number, Syntax::State);
+  vPhenology.add ("partial_soil_temperature", 0.0);
+  Phenology.add ("soil_temperature", Syntax::Number, Syntax::State);
+  vPhenology.add ("soil_temperature", 0.0);
+
+  syntax.add ("Phenology", Phenology, Syntax::State);
+  alist.add ("Phenology", vPhenology);
 
   // Canopy
   Canopy.add ("Height", Syntax::Number, Syntax::State);
@@ -924,11 +936,12 @@ CropStandardSyntax::CropStandardSyntax ()
   Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::State);
   vCanopy.add ("LAIvsH", empty_csmp);
 
+  syntax.add ("Canopy", Canopy, Syntax::State);
+  alist.add ("Canopy", vCanopy);
+
   // RootSys
   Syntax& RootSys = *new Syntax ();
   AttributeList& vRootSys = *new AttributeList ();
-  syntax.add ("RootSys", RootSys, Syntax::State);
-  alist.add ("RootSys", vRootSys);
 
   RootSys.add ("Depth", Syntax::Number, Syntax::Optional);
   RootSys.add ("Density", Syntax::Number, Syntax::State, Syntax::Sequence);
@@ -948,11 +961,11 @@ CropStandardSyntax::CropStandardSyntax ()
   RootSys.add ("nitrogen_stress", Syntax::Number, Syntax::LogOnly);
   RootSys.add ("Ept", Syntax::Number, Syntax::LogOnly);
 
+  syntax.add ("RootSys", RootSys, Syntax::State);
+  alist.add ("RootSys", vRootSys);
+
   // Prod
   // Warning: Uses same syntax as `ProdPar'.
-  AttributeList& vProd = *new AttributeList ();
-  alist.add ("Prod", vProd);
-
   Prod.add ("WLeaf", Syntax::Number, Syntax::State);
   vProd.add ("WLeaf", 0.001);
   Prod.add ("WStem", Syntax::Number, Syntax::State);
@@ -962,6 +975,9 @@ CropStandardSyntax::CropStandardSyntax ()
   Prod.add ("WSOrg", Syntax::Number, Syntax::State);
   vProd.add ("WSOrg", 0.000);
   Prod.add ("NCrop", Syntax::Number, Syntax::Optional);
+
+  alist.add ("Prod", vProd);
+  syntax.add ("Prod", Prod, Syntax::State);
 
   // CrpAux
   Syntax& CrpAux = *new Syntax ();
@@ -1133,13 +1149,12 @@ CropStandard::Vernalization (double Ta)
 }
 
 void 
-CropStandard::Emergence (const Soil& soil, const SoilHeat& soil_heat)
+CropStandard::Emergence ()
 {
   const Parameters::DevelPar& Devel = par.Devel;
-  const double EmrDpt = par.Root.DptEmr;
   double& DS = var.Phenology.DS;
 
-  DS += soil_heat.T (soil.interval_plus (-EmrDpt)) / Devel.EmrTSum;
+  DS += var.Phenology.soil_temperature / Devel.EmrTSum;
   if (DS > 0)
     DS = Devel.DS_Emr;
 }
@@ -1159,7 +1174,7 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 	  >  -var.Prod.WLeaf /1000.0) // It lost 0.1% of its leafs to resp.
 	Phenology.DS += (Devel.DSRate1
 			 * Devel.TempEff1 (Ta)
-			 * Devel.PhotEff1 (var.Phenology.day_length));
+			 * Devel.PhotEff1 (var.Phenology.day_length + 1.0));
       if (par.Vernal.required && Phenology.Vern < 0)
 	Vernalization (Ta);
     }
@@ -1197,9 +1212,13 @@ CropStandard::InitialLAI ()
     }
   else
     {
+#if 0
       if (DS > Canopy.DSinit)
 	DS = Canopy.DSinit;
       LAI = 0.5 * (exp (Canopy.InitGrowth * DS) - 1);
+#else
+      LAI = 0.5 * (exp (Canopy.InitGrowth * min (DS, Canopy.DSinit)) - 1);
+#endif
     }
 }
 
@@ -1435,6 +1454,7 @@ double
 CropStandard::PotentialWaterUptake (const double h_x, 
 				    const Soil& soil, const SoilWater& soil_water)
 {
+  const double h_wp = par.Root.h_wp;
   const double Rxylem = par.Root.Rxylem;
   const double area = M_PI * par.Root.Rad * par.Root.Rad;
   const vector<double>& L = var.RootSys.Density;
@@ -1448,10 +1468,18 @@ CropStandard::PotentialWaterUptake (const double h_x,
 	  continue;
 	}
       const double h = h_x - (1 + Rxylem) * soil.z (i);
-      const double uptake = max (2 * M_PI * L[i] * (soil.Theta (i, h) / soil.Theta (i, 0.0))
-				      * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
-                                      / (- 0.5 * log (area * L[i])),
-                                 0.0);
+      assert (soil_water.Theta_left (i) >= 0.0);
+      assert (soil.Theta (i, h_wp) >= soil.Theta_res (i));
+      const double max_uptake 
+	= (soil_water.Theta_left (i) - soil.Theta (i, h_wp)) / dt;
+      const double uptake
+	= max (min (2 * M_PI * L[i]
+		    * (soil.Theta (i, h) / soil.Theta (i, 0.0))
+		    * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
+		    / (- 0.5 * log (area * L[i])),
+		    max_uptake),
+	       0.0);
+      assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
       assert (L[i] >= 0.0);
       assert (soil.Theta (i, h) > 0.0);
       assert (soil.Theta (i, 0.0) > 0.0);
@@ -1755,6 +1783,11 @@ CropStandard::AssimilatePartitioning (double DS,
   f_Leaf = (1 - f_Root) * Partit.Leaf (DS);
   f_Stem = (1 - f_Root) * Partit.Stem (DS);
   f_SOrg = max (0.0, 1 - f_Root - f_Leaf - f_Stem);
+  if (f_SOrg < 1e-5)
+    {
+      f_Root += f_SOrg;
+      f_SOrg = 0.0;
+    }
 }
 
 double 
@@ -1921,9 +1954,18 @@ CropStandard::tick (const Time& time,
 	var.RootSys.NH4Extraction.end (),
 	0.0);
 
+  // Update partial_soil_temperature.
+  var.Phenology.partial_soil_temperature += 
+    soil_heat.T (soil.interval_plus (-par.Root.DptEmr));
+
   if (time.hour () == 0 && var.Phenology.DS <= 0)
     {
-      Emergence (soil, soil_heat);
+      // Calculate average soil temperature.
+      var.Phenology.soil_temperature = 
+	var.Phenology.partial_soil_temperature / 24.0;
+      var.Phenology.partial_soil_temperature = 0.0;
+
+      Emergence ();
       if (var.Phenology.DS >= 0)
 	{
 	  InitialLAI ();
@@ -2034,7 +2076,7 @@ CropStandard::harvest (const string& column_name,
 
   const double NShoot = NCrop - NRoot;
 
-  if (WSOrg > 0.0)
+  if (WSOrg > 0.1)
     {
       const double WStraw = WLeaf + WStem;
       const double CShoot = NShoot / WShoot;

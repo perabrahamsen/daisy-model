@@ -3,7 +3,8 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include "common.h"
+#include <string>
+using namespace std;
 
 class Time
 {

@@ -108,11 +108,12 @@ Daisy::tick_logs ()
     }
 }
 
-void 
+void
 Daisy::tick ()
 { 
   action.doIt (frame, *this);
   weather.tick (time);
+
   tick_columns ();
   tick_logs ();
   time.tick_hour ();
@@ -153,19 +154,31 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Library::load_syntax (syntax, alist);
 
-  syntax.add ("description", Syntax::String, Syntax::Optional);
+  syntax.add ("description", Syntax::String, Syntax::Optional,
+	      "Description of this simulation setup.");
   syntax.add ("output", Librarian<Log>::library (),
-	      Syntax::Const, Syntax::Sequence);
+	      Syntax::Const, Syntax::Sequence,
+	      "List of logs for output during the simulation.");
   syntax.add ("input", Librarian<Parser>::library (), Syntax::Optional, 
-	      Syntax::Singleton);
-  syntax.add ("manager", Librarian<Action>::library (), Syntax::Const);
-  syntax.add ("time", Syntax::Date, Syntax::State);
+	      Syntax::Singleton,
+	      "Command to add more information about the simulation.");
+  syntax.add ("manager", Librarian<Action>::library (), Syntax::Const,
+	      Syntax::Singleton,
+	      "Specify the management operations to perform during \
+the simulation.");
+  syntax.add ("time", Syntax::Date, Syntax::State,
+	      "Current time in the simulation.");
   syntax.add ("column",
 	      Librarian<Column>::library (), 
-	      Syntax::State, Syntax::Sequence);
-  syntax.add ("weather", Librarian<Weather>::library ());
+	      Syntax::State, Syntax::Sequence,
+	      "List of columns to use in this simulation.");
+  syntax.add ("weather", Librarian<Weather>::library (),
+	      Syntax::State, Syntax::Singleton,
+	      "Weather model for probiding climate information during \
+the simulation.");
   add_submodule<Harvest> ("harvest", syntax, alist,
-			  Syntax::LogOnly, Syntax::Sequence);
+			  Syntax::LogOnly, Syntax::Sequence, 
+			  "Total list of all crop yields.");
 }
 
 Daisy::~Daisy ()

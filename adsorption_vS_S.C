@@ -23,7 +23,7 @@ public:
       const double S_planar = 5.964e-3;
       const double porosity = soil.Theta (i, 0.0);
       const double clay = soil.clay (i);
-      return S_planar * clay * rho_mineral * (1.0 - porosity); 
+      return S_planar * clay * soil.dry_bulk_density (i) * (1.0 - porosity); 
     }
   double v_edge (const Soil& soil, int i) const
     {
@@ -31,7 +31,7 @@ public:
       const double porosity = soil.Theta (i, 0.0);
       const double clay = soil.clay (i);
       
-      return S_edge * clay * rho_mineral * (1.0 - porosity); 
+      return S_edge * clay * soil.dry_bulk_density (i) * (1.0 - porosity); 
     }
 
   // Create.

@@ -6,7 +6,6 @@
 #include "soil_heat.h"
 #include "soil_NH4.h"
 #include "soil_NO3.h"
-#include "csmp.h"
 #include "log.h"
 #include "mathlib.h"
 #include "groundwater.h"
@@ -106,8 +105,12 @@ NitrificationSolute::tick (const Soil& soil, const SoilWater& soil_water,
       const double T = soil_heat.T (i);
       const double rate = k_10 * f_h (h) * f_T (T) * C / (k + C);
       assert (rate >= 0.0);
+      assert (soil_NH4.M_left (i) >= 0.0);
       const double M_new = min (rate, soil_NH4.M_left (i) / dt - 1e-8);
-      converted.push_back (M_new);
+      if (M_new >= 0.0)
+	converted.push_back (M_new);
+      else
+	converted.push_back (0.0);
     }
   soil_NH4.add_to_sink (converted);
   soil_NO3.add_to_source (converted);

@@ -13,248 +13,417 @@
 //
 // Common abstraction of an attribute value.
 
-class Value
+struct Value
 {
-public:
-  // BAD KLUDGE.
-  virtual bool is_alist_sequence () const
-    { return false; }
+  union
+  {
+    double number;
+    string* name;
+    bool flag;
+    CSMP* csmp;
+    AttributeList* alist;
+    int integer;
+    Time* time;
+    vector<double>* number_sequence;
+    vector<string>* name_sequence;
+    vector<bool>* flag_sequence;
+    vector<int>* integer_sequence;
+    vector<const Time*>* time_sequence;
+    vector<const CSMP*>* csmp_sequence;
+    vector<AttributeList*>* alist_sequence;
+  };
+  Syntax::type type;
+  bool is_sequence;
+  int* ref_count;
 
-  // Retrieve data (Singletons).
-  virtual operator double () const
-    { assert (false); }
-  virtual operator const string& () const
-    { assert (false); }
-  virtual operator bool () const
-    { assert (false); }
-  virtual operator int () const
-    { assert (false); }
-  virtual operator const CSMP& () const
-    { assert (false); }
-  virtual operator AttributeList& () const
-    { assert (false); }
-  virtual operator const Time& () const
-    { assert (false); }
+  bool subset (const Value& other, const Syntax&, const string& key) const;
 
-  // Retrieve data (Sequences).
-  virtual operator const vector<double>& () const
-    { assert (false); }
-  virtual operator const vector<string>& () const
-    { assert (false); }
-  virtual operator const vector<bool>& () const
-    { assert (false); }
-  virtual operator const vector<int>& () const
-    { assert (false); }
-  virtual operator const vector<const CSMP*>& () const
-    { assert (false); }
-  virtual operator const vector<AttributeList*>& () const
-    { assert (false); }
-  virtual operator const vector<const Time*>& () const
-    { assert (false); }
-
-  // Compare data.
-  virtual bool subset (const Value&, const Syntax&, const string&) const = 0;
-
-protected:
+  Value (double v)
+    : number (v),
+      type (Syntax::Number),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
+  Value (const string& v)
+    : name (new string (v)),
+      type (Syntax::String),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
+  Value (bool v)
+    : flag (v),
+      type (Syntax::Boolean),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
+  Value (const CSMP& v)
+    : csmp (new CSMP (v)),
+      type (Syntax::CSMP),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
+  Value (const AttributeList& v)
+    : alist (new AttributeList (v)),
+      type (Syntax::AList),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
+  Value (int v)
+    : integer (v),
+      type (Syntax::Integer),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
+  Value (const Time& v)
+    : time (new Time (v)),
+      type (Syntax::Date),
+      is_sequence (false),
+      ref_count (new int (1))
+    { }
+  Value (const vector<double>& v)
+    : number_sequence (new vector<double> (v)),
+      type (Syntax::Number),
+      is_sequence (true),
+      ref_count (new int (1))
+    { }
+  Value (const vector<string>& v)
+    : name_sequence (new vector<string> (v)),
+      type (Syntax::String),
+      is_sequence (true),
+      ref_count (new int (1))
+    { }
+  Value (const vector<bool>& v)
+    : flag_sequence (new vector<bool> (v)),
+      type (Syntax::Boolean),
+      is_sequence (true),
+      ref_count (new int (1))
+    { }
+  Value (const vector<int>& v)
+    : integer_sequence (new vector<int> (v)),
+      type (Syntax::Integer),
+      is_sequence (true),
+      ref_count (new int (1))
+    { }
+  Value (const vector<const Time*>& v)
+    : time_sequence (new vector<const Time*> (v)),
+      type (Syntax::Date),
+      is_sequence (true),
+      ref_count (new int (1))
+    { }
+  Value (const vector<const CSMP*>& v)
+    : csmp_sequence (new vector<const CSMP*> (v)),
+      type (Syntax::CSMP),
+      is_sequence (true),
+      ref_count (new int (1))
+    { }
+  Value (const vector<AttributeList*>& v)
+    : alist_sequence (new vector<AttributeList*> (v)),
+      type (Syntax::AList),
+      is_sequence (true),
+      ref_count (new int (1))
+    { }
   Value ()
+    : number (-42.42e42),
+      type (Syntax::Error),
+      is_sequence (false),
+      ref_count (new int (1))
     { }
-public:
-  virtual ~Value ()
-    { }
+  Value (const Value& v)
+    : number (v.number),
+      type (v.type),
+      is_sequence (v.is_sequence),
+      ref_count (v.ref_count)
+    { (*ref_count)++; }
+  Value& operator = (const Value& v);
+  ~Value ()
+    { cleanup (); }
+  void cleanup ();
 };
 
-// Specific attribute values.
-
-// We store most values as references.
-template <class T>
-class dValue : public Value
+bool
+Value::subset (const Value& v, const Syntax& syntax, 
+	       const string& key) const
 {
-  const T& value;
-public:
-  operator const T& () const
-  { return value; }
-  bool subset (const Value& v, const Syntax&, const string&) const
-    { return value == T (v); }
-  dValue (const T& v)
-    : value (v)
-  { };
-};
+  assert (type == v.type);
+  // Design bug: An alist can be used as default for an alist sequence.
+  if (type != Syntax::AList)
+    assert (is_sequence == v.is_sequence);
 
-// Primitive and simple types are stored directly, though.
-class dValue<double> : public Value
-{
-  double value;
-public:
-  operator double () const
-  { return value; }
-  bool subset (const Value& v, const Syntax&, const string&) const
-    { return value == double (v); }
-  dValue (double v)
-    : value (v)
-  { };
-};
-
-class dValue<int> : public Value
-{
-  int value;
-public:
-  operator int () const
-  { return value; }
-  bool subset (const Value& v, const Syntax&, const string&) const
-    { return value == int (v); }
-  dValue (int v)
-    : value (v)
-  { };
-};
-
-class dValue<bool> : public Value
-{
-  bool value;
-public:
-  operator bool () const
-  { return value; }
-  bool subset (const Value& v, const Syntax&, const string&) const
-    { return value == bool (v); }
-  dValue (bool v)
-    : value (v)
-  { };
-};
-
-class dValue<string> : public Value
-{
-  string value;
-public:
-  operator const string& () const
-  { return value; }
-  bool subset (const Value& v, const Syntax&, const string&) const
-    { return value == string (v); }
-  dValue (const string& v)
-    : value (v)
-  { };
-};
-
-class dValue<Time> : public Value
-{
-  const Time& value;
-public:
-  operator const Time& () const
-  { return value; }
-  bool subset (const Value& v, const Syntax&, const string&) const
-    { return v == value; }
-  dValue (const Time& v)
-    : value (*new Time (v))
-  { };
-};
-
-class dValue<AttributeList> : public Value
-{
-  AttributeList& value;
-public:
-  operator AttributeList& () const
-  { return value; }
-  bool subset (const Value& v, const Syntax& syntax, const string& key) const
-    {
-      const AttributeList& other = v;
-      const Syntax::type type = syntax.lookup (key);
-      if (type == Syntax::AList)
-	return value.subset (other, syntax.syntax (key));
-      assert (type == Syntax::Object);
-      const Library& library = syntax.library (key);
-
-      assert (value.check ("type"));
-      if (!other.check ("type"))
-	return false;
-      const string element = value.name ("type");
-      if (element != other.name ("type"))
-	return false;
-      if (!library.check (element))
-	return false;
-      return value.subset (other, library.syntax (element));
-    }
-  dValue (AttributeList& v)
-    : value (v)
-  { };
-};
-
-// Sequences of Attribute Lists and numbers can be dumped.
-class dValue<vector<double>/**/> : public Value
-{
-  const vector<double> value;
-public:
-  operator const vector<double>& () const
-  { return value; }
-  bool subset (const Value& v, const Syntax&, 
-	      const string&) const
-    { return value == vector<double> (v); }
-  dValue (const vector<double>& v)
-    : value (v)
-  { };
-};
-
-class dValue<vector<AttributeList*>/**/> : public Value
-{
-  const vector<AttributeList*> value;
-public:
-  operator const vector<AttributeList*>& () const
-  { return value; }
-  // BAD KLUDGE.
-  bool is_alist_sequence () const
-    { return true; }
-  bool subset (const Value& v , const Syntax& syntax, const string& key) const
-    {
-      // Design Bug: `add_submodule' adds an alist instead of an
-      // alist_sequence. 
-      if (!v.is_alist_sequence ())
-	return false;
-
-      const vector<AttributeList*>& other = v;
-
-
-      const unsigned int size = value.size ();
-      if (other.size () != size)
-	return false;
-      const Syntax::type type = syntax.lookup (key);
-      if (type == Syntax::AList)
+  if (!is_sequence)
+    switch (type)
+      {
+      case Syntax::Number:
+	return number == v.number;
+      case Syntax::Boolean:
+	return flag == v.flag;
+      case Syntax::Integer:
+	return integer == v.integer;
+      case Syntax::AList:
 	{
-	  const Syntax& nested = syntax.syntax (key);
-	  for (unsigned int i = 0; i < size; i++)
-	    if (!value[i]->subset (*other[i], nested))
-	      return false;
-	  return true;
-		
-	}
-      assert (type == Syntax::Object);
-      const Library& library = syntax.library (key);
-      for (unsigned int i = 0; i < size; i++)
-	{
-	  assert (value[i]->check ("type"));
-	  if (!other[i]->check ("type"))
+	  // Design bug: An alist can be used as default for an alist sequence.
+	  if (v.is_sequence)
+	    return true;
+	  const AttributeList& value = *alist;
+	  const AttributeList& other = *v.alist;
+	  const Syntax::type type = syntax.lookup (key);
+	  if (type == Syntax::AList)
+	    return value.subset (other, syntax.syntax (key));
+	  assert (type == Syntax::Object);
+	  const Library& library = syntax.library (key);
+
+	  assert (value.check ("type"));
+	  if (!other.check ("type"))
 	    return false;
-	  const string element = value[i]->name ("type");
-	  if (element != other[i]->name ("type"))
+	  const string element = value.name ("type");
+	  if (element != other.name ("type"))
 	    return false;
 	  if (!library.check (element))
 	    return false;
-	  if (!value[i]->subset (*other[i], library.syntax (element)))
-	    return false;
+	  return value.subset (other, library.syntax (element));
 	}
-      return true;
+      case Syntax::CSMP:
+	return *csmp == *v.csmp;
+      case Syntax::String:
+	return *name == *v.name;
+      case Syntax::Date:
+	return *time == *v.time;
+      case Syntax::Object:
+      case Syntax::Library:
+      case Syntax::Error:
+      default:
+	assert (false);
+      }
+  else
+    switch (type)
+      {
+      case Syntax::Number:
+	return *number_sequence == *v.number_sequence;
+      case Syntax::Boolean:
+	return *flag_sequence == *v.flag_sequence;
+      case Syntax::Integer:
+	return *integer_sequence == *v.integer_sequence;
+      case Syntax::AList:
+	{
+	  // Design Bug: `add_submodule' adds an alist instead of an
+	  // alist_sequence. 
+	  if (!v.is_sequence)
+	    return false;
+
+	  const vector<AttributeList*>& value = *alist_sequence;
+	  const vector<AttributeList*>& other = *v.alist_sequence;
+
+	  const unsigned int size = value.size ();
+	  if (other.size () != size)
+	    return false;
+	  const Syntax::type type = syntax.lookup (key);
+	  if (type == Syntax::AList)
+	    {
+	      const Syntax& nested = syntax.syntax (key);
+	      for (unsigned int i = 0; i < size; i++)
+		if (!value[i]->subset (*other[i], nested))
+		  return false;
+	      return true;
+		
+	    }
+	  assert (type == Syntax::Object);
+	  const Library& library = syntax.library (key);
+	  for (unsigned int i = 0; i < size; i++)
+	    {
+	      assert (value[i]->check ("type"));
+	      if (!other[i]->check ("type"))
+		return false;
+	      const string element = value[i]->name ("type");
+	      if (element != other[i]->name ("type"))
+		return false;
+	      if (!library.check (element))
+		return false;
+	      if (!value[i]->subset (*other[i], library.syntax (element)))
+		return false;
+	    }
+	  return true;
+	}
+      case Syntax::CSMP:
+	return *csmp_sequence == *v.csmp_sequence;
+      case Syntax::String:
+	return *name_sequence == *v.name_sequence;
+      case Syntax::Date:
+	return *time_sequence == *v.time_sequence;
+      case Syntax::Object:
+      case Syntax::Library:
+      case Syntax::Error:
+      default:
+	assert (false);
+      }
+  // Not reached.
+  return false;
+}
+
+void 
+Value::cleanup ()
+{
+  switch (*ref_count)
+    {
+    case 1:
+      delete ref_count;
+      if (!is_sequence)
+	switch (type)
+	  {
+	  case Syntax::Number:
+	  case Syntax::Boolean:
+	  case Syntax::Integer:
+	    // Primitives, do nothing.
+	    break;
+	  case Syntax::AList:
+	    delete alist;
+	    break;
+	  case Syntax::CSMP:
+	    delete csmp;
+	    break;
+	  case Syntax::String:
+	    delete name;
+	    break;
+	  case Syntax::Date:
+	    delete time;
+	    break;
+	  case Syntax::Error:
+	    // Empty (dummy) value.
+	    break;
+	  case Syntax::Object:
+	  case Syntax::Library:
+	  default:
+	    assert (false);
+	  }
+      else
+	switch (type)
+	  {
+	  case Syntax::Number:
+	    delete number_sequence;
+	    break;
+	  case Syntax::Boolean:
+	    delete number_sequence;
+	    break;
+	  case Syntax::Integer:
+	    delete number_sequence;
+	    break;
+	  case Syntax::AList:
+	    // BUG: Should delete elements also.
+	    delete alist_sequence;
+	    break;
+	  case Syntax::CSMP:
+	    delete csmp_sequence;
+	    break;
+	  case Syntax::String:
+	    delete name_sequence;
+	    break;
+	  case Syntax::Date:
+	    delete time_sequence;
+	    break;
+	  case Syntax::Object:
+	  case Syntax::Library:
+	  case Syntax::Error:
+	  default:
+	    assert (false);
+	  }
+      break;
+    default:
+      assert (*ref_count > 1);
+      (*ref_count)--;
     }
-  dValue (const vector<AttributeList*>& v)
-    : value (v)
-  { };
-};
+}
+
+Value& 
+Value::operator = (const Value& v)
+{
+  // Check that we aren't overwriting ourself.
+  if (&v == this)
+    return *this;
+
+  // Delete old value, if necessary.
+  cleanup ();
+
+  // Copy the data.
+  type = v.type;
+  is_sequence = v.is_sequence;
+  ref_count = v.ref_count;
+  (*ref_count)++;
+
+  if (!is_sequence)
+    switch (type)
+      {
+      case Syntax::Number:
+	number = v.number;
+        break;
+      case Syntax::Boolean:
+	flag = v.flag;
+        break;
+      case Syntax::Integer:
+	integer = v.integer;
+        break;
+      case Syntax::AList:
+        alist = v.alist;
+        break;
+      case Syntax::CSMP:
+	csmp = v.csmp;
+        break;
+      case Syntax::String:
+	name = v.name;
+        break;
+      case Syntax::Date:
+	time = v.time;
+        break;
+      case Syntax::Object:
+      case Syntax::Library:
+      case Syntax::Error:
+      default:
+	assert (false);
+      }
+  else
+    switch (type)
+      {
+      case Syntax::Number:
+	number_sequence = v.number_sequence;
+        break;
+      case Syntax::Boolean:
+	flag_sequence = v.flag_sequence;
+        break;
+      case Syntax::Integer:
+	integer_sequence = v.integer_sequence;
+        break;
+      case Syntax::AList:
+        alist_sequence = v.alist_sequence;
+        break;
+      case Syntax::CSMP:
+	csmp_sequence = v.csmp_sequence;
+        break;
+      case Syntax::String:
+	name_sequence = v.name_sequence;
+        break;
+      case Syntax::Date:
+	time_sequence = v.time_sequence;
+        break;
+      case Syntax::Object:
+      case Syntax::Library:
+      case Syntax::Error:
+      default:
+	assert (false);
+      }
+
+  // Return this for further mutilation.
+  return *this;
+}
+
+// Specific attribute values.
 
 // @ AttributeList
 
-typedef map <string, Value*, less<string> > value_map;
+typedef map <string, Value, less<string> > value_map;
 
 struct AttributeList::Implementation
 {
   value_map values;
   bool check (const string& key) const;
-  Value* lookup (const string& key) const;
-  void add (const string& key, Value* value);
+  const Value& lookup (const string& key) const;
+  void add (const string& key, const Value& value);
 };    
 
 bool
@@ -263,7 +432,7 @@ AttributeList::Implementation::check (const string& key) const
   return values.find (key) != values.end ();
 }
 
-Value* 
+const Value& 
 AttributeList::Implementation::lookup (const string& key) const
 { 
   value_map::const_iterator i = values.find (key);
@@ -273,21 +442,9 @@ AttributeList::Implementation::lookup (const string& key) const
 }
 
 void
-AttributeList::Implementation::add (const string& key, Value* value)
+AttributeList::Implementation::add (const string& key, const Value& value)
 {
-  value_map::iterator i = values.find (key);
-
-  if (i == values.end ())
-    values[key] = value;
-  else
-    {
-      // BUG: Memory leak: We can't delete the old value, as it might
-      // be shared with another alist.  Use reference counting to solve.
-#if 0
-      delete (*i).second;
-#endif
-      (*i).second = value;
-    }
+  values[key] = value;
 }
 
 bool
@@ -324,14 +481,13 @@ AttributeList::subset (const AttributeList& other, const Syntax& syntax,
       // alist_sequence. 
       if (syntax.lookup (key) == Syntax::AList
 	  && syntax.size (key) != Syntax::Singleton
-	  && !impl.values[key]->is_alist_sequence ())
+	  && size (key) != Syntax::Singleton)
 	// This has not been overwritten from the default value.
 	return true;
 
       if (other.check (key))
 	{
-	  if (!impl.values[key]->subset (*other.impl.values[key],
-					 syntax, key))
+	  if (!impl.values[key].subset (other.impl.values[key], syntax, key))
 	    return false;
 	}
       else
@@ -341,187 +497,224 @@ AttributeList::subset (const AttributeList& other, const Syntax& syntax,
 }
 
 int
-AttributeList::size (const string& key)	const // BUG: UNIMPLEMENTED.
+AttributeList::size (const string& key)	const
 {
-  if (impl.values[key]->is_alist_sequence ())
-    return Syntax::Sequence;
-  
-  return Syntax::Singleton;
+  const Value& value = impl.lookup (key);
+
+  if (!value.is_sequence)
+    return Syntax::Singleton;
+  switch (value.type)
+    {
+    case Syntax::Number:
+      return value.number_sequence->size ();
+    case Syntax::AList:
+      return value.alist_sequence->size ();
+    case Syntax::CSMP:
+      return value.csmp_sequence->size ();
+    case Syntax::Boolean:
+      return value.flag_sequence->size ();
+    case Syntax::String:
+      return value.name_sequence->size ();
+    case Syntax::Date:
+      return value.time_sequence->size ();
+    case Syntax::Integer:
+      return value.integer_sequence->size ();
+    case Syntax::Object:
+      return value.alist_sequence->size ();
+    case Syntax::Library:
+    case Syntax::Error:
+    default:
+      assert (false);
+    }
+  // Not reached.
+  return Syntax::Unspecified;
 }
 
 double 
 AttributeList::number (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Number);
+  assert (!value.is_sequence);
+  return value.number;
 }
 
 const string& 
 AttributeList::name (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::String);
+  assert (!value.is_sequence);
+  return *value.name;
 }
 
 bool 
 AttributeList::flag (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Boolean);
+  assert (!value.is_sequence);
+  return value.flag;
 }
 
 int
 AttributeList::integer (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Integer);
+  assert (!value.is_sequence);
+  return value.integer;
 }
 
 const Time&
 AttributeList::time (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Date);
+  assert (!value.is_sequence);
+  return *value.time;
 }
 
 const CSMP& 
 AttributeList::csmp (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::CSMP);
+  assert (!value.is_sequence);
+  return *value.csmp;
 }
 
 AttributeList& 
 AttributeList::alist (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::AList);
+  assert (!value.is_sequence);
+  return *value.alist;
 }
 
 const vector<double>& 
 AttributeList::number_sequence (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Number);
+  assert (value.is_sequence);
+  return *value.number_sequence;
 }
 
 const vector<string>& 
 AttributeList::name_sequence (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::String);
+  assert (value.is_sequence);
+  return *value.name_sequence;
 }
 
 const vector<bool>& 
 AttributeList::flag_sequence (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Boolean);
+  assert (value.is_sequence);
+  return *value.flag_sequence;
 }
 
 const vector<int>& 
 AttributeList::integer_sequence (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Integer);
+  assert (value.is_sequence);
+  return *value.integer_sequence;
 }
 
 const vector<const Time*>& 
 AttributeList::time_sequence (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Date);
+  assert (value.is_sequence);
+  return *value.time_sequence;
 }
 
 const vector<const CSMP*>& 
 AttributeList::csmp_sequence (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::CSMP);
+  assert (value.is_sequence);
+  return *value.csmp_sequence;
 }
 
 const vector<AttributeList*>& 
 AttributeList::alist_sequence (string key) const
 {
-  return *impl.lookup (key);
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::AList);
+  assert (value.is_sequence);
+  return *value.alist_sequence;
 }
 
 void 
 AttributeList::add (const string& key, double v)
-{
-  impl.add (key, new dValue<double> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const char* v)
-{
-  impl.add (key, new dValue<string> (v));
-}
+{ add (key, string (v)); }
 
 void 
 AttributeList::add (const string& key, const string& v)
-{
-  impl.add (key, new dValue<string> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, bool v)
-{
-  impl.add (key, new dValue<bool> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, int v)
-{
-  impl.add (key, new dValue<int> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const Time& v)
-{
-  impl.add (key, new dValue<Time> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, AttributeList& v)
-{
-  impl.add (key, new dValue<AttributeList> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const CSMP& v)
-{
-  impl.add (key, new dValue<CSMP> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const vector<double>& v)
-{
-  impl.add (key, new dValue<vector<double>/**/> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const vector<string>& v)
-{
-  impl.add (key, new dValue<vector<string>/**/> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const vector<bool>& v)
-{
-  impl.add (key, new dValue<vector<bool>/**/> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const vector<int>& v)
-{
-  impl.add (key, new dValue<vector<int>/**/> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const vector<AttributeList*>& v)
-{
-  impl.add (key, new dValue<vector<AttributeList*>/**/> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const vector<const CSMP*>& v)
-{
-  impl.add (key, new dValue<vector<const CSMP*>/**/> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const vector<const Time*>& v)
-{
-  impl.add (key, new dValue<vector<const Time*>/**/> (v));
-}
+{ impl.add (key, Value (v)); }
 
 void
 AttributeList::operator += (const AttributeList& al)
@@ -538,15 +731,9 @@ AttributeList::AttributeList ()
 
 AttributeList::AttributeList (const AttributeList& old)
   : impl (*new Implementation ())
-{ 
-  impl.values = old.impl.values;
-}
+{ impl.values = old.impl.values; }
 
 AttributeList::~AttributeList ()
-{
-  // BUG: Memory leak:  We don't delete the values since they can be
-  // shared as above.  Solve by using reference counting.
-  delete &impl; 
-}
+{ delete &impl; }
 
 const AttributeList AttributeList::empty;

@@ -43,6 +43,8 @@ public:
   double pF (int i) const;
   double Theta (int i) const
   { return Theta_[i]; }
+  double Theta_left (int i) const
+  { return Theta_[i] - S[i]; }
   double Theta_old (int i) const
   { return Theta_old_[i]; }
   double q (int i) const

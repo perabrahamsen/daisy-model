@@ -1,3 +1,114 @@
+1998-10-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.030 released.
+
+1998-10-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (initialize): Fix initialization from ppm.
+
+	* syntax.h (check_list_fun): New typedef.
+	* syntax.C (check): Use it.
+	* geometry.C (add): Check that the bottom is below the top.
+	(check_layers): New function.
+	(add_layer): Use it.
+
+	* adsorption_vS_S.C, adsorption_linear.C, adsorption_langmuir.C,
+	* adsorption_freundlich.C (C_to_M): Use `dry_bulk_density' instead
+	of `rho_mineral'.
+
+	* parser_file.C (load_list): Don't crash if we are overwriting an
+	alist sequence.
+
+1998-10-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pmain.C: New `monochrome' view option.
+
+1998-10-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C (Implementation): Fix dry_bulk_density to take
+	porosity into account.
+
+	* organic_matter.C (Implementation): Check for `!='
+	Syntax::Singleton instead of `==' Syntax::Sequence.
+
+	* crop_std.C (AssimilatePartitioning): Don't allow 
+	0.0 < f_SOrg < 1e-5. 
+	(harvest): Only partition N to SOrg iff WSorg > 0.1 g/m².
+
+1998-10-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_file.C (print): Use array delete.
+
+1998-10-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pmain.C: Make widgets members when possible, to ensure they are
+	deleted properly.
+
+	* uzrichard.C (UZRichardSyntax): Demand 10 time better convergense.
+
+1998-10-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (CropFun): Removed typedef.
+
+1998-10-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.h (Theta_left): New member function.
+
+	* crop_std.C (PotentialWaterUptake): Leave at least h_wp.
+
+	* weather_file.C (tick): Don't eat last newline.
+
+	* crop_std.C: Use average soil temperature.
+	(DevelopmentStage): Use day_length + 1.0.
+	(InitialLAI): Don't stop DS when there is too little WLeaf.
+
+1998-10-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C (load_syntax): Fix parameter for manager syntax.
+
+	* nitrification_soil.C (tick): No negative nitrification.
+
+1998-10-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pmain.C: New main file, a simple plot program.
+	* gmain.C: New main file, a Daisy library browser.
+	* Makefile: Add support for them.
+
+	* time.h: Don't include "common.h".  This makes `time' a
+	stand-alone module.
+
+1998-09-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C (load_syntax): Add descriptiobs.
+	* harvest.C (load_syntax): Ditto.
+
+	* syntax.C: Added `description' and `dimension' properties to
+	syntax entries. 
+
+1998-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.C (size): Use reference counting.
+	* crop_std.C (CropStandardSyntax): Add alists after filling them.
+	* crop_sold.C (CropSoldSyntax): Ditto.
+	* crop_old.C (CropOldSyntax): Ditto.
+
+	* syntax.C (entries): new function.
+
+1998-09-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mathlib.C: No implicit int in egcs 1.1.
+
+1998-09-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_file.C (tick): Don't "use >> char"; it works differently
+	on BCC and GCC.
+
+	* weather_hourly.C: Keep track of number of values we are
+	averaging over when accumulating, to deal less bad with missing
+	values. 
+
+	* main.C (main): Add exception handling.
+
 1998-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.029 released.

@@ -16,7 +16,7 @@ public:
     {
       const double K = K_clay * soil.clay (i);
       const double S = (my_max * C) / (K + C);
-      return rho_mineral * S + Theta * C;
+      return soil.dry_bulk_density (i) * S + Theta * C;
     }
   double M_to_C (const Soil& soil, double Theta, int i, double M) const
     {
@@ -33,7 +33,7 @@ public:
       const double K = K_clay * soil.clay (i);
 
       const double a = Theta;
-      const double b = rho_mineral * my_max + Theta * K - M;
+      const double b = soil.dry_bulk_density (i) * my_max + Theta * K - M;
       const double c = - M * K;
 
       return single_positive_root_of_square_equation (a, b, c);

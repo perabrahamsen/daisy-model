@@ -20,7 +20,6 @@ struct WeatherFile : public Weather
   // Values.
   double precipitation;
   double reference_evapotranspiration_;
-  double hourly_reference_evapotranspiration;
   double air_temperature;
 
   // Simulation.
@@ -30,14 +29,19 @@ struct WeatherFile : public Weather
   double daily_air_temperature (void) const // [°C]
     { return air_temperature; }
   double reference_evapotranspiration () const // [mm/h]
-    { return hourly_reference_evapotranspiration; }
+    { 
+      if (reference_evapotranspiration_ < -1.0e11)
+	return Weather::reference_evapotranspiration ();
+      return reference_evapotranspiration_ * day_cycle (); 
+    }
 
   // Communication with external model.
   void put_precipitation (double prec)
     { Weather::distribute (prec / 24.0); }
   void put_air_temperature (double T)
     { air_temperature = T; }
-  void put_reference_evapotranspiration (double ref); // [mm/d]
+  void put_reference_evapotranspiration (double ref)
+    { reference_evapotranspiration_ = ref; }
 
   // Create and Destroy.
   WeatherFile (const AttributeList& al)
@@ -48,7 +52,6 @@ struct WeatherFile : public Weather
       line (0),
       precipitation (-42.42e42),
       reference_evapotranspiration_ (-42.42e42),
-      hourly_reference_evapotranspiration (-42.42e42),
       air_temperature (-42.42e42)
     { }
   ~WeatherFile ()
@@ -78,11 +81,12 @@ WeatherFile::tick (const Time& time)
   while (date < time)
     {
       file >> year >> month >> day
-	   >> global_radiation >> air_temperature >> precipitation >> end;
+	   >> global_radiation >> air_temperature >> precipitation;
+      end = file.get ();
       if (year < 100)
 	year += 1900;
-      while (file.good () && strchr ("\n \t", end))
-	file >> end;
+      while (file.good () && strchr (" \t", end))
+	end = file.get ();
       
       if (!file.good ())
 	THROW ("No more climate data.");
@@ -104,8 +108,7 @@ WeatherFile::tick (const Time& time)
       assert (global_radiation >= 0 && global_radiation < 700);
       assert (air_temperature >= -70 && air_temperature < 60);
       assert (precipitation >= 0 && precipitation < 1000);
-      assert (reference_evapotranspiration_ >= 0
-	      && reference_evapotranspiration_ <= 20);
+      assert (reference_evapotranspiration_ <= 20);
     }
   assert (time.year () == date.year ());
   assert (time.month () == date.month ());
@@ -114,24 +117,8 @@ WeatherFile::tick (const Time& time)
   // Update the daily values.
   put_global_radiation (global_radiation);
 
-  // Update the hourly values.
-  put_reference_evapotranspiration (reference_evapotranspiration_);
+  // Hourly value.
   distribute (precipitation / 24.0);
-}
-
-void 
-WeatherFile::put_reference_evapotranspiration (double ref)
-{
-  reference_evapotranspiration_ = ref;
-
-  if (reference_evapotranspiration_ < -1.0e11)
-    {
-      hourly_reference_evapotranspiration 
-	= Weather::reference_evapotranspiration ();
-    }
-  else
-    hourly_reference_evapotranspiration 
-      = reference_evapotranspiration_ * day_cycle ();
 }
 
 static struct WeatherFileSyntax

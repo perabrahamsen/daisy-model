@@ -76,6 +76,20 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
 {
   hydraulic = &hydro;
 
+  // Did we specify `dry_bulk_density'?  Else calculate it now.
+  if (dry_bulk_density < 0.0)
+    dry_bulk_density = rho_soil_particles () * (1.0 - hydraulic->porosity ());
+
+  // C factor is the specific C content in horizon [g C/cm³]
+  const double C_divisor 
+    = accumulate (SOM_fractions.begin (), SOM_fractions.end (), 0.0);
+  
+  C_factor = dry_bulk_density * humus * c_fraction_in_humus;
+  if (C_divisor > 0.0)
+    C_factor /= C_divisor;
+  else
+    cerr << "Horizon: No C fractions given.\n";
+
   // The particles are not in a real continuous medium.  Try to correct.
   const double continuum_correction_factor = 1.25;
       
@@ -309,16 +323,7 @@ Horizon::Implementation::Implementation (const AttributeList& al)
   if (al.check ("dry_bulk_density"))
     dry_bulk_density = al.number ("dry_bulk_density");
   else 
-    dry_bulk_density = rho_soil_particles ();
-
-  const double C_divisor 
-    = accumulate (SOM_fractions.begin (), SOM_fractions.end (), 0.0);
-  
-  C_factor = dry_bulk_density * humus * c_fraction_in_humus;
-  if (C_divisor > 0.0)
-    C_factor /= C_divisor;
-  else
-    cerr << "Horizon: No C fractions given.\n";
+    dry_bulk_density = -1.0;
 }
 
 double

@@ -551,8 +551,11 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		    // alist whether the superclass specified a
 		    // singleton or a sequence.  But the alist API does
 		    // not currently allow that.
-		    AttributeList& al = (atts.check (name) 
-					 ? *new AttributeList (atts.alist (name))
+		    AttributeList& al = ((atts.check (name) 
+					  && (atts.size (name)
+					      == Syntax::Singleton))
+					 ? *new AttributeList (atts.alist
+							       (name))
 					 : *new AttributeList ());
 
 		    load_list (al, syn);

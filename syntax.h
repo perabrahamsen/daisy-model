@@ -12,6 +12,7 @@ struct Library;
 class Syntax
 { 
   struct Implementation;
+  friend struct Implementation;
   Implementation& impl;
 public:
   // A syntax entry has an associated size.  If the size is a positive
@@ -22,6 +23,10 @@ public:
   static const int Singleton;	
   static const int Sequence;
   static const int Unspecified;
+
+  // A syntax may have a dimension associated.
+  static const string& Unknown ();
+  static const string& None ();
 
   // Each syntax entry should have an associated type.
   enum type 
@@ -63,6 +68,8 @@ public:
 public:
   ::Library& library (const string&) const;
   int  size (const string&) const;
+  const string& dimension (const string&) const;
+  const string& description (const string&) const;
   bool ordered () const;
   const vector<string>& order () const;
   int order (const string& name) const;	// Return index in order, or -1.
@@ -73,13 +80,60 @@ public:
 
   // Get a list of all entries.
   void entries (vector<string>&) const;
+  unsigned int entries () const;
 
   // Add syntax entries
-  void add (const string&, type, category, int size = Singleton);
-  void add (const string&, const Syntax&, 
-	    category = State, int size = Singleton);
-  void add (const string&, ::Library&, 
-	    category = State, int size = Singleton);
+  void add (const string& key,	// Generic.
+	    type t, 
+	    category cat,
+	    int size,
+	    const string& description);
+  void add (const string& key,
+	    type t, 
+	    category cat,
+	    const string& description)
+    { add (key, t, cat, Singleton, description); }
+  void add (const string& key,  // Compatibility, remove.
+	    type t, category cat, int size = Singleton)
+    { add (key, t, cat, size, Unknown ()); }
+
+  void add (const string& key, // Number.
+	    const string& dim,
+	    category cat,
+	    int size,
+	    const string& description);
+  void add (const string& key, 
+	    const string& dim,
+	    category cat,
+	    const string& description)
+    { add (key, dim, cat, Singleton, description); } 
+
+  void add (const string& key,  // AList
+	    const Syntax& syntax,
+	    int size,
+	    const string& description)
+    { add (key, syntax, State, size, description); }
+  void add (const string& key,  // AList
+	    const Syntax& syntax,
+	    const string& description)
+    { add (key, syntax, State, Singleton, description); }
+  void add (const string&, const Syntax&, // Compatibility, remove.
+	    category = State, int size = Singleton, 
+	    const string& description = Unknown ());
+
+  void add (const string& key, // Object
+	    ::Library& lib, 
+	    int size,
+	    const string& description)
+    { add (key, lib, State, size, description); }
+  void add (const string& key,
+	    ::Library& lib, 
+	    const string& description)
+    { add (key, lib, State, Singleton, description); }
+  void add (const string&, ::Library&, // Compatibility, remove.
+	    category = State, int size = Singleton, 
+	    const string& description = Unknown ());
+
   void add_library (const string&, ::Library&);
 
   // It is possible to impose an order on the syntax entries, which
@@ -99,8 +153,11 @@ public:
 
   // A check_fun is a function used for extra syntax checking.
   typedef bool (*check_fun)(const AttributeList&);
+  typedef bool (*check_list_fun)(const vector<AttributeList*>&);
 
-  Syntax (check_fun = 0);
+  Syntax ();
+  Syntax (check_fun);
+  Syntax (check_list_fun);
   ~Syntax ();
 private:
   Syntax (Syntax&);
@@ -110,14 +167,15 @@ private:
 template <class T> 
 struct add_submodule
 {
-  add_submodule(const char* name, Syntax& syntax, AttributeList& alist,
-		Syntax::category cat = Syntax::State, 
-		int size = Syntax::Singleton)
+  add_submodule (const char* name, Syntax& syntax, AttributeList& alist,
+		 Syntax::category cat = Syntax::State, 
+		 int size = Syntax::Singleton, 
+		 const string& description = Syntax::Unknown ())
   {
     Syntax& s = *new Syntax ();
     AttributeList& a = *new AttributeList ();
     T::load_syntax (s, a);
-    syntax.add (name, s, cat, size);
+    syntax.add (name, s, cat, size, description);
     // KLUDGE: This is *incorrect* for sequences.  The specified alist
     // currently works as a _default_ for each member of a derived
     // object.  However, both the parser and the pretty printer must

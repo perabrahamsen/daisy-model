@@ -156,7 +156,7 @@ bool approximate (const double a, const double b, const double noise)
 #ifdef __sparc__
 
 #include <sys/fsr.h>
-extern "C" set_exceptions ();
+extern "C" int set_exceptions ();
 
 struct set_sparc_exceptions
 {

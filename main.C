@@ -10,51 +10,67 @@
 int 
 main (int argc, char* argv[])
 {
-  // We need exactly one argument.
-  if (argc != 2)
+#ifdef HANDLE_EXCEPTIONS
+  try 
     {
-      cerr << "Usage: " << argv[0] << " file\n";
-      return 2;
-    }
-  // Initialize syntax and attribute list.
-  Syntax syntax;
-  AttributeList alist;
-  Daisy::load_syntax (syntax, alist);
-  Library::load_syntax (syntax, alist);
+#endif
+      // We need exactly one argument.
+      if (argc != 2)
+	{
+	  cerr << "Usage: " << argv[0] << " file\n";
+	  return 2;
+	}
+      // Initialize syntax and attribute list.
+      Syntax syntax;
+      AttributeList alist;
+      Daisy::load_syntax (syntax, alist);
+      Library::load_syntax (syntax, alist);
 
-  // Dump syntax, if specified.
-  if (strcmp (argv[1], "-p") == 0)
-    {
-      syntax.dump ();
+      // Dump syntax, if specified.
+      if (strcmp (argv[1], "-p") == 0)
+	{
+	  syntax.dump ();
+	  return 0;
+	}
+
+      // print version, if specified.
+      if (strcmp (argv[1], "-v") == 0)
+	{
+	  cerr << "Daisy crop/soil simulation version "
+	       << version << ". (" __DATE__ ")\n"
+	    "Copyright 1996 - 1998 Per Abrahamsen\n"
+	    "Copyright 1996 Søren Hansen\n";
+	  return 2;
+	}
+
+      // Parse the file.
+      ParserFile parser (syntax, argv[1]);
+      parser.load (alist);
+
+      // Check the result.
+      if (!syntax.check (alist, "daisy") || parser.error_count () > 0)
+	return 1;
+
+      // Create, check and run the simulation.
+      Daisy daisy (alist);
+      daisy.initialize (syntax);
+
+      if (!daisy.check ())
+	return 1;
+      daisy.run ();
+
+      // All is well.
       return 0;
+#ifdef HANDLE_EXCEPTIONS
     }
-
-  // print version, if specified.
-  if (strcmp (argv[1], "-v") == 0)
+  catch (const char* error)
     {
-      cerr << "Daisy crop/soil simulation version "
-	   << version << ". (" __DATE__ ")\n"
-	"Copyright 1996 - 1998 Per Abrahamsen\n"
-	"Copyright 1996 Søren Hansen\n";
-      return 2;
+      cerr << "Exception: " << error << "\n";
     }
-
-  // Parse the file.
-  ParserFile parser (syntax, argv[1]);
-  parser.load (alist);
-
-  // Check the result.
-  if (!syntax.check (alist, "daisy") || parser.error_count () > 0)
-    return 1;
-
-  // Create, check and run the simulation.
-  Daisy daisy (alist);
-  daisy.initialize (syntax);
-
-  if (!daisy.check ())
-    return 1;
-  daisy.run ();
-
-  // All is well.
-  return 0;
+  catch (...)
+    {
+      cerr << "Unhandled exception\n";
+    }
+  exit (1);
+#endif
 }

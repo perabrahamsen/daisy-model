@@ -27,6 +27,7 @@ struct WeatherHourly : public Weather
   // Accumulated values.
   double accumulated_global_radiation;
   double accumulated_air_temperature;
+  unsigned int accumulated_count;
   double daily_air_temperature_;
 
   // Simulation.
@@ -60,6 +61,7 @@ struct WeatherHourly : public Weather
       wind_ (-42.42e42),
       accumulated_global_radiation (0.0),
       accumulated_air_temperature (0.0),
+      accumulated_count (0),
       daily_air_temperature_ (-42.42e42)
     { }
 
@@ -81,24 +83,19 @@ WeatherHourly::tick (const Time& time)
   int month; 
   int day;
   int hour;
-  char end;
 
   while (date < time)
     {
       file >> year >> month >> day >> hour
 	   >> global_radiation >> air_temperature >> precipitation
-	   >> cloudiness_ >> vapor_pressure_ >> wind_
-	   >> end;
+	   >> cloudiness_ >> vapor_pressure_ >> wind_;
       if (year < 100)
 	year += 1900;
-      while (file.good () && strchr ("\n \t", end))
-	file >> end;
-      
+      while (file.good () && file.get () != '\n')
+	/* do nothing */;
+
       if (!file.good ())
 	THROW ("No more climate data.");
-
-      while (file.good () && end != '\n')
-	end = file.get ();
 
       date = Time (year, month, day, hour);
 
@@ -109,17 +106,19 @@ WeatherHourly::tick (const Time& time)
       assert (vapor_pressure_ >= 0 && vapor_pressure_ <= 5000);
       assert (wind_ >= 0 && wind_ <= 40);
 
+      accumulated_global_radiation += global_radiation;
+      accumulated_air_temperature += air_temperature;
+      accumulated_count++;	// BUGLET: We ignore missing values.
+
       if (hour == 0)
 	{
-	  put_global_radiation (accumulated_global_radiation / 24.0);
-	  daily_air_temperature_ = accumulated_air_temperature / 24.0;
+	  put_global_radiation (accumulated_global_radiation 
+				/ accumulated_count);
+	  daily_air_temperature_ 
+	    = accumulated_air_temperature / accumulated_count;
 	  accumulated_global_radiation = 0.0;
 	  accumulated_air_temperature = 0.0;
-	}
-      else
-	{
-	  accumulated_global_radiation += global_radiation;
-	  accumulated_air_temperature += air_temperature;
+	  accumulated_count = 0;
 	}
     }
 
