@@ -35,7 +35,7 @@ public:
   virtual type lookup (symbol tag) const = 0;
   virtual double number (symbol tag) const = 0;
   virtual symbol name (symbol tag) const = 0;
-  virtual const vector<double>& array (symbol tag) const = 0;
+  virtual const std::vector<double>& array (symbol tag) const = 0;
 
   // Library.
   static const LogExternSource& find (symbol name);

@@ -39,6 +39,8 @@
 #include "treelog.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 class CropOld : public Crop
 {
   // Content.

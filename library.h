@@ -26,7 +26,6 @@
 #include "symbol.h"
 #include <string>
 #include <vector>
-using namespace std;
 
 class Syntax;
 class AttributeList;
@@ -46,7 +45,7 @@ public:
   // Find a specific library.
   static bool exist (symbol name);
   static Library& find (symbol name);
-  static void all (vector<symbol>& libraries);
+  static void all (std::vector<symbol>& libraries);
   static int get_sequence ();
 
   // Use.
@@ -58,7 +57,7 @@ public:
   void add_derived (symbol name, AttributeList& al,
 		    symbol super);
   const Syntax& syntax (symbol) const;
-  void entries (vector<symbol>&) const;
+  void entries (std::vector<symbol>&) const;
   bool is_derived_from (symbol a, symbol b) const;
   const symbol base_model (symbol parameterization) const;
 
@@ -72,7 +71,7 @@ public:
 
   // File handling.
   static void clear_all_parsed ();
-  static void refile_parsed (const string& from, const string& to);
+  static void refile_parsed (const std::string& from, const std::string& to);
 
   // Create and destroy.
   static void load_syntax (Syntax&, AttributeList&);

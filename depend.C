@@ -32,6 +32,8 @@
 #include <algorithm>
 #include <numeric>
 
+using namespace std;
+
 class TraverseDepend : public Traverse
 {
 private:

@@ -36,7 +36,7 @@ struct Condition;
 struct LogSelect : public Log
 {
   // Parameters.
-  const string description;	// Description of log file.
+  const std::string description;	// Description of log file.
   Condition& condition;	// Should we print a log now?
   std::vector<Select*> entries;
   const std::vector<symbol> conv_vector;

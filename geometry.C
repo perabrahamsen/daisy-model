@@ -30,6 +30,8 @@
 #include "groundwater.h"
 #include "assertion.h"
 
+using namespace std;
+
 unsigned int 
 Geometry::interval_plus (double z) const
 {
@@ -470,10 +472,10 @@ Can't automatically make discretizations less than 1 [cm], needed at "
 
       // Debug messages.
       TmpStream tmp;
-      tmp () << "(zplus ";
+      tmp () << "(zplus";
       for (unsigned int i = 0; i < zplus_.size (); i++)
 	tmp () << " " << zplus_[i];
-      tmp () << ") ; Intervals: " << zplus_.size ();
+      tmp () << "); " << zplus_.size () << " nodes.";
       msg.debug (tmp.str ());
       // Check that zplus is strictly decreasing.
       last = 0.0;

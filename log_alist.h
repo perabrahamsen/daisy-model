@@ -36,20 +36,25 @@ struct LogAList : public Log
   bool is_active;		// ... store the answer here.
   unsigned int nested;		// Nesting iff active.
 
-  // Stacks.
-  deque<symbol> entry_stack;	// Name of the entity we are logging.
-  deque<const Library*> library_stack; // Library of the object we are logging.
-  deque<const Syntax*> syntax_stack; // Syntax of the alist we are logging.
-  deque<AttributeList*> alist_stack; // State and parameters of entity.
-  deque<vector<AttributeList*>/**/> alist_sequence_stack; // Ditto for lists.
-  deque<int> unnamed_stack;	// Current element of AList sequence.
+  // Name of the entity we are logging.
+  std::deque<symbol> entry_stack; 
+  // Library of the object we are logging.
+  std::deque<const Library*> library_stack; 
+  // Syntax of the alist we are logging.
+  std::deque<const Syntax*> syntax_stack; 
+  // State and parameters of entity.
+  std::deque<AttributeList*> alist_stack; 
+  // Ditto for lists.
+  std::deque<std::vector<AttributeList*>/**/> alist_sequence_stack; 
+  // Current element of AList sequence.
+  std::deque<int> unnamed_stack;
 
   // Stack Accessors.
   symbol entry () const;
   const Library& library () const;
   const Syntax& syntax () const;
   AttributeList& alist () const;
-  vector<AttributeList*>& alist_sequence ();
+  std::vector<AttributeList*>& alist_sequence ();
   int unnamed ();
 
   // Stack Constructors.
@@ -60,7 +65,7 @@ struct LogAList : public Log
   void push (symbol entry, 
 	     const Syntax& syntax, 
 	     const AttributeList& default_alist,
-	     vector<AttributeList*> alist_sequence);
+	     std::vector<AttributeList*> alist_sequence);
   void pop ();
 
   // Nesting.
@@ -93,7 +98,7 @@ struct LogAList : public Log
   void output (symbol name, double value);
   void output (symbol name, int value);
   void output (symbol name, symbol value);
-  void output (symbol name, const vector<double>& value);
+  void output (symbol name, const std::vector<double>& value);
   void output (symbol name, const PLF& value);
   void output (symbol name, const Time& value);
 

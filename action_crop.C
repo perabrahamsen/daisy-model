@@ -32,6 +32,8 @@
 #include "im.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 struct ActionCrop : public Action
 {
   // Submodules.

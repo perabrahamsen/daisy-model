@@ -24,6 +24,8 @@
 #include "time.h"
 #include "daisy.h"
 
+using namespace std;
+
 struct ConditionMMDD : public Condition
 {
   const int month;

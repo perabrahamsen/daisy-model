@@ -42,6 +42,8 @@
 #include <fstream>
 #include <iostream>
 
+using namespace std;
+
 #ifdef __BORLANDC__
 #define EXPORT _export
 #define IMPORT _import

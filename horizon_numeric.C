@@ -29,6 +29,8 @@
 #include "tmpstream.h"
 #include <numeric>
 
+using namespace std;
+
 struct HorizonNumeric : public Horizon
 {
   // Content.

@@ -23,6 +23,8 @@
 #include "column_base.h"
 #include "am.h"
 
+using namespace std;
+
 class ColumnInorganic : public ColumnBase
 {
   // Actions.

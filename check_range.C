@@ -22,6 +22,8 @@
 #include "check_range.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 void
 RangeII::check (const double value) const throw (string)
 {

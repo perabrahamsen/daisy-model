@@ -28,6 +28,8 @@
 #include "im.h"
 #include "am.h"
 
+using namespace std;
+
 class ColumnStandard : public ColumnBase
 {
   // Content.
@@ -540,11 +542,9 @@ ColumnStandard::check_inner (Treelog& err) const
     if (!soil_NH4.check (n, err))
       ok = false;
   }
-  {
-    Treelog::Open nest (err, "OrganicMatter");
-    if (!organic_matter.check (err))
-      ok = false;
-  }
+  if (!organic_matter.check (soil, err))
+    ok = false;
+
   return ok;
 }
 

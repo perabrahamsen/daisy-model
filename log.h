@@ -25,6 +25,7 @@
 
 #include "librarian.h"
 #include "symbol.h"
+#include <iosfwd>
 
 class Daisy;
 class PLF;
@@ -237,7 +238,7 @@ public:
   virtual void output (symbol, double) = 0;
   virtual void output (symbol, int) = 0;
   virtual void output (symbol, symbol) = 0;
-  virtual void output (symbol, const vector<double>&) = 0;
+  virtual void output (symbol, const std::vector<double>&) = 0;
   virtual void output (symbol, const PLF&) = 0;
   virtual void output (symbol, const Time&) = 0; // Obsolete.
 
@@ -263,7 +264,7 @@ public:
 
   // Utilities
 public:
-  static void print_dlf_header (ostream& out, const AttributeList& al);
+  static void print_dlf_header (std::ostream& out, const AttributeList& al);
 
   // Create and Destroy.
 public:

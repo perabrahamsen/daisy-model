@@ -44,7 +44,7 @@ const AttributeList&
 LogClone::result ()
 { return alist (); }
 
-LogClone::LogClone (const string& name, 
+LogClone::LogClone (const std::string& name, 
 		    const Syntax& syntax, const AttributeList& alist)
   : LogAList (alist)
 { 

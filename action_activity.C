@@ -23,6 +23,8 @@
 #include "action.h"
 #include "log.h"
 
+using namespace std;
+
 struct ActionActivity : public Action
 {
   vector<Action*> actions;
@@ -94,7 +96,8 @@ static struct ActionActivitySyntax
 Perform all the specified actions in the sequence listed.  Each\n\
 action is performed until done.  At most one action can be performed\n\
 at each time step.");
-    syntax.add ("actions", Librarian<Action>::library (), Syntax::Sequence,
+    syntax.add ("actions", Librarian<Action>::library (), 
+                Syntax::State, Syntax::Sequence,
 		"Sequence of actions to perform.");
     alist.add ("actions", vector<AttributeList*> ());
     syntax.order ("actions");

@@ -25,6 +25,8 @@
 #include "assertion.h"
 #include <map>
 
+using namespace std;
+
 typedef map<string, Submodel::load_fun, less<string>/**/> submodel_map_type;
 
 static submodel_map_type* submodel_map = NULL;

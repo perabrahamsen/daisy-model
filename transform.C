@@ -1,4 +1,4 @@
-// transform.C --- Transformation between two soil chemicals.
+// transform.C --- Transformation between two soil components.
 // 
 // Copyright 2002 Per Abrahamsen and KVL.
 //
@@ -25,18 +25,14 @@ EMPTY_TEMPLATE
 Librarian<Transform>::Content* Librarian<Transform>::content = NULL;
 
 const char *const Transform::description = "\
-Generic transformations between soil chemicals.";
-
-void
-Transform::output (Log&) const
-{ }
+Generic transformations between soil components.";
 
 bool
 Transform::check (const Soil&, Treelog&) const
 { return true; }
 
 void
-Transform::initialize (const Soil&)
+Transform::initialize (const Soil&, Treelog&)
 { }
 
 void

@@ -24,6 +24,7 @@
 #define ORGANIC_MATTER_H
 
 #include "clayom.h" // Must be included here to ensure correct initialization.
+#include "domsorp.h" // Ditto.
 
 class AttributeList;
 class Syntax;
@@ -68,7 +69,7 @@ public:
 
   // Create and Destroy.
   int som_pools () const;
-  bool check (Treelog& err) const;
+  bool check (const Soil&, Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
   void fertilize (const AttributeList&, const Soil&);

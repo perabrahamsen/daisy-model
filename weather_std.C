@@ -35,6 +35,8 @@
 #include <numeric>
 #include <set>
 
+using namespace std;
+
 struct WeatherStandard : public Weather
 {
   // Snow Model.

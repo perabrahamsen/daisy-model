@@ -41,10 +41,10 @@ public:
   virtual void tick (Treelog&, const Soil&, const SoilWater&, 
 		     const Adsorption&, 
 		     double diffusion_coefficient,
-		     vector<double>& M, 
-		     vector<double>& C,
-		     const vector<double>& S,
-		     vector<double>& J) = 0;
+		     std::vector<double>& M, 
+		     std::vector<double>& C,
+		     const std::vector<double>& S,
+		     std::vector<double>& J) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

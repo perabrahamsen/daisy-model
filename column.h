@@ -60,7 +60,7 @@ public:
 			double stem_harvest, 
 			double leaf_harvest, 
 			double sorg_harvest, 
-			vector<const Harvest*>& harvest, Treelog&) = 0;
+			std::vector<const Harvest*>& harvest, Treelog&) = 0;
   virtual void mix (Treelog&, const Time&,
 		    double from, double to, double penetration = 1.0) = 0;
   virtual void swap (Treelog&, 
@@ -98,10 +98,11 @@ public:
   // Communication with external model.
   virtual unsigned int count_layers () const = 0; // Number of num. layers.
   virtual double get_dz (unsigned int i) const = 0; // Size of layer 'i'. [cm]
-  virtual void put_water_pressure (const vector<double>& v) = 0; // [cm]
-  virtual void get_water_sink (vector<double>& v) const = 0; // [cm^3/cm^3/h]
-  virtual void put_no3_m (const vector<double>& v) = 0; // [g/cm^3]
-  virtual void get_no3_m (vector<double>& v) const = 0; // [g/cm^3]
+  virtual void put_water_pressure (const std::vector<double>& v) = 0; // [cm]
+  virtual void get_water_sink (std::vector<double>& v) 
+    const = 0; // [cm^3/cm^3/h]
+  virtual void put_no3_m (const std::vector<double>& v) = 0; // [g/cm^3]
+  virtual void get_no3_m (std::vector<double>& v) const = 0; // [g/cm^3]
   virtual double get_evap_interception () const = 0; // [mm/h]
   virtual double get_intercepted_water () const = 0; // [mm]
   virtual double get_net_throughfall () const = 0; // [mm/h]

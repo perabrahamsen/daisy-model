@@ -30,6 +30,8 @@
 #include "mathlib.h"
 #include "check.h"
 
+using namespace std;
+
 class GroundwaterPipe : public Groundwater
 {
   // Parameters

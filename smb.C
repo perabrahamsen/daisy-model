@@ -28,6 +28,8 @@
 #include "check.h"
 #include "mathlib.h"
 
+using namespace std;
+
 void
 SMB::maintain (unsigned int end, const double* abiotic_factor, 
 	       double* N_used, double* CO2)

@@ -88,7 +88,7 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 		     << K (h + step) << " and K (0) = " << Ksat << "\n";
 	      tmp () << "Change = " << K (h + step) / K (h) 
 		     << " > Max = " << max_change;
-	      daisy_warning (tmp.str ());
+	      Assertion::debug (tmp.str ());
 	      break;
 	    }
 	  step /= 2;

@@ -42,6 +42,8 @@
 #include "am.h"
 #include "mathlib.h"
 
+using namespace std;
+
 class CropStandard : public Crop
 {
   // Content.

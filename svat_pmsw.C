@@ -52,6 +52,8 @@
 # define NP 20 // from xgaussj driver program
 # define MP 20 // from xgaussj driver program
 
+using namespace std;
+
 #ifdef _MSC_VER
 #pragma warning (disable: 4244)
 #endif

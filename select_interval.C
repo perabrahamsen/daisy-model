@@ -35,7 +35,7 @@ struct SelectInterval : public Select
 
   // Output routines.
 
-  void output_array (const vector<double>& array, 
+  void output_array (const std::vector<double>& array, 
 		     const Geometry* geometry, Treelog&)
   { 
     double result;
@@ -74,7 +74,7 @@ struct SelectInterval : public Select
   }
 
   // Create and Destroy.
-  const string default_dimension (const string& spec_dim) const
+  const std::string default_dimension (const std::string& spec_dim) const
   { 
     if (density)
       return spec_dim;
@@ -82,9 +82,9 @@ struct SelectInterval : public Select
     return Units::multiply (spec_dim, "cm");
   }
 
-  void initialize (const map<symbol, symbol>& conv, 
+  void initialize (const std::map<symbol, symbol>& conv, 
 		   double default_from, double default_to, 
-		   const string& timestep)
+		   const std::string& timestep)
   {
     Select::initialize (conv, default_from, default_to, timestep);
 

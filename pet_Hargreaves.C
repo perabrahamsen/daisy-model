@@ -25,6 +25,8 @@
 #include "log.h"
 #include "mathlib.h"
 
+using namespace std;
+
 struct PetHargreaves : public Pet
 {
   // State.

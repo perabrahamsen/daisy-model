@@ -22,6 +22,8 @@
 
 #include "select.h"
 
+using namespace std;
+
 struct SelectArray : public Select
 {
   // Content.
@@ -29,7 +31,7 @@ struct SelectArray : public Select
   const Geometry* last_geometry; // For printing dimensions;
 
   // Output routines.
-  void output_array (const vector<double>& array, 
+  void output_array (const std::vector<double>& array, 
 		     const Geometry* geometry, Treelog&)
   { 
     if (geometry)

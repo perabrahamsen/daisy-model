@@ -25,6 +25,8 @@
 #include "log.h"
 #include "daisy.h"
 
+using namespace std;
+
 struct ActionAssert : public Action
 {
   Condition& condition;

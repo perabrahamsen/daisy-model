@@ -32,6 +32,8 @@
 #include <map>
 #include <set>
 
+using namespace std;
+
 struct Library::Implementation
 {
   typedef map<symbol, Library*> library_map;

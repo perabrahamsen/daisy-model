@@ -25,6 +25,8 @@
 #include "plf.h"
 #include "check.h"
 
+using namespace std;
+
 class NitrificationSoil : public Nitrification
 {
   // Parameters.

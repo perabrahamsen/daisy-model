@@ -40,11 +40,11 @@ public:
   // Simulation.
 public:
   virtual void tick (const Soil& soil, const SoilWater&,
-		     const vector<double>& M,
-		     const vector<double>& C,
-		     vector<double>& S,
-		     vector<double>& S_p,
-		     vector<double>& J_p, Treelog&) = 0;
+		     const std::vector<double>& M,
+		     const std::vector<double>& C,
+		     std::vector<double>& S,
+		     std::vector<double>& S_p,
+		     std::vector<double>& J_p, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

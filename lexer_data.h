@@ -31,7 +31,7 @@ class LexerData : public Lexer
 {
   // Lex me!
 public:
-  string get_word ();
+  std::string get_word ();
   double get_number ();
   int get_cardinal ();
   void read_date (Time&);
@@ -43,7 +43,7 @@ public:
 
   // Create and Destroy.
 public:
-  LexerData (const string& name, Treelog&);
+  LexerData (const std::string& name, Treelog&);
   ~LexerData ();
 };
 

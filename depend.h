@@ -26,36 +26,40 @@
 #include "symbol.h"
 #include <set>
 #include <map>
-using namespace std;
 
 class Treelog;
 class Syntax;
 class AttributeList;
 
-typedef set<symbol> symbol_set;
-typedef map<symbol, symbol_set> dep_map;
+typedef std::set<symbol> symbol_set;
+typedef std::map<symbol, symbol_set> dep_map;
 
 bool
-has_dependencies (const string& component, const string& parameterization);
+has_dependencies (const std::string& component,
+                  const std::string& parameterization);
 
 bool
-has_dependencies (const string& component, const string& parameterization, 
-		    const Syntax& syntax, AttributeList& alist,
-		    const string& name);
+has_dependencies (const std::string& component,
+                  const std::string& parameterization, 
+                  const Syntax& syntax, AttributeList& alist,
+                  const std::string& name);
 bool
-check_dependencies (const string& component, const string& parameterization, 
+check_dependencies (const std::string& component,
+                    const std::string& parameterization, 
 		    Treelog& treelog);
 
 bool
-check_dependencies (const string& component, const string& parameterization, 
+check_dependencies (const std::string& component,
+                    const std::string& parameterization, 
 		    const Syntax& syntax, AttributeList& alist,
-		    const string& name, Treelog& treelog);
+		    const std::string& name, Treelog& treelog);
 bool
-find_dependencies (const string& component, const string& parameterization, 
+find_dependencies (const std::string& component,
+                   const std::string& parameterization, 
 		   dep_map& dependencies);
 
 void
-resequence (const string& component, const string& parameterization, 
+resequence (const std::string& component, const std::string& parameterization, 
 	    const dep_map& dependencies);
 
 

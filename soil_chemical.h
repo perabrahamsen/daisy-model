@@ -41,9 +41,9 @@ class SoilChemical : public Solute
 public:
   const Chemical& chemical;
 private:
-  vector<double> decomposed;
-  vector<double> uptaken;
-  vector<double> lag;
+  std::vector<double> decomposed;
+  std::vector<double> uptaken;
+  std::vector<double> lag;
   const PLF lag_increment;
 
   // Simulation.

@@ -53,9 +53,9 @@ public:
 
   void mixture (const IM& soil_im /* g/cm^2/mm */);
   void mixture (const SoilChemicals& soil_chemicals);
-  void update_water (const Soil&, const vector<double>& S_,
-		     vector<double>& h_, vector<double>& Theta_,
-		     vector<double>& q, const vector<double>& q_p);
+  void update_water (const Soil&, const std::vector<double>& S_,
+		     std::vector<double>& h_, std::vector<double>& Theta_,
+		     std::vector<double>& q, const std::vector<double>& q_p);
 
   // Manager.
   void fertilize (const IM&);

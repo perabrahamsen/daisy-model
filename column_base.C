@@ -19,8 +19,9 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #include "column_base.h"
+
+using namespace std;
 
 static const double m2_per_cm2 = 0.0001;
 static const double cm2_per_m2 = 1.0 / m2_per_cm2;
@@ -316,14 +317,14 @@ ColumnBase::check (bool require_weather,
       ok = false;
   }
   {
-    Treelog::Open nest (err, "Transformations");
-    for (vector<Transform*>::const_iterator i = transformations.begin ();
-	 i != transformations.end ();
+    Treelog::Open nest (err, "Chemistry");
+    for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
+	 i != chemistry.end ();
 	 i++)
       {
-	const Transform& transform = **i;
-	Treelog::Open nest (err, transform.name);
-	if (!transform.check (soil, err))
+	const Chemistry& reaction = **i;
+	Treelog::Open nest (err, reaction.name);
+	if (!reaction.check (soil, err))
 	  ok = false;
       }
   }
@@ -335,8 +336,8 @@ ColumnBase::check (bool require_weather,
 void
 ColumnBase::tick_base (Treelog& msg)
 {
-  for (vector<Transform*>::const_iterator i = transformations.begin ();
-       i != transformations.end ();
+  for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
+       i != chemistry.end ();
        i++)
     (*i)->tick (soil, soil_water, soil_chemicals, msg);
 }
@@ -354,8 +355,8 @@ ColumnBase::output (Log& log) const
   output_submodule (soil_water, "SoilWater", log);
   output_submodule (soil_heat, "SoilHeat", log);
   output_submodule (soil_chemicals, "SoilChemicals", log);
-  output_list (transformations, "Transformations", log, 
-	       Librarian<Transform>::library ());
+  output_list (chemistry, "Chemistry", log, 
+	       Librarian<Chemistry>::library ());
   output_derived (groundwater, "Groundwater", log);
   output_derived (vegetation, "Vegetation", log);
   output_inner (log);
@@ -404,8 +405,8 @@ ColumnBase::ColumnBase (const AttributeList& al)
     soil_water (al.alist ("SoilWater")),
     soil_heat (al.alist ("SoilHeat")),
     soil_chemicals (al.alist ("SoilChemicals")),
-    transformations (map_create<Transform> (al.alist_sequence 
-					    ("Transformations"))),
+    chemistry (map_create<Chemistry> (al.alist_sequence 
+					    ("Chemistry"))),
     groundwater (Librarian<Groundwater>::create (al.alist ("Groundwater"))),
     harvest_DM (0.0),
     harvest_N (0.0),
@@ -434,10 +435,10 @@ ColumnBase::initialize_common (const Time& time, Treelog& err,
   soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater, err);
   soil_chemicals.initialize (alist.alist ("SoilChemicals"), soil, soil_water, 
 			     err);
-  for (vector<Transform*>::const_iterator i = transformations.begin ();
-       i != transformations.end ();
+  for (vector<Chemistry*>::const_iterator i = chemistry.begin ();
+       i != chemistry.end ();
        i++)
-    (*i)->initialize (soil);
+    (*i)->initialize (soil, err);
 }
 
 ColumnBase::~ColumnBase ()
@@ -446,7 +447,7 @@ ColumnBase::~ColumnBase ()
     delete weather;
   delete &vegetation;
   delete &bioclimate;
-  sequence_delete (transformations.begin (), transformations.end ());
+  sequence_delete (chemistry.begin (), chemistry.end ());
   delete &groundwater;
 }
 
@@ -486,11 +487,11 @@ the simulation.  If unspecified, used global weather.");
   syntax.add_submodule ("SoilChemicals", alist, Syntax::State,
 			"Chemicals in the soil.",
 			SoilChemicals::load_syntax);
-  syntax.add ("Transformations", Librarian<Transform>::library (), 
-	      Syntax::Sequence, 
+  syntax.add ("Chemistry", Librarian<Chemistry>::library (), 
+	      Syntax::State, Syntax::Sequence, 
 	      "Transformations applied to soil chemicals.");
   const vector<AttributeList*> empty;
-  alist.add ("Transformations", empty);
+  alist.add ("Chemistry", empty);
   syntax.add ("Groundwater", Librarian<Groundwater>::library (),
 	      "The groundwater level.");
   syntax.add ("harvest_DM", "g/m^2", Syntax::LogOnly, 

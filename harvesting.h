@@ -28,7 +28,6 @@
 
 #include <vector>
 #include <string>
-using namespace std;
 
 class AttributeList;
 class Syntax;
@@ -44,14 +43,14 @@ class Harvesting
 {
   // Parameters.
 private:
-  const vector<AttributeList*>& Stem; // Stem AM parameters.
-  const vector<AttributeList*>& Leaf; // Leaf AM parameters.
+  const std::vector<AttributeList*>& Stem; // Stem AM parameters.
+  const std::vector<AttributeList*>& Leaf; // Leaf AM parameters.
 public:
-  const vector<AttributeList*>& Dead; // Dead AM parameters.
+  const std::vector<AttributeList*>& Dead; // Dead AM parameters.
 private:
-  const vector<AttributeList*>& SOrg; // SOrg AM parameters.
+  const std::vector<AttributeList*>& SOrg; // SOrg AM parameters.
 public:
-  const vector<AttributeList*>& Root; // Root AM parameters.
+  const std::vector<AttributeList*>& Root; // Root AM parameters.
 private:
   const double EconomicYield_W; // Frac. of economic yield (DM) in storage org.
   const double EconomicYield_N; // Frac. of economic yield (N) in storage org.
@@ -74,7 +73,7 @@ public:
 public:
   const Harvest& operator() (symbol column_name,
 			     symbol crop_name,
-			     const vector<double>& density,
+			     const std::vector<double>& density,
 			     const Time& time,
 			     const Geometry& geometry,
 			     Production& production,
@@ -86,11 +85,11 @@ public:
 			     const double leaf_harvest_frac,
 			     const double sorg_harvest_frac,
 			     const bool kill_off,
-			     vector<AM*>& residuals,
+			     std::vector<AM*>& residuals,
 			     double& residuals_DM,
 			     double& residuals_N_top, double& residuals_C_top,
-			     vector<double>& residuals_N_soil,
-			     vector<double>& residuals_C_soil);
+			     std::vector<double>& residuals_N_soil,
+			     std::vector<double>& residuals_C_soil);
   void tick (const Time& time);
   void output (Log& log) const;
 

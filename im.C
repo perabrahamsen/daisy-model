@@ -27,6 +27,8 @@
 #include "syntax.h"
 #include "submodel.h"
 
+using namespace std;
+
 void
 IM::output (Log& log) const
 {

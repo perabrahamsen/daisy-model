@@ -23,6 +23,8 @@
 #include "tortuosity.h"
 #include "hydraulic.h"
 
+using namespace std;
+
 static double h_wp = -15000;
 
 class TortuosityLinear : public Tortuosity

@@ -304,6 +304,13 @@ Syntax::Fraction ()
   return fraction;
 }
 
+const string&
+Syntax::User ()
+{
+  static const string fraction = "<user>";
+  return fraction;
+}
+
 // Each syntax entry should have an associated type.
 
 static const char * const type_names[] = 

@@ -40,6 +40,8 @@
 #include "submodel.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 const char *const Daisy::default_description = "\
 The Daisy Crop/Soil/Atmosphere Model.";
 

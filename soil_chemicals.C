@@ -35,6 +35,8 @@
 #include <map>
 #include <set>
 
+using namespace std;
+
 struct SoilChemicals::Implementation
 {
   // Content

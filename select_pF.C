@@ -23,6 +23,8 @@
 #include "select.h"
 #include "mathlib.h"
 
+using namespace std;
+
 struct SelectPF : public Select
 {
   // Content.

@@ -54,7 +54,7 @@ protected:
   int count;			// Number of accumulated values.
 public:
   static const char *const description;
-  virtual const string& dimension () const;
+  virtual const std::string& dimension () const;
   virtual symbol tag () const;
   symbol log_name () const;
   virtual const Geometry* geometry () const; // For array tags.
@@ -62,7 +62,7 @@ public:
 
   // Nesting.
 public:
-  vector<symbol> path;		// Content of this entry.
+  std::vector<symbol> path;		// Content of this entry.
   const unsigned int last_index;	// Index of last member in path.
   symbol current_name;
   static const symbol wildcard;
@@ -90,7 +90,8 @@ public:
   virtual void output_number (double);
   virtual void output_integer (int);
   virtual void output_name (symbol);
-  virtual void output_array (const vector<double>&, const Geometry*, Treelog&);
+  virtual void output_array (const std::vector<double>&,
+                             const Geometry*, Treelog&);
   virtual void output_time (const Time&); // Obsolete
 
   // Reset at start of time step.
@@ -112,11 +113,13 @@ public:
 
   // Create and Destroy.
 protected:
-  virtual const string default_dimension (const string& spec_dim) const;
+  virtual const std::string 
+  /**/ default_dimension (const std::string& spec_dim) const;
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const map<symbol, symbol>& conv, 
-			   double from, double to, const string& timestep);
+  virtual void initialize (const std::map<symbol, symbol>& conv, 
+			   double from, double to,
+                           const std::string& timestep);
   void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;
 protected:

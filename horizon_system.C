@@ -28,6 +28,8 @@
 #include "tmpstream.h"
 #include <numeric>
 
+using namespace std;
+
 struct HorizonSystem : public Horizon
 {
   // Types.

@@ -31,6 +31,8 @@
 #include "mathlib.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 struct Snow::Implementation
 { 
   // Flux variables.

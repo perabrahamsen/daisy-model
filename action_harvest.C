@@ -43,9 +43,9 @@ struct ActionHarvest : public Action
     daisy.field.harvest (daisy.time, crop, stub, stem, leaf, sorg,
 			 daisy.harvest, out);
     if (daisy.field.crop_ds (crop) < 0.0)
-      out.message (string("Harvesting ") + crop);
+      out.message ("Harvesting " + crop);
     else
-      out.message (string("Cutting ") + crop);
+      out.message ("Cutting " + crop);
   }
 
   ActionHarvest (const AttributeList& al)

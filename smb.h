@@ -25,15 +25,14 @@
 #include "om.h"
 
 #include <vector>
-using namespace std;
 
 class SMB : public OM
 { 
   // Content.
 public:
   const double maintenance;	// How fast does it eat itself?
-  vector<double> clay_turnover;	// Clay dependent turnover rate.
-  vector<double> clay_maintenance; // Clay dependent maintenance rate.
+  std::vector<double> clay_turnover;	// Clay dependent turnover rate.
+  std::vector<double> clay_maintenance; // Clay dependent maintenance rate.
 
   // Simulation.
 public:

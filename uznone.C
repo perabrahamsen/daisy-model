@@ -25,6 +25,8 @@
 #include "log.h"
 #include "mathlib.h"
 
+using namespace std;
+
 class UZNone : public UZmodel
 {
   // UZmodel.

@@ -32,6 +32,8 @@
 #include "submodel.h"
 #include <numeric>
 
+using namespace std;
+
 double
 HorHeat::heat_conductivity (double Theta, double Ice) const
 {

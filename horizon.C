@@ -38,6 +38,8 @@
 #include <vector>
 #include <map>
 
+using namespace std;
+
 // Weight of humus. [g/cm^3]
 static const double rho_water = 1.0; // [g/cm^3]
 static const double rho_ice = 0.917; // [g/cm^3]
@@ -52,15 +54,18 @@ struct Horizon::Implementation
   /* const */ vector<double> SOM_fractions;
   const double turnover_factor;
   const double anisotropy;
-  /*const*/ map<string, double, less<string>/**/> attributes;
+  typedef map<string, double, less<string> > double_map;
+  const double_map attributes;
+  typedef map<string, string, less<string> > string_map;
+  const string_map dimensions;
   /*const*/ Nitrification& nitrification;
   HorHeat hor_heat;
   
-  // Initialize.
+  // Create and Detroy.
   void initialize (const Hydraulic&, const Texture& texture, double quarts, 
                    int som_size, Treelog& msg);
-  
-  // Create.
+  static double_map get_attributes (const vector<AttributeList*>& alists);
+  static string_map get_dimensions (const vector<AttributeList*>& alists);
   Implementation (const AttributeList& al);
   ~Implementation ();
 };
@@ -93,6 +98,24 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic,
   hor_heat.initialize (hydraulic, texture, quarts, msg);
 }
 
+Horizon::Implementation::double_map
+Horizon::Implementation::get_attributes (const vector<AttributeList*>& alists)
+{ 
+  double_map result; 
+  for (unsigned int i = 0; i < alists.size (); i++)
+    result[alists[i]->name ("key")] = alists[i]->number ("value");
+  return result;
+}
+
+Horizon::Implementation::string_map
+Horizon::Implementation::get_dimensions (const vector<AttributeList*>& alists)
+{ 
+  string_map result; 
+  for (unsigned int i = 0; i < alists.size (); i++)
+    result[alists[i]->name ("key")] = alists[i]->name ("value");
+  return result;
+}
+
 Horizon::Implementation::Implementation (const AttributeList& al)
   : dry_bulk_density (al.number ("dry_bulk_density", -42.42e42)),
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
@@ -102,6 +125,8 @@ Horizon::Implementation::Implementation (const AttributeList& al)
 		   : vector<double> ()),
     turnover_factor (al.number ("turnover_factor")),
     anisotropy (al.number ("anisotropy")),
+    attributes (get_attributes (al.alist_sequence ("attributes"))),
+    dimensions (get_dimensions (al.alist_sequence ("attributes"))),
     nitrification (Librarian<Nitrification>::create 
 		   (al.alist ("Nitrification"))),
     hor_heat (al.alist ("HorHeat"))
@@ -183,8 +208,17 @@ Horizon::has_attribute (const string& name) const
 double 
 Horizon::get_attribute (const string& name) const
 { 
-  daisy_assert (has_attribute (name));
-  return impl.attributes[name];
+  Implementation::double_map::const_iterator i = impl.attributes.find (name);
+  daisy_assert (i != impl.attributes.end ());
+  return (*i).second;
+}
+
+string
+Horizon::get_dimension (const string& name) const
+{ 
+  Implementation::string_map::const_iterator i = impl.dimensions.find (name);
+  daisy_assert (i != impl.dimensions.end ());
+  return (*i).second;
 }
 
 bool
@@ -193,7 +227,7 @@ Horizon::check_alist (const AttributeList& al, Treelog& err)
   bool ok = true;
 
   daisy_assert (al.check ("hydraulic"));
-  const AttributeList& hydraulic =al.alist ("hydraulic");
+  const AttributeList& hydraulic = al.alist ("hydraulic");
   if (hydraulic.name ("type") == "hypres"
       && !al.check ("dry_bulk_density"))
     {
@@ -321,12 +355,13 @@ this horizon.");
   Syntax& attSyntax = *new Syntax ();
   attSyntax.add ("key", Syntax::String, Syntax::Const,
 		 "Name of attribute.");
-  attSyntax.add ("value", Syntax::Unknown (), Syntax::Const,
+  attSyntax.add ("value", Syntax::User (), Syntax::Const,
 		 "Value of attribute.");
   attSyntax.order ("key", "value");
   syntax.add ("attributes", attSyntax, Syntax::OptionalConst, Syntax::Sequence,
 	      "List of additional attributes for this horizon.\n\
 Intended for use with pedotransfer functions.");
+  alist.add ("attributes", vector<AttributeList*> ());
 }
 
 Horizon::Horizon (const AttributeList& al)
@@ -336,14 +371,7 @@ Horizon::Horizon (const AttributeList& al)
     name (al.identifier ("type")),
     hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
     tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
-{ 
-  if (al.check ("attributes"))
-    {
-      const vector<AttributeList*>& alists = al.alist_sequence ("attributes");
-      for (unsigned int i = 0; i < alists.size (); i++)
-	impl.attributes[alists[i]->name ("key")] = alists[i]->number ("value");
-    }
-}
+{ }
 
 void 
 Horizon::initialize_base (bool top_soil,

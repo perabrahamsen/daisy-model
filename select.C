@@ -28,6 +28,8 @@
 #include <numeric>
 #include <set>
 
+using namespace std;
+
 EMPTY_TEMPLATE
 Librarian<Select>::Content* Librarian<Select>::content = NULL;
 

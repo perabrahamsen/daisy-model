@@ -42,7 +42,7 @@ public:
 public:
   void initialize (const Syntax&, Treelog&);
   ParserFile (const AttributeList&);
-  ParserFile (const Syntax& syntax, const string& n, Treelog&);
+  ParserFile (const Syntax& syntax, const std::string& n, Treelog&);
   ~ParserFile ();
 };
 

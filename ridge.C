@@ -32,6 +32,8 @@
 #include "soil_water.h"
 #include "check.h"
 
+using namespace std;
+
 struct Ridge::Implementation
 {
   // Parameters.

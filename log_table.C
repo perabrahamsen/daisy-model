@@ -30,6 +30,8 @@
 #include <fstream>
 #include <time.h>
 
+using namespace std;
+
 struct LogTable : public LogSelect, public Destination
 {
   static const char *const default_description;

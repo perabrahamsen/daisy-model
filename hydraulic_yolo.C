@@ -24,6 +24,8 @@
 #include "plf.h"
 #include "mathlib.h"
 
+using namespace std;
+
 class HydraulicYolo : public Hydraulic
 {
   int M_intervals;

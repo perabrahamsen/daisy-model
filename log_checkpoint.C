@@ -26,6 +26,8 @@
 #include "printer_file.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 struct LogCheckpoint : public LogAList
 {
   // Content.

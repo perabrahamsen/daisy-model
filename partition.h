@@ -28,7 +28,6 @@ class Log;
 
 #include "plf.h"
 #include <vector>
-using namespace std;
 
 class Partition 
 {

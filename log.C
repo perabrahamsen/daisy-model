@@ -24,6 +24,8 @@
 #include "daisy.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 EMPTY_TEMPLATE
 Librarian<Log>::Content* Librarian<Log>::content = NULL;
 

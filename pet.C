@@ -25,6 +25,8 @@
 #include "vegetation.h"
 #include "surface.h"
 
+using namespace std;
+
 EMPTY_TEMPLATE
 Librarian<Pet>::Content* Librarian<Pet>::content = NULL;
 

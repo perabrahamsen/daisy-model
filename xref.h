@@ -26,7 +26,6 @@
 #include <string>
 #include <map>
 #include <vector>
-using namespace std;
 
 class XRef
 {
@@ -44,28 +43,28 @@ public:
   {
     symbol component;
     symbol model;
-    vector<string> path;
-    ModelUser (symbol com, symbol mod, const vector<string>& p);
+    std::vector<std::string> path;
+    ModelUser (symbol com, symbol mod, const std::vector<std::string>& p);
   };
 
   struct SubmodelUser
   {
-    string submodel;
-    vector<string> path;
-    SubmodelUser (const string& sub, const vector<string>& p);
+    std::string submodel;
+    std::vector<std::string> path;
+    SubmodelUser (const std::string& sub, const std::vector<std::string>& p);
     SubmodelUser ();
   };
 
   struct Users
   { 
-    vector<ModelUser> models;
-    vector<SubmodelUser> submodels;
+    std::vector<ModelUser> models;
+    std::vector<SubmodelUser> submodels;
     Users ();
   };
 
-  map<string, Users, less<string>/**/> submodels;
-  map<ModelUsed, Users, less<ModelUsed>/**/> models;
-  map<symbol, Users> components;
+  std::map<std::string, Users, std::less<std::string>/**/> submodels;
+  std::map<ModelUsed, Users, std::less<ModelUsed>/**/> models;
+  std::map<symbol, Users> components;
 
   // Create and Destroy.
 public:

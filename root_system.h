@@ -26,7 +26,6 @@
 #include "plf.h"
 
 #include <vector>
-using namespace std;
 
 struct Geometry;
 struct Soil;
@@ -62,11 +61,11 @@ private:
   double PotRtDpt;	        // Potential Root Penetration Depth [cm]
 public:
   double Depth;			// Rooting Depth [cm]
-  vector<double> Density;	// Root density [cm/cm3] in soil layers
+  std::vector<double> Density;	// Root density [cm/cm3] in soil layers
 private:
-  vector<double> H2OExtraction; // Extraction of H2O in soil [cm³/cm³/h]
-  vector<double> NH4Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
-  vector<double> NO3Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
+  std::vector<double> H2OExtraction; // Extraction of H2O in soil [cm³/cm³/h]
+  std::vector<double> NH4Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
+  std::vector<double> NO3Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
   double h_x;			// Root extraction at surface.
 public:
   double partial_soil_temperature; // Accumaleted soil temperature. [°C]
@@ -96,7 +95,7 @@ public:
 		       Treelog&);
 private:
   double solute_uptake (const Soil&, const SoilWater&, Solute&,
-			double PotNUpt, vector<double>& uptake,
+			double PotNUpt, std::vector<double>& uptake,
 			double i_max, double C_root_min);
 public:
   double nitrogen_uptake (const Soil& soil,

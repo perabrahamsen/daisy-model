@@ -38,6 +38,8 @@
 #include "chemicals.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 struct BioclimateStandard : public Bioclimate
 { 
   // Canopy State.

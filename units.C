@@ -25,6 +25,8 @@
 #include "common.h"
 #include <map>
 
+using namespace std;
+
 struct Units::Content
 {
   typedef map<string, Convert*, less<string>/**/> to_type;
@@ -319,6 +321,9 @@ Units::standard_conversions ()
   add ("ppm", "mg N/l", 1.0);
   add ("L/kg", "cm^3/g", 1.0);
   add ("l/kg", "cm^3/g", 1.0);
+  add ("%", Syntax::Fraction (), 0.01);
+  add (Syntax::Fraction (), "%", 100.0);
+  add (Syntax::Fraction (), "", 1.0);
 
   // Weather.
   add ("dgWest", "dgEast", -1.0);

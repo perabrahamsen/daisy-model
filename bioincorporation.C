@@ -35,6 +35,8 @@
 #include "mathlib.h"
 #include <algorithm>
 
+using namespace std;
+
 struct Bioincorporation::Implementation
 { 
   // Parameters.

@@ -34,6 +34,8 @@
 #include "mathlib.h"
 #include <numeric>
 
+using namespace std;
+
 EMPTY_TEMPLATE
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
 

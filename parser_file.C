@@ -76,6 +76,7 @@ struct ParserFile::Implementation
   bool looking_at (char);
 
   // Parser.
+  void check_value (const Syntax& syntax, const string& name,  double value);
   void add_derived (Library&);
   AttributeList& load_derived (const Library& lib, bool in_sequence,
 			       const AttributeList* original);
@@ -126,6 +127,8 @@ ParserFile::Implementation::get_string ()
 	}
       return str;
     }
+  else if (c == '[')
+    return get_dimension ();
   else if (c != '_' && c != '-' && !isalpha (c))
     {
       error ("Identifier or string expected");
@@ -366,6 +369,21 @@ ParserFile::Implementation::looking_at (char c)
 }
 
 void
+ParserFile::Implementation::check_value (const Syntax& syntax, 
+                                         const string& name,
+                                         const double value)
+{
+  try
+    {
+      syntax.check (name, value);
+    }
+  catch (const string& message)
+    {
+      error (name + ": " + message);
+    }
+}
+
+void
 ParserFile::Implementation::add_derived (Library& lib)
 {
   // Get the name of the class and the existing superclass to derive from.
@@ -502,16 +520,16 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  {
 	  case Syntax::Number:
 	    {
-	      double value = get_number (syntax.dimension (name));
-
-	      try
-		{
-		  syntax.check (name, value);
-		}
-	      catch (const string& message)
-		{
-		  error (name + ": " + message);
-		}
+              if (syntax.dimension (name) == Syntax::User ())
+                {
+                  const double value = get_number ();
+                  const string dim = get_dimension ();
+                  check_value (syntax, name, value);
+                  atts.add (name, value, dim);
+                  break;
+                }
+	      const double value = get_number (syntax.dimension (name));
+              check_value (syntax, name, value);
 	      atts.add (name, value);
 	      break;
 	    }
@@ -865,29 +883,28 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			      }
 			  }
 		      }
-		    else
+                    else if (looking_at ('['))
+                      {
+                        const string read_dim = get_dimension ();
+                        if (check_dimension (syntax_dim, read_dim))
+                          {
+                            daisy_assert (positions.size () == array.size ());
+                            for (unsigned int i = first_unchecked;
+                                 i < array.size ();
+                                 i++)
+                              {
+                                array[i] = convert (array[i],
+                                                    syntax_dim, read_dim, 
+                                                    positions[i]);
+                              }
+                            first_unchecked = array.size ();
+                          }
+                      }
+		    else 
 		      {
 			array.push_back (get_number ());
 			positions.push_back (lexer->position ());
 			count++;
-			
-			if (looking_at ('['))
-			  {
-			    const string read_dim = get_dimension ();
-			    if (check_dimension (syntax_dim, read_dim))
-			      {
-				daisy_assert (positions.size () == array.size ());
-				for (unsigned int i = first_unchecked;
-				     i < array.size ();
-				     i++)
-				  {
-				    array[i] = convert (array[i],
-							syntax_dim, read_dim, 
-							positions[i]);
-				  }
-				first_unchecked = array.size ();
-			      }
-			  }
 		      }
 		  }
 		daisy_assert (positions.size () == array.size ());

@@ -26,6 +26,8 @@
 #include "log.h"
 #include "mathlib.h"
 
+using namespace std;
+
 EMPTY_TEMPLATE
 Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 

@@ -38,6 +38,8 @@
 #endif
 #include <iostream>
 
+using namespace std;
+
 struct Soil::Implementation
 {
   // Layers.
@@ -183,6 +185,10 @@ Soil::clay (int i) const
 { return horizon_[i]->clay (); }
 
 double 
+Soil::texture_below (int i, double size) const
+{ return horizon_[i]->texture_below (size); }
+
+double 
 Soil::humus (int i) const
 { return horizon_[i]->humus (); }
 
@@ -225,6 +231,10 @@ Soil::has_attribute (int i, const std::string& name) const
 double 
 Soil::get_attribute (int i, const std::string& name) const
 { return horizon_[i]->get_attribute (name); }
+
+string
+Soil::get_dimension (int i, const std::string& name) const
+{ return horizon_[i]->get_dimension (name); }
 
 void
 Soil::output (Log& log) const

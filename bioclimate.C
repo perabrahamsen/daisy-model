@@ -24,6 +24,8 @@
 #include "weather.h"
 #include "mathlib.h"
 
+using namespace std;
+
 EMPTY_TEMPLATE
 Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content = NULL;
 

@@ -31,12 +31,12 @@ struct MacroNone : public Macro
   void tick (const Soil& /* soil */, 
 	     unsigned int /* first */, unsigned int /* last */,
 	     UZtop& /* surface */,
-	     const vector<double>& /* h_ice */,
-	     const vector<double>& /* h */,
-	     const vector<double>& /* Theta */,
-	     vector<double>& /* S */,
-	     vector<double>& /* S_p */,
-	     vector<double>& /* q_p */,
+	     const std::vector<double>& /* h_ice */,
+	     const std::vector<double>& /* h */,
+	     const std::vector<double>& /* Theta */,
+	     std::vector<double>& /* S */,
+	     std::vector<double>& /* S_p */,
+	     std::vector<double>& /* q_p */,
 	     Treelog&)
     { }
   void output (Log&) const

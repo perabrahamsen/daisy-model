@@ -28,6 +28,8 @@
 #include "assertion.h"
 #include <deque>
 
+using namespace std;
+
 class TraverseXRef : public Traverse
 {
   // We store it here.

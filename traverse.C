@@ -27,6 +27,8 @@
 #include "submodel.h"
 #include "assertion.h"
 
+using namespace std;
+
 void 
 Traverse::traverse_all_libraries ()
   // Traverse through all libraries.

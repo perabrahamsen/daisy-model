@@ -24,6 +24,8 @@
 
 #include "condition.h"
 
+using namespace std;
+
 struct ConditionFalse : public Condition
 {
   bool match (const Daisy&) const
@@ -235,7 +237,7 @@ True iff all the listed conditions are true.\n\
 The conditions are tested in the sequence listed, until a false is found,\n\
 or the end of the list is reached.");
     syntax.add ("operands", Librarian<Condition>::library (), 
-		Syntax::Sequence, "Conditions to test.");
+		Syntax::State, Syntax::Sequence, "Conditions to test.");
     syntax.order ("operands");
     Librarian<Condition>::add_type ("or", alist_or, syntax, &make_or);
     Librarian<Condition>::add_type ("and", alist_and, syntax, &make_and);

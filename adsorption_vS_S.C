@@ -84,7 +84,7 @@ Adsorption_vS_S::M_to_C (const Soil& soil, double Theta, int i, double M) const
 
   double C;
 
-  if (M < 1e-6 * min (Ke, Kp))
+  if (M < 1e-6 * std::min (Ke, Kp))
     // There are numerical problems in the general solution for small M. 
     C = M / (Theta + ve  / Ke + vp / Kp);
   else

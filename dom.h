@@ -58,8 +58,8 @@ public:
   /* const */ PLF heat_factor;
   /* const */ PLF water_factor;
   const double turnover_rate;	// How fast this is it turned over?
-  const vector<double> efficiency;	// How digestible is this?
-  const vector<double> fractions;	// Where does it end up?
+  const std::vector<double> efficiency;	// How digestible is this?
+  const std::vector<double> fractions;	// Where does it end up?
 
   // Simulation.
 public:
@@ -80,7 +80,7 @@ public:
   void clear ();
   void turnover (unsigned int size, const double* turnover_factor, 
 		 const double* N_soil, double* N_used,
-		 double* CO2, const vector<SMB*>& smb);
+		 double* CO2, const std::vector<SMB*>& smb);
 private:
   void tock (unsigned int end,
 	     const double* factor, double fraction, double efficiency,

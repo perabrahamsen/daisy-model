@@ -27,7 +27,7 @@
 #include "soil_water.h"
 #include "soil_heat.h"
 #include "soil_chemicals.h"
-#include "transform.h"
+#include "chemistry.h"
 #include "groundwater.h"
 #include "alist.h"
 #include "syntax.h"
@@ -52,7 +52,7 @@ protected:
   SoilWater soil_water;
   SoilHeat soil_heat;
   SoilChemicals soil_chemicals;
-  vector<Transform*> transformations;
+  std::vector<Chemistry*> chemistry;
   Groundwater& groundwater;
 
   // Log variables.
@@ -64,8 +64,8 @@ protected:
   double residuals_DM;
   double residuals_N_top;
   double residuals_C_top;
-  vector<double> residuals_N_soil;
-  vector<double> residuals_C_soil;
+  std::vector<double> residuals_N_soil;
+  std::vector<double> residuals_C_soil;
 
   // Actions.
 public:
@@ -83,8 +83,8 @@ public:
 		double stem_harvest,
 		double leaf_harvest, 
 		double sorg_harvest,
-		vector<const Harvest*>& harvest, Treelog&);
-  virtual void add_residuals (vector<AM*>&) = 0;
+		std::vector<const Harvest*>& harvest, Treelog&);
+  virtual void add_residuals (std::vector<AM*>&) = 0;
   void mix (Treelog&, const Time&,
 	    double from, double to, double penetration = 1.0);
   void swap (Treelog&, const Time&,
@@ -106,8 +106,8 @@ public:
 public:
   unsigned int count_layers () const; // Number of num. layers.
   double get_dz (unsigned int i) const; // Size of layer 'i'. [cm]
-  void put_water_pressure (const vector<double>& v); // [cm]
-  void get_water_sink (vector<double>& v) const; // [cm^3/cm^3/h]
+  void put_water_pressure (const std::vector<double>& v); // [cm]
+  void get_water_sink (std::vector<double>& v) const; // [cm^3/cm^3/h]
   double get_evap_interception () const; // [mm/h]
   double get_intercepted_water () const; // [mm]
   double get_net_throughfall () const; // [mm/h]

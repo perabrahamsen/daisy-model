@@ -117,7 +117,7 @@ PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
                                Rn, G, Temp, VaporPressure,
                                U2, AtmPressure) * 3600;
       potential_evapotranspiration_dry
-	= max (0.0, reference_evapotranspiration_dry);
+	= std::max (0.0, reference_evapotranspiration_dry);
 
       // Wet.
       reference_evapotranspiration_wet
@@ -125,7 +125,7 @@ PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
                                LAI, 0.0, Rn, G, Temp, VaporPressure,
                                U2, AtmPressure) * 3600;
       potential_evapotranspiration_wet
-	= max (0.0, reference_evapotranspiration_wet);
+	= std::max (0.0, reference_evapotranspiration_wet);
     }
   else
     {

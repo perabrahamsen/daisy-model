@@ -25,6 +25,8 @@
 #include "mathlib.h"
 #include <ctype.h>
 
+using namespace std;
+
 string
 LexerData::get_word ()
 {

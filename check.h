@@ -23,13 +23,12 @@
 #define CHECK_H
 
 #include <string>
-using namespace std;
 
 class Check
 { 
   // Use.
 public:
-  virtual void check (const double value) const throw (string) = 0;
+  virtual void check (const double value) const throw (std::string) = 0;
 
   // Utilities.
 public:

@@ -28,9 +28,9 @@ class LogAll : public LogSelect
 {
   // Content.
 private:
-  vector<LogSelect*> slaves;
-  stack<vector<Select*>/**/> active_leafs;
-  stack<vector<Select*>/**/> active_interiors;
+  std::vector<LogSelect*> slaves;
+  std::stack<std::vector<Select*>/**/> active_leafs;
+  std::stack<std::vector<Select*>/**/> active_interiors;
   Treelog* msg;
 
   // Filter functions.
@@ -57,7 +57,7 @@ public:
   void output (symbol name, double);
   void output (symbol name, int);
   void output (symbol name, symbol);
-  void output (symbol name, const vector<double>& value);
+  void output (symbol name, const std::vector<double>& value);
   void output (symbol name, const PLF&);
   void output (symbol name, const Time&); // Obsolete.
 
@@ -65,7 +65,7 @@ public:
 private:
   static const AttributeList& get_alist ();
 public:
-  LogAll (const vector<Log*>& logs);
+  LogAll (const std::vector<Log*>& logs);
   ~LogAll ();
 };
 

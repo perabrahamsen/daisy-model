@@ -26,6 +26,8 @@
 #include "log_clone.h"
 #include "treelog.h"
 
+using namespace std;
+
 struct Field::Implementation
 {
   // Columns.

@@ -12,6 +12,17 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.57
+
+** Reorganised chemical transformations.
+
+** DOM sorption
+
+These are not really documented yet, if you need to do advanced
+trasnformations of soil chemicals (actually, anything beyond a
+constant decompose rate) or you are working on dissolved origanic
+matter, contact us.
+
 * 3.56
 
 ** Some planting support.

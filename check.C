@@ -23,7 +23,7 @@
 // GCC 2.95 -O2 dislike declaring these classes local.
 struct None : public Check
 {
-  void check (const double) const throw (string)
+  void check (const double) const throw (std::string)
   { }
 };
 
@@ -36,7 +36,7 @@ Check::none ()
 
 struct Unknown : public Check
 {
-  void check (const double) const throw (string)
+  void check (const double) const throw (std::string)
   { }
 };
 
@@ -49,10 +49,10 @@ Check::unknown ()
 
 struct NonNegative : public Check
 {
-  void check (const double value) const throw (string)
+  void check (const double value) const throw (std::string)
   {
     if (value < 0.0)
-      throw string ("Negative value not permitted");
+      throw std::string ("Negative value not permitted");
   }
 };
 
@@ -65,10 +65,10 @@ Check::non_negative ()
 
 struct NonPositive : public Check
 {
-  void check (const double value) const throw (string)
+  void check (const double value) const throw (std::string)
   {
     if (value > 0.0)
-      throw string ("Positive value not permitted");
+      throw std::string ("Positive value not permitted");
   }
 };
 
@@ -81,10 +81,10 @@ Check::non_positive ()
 
 struct Negative : public Check
 {
-  void check (const double value) const throw (string)
+  void check (const double value) const throw (std::string)
   {
     if (value >= 0.0)
-      throw string ("Value must be negative");
+      throw std::string ("Value must be negative");
   }
 };
 
@@ -97,10 +97,10 @@ Check::negative ()
 
 struct Positive : public Check
 {
-  void check (const double value) const throw (string)
+  void check (const double value) const throw (std::string)
   {
     if (value <= 0.0)
-      throw string ("Value must be positive");
+      throw std::string ("Value must be positive");
   }
 };
 
@@ -113,10 +113,10 @@ Check::positive ()
 
 struct Fraction : public Check
 {
-  void check (const double value) const throw (string)
+  void check (const double value) const throw (std::string)
   {
     if (value < 0.0 || value > 1.0)
-      throw string ("Value must be fraction [0;1]");
+      throw std::string ("Value must be fraction [0;1]");
   }
 };
 

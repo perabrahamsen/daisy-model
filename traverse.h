@@ -26,7 +26,6 @@
 #include "symbol.h"
 
 #include <string>
-using namespace std;
 
 class Library;
 class Syntax;
@@ -42,33 +41,33 @@ public:
   void traverse_model (const symbol component, const symbol model);
   void traverse_submodel (const Syntax& syntax, AttributeList& alist,
 			  const AttributeList& default_alist,
-			  const string& name);
+			  const std::string& name);
   
   // Minor calls.
   void traverse_submodel_default (const Syntax& syntax, 
 				  const AttributeList& default_alist,
-				  const string& name);
+				  const std::string& name);
   void traverse_submodel_sequence (const Syntax& syntax,
 				   AttributeList& alist,
 				   const AttributeList& default_alist,
-				   const string& name, unsigned index);
+				   const std::string& name, unsigned index);
   void traverse_submodel_sequence_default (const Syntax& syntax, 
 					   const AttributeList& default_alist,
-					   const string& name);
+					   const std::string& name);
   void traverse_object (const Library& library,
 			const Syntax& syntax, AttributeList& alist,
 			const AttributeList& default_alist,
-			const string& name);
+			const std::string& name);
   void traverse_object_sequence (const Library& library,
 				 const Syntax& syntax, AttributeList& alist,
 				 const AttributeList& default_alist,
-				 const string& name, unsigned index);
+				 const std::string& name, unsigned index);
   void traverse_alist (const Syntax&, AttributeList& alist, 
 		       const AttributeList& default_alist,
-		       const string& name);
+		       const std::string& name);
   void traverse_parameter (const Syntax&, AttributeList& alist, 
 			   const AttributeList& default_alist, 
-			   const string& name, const string& parameter);
+			   const std::string& name, const std::string& parameter);
 
   // Subclass Responsibility.
 protected:
@@ -79,38 +78,38 @@ protected:
   virtual void leave_model (symbol component, symbol name) = 0;
   virtual bool enter_submodel (const Syntax& syntax, AttributeList& alist,
 			       const AttributeList& default_alist,
-			       const string& name) = 0;
+			       const std::string& name) = 0;
   virtual void leave_submodel () = 0;
   virtual bool enter_submodel_default (const Syntax& syntax, 
 				       const AttributeList& default_alist,
-				       const string& name) = 0;
+				       const std::string& name) = 0;
   virtual void leave_submodel_default () = 0;
   virtual bool enter_submodel_sequence (const Syntax& syntax,
 					AttributeList& alist,
 					const AttributeList& default_alist,
-					const string& name, 
+					const std::string& name, 
 					unsigned index) = 0;
   virtual void leave_submodel_sequence () = 0;
   virtual bool enter_submodel_sequence_default (const Syntax& syntax, 
 						const AttributeList&
 						/**/ default_alist,
-						const string& name) = 0;
+						const std::string& name) = 0;
   virtual void leave_submodel_sequence_default () = 0;
   virtual bool enter_object (const Library&, 
 			     const Syntax& syntax, AttributeList& alist,
 			     const AttributeList& default_alist,
-			     const string& name) = 0;
+			     const std::string& name) = 0;
   virtual void leave_object () = 0;
   virtual bool enter_object_sequence (const Library&, const Syntax& syntax, 
 				      AttributeList& alist,
 				      const AttributeList& default_alist,
-				      const string& name, 
+				      const std::string& name, 
 				      unsigned index) = 0;
   virtual void leave_object_sequence () = 0;
   virtual bool enter_parameter (const Syntax&, AttributeList& alist, 
 				const AttributeList& default_alist, 
-				const string& name, 
-				const string& parameter) = 0;
+				const std::string& name, 
+				const std::string& parameter) = 0;
   virtual void leave_parameter () = 0;
 
   // Create and destroy.

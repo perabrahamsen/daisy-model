@@ -44,7 +44,7 @@ public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const description;
-  void append_to (vector<AOM*>& added);
+  void append_to (std::vector<AOM*>& added);
   symbol real_name () const;
 
   // Simulation.
@@ -53,19 +53,21 @@ public:
   bool check (Treelog& err) const;
   void mix (const Geometry&, double from, double to, double penetration,
             double& tillage_N_top, double& tillage_C_top,
-            vector<double>& tillage_N_soil, vector<double>& tillage_C_soil);
+            std::vector<double>& tillage_N_soil,
+            std::vector<double>& tillage_C_soil);
   void swap (const Geometry&, double from, double middle, double to,
-             vector<double>& tillage_N_soil, vector<double>& tillage_C_soil);
+             std::vector<double>& tillage_N_soil,
+             std::vector<double>& tillage_C_soil);
   double total_C (const Geometry& geometry) const; // [g C/cm^2]
   double total_N (const Geometry& geometry) const; // [g N/cm^2]
   double C_at (unsigned int at) const;
   double N_at (unsigned int at) const;
-  void pour (vector<double>& cc, vector<double>& nn);
+  void pour (std::vector<double>& cc, std::vector<double>& nn);
   void add (double C, double N);// Add dead leafs.
   void add (const Geometry& geometry, AM& other); // Merge AOMs.
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
-	    const vector<double>& density);
+	    const std::vector<double>& density);
   double top_C () const;	// [g C/cm^2]
   double top_N () const;	// [g N/cm^2]
   void multiply_top (double fraction);
@@ -84,10 +86,10 @@ public:
   static AM& create (const AttributeList&, const Soil&);
   // Crop part.
   static AM& create (const Geometry&, const Time&,
-		     const vector<AttributeList*>&,
+		     const std::vector<AttributeList*>&,
 		     symbol sort, symbol part, lock_type lock = Unlocked);
   void initialize (const Soil&);
-  static const vector<AttributeList*>& default_AM ();
+  static const std::vector<AttributeList*>& default_AM ();
   static const AttributeList& default_root ();
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]

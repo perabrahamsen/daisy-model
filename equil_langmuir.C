@@ -25,28 +25,31 @@
 #include "treelog.h"
 #include "check.h"
 #include "mathlib.h"
+#include <memory>
 
-class EquilibriumLangmuir : public Equilibrium
+using namespace std;
+
+struct EquilibriumLangmuir : public Equilibrium
 {
   // Parameters.
   /* const */ vector<double> K;
   /* const */ vector<double> my_max;
-  /* const */ Pedotransfer *const pedo_K;
-  /* const */ Pedotransfer *const pedo_my_max;
 
   // Simulation.
-public:
   void find (const Soil&, const SoilWater&, unsigned int i,
 	     double has_A, double has_B, 
 	     double& want_A, double& want_B) const;
-  bool check (const Soil&, Treelog& err) const;
 
   // Create and Destroy.
-public:
-  void initialize (const Soil&);
-public:
-  EquilibriumLangmuir (const AttributeList& al);
-  ~EquilibriumLangmuir ();
+  enum { uninitialized, init_succes, init_failure } initialize_state;
+  void initialize (const Soil&, Treelog&);
+  bool check (const Soil&, Treelog& err) const;
+  EquilibriumLangmuir (const AttributeList& al)
+    : Equilibrium (al),
+      initialize_state (uninitialized)
+  { }
+  ~EquilibriumLangmuir ()
+  { }
 };
 
 void
@@ -84,69 +87,44 @@ EquilibriumLangmuir::find (const Soil&, const SoilWater&, unsigned int i,
   daisy_assert (want_A >= 0.0);
 }
 
-bool
-EquilibriumLangmuir::check (const Soil& soil, Treelog& err) const
-{ 
-  bool ok = true;
-  if (pedo_K)
-    {
-      Treelog::Open nest (err, "pedo_K");
-      if (!pedo_K->check (soil, err))
-	ok = false;
-    }
-  if (pedo_my_max)
-    {
-      Treelog::Open nest (err, "pedo_my_max");
-      if (!pedo_my_max->check (soil, err))
-	ok = false;
-    }
-  return ok;
-}
-
 void
-EquilibriumLangmuir::initialize (const Soil& soil)
+EquilibriumLangmuir::initialize (const Soil& soil, Treelog& err)
 { 
-  if (K.size () > 0)
-    K.insert (K.end (), soil.size () - K.size (), K.back ());
-  else
-    {
-      daisy_assert (pedo_K);
-      pedo_K->initialize (soil);
-      pedo_K->set (soil, K);
-    }
+  daisy_assert (initialize_state == uninitialized);
+  initialize_state = init_succes;
 
-  if (my_max.size () > 0)
-    my_max.insert (my_max.end (), 
-		   soil.size () - my_max.size (), my_max.back ());
-  else
-    {
-      daisy_assert (pedo_my_max);
-      pedo_my_max->initialize (soil);
-      pedo_my_max->set (soil, my_max);
-    }
+  // K
+  {
+    auto_ptr<Pedotransfer> pedo_K 
+      (&Librarian<Pedotransfer>::create (alist.alist ("K")));
+    if (pedo_K->check (soil, "g/cm^3", err))
+      pedo_K->set (soil, K, "g/cm^3");
+    else 
+      initialize_state = init_failure;
+    Pedotransfer::debug_message ("K", K, err);
+  }
+
+  // my_max
+  {
+    auto_ptr<Pedotransfer> pedo_my_max 
+      (&Librarian<Pedotransfer>::create (alist.alist ("my_max")));
+    if (pedo_my_max->check (soil, "g/cm^3", err))
+      pedo_my_max->set (soil, my_max, "g/cm^3");
+    else 
+      initialize_state = init_failure;
+    Pedotransfer::debug_message ("my_max", my_max, err);
+  }
 }
 
-EquilibriumLangmuir::EquilibriumLangmuir (const AttributeList& al)
-  : Equilibrium (al),
-    pedo_K (al.check ("pedo_K")
-	    ? &Librarian<Pedotransfer>::create (al.alist ("pedo_K"))
-	    : NULL),
-    pedo_my_max (al.check ("pedo_my_max")
-		 ? &Librarian<Pedotransfer>::create (al.alist ("pedo_my_max"))
-		 : NULL)
+bool 
+EquilibriumLangmuir::check (const Soil&, Treelog& err) const
 {
-  if (al.check ("K"))
-    K = al.number_sequence ("K");
-  if (al.check ("my_max"))
-    my_max = al.number_sequence ("my_max");
-}
+  if (initialize_state == init_succes)
+    return true;
 
-EquilibriumLangmuir::~EquilibriumLangmuir ()
-{ 
-  if (pedo_K)
-    delete pedo_K;
-  if (pedo_my_max)
-    delete pedo_my_max;
+  Treelog::Open nest (err, name);
+  err.error ("Initialize failed");
+  return false;
 }
 
 static struct EquilibriumLangmuirSyntax
@@ -154,46 +132,18 @@ static struct EquilibriumLangmuirSyntax
   static Equilibrium& make (const AttributeList& al)
   { return *new EquilibriumLangmuir (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
-  {
-    bool ok = true;
-
-    if ((!al.check ("K") || al.number_sequence ("K").size () < 1)
-	&& !al.check ("pedo_K"))
-      {
-	err.entry ("You must specify either 'K' or 'pedo_K'");
-	ok = false;
-      }
-    if ((!al.check ("my_max") || al.number_sequence ("my_max").size () < 1)
-	&& !al.check ("pedo_my_max"))
-      {
-	err.entry ("You must specify either 'my_max' or 'pedo_my_max'");
-	ok = false;
-      }
-
-    return ok;
-
-  }
   EquilibriumLangmuirSyntax ()
   {
     Syntax& syntax = *new Syntax ();
-    syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     Equilibrium::load_syntax (syntax, alist);
     alist.add ("description", "A = (my_max B) / (K + B)");
-    syntax.add ("K", "g/cm^3", Check::non_negative (), 
-		Syntax::OptionalConst, Syntax::Sequence,
-		"Half saturation constant.");
-    syntax.add ("pedo_K", Librarian<Pedotransfer>::library (),
-		Syntax::OptionalConst, Syntax::Singleton,
-		"Function to calculate 'K' if not specified.");
-    syntax.add ("my_max", "g/cm^3", Check::non_negative (), 
-		Syntax::OptionalConst, Syntax::Sequence,
-		"Max equilibrium capacity.");
-    syntax.add ("pedo_my_max", Librarian<Pedotransfer>::library (),
-		Syntax::OptionalConst, Syntax::Singleton,
-		"Function to calculate 'my_max' if not specified.");
-
+    syntax.add ("K", Librarian<Pedotransfer>::library (), 
+                Syntax::Const, Syntax::Singleton,
+                "Half saturation constant [g/cm^3].");
+    syntax.add ("my_max", Librarian<Pedotransfer>::library (), 
+                Syntax::Const, Syntax::Singleton,
+                "Max equilibrium capacity [g/cm^3].");
     Librarian<Equilibrium>::add_type ("Langmuir", alist, syntax, &make);
   }
 } EquilibriumLangmuir_syntax;

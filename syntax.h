@@ -51,6 +51,7 @@ public:
   static const std::string& Unknown ();
   static const std::string& None ();
   static const std::string& Fraction ();
+  static const std::string& User ();
 
   // Each syntax entry should have an associated type.
   enum type 
@@ -204,12 +205,7 @@ public:
 	    // Alist sequence with default element.
 	    category, int size, const std::string& description);
 
-  void add (const std::string& key, // Object
-	    ::Library& lib, 
-	    int size,
-	    const std::string& description)
-  { add (key, lib, State, size, description); }
-  void add (const std::string& key,
+  void add (const std::string& key,// Object
 	    ::Library& lib, 
 	    const std::string& description)
   { add (key, lib, State, Singleton, description); }

@@ -42,14 +42,14 @@ private:
   // Interface.
 public:
   // Print comment.
-  void print_comment (const string& comment);
+  void print_comment (const std::string& comment);
   // Print content of alist.
   void print_alist (const AttributeList& alist, const Syntax&,
 		    const AttributeList& super);
   // Print entry in alist.
-  void print_entry (const AttributeList&, const Syntax&, const string& key);
+  void print_entry (const AttributeList&, const Syntax&, const std::string& key);
   // Print all elements in all libraries associated with 'filename'.
-  void print_library_file (const string& filename);
+  void print_library_file (const std::string& filename);
   // Print a parser input.
   void print_input (const AttributeList& alist);
 
@@ -57,12 +57,12 @@ public:
   bool good ();
 
   // Utitlites.
-  static void print_string (std::ostream& out, const string& value);
+  static void print_string (std::ostream& out, const std::string& value);
 
  // Create and Destroy.
 public:
   PrinterFile (const AttributeList& al);
-  PrinterFile (const string& filename);
+  PrinterFile (const std::string& filename);
   PrinterFile (std::ostream& out);
   ~PrinterFile ();
 };

@@ -19,6 +19,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "vcheck.h"
+#include "units.h"
 #include "syntax.h"
 #include "alist.h"
 #include "time.h"
@@ -494,6 +495,44 @@ VCheck::MinSize::check (const Syntax& syntax, const AttributeList& alist,
 
 VCheck::MinSize::MinSize (unsigned int size)
   : min_size (size)
+{ }
+
+void 
+VCheck::Compatible::validate (const string& value) const throw (string)
+{
+  if (!Units::can_convert (dimension, value))
+    {
+      TmpStream tmp;
+      tmp () << "Cannot convert [" << dimension << "] to [" << value << "]";
+      throw string (tmp.str ());
+    }
+}
+
+const VCheck& 
+VCheck::fraction ()
+{
+  static Compatible fraction (Syntax::Fraction ());
+  return fraction;
+}
+
+void
+VCheck::Compatible::check (const Syntax& syntax, const AttributeList& alist, 
+			const string& key) const throw (string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  if (syntax.size (key) == Syntax::Singleton)
+    validate (alist.name (key));
+  else
+    {
+      const vector<symbol> names = alist.identifier_sequence (key);
+      for (size_t i = 0; i < names.size (); i++)
+        validate (names[i].name ());
+    }
+}
+
+VCheck::Compatible::Compatible (const string& dim)
+  : dimension (dim)
 { }
 
 void

@@ -25,7 +25,6 @@
 
 #include <vector>
 #include <string>
-using namespace std;
 
 class AttributeList;
 class Syntax;
@@ -35,9 +34,9 @@ class Groundwater;
 class Geometry
 {
   // Parameters.
-  vector<double> zplus_;	// Lower boundary of each interval.
-  vector<double> z_;		// Center of each interval.
-  vector<double> dz_;		// Size of each interval.
+  std::vector<double> zplus_;	// Lower boundary of each interval.
+  std::vector<double> z_;		// Center of each interval.
+  std::vector<double> dz_;		// Size of each interval.
   unsigned int size_;		// Number of intervals.
 public:
   // Accessors.
@@ -53,26 +52,30 @@ public:
   unsigned int interval_border (double z) const;
 
   // Vector operations.
-  void mix (vector<double>& v, double from, double to) const;
-  void mix (vector<double>& v, double from, double to, 
-            vector<double>& change) const;
-  void add (vector<double>& v, double from, double to, double amount) const;
-  void add (vector<double>& v, const vector<double>& density,
+  void mix (std::vector<double>& v, double from, double to) const;
+  void mix (std::vector<double>& v, double from, double to, 
+            std::vector<double>& change) const;
+  void add (std::vector<double>& v,
+            double from, double to, double amount) const;
+  void add (std::vector<double>& v, const std::vector<double>& density,
 	    double amount) const;
-  double extract (vector<double>& v, double from, double to) const;
-  void set (vector<double>& v, double from, double to, double amount) const;
-  void swap (vector<double>& v, double from, double middle, double to) const;
-  void swap (vector<double>& v, double from, double middle, double to, 
-             vector<double>& change) const;
-  double total (const vector<double>& v) const;
-  double total (const vector<double>& v, double from, double to) const;
+  double extract (std::vector<double>& v, double from, double to) const;
+  void set (std::vector<double>& v,
+            double from, double to, double amount) const;
+  void swap (std::vector<double>& v,
+             double from, double middle, double to) const;
+  void swap (std::vector<double>& v, double from, double middle, double to, 
+             std::vector<double>& change) const;
+  double total (const std::vector<double>& v) const;
+  double total (const std::vector<double>& v, double from, double to) const;
 
   // Layers -- Support initializing soil arrays layer by layer.
-  static void add_layer (Syntax& syntax, const string& name,
-			 const string& dimension, const string& description);
-  void initialize_layer (vector<double>& value, 
+  static void add_layer (Syntax& syntax, const std::string& name,
+			 const std::string& dimension,
+                         const std::string& description);
+  void initialize_layer (std::vector<double>& value, 
 			 const AttributeList& al, 
-			 const string& name, Treelog&) const;
+			 const std::string& name, Treelog&) const;
 
   // Creation.
   bool check (Treelog&) const;
@@ -80,7 +83,7 @@ protected:
   static void load_syntax (Syntax&, AttributeList&);
   Geometry (const AttributeList&);
   void initialize_zplus (const Groundwater& groundwater,
-			 const vector<double>& fixed,
+			 const std::vector<double>& fixed,
 			 const double max_rooting_depth,
 			 const double max_interval,
 			 Treelog& msg);

@@ -20,6 +20,12 @@
 
 
 #include "pedo.h"
+#include "soil.h"
+#include "units.h"
+#include "tmpstream.h"
+#include "treelog.h"
+
+using namespace std;
 
 EMPTY_TEMPLATE
 Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content = NULL;
@@ -27,19 +33,52 @@ Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content = NULL;
 const char *const Pedotransfer::description = "\
 Pedotransfer functions based on soil attributes.";
 
-bool
-Pedotransfer::check (const Soil&, Treelog&) const
-{ return true; }
-
-void
-Pedotransfer::initialize (const Soil&)
-{ }
-
-void
-Pedotransfer::load_syntax (Syntax& syntax, AttributeList&)
+void 
+Pedotransfer::set (const Soil& soil, vector<double>& array,
+                   const string& dim) const
 {
-  syntax.add ("description", Syntax::String, Syntax::OptionalConst,
-	      "Description of this parameterization."); 
+  array.insert (array.end (), soil.size () - array.size (), 0.0);
+
+  for (unsigned int i = 0; i < soil.size (); i++)
+    if (known (dim) && known (dimension ()))
+      array[i] = Units::convert (dimension (), dim, value (soil, i));
+}
+
+
+bool
+Pedotransfer::check (const Soil& soil, const string& dim, Treelog& msg) const
+{ 
+  Treelog::Open nest (msg, name);
+  bool ok = true;
+
+  if (known (dim) && known (dimension ())
+      && !Units::can_convert (dimension (), dim))
+    {
+      msg.error ("Cannot convert [" + dimension () + "] to [" + dim + "]");
+      ok = false;
+    }
+  
+  if (!check_nested (soil, msg))
+    ok = false;
+
+  return ok; 
+}
+
+bool 
+Pedotransfer::known (const std::string& dim)
+{ return dim != Syntax::Unknown () && (dim.size () < 1 || dim[0] != '?'); }
+
+void 
+Pedotransfer::debug_message (const string& name,
+                             const vector<double>& value, 
+                             Treelog& msg)
+{ 
+  TmpStream tmp;
+  tmp () << "(" << name;
+  for (unsigned int i = 0; i < value.size (); i++)
+    tmp () << " " << value[i];
+  tmp () << ")";
+  msg.debug (tmp.str ());
 }
 
 Pedotransfer::Pedotransfer (const AttributeList& al)

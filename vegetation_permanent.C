@@ -36,6 +36,8 @@
 #include "tmpstream.h"
 #include <deque>
 
+using namespace std;
+
 struct VegetationPermanent : public Vegetation
 {
   // Canopy.

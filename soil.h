@@ -54,6 +54,7 @@ public:
   double anisotropy (int i) const;
   double dry_bulk_density (int i) const;
   double clay (int i) const;
+  double texture_below (int i, double size /* [um] */) const;
   double humus (int i) const;
   double humus_C (int i) const;
   const std::vector<double>& SOM_fractions (int i) const;
@@ -69,6 +70,7 @@ public:
   bool has_attribute (const std::string& name) const;
   bool has_attribute (int i, const std::string& name) const;
   double get_attribute (int i, const std::string& name) const;
+  std::string get_dimension (int i, const std::string& name) const;
 
   // 
 

@@ -33,6 +33,8 @@
 #include "mathlib.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 double 
 RootSystem::potential_water_uptake (const double h_x,
 				    const Soil& soil,
@@ -460,7 +462,7 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("soil_temperature", 0.0);
   syntax.add ("water_stress", Syntax::None (), Check::fraction (),
 	      Syntax::LogOnly,
-	       "Fraction of requested water we got.");
+	       "Fraction of requested water we didn't get.");
   syntax.add ("water_stress_days", "d", Check::non_negative (),
 	      Syntax::State,
 	       "Number of days production has halted due to water stress.\n\

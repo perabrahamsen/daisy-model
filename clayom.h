@@ -25,7 +25,6 @@
 #include "librarian.h"
 
 #include <vector>
-using namespace std;
 
 class SMB;
 class Soil;
@@ -41,14 +40,15 @@ public:
 
   // Simulation.
 public:
-  virtual void set_rates (const Soil& soil, const vector<SMB*>& smb) const = 0;
+  virtual void set_rates (const Soil& soil, 
+                          const std::vector<SMB*>& smb) const = 0;
   virtual double factor (const double clay) const = 0;
   virtual bool smb_use_clay (unsigned int pool) const = 0;
   virtual bool som_use_clay (unsigned int pool) const = 0;
 
   // Create and Destroy.
 public:
-  virtual bool check (const vector<SMB*>& smb, Treelog& err) const = 0;
+  virtual bool check (const std::vector<SMB*>& smb, Treelog& err) const = 0;
 protected:
   ClayOM (const AttributeList& al);
 public:

@@ -37,6 +37,8 @@
 #include "tmpstream.h"
 #include "check.h"
 
+using namespace std;
+
 struct Surface::Implementation
 {
   // Content.

@@ -27,6 +27,8 @@
 #include "mathlib.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 struct MactransStandard : public Mactrans
 {
   // Simulation.

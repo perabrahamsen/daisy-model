@@ -36,63 +36,67 @@ private:
 
   // Typeset parts of it.
 protected:
-  virtual void print_users (ostream&, const XRef::Users&) = 0;
-  virtual void print_submodel_entry (ostream&, const string&, int level,
+  virtual void print_users (std::ostream&, const XRef::Users&) = 0;
+  virtual void print_submodel_entry (std::ostream&, const std::string&, int level,
 				     const Syntax& syntax,
 				     const AttributeList& alist) = 0;
-  virtual void print_submodel_empty (ostream&, const string&, int level) = 0;
-  virtual void print_submodel_header (ostream&, const string&, int level) = 0;
-  virtual void print_submodel_trailer (ostream&, const string&, int level) = 0;
-  virtual void print_log_header (ostream&, const string&, int level) = 0;
-  virtual void print_log_trailer (ostream&, const string&, int level) = 0;
-  virtual void print_sample_ordered (ostream&, const string&, bool seq) = 0;
-  virtual void print_sample_entry (ostream&, const string& name, 
+  virtual void print_submodel_empty (std::ostream&, const std::string&,
+                                     int level) = 0;
+  virtual void print_submodel_header (std::ostream&, const std::string&,
+                                      int level) = 0;
+  virtual void print_submodel_trailer (std::ostream&, const std::string&,
+                                       int level) = 0;
+  virtual void print_log_header (std::ostream&, const std::string&, int level) = 0;
+  virtual void print_log_trailer (std::ostream&, const std::string&, int level) = 0;
+  virtual void print_sample_ordered (std::ostream&, const std::string&,
+                                     bool seq) = 0;
+  virtual void print_sample_entry (std::ostream&, const std::string& name, 
 				   const Syntax& syntax,
 				   const AttributeList& alist) = 0;
-  virtual void print_sample_header (ostream& out, const string& name) = 0;
-  virtual void print_sample_trailer (ostream& out, const string&) = 0;
-  virtual void print_model_header (ostream&, symbol name) = 0;
-  virtual void print_model_description (ostream&, const string&) = 0;
-  virtual void print_model_trailer (ostream&, symbol name) = 0;
-  virtual void print_parameterization_header (ostream& out, 
+  virtual void print_sample_header (std::ostream& out, const std::string& name) = 0;
+  virtual void print_sample_trailer (std::ostream& out, const std::string&) = 0;
+  virtual void print_model_header (std::ostream&, symbol name) = 0;
+  virtual void print_model_description (std::ostream&, const std::string&) = 0;
+  virtual void print_model_trailer (std::ostream&, symbol name) = 0;
+  virtual void print_parameterization_header (std::ostream& out, 
 					      symbol name, symbol type) = 0;
-  virtual void print_parameterization_file (ostream& out, 
-					    const string& name) = 0;
-  virtual void print_parameterization_no_file (ostream& out) = 0;
-  virtual void print_parameterization_description (ostream& out, 
-						   const string&
+  virtual void print_parameterization_file (std::ostream& out, 
+					    const std::string& name) = 0;
+  virtual void print_parameterization_no_file (std::ostream& out) = 0;
+  virtual void print_parameterization_description (std::ostream& out, 
+						   const std::string&
 						   description) = 0;
-  virtual void print_parameterization_trailer (ostream& out, 
+  virtual void print_parameterization_trailer (std::ostream& out, 
 					       symbol name) = 0;
-  virtual void print_fixed_header (ostream&, const string& name) = 0;
-  virtual void print_fixed_trailer (ostream&, const string& name) = 0;
-  virtual void print_component_header (ostream&, symbol name) = 0;
-  virtual void print_component_description (ostream&, const string&) = 0;
-  virtual void print_component_trailer (ostream&, symbol name) = 0;
-  virtual void print_fixed_all_header (ostream&) = 0;
-  virtual void print_fixed_all_trailer (ostream&) = 0;
-  virtual void print_document_header (ostream&) = 0;
-  virtual void print_document_trailer (ostream&) = 0;
+  virtual void print_fixed_header (std::ostream&, const std::string& name) = 0;
+  virtual void print_fixed_trailer (std::ostream&, const std::string& name) = 0;
+  virtual void print_component_header (std::ostream&, symbol name) = 0;
+  virtual void print_component_description (std::ostream&, const std::string&) = 0;
+  virtual void print_component_trailer (std::ostream&, symbol name) = 0;
+  virtual void print_fixed_all_header (std::ostream&) = 0;
+  virtual void print_fixed_all_trailer (std::ostream&) = 0;
+  virtual void print_document_header (std::ostream&) = 0;
+  virtual void print_document_trailer (std::ostream&) = 0;
 
   // Print parts of it.
 protected:
-  void print_submodel (ostream& out, const string& name, int level,
+  void print_submodel (std::ostream& out, const std::string& name, int level,
 		       const Syntax& syntax,
 		       const AttributeList& alist);
-  void print_sample (ostream& out, const string& name,
+  void print_sample (std::ostream& out, const std::string& name,
 		     const Syntax& syntax,
 		     const AttributeList& alist);
 private:
-  void print_model (ostream& out, symbol name, 
+  void print_model (std::ostream& out, symbol name, 
 		    const Library& library);
-  void print_fixed (ostream& out, const string& name, 
+  void print_fixed (std::ostream& out, const std::string& name, 
 		    const Syntax& syntax,
 		    const AttributeList& alist);
-  void print_component (ostream& out, const Library& library);
+  void print_component (std::ostream& out, const Library& library);
 
   // Print it.
 public:
-  void print_document (ostream& out);
+  void print_document (std::ostream& out);
 
   // Print syntactical sugar.
 

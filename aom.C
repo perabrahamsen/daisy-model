@@ -31,6 +31,8 @@
 #include "geometry.h"
 #include "mathlib.h"
 
+using namespace std;
+
 void
 AOM::output (Log& log) const
 {

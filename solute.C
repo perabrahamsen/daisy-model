@@ -29,6 +29,8 @@
 #include "mathlib.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 double
 Solute::total (const Geometry& geometry, double from, double to) const
 { return geometry.total (M_, from, to); }

@@ -66,7 +66,7 @@ NitrificationSolute::tick (const double /* M */, const double C,
   const double rate = k_10 * w_factor * T_factor * C / (k + C);
   daisy_assert (rate >= 0.0);
   daisy_assert (M_left >= 0.0);
-  const double M_new = min (rate, M_left / dt - 1e-8);
+  const double M_new = std::min (rate, M_left / dt - 1e-8);
   if (M_new > 0.0)
     {
       NH4 = M_new;

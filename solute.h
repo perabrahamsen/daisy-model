@@ -27,6 +27,7 @@
 #include "adsorption.h"
 #include "transport.h"
 #include "mactrans.h"
+#include <string>
 
 struct Log;
 struct Syntax;
@@ -37,30 +38,30 @@ struct SoilWater;
 
 class Solute
 {
-  const string submodel;	// Derived submodel.
+  const std::string submodel;	// Derived submodel.
 
   // State variables.
 protected:
-  vector<double> M_;		// Concentration in soil [g / cm設
-  vector<double> C_;		// Concentration in soil solution [g / cm設
+  std::vector<double> M_;		// Concentration in soil [g / cm設
+  std::vector<double> C_;		// Concentration in soil solution [g / cm設
 
   // Flux variables.
 protected:
-  vector<double> S;		// Combined source term.
-  vector<double> S_p;		// Source term for macropores only.
-  vector<double> S_drain;	// Source term for soil drainage only.
-  vector<double> S_external;	// External source term, e.g. incorp. fert.
-  vector<double> S_permanent;	// Permanent external source term.
-  vector<double> S_root;	// Root uptake source term (negative).
-  vector<double> J;		// Solute transport log in matrix.
-  vector<double> J_p;		// Solute transport log in macropores.
+  std::vector<double> S;		// Combined source term.
+  std::vector<double> S_p;		// Source term for macropores only.
+  std::vector<double> S_drain;	// Source term for soil drainage only.
+  std::vector<double> S_external;	// External source term, e.g. incorp. fert.
+  std::vector<double> S_permanent;	// Permanent external source term.
+  std::vector<double> S_root;	// Root uptake source term (negative).
+  std::vector<double> J;		// Solute transport log in matrix.
+  std::vector<double> J_p;		// Solute transport log in macropores.
   Transport& transport;		// Solute transport model in matrix.
   Transport& reserve;		// Reserve solute transport model in matrix.
   Transport& last_resort;       // Last resort solute transport model.
   Mactrans& mactrans;		// Solute transport model in macropores.
   Adsorption& adsorption;	// Solute adsorption.
 private:
-  vector<double> tillage;       // Changes during tillage.
+  std::vector<double> tillage;       // Changes during tillage.
 
 public:
   virtual double diffusion_coefficient () const = 0; // in free solute. 
@@ -70,6 +71,8 @@ public:
   { return adsorption.M_to_C (soil, Theta, i, M); }
 
 public:
+  const std::vector<double>& M () const
+  { return M_; }
   double M (int i) const
   { return M_[i]; }
   double C (int i) const
@@ -81,9 +84,9 @@ public:
   // Sink.
 public:
   void clear ();
-  void add_to_source (const vector<double>&);
-  void add_to_sink (const vector<double>&);
-  void add_to_root_sink (const vector<double>&);
+  void add_to_source (const std::vector<double>&);
+  void add_to_sink (const std::vector<double>&);
+  void add_to_root_sink (const std::vector<double>&);
 
   // Simulation.
 public:
@@ -98,7 +101,7 @@ public:
 
   // Communication with external model.
   void put_M (const Soil& soil, const SoilWater& soil_water,
-	      const vector<double>& v);
+	      const std::vector<double>& v);
 
   // Create and destroy.
 protected:

@@ -25,6 +25,8 @@
 #include "log.h"
 #include "mathlib.h"
 
+using namespace std;
+
 class WeatherSimple : public WeatherOld
 {
   const double precipitation;

@@ -26,6 +26,8 @@
 #include "tmpstream.h"
 #include "treelog.h"
 
+using namespace std;
+
 struct SelectFluxTop : public SelectValue
 {
   // Content.

@@ -43,7 +43,7 @@ public:
 
   // Create and Destroy.
 public:
-  LogClone (const string& name, const Syntax&, const AttributeList&);
+  LogClone (const std::string& name, const Syntax&, const AttributeList&);
   ~LogClone ();
 };
 

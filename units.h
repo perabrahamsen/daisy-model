@@ -23,7 +23,6 @@
 #define UNITS_H
 
 #include <string>
-using namespace std;
 
 static class Units
 {
@@ -48,14 +47,17 @@ public:
 
   // Utilities.
 public:
-  static void add (const string& from, const string& to,
+  static void add (const std::string& from, const std::string& to,
 		   double factor, double offset = 0.0);
-  static void add (const string& from, const string& to, Convert&);
-  static double convert (const string& from, const string& to, double value);
-  static bool can_convert (const string& from, const string& to);
-  static bool can_convert (const string& from, const string& to, double value);
-  static const Convert& get_convertion (const string& from, const string& to);
-  static string multiply (const string&, const string&);
+  static void add (const std::string& from, const std::string& to, Convert&);
+  static double convert (const std::string& from, const std::string& to,
+                         double value);
+  static bool can_convert (const std::string& from, const std::string& to);
+  static bool can_convert (const std::string& from, const std::string& to,
+                           double value);
+  static const Convert& get_convertion (const std::string& from,
+                                        const std::string& to);
+  static std::string multiply (const std::string&, const std::string&);
 
   // Create and destroy.
 private:

@@ -30,6 +30,8 @@
 #include <algorithm>
 #include <numeric>
 
+using namespace std;
+
 struct PrinterFile::Implementation
 {
   // Data.
@@ -44,6 +46,8 @@ struct PrinterFile::Implementation
 				   const string& name);
 
   // Print entry 'key' in alist.
+  void print_dimension (const AttributeList&, const string& key, 
+                        const string& dim);
   void print_entry (const AttributeList& alist, const Syntax&,
 		    const AttributeList& super, const string& key,
 		    int indent, bool need_wrapper);
@@ -177,6 +181,21 @@ PrinterFile::Implementation::print_quoted_string (std::ostream& out,
   out << "\"";
 }
 
+void 
+PrinterFile::Implementation::print_dimension (const AttributeList& alist,
+                                              const string& key,
+                                              const string& dim)
+{
+  if (dim == Syntax::Unknown ())
+    /* do nothing */;
+  else if (dim == Syntax::None () || dim == Syntax::Fraction ())
+    out << " []";
+  else if (dim == Syntax::User ())
+    out << " [" << alist.name (key) << "]";
+  else
+    out << " [" << dim << "]";
+}
+
 void
 PrinterFile::Implementation::print_entry (const AttributeList& alist, 
 					  const Syntax& syntax,
@@ -201,6 +220,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	{
 	case Syntax::Number:
 	  out << alist.number (key);
+          print_dimension (alist, key, syntax.dimension (key));
 	  break;
 	case Syntax::AList:
 	  if (super.check (key))
@@ -251,6 +271,7 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 		  out << " ";
 		out << value[i]; 
 	      }
+            print_dimension (alist, key, syntax.dimension (key));
 	  }
 	  break;
 	case Syntax::AList:

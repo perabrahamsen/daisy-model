@@ -68,6 +68,7 @@ public:
 public:
   bool has_attribute (const std::string& name) const;
   double get_attribute (const std::string& name) const;
+  std::string get_dimension (const std::string& name) const;
 
   // Simulation.
 public:

@@ -30,6 +30,8 @@
 #include "mathlib.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 class DOM::Element
 {
   // Content.

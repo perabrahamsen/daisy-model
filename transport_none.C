@@ -28,6 +28,8 @@
 #include "mathlib.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 class TransportNone : public Transport
 {
   // Simulation.

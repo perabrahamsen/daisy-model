@@ -30,6 +30,9 @@
 #include "mathlib.h"
 #include "submodel.h"
 #include "check.h"
+
+using namespace std;
+
 void
 CrpN::cut (const double DS)
 {

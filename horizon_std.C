@@ -26,6 +26,8 @@
 #include "check.h"
 #include "mathlib.h"
 
+using namespace std;
+
 struct HorizonStandard : public Horizon
 {
   // Content.

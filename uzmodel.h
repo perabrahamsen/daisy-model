@@ -81,13 +81,13 @@ public:
   virtual bool tick (Treelog&, const Soil& soil, const SoilHeat&,
 		     unsigned int first, const UZtop& top, 
 		     unsigned int last, const UZbottom& bottom, 
-		     const vector<double>& S,
-		     const vector<double>& h_old,
-		     const vector<double>& Theta_old,
-		     const vector<double>& h_ice,
-		     vector<double>& h,
-		     vector<double>& Theta,
-		     vector<double>& q) = 0;
+		     const std::vector<double>& S,
+		     const std::vector<double>& h_old,
+		     const std::vector<double>& Theta_old,
+		     const std::vector<double>& h_ice,
+		     std::vector<double>& h,
+		     std::vector<double>& Theta,
+		     std::vector<double>& q) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

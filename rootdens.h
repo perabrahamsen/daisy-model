@@ -24,6 +24,7 @@
 #define ROOTDENS_H
 
 #include "librarian.h"
+#include <vector>
 
 class Geometry;
 
@@ -38,7 +39,7 @@ protected:
 
   // Simulation.
 public:
-  virtual void set_density (Treelog&, vector<double>& Density,
+  virtual void set_density (Treelog&, std::vector<double>& Density,
 			    const Geometry& geometry, 
 			    double Depth, double PotRtDpt,
 			    double WRoot, double DS) = 0;

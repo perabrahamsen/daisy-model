@@ -54,8 +54,8 @@ public:
 
   // Canopy.
 public:
-  virtual const vector<double>& height () const = 0;
-  virtual const vector<double>& PAR () const = 0;
+  virtual const std::vector<double>& height () const = 0;
+  virtual const std::vector<double>& PAR () const = 0;
   virtual double LAI () const = 0;
   virtual double shared_light_fraction () const = 0;
 
@@ -89,11 +89,11 @@ public:
                                       const double Ref,
                                       const double Si,
                                       const double Ext,
-                                      vector <double>& Rad);
+                                      std::vector <double>& Rad);
 private:
   static void intensity_distribution (int No, double LAI,
                                       double Rad0, double Ext, 
-                                      vector <double>& Rad);
+                                      std::vector <double>& Rad);
 
   // Create.
 public:

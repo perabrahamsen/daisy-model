@@ -24,6 +24,8 @@
 #include "common.h"
 #include <algorithm>
 
+using namespace std;
+
 EMPTY_TEMPLATE
 Librarian<Document>::Content* Librarian<Document>::content = NULL;
 

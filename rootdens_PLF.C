@@ -27,6 +27,8 @@
 #include "vcheck.h"
 #include "mathlib.h"
 
+using namespace std;
+
 struct Rootdens_PLF : public Rootdens
 {
   // Parameters.

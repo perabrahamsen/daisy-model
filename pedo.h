@@ -36,14 +36,22 @@ public:
 
   // Simulation.
 public:
-  virtual void set (const Soil&, vector<double>&) const = 0;
-  virtual bool check (const Soil&, Treelog& err) const;
+  void set (const Soil&, std::vector<double>&, const std::string& dim ) const;
+  virtual double value (const Soil&, int i) const = 0; 
+  virtual const std::string& dimension () const = 0;
+
+  // Utilities.
+public:
+  static bool known (const std::string& dim);
+  static void debug_message (const std::string& name, 
+                             const std::vector<double>& value, 
+                             Treelog& msg);
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&);
-  static void load_syntax (Syntax&, AttributeList&);
-protected:
+  bool check (const Soil&, const std::string& dim,
+              Treelog& err) const;
+  virtual bool check_nested (const Soil&, Treelog& err) const = 0;
   Pedotransfer (const AttributeList&);
 public:
   virtual ~Pedotransfer ();

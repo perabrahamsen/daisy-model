@@ -33,7 +33,7 @@ class Condition
 public:
   const symbol name;
   static const char *const description;
-  virtual const string timestep ();
+  virtual const std::string timestep ();
 
   // Simulation.
 public:

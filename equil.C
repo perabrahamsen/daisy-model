@@ -27,14 +27,6 @@ Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content = NULL;
 const char *const Equilibrium::description = "\
 Find equilibrium between two soil chemicals.";
 
-bool
-Equilibrium::check (const Soil&, Treelog&) const
-{ return true; }
-
-void
-Equilibrium::initialize (const Soil&)
-{ }
-
 void
 Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
 {
@@ -43,7 +35,8 @@ Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 Equilibrium::Equilibrium (const AttributeList& al)
-  : name (al.identifier ("type"))
+  : name (al.identifier ("type")),
+    alist (al)
 { }
 
 Equilibrium::~Equilibrium ()

@@ -27,6 +27,8 @@
 #include "alist.h"
 #include "assertion.h"
 
+using namespace std;
+
 class TraverseDelete : public Traverse
 {
 private:

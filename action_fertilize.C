@@ -28,6 +28,8 @@
 #include "tmpstream.h"
 #include "check.h"
 
+using namespace std;
+
 struct ActionFertilize : public Action
 {
   // Parameters.

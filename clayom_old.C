@@ -24,6 +24,8 @@
 #include "smb.h"
 #include "soil.h"
 
+using namespace std;
+
 class ClayOMOld : public ClayOM
 {
   // Content.

@@ -32,6 +32,8 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 
+using namespace std;
+
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
 // Based on Penning de Vries et al. 1989, page 63

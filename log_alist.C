@@ -24,6 +24,8 @@
 
 #include "log_alist.h"
 
+using namespace std;
+
 bool
 LogAList::check_entry (symbol, const Library&) const
 { return is_active; }

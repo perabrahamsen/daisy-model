@@ -25,6 +25,8 @@
 #include "select.h"
 #include <map>
 
+using namespace std;
+
 typedef map<symbol, const LogExternSource*> log_extern_map_type; 
 log_extern_map_type* log_extern_map = NULL;
 int log_extern_count = 0;

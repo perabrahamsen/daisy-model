@@ -115,7 +115,7 @@ FAO::CloudinessFactor_Arid (double Si, double rad)
 {
   const double a = 1.35;
   const double x = Si / 0.75 / rad;
-  return (a * min (1.0, x) + 1 - a);
+  return (a * std::min (1.0, x) + 1 - a);
 }
 
 double
@@ -123,7 +123,7 @@ FAO::CloudinessFactor_Humid (double Si, double rad)
 {
   const double a = 1.00;
   const double x = Si / 0.75 / rad;
-  const double cfh = (a * min (1.0, x) + 1 - a);
+  const double cfh = (a * std::min (1.0, x) + 1 - a);
   return cfh;
 }
 

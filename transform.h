@@ -1,4 +1,4 @@
-// transform.h --- Transformation between two soil chemicals.
+// transform.h --- Transformation between two soil components.
 // 
 // Copyright 2002 Per Abrahamsen and KVL.
 //
@@ -23,10 +23,10 @@
 #define TRANSFORM_H
 
 #include "librarian.h"
+#include <vector>
 
 class Soil;
 class SoilWater;
-class SoilChemicals;
 
 class Transform
 {
@@ -38,14 +38,15 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil&, const SoilWater&, SoilChemicals&, 
-		     Treelog&) = 0;
-  virtual void output (Log&) const;
+  virtual void tick (const Soil&, const SoilWater&, 
+                     const std::vector<double>& A,
+                     const std::vector<double>& B, 
+                     std::vector<double>& S_AB, Treelog&) const = 0;
   virtual bool check (const Soil&, Treelog& err) const;
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&);
+  virtual void initialize (const Soil&, Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
 protected:
   Transform (const AttributeList& al);

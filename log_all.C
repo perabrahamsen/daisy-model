@@ -22,6 +22,8 @@
 #include "log_all.h"
 #include "assertion.h"
 
+using namespace std;
+
 bool 
 LogAll::check_leaf (symbol name) const
 { 

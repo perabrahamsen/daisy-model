@@ -25,6 +25,8 @@
 #include "field.h"
 #include "crop.h"
 
+using namespace std;
+
 struct ActionSow : public Action
 {
   const AttributeList& crop;

@@ -31,6 +31,8 @@
 #include "average.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 class UZRichard : public UZmodel
 {
   // Variables.

@@ -27,6 +27,8 @@
 #include "treelog.h"
 #include "mathlib.h"
 
+using namespace std;
+
 class ClayOMBiomod : public ClayOM
 {
   // Content.

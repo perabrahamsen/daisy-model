@@ -30,6 +30,8 @@
 #include "tmpstream.h"
 #include "check.h"
 
+using namespace std;
+
 // Chemical constants affecting the crop.
 const double molWeightCH2O = 30.0; // [gCH2O/mol]
 const double molWeightCO2 = 44.0; // [gCO2/mol]

@@ -85,8 +85,8 @@ public:
 		     SoilNH4*, SoilNO3*, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,
-		     vector<double>& residuals_N_soil, 
-		     vector<double>& residuals_C_soil,
+		     std::vector<double>& residuals_N_soil, 
+		     std::vector<double>& residuals_C_soil,
 		     double ForcedCAI,
 		     Treelog&) = 0;
   virtual const Harvest& harvest (symbol column_name,
@@ -97,19 +97,19 @@ public:
 				  double leaf_harvest, 
 				  double sorg_harvest,
 				  bool kill_off,
-				  vector<AM*>& residuals,
+				  std::vector<AM*>& residuals,
 				  double& residuals_DM,
 				  double& residuals_N_top,
 				  double& residuals_C_top,
-				  vector<double>& residuals_N_soil,
-				  vector<double>& residuals_C_soil,
+				  std::vector<double>& residuals_N_soil,
+				  std::vector<double>& residuals_C_soil,
 				  Treelog&) = 0;
   void kill (symbol, const Time&, const Geometry&, Bioclimate&,
-	     vector<AM*>& residuals, 
+	     std::vector<AM*>& residuals, 
 	     double& residuals_DM, 
 	     double& residuals_N_top, double& residuals_C_top,
-	     vector<double>& residuals_N_soil, 
-	     vector<double>& residuals_C_soil,
+	     std::vector<double>& residuals_N_soil, 
+	     std::vector<double>& residuals_C_soil,
 	     Treelog&);
   virtual double sorg_height () const = 0; // [cm]
   virtual void output (Log&) const = 0;

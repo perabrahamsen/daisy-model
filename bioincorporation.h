@@ -24,7 +24,6 @@
 #define BIOINCORPORATION_H
 
 #include <vector>
-using namespace std;
 
 class AttributeList;
 class Syntax;
@@ -42,7 +41,7 @@ private:
   
   // Simulation.
 public:
-  void tick (const Geometry&, vector <AM*>&, double T, double& CO2);
+  void tick (const Geometry&, std::vector <AM*>&, double T, double& CO2);
   void output (Log&) const;
 
   // Create and Destroy.

@@ -25,7 +25,6 @@
 
 #include "symbol.h"
 #include <vector>
-using namespace std;
 
 class Column;
 class AttributeList;
@@ -73,7 +72,7 @@ public:
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
-		vector<const Harvest*>&, Treelog&);
+		std::vector<const Harvest*>&, Treelog&);
   void mix (Treelog&, const Time&,
 	    double from, double to, double penetration = 1.0);
   void swap (Treelog&, const Time&, double from, double middle, double to);
@@ -115,7 +114,7 @@ public:
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void initialize (const Time&, Treelog& err, const Weather*);
-  Field (const vector<AttributeList*>&);
+  Field (const std::vector<AttributeList*>&);
   ~Field ();
 };
 

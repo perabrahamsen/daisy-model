@@ -29,8 +29,6 @@
 #include <vector>
 #include <list>
 
-using namespace std;
-
 class PLF;
 class AttributeList;
 class Syntax;
@@ -39,70 +37,74 @@ class AttributeList
 {
   // Content.
   struct Implementation;
-public:				// EGCS require this to be public...
   Implementation& impl;
 
 public:
   // Is 'key' an element of this alist?
-  bool check (const string& key) const;
+  bool check (const std::string& key) const;
   bool check (const char* key) const;
   // Is this alist a subset of 'other'?
   bool subset (const AttributeList& other, const Syntax& syntax) const;
   // Is the element 'key' in this alist a subset of the correspi
   bool subset (const AttributeList& other, const Syntax& syntax,
-	       const string& key) const;
-  int size (const string& key) const;
+	       const std::string& key) const;
+  int size (const std::string& key) const;
 
   // Extract values.
-  double number (const string&) const;
+  double number (const std::string&) const;
   double number (const char*) const;
-  double number (const string&, double default_value) const;
+  double number (const std::string&, double default_value) const;
   double number (const char*, double default_value) const;
-  const string& name (const string&) const;
-  const string& name (const char*) const;
-  const string& name (const string&, const string& default_value) const;
-  const string& name (const char*, const string& default_value) const;
-  symbol identifier (const string&) const;
+  const std::string& name (const std::string&) const;
+  const std::string& name (const char*) const;
+  const std::string& name (const std::string&,
+                           const std::string& default_value) const;
+  const std::string& name (const char*,
+                           const std::string& default_value) const;
+  symbol identifier (const std::string&) const;
   symbol identifier (const char*) const;
-  bool flag (const string&) const;
+  bool flag (const std::string&) const;
   bool flag (const char*) const;
-  const PLF& plf (const string&) const;
+  const PLF& plf (const std::string&) const;
   const PLF& plf (const char*) const;
-  AttributeList& alist (const string&) const;
+  AttributeList& alist (const std::string&) const;
   AttributeList& alist (const char*) const;
-  int integer (const string&) const;
+  int integer (const std::string&) const;
   int integer (const char*) const;
-  const vector<double>& number_sequence (const string&) const;
-  const vector<double>& number_sequence (const char*) const;
-  const vector<symbol>& identifier_sequence (const string& key) const;
-  const vector<symbol>& identifier_sequence (const char* key) const;
-  const vector<bool>& flag_sequence (const string& key) const;
-  const vector<bool>& flag_sequence (const char* key) const;
-  const vector<int>& integer_sequence (const string& key) const;
-  const vector<int>& integer_sequence (const char* key) const;
-  const vector<const PLF*>& plf_sequence (const string& key) const;
-  const vector<const PLF*>& plf_sequence (const char* key) const;
-  const vector<AttributeList*>& alist_sequence (const string& key) const;
-  const vector<AttributeList*>& alist_sequence (const char* key) const;
+  const std::vector<double>& number_sequence (const std::string&) const;
+  const std::vector<double>& number_sequence (const char*) const;
+  const std::vector<symbol>& 
+  /**/ identifier_sequence (const std::string& key) const;
+  const std::vector<symbol>& identifier_sequence (const char* key) const;
+  const std::vector<bool>& flag_sequence (const std::string& key) const;
+  const std::vector<bool>& flag_sequence (const char* key) const;
+  const std::vector<int>& integer_sequence (const std::string& key) const;
+  const std::vector<int>& integer_sequence (const char* key) const;
+  const std::vector<const PLF*>& plf_sequence (const std::string& key) const;
+  const std::vector<const PLF*>& plf_sequence (const char* key) const;
+  const std::vector<AttributeList*>& 
+  /**/ alist_sequence (const std::string& key) const;
+  const std::vector<AttributeList*>& alist_sequence (const char* key) const;
 
   // Create and Destroy.
-  void add (const string&, double);
-  void add (const string&, const char*);
-  void add (const string&, const string&);
-  void add (const string&, symbol);
-  void add (const string&, bool);
-  void add (const string&, int);
-  void add (const string&, const AttributeList&);
-  void add (const string&, const PLF&);
-  void add (const string&, const vector<double>&);
-  void add (const string&, const vector<symbol>&);
-  void add (const string&, const vector<bool>&);
-  void add (const string&, const vector<int>&);
-  void add (const string&, const vector<AttributeList*>&);
-  void add (const string&, const vector<const PLF*>&);
+  void add (const std::string&, double);
+  void add (const std::string&, double, const std::string&);
+  void add (const std::string&, const char*);
+  void add (const std::string&, const std::string&);
+  void add (const std::string&, symbol);
+  void add (const std::string&, bool);
+  void add (const std::string&, int);
+  void add (const std::string&, const AttributeList&);
+  void add (const std::string&, const PLF&);
+  void add (const std::string&, const std::vector<double>&);
+  void add (const std::string&, const std::vector<symbol>&);
+  void add (const std::string&, const std::vector<bool>&);
+  void add (const std::string&, const std::vector<int>&);
+  void add (const std::string&, const std::vector<AttributeList*>&);
+  void add (const std::string&, const std::vector<const PLF*>&);
 
-  void remove (const string&);
-  bool revert (const string&, const AttributeList&, const Syntax&);
+  void remove (const std::string&);
+  bool revert (const std::string&, const AttributeList&, const Syntax&);
   void operator += (const AttributeList&);
   void operator = (const AttributeList&);
   void clear ();

@@ -25,7 +25,6 @@
 #include "symbol.h"
 #include <string>
 #include <vector>
-using namespace std;
 
 class OrganicMatter;
 class CrpN;
@@ -135,7 +134,7 @@ private:
   static double GrowthRespCoef (double E);
 public:
   void tick (double AirT, double SoilT,
-	     const vector<double>& Density,
+	     const std::vector<double>& Density,
 	     const Geometry& geometry,
 	     double DS, double CAImRat,
 	     const CrpN& nitrogen,
@@ -143,8 +142,8 @@ public:
 	     const Partition& partition,
 	     double& residuals_DM, 
 	     double& residuals_N_top, double& residuals_C_top,
-	     vector<double>& residuals_N_soil,
-	     vector<double>& residuals_C_soil,
+	     std::vector<double>& residuals_N_soil,
+	     std::vector<double>& residuals_C_soil,
 	     Treelog&);
   void none ();
   void output (Log& log) const;
@@ -153,8 +152,8 @@ public:
 public:
   void initialize (const double SeedN);
   void initialize (symbol name,
-		   const vector<AttributeList*>& root,
-		   const vector<AttributeList*>& dead,
+		   const std::vector<AttributeList*>& root,
+		   const std::vector<AttributeList*>& dead,
 		   const Geometry&, OrganicMatter&);
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   Production (const AttributeList&);

@@ -30,7 +30,6 @@ struct Soil;
 struct SoilWater;
 
 #include <vector>
-using namespace std;
 
 class Ridge
 { 
@@ -41,9 +40,9 @@ class Ridge
 public:
   void tick (const Soil&, const SoilWater&, 
 	     double external_ponding /* [mm] */);
-  void update_water (const Soil&, const vector<double>& S_,
-		     vector<double>& h_, vector<double>& Theta_,
-		     vector<double>& q, const vector<double>& q_p);
+  void update_water (const Soil&, const std::vector<double>& S_,
+		     std::vector<double>& h_, std::vector<double>& Theta_,
+		     std::vector<double>& q, const std::vector<double>& q_p);
   void output (Log&) const;
   int last_node () const;
   double h () const;		// [cm]

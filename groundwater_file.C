@@ -25,6 +25,8 @@
 #include "time.h"
 #include <fstream>
 
+using namespace std;
+
 class GroundwaterFile : public Groundwater
 {
   // Data.

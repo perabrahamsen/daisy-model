@@ -25,6 +25,8 @@
 #include "alist.h"
 #include "syntax.h"
 
+using namespace std;
+
 void
 Vernalization::operator () (double Ta, double& DS)
 {

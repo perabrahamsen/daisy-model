@@ -1,3 +1,101 @@
+2004-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.57 released.
+
+2004-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pedo_linear.C: Removed.
+	* Makefile (REMOVE, MODELS): Remove it.
+	* equil_goal.C: New models.
+	* equil_langmuir.C (initialize_state): Remember whether
+	initialization failed.
+	* vcheck.C, vcheck.h (Compatible): New member class.
+	(fraction): New static member function.
+	* pedo_const.C: Added dimensions.
+
+	* all: Don't include namespace std in header files.
+
+2004-09-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pedo_arit.C: New model.
+
+	* alist.C (Scalar): New value type.
+	* syntax.C, syntax.h (User): New dimension.
+	* horizon.C (load_syntax): Use it.
+	* parser_file.C (load_list): Support it.
+	(check_value): New function.
+	(load_list): Use it.
+	* printer_file.C (print_dimension): New function.
+	(print_entry): Use it.
+	* horizon.C, horizon.h (get_dimension): New function.
+	* soil.C, soil.h (texture_below, get_dimension): New functions.
+	* pedo_linear.C, pedo_const.C, pedo.h (value): New non-virtual
+	function. 
+	* pedo.C, pedo.h, pedo_linear.C, pedo_const.C (set): Made
+	non-virtual. 
+
+2004-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* domsorp.C, domsorp.h: New component.
+	* Makefile (COMPONENTS): Added it.
+	* domsorp_std.C: New model.
+	* Makefile (MODELS): Added it.
+	* organic_matter.C: Use it.
+	* column_std.C (check_inner): Pass soil to OrganicMatter::check.
+
+	* lib/log.dai ("Chemistry"): Renamed from "Transform".
+
+2004-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.h (add): Removed one library variant.
+	* action_with.C (ActionWithColumnSyntax): 
+	* action_activity.C (ActionActivitySyntax): 
+	* action_while.C (ActionWhileSyntax): 
+	* vegetation_crops.C (VegetationCropsSyntax): 
+	* equil_langmuir.C (EquilibriumLangmuirSyntax): 
+	* log_select.C (load_syntax): 
+	* condition_logic.C (ConditionLogicSyntax): 
+	* organic_matter.C (load_syntax): Update caller.
+
+	* solute.h (M): New member function.
+	* chemistry.C, chemistry.h: New component.
+	* Makefile (COMPONENTS): Added it.
+	* chemistry_std.C: New model.
+	* Makefile (MODELS): Added it.
+	* column_base.C, column_base.h: Use it.
+
+2004-09-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pedo.C, pedo.h (debug_message): New utility function.
+
+	* equil_linear.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* pedo_const.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* transform_equil.C (k_AB, pedo_k_AB, k_BA, pedo_k_BA): Alwys use
+	pedotranfer functions.
+
+	* geometry.C (initialize_zplus): Fixed debug message.
+
+2004-09-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transform.C, transform.h, transform_equil.C (output): Removed.
+	* transform.h, transform_equil.C (tick): Make it deal with any
+	soil components. 
+
+2004-09-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic.C (K_to_M): Changed warning message to debug message.
+
+2004-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C (water_stress): Fix description.
+
+	* txt/exercises.tex (section{Calculating Hydraulic Properties}):
+	Removed extra hyphen.
+
 2004-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.56 released.

@@ -27,6 +27,8 @@
 #include "log.h"
 #include "mathlib.h"
 
+using namespace std;
+
 class TransportCD : public Transport
 {
   // Parameters.

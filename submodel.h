@@ -26,8 +26,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 class Syntax;
 class AttributeList;
 
@@ -36,14 +34,14 @@ class Submodel
 public:
   typedef void (*load_fun) (Syntax&, AttributeList&);
   
-  static void all (vector<string>& entries);
-  static void load_syntax (const string& model, Syntax&, AttributeList&);
-  static bool registered (const string& submodel);
+  static void all (std::vector<std::string>& entries);
+  static void load_syntax (const std::string& model, Syntax&, AttributeList&);
+  static bool registered (const std::string& submodel);
 
   class Register
   {
   public:
-      Register (const string& name, load_fun fun);
+      Register (const std::string& name, load_fun fun);
       ~Register ();
   };
 

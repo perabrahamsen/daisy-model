@@ -33,17 +33,18 @@ class Equilibrium
 public:
   static const char *const description;
   const symbol name;
-
+  const AttributeList& alist;
+  
   // Simulation.
 public:
   virtual void find (const Soil&, const SoilWater&, unsigned int i,
 		     double has_A, double has_B, 
 		     double& want_A, double& want_B) const = 0;
-  virtual bool check (const Soil&, Treelog& err) const;
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil&);
+  virtual void initialize (const Soil&, Treelog&) = 0;
+  virtual bool check (const Soil&, Treelog& err) const = 0;
   static void load_syntax (Syntax&, AttributeList&);
 protected:
   Equilibrium (const AttributeList& al);

@@ -24,7 +24,6 @@
 #define LEXER_H
 
 #include <string>
-using namespace std;
 
 class Treelog;
 
@@ -36,7 +35,7 @@ private:
   Implementation& impl;
 public:
   Treelog& err;
-  const string file;
+  const std::string file;
   int error_count;
 
   // Position
@@ -72,15 +71,15 @@ public:
   int get ();
   int peek ();
   bool good ();
-  void warning (const string& str, const Position&);
-  void error (const string& str, const Position&);
-  void warning (const string& str);
-  void error (const string& str);
+  void warning (const std::string& str, const Position&);
+  void error (const std::string& str, const Position&);
+  void warning (const std::string& str);
+  void error (const std::string& str);
   void eof ();
 
   // Create and destroy.
 public:
-  Lexer (const string&, Treelog&);
+  Lexer (const std::string&, Treelog&);
   virtual ~Lexer ();
 };
 

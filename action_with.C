@@ -27,6 +27,8 @@
 #include "field.h"
 #include "log.h"
 
+using namespace std;
+
 struct ActionWithColumn : public Action
 {
   const symbol column;
@@ -103,7 +105,8 @@ static struct ActionWithColumnSyntax
     alist.add ("description", "Perform actions on a specific column.");
     syntax.add ("column", Syntax::String, Syntax::Const, 
 		"Name of column to perform actions on.");
-    syntax.add ("actions", Librarian<Action>::library (), Syntax::Sequence,
+    syntax.add ("actions", Librarian<Action>::library (), 
+                Syntax::State, Syntax::Sequence,
 		"Actions to perform on the specified column.");
     syntax.order ("column", "actions");
     Librarian<Action>::add_type ("with-column", alist, syntax, &make);

@@ -78,8 +78,8 @@ public:
 		     SoilNH4 *const, SoilNO3 *const, 
 		     double& residuals_DM,
 		     double& residuals_N_top, double& residuals_C_top,
-		     vector<double>& residuals_N_soil,
-		     vector<double>& residuals_C_soil,
+		     std::vector<double>& residuals_N_soil,
+		     std::vector<double>& residuals_C_soil,
 		     Treelog&) = 0;
   virtual double transpiration (// Actual trans. [mm/h]
 				double potential_transpiration,	
@@ -88,11 +88,11 @@ public:
 				double day_fraction, Treelog&) = 0;
   virtual void force_production_stress  (double pstress) = 0;
   virtual void kill_all (symbol, const Time&, const Geometry&,
-			 Bioclimate&, vector<AM*>& residuals, 
+			 Bioclimate&, std::vector<AM*>& residuals, 
 			 double& residuals_DM,
 			 double& residuals_N_top, double& residuals_C_top,
-			 vector<double>& residuals_N_soil,
-			 vector<double>& residuals_C_soil,
+			 std::vector<double>& residuals_N_soil,
+			 std::vector<double>& residuals_C_soil,
 			 Treelog&) = 0;
   virtual void harvest (symbol column_name,
 			symbol crop_name,
@@ -102,15 +102,15 @@ public:
 			double stem_harvest,
 			double leaf_harvest, 
 			double sorg_harvest,
-			vector<const Harvest*>& harvest,
+			std::vector<const Harvest*>& harvest,
                         double& min_height,
-			vector<AM*>& residuals,
+			std::vector<AM*>& residuals,
 			double& harvest_DM, 
 			double& harvest_N, double& harvest_C,
 			double& residuals_DM,
 			double& residuals_N_top, double& residuals_C_top,
-			vector<double>& residuals_N_soil,
-			vector<double>& residuals_C_soil,
+			std::vector<double>& residuals_N_soil,
+			std::vector<double>& residuals_C_soil,
 			Treelog&) = 0;
   virtual void sow (Treelog& msg, 
                     const AttributeList& al, 

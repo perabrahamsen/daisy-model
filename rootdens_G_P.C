@@ -26,6 +26,8 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 
+using namespace std;
+
 struct Rootdens_G_P : public Rootdens
 {
   // Parameters.

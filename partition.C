@@ -29,6 +29,8 @@
 #include "tmpstream.h"
 #include "common.h"
 
+using namespace std;
+
 void
 Partition::operator() (double DS, double current_RSR, double nitrogen_stress,
 		       double& f_Leaf, double& f_Stem,

@@ -30,6 +30,8 @@
 #include "tmpstream.h"
 #include <deque>
 
+using namespace std;
+
 struct VegetationCrops : public Vegetation
 {
   // Types.
@@ -696,7 +698,7 @@ emerged.  If no crops have emerged on the field, it will be ignored.",
 				  VegetationCrops::ForcedLAI::load_syntax);
     alist.add ("ForcedLAI", vector<AttributeList*> ());
     syntax.add ("crops", Librarian<Crop>::library (), 
-		Syntax::Sequence,
+		Syntax::State, Syntax::Sequence,
 		"List of crops growing in the field");
     alist.add ("crops", vector<AttributeList*> ());
     Librarian<Vegetation>::add_type ("crops", alist, syntax, &make);

@@ -29,6 +29,8 @@
 #include "assertion.h"
 #include <map>
 
+using namespace std;
+
 // @ Value
 //
 // Common abstraction of an attribute value.
@@ -37,9 +39,21 @@
 
 struct Value
 {
+  struct Scalar
+  {
+    double number;
+    symbol name;
+    Scalar (double d, symbol s)
+      : number (d),
+        name (s)
+    { }
+    bool operator== (const Scalar& s)
+    { return number == s.number && name == s.name; }
+  };
   union
   {
     double number;
+    Scalar* scalar;
     symbol* name;
     bool flag;
     PLF* plf;
@@ -64,6 +78,12 @@ struct Value
       is_sequence (false),
       ref_count (new int (1))
     { }
+  Value (double v, const string& s)
+    : scalar (new Scalar (v, symbol (s))),
+      type (Syntax::Library),
+      is_sequence (false),
+      ref_count (new int (1))
+  { }
   Value (const symbol v)
     : name (new symbol (v)),
       type (Syntax::String),
@@ -227,8 +247,9 @@ Value::subset (const Value& v, const Syntax& syntax,
 	return *plf == *v.plf;
       case Syntax::String:
 	return *name == *v.name;
-      case Syntax::Object:
       case Syntax::Library:
+        return *scalar == *v.scalar;
+      case Syntax::Object:
       case Syntax::Error:
       default:
 	daisy_assert (false);
@@ -311,6 +332,9 @@ Value::cleanup ()
 	  case Syntax::PLF:
 	    delete plf;
 	    break;
+	  case Syntax::Library:
+            delete scalar;
+            break;
 	  case Syntax::String:
 	    delete name;
 	    break;
@@ -318,7 +342,6 @@ Value::cleanup ()
 	    // Empty (dummy) value.
 	    break;
 	  case Syntax::Object:
-	  case Syntax::Library:
 	  default:
 	    daisy_assert (false);
 	  }
@@ -392,11 +415,13 @@ Value::operator = (const Value& v)
       case Syntax::PLF:
 	plf = v.plf;
         break;
+      case Syntax::Library:
+        scalar = v.scalar;
+        break;
       case Syntax::String:
 	name = v.name;
         break;
       case Syntax::Object:
-      case Syntax::Library:
       case Syntax::Error:
       default:
 	daisy_assert (false);
@@ -568,19 +593,16 @@ double
 AttributeList::number (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Number);
   daisy_assert (!value.is_sequence);
-  return value.number;
+  if (value.type == Syntax::Number)
+    return value.number;
+  daisy_assert (value.type == Syntax::Library);
+  return value.scalar->number;
 }
 
 double 
 AttributeList::number (const char *const key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Number);
-  daisy_assert (!value.is_sequence);
-  return value.number;
-}
+{ return number (string (key)); }
 
 double 
 AttributeList::number (const string& key, const double default_value) const
@@ -588,23 +610,12 @@ AttributeList::number (const string& key, const double default_value) const
   if (!check (key))
     return default_value;
 
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Number);
-  daisy_assert (!value.is_sequence);
-  return value.number;
+  return number (key);
 }
 
 double 
 AttributeList::number (const char *const key, const double default_value) const
-{
-  if (!check (key))
-    return default_value;
-
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::Number);
-  daisy_assert (!value.is_sequence);
-  return value.number;
-}
+{ return number (string (key), default_value); }
 
 const string& 
 AttributeList::name (const string& key) const
@@ -624,29 +635,22 @@ AttributeList::name (const string& key, const string& default_value) const
 
 const string& 
 AttributeList::name (const char *const key, const string& default_value) const
-{ 
-  if (!check (key))
-    return default_value;
-  return identifier (key).name (); 
-}
+{ return name (string (key), default_value); }
 
 symbol
 AttributeList::identifier (const string& key) const
 {
   const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::String);
   daisy_assert (!value.is_sequence);
-  return *value.name;
+  if (value.type == Syntax::String)
+    return *value.name;
+  daisy_assert (value.type == Syntax::Library);
+  return value.scalar->name;
 }
 
 symbol
 AttributeList::identifier (const char *const key) const
-{
-  const Value& value = impl.lookup (key);
-  daisy_assert (value.type == Syntax::String);
-  daisy_assert (!value.is_sequence);
-  return *value.name;
-}
+{ return identifier (string (key)); }
 
 bool 
 AttributeList::flag (const string& key) const
@@ -832,6 +836,10 @@ void
 AttributeList::add (const string& key, double v)
 { impl.add (key, Value (v)); }
 
+void
+AttributeList::add (const string& key, double v, const string& d)
+{ impl.add (key, Value (v, d)); }
+
 void 
 AttributeList::add (const string& key, const char *const v)
 { impl.add (key, Value (v)); }
@@ -907,7 +915,10 @@ AttributeList::revert (const string& key,
     switch (syntax.lookup (key))
       {
       case Syntax::Number:
-	add (key, default_alist.number (key));
+        if (syntax.dimension (key) == Syntax::User ())
+          add (key, default_alist.number (key), default_alist.name (key));
+        else 
+          add (key, default_alist.number (key));
         break;
       case Syntax::Boolean:
 	add (key, default_alist.flag (key));

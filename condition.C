@@ -35,7 +35,7 @@ void
 Condition::tick (const Daisy&, Treelog&)
 { }
 
-const string
+const std::string
 Condition::timestep ()
 { return "dt"; } 
 

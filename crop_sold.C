@@ -38,6 +38,8 @@
 #include "mathlib.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 class CropSold : public Crop
 {
   // Content.

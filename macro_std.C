@@ -30,6 +30,8 @@
 #include "vcheck.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 struct MacroStandard : public Macro
 {
   // Parameters.

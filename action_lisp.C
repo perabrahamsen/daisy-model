@@ -26,6 +26,8 @@
 // We need to initialize the Condition library.
 #include "condition.h"
 
+using namespace std;
+
 struct ActionNil : public Action
 {
   void doIt (Daisy&, Treelog&)
@@ -313,7 +315,8 @@ ActionLispSyntax::ActionLispSyntax ()
     alist.add ("description", "\
 Perform all the specified actions in the sequence listed.\n\
 All the actions will be performed in the same time step.");
-    syntax.add ("actions", Librarian<Action>::library (), Syntax::Sequence,
+    syntax.add ("actions", Librarian<Action>::library (), 
+                Syntax::State, Syntax::Sequence,
 		"List of actions to perform.");
     syntax.order ("actions");
     Librarian<Action>::add_type ("progn", alist, syntax, &make_progn);
@@ -329,7 +332,8 @@ Perform the actions associated with the first true condition in the list.");
 		      Librarian<Condition>::library (), 
 		      "Condition for performing the actions.");
     clauseSyntax.add ("actions", 
-		      Librarian<Action>::library (), Syntax::Sequence, 
+		      Librarian<Action>::library (),
+                      Syntax::State, Syntax::Sequence, 
 		      "Actions to perform when condition is meet.");
     clauseSyntax.order ("condition", "actions");
     syntax.add ("clauses", clauseSyntax, Syntax::Sequence,

@@ -23,6 +23,8 @@
 #include "log_select.h"
 #include "tmpstream.h"
 
+using namespace std;
+
 bool 
 LogSelect::check_leaf (symbol) const
 { daisy_assert (false); }
@@ -233,7 +235,7 @@ Each selected variable is represented by a column in the log.");
   syntax.add ("when", Librarian<Condition>::library (), 
 	      "Add entries to the log file when this condition is true.");
   syntax.add ("entries", Librarian<Select>::library (), 
-	      Syntax::Sequence,
+	      Syntax::State, Syntax::Sequence,
 	      "What to log in each column.");
   syntax.add ("time_columns", Syntax::Boolean, Syntax::OptionalConst, "\
 Iff true, add columns for year, month, mday and hour in the begining of\n\

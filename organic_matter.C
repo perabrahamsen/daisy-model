@@ -49,6 +49,8 @@
 #include <fstream>
 #include <time.h>
 
+using namespace std;
+
 // Convertions
 static const double g_per_cm2_to_kg_per_ha = (10000.0 * 10000.0) / 1000.0;
 static const double g_per_cm2_per_h_to_kg_per_ha_per_y 
@@ -71,6 +73,7 @@ struct OrganicMatter::Implementation
   const vector<SMB*> smb;	// Living Organic Matter.
   const vector<SOM*> som;	// Soil Organic Matter.
   const vector<DOM*> dom;	// Dissolved Organic Matter.
+  const vector<Domsorp*> domsorp; // SOM <-> DOM transfer.
   struct Buffer
   {
     vector<double> C;			// Carbon.
@@ -189,7 +192,7 @@ struct OrganicMatter::Implementation
 	     double from, double middle, double to,
 	     const Time& time);
   void output (Log&, const Geometry&) const;
-  bool check (Treelog& err) const;
+  bool check (const Soil& soil, Treelog& err) const;
 
   double heat_turnover_factor (double T) const;
   double water_turnover_factor (double h) const;
@@ -812,6 +815,7 @@ OrganicMatter::Implementation::output (Log& log,
   output_ordered (smb, "smb", log);
   output_ordered (som, "som", log);
   output_ordered (dom, "dom", log);
+  output_list (domsorp, "domsorp", log, Librarian<Domsorp>::library ());
   output_submodule (buffer, "buffer", log);
   output_submodule (bioincorporation, "Bioincorporation", log);
   output_variable (NO3_source, log);
@@ -825,11 +829,15 @@ OrganicMatter::Implementation::output (Log& log,
 }
 
 bool
-OrganicMatter::Implementation::check (Treelog& err) const
+OrganicMatter::Implementation::check (const Soil& soil, Treelog& err) const
 {
+  Treelog::Open nest (err, "OrganicMatter");
   bool ok = true;
   for (unsigned int i = 0; i < am.size (); i++)
     if (!am[i]->check (err))
+      ok = false;
+  for (size_t i = 0; i < domsorp.size (); i++)
+    if (!domsorp[i]->check (soil, dom.size (), som.size (), err))
       ok = false;
   if (!clayom.check (smb, err))
     ok = false;
@@ -1233,6 +1241,9 @@ OrganicMatter::Implementation::transport (const Soil& soil,
 					  const SoilWater& soil_water, 
 					  Treelog& msg)
 {
+  for (size_t j = 0; j < domsorp.size (); j++)
+    domsorp[j]->tick (soil, soil_water, dom, som, msg);
+
   for (unsigned int j = 0; j < dom.size (); j++)
     dom[j]->transport (soil, soil_water, msg);
 }
@@ -2483,6 +2494,10 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   for (unsigned int pool = 0; pool < dom_size; pool++)
     dom[pool]->initialize (soil, soil_water, err);
 
+  // Initialize domsorp
+  for (size_t i = 0; i < domsorp.size (); i++)
+    domsorp[i]->initialize (soil, err);
+
   // Print top summary.
   {
     const string summary 
@@ -2532,6 +2547,7 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     smb (map_construct<SMB> (al.alist_sequence ("smb"))),
     som (map_construct<SOM> (al.alist_sequence ("som"))),
     dom (map_construct<DOM> (al.alist_sequence ("dom"))),
+    domsorp (map_create <Domsorp> (al.alist_sequence ("domsorp"))),
     buffer (al.alist ("buffer")),
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
@@ -2556,6 +2572,7 @@ OrganicMatter::Implementation::~Implementation ()
   sequence_delete (smb.begin (), smb.end ());
   sequence_delete (som.begin (), som.end ());
   sequence_delete (dom.begin (), dom.end ());
+  sequence_delete (domsorp.begin (), domsorp.end ());
   delete &clayom;
 }
 
@@ -2675,8 +2692,8 @@ OrganicMatter::som_pools () const
 { return impl.som.size (); }
 
 bool
-OrganicMatter::check (Treelog& err) const
-{ return impl.check (err); }
+OrganicMatter::check (const Soil& soil, Treelog& err) const
+{ return impl.check (soil, err); }
 
 void 
 OrganicMatter::add (AM& am)
@@ -2999,7 +3016,8 @@ Turnover rate above which pools will contribute to 'CO2_fast'.");
   alist.add ("CO2_threshold", 1e-4); // SMB2 and default AOM pools.
   syntax.add ("top_CO2", "g CO_2-C/cm^2/h", Syntax::LogOnly,
 	      "CO2 evolution at surface.");
-  syntax.add ("am", Librarian<AM>::library (), Syntax::Sequence, 
+  syntax.add ("am", Librarian<AM>::library (), 
+              Syntax::State, Syntax::Sequence, 
 	      "Added organic matter pools.");
   vector<AttributeList*> am;
   AttributeList root (AM::default_root ());
@@ -3125,8 +3143,11 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   syntax.add_submodule_sequence ("dom", Syntax::State, 
 				 "Dissolved Organic Matter pools.",
 				 DOM::load_syntax);
-  vector<AttributeList*> DOM;
-  alist.add ("dom", DOM);
+  alist.add ("dom", vector<AttributeList*> ());
+  syntax.add ("domsorp", Librarian<Domsorp>::library (), 
+              Syntax::State, Syntax::Sequence, 
+	      "Interchange between DOM and SOM pools.");
+  alist.add ("domsorp", vector<AttributeList*> ());
 
   syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
 	      Syntax::Const,
