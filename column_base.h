@@ -53,6 +53,15 @@ protected:
   SoilChemicals soil_chemicals;
   Groundwater& groundwater;
 
+  // Log variables.
+private:
+  double log_harvest_DM;
+  double log_harvest_N;
+  double log_harvest_C;
+  double harvest_DM;
+  double harvest_N;
+  double harvest_C;
+
   // Actions.
 public:
   void ridge (const AttributeList& al);
@@ -103,6 +112,7 @@ public:
 
   // Simulation.
 public:
+  void tick_base ();
   void output (Log&) const;
   virtual void output_inner (Log&) const;
   void clear ();

@@ -336,6 +336,9 @@ ColumnStandard::clear ()
 void
 ColumnStandard::tick (const Time& time, const Weather* global_weather)
 {
+  // Base log.
+  tick_base ();
+
   // Weather.
   if (weather)
     weather->tick (time);

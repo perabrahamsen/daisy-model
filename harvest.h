@@ -51,6 +51,9 @@ public:
   const double sorg_N;
   const double sorg_C;
   const Chemicals chemicals;
+  double total_N () const;
+  double total_C () const;
+  double total_DM () const;
 
   // Simulation:
 public:

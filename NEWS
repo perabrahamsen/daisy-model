@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.88
+
+** "N Balance" and "Carbon Balance" now contains harvest information.
+
 * 1.87
 
 ** Mark "CrpN SeedN" as obsolete in default crop model.

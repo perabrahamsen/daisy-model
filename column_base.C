@@ -77,7 +77,7 @@ ColumnBase::harvest (const Time& time, const string& crop_name,
 		      bioclimate,
 		      stub_length, 
 		      stem_harvest, leaf_harvest, sorg_harvest,
-		      harvest, residuals); 
+		      harvest, residuals, harvest_DM, harvest_N, harvest_C); 
   add_residuals (residuals);
 }
 
@@ -278,6 +278,17 @@ ColumnBase::check_inner (Treelog&) const
 { return true; }
 
 void
+ColumnBase::tick_base ()
+{
+  log_harvest_DM = harvest_DM;
+  log_harvest_N = harvest_N;
+  log_harvest_C = harvest_C;
+  harvest_DM = 0.0;
+  harvest_N = 0.0;
+  harvest_C = 0.0;
+}
+
+void
 ColumnBase::output (Log& log) const
 {
   Column::output (log);
@@ -293,6 +304,9 @@ ColumnBase::output (Log& log) const
   output_derived (groundwater, "Groundwater", log);
   output_derived (vegetation, "Vegetation", log);
   output_inner (log);
+  log.output ("harvest_DM", log_harvest_DM);
+  log.output ("harvest_N", log_harvest_N);
+  log.output ("harvest_C", log_harvest_C);
   log.close_geometry ();
 }
 
@@ -312,7 +326,13 @@ ColumnBase::ColumnBase (const AttributeList& al)
     soil_water (al.alist ("SoilWater")),
     soil_heat (al.alist ("SoilHeat")),
     soil_chemicals (al.alist ("SoilChemicals")),
-    groundwater (Librarian<Groundwater>::create (al.alist ("Groundwater")))
+    groundwater (Librarian<Groundwater>::create (al.alist ("Groundwater"))),
+    log_harvest_DM (0.0),
+    log_harvest_N (0.0),
+    log_harvest_C (0.0),
+    harvest_DM (0.0),
+    harvest_N (0.0),
+    harvest_C (0.0)
 { }
 
 void 
@@ -379,4 +399,11 @@ the simulation.  If unspecified, used global weather.");
 				"Chemicals in the soil.");
   syntax.add ("Groundwater", Librarian<Groundwater>::library (),
 	      "The groundwater level.");
+  syntax.add ("harvest_DM", "g/m^2", Syntax::LogOnly, 
+	      "Amount of DM removed by harvest this hour.");
+  syntax.add ("harvest_N", "g/m^2", Syntax::LogOnly, 
+	      "Amount of nitrogen removed by harvest this hour.");
+  syntax.add ("harvest_C", "g/m^2", Syntax::LogOnly, 
+	      "Amount of carbon removed by harvest this hour.");
+  
 }

@@ -93,7 +93,7 @@ struct VegetationPermanent : public Vegetation
 		const Time&, const Geometry&, Bioclimate&,
 		double, double, double, double, 
 		vector<const Harvest*>&,
-		vector<AM*>&)
+ 		vector<AM*>&, double&, double&, double&)
   { }
   double sow (const AttributeList&, const Geometry&, OrganicMatter&)
   { throw "Can't sow on permanent vegetation"; }

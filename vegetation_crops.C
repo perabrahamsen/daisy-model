@@ -97,7 +97,8 @@ struct VegetationCrops : public Vegetation
 		const Time&, const Geometry&, Bioclimate&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
-		vector<const Harvest*>& harvest, vector<AM*>& residuals);
+		vector<const Harvest*>& harvest, vector<AM*>& residuals,
+		double& harvest_DM, double& harvest_N, double& harvest_C);
   double sow (const AttributeList& al, const Geometry&, OrganicMatter&);
   void sow (const AttributeList& al, const Geometry&);
   void output (Log&) const;
@@ -351,7 +352,9 @@ VegetationCrops::harvest (const string& column_name,
 			  double stem_harvest, double leaf_harvest, 
 			  double sorg_harvest, 
 			  vector<const Harvest*>& harvest,
-			  vector<AM*>& residuals)
+			  vector<AM*>& residuals,
+			  double& harvest_DM, 
+			  double& harvest_N, double& harvest_C)
 {
   const bool all = (crop_name == "all");
 
@@ -360,12 +363,21 @@ VegetationCrops::harvest (const string& column_name,
        crop != crops.end();
        crop++)
     if (all || (*crop)->name == crop_name)
-      harvest.push_back (&(*crop)->harvest (column_name, time, 
-					    geometry, 
-					    bioclimate,
-					    stub_length, stem_harvest,
-					    leaf_harvest, sorg_harvest, 
-					    false, residuals));
+      {
+	const Harvest& mine = 
+	  (*crop)->harvest (column_name, time, 
+			    geometry, 
+			    bioclimate,
+			    stub_length, stem_harvest,
+			    leaf_harvest, sorg_harvest, 
+			    false, residuals);
+
+	harvest_DM += mine.total_DM ();
+	harvest_N += mine.total_N ();
+	harvest_C += mine.total_C ();
+
+	harvest.push_back (&mine);
+      }
 
   // Remove all dead crops.  There has to be a better way.
   bool removed;

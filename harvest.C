@@ -25,6 +25,19 @@
 #include "log.h"
 #include "submodel.h"
 
+double
+Harvest::total_N () const
+{ return stem_N + dead_N + leaf_N + sorg_N; }
+
+double 
+Harvest::total_C () const
+{ return stem_C + dead_C + leaf_C + sorg_C; }
+
+double 
+Harvest::total_DM () const
+{ return stem_DM + dead_DM + leaf_DM + sorg_DM; }
+
+
 void 
 Harvest::output (Log& log) const
 {

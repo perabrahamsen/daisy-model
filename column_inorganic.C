@@ -135,6 +135,9 @@ ColumnInorganic::get_co2_production_at (unsigned int) const // [g C/cm³]
 void
 ColumnInorganic::tick (const Time& time, const Weather* global_weather)
 {
+  // Base log.
+  tick_base ();
+
   // Weather.
   if (weather)
     weather->tick (time);

@@ -1,5 +1,22 @@
 2001-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.88 released.
+
+2001-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("N Balance"): Log harvest N.
+	("Carbon Balance"): Log harvest C.
+
+	* harvest.C, harvest.h (total_N, total_C, total_DM): New
+	functions.
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h
+	(harvest):  New harvest_DM, harvest_N and harvest_C parameters. 
+	* column_base.C (harvest): Update caller.
+	* column_base.C, column_base.h (tick_base): New function.
+	* column_std.C, column_inorganic.C (tick): Call it.
+	* column_base.C, column_base.h (harvest_DM, harvest_N, harvest_C):
+	New log variables.
+
 	* Version 1.87 released.
 
 2001-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
