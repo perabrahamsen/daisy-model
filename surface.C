@@ -184,7 +184,7 @@ Surface::q () const
   if (impl.ridge_)
     return -impl.ridge_->h () / dt;
   else
-    return -impl.pond * 0.1;		// mm -> cm.
+    return -ponding () * 0.1;		// mm -> cm.
 }
   
 void  

@@ -29,13 +29,19 @@ class LogAll : public LogSelect
   // Content.
 private:
   vector<LogSelect*> slaves;
-  stack<vector<Select*>/**/> active_stack;
+  stack<vector<Select*>/**/> active_leafs;
+  stack<vector<Select*>/**/> active_interiors;
 
   // Filter functions.
+  bool check_leaf (symbol) const;
+  bool check_interior (symbol) const;
   bool check_member (symbol) const;
 
   // Use.
+private:
+  
 public:
+  void insert_active ();
   bool match (const Daisy& daisy, Treelog&);
   void done ();
 

@@ -77,38 +77,28 @@ public:
   // Nesting.
 private:
   vector<symbol> path;		// Content of this entry.
+public:
   const unsigned int last_index;	// Index of last member in path.
-  unsigned int current_path_index;// How nested in open's we are.
   symbol current_name;
   static const symbol wildcard;
   
 public:
-  bool valid (symbol name) const
+  bool valid (const symbol name) const
   { return current_name == wildcard || name == current_name; }
-  bool valid_leaf (symbol name)
-  { return valid (name) && last_index == current_path_index; }
-  bool open (symbol name)	// Open one leaf level.
+  bool open (const symbol name, const int depth)	// Open one leaf level.
   { 
     // Check if next level is also in path.
     if (!valid (name))
 	return false;
 
-    // We may have reached the end of path.
-    if (current_path_index == last_index)
-      return false;
-
-    // Remember nesting.
-    current_path_index++;
     // Direct acces to new head of path.
-    current_name = path[current_path_index];
+    current_name = path[depth];
     return true;
   }
-  void close ()		// Close one level.
+  void close (const int depth)		// Close one level.
   { 
-    // Decrease nesting.
-    current_path_index--;
     // And restore direct access to current path.
-    current_name = path[current_path_index];
+    current_name = path[depth];
   }
 
   // Output routines.

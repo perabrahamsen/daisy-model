@@ -485,7 +485,6 @@ Select::Select (const AttributeList& al)
     count (al.integer ("count")),
     path (al.identifier_sequence ("path")),
     last_index (path.size () - 1),
-    current_path_index (0U),
     current_name (path[0]),
     is_active (false)
 { }

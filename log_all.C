@@ -23,12 +23,12 @@
 #include "assertion.h"
 
 bool 
-LogAll::check_member (symbol name) const
+LogAll::check_leaf (symbol name) const
 { 
   daisy_assert (is_active);
-  daisy_assert (!active_stack.empty ());
+  daisy_assert (!active_leafs.empty ());
 
-  const vector<Select*>& current = active_stack.top ();
+  const vector<Select*>& current = active_leafs.top ();
   for (vector<Select*>::const_iterator i = current.begin (); 
        i < current.end (); 
        i++)
@@ -39,6 +39,52 @@ LogAll::check_member (symbol name) const
 }
 
 bool 
+LogAll::check_interior (symbol name) const
+{ 
+  daisy_assert (is_active);
+  daisy_assert (!active_interiors.empty ());
+
+  const vector<Select*>& current = active_interiors.top ();
+  for (vector<Select*>::const_iterator i = current.begin (); 
+       i < current.end (); 
+       i++)
+    if ((*i)->valid (name))
+      return true;
+
+  return false;
+}
+
+bool 
+LogAll::check_member (symbol name) const
+{ return check_interior (name) || check_leaf (name); }
+
+void
+LogAll::insert_active ()
+{
+  daisy_assert (active_leafs.empty ());
+  active_leafs.push (vector<Select*> ());
+  vector<Select*>& leafs = active_leafs.top ();
+  daisy_assert (leafs.size () == 0);
+  daisy_assert (active_interiors.empty ());
+  active_interiors.push (vector<Select*> ());
+  vector<Select*>& interiors = active_interiors.top ();
+  daisy_assert (interiors.size () == 0);
+
+  const int depth = 0;
+  for (unsigned int i = 0; i < entries.size (); i++)
+    {
+      Select* sel = entries[i];
+
+      if (sel->is_active)
+	if (depth == sel->last_index)
+	  leafs.push_back (sel);
+	else
+	  interiors.push_back (sel);
+    }
+}
+
+
+bool 
 LogAll::match (const Daisy& daisy, Treelog& msg)
 {
   is_active = false;
@@ -47,16 +93,7 @@ LogAll::match (const Daisy& daisy, Treelog& msg)
       is_active = true;
 
   if (is_active)
-    {
-      daisy_assert (active_stack.empty ());
-      active_stack.push (vector<Select*> ());
-      vector<Select*>& current = active_stack.top ();
-      daisy_assert (current.size () == 0);
-
-      for (unsigned int i = 0; i < entries.size (); i++)
-	if (entries[i]->is_active)
-	  current.push_back (entries[i]);
-    }
+    insert_active ();
 
   return is_active;
 }
@@ -68,7 +105,8 @@ LogAll::done ()
     if (slaves[i]->is_active)
       slaves[i]->done ();
 
-  active_stack.pop ();
+  active_leafs.pop ();
+  active_interiors.pop ();
 }
 
 bool 
@@ -80,16 +118,7 @@ LogAll::initial_match (const Daisy& daisy, Treelog& msg)
       is_active = true;
 
   if (is_active)
-    {
-      daisy_assert (active_stack.empty ());
-      active_stack.push (vector<Select*> ());
-      vector<Select*>& current = active_stack.top ();
-      daisy_assert (current.size () == 0);
-
-      for (unsigned int i = 0; i < entries.size (); i++)
-	if (entries[i]->is_active)
-	  current.push_back (entries[i]);
-    }
+    insert_active ();
 
   return is_active;
 }
@@ -101,38 +130,54 @@ LogAll::initial_done ()
     if (slaves[i]->is_active)
       slaves[i]->initial_done ();
 
-  active_stack.pop ();
+  active_leafs.pop ();
+  active_interiors.pop ();
 }
 
 void 
 LogAll::open (symbol name)
 { 
   daisy_assert (is_active);
-  daisy_assert (!active_stack.empty ());
 
-  const vector<Select*>& current = active_stack.top ();
-  daisy_assert (&current == &active_stack.top ());
-  active_stack.push (vector<Select*> ());
-  vector<Select*>& next = active_stack.top ();
-  
-  for (vector<Select*>::const_iterator i = current.begin (); 
-       i < current.end (); 
+  const int depth = active_interiors.size ();
+  daisy_assert (depth > 0);
+  daisy_assert (depth == active_leafs.size ());
+
+  const vector<Select*>& old = active_interiors.top ();
+  active_interiors.push (vector<Select*> ());
+  vector<Select*>& interiors = active_interiors.top ();
+  active_leafs.push (vector<Select*> ());
+  vector<Select*>& leafs = active_leafs.top ();
+
+  for (vector<Select*>::const_iterator i = old.begin (); 
+       i < old.end (); 
        i++)
-    if ((*i)->open (name))
-      next.push_back ((*i));
+    if ((*i)->open (name, depth))
+      if ((*i)->last_index == depth)
+	leafs.push_back (*i);
+      else
+	interiors.push_back (*i);
 }
 
 void 
 LogAll::close ()
 { 
-  const vector<Select*>& current = active_stack.top ();
+  const int depth = active_interiors.size () - 2;
+  daisy_assert (depth >= 0);
 
-  for (vector<Select*>::const_iterator i = current.begin (); 
-       i < current.end (); 
+  const vector<Select*>& leafs = active_leafs.top ();
+  for (vector<Select*>::const_iterator i = leafs.begin (); 
+       i < leafs.end (); 
        i++)
-    (*i)->close ();
+    (*i)->close (depth);
+  const vector<Select*>& interiors = active_interiors.top ();
+  for (vector<Select*>::const_iterator i = interiors.begin (); 
+       i < interiors.end (); 
+       i++)
+    (*i)->close (depth);
 
-  active_stack.pop ();
+  active_leafs.pop ();
+  active_interiors.pop ();
 }
 
 void 
@@ -142,40 +187,40 @@ LogAll::output (symbol, const bool)
 void 
 LogAll::output (symbol name, const double value)
 { 
-  const vector<Select*>& sels = active_stack.top ();
+  const vector<Select*>& sels = active_leafs.top ();
 
   for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
+    if (name == (*i)->current_name)
       (*i)->output_number (value);
 }
 
 void 
 LogAll::output (symbol name, const int value)
 { 
-  const vector<Select*>& sels = active_stack.top ();
+  const vector<Select*>& sels = active_leafs.top ();
 
   for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
+    if (name == (*i)->current_name)
       (*i)->output_integer (value);
 }
 
 void 
 LogAll::output (symbol name, const string& value)
 { 
-  const vector<Select*>& sels = active_stack.top ();
+  const vector<Select*>& sels = active_leafs.top ();
 
   for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
+    if (name == (*i)->current_name)
       (*i)->output_name (value);
 }
 
 void 
 LogAll::output (symbol name, const vector<double>& value)
 { 
-  const vector<Select*>& sels = active_stack.top ();
+  const vector<Select*>& sels = active_leafs.top ();
 
   for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
+    if (name == (*i)->current_name)
       (*i)->output_array (value, geometry ());
 }
 
@@ -186,10 +231,10 @@ LogAll::output (symbol, const PLF&)
 void 
 LogAll::output (symbol name, const Time& value)
 { 
-  const vector<Select*>& sels = active_stack.top ();
+  const vector<Select*>& sels = active_leafs.top ();
 
   for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
-    if ((*i)->valid_leaf (name))
+    if (name == (*i)->current_name)
       (*i)->output_time (value);
 }
 
