@@ -26,7 +26,7 @@
 #include <deque>
 // GCC 2.95.2 need a ".h".
 #include <assert.h>
-1
+
 struct TreelogStream::Implementation
 {
   ostream& out;

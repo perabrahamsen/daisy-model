@@ -2,6 +2,7 @@
 
 	* treelog.h, treelog_dual.h, treelog_dual.C, treelog_stream.h,
 	treelog_stream.C (flush):  New virtual member function.
+	* assertion.C (failure): Use it.
 
 	* assertion.C, assertion.h: New utility.
 	* Makefile (OTHER): Added it.
