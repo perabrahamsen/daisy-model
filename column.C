@@ -8,7 +8,7 @@
 
 Librarian<Column>::Content* Librarian<Column>::content = NULL;
 
-Column::Column (string n)
+Column::Column (const string& n)
   : name (n)
 { }
 

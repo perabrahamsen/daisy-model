@@ -4,6 +4,7 @@
 #include "parser_file.h"
 #include "syntax.h"
 #include "alist.h"
+#include "version.h"
 #include <iostream.h>
 
 int 
@@ -26,6 +27,16 @@ main (int argc, char* argv[])
     {
       syntax.dump ();
       return 0;
+    }
+
+  // print version, if specified.
+  if (strcmp (argv[1], "-v") == 0)
+    {
+      cerr << "Daisy crop/soil simulation version "
+	   << version << ". (" __DATE__ ")\n"
+	"Copyright 1996 - 1998 Per Abrahamsen\n"
+	"Copyright 1996 Søren Hansen\n";
+      return 2;
     }
 
   // Parse the file.

@@ -50,7 +50,7 @@ public:
   void fertilize (const AttributeList&, const Time&, double from, double to);
   void fertilize (const IM&);
   void fertilize (const IM&, double from, double to);
-  vector<const Harvest*> harvest (const Time&, const string name,
+  vector<const Harvest*> harvest (const Time&, const string& name,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
@@ -74,8 +74,13 @@ public:
 
   // Create and Destroy.
 public:
+  Column& clone (const string& name) const
+    { return *new ColumnStandard (*this, name); }
+
   ColumnStandard (const AttributeList&);
-  void initialize (const Time& time, const Groundwater&);
+  ColumnStandard (const ColumnStandard& column, const string& name);
+  void initialize (const AttributeList& al, 
+		   const Time& time, const Groundwater&);
   ~ColumnStandard ();
 };
 
@@ -126,7 +131,7 @@ ColumnStandard::fertilize (const IM& im,
 }
 
 vector<const Harvest*>
-ColumnStandard::harvest (const Time& time, const string crop_name,
+ColumnStandard::harvest (const Time& time, const string& crop_name,
 			 double stub_length,
 			 double stem_harvest, double leaf_harvest, 
 			 double sorg_harvest)
@@ -312,14 +317,32 @@ ColumnStandard::output (Log& log, Filter& filter) const
   log.close_geometry ();
 }
 
+ColumnStandard::ColumnStandard (const ColumnStandard& column, 
+				const string& name)
+  : Column (name),
+    // BUG: None of the constructors below have been implemented.
+    crops (column.crops),
+    bioclimate (column.bioclimate),
+    surface (column.surface),
+    soil (column.soil),
+    soil_water (column.soil_water),
+    soil_heat (column.soil_heat),
+    soil_NH4 (column.soil_NH4),
+    soil_NO3 (column.soil_NO3),
+    organic_matter (column.organic_matter),
+    nitrification (column.nitrification),
+    denitrification (column.denitrification)
+{ }
+    
+
 ColumnStandard::ColumnStandard (const AttributeList& al)
   : Column (al.name ("type")),
     crops (al.alist_sequence ("crops")),
     bioclimate (al.alist ("Bioclimate")),
     surface (al.alist ("Surface")),
     soil (al.alist ("Soil")),
-    soil_water (soil, al.alist ("SoilWater")),
-    soil_heat (soil, al.alist ("SoilHeat")),
+    soil_water (al.alist ("SoilWater")),
+    soil_heat (al.alist ("SoilHeat")),
     soil_NH4 (al.alist ("SoilNH4")),
     soil_NO3 (al.alist ("SoilNO3")),
     organic_matter (soil, al.alist ("OrganicMatter")),
@@ -328,13 +351,14 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     denitrification (al.alist ("Denitrification"))
 { }
 
-void ColumnStandard::initialize (const Time& time, 
+void ColumnStandard::initialize (const AttributeList& al, 
+				 const Time& time, 
 				 const Groundwater& groundwater)
 {
-  soil_heat.initialize (soil, time);
-  soil_water.initialize (soil, groundwater);
-  soil_NH4.initialize (soil, soil_water);
-  soil_NO3.initialize (soil, soil_water);
+  soil_heat.initialize (al.alist ("SoilHeat"), soil, time);
+  soil_water.initialize (al.alist ("SoilWater"), soil, groundwater);
+  soil_NH4.initialize (al.alist ("SoilNH4"), soil, soil_water);
+  soil_NO3.initialize (al.alist ("SoilNO3"), soil, soil_water);
 }
 
 ColumnStandard::~ColumnStandard ()

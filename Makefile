@@ -170,7 +170,8 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	action_with.C hydraulic_old2.C nitrification_soil.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
 	transport_none.C transport_convection.C adsorbtion_vS_S.C \
-	adsorbtion_none.C tortuosity_M_Q.C tortuosity_linear.C
+	adsorbtion_none.C tortuosity_M_Q.C tortuosity_linear.C \
+	adsorbtion_freundlich.C adsorbtion_linear.C adsorbtion_langmuir.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -195,7 +196,7 @@ LIBOBJ = $(COMPONENTS:.C=${OBJ}) $(INTERFACES:.C=${OBJ}) $(SPARCOBJ)
 #
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ}
 SOURCES = $(COMPONENTS) $(INTERFACES) $(SPARCSRC) $(MAIN) cmain.c
-HEADERS = $(INTERFACES:.C=.h) common.h
+HEADERS = $(INTERFACES:.C=.h) common.h version.h
 
 # Find all printable files.
 #
@@ -221,6 +222,11 @@ all:	$(EXECUTABLES)
 #
 daisy${EXT}:	main${OBJ} $(FORLIB) $(LIBOBJ)
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
+
+# Create the main executable.
+#
+mandaisy${EXT}:	manmain${OBJ} $(FORLIB) $(LIBOBJ)
+	$(LINK)mandaisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create executable with embedded tcl/tk.
 #
@@ -316,17 +322,27 @@ depend: $(SOURCES)
 # Create a ZIP file with all the sources.
 #
 daisy.zip:	$(TEXT)
-	zip daisy.zip $(TEXT)
+	zip daisy.zip $(TEXT) daisy.ide
+
+# Move it to ftp.
+#
+dist:	daisy.zip
+	mv -f daisy.zip $(HOME)/.public_ftp/daisy/
 
 # Update the CVS repository.
 #
 cvs: $(TEXT)
-	(cd lib; $(MAKE) cvs);
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	rm -f version.h
+	echo "// version.h -- automatically generated file" > version.h
+	echo " " >> version.h
+	echo "static const char *const version = \"$(TAG)\";" >> version.h
+	(cd lib; $(MAKE) cvs);
 	-cvs add $(TEXT)
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
-	cvs commit -m "$(TAG)" # "Version $(TAG)"
+	cvs commit -m "Version $(TAG)"
+	cvs tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
 
 # How to compile the assembler file.
 #

@@ -23,7 +23,7 @@ struct SoilHeat::Implementation
   const double amplitude;	// Variation in bottom temperature [C]
   const double omega;		// Period length for above [ rad / day]
   const double omega_offset;	// Period start for above [rad]
-  const double delay;		// Period delay [ cm/rad ??? ]
+  /* const */ double delay;	// Period delay [ cm/rad ??? ]
 
   // Calculate season delay [C/cm] at pF 2.
   static double calculate_delay (const Soil& soil, double omega);
@@ -38,8 +38,9 @@ struct SoilHeat::Implementation
 
   // Create & Destroy.
   bool check (unsigned n) const;
-  void initialize (const Soil& soil, const Time& time);
-  Implementation (const Soil&, const AttributeList&);
+  void initialize (const AttributeList& al, 
+		   const Soil& soil, const Time& time);
+  Implementation (const AttributeList&);
 };
 
 void
@@ -262,23 +263,20 @@ SoilHeat::Implementation::check (unsigned n) const
   return ok;
 }
 
-SoilHeat::Implementation::Implementation (const Soil& soil, 
-					  const AttributeList& al)
+SoilHeat::Implementation::Implementation (const AttributeList& al)
   : T_top (al.number ("T_top")),
     average (al.number ("average")),
     amplitude (al.number ("amplitude")),
     omega (al.number ("omega")),
-    omega_offset (al.number ("omega_offset")),
-    delay (calculate_delay (soil, omega))
-{ 
-  // Initialize T.  Use specified numbers, if any.
-  if (al.check ("T"))
-    T = al.number_sequence ("T");
-}
+    omega_offset (al.number ("omega_offset"))
+{ }
 
 void
-SoilHeat::Implementation::initialize (const Soil& soil, const Time& time)
+SoilHeat::Implementation::initialize (const AttributeList& al, 
+				      const Soil& soil, const Time& time)
 {
+  delay  = calculate_delay (soil, omega);
+  soil.initialize_layer (T, al, "T");
   // Fill out with T calculated numbers if necessary.
   for (unsigned int i = T.size (); i < soil.size (); i++)
     T.push_back (bottom (time, -soil.zplus (i)));
@@ -344,7 +342,7 @@ SoilHeat::check (unsigned n) const
 void
 SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add ("T", Syntax::Number, Syntax::Optional, Syntax::Sequence);
+  Geometry::add_layer (syntax, "T");
   syntax.add ("T_top", Syntax::Number, Syntax::State);
   alist.add ("T_top", -500.0);	// Use surface temperature.
   syntax.add ("average", Syntax::Number, Syntax::Const);
@@ -357,14 +355,15 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("omega_offset", -209.0);
 }
 
-SoilHeat::SoilHeat (const Soil& soil, const AttributeList& al)
-  : impl (*new Implementation (soil, al))
+SoilHeat::SoilHeat (const AttributeList& al)
+  : impl (*new Implementation (al))
 { }
 
 
 void
-SoilHeat::initialize (const Soil& soil, const Time& time)
-{ impl.initialize (soil, time); }
+SoilHeat::initialize (const AttributeList& al, 
+		      const Soil& soil, const Time& time)
+{ impl.initialize (al, soil, time); }
 
 SoilHeat::~SoilHeat ()
 {

@@ -31,8 +31,10 @@ Daisy::Daisy (const AttributeList& al)
     columns (*new ColumnList (al.alist_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
 { 
+  const vector<AttributeList*>& column_alists = al.alist_sequence ("column");
+  
   for (unsigned int i = 0; i < columns.size (); i++)
-    columns[i]->initialize (time, groundwater);
+    columns[i]->initialize (*column_alists[i], time, groundwater);
 }
 
 bool

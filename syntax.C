@@ -222,7 +222,7 @@ static const char * const type_names[] =
 const char* 
 Syntax::type_name (type t)
 {
-  assert (sizeof (type_names) / sizeof  (const char*) == Error);
+  assert (sizeof (type_names) / sizeof  (const char*) == Error + 2);
   return type_names[t];
 }
     

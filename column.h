@@ -34,7 +34,7 @@ public:
   virtual void fertilize (const AttributeList&, const Time&) = 0;
   virtual void fertilize (const IM&, double from, double to) = 0; // Mineral.
   virtual void fertilize (const IM&) = 0;
-  virtual vector<const Harvest*> harvest (const Time&, const string name,
+  virtual vector<const Harvest*> harvest (const Time&, const string& name,
 					  double stub_length, 
 					  double stem_harvest, 
 					  double leaf_harvest, 
@@ -57,9 +57,11 @@ public:
 
   // Create and Destroy.
 protected:
-  Column (string name);
+  Column (const string& name);
 public:
-  virtual void initialize (const Time& time, const Groundwater&) = 0;
+  virtual Column& clone (const string& name) const = 0;
+  virtual void initialize (const AttributeList& al,
+			   const Time& time, const Groundwater&) = 0;
 
   virtual ~Column ();
 };

@@ -181,14 +181,13 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList&)
   syntax.add ("UZbottom", Librarian<UZmodel>::library (), Syntax::Optional);
   syntax.add ("UZborder", Syntax::Integer, Syntax::Optional);
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  syntax.add ("Theta", Syntax::Number, Syntax::Optional, Syntax::Sequence);
-  syntax.add ("h", Syntax::Number, Syntax::Optional, Syntax::Sequence);
+  Geometry::add_layer (syntax, "Theta");
+  Geometry::add_layer (syntax, "h");
   syntax.add ("Xi", Syntax::Number, Syntax::Optional, Syntax::Sequence);
   syntax.add ("q", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
 }
 
-SoilWater::SoilWater (const Soil& soil, 
-		      const AttributeList& al)
+SoilWater::SoilWater (const AttributeList& al)
   : top (&Librarian<UZmodel>::create (al.alist ("UZtop"))),
     bottom (  al.check ("UZbottom") 
 	    ? &Librarian<UZmodel>::create (al.alist ("UZbottom"))
@@ -196,26 +195,30 @@ SoilWater::SoilWater (const Soil& soil,
     bottom_start (  al.check ("UZborder") 
 		  ? al.integer ("UZborder")
 		  : -1)
-{ 
+{ }
+
+void
+SoilWater::initialize (const AttributeList& al,
+		       const Soil& soil, const Groundwater& groundwater)
+{
   const unsigned int size = soil.size ();
 
-  if (al.check ("Theta"))
+  soil.initialize_layer (Theta_, al, "Theta");
+  soil.initialize_layer (h_, al, "h");
+
+  if (Theta_.size () > 0)
     {
-      Theta_ = al.number_sequence ("Theta");
-      assert (Theta_.size () > 0);
       while (Theta_.size () < size)
 	Theta_.push_back (Theta_[Theta_.size () - 1]);
-      if (!al.check ("h"))
+      if (!h_.size () == 0)
 	for (unsigned int i = 0; i < size; i++)
 	  h_.push_back (soil.h (i, Theta_[i]));
     }
-  if (al.check ("h"))
+  if (h_.size () > 0)
     {
-      h_ = al.number_sequence ("h");
-      assert (h_.size () > 0);
       while (h_.size () < size)
 	h_.push_back (h_[h_.size () - 1]);
-      if (!al.check ("Theta"))
+      if (Theta_.size () == 0)
 	for (unsigned int i = 0; i < size; i++)
 	  Theta_.push_back (soil.Theta (i, h_[i]));
     }
@@ -232,11 +235,7 @@ SoilWater::SoilWater (const Soil& soil,
 
   S.insert (S.begin (), size, 0.0);
   q_.insert (q_.begin (), size + 1, 0.0);
-}
 
-void
-SoilWater::initialize (const Soil& soil, const Groundwater& groundwater)
-{
   assert (h_.size () == Theta_.size ());
   if (h_.size () == 0)
     {

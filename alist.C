@@ -136,9 +136,48 @@ class dValue<string> : public Value
 {
   string value;
 public:
+  static bool is_identifier (const string& name)
+    {
+      if (name.size () < 1)
+	return false;
+
+      const char c = name[0];
+      if (c != '_' && c != '-' && !isalpha (c))
+	return false;
+      
+      for (unsigned int i = 1; i < name.size (); i++)
+	{
+	  const char c = name[i];
+	  if (c != '_' && c != '-' && !isalnum (c))
+	    return false;
+	}
+      return true;
+    }
+  static void print_string (ostream& out, const string& name)
+    {
+      out << "\"";
+      for (unsigned int i = 0; i < name.size (); i++)
+	switch (name[i])
+	  {
+	  case '\"':
+	    out << "\\\"";
+	    break;
+	  case '\\':
+	    out << "\\\\";
+	    break;
+	  default:
+	    out << name[i];
+	  }
+      out << "\"";
+    }
   void dump (ostream& out, const Syntax& syntax,
 	     const string& key, int indent)
-    { out << value; }
+    { 
+      if (is_identifier (value))
+	out << value; 
+      else
+	print_string (out, value);
+    }
   operator const string& () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (const string& v)
@@ -152,7 +191,8 @@ class dValue<Time> : public Value
 public:
   void dump (ostream& out, const Syntax& syntax,
 	     const string& key, int indent)
-    { out << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
+    { out << value.year () << " " << value.month () << " " 
+	  << value.mday () << " " << value.hour (); }
   operator const Time& () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (const Time& v)
@@ -176,6 +216,52 @@ public:
   operator AttributeList& () const throw1 (AttributeList::Invalid)
   { return value; }
   dValue (AttributeList& v)
+    : value (v)
+  { };
+};
+
+// Sequences of Attribute Lists and numbers can be dumped.
+class dValue<vector<double>/**/> : public Value
+{
+  const vector<double>& value;
+public:
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
+    { 
+      for (unsigned int i = 0; i < value.size (); i++)
+	{
+	  if (i > 0) 
+	    out << " ";
+	  out << value[i]; 
+	}
+    }
+  operator const vector<double>& () const throw1 (AttributeList::Invalid)
+  { return value; }
+  dValue (const vector<double>& v)
+    : value (v)
+  { };
+};
+
+class dValue<vector<AttributeList*>/**/> : public Value
+{
+  const vector<AttributeList*>& value;
+public:
+  void dump (ostream& out, const Syntax& syntax,
+	     const string& key, int indent)
+    { 
+      const Syntax& child = syntax.syntax (key);
+      for (unsigned int i = 0; i < value.size (); i++)
+	{
+	  if (i > 0) 
+	    out << "\n" + string (indent, ' ');
+	  out << "(";
+	  value[i]->dump (out, child, indent + 1); 
+	  out << ")";
+	}
+    }
+  operator const vector<AttributeList*>& () const throw1 (AttributeList::Invalid)
+  { return value; }
+  dValue (const vector<AttributeList*>& v)
     : value (v)
   { };
 };
@@ -221,7 +307,11 @@ AttributeList::Implementation::dump (ostream& out, const Syntax& syntax,
   bool first = true;
   for (unsigned int i = 0; i < order.size (); i++)
     {
-      first = false;
+      if (first) 
+	first = false;
+      else
+	out << " ";
+
       const string& key = order[i];
 
       if (check (key))

@@ -511,6 +511,13 @@ AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
 	  
 	  last = end;
 	}
+      // Fill C_per_N to match C.
+      for (unsigned int i = 0; i < om.size (); i++)
+	{
+	  assert (om[i]->C_per_N.size () > 0);
+	  while (om[i]->C_per_N.size () < om[i]->C.size ())
+	    om[i]->C_per_N.push_back(om[i]->C_per_N[om[i]->C_per_N.size ()-1]);
+	}
     }
   else if (syntax == "root")
     {

@@ -178,6 +178,46 @@ Geometry::swap (vector<double>& v, double from, double middle, double to) const
   assert (approximate (old_total, total (v)));
 }
 
+void Geometry::add_layer (Syntax& syntax, const string& name)
+{
+  static Syntax& layer = *new Syntax ();
+  if (!layer.ordered ())
+    {
+      // Initialize as first call.
+      layer.add ("size", Syntax::Number, Syntax::Const);
+      layer.add ("value", Syntax::Number, Syntax::Const);
+      layer.order ("size", "value");
+    }
+  syntax.add (string ("initial_") + name, layer,
+	      Syntax::Optional, Syntax::Sequence);
+  syntax.add (name, Syntax::Number, Syntax::Optional, Syntax::Sequence);
+}
+
+void Geometry::initialize_layer (vector<double>& array, 
+				 const AttributeList& al, 
+				 const string& name) const
+{
+  const string initial = string ("initial_") + name;
+  assert (array.size () == 0);
+  if (al.check (name))
+    // Specified by user.
+    array = al.number_sequence (name);
+  else if (al.check (initial))
+    {
+      // Initialize by layers.
+      vector<AttributeList*>& layers = al.alist_sequence (initial);
+      array.insert (array.begin (), size (), 0.0);
+      double last = 0.0;
+      for (unsigned int i = 0; i < layers.size (); i++)
+	{
+	  const double next = last - layers[i]->number ("size");
+	  const double value = layers[i]->number ("value");
+	  add (array, last, next, value);
+	  last = next;
+	}
+    }
+}
+
 void
 Geometry::load_syntax (Syntax& syntax, AttributeList&)
 { 

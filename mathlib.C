@@ -62,8 +62,7 @@ inline double pow3 (double x)
 { return x * x * x; }
 
 double
-single_positive_root_of_cubic_equation 
-(double a, double b, double c, double d)
+single_positive_root_of_cubic_equation (double a, double b, double c, double d)
 {
   const double p = 1.0 / 3.0 * ( - 1.0/3.0 * pow2 (b / a) + c / a);
   const double q = 1.0 / 2.0 * ( 2.0 / 27.0 * pow3 (b / a)
@@ -106,6 +105,37 @@ single_positive_root_of_cubic_equation
       
       assert (y3 >= 0);
       return y3;
+    }
+}
+
+double 
+single_positive_root_of_square_equation (double a, double b, double c)
+{
+  const double D = sqrt (pow2 (b) + 4.0 * a * c);
+  
+  // One solution.
+  if (D == 0.0)
+    {
+      const double x = -b / (2.0 * a);
+      // Must be positive.
+      assert (x >= 0.0);
+      return x;
+    }
+
+  // Two solutions.
+  const double x1 = (-b - D) / (2.0 * a);
+  const double x2 = (-b + D) / (2.0 * a);
+
+  // Return the positive solution.
+  if (x1 > 0.0)
+    {
+      assert (x2 <= 0.0);
+      return x1;
+    }
+  else
+    {
+      assert (x2 >= 0.0);
+      return x2;
     }
 }
 

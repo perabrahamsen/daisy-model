@@ -40,6 +40,12 @@ public:
   double total (const vector<double>& v) const;
   double total (const vector<double>& v, double from, double to) const;
 
+  // Layers -- Support initializing soil arrays layer by layer.
+  static void add_layer (Syntax& syntax, const string& name);
+  void initialize_layer (vector<double>& value, 
+			 const AttributeList& al, 
+			 const string& name) const;
+
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);
   Geometry (const AttributeList&);

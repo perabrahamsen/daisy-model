@@ -33,8 +33,9 @@ public:
   void output (Log&, Filter&) const;
   bool check (unsigned n) const;
   static void load_syntax (Syntax&, AttributeList&);
-  SoilHeat (const Soil&, const AttributeList&);
-  void initialize (const Soil& soil, const Time& time);
+  SoilHeat (const AttributeList&);
+  void initialize (const AttributeList& al, 
+		   const Soil& soil, const Time& time);
   ~SoilHeat ();
 };
 

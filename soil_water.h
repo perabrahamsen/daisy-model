@@ -61,8 +61,9 @@ public:
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);
-  SoilWater (const Soil&, const AttributeList&);
-  void initialize (const Soil& soil, const Groundwater& groundwater);
+  SoilWater (const AttributeList&);
+  void initialize (const AttributeList&, 
+		   const Soil& soil, const Groundwater& groundwater);
     ~SoilWater ();
 };
 

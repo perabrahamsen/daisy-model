@@ -65,20 +65,15 @@ Solute::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add ("transport", Librarian<Transport>::library (), Syntax::State);
   syntax.add ("adsorbtion", Librarian<Adsorbtion>::library (), Syntax::Const);
-  syntax.add ("C", Syntax::Number, Syntax::Optional, Syntax::Sequence);
-  syntax.add ("M", Syntax::Number, Syntax::Optional, Syntax::Sequence);
+  Geometry::add_layer (syntax, "C");
+  Geometry::add_layer (syntax, "M");
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
 }
 
 Solute::Solute (const AttributeList& al)
   : transport (Librarian<Transport>::create (al.alist ("transport"))),
     adsorbtion (Librarian<Adsorbtion>::create (al.alist ("adsorbtion")))
-{ 
-  if (al.check ("C"))
-    C_ = al.number_sequence ("C");
-  if (al.check ("M"))
-    M_ = al.number_sequence ("M");
-}
+{ }
 
 Solute::~Solute ()
 { 
@@ -114,8 +109,11 @@ Solute::swap (const Soil& soil, const SoilWater& soil_water,
 }
 
 void
-Solute::initialize (const Soil& soil, const SoilWater& soil_water)
+Solute::initialize (const AttributeList& al, 
+		    const Soil& soil, const SoilWater& soil_water)
 {
+  soil.initialize_layer (C_, al, "C");
+  soil.initialize_layer (M_, al, "M");
   if (C_.size () > 0)
     {
       // Fill it up.
