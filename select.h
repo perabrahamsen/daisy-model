@@ -73,6 +73,7 @@ public:
 private:
   vector<symbol> path;		// Content of this entry.
   const unsigned int path_size;	// #entries in path.
+  const unsigned int last_index;	// Index of last member in path.
   unsigned int current_path_index;// How nested in open's we are.
   unsigned int last_valid_path_index;	// Remember the last valid level.
   symbol current_name;
@@ -85,7 +86,8 @@ public:
     return current_name == wildcard || name == current_name; 
   }
   bool valid_level;
-
+  bool valid_leaf ()
+  { return valid_level && last_index == current_path_index; }
   void open (symbol name)	// Open one leaf level.
   { 
     // Remember nesting.

@@ -349,10 +349,10 @@ Select::match (const Daisy& daisy, Treelog& out, bool is_printing)
   daisy_assert (last_valid_path_index == 0U);
   daisy_assert (current_name == path[0]);
 
-  if (condition)
+  if (impl.condition)
     {
-      condition->tick (daisy, out);
-      is_active = condition->match (daisy);
+      impl.condition->tick (daisy, out);
+      is_active = impl.condition->match (daisy);
     }
   else
     is_active = is_printing;
@@ -487,6 +487,7 @@ Select::Select (const AttributeList& al)
     count (al.integer ("count")),
     path (al.identifier_sequence ("path")),
     path_size (path.size ()),
+    last_index (path_size - 1),
     current_path_index (0U),
     last_valid_path_index (0U),
     current_name (path[0]),

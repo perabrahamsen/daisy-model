@@ -340,7 +340,8 @@ COMPONENTS = phenology.C clayom.C equil.C pedo.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = som.C smb.C aom.C dom.C photosynthesis.C crpn.C vernalization.C \
+SUBMODELS = time.C \
+	som.C smb.C aom.C dom.C photosynthesis.C crpn.C vernalization.C \
 	partition.C production.C \
 	harvesting.C canopy_simple.C canopy_std.C root_system.C \
 	ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
@@ -351,7 +352,7 @@ SUBMODELS = som.C smb.C aom.C dom.C photosynthesis.C crpn.C vernalization.C \
 
 # Special or intermediate models with their own interface.
 #
-SPECIALS = om.C select_value.C \
+SPECIALS = log_all.C om.C select_value.C \
 	weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 	geometry.C printer_file.C log_alist.C log_clone.C column_base.C
 
@@ -362,7 +363,7 @@ OTHER = symbol.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
-	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
+	mathlib.C librarian.C cdaisy.C common.C nrutil.C \
 	submodel.C
 
 # Everything that has an interface.
@@ -692,7 +693,7 @@ rootdens${OBJ}: rootdens.C rootdens.h librarian.h common.h library.h \
  symbol.h alist.h syntax.h treelog.h assertion.h check.h
 select${OBJ}: select.C select.h condition.h librarian.h common.h library.h \
  symbol.h alist.h syntax.h treelog.h assertion.h geometry.h check.h \
- units.h
+ vcheck.h units.h
 average${OBJ}: average.C average.h librarian.h common.h library.h symbol.h \
  alist.h syntax.h treelog.h assertion.h
 mactrans${OBJ}: mactrans.C mactrans.h librarian.h common.h library.h \
@@ -751,6 +752,8 @@ svat${OBJ}: svat.C svat.h librarian.h common.h library.h symbol.h alist.h \
  syntax.h treelog.h assertion.h log.h
 vegetation${OBJ}: vegetation.C vegetation.h librarian.h common.h library.h \
  symbol.h alist.h syntax.h treelog.h assertion.h log.h
+time${OBJ}: time.C time.h assertion.h log.h librarian.h common.h library.h \
+ symbol.h alist.h syntax.h treelog.h vcheck.h submodel.h
 som${OBJ}: som.C som.h om.h plf.h submodel.h alist.h symbol.h
 smb${OBJ}: smb.C smb.h om.h plf.h dom.h adsorption.h librarian.h common.h \
  library.h symbol.h alist.h syntax.h treelog.h assertion.h transport.h \
@@ -861,6 +864,9 @@ bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
  symbol.h syntax.h treelog.h log.h librarian.h common.h library.h \
  assertion.h soil.h geometry.h am.h submodel.h plf.h aom.h om.h \
  check.h vcheck.h mathlib.h
+log_all${OBJ}: log_all.C log_all.h log_select.h log.h librarian.h common.h \
+ library.h symbol.h alist.h syntax.h treelog.h assertion.h select.h \
+ condition.h
 om${OBJ}: om.C om.h plf.h som.h smb.h dom.h adsorption.h librarian.h \
  common.h library.h symbol.h alist.h syntax.h treelog.h assertion.h \
  transport.h mactrans.h check.h vcheck.h geometry.h log.h mathlib.h \
@@ -934,9 +940,10 @@ lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h mathlib.h assertion.h
 lexer${OBJ}: lexer.C lexer.h tmpstream.h treelog.h symbol.h path.h
 daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h common.h \
  library.h symbol.h alist.h syntax.h treelog.h assertion.h im.h \
- groundwater.h uzmodel.h horizon.h log.h parser.h nitrification.h \
- bioclimate.h hydraulic.h field.h harvest.h chemicals.h action.h \
- condition.h column.h submodel.h tmpstream.h
+ groundwater.h uzmodel.h horizon.h log_all.h log_select.h log.h \
+ select.h condition.h parser.h nitrification.h bioclimate.h \
+ hydraulic.h field.h harvest.h chemicals.h action.h column.h \
+ submodel.h tmpstream.h
 alist${OBJ}: alist.C plf.h library.h symbol.h alist.h syntax.h treelog.h \
  common.h assertion.h
 syntax${OBJ}: syntax.C syntax.h treelog.h symbol.h alist.h library.h \
@@ -944,8 +951,6 @@ syntax${OBJ}: syntax.C syntax.h treelog.h symbol.h alist.h library.h \
 library${OBJ}: library.C library.h symbol.h alist.h syntax.h treelog.h \
  tmpstream.h assertion.h common.h
 plf${OBJ}: plf.C plf.h assertion.h
-time${OBJ}: time.C time.h assertion.h log.h librarian.h common.h library.h \
- symbol.h alist.h syntax.h treelog.h vcheck.h submodel.h
 mathlib${OBJ}: mathlib.C mathlib.h assertion.h
 librarian${OBJ}: librarian.C librarian.h common.h library.h symbol.h \
  alist.h syntax.h treelog.h assertion.h

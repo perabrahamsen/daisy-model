@@ -85,6 +85,8 @@ LogTable::match (const Daisy& daisy, Treelog& msg)
 void 
 LogTable::done ()
 { 
+  LogSelect::done ();
+
   if (!is_printing)
     return;
 

@@ -35,6 +35,7 @@ class Syntax;
 class AttributeList;
 class Condition;
 class Treelog;
+class LogAll;
 
 class Daisy
 {
@@ -48,6 +49,10 @@ public:
 public:
   bool running;
   const std::vector<Log*> logs;
+  LogAll& log_all;
+  static const std::vector<Log*> 
+  /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
+  const std::vector<Log*> active_logs;
   Condition& activate_output;
   Time time;
   Action& action;

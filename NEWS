@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.77
+
+** A bit more speedups and cleanups to logging.
+
 * 2.76
 
 ** Logging is much faster.

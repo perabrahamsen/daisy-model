@@ -26,11 +26,11 @@
 bool 
 LogSelect::check_member (symbol name) const
 { 
-  if (!is_active)
-    return false;
+  daisy_assert (is_active);
 
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->valid_level && entries[i]->valid (name))
+  const vector<Select*>& current = active_stack.top ();
+  for (unsigned int i = 0; i < current.size (); i++)
+    if (current[i]->valid_level && current[i]->valid (name))
       return true;
 
   return false;
@@ -47,29 +47,61 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
   condition.tick (daisy, out);
   is_printing = condition.match (daisy);
   is_active = is_printing;
+  daisy_assert (active_stack.empty ());
 
+  vector<Select*> current;
   for (unsigned int i = 0; i < entries.size (); i++)
     if (entries[i]->match (daisy, out, is_printing))
-      is_active = true;
+      {
+	is_active = true;
+	current.push_back (entries[i]);
+	daisy_assert (entries[i]->valid_level);
+      }
+
+  if (is_active)
+    active_stack.push (current);
 
   return is_active;
+}
+
+void
+LogSelect::done ()
+{ 
+  daisy_assert (active_stack.size () == 1);
+  active_stack.pop ();
 }
 
 void 
 LogSelect::open (symbol name)
 { 
   daisy_assert (is_active);
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->is_active)
-      entries[i]->open (name);
+  daisy_assert (!active_stack.empty ());
+
+  const vector<Select*>& current = active_stack.top ();
+  daisy_assert (&current == &active_stack.top ());
+  active_stack.push (vector<Select*> ());
+  vector<Select*>& next = active_stack.top ();
+  
+  for (unsigned int i = 0; i < current.size (); i++)
+    {
+      daisy_assert (current[i]->valid_level);
+      current[i]->open (name);
+      if (current[i]->valid_level)
+	next.push_back (current[i]);
+    }
 }
 
 void 
 LogSelect::close ()
 { 
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->is_active)
-      entries[i]->close ();
+  active_stack.pop ();
+  const vector<Select*>& current = active_stack.top ();
+
+  for (unsigned int i = 0; i < current.size (); i++)
+    {
+      daisy_assert (current[i]->is_active);
+      current[i]->close ();
+    }
 }
 
 void 
@@ -137,8 +169,8 @@ LogSelect::output (symbol name, const double value)
   const vector<Select*>& sels = (*i).second;
 
   for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid_level && sels[i]->valid (name))
-	  sels[i]->output_number (value);
+    if (sels[i]->valid_leaf ())
+      sels[i]->output_number (value);
 }
 
 void 
@@ -151,7 +183,7 @@ LogSelect::output (symbol name, const int value)
   const vector<Select*>& sels = (*i).second;
 
   for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid_level && sels[i]->valid (name))
+    if (sels[i]->valid_leaf ())
       sels[i]->output_integer (value);
 }
 
@@ -165,7 +197,7 @@ LogSelect::output (symbol name, const string& value)
   const vector<Select*>& sels = (*i).second;
 
   for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid_level && sels[i]->valid (name))
+    if (sels[i]->valid_leaf ())
       sels[i]->output_name (value);
 }
 
@@ -179,7 +211,7 @@ LogSelect::output (symbol name, const vector<double>& value)
   const vector<Select*>& sels = (*i).second;
 
   for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid_level && sels[i]->valid (name))
+    if (sels[i]->valid_leaf ())
       sels[i]->output_array (value, geometry ());
 }
 

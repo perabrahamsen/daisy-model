@@ -23,7 +23,7 @@
 #include "weather.h"
 #include "groundwater.h"
 #include "horizon.h"
-#include "log.h"
+#include "log_all.h"
 #include "parser.h"
 #include "nitrification.h"
 #include "bioclimate.h"
@@ -43,11 +43,27 @@
 const char *const Daisy::default_description = "\
 The Daisy Crop/Soil/Atmosphere Model.";
 
+const vector<Log*> 
+Daisy::find_active_logs (const vector<Log*>& logs, LogAll& log_all)
+{
+  vector<Log*> result;
+
+  for (unsigned int i = 0; i < logs.size (); i++)
+    if (!dynamic_cast<LogSelect*> (logs[i]))
+      result.push_back (logs[i]);
+  
+  result.push_back (&log_all);
+  
+  return result;
+}
+
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
     alist (al),
     running (false),
     logs (map_create<Log> (al.alist_sequence ("output"))),
+    log_all (*new LogAll (logs)),
+    active_logs (find_active_logs (logs, log_all)),
     activate_output (Librarian<Condition>::create
 		     (al.alist ("activate_output"))),
     time (al.alist ("time")),
@@ -109,9 +125,9 @@ Daisy::tick_logs (Treelog& out)
 
   if (activate_output.match (*this))
     {
-      for (unsigned int i = 0; i < logs.size (); i++)
+      for (unsigned int i = 0; i < active_logs.size (); i++)
 	{
-	  Log& log = *logs[i];
+	  Log& log = *active_logs[i];
 	  if (log.match (*this, out))
 	    {
 	      output_submodule (time, "time", log);
@@ -221,6 +237,7 @@ the simulation.  Can be overwritten by column specific weather.");
 Daisy::~Daisy ()
 {
   sequence_delete (logs.begin (), logs.end ());
+  delete &log_all;
   delete &activate_output;
   delete &action;
   if (weather)

@@ -28,6 +28,7 @@
 #include "condition.h"		// initialization in derived classes.
 #include <map>
 #include <vector>
+#include <stack>
 
 struct Select;
 struct Condition;
@@ -49,8 +50,11 @@ struct LogSelect : public Log
   typedef map<symbol, vector<Select*>/**/> symmap_t;
   symmap_t symmap;
 
+  stack<vector<Select*>/**/> active_stack;
+
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&);
+  void done ();
 
   // Open normal items.
   void open (symbol name);

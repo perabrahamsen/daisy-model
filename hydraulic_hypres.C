@@ -189,7 +189,7 @@ pedotransfer function");
     = 0.0202 + 0.0006193 * clay * clay - 0.001136 * humus * humus
     - 0.2316 * log (humus) - 0.03544 * rho_b * clay + 0.00283 * rho_b * silt
     + 0.0488 * rho_b * humus;
-  l = 10.0 * (exp (l_star) - 1.0) / (1.0 + exp (l_star));
+  l = (10.0 * exp (l_star) - 10.0) / (1.0 + exp (l_star));
   
   if (K_sat < 0.0 && K_init == NULL)
     {
@@ -217,12 +217,14 @@ pedotransfer function");
 
   // Debug messages.
   TmpStream tmp;
+  tmp () << ";; clay = " << clay << ", silt = " << silt << ", sand = "
+	 << sand << ", humus = " << humus << "\n";
   tmp () << "M_vG\n";
   tmp () << "(l " << l << ")\n";
   tmp () << ";; (m " << m << ")\n";
   tmp () << "(n " << n << ")\n";
   tmp () << "(alpha " << alpha << ")\n";
-  tmp () << "(K_sat " << K_sat << ")\n";
+  tmp () << "(K_sat " << K_sat << " [cm/h])\n";
   tmp () << "(Theta_sat " << Theta_sat << ")";
   msg.debug (tmp.str ());
 }

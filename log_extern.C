@@ -102,6 +102,8 @@ struct LogExtern : public LogSelect,
 void 
 LogExtern::done ()
 { 
+  LogSelect::done ();
+
   if (!is_printing)
     return;
 
