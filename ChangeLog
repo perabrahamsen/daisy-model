@@ -1,5 +1,14 @@
 2003-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.54 released.
+
+2003-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.h: Use namespace std to see if that help performance
+	on MinGW.
+
+	* organic_matter.C (partition): More debug code.
+
 	* Version 2.53 released.
 
 2003-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>

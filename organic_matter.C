@@ -1377,7 +1377,16 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  continue;
 	}
       if (smb[pool]->C.size () > lay)
-	daisy_assert (approximate (smb[pool]->C[lay], value));
+	{
+	  if (!approximate (smb[pool]->C[lay], value))
+	    {
+	      TmpStream tmp;
+	      tmp () << "smb[" << pool << "]: (old) " << smb[pool]->C[lay]
+		     << " != " << value << " (new)";
+	      msg.error (tmp.str ());
+	      error_found = true;
+	    }
+	}
       else
 	{
 	  daisy_assert (smb[pool]->C.size () == lay);
@@ -1409,7 +1418,16 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  continue;
 	}
       if (som[pool]->C.size () > lay)
-	daisy_assert (approximate (som[pool]->C[lay], value));
+	{
+	  if (!approximate (som[pool]->C[lay], value))
+	    {
+	      TmpStream tmp;
+	      tmp () << "som[" << pool << "]: (old) " << som[pool]->C[lay]
+		     << " != " << value << " (new)";
+	      msg.error (tmp.str ());
+	      error_found = true;
+	    }
+	}
       else
 	{
 	  daisy_assert (som[pool]->C.size () == lay);
