@@ -759,33 +759,38 @@
   (entries (year (path time))
            (month (path time))
            (mday (path time))
-           (flux_top (path column "$col" SoilChemicals solutes solute J)
+           (flux_top (path column "$col" SoilChemicals solutes
+			   solute J)
                      (tag "In")
                      (when hourly)
                      (dimension "g/ha/&")
                      (factor -1e8))     ;g/cm^2 -> g/ha
-           (flux_bottom (path column "$col" SoilChemicals solutes solute J)
+           (flux_bottom (path column "$col" SoilChemicals solutes
+			      solute J)
                         (tag "Leak-Matrix")
                         (when hourly)
                         (dimension "g/ha/&")
                         (factor -1e8))  ;g/cm^2 -> g/ha
-           (flux_bottom (path column "$col" SoilChemicals solutes solute J_p)
+           (flux_bottom (path column "$col" SoilChemicals solutes
+			      solute J_p)
                         (tag "Leak-Macro")
                         (when hourly)
                         (dimension "g/ha/&")
                         (factor -1e8))  ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes solute S_drain)
+           (interval (path column "$col" SoilChemicals solutes
+			   solute S_drain)
                      (tag "Drain")
                      (when hourly)
                      (dimension "g/ha/&")
                      (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes solute 
-                           S_external)
+           (interval (path column "$col" SoilChemicals solutes
+			   solute S_external)
                      (tag "External")
                      (when hourly)
                      (dimension "g/ha/&")
                      (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes solute uptaken)
+           (interval (path column "$col" SoilChemicals solutes
+			   solute uptaken)
                      (tag "Uptake")
                      (when hourly)
                      (dimension "g/ha/&")
@@ -796,7 +801,8 @@
                      (when hourly)
                      (dimension "g/ha/&")
                      (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes solute M)
+           (interval (path column "$col" SoilChemicals solutes
+			   solute M)
                      (tag "Content")
                      (dimension "g/ha")
                      (factor 1e8))))    ;g/cm^2 -> g/ha
@@ -805,6 +811,65 @@
   (where "soil_chemicals_000-100.dlf")
   (from   0)
   (to   -100))
+
+(deflog "Soil Chemical" table
+  (where "soil_chemical.dlf")
+  (when daily)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (flux_top (path column "$col" SoilChemicals solutes "$chem" 
+			   solute J)
+                     (tag "In")
+                     (when hourly)
+                     (dimension "g/ha/&")
+                     (factor -1e8))     ;g/cm^2 -> g/ha
+           (flux_bottom (path column "$col" SoilChemicals solutes "$chem"
+			      solute J)
+                        (tag "Leak-Matrix")
+                        (when hourly)
+                        (dimension "g/ha/&")
+                        (factor -1e8))  ;g/cm^2 -> g/ha
+           (flux_bottom (path column "$col" SoilChemicals solutes "$chem"
+			      solute J_p)
+                        (tag "Leak-Macro")
+                        (when hourly)
+                        (dimension "g/ha/&")
+                        (factor -1e8))  ;g/cm^2 -> g/ha
+           (interval (path column "$col" SoilChemicals solutes "$chem"
+			   solute S_drain)
+                     (tag "Drain")
+                     (when hourly)
+                     (dimension "g/ha/&")
+                     (factor 1e8))      ;g/cm^2 -> g/ha
+           (interval (path column "$col" SoilChemicals solutes "$chem"
+			   solute S_external)
+                     (tag "External")
+                     (when hourly)
+                     (dimension "g/ha/&")
+                     (factor 1e8))      ;g/cm^2 -> g/ha
+           (interval (path column "$col" SoilChemicals solutes "$chem"
+			   solute uptaken)
+                     (tag "Uptake")
+                     (when hourly)
+                     (dimension "g/ha/&")
+                     (factor 1e8))      ;g/cm^2 -> g/ha
+           (interval (path column "$col" SoilChemicals solutes "$chem"
+                           solute decomposed)
+                     (tag "Decompose")
+                     (when hourly)
+                     (dimension "g/ha/&")
+                     (factor 1e8))      ;g/cm^2 -> g/ha
+           (interval (path column "$col" SoilChemicals solutes "$chem"
+			   solute M)
+                     (tag "Content")
+                     (dimension "g/ha")
+                     (factor 1e8))))    ;g/cm^2 -> g/ha
+
+(deflog "Soil Chemical 0-100 cm" "Soil Chemical"
+  (where "soil_chemical_000-100.dlf")
+  (from    0 [cm])
+  (to   -100 [cm]))
 
 (deflog "Weather" table
   (where "weather.dlf")
