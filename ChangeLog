@@ -1,3 +1,19 @@
+2004-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.27 released.
+
+2004-01-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/wrape.dai ("Winter Rape"): Changed DSlim from 0.99 til 0.33. 
+	* lib/wwheat.dai ("Winter Wheat"): Changed DSlim from 0.99 til 0.25. 
+	* lib/dk-wwheat.dai ("Vinterhvede"): Ditto.
+	* lib/wbarley.dai ("Winter Barley"): Ditto.
+	* lib/dk-wbarley.dai ("Vinterbyg"): Ditto.
+	
+2004-01-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (initialize_zplus): Made it more numerically stable.
+
 2004-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.26 released.

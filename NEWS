@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.27
+
+** Adjusted parameterizations for winter crops (wheat, barley, and rape)
+
+** Slightly finer automatic numeric discretions of soil.
+
 * 3.26
 
 ** Made "weather default missing_years" more robust.

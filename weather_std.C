@@ -630,7 +630,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	}
     }
 
-  // Now and tomorrow.
+  // Now.
   Time now = time;
   if (active_map >= 0)
     {
@@ -640,15 +640,11 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	  TmpStream tmp;
 	  tmp () << "No mapped weather data for " << now.year () 
 		 << "-" << now.month ()
-		 << "-" << now.mday () << ":" << now.hour ()
-                 << "\nReusing last data.";
+		 << "-" << now.mday () << ":" << now.hour ();
 	  msg.error (tmp.str ());
           now = time;
         }
     }
-  Time tomorrow = now;
-  tomorrow.tick_day ();
-
   if (!now.between (begin, end))
     {
       TmpStream tmp;
@@ -659,6 +655,10 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       msg.error (tmp.str ());
       return;
     }
+
+  // Tomorrow.
+  Time tomorrow = now;
+  tomorrow.tick_day ();
 
   // Initialize.
   if (!initialized)

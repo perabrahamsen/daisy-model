@@ -349,13 +349,11 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 	  // We divide the soil into zones with desired interval sizes.
 	  double zone_end;
 	  double zone_size;
-	  bool do_round = true;
 	  
 	  if (last > -5.0)
 	    {
 	      zone_end = -5.0;
 	      zone_size = 2.5;
-	      do_round = true;
 	    }
 	  else if (volatile_bottom)
 	    {
@@ -382,9 +380,9 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 	  if (zone_size > max_interval)
 	    zone_size = max_interval;
 
-	  if (current < zone_end - zone_size)
+	  if (current < zone_end - zone_size + 1e-8)
 	    // The zone ends before the next fixed interval limit.
-	    while (last > zone_end)
+	    while (last > zone_end + 1e-8)
 	      // Just add intervals to the end of the zone.
 	      {
 		last -= zone_size;
@@ -394,7 +392,8 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 	    // The next fixed interval limit is before the end of the zone.
 	    {
 	      // Find approximate number of intervals until fixed limit.
-	      const int intervals = double2int ((last - current) / zone_size);
+	      const int intervals 
+                = double2int ((last - current) / zone_size + 0.499);
 	      if (intervals > 1)
 		{
 		  // Add interior intervals.
@@ -404,19 +403,11 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 		  for (int j = 1; j < intervals; j++)
 		    {
 		      const double next = first - step * j;
-		      if (do_round)
-			{
-			  if (!approximate (double2int (next), last))
-			    {
-			      last = double2int (next);
-			      zplus_.push_back (last);
-			    }
-			}
-		      else
-			{
-			  last = next;
-			  zplus_.push_back (last);
-			}
+                      if (!approximate (double2int (next), last))
+                        {
+                          last = double2int (next);
+                          zplus_.push_back (last);
+                        }
 		    }
 		}
 	      // Add fixed limit.
