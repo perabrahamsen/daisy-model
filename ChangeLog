@@ -1,5 +1,15 @@
 1998-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 0.005 released.
+
+1998-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.C: Removed exception handling.
+
+	* filter_some.C (lookup): Replace THROW with assert (false).
+	* library.C (lookup): Ditto.
+	(syntax): Ditto.
+
 	* Version 0.004 released.
 
 1998-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>

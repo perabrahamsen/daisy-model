@@ -22,48 +22,35 @@ public:
 
   // Retrieve data (Singletons).
   virtual operator double () const
-    throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator const string& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator bool () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator int () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator const CSMP& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator AttributeList& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
-  virtual operator const Time& () const throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
+  virtual operator const Time& () const
+    { assert (false); }
 
   // Retrieve data (Sequences).
   virtual operator const vector<double>& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator const vector<string>& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator const vector<bool>& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator const vector<int>& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator const vector<const CSMP*>& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator const vector<AttributeList*>& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
   virtual operator const vector<const Time*>& () const
-       throw1 (AttributeList::Invalid)
-    { THROW (AttributeList::Invalid ()); }
+    { assert (false); }
 
   // Compare data.
   virtual bool subset (const Value&, const Syntax&, const string&) const = 0;
@@ -84,7 +71,7 @@ class dValue : public Value
 {
   const T& value;
 public:
-  operator const T& () const throw1 (AttributeList::Invalid)
+  operator const T& () const
   { return value; }
   bool subset (const Value& v, const Syntax&, const string&) const
     { return value == T (v); }
@@ -98,7 +85,7 @@ class dValue<double> : public Value
 {
   double value;
 public:
-  operator double () const throw1 (AttributeList::Invalid)
+  operator double () const
   { return value; }
   bool subset (const Value& v, const Syntax&, const string&) const
     { return value == double (v); }
@@ -112,7 +99,6 @@ class dValue<int> : public Value
   int value;
 public:
   operator int () const
-    throw1 (AttributeList::Invalid)
   { return value; }
   bool subset (const Value& v, const Syntax&, const string&) const
     { return value == int (v); }
@@ -125,7 +111,7 @@ class dValue<bool> : public Value
 {
   bool value;
 public:
-  operator bool () const throw1 (AttributeList::Invalid)
+  operator bool () const
   { return value; }
   bool subset (const Value& v, const Syntax&, const string&) const
     { return value == bool (v); }
@@ -138,7 +124,7 @@ class dValue<string> : public Value
 {
   string value;
 public:
-  operator const string& () const throw1 (AttributeList::Invalid)
+  operator const string& () const
   { return value; }
   bool subset (const Value& v, const Syntax&, const string&) const
     { return value == string (v); }
@@ -151,7 +137,7 @@ class dValue<Time> : public Value
 {
   const Time& value;
 public:
-  operator const Time& () const throw1 (AttributeList::Invalid)
+  operator const Time& () const
   { return value; }
   bool subset (const Value& v, const Syntax&, const string&) const
     { return v == value; }
@@ -164,7 +150,7 @@ class dValue<AttributeList> : public Value
 {
   AttributeList& value;
 public:
-  operator AttributeList& () const throw1 (AttributeList::Invalid)
+  operator AttributeList& () const
   { return value; }
   bool subset (const Value& v, const Syntax& syntax, const string& key) const
     {
@@ -195,7 +181,7 @@ class dValue<vector<double>/**/> : public Value
 {
   const vector<double> value;
 public:
-  operator const vector<double>& () const throw1 (AttributeList::Invalid)
+  operator const vector<double>& () const
   { return value; }
   bool subset (const Value& v, const Syntax&, 
 	      const string&) const
@@ -210,7 +196,6 @@ class dValue<vector<AttributeList*>/**/> : public Value
   const vector<AttributeList*> value;
 public:
   operator const vector<AttributeList*>& () const
-    throw1 (AttributeList::Invalid)
   { return value; }
   // BAD KLUDGE.
   bool is_alist_sequence () const

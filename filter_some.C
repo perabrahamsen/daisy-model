@@ -41,8 +41,10 @@ FilterSome::lookup (string key) const
   
   if (i != filters.end ())
     return *(*i).second;
-  else
-    THROW (AttributeList::Uninitialized ());
+
+  assert (false);
+  // Not reached.
+  return lookup (key);
 }
 
 void 

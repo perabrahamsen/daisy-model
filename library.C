@@ -50,7 +50,7 @@ Library::Implementation::lookup (const string& key) const
   alist_map::const_iterator i = alists.find (key);
 
   if (i == alists.end ())
-    THROW (AttributeList::Uninitialized ());
+    assert (false);
 
   return *(*i).second;
 }
@@ -87,7 +87,7 @@ Library::Implementation::syntax (const string& key) const
   syntax_map::const_iterator i = syntaxen.find (key);
 
   if (i == syntaxen.end ())
-    THROW (AttributeList::Uninitialized ());
+    assert (false);
 
   return *(*i).second;
 }
