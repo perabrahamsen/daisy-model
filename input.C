@@ -2,7 +2,7 @@
 
 #include "input.h"
 #include "manager.h"
-#include "wheather.h"
+#include "bioclimate.h"
 #include "log.h"
 #include "horizon.h"
 #include "column.h"
@@ -32,6 +32,7 @@ struct Input::Implementation
     Library columns;
     Library managers;
     string chief;
+    Time time;
     ColumnList field;
     void load ();
     int get ();
@@ -53,6 +54,7 @@ struct Input::Implementation
     void load_crops (CropList&);
     void load_library (Library& lib);
     void load_list (AttributeList*, const Syntax*);
+    Time get_time ();
     const Condition* get_condition ();
     const Action* get_action ();
     const Filter* get_filter (const Syntax*);
@@ -66,16 +68,21 @@ struct Input::Implementation
     Implementation (int& argc, char**& argv, ostream&);
 };
 
+const Time& 
+Input::makeTime () const
+{
+    return impl.time;
+}
 Manager& 
 Input::makeManager () const
 { 
     return *new Manager (impl.managers.lookup (impl.chief));
 }
 
-Wheather& 
-Input::makeWheather () const 
+Bioclimate& 
+Input::makeBioclimate () const 
 {     
-    return *new Wheather ();
+    return *new Bioclimate ();
 }
 
 Log& 
@@ -117,6 +124,8 @@ Input::Implementation::load ()
 		load_library (managers);
 	    else if (item == "chief")
 		chief = get_id ();
+	    else if (item == "time")
+		time = get_time ();
 	    else if (item == "field")
 		load_columns (field);
 	    else if (item == "log")
@@ -530,6 +539,9 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 			}
 		    break;
 		}
+		case Syntax::Date:
+		    atts->add (name, get_time ());
+		    break;
 		case Syntax::Error:
 		    error (string("Unknown attribute `") + name + "'");
 		    skip_to_end ();
@@ -541,6 +553,26 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 	}
 }
 
+Time
+Input::Implementation::get_time ()
+{
+    int year = get_integer ();
+    int month = get_integer ();
+    int mday = get_integer ();
+    int hour = (looking_at (')') ? 0 : get_integer ());
+
+    if (month < 1 || month > 12)
+	error ("There are only 12 month in a year");
+    else if (mday < 1 || mday > Time::month_length (year, month))
+	error ("That day doesn't exists in the selected month");
+    else if (hour < 0 || hour > 23)
+	error ("Specify an hour between 0 and 23 only");
+    else
+	return Time (year, month, mday, hour); 
+
+    return Time (-999, 1, 1, 0);
+}
+
 const Condition*
 Input::Implementation::get_condition ()
 { 
@@ -549,21 +581,15 @@ Input::Implementation::get_condition ()
     string name = get_id ();
     if (name == "at")
 	{ 
-	    int day = get_integer ();
-	    int hour = get_integer ();
-	    condition = new ConditionAt (day, hour);
+	    condition = new ConditionAt (get_time ());
 	}
     else if (name == "before")
 	{ 
-	    int day = get_integer ();
-	    int hour = get_integer ();
-	    condition = new ConditionBefore (day, hour);
+	    condition = new ConditionBefore (get_time ());
 	}
     else if (name == "after")
 	{ 
-	    int day = get_integer ();
-	    int hour = get_integer ();
-	    condition = new ConditionAfter (day, hour);
+	    condition = new ConditionAfter (get_time ());
 	}
     else if (name == "hourly")
 	{ 
@@ -724,6 +750,7 @@ Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
       horizons (),
       columns (),
       chief ("manager"),
+      time (0, 1, 1, 0),
       err (e),
       line (1),
       column (0)

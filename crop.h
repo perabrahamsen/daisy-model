@@ -23,14 +23,14 @@ public:
 protected:
     // <insert calculation functions here>
 public:
-    void tick (const Wheather& wheater, int day, int hour);
-    void output (Log&, const Filter*) const;
+    virtual void tick (const Bioclimate&, const Time&);
+    virtual void output (Log&, const Filter*) const;
 
     // Create and Destroy.
 public:
     Crop (const string, const AttributeList& pl);
     Crop (const string, const AttributeList& pl, const AttributeList& pl);
-    ~Crop ();
+    virtual ~Crop ();
 };
 
 #endif CROP_H

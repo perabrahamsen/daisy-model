@@ -3,7 +3,7 @@
 #include "daisy.h"
 #include "input.h"
 #include "manager.h"
-#include "wheather.h"
+#include "bioclimate.h"
 #include "log.h"
 #include "column.h"
 #include "action.h"
@@ -14,17 +14,16 @@
 #include <iostream.h>
 
 struct Daisy::Implementation
-{
-    int day;
-    int hour;
-    Implementation () : day (0), hour (0) { }
+{   
+    Implementation () { };
 };
 
 Daisy::Daisy (const Input& input)
-    : impl (*new Implementation), 
+    : impl (*new Implementation ()), 
       log (input.makeLog ()), 
+      time (input.makeTime ()),
       manager (input.makeManager ()),
-      wheather (input.makeWheather ()), 
+      bioclimate (input.makeBioclimate ()), 
       columns (input.makeColumns ()),
       crops (input.makeCrops ())
 { }
@@ -40,9 +39,10 @@ Daisy::run ()
 	    if (action->stop ())
 		break;
 	    
-	    cout << "Tick " << impl.day << ":" << impl.hour << " ";
+	    cout << "Tick " << time.year () << "-" << time.month () << "-"
+		 << time.mday () << " " << time.hour () << " ";
 
-	    action->doIt (columns, wheather, crops, log);
+	    action->doIt (columns, bioclimate, crops, log);
 
 	    ColumnList::iterator prev;
 	    ColumnList::iterator column = columns.end ();
@@ -56,15 +56,10 @@ Daisy::run ()
 
 		    (*column)->tick (((prev != columns.end ()) ? *prev : 0),
 				     ((next != columns.end ()) ? *next : 0),
-				     wheather, impl.day, impl.hour);
+				     bioclimate, time);
 		}
 
-	    if (++impl.hour > 23)
-		{
-		    impl.hour = 0;
-		    impl.day++;
-		}
-
+	    time.step ();
 	    log.tick (*this);
 	}
 }
@@ -72,13 +67,14 @@ Daisy::run ()
 bool
 Daisy::match (const Condition* c) const
 {
-    return c->match (columns, wheather, impl.day, impl.hour);
+    return c->match (columns, bioclimate, time);
 }
 
 void
 Daisy::output (Log& log, const Filter* filter) const
 {
     log.open ();
+    log.output ("time", filter, time);
     if (filter->check ("columns"))
 	output_field (log, filter->lookup ("columns"));
     log.close ();
@@ -102,7 +98,7 @@ Daisy::output_field (Log&, const Filter* filter) const
 Daisy::~Daisy ()
 {
     delete &manager;
-    delete &wheather;
+    delete &bioclimate;
     delete &log;
     delete &impl;
     for (ColumnList::iterator column = columns.begin();
@@ -121,5 +117,6 @@ DaisySyntax::DaisySyntax ()
 { 
     Syntax* syntax = new Syntax ();
     syntax->add ("columns", Syntax::Columns);
+    syntax->add ("time", Syntax::Date);
     syntax_table->add ("daisy", syntax);
 }

@@ -6,6 +6,7 @@
 #include "daisy.h"
 
 struct AttributeList;
+struct Time;
 
 class Column
 {
@@ -24,21 +25,29 @@ public:
     string name;
     CropList crops;
 
-    // Simulation.
+    // Run.
 public:
-    void tick (Column* left, Column* rigth, const Wheather& wheater, 
-	       int day, int hour);
+    virtual void tick (Column* left, Column* rigth, const Bioclimate& wheater, 
+		       const Time&);
     void sow (const Library& croplib, string crop, Log&);
 
-    void output (Log&, const Filter*) const;
+    virtual void output (Log&, const Filter*) const;
     void output_crops (Log&, const Filter*) const;
+    
+#if 0
+    // Simulation.
+    virtual double PotentialTranspiration (const Bioclimate&);
+    virtual double SoilTemperature (double depth);
+    virtual double MaxRootingDepth ();
+    virtual double EvapInterception ();
+#endif
 
     // Create and Destroy.
 public:
     Column (string name, 
 	    const AttributeList& paramenters, const AttributeList& variables, 
 	    const Library& horizons);
-    ~Column ();
+    virtual ~Column ();
 };
 
 #endif COLUMN_H

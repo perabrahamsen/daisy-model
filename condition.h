@@ -1,12 +1,12 @@
 // condition.h -- Logic expressions
 
 #include "daisy.h"
+#include "time.h"
 
 class Condition
 {  
 public:
-    virtual bool match (ColumnList&, const Wheather&, 
-			int day, int hour) const;
+    virtual bool match (ColumnList&, const Bioclimate&, const Time&) const;
     static Condition null;
 protected:
     Condition ();
@@ -16,36 +16,33 @@ public:
 
 class ConditionAt : public Condition
 {
-    const int day;
-    const int hour;
+    const Time time;
 public:
-    bool match (ColumnList&, const Wheather&, int d, int h) const;
-    ConditionAt (int d, int h);
+    bool match (ColumnList&, const Bioclimate&, const Time&) const;
+    ConditionAt (const Time&);
 };
 
 class ConditionBefore : public Condition
 {
-    const int day;
-    const int hour;
+    const Time time;
 public:
-    bool match (ColumnList&, const Wheather&, int d, int h) const;
-    ConditionBefore (int d, int h);
+    bool match (ColumnList&, const Bioclimate&, const Time&) const;
+    ConditionBefore (const Time&);
 };
 
 class ConditionAfter : public Condition
 {
-    const int day;
-    const int hour;
+    const Time time;
 public:
-    bool match (ColumnList&, const Wheather&, int d, int h) const;
-    ConditionAfter (int d, int h);
+    bool match (ColumnList&, const Bioclimate&, const Time&) const;
+    ConditionAfter (const Time&);
 };
 
 class ConditionHourly : public Condition
 {
     const int step;
 public:
-    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    bool match (ColumnList&, const Bioclimate&, const Time&) const;
     ConditionHourly (int);
 };
 
@@ -53,7 +50,7 @@ class ConditionDaily : public Condition
 {
     const int step;
 public:
-    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    bool match (ColumnList&, const Bioclimate&, const Time&) const;
     ConditionDaily (int);
 };
 
@@ -61,7 +58,7 @@ class ConditionWeekly : public Condition
 {
     const int step;
 public:
-    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    bool match (ColumnList&, const Bioclimate&, const Time&) const;
     ConditionWeekly (int);
 };
 
@@ -69,7 +66,7 @@ class ConditionMonthly : public Condition
 {
     const int step;
 public:
-    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    bool match (ColumnList&, const Bioclimate&, const Time&) const;
     ConditionMonthly (int);
 };
 
@@ -77,7 +74,7 @@ class ConditionYearly : public Condition
 {
     const int step;
 public:
-    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    bool match (ColumnList&, const Bioclimate&, const Time&) const;
     ConditionYearly (int);
 };
 

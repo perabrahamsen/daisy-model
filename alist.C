@@ -23,6 +23,7 @@ public:
     virtual const AttributeList& list () const throw (AttributeList::Invalid);
     virtual CropList& crops () const throw (AttributeList::Invalid);
     virtual ColumnList& columns () const throw (AttributeList::Invalid);
+    virtual const Time& time () const throw (AttributeList::Invalid);
 protected:
     Value ();
     virtual ~Value ();
@@ -52,6 +53,14 @@ class ValueBool : public Value
 public:
     bool flag () const;
     ValueBool (bool);
+};
+
+class ValueTime : public Value
+{
+    Time value;
+public:
+    const Time& time () const;
+    ValueTime (const Time&);
 };
 
 class ValueArray : public Value
@@ -116,6 +125,12 @@ Value::name () const throw (AttributeList::Invalid)
 
 bool
 Value::flag () const throw (AttributeList::Invalid)
+{ 
+    THROW (AttributeList::Invalid ());
+}
+
+const Time&
+Value::time () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
 }
@@ -186,6 +201,15 @@ ValueBool::flag () const
 }
 
 ValueBool::ValueBool (bool b) : value (b)
+{ }
+
+const Time&
+ValueTime::time () const
+{
+    return value;
+}
+
+ValueTime::ValueTime (const Time& t) : value (t)
 { }
 
 const vector<double>&
@@ -321,6 +345,12 @@ AttributeList::flag (string key) const throw2 (Invalid, Uninitialized)
     return impl.lookup (key)->flag ();
 }
 
+const Time&
+AttributeList::time (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->time ();
+}
+
 const vector<double>& 
 AttributeList::array (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -373,6 +403,12 @@ void
 AttributeList::add (string key, bool v)
 {
     impl.add (key, new ValueBool (v));
+}
+
+void 
+AttributeList::add (string key, const Time& v)
+{
+    impl.add (key, new ValueTime (v));
 }
 
 void 

@@ -3,6 +3,8 @@
 #ifndef DAISY_H
 #define DAISY_H
 
+#include "time.h"
+
 #include <std/typeinfo.h>
 #include <std/string.h>
 #include <list.h>
@@ -11,7 +13,7 @@ class Column;
 class Crop;
 class Daisy;
 class Manager;
-class Wheather;
+class Bioclimate;
 class Log;
 class Input;
 class Library;
@@ -45,8 +47,9 @@ class Daisy
     Implementation& impl;
 public:
     Log& log;
+    Time time;
     Manager& manager;
-    Wheather& wheather;
+    Bioclimate& bioclimate;
     ColumnList& columns;
     const Library& crops;
 

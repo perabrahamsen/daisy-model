@@ -163,6 +163,20 @@ Log::print (string s)
 }
 
 void
+Log::output (string name, const Filter* filter, const Time& value)
+{
+    if (filter->check (name))
+	{
+	    open (name);
+	    ostrstream scratch;
+	    scratch << value.year () << " " << value.month () << " "
+		    << value.mday () << " " << value.hour ();
+	    print (scratch.str ());
+	    close ();
+	}
+}
+
+void
 Log::output (string name, const Filter* filter, const bool& value)
 {
     if (filter->check (name))

@@ -20,8 +20,9 @@ private:
     
     // Extract.
 public:
+    const Time& makeTime () const;
     Manager& makeManager () const;
-    Wheather& makeWheather () const;
+    Bioclimate& makeBioclimate () const;
     Log& makeLog () const;
     ColumnList& makeColumns () const;
     const Library& makeCrops () const;

@@ -1,11 +1,11 @@
-// wheather.h
+// bioclimate.h
 
-#ifndef WHEATHER_H
-#define WHEATHER_H
+#ifndef BIOCLIMATE_H
+#define BIOCLIMATE_H
 
 #include "daisy.h"
 
-class Wheather
+class Bioclimate
 {
     // Content.
 private:
@@ -13,7 +13,7 @@ private:
     // Create and Destroy.
 private:
     friend Input; // Only create from Input.
-    Wheather ();
+    Bioclimate ();
 };
 
-#endif WHEATHER_H
+#endif BIOCLIMATE_H

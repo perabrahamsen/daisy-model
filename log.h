@@ -11,6 +11,7 @@ class Condition;
 class Daisy;
 class Column;
 class Crop;
+class Time;
 
 class Log
 {
@@ -21,6 +22,7 @@ public:
     void open (string = "");
     void close ();
     void print (string);
+    void output (string, const Filter*, const Time&);
     void output (string, const Filter*, const bool&);
     void output (string, const Filter*, const double&);
     void output (string, const Filter*, const vector<double>&);

@@ -4,7 +4,7 @@
 #include "column.h"
 
 void 
-Action::doIt (ColumnList&, const Wheather&, const Library&, Log&) const
+Action::doIt (ColumnList&, const Bioclimate&, const Library&, Log&) const
 {
     cout << "resting...\n";
 }
@@ -24,7 +24,7 @@ Action::~Action ()
 { }
 
 void 
-ActionSow::doIt (ColumnList& cl, const Wheather&, const Library& crops,
+ActionSow::doIt (ColumnList& cl, const Bioclimate&, const Library& crops,
 		 Log& log) const
 {
     cout << "Sowing " << crop << "\n";
@@ -41,7 +41,7 @@ ActionSow::ActionSow (string c) : crop (c)
 { }
 
 void 
-ActionStop::doIt (ColumnList&, const Wheather&, const Library&, Log&) const
+ActionStop::doIt (ColumnList&, const Bioclimate&, const Library&, Log&) const
 {
     assert (0);
 }

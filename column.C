@@ -23,11 +23,11 @@ Column::Implementation::~Implementation ()
 { }
 
 void Column::tick (Column* /* left */, Column* /* rigth */,
-		   const Wheather& wheater, int day, int hour)
+		   const Bioclimate& wheater, const Time& time)
 {
     cout << "Column `" << name << "' tick\n"; 
     for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
-	 (*crop)->tick (wheater, day, hour);
+	 (*crop)->tick (wheater, time);
 }
 
 void Column::sow (const Library& croplib, string crop, Log& log)
@@ -72,6 +72,33 @@ Column::output_crops (Log& log, const Filter* filter) const
 	}
     log.close ();
 }
+
+#if 0
+double
+PotentialTranspiration (const Bioclimate&)
+{
+    return 1;
+}
+
+double
+SoilTemperature (double /* depth */)
+{
+    return ;
+}
+
+double
+MaxRootingDepth ()
+{
+    return 100;
+}
+
+double
+EvapInterception ()
+{
+    return ;
+}
+
+#endif
 
 Column::~Column ()
 { 

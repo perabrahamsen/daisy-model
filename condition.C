@@ -3,7 +3,7 @@
 #include "condition.h"
 
 bool
-Condition::match (ColumnList&, const Wheather&, int /* d */, int /* h */) const
+Condition::match (ColumnList&, const Bioclimate&, const Time&) const
 {
     return true;
 }
@@ -17,73 +17,86 @@ Condition::~Condition ()
 { }
 
 bool
-ConditionAt::match (ColumnList&, const Wheather&, int d, int h) const
+ConditionAt::match (ColumnList&, const Bioclimate&, const Time& t) const
 {
-    return day == d && hour == h;
+    return time == t;
 }
 
-ConditionAt::ConditionAt (int d, int h) : day (d), hour (h)
+ConditionAt::ConditionAt (const Time& t) 
+    : time (t)
 { }
 
 bool
-ConditionBefore::match (ColumnList&, const Wheather&, int d, int h) const
+ConditionBefore::match (ColumnList&, const Bioclimate&, const Time& t) const
 {
-    return day > d || (day == d && hour > h);
+    return time > t;
 }
 
-ConditionBefore::ConditionBefore (int d, int h) : day (d), hour (h)
+ConditionBefore::ConditionBefore (const Time& t)
+    : time (t)
 { }
 
 bool
-ConditionAfter::match (ColumnList&, const Wheather&, int d, int h) const
+ConditionAfter::match (ColumnList&, const Bioclimate&, const Time& t) const
 {
-    return day < d || (day == d && hour < h);
+    return time < t;
 }
 
-ConditionAfter::ConditionAfter (int d, int h) : day (d), hour (h)
+ConditionAfter::ConditionAfter (const Time& t)
+    : time (t)
 { }
 
 bool
-ConditionHourly::match (ColumnList&, const Wheather&, int d, int h) const
+ConditionHourly::match (ColumnList&, const Bioclimate&, const Time& t) const
 {
-    return ((24 * d + h) % step) == 0;
+    // BUG:  Behave strangely around new year.
+    return ((24 * t.yday () + t.hour ()) % step) == 0;
 }
 
-ConditionHourly::ConditionHourly (int s) : step (s)
+ConditionHourly::ConditionHourly (int s)
+    : step (s)
 { }
 
 bool
-ConditionDaily::match (ColumnList&, const Wheather&, int d, int h) const
+ConditionDaily::match (ColumnList&, const Bioclimate&, const Time& t) const
 {
-    return h == 0 && (d % step) == 0;
+    // BUG:  Behave strangely around new year.
+    return t.hour () == 0 && (t.yday () % step) == 0;
 }
 
-ConditionDaily::ConditionDaily (int s) : step (s)
+ConditionDaily::ConditionDaily (int s)
+    : step (s)
 { }
 
 bool
-ConditionWeekly::match (ColumnList&, const Wheather&, int d, int h) const
+ConditionWeekly::match (ColumnList&, const Bioclimate&, const Time& t) const
 {
-    return h == 0 && (d % step) == 0;
+    // BUG:  Behave strangely around new year.
+    return t.hour () == 0 && (t.yday () % step) == 0;
 }
 
-ConditionWeekly::ConditionWeekly (int s) : step (7 * s)
+ConditionWeekly::ConditionWeekly (int s)
+    : step (7 * s)
 { }
 
 bool
-ConditionMonthly::match (ColumnList&, const Wheather&, int d, int h) const
+ConditionMonthly::match (ColumnList&, const Bioclimate&, const Time& t) const
 {
-    return h == 0 && (d % step) == 0;
+    // BUG:  Behave strangely around new year.
+    return t.hour () == 0 && (t.yday () % step) == 0;
 }
 
-ConditionMonthly::ConditionMonthly (int s) : step (30 * s)
+ConditionMonthly::ConditionMonthly (int s)
+    : step (30 * s)
 { }
 
 bool
-ConditionYearly::match (ColumnList&, const Wheather&, int d, int h) const
+ConditionYearly::match (ColumnList&, const Bioclimate&, const Time& t) const
 {
-    return h == 0 && (d % step) == 0;
+    // BUG:  Behave strangely around new year.
+    return t.hour () == 0 && (t.yday () % step) == 0;
 }
 
-ConditionYearly::ConditionYearly (int s) : step (365 * s)
+ConditionYearly::ConditionYearly (int s)
+    : step (365 * s)
 { }

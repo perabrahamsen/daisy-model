@@ -4,6 +4,7 @@
 #define ALIST_H
 
 #include "daisy.h"
+#include "time.h"
 #include <std/stdexcept.h>
 #include <vector.h>
 
@@ -56,6 +57,9 @@ public:
         throw2 (Invalid, Uninitialized);
     ColumnList& columns (string) const
         throw2 (Invalid, Uninitialized);
+    const Time& time (string) const
+        throw2 (Invalid, Uninitialized);
+
 
     // Create and Destroy.
     void add (string, double);
@@ -67,6 +71,7 @@ public:
     void add (string, string);
     void add (string, const vector<double>&);
     void add (string, bool);
+    void add (string, const Time&);
     AttributeList ();
     ~AttributeList ();
 };

@@ -2,9 +2,10 @@
 
 #include "crop_impl.h"
 #include "log.h"
+#include "time.h"
 
 void
-Crop::tick (const Wheather& /* wheater */, int /* day */, int /* hour */)
+Crop::tick (const Bioclimate&, const Time&)
 { 
     cout << "Crop `" << name << "' tick\n"; 
 }
