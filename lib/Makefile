@@ -8,7 +8,7 @@ DAISY 	= crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS)
 MSHE	= mshe.dai mshe-standalone.dai
 TEXT	= Makefile test.dai
-CLIMATE = weather.clm
+CLIMATE = weather.dwf
 REMOVE 	=  cutgrass.dai 
 
 all:
@@ -38,7 +38,7 @@ dist:
 
 # Update the CVS repository.
 #
-cvs: $(DAISY) $(TEXT) $(MSHE)
+cvs: $(DAISY) $(TEXT) $(MSHE) $(CLIMATE)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(DAISY) $(TEXT) $(MSHE)
 	rm -f $(REMOVE) 
