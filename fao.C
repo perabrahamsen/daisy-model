@@ -207,7 +207,7 @@ FAO::PenmanMonteith (double CropHeight, double ScreenHeight,
 
 double
 FAO::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
-			double U2, double AtmPressure, Treelog& out)
+			double U2, double AtmPressure)
 {
   double E3 = 0.03525 * SlopeVapourPressureCurve (Temp) * (Rn - G) +
     PsychrometricConstant (AtmPressure, Temp)
@@ -215,26 +215,6 @@ FAO::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
     (SaturationVapourPressure (Temp) - ea);
   E3 /= SlopeVapourPressureCurve (Temp) +
     PsychrometricConstant (AtmPressure, Temp) * (1 + 0.34 * U2);
-#if 1
-  if (Rn>750.0)
-    {
-      TmpStream tmp;
-      tmp () << "Rn          " << Rn << "\n"
-	     << "G           " << G << "\n"
-	     << "Temp        " << Temp << "\n"
-	     << "es          " 
-	     << SaturationVapourPressure (Temp) << "\n"
-	     << "ea          " << ea << "\n"
-	     << "U2          " << U2 << "\n"
-	     << "AtmPressure " << AtmPressure << "\n"
-	     << "Delta       "
-	     << SlopeVapourPressureCurve (Temp) << "\n"
-	     << "Gamma       "
-	     << PsychrometricConstant (AtmPressure, Temp) << "\n"
-	     << "Ep (mm/d)   " << E3;
-      out.warning (tmp.str ());
-    }
-#endif
   return E3 / 86400.0; // [kg/m2/s]
 }
 

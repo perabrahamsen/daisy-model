@@ -49,6 +49,7 @@ private:
 public:
   void clear ();
   void monthly (const Geometry& soil);
+  size_t active_size (const Soil&, const SoilWater&) const;
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&, Treelog& msg);
   void transport (const Soil&, const SoilWater&, Treelog&);

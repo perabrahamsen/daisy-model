@@ -60,7 +60,7 @@ struct ActionIrrigate : public Action
         out.message (tmp.str ());      
       }
     else if (daisy.time == end_time)
-      out.message ("Irrating done");
+      out.message ("Irrigating done");
 
     irrigate (daisy.field, flux, temp, sm);
   }

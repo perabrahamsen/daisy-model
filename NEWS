@@ -14,10 +14,43 @@ release.
 
 * 3.48
 
+** Nitrification parameter moved.
+
+This used to be a parameter of the default Column model.  It is now a
+parameter of the default horizon model.  This means you can have
+different nitrification parameters for different horizons.
+
+Note that unless you have special knowledge, you should not set the
+nitrification parameters explicitly.  The default values are usually
+adequate. 
+
+You need to fetch a new log.dai to get correct nitrification logs.  Or
+you can change 
+
+  Nitrification "*" 
+
+to just 
+
+  Nitrification 
+
+(i.e. remove the "*") in you log models manually.
+
+** active_underground and active_groundwater only set once.
+
+They have been removed from the nitrification models and the
+Denitrification submodel, so now they are only set in the
+OrganicMatter submodel.  Setting them in OrganicMatter also affects
+nitrification and denitrification.
+
+By default, there is no mineralization, nitrification or
+denitrification below the root zone.
+
 ** Log summaries can now be redirected to files.
 
 There is a new "where" summary parameter.   It is mostly intended to
-help me create a test suite.
+help me create a better test suite.
+
+** Daisy will complain if the "stop" time is after end of weather data.
 
 * 3.47
 

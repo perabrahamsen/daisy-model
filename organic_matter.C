@@ -178,6 +178,7 @@ struct OrganicMatter::Implementation
 			      const vector<double>& default_value,
 			      bool use_clay,
 			      vector<double>& scratch) const;
+  size_t active_size (const Soil&, const SoilWater&) const;
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
 	     SoilNO3&, SoilNH4&, Treelog& msg);
   void transport (const Soil&, const SoilWater&, Treelog&);
@@ -1016,6 +1017,20 @@ OrganicMatter::Implementation::find_abiotic (const OM& om,
   return &scratch[0];
 }
 
+size_t
+OrganicMatter::Implementation::active_size (const Soil& soil, 
+                                            const SoilWater& soil_water) const
+{
+  size_t size = soil.size ();
+  if (!active_underground && soil.zplus (size - 1) < -100.0)
+    size = soil.interval_plus (min (-100.0, soil.MaxRootingDepth ())) + 1;
+  if (!active_groundwater)
+    size = min (soil_water.first_groundwater_node (), size);
+  size = min (size, soil.size ());
+  
+  return size;
+}
+
 void 
 OrganicMatter::Implementation::tick (const Soil& soil, 
 				     const SoilWater& soil_water, 
@@ -1044,12 +1059,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     dom[j]->clear ();
 
   // Setup arrays.
-  unsigned int size = soil.size ();
-  if (!active_underground && soil.zplus (size - 1) < -100.0)
-    size = soil.interval_plus (min (-100.0, soil.MaxRootingDepth ())) + 1;
-  if (!active_groundwater)
-    size = min (soil_water.first_groundwater_node (), size);
-  size = min (size, soil.size ());
+  const size_t size = active_size (soil, soil_water);
   
   vector<double> N_soil (size);
   vector<double> N_used (size);
@@ -2556,6 +2566,11 @@ OrganicMatter::clear ()
 void 
 OrganicMatter::monthly (const Geometry& geometry)
 { impl.monthly (geometry); }
+
+size_t
+OrganicMatter::active_size (const Soil& soil, 
+                            const SoilWater& soil_water) const
+{ return impl.active_size (soil, soil_water); }
 
 void 
 OrganicMatter::tick (const Soil& soil, 

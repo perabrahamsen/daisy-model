@@ -1,7 +1,7 @@
 // soil.C
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2004 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2004 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -240,6 +240,14 @@ Soil::output (Log& log) const
 	}
     }
 }
+
+void 
+Soil::nitrification (const size_t i,
+                     const double M, const double C, 
+                     const double M_left,
+                     const double h, const double T,
+                     double& NH4, double& N2O, double& NO3) const
+{ horizon_[i]->nitrification (M, C, M_left, h,  T, NH4, N2O, NO3); }
 
 double
 Soil::MaxRootingDepth () const

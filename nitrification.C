@@ -21,7 +21,13 @@
 
 
 #include "nitrification.h"
+#include "soil.h"
+#include "soil_water.h"
+#include "soil_heat.h"
+#include "soil_NH4.h"
+#include "soil_NO3.h"
 #include "log.h"
+#include "mathlib.h"
 
 EMPTY_TEMPLATE
 Librarian<Nitrification>::Content* Librarian<Nitrification>::content = NULL;
@@ -30,12 +36,53 @@ const char *const Nitrification::description = "\
 The nitrification process, transforming ammonium into nitrate and\n\
 nitrous oxide.";
 
-void
-Nitrification::output (Log& log) const
+double 
+Nitrification::f_h (double h)
 {
-  output_variable (NH4, log);
-  output_variable (NO3, log);
-  output_variable (N2O, log);
+  if (h >= 0.0)
+    return 0.6;
+
+  const double pF = h2pF (h);
+
+  if (pF <= 0.0)
+    return 0.0;
+  if (pF <= 1.5)
+    return pF / 1.5;
+  if (pF <= 2.5)
+    return 1.0;
+  if (pF <= 5.0)
+    return 1.0 - (pF - 2.5) / (5.0 - 2.5);
+  
+  return 0.0;
+}
+      
+double 
+Nitrification::f_T (double T)
+{
+#if 1
+  if (T < 2.0)
+    return 0.0;
+  if (T < 6.0)
+    return 0.15 * (T - 2.0);
+  if (T < 20.0)
+    return 0.10 * T;
+#else
+  if (T < 1.0)
+    return 0.0;
+  if (T < 5.0)
+    return 0.125 * (T - 1.0);
+  if (T < 20.0)
+    return 0.10 * T;
+#endif
+  if (T < 37.0)
+    return exp (0.47 - 0.027 * T + 0.00193 * T * T);
+  if (T < 60.0)
+    {
+      // J.A. van Veen and M.J.Frissel.
+      const double max_val = exp (0.47 - 0.027 * T + 0.00193 * T * T);
+      return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
+    }
+  return 0.0;
 }
 
 void
@@ -44,15 +91,6 @@ Nitrification::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_fraction ("N2O_fraction", Syntax::Const, 
                        "Fraction of ammonium lost as N2O.");
   alist.add ("N2O_fraction", 0.02);
-  syntax.add ("NH4", 
-              "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
-              "Amount of ammonium consumed this hour.");
-  syntax.add ("NO3", 
-              "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
-              "Amount of nitrate generated this hour.");
-  syntax.add ("N2O", 
-              "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
-              "Amount of nitrous oxide generated this hour.");
 }
 
 Nitrification::Nitrification (const AttributeList& al)

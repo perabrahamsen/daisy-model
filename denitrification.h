@@ -39,8 +39,6 @@ class Denitrification
 {
   // Parameters.
 private: 
-  const bool active_underground; // True, iff turnover happens below rootzone.
-  const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double K;
   const double K_fast;
   const double alpha;
@@ -61,7 +59,8 @@ private:
   // Simulation.
 public:
   void output (Log&) const;
-  void tick (const Soil&, const SoilWater&, const SoilHeat&, SoilNO3&,
+  void tick (size_t size, 
+             const Soil&, const SoilWater&, const SoilHeat&, SoilNO3&,
 	     const OrganicMatter&);
 
   // Create.

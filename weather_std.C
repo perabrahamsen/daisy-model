@@ -1257,7 +1257,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
       err.error ("Simulation starts before weather data");
       ok = false;
     }
-  if (to > end && find_map (to) < 0)
+  if (to.year () < 9000 && to > end && find_map (to) < 0)
     {
       err.error ("Simulation ends after weather data");
       ok = false;

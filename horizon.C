@@ -1,7 +1,7 @@
 // horizon.C
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2004 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2004 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -29,6 +29,7 @@
 #include "mathlib.h"
 #include "tortuosity.h"
 #include "texture.h"
+#include "nitrification.h"
 #include "log.h"
 #include "check_range.h"
 #include "vcheck.h"
@@ -64,7 +65,10 @@ struct Horizon::Implementation
   vector<double> K_ice;
 
   // Chemistry.
-  /* const */map<string, double, less<string>/**/> attributes;
+  /*const*/ map<string, double, less<string>/**/> attributes;
+  
+  // Nitrification.
+  /*const*/ Nitrification& nitrification;
   
   // Initialize.
   // Note:  These variables are really not used after initialization.
@@ -88,6 +92,7 @@ struct Horizon::Implementation
   
   // Create.
   Implementation (const AttributeList& al);
+  ~Implementation ();
 };
 
 const double 
@@ -333,6 +338,8 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
     anisotropy (al.number ("anisotropy")),
+    nitrification (Librarian<Nitrification>::create 
+		   (al.alist ("Nitrification"))),
     intervals (al.integer ("intervals"))
 { 
   if (al.check ("C_soil"))
@@ -345,6 +352,11 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     dry_bulk_density = al.number ("dry_bulk_density");
   else 
     dry_bulk_density = -1.0;
+}
+
+Horizon::Implementation::~Implementation ()
+{
+  delete &nitrification;
 }
 
 double
@@ -452,6 +464,13 @@ hydraulic model");
 }
 
 void 
+Horizon::nitrification (const double M, const double C, 
+                        const double M_left,
+                        const double h, const double T,
+                        double& NH4, double& N2O, double& NO3) const
+{ impl.nitrification.tick (M, C, M_left, h,  T, NH4, N2O, NO3); }
+
+void 
 Horizon::output (Log& log) const
 { output_derived (hydraulic, "hydraulic", log); }
 
@@ -541,6 +560,19 @@ Negative numbers mean unspecified, let Daisy find appropriate values.");
 Factor multiplied to the turnover rate for all organic matter pools in\n\
 this horizon.");
   alist.add ("turnover_factor", 1.0);
+  syntax.add ("Nitrification", Librarian<Nitrification>::library (),
+              "The soil nitrification process.");
+  AttributeList nitrification_alist;
+  nitrification_alist.add ("type", "soil");
+  nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-6/24 [1/h]
+  nitrification_alist.add ("k", 5.0e-5); // [g N/cm^3]
+  nitrification_alist.add ("heat_factor", PLF::empty ());
+  nitrification_alist.add ("water_factor", PLF::empty ());
+  nitrification_alist.add ("N2O_fraction", 0.02);
+
+  alist.add ("Nitrification", nitrification_alist);
+
+
   syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("quarts_form_factor", 2.0);

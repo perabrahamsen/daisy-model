@@ -71,6 +71,10 @@ public:
 
   // Simulation.
 public:
+  void nitrification (const double M, const double C, 
+                      const double M_left,
+                      const double h, const double T,
+                      double& NH4, double& N2O, double& NO3) const;
   void output (Log&) const;
 
   // Create and Destroy.

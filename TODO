@@ -1,7 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Dario: check at groundwater file virker
 
-* Brug "stop" til at checke mod weather.
+* Omdøb lib/weather.dwf to sample/taastrup.dwf
+
+... og lib/test.dai to sample/test.dai
 
 * crop simple med nit
 
@@ -77,6 +80,28 @@ plus lineær fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
 ** Akademisk bekrivelse?
 
 Til referencemanual?
+
+* Make "daisy" a program model.
+
+
+** create a new "program" component.
+
+** made daisy a model instead of a submodel.
+
+** change top level to only contain definitions (and input, path, directory)
+
+Instead of "defhorizon" we would have 
+
+(horizon Ap default ...)
+
+** the main program is what is executed, unless something else is specified.
+
+(program main daisy ...)
+
+** a new "batch" program
+
+(program main batch
+   setup1 setup2 setup3)
 
 * Idea: Ignore "ordered" when creating a derived parameterization.
 

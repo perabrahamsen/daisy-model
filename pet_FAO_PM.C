@@ -101,7 +101,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const Vegetation& crops,
 
   reference_evapotranspiration_dry
     = FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
-                              AtmPressure, out)
+                              AtmPressure)
     * 3600;
 
   potential_evapotranspiration_dry
@@ -110,7 +110,7 @@ PetFAO_PM::tick (const Time&, const Weather& weather, const Vegetation& crops,
 
   reference_evapotranspiration_wet
     = FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
-                              AtmPressure, out)
+                              AtmPressure)
     * 3600;
   potential_evapotranspiration_wet
     = reference_to_potential (crops, surface,

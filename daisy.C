@@ -88,14 +88,14 @@ Daisy::check (Treelog& err)
   // Check weather.
   {
     Treelog::Open nest (err, "weather");
-    if (weather && !weather->check (time, time, err))
+    if (weather && !weather->check (time, stop, err))
       ok = false;
   }
 
   // Check field.
   {
     Treelog::Open nest (err, "column");
-    if (!field.check (weather == NULL, time, time, err))
+    if (!field.check (weather == NULL, time, stop, err))
       ok = false;
   }
   // Check logs.

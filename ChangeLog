@@ -1,3 +1,55 @@
+2004-09-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.48 released.
+
+2004-09-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* denitrification.C, denitrification.h (active_underground,
+	active_groundwater): Removed parameter.
+	(tick): Take size parameter.
+	* column_std.C (tick): Update caller.
+
+	* horizon.h, horizon.C (nitrification_): New parameter.
+	* horizon.h, horizon.C, soil.C, soil.h (nitrification): New function.
+	* organic_matter.C, organic_matter.h (active_size): New function. 
+	* organic_matter.C (tick): Use it.
+	* column_std.C (NitLog): New member class.
+	(nitrification): Change to NitLog class.
+	* lib/log.dai ("N Balance", "Denitrification"): Update users.
+
+2004-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* nitrification.C, nitrification.h, nitrification_solute.C,
+	nitrification_soil.C (tick): Split in two. 
+
+2004-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* fao.C, fao.h (RefPenmanMonteith): Removed debug message and
+	Treelog parameter.
+	* pet_FAO_PM.C (tick): Update caller.
+	* pet_PM.C (tick): Ditto.
+
+2004-08-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/exercises.tex (section{Writing a \Daisy{} Setup File}): Use
+	"(description)" for description string.
+
+2004-08-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/pedo-soil.dai: Moved dry_bulk_density from Cosby to
+	HYPRES. 
+
+2004-07-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/weather.dwf: Removed noise char.
+
+2004-07-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C (check): Check stop time.
+
+	* weather_std.C (check): A to.year after 9000 means no specific
+	limit. 
+
 2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* summary_simple.C (where): New parameter.

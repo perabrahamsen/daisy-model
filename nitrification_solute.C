@@ -33,9 +33,6 @@
 class NitrificationSolute : public Nitrification
 {
   // Parameters.
-private: 
-  const bool active_underground; // True, iff turnover happens below rootzone.
-  const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double k;
   const double k_10;
   const PLF heat_factor;
@@ -43,113 +40,45 @@ private:
 
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&);
+  void tick (const double M, const double C, 
+             const double M_left,
+             const double h, const double T,
+             double& NH4, double& N2O, double& NO3) const;
 
   // Create.
 public:
   NitrificationSolute (const AttributeList&);
 };
 
-static double f_h (double h)
-{
-  if (h >= 0.0)
-    return 0.6;
-
-  const double pF = h2pF (h);
-
-  if (pF <= 0.0)
-    return 0.0;
-  if (pF <= 1.5)
-    return pF / 1.5;
-  if (pF <= 2.5)
-    return 1.0;
-  if (pF <= 5.0)
-    return 1.0 - (pF - 2.5) / (5.0 - 2.5);
-  
-  return 0.0;
-}
-      
-static double f_T (double T)
-{
-#if 1
-  if (T < 2.0)
-    return 0.0;
-  if (T < 6.0)
-    return 0.15 * (T - 2.0);
-  if (T < 20.0)
-    return 0.10 * T;
-#else
-  if (T < 1.0)
-    return 0.0;
-  if (T < 5.0)
-    return 0.125 * (T - 1.0);
-  if (T < 20.0)
-    return 0.10 * T;
-#endif
-  if (T < 37.0)
-    return exp (0.47 - 0.027 * T + 0.00193 * T * T);
-  if (T < 60.0)
-    {
-      // J.A. van Veen and M.J.Frissel.
-      const double max_val = exp (0.47 - 0.027 * T + 0.00193 * T * T);
-      return max_val * (1.0 - (T - 37.0) / (60.0 - 37.0));
-    }
-  return 0.0;
-}
-
 void 
-NitrificationSolute::tick (const Soil& soil, const SoilWater& soil_water,
-			   const SoilHeat& soil_heat,
-			   SoilNO3& soil_NO3, SoilNH4& soil_NH4)
+NitrificationSolute::tick (const double /* M */, const double C, 
+                           const double M_left,
+                           const double h, const double T,
+                           double& NH4, double& N2O, double& NO3) const
 {
-  unsigned int size = soil.size ();
-  if (!active_underground)
-    size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
-  if (!active_groundwater)
-    size = soil_water.first_groundwater_node ();
+  const double T_factor = (heat_factor.size () < 1)
+    ? f_T (T)
+    : heat_factor (T);
+  const double w_factor = (water_factor.size () < 1)
+    ? f_h (h)
+    : water_factor (h);
 
-  if (NH4.size () < size)
-    NH4.insert (NH4.end (), size - NH4.size (), 0.0);
-  if (NO3.size () < size)
-    NO3.insert (NO3.end (), size - NO3.size (), 0.0);
-  if (N2O.size () < size)
-    N2O.insert (N2O.end (), size - N2O.size (), 0.0);
-
-  fill (NH4.begin(), NH4.end (), 0.0);
-  fill (NO3.begin(), NO3.end (), 0.0);
-  fill (N2O.begin(), N2O.end (), 0.0);
-
-  for (unsigned int i = 0; i < size; i++)
+  const double rate = k_10 * w_factor * T_factor * C / (k + C);
+  daisy_assert (rate >= 0.0);
+  daisy_assert (M_left >= 0.0);
+  const double M_new = min (rate, M_left / dt - 1e-8);
+  if (M_new > 0.0)
     {
-      const double C = soil_NH4.C (i);
-      const double h = soil_water.h (i);
-      const double T = soil_heat.T (i);
-      const double T_factor = (heat_factor.size () < 1)
-	? f_T (T)
-	: heat_factor (T);
-      const double w_factor = (water_factor.size () < 1)
-	? f_h (h)
-	: water_factor (h);
-      const double rate = k_10 * w_factor * T_factor * C / (k + C);
-      daisy_assert (rate >= 0.0);
-      daisy_assert (soil_NH4.M_left (i) >= 0.0);
-      const double M_new = min (rate, soil_NH4.M_left (i) / dt - 1e-8);
-      if (M_new > 0.0)
-        {
-          NH4[i] = M_new;
-          N2O[i] = M_new * N2O_fraction;
-          NO3[i] = NH4[i] - N2O[i];
-        }
+      NH4 = M_new;
+      N2O = M_new * N2O_fraction;
+      NO3 = NH4 - N2O;
     }
-  soil_NH4.add_to_sink (NH4);
-  soil_NO3.add_to_source (NO3);
+  else
+    NH4 = N2O = NO3 = 0.0;
 }
 
 NitrificationSolute::NitrificationSolute (const AttributeList& al)
   : Nitrification (al),
-    active_underground (al.flag ("active_underground")),
-    active_groundwater (al.flag ("active_groundwater")),
     k (al.number ("k")),
     k_10 (al.number ("k_10")),
     heat_factor (al.plf ("heat_factor")),
@@ -172,12 +101,6 @@ static struct NitrificationSoluteSyntax
     alist.add ("description", 
 	       "k_10 * C / (k + C).  Michaelis-Menten kinetics,\n\
 with nitrification based on ammonium solute.");
-    syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
-Set this to true to enable nitrification below the root zone.");
-    alist.add ("active_underground", false);
-    syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
-Set this to true to enable nitrification in the groundwater.");
-    alist.add ("active_groundwater", false);
     syntax.add ("k", "g/cm^3", Check::positive (), Syntax::Const, 
 		"Half saturation constant.");
     syntax.add ("k_10", "h^-1", Check::non_negative (),

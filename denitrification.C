@@ -65,7 +65,8 @@ Denitrification::output (Log& log) const
   output_variable (potential_fast, log);
 }
 
-void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
+void Denitrification::tick (const size_t size,
+                            const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    SoilNO3& soil_NO3, 
 			    const OrganicMatter& organic_matter)
@@ -75,12 +76,6 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
   converted_redox.erase (converted_redox.begin (), converted_redox.end ());
   potential.erase (potential.begin (), potential.end ());
   potential_fast.erase (potential_fast.begin (), potential_fast.end ());
-
-  unsigned int size = soil.size ();
-  if (!active_underground)
-    size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
-  if (!active_groundwater)
-    size = soil_water.first_groundwater_node ();
 
   for (unsigned int i = 0; i < size; i++)
     {
@@ -133,12 +128,6 @@ denitrification is also affected by temperature and water pressure.\n\
 Additional denitrification from CO2 produced from fast OM pools can\n\
 be triggered by setting alpha_fast or water_factor_fast different.\n\
 This additional denitrification is limited by K_fast.");
-  syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
-Set this flag to turn on denitrification below the root zone.");
-  alist.add ("active_underground", false);
-  syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
-Clear this flag to turn off denitrification in groundwater.");
-  alist.add ("active_groundwater", true);
   syntax.add ("converted", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Amount of denitrification.");
   syntax.add ("converted_fast", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -190,9 +179,7 @@ By default no redox denitrification occurs.");
 }
 
 Denitrification::Denitrification (const AttributeList& al)
-  : active_underground (al.flag ("active_underground")),
-    active_groundwater (al.flag ("active_groundwater")),
-    K (al.number ("K")),
+  : K (al.number ("K")),
     K_fast (al.number ("K_fast", K)),
     alpha (al.number ("alpha")),
     alpha_fast (al.number ("alpha_fast", alpha)),

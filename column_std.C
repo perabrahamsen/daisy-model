@@ -24,7 +24,6 @@
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include "organic_matter.h"
-#include "nitrification.h"
 #include "denitrification.h"
 #include "im.h"
 #include "am.h"
@@ -36,7 +35,6 @@ private:
   SoilNH4 soil_NH4;
   SoilNO3 soil_NO3;
   OrganicMatter organic_matter;
-  Nitrification& nitrification;
   Denitrification denitrification;
   double second_year_utilization_;
 
@@ -52,6 +50,30 @@ private:
   double volatilization_surface;
   double fertilized_DM;
   double first_year_utilization;
+
+public:
+  struct NitLog			// Nitrification log variables.
+  {
+  // Log variables.
+    vector<double> NH4;
+    vector<double> NO3;
+    vector<double> N2O;
+
+    // Simulation.
+    void tick (const size_t size,
+               const Soil& soil, const SoilWater& soil_water,
+               const SoilHeat& soil_heat,
+               SoilNO3& soil_NO3, SoilNH4& soil_NH4);
+    void output (Log&) const;
+    
+    // Create and Destroy.
+    void initialize (const size_t size);
+    static void load_syntax (Syntax&, AttributeList&);
+    NitLog (const AttributeList&)
+    { }
+    ~NitLog () 
+    { }
+  } nitrification;
 
   // Actions.
 public:
@@ -109,6 +131,69 @@ public:
   void initialize (const Time&, Treelog&, const Weather*);
   ~ColumnStandard ();
 };
+
+void 
+ColumnStandard::NitLog::tick (const size_t size,
+                              const Soil& soil, const SoilWater& soil_water,
+                              const SoilHeat& soil_heat,
+                              SoilNO3& soil_NO3, SoilNH4& soil_NH4)
+{
+  for (int i = 0; i < soil.size (); i++)
+    {
+      daisy_assert (soil_NO3.M_left (i) >= 0.0);
+      daisy_assert (soil_NH4.M_left (i) >= 0.0);
+    }
+
+  daisy_assert (NH4.size () == NO3.size ());
+  daisy_assert (N2O.size () == NO3.size ());
+  daisy_assert (soil.size () == NO3.size ());
+
+  for (unsigned int i = 0; i < size; i++)
+    {
+      soil.nitrification (i, 
+                          soil_NH4.M (i), soil_NH4.C (i), soil_NH4.M_left (i),
+                          soil_water.h (i), soil_heat.T (i),
+                          NH4[i], N2O[i], NO3[i]);
+    }
+  for (unsigned int i = size; i < NH4.size (); i++)
+    NH4[i] = N2O[i] = NO3[i] = 0.0;
+
+  soil_NH4.add_to_sink (NH4);
+  soil_NO3.add_to_source (NO3);
+
+  for (int i = 0; i < soil.size (); i++)
+    {
+      daisy_assert (soil_NO3.M_left (i) >= 0.0);
+      daisy_assert (soil_NH4.M_left (i) >= 0.0);
+    }
+}
+
+void 
+ColumnStandard::NitLog::output (Log& log) const
+{ 
+  output_variable (NH4, log);
+  output_variable (NO3, log);
+  output_variable (N2O, log);
+}
+    
+void 
+ColumnStandard::NitLog::initialize (const size_t size)
+{
+  NH4 = vector<double> (size, 0.0);
+  NO3 = vector<double> (size, 0.0);
+  N2O = vector<double> (size, 0.0);
+}
+
+void 
+ColumnStandard::NitLog::load_syntax (Syntax& syntax, AttributeList&)
+{
+  syntax.add ("NH4", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
+              "Amount of ammonium consumed this hour.");
+  syntax.add ("NO3", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
+              "Amount of nitrate generated this hour.");
+  syntax.add ("N2O", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
+              "Amount of nitrous oxide generated this hour.");
+}
 
 void 
 ColumnStandard::sow (Treelog& msg, const AttributeList& al)
@@ -386,8 +471,10 @@ ColumnStandard::tick (Treelog& out,
 		   residuals_N_soil, residuals_C_soil, out);
   organic_matter.tick (soil, soil_water, soil_heat, 
 		       soil_NO3, soil_NH4, out);
-  nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
-  denitrification.tick (soil, soil_water, soil_heat, soil_NO3, 
+  const size_t active_size = organic_matter.active_size (soil, soil_water);
+  nitrification.tick (active_size,
+                      soil, soil_water, soil_heat, soil_NO3, soil_NH4);
+  denitrification.tick (active_size, soil, soil_water, soil_heat, soil_NO3, 
 			organic_matter);
   groundwater.tick (soil, soil_water, surface.h (), soil_heat, time, out);
 
@@ -416,7 +503,6 @@ ColumnStandard::output_inner (Log& log) const
       Log::Open open (log, OrganicMatter_symbol);
       organic_matter.output (log, soil);
     }
-  output_derived (nitrification, "Nitrification", log);
   output_submodule (denitrification, "Denitrification", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
   output_variable (seed_N, log);
@@ -429,6 +515,7 @@ ColumnStandard::output_inner (Log& log) const
   output_variable (volatilization_surface, log);
   output_variable (fertilized_DM, log);
   output_variable (first_year_utilization, log);
+  output_submodule (nitrification, "Nitrification", log);
 }
 
 bool 
@@ -472,8 +559,6 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     soil_NH4 (al.alist ("SoilNH4")),
     soil_NO3 (al.alist ("SoilNO3")),
     organic_matter (al.alist ("OrganicMatter")),
-    nitrification (Librarian<Nitrification>::create 
-		   (al.alist ("Nitrification"))),
     denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),
     seed_N (0.0),
@@ -485,7 +570,8 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     fertilized_NH4_surface (0.0),
     volatilization_surface (0.0),
     fertilized_DM (0.0),
-    first_year_utilization (0.0)
+    first_year_utilization (0.0),
+    nitrification (al.alist ("Nitrification"))
 { }
 
 void 
@@ -505,13 +591,12 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water, err);
   organic_matter.initialize (alist.alist ("OrganicMatter"), soil, soil_water, 
 			     T_avg, err);
+  nitrification.initialize (soil.size ());
   vegetation.initialize (time, soil, &organic_matter, err);
 }
 
 ColumnStandard::~ColumnStandard ()
-{
-  delete &nitrification;
-}
+{ }
 
 static struct ColumnStandardSyntax
 {
@@ -537,20 +622,6 @@ static struct ColumnStandardSyntax
     syntax.add_submodule ("OrganicMatter", alist, Syntax::State, "\
 The organic matter in the soil and on the surface.",
 			  OrganicMatter::load_syntax);
-    syntax.add ("Nitrification", Librarian<Nitrification>::library (),
-		"The soil nitrification process.");
-    AttributeList nitrification_alist;
-    nitrification_alist.add ("type", "soil");
-    nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-6/24 [1/h]
-    nitrification_alist.add ("k", 5.0e-5); // [g N/cm^3]
-    nitrification_alist.add ("active_underground", false);
-    nitrification_alist.add ("active_groundwater", false);
-    nitrification_alist.add ("heat_factor", PLF::empty ());
-    nitrification_alist.add ("water_factor", PLF::empty ());
-    nitrification_alist.add ("clay_factor", PLF::empty ());
-    nitrification_alist.add ("N2O_fraction", 0.02);
-
-    alist.add ("Nitrification", nitrification_alist);
     syntax.add_submodule ("Denitrification", alist, Syntax::State, "\
 The denitrification process.",
 			  Denitrification::load_syntax);
@@ -584,5 +655,9 @@ This includes dry matter incorporated directly in the soil.");
 Amount of NH4 volatilization, also from incorporated fertilizer.");
     syntax.add ("volatilization_surface", "kg N/ha/h", Syntax::LogOnly, "\
 Amount of NH4 volatilization, only from surface applied fertilizer.");
+    syntax.add_submodule ("Nitrification", alist, Syntax::State, "\
+The nitrification log.\n\
+Note that the nitrification parameters are found in the horizons.",
+			  ColumnStandard::NitLog::load_syntax);
   }
 } column_syntax;

@@ -70,9 +70,16 @@ public:
   bool has_attribute (int i, const std::string& name) const;
   double get_attribute (int i, const std::string& name) const;
 
+  // 
+
   // Simulation.
 public:
   void output (Log&) const;
+  void nitrification (const size_t i,
+                      const double M, const double C, 
+                      const double M_left,
+                      const double h, const double T,
+                      double& NH4, double& N2O, double& NO3) const;
 
   // Calculations.
   double MaxRootingDepth () const;

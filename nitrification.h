@@ -42,17 +42,16 @@ public:
 protected:
   const double N2O_fraction;
 
-  // Log variable.
-protected:
-  vector<double> NH4;
-  vector<double> NO3;
-  vector<double> N2O;
-  
   // Simulation.
 public:
-  virtual void tick (const Soil&, const SoilWater&, const SoilHeat&,
-		     SoilNO3&, SoilNH4&) = 0;
-  void output (Log&) const;
+  virtual void tick (const double M, const double C, 
+                     const double M_left,
+                     const double h, const double T,
+                     double& NH4, double& N2O, double& NO3) const = 0;
+
+  // Utilities.
+  static double f_h (double h);
+  static double f_T (double T);
 
   // Create and Destroy.
 public:
