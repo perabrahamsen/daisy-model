@@ -10,7 +10,7 @@
 #include "syntax.h"
 
 void
-SoilWater::tick (Surface& surface, const Groundwater& groundwater,
+SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		 const Soil& soil)
 {
   Theta_old = Theta;
@@ -99,6 +99,12 @@ SoilWater::output (Log& log, const Filter* filter) const
   log.output ("h", filter, h);
   log.output ("Xi", filter, Xi);
   log.output ("q", filter, q);
+}
+
+double
+SoilWater::MaxExfiltration (const Soil& soil) const
+{
+  return - (soil.K (0, h[0]) / soil.Cw2 (0, h[0])) * (Theta[0] / soil.z(0));
 }
 
 void

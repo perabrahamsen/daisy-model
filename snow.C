@@ -100,10 +100,10 @@ Snow::Implementation::tick (const double Si, const double q_h,
   const double Mprime = (mt * Tair + mr * Si + q_h / Lm) * f;
 
   // Minimal possible melting (all water freezes). [mm/h]
-  const double M1 = - (Swater/dt + Prain - Eprime);
+  const double M1 = - (Swater/dt + Prain);
   
   // Maximal possible melting (all ice melts). [mm/h]
-  const double M2 = (Ssnow - Swater)/dt + Psnow - (Esnow - Eprime);
+  const double M2 = (Ssnow - Swater)/dt + Psnow;
 
   // Actual melting. [mm/h]
   const double M = min (max (M1, Mprime), M2);
@@ -164,7 +164,10 @@ Snow::percolation ()
 double 
 Snow::temperature ()
 {
-  return impl.T;
+  if (impl.Ssnow > 1.0e-6)
+    return 0.0;
+  else
+    return impl.T;
 }
 
 double 

@@ -17,9 +17,9 @@ class UZtop
 public:
   virtual bool flux_top () const = 0;
   virtual double q () const = 0;
-  virtual void flux_top_on () const = 0;
-  virtual void flux_top_off () const = 0;
-  virtual bool accept_top (double) const = 0;
+  virtual void flux_top_on () = 0;
+  virtual void flux_top_off () = 0;
+  virtual bool accept_top (double) = 0;
   virtual ~UZtop ();
 };
 
@@ -27,7 +27,7 @@ class UZbottom
 {
 public:
   virtual bool flux_bottom () const = 0;
-  virtual bool accept_bottom (double) const = 0;
+  virtual bool accept_bottom (double) = 0;
   virtual ~UZbottom ();
 };
 
@@ -37,20 +37,20 @@ class UZmodel : public UZtop, public UZbottom
 public:
   bool flux_top () const = 0;
   double q () const = 0;
-  void flux_top_on () const = 0;
-  void flux_top_off () const = 0;
-  bool accept_top (double) const = 0;
+  void flux_top_on () = 0;
+  void flux_top_off () = 0;
+  bool accept_top (double) = 0;
 
   // UZbottom.
 public:
   bool flux_bottom () const = 0;
-  bool accept_bottom (double) const = 0;
+  bool accept_bottom (double) = 0;
   
   // Simulate.
 public:
   virtual void tick (const Soil& soil,
-		     int first, const UZtop& top, 
-		     int last, const UZbottom& bottom, 
+		     int first, UZtop& top, 
+		     int last, UZbottom& bottom, 
 		     const vector<double>& S,
 		     const vector<double>& h_old,
 		     const vector<double>& Theta_old,

@@ -13,7 +13,7 @@ private:
   // UZbottom.
 public:
   bool flux_bottom () const;
-  bool accept_bottom (double) const;
+  bool accept_bottom (double);
 
   // Simulation.
 public:
@@ -36,7 +36,7 @@ GroundwaterStatic::flux_bottom () const
 }
 
 bool 
-GroundwaterStatic::accept_bottom (double) const
+GroundwaterStatic::accept_bottom (double)
 {
   return true;
 }

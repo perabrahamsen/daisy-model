@@ -48,7 +48,7 @@ private:
 
   // Simulation.
 public:
-  void tick (const Time&, const Weather&, const Groundwater&);
+  void tick (const Time&, const Weather&, Groundwater&);
 
   // Communication with crops.
 public:
@@ -87,11 +87,11 @@ ColumnStandard::check (Log& log) const
 
 void
 ColumnStandard::tick (const Time& time, 
-		      const Weather& weather, const Groundwater& groundwater)
+		      const Weather& weather, Groundwater& groundwater)
 {
   cout << "Column `" << name << "' tick\n"; 
   
-  bioclimate.tick (surface, weather, crops, soil);
+  bioclimate.tick (surface, weather, crops, soil, soil_water);
   soil_heat.tick (surface, bioclimate);
   soil_water.tick (surface, groundwater, soil);
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
@@ -105,8 +105,10 @@ ColumnStandard::output (Log& log, const Filter* filter) const
 #if 0
   if (filter->check ("Bioclimate"))
     bioclimate.output (log, filter->lookup ("Bioclimate"));
+#endif
   if (filter->check ("Surface"))
     surface.output (log, filter->lookup ("Surface"));
+#if 0
   if (filter->check ("Soil"))
     soil.output (log, filter->lookup ("Soil"));
 #endif

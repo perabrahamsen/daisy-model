@@ -2,16 +2,16 @@
 
 SHELL = /bin/sh
 CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -frepo # -O2 -fhandle-exceptions -pipe -fno-implicit-templates
-SRCONLY = column_std.o template.o manager_rule.o weather_simple.o \
+SRCONLY = column_std.o manager_rule.o weather_simple.o uzrichard.o \
 	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
-	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o 
+	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o \
+	crop_std.o 
 OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o rules.o time.o uzmodel.o \
 	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
-	denitrification.o soil_heat.o groundwater.o uzrichard.o \
-	crop_std.o snow.o
+	denitrification.o soil_heat.o groundwater.o snow.o
 OBJ = $(OBJECTS) $(SRCONLY)
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJECTS:.o=.h) common.h
@@ -20,9 +20,7 @@ TEST = crop.dai old_crop.chp old_crop.log \
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = crop_impl.C crop_impl.h crop_std.h horizon_yolo.h horizon_M_vG.h \
-	horizon_B_vG.h horizon_M_C.h horizon_B_C.h horizon_M_BaC.h \
-	horizon_B_BaC.h groundwater_static.h weather_simple.h manager_rule.h
+REMOVE = uzrichard.h
 
 .SUFFIXES:	.C .o .h
 
@@ -123,14 +121,12 @@ manager.o: manager.C manager.h library.h alist.h common.h syntax.h
 column.o: column.C column.h library.h alist.h common.h syntax.h
 crop.o: crop.C crop.h library.h alist.h common.h syntax.h
 alist.o: alist.C alist.h common.h action.h condition.h time.h
-syntax.o: syntax.C syntax.h alist.h common.h log.h
+syntax.o: syntax.C syntax.h alist.h common.h log.h library.h
 library.o: library.C library.h alist.h common.h
 action.o: action.C action.h column.h alist.h common.h
 condition.o: condition.C condition.h time.h
 horizon.o: horizon.C horizon.h library.h alist.h common.h syntax.h
 ftable.o: ftable.C ftable.h
-crop_impl.o: crop_impl.C crop_impl.h crop_std.h crop.h ftable.h csmp.h \
- syntax.h alist.h common.h filter.h log.h bioclimate.h
 filter.o: filter.C filter.h
 csmp.o: csmp.C csmp.h log.h
 rules.o: rules.C rules.h daisy.h time.h action.h
@@ -138,8 +134,6 @@ time.o: time.C time.h
 uzmodel.o: uzmodel.C uzmodel.h library.h alist.h common.h syntax.h
 soil.o: soil.C soil.h horizon.h alist.h common.h syntax.h
 mathlib.o: mathlib.C mathlib.h
-template.o: template.C ftable.h crop_impl.h crop_std.h crop.h csmp.h \
- ftable.t
 bioclimate.o: bioclimate.C bioclimate.h surface.h uzmodel.h weather.h \
  time.h crop.h csmp.h alist.h common.h soil.h horizon.h syntax.h \
  snow.h
@@ -157,15 +151,11 @@ groundwater.o: groundwater.C groundwater.h time.h uzmodel.h library.h \
  alist.h common.h syntax.h
 uzrichard.o: uzrichard.C uzrichard.h uzmodel.h soil.h horizon.h \
  mathlib.h alist.h common.h syntax.h
-crop_std.o: crop_std.C crop_impl.h crop_std.h crop.h ftable.h csmp.h \
- log.h time.h column.h bioclimate.h common.h
-snow.o: snow.C
+snow.o: snow.C snow.h alist.h common.h syntax.h
 column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h soil.h horizon.h soil_water.h soil_heat.h soil_NH4.h \
  soil_NO3.h organic_matter.h nitrification.h denitrification.h alist.h \
  common.h syntax.h library.h log.h filter.h
-template.o: template.C ftable.h crop_impl.h crop_std.h crop.h csmp.h \
- ftable.t
 manager_rule.o: manager_rule.C manager.h syntax.h rules.h alist.h \
  common.h
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
@@ -179,3 +169,5 @@ horizon_M_BaC.o: horizon_M_BaC.C horizon.h syntax.h alist.h common.h
 horizon_B_BaC.o: horizon_B_BaC.C horizon.h syntax.h alist.h common.h
 groundwater_static.o: groundwater_static.C groundwater.h time.h \
  uzmodel.h syntax.h alist.h common.h
+crop_std.o: crop_std.C crop.h log.h time.h column.h csmp.h \
+ bioclimate.h common.h ftable.h syntax.h alist.h filter.h ftable.t

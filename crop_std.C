@@ -13,6 +13,7 @@
 #include "alist.h"
 #include "filter.h"
 #include "bioclimate.h"
+#include "ftable.t"
 
 #include <list.h>
 

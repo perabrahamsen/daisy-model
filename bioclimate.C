@@ -10,6 +10,7 @@
 #include "common.h"
 #include "syntax.h"
 #include "snow.h"
+#include "soil_water.h"
 
 
 class Bioclimate::Implementation
@@ -136,7 +137,8 @@ Bioclimate::Implementation::IntensityDistribution (const double Rad0,
 
 void 
 Bioclimate::tick (Surface& surface, const Weather& weather, 
-		  const CropList& crops, const Soil& soil)
+		  const CropList& crops, const Soil& soil, 
+		  const SoilWater& soil_water)
 {
   // Keep weather information during time step.
   impl.temperature = weather.AirTemperature ();
@@ -216,8 +218,11 @@ Bioclimate::tick (Surface& surface, const Weather& weather,
 	impl.snow.evaporation () - PotSoilEvaporation;
       PotSoilEvaporation = 0;
     }
-  PotSoilEvaporation -= surface.evaporation (PotSoilEvaporation, 
-					     impl.snow.percolation ());
+  PotSoilEvaporation -= 
+    surface.evaporation (PotSoilEvaporation, 
+			 impl.snow.percolation (),
+			 // cm -> mm
+			 soil_water.MaxExfiltration (soil) / 10);
 
   PotCanopyEvapotranspiration += PotSoilEvaporation * soil.EpInterchange ();
   impl.PotTransPerLAI = PotCanopyEvapotranspiration / impl.LAI;

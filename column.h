@@ -29,7 +29,7 @@ public:
   virtual void output (Log&, const Filter*) const = 0;
 
   // Simulation.
-  virtual void tick (const Time&, const Weather&, const Groundwater&) = 0;
+  virtual void tick (const Time&, const Weather&, Groundwater&) = 0;
 
   // Communication with crops.
   virtual double SoilTemperature (double depth) const = 0;

@@ -31,9 +31,12 @@ class SoilWater
 
   // Simulation.
 public:
-  void tick (Surface&, const Groundwater&, const Soil&);
+  void tick (Surface&, Groundwater&, const Soil&);
   bool check (Log&, unsigned n) const;
   void output (Log&, const Filter*) const;
+
+  // Communication with surface.
+  double MaxExfiltration (const Soil&) const;
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

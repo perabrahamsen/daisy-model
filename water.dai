@@ -32,7 +32,7 @@
  (time 1990 4 11)
  (field (c1 (crops)
 	    (Bioclimate)
-	    (Surface)
+	    (Surface (lake 0))
 	    (Soil)
             (SoilHeat (T 10.0 * 53))	;Unused
 	    (SoilWater (h -600.0 * 53)

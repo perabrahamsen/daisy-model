@@ -1,50 +1,112 @@
 // surface.C
 
 #include "surface.h"
+#include "syntax.h"
+#include "alist.h"
+#include "log.h"
+
+extern double abs (double);
 
 bool 
 Surface::flux_top () const
 {
-  return true;
+  return lake < 0.0 && flux;
 }
 
 double 
 Surface::q () const
 {
   assert (flux_top ());
-  return 0.0;
+  return -pond / 10;		// mm -> cm.
 }
   
 void  
-Surface::flux_top_on () const
-{ }
+Surface::flux_top_on ()
+{ 
+  flux = true;
+}
 
 void  
-Surface::flux_top_off () const
-{ }
+Surface::flux_top_off ()
+{ 
+  flux = false;
+}
 
 bool  
-Surface::accept_top (double) const
+Surface::accept_top (double water)
 {
-  return true;
+  if (lake >= 0.0)
+    return true;
+
+  water *= 10;			// cm -> mm.
+
+  static const double dt = 1.0; // Time step [h].
+
+  if (pond + water * dt >= - max (abs (pond), abs (water)) / 1000)
+    {
+      pond += water * dt;
+      return true;
+    }
+  else
+    return false;
 }
 
 double
 Surface::ponding () const
 {
-  assert (!flux_top ());
-  return 0.0;
+  if (lake < 0.0)
+    {
+      assert (!flux_top ());
+      return pond;
+    }
+  else
+    return lake;
 }
 
 double
-Surface::evaporation (double /* PotSoilEvaporation */, double /* Water */)
+Surface::evaporation (double PotSoilEvaporation, double water, double MaxExfiltration)
 {
-  return 0.0;
+  static const double dt = 1.0; // Time step [h].
+  Eps = PotSoilEvaporation;
+
+  if (pond + water * dt < Eps * dt)
+    flux_top_on ();
+
+  if (pond + water * dt + MaxExfiltration * dt < Eps * dt)
+    Es = pond / dt + water + MaxExfiltration;
+  else
+    Es = Eps;
+
+  pond = pond - Es * dt + water * dt;
+  return Es;
 }
 
 void
-Surface::load_syntax (Syntax&, AttributeList&)
-{ }
+Surface::output (Log& log, const Filter* filter) const
+{
+  log.output ("pond", filter, pond);
+  log.output ("flux", filter, flux);
+  log.output ("Es", filter, Es);
+  log.output ("Eps", filter, Eps);
+}
 
-Surface::Surface (const AttributeList&)
+void
+Surface::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("lake", Syntax::Number);
+  alist.add ("lake", -1.0);
+  syntax.add ("pond", Syntax::Number);
+  alist.add ("pond", 0.0);
+  syntax.add ("flux", Syntax::Boolean);
+  alist.add ("flux", true);
+  syntax.add ("Es", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
+}
+
+Surface::Surface (const AttributeList& al)
+  : lake (al.number ("lake")),
+    pond (al.number ("pond")),
+    flux (al.flag ("flux")),
+    Es (0.0),
+    Eps (0.0)
 { }

@@ -1,14 +1,69 @@
 // uzrichard.C
 
-#include "uzrichard.h"
+#include "uzmodel.h"
 #include "soil.h"
 #include "mathlib.h"
 #include "alist.h"
 #include "syntax.h"
+#include "common.h"
 
-#define exception BUG_exception
-#include <math.h>
-#undef exception
+class UZRichard : public UZmodel
+{
+  // UZmodel.
+private:
+  struct Parameters;
+  const Parameters& par;
+  struct Variables;
+  Variables& var;
+public:
+  bool flux_top () const;
+  double q () const;
+  void flux_top_on ();
+  void flux_top_off ();
+  bool accept_top (double);
+  bool flux_bottom () const;
+  bool accept_bottom (double);
+
+  // Simulate.
+private:
+  bool richard (const Soil& soil,
+		int first, UZtop& top, 
+		int last, UZbottom& bottom, 
+		const vector<double>& S,
+		const vector<double>& h_old,
+		const vector<double>& Theta_old,
+		vector<double>& h,
+		vector<double>& Theta,
+		vector<double>& q);
+  bool converges (const vector<double>& previous, 
+		  const vector<double>& current) const;
+  void internode (const Soil& Soil, int first, int last,
+		  const vector<double>& K, 
+		  vector<double>& Kplus) const;
+  int max_time_step_reductions () const;
+  int time_step_reduction () const;
+  int max_iterations () const;
+  double max_absolute_difference () const;
+  double max_relative_difference () const;
+public:
+  void tick (const Soil& soil,
+	     int first, UZtop& top, 
+	     int last, UZbottom& bottom, 
+	     const vector<double>& S,
+	     const vector<double>& h_old,
+	     const vector<double>& Theta_old,
+	     vector<double>& h,
+	     vector<double>& Theta,
+	     vector<double>& q);
+
+  // Create and Destroy.
+private:
+  friend class UZRichardSyntax;
+  static UZmodel* make (const AttributeList&);
+  UZRichard (const AttributeList& par);
+public:
+  ~UZRichard ();
+};
 
 struct UZRichard::Variables
 {
@@ -52,15 +107,15 @@ UZRichard::q () const
   return var.q_down;
 }
 void  
-UZRichard::flux_top_on () const
+UZRichard::flux_top_on ()
 { }
 
 void  
-UZRichard::flux_top_off () const
+UZRichard::flux_top_off ()
 { }
 
 bool  
-UZRichard::accept_top (double) const
+UZRichard::accept_top (double)
 { 
   return true;
 }
@@ -72,15 +127,15 @@ UZRichard::flux_bottom () const
 }
 
 bool  
-UZRichard::accept_bottom (double) const
+UZRichard::accept_bottom (double)
 { 
   return true;
 }
 
 bool
 UZRichard::richard (const Soil& soil, 
-		    int first, const UZtop& top, 
-		    int last, const UZbottom& bottom, 
+		    int first, UZtop& top, 
+		    int last, UZbottom& bottom, 
 		    const vector<double>& S,
 		    const vector<double>& h_old,
 		    const vector<double>& Theta_old,
@@ -167,7 +222,7 @@ UZRichard::richard (const Soil& soil,
 		    {	
 		      b[i] = Cw2 + (dt / dz) * (Kplus[i] / dz_plus);
 		      d[i] = Theta[i] - Cw1 - dt * S[first + i] 
-			+ (dt / dz) * (top.q () - Kplus[i]);
+			+ (dt / dz) * (- top.q () - Kplus[i]);
 		    }
 		  else 
 		    {
@@ -378,8 +433,8 @@ UZRichard::max_relative_difference () const
 
 void 
 UZRichard::tick (const Soil& soil,
-		 int first, const UZtop& top, 
-		 int last, const UZbottom& bottom, 
+		 int first, UZtop& top, 
+		 int last, UZbottom& bottom, 
 		 const vector<double>& S,
 		 const vector<double>& h_old,
 		 const vector<double>& Theta_old,
@@ -391,14 +446,23 @@ UZRichard::tick (const Soil& soil,
 		S, h_old, Theta_old, h, Theta, q))
     THROW (Runtime ("Richard's Equation doesn't converge."));
     
-  if (top.flux_top () && h[first] > 0)
+  if (top.flux_top ())
     {
-      top.flux_top_off ();
-      if (!richard (soil, first, top, last, bottom, 
-		    S, h_old, Theta_old, h, Theta, q))
-	THROW (Runtime ("Richard's Equation doesn't converge."));
-      if (!top.accept_top (q[first]))
-	THROW (Numeric ("Couldn't accept top flux"));
+      if (h[first] > 0)
+	{
+	  top.flux_top_off ();
+	  if (!richard (soil, first, top, last, bottom, 
+			S, h_old, Theta_old, h, Theta, q))
+	    THROW (Runtime ("Richard's Equation doesn't converge."));
+	  if (!top.accept_top (q[first]))
+	    THROW (Numeric ("Couldn't accept top flux"));
+	}
+      else
+	{
+	  assert (top.q () == q[first]);
+	  const bool ok = top.accept_top (q[first]);
+	  assert (ok);
+	}
     }
   else if (!top.flux_top () && !top.accept_top (q[first]))
     {
@@ -408,6 +472,9 @@ UZRichard::tick (const Soil& soil,
 	THROW (Runtime ("Richard's Equation doesn't converge."));
       if (h[first] < 0)
 	THROW (Numeric ("Couldn't drain top flux"));
+      assert (top.q () == q[first]);
+      const bool ok = top.accept_top (q[first]);
+      assert (ok);
     }
   bottom.accept_bottom (q[last + 1]);
 

@@ -34,14 +34,14 @@ WeatherSimple::tick ()
 { }
 
 double
-WeatherSimple::AirTemperature (void) const
+WeatherSimple::AirTemperature (void) const // [C]
 {
   double t = 2 * M_PI / 365 * time.yday ();
   return (7.7 - 7.7 * cos (t) - 3.6 * sin (t));
 }
 
 double
-WeatherSimple::GlobalRadiation () const
+WeatherSimple::GlobalRadiation () const	// [W/m^2]
 {
   /*a function of the weather*/
   static const double A0[] =
@@ -66,11 +66,11 @@ WeatherSimple::GlobalRadiation () const
 }
 
 double
-WeatherSimple::ReferenceEvapotranspiration () const
+WeatherSimple::ReferenceEvapotranspiration () const // [mm/h]
 {
   const double T = 273.16 + AirTemperature ();
   const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
-  return 0.0245 * Delta / (Delta + 66.7) * GlobalRadiation ();
+  return 1.05e-3 * Delta / (Delta + 66.7) * GlobalRadiation ();
 }
 
 double
