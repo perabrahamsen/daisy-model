@@ -8,30 +8,42 @@
 //
 // You add one Condition, Action pair a time, the first pair will also
 // be the first in the list.
-//
-// When creating a new Rules object, you may specify it as an
-// extention to an old object.  The rules of the old object will be
-// less significant than any of the new rules.
 
 #ifndef RULES_H
 #define RULES_H
 
+#include <std/string.h>
+#include <vector.h>
+
 struct Action;
 struct Condition;
 struct Daisy;
+struct Syntax;
+struct AttributeList;
 
 class Rules
 {
-    // Content.
-    struct Implementation;
-    Implementation& impl;
+  // Content.
+  struct Implementation;
+  Implementation& impl;
 public:
-    // Use.
-    const Action* match (const Daisy&) const;
-    // Create and Destroy.
-    void add (const Condition*, const Action*);
-    Rules (const Rules* = 0);
-    ~Rules ();
+  // Use.
+  const Action* match (const Daisy&) const;
+  // Create and Destroy.
+  void add (const Condition*, const Action*);
+  static const Syntax& syntax ();
+  Rules (const vector <const AttributeList*>& rl);
+  ~Rules ();
 };
+
+// Ensure the Rules syntax is initialized.
+// See TC++PL, 2ed, 10.5.1, for an explanation.
+static class Rules_init
+{
+  static int count;
+public:
+  Rules_init ();
+  ~Rules_init ();
+} Rules_init;
 
 #endif RULES_H

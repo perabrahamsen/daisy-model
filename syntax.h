@@ -28,7 +28,7 @@ public:
 
   // Each syntax entry should have an associated type.
   enum type 
-  { Number, List, Rules, CSMP, Function, Boolean, String,
+  { Number, List, CSMP, Function, Boolean, String,
     Date, Integer, Output, Class, Object, Error };
 
   // The requirements with regard to input and output varies with each

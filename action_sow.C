@@ -36,7 +36,7 @@ ActionSow::doIt (ColumnList& cl, const Weather&, Log& log) const
 }
 
 ActionSow::ActionSow (const AttributeList& al)
-  : crop (al)
+  : crop (al.list ("crop"))
 { }
 
 ActionSow::~ActionSow ()

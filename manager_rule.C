@@ -9,7 +9,7 @@ class ManagerRule : public Manager
 {
   // Content.
 private:
-  const Rules& rules;
+  const Rules rules;
 
     // Simulation.
 public:
@@ -31,7 +31,7 @@ ManagerRule::action (const Daisy& daisy)
 }
 
 ManagerRule::ManagerRule (const AttributeList& vl)
-  : rules (vl.rules ("rules"))
+  : rules (vl.list_sequence ("rules"))
 { }
 
 ManagerRule::~ManagerRule () 
@@ -53,6 +53,8 @@ ManagerRuleSyntax::ManagerRuleSyntax ()
 {
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("rules", Syntax::Rules, Syntax::Const);
+  syntax.add ("rules", Rules::syntax (), Syntax::Const, Syntax::Sequence);
+  syntax.order ("rules");
+  // syntax.order ("rules");
   Manager::add_type ("rule", alist, syntax, &ManagerRule::make);
 }

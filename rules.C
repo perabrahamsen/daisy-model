@@ -3,86 +3,110 @@
 #include "rules.h"
 #include "daisy.h"
 #include "action.h"
-
+#include "condition.h"
+#include "syntax.h"
+#include "alist.h"
 #include <list.h>
+
+static const Syntax* Rules_syntax = NULL;
 
 struct Rules::Implementation
 {
-    struct Rule
+  struct Rule
+  {
+    Condition const* condition;
+    Action const* action;
+    Rule (Condition const* c, Action const* a)
+      : condition (c), 
+	action (a)
+    { }
+    ~Rule ()
     {
-	Condition const* condition;
-	Action const* action;
-	Rule (Condition const*, Action const*);
-    };
-    typedef list <Rule*> RuleList;
-    RuleList rules;
-    RuleList super;    
+      delete condition;
+      delete action;
+    }
+  };
+  typedef vector <Rule*> RuleList;
+  RuleList rules;
+  Implementation (const vector<const AttributeList*>& rl);
+  ~Implementation ();
 };
 
-Rules::Implementation::Rule::Rule (Condition const* c, Action const* a) 
-    : condition (c), 
-      action (a)
-{ }
+Rules::Implementation::Implementation (const vector<const AttributeList*>& rl)
+  : rules ()
+{
+  for (vector<const AttributeList*>::const_iterator i = rl.begin ();
+       i != rl.end ();
+       i++)
+    {
+      const AttributeList& al = **i;
+      rules.push_back (new Rule (&Condition::create (al.list ("condition")),
+				 &Action::create (al.list ("action"))));
+    }
+}
+
+Rules::Implementation::~Implementation ()
+{
+  for (RuleList::const_iterator i = rules.begin (); i != rules.end (); i++)
+    delete *i;
+}
+
+const Syntax&
+Rules::syntax ()
+{
+  assert (Rules_syntax);
+  return *Rules_syntax;
+}
 
 void 
 Rules::add (const Condition* c, const Action* a)
 {
-    impl.rules.push_front (new Implementation::Rule (c, a));
+  impl.rules.push_back (new Implementation::Rule (c, a));
 }
 
 const Action*
 Rules::match (const Daisy& daisy) const
 {
-    for (Implementation::RuleList::iterator i = impl.rules.begin ();
-	 i != impl.rules.end ();
-	 i++)
-	{
-	    if (daisy.match ((*i)->condition))
-		return (*i)->action;
-	}
-    for (Implementation::RuleList::iterator i = impl.super.begin ();
-	 i != impl.super.end ();
-	 i++)
-	{
-	    if (daisy.match ((*i)->condition))
-		return (*i)->action;
-	}
-    return &Action::null;
+  for (Implementation::RuleList::iterator i = impl.rules.begin ();
+       i != impl.rules.end ();
+       i++)
+    {
+      if (daisy.match ((*i)->condition))
+	return (*i)->action;
+    }
+  return &Action::null;
 }
 
-Rules::Rules (const Rules *const old = NULL)
-    : impl (*new Implementation)
-{ 
-    if (old)
-	{
-	    for (Implementation::RuleList::iterator i 
-		     = old->impl.rules.begin();
-		 i != old->impl.rules.end ();
-		 i++)
-		{
-		    impl.super.push_back (*i);
-		}
-	    for (Implementation::RuleList::iterator i
-		     = old->impl.super.begin();
-		 i != old->impl.super.end ();
-		 i++)
-		{
-		    impl.super.push_back (*i);
-		}
-	}
-}
+Rules::Rules (const vector<const AttributeList*>& rl)
+  : impl (*new Implementation (rl))
+{ }
 
 Rules::~Rules ()
 { 
-    delete &impl;
-    // I should delete all members of `impl.rules' here, but they
-    // might appear in some other Rules `impl.super'.  Obviously
-    // the solution is to use `list <RefCount <Rules> >' instead of
-    // `list <Rules*>'.  The same is true for the other places I use
-    // STL containers.  I'll experiement with this latter.  BTW: It
-    // isn't a real memory leak, as Rules are created during
-    // initialization, and deleted only when the simulation is over,
-    // after which the program ends. However, it might be useful one
-    // day to run multiple simulations in the same program execution.
+  delete &impl;
 }
 
+int Rules_init::count;
+
+Rules_init::Rules_init ()
+{ 
+  if (count++ == 0)
+    {
+      Syntax& rule = *new Syntax ();
+      rule.add ("condition", Condition::library (), Syntax::Const);
+      rule.add ("action", Action::library (), Syntax::Const);
+      rule.order ("condition", "action");
+      Rules_syntax = &rule;
+    }
+  assert (count > 0);
+}
+
+Rules_init::~Rules_init ()
+{ 
+  if (--count == 0)
+    {
+      delete Rules_syntax;
+      Rules_syntax = NULL;
+    }
+  assert (count >= 0);
+}

@@ -41,7 +41,7 @@ struct Parser
   void eof ();
   void load_library (Library& lib);
   void add_derived (const Library&, derive_fun);
-  AttributeList& load_derived (const Library& lib);
+  AttributeList& load_derived (const Library& lib, bool in_sequence = false);
   void load_list (AttributeList&, const Syntax&);
   Time get_time ();
   const Condition* get_condition ();
@@ -289,21 +289,32 @@ Parser::add_derived (const Library& lib, derive_fun derive)
 }
 
 AttributeList&
-Parser::load_derived (const Library& lib)
+Parser::load_derived (const Library& lib, bool in_sequence)
 {
+  AttributeList* alist = NULL;
+  bool skipped = false;
+  if (looking_at ('('))
+    {
+      skip ("(");
+      skipped = true;
+    }
   const string type = get_id ();
   if (lib.check (type))
     {
-      AttributeList& alist = *new AttributeList (lib.lookup (type));
-      alist.add ("type", type);
-      load_list (alist, lib.syntax (type));
-      return alist;
+      alist = new AttributeList (lib.lookup (type));
+      alist->add ("type", type);
+      if (skipped || !in_sequence)
+	load_list (*alist, lib.syntax (type));
     }
   else
     {
       error (string ("Unknown superclass `") + type + "'");
-      return *new AttributeList ();
+      alist = new AttributeList ();
     }
+  if (skipped)
+    skip (")");
+  assert (alist != NULL);
+  return *alist;
 }
 
 void
@@ -314,16 +325,21 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 
   while (!looking_at (')') && good ())
     {
+      bool skipped = false;
       string name;
       if (current == end)
 	// Unordered association list, get name.
 	{
 	  skip ("(");
+	  skipped = true;
 	  name = get_id ();
 	}
       else
 	// Ordered tupple, name know.
-	name = *current;
+	{
+	  name = *current;
+	  current++;
+	}
 	
       if (syntax.size (name) == Syntax::Singleton)
 	switch (syntax.lookup (name))
@@ -336,24 +352,6 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	      AttributeList& list = *new AttributeList ();
 	      load_list (list, syntax.syntax (name));
 	      atts.add (name, list);
-	      break;
-	    }
-	  case Syntax::Rules:
-	    {
-	      Rules* rules = atts.check (name) 
-		? new Rules (&atts.rules (name))
-		: new Rules ();
-	      skip ("(");
-	      while (!looking_at (')') && good ())
-		{
-		  skip ("(");
-		  const Condition* c = get_condition ();
-		  const Action* a = get_action ();
-		  rules->add (c, a);
-		  skip (")");
-		}
-	      atts.add (name, rules);
-	      skip (")");
 	      break;
 	    }
 	  case Syntax::CSMP:
@@ -427,7 +425,7 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	  case Syntax::Object:
 	    {
 	      const Library& lib = syntax.library (name);
-	      AttributeList& al = load_derived (lib);
+	      AttributeList& al = load_derived (lib, current != end);
 	      const string obj = al.name ("type");
 	      lib.syntax (obj).check (obj, al, log);
 	      atts.add (name, al);
@@ -453,12 +451,10 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 		= *new vector<const AttributeList*> ();
 	      while (!looking_at (')') && good ())
 		{
-		  skip ("(");
-		  const AttributeList& al = load_derived (lib);
+		  const AttributeList& al = load_derived (lib, true);
 		  const string obj = al.name ("type");
 		  lib.syntax (obj).check (obj, al, log);
 		  sequence.push_back (&al);
-		  skip (")");
 		}
 	      atts.add (name, sequence);
 	      break;
@@ -470,14 +466,22 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	      const Syntax& syn = syntax.syntax (name);
 	      vector<const AttributeList*>& sequence
 		= *new vector<const AttributeList*> ();
-	      skip ("(");
+	      bool skipped = false;
+	      if (current != end)
+		{
+		  skip ("(");
+		  skipped = true;
+		}
 	      while (!looking_at (')') && good ())
 		{
+		  skip ("(");
 		  AttributeList& al = *new AttributeList ();
 		  load_list (al, syn);
 		  sequence.push_back (&al);
+		  skip (")");
 		}
-	      skip (")");
+	      if (skipped)
+		skip (")");
 	      atts.add (name, sequence);
 	      break;
 	    }
@@ -520,15 +524,16 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	      atts.add (name, array);
 	      break;
 	    }
+	  case Syntax::Error:
+	    error (string("Unknown sequence `") + name + "'");
+	    skip_to_end ();
+	    break;
 	  default:
-	    // Only numbers and objects supported yet.
-	    cerr << name << "()";
-	    assert (false);
+	    error (string("Unsupported sequence `") + name + "'");
+	    skip_to_end ();
 	  }
-      if (current == end)
+      if (skipped)
 	skip (")");
-      else
-	current++;
     }
 }
 
@@ -696,4 +701,3 @@ parse (const Syntax& syntax, int& argc, char**& argv)
   Parser parser(argc, argv, log);
   return make_pair (&log, &parser.load (syntax));
 }
-  

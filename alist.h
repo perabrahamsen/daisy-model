@@ -11,7 +11,6 @@
 #include <list.h>
 
 struct Time;
-struct Rules;
 struct CSMP;
 struct AttributeList;
 
@@ -47,8 +46,6 @@ public:
        throw2 (Invalid, Uninitialized);
   bool flag (string) const
        throw2 (Invalid, Uninitialized);
-  const Rules& rules (string) const
-       throw2 (Invalid, Uninitialized);
   const CSMP& csmp (string) const 
        throw2 (Invalid, Uninitialized);
   const AttributeList& list (string) const
@@ -67,8 +64,6 @@ public:
        throw2 (Invalid, Uninitialized);
   const vector<const Time*>& time_sequence (string key) const
        throw2 (Invalid, Uninitialized);
-  const vector<const Rules*>& rules_sequence (string key) const
-       throw2 (Invalid, Uninitialized);
   const vector<const CSMP*>& csmp_sequence (string key) const
        throw2 (Invalid, Uninitialized);
   const vector<const AttributeList*>& list_sequence (string key) const
@@ -80,7 +75,6 @@ public:
   void add (string, bool);
   void add (string, int);
   void add (string, AttributeList&);
-  void add (string, const Rules*);
   void add (string, const CSMP*);
   void add (string, const Time&);
   void add (string, const vector<double>&);
@@ -88,7 +82,6 @@ public:
   void add (string, const vector<bool>&);
   void add (string, const vector<int>&);
   void add (string, const vector<const AttributeList*>&);
-  void add (string, const vector<const Rules*>&);
   void add (string, const vector<const CSMP*>&);
   void add (string, const vector<const Time*>&);
 

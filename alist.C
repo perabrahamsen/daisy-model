@@ -24,8 +24,6 @@ public:
        throw (AttributeList::Invalid);
   virtual operator int () const
        throw (AttributeList::Invalid);
-  virtual operator const Rules& () const
-       throw (AttributeList::Invalid);
   virtual operator const CSMP& () const
        throw (AttributeList::Invalid);
   virtual operator const AttributeList& () const
@@ -40,8 +38,6 @@ public:
   virtual operator const vector<bool>& () const
        throw (AttributeList::Invalid);
   virtual operator const vector<int>& () const
-       throw (AttributeList::Invalid);
-  virtual operator const vector<const Rules*>& () const
        throw (AttributeList::Invalid);
   virtual operator const vector<const CSMP*>& () const
        throw (AttributeList::Invalid);
@@ -185,13 +181,6 @@ Value::operator const Time& () const
   return *((Time*) 0); // SHUT UP.
 }
 
-Value::operator const Rules& () const
-     throw (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-  return *((Rules*) 0); // SHUT UP.
-}
-
 Value::operator const CSMP& () const
      throw (AttributeList::Invalid)
 { 
@@ -232,13 +221,6 @@ Value::operator const vector<int>& () const
 { 
   THROW (AttributeList::Invalid ());
   return *((vector<int>*) 0);
-}
-
-Value::operator const vector<const Rules*>& () const
-     throw (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-  return *((vector<const Rules*>*) 0);
 }
 
 Value::operator const vector<const CSMP*>& () const
@@ -361,12 +343,6 @@ AttributeList::time (string key) const throw2 (Invalid, Uninitialized)
   return *impl.lookup (key);
 }
 
-const Rules& 
-AttributeList::rules (string key) const throw2 (Invalid, Uninitialized)
-{
-  return *impl.lookup (key);
-}
-
 const CSMP& 
 AttributeList::csmp (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -409,13 +385,6 @@ AttributeList::integer_sequence (string key) const
 
 const vector<const Time*>& 
 AttributeList::time_sequence (string key) const
-     throw2 (Invalid, Uninitialized)
-{
-  return *impl.lookup (key);
-}
-
-const vector<const Rules*>& 
-AttributeList::rules_sequence (string key) const
      throw2 (Invalid, Uninitialized)
 {
   return *impl.lookup (key);
@@ -472,12 +441,6 @@ AttributeList::add (string key, AttributeList& v)
 }
 
 void 
-AttributeList::add (string key, const Rules* v)
-{
-  impl.add (key, new dValue<Rules> (*v));
-}
-
-void 
 AttributeList::add (string key, const CSMP* v)
 {
   impl.add (key, new dValue<CSMP> (*v));
@@ -511,12 +474,6 @@ void
 AttributeList::add (string key, const vector<const AttributeList*>& v)
 {
   impl.add (key, new dValue<vector<const AttributeList*>/**/> (v));
-}
-
-void 
-AttributeList::add (string key, const vector<const Rules*>& v)
-{
-  impl.add (key, new dValue<vector<const Rules*>/**/> (v));
 }
 
 void 
