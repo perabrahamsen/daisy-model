@@ -52,7 +52,7 @@ public:
    virtual EventType Type(void) = 0;
    void Visit(const Time&,RelEventList&,EventQueue&);
    void Udfoer(Daisy& daisy,const Time& dato, EventQueue& EQ);
-   bool match(Column& c) const {return true;};
+   bool match(Column& ) const {return true;};
   virtual ~Event(){};
 };
 
@@ -145,7 +145,7 @@ class SowEvent : Event {
    EventList* RelativTilUdviklingsTrin;
    HarvestEvent* harvest;
    Event* ModelIrr;
-   SowEvent(string& model, string& crop, AttributeList &ca): Crop(crop),CropAttributes(ca){RelativTilUdviklingsTrin = new EventList;};
+   SowEvent(string& , string& crop, AttributeList &ca): Crop(crop),CropAttributes(ca){RelativTilUdviklingsTrin = new EventList;};
 public:
    static SowEvent* create(AttributeList &al);
    void Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ);

@@ -1,5 +1,3 @@
- Bioclimate/crop 
-
 * Condition: ds_after ("grass", 0.8)
 
 * Implementer SWAT interface

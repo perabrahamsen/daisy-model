@@ -13,6 +13,7 @@
 #include "action.h"
 #include "horizon.h"
 #include "printer_file.h"
+#include "version.h"
 
 #include <fstream.h>
 
@@ -628,3 +629,7 @@ daisy_initialize ()
   // We should load the DLL here on MSDOS.
 #endif
 }
+
+extern "C" const char* EXPORT
+daisy_version ()
+{ return version; }

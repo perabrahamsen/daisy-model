@@ -9,7 +9,6 @@
 #include "daisy.h"
 #include "weather.h"
 #include "crop.h"
-#include "library.h"
 
 void Event::Udfoer(Daisy& daisy,const Time& dato, EventQueue& EQ) {
    // Wrapper to make sure Visit is done
@@ -40,7 +39,7 @@ FertilizeEvent* FertilizeEvent::create(AttributeList &al){
    return 0;
 }
 
-void FertilizeEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
+void FertilizeEvent::Do_It(Daisy& ,const Time& , EventQueue& ){
 	// Fertilize the WORLD
 
 /* TODO
@@ -66,7 +65,7 @@ void FertilizeEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
 */
 }
 
-bool FertilizeEvent::KanUdfoeres(Daisy& daisy,const Time& dato){
+bool FertilizeEvent::KanUdfoeres(Daisy& ,const Time& ){
    // Can I Fertilize the WORLD ?
    return true;
 }
@@ -78,7 +77,7 @@ IrrigateEvent* IrrigateEvent::create(AttributeList &al){
                                      al.flag("UseAir"), al.flag("OverheadIrr"));
    return 0;
 }
-void IrrigateEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
+void IrrigateEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
 
    IM sm;
 
@@ -97,7 +96,7 @@ void IrrigateEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
    }
 }
 
-bool IrrigateEvent::KanUdfoeres(Daisy& daisy,const Time& dato){
+bool IrrigateEvent::KanUdfoeres(Daisy& ,const Time& ){
    // Can I Irrigate the WORLD ?
    return true;
 }
@@ -109,7 +108,7 @@ TillageEvent* TillageEvent::create(AttributeList &al){
    }
    return 0;
 }
-void TillageEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
+void TillageEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
    bool mix_it=true;
    double middle, depth, penetration = 1.0;
 
@@ -140,7 +139,7 @@ void TillageEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
    }
 }
 
-bool TillageEvent::KanUdfoeres(Daisy& daisy,const Time& dato){
+bool TillageEvent::KanUdfoeres(Daisy& ,const Time& ){
    return true; // Hvilke betingelser ?   Bære evne
 }
 
@@ -154,7 +153,7 @@ HarvestEvent* HarvestEvent::create(AttributeList &al){
    return 0;
 }
 
-void HarvestEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
+void HarvestEvent::Do_It(Daisy& daisy,const Time&, EventQueue& ){
    ColumnList& cl = daisy.columns;
    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
       if (!match (**i))
@@ -163,7 +162,7 @@ void HarvestEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
       daisy.harvest.insert (daisy.harvest.end (), entry.begin (), entry.end ());
    }
 }
-bool HarvestEvent::KanUdfoeres(Daisy& daisy,const Time& dato){
+bool HarvestEvent::KanUdfoeres(Daisy& ,const Time& ){
    return true;
 }
 
@@ -179,14 +178,14 @@ FuncHarvestEvent* FuncHarvestEvent::create(AttributeList &al) {
 void FuncHarvestEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
    HarvestEvent::Do_It(daisy,dato,EQ);
 }
-bool FuncHarvestEvent::KanUdfoeres(Daisy& daisy,const Time& dato){
+bool FuncHarvestEvent::KanUdfoeres(Daisy& ,const Time& ){
    // Er developmentstage opnået ?
    return true;
 }
 
 
 SowEvent* SowEvent::create(AttributeList &al){
-   const Library& library = Crop::library ();
+   const Library& library = Librarian<struct Crop>::library ();
    if (al.check("What") /* && al.check("Model")*/&& library.check (al.name("What"))){
       string m(""/*al.name("Model")*/), w(al.name("What"));
       return new SowEvent(m, w,library.lookup(al.name("What")));

@@ -7,9 +7,6 @@
 #include "bioclimate.h"
 #include "common.h"
 #include "csmp.h"
-#include "syntax.h"
-#include "alist.h"
-#include "filter.h"
 #include "soil_water.h"
 #include "soil.h"
 #include "om.h"
@@ -110,11 +107,9 @@ public:
   double DS () const;
 
   // Create and Destroy.
-private:
-  friend class CropStandardSyntax;
-  static Crop* make (const AttributeList&, int layers);
-  CropStandard (const AttributeList& vl, int layers);
 public:
+  void initialize (const Geometry& geometry);
+  CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
 
@@ -311,7 +306,7 @@ struct CropStandard::Variables
     double Ept;			// Potential evapotranspiration.
   private:
     friend struct CropStandard::Variables;
-    RecRootSys (const Parameters&, const AttributeList&, int layers);
+    RecRootSys (const Parameters&, const AttributeList&);
   } RootSys;
   struct RecProd
   {
@@ -361,7 +356,7 @@ struct CropStandard::Variables
   } CrpAux;
 private:
   friend class CropStandard;
-  Variables (const Parameters&, const AttributeList&, int layers);
+  Variables (const Parameters&, const AttributeList&);
 public:
   ~Variables ();
 };
@@ -500,11 +495,10 @@ CropStandard::Parameters::~Parameters ()
 { }
 
 CropStandard::Variables::Variables (const Parameters& par, 
-				    const AttributeList& vl,
-				    int layers)
+				    const AttributeList& vl)
   : Phenology (par, vl.alist ("Phenology")),
     Canopy (par, vl.alist ("Canopy")),
-    RootSys (par, vl.alist ("RootSys"), layers),
+    RootSys (par, vl.alist ("RootSys")),
     Prod (par, vl.alist ("Prod")),
     CrpAux (par, vl.alist ("CrpAux"))
 { }
@@ -559,8 +553,7 @@ CropStandard::Variables::RecCanopy::output (Log& log, Filter& filter) const
 }
 
 CropStandard::Variables::RecRootSys::RecRootSys (const Parameters& par,
-						 const AttributeList& vl, 
-						 int layers)
+						 const AttributeList& vl)
   : Depth (vl.check ("Depth") ? vl.number ("Depth") : par.Root.DptEmr),
     Density (vl.number_sequence ("Density")),
     H2OExtraction (vl.number_sequence ("H2OExtraction")),
@@ -570,19 +563,7 @@ CropStandard::Variables::RecRootSys::RecRootSys (const Parameters& par,
     water_stress (1.0),
     nitrogen_stress (1.0),
     Ept (0.0)
-{ 
-  if (layers > 0)
-    {
-      assert (Density.size () == 0);
-      Density.insert (Density.begin (), layers, 0.0);
-      assert (H2OExtraction.size () == 0);
-      H2OExtraction.insert (H2OExtraction.begin (), layers, 0.0);
-      assert (NH4Extraction.size () == 0);
-      NH4Extraction.insert (NH4Extraction.begin (), layers, 0.0);
-      assert (NO3Extraction.size () == 0);
-      NO3Extraction.insert (NO3Extraction.begin (), layers, 0.0);
-    }
-}
+{ }
 
 void 
 CropStandard::Variables::RecRootSys::output (Log& log, Filter& filter) const
@@ -687,15 +668,30 @@ CropStandard::Variables::RecCrpAux::output (Log& log, Filter& filter) const
 CropStandard::Variables::~Variables ()
 { }
 
-// Add the Crop syntax to the syntax table.
-Crop*
-CropStandard::make (const AttributeList& vl, int layers)
+void
+CropStandard::initialize (const Geometry& geometry)
 {
-  return new CropStandard (vl, layers);
+  unsigned int size = geometry.size ();
+
+  // Fill rootsys arrays.
+  var.RootSys.Density.insert (var.RootSys.Density.end (),
+			      size - var.RootSys.Density.size (), 
+			      0.0);
+  var.RootSys.H2OExtraction.insert (var.RootSys.H2OExtraction.end (),
+				    size - var.RootSys.H2OExtraction.size (),
+				    0.0);
+  var.RootSys.NH4Extraction.insert (var.RootSys.NH4Extraction.end (),
+				    size - var.RootSys.NH4Extraction.size (),
+				    0.0);
+  var.RootSys.NO3Extraction.insert (var.RootSys.NO3Extraction.end (),
+				    size - var.RootSys.NO3Extraction.size (),
+				    0.0);
 }
 
 static struct CropStandardSyntax
 {
+  static Crop& make (const AttributeList& al)
+    { return *new CropStandard (al); }
   CropStandardSyntax ();
 } standard_crop_syntax;
 
@@ -972,7 +968,7 @@ CropStandardSyntax::CropStandardSyntax ()
   syntax.add ("CrpAux", CrpAux, Syntax::State);
   alist.add ("CrpAux", vCrpAux);
 
-  Crop::add_type ("default", alist, syntax, &CropStandard::make);
+  Librarian<Crop>::add_type ("default", alist, syntax, &make);
 }
 
 double CropStandard::water_stress () const // [0-1] (1 = full production)
@@ -1274,15 +1270,9 @@ CropStandard::CanopyStructure ()
 
 	      // Insert this special distribution, and return.
 	      CSMP LADvsH;
-#ifdef CANOPY_TOP_IS_ZERO
 	      LADvsH.add (x0 * Canopy.Height, 0.0);
 	      LADvsH.add (x1 * Canopy.Height, y1 * Canopy.LADm);
 	      LADvsH.add (     Canopy.Height, 0.0);
-#else
-	      LADvsH.add (0.0,                        0.0);
-	      LADvsH.add ((1.0 - x1) * Canopy.Height, y1 * Canopy.LADm);
-	      LADvsH.add ((1.0 - x0) * Canopy.Height, 0.0);
-#endif
 	      Canopy.LAIvsH = LADvsH.integrate_stupidly ();
 	      return;
 	    }
@@ -1294,17 +1284,10 @@ CropStandard::CanopyStructure ()
     
   // Create CSMP for standard "z0, z1, z2" distribution.
   CSMP LADvsH;
-#ifdef CANOPY_TOP_IS_ZERO
   LADvsH.add (z0 * Canopy.Height, 0.0);
   LADvsH.add (z1 * Canopy.Height, Canopy.LADm);
   LADvsH.add (z2 * Canopy.Height, Canopy.LADm);
   LADvsH.add (     Canopy.Height, 0.0);
-#else
-  LADvsH.add (0.0                       , 0.0);
-  LADvsH.add ((1.0 - z2) * Canopy.Height, Canopy.LADm);
-  LADvsH.add ((1.0 - z1) * Canopy.Height, Canopy.LADm);
-  LADvsH.add ((1.0 - z0) * Canopy.Height, 0.0);
-#endif
   Canopy.LAIvsH = LADvsH.integrate_stupidly ();
 }
 
@@ -2108,14 +2091,15 @@ double
 CropStandard::DS () const
 { return var.Phenology.DS; }
 
-CropStandard::CropStandard (const AttributeList& al, int layers)
+CropStandard::CropStandard (const AttributeList& al)
   : Crop (al.name ("type")),
     par (*new Parameters (al)),
-    var (*new Variables (par, al, layers))
+    var (*new Variables (par, al))
 { }
 
 CropStandard::~CropStandard ()
 { 
   delete &var;
+  delete &par;
 }
 

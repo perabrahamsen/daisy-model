@@ -165,8 +165,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
   // Find H as a function of LAI.
   CSMP HvsLAI = LAIvsH.inverse ();
   // Check that the end points still match.
-  cerr << "[" << MxH << ";" << HvsLAI (LAI_) << ";";
-  //  assert (approximate (MxH, HvsLAI (LAI_)));
+  assert (approximate (MxH, HvsLAI (LAI_)));
   assert (HvsLAI (0.0) == 0.0);
   
   // Count height of each interval.  Interval 0 is the top of the crop
@@ -176,8 +175,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
     Height[i] = HvsLAI ((No - i) * dLAI);
 
   assert (Height[No] == 0.0);
-  cerr << Height[0] << "]\n";
-  // assert (approximate (Height[0], MxH, 0.05));
+  assert (approximate (Height[0], MxH));
   Height[0] = MxH;
 
   double PAR0 = (1 - ACRef) * PARinSi * weather.GlobalRadiation ();

@@ -556,6 +556,9 @@ daisy_load (daisy_syntax* syntax, daisy_alist* alist);
 void				/* Initialize the Daisy subsystem. */
 daisy_initialize (void);
 
+const char*			/* The Daisy library version number. */
+daisy_version (void);
+
 #if 0
 {
 #endif

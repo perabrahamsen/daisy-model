@@ -125,9 +125,7 @@ static struct NitrificationSoilSyntax
 {
   static Nitrification&
   make (const AttributeList& al)
-    {
-      return *new NitrificationSoil (al);
-    }
+    { return *new NitrificationSoil (al); }
   NitrificationSoilSyntax ()
     {
       Syntax& syntax = *new Syntax ();

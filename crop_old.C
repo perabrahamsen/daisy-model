@@ -7,9 +7,6 @@
 #include "bioclimate.h"
 #include "common.h"
 #include "csmp.h"
-#include "syntax.h"
-#include "alist.h"
-#include "filter.h"
 #include "soil_water.h"
 #include "soil.h"
 #include "om.h"
@@ -20,7 +17,6 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
-#include <list>
 
 class CropOld : public Crop
 {
@@ -98,11 +94,9 @@ public:
   double DS () const;
 
   // Create and Destroy.
-private:
-  friend class CropOldSyntax;
-  static Crop* make (const AttributeList&, int layers);
-  CropOld (const AttributeList& vl, int layers);
 public:
+  void initialize (const Geometry& geometry);
+  CropOld (const AttributeList& vl);
   ~CropOld ();
 };
 
@@ -287,7 +281,7 @@ struct CropOld::Variables
     double transpiration;	// Total water uptake.
   private:
     friend struct CropOld::Variables;
-    RecRootSys (const Parameters&, const AttributeList&, int layers);
+    RecRootSys (const Parameters&, const AttributeList&);
   } RootSys;
   struct RecProd
   {
@@ -325,7 +319,7 @@ struct CropOld::Variables
   } CrpAux;
 private:
   friend class CropOld;
-  Variables (const Parameters&, const AttributeList&, int layers);
+  Variables (const Parameters&, const AttributeList&);
 public:
   ~Variables ();
 };
@@ -445,12 +439,10 @@ CropOld::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
 CropOld::Parameters::~Parameters ()
 { }
 
-CropOld::Variables::Variables (const Parameters& par, 
-				    const AttributeList& vl,
-				    int layers)
+CropOld::Variables::Variables (const Parameters& par, const AttributeList& vl)
   : Phenology (par, vl.alist ("Phenology")),
     Canopy (par, vl.alist ("Canopy")),
-    RootSys (par, vl.alist ("RootSys"), layers),
+    RootSys (par, vl.alist ("RootSys")),
     Prod (par, vl.alist ("Prod")),
     CrpAux (par, vl.alist ("CrpAux"))
 { }
@@ -505,8 +497,7 @@ CropOld::Variables::RecCanopy::output (Log& log, Filter& filter) const
 }
 
 CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
-						 const AttributeList& vl, 
-						 int layers)
+						 const AttributeList& vl)
   : Depth (vl.check ("Depth") ? vl.number ("Depth") : par.Root.DptEmr),
     Density (vl.number_sequence ("Density")),
     H2OExtraction (vl.number_sequence ("H2OExtraction")),
@@ -518,19 +509,7 @@ CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
     ws_down (0.0),
     Ept (0.0),
     transpiration (0.0)
-{ 
-  if (layers > 0)
-    {
-      assert (Density.size () == 0);
-      Density.insert (Density.begin (), layers, 0.0);
-      assert (H2OExtraction.size () == 0);
-      H2OExtraction.insert (H2OExtraction.begin (), layers, 0.0);
-      assert (NH4Extraction.size () == 0);
-      NH4Extraction.insert (NH4Extraction.begin (), layers, 0.0);
-      assert (NO3Extraction.size () == 0);
-      NO3Extraction.insert (NO3Extraction.begin (), layers, 0.0);
-    }
-}
+{ }
 
 void 
 CropOld::Variables::RecRootSys::output (Log& log, Filter& filter) const
@@ -615,15 +594,30 @@ CropOld::Variables::RecCrpAux::output (Log& log, Filter& filter) const
 CropOld::Variables::~Variables ()
 { }
 
-// Add the Crop syntax to the syntax table.
-Crop*
-CropOld::make (const AttributeList& vl, int layers)
+void
+CropOld::initialize (const Geometry& geometry)
 {
-  return new CropOld (vl, layers);
+  unsigned int size = geometry.size ();
+
+  // Fill rootsys arrays.
+  var.RootSys.Density.insert (var.RootSys.Density.end (),
+			      size - var.RootSys.Density.size (), 
+			      0.0);
+  var.RootSys.H2OExtraction.insert (var.RootSys.H2OExtraction.end (),
+				    size - var.RootSys.H2OExtraction.size (),
+				    0.0);
+  var.RootSys.NH4Extraction.insert (var.RootSys.NH4Extraction.end (),
+				    size - var.RootSys.NH4Extraction.size (),
+				    0.0);
+  var.RootSys.NO3Extraction.insert (var.RootSys.NO3Extraction.end (),
+				    size - var.RootSys.NO3Extraction.size (),
+				    0.0);
 }
 
 static struct CropOldSyntax
 {
+  static Crop& make (const AttributeList& al)
+    { return *new CropOld (al); }
   CropOldSyntax ();
 } old_crop_syntax;
 
@@ -864,7 +858,7 @@ CropOldSyntax::CropOldSyntax ()
   CrpAux.add ("NO3Upt", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("Fixated", Syntax::Number, Syntax::LogOnly);
 
-  Crop::add_type ("old", alist, syntax, &CropOld::make);
+  Librarian<Crop>::add_type ("old", alist, syntax, &make);
 }
 
 double
@@ -1886,10 +1880,10 @@ double
 CropOld::DS () const
 { return var.Phenology.DS; }
 
-CropOld::CropOld (const AttributeList& al, int layers)
+CropOld::CropOld (const AttributeList& al)
   : Crop (al.name ("type")),
     par (*new Parameters (al)),
-    var (*new Variables (par, al, layers))
+    var (*new Variables (par, al))
 { }
 
 CropOld::~CropOld ()

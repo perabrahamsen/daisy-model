@@ -36,7 +36,7 @@ private:
     const string name = crop.name ("type");
 
     // Does it exists?
-    const Library& library = Crop::library ();
+    const Library& library = Librarian<Crop>::library ();
     if (!library.check (name))
       {
 	cerr << "Cannot sow unknown crop `" << name << "'\n";
@@ -72,7 +72,7 @@ static struct ActionSowSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("crop", Crop::library (), Syntax::Const);
+    syntax.add ("crop", Librarian<Crop>::library (), Syntax::Const);
     syntax.order ("crop");
     Action::add_type ("sow", alist, syntax, &ActionSow::make);
   }

@@ -140,7 +140,7 @@ void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Libraries.
-  syntax.add_library ("defcrop", Crop::library (), &Crop::derive_type);
+  Librarian<Crop>::add_library (syntax, "defcrop");
   Librarian<Horizon>::add_library (syntax, "defhorizon");
   Librarian<Column>::add_library (syntax, "defcolumn");
   Librarian<Log>::add_library (syntax, "deflog");

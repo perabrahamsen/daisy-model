@@ -85,9 +85,11 @@ public:
 };
 
 void
-ColumnStandard::sow (const AttributeList& crop)
+ColumnStandard::sow (const AttributeList& al)
 {
-  crops.push_back (Crop::create (crop, soil.size ()));
+  Crop& crop = Librarian<Crop>::create (al);
+  crop.initialize (soil);
+  crops.push_back (&crop);
 }
 
 void 
@@ -314,7 +316,7 @@ ColumnStandard::output (Log& log, Filter& filter) const
   output_derived (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
   output_derived (groundwater, "Groundwater", log, filter);
-  output_list (crops, "crops", log, filter, Crop::library ());
+  output_list (crops, "crops", log, filter, Librarian<Crop>::library ());
   log.close_geometry ();
 }
 
@@ -393,7 +395,8 @@ static struct ColumnStandardSyntax
     AttributeList& alist = *new AttributeList ();
 
     syntax.add ("description", Syntax::String, Syntax::Optional); 
-    syntax.add ("crops", Crop::library (), Syntax::State, Syntax::Sequence);
+    syntax.add ("crops", Librarian<Crop>::library (), 
+		Syntax::State, Syntax::Sequence);
     alist.add ("crops", *new vector<AttributeList*>);
     syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
 		Syntax::State);

@@ -3,10 +3,8 @@
 #ifndef CROP_H
 #define CROP_H
 
-#include <string>
-#include <list>
-#include <vector>
 #include "time.h"
+#include "librarian.h"
 
 struct Log;
 struct Filter;
@@ -24,7 +22,6 @@ struct SoilHeat;
 struct SoilNH4;
 struct SoilNO3;
 struct Column;
-struct AM;
 struct Harvest;
 
 class Crop 
@@ -74,23 +71,16 @@ protected:
   virtual double DS () const = 0;
   static const double DSremove;
 
-  // Library.
-public:
-  static const Library& library ();
-  typedef Crop* (*constructor) (const AttributeList&, int layers);
-  static void add_type (const string& name, 
-			AttributeList&, const Syntax&,
-			constructor);
-  static void derive_type (const string& name, AttributeList& al, 
-			   const string& super);
-  static Crop* create (const AttributeList&, int layers = -1);
-
   // Create and Destroy.
+public:
+  virtual void initialize (const Geometry&) = 0;
 protected:
   Crop (const string& );
 public:
   virtual ~Crop ();
 };
+
+static Librarian<Crop> Crop_init ("crop");
 
 class CropList : public list <Crop*> 
 { 
@@ -98,15 +88,5 @@ public:
   CropList (const vector<AttributeList*>&);
   ~CropList ();
 };
-
-// Ensure the Crop library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class Crop_init
-{
-  static int count;
-public:
-  Crop_init ();
-  ~Crop_init ();
-} Crop_init;
 
 #endif CROP_H

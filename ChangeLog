@@ -1,15 +1,33 @@
+1998-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.008 released.
+
+1998-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C, cdaisy.h (daisy_version): New function.
+
+	* crop.C, crop.h: Use librarian to manage Crop.
+	* crop_std.C, crop_old.C, crop_sold.C: Updated derived classes.
+	* column_std.C, daisy.C, action_sow.C, event.C: Updated callers.
+
+	* crop_std.C (CanopyStructure): Reverted previous change.  They
+	already started at the ground.
+	* bioclimate_std.C (RadiationDistribution): Enabled assertions.
+
 1998-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.007 released.
 
 1998-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* bioclimate_std.C (BioclimateStandard): Ditto.
-	(RadiationDistribution): Ditto.
+	* parser_file.C (get_number, get_integer): Read one character a
+	time in order to know the column number.
 
 	* crop_std.C (CanopyStructure): Make LAIvsH start from the ground
 	instead of the top.
 	(CanopyPhotosynthesis): Adjust.
+	* bioclimate_std.C (BioclimateStandard): Ditto.
+	(RadiationDistribution): Ditto.
 
 	* printer_file.C: Include <algorithm>.
 
