@@ -26,8 +26,8 @@
 #include "mathlib.h"
 #include "log.h"
 #include "uzmodel.h"
-#include "message.h"
 #include "check.h"
+#include "tmpstream.h"
 
 struct MacroStandard : public Macro
 {
@@ -47,7 +47,7 @@ struct MacroStandard : public Macro
 	    const vector<double>& Theta,
 	    vector<double>& S_m,
 	    vector<double>& S_p,
-	    vector<double>& q_p);
+	    vector<double>& q_p, Treelog&);
   void output (Log&) const
     { }
 
@@ -74,7 +74,8 @@ MacroStandard::tick (const Soil& soil,
 		     const vector<double>& Theta,
 		     vector<double>& S_m,
 		     vector<double>& S_p,
-		     vector<double>& q_p)
+		     vector<double>& q_p,
+		     Treelog& msg)
 { 
   // Check input.
   assert (last > first);
@@ -104,7 +105,7 @@ MacroStandard::tick (const Soil& soil,
 	  assert (q_p[0] == 0.0);
 	  assert (from == 0);
 	  q_p[0] = q_top;
-	  const bool accepted = surface.accept_top (q_p[0]);
+	  const bool accepted = surface.accept_top (msg, q_p[0]);
 	  assert (accepted);
 	}
     }
@@ -164,9 +165,13 @@ MacroStandard::tick (const Soil& soil,
 
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
-    CERR << __FILE__ << ":" <<  __LINE__
-	 << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top)
-	 << "' first pass\n";
+    {
+      TmpStream tmp;
+      tmp () << __FILE__ << ":" <<  __LINE__
+	     << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top)
+	     << "' first pass";
+      msg.error (tmp.str ());
+    }
 
   // Now check for saturated conditions.
   double extra_water = 0.0;	// [cm]
@@ -231,15 +236,23 @@ MacroStandard::tick (const Soil& soil,
 
   // Check that we got all the extra water stored somewhere.
   if (extra_water != 0.0)
-    if (!surface.accept_top (extra_water))
-      CERR << "BUG: Surface would not accept " << extra_water 
-	   << "mm overflowing water (layer " << from << ")\n";
+    if (!surface.accept_top (msg, extra_water))
+      {
+	TmpStream tmp;
+	tmp () << "BUG: Surface would not accept " << extra_water 
+	       << "mm overflowing water (layer " << from << ")";
+	msg.error (tmp.str ());
+      }
 
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) - q_top) > 1.0e-11)
-    CERR << __FILE__ << ":" <<  __LINE__
-	 << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top) 
-	 << "' second pass\n";
+    {
+      TmpStream tmp;
+      tmp () << __FILE__ << ":" <<  __LINE__
+	     << ": BUG: Total S_p = '" << (soil.total (S_p) - q_top) 
+	     << "' second pass";
+      msg.error (tmp.str ());
+    }
 }
 
 static struct MacroStandardSyntax

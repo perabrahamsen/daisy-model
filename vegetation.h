@@ -69,16 +69,18 @@ public:
 public:
   virtual void tick (const Time&, const Bioclimate&, const Soil&,
 		     OrganicMatter&, const SoilHeat&, const SoilWater&,
-		     SoilNH4&, SoilNO3&) = 0; // Allow plants to grow (hourly).
+		     // Allow plants to grow (hourly).
+		     SoilNH4&, SoilNO3&, Treelog&) = 0;
   virtual void tick (const Time&, const Bioclimate&, const Soil&,
-		     const SoilHeat&, const SoilWater&) = 0;
+		     const SoilHeat&, const SoilWater&, Treelog&) = 0;
   virtual double transpiration (// Actual trans. [mm/h]
 				double potential_transpiration,	
 				double canopy_evaporation,
-				const Soil& soil, SoilWater& soil_water) = 0;
+				const Soil& soil, SoilWater& soil_water,
+				Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
   virtual void kill_all (const string&, const Time&, const Geometry&,
-			 Bioclimate&, vector<AM*>& residuals) = 0;
+			 Bioclimate&, vector<AM*>& residuals, Treelog&) = 0;
   virtual void harvest (const string& column_name,
 			const string& crop_name,
 			const Time&, const Geometry&, 
@@ -90,16 +92,18 @@ public:
 			vector<const Harvest*>& harvest,
 			vector<AM*>& residuals,
 			double& harvest_DM, 
-			double& harvest_N, double& harvest_C) = 0;
-  virtual double sow (const AttributeList& al, // Return kg N/ha in seed.
+			double& harvest_N, double& harvest_C,
+			Treelog&) = 0;
+  virtual double sow (Treelog& msg, 
+		      const AttributeList& al, // Return kg N/ha in seed.
 		      const Geometry&, OrganicMatter&) = 0;
-  virtual void sow (const AttributeList& al,
+  virtual void sow (Treelog& msg, const AttributeList& al,
 		    const Geometry&) = 0;
   virtual void output (Log&) const;
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Soil& soil, OrganicMatter&) = 0;
+  virtual void initialize (Treelog&, const Soil& soil, OrganicMatter&) = 0;
   static void load_syntax (Syntax&, AttributeList&);
   Vegetation (const AttributeList&);
   virtual ~Vegetation ();

@@ -41,7 +41,7 @@ Weather::screen_height () const	// [m];
 { return screen_height_; }
 
 void
-Weather::tick (const Time& time)
+Weather::tick (const Time& time, Treelog&)
 {
   // Day length.
   day_length_ = day_length (time);
@@ -49,7 +49,7 @@ Weather::tick (const Time& time)
 }
 
 void 
-Weather::tick_after (const Time& time)
+Weather::tick_after (const Time& time, Treelog&)
 {
   // Hourly claudiness.
   const double Si = hourly_global_radiation (); 
@@ -222,7 +222,7 @@ Weather::CloudinessFactor_Humid (const Time& time, double Si) const
 
 double
 Weather::RefNetRadiation (const Time& time, double Si,
-			  double Temp, double ea) const
+			  double Temp, double ea, Treelog& out) const
 {
   static NetRadiation* net_radiation = NULL;
   if (net_radiation == NULL)
@@ -235,7 +235,7 @@ Weather::RefNetRadiation (const Time& time, double Si,
 
   const double albedo = 0.23;
   net_radiation->tick (CloudinessFactor_Arid (time, Si),
-		       Temp, ea, Si, albedo);
+		       Temp, ea, Si, albedo, out);
   return net_radiation->net_radiation ();
 }
 

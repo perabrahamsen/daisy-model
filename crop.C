@@ -38,10 +38,10 @@ Crop::albedo () const
 
 void
 Crop::kill (const string& name, const Time& time, const Geometry& geometry,
-	    Bioclimate& bioclimate, vector<AM*>& residuals)
+	    Bioclimate& bioclimate, vector<AM*>& residuals, Treelog& out)
 { 
   harvest (name, time, geometry, bioclimate,
-	   0.0, 0.0, 0.0, 0.0, true, residuals); 
+	   0.0, 0.0, 0.0, 0.0, true, residuals, out); 
 }
 
 void 
@@ -53,8 +53,8 @@ Crop::ds_remove (const Crop* crop)
 { return crop->DS () == Crop::DSremove; }
 
 void
-Crop::initialize (const Geometry& geometry, OrganicMatter&)
-{ initialize (geometry); }
+Crop::initialize (Treelog& msg, const Geometry& geometry, OrganicMatter&)
+{ initialize (msg, geometry); }
 
 Crop::Crop (const AttributeList& al)
   : alist (al),

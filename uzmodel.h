@@ -40,7 +40,7 @@ public:
   { return -q () * dt; }
   virtual void flux_top_on () const = 0;
   virtual void flux_top_off () const = 0;
-  virtual bool accept_top (double) = 0;
+  virtual bool accept_top (Treelog&, double) = 0;
   virtual bool soil_top () const;
   virtual ~UZtop ();
 };
@@ -67,7 +67,7 @@ public:
   double q () const = 0;
   void flux_top_on () const = 0;
   void flux_top_off () const = 0;
-  bool accept_top (double) = 0;
+  bool accept_top (Treelog&, double) = 0;
 
   // UZbottom.
 public:
@@ -76,7 +76,7 @@ public:
   
   // Simulate.
 public:
-  virtual bool tick (const Soil& soil,
+  virtual bool tick (Treelog&, const Soil& soil,
 		     unsigned int first, const UZtop& top, 
 		     unsigned int last, const UZbottom& bottom, 
 		     const vector<double>& S,

@@ -57,7 +57,7 @@ public:
   // Simulation.
 public:
   virtual void tick (Surface&, const Weather&, Vegetation&, 
-		     const Soil&, SoilWater&, const SoilHeat&) = 0;
+		     const Soil&, SoilWater&, const SoilHeat&, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 
   // Canopy.

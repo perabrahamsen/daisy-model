@@ -31,6 +31,7 @@ struct Log;
 struct Soil;
 struct SoilWater;
 struct SoilHeat;
+struct Treelog;
 
 class Snow
 { 
@@ -39,7 +40,7 @@ class Snow
 
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&, const SoilHeat&,
+  void tick (Treelog&, const Soil&, const SoilWater&, const SoilHeat&,
 	     double Si, double q_h, double Prain,
 	     double Psnow, double Pond, double T, double Epot);
   void output (Log&) const;

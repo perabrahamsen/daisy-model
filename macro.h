@@ -46,7 +46,7 @@ public:
 		     const vector<double>& Theta,
 		     vector<double>& S,
 		     vector<double>& S_p,
-		     vector<double>& q_p) = 0;
+		     vector<double>& q_p, Treelog&) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

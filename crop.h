@@ -70,14 +70,14 @@ public:
   virtual double albedo () const;
   virtual void CanopyStructure () = 0;
   virtual double ActualWaterUptake (double Ept, const Soil&, SoilWater&, 
-				    double EvapInterception) = 0;
+				    double EvapInterception, Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
 
   // Simulation.
 public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&,
 		     OrganicMatter*, const SoilHeat&, const SoilWater&,
-		     SoilNH4*, SoilNO3*) = 0;
+		     SoilNH4*, SoilNO3*, Treelog&) = 0;
   virtual const Harvest& harvest (const string& column_name,
 				  const Time&, const Geometry&, 
 				  Bioclimate& bioclimate,
@@ -86,9 +86,9 @@ public:
 				  double leaf_harvest, 
 				  double sorg_harvest,
 				  bool kill_off,
-				  vector<AM*>& residuals) = 0;
+				  vector<AM*>& residuals, Treelog&) = 0;
   void kill (const string&, const Time&, const Geometry&, Bioclimate&,
-	     vector<AM*>&);
+	     vector<AM*>&, Treelog&);
   virtual void output (Log&) const = 0;
   
   // Queries.
@@ -101,8 +101,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Geometry&, OrganicMatter&);
-  virtual void initialize (const Geometry&) = 0;
+  virtual void initialize (Treelog&, const Geometry&, OrganicMatter&);
+  virtual void initialize (Treelog&, const Geometry&) = 0;
 protected:
   Crop (const AttributeList& al);
 public:

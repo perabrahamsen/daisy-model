@@ -258,7 +258,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 	  const double dz_bottom
 	    = z.integrate (0.0, x_bottom) / bottom_width + dz;
 #if 0
-	  CERR << "dz_bottom = " << dz_bottom << ", x_bottom = " 
+	  cerr << "dz_bottom = " << dz_bottom << ", x_bottom = " 
 	       << x_bottom << ", bottom_width = " << bottom_width
 	       << ", dz = " << dz << "\n";
 #endif
@@ -280,12 +280,12 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 	  const double dz_wall
 	    = z.integrate (x_switch, x_pond) / wall_width + dz;
 #if 0 
-	  CERR << "dz_wall = " << dz_wall << ", wall_with = " 
+	  cerr << "dz_wall = " << dz_wall << ", wall_with = " 
 	       << wall_width << "\n";
 #endif
 	  R_wall = (x_width / wall_width) * (dz_wall / K);
 #if 0
-	  CERR << "R_wall = " << R_wall << ", x_width = " <<x_width
+	  cerr << "R_wall = " << R_wall << ", x_width = " <<x_width
 	       << ", dz_wall = " <<dz_wall << ", K = " << K << "\n";
 #endif
 	  I_wall = min ((z_pond - z_switch) / R_wall, I_max - I_bottom);
@@ -302,7 +302,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   assert (I < external_ponding + 1.0e-8);
 
 #if 0
-  CERR << "switch = (" << x_switch << ", " << z_switch << "), pond = ("
+  cerr << "switch = (" << x_switch << ", " << z_switch << "), pond = ("
        << x_pond << ", " << z_pond << ") I = " << I 
        << " (bottom = " << I_bottom << ", wall = " << I_wall 
        << "), internal ponding = " << internal_ponding 

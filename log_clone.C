@@ -29,7 +29,7 @@
 #endif
 
 bool
-LogClone::match (const Daisy&)
+LogClone::match (const Daisy&, Treelog&)
 { assert (false); return false; }
 
 #ifdef BORLAND_PRAGMA

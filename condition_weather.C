@@ -39,7 +39,7 @@ struct ConditionTSum : public Condition
   // State.
   double TSum_now;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog&)
   {
     if (daisy.time.hour () == check_hour)
       {

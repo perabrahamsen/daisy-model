@@ -134,7 +134,7 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
 	const_cast<double&> (Theta_sat) = Theta;
       
       if (i != int (rint (pF * 100)))
-	CERR << name << ":" << line << ": i " << i << " != "
+	cerr << name << ":" << line << ": i " << i << " != "
 	     << pF * 100 << "(" << int (rint (pF * 100)) << ")\n";
       
       Theta_[i] = Theta;

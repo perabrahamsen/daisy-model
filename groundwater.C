@@ -38,7 +38,8 @@ Groundwater::update_water (const Soil&,
 			   vector<double>& /* h_ice */,
 			   vector<double>& /* Theta */,
 			   vector<double>& /* q */,
-			   vector<double>& /* q_p */)
+			   vector<double>& /* q_p */,
+			   Treelog&)
 { }
 
 void

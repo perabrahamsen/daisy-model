@@ -8,8 +8,8 @@
 #include "mathlib.h"
 #include "harvest.h"
 #include "log.h"
+#include "tmpstream.h"
 #include <deque>
-#include "message.h"
 
 struct VegetationCrops : public Vegetation
 {
@@ -80,31 +80,33 @@ struct VegetationCrops : public Vegetation
 	     const SoilHeat& soil_heat,
 	     const SoilWater& soil_water,
 	     SoilNH4& soil_NH4,
-	     SoilNO3& soil_NO3);
+	     SoilNO3& soil_NO3, Treelog&);
   void tick (const Time& time,
 	     const Bioclimate& bioclimate,
 	     const Soil& soil,
 	     const SoilHeat& soil_heat,
-	     const SoilWater& soil_water);
-  void reset_canopy_structure ();
+	     const SoilWater& soil_water, Treelog&);
+  void reset_canopy_structure (Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
-			const Soil& soil, SoilWater& soil_water);
+			const Soil& soil, SoilWater& soil_water, Treelog&);
   void force_production_stress  (double pstress);
   void kill_all (const string&, const Time&, const Geometry&, 
-		 Bioclimate&, vector<AM*>& residuals);
+		 Bioclimate&, vector<AM*>& residuals, Treelog&);
   void harvest (const string& column_name, const string& crop_name,
 		const Time&, const Geometry&, Bioclimate&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
 		vector<const Harvest*>& harvest, vector<AM*>& residuals,
-		double& harvest_DM, double& harvest_N, double& harvest_C);
-  double sow (const AttributeList& al, const Geometry&, OrganicMatter&);
-  void sow (const AttributeList& al, const Geometry&);
+		double& harvest_DM, double& harvest_N, double& harvest_C, 
+		Treelog&);
+  double sow (Treelog& msg, 
+	      const AttributeList& al, const Geometry&, OrganicMatter&);
+  void sow (Treelog& msg, const AttributeList& al, const Geometry&);
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (const Soil& soil, OrganicMatter&);
+  void initialize (Treelog& msg, const Soil& soil, OrganicMatter&);
   VegetationCrops (const AttributeList&);
   ~VegetationCrops ();
 };
@@ -161,7 +163,8 @@ VegetationCrops::tick (const Time& time,
 		       const SoilHeat& soil_heat,
 		       const SoilWater& soil_water,
 		       SoilNH4& soil_NH4,
-		       SoilNO3& soil_NO3)
+		       SoilNO3& soil_NO3,
+		       Treelog& msg)
 {
   // Uptake and convertion of matter.
   for (CropList::iterator crop = crops.begin(); 
@@ -169,7 +172,7 @@ VegetationCrops::tick (const Time& time,
        crop++)
     {
       (*crop)->tick (time, bioclimate, soil, &organic_matter, 
-		     soil_heat, soil_water, &soil_NH4, &soil_NO3);
+		     soil_heat, soil_water, &soil_NH4, &soil_NO3, msg);
     }
 
   // Make sure the crop which took first this time will be last next.
@@ -180,7 +183,7 @@ VegetationCrops::tick (const Time& time,
     }
 
   // Reset canopy structure.
-  reset_canopy_structure ();
+  reset_canopy_structure (msg);
 }
 
 void 
@@ -188,7 +191,7 @@ VegetationCrops::tick (const Time& time,
 		       const Bioclimate& bioclimate,
 		       const Soil& soil,
 		       const SoilHeat& soil_heat,
-		       const SoilWater& soil_water)
+		       const SoilWater& soil_water, Treelog& msg)
 {
   // Uptake and convertion of matter.
   for (CropList::iterator crop = crops.begin(); 
@@ -196,7 +199,7 @@ VegetationCrops::tick (const Time& time,
        crop++)
     {
       (*crop)->tick (time, bioclimate, soil, NULL, 
-		     soil_heat, soil_water, NULL, NULL);
+		     soil_heat, soil_water, NULL, NULL, msg);
     }
 
   // Make sure the crop which took first this time will be last next.
@@ -207,11 +210,11 @@ VegetationCrops::tick (const Time& time,
     }
 
   // Reset canopy structure.
-  reset_canopy_structure ();
+  reset_canopy_structure (msg);
 }
 
 void 
-VegetationCrops::reset_canopy_structure ()
+VegetationCrops::reset_canopy_structure (Treelog& msg)
 {
   // Reset vegetation state.
   LAI_ = 0.0;
@@ -244,17 +247,21 @@ VegetationCrops::reset_canopy_structure ()
       HvsLAI_ = LAIvsH_.inverse ();
       if (!approximate (height_, HvsLAI_ (LAI_), 0.01))
 	{
-	  CERR << "BUG: Vegetation: height == " << height_
-	       << ", LAI == " << LAI_
-	       << ", HvsLAI (LAI) == " << HvsLAI_ (LAI_) << ".\n";
-	  
+	  Treelog::Open nest (msg, "Vegetation reset canopy structure");
+	  TmpStream tmp;
+	  tmp () << "BUG: Vegetation: height == " << height_
+		 << ", LAI == " << LAI_
+		 << ", HvsLAI (LAI) == " << HvsLAI_ (LAI_);
+	  msg.error (tmp.str ());
 	  for (CropList::iterator crop = crops.begin(); 
 	       crop != crops.end(); 
 	       crop++)
 	    {
-	      CERR << (*crop)->name << " has height "
-		   << (*crop)->height () << " and LAI "
-		   << (*crop)->LAI () << ".\n";
+	      TmpStream tmp;
+	      tmp () << (*crop)->name << " has height "
+		     << (*crop)->height () << " and LAI "
+		     << (*crop)->LAI ();
+	      msg.error (tmp.str ());
 	    }
 	  LAI_ = 0.0;
 	  height_ = 0.0;
@@ -289,7 +296,7 @@ double
 VegetationCrops::transpiration (double potential_transpiration,
 				double canopy_evaporation,
 				const Soil& soil, 
-				SoilWater& soil_water)
+				SoilWater& soil_water, Treelog& msg)
 {
   double value = 0.0;
   
@@ -308,7 +315,7 @@ VegetationCrops::transpiration (double potential_transpiration,
 	{
 	  value += (*crop)->ActualWaterUptake (pt_per_LAI * (*crop)->LAI (), 
 					       soil, soil_water, 
-					       canopy_evaporation);
+					       canopy_evaporation, msg);
 	}
     }
   return value;
@@ -328,18 +335,19 @@ VegetationCrops::force_production_stress (double pstress)
 void
 VegetationCrops::kill_all (const string& name, const Time& time, 
 			   const Geometry& geometry, 
-			   Bioclimate& bioclimate, vector<AM*>& residuals)
+			   Bioclimate& bioclimate, vector<AM*>& residuals,
+			   Treelog& msg)
 {
   for (CropList::iterator crop = crops.begin(); 
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->kill (name, time, geometry, bioclimate, residuals);
+      (*crop)->kill (name, time, geometry, bioclimate, residuals, msg);
       delete *crop;
     }
   crops.erase (crops.begin (), crops.end ());
   assert (crops.size () == 0);
-  reset_canopy_structure ();
+  reset_canopy_structure (msg);
 }
 
 void
@@ -354,7 +362,7 @@ VegetationCrops::harvest (const string& column_name,
 			  vector<const Harvest*>& harvest,
 			  vector<AM*>& residuals,
 			  double& harvest_DM, 
-			  double& harvest_N, double& harvest_C)
+			  double& harvest_N, double& harvest_C, Treelog& msg)
 {
   const bool all = (crop_name == "all");
 
@@ -370,7 +378,7 @@ VegetationCrops::harvest (const string& column_name,
 			    bioclimate,
 			    stub_length, stem_harvest,
 			    leaf_harvest, sorg_harvest, 
-			    false, residuals);
+			    false, residuals, msg);
 
 	harvest_DM += mine.total_DM ();
 	harvest_N += mine.total_N ();
@@ -402,26 +410,26 @@ VegetationCrops::harvest (const string& column_name,
   while (removed);
 
   // Notify the vegetation.
-  reset_canopy_structure ();
+  reset_canopy_structure (msg);
 }
 
 double
-VegetationCrops::sow (const AttributeList& al,
+VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      const Geometry& geometry,
 		      OrganicMatter& organic_matter)
 {
   Crop& crop = Librarian<Crop>::create (al);
-  crop.initialize (geometry, organic_matter);
+  crop.initialize (msg, geometry, organic_matter);
   crops.push_back (&crop);
   return crop.total_N ();
 }
 
 void
-VegetationCrops::sow (const AttributeList& al,
+VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      const Geometry& geometry)
 {
   Crop& crop = Librarian<Crop>::create (al);
-  crop.initialize (geometry);
+  crop.initialize (msg, geometry);
   crops.push_back (&crop);
 }
 
@@ -433,12 +441,12 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (const Soil& soil, 
+VegetationCrops::initialize (Treelog& msg, const Soil& soil, 
 			     OrganicMatter& organic_matter)
 {
   for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize (soil, organic_matter);
-  reset_canopy_structure ();
+    crops[i]->initialize (msg, soil, organic_matter);
+  reset_canopy_structure (msg);
 }
 
 VegetationCrops::VegetationCrops (const AttributeList& al)

@@ -38,7 +38,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Soil&, const SoilWater&, SoilChemicals&) = 0;
+  virtual void tick (const Soil&, const SoilWater&, SoilChemicals&, 
+		     Treelog&) = 0;
   virtual void output (Log&) const;
   virtual bool check (const Soil&, Treelog& err) const;
 

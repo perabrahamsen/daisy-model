@@ -88,7 +88,7 @@ public:
 			     const Geometry* geometry);
 
   // Reset at start of time step.
-  bool match (const Daisy& daisy, bool is_printing);
+  bool match (const Daisy& daisy, Treelog&, bool is_printing);
 
   // Print result at end of time step.
   virtual void done (Destination& dest) = 0;

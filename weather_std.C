@@ -132,7 +132,7 @@ struct WeatherStandard : public Weather
   double rain_fraction;
 
   // Simulation.
-  void tick (const Time& time);
+  void tick (const Time& time, Treelog&);
   void output (Log& log) const
     { Weather::output (log); }
   void read_line ();
@@ -247,9 +247,9 @@ WeatherStandard::has_data (const string& name)
 }
 
 void
-WeatherStandard::tick (const Time& time)
+WeatherStandard::tick (const Time& time, Treelog& out)
 {
-  Weather::tick (time);
+  Weather::tick (time, out);
 
   hour = time.hour ();
   
@@ -277,7 +277,7 @@ WeatherStandard::tick (const Time& time)
   assert (snow_fraction >= 0 && snow_fraction <= 1);
   assert (approximate (rain_fraction + snow_fraction, 1.0));
 
-  Weather::tick_after (time);
+  Weather::tick_after (time, out);
 }
 
 void 

@@ -26,7 +26,6 @@
 #include "am.h"
 #include "im.h"
 #include "tmpstream.h"
-#include "message.h"
 #include "check.h"
 
 struct ActionFertilize : public Action
@@ -54,7 +53,7 @@ struct ActionFertilize : public Action
   Precision *const precision;
 
   // Simulation.
-  void doIt (Daisy& daisy);
+  void doIt (Daisy& daisy, Treelog&);
 
   // Create and Destroy.
   bool check (const Daisy& daisy, Treelog& err) const;
@@ -116,7 +115,7 @@ ActionFertilize::Precision::~Precision ()
 { }
 
 void 
-ActionFertilize::doIt (Daisy& daisy)
+ActionFertilize::doIt (Daisy& daisy, Treelog& out)
 {
   if (precision)
     {
@@ -126,7 +125,7 @@ ActionFertilize::doIt (Daisy& daisy)
       
       if (weight <= minimum_weight)
 	{
-	  COUT << " [Not fertilizing due to precision farming]\n";
+	  out.message (" [Not fertilizing due to precision farming]");
 	  return;
 	}
       AM::set_utilized_weight (am, weight);
@@ -139,7 +138,7 @@ ActionFertilize::doIt (Daisy& daisy)
 
       if (weight - compensation <= minimum_weight)
 	{
-	  COUT << " [Not fertilizing due to second year effect]\n";
+	  out.message (" [Not fertilizing due to second year effect]");
 	  return;
 	}
       else
@@ -148,20 +147,21 @@ ActionFertilize::doIt (Daisy& daisy)
   else if (minimum_weight > 0.0
 	   && minimum_weight > AM::utilized_weight (am))
     {
-      COUT << " [Not fertilizing due to minimum weight]\n";
+      out.message (" [Not fertilizing due to minimum weight]");
       return;
     }
 
   const string syntax = am.name ("syntax");
+  TmpStream tmp;
   if (syntax == "mineral")
-    COUT << " [Fertilizing " << am.number ("weight") 
-	 << " kg "<< am.name ("type") << "-N/ha]\n";
+    tmp () << " [Fertilizing " << am.number ("weight") 
+	   << " kg "<< am.name ("type") << "-N/ha]";
   else if (syntax == "organic")
-    COUT << " [Fertilizing " << am.number ("weight") 
-	 << " ton "<< am.name ("type") << " ww/ha]\n";
+    tmp () << " [Fertilizing " << am.number ("weight") 
+	   << " ton "<< am.name ("type") << " ww/ha]";
   else
-    COUT << " [Fertilizing " << am.name ("type") << "]\n";
-
+    tmp () << " [Fertilizing " << am.name ("type") << "]";
+  out.message (tmp.str ());
   if (syntax != "mineral")
     am.add ("creation", daisy.time);
 

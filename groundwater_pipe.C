@@ -26,7 +26,6 @@
 #include "tmpstream.h"
 #include "treelog.h"
 #include "mathlib.h"
-#include "message.h"
 #include "check.h"
 
 class GroundwaterPipe : public Groundwater
@@ -61,14 +60,14 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&)
-    {
+  void tick (const Time&, Treelog&)
+  {
 #if 0
-       if (time.year () == 1986 && time.month () == 12 && time.mday () == 18 &&
-           time.hour () == 20)
-           COUT << "it's time - Greetings from pipe drains" << "\n";
+    if (time.year () == 1986 && time.month () == 12 && time.mday () == 18 &&
+	time.hour () == 20)
+      out.warning ("it's time - Greetings from pipe drains");
 #endif
-    }
+  }
   void update_water (const Soil&,
   		     vector<double>& S_sum,
   		     vector<double>& S_drain,
@@ -76,7 +75,8 @@ public:
 		     vector<double>& h_ice,
 		     vector<double>& Theta,
 		     vector<double>& q,
-		     vector<double>& q_p);
+		     vector<double>& q_p,
+		     Treelog&);
   void output (Log& log) const;
 
 private:
@@ -84,17 +84,17 @@ private:
   double EquilibriumDrainFlow (const Soil&);
   void RaisingGWT  (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
-                    vector<double>& Theta, const double deficit);
+                    vector<double>& Theta, const double deficit, Treelog&);
   void FallingGWT1 (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
-                    vector<double>& Theta, const double deficit);
+                    vector<double>& Theta, const double deficit, Treelog&);
   void FallingGWT2 (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
-                    vector<double>& Theta, const double deficit);
+                    vector<double>& Theta, const double deficit, Treelog&);
   void Update_GWT  (const Soil&,
                     vector<double>& h, vector<double>& h_ice,
                     vector<double>& Theta, vector<double>& q,
-                    vector<double>& q_p);
+                    vector<double>& q_p, Treelog&);
   double EquilibriumDrainage (const int i_drainage, const Soil& soil,
                     vector<double>& h_ice);
   double EqlDeficit (const int node, const Soil& soil, const double Theta,
@@ -151,7 +151,8 @@ GroundwaterPipe::update_water (const Soil& soil,
 			       vector<double>& h_ice,
 			       vector<double>& Theta,
 			       vector<double>& q,
-			       vector<double>& q_p)
+			       vector<double>& q_p,
+			       Treelog& out)
 {
   fill (S.begin (), S.end (), 0.0);
   for (unsigned int i = 1; i <= i_bottom+1; i++)
@@ -170,7 +171,7 @@ GroundwaterPipe::update_water (const Soil& soil,
   if (height<GWT_UZ) height = GWT_UZ;
   Percolation[i_bottom] = DeepPercolation(soil);
   EqDrnFlow = EquilibriumDrainFlow (soil);
-  Update_GWT (soil, h, h_ice, Theta, q, q_p);
+  Update_GWT (soil, h, h_ice, Theta, q, q_p, out);
   const int i_GWT_old = soil.interval_plus (height) + 1;
   const int i_GWT = soil.interval_plus (GWT_new) + 1;
   for (unsigned int i = 1; i <= i_bottom; i++)
@@ -181,19 +182,26 @@ GroundwaterPipe::update_water (const Soil& soil,
                          /soil.dz(i) -
                          S[i])*dt;
        if (fabs(w)>0.0001)
-         COUT << "GWT " << int(GWT_State)
-              << " i_GWT = " << int(i_GWT) << " i_GWT_old = " << int(i_GWT_old)
-              << " BUG: W = " << w << " i = " << i << "\n";
+	 {
+	   TmpStream tmp;
+	   tmp () << "GWT " << int(GWT_State)
+		  << " i_GWT = " << int(i_GWT) << " i_GWT_old = " 
+		  << int(i_GWT_old) << " BUG: W = " << w << " i = " << i;
+	   out.error (tmp.str ());
+	 }
     }
   DrainFlow = 0.0;
   for (unsigned int i = 0; i <= i_bottom; i++)
     {
        S_sum[i] += S[i];
        if (i==i_GWT && S[i_drain]<=0.0 && S[i_drain-1]>0.0)
-         COUT << " i_GWT = " << i_GWT
-              << " Percolation[i_GWT-1] = " << Percolation[i_GWT-1]
-              << " Eq-Drainage = " << EqDrnFlow
-              << "\n";
+	 {
+	   TmpStream tmp;
+	   tmp () << " i_GWT = " << i_GWT
+		  << " Percolation[i_GWT-1] = " << Percolation[i_GWT-1]
+		  << " Eq-Drainage = " << EqDrnFlow;
+	   out.error (tmp.str ());
+	 }
 
        DrainFlow += S[i] * soil.dz (i);
     }
@@ -284,7 +292,7 @@ void
 GroundwaterPipe::Update_GWT (const Soil& soil,
                              vector<double>& h, vector<double>& h_ice,
                              vector<double>& Theta, vector<double>& q,
-                             vector<double>& q_p)
+                             vector<double>& q_p, Treelog& out)
 {
   const int i_GWT = soil.interval_plus (height) + 1;
   const double z_drain = soil.zplus (i_drain);
@@ -293,20 +301,20 @@ GroundwaterPipe::Update_GWT (const Soil& soil,
   const double deficit = (Percolation[i_GWT-1] + (q[i_GWT]+q_p[i_GWT])) * dt;
   if (deficit < 0)
     {
-      RaisingGWT (soil, h, h_ice, Theta, deficit);
+      RaisingGWT (soil, h, h_ice, Theta, deficit, out);
       GWT_State = Raising;
     }
   else if (height>z_drain)
     {
       Percolation[i_GWT-1] =  -(q[i_GWT]+q_p[i_GWT]) - dPerc;
-      FallingGWT1 (soil, h, h_ice, Theta, deficit);
+      FallingGWT1 (soil, h, h_ice, Theta, deficit, out);
       Percolation[i_GWT-1] += dPerc;
       GWT_State = Falling;
     }
   else
     {
       Percolation[i_GWT-1] =  -(q[i_GWT]+q_p[i_GWT]) - dPerc;
-      FallingGWT2 (soil, h, h_ice, Theta, deficit);
+      FallingGWT2 (soil, h, h_ice, Theta, deficit, out);
       Percolation[i_GWT-1] += dPerc;
       GWT_State = Falling;
     }
@@ -317,7 +325,8 @@ GroundwaterPipe::Update_GWT (const Soil& soil,
 void
 GroundwaterPipe::RaisingGWT (const Soil& soil,
                              vector<double>& h, vector<double>& h_ice,
-                             vector<double>& Theta, const double deficit)
+                             vector<double>& Theta, const double deficit,
+			     Treelog& out)
 {
   vector<double> WaterDef;
   const int i_UZ = soil.interval_plus (height);
@@ -377,9 +386,13 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 		   Percolation[j-1] = Percolation[j-1] - def / dt;
 		 }
 	       else
-		 CERR << "BUG: Groundwater pipe: percolation[" << j - 1 
-		      << "] = " << def / dt << " (dw < def)\n";
-
+		 {
+		   Treelog::Open nest (out, "Groundwater pipe");
+		   TmpStream tmp;
+		   tmp () << "BUG: percolation[" << j - 1 
+			  << "] = " << def / dt << " (dw < def)";
+		   out.error (tmp.str ());
+		 }
                if (def<=0.0) break;
              }
            break;
@@ -407,8 +420,13 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 		   Percolation[j-1] -= def / dt;
 		 }
 	       else
-		 CERR << "BUG: Groundwater pipe: percolation[" << j - 1 
-		      << "] = " << def / dt << "\n";
+		 {
+		   Treelog::Open nest (out, "Groundwater pipe");
+		   TmpStream tmp;
+		   tmp () << "BUG: percolation[" << j - 1 
+			  << "] = " << def / dt << " (dw < def)";
+		   out.error (tmp.str ());
+		 }
                if (def<=0.0) break;
              }
 	   assert (i > 0);
@@ -437,7 +455,8 @@ void
 GroundwaterPipe::FallingGWT1 (const Soil& soil,
                               vector<double>& h, vector<double>& h_ice,
                               vector<double>& Theta,
-                              const double deficit)
+                              const double deficit,
+			      Treelog& out)
 {
   int i_drainage = -42;		// Shut up gcc.
   GWT_new = height;
@@ -482,8 +501,13 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil,
            const double w = (Percolation[i_GWT-1] - Percolation[i_GWT]) * dt -
                             S[i_GWT] * soil.dz (i_GWT) * dt;
            if (fabs(w)>0.0001)
-             COUT << "Falling GWT : BUG: W = " << w << " i_GWT = " << i_GWT
-                  << " deficit = " << deficit << "\n";
+	     {
+	       Treelog::Open nest (out, "Groundwater pipe");
+	       TmpStream tmp;
+	       tmp () << "Falling GWT : BUG: W = " << w << " i_GWT = " << i_GWT
+		      << " deficit = " << deficit;
+	       out.error (tmp.str ());
+	     }
            return;
       }
     }
@@ -503,9 +527,13 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil,
   else
     Theta[i_GWT] += dTheta;
   if (Theta[i_GWT] > soil.Theta(i_GWT,0.0,h_ice[i_GWT]))
-     CERR << "Theta = " << Theta[i_GWT] << ", Theta_sat = "
-          << soil.Theta(i_GWT,0.0,h_ice[i_GWT]) << "\n";
-
+    { 
+      Treelog::Open nest (out, "Groundwater pipe");
+      TmpStream tmp;
+      tmp () << "Theta = " << Theta[i_GWT] << ", Theta_sat = "
+	     << soil.Theta(i_GWT,0.0,h_ice[i_GWT]);
+      out.error (tmp.str ());
+    }
   h[i_GWT] = soil.h (i_GWT, Theta[i_GWT]);
 }
 
@@ -513,7 +541,7 @@ void
 GroundwaterPipe::FallingGWT2 (const Soil& soil,
                               vector<double>& h, vector<double>& h_ice,
                               vector<double>& Theta,
-                              const double deficit)
+                              const double deficit, Treelog& out)
 {
   int i_drainage = -42;		// Shut up GCC.
   GWT_new = height;
@@ -537,9 +565,13 @@ GroundwaterPipe::FallingGWT2 (const Soil& soil,
                         / soil.dz (i_GWT) * dt;
   Theta[i_GWT] += dTheta;
   if (Theta[i_GWT] > soil.Theta(i_GWT,0.0,h_ice[i_GWT]))
-     CERR << "Theta = " << Theta[i_GWT] << ", Theta_sat = "
-          << soil.Theta(i_GWT,0.0,h_ice[i_GWT]) << "\n";
-
+    {
+      Treelog::Open nest (out, "Groundwater pipe");
+      TmpStream tmp;
+      tmp () << "Theta = " << Theta[i_GWT] << ", Theta_sat = "
+	     << soil.Theta(i_GWT,0.0,h_ice[i_GWT]);
+      out.error (tmp.str ());
+    }
   h[i_GWT] = soil.h (i_GWT, Theta[i_GWT]);
 }
 
@@ -548,7 +580,7 @@ GroundwaterPipe::FallingGWT2 (const Soil& soil,
 void
 GroundwaterPipe::FallingGWT2 (const Soil& soil,
                               vector<double>& h, vector<double>& h_ice,
-                              vector<double>& Theta)
+                              vector<double>& Theta, treelog&)
 {
   GWT_new = height;
   const double z_bottom = soil.zplus(i_bottom);

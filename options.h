@@ -27,6 +27,7 @@
 
 class Syntax;
 class AttributeList;
+class Treelog;
 
 class Options
 {
@@ -35,9 +36,9 @@ class Options
 public: 
   static const char *const log_name;
   const string program_name;
-  void usage () const;
+  void usage (Treelog&) const;
   Options (int& argc, char**& argv, 
-	   Syntax& syntax, AttributeList& alist);
+	   Syntax& syntax, AttributeList& alist, Treelog&);
 };
 
 #endif // OPTIONS_H

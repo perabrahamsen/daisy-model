@@ -33,7 +33,8 @@ struct MacroNone : public Macro
 	     const vector<double>& /* Theta */,
 	     vector<double>& /* S */,
 	     vector<double>& /* S_p */,
-	     vector<double>& /* q_p */)
+	     vector<double>& /* q_p */,
+	     Treelog&)
     { }
   void output (Log&) const
     { }

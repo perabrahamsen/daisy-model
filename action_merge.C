@@ -23,24 +23,23 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
-#include "message.h"
 
 struct ActionMerge : public Action
 {
   const string combine;
   const string remove;
 
-  void doIt (Daisy& daisy)
-    {
-      COUT << "[Merging " << remove << " into " << combine << "]\n";
-      daisy.field.merge (combine, remove);
-    }
-
+  void doIt (Daisy& daisy, Treelog& out)
+  {
+    out.message (string (" [Merging ") + remove + " into " + combine + "]");
+    daisy.field.merge (combine, remove);
+  }
+  
   ActionMerge (const AttributeList& al)
     : Action (al),
       combine (al.name ("combine")), 
       remove (al.name ("remove"))
-    { }
+  { }
 };
 
 static struct ActionMergeSyntax

@@ -31,7 +31,6 @@
 #include "check_range.h"
 #include "im.h"
 #include "tmpstream.h"
-#include "message.h"
 
 struct ActionCrop : public Action
 {
@@ -63,7 +62,7 @@ struct ActionCrop : public Action
     bool done;
   
     // Simulation.
-    void doIt (Daisy&);
+    void doIt (Daisy&, Treelog&);
     void output (Log&) const;
 
     // Create and Destroy.
@@ -86,7 +85,7 @@ struct ActionCrop : public Action
     bool done;
   
     // Simulation.
-    bool doIt (Daisy&, const string& name);
+    bool doIt (Daisy&, Treelog&, const string& name);
     void output (Log&) const;
 
     // Create and Destroy.
@@ -113,10 +112,11 @@ struct ActionCrop : public Action
 
     // Simulation.
   private:
-    void harvest (Daisy&);
+    void harvest (Daisy&, Treelog&);
   public:
-    bool doIt (Daisy&, const string& name);
-    bool doIt (Daisy&, const string& primary, const string& secondary);
+    bool doIt (Daisy&, Treelog&, const string& name);
+    bool doIt (Daisy&, Treelog&, 
+	       const string& primary, const string& secondary);
     bool done (const Daisy&) const;
     void output (Log&) const;
 
@@ -142,7 +142,7 @@ struct ActionCrop : public Action
   const vector <const Fertilize*> fertilize_at;
   int fertilize_at_index;
   const bool fertilize_incorporate;
-  void fertilize (Daisy& daisy, const AttributeList& am) const;
+  void fertilize (Daisy& daisy, Treelog&, const AttributeList& am) const;
 
   struct Tillage		// Tillage operations.
   {
@@ -192,7 +192,7 @@ struct ActionCrop : public Action
     const double potential;
 
     // Simulation.
-    bool doIt (Daisy&) const;
+    bool doIt (Daisy&, Treelog&) const;
 
     // Create and Destroy.
     static void load_syntax (Syntax&, AttributeList&);
@@ -205,8 +205,8 @@ struct ActionCrop : public Action
   int irrigation_delay;
 
   // Simulation.
-  void tick (const Daisy&);
-  void doIt (Daisy&);
+  void tick (const Daisy&, Treelog&);
+  void doIt (Daisy&, Treelog&);
   bool done (const Daisy&) const;
   void output (Log&) const;
 
@@ -275,21 +275,21 @@ ActionCrop::MM_DD::~MM_DD ()
 { }
 
 void 
-ActionCrop::tick (const Daisy& daisy)
+ActionCrop::tick (const Daisy& daisy, Treelog& out)
 { 
   for (vector<const Tillage*>::const_iterator i = tillage.begin ();
        i != tillage.end ();
        i++)
-    (*i)->operation.tick (daisy);
+    (*i)->operation.tick (daisy, out);
 }
 
 void 
-ActionCrop::Sow::doIt (Daisy& daisy)
+ActionCrop::Sow::doIt (Daisy& daisy, Treelog& out)
 {
   if (!done && date.match (daisy.time))
     {
-      COUT << " [Sowing " << crop.name ("type") << "]\n";      
-      daisy.field.sow (crop); 
+      out.message (string (" [Sowing ") + crop.name ("type") + "]");      
+      daisy.field.sow (out, crop); 
       done = true;
     }
 }
@@ -328,7 +328,7 @@ ActionCrop::Sow::~Sow ()
 { }
 
 bool
-ActionCrop::Annual::doIt (Daisy& daisy, const string& name)
+ActionCrop::Annual::doIt (Daisy& daisy, Treelog& out, const string& name)
 {
   if (!done && (daisy.field.crop_ds (name) >= 2.0
 		|| latest.match (daisy.time)))
@@ -338,8 +338,8 @@ ActionCrop::Annual::doIt (Daisy& daisy, const string& name)
       const double leaf = remove_residuals ? 1.0 : 0.0;
       const double sorg = (1.0 - loss);
       daisy.field.harvest (daisy.time, "all", stub, stem, leaf, sorg, 
-			   daisy.harvest);
-      COUT << " [Annual harvest of " << name << "]\n";
+			   daisy.harvest, out);
+      out.message (string (" [Annual harvest of ") + name + "]");
       done = true;
       return true;
     }
@@ -386,33 +386,33 @@ ActionCrop::Annual::~Annual ()
 { }
 
 void
-ActionCrop::Perennial::harvest (Daisy& daisy)
+ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& out)
 {
   const double stub = 8.0;
   const double stem = 1.0;
   const double leaf = 1.0;
   const double sorg = 1.0;
   daisy.field.harvest (daisy.time, "all", stub, stem, leaf, sorg, 
-		       daisy.harvest);
-  COUT << " [Perennial harvest]\n";
+		       daisy.harvest, out);
+  out.message (" [Perennial harvest]");
 }
 
 bool
-ActionCrop::Perennial::doIt (Daisy& daisy, const string& name)
+ActionCrop::Perennial::doIt (Daisy& daisy, Treelog& out, const string& name)
 {
   if (year_of_last_harvest < 0)
     year_of_last_harvest = daisy.time.year () + seasons - 1;
 
   if (daisy.field.crop_ds (name) >= DS || daisy.field.crop_dm (name) >= DM)
     {
-      harvest (daisy);
+      harvest (daisy, out);
       return true;
     }
   return false;
 }
 
 bool
-ActionCrop::Perennial::doIt (Daisy& daisy, 
+ActionCrop::Perennial::doIt (Daisy& daisy, Treelog& out,
 			     const string& primary, const string& secondary)
 {
   if (year_of_last_harvest < 0)
@@ -423,7 +423,7 @@ ActionCrop::Perennial::doIt (Daisy& daisy,
       || (daisy.field.crop_dm (primary)
 	  + daisy.field.crop_dm (secondary)) >= DM)
     {
-      harvest (daisy);
+      harvest (daisy, out);
       return true;
     }
   return false;
@@ -574,9 +574,10 @@ ActionCrop::Fertilize::~Fertilize ()
 { }
 
 void
-ActionCrop::fertilize (Daisy& daisy, const AttributeList& am) const
+ActionCrop::fertilize (Daisy& daisy, Treelog& out,
+		       const AttributeList& am) const
 {
-  COUT << " [Fertilizing " << am.name ("type") << "]\n";
+  out.message (string ("[Fertilizing ") + am.name ("type") + "]");
 
 #if 0
   if (am.name ("syntax") != "mineral")
@@ -697,7 +698,7 @@ ActionCrop::Spray::~Spray ()
 { }
 
 bool
-ActionCrop::Irrigation::doIt (Daisy& daisy) const
+ActionCrop::Irrigation::doIt (Daisy& daisy, Treelog& out) const
 {
   if (amount == 0.0)
     return false;
@@ -715,7 +716,9 @@ ActionCrop::Irrigation::doIt (Daisy& daisy) const
   if (daisy.field.soil_water_potential (depth) >= potential)
     return false;
 
-  COUT << " [Irrigating " << amount << " mm]\n";
+  TmpStream tmp;
+  tmp () << " [Irrigating " << amount << " mm]";
+  out.message (tmp.str ());
   daisy.field.irrigate_overhead (amount, IM ());
   return true;
 }
@@ -746,12 +749,12 @@ ActionCrop::Irrigation::~Irrigation ()
 { }
 
 void
-ActionCrop::doIt (Daisy& daisy)
+ActionCrop::doIt (Daisy& daisy, Treelog& out)
 {
   // Sowing.
-  primary->doIt (daisy);
+  primary->doIt (daisy, out);
   if (secondary)
-    secondary->doIt (daisy);
+    secondary->doIt (daisy, out);
 
   // Harvesting.
   bool harvested = false;
@@ -763,12 +766,13 @@ ActionCrop::doIt (Daisy& daisy)
 	{
 	  // If annual done, do perennial.
 	  if (secondary->done 
-	      && harvest_perennial->doIt (daisy,
+	      && harvest_perennial->doIt (daisy, out,
 					  secondary->crop.name ("type")))
 	    harvested = true;
 	}
       else if (primary->done 
-	       && harvest_annual->doIt (daisy, primary->crop.name ("type")))
+	       && harvest_annual->doIt (daisy, out, 
+					primary->crop.name ("type")))
 	// else do annual.
 	harvested = true;
     }
@@ -776,7 +780,7 @@ ActionCrop::doIt (Daisy& daisy)
     {
       // We have only annual crops.  Let 'primary' when they are harvested.
       if (primary->done 
-	  && harvest_annual->doIt (daisy, primary->crop.name ("type")))
+	  && harvest_annual->doIt (daisy, out, primary->crop.name ("type")))
 	harvested = true;
     }
   else
@@ -787,13 +791,14 @@ ActionCrop::doIt (Daisy& daisy)
 	{
 	  // If we have two, let them both control.
 	  if ((primary->done || secondary->done)
-	      && harvest_perennial->doIt (daisy, 
+	      && harvest_perennial->doIt (daisy, out,
 					  primary->crop.name ("type"),
 					  secondary->crop.name ("type")))
 	    harvested = true;
 	}
       else if (primary->done 
-	       && harvest_perennial->doIt (daisy, primary->crop.name ("type")))
+	       && harvest_perennial->doIt (daisy, out, 
+					   primary->crop.name ("type")))
 	// If we have only one, it is of course in control.
 	harvested = true;
     }
@@ -805,7 +810,7 @@ ActionCrop::doIt (Daisy& daisy)
       && daisy.time.mday () == fertilize_at[fertilize_at_index]->day)
     {
       // Fertilize by date.
-      fertilize (daisy, fertilize_at[fertilize_at_index]->what);
+      fertilize (daisy, out, fertilize_at[fertilize_at_index]->what);
       fertilize_at_index++;
     }
   if (harvested && harvest_perennial && harvest_perennial->fertilize)
@@ -839,7 +844,7 @@ ActionCrop::doIt (Daisy& daisy)
 	  < harvest_perennial->fertilize->size ())
 	{
 	  // If 'fertilize' is active, use it.
-	  fertilize (daisy, *(*harvest_perennial->fertilize)
+	  fertilize (daisy, out, *(*harvest_perennial->fertilize)
 		     [harvest_perennial->fertilize_index]);
 	  harvest_perennial->fertilize_index++;
 	}
@@ -848,7 +853,7 @@ ActionCrop::doIt (Daisy& daisy)
 		   < harvest_perennial->fertilize_rest->size ()))
 	{
 	  // Else, if 'fertilize_rest' is active, us that.
-	  fertilize (daisy, *(*harvest_perennial->fertilize_rest)
+	  fertilize (daisy, out, *(*harvest_perennial->fertilize_rest)
 		     [harvest_perennial->fertilize_rest_index]);
 	  harvest_perennial->fertilize_rest_index++;
 	}
@@ -860,7 +865,7 @@ ActionCrop::doIt (Daisy& daisy)
       && daisy.time.month () == tillage[tillage_index]->month
       && daisy.time.mday () == tillage[tillage_index]->day)
     {
-      tillage[tillage_index]->operation.doIt (daisy);
+      tillage[tillage_index]->operation.doIt (daisy, out);
       tillage_index++;
     }
 
@@ -872,7 +877,7 @@ ActionCrop::doIt (Daisy& daisy)
     {
       const string& chemical = spray[spray_index]->name;
       const double amount = spray[spray_index]->amount;
-      COUT << " [Spraying " << chemical << "]\n";
+      out.message (string (" [Spraying " + chemical + "]"));
       daisy.field.spray (chemical, amount); 
 
       spray_index++;
@@ -887,10 +892,10 @@ ActionCrop::doIt (Daisy& daisy)
     {
       if (irrigation_rest && irrigation_year != daisy.time.year ())
 	{
-	  if (irrigation_rest->doIt (daisy))
+	  if (irrigation_rest->doIt (daisy, out))
 	    irrigation_delay = 48;
 	}
-      else if (irrigation->doIt (daisy))
+      else if (irrigation->doIt (daisy, out))
 	irrigation_delay = 48;
     }
 }

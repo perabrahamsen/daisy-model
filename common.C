@@ -21,14 +21,13 @@
 
 
 #include "common.h"
-#include "message.h"
 
 #if 0 //def BORLAND_ASSERT
 extern "C"
 {
   void _RTLENTRY _EXPFUNC _assert(char * __cond, char * __file, int __line)
   {
-    CERR << __file << ":" << __line << ": '" << __cond 
+    cerr << __file << ":" << __line << ": '" << __cond 
 	 << "' assertion failed\n";
     exit (1);
   }

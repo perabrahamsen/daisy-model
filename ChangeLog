@@ -1,3 +1,16 @@
+2002-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (OTHER): Removed message.C
+
+2002-03-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* treelog.C, treelog.h (message, warning, error): New virtual
+	members.
+	* treelog_dual.C, treelog_dual.h: New utility.
+	* Makefile (OTHER): Added it.
+	* main.C (main): Use it.
+	* all: Take treelog argument.
+
 2002-03-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.17 released.

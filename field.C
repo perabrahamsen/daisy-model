@@ -38,7 +38,7 @@ struct Field::Implementation
   void unrestrict ();
 
   // Actions.
-  void sow (const AttributeList& crop);
+  void sow (Treelog&, const AttributeList& crop);
   void ridge (const AttributeList& ridge);
   void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
@@ -54,10 +54,10 @@ struct Field::Implementation
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
-		vector<const Harvest*>&);
-  void mix (const Time&,
-		    double from, double to, double penetration);
-  void swap (const Time&, double from, double middle, double to);
+		vector<const Harvest*>&, Treelog&);
+  void mix (Treelog&, const Time&,
+	    double from, double to, double penetration);
+  void swap (Treelog&, const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value);
   void spray (const string& chemical, double amount); // [g/ha]
@@ -79,7 +79,7 @@ public:
 
   // Simulation.
   void clear ();
-  void tick (const Time&, const Weather*);
+  void tick (Treelog&, const Time&, const Weather*);
   void output (Log&) const;
 
   // Find a specific column.
@@ -118,18 +118,18 @@ Field::Implementation::unrestrict ()
 }
 
 void 
-Field::Implementation::sow (const AttributeList& crop)
+Field::Implementation::sow (Treelog& msg, const AttributeList& crop)
 {
   if (selected)
     {
-      selected->sow (crop);
+      selected->sow (msg, crop);
     }
   else 
     {
       for (ColumnList::iterator i = columns.begin ();
 	   i != columns.end ();
 	   i++)
-	(*i)->sow (crop);
+	(*i)->sow (msg, crop);
     }
 }
 
@@ -250,44 +250,64 @@ Field::Implementation::harvest (const Time& time, const string& name,
 				double stem_harvest, 
 				double leaf_harvest, 
 				double sorg_harvest,
-				vector<const Harvest*>& total)
+				vector<const Harvest*>& total,
+				Treelog& out)
 {
   if (selected)
-    selected->harvest (time, name,
-		       stub_length,
-		       stem_harvest, leaf_harvest, sorg_harvest, total);
+    {
+      Treelog::Open nest (out, selected->name);
+      selected->harvest (time, name,
+			 stub_length,
+			 stem_harvest, leaf_harvest, sorg_harvest, total, out);
+    }
   else
     {
       for (ColumnList::iterator i = columns.begin ();
 	   i != columns.end ();
 	   i++)
-	(*i)->harvest (time, name,
-		       stub_length,
-		       stem_harvest, leaf_harvest, sorg_harvest, total);
+	{
+	  Treelog::Open nest (out, (*i)->name);
+	  (*i)->harvest (time, name,
+			 stub_length,
+			 stem_harvest, leaf_harvest, sorg_harvest, total, out);
+	}
     }
 }
 
 void 
-Field::Implementation::mix (const Time& time,
+Field::Implementation::mix (Treelog& out, const Time& time,
 			    double from, double to, double penetration)
 {
   if (selected)
-    selected->mix (time, from, to, penetration);
+    {
+      Treelog::Open nest (out, selected->name); 
+      selected->mix (out, time, from, to, penetration);
+    }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->mix (time, from, to, penetration);
+    {
+      Treelog::Open nest (out, (*i)->name);
+      (*i)->mix (out, time, from, to, penetration);
+    }
 }
 
 void 
-Field::Implementation::swap (const Time& time, double from, double middle, double to)
+Field::Implementation::swap (Treelog& out, const Time& time,
+			     double from, double middle, double to)
 {
   if (selected)
-    selected->swap (time, from, middle, to);
+    {
+      Treelog::Open nest (out, selected->name);
+      selected->swap (out, time, from, middle, to);
+    }
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->swap (time, from, middle, to);
+    {
+      Treelog::Open nest (out, (*i)->name);
+      (*i)->swap (out, time, from, middle, to);
+    }
 }
 
 void 
@@ -438,12 +458,13 @@ Field::Implementation::clear ()
 }
 
 void 
-Field::Implementation::tick (const Time& time, const Weather* weather)
+Field::Implementation::tick (Treelog& out, 
+			     const Time& time, const Weather* weather)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->tick (time, weather);
+    (*i)->tick (out, time, weather);
 }
 
 void 
@@ -576,8 +597,8 @@ Field::Restrict::~Restrict ()
 { field.impl.unrestrict (); }
 
 void 
-Field::sow (const AttributeList& crop)
-{ impl.sow (crop); }
+Field::sow (Treelog& msg, const AttributeList& crop)
+{ impl.sow (msg, crop); }
 
 void 
 Field::ridge (const AttributeList& al)
@@ -622,19 +643,20 @@ Field::harvest (const Time& time, const string& name,
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
-		vector<const Harvest*>& total)
+		vector<const Harvest*>& total, Treelog& out)
 { impl.harvest (time, name,
 		stub_length,
-		stem_harvest, leaf_harvest, sorg_harvest, total); }
+		stem_harvest, leaf_harvest, sorg_harvest, total, out); }
 
 void 
-Field::mix (const Time& time,
+Field::mix (Treelog& out, const Time& time,
 	    double from, double to, double penetration)
-{ impl.mix (time, from, to, penetration); }
+{ impl.mix (out, time, from, to, penetration); }
 
 void 
-Field::swap (const Time& time, double from, double middle, double to)
-{ impl.swap (time, from, middle, to); }
+Field::swap (Treelog& out, const Time& time, 
+	     double from, double middle, double to)
+{ impl.swap (out, time, from, middle, to); }
 
 void 
 Field::set_porosity (double at, double Theta)
@@ -689,8 +711,8 @@ Field::clear ()
 { impl.clear (); }
 
 void
-Field::tick (const Time& time, const Weather* weather)
-{ impl.tick (time, weather); }
+Field::tick (Treelog& out, const Time& time, const Weather* weather)
+{ impl.tick (out, time, weather); }
 
 void 
 Field::output (Log& log) const

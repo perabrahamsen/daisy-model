@@ -24,7 +24,6 @@
 #include "daisy.h"
 #include "field.h"
 #include "check.h"
-#include "message.h"
 
 struct ActionMix : public Action
 {
@@ -33,10 +32,10 @@ struct ActionMix : public Action
   const double penetration;
 
   // Simulation.
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
     {
-      COUT << " [Tillage]\n";
-      daisy.field.mix (daisy.time, 0.0, depth, penetration);
+      out.message (" [Tillage]");
+      daisy.field.mix (out, daisy.time, 0.0, depth, penetration);
     }
 
   ActionMix (const AttributeList& al)
@@ -77,10 +76,10 @@ struct ActionSwap : public Action
   const double depth;
 
   // Simulation.
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   {
-    COUT << " [Plowing]\n";
-    daisy.field.swap (daisy.time, 0.0, middle, depth);
+    out.message (string (" [") + name + "]");
+    daisy.field.swap (out, daisy.time, 0.0, middle, depth);
   }
 
   ActionSwap (const AttributeList& al)
@@ -135,8 +134,9 @@ struct ActionSetPorosity : public Action
   const double depth;
 
   // Simulation.
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   {
+    out.message (" [Setting porosity]");
     daisy.field.set_porosity (depth, porosity);
   }
 

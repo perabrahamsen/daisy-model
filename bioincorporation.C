@@ -32,7 +32,6 @@
 #include "om.h"
 #include "mathlib.h"
 #include <algorithm>
-#include "message.h"
 
 struct Bioincorporation::Implementation
 { 
@@ -131,15 +130,13 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     const double top_N = am[i]->top_N ();
     assert (top_N > 0.0);
     const double C_per_N = top_C / top_N;
-    if (C_per_N < last_C_per_N)
-      CERR << "Bug: C/N (" << C_per_N << ") < last C/N ("
-	   << last_C_per_N <<")\n";
+    assert (C_per_N >= last_C_per_N);
     speed = R_total * C_per_N_factor (C_per_N) * top_C / (top_C + k_total);
 
     // Don't take more than the bioincorporation can handle.
     if (speed * dt > available)
       speed = available / dt;
-
+    
     if (speed * dt > top_C)
       {
 	// Take all.

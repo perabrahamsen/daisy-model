@@ -40,7 +40,6 @@
 #include "organic_matter.h"
 #include "soil_heat.h"
 #include "am.h"
-#include "message.h"
 #include "mathlib.h"
 
 class CropStandard : public Crop
@@ -89,8 +88,9 @@ public:
   { canopy.CanopyStructure (development.DS); }
   double ActualWaterUptake (double Ept, 
 			    const Soil& soil, SoilWater& soil_water,
-			    double EvapInterception)
-  { return root_system.water_uptake (Ept, soil, soil_water, EvapInterception);}
+			    double EvapInterception, Treelog& msg)
+  { return root_system.water_uptake (Ept, soil, soil_water, EvapInterception, 
+				     msg);}
   void force_production_stress  (double pstress)
   { root_system.production_stress = pstress; }
 
@@ -101,14 +101,14 @@ public:
 	     const SoilHeat&,
 	     const SoilWater&,
 	     SoilNH4*,
-	     SoilNO3*);
+	     SoilNO3*, Treelog&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off,
-			  vector<AM*>& residuals);
+			  vector<AM*>& residuals, Treelog&);
   void output (Log&) const;
 
   // Queries.
@@ -121,14 +121,14 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry, OrganicMatter&);
-  void initialize (const Geometry& geometry);
+  void initialize (Treelog&, const Geometry& geometry, OrganicMatter&);
+  void initialize (Treelog&, const Geometry& geometry);
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
 
 void
-CropStandard::initialize (const Geometry& geometry,
+CropStandard::initialize (Treelog& msg, const Geometry& geometry,
 			  OrganicMatter& organic_matter)
 {
   root_system.initialize (geometry.size ());
@@ -143,13 +143,14 @@ CropStandard::initialize (const Geometry& geometry,
       // Update derived state content.
       canopy.tick (production.WLeaf, production.WSOrg, 
 		   production.WStem, development.DS);
-      root_system.set_density (geometry, production.WRoot, development.DS);
+      root_system.set_density (msg, 
+			       geometry, production.WRoot, development.DS);
       nitrogen.content (development.DS, production);
     }
 }
 
 void
-CropStandard::initialize (const Geometry& geometry)
+CropStandard::initialize (Treelog&, const Geometry& geometry)
 {
   root_system.initialize (geometry.size ());
   production.initialize (nitrogen.SeedN);
@@ -166,7 +167,7 @@ CropStandard::tick (const Time& time,
 		    const SoilHeat& soil_heat,
 		    const SoilWater& soil_water,
 		    SoilNH4* soil_NH4,
-		    SoilNO3* soil_NO3)
+		    SoilNO3* soil_NO3, Treelog& msg)
 {
   // Update cut stress.
   harvesting.tick (time);
@@ -187,12 +188,11 @@ CropStandard::tick (const Time& time,
       development.emergence ();
       if (development.DS >= 0)
 	{
-	  COUT << " [" << name << " is emerging]\n";
-
+	  msg.message (string (" [") + name + " is emerging]");
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development.DS);
 	  nitrogen.content (development.DS, production);
-	  root_system.tick (soil, soil_heat, 
+	  root_system.tick (msg, soil, soil_heat, 
 			    production.WRoot, 0.0, development.DS);
 
 	  if (organic_matter)
@@ -244,7 +244,7 @@ CropStandard::tick (const Time& time,
 
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
-      double Ass = photosynthesis (bioclimate, canopy, development);
+      double Ass = photosynthesis (bioclimate, canopy, development, msg);
       production.PotCanopyAss = Ass;
       if (root_system.production_stress >= 0.0)
 	Ass *= (1.0 - root_system.production_stress);
@@ -263,7 +263,7 @@ CropStandard::tick (const Time& time,
   production.tick (bioclimate.daily_air_temperature (),
 		   soil_heat.T (soil.interval_plus (-root_system.Depth / 3.0)),
 		   root_system.Density, soil, development.DS, 
-		   canopy.CAImRat, nitrogen, partition);
+		   canopy.CAImRat, nitrogen, partition, msg);
   nitrogen.content (development.DS, production);
   if (time.hour () != 0)
     return;
@@ -273,8 +273,8 @@ CropStandard::tick (const Time& time,
 
   development.tick_daily (name, bioclimate.daily_air_temperature (), 
 			  production.WLeaf, production, vernalization,
-			  harvesting.cut_stress);
-  root_system.tick (soil, soil_heat, 
+			  harvesting.cut_stress, msg);
+  root_system.tick (msg, soil, soil_heat, 
 		    production.WRoot, production.IncWRoot, development.DS);
 }
 
@@ -288,7 +288,7 @@ CropStandard::harvest (const string& column_name,
 		       double leaf_harvest_frac,
 		       double sorg_harvest_frac,
 		       bool kill_off,
-		       vector<AM*>& residuals)
+		       vector<AM*>& residuals, Treelog&)
 {
   // Update nitrogen content.
   nitrogen.content (development.DS, production);
@@ -402,7 +402,7 @@ CropStandard::~CropStandard ()
 static struct CropStandardSyntax
 {
   static Crop& make (const AttributeList& al)
-    { return *new CropStandard (al); }
+  { return *new CropStandard (al); }
   CropStandardSyntax ();
 } standard_crop_syntax;
 

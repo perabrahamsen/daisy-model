@@ -38,7 +38,7 @@ protected:
 
   // Simulation.
 public:
-  virtual void set_density (vector<double>& Density,
+  virtual void set_density (Treelog&, vector<double>& Density,
 			    const Geometry& geometry, 
 			    double Depth, double PotRtDpt,
 			    double WRoot, double DS) = 0;

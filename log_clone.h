@@ -33,7 +33,7 @@ class LogClone : public LogAList
   // Don't use this as a real log.
 private:
   bool check(const string&) const;
-  bool match (const Daisy& daisy);
+  bool match (const Daisy& daisy, Treelog&);
   void done ();
 
   // Get result.

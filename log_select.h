@@ -46,7 +46,7 @@ struct LogSelect : public Log
   vector<Select*> entries;
 
   // Checking to see if we should log this time step.
-  bool match (const Daisy& daisy);
+  bool match (const Daisy& daisy, Treelog&);
 
   // Obey conditionals.
   void open_maybe (const string& value);

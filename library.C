@@ -196,10 +196,7 @@ Library::Implementation::Implementation (const char* n, derive_fun d,
 
 Library::Implementation::~Implementation ()
 { 
-  // CERR << "Deleting library " << name << "\n";
-
   // Delete alists.
-  // CERR << "  including " << alists.size () << " parameterizations\n";
   map_delete (alists.begin (), alists.end ());
 
   // Delete unique syntaxen.
@@ -212,7 +209,6 @@ Library::Implementation::~Implementation ()
       unique.insert ((*i).second);
       (*i).second = NULL;
     }
-  // CERR << "  of " << unique.size () << " models\n";
   sequence_delete (unique.begin (), unique.end ());
   
   // Remove from list of libraries.
@@ -220,7 +216,6 @@ Library::Implementation::~Implementation ()
 
   // Delete list of libraries if empty.
   all_count--;
-  // CERR << "  " << all_count << " libraries left\n";
   assert (all->size () == all_count);
   if (all_count == 0)
     delete all;

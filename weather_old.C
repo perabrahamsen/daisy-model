@@ -48,9 +48,9 @@ struct WeatherOld::Implementation
 };
 
 void 
-WeatherOld::tick (const Time& time)
+WeatherOld::tick (const Time& time, Treelog& out)
 {
-  Weather::tick (time);
+  Weather::tick (time, out);
   impl.time = time;
 }
 

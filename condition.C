@@ -32,7 +32,7 @@ threshold.  Logic conditions like 'and' and 'or' can be used for\n\
 testing whether multiple conditions are fulfilled simultaneously.";
 
 void
-Condition::tick (const Daisy&)
+Condition::tick (const Daisy&, Treelog&)
 { }
 
 const string

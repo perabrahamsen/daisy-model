@@ -42,7 +42,7 @@ public:
   double q () const;
   void flux_top_on () const;
   void flux_top_off () const;
-  bool accept_top (double);
+  bool accept_top (Treelog&, double);
   bool soil_top () const;
   double ponding () const;
   double temperature () const;
@@ -67,7 +67,7 @@ public:
 
   // Simulation.
   void output (Log&) const;
-  void tick (double PotSoilEvaporation, double Water, double temp,
+  void tick (Treelog&, double PotSoilEvaporation, double Water, double temp,
 	     const Soil&, const SoilWater&);
 
   // Communication with bioclimate.
@@ -76,7 +76,7 @@ public:
   double albedo (const Soil& soil, const SoilWater& soil_water) const;
   double exfiltration () const; // [mm/h]
   double evap_soil_surface () const; // [mm/h]
-  double evap_pond () const; // [mm/h]
+  double evap_pond (Treelog&) const; // [mm/h]
 
   // Communication with external model.
   void put_ponding (double pond);	// [mm]

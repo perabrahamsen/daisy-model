@@ -23,7 +23,7 @@
 #include "rootdens.h"
 #include "geometry.h"
 #include "check.h"
-#include "message.h"
+#include "tmpstream.h"
 
 struct Rootdens_G_P : public Rootdens
 {
@@ -33,7 +33,7 @@ struct Rootdens_G_P : public Rootdens
 
   // Simulation.
   static double density_distribution_parameter (double a);
-  void set_density (vector<double>& Density,
+  void set_density (Treelog&, vector<double>& Density,
 		    const Geometry& geometry, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double DS);
@@ -101,7 +101,8 @@ Rootdens_G_P::density_distribution_parameter (double a)
 }
 
 void
-Rootdens_G_P::set_density (vector<double>& Density,
+Rootdens_G_P::set_density (Treelog& msg,
+			   vector<double>& Density,
 			   const Geometry& geometry, 
 			   const double Depth, const double PotRtDpt,
 			   const double WRoot, const double)
@@ -136,9 +137,12 @@ Rootdens_G_P::set_density (vector<double>& Density,
 	  const double NewLengthPrArea 
 	    =  LengthPrArea - MinDens * Depth; // [cm/cm^2]
 #if 1
-	  CERR << "too_low = " << too_low 
-	       << ", NewLengthPrArea = " << NewLengthPrArea
-	       << "MinLengthPrArea = " << MinLengthPrArea << "\n";
+	  Treelog::Open nest (msg, "RootDens G+P");
+	  TmpStream tmp;
+	  tmp () << "too_low = " << too_low 
+		 << ", NewLengthPrArea = " << NewLengthPrArea
+		 << "MinLengthPrArea = " << MinLengthPrArea;
+	  msg.warning (tmp.str ());
 #endif	    
 	  if (too_low > 0.0 && NewLengthPrArea > too_low * DensRtTip * 1.2)
 	    {

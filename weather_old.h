@@ -34,7 +34,7 @@ private:
   
   // Simulation.
 public:
-  void tick (const Time& time);
+  void tick (const Time& time, Treelog&);
   void output (Log&) const;
 protected:
   void distribute (double precipitation);

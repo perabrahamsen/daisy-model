@@ -28,7 +28,7 @@
 
 struct ActionNil : public Action
 {
-  void doIt (Daisy&)
+  void doIt (Daisy&, Treelog&)
   { }
 
   ActionNil (const AttributeList& al)
@@ -38,7 +38,7 @@ struct ActionNil : public Action
 
 struct ActionT : public Action
 {
-  void doIt (Daisy&)
+  void doIt (Daisy&, Treelog&)
   { }
 
   bool done (const Daisy&) const
@@ -53,23 +53,23 @@ struct ActionProgn : public Action
 {
   vector<Action*> actions;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   { 
     for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->tick (daisy);
+	(*i)->tick (daisy, out);
       }
   }
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   { 
     for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->doIt (daisy);
+	(*i)->doIt (daisy, out);
       }
   }
 
@@ -144,20 +144,20 @@ struct ActionCond : public Action
 {
   vector<clause>& clauses;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   { 
     for (vector<clause>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	(*i).condition->tick (daisy);
+	(*i).condition->tick (daisy, out);
 	vector<Action*>& actions = (*i).actions;
 	for (unsigned int j = 0; j < actions.size (); j++)
-	  actions[j]->tick (daisy);
+	  actions[j]->tick (daisy, out);
       }
   }
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   { 
     for (vector<clause>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
@@ -167,7 +167,7 @@ struct ActionCond : public Action
 	  {
 	    vector<Action*>& actions = (*i).actions;
 	    for (unsigned int j = 0; j < actions.size (); j++)
-	      actions[j]->doIt (daisy);
+	      actions[j]->doIt (daisy, out);
 	    break;
 	  }
       }
@@ -228,19 +228,19 @@ struct ActionIf : public Action
   Action& then_a;
   Action& else_a;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   { 
-    if_c.tick (daisy);
-    then_a.tick (daisy);
-    else_a.tick (daisy);
+    if_c.tick (daisy, out);
+    then_a.tick (daisy, out);
+    else_a.tick (daisy, out);
   }
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   { 
     if (if_c.match (daisy))
-      then_a.doIt (daisy);
+      then_a.doIt (daisy, out);
     else
-      else_a.doIt (daisy);
+      else_a.doIt (daisy, out);
   }
 
   void output (Log& log) const

@@ -27,16 +27,16 @@ struct ActionWhile : public Action
 {
   const vector<Action*> actions;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   { 
     for (unsigned int i = 0; i < actions.size (); i++)
-      actions[i]->tick (daisy);
+      actions[i]->tick (daisy, out);
   }
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   { 
     for (unsigned int i = 0; i < actions.size (); i++)
-      actions[i]->doIt (daisy);
+      actions[i]->doIt (daisy, out);
   }
 
   bool done (const Daisy& daisy) const

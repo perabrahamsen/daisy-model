@@ -106,12 +106,12 @@ public:
  
   // Simulation.
 public:
-  void macro_tick (const Soil&, Surface&);
-  void tick (const Soil&, Surface&, Groundwater&);
+  void macro_tick (const Soil&, Surface&, Treelog&);
+  void tick (const Soil&, Surface&, Groundwater&, Treelog&);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
   void mix (const Soil&, double from, double to);
-  void swap (const Soil&, double from, double middle, double to);
+  void swap (Treelog&, const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 
 		  unsigned int from, unsigned int to, double Theta);
   bool check (unsigned n, Treelog& err) const;
@@ -130,7 +130,8 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilWater (const AttributeList&);
   void initialize (const AttributeList&, 
-		   const Soil& soil, const Groundwater& groundwater);
+		   const Soil& soil, const Groundwater& groundwater,
+		   Treelog&);
     ~SoilWater ();
 };
 

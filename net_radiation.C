@@ -65,7 +65,7 @@ struct NetRadiationParent : public NetRadiation
     { return net_radiation_; }
   void tick (double Cloudiness, double Temp,
 	     double VapourPressure, double Si,
-	     double Albedo)
+	     double Albedo, Treelog&)
     {
       VapourPressure *= 0.001;	// Pa -> kPa
       const double Ln

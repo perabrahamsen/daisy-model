@@ -85,7 +85,8 @@ struct SoilHeat::Implementation
   // Create & Destroy.
   bool check (unsigned n, Treelog& err) const;
   void initialize (const AttributeList& al, 
-		   const Soil& soil, const Time& time, const Weather& weather);
+		   const Soil& soil, const Time& time, const Weather& weather,
+		   Treelog&);
   Implementation (const AttributeList&);
 };
 
@@ -604,7 +605,7 @@ void
 SoilHeat::Implementation::initialize (const AttributeList& al, 
 				      const Soil& soil, 
 				      const Time& time, 
-				      const Weather& weather)
+				      const Weather& weather, Treelog& out)
 {
   // Freezing point.
   T_freezing.insert (T_freezing.end (), soil.size (), 0.0);
@@ -621,7 +622,7 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
   const double rad_per_day = 2.0 * M_PI / 365.0;
 
   // Fetch initial T.
-  soil.initialize_layer (T, al, "T");
+  soil.initialize_layer (T, al, "T", out);
 
   // Calculate delay.
   const double pF_2_0 = -100.0;
@@ -766,8 +767,8 @@ SoilHeat::SoilHeat (const AttributeList& al)
 void
 SoilHeat::initialize (const AttributeList& al, 
 		      const Soil& soil, const Time& time, 
-		      const Weather& weather)
-{ impl.initialize (al, soil, time, weather); }
+		      const Weather& weather, Treelog& out)
+{ impl.initialize (al, soil, time, weather, out); }
 
 SoilHeat::~SoilHeat ()
 {

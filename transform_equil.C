@@ -46,7 +46,7 @@ struct TransformEquilibrium : public Transform
   void output (Log&) const;
 
   // Simulation.
-  void tick (const Soil&, const SoilWater&, SoilChemicals&);
+  void tick (const Soil&, const SoilWater&, SoilChemicals&, Treelog&);
 
   // Create.
   bool check (const Soil&, Treelog& err) const;
@@ -63,13 +63,13 @@ TransformEquilibrium::output (Log& log) const
 
 void 
 TransformEquilibrium::tick (const Soil& soil, const SoilWater& soil_water,
-			    SoilChemicals& soil_chemicals)
+			    SoilChemicals& soil_chemicals, Treelog& out)
 { 
   assert (k_AB.size () == soil.size ());
   assert (k_BA.size () == soil.size ());
 
-  SoilChemical& A = soil_chemicals.find (soil, soil_water, name_A);
-  SoilChemical& B = soil_chemicals.find (soil, soil_water, name_B);
+  SoilChemical& A = soil_chemicals.find (soil, soil_water, name_A, out);
+  SoilChemical& B = soil_chemicals.find (soil, soil_water, name_B, out);
 
   for (unsigned int i = 0; i < soil.size (); i++)
     { 

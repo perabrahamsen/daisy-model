@@ -29,7 +29,7 @@
 #include "net_radiation.h"
 #include "vegetation.h"
 #include "log.h"
-#include "message.h"
+#include "tmpstream.h"
 
 class PetPM : public Pet
 {
@@ -64,7 +64,8 @@ public:
 				   double Temp /* [dg C] */,
 				   double ea /* [Pa] */,
 				   double U2 /* [m/s] */,
-				   double AtmPressure); // [kg/m2/s]
+				   double AtmPressure, // [kg/m2/s]
+				   Treelog&);
   static double RefPenmanMonteithWet (double Rn /* [W/m2] */,
 				      double G /* [W/m2] */,
 				      double Temp /* [dg C] */,
@@ -85,7 +86,7 @@ public:
   // Simulation.
   void tick (const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil& soil,
-	     const SoilHeat& soil_heat, const SoilWater& soil_water);
+	     const SoilHeat& soil_heat, const SoilWater& soil_water, Treelog&);
 
   void output (Log& log) const
     {
@@ -167,7 +168,7 @@ PetPM::PenmanMonteith (double CropHeight, double ScreenHeight,
 
 double
 PetPM::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
-			  double U2, double AtmPressure)
+			  double U2, double AtmPressure, Treelog& out)
 {
   double E3 = 0.03525 * Weather::SlopeVapourPressureCurve (Temp) * (Rn - G) +
     Weather::PsychrometricConstant (AtmPressure, Temp)
@@ -178,16 +179,21 @@ PetPM::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
 #if 1
   if (Rn>750.0)
     {
-      COUT << "Rn          " << Rn << "\n";
-      COUT << "G           " << G << "\n";
-      COUT << "Temp        " << Temp << "\n";
-      COUT << "es          " << Weather::SaturationVapourPressure (Temp) << "\n";
-      COUT << "ea          " << ea << "\n";
-      COUT << "U2          " << U2 << "\n";
-      COUT << "AtmPressure " << AtmPressure << "\n";
-      COUT << "Delta       " << Weather::SlopeVapourPressureCurve (Temp) << "\n";
-      COUT << "Gamma       " << Weather::PsychrometricConstant (AtmPressure, Temp) << "\n";
-      COUT << "Ep (mm/d)   " << E3 << "\n";
+      TmpStream tmp;
+      tmp () << "Rn          " << Rn << "\n"
+	     << "G           " << G << "\n"
+	     << "Temp        " << Temp << "\n"
+	     << "es          " 
+	     << Weather::SaturationVapourPressure (Temp) << "\n"
+	     << "ea          " << ea << "\n"
+	     << "U2          " << U2 << "\n"
+	     << "AtmPressure " << AtmPressure << "\n"
+	     << "Delta       "
+	     << Weather::SlopeVapourPressureCurve (Temp) << "\n"
+	     << "Gamma       "
+	     << Weather::PsychrometricConstant (AtmPressure, Temp) << "\n"
+	     << "Ep (mm/d)   " << E3;
+      out.warning (tmp.str ());
     }
 #endif
   return E3 / 86400.0; // [kg/m2/s]
@@ -207,7 +213,8 @@ PetPM::RefPenmanMonteithWet (double Rn, double G, double Temp, double ea,
 void
 PetPM::tick (const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil& soil,
-	     const SoilHeat& soil_heat, const SoilWater& soil_water)
+	     const SoilHeat& soil_heat, const SoilWater& soil_water,
+	     Treelog& out)
 {
   // Weather.
   const double Cloudiness = weather.hourly_cloudiness ();
@@ -230,7 +237,7 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
     Albedo =  surface.albedo (soil, soil_water);
 
   // Net Radiation.
-  net_radiation.tick (Cloudiness, Temp, VaporPressure, Si, Albedo);
+  net_radiation.tick (Cloudiness, Temp, VaporPressure, Si, Albedo, out);
   const double Rn = net_radiation.net_radiation ();
 
   // Ground heat flux.
@@ -263,7 +270,7 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
   else
     {
       reference_evapotranspiration_dry
-	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure)
+	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure, out)
 	* 3600;
 
       potential_evapotranspiration_dry
@@ -271,7 +278,7 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
 				  reference_evapotranspiration_dry);
 
       reference_evapotranspiration_wet
-	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure)
+	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure, out)
 	* 3600;
       potential_evapotranspiration_wet
 	= reference_to_potential (crops, surface,

@@ -24,7 +24,6 @@
 #include "vernalization.h"
 #include "plf.h"
 #include "log.h"
-#include "message.h"
 #include "submodel.h"
 
 void
@@ -35,7 +34,7 @@ void
 Development::tick_daily (const string& name, 
 			 const double Ta, const double WLeaf, 
 			 Production& production, Vernalization& vernalization,
-			 const double cut_stress)
+			 const double cut_stress, Treelog& out)
 {
   // Update final day length.
   day_length = partial_day_length;
@@ -52,7 +51,7 @@ Development::tick_daily (const string& name,
       vernalization (Ta, DS);
 
       if (DS >= 1.0)
-	COUT << " [" << name << " is flowering]\n";
+	out.message (string (" [") + name + " is flowering]");
     }
   else
     {
@@ -63,7 +62,7 @@ Development::tick_daily (const string& name,
        }
       if (DS > DSMature)
        {
-	 COUT << " [" << name << " is ripe]\n";
+	 out.message (string (" [") + name + " is ripe]");
 	 DS = DSMature;
 	 production.none ();
        }

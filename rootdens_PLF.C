@@ -46,7 +46,7 @@ private:
 
   // Simulation.
 protected:
-  void get_density (vector<double>& Density,
+  void get_density (Treelog&, vector<double>& Density,
 		    const Geometry& geometry, 
 		    double WRoot, double value, double z_factor,
 		    double max_depth = 1e100);
@@ -107,7 +107,7 @@ Rootdens_PLF::Entry::~Entry ()
 { }
 	
 void 
-Rootdens_PLF::get_density (vector<double>& abs_dens,
+Rootdens_PLF::get_density (Treelog&, vector<double>& abs_dens,
 			   const Geometry& geometry, 
 			   const double WRoot,
 			   const double index, const double z_factor, 
@@ -188,11 +188,11 @@ Rootdens_PLF::~Rootdens_PLF ()
 struct Rootdens_DS_Depth : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (vector<double>& abs_dens,
+  void set_density (Treelog& msg, vector<double>& abs_dens,
 		    const Geometry& geometry, 
 		    double /* Depth */, double /* PotRtDpt */,
 		    double WRoot, double DS)
-  { get_density (abs_dens, geometry, WRoot, DS, -1.0); }
+  { get_density (msg, abs_dens, geometry, WRoot, DS, -1.0); }
   
   // Create.
   Rootdens_DS_Depth (const AttributeList& al)
@@ -235,13 +235,13 @@ total root mass.",
 struct Rootdens_DS_Rel : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (vector<double>& abs_dens,
+  void set_density (Treelog& msg, vector<double>& abs_dens,
 		    const Geometry& geometry, 
 		    double Depth, double /* PotRtDpt */,
 		    double WRoot, double DS)
   { 
     assert (Depth > 0.0);
-    get_density (abs_dens, geometry, WRoot, DS, -1.0 / Depth); 
+    get_density (msg, abs_dens, geometry, WRoot, DS, -1.0 / Depth); 
   }
 
   // Create.
@@ -285,12 +285,12 @@ total root mass.",
 struct Rootdens_Depth_Depth : public Rootdens_PLF
 {
   // Simulation.
-  void set_density (vector<double>& abs_dens,
+  void set_density (Treelog& msg, vector<double>& abs_dens,
 		    const Geometry& geometry, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double /* DS */)
   { 
-    get_density (abs_dens, geometry, WRoot, -PotRtDpt, -1.0, -Depth); 
+    get_density (msg, abs_dens, geometry, WRoot, -PotRtDpt, -1.0, -Depth); 
   }
 
   // Create.

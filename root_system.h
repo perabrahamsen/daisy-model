@@ -90,7 +90,7 @@ private:
 public:
   double water_uptake (double Ept,
 		       const Soil& soil, SoilWater& soil_water,
-		       const double EvapInterception);
+		       const double EvapInterception, Treelog&);
 private:
   double solute_uptake (const Soil&, const SoilWater&, Solute&,
 			double PotNUpt, vector<double>& uptake,
@@ -106,10 +106,11 @@ public:
 private:
   static double density_distribution_parameter (double a);
 public:
-  void tick (const Soil&, const SoilHeat&, 
+  void tick (Treelog&, const Soil&, const SoilHeat&, 
 	     double WRoot, double IncWRoot, double DS);
-  void set_density (const Geometry& geometry, double WRoot, double DS);
-  void full_grown (const Soil& soil, double WRoot);
+  void set_density (Treelog&,
+		    const Geometry& geometry, double WRoot, double DS);
+  void full_grown (Treelog&, const Soil& soil, double WRoot);
   void output (Log& log) const;
 
   // Create and Destroy

@@ -42,7 +42,8 @@ public:
 		     double Temp /* [dg C] */, 
 		     double VapourPressure /* [kPa] */,
 		     double Si /* [W/m2] */, 
-		     double Albedo /* [0-1] */) = 0;
+		     double Albedo /* [0-1] */,
+		     Treelog&) = 0;
 
   // Create and Destroy.
 protected:

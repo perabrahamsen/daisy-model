@@ -63,7 +63,7 @@ public:
 			 const string& dimension, const string& description);
   void initialize_layer (vector<double>& value, 
 			 const AttributeList& al, 
-			 const string& name) const;
+			 const string& name, Treelog&) const;
 
   // Creation.
   bool check (Treelog&) const;

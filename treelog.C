@@ -33,6 +33,18 @@ void
 Treelog::entry (const string&)
 { count++; }
 
+void
+Treelog::message (const string& str)
+{ entry (str); }
+
+void
+Treelog::warning (const string& str)
+{ entry (str); }
+
+void
+Treelog::error (const string& str)
+{ entry (str); }
+
 class TreelogNull : public Treelog
 {
   // Nesting.

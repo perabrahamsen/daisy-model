@@ -26,7 +26,6 @@
 #include "mathlib.h"
 #include "submodel.h"
 #include "log.h"
-#include "message.h"
 #include "check.h"
 #include <assert.h>
 #include <iomanip.h>
@@ -205,11 +204,11 @@ check_alist (const AttributeList& al, Treelog& err)
 void 
 Soil::make_table (int i)
 {
-  COUT << "pF   Theta   Cw2           K           (depth " << z (i) << ").\n";
+  cout << "pF   Theta   Cw2           K           (depth " << z (i) << ").\n";
   for (double pF = 0.00; pF <= 5.0; pF += 0.01)
     {
       const double h = pF2h (pF);
-      COUT << setw (4) << setprecision (3) << pF << " "
+      cout << setw (4) << setprecision (3) << pF << " "
 	   << setw (6) << setprecision (5) << Theta (i, h, 0.0) << " "
 	   << setw (12) << setprecision (11) << Cw2 (i, h) * 100.0 << " "
 	   << setw (12) << setprecision (11) << K (i, h, 0.0) / 3.6e5 << "\n";

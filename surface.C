@@ -35,8 +35,7 @@
 #include "soil_chemicals.h"
 #include "plf.h"
 #include "ridge.h"
-
-#include "message.h"
+#include "tmpstream.h"
 
 struct Surface::Implementation
 {
@@ -73,9 +72,9 @@ struct Surface::Implementation
   void mixture (const SoilChemicals& soil_chemicals);
   bool flux_top () const;
   void  flux_top_on () const;
-  bool exfiltrate (double water);
+  bool exfiltrate (Treelog&, double water);
   double ponding () const;
-  void tick (double PotSoilEvaporation, double water, double temp,
+  void tick (Treelog&, double PotSoilEvaporation, double water, double temp,
 	     const Soil& soil, const SoilWater& soil_water);
   double albedo (const Soil& soil, const SoilWater& soil_water) const;
   void fertilize (const IM& n);
@@ -205,12 +204,12 @@ Surface::flux_top_off () const
 }
 
 bool  
-Surface::accept_top (double water /* cm */)
+Surface::accept_top (Treelog& msg, double water /* cm */)
 { 
   if (impl.ridge_)
     return true;		// Handled by ridge based on flux.
   else
-    return impl.exfiltrate (water * 10.0); 
+    return impl.exfiltrate (msg, water * 10.0); 
 }
 
 bool
@@ -218,7 +217,7 @@ Surface::soil_top () const
 { return impl.ridge_ != NULL; }
 
 bool  
-Surface::Implementation::exfiltrate (double water /* mm */)
+Surface::Implementation::exfiltrate (Treelog& msg, double water /* mm */)
 {
   if (lake >= 0.0)
     return true;
@@ -236,14 +235,19 @@ Surface::Implementation::exfiltrate (double water /* mm */)
   // Infiltration.
   if (pond + water * dt >= - max (fabs (pond), fabs (water)) / 100.0)
     {
+      Treelog::Open nest (msg, "Surface exfiltration");
       if (im.NO3 < 0.0)
 	{
-	  CERR << "BUG: Added " << -im.NO3 << " NO3 to surface\n";
+	  TmpStream tmp;
+	  tmp () << "BUG: Added " << -im.NO3 << " NO3 to surface";
+	  msg.error (tmp.str ());
 	  im.NO3 = 0.0;
 	}
       if (im.NH4 < 0.0)
 	{
-	  CERR << "BUG: Added " << -im.NH4 << " NH4 to surface\n";
+	  TmpStream tmp;
+	  tmp () << "BUG: Added " << -im.NH4 << " NH4 to surface\n";
+	  msg.error (tmp.str ());
 	  im.NH4 = 0.0;
 	}
       if (total_matter_flux)
@@ -313,12 +317,14 @@ Surface::chemicals_down () const
 { return impl.chemicals_out; }
 
 void
-Surface::tick (double PotSoilEvaporation, double water, double temp,
+Surface::tick (Treelog& msg,
+	       double PotSoilEvaporation, double water, double temp,
 	       const Soil& soil, const SoilWater& soil_water)
-{ impl.tick (PotSoilEvaporation, water, temp, soil, soil_water); }
+{ impl.tick (msg, PotSoilEvaporation, water, temp, soil, soil_water); }
 
 void
-Surface::Implementation::tick (double PotSoilEvaporation,
+Surface::Implementation::tick (Treelog& msg,
+			       double PotSoilEvaporation,
 			       double water, double temp,
 			       const Soil& soil, const SoilWater& soil_water)
 {
@@ -369,7 +375,7 @@ Surface::Implementation::tick (double PotSoilEvaporation,
   if (ridge_)
     {
       ridge_->tick (soil, soil_water, pond);
-      exfiltrate (ridge_->exfiltration ());
+      exfiltrate (msg, ridge_->exfiltration ());
     }
 }
 
@@ -472,13 +478,18 @@ Surface::evap_soil_surface () const // [mm/h]
 { return impl.EvapSoilSurface; }
 
 double 
-Surface::evap_pond () const	// [mm/h]
+Surface::evap_pond (Treelog& msg) const	// [mm/h]
 { 
   const double ep = evap_soil_surface () - exfiltration (); 
   if (ep >= 0.0)
     return ep;
   if (ep < -1e-13)
-    CERR << "BUG: evap_pond = " << ep << "\n";
+    {
+      Treelog::Open nest (msg, "Surface evap pond");
+      TmpStream tmp;
+      tmp () << "BUG: evap_pond = " << ep;
+      msg.error (tmp.str ());
+    }
   return 0.0;
 }
 

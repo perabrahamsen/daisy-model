@@ -23,7 +23,6 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
-#include "message.h"
 
 struct ActionDivide : public Action
 {
@@ -31,9 +30,9 @@ struct ActionDivide : public Action
   const string copy;
   const double size;
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
     {
-      COUT << "[Dividing " << original << " into " << copy << "]\n";
+      out.message (string ("[Dividing ") + original + " into " + copy + "]");
       daisy.field.divide (original, copy, size, daisy.time, daisy.weather);
     }
 

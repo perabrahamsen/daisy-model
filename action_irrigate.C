@@ -25,7 +25,7 @@
 #include "field.h"
 #include "im.h"
 #include "check.h"
-#include "message.h"
+#include "tmpstream.h"
 
 struct ActionIrrigate : public Action
 {
@@ -38,9 +38,9 @@ struct ActionIrrigate : public Action
   virtual void irrigate (Field&,
 			 double flux, double temp, const IM&) const = 0;
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   {
-    COUT << " [Irrigating]\n";      
+    out.message (" [Irrigating]");      
     double t = temp;
 
     irrigate (daisy.field, flux, t, sm);
@@ -108,13 +108,15 @@ struct ActionIrrigateSubsoil : public Action
   const double to;
   const IM sm;
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   {
     daisy.field.set_subsoil_irrigation (flux, sm, from, to);
+    TmpStream tmp;
     if (flux != 0.0)
-      COUT << " [Subsoil irrigating with " << flux << " mm/h]\n";
+      tmp () << " [Subsoil irrigating with " << flux << " mm/h]\n";
     else
-      COUT << " [Subsoil irrigating turned off]\n";
+      tmp () << " [Subsoil irrigating turned off]\n";
+    out.message (tmp.str ());
   }
 
   ActionIrrigateSubsoil (const AttributeList& al)
@@ -130,11 +132,11 @@ struct ActionIrrigateSubsoil : public Action
 
 struct ActionIrrigateStop : public Action
 {
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   {
     IM sm;
     daisy.field.set_subsoil_irrigation (0.0, sm, 0.0, -0.1);
-    COUT << " [Subsoil irrigating turned off]\n";
+    out.message (" [Subsoil irrigating turned off]");
   }
   ActionIrrigateStop (const AttributeList& al)
     : Action (al)

@@ -26,13 +26,13 @@
 #include "solute.h"
 #include "log.h"
 #include "mathlib.h"
-#include "message.h"
+#include "tmpstream.h"
 
 class TransportNone : public Transport
 {
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&, const Solute&,
+  void tick (Treelog&, const Soil&, const SoilWater&, const Solute&,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
@@ -48,13 +48,15 @@ public:
 };
 
 void 
-TransportNone::tick (const Soil& soil, const SoilWater& soil_water,
+TransportNone::tick (Treelog& msg,
+		     const Soil& soil, const SoilWater& soil_water,
 		     const Solute& solute, 
 		     vector<double>& M, 
 		     vector<double>& C,
 		     const vector<double>& S,
 		     vector<double>& J)
 {
+  Treelog::Open* nest = NULL;
   for (unsigned int i = 0; i < soil.size (); i++)
     {
       M[i] += S[i] *dt;
@@ -67,13 +69,18 @@ TransportNone::tick (const Soil& soil, const SoilWater& soil_water,
       C[i] = solute.M_to_C (soil, soil_water.Theta (i), i, M[i]);
       if (!(M[i] >= 0.0))
 	{
-	  CERR << "BUG: M[" << i << "] = " << M[i] 
-	       << " (J_in = " << J[0] << ") S[" << i << "] = " << S[i] << "\n";
-
+	  if (!nest)
+	    nest = new Treelog::Open (msg, "Transport none");
+	  TmpStream tmp;
+	  tmp () << "BUG: M[" << i << "] = " << M[i] 
+		 << " (J_in = " << J[0] << ") S[" << i << "] = " << S[i];
+	  msg.error (tmp.str ());
 	}
       assert (M[i] >= 0.0);
       assert (C[i] >= 0.0);
     }
+  if (nest)
+    delete nest;
 }
 
 static struct TransportNoneSyntax

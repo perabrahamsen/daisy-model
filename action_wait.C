@@ -30,10 +30,10 @@ struct ActionWait : public Action
 {
   Condition& condition;
 
-  void tick (const Daisy& daisy)
-  { condition.tick (daisy); }
+  void tick (const Daisy& daisy, Treelog& out)
+  { condition.tick (daisy, out); }
 
-  void doIt (Daisy&)
+  void doIt (Daisy&, Treelog&)
   { }
 
   bool done (const Daisy& daisy) const
@@ -58,7 +58,7 @@ struct ActionWaitDays : public Action
   bool activated;
   Time end_time;
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog&)
   { 
     if (!activated)
       {
@@ -102,7 +102,7 @@ struct ActionWaitMMDD : public Action
   const int day;
   const int hour;
 
-  void doIt (Daisy&)
+  void doIt (Daisy&, Treelog&)
   { }
 
   bool done (const Daisy& daisy) const

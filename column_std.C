@@ -61,7 +61,7 @@ private:
 
   // Actions.
 public:
-  void sow (const AttributeList&);
+  void sow (Treelog&, const AttributeList&);
   void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
   void irrigate_overhead (double flux, const IM&);
@@ -73,8 +73,10 @@ public:
   void clear_second_year_utilization ();
 
   void add_residuals (vector<AM*>& residuals);
-  void mix (const Time&, double from, double to, double penetration = 1.0);
-  void swap (const Time&, double from, double middle, double to);
+  void mix (Treelog&,
+	    const Time&, double from, double to, double penetration = 1.0);
+  void swap (Treelog&,
+	     const Time&, double from, double middle, double to);
 
   // Conditions.
 public:
@@ -93,7 +95,7 @@ public:
   // Simulation.
 public:
   void clear ();
-  void tick (const Time&, const Weather*);
+  void tick (Treelog&, const Time&, const Weather*);
   void output_inner (Log&) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   bool check_inner (Treelog&) const;
@@ -113,8 +115,8 @@ public:
 };
 
 void 
-ColumnStandard::sow (const AttributeList& al)
-{ seed_N += vegetation.sow (al, soil, organic_matter); }
+ColumnStandard::sow (Treelog& msg, const AttributeList& al)
+{ seed_N += vegetation.sow (msg, al, soil, organic_matter); }
 
 // We need to convert from mm * mg N / liter to g N/m^2.
 // mm / liter = 1/m^2
@@ -265,19 +267,20 @@ ColumnStandard::add_residuals (vector<AM*>& residuals)
 }
 
 void 
-ColumnStandard::mix (const Time& time,
+ColumnStandard::mix (Treelog& out, const Time& time,
 		     double from, double to, double penetration)
 {
-  ColumnBase::mix (time, from, to, penetration);
+  ColumnBase::mix (out, time, from, to, penetration);
   soil_NO3.mix (soil, soil_water, from, to);
   soil_NH4.mix (soil, soil_water, from, to);
   organic_matter.mix (soil, from, to, penetration, time);
 }
 
 void 
-ColumnStandard::swap (const Time& time, double from, double middle, double to)
+ColumnStandard::swap (Treelog& out, 
+		      const Time& time, double from, double middle, double to)
 {
-  ColumnBase::swap (time, from, middle, to);
+  ColumnBase::swap (out, time, from, middle, to);
   soil_NO3.swap (soil, soil_water, from, middle, to);
   soil_NH4.swap (soil, soil_water, from, middle, to);
   organic_matter.swap (soil, from, middle, to, time);
@@ -334,14 +337,15 @@ ColumnStandard::clear ()
 }
 
 void
-ColumnStandard::tick (const Time& time, const Weather* global_weather)
+ColumnStandard::tick (Treelog& out, 
+		      const Time& time, const Weather* global_weather)
 {
   // Base log.
-  tick_base ();
+  tick_base (out);
 
   // Weather.
   if (weather)
-    weather->tick (time);
+    weather->tick (time, out);
   const Weather& my_weather = *(weather ? weather : global_weather);
 
   // Save logs.
@@ -368,26 +372,26 @@ ColumnStandard::tick (const Time& time, const Weather* global_weather)
   soil_top_conc.NH4 = soil_NH4.C (0) / 10.0; // [g/cm^3] -> [g/cm^2/mm]
   surface.mixture (soil_top_conc);
   surface.mixture (soil_chemicals);
-  soil_water.macro_tick (soil, surface);
+  soil_water.macro_tick (soil, surface, out);
 
   bioclimate.tick (surface, my_weather, 
-		   vegetation, soil, soil_water, soil_heat);
+		   vegetation, soil, soil_water, soil_heat, out);
   vegetation.tick (time, bioclimate, soil, organic_matter, 
-		   soil_heat, soil_water, soil_NH4, soil_NO3);
+		   soil_heat, soil_water, soil_NH4, soil_NO3, out);
   organic_matter.tick (soil, soil_water, soil_heat, 
-		       soil_NO3, soil_NH4);
+		       soil_NO3, soil_NH4, out);
   nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
   denitrification.tick (soil, soil_water, soil_heat, soil_NO3, 
 			organic_matter);
-  groundwater.tick (time);
+  groundwater.tick (time, out);
 
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, my_weather);
-  soil_water.tick (soil, surface, groundwater);
+  soil_water.tick (soil, surface, groundwater, out);
   soil_chemicals.tick (soil, soil_water, soil_heat, &organic_matter,
-		       surface.chemicals_down ());
-  soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
-  soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4);
+		       surface.chemicals_down (), out);
+  soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3, out);
+  soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4, out);
   
   // Once a month we clean up old AM from organic matter.
   if (time.hour () == 13 && time.mday () == 13)
@@ -483,10 +487,10 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
   if (!global_weather && !weather)
     return;
   ColumnBase::initialize (time, err, global_weather);
-  soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water);
-  soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water);
+  soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water, err);
+  soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water, err);
   organic_matter.initialize (alist.alist ("OrganicMatter"), soil, err);
-  vegetation.initialize (soil, organic_matter);
+  vegetation.initialize (err, soil, organic_matter);
 }
 
 ColumnStandard::~ColumnStandard ()

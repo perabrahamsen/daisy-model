@@ -33,25 +33,27 @@ struct ActionWithColumn : public Action
   vector<Action*> actions;
 
 public:
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   { 
     Field::Restrict restriction (daisy.field, column);
+    Treelog::Open nest (out, column);
     for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->tick (daisy);
+	(*i)->tick (daisy, out);
       }
   }
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   { 
     Field::Restrict restriction (daisy.field, column);
+    Treelog::Open nest (out, column);
     for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
-	(*i)->doIt (daisy);
+	(*i)->doIt (daisy, out);
       }
   }
 

@@ -49,7 +49,7 @@ private:
 public:
   void monthly (const Geometry& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&);
+	     SoilNO3&, SoilNH4&, Treelog& msg);
   void output (Log&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
   void mix (const Geometry&, double from, double to, double penetration, 

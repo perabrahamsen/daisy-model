@@ -23,7 +23,6 @@
 // Brooks and Corey retention curve model with Mualem theory.
 
 #include "hydraulic.h"
-#include "message.h"
 
 class HydraulicM_BaC : public Hydraulic
 {
@@ -101,11 +100,7 @@ HydraulicM_BaC::Se (double h) const
   else
     result = 1;
   
-  if (result <= 0.0)
-    {
-      CERR << "Se (" << h << ") = " << result << "; lambda = " << lambda
-	   << "; h_b = " << h_b << "\n;";
-    }
+  assert (result > 0.0);
   return result;
 }
 

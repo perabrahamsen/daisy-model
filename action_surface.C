@@ -24,7 +24,6 @@
 #include "daisy.h"
 #include "field.h"
 #include "check.h"
-#include "message.h"
 
 struct ActionSetSurfaceDetentionCapacity : public Action
 {
@@ -32,9 +31,9 @@ struct ActionSetSurfaceDetentionCapacity : public Action
   const double height;
 
   // Simulation.
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   {
-    COUT << " [Surface]\n";
+    out.message (" [Surface]");
     daisy.field.set_surface_detention_capacity (height);
   }
 

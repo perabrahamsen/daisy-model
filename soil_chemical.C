@@ -155,9 +155,10 @@ When it reached 1.0, decomposition begins.");
 
 void
 SoilChemical::initialize (const AttributeList& al,
-			  const Soil& soil, const SoilWater& soil_water)
+			  const Soil& soil, const SoilWater& soil_water, 
+			  Treelog& out)
 {
-  Solute::initialize (al, soil, soil_water);
+  Solute::initialize (al, soil, soil_water, out);
   uptaken.insert (uptaken.begin (), soil.size (), 0.0);
   decomposed.insert (decomposed.begin (), soil.size (), 0.0);
   lag.insert (lag.end (), soil.size () - lag.size (), 0.0);

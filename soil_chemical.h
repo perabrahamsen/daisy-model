@@ -62,7 +62,8 @@ private:
   static const PLF& no_lag ();
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  void initialize (const AttributeList&, const Soil&, const SoilWater&);
+  void initialize (const AttributeList&, const Soil&, const SoilWater&,
+		   Treelog&);
   SoilChemical (const Chemical&, const AttributeList&);	// From parser.
   SoilChemical (const Chemical&); // From influx.
   ~SoilChemical ();

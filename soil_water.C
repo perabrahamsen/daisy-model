@@ -32,8 +32,6 @@
 #include "tmpstream.h"
 #include "submodel.h"
 
-#include "message.h"
-
 void
 SoilWater::clear (const Geometry&)
 {
@@ -95,18 +93,21 @@ SoilWater::Theta (const Soil& soil, int i, double h) const
 { return soil.Theta (i, h, h_ice_[i]); }
 
 void
-SoilWater::macro_tick (const Soil& soil, Surface& surface)
+SoilWater::macro_tick (const Soil& soil, Surface& surface, Treelog& out)
 {
   // Calculate preferential flow first.
   fill (S_p_.begin (), S_p_.end (), 0.0);
   fill (q_p_.begin (), q_p_.end (), 0.0);
   macro.tick (soil, 0, soil.size () - 1, surface, h_ice_, h_, Theta_,
-	      S_sum_, S_p_, q_p_);
+	      S_sum_, S_p_, q_p_, out);
 }
 
 void
-SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
+SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater,
+		 Treelog& msg)
 {
+  Treelog::Open nest (msg, "SoilWater");
+
   // Ice first.
   for (unsigned int i = 0; i < soil.size (); i++)
     {
@@ -138,8 +139,12 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
       if (X_ice_[i] < 0.0)
 	{
 	  if (X_ice_[i] < -1e-13)
-	    CERR << "BUG: X_ice[" << i << "] = " << X_ice_[i]
-		 << " (S_sum[i] = " << S_sum_[i] << ")\n";
+	    {
+	      TmpStream tmp;
+	      tmp () << "BUG: X_ice[" << i << "] = " << X_ice_[i]
+		     << " (S_sum[i] = " << S_sum_[i] << ")";
+	      msg.error (tmp.str ());
+	    }
           X_ice_buffer[i] += X_ice_[i];
 	  X_ice_[i] = 0.0;
 	}
@@ -185,13 +190,13 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
       if (bottom)
 	{
 	  // We have two UZ models.
-	  ok = top->tick (soil,
+	  ok = top->tick (msg, soil,
 			  first, surface,
 			  bottom_start - 1, *bottom,
 			  S_sum_, h_old, Theta_old_, h_ice_,
 			  h_, Theta_, q_);
 	  if (ok)
-	    ok = bottom->tick (soil,
+	    ok = bottom->tick (msg, soil,
 			       bottom_start, *top,
 			       last, groundwater,
 			       S_sum_, h_old, Theta_old_, h_ice_,
@@ -200,7 +205,7 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
       else
 	{
 	  // We have only one UZ model.
-	  ok = top->tick (soil,
+	  ok = top->tick (msg, soil,
 			  first, surface,
 			  last, groundwater,
 			  S_sum_, h_old, Theta_old_, h_ice_,
@@ -209,13 +214,13 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
     }
   catch (const char* error)
     {
-      CERR << "UZ problem: " << error << "\n";
+      msg.warning (string ("UZ problem: ") + error);
       ok = false;
     }
   if (!ok)
     {
-      CERR << "Using reserve uz model.\n";
-      reserve->tick (soil,
+      msg.message ("Using reserve uz model.");
+      reserve->tick (msg, soil,
                      first, surface,
                      last, groundwater,
                      S_sum_, h_old, Theta_old_, h_ice_,
@@ -236,7 +241,7 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
     }
 
   // Update surface and groundwater reservoirs.
-  const bool top_accepted = surface.accept_top (q_[0] * dt);
+  const bool top_accepted = surface.accept_top (msg, q_[0] * dt);
   assert (top_accepted);
   const bool bottom_accepted 
     = groundwater.accept_bottom ((q_[last + 1] + q_p_[last + 1]) * dt);
@@ -245,7 +250,8 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
   // Update flux in surface and groundwater.
   surface.update_water (soil, S_sum_, h_, Theta_, q_, q_p_);
   groundwater.update_water (soil,
-			    S_sum_, S_drain_, h_, h_ice_, Theta_, q_, q_p_);
+			    S_sum_, S_drain_, h_, h_ice_, Theta_, q_, q_p_,
+			    msg);
 }
 
 void 
@@ -265,7 +271,8 @@ SoilWater::mix (const Soil& soil, double from, double to)
 }
 
 void
-SoilWater::swap (const Soil& soil, double from, double middle, double to)
+SoilWater::swap (Treelog& msg,
+		 const Soil& soil, double from, double middle, double to)
 {
   soil.swap (Theta_, from, middle, to);
 
@@ -274,8 +281,10 @@ SoilWater::swap (const Soil& soil, double from, double middle, double to)
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
       if (Theta_[i] > Theta_sat)
 	{
-	  CERR << "\nBUG: Theta[ " << i << "] (" << Theta_[i]
-	       << ") > Theta_sat (" << Theta_sat << ")\n";
+	  TmpStream tmp;
+	  tmp () << "BUG: Theta[ " << i << "] (" << Theta_[i]
+		 << ") > Theta_sat (" << Theta_sat << ")";
+	  msg.error (tmp.str ());
 	  Theta_[i] = Theta_sat;
 	}
       h_[i] = soil.h (i, Theta_[i]);
@@ -461,7 +470,8 @@ SoilWater::SoilWater (const AttributeList& al)
 
 void
 SoilWater::initialize (const AttributeList& al,
-		       const Soil& soil, const Groundwater& groundwater)
+		       const Soil& soil, const Groundwater& groundwater, 
+		       Treelog& out)
 {
   const unsigned int size = soil.size ();
 
@@ -495,8 +505,8 @@ SoilWater::initialize (const AttributeList& al,
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
     }
 
-  soil.initialize_layer (Theta_, al, "Theta");
-  soil.initialize_layer (h_, al, "h");
+  soil.initialize_layer (Theta_, al, "Theta", out);
+  soil.initialize_layer (h_, al, "h", out);
 
   if (Theta_.size () > 0)
     {

@@ -23,16 +23,17 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
-#include "treelog_stream.h"
+#include "treelog_dual.h"
 #include "options.h"
 #include <stdexcept>
 #include <typeinfo>
-
-#include "message.h"
+#include <iostream>
 
 int
 main (int argc, char* argv[])
 {
+  TreelogDual treelog ("daisy.log", cerr);
+
   try
     {
       // Initialize syntax and attribute list.
@@ -41,12 +42,12 @@ main (int argc, char* argv[])
       Daisy::load_syntax (syntax, alist);
       Library::load_syntax (syntax, alist);
 
-      Options options (argc, argv, syntax, alist);
+      Options options (argc, argv, syntax, alist, treelog);
 
       switch (argc)
 	{
 	case -2:
-	  options.usage ();
+	  options.usage (treelog);
 	  return 2;
 	case -1:
 	  return 1;
@@ -60,7 +61,6 @@ main (int argc, char* argv[])
 	}
 
       // Check the result.
-      TreelogStream treelog (CERR);
       Treelog::Open nest (treelog, "Daisy");
       if (!syntax.check (alist, treelog))
 	return 1;
@@ -71,27 +71,27 @@ main (int argc, char* argv[])
 
       if (!daisy.check (treelog))
 	return 1;
-      daisy.run ();
+      daisy.run (treelog);
 
       // All is well.
       return 0;
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      treelog.error (string ("Exception: ") + error);
     }
   catch (const string& error)
     {
-      CERR << "Exception: " << error << "\n";
+      treelog.error (string ("Exception raised: ") + error);
     }
   catch (const exception& e)
     {
-      CERR << "Standard exception: " << typeid (e).name ()
-	   << ": " << e.what () << "\n";
+      treelog.error (string ("Standard exception: ") + typeid (e).name ()
+		     + ": " + e.what ());
     }
   catch (...)
     {
-      CERR << "Unknown exception\n";
+      treelog.error ("Unknown exception");
     }
   exit (1);
 }

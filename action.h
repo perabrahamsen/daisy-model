@@ -36,8 +36,8 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Daisy&);
-  virtual void doIt (Daisy&) = 0;
+  virtual void tick (const Daisy&, Treelog&);
+  virtual void doIt (Daisy&, Treelog&) = 0;
   virtual bool done (const Daisy&) const;
   virtual void output (Log&) const;
 

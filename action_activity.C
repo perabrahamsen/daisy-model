@@ -27,21 +27,21 @@ struct ActionActivity : public Action
 {
   vector<Action*> actions;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   { 
     for (vector<Action*>::const_iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
-      (*i)->tick (daisy);
+      (*i)->tick (daisy, out);
   }
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   { 
     if (actions.size () == 0U)
       return;
 
     Action* action = actions.front ();
-    action->doIt (daisy);
+    action->doIt (daisy, out);
 
     if (action->done (daisy))
       {

@@ -70,24 +70,25 @@ ColumnBase::harvest (const Time& time, const string& crop_name,
 		     double stem_harvest,
 		     double leaf_harvest, 
 		     double sorg_harvest,
-		     vector<const Harvest*>& harvest)
+		     vector<const Harvest*>& harvest, Treelog& msg)
 { 
   vector<AM*> residuals;
   vegetation.harvest (name, crop_name, time, soil, 
 		      bioclimate,
 		      stub_length, 
 		      stem_harvest, leaf_harvest, sorg_harvest,
-		      harvest, residuals, harvest_DM, harvest_N, harvest_C); 
+		      harvest, residuals, harvest_DM, harvest_N, harvest_C, 
+		      msg); 
   add_residuals (residuals);
 }
 
 
 void 
-ColumnBase::mix (const Time& time,
+ColumnBase::mix (Treelog& msg, const Time& time,
 		 double from, double to, double)
 {
   vector<AM*> residuals;
-  vegetation.kill_all (name, time, soil, bioclimate, residuals);
+  vegetation.kill_all (name, time, soil, bioclimate, residuals, msg);
   add_residuals (residuals);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
@@ -97,11 +98,12 @@ ColumnBase::mix (const Time& time,
 }
 
 void 
-ColumnBase::swap (const Time& time, double from, double middle, double to)
+ColumnBase::swap (Treelog& msg, 
+		  const Time& time, double from, double middle, double to)
 {
-  mix (time, from, middle, 1.0);
-  mix (time, middle, to, 0.0);
-  soil_water.swap (soil, from, middle, to);
+  mix (msg, time, from, middle, 1.0);
+  mix (msg, time, middle, to, 0.0);
+  soil_water.swap (msg, soil, from, middle, to);
   soil_heat.swap (soil, from, middle, to);
   soil_chemicals.swap (soil, soil_water, from, middle, to);
 }
@@ -304,12 +306,12 @@ ColumnBase::check_inner (Treelog&) const
 { return true; }
 
 void
-ColumnBase::tick_base ()
+ColumnBase::tick_base (Treelog& msg)
 {
   for (vector<Transform*>::const_iterator i = transformations.begin ();
        i != transformations.end ();
        i++)
-    (*i)->tick (soil, soil_water, soil_chemicals);
+    (*i)->tick (soil, soil_water, soil_chemicals, msg);
 
   log_harvest_DM = harvest_DM;
   log_harvest_N = harvest_N;
@@ -402,9 +404,10 @@ ColumnBase::initialize (const Time& time, Treelog& err,
     return;
   const Weather& my_weather = *(weather ? weather : global_weather);
   groundwater.initialize (time, soil, err);
-  soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, my_weather);
-  soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater);
-  soil_chemicals.initialize (alist.alist ("SoilChemicals"), soil, soil_water);
+  soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, my_weather, err);
+  soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater, err);
+  soil_chemicals.initialize (alist.alist ("SoilChemicals"), soil, soil_water, 
+			     err);
   for (vector<Transform*>::const_iterator i = transformations.begin ();
        i != transformations.end ();
        i++)

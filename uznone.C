@@ -37,7 +37,7 @@ public:
     { }
   void flux_top_off () const
     { }
-  bool accept_top (double)
+  bool accept_top (Treelog&, double)
     { return true; }
   bool flux_bottom () const
     { return true; }
@@ -47,7 +47,7 @@ public:
     { }
 
 public:
-  bool tick (const Soil& /* soil */,
+  bool tick (Treelog&, const Soil& /* soil */,
 	     unsigned int first, const UZtop& /* top */, 
 	     unsigned int last, const UZbottom& /* bottom */, 
 	     const vector<double>& /* S */,

@@ -25,16 +25,15 @@
 #include "field.h"
 #include "chemical.h"
 #include "check.h"
-#include "message.h"
 
 struct ActionSpray : public Action
 {
   const string chemical;
   const double amount;
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
     {
-      COUT << " [Spraying " << chemical << "]\n";
+      out.message (string (" [Spraying ") + chemical + "]");
       daisy.field.spray (chemical, amount); 
     }
 

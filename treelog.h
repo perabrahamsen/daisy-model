@@ -48,6 +48,9 @@ public:
   // Use.
 public:
   virtual void entry (const string&);
+  virtual void message (const string&);
+  virtual void warning (const string&);
+  virtual void error (const string&);
   
   // Create and Destroy.
 public:

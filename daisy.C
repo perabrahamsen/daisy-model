@@ -39,7 +39,7 @@
 #include "common.h"
 #include "column.h"
 #include "submodel.h"
-#include "message.h"
+#include "tmpstream.h"
 
 const char *const Daisy::default_description = "\
 The Daisy Crop/Soil/Atmosphere Model.";
@@ -100,20 +100,20 @@ Daisy::check (Treelog& err)
 }
 
 void
-Daisy::tick_columns ()
-{ field.tick (time, weather); }
+Daisy::tick_columns (Treelog& out)
+{ field.tick (out, time, weather); }
 
 void
-Daisy::tick_logs ()
+Daisy::tick_logs (Treelog& out)
 {
-  activate_output.tick (*this);
+  activate_output.tick (*this, out);
 
   if (activate_output.match (*this))
     {
       for (unsigned int i = 0; i < logs.size (); i++)
 	{
 	  Log& log = *logs[i];
-	  if (log.match (*this))
+	  if (log.match (*this, out))
 	    {
 	      log.output ("time", time);
 	      if (weather)
@@ -132,29 +132,33 @@ Daisy::tick_logs ()
 }
 
 void
-Daisy::tick ()
+Daisy::tick (Treelog& out)
 { 
   if (weather)
-    weather->tick (time);
-  action.tick (*this);
-  action.doIt (*this);
+    weather->tick (time, out);
+  action.tick (*this, out);
+  action.doIt (*this, out);
 
-  tick_columns ();
-  tick_logs ();
+  tick_columns (out);
+  tick_logs (out);
   time.tick_hour ();
 }
 
 void 
-Daisy::run ()
+Daisy::run (Treelog& out)
 { 
   running = true;
 
   while (running)
     {
       if (time.hour () == 0)
-	COUT << time.year () << "-" << time.month () << "-" 
-	     << time.mday () << "\n";
-      tick ();
+	{
+	  TmpStream tmp;
+	  tmp () << time.year () << "-" << time.month () << "-" 
+		 << time.mday ();
+	  out.entry (tmp.str ());
+	}
+      tick (out);
     }
 }
 

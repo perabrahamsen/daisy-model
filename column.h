@@ -43,7 +43,7 @@ public:
 
   // Actions.
 public:
-  virtual void sow (const AttributeList& crop) = 0;
+  virtual void sow (Treelog&, const AttributeList& crop) = 0;
   virtual void ridge (const AttributeList& ridge) = 0;
   virtual void irrigate_overhead (double flux, double temp, const IM&) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&) = 0;
@@ -59,10 +59,11 @@ public:
 			double stem_harvest, 
 			double leaf_harvest, 
 			double sorg_harvest, 
-			vector<const Harvest*>& harvest) = 0;
-  virtual void mix (const Time&,
+			vector<const Harvest*>& harvest, Treelog&) = 0;
+  virtual void mix (Treelog&, const Time&,
 		    double from, double to, double penetration = 1.0) = 0;
-  virtual void swap (const Time&, double from, double middle, double to) = 0;
+  virtual void swap (Treelog&, 
+		     const Time&, double from, double middle, double to) = 0;
   virtual void set_porosity (double at, double Theta) = 0;
   virtual void set_heat_source (double at, double value) = 0; // [W/m^2]
   virtual void spray (const string& chemical, double amount) = 0; // [g/ha]
@@ -85,7 +86,7 @@ public:
   
   // Simulation.
   virtual void clear () = 0;
-  virtual void tick (const Time&, const Weather*) = 0;
+  virtual void tick (Treelog&, const Time&, const Weather*) = 0;
 
   virtual bool check (bool require_weather,
 		      const Time& from, const Time& to, 

@@ -24,7 +24,6 @@
 #include "daisy.h"
 #include "field.h"
 #include "check.h"
-#include "message.h"
 
 struct ActionSetHeatSource : public Action
 {
@@ -33,9 +32,9 @@ struct ActionSetHeatSource : public Action
   const double value;
 
   // Simulation.
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   {
-    COUT << " [Heat]\n";
+    out.message (" [Heat]");
     daisy.field.set_heat_source (height, value);
   }
 

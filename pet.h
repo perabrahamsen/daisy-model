@@ -48,7 +48,7 @@ public:
 public:
   virtual void tick (const Weather&, const Vegetation&,
 		     const Surface&, const Soil&, const SoilHeat&, 
-		     const SoilWater&) = 0;
+		     const SoilWater&, Treelog&) = 0;
   virtual double wet () const = 0; // [mm/h]
   virtual double dry () const; // [mm/h]
   virtual void output (Log&) const;

@@ -58,13 +58,13 @@ struct ConditionOr : public Condition
 {
   const vector<Condition*> conditions;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   {
     for (vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
-	(*i)->tick (daisy);
+	(*i)->tick (daisy, out);
       }
   }
   bool match (const Daisy& daisy) const
@@ -94,13 +94,13 @@ struct ConditionAnd : public Condition
 {
   const vector<Condition*> conditions;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   {
     for (vector<Condition*>::const_iterator i = conditions.begin ();
 	 i != conditions.end ();
 	 i++)
       {
-	(*i)->tick (daisy);
+	(*i)->tick (daisy, out);
       }
   }
   bool match (const Daisy& daisy) const
@@ -133,8 +133,8 @@ struct ConditionNot : public Condition
   bool match (const Daisy& daisy) const
   { return !condition.match (daisy); }
 
-  void tick (const Daisy& daisy)
-  { condition.tick (daisy); }
+  void tick (const Daisy& daisy, Treelog& out)
+  { condition.tick (daisy, out); }
 
   void output (Log&) const
   { }
@@ -158,11 +158,11 @@ struct ConditionIf : public Condition
   Condition& then_c;
   Condition& else_c;
 
-  void tick (const Daisy& daisy)
+  void tick (const Daisy& daisy, Treelog& out)
   { 
-    if_c.tick (daisy);
-    then_c.tick (daisy);
-    else_c.tick (daisy);
+    if_c.tick (daisy, out);
+    then_c.tick (daisy, out);
+    else_c.tick (daisy, out);
   }
   bool match (const Daisy& daisy) const
   { 

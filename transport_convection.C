@@ -40,7 +40,7 @@ private:
   
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&, const Solute&,
+  void tick (Treelog&, const Soil&, const SoilWater&, const Solute&,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
@@ -63,7 +63,8 @@ TransportConvection::output (Log& log) const
 }
 
 void 
-TransportConvection::tick (const Soil& soil, const SoilWater& soil_water,
+TransportConvection::tick (Treelog&, 
+			   const Soil& soil, const SoilWater& soil_water,
 			   const Solute& solute, 
 			   vector<double>& M, 
 			   vector<double>& C,

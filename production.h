@@ -35,6 +35,7 @@ class Syntax;
 class Log;
 class PLF;
 class AM;
+class Treelog;
 
 class Production 
 {
@@ -139,7 +140,7 @@ public:
 	     const Geometry& geometry,
 	     double DS, double CAImRat,
 	     const CrpN& nitrogen,
-	     const Partition& partition);
+	     const Partition& partition, Treelog&);
   void none ();
   void output (Log& log) const;
 

@@ -47,7 +47,7 @@ struct WeatherHourly : public WeatherOld
   double daily_air_temperature_;
 
   // Simulation.
-  void tick (const Time&);
+  void tick (const Time&, Treelog&);
 
   // Communication with Bioclimate.
   double daily_air_temperature () const
@@ -89,13 +89,15 @@ struct WeatherHourly : public WeatherOld
 };
 
 void
-WeatherHourly::tick (const Time& time)
+WeatherHourly::tick (const Time& time, Treelog& out)
 { 
-  WeatherOld::tick (time);
+  WeatherOld::tick (time, out);
 
   if (!file.good ())
     {
-      CERR << file_name << ":" << line << ": file error";
+      TmpStream tmp;
+      tmp () << file_name << ":" << line << ": file error";
+      out.error (tmp.str ());
       throw ("read error");
     }
   int year;
@@ -125,8 +127,12 @@ WeatherHourly::tick (const Time& time)
       assert (precipitation >= 0 && precipitation < 300);
       assert (cloudiness_ >= 0 && cloudiness_ <= 1);
       if (!approximate (cloudiness_, hourly_cloudiness ()))
-	CERR << "Warning: claudiness read (" << cloudiness_ 
-	     << ") != calculated (" << hourly_cloudiness () << ")\n";
+	{
+	  TmpStream tmp;
+	  tmp () << "cloudiness read (" << cloudiness_ 
+		 << ") != calculated (" << hourly_cloudiness () << ")";
+	  out.error (tmp.str ());
+	}
       assert (vapor_pressure_ >= 0 && vapor_pressure_ <= 5000);
       assert (wind_ >= 0 && wind_ <= 40);
 
@@ -149,7 +155,7 @@ WeatherHourly::tick (const Time& time)
   // Update the hourly values.
   distribute (precipitation);
 
-  Weather::tick_after (time);
+  Weather::tick_after (time, out);
 }
 
 static struct WeatherHourlySyntax

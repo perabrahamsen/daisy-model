@@ -77,32 +77,33 @@ struct VegetationPermanent : public Vegetation
 	     const SoilHeat& soil_heat,
 	     const SoilWater& soil_water,
 	     SoilNH4& soil_NH4,
-	     SoilNO3& soil_NO3);
+	     SoilNO3& soil_NO3,
+	     Treelog&);
   void tick (const Time& time,
 	     const Bioclimate& bioclimate,
 	     const Soil& soil,
 	     const SoilHeat& soil_heat,
-	     const SoilWater& soil_water);
+	     const SoilWater& soil_water, Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
-			const Soil& soil, SoilWater& soil_water);
+			const Soil& soil, SoilWater& soil_water, Treelog&);
   void kill_all (const string&, const Time&, const Geometry&, Bioclimate&,
-		 vector<AM*>&)
+		 vector<AM*>&, Treelog&)
   { }
   void harvest (const string&, const string&,
 		const Time&, const Geometry&, Bioclimate&,
 		double, double, double, double, 
 		vector<const Harvest*>&,
- 		vector<AM*>&, double&, double&, double&)
+ 		vector<AM*>&, double&, double&, double&, Treelog&)
   { }
-  double sow (const AttributeList&, const Geometry&, OrganicMatter&)
+  double sow (Treelog&, const AttributeList&, const Geometry&, OrganicMatter&)
   { throw "Can't sow on permanent vegetation"; }
-  void sow (const AttributeList&, const Geometry&)
+  void sow (Treelog&, const AttributeList&, const Geometry&)
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (const Soil& soil, OrganicMatter&);
+  void initialize (Treelog&, const Soil& soil, OrganicMatter&);
   VegetationPermanent (const AttributeList&);
   ~VegetationPermanent ();
 };
@@ -115,7 +116,8 @@ VegetationPermanent::tick (const Time& time,
 			   const SoilHeat&,
 			   const SoilWater& soil_water,
 			   SoilNH4& soil_NH4,
-			   SoilNO3& soil_NO3)
+			   SoilNO3& soil_NO3,
+			   Treelog&)
 {
   // Canopy.
   const double old_LAI = canopy.CAI;
@@ -161,7 +163,8 @@ VegetationPermanent::tick (const Time& time,
 			   const Bioclimate&,
 			   const Soil&,
 			   const SoilHeat&,
-			   const SoilWater&)
+			   const SoilWater&,
+			   Treelog&)
 {
   canopy.CAI = LAIvsDAY (time.yday ());
   cover_ =  1.0 - exp (-(canopy.EPext * canopy.CAI));
@@ -175,12 +178,12 @@ double
 VegetationPermanent::transpiration (double potential_transpiration,
 				    double canopy_evaporation,
 				    const Soil& soil, 
-				    SoilWater& soil_water)
+				    SoilWater& soil_water, Treelog& msg)
 {
   if (canopy.CAI > 0.0)
     return  root_system.water_uptake (potential_transpiration, 
 				      soil, soil_water, 
-				      canopy_evaporation);
+				      canopy_evaporation, msg);
   return 0.0;
 }
 
@@ -197,11 +200,11 @@ VegetationPermanent::output (Log& log) const
 }
 
 void
-VegetationPermanent::initialize (const Soil& soil, 
+VegetationPermanent::initialize (Treelog& msg, const Soil& soil, 
 				 OrganicMatter& organic_matter)
 {
   root_system.initialize (soil.size ());
-  root_system.full_grown (soil, WRoot);
+  root_system.full_grown (msg, soil, WRoot);
   litter = organic_matter.find_am ("vegetation", "litter");
 }
 

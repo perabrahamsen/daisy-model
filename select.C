@@ -66,7 +66,7 @@ struct Select::Implementation
   void open (const string& name); // Open one leaf level.
   void close ();		// Close one level.
 
-  bool match (const Daisy& daisy, bool is_printing);
+  bool match (const Daisy& daisy, Treelog&, bool is_printing);
 
   // Create and Destroy.
   void initialize (const string_map& conv, const string& timestep, 
@@ -241,14 +241,15 @@ Select::Implementation::close ()		// Close one level.
 
 // Reset at start of time step.
 bool 
-Select::Implementation::match (const Daisy& daisy, bool is_printing)
+Select::Implementation::match (const Daisy& daisy, Treelog& out,
+			       bool is_printing)
 {
   assert (current_path_index == 0U);
   assert (last_valid_path_index == 0U);
 
   if (condition)
     {
-      condition->tick (daisy);
+      condition->tick (daisy, out);
       is_active = condition->match (daisy);
     }
   else
@@ -387,8 +388,8 @@ Select::output_array (const string& name, const vector<double>&,
 
 // Reset at start of time step.
 bool 
-Select::match (const Daisy& daisy, bool is_printing)
-{ return impl.match (daisy, is_printing); }
+Select::match (const Daisy& daisy, Treelog& out, bool is_printing)
+{ return impl.match (daisy, out, is_printing); }
 
 void 
 Select::load_syntax (Syntax& syntax, AttributeList& alist)

@@ -35,7 +35,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&)
+  void tick (const Time&, Treelog&)
   { }
   double table () const
   { return 1.0; }

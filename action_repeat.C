@@ -28,10 +28,10 @@ struct ActionRepeat : public Action
   const AttributeList repeat;
   Action* action;
 
-  void tick (const Daisy& daisy)
-  { action->tick (daisy); }
+  void tick (const Daisy& daisy, Treelog& out)
+  { action->tick (daisy, out); }
     
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
   { 
     if (action && action->done (daisy))
       {
@@ -40,7 +40,7 @@ struct ActionRepeat : public Action
       }
     if (action == NULL)
       action = &Librarian<Action>::create (repeat);
-    action->doIt (daisy);
+    action->doIt (daisy, out);
   }
 
   bool done (const Daisy&) const

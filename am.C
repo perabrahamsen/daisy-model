@@ -30,7 +30,6 @@
 #include "soil.h"
 #include "check.h"
 #include "tmpstream.h"
-#include "message.h"
 #include "mathlib.h"
 #include <numeric>
 
@@ -428,12 +427,8 @@ AM::Implementation::mix (const Geometry& geometry,
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
   
-  if (!approximate (new_C, old_C))
-    CERR << "BUG: AM::mix new C (" << new_C 
-	 << ") != old_C (" << old_C << ")\n";
-  if (!approximate (new_N, old_N))
-    CERR << "BUG: AM::mix new_N (" << new_N 
-	 << ") != old_N (" << old_N << ")\n";
+  assert (approximate (new_C, old_C));
+  assert (approximate (new_N, old_N));
 }
 
 void
@@ -449,12 +444,8 @@ AM::Implementation::swap (const Geometry& geometry,
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
   
-  if (!approximate (new_C, old_C))
-    CERR << "BUG: AM::swap new C (" << new_C 
-	 << ") != old_C (" << old_C << ")\n";
-  if (!approximate (new_N, old_N))
-    CERR << "BUG: AM::swap new_N (" << new_N 
-	 << ") != old_N (" << old_N << ")\n";
+  assert (approximate (new_C, old_C));
+  assert (approximate (new_N, old_N));
 }
 
 double 

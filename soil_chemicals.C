@@ -46,14 +46,14 @@ struct SoilChemicals::Implementation
   // Utilities
   void add_missing (const Soil& soil, 
 		    const SoilWater& soil_water,
-		    const Chemicals& chemicals);
+		    const Chemicals& chemicals, Treelog&);
   SoilChemical& find (const Soil& soil, 
 		      const SoilWater& soil_water,
-		      const string& name);
+		      const string& name, Treelog&);
 
   // Simulation
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
-	     const OrganicMatter*, const Chemicals& flux_in);
+	     const OrganicMatter*, const Chemicals& flux_in, Treelog&);
   void mixture (Chemicals& storage, Chemicals& down, 
 		double pond, double rate) const;
   void output (Log&) const;
@@ -64,7 +64,7 @@ struct SoilChemicals::Implementation
   // Create & Destroy
   void clear ();
   void initialize (const vector<AttributeList*>,
-		   const Soil&, const SoilWater&);
+		   const Soil&, const SoilWater&, Treelog&);
   bool check (unsigned n, Treelog&) const;
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
@@ -73,7 +73,8 @@ struct SoilChemicals::Implementation
 void
 SoilChemicals::Implementation::add_missing (const Soil& soil, 
 					    const SoilWater& soil_water,
-					    const Chemicals& chemicals)
+					    const Chemicals& chemicals,
+					    Treelog& out)
 {
   string_set missing;
   chemicals.find_missing (all, missing);
@@ -86,7 +87,8 @@ SoilChemicals::Implementation::add_missing (const Soil& soil,
       assert (solutes.find (name) == solutes.end ());
       const Chemical& chemical = Chemicals::lookup (name);
       solutes[name] = new SoilChemical (chemical);
-      solutes[name]->initialize (chemical.solute_alist (), soil, soil_water);
+      solutes[name]->initialize (chemical.solute_alist (), soil, soil_water,
+				 out);
       all.insert (name);
     }
 }
@@ -94,13 +96,14 @@ SoilChemicals::Implementation::add_missing (const Soil& soil,
 SoilChemical& 
 SoilChemicals::Implementation::find (const Soil& soil, 
 				     const SoilWater& soil_water,
-				     const string& name)
+				     const string& name, Treelog& out)
 {
   if (solutes.find (name) == solutes.end ())
     {
       const Chemical& chemical = Chemicals::lookup (name);
       solutes[name] = new SoilChemical (chemical);
-      solutes[name]->initialize (chemical.solute_alist (), soil, soil_water);
+      solutes[name]->initialize (chemical.solute_alist (), soil, soil_water, 
+				 out);
       all.insert (name);
     }
   return *solutes[name];
@@ -111,10 +114,11 @@ SoilChemicals::Implementation::tick (const Soil& soil,
 				     const SoilWater& soil_water,
 				     const SoilHeat& soil_heat,
 				     const OrganicMatter* organic_matter,
-				     const Chemicals& flux_in)
+				     const Chemicals& flux_in,
+				     Treelog& out)
 { 
   // Allow 'flux_in' to create new solutes.
-  add_missing (soil, soil_water, flux_in);
+  add_missing (soil, soil_water, flux_in, out);
 
   // Crop Uptake.
   for (SoluteMap::const_iterator i = solutes.begin ();
@@ -137,7 +141,7 @@ SoilChemicals::Implementation::tick (const Soil& soil,
       SoilChemical& solute = *(*i).second;
       // [g/m^2/h ned -> g/cm^2/h op]
       const double J_in = -flux_in.amount (name) / (100.0 * 100.0);
-      solute.tick (soil, soil_water, J_in); 
+      solute.tick (soil, soil_water, J_in, out); 
     }
 }
 
@@ -242,13 +246,14 @@ SoilChemicals::Implementation::clear ()
 void 
 SoilChemicals::Implementation::initialize (const vector<AttributeList*> al,
 					   const Soil& soil, 
-					   const SoilWater& soil_water)
+					   const SoilWater& soil_water, 
+					   Treelog& out)
 {
   for (unsigned int i = 0; i < al.size (); i++)
     {
       const string& name = al[i]->name ("chemical");
       const AttributeList& alist = al[i]->alist ("solute");
-      solutes[name]->initialize (alist, soil, soil_water);
+      solutes[name]->initialize (alist, soil, soil_water, out);
     }
 }
 
@@ -286,15 +291,15 @@ SoilChemicals::Implementation::~Implementation ()
 SoilChemical& 
 SoilChemicals::find (const Soil& soil, 
 		     const SoilWater& soil_water,
-		     const string& name)
-{ return impl.find (soil, soil_water, name); }
+		     const string& name, Treelog& out)
+{ return impl.find (soil, soil_water, name, out); }
 
 void 
 SoilChemicals::tick (const Soil& soil, const SoilWater& soil_water,
 		     const SoilHeat& soil_heat, 
 		     const OrganicMatter* organic_matter,
-		     const Chemicals& flux_in)
-{ impl.tick (soil, soil_water, soil_heat, organic_matter, flux_in); }
+		     const Chemicals& flux_in, Treelog& out)
+{ impl.tick (soil, soil_water, soil_heat, organic_matter, flux_in, out); }
 
 void 
 SoilChemicals::mixture (Chemicals& storage, // [g/m^2]
@@ -323,8 +328,9 @@ SoilChemicals::clear ()
 
 void
 SoilChemicals::initialize (const AttributeList& al, 
-			   const Soil& soil, const SoilWater& soil_water)
-{ impl.initialize (al.alist_sequence ("solutes"), soil, soil_water); }
+			   const Soil& soil, const SoilWater& soil_water,
+			   Treelog& out)
+{ impl.initialize (al.alist_sequence ("solutes"), soil, soil_water, out); }
 
 bool 
 SoilChemicals::check (unsigned n, Treelog& err) const

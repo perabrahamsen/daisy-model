@@ -33,7 +33,7 @@ a farm.  Typically, but not necessarily, the high level management\n\
 strategies are build by combining low level management operations.";
 
 void
-Action::tick (const Daisy&)
+Action::tick (const Daisy&, Treelog&)
 { }
 
 void 

@@ -50,7 +50,7 @@ public:
   // Use.  
 public:
   // Called at the start of each time step.
-  virtual bool match (const Daisy&) = 0;
+  virtual bool match (const Daisy&, Treelog&) = 0;
   // Called at the end of each time step.
   virtual void done ();
 

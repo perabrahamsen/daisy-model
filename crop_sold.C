@@ -36,7 +36,7 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
-#include "message.h"
+#include "tmpstream.h"
 
 class CropSold : public Crop
 {
@@ -59,7 +59,7 @@ public:
   double EpFac () const; // Convertion to potential evapotransp.
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
-			    double EvapInterception);
+			    double EvapInterception, Treelog&);
   
   // Internal functions.
 protected:
@@ -102,14 +102,14 @@ public:
 	     const SoilHeat&,
 	     const SoilWater&, 
 	     SoilNH4*,
-	     SoilNO3*);
+	     SoilNO3*, Treelog&);
   const Harvest& harvest (const string& column_name, const Time&,
 			  const Geometry& geometry, 
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off,
-			  vector<AM*>& residuals);
+			  vector<AM*>& residuals, Treelog&);
   void output (Log&) const;
 
   double DS () const;
@@ -118,7 +118,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry);
+  void initialize (Treelog&, const Geometry& geometry);
   CropSold (const AttributeList& vl);
   ~CropSold ();
 };
@@ -608,7 +608,7 @@ CropSold::Variables::~Variables ()
 { }
 
 void
-CropSold::initialize (const Geometry& geometry)
+CropSold::initialize (Treelog&, const Geometry& geometry)
 {
   unsigned int size = geometry.size ();
 
@@ -1300,11 +1300,13 @@ CropSold::CanopyStructure ()
 double
 CropSold::ActualWaterUptake (double Ept,
 			     const Soil& soil, SoilWater& soil_water,
-			     const double EvapInterception)
+			     const double EvapInterception, Treelog& out)
 {
   if (Ept < 0)
     {
-      CERR << "\nBUG: Negative EPT (" << Ept << ")\n";
+      TmpStream tmp;
+      tmp () << "BUG: Negative EPT (" << Ept << ")";
+      out.error (tmp.str ());
       Ept = 0.0;
     }
   assert (EvapInterception >= 0);
@@ -1699,7 +1701,7 @@ CropSold::tick (const Time& time,
 		const SoilHeat& soil_heat,
 		const SoilWater& soil_water, 
 		SoilNH4* soil_NH4,
-		SoilNO3* soil_NO3)
+		SoilNO3* soil_NO3, Treelog&)
 {
   // Clear log.
   fill (var.RootSys.NO3Extraction.begin (), 
@@ -1816,7 +1818,7 @@ CropSold::harvest (const string& column_name,
 		   Bioclimate&,
 		   double,
 		   double, double leaf_harvest, double sorg_harvest, 
-		   bool, vector<AM*>& residuals)
+		   bool, vector<AM*>& residuals, Treelog&)
 {
   const Parameters::HarvestPar& Hp = par.Harvest;
   Variables::RecProd& Prod = var.Prod;

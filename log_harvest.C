@@ -24,7 +24,6 @@
 #include "daisy.h"
 #include "harvest.h"
 #include "version.h"
-#include "message.h"
 #include <fstream.h>
 #include <time.h>
 
@@ -47,7 +46,7 @@ struct LogHarvest : public Log
   const bool print_C;		// Set if carbon content should be printed.
 
   // Checking to see if we should log this time step.
-  bool match (const Daisy& daisy)
+  bool match (const Daisy& daisy, Treelog&)
   {
     if (print_header)
       {
@@ -180,7 +179,7 @@ struct LogHarvest : public Log
   ~LogHarvest ()
   {
     if (!out.good ())
-      CERR << "Problems writing to '" << file << "'\n";
+      throw (string ("Problems writing to '") + file + "'");
   }
 };
 

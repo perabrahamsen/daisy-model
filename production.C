@@ -27,8 +27,8 @@
 #include "log.h"
 #include "time.h"
 #include "plf.h"
-#include "message.h"
 #include "submodel.h"
+#include "tmpstream.h"
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
@@ -112,7 +112,8 @@ Production::tick (const double AirT, const double SoilT,
 		  const Geometry& geometry,
 		  const double DS, const double CAImRat,
 		  const CrpN& nitrogen,
-		  const Partition& partition)
+		  const Partition& partition,
+		  Treelog& msg)
 {
   const double LeafGrowthRespCoef = GrowthRespCoef (E_Leaf);
   const double StemGrowthRespCoef = GrowthRespCoef (E_Stem);
@@ -136,7 +137,9 @@ Production::tick (const double AirT, const double SoilT,
             CH2OPool += RootRelease;
             WRoot -= RootRelease;
             ReleaseOfRootReserves = true;
-            CERR << "Extra CH2O: " << RootRelease << "\n";
+	    TmpStream tmp;
+	    tmp () << "Extra CH2O: " << RootRelease;
+	    msg.error (tmp.str ());
          }
     }
   double NetAss = CanopyAss;
@@ -243,7 +246,11 @@ Production::tick (const double AirT, const double SoilT,
 	  CH2OPool = 0.0;
 	}
       if (CH2OPool > 0.0)
-	CERR << "BUG: Extra CH2O: " << CH2OPool << "\n";
+	{
+	  TmpStream tmp;
+	  tmp () << "BUG: Extra CH2O: " << CH2OPool;
+	  msg.error (tmp.str ());
+	}
     }
   NetPhotosynthesis = molWeightCO2 / molWeightCH2O * NetAss;
   AccNetPhotosynthesis += NetPhotosynthesis;

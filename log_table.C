@@ -25,7 +25,6 @@
 #include "geometry.h"
 #include "version.h"
 #include "daisy.h"
-#include "message.h"
 #include <fstream.h>
 #include <time.h>
 
@@ -53,7 +52,7 @@ struct LogTable : public LogSelect, public Select::Destination
   const vector<double>* dest_array;
   
   // Log.
-  bool match (const Daisy& daisy);
+  bool match (const Daisy& daisy, Treelog& out);
   void done ();
 
   // Select::Destination
@@ -72,14 +71,14 @@ const char *const LogTable::default_description = "\
 Each selected variable is represented by a column in the specified log file.";
 
 bool 
-LogTable::match (const Daisy& daisy)
+LogTable::match (const Daisy& daisy, Treelog& msg)
 {
   if (print_header)
     {
       print_dlf_header (out, daisy.alist);
       print_header = false;
     }
-  return LogSelect::match (daisy);
+  return LogSelect::match (daisy, msg);
 }
 void 
 LogTable::done ()
@@ -303,7 +302,7 @@ LogTable::LogTable (const AttributeList& al)
 LogTable::~LogTable ()
 {
   if (!out.good ())
-    CERR << "Problems writing to '" << file << "'\n";
+    throw (string ("Problems writing to '") + file + "'");
 }
 
 static struct LogTableSyntax

@@ -39,7 +39,6 @@
 #include "harvest.h"
 #include "mathlib.h"
 #include "check.h"
-#include "message.h"
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
@@ -110,7 +109,7 @@ public:
   { return canopy.EpFactor (DS ()); }
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
-			    double EvapInterception);
+			    double EvapInterception, Treelog&);
   void force_production_stress  (double pstress);
 
   // Simulation.
@@ -119,14 +118,13 @@ public:
 	     OrganicMatter*,
 	     const SoilHeat&,
 	     const SoilWater&,
-	     SoilNH4*,
-	     SoilNO3*);
+	     SoilNH4*, SoilNO3*, Treelog&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&, 
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
-			  bool kill_off, vector<AM*>& residuals);
+			  bool kill_off, vector<AM*>& residuals, Treelog&);
   void output (Log&) const;
 
   double DS () const;
@@ -135,7 +133,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry);
+  void initialize (Treelog&, const Geometry& geometry);
   CropSimple (const AttributeList& vl);
   ~CropSimple ();
 };
@@ -152,9 +150,10 @@ CropSimple::CanopyStructure ()
 double
 CropSimple::ActualWaterUptake (double Ept,
 			       const Soil& soil, SoilWater& soil_water,
-			       const double EvapInterception)
+			       const double EvapInterception, Treelog& msg)
 {
-  return root_system.water_uptake (Ept, soil, soil_water, EvapInterception);
+  return root_system.water_uptake (Ept, soil, soil_water, EvapInterception,
+				   msg);
 }
 
 void 
@@ -169,7 +168,7 @@ CropSimple::tick (const Time& time,
 		  const SoilHeat& soil_heat,
 		  const SoilWater& soil_water,
 		  SoilNH4* soil_NH4,
-		  SoilNO3* soil_NO3)
+		  SoilNO3* soil_NO3, Treelog& msg)
 {
   // Growth
   if (time.month () == spring_mm
@@ -206,26 +205,27 @@ CropSimple::tick (const Time& time,
       else if (T < T_flowering)
 	{
 	  if (old_T < T_emergence)
-	    COUT << " [" << name << " is emerging]\n";
+	    msg.message (string (" [") + name + " is emerging]");
 	  const double T_growth = T_flowering - T_emergence;
 	  const double step = T_air / T_growth;
 	  const double this_far = (T - T_emergence) / T_growth;
 	  
 	  canopy.Height = height_max * this_far;
-	  root_system.tick (soil, soil_heat, WRoot * this_far, WRoot * step, 
+	  root_system.tick (msg, soil, soil_heat,
+			    WRoot * this_far, WRoot * step, 
 			    DS ());
 	}
       else if (old_T < T_flowering)
 	{
-	  COUT << " [" << name << " is flowering]\n";
+	  msg.message (string (" [") + name + " is flowering]");
 	  canopy.Height = height_max;
-	  root_system.tick (soil, soil_heat, WRoot,
+	  root_system.tick (msg, soil, soil_heat, WRoot,
 			    WRoot * (1.0 - old_T / T_flowering), DS ());
 	}
       else if (T < T_ripe)
 	/* do nothing */;
       else if (old_T < T_ripe)
-	COUT << " [" << name << " is ripe]\n";
+	msg.message (string (" [") + name + " is ripe]");
     }
 
   // Nitrogen uptake.
@@ -258,7 +258,7 @@ CropSimple::harvest (const string& column_name,
 		     double /* leaf_harvest */,
 		     double /* sorg_harvest */,
 		     bool /* kill_off */,
-		     vector<AM*>& residuals)
+		     vector<AM*>& residuals, Treelog&)
 {
   dead = true;
 
@@ -329,7 +329,7 @@ CropSimple::total_N () const
 }
 
 void
-CropSimple::initialize (const Geometry& geometry)
+CropSimple::initialize (Treelog&, const Geometry& geometry)
 {
   root_system.initialize (geometry.size ());
 }

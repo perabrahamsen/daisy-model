@@ -35,7 +35,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&);
+  void tick (const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
@@ -57,7 +57,7 @@ GroundwaterStatic::accept_bottom (double)
 }
 
 void
-GroundwaterStatic::tick (const Time&)
+GroundwaterStatic::tick (const Time&, Treelog&)
 { }
 
 double

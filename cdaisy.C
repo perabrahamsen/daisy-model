@@ -38,7 +38,6 @@
 #include "chemical.h"
 #include "log_extern.h"
 #include "treelog_stream.h"
-#include "message.h"
 #include <fstream.h>
 
 typedef int daisy_bool;
@@ -57,7 +56,7 @@ extern "C" int EXPORT
 daisy_syntax_check (const Syntax* syntax, const AttributeList* alist, 
 		    const char* name)
 { 
-  TreelogStream treelog (CERR);
+  TreelogStream treelog (cerr);
   Treelog::Open nest (treelog, name);
   return syntax->check (*alist, treelog); 
 }
@@ -401,7 +400,7 @@ daisy_library_remove (Library* library, const char* name)
 extern "C" Parser* EXPORT
 daisy_parser_create_file (const Syntax* syntax, const char* filename)
 { 
-  static TreelogStream treelog (CERR);
+  static TreelogStream treelog (cerr);
   static Treelog::Open nest (treelog, "parser");
   return new ParserFile (*syntax, filename, treelog); 
 }
@@ -450,7 +449,7 @@ daisy_printer_good (Printer* printer)
 extern "C" Daisy* EXPORT
 daisy_daisy_create (const Syntax* syntax, const AttributeList* alist)
 { 
-  static TreelogStream treelog (CERR);
+  static TreelogStream treelog (cerr);
   static Treelog::Open nest (treelog, "daisy");
   Daisy* daisy =  new Daisy (*alist); 
   daisy->initialize (*syntax, treelog);
@@ -464,7 +463,7 @@ daisy_daisy_delete (Daisy* daisy)
 extern "C" daisy_bool EXPORT	// Check context.
 daisy_daisy_check (Daisy* daisy)
 { 
-  TreelogStream treelog (CERR);
+  TreelogStream treelog (cerr);
   Treelog::Open nest (treelog, "Daisy");
   return daisy->check (treelog); 
 }
@@ -476,16 +475,17 @@ daisy_daisy_run (Daisy* daisy)
 {
   try
     {
-      daisy->run (); 
+      TreelogStream treelog (cerr);
+      daisy->run (treelog); 
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      cerr << "Exception: " << error << "\n";
       exit (1);
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      cerr << "Unhandled exception\n";
       exit (1);
     }
 }
@@ -503,16 +503,17 @@ daisy_daisy_tick (Daisy* daisy)
 {
   try
     {
-      daisy->tick (); 
+      TreelogStream treelog (cerr);
+      daisy->tick (treelog); 
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      cerr << "Exception: " << error << "\n";
       exit (1);
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      cerr << "Unhandled exception\n";
       exit (1);
     }
 }
@@ -522,16 +523,17 @@ daisy_daisy_tick_action (Daisy* daisy)
 {
   try
     {
-      daisy->action.doIt (*daisy);
+      TreelogStream treelog (cerr);
+      daisy->action.doIt (*daisy, treelog);
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      cerr << "Exception: " << error << "\n";
       exit (1);
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      cerr << "Unhandled exception\n";
       exit (1);
     }
 }
@@ -544,16 +546,17 @@ daisy_daisy_tick_weather (Daisy* daisy)
 
   try
     {
-      daisy->weather->tick (daisy->time); 
+      TreelogStream treelog (cerr);
+      daisy->weather->tick (daisy->time, treelog); 
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      cerr << "Exception: " << error << "\n";
       exit (1);
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      cerr << "Unhandled exception\n";
       exit (1);
     }
 }
@@ -563,16 +566,17 @@ daisy_daisy_tick_columns (Daisy* daisy)
 {
   try
     {
-      daisy->tick_columns ();
+      TreelogStream treelog (cerr);
+      daisy->tick_columns (treelog);
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      cerr << "Exception: " << error << "\n";
       exit (1);
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      cerr << "Unhandled exception\n";
       exit (1);
     }
 }
@@ -582,16 +586,17 @@ daisy_daisy_tick_column (Daisy* daisy, int col)
 {
   try
     {
-      daisy->field.find (col)->tick (daisy->time, daisy->weather);
+      TreelogStream treelog (cerr);
+      daisy->field.find (col)->tick (treelog, daisy->time, daisy->weather);
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      cerr << "Exception: " << error << "\n";
       exit (1);
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      cerr << "Unhandled exception\n";
       exit (1);
     }
 }
@@ -601,16 +606,17 @@ daisy_daisy_tick_logs (Daisy* daisy)
 {
   try
     {
-      daisy->tick_logs (); 
+      TreelogStream treelog (cerr);
+      daisy->tick_logs (treelog); 
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      cerr << "Exception: " << error << "\n";
       exit (1);
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      cerr << "Unhandled exception\n";
       exit (1);
     }
 }
@@ -624,12 +630,12 @@ daisy_daisy_tick_time (Daisy* daisy)
     }
   catch (const char* error)
     {
-      CERR << "Exception: " << error << "\n";
+      cerr << "Exception: " << error << "\n";
       exit (1);
     }
   catch (...)
     {
-      CERR << "Unhandled exception\n";
+      cerr << "Unhandled exception\n";
       exit (1);
     }
 }

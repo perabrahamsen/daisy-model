@@ -57,7 +57,8 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const AttributeList&);
   void initialize (const AttributeList& al, 
-		   const Soil& soil, const Time& time, const Weather& weather);
+		   const Soil& soil, const Time& time, const Weather& weather,
+		   Treelog&);
   ~SoilHeat ();
 };
 

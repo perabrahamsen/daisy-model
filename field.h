@@ -55,7 +55,7 @@ public:
 
   // Actions.
 public:
-  void sow (const AttributeList& crop);
+  void sow (Treelog&, const AttributeList& crop);
   void ridge (const AttributeList& ridge);
   void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
@@ -71,10 +71,10 @@ public:
 		double stem_harvest, 
 		double leaf_harvest, 
 		double sorg_harvest,
-		vector<const Harvest*>&);
-  void mix (const Time&,
+		vector<const Harvest*>&, Treelog&);
+  void mix (Treelog&, const Time&,
 	    double from, double to, double penetration = 1.0);
-  void swap (const Time&, double from, double middle, double to);
+  void swap (Treelog&, const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
   void spray (const string& chemical, double amount); // [g/ha]
@@ -95,7 +95,7 @@ public:
   double crop_dm (const string& crop) const; 
   // Simulation.
   void clear ();
-  void tick (const Time&, const Weather*);
+  void tick (Treelog&, const Time&, const Weather*);
   void output (Log&) const;
 
   // Find a specific column.

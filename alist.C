@@ -28,7 +28,6 @@
 #include "common.h"
 #include <assert.h>
 #include <map>
-#include "message.h"
 
 // @ Value
 //
@@ -480,10 +479,8 @@ AttributeList::Implementation::lookup (const string& key) const
   value_map::const_iterator i = values.find (key);
   
   if (i == values.end ())
-    {
-      CERR << "Missing key '" << key << "'\n";
-      assert (false);
-    }
+    throw (string ("AList: Missing key '") + key + "'");
+
   return (*i).second;
 }
 

@@ -25,7 +25,7 @@
 #include "soil.h"
 #include "plf.h"
 #include "mathlib.h"
-#include "message.h"
+#include "tmpstream.h"
 
 struct MactransStandard : public Mactrans
 {
@@ -35,7 +35,7 @@ struct MactransStandard : public Mactrans
 	    const vector<double>& C,
 	    vector<double>& S,
 	    vector<double>& S_p,
-	    vector<double>& J_p);
+	    vector<double>& J_p, Treelog&);
   void output (Log&) const
     { }
 
@@ -53,7 +53,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 			const vector<double>& C,
 			vector<double>& S_m,
 			vector<double>& S_p,
-			vector<double>& J_p)
+			vector<double>& J_p, Treelog& out)
 { 
   double max_delta_matter = 0.0; // [g/cm^2]
 
@@ -97,9 +97,12 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 			  : delta_water / water_in_above;
 	      if (water_fraction < 0.0 || water_fraction > 1.0)
 		{
-		  CERR << __FILE__ << ":" <<  __LINE__
-		       << ": BUG: water fraction from macropore = " 
-		       << water_fraction << "\n";
+		  Treelog::Open nest (out, "mactrans default");
+		  TmpStream tmp;
+		  tmp () << __FILE__ << ":" <<  __LINE__
+			 << ": BUG: water fraction from macropore = " 
+			 << water_fraction;
+		  out.error (tmp.str ());
 		  set_bound (0.0, water_fraction, 1.0);
 		}
 
@@ -149,10 +152,15 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
   // Check that the sink terms add up.
   if (fabs (soil.total (S_p) + J_p[0] - J_p[soil.size ()])
       > max_delta_matter * 1e-8)
-    CERR << __FILE__ << ":" <<  __LINE__
-	 << ": BUG: mactrans Total S_p = '"
-	 << soil.total (S_p) + J_p[0]  - J_p[soil.size ()]
-	 << "' solute\n";
+    {
+      Treelog::Open nest (out, "mactrans default");
+      TmpStream tmp;
+      tmp () << __FILE__ << ":" <<  __LINE__
+	     << ": BUG: Total S_p = '"
+	     << soil.total (S_p) + J_p[0]  - J_p[soil.size ()]
+	     << "' solute\n";
+      out.error (tmp.str ());
+    }
 }
 
 static struct MactransStandardSyntax

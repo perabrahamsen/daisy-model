@@ -26,7 +26,6 @@
 #include "solute.h"
 #include "log.h"
 #include "mathlib.h"
-#include "message.h"
 
 class TransportCD : public Transport
 {
@@ -40,7 +39,7 @@ private:
   
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&, const Solute&,
+  void tick (Treelog&, const Soil&, const SoilWater&, const Solute&,
 	     vector<double>& M, 
 	     vector<double>& C,
 	     const vector<double>& S,
@@ -63,7 +62,7 @@ TransportCD::output (Log& log) const
 }
 
 void 
-TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
+TransportCD::tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 		   const Solute& solute, 
 		   vector<double>& M, 
 		   vector<double>& C,
@@ -159,11 +158,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   double C_top = 0.0;
   double S_top = 0.0;
 #ifdef DISABLE_MIXING
-  if (J_in > 0.0)
-    {
-      CERR << "\nBug: Positive J_in (" << J_in << ")\n";
-      J_in = 0.0;
-    }
+  assert (J_in <= 0.0);
 #endif
   if (J_in != 0.0)
     {

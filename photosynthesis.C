@@ -26,9 +26,9 @@
 #include "plf.h"
 #include "alist.h"
 #include "syntax.h"
-#include "message.h"
 #include "submodel.h"
 #include "mathlib.h"
+#include "tmpstream.h"
 
 // Chemical constants affecting the crop.
 const double molWeightCH2O = 30.0; // [gCH2O/mol]
@@ -37,7 +37,8 @@ const double molWeightCO2 = 44.0; // [gCO2/mol]
 double
 Photosynthesis::operator () (const Bioclimate& bioclimate, 
 			     CanopyStandard& canopy,
-			     Development& development) const
+			     Development& development,
+			     Treelog& msg) const
 {
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const PLF& LAIvsH = canopy.LAIvsH;
@@ -50,11 +51,13 @@ Photosynthesis::operator () (const Bioclimate& bioclimate,
   // One crop: assert (approximate (canopy.CAI, bioclimate.CAI ()));
   if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
     {
-      CERR << "Bug: CAI below top: " << LAIvsH (canopy.Height)
-	   << " Total CAI: " << canopy.CAI << "\n";
+      TmpStream tmp;
+      tmp () << "Bug: CAI below top: " << LAIvsH (canopy.Height)
+	     << " Total CAI: " << canopy.CAI << "\n";
       canopy.CanopyStructure (DS);
-      CERR << "Adjusted: CAI below top: " << LAIvsH (canopy.Height)
-	   << " Total CAI: " << canopy.CAI << "\n";
+      tmp () << "Adjusted: CAI below top: " << LAIvsH (canopy.Height)
+	     << " Total CAI: " << canopy.CAI;
+      msg.error (tmp.str ());
     }
 
  // CAI below the current leaf layer.

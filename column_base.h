@@ -78,10 +78,12 @@ public:
 		double stem_harvest,
 		double leaf_harvest, 
 		double sorg_harvest,
-		vector<const Harvest*>& harvest);
+		vector<const Harvest*>& harvest, Treelog&);
   virtual void add_residuals (vector<AM*>&) = 0;
-  void mix (const Time&, double from, double to, double penetration = 1.0);
-  void swap (const Time&, double from, double middle, double to);
+  void mix (Treelog&, const Time&,
+	    double from, double to, double penetration = 1.0);
+  void swap (Treelog&, const Time&,
+	     double from, double middle, double to);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
   void spray (const string& chemical, double amount); // [g/ha]
@@ -116,7 +118,7 @@ public:
 
   // Simulation.
 public:
-  void tick_base ();
+  void tick_base (Treelog&);
   void output (Log&) const;
   virtual void output_inner (Log&) const;
   void clear ();

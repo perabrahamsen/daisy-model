@@ -39,7 +39,7 @@ struct WeatherFile : public WeatherOld
   double air_temperature;
 
   // Simulation.
-  void tick (const Time&);
+  void tick (const Time&, Treelog&);
 
   // Communication with Bioclimate.
   double daily_air_temperature (void) const // [°C]
@@ -80,16 +80,18 @@ struct WeatherFile : public WeatherOld
 };
 
 void
-WeatherFile::tick (const Time& time)
+WeatherFile::tick (const Time& time, Treelog& out)
 { 
-  WeatherOld::tick (time);
+  WeatherOld::tick (time, out);
 
   if (!(date < time))
     return;
 
   if (!file.good ())
     {
-      CERR << file_name << ":" << line << ": file error";
+      TmpStream tmp;
+      tmp () << file_name << ":" << line << ": file error";
+      out.error (tmp.str ());
       throw ("read error");
     }
   int year;
@@ -141,7 +143,7 @@ WeatherFile::tick (const Time& time)
   // Hourly value.
   distribute (precipitation / 24.0);
 
-  Weather::tick_after (time);
+  Weather::tick_after (time, out);
 }
 
 static struct WeatherFileSyntax

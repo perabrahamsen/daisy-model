@@ -38,7 +38,7 @@ class WeatherSimple : public WeatherOld
 
   // Simulation.
 public:
-  void tick (const Time&);
+  void tick (const Time&, Treelog&);
   double daily_air_temperature () const;
   double hourly_global_radiation () const;
   double daily_global_radiation () const;
@@ -52,12 +52,12 @@ public:
 };
 
 void
-WeatherSimple::tick (const Time& t)
+WeatherSimple::tick (const Time& t, Treelog& o)
 { 
-  WeatherOld::tick (t);
+  WeatherOld::tick (t, o);
   time = t;
   WeatherOld::distribute (Precipitation ());
-  Weather::tick_after (time);
+  Weather::tick_after (time, o);
 }
 
 double

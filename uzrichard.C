@@ -28,7 +28,7 @@
 #include "common.h"
 #include "log.h"
 #include "average.h"
-#include "message.h"
+#include "tmpstream.h"
 
 class UZRichard : public UZmodel
 {
@@ -56,7 +56,7 @@ public:
     { }
   void flux_top_off () const
     { }
-  bool accept_top (double)
+  bool accept_top (Treelog&, double)
     { return true; };
   bool flux_bottom () const
     { return true; };
@@ -66,7 +66,7 @@ public:
 
   // Simulate.
 private:
-  bool richard (const Soil& soil,
+  bool richard (Treelog&, const Soil& soil,
 		int first, const UZtop& top,
 		int last, const UZbottom& bottom,
 		const vector<double>& S,
@@ -93,7 +93,7 @@ private:
 		double ddt,
 		vector<double>& q);
 public:
-  bool tick (const Soil& soil,
+  bool tick (Treelog&, const Soil& soil,
 	     unsigned int first, const UZtop& top,
 	     unsigned int last, const UZbottom& bottom,
 	     const vector<double>& S,
@@ -112,7 +112,8 @@ public:
 };
 
 bool
-UZRichard::richard (const Soil& soil,
+UZRichard::richard (Treelog& msg,
+		    const Soil& soil,
 		    int first, const UZtop& top,
 		    const int last, const UZbottom& bottom,
 		    const vector<double>& S,
@@ -123,6 +124,7 @@ UZRichard::richard (const Soil& soil,
 		    vector<double>& Theta_new,
 		    vector<double>& q)
 {
+  Treelog::Open nest (msg, "UZ Richard");
   // Input variables for solving a tridiagonal matrix.
   const unsigned int size = last - first + 1;
   vector<double> a (size);
@@ -267,8 +269,12 @@ UZRichard::richard (const Soil& soil,
 		    {
 		      h_above = top.h () - soil.z (first) + top_water;
 		      if (top.h () < 0.0)
-			CERR << "TOP H = " << top.h () << ", H ABOVE = " 
-			     << h_above << "\n";
+			{
+			  TmpStream tmp;
+			  tmp () << "TOP H = " << top.h () << ", H ABOVE = " 
+				 << h_above;
+			  msg.error (tmp.str ());
+			}
 		    }
 		  b[i] = Cw2
 		    + (ddt / dz) * (Kplus[i - 1] / dz_minus + Kplus[i] / dz_plus);
@@ -325,9 +331,11 @@ UZRichard::richard (const Soil& soil,
 
 	  if (h[0] < -1e9 || h[1] < -1e9 || h[size-1] < -1e9)
 	    {
-	      CERR << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
-		   << " h[" << (size-1) << "] = " << h[size-1]
-		   << " stepping down\n";
+	      TmpStream tmp;
+	      tmp () << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
+		     << " h[" << (size-1) << "] = " << h[size-1]
+		     << " stepping down";
+	      msg.error (tmp.str ());
 	      iterations_used = max_iterations + 42;
 	      break;
 	    }
@@ -437,11 +445,13 @@ UZRichard::richard (const Soil& soil,
                         && i<2)
 		      {
 			error_found = true;
-			CERR << "q[" << (i + 1) << "] = " << q[i+1]
-			     << ", darcy = " << darcy
-			     << "delta_top_water = " << delta_top_water
-			     << " ddt = " << ddt
-			     << " top.flux() = " << top.flux_top() << "\n";
+			TmpStream tmp;
+			tmp () << "q[" << (i + 1) << "] = " << q[i+1]
+			       << ", darcy = " << darcy
+			       << "delta_top_water = " << delta_top_water
+			       << " ddt = " << ddt
+			       << " top.flux() = " << top.flux_top();
+			msg.error (tmp.str ());
 		      }
 		  }
 		if (error_found)
@@ -595,7 +605,7 @@ calculating flow with pressure top.");
 }
 
 bool
-UZRichard::tick (const Soil& soil,
+UZRichard::tick (Treelog& msg, const Soil& soil,
 		 unsigned int first, const UZtop& top, 
 		 unsigned int last, const UZbottom& bottom, 
 		 const vector<double>& S,
@@ -607,7 +617,7 @@ UZRichard::tick (const Soil& soil,
 		 vector<double>& q)
 {
   iterations = 0;
-  if (!richard (soil, first, top, last, bottom, 
+  if (!richard (msg, soil, first, top, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q))
     {
 #ifdef WORKING_EXCEPTIONS

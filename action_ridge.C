@@ -24,15 +24,14 @@
 #include "daisy.h"
 #include "field.h"
 #include "ridge.h"
-#include "message.h"
 
 struct ActionRidge : public Action
 {
   const AttributeList& ridge;
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog& out)
     { 
-      COUT << " [Ridging]\n";      
+      out.message (" [Ridging]");      
       daisy.field.ridge (ridge); 
     }
 

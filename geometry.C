@@ -25,7 +25,6 @@
 #include "alist.h"
 #include "tmpstream.h"
 #include "mathlib.h"
-#include "message.h"
 #include "check.h"
 #include <assert.h>
 
@@ -263,7 +262,7 @@ VALUE from the END of the previous layer, to the END of the current layer.");
 void 
 Geometry::initialize_layer (vector<double>& array, 
 			    const AttributeList& al, 
-			    const string& name) const
+			    const string& name, Treelog& out) const
 {
   const string initial = string ("initial_") + name;
   assert (array.size () == 0);
@@ -284,8 +283,8 @@ Geometry::initialize_layer (vector<double>& array,
 	  const double value = layers[i]->number ("value");
 	  if (next < soil_end)
 	    {
-	      CERR << "WARNING: initial_" << name 
-		   << " layer ends below the last node\n";
+	      out.warning (string ("WARNING: initial_") + name 
+			   + " layer ends below the last node");
 	      next = soil_end;
 	      i = layers.size ();
 	    }

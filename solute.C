@@ -27,7 +27,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "mathlib.h"
-#include "message.h"
+#include "tmpstream.h"
 
 double
 Solute::total (const Geometry& geometry, double from, double to) const
@@ -67,7 +67,7 @@ Solute::add_to_sink (const vector<double>& v)
 void 
 Solute::tick (const Soil& soil, 
 	      const SoilWater& soil_water, 
-	      double J_in)
+	      double J_in, Treelog& msg)
 {
   for (unsigned i = 0; i < soil.size (); i++)
     assert (M_left (i) >= 0.0);
@@ -90,8 +90,12 @@ Solute::tick (const Soil& soil,
       if (soil_water.q (0) >= 0.0)
 	{
 	  if (soil_water.q (0) > 1.0e-10)
-	    CERR << "BUG: q_p[0] = " << soil_water.q_p (0) 
-		 << " and q[0] = " << soil_water.q (0) << "\n";
+	    {
+	      TmpStream tmp;
+	      tmp () << "BUG: q_p[0] = " << soil_water.q_p (0) 
+		     << " and q[0] = " << soil_water.q (0);
+	      msg.error (tmp.str ());
+	    }
 	  J_p[0] = J_in;
 	  J[0] = J_in;
 	}
@@ -116,30 +120,31 @@ Solute::tick (const Soil& soil,
 
   // Flow.
   const double old_content = soil.total (M_);
-  mactrans.tick (soil, soil_water, M_, C_, S, S_p, J_p);
+  mactrans.tick (soil, soil_water, M_, C_, S, S_p, J_p, msg);
 
   try
     {
       for (unsigned i = 0; i < soil.size (); i++)
 	assert (M_left (i) >= 0.0);
-      transport.tick (soil, soil_water, *this, M_, C_, S, J);
+      transport.tick (msg, soil, soil_water, *this, M_, C_, S, J);
     }
   catch (const char* error)
     {
-      CERR << "Transport problem: " << error << ", trying reserve.\n";
+      msg.warning (string ("Transport problem: ") + error +
+		   ", trying reserve.");
       try
 	{
 	  for (unsigned i = 0; i < soil.size (); i++)
 	    assert (M_left (i) >= 0.0);
-	  reserve.tick (soil, soil_water, *this, M_, C_, S, J);
+	  reserve.tick (msg, soil, soil_water, *this, M_, C_, S, J);
 	}
       catch (const char* error)
 	{
-	  CERR << "Reserve transport problem: " << error
-	       << ", trying last resort.\n";
+	   msg.warning (string ("Reserve transport problem: ") + error
+			+ ", trying last resort.");
 	  for (unsigned i = 0; i < soil.size (); i++)
 	    assert (M_left (i) >= 0.0);
-	  last_resort.tick (soil, soil_water, *this, M_, C_, S, J);
+	  last_resort.tick (msg, soil, soil_water, *this, M_, C_, S, J);
 	}
     }
   const double new_content = soil.total (M_);
@@ -150,11 +155,15 @@ Solute::tick (const Soil& soil,
   const double expected = source + in - out;
   if (!approximate (delta_content, expected)
       && new_content < fabs (expected) * 1e10)
-    CERR << __FILE__ << ":" << __LINE__ << ":" << submodel
-	 << ": mass balance new - old != source + in - out\n"
-	 << new_content << " - " << old_content << " != " 
-	 << source << " + " << in << " - " << out << " (error "
-	 << delta_content - expected << ")\n";
+    {
+      TmpStream tmp;
+      tmp () << __FILE__ << ":" << __LINE__ << ":" << submodel
+	     << ": mass balance new - old != source + in - out\n"
+	     << new_content << " - " << old_content << " != " 
+	     << source << " + " << in << " - " << out << " (error "
+	     << delta_content - expected << ")";
+      msg.error (tmp.str ());
+    }
 }
 
 bool 
@@ -331,14 +340,15 @@ Solute::default_initialize (const Soil& soil, const SoilWater&)
 
 void
 Solute::initialize (const AttributeList& al, 
-		    const Soil& soil, const SoilWater& soil_water)
+		    const Soil& soil, const SoilWater& soil_water, 
+		    Treelog& out)
 {
   vector<double> soil_ppm;
   vector<double> solute_ppm;
-  soil.initialize_layer (C_, al, "C");
-  soil.initialize_layer (M_, al, "M");
-  soil.initialize_layer (soil_ppm, al, "soil_ppm");
-  soil.initialize_layer (solute_ppm, al, "solute_ppm");
+  soil.initialize_layer (C_, al, "C", out);
+  soil.initialize_layer (M_, al, "M", out);
+  soil.initialize_layer (soil_ppm, al, "soil_ppm", out);
+  soil.initialize_layer (solute_ppm, al, "solute_ppm", out);
 
   if (C_.size () > 0)
     {

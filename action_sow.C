@@ -24,22 +24,21 @@
 #include "daisy.h"
 #include "field.h"
 #include "crop.h"
-#include "message.h"
 
 struct ActionSow : public Action
 {
   const AttributeList& crop;
 
-  void doIt (Daisy& daisy)
-    { 
-      COUT << " [Sowing " << crop.name ("type") << "]\n";      
-      daisy.field.sow (crop); 
-    }
+  void doIt (Daisy& daisy, Treelog& msg)
+  { 
+    msg.message (string ("[Sowing ") + crop.name ("type") + "]");      
+    daisy.field.sow (msg, crop); 
+  }
 
   ActionSow (const AttributeList& al)
     : Action (al),
       crop (al.alist ("crop"))
-    { }
+  { }
 };
 
 // Add the ActionSow syntax to the syntax table.

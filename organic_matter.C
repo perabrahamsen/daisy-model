@@ -37,7 +37,6 @@
 #include "plf.h"
 #include "tmpstream.h"
 #include "submodel.h"
-#include "message.h"
 #include "treelog.h"
 #include <algorithm>
 #include <numeric>
@@ -93,7 +92,7 @@ struct OrganicMatter::Implementation
   { am.push_back (&om); }
   void monthly (const Geometry& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
-	     SoilNO3&, SoilNH4&);
+	     SoilNO3&, SoilNH4&, Treelog& msg);
   void mix (const Geometry&, double from, double to, double penetration, 
 	    const Time& time);
   void swap (const Geometry&, double from, double middle, double to, 
@@ -425,7 +424,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 				     const SoilWater& soil_water, 
 				     const SoilHeat& soil_heat,
 				     SoilNO3& soil_NO3,
-				     SoilNH4& soil_NH4)
+				     SoilNH4& soil_NH4,
+				     Treelog& msg)
 {
   const double old_N = total_N (soil);
   const double old_C = total_C (soil);
@@ -550,12 +550,14 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   const double N_source = soil.total (NO3_source) + soil.total (NH4_source);
   if (!approximate (delta_N, N_source) && !approximate (old_N, new_N, 1e-10))
     {
-      CERR << "BUG: OrganicMatter: delta_N != NO3 + NH4 [g N/cm^2]\n"
-	   << delta_N << " != " << soil.total (NO3_source)
-	   << " + " << soil.total (NH4_source);
+      TmpStream tmp;
+      tmp () << "BUG: OrganicMatter: delta_N != NO3 + NH4 [g N/cm^2]\n"
+	     << delta_N << " != " << soil.total (NO3_source)
+	     << " + " << soil.total (NH4_source);
       if (N_source != 0.0)
-	CERR << " (error " << fabs (delta_N / N_source - 1.0) * 100.0 << "%)";
-      CERR << "\n";    
+	tmp () << " (error " 
+	       << fabs (delta_N / N_source - 1.0) * 100.0 << "%)";
+      msg.error (tmp.str ());
     }
   const double new_C = total_C (soil);
   const double delta_C = old_C - new_C;
@@ -563,9 +565,12 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   if (!approximate (delta_C, C_source) && !approximate (old_C, new_C, 1e-10))
     {
-      CERR << "BUG: OrganicMatter: delta_C != soil_CO2 + top_CO2 [g C/cm^2]\n"
-	   << delta_C << " != " 
-	   << soil.total (CO2) << " + " << top_CO2 << "\n";
+      TmpStream tmp;
+      tmp () << "BUG: OrganicMatter: "
+	"delta_C != soil_CO2 + top_CO2 [g C/cm^2]\n"
+	     << delta_C << " != " 
+	     << soil.total (CO2) << " + " << top_CO2;
+      msg.error (tmp.str ());
     }
 
   // We didn't steal it all?
@@ -856,9 +861,10 @@ OrganicMatter::tick (const Soil& soil,
 		     const SoilWater& soil_water, 
 		     const SoilHeat& soil_heat,
 		     SoilNO3& soil_NO3,
-		     SoilNH4& soil_NH4)
+		     SoilNH4& soil_NH4,
+		     Treelog& msg)
 {
-  impl.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
+  impl.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4, msg);
 }
 
 void 

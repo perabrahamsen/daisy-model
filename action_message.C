@@ -24,17 +24,16 @@
 #include "condition.h"
 #include "log.h"
 #include "daisy.h"
-#include "message.h"
 
 struct ActionAssert : public Action
 {
   Condition& condition;
   const string message;
 
-  void tick (const Daisy& daisy)
-  { condition.tick (daisy); }
+  void tick (const Daisy& daisy, Treelog& out)
+  { condition.tick (daisy, out); }
 
-  void doIt (Daisy& daisy)
+  void doIt (Daisy& daisy, Treelog&)
   { 
     if (!condition.match (daisy))
       throw (message);
@@ -57,9 +56,9 @@ struct ActionMessage : public Action
 {
   const string message;
 
-  void doIt (Daisy&)
+  void doIt (Daisy&, Treelog& out)
   { 
-    COUT << message << "\n";
+    out.message (message);
   }
 
   ActionMessage (const AttributeList& al)
@@ -75,9 +74,9 @@ struct ActionWarning : public Action
 {
   const string message;
 
-  void doIt (Daisy&)
+  void doIt (Daisy&, Treelog& out)
   { 
-    COUT << message << "\n";
+    out.warning (message);
   }
 
   ActionWarning (const AttributeList& al)
@@ -93,7 +92,7 @@ struct ActionError : public Action
 {
   const string message;
 
-  void doIt (Daisy&)
+  void doIt (Daisy&, Treelog&)
   { throw (message); }
 
   ActionError (const AttributeList& al)

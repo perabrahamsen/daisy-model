@@ -29,6 +29,7 @@ class AttributeList;
 class Syntax;
 class Log;
 class PLF;
+class Treelog;
 
 class Photosynthesis 
 {
@@ -43,7 +44,7 @@ private:
 public:
   double operator () (const Bioclimate& bioclimate, 
 		      CanopyStandard& canopy,
-		      Development& development) const;
+		      Development& development, Treelog&) const;
 
   // Create and Destroy.
 public:

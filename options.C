@@ -1,7 +1,7 @@
 // options.C --- Parsing command line options.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -27,7 +27,6 @@
 #include "alist.h"
 #include "treelog_stream.h"
 #include "version.h"
-#include "message.h"
 #include "path.h"
 
 #if defined (__unix) 
@@ -54,9 +53,10 @@ Options::get_arg (int& argc, char**& argv)
 }
 
 void
-Options::usage () const
+Options::usage (Treelog& out) const
 {
-  CERR << "Usage: " << program_name << " [-p type] [-v] [-d dir] file...\n";
+  out.error (string ("Usage: ")
+	     + program_name + " [-p type] [-v] [-d dir] file...");
 }
 
 void 
@@ -82,7 +82,7 @@ Options::initialize_path ()
 }
 
 Options::Options (int& argc, char**& argv,
-		  Syntax& syntax, AttributeList& alist)
+		  Syntax& syntax, AttributeList& alist, Treelog& out)
   : program_name (argv[0])
 {
   if (argc < 2)
@@ -108,9 +108,8 @@ Options::Options (int& argc, char**& argv,
       else if (options_finished || arg[0] != '-')
 	{
 	  // Parse the file.
-	  TreelogStream treelog (CERR);
-	  Treelog::Open nest (treelog, "Parsing");
-	  ParserFile parser (syntax, arg, treelog);
+	  Treelog::Open nest (out, "Parsing");
+	  ParserFile parser (syntax, arg, out);
 	  parser.load (alist);
 	  file_found = true;
 	  errors_found += parser.error_count ();
@@ -131,7 +130,7 @@ Options::Options (int& argc, char**& argv,
 		{
 		  const string dir = get_arg (argc, argv);
 		  if (!Path::set_directory (dir))
-		    CERR << program_name << ": chdir (" << dir << ") failed\n";
+		    out.error (program_name + ": chdir (" + dir + ") failed");
 		}
 	      else
 		// Usage.
@@ -148,21 +147,20 @@ Options::Options (int& argc, char**& argv,
 		      const Syntax& syntax = library.syntax (name);
 		      AttributeList alist;
 		      alist.add ("type", name);
-		      TreelogStream treelog (CERR);
-		      Treelog::Open nest (treelog, name);
-		      if (syntax.check (alist, treelog))
+		      Treelog::Open nest (out, name);
+		      if (syntax.check (alist, out))
 			{
 			  Document& document = 
 			    Librarian<Document>::create (alist);
-			  document.print_document (COUT);
+			  document.print_document (cout);
 			  delete &document;
 			}
 		      prevent_run = true;
 		    }
 		  else
 		    {
-		      CERR << program_name << ": `" << name 
-			   << "' unknown document type\n";
+		      out.error (program_name + ": `" + name 
+				 + "' unknown document type");
 		      argc = -2;
 		    }
 		}
@@ -172,10 +170,10 @@ Options::Options (int& argc, char**& argv,
 	      break;
 	    case 'v':
 	      // Print version.
-	      COUT << "Daisy crop/soil simulation version "
-		   << version << ". (" __DATE__ ")\n"
-		"Copyright 1996 - 2002 Per Abrahamsen, "
-		"Søren Hansen and KVL.\n";
+	      out.message (string ("Daisy crop/soil simulation version ")
+			   + version + ". (" __DATE__ ")\n"
+			   "Copyright 1996 - 2002 Per Abrahamsen, "
+			   "Søren Hansen and KVL.");
 	      break;
 	    case '-':
 	      // Finish option list.

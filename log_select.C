@@ -53,14 +53,14 @@ LogSelect::check_derived (const string& field, const string& /* name */,
 }
 
 bool 
-LogSelect::match (const Daisy& daisy)
+LogSelect::match (const Daisy& daisy, Treelog& out)
 {
-  condition.tick (daisy);
+  condition.tick (daisy, out);
   is_printing = condition.match (daisy);
   is_active = is_printing;
 
   for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->match (daisy, is_printing))
+    if (entries[i]->match (daisy, out, is_printing))
       is_active = true;
 
   return is_active;

@@ -24,7 +24,6 @@
 #include "condition.h"
 #include "time.h"
 #include "geometry.h"
-#include "message.h"
 #include <fstream.h>
 #include <numeric>
 #include <set>
@@ -241,14 +240,14 @@ struct LogEntry
     }
 
   // Reset at start of time step.
-  bool match (const Daisy& daisy, bool is_printing)
+  bool match (const Daisy& daisy, Treelog& out, bool is_printing)
     {
       assert (current_path_index == 0U);
       assert (last_valid_path_index == 0U);
 
       if (condition)
 	{
-	  condition->tick (daisy);
+	  condition->tick (daisy, out);
 	  is_active = condition->match (daisy);
 	}
       else
@@ -374,14 +373,14 @@ struct LogTable1 : public Log
   const double to;		// to here.
 
   // Checking to see if we should log this time step.
-  bool match (const Daisy& daisy)
+  bool match (const Daisy& daisy, Treelog& out)
     {
-      condition.tick (daisy);
+      condition.tick (daisy, out);
       is_printing = condition.match (daisy);
       is_active = is_printing;
 
       for (unsigned int i = 0; i < entries.size (); i++)
-	if (entries[i]->match (daisy, is_printing))
+	if (entries[i]->match (daisy, out, is_printing))
 	  is_active = true;
       
       return is_active;
@@ -550,7 +549,7 @@ struct LogTable1 : public Log
   ~LogTable1 ()
     {
       if (!out.good ())
-	CERR << "Problems writing to '" << file << "'\n";
+	throw (string ("Problems writing to '") + file + "'");
       delete &condition;
       sequence_delete (entries.begin (), entries.end ());
     }
@@ -559,20 +558,20 @@ struct LogTable1 : public Log
 static struct LogTable1Syntax
 {
   static Log& make (const AttributeList& al)
-    { return *new LogTable1 (al); }
+  { return *new LogTable1 (al); }
 
   static bool check_alist (const AttributeList& al, Treelog& err)
-    {
-      bool ok = true;
+  {
+    bool ok = true;
 
-      if ((al.size ("set") % 2) == 1)
-	{
-	  err.entry ("'set' should contain an even number of arguments");
-	  ok = false;
-	}
+    if ((al.size ("set") % 2) == 1)
+      {
+	err.entry ("'set' should contain an even number of arguments");
+	ok = false;
+      }
 
-      return ok;
-    }
+    return ok;
+  }
   static bool check_entry_alist (const AttributeList& al, Treelog& err)
     {
       bool ok = true;

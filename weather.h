@@ -70,8 +70,8 @@ private:
 
   // Simulation.
 public:
-  virtual void tick (const Time& time);
-  void tick_after (const Time& time);
+  virtual void tick (const Time& time, Treelog&);
+  void tick_after (const Time& time, Treelog&);
   virtual void output (Log&) const;
 
   // Communication with Bioclimate.
@@ -128,7 +128,8 @@ public:
   double CloudinessFactor_Humid (const Time&, double Si /* [W/m2] */) const;
   double RefNetRadiation (const Time& time, double Si /* [W/m2] */,
 			  double Temp /* [dg C] */,
-			  double ea /* [Pa] */) const;// [W/m2]
+			  double ea /* [Pa] */,
+			  Treelog&) const;// [W/m2]
   static double Makkink (double air_temperature /* [dg C] */,
  		         double global_radiation /* [W/m^2] */); /* [mm/h] */
 

@@ -46,7 +46,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&);
+  void tick (const Time&, Treelog&);
   double table () const;
 
   // Create and Destroy.
@@ -69,7 +69,7 @@ GroundwaterFile::accept_bottom (double)
 }
 
 void
-GroundwaterFile::tick (const Time& time)
+GroundwaterFile::tick (const Time& time, Treelog&)
 {
   assert (lex);
   while (next_time < time)
@@ -139,7 +139,7 @@ GroundwaterFile::initialize (const Time& time, const Soil&, Treelog& err)
 {
   assert (lex == NULL);
   lex = new LexerData (file_name, err);
-  tick (time); 
+  tick (time, err); 
 }
 
 GroundwaterFile::GroundwaterFile (const AttributeList& al)

@@ -31,6 +31,7 @@ class Log;
 class PLF;
 class Production;
 class Vernalization;
+class Treelog;
 
 class Development 
 {
@@ -65,7 +66,7 @@ public:
 public:
   void light_hour ();
   void tick_daily (const string& name, double Ta, double WLeaf, 
-		   Production&, Vernalization&, double cut_stress);
+		   Production&, Vernalization&, double cut_stress, Treelog&);
   void emergence ();
   void output (Log& log) const;
 

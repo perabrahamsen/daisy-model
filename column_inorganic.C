@@ -27,7 +27,7 @@ class ColumnInorganic : public ColumnBase
 {
   // Actions.
 public:
-  void sow (const AttributeList&);
+  void sow (Treelog& msg, const AttributeList&);
   void fertilize (const AttributeList&);
   void fertilize (const AttributeList&, double from, double to);
   void clear_second_year_utilization ();
@@ -49,7 +49,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&, const Weather*);
+  void tick (Treelog&, const Time&, const Weather*);
   bool check_am (const AttributeList& am, Treelog& err) const;
 
   // Create and Destroy.
@@ -69,8 +69,8 @@ public:
 };
 
 void 
-ColumnInorganic::sow (const AttributeList& al)
-{ vegetation.sow (al, soil); }
+ColumnInorganic::sow (Treelog& msg, const AttributeList& al)
+{ vegetation.sow (msg, al, soil); }
 
 
 void
@@ -133,30 +133,31 @@ ColumnInorganic::get_co2_production_at (unsigned int) const // [g C/cm³]
 }
 
 void
-ColumnInorganic::tick (const Time& time, const Weather* global_weather)
+ColumnInorganic::tick (Treelog& out,
+		       const Time& time, const Weather* global_weather)
 {
   // Base log.
-  tick_base ();
+  tick_base (out);
 
   // Weather.
   if (weather)
-    weather->tick (time);
+    weather->tick (time, out);
   const Weather& my_weather = *(weather ? weather : global_weather);
 
   // Early calculation.
   surface.mixture (soil_chemicals);
-  soil_water.macro_tick (soil, surface);
+  soil_water.macro_tick (soil, surface, out);
 
   bioclimate.tick (surface, my_weather, 
-		   vegetation, soil, soil_water, soil_heat);
-  vegetation.tick (time, bioclimate, soil, soil_heat, soil_water);
-  groundwater.tick (time);
+		   vegetation, soil, soil_water, soil_heat, out);
+  vegetation.tick (time, bioclimate, soil, soil_heat, soil_water, out);
+  groundwater.tick (time, out);
 
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, my_weather);
-  soil_water.tick (soil, surface, groundwater);
+  soil_water.tick (soil, surface, groundwater, out);
   soil_chemicals.tick (soil, soil_water, soil_heat, NULL, 
-		       surface.chemicals_down ());
+		       surface.chemicals_down (), out);
 }
 
 bool 

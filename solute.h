@@ -83,7 +83,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&, double J_in);
+  void tick (const Soil&, const SoilWater&, double J_in, Treelog&);
   bool check (unsigned n, Treelog& err) const;
   virtual void output (Log&) const;
   void add_external (const Soil&, const SoilWater&,
@@ -105,7 +105,7 @@ private:
   virtual void default_initialize (const Soil& soil, const SoilWater&);
 public:
   virtual void initialize (const AttributeList&,
-			   const Soil&, const SoilWater&);
+			   const Soil&, const SoilWater&, Treelog&);
 public:
   virtual ~Solute ();
 };

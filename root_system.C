@@ -31,7 +31,7 @@
 #include "log.h"
 #include "check.h"
 #include "mathlib.h"
-#include "message.h"
+#include "tmpstream.h"
 
 double 
 RootSystem::potential_water_uptake (const double h_x,
@@ -84,12 +84,16 @@ double
 RootSystem::water_uptake (double Ept_,
 			  const Soil& soil,
 			  SoilWater& soil_water,
-			  const double EvapInterception)
+			  const double EvapInterception,
+			  Treelog& msg)
 {
   assert (EvapInterception >= 0);
   if (Ept_ < 0)
     {
-      CERR << "\nBUG: Negative EPT (" << Ept_ << ")\n";
+      Treelog::Open nest (msg, "RootSystem water uptake");
+      TmpStream tmp;
+      tmp () << "BUG: Negative EPT (" << Ept_ << ")";
+      msg.error (tmp.str ());
       Ept_ = 0.0;
     }
   Ept = Ept_;
@@ -293,7 +297,7 @@ RootSystem::nitrogen_uptake (const Soil& soil,
 }
 
 void
-RootSystem::tick (const Soil& soil, 
+RootSystem::tick (Treelog& msg, const Soil& soil, 
 		  const SoilHeat& soil_heat, 
 		  const double WRoot,
 		  const double IncWRoot,
@@ -311,21 +315,21 @@ RootSystem::tick (const Soil& soil,
       /*max depth determined by crop*/
       Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
     }
-  set_density (soil, WRoot, DS);
+  set_density (msg, soil, WRoot, DS);
 }
 
 void
-RootSystem::set_density (const Geometry& geometry, 
+RootSystem::set_density (Treelog& msg, const Geometry& geometry, 
 			 const double WRoot, const double DS)
-{ rootdens.set_density (Density, geometry, Depth, PotRtDpt, WRoot, DS); }
+{ rootdens.set_density (msg, Density, geometry, Depth, PotRtDpt, WRoot, DS); }
 
 void
-RootSystem::full_grown (const Soil& soil, 
+RootSystem::full_grown (Treelog& msg, const Soil& soil, 
 			const double WRoot)
 {
   PotRtDpt = MaxPen;
   Depth = min (MaxPen, -soil.MaxRootingDepth ());
-  set_density (soil, WRoot, 1.0);
+  set_density (msg, soil, WRoot, 1.0);
 }
 
 void

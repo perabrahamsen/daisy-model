@@ -29,8 +29,7 @@
 #include "soil_heat.h"
 #include "submodel.h"
 #include "mathlib.h"
-
-#include "message.h"
+#include "tmpstream.h"
 
 struct Snow::Implementation
 { 
@@ -64,7 +63,7 @@ struct Snow::Implementation
 				// for snow water mix [W m^5/kg^2/dg C]
 
   void output (Log& log) const;
-  void tick (const Soil& soil, const SoilWater& soil_water,
+  void tick (Treelog&, const Soil& soil, const SoilWater& soil_water,
 	     const SoilHeat& soil_heat,
 	     double Si, double q_h, double Prain,
 	     double Psnow, double Pond, double T, double Epot);
@@ -104,7 +103,8 @@ Snow::Implementation::output (Log& log) const
 }
 
 void
-Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
+Snow::Implementation::tick (Treelog& msg,
+			    const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    const double Si, const double q_h,
 			    const double Prain, const double Psnow,
@@ -199,7 +199,12 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   if (Ssnow_new < 0.0)
     {
       if (Ssnow_new < -1.0e-7)
-        CERR << "Lost " << -Ssnow_new << " mm from snow pack.\n";
+	{
+	  Treelog::Open nest (msg, "Snow");
+	  TmpStream tmp;
+	  tmp () << "Lost " << -Ssnow_new << " mm from snow pack.";
+	  msg.error (tmp.str ());
+	}
       Ssnow_new = 0.0;
     }
   
@@ -208,13 +213,23 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   if (Swater_new < 0.0)
     {
       if (Swater_new < -1.0e-7)
-        CERR << "Lost " << -Swater_new << " mm water from snow pack.\n";
+	{
+	  Treelog::Open nest (msg, "Snow");
+	  TmpStream tmp;
+	  tmp () << "Lost " << -Swater_new << " mm water from snow pack.";
+	  msg.error (tmp.str ());
+	}
       Swater_new = 0.0;
     }
   if (Swater_new > Ssnow_new)
     {
       if (Swater_new > Ssnow_new + 1.0e-7)
-        CERR << "Removed " << (Swater_new - Ssnow_new) << " mm water.\n";
+	{
+	  Treelog::Open nest (msg, "Snow");
+	  TmpStream tmp;
+	  tmp () << "Removed " << (Swater_new - Ssnow_new) << " mm water.";
+	  msg.error (tmp.str ());
+	}
       Swater_new = Ssnow_new;
     }
 
@@ -229,7 +244,7 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 	    = max (Ssnow_old / (f * dZs), 
 		   rho_s + rho_1 * Swater_new / Scapacity + rho_2 * Ssnow_old);
 #if 0
-	  CERR << "rho_c == " << rho_c << " Ssnow _old== " << Ssnow_old
+	  cerr << "rho_c == " << rho_c << " Ssnow _old== " << Ssnow_old
 	       << " dZs == " << dZs << " Swater_new == " << Swater_new
 	       << " Scapacity == " << Scapacity << "\n";
 #endif
@@ -288,7 +303,7 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
       const double T_calc = (K_soil / Z * T_soil + K_snow / dZs * T) 
 	/ (K_soil / Z + K_snow / dZs);
 #if 0
-      CERR << "Snow T_calc == " << T_calc << " Ssnow == " << Ssnow 
+      cerr << "Snow T_calc == " << T_calc << " Ssnow == " << Ssnow 
 	   << " Swater == " << Swater << " M == " << M << " T == " << T
 	   << " T_soil == " << T_soil << " K_soil == " << K_soil 
 	   << " K_snow == " << K_snow << "\n";
@@ -302,13 +317,13 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 }
   
 void 
-Snow::tick (const Soil& soil, const SoilWater& soil_water,
+Snow::tick (Treelog& msg, const Soil& soil, const SoilWater& soil_water,
 	    const SoilHeat& soil_heat,
 	    double Si, double q_h, double Prain,
 	    double Psnow, double Pond, double T, double Epot)
 {
   if (impl.Ssnow > 0.0 || Psnow > 0.0)
-    impl.tick (soil, soil_water, soil_heat, Si, q_h,
+    impl.tick (msg, soil, soil_water, soil_heat, Si, q_h,
 	       Prain, Psnow, Pond, T, Epot);
   else
     {

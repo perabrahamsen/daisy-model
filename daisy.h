@@ -57,10 +57,10 @@ public:
 
   // Simulation.
 public:
-  void tick_columns ();
-  void tick_logs ();
-  void tick ();
-  void run ();
+  void tick_columns (Treelog&);
+  void tick_logs (Treelog&);
+  void tick (Treelog&);
+  void run (Treelog&);
   bool check (Treelog& err);
 
   // Create and Destroy.

@@ -36,7 +36,7 @@ struct LogCheckpoint : public LogAList
 
   // Start and end of time step.
   bool check(const string&) const;
-  bool match (const Daisy& daisy);
+  bool match (const Daisy& daisy, Treelog& out);
   void done ();
 
   // Create and Destroy.
@@ -49,10 +49,10 @@ LogCheckpoint::check(const string&) const
 { return true; }
 
 bool
-LogCheckpoint::match (const Daisy& daisy)
+LogCheckpoint::match (const Daisy& daisy, Treelog& out)
 {
   assert (nested == 0);
-  condition.tick (daisy);
+  condition.tick (daisy, out);
   is_active = condition.match (daisy);
   if (is_active)
     {

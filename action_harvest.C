@@ -23,7 +23,6 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
-#include "message.h"
 
 struct ActionHarvest : public Action
 {
@@ -33,12 +32,12 @@ struct ActionHarvest : public Action
   const double leaf;
   const double sorg;
 
-  void doIt (Daisy& daisy)
-    {
-      COUT << " [Harvesting " << name << "]\n";
-      daisy.field.harvest (daisy.time, name, stub, stem, leaf, sorg,
-			   daisy.harvest);
-    }
+  void doIt (Daisy& daisy, Treelog& out)
+  {
+    out.message (string(" [Harvesting ") + name + "]");
+    daisy.field.harvest (daisy.time, name, stub, stem, leaf, sorg,
+			 daisy.harvest, out);
+  }
 
   ActionHarvest (const AttributeList& al)
     : Action (al),
