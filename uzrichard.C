@@ -59,7 +59,7 @@ public:
     { }
   bool accept_top (Treelog&, double)
     { return true; };
-  type_t type () const
+  bottom_t bottom_type () const
     { return free_drainage; };
   bool accept_bottom (double)
     { return true; };
@@ -147,7 +147,7 @@ UZRichard::richard (Treelog& msg,
   vector<double> Kplus (size);
 
   // For h bottom.
-  if (bottom.type () == UZbottom::pressure)
+  if (bottom.bottom_type () == UZbottom::pressure)
     {
       daisy_assert (last + 1 < soil.size ());
       K[size] = soil.K (last + 1, 0.0, h_ice[last + 1], 
@@ -227,7 +227,7 @@ UZRichard::richard (Treelog& msg,
 				 soil_heat.T (first + i));
 	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2;
 	    }
-	  if (bottom.type () != UZbottom::pressure)
+	  if (bottom.bottom_type () != UZbottom::pressure)
 	    K[size] = K[size - 1];
 
 	  internode (soil, soil_heat, first, last, h_ice, K, Kplus);
@@ -295,21 +295,21 @@ UZRichard::richard (Treelog& msg,
 		  // Calculate lower boundary
 		  const double dz_minus = soil.z (first + i - 1) - z;
 
-		  if (bottom.type () != pressure)
+		  if (bottom.bottom_type () != pressure)
 		    {
 		      double q_bottom;
-		      if (bottom.type () == UZbottom::lysimeter)
+		      if (bottom.bottom_type () == UZbottom::lysimeter)
 			{ 
 			  if (h[i] > h_lim)
 			    q_bottom = -K[i];
 			  else 
 			    q_bottom = 0.0;
 			}
-		      else if (bottom.type () == UZbottom::forced_flux)
+		      else if (bottom.bottom_type () == UZbottom::forced_flux)
 			q_bottom = bottom.q_bottom ();
 		      else
 			{
-			  daisy_assert (bottom.type ()
+			  daisy_assert (bottom.bottom_type ()
 					== UZbottom::free_drainage);
 			  q_bottom = - Kold[i];
 			}
@@ -396,7 +396,7 @@ UZRichard::richard (Treelog& msg,
 	  if (!top.flux_top ())
 	    {
 	      // Find flux.
-	      if (bottom.type () == UZbottom::forced_flux)
+	      if (bottom.bottom_type () == UZbottom::forced_flux)
 		{
 		  q[last + 1] = bottom.q_bottom ();
 		  for (int i = last; i >= first; i--)

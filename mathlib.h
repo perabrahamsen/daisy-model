@@ -24,6 +24,7 @@
 #define MATHLIB_H
 #include "assertion.h"
 #include <vector>
+#define _GLIBCPP_USE_C99 1
 #define __USE_ISOC99 1
 #include <math.h>
 

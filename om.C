@@ -373,7 +373,7 @@ You must specify either this or 'turnover_halftime'.");
 	      "Time until half had been converted to other pools.\n\
 You must specify either this or 'turnover_rate'.");
   syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
-the efficiency this pool can be digested by each of the SMB pools.");
+The efficiency this pool can be digested by each of the SMB pools.");
   syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
 How this pool is divided into other pools.\n\
 The first numbers corresponds to each of the SMB pools, the remaining\n\

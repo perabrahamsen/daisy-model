@@ -39,7 +39,7 @@ public:
     { }
   bool accept_top (Treelog&, double)
     { return true; }
-  type_t type () const
+  bottom_t bottom_type () const
     { return free_drainage; }
   bool accept_bottom (double)
     { return true; }

@@ -1,8 +1,20 @@
+2003-06-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.00 released.
+
+2003-06-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (efficiency): New init parameter.
+
+	* weather_std.C (PrecipScale): Renamed from PrecipCorrect.
+
 2003-06-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.99 released.
 
 2003-06-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mathlib.h (_GLIBCPP_USE_C99): Define for MingW32.
 
 	* weather_std.C (precipitation_correction_key): New parameter.
 	(precipitation_correction_dai): New parameter.

@@ -30,7 +30,7 @@ private:
   
   // UZbottom.
 public:
-  type_t type () const
+  bottom_t bottom_type () const
   { return pressure; }
   bool accept_bottom (double)
   { return true; }

@@ -231,7 +231,7 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
 
   // Limit for groundwater table.
   int last  = soil.size () - 1;
-  if (groundwater.type () == UZbottom::pressure)
+  if (groundwater.bottom_type () == UZbottom::pressure)
     {
       daisy_assert (soil.size () > 1);
       if (groundwater.table () <= soil.zplus (soil.size () - 2))
@@ -302,7 +302,7 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
     }
 
   // Update Theta below groundwater table.
-  if (groundwater.type () == UZbottom::pressure)
+  if (groundwater.bottom_type () == UZbottom::pressure)
     {
       for(unsigned int i = last + 1; i < soil.size (); i++)
 	Theta[i] = soil.Theta (i, h[i], h_ice[i]);

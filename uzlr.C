@@ -51,7 +51,7 @@ public:
     { }
   bool accept_top (Treelog&, double)
     { return true; };
-  type_t type () const
+  bottom_t bottom_type () const
     { return free_drainage; };
   bool accept_bottom (double)
     { return true; };
@@ -187,7 +187,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 		K_new = sqrt (K_new * soil.K (i+1, h_old[i+1], h_ice[i+1],
 					      soil_heat.T (i+1)));
 	    }
-	  else if (bottom.type () == UZbottom::forced_flux)
+	  else if (bottom.bottom_type () == UZbottom::forced_flux)
 	    K_new = -bottom.q_bottom ();
 	  else
 	    // Use previos value for last node.
@@ -223,7 +223,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
   q_down = q[last + 1];
 
 #if 1
-  if (bottom.type () == UZbottom::forced_flux
+  if (bottom.bottom_type () == UZbottom::forced_flux
       && !approximate (q_down, bottom.q_bottom ()))
     {
       // Ensure forced bottom.

@@ -41,7 +41,7 @@ private:
   
   // UZbottom.
 public:
-  type_t type () const;
+  bottom_t bottom_type () const;
   bool accept_bottom (double);
 
   // Simulation.
@@ -59,8 +59,8 @@ public:
   ~GroundwaterFile ();
 };
 
-UZbottom::type_t
-GroundwaterFile::type () const
+UZbottom::bottom_t
+GroundwaterFile::bottom_type () const
 {
   if (depth > 0)	     // Positive numbers indicate flux bottom.
     return free_drainage;

@@ -59,7 +59,7 @@ class GroundwaterPipe : public Groundwater
 
   // UZbottom.
 public:
-  type_t type () const
+  bottom_t bottom_type () const
   { 
 #ifdef USE_UPDATE_WATER
     return pressure; 

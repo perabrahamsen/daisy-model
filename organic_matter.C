@@ -101,6 +101,7 @@ struct OrganicMatter::Implementation
     const double end;		// End of plowing layer. [cm]
   private:
     const vector<double> fractions; // C destiations. []
+    const vector<double> efficiency; // Input efficiency. []
     vector<double> per_lay;	// C input in numeric intervals. [g C/cm^3/h]
   public:
     const double T;		// Equilibrium temperature. [dg C]
@@ -212,6 +213,7 @@ struct OrganicMatter::Implementation
 		  int SOM_limit_where,
 		  vector<double>& SOM_results,
 		  vector<double>& SMB_results,
+		  const double dry_bulk_density,
 		  Treelog& msg,
 		  bool print_equations, bool print_rows,
 		  bool debug_to_screen) const;
@@ -323,8 +325,14 @@ void OrganicMatter::Implementation::Initialization::
 /**/ find_input (vector<double>& destination, const int lay) const
 {
   daisy_assert (destination.size () == fractions.size ());
+  daisy_assert (destination.size () >= efficiency.size ());
   for (unsigned int i = 0; i < destination.size (); i++)
-    destination[i] = per_lay[lay] * fractions[i];
+    {
+      destination[i] = per_lay[lay] * fractions[i];
+      // No abiotic factor since we this is already a rate.
+      if (i < efficiency.size ())
+        destination[i] *= efficiency[i];
+    }
   assert_non_negative (destination);
 }
 
@@ -358,14 +366,22 @@ Amount of carbon added to the organic matter system.\n\
 If this is unspecifed, the input rate from the inital added matter\n\
 pools will be used instead.");
   syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
-Desitinations for AOM input.  The first numbers corresponds to eac\n\
-SMB pool, while the last number correspond to the SOM buffer.");
+Desitinations for AOM input.  The first numbers corresponds to each\n\
+SMB pool, while the last number correspond to the SOM buffer.\n\
+This is only used if you specify the input parameter.");
   syntax.add_check ("fractions", VCheck::sum_equal_1 ());
   vector<double> fractions;
   fractions.push_back (0.0);
   fractions.push_back (1.0);
   fractions.push_back (0.0);
   alist.add ("fractions", fractions);
+  syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
+The efficiency this pool can be digested by each of the SMB pools.\n\
+This is only used if you specify the input parameter.");
+  vector<double> efficiency;
+  efficiency.push_back (0.5);
+  efficiency.push_back (0.5);
+  alist.add ("efficiency", efficiency);
   syntax.add ("root", "kg C/ha/y", Check::non_negative (), Syntax::Const, "\
 Amount of carbon added to the organic matter system from dead roots.\n\
 \n\
@@ -517,6 +533,7 @@ OrganicMatter::Implementation::Initialization::
   : input (al.check ("input") ? al.number ("input") : -1.0),
     end (al.check ("end") ? al.number ("end") : soil.end_of_first_horizon ()),
     fractions (al.number_sequence ("fractions")),
+    efficiency (al.number_sequence ("efficiency")),
     T (al.check ("T") ? al.number ("T") : T_avg),
     h (al.number ("h")),
     variable_pool (al.check ("variable_pool")
@@ -1283,6 +1300,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 					  const int SOM_limit_where,
 					  vector<double>& SOM_results,
 					  vector<double>& SMB_results,
+					  const double dry_bulk_density,
 					  Treelog& msg,
 					  const bool print_equations,
 					  const bool print_rows,
@@ -1325,7 +1343,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
   if (lay == 0)
     {
       // Tag line.
-      table_string () << "lay\thumus\tinput\tinput\tAOM";
+      table_string () << "lay\thumus\thumus\tinput\tinput\tAOM";
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	table_string () << "\tSMB" << (pool + 1);
       for (unsigned int pool = 0; pool < som_size; pool++)
@@ -1336,7 +1354,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	table_string () << "\tdSOM" << (pool + 1) << "\tdSOM" << (pool + 1);
       table_string () << "\n";
       // Dimension line.
-      table_string () << "\tkg C/ha/cm\tkg C/ha/cm/y\t%\t%";
+      table_string () << "\tkg C/ha/cm\t%\tkg C/ha/cm/y\t%\t%";
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	table_string () << "\t%";
       for (unsigned int pool = 0; pool < som_size; pool++)
@@ -1502,7 +1520,8 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 		matrix.set_entry (equation, som_column + i, 1.0);
 	      use_humus_equation = true;
 	    }
-	  else if (SOM_fractions.size () > 0)
+	  else if (variable_pool >= 0
+                   && SOM_fractions.size () > 0)
 	    {
 	      // The SOM fractions equations:
 	      // 
@@ -1569,6 +1588,14 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  else if (top_soil)
 	    {
 	      // No inert humus in the plowing layer.
+	      //
+	      // 0 = SOMn
+	      // matrix.set_value (equation, 0.0);
+	      matrix.set_entry (equation, som_column + pool, 1.0);
+	    }
+          else if (variable_pool < 0)
+	    {
+	      // No inert humus if we have to find total humus ourselves.
 	      //
 	      // 0 = SOMn
 	      // matrix.set_value (equation, 0.0);
@@ -1690,13 +1717,17 @@ Setting additional pool to zero");
 	total += matrix.result (i);
       daisy_assert (!use_humus_equation || approximate (total, total_C));
 
+      static const double c_fraction_in_humus = 0.587;
+
       // Messages.
-      table_string () << lay << "\t"
-	     << total * g_per_cm2_to_kg_per_ha << "\t"
-	     << total_input * g_per_cm2_per_h_to_kg_per_ha_per_y << "\t"
-	     << 100.0 * ((total_input * g_per_cm2_per_h_to_kg_per_ha_per_y) 
-			 / (total * g_per_cm2_to_kg_per_ha)) << "\t"
-	     << 100.0 * total_am / total;
+      table_string () 
+	<< lay << "\t"
+	<< total * g_per_cm2_to_kg_per_ha << "\t"
+	<< 100.0 * total / (c_fraction_in_humus * dry_bulk_density) << "\t"
+	<< total_input * g_per_cm2_per_h_to_kg_per_ha_per_y << "\t"
+	<< 100.0 * ((total_input * g_per_cm2_per_h_to_kg_per_ha_per_y) 
+		    / (total * g_per_cm2_to_kg_per_ha)) << "\t"
+	<< 100.0 * total_am / total;
       
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
@@ -2042,6 +2073,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 		 init.SOM_limit_lower, init.SOM_limit_upper, 
 		 (top_soil ? init.SOM_limit_where : -1),
 		 SOM_results, SMB_results,
+		 soil.dry_bulk_density (lay),
 		 err,
 		 init.print_equations (lay), init.debug_rows, 
 		 init.debug_to_screen);

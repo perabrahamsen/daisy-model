@@ -12,6 +12,24 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.00
+
+** The "PrecipCorrect" in the .dai file renamed to "PrecipScale".
+
+I.e. the new syntax is
+
+  (weather default "weather.dwf"
+           (PrecipScale 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0))
+
+The PrecipCorrect in the ".dwf" file is unchanged.
+
+** Fixed (yet another) bug in OrganicMatter init.
+
+There is a new 'efficiency' parameter which specifies the efficiency
+the C input is integrated into the SMB pools.  This has the default
+value of 0.5.  Before it was integrated with an implicit 100%
+efficiency rate.
+
 * 2.99
 
 ** dk-horizon.dai now has C/N values.
@@ -21,7 +39,7 @@ release.
 To double precipitation in "weather.dwf":
 
 (weather default "weather.dwf"
-	 (PrecipCorrect 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0))
+         (PrecipCorrect 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0))
 
 If you specify PrecipCorrect in with the .dai file and the .dwf file,
 both will be applied.

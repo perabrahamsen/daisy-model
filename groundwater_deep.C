@@ -26,7 +26,7 @@ class GroundwaterDeep : public Groundwater
 {
   // UZbottom.
 public:
-  type_t type() const
+  bottom_t bottom_type() const
   { return free_drainage; }
   bool accept_bottom (double)
   { return true; }

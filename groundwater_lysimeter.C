@@ -26,7 +26,7 @@ class GroundwaterLysimeter : public Groundwater
 {
   // UZbottom.
 public:
-  type_t type () const
+  bottom_t bottom_type () const
   { return lysimeter; }
   bool accept_bottom (double)
   { return true; }

@@ -1,6 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* PercipCorrect i .dai fil (til lokale forhold)
+* Træk bioincorporation-respiration-C fra total-C-input.
+
+Log vertikal distribution?  Skal det fungere ligesom rødder?
+
+* Find gcc-2.95 mingw32
 
 * SH: Salg af referencemanual på www-siden?
 
