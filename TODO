@@ -1,6 +1,6 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Implement litter_albedo
+* Fejl med missing_years.  Den checker ikke "end" for mappede data.
 
 * Make it possible to specify texture using different systems
 

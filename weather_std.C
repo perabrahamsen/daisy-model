@@ -618,15 +618,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
   if (find_new_map)
     {
       active_map = find_map (time);
-      if (active_map < 0)
-	{
-	  TmpStream tmp;
-	  tmp () << "No weather data for " << time.year () 
-		 << "-" << time.month ()
-		 << "-" << time.mday () << ":" << time.hour ();
-	  msg.error (tmp.str ());
-	}
-      else
+      if (active_map >= 0)
 	{
 	  TmpStream tmp;
 	  tmp () << "Using data from [" << missing_years[active_map]->to.from
@@ -641,9 +633,32 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
   // Now and tomorrow.
   Time now = time;
   if (active_map >= 0)
-    missing_years[active_map]->map_time (now);
+    {
+      missing_years[active_map]->map_time (now);
+      if (!now.between (begin, end))
+        {
+	  TmpStream tmp;
+	  tmp () << "No mapped weather data for " << now.year () 
+		 << "-" << now.month ()
+		 << "-" << now.mday () << ":" << now.hour ()
+                 << "\nReusing last data.";
+	  msg.error (tmp.str ());
+          now = time;
+        }
+    }
   Time tomorrow = now;
   tomorrow.tick_day ();
+
+  if (!now.between (begin, end))
+    {
+      TmpStream tmp;
+      tmp () << "No weather data for " << time.year () 
+             << "-" << time.month ()
+             << "-" << time.mday () << ":" << time.hour ()
+             << "\nReusing yesterdays data.";
+      msg.error (tmp.str ());
+      return;
+    }
 
   // Initialize.
   if (!initialized)
@@ -654,7 +669,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       next_time.tick_hour (-timestep);
       read_line ();
     }
-
+  
   // BC5 sucks // while (next_time <= now)
   while (!(now < next_time))
     read_line ();
@@ -847,6 +862,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	{
 	  lex->skip_space ();
 	  lex->read_date (end);
+          end.tick_day (-2);
 	}
       else
 	{

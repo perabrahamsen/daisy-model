@@ -1,5 +1,15 @@
 2004-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.26 released.
+
+2004-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (read_new_day): Handle mapping data to a period
+	not in file.
+	(initialize): Subtract two days from end.
+	* lib/weather.dwf (End): Changed value to reflect last date.
+	Removed warning about putting end a few days before.
+
 	* Version 3.25 released.
 
 2004-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>

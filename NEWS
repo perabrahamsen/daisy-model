@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.26
+
+** Made "weather default missing_years" more robust.
+
 * 3.25
 
 ** Fixed bug in Freundlich adsorbtion model.
