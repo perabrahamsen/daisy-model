@@ -1547,7 +1547,9 @@ the sum of all chemicals."
            (number (path column "$col" Vegetation crops crops "$crop"
                          Root water_stress_days))
            (number (path column "$col" Vegetation crops crops "$crop"
-                         Root nitrogen_stress))
+                         CrpN nitrogen_stress))
+           (number (path column "$col" Vegetation crops crops "$crop"
+                         CrpN nitrogen_stress_days))
            (number (path column "$col" Vegetation crops crops "$crop"
                          Harvest cut_stress))
            (number (path column "$col" Vegetation crops crops "$crop"
