@@ -451,6 +451,9 @@ BioclimateStandard::tick (Surface& surface, const Weather& weather,
   WaterDistribution (surface, weather, vegetation,
 		     soil, soil_water, soil_heat);
 
+#ifdef HANDLE_CHEMICALS
+  ChemicalDistribution (vegetation);
+#endif HANDLE_CHEMICALS
 }
 
 #ifdef HANDLE_CHEMICALS

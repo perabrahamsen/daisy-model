@@ -1,14 +1,20 @@
 * Indfør stof på overfladen.
 
-** Høst stof fra canopy.
-
 ** Kør test.
+
+** Fjern stof under 1e-18 (et molekyle per kvadratmeter)
+
+** Høst stof fra canopy.
 
 * Indfør stof i jorden.
 
 * Tilføj "Field" abstraction i stil med "Vegetation".
 
 ** Lad evt. field kunne "huske" hvilke søjler der er valgt med "with-column".
+
+* Check pet_pm sammen med PvdK.
+
+* Log af crop navne.
 
 ======================================================================
 

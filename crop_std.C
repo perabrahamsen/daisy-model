@@ -1274,7 +1274,7 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 
   const double Ta = bioclimate.daily_air_temperature ();
 
-  if (Phenology.DS < 1)
+  if (Phenology.DS < 1.0)
     {
       // Only increase DS if assimilate production covers leaf respiration.
       if (var.CrpAux.IncWLeaf +  var.CrpAux.DeadWLeaf 
@@ -1284,12 +1284,19 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 			 * Devel.PhotEff1 (var.Phenology.day_length + 1.0));
       if (par.Vernal.required && Phenology.Vern < 0)
 	Vernalization (Ta);
+      if (Phenology.DS >= 1.0)
+	COUT << "[" << name << " is flowering]\n";
     }
   else
     {
+      bool not_yet_ripe = (Phenology.DS < 2.0);
       Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
       if (Phenology.DS > 2)
-	Phenology.DS = 2.0;
+	{
+	  if (not_yet_ripe)
+	    COUT << "[" << name << " is ripe]\n";
+	  Phenology.DS = 2.0;
+	}
     }
 
   assert (Phenology.DS <= Devel.defined_until_ds);
@@ -2148,6 +2155,8 @@ CropStandard::tick (const Time& time,
       Emergence ();
       if (var.Phenology.DS >= 0)
 	{
+	  COUT << "[" << name << " is emerging]\n";
+
 	  InitialLAI ();
 	  var.Canopy.Height = CropHeight ();
 	  NitContent ();

@@ -1,3 +1,11 @@
+1998-12-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.50 released.
+
+1998-12-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (tick): Call `ChemicalDistribution'.
+
 1998-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.49 released.
