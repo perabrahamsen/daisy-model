@@ -55,7 +55,7 @@ public:
   virtual ~Chemical ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Chemical>::Content* Librarian<Chemical>::content;
 #endif

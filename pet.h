@@ -65,7 +65,7 @@ public:
   virtual ~Pet ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Pet>::Content* Librarian<Pet>::content;
 #endif

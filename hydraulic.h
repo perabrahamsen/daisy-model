@@ -78,7 +78,7 @@ public:
   virtual ~Hydraulic ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content;
 #endif

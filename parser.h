@@ -49,7 +49,7 @@ public:
   virtual ~Parser ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Parser>::Content* Librarian<Parser>::content;
 #endif

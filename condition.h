@@ -48,7 +48,7 @@ public:
   virtual ~Condition ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Condition>::Content* Librarian<Condition>::content;
 #endif

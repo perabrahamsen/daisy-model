@@ -124,7 +124,7 @@ public:
   virtual ~Select ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Select>::Content* Librarian<Select>::content;
 #endif

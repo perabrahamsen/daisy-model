@@ -46,7 +46,7 @@ public:
   virtual ~Summary ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Summary>::Content* Librarian<Summary>::content;
 #endif

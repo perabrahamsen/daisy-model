@@ -45,7 +45,7 @@ public:
   virtual ~Tortuosity ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Tortuosity>::Content* Librarian<Tortuosity>::content;
 #endif

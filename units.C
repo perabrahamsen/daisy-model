@@ -317,6 +317,8 @@ Units::standard_conversions ()
   add ("mm/d", "cm/h", 0.1/24.0);
   add ("T w.w./ha", "Mg w.w./ha", 1.0);
   add ("ppm", "mg N/l", 1.0);
+  add ("L/kg", "cm^3/g", 1.0);
+  add ("l/kg", "cm^3/g", 1.0);
 
   // Weather.
   add ("dgWest", "dgEast", -1.0);

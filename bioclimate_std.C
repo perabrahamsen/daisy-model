@@ -41,7 +41,7 @@
 struct BioclimateStandard : public Bioclimate
 { 
   // Canopy State.
-  const long No;		// No of intervals in canopy discretation.
+  const long No;		// No of intervals in canopy discretization.
   double LAI_;			// Total LAI of all crops on this column. [0-]
   vector<double> Height;	// Height in cm of each endpoint in c.d.
   vector<double> PAR_;		// PAR of each interval of c.d.

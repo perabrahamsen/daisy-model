@@ -49,7 +49,7 @@ public:
   virtual ~Pedotransfer ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content;
 #endif

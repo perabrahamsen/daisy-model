@@ -62,7 +62,7 @@ public:
   virtual ~Nitrification ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Nitrification>::Content* Librarian<Nitrification>::content;
 #endif

@@ -51,7 +51,7 @@ public:
   virtual ~Equilibrium ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content;
 #endif

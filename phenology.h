@@ -59,7 +59,7 @@ public:
   virtual ~Phenology ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Phenology>::Content* Librarian<Phenology>::content;
 #endif

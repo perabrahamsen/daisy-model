@@ -51,7 +51,7 @@ public:
   virtual ~Action ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Action>::Content* Librarian<Action>::content;
 #endif

@@ -99,7 +99,7 @@ public:
   virtual ~UZmodel ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<UZmodel>::Content* Librarian<UZmodel>::content;
 #endif

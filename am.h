@@ -101,7 +101,7 @@ public:
   virtual ~AM ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<AM>::Content* Librarian<AM>::content;
 #endif

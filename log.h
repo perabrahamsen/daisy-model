@@ -276,7 +276,7 @@ public:
   virtual ~Log ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Log>::Content* Librarian<Log>::content;
 #endif

@@ -53,7 +53,7 @@ public:
   virtual ~Rootdens ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Rootdens>::Content* Librarian<Rootdens>::content;
 #endif

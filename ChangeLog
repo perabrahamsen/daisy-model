@@ -1,4 +1,25 @@
+2004-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Chemical Content"): Renamed from "Chemicals".
+	("Chemical Concentration"): New log model.
+
+	* organic_matter.C (initialize): Clarified background
+	mineralization message.
+	(top_summary): Take zone_delta_N and zone_delta_C arguments.
+	(initialize): Update caller.
+
+	* units.C (standard_conversions): Added [L/kg] and [l/kg] to
+	[cm^3/g] convertions.
+
+	* lib/chemistry.dai (common): New partial parameterization.
+	(Atrazine, Bentazon, IPU, MCPP, Pendimethalin, Ioxynil): Use it. 
+	(fungicide, herbicide, insecticide): New partical parameterizations.
+
 2004-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (find_total_input, total_input_from_am): New
+	function. 
+	(top_summary, initialize): Call them.
 
 	* Version 3.34 released.
 

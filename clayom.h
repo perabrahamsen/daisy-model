@@ -55,7 +55,7 @@ public:
   virtual ~ClayOM ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<ClayOM>::Content* Librarian<ClayOM>::content;
 #endif

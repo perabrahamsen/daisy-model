@@ -132,7 +132,7 @@ public:
   virtual ~Vegetation ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Vegetation>::Content* Librarian<Vegetation>::content;
 #endif

@@ -47,7 +47,7 @@ public:
   virtual ~Adsorption ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Adsorption>::Content* Librarian<Adsorption>::content;
 #endif

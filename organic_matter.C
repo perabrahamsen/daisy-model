@@ -126,7 +126,8 @@ struct OrganicMatter::Implementation
 	!=  debug_equations.end (); }
 
     void find_input (vector<double>& destination, const int lay) const;
-    
+    double find_total_input (const int lay) const;
+
     // Create and Destroy.
   private:
     static int find_som_1 (const vector<SOM*>& som);
@@ -203,11 +204,13 @@ struct OrganicMatter::Implementation
   AM* find_am (symbol sort, symbol part) const;
   void input_from_am (vector<double>& destination, 
 		      double T, double h, const int lay) const;
+  double total_input_from_am (double T, double h, const int lay) const;
   double abiotic (const OM& om, double T, double h, 
 		  bool use_clay, int lay) const;
   static vector<double> SOM_limit_normalize (const vector<double>& limit, 
                                              const vector<double>& fractions);
-  void partition (const vector<double>& am_input, double T, double h, 
+  void partition (const vector<double>& am_input, double total_input,
+                  double T, double h, 
 		  int lay, double total_C, 
 		  int variable_pool, int variable_pool_2, 
 		  double background_mineralization, bool top_soil,
@@ -228,7 +231,9 @@ struct OrganicMatter::Implementation
 		     const double total_C_per_N,
 		     const vector<double>& SOM_C_per_N_goal,
 		     const vector<double>& SMB_results, int lay);
-  string top_summary (const Soil&, const Initialization&) const;
+  string top_summary (const Soil&, const Initialization&,
+                      const double zone_delta_N, 
+                      const double zone_delta_C) const;
   void initialize (const AttributeList&, const Soil&, const SoilWater&,
 		   double T_avg, Treelog& err);
   Implementation (const AttributeList&);
@@ -329,8 +334,9 @@ is numbered '1'.");
   alist.add ("where", 1);
 }
 
-void OrganicMatter::Implementation::Initialization::
-/**/ find_input (vector<double>& destination, const int lay) const
+void 
+OrganicMatter::Implementation::Initialization
+::find_input (vector<double>& destination, const int lay) const
 {
   daisy_assert (destination.size () == fractions.size ());
   daisy_assert (destination.size () >= efficiency.size ());
@@ -343,6 +349,11 @@ void OrganicMatter::Implementation::Initialization::
     }
   assert_non_negative (destination);
 }
+
+double
+OrganicMatter::Implementation::Initialization
+::find_total_input (const int lay) const
+{ return per_lay[lay]; }
 
 bool 
 OrganicMatter::Implementation::Initialization::
@@ -1287,6 +1298,39 @@ OrganicMatter::Implementation::input_from_am (vector<double>& destination,
       }
 }
 
+double
+OrganicMatter::Implementation::total_input_from_am (double T, double h,
+                                                    const int lay) const
+{
+  const unsigned int som_pool = smb.size ();
+
+  // Loop over all AOM pools.
+  vector<AOM*> added;
+  for (unsigned int i = 0; i < am.size (); i++)
+    am[i]->append_to (added);
+
+  double total = 0.0;
+  for (unsigned int i = 0; i < added.size (); i++)
+    if (added[i]->C.size () > lay)
+      {
+	const double abiotic_factor 
+	  = abiotic (*added[i], T, h, false, lay);
+	// For SMB pools.
+	for (unsigned int pool = 0; pool < som_pool ; pool++)
+	  total += added[i]->C[lay] 
+	    * added[i]->turnover_rate 
+	    * added[i]->fractions[pool]
+	    * abiotic_factor;
+	
+	// For SOM buffer.
+	total += added[i]->C[lay] 
+	  * added[i]->turnover_rate 
+	  * added[i]->fractions[som_pool]
+	  * abiotic_factor;
+      }
+  return total;
+}
+
 				     
 double
 OrganicMatter::Implementation::abiotic (const OM& om, double T, double h,
@@ -1355,6 +1399,7 @@ OrganicMatter::Implementation::SOM_limit_normalize
 				     
 void
 OrganicMatter::Implementation::partition (const vector<double>& am_input,
+                                          const double total_input,
 					  const double T, const double h,
 					  const int lay, const double total_C,
 					  const int variable_pool,
@@ -1384,8 +1429,6 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
   double total_am = 0.0;
   for (unsigned int i = 0; i < am.size (); i++)
     total_am += am[i]->C_at (lay);
-  const double total_input 
-    = accumulate (am_input.begin (), am_input.end (), 0.0);
 
   // We know the total humus, the yearly input and has been told the
   // relative sizes of the SOM pools.  We need to calculate the SMB
@@ -1957,7 +2000,9 @@ Setting additional pool to zero");
 
 string
 OrganicMatter::Implementation::top_summary (const Soil& soil,
-                                            const Initialization& init) const
+                                            const Initialization& init,
+                                            const double zone_delta_N, 
+                                            const double zone_delta_C) const
 {
   TmpStream tmp;
     
@@ -2073,18 +2118,31 @@ OrganicMatter::Implementation::top_summary (const Soil& soil,
 
       clay += soil.clay (lay) * dz;
 
-      vector<double> am_input (smb.size () + 1);
-      if (init.input >= 0)
-        init.find_input (am_input, lay);
-      else
-        input_from_am (am_input, init.T, init.h, lay);
       const double total_input 
-        = accumulate (am_input.begin (), am_input.end (), 0.0);
+        = (init.input >= 0)
+        ? init.find_total_input (lay)
+        : total_input_from_am (init.T, init.h, lay);
       input += total_input * dz * g_per_cm2_per_h_to_kg_per_ha_per_y;
     }
   clay /= -init.end;
-  tmp () << "Clay\t" << clay * 100 << "\t%\n";
-  tmp () << "Input\t" << input << "\tkg C/ha/y\n";
+  tmp () << "clay\t" << clay * 100 << "\t%\n";
+  tmp () << "Specified input\t";
+  if (init.input < 0.0)
+    tmp () << "not specified";
+  else
+    tmp () << init.input;
+  tmp () << "\tkg C/ha/y\n";
+  tmp () << "Specified background mineralization\t";
+  if (init.background_mineralization < -1e10)
+    tmp () << "not specified";
+  else
+    tmp () << init.background_mineralization;
+  tmp () << "\tkg N/ha/y\n";
+
+  tmp () << "Zone input\t" << input << "\tkg C/ha/y\n";
+  tmp () << "Zone background mineralization\t" << zone_delta_N 
+         << "\tkg C/ha/y\n";
+  tmp () << "Zone humus change\t" << zone_delta_C << "\tkg C/ha/y\n";
 
   // Time.
   time_t start_time = time (NULL);
@@ -2278,79 +2336,101 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     }
 
   // Initialize rest from humus.
-  double last = 0.0;
-  for (unsigned int lay = 0; lay < soil.size (); lay++)
-    {
-      const double humus_C = soil.humus_C (lay);
-      const double zplus = soil.zplus (lay);
-      if (zplus < first_humus)
-	if (last <= first_humus)
-	  total_C[lay] = humus_C;
-	else
-	  soil.add (total_C, first_humus, zplus, 
-		    humus_C * (first_humus - zplus));
-      last = zplus;
-    }
-
+  {
+    double last = 0.0;
+    for (unsigned int lay = 0; lay < soil.size (); lay++)
+      {
+        const double humus_C = soil.humus_C (lay);
+        const double zplus = soil.zplus (lay);
+        if (zplus < first_humus)
+          if (last <= first_humus)
+            total_C[lay] = humus_C;
+          else
+            soil.add (total_C, first_humus, zplus, 
+                      humus_C * (first_humus - zplus));
+        last = zplus;
+      }
+  }
   // Partitioning.
   Initialization init (al.alist ("init"), soil, som, T_avg);
 		       
-  vector<double> SOM_results (som_size, 0.0);
-  vector<double> SMB_results (smb_size, 0.0);
   double total_delta_C = 0.0;
   double total_delta_N = 0.0;
-  for (unsigned int lay = 0; lay < soil.size (); lay++)
-    {
-      vector<double> am_input (smb.size () + 1);
-      if (init.input >= 0)
-	init.find_input (am_input, lay);
-      else
-	input_from_am (am_input, init.T, init.h, lay);
-      
-      const bool top_soil = soil.z (lay) > init.end;
-      const double background_mineralization = 
-	(top_soil && init.background_mineralization > -1e10)
-	? (init.background_mineralization * kg_per_ha_per_y_to_g_per_cm2_per_h
-	   / -init.end)
-	: -42.42e42;
-      double delta_C;
-      double delta_N;
-      partition (am_input, init.T, init.h, 
-		 lay, total_C[lay], init.variable_pool, init.variable_pool_2,
-		 background_mineralization, top_soil,
-		 soil.SOM_fractions (lay), 
-		 soil.SOM_C_per_N (lay),
-		 init.SOM_limit_lower, init.SOM_limit_upper, 
-		 (top_soil ? init.SOM_limit_where : -1),
-		 SOM_results, SMB_results,
-                 delta_C, delta_N,
-		 soil.dry_bulk_density (lay),
-		 err,
-		 init.print_equations (lay), init.debug_rows, 
-		 init.debug_to_screen);
-      total_delta_C += delta_C * soil.dz (lay);
-      total_delta_N += delta_N * soil.dz (lay);
-      update_pools (SOM_results, soil.C_per_N (lay), 
-		    soil.SOM_C_per_N (lay), SMB_results, lay);
-    }
+  double zone_delta_C = 0.0;
+  double zone_delta_N = 0.0;
+  {
+    vector<double> SOM_results (som_size, 0.0);
+    vector<double> SMB_results (smb_size, 0.0);
+    double last = 0.0;
 
-  // 
-  TmpStream total;
-  total () << "Expected humus change: " 
-           << total_delta_C * g_per_cm2_per_h_to_kg_per_ha_per_y 
-           << " [kg C/ha/y], ";
-  const double all_C = this->total_C (soil);
-  if (isnormal (all_C))
-    total () << total_delta_C / all_C << " [y^-1]";
-  else
-    total () << "all new";
-  total () << ".\nBackground mineralization: "
-           << -total_delta_N * g_per_cm2_per_h_to_kg_per_ha_per_y 
-           << " [kg N/ha/y].";
-  if (init.debug_to_screen)
-    err.message (total.str ());
-  else
-    err.debug (total.str ());  
+    for (unsigned int lay = 0; lay < soil.size (); lay++)
+      {
+        vector<double> am_input (smb.size () + 1);
+        if (init.input >= 0)
+          init.find_input (am_input, lay);
+        else
+          input_from_am (am_input, init.T, init.h, lay);
+        const double total_input 
+          = (init.input >= 0)
+          ? init.find_total_input (lay)
+          : total_input_from_am (init.T, init.h, lay);
+      
+        const bool top_soil = soil.z (lay) > init.end;
+        const double background_mineralization = 
+          (top_soil && init.background_mineralization > -1e10)
+          ? (init.background_mineralization 
+             * kg_per_ha_per_y_to_g_per_cm2_per_h / -init.end)
+          : -42.42e42;
+        double delta_C;
+        double delta_N;
+        partition (am_input, total_input, init.T, init.h, 
+                   lay, total_C[lay], init.variable_pool, init.variable_pool_2,
+                   background_mineralization, top_soil,
+                   soil.SOM_fractions (lay), 
+                   soil.SOM_C_per_N (lay),
+                   init.SOM_limit_lower, init.SOM_limit_upper, 
+                   (top_soil ? init.SOM_limit_where : -1),
+                   SOM_results, SMB_results,
+                   delta_C, delta_N,
+                   soil.dry_bulk_density (lay),
+                   err,
+                   init.print_equations (lay), init.debug_rows, 
+                   init.debug_to_screen);
+        total_delta_C += delta_C * soil.dz (lay);
+        total_delta_N += delta_N * soil.dz (lay);
+        if (top_soil)
+          {
+            const double next = max (init.end, soil.zplus (lay));
+            const double dz = last - next;
+            last = next;
+            total_delta_C += delta_C * dz;
+            total_delta_N += delta_N * dz;
+          }
+        update_pools (SOM_results, soil.C_per_N (lay), 
+                      soil.SOM_C_per_N (lay), SMB_results, lay);
+      }
+  }
+
+  // Summary.
+  {
+    Treelog::Open nest (err, "Total soil summary");
+    TmpStream total;
+    total () << "Expected humus change: " 
+             << total_delta_C * g_per_cm2_per_h_to_kg_per_ha_per_y 
+             << " [kg C/ha/y], ";
+    const double all_C = this->total_C (soil);
+    if (isnormal (all_C))
+      total () << total_delta_C / all_C << " [y^-1]";
+    else
+      total () << "all new";
+    total () << ".\nExpected background mineralization: "
+             << -total_delta_N * g_per_cm2_per_h_to_kg_per_ha_per_y 
+             << " [kg N/ha/y].";
+    if (init.debug_to_screen)
+      err.message (total.str ());
+    else
+      err.debug (total.str ());  
+  }
 
   // Clay affect or SMB turnover and mantenance.
   clayom.set_rates (soil, smb);
@@ -2361,7 +2441,8 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 
   // Print top summary.
   {
-    const string summary = top_summary (soil, init);
+    const string summary 
+      = top_summary (soil, init, zone_delta_N, zone_delta_C);
 
     Treelog::Open nest (err, "Top soil summary");
     if (init.debug_to_screen)

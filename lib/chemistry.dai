@@ -9,52 +9,59 @@
   (solute (adsorption full) (transport none))
   (decompose_rate 0 [h^-1]))
   
-(defchemical Atrazine default
-  (canopy_dissipation_rate 8e-3 [h^-1])
+(defchemical common default
+  "For chemicals where we know no better."
+  (canopy_dissipation_rate 0.0083 [h^-1])
   (canopy_washoff_coefficient 1.0 [])
+  (crop_uptake_reflection_factor 1 [])
+  (diffusion_coefficient 4.6e-6 [cm^2/s]))
+  
+(defchemical fungicide common
+  "This stuff kills swamps.")
+
+(defchemical herbicide common
+  "This stuff kills plants.")
+
+(defchemical insecticide common
+  "This stuff kills insects.")
+
+(defchemical Atrazine herbicide
   (crop_uptake_reflection_factor 0.8 [])
   (decompose_rate 7e-5 [h^-1])
   (diffusion_coefficient 8e-6 [cm^2/s])
   (solute (adsorption linear (K_clay 7 [cm^3/g]))))
 
-(defchemical Bentazon default
-  (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 1.0 [])
-  (crop_uptake_reflection_factor 1 [])
-  (decompose_halftime 40 [d])		; at 10 dg C
-  (diffusion_coefficient 4.6e-6 [cm^2/s])
+(defchemical Bentazon herbicide
+  (decompose_halftime 40 [d])	
   (solute (adsorption linear (K_OC 34 [cm^3/g]))))
 
-(defchemical IPU default
-  (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 1.0 [])
-  (crop_uptake_reflection_factor 1 [])
+(defchemical IPU herbicide
   (decompose_halftime 29 [d])
-  (diffusion_coefficient 4.6e-6 [cm^2/s])	
   (solute (adsorption linear (K_OC 100 [cm^3/g]))))
 
-(defchemical MCPP default
-  (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 1.0 [])
-  (crop_uptake_reflection_factor 1 [])
+(defchemical MCPP herbicide
   (decompose_halftime 7 [d])
-  (diffusion_coefficient 4.6e-6 [cm^2/s])
   (solute (adsorption linear (K_OC 20 [cm^3/g]))))
 
-(defchemical Pendimethalin default
-  (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 1.0 [])
-  (crop_uptake_reflection_factor 1 [])
+(defchemical Pendimethalin herbicide
   (decompose_rate 0.0004 [h^-1])
-  (diffusion_coefficient 4.6e-6 [cm^2/s])
   (solute (adsorption linear (K_OC 16000 [cm^3/g]))))
 
-(defchemical Ioxynil default
-  (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 1.0 [])
-  (crop_uptake_reflection_factor 1 [])
-  (decompose_halftime 10 [d])		; at 10 dg C
-  (diffusion_coefficient 4.6e-6 [cm^2/s])
+(defchemical Ioxynil herbicide
+  (decompose_halftime 10 [d])	
   (solute (adsorption linear (K_OC 350 [cm^3/g]))))
+
+(defchemical "2,4-D" herbicide
+  "Selective herbicide, kill weeds but not crops."
+  (decompose_halftime 10 [d])
+  (solute (adsorption linear (K_OC 20 [cm^3/g]))))
+
+(defchemical Heptachlor insecticide
+  (decompose_halftime 300 [d])
+  (solute (adsorption linear (K_OC 24e3 [cm^3/g]))))
+
+(defchemical DDT insecticide
+  (decompose_halftime 2000 [d])
+  (solute (adsorption linear (K_OC 2e6 [cm^3/g]))))
 
 ;;; chemestry.dai ends here.

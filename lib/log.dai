@@ -1181,18 +1181,32 @@ will be logged."
                      (dimension "g/ha")
                      (factor 1e8))))    ;g/cm^2 -> g/ha
 
-(deflog "Chemicals" table
+;; We need two new log models.
+(deflog "Chemical Content" table
   "Amount of chemicals in each numeric soil layer.  
 You can specify a single chemical with (set \"$chem\" \"<name>\"), 
 where <name> is the name of the chemical to log.  Otherwise, you will get 
 the sum of all chemicals."
-  (where "chemicals.dlf")
+  (where "chemical_content.dlf")
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "$col" SoilChemicals solutes "$chem" solute M)
                   (flux true)
-                  (dimension "g/cm^3"))
-           ))
+                  (factor 1e12); g/cm^3 -> ug/m^3
+                  (dimension "ug/m^3"))))
+
+(deflog "Chemical Concentration" table
+  "Concentration in water of chemicals in each numeric soil layer.  
+You can specify a single chemical with (set \"$chem\" \"<name>\"), 
+where <name> is the name of the chemical to log.  Otherwise, you will get 
+the sum of all chemicals."
+  (where "chemical_conc.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "$col" SoilChemicals solutes "$chem" solute C)
+                  (flux true)
+                  (factor 1e12); g/cm^3 -> ng/l
+                  (dimension "ng/l"))))
 
 (deflog "Transform" table
   (where "transform.dlf")

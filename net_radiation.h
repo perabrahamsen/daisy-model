@@ -52,7 +52,7 @@ public:
   virtual ~NetRadiation ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content;
 #endif

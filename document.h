@@ -102,7 +102,7 @@ public:
   virtual ~Document ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Document>::Content* Librarian<Document>::content;
 #endif

@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.35
+
+** New information in the top summary.
+
+** Bug fixes
+
+The input listed in the OrnaicMatter section in the beginning of
+daisy.log did not included carbon lost digesting the added matter.
+Now it does.
+
 * 3.34
 
 ** New way to specify deposition in the default weather model

@@ -59,7 +59,7 @@ public:
   virtual ~SVAT ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<SVAT>::Content* Librarian<SVAT>::content;
 #endif

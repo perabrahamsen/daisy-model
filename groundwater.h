@@ -64,7 +64,7 @@ public:
   virtual ~Groundwater ();
 };
 
-#if !defined (__BORLANDC__)
+#ifdef FORWARD_TEMPLATES
 EMPTY_TEMPLATE
 Librarian<Groundwater>::Content* Librarian<Groundwater>::content;
 #endif
