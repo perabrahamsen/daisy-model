@@ -28,6 +28,8 @@ main (int argc, char* argv[])
   if (!syntax.check (alist, "daisy"))
     return 1;
   Daisy daisy (alist);
+  if (!daisy.check (syntax))
+    return 1;
   daisy.run ();
   return 0;
 }

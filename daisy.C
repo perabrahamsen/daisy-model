@@ -39,21 +39,54 @@ Daisy::Daisy (const AttributeList& al)
   assert (!mike_she);
   mike_she = new MikeSHE (al.list ("MikeSHE"), time);
 #endif
-  
-  bool ok = true;
-  // This was ::const_iterator in g++
-  for (ColumnList::iterator i = columns.begin ();
-       i != columns.end ();
-       i++)
-    {
-      if (*i == NULL || !(*i)-> check ())
-	ok = false;
-    }
-  if (!ok)
-    THROW (Initialization ("Malformed column(s)"));
+}
 
+bool
+Daisy::check (const Syntax& syntax)
+{
+  bool all_ok = true;
+
+  // Check columns.
+  {
+    bool ok = true;
+    // This was ::const_iterator in g++
+    for (ColumnList::iterator i = columns.begin ();
+	 i != columns.end ();
+	 i++)
+      {
+	if (*i == NULL || !(*i)-> check ())
+	  ok = false;
+      }
+    if (!ok)
+      {
+	cerr << "Malformed column(s)\n";
+	all_ok = false;
+      }
+  }
+  // Check filters.
+  {
+    bool ok = true;
+    for (vector<Log*>::const_iterator i = logs.begin ();
+	 i != logs.end ();
+	 i++)
+      {
+	if (*i == NULL || !(*i)-> check (syntax))
+	  ok = false;
+      }
+    if (!ok)
+      {
+	cerr << "Malformed log(s)\n";
+	all_ok = false;
+      }
+  }
+  // Check actions.
   if (!action.check (*this))
-    THROW (Initialization ("Malformed action(s)"));
+    {
+      cerr << "Malformed action(s)\n";
+      all_ok = false;
+    }
+
+  return all_ok;
 }
 
 void 
@@ -97,9 +130,6 @@ Daisy::run ()
 	{
 	  Log& log = **i;
 	  const Filter& filter = log.match (*this);
-	  if (&filter == Filter::none)
-	    // Don't waste time with empty filters.
-	    continue;
 	  log.output ("time", filter, time);
 	  output_derived (weather, "weather", log, filter);
 	  output_list (columns, "column", log, filter);
@@ -127,13 +157,16 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_class ("defcrop", Crop::library (), &Crop::derive_type);
   syntax.add_class ("defhorizon", Horizon::library (), &Horizon::derive_type);
   syntax.add_class ("defcolumn", Column::library (), &Column::derive_type);
-  syntax.add_class ("deflog", Log::library (), &Log::derive_type);
+  syntax.add_class ("deflog", 
+		    Librarian<Log>::library (), 
+		    &Librarian<Log>::derive_type);
   syntax.add_class ("defparser", Parser::library (), &Parser::derive_type);
   syntax.add_class ("defam", AM::library (), &AM::derive_type);
   // These are mostly for making 
   syntax.add_class ("defaction", Action::library (), &Action::derive_type);
   syntax.add_class ("defcondition",
-		    Condition::library (), &Condition::derive_type);
+		    Librarian<Condition>::library (),
+		    &Librarian<Condition>::derive_type);
   syntax.add_class ("defweather", 
 		    Librarian<Weather>::library (), 
 		    Librarian<Weather>::derive_type);
@@ -145,8 +178,12 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_class ("defnitrification", 
 		    Librarian<Nitrification>::library (),
 		    &Librarian<Nitrification>::derive_type);
+  syntax.add_class ("deffilter", 
+		    Librarian<Filter>::library (),
+		    &Librarian<Filter>::derive_type);
   // The actual data.
-  syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
+  syntax.add ("output", Librarian<Log>::library (),
+	      Syntax::Const, Syntax::Sequence);
   syntax.add ("input", Parser::library (), Syntax::Optional, 
 	      Syntax::Singleton);
   syntax.add ("manager", Action::library (), Syntax::Const);

@@ -3,10 +3,9 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include "common.h"
+#include "librarian.h"
 
-class FilterAll;
-class FilterNone;
+class Geometry;
 
 class Filter
 {
@@ -14,61 +13,19 @@ class Filter
 public:
   virtual bool check (string, bool log_only = false) const = 0;
   virtual const Filter& lookup (string) const = 0;
+  virtual const vector<double> select (const Geometry&,
+				       const vector<double>&) const;
 
-    // Content.
+  // Create and Destroy.
 public:
-  static const FilterAll* all;
-  static const FilterNone* none;
-
-    // Create and Destroy.
-public:
+  virtual bool check (const Library&, int size) const;
+  virtual bool check (const Syntax&, int size) const;
+  virtual bool check (Syntax::type, int size) const;
   virtual ~Filter ();
 protected:
   Filter ();
 };
 
-class FilterAll : public Filter
-{
-  // Use.
-public:
-  bool check (string, bool log_only = false) const;
-  const Filter& lookup (string) const;
-
-    // Create and Destroy.
-public:
-  FilterAll ();
-};
-
-class FilterNone : public Filter
-{
-  // Use.
-public:
-  bool check (string, bool log_only = false) const;
-  const Filter& lookup (string) const;
-
-    // Create and Destroy.
-public:
-  FilterNone ();
-};
-
-class FilterSome : public Filter
-{
-  // Use.
-public:
-  bool check (string, bool log_only = false) const;
-  const Filter& lookup (string) const;
-
-    // Content.
-private:
-  struct Implementation;
-  Implementation& impl;
-	
-  // Create and Destroy.
-public:
-  ~FilterSome ();
-  friend class Parser;
-  void add (string, const Filter& = *Filter::all);
-  FilterSome ();
-};
+static Librarian<Filter> Filter_init ("filter");
 
 #endif FILTER_H

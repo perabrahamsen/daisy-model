@@ -1304,8 +1304,8 @@ CropSold::ActualWaterUptake (double Ept,
   // Update soil water sink term.
   soil_water.add_to_sink (H2OExtraction);
   // Update water stress factor
-  double& water_stress = var.RootSys.water_stress;
 #ifdef USE_HOURLY_PHOTO
+  double& water_stress = var.RootSys.water_stress;
   if (Ept < 0.010)
     water_stress = 1.0;
   else

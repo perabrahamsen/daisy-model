@@ -295,6 +295,7 @@ ColumnStandard::tick (const Time& time,
 void
 ColumnStandard::output (Log& log, const Filter& filter) const
 {
+  log.open_geometry (soil);
   output_submodule (bioclimate, "Bioclimate", log, filter);
   output_submodule (surface, "Surface", log, filter);
 #if 0
@@ -313,6 +314,7 @@ ColumnStandard::output (Log& log, const Filter& filter) const
   output_derived (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
   output_list (crops, "crops", log, filter);
+  log.close_geometry ();
 }
 
 ColumnStandard::ColumnStandard (const AttributeList& al)

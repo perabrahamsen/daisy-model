@@ -6,7 +6,6 @@
 #include "common.h"
 #include <list>
 
-struct FTable;
 struct AttributeList;
 struct Library;
 
@@ -27,8 +26,8 @@ public:
 
   // Each syntax entry should have an associated type.
   enum type 
-  { Number, List, CSMP, Function, Boolean, String,
-    Date, Integer, Filter, Class, Object, Error };
+  { Number, List, CSMP, Boolean, String,
+    Date, Integer, Class, Object, Error };
   static const char* type_name (type);
     
   // The requirements with regard to input and output varies with each
@@ -60,7 +59,7 @@ public:
   bool is_const (string) const;
   type lookup (string) const;
   const Syntax& syntax (string) const;
-  const FTable* function (string) const;
+public:
   const Library& library (string) const;
   derive_fun derive (string) const;
   int  size (string) const;
@@ -70,9 +69,7 @@ public:
   // Add syntax entries
   void add (string, type, category, int size = Singleton);
   void add (string, const Syntax&, category = State, int size = Singleton);
-  void add (string, const FTable*, category, int size = Singleton);
   void add (string, const Library&, category = State, int size = Singleton);
-  void add_filter (string, const Syntax&, category);
   void add_class (string, const Library&, derive_fun);
 
   // It is possible to impose an order on the syntax entries, which

@@ -31,9 +31,6 @@ struct ParserFile::Implementation
   AttributeList& load_derived (const Library& lib, bool in_sequence = false);
   void load_list (AttributeList&, const Syntax&);
   Time get_time ();
-  const Filter& get_filter (const Syntax&);
-  const Filter& get_filter_object (const Library&);
-  const Filter& get_filter_sequence (const Library&);
   ifstream in;
   string file;
   int line;
@@ -366,9 +363,6 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      atts.add (name, csmp);
 	      break;
 	    }
-	  case Syntax::Function:
-	    atts.add (name, get_string ());
-	    break;
 	  case Syntax::String:
 	    atts.add (name, get_string ());
 	    break;
@@ -391,12 +385,6 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    break;
 	  case Syntax::Date:
 	    atts.add (name, get_time ());
-	    break;
-	  case Syntax::Filter:
-	    if (&syntax.syntax (name) == Log::global_syntax_table)
-	      atts.add (name, get_filter (global_syntax_table));
-	    else
-	      atts.add (name, get_filter (syntax.syntax (name)));
 	    break;
 	  case Syntax::Class:
 	    // Handled specially: Put directly in global library.
@@ -558,104 +546,6 @@ ParserFile::Implementation::get_time ()
     return Time (year, month, mday, hour); 
 
   return Time (-999, 1, 1, 0);
-}
-
-const Filter&
-ParserFile::Implementation::get_filter (const Syntax& syntax)
-{
-  if (looking_at ('*'))
-    {
-      skip ("*");
-      return *Filter::all;
-    }
-  FilterSome& filter = *new FilterSome ();
-  while (!looking_at (')') && good ())
-    {
-      if (looking_at ('('))
-	{
-	  skip ("(");
-	  string name = get_string ();
-	  Syntax::type type = syntax.lookup (name);
-	  if (type == Syntax::Error)
-	    {
-	      error (string ("Unknown attribute `") + name + "'");
-	      skip_to_end ();  
-	    }
-	  else if (syntax.is_const (name))
-	    {
-	      error (string ("Constant attribute `") + name + "'");
-	      skip_to_end ();  
-	    }
-	  else switch (type)
-	    {
-	    case Syntax::List:
-	      filter.add (name, get_filter (syntax.syntax (name)));
-	      break;
-	    case Syntax::Object:
-	      if (syntax.size (name) == Syntax::Sequence)
-		filter.add (name,
-			     get_filter_sequence (syntax.library (name)));
-	      else
-		filter.add (name, get_filter_object (syntax.library (name)));
-	      break;
-	    default:
-	      error (string ("Atomic attribute `") + name + "'");
-	      skip_to_end ();   
-	    }
-	  skip (")");
-	}
-      else 
-	{
-	  string name = get_string ();
-	  if (syntax.lookup (name) == Syntax::Error)
-	    error (string ("Attribute `") + name + "' not known");
-	  else if (syntax.is_const (name))
-	    error (string ("Attribute `") + name + "' is const");
-	  else
-	    filter.add (name);
-	}
-    }
-  return filter;
-}
-
-const Filter&
-ParserFile::Implementation::get_filter_object (const Library& library)
-{
-  if (looking_at ('*'))
-    {
-      skip ("*");
-      return *Filter::all;
-    }  
-  string name = get_string ();
-  if (library.check (name))
-    {
-      FilterSome& filter = *new FilterSome ();
-      filter.add (name, get_filter (library.syntax (name)));
-      return filter;
-    }
-  else 
-    {
-      error (string ("Unknown object `") + name + "' in filter");
-      return *Filter::none;
-    }
-}
-
-const Filter&
-ParserFile::Implementation::get_filter_sequence (const Library& library)
-{
-  FilterSome& filter = *new FilterSome ();
-
-  while (!looking_at (')') && good ())
-    {	
-      skip ("(");
-      string name = get_string ();
-      if (library.check (name))
-	filter.add (name, get_filter (library.syntax (name)));
-      else 
-	error (string ("Unknown object `") + name + "' in filter sequence");
-      skip (")");
-    }
-  return filter;
 }
 
 ParserFile::Implementation::Implementation (const Syntax& syntax, string name)

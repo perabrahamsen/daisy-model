@@ -101,7 +101,7 @@ vector<clause>& make_clauses (const vector<const AttributeList*>& s,
        i != s.end ();
        i++)
     {
-      c.push_back (clause (&Condition::create ((*i)->list ("condition")),
+      c.push_back (clause (&Librarian<Condition>::create ((*i)->list ("condition")),
 			   &Action::create ((*i)->list ("action"), p)));
     }
   return c;
@@ -196,7 +196,7 @@ private:
   { return *new ActionIf (al, p); }
   ActionIf (const AttributeList& al, const Action *const p)
     : Action (p),
-      if_c (Condition::create (al.list ("if"))),
+      if_c (Librarian<Condition>::create (al.list ("if"))),
       then_a (Action::create (al.list ("then"), this)),
       else_a (Action::create (al.list ("else"), this))
   { }
@@ -238,7 +238,8 @@ ActionLispSyntax::ActionLispSyntax ()
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     Syntax& clauseSyntax = *new Syntax ();
-    clauseSyntax.add ("condition", Condition::library (), Syntax::Const);
+    clauseSyntax.add ("condition",
+		      Librarian<Condition>::library (), Syntax::Const);
     clauseSyntax.add ("action", Action::library (), Syntax::Const);
     clauseSyntax.order ("condition", "action");
     syntax.add ("clauses", clauseSyntax, Syntax::Const, Syntax::Sequence);
@@ -249,7 +250,7 @@ ActionLispSyntax::ActionLispSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("if", Condition::library (), Syntax::Const);
+    syntax.add ("if", Librarian<Condition>::library (), Syntax::Const);
     syntax.add ("then", Action::library (), Syntax::Const);
     syntax.add ("else", Action::library (), Syntax::Const);
     syntax.order ("if", "then", "else");

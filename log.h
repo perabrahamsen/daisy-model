@@ -3,22 +3,20 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include <string>
-#include <vector>
 #include "filter.h"
+#include "librarian.h"
 
 class Daisy;
 class Time;
 class CSMP;
-class AttributeList;
-class Library;
-class Syntax;
+class Geometry;
 
 class Log
 {
   // Content.
 public:
-  static Syntax* global_syntax_table;
+  struct Implementation;
+  Implementation& impl;
 
   // Use.
 public:
@@ -42,39 +40,27 @@ public:
   virtual void output (string, const Filter&, const CSMP&,
 		       bool log_only = false) = 0;
 
+  void open_geometry (const Geometry&);
+  void close_geometry ();
+  const Geometry* geometry ();
+
   // Used by CSMP.
 public:
   virtual void output_point (double x, double y) = 0;
 
-  // Library.
-public:
-  static const Library& library ();
-  static Log& create (const AttributeList&);
-  typedef Log& (*constructor) (const AttributeList&);
-  static void add_type (const string, const AttributeList&, const Syntax&,
-			constructor);
-  static void derive_type (const string, const AttributeList&, string super);
- 
   // Create and Destroy.
 protected:
   Log ();
 public:
+  virtual bool check (const Syntax&) const = 0;
   virtual ~Log ();
 };
 
-// Ensure the Log library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class Log_init
-{
-  static int count;
-public:
-  Log_init ();
-  ~Log_init ();
-} Log_init;
+static Librarian<Log> Log_init ("log");
 
 template <class T> void
 output_submodule (const T& submodule,
-		  const char* name, Log& log, const Filter& filter)
+                  const char* name, Log& log, const Filter& filter)
 {
   if (filter.check (name))
     {
@@ -83,7 +69,7 @@ output_submodule (const T& submodule,
       log.close ();
     }
 }
-
+ 
 template <class T> void
 output_derived (const T& submodule,
 		const char* name,

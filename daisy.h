@@ -42,6 +42,7 @@ public:
   // Simulation.
 public:
   void run();
+  bool check (const Syntax&);
 
   // Create and Destroy.
 public:

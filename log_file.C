@@ -27,8 +27,8 @@ private:
     const Filter& filter;
     Entry (const AttributeList& al)
       : active (false),
-	condition (&Condition::create (al.list ("when"))), 
-	filter (al.filter ("what"))
+	condition (&Librarian<Condition>::create (al.list ("when"))), 
+	filter (Librarian<Filter>::create (al.list ("what")))
     { }
     ~Entry ()
     {
@@ -68,10 +68,10 @@ public:
 
   // Create and Destroy.
 private:
-  friend class LogFileSyntax;
-  static Log& make (const AttributeList&);
   LogFile (const AttributeList&);
 public:
+  static Log& make (const AttributeList&);
+  bool check (const Syntax& syntax) const;
   ~LogFile ();
 };
 
@@ -141,7 +141,15 @@ LogFile::match (const Daisy& daisy)
     }
   if (found)
     return *this;
-  return *Filter::none;
+
+  static const Filter* none = NULL;
+  if (!none)
+    {
+      AttributeList none_alist;
+      none_alist.add ("type", "none");
+      none = &Librarian<Filter>::create (none_alist);
+    }
+  return *none;
 }
 
 void 
@@ -256,9 +264,15 @@ LogFile::output (string name, const Filter& filter, const vector<double>& value,
 {
   if (filter.check (name, log_only))
     {
+      const Filter& f = filter.lookup (name);
+      const Geometry* g = geometry ();
+
+      
+      const vector<double> val = g ? f.select (*g, value) : value;
+      
       open (name);
       bool first = true;
-      for (const double* p = value.begin (); p != value.end (); p++)
+      for (const double* p = val.begin (); p != val.end (); p++)
 	{
 	  if (first)
 	    first = false;
@@ -315,7 +329,23 @@ LogFile::lookup (string s) const
 	return (*i)->filter.lookup (s);
     }
   assert (false);
-  return *Filter::none;	// Shut up!
+}
+
+bool
+LogFile::check (const Syntax& syntax) const
+{
+  bool ok =true;
+  for (EntryList::const_iterator i = entries.begin ();
+       i != entries.end ();
+       i++)
+    {
+      if (!(*i)->filter.check (syntax, Syntax::Singleton))
+	ok = false;
+    }
+  if (!ok)
+    cerr << "in log file `" << name << "'\n";
+  
+  return ok;
 }
 
 LogFile::LogFile (const AttributeList& av)
@@ -364,12 +394,11 @@ LogFileSyntax::LogFileSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   Syntax& match = *new Syntax ();
-  match.add ("when", Condition::library (), Syntax::Const);
-  assert (Log::global_syntax_table != NULL);
-  match.add_filter ("what", *Log::global_syntax_table, Syntax::Const);
+  match.add ("when", Librarian<Condition>::library (), Syntax::Const);
+  match.add ("what", Librarian<Filter>::library (), Syntax::Const);
   match.order ("when", "what");
   syntax.add ("where", Syntax::String, Syntax::Const);
   syntax.add ("matches", match, Syntax::Const, Syntax::Sequence);
   syntax.order ("where", "matches");
-  Log::add_type ("file", alist, syntax, &LogFile::make);
+  Librarian<Log>::add_type ("file", alist, syntax, &LogFile::make);
 }

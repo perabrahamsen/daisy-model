@@ -24,7 +24,7 @@ public:
     return false;
   }
   ConditionOr (const AttributeList& al)
-    : conditions (map_create<const Condition> (al.list_sequence ("operands")))
+    : conditions (map_create_const<Condition> (al.list_sequence ("operands")))
   { }
   ~ConditionOr ()
   {
@@ -53,7 +53,7 @@ public:
     return false;
   }
   ConditionAnd (const AttributeList& al)
-    : conditions (map_create<const Condition> (al.list_sequence ("operands")))
+    : conditions (map_create_const<Condition> (al.list_sequence ("operands")))
   { }
   ~ConditionAnd ()
   {
@@ -73,7 +73,7 @@ public:
   bool match (const Daisy& daisy) const
   { return !condition.match (daisy); }
   ConditionNot (const AttributeList& al)
-    : condition (Condition::create (al.list ("operand")))
+    : condition (Librarian<Condition>::create (al.list ("operand")))
   { }
   ~ConditionNot ()
   {
@@ -94,9 +94,9 @@ public:
   bool match (const Daisy& daisy) const
   { return if_c.match (daisy) ? then_c.match (daisy) : else_c.match (daisy); }
   ConditionIf (const AttributeList& al)
-    : if_c (Condition::create (al.list ("if"))),
-      then_c (Condition::create (al.list ("then"))),
-      else_c (Condition::create (al.list ("else")))
+    : if_c (Librarian<Condition>::create (al.list ("if"))),
+      then_c (Librarian<Condition>::create (al.list ("then"))),
+      else_c (Librarian<Condition>::create (al.list ("else")))
   { }
   ~ConditionIf ()
   {
@@ -121,28 +121,28 @@ ConditionLogicSyntax::ConditionLogicSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("operands", Condition::library (), 
+    syntax.add ("operands", Librarian<Condition>::library (), 
 		Syntax::Const, Syntax::Sequence);
     syntax.order ("operands");
-    Condition::add_type ("or", alist, syntax, &ConditionOr::make);
-    Condition::add_type ("and", alist, syntax, &ConditionAnd::make);
+    Librarian<Condition>::add_type ("or", alist, syntax, &ConditionOr::make);
+    Librarian<Condition>::add_type ("and", alist, syntax, &ConditionAnd::make);
   }
   // "not".
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("operand", Condition::library (), Syntax::Const);
+    syntax.add ("operand", Librarian<Condition>::library (), Syntax::Const);
     syntax.order ("operand");
-    Condition::add_type ("not", alist, syntax, &ConditionNot::make);
+    Librarian<Condition>::add_type ("not", alist, syntax, &ConditionNot::make);
   }
   // "if".
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("if", Condition::library (), Syntax::Const);
-    syntax.add ("then", Condition::library (), Syntax::Const);
-    syntax.add ("else", Condition::library (), Syntax::Const);
+    syntax.add ("if", Librarian<Condition>::library (), Syntax::Const);
+    syntax.add ("then", Librarian<Condition>::library (), Syntax::Const);
+    syntax.add ("else", Librarian<Condition>::library (), Syntax::Const);
     syntax.order ("if", "then", "else");
-    Condition::add_type ("if", alist, syntax, &ConditionIf::make);
+    Librarian<Condition>::add_type ("if", alist, syntax, &ConditionIf::make);
   }
 }

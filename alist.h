@@ -113,9 +113,25 @@ struct map_create
     for (vector<const AttributeList*>::const_iterator i = f.begin ();
 	 i != f.end ();
 	 i++)
-      t.push_back (&T::create (**i));
+      t.push_back (&Librarian<T>::create (**i));
   }
   operator vector<T*>& ()
+  { return t; }
+};
+
+template <class T> 
+struct map_create_const
+{
+  vector<const T*>& t;
+  map_create_const (const vector<const AttributeList*>& f)
+    : t (*new vector<const T*> ())
+  { 
+    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+	 i != f.end ();
+	 i++)
+      t.push_back (&Librarian<T>::create (**i));
+  }
+  operator vector<const T*>& ()
   { return t; }
 };
 

@@ -1,7 +1,6 @@
 // nitrification.C
 
 #include "nitrification.h"
-#include "common.h"
 
 Librarian<Nitrification>::Content* Librarian<Nitrification>::content = NULL;
 

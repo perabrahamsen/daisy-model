@@ -79,7 +79,7 @@ ActionHarvestSyntax::ActionHarvestSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("name", Syntax::Function, Syntax::Const);
+  syntax.add ("name", Syntax::String, Syntax::Const);
   alist.add ("name", "all");
   syntax.add ("stub", Syntax::Number, Syntax::Const);
   alist.add ("stub", 0.0);

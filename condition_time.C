@@ -125,9 +125,12 @@ ConditionTimeSyntax::ConditionTimeSyntax ()
     AttributeList& alist = *new AttributeList ();
     syntax.add ("time", Syntax::Date, Syntax::Const);
     syntax.order ("time");
-    Condition::add_type ("at", alist, syntax, &ConditionAt::make);
-    Condition::add_type ("before", alist, syntax, &ConditionBefore::make);
-    Condition::add_type ("after", alist, syntax, &ConditionAfter::make);
+    Librarian<Condition>::add_type ("at", alist, syntax,
+				    &ConditionAt::make);
+    Librarian<Condition>::add_type ("before", alist, syntax, 
+				    &ConditionBefore::make);
+    Librarian<Condition>::add_type ("after", alist, syntax,
+				    &ConditionAfter::make);
   }
   // Every nth something.
   {
@@ -136,10 +139,15 @@ ConditionTimeSyntax::ConditionTimeSyntax ()
     syntax.add ("step", Syntax::Integer, Syntax::Const);
     syntax.order ("step");
     alist.add ("step", 1);
-    Condition::add_type ("hourly", alist, syntax, &ConditionHourly::make);
-    Condition::add_type ("daily", alist, syntax, &ConditionDaily::make);
-    Condition::add_type ("weekly", alist, syntax, &ConditionWeekly::make);
-    Condition::add_type ("monthly", alist, syntax, &ConditionMonthly::make);
-    Condition::add_type ("yearly", alist, syntax, &ConditionYearly::make);
+    Librarian<Condition>::add_type ("hourly", alist, syntax,
+				    &ConditionHourly::make);
+    Librarian<Condition>::add_type ("daily", alist, syntax,
+				    &ConditionDaily::make);
+    Librarian<Condition>::add_type ("weekly", alist, syntax,
+				    &ConditionWeekly::make);
+    Librarian<Condition>::add_type ("monthly", alist, syntax,
+				    &ConditionMonthly::make);
+    Librarian<Condition>::add_type ("yearly", alist, syntax,
+				    &ConditionYearly::make);
   }
 }
