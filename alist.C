@@ -609,8 +609,26 @@ AttributeList::name (const string& key) const
   return *value.name;
 }
 
+const string& 
+AttributeList::name (const char* key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::String);
+  assert (!value.is_sequence);
+  return *value.name;
+}
+
 bool 
 AttributeList::flag (const string& key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Boolean);
+  assert (!value.is_sequence);
+  return value.flag;
+}
+
+bool 
+AttributeList::flag (const char* key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Boolean);
@@ -627,17 +645,26 @@ AttributeList::integer (const string& key) const
   return value.integer;
 }
 
-const Time&
-AttributeList::time (const string& key) const
+int
+AttributeList::integer (const char* key) const
 {
   const Value& value = impl.lookup (key);
-  assert (value.type == Syntax::Date);
+  assert (value.type == Syntax::Integer);
   assert (!value.is_sequence);
-  return *value.time;
+  return value.integer;
 }
 
 const PLF& 
 AttributeList::plf (const string& key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::PLF);
+  assert (!value.is_sequence);
+  return *value.plf;
+}
+
+const PLF& 
+AttributeList::plf (const char* key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::PLF);
@@ -672,8 +699,26 @@ AttributeList::number_sequence (const string& key) const
   return *value.number_sequence;
 }
 
+const vector<double>& 
+AttributeList::number_sequence (const char* key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Number);
+  assert (value.is_sequence);
+  return *value.number_sequence;
+}
+
 const vector<string>& 
 AttributeList::name_sequence (const string& key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::String);
+  assert (value.is_sequence);
+  return *value.name_sequence;
+}
+
+const vector<string>& 
+AttributeList::name_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::String);
@@ -690,8 +735,26 @@ AttributeList::flag_sequence (const string& key) const
   return *value.flag_sequence;
 }
 
+const vector<bool>& 
+AttributeList::flag_sequence (const char* key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Boolean);
+  assert (value.is_sequence);
+  return *value.flag_sequence;
+}
+
 const vector<int>& 
 AttributeList::integer_sequence (const string& key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Integer);
+  assert (value.is_sequence);
+  return *value.integer_sequence;
+}
+
+const vector<int>& 
+AttributeList::integer_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::Integer);
@@ -708,8 +771,26 @@ AttributeList::time_sequence (const string& key) const
   return *value.time_sequence;
 }
 
+const vector<const Time*>& 
+AttributeList::time_sequence (const char* key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Date);
+  assert (value.is_sequence);
+  return *value.time_sequence;
+}
+
 const vector<const PLF*>& 
 AttributeList::plf_sequence (const string& key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::PLF);
+  assert (value.is_sequence);
+  return *value.plf_sequence;
+}
+
+const vector<const PLF*>& 
+AttributeList::plf_sequence (const char* key) const
 {
   const Value& value = impl.lookup (key);
   assert (value.type == Syntax::PLF);
