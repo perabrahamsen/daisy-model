@@ -305,8 +305,8 @@ void
 Bioclimate::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   
-  syntax.add ("NoOfIntervals", Syntax::Integer);
-  syntax.add ("intercepted_water", Syntax::Number);
+  syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const);
+  syntax.add ("intercepted_water", Syntax::Number, Syntax::InOut);
   alist.add ("intercepted_water", 0.0);
   add_submodule<Snow> ("Snow", syntax, alist);
 }

@@ -112,12 +112,12 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
   syntax.add_class ("column", Column::library (), &Column::derive_type);
   syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
-  syntax.add_object ("chief", Manager::library ());
-  syntax.add ("time", Syntax::Date);
-  syntax.add_sequence ("field", Column::library ());
+  syntax.add_object ("chief", Manager::library (), Syntax::Const);
+  syntax.add ("time", Syntax::Date, Syntax::InOut);
+  syntax.add_sequence ("field", Column::library (), Syntax::InOut);
   syntax.add_output ("log", syntax, Syntax::Sparse);
-  syntax.add_object ("weather", Weather::library ());
-  syntax.add_object ("groundwater", Groundwater::library ());
+  syntax.add_object ("weather", Weather::library (), Syntax::Const);
+  syntax.add_object ("groundwater", Groundwater::library (), Syntax::Const);
 }
 
 Daisy::~Daisy ()

@@ -51,13 +51,16 @@ TAGS: $(SRC) $(HEAD)
 print:
 	mp -p /home/user_13/fischer/bin/mp.pro.none -a4 $(TEXT) | parr -s | up -n pup | lpr -Pduplex
 
-test:	crop-test water-test
+test:	crop-test water-test evapo-test
 
 water-test:	daisy 
 	(cd test/water; make test )
 
 crop-test:	daisy 
 	(cd test/crop; make test )
+
+evapo-test:	daisy 
+	(cd test/evapo; make test )
 
 check:	daisy
 	(cd exp; make test )

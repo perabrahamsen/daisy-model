@@ -119,11 +119,11 @@ HorizonM_BaCSyntax::HorizonM_BaCSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("Theta_sat", Syntax::Number);
-  syntax.add ("Theta_res", Syntax::Number);
-  syntax.add ("lambda", Syntax::Number);
-  syntax.add ("h_b", Syntax::Number);
-  syntax.add ("K_sat", Syntax::Number);
+  syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
+  syntax.add ("Theta_res", Syntax::Number, Syntax::Const);
+  syntax.add ("lambda", Syntax::Number, Syntax::Const);
+  syntax.add ("h_b", Syntax::Number, Syntax::Const);
+  syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
   Horizon::add_type ("M_BaC", alist, syntax, &HorizonM_BaC::make);
 }

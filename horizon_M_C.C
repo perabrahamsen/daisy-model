@@ -109,10 +109,10 @@ HorizonM_CSyntax::HorizonM_CSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("Theta_sat", Syntax::Number);
-  syntax.add ("h_b", Syntax::Number);
-  syntax.add ("b", Syntax::Number);
-  syntax.add ("K_sat", Syntax::Number);
+  syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
+  syntax.add ("h_b", Syntax::Number, Syntax::Const);
+  syntax.add ("b", Syntax::Number, Syntax::Const);
+  syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
   Horizon::add_type ("M_C", alist, syntax, &HorizonM_C::make);
 }

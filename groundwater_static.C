@@ -76,7 +76,7 @@ GroundwaterStaticSyntax::GroundwaterStaticSyntax ()
 { 
   Syntax* syntax = new Syntax ();
   AttributeList* alist = new AttributeList ();
-  syntax->add ("table", Syntax::Number);
+  syntax->add ("table", Syntax::Number, Syntax::Const);
   alist->add ("table", 1.0);	// Positive number indicates flux bottom.
   Groundwater::add_type ("static", *alist, *syntax, &GroundwaterStatic::make);
 }

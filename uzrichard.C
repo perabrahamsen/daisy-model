@@ -495,10 +495,10 @@ UZRichard::output (const string name, Log& log, const Filter* filter) const
   if (filter->check (name))
     {
       filter = filter->lookup (name);
-      if (filter->check ("UZRichard"))
+      if (filter->check ("richards"))
 	{
-	  filter = filter->lookup ("UZRichard");
-	  log.open (name, "UZRichard");
+	  filter = filter->lookup ("richards");
+	  log.open (name, "richards");
 	  log.output ("q_up", filter, var.q_up);
 	  log.output ("q_down", filter, var.q_down);
 	  log.output ("iterations", filter, var.iterations);
@@ -536,15 +536,15 @@ UZRichardSyntax::UZRichardSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   
-  syntax.add ("max_time_step_reductions", Syntax::Integer);
+  syntax.add ("max_time_step_reductions", Syntax::Integer, Syntax::Const);
   alist.add ("max_time_step_reductions", 4);
-  syntax.add ("time_step_reduction", Syntax::Integer);
+  syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const);
   alist.add ("time_step_reduction", 4);
-  syntax.add ("max_iterations", Syntax::Integer);
+  syntax.add ("max_iterations", Syntax::Integer, Syntax::Const);
   alist.add ("max_iterations", 25);
-  syntax.add ("max_absolute_difference", Syntax::Number);
+  syntax.add ("max_absolute_difference", Syntax::Number, Syntax::Const);
   alist.add ("max_absolute_difference", 0.002);
-  syntax.add ("max_relative_difference", Syntax::Number);
+  syntax.add ("max_relative_difference", Syntax::Number, Syntax::Const);
   alist.add ("max_relative_difference", 0.001);
   syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
   syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);

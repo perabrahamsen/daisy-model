@@ -21,7 +21,7 @@ public:
   { Number, List, Rules, CSMP, Function, Array, Boolean, String,
     Date, Integer, Output, Class, Object, Sequence, Layers, Error };
   enum required
-  { Mandatory, Sparse, Optional, LogOnly };
+  { Const, InOut, Mixed, Sparse, Optional, LogOnly };
   bool check (string, const AttributeList&, const Log&, 
 	      bool sparse = false) const;
   bool check (const AttributeList&) const;
@@ -32,15 +32,15 @@ public:
   const Library& library (string) const;
   derive_fun derive (string) const;
   int  size (string) const;
-  void add (string, type, required = Mandatory);
-  void add (string, const Syntax&, required = Mandatory);
-  void add (string, const FTable*, required = Mandatory);
-  void add (string, const int, required = Mandatory);
-  void add_output (string, const Syntax&, required = Sparse);
+  void add (string, type, required);
+  void add (string, const Syntax&, required = Mixed);
+  void add (string, const FTable*, required);
+  void add (string, const int, required);
+  void add_output (string, const Syntax&, required);
   void add_class (string, const Library&, derive_fun);
-  void add_object (string, const Library&, required = Mandatory);
-  void add_sequence (string, const Library&, required = Mandatory);
-  void add_layers (string, const Library&, required = Mandatory);
+  void add_object (string, const Library&, required = Mixed);
+  void add_sequence (string, const Library&, required = Mixed);
+  void add_layers (string, const Library&, required = Mixed);
   Syntax ();
   ~Syntax ();
 };

@@ -42,7 +42,9 @@ Syntax::Implementation::check (string name, const AttributeList& vl,
     {
       string key = (*i).first;
       required state = status[key];
-      if (!sparse && state == Mandatory && !vl.check (key))
+      if (!sparse
+	  && (state == InOut || state == Const || state == Mixed)
+	  && !vl.check (key))
 	{
 	  log.err () << "Attributte " << key << " missing\n";
 	  error = true;
@@ -97,7 +99,8 @@ Syntax::Implementation::check (const AttributeList& vl)
        i++)
     {
       string key = (*i).first;
-      if (status[key] == Mandatory && !vl.check (key))
+      if ((status[key] == InOut|| status[key] == Const || status[key] == Mixed)
+	  && !vl.check (key))
 	return false;
       else if (types[key] == Sequence && vl.check (key))
 	{
@@ -170,30 +173,35 @@ Syntax::lookup (string key) const
 Syntax::required
 Syntax::status (string key) const
 {
+  assert (impl.status.find (key) != impl.status.end ());
   return impl.status[key];
 }
 
 const Syntax&
 Syntax::syntax (string key) const
 {
+  assert (impl.syntax.find (key) != impl.syntax.end ());
   return *impl.syntax[key];
 }
 
 const FTable*
 Syntax::function (string key) const
 {
+  assert (impl.ftables.find (key) != impl.ftables.end ());
   return impl.ftables[key];
 }
 
 const Library&
 Syntax::library (string key) const
 {
+  assert (impl.libraries.find (key) != impl.libraries.end ());
   return *impl.libraries[key];
 }
 
 derive_fun
 Syntax::derive (string key) const
 {
+  assert (impl.derived.find (key) != impl.derived.end ());
   return impl.derived[key];
 }
 

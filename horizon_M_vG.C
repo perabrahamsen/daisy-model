@@ -135,11 +135,11 @@ HorizonM_vGSyntax::HorizonM_vGSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("Theta_sat", Syntax::Number);
-  syntax.add ("Theta_res", Syntax::Number);
-  syntax.add ("alpha", Syntax::Number);
-  syntax.add ("n", Syntax::Number);
-  syntax.add ("K_sat", Syntax::Number);
+  syntax.add ("Theta_sat", Syntax::Number, Syntax::Const);
+  syntax.add ("Theta_res", Syntax::Number, Syntax::Const);
+  syntax.add ("alpha", Syntax::Number, Syntax::Const);
+  syntax.add ("n", Syntax::Number, Syntax::Const);
+  syntax.add ("K_sat", Syntax::Number, Syntax::Const);
 
   Horizon::add_type ("M_vG", alist, syntax, &HorizonM_vG::make);
 }

@@ -123,13 +123,13 @@ WeatherSimpleSyntax::WeatherSimpleSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("Latitude", Syntax::Number);
+  syntax.add ("Latitude", Syntax::Number, Syntax::Const);
   alist.add ("Latitude", 56.0);
-  syntax.add ("T1", Syntax::Number);
+  syntax.add ("T1", Syntax::Number, Syntax::Const);
   alist.add ("T1", -2.0);
-  syntax.add ("T2", Syntax::Number);
+  syntax.add ("T2", Syntax::Number, Syntax::Const);
   alist.add ("T2", 2.0);
-  syntax.add ("precipitation", Syntax::Number);
+  syntax.add ("precipitation", Syntax::Number, Syntax::Const);
   alist.add ("precipitation", 0.0);
   Weather::add_type ("simple", alist, syntax, &WeatherSimple::make);
 }

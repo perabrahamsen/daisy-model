@@ -96,11 +96,11 @@ Surface::output (Log& log, const Filter* filter) const
 void
 Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("lake", Syntax::Number);
+  syntax.add ("lake", Syntax::Number, Syntax::Const);
   alist.add ("lake", -1.0);
-  syntax.add ("pond", Syntax::Number);
+  syntax.add ("pond", Syntax::Number, Syntax::InOut);
   alist.add ("pond", 0.0);
-  syntax.add ("flux", Syntax::Boolean);
+  syntax.add ("flux", Syntax::Boolean, Syntax::InOut);
   alist.add ("flux", true);
   syntax.add ("Es", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);

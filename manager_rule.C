@@ -53,6 +53,6 @@ ManagerRuleSyntax::ManagerRuleSyntax ()
 {
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("rules", Syntax::Rules);
+  syntax.add ("rules", Syntax::Rules, Syntax::Const);
   Manager::add_type ("rule", alist, syntax, &ManagerRule::make);
 }

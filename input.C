@@ -625,7 +625,18 @@ Parser::get_filter (const Syntax& syntax)
 	{
 	  skip ("(");
 	  string name = get_id ();
-	  switch (syntax.lookup (name))
+	  Syntax::type type = syntax.lookup (name);
+	  if (type == Syntax::Error)
+	    {
+	      error (string ("Unknown attribute `") + name + "'");
+	      skip_to_end ();  
+	    }
+	  else if (syntax.status (name) == Syntax::Const)
+	    {
+	      error (string ("Constant attribute `") + name + "'");
+	      skip_to_end ();  
+	    }
+	  else switch (type)
 	    {
 	    case Syntax::List:
 	      filter->add (name, get_filter (syntax.syntax (name)));
@@ -636,14 +647,8 @@ Parser::get_filter (const Syntax& syntax)
 	    case Syntax::Sequence:
 	      filter->add (name, get_filter_sequence (syntax.library (name)));
 	      break;
-	    case Syntax::Error:
-	      error (string ("Unknown attribute `")
-		     + name + "'");
-	      skip_to_end ();   
-	      break;
 	    default:
-	      error (string ("Atomic attribute `")
-		     + name + "'");
+	      error (string ("Atomic attribute `") + name + "'");
 	      skip_to_end ();   
 	    }
 	  skip (")");
@@ -651,10 +656,12 @@ Parser::get_filter (const Syntax& syntax)
       else 
 	{
 	  string name = get_id ();
-	  if (syntax.lookup (name) != Syntax::Error)
-	    filter->add (name);
-	  else
+	  if (syntax.lookup (name) == Syntax::Error)
 	    error (string ("Attribute `") + name + "' not known");
+	  else if (syntax.status (name) == Syntax::Const)
+	    error (string ("Attribute `") + name + "' is const");
+	  else
+	    filter->add (name);
 	}
     }
   return filter;
@@ -663,15 +670,23 @@ Parser::get_filter (const Syntax& syntax)
 const Filter*
 Parser::get_filter_object (const Library& library)
 {
-  const Filter* filter = Filter::all;
-  skip ("(");
+  if (looking_at ('*'))
+    {
+      skip ("*");
+      return Filter::all;
+    }  
   string name = get_id ();
   if (library.check (name))
-    filter = get_filter (library.syntax (name));
+    {
+      FilterSome* filter = new FilterSome ();
+      filter->add (name, get_filter (library.syntax (name)));
+      return filter;
+    }
   else 
-    error (string ("Unknown object `") + name + "' in filter");
-  skip (")");
-  return filter;
+    {
+      error (string ("Unknown object `") + name + "' in filter");
+      return Filter::all;
+    }
 }
 
 const Filter*

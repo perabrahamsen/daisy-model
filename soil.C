@@ -76,11 +76,11 @@ Soil::check (Log& /* log */) const
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add_layers ("horizons", Horizon::library ());
-  syntax.add ("zplus", Syntax::Array);
-  syntax.add ("EpFactor", Syntax::Number);
+  syntax.add_layers ("horizons", Horizon::library (), Syntax::Mixed);
+  syntax.add ("zplus", Syntax::Array, Syntax::Const);
+  syntax.add ("EpFactor", Syntax::Number, Syntax::Const);
   alist.add ("EpFactor", 0.8);
-  syntax.add ("EpInterchange", Syntax::Number);
+  syntax.add ("EpInterchange", Syntax::Number, Syntax::Const);
   alist.add ("EpInterchange", 0.6);
 }
   
