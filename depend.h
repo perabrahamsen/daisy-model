@@ -12,7 +12,8 @@ struct Treelog;
 struct Syntax;
 struct AttributeList;
 
-typedef map<string, set<string>/**/> dep_map;
+typedef set<string, less<string>/**/> string_set;
+typedef map<string, string_set, less<string>/**/> dep_map;
 
 bool
 has_dependencies (const string& component, const string& parameterization);

@@ -348,8 +348,8 @@ resequence (const string& component, const string& parameterization,
        i++)
     {
       const string component = (*i).first;
-      const set<string>& pars = (*i).second;
-      for (set<string>::const_iterator j = pars.begin ();
+      const string_set& pars = (*i).second;
+      for (string_set::const_iterator j = pars.begin ();
 	   j != pars.end ();
 	   j++)
 	deps.push_back (spair (component, *j));
