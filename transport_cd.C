@@ -301,14 +301,11 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   if (size + 1 > J.size ())
     J.insert (J.begin (), size + 1 - J.size (), 0.0);
 
-  J[0] = J_in;
+  J[0] = J_in - S_top * soil.dz (0);
   for (unsigned int i = 0; i < size; i++)
     {
-      double S_term = S[i];
-      if (i == 0)
-	S_term += S_top;
       assert (M[i] >= 0.0);
-      J[i + 1] = (((M[i] - M_prev[i]) / dt) - S_term) * soil.dz (i) + J[i];
+      J[i + 1] = (((M[i] - M_prev[i]) / dt) - S[i]) * soil.dz (i) + J[i];
     }
 }
 

@@ -1,4 +1,21 @@
+1999-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.69 released.
+
+1999-02-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (output): Fix calculation of total C and N.
+
+	* lib/log.dai ("Total Soil Content"): Added buffer C and N.
+
+	* transport_cd.C (tick): Add `S_top' to J[0].
+
+	* lib/log.dai ("Crop Production"): Added `water_stress' and
+	`nitrogen_stress', output at hour 12.
+
 1999-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (Buffer::tick): Added assertions.
 
 	* Version 0.68 released.
 

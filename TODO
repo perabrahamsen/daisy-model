@@ -1,4 +1,10 @@
+* Ny daisy.exe samt daisy-lib.zip til Mette.
+
 * Implementer put/get DLL funktioner til overflade kemi.
+
+Vi skal have et bioklima flag der forhindrer kemikalier i at forlade
+overfladen.  På den måde vil der aldrig blive oprettet nogen
+soil_chemicals! 
 
 * Document 
 
@@ -44,9 +50,9 @@
 
 ** Hutig måde at skippe log på i Daisy::output, hvis condition er falsk.
 
-* Cloning.
+* LogTable: Gør det muligt at logge min/max værdier i tidsinterval.
 
-** Giv hver søjle en "size" som bruges ved merge.
+* Cloning.
 
 ** Check af clone af vegetation virker.
 

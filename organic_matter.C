@@ -102,6 +102,10 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 					     double N_soil, double& N_used,
 					     const vector<OM*>& som)
 {
+  assert (som[where]->C[i] >= 0.0);
+  assert (C[i] >= 0.0);
+  assert (N[i] >= 0.0);
+
   // assert (N_soil * 1.001 >= N_used);
   // How much can we process?
   double rate;
@@ -249,17 +253,17 @@ OrganicMatter::Implementation::output (Log& log, Filter& filter,
 	      new_total_C += som[j]->C[i];
 	      new_total_N += som[j]->C[i] / som[j]->C_per_N[i];
 	    }
-	  const int all_am_size = am.size ();
-	  for (int k = 0; k < all_am_size; k++)
-	    {
-	      new_total_C += am[k]->total_C (geometry);
-	      new_total_N += am[k]->total_N (geometry);
-	    }
 	  new_total_C += buffer.C[i];
 	  new_total_N += buffer.N[i];
 
 	  total_C += new_total_C * geometry.dz (i);
 	  total_N += new_total_N * geometry.dz (i);
+	}
+      const int all_am_size = am.size ();
+      for (int k = 0; k < all_am_size; k++)
+	{
+	  total_C += am[k]->total_C (geometry);
+	  total_N += am[k]->total_N (geometry);
 	}
       log.output ("total_N", filter, total_N, true);
       log.output ("total_C", filter, total_C, true);
