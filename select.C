@@ -26,6 +26,7 @@
 #include "units.h"
 #include "symbol.h"
 #include "format.h"
+#include "submodel.h"
 #include <numeric>
 #include <set>
 
@@ -71,9 +72,16 @@ struct Select::Implementation
     const vector<symbol> submodels_and_attribute;
     
     // Use.
+    const Syntax& leaf_syntax (Syntax&) const;
+    const string& leaf_name () const;
     const string& dimension () const;
+    const string& description () const;
+    void refer (Format&) const;
 
     // Create and Destroy.
+    static bool check_path (const vector<symbol>& path,
+			    const Syntax* syntax,
+			    Treelog& err);
     static bool check_alist (const AttributeList& al, Treelog& err);
     static void load_syntax (Syntax& syntax, AttributeList&);
     Spec (const AttributeList&);
@@ -92,27 +100,115 @@ struct Select::Implementation
 
   // Create and Destroy.
   bool check (const string& spec_tdim, Treelog& err) const;
-  static string find_description (const AttributeList& al);
+  static string find_description (const AttributeList&);
   Implementation (const AttributeList& al);
   ~Implementation ();
 };
 
-const string&
-Select::Implementation::Spec::dimension () const
+const Syntax&
+Select::Implementation::Spec::leaf_syntax (Syntax& buffer) const
 {
-  const Library& library = Library::find (library_name);
-  const Syntax* syntax = &library.syntax (model_name);
+  const Syntax* syntax;
+
+  if (library_name == symbol ("fixed"))
+    {
+      AttributeList alist;
+      Submodel::load_syntax (model_name.name (), buffer, alist);
+      syntax = &buffer;
+    }
+  else
+    {
+      const Library& library = Library::find (library_name);
+      syntax = &library.syntax (model_name);
+    }
 
   for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
     syntax = &syntax->syntax (submodels_and_attribute[i].name ());
-  
-  const string& attribute_name = submodels_and_attribute.back ().name ();
-  const Syntax::type type = syntax->lookup (attribute_name);
 
-  if (type == Syntax::Number)
-    return syntax->dimension (attribute_name);
+  return *syntax;
+}
+
+const string&
+Select::Implementation::Spec::leaf_name () const
+{ return submodels_and_attribute.back ().name (); }
+
+const string&
+Select::Implementation::Spec::dimension () const
+{
+  Syntax buffer;
+  const Syntax& syntax = leaf_syntax (buffer);
+  if (syntax.lookup (leaf_name ()) == Syntax::Number)
+    return syntax.dimension (leaf_name ());
   else
     return Syntax::Unknown ();
+}
+
+const string&
+Select::Implementation::Spec::description () const
+{ 
+  Syntax buffer;
+  return leaf_syntax (buffer).description (leaf_name ()); 
+}
+
+void 
+Select::Implementation::Spec::refer (Format& format) const
+{
+  format.text (" ");
+  if (library_name != symbol ("fixed"))
+    {
+      format.text (library_name.name ());
+      format.special ("nbsp");
+    }
+  format.text (model_name.name ());
+  format.text (" ");
+  format.text ("(section");
+  format.special ("nbsp");
+  format.ref (library_name.name (), model_name.name ());
+  format.text (")");
+  string aref = model_name.name ();
+  for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
+    {
+      const string name = submodels_and_attribute[i].name ();
+      aref += "+" + name;
+      format.text (" ");
+      format.text (name);
+    }
+  format.text (" ");
+  format.text ("(page");
+  format.special ("nbsp");
+  format.pageref (library_name.name (), aref);
+  format.text (")");
+}
+
+bool 
+Select::Implementation::Spec::check_path (const vector<symbol>& path,
+					  const Syntax* syntax,
+					  Treelog& err)
+{
+  bool ok = true;
+  for (unsigned int i = 0; i < path.size (); i++)
+    {
+      const symbol name = path[i];
+      bool last = (i + 1 == path.size ());
+      const Syntax::type type = syntax->lookup (name.name ());
+
+      if (!last)
+	{
+	  if (type != Syntax::AList)
+	    {
+	      err.entry ("'" + name + "': no such submodel");
+	      ok = false;
+	      break;
+	    }
+	  syntax = &syntax->syntax (name.name ());
+	}
+      else if (type == Syntax::Error)
+	{
+	  err.entry ("'" + name + "': no such attribute");
+	  ok = false;
+	}
+    }
+  return ok;
 }
 
 bool 
@@ -131,7 +227,23 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
       err.entry ("You must specify an attribute");
       ok = false;
     }
-  if (!Library::exist (library_name))
+  if (library_name.name () == "fixed")
+    {
+      if (!Submodel::registered (model_name.name ()))
+	{
+	  err.entry ("'" + model_name + "': no such model");
+	  ok = false;
+	}
+      else
+	{
+	  Syntax syntax;
+	  AttributeList alist;
+	  Submodel::load_syntax (model_name.name (), syntax, alist);
+	  if (!check_path (submodels_and_attribute, &syntax, err))
+	    ok = false;
+	}
+    }
+  else if (!Library::exist (library_name))
     {
       err.entry ("'" + library_name + "': no such library");
       ok = false;
@@ -148,29 +260,8 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
       else
 	{
 	  const Syntax* syntax = &library.syntax (model_name);
-	  
-	  for (unsigned int i = 0; i < submodels_and_attribute.size (); i++)
-	    {
-	      const symbol name = submodels_and_attribute[i];
-	      bool last = (i + 1 == submodels_and_attribute.size ());
-	      const Syntax::type type = syntax->lookup (name.name ());
-
-	      if (!last)
-		{
-		  if (type != Syntax::AList)
-		    {
-		      err.entry ("'" + name + "': no such submodel");
-		      ok = false;
-		      break;
-		    }
-		  syntax = &syntax->syntax (name.name ());
-		}
-	      else if (type == Syntax::Error)
-		{
-		  err.entry ("'" + name + "': no such attribute");
-		  ok = false;
-		}
-	    }
+	  if (!check_path (submodels_and_attribute, syntax, err))
+	    ok = false;
 	}
     }
   return ok;
@@ -181,9 +272,10 @@ Select::Implementation::Spec::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add_check (check_alist);
   syntax.add ("library", Syntax::String, Syntax::Const, "\
-Name of library where the attribute belong.");
+Name of library where the attribute belong.\n\
+Use 'fixed' to denote a fixed component.");
   syntax.add ("model", Syntax::String, Syntax::Const, "\
-Name of model where the attribute belong.");
+Name of model or fixed component where the attribute belongs.");
   syntax.add ("submodels_and_attribute", Syntax::String, 
 	      Syntax::Const, Syntax::Sequence, "\
 Name of submodels and attribute.");
@@ -220,7 +312,7 @@ Select::Implementation::check (const string& spec_dim, Treelog& err) const
   return ok;
 }
   
-static string 
+string 
 Select::Implementation::find_description (const AttributeList& al)
 {
   const Library& library = Librarian<Select>::library ();
@@ -341,6 +433,17 @@ Select::document (Format& format) const
     {
       format.soft_linebreak ();
       format.text (impl.description);
+    }
+  else if (impl.spec)
+    {
+      if (impl.negate)
+	{
+	  format.special ("nbsp");
+	  format.text ("(reversed)");
+	}
+      impl.spec->refer (format);
+      format.soft_linebreak ();
+      format.text (impl.spec->description ());
     }
 }
 

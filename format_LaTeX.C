@@ -65,6 +65,7 @@ struct FormatLaTeX : public Format
   void hard_linebreak ();
   void new_paragraph ();
   void index (const std::string& name);
+  void pageref (const std::string& scope, const std::string& id);
   void ref (const std::string& scope, const std::string& id);
   void see (const std::string& type,
 	    const std::string& scope, const std::string& id);
@@ -345,6 +346,10 @@ FormatLaTeX::index (const std::string& name)
 }
 
 void
+FormatLaTeX::pageref (const std::string& scope, const std::string& id)
+{ out () << "\\pageref{" << scope << ":" << id << "}"; }
+
+void
 FormatLaTeX::ref (const std::string& scope, const std::string& id)
 { out () << "\\ref{" << scope << ":" << id << "}"; }
 
@@ -356,8 +361,11 @@ FormatLaTeX::see (const std::string& type,
 void
 FormatLaTeX::see_page (const std::string& scope, const std::string& id)
 {
-  out () << "(see \\ref{" << scope << ":" << id << "}, page \\pageref{"
-	 << scope << ":" << id << "})";
+  out () << "(see ";
+  ref (scope, id);
+  out () << ", page ";
+  pageref (scope, id);
+  out () << ")";
 }
 
 static struct FormatLaTeXSyntax

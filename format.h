@@ -202,6 +202,7 @@ public:
   virtual void hard_linebreak () = 0;
   virtual void new_paragraph () = 0;
   virtual void index (const std::string& name) = 0;
+  virtual void pageref (const std::string& scope, const std::string& id) = 0;
   virtual void ref (const std::string& scope, const std::string& id) = 0;
   virtual void see (const std::string& type,
 		    const std::string& scope, const std::string& id) = 0;

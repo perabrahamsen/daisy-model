@@ -344,7 +344,7 @@ Library::base_model (const symbol parameterization) const
 }
 
 bool 
-Library::has_interesting_description (const AttributeList& alist)
+Library::has_interesting_description (const AttributeList& alist) const
 {
   // A missing description is boring.
   if (!alist.check ("description"))

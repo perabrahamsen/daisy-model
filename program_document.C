@@ -35,15 +35,12 @@
 
 struct ProgramDocument : public Program
 {
-  
-
   // Content.
   XRef xref;
   std::auto_ptr<Format> format;
   const bool print_parameterizations;
   // remember this for models.
   symbol current_component;
-  bool submodel;
 
   // LaTeX functions.
   void print_description (const std::string& description);
@@ -234,7 +231,6 @@ ProgramDocument::print_entry_submodel (const std::string& name,
 
   if (type == Syntax::AList)
     {
-      submodel = true;		// Affects how the sample header looks.
       const Syntax& child = syntax.syntax (name);
       const AttributeList& nested 
 	= (size != Syntax::Singleton || !alist.check (name))
@@ -245,8 +241,6 @@ ProgramDocument::print_entry_submodel (const std::string& name,
 	  print_sample (name, child, nested);
 	  print_submodel (name, level, child, nested);
 	}
-      if (level == 1)
-	submodel = false;
     }
 }
     
