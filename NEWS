@@ -16,6 +16,26 @@ release.
 
 ** Fixed mass balance error in mineralization.
 
+When removing tiny organic matter pools, their remaining C was
+incorporated into the SOM, but not their N.  This could add up to 1 kg
+N inbalance over 10 years under some circumstances.
+
+** Imobilization is now restricted by available nitrogen.
+
+It used to run on full speed, even when there was no nitrogen to
+immobilize.
+
+** Fixed bug in the Cosby hydraulic model.
+
+The estimated conductivity was far too low to be useful.
+
+** The cd transport model can switch to smaller timesteps.
+
+This will happen in the cases where it gave negative answers, and
+eliminates the "BUG: M[0] = -1.4115e-7 after transport" messages.  The
+effect of the bug would be a slightly too low estimate on leaching for
+nitrogen starved systems.
+
 * 2.09
 
 ** There is now an index of logable variables in the reference manual.

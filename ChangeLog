@@ -1,4 +1,17 @@
+2002-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.11 released.
+
+2002-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport_cd.C: Decrease timestep if we get negative results.
+	* solute.C: Added reserve transport model.
+	(tick): Added checks.
+
 2002-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_Cosby.C (initialize): Use pow (10, x), not exp (x) for
+	K_sat and h_b.
 
 	* om.C (tick): Really fix the mass balance bug.
 

@@ -52,6 +52,7 @@ protected:
   vector<double> J;		// Solute transport log in matrix.
   vector<double> J_p;		// Solute transport log in macropores.
   Transport& transport;		// Solute transport model in matrix.
+  Transport& reserve;		// Reserve solute transport model in matrix.
   Mactrans& mactrans;		// Solute transport model in macropores.
   Adsorption& adsorption;	// Solute adsorption.
   

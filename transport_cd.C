@@ -30,6 +30,10 @@
 
 class TransportCD : public Transport
 {
+  // Parameters.
+private:
+  int max_time_step_reductions;
+
   // Log variable.
 private:
   double ddt;
@@ -47,6 +51,7 @@ public:
 public:
   TransportCD (const AttributeList& al)
     : Transport (al.name ("type")),
+      max_time_step_reductions (al.integer ("max_time_step_reductions")),
       ddt (dt)
     { }
 };
@@ -186,6 +191,11 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   ddt = 1.0;
   for (unsigned int i = 0; i < size; i++)
     ddt = min (ddt, pow (soil.dz (i), 2) / (2 * D[i + 1]));
+  int time_step_reductions = 0;
+
+  // We rstart from here if anything goes wrong.
+ try_again:;
+
   // Loop through small time steps.
   for (double old_t = 0.0, t = ddt; 
        old_t != t;
@@ -310,19 +320,25 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
       // Calculate new concentration.
       tridia (0, size, a, b, c, d, C.begin ());
 
+      // Check solution.
+      for (unsigned int j = 0; j < size; j++)
+	if (C[j] < 0.0)
+	  {
+	    ddt *= 0.5;
+	    C = C_prev;
+	    time_step_reductions++;
+	    if (time_step_reductions > max_time_step_reductions)
+	      throw ("convection-dispersion gave negative solution");
+	    goto try_again;
+	  }
+
       // Update M and C.
       for (unsigned int j = 0; j < size; j++)
 	{
 	  // We use the old absorbed stuff plus the new dissolved stuff.
-	  M[j] = A[j] + Theta_new[j] * C[j];
+ 	  M[j] = A[j] + Theta_new[j] * C[j];
+	  assert (M[j] >= 0.0);
 
-	  if (M[j] < 0.0)
-	    { 
-	      if (M[j] < -1e-13) // 1 mg/ha
-		CERR << "\nBUG: M[" << j << "] = " << M[j] 
-		     << " after transport\n";
-	      M[j] = 0.0;
-	    }
 	  // We calculate new C by assumining instant absorption.
 	  C[j] = solute.M_to_C (soil, Theta_new[j], j, M[j]);
 	}
@@ -355,6 +371,10 @@ static struct TransportCDSyntax
 	       "Solute transport using convection-dispersion.");
     syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
 		"Time step used in the numeric solution.");
+    syntax.add ("max_time_step_reductions",
+		Syntax::Integer, Syntax::Const, "\
+Number of times we may reduce the time step before giving up");
+    alist.add ("max_time_step_reductions", 20);
     Librarian<Transport>::add_type ("cd", alist, syntax, &make);
   }
 } TransportCD_syntax;

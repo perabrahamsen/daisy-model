@@ -87,6 +87,7 @@ Solute::tick (const Soil& soil,
 	    CERR << "BUG: q_p[0] = " << soil_water.q_p (0) 
 		 << " and q[0] = " << soil_water.q (0) << "\n";
 	  J_p[0] = J_in;
+	  J[0] = J_in;
 	}
       else
 	{
@@ -110,8 +111,23 @@ Solute::tick (const Soil& soil,
     }
 
   // Flow.
+  const double old_content = soil.total (M_);
   mactrans.tick (soil, soil_water, C_, S, S_p, J_p);
-  transport.tick (soil, soil_water, *this, M_, C_, S, J);
+  try
+    {
+      transport.tick (soil, soil_water, *this, M_, C_, S, J);
+    }
+  catch (const char* error)
+    {
+      CERR << "Transport problem: " << error << "\n";
+      reserve.tick (soil, soil_water, *this, M_, C_, S, J);
+    }
+  const double new_content = soil.total (M_);
+  const double delta_content = new_content - old_content;
+  const double source = soil.total (S);
+  const double in = -(J[0] + J_p[0]);
+  const double out = - (J[soil.size ()] + J_p[soil.size ()]);
+  assert (approximate (delta_content, source + in - out));
 }
 
 bool 
@@ -161,7 +177,14 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Solute transport model in matrix.");
   AttributeList cd;
   cd.add ("type", "cd");
+  cd.add ("max_time_step_reductions", 20);
   alist.add ("transport", cd);
+  syntax.add ("reserve", Librarian<Transport>::library (),
+	      "Reserve transport model if the primary model fails.");
+  AttributeList convection;
+  convection.add ("type", "convection");
+  alist.add ("reserve", convection);
+
   syntax.add ("mactrans", Librarian<Mactrans>::library (), 
 	      "Solute transport model in macropores.");
   AttributeList mactrans;
@@ -196,6 +219,7 @@ Only used for initialization of the 'C' parameter.");
 Solute::Solute (const AttributeList& al)
   : S_permanent (al.number_sequence ("S_permanent")),
     transport (Librarian<Transport>::create (al.alist ("transport"))),
+    reserve (Librarian<Transport>::create (al.alist ("reserve"))),
     mactrans  (Librarian<Mactrans>::create (al.alist ("mactrans"))),
     adsorption (Librarian<Adsorption>::create (al.alist ("adsorption")))
 { }
@@ -203,6 +227,7 @@ Solute::Solute (const AttributeList& al)
 Solute::~Solute ()
 { 
   delete &transport; 
+  delete &reserve; 
   delete &mactrans;
   delete &adsorption; 
 }
