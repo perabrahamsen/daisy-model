@@ -1,3 +1,23 @@
+2003-06-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.99 released.
+
+2003-06-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (precipitation_correction_key): New parameter.
+	(precipitation_correction_dai): New parameter.
+	(precipitation_correction): Removed.
+	(read_line): Update caller.
+	(initialize): Ditto.
+	(WeatherStandard): Ditto.
+	(WeatherStandardSyntax): Ditto.
+
+2003-06-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/all.dai: Added dk-horizon.dai.
+
+	* lib/dk-horizon.dai: Updated numbers.
+
 2003-06-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.98 released.

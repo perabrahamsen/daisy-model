@@ -27,6 +27,7 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 #include "units.h"
+#include "check.h"
 #include "vcheck.h"
 #include <vector>
 #include <algorithm>
@@ -91,7 +92,10 @@ struct WeatherStandard : public Weather
   int timestep;
   Time begin;
   Time end;
-  vector<double> precipitation_correction;
+  vector<double> precipitation_correction_key;
+
+  // Extra parameters.
+  vector<double> precipitation_correction_dai;
 
   // Data description.
   struct data_description_type
@@ -543,7 +547,8 @@ WeatherStandard::read_line ()
 
   // Precipitation correction.
   const int month = double2int (next_time.month ());
-  next_precipitation *= precipitation_correction[month-1];
+  next_precipitation *= precipitation_correction_key[month-1]
+    * precipitation_correction_dai[month-1];
 }
 
 void 
@@ -749,7 +754,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 		lex->warning ("Unreasonable low value");
 	      else if (val > 1.8)
 		lex->warning ("Unreasonable high value");
-	      precipitation_correction[i] = val;
+	      precipitation_correction_key[i] = val;
 	    }
 	}
       else if (key == "Begin")
@@ -946,7 +951,8 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     timestep (0),
     begin (1900, 1, 1, 0),
     end (2100, 1, 1, 0),
-    precipitation_correction (vector<double> (12, 1.0)),
+    precipitation_correction_key (vector<double> (12, 1.0)),
+    precipitation_correction_dai (al.number_sequence ("PrecipCorrect")),
     has_date (false),
     has_hour (false),
     has_temperature (false),
@@ -1101,6 +1107,27 @@ one will be used.",
 		"Below this air temperature all precipitation is snow.");
     alist.add ("T_snow", -2.0);
 
+    // PrecipCorrect.
+    syntax.add ("PrecipCorrect", Syntax::None (), Check::non_negative (), 
+		Syntax::Const, 12, "\
+The precipitation listed in the file will be multiplied by the number\n\
+from this list before it is used in the simulation, depending on the\n\
+month.  The first number corresponds to January, the second to\n\
+February, etc.  For example, the number 0.5 in the first place in the\n\
+list will mean the precipitation used in the simulation will be half\n\
+of what is listed in the file for January, while 2.0 will mean that\n\
+the precipitation used is twice the amount listed.\n\
+\n\
+If PrecipCorrect is specified both as a parameter in the Daisy setup\n\
+file and as a keyword in the Daisy weather file, the two values will\n\
+be multiplied together.\n\
+\n\
+It is suggested that the keyword is used to correct systematic\n\
+mistakes in the measurement process, while the parameter is used for\n\
+experimenting with different precipitation values and for reusing data\n\
+from one weather station in nearby areas where only average values are\n\
+known.");
+    alist.add ("PrecipCorrect", vector<double> (12, 1.0));
 
     Librarian<Weather>::add_type ("default", alist, syntax, &make);
   }

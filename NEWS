@@ -12,6 +12,25 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.99
+
+** dk-horizon.dai now has C/N values.
+
+** You can now specify PrecipCorrect in the .dai file.
+
+To double precipitation in "weather.dwf":
+
+(weather default "weather.dwf"
+	 (PrecipCorrect 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0))
+
+If you specify PrecipCorrect in with the .dai file and the .dwf file,
+both will be applied.
+
+It is suggested that the numbers in the .dwf should represent
+corrections based on systematic errors in the measurement process,
+while corrections done as experiments and attempts to use the data at
+different locales should be located in the .dai file.
+
 * 2.98
 
 ** Bug fixes.
