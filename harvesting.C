@@ -268,9 +268,9 @@ Harvesting::operator() (const string& column_name,
 
   // Dead or alive?
   if (!kill_off && DS < DSmax
-      // BUG: Grass may actually live even if cut all the way, but we
-      // can't model that yet.
-      && stem_harvest < 0.99)
+      // It may survive by canibalizing its own roots.
+      // && stem_harvest < 0.99
+      )
     {
       // Cut delay.
       const double removed_DM = old_DM - production.DM ();
@@ -479,8 +479,7 @@ Valuable fraction of storage organ (DM), e.g. grain or tuber.");
   syntax.add ("EconomicYield_N", Syntax::None (), Syntax::OptionalConst,
                "Valuable fraction of storage organ (N).\n\
 By default the value for DM is used.");
-  static const RangeII range_max (0.0, 2.0);
-  syntax.add ("DSmax", Syntax::None (), range_max, Syntax::Const, "\
+  syntax.add ("DSmax", Syntax::None (), Check::positive (), Syntax::Const, "\
 Maximal development stage for which the crop survives harvest.");
   alist.add ("DSmax", 0.80);
   static const RangeII range_new (0.0, 1.0);

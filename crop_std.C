@@ -185,6 +185,8 @@ CropStandard::tick (const Time& time,
 		    vector<double>& residuals_C_soil,
 		    Treelog& msg)
 {
+  Treelog::Open nest (msg, name);
+
   // Update cut stress.
   harvesting.tick (time);
 
@@ -204,7 +206,7 @@ CropStandard::tick (const Time& time,
       development.emergence ();
       if (development.DS >= 0)
 	{
-	  msg.message (string (" [") + name + " is emerging]");
+	  msg.message ("emerging");
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development.DS);
 	  nitrogen.content (development.DS, production);

@@ -136,16 +136,16 @@ Production::tick (const double AirT, const double SoilT,
   bool ReleaseOfRootReserves = false;
   if (DS1 > IntDSRelRtRes && DS1 < EndDSRelRtRes)
     {
-       if (WLeaf < LfRtRelRtRes * WRoot)
-         {
-            double RootRelease = RelRateRtRes * WRoot / 24.;
-            CH2OPool += RootRelease;
-            WRoot -= RootRelease;
-            ReleaseOfRootReserves = true;
-	    TmpStream tmp;
-	    tmp () << "Extra CH2O: " << RootRelease;
-	    msg.error (tmp.str ());
-         }
+      if (WLeaf < LfRtRelRtRes * WRoot)
+	{
+	  const double RootRelease = RelRateRtRes * WRoot / 24.;
+	  CH2OPool += RootRelease;
+	  WRoot -= RootRelease;
+	  ReleaseOfRootReserves = true;
+	  TmpStream tmp;
+	  tmp () << "Released root CH2O: " << RootRelease;
+	  msg.message (tmp.str ());
+	}
     }
   double NetAss = CanopyAss;
 

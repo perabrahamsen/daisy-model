@@ -12,6 +12,18 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.43
+
+** New TSum phenology model.
+
+Simply specify a temeprature sum for each fase:: emergence, vegetative
+and reproductive.
+
+ (Devel TSum 
+	(EmrTSum 100.0 [dg C d])
+	(VegTSum 760.0 [dg C d])
+	(RepTSum 740.0 [dg C d]))
+
 * 2.42
 
 ** Fixed bug in hypres implementation.

@@ -1,4 +1,23 @@
+2003-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (tick): Modify messages.
+
+	* harvesting.C (load_syntax): Allow DS_max > 2.0.
+	(operator ()): Don't require stem, root reserves may be sufficient.
+
+2003-01-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (check): Don't try to run simulation if we could
+	not open the file.
+
 2003-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* phenology_std.C (EmrTSum): Removed default value (of 100).
+
+	* phenology_TSum.C: New model.
+	* Makefile (MODELS): Added it.
+
+	* hydraulic_hypres.C (initialize): Removed debug messages.
 
 	* Version 2.42 released.
 

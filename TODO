@@ -1,14 +1,24 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* EU workshop
+* Læg svar på øvelser på hjemmeside.
 
-** New "TSum" phenology model.
+* Forced LAI i planter.
 
-This models the phenology as a pure temperature sum.
+* Øvelser:
 
-** Kør øvelser igennem.
+** groundwater pipe
 
-** weather default year
+*** ref: Forklar at aquitard stopper efter nederste horisont
+
+*** ref: z_aquitard: Thickness, not height
+
+*** tut: forklar hvordan og hvornår man laver en aquitard horizont.
+
+** CanopyStandard Partit
+
+Forklar hvor meget går til hvilke steder.
+
+* weather default year
 
 Used for warming period.
 
@@ -18,7 +28,9 @@ Den skal nok være i .dai filen...
   (missing_years (((1987 1990) (1993 1997))
 	          ((2001 2001) (1991 1991)))))
 
-* Forced LAI i planter.
+* OrganicMatter XOM
+
+Gør det muligt at overskrive turnover_rate uden at sætte fractions m.m.
 
 * DOM
 

@@ -209,23 +209,10 @@ pedotransfer function");
 
   // Debug messages.
   TmpStream tmp;
-  tmp () << "clay = " << clay << "\n";
-  tmp () << "silt = " << silt << "\n";
-  tmp () << "sand = " << sand << "\n";
-  tmp () << "humus = " << humus << "\n";
-  tmp () << "db = " << rho_b << "\n";
   tmp () << "l = " << l << "\n";
-  tmp () << "l* = " << l_star << "\n";
-  tmp () << "ln ((l* + 10)/(10 - l*)) = "
-	 << log ((l_star + 10.0) / (10.0 - l_star)) << "\n";
-  
   tmp () << "m = " << m << "\n";
-  tmp () << "n* = " << n_star << "\n";
   tmp () << "n = " << n << "\n";
-  tmp () << "alpha_star = " << alpha_star << "\n";
   tmp () << "alpha = " << alpha << "\n";
-  tmp () << "a = " << a << "\n";
-  tmp () << "K_sat_star = " << K_sat_star << "\n";
   tmp () << "K_sat = " << K_sat << "\n";
   tmp () << "Theta_sat = " << Theta_sat;
   msg.debug (tmp.str ());

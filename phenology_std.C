@@ -140,7 +140,6 @@ static struct PhenologyStandardSyntax
     // Parameters.
     syntax.add ("EmrTSum", "dg C d", Syntax::Const,
 		"Soil temperature sum at emergence.");
-    alist.add ("EmrTSum", 100.0);
     syntax.add ("EmrSMF", "cm", "d", Syntax::Const,
 		"Soil moisture (h-function) effect on emergense.");
     PLF SMF;

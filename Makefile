@@ -265,7 +265,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = phenology_std.C hydraulic_hypres.C clayom_biomod.C \
+MODELS = phenology_TSum.C phenology_std.C hydraulic_hypres.C clayom_biomod.C \
         clayom_old.C hydraulic_Cosby.C pedo_linear.C adsorption_full.C \
 	equil_langmuir.C transform_equil.C condition_weather.C \
 	rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
@@ -556,7 +556,7 @@ daisy-src.zip:	$(TEXT)
 dist:	cvs
 	$(MAKE) daisy
 	mv -f $(WWWINDEX) $(WWWINDEX).old
-	sed -e 's/version [1-9]\.[0-9][0-9]/version $(TAG)/' \
+	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
 		< $(WWWINDEX).old > $(WWWINDEX)
 	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
 	$(MAKE) daisy-src.zip

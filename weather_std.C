@@ -737,21 +737,26 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 { 
   daisy_assert (lex);
   bool ok = true;
+  if (!lex->good ())
+    {
+      err.error ("file error");
+      return false;
+    }
   if (lex->error_count > 0)
     {
       TmpStream tmp;
       tmp () << lex->error_count << " parser errors encountered";
-      err.entry (tmp.str ());
-      ok = false;
+      err.error (tmp.str ());
+      return false;
     }
   if (from < begin)
     {
-      err.entry ("Simulation starts before weather data");
+      err.error ("Simulation starts before weather data");
       ok = false;
     }
   if (to > end)
     {
-      err.entry ("Simulation ends after weather data");
+      err.error ("Simulation ends after weather data");
       ok = false;
     }
   if (latitude < -66 || latitude > 66)
@@ -759,7 +764,7 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
       TmpStream tmp;
       tmp () << "Researching arctic agriculture? (latitude = " << 
 	latitude << ")";
-      err.entry (tmp.str ());
+      err.error (tmp.str ());
     }
   return ok;
 }
