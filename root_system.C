@@ -358,6 +358,7 @@ RootSystem::full_grown (Treelog& msg, const Soil& soil,
 void
 RootSystem::output (Log& log) const
 {
+  output_derived (rootdens, "rootdens", log);
   output_variable (PotRtDpt, log);
   output_variable (Depth, log);
   output_variable (Density, log);

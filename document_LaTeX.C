@@ -542,17 +542,22 @@ DocumentLaTeX::print_users (std::ostream& out, const XRef::Users& users)
 
   out << "\nUsed by ";
 
-  for (unsigned int i = 0; i < users.models.size (); i++)
+  for (std::set<XRef::ModelUser>::const_iterator i = users.models.begin ();
+       i != users.models.end ();
+       i++)
     {
-      if (i == 0)
+      std::set<XRef::ModelUser>::const_iterator next = i;
+      next++;
+
+      if (i == users.models.begin ())
 	;
-      else if (i == users.models.size () - 1 && users.submodels.empty ())
+      else if (next == users.models.end () && users.submodels.empty ())
 	out << ", and \n";
       else 
 	out << ",\n";
-      const symbol component = users.models[i].component;
-      const symbol model = users.models[i].model;
-      const std::vector<std::string>& path = users.models[i].path;
+      const symbol component = (*i).component;
+      const symbol model = (*i).model;
+      const std::vector<std::string>& path = (*i).path;
       print_quoted (out, component);
       out << " ";
       print_quoted (out, model);
@@ -566,16 +571,22 @@ DocumentLaTeX::print_users (std::ostream& out, const XRef::Users& users)
 	  << "}, page \\pageref{model:" << component << "-" << model << "})";
     }
 
-  for (unsigned int i = 0; i < users.submodels.size (); i++)
+  for (std::set<XRef::SubmodelUser>::const_iterator i 
+         = users.submodels.begin ();
+       i != users.submodels.end (); 
+       i++)
     {
-      if (i == 0 && users.models.empty ())
+      std::set<XRef::SubmodelUser>::const_iterator next = i;
+      next++;
+
+      if (i == users.submodels.begin () && users.models.empty ())
 	;
-      else if (i == users.submodels.size () - 1)
+      else if (next == users.submodels.end ())
 	out << ", and \n";
       else 
 	out << ",\n";
-      const std::string submodel = users.submodels[i].submodel;
-      const std::vector<std::string>& path = users.submodels[i].path;
+      const std::string submodel = (*i).submodel;
+      const std::vector<std::string>& path = (*i).path;
       print_quoted (out, submodel);
       out << " @";
       for (unsigned int j = 0; j < path.size (); j++)

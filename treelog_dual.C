@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include <deque>
+
 // GCC 2.95.2 need a ".h".
 #if defined (__unix)
 #include <unistd.h>
@@ -34,6 +35,7 @@ extern "C" char* getcwd (char*, int);
 #else
 #include <dir.h>
 #endif
+
 using namespace std;
 
 struct TreelogDual::Implementation
@@ -45,7 +47,8 @@ struct TreelogDual::Implementation
   deque<string> path;
   deque<bool> touched_one;
   deque<bool> touched_two;
-
+  string lazy_string;
+  
   void touch (std::ostream& out, deque<bool>& touched);
   void print (std::ostream& out, deque<bool>& touched,
 	      const string& text);
@@ -53,12 +56,14 @@ struct TreelogDual::Implementation
   void debug (const string& text);
   void entry (const string& text);
 
+  void do_lazy ();
   void flush ();
 
   Implementation (const string& filename, std::ostream& second)
     : file (filename),
       one (NULL),
-      two (second)
+      two (second),
+      lazy_string ("")
   { }
   
   ~Implementation ()
@@ -158,52 +163,76 @@ TreelogDual::Implementation::flush ()
   two.flush ();
 }
 
+void 
+TreelogDual::Implementation::do_lazy ()
+{
+  if (lazy_string.length () > 0)
+    {
+      entry (lazy_string);
+      lazy_string = "";
+    }
+}
+
 void
 TreelogDual::open (const string& name)
 { 
-  impl.path.push_back (name); 
-  impl.touched_one.push_back (false); 
-  impl.touched_two.push_back (false); 
+  impl->path.push_back (name); 
+  impl->touched_one.push_back (false); 
+  impl->touched_two.push_back (false); 
 }
 
 void
 TreelogDual::close ()
 {
-  impl.path.pop_back (); 
-  impl.touched_one.pop_back (); 
-  impl.touched_two.pop_back (); 
+  impl->path.pop_back (); 
+  impl->touched_one.pop_back (); 
+  impl->touched_two.pop_back (); 
 }
 
 void
 TreelogDual::debug (const string& text)
 {
-  impl.debug (text);
+  impl->do_lazy ();
+  impl->debug (text);
   Treelog::debug (text);
 }
 
 void
 TreelogDual::entry (const string& text)
 {
-  impl.entry (text);
+  impl->do_lazy ();
+  impl->entry (text);
   Treelog::entry (text);
+}
+
+void
+TreelogDual::lazy (const string& text)
+{
+  if (impl->lazy_string.length () > 0)
+    impl->lazy_string += "\n";
+  impl->lazy_string += text;
 }
 
 void
 TreelogDual::touch ()
 { 
-  impl.touch (impl.two, impl.touched_two);
-  impl.two.flush ();
-  impl.init_one ();
-  impl.touch (*impl.one, impl.touched_one); 
+  impl->do_lazy ();
+  impl->touch (impl->two, impl->touched_two);
+  impl->two.flush ();
+  impl->init_one ();
+  impl->touch (*impl->one, impl->touched_one); 
 }
 
 void
 TreelogDual::flush ()
-{ impl.flush (); }
+{ 
+  impl->do_lazy ();
+  impl->flush (); 
+}
 
 TreelogDual::TreelogDual (const string& file, std::ostream& two)
-  : impl (*new Implementation (file, two))
+  : impl (new Implementation (file, two))
 { }
 
 TreelogDual::~TreelogDual ()
-{ delete &impl; }
+{ }

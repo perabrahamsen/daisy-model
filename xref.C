@@ -105,10 +105,10 @@ TraverseXRef::use_submodel (const string& submodel)
     case is_parameterization:
       break;
     case is_submodel:
-      moi.submodels.push_back (XRef::SubmodelUser (current_submodel, path));
+      moi.submodels.insert (XRef::SubmodelUser (current_submodel, path));
       break;
     case is_model:
-      moi.models.push_back (XRef::ModelUser (current_component, current_model, 
+      moi.models.insert (XRef::ModelUser (current_component, current_model, 
 					     path)); 
       break;
     case is_invalid:
@@ -129,10 +129,10 @@ TraverseXRef::use_component (const Library& library)
     case is_parameterization:
       break;
     case is_submodel:
-      moi.submodels.push_back (XRef::SubmodelUser (current_submodel, path));
+      moi.submodels.insert (XRef::SubmodelUser (current_submodel, path));
       break;
     case is_model:
-      moi.models.push_back (XRef::ModelUser (current_component, current_model, 
+      moi.models.insert (XRef::ModelUser (current_component, current_model, 
 					     path)); 
       break;
     case is_invalid:
@@ -153,11 +153,11 @@ TraverseXRef::use_model (const Library& library, const symbol model)
   switch (type)
     {
     case is_submodel:
-      moi.submodels.push_back (XRef::SubmodelUser (current_submodel, path));
+      moi.submodels.insert (XRef::SubmodelUser (current_submodel, path));
       break;
     case is_parameterization:
     case is_model:
-      moi.models.push_back (XRef::ModelUser (current_component, current_model, 
+      moi.models.insert (XRef::ModelUser (current_component, current_model, 
 					     path)); 
       break;
     case is_invalid:
@@ -331,15 +331,22 @@ TraverseXRef::~TraverseXRef ()
   daisy_assert (path.empty ());
 }
 
+bool
+XRef::ModelUsed::operator< (const ModelUsed& other) const
+{ return component < other.component
+    || (component == other.component && model < other.model); }
+
+
 XRef::ModelUsed::ModelUsed (const symbol comp, const symbol mod)
   : component (comp),
     model (mod)
 { }
 
 bool
-XRef::ModelUsed::operator< (const ModelUsed& other) const
+XRef::ModelUser::operator< (const ModelUser& other) const
 { return component < other.component
     || (component == other.component && model < other.model); }
+
 
 XRef::ModelUser::ModelUser (const symbol comp, const symbol mod,
 			    const vector<string>& p)
@@ -347,6 +354,10 @@ XRef::ModelUser::ModelUser (const symbol comp, const symbol mod,
     model (mod),
     path (p)
 { }
+
+bool
+XRef::SubmodelUser::operator< (const SubmodelUser& other) const
+{ return submodel < other.submodel; }
 
 XRef::SubmodelUser::SubmodelUser (const string& sub, const vector<string>& p)
   : submodel (sub),

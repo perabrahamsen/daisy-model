@@ -77,7 +77,7 @@ If there are no crop on the field with the specified name,\n\
 nothing will happen.");
   alist.add ("crop", "all");
   syntax.add ("stub", "cm", Syntax::Const, "\
-Leave stem and leafs below this size on the field.");
+Leave stem and leafs below this height on the field.");
   alist.add ("stub", 0.0);
   syntax.add_fraction ("stem", Syntax::Const, "\
 Fraction of stem (above stub) to harvest.");

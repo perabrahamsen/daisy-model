@@ -100,7 +100,7 @@ CanopyStandard::CropCAI (double WLeaf, double WSOrg, double WStem, double DS)
 void
 CanopyStandard::CanopyStructure (double DS)
 {
-  // The leaf density is assumed to from the group up to height z0,
+  // The leaf density is assumed to be zero from the group up to height z0,
   // then increase linearly until height z1, continue at that
   // density until z2, and then decrease linearly until the top of
   // the crop.  The values of z1, z2, and z3 are scaled so the
@@ -307,7 +307,8 @@ By default, it needs 200 g DM/m^2 to reach full height.");
   syntax.add ("LAIDist1", Syntax::None (), Syntax::Const, 3,
 	      "Relative CAI distribution at DS=1.");
   syntax.add ("PARrel", Syntax::None (), Syntax::Const,
-	      "Relative PAR below the syntax.");
+	      "Relative PAR below the canopy.\n\
+If the relative PAR get below this, the bottom leaves will start dying.");
   alist.add ("PARrel", 0.05);
 
   // Variables.

@@ -12,6 +12,28 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.61
+
+** In the irrigate actions, 'hours' now defaults to zero if 'days' > 0.
+
+** Avoid duplicate references in reference manual.
+
+** Also print version number when there are parse errors.
+
+** You kan now log "a" and "L0" in the "Gerwitz+Page74" rootdens model.
+
+Use the "Root form parameter" log parameterization.
+
+** New experimental "Anders Pedersen" rootdens model.
+
+This is Gerwitz and Page with 'a' as a free parameter.
+
+Use it like this:
+
+    (sow ("Spring Barley" (Root (rootdens "Anders Pedersen"
+                                          (a_DS (-1.0 0.08 [cm^-1])
+                                                ( 2.0 0.08 [cm^-1]))
+                                          (q 1.2 [m])))))
 * 3.60
 
 ** You can now give specific numbers symbolic names.

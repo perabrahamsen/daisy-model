@@ -71,6 +71,8 @@ public:
   AttributeList& alist (const char*) const;
   int integer (const std::string&) const;
   int integer (const char*) const;
+  int integer (const std::string&, int default_value) const;
+  int integer (const char*, int default_value) const;
   const std::vector<double>& number_sequence (const std::string&) const;
   const std::vector<double>& number_sequence (const char*) const;
   const std::vector<symbol>& 

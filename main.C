@@ -83,7 +83,7 @@ main (int argc, char* argv[])
 	  return 1;
       }
       // Create, check and run the simulation.
-      Options::copyright (treelog);
+      options.copyright (treelog);
       Daisy daisy (alist);
       daisy.initialize (syntax, treelog);
       if (!daisy.check (treelog))

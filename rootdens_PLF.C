@@ -58,6 +58,8 @@ struct Rootdens_PLF : public Rootdens
 		    const Geometry& geometry, 
 		    double WRoot, double value, double z_factor,
 		    double max_depth = 1e100);
+  void output (Log&) const
+  { }
 
   // Create.
   Rootdens_PLF (const AttributeList&);

@@ -92,9 +92,10 @@ struct ActionIrrigate : public Action
     syntax.add ("days", Syntax::Integer, Syntax::Const, 
                 "Irrigate this number of days.");
     alist.add ("days", 0);
-    syntax.add ("hours", Syntax::Integer, Syntax::Const, 
-                "Irrigate this number of days.");
-    alist.add ("hours", 1);
+    syntax.add ("hours", Syntax::Integer, Syntax::OptionalConst, 
+                "Irrigate this number of hours.\n\
+By default, irrigate 1 hour if days is 0, and 0 hours plus the specified\n\
+number of days else.");
     syntax.add_submodule ("end_time", alist, Syntax::OptionalState,
                           "Irrigate until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
@@ -112,7 +113,7 @@ Nitrogen content of irrigation water [mg N/l] (default: none).",
   ActionIrrigate (const AttributeList& al)
     : Action (al),
       days (al.integer ("days")),
-      hours (al.integer ("hours")),
+      hours (al.integer ("hours", (days > 0) ? 0 : 1)),
       activated (al.check ("end_time")),
       end_time (1, 1, 1, 1),
       flux (al.number ("flux")),

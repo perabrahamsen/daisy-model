@@ -24,6 +24,7 @@
 #define TREELOG_DUAL_H
 
 #include "treelog.h"
+#include <memory>
 
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
 #include <iostream>
@@ -37,7 +38,7 @@ class TreelogDual : public Treelog
   // Content.
 private:
   struct Implementation;
-  Implementation& impl;
+  std::auto_ptr<Implementation> impl;
 
   // Nesting.
 public:
@@ -48,6 +49,7 @@ public:
 public:
   void debug (const std::string&);
   void entry (const std::string&);
+  void lazy (const std::string&);
   void touch ();
   void flush ();
 

@@ -66,6 +66,9 @@ Options::usage (Treelog& out) const
 void
 Options::copyright (Treelog& out)
 {
+  if (has_printed_copyright)
+    return;
+  has_printed_copyright = true;
   out.message (string ("Daisy crop/soil simulation version ")
 	       + version + ". (" + version_date + ")\n"
 	       "Copyright 1996 - 2004 Per Abrahamsen, "
@@ -96,7 +99,8 @@ Options::initialize_path ()
 
 Options::Options (int& argc, char**& argv,
 		  Syntax& syntax, AttributeList& alist, Treelog& out)
-  : program_name (argv[0])
+  : has_printed_copyright (false),
+    program_name (argv[0])
 {
   string command_line;
   for (unsigned int i = 0; i < argc; i++)
@@ -128,6 +132,7 @@ Options::Options (int& argc, char**& argv,
 	}
       else if (options_finished || arg[0] != '-')
 	{
+          copyright (out);
 	  // Parse the file.
 	  Treelog::Open nest (out, "Parsing file");
 	  ParserFile parser (syntax, arg, out);

@@ -1,11 +1,43 @@
+2004-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.61 released.
+
+2004-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens.h, rootdens_G_P.C, rootdens_PLF.C: Make 'a' and 'L0'
+	logable.  
+	* root_system.C (output): Log them.
+	* lib/log.dai ("Root form parameter"): New log parameterization. 
+	* rootdens_AP.C: New model.
+
+2004-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_irrigate.C (hours): Use it.
+	* alist.C (integer): Add support for default value.
+
+2004-10-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* xref.h: Use 'set' instead of 'vector' to avoid duplicates.
+	* document_LaTeX.C (print_users): Update caller.
+
+2004-10-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_std.C (CanopyStructure): Fix comment.
+
+2004-10-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* options.C, options.h (copyright): Made is non-static.
+	* treelog_dual.C, treelog_dual.h (lazy): New method.
+	* options.C (copyright): Use it.
+	(Options): Call copyright before parsing.
+	* main.C (main): Update caller.
+
 2004-10-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.60 released.
 
-2004-10-05  Per Abrahamsen  <abraham@dina.kvl.dk>
-
-	* Version 3.60 released.
-
+	* all: Include <memory> in files that uses auto_ptr.
+	
 2004-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* vcheck.C (valid_hour, valid_mday, valid_month): New checks.

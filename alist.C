@@ -688,6 +688,18 @@ AttributeList::integer (const char *const key) const
   return value.integer;
 }
 
+int
+AttributeList::integer (const string& key, const int default_value) const
+{
+  if (!check (key))
+    return default_value;
+  return integer (key); 
+}
+
+int
+AttributeList::integer (const char *const key, const int default_value) const
+{ return integer (string (key), default_value); }
+
 const PLF& 
 AttributeList::plf (const string& key) const
 {

@@ -43,6 +43,7 @@ public:
 			    const Geometry& geometry, 
 			    double Depth, double PotRtDpt,
 			    double WRoot, double DS) = 0;
+  virtual void output (Log& log) const = 0;
 
   // Create and Destroy.
 public:

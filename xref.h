@@ -26,6 +26,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <set>
 
 class XRef
 {
@@ -44,6 +45,7 @@ public:
     symbol component;
     symbol model;
     std::vector<std::string> path;
+    bool operator< (const ModelUser&) const;
     ModelUser (symbol com, symbol mod, const std::vector<std::string>& p);
   };
 
@@ -51,14 +53,15 @@ public:
   {
     std::string submodel;
     std::vector<std::string> path;
+    bool operator< (const SubmodelUser&) const;
     SubmodelUser (const std::string& sub, const std::vector<std::string>& p);
     SubmodelUser ();
   };
 
   struct Users
   { 
-    std::vector<ModelUser> models;
-    std::vector<SubmodelUser> submodels;
+    std::set<ModelUser> models;
+    std::set<SubmodelUser> submodels;
     Users ();
   };
 

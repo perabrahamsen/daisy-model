@@ -22,6 +22,7 @@
 
 #include "rootdens.h"
 #include "geometry.h"
+#include "log.h"
 #include "check.h"
 #include "tmpstream.h"
 #include "mathlib.h"
@@ -33,6 +34,9 @@ struct Rootdens_G_P : public Rootdens
   // Parameters.
   const double DensRtTip;	// Root density at (pot) pen. depth [cm/cm^3]
   const double MinDens;		// Minimal root density [cm/cm^3]
+  // Log variables.
+  double a;                     // Form "parameter" [cm^-1].
+  double L0;                    // Root density at soil surface [cm/cm^3]
 
   // Simulation.
   static double density_distribution_parameter (double a);
@@ -40,6 +44,7 @@ struct Rootdens_G_P : public Rootdens
 		    const Geometry& geometry, 
 		    double Depth, double PotRtDpt,
 		    double WRoot, double DS);
+  void output (Log& log) const;
 
   // Create.
   Rootdens_G_P (const AttributeList&);
@@ -116,9 +121,9 @@ Rootdens_G_P::set_density (Treelog& msg,
   const double MinLengthPrArea = (DensRtTip * 1.2) * PotRtDpt;
   const double LengthPrArea
     = max (m_per_cm * SpRtLength * WRoot, MinLengthPrArea); // [cm/cm^2]
-  double a = density_distribution_parameter (LengthPrArea / 
-					     (PotRtDpt * DensRtTip));
-  double L0 = DensRtTip * exp (a);
+  a = density_distribution_parameter (LengthPrArea / 
+                                      (PotRtDpt * DensRtTip));
+  L0 = DensRtTip * exp (a);
   a /= PotRtDpt;
   if (Depth < PotRtDpt)
     {
@@ -180,10 +185,19 @@ Rootdens_G_P::set_density (Treelog& msg,
 
 }
 
+void 
+Rootdens_G_P::output (Log& log) const
+{
+  output_variable (a, log); 
+  output_variable (L0, log); 
+}
+
 Rootdens_G_P::Rootdens_G_P (const AttributeList& al)
   : Rootdens (al),
     DensRtTip (al.number ("DensRtTip")),
-    MinDens (al.number ("MinDens"))
+    MinDens (al.number ("MinDens")),
+    a (-42.42e42),
+    L0 (-42.42e42)
 { }
 
 const AttributeList& 
@@ -216,18 +230,22 @@ static struct Rootdens_G_PSyntax
 \n\
 See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
 to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
-    alist.add ("DensRtTip", 0.1);
-    alist.add ("MinDens", 0.0);
 
     Rootdens::load_syntax (syntax, alist);
     syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
 		"Root density at (potential) penetration depth.");
+    alist.add ("DensRtTip", 0.1);
     syntax.add ("MinDens", "cm/cm^3", Check::non_negative (), Syntax::Const,
 		"Minimal root density\n\
 Root density will never be below this, as long as there is enough root mass.\n\
 Extra root mass will be distributed according to Gerwitz and Page.\n\
 If there are too little root mass, the root will have the same density\n\
 all the way down.");
+    alist.add ("MinDens", 0.0);
+    syntax.add ("a", "cm^-1", Syntax::LogOnly, "Form parameter.\n\
+Calculated from 'DensRtTip'.");
+    syntax.add ("L0", "cm/cm^3", Syntax::LogOnly,
+                "Root density at soil surface.");
     Librarian<Rootdens>::add_type ("Gerwitz+Page74", alist, syntax, &make);
   }
 } Rootdens_G_P_syntax;

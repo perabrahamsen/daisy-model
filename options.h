@@ -31,13 +31,14 @@ class Treelog;
 
 class Options
 {
+  bool has_printed_copyright;
 public: 
   static std::string get_arg (int& argc, char**& argv);
   static void initialize_path ();
   static const char *const log_name;
   const std::string program_name;
   void usage (Treelog&) const;
-  static void copyright (Treelog&);
+  void copyright (Treelog&);
   Options (int& argc, char**& argv, 
 	   Syntax& syntax, AttributeList& alist, Treelog&);
 };

@@ -1,16 +1,77 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Birgitte + SH EU ark
+* Kig gennem mail!
 
-2 mnd wp3, 2 wp4, 1 coor, 7 wp5
+* Tove eksempelopsætning.
 
-antal timer?  sh vil spørge fredag
+* Hvorfor virker USDA3 ikke?
 
-* DOM/SOM equilibrium (bgj)
+* (Soil (borders -35 -45))
 
-** Brug i adsorbtion?
+Fejl hvis log interval ikke er i border.
 
-** Generaliser til Number med ScopeSoil?
+* min_intensity parameter for default weather
+
+Hvis dagsregn er mindre end 24 * min_intensity, start timeregn med
+min_intensite kl. 8 
+
+* Skriv parameteriseringer i referencemanual.
+
+Specielt format for log filer.
+
+* (defstring field_sep "\t")
+
+Vi skal have en måde at ændre log options globalt.  Det gælder også
+udskrivning af tid i excell format.
+
+* Gør det muligt at skifte enhed i en log fil.
+
+* Tillad [%] for Theta_sat
+
+* Agronomy for Daisy User  / Model overview
+
+New chapter for reference manual?  
+
+* Solute log 
+
+C -> Vl (Volume liquid) [g/cm^3]
+
+M -> Vs (Volume soil)   [g/cm^3]
+
+     Ms (Mass soil)     []
+
+* Oprydning af log filer
+
+** lib/log-general.dai
+
+{ System, Soil } x { Pesticides, Carbon, Nitrogen, Water }
+
+{ Content, Flux } x { Water, NH4-N, NO3-N, NO3, Pest }
+
+Water Pressure, Water Pressure (pF)
+
+Crop Production
+
+** lib/log-extra.dai
+
+Crop Extra
+  Carbon
+  day_length
+
+AOM
+DOM 
+Bioclimate
+Weather
+
+** sample/log-measured.dai
+
+Water Content in intervals
+
+Water Pressure in intervals
+
+N content in intervals (per soil)
+
+* En måde at tilføje measured values i log filer.
 
 * crop simple med nit
 
@@ -77,6 +138,12 @@ Instead of "defhorizon" we would have
 (program main batch
    setup1 setup2 setup3)
 
+* DOM/SOM equilibrium (bgj)
+
+** Brug i adsorbtion?
+
+** Generaliser til Number med ScopeSoil?
+
 * Idea: Ignore "ordered" when creating a derived parameterization.
 
 I.e. 
@@ -86,6 +153,8 @@ I.e.
 instead of 
 
 (defaction fertiligation irrigate_subsoil 0.0 (from -5) (to -10))
+
+DOESN'T WORK FOR "defaction activity".
 
 * min, max og average log select models skal opføre sig som fluxe.
 
