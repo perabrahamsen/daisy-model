@@ -44,7 +44,7 @@ CanopyStandard::InitialCAI (double WLeaf, double DS)
     }
   else
     {
-     CAI2 = max( 0.01, SpLAIfac * SpLAI * WLeaf);
+     CAI2 = max( 0.01, SpLAIfac (DS) * SpLAI * WLeaf);
     }
   const double CAI3 = min ( CAI2, 1.0/(1.0+exp(-15.0*(DS-DSLAI05))));
   if (CAI1 >= CAI3)
@@ -221,9 +221,14 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   AIDef.add (0.00, 1.00);
   AIDef.add (2.00, 1.00);
   alist.add ("LeafAIMod", AIDef);
-  syntax.add ("SpLAIfac", Syntax::None (), Syntax::Const,
+  PLF SpLf;
+  SpLf.add (0.00, 3.00);
+  SpLf.add (0.20, 1.50);
+  SpLf.add (0.40, 1.25);
+  SpLf.add (0.60, 1.00);
+  syntax.add ("SpLAIfac", "DS",Syntax::None (), Syntax::Const,
 	      "Factor defining maximum Specific leaf weight.");
-  alist.add ("SpLAIfac", 2.0);
+  alist.add ("SpLAIfac", SpLf);
   syntax.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      "Specific storage organ weight.");
   alist.add ("SpSOrgAI", 0.0);
@@ -284,7 +289,7 @@ CanopyStandard::CanopyStandard (const AttributeList& vl)
     DSLAI05 (vl.number ("DSLAI05")),
     SpLAI (vl.number ("SpLAI")),
     LeafAIMod (vl.plf ("LeafAIMod")),
-    SpLAIfac (vl.number ("SpLAIfac")),
+    SpLAIfac (vl.plf ("SpLAIfac")),
     SpSOrgAI (vl.number ("SpSOrgAI")),
     SOrgAIMod (vl.plf ("SOrgAIMod")),
     SOrgPhotEff (vl.number ("SOrgPhotEff")),

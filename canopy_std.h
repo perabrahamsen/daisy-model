@@ -9,7 +9,7 @@ private:
   const double DSLAI05;		// DS at CAI=0.5; forced development
   const double SpLAI;		// Specific leaf weight [ (m²/m²) / (g/m²) ]
   const PLF& LeafAIMod;		// Specific leaf area index modifier
-  const double SpLAIfac;	// Factor defining max Specific leaf weight
+  const PLF& SpLAIfac;		// Factor defining max Specific leaf weight
   const double SpSOrgAI;	// Specific storage organ area index
   const PLF& SOrgAIMod;		// Specific storage organ area index modifier
   const double SOrgPhotEff;	// Relative photosynthetic effiency of stor. org.
