@@ -16,11 +16,17 @@ release.
 
 ** New information in the top summary.
 
+** New log models "Chemical Content" and "Chemical Concentration".
+
+** chemistry.dai reorganizaed, and new pesticides added.
+
 ** Bug fixes
 
 The input listed in the OrnaicMatter section in the beginning of
 daisy.log did not included carbon lost digesting the added matter.
 Now it does.
+
+** Visual C++ .Net 2003 port.
 
 * 3.34
 

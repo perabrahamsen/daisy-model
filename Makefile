@@ -77,6 +77,10 @@ ifeq ($(HOSTTYPE),sun4)
 	SPARCOBJ = set_exceptions.o
 endif
 
+ifeq ($(COMPILER),ms)
+        MSSRC = win32_unistd.C
+endif
+
 # Find the profile flags.
 #
 ifeq ($(USE_PROFILE),true)
@@ -321,7 +325,7 @@ MODELS = select_pF.C pet_FAO_PM.C \
 	svat_pmsw.C action_merge.C action_divide.C \
 	action_surface.C
 
-DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
+[]DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
 
 
 # A component is a common interface to a number of models.
@@ -383,13 +387,14 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 #
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
-	cmain.c bugmain.c $(DISABLED)
+	cmain.c bugmain.c $(DISABLED) $(MSSRC)
 HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h)
 
 # Find all printable files.
 #
 TEXT =  ChangeLog.1 Makefile ChangeLog TODO NEWS FILES COPYING COPYING.LIB \
-	$(HEADERS) $(SOURCES) tlink32.ini daisy.bpr daisy.bpf daisy.bpg
+	$(HEADERS) $(SOURCES) tlink32.ini daisy.bpr daisy.bpf daisy.bpg \
+	Daisy.vcproj
 
 # The executables.
 #
@@ -637,8 +642,8 @@ cvs: $(TEXT)
 	cvs tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
 
 cast:
-	fgrep _cast $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN)
-	wc -l  $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN)
+	fgrep _cast $(INTERFACES) $(MODELS) $(MAIN)
+	wc -l  $(INTERFACES) $(MODELS) $(MAIN)
 
 # How to compile the assembler file.
 #
