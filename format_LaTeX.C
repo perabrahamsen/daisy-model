@@ -160,9 +160,7 @@ FormatLaTeX::section_open (const std::string& type, const std::string& title,
   out () << "\\" << type;
   out () << "{";
   text (title);
-  out () << "}\n\\label{" << scope << ":";
-  text (label);
-  out () << "}\n";
+  out () << "}\n\\label{" << scope << ":" << label << "}\n";
 }
 
 void 
@@ -288,7 +286,7 @@ FormatLaTeX::special (const std::string& name)
     {
       typedef std::pair<std::string,std::string> p;
       insert (p ("...", "\\ldots{}"));
-      insert (p ("->", "$\\rightarrow$"));
+      insert (p ("->", "$\\rightarrow $"));
       insert (p ("nbsp", "~"));
       insert (p ("daisy", "\\daisy{}"));
     }
