@@ -46,11 +46,11 @@ private:
   const double diffusion_coefficient_; // [cm^2/h]
   const AttributeList solute_alist_;
   const double decompose_rate_;
-  CSMP decompose_heat_factor_;
-  CSMP decompose_water_factor_;
-  CSMP decompose_CO2_factor_;
-  CSMP decompose_conc_factor_;
-  bool active_groundwater_;
+  const CSMP decompose_heat_factor_;
+  const CSMP decompose_water_factor_;
+  const CSMP decompose_CO2_factor_;
+  const CSMP decompose_conc_factor_;
+  const bool active_groundwater_;
 
   // Queries.
 public:

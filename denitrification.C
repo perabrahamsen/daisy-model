@@ -60,9 +60,19 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
     {
       const double CO2 = organic_matter.CO2 (i);
       const double Theta = soil_water.Theta (i);
+      const double Theta_sat = soil_water.Theta (soil, i, 0.0);
+      const double Theta_fraction = Theta / Theta_sat;
+
       const double T = soil_heat.T (i);
-      const double rate = f_Theta (Theta / soil_water.Theta (soil, i, 0.0)) 
-	* f_T (T) * alpha * CO2 ;
+      
+      const double T_factor = (heat_factor.size () < 1)
+	? f_T (T)
+	: heat_factor (T);
+      const double w_factor = (water_factor.size () < 1)
+	? f_Theta (Theta_fraction)
+	: water_factor (Theta_fraction);
+
+      const double rate = w_factor * T_factor * alpha * CO2 ;
       const double M = min (rate, K * soil_NO3.M_left (i) / dt);
       converted.push_back (M);
     }
@@ -92,13 +102,23 @@ Maximum fraction of nitrate converted at each time step.");
   syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Syntax::Const, 
 	      "Anaerobic denitrification constant.");
   alist.add ("alpha", 0.1);
+  CSMP empty;
+  syntax.add ("heat_factor", Syntax::CSMP, Syntax::Const,
+	      "Heat factor [dg C ->].");
+  alist.add ("heat_factor", empty);
+  syntax.add ("water_factor", Syntax::CSMP, Syntax::Const,
+	      "Water potential factor, a function of the current\n\
+water content as a fraction of the maximal water content. [->].");
+  alist.add ("water_factor", empty);
 }
 
 Denitrification::Denitrification (const AttributeList& al)
   : active_underground (al.flag ("active_underground")),
     active_groundwater (al.flag ("active_groundwater")),
     K (al.number ("K")),
-    alpha (al.number ("alpha"))
+    alpha (al.number ("alpha")),
+    heat_factor (al.csmp ("heat_factor")),
+    water_factor (al.csmp ("water_factor"))
 { }
 
 static Submodel::Register 

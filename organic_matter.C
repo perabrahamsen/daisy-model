@@ -46,6 +46,9 @@ struct OrganicMatter::Implementation
     void initialize (const Geometry& geometry);
     Buffer (const AttributeList& al);
   } buffer;
+  const CSMP heat_factor;
+  const CSMP water_factor;
+  const CSMP clay_factor;
   const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]
   const double min_AM_N;	// Minimal amount of N in an AM. [g/m²]
   Bioincorporation bioincorporation;
@@ -195,6 +198,8 @@ OrganicMatter::Implementation::om_compare (const OM* a, const OM* b)
 double 
 OrganicMatter::Implementation::heat_turnover_factor (double T) const
 {
+  if (heat_factor.size () > 0)
+    return heat_factor (T);
   if (T < 0.0)
     return 0.0;
   if (T < 20.0)
@@ -206,6 +211,9 @@ OrganicMatter::Implementation::heat_turnover_factor (double T) const
 double
 OrganicMatter::Implementation::water_turnover_factor (double h) const
 {
+  if (water_factor.size () > 0)
+    return water_factor (h);
+
   if (h >= 0.0)
     return 0.6;
 
@@ -499,12 +507,7 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 
   // Clay.
   for (unsigned int i = 0; i < soil.size (); i++)
-    {
-      const double a = 2.0;
-      const double X_c_prime = 0.25;
-      const double X_c = soil.clay (i);
-      clay_turnover_factor.push_back (1.0 - a * (min (X_c, X_c_prime)));
-    }
+    clay_turnover_factor.push_back (clay_factor (soil.clay (i)));
   
   // Fill SMB C_per_N array with last value.
   for (unsigned int pool = 0; pool < som_size; pool++)
@@ -656,6 +659,9 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     smb (map_construct<OM> (al.alist_sequence ("smb"))),
     som (map_construct<OM> (al.alist_sequence ("som"))),
     buffer (al.alist ("buffer")),
+    heat_factor (al.csmp ("heat_factor")),
+    water_factor (al.csmp ("water_factor")),
+    clay_factor (al.csmp ("clay_factor")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N")),
     bioincorporation (al.alist ("Bioincorporation"))
@@ -1045,11 +1051,20 @@ Mineralization this time step (negative numbers mean immobilization).");
   layer_syntax.order ("end", "weight");
   syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
 	      "Layered initialization of soil SOM content.");
-#if 0
-  // It should be possible to overwrite the default by specifying these.
-  syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);
-  syntax.add ("water_turnover_factor", Syntax::CSMP, Syntax::Const);
-#endif
+  CSMP empty;
+  syntax.add ("heat_factor", Syntax::CSMP, Syntax::Const,
+	      "Heat factor [dg C ->].");
+  alist.add ("heat_factor", empty);
+  syntax.add ("water_factor", Syntax::CSMP, Syntax::Const,
+	      "Water potential factor [cm ->].");
+  alist.add ("water_factor", empty);
+  syntax.add ("clay_factor", Syntax::CSMP, Syntax::Const,
+	      "Clay fraction factor [->].");
+  CSMP clay;
+  clay.add (0.00, 1.0);
+  clay.add (0.25, 0.5);
+  clay.add (1.00, 0.5);
+  alist.add ("clay_factor", clay);
   syntax.add ("min_AM_C", "g C/m^2", Syntax::Const, 
 	      "Minimal amount of carbon in AOM ensuring it is not removed.");
   alist.add ("min_AM_C", 0.5);

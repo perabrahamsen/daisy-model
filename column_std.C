@@ -439,6 +439,11 @@ The organic matter in the soil and on the surface.");
     nitrification_alist.add ("k", 5.0e-5); // [gN/cm³]
     nitrification_alist.add ("active_underground", false);
     nitrification_alist.add ("active_groundwater", false);
+    CSMP empty;
+    nitrification_alist.add ("heat_factor", empty);
+    nitrification_alist.add ("water_factor", empty);
+    nitrification_alist.add ("clay_factor", empty);
+
     alist.add ("Nitrification", nitrification_alist);
     add_submodule<Denitrification> ("Denitrification", syntax, alist,
 				    Syntax::State, "\

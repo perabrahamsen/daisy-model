@@ -8,6 +8,7 @@
 #include "soil_NO3.h"
 #include "log.h"
 #include "mathlib.h"
+#include "csmp.h"
 
 class NitrificationSolute : public Nitrification
 {
@@ -17,6 +18,8 @@ private:
   const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double k;
   const double k_10;
+  const CSMP heat_factor;
+  const CSMP water_factor;
 
   // Log variable.
 private:
@@ -101,7 +104,13 @@ NitrificationSolute::tick (const Soil& soil, const SoilWater& soil_water,
       const double C = soil_NH4.C (i);
       const double h = soil_water.h (i);
       const double T = soil_heat.T (i);
-      const double rate = k_10 * f_h (h) * f_T (T) * C / (k + C);
+      const double T_factor = (heat_factor.size () < 1)
+	? f_T (T)
+	: heat_factor (T);
+      const double w_factor = (water_factor.size () < 1)
+	? f_h (h)
+	: water_factor (h);
+      const double rate = k_10 * w_factor * T_factor * C / (k + C);
       assert (rate >= 0.0);
       assert (soil_NH4.M_left (i) >= 0.0);
       const double M_new = min (rate, soil_NH4.M_left (i) / dt - 1e-8);
@@ -119,7 +128,9 @@ NitrificationSolute::NitrificationSolute (const AttributeList& al)
     active_underground (al.flag ("active_underground")),
     active_groundwater (al.flag ("active_groundwater")),
     k (al.number ("k")),
-    k_10 (al.number ("k_10"))
+    k_10 (al.number ("k_10")),
+    heat_factor (al.csmp ("heat_factor")),
+    water_factor (al.csmp ("water_factor"))
 { }
 
 static struct NitrificationSoluteSyntax
@@ -149,6 +160,13 @@ Set this to true to enable nitrification in the groundwater.");
 		"Half saturation constant.");
     syntax.add ("k_10", "h^-1", Syntax::Const,
 		"Max rate.");
+    CSMP empty;
+    syntax.add ("heat_factor", Syntax::CSMP, Syntax::Const,
+		"Heat factor [dg C ->].");
+    alist.add ("heat_factor", empty);
+    syntax.add ("water_factor", Syntax::CSMP, Syntax::Const,
+		"Water potential factor [cm ->].");
+    alist.add ("water_factor", empty);
     Librarian<Nitrification>::add_type ("solute", alist, syntax, &make);
   }
 } NitrificationSolute_syntax;

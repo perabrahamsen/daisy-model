@@ -1,3 +1,25 @@
+2000-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.08 released.
+
+2000-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tortuosity_linear.C (TortuosityLinearSyntax): Add default value
+	for the `b' parameter.
+
+	* organic_matter.C (heat_factor, water_factor, clay_factor): New
+	parameters. 
+	* nitrification_soil.C, nitrification_solute.C (heat_factor,
+	water_factor): New parameters.
+	* column_std.C (ColumnStandardSyntax): Add them to default
+	nitrification model..
+	* dendenitrification.C, denitrification.h (heat_factor,
+	water_factor): New parameters.
+
+	* chemical_std.C (decompose_heat_factor_, decompose_water_factor_,
+	decompose_CO2_factor_, decompose_conc_factor_,
+	active_groundwater_): Made them const.
+
 1999-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.07 released.
