@@ -511,6 +511,12 @@ AttributeList::check (const string& key) const
 }
 
 bool
+AttributeList::check (const char* key) const
+{ 
+  return impl.check (key);
+}
+
+bool
 AttributeList::subset (const AttributeList& other, const Syntax& syntax) const
 { 
   // Find syntax entries.

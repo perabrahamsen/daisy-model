@@ -1,8 +1,12 @@
 2002-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* alist.C (check): New char* variant for the sake of BCC 5.0.
+
+2002-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* Version 2.25 released.
 
-xo2002-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+2002-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* transform_equil.C (TransformEquilibriumSyntax): Added checks.
 	(TransformEquilibriumSyntax): Removed order.

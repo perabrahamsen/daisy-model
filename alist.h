@@ -45,6 +45,7 @@ public:				// EGCS require this to be public...
 public:
   // Is 'key' an element of this alist?
   bool check (const string& key) const;
+  bool check (const char* key) const;
   // Is this alist a subset of 'other'?
   bool subset (const AttributeList& other, const Syntax& syntax) const;
   // Is the element 'key' in this alist a subset of the correspi
