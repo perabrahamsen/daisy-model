@@ -37,7 +37,9 @@ private:
   const PLF Root;		// Partitioning functions for root
   const PLF Leaf;		//   leaf, and stem as function of DS
   const PLF Stem;
+public:
   const PLF RSR;		// Root/Shoot ratio.
+private:
   const double nitrogen_stress_limit; // Allocate all ass. to SOrg above this.
 
   // Utilities.
