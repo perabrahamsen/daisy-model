@@ -1,6 +1,6 @@
 // traverse_delete.C -- FInd and remove dependencies in Daisy datastructures.
 
-#include "traverse_depend.h"
+#include "traverse_delete.h"
 #include "traverse.h"
 #include "library.h"
 #include "syntax.h"
