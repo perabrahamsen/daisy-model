@@ -25,6 +25,9 @@ protected:
   vector<double> S;		// Sink-source term [kg / m^3 / s]
   vector<double> J;		// Flux density [kg / m^2 / s]
 
+  // FYI variables.
+  double ddt;			// Calculated time step.
+
   // Substance specific constants.
   virtual double beta (const Soil&, const SoilWater&,
 		       int i, double C) const = 0; // dA/dC

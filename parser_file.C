@@ -392,9 +392,18 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    {
 	      const Library& lib = syntax.library (name);
 	      AttributeList& al = load_derived (lib, current != end);
-	      const string obj = al.name ("type");
-	      lib.syntax (obj).check (al, obj);
-	      atts.add (name, al);
+	      if (&lib == &Parser::library ())
+		{
+		  Parser& parser = Parser::create (global_syntax_table, al);
+		  parser.load (atts);
+		  delete &parser;
+		}
+	      else
+		{
+		  const string obj = al.name ("type");
+		  lib.syntax (obj).check (al, obj);
+		  atts.add (name, al);
+		}
 	    }
 	    break;
 	  case Syntax::Error:
@@ -413,30 +422,16 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      // We don't support fixed sized object arrays yet.
 	      assert (syntax.size (name) == Syntax::Sequence);
 	      const Library& lib = syntax.library (name);
-	      if (&lib == &Parser::library ())
+	      vector<const AttributeList*>& sequence
+		= *new vector<const AttributeList*> ();
+	      while (!looking_at (')') && good ())
 		{
-		  while (!looking_at (')') && good ())
-		    {
-		      const AttributeList& al = load_derived (lib, true);
-		      Parser& parser 
-			= Parser::create (global_syntax_table, al);
-		      parser.load (atts);
-		      delete &parser;
-		    }
+		  const AttributeList& al = load_derived (lib, true);
+		  const string obj = al.name ("type");
+		  lib.syntax (obj).check (al, obj);
+		  sequence.push_back (&al);
 		}
-	      else
-		{
-		  vector<const AttributeList*>& sequence
-		    = *new vector<const AttributeList*> ();
-		  while (!looking_at (')') && good ())
-		    {
-		      const AttributeList& al = load_derived (lib, true);
-		      const string obj = al.name ("type");
-		      lib.syntax (obj).check (al, obj);
-		      sequence.push_back (&al);
-		    }
-		  atts.add (name, sequence);
-		}
+	      atts.add (name, sequence);
 	      break;
 	    }
 	  case Syntax::List:

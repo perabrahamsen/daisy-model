@@ -78,115 +78,132 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 #endif
     }
 
-
-  // Parameters for tridiagonal matrix.
-  vector<double> a (size);
-  vector<double> b (size);
-  vector<double> c (size);
-  vector<double> d (size);
-  
-  for (int j = 0; j < size; j++)
-    {
-      // dA/dC in the present soil water solute.
-      const double beta = this->beta (soil, soil_water, j, C[j]);
-      
-      const double dz_minus	// Size of layer above current node.
-	= (j < 1) ? - 2.0 * soil.z (j) : soil.z (j-1) - soil.z (j);
-
-      const double dz_plus	// Size of layer below current node.
-	= (j == size - 1) ? dz_minus : (soil.z (j) - soil.z (j+1));
-
-      const double dz = soil.dz (j); // Size of current node.
-      const double q_minus = soil_water.q (j); // Flow to above.
-      const double q_plus = soil_water.q (j+1);	// Flow from below.
-      const double alpha_minus = alpha[j]; // Direction above.
-      const double alpha_plus = alpha[j+1]; // Direction below.
-      const double D_minus = D[j]; // Dispertion above.
-      const double D_plus = D[j+1]; // Dispertion below.
-      const double Theta_new = soil_water.Theta (j); // New water content.
-      const double Theta_old = soil_water.Theta_old (j); // Old water content.
-      
-      
-      // Concentration above and below current node.
-      const double C_minus = (j < 1) ? C[j] : C[j-1];
-      const double C_plus = (j == size - 1) ? C[j] : C[j+1];
-      
-      a[j] = - D_minus / (2.0 * dz_minus * dz) 
-	+ (alpha_minus * q_minus) / (2.0 * dz);
-      b[j] = ((Theta_new + beta) / dt
-	      + D_minus / (2.0 * dz_minus * dz)
-	      + D_plus / (2.0 * dz_plus * dz)
-	      + ((1 - alpha_minus) * q_minus) / (2.0 * dz)
-	      - (alpha_plus * q_plus) / (2.0 * dz));
-      c[j] = - D_plus / (2.0 * dz_plus * dz)
-	- ((1.0 - alpha_plus) * q_plus) / (2.0 * dz);
-      d[j] = ((Theta_old + beta) * C[j] / dt
-	      + S[j]
-	      + ((D_minus * (C_minus - C[j])) / (2.0 * dz_minus * dz))
-	      - ((D_plus * (C[j] - C_plus)) / (2.0 * dz_plus * dz))
-	      - (q_minus * (alpha_minus * C_minus + (1.0 - alpha_minus) * C[j])
-		 / (2.0 * dz))
-	      + (q_plus * (alpha_plus * C[j] + (1.0 - alpha_plus) * C_plus)
-		 / (2.0 * dz)));
-    }
-#if 0
-  // Adjust for upper boundary condition.
-  const double dz_minus = - 2.0 * soil.z (0);
-  const double b_in 
-    = (D[0] / dz_minus + soil_water.q (0) * alpha[0]) * 0.5
-    / (D[0] / dz_minus + soil_water.q (0) * (1 - alpha[0]));
-  const double d_in 
-    = (- J_in + (D[0] / dz_minus + soil_water.q (0) * alpha[0]) * 0.5 * C[0])
-    / (D[0] / dz_minus + soil_water.q (0) * (1 - alpha[0]));
-  d[0] -= a[0] * d_in;
-  b[0] += a[0] * b_in;
-  a[0] = 42.42e42;
-#elif 1
-  const double dz_x = - 2.0 * soil.z (0);
-  const double d_x = 4 * J_in + 2 * D[0] / dz_x * C[0] 
-    - soil_water.q (0) * C[0];
-  const double b_x = 2 * (soil_water.q (0) - 2 * D[0] / dz_x);
-  const double a_x = soil_water.q (0) + 2 * D[0] / dz_x;
-  d[0] -= a[0] * d_x / b_x;
-  b[0] -= a[0] * a_x / b_x;
-  a[0] = 42.42e42;
-#else
-  {
-    const int j = 0;
-    const double beta = this->beta (soil, soil_water, j, C[j]);
-    const double dz_plus	// Size of layer below current node.
-      = soil.z (j) - soil.z (j+1);
-    const double dz = soil.dz (j); // Size of current node.
-    const double q_plus = soil_water.q (j+1);	// Flow from below.
-    const double alpha_plus = alpha[j+1]; // Direction below.
-    const double D_plus = D[j+1]; // Dispertion below.
-    const double Theta_new = soil_water.Theta (j); // New water content.
-    const double Theta_old = soil_water.Theta_old (j); // Old water content.
-    const double C_plus = (j == size - 1) ? C[j] : C[j+1];
-
-    a[0] = 42.42e42;
-    b[0] = ((Theta_new + beta) / dt
-	    + D_plus / (2.0 * dz_plus * dz)
-	    - (alpha_plus * q_plus) / (2.0 * dz));
-    d[0] = ((Theta_old + beta) * C[j] / dt
-	    + S[j]
-	    - J_in / dz
-	    - ((D_plus * (C[j] - C_plus)) / (2.0 * dz_plus * dz))
-	    + (q_plus * (alpha_plus * C[j] + (1.0 - alpha_plus) * C_plus) 
-	       / (2.0 * dz)));
-  }
-#endif
-  // Adjust for lower boundary condition.
-  b[size - 1] += c[size - 1];
-  c[size - 1] = -42.42e42;
-
 #if 1
-  const vector<double> C_old = C;
+      const vector<double> C_old = C;
 #endif
 
-  // Calculate new concentration.
-  tridia (0, size, a, b, c, d, C.begin ());
+  // Find the time step using Courant.
+  ddt = 1.0;
+  for (int i = 0; i < size; i++)
+    ddt = min (ddt, pow (soil.dz (i), 2) / (2 * D[i + 1]));
+      
+  // Loop through small time steps.
+  for (double old_t = 0.0, t = ddt; 
+       old_t != t;
+       old_t = t, t = min (dt, t + ddt))
+    {
+      // Parameters for tridiagonal matrix.
+      vector<double> a (size);
+      vector<double> b (size);
+      vector<double> c (size);
+      vector<double> d (size);
+  
+      for (int j = 0; j < size; j++)
+	{
+	  // dA/dC in the present soil water solute.
+	  const double beta = this->beta (soil, soil_water, j, C[j]);
+      
+	  const double dz_minus	// Size of layer above current node.
+	    = (j < 1) ? - 2.0 * soil.z (j) : soil.z (j-1) - soil.z (j);
 
+	  const double dz_plus	// Size of layer below current node.
+	    = (j == size - 1) ? dz_minus : (soil.z (j) - soil.z (j+1));
+
+	  const double dz = soil.dz (j); // Size of current node.
+	  const double q_minus = soil_water.q (j); // Flow to above.
+	  const double q_plus = soil_water.q (j+1);	// Flow from below.
+	  const double alpha_minus = alpha[j]; // Direction above.
+	  const double alpha_plus = alpha[j+1]; // Direction below.
+	  const double D_minus = D[j]; // Dispertion above.
+	  const double D_plus = D[j+1]; // Dispertion below.
+	  const double Theta_ratio 
+	    = (soil_water.Theta (j) - soil_water.Theta_old (j)) / dt;
+	  const double Theta_new // New water content.
+	    = soil_water.Theta_old (j) + Theta_ratio * t;
+	  const double Theta_old // Old water content.
+	    = soil_water.Theta_old (j) + Theta_ratio * old_t;
+      
+	  // Concentration above and below current node.
+	  const double C_minus = (j < 1) ? C[j] : C[j-1];
+	  const double C_plus = (j == size - 1) ? C[j] : C[j+1];
+      
+	  a[j] = - D_minus / (2.0 * dz_minus * dz) 
+	    + (alpha_minus * q_minus) / (2.0 * dz);
+	  b[j] = ((Theta_new + beta) / (t - old_t)
+		  + D_minus / (2.0 * dz_minus * dz)
+		  + D_plus / (2.0 * dz_plus * dz)
+		  + ((1 - alpha_minus) * q_minus) / (2.0 * dz)
+		  - (alpha_plus * q_plus) / (2.0 * dz));
+	  c[j] = - D_plus / (2.0 * dz_plus * dz)
+	    - ((1.0 - alpha_plus) * q_plus) / (2.0 * dz);
+	  d[j] = ((Theta_old + beta) * C[j] / (t - old_t)
+		  + S[j]
+		  + ((D_minus * (C_minus - C[j])) / (2.0 * dz_minus * dz))
+		  - ((D_plus * (C[j] - C_plus)) / (2.0 * dz_plus * dz))
+		  - (q_minus * (alpha_minus * C_minus + (1.0 - alpha_minus) * C[j])
+		     / (2.0 * dz))
+		  + (q_plus * (alpha_plus * C[j] + (1.0 - alpha_plus) * C_plus)
+		     / (2.0 * dz)));
+	}
+      // Adjust for upper boundary condition.
+#if 0
+      const double dz_minus = - 2.0 * soil.z (0);
+      const double b_in 
+	= (D[0] / dz_minus + soil_water.q (0) * alpha[0]) * 0.5
+	/ (D[0] / dz_minus + soil_water.q (0) * (1 - alpha[0]));
+      const double d_in 
+	= (- J_in + (D[0] / dz_minus + soil_water.q (0) * alpha[0]) * 0.5 * C[0])
+	/ (D[0] / dz_minus + soil_water.q (0) * (1 - alpha[0]));
+      d[0] -= a[0] * d_in;
+      b[0] += a[0] * b_in;
+      a[0] = 42.42e42;
+#elif 1
+      const double dz_x = - 2.0 * soil.z (0);
+      const double d_x = 4 * J_in + 2 * D[0] / dz_x * C[0] 
+	- soil_water.q (0) * C[0];
+      const double b_x = 2 * (soil_water.q (0) - 2 * D[0] / dz_x);
+      const double a_x = soil_water.q (0) + 2 * D[0] / dz_x;
+      d[0] -= a[0] * d_x / b_x;
+      b[0] -= a[0] * a_x / b_x;
+      a[0] = 42.42e42;
+#else
+      {
+	const int j = 0;
+	const double beta = this->beta (soil, soil_water, j, C[j]);
+	const double dz_plus	// Size of layer below current node.
+	  = soil.z (j) - soil.z (j+1);
+	const double dz = soil.dz (j); // Size of current node.
+	const double q_plus = soil_water.q (j+1);	// Flow from below.
+	const double alpha_plus = alpha[j+1]; // Direction below.
+	const double D_plus = D[j+1]; // Dispertion below.
+	const double Theta_ratio 
+	  = (soil_water.Theta (j) - soil_water.Theta_old (j)) / dt;
+	const double Theta_new // New water content.
+	  = soil_water.Theta_old (j) + Theta_ratio * t;
+	const double Theta_old // Old water content.
+	  = soil_water.Theta_old (j) + Theta_ratio * old_t;
+
+	const double C_plus = (j == size - 1) ? C[j] : C[j+1];
+
+	a[0] = 42.42e42;
+	b[0] = ((Theta_new + beta) / (t - old_t)
+		+ D_plus / (2.0 * dz_plus * dz)
+		- (alpha_plus * q_plus) / (2.0 * dz));
+	d[0] = ((Theta_old + beta) * C[j] / (t - old_t)
+		+ S[j]
+		- J_in / dz
+		- ((D_plus * (C[j] - C_plus)) / (2.0 * dz_plus * dz))
+		+ (q_plus * (alpha_plus * C[j] + (1.0 - alpha_plus) * C_plus) 
+		   / (2.0 * dz)));
+      }
+#endif
+      // Adjust for lower boundary condition.
+      b[size - 1] += c[size - 1];
+      c[size - 1] = -42.42e42;
+
+      // Calculate new concentration.
+      tridia (0, size, a, b, c, d, C.begin ());
+    }
   // Calculate flux with mass conservation.
   J[0] = J_in;
   for (int i = 0; i < size; i++)
@@ -239,6 +256,7 @@ Solute::output (Log& log, const Filter& filter) const
   log.output ("M", filter, M);
   log.output ("S", filter, S, true);
   log.output ("J", filter, J, true);
+  log.output ("ddt", filter, ddt, true);
 }
 
 void 
@@ -248,9 +266,11 @@ Solute::load_syntax (Syntax& syntax, AttributeList&)
   syntax.add ("M", Syntax::Number, Syntax::Optional, Syntax::Sequence);
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("J", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
+  syntax.add ("ddt", Syntax::Number, Syntax::LogOnly, Syntax::Singleton);
 }
 
 Solute::Solute ()
+  : ddt (1.0)
 { }
 
 void

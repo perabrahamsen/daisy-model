@@ -113,7 +113,8 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add_class ("log", Log::library (), &Manager::derive_type);
   syntax.add_class ("parser", Parser::library (), &Manager::derive_type);
   syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
-  syntax.add ("input", Parser::library (), Syntax::Optional, Syntax::Sequence);
+  syntax.add ("input", Parser::library (), Syntax::Optional, 
+	      Syntax::Singleton);
   syntax.add ("chief", Manager::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::State);
   syntax.add ("field", Column::library (), Syntax::State, Syntax::Sequence);
