@@ -23,6 +23,7 @@ static struct ActionStopSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Stop the simulation.");
     Librarian<Action>::add_type ("stop", alist, syntax, &make);
   }
 } ActionStop_syntax;

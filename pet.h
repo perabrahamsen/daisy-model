@@ -17,6 +17,7 @@ class Pet
   // Content.
 public:
   const string name;
+  static const char *const description;
 
   // Utilities.
 public:

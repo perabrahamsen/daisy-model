@@ -1,16 +1,12 @@
+* Implementer put/get DLL funktioner til overflade kemi.
+
 * Document 
 
-** Submodeler i eget afsnit.
+** Log variable for sig selv til sidst.
 
 ** Udskrift af komplekse værdier.
 
-** Dimensioner.
-
-** Beskrivelse af attributer.
-
-** Beskrivelse af modeler.
-
-** Beskrivelse af komponenter.
+** Dimensioner, Beskrivelse af attributer og Beskrivelse af modeler.
 
 ** Introduktion.
 

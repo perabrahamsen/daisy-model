@@ -5,6 +5,10 @@
 
 Librarian<Groundwater>::Content* Librarian<Groundwater>::content = NULL;
 
+const char *const Groundwater::description = "\
+The `groundwater' component is responsible for specifying the\n\
+groundwater table at each timestep.";
+
 void
 Groundwater::output (Log& log, Filter& filter) const
 { 

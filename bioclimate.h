@@ -22,6 +22,7 @@ class Bioclimate
   // Content.
 public:
   const string name;
+  static const char *const description;
 
   // FAO utility functions.
   static double CanopyResistance (double LAI /* [m^2/m^2] */); // [s/m]

@@ -4,6 +4,7 @@
 #include "log.h"
 #include "alist.h"
 #include "syntax.h"
+#include "submodel.h"
 
 void
 IM::output (Log& log, Filter& filter) const
@@ -138,6 +139,10 @@ IM::~IM ()
 void 
 IM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  alist.add ("submodel", "IM");
+  alist.add ("description", "\
+Inorganic matter, or more precisely, mineral nitrogen.\n\
+The dimensions depend on which model the `IM' fixed component is used in.");
   syntax.add ("NH4", Syntax::Unknown (), Syntax::State,
 	      "Ammonium content.");
   alist.add ("NH4", 0.0);
@@ -145,3 +150,5 @@ IM::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Nitrate content.");
   alist.add ("NO3", 0.0);
 }
+
+static Submodel::Register im_submodel ("IM", IM::load_syntax);

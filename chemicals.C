@@ -6,6 +6,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "chemical.h"
+#include "submodel.h"
 #include <map>
 
 struct Chemicals::Implementation
@@ -368,21 +369,37 @@ check_alist_entry (const AttributeList& al)
   return ok;
 }
 
+// KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.
+static Syntax::category chemicals_default_category = Syntax::State;
+
+static void chemicals_load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add_check (check_alist_entry);
+  alist.add ("description", "Name and amount of chemical compounds.");
+  alist.add ("submodel", "Chemicals");
+  syntax.add ("chemical", Syntax::String, Syntax::State, 
+	      "Name of chemical.");
+  syntax.add ("amount", "g/m^2", chemicals_default_category,
+	      "Amount of chemical compound");
+  syntax.order ("chemical", "amount");
+}
+
 void 
 Chemicals::add_syntax (const char* name,
 		       Syntax& syntax, AttributeList& alist,
 		       Syntax::category cat, 
 		       const string& description)
 {
-  Syntax& entry_syntax = *new Syntax (check_alist_entry);
-  entry_syntax.add ("chemical", Syntax::String, Syntax::State, 
-		    "Name of chemical.");
-  entry_syntax.add ("amount", "g/m^2", cat,
-		    "Amount of chemical compound");
-  entry_syntax.order ("chemical", "amount");
-  syntax.add (name, entry_syntax, Syntax::Sequence, description);
+  // KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.
+  chemicals_default_category = cat;
+  Syntax& entry_syntax = *new Syntax ();
+  AttributeList& entry_alist = *new AttributeList ();
+  chemicals_load_syntax (entry_syntax, entry_alist);
+  syntax.add (name, entry_syntax, entry_alist, cat, description);
   vector<AttributeList*> alist_sequence;
   alist.add (name, alist_sequence);
+// KLUDGE: Ugly hack to be able to use the standard `load_syntax' form.
+  chemicals_default_category = Syntax::State;
 }
   
 Chemicals::Chemicals (const vector<AttributeList*>& al)
@@ -396,3 +413,5 @@ Chemicals::Chemicals ()
 Chemicals::~Chemicals ()
 { delete &impl; }
 
+static Submodel::Register chemicals_submodel ("Chemicals", 
+					      chemicals_load_syntax);

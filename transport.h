@@ -14,6 +14,7 @@ class Transport
   // Content.
 public:
   const string name;
+  static const char *const description;
 
   // Simulation.
 public:

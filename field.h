@@ -74,9 +74,9 @@ public:
   unsigned int size () const;
 
   // Create and destroy.
-  void divide (const string& original, const string& copy,
+  void divide (const string& original, const string& copy, double copy_size,
 	       const Time&, const Weather&);
-  void merge (const string& combine, const string& remove, double weight);
+  void merge (const string& combine, const string& remove);
   bool check () const;
   bool check_am (const AttributeList& am) const;
   void initialize (const Time&, const Weather&);

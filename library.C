@@ -164,7 +164,10 @@ Library::add (const string& key, AttributeList& value, const Syntax& syntax)
 void 
 Library::add_derived (const string& name, AttributeList& al,
 		      const string& super)
-{ impl.derive (name, al, super); }
+{ 
+  al.add ("type", super);
+  impl.derive (name, al, super); 
+}
 
 void
 Library::remove (const string& key)

@@ -16,6 +16,7 @@ private:
   Implementation& impl;
 public: 
   const string name;
+  static const char *const description;
   
   // Simulation.
 public:

@@ -598,74 +598,74 @@ static struct BioclimateStandardSyntax
   
       // Canopy structure.
       syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const, "\
-Number of vertical intervals in which we partition the canopy");
+Number of vertical intervals in which we partition the canopy.");
       alist.add ("NoOfIntervals", 30);
 
       // External water sources and sinks.
       syntax.add ("pet", Librarian<Pet>::library (), 
-		  "Potential Evapotranspiration component");
+		  "Potential Evapotranspiration component.");
       AttributeList& pet_alist = *new AttributeList;
       pet_alist.add ("type", "makkink");
       alist.add ("pet", pet_alist);
       syntax.add ("total_ep", "mm/h", Syntax::LogOnly,
-		  "Potential evapotranspiration");
+		  "Potential evapotranspiration.");
       syntax.add ("total_ea", "mm/h", Syntax::LogOnly,
-		  "Actual evapotranspiration");
+		  "Actual evapotranspiration.");
       syntax.add ("irrigation_top", "mm/h", Syntax::LogOnly,
-		  "Irrigation above canopy");
+		  "Irrigation above canopy.");
       syntax.add ("irrigation_top_temperature", "dg C", Syntax::LogOnly,
-		  "Water temperature");
+		  "Water temperature.");
       syntax.add ("irrigation_surface", "mm/h", Syntax::LogOnly,
-		  "Irrigation below canopy");
+		  "Irrigation below canopy.");
       syntax.add ("irrigation_surface_temperature", "dg C", Syntax::LogOnly,
-		  "Water temperature");
+		  "Water temperature.");
 
       // Water in snowpack.
       add_submodule<Snow> ("Snow", syntax, alist, Syntax::State, 
-			   "Surface snow pack");
+			   "Surface snow pack.");
       syntax.add ("snow_ep", "mm/h", Syntax::LogOnly,
-		  "Potential snow evaporation");
+		  "Potential snow evaporation.");
       syntax.add ("snow_ea", "mm/h", Syntax::LogOnly,
-		  "Actual snow evaporation");
+		  "Actual snow evaporation.");
       syntax.add ("snow_water_in", "mm/h", Syntax::LogOnly,
-		  "Water entering snow pack");
+		  "Water entering snow pack.");
       syntax.add ("snow_water_in_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of water entering snow pack");
+		  "Temperature of water entering snow pack.");
       syntax.add ("snow_water_out", "mm/h", Syntax::LogOnly,
 		  "Water leaving snow pack");
       syntax.add ("snow_water_out_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of water leaving snow pack");
+		  "Temperature of water leaving snow pack.");
 
       // Water intercepted on canopy.
       syntax.add ("canopy_ep", "mm/h", Syntax::LogOnly,
-		  "Potential canopy evaporation");
+		  "Potential canopy evaporation.");
       syntax.add ("canopy_ea", "mm/h", Syntax::LogOnly,
-		  "Actual canopy evaporation");
+		  "Actual canopy evaporation.");
       syntax.add ("canopy_water_storage", "mm", Syntax::State,
-		  "Intercepted water on canopy");
+		  "Intercepted water on canopy.");
       alist.add ("canopy_water_storage", 0.0);
       syntax.add ("canopy_water_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of incomming water");
+		  "Temperature of incomming water.");
       syntax.add ("canopy_water_in", "mm/h", Syntax::LogOnly,
-		  "Water entering canopy");
+		  "Water entering canopy.");
       syntax.add ("canopy_water_out", "mm/h", Syntax::LogOnly,
-		  "Canopy drip throughfall");
+		  "Canopy drip throughfall.");
       syntax.add ("canopy_water_bypass", "mm/h", Syntax::LogOnly,
-		  "Water from above bypassing the canopy");
+		  "Water from above bypassing the canopy.");
   
       // Water in pond.
       syntax.add ("pond_ep", "mm/h", Syntax::LogOnly,
-		  "Potential evaporation from pond");
+		  "Potential evaporation from pond.");
       syntax.add ("pond_ea", "mm/h", Syntax::LogOnly,
-		  "Actual evaporation from pond");
+		  "Actual evaporation from pond.");
       syntax.add ("pond_water_in", "mm/h", Syntax::LogOnly,
-		  "Water entering pond");
+		  "Water entering pond.");
       syntax.add ("pond_water_in_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of water entering pond");
+		  "Temperature of water entering pond.");
 
       // Water going through soil surface.
       syntax.add ("pt", Librarian<PT>::library (), 
-		  "Potential Transpiration component");
+		  "Potential Transpiration component.");
       AttributeList& pt_alist = *new AttributeList;
       pt_alist.add ("type", "default");
       alist.add ("pt", pt_alist);

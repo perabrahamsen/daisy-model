@@ -6,6 +6,7 @@
 #include "geometry.h"
 #include "log.h"
 #include "mathlib.h"
+#include "submodel.h"
 #include <numeric>
 
 static double
@@ -484,33 +485,51 @@ OM::tick (unsigned int end, const double* abiotic_factor,
     }
 }
 
-#if 0
-OM& 
-OM::create (const AttributeList& al, const Geometry& geometry)
-{ return *new OM (al, geometry); }
-#endif
-
 const double OM::Unspecified = -1042.42e42;
 
 void
 OM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("top_C", Syntax::Number, Syntax::State);
+  alist.add ("submodel", "OM");
+  alist.add ("description", "\
+Organic matter.  This is a common abstraction for the SMB (Soil\n\
+MicroBiomass), SOM (Soil Organic Matter) and AOM (Added Organic Matter)\n\
+pools.  That is, all the organic matter in the soil.  Some attributes,\n\
+such as `maintenance', are only meaningful for certain kinds of organic\n\
+matter, in this case the SMB pools.");
+  syntax.add ("top_C", "g C/cm^2", Syntax::State,
+	      "Carbon on top of soil.");
   alist.add ("top_C", 0.0);
-  syntax.add ("top_N", Syntax::Number, Syntax::State);
+  syntax.add ("top_N", "g C/cm^2", Syntax::State,
+	      "Nitrogen on top of soil.");
   alist.add ("top_N", 0.0);
-  syntax.add ("C", Syntax::Number, Syntax::OptionalState, Syntax::Sequence);
-  syntax.add ("C_per_N", Syntax::Number, Syntax::OptionalState,
-	       Syntax::Sequence);
-  syntax.add ("N", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  syntax.add ("turnover_rate", Syntax::Number, Syntax::Const);
-  syntax.add ("efficiency", Syntax::Number, Syntax::Const,
-	       Syntax::Sequence);
-  syntax.add ("maintenance", Syntax::Number, Syntax::Const);
+  syntax.add ("C", "g C/cm^3", Syntax::OptionalState, Syntax::Sequence,
+	      "Carbon in each soil interval.");
+  syntax.add ("C_per_N", "(g C/cm^3)/(g N/cm^3)",
+	      Syntax::OptionalState, Syntax::Sequence, 
+	      "The carbon/nitrogen ratio.");
+  syntax.add ("N", "g N/cm^3", Syntax::LogOnly, Syntax::Sequence,
+	      "Nitrogen in each soil interval.");
+  syntax.add ("turnover_rate", "h^-1", Syntax::Const,
+	      "Fraction converted to other pools each hour.");
+  syntax.add ("efficiency", Syntax::None (), Syntax::Const, Syntax::Sequence,
+	      "\
+the efficiency this pool can be digested by each of the SMB pools.");
+  syntax.add ("maintenance", "h^-1", Syntax::Const, "\
+The fraction used for staying alive each hour.");
   alist.add ("maintenance", 0.0);
-  syntax.add ("fractions", Syntax::Number, Syntax::Const, 
-	       Syntax::Sequence);
-  syntax.add ("initial_C_per_N", Syntax::Number, Syntax::OptionalState);
-  syntax.add ("initial_fraction", Syntax::Number, Syntax::Const);
+  syntax.add ("fractions", Syntax::None (), Syntax::Const, Syntax::Sequence, "\
+How this pool is divided into other pools.\n\
+The first numbers corresponds to each of the SMB pools, the remaining\n\
+numbers corresponds to the SOM pools.  The length of the sequence should\n\
+thus be the number of SMB pools plus the number of SOM pools.");
+  syntax.add ("initial_C_per_N", Syntax::Number, Syntax::OptionalState, "\
+The initial C/N ratio when this pool is created.");
+  syntax.add ("initial_fraction", Syntax::Number, Syntax::Const, "\
+The initial fraction of the total available carbon\n\
+allocated to this pool for AOM.  One pool should be left unspecified\n\
+\(which corresponds to the default value, a large negative number).");
   alist.add ("initial_fraction", Unspecified);
 }
+
+static Submodel::Register om_submodel ("OM", OM::load_syntax);

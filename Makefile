@@ -183,7 +183,7 @@ INTERFACES = document.C daisy.C parser.C log.C weather.C column.C crop.C \
 	librarian.C cdaisy.C adsorption.C tortuosity.C event.C eventqueue.C \
 	minimanager.C printer.C printer_file.C chemical.C common.C \
 	pet.C net_radiation.C pt.C vegetation.C chemicals.C nrutil.C field.C \
-	log_alist.C log_clone.C soil_chemical.C soil_chemicals.C
+	log_alist.C log_clone.C soil_chemical.C soil_chemicals.C submodel.C
 
 # Select the C files that are not part of the library.
 #
@@ -416,11 +416,11 @@ pmain${OBJ}: pmain.C
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
 document${OBJ}: document.C document.h librarian.h library.h common.h \
- alist.h syntax.h
+ alist.h syntax.h submodel.h
 daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
  log.h filter.h parser.h am.h nitrification.h bioclimate.h hydraulic.h \
- crop.h field.h harvest.h chemicals.h action.h condition.h
+ crop.h field.h harvest.h chemicals.h action.h condition.h column.h
 parser${OBJ}: parser.C parser.h librarian.h library.h common.h alist.h \
  syntax.h
 log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
@@ -428,7 +428,7 @@ log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
 weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
  syntax.h im.h log.h filter.h mathlib.h net_radiation.h
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
- syntax.h
+ syntax.h log.h filter.h
 crop${OBJ}: crop.C crop.h time.h librarian.h library.h common.h alist.h \
  syntax.h chemicals.h
 alist${OBJ}: alist.C csmp.h library.h common.h alist.h syntax.h
@@ -439,7 +439,7 @@ action${OBJ}: action.C action.h librarian.h library.h common.h alist.h \
 condition${OBJ}: condition.C condition.h librarian.h library.h common.h \
  alist.h syntax.h
 horizon${OBJ}: horizon.C horizon.h librarian.h library.h common.h alist.h \
- syntax.h csmp.h hydraulic.h mathlib.h
+ syntax.h csmp.h hydraulic.h mathlib.h tortuosity.h
 filter${OBJ}: filter.C filter.h librarian.h library.h common.h alist.h \
  syntax.h
 csmp${OBJ}: csmp.C csmp.h
@@ -492,7 +492,7 @@ solute${OBJ}: solute.C solute.h adsorption.h librarian.h library.h \
 am${OBJ}: am.C am.h librarian.h library.h common.h alist.h syntax.h om.h \
  im.h log.h filter.h geometry.h mathlib.h
 im${OBJ}: im.C im.h log.h filter.h librarian.h library.h common.h alist.h \
- syntax.h
+ syntax.h submodel.h
 om${OBJ}: om.C om.h common.h syntax.h alist.h geometry.h log.h filter.h \
  librarian.h library.h mathlib.h
 harvest${OBJ}: harvest.C harvest.h chemicals.h syntax.h common.h log.h \
@@ -545,12 +545,13 @@ log_clone${OBJ}: log_clone.C log_clone.h log_alist.h log.h filter.h \
 soil_chemical${OBJ}: soil_chemical.C soil_chemical.h solute.h adsorption.h \
  librarian.h library.h common.h alist.h syntax.h transport.h \
  chemical.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
- soil_heat.h soil_water.h organic_matter.h
+ soil_heat.h soil_water.h organic_matter.h log.h filter.h
 soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  librarian.h library.h common.h alist.h syntax.h hydraulic.h \
  tortuosity.h geometry.h soil_water.h soil_heat.h organic_matter.h \
  chemical.h chemicals.h log.h filter.h soil_chemical.h solute.h \
  adsorption.h transport.h
+submodel${OBJ}: submodel.C submodel.h
 document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h library.h \
  common.h alist.h syntax.h
 filter_array${OBJ}: filter_array.C filter.h librarian.h library.h common.h \
@@ -721,9 +722,10 @@ pt_std${OBJ}: pt_std.C pt.h librarian.h library.h common.h alist.h \
  syntax.h pet.h vegetation.h surface.h uzmodel.h log.h filter.h
 action_spray${OBJ}: action_spray.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h chemical.h
-pt_pmsw${OBJ}: pt_pmsw.C weather.h librarian.h library.h common.h alist.h \
- syntax.h im.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
- soil_water.h soil_heat.h vegetation.h pet.h pt.h nrutil.h
+pt_pmsw${OBJ}: pt_pmsw.C surface.h uzmodel.h librarian.h library.h \
+ common.h alist.h syntax.h weather.h im.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h soil_water.h soil_heat.h vegetation.h pet.h \
+ pt.h log.h filter.h nrutil.h
 action_merge${OBJ}: action_merge.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h
 action_divide${OBJ}: action_divide.C action.h librarian.h library.h \

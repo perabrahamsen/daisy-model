@@ -2100,6 +2100,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   const double C_foli = par.Harvest.C_Dead *
                         par.Prod.ExfoliationFac * CrpAux.DeadWLeaf;
   const double N_foli = par.Prod.ExfoliationFac * CrpAux.DeadNLeaf;
+  assert (C_foli == 0.0 || N_foli > 0.0);
   vProd.AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
   vProd.C_AM += C_foli;
   vProd.N_AM += N_foli;
@@ -2122,6 +2123,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   vProd.AM_root->add (geometry, C_Root * m2_per_cm2,
 		      CrpAux.DeadNRoot * m2_per_cm2,
 		      var.RootSys.Density);
+  assert (C_Root == 0.0 || CrpAux.DeadNRoot > 0.0);
   vProd.C_AM += C_Root;
   vProd.N_AM += CrpAux.DeadNRoot;
 
@@ -2332,6 +2334,7 @@ CropStandard::harvest (const string& column_name,
           const double N = (NDead+NStem) * (1.0 - stem_harvest);
 	  AM& am = AM::create (geometry, time, Stem, name, "stem");
 	  am.add (C * m2_per_cm2, N * m2_per_cm2);
+	  assert (C == 0.0 || N > 0.0);
 	  organic_matter.add (am);
           Prod.C_AM += C;
           Prod.N_AM += N;
@@ -2343,6 +2346,7 @@ CropStandard::harvest (const string& column_name,
           const double C = WLeaf * C_Leaf * (1.0 - leaf_harvest);
           const double N = NLeaf * (1.0 - leaf_harvest);
 	  AM& am = AM::create (geometry, time, Leaf, name, "leaf");
+	  assert (C == 0.0 || N > 0.0);
 	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
 	  organic_matter.add (am);
           Prod.C_AM += C;
@@ -2353,6 +2357,7 @@ CropStandard::harvest (const string& column_name,
           const double C = WSOrg * C_SOrg * (1.0 - sorg_harvest);
           const double N = NSOrg * (1.0 - sorg_harvest);
 	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
+	  assert (C == 0.0 || N > 0.0);
 	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
 	  organic_matter.add (am);
           Prod.C_AM += C;
@@ -2370,6 +2375,7 @@ CropStandard::harvest (const string& column_name,
 	  else
 	    var.Prod.AM_root->add (WRoot * C_Root * m2_per_cm2,
 				   NRoot * m2_per_cm2);
+	  assert (WRoot == 0.0 || NRoot > 0.0);
 	  var.Prod.AM_root->unlock ();
 	  var.Prod.AM_root = NULL;
           Prod.C_AM += C_Root * WRoot;

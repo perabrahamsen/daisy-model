@@ -115,6 +115,8 @@ static struct ChemicalStandardSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
+Read chemical properties as normal Daisy parameters.");
       syntax.add ("crop_uptake_reflection_factor", "[0-1]", Syntax::Const,
 		  "How much of the chemical is reflexted at crop uptake.");
       syntax.add ("canopy_dissipation_rate_coefficient", "h^-1", Syntax::Const,
@@ -122,21 +124,21 @@ static struct ChemicalStandardSyntax
       syntax.add ("canopy_washoff_coefficient", "mm", Syntax::Const,
 		  "How fast is the chemical washed off the canopy.");
       syntax.add ("diffusion_coefficient", "cm^2/s", Syntax::Const, 
-		  "Diffusion coefficient");
+		  "Diffusion coefficient.");
       add_submodule<SoilChemical> ("solute", syntax, alist, 
 				   Syntax::Const,
 				   "Description of chemical in soil.");
       syntax.add ("decompose_rate", "h^-1", Syntax::Const,
-		  "Fraction of solute being decomposed each hour");
+		  "Fraction of solute being decomposed each hour.");
       CSMP empty;
       syntax.add ("decompose_heat_factor", Syntax::CSMP, Syntax::Const,
-		  "Heat factor on decomposition [dg C ->]");
+		  "Heat factor on decomposition [dg C ->].");
       alist.add ("decompose_heat_factor", empty);
       syntax.add ("decompose_water_factor", Syntax::CSMP, Syntax::Const,
-		  "Water potential factor on decomposition [cm ->]");
+		  "Water potential factor on decomposition [cm ->].");
       alist.add ("decompose_water_factor", empty);
       syntax.add ("decompose_CO2_factor", Syntax::CSMP, Syntax::Const,
-		  "CO2 development factor on decomposition [g C/cm³ ->]");
+		  "CO2 development factor on decomposition [g C/cm^3 ->].");
       CSMP CO2_factor;
       CO2_factor.add (0.0, 1.0);
       CO2_factor.add (1.0, 1.0);

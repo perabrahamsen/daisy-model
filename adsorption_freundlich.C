@@ -8,6 +8,7 @@ class AdsorptionFreundlich : public Adsorption
 {
   // Parameters.
   const double K_clay;
+  const double K_humus;
   const double m;
 
   // Simulation.
@@ -19,7 +20,10 @@ public:
 public:
   AdsorptionFreundlich (const AttributeList& al)
     : Adsorption (al.name ("type")),
-      K_clay (al.number ("K_clay")),
+      K_clay (al.check ("K_clay") ? al.number ("K_clay") : 0.0),
+      K_humus (al.check ("K_humus") 
+	       ? al.number ("K_humus") 
+	       : al.number ("K_clay")),
       m (al.number ("m"))
     { }
 };
@@ -28,8 +32,10 @@ double
 AdsorptionFreundlich::C_to_M (const Soil& soil,
 			      double Theta, int i, double C) const
 {
-  const double S = K_clay * soil.clay (i) * pow (C, m);
-  return soil.dry_bulk_density (i) * S + Theta * C;
+  const double K = soil.clay (i) * K_clay + soil.humus (i) * K_humus;
+  const double rho = soil.dry_bulk_density (i);
+  const double S = K * pow (C, m);
+  return rho * S + Theta * C;
 }
 
 double 
@@ -77,15 +83,48 @@ static struct AdsorptionFreundlichSyntax
   {
     return *new AdsorptionFreundlich (al);
   }
+  static bool check_alist (const AttributeList& al)
+    {
+      bool ok = true;
+
+      const bool has_K_clay = al.check ("K_clay");
+      const bool has_K_humus = al.check ("K_humus");
+      
+      if (!has_K_clay && !has_K_humus)
+	{
+	  CERR << "You must specify either `K_clay' or `K_humus'\n";
+	  ok = false;
+	}
+      if (has_K_clay)
+	non_negative (al.number ("K_clay"), "K_clay", ok);
+      if (has_K_humus)
+	non_negative (al.number ("K_humus"), "K_humus", ok);
+
+      non_negative (al.number ("m"), "m", ok);
+      
+      if (!ok)
+	CERR << "in `Freundlich' adsorption\n";
+
+      return ok;
+    }
 
   AdsorptionFreundlichSyntax ()
   {
-    Syntax& syntax = *new Syntax ();
-    syntax.add ("K_clay", "g/cm^3/g clay", Syntax::Const, 
-		"Clay dependent distribution parameter");
+    Syntax& syntax = *new Syntax (check_alist);
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "M = rho K C^m + Theta C");
+    syntax.add ("K_clay", "(g/cm^3)^-m", Syntax::OptionalConst, 
+		"Clay dependent distribution parameter.\n\
+It is multiplied with the soil clay fraction to get the clay part of\n\
+the `K' factor.  If `K_humus' is specified, `K_clay' defaults to 0.\n\
+The dimension depends on the `m' parameter.");
+    syntax.add ("K_humus", "(g/cm^3)^-m", Syntax::OptionalConst, 
+		"Humus dependent distribution parameter.\n\
+It is multiplied with the soil humus fraction to get the humus part\n\
+of the `K' factor.  By default, `K_humus' is equal to `K_clay'.\n\
+The dimension depends on the `m' parameter.");
     syntax.add ("m", Syntax::None (), Syntax::Const,
 		"Freundlich parameter");
-    AttributeList& alist = *new AttributeList ();
     Librarian<Adsorption>::add_type ("Freundlich", alist, syntax, &make);
   }
 } AdsorptionFreundlich_syntax;

@@ -9,6 +9,10 @@ struct CSMP;
 
 class Hydraulic 
 {
+  // Content.
+public:
+  static const char *const description;
+
   // Standard parameters.
 public:
   const double Theta_sat;

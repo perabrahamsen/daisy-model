@@ -53,9 +53,9 @@ public:
   Column* find (const string& name) const;
 
   // Changing the field.
-  void divide (const string& original, const string& copy,
+  void divide (const string& original, const string& copy, double copy_size, 
 	       const Time&, const Weather&);
-  void merge (const string& combine, const string& remove, double weight);
+  void merge (const string& combine, const string& remove);
 
   // Create and destroy.
   bool check () const;
@@ -337,11 +337,15 @@ Field::Implementation::find (const string& name) const
 
 void 
 Field::Implementation::divide (const string& original, const string& copy,
+			       double copy_size,
 			       const Time& time, const Weather& weather)
 { 
   Column* old = find (original);
   if (!old)
-    throw ("Attempt to clone non-existing column"); 
+    throw ("Attempt to divide non-existing column"); 
+  if (old->size <= copy_size)
+    throw ("Attempt to divide column into fraction larger than the original");
+  old->size -= copy_size;
   const Library& library = Librarian<Column>::library ();
   const Syntax& syntax = library.syntax (old->alist.name ("type"));
   LogClone log_clone ("column", syntax, old->alist);
@@ -354,6 +358,7 @@ Field::Implementation::divide (const string& original, const string& copy,
   Librarian<Column>::derive_type (copy, lib_alist, original);
   AttributeList copy_alist (log_clone.result ());
   copy_alist.add ("type", copy);
+  copy_alist.add ("size", copy_size);
   Column* result = &Librarian<Column>::create (copy_alist);
   result->initialize (time, weather);
   columns.push_back (result);
@@ -361,7 +366,7 @@ Field::Implementation::divide (const string& original, const string& copy,
   
 void
 Field::Implementation::merge (const string& /*combine*/,
-			      const string& /*remove*/, double /*weight*/)
+			      const string& /*remove*/)
 { throw ("Merge is not yet implemented"); } 
 
 bool 
@@ -509,13 +514,13 @@ Field::size () const
 { return impl.columns.size (); }
 
 void 
-Field::divide (const string& original, const string& copy, 
+Field::divide (const string& original, const string& copy, double copy_size,
 	       const Time& time, const Weather& weather)
-{ impl.divide (original, copy, time, weather); }
+{ impl.divide (original, copy, copy_size, time, weather); }
 
 void 
-Field::merge (const string& combine, const string& remove, double weight)
-{ impl.merge (combine, remove, weight); }
+Field::merge (const string& combine, const string& remove)
+{ impl.merge (combine, remove); }
 
 bool 
 Field::check () const

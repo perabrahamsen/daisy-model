@@ -9,6 +9,10 @@ class Geometry;
 
 class Filter
 {
+  // Conent.
+public:
+  static const char *const description;
+
   // Use.
 public:
   virtual bool check (const string&, bool log_only = false) const = 0;

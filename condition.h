@@ -9,6 +9,10 @@ class Daisy;
 
 class Condition
 {  
+  // Content.
+public:
+  static const char *const description;
+
   // Simulation.
 public:
   virtual bool match (const Daisy&) const = 0;

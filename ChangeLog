@@ -1,3 +1,57 @@
+1999-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.68 released.
+
+1999-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* library.C (add_derived): Add superclass here.
+	* parser_file.C (add_derived): Not here.
+
+1999-02-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* snow.C (load_syntax): Made it a submodel, and added dimensions
+	and descriptions.
+	(load_syntax): Changed default for `Psa' from 200 to 5/24, and
+	`fsa' from 0.5 to 0.9.
+
+	* bioclimate_std.C (BioclimateStandardSyntax): Added points to
+	description.
+	* chemicals.C (add_syntax, load_syntax): Made it a submodel.
+
+	* horizon.C, horizon.h, soil.h (humus): New function.
+	* adsorption_linear.C (C_to_M): Use it.
+	* (K_humus): New parameter.
+	* (test_alist): New function.
+	* adsorption_freundlich.C: Ditto.
+	* adsorption_langmuir.C: Ditto.
+
+	* adsorption_langmuir.C: Added descriptions.
+	* adsorption_freundlich.C: Ditto.
+	* adsorption_linear.C: Ditto.
+	* adsorption_vS_S.C: Ditto.
+	* adsorption_none.C: Ditto.
+
+	* adsorption_linear.C (C_to_M, M_to_C): Don't multiply dry bulk
+	density with (1 - porosity).
+
+1999-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_merge.C (ActionMergeSyntax): Added description.
+
+	* submodel.C, submodel.h: New files.
+	* Makefile (INTERFACES): Add them.
+	* im.C (im_submodel): Use it.
+
+	* column.h (size): New member.
+	* action_merge.C, action_divide.C, field.h, field.C: Use it.
+	* column.C, column.h (load_syntax): New function.
+	* column_std.C (ColumnStandardSyntax): Call it.
+	* column.C, column.h (output): Made it impure..
+
+1999-02-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Added descriptions of all components.
+
 1999-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.67 released.

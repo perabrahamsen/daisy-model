@@ -56,6 +56,6 @@ public:
   virtual ~AM ();
 };
 
-static Librarian<AM> AM_init ("am", AM::description);
+static Librarian<AM> AM_init ("am");
 
 #endif AM_H

@@ -14,9 +14,9 @@
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
 
 const char *const AM::description = "\
-The `AM' component describes various kinds of fertilizer and other added \
-matter such as crop remains.  In particular, it describes how they \
-decompose.";
+The `am' component describes various kinds of fertilizer and other\n\
+added matter such as crop residues.  In particular, it describes how\n\
+they decompose.";
 
 struct AM::Implementation
 {
@@ -673,7 +673,8 @@ pools, each of which have their own turnover rate.");
 	syntax.add ("creation", Syntax::Date, Syntax::State, 
 		    "Time this AM was created.");
 	alist.add ("syntax", "state");
-	syntax.add ("name", Syntax::String, Syntax::State);
+	syntax.add ("name", Syntax::String, Syntax::State, "\
+A name given to this AOM so you can identify it in for example log files.");
 	add_submodule<AM::Implementation::Lock> ("lock", syntax, alist,
 						 Syntax::OptionalState, "\
 This AM belongs to a still living plant");
@@ -710,7 +711,7 @@ The remaining nitrogen is assumed to be ammonium or organic.");
 The remaining nitrogen is assumed to be nitrate or organic.");
 	alist.add ("NH4_fraction", 0.0);
 	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::Const, 
-		    "Fraction of NH4 that evaporate on application.");
+		    "Fraction of NH4 that evaporates on application.");
 	alist.add ("NH4_evaporation", 0.0);
 	Librarian<AM>::add_type ("organic", alist, syntax, &make);
       }
@@ -725,10 +726,10 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 	syntax.add ("weight", "kg N/ha", Syntax::Const,
 		    "Amount of fertilizer applied.");
 	syntax.add ("NH4_fraction", Syntax::None (), Syntax::Const, 
-		    "Ammonium fraction of total N in fertilized.  \
+		    "Ammonium fraction of total N in fertilizer.  \
 The remaining nitrogen is assumed to be nitrate.");
 	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::Const, 
-		    "Fraction of NH4 that evaporate on application.");
+		    "Fraction of NH4 that evaporates on application.");
 	alist.add ("NH4_evaporation", 0.0);
 	alist.add ("syntax", "mineral");
 	Librarian<AM>::add_type ("mineral", alist, syntax, &make);
@@ -748,7 +749,7 @@ Initial added organic matter at the start of the simulation.");
 			  "\
 Height where this layer ends (a negative number).");
 	layer_syntax.add ("weight", "kg C/m^2", Syntax::Const,
-			  "Carbin in this layer.");
+			  "Carbon in this layer.");
 	layer_syntax.order ("end", "weight");
 	syntax.add ("layers", layer_syntax, Syntax::Sequence, "\
 Carbon content in different soil layers.  The carbon is assumed to be \

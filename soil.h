@@ -43,6 +43,8 @@ public:
     { return horizon_[i]->dry_bulk_density (); }
   inline double clay (int i) const
   { return horizon_[i]->clay (); }
+  inline double humus (int i) const
+  { return horizon_[i]->humus (); }
   inline double SOM_C (int i, unsigned int pool) const
   { return horizon_[i]->SOM_C (pool); }
   inline double SOM_C_per_N (int i, unsigned int pool) const

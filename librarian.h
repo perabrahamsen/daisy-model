@@ -64,12 +64,12 @@ public:
 
   // Create and Destroy.
 public:
-  Librarian (const char *const name, const char *const description = NULL)
+  Librarian (const char *const name)
   { 
     if (content)
       content->count++;
     else 
-      content = new Content (name, &derive_type, description);
+      content = new Content (name, &derive_type, T::description);
   }
   ~Librarian ()
   { 

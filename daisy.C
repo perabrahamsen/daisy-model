@@ -20,6 +20,7 @@
 #include "condition.h"
 #include "alist.h"
 #include "common.h"
+#include "column.h"
 
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
@@ -125,7 +126,7 @@ Daisy::run ()
 void
 Daisy::initialize (const Syntax& s)
 { 
-  syntax = & s; 
+  syntax = &s; 
   field.initialize (time, weather);
 }
 

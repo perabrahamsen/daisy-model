@@ -21,6 +21,7 @@ private:
   struct Implementation;
   Implementation& impl;
 public:
+  static const char *const description;
 
   // Water.
 public:
@@ -33,6 +34,7 @@ public:
   const Tortuosity& tortuosity;
   double dry_bulk_density () const;
   double clay () const;
+  double humus () const;
   double SOM_C (unsigned int pool) const;
   double SOM_C_per_N (unsigned int pool) const;
 

@@ -42,15 +42,24 @@ ActionHarvestSyntax::ActionHarvestSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("name", Syntax::String, Syntax::Const);
+  alist.add ("description", "Harvest a crop.");
+  syntax.add ("name", Syntax::String, Syntax::Const, 
+	      "Name of the crop to harvest.\n\
+If you specify `all', all crops will be harvested.\n\
+If there are no crop on the field with the specified name,\n\
+nothing will happen.");
   alist.add ("name", "all");
-  syntax.add ("stub", Syntax::Number, Syntax::Const);
+  syntax.add ("stub", "cm", Syntax::Const, "\
+Leave stem and leafs below this size on the field.");
   alist.add ("stub", 0.0);
-  syntax.add ("stem", Syntax::Number, Syntax::Const);
+  syntax.add ("stem", Syntax::None (), Syntax::Const, "\
+Fraction of stem (above stub) to harvest.");
   alist.add ("stem", 1.0);
-  syntax.add ("leaf", Syntax::Number, Syntax::Const);
+  syntax.add ("leaf", Syntax::None (), Syntax::Const, "\
+Fraction of leafs (above stub) to harvest.");
   alist.add ("leaf", 1.0);
-  syntax.add ("sorg", Syntax::Number, Syntax::Const);
+  syntax.add ("sorg", Syntax::None (), Syntax::Const, "\
+Fraction of storage organ to harvest.");
   alist.add ("sorg", 1.0);
   syntax.order ("name");
   Librarian<Action>::add_type ("harvest", alist, syntax, &make);

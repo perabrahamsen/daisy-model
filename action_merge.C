@@ -8,19 +8,17 @@ struct ActionMerge : public Action
 {
   const string combine;
   const string remove;
-  const double weight;
 
   void doIt (Daisy& daisy)
     {
       COUT << "[Merging " << remove << " into " << combine << "]\n";
-      daisy.field.merge (combine, remove, weight);
+      daisy.field.merge (combine, remove);
     }
 
   ActionMerge (const AttributeList& al)
     : Action (al.name ("type")),
       combine (al.name ("combine")), 
-      remove (al.name ("remove")),
-      weight (al.number ("weight"))
+      remove (al.name ("remove"))
     { }
 };
 
@@ -32,14 +30,13 @@ static struct ActionMergeSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
+Merge two columns.  After the merge, only the first columnn will remain,\n\
+but its state will be a average of the the columns, weighted after size.");
       syntax.add ("combine", Syntax::String, Syntax::Const,
 		  "Column to merge into.");
       syntax.add ("remove", Syntax::String, Syntax::Const,
 		  "Column to remove after merge.");
-      syntax.add ("weight", Syntax::None (), Syntax::Const,
-		  "Relative size of the partition to remove.  \
-(2.0 twice as big, 0.5 half as big).");
-      alist.add ("weight", 1.0);
       syntax.order ("combine", "remove");
       Librarian<Action>::add_type ("merge", alist, syntax, &make);
     }

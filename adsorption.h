@@ -11,6 +11,7 @@ class Adsorption
 {
   // Content.
 public:
+  static const char *const description;
   const string name;
 
   // Simulation.

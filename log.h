@@ -17,6 +17,8 @@ class Log
 private:
   struct Implementation;
   Implementation& impl;
+public:
+  static const char *const description;
 
   // Use.  
 public:

@@ -79,10 +79,17 @@ static struct ActionFertilizeSyntax
   { 
     Syntax& syntax = *new Syntax (check);
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("am", Librarian<AM>::library ());
-    syntax.add ("from", Syntax::Number, Syntax::Const);
+    alist.add ("description", "Apply fertilizer to the soil.\n\
+If you want to incoorperate the fertilizer directly in the soil, specify\n\
+the `from' and `to' parameters.  By default, the fertilizer will be\n\
+left on the surface.");
+    syntax.add ("am", Librarian<AM>::library (), "\
+The type of fertilizer you want to apply.");
+    syntax.add ("from", "cm", Syntax::Const, "\
+Height where you want to start the incoorperation (a negative number).");
     alist.add ("from", 0.0);
-    syntax.add ("to", Syntax::Number, Syntax::Const);
+    syntax.add ("to", "cm", Syntax::Const, "\
+Height where you want to end the incoorperation (a negative number).");
     alist.add ("to", 0.0);
     syntax.order ("am");
     Librarian<Action>::add_type ("fertilize", alist, syntax, &make);

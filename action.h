@@ -26,6 +26,6 @@ public:
   virtual ~Action ();
 };
 
-static Librarian<Action> Action_init ("action", Action::description);
+static Librarian<Action> Action_init ("action");
 
 #endif ACTION_H

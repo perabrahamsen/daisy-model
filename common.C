@@ -24,10 +24,24 @@ extern "C"
 }
 #endif
 
+#ifndef __unix
+// #define MESSAGE_LOG "daisy.msg"
+#endif
+
+#ifdef MESSAGE_LOG
+#include <fstream>
+ofstream message_log (MESSAGE_LOG);
+#endif
 
 ostream& 
 Options::message ()
-{ return cout; }
+{
+#ifdef MESSAGE_LOG
+  return message_log;
+#else
+  return cout; 
+#endif
+}
 
 ostream& 
 Options::warning ()
@@ -36,10 +50,14 @@ Options::warning ()
 ostream& 
 Options::error ()
 { 
+#ifdef MESSAGE_LOG
+  return message_log;
+#else
 #ifdef USELESS_STDERR
   return cout;
 #else
   return cerr; 
+#endif
 #endif
 }
 

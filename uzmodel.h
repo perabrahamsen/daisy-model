@@ -38,6 +38,7 @@ class UZmodel : public UZtop, public UZbottom
   // Content.
 public: 
   const string name;
+  static const char *const description;
 
   // UZtop.
 public:

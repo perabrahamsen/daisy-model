@@ -12,6 +12,7 @@ class NetRadiation
   // Content.
 public:
   const string name;
+  static const char *const description;
 
   // Simulation.
 public:

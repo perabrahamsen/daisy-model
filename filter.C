@@ -4,6 +4,10 @@
 
 Librarian<Filter>::Content* Librarian<Filter>::content = NULL;
 
+const char *const Filter::description = "\
+The `filter' component is responsible for specifying which data should\n\
+be logged with the `file' log model.";
+
 bool
 Filter::check_derived (const string& name, const Library& library) const
 {

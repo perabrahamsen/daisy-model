@@ -8,6 +8,11 @@
 
 Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 
+const char *const Weather::description = "\
+Meteorological data, as well as the global positioning, are the\n\
+responsibility of the `weather' component, typically be reading the\n\
+data from a file.  The meteorological data are common to all columns.";
+
 struct Weather::Implementation
 {
   // Parameters.

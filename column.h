@@ -17,6 +17,8 @@ class Column
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   string name;
+  double size;
+  static const char *const description;
 
   // Actions.
 public:
@@ -52,7 +54,7 @@ public:
 
   virtual bool check () const = 0;
   virtual bool check_am (const AttributeList& am) const = 0;
-  virtual void output (Log&, Filter&) const = 0;
+  virtual void output (Log&, Filter&) const;
 
   // Communication with external model.
   virtual unsigned int count_layers () const = 0; // Number of num. layers.
@@ -80,6 +82,7 @@ public:
 protected:
   Column (const AttributeList&);
 public:
+  static void load_syntax (Syntax&, AttributeList&);
   virtual Column& clone (const string& name) const = 0;
   virtual void initialize (const Time&, const Weather&) = 0;
 

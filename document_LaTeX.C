@@ -2,14 +2,48 @@
 
 #include "document.h"
 #include "time.h"
+#include <ctype.h>
 
 struct DocumentLaTeX : public Document
 {
   // remember this for models.
   string current_component;
+  bool ordered;
+  bool submodel;
 
   // LaTeX functions.
   void print_quoted (ostream&, const string&);
+
+  // Private functions.
+  void print_entry_name (ostream& out, const string& name);
+  void print_entry_type (ostream& out,
+			 const string& name,
+			 const Syntax::type type,
+			 int size, 
+			 const Syntax& syntax,
+			 const AttributeList& alist);
+  void print_entry_size (ostream& out, const string&, int size);
+  void print_entry_description (ostream& out,
+				const string& name, 
+				const string& description);
+  void print_entry_submodel (ostream& out,
+			     const string& name, 
+			     const Syntax::type type, 
+			     int size,
+			     int level,
+			     const Syntax& syntax,
+			     const AttributeList& alist);
+  void print_entry_category (ostream& out,
+			     const string& name, 
+			     const Syntax::type type, 
+			     const Syntax& syntax,
+			     const AttributeList& alist,
+			     bool& printed_category_line);
+  void print_entry_value (ostream& out,
+			  const string& name, 
+			  const Syntax::type type, 
+			  int size,
+			  const AttributeList& alist);
 
   // Document functions.
   void print_submodel_entry (ostream&, const string&, int level,
@@ -18,23 +52,29 @@ struct DocumentLaTeX : public Document
   void print_submodel_empty (ostream&, const string&, int level);
   void print_submodel_header (ostream& out, const string&, int level);
   void print_submodel_trailer (ostream& out, const string&, int level);
-  void print_sample_ordered (ostream& out, const string& name);
-  void print_sample_entry (ostream& out, const string& name);
+  void print_sample_ordered (ostream& out, const string& name, bool seq);
+  void print_sample_entry (ostream& out, const string& name, bool seq);
   void print_sample_header (ostream& out, const string& name);
   void print_sample_trailer (ostream& out, const string&);
   void print_model_header (ostream& out, const string& name);
   void print_model_description (ostream& out, const string& description);
   void print_model_trailer (ostream& out, const string& name);
+  void print_fixed_header (ostream&, const string& name);
+  void print_fixed_trailer (ostream&, const string& name);
   void print_component_header (ostream& out, const string& name);
   void print_component_description (ostream& out, const string& description);
   void print_component_trailer (ostream& out, const string& name);
+  void print_fixed_all_header (ostream&) ;
+  void print_fixed_all_trailer (ostream&);
   void print_document_header (ostream& out);
   void print_document_trailer (ostream& out);
   
   // Create & Destroy.
   DocumentLaTeX (const AttributeList& al)
     : Document (al),
-      current_component ("Daisy")
+      current_component ("Daisy"),
+      ordered (false),
+      submodel (false)
     { }
   ~DocumentLaTeX ()
     { }
@@ -47,6 +87,14 @@ DocumentLaTeX::print_quoted (ostream& out, const string& name)
     switch (name[i])
       {
       case '^':
+	if (i+1 < name.length () && isdigit (name[i+1]))
+	  {
+	    out << "$" << name[i] << "{" << name[i+1] << "}$";
+	    i++;
+	  }
+	else
+	  out << "\\" << name[i] << "{ }";
+	break;
       case '~':
 	out << "\\" << name[i] << "{ }";
 	break;
@@ -76,23 +124,21 @@ DocumentLaTeX::print_quoted (ostream& out, const string& name)
 }
 
 void 
-DocumentLaTeX::print_submodel_entry (ostream& out,
-				     const string& name, int level,
-				     const Syntax& syntax,
-				     const AttributeList& alist)
+DocumentLaTeX::print_entry_name (ostream& out, const string& name)
 {
-  const Syntax::type type = syntax.lookup (name);
-
-  // We ignore libraries.
-  if (type == Syntax::Library)
-    return;
-
-  // Print name.
-  out << "\\item \\textit{";
+  out << "\n\\item \\textit{";
   print_quoted (out, name);
   out << "}: ";
+}
 
-  // Print type.
+void 
+DocumentLaTeX::print_entry_type (ostream& out,
+				 const string& name,
+				 const Syntax::type type, 
+				 int size, 
+				 const Syntax& syntax,
+				 const AttributeList& alist)
+{
   switch (type)
     {
     case Syntax::Number:
@@ -112,7 +158,32 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
       }
       break;
     case Syntax::AList:
-      out << "submodel (see section~\\ref{type:alist})";
+      {
+	string submodel = "";
+	if (size != Syntax::Singleton)
+	  {
+	    const AttributeList& nested = syntax.default_alist (name);
+	    if (nested.check ("submodel"))
+	      submodel = nested.name ("submodel");
+	  }
+	else if (!alist.check (name))
+	  /* do nothing */;
+	else
+	  {
+	    const AttributeList& nested = alist.alist (name);
+	    if (nested.check ("submodel"))
+	      submodel = nested.name ("submodel");
+	  }
+	if (submodel.length () > 0)
+	  {
+	    out << "\\textbf{";
+	    print_quoted (out, submodel);
+	    out << "} fixed component (see section~\\ref{fixed:"
+		<< submodel << "})";
+	  }
+	else
+	  out << "submodel (see section~\\ref{type:alist})";
+      }
       break;
     case Syntax::CSMP:
       out << "csmp (see section~\\ref{type:csmp})";
@@ -134,8 +205,8 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
 	const string& component = syntax.library (name).name ();
 	out << "\\textbf{";
 	print_quoted (out, component);
-	out << "} component (see chapter~\\ref{component:" << component
-	    << "})";
+	out << "} component (see chapter~\\ref{component:"
+	    << component << "})";
       }
       break;
     case Syntax::Library:
@@ -143,55 +214,131 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
     default:
       assert (false);
     };
+}
 
-  // Print size.
-  const int size = syntax.size (name);
+void 
+DocumentLaTeX::print_entry_size (ostream& out, const string&, int size)
+{
   if (size == Syntax::Singleton)
     /* do nothing */;
   else if (size == Syntax::Sequence)
     out << " sequence";
   else
     out << " array of length " << size;
+}
 
-  // Print category.
-  out << "\\\\\n";
+void 
+DocumentLaTeX::print_entry_description (ostream& out,
+					const string&, 
+					const string& description)
+{
+  if (description != Syntax::Unknown ())
+    {
+      out << "\\\\\n";
+      print_quoted (out, description);
+      out << "\n";
+    }
+}
+
+void 
+DocumentLaTeX::print_entry_submodel (ostream& out,
+				     const string& name, 
+				     const Syntax::type type, 
+				     int size,
+				     int level,
+				     const Syntax& syntax,
+				     const AttributeList& alist)
+{
+  if (type == Syntax::AList)
+    {
+      submodel = true;		// Affects how the sample header looks.
+      const Syntax& child = syntax.syntax (name);
+      if (size != Syntax::Singleton)
+	{
+	  const AttributeList& nested = syntax.default_alist (name);
+	  if (!nested.check ("submodel"))
+	    {
+	      print_sample (out, name, child, nested);
+	      print_submodel (out, name, level, child, nested);
+	    }
+	}
+      else if (!alist.check (name))
+	{
+	  const AttributeList nested;
+	  print_sample (out, name, child, nested);
+	  print_submodel (out, name, level, child, nested);
+	}
+      else
+	{
+	  const AttributeList& nested = alist.alist (name);
+	  if (!nested.check ("submodel"))
+	    {
+	      print_sample (out, name, child, nested);
+	      print_submodel (out, name, level, child, nested);
+	    }
+	}
+      if (level == 1)
+	submodel = false;
+    }
+}
+
+void 
+DocumentLaTeX::print_entry_category (ostream& out,
+				     const string& name, 
+				     const Syntax::type type, 
+				     const Syntax& syntax,
+				     const AttributeList& alist,
+				     bool& printed_category_line)
+{
   if (type == Syntax::Object)	// Objects and ALists don't have categories.
     {
       if (syntax.is_optional (name))
-	out << "Optional component";
+	out << "\\\\\nOptional component";
+      else if (alist.check (name))
+	out << "\\\\\nComponent";
       else
-	out << "Component";
+	printed_category_line = false;
     }
   else if (type == Syntax::AList)
     {
       if (syntax.is_optional (name))
-	out << "Optional submodel";
+	out << "\\\\\nOptional submodel";
+      else if (alist.check (name))
+	out << "\\\\\nSubmodel";
       else
-	out << "Submodel";
+	printed_category_line = false;
     }
   else if (syntax.is_optional (name))
     {
       if (syntax.is_const (name))
-	out << "Optional parameter";
+	out << "\\\\\nOptional parameter";
       else if (syntax.is_state (name))
-	out << "Optional state variable";
+	out << "\\\\\nOptional state variable";
       else if (syntax.is_log (name))
-	out << "Optional log variable";
+	out << "\\\\\nOptional log variable";
       else 
 	assert (false);
     }
   else
     {
       if (syntax.is_const (name))
-	out << "Parameter";
+	out << "\\\\\nParameter";
       else if (syntax.is_state (name))
-	out << "State variable";
+	out << "\\\\\nState variable";
       else if (syntax.is_log (name))
-	out << "Log variable";
+	out << "\\\\\nLog variable";
       else 
 	assert (false);
     }
-  
+}
+
+void 
+DocumentLaTeX::print_entry_value (ostream& out,
+				  const string& name, 
+				  const Syntax::type type, 
+				  int size,
+				  const AttributeList& alist)
+{
   if (alist.check (name))
     {
       if (size == Syntax::Singleton)
@@ -260,39 +407,54 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
 	  case Syntax::Date:
 	  case Syntax::Integer:
 	  case Syntax::Object:
-	    out << " (has default value)";
+	    if (alist.size (name) == 0)
+	      out << " (default: an empty sequence)";
+	    else
+	      out << " (has default value with length " 
+		  << alist.size (name) << ")";
 	    break;
 	  case Syntax::Library:
 	  case Syntax::Error:
 	    assert (false);
 	  }
     }
+}
+void 
+DocumentLaTeX::print_submodel_entry (ostream& out,
+				     const string& name, int level,
+				     const Syntax& syntax,
+				     const AttributeList& alist)
+{
+  const Syntax::type type = syntax.lookup (name);
+
+  // We ignore libraries.
+  if (type == Syntax::Library)
+    return;
+
+  const int size = syntax.size (name);
+
+  // Print name.
+  print_entry_name (out, name);
+
+  // Print type.
+  print_entry_type (out, name, type, size, syntax, alist);
+
+  // Print size.
+  print_entry_size (out, name, size);
+
+  // Print category.
+  bool printed_category_line = true;
+  print_entry_category (out, name, type, syntax, alist, printed_category_line);
+
+  // Print value.
+  print_entry_value (out, name, type, size, alist);
 
   // Print description line.
   const string& description = syntax.description (name);
-  if (description != Syntax::Unknown ())
-    {
-      out << "\\\\\n";
-      print_quoted (out, description);
-      out << "\n";
-    }
+  print_entry_description (out, name, description);
 
   // print submodel entries, if applicable
-  if (type == Syntax::AList)
-    {
-      if (!alist.check (name))
-	{
-	  AttributeList submodel_alist;
-	  print_submodel (out, name, level + 1, 
-			  syntax.syntax (name), submodel_alist);
-	}
-      else if (size == Syntax::Singleton)
-	print_submodel (out, name, level + 1, 
-			syntax.syntax (name), alist.alist (name));
-      else 
-	print_submodel (out, name, level + 1, 
-			syntax.syntax (name), syntax.default_alist (name));
-    }
+  print_entry_submodel (out, name, type, size, level + 1, syntax, alist);
 }
 
 
@@ -300,42 +462,61 @@ void
 DocumentLaTeX::print_submodel_empty (ostream& out,
 				     const string& name, int)
 { 
-  out << "\\\\\n\n";
+  out << "\n\n";
   print_quoted (out, name);
   out << " has no members\n";
 }
 
 void
-DocumentLaTeX::print_sample_ordered (ostream& out, const string& name)
+DocumentLaTeX::print_sample_ordered (ostream& out, 
+				     const string& name, bool sequence)
 { 
-  out << "~\\textit{";
+  ordered = true;
+  out << "\\textit{";
   print_quoted (out, name);
   out << "}";
+  if (sequence)
+    out << "\\ldots{}";
+  out << "~";
 }
 
 void
-DocumentLaTeX::print_sample_entry (ostream& out, const string& name)
+DocumentLaTeX::print_sample_entry (ostream& out,
+				   const string& name, bool sequence)
 { 
-  out << "\\\\\n\\hspace*{1em}(";
+  if (ordered)
+    out << "\\\\\n\\>";
+  else
+    ordered = true;
+      
+  out << "(";
   print_quoted (out, name);
   out << "~\\textit{";
   print_quoted (out, name);
-  out << "})";
+  out << "}";
+  if (sequence)
+    out << "\\ldots{}";
+  out << ")~";
 }
 
 void
 DocumentLaTeX::print_sample_header (ostream& out, const string& name)
 { 
-  out << "\n\\noindent\n\\begin{tt}\n\(def";
-  print_quoted (out, current_component);
-  out << "~\\textit{name}~";
-  print_quoted (out, name);
+  assert (ordered == false);
+  out << "\n\\noindent\n\\begin{tt}\n\\begin{tabbing}\n$<$~";
+  if (!submodel)
+    {
+      print_quoted (out, name);
+      out << "~";
+    }
+  out << "\\=";
 }
 
 void
 DocumentLaTeX::print_sample_trailer (ostream& out, const string&)
 { 
-  out << ")\n\\end{tt}\n";
+  out << "$>$\n\\end{tabbing}\n\\end{tt}";
+  ordered = false;
 }
 
 void
@@ -343,9 +524,9 @@ DocumentLaTeX::print_submodel_header (ostream& out,
 				      const string&, int level)
 { 
   if (level > 3)
-    out << "\n\\begin{enumerate}\n";
+    out << "\n\\begin{enumerate}";
   else
-    out << "\n\\begin{itemize}\n";
+    out << "\n\\begin{itemize}";
 }
 
 void
@@ -357,9 +538,6 @@ DocumentLaTeX::print_submodel_trailer (ostream& out,
   else
     out << "\\end{itemize}\n";
 }
-
-
-
 
 void
 DocumentLaTeX::print_model_header (ostream& out, const string& name)
@@ -375,11 +553,23 @@ DocumentLaTeX::print_model_description (ostream& out,
 { 
   out << "\n";
   print_quoted (out, description);
-  out << "\\\\\n";
+  out << "\n";
 }
 
 void
 DocumentLaTeX::print_model_trailer (ostream&, const string&)
+{ }
+
+void
+DocumentLaTeX::print_fixed_header (ostream& out, const string& name)
+{ 
+  out << "\n\\section{";
+  print_quoted (out, name);
+  out << "}\n\\label{fixed:" << name << "}\n";
+}
+
+void
+DocumentLaTeX::print_fixed_trailer (ostream&, const string&)
 { }
 
 void
@@ -405,6 +595,23 @@ DocumentLaTeX::print_component_trailer (ostream&, const string&)
 { 
   current_component = "Daisy";
 }
+
+void
+DocumentLaTeX::print_fixed_all_header (ostream& out)
+{ 
+  out << "\
+\\chapter{Fixed Components}\n\
+\\label{chp:fixed}\n\
+\n\
+Fixed components are similar to ordinary component, with the exceptions\n\
+that there can only be one model, that is, only a single implementation\n\
+of the component, and that it is not possible to define libraries of\n\
+standard parameterizations for the model.\n\
+"; }
+
+void
+DocumentLaTeX::print_fixed_all_trailer (ostream&)
+{ }
 
 void
 DocumentLaTeX::print_document_header (ostream& out)

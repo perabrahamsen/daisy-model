@@ -289,8 +289,6 @@ ParserFile::Implementation::add_derived (Library& lib)
   // Remember where we got this object.
   atts.add ("parsed_from_file", file);
   atts.add ("parsed_sequence", Library::get_sequence ());
-  // Remember the superclass.
-  atts.add ("type", super);
   // Add separate attributes for this object.
   load_list (atts, lib.syntax (super));
   // Add new object to library.

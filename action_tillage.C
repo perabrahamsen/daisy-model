@@ -44,9 +44,16 @@ static struct ActionMixSyntax
     { 
       Syntax& syntax = *new Syntax (&check);
       AttributeList& alist = *new AttributeList ();
-      syntax.add ("depth", Syntax::Number, Syntax::Const);
+      alist.add ("description", "\
+Mix soil content down to the specified depth.\n\
+The effect is that nitrogen, water, temperature and such are averaged in\n\
+the interval.");
+      syntax.add ("depth", "cm", Syntax::Const,
+		  "How far down to mix the soil (a negative number).");
       syntax.order ("depth");
-      syntax.add ("penetration", Syntax::Number, Syntax::Const);
+      syntax.add ("penetration", Syntax::None (), Syntax::Const, "\
+Fraction of organic matter on surface that are incoorperated in the soil \
+by this operation.");
       alist.add ("penetration", 0.0);
       Librarian<Action>::add_type ("mix", alist, syntax, &make);
     }
@@ -98,8 +105,17 @@ static struct ActionSwapSyntax
     {
       Syntax& syntax = *new Syntax (&check);
       AttributeList& alist = *new AttributeList ();
-      syntax.add ("middle", Syntax::Number, Syntax::Const);
-      syntax.add ("depth", Syntax::Number, Syntax::Const);
+      alist.add ("description", "\
+Swap two soil layers.  The top layer start at the surface and goes down to\n\
+`middle', and the second layer starts with `middle' and goes down to\n\
+ `depth'.  After the operation, the content (such as heat, water, and\n\
+organic matter) will be averaged in each layer, and the bottom layer will\n\
+be placed on top of what used to be the top layer.");
+      syntax.add ("middle", "cm", Syntax::Const, "\
+the end of the first layer and the start of the second layer to swap\n\
+\(a negative number).");
+      syntax.add ("depth", "cm", Syntax::Const, "\
+The end of the second layer to swap (a negative number).");
       Librarian<Action>::add_type ("swap", alist, syntax, &make);
     }
 } ActionSwap_syntax;

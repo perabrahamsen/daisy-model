@@ -10,6 +10,7 @@ class Parser
   // Content.
 public:
   const string name;
+  static const char *const description;
 
   // Interface.
 public:

@@ -5,6 +5,12 @@
 
 Librarian<PT>::Content* Librarian<PT>::content = NULL;
 
+const char *const PT::description = "\
+The task of the `pt' component is to calculate the potential\n\
+transpiration, given the potential evapotranspiration, the actual\n\
+evaporation from the surface, meteorological data, and the vegetation\n\
+and soil state.";
+
 void
 PT::output (Log& log, Filter& filter) const
 {

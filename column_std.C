@@ -313,6 +313,7 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
 void
 ColumnStandard::output (Log& log, Filter& filter) const
 {
+  Column::output (log, filter);
   log.open_geometry (soil);
   output_derived (bioclimate, "Bioclimate", log, filter);
   output_submodule (surface, "Surface", log, filter);
@@ -396,6 +397,7 @@ static struct ColumnStandardSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    Column::load_syntax (syntax, alist);
 
     syntax.add ("description", Syntax::String, Syntax::OptionalConst); 
     add_submodule<Vegetation> ("Vegetation", syntax, alist);

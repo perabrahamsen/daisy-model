@@ -30,6 +30,7 @@ class Crop
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const string name;
+  static const char *const description;
 
   // Communication with Bioclimate.
 public:

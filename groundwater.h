@@ -13,6 +13,7 @@ class Groundwater : public UZbottom
   // Content.
 public:
   const string name;
+  static const char *const description;
 
   // Simulation.
 public:

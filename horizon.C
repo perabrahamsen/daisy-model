@@ -7,6 +7,7 @@
 #include "csmp.h"
 #include "hydraulic.h"
 #include "mathlib.h"
+#include "tortuosity.h"
 #include <vector>
 #include <map>
 // G++ 2.7.2 has `accumulate' here.
@@ -335,6 +336,10 @@ Horizon::clay () const
 { return impl.clay; }
 
 double 
+Horizon::humus () const 
+{ return impl.humus; }
+
+double 
 Horizon::SOM_C (unsigned int pool) const
 {
   if (pool < impl.SOM_fractions.size ())
@@ -444,3 +449,8 @@ Horizon::~Horizon ()
 
 // Create Horizon library.
 Librarian<Horizon>::Content* Librarian<Horizon>::content = NULL;
+
+const char *const Horizon::description = "\
+A `horizon' is a soil type with specific physical properties.  It is\n\
+the responsibility of the `horizon' component to specify these\n\
+properties.";

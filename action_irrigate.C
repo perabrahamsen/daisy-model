@@ -75,13 +75,19 @@ static struct ActionIrrigateSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
+Irrigate the field.  Irrigation can either be applied from the top, in\n\
+which case it will typically hit the canopy, or directly on the surface,\n\
+bypassing the canopy.");
       syntax.add ("flux", "mm/h", Syntax::Const, 
 		  "Amount of irrigation applied");
       syntax.order ("flux");
       syntax.add ("temperature", "dg C", Syntax::Const,
 		  "Temperature of irrigation (default: air temperature)");
       alist.add ("temperature", ActionIrrigate::at_air_temperature);
-      add_submodule<IM> ("solute", syntax, alist);
+      add_submodule<IM> ("solute", syntax, alist, Syntax::Const,
+			 "\
+Nitrogen content of irrigation water [g/mm] (default: none).");
       Librarian<Action>::add_type ("irrigate_top", alist, syntax, &make_top);
       Librarian<Action>::add_type ("irrigate_surface", alist, syntax,
 				   &make_surface);

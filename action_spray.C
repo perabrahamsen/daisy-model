@@ -12,7 +12,7 @@ struct ActionSpray : public Action
 
   void doIt (Daisy& daisy)
     {
-      COUT << "[Spraying " << chemical << "]\n";
+      COUT << " [Spraying " << chemical << "]\n";
       daisy.field.spray (chemical, amount); 
     }
 
@@ -60,6 +60,8 @@ static struct ActionSpraySyntax
   { 
     Syntax& syntax = *new Syntax (check_alist);
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "\
+Spray a chemical (typically a pesticid) on the field.");
     syntax.add ("chemical", Syntax::String, Syntax::Const,
 		"Name of pesticide to spray.");
     syntax.add ("amount", "g/ha", Syntax::Const,

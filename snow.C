@@ -1,4 +1,4 @@
-// snow.C
+// snow.C --- Simulate snowpack on surface.
 
 #include "snow.h"
 #include "alist.h"
@@ -7,6 +7,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
+#include "submodel.h"
 #include "mathlib.h"
 
 struct Snow::Implementation
@@ -106,8 +107,16 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
   assert (fs >= 0.0);
 
   // Check if snow has become white.
-  if (Psnow > Psa && fs > fsa) 
-    age = 0;
+  if (Prain > 0.0)
+    {
+      if (Psnow > Psa && fs > fsa) 
+	age = 0;
+    }
+  else
+    {
+      if (Psnow > Psa) 
+	age = 0;
+    }
 
   // We evaporate as much of the water as we can.  If we can evaporate
   // more than that, evaporate all the snow too.
@@ -298,41 +307,63 @@ Snow::storage () const
 void
 Snow::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  alist.add ("submodel", "Snow");
+  alist.add ("description", "Simulate snow pack on surface.\n\
+_Snow Hydrology_, U.S. Corps of Engineers, 1956.");
+
   static const double hours_per_day = 24.0; // [h/d]
-  
-  syntax.add ("EvapSnowPack", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("q_s", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("Ssnow", Syntax::Number, Syntax::State);
+
+  syntax.add ("EvapSnowPack", "mm", Syntax::LogOnly, 
+	      "Evaporation from snowpack.");
+  syntax.add ("q_s", "mm", Syntax::LogOnly,
+	      "Leaking water.");
+  syntax.add ("Ssnow", "mm", Syntax::State,
+	      "Snow storage expressed as water.");
   alist.add ("Ssnow", 0.0);
-  syntax.add ("Swater", Syntax::Number, Syntax::State);
+  syntax.add ("Swater", "mm", Syntax::State, 
+	      "Water in snow storage.");
   alist.add ("Swater", 0.0);
-  syntax.add ("age", Syntax::Number, Syntax::State);
+  syntax.add ("age", "h", Syntax::State,
+	      "Time since last snow.");
   alist.add ("age", 0.0);
-  syntax.add ("dZs", Syntax::Number, Syntax::State);
+  syntax.add ("dZs", "m", Syntax::State,
+	      "Depth of snow layer.");
   alist.add ("dZs", 0.0);
-  syntax.add ("mf", Syntax::Number, Syntax::Const);
+  syntax.add ("mf", "m^-1", Syntax::Const,
+	      "Snow pack depth melting factor.");
   alist.add ("mf", 10.0);
-  syntax.add ("mtprime", Syntax::Number, Syntax::Const);
+  syntax.add ("mtprime", "kg/m^2/h C", Syntax::Const,
+	      "Air temperature melting factor.");
   alist.add ("mtprime", 2.0 / hours_per_day);
-  syntax.add ("mrprime", Syntax::Number, Syntax::Const);
+  syntax.add ("mrprime", "kg/J", Syntax::Const,
+	      "Radiation melting factor.");
   alist.add ("mrprime", 1.5e-7);
-  syntax.add ("m1", Syntax::Number, Syntax::Const);
+  syntax.add ("m1", "kg/J", Syntax::Const,
+	      "Radiation melting linear.");
   alist.add ("m1", 2.0);
-  syntax.add ("m2", Syntax::Number, Syntax::Const);
+  syntax.add ("m2", "h^-1", Syntax::Const, 
+	      "Radiation melting exponential factor.");
   alist.add ("m2", 0.1 / hours_per_day);
-  syntax.add ("rho_s", Syntax::Number, Syntax::Const);
+  syntax.add ("rho_s", "kg/m^3", Syntax::Const,
+	      "Density of newly fallen snow.");
   alist.add ("rho_s", 100.0);
-  syntax.add ("f_c", Syntax::Number, Syntax::Const);
+  syntax.add ("f_c", Syntax::None (), Syntax::Const,
+	      "Water capacity in snow factor.");
   alist.add ("f_c", 0.07);
-  syntax.add ("rho_1", Syntax::Number, Syntax::Const);
+  syntax.add ("rho_1", "kg/m^3", Syntax::Const,
+	      "Water collapse factor.");
   alist.add ("rho_1", 200.0);
-  syntax.add ("rho_2", Syntax::Number, Syntax::Const);
+  syntax.add ("rho_2", "m^-1", Syntax::Const, 
+	      "Snow collapse factor.");
   alist.add ("rho_2", 0.5);
-  syntax.add ("Psa", Syntax::Number, Syntax::Const);
-  alist.add ("Psa", 200.0);
-  syntax.add ("fsa", Syntax::Number, Syntax::Const);
-  alist.add ("fsa", 0.5);
-  syntax.add ("K_snow_factor", Syntax::Number, Syntax::Const);
+  syntax.add ("Psa", "mm", Syntax::Const, 
+	      "Absolute amount of snow required for snow to become new.");
+  alist.add ("Psa", 5.0 / hours_per_day);
+  syntax.add ("fsa", Syntax::None (), Syntax::Const, 
+	      "Relative amount of snow required for snow to become new.");
+  alist.add ("fsa", 0.9);
+  syntax.add ("K_snow_factor", "W m^4 / Kg^2", Syntax::Const,
+	      "Factor related to termal conductivity for snow water mix.");
   alist.add ("K_snow_factor", 2.86e6);
 }
   
@@ -342,3 +373,5 @@ Snow::Snow (const AttributeList& al)
 
 Snow::~Snow ()
 { }
+
+static Submodel::Register snow_submodel ("Snow", Snow::load_syntax);

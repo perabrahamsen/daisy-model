@@ -15,7 +15,7 @@ struct ConditionDSAfter : public Condition
   bool match (const Daisy& daisy) const
     { 
       double crop_ds = daisy.field.crop_ds (crop); 
-      if (crop_ds != Crop::DSremove && crop_ds > ds)
+      if (crop_ds != Crop::DSremove && crop_ds >= ds)
 	return true;
       return false;
     }
@@ -32,7 +32,7 @@ struct ConditionDMOver : public Condition
   const double weight;
 
   bool match (const Daisy& daisy) const
-    { return (daisy.field.crop_dm (crop) > weight); }
+    { return (daisy.field.crop_dm (crop) >= weight); }
 
   ConditionDMOver (const AttributeList& al)
     : crop (al.name ("crop")),
