@@ -24,6 +24,10 @@
 const char *const Daisy::default_description = "\
 The Daisy Crop/Soil/Atmosphere Model.";
 
+#ifdef BORLAND_TEMPLATES
+template class map_construct_const<Harvest>;
+#endif
+
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
     alist (al),
@@ -157,7 +161,7 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "List of logs for output during the simulation.");
   syntax.add ("activate_output", Librarian<Condition>::library (),
 	      "Activate output logs when this condition is true.\n\
-You can use the `after' condition to avoid logging during an initialization\n\
+You can use the 'after' condition to avoid logging during an initialization\n\
 period.");
   AttributeList true_alist;
   true_alist.add ("type", "true");

@@ -443,7 +443,7 @@ ActionCrop::Perennial::check_alist (const AttributeList& al, Treelog& err)
   non_negative (al.number ("DM"), "DM", ok, err);
   if (al.check ("fertilize_rest") && !al.check ("fertilize"))
     {
-      err.entry ("`fertilize_rest' specified, but `fertilize' isn't");
+      err.entry ("'fertilize_rest' specified, but 'fertilize' isn't");
       ok = false;
     }
   
@@ -471,14 +471,14 @@ The first season is the year the crop management starts.");
 Fertilizer applications after harvest first season.\n\
 First season is defined as the year where the first harvest occurs.");
   syntax.add ("fertilize_index", Syntax::Integer, Syntax::State,
-	      "Next entry in `fertilize' to execute.");
+	      "Next entry in 'fertilize' to execute.");
   alist.add ("fertilize_index", 0);
   syntax.add ("fertilize_rest", Librarian<AM>::library (),
 	      Syntax::OptionalConst, Syntax::Sequence,"\
 Fertilizer applications after harvest remaining seasons.\n\
 If missing, use the same fertilizer as first season.");
   syntax.add ("fertilize_rest_index", Syntax::Integer, Syntax::State,
-	      "Next entry in `fertilize_rest' to execute.");
+	      "Next entry in 'fertilize_rest' to execute.");
   alist.add ("fertilize_rest_index", 0);
   syntax.add ("fertilize_year", Syntax::Integer, Syntax::OptionalState, 
 	      "Year last fertilization was applid.");
@@ -762,7 +762,7 @@ ActionCrop::doIt (Daisy& daisy)
     }
   else if (harvest_annual)
     {
-      // We have only annual crops.  Let `primary' when they are harvested.
+      // We have only annual crops.  Let 'primary' when they are harvested.
       if (primary->done 
 	  && harvest_annual->doIt (daisy, primary->crop.name ("type")))
 	harvested = true;
@@ -811,14 +811,14 @@ ActionCrop::doIt (Daisy& daisy)
 	  // New season initialization.
 	  if (harvest_perennial->fertilize_rest)
 	    {
-	      // If we have `fertilize_rest', use it.
+	      // If we have 'fertilize_rest', use it.
 	      harvest_perennial->fertilize_rest_index = 0;
 	      harvest_perennial->fertilize_index
 		= harvest_perennial->fertilize->size ();
 	    }
 	  else 
 	    {
-	      // Otherwise, reuse `fertilize'.
+	      // Otherwise, reuse 'fertilize'.
 	      harvest_perennial->fertilize_index = 0;
 	    }
 	  harvest_perennial->fertilize_year = daisy.time.year ();
@@ -826,7 +826,7 @@ ActionCrop::doIt (Daisy& daisy)
       if (harvest_perennial->fertilize_index 
 	  < harvest_perennial->fertilize->size ())
 	{
-	  // If `fertilize' is active, use it.
+	  // If 'fertilize' is active, use it.
 	  fertilize (daisy, *(*harvest_perennial->fertilize)
 		     [harvest_perennial->fertilize_index]);
 	  harvest_perennial->fertilize_index++;
@@ -835,7 +835,7 @@ ActionCrop::doIt (Daisy& daisy)
 	       && (harvest_perennial->fertilize_rest_index
 		   < harvest_perennial->fertilize_rest->size ()))
 	{
-	  // Else, if `fertilize_rest' is active, us that.
+	  // Else, if 'fertilize_rest' is active, us that.
 	  fertilize (daisy, *(*harvest_perennial->fertilize_rest)
 		     [harvest_perennial->fertilize_rest_index]);
 	  harvest_perennial->fertilize_rest_index++;
@@ -908,6 +908,12 @@ ActionCrop::output (Log& log) const
   log.output ("irrigation_delay", irrigation_delay);
 }
 
+#ifdef BORLAND_TEMPLATES
+template class map_construct_const<Fertilize>;
+template class map_construct_const<Tillage>;
+template class map_construct_const<Spray>;
+#endif
+
 ActionCrop::ActionCrop (const AttributeList& al)
   : Action (al),
     primary (new Sow (al.alist ("primary"))),
@@ -967,7 +973,7 @@ static struct ActionCropSyntax
 
     if (al.check ("irrigation_rest") && !al.check ("irrigation"))
       {
-	err.entry ("`irrigation_rest' specified, but `irrigation' isn't");
+	err.entry ("'irrigation_rest' specified, but 'irrigation' isn't");
 	ok = false;
       }
     if (!al.check ("harvest_annual") && !al.check ("harvest_perennial"))
@@ -1008,7 +1014,7 @@ Harvest conditions for perennial crops.");
 Fertilizer application by date.");
     alist.add ("fertilize_at", vector<AttributeList*> ());
     syntax.add ("fertilize_at_index", Syntax::Integer, Syntax::State,
-		"Next entry in `fertilize_at' to execute.");
+		"Next entry in 'fertilize_at' to execute.");
     alist.add ("fertilize_at_index", 0);
     syntax.add ("fertilize_incorporate", Syntax::Boolean, Syntax::Const,
 		"Incorporate organic fertilizer in plowing zone.");
@@ -1018,14 +1024,14 @@ Fertilizer application by date.");
 List of tillage operations to apply.");
     alist.add ("tillage", vector<AttributeList*> ());
     syntax.add ("tillage_index", Syntax::Integer, Syntax::State,
-		"Next entry in `tillage' to execute.");
+		"Next entry in 'tillage' to execute.");
     alist.add ("tillage_index", 0);
     add_submodule_sequence<ActionCrop::Spray> ("spray", syntax, 
 						 Syntax::State, "\
 List of chemicals to apply.");
     alist.add ("spray", vector<AttributeList*> ());
     syntax.add ("spray_index", Syntax::Integer, Syntax::State,
-		"Next entry in `spray' to execute.");
+		"Next entry in 'spray' to execute.");
     alist.add ("spray_index", 0);
     add_submodule<ActionCrop::Irrigation>("irrigation", syntax, alist,
 					  Syntax::OptionalConst, "\
