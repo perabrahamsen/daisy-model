@@ -30,8 +30,10 @@ LogSelect::check_member (symbol name) const
   daisy_assert (!active_stack.empty ());
 
   const vector<Select*>& current = active_stack.top ();
-  for (unsigned int i = 0; i < current.size (); i++)
-    if (current[i]->valid (name))
+  for (vector<Select*>::const_iterator i = current.begin (); 
+       i < current.end (); 
+       i++)
+    if ((*i)->valid (name))
       return true;
 
   return false;
@@ -48,8 +50,10 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
   condition.tick (daisy, out);
   is_printing = condition.match (daisy);
   is_active = is_printing;
-  daisy_assert (active_stack.empty ());
 
+#ifdef NO_LOG_ALL
+  // If we don't have log_all.C, we keep track of the active_stack in
+  // each indidual log file.
   vector<Select*> current;
   for (unsigned int i = 0; i < entries.size (); i++)
     if (entries[i]->match (daisy, out, is_printing))
@@ -60,6 +64,15 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 
   if (is_active)
     active_stack.push (current);
+#else //!NO_LOG_ALL
+  // If we have log_all.C, we let it keep track of the active_stack.
+  daisy_assert (active_stack.empty ());
+  for (vector<Select*>::const_iterator i = entries.begin (); 
+       i < entries.end (); 
+       i++)
+    if ((*i)->match (is_printing))
+      is_active = true;
+#endif
 
   return is_active;
 }
@@ -67,9 +80,12 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 void
 LogSelect::done ()
 { 
+#ifdef NO_LOG_ALL
+  // No log_all.C file, keep track of active_stack here.
   daisy_assert (is_active);
   daisy_assert (active_stack.size () == 1);
   active_stack.pop ();
+#endif
 }
 
 void 
@@ -83,11 +99,11 @@ LogSelect::open (symbol name)
   active_stack.push (vector<Select*> ());
   vector<Select*>& next = active_stack.top ();
   
-  for (unsigned int i = 0; i < current.size (); i++)
-    {
-      if (current[i]->open (name))
-	next.push_back (current[i]);
-    }
+  for (vector<Select*>::const_iterator i = current.begin (); 
+       i < current.end (); 
+       i++)
+    if ((*i)->open (name))
+	next.push_back ((*i));
 }
 
 void 
@@ -95,11 +111,11 @@ LogSelect::close ()
 { 
   const vector<Select*>& current = active_stack.top ();
 
-  for (unsigned int i = 0; i < current.size (); i++)
-    {
-      daisy_assert (current[i]->is_active);
-      current[i]->close ();
-    }
+  for (vector<Select*>::const_iterator i = current.begin (); 
+       i < current.end (); 
+       i++)
+    (*i)->close ();
+
   active_stack.pop ();
 }
 
@@ -163,9 +179,9 @@ LogSelect::output (symbol name, const double value)
 { 
   const vector<Select*>& sels = active_stack.top ();
 
-  for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid (name) && sels[i]->valid_leaf ())
-      sels[i]->output_number (value);
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_number (value);
 }
 
 void 
@@ -173,9 +189,9 @@ LogSelect::output (symbol name, const int value)
 { 
   const vector<Select*>& sels = active_stack.top ();
 
-  for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid (name) && sels[i]->valid_leaf ())
-      sels[i]->output_integer (value);
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_integer (value);
 }
 
 void 
@@ -183,9 +199,9 @@ LogSelect::output (symbol name, const string& value)
 { 
   const vector<Select*>& sels = active_stack.top ();
 
-  for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid (name) && sels[i]->valid_leaf ())
-      sels[i]->output_name (value);
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_name (value);
 }
 
 void 
@@ -193,9 +209,9 @@ LogSelect::output (symbol name, const vector<double>& value)
 { 
   const vector<Select*>& sels = active_stack.top ();
 
-  for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid (name) && sels[i]->valid_leaf ())
-      sels[i]->output_array (value, geometry ());
+  for (vector<Select*>::const_iterator i = sels.begin (); i < sels.end (); i++)
+    if ((*i)->valid_leaf (name))
+      (*i)->output_array (value, geometry ());
 }
 
 void 
@@ -253,7 +269,6 @@ static bool check_alist (const AttributeList& al, Treelog& err)
       err.entry ("'set' should contain an even number of arguments");
       ok = false;
     }
-
   return ok;
 }
 

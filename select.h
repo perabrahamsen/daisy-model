@@ -42,6 +42,7 @@ private:
   Implementation& impl;
 protected:
   const bool accumulate;	// Accumulate numbers over time.
+  const bool flux;		// Is this a flux variable?
   double convert (double) const; // Convert value.
   int count;			// Number of accumulated values.
 public:
@@ -72,18 +73,16 @@ public:
   // Nesting.
 private:
   vector<symbol> path;		// Content of this entry.
-  const unsigned int path_size;	// #entries in path.
   const unsigned int last_index;	// Index of last member in path.
   unsigned int current_path_index;// How nested in open's we are.
-  unsigned int last_valid_path_index;	// Remember the last valid level.
   symbol current_name;
   static const symbol wildcard;
   
 public:
   bool valid (symbol name) const
   { return current_name == wildcard || name == current_name; }
-  bool valid_leaf ()
-  { return last_index == current_path_index; }
+  bool valid_leaf (symbol name)
+  { return valid (name) && last_index == current_path_index; }
   bool open (symbol name)	// Open one leaf level.
   { 
     // Check if next level is also in path.
@@ -91,13 +90,11 @@ public:
 	return false;
 
     // We may have reached the end of path.
-    if (current_path_index == path_size)
+    if (current_path_index == last_index)
       return false;
 
     // Remember nesting.
     current_path_index++;
-    // This level is also valid.
-    last_valid_path_index++;
     // Direct acces to new head of path.
     current_name = path[current_path_index];
     return true;
@@ -106,9 +103,6 @@ public:
   { 
     // Decrease nesting.
     current_path_index--;
-
-    // Decrease valid level.
-    last_valid_path_index--;
     // And restore direct access to current path.
     current_name = path[current_path_index];
   }
@@ -121,10 +115,14 @@ public:
 
   // Reset at start of time step.
 public:
-  bool is_active;		// Should we be accumulating now?
-  bool match (const Daisy& daisy, Treelog&, bool is_printing);
+  bool is_active;		// Use by log_all.C.
+  bool match (bool is_printing)
+  { 
+    is_active = flux || is_printing;
+    return is_active;
+  }
 
-  // Print result at end of time step.
+   // Print result at end of time step.
   virtual void done (Destination& dest) = 0;
   virtual bool prevent_printing ();
 

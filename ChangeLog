@@ -1,9 +1,25 @@
+2003-05-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.77 released.
+
+2003-05-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/dk-horizon.dai: New file.
+	* lib/Makefile (DAISY): Added it.
+
 2003-05-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_all.C: New utility.
-	* Makefile (OTHER, SUBMODEL): Moved 'time.C' to SUBMODEL.
-	(SPECIALS): Added 'log_all.C'.
+	* Makefile (SPECIALS): Added 'log_all.C'.
+	* daisy.C, daisy.h: Use it.
+	* log_select.C: Cleanups.
+	* select.h, select.C (flux): New parameter.
+	(match): Use it.
+	* log_select.C: Update caller.
+	* lib/log.dai: Updated.
 
+	* Makefile (OTHER, SUBMODEL): Moved 'time.C' to SUBMODEL.
+	
 2003-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* select.h, log_select.C: Cleanups and more speedups.

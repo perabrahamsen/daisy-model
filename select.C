@@ -54,7 +54,6 @@ struct Select::Implementation
   } *spec;
 
   // Content.
-  Condition* condition;		// Should we accumulate now?
   const Units::Convert* spec_conv; // Convert value.
   const double factor;		// - || -
   const double offset;		// - || -
@@ -269,9 +268,6 @@ Select::Implementation::check (const string& spec_dim, Treelog& err) const
   
 Select::Implementation::Implementation (const AttributeList& al)
   : spec (al.check ("spec") ? new Spec (al.alist ("spec")) : NULL),
-    condition (al.check ("when") 
-	       ? &Librarian<Condition>::create (al.alist ("when"))
-	       : NULL),
     spec_conv (NULL),
     factor (al.number ("factor")),
     offset (al.number ("offset")),
@@ -284,8 +280,6 @@ Select::Implementation::~Implementation ()
 { 
   if (spec)
     delete spec;
-  if (condition)
-    delete condition; 
 }
 
 double 
@@ -341,25 +335,6 @@ void
 Select::output_array (const vector<double>&, const Geometry*)
 { throw ("This log selection can't log arrays."); }
 
-// Reset at start of time step.
-bool 
-Select::match (const Daisy& daisy, Treelog& out, bool is_printing)
-{ 
-  daisy_assert (current_path_index == 0U);
-  daisy_assert (last_valid_path_index == 0U);
-  daisy_assert (current_name == path[0]);
-
-  if (impl.condition)
-    {
-      impl.condition->tick (daisy, out);
-      is_active = impl.condition->match (daisy);
-    }
-  else
-    is_active = is_printing;
-
-  return is_active;
-}
-
 bool
 Select::prevent_printing ()
 { return false; }
@@ -373,6 +348,13 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 	err.warning ("Specifying both 'spec' and 'factor' may conflict");
       else if (al.number ("offset") != 0.0)
 	err.warning ("Specifying both 'spec' and 'offset' may conflict");
+    }
+  static bool has_warned_about_when = false;
+  if (!has_warned_about_when && al.check ("when"))
+    {
+      err.warning ("The 'when' select parametere is obsolete.\n\
+Set the 'flux' parameter instead.");
+      has_warned_about_when = true;
     }
   return ok;
 }
@@ -433,11 +415,18 @@ attribute.", Select::Implementation::Spec::load_syntax);
 	      Librarian<Condition>::library (),
 	      Syntax::OptionalConst, Syntax::Singleton,
 	      "\
-When to calculate the values in this column.\n\
-By default, the values will be calculated once, when the a new log entry\n\
-is written.  If you calculate the values more often, they will be\n\
-accumulated.  This is useful if you for example want to summarize the\n\
-hourly percolation into a daily log.");
+OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
+This overwrites any direct setting of 'flux'.");
+  syntax.add ("flux", Syntax::Boolean, Syntax::OptionalConst, "\
+Set this to true for flux variables and false for content variables.\n\
+\n\
+If the time step for logging is larger than the time step for the\n\
+simulation, log system will accumulate flux variables between log\n\
+steps.  For example, if you log daily values for nitrogen leaching,\n\
+the log system will need to accumulate the hourly leaching to\n\
+calculate the daily values.  For content variables, no accumulation is\n\
+needed (or desired).  If you log nitrogen content on a daily basis, the\n\
+log will contain the value present at the end of the day.");
   syntax.add ("factor", Syntax::Unknown (), Check::none (), Syntax::Const, "\
 Factor to multiply the calculated value with, before logging.");
   alist.add ("factor", 1.0);
@@ -466,7 +455,6 @@ Select::initialize (const string_map& conv, double, double,
   else
     spec_dim = Syntax::Unknown ();
   impl.initialize (path, conv, spec_dim, timestep); 
-  daisy_assert (path.size () == path_size);
 }
 
 bool 
@@ -483,12 +471,11 @@ Select::check (Treelog& err) const
 Select::Select (const AttributeList& al)
   : impl (*new Implementation (al)),
     accumulate (al.flag ("accumulate")),
+    flux (al.check ("when") ||  (al.check ("flux") && al.flag ("flux"))),
     count (al.integer ("count")),
     path (al.identifier_sequence ("path")),
-    path_size (path.size ()),
-    last_index (path_size - 1),
+    last_index (path.size () - 1),
     current_path_index (0U),
-    last_valid_path_index (0U),
     current_name (path[0]),
     is_active (false)
 { }

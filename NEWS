@@ -16,6 +16,20 @@ release.
 
 ** A bit more speedups and cleanups to logging.
 
+Having lots of log files is no longer expensive,
+
+** The 'flux' parameter for all select models.
+
+Instead of writing (when hourly) to ensure flux variables are getting
+accumulated between log file timesteps, write (flux true).  The old
+syntax will contibue to work for some time, but generates a warning.
+
+** New dk-horizon.dai parameterization file.
+
+This file contains median values from the DJF "Profil Database".
+
+** You can now use [cm/d] instead of [cm/h].
+
 * 2.76
 
 ** Logging is much faster.
