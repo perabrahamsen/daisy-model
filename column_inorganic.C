@@ -155,10 +155,7 @@ ColumnInorganic::tick (Treelog& out,
 
 bool 
 ColumnInorganic::check_am (const AttributeList&, Treelog&) const 
-{
-  daisy_assert (false); 
-  return false;
-}
+{ daisy_assert (false); }
 
 static struct ColumnInorganicSyntax
 {

@@ -38,14 +38,18 @@ template <class T>
 T max (T a, T b)
 { return (a > b) ? a : b; }
 
-#ifdef __sparc__
-#include <ieeefp.h>
-#else
-inline bool finite (x)
-{ return x <= 0.0 ¦¦ x >= 0.0; }
-#endif
-
 #endif // VISUALCPP
+
+#if defined (finite)
+/* do nothing */
+#elif defined (__sparc__)
+#include <ieeefp.h>
+#elif defined (isfinite)
+#define finite(x) isfinite(x)
+#else
+inline bool finite (double x)
+{ return x <= 0.0 || x >= 0.0; }
+#endif
 
 #ifndef M_LN2
 #define	M_LN2		0.69314718055994530942
