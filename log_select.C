@@ -159,56 +159,40 @@ LogSelect::output (symbol, const bool)
 void 
 LogSelect::output (symbol name, const double value)
 { 
-  daisy_assert (is_active);
-  symmap_t::const_iterator i = symmap.find (name);
-  if (i == symmap.end ())
-    return;
-  const vector<Select*>& sels = (*i).second;
+  const vector<Select*>& sels = active_stack.top ();
 
   for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid_leaf ())
+    if (sels[i]->valid (name) && sels[i]->valid_leaf ())
       sels[i]->output_number (value);
 }
 
 void 
 LogSelect::output (symbol name, const int value)
 { 
-  daisy_assert (is_active);
-  symmap_t::const_iterator i = symmap.find (name);
-  if (i == symmap.end ())
-    return;
-  const vector<Select*>& sels = (*i).second;
+  const vector<Select*>& sels = active_stack.top ();
 
   for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid_leaf ())
+    if (sels[i]->valid (name) && sels[i]->valid_leaf ())
       sels[i]->output_integer (value);
 }
 
 void 
 LogSelect::output (symbol name, const string& value)
 { 
-  daisy_assert (is_active);
-  symmap_t::const_iterator i = symmap.find (name);
-  if (i == symmap.end ())
-    return;
-  const vector<Select*>& sels = (*i).second;
+  const vector<Select*>& sels = active_stack.top ();
 
   for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid_leaf ())
+    if (sels[i]->valid (name) && sels[i]->valid_leaf ())
       sels[i]->output_name (value);
 }
 
 void 
 LogSelect::output (symbol name, const vector<double>& value)
 { 
-  daisy_assert (is_active);
-  symmap_t::const_iterator i = symmap.find (name);
-  if (i == symmap.end ())
-    return;
-  const vector<Select*>& sels = (*i).second;
+  const vector<Select*>& sels = active_stack.top ();
 
   for (unsigned int i = 0; i < sels.size (); i++)
-    if (sels[i]->valid_leaf ())
+    if (sels[i]->valid (name) && sels[i]->valid_leaf ())
       sels[i]->output_array (value, geometry ());
 }
 

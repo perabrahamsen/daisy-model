@@ -120,7 +120,7 @@ public:
   }
   void close ()		// Close one level.
   { 
-    daisy_assert (valid_level);
+    // daisy_assert (valid_level);
     // Decrease nesting.
     current_path_index--;
 
