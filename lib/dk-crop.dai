@@ -1,0 +1,8 @@
+;;; dk-crop.dai -*- lisp -*-
+
+(input file "dk-rye.dai")
+(input file "dk-sbarley.dai")
+(input file "dk-wbarley.dai")
+(input file "dk-wwheat.dai")
+
+;;; dk-crop.dai ends here

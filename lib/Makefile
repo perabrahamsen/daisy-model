@@ -5,9 +5,12 @@ NEWCROPS = potato.dai \
 	maize.dai pea.dai rye.dai sbarley.dai sugarbeet.dai srape.dai \
 	swheat.dai wbarley.dai wrape.dai wwheat.dai grass.dai fodderbeet.dai
 
-DAISY 	= dk-horizon.dai log-old.dai crop-old.dai vegetation.dai \
+DKCROPS = dk-rye.dai dk-wwheat.dai dk-wbarley.dai dk-sbarley.dai
+
+DAISY 	= dk-fertilizer.dai \
+	dk-crop.dai dk-horizon.dai log-old.dai crop-old.dai vegetation.dai \
 	crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
-	$(OLDCROPS) $(NEWCROPS)
+	$(OLDCROPS) $(NEWCROPS) $(DKCROPS)
 MSHE	= mshe.dai mshe-standalone.dai
 TEXT	= Makefile test.dai all.dai 
 CLIMATE = weather.dwf

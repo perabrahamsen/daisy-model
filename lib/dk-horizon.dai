@@ -1,4 +1,4 @@
-; hydraulic.dai -- Physical and hydraulic parameters for soil horisons
+; dk-horizon.dai -- Physical and hydraulic parameters for soil horisons
 
 ; Indeholder medianværdier for teksturen i A,B og C horisonterne. Data
 ; stammer fra jordprofildatabasen (DJF), men er konverteret til USDA
@@ -335,4 +335,6 @@
 	(Theta_res 0.0)
 	(l -2.255))) ;
 
-; END OF FILE
+;;; dk-horizon.dai ends here
+
+

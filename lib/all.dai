@@ -3,11 +3,14 @@
 (input file "crop.dai")
 (input file "crop-old.dai")
 (input file "log.dai")
-(input file "fertilizer.dai")
+;; (input file "fertilizer.dai")
 (input file "tillage.dai")
 (input file "chemistry.dai")
 (input file "vegetation.dai")
+
 (input file "dk-horizon.dai")
+(input file "dk-crop.dai")
+(input file "dk-fertilizer.dai")
 
 ;;; all.dai ends here.
 

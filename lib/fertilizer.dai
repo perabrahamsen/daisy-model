@@ -19,6 +19,22 @@ Added by <sha@kvl.dk>, 2000.")
 Added by <sha@kvl.dk>, 2000.")
   (NH4_fraction 0.508))
 
+(defam NPK01 mineral
+  (description "Various NPK and NS fertilizers")
+  (NH4_fraction 0.53 []))
+
+(defam NPK02 mineral
+  (description "Various NPK fertilizers")
+  (NH4_fraction 0.57 []))
+  
+(defam NP mineral
+  (description "Typical NP or NPS fertilizer")
+  (NH4_fraction 0.650 []))
+
+(defam CalciumNitrate mineral
+  (description "Kalksalpeter")
+  (NH4_fraction 0.08 []))
+
 (defam slurry organic
   (description "Average based on numbers provided by Torben Bonde, Danish
 Environmental Protection Agency, approximately 1991.
