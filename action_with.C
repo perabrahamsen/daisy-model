@@ -22,19 +22,19 @@ public:
 	  (*i)->doIt (daisy);
 	}
     }
-  bool check (const Daisy& daisy) const
+  bool check (const Daisy& daisy, ostream& err) const
     { 
       bool ok = true;
       for (vector<const Action*>::const_iterator i = actions.begin ();
 	   i != actions.end ();
 	   i++)
 	{
-	  if (!(*i)->check (daisy))
+	  if (!(*i)->check (daisy, err))
 	    ok = false;
 	}
       if (!daisy.field.find (column))
 	{
-	  CERR << "No column `" << column << "'\n";
+	  err << "No column `" << column << "'\n";
 	  ok = false;
 	}
       return ok;

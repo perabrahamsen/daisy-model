@@ -62,7 +62,8 @@ public:
   static int category_number (const char* name);
 
   // This function will check that an alist conform to the syntax.
-  bool check (const AttributeList&, const string& = "<unknown>") const;
+  bool check (const AttributeList&, 
+	      ostream& err, const string& = "<unknown>") const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 
@@ -177,8 +178,8 @@ public:
   // Create and Destroy.
 
   // A check_fun is a function used for extra syntax checking.
-  typedef bool (*check_fun)(const AttributeList&);
-  typedef bool (*check_list_fun)(const vector<AttributeList*>&);
+  typedef bool (*check_fun)(const AttributeList&, ostream& err);
+  typedef bool (*check_list_fun)(const vector<AttributeList*>&, ostream& err);
   void add_check (check_fun);
   void add_check (check_list_fun);
 
@@ -212,9 +213,12 @@ struct add_submodule_sequence
   }
 };
 
-void check (const AttributeList& al, const string& s, bool& ok);
-void non_negative (double v, const string& s, bool& ok, int index = -1);
-void non_positive (double v, const string& s, bool& ok, int index = -1);
-void is_fraction (double v, const string& s, bool& ok, int index = -1);
+void check (const AttributeList& al, const string& s, bool& ok, ostream& err);
+void non_negative (double v, const string& s, bool& ok, ostream& err, 
+		   int index = -1);
+void non_positive (double v, const string& s, bool& ok, ostream& err, 
+		   int index = -1);
+void is_fraction (double v, const string& s, bool& ok, ostream& err,
+		  int index = -1);
 
 #endif SYNTAX_H

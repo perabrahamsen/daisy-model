@@ -47,7 +47,7 @@ Daisy::Daisy (const AttributeList& al)
 }
 
 bool
-Daisy::check ()
+Daisy::check (ostream& err)
 {
   assert (syntax);
   bool all_ok = true;
@@ -55,12 +55,12 @@ Daisy::check ()
   // Check weather.
   {
     bool ok = true;
-    if (weather && !weather->check (time, time))
+    if (weather && !weather->check (time, time, err))
       ok = false;
 
     if (!ok)
       {
-	CERR << "Weather problems\n";
+	err << "Weather problems\n";
 	all_ok = false;
       }
   }
@@ -69,12 +69,12 @@ Daisy::check ()
   {
     bool ok = true;
     // This was ::const_iterator in g++
-    if (!field.check (weather == NULL, time, time))
+    if (!field.check (weather == NULL, time, time, err))
       ok = false;
 
     if (!ok)
       {
-	CERR << "Malformed column(s)\n";
+	err << "Malformed column(s)\n";
 	all_ok = false;
       }
   }
@@ -85,19 +85,19 @@ Daisy::check ()
 	 i != logs.end ();
 	 i++)
       {
-	if (*i == NULL || !(*i)-> check (*syntax))
+	if (*i == NULL || !(*i)-> check (*syntax, err))
 	  ok = false;
       }
     if (!ok)
       {
-	CERR << "Malformed log(s)\n";
+	err << "Malformed log(s)\n";
 	all_ok = false;
       }
   }
   // Check actions.
-  if (!action.check (*this))
+  if (!action.check (*this, err))
     {
-      CERR << "Malformed action(s)\n";
+      err << "Malformed action(s)\n";
       all_ok = false;
     }
 

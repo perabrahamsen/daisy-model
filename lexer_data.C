@@ -146,8 +146,8 @@ LexerData::next_line ()
     }
 }
 
-LexerData::LexerData (const string& name)
-  : Lexer (name)
+LexerData::LexerData (const string& name, ostream& out)
+  : Lexer (name, out)
 { }
 
 LexerData::~LexerData ()

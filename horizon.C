@@ -87,7 +87,7 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
   if (C_divisor > 0.0)
     C_factor /= C_divisor;
   else
-    CERR << "Horizon: No C fractions given.\n";
+    throw ("Horizon: No C fractions given");
 
   // The particles are not in a real continuous medium.  Try to correct.
   const double continuum_correction_factor = 1.25;
@@ -360,7 +360,7 @@ Horizon::SOM_C_per_N (unsigned int pool) const
     // Used last specified number.
     return impl.SOM_C_per_N[impl.SOM_C_per_N.size () - 1];
   // Give up.  Guess.
-  CERR << "Horizon: SOM: no C_per_N\n";
+  throw ("Horizon: SOM: no C_per_N");
   return 11.0;
 }
 
@@ -384,13 +384,18 @@ Horizon::heat_capacity (double Theta, double Ice) const
 }
 
 static bool
-check_alist (const AttributeList& al)
+check_alist (const AttributeList& al, ostream& err)
 {
   bool ok = true;
 
   if (!(al.number ("humus") > 0.0))
     {
-      CERR << "humus must be a positive number\n";
+      err << "humus must be a positive number\n";
+      ok = false;
+    }
+  if (al.size ("SOM_C_per_N") < 1)
+    {
+      err << "must specify at least one SOM_C_per_N\n";
       ok = false;
     }
   return ok;

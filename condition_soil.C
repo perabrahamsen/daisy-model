@@ -51,14 +51,14 @@ static struct ConditionSoilSyntax
   static Condition& make_potential (const AttributeList& al)
     { return *new ConditionSoilPotential (al); }
 
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       const double height (al.number ("height"));
       bool ok = true;
-      non_positive (height, "height", ok);
+      non_positive (height, "height", ok, err);
 
       if (!ok)
-	CERR << "in soil condition\n";
+	err << "in soil condition\n";
       return ok;
     }
 
@@ -66,7 +66,7 @@ static struct ConditionSoilSyntax
     {
       {
 	Syntax& syntax = *new Syntax ();
-	syntax.add_check (check);
+	syntax.add_check (check_alist);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Test if the soil is warmer than the specified temperature.");
@@ -79,7 +79,7 @@ Soil depth in which to test the temperature (a negative number).");
       }
       {
 	Syntax& syntax = *new Syntax ();
-	syntax.add_check (check);
+	syntax.add_check (check_alist);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Test if the soil is wetter than the specified pressure potential.");

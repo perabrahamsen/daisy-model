@@ -29,25 +29,25 @@ static struct ActionSpraySyntax
   static Action& make (const AttributeList& al)
   { return *new ActionSpray (al); }
 
-  static bool check_alist (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       bool ok = true;
       const string chemical = al.name ("chemical");
-      non_negative (al.number ("amount"), "amount", ok);
+      non_negative (al.number ("amount"), "amount", ok, err);
 
       const Library& library = Librarian<Chemical>::library ();
       if (!library.check (chemical))
 	{
-	  CERR << "Unknown chemical `" << chemical << "'\n";
+	  err << "Unknown chemical `" << chemical << "'\n";
 	  ok = false;
 	}
       else
 	{
 	  const Syntax& syntax = library.syntax (chemical);
 	  const AttributeList& alist = library.lookup (chemical);
-	  if (!syntax.check (alist))
+	  if (!syntax.check (alist, err))
 	    {
-	      CERR << "Incomplete chemical `" << chemical << "'\n";
+	      err << "Incomplete chemical `" << chemical << "'\n";
 	      ok = false;
 	    }
 	}

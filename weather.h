@@ -122,7 +122,7 @@ private:
 protected:
   Weather (const AttributeList&);
 public:
-  virtual bool check (const Time& from, const Time& to) const;
+  virtual bool check (const Time& from, const Time& to, ostream& err) const;
   static void load_syntax (Syntax&, AttributeList&);
   virtual ~Weather ();
 };

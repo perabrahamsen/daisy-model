@@ -108,7 +108,7 @@ static struct ActionWaitSyntax
   static Action& make_mm_dd (const AttributeList& al)
   { return *new ActionWaitMMDD (al); }
 
-  static bool check_mm_dd (const AttributeList& alist)
+  static bool check_mm_dd (const AttributeList& alist, ostream& err)
   {
     bool ok = true;
 
@@ -118,19 +118,19 @@ static struct ActionWaitSyntax
 
     if (mm < 1 || mm > 12)
       {
-	CERR << "month should be between 1 and 12\n";
+	err << "month should be between 1 and 12\n";
 	ok = false;
       }
     // don't test for bad month.
     else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
       {
-	CERR << "day should be between 1 and " 
-	     << Time::month_length (1, mm) << "\n";
+	err << "day should be between 1 and " 
+	    << Time::month_length (1, mm) << "\n";
 	ok = false;
       }
     if (hh < 0 || hh > 23)
       {
-	CERR << "hour should be between 0 and 23\n";
+	err << "hour should be between 0 and 23\n";
 	ok = false;
       }
     return ok;

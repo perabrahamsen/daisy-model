@@ -37,14 +37,14 @@ main (int argc, char* argv[])
 	}
 
       // Check the result.
-      if (!syntax.check (alist, "daisy"))
+      if (!syntax.check (alist, CERR, "daisy"))
 	return 1;
 
       // Create, check and run the simulation.
       Daisy daisy (alist);
       daisy.initialize (syntax);
 
-      if (!daisy.check ())
+      if (!daisy.check (CERR))
 	return 1;
       daisy.run ();
 

@@ -67,8 +67,9 @@ public:
   void merge (const string& combine, const string& remove);
 
   // Create and destroy.
-  bool check (bool require_weather, const Time& from, const Time& to) const;
-  bool check_am (const AttributeList& am) const;
+  bool check (bool require_weather, const Time& from, const Time& to, 
+	      ostream& err) const;
+  bool check_am (const AttributeList& am, ostream& err) const;
   void initialize (const Time&, const Weather*);
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
@@ -97,7 +98,6 @@ Field::Implementation::sow (const AttributeList& crop)
 {
   if (selected)
     {
-      CERR << "on " << selected->name << "\n";
       selected->sow (crop);
     }
   else 
@@ -196,20 +196,16 @@ Field::Implementation::fertilize (const AttributeList& al)
 {
   if (selected)
     {
-      CERR << "on " << selected->name << "\n";
       selected->fertilize (al);
     }
   else 
     {
-      CERR << "on";
       for (ColumnList::iterator i = columns.begin ();
 	   i != columns.end ();
 	   i++)
 	{
-	  CERR << " " << (*i)->name;
 	  (*i)->fertilize (al);
 	}
-      CERR << "\n";
     }
 }
 
@@ -461,28 +457,29 @@ Field::Implementation::merge (const string& /*combine*/,
 
 bool 
 Field::Implementation::check (bool require_weather,
-			      const Time& from, const Time& to) const
+			      const Time& from, const Time& to, 
+			      ostream& err) const
 { 
   bool ok = true;
 
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    if ((*i) == NULL || !(*i)->check (require_weather, from, to))
+    if ((*i) == NULL || !(*i)->check (require_weather, from, to, err))
       ok = false;
 
   return ok;
 }
 
 bool 
-Field::Implementation::check_am (const AttributeList& am) const
+Field::Implementation::check_am (const AttributeList& am, ostream& err) const
 { 
   bool ok = true;
 
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    if (!(*i)->check_am (am))
+    if (!(*i)->check_am (am, err))
       ok = false;
 
   return ok;
@@ -648,12 +645,13 @@ Field::merge (const string& combine, const string& remove)
 { impl.merge (combine, remove); }
 
 bool 
-Field::check (bool require_weather, const Time& from, const Time& to) const
-{ return impl.check (require_weather, from, to); }
+Field::check (bool require_weather, const Time& from, const Time& to, 
+	      ostream& err) const
+{ return impl.check (require_weather, from, to, err); }
 
 bool 
-Field::check_am (const AttributeList& am) const
-{ return impl.check_am (am); }
+Field::check_am (const AttributeList& am, ostream& err) const
+{ return impl.check_am (am, err); }
 
 void 
 Field::initialize (const Time& time, const Weather* weather)

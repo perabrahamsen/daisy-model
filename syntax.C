@@ -33,7 +33,8 @@ struct Syntax::Implementation
   string_map descriptions;
   alist_map alists;
 
-  bool check (const AttributeList& vl, const string& name, unsigned int level);
+  bool check (const AttributeList& vl, 
+	      ostream& err, const string& name, unsigned int level);
   Syntax::type lookup (const string& key) const;
   int order_number (const string& name) const;
   void entries (vector<string>& result) const;
@@ -47,7 +48,8 @@ struct Syntax::Implementation
 };    
 
 bool 
-Syntax::Implementation::check (const AttributeList& vl, const string& name,
+Syntax::Implementation::check (const AttributeList& vl,
+			       ostream& err, const string& name,
 			       unsigned int level)
 {
   bool error = false;
@@ -62,7 +64,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name,
 	{
 	  if (status[key] == Const || status[key] == State)
 	    {
-	      CERR << "Attribute " << key << " missing\n";
+	      err << "Attribute " << key << " missing\n";
 	      error = true;
 	    }
 	}
@@ -78,22 +80,22 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name,
 		const AttributeList& al = **j;
 		if (!al.check ("type"))
 		  {
-		    CERR << "Non object found\n";
+		    err << "Non object found\n";
 		    key_error = true;
 		  }
 		else if (al.name ("type") == "error")
 		  {
-		    CERR << "Error node found\n";
+		    err << "Error node found\n";
 		    key_error = true;
 		  }
 		else if (!lib.check (al.name ("type")))
 		  {
-		    CERR << "Unknown library member `" << al.name ("type")
+		    err << "Unknown library member `" << al.name ("type")
 			 << "'\n";
 		    key_error = true;
 		  }
-		else if (!lib.syntax (al.name ("type")).impl.check (al, key,
-								    level + 1))
+		else if (!lib.syntax (al.name ("type")).impl.check
+			 (al, err, key, level + 1))
 		  key_error = true;
 	      }
 	  }
@@ -103,10 +105,10 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name,
 	    const AttributeList& al = vl.alist (key);
 	    if (!al.check ("type"))
 	      {
-		CERR << "Non object found\n";
+		err << "Non object found\n";
 		key_error = true;
 	      }
-	    else if (!lib.syntax (al.name ("type")).check (al))
+	    else if (!lib.syntax (al.name ("type")).check (al, err))
 	      key_error = true;
 	  }
       else if (types[key] == AList)
@@ -118,7 +120,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name,
 		 j < syntax[key]->impl.list_checker.size ();
 		 j++)
 	      {
-		if (!syntax[key]->impl.list_checker[j] (seq))
+		if (!syntax[key]->impl.list_checker[j] (seq, err))
 		  {
 		    key_error = true;
 		    break;
@@ -129,25 +131,26 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name,
 		 j++)
 	      {
 		const AttributeList& al = **j;
-		if (!syntax[key]->impl.check (al, key, level + 1))
+		if (!syntax[key]->impl.check (al, err, key, level + 1))
 		  key_error = true;
 	      }
 	  }
-	else if (!syntax[key]->impl.check (vl.alist (key), key, level + 1))
+	else if (!syntax[key]->impl.check (vl.alist (key), err, 
+					   key, level + 1))
 	  key_error = true;
       if (key_error)
 	{
 	  error = true;
 	  for (unsigned l = 0; l < level; l++)
-	    CERR << "* ";
-	  CERR << "with key " << key << "\n";
+	    err << "* ";
+	  err << "with key " << key << "\n";
 	}
     }
   if (!error)
     {
       for (unsigned int j = 0; j < checker.size (); j++)
 	{
-	  if (!checker[j] (vl))
+	  if (!checker[j] (vl, err))
 	    {
 	      error = true;
 	      break;
@@ -157,8 +160,8 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name,
   if (error)
     {
       for (unsigned l = 0; l < level; l++)
-	CERR << "* ";
-      CERR << "in " << name << "\n";
+	err << "* ";
+      err << "in " << name << "\n";
     }
 
   return !error;
@@ -260,9 +263,9 @@ Syntax::category_number (const char* name)
 }
 
 bool
-Syntax::check (const AttributeList& vl, const string& name) const
+Syntax::check (const AttributeList& vl, ostream& err, const string& name) const
 {
-  return impl.check (vl, name, 0U);
+  return impl.check (vl, err, name, 0U);
 }
 
 Syntax::type 
@@ -584,50 +587,50 @@ Syntax::~Syntax ()
 { delete &impl; }
 
 void
-check (const AttributeList& al, const string& s, bool& ok)
+check (const AttributeList& al, const string& s, bool& ok, ostream& err)
 {
   if (!al.check (s))
     {
-      CERR << "Missing " << s << "\n";
+      err << "Missing " << s << "\n";
       ok = false;
     }
 }
 
 void
-non_negative (double v, const string& s, bool& ok, int index)
+non_negative (double v, const string& s, bool& ok, ostream& err, int index)
 {
   if (v < 0.0)
     {
-      CERR << "Negative " << s;
+      err << "Negative " << s;
       if (index >= 0)
-	CERR << "[" << index << "]";
-      CERR << "\n";
+	err << "[" << index << "]";
+      err << "\n";
       ok = false;
     }
 }
 
 void
-non_positive (double v, const string& s, bool& ok, int index)
+non_positive (double v, const string& s, bool& ok, ostream& err, int index)
 {
   if (v > 0.0)
     {
-      CERR << "Positive " << s;
+      err << "Positive " << s;
       if (index >= 0)
-	CERR << "[" << index << "]";
-      CERR << "\n";
+	err << "[" << index << "]";
+      err << "\n";
       ok = false;
     }
 }
 
 void
-is_fraction (double v, const string& s, bool& ok, int index)
+is_fraction (double v, const string& s, bool& ok, ostream& err, int index)
 {
   if (v < 0.0 || v > 1.0)
     {
-      CERR << "fraction " << s << " must be between 0 and 1";
+      err << "fraction " << s << " must be between 0 and 1";
       if (index >= 0)
-	CERR << "[" << index << "]";
-      CERR << "\n";
+	err << "[" << index << "]";
+      err << "\n";
       ok = false;
     }
 }

@@ -23,7 +23,7 @@ struct ActionFertilize : public Action
     const double to;
     
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al);
+    static bool check_alist (const AttributeList& al, ostream& err);
     static void load_syntax (Syntax& syntax, AttributeList& alist);
     Precision (const AttributeList& al);
     ~Precision ();
@@ -34,13 +34,13 @@ struct ActionFertilize : public Action
   void doIt (Daisy& daisy);
 
   // Create and Destroy.
-  bool check (const Daisy& daisy) const;
+  bool check (const Daisy& daisy, ostream& err) const;
   ActionFertilize (const AttributeList& al);
   ~ActionFertilize ();
 };
 
 bool 
-ActionFertilize::Precision::check_alist (const AttributeList& al)
+ActionFertilize::Precision::check_alist (const AttributeList& al, ostream& err)
 {
   bool ok = true; 
 
@@ -50,18 +50,18 @@ ActionFertilize::Precision::check_alist (const AttributeList& al)
 
   if (target <= 0.0)
     {
-      CERR << "You must specify a positive nitrogen target.\n";
+      err << "You must specify a positive nitrogen target.\n";
       ok = false;
     }
   if (from > 0.0 || to > 0.0)
     {
-      CERR << "You can only measure nitrogen below the ground.\n";
+      err << "You can only measure nitrogen below the ground.\n";
       ok = false;
     }
   if (from < to)
     {
-      CERR << "`from' must be higher than `to' in"
-	   << " the measurement area.\n";
+      err << "`from' must be higher than `to' in"
+	  << " the measurement area.\n";
       ok = false;
     }
   return ok;
@@ -149,10 +149,10 @@ ActionFertilize::doIt (Daisy& daisy)
 }
 
 bool 
-ActionFertilize::check (const Daisy& daisy) const
+ActionFertilize::check (const Daisy& daisy, ostream& err) const
 {
   bool ok = true;
-  if (am.name ("syntax") != "mineral" && !daisy.field.check_am (am))
+  if (am.name ("syntax") != "mineral" && !daisy.field.check_am (am, err))
     ok = false;
   return ok;
 }
@@ -184,19 +184,19 @@ static struct ActionFertilizeSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionFertilize (al); }
 
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
   { 
     bool ok = true;
     const double from = al.number ("from");
     const double to = al.number ("to");
     if (from > 0.0 || to > 0.0)
       {
-	CERR << "You can only fertilize on or below the ground.\n";
+	err << "You can only fertilize on or below the ground.\n";
 	ok = false;
       }
     if (from < to)
       {
-	CERR << "`from' must be higher than `to' in"
+	err << "`from' must be higher than `to' in"
 	     << " the fertilization area.\n";
 	ok = false;
       }
@@ -210,14 +210,14 @@ static struct ActionFertilizeSyntax
 
     if (second_year_compensation && precision)
       {
-	CERR << "You cannot use `second_year_compensation' "
-	     << "with `precision'.\n";
+	err << "You cannot use `second_year_compensation' "
+	    << "with `precision'.\n";
 	ok = false;
       }
     if (fertilizer_weight + equivalent_weight + precision != 1)
       {
-	CERR << "You must specify exactly one of `weight', "
-	     << "`equivalent_weight' and `precision'.\n";
+	err << "You must specify exactly one of `weight', "
+	    << "`equivalent_weight' and `precision'.\n";
 	ok = false;
       }
 
@@ -228,14 +228,14 @@ static struct ActionFertilizeSyntax
 	  {
 	    if (!am.check ("first_year_utilization"))
 	      {
-		CERR << "You must specify `first_year_utilization' for "
-		     << "the organic fertilizer.\n";
+		err << "You must specify `first_year_utilization' for "
+		    << "the organic fertilizer.\n";
 		ok = false;
 	      }
 	    if (!am.check ("weight") || !am.check ("total_N_fraction"))
 	      {
-		CERR << "You cannot use `equivalent_weight' with "
-		     << syntax << " fertilizer.\n";
+		err << "You cannot use `equivalent_weight' with "
+		    << syntax << " fertilizer.\n";
 	      }
 	  }
 	
@@ -246,7 +246,7 @@ static struct ActionFertilizeSyntax
   ActionFertilizeSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    syntax.add_check (check);
+    syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Apply fertilizer to the soil.\n\
 If you want to incorporate the fertilizer directly in the soil, specify\n\

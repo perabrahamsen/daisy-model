@@ -37,8 +37,8 @@ public:
   double get_smb_c_at (unsigned int i) const; // [g C/cm³]
 
   // Create and Destroy.
-  bool check () const;
-  bool check_am (const AttributeList& am) const;
+  bool check (ostream& err) const;
+  bool check_am (const AttributeList& am, ostream& err) const;
   void add (AM&);
   AM* find_am (const string& sort, const string& part) const;
 public:

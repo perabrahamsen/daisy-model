@@ -27,6 +27,7 @@ struct Library::Implementation
   void remove (const string&);
   const Syntax& syntax (const string&) const;
   void entries (vector<string>&) const;
+  void clear_parsed ();
   static void load_syntax (Syntax&, AttributeList&);
   Implementation (const char* n, derive_fun d, const char* des) 
     : name (n),
@@ -109,6 +110,25 @@ Library::Implementation::entries (vector<string>& result) const
 }
 
 void
+Library::Implementation::clear_parsed ()
+{
+ retry:
+  for (alist_map::iterator i = alists.begin (); i != alists.end (); i++)
+    {
+      AttributeList& alist = *((*i).second);
+      if (alist.check ("parsed_from_file"))
+	{
+	  string key = (*i).first;
+	  syntax_map::iterator j = syntaxen.find (key);
+	  assert (j != syntaxen.end ());
+	  syntaxen.erase (j);
+	  alists.erase (i);
+	  goto retry;
+	}
+    }
+}
+
+void
 Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
 {
   const string def = "def";
@@ -180,6 +200,21 @@ Library::syntax (const string& key) const
 void
 Library::entries (vector<string>& result) const
 { impl.entries (result); }
+
+void 
+Library::clear_all_parsed ()
+{
+  vector<string> components;
+  Library::all (components);
+
+  for (unsigned int i = 0; i < components.size (); i++)
+    {
+      const string& component = components[i];
+      const Library& library = Library::find (component);
+      
+      library.impl.clear_parsed ();
+    }
+}
 
 void 
 Library::load_syntax (Syntax& syntax, AttributeList& alist)

@@ -447,7 +447,7 @@ struct LogTable1 : public Log
     { }
 
   // Create and Destroy.
-  bool check (const Syntax&) const
+  bool check (const Syntax&, ostream&) const
     { return true; }
 
   LogTable1 (const AttributeList& al)
@@ -536,19 +536,19 @@ static struct LogTable1Syntax
   static Log& make (const AttributeList& al)
     { return *new LogTable1 (al); }
 
-  static bool check_alist (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       bool ok = true;
 
       if ((al.size ("set") % 2) == 1)
 	{
-	  CERR << "`set' should contain an even number of arguments.\n";
+	  err << "`set' should contain an even number of arguments.\n";
 	  ok = false;
 	}
 
       return ok;
     }
-  static bool check_entry_alist (const AttributeList& al)
+  static bool check_entry_alist (const AttributeList& al, ostream& err)
     {
       bool ok = true;
 
@@ -559,12 +559,12 @@ static struct LogTable1Syntax
 
       if (specify_content && specify_flux)
 	{
-	  CERR << "You cannot specify both `content_at' and `flux_at'\n";
+	  err << "You cannot specify both `content_at' and `flux_at'\n";
 	  ok = false;
 	}
       if ((specify_content || specify_flux) && specify_interval)
 	{
-	  CERR << "You cannot specify both position and interval\n";
+	  err << "You cannot specify both position and interval\n";
 	  ok = false;
 	}
 

@@ -35,7 +35,7 @@ struct AM::Implementation
 
   // Simulation.
   void output (Log&) const;
-  bool check () const;
+  bool check (ostream& err) const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
   void swap (const Geometry&, double from, double middle, double to);
   double total_C (const Geometry& geometry) const;
@@ -391,7 +391,7 @@ AM::Implementation::output (Log& log) const
 }
 
 bool 
-AM::Implementation::check () const
+AM::Implementation::check (ostream& err) const
 { 
   bool ok = true;
 
@@ -399,26 +399,26 @@ AM::Implementation::check () const
     {
       bool om_ok = true;
       
-      non_negative (om[i]->top_C, "top_C", om_ok);
+      non_negative (om[i]->top_C, "top_C", om_ok, err);
 
       for (unsigned int j = 0; j < om[i]->C_per_N.size (); j++)
-	non_negative (om[i]->C_per_N[j], "C_per_N", om_ok, j);
+	non_negative (om[i]->C_per_N[j], "C_per_N", om_ok, err, j);
 
-      non_negative (om[i]->turnover_rate, "turnover_rate", om_ok);
+      non_negative (om[i]->turnover_rate, "turnover_rate", om_ok, err);
 
       for (unsigned int j = 0; j < om[i]->efficiency.size (); j++)
-	non_negative (om[i]->efficiency[j], "efficiency", om_ok, j);
+	non_negative (om[i]->efficiency[j], "efficiency", om_ok, err, j);
 
-      non_negative (om[i]->maintenance, "maintenance", om_ok);
+      non_negative (om[i]->maintenance, "maintenance", om_ok, err);
 
       if (!om_ok)
 	{
-	  CERR << "in om[" << i << "]\n";
+	  err << "in om[" << i << "]\n";
 	  ok = false;
 	}
       }
   if (!ok)
-    CERR << "in am\n";
+    err << "in am\n";
   
   return ok;
 }
@@ -517,8 +517,8 @@ AM::append_to (vector<OM*>& added)
 { impl.append_to (added); }
 
 bool 
-AM::check () const
-{ return impl.check (); }
+AM::check (ostream& err) const
+{ return impl.check (err); }
 
 void 
 AM::mix (const Geometry& geometry,
@@ -848,22 +848,22 @@ AM::initialize (const Geometry& geometry)
 		}
 	      else if (missing_number != -1)
 		// Should be catched by syntax check.
-		CERR << "Missing initial fraction in initial am.\n";
+		throw ("Missing initial fraction in initial am");
 	      else
 		missing_number = j;
 	    }
 	  if (missing_number > -1)
 	    {
 	      if (missing_fraction < -0.1e-10)
-		CERR << "Specified over 100% C in om in initial am.\n";
+		throw ("Specified over 100% C in om in initial am");
 	      else if (missing_fraction > 0.0)
 		geometry.add (om[missing_number]->C, 
 			  last, end, C * missing_fraction);
 	    }
 	  else if (missing_fraction < -0.1e-10)
-	    CERR << "Specified more than all C in om in initial am.\n";
+	    throw ("Specified more than all C in om in initial am");
 	  else if (missing_fraction > 0.1e-10)
-	    CERR << "Specified less than all C in om in initial am.\n";
+	    throw ("Specified less than all C in om in initial am");
 	  
 	  last = end;
 	}
@@ -905,11 +905,11 @@ AM::~AM ()
   delete &impl;
 }
 
-static bool check_organic (const AttributeList& al)
+static bool check_organic (const AttributeList& al, ostream& err)
 { 
   if (!al.check ("syntax"))
     {
-      CERR << "no syntax";
+      err << "no syntax";
       return false;
     }
 
@@ -919,14 +919,14 @@ static bool check_organic (const AttributeList& al)
   static bool warned = false;
   if (al.check ("NH4_evaporation") && !warned)
     {
-      CERR << "OBSOLETE: Use `volatilization' instead of `NH4_evaporation'.\n";
+      err << "OBSOLETE: Use `volatilization' instead of `NH4_evaporation'.\n";
       warned = true;
     }
   
   bool ok = true;
-  ::check (al, "dry_matter_fraction", ok);
-  ::check (al, "total_C_fraction", ok);
-  ::check (al, "total_N_fraction", ok);
+  ::check (al, "dry_matter_fraction", ok, err);
+  ::check (al, "total_C_fraction", ok, err);
+  ::check (al, "total_N_fraction", ok, err);
   const vector<AttributeList*>& om_alist = al.alist_sequence ("om");
   bool has_all_initial_fraction = true;
   bool has_all_C_per_N = true;
@@ -939,48 +939,48 @@ static bool check_organic (const AttributeList& al)
 	    has_all_initial_fraction = false;
 	}
       else
-	::check (*om_alist[i], "initial_fraction", om_ok);
+	::check (*om_alist[i], "initial_fraction", om_ok, err);
       if (has_all_C_per_N)
 	{
 	  if (!om_alist[i]->check ("C_per_N"))
 	    has_all_C_per_N = false;
 	}
       else
-	::check (*om_alist[i], "C_per_N", om_ok);
-      ::check (*om_alist[i], "turnover_rate", om_ok);
-      ::check (*om_alist[i], "efficiency", om_ok);
+	::check (*om_alist[i], "C_per_N", om_ok, err);
+      ::check (*om_alist[i], "turnover_rate", om_ok, err);
+      ::check (*om_alist[i], "efficiency", om_ok, err);
       if (!om_ok)
 	{
-	  CERR << "in om[" << i << "]\n";
+	  err << "in om[" << i << "]\n";
 	  ok = false;
 	}
       }
   if (has_all_initial_fraction)
     {
-      CERR << "you should leave initial_fraction in one om unspecified\n";
+      err << "you should leave initial_fraction in one om unspecified\n";
       ok = false;
     }
   if (has_all_C_per_N)
     {
-      CERR << "you should leave C_per_N in one om unspecified\n";
+      err << "you should leave C_per_N in one om unspecified\n";
       ok = false;
     }
-  ::check (al, "weight", ok);
+  ::check (al, "weight", ok, err);
   if (!ok)
-    CERR << "in am\n";
+    err << "in am\n";
   
   return ok;
 }
 
-static bool check_root (const AttributeList& al)
+static bool check_root (const AttributeList& al, ostream& err)
 { 
   assert (al.name ("syntax") == "root");
   
   bool ok = true;
 
-  non_positive (al.number ("depth"), "depth", ok);
-  non_negative (al.number ("dist"), "dist", ok);
-  non_negative (al.number ("weight"), "weight", ok);
+  non_positive (al.number ("depth"), "depth", ok, err);
+  non_negative (al.number ("dist"), "dist", ok, err);
+  non_negative (al.number ("weight"), "weight", ok, err);
 
   return ok;
 }

@@ -2,6 +2,7 @@
 
 #include "document.h"
 #include "time.h"
+#include "plf.h"
 #include "version.h"
 #include <ctype.h>
 #include <time.h>
@@ -44,6 +45,7 @@ struct DocumentLaTeX : public Document
 			  const string& name, 
 			  const Syntax::type type, 
 			  int size,
+			  const Syntax& syntax,
 			  const AttributeList& alist);
 
   // Document functions.
@@ -333,6 +335,7 @@ DocumentLaTeX::print_entry_value (ostream& out,
 				  const string& name, 
 				  const Syntax::type type, 
 				  int size,
+				  const Syntax& syntax,
 				  const AttributeList& alist)
 {
   if (alist.check (name))
@@ -344,8 +347,20 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	    out << " (default " << alist.number (name) << ")";
 	    break;
 	  case Syntax::AList:
+	    {
+	      ostrstream tmp;
+	      const bool has_errors
+		= !syntax.syntax (name).check (alist.alist (name), 
+					       tmp, name);
+	      if (has_errors)
+		out << " (has partially specified default value)";
+	      else 
+		out << " (has fully specified default value)";
+	    }
+	    break;
 	  case Syntax::PLF:
-	    out << " (has default value)";
+	    out << " (has default value with" << alist.plf (name).size ()
+		<< " points)";
 	    break;
 	  case Syntax::Boolean:
 	    out << " (default " 
@@ -361,7 +376,8 @@ DocumentLaTeX::print_entry_value (ostream& out,
 		  out << "')";
 		}
 	      else
-		out << " (has default value)";
+		out << " (has default value with length "
+		    << value.length () << ")";
 	    }
 	    break;
 	  case Syntax::Date:
@@ -444,7 +460,7 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
       print_entry_category (out, name, type, syntax, alist);
 
       // Print value.
-      print_entry_value (out, name, type, size, alist);
+      print_entry_value (out, name, type, size, syntax, alist);
     }
 
   // Print description line.

@@ -29,19 +29,19 @@ static struct ActionMixSyntax
   static Action& make (const AttributeList& al)
     { return *new ActionMix (al); }
 
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       const double depth (al.number ("depth"));
       bool ok = true;
-      non_positive (depth, "depth", ok);
+      non_positive (depth, "depth", ok, err);
       if (!ok)
-	CERR << "in mix action\n";
+	err << "in mix action\n";
       return ok;
     }
   ActionMixSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
-      syntax.add_check (check);
+      syntax.add_check (check_alist);
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Mix soil content down to the specified depth.\n\
@@ -83,27 +83,27 @@ static struct ActionSwapSyntax
   static Action& make (const AttributeList& al)
     { return *new ActionSwap (al); }
 
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       const double middle (al.number ("middle"));
       const double depth (al.number ("depth"));
       bool ok = true;
-      non_positive (middle, "middle", ok);
-      non_positive (depth, "depth", ok);
+      non_positive (middle, "middle", ok, err);
+      non_positive (depth, "depth", ok, err);
       if (middle <= depth)
 	{
-	  CERR << "swap middle should be above the depth\n";
+	  err << "swap middle should be above the depth\n";
 	  ok = false;
 	}
       if (!ok)
-	CERR << "in swap action\n";
+	err << "in swap action\n";
       return ok;
     }
 
   ActionSwapSyntax ()
     {
       Syntax& syntax = *new Syntax ();
-      syntax.add_check (check);
+      syntax.add_check (check_alist);
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Swap two soil layers.  The top layer start at the surface and goes down to\n\
@@ -145,26 +145,26 @@ static struct ActionSetPorositySyntax
   static Action& make (const AttributeList& al)
     { return *new ActionSetPorosity (al); }
 
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       const double porosity (al.number ("porosity"));
       const double depth (al.number ("depth"));
       bool ok = true;
-      non_positive (depth, "depth", ok);
+      non_positive (depth, "depth", ok, err);
       if (porosity <= 0 || porosity >= 1.0)
 	{
-	  CERR << "porosity should be larger than 0 and less than 1\n";
+	  err << "porosity should be larger than 0 and less than 1\n";
 	  ok = false;
 	}
       if (!ok)
-	CERR << "in swap action\n";
+	err << "in swap action\n";
       return ok;
     }
 
   ActionSetPorositySyntax ()
     {
       Syntax& syntax = *new Syntax ();
-      syntax.add_check (check);
+      syntax.add_check (check_alist);
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Set the porosity of the horizon at the specified depth.\n\

@@ -94,13 +94,13 @@ static struct HydraulicB_CSyntax
       return *new HydraulicB_C (al);
     }
 
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     { 
       bool ok = true;
 
-      non_positive (al.number ("h_b"), "h_b", ok);
-      is_fraction (al.number ("b"), "b", ok);
-      non_negative (al.number ("K_sat"), "K_sat", ok);
+      non_positive (al.number ("h_b"), "h_b", ok, err);
+      is_fraction (al.number ("b"), "b", ok, err);
+      non_negative (al.number ("K_sat"), "K_sat", ok, err);
 
       return ok;
     }
@@ -109,7 +109,7 @@ static struct HydraulicB_CSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      syntax.add_check (check);
+      syntax.add_check (check_alist);
       alist.add ("description", 
 		 "Campbell retention curve model with Burdine theory.");
       Hydraulic::load_syntax (syntax, alist);

@@ -31,14 +31,14 @@ struct ActionActivity : public Action
 		   Librarian<Action>::library ());
     }
 
-  bool check (const Daisy& daisy) const
+  bool check (const Daisy& daisy, ostream& err) const
     { 
       bool ok = true;
       for (vector<const Action*>::const_iterator i = actions.begin ();
 	   i != actions.end ();
 	   i++)
 	{
-	  if (!(*i)->check (daisy))
+	  if (!(*i)->check (daisy, err))
 	    ok = false;
 	}
       return ok;

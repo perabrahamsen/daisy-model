@@ -30,10 +30,10 @@ struct ActionRepeat : public Action
     output_derived (*action, "do", log);
   }
 
-  bool check (const Daisy& daisy) const
+  bool check (const Daisy& daisy, ostream& err) const
   { 
     if (action)
-      return action->check (daisy);
+      return action->check (daisy, err);
     else
       return true;
   }

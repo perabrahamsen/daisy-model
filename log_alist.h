@@ -73,7 +73,7 @@ struct LogAList : public Log
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
-  bool check (const Syntax&) const;
+  bool check (const Syntax&, ostream& err) const;
   LogAList (const AttributeList& al);
   ~LogAList ();
 };

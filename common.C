@@ -237,7 +237,7 @@ Options::Options (int& argc, char**& argv,
       else if (options_finished || arg[0] != '-')
 	{
 	  // Parse the file.
-	  ParserFile parser (syntax, arg);
+	  ParserFile parser (syntax, arg, CERR);
 	  parser.load (alist);
 	  file_found = true;
 	  errors_found += parser.error_count ();
@@ -275,7 +275,7 @@ Options::Options (int& argc, char**& argv,
 		      const Syntax& syntax = library.syntax (name);
 		      AttributeList alist;
 		      alist.add ("type", name);
-		      if (syntax.check (alist, name))
+		      if (syntax.check (alist, CERR, name))
 			{
 			  Document& document = 
 			    Librarian<Document>::create (alist);

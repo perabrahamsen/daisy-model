@@ -22,7 +22,7 @@ public:
 
   // Create and Destroy.
 public: 
-  virtual bool check (const Daisy&) const;
+  virtual bool check (const Daisy&, ostream& err) const;
   static const char *const description;
 protected:
   Action (const AttributeList& al);

@@ -35,21 +35,21 @@ Geometry::interval_border (double z) const
 }
 
 bool 
-Geometry::check () const
+Geometry::check (ostream&) const
 {
   bool ok = true;
   return ok;
 }
 
 static bool 
-check_alist (const AttributeList& al)
+check_alist (const AttributeList& al, ostream& err)
 {
   bool ok = true;
   const vector<double> zplus = al.number_sequence ("zplus");
   
   if (zplus.size () < 1)
     {
-      CERR << "You need at least one interval\n";
+      err << "You need at least one interval\n";
       ok = false;
     }
   double last = 0.0;
@@ -57,7 +57,7 @@ check_alist (const AttributeList& al)
     {
       if (zplus[i] >= last)
 	{
-	  CERR << "Intervals should be monotonically decreasing, but "
+	  err << "Intervals should be monotonically decreasing, but "
 	       << zplus[i] << " > " << last << "\n";
 	  ok = false;
 	  break;
@@ -191,7 +191,7 @@ Geometry::swap (vector<double>& v, double from, double middle, double to) const
 }
 
 static bool 
-check_layers (const vector<AttributeList*>& layers)
+check_layers (const vector<AttributeList*>& layers, ostream& err)
 {
   double last = 0.0;
   for (unsigned int i = 0; i < layers.size (); i++)
@@ -201,8 +201,8 @@ check_layers (const vector<AttributeList*>& layers)
 	last = next;
       else
 	{
-	  CERR << "Layer ending at " << next 
-	       << " should be below " << last << "\n";
+	  err << "Layer ending at " << next 
+	      << " should be below " << last << "\n";
 	  return false;
 	}
     }

@@ -1,5 +1,11 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Use "parsed_sequence" for dependency tracking.
+
+* Redirect error messages
+
+for weather std, file, hourly, and for hydraulic old, old2
+
 * Test Qt.
 
 ** Menu -> View -> Check (Model)
@@ -43,10 +49,6 @@ number of "interest groups", which can be use by QDaisy for filtering.
 
 Avoid losing all open/close/selected information when changing tree
 view og loading files.
-
-* document LaTeX
-
-** Use the full/partial check for submodels with default values.
 
 * crop_std: RSR
 

@@ -268,32 +268,33 @@ SoilWater::set_Theta (const Soil& soil,
 
 
 bool 
-SoilWater::check (unsigned n) const
+SoilWater::check (unsigned n, ostream& err) const
 {
   bool ok = true;
 
   if (Theta_.size () != n)
     {
-      CERR << "You have " << n 
-	   << " intervals but " << Theta_.size () << " Theta values\n";
+      err << "You have " << n 
+	  << " intervals but " << Theta_.size () << " Theta values\n";
       ok = false;
     }
   if (h_.size () != n)
     {
-      CERR << "You have " << n 
-	   << " intervals but " << h_.size () << " h values\n";
+      err << "You have " << n 
+	  << " intervals but " << h_.size () << " h values\n";
       ok = false;
     }
   if (X_ice_.size () != n)
     {
-      CERR << "You have " << n 
-	   << " intervals but " << X_ice_.size () << " X_ice values\n";
+      err << "You have " << n 
+	  << " intervals but " << X_ice_.size () << " X_ice values\n";
       ok = false;
     }
   if (X_ice_buffer.size () != n)
     {
-      CERR << "You have " << n 
-	   << " intervals but " << X_ice_buffer.size () << " X_ice_buffer values\n";
+      err << "You have " << n 
+	  << " intervals but " << X_ice_buffer.size () 
+	  << " X_ice_buffer values\n";
       ok = false;
     }
   return ok;

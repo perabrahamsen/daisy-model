@@ -85,8 +85,9 @@ public:
   void divide (const string& original, const string& copy, double copy_size,
 	       const Time&, const Weather*);
   void merge (const string& combine, const string& remove);
-  bool check (bool require_weather, const Time& from, const Time& to) const;
-  bool check_am (const AttributeList& am) const;
+  bool check (bool require_weather, const Time& from, const Time& to, 
+	      ostream& err) const;
+  bool check_am (const AttributeList& am, ostream& err) const;
   void initialize (const Time&, const Weather*);
   Field (const vector<AttributeList*>&);
   ~Field ();

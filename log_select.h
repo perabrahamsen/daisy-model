@@ -57,7 +57,7 @@ struct LogSelect : public Log
   void output (const string&, const PLF&);
 
   // Create and Destroy.
-  bool check (const Syntax&) const;
+  bool check (const Syntax&, ostream& err) const;
   static void load_syntax (Syntax&, AttributeList&);
   LogSelect (const AttributeList& al);
   ~LogSelect ();

@@ -414,6 +414,7 @@ struct AttributeList::Implementation
   bool check (const string& key) const;
   const Value& lookup (const string& key) const;
   void add (const string& key, const Value& value);
+  void clear ();
 };    
 
 bool
@@ -439,6 +440,12 @@ void
 AttributeList::Implementation::add (const string& key, const Value& value)
 {
   values[key] = value;
+}
+
+void
+AttributeList::Implementation::clear ()
+{
+  values.erase (values.begin (), values.end ());
 }
 
 bool
@@ -710,6 +717,10 @@ AttributeList::operator += (const AttributeList& al)
        i++)
     impl.add ((*i).first, (*i).second);
 }
+
+void 
+AttributeList::clear ()
+{ impl.clear (); }
 
 AttributeList::AttributeList ()
   : impl (*new Implementation ())

@@ -35,7 +35,7 @@ daisy_syntax_delete (Syntax* syntax)
 extern "C" int EXPORT
 daisy_syntax_check (const Syntax* syntax, const AttributeList* alist, 
 		    const char* name)
-{ return syntax->check (*alist, name); }
+{ return syntax->check (*alist, CERR, name); }
 
 extern "C" void EXPORT
 daisy_syntax_add (Syntax* syntax, const char* name,
@@ -376,7 +376,7 @@ daisy_library_remove (Library* library, const char* name)
 
 extern "C" Parser* EXPORT
 daisy_parser_create_file (const Syntax* syntax, const char* filename)
-{ return new ParserFile (*syntax, filename); }
+{ return new ParserFile (*syntax, filename, CERR); }
 
 extern "C" void EXPORT
 daisy_parser_delete (Parser* parser)
@@ -433,7 +433,7 @@ daisy_daisy_delete (Daisy* daisy)
 
 extern "C" daisy_bool EXPORT	// Check context.
 daisy_daisy_check (Daisy* daisy)
-{ return daisy->check (); }
+{ return daisy->check (CERR); }
 
 // @@ Running the simulation.
 

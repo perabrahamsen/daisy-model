@@ -165,7 +165,7 @@ struct WeatherStandard : public Weather
   // Create and Destroy.
   WeatherStandard (const AttributeList&);
   ~WeatherStandard ();
-  bool check (const Time& from, const Time& to) const;
+  bool check (const Time& from, const Time& to, ostream& err) const;
 };
 
 const WeatherStandard::unit_type 
@@ -465,7 +465,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     relative_humidity_factor (1.0),
     wind_speed_factor (1.0),
     reference_evapotranspiration_factor (1.0),
-    lex (al.name ("where")),
+    lex (al.name ("where"), CERR),
     last_time (end),
     last_air_temperature (-42.42e42),
     last_global_radiation (-42.42e42),
@@ -732,27 +732,27 @@ WeatherStandard::~WeatherStandard ()
 { }
 
 bool
-WeatherStandard::check (const Time& from, const Time& to) const
+WeatherStandard::check (const Time& from, const Time& to, ostream& err) const
 { 
   bool ok = true;
   if (lex.error_count > 0)
     {
-      CERR << lex.error_count << " parser errors encountered\n";
+      err << lex.error_count << " parser errors encountered\n";
       ok = false;
     }
   if (from < begin)
     {
-      CERR << "Simulation starts before weather data\n";
+      err << "Simulation starts before weather data\n";
       ok = false;
     }
   if (to > end)
     {
-      CERR << "Simulation ends after weather data\n";
+      err << "Simulation ends after weather data\n";
       ok = false;
     }
   if (latitude < -66 || latitude > 66)
     {
-      CERR << "Researching arctic agriculture? (latitude = "
+      err << "Researching arctic agriculture? (latitude = "
 	   << latitude << ")\n";
     }
   return ok;

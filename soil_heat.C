@@ -62,7 +62,7 @@ struct SoilHeat::Implementation
   double bottom (const Time&, const Weather& weather) const;
 
   // Create & Destroy.
-  bool check (unsigned n) const;
+  bool check (unsigned n, ostream& err) const;
   void initialize (const AttributeList& al, 
 		   const Soil& soil, const Time& time, const Weather& weather);
   Implementation (const AttributeList&);
@@ -556,12 +556,12 @@ SoilHeat::Implementation::bottom (const Time& time,
 }
 
 bool
-SoilHeat::Implementation::check (unsigned n) const
+SoilHeat::Implementation::check (unsigned n, ostream& err) const
 {
   bool ok = true;
   if (T.size () != n)
     {
-      CERR << "You have " << n << " intervals but " 
+      err << "You have " << n << " intervals but " 
 	   << T.size () << " T values\n";
       ok = false;
     }
@@ -700,9 +700,9 @@ SoilHeat::output (Log& log) const
 }
 
 bool
-SoilHeat::check (unsigned n) const
+SoilHeat::check (unsigned n, ostream& err) const
 {
-  return impl.check (n);
+  return impl.check (n, err);
 }
 
 void

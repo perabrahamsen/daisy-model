@@ -94,13 +94,13 @@ static struct HydraulicM_CSyntax
       return *new HydraulicM_C (al);
     }
 
-  static bool check (const AttributeList& al)
+  static bool check (const AttributeList& al, ostream& err)
     { 
       bool ok = true;
 
-      non_positive (al.number ("h_b"), "h_b", ok);
-      is_fraction (al.number ("b"), "b", ok);
-      non_negative (al.number ("K_sat"), "K_sat", ok);
+      non_positive (al.number ("h_b"), "h_b", ok, err);
+      is_fraction (al.number ("b"), "b", ok, err);
+      non_negative (al.number ("K_sat"), "K_sat", ok, err);
 
       return ok;
     }

@@ -299,7 +299,7 @@ Weather::~Weather ()
 { }
 
 bool
-Weather::check (const Time&, const Time&) const
+Weather::check (const Time&, const Time&, ostream&) const
 { return true; }
 
 void

@@ -19,9 +19,9 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Syntax&);
+  void initialize (const Syntax&, ostream&);
   ParserFile (const AttributeList&);
-  ParserFile (const Syntax& syntax, const string& n);
+  ParserFile (const Syntax& syntax, const string& n, ostream&);
   ~ParserFile ();
 };
 

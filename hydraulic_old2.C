@@ -81,13 +81,10 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
   const int M_intervals (al.integer ("M_intervals"));
   const string name (al.name ("file"));
   
-  // CERR << "\n" << name << ": opening\n";
-
   ifstream file (Options::find_file (name));
   if (!file.good ())
     {
-      CERR << "\n" << name << ": file open error";
-      throw ("read error");
+      throw (name + "read error");
     }
   while (file.good () && file.get () != '\n')
     ;
@@ -103,8 +100,13 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
   for (int i = 0; i <= 500; i++)
     {
       if (!file.good ())
-	CERR << "\n" << name << ":" << line << ": no good";
-
+	{
+#if 0
+	throw name + ":" + line + ": no good";
+#else
+	throw name + ": no good";
+#endif
+	}
       file >> pF >> Theta >> Cw2 >> K;
       line++;
 
@@ -112,8 +114,8 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
 	const_cast<double&> (Theta_sat) = Theta;
       
       if (i != int (rint (pF * 100)))
-	CERR << "\n" << name << ":" << line << ": i " << i << " != "
-	     << pF * 100 << "(" << int (rint (pF * 100)) << ")";
+	CERR << name << ":" << line << ": i " << i << " != "
+	     << pF * 100 << "(" << int (rint (pF * 100)) << ")\n";
       
       Theta_[i] = Theta;
       Cw2_[i] = Cw2 * 1.0e-2;
@@ -124,17 +126,6 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
       Thetam_.add (h_minus, -Theta);
     }
   
-#if 0
-  if (!file.eof ())
-    {
-      CERR << name << ":" << line << ": end of file expected\nGot:";
-
-      while (file.good () && !file.eof ())
-	CERR << " `" << file.get () << "'";
-      CERR << "\n";
-      // throw ("read error");
-    }
-#endif
   hm_ = Thetam_.inverse ();
 
   PLF myM;

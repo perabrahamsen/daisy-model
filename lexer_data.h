@@ -23,7 +23,7 @@ public:
 
   // Create and Destroy.
 public:
-  LexerData (const string& name);
+  LexerData (const string& name, ostream&);
   ~LexerData ();
 };
 

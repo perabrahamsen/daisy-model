@@ -86,7 +86,8 @@ Chemicals::Implementation::lookup (const string& name)
   assert (library.check (name));
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
-  assert (syntax.check (alist));
+  ostrstream dummy_stream;
+  assert (syntax.check (alist, dummy_stream));
   AttributeList child (alist);
   child.add ("type", name);
 
@@ -349,7 +350,7 @@ Chemicals::Chemicals (const Chemicals& other)
 { }
 
 static bool
-check_alist_entry (const AttributeList& al)
+check_alist_entry (const AttributeList& al, ostream& err)
 {
   bool ok = true;
   
@@ -359,19 +360,19 @@ check_alist_entry (const AttributeList& al)
 
   if (!library.check (chemical))
     {
-      CERR << "Unknown chemical `" << chemical << "'\n";
+      err << "Unknown chemical `" << chemical << "'\n";
       ok = false;
     }
   else
     {
       const Syntax& syntax = library.syntax (chemical);
       const AttributeList& alist = library.lookup (chemical);
-      if (!syntax.check (alist))
+      if (!syntax.check (alist, err))
 	ok = false;
     }
   if (!(amount >= 0.0))
     {
-      CERR << "Amount must be non-negative\n";
+      err << "Amount must be non-negative\n";
       ok = false;
     }
   return ok;

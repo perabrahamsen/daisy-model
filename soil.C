@@ -118,14 +118,14 @@ Soil::MaxRootingDepth () const
 }
 
 bool 
-Soil::check () const
+Soil::check (ostream& err) const
 {
-  bool ok = Geometry::check ();
+  bool ok = Geometry::check (err);
   return ok;
 }
 
 static bool
-check_alist (const AttributeList& al)
+check_alist (const AttributeList& al, ostream& err)
 {
   bool ok = true;
 
@@ -133,7 +133,7 @@ check_alist (const AttributeList& al)
 
   if (layers.size () < 1U)
     {
-      CERR << "You need at least one horizon\n";
+      err << "You need at least one horizon\n";
       ok = false;
     }
   double last = 0.0;
@@ -143,7 +143,7 @@ check_alist (const AttributeList& al)
       double end = layers[i]->number ("end");
       if (end >= last)
 	{
-	  CERR << "Horizon endpoints must be monotonically decreasing\n";
+	  err << "Horizon endpoints must be monotonically decreasing\n";
 	  ok = false;
 	  break;
 	}
@@ -157,7 +157,7 @@ check_alist (const AttributeList& al)
   
       if (last != zplus[zplus.size() - 1])
 	{
-	  CERR <<
+	  err <<
 	    "The last horizon must end the same place as the last interval\n";
 	  ok = false;
 	}

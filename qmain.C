@@ -6,11 +6,17 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
+#include "version.h"
+#include "plf.h"
+#include "parser_file.h"
 
 #include <qapplication.h>
 #include <qmenubar.h>
 #include <qvbox.h>
 #include <qlabel.h>
+#include <qhgroupbox.h>
+#include <qmessagebox.h>
+#include <qfiledialog.h>
 
 int 
 main (int argc, char** argv)
@@ -20,7 +26,9 @@ main (int argc, char** argv)
   MainWindow main_window;
   
   // Initialize it.
+  main_window.setCaption ("QDaisy: untitled");
   main_window.populate_tree ();
+  main_window.set_description ("No selection", NULL);
   main_window.set_selection_editable (false);
   main_window.set_selection_copyable (false);
   main_window.set_selection_viewable (false);
@@ -31,11 +39,15 @@ main (int argc, char** argv)
   return app.exec ();
 }
 
-MainWindow::MainWindow (QWidget* parent, const char* name)
-  : QMainWindow (parent, name),
+MainWindow::MainWindow ()
+  : QMainWindow (),
     view_logonly (true),
-    view_parameters (true)
+    view_parameters (true),
+    errors (NULL)
 {
+  // Daisy.
+  Daisy::load_syntax (daisy_syntax, daisy_alist);
+
   // Arrange tree and description.
   QVBox* qmain = new QVBox (this);
   setCentralWidget (qmain);
@@ -49,7 +61,8 @@ MainWindow::MainWindow (QWidget* parent, const char* name)
   tree->setRootIsDecorated (true);
 
   // The description.
-  description = new QLabel (qmain);
+  QHGroupBox* dbox = new QHGroupBox ("Description", qmain);
+  description = new QLabel (dbox);
 
   // Menu bar.
   QMenuBar* menu = new QMenuBar (this);
@@ -57,12 +70,13 @@ MainWindow::MainWindow (QWidget* parent, const char* name)
   // - File menu.
   QPopupMenu* menu_file = new QPopupMenu (this);
   menu->insertItem ("&File", menu_file);
-  menu_file->insertItem ("&Open...", this, SLOT (menu_action ()));
+  menu_file->insertItem ("&New", this, SLOT (file_new ()));
+  menu_file->insertItem ("&Open...", this, SLOT (file_open ()));
   menu_file->insertItem ("&Save", this, SLOT (menu_action ()));
   menu_file->insertItem ("S&ave as...", this, SLOT (menu_action ()));
   menu_file->insertSeparator ();
-  menu_file->insertItem ("Run", this, SLOT (menu_action ()));
-  menu_file->insertItem ("Check", this, SLOT (menu_action ()));
+  menu_file->insertItem ("&Run", this, SLOT (menu_action ()));
+  menu_file->insertItem ("&Check", this, SLOT (menu_action ()));
   menu_file->insertSeparator ();
   menu_file->insertItem ("E&xit",  qApp, SLOT (quit()));
   
@@ -90,7 +104,7 @@ MainWindow::MainWindow (QWidget* parent, const char* name)
   menu_view_selected_id
     = menu_view->insertItem ("View &selected...", this, SLOT (menu_action ()));
   menu_view_check_id
-    = menu_view->insertItem ("&Check model...", this, SLOT (menu_action ()));
+    = menu_view->insertItem ("&Check model...", this, SLOT (view_check ()));
   menu_view->insertSeparator ();
   menu_view_logonly_id
     = menu_view->insertItem ("Include L&og variables",
@@ -117,19 +131,63 @@ MainWindow::MainWindow (QWidget* parent, const char* name)
   menu->insertSeparator ();
   QPopupMenu* help = new QPopupMenu (this);
   menu->insertItem ("&Help", help);
-  help->insertItem ("&About", this, SLOT (menu_action ()));
+  help->insertItem ("&About...", this, SLOT (help_about ()));
+  help->insertItem ("&About Qt...", this, SLOT (help_aboutQt ()));
+}
+
+void
+MainWindow::daisy_clear ()
+{ 
+  // Clear simulation.
+  daisy_alist.clear ();
+  Syntax dummy;
+  Daisy::load_syntax (dummy, daisy_alist);
+  
+  // Clear libraries.
+  Library::clear_all_parsed ();
+}
+
+void
+MainWindow::new_file ()
+{ 
+  // Delete old content.
+  daisy_clear ();
+
+  // Make it official.
+  file_name = "";
+  setCaption (QString ("QDaisy: untitled"));
+  tree->clear ();
+  populate_tree ();
+}
+
+void
+MainWindow::open_file (QString name)
+{ 
+  // Delete old content.
+  daisy_clear ();
+
+  // Load new content.
+  ostrstream errors;
+  ParserFile parser (daisy_syntax, name.ascii (), errors);
+  parser.load (daisy_alist);
+  const char* s = errors.str ();
+  if (parser.error_count ())
+    QMessageBox::critical (this, "QDaisy: Load errors", s);
+  else if (strlen (s) > 0)
+    QMessageBox::warning (this, "QDaisy: Load warnings", s);
+  delete [] s;
+
+  // In any case:  Make it official.
+  file_name = name;
+  setCaption (QString ("QDaisy: " + name));
+  tree->clear ();
+  populate_tree ();
 }
 
 void
 MainWindow::set_selection_viewable (bool viewable)
 {
   menu_view->setItemEnabled (menu_view_selected_id, viewable);
-}
-
-void
-MainWindow::set_selection_checkable (bool checkable)
-{
-  menu_view->setItemEnabled (menu_view_check_id, checkable);
 }
 
 void
@@ -167,13 +225,22 @@ MainWindow::populate_tree ()
 	  const string& model = models[i];
 	  const Syntax& syntax = library.syntax (model);
 	  const AttributeList& alist = library.lookup (model);
-	  QString value = syntax.check (alist) ? "Full" : "";
+	  ostrstream str;
+	  const bool has_errors = !syntax.check (alist, str, model);
+	  const char* errors = str.str ();
+	  QString value =  has_errors ? "" : "Full";
 	  QString description = "no description";
 	  if (alist.check ("description"))
 	    description = alist.name ("description").c_str ();
+	  QString type;
+	  if (alist.check ("parsed_from_file"))
+	    type = QString ("\"")
+	      + alist.name ("parsed_from_file").c_str () + "\"";
 	  MyListViewItem* qmodel 
-	    = new MyListViewItem (this, description, qcomponent,
-				  model.c_str (), "", value, "");
+	    = new MyListViewItem (this, description,
+				  has_errors ? new QString (errors) : NULL,
+				  qcomponent, model.c_str (), type, value, "");
+	  delete [] errors;
 
 	  add_alist_children (qmodel, syntax, alist);
 	}
@@ -252,6 +319,8 @@ MainWindow::add_alist_entry (MyListViewItem* node,
     }
 
   // Type specific changes.
+  bool has_errors = false;
+  QString errors;
   switch (type)
     {
     case Syntax::AList:
@@ -279,10 +348,18 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 	      }
 	  }
 	if (has_value && size == Syntax::Singleton)
-	  if (syntax.syntax (entry).check (alist.alist (entry)))
-	    value_name = "Full";
-	  else
-	    value_name = "Partial";
+	  {
+	    ostrstream str;
+	    has_errors = !syntax.syntax (entry).check (alist.alist (entry), 
+						       str, entry);
+	    const char* tmp = str.str ();
+	    errors = tmp;
+	    delete [] tmp;
+	    if (has_errors)
+	      value_name = "Partial";
+	    else
+	      value_name = "Full";
+	  }
       }
       break;
     case Syntax::Object:
@@ -296,10 +373,17 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 	  value_name = "`";
 	  value_name += type.c_str ();
 	  value_name += "'";
-	  if (syntax.library (entry).syntax (type).check (alist.alist (entry)))
-	    value_name += " full";
-	  else
+	  ostrstream str;
+	  has_errors 
+	    = !syntax.library (entry).syntax (type).check (alist.alist (entry),
+							   str, entry);
+	  const char* tmp = str.str ();
+	  errors = tmp;
+	  delete [] tmp;
+	  if (has_errors)
 	    value_name += " partial";
+	  else
+	    value_name += " full";
 	}
       break;
     case Syntax::Number:
@@ -320,6 +404,20 @@ MainWindow::add_alist_entry (MyListViewItem* node,
       type_name += syntax.range (entry).c_str ();
       type_name += " -> ";
       type_name += syntax.domain (entry).c_str ();
+      if (has_value && size == Syntax::Singleton)
+	{
+	  value_name = "<";
+	  value_name += QString::number (alist.plf (entry).size ());
+	  value_name += " points>";
+	}
+      break;
+    case Syntax::String:
+      if (has_value && size == Syntax::Singleton)
+	{
+	  value_name = "<";
+	  value_name += QString::number (alist.name (entry).length ());
+	  value_name += " characters>";
+	}
       break;
     case Syntax::Date:
       if (has_value && size == Syntax::Singleton)
@@ -330,8 +428,10 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 			      time.hour ());
 	}
       break;
+    case Syntax::Library:
+    case Syntax::Error:
     default:
-      break;
+      assert (false);
     }
 
   // Size specific changes.
@@ -348,7 +448,9 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 
   // Create it.
   MyListViewItem* item = 
-    new MyListViewItem (this, description, node,
+    new MyListViewItem (this, description, 
+			has_errors ? new QString (errors) : NULL,
+			node,
 			entry_name, type_name, value_name, 
 			category_name, order);
 
@@ -375,12 +477,44 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 }
 
 void 
-MainWindow::set_description (const QString& s)
-{ description->setText (s); }
+MainWindow::set_description (const QString& s, const QString* e)
+{ 
+  description->setText (s); 
+  errors = e;
+  menu_view->setItemEnabled (menu_view_check_id, e != NULL);
+}
 
 void 
 MainWindow::menu_action ()
 { }
+
+void 
+MainWindow::file_new ()
+{ 
+  // TODO: Warning if changed...
+}
+
+void 
+MainWindow::file_open ()
+{ 
+  QString file (QFileDialog::getOpenFileName (QString::null,
+					      "Daisy setup files (*.dai)", 
+					      this));
+  if (!file.isEmpty())
+    open_file (file);
+}
+
+void 
+MainWindow::view_check ()
+{ 
+  assert (errors);
+  const QListViewItem* current = tree->currentItem ();
+  assert (current);
+  const MyListViewItem* mine = dynamic_cast<const MyListViewItem*> (current);
+  assert (mine);
+  QString title = QString ("QDaisy: Check ") + mine->entry;
+  QMessageBox::information (this, title, *errors);
+}
 
 void 
 MainWindow::toggle_view_logonly ()
@@ -398,6 +532,19 @@ MainWindow::toggle_view_parameters ()
   menu_view->setItemChecked (menu_view_parameters_id, view_parameters);
   tree->clear ();
   populate_tree ();
+}
+
+void 
+MainWindow::help_about ()
+{ 
+  static const QString about = QString ("QDaisy version ") + version + ".";
+  QMessageBox::about (this, "QDaisy: About", about);
+}
+
+void 
+MainWindow::help_aboutQt ()
+{ 
+  QMessageBox::aboutQt (this, "QDaisy: About Qt");
 }
 
 QString
@@ -419,23 +566,25 @@ MyListViewItem::setSelected (bool s)
   main->set_selection_editable (false);
   main->set_selection_copyable (false);
   main->set_selection_viewable (false);
-  main->set_selection_checkable (false);
 
   if (s)
-    main->set_description (description);
+    main->set_description (description, errors);
   else
-    main->set_description ("no selection");
+    main->set_description ("no selection", NULL);
   QListViewItem::setSelected (s);
 }
 
 MyListViewItem::MyListViewItem (MainWindow* m, const QString& d,
+				const QString* err,
 				MyListViewItem* i,
 				const QString& e, const QString& t, 
 				const QString& v, const QString& c, 
 				int o)
   : QListViewItem (i, e, t, v, c),
     main (m),
+    entry (e),
     description (d),
+    errors (err),
     order (o)
 { }
 
@@ -443,6 +592,14 @@ MyListViewItem::MyListViewItem (MainWindow* m, const QString& d, QListView* i,
 				const QString& e)
   : QListViewItem (i, e),
     main (m),
+    entry (e),
     description (d),
+    errors (NULL),
     order (0)
 { }
+
+MyListViewItem::~MyListViewItem ()
+{
+  if (errors)
+    delete errors;
+}

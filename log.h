@@ -87,7 +87,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual bool check (const Syntax&) const = 0;
+  virtual bool check (const Syntax&, ostream& err) const = 0;
   virtual void initialize (const string& description);
 protected:
   Log (const AttributeList& al);

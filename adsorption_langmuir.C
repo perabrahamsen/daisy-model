@@ -59,7 +59,7 @@ static struct AdsorptionLangmuirSyntax
     return *new AdsorptionLangmuir (al);
   }
 
-  static bool check_alist (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       bool ok = true;
 
@@ -68,18 +68,18 @@ static struct AdsorptionLangmuirSyntax
       
       if (!has_my_max_clay && !has_my_max_OC)
 	{
-	  CERR << "You must specify either `my_max_clay' or `my_max_OC'\n";
+	  err << "You must specify either `my_max_clay' or `my_max_OC'\n";
 	  ok = false;
 	}
       if (has_my_max_clay)
-	non_negative (al.number ("my_max_clay"), "my_max_clay", ok);
+	non_negative (al.number ("my_max_clay"), "my_max_clay", ok, err);
       if (has_my_max_OC)
-	non_negative (al.number ("my_max_OC"), "my_max_OC", ok);
+	non_negative (al.number ("my_max_OC"), "my_max_OC", ok, err);
 
-      non_negative (al.number ("K"), "K", ok);
+      non_negative (al.number ("K"), "K", ok, err);
 
       if (!ok)
-	CERR << "in `linear' adsorption\n";
+	err << "in `linear' adsorption\n";
 
       return ok;
     }

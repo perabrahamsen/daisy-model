@@ -60,15 +60,15 @@ static struct GroundwaterStaticSyntax
   { 
     return *new GroundwaterStatic (al);
   }
-  static bool check_alist (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
   {
     static bool warned = false;
     if (warned)
       return true;
     else if (al.number ("table") > 0)
-      CERR << "OBSOLETE: Use `deep' instead `table' groundwater.\n";
+      err << "OBSOLETE: Use `deep' instead `table' groundwater.\n";
     else
-      CERR << "OBSOLETE: Use `fixed' instead `table' groundwater.\n";
+      err << "OBSOLETE: Use `fixed' instead `table' groundwater.\n";
     warned = true;
     return true;
   }

@@ -24,7 +24,7 @@ public:
   // Simulation.
 public:
   void output (Log&) const;
-  bool check () const;
+  bool check (ostream& err) const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
   void swap (const Geometry&, double from, double middle, double to);
   double total_C (const Geometry& geometry) const; // [g C/cm^2]

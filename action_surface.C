@@ -27,19 +27,19 @@ static struct ActionSurfaceSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionSetSurfaceDetentionCapacity (al); }
   
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
   {
     const double height  = al.number ("height");
     bool ok = true;
-    non_negative (height, "height", ok);
+    non_negative (height, "height", ok, err);
     if (!ok)
-      CERR << "in set_surface_detention_capacity action\n";
+      err << "in set_surface_detention_capacity action\n";
     return ok;
   }
   ActionSurfaceSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    syntax.add_check (check);
+    syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Set amount of ponding the surface can retain.");

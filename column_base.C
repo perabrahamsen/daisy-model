@@ -206,35 +206,37 @@ ColumnBase::get_water_content_at (unsigned int i) const // [cm³/cm³]
 
 bool
 ColumnBase::check (bool require_weather,
-		   const Time& from, const Time& to) const
+		   const Time& from, const Time& to, ostream& err) const
 {
-  int n = soil.size ();
+  const int n = soil.size ();
   bool ok = true;
 
   if (require_weather && !weather)
     {
-      CERR << "Weather unspecified\n";
+      err << "Weather unspecified\n";
       ok = false;
     }
-  if (weather && !weather->check (from, to))
+  if (weather && !weather->check (from, to, err))
     ok = false;
-  if (!soil.check ())
+  if (!soil.check (err))
     ok = false;
-  if (!soil_heat.check (n))
+  if (!soil_water.check (n, err))
     ok = false;
-  if (!soil_chemicals.check (n))
+  if (!soil_heat.check (n, err))
     ok = false;
-  if (!check_inner (n))
+  if (!soil_chemicals.check (n, err))
+    ok = false;
+  if (!check_inner (err))
     ok = false;
 
   if (!ok)
-    CERR << "in column `" << name << "'\n";
+    err << "in column `" << name << "'\n";
 
   return ok;
 }
 
 bool
-ColumnBase::check_inner (int) const
+ColumnBase::check_inner (ostream&) const
 { return true; }
 
 void

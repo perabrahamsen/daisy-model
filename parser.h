@@ -19,7 +19,7 @@ public:
  
   // Create and Destroy.
 public:
-  virtual void initialize (const Syntax&) = 0;
+  virtual void initialize (const Syntax&, ostream&) = 0;
 protected:
   Parser (const string& name);
 public:

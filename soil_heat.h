@@ -32,7 +32,7 @@ public:
   void set_source (unsigned int i, double value); // [erg/cm^3/h]
   double T (unsigned int i) const; // [dg C]
   void output (Log&) const;
-  bool check (unsigned n) const;
+  bool check (unsigned n, ostream&) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const AttributeList&);
   void initialize (const AttributeList& al, 

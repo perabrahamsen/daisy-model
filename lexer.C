@@ -45,10 +45,10 @@ Lexer::good ()
 }
 
 void 
-Lexer::error (string str)
+Lexer::error (const string& str)
 {
   error_count++;
-  CERR << file << ":" << line << ":" << (column + 1) << ": " << str << "\n";
+  err << file << ":" << line << ":" << (column + 1) << ": " << str << "\n";
 }
 
 void
@@ -58,20 +58,21 @@ Lexer::eof ()
     error ("Expected end of file");
 }
     
-Lexer::Lexer (const string& name)
+Lexer::Lexer (const string& name, ostream& out)
   : in (Options::find_file (name)),
+    err (out),
     line (1),
     column (0),
     file (name),
     error_count (0)
 {  
   if (!in.good ())
-    CERR << "Open `" << file << "' failed\n";
+    err << "Open `" << file << "' failed\n";
 }
 
 Lexer::~Lexer ()
 {
   if (in.bad ())
-    CERR << "There were trouble parsing `" << file << "'\n";
+    err << "There were trouble parsing `" << file << "'\n";
   close (in.rdbuf ()->fd ());
 }

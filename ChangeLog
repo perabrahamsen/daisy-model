@@ -1,4 +1,30 @@
+2000-09-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.50 released.
+
+2000-09-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* library.C, library.h (clear_all_parsed): New function.
+	* library.C (Implementation::clear_parsed): New function.
+	* alist.C, alist.h (clear): New function.
+	* qmain.C, qmain.h (file_new): New menu function.
+
+2000-09-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Made the `check (Daisy*)' and the file parser take ostream
+	arguments. 
+	* qmain.C, qmain.h (file_load): New menu function.
+
+	* horizon.C (check_alist): Check that `SOM_C_per_N' is at least
+	one long.
+
 2000-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* document_LaTeX.C (print_submodel_entry): Better value
+	descriptions for alists, plf's and strings.
+	* syntax.h, syntax.C (check): Take an ostream argument.
+	* all: Updated callers.	
+	* qmain.C, qmain.h (view_check): New menu function.
 
 	* Version 1.49 released.
 
@@ -6,6 +32,7 @@
 
 	* column_std.C (fertilize): Merged inorganic and organic
 	function variants. 
+	* column.h, column_inorganic.C, field.h, field.C (fertilize): Ditto.
 	* action_fertilize.C (doIt): Update caller
 	* action_crop.C (fertilize): Ditto.
 

@@ -7,8 +7,23 @@
 #include "log.h"
 
 
-struct ParserFile::Implementation : public Lexer
+struct ParserFile::Implementation
 {
+  // Lexer.
+  string file;
+  Lexer* lexer;
+
+  int get ()
+  { return lexer->get (); }
+  int peek ()
+  { return lexer->peek (); }
+  bool good ()
+  { return lexer->good (); }
+  void error (const string& str)
+  { lexer->error (str); }
+  void eof ()
+  { lexer->eof (); }
+
   // Lisp lexer.
   string get_string ();
   int get_integer ();
@@ -27,7 +42,7 @@ struct ParserFile::Implementation : public Lexer
   const Syntax* global_syntax_table;
 
   // Create and destroy.
-  void initialize (const Syntax&);
+  void initialize (const Syntax&, ostream&);
   Implementation (const string&);
   ~Implementation ();
 };
@@ -44,7 +59,7 @@ ParserFile::Implementation::get_string ()
       string str ("");
       skip ("\"");
 
-      for (c = get (); good() && c != '"'; c = get ())
+      for (c = get (); good () && c != '"'; c = get ())
 	{
 	  if (c == '\\')
 	    {
@@ -56,7 +71,6 @@ ParserFile::Implementation::get_string ()
 		  break;
 		default:
 		  error (string ("Unknown character escape '")
-			 // BUG: SHOULD USE DYNAMIC CAST!
 			 + char (c) + "'");
 		}
 	    }
@@ -125,7 +139,7 @@ ParserFile::Implementation::get_integer ()
   string str;
   int c = peek ();
 
-  while (isdigit (c) || c == '-' || c == '+')
+  while (good () && (isdigit (c) || c == '-' || c == '+'))
     {
       str += static_cast<char> (c);
       get ();
@@ -172,8 +186,7 @@ ParserFile::Implementation::skip ()
 }
 
 void
-ParserFile::Implementation::skip_token ()
-{
+ParserFile::Implementation::skip_token () {
   if (peek () == ';' || isspace (peek ()))
     skip ();
   if (peek () == '"')
@@ -369,10 +382,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      if (&lib == &Librarian<Parser>::library ())
 		{
 		  Parser& parser = Librarian<Parser>::create (al);
-		  parser.initialize (*global_syntax_table);
+		  parser.initialize (*global_syntax_table, lexer->err);
 		  delete &al;
 		  parser.load (atts);
-		  error_count += parser.error_count ();
+		  lexer->error_count += parser.error_count ();
 		  delete &parser;
 		}
 	      else
@@ -380,9 +393,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  const string obj = al.name ("type");
 		  if (obj == "error")
 		    break;
-		  if (!lib.syntax (obj).check (al, obj))
+		  if (!lib.syntax (obj).check (al, lexer->err, obj))
 		    error (string ("Error for member `") + obj 
-			   + "' in library `" + name + "'");
+				+ "' in library `" + name + "'");
 		  atts.add (name, al);
 		}
 	    }
@@ -426,7 +439,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    AttributeList& al = load_derived (lib, true);
 		    const string obj = al.name ("type");
 		    if (obj != "error")
-		      lib.syntax (obj).check (al, obj);
+		      lib.syntax (obj).check (al, lexer->err, obj);
 		    sequence.push_back (&al);
 		  }
 		atts.add (name, sequence);
@@ -474,7 +487,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    ostrstream str;
 		    str << "Got " << sequence.size ()
 			<< " array members, expected " << size << '\0';
-		    error (str.str ());
+		    const char* s = str.str ();
+		    error (s);
+		    delete [] s;
 		  }
 		atts.add (name, sequence);
 		break;
@@ -513,7 +528,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    ostrstream str;
 		    str << "Got " << count 
 			<< " array members, expected " << size << '\0';
-		    error (str.str ());
+		    const char* s = str.str ();
+		    error (s);
+		    delete [] s;
 
 		    for (;count < size; count++)
 		      array.push_back (-1.0);
@@ -537,7 +554,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    ostrstream str;
 		    str << "Got " << count 
 			<< " array members, expected " << size << '\0';
-		    error (str.str ());
+		    const char* s = str.str ();
+		    error (s);
+		    delete [] s;
 
 		    for (;count < size; count++)
 		      array.push_back ("<error>");
@@ -581,15 +600,18 @@ ParserFile::Implementation::get_time ()
 }
 
 void
-ParserFile::Implementation::initialize (const Syntax& syntax)
-{ global_syntax_table = &syntax; }
+ParserFile::Implementation::initialize (const Syntax& syntax, ostream& out)
+{ 
+  global_syntax_table = &syntax; 
+  lexer = new Lexer (file, out);
+}
 
 ParserFile::Implementation::Implementation (const string& name)
-  : Lexer (name)
+  : file (name)
 { }
 
 ParserFile::Implementation::~Implementation ()
-{ }
+{ delete lexer; }
 
 void
 ParserFile::load (AttributeList& alist)
@@ -603,17 +625,17 @@ ParserFile::load (AttributeList& alist)
 int
 ParserFile::error_count () const
 {
- return impl.error_count; 
+ return impl.lexer->error_count; 
 }
 
 void
-ParserFile::initialize (const Syntax& syntax)
-{ impl.initialize (syntax); }
+ParserFile::initialize (const Syntax& syntax, ostream& out)
+{ impl.initialize (syntax, out); }
 
-ParserFile::ParserFile (const Syntax& syntax, const string& name)
+ParserFile::ParserFile (const Syntax& syntax, const string& name, ostream& out)
   : Parser ("file"),
     impl (*new Implementation (name))
-{ initialize (syntax); }
+{ initialize (syntax, out); }
 
 ParserFile::ParserFile (const AttributeList& al)
   : Parser (al.name ("type")),
@@ -628,17 +650,17 @@ ParserFile::~ParserFile ()
 static struct ParserFileSyntax
 {
   static Parser& make (const AttributeList& al)
-    { return *new ParserFile (al); }
+  { return *new ParserFile (al); }
 
   ParserFileSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", 
-		 "Read Daisy a setup file containing lots of parentheses.");
-      syntax.add ("where", Syntax::String, Syntax::Const,
-		  "File to read from.");
-      syntax.order ("where");
-      Librarian<Parser>::add_type ("file", alist, syntax, &make);
-    }
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", 
+	       "Read Daisy a setup file containing lots of parentheses.");
+    syntax.add ("where", Syntax::String, Syntax::Const,
+		"File to read from.");
+    syntax.order ("where");
+    Librarian<Parser>::add_type ("file", alist, syntax, &make);
+  }
 } ParserFile_syntax;

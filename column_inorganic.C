@@ -30,7 +30,7 @@ public:
   // Simulation.
 public:
   void tick (const Time&, const Weather*);
-  bool check_am (const AttributeList& am) const;
+  bool check_am (const AttributeList& am, ostream& err) const;
 
   // Create and Destroy.
 public:
@@ -141,7 +141,7 @@ ColumnInorganic::tick (const Time& time, const Weather* global_weather)
 }
 
 bool 
-ColumnInorganic::check_am (const AttributeList&) const 
+ColumnInorganic::check_am (const AttributeList&, ostream&) const 
 {
   assert (false); 
   return false;

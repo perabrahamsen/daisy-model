@@ -84,7 +84,7 @@ static struct AdsorptionFreundlichSyntax
   {
     return *new AdsorptionFreundlich (al);
   }
-  static bool check_alist (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       bool ok = true;
 
@@ -93,18 +93,18 @@ static struct AdsorptionFreundlichSyntax
       
       if (!has_K_clay && !has_K_OC)
 	{
-	  CERR << "You must specify either `K_clay' or `K_OC'\n";
+	  err << "You must specify either `K_clay' or `K_OC'\n";
 	  ok = false;
 	}
       if (has_K_clay)
-	non_negative (al.number ("K_clay"), "K_clay", ok);
+	non_negative (al.number ("K_clay"), "K_clay", ok, err);
       if (has_K_OC)
-	non_negative (al.number ("K_OC"), "K_OC", ok);
+	non_negative (al.number ("K_OC"), "K_OC", ok, err);
 
-      non_negative (al.number ("m"), "m", ok);
+      non_negative (al.number ("m"), "m", ok, err);
       
       if (!ok)
-	CERR << "in `Freundlich' adsorption\n";
+	err << "in `Freundlich' adsorption\n";
 
       return ok;
     }

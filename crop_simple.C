@@ -346,17 +346,17 @@ static struct CropSimpleSyntax
   static Crop& make (const AttributeList& al)
   { return *new CropSimple (al); }
 
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
   { 
     bool ok = true;
     if (!al.check ("LAIvsTS") && !al.check ("LAIvsDay"))
       {
-	CERR << "Must specify either `LAIvsTS' or `LAIvsDay'\n";
+	err << "Must specify either `LAIvsTS' or `LAIvsDay'\n";
 	ok = false;
       }
     else if (al.check ("LAIvsTS") && al.check ("LAIvsDay"))
       {
-	CERR << "Cannot specify both `LAIvsTS' or `LAIvsDay'\n";
+	err << "Cannot specify both `LAIvsTS' or `LAIvsDay'\n";
 	ok = false;
       }
     else
@@ -371,22 +371,22 @@ static struct CropSimpleSyntax
 	  }
 	catch (...)
 	  {
-	    CERR << "`" << (al.check ("LAIvsTS") ? "LAIvsTS" : "LAIvsDay")
+	    err << "`" << (al.check ("LAIvsTS") ? "LAIvsTS" : "LAIvsDay")
 		 << "' has bogus value.";
 	    ok = false;
 	  }
       }
-    non_negative (al.number ("forced_LAI"), "forced_LAI", ok);
-    non_negative (al.number ("height_max"), "height_max", ok);
-    non_negative (al.number ("T_sum"), "T_sum", ok);
-    non_negative (al.number ("day"), "day", ok);
-    non_negative (al.number ("spring_LAI"), "spring_LAI", ok);
-    non_negative (al.number ("root_DM"), "root_DM", ok);
-    non_negative (al.number ("root_N"), "root_N", ok);
-    non_negative (al.number ("potential_N"), "potential_N", ok);
-    non_negative (al.number ("N_actual"), "N_actual", ok);
-    non_negative (al.number ("N_b"), "N_b", ok);
-    non_negative (al.number ("N_flowering"), "N_flowering", ok);
+    non_negative (al.number ("forced_LAI"), "forced_LAI", ok, err);
+    non_negative (al.number ("height_max"), "height_max", ok, err);
+    non_negative (al.number ("T_sum"), "T_sum", ok, err);
+    non_negative (al.number ("day"), "day", ok, err);
+    non_negative (al.number ("spring_LAI"), "spring_LAI", ok, err);
+    non_negative (al.number ("root_DM"), "root_DM", ok, err);
+    non_negative (al.number ("root_N"), "root_N", ok, err);
+    non_negative (al.number ("potential_N"), "potential_N", ok, err);
+    non_negative (al.number ("N_actual"), "N_actual", ok, err);
+    non_negative (al.number ("N_b"), "N_b", ok, err);
+    non_negative (al.number ("N_flowering"), "N_flowering", ok, err);
 
     return ok;
   }
@@ -395,6 +395,7 @@ static struct CropSimpleSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    syntax.add_check (check_alist);
     syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 		"Description of this parameterization."); 
     alist.add ("description", "Forced growth crop model.");

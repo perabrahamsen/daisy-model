@@ -29,21 +29,21 @@ static struct ActionHeatSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionSetHeatSource (al); }
   
-  static bool check (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
   {
     const double height  = al.number ("height");
     const double value  = al.number ("value");
     bool ok = true;
-    non_positive (height, "height", ok);
-    non_negative (value, "value", ok);
+    non_positive (height, "height", ok, err);
+    non_negative (value, "value", ok, err);
     if (!ok)
-      CERR << "in set_heat_source action\n";
+      err << "in set_heat_source action\n";
     return ok;
   }
   ActionHeatSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    syntax.add_check (check);
+    syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Set external point heat source at height to value.");

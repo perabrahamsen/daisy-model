@@ -45,7 +45,7 @@ public:
 			 const string& name) const;
 
   // Creation.
-  bool check () const;
+  bool check (ostream&) const;
   static void load_syntax (Syntax&, AttributeList&);
   Geometry (const AttributeList&);
   virtual ~Geometry ();

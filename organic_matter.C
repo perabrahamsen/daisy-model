@@ -70,7 +70,7 @@ struct OrganicMatter::Implementation
   void mix (const Geometry&, double from, double to, double penetration);
   void swap (const Geometry&, double from, double middle, double to);
   void output (Log&, const Geometry&) const;
-  bool check () const;
+  bool check (ostream& err) const;
 
   double heat_turnover_factor (double T) const;
   double water_turnover_factor (double h) const;
@@ -300,14 +300,14 @@ OrganicMatter::Implementation::output (Log& log,
 }
 
 bool
-OrganicMatter::Implementation::check () const
+OrganicMatter::Implementation::check (ostream& err) const
 {
   bool ok = true;
   for (unsigned int i = 0; i < am.size (); i++)
-    if (!am[i]->check ())
+    if (!am[i]->check (err))
       ok = false;
   if (!ok)
-    CERR << "in OrganicMatter\n";
+    err << "in OrganicMatter\n";
   return ok;
 }
 
@@ -738,10 +738,10 @@ OrganicMatter::output (Log& log, const Geometry& geometry) const
 }
 
 bool
-OrganicMatter::check_am (const AttributeList& am) const
+OrganicMatter::check_am (const AttributeList& am, ostream& err) const
 {
   bool ok = true;
-  ::check (am, "om", ok);
+  ::check (am, "om", ok, err);
   if (ok)
     {
       const vector<AttributeList*>& om_alist
@@ -750,42 +750,42 @@ OrganicMatter::check_am (const AttributeList& am) const
       for (unsigned int i = 0; i < om_alist.size(); i++)
 	{
 	  bool om_ok = true;
-	  ::check (*om_alist[i], "fractions", ok);
+	  ::check (*om_alist[i], "fractions", ok, err);
 	  if (om_ok)
 	    {
 	      vector<double> fractions
 		= om_alist[i]->number_sequence ("fractions");
 	      if (fractions.size () != impl.smb.size () + 1)
 		{
-		  CERR << "You have " << fractions.size ()
-		       << " fractions but " << impl.smb.size ()
-		       << " smb and one buffer.\n";
+		  err << "You have " << fractions.size ()
+		      << " fractions but " << impl.smb.size ()
+		      << " smb and one buffer.\n";
 		  om_ok = false;
 		}
 	      double sum
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
 	      if (fabs (sum - 1.0) > 0.0001)
 		{
-		  CERR << "The sum of all fractions is " << sum << "\n";
+		  err << "The sum of all fractions is " << sum << "\n";
 		  om_ok = false;
 		}
 	    }
 	  if (!om_ok)
 	    {
-	      CERR << "in om[" << i << "]\n";
+	      err << "in om[" << i << "]\n";
 	      ok = false;
 	    }
 	}
     }
   if (!ok)
-    CERR << "in added matter `" << am.name ("type") << "'\n";
+    err << "in added matter `" << am.name ("type") << "'\n";
   return ok;
 }
 
 bool
-OrganicMatter::check () const
+OrganicMatter::check (ostream& err) const
 {
-  return impl.check ();
+  return impl.check (err);
 }
 
 void 
@@ -812,7 +812,7 @@ OrganicMatter::~OrganicMatter ()
 }
 
 static bool 
-check_alist (const AttributeList& al)
+check_alist (const AttributeList& al, ostream& err)
 {
   bool ok = true;
 
@@ -823,7 +823,7 @@ check_alist (const AttributeList& al)
   for (unsigned int j = 0; j < am_alist.size(); j++)
     {
       bool am_ok = true;
-      ::check (*am_alist[j], "om", am_ok);
+      ::check (*am_alist[j], "om", am_ok, err);
       if (am_ok)
 	{
 	  bool om_ok = true;
@@ -832,36 +832,36 @@ check_alist (const AttributeList& al)
 	  for (unsigned int i = 0; i < smb_alist.size(); i++)
 	    {
 #if 0
-	      ::check (*om_alist[i], "C_per_N", om_ok);
+	      ::check (*om_alist[i], "C_per_N", om_ok, err);
 #endif
-	      ::check (*om_alist[i], "turnover_rate", om_ok);
-	      ::check (*om_alist[i], "efficiency", om_ok);
+	      ::check (*om_alist[i], "turnover_rate", om_ok, err);
+	      ::check (*om_alist[i], "efficiency", om_ok, err);
 	      vector<double> fractions
 		= om_alist[i]->number_sequence ("fractions");
 	      if (fractions.size () != smb_alist.size () + 1)
 		{
-		  CERR << "You have " << fractions.size ()
-		       << " fractions but " << smb_alist.size ()
-		       << " smb and one buffer.\n";
+		  err << "You have " << fractions.size ()
+		      << " fractions but " << smb_alist.size ()
+		      << " smb and one buffer.\n";
 		  om_ok = false;
 		}
 	      double sum
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
 	      if (fabs (sum - 1.0) > 0.0001)
 		{
-		  CERR << "The sum of all fractions is " << sum << "\n";
+		  err << "The sum of all fractions is " << sum << "\n";
 		  om_ok = false;
 		}
 	      if (!om_ok)
 		{
-		  CERR << "in om[" << i << "]\n";
+		  err << "in om[" << i << "]\n";
 		  am_ok = false;
 		}
 	    }
 	}
       if (!am_ok)
 	{
-	  CERR << "in am[" << j << "]\n";
+	  err << "in am[" << j << "]\n";
 	  ok = false;
 	}
     }
@@ -870,34 +870,34 @@ check_alist (const AttributeList& al)
     {
       bool om_ok = true;
 #if 0
-      ::check (*smb_alist[i], "C_per_N", om_ok);
+      ::check (*smb_alist[i], "C_per_N", om_ok, err);
 #endif
-      ::check (*smb_alist[i], "turnover_rate", om_ok);
-      ::check (*smb_alist[i], "maintenance", om_ok);
+      ::check (*smb_alist[i], "turnover_rate", om_ok, err);
+      ::check (*smb_alist[i], "maintenance", om_ok, err);
       vector<double> fractions = smb_alist[i]->number_sequence ("fractions");
       if (fractions.size () != smb_alist.size () + som_alist.size ())
 	{
-	  CERR << "You have " << fractions.size () << " fractions but " 
-	       << smb_alist.size () << " smb and " << som_alist.size ()
-	       << " som.\n";
+	  err << "You have " << fractions.size () << " fractions but " 
+	      << smb_alist.size () << " smb and " << som_alist.size ()
+	      << " som.\n";
 	  om_ok = false;
 	}
       vector<double> efficiency = smb_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  CERR << "You have " << efficiency.size () << " efficiency but " 
-	       << smb_alist.size () << " smb.\n";
+	  err << "You have " << efficiency.size () << " efficiency but " 
+	      << smb_alist.size () << " smb.\n";
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  CERR << "The sum of all fractions is " << sum << "\n";
+	  err << "The sum of all fractions is " << sum << "\n";
 	  om_ok = false;
 	}
       if (!om_ok)
 	{
-	  CERR << "in smb[" << i << "]\n";
+	  err << "in smb[" << i << "]\n";
 	  ok = false;
 	}
     }
@@ -906,39 +906,39 @@ check_alist (const AttributeList& al)
     {
       bool om_ok = true;
 #if 0
-      ::check (*som_alist[i], "C_per_N", om_ok);
+      ::check (*som_alist[i], "C_per_N", om_ok, err);
 #endif
-      ::check (*som_alist[i], "turnover_rate", om_ok);
+      ::check (*som_alist[i], "turnover_rate", om_ok, err);
       vector<double> efficiency = som_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  CERR << "You have " << efficiency.size () << " efficiency but " 
-	       << smb_alist.size () << " smb.\n";
+	  err << "You have " << efficiency.size () << " efficiency but " 
+	      << smb_alist.size () << " smb.\n";
 	  om_ok = false;
 	}
       vector<double> fractions = som_alist[i]->number_sequence ("fractions");
       if (fractions.size () != smb_alist.size () + som_alist.size ())
 	{
-	  CERR << "You have " << fractions.size () << " fractions but " 
-	       << smb_alist.size () << " smb and " << som_alist.size ()
-	       << " som.\n";
+	  err << "You have " << fractions.size () << " fractions but " 
+	      << smb_alist.size () << " smb and " << som_alist.size ()
+	      << " som.\n";
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  CERR << "The sum of all fractions is " << sum << "\n";
+	  err << "The sum of all fractions is " << sum << "\n";
 	  om_ok = false;
 	}
       if (!om_ok)
 	{
-	  CERR << "in som[" << i << "]\n";
+	  err << "in som[" << i << "]\n";
 	  ok = false;
 	}
     }
 
   if (!ok)
-    CERR << "in OrganicMatter\n";
+    err << "in OrganicMatter\n";
 
   return ok;
 }

@@ -28,12 +28,12 @@ struct ActionIrrigate : public Action
     irrigate (daisy.field, flux, t, sm);
   }
 
-  static bool check_alist (const AttributeList& alist)
+  static bool check_alist (const AttributeList& alist, ostream& err)
   {
     bool ok = true;
-    non_negative (alist.number ("flux"), "flux", ok);
+    non_negative (alist.number ("flux"), "flux", ok, err);
     if (alist.check ("temperature"))
-      non_negative (alist.number ("temperature"), "temperature", ok);
+      non_negative (alist.number ("temperature"), "temperature", ok, err);
     return ok;
   }
 
@@ -168,13 +168,13 @@ static struct ActionIrrigateTopSyntax
 {
   static Action& make (const AttributeList& al)
   { return *new ActionIrrigateOverhead (al); }
-  static bool check_alist (const AttributeList&)
+  static bool check_alist (const AttributeList&, ostream& err)
   {
     static bool warned = false;
     if (warned)
       return true;
     warned = true;
-    CERR << "OBSOLETE: Use `irrigate_overhead' instead of `irrigate_top'.\n";
+    err << "OBSOLETE: Use `irrigate_overhead' instead of `irrigate_top'.\n";
     return true;
   }
   ActionIrrigateTopSyntax ()
@@ -194,18 +194,18 @@ static struct ActionIrrigateSubsoilSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionIrrigateSubsoil (al); }
 
-  static bool check_alist (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
   { 
     bool ok = true;
     const double from = al.number ("from");
     const double to = al.number ("to");
-    non_negative (al.number ("flux"), "flux", ok);
-    non_positive (from, "from", ok);
-    non_positive (to, "to", ok);
+    non_negative (al.number ("flux"), "flux", ok, err);
+    non_positive (from, "from", ok, err);
+    non_positive (to, "to", ok, err);
     if (from <= to)
       {
-	CERR << "`from' must be higher than `to' in"
-	     << " the subsoilirrigation zone.\n";
+	err << "`from' must be higher than `to' in"
+	    << " the subsoilirrigation zone.\n";
 	ok = false;
       }
     return ok;

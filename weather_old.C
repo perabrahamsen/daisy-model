@@ -135,14 +135,14 @@ WeatherOld::~WeatherOld ()
 }
 
 static bool 
-check_alist (const AttributeList& al)
+check_alist (const AttributeList& al, ostream& err)
 {
   bool ok = true;
   const double latitude = al.number ("Latitude");
   
   if (latitude > 66 || latitude < -66)
-    CERR << "Warning, Daisy is untested under arctic conditions (Latitude = "
-	 << latitude << ")\n";
+    err << "Warning, Daisy is untested under arctic conditions (Latitude = "
+	<< latitude << ")\n";
 
   return ok;
 }

@@ -42,7 +42,7 @@ struct SoilChemicals::Implementation
   void clear ();
   void initialize (const vector<AttributeList*>,
 		   const Soil&, const SoilWater&);
-  bool check (unsigned n) const;
+  bool check (unsigned n, ostream&) const;
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
 };
@@ -215,7 +215,7 @@ SoilChemicals::Implementation::initialize (const vector<AttributeList*> al,
 }
 
 bool 
-SoilChemicals::Implementation::check (unsigned n) const
+SoilChemicals::Implementation::check (unsigned n, ostream& err) const
 { 
   bool ok = true; 
   for (SoluteMap::const_iterator i = solutes.begin ();
@@ -223,7 +223,7 @@ SoilChemicals::Implementation::check (unsigned n) const
        i++)
     {
       const SoilChemical& solute = *(*i).second;
-      if (!solute.check (n))
+      if (!solute.check (n, err))
 	ok = false;
     }
   return ok;
@@ -282,8 +282,8 @@ SoilChemicals::initialize (const AttributeList& al,
 { impl.initialize (al.alist_sequence ("solutes"), soil, soil_water); }
 
 bool 
-SoilChemicals::check (unsigned n) const
-{ return impl.check (n); }
+SoilChemicals::check (unsigned n, ostream& err) const
+{ return impl.check (n, err); }
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<SoilChemical>;

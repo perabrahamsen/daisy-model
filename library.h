@@ -36,6 +36,7 @@ public:
   const Syntax& syntax (const string&) const;
 
   void entries (vector<string>&) const;
+  static void clear_all_parsed ();
   static void load_syntax (Syntax&, AttributeList&);
 private: 
   Library (const Library&);

@@ -49,14 +49,14 @@ struct ActionProgn : public Action
 		   Librarian<Action>::library ());
     }
 
-  bool check (const Daisy& daisy) const
+  bool check (const Daisy& daisy, ostream& err) const
     { 
       bool ok = true;
       for (vector<const Action*>::const_iterator i = actions.begin ();
 	   i != actions.end ();
 	   i++)
 	{
-	  if (!(*i)->check (daisy))
+	  if (!(*i)->check (daisy, err))
 	    ok = false;
 	}
       return ok;
@@ -149,7 +149,7 @@ struct ActionCond : public Action
 	}
     }
 
-  bool check (const Daisy& daisy) const
+  bool check (const Daisy& daisy, ostream& err) const
     { 
       bool ok = true;
       for (vector<clause>::const_iterator i = clauses.begin (); 
@@ -158,7 +158,7 @@ struct ActionCond : public Action
 	{
 	  const vector<Action*>& actions = (*i).actions;
 	  for (unsigned int j = 0; j < actions.size (); j++)
-	    if (!actions[j]->check (daisy))
+	    if (!actions[j]->check (daisy, err))
 	      ok = false;
 	}
       return ok;
@@ -204,12 +204,12 @@ struct ActionIf : public Action
       output_derived (else_a, "else", log);
     }
 
-  bool check (const Daisy& daisy) const
+  bool check (const Daisy& daisy, ostream& err) const
     { 
       bool ok = true; 
-      if (!then_a.check (daisy))
+      if (!then_a.check (daisy, err))
 	ok = false;
-      if (!else_a.check (daisy))
+      if (!else_a.check (daisy, err))
 	ok = false;
       return ok;
     }

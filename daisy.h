@@ -42,7 +42,7 @@ public:
   void tick_logs ();
   void tick ();
   void run ();
-  bool check ();
+  bool check (ostream& err);
 
   // Create and Destroy.
 public:

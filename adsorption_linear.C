@@ -41,7 +41,7 @@ static struct AdsorptionLinearSyntax
     return *new AdsorptionLinear (al);
   }
 
-  static bool check_alist (const AttributeList& al)
+  static bool check_alist (const AttributeList& al, ostream& err)
     {
       bool ok = true;
 
@@ -50,16 +50,16 @@ static struct AdsorptionLinearSyntax
       
       if (!has_K_clay && !has_K_OC)
 	{
-	  CERR << "You must specify either `K_clay' or `K_OC'\n";
+	  err << "You must specify either `K_clay' or `K_OC'\n";
 	  ok = false;
 	}
       if (has_K_clay)
-	non_negative (al.number ("K_clay"), "K_clay", ok);
+	non_negative (al.number ("K_clay"), "K_clay", ok, err);
       if (has_K_OC)
-	non_negative (al.number ("K_OC"), "K_OC", ok);
+	non_negative (al.number ("K_OC"), "K_OC", ok, err);
       
       if (!ok)
-	CERR << "in `linear' adsorption\n";
+	err << "in `linear' adsorption\n";
 
       return ok;
     }

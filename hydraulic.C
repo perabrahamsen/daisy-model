@@ -40,24 +40,24 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 }
 
 static bool
-check_alist (const AttributeList& al)
+check_alist (const AttributeList& al, ostream& err)
 {
   bool ok = true;
 
   const double Theta_res = al.number ("Theta_res");
   const double Theta_sat = al.number ("Theta_sat");
 
-  non_negative (Theta_res, "Theta_res", ok);
+  non_negative (Theta_res, "Theta_res", ok, err);
 
   if (Theta_sat >= 0.9)
     {
-      CERR << "Theta_sat should be below 0.9 (is " << Theta_sat << ")\n";
+      err << "Theta_sat should be below 0.9 (is " << Theta_sat << ")\n";
       ok = false;
     }
 
   if (Theta_res >= Theta_sat)
     {
-      CERR << "Theta_sat should be above Theta_res\n";
+      err << "Theta_sat should be above Theta_res\n";
       ok = false;
     }
   return ok;

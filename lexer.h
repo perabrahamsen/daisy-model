@@ -11,6 +11,9 @@ class Lexer
   // State.
 private:
   ifstream in;
+public:
+  ostream& err;
+private:
   int line;
   int column;
 public:
@@ -22,12 +25,12 @@ public:
   int get ();
   int peek ();
   bool good ();
-  void error (string str);
+  void error (const string& str);
   void eof ();
 
   // Create and destroy.
 public:
-  Lexer (const string&);
+  Lexer (const string&, ostream&);
   ~Lexer ();
 };
 
