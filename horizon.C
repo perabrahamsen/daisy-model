@@ -164,8 +164,8 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
     }
   for (int i = to; i < intervals; i++)
     {
-      K_water[i] = K_water[to];
-      K_ice[i] = K_ice[to];
+      K_water[i] = K_water[to-1];
+      K_ice[i] = K_ice[to-1];
     }
   for (int i = 0; i < from; i++)
     {

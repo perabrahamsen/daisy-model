@@ -57,8 +57,8 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       if (groundwater.table () < soil.z (last))
 	THROW (runtime_error ("Groundwater table below lowest node."));
       last = soil.interval (groundwater.table ());
-      // Presure at the last + 1 node is equal to the water above it.
-      for (unsigned int i = last + 1; i < soil.size (); i++)
+      // Presure at the last node is equal to the water above it.
+      for (unsigned int i = last; i < soil.size (); i++)
 	{
 	  h_old[i] = groundwater.table () - soil.z (i);
 	  h_[i] = groundwater.table () - soil.z (i);
@@ -92,14 +92,9 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		 h_, Theta_, q_);
     }
   
-  // Update values in groundwater.
-  // Bug: Is this also done somewhere else?   Where?
+  // Update flux in groundwater.
   for (unsigned int i = last + 1; i < soil.size (); i++)
-    {
-      h_[i] = 0.0;
-      Theta_[i] = soil.Theta (i, 0.0);
-      q_[i] = q_[i-1];
-    }
+    q_[i] = q_[i-1];
 }
 
 void 

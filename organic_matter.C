@@ -478,16 +478,74 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
       assert (smb[pool]->C_per_N.size () == soil.size ());
     }
 
+  // Initialize SOM.
+  if (al.check ("initial_SOM") && al.size ("initial_SOM") == Syntax::Sequence)
+    {
+      const vector<AttributeList*>& layers
+	= al.alist_sequence ("initial_SOM");
+      
+      // Find total C in layers.
+      vector<double> total (soil.size(), 0.0);
+
+      double last = 0.0;
+      for (unsigned int i = 0; i < layers.size (); i++)
+	{
+	  const double end = layers[i]->number ("end");
+	  const double weight = layers[i]->number ("weight"); // kg C/m²
+	  assert (weight > 0);
+	  assert (end < last);
+	  const double C = weight * 1000.0 / (100.0 * 100.0); // g C / cm²
+	  soil.add (total, last, end, C);
+	  last = end;
+	}
+
+#if 0      
+      // Use last value to the bottom.
+      last = total[0];
+      assert (last > 0.0);
+      for (unsigned int lay = 0; lay < soil.size (); lay++)
+	{
+	  if (total[lay] == 0.0)
+	    total[lay] = last;
+	  else 
+	    last = total[lay];
+	}
+#endif  
+      // Distribute C in pools.
+      for (unsigned int lay = 0; lay < soil.size (); lay++)
+	{
+	  // Examine how the C should be distributed.
+	  double total_C = 0.0;
+	  for (unsigned int pool = 0; pool < som_size; pool++)
+	    total_C += soil.SOM_C (lay, pool);
+
+	  // Distribute it.
+	  for (unsigned int pool = 0; pool < som_size; pool++)
+	    {
+	      const double fraction = soil.SOM_C (lay, pool) / total_C;
+	      if (som[pool]->C.size () == lay)
+		som[pool]->C.push_back (total[lay] * fraction);
+	      if (som[pool]->C_per_N.size () == lay)
+		som[pool]->C_per_N.push_back (soil.SOM_C_per_N (lay, pool));
+	    }
+	}
+    }
+  else
+    {
+      // Initialize SOM from humus in horizons.
+      for (unsigned int lay = 0; lay < soil.size (); lay++)
+	{
+	  for (unsigned int pool = 0; pool < som_size; pool++)
+	    {
+	      if (som[pool]->C.size () == lay)
+		som[pool]->C.push_back (soil.SOM_C (lay, pool));
+	      if (som[pool]->C_per_N.size () == lay)
+		som[pool]->C_per_N.push_back (soil.SOM_C_per_N (lay, pool));
+	    }
+	}
+    }
   for (unsigned int lay = 0; lay < soil.size (); lay++)
     {
-      // Initialize SOM from horizons.
-      for (unsigned int pool = 0; pool < som_size; pool++)
-	{
-	  if (som[pool]->C.size () == lay)
-	    som[pool]->C.push_back (soil.SOM_C (lay, pool));
-	  if (som[pool]->C_per_N.size () == lay)
-	    som[pool]->C_per_N.push_back (soil.SOM_C_per_N (lay, pool));
-	}
       // SMB C should be calculated from equilibrium.
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
@@ -791,13 +849,21 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
   add_submodule<OM> ("smb", syntax, alist, Syntax::State, Syntax::Sequence);
   add_submodule<OM> ("som", syntax, alist, Syntax::State, Syntax::Sequence);
+  Syntax& layer_syntax = *new Syntax ();
+  AttributeList& layer_alist = *new AttributeList ();
+  layer_syntax.add ("end", Syntax::Number, Syntax::Const);
+  layer_syntax.add ("weight", Syntax::Number, Syntax::Const); // Kg C/m²
+  layer_syntax.order ("end", "weight");
+  syntax.add ("initial_SOM", layer_syntax, Syntax::Optional, Syntax::Sequence);
+  alist.add ("initial_SOM", layer_alist);
 #if 0
   // It should be possible to overwrite the default by specifying these.
   syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);
   syntax.add ("water_turnover_factor", Syntax::CSMP, Syntax::Const);
 #endif
   syntax.add ("min_AM_C", Syntax::Number, Syntax::Const);
-  alist.add ("min_AM_C", 0.0);
+  alist.add ("min_AM_C", 0.5);
+  //  We require 5 kg C / Ha in order to keep an AM dk:pulje.
   syntax.add ("min_AM_N", Syntax::Number, Syntax::Const);
   // We require ½ kg N / Ha in order to keep an AM dk:pulje.
   alist.add ("min_AM_N", 0.05);

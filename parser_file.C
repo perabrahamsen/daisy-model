@@ -450,6 +450,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		  parser.initialize (*global_syntax_table);
 		  delete &al;
 		  parser.load (atts);
+		  error_count += parser.error_count ();
 		  delete &parser;
 		}
 	      else
@@ -686,7 +687,6 @@ ParserFile::Implementation::Implementation (const string& name)
 
 ParserFile::Implementation::~Implementation ()
 {
-  cerr << "Close `" << file << "'\n";
   if (in.bad ())
     cerr << "There were trouble parsing `" << file << "'\n";
   close (in.rdbuf ()->fd ());
@@ -701,7 +701,9 @@ ParserFile::load (AttributeList& alist)
 
 int
 ParserFile::error_count () const
-{ return impl.error_count; }
+{
+ return impl.error_count; 
+}
 
 void
 ParserFile::initialize (const Syntax& syntax)
@@ -718,7 +720,9 @@ ParserFile::ParserFile (const AttributeList& al)
 {  }
 
 ParserFile::~ParserFile ()
-{ }
+{ 
+  delete &impl; 
+}
 
 static struct ParserFileSyntax
 {

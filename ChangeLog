@@ -1,3 +1,26 @@
+1998-05-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.028 released.
+
+1998-05-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (load_syntax): Change default `min_AM_C' to 5
+	kg C / Ha.
+
+	* horizon.C (initialize): Use `to-1' instead of `to' for remaining
+	elements. 
+
+	* parser_file.C (load_list): Also count errors in nested files.
+
+	* soil_heat.C (tick): Also calculate in groundwater.
+
+	* organic_matter.C (load_syntax): Support `initial_SOM'.
+	(Implementation::Implementation): Obey it.
+
+	* transport_cd.C (tick): Complete 1998-05-19 change.
+
+	* uznone.C (class UZNone): Don't check that asser_top succeded.
+
 1998-05-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.027 released.

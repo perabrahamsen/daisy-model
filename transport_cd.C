@@ -144,9 +144,12 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
       if (soil_water.q (0) < 0.0)
 	// Normal condition, stuff is in solute.
 	C_top = J_in / soil_water.q (0);
-      else			
-	// This should only happen if Surface::total_matter_flux.
-	S_top = -J_in / soil.dz (0);
+      else
+	{
+	  // This should only happen if Surface::total_matter_flux.
+	  S_top = -J_in / soil.dz (0);
+	  J_in = 0.0;
+	}
     }
 
   // Find the time step using Courant.
@@ -305,7 +308,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
       if (i == 0)
 	S_term += S_top;
       assert (M[i] >= 0.0);
-      J[i + 1] = (((M[i] - M_prev[i]) / dt) - S[i]) * soil.dz (i) + J[i];
+      J[i + 1] = (((M[i] - M_prev[i]) / dt) - S_term) * soil.dz (i) + J[i];
     }
 }
 

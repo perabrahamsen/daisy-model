@@ -55,8 +55,9 @@ SoilHeat::Implementation::tick (const Time& time,
   if (T_top < -400.0)
     T_top = T_top_new;
 
-  // Limit for groundwater table.
   int size = soil.size ();
+#if 0
+  // Limit for groundwater table.
   if (!groundwater.flux_bottom ())
     {
       if (groundwater.table () < soil.z (size - 1))
@@ -66,6 +67,7 @@ SoilHeat::Implementation::tick (const Time& time,
   // Maybe the groundwater module lied...
   while (size > 0 && soil_water.h (size - 1) >= 0)
     size--;
+#endif
 
   // Tridiagonal matrix.
   vector<double> a (size, 0.0);

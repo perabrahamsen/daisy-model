@@ -14,7 +14,7 @@ public:
   // Interface.
 public:
   virtual void load (AttributeList&) = 0;
-  virtual int error_count () const;
+  virtual int error_count () const = 0;
  
   // Create and Destroy.
 public:
