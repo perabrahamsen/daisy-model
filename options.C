@@ -135,6 +135,7 @@ Options::Options (int& argc, char**& argv,
 	      else
 		// Usage.
 		argc = -1;
+              break;
 	    case 'p':
 	      // Dump syntax.
 	      syntax.dump ();

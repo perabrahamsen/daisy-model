@@ -8,6 +8,7 @@
 #include "common.h"
 #include "filter.h"
 #include "log.h"
+#include "options.h"
 
 class UZRichard : public UZmodel
 {
@@ -38,21 +39,21 @@ public:
   // Simulate.
 private:
   bool richard (const Soil& soil,
-		int first, UZtop& top, 
-		int last, UZbottom& bottom, 
+		int first, UZtop& top,
+		int last, UZbottom& bottom,
 		const vector<double>& S,
 		const vector<double>& h_old,
 		const vector<double>& Theta_old,
 		vector<double>& h,
 		vector<double>& Theta,
 		vector<double>& q);
-  bool converges (const vector<double>& previous, 
+  bool converges (const vector<double>& previous,
 		  const vector<double>& current) const;
   void internode (const Soil& Soil, int first, int last,
-		  const vector<double>& K, 
+		  const vector<double>& K,
 		  vector<double>& Kplus) const;
-  void q_darcy (const Soil& soil, 
-		int first, int last, 
+  void q_darcy (const Soil& soil,
+		int first, int last,
 		const vector<double>& h_previous,
 		const vector<double>& h,
 		const vector<double>& Theta_previous,
@@ -63,8 +64,8 @@ private:
 		vector<double>& q);
 public:
   void tick (const Soil& soil,
-	     int first, UZtop& top, 
-	     int last, UZbottom& bottom, 
+	     int first, UZtop& top,
+	     int last, UZbottom& bottom,
 	     const vector<double>& S,
 	     const vector<double>& h_old,
 	     const vector<double>& Theta_old,
@@ -78,26 +79,26 @@ public:
   ~UZRichard ();
 };
 
-bool 
+bool
 UZRichard::flux_top () const
 {
   return true;
 }
 
-double 
+double
 UZRichard::q () const
 {
   return q_down;
 }
-void  
+void
 UZRichard::flux_top_on ()
 { }
 
-void  
+void
 UZRichard::flux_top_off ()
 { }
 
-bool  
+bool
 UZRichard::accept_top (double)
 { 
   return true;
@@ -109,16 +110,16 @@ UZRichard::flux_bottom () const
   return true;
 }
 
-bool  
+bool
 UZRichard::accept_bottom (double)
-{ 
+{
   return true;
 }
 
 bool
-UZRichard::richard (const Soil& soil, 
-		    int first, UZtop& top, 
-		    int last, UZbottom& bottom, 
+UZRichard::richard (const Soil& soil,
+		    int first, UZtop& top,
+		    int last, UZbottom& bottom,
 		    const vector<double>& S,
 		    const vector<double>& h_old,
 		    const vector<double>& Theta_old,
@@ -127,12 +128,12 @@ UZRichard::richard (const Soil& soil,
 		    vector<double>& q)
 {
   // Input variables for solving a tridiagonal matrix.
-  const unsigned int size = last - first + 1; 
+  const unsigned int size = last - first + 1;
   vector<double> a (size);
   vector<double> b (size);
   vector<double> c (size);
   vector<double> d (size);
-  
+
   // Intermeditate results.
   vector<double> h (size);
   vector<double> h_previous (size);
@@ -149,13 +150,15 @@ UZRichard::richard (const Soil& soil,
 
   // Check if we have already switched top once.
   bool switched_top = false;
-  // If the original top is a flux top, we need to make sure we don't
-  // drain it too fast.
-  const bool real_flux_top = top.flux_top ();
-  const double real_top_q = real_flux_top ? top.q () : 66.0e66;
-  double flux_pond = 0;
+
   // Keep track of water going to the top.
   double top_water = 0.0;
+  double available_water = top.h ();
+
+  if (available_water
+      > soil.K (first, 0.0) * dt
+      + (soil.Theta (first, 0.0) - Theta_old[first]) * soil.dz (first))
+    top.flux_top_off ();
 
   // First guess is the old value.
   copy (h_old.begin () + first, h_old.begin () + last + 1, h.begin ());
@@ -166,6 +169,9 @@ UZRichard::richard (const Soil& soil,
   double ddt = dt;		// We start with small == large time step.
   int number_of_time_step_reductions = 0;
   int iterations_with_this_time_step = 0;
+
+  double inf = 0;
+  if (top.q()<-2.0) inf = -top.q();
 
   while (time_left > 0.0)
     {
@@ -183,7 +189,7 @@ UZRichard::richard (const Soil& soil,
       Theta_previous = Theta;
 
       if (!top.flux_top ())
-	h[first] = 0.0; 
+	h[first] = 0.0;
 
       do
 	{
@@ -194,7 +200,7 @@ UZRichard::richard (const Soil& soil,
 	  // Calculate parameters.
 	  for (unsigned int i = 0; i < size; i++)
 	    {
-	      
+
 	      Ksum[i] += soil.K (first + i, h[i]);
 	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2;
 	    }
@@ -215,15 +221,15 @@ UZRichard::richard (const Soil& soil,
 	      if (i == 0)
 		{
 		  if (top.flux_top ())
-		    {	
+		    {
 		      // Calculate upper boundary.
 		      const double dz_plus = z - soil.z (first + i + 1);
 
 		      b[i] = Cw2 + (ddt / dz) * (Kplus[i] / dz_plus);
-		      d[i] = Theta[i] - Cw1 - ddt * S[first + i] 
+		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 			+ (ddt / dz)
-			* (- (top.q () + flux_pond / ddt) - Kplus[i]);
-		      
+			* (available_water / time_left - Kplus[i]);
+
 		      // Same as pressure boudnary.
 		      a[i] = 0.0;
 		      c[i] = - (ddt / dz) * (Kplus[i] / dz_plus);
@@ -234,10 +240,10 @@ UZRichard::richard (const Soil& soil,
 		  // Calculate upper boundary.
 		  const double dz_plus = z - soil.z (first + i + 1);
 		  const double dz_minus = soil.z (first + i - 1) - z;
-		  b[i] = Cw2 
+		  b[i] = Cw2
 		    + (ddt / dz) * (Kplus[i - 1] / dz_minus + Kplus[i] / dz_plus);
-		  d[i] = Theta[i] - Cw1 - ddt * S[first + i] 
-		    + (ddt / dz) 
+		  d[i] = Theta[i] - Cw1 - ddt * S[first + i]
+		    + (ddt / dz)
 		    * (Kplus[i - 1] * (1 + h[i - 1] / dz_minus) - Kplus[i]);
 		  a[i] = 0.0;
 		  c[i] = - (ddt / dz) * (Kplus[i] / dz_plus);
@@ -251,16 +257,16 @@ UZRichard::richard (const Soil& soil,
 		    {
 		      double q_bottom = - Kold[i];
 		      b[i] = Cw2 + (ddt / dz) * (Kplus[i - 1] / dz_minus);
-		      d[i] = Theta[i] - Cw1 - ddt * S[first + i] 
+		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 			+ (ddt / dz) * (Kplus[i - 1] + q_bottom);
 		    }
-		  else 
+		  else
 		    {
 		      const double dz_plus = z - soil.z (first + i + 1);
 
-		      b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus 
+		      b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
 						+ Kplus[i] / dz_plus);
-		      d[i] = Theta[i] - Cw1 - ddt * S[first + i] 
+		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 			+ (ddt / dz)
 			* (Kplus[i - 1] - Kplus[i] * (1 - h[i + 1] / dz_plus));
 		    }
@@ -274,24 +280,24 @@ UZRichard::richard (const Soil& soil,
 		  const double dz_plus = z - soil.z (first + i + 1);
 
 		  a[i] = - (ddt / dz) * (Kplus[i - 1] / dz_minus);
-		  b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus 
+		  b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
 					    + Kplus[i] / dz_plus);
 		  c[i] = - (ddt / dz) * (Kplus[i] / dz_plus);
-		  d[i] = Theta[i] - Cw1 - ddt * S[first + i] 
+		  d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 		    +  (ddt / dz) * (Kplus[i - 1] - Kplus[i] );
 		}
 	    }
-	  tridia (top.flux_top () ? 0 : 1, 
-		  (bottom.flux_bottom () ? size : size - 1), 
+	  tridia (top.flux_top () ? 0 : 1,
+		  (bottom.flux_bottom () ? size : size - 1),
 		  a, b, c, d, h.begin ());
 	}
-      while (   !converges (h_conv, h) 
+      while (   !converges (h_conv, h)
 	     && iterations_used <= max_iterations);
 
       if (iterations_used > max_iterations)
 	{
 	  number_of_time_step_reductions++;
-	  
+
 	  if (number_of_time_step_reductions > max_time_step_reductions)
 	    return false;
 
@@ -307,40 +313,39 @@ UZRichard::richard (const Soil& soil,
 	  bool accepted = true;	// Could the top accept the results?
 	  // Amount of water we put into the top this small time step.
 	  double delta_top_water = 88.0e88;
-
+#if 1
+          if (inf>0)
+            {
+		      CERR << " ddt = " << ddt
+                           << " time_left = " << time_left
+                           << " h[0] = " << h[0]
+                           << " h[1] = " << h[1]
+                           << " Infl = " << top.q()
+                           << " delta_top_water = " << delta_top_water
+                           << " top.flux() = " << top.flux_top() << "\n";
+            }
+#endif
 	  if (!top.flux_top ())
 	    {
 	      q_darcy (soil, first, last, h_previous, h, Theta_previous, Theta,
 		       Kplus, S, ddt, q);
-
+#if 1
+		      CERR << " ddt = " << ddt
+                           << " time_left = " << time_left
+                           << " q[0] = " << q[0]
+                           << " q[1] = " << q[1]
+                           << " delta_top_water = " << delta_top_water
+                           << " top.flux() = " << top.flux_top() << "\n";
+#endif
 	      // We take water from flux pond first.
-	      delta_top_water = q[first] * ddt + flux_pond;
-	      // !! delta_top_water = q[first] * ddt;
+	      delta_top_water = q[first] * ddt;
 
-	      if (real_flux_top)
-		{
-		  assert (real_top_q < 0);
-
-		  if (-delta_top_water > - real_top_q * ddt * 1.001)
-		  // !! if (-real_top_q * ddt * 1.001 + flux_pond < -delta_top_water)
-		    {
-		      // We can't retrieve water this fast from the flux top.
-		      top.flux_top_on ();
-		      accepted = false;
-		    }
-		  else
-		    {
-		      const bool ok = top.accept_top (delta_top_water);
-		      assert (ok);
-		      flux_pond += - (real_top_q - q[first]) * ddt;
-		    }
-		}
-	      else if (!top.accept_top (q[first] * ddt))
+	      if (available_water + delta_top_water < -1e-30)
 		// We don't have more water in the pressure top.
 		{
 		  if (switched_top)
 		    THROW ("Couldn't accept top flux");
-		  else 
+		  else
 		    {
 		      top.flux_top_on ();
 		      accepted = false;
@@ -350,10 +355,12 @@ UZRichard::richard (const Soil& soil,
 	  else if (h[first] <= 0)
 	    // We have a flux top, and unsaturated soil.
 	    {
-	      flux_pond = 0.0;
-	      delta_top_water = top.q () * (ddt / time_left);
-	      const bool ok = top.accept_top (delta_top_water);
-	      assert (ok);
+//	      flux_pond = 0.0;
+//	      delta_top_water = top.q () * ddt;
+//	      delta_top_water = top.q () * (ddt / time_left);
+//              const bool ok = top.accept_top (delta_top_water);
+//              assert (ok);
+              delta_top_water = -(available_water / time_left) * ddt;
 	    }
 	  else if (!switched_top)
 	    // We have satured soil, make it a pressure top.
@@ -367,11 +374,11 @@ UZRichard::richard (const Soil& soil,
 	  if (accepted)
 	    {
 
-#if 0
+#if 1
 	      // This code checks that darcy and the mass preservation
 	      // code gives the same results.
 	      {
-		q[first] = delta_top_water / ddt;
+                q[first] = delta_top_water / ddt;
 		for (int i = first; i < last; i++)
 		  {
 		    // Mass preservation.
@@ -379,18 +386,24 @@ UZRichard::richard (const Soil& soil,
 				+ S[i] * ddt) * soil.dz (i) + q[i];
 		    if (h[i - first] >= 0.0 && h[i + 1 - first] >= 0.0)
 		      continue;
-		    const double darcy 
-		      = -Kplus[i - first] 
+		    const double darcy
+		      = -Kplus[i - first]
 		      * ((  (h[i - first] - h[i + 1 - first])
 			  / (soil.z (i) - soil.z (i + 1)))
 			 + 1);
-		    if (fabs (q[i+1] / darcy - 1.0) > 0.01)
-		      CERR << "q[" << i + 1 << "] = " << q[i+1] 
-			   << ", darcy = " << darcy << "\n";
+		    if (fabs (q[i+1] / darcy - 1.0) > 0.10
+                        && fabs (q[i+1] - darcy) > 0.01 / ddt
+                        && i<2)
+		      CERR << "q[" << (i + 1) << "] = " << q[i+1]
+			   << ", darcy = " << darcy
+                           << "delta_top_water = " << delta_top_water
+                           << " ddt = " << ddt
+                           << " top.flux() = " << top.flux_top() << "\n";
 		  }
 	      }
 #endif
 	      top_water += delta_top_water;
+              available_water += delta_top_water;
 	      switched_top = false;
 	      time_left -= ddt;
 	      iterations_with_this_time_step++;
@@ -424,6 +437,11 @@ UZRichard::richard (const Soil& soil,
 	Theta_new[i] = soil.Theta (i, h[i]);
     }
 
+  // Update upper boundary.
+  assert (approximate (top.h (), available_water - top_water));
+  const bool ok = top.accept_top (top_water);
+  assert (ok);
+
 #if 0
   q_darcy (soil, first, last, h_old, h_new, Theta_old, Theta_new,
 	   Kplus, S, dt, q);
@@ -441,7 +459,7 @@ UZRichard::richard (const Soil& soil,
 }
 
 bool
-UZRichard::converges (const vector<double>& previous, 
+UZRichard::converges (const vector<double>& previous,
 		      const vector<double>& current) const
 {
   unsigned int size = previous.size ();
@@ -483,7 +501,7 @@ UZRichard::internode (const Soil& soil, int first, int last,
 
 void
 UZRichard::q_darcy (const Soil& soil, 
-		    const int first, const int last, 
+		    const int first, const int last,
 		    const vector<double>& /* h_previous */,
 		    const vector<double>& h,
 		    const vector<double>& Theta_previous,
@@ -597,9 +615,9 @@ static struct UZRichardSyntax
       syntax.add ("max_iterations", Syntax::Integer, Syntax::Const);
       alist.add ("max_iterations", 25);
       syntax.add ("max_absolute_difference", Syntax::Number, Syntax::Const);
-      alist.add ("max_absolute_difference", 0.0002);
+      alist.add ("max_absolute_difference", 0.02);
       syntax.add ("max_relative_difference", Syntax::Number, Syntax::Const);
-      alist.add ("max_relative_difference", 0.0001);
+      alist.add ("max_relative_difference", 0.001);
       syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
       syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);
       syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly);

@@ -70,15 +70,16 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   const int first = 0;
 
 #ifdef HANDLE_EXCEPTIONS
+
   try
     {
 #endif
       if (bottom)
 	{
 	  // We have two UZ models.
-	  top->tick (soil, 
-		     first, surface, 
-		     bottom_start - 1, *bottom, 
+	  top->tick (soil,
+		     first, surface,
+		     bottom_start - 1, *bottom,
 		     S, h_old, Theta_old_,
 		     h_, Theta_, q_);
 	  bottom->tick (soil,
@@ -90,8 +91,8 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       else
 	{
 	  // We have only one UZ model.
-	  top->tick (soil, 
-		     first, surface, 
+	  top->tick (soil,
+		     first, surface,
 		     last, groundwater,
 		     S, h_old, Theta_old_,
 		     h_, Theta_, q_);
@@ -101,21 +102,21 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   catch (const char* error)
     {
       CERR << "UZ problem: " << error << "\n"
-	   << "Using reserve uz model.\n";
-      reserve->tick (soil, 
-		     first, surface, 
-		     last, groundwater,
-		     S, h_old, Theta_old_,
-		     h_, Theta_, q_);
+           << "Using reserve uz model.\n";
+      reserve->tick (soil,
+                     first, surface,
+                     last, groundwater,
+                     S, h_old, Theta_old_,
+                     h_, Theta_, q_);
     }
 #endif
-  
+
   // Update flux in groundwater.
   for (unsigned int i = last + 1; i < soil.size (); i++)
     q_[i] = q_[i-1];
 }
 
-void 
+void
 SoilWater::mix (const Soil& soil, double from, double to)
 {
   soil.mix (Theta_, from, to);

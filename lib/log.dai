@@ -264,7 +264,7 @@
 	   ((path column "*" crops "*" CrpAux NH4Upt)
 	    (when hourly)
 	    (dimension "kg N/ha/d")
-	    (factor 1e5))		;g/cm²/d -> kg N/ha/d
+	    (factor 10.0))		;g/m²/d -> kg N/ha/d
 	   ((path column "*" Nitrification "*" converted)
 	    (when hourly)
 	    (tag "Nit")
@@ -303,7 +303,7 @@
 	   ((path column "*" crops "*" CrpAux NO3Upt)
 	    (when hourly)
 	    (dimension "kg N/ha/d")
-	    (factor 1e5))		;g/cm²/d -> kg N/ha/d
+	    (factor 10.0))		;g/m²/d -> kg N/ha/d
 	   ((path column "*" Denitrification converted)
 	    (tag "Denit")
 	    (when hourly)

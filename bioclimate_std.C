@@ -39,6 +39,7 @@ public:
 
   // Manager.
   double irrigation;
+  double irrigation_log;
   double irrigation_temperature;
   Column::irrigation_from irrigation_type;
 
@@ -46,7 +47,7 @@ public:
   double water_temperature;	// Temperature of incomming water.
   double intercepted_water;
   Snow snow;
-  
+
   // Log.
   double PotEvapotranspiration;
   double ActualEvapotranspiration;
@@ -84,7 +85,7 @@ public:
 public:
   void irrigate (double flux, double temp, 
 		 Column::irrigation_from from);
-  
+
   // Communication with external model.
   double get_evap_interception () const // [mm/h]
     { return EvapInterception; }
@@ -108,6 +109,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     Height (al.integer ("NoOfIntervals") + 1),
     PAR_ (al.integer ("NoOfIntervals") + 1),
     irrigation (0.0),
+    irrigation_log (0.0),
     irrigation_temperature (0.0),
     intercepted_water (al.number ("intercepted_water")),
     snow (al.alist ("Snow")),
@@ -122,7 +124,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
 					   const CropList& crops)
 {
   // Fraction of Photosynthetically Active Radiation in Shortware
-  // incomming radiation. 
+  // incomming radiation.
   static const double PARinSi = 0.50;	
 
   double MxH = 0.0;		// Max crop Hieght in canopy [cm].
@@ -334,6 +336,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   ActualEvapotranspiration = TotalCropUptake + EvapInterception 
     + EvapSoilSurface + snow.evaporation ();
 
+  irrigation_log = irrigation;
   irrigation = 0.0;
 }
 
@@ -364,6 +367,7 @@ BioclimateStandard::tick (Surface& surface, const Weather& weather,
 void 
 BioclimateStandard::output (Log& log, Filter& filter) const
 {
+  log.output ("irrigation", filter, irrigation_log);
   log.output ("intercepted_water", filter, intercepted_water);
   log.output ("EvapInterception", filter, EvapInterception, true);
   log.output ("net_throughfall", filter, net_throughfall, true);
@@ -402,6 +406,8 @@ static struct BioclimateStandardSyntax
   
       syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const);
       alist.add ("NoOfIntervals", 30);
+      syntax.add ("irrigation", "mm", Syntax::LogOnly,
+      		  "Applied hourly irrigation");
       syntax.add ("intercepted_water", Syntax::Number, Syntax::State);
       syntax.add ("EvapInterception", Syntax::Number, Syntax::LogOnly);
       syntax.add ("net_throughfall", Syntax::Number, Syntax::LogOnly);
