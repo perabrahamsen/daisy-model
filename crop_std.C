@@ -177,7 +177,7 @@ struct CropStandard::Parameters
     double PenPar1;		// Penetration rate parameter, coefficient
     double PenPar2;		// Penetration rate parameter, threshold
     double MaxPen;		// Max penetration depth
-    double SpRtLength;		// Specific root length
+    double SpRtLength;		// Specific root length [m/g]
     double DensRtTip;		// Root density at (pot) penetration depth
     double Rad;			// Root radius [ cm ]
     double h_wp;		// Matrix potential at wilting
@@ -818,7 +818,9 @@ CropStandardSyntax::CropStandardSyntax ()
   Root.add ("PenPar1", Syntax::Number, Syntax::Const);
   Root.add ("PenPar2", Syntax::Number, Syntax::Const);
   Root.add ("MaxPen", Syntax::Number, Syntax::Const);
-  Root.add ("SpRtLength", Syntax::Number, Syntax::Const);
+  Root.add ("SpRtLength", "m/g", Syntax::Const,
+	    "Specific root length");
+  vRoot.add ("SpRtLength", 0.1);
   Root.add ("DensRtTip", Syntax::Number, Syntax::Const);
   vRoot.add ("DensRtTip", 0.1);
   Root.add ("Rad", Syntax::Number, Syntax::Const);
@@ -1666,7 +1668,7 @@ CropStandard::RootDensity (const Soil& soil)
   Variables::RecRootSys& RootSys = var.RootSys;
 
   double LengthPrArea
-    = max (10 * Root.SpRtLength * WRoot, 3 * PotRtDpt); /*cm/cm2*/
+    = max (100 * Root.SpRtLength * WRoot, 3 * PotRtDpt); /*cm/cm2*/
   double a = RootDensDistPar (LengthPrArea / (PotRtDpt * Root.DensRtTip));
   double L0 = Root.DensRtTip * exp (a);
   a /= PotRtDpt;

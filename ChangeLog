@@ -1,3 +1,7 @@
+1998-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.41 released.
+
 1998-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.40 released.
@@ -7,6 +11,10 @@
 	* lib/log.dai ("Crop Production"): Output N for each crop part.
 
 1998-11-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/mini.dai: New file.
+	* lib/Makefile (DAISY): Add it.
+	* lib/Makefile (stdref.dai): New target.
 
 	* pet_makkink.C: New file.
 	* Makefile (COMPONENTS): Add it.
