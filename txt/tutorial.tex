@@ -809,9 +809,9 @@ to 1.2 at flowering (DS 1.0), and then fall towards 1.0 at ripeness (DS
 \label{sec:management}
 
 Writing management specifications that behave both semi-intelligently
-and robustly to the simulation state is an endless source of fun.
-However, specifying each and every little management operation for a
-30 year run can get both tedious and error prone.
+and robustly to the simulation state is a challenge.  However,
+specifying each and every little management operation for a 30 year
+run can get both tedious and error prone.
 
 In this section, we will therefore start by introducing you to a way
 to organize your manager in ``crops'' and ``rotations'', which will
@@ -1396,7 +1396,7 @@ The command to apply pesticides is
   (spray Bentazon 1000 [g/ha])
 \end{verbatim}
 with \texttt{Bentazon} being the name of the pesticide.  The currently
-available pesticide parameterizations are \texttt{Atrazine},
+available pesticide parameterizations includes \texttt{Atrazine},
 \texttt{Bentazon}, \texttt{IPU}, \texttt{MCPP},
 \texttt{Pendimethalin}.  To use them, you must add
 \begin{verbatim}
@@ -1404,7 +1404,108 @@ available pesticide parameterizations are \texttt{Atrazine},
 \end{verbatim}
 to the start of the setup file.
 
-% TODO: Define new pesticides.
+\subsubsection{Defining New Pesticides}
+
+You can easily introduce new pesticides by specifying a few
+parameters.  The parameters may not be that easy to obtain, though.
+Here is an example:
+\begin{verbatim}
+  (defchemical Atrazine default
+    "From a FAO sponsored field experiment near Andeby, 2002."
+    (canopy_dissipation_rate 8e-3 [h^-1])
+    (canopy_washoff_coefficient 100.0 [mm])
+    (crop_uptake_reflection_factor 0.8 [])
+    (decompose_rate 7e-5 [h^-1])
+    (diffusion_coefficient 8e-6 [cm^2/s])
+    (solute (adsorption linear (K_clay 7 [cm^3/g]))))
+\end{verbatim}
+As we have seen before, in the first line we \emph{def}ine a new
+\emph{chemical} name \emph{Atrazine}, using the \emph{default} (and
+currently only) model for chemicals in \daisy{}.  In the second line,
+we put some information about this chemical so we will know later
+where these numbers come from.
+
+\subsubsection{Canopy}
+
+The pesticide will be introduced into the system with the
+\texttt{spray} command.  Some of the pesticide will land directly on
+the soil surface, while other will hit the canopy, depending on how
+large a fraction of the soil is covered by the crops.  The fraction
+that hits the canopy is assumed to stay there, until it either
+dissipate entirely out of the system, or is washed down to the soil
+surface by rain or irrigation.  
+
+The parameter \texttt{canopy\_dissipation\_rate} indicates how large a
+fraction of the pesticide dissipate from the canopy each hour, while
+\texttt{canopy\_washoff\_coefficient} can (roughly) be thought of as
+the amount of water that must fall off the canopy, in order to wash
+half the pesticide off.
+
+\subsubsection{Soil Surface and Root Uptake}
+
+Down on the soil surface, \daisy{} will pretend that the pesticide is
+immediately fully dissolved in any water that hits the soil surface,
+and follow the water when it enters the soil.  Nothing else will
+happen to the pesticides when on the soil surface.  Pesticides in the
+top of the soil can also move up to the soil surface in case of
+ponding.  This effect can be significant when there are macropores
+activated by the ponding, as pesticides that have already entered the
+soil can later be transported with macropores from the surface.
+
+In the soil, the pesticides can be adsorbed, transported, decomposed,
+or taken up by the roots by transpiration.  The later is controlled by
+\linebreak{}\texttt{crop\_uptake\_reflection\_factor}.  In the
+example, we specify that 80\% of the pesticides dissolved in the water
+extracted by the roots for transpiration will be reflected, that is
+will stay in the soil water.  The 20\% that is uptaken will disappear
+out of the system.
+
+\subsubsection{Decomposition}
+
+We set \texttt{decompose\_rate} to the fraction of pesticides assumed
+to be decomposed each hour.  This rate is affected by a number of
+factors, listed here:
+\begin{description}
+\item[\texttt{decompose\_heat\_factor},
+  \texttt{decompose\_water\_factor}] Biological decomposition tend to
+  accelerate with increasing heat and moisture.  Unless you specify
+  otherwise, the factors used for mineralization will be reused here.
+\item[\texttt{decompose\_CO2\_factor}] CO$_2$ production is an
+  indicator of an active soil biomass.  By specifying this parameter,
+  you can let the general biological activity influence the
+  decomposition. 
+\item[\texttt{decompose\_conc\_factor}] Some pesticides will be hard
+  to decompose at high or low concentrations, which can be specified
+  with this parameter. 
+\item[\texttt{decompose\_depth\_factor}] Sometimes the decompose rate
+  depend on how deep in the soil we are, which is what this parameter
+  is for. 
+\item[\texttt{decompose\_lag\_increment}] Some pesticides require
+  specialized organisms to decompose, which may take some time to
+  appear.  \Daisy{} therefore keep track of a time lag variable for
+  each pesticide, which starts at zero.  When it reaches one,
+  decomposition begins.  You can set this parameter to specify the
+  hourly increment, as a function of the concentration in the soil.
+  By default, the increment is 1, which means decompositions starts
+  immediately, with no time lag.
+\end{description}
+See~\cite{dina81} for more specific information about each of these
+factors. 
+
+\subsubsection{Transportation}
+
+The pesticide in the soil can be transported with convection and
+diffusion.  Set \texttt{diffusion\_coefficient} to specify the later.
+Finally, the pesticide may adsorb to the soil.  \Daisy{} have a number
+of advanced models for adsorption, but for pesticides it is usually
+adequate to either disable adsorption \texttt{(adsorbtion none)}, or
+use a simple linear correspondence between adsorbed and dissolved
+matter, $A = K \rho C$, where $A$ is the amount of adsorbed matter,
+$K$ is a pesticide and soil specific parameter, $\rho$ is the bulk
+density of the soil, and $C$ is the amount of dissolved matter.  In
+\daisy{}, we have split $K$ into a \texttt{K\_clay} parameter which is
+multiplied with the clay fraction of the soil, and a \texttt{K\_OC}
+parameter which is multiplied with the humus fraction of the soil.
 
 % TODO: Transformations.
 
@@ -1666,6 +1767,11 @@ purpose is to examine the effect of each feature.
 \label{sec:phosphor}
 
 % TODO: not supported, strongly adsorbed, solid, transformations.
+
+\subsection{Dividing and Merging Fields}
+\label{sec:divide}
+
+% TODO: grazing
 
 \subsection{Ridging}
 

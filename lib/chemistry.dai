@@ -1,57 +1,52 @@
 ;;; chemestry.dai --- standard pesticides
 
 (defchemical solid default
-  (description "Non-dissolvable chemicals")
+  "Non-dissolvable chemicals"
   (crop_uptake_reflection_factor 1 [])
-  (canopy_dissipation_rate_coefficient 0 [h^-1])
+  (canopy_dissipation_rate 0 [h^-1])
   (canopy_washoff_coefficient 1 [mm])
   (diffusion_coefficient 1 [cm^2/s])
-  (solute (adsorption full)
-	  (transport none))
+  (solute (adsorption full) (transport none))
   (decompose_rate 0 [h^-1]))
   
 (defchemical Atrazine default
-  ;;(crop_uptake_reflection_factor 1.0)
-  (crop_uptake_reflection_factor 0.8)
-  (canopy_dissipation_rate_coefficient 8e-3)
-  (canopy_washoff_coefficient 100.0)
-  (diffusion_coefficient 8e-6)
-  (solute (adsorption linear (K_clay 7)))
-  (decompose_rate 7e-5))
-
-;; Reactive parameters for the pesticides
+  (canopy_dissipation_rate 8e-3 [h^-1])
+  (canopy_washoff_coefficient 100.0 [mm])
+  (crop_uptake_reflection_factor 0.8 [])
+  (decompose_rate 7e-5 [h^-1])
+  (diffusion_coefficient 8e-6 [cm^2/s])
+  (solute (adsorption linear (K_clay 7 [cm^3/g]))))
 
 (defchemical Bentazon default
-  (canopy_dissipation_rate_coefficient 0.0083) ; (h-1)
-  (canopy_washoff_coefficient 100.0)	; (mm-1)??
-  (crop_uptake_reflection_factor 1)	; (-)
-					; (decompose_CO2_factor 1) (-)
-  (decompose_rate 0.000722)		; 40 days at 10 C (h-1) 
-  (diffusion_coefficient 4.6e-6)	; (cm2/s)
-  (solute (adsorption linear (K_OC 34)))) ; (ml/g) 
+  (canopy_dissipation_rate 0.0083 [h^-1])
+  (canopy_washoff_coefficient 100.0 [mm])
+  (crop_uptake_reflection_factor 1 [])
+  (decompose_halftime 40 [d])		; at 10 dg C
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (solute (adsorption linear (K_OC 34 [cm^3/g]))))
 
 (defchemical IPU default
-  (canopy_dissipation_rate_coefficient 0.0083) ; (h-1)
-  (canopy_washoff_coefficient 100.0)	; (mm-1)??
-  (crop_uptake_reflection_factor 1)	; (-)
-  (decompose_rate 0.000996)		; 29 days (h-1) 
-  (diffusion_coefficient 4.6e-6)	; (cm2/s)
-  (solute (adsorption linear (K_OC 100)))) ; (ml/g) 
+  (canopy_dissipation_rate 0.0083 [h^-1])
+  (canopy_washoff_coefficient 100.0 [mm])
+  (crop_uptake_reflection_factor 1 [])
+  (decompose_halftime 29 [d])
+  (diffusion_coefficient 4.6e-6 [cm^2/s])	
+  (solute (adsorption linear (K_OC 100 [cm^3/g]))))
 
 (defchemical MCPP default
-  (canopy_dissipation_rate_coefficient 0.0083) ; (h-1)
-  (canopy_washoff_coefficient 100.0)	; (mm-1)??
-  (crop_uptake_reflection_factor 1)	; (-)
-  (decompose_rate 0.004126)		; (h-1) (t½= 7 days)
-  (diffusion_coefficient 4.6e-6)	; (cm2/s)
-  (solute (adsorption linear (K_OC 20)))) ; (ml/g) (koc=20)
+  (canopy_dissipation_rate 0.0083 [h^-1])
+  (canopy_washoff_coefficient 100.0 [mm])
+  (crop_uptake_reflection_factor 1 [])
+  (decompose_halftime 7 [d])
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (solute (adsorption linear (K_OC 20 [cm^3/g]))))
 
 (defchemical Pendimethalin default
-  (canopy_dissipation_rate_coefficient 0.0083) ; (h-1)
-  (canopy_washoff_coefficient 100.0)	; (mm-1)??
-  (crop_uptake_reflection_factor 1)	; (-)
-  (decompose_rate 0.0004)		; 
-  (diffusion_coefficient 4.6e-6)	; (cm2/s)
-  (solute (adsorption linear (K_OC 16000))))
+  (canopy_dissipation_rate 0.0083 [h^-1])
+  (canopy_washoff_coefficient 100.0 [mm])
+  (crop_uptake_reflection_factor 1 [])
+  (decompose_rate 0.0004 [h^-1])
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (solute (adsorption linear (K_OC 16000 [cm^3/g]))))
 
 ;;; chemestry.dai ends here.
