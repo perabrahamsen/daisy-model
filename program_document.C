@@ -73,7 +73,6 @@ struct ProgramDocument : public Program
   void print_sample_entry (std::ostream& out, const std::string& name, 
 			   const Syntax& syntax,
 			   const AttributeList& alist);
-  void print_sample_base (std::ostream& out, const symbol, const symbol);
 
   // Print parts of it.
   static void own_entries (const Library& library, const symbol name, 
@@ -727,20 +726,6 @@ ProgramDocument::print_sample_entry (std::ostream& out,
 }
 
 void
-ProgramDocument::print_sample_base (std::ostream& out, 
-                                  const symbol component, 
-                                  const symbol model)
-{ 
-  if (ordered)
-    out << "\\\\\n&";
-  else
-    ordered = true;
-  out << "\\multicolumn{2}{l}{;; Shared parameters are described "
-      << "in section~\\ref{model:"
-      << component << "-" << model << "}}";
-}
-
-void
 ProgramDocument::own_entries (const Library& library, const symbol name, 
 			      std::vector<std::string>& entries)
 {
@@ -806,20 +791,22 @@ ProgramDocument::print_sample (std::ostream& out, const std::string& name,
   Format::Typewriter dummy (*format);
   Format::Table d2 (*format, "lll");
   format->soft_linebreak ();
-  format->text ("<");
-  format->special ("nbsp");
-  if (!submodel)
-    {
-      print_string (name);
-      out << "~";
-    }
-  out << "&";
+  {
+    format->text ("<");
+    format->special ("nbsp");
+    if (!submodel)
+      {
+	print_string (name);
+	out << "~";
+      }
+    out << "&";
 
-  // Ordered members first.
-  const std::vector<std::string>& order = syntax.order ();
-  for (unsigned int i = 0; i < order.size (); i++)
-    print_sample_ordered (order[i], 
-			  syntax.size (order[i]) == Syntax::Sequence);
+    // Ordered members first.
+    const std::vector<std::string>& order = syntax.order ();
+    for (unsigned int i = 0; i < order.size (); i++)
+      print_sample_ordered (order[i], 
+			    syntax.size (order[i]) == Syntax::Sequence);       
+  }
       
   // Then the remaining members.
   std::vector<std::string> entries;
@@ -837,27 +824,35 @@ ProgramDocument::print_sample (std::ostream& out, const symbol name,
 			       const Library& library)
 {
   daisy_assert (ordered == false);
+  const Syntax& syntax = library.syntax (name);
+  const AttributeList& alist = library.lookup (name);
+
   format->soft_linebreak ();
   format->raw ("LaTeX", "\\noindent\n");
   Format::Typewriter dummy (*format);
   Format::Table d2 (*format, "lll");
-  format->text ("<");
-  format->special ("nbsp");
-  if (!submodel)
+  Format::TableRow row (*format);
+  {
     {
-      print_string (name.name ());
-      out << "~";
+      Format::TableCell d4 (*format);
+      format->text ("<");
+      format->special ("nbsp");
+      if (!submodel)
+	{
+	  print_string (name.name ());
+	  out << "~";
+	}
     }
-  out << "&";
-
-  const Syntax& syntax = library.syntax (name);
-  const AttributeList& alist = library.lookup (name);
-
-  // Ordered members first.
-  const std::vector<std::string>& order = syntax.order ();
-  for (unsigned int i = 0; i < order.size (); i++)
-    print_sample_ordered (order[i], 
-			  syntax.size (order[i]) == Syntax::Sequence);
+    // Ordered members first.
+    Format::TableCell d4 (*format);
+    const std::vector<std::string>& order = syntax.order ();
+    for (unsigned int i = 0; i < order.size (); i++)
+      print_sample_ordered (order[i], 
+			    syntax.size (order[i]) == Syntax::Sequence);
+    
+    format->special ("nbsp");
+    format->text (">");
+  }
   
   // Then own members.
   std::vector<std::string> entries;
@@ -869,8 +864,13 @@ ProgramDocument::print_sample (std::ostream& out, const symbol name,
   inherited_entries (library, name, base_entries);
   if (base_entries.size () > 0)
     {
-      print_sample_base (out, library.name (), 
-                         alist.identifier ("base_model"));
+      if (ordered)
+	out << "\\\\\n&";
+      else
+	ordered = true;
+      out << "\\multicolumn{2}{l}{;; Shared parameters are described "
+	  << "in section~\\ref{model:"
+	  << library.name () << "-" << alist.identifier ("base_model") << "}}";
       print_sample_entries (out, syntax, alist, base_entries);
     }
   

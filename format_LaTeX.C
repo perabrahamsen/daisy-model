@@ -134,7 +134,7 @@ FormatLaTeX::table_cell_open ()
   if (table_first_column.top ())
     table_first_column.top () = false;
   else
-    out () << " & ";
+    out () << "&";
 }
 
 void 
@@ -233,7 +233,7 @@ FormatLaTeX::text (const std::string& text)
 	out () << "\\" << text[i];
 	break;
       case '\\':
-	out () << "\\mbox{$\\backslash$}";
+	out () << "$\\backslash$";
 	break;
       case '[':
       case ']':
@@ -241,7 +241,7 @@ FormatLaTeX::text (const std::string& text)
       case '=':
       case '<':
       case '>':
-	out () << "\\mbox{$" << text[i] << "$}";
+	out () << "$" << text[i] << "$";
 	break;
       default:
 	out () << text[i];

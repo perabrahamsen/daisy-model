@@ -91,27 +91,27 @@ Format::Table::~Table ()
 Format::TableRow::TableRow (Format& f)
   : format (f)
 { 
-  format.push ("typewriter");
-  format.typewriter_open ();
+  format.push ("table_row");
+  format.table_row_open ();
 }
 
 Format::TableRow::~TableRow ()
 { 
-  format.pop ("typewriter");
-  format.typewriter_close (); 
+  format.pop ("table_row");
+  format.table_row_close (); 
 }
 
 Format::TableCell::TableCell (Format& f)
   : format (f)
 { 
-  format.push ("typewriter");
-  format.typewriter_open ();
+  format.push ("table_cell");
+  format.table_cell_open ();
 }
 
 Format::TableCell::~TableCell ()
 { 
-  format.pop ("typewriter");
-  format.typewriter_close (); 
+  format.pop ("table_cell");
+  format.table_cell_close (); 
 }
 
 Format::Typewriter::Typewriter (Format& f)

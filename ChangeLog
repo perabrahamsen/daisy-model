@@ -1,3 +1,7 @@
+2005-01-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/log-sample.dai ("Sample water content"): New sample.
+
 2005-01-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* log_table.C (common_done): Time columns now obey

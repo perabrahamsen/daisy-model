@@ -1,4 +1,5 @@
-LIBS 	= init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
+LIBS 	= log-sample.dai \
+	init-soil.dai pedo-soil.dai irrigation.dai dk-management.dai
 SETUPS  = batch.dai sample.dai test.dai
 DATA = taastrup.dwf example.gwt
 TEXT	= Makefile README $(SETUPS) $(DATA) $(LIBS)

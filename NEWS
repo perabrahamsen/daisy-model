@@ -16,6 +16,15 @@ release.
 
 ** field seperator now obeyed for time columns in table log.
 
+** New log-sample.dai file in sample directory.
+
+This file contain additional log model parameterizations, serving as
+examples of how to create your owm, geared towards comparing simulated
+and measured data.
+
+Since measured data tend to wary a lot, standardized files are less
+useful. 
+
 * 3.68
 
 ** h_aquifer for drained soil may now vary with time.

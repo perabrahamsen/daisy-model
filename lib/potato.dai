@@ -106,7 +106,7 @@
                   (fractions  0.00 1.00 0.00)))))
 
 (defcrop "Potato; SCRI" default
-  "Potate paramterized by sha@kvl.dk -- 2003.
+  "Potate parameterized by sha@kvl.dk -- 2003.
 It is based on experimental data from SCRI from 1983 and 1984."
   (Devel default (EmrTSum 425 [dg C d])
          (DS_Emr   0.01)
