@@ -56,8 +56,10 @@ public:
   virtual ~Macro ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Macro>::Content* Librarian<Macro>::content;
+#endif
 
 static Librarian<Macro> Macro_init ("macro");
 

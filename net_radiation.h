@@ -52,8 +52,10 @@ public:
   virtual ~NetRadiation ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content;
+#endif
 
 static Librarian<NetRadiation> NetRadiation_init ("net_radiation");
 

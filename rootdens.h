@@ -53,8 +53,10 @@ public:
   virtual ~Rootdens ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Rootdens>::Content* Librarian<Rootdens>::content;
+#endif
 
 static Librarian<Rootdens> Rootdens_init ("rootdens");
 

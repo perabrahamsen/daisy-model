@@ -28,11 +28,6 @@
 
 // Portability code.
 
-#if (defined (__GNUC__) && __GNUC__ < 3) \
-	|| (defined (__BORLANDC__) && __BORLANDC__ < 0x0550)
-#define BROKEN_HEADERS
-#endif
-
 #if (defined (__GNUC__) && __GNUC__ > 2)
 #define NORETURN __attribute__ ((noreturn))
 #else
@@ -47,52 +42,13 @@
 #define asin(x) (daisy_assert (x >= -1 && x <= 1), (asin(x)))
 #endif
 
-#define WORKING_EXCEPTIONS
-
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
 #define EMPTY_TEMPLATE
 #else
 #define EMPTY_TEMPLATE template<>
 #endif
 
-#ifdef __GNUC__
-// Only gcc has a C++ safe <math.h>.
-#include <math.h>
-#else
-#define exception _BUG_EXCEPTION
-#include <math.h>
-#undef exception
-#endif
-
-#ifdef __GNUC__
-
-#include <unistd.h>
-
-// GCC doesn't have DLL keywords.
-#define EXPORT
-#define IMPORT
-
-// If you can delete const objects.
-#define CONST_DELETE
-
-#define HAS_TEMPLATE_MEMBERS
-
-// GNU doesn't mind unused global constants.
-#define GLOBAL_CONSTANT
-
-#elif defined (VISUALCPP)
-
-#pragma warning (disable: 4786 4503)
-#pragma warning (3: 4019 4032 4057 4061 4125 4130 4152 4189 4201 4706)
-
-#define CONST_DELETE
-#define HAS_TEMPLATE_MEMBERS
-#define GLOBAL_CONSTANT
-
-// Work around broken for-scoping
-#define for if(0);else for
-
-#else /* BORLAND */
+#ifdef __BORLANDC__
 
 // WIN32 DLL keywords.
 #define EXPORT _export
@@ -104,28 +60,38 @@
 #if __BORLANDC__ < 0x0550
 // Define these for Borland C++ 5.0.1
 #define BORLAND_TEMPLATES
-#define BORLAND_EOF
-#define BORLAND_PRAGMA
-
-// #define BORLAND_PERMISSIONS
-
-// Needed in BCC for 'close'.
-#include <io.h>
-
-// BC++ 5.01 hasn't <ostream.h>
-#define MISSING_OSTREAM
-
 #endif
+
+// If you can't delete const objects.
+#define NO_CONST_DELETE
+
+#elif defined (_MSC_VER)
+// MS Visual C++.
+
+#pragma warning (disable: 4786 4503)
+#pragma warning (3: 4019 4032 4057 4061 4125 4130 4152 4189 4201 4706)
+
+#define GLOBAL_CONSTANT
+
+// Work around broken for-scoping
+#define for if(0);else for
+
+#else
+// GCC & ICC
+
+// GCC doesn't have DLL keywords.
+#define EXPORT
+#define IMPORT
+
+// GNU doesn't mind unused global constants.
+#define GLOBAL_CONSTANT
+
 #endif
 
 #if !defined (__unix) && !defined (__CYGWIN__)
 // When running a pure DOS, don't use stderr.
 #define USELESS_STDERR
 #endif
-
-#include <stdexcept>
-
-using namespace std;
 
 // Shared code.
 
@@ -144,7 +110,7 @@ void map_delete (ForwardIterator first, ForwardIterator last)
   while (first != last)
     {
       delete (*first).second;
-      (*first).second = NULL;
+      (*first).second = 0;
       first++;
     }
 }

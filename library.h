@@ -23,8 +23,8 @@
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
-#include "common.h"
 #include <vector>
+using namespace std;
 
 class Syntax;
 class AttributeList;

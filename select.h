@@ -105,8 +105,10 @@ public:
   virtual ~Select ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Select>::Content* Librarian<Select>::content;
+#endif
 
 static Librarian<Select> Select_init ("select");
 

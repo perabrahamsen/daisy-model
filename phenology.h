@@ -61,8 +61,10 @@ public:
   virtual ~Phenology ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Phenology>::Content* Librarian<Phenology>::content;
+#endif
 
 static Librarian<Phenology> Phenology_init ("phenology");
 

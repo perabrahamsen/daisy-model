@@ -485,11 +485,7 @@ struct LogTable1 : public Log
     : Log (al),
       description (al.name ("description")),
       file (al.name ("where")),
-#ifdef BORLAND_PERMISSIONS
-      out (file.c_str (), ios::out|ios::trunc, 0666),
-#else
       out (file.c_str ()),
-#endif
       condition (Librarian<Condition>::create (al.alist ("when"))),
       entries (map_construct<LogEntry> (al.alist_sequence ("entries"))),
       print_tags (al.flag ("print_tags")),

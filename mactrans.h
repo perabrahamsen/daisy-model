@@ -54,8 +54,10 @@ public:
   virtual ~Mactrans ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Mactrans>::Content* Librarian<Mactrans>::content;
+#endif
 
 static Librarian<Mactrans> Mactrans_init ("mactrans");
 

@@ -51,8 +51,10 @@ public:
   virtual ~Action ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Action>::Content* Librarian<Action>::content;
+#endif
 
 static Librarian<Action> Action_init ("action");
 

@@ -130,8 +130,10 @@ public:
   virtual ~Crop ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Crop>::Content* Librarian<Crop>::content;
+#endif
 
 static Librarian<Crop> Crop_init ("crop");
 

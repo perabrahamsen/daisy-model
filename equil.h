@@ -51,8 +51,10 @@ public:
   virtual ~Equilibrium ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Equilibrium>::Content* Librarian<Equilibrium>::content;
+#endif
 
 static Librarian<Equilibrium> Equilibrium_init ("equilibrium");
 

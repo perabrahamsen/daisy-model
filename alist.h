@@ -23,12 +23,12 @@
 #ifndef ALIST_H
 #define ALIST_H
 
-#include "common.h"
-
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <list>
+
+using namespace std;
 
 class Time;
 class PLF;

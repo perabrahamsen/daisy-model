@@ -53,8 +53,10 @@ public:
   virtual ~Transform ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Transform>::Content* Librarian<Transform>::content;
+#endif
 
 static Librarian<Transform> Transform_init ("transform");
 

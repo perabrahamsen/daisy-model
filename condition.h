@@ -48,8 +48,10 @@ public:
   virtual ~Condition ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Condition>::Content* Librarian<Condition>::content;
+#endif
 
 static Librarian<Condition> Condition_init ("condition");
 

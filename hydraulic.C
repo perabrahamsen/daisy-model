@@ -25,6 +25,7 @@
 #include "log.h"
 #include "tmpstream.h"
 #include "check_range.h"
+#include <math.h>
 
 void 
 Hydraulic::set_porosity (double Theta)

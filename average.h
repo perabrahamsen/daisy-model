@@ -43,8 +43,10 @@ public:
   virtual ~Average ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Average>::Content* Librarian<Average>::content;
+#endif
 
 static Librarian<Average> Average_init ("average");
 

@@ -27,12 +27,10 @@
 
 #include "common.h"
 
-#if defined (MISSING_OSTREAM)
-#include <iostream.h>
-#elif defined (BROKEN_HEADERS)
-#include <ostream.h>
+#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
+struct ostream;
 #else
-#include <ostream>
+#include <iosfwd>
 #endif
 
 class TmpStream

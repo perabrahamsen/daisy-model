@@ -103,8 +103,10 @@ public:
   virtual ~AM ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<AM>::Content* Librarian<AM>::content;
+#endif
 
 static Librarian<AM> AM_init ("am");
 

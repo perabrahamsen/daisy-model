@@ -31,11 +31,7 @@ bool Path::Output::good () const
 { return owner && out.good (); }
 
 Path::Output::Output (const string& file)
-#ifdef BORLAND_PERMISSIONS
-  : out (*new ofstream (file.c_str (), ios::out|ios::trunc, 0666)),
-#else
   : out (*new ofstream (file.c_str ())),
-#endif
     owner (true)
 { }
 

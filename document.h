@@ -101,8 +101,10 @@ public:
   virtual ~Document ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Document>::Content* Librarian<Document>::content;
+#endif
 
 static Librarian<Document> Document_init ("document");
 

@@ -54,8 +54,10 @@ public:
   virtual ~Transport ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Transport>::Content* Librarian<Transport>::content;
+#endif
 
 static Librarian<Transport> Transport_init ("transport");
 

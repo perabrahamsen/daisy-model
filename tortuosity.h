@@ -45,8 +45,10 @@ public:
   virtual ~Tortuosity ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Tortuosity>::Content* Librarian<Tortuosity>::content;
+#endif
 
 static Librarian<Tortuosity> Tortuosity_init ("tortuosity");
 

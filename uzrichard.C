@@ -380,14 +380,7 @@ UZRichard::richard (Treelog& msg,
 		// We don't have more water in the pressure top.
 		{
 		  if (switched_top)
-		    {
-#ifdef WORKING_EXCEPTIONS
-		      throw ("Couldn't accept top flux");
-#else
-#error "accept no exceptions!"
-		      return false;
-#endif
-		    }
+		    throw ("Couldn't accept top flux");
 		  else
 		    {
 		      top.flux_top_on ();
@@ -403,11 +396,7 @@ UZRichard::richard (Treelog& msg,
 	  else if (top.q () > 0.0)
 	    {
 	      // We have a saturated soil, with an upward flux.
-#ifdef WORKING_EXCEPTIONS
 	      throw ("Saturated soil with an upward flux");
-#else
-	      return false;
-#endif
 	    }
 	  else if (!switched_top)
 	    // We have saturated soil, make it a pressure top.
@@ -416,13 +405,7 @@ UZRichard::richard (Treelog& msg,
 	      accepted = false;
 	    }
 	  else
-	    {
-#ifdef WORKING_EXCEPTIONS
-	      throw ("Couldn't drain top flux");
-#else
-	      return false;
-#endif
-	    }
+	    throw ("Couldn't drain top flux");
 
 	  if (accepted)
 	    {
@@ -462,14 +445,8 @@ UZRichard::richard (Treelog& msg,
 		      }
 		  }
 		if (error_found)
-		  {
-#ifdef WORKING_EXCEPTIONS
 		    throw ("\
 Richard eq. mass balance flux is different than darcy flux");
-#else
-		    return false;
-#endif
-		  }
 	      }
 #endif
 	      top_water += delta_top_water;
@@ -628,13 +605,8 @@ UZRichard::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
   iterations = 0;
   if (!richard (msg, soil, soil_heat, first, top, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q))
-    {
-#ifdef WORKING_EXCEPTIONS
-      throw ("Richard's Equation doesn't converge");
-#else
-      return false;
-#endif
-    }
+    throw ("Richard's Equation doesn't converge");
+
   q_up = q[first];
   q_down = q[last + 1];
   return true;

@@ -57,8 +57,10 @@ public:
   virtual ~Printer ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Printer>::Content* Librarian<Printer>::content;
+#endif
 
 static Librarian<Printer> Printer_init ("printer");
 

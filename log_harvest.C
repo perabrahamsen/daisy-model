@@ -159,11 +159,7 @@ struct LogHarvest : public Log
     : Log (al),
       last_size (0),
       file (al.name ("where")),
-#ifdef BORLAND_PERMISSIONS
-      out (file.c_str (), ios::out|ios::trunc, 0666),
-#else
       out (file.c_str ()),
-#endif
       print_header (al.flag ("print_header")),
       print_tags (al.flag ("print_tags")),
       print_dimension (al.flag ("print_dimension")),

@@ -394,14 +394,14 @@ PLF::operator += (const PLF& plf)
   combined.merge (other);
   combined.unique ();
   // Finally, I convert it to a vector.
-#ifdef HAS_TEMPLATE_MEMBERS
-  vector<double> points (combined.begin (), combined.end ());
-#else
+#ifdef __BORLANDC__
   vector<double> points;
   for (list<double>::iterator i = combined.begin ();
        i != combined.end ();
        i++)
     points.push_back (*i);
+#else
+  vector<double> points (combined.begin (), combined.end ());
 #endif
 
   // I then add the points to a temporary PLF.

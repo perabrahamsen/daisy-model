@@ -154,8 +154,10 @@ public:
   virtual ~Weather ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Weather>::Content* Librarian<Weather>::content;
+#endif
 
 static Librarian<Weather> Weather_init ("weather");
 

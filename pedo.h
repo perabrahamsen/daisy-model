@@ -49,8 +49,10 @@ public:
   virtual ~Pedotransfer ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Pedotransfer>::Content* Librarian<Pedotransfer>::content;
+#endif
 
 static Librarian<Pedotransfer> Pedotransfer_init ("pedotransfer");
 

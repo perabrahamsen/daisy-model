@@ -81,8 +81,10 @@ public:
   virtual ~Horizon ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Horizon>::Content* Librarian<Horizon>::content;
+#endif
 
 static Librarian<Horizon> Horizon_init ("horizon");
 

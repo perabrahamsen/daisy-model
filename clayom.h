@@ -55,8 +55,10 @@ public:
   virtual ~ClayOM ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<ClayOM>::Content* Librarian<ClayOM>::content;
+#endif
 
 static Librarian<ClayOM> ClayOM_init ("ClayOM");
 

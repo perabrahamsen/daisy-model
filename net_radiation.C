@@ -23,6 +23,7 @@
 #include "net_radiation.h"
 #include "log.h"
 #include "weather.h"
+#include <math.h>
 
 EMPTY_TEMPLATE
 Librarian<NetRadiation>::Content* Librarian<NetRadiation>::content = NULL;

@@ -51,8 +51,10 @@ public:
   virtual ~Nitrification ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Nitrification>::Content* Librarian<Nitrification>::content;
+#endif
 
 static Librarian<Nitrification> Nitrification_init ("nitrification");
 

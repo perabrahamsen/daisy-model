@@ -24,17 +24,9 @@
 
 #include "log_clone.h"
 
-#ifdef BORLAND_PRAGMA
-#pragma warn -rvl
-#endif
-
 bool
 LogClone::match (const Daisy&, Treelog&)
 { daisy_assert (false); }
-
-#ifdef BORLAND_PRAGMA
-#pragma warn +rvl
-#endif
 
 bool 
 LogClone::check_member (const string &) const

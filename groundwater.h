@@ -64,8 +64,10 @@ public:
   virtual ~Groundwater ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Groundwater>::Content* Librarian<Groundwater>::content;
+#endif
 
 static Librarian<Groundwater> Groundwater_init ("groundwater");
 

@@ -47,8 +47,10 @@ public:
   virtual ~Adsorption ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Adsorption>::Content* Librarian<Adsorption>::content;
+#endif
 
 static Librarian<Adsorption> Adsorption_init ("adsorption");
 

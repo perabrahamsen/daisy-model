@@ -70,8 +70,10 @@ public:
   virtual ~Hydraulic ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content;
+#endif
 
 static Librarian<Hydraulic> Hydraulic_init ("hydraulic");
 

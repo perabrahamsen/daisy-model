@@ -146,7 +146,7 @@ struct ConditionNot : public Condition
 
   ~ConditionNot ()
   {
-#ifdef CONST_DELETE
+#ifdef NO_CONST_DELETE
     delete &condition; 
 #endif
   }
@@ -183,7 +183,7 @@ struct ConditionIf : public Condition
 
   ~ConditionIf ()
   {
-#ifdef CONST_DELETE
+#ifdef NO_CONST_DELETE
     delete &if_c;
     delete &then_c;
     delete &else_c;

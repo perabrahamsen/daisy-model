@@ -121,8 +121,10 @@ public:
   virtual ~Vegetation ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Vegetation>::Content* Librarian<Vegetation>::content;
+#endif
 
 static Librarian<Vegetation> Vegetation_init ("vegetation");
 

@@ -61,8 +61,10 @@ public:
   virtual ~Pet ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Pet>::Content* Librarian<Pet>::content;
+#endif
 
 static Librarian<Pet> Pet_init ("pet");
 

@@ -93,8 +93,10 @@ public:
   virtual ~Bioclimate ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Bioclimate>::Content* Librarian<Bioclimate>::content;
+#endif
 
 static Librarian<Bioclimate> Bioclimate_init ("bioclimate");
 

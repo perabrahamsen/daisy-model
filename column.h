@@ -129,8 +129,10 @@ public:
   virtual ~Column ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Column>::Content* Librarian<Column>::content;
+#endif
 
 static Librarian<Column> Column_init ("column");
 

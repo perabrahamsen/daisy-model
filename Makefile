@@ -113,6 +113,10 @@ ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),icc)
 		OPTIMIZE = -O2
 	endif
+else
+	ifeq ($(COMPILER),icc)
+		OPTIMIZE = -O0
+	endif
 endif
 
 # Do we want to create a dynamic library?
@@ -414,7 +418,7 @@ daisy:	main${OBJ} $(LIBOBJ) #daisy.so
 
 exp:	
 	(cd $(OBJHOME)/exp \
-         && $(MAKE) VPATH=$(SRCDIR) COMPILER=icc -f $(SRCDIR)/Makefile daisy)
+         && $(MAKE) VPATH=$(SRCDIR) USE_OPTIMIZE=false COMPILER=icc -f $(SRCDIR)/Makefile daisy)
 
 native:	
 	(cd $(OBJHOME)/$(HOSTTYPE) \

@@ -246,8 +246,10 @@ public:
   virtual ~Log ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Log>::Content* Librarian<Log>::content;
+#endif
 
 static Librarian<Log> Log_init ("log");
 

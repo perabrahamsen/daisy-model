@@ -258,11 +258,7 @@ LogTable::add (const string&, const string& value)
 LogTable::LogTable (const AttributeList& al)
   : LogSelect (al),
     file (al.name ("where")),
-#ifdef BORLAND_PERMISSIONS
-    out (file.c_str (), ios::out|ios::trunc, 0666),
-#else
     out (file.c_str ()),
-#endif
     flush (al.flag ("flush")),
     record_separator (al.name ("record_separator")),
     field_separator (al.name ("field_separator")),

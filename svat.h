@@ -59,8 +59,10 @@ public:
   virtual ~SVAT ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<SVAT>::Content* Librarian<SVAT>::content;
+#endif
 
 static Librarian<SVAT> SVAT_init ("svat");
 

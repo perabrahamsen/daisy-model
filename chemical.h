@@ -55,8 +55,10 @@ public:
   virtual ~Chemical ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<Chemical>::Content* Librarian<Chemical>::content;
+#endif
 
 static Librarian<Chemical> Chemical_init ("chemical");
 

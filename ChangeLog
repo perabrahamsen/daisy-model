@@ -1,3 +1,7 @@
+2003-02-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.h: Cleanup.
+
 2003-02-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* library.h, chemicals.h (Implementation): Made it public (for icc).

@@ -98,8 +98,10 @@ public:
   virtual ~UZmodel ();
 };
 
+#if !defined (__BORLANDC__)
 EMPTY_TEMPLATE
 Librarian<UZmodel>::Content* Librarian<UZmodel>::content;
+#endif
 
 static Librarian<UZmodel> UZmodel_init ("uzmodel");
 
