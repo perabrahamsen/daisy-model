@@ -30,6 +30,10 @@ Treelog::Open::~Open ()
 { log.close (); }
 
 void
+Treelog::debug (const string&)
+{ }
+
+void
 Treelog::entry (const string&)
 { count++; }
 

@@ -63,7 +63,6 @@
 #else
 #define finite(x) 1
 // ((x) <= 0.0 ¦¦ (x) >= 0.0)
-#define rint(x) ((int)x)
 #endif
 
 #ifdef __GNUC__

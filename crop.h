@@ -118,8 +118,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (Treelog&, const Geometry&, OrganicMatter&);
-  virtual void initialize (Treelog&, const Geometry&) = 0;
+  virtual void initialize_organic (Treelog&, const Geometry&, OrganicMatter&);
+  virtual void initialize_inorganic (Treelog&, const Geometry&) = 0;
 protected:
   Crop (const AttributeList& al);
 public:

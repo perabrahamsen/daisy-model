@@ -1,16 +1,20 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* daisy.log
+* OM: Ændr C + C/N til C + N.
 
-** Indsæt start og sluttidpunkt i daisy.log.
+* DOM.
 
-Husk, det skal være efter (direactory "foo") er parset.
+** En enkelt DOM med C + N
 
-** Indsæt kommandolineargumenter i daisy.log.
+** Udvid OM::fractions med et ekstra medlem -> DOM
 
-** Sørg for at diskretisering kun kommer i daisy.log, ikke til skærm.
+** DOM::turnover_rate + DOM::fractions
 
-* Reference manual:  udskriv alle default værdier.
+** matrix transport af C og N seperat
+
+** macro transport af C og N seperat
+
+** adsorbtion af DOM til matrix
 
 * User Manual
 

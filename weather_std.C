@@ -326,11 +326,11 @@ WeatherStandard::read_line ()
 	next_time.tick_hour (timestep);
       if (has_date)
 	{
-	  const int year = static_cast<int> (next_year);
-	  const int month = static_cast<int> (next_month);
-	  const int mday = static_cast<int> (next_day);
+	  const int year = double2int (next_year);
+	  const int month = double2int (next_month);
+	  const int mday = double2int (next_day);
 	  const int hour = has_hour 
-	    ? static_cast<int> (next_hour) : next_time.hour ();
+	    ? double2int (next_hour) : next_time.hour ();
 
 	  if (!Time::valid (year, month, mday, hour))
 	    {
@@ -349,7 +349,7 @@ WeatherStandard::read_line ()
   lex->next_line ();
 
   // Precipitation correction.
-  const int month = static_cast<int> (next_time.month ());
+  const int month = double2int (next_time.month ());
   next_precipitation *= precipitation_correction[month-1];
 }
 void 
@@ -563,7 +563,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 		val = Units::convert (dim, "hours", val);
 	      else
 		lex->error ("Unknown dimension");
-	      timestep = static_cast<int> (val);
+	      timestep = double2int (val);
 	      if (timestep != val || timestep < 0.0)
 		lex->error ("Timestep should be a cardinal number");
 	    }

@@ -90,6 +90,17 @@ inline void set_bound (double a, double& x, double b)
     x = b;
 }
 
+inline int double2int (double x)
+{ return static_cast<int> (x); }
+
+inline double int2double (int x)
+{ return x; }
+
+inline char int2char (int x)
+{ return static_cast<char> (x); }
+
+#define rint(x) ((int)x)
+
 inline double pF2h (double pF)
 { 
   return -pow (10, pF);

@@ -24,7 +24,7 @@
 #include "tmpstream.h"
 
 bool 
-LogSelect::check (const string& name) const
+LogSelect::check_member (const string& name) const
 { 
   if (!is_active)
     return false;
@@ -40,7 +40,7 @@ bool
 LogSelect::check_derived (const string& field, const string& /* name */,
 			  const Library& /* library */) const
 { 
-  if (!check (field))
+  if (!check_member (field))
     return false;
 
 #if 0

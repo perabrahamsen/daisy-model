@@ -96,9 +96,10 @@ MacroStandard::tick (const Soil& soil,
   const double soil_end = soil.zplus (soil.size () - 1);
 
   // Start and end of macro intervals.
-  const unsigned int from = max (((int) soil.interval_plus (height_start)) - 1,
+  const unsigned int from = max (double2int (soil.interval_plus 
+					     (height_start)) - 1,
 				 /* not unsigned, or -1 fails */
-				 (int) first);
+				 double2int (first));
   const unsigned int to 
     = min (soil.interval_plus (max (height_end, soil_end)), last);
 
@@ -185,7 +186,9 @@ MacroStandard::tick (const Soil& soil,
 
   // Now check for saturated conditions.
   double extra_water = 0.0;	// [cm]
-  for ( /* not unsigned, or the >= fails */ int i = to; i >= (int) from; i--)
+  for ( /* not unsigned, or the >= fails */ int i = to; 
+					    i >= double2int (from);
+					    i--)
     {
       // The size of the layer.
       const double dz = soil.dz (i); // [cm]

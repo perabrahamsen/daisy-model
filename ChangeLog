@@ -1,4 +1,70 @@
+2002-05-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.31 released.
+
+2002-05-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* nrutil.C, nrutil.h (nrerror): Promise not to touch the string.
+
+	* mathlib.h (double2int, int2double, int2char): New functions.
+	* all: Use them instead of casts.
+
+	* crop.h, crop.C, crop_simple.C, crop_old.C, crop_sold.C,
+	crop_std.C (initialize_organic, initialize_inorganic):  Renamed
+	from overloaded `initialize'.
+	* vegetation_crops.C (sow): Update caller.
+	(initialize): Ditto.
+
+	* log.h, log_select.h, log_select.C, log_clone.h, log_clone.C,
+	log_table1.C, log_alist.h, log_harvest.C (check_member): Renamed
+	from `check'.  
+	* column_std.C (output_inner): Update caller.
+	* action_lisp.C, bioincorporation.C, crop_old.C, crop_sold.C,
+	om.C, organic_matter.C, soil_chemicals.C, soil_chemicals.C,
+	soil_heat.C (output): Update callers. 
+	* log.C (check_entry): Update caller.
+	* log_select.C (check_derived): Ditto.
+
+	* horizon.C (initialize): Remove old style casts.
+	* parser_file.C (get_number): Ditto.
+	* soil_heat.C (output): Ditto.
+	* lexer_data.C (get_number): Ditto.
+	* geometry.C (initialize_zplus): Ditto.
+	* select_average.C (done): Ditto.
+	* crop_simple.C (check_alist): Ditto.
+	* parser_file.C (load_list): Ditto.
+
+2002-05-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* path.h, path.C (Input, Output): New classes.
+	* printer_file.C (PrinterFile): Can now be constructed from an
+	ostream reference.
+	(print_plf): Attempt to wrap at 72 columns.
+	* printer_file.C, printer_file.h, printer.h (print_alist): Add
+	`super' agrument.
+	* qmain.C (save_file): Update caller.
+	* log_checkpoint.C (done): Ditto.
+	* cdaisy.C, cdaisy.h (daisy_printer_alist): Ditto.
+	* document_LaTeX.C (is_submodel, find_submodel): New utility
+	functions. 
+	(print_entry_type): Use them.
+	(print_entry_type): Drop `size' argument.
+	(print_entry_value): Also print complex default values. 
+	(print_users): Get rid of "@" in references.
+
+2002-05-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport_convection.C (tick): Allow for more noise in mass
+	balance check..
+	Initialize of J after time step reduction.
+
 2002-05-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_base.C (initialize): Add treelog nesting.
+
+	* treelog.C, treelog.h, treelog_dual.C, treelog_dual.h (debug):
+	New virtual member function.
+	* geometry.C (initialize_zplus): Use it.
 
 	* Version 2.30 released.
 

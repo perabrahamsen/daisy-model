@@ -132,15 +132,15 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&, const Geometry& geometry, OrganicMatter&);
-  void initialize (Treelog&, const Geometry& geometry);
+  void initialize_organic (Treelog&, const Geometry& geometry, OrganicMatter&);
+  void initialize_inorganic (Treelog&, const Geometry& geometry);
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
 
 void
-CropStandard::initialize (Treelog& msg, const Geometry& geometry,
-			  OrganicMatter& organic_matter)
+CropStandard::initialize_organic (Treelog& msg, const Geometry& geometry,
+				  OrganicMatter& organic_matter)
 {
   root_system.initialize (geometry.size ());
   production.initialize (nitrogen.SeedN);
@@ -161,7 +161,7 @@ CropStandard::initialize (Treelog& msg, const Geometry& geometry,
 }
 
 void
-CropStandard::initialize (Treelog&, const Geometry& geometry)
+CropStandard::initialize_inorganic (Treelog&, const Geometry& geometry)
 {
   root_system.initialize (geometry.size ());
   production.initialize (nitrogen.SeedN);

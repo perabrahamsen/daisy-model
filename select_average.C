@@ -21,6 +21,7 @@
 
 
 #include "select.h"
+#include "mathlib.h"
 
 struct SelectAverage : public Select
 {
@@ -49,7 +50,7 @@ struct SelectAverage : public Select
       if (count == 0)
 	dest.missing (tag ());
       else 
-	dest.add (tag (), convert (value/(double) count));
+	dest.add (tag (), convert (value / int2double (count)));
 
       if (!accumulate)
 	count = 0;

@@ -175,7 +175,7 @@ struct ActionCond : public Action
 
   void output (Log& log) const
   { 
-    if (log.check ("clauses"))
+    if (log.check_member ("clauses"))
       {
 	Log::Open open (log, "clauses");
 	for (vector<clause>::const_iterator item = clauses.begin ();

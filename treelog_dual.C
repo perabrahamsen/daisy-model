@@ -40,8 +40,12 @@ struct TreelogDual::Implementation
   ostream* one;
   ostream& two;
   deque<string> path;
-  deque<bool> touched;
+  deque<bool> touched_one;
+  deque<bool> touched_two;
 
+  void print (ostream& out, deque<bool>& touched, const string& text);
+  void init_one ();
+  void debug (const string& text);
   void entry (const string& text);
 
   void flush ();
@@ -63,12 +67,31 @@ struct TreelogDual::Implementation
 	delete one;
       }
     daisy_assert (path.size () == 0);
-    daisy_assert (touched.size () == 0);
+    daisy_assert (touched_one.size () == 0);
+    daisy_assert (touched_two.size () == 0);
   }
 };
 
 void
-TreelogDual::Implementation::entry (const string& text)
+TreelogDual::Implementation::print (ostream& out, deque<bool>& touched, 
+				    const string& text)
+{
+  for (unsigned int i = 0; i < touched.size (); i++)
+    {
+      if (!touched[i])
+	{
+	  touched[i] = true;
+	  for (unsigned int j = 0; j <= i; j++)
+	    out << "*";
+
+	  out << " " << path[i] << "\n";
+	}
+    }
+  out << text << "\n";
+}
+
+void
+TreelogDual::Implementation::init_one ()
 {
   if (!one)
     {
@@ -79,23 +102,21 @@ TreelogDual::Implementation::entry (const string& text)
       if (!one->good ())
 	two << "Problems opening `" << file << "' in '" << directory << "\n";
     }
+}
 
-  for (unsigned int i = 0; i < touched.size (); i++)
-    {
-      if (!touched[i])
-	{
-	  touched[i] = true;
-	  for (unsigned int j = 0; j <= i; j++)
-	    {
-	      *one << "*";
-	      two << "*";
-	    }
-	  *one << " " << path[i] << "\n";
-	  two << " " << path[i] << "\n";
-	}
-    }
-  *one << text << "\n";
-  two << text << "\n";
+void
+TreelogDual::Implementation::debug (const string& text)
+{ 
+  init_one ();
+  print (*one, touched_one, text); 
+}
+
+void
+TreelogDual::Implementation::entry (const string& text)
+{
+  print (two, touched_two, text);
+  init_one ();
+  print (*one, touched_one, text); 
 }
 
 void 
@@ -110,14 +131,23 @@ void
 TreelogDual::open (const string& name)
 { 
   impl.path.push_back (name); 
-  impl.touched.push_back (false); 
+  impl.touched_one.push_back (false); 
+  impl.touched_two.push_back (false); 
 }
 
 void
 TreelogDual::close ()
 {
   impl.path.pop_back (); 
-  impl.touched.pop_back (); 
+  impl.touched_one.pop_back (); 
+  impl.touched_two.pop_back (); 
+}
+
+void
+TreelogDual::debug (const string& text)
+{
+  impl.debug (text);
+  Treelog::debug (text);
 }
 
 void
@@ -137,4 +167,3 @@ TreelogDual::TreelogDual (const string& file, ostream& two)
 
 TreelogDual::~TreelogDual ()
 { delete &impl; }
-

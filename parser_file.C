@@ -28,6 +28,7 @@
 #include "treelog_stream.h"
 #include "path.h"
 #include "units.h"
+#include "mathlib.h"
 
 struct ParserFile::Implementation
 {
@@ -114,7 +115,7 @@ ParserFile::Implementation::get_string ()
 			 + char (c) + "'");
 		}
 	    }
-	  str += static_cast<char> (c);
+	  str += int2char (c);
 	}
       return str;
     }
@@ -149,7 +150,7 @@ ParserFile::Implementation::get_integer ()
 
   while (good () && (isdigit (c) || c == '-' || c == '+'))
     {
-      str += static_cast<char> (c);
+      str += int2char (c);
       get ();
       c = peek ();
     }
@@ -174,7 +175,7 @@ ParserFile::Implementation::get_number ()
 		     || c == '.' || c == '-' || c == '+' 
 		     || c == 'e' || c == 'E'))
     {
-      str += static_cast<char> (c);
+      str += int2char (c);
       get ();
       c = peek ();
     }
@@ -187,7 +188,7 @@ ParserFile::Implementation::get_number ()
     }
   const char *c_str = str.c_str ();
   const char *endptr = c_str;
-  const double value = strtod (c_str, (char**) &endptr);
+  const double value = strtod (c_str, const_cast<char**> (&endptr));
   
   if (*endptr != '\0')
     error (string ("Junk at end of number '") + endptr + "'");
@@ -204,7 +205,7 @@ ParserFile::Implementation::get_dimension ()
 
   while (good () && c != ']' && c != '\n')
     {
-      str += static_cast<char> (c);
+      str += int2char (c);
       get ();
       c = peek ();
     }
@@ -658,7 +659,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		if (skipped)
 		  skip (")");
 		if (size != Syntax::Sequence 
-		    && (int) sequence.size () != size)
+		    && sequence.size () != size)
 		  {
 		    TmpStream str;
 		    str () << "Got " << sequence.size ()

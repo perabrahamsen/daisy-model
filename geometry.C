@@ -391,20 +391,21 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 	    // The next fixed interval limit is before the end of the zone.
 	    {
 	      // Find approximate number of intervals until fixed limit.
-	      const int intervals = (int) rint ((last - current) / zone_size);
+	      const int intervals = double2int ((last - current) / zone_size);
 	      if (intervals > 1)
 		{
 		  // Add interior intervals.
-		  const double step = (last - current) / (double) intervals;
+		  const double step 
+		    = (last - current) / int2double (intervals);
 		  const double first = last;
 		  for (int j = 1; j < intervals; j++)
 		    {
 		      const double next = first - step * j;
 		      if (do_round)
 			{
-			  if (!approximate (rint (next), last))
+			  if (!approximate (double2int (next), last))
 			    {
-			      last = rint (next);
+			      last = double2int (next);
 			      zplus_.push_back (last);
 			    }
 			}
@@ -432,7 +433,7 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
       for (unsigned int i = 0; i < zplus_.size (); i++)
 	tmp () << " " << zplus_[i];
       tmp () << "\nTotal: " << zplus_.size ();
-      msg.entry (tmp.str ());
+      msg.debug (tmp.str ());
 
       // Check that zplus is strictly decreasing.
       last = 0.0;

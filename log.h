@@ -42,7 +42,7 @@ public:
 
   // Filter
 public:
-  virtual bool check (const string&) const = 0;
+  virtual bool check_member (const string&) const = 0;
   virtual bool check_entry (const string&, const Library& library) const;
   virtual bool check_derived (const string& field, const string& name, 
 			      const Library& library) const = 0;
@@ -253,7 +253,7 @@ template <class T> void
 output_submodule (const T& submodule, 
 		  const char* name, Log& log)
 {
-  if (log.check (name))
+  if (log.check_member (name))
     {
       Log::Open open (log, name);
       submodule.output (log);
@@ -278,7 +278,7 @@ template <class T> void
 output_list (T const& items, const char* name, Log& log, 
 	     const Library& library)
 {
-  if (log.check (name))
+  if (log.check_member (name))
     {
       Log::Open open (log, name);
       for (typename T::const_iterator item = items.begin(); 
@@ -298,7 +298,7 @@ output_list (T const& items, const char* name, Log& log,
 template <class T> void
 output_named (T const& items, const char* name, Log& log)
 {
-  if (log.check (name))
+  if (log.check_member (name))
     {
       Log::Open open (log, name);
       for (typename T::const_iterator item = items.begin ();
@@ -315,7 +315,7 @@ output_named (T const& items, const char* name, Log& log)
 template <class T> void
 output_ordered (T const& items, const char* name, Log& log)
 {
-  if (log.check (name))
+  if (log.check_member (name))
     {
       Log::Open open (log, name);
       int i = 0;
@@ -334,7 +334,7 @@ output_ordered (T const& items, const char* name, Log& log)
 template <class T> void
 output_vector (T const& items, const char* name, Log& log)
 {
-  if (log.check (name))
+  if (log.check_member (name))
     {
       Log::Open open (log, name);
       for (typename T::const_iterator item = items.begin ();

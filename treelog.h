@@ -47,6 +47,7 @@ public:
   
   // Use.
 public:
+  virtual void debug (const string&);
   virtual void entry (const string&);
   virtual void message (const string&);
   virtual void warning (const string&);

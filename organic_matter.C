@@ -336,7 +336,7 @@ OrganicMatter::Implementation::output (Log& log,
 {
   log.output ("CO2", CO2);
   log.output ("top_CO2", top_CO2);
-  if (log.check ("total_N") || log.check ("total_C"))
+  if (log.check_member ("total_N") || log.check_member ("total_C"))
     {
       const int size = geometry.size ();
 
@@ -366,7 +366,7 @@ OrganicMatter::Implementation::output (Log& log,
       log.output ("total_C", total_C);
     }
   log.output ("tillage_age", tillage_age);
-  if (log.check ("am"))
+  if (log.check_member ("am"))
     {
       const Library& library = Librarian<AM>::library ();
       

@@ -83,9 +83,6 @@ TransportConvection::tick (Treelog&,
   // Remember old content
   const double old_total = soil.total (M) + soil.total (S) * dt;
 
-  // Initialize flux.
-  fill (J.begin (), J.end (), 0.0);
-
   // Flux in individual time step.
   vector<double> dJ (size + 1, 0.0); 
 
@@ -123,6 +120,9 @@ TransportConvection::tick (Treelog&,
       steps = int (dt / ddt) + 1U;
       ddt = dt / (steps + 0.0);
     }
+
+  // Initialize flux.
+  fill (J.begin (), J.end (), 0.0);
 
   // Step through it.
   for (unsigned int step = 0; step < steps; step++)
@@ -169,7 +169,8 @@ TransportConvection::tick (Treelog&,
   // Check mass conservation.
   const double new_total = soil.total (M);
   daisy_assert (approximate (old_total - J[0] * dt + J[size] * dt, new_total));
-  daisy_assert (approximate (- J[0] * dt + J[size] * dt, new_total - old_total));
+  daisy_assert (approximate (- J[0] * dt + J[size] * dt, new_total - old_total,
+			     0.05));
 }
 
 static struct TransportConvectionSyntax

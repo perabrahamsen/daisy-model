@@ -30,7 +30,7 @@
 struct LogHarvest : public Log
 {
   // Filter function.
-  bool check (const string&) const
+  bool check_member (const string&) const
   { return false; }
   bool check_derived (const string&, const string&, const Library&) const
   { return false; }

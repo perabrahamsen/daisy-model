@@ -288,7 +288,7 @@ MainWindow::save_file ()
 
     // Print content.
   printer.print_comment ("Content");
-  printer.print_alist (daisy_alist, daisy_syntax);
+  printer.print_alist (daisy_alist, daisy_syntax, daisy_default_alist);
   if (!printer.good ())
     {
       NotBusy notbusy;

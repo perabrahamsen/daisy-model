@@ -124,7 +124,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&, const Geometry& geometry);
+  void initialize_inorganic (Treelog&, const Geometry& geometry);
   CropSold (const AttributeList& vl);
   ~CropSold ();
 };
@@ -471,15 +471,15 @@ CropSold::Variables::Variables (const Parameters& par,
 void 
 CropSold::Variables::output (Log& log) const
 {
-  if (log.check ("Phenology"))
+  if (log.check_member ("Phenology"))
     Phenology.output (log);
-  if (log.check ("Canopy"))
+  if (log.check_member ("Canopy"))
     Canopy.output (log);
-  if (log.check ("RootSys"))
+  if (log.check_member ("RootSys"))
     RootSys.output (log);
-  if (log.check ("Prod"))
+  if (log.check_member ("Prod"))
     Prod.output (log);
-  if (log.check ("CrpAux"))
+  if (log.check_member ("CrpAux"))
     CrpAux.output (log);
 }
 
@@ -609,7 +609,7 @@ CropSold::Variables::~Variables ()
 { }
 
 void
-CropSold::initialize (Treelog&, const Geometry& geometry)
+CropSold::initialize_inorganic (Treelog&, const Geometry& geometry)
 {
   unsigned int size = geometry.size ();
 

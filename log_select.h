@@ -37,7 +37,7 @@ struct LogSelect : public Log
   bool is_active;		// True iff we need values for this time step.
 
   // Filter functions.
-  bool check (const string&) const;
+  bool check_member (const string&) const;
   bool check_derived (const string& field, const string& name,
 		      const Library&) const;
   const string description;	// Description of log file.

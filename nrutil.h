@@ -3,7 +3,7 @@
 
 #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
 
-void nrerror(char error_text[]);
+void nrerror(const char error_text[]);
 #if 0
 float *vector(long nl, long nh);
 #endif

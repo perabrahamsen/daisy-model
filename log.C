@@ -43,7 +43,7 @@ Log::check_entry (const string& name, const Library& library) const
   const string* type = &name;
   bool looking = true;
 
-  while (looking && !check (*type))
+  while (looking && !check_member (*type))
     {
       if (library.check (*type))
 	{

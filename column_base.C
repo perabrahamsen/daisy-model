@@ -421,6 +421,7 @@ void
 ColumnBase::initialize (const Time& time, Treelog& err, 
 			const Weather* global_weather)
 {
+  Treelog::Open nest (err, name);
   soil.initialize (groundwater, err);
   residuals_N_soil.insert (residuals_N_soil.begin (), soil.size (), 0.0);
   daisy_assert (residuals_N_soil.size () == soil.size ());

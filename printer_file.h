@@ -25,6 +25,12 @@
 
 #include "printer.h"
 
+#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
+struct ostream;
+#else
+#include <iosfwd>
+#endif
+
 class PrinterFile : public Printer
 {
   // Content.
@@ -37,7 +43,8 @@ public:
   // Print comment.
   void print_comment (const string& comment);
   // Print content of alist.
-  void print_alist (const AttributeList&, const Syntax&);
+  void print_alist (const AttributeList& alist, const Syntax&,
+		    const AttributeList& super);
   // Print entry in alist.
   void print_entry (const AttributeList&, const Syntax&, const string& key);
   // Print all elements in all libraries associated with 'filename'.
@@ -52,6 +59,7 @@ public:
 public:
   PrinterFile (const AttributeList& al);
   PrinterFile (const string& filename);
+  PrinterFile (ostream& out);
   ~PrinterFile ();
 };
 

@@ -37,6 +37,8 @@ public:
   static const char *const log_name;
   const string program_name;
   void usage (Treelog&) const;
+  static void copyright (Treelog&);
+  static void timestamp (Treelog&);
   Options (int& argc, char**& argv, 
 	   Syntax& syntax, AttributeList& alist, Treelog&);
 };

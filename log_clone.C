@@ -37,7 +37,7 @@ LogClone::match (const Daisy&, Treelog&)
 #endif
 
 bool 
-LogClone::check (const string &) const
+LogClone::check_member (const string &) const
 { daisy_assert (false); return false; }
 void
 LogClone::done ()

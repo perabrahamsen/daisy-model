@@ -181,9 +181,9 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
 void 
 Bioincorporation::Implementation::output (Log& log) const
 { 
-  if (log.check ("CO2"))
+  if (log.check_member ("CO2"))
     log.output ("CO2", respiration * C / (1.0 - respiration));
-  if (log.check ("DM"))
+  if (log.check_member ("DM"))
     log.output ("DM", C * C_to_DM);
   log.output ("C", C);
   log.output ("N", N);

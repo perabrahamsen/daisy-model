@@ -183,7 +183,7 @@ SoilChemicals::Implementation::mixture (Chemicals& storage, // [g/m^2]
 void 
 SoilChemicals::Implementation::output (Log& log) const
 {
-  if (log.check ("solutes"))
+  if (log.check_member ("solutes"))
     {
       Log::Open open (log, "solutes");
       for (SoluteMap::const_iterator i = solutes.begin ();
@@ -195,7 +195,7 @@ SoilChemicals::Implementation::output (Log& log) const
 
 	  Log::Named named (log, name);
 	  log.output ("chemical", name);
-	  if (log.check ("solute"))
+	  if (log.check_member ("solute"))
 	    {
 	      Log::AList alist (log, "solute", 
 				solute.chemical.solute_alist ());

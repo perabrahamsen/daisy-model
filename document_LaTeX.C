@@ -26,6 +26,8 @@
 #include "plf.h"
 #include "tmpstream.h"
 #include "version.h"
+#include "printer_file.h"
+#include "submodel.h"
 #include <ctype.h>
 #include <time.h>
 
@@ -40,12 +42,13 @@ struct DocumentLaTeX : public Document
   void print_quoted (ostream&, const string&);
 
   // Private functions.
+  bool is_submodel (const Syntax&, const AttributeList&, const string&);
+  string find_submodel (const Syntax&, const AttributeList&, const string&);
   void print_index (ostream& out, const string& name);
   void print_entry_name (ostream& out, const string& name);
   void print_entry_type (ostream& out,
 			 const string& name,
 			 const Syntax::type type,
-			 int size, 
 			 const Syntax& syntax,
 			 const AttributeList& alist);
   void print_entry_size (ostream& out, const string&, int size);
@@ -165,6 +168,44 @@ DocumentLaTeX::print_quoted (ostream& out, const string& name)
       }
 }
 
+bool 
+DocumentLaTeX::is_submodel (const Syntax& syntax, const AttributeList& alist,
+			    const string& name)
+{
+  if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
+    {
+      const AttributeList& nested = syntax.default_alist (name);
+      if (nested.check ("submodel"))
+	return true;
+    }
+  else
+    {
+      const AttributeList& nested = alist.alist (name);
+      if (nested.check ("submodel"))
+	return true;
+    }
+  return false;
+}
+
+string
+DocumentLaTeX::find_submodel (const Syntax& syntax, const AttributeList& alist,
+			      const string& name)
+{
+  if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
+    {
+      const AttributeList& nested = syntax.default_alist (name);
+      if (nested.check ("submodel"))
+	return nested.name ("submodel");
+    }
+  else
+    {
+      const AttributeList& nested = alist.alist (name);
+      if (nested.check ("submodel"))
+	return nested.name ("submodel");
+    }
+  daisy_assert (false);
+}
+
 void
 DocumentLaTeX::print_index (ostream& out, const string& name)
 {
@@ -185,7 +226,6 @@ void
 DocumentLaTeX::print_entry_type (ostream& out,
 				 const string& name,
 				 const Syntax::type type, 
-				 int size, 
 				 const Syntax& syntax,
 				 const AttributeList& alist)
 {
@@ -209,25 +249,12 @@ DocumentLaTeX::print_entry_type (ostream& out,
       break;
     case Syntax::AList:
       {
-	string submodel = "";
-	if (size != Syntax::Singleton || !alist.check (name))
-	  {
-	    const AttributeList& nested = syntax.default_alist (name);
-	    if (nested.check ("submodel"))
-	      submodel = nested.name ("submodel");
-	  }
-	else
-	  {
-	    const AttributeList& nested = alist.alist (name);
-	    if (nested.check ("submodel"))
-	      submodel = nested.name ("submodel");
-	  }
-	if (submodel.length () > 0)
+	if (is_submodel (syntax, alist, name))
 	  {
 	    out << "\\textbf{";
-	    print_quoted (out, submodel);
+	    print_quoted (out, find_submodel (syntax, alist, name));
 	    out << "} fixed component (see section~\\ref{fixed:"
-		<< submodel << "})";
+		<< find_submodel (syntax, alist, name) << "})";
 	  }
 	else
 	  out << "submodel (see section~\\ref{type:alist})";
@@ -379,6 +406,8 @@ DocumentLaTeX::print_entry_value (ostream& out,
 {
   if (alist.check (name))
     {
+      bool print_default_value = false;
+      
       if (size == Syntax::Singleton)
 	switch (type)
 	  {
@@ -394,11 +423,27 @@ DocumentLaTeX::print_entry_value (ostream& out,
 		out << " (has partially specified default value)";
 	      else 
 		out << " (has fully specified default value)";
+	      if (is_submodel (syntax, alist, name))
+		{
+		  const AttributeList& nested = alist.alist (name);
+		  const string submodel = find_submodel (syntax, alist, name);
+		  Syntax nested_syntax;
+		  AttributeList default_alist;
+		  Submodel::load_syntax (submodel, 
+					 nested_syntax, default_alist);
+		  
+		  if (!nested.subset (default_alist, nested_syntax))
+		    print_default_value = true;
+		}
+	      else
+		print_default_value = true;
 	    }
 	    break;
 	  case Syntax::PLF:
-	    out << " (has default value with" << alist.plf (name).size ()
+	    out << " (has default value with " << alist.plf (name).size ()
 		<< " points)";
+	    if (alist.plf (name).size () > 0)
+	      print_default_value = true;
 	    break;
 	  case Syntax::Boolean:
 	    out << " (default " 
@@ -414,8 +459,11 @@ DocumentLaTeX::print_entry_value (ostream& out,
 		  out << "')";
 		}
 	      else
-		out << " (has default value with length "
-		    << value.length () << ")";
+		{
+		  out << " (has default value with length "
+		      << value.length () << ")";
+		  print_default_value = true;
+		}
 	    }
 	    break;
 	  case Syntax::Date:
@@ -432,14 +480,16 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	  case Syntax::Object:
 	    {
 	      const AttributeList& object = alist.alist (name);
-	      if (object.check ("type"))
-		{
-		  out << " (default `";
-		  print_quoted (out, object.name ("type"));
-		  out << "')";
-		}
-	      else
-		out << " (default anonymous model)";
+	      assert (object.check ("type"));
+	      const string& type = object.name ("type");
+	      out << " (default `";
+	      print_quoted (out, type);
+	      out << "')";
+		 
+	      const Library& library = syntax.library (name);
+	      const AttributeList& super = library.lookup (type);
+	      if (!object.subset (super, library.syntax (type)))
+		print_default_value = true;
 	    }
 	    break;
 	  case Syntax::Library:
@@ -460,13 +510,26 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	    if (alist.size (name) == 0)
 	      out << " (default: an empty sequence)";
 	    else
-	      out << " (has default value with length " 
-		  << alist.size (name) << ")";
+	      {
+		out << " (has default value with length " 
+		    << alist.size (name) << ")";
+		print_default_value = true;
+	      }
 	    break;
 	  case Syntax::Library:
 	  case Syntax::Error:
 	    daisy_assert (false);
 	  }
+
+      if (print_default_value)
+	{
+	  out << "\n\\begin{verbatim}\n";
+	  TmpStream tmp;
+	  PrinterFile printer (tmp ());
+	  printer.print_entry (alist, syntax, name);
+	  out << tmp.str ();
+	  out << "\\end{verbatim}\nDescription:";
+	}
     }
 }
 
@@ -492,7 +555,7 @@ DocumentLaTeX::print_users (ostream& out, const XRef::Users& users)
       print_quoted (out, component);
       out << " ";
       print_quoted (out, model);
-      out << " @";
+      out << " ";
       for (unsigned int j = 0; j < path.size (); j++)
 	{
 	  out << " ";
@@ -544,7 +607,7 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
   print_index (out, name);
 
   // Print type.
-  print_entry_type (out, name, type, size, syntax, alist);
+  print_entry_type (out, name, type, syntax, alist);
 
   // Print size.
   print_entry_size (out, name, size);

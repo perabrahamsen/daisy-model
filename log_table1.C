@@ -352,7 +352,7 @@ struct LogTable1 : public Log
   bool is_active;		// True iff we need values for this time step.
 
   // Filter functions.
-  bool check (const string&) const
+  bool check_member (const string&) const
     { return is_active; }
   bool check_derived (const string&, const string&, const Library&) const
     { return is_active; }

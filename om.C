@@ -39,7 +39,7 @@ OM::output (Log& log) const
   log.output ("top_C", top_C);
   log.output ("top_N", top_N);
   log.output ("C", C);
-  if (log.check ("N"))
+  if (log.check_member ("N"))
     {
       vector<double> N;
       unsigned int size = C.size ();

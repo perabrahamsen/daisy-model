@@ -22,13 +22,14 @@
 
 #include "lexer_data.h"
 #include "time.h"
+#include "mathlib.h"
 
 string
 LexerData::get_word ()
 {
   string tmp;
   while (good () && !isspace (peek ()))
-    tmp += static_cast<char> (get ());
+    tmp += int2char (get ());
   return tmp;
 }
 
@@ -42,7 +43,7 @@ LexerData::get_number ()
 		     || c == '.' || c == '-' || c == '+' 
 		     || c == 'e' || c == 'E'))
     {
-      str += static_cast<char> (c);
+      str += int2char (c);
       get ();
       c = peek ();
     }
@@ -54,7 +55,7 @@ LexerData::get_number ()
     }
   const char *c_str = str.c_str ();
   const char *endptr = c_str;
-  const double value = strtod (c_str, (char**) &endptr);
+  const double value = strtod (c_str, const_cast<char**> (&endptr));
   
   if (*endptr != '\0')
     error (string ("Junk at end of number '") + endptr + "'");
@@ -70,7 +71,7 @@ LexerData::get_cardinal ()
 
   while (isdigit (c))
     {
-      str += static_cast<char> (c);
+      str += int2char (c);
       get ();
       c = peek ();
     }
@@ -94,7 +95,7 @@ LexerData::read_date (Time& time)
   int hour = 0;
   if (peek () == 'T' || peek () == ':')
     {
-      (void) get ();
+      get ();
       hour = get_cardinal ();
     }
   if (Time::valid (year, month, mday, hour))
@@ -120,21 +121,21 @@ void
 LexerData::skip_line ()
 {
   while (good () && peek () != '\n')
-    (void) get ();
+    get ();
 }
 
 void
 LexerData::skip_space ()
 {
   while (good () && (peek () == ' ' || peek () == '\t'))
-    (void) get ();
+    get ();
 }
 
 void
 LexerData::skip_hyphens ()
 {
   while (good () && peek () == '-')
-    (void) get ();
+    get ();
   if (get () != '\n')
     {
       error ("Expected line of hyphens only");
@@ -152,7 +153,7 @@ LexerData::next_line ()
       error ("Expected end of line");
       skip_line ();
     }
-  (void) get ();
+  get ();
 
   while (good ())
     {
@@ -162,7 +163,7 @@ LexerData::next_line ()
       else if (peek () != '\n')
 	break;
       else
-	(void) get ();
+	get ();
     }
 }
 

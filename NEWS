@@ -12,6 +12,16 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.31
+
+** More information i daisy.log.
+
+** Complex default values are now also written in the reference manual.
+
+** Bug fix in the transport convection model.
+
+** C API change:  daisy_printer_alist now takes four arguments.
+
 * 2.30
 
 ** Assertion failures are now logged in daisy.log.

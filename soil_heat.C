@@ -714,11 +714,11 @@ SoilHeat::output (Log& log) const
   log.output ("q", impl.q);
   log.output ("capacity", impl.capacity);
   log.output ("C_apparent", impl.C_apparent);
-  if (log.check ("state"))
+  if (log.check_member ("state"))
     {
       vector<double> tmp (impl.state.size (), -1.0);
       for (unsigned int i = 0; i < impl.state.size (); i++)
-	tmp[i] = (double) impl.state[i];
+	tmp[i] = static_cast<double> (impl.state[i]);
       log.output ("state", tmp);
     }
 }

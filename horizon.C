@@ -142,8 +142,8 @@ Horizon::Implementation::initialize (const Hydraulic& hydraulic)
   C_soil = HeatCapacity ();
 
   // We calculate for water between Theta_res and Theta_sat.
-  const int from = (int) floor (intervals * hydraulic.Theta_res);
-  const int to = (int) ceil (intervals * hydraulic.Theta_sat);
+  const int from = double2int (floor (intervals * hydraulic.Theta_res));
+  const int to = double2int (ceil (intervals * hydraulic.Theta_sat));
   
   daisy_assert (0 <= from);
   daisy_assert (from < to);

@@ -24,6 +24,8 @@
 #include "plf.h"
 #include "time.h"
 #include "parser.h"
+#include "path.h"
+#include "tmpstream.h"
 #include <fstream>
 #include <algorithm>
 #include <numeric>
@@ -31,7 +33,8 @@
 struct PrinterFile::Implementation
 {
   // Data.
-  ofstream out;
+  Path::Output* output;
+  ostream& out;
 
   // String utilities.
   bool is_identifier (const string& name) const;
@@ -64,6 +67,8 @@ struct PrinterFile::Implementation
 
   // Creation.
   Implementation (const string& name);
+  Implementation (ostream& stream);
+  ~Implementation ();
 };
 
 bool 
@@ -383,11 +388,27 @@ PrinterFile::Implementation::print_time (const Time& value)
 void 
 PrinterFile::Implementation::print_plf (const PLF& plf, int indent) 
 { 
+  int column = indent;
   for (unsigned int i = 0; i < plf.size (); i++)
     {
-      if (i > 0)
-	out << "\n" << string (indent, ' ');
-      out << "(" << plf.x (i) << " " << plf.y (i) << ")";
+      TmpStream tmp;
+      tmp () << "(" << plf.x (i) << " " << plf.y (i) << ")";
+      int entry = strlen (tmp.str ());
+      
+      if (column == indent)
+	/* do nothing */;
+      else if (column + entry > 71)
+	{
+	  out << "\n" << string (indent, ' ');
+	  column = indent;
+	}
+      else
+	{
+	  out << " ";
+	  column ++;
+	}
+      out << tmp.str ();
+      column += entry;
     }
 }
 
@@ -426,7 +447,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
 	    print_entry (alist, syntax, super, key, indent, true);
 	}
       else if (!syntax.is_optional (key))
-	out << " <missing " << key << ">";
+	out << "<missing " << key << ">";
     }
 
 
@@ -597,12 +618,20 @@ PrinterFile::Implementation::good ()
 { return out.good (); }
 
 PrinterFile::Implementation::Implementation (const string& name)
-#ifdef BORLAND_PERMISSIONS
-  : out (name.c_str (), ios::out|ios::trunc, 0666)
-#else
-  : out (name.c_str ())
-#endif
+  : output (new Path::Output (name)),
+    out (output->stream ())
 { }
+
+PrinterFile::Implementation::Implementation (ostream& stream)
+  : output (NULL),
+    out (stream)
+{ }
+
+PrinterFile::Implementation::~Implementation ()
+{
+  if (output)
+    delete output;
+}
 
 void
 PrinterFile::print_comment (const string& comment)
@@ -625,10 +654,10 @@ PrinterFile::print_comment (const string& comment)
 }
 
 void 
-PrinterFile::print_alist (const AttributeList& alist, const Syntax& syntax)
+PrinterFile::print_alist (const AttributeList& alist, const Syntax& syntax, 
+			  const AttributeList& super)
 { 
-  const AttributeList empty_alist;
-  impl.print_alist (alist, syntax, empty_alist, 0, false);
+  impl.print_alist (alist, syntax, super, 0, false);
   impl.out << "\n";
 }
 
@@ -640,7 +669,8 @@ PrinterFile::print_entry (const AttributeList& alist, const Syntax& syntax,
     {
       const AttributeList empty_alist;
       impl.out << "(" << key << " ";
-      impl.print_entry (alist, syntax, empty_alist, key, 0, false);
+      const int indent = 2 + key.length ();
+      impl.print_entry (alist, syntax, empty_alist, key, indent, false);
       impl.out << ")\n";
     }
 }
@@ -670,6 +700,11 @@ PrinterFile::good ()
 PrinterFile::PrinterFile (const string& filename)
   : Printer ("file"),
     impl (*new Implementation (filename))
+{ }
+    
+PrinterFile::PrinterFile (ostream& stream)
+  : Printer ("stream"),
+    impl (*new Implementation (stream))
 { }
     
 PrinterFile::PrinterFile (const AttributeList& al)

@@ -140,7 +140,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&, const Geometry& geometry);
+  void initialize_inorganic (Treelog&, const Geometry& geometry);
   CropSimple (const AttributeList& vl);
   ~CropSimple ();
 };
@@ -349,7 +349,7 @@ CropSimple::total_N () const
 }
 
 void
-CropSimple::initialize (Treelog&, const Geometry& geometry)
+CropSimple::initialize_inorganic (Treelog&, const Geometry& geometry)
 {
   root_system.initialize (geometry.size ());
 }
@@ -414,9 +414,9 @@ static struct CropSimpleSyntax
 	  ? al.plf ("LAIvsTS") : al.plf ("LAIvsDay");
 	try 
 	  {
-	    (void) plf.first_interesting ();
-	    (void) plf.last_interesting ();
-	    (void) plf.max_at ();
+	    plf.first_interesting ();
+	    plf.last_interesting ();
+	    plf.max_at ();
 	  }
 	catch (...)
 	  {

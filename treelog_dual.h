@@ -40,6 +40,7 @@ public:
 
   // Use.
 public:
+  void debug (const string&);
   void entry (const string&);
   void flush ();
 

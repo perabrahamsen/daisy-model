@@ -35,7 +35,7 @@ struct LogCheckpoint : public LogAList
   Time time;			// Time of current checkpoint.
 
   // Start and end of time step.
-  bool check(const string&) const;
+  bool check_member (const string&) const;
   bool match (const Daisy& daisy, Treelog& out);
   void done ();
 
@@ -45,7 +45,7 @@ struct LogCheckpoint : public LogAList
 };
 
 bool 
-LogCheckpoint::check(const string&) const
+LogCheckpoint::check_member (const string&) const
 { return true; }
 
 bool
@@ -127,7 +127,12 @@ LogCheckpoint::done ()
 
       // Print content.
       printer.print_comment ("Content");
-      printer.print_alist (alist (), syntax ());
+      static Syntax dummy_syntax;
+      static AttributeList default_alist;
+      if (dummy_syntax.entries () == 0)
+	Daisy::load_syntax (dummy_syntax, default_alist);
+
+      printer.print_alist (alist (), syntax (), default_alist);
 	  
       // Close stack.
       delete &alist ();

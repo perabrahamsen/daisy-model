@@ -155,7 +155,10 @@ ifeq ($(COMPILER),gcc)
 		DEBUG =
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
-		  -Wconversion -Wmissing-prototypes 
+		  -Wconversion -Wmissing-prototypes -Woverloaded-virtual \
+		  -Wsign-promo \
+		  -Wundef -Wpointer-arith -Wwrite-strings -Wmissing-noreturn
+#  -Wold-style-cast: triggered by isalpha and friends.
 	COMPILE = "c++" -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
@@ -522,7 +525,7 @@ txt/reference.pdf:	txt/components.tex
 
 txt/components.tex:	daisy
 	(cd txt \
-	 && ../../daisy all.dai -p LaTeX > components.tex)
+	 && ../daisy all.dai -p LaTeX > components.tex)
 
 # Remove all the temporary files.
 #
@@ -816,7 +819,7 @@ geometry${OBJ}: geometry.C geometry.h common.h syntax.h treelog.h alist.h \
  librarian.h library.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h assertion.h plf.h \
- parser.h
+ parser.h path.h tmpstream.h
 log_alist${OBJ}: log_alist.C log_alist.h log.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h assertion.h
 log_clone${OBJ}: log_clone.C log_clone.h log_alist.h log.h librarian.h \
@@ -1016,7 +1019,7 @@ macro_none${OBJ}: macro_none.C macro.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h assertion.h
 document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h assertion.h xref.h plf.h \
- tmpstream.h version.h
+ tmpstream.h version.h printer_file.h printer.h submodel.h
 column_std${OBJ}: column_std.C column_base.h column.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h assertion.h \
  bioclimate.h surface.h uzmodel.h soil.h horizon.h hydraulic.h \
