@@ -53,7 +53,7 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 }
 
 void
-LogSelect::done ()
+LogSelect::done (const Time&)
 { }
 
 bool
@@ -72,7 +72,7 @@ LogSelect::initial_match (const Daisy&, Treelog&)
 }
 
 void
-LogSelect::initial_done ()
+LogSelect::initial_done (const Time&)
 { }
 
 void 
@@ -229,6 +229,10 @@ Each selected variable is represented by a column in the log.");
   syntax.add ("entries", Librarian<Select>::library (), 
 	      Syntax::Sequence,
 	      "What to log in each column.");
+  syntax.add ("time_columns", Syntax::Boolean, Syntax::OptionalConst, "\
+Iff true, add columns for year, month, mday and hour in the begining of\n\
+the lines.  By default, this will be true of you have not specified any\n\
+time entries yourself.");
   syntax.add ("set", Syntax::String, Syntax::Const, Syntax::Sequence, 
 	      "Map path names in the entries.\n\
 The first entry in the sequence is a symbol from the paths (e.g. $crop),\n\

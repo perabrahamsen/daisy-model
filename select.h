@@ -75,9 +75,8 @@ public:
   };
 
   // Nesting.
-private:
-  vector<symbol> path;		// Content of this entry.
 public:
+  vector<symbol> path;		// Content of this entry.
   const unsigned int last_index;	// Index of last member in path.
   symbol current_name;
   static const symbol wildcard;

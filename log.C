@@ -43,7 +43,7 @@ Log::initial_match (const Daisy&, Treelog&)
 { return false; }
 
 void
-Log::initial_done ()
+Log::initial_done (const Time&)
 { }
 
 bool
@@ -116,7 +116,7 @@ Log::geometry ()
 }
 
 void 
-Log::done ()
+Log::done (const Time&)
 { }
 
 void

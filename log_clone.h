@@ -35,7 +35,7 @@ private:
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
   bool match (const Daisy& daisy, Treelog&);
-  void done ();
+  void done (const Time&);
 
   // Get result.
 public:

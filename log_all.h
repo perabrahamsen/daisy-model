@@ -42,11 +42,11 @@ private:
 public:
   void insert_active ();
   bool match (const Daisy& daisy, Treelog&);
-  void done ();
+  void done (const Time& time);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
-  void initial_done ();
+  void initial_done (const Time& time);
 
   // Open normal items.
   void open (symbol name);

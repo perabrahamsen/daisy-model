@@ -264,8 +264,8 @@ static struct UZlrSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
-Use gravitational water movement for wet soil, where h < h_fc.\n\
-There are no water movement when h > h_fc, except at the layers down\n\
+Use gravitational water movement for wet soil, where h > h_fc.\n\
+There are no water movement when h < h_fc, except at the layers down\n\
 to z_top, where there can be darcy movement.");
       
       // Variables.

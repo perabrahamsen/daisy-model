@@ -37,7 +37,7 @@ LogClone::check_interior (symbol) const
 { daisy_assert (false); }
 
 void
-LogClone::done ()
+LogClone::done (const Time&)
 { daisy_assert (false); }
 
 const AttributeList& 

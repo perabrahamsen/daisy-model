@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.84
+
+** New log table time_columns parameter.
+
+If you specify this, you will automatically get year, month, mday and
+hour columns.  By default, time_columns will be true if you do not
+specify any time columns in the entries list.  All the log
+parameterizations in log.dai has been updated to take advantage of
+this, which gained approximately 10% speed.
+
 * 2.83
 
 ** Minor cleanups and speedups to logging.

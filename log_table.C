@@ -45,6 +45,7 @@ struct LogTable : public LogSelect, public Select::Destination
   bool print_header;		// Set if header should be printed.
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
+  const bool time_columns;	// Add year, month, day and hour columns.
 
   // Destination Content.
   enum { Error, Missing, Number, Name, Array } type;
@@ -54,15 +55,15 @@ struct LogTable : public LogSelect, public Select::Destination
   
   // Log.
   void common_match (const Daisy& daisy, Treelog& out);
-  void common_done ();
+  void common_done (const Time& time);
 
   // Log.
   bool match (const Daisy& daisy, Treelog& out);
-  void done ();
+  void done (const Time& time);
 
   // Initial line.
   bool initial_match (const Daisy&, Treelog&);
-  void initial_done ();
+  void initial_done (const Time& time);
 
   // Select::Destination
   void error (const string& tag);
@@ -73,6 +74,7 @@ struct LogTable : public LogSelect, public Select::Destination
 
   // Create and destroy.
   bool check (const Syntax&, Treelog& msg) const;
+  static bool contain_time_columns (const vector<Select*>& entries);
   LogTable (const AttributeList& al);
   ~LogTable ();
 };
@@ -91,10 +93,13 @@ LogTable::common_match (const Daisy& daisy, Treelog&)
 }
 
 void 
-LogTable::common_done ()
+LogTable::common_done (const Time& time)
 { 
   if (print_tags)
     {
+      if (time_columns)
+	out << "year\tmonth\tmday\thour\t";
+
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
 	{
@@ -154,6 +159,9 @@ LogTable::common_done ()
     }
   if (print_dimension)
     {
+      if (time_columns)
+	out << "\t\t\t\t";
+
       // Print the entry names in the first line of the log file..
       for (unsigned int i = 0; i < entries.size (); i++)
 	{
@@ -183,6 +191,10 @@ LogTable::common_done ()
       out << record_separator;
       print_dimension = false;
     }
+
+  if (time_columns)
+    out << time.year () << "\t" << time.month () << "\t" 
+	<< time.mday () << "\t" << time.hour () << "\t";
 
   for (unsigned int i = 0; i < entries.size (); i++)
     {
@@ -232,9 +244,9 @@ LogTable::match (const Daisy& daisy, Treelog& msg)
   return LogSelect::match (daisy, msg);
 }
 void 
-LogTable::done ()
+LogTable::done (const Time& time)
 { 
-  LogSelect::done ();
+  LogSelect::done (time);
 
   if (!is_printing)
     return;
@@ -243,7 +255,7 @@ LogTable::done ()
     if (entries[i]->prevent_printing ())
       return;
 
-  common_done ();
+  common_done (time);
 }
 bool 
 LogTable::initial_match (const Daisy& daisy, Treelog& msg)
@@ -252,15 +264,15 @@ LogTable::initial_match (const Daisy& daisy, Treelog& msg)
   return LogSelect::initial_match (daisy, msg);
 }
 void 
-LogTable::initial_done ()
+LogTable::initial_done (const Time& time)
 { 
-  LogSelect::initial_done ();
+  LogSelect::initial_done (time);
 
   for (unsigned int i = 0; i < entries.size (); i++)
     if (entries[i]->prevent_printing ())
       return;
 
-  common_done ();
+  common_done (time);
 }
 
 void 
@@ -310,6 +322,16 @@ bool LogTable::check (const Syntax&, Treelog& msg) const
   return ok; 
 }
 
+bool 
+LogTable::contain_time_columns (const vector<Select*>& entries)
+{
+  static const symbol time ("time");
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->path[0] == time)
+      return true;
+  return false;
+}
+
 LogTable::LogTable (const AttributeList& al)
   : LogSelect (al),
     file (al.name ("where")),
@@ -323,6 +345,7 @@ LogTable::LogTable (const AttributeList& al)
     print_header (al.flag ("print_header")),
     print_tags (al.flag ("print_tags")),
     print_dimension (al.flag ("print_dimension")),
+    time_columns (!contain_time_columns (entries)),
     type (Error)
 {
   if (print_header)

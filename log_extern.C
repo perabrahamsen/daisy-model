@@ -79,7 +79,7 @@ struct LogExtern : public LogSelect,
   array_map arrays;
   
   // Log.
-  void done ();
+  void done (const Time&);
 
   // No initial line.
   bool initial_match (const Daisy&, Treelog&)
@@ -104,9 +104,9 @@ struct LogExtern : public LogSelect,
 };
 
 void 
-LogExtern::done ()
+LogExtern::done (const Time& time)
 { 
-  LogSelect::done ();
+  LogSelect::done (time);
 
   if (!is_printing)
     return;

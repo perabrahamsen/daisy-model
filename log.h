@@ -54,12 +54,12 @@ public:
   // Called at the start of each time step.
   virtual bool match (const Daisy&, Treelog&) = 0;
   // Called at the end of each time step.
-  virtual void done ();
+  virtual void done (const Time& time);
 
   // Initial line.
 public:
   virtual bool initial_match (const Daisy&, Treelog&);
-  virtual void initial_done ();
+  virtual void initial_done (const Time& time);
 
   // Normal items.
 public:

@@ -142,7 +142,7 @@ Daisy::initial_logs (Treelog& out)
 		  output_submodule (field, "column", log);
 		  output_vector (harvest, "harvest", log);
 		  output_derived (action, "manager", log);
-		  log.initial_done ();
+		  log.initial_done (previous);
 		}
 	    }
 	}
@@ -168,7 +168,7 @@ Daisy::tick_logs (Treelog& out)
 	      output_submodule (field, "column", log);
 	      output_vector (harvest, "harvest", log);
 	      output_derived (action, "manager", log);
-	      log.done ();
+	      log.done (time);
 	    }
 	}
     }

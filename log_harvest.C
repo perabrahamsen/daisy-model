@@ -106,7 +106,7 @@ struct LogHarvest : public Log
     return false;
   }
 
-  void done ()
+  void done (const Time&)
   { daisy_assert (false); }
 
   // Normal items.

@@ -95,11 +95,11 @@ LogAll::match (const Daisy& daisy, Treelog& msg)
 }
 
 void 
-LogAll::done ()
+LogAll::done (const Time& time)
 {
   for (unsigned int i = 0; i < slaves.size (); i++)
     if (slaves[i]->is_active)
-      slaves[i]->done ();
+      slaves[i]->done (time);
 
   active_leafs.pop ();
   active_interiors.pop ();
@@ -120,11 +120,11 @@ LogAll::initial_match (const Daisy& daisy, Treelog& msg)
 }
 
 void 
-LogAll::initial_done ()
+LogAll::initial_done (const Time& time)
 {
   for (unsigned int i = 0; i < slaves.size (); i++)
     if (slaves[i]->is_active)
-      slaves[i]->initial_done ();
+      slaves[i]->initial_done (time);
 
   active_leafs.pop ();
   active_interiors.pop ();

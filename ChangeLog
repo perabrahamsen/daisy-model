@@ -1,5 +1,17 @@
 2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.84 released.
+
+2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (time_columns): New parameter.
+	* log.h (done): Take time argument.
+	* all: Update callers and implementors.
+	* lib/log.dai: Use it.
+
+	* uzlr.C (description): Fix sign. Reported by <mmo@kvl.dk>.
+	(tick): Handle pressure top.
+
 	* Version 2.83 released.
 
 2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
