@@ -31,7 +31,7 @@
 	  (EPext 0.50)
 	  (EpFac 1.0)
 	  (IntcpCap 0.5))
-    (Root (DptEmr 10)
+  (Root (DptEmr 10)
 	(PenPar1 0.20)
 	(PenPar2 4.0)
 	(MaxPen 70)

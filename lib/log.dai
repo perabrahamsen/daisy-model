@@ -13,51 +13,51 @@
            (interval (tag "NH4")
                      (path column "$col" SoilNH4 M)
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (tag "NO3")
                      (path column "$col" SoilNO3 M)
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter total_N)
                      (tag "ORG_N")
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter total_C)
                      (tag "ORG_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter som N)
                      (tag "SOM_N")
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter som C)
                      (tag "SOM_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter smb N)
                      (tag "SMB_N")
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter smb C)
                      (tag "SMB_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter am "*" om N)
                      (tag "AOM_N")
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter am "*" om C)
                      (tag "AOM_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter buffer N)
                      (tag "BUFFER_N")
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter buffer C)
                      (tag "BUFFER_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            ))
 
 (deflog "Soil Content 0-10 cm" "Total Soil Content"
@@ -207,7 +207,7 @@
                   (tag "NO3-J_p")
 		  (when hourly)
                   (dimension "kg N/ha/&")
-                  (factor -1e5))        ;g/cm² -> kg N/ha
+                  (factor -1e5))        ;g/cm^2 -> kg N/ha
            ))
 
 (deflog "Preferential NH4 Transport" table
@@ -221,7 +221,7 @@
                   (tag "NH4-J_p")
 		  (when hourly)
                   (dimension "kg N/ha/&")
-                  (factor -1e5))        ;g/cm² -> kg N/ha
+                  (factor -1e5))        ;g/cm^2 -> kg N/ha
            ))
 
 (deflog "Surface Water Balance" table
@@ -415,123 +415,133 @@
            (mday (path time))
            (number (path column "$col" fertilized_NH4)
                    (when hourly)
-                   (tag "NH4 Fertilizer")
+                   (tag "NH4-Fertilizer")
                    (dimension "kg N/ha/&"))
            (number (path column "$col" volatilization)
                    (when hourly)
                    (tag "NH4-Volatilization")
                    (dimension "kg N/ha/&"))
+           (number (path weather "*" deposit NH4)
+                   (when hourly)
+		   (tag "NH4-Deposit")
+		   (factor 1e5)      ;g/cm^2 -> kg N/ha
+                   (dimension "kg N/ha/&"))
            (interval (path column "$col" SoilNH4 S_external)
                      (tag "NH4-Incorp")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (number (path column "$col" Surface IM NH4)
                    (tag "NH4-Surface")
                    (dimension "kg N/ha")
-                   (factor 1e5))        ;g/cm² -> kg/ha
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
            (number (path column "$col" Surface IM_runoff NH4)
                    (when hourly)
                    (tag "NH4-runoff")
                    (dimension "kg N/ha/&")
-                   (factor 1e5))        ;g/cm² -> kg/ha
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
            (flux_top (path column "$col" SoilNH4 J)
                      (tag "NH4-In")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor -1e5))     ;g/cm² -> kg N/ha
+                     (factor -1e5))     ;g/cm^2 -> kg N/ha
            (flux_bottom (path column "$col" SoilNH4 J)
                         (when hourly)
                         (tag "NH4-Leak-Matrix")
                         (dimension "kg N/ha/&")
-                        (factor -1e5))  ;g/cm² -> kg N/ha
+                        (factor -1e5))  ;g/cm^2 -> kg N/ha
            (flux_bottom (path column "$col" SoilNH4 J_p)
                         (when hourly)
                         (tag "NH4-Leak-Macro")
                         (dimension "kg N/ha/&")
-                        (factor -1e5))  ;g/cm² -> kg N/ha
+                        (factor -1e5))  ;g/cm^2 -> kg N/ha
            (interval (path column "$col" SoilNH4 S_drain)
                      (tag "NH4-Drain")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (number (path column "$col" Vegetation crops crops "*" Root NH4Upt)
                    (when hourly)
                    (dimension "kg N/ha/&")
-                   (factor 10.0))       ;g/m² -> kg N/ha
+                   (factor 10.0))       ;g/m^2 -> kg N/ha
            (interval (path column "$col" Nitrification "*" converted)
                      (when hourly)
                      (tag "Nitrification")
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (interval (path column "$col" OrganicMatter NH4_source)
 		     (tag "NH4-mineralization")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (interval (path column "$col" SoilNH4 M)
                      (tag "NH4-Total")
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (number (path column "$col" fertilized_NO3)
                    (when hourly)
-                   (tag "NO3 Fertilizer")
+                   (tag "NO3-Fertilizer")
+                   (dimension "kg N/ha/&"))
+           (number (path weather "*" deposit NO3)
+                   (when hourly)
+		   (tag "NO3-Deposit")
+		   (factor 1e5)      ;g/cm^2 -> kg N/ha
                    (dimension "kg N/ha/&"))
            (number (path column "$col" Surface IM NO3)
                    (tag "NO3-Surface")
                    (dimension "kg N/ha")
-                   (factor 1e5))        ;g/cm² -> kg/ha
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
            (number (path column "$col" Surface IM_runoff NO3)
                    (when hourly)
                    (tag "NO3-Runoff")
                    (dimension "kg N/ha/&")
-                   (factor 1e5))        ;g/cm² -> kg/ha
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
            (flux_top (path column "$col" SoilNO3 J)
                      (when hourly)
                      (tag "NO3-In")
                      (dimension "kg N/ha/&")
-                     (factor -1e5))     ;g/cm² -> kg N/ha
+                     (factor -1e5))     ;g/cm^2 -> kg N/ha
            (flux_bottom (path column "$col" SoilNO3 J)
                         (tag "NO3-Leak-Matrix")
                         (when hourly)
                         (dimension "kg N/ha/&")
-                        (factor -1e5))  ;g/cm² -> kg N/ha
+                        (factor -1e5))  ;g/cm^2 -> kg N/ha
            (flux_bottom (path column "$col" SoilNO3 J_p)
                         (tag "NO3-Leak-Macro")
                         (when hourly)
                         (dimension "kg N/ha/&")
-                        (factor -1e5))  ;g/cm² -> kg N/ha
+                        (factor -1e5))  ;g/cm^2 -> kg N/ha
            (interval (path column "$col" SoilNO3 S_drain)
                      (tag "NO3-Drain")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (interval (path column "$col" SoilNO3 S_external)
                      (tag "NO3-Incorp")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (number (path column "$col" Vegetation crops crops "*" Root NO3Upt)
                    (when hourly)
                    (dimension "kg N/ha/&")
-                   (factor 10.0))       ;g/m² -> kg N/ha
+                   (factor 10.0))       ;g/m^2 -> kg N/ha
            (interval (path column "$col" Denitrification converted)
                      (tag "Denit")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (interval (path column "$col" OrganicMatter NO3_source)
                      (tag "NO3-immobilization")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor -1e5))      ;g/cm² -> kg N/ha
+                     (factor -1e5))      ;g/cm^2 -> kg N/ha
            (interval (tag "NO3-Total")
                      (path column "$col" SoilNO3 M)
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (number (path column "$col" fertilized_Org_N)
                    (when hourly)
-                   (tag "Org_N Fertilizer")
+                   (tag "Org_N-Fertilizer")
                    (dimension "kg N/ha/&"))
            (number (path column "$col" seed_N)
                    (when hourly)
@@ -545,15 +555,15 @@
            (interval (tag "AOM")
                      (path column "$col" OrganicMatter am "*" om N)
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (tag "SOM")
                      (path column "$col" OrganicMatter som N)
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (tag "SMB")
                      (path column "$col" OrganicMatter smb N)
                      (dimension "kg N/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            ))
 
 (deflog "N Balance 0-100 cm" "N Balance"
@@ -750,43 +760,43 @@
                      (tag "In")
                      (when hourly)
                      (dimension "g/ha/&")
-                     (factor -1e8))     ;g/cm² -> g/ha
+                     (factor -1e8))     ;g/cm^2 -> g/ha
            (flux_bottom (path column "$col" SoilChemicals solutes solute J)
                         (tag "Leak-Matrix")
                         (when hourly)
                         (dimension "g/ha/&")
-                        (factor -1e8))  ;g/cm² -> g/ha
+                        (factor -1e8))  ;g/cm^2 -> g/ha
            (flux_bottom (path column "$col" SoilChemicals solutes solute J_p)
                         (tag "Leak-Macro")
                         (when hourly)
                         (dimension "g/ha/&")
-                        (factor -1e8))  ;g/cm² -> g/ha
+                        (factor -1e8))  ;g/cm^2 -> g/ha
            (interval (path column "$col" SoilChemicals solutes solute S_drain)
                      (tag "Drain")
                      (when hourly)
                      (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm² -> g/ha
+                     (factor 1e8))      ;g/cm^2 -> g/ha
            (interval (path column "$col" SoilChemicals solutes solute 
                            S_external)
                      (tag "External")
                      (when hourly)
                      (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm² -> g/ha
+                     (factor 1e8))      ;g/cm^2 -> g/ha
            (interval (path column "$col" SoilChemicals solutes solute uptaken)
                      (tag "Uptake")
                      (when hourly)
                      (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm² -> g/ha
+                     (factor 1e8))      ;g/cm^2 -> g/ha
            (interval (path column "$col" SoilChemicals solutes
                            solute decomposed)
                      (tag "Decompose")
                      (when hourly)
                      (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm² -> g/ha
+                     (factor 1e8))      ;g/cm^2 -> g/ha
            (interval (path column "$col" SoilChemicals solutes solute M)
                      (tag "Content")
                      (dimension "g/ha")
-                     (factor 1e8))))    ;g/cm² -> g/ha
+                     (factor 1e8))))    ;g/cm^2 -> g/ha
 
 (deflog "Soil Chemicals 0-100 cm" "Soil Chemicals"
   (where "soil_chemicals_000-100.dlf")
@@ -1433,22 +1443,22 @@
                      (tag "NH4-Drain")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (flux_bottom (path column "$col" SoilNH4 J)
                         (tag "NH4-Perc-Matrix")
                         (when hourly)
                         (dimension "kg N/ha/&")
-                        (factor 1e5))   ;g/cm² -> kg N/ha
+                        (factor 1e5))   ;g/cm^2 -> kg N/ha
            (interval (path column "$col" SoilNO3 S_drain)
                      (tag "NO3-Drain")
                      (when hourly)
                      (dimension "kg N/ha/&")
-                     (factor 1e5))      ;g/cm² -> kg N/ha
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
            (flux_bottom (path column "$col" SoilNO3 J)
                         (tag "NO3-Perc-Matrix")
                         (when hourly)
                         (dimension "kg N/ha/&")
-                        (factor 1e5))   ;g/cm² -> kg N/ha
+                        (factor 1e5))   ;g/cm^2 -> kg N/ha
            ))
 
 (deflog Bioincorporation table
@@ -1604,8 +1614,7 @@
 
 
 (deflog "Fertilizer" table
-  (description "Track applied fertilizer.
-This does *not* include deposition or irrigation!")
+  (description "Track applied fertilizer.")
   (entries (year (path time))
            (month (path time))
            (number (path column "$col" fertilized_NO3)
@@ -1658,23 +1667,23 @@ This does *not* include deposition or irrigation!")
            (interval (path column "$col" OrganicMatter total_C)
                      (tag "Soil_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter som C)
                      (tag "SOM_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter smb C)
                      (tag "SMB_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter am "*" om C)
                      (tag "AOM_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter buffer C)
                      (tag "BUFFER_C")
                      (dimension "kg C/ha")
-                     (factor 1e5))      ;g/cm² -> kg/ha
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter CO2)
                      (tag "SMB-CO2") 
                      (dimension "kg CO2-C/ha/&")
