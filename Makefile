@@ -563,6 +563,8 @@ soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  organic_matter.h chemical.h chemicals.h log.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h submodel.h
 submodel${OBJ}: submodel.C submodel.h common.h
+select_index${OBJ}: select_index.C select.h librarian.h library.h common.h \
+ alist.h syntax.h
 select_content${OBJ}: select_content.C select.h librarian.h library.h \
  common.h alist.h syntax.h geometry.h
 select_interval${OBJ}: select_interval.C select.h librarian.h library.h \

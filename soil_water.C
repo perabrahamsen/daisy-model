@@ -40,7 +40,7 @@ SoilWater::freeze (const Soil&, const vector<double>& v)
 {
   assert (v.size () == X_ice_.size ());
   add_to_sink (v);
-  for (unsigned int i; i < X_ice_.size (); i++)
+  for (unsigned int i = 0; i < X_ice_.size (); i++)
     S_ice[i] -= v[i] * rho_water / rho_ice;
 }
 
@@ -72,7 +72,8 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 	}
 
       const double Theta_sat = soil.Theta (i, 0.0, 0.0);
-      assert (Theta_sat >= X_ice_[i]);
+      const double Theta_res = soil.Theta_res (i);
+      assert (Theta_sat - Theta_res >= X_ice_[i]);
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
     }
 

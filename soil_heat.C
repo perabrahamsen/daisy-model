@@ -143,6 +143,7 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 
 	      // Check if there are sufficient water.
 	      const double Theta_min = soil.Theta (i, h_frozen, 0.0);
+	      assert (Theta_min >= soil.Theta_res (i));
 	      const double available_water = soil_water.Theta (i) - Theta_min;
 	      if (freezing_rate[i] * dt > available_water)
 		{
@@ -175,7 +176,10 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	      else
 		state[i] = liquid;
 	      changed = true;
+	      freezing_rate[i] = 0.0;
 	    }
+	  assert (-freezing_rate[i] * rho_water / rho_ice
+		  <= soil_water.X_ice (i));
 	  break;
 	case frozen:
 	  freezing_rate[i] = 0.0;
@@ -193,6 +197,8 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	      changed = true;
 	    }
 
+	  assert (-freezing_rate[i] * rho_water / rho_ice
+		  <= soil_water.X_ice (i));
 	  break;
 	case thawing:
 	  if (T[i] > T_thawing[i])
@@ -215,7 +221,11 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 		  freezing_rate[i] = -ice_water / dt;
 		  assert (freezing_rate[i] <= 0.0);
 		  state[i] = liquid;
+		  assert (-freezing_rate[i] * rho_water / rho_ice
+			  <= soil_water.X_ice (i));
 		}
+	      assert (-freezing_rate[i] * rho_water / rho_ice
+		      <= soil_water.X_ice (i));
 	      // We have used the energy.
 	      T[i] = T_thawing[i];
 	    }
@@ -223,7 +233,10 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	    {
 	      state[i] = freezing;
 	      changed = true;
+	      freezing_rate[i] = 0.0;
 	    }
+	  assert (-freezing_rate[i] * rho_water / rho_ice
+		  <= soil_water.X_ice (i));
 	  break;
 	case liquid:
 	  freezing_rate[i] = 0.0;
@@ -232,8 +245,18 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	      state[i] = freezing;
 	      changed = true;
 	    }
+	  assert (-freezing_rate[i] * rho_water / rho_ice
+		  <= soil_water.X_ice (i));
 	  break;
 	}
+      assert (-freezing_rate[i] * rho_water / rho_ice
+	      <= soil_water.X_ice (i));
+
+      const double Theta_sat = soil.Theta (i, 0.0, 0.0);
+      const double Theta_res = soil.Theta_res (i);
+      assert (Theta_sat - Theta_res
+	      >= soil_water.X_ice (i)
+	      + freezing_rate[i] * rho_water / rho_ice);
     }
   return changed;
 }
