@@ -190,6 +190,7 @@ USEUNIT("harvesting.C");
 USEUNIT("vernalization.C");
 USEUNIT("check.C");
 USEUNIT("check_range.C");
+USEUNIT("rootdens_PLF.C");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 
