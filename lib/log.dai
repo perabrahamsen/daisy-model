@@ -290,6 +290,13 @@ flow to drain pipes, and subsoil irrigation."
 (defsummary "Total Water Balance" simple
   "Water balance for the complete system.
 
+Root Extraction only summarizes water removed from the soil in the
+interval being logged, so it will be different from Transpiration if
+you do not log the entire root zone.
+
+You must log the top of soil (from = 0), including the entire plowing
+layer for the balance to be valid.
+
 Note that negative deltas means the amount of water increases."
   (precision 1)
   (fetch (rain (name "Rain"))
@@ -303,7 +310,10 @@ Note that negative deltas means the amount of water increases."
 	 ("Surface Ponding" (name "Ponding") (factor -1.0))
 	 ("Surface Runoff" (factor -1.0))
 	 ("Interception Storage" (name "Stored on leafs") (factor -1.0))
-	 ("Snow Storage" (name "Snow Pack") (factor -1.0)))
+	 ("Snow Storage" (name "Snow Pack") (factor -1.0))
+         ("Transpiration")
+         ("Root Extraction" (factor -1.0))
+         )
   (sum_name "Balance"))
 	 
 (deflog "Root Zone Water Balance" table
@@ -411,6 +421,9 @@ Note that negative deltas means the amount of water increases."
 (defsummary "NH4 Soil Balance" simple
   "Mass balance for NH4 in soil.
 
+You must log the top of soil (from = 0), including the entire plowing
+layer for the balance to be valid.
+
 Note that a negative delta Content means that the amount of NH4 in the
 soil increases."
   (sum_name "Balance")
@@ -420,13 +433,16 @@ soil increases."
 	 ("NH4-Leak-Matrix" (name "Matrix leak") (factor -1.0))
 	 ("NH4-Leak-Macro" (name "Macropores leak") (factor -1.0))
 	 ("NH4-Drain" (name "Drain pipes leak") (factor -1.0))
-	 (NH4Upt (name "Root uptake") (factor -1.0))
+	 ("NH4-Root" (name "Root uptake") (factor -1.0))
 	 ("NH4-Nit" (name "Nitrification") (factor -1.0))
 	 ("NH4-mineralization" (name "Mineralization"))
 	 ("NH4-Total" (name "Content") (factor -1.0))))
 	 
 (defsummary "NO3 Soil Balance" simple
   "Mass balance for NO3 in soil.
+
+You must log the top of soil (from = 0), including the entire plowing
+layer for the balance to be valid.
 
 Note that a negative delta Content means that the amount of NO3 in the
 soil increases."
@@ -437,14 +453,44 @@ soil increases."
 	 ("NO3-Leak-Matrix" (name "Matrix leak") (factor -1.0))
 	 ("NO3-Leak-Macro" (name "Macropores leak") (factor -1.0))
 	 ("NO3-Drain" (name "Drain pipes leak") (factor -1.0))
-	 (NO3Upt (name "Root uptake") (factor -1.0))
+	 ("NO3-Root" (name "Root uptake") (factor -1.0))
 	 ("NO3-Nit" (name "Nitrification"))
 	 ("Denit" (name Denitrification) (factor -1.0))
 	 ("NO3-immobilization" (name "Immobilization") (factor -1.0))
 	 ("NO3-Total" (name "Content") (factor -1.0))))
 	 
+(defsummary "Organic Nitrogen Balance" simple
+  "Total system mass balance for organic bound nitrogen.
+
+You must log the top of soil (from = 0), including the entire plowing
+layer for the balance to be valid.
+
+Note that a negative delta content means that the amount increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch (Fixated)
+         ("NO3-Crop")
+	 ("NH4-Crop")
+         ("Org_N-Fertilizer")
+         ("Seed_N")
+         ("NO3-immobilization" (name "Immobilization"))
+         ("NH4-mineralization" (name "Mineralization") (factor -1.0))
+         ("Harvest_N" (factor -1.0))
+         ("AOM" (factor -1.0))
+         ("SOM" (factor -1.0))
+         ("SMB" (factor -1.0))
+         ("AOM-Surface" (factor -1.0))
+         ("Bioinc_N-Surface" (factor -1.0))
+         ("Bioinc_N-Soil")
+         ("Residuals_N_root" (factor -1.0))
+         ("Residuals_N_soil")
+         ("Crop-N" (factor -1.0))))
+
 (defsummary "Nitrogen Balance" simple
   "Total system mass balance for nitrogen.
+
+You must log the top of soil (from = 0), including the entire plowing
+layer for the balance to be valid.
 
 Note that a negative delta content means that the amount increases."
   (sum_name "Balance")
@@ -477,12 +523,21 @@ Note that a negative delta content means that the amount increases."
          ("SMB" (factor -1.0))
          ("Buffer" (factor -1.0))
          ("AOM-Surface" (factor -1.0))
-         ("Crop-N" (factor -1.0))))
+         ("Bioinc_N-Surface" (factor -1.0))
+         ("Bioinc_N-Soil")
+         ("Residuals_N_root" (factor -1.0))
+         ("Residuals_N_soil")
+         ("Crop-N" (factor -1.0))
+	 ("NO3-Crop" (name "NO3 Root uptake (full)"))
+	 ("NO3-Root" (name "NO3 Root uptake (interval)") (factor -1.0))
+	 ("NH4-Crop" (name "NH4 Root uptake (full)"))
+	 ("NH4-Root" (name "NH4 Root uptake (interval)") (factor -1.0))))
 
 (deflog "N Balance" table
   "Enough information to create a balance for the soil nitrogen."
   (where "N_balance.dlf")
-  (summary "NH4 Soil Balance" "NO3 Soil Balance" "Nitrogen Balance")
+  (summary "NH4 Soil Balance" "NO3 Soil Balance" "Organic Nitrogen Balance"
+           "Nitrogen Balance")
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (path column "$col" fertilized_NH4)
@@ -533,9 +588,15 @@ Note that a negative delta content means that the amount increases."
                      (dimension "kg N/ha/&")
                      (factor -1e5))      ;g/cm^2 -> kg N/ha
            (number (path column "$col" Vegetation crops crops "*" Root NH4Upt)
+                   (tag "NH4-Crop")
                    (flux true)
                    (dimension "kg N/ha/&")
                    (factor 10.0))       ;g/m^2 -> kg N/ha
+           (interval (path column "$col" SoilNH4 S_root)
+                     (tag "NH4-Root")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor -1e5))      ;g/cm^2 -> kg N/ha
            (interval (path column "$col" Nitrification "*" NH4)
                      (flux true)
                      (tag "NH4-Nit")
@@ -604,9 +665,15 @@ Note that a negative delta content means that the amount increases."
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
            (number (path column "$col" Vegetation crops crops "*" Root NO3Upt)
+                   (tag "NO3-Crop")
                    (flux true)
                    (dimension "kg N/ha/&")
                    (factor 10.0))       ;g/m^2 -> kg N/ha
+           (interval (path column "$col" SoilNO3 S_root)
+                     (tag "NO3-Root")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor -1e5))      ;g/cm^2 -> kg N/ha
            (interval (path column "$col" Denitrification converted)
                      (tag "Denit")
                      (flux true)
@@ -643,11 +710,28 @@ Note that a negative delta content means that the amount increases."
                    (tag "Residuals_N_top")
                    (factor 10); g/m^2 -> kg/ha
                    (dimension "kg N/ha/&"))
+           (number (path column "$col" residuals_N_root)
+                   (flux true)
+                   (tag "Residuals_N_root")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg N/ha/&"))
            (interval (path column "$col" residuals_N_soil)
                      (flux true)
                      (tag "Residuals_N_soil")
                      (factor 1e5)      ;g/cm^2 -> kg/ha
                      (dimension "kg N/ha/&"))
+           (number (path column "$col" OrganicMatter Bioincorporation
+                         N_removed)
+                   (tag "Bioinc_N-Surface")
+                   (flux true)
+                   (dimension "kg N/ha/&")
+                   (factor 10))         ;g/m^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter Bioincorporation 
+                           N_added)
+                     (tag "Bioinc_N-Soil")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (tag "AOM")
                      (path column "$col" OrganicMatter am "*" om "*" N)
                      (dimension "kg N/ha")
@@ -1690,13 +1774,15 @@ the sum of all chemicals."
                    (tag "TOP_C")
                    (dimension "kg C/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "$col" OrganicMatter Bioincorporation N)
-                   (tag "INC_N")
+           (number (path column "$col" OrganicMatter Bioincorporation
+                         N_removed)
+                   (tag "REMOVED_N")
                    (flux true)
                    (dimension "kg N/ha/&")
                    (factor 10))         ;g/m^2 -> kg/ha
-           (number (path column "$col" OrganicMatter Bioincorporation C)
-                   (tag "INC_C")
+           (number (path column "$col" OrganicMatter Bioincorporation 
+                         C_removed)
+                   (tag "REMOVED_C")
                    (flux true)
                    (dimension "kg C/ha/&")
                    (factor 10))         ;g/m^2 -> kg/ha
@@ -1705,6 +1791,18 @@ the sum of all chemicals."
                    (flux true)
                    (dimension "kg C/ha/&")
                    (factor 10))         ;g/m^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter Bioincorporation 
+                           N_added)
+                     (tag "ADDED_N")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter Bioincorporation 
+                           C_added)
+                     (tag "ADDED_C")
+                     (flux true)
+                     (dimension "kg C/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
            (number (path column "$col" OrganicMatter Bioincorporation speed)
                    (tag "Speed")
                    (flux true)
@@ -2169,9 +2267,9 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
 			   (name "Fertilizer"))
 			  ("Residuals_C_top"
 			   (name "Residuals"))
-			  ("Residuals_C_soil"
+			  ("Residuals_C_root"
 			   (name "Roots"))
-                          ("BioInc CO2" (factor -1.0)))
+                          ("Bioinc_CO2" (factor -1.0)))
 		   (sum_name "Total C input")
 		   (period "y")
 		   (precision 0)))
@@ -2205,13 +2303,20 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                    (tag "Surface_C")
                    (dimension "kg C/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "$col" OrganicMatter Bioincorporation C)
-                   (tag "BioInc")
+           (number (path column "$col" OrganicMatter Bioincorporation
+                         C_removed)
+                   (tag "Bioinc_C-Surface")
                    (flux true)
                    (dimension "kg C/ha/&")
                    (factor 10))         ;g/m^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter Bioincorporation
+                           C_added)
+                     (tag "Bioinc_C-Soil")
+                     (flux true)
+                     (dimension "kg C/ha/&")
+                     (factor 1e5))        ;g/cm^2 -> kg/ha
            (number (path column "$col" OrganicMatter Bioincorporation CO2)
-                   (tag "BioInc CO2")
+                   (tag "Bioinc_CO2")
                        (flux true)
                    (dimension "kg C/ha/&")
                    (factor 10))         ;g/m^2 -> kg/ha
@@ -2271,6 +2376,11 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
            (number (path column "$col" residuals_C_top)
                    (flux true)
                    (tag "Residuals_C_top")
+                   (factor 10); g/m^2 -> kg/ha
+                   (dimension "kg C/ha/&"))
+           (number (path column "$col" residuals_C_root)
+                   (flux true)
+                   (tag "Residuals_C_root")
                    (factor 10); g/m^2 -> kg/ha
                    (dimension "kg C/ha/&"))
            (interval (path column "$col" residuals_C_soil)
