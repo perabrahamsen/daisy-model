@@ -115,7 +115,8 @@
 		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (DSmax 0.99)
-	   (DSnew 0.2))
+	   (DSnew 0.2)
+	   )
 )
 
 (defcrop Grass "Grass to grain"
