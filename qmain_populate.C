@@ -20,6 +20,7 @@ class TraverseQtTree : public Traverse
   // Content.
 private:
   MainWindow* main;
+  const bool check_alists;
   deque<TreeItem*> path;
   deque<bool> buildins;
   bool editable;
@@ -74,7 +75,7 @@ private:
 
   // Create and destroy.
 public:
-  TraverseQtTree (MainWindow*);
+  TraverseQtTree (MainWindow*, bool check_alists);
   ~TraverseQtTree ();
 };
 
@@ -123,8 +124,7 @@ TraverseQtTree::enter_library (Library& library, const string& component)
   // Add it.
   TmpStream value;
   value () << models.size () << " entries";
-  enter (new TreeItem (library.description (), main->tree,
-		       component.c_str (), value.str ()));
+  enter (new LibraryItem (main->tree, component.c_str (), value.str ()));
   // Recurse.
   return true;
 }
@@ -149,9 +149,12 @@ TraverseQtTree::enter_model (const Syntax& syntax, AttributeList& alist,
     value = "buildin";
 
   // Check if it is fully defined.
-  TmpStream errors;
-  const bool has_errors = !syntax.check (alist, errors (), model);
-  value +=  has_errors ? " partial" : " full";
+  if (check_alists)
+    {
+      TmpStream errors;
+      const bool has_errors = !syntax.check (alist, errors (), model);
+      value +=  has_errors ? " partial" : " full";
+    }
   
   // Find the model description.
   QString description = "no description";
@@ -187,31 +190,24 @@ TraverseQtTree::enter_model (const Syntax& syntax, AttributeList& alist,
 			? alist.integer ("parsed_sequence")
 			: 0);
   // Add it
-  if (from_file && main->file_name == file.c_str ())
+  editable = (from_file && main->file_name == file.c_str ());
+  if (alist.check ("type"))
     {
-      editable = true;
-      if (alist.check ("type"))
-	{
-	  const Library& library = library.find (component);
-	  const string& type = alist.name ("type");
-	  const AttributeList& default_alist = library.lookup (type);
-	  enter (new AListItem (syntax, alist, default_alist,
-				description, errors.str (),
-				item (), model.c_str (), "", value, from,
-				sequence));
-	}
-      else
-	{
-	  static const AttributeList empty_alist;
-	  enter (new AListItem (syntax, alist, empty_alist,
-				description, errors.str (),
-				item (), model.c_str (), "", value, from,
-				sequence));
-	}
+      const Library& library = library.find (component);
+      const string& type = alist.name ("type");
+      const AttributeList& default_alist = library.lookup (type);
+      enter (new ModelItem (syntax, alist, default_alist,
+			    item (), model.c_str (), value, from,
+			    sequence, editable));
     }
   else
-    enter (new TreeItem (description, errors.str (),
-			 item (), model.c_str (), "", value, from, sequence));
+    {
+      assert (!editable);
+      static const AttributeList empty_alist;
+      enter (new ModelItem (syntax, alist, empty_alist,
+			    item (), model.c_str (), value, from,
+			    sequence, editable));
+    }
     
   // Remember whether this is buildin or not.
   buildins.push_back (!alist.check ("type"));
@@ -258,19 +254,15 @@ TraverseQtTree::enter_submodel_sequence (const Syntax& syntax,
 { 
   QString name;
   name.sprintf ("[%d]", index);
-  TmpStream errors;
-  const bool has_errors = !syntax.check (alist, errors (), name.latin1 ());
-  if (editable)
-    enter (new AListItem (syntax, alist, default_alist,
-			  "Value for item in sequence.", errors.str (),
-			  item (), name, "", 
-			  has_errors ? "Partial" : "Full",
-			  "", index+1));
-  else
-    enter (new TreeItem ("Value for item in sequence.", errors.str (),
-			 item (), name, "", 
-			 has_errors ? "Partial" : "Full",
-			 "", index+1));
+  QString value;
+  if (check_alists)
+    {
+      TmpStream errors;
+      const bool has_errors = !syntax.check (alist, errors (), name.latin1 ());
+      value = has_errors ? "Partial" : "Full";
+    }
+  enter (new SequenceItem (syntax, alist, default_alist,
+			   item (), name, "", value, "", index+1));
   buildins.push_back (false);
   return true; 
 }
@@ -291,12 +283,18 @@ TraverseQtTree::enter_submodel_sequence_default (const Syntax& syntax,
   if (!buildin ())
     return false;
 
-  TmpStream errors;
-  const bool has_errors = !syntax.check (default_alist, errors (), "default");
-  enter (new TreeItem ("Default values for items in sequence.", errors.str (),
-		       item (), "default", "", 
-		       has_errors ? "Partial" : "Full",
-		       "", 0));
+  QString value;
+  if (check_alists)
+    {
+      TmpStream errors;
+      const bool has_errors = !syntax.check (default_alist, errors (),
+					     "default");
+      value = has_errors ? "Partial" : "Full";
+    }
+  static const AttributeList empty;
+  enter (new DefaultItem (syntax, const_cast <AttributeList&> (default_alist),
+			  empty, 
+			  item (), "default", "", value, "", 0));
   return true; 
 }
 
@@ -326,18 +324,16 @@ TraverseQtTree::enter_object_sequence (const Library&, const Syntax& syntax,
 { 
   QString name;
   name.sprintf ("[%d]", index);
-  TmpStream errors;
-  const bool has_errors = !syntax.check (alist, errors (), name.latin1 ());
   assert (alist.check ("type"));
   QString value = QString ("`") + alist.name ("type").c_str () + "'";
-  value += (has_errors ? " partial" : " full");
-  if (editable)
-    enter (new AListItem (syntax, alist, default_alist, 
-			  "Value for item in sequence.", errors.str (),
-			 item (), name, "", value, "", index+1));
-  else
-    enter (new TreeItem ("Value for item in sequence.", errors.str (),
-			 item (), name, "", value, "", index+1));
+  if (check_alists)
+    {
+      TmpStream errors;
+      const bool has_errors = !syntax.check (alist, errors (), name.latin1 ());
+      value += (has_errors ? " partial" : " full");
+    }
+  enter (new SequenceItem (syntax, alist, default_alist, 
+			   item (), name, "", value, "", index+1));
   buildins.push_back (false);
   return true; 
 }
@@ -365,7 +361,6 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
   const int size = syntax.size (parameter);
   const bool has_value = alist.check (parameter);
   QString value_name = has_value ? "<has value>" : "";
-  QString description = syntax.description (parameter).c_str ();
 
   // Set category name and order.
   QString category_name;
@@ -406,7 +401,6 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
     }
 
   // Type specific changes.
-  bool has_errors = false;
   QString errors;
   switch (type)
     {
@@ -425,19 +419,10 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	else
 	  type_name = "Submodel";
 
-	if (child.check ("description"))
-	  {
-	    QString child_description = child.name ("description").c_str ();
-	    if (description != child_description)
-	      {
-		description += "\n--\n";
-		description += child_description;
-	      }
-	  }
-	if (has_value && size == Syntax::Singleton)
+	if (has_value && size == Syntax::Singleton && check_alists)
 	  {
 	    TmpStream str;
-	    has_errors = 
+	    const bool has_errors = 
 	      !syntax.syntax (parameter).check (alist.alist (parameter), 
 						str (), parameter);
 	    errors = str.str ();
@@ -459,16 +444,19 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	  value_name = "`";
 	  value_name += type.c_str ();
 	  value_name += "'";
-	  TmpStream str;
-	  has_errors 
-	    = (!syntax.library (parameter)
-	       .syntax (type).check (alist.alist (parameter),
-				     str (), parameter));
-	  errors = str.str ();
-	  if (has_errors)
-	    value_name += " partial";
-	  else
-	    value_name += " full";
+	  if (check_alists)
+	    {
+	      TmpStream str;
+	      const bool has_errors 
+		= (!syntax.library (parameter)
+		   .syntax (type).check (alist.alist (parameter),
+					 str (), parameter));
+	      errors = str.str ();
+	      if (has_errors)
+		value_name += " partial";
+	      else
+		value_name += " full";
+	    }
 	}
       break;
     case Syntax::Number:
@@ -543,10 +531,10 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	  AttributeList& child_alist = alist.alist (parameter);
 	  const AttributeList& child_default 
 	    = syntax.default_alist (parameter);
-	  enter (new AListItem (child_syntax, child_alist, child_default,
-				description, errors, item (),
-				parameter_name, type_name, value_name, 
-				category_name, order));
+	  enter (new SubmodelItem (child_syntax, child_alist, child_default,
+				   item (), 
+				   parameter_name, type_name, value_name, 
+				   category_name, order));
 	}
       else
 	{
@@ -557,15 +545,14 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	  const string& type = child_alist.name ("type");
 	  const Syntax& child_syntax = library.syntax (type);
 	  const AttributeList& child_default = library.lookup (type);
-	  enter (new AListItem (child_syntax, child_alist, child_default,
-				description, errors, item (),
-				parameter_name, type_name, value_name, 
-				category_name, order));
+	  enter (new ObjectItem (child_syntax, child_alist, child_default,
+				 item (),
+				 parameter_name, type_name, value_name, 
+				 category_name, order));
 	}
     }
   else
-    enter (new TreeItem (description, errors,
-			 item (), parameter_name, type_name, value_name, 
+    enter (new AtomItem (item (), parameter_name, type_name, value_name, 
 			 category_name, order));
 
   // Recurse.
@@ -576,8 +563,9 @@ void
 TraverseQtTree::leave_parameter ()
 { leave (); }
 
-TraverseQtTree::TraverseQtTree (MainWindow* m)
+TraverseQtTree::TraverseQtTree (MainWindow* m, bool ca)
   : main (m),
+    check_alists (ca),
     editable (false)
 { }
 
@@ -589,10 +577,10 @@ TraverseQtTree::~TraverseQtTree ()
 }
 
 void 
-populate_tree (MainWindow* main)
+populate_tree (MainWindow* main, bool check_alists)
 {
   main->tree->clear();
   
-  TraverseQtTree build (main);
+  TraverseQtTree build (main, check_alists);
   build.traverse_all_libraries ();
 }

@@ -12,6 +12,16 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.55
+
+** Fixed bad initialization crash.
+
+Found by ML.
+
+** The PM pet module now gives more realistic results.
+
+Bugs found by SH.
+
 * 1.54
 
 ** Adjusted DSLAI05 in `Grass' parameterization.

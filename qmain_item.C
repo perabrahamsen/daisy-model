@@ -1,15 +1,15 @@
 // qmain_item.C -- Items in the parameter tree.
 
 #include "qmain_item.h"
+#include "qmain_edit.h"
 #include "qmain_tree.h"
 #include "qmain_busy.h"
 #include "qmain.h"
 
+#include "library.h"
 #include "tmpstream.h"
 #include "treelog_stream.h"
 #include "traverse_depend.h"
-#include "syntax.h"
-#include "alist.h"
 
 #include <qmessagebox.h>
 
@@ -24,50 +24,17 @@ TreeItem::main () const
 }
 
 void
-TreeItem::find_path (vector<string>& path) const
-{
-  if (parent ())
-    {
-      const TreeItem* myParent = dynamic_cast<const TreeItem*> (parent ());
-      assert (myParent);
-
-      myParent->find_path (path);
-    }
-  path.push_back (entry.latin1 ());
-}
-
-void
 TreeItem::setSelected (bool s)
 {
-  main ()->set_selection_editable (false);
-  main ()->set_selection_copyable (false);
-  main ()->set_selection_viewable (false);
+  main ()->clear_description ();
+  main ()->clear_selection ();
 
   if (s)
     {
-      if (const AListItem* container
-	  = dynamic_cast<const AListItem*> (parent ()))
-	{
-	  if (container->syntax.lookup (entry.latin1 ()) == Syntax::Number)
-	    main ()->set_selection_raw_editable (true);
-	  else
-	    main ()->set_selection_raw_editable (false);
-	}
-      else
-	main ()->set_selection_raw_editable (false);
-      main ()->set_selection_checkable (!errors.isEmpty ());
-      vector<string> path;
-      find_path (path);
-      main ()->set_selection_depable (path.size () == 2);
-      main ()->set_description (description);
+      main ()->set_selection_raw_editable (editable ());
+      set_selected ();
     }
-  else
-    {
-      main ()->set_selection_raw_editable (false);
-      main ()->set_selection_checkable (false);
-      main ()->set_selection_depable (false);
-      main ()->clear_description ();
-    }
+
   QListViewItem::setSelected (s);
 }
 
@@ -79,31 +46,255 @@ TreeItem::key (int, bool) const
   return tmp;
 }
 
+void
+TreeItem::edit_edit ()
+{ assert (false); }
+
 void 
 TreeItem::edit_raw ()
-{ }
+{ assert (false); }
+
+void
+TreeItem::edit_after ()
+{ assert (false); }
+
+void
+TreeItem::edit_child ()
+{ assert (false); }
+
+void
+TreeItem::edit_copy ()
+{ assert (false); }
+
+void
+TreeItem::edit_inherit ()
+{ assert (false); }
 
 void 
 TreeItem::edit_delete ()
-{ }
+{ assert (false); }
+
+void
+TreeItem::view_selected ()
+{ assert (false); }
 
 void 
 TreeItem::view_check ()
-{ 
-  QString title = QString ("QDaisy: Check ") + entry;
-  QMessageBox::information (main (), title, errors);
-}
+{ assert (false); }
+
+bool 
+TreeItem::toggle_view_defaults ()
+{ assert (false); }
 
 void 
 TreeItem::view_dependencies ()
-{ 
-  vector<string> path;
-  find_path (path);
-  const string& component = path[0];
-  const string& model = path[1];
+{ assert (false); }
 
+TreeItem::TreeItem (TreeItem* i,
+		    const QString& e, const QString& t, 
+		    const QString& v, const QString& c, int o)
+  : QListViewItem (i, e, t, v, c),
+    entry (e),
+    order (o)
+{ }
+
+TreeItem::TreeItem (QListView* i, const QString& e, const QString& v)
+  : QListViewItem (i, e, "", v, ""),
+    entry (e),
+    order (0)
+{ }
+
+bool
+LibraryItem::editable () const
+{ return false; }
+
+void
+LibraryItem::set_selected ()
+{
+  const string component = entry.latin1 ();
+  const Library& library = Library::find (component);
+  main ()->set_description (library.description ());
+}
+
+QString 
+LibraryItem::key (int, bool) const
+{ return entry; }
+
+LibraryItem::LibraryItem (QListView* i, const QString& e, const QString& v)
+  : TreeItem (i, e, v)
+{ }
+
+bool
+AtomItem::editable () const
+{
+  const TreeItem* c = dynamic_cast<const TreeItem*> (parent ());
+  assert (c);
+  return c->editable ();
+}
+
+void 
+AtomItem::edit_raw ()
+{
+  AListItem* c = dynamic_cast<AListItem*> (parent ());
+  assert (c); 
+  c->edit_item (this); 
+}
+
+void 
+AtomItem::edit_delete ()
+{ 
+  AListItem* c = dynamic_cast<AListItem*> (parent ());
+  assert (c); 
+  c->delete_item (this); 
+}
+
+void
+AtomItem::edit_child ()
+{ 
+  const AListItem* c = dynamic_cast<const AListItem*> (parent ());
+  assert (c); 
+  const string parameter = entry.latin1 ();
+  const Syntax::type type = c->syntax.lookup (parameter);
+  assert (type == Syntax::AList || type == Syntax::Object);
+  assert (c->syntax.size (parameter) != Syntax::Singleton);
+}
+
+void
+AtomItem::set_selected ()
+{
+  const AListItem* c = dynamic_cast<const AListItem*> (parent ());
+  assert (c);
+  main ()->set_description (c->description (entry));
+  const string parameter = entry.latin1 ();
+  const Syntax::type type = c->syntax.lookup (parameter);
+  assert (type != Syntax::Error);
+  if (type == Syntax::AList || type == Syntax::Object)
+    {
+      assert (c->syntax.size (parameter) != Syntax::Singleton);
+      main ()->set_selection_childable (true);
+    }
+}
+
+AtomItem::AtomItem (TreeItem* i,
+		    const QString& e, const QString& t, 
+		    const QString& v, const QString& c, int o)
+  : TreeItem (i, e, t, v, c, o)
+{ }
+
+void
+AListItem::set_selected ()
+{
+  main ()->set_selection_checkable (true);
+  main ()->set_selection_defaults_shown (view_defaults);
+  main ()->set_selection_showable (true);
+}
+
+void 
+AListItem::view_check ()
+{ 
+  QString title = QString ("QDaisy: Check ") + entry;
   TmpStream errors;
-  TreelogStream treelog (errors ());
+  const bool ok = syntax.check (alist, errors (), entry.latin1 ());
+  if (strlen (errors.str ()) > 0)
+    QMessageBox::information (main (), title, errors.str ());
+  else if (ok)
+    QMessageBox::information (main (), title, "No errors found.");
+  else
+    QMessageBox::information (main (), title, "Strange errors found.");
+}
+
+bool
+AListItem::toggle_view_defaults ()
+{
+  view_defaults = !view_defaults;
+  return view_defaults;
+}
+
+void 
+AListItem::edit_item (TreeItem* item)
+{ 
+  const string parameter = item->entry.latin1 ();
+  ItemDialog edit_item (main (), syntax, alist, default_alist, parameter);
+
+  switch (edit_item.exec ())
+    {
+    case QDialog::Rejected:
+      break;
+    case QDialog::Accepted:
+      item->setText (2, edit_item.value ());
+      break;
+    default:
+      assert (false);
+    }
+}
+
+QString 
+AListItem::description (const QString& par) const
+{ 
+  const string parameter = par.latin1 ();
+  if (syntax.lookup (parameter) != Syntax::Error)
+    return syntax.description (parameter).c_str (); 
+  return "Unknown item.";
+}
+
+void 
+AListItem::delete_item (TreeItem*)
+{ }
+
+AListItem::AListItem (const Syntax& syn, AttributeList& al,
+		      const AttributeList& def_al,
+		      TreeItem* i,
+		      const QString& e, const QString& t, const QString& v,
+		      const QString& c, int o = 0)
+  : TreeItem (i, e, t, v, c, o),
+    syntax (syn),
+    alist (al),
+    default_alist (def_al)
+{ }
+
+bool 
+ModelItem::editable () const
+{ return editable_; }
+
+void
+ModelItem::set_selected ()
+{
+  AListItem::set_selected ();
+  main ()->set_selection_depable (true);  
+  main ()->set_selection_deletable (editable ());
+  main ()->set_selection_copyable (true);
+  if (alist.check ("description"))
+    main ()->set_description (alist.name ("description").c_str ());
+  else
+    main ()->set_description ("Model with no description.");
+}
+
+void
+ModelItem::edit_raw ()
+{ }
+
+void
+ModelItem::edit_copy ()
+{ }
+
+void
+ModelItem::edit_inherit ()
+{ }
+
+void
+ModelItem::edit_delete ()
+{ }
+
+void 
+ModelItem::view_dependencies ()
+{ 
+  LibraryItem* par = dynamic_cast<LibraryItem*> (parent ());
+  assert (par);
+  const string& component = par->entry.latin1 ();
+  const string& model = entry.latin1 ();
+  
+  TmpStream deps;
+  TreelogStream treelog (deps ());
   QString title = QString ("QDaisy: ") + entry + " dependencies";
 
   bool found = false;
@@ -123,51 +314,134 @@ TreeItem::view_dependencies ()
 			    "Daisy", treelog))
       found = true;
   }
-  if (found)
-    QMessageBox::information (main (), title, errors.str ());
+  if (strlen (deps.str ()) > 0)
+    QMessageBox::information (main (), title, deps.str ());
+  else if (found)
+    QMessageBox::information (main (), title, "Strange dependencies found.");
   else
     QMessageBox::information (main (), title, "No dependencies found.");
 }
 
-TreeItem::TreeItem (const QString& d, const QString& err, TreeItem* i,
-		    const QString& e, const QString& t, 
-		    const QString& v, const QString& c, int o)
-  : QListViewItem (i, e, t, v, c),
-    entry (e),
-    description (d),
-    errors (err),
-    order (o)
+ModelItem::ModelItem (const Syntax& syn, AttributeList& al, 
+		      const AttributeList& al_def, 
+		      TreeItem* i,
+		      const QString& e, const QString& v, const QString& c, 
+		      int o, bool editable)
+  : AListItem (syn, al, al_def, i, e, "", v, c, o),
+    editable_ (editable)
 { }
 
-TreeItem::TreeItem (const QString& d, QListView* i, 
-		    const QString& e, const QString& v)
-  : QListViewItem (i, e, "", v, ""),
-    entry (e),
-    description (d),
-    errors (""),
-    order (0)
+bool
+SubmodelItem::editable () const
+{
+  const TreeItem* c = dynamic_cast<const TreeItem*> (parent ());
+  assert (c);
+  return c->editable ();
+}
+
+void
+SubmodelItem::set_selected ()
+{
+  const AListItem* c = dynamic_cast<const AListItem*> (parent ());
+  assert (c); 
+  main ()->set_description (c->description (entry));
+  const string parameter = entry.latin1 ();
+  const Syntax::type type = c->syntax.lookup (parameter);
+  assert (type == Syntax::AList || type == Syntax::Object);
+  assert (c->syntax.size (parameter) == Syntax::Singleton);
+  AListItem::set_selected ();
+}
+
+void 
+SubmodelItem::edit_raw ()
+{
+  AListItem* c = dynamic_cast<AListItem*> (parent ());
+  assert (c); 
+  c->edit_item (this); 
+}
+
+void 
+SubmodelItem::edit_delete ()
+{ 
+  AListItem* c = dynamic_cast<AListItem*> (parent ());
+  assert (c); 
+  c->delete_item (this); 
+}
+
+SubmodelItem::SubmodelItem (const Syntax& syn, AttributeList& al,
+			    const AttributeList& al_def,
+			    TreeItem* i,
+			    const QString& e, const QString& t, 
+			    const QString& v, const QString& c,
+			    int o)
+  : AListItem (syn, al, al_def, i, e, t, v, c, o)
 { }
 
-TreeItem::~TreeItem ()
+ObjectItem::ObjectItem (const Syntax& syn, AttributeList& al,
+			const AttributeList& al_def,
+			TreeItem* i,
+			const QString& e, const QString& t, 
+			const QString& v, const QString& c,
+			int o)
+  : SubmodelItem (syn, al, al_def, i, e, t, v, c, o)
+{ }
+
+bool
+SequenceItem::editable () const
+{
+  const AtomItem* c = dynamic_cast<const AtomItem*> (parent ());
+  assert (c);
+  const AListItem* cc = dynamic_cast<const AListItem*> (c->parent ());
+  assert (cc);
+  return cc->editable ();
+}
+
+void 
+SequenceItem::edit_raw ()
 { }
 
 void
-AListItem::setSelected (bool s)
-{
-  TreeItem::setSelected (s);
-}
-
-AListItem::AListItem (const Syntax& syn, AttributeList& al,
-		      const AttributeList& def_al,
-		      const QString& d, const QString& err,
-		      TreeItem* i,
-		      const QString& e, const QString& t, const QString& v,
-		      const QString& c, int o = 0)
-  : TreeItem (d, err, i, e, t, v, c, o),
-    syntax (syn),
-    alist (al),
-    default_alist (def_al)
+SequenceItem::edit_after ()
 { }
 
-AListItem::~AListItem ()
+void
+SequenceItem::edit_delete ()
+{ }
+
+void
+SequenceItem::set_selected ()
+{
+  const AtomItem* c = dynamic_cast<const AtomItem*> (parent ());
+  assert (c);
+  const AListItem* cc = dynamic_cast<const AListItem*> (c->parent ());
+  assert (cc);
+  const string parameter = c->entry.latin1 ();
+  Syntax::type type = cc->syntax.lookup (parameter);
+  assert (type == Syntax::AList || type == Syntax::Object);
+  main ()->set_selection_deletable (true);
+  main ()->set_selection_afterable (true);
+  main ()->set_description ("Item in sequence.");
+  AListItem::set_selected ();
+}
+
+SequenceItem::SequenceItem (const Syntax& syn, AttributeList& al,
+			    const AttributeList& al_def,
+			    TreeItem* i,
+			    const QString& e, const QString& t, 
+			    const QString& v, const QString& c,
+			    int o)
+  : AListItem (syn, al, al_def, i, e, t, v, c, o)
+{ }
+
+bool
+DefaultItem::editable () const
+{ return false; }
+
+DefaultItem::DefaultItem (const Syntax& syn, AttributeList& al,
+			  const AttributeList& al_def,
+			  TreeItem* i,
+			  const QString& e, const QString& t, 
+			  const QString& v, const QString& c,
+			  int o)
+  : AListItem (syn, al, al_def, i, e, t, v, c, o)
 { }

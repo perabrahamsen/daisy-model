@@ -77,7 +77,7 @@ struct NetRadiationBrunt : public NetRadiationParent
 			      double Temp,
 			      double VapourPressure) const
     {
-      const double NetEmiss = 0.34 - 0.14 * sqrt (VapourPressure);
+      const double NetEmiss = a - b * sqrt (VapourPressure);
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
   

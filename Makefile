@@ -278,8 +278,8 @@ OTHER = traverse_depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 INTERFACES = $(COMPONENTS) $(SUBMODELS) $(SPECIALS) $(OTHER)
 
 # Select the Qt frontend files.
-QTSOURCES = qmain.C qmain_moc.C qmain_tree.C qmain_item.C qmain_populate.C \
-	qmain_busy.C
+QTSOURCES = qmain_edit.C qmain_edit_moc.C qmain.C \
+	qmain_moc.C qmain_tree.C qmain_item.C qmain_populate.C 	qmain_busy.C
 QTOBJECTS = $(QTSOURCES:.C=${OBJ})
 
 # Select the C files that are not part of the library.
@@ -349,6 +349,9 @@ qdaisy${EXT}:	$(QTOBJECTS) daisy.so
 
 qmain_moc.C:	qmain.h
 	/pack/qt/bin/moc $^ > qmain_moc.C
+
+qmain_edit_moc.C:	qmain_edit.h
+	/pack/qt/bin/moc $^ > qmain_edit_moc.C
 
 # Create the C main executable.
 #
@@ -1011,15 +1014,17 @@ set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h time.h syntax.h common.h alist.h library.h
 tkmain${OBJ}: tkmain.C daisy.h time.h syntax.h common.h alist.h library.h
 gmain${OBJ}: gmain.C daisy.h time.h syntax.h common.h alist.h library.h
+qmain_edit${OBJ}: qmain_edit.C qmain_edit.h alist.h common.h syntax.h
+qmain_edit_moc${OBJ}: qmain_edit_moc.C qmain_edit.h
 qmain${OBJ}: qmain.C qmain.h syntax.h common.h alist.h qmain_tree.h \
  qmain_populate.h qmain_busy.h daisy.h library.h version.h \
  parser_file.h parser.h librarian.h tmpstream.h printer_file.h \
  printer.h
 qmain_moc${OBJ}: qmain_moc.C qmain.h syntax.h common.h alist.h
 qmain_tree${OBJ}: qmain_tree.C qmain_tree.h qmain_item.h
-qmain_item${OBJ}: qmain_item.C qmain_item.h qmain_tree.h qmain_busy.h \
- qmain.h syntax.h common.h alist.h tmpstream.h treelog_stream.h \
- treelog.h traverse_depend.h
+qmain_item${OBJ}: qmain_item.C qmain_item.h qmain_edit.h qmain_tree.h \
+ qmain_busy.h qmain.h syntax.h common.h alist.h tmpstream.h \
+ treelog_stream.h treelog.h traverse_depend.h
 qmain_populate${OBJ}: qmain_populate.C qmain_populate.h qmain_tree.h \
  qmain_item.h qmain.h syntax.h common.h alist.h traverse.h tmpstream.h \
  plf.h library.h

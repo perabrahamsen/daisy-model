@@ -57,9 +57,11 @@ Traverse::traverse_model (const string& component, const string& model)
 	  traverse_alist (syntax, alist, default_alist, model);
 	}
       else
-	// Buildin, no default values.
-	traverse_alist (syntax, alist, AttributeList (), model);
-	
+	{
+	  // Buildin, no default values.
+	  static const AttributeList empty_alist;
+	  traverse_alist (syntax, alist, empty_alist, model);
+	}	
       leave_model (component, model);
     }
 }
@@ -86,8 +88,9 @@ Traverse::traverse_submodel_default (const Syntax& syntax,
 {
   if (enter_submodel_default (syntax, default_alist, name))
     {
-      AttributeList alist (default_alist);
-      traverse_alist (syntax, alist, AttributeList (), name);
+      static AttributeList empty_alist;
+      traverse_alist (syntax, const_cast<AttributeList&> (default_alist),
+		      empty_alist, name);
       leave_submodel_default ();
     }
 }
@@ -116,8 +119,9 @@ Traverse::traverse_submodel_sequence_default (const Syntax& syntax,
 {
   if (enter_submodel_sequence_default (syntax, default_alist, name))
     {
-      AttributeList alist (default_alist);
-      traverse_alist (syntax, alist, AttributeList (), name);
+      static AttributeList empty_alist;
+      traverse_alist (syntax, const_cast<AttributeList&> (default_alist),
+		      empty_alist, name);
       leave_submodel_sequence_default ();
     }
 }

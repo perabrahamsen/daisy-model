@@ -1,4 +1,21 @@
+2000-10-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.55 released.
+
+2000-10-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_irrigate.C (ActionIrrigateStopSyntax): Fixed
+	initialization bug.
+
+2000-10-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C (PsychrometricConstant): Fix constant.
+	(SlopeVapourPressureCurve): Ditto.
+
 2000-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* qmain_edit.C, qmain_edit.h: New files.
+	* Makefile (QTSOURCES): Add them.
 
 	* Version 1.54 released.
 

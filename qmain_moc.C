@@ -1,7 +1,7 @@
 /****************************************************************************
 ** MainWindow meta object code from reading C++ file 'qmain.h'
 **
-** Created: Sat Sep 30 13:19:44 2000
+** Created: Tue Oct 3 13:31:28 2000
 **      by: The Qt MOC ($Id$)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -74,26 +74,42 @@ QMetaObject* MainWindow::staticMetaObject()
     typedef void(MainWindow::*m1_t9)();
     typedef void(MainWindow::*m1_t10)();
     typedef void(MainWindow::*m1_t11)();
-    typedef void(MainWindow::*m1_t12)(unsigned int);
+    typedef void(MainWindow::*m1_t12)();
     typedef void(MainWindow::*m1_t13)();
     typedef void(MainWindow::*m1_t14)();
+    typedef void(MainWindow::*m1_t15)();
+    typedef void(MainWindow::*m1_t16)();
+    typedef void(MainWindow::*m1_t17)();
+    typedef void(MainWindow::*m1_t18)();
+    typedef void(MainWindow::*m1_t19)();
+    typedef void(MainWindow::*m1_t20)(unsigned int);
+    typedef void(MainWindow::*m1_t21)();
+    typedef void(MainWindow::*m1_t22)();
     m1_t0 v1_0 = Q_AMPERSAND MainWindow::menu_action;
     m1_t1 v1_1 = Q_AMPERSAND MainWindow::file_new;
     m1_t2 v1_2 = Q_AMPERSAND MainWindow::file_open;
     m1_t3 v1_3 = Q_AMPERSAND MainWindow::file_save;
     m1_t4 v1_4 = Q_AMPERSAND MainWindow::file_save_as;
-    m1_t5 v1_5 = Q_AMPERSAND MainWindow::edit_raw;
-    m1_t6 v1_6 = Q_AMPERSAND MainWindow::edit_delete;
-    m1_t7 v1_7 = Q_AMPERSAND MainWindow::view_check;
-    m1_t8 v1_8 = Q_AMPERSAND MainWindow::view_dependencies;
-    m1_t9 v1_9 = Q_AMPERSAND MainWindow::toggle_view_logonly;
-    m1_t10 v1_10 = Q_AMPERSAND MainWindow::toggle_view_parameters;
-    m1_t11 v1_11 = Q_AMPERSAND MainWindow::toggle_view_empty;
-    m1_t12 v1_12 = Q_AMPERSAND MainWindow::select_view_filter;
-    m1_t13 v1_13 = Q_AMPERSAND MainWindow::help_about;
-    m1_t14 v1_14 = Q_AMPERSAND MainWindow::help_aboutQt;
-    QMetaData *slot_tbl = QMetaObject::new_metadata(15);
-    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(15);
+    m1_t5 v1_5 = Q_AMPERSAND MainWindow::edit_edit;
+    m1_t6 v1_6 = Q_AMPERSAND MainWindow::edit_raw;
+    m1_t7 v1_7 = Q_AMPERSAND MainWindow::edit_after;
+    m1_t8 v1_8 = Q_AMPERSAND MainWindow::edit_child;
+    m1_t9 v1_9 = Q_AMPERSAND MainWindow::edit_copy;
+    m1_t10 v1_10 = Q_AMPERSAND MainWindow::edit_inherit;
+    m1_t11 v1_11 = Q_AMPERSAND MainWindow::edit_delete;
+    m1_t12 v1_12 = Q_AMPERSAND MainWindow::view_selected;
+    m1_t13 v1_13 = Q_AMPERSAND MainWindow::view_check;
+    m1_t14 v1_14 = Q_AMPERSAND MainWindow::toggle_view_defaults;
+    m1_t15 v1_15 = Q_AMPERSAND MainWindow::view_dependencies;
+    m1_t16 v1_16 = Q_AMPERSAND MainWindow::toggle_view_logonly;
+    m1_t17 v1_17 = Q_AMPERSAND MainWindow::toggle_view_parameters;
+    m1_t18 v1_18 = Q_AMPERSAND MainWindow::toggle_view_empty;
+    m1_t19 v1_19 = Q_AMPERSAND MainWindow::toggle_check_composite;
+    m1_t20 v1_20 = Q_AMPERSAND MainWindow::select_view_filter;
+    m1_t21 v1_21 = Q_AMPERSAND MainWindow::help_about;
+    m1_t22 v1_22 = Q_AMPERSAND MainWindow::help_aboutQt;
+    QMetaData *slot_tbl = QMetaObject::new_metadata(23);
+    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(23);
     slot_tbl[0].name = "menu_action()";
     slot_tbl[0].ptr = (QMember)v1_0;
     slot_tbl_access[0] = QMetaData::Public;
@@ -109,39 +125,63 @@ QMetaObject* MainWindow::staticMetaObject()
     slot_tbl[4].name = "file_save_as()";
     slot_tbl[4].ptr = (QMember)v1_4;
     slot_tbl_access[4] = QMetaData::Public;
-    slot_tbl[5].name = "edit_raw()";
+    slot_tbl[5].name = "edit_edit()";
     slot_tbl[5].ptr = (QMember)v1_5;
     slot_tbl_access[5] = QMetaData::Public;
-    slot_tbl[6].name = "edit_delete()";
+    slot_tbl[6].name = "edit_raw()";
     slot_tbl[6].ptr = (QMember)v1_6;
     slot_tbl_access[6] = QMetaData::Public;
-    slot_tbl[7].name = "view_check()";
+    slot_tbl[7].name = "edit_after()";
     slot_tbl[7].ptr = (QMember)v1_7;
     slot_tbl_access[7] = QMetaData::Public;
-    slot_tbl[8].name = "view_dependencies()";
+    slot_tbl[8].name = "edit_child()";
     slot_tbl[8].ptr = (QMember)v1_8;
     slot_tbl_access[8] = QMetaData::Public;
-    slot_tbl[9].name = "toggle_view_logonly()";
+    slot_tbl[9].name = "edit_copy()";
     slot_tbl[9].ptr = (QMember)v1_9;
     slot_tbl_access[9] = QMetaData::Public;
-    slot_tbl[10].name = "toggle_view_parameters()";
+    slot_tbl[10].name = "edit_inherit()";
     slot_tbl[10].ptr = (QMember)v1_10;
     slot_tbl_access[10] = QMetaData::Public;
-    slot_tbl[11].name = "toggle_view_empty()";
+    slot_tbl[11].name = "edit_delete()";
     slot_tbl[11].ptr = (QMember)v1_11;
     slot_tbl_access[11] = QMetaData::Public;
-    slot_tbl[12].name = "select_view_filter(unsigned int)";
+    slot_tbl[12].name = "view_selected()";
     slot_tbl[12].ptr = (QMember)v1_12;
     slot_tbl_access[12] = QMetaData::Public;
-    slot_tbl[13].name = "help_about()";
+    slot_tbl[13].name = "view_check()";
     slot_tbl[13].ptr = (QMember)v1_13;
     slot_tbl_access[13] = QMetaData::Public;
-    slot_tbl[14].name = "help_aboutQt()";
+    slot_tbl[14].name = "toggle_view_defaults()";
     slot_tbl[14].ptr = (QMember)v1_14;
     slot_tbl_access[14] = QMetaData::Public;
+    slot_tbl[15].name = "view_dependencies()";
+    slot_tbl[15].ptr = (QMember)v1_15;
+    slot_tbl_access[15] = QMetaData::Public;
+    slot_tbl[16].name = "toggle_view_logonly()";
+    slot_tbl[16].ptr = (QMember)v1_16;
+    slot_tbl_access[16] = QMetaData::Public;
+    slot_tbl[17].name = "toggle_view_parameters()";
+    slot_tbl[17].ptr = (QMember)v1_17;
+    slot_tbl_access[17] = QMetaData::Public;
+    slot_tbl[18].name = "toggle_view_empty()";
+    slot_tbl[18].ptr = (QMember)v1_18;
+    slot_tbl_access[18] = QMetaData::Public;
+    slot_tbl[19].name = "toggle_check_composite()";
+    slot_tbl[19].ptr = (QMember)v1_19;
+    slot_tbl_access[19] = QMetaData::Public;
+    slot_tbl[20].name = "select_view_filter(unsigned int)";
+    slot_tbl[20].ptr = (QMember)v1_20;
+    slot_tbl_access[20] = QMetaData::Public;
+    slot_tbl[21].name = "help_about()";
+    slot_tbl[21].ptr = (QMember)v1_21;
+    slot_tbl_access[21] = QMetaData::Public;
+    slot_tbl[22].name = "help_aboutQt()";
+    slot_tbl[22].ptr = (QMember)v1_22;
+    slot_tbl_access[22] = QMetaData::Public;
     metaObj = QMetaObject::new_metaobject(
 	"MainWindow", "QMainWindow",
-	slot_tbl, 15,
+	slot_tbl, 23,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
 	0, 0,

@@ -2,13 +2,13 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * QDaisy.
 
+** Delete value.
+
 ** Tree
 
 *** command to show all object content in tree for specific object
 
 *** show object superclass in library -> model
-
-*** shorten filenames.
 
 ** Filter setup
 

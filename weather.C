@@ -149,7 +149,7 @@ Weather::LatentHeatVaporization (double Temp) // [J/kg]
 
 double
 Weather::PsychrometricConstant (double AtmPressure, double Temp) // [Pa/K]
-{ return (1.63 * AtmPressure / LatentHeatVaporization (Temp)); }
+{ return (1.63e3 * AtmPressure / LatentHeatVaporization (Temp)); }
 
 double
 Weather::T_normal (const Time& time, double delay) const
@@ -175,7 +175,7 @@ Weather::SaturationVapourPressure (double Temp) // [Pa]
 
 double
 Weather::SlopeVapourPressureCurve (double Temp) // [Pa/K]
-{ return (4.098E6 * SaturationVapourPressure (Temp) / pow (Temp + 237.3, 2)); }
+{ return (4.098E3 * SaturationVapourPressure (Temp) / pow (Temp + 237.3, 2)); }
 
 double
 Weather::AtmosphericPressure ()	const // [Pa]

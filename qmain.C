@@ -33,9 +33,20 @@ main (int argc, char** argv)
   MainWindow main_window;
   
   // Initialize it.
-  main_window.set_nofile ();
-  main_window.populate_tree ();
-
+  switch (argc)
+    {
+    case 0:
+    case 1:
+      main_window.set_nofile ();
+      main_window.populate_tree ();
+      break;
+    case 2:
+      main_window.open_file (argv[1]);
+      break;
+    default:
+      cerr << "Usage: " << argv[0] << " [ file ]\n";
+      return 2;
+    }
   // View it.
   app.setMainWidget (&main_window);
   main_window.show ();
@@ -47,7 +58,8 @@ MainWindow::MainWindow ()
     view_logonly (true),
     view_parameters (true),
     view_filter (0),
-    view_empty (false)
+    view_empty (false),
+    check_composite (false)
 {
   // Daisy.
   Daisy::load_syntax (daisy_syntax, daisy_default_alist);
@@ -94,13 +106,17 @@ MainWindow::MainWindow ()
   menu_edit = new QPopupMenu (this);
   menu->insertItem ("&Edit", menu_edit);
   menu_edit_edit_id 
-    = menu_edit->insertItem ("&Edit...", this, SLOT (menu_action ()));
+    = menu_edit->insertItem ("&Edit...", this, SLOT (edit_edit ()));
   menu_edit_raw_id 
     = menu_edit->insertItem ("&Raw...", this, SLOT (edit_raw ()));
+  menu_edit_after_id 
+    = menu_edit->insertItem ("Insert &after...", this, SLOT (edit_after ()));
+  menu_edit_child_id 
+    = menu_edit->insertItem ("Insert chi&ld...", this, SLOT (edit_child ()));
   menu_edit_copy_id 
-    = menu_edit->insertItem ("&Copy...", this, SLOT (menu_action ()));
+    = menu_edit->insertItem ("&Copy...", this, SLOT (edit_copy ()));
   menu_edit_inherit_id 
-    = menu_edit->insertItem ("In&herit...", this, SLOT (menu_action ()));
+    = menu_edit->insertItem ("In&herit...", this, SLOT (edit_inherit ()));
   menu_edit_delete_id 
     = menu_edit->insertItem ("&Delete...", this, SLOT (edit_delete ()));
   menu_edit->insertSeparator ();
@@ -119,9 +135,11 @@ MainWindow::MainWindow ()
   menu->insertItem ("&View", menu_view);
   menu_view->setCheckable (true);
   menu_view_selected_id
-    = menu_view->insertItem ("&Selected...", this, SLOT (menu_action ()));
+    = menu_view->insertItem ("&Selected...", this, SLOT (view_selected ()));
   menu_view_check_id
     = menu_view->insertItem ("&Check model...", this, SLOT (view_check ()));
+  menu_view_defaults_id
+    = menu_view->insertItem ("S&how defaults...", this, SLOT (toggle_view_defaults ()));
   menu_view_dependencies_id
     = menu_view->insertItem ("&Dependencies...", 
 			     this, SLOT (view_dependencies ()));
@@ -151,6 +169,10 @@ MainWindow::MainWindow ()
     = menu_view->insertItem ("Include e&mpty libraries", 
 			     this, SLOT (toggle_view_empty ()));
   menu_view->setItemChecked (menu_view_empty_id, view_empty);
+  menu_view_check_composite_id 
+    = menu_view->insertItem ("Check co&mposite entries", 
+			     this, SLOT (toggle_check_composite ()));
+  menu_view->setItemChecked (menu_view_check_composite_id, check_composite);
 
   // - Help menu.
   menu->insertSeparator ();
@@ -217,6 +239,7 @@ MainWindow::open_file (QString name)
 
   // In any case:  Make it official.
   set_filename (name);
+  set_view_filter (1);
   populate_tree ();
 }
 
@@ -253,6 +276,43 @@ MainWindow::save_file ()
 }
 
 void
+MainWindow::set_selection_editable (bool editable)
+{
+  menu_edit->setItemEnabled (menu_edit_edit_id, editable);
+}
+
+void
+MainWindow::set_selection_raw_editable (bool editable)
+{
+  menu_edit->setItemEnabled (menu_edit_raw_id, editable);
+}
+
+void
+MainWindow::set_selection_afterable (bool afterable)
+{
+  menu_edit->setItemEnabled (menu_edit_after_id, afterable);
+}
+
+void
+MainWindow::set_selection_childable (bool childable)
+{
+  menu_edit->setItemEnabled (menu_edit_child_id, childable);
+}
+
+void
+MainWindow::set_selection_copyable (bool copyable)
+{
+  menu_edit->setItemEnabled (menu_edit_copy_id, copyable);
+  menu_edit->setItemEnabled (menu_edit_inherit_id, copyable);
+}
+
+void
+MainWindow::set_selection_deletable (bool deletable)
+{
+  menu_edit->setItemEnabled (menu_edit_delete_id, deletable);
+}
+
+void
 MainWindow::set_selection_viewable (bool viewable)
 {
   menu_view->setItemEnabled (menu_view_selected_id, viewable);
@@ -265,29 +325,37 @@ MainWindow::set_selection_checkable (bool checkable)
 }
 
 void
-MainWindow::set_selection_editable (bool editable)
+MainWindow::set_selection_defaults_shown (bool shown)
 {
-  menu_edit->setItemEnabled (menu_edit_edit_id, editable);
+  menu_view->setItemChecked (menu_view_defaults_id, shown);
 }
 
 void
-MainWindow::set_selection_raw_editable (bool editable)
+MainWindow::set_selection_showable (bool showable)
 {
-  menu_edit->setItemEnabled (menu_edit_raw_id, editable);
-  menu_edit->setItemEnabled (menu_edit_delete_id, editable);
-}
-
-void
-MainWindow::set_selection_copyable (bool copyable)
-{
-  menu_edit->setItemEnabled (menu_edit_copy_id, copyable);
-  menu_edit->setItemEnabled (menu_edit_inherit_id, copyable);
+  menu_view->setItemEnabled (menu_view_defaults_id, showable);
 }
 
 void
 MainWindow::set_selection_depable (bool depable)
 {
   menu_view->setItemEnabled (menu_view_dependencies_id, depable);
+}
+
+void
+MainWindow::clear_selection ()
+{
+  set_selection_editable (false);
+  set_selection_raw_editable (false);
+  set_selection_afterable (false);
+  set_selection_childable (false);
+  set_selection_copyable (false);
+  set_selection_deletable (false);
+  set_selection_viewable (false);
+  set_selection_checkable (false);
+  set_selection_defaults_shown (true);
+  set_selection_showable (false);
+  set_selection_depable (false);
 }
 
 void 
@@ -302,13 +370,9 @@ void
 MainWindow::populate_tree ()
 {
   Busy busy (this, "Populating tree...");
-  ::populate_tree (this);
+  ::populate_tree (this, check_composite);
   clear_description ();
-  set_selection_editable (false);
-  set_selection_raw_editable (false);
-  set_selection_copyable (false);
-  set_selection_viewable (false);
-  set_selection_checkable (false);
+  clear_selection ();
 }
 
 void 
@@ -336,10 +400,7 @@ MainWindow::file_open ()
 					      "Daisy setup files (*.dai)", 
 					      this));
   if (!file.isEmpty())
-    {
-      set_view_filter (1);
-      open_file (file);
-    }
+    open_file (file);
 }
 
 void 
@@ -369,17 +430,47 @@ MainWindow::file_save_as ()
 }
 
 void
+MainWindow::edit_edit ()
+{ tree->edit_edit (); }
+
+void
 MainWindow::edit_raw ()
 { tree->edit_raw (); }
+
+void
+MainWindow::edit_after ()
+{ tree->edit_after (); }
+
+void
+MainWindow::edit_child ()
+{ tree->edit_child (); }
+
+void
+MainWindow::edit_copy ()
+{ tree->edit_copy (); }
+
+void
+MainWindow::edit_inherit ()
+{ tree->edit_inherit (); }
 
 void
 MainWindow::edit_delete ()
 { tree->edit_delete (); }
 
+void 
+MainWindow::view_selected ()
+{ tree->view_selected (); }
 
 void 
 MainWindow::view_check ()
 { tree->view_check (); }
+
+void 
+MainWindow::toggle_view_defaults ()
+{
+  menu_view->setItemChecked (menu_view_empty_id, 
+			     tree->toggle_view_defaults ()); 
+}
 
 void 
 MainWindow::view_dependencies ()
@@ -417,6 +508,15 @@ MainWindow::toggle_view_empty ()
   view_empty = !view_empty;
   menu_view->setItemChecked (menu_view_empty_id, view_empty);
   populate_tree ();
+}
+
+void 
+MainWindow::toggle_check_composite ()
+{
+  check_composite = !check_composite;
+  menu_view->setItemChecked (menu_view_check_composite_id, check_composite);
+  if (check_composite)
+    populate_tree ();
 }
 
 void 
