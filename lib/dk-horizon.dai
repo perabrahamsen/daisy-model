@@ -16,8 +16,8 @@
             (Theta_sat 0.40)
             (alpha 0.032 [cm^-1])
             (n 1.426)
-            (K_sat 52.9 [cm/d])
-            (l -0.160)))
+            (K_sat 57.4 [cm/d])
+            (l -0.2238)))
 
 (defhorizon Ap_JB2 default
   ;; Observations: 47.
@@ -33,8 +33,8 @@
             (Theta_sat 0.39)
             (alpha 0.018 [cm^-1])
             (n 1.445)
-            (K_sat 16.6 [cm/d])
-            (l 0.148)))
+            (K_sat 18.8 [cm/d])
+            (l 0.0364)))
 
 (defhorizon Ap_JB3 default
   ;; Observations: 164.
@@ -50,8 +50,8 @@
             (Theta_sat 0.39)
             (alpha 0.021 [cm^-1])
             (n 1.408)
-            (K_sat 20.4 [cm/d])
-            (l -0.381)))
+            (K_sat 22.9 [cm/d])
+            (l -0.5123)))
 
 (defhorizon Ap_JB4 default
   ;; Observations: 171.
@@ -67,8 +67,8 @@
             (Theta_sat 0.40)
             (alpha 0.013 [cm^-1])
             (n 1.434)
-            (K_sat 10.7 [cm/d])
-            (l -0.084)))
+            (K_sat 12.5 [cm/d])
+            (l -0.2599)))
 
 (defhorizon Ap_JB5 default
   ;; Observations: 56.
@@ -84,8 +84,8 @@
             (Theta_sat 0.38)
             (alpha 0.010 [cm^-1])
             (n 1.441)
-            (K_sat 4.8 [cm/d])
-            (l -0.338)))
+            (K_sat 5.7 [cm/d])
+            (l -0.5664)))
 
 (defhorizon Ap_JB6 default
   ;; Observations: 127.
@@ -101,8 +101,8 @@
             (Theta_sat 0.37)
             (alpha 0.008 [cm^-1])
             (n 1.469)
-            (K_sat 3.3 [cm/d])
-            (l -0.096)))
+            (K_sat 4.0 [cm/d])
+            (l -0.3484)))
 
 (defhorizon Ap_JB7 default
   ;; Observations: 114.
@@ -118,8 +118,8 @@
             (Theta_sat 0.38)
             (alpha 0.006 [cm^-1])
             (n 1.474)
-            (K_sat 2.1 [cm/d])
-            (l -0.101)))
+            (K_sat 2.6 [cm/d])
+            (l -0.4092)))
 
 (defhorizon B_JB1 default
   ;; Observations: 284.
@@ -135,8 +135,8 @@
             (Theta_sat 0.39)
             (alpha 0.046 [cm^-1])
             (n 1.531)
-            (K_sat 38.1 [cm/d])
-            (l 0.480)))
+            (K_sat 41.6 [cm/d])
+            (l 0.4298)))
 
 (defhorizon B_JB2 default
   ;; Observations: 48.
@@ -152,8 +152,8 @@
             (Theta_sat 0.39)
             (alpha 0.033 [cm^-1])
             (n 1.433)
-            (K_sat 28.5 [cm/d])
-            (l 0.497)))
+            (K_sat 30.5 [cm/d])
+            (l 0.4512)))
 
 (defhorizon B_JB3 default
   ;; Observations: 139.
@@ -169,8 +169,8 @@
             (Theta_sat 0.40)
             (alpha 0.036 [cm^-1])
             (n 1.421)
-            (K_sat 23.8 [cm/d])
-            (l -0.295)))
+            (K_sat 25.7 [cm/d])
+            (l -0.3724)))
 
 (defhorizon B_JB4 default
   ;; Observations: 139.
@@ -186,8 +186,8 @@
             (Theta_sat 0.37)
             (alpha 0.022 [cm^-1])
             (n 1.413)
-            (K_sat 11.7 [cm/d])
-            (l 0.418)))
+            (K_sat 13.3 [cm/d])
+            (l 0.2830)))
 
 (defhorizon B_JB5 default
   ;; Observations: 41.
@@ -203,8 +203,8 @@
             (Theta_sat 0.36)
             (alpha 0.018 [cm^-1])
             (n 1.410)
-            (K_sat 3.9 [cm/d])
-            (l -0.214)))
+            (K_sat 4.4 [cm/d])
+            (l -0.4105)))
 
 (defhorizon B_JB6 default
   ;; Observations: 87.
@@ -220,8 +220,8 @@
             (Theta_sat 0.35)
             (alpha 0.012 [cm^-1])
             (n 1.421)
-            (K_sat 2.8 [cm/d])
-            (l 0.150)))
+            (K_sat 3.4 [cm/d])
+            (l -0.0761)))
 
 (defhorizon B_JB7 default
   ;; Observations: 290.
@@ -237,8 +237,8 @@
             (Theta_sat 0.35)
             (alpha 0.008 [cm^-1])
             (n 1.421)
-            (K_sat 0.9 [cm/d])
-            (l 0.059)))
+            (K_sat 1.0 [cm/d])
+            (l -0.2605)))
 
 (defhorizon C_JB1 default
   ;; Observations: 359.
@@ -254,8 +254,8 @@
             (Theta_sat 0.37)
             (alpha 0.049 [cm^-1])
             (n 1.652)
-            (K_sat 24.9 [cm/d])
-            (l 2.068)))
+            (K_sat 28.4 [cm/d])
+            (l 2.0069)))
 
 (defhorizon C_JB2 default
   ;; Observations: 97.
@@ -271,8 +271,8 @@
             (Theta_sat 0.37)
             (alpha 0.037 [cm^-1])
             (n 1.503)
-            (K_sat 17.7 [cm/d])
-            (l 1.733)))
+            (K_sat 19.1 [cm/d])
+            (l 1.6958)))
 
 (defhorizon C_JB3 default
   ;; Observations: 58.
@@ -288,8 +288,8 @@
             (Theta_sat 0.35)
             (alpha 0.029 [cm^-1])
             (n 1.441)
-            (K_sat 6.2 [cm/d])
-            (l 1.150)))
+            (K_sat 7.1 [cm/d])
+            (l 1.0015)))
 
 (defhorizon C_JB4 default
   ;; Observations: 104.
@@ -305,8 +305,8 @@
             (Theta_sat 0.34)
             (alpha 0.017 [cm^-1])
             (n 1.430)
-            (K_sat 4.9 [cm/d])
-            (l 1.255)))
+            (K_sat 5.8 [cm/d])
+            (l 1.0699)))
 
 (defhorizon C_JB5 default
   ;; Observations: 75.
@@ -322,8 +322,8 @@
             (Theta_sat 0.32)
             (alpha 0.009 [cm^-1])
             (n 1.416)
-            (K_sat 0.9 [cm/d])
-            (l 0.573)))
+            (K_sat 1.1 [cm/d])
+            (l 0.2806)))
 
 (defhorizon C_JB6 default
   ;; Observations: 89.
@@ -339,8 +339,8 @@
             (Theta_sat 0.33)
             (alpha 0.010 [cm^-1])
             (n 1.430)
-            (K_sat 1.4 [cm/d])
-            (l 1.007)))
+            (K_sat 1.7 [cm/d])
+            (l 0.7245)))
 
 (defhorizon C_JB7 default
   ;; Observations: 216.
@@ -356,15 +356,7 @@
             (Theta_sat 0.34)
             (alpha 0.008 [cm^-1])
             (n 1.424)
-            (K_sat 0.6 [cm/d])
-            (l 0.491)))
-
-;;; Original data:
-;; 
-;; 	"Data from the DJF ""Profil Database"" Median values"															
-;; 												Van Genuchten Parameters				
-;; 			Texture									Theta				
-;; JB	Horizon	Obs	Clay	F. Silt	C. Silt	F. Sand			C. Sand	Humus	DBD	Res	Sat	alpha	n	Ksat
-;; 			2	20	63	125	200	500	>500		g/cm3			1/cm		cm/d
+            (K_sat 0.7 [cm/d])
+            (l 0.1433)))
 
 ;;; dk-horizon.dai ends here.
