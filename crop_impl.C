@@ -3,7 +3,6 @@
 #include "crop_impl.h"
 #include "syntax.h"
 #include "alist.h"
-#include "csmp.h"
 #include "filter.h"
 #include "log.h"
 #include "bioclimate.h"
@@ -134,7 +133,6 @@ Crop::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
       HvsDS (vl.csmp ("HvsDS")),
       LAIDist0 (vl.array ("LAIDist0")),
       LAIDist1 (vl.array ("LAIDist1")),
-      LAIDista (vl.number ("LAIDista")),
       PARref (vl.number ("PARref")),
       PARext (vl.number ("PARext")),
       EPext (vl.number ("EPext"))
@@ -242,16 +240,14 @@ Crop::Variables::RecCanopy::RecCanopy (const Parameters& /* par */)
     : Height (0.0),
       LAI (0.0),
       LADm (-9999.99), 
-      LADDist0 (), 
-      LADDist1 ()
+      LAIvsH ()
 { }
 
 Crop::Variables::RecCanopy::RecCanopy (const AttributeList& vl)
     : Height (vl.number ("Height")),
       LAI (vl.number ("LAI")),
       LADm (vl.number ("LADm")),
-      LADDist0 (vl.array ("LADDist0")),
-      LADDist1 (vl.array ("LADDist1"))
+      LAIvsH (vl.csmp ("LAIvsH"))
 { }
 
 void 
@@ -261,8 +257,7 @@ Crop::Variables::RecCanopy::output (Log& log, const Filter* filter) const
     log.output ("Height", filter, Height);
     log.output ("LAI", filter, LAI);
     log.output ("LADm", filter, LADm);
-    log.output ("LADDist0", filter, LADDist0);
-    log.output ("LADDist1", filter, LADDist1);
+    log.output ("LAIvsH", filter, LAIvsH);
     log.close();
 }
 
@@ -446,7 +441,6 @@ void CropSyntax::parameters ()
     Canopy->add ("HvsDS", Syntax::CSMP);
     Canopy->add ("LAIDist0", 3);
     Canopy->add ("LAIDist1", 3);
-    Canopy->add ("LAIDista", Syntax::Number);
     Canopy->add ("PARref", Syntax::Number);
     Canopy->add ("PARext", Syntax::Number);
     Canopy->add ("EPext", Syntax::Number);
@@ -525,8 +519,7 @@ void CropSyntax::variables ()
     Canopy->add ("Height", Syntax::Number);
     Canopy->add ("LAI", Syntax::Number);
     Canopy->add ("LADm", Syntax::Number);
-    Canopy->add ("LADDist0", Syntax::Array);
-    Canopy->add ("LADDist1", Syntax::Array);
+    Canopy->add ("LAIvsH", Syntax::CSMP);
 
     // RootSys
     Syntax* RootSys = new Syntax ();

@@ -59,7 +59,8 @@ public:
         throw2 (Invalid, Uninitialized);
     const Time& time (string) const
         throw2 (Invalid, Uninitialized);
-
+    int integer (string) const
+        throw2 (Invalid, Uninitialized);
 
     // Create and Destroy.
     void add (string, double);
@@ -71,6 +72,7 @@ public:
     void add (string, string);
     void add (string, const vector<double>&);
     void add (string, bool);
+    void add (string, int);
     void add (string, const Time&);
     AttributeList ();
     ~AttributeList ();

@@ -16,6 +16,7 @@ public:
     virtual double number () const throw (AttributeList::Invalid);
     virtual string name () const throw (AttributeList::Invalid);
     virtual bool flag () const throw (AttributeList::Invalid);
+    virtual int integer () const throw (AttributeList::Invalid);
     virtual const vector<double>& array ()
         const throw (AttributeList::Invalid);
     virtual const Rules& rules () const throw (AttributeList::Invalid);
@@ -53,6 +54,14 @@ class ValueBool : public Value
 public:
     bool flag () const;
     ValueBool (bool);
+};
+
+class ValueInteger : public Value
+{
+    int value;
+public:
+    int integer () const;
+    ValueInteger (int);
 };
 
 class ValueTime : public Value
@@ -127,6 +136,13 @@ Value::name () const throw (AttributeList::Invalid)
 
 bool
 Value::flag () const throw (AttributeList::Invalid)
+{ 
+    THROW (AttributeList::Invalid ());
+    return false; // SHUT UP.
+}
+
+int
+Value::integer () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
     return false; // SHUT UP.
@@ -211,6 +227,15 @@ ValueBool::flag () const
 }
 
 ValueBool::ValueBool (bool b) : value (b)
+{ }
+
+int
+ValueInteger::integer () const
+{
+    return value;
+}
+
+ValueInteger::ValueInteger (int i) : value (i)
 { }
 
 const Time&
@@ -355,6 +380,12 @@ AttributeList::flag (string key) const throw2 (Invalid, Uninitialized)
     return impl.lookup (key)->flag ();
 }
 
+int
+AttributeList::integer (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->integer ();
+}
+
 const Time&
 AttributeList::time (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -413,6 +444,12 @@ void
 AttributeList::add (string key, bool v)
 {
     impl.add (key, new ValueBool (v));
+}
+
+void 
+AttributeList::add (string key, int v)
+{
+    impl.add (key, new ValueInteger (v));
 }
 
 void 

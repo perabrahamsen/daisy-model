@@ -5,8 +5,7 @@
 
 #include "crop.h"
 #include "ftable.h"
-
-struct CSMP;
+#include "csmp.h"
 
 typedef void (*CropFun)(Crop&);
 
@@ -57,7 +56,6 @@ struct Crop::Parameters
 	const CSMP& HvsDS;	// Crop height as function of DS
 	const vector<double>& LAIDist0; // Relative LAI distribution at DS=0
 	const vector<double>& LAIDist1; // Relative LAI distribution at DS=1
-        double LAIDista;        // LAI distribution transition value
         double PARref;		// PAR reflectance
         double PARext;		// PAR extinction coefficient
         double EPext;		// EP extinction coefficient
@@ -149,8 +147,7 @@ struct Crop::Variables
 	double Height;		// Crop height [cm]
 	double LAI;		// Leaf Area Index
 	double LADm;		// Max Leaf Area Density [cm2/cm3]
-	vector<double> LADDist0;	// LAD vs height
-	vector<double> LADDist1;	// LAD vs height
+	CSMP LAIvsH;		// Accumulated Leaf Area Index at Height
     private:
 	friend struct Crop::Variables;
 	RecCanopy (const AttributeList&);

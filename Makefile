@@ -15,7 +15,8 @@ daisy:	$(OBJ)
 	$(CC) -o daisy $(OBJ) -lm
 
 bug: bug.C
-	$(CC) -v -c bug.C
+	$(CC) -v -o bug bug.C
+	bug
 
 wc: $(TEXT)
 	wc -l $(TEXT)
@@ -67,14 +68,14 @@ daisy.o: daisy.C daisy.h time.h input.h column.h manager.h \
 input.o: input.C input.h column.h daisy.h time.h manager.h \
  bioclimate.h log.h horizon.h crop.h alist.h csmp.h rules.h library.h \
  syntax.h action.h condition.h filter.h
-log.o: log.C log.h condition.h daisy.h time.h filter.h
+log.o: log.C log.h condition.h daisy.h time.h filter.h csmp.h
 bioclimate.o: bioclimate.C bioclimate.h time.h syntax.h alist.h \
  daisy.h
 manager.o: manager.C manager.h daisy.h time.h syntax.h rules.h alist.h
 column.o: column.C column.h daisy.h time.h crop.h syntax.h log.h \
- filter.h library.h bioclimate.h crop_impl.h ftable.h alist.h csmp.h
-crop.o: crop.C crop_impl.h crop.h daisy.h time.h ftable.h log.h \
- column.h csmp.h bioclimate.h
+ filter.h library.h bioclimate.h crop_impl.h ftable.h csmp.h alist.h
+crop.o: crop.C crop_impl.h crop.h daisy.h time.h ftable.h csmp.h log.h \
+ column.h bioclimate.h
 alist.o: alist.C alist.h daisy.h time.h action.h condition.h
 syntax.o: syntax.C syntax.h alist.h daisy.h time.h
 library.o: library.C library.h alist.h daisy.h time.h syntax.h
@@ -83,10 +84,10 @@ condition.o: condition.C condition.h daisy.h time.h
 horizon.o: horizon.C horizon.h daisy.h time.h syntax.h
 ftable.o: ftable.C ftable.h
 crop_impl.o: crop_impl.C crop_impl.h crop.h daisy.h time.h ftable.h \
- syntax.h alist.h csmp.h filter.h log.h bioclimate.h
+ csmp.h syntax.h alist.h filter.h log.h bioclimate.h
 template.o: template.C ftable.h ftable.t crop_impl.h crop.h daisy.h \
- time.h
+ time.h csmp.h
 filter.o: filter.C filter.h
-csmp.o: csmp.C csmp.h
+csmp.o: csmp.C csmp.h log.h
 rules.o: rules.C rules.h daisy.h time.h action.h
 time.o: time.C time.h

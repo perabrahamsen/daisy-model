@@ -551,6 +551,9 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 			}
 		    break;
 		}
+		case Syntax::Integer:
+		    atts->add (name, get_integer ());
+		    break;
 		case Syntax::Date:
 		    atts->add (name, get_time ());
 		    break;
