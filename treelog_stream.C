@@ -4,7 +4,8 @@
 // BCC5.01 lack ostream.
 #include <iostream>
 #include <deque>
-#include <assert>
+// GCC 2.95.2 need a ".h".
+#include <assert.h>
 
 struct TreelogStream::Implementation
 {
