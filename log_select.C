@@ -24,13 +24,17 @@
 #include "tmpstream.h"
 
 bool 
-LogSelect::check_member (symbol) const
+LogSelect::check_leaf (symbol) const
+{ daisy_assert (false); }
+
+bool 
+LogSelect::check_interior (symbol) const
 { daisy_assert (false); }
 
 bool 
 LogSelect::check_derived (symbol field, symbol /* name */,
 			  const Library& /* library */) const
-{ return check_member (field); }
+{ return check_interior (field); }
 
 bool 
 LogSelect::match (const Daisy& daisy, Treelog& out)

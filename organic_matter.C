@@ -688,7 +688,7 @@ OrganicMatter::Implementation::output (Log& log,
 				       const Geometry& geometry) const
 {
   static const symbol CO2_symbol ("CO2");
-  if (log.check_member (CO2_symbol))
+  if (log.check_leaf (CO2_symbol))
     {
       vector<double> CO2 (CO2_slow);
       daisy_assert (CO2.size () == CO2_fast.size ());
@@ -700,7 +700,7 @@ OrganicMatter::Implementation::output (Log& log,
   output_variable (top_CO2, log);
   static const symbol total_N_symbol ("total_N");
   static const symbol total_C_symbol ("total_C");
-  if (log.check_member (total_N_symbol) || log.check_member (total_C_symbol))
+  if (log.check_leaf (total_N_symbol) || log.check_leaf (total_C_symbol))
     {
       const int size = geometry.size ();
 
@@ -736,7 +736,7 @@ OrganicMatter::Implementation::output (Log& log,
     }
   output_variable (tillage_age, log);
   static const symbol am_symbol ("am");
-  if (log.check_member (am_symbol))
+  if (log.check_interior (am_symbol))
     {
       const Library& library = Librarian<AM>::library ();
       

@@ -585,6 +585,8 @@ SoilWater::Implementation::initialize (const AttributeList& al,
 
       // Add them.
       macro = &Macro::create (height);
+
+      out.debug ("Adding macropores");
     }
 
   // Let 'macro' choose the default method to average K values in 'uz'.

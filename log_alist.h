@@ -29,7 +29,6 @@
 struct LogAList : public Log
 {
   // Filter functions.
-  bool check_member (symbol) const = 0;
   bool check_entry (symbol, const Library&) const;
   bool check_derived (symbol, symbol, const Library&) const;
 

@@ -35,7 +35,8 @@ struct LogCheckpoint : public LogAList
   Time time;			// Time of current checkpoint.
 
   // Start and end of time step.
-  bool check_member (symbol) const;
+  bool check_leaf (symbol) const;
+  bool check_interior (symbol) const;
   bool match (const Daisy& daisy, Treelog& out);
   void done ();
 
@@ -45,7 +46,11 @@ struct LogCheckpoint : public LogAList
 };
 
 bool 
-LogCheckpoint::check_member (symbol) const
+LogCheckpoint::check_leaf (symbol) const
+{ return true; }
+
+bool 
+LogCheckpoint::check_interior (symbol) const
 { return true; }
 
 bool

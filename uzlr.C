@@ -116,8 +116,15 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       const double K_sat = soil.K (first, 0.0, h_ice[first],
 				   soil_heat.T (first));
       daisy_assert (K_sat > 0.0);
-      q_up = q[first] = max (top.q (), -K_sat);
 
+      // Make sure it is a flux top.
+      top.flux_top_on ();
+
+      if (!top.flux_top ())
+	// It refuses to be a flux, must be a lake.
+	q_up = q[first] = -K_sat;
+      else
+	q_up = q[first] = max (top.q (), -K_sat);
     }
 
   //  Use darcy for upward movement in the top.

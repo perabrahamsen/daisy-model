@@ -29,8 +29,13 @@ LogClone::match (const Daisy&, Treelog&)
 { daisy_assert (false); }
 
 bool 
-LogClone::check_member (symbol) const
+LogClone::check_leaf (symbol) const
 { daisy_assert (false); }
+
+bool 
+LogClone::check_interior (symbol) const
+{ daisy_assert (false); }
+
 void
 LogClone::done ()
 { daisy_assert (false); }

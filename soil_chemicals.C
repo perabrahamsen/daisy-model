@@ -184,7 +184,7 @@ void
 SoilChemicals::Implementation::output (Log& log) const
 {
   static const symbol solutes_symbol ("solutes");
-  if (log.check_member (solutes_symbol))
+  if (log.check_interior (solutes_symbol))
     {
       Log::Open open (log, solutes_symbol);
       for (SoluteMap::const_iterator i = solutes.begin ();
@@ -197,7 +197,7 @@ SoilChemicals::Implementation::output (Log& log) const
 	  Log::Named named (log, symbol (name));
 	  output_value (name, "chemical", log);
 	  static const symbol solute_symbol ("solute");
-	  if (log.check_member (solute_symbol))
+	  if (log.check_interior (solute_symbol))
 	  {
 	      Log::AList alist (log, solute_symbol, 
 				solute.chemical.solute_alist ());

@@ -43,7 +43,8 @@ public:
 
   // Filter
 public:
-  virtual bool check_member (symbol) const = 0;
+  virtual bool check_leaf (symbol) const = 0;
+  virtual bool check_interior (symbol) const = 0;
   virtual bool check_entry (symbol, const Library& library) const;
   virtual bool check_derived (symbol field, symbol name, 
 			      const Library& library) const = 0;
@@ -274,7 +275,7 @@ do { \
 #define output_submodule(submodule, key, log)\
 do { \
   static const symbol MACRO_name (key); \
-  if (log.check_member (MACRO_name)) \
+  if (log.check_interior (MACRO_name)) \
     { \
       Log::Open open (log, MACRO_name); \
       (submodule).output (log); \
@@ -310,7 +311,7 @@ do { \
 template <class T> void
 output_list_ (T const& items, const symbol name, Log& log, const Library& library)
 {
-  if (log.check_member (name))
+  if (log.check_interior (name))
     {
       Log::Open open (log, name);
       for (typename T::const_iterator item = items.begin(); 
@@ -337,7 +338,7 @@ do { \
 template <class T> void
 output_named_ (T const& items, const symbol name, Log& log)
 {
-  if (log.check_member (name))
+  if (log.check_interior (name))
     {
       Log::Open open (log, name);
       for (typename T::const_iterator item = items.begin ();
@@ -360,7 +361,7 @@ do { \
 template <class T> void
 output_ordered_ (T const& items, const symbol name, Log& log)
 {
-  if (log.check_member (name))
+  if (log.check_interior (name))
     {
       Log::Open open (log, name);
       int i = 0;
@@ -385,7 +386,7 @@ do { \
 template <class T> void
 output_vector_ (T const& items, const symbol name, Log& log)
 {
-  if (log.check_member (name))
+  if (log.check_interior (name))
     {
       Log::Open open (log, name);
       for (typename T::const_iterator item = items.begin ();

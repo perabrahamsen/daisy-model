@@ -43,7 +43,7 @@ OM::output (Log& log) const
   output_variable (C, log);
   output_variable (N, log);
   static const symbol C_per_N_symbol ("C_per_N");
-  if (log.check_member (C_per_N_symbol))
+  if (log.check_leaf (C_per_N_symbol))
     {
       vector<double> C_per_N;
       unsigned int size = N.size ();

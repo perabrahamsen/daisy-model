@@ -32,7 +32,7 @@ LogAll::check_leaf (symbol name) const
   for (vector<Select*>::const_iterator i = current.begin (); 
        i < current.end (); 
        i++)
-    if ((*i)->valid (name))
+    if (name == (*i)->current_name)
       return true;
 
   return false;
@@ -53,10 +53,6 @@ LogAll::check_interior (symbol name) const
 
   return false;
 }
-
-bool 
-LogAll::check_member (symbol name) const
-{ return check_interior (name) || check_leaf (name); }
 
 void
 LogAll::insert_active ()

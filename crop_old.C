@@ -469,15 +469,15 @@ CropOld::Variables::Variables (const Parameters& par, const AttributeList& vl)
 void 
 CropOld::Variables::output (Log& log) const
 {
-  if (log.check_member (symbol ("Phenology")))
+  if (log.check_interior (symbol ("Phenology")))
     Phenology.output (log);
-  if (log.check_member (symbol ("Canopy")))
+  if (log.check_interior (symbol ("Canopy")))
     Canopy.output (log);
-  if (log.check_member (symbol ("RootSys")))
+  if (log.check_interior (symbol ("RootSys")))
     RootSys.output (log);
-  if (log.check_member (symbol ("Prod")))
+  if (log.check_interior (symbol ("Prod")))
     Prod.output (log);
-  if (log.check_member (symbol ("CrpAux")))
+  if (log.check_interior (symbol ("CrpAux")))
     CrpAux.output (log);
 }
 

@@ -32,7 +32,8 @@ class LogClone : public LogAList
 
   // Don't use this as a real log.
 private:
-  bool check_member (symbol) const;
+  bool check_leaf (symbol) const;
+  bool check_interior (symbol) const;
   bool match (const Daisy& daisy, Treelog&);
   void done ();
 

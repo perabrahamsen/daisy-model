@@ -35,7 +35,6 @@ private:
   // Filter functions.
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
-  bool check_member (symbol) const;
 
   // Use.
 private:

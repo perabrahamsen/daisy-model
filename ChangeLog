@@ -1,6 +1,18 @@
 2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.83 released.
+
+2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.h (check_member): Split into check_leaf and check_interior.
+	* all: Updated callers and implementors.
+
+	* soil_water.C (initialize): Added log file message if automatic
+	macropores are added. 
+
 	* Version 2.82 released.
+
+	* select.h, select.C, log_all.C: Minor speedups.
 
 2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 

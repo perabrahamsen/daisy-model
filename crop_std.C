@@ -418,7 +418,7 @@ CropStandard::output (Log& log) const
   output_submodule (harvesting, "Harvest", log);
 #if 1
   static const symbol Prod_symbol ("Prod");
-  if (log.check_member (Prod_symbol))
+  if (log.check_interior (Prod_symbol))
     {
       Log::Open open (log, Prod_symbol);
       production.output (log);

@@ -51,7 +51,7 @@ Log::check_entry (symbol name, const Library& library) const
 {
   bool looking = true;
 
-  while (looking && !check_member (name))
+  while (looking && !check_interior (name))
     {
       if (library.check (name))
 	{

@@ -410,7 +410,7 @@ ColumnStandard::output_inner (Log& log) const
   output_submodule (soil_NH4, "SoilNH4", log);
   output_submodule (soil_NO3, "SoilNO3", log);
   static const symbol OrganicMatter_symbol ("OrganicMatter");
-  if (log.check_member (OrganicMatter_symbol))
+  if (log.check_interior (OrganicMatter_symbol))
     {
       Log::Open open (log, OrganicMatter_symbol);
       organic_matter.output (log, soil);

@@ -227,7 +227,7 @@ void
 Soil::output (Log& log) const
 {
   static const symbol horizons_symbol ("horizons");
-  if (log.check_member (horizons_symbol))
+  if (log.check_interior (horizons_symbol))
     {
       Log::Open open (log, horizons_symbol);
       for (int i = 0; i < impl.original_layer_size; i++)

@@ -716,7 +716,7 @@ SoilHeat::output (Log& log) const
   output_value (impl.capacity, "capacity", log);
   output_value (impl.C_apparent, "C_apparent", log);
   static const symbol state_symbol ("state");
-  if (log.check_member (state_symbol))
+  if (log.check_leaf (state_symbol))
     {
       vector<double> tmp (impl.state.size (), -1.0);
       for (unsigned int i = 0; i < impl.state.size (); i++)
