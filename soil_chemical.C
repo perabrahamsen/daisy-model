@@ -72,9 +72,11 @@ SoilChemical::decompose (const Soil& soil,
 	: 1.0;
       const double conc_factor
 	= chemical.decompose_conc_factor (C_[i]);
+      const double depth_factor
+	= chemical.decompose_depth_factor (soil.z (i));
       const double rate
 	= decompose_rate * heat_factor * water_factor * CO2_factor
-	* conc_factor;
+	* conc_factor * depth_factor;
       decomposed[i] = M_left (i) * rate;
     }
   for (unsigned int i = size; i < soil.size (); i++)
@@ -91,14 +93,14 @@ SoilChemical::output (Log& log) const
   log.output ("decomposed", decomposed);
 }
 
-double 
+double
 SoilChemical::diffusion_coefficient () const
 { return chemical.diffusion_coefficient (); }
 
 void
 SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  Solute::load_syntax (syntax, alist); 
+  Solute::load_syntax (syntax, alist);
   alist.add ("submodel", "SoilChemical");
   alist.add ("description", "Chemical solute in soil.");
   syntax.add ("uptaken", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -127,7 +129,7 @@ When it reached 1.0, decomposition begins.");
 }
 
 void
-SoilChemical::initialize (const AttributeList& al, 
+SoilChemical::initialize (const AttributeList& al,
 		    const Soil& soil, const SoilWater& soil_water)
 {
   Solute::initialize (al, soil, soil_water);
@@ -140,7 +142,7 @@ SoilChemical::SoilChemical (const Chemical& chem, const AttributeList& al)
   : Solute (al),
     chemical (chem),
     lag_increment (al.plf ("lag_increment"))
-{ 
+{
   if (al.check ("lag"))
     lag = al.number_sequence ("lag");
 }

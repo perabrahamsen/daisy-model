@@ -39,7 +39,7 @@ water_turnover_factor (double h)
 class ChemicalStandard : public Chemical
 {
   // Parameters.
-private: 
+private:
   const double crop_uptake_reflection_factor_;
   const double canopy_dissipation_rate_coefficient_;
   const double canopy_washoff_coefficient_;
@@ -50,6 +50,7 @@ private:
   const PLF decompose_water_factor_;
   const PLF decompose_CO2_factor_;
   const PLF decompose_conc_factor_;
+  const PLF decompose_depth_factor_;
   const bool active_groundwater_;
 
   // Queries.
@@ -74,7 +75,7 @@ public:
 	return decompose_heat_factor_ (T);
     }
   double decompose_water_factor (double h) const
-    { 
+    {
       if (decompose_water_factor_.size () < 1)
 	return water_turnover_factor (h);
       else
@@ -84,7 +85,9 @@ public:
     { return decompose_CO2_factor_ (CO2); }
   double decompose_conc_factor (double conc) const
     { return decompose_conc_factor_ (conc); }
-  bool active_groundwater () const 
+  double decompose_depth_factor (double depth) const
+    { return decompose_depth_factor_ (depth); }
+  bool active_groundwater () const
     { return active_groundwater_; }
 
   // Create.
@@ -107,6 +110,7 @@ canopy_dissipation_rate_coefficient")),
     decompose_water_factor_ (al.plf ("decompose_water_factor")),
     decompose_CO2_factor_ (al.plf ("decompose_CO2_factor")),
     decompose_conc_factor_ (al.plf ("decompose_conc_factor")),
+    decompose_depth_factor_ (al.plf ("decompose_depth_factor")),
     active_groundwater_ (al.flag ("active_groundwater"))
 { }
 
@@ -125,7 +129,7 @@ static struct ChemicalStandardSyntax
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Read chemical properties as normal Daisy parameters.");
-      syntax.add ("crop_uptake_reflection_factor", 
+      syntax.add ("crop_uptake_reflection_factor",
 		  Syntax::Fraction (), Syntax::Const,
 		  "How much of the chemical is reflected at crop uptake.");
       alist.add ("crop_uptake_reflection_factor", 1.0);
@@ -133,22 +137,22 @@ Read chemical properties as normal Daisy parameters.");
 		  "How fast does the chemical dissipate on canopy.");
       syntax.add ("canopy_washoff_coefficient", "mm", Syntax::Const,
 		  "How fast is the chemical washed off the canopy.");
-      syntax.add ("diffusion_coefficient", "cm^2/s", Syntax::Const, 
+      syntax.add ("diffusion_coefficient", "cm^2/s", Syntax::Const,
 		  "Diffusion coefficient.");
-      add_submodule<SoilChemical> ("solute", syntax, alist, 
+      add_submodule<SoilChemical> ("solute", syntax, alist,
 				   Syntax::Const,
 				   "Description of chemical in soil.");
       syntax.add ("decompose_rate", "h^-1", Syntax::Const,
 		  "Fraction of solute being decomposed each hour.");
       PLF empty;
-      syntax.add ("decompose_heat_factor", "dg C", Syntax::None (), 
+      syntax.add ("decompose_heat_factor", "dg C", Syntax::None (),
 		  Syntax::Const, "Heat factor on decomposition.");
       alist.add ("decompose_heat_factor", empty);
-      syntax.add ("decompose_water_factor", "cm", Syntax::None (), 
+      syntax.add ("decompose_water_factor", "cm", Syntax::None (),
 		  Syntax::Const,
 		  "Water potential factor on decomposition.");
       alist.add ("decompose_water_factor", empty);
-      syntax.add ("decompose_CO2_factor", "g C/cm^3", Syntax::None (), 
+      syntax.add ("decompose_CO2_factor", "g C/cm^3", Syntax::None (),
 		  Syntax::Const,
 		  "CO2 development factor on decomposition.");
       PLF no_factor;
@@ -159,6 +163,10 @@ Read chemical properties as normal Daisy parameters.");
 		  Syntax::Const,
 		  "Concentration development factor on decomposition.");
       alist.add ("decompose_conc_factor", no_factor);
+      syntax.add ("decompose_depth_factor", "cm", Syntax::None (),
+		  Syntax::Const,
+		  "Depth influence on decomposition.");
+      alist.add ("decompose_depth_factor", no_factor);
       syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
 Clear this flag to turn off decomposition in groundwater.");
       alist.add ("active_groundwater", true);

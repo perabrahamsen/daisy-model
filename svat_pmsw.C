@@ -1637,7 +1637,6 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       e_c_abs=x[4][1];  // e_c in kg/m**3
       e_sl_abs=x[5][1]; // e_sl in kg/m**3
 
-<<<<<<< svat_pmsw.C
       tcan_prev=tcan; // save tcan for use in RAASTAB()
 
       LEHFLUX(tair,tskin,tcan,tleaf,r_aastab2,r_ac,r_as,r_sc,r_sc_js,e_c_abs,
@@ -1649,19 +1648,6 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
                canopy_ea,r_sc,lel,f1_dolman,f_def,f_3,env_lai_factor,f_etep,
                rcmin_star,pstress,r_sc_js);
 
-=======
-      tcan_prev=tcan; // save tcan for use in RAASTAB()
-
-      LEHFLUX(tair,tskin,tcan,tleaf,r_aastab2,r_ac,r_as,r_sc,r_sc_js,e_c_abs,
-      		  e_sl_abs,e_abs,les,crop_ea_w,hl,ha,hs,lea,lel,hclos,leclos,dtcta,
-              dtltc,dtstc,dtlta,r_sc);
-
-      RSCSTAR (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,rcmax,
-               zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
-               canopy_ea,r_sc,lel,f1_dolman,f_def,f_3,env_lai_factor,f_etep,
-               rcmin_star,pstress,r_sc_js);
-
->>>>>>> 1.6
       // convert vapor pressure from kg/m**3 to Pa
       EABS2PA(e_c_abs,tcan,e_c);  // at canopy temperature
       EABS2PA(e_sl_abs,tleaf,e_sl); // at leaf temperature

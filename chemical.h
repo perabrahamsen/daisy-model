@@ -24,6 +24,7 @@ public:
   virtual double decompose_water_factor (double h) const = 0 ; // [cm ->]
   virtual double decompose_CO2_factor (double CO2) const = 0; // [g C/cm^3 ->]
   virtual double decompose_conc_factor (double conc) const = 0; // [g X/cm^3 H2O->]
+  virtual double decompose_depth_factor (double depth) const = 0; // [cm->]
   virtual bool active_groundwater () const = 0;
 
   // Create and Destroy.
