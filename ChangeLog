@@ -1,3 +1,9 @@
+2002-10-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* assertion.h: Don't use __FUNCTION__ on any Borland version.
+
+	* Merged SHA changes.
+
 2002-10-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.38 released.
