@@ -2059,10 +2059,10 @@ CropStandard::harvest (const string& column_name,
      Prod.N_AM += N;
    }
   return *new Harvest (column_name, time, name,
-		       Stem_W_Yield, Stem_N_Yield,
-		       Dead_W_Yield, Dead_N_Yield,
-		       Leaf_W_Yield, Leaf_N_Yield,
-		       WEYRm, NEYRm, chemicals);
+		       Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
+		       Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
+		       Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,
+		       WEYRm, NEYRm, SOrg_C_Yield, chemicals);
 }
 
 void

@@ -36,13 +36,16 @@ struct LogHarvest : public Log
 	{
 	  out << "year\tmonth\tday\tcolumn\tcrop\t"
 	      << "stem_DM\tdead_DM\tleaf_DM\tsorg_DM\t"
-	      << "stem_N\tdead_N\tleaf_N\tsorg_N\n";
+	      << "stem_N\tdead_N\tleaf_N\tsorg_N\t"
+	      << "stem_C\tdead_C\tleaf_C\tsorg_C\n";
 	  print_tags = false;
 	}
       if (print_dimension)
 	{
 	  out << "\t\t\t\t\t"
-	      << "t/ha\tt/ha\tt/ha\tt/ha\tkg/ha\tkg/ha\tkg/ha\tkg/ha\n";
+	      << "t/ha\tt/ha\tt/ha\tt/ha\t"
+	      << "kg/ha\tkg/ha\tkg/ha\tkg/ha\t"
+	      << "kg/ha\tkg/ha\tkg/ha\tkg/ha\n";
 	  print_dimension = false;
 	}
       for (; last_size < daisy.harvest.size (); last_size++)
@@ -60,7 +63,11 @@ struct LogHarvest : public Log
 	      << harvest.stem_N * 10.0 << "\t"
 	      << harvest.dead_N * 10.0 << "\t"
 	      << harvest.leaf_N * 10.0 << "\t"
-	      << harvest.sorg_N * 10.0 << "\n";
+	      << harvest.sorg_N * 10.0 << "\t"
+	      << harvest.stem_C * 10.0 << "\t"
+	      << harvest.dead_C * 10.0 << "\t"
+	      << harvest.leaf_C * 10.0 << "\t"
+	      << harvest.sorg_C * 10.0 << "\n";
 	  out.flush ();
 	}
       return false;

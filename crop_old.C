@@ -1931,10 +1931,10 @@ CropOld::harvest (const string& column_name,
 
   Chemicals chemicals;
   return *new Harvest (column_name, time, name, 
-		       WStraw * stem_harvest, NStraw * stem_harvest,
-		       0.0, 0.0,
-		       0.0, 0.0,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest,
+		       WStraw * stem_harvest, NStraw * stem_harvest, 0.0,
+		       0.0, 0.0, 0.0,
+		       0.0, 0.0, 0.0,
+		       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 0.0,
 		       chemicals);
 }
 

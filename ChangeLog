@@ -1,3 +1,16 @@
+2001-10-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.82 released.
+
+2001-10-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_simple.C, crop_std.C, crop_old.C, crop_sold.C (harvest):
+	Update callers. 
+
+	* log_harvest.C (match): Use it.
+
+	* harvest.C, harvest.h (stem_C, dead_C, leaf_C, sorg_C): New members.
+
 2001-10-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.80 released.

@@ -259,7 +259,10 @@ CropSimple::harvest (const string& column_name,
   if (canopy.CAI > 0.0)
     bioclimate.harvest_chemicals (chemicals, canopy.CAI);
   return *new Harvest (column_name, time, name,
-		       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, N_actual - NRoot,
+		       0.0, 0.0, 0.0, 
+		       0.0, 0.0, 0.0, 
+		       0.0, 0.0, 0.0, 
+		       0.0, N_actual - NRoot, 0.0,
 		       chemicals);
 }
 
