@@ -20,7 +20,7 @@
 
 #define HANDLE_NAMESPACES
 
-#ifdef __GNU__
+#ifdef __GNUC__
 // Only egcs has a C++ safe <math.h>.
 #include <math.h>
 #else
@@ -37,7 +37,7 @@
 #define rint(x) ((int)x)
 #endif
 
-#ifdef __GNU__
+#ifdef __GNUC__
 
 // Unix doesn't have DLL keywords.
 #define EXPORT

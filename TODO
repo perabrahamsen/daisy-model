@@ -1,12 +1,8 @@
-* Artikel / Diskussion
-
 * Nyt `utils' katalog med de to dhi scripts.
 
 * An `assert CONDITION' action.
 
 Gives an error if CONDITION is not true.
-
-* En `forever' aktivitet.  Eller en `until CONDITION activity'.
 
 * Simulation:
 

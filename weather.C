@@ -27,9 +27,8 @@ void
 Weather::tick_after (const Time& time)
 {
   // Hourly claudiness.
-  const double Si = hourly_global_radiation () 
-    * (60.0 * 60.0 * 24.0) / 1e6; // W/m^2 -> MJ/m^2/d
-  if (Si > 0.0)
+  const double Si = hourly_global_radiation (); 
+  if (Si > 25.0)
     {
       hourly_cloudiness_ = CloudinessFactor_Humid (time, Si);
       assert (hourly_cloudiness_ >= 0.0);
@@ -39,9 +38,8 @@ Weather::tick_after (const Time& time)
   // Daily claudiness.
   if (time.hour () == 0.0)
     {
-      const double Si = daily_global_radiation () 
-	* (60.0 * 60.0 * 24.0) / 1e6; // W/m^2 -> MJ/m^2/d
-      if (Si > 0.0)
+      const double Si = daily_global_radiation () ;
+      if (Si > 25.0)
 	{
 	  daily_cloudiness_ = CloudinessFactor_Humid (time, Si);
 	  assert (daily_cloudiness_ >= 0.0);

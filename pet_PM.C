@@ -203,7 +203,7 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
       // Dry.
       reference_evapotranspiration_dry
 	= PenmanMonteith (CropHeight, LAI, Rn, G, Temp, VaporPressure,
-			  U2, AtmPressure);
+			  U2, AtmPressure) * 3600;
       potential_evapotranspiration_dry
 	= max (0.0, reference_evapotranspiration_dry);
 
@@ -213,22 +213,24 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
       const double rc = 0.0;
       const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
       const double E2 = ETaero (AtmPressure, Temp, VaporPressure, ra, rc);
-      reference_evapotranspiration_wet = E1 + E2;
+      reference_evapotranspiration_wet = (E1 + E2) * 3600;
       potential_evapotranspiration_wet
 	= max (0.0, reference_evapotranspiration_wet);
 
     }
   else
     {
-      const double reference_evapotranspiration_dry
-	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure);
+      reference_evapotranspiration_dry
+	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure)
+	* 3600;
 
       potential_evapotranspiration_dry
 	= reference_to_potential (crops, surface,
 				  reference_evapotranspiration_dry);
 
-      const double reference_evapotranspiration_wet
-	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure);
+      reference_evapotranspiration_wet
+	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure)
+	* 3600;
       potential_evapotranspiration_wet
 	= reference_to_potential (crops, surface,
 				  reference_evapotranspiration_wet);

@@ -1,4 +1,16 @@
+1999-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.98 released.
+
+1999-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C (tick_after): Convert FAO units.
+
+	* pet_PM.C (tick): Convert FAO units.
+
 1999-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Merged cygwin and BC5 changes.
 
 	* weather_std.C: Added `RelHum' data type.
 

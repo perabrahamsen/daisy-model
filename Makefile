@@ -30,31 +30,31 @@ endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-#USE_OPTIMIZE = true
-USE_OPTIMIZE = false
+USE_OPTIMIZE = true
+#USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
-USE_PROFILE = true
-#USE_PROFILE = false
+#USE_PROFILE = true
+USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
-#	egcs		Use the experimental GNU compiler.
+#	gcc		Use the experimental GNU compiler.
 #	borland		Use the Borland compiler.
 #
 ifeq ($(HOSTTYPE),sun4)
-	COMPILER = egcs
+	COMPILER = gcc
 #	COMPILER = sun	
 endif
 ifeq ($(HOSTTYPE),hp)
-	COMPILER = egcs
+	COMPILER = gcc
 endif
 ifeq ($(HOSTTYPE),win32)
 	COMPILER = borland
 endif
 ifeq ($(HOSTTYPE),cygwin)
-	COMPILER = egcs
+	COMPILER = gcc
 endif
 
 # On SPARC platforms we trap mathematical exception with some assembler code.
@@ -75,7 +75,7 @@ endif
 # Find the optimize flags.
 #
 ifeq ($(USE_OPTIMIZE),true)
-	ifeq ($(COMPILER),egcs)
+	ifeq ($(COMPILER),gcc)
 		ifeq ($(HOSTTYPE),sun4)
 			OPTIMIZE = -O3 -ffast-math -fno-inline
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
@@ -102,7 +102,7 @@ else
 	DEBUG = 
 endif
 
-ifeq ($(COMPILER),egcs)
+ifeq ($(COMPILER),gcc)
 	COMPILE = c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -Wmissing-prototypes $(DEBUG) $(REPO)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
@@ -370,7 +370,7 @@ depend: $(SOURCES)
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	/pack/egcs/bin/c++ -I. $(TKINCLUDE) $(GTKMMINCLUDE) \
+	c++ -I. $(TKINCLUDE) $(GTKMMINCLUDE) \
 	        -MM $(SOURCES) | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
@@ -424,9 +424,9 @@ set_exceptions${OBJ}: set_exceptions.S
 .c${OBJ}:
 	$(CCOMPILE) $(OPTIMIZE) $(PROFILE) $(NOLINK) $<
 
-# There is a bug when egcs compile snow.C with optimization.
+# There is a bug when gcc compile snow.C with optimization.
 #
-ifeq ($(COMPILER),egcs)
+ifeq ($(COMPILER),gcc)
 ifeq ($(USE_OPTIMIZE),true)
 
 snow.o: snow.C
