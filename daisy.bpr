@@ -46,15 +46,14 @@
       transport_none.obj traverse.obj traverse_delete.obj treelog.obj 
       treelog_stream.obj uzlr.obj uzmodel.obj uznone.obj uzrichard.obj 
       vegetation.obj vegetation_crops.obj vegetation_permanent.obj weather.obj 
-      weather_none.obj weather_old.obj weather_simple.obj weather_std.obj 
-      path.obj rootdens_std.obj rootdens.obj"/>
+      weather_none.obj weather_old.obj weather_simple.obj weather_std.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
     <LIBFILES value=""/>
     <LIBRARIES value=""/>
     <SPARELIBS value=""/>
-    <PACKAGES value="Vcl50.bpi Vclx50.bpi bcbsmp50.bpi dclocx50.bpi"/>
+    <PACKAGES value=""/>
     <PATHCPP value=".;"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
@@ -71,11 +70,11 @@
       -wpin -wnod -wnak -wdef -w-csu -wcln -wbbf -wasm -wamp -wamb"/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-O2 -Vx -Ve -X- -r- -a8 -6 -b- -k -y -v -vi- -Pfoo -tWC -c"/>
+    <CFLAG1 value="-Od -Vx -Ve -X- -r- -a8 -b- -k -y -v -vi- -Pfoo -tWC -c"/>
     <PFLAGS value="-$YD -$W -$O- -v -JPHNE -M"/>
     <RFLAGS value=""/>
     <AFLAGS value="/mx /w2 /zd"/>
-    <LFLAGS value="-D&quot;&quot; -ap -Tpe -x -Gn -w-dup -v"/>
+    <LFLAGS value="-D&quot;&quot; -ap -Tpe -x -Gn -v -w-dup -w-dpl"/>
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="c0x32.obj $(OBJFILES)"/>
@@ -109,6 +108,12 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
+
+[Excluded Packages]
+$(BCB)\Bin\dclstd50.bpl=Borland Standard Components
+$(BCB)\Bin\dcl31w50.bpl=Delphi 1.0 Compatibility Components
+$(BCB)\Bin\bcbsmp50.bpl=Borland C++ Sample Components
+$(BCB)\Bin\dclocx50.bpl=Borland Sample Imported ActiveX Controls
 
 [HistoryLists\hlIncludePath]
 Count=1
