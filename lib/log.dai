@@ -259,6 +259,7 @@
 		     (when hourly)
 		     (dimension "mm")
 		     (factor -10))	;cm -> mm
+	   (number (path column "$col" Bioclimate "*" production_stress))
 	   (number (path column "$col" Surface pond)
 		   (dimension "mm"))
 	   (number (path column "$col" Surface runoff)
