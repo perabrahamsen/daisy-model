@@ -13,7 +13,8 @@ class Column;
 class Crop;
 class Daisy;
 class Manager;
-class Bioclimate;
+class Weather;
+class Groundwater;
 class Log;
 class Input;
 class Library;
@@ -49,7 +50,8 @@ public:
     Log& log;
     Time time;
     Manager& manager;
-    Bioclimate& bioclimate;
+    Weather& weather;
+    Groundwater& groundwater;
     ColumnList& columns;
     const Library& crops;
 

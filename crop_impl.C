@@ -8,11 +8,11 @@
 #include "bioclimate.h"
 
 static void 
-devel_m1 (Crop& crop)
+devel_m1 (const Bioclimate& bioclimate, Crop& crop)
 {
     const Crop::Parameters::DevelPar& Devel = crop.par.Devel;
     Crop::Variables::RecPhenology& Phenology = crop.var.Phenology;
-    double Ta = crop.bioclimate.AirTemperature ();
+    double Ta = bioclimate.AirTemperature ();
 
     if (Phenology.DS < 1)
 	{
@@ -29,11 +29,11 @@ devel_m1 (Crop& crop)
 }
 
 static void 
-devel_m2 (Crop& crop)
+devel_m2 (const Bioclimate& bioclimate, Crop& crop)
 {
     const Crop::Parameters::DevelPar& Devel = crop.par.Devel;
     Crop::Variables::RecPhenology& Phenology = crop.var.Phenology;
-    double Ta = crop.bioclimate.AirTemperature ();
+    double Ta = bioclimate.AirTemperature ();
 
     if (Phenology.DS < 1)
 	{
@@ -50,17 +50,17 @@ devel_m2 (Crop& crop)
 }
 
 static void 
-devel_m3 (Crop& crop)
+devel_m3 (const Bioclimate& bioclimate, Crop& crop)
 {
     const Crop::Parameters::DevelPar& Devel = crop.par.Devel;
     Crop::Variables::RecPhenology& Phenology = crop.var.Phenology;
-    double Ta = crop.bioclimate.AirTemperature ();
+    double Ta = bioclimate.AirTemperature ();
 
     if (Phenology.DS < 1)
 	{
 	    Phenology.DS += (Devel.DSRate1
 			      * Devel.TempEff1 (Ta)
-			      * Devel.PhotEff1 (crop.bioclimate.DayLength ()));
+			      * Devel.PhotEff1 (bioclimate.DayLength ()));
 	    if (Phenology.Vern < 0)
 		crop.Vernalization (Ta);
 	}

@@ -23,7 +23,7 @@ class Syntax
 public:
     enum type 
     { Number, List, Rules, CSMP, Function, Array, Boolean, String,
-      Date, Crops, Columns, Integer, Error };
+      Date, Crops, Columns, Integer, Soil, UZmodel, Error };
     bool check (string, const AttributeList&, const Log&) const;
     type lookup (string) const;
     const Syntax* syntax (string) const;

@@ -6,7 +6,8 @@
 #include "daisy.h"
 
 struct AttributeList;
-struct ColumnCanopy;
+struct Bioclimate;
+struct CSMP;
 
 class Crop 
 {
@@ -17,46 +18,54 @@ public:
   struct Variables;
   const Parameters& par;
   Variables& var;
-  const Bioclimate& bioclimate;
-  const Column* column;
 
-  // Simulation.
+  // Communication with Bioclimate.
 public:
+  virtual double height ();
+  virtual double LAI ();
+  virtual const CSMP& LAIvsH ();
+  virtual double PARext ();
+  virtual double PARref ();
+  virtual double EPext ();
+  virtual void CanopyStructure ();
+  
+  // Internal functions.
+protected:
   virtual double SoluteUptake (string /* SoluteID */, double /* PotNUpt */,
 			       double /* I_Mx */, double /* Rad */);
   virtual double H2OUptake (double PotTransp,
 			    double /* RootRad */, double /* h_wp */);
+public:				// Used by external development models.
   virtual void Vernalization (double Ta);
-  virtual void Emergence ();
-  virtual void DevelopmentStage ();
+protected:
+  virtual void Emergence (const Column& column);
+  virtual void DevelopmentStage (const Bioclimate&);
   virtual double CropHeight ();
   virtual void InitialLAI ();
   virtual double CropLAI ();
-  virtual void CanopyStructure ();
-  virtual void RootPenetration ();
+  virtual void RootPenetration (const Column& column);
   virtual double RootDensDistPar (double a);
   virtual void RootDensity ();
   virtual void NitContent ();
   virtual void NitrogenUptake (int Hour);
   // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
-  virtual double CanopyPhotosynthesis (const ColumnCanopy& CanStr);
+  virtual double CanopyPhotosynthesis (const Bioclimate&);
   virtual void AssimilatePartitioning (double DS, 
 				       double& f_Leaf, double& f_Stem,
 				       double& f_Root, double& f_SOrg);
   virtual double MaintenanceRespiration (double r, double Q10,
 					 double w, double T);
-  virtual void NetProduction ();
+  virtual void NetProduction (const Column&, const Bioclimate&);
 
+  // Simulation.
 public:
-  virtual void tick (const Time& time, const ColumnCanopy& CanStr);
+  virtual void tick (const Time& time, const Column&, const Bioclimate&);
   virtual void output (Log&, const Filter*) const;
 
   // Create and Destroy.
 public:
-  void set_column (const Column*);
-  Crop (const string, const Bioclimate&, const Column*,
-	const AttributeList& pl);
-  Crop (const string, const Bioclimate&, const Column*,
+  Crop (const string, const AttributeList& pl);
+  Crop (const string, 
 	const AttributeList& pl, const AttributeList& vl);
   virtual ~Crop ();
 };

@@ -10,6 +10,7 @@
 
 struct Rules;
 struct CSMP;
+struct HorizonList;
 
 // A map from attribute names to attribute values.
 
@@ -57,6 +58,8 @@ public:
         throw2 (Invalid, Uninitialized);
     ColumnList& columns (string) const
         throw2 (Invalid, Uninitialized);
+    HorizonList& horizons (string) const
+        throw2 (Invalid, Uninitialized);
     const Time& time (string) const
         throw2 (Invalid, Uninitialized);
     int integer (string) const
@@ -66,6 +69,7 @@ public:
     void add (string, double);
     void add (string, CropList*);
     void add (string, ColumnList*);
+    void add (string, HorizonList*);
     void add (string, const AttributeList*);
     void add (string, const Rules*);
     void add (string, const CSMP*);

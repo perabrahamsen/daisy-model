@@ -24,6 +24,7 @@ public:
     virtual const AttributeList& list () const throw (AttributeList::Invalid);
     virtual CropList& crops () const throw (AttributeList::Invalid);
     virtual ColumnList& columns () const throw (AttributeList::Invalid);
+    virtual HorizonList& horizons () const throw (AttributeList::Invalid);
     virtual const Time& time () const throw (AttributeList::Invalid);
 protected:
     Value ();
@@ -112,6 +113,14 @@ public:
     ValueColumns (ColumnList&);
 };
 
+class ValueHorizons : public Value
+{
+    HorizonList& value;
+public:
+    HorizonList& horizons () const;
+    ValueHorizons (HorizonList&);
+};
+
 class ValueCrops : public Value
 {
     CropList& value;
@@ -181,6 +190,12 @@ ColumnList& Value::columns () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
     return *((ColumnList*) 0); // SHUT UP.
+}
+
+HorizonList& Value::horizons () const throw (AttributeList::Invalid)
+{ 
+    THROW (AttributeList::Invalid ());
+    return *((HorizonList*) 0); // SHUT UP.
 }
 
 CropList& Value::crops () const throw (AttributeList::Invalid)
@@ -281,6 +296,15 @@ ValueColumns::columns () const
 }
 
 ValueColumns::ValueColumns (ColumnList& v) : value (v)
+{ }
+
+HorizonList& 
+ValueHorizons::horizons () const
+{
+    return value;
+}
+
+ValueHorizons::ValueHorizons (HorizonList& v) : value (v)
 { }
 
 CropList& 
@@ -416,6 +440,12 @@ AttributeList::columns (string key) const throw2 (Invalid, Uninitialized)
     return impl.lookup (key)->columns ();
 }
 
+HorizonList& 
+AttributeList::horizons (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->horizons ();
+}
+
 CropList& 
 AttributeList::crops (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -480,6 +510,12 @@ void
 AttributeList::add (string key, ColumnList* v)
 {
     impl.add (key, new ValueColumns (*v));
+}
+
+void 
+AttributeList::add (string key, HorizonList* v)
+{
+    impl.add (key, new ValueHorizons (*v));
 }
 
 void 

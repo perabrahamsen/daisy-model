@@ -7,7 +7,9 @@
 #include "ftable.h"
 #include "csmp.h"
 
-typedef void (*CropFun)(Crop&);
+struct Bioclimate;
+
+typedef void (*CropFun)(const Bioclimate&, Crop&);
 
 struct Crop::Parameters
 { 

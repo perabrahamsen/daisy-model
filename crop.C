@@ -11,6 +11,42 @@
 #undef exception 
 
 double
+Crop::height ()
+{
+  return var.Canopy.Height;
+}
+
+double
+Crop::LAI ()
+{
+  return var.Canopy.LAI;
+}
+
+const CSMP&
+Crop::LAIvsH ()
+{
+  return var.Canopy.LAIvsH;
+}
+
+double
+Crop::PARext ()
+{
+  return par.Canopy.PARext;
+}
+
+double
+Crop::PARref ()
+{
+  return par.Canopy.PARref;
+}
+
+double
+Crop::EPext ()
+{
+  return par.Canopy.EPext;
+}
+
+double
 Crop::SoluteUptake (string /* SoluteID */, double PotNUpt,
 		    double /* I_Mx */, double /* Rad */)
 {
@@ -42,23 +78,23 @@ Crop::Vernalization (double Ta)
 }
 
 void 
-Crop::Emergence ()
+Crop::Emergence (const Column& column)
 {
   const Parameters::DevelPar& Devel = par.Devel;
   const double EmrDpt = par.Root.DptEmr;
   double& DS = var.Phenology.DS;
 
-  DS += column->SoilTemperature (EmrDpt) / Devel.EmrTSum;
+  DS += column.SoilTemperature (EmrDpt) / Devel.EmrTSum;
   if (DS > 0)
     DS = Devel.DS_Emr;
 }
 
 void 
-Crop::DevelopmentStage ()
+Crop::DevelopmentStage (const Bioclimate& bioclimate)
 {
   const Parameters::DevelPar& Devel = par.Devel;
 
-  Devel.Model (*this);
+  Devel.Model (bioclimate, *this);
 }
 
 double 
@@ -167,7 +203,7 @@ Crop::CanopyStructure ()
 	      // height where the canopy top, and y1 the canopy at x1. 
 	      //
 	      // We know the area of the triangle:
-	      // (1):  Need == (1 - x0) * y1 / 2
+	      // (1):  Need = (1 - x0) * y1 / 2
 	      // 
 	      // We assume that the slope of the canopy increase and
 	      // descrease is unchanged:
@@ -211,7 +247,7 @@ Crop::CanopyStructure ()
 }
 
 void 
-Crop::RootPenetration ()
+Crop::RootPenetration (const Column& column)
 {
   const Parameters::RootPar& Root = par.Root;
   // const double DS = var.Phenology.DS;
@@ -222,13 +258,13 @@ Crop::RootPenetration ()
   if (IncWRoot <= 0)
     return;
 
-  double Ts = column->SoilTemperature (Depth);
+  double Ts = column.SoilTemperature (Depth);
   double dp = Root.PenPar1 * max (0.0, Ts - Root.PenPar2);
   PotRtDpt = min (PotRtDpt + dp, Root.MaxPen);
   /*max depth determined by crop*/
   Depth = min (Depth + dp, Root.MaxPen);
   /*max depth determined by crop*/
-  Depth = min (Depth, column->MaxRootingDepth ()); /*or by soil conditions*/
+  Depth = min (Depth, column.MaxRootingDepth ()); /*or by soil conditions*/
 }
 
 double 
@@ -311,12 +347,13 @@ Crop::RootDensity ()
 	/ RootSys.Depth;
     }
 
-  int Nz;
+#if 0
   double z_b[81];
   double z_n[81];
+  int Nz;
   double dz[81];
 
-  column->SoilColumnDiscretization (Nz, z_b, z_n, dz);
+  column.SoilColumnDiscretization (Nz, z_b, z_n, dz);
 
   RootSys.Density.reserve (20);
 
@@ -327,6 +364,7 @@ Crop::RootDensity ()
 
   for (int j = i - 1; j <= 19; j++)
     RootSys.Density[j] = 0.0;
+#endif
 }
 
 void 
@@ -404,7 +442,7 @@ Crop::NitrogenUptake (int Hour)
 }
 
 double 
-Crop::CanopyPhotosynthesis (const ColumnCanopy& CanStr)
+Crop::CanopyPhotosynthesis (const Bioclimate& bioclimate)
 {
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const Parameters::LeafPhotPar& LeafPhot = par.LeafPhot;
@@ -416,7 +454,7 @@ Crop::CanopyPhotosynthesis (const ColumnCanopy& CanStr)
   double prevLA = 0.0;	// LAI below the current leaf layer.
   double Ass = 0.0;		// Assimilate produced by canopy photosynthesis
   double Ta = bioclimate.AirTemperature ();
-
+  
   if (Ta < LeafPhot.TLim1)
     Teff = 0.0;
   else
@@ -428,11 +466,12 @@ Crop::CanopyPhotosynthesis (const ColumnCanopy& CanStr)
 	  / (LeafPhot.TLim2 - LeafPhot.TLim1);
     }
 
-  for (int i = 0; i < CanStr.No; i++)
+  int No = bioclimate.NumberOfIntervals ();
+  for (int i = 0; i < No; i++)
     {
-      double height = CanStr.Height[i];
+      double height = bioclimate.height (i);
 
-      F = LeafPhot.Fm * (1 - exp (- (LeafPhot.Qeff *  CanStr.PAR[i] 
+      F = LeafPhot.Fm * (1 - exp (- (LeafPhot.Qeff *  bioclimate.PAR (i)
 				     / LeafPhot.Fm)));
 	    
       LA = LAIvsH (height) - prevLA;
@@ -466,7 +505,7 @@ Crop::MaintenanceRespiration (double r, double Q10, double w, double T)
 }
 
 void 
-Crop::NetProduction ()
+Crop::NetProduction (const Column& column, const Bioclimate& bioclimate)
 {
   const Parameters::PartitPar& Partit = par.Partit;
   const Parameters::RespPar& Resp = par.Resp;
@@ -482,7 +521,7 @@ Crop::NetProduction ()
     = MaintenanceRespiration (Resp.r_Stem, Resp.Q10, Prod.WStem, T);
   double RMSOrg
     = MaintenanceRespiration (Resp.r_SOrg, Resp.Q10, Prod.WSOrg, T);
-  T = column->SoilTemperature (Depth / 3);
+  T = column.SoilTemperature (Depth / 3);
   double RMRoot
     = MaintenanceRespiration (Resp.r_Root, Resp.Q10, Prod.WRoot, T);
   RMLeaf = max (0.0, RMLeaf - CrpAux.PotCanopyAss + CrpAux.CanopyAss);
@@ -553,13 +592,14 @@ Crop::NetProduction ()
 }
 
 void 
-Crop::tick (const Time& time, const ColumnCanopy& CanStr)
+Crop::tick (const Time& time, 
+	    const Column& column, const Bioclimate& bioclimate)
 {
   cout << "Crop `" << name << "' tick\n"; 
 
   if (time.hour () == 0 && var.Phenology.DS <= 0)
     {
-      Emergence ();
+      Emergence (column);
       if (var.Phenology.DS >= 0)
 	{
 	  InitialLAI ();
@@ -584,22 +624,22 @@ Crop::tick (const Time& time, const ColumnCanopy& CanStr)
 #endif
   double WStress = 1.0;
   NitrogenUptake (time.hour ());
-  if (CanStr.PAR[CanStr.No - 1] > 0)
+  if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
-      double Ass = CanopyPhotosynthesis (CanStr);
+      double Ass = CanopyPhotosynthesis (bioclimate);
       var.CrpAux.PotCanopyAss += Ass;
       var.CrpAux.CanopyAss += WStress * Ass;
     }
   if (time.hour () != 0)
     return;
-  DevelopmentStage ();
+  DevelopmentStage (bioclimate);
   var.Canopy.Height = CropHeight ();
   if (var.CrpAux.InitLAI)
     InitialLAI ();
   else
     var.Canopy.LAI = CropLAI ();
-  NetProduction ();
-  RootPenetration ();
+  NetProduction (column, bioclimate);
+  RootPenetration (column);
   RootDensity ();
 }
 
@@ -611,28 +651,17 @@ Crop::output (Log& log, const Filter* filter) const
   log.close ();
 }
 
-void 
-Crop::set_column (const Column* c)
-{
-  column = c;
-}
-
-Crop::Crop (const string n, const Bioclimate& b, const Column* c,
-	    const AttributeList& pl)
+Crop::Crop (const string n, const AttributeList& pl)
   : name (n),
     par (Parameters::get (n, pl)),
-    var (*new Variables (par)),
-    bioclimate (b),
-    column (c)
+    var (*new Variables (par))
 { }
 
-Crop::Crop (const string n, const Bioclimate& b, const Column* c,
+Crop::Crop (const string n,
 	    const AttributeList& pl, const AttributeList& vl)
   : name (n),
     par (Parameters::get (n, pl)),
-    var (*new Variables (vl)),
-    bioclimate (b),
-    column (c)
+    var (*new Variables (vl))
 { }
 
 Crop::~Crop ()

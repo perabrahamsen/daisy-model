@@ -3,7 +3,7 @@
 #include "condition.h"
 
 bool
-Condition::match (ColumnList&, const Bioclimate&, const Time&) const
+Condition::match (ColumnList&, const Weather&, const Time&) const
 {
     return true;
 }
@@ -17,7 +17,7 @@ Condition::~Condition ()
 { }
 
 bool
-ConditionAt::match (ColumnList&, const Bioclimate&, const Time& t) const
+ConditionAt::match (ColumnList&, const Weather&, const Time& t) const
 {
     return time == t;
 }
@@ -27,7 +27,7 @@ ConditionAt::ConditionAt (const Time& t)
 { }
 
 bool
-ConditionBefore::match (ColumnList&, const Bioclimate&, const Time& t) const
+ConditionBefore::match (ColumnList&, const Weather&, const Time& t) const
 {
     return time > t;
 }
@@ -37,7 +37,7 @@ ConditionBefore::ConditionBefore (const Time& t)
 { }
 
 bool
-ConditionAfter::match (ColumnList&, const Bioclimate&, const Time& t) const
+ConditionAfter::match (ColumnList&, const Weather&, const Time& t) const
 {
     return time < t;
 }
@@ -47,7 +47,7 @@ ConditionAfter::ConditionAfter (const Time& t)
 { }
 
 bool
-ConditionHourly::match (ColumnList&, const Bioclimate&, const Time& t) const
+ConditionHourly::match (ColumnList&, const Weather&, const Time& t) const
 {
     // BUG:  Behave strangely around new year.
     return ((24 * t.yday () + t.hour ()) % step) == 0;
@@ -58,7 +58,7 @@ ConditionHourly::ConditionHourly (int s)
 { }
 
 bool
-ConditionDaily::match (ColumnList&, const Bioclimate&, const Time& t) const
+ConditionDaily::match (ColumnList&, const Weather&, const Time& t) const
 {
     // BUG:  Behave strangely around new year.
     return t.hour () == 0 && (t.yday () % step) == 0;
@@ -69,7 +69,7 @@ ConditionDaily::ConditionDaily (int s)
 { }
 
 bool
-ConditionWeekly::match (ColumnList&, const Bioclimate&, const Time& t) const
+ConditionWeekly::match (ColumnList&, const Weather&, const Time& t) const
 {
     // BUG:  Behave strangely around new year.
     return t.hour () == 0 && (t.yday () % step) == 0;
@@ -80,7 +80,7 @@ ConditionWeekly::ConditionWeekly (int s)
 { }
 
 bool
-ConditionMonthly::match (ColumnList&, const Bioclimate&, const Time& t) const
+ConditionMonthly::match (ColumnList&, const Weather&, const Time& t) const
 {
     // BUG:  Behave strangely around new year.
     return t.hour () == 0 && (t.yday () % step) == 0;
@@ -91,7 +91,7 @@ ConditionMonthly::ConditionMonthly (int s)
 { }
 
 bool
-ConditionYearly::match (ColumnList&, const Bioclimate&, const Time& t) const
+ConditionYearly::match (ColumnList&, const Weather&, const Time& t) const
 {
     // BUG:  Behave strangely around new year.
     return t.hour () == 0 && (t.yday () % step) == 0;
