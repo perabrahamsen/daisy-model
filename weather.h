@@ -24,7 +24,7 @@ public:
 protected:
   void distribute (double precipitation);
 
-  // Communication with Biocliamte.
+  // Communication with Bioclimate.
 public:
   virtual double AirTemperature () const = 0;
   virtual double GlobalRadiation () const = 0;
@@ -33,6 +33,9 @@ public:
   virtual double Rain () const;
   virtual double Snow () const;
   virtual IM Deposit () const; // [g [stuff] /cm²/h]
+  virtual double cloudiness () const; // [0-1]
+  virtual double vaporpressure () const; // [Pa]
+  virtual double wind () const;	// [m/s]
 
   // Light distribution.
   double DayLength (const Time& time) const;

@@ -38,7 +38,7 @@ struct ParserFile::Implementation
   int line;
   int column;
   const Syntax& global_syntax_table;
-  Implementation (const Syntax&, string);
+  Implementation (const Syntax&, const string&);
   ~Implementation ();
 };
 
@@ -142,20 +142,34 @@ double
 ParserFile::Implementation::get_number ()
 {
   skip ();
-  // Cheat... This doesn't give us the right error handling.
-  double d;
-  in >> d;
-  return d;
+  string str;
+  int c = peek ();
+
+  while (isdigit (c) 
+	 || c == '.' || c == '-' || c == '+' || 
+	 c == 'e' || c == 'E')
+    {
+      str += static_cast<char> (c);
+      get ();
+      c = peek ();
+    }
+  return atof (str.c_str ());
 }
 
 int
 ParserFile::Implementation::get_integer ()
 {
   skip ();
-  // Cheat... This doesn't give us the right error handling.
-  int i;
-  in >> i;
-  return i;
+  string str;
+  int c = peek ();
+
+  while (isdigit (c) || c == '-' || c == '+')
+    {
+      str += static_cast<char> (c);
+      get ();
+      c = peek ();
+    }
+  return atoi (str.c_str ());
 }
 
 void 
@@ -588,7 +602,8 @@ ParserFile::Implementation::get_time ()
   return Time (-999, 1, 1, 0);
 }
 
-ParserFile::Implementation::Implementation (const Syntax& syntax, string name)
+ParserFile::Implementation::Implementation (const Syntax& syntax, 
+					    const string& name)
   : in (Options::find_file (name)),
     file (name),
     line (1),
@@ -614,7 +629,7 @@ ParserFile::load (AttributeList& alist)
   impl.eof ();
 }
 
-ParserFile::ParserFile (const Syntax& syntax, string name)
+ParserFile::ParserFile (const Syntax& syntax, const string& name)
   : impl (*new Implementation (syntax, name))
 {  }
 

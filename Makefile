@@ -86,7 +86,7 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
+	COMPILE = /pack/egcs-1.0.2/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
 	#COMPILE = /pack/gcc-2.8.1/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 
@@ -169,7 +169,7 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	transport_none.C transport_convection.C adsorbtion_vS_S.C \
 	adsorbtion_none.C tortuosity_M_Q.C tortuosity_linear.C \
 	adsorbtion_freundlich.C adsorbtion_linear.C adsorbtion_langmuir.C \
-	filter_checkpoint.C
+	filter_checkpoint.C bioclimate_std.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -328,7 +328,7 @@ depend: $(SOURCES)
 #
 daisy-src.zip:	$(TEXT)
 	rm -f daisy-src.zip
-	zip daisy-src.zip $(TEXT) daisy.ide
+	zip daisy-src.zip $(TEXT) daisy.ide tlink32.ini
 
 # Move it to ftp.
 #
@@ -520,10 +520,14 @@ adsorbtion_langmuir${OBJ}: adsorbtion_langmuir.C adsorbtion.h librarian.h \
  tortuosity.h geometry.h mathlib.h
 filter_checkpoint${OBJ}: filter_checkpoint.C filter.h librarian.h \
  library.h common.h alist.h syntax.h
+bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h library.h \
+ common.h alist.h syntax.h column.h surface.h uzmodel.h im.h weather.h \
+ crop.h csmp.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
+ snow.h log.h filter.h
 daisy${OBJ}: daisy.C daisy.h common.h weather.h librarian.h library.h \
  alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h log.h \
- filter.h parser.h am.h nitrification.h hydraulic.h crop.h column.h \
- harvest.h action.h condition.h
+ filter.h parser.h am.h nitrification.h bioclimate.h column.h \
+ hydraulic.h crop.h harvest.h action.h condition.h
 parser${OBJ}: parser.C parser.h common.h syntax.h alist.h library.h
 log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h
@@ -553,10 +557,8 @@ hydraulic${OBJ}: hydraulic.C hydraulic.h librarian.h library.h common.h \
 soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \
  syntax.h hydraulic.h tortuosity.h geometry.h mathlib.h
 mathlib${OBJ}: mathlib.C mathlib.h common.h
-bioclimate${OBJ}: bioclimate.C bioclimate.h column.h librarian.h library.h \
- common.h alist.h syntax.h surface.h uzmodel.h im.h weather.h crop.h \
- csmp.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h snow.h \
- log.h filter.h
+bioclimate${OBJ}: bioclimate.C bioclimate.h librarian.h library.h common.h \
+ alist.h syntax.h column.h
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
  common.h alist.h syntax.h im.h soil_water.h log.h filter.h am.h \
  mathlib.h

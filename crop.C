@@ -12,6 +12,22 @@ static Library* Crop_library = NULL;
 typedef map<string, Crop::constructor, less<string> > Crop_map_type;
 static Crop_map_type* Crop_constructors;
 
+double 
+Crop::water_stress () const
+{ assert (false); }
+
+double 
+Crop::nitrogen_stress () const
+{ assert (false); }
+
+double 
+Crop::rs_min () const
+{ assert (false); }
+
+double 
+Crop::rs_max () const
+{ assert (false); }
+
 const Library&
 Crop::library ()
 {

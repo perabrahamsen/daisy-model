@@ -21,7 +21,12 @@
 #include "harvest.h"
 #include "mathlib.h"
 
+// Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
+
+// Chemical constants affecting the crop.
+const double molWeightCH2O = 30.0; // [gCH2O/mol]
+const double molWeightCO2 = 44.0; // [gCO2/mol]
 
 class CropStandard : public Crop
 {
@@ -34,14 +39,18 @@ public:
 
   // Communication with Bioclimate.
 public:
-  double height () const;
+  double water_stress () const;	// [0-1] (1 = full production)
+  double nitrogen_stress () const; // [0-1] (0 = no production)
+  double rs_min () const;	// Minimum trasnpiration resistance.
+  double rs_max () const;	// Maximum trasnpiration resistance.
+  double height () const;	// Crop height [cm]
   double LAI () const;
   const CSMP& LAIvsH () const;
   double PARext () const;
   double PARref () const;
   double EPext () const;
-  double IntcpCap () const; // Interception Capacity.
-  double EpFac () const; // Convertion to potential evapotransp.
+  double IntcpCap () const;	// Interception Capacity.
+  double EpFac () const;	// Convertion to potential evapotransp.
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
 			    double EvapInterception);
@@ -109,11 +118,6 @@ public:
   ~CropStandard ();
 };
 
-// Chemical constants affecting the crop.
-
-const double molWeightCH2O = 30.0; // [gCH2O/mol]
-const double molWeightCO2 = 44.0; // [gCO2/mol]
-
 typedef void (*CropFun)(const Bioclimate&, CropStandard&);
 
 struct CropStandard::Parameters
@@ -125,10 +129,12 @@ struct CropStandard::Parameters
     double DSRate1;		// Development rate [C-1 or d-1],
     // the vegetative stage
     double DSRate2;		// Development rate [C-1 or d-1],
-    // the reproductive stage
-    const CSMP& TempEff1;   // Temperature effect, vegetative stage
-    const CSMP& TempEff2;   // Temperature effect, reproductive stage
-    const CSMP& PhotEff1;   // Ptotoperiode effect, vegetative stage
+				// the reproductive stage
+    const CSMP& TempEff1;	// Temperature effect, vegetative stage
+    const CSMP& TempEff2;	// Temperature effect, reproductive stage
+    const CSMP& PhotEff1;	// Ptotoperiode effect, vegetative stage
+    // defined limit 
+    double defined_until_ds;	// Model invalid after this DS.
   private:
     friend struct CropStandard::Parameters;
     DevelPar (const AttributeList&);
@@ -162,6 +168,8 @@ struct CropStandard::Parameters
     double PARref;		// PAR reflectance
     double PARext;		// PAR extinction coefficient
     double EPext;		// EP extinction coefficient
+    double rs_max;		// max transpiration resistance
+    double rs_min;		// min transpiration resistance
   private:
     friend struct CropStandard::Parameters;
     CanopyPar (const AttributeList&);
@@ -299,6 +307,7 @@ struct CropStandard::Variables
     // [gN/cm³/h]
     double h_x;			// Root extraction at surface.
     double water_stress;	// Fraction of requested water we got.
+    double nitrogen_stress;	// Fraction of requested nitrogen we got.
     double Ept;			// Potential evapotranspiration.
   private:
     friend struct CropStandard::Variables;
@@ -380,7 +389,8 @@ CropStandard::Parameters::DevelPar::DevelPar (const AttributeList& vl)
     DSRate2 (vl.number ("DSRate2")),
     TempEff1 (vl.csmp ("TempEff1")),
     TempEff2 (vl.csmp ("TempEff2")),
-    PhotEff1 (vl.csmp ("PhotEff1"))
+    PhotEff1 (vl.csmp ("PhotEff1")),
+    defined_until_ds (vl.number ("defined_until_ds"))
 { }
 
 CropStandard::Parameters::VernalPar::VernalPar (const AttributeList& vl)
@@ -407,7 +417,9 @@ CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
     LAIDist1 (vl.number_sequence ("LAIDist1")),
     PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
-    EPext (vl.number ("EPext"))
+    EPext (vl.number ("EPext")),
+    rs_max (vl.number ("rs_max")),
+    rs_min (vl.number ("rs_min"))
 { }
 
 CropStandard::Parameters::RootPar::RootPar (const AttributeList& vl)
@@ -556,6 +568,7 @@ CropStandard::Variables::RecRootSys::RecRootSys (const Parameters& par,
     NO3Extraction (vl.number_sequence ("NO3Extraction")),
     h_x (vl.number ("h_x")),
     water_stress (1.0),
+    nitrogen_stress (1.0),
     Ept (0.0)
 { 
   if (layers > 0)
@@ -582,6 +595,7 @@ CropStandard::Variables::RecRootSys::output (Log& log, Filter& filter) const
   log.output ("NO3Extraction", filter, NO3Extraction);
   log.output ("h_x", filter, h_x);
   log.output ("water_stress", filter, water_stress, true);
+  log.output ("nitrogen_stress", filter, nitrogen_stress, true);
   log.output ("Ept", filter, Ept, true);
   log.close();
 }
@@ -697,15 +711,19 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
 
-    // Canopy
+  // Canopy
   Syntax& Canopy = *new Syntax ();
   syntax.add ("Canopy", Canopy, Syntax::State);
+  AttributeList& vCanopy = *new AttributeList ();
+  alist.add ("Canopy", vCanopy);
 
   // CropPar
 
   // DevelPar
   Syntax& Devel = *new Syntax ();
   syntax.add ("Devel", Devel, Syntax::Const);
+  AttributeList& vDevel = *new AttributeList ();
+  alist.add ("Devel", vDevel);
 
   Devel.add ("EmrTSum", Syntax::Number, Syntax::Const);
   Devel.add ("DS_Emr", Syntax::Number, Syntax::Const);
@@ -714,6 +732,8 @@ CropStandardSyntax::CropStandardSyntax ()
   Devel.add ("TempEff1", Syntax::CSMP, Syntax::Const);
   Devel.add ("TempEff2", Syntax::CSMP, Syntax::Const);
   Devel.add ("PhotEff1", Syntax::CSMP, Syntax::Const);
+  Devel.add ("defined_until_ds", Syntax::Number, Syntax::Const);
+  vDevel.add ("defined_until_ds", 2.0);
     
   // VernalPar
   Syntax& Vernal = *new Syntax ();
@@ -743,6 +763,10 @@ CropStandardSyntax::CropStandardSyntax ()
   Canopy.add ("PARref", Syntax::Number, Syntax::Const);
   Canopy.add ("PARext", Syntax::Number, Syntax::Const);
   Canopy.add ("EPext", Syntax::Number, Syntax::Const);
+  Canopy.add ("rs_max", Syntax::Number, Syntax::Const);
+  vCanopy.add ("rs_max", 1.0e5);
+  Canopy.add ("rs_min", Syntax::Number, Syntax::Const);
+  vCanopy.add ("rs_min", 0.0);
 
   // RootPar
   Syntax& Root = *new Syntax ();
@@ -863,9 +887,6 @@ CropStandardSyntax::CropStandardSyntax ()
   Phenology.add ("Vern", Syntax::Number, Syntax::Optional);
 
   // Canopy
-  AttributeList& vCanopy = *new AttributeList ();
-  alist.add ("Canopy", vCanopy);
-
   Canopy.add ("Height", Syntax::Number, Syntax::State);
   vCanopy.add ("Height", 0.0);
   Canopy.add ("LAI", Syntax::Number, Syntax::State);
@@ -896,6 +917,7 @@ CropStandardSyntax::CropStandardSyntax ()
   RootSys.add ("h_x", Syntax::Number, Syntax::State);
   vRootSys.add ("h_x", 0.0);
   RootSys.add ("water_stress", Syntax::Number, Syntax::LogOnly);
+  RootSys.add ("nitrogen_stress", Syntax::Number, Syntax::LogOnly);
   RootSys.add ("Ept", Syntax::Number, Syntax::LogOnly);
 
   // Prod
@@ -953,53 +975,41 @@ CropStandardSyntax::CropStandardSyntax ()
   Crop::add_type ("default", alist, syntax, &CropStandard::make);
 }
 
-double
-CropStandard::height () const
-{
-  return var.Canopy.Height;
-}
+double CropStandard::water_stress () const // [0-1] (1 = full production)
+{ return var.RootSys.water_stress; }
 
-double
-CropStandard::LAI () const
-{
-  return var.Canopy.LAI;
-}
+double CropStandard::nitrogen_stress () const // [0-1] (0 = no production)
+{ return var.RootSys.nitrogen_stress; }
 
-const CSMP&
-CropStandard::LAIvsH () const
-{
-  return var.Canopy.LAIvsH;
-}
+double CropStandard::rs_min () const // Minimum trasnpiration resistance.
+{ return par.Canopy.rs_min; }
 
-double
-CropStandard::PARext () const
-{
-  return par.Canopy.PARext;
-}
+double CropStandard::rs_max () const // Maximum trasnpiration resistance.
+{ return par.Canopy.rs_max; }
 
-double
-CropStandard::PARref () const
-{
-  return par.Canopy.PARref;
-}
+double CropStandard::height () const // Crop height [cm]
+{ return var.Canopy.Height; }
 
-double
-CropStandard::EPext () const
-{
-  return par.Canopy.EPext;
-}
+double CropStandard::LAI () const
+{ return var.Canopy.LAI; }
 
-double
-CropStandard::IntcpCap () const
-{
-  return par.IntcpCap;
-}
+const CSMP& CropStandard::LAIvsH () const
+{ return var.Canopy.LAIvsH; }
 
-double
-CropStandard::EpFac () const
-{
-  return par.EpFac;
-}
+double CropStandard::PARext () const
+{ return par.Canopy.PARext; }
+
+double CropStandard::PARref () const
+{ return par.Canopy.PARref; }
+
+double CropStandard::EPext () const
+{ return par.Canopy.EPext; }
+
+double CropStandard::IntcpCap () const // Interception Capacity.
+{ return par.IntcpCap; }
+
+double CropStandard::EpFac () const // Convertion to potential evapotransp.
+{ return par.EpFac; }
 
 double
 CropStandard::SoluteUptake (const Soil& soil,
@@ -1130,6 +1140,8 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
       if (Phenology.DS > 2)
 	Phenology.DS = 2.0;
     }
+
+  assert (Phenology.DS <= Devel.defined_until_ds);
 }
 double 
 CropStandard::CropHeight ()
@@ -1256,16 +1268,21 @@ CropStandard::CanopyStructure ()
 	      double y1 = sqrt (2 * Need / (z1 - z2 - z0 + 1));
 			    
 	      // Check the results.
-	      assert (fabs (Need - (1 - x0) * y1 / 2) < 0.0001);
-	      assert (fabs ((1 - x1) / y1 - (1 - z2)) < 0.0001);
-	      assert (fabs ((x1 - x0) / y1 - (z1 - z0)) < 0.0001);
+	      assert (approximate (Need, (1 - x0) * y1 / 2));
+	      assert (approximate ((1 - x1) / y1, (1 - z2)));
+	      assert (approximate ((x1 - x0) / y1, (z1 - z0)));
 
 	      // Insert this special distribution, and return.
 	      CSMP LADvsH;
+#ifdef CANOPY_TOP_IS_ZERO
 	      LADvsH.add (x0 * Canopy.Height, 0.0);
-	      LADvsH.add (x1 * Canopy.Height, 
-			  y1 * Canopy.LADm);
+	      LADvsH.add (x1 * Canopy.Height, y1 * Canopy.LADm);
 	      LADvsH.add (     Canopy.Height, 0.0);
+#else
+	      LADvsH.add (0.0,                        0.0);
+	      LADvsH.add ((1.0 - x1) * Canopy.Height, y1 * Canopy.LADm);
+	      LADvsH.add ((1.0 - x0) * Canopy.Height, 0.0);
+#endif
 	      Canopy.LAIvsH = LADvsH.integrate_stupidly ();
 	      return;
 	    }
@@ -1277,10 +1294,17 @@ CropStandard::CanopyStructure ()
     
   // Create CSMP for standard "z0, z1, z2" distribution.
   CSMP LADvsH;
+#ifdef CANOPY_TOP_IS_ZERO
   LADvsH.add (z0 * Canopy.Height, 0.0);
   LADvsH.add (z1 * Canopy.Height, Canopy.LADm);
   LADvsH.add (z2 * Canopy.Height, Canopy.LADm);
   LADvsH.add (     Canopy.Height, 0.0);
+#else
+  LADvsH.add (0.0                       , 0.0);
+  LADvsH.add ((1.0 - z2) * Canopy.Height, Canopy.LADm);
+  LADvsH.add ((1.0 - z1) * Canopy.Height, Canopy.LADm);
+  LADvsH.add ((1.0 - z0) * Canopy.Height, 0.0);
+#endif
   Canopy.LAIvsH = LADvsH.integrate_stupidly ();
 }
 
@@ -1614,21 +1638,28 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   assert (approximate (var.Canopy.LAI, bioclimate.LAI ()));
   assert (approximate (LAIvsH (var.Canopy.Height), var.Canopy.LAI));
 
-  double prevLA = 0.0;		// LAI below the current leaf layer.
-  double Ass = 0.0;	// Assimilate produced by canopy photosynthesis
+ // LAI below the current leaf layer.
+  double prevLA = LAIvsH (bioclimate.height (0));
+  // Assimilate produced by canopy photosynthesis
+  double Ass = 0.0;
+  // Accumulated LAI, for testing purposes.
   double accLAI =0.0;
+  // Number of computational intervals in the canopy.
   const int No = bioclimate.NumberOfIntervals ();
+  // LAI in each interval.
   const double dLAI = bioclimate.LAI () / No;
   for (int i = 0; i < No; i++)
     {
-      const double height = bioclimate.height (i);
+      const double height = bioclimate.height (i+1);
+      assert (height < bioclimate.height (i));
       // Leaf Area index for a given leaf layer
-      const double LA = LAIvsH (height) - prevLA;
-      prevLA = LAIvsH (height);
-      accLAI += LA;
-
+      const double LA = prevLA - LAIvsH (height);
+      assert (LA >= 0.0);
       if (LA > 0)
 	{
+	  prevLA = LAIvsH (height);
+	  accLAI += LA;
+
 	  const double dPAR
 	    = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / dLAI;
 
@@ -1721,11 +1752,12 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   RMLeaf = max (0.0, RMLeaf - CrpAux.PotCanopyAss + CrpAux.CanopyAss);
   const double RM = RMLeaf + RMStem + RMSOrg + RMRoot;
+
+  double& Stress = var.RootSys.nitrogen_stress;
     
   if (CrpAux.CanopyAss >= RM)
     {
       const double AssG = CrpAux.CanopyAss - RM;
-      double Stress;
       if (par.enable_N_stress)
 	Stress 
 	  = max (0.0, min (1.0, ((vProd.NCrop - CrpAux.NfNCnt) 
@@ -1742,6 +1774,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
     }
   else
     {
+      Stress = 1.0;
       double AssG;
 
       if (RMLeaf <= CrpAux.CanopyAss)

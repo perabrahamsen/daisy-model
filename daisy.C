@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "am.h"
 #include "nitrification.h"
+#include "bioclimate.h"
 #include "hydraulic.h"
 #include "crop.h"
 #include "column.h"
@@ -154,6 +155,7 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   Librarian<Hydraulic>::add_library (syntax, "defhydraulic");
   Librarian<Nitrification>::add_library (syntax, "defnitrification");
   Librarian<Filter>::add_library (syntax, "deffilter");
+  Librarian<Bioclimate>::add_library (syntax, "defbioclimate");
 
   // The actual data.
   syntax.add ("output", Librarian<Log>::library (),

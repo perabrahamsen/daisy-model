@@ -109,11 +109,21 @@ Weather::Deposit() const
   return result;
 }
 
+double 
+Weather::cloudiness () const
+{ return 0.0; }
+
+double 
+Weather::vaporpressure () const
+{ return 0.0; }
+
+double 
+Weather::wind () const
+{ return 0.0; }
+
 void 
 Weather::put_precipitation (double prec)
-{ 
-  distribute (prec / 24.0);
-}
+{ distribute (prec / 24.0); }
 
 void 
 Weather::put_air_temperature (double)

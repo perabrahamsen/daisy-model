@@ -22,7 +22,7 @@ private:
   static Parser& make (const Syntax& syntax, const AttributeList&);
   ParserFile (const Syntax& syntax, const AttributeList&);
 public:
-  ParserFile (const Syntax& syntax, string n);
+  ParserFile (const Syntax& syntax, const string& n);
   ~ParserFile ();
 };
 

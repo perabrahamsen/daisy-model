@@ -1,4 +1,51 @@
+1998-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.007 released.
+
+1998-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (BioclimateStandard): Ditto.
+	(RadiationDistribution): Ditto.
+
+	* crop_std.C (CanopyStructure): Make LAIvsH start from the ground
+	instead of the top.
+	(CanopyPhotosynthesis): Adjust.
+
+	* printer_file.C: Include <algorithm>.
+
+1998-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C, weather.h (cloudiness, vaporpressure, wind): New
+	functions. 
+
+	* parser_file.C, parser_file.h (class ParserFile): Pass strings by
+	reference.
+
+	* crop_std.C (var.RootSys.nitrogen_stress): New log variable.
+	(NetProduction): Use it.
+	(par.Devel.defined_until_ds): New parameter.
+	(CropHeight): Use it.
+	(par.Canopy.rs_min, par.Canopy.rs_max): New parameters.
+
+	* crop.C, crop.h, crop_std.C (water_stress, nitrogen_stress,
+	rs_min, rs_max): New functions. 
+
+	* lib/sbarley.dai: Fixed parameters.
+
+	* lib/grass.dai: New file.
+	* lib/wwheat.dai: New file.
+	* lib/crop.dai: New file.
+	* lib/Makefile (DAISY): Added.
+
 1998-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate.C, bioclimate.h: Converted to library.
+	* bioclimate_std.C: New file.
+	* Makefile (COMPONENTS): Add it.
+	* column_std.C: Update caller.
+	* daisy.C (load_syntax): Add it.
+
+	* Makefile (daisy-src.zip): Added `tlink32.ini'.
 
 	* Version 0.006 released.
 

@@ -3,8 +3,7 @@
 #ifndef BIOCLIMATE_H
 #define BIOCLIMATE_H
 
-#include <string>
-#include <vector>
+#include "librarian.h"
 #include "column.h"
 
 struct Surface;
@@ -20,35 +19,39 @@ struct Filter;
 
 class Bioclimate
 { 
-  struct Implementation;
-  Implementation& impl;
+  // Content.
 public:
-  // Simulation
-  void tick (Surface&, const Weather&, const Time&, 
-	     const CropList&, 
-	     const Soil&, SoilWater&, const SoilHeat&);
-  void output (Log&, Filter&) const;
+  const string name;
+
+  // Simulation.
+public:
+  virtual void tick (Surface&, const Weather&, const Time&, 
+		     const CropList&, 
+		     const Soil&, SoilWater&, const SoilHeat&) = 0;
+  virtual void output (Log&, Filter&) const = 0;
 
   // Canopy.
 public:
-  int NumberOfIntervals () const;
-  double height (int) const;
-  double PAR (int) const;
-  double LAI () const;
-  double AirTemperature () const;
-  double DayLength () const;
-  double DailyRadiation () const;
+  virtual int NumberOfIntervals () const = 0;
+  virtual double height (int) const = 0;
+  virtual double PAR (int) const = 0;
+  virtual double LAI () const = 0;
+  virtual double AirTemperature () const = 0;
+  virtual double DayLength () const = 0;
+  virtual double DailyRadiation () const = 0;
 
   // Manager.
 public:
-  void irrigate (double flux, double temp, 
-		 Column::irrigation_from from);
+  virtual void irrigate (double flux, double temp, 
+			 Column::irrigation_from from) = 0;
   
   // Create.
+protected:
+  Bioclimate (const string& name);
 public:
-  static void load_syntax (Syntax&, AttributeList&);
-  Bioclimate (const AttributeList&);
-  ~Bioclimate ();
+  virtual ~Bioclimate ();
 };
+
+static Librarian<Bioclimate> Bioclimate_init ("bioclimate");
 
 #endif BIOCLIMATE_H

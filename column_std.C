@@ -29,7 +29,7 @@ class ColumnStandard : public Column
   // Content.
 private:
   CropList crops;
-  Bioclimate bioclimate;
+  Bioclimate& bioclimate;
   Surface surface;
   Soil soil;
   SoilWater soil_water;
@@ -296,7 +296,7 @@ void
 ColumnStandard::output (Log& log, Filter& filter) const
 {
   log.open_geometry (soil);
-  output_submodule (bioclimate, "Bioclimate", log, filter);
+  output_derived (bioclimate, "Bioclimate", log, filter);
   output_submodule (surface, "Surface", log, filter);
 #if 0
   output_submodule (soil, "Soil", log, filter);
@@ -340,7 +340,7 @@ ColumnStandard::ColumnStandard (const ColumnStandard& column,
 ColumnStandard::ColumnStandard (const AttributeList& al)
   : Column (al.name ("type")),
     crops (al.alist_sequence ("crops")),
-    bioclimate (al.alist ("Bioclimate")),
+    bioclimate (Librarian<Bioclimate>::create (al.alist ("Bioclimate"))),
     surface (al.alist ("Surface")),
     soil (al.alist ("Soil")),
     soil_water (al.alist ("SoilWater")),
@@ -369,7 +369,6 @@ ColumnStandard::~ColumnStandard ()
 }
 
 #ifdef BORLAND_TEMPLATES
-template class add_submodule<Bioclimate>;
 template class add_submodule<Surface>;
 template class add_submodule<Soil>;
 template class add_submodule<SoilWater>;
@@ -396,7 +395,8 @@ static struct ColumnStandardSyntax
     syntax.add ("description", Syntax::String, Syntax::Optional); 
     syntax.add ("crops", Crop::library (), Syntax::State, Syntax::Sequence);
     alist.add ("crops", *new vector<AttributeList*>);
-    add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
+    syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
+		Syntax::State);
     add_submodule<Surface> ("Surface", syntax, alist);
     add_submodule<Soil> ("Soil", syntax, alist);
     add_submodule<SoilWater> ("SoilWater", syntax, alist);

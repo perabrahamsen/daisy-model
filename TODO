@@ -1,3 +1,7 @@
+ Bioclimate/crop 
+
+* Condition: ds_after ("grass", 0.8)
+
 * Implementer SWAT interface
 
 * Standard filtre
@@ -19,6 +23,10 @@
 * Try out gtk--
 
 * Få "union" valeret AList til at virke.
+
+* Implement in parser and pretty printer:
+
+	(define LIBRARY ELEMENT SUPER (NAME VALUE)...)
 
 * Remove exception handling.
 
