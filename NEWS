@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.10
+
+** Fixed mass balance error in mineralization.
+
 * 2.09
 
 ** There is now an index of logable variables in the reference manual.

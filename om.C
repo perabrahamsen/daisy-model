@@ -393,17 +393,22 @@ OM::tick (unsigned int end, const double* abiotic_factor,
   const unsigned int size = min (C.size (), end);
   assert (C_per_N.size () >= size);
 
-  for (unsigned int i = 0; i < size; i++)
+  if (maintenance != 0.0)
     {
-      assert (C[i] >= 0.0);
-      // assert (N_soil * 1.001 >= N_used);
-      // Maintenance.
-      const double C_use = C[i] * maintenance * abiotic_factor[i];
-      CO2[i] += C_use;
-      C[i] -= C_use;
-      N_used[i] -= C_use / C_per_N[i];
-      // assert (N_soil * 1.001 >= N_used);
+      // SMB maintenance.
+      for (unsigned int i = 0; i < size; i++)
+	{
+	  assert (C[i] >= 0.0);
+	  // assert (N_soil * 1.001 >= N_used);
+	  // Maintenance.
+	  const double C_use = C[i] * maintenance * abiotic_factor[i];
+	  CO2[i] += C_use;
+	  C[i] -= C_use;
+	  N_used[i] -= C_use / C_per_N[i];
+	  // assert (N_soil * 1.001 >= N_used);
+	}
     }
+
   assert (fractions.size () == smb.size () + som.size ());
   // Distribute to all biological pools.
   const unsigned int smb_size = smb.size ();
@@ -435,7 +440,9 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 {
   const unsigned int size = min (C.size (), end);
   assert (C_per_N.size () >= size);
-  
+
+  assert (maintenance == 0.0);
+#if 0
   // Maintenance.
   for (unsigned int i = 0; i < size; i++)
     {
@@ -448,6 +455,7 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	}
     }
   assert (fractions.size () == smb.size () + 1);
+#endif
   
   // Distribute to all biological pools.
   const unsigned int smb_size = smb.size ();
@@ -464,17 +472,20 @@ OM::tick (unsigned int end, const double* abiotic_factor,
   for (unsigned int i = 0; i < size; i++)
     {
       const double rate = min (factor * abiotic_factor[i], 0.1);
-      som_N[i] += C[i] * rate / C_per_N[i];
-      som_C[i] += C[i] * rate;
-      C[i] *= (1.0 - rate);
-      // assert (N_soil * 1.001 >= N_used);
-      
+      const double C_use = C[i] * rate;
+      const double N_use = C_use / C_per_N[i];
+      som_N[i] += N_use;
+      som_C[i] += C_use;
+      C[i] -= C_use;
+      N_used[i] -= N_use;
+#if 0      
       if (C[i] < 1e-9)
 	{
 	  assert (C[i] > -1e9);
 	  som_C[i] += C[i];
 	  C[i] = 0.0;
 	}
+#endif
       assert (C[i] >= 0.0);
       assert (som_C[i] >= 0.0);
       assert (som_N[i] >= 0.0);

@@ -27,6 +27,7 @@
 #include "treelog.h"
 #include "mathlib.h"
 #include "message.h"
+#include "check.h"
 
 class GroundwaterPipe : public Groundwater
 {
@@ -647,26 +648,27 @@ static struct GroundwaterPipeSyntax
       alist.add ("description", "Groundwater for pipe (tile) drained soil.");
       Groundwater::load_syntax (syntax, alist);
 
-      syntax.add ("L", "cm", Syntax::Const,
+      syntax.add ("L", "cm", Check::positive (), Syntax::Const,
 		  "Distance between pipes.");
       alist.add ("L", 1800.0);
-      syntax.add ("x", "cm", Syntax::OptionalConst,
+      syntax.add ("x", "cm", Check::positive (), Syntax::OptionalConst,
 		  "Horizontal distance to nearest pipe.\n\
 By default, this is 1/2 L.");
-      syntax.add ("pipe_position", "cm", Syntax::Const,
+      syntax.add ("pipe_position", "cm", Check::negative (), Syntax::Const,
 		  "Height pipes are placed in the soil (a negative number).");
       alist.add ("pipe_position", -110.0);
-      syntax.add ("K_aquitard", "cm/h", Syntax::Const,
+      syntax.add ("K_aquitard", "cm/h", Check::non_negative (), Syntax::Const,
 		  "Conductivity of the aquitard.");
       alist.add ("K_aquitard", 1.0E-5);
-      syntax.add ("Z_aquitard", "cm", Syntax::Const,
+      syntax.add ("Z_aquitard", "cm", Check::positive (), Syntax::Const,
 		  "Height of the aquitard.");
       alist.add ("Z_aquitard", 200.0);
-      syntax.add ("h_aquifer", "cm", Syntax::OptionalConst,
+      syntax.add ("h_aquifer", "cm", Check::positive (), Syntax::OptionalConst,
 		  "Pressure potential in the aquifer below the aquitard.\n\
 By default. this is Z_aquitard.");
 
-      syntax.add ("height", "cm", Syntax::OptionalState,
+      syntax.add ("height", "cm", Check::non_positive (), 
+		  Syntax::OptionalState,
 		  "Current groundwater level (a negative number).");
       syntax.add ("DrainFlow", "cm/h", Syntax::LogOnly,
 		  "Drain flow to pipes.");

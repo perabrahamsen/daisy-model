@@ -1,4 +1,19 @@
+2002-02-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.10 released.
+
+2002-02-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (tick): Fixed mass balance error.
+
+	* organic_matter.C (total_N, total_C): New functions.
+	(tick): Added mass balance check.
+
 2002-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* macro_std.C (MacroStandardSyntax): Added checks.
+
+	* groundwater_pipe.C (GroundwaterPipeSyntax): Added checks.
 
 	* Version 2.09 released.
 

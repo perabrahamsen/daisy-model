@@ -84,6 +84,8 @@ struct OrganicMatter::Implementation
 
   // Utilities.
   static bool om_compare (const OM* a, const OM* b);
+  double total_N (const Geometry& ) const;
+  double total_C (const Geometry& ) const;
 
   // Simulation.
   void add (AM& om)
@@ -220,6 +222,35 @@ OrganicMatter::Implementation::om_compare (const OM* a, const OM* b)
     < (b->C_per_N.size () == 0 ? b->initial_C_per_N : b->C_per_N[0]);
 }
 
+double 
+OrganicMatter::Implementation::total_N (const Geometry& geometry) const
+{
+  double result = geometry.total (buffer.N);
+
+  for (unsigned int i = 0; i < smb.size (); i++)
+    result += smb[i]->total_N (geometry);
+  for (unsigned int i = 0; i < som.size (); i++)
+    result += som[i]->total_N (geometry);
+  for (int i = 0; i < am.size (); i++)
+    result += am[i]->total_N (geometry);
+  
+  return result;
+}
+
+double 
+OrganicMatter::Implementation::total_C (const Geometry& geometry) const
+{
+  double result = geometry.total (buffer.C);
+
+  for (unsigned int i = 0; i < smb.size (); i++)
+    result += smb[i]->total_C (geometry);
+  for (unsigned int i = 0; i < som.size (); i++)
+    result += som[i]->total_C (geometry);
+  for (int i = 0; i < am.size (); i++)
+    result += am[i]->total_C (geometry);
+  
+  return result;
+}
 
 double 
 OrganicMatter::Implementation::heat_turnover_factor (double T) const
@@ -394,6 +425,9 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 				     SoilNO3& soil_NO3,
 				     SoilNH4& soil_NH4)
 {
+  const double old_N = total_N (soil);
+  const double old_C = total_C (soil);
+
   // Create an array of all AM dk:puljer, sorted by their C_per_N.
   const int all_am_size = am.size ();
   vector<OM*> added;
@@ -474,19 +508,22 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     added[j]->tick (size, &abiotic_factor[0], &N_soil[0], &N_used[0], &CO2[0],
 		    smb, &buffer.C[0], &buffer.N[0]);
 
+  // Update buffer.
+  for (unsigned int i = 0; i < size; i++)
+      buffer.tick (i, abiotic_factor[i], N_soil[i], N_used[i], som);
+
+  // Update source.
   for (unsigned int i = 0; i < size; i++)
     {
       const double NH4 = soil_NH4.M_left (i) * K_NH4;
-
-      buffer.tick (i, abiotic_factor[i], N_soil[i], N_used[i], som);
-
+#if 0
       if (N_used[i] > N_soil[i])
 	{
-	  // CERR << "\nBUG: Adding " << N_used - N_soil << " mystery N\n";
+	  CERR << "\nBUG: Adding " << N_used[i] - N_soil[i] << " mystery N\n";
 	  N_used[i] = N_soil[i];
 	}
+#endif
 
-      // Update soil solutes.
       if (N_used[i] > NH4)
 	{
 	  NH4_source[i] = -NH4 / dt;
@@ -498,7 +535,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 	  NO3_source[i] = 0.0;
 	}
     }
-
+  
   // Update soil solutes.
   soil_NO3.add_to_source (NO3_source);
   soil_NH4.add_to_source (NH4_source);
@@ -509,6 +546,30 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   // Tillage time.
   for (unsigned int i = 0; i < size; i++)
     tillage_age[i] += 1.0/24.0;
+
+  // Mass balance.
+  const double new_N = total_N (soil);
+  const double delta_N = old_N - new_N;
+  const double N_source = soil.total (NO3_source) + soil.total (NH4_source);
+  if (!approximate (delta_N, N_source) && !approximate (old_N, new_N, 1e-10))
+    {
+      CERR << "BUG: OrganicMatter: delta_N != NO3 + NH4 [g N/cm^2]\n"
+	   << delta_N << " != " << soil.total (NO3_source)
+	   << " + " << soil.total (NH4_source);
+      if (N_source != 0.0)
+	CERR << " (error " << fabs (delta_N / N_source - 1.0) * 100.0 << "%)";
+      CERR << "\n";    
+    }
+  const double new_C = total_C (soil);
+  const double delta_C = old_C - new_C;
+  const double C_source = soil.total (CO2) + top_CO2;
+  
+  if (!approximate (delta_C, C_source) && !approximate (old_C, new_C, 1e-10))
+    {
+      CERR << "BUG: OrganicMatter: delta_C != soil_CO2 + top_CO2 [g C/cm^2]\n"
+	   << delta_C << " != " 
+	   << soil.total (CO2) << " + " << top_CO2 << "\n";
+    }
 }
       
 void 

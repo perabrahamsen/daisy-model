@@ -27,6 +27,7 @@
 #include "log.h"
 #include "uzmodel.h"
 #include "message.h"
+#include "check.h"
 
 struct MacroStandard : public Macro
 {
@@ -255,9 +256,9 @@ and then immediately emptied down to 'pressure_end'.  The water entering\n\
 the macropore is distributed in soil below as a source term, according\n\
 to the 'distribution' parameter.");
 
-      syntax.add ("height_start", "cm", Syntax::Const, 
+      syntax.add ("height_start", "cm", Check::non_positive (), Syntax::Const, 
 		  "Macropores starts at this depth (a negative number)");
-      syntax.add ("height_end", "cm", Syntax::Const, 
+      syntax.add ("height_end", "cm", Check::non_positive (), Syntax::Const, 
 		  "Macropores ends at this depth (a negative number)");
       syntax.add ("distribution", "cm", Syntax::Fraction (), Syntax::Const, "\
 Distribution of macropore end points as a function of height.\n\
@@ -271,7 +272,7 @@ where all macropores is assumed to start at the top.");
 		  "Pressure after pref.flow has been init");
       syntax.add ("S_p", "h-1", Syntax::LogOnly,
 		  "Macropore sink term.");
-      syntax.add ("pond_max", "mm", Syntax::Const, "\
+      syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
 Maximum height of ponding before spilling into macropores.\n\
 After macropores are activated pond will havethis height.");
       alist.add ("pond_max", 0.5);
