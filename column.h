@@ -54,7 +54,7 @@ public:
 
   virtual bool check () const = 0;
   virtual bool check_am (const AttributeList& am) const = 0;
-  virtual void output (Log&, Filter&) const;
+  virtual void output (Log&) const;
 
   // Communication with external model.
   virtual unsigned int count_layers () const = 0; // Number of num. layers.

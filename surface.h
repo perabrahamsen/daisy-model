@@ -5,7 +5,6 @@
 struct IM;
 struct AttributeList;
 struct Log;
-struct Filter;
 struct SoilWater;
 struct Soil;
 
@@ -35,7 +34,7 @@ public:
   void fertilize (const IM&);
 
   // Simulation.
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   void tick (double PotSoilEvaporation, double Water, double temp,
 	     const Soil&, const SoilWater&);
 

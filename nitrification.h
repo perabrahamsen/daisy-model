@@ -23,7 +23,7 @@ public:
 public:
   virtual void tick (const Soil&, const SoilWater&, const SoilHeat&,
 		     SoilNO3&, SoilNH4&, const Groundwater&) = 0;
-  virtual void output (Log&, Filter&) const = 0;
+  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 protected:

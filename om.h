@@ -9,7 +9,6 @@
 class AttributeList;
 class Syntax;
 class Log;
-class Filter;
 class Geometry;
 
 class OM
@@ -36,7 +35,7 @@ private:
 
   // Simulation.
 public:
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
   void distribute (const Geometry&, const vector<double>& density);
   void swap (const Geometry&, double from, double middle, double to);

@@ -41,7 +41,7 @@ struct Snow::Implementation
   const double K_snow_factor;	// Factor related to thermal conductivity
 				// for snow water mix [W m^4 / Kg²]
 
-  void output (Log& log, Filter& filter) const;
+  void output (Log& log) const;
   void tick (const Soil& soil, const SoilWater& soil_water,
 	     const SoilHeat& soil_heat,
 	     double Si, double q_h, double Prain,
@@ -71,14 +71,14 @@ Snow::Implementation::Implementation (const AttributeList& al)
 { }
 
 void 
-Snow::Implementation::output (Log& log, Filter& filter) const
+Snow::Implementation::output (Log& log) const
 {
-  log.output ("EvapSnowPack", filter, EvapSnowPack, true);
-  log.output ("q_s", filter, q_s, true);
-  log.output ("Ssnow", filter, Ssnow);
-  log.output ("Swater", filter, Swater);
-  log.output ("age", filter, age);
-  log.output ("dZs", filter, dZs);
+  log.output ("EvapSnowPack", EvapSnowPack);
+  log.output ("q_s", q_s);
+  log.output ("Ssnow", Ssnow);
+  log.output ("Swater", Swater);
+  log.output ("age", age);
+  log.output ("dZs", dZs);
 }
 
 void
@@ -275,9 +275,9 @@ Snow::tick (const Soil& soil, const SoilWater& soil_water,
 }
 
 void 
-Snow::output (Log& log, Filter& filter) const
+Snow::output (Log& log) const
 {
-  impl.output (log, filter);
+  impl.output (log);
 }
 
 double 

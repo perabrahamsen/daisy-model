@@ -33,7 +33,7 @@ public:
     { return true; };
   bool accept_bottom (double)
     { return true; };
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Simulate.
 public:
@@ -140,10 +140,10 @@ UZlr::tick (const Soil& soil,
 }
 
 void
-UZlr::output (Log& log, Filter& filter) const
+UZlr::output (Log& log) const
 {
-  log.output ("q_up", filter, q_up, true);
-  log.output ("q_down", filter, q_down, true);
+  log.output ("q_up", q_up);
+  log.output ("q_down", q_down);
 }
 
 UZlr::UZlr (const AttributeList& al)

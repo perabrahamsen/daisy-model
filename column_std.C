@@ -18,7 +18,6 @@
 #include "syntax.h"
 #include "library.h"
 #include "log.h"
-#include "filter.h"
 #include "im.h"
 #include "am.h"
 #include "weather.h"
@@ -82,7 +81,7 @@ public:
   bool check () const;
   bool check_am (const AttributeList& am) const 
   { return organic_matter.check_am (am); }
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Communication with external model.
   unsigned int count_layers () const // Number of num. layers.
@@ -315,30 +314,30 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
 }
 
 void
-ColumnStandard::output (Log& log, Filter& filter) const
+ColumnStandard::output (Log& log) const
 {
-  Column::output (log, filter);
+  Column::output (log);
   log.open_geometry (soil);
-  output_derived (bioclimate, "Bioclimate", log, filter);
-  output_submodule (surface, "Surface", log, filter);
+  output_derived (bioclimate, "Bioclimate", log);
+  output_submodule (surface, "Surface", log);
 #if 0
-  output_submodule (soil, "Soil", log, filter);
+  output_submodule (soil, "Soil", log);
 #endif
-  output_submodule (soil_water, "SoilWater", log, filter);
-  output_submodule (soil_heat, "SoilHeat", log, filter);
-  output_submodule (soil_NH4, "SoilNH4", log, filter);
-  output_submodule (soil_NO3, "SoilNO3", log, filter);
-  output_submodule (soil_chemicals, "SoilChemicals", log, filter);
-  if (filter.check ("OrganicMatter"))
+  output_submodule (soil_water, "SoilWater", log);
+  output_submodule (soil_heat, "SoilHeat", log);
+  output_submodule (soil_NH4, "SoilNH4", log);
+  output_submodule (soil_NO3, "SoilNO3", log);
+  output_submodule (soil_chemicals, "SoilChemicals", log);
+  if (log.check ("OrganicMatter"))
     {
       log.open ("OrganicMatter");
-      organic_matter.output (log, filter.lookup ("OrganicMatter"), soil);
+      organic_matter.output (log, soil);
       log.close ();
     }
-  output_derived (nitrification, "Nitrification", log, filter);
-  output_submodule (denitrification, "Denitrification", log, filter);
-  output_derived (groundwater, "Groundwater", log, filter);
-  output_submodule (vegetation, "Vegetation", log, filter);
+  output_derived (nitrification, "Nitrification", log);
+  output_submodule (denitrification, "Denitrification", log);
+  output_derived (groundwater, "Groundwater", log);
+  output_submodule (vegetation, "Vegetation", log);
   log.close_geometry ();
 }
 

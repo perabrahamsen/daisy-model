@@ -15,8 +15,8 @@ struct ActionWait : public Action
   bool done (const Daisy& daisy) const
     { return condition.match (daisy); }
 
-  void output (Log& log, Filter& filter) const
-    { output_derived (condition, "condition", log, filter); }
+  void output (Log& log) const
+    { output_derived (condition, "condition", log); }
 
   ActionWait (const AttributeList& al)
     : Action (al),
@@ -51,10 +51,10 @@ struct ActionWaitDays : public Action
       return daisy.time >= end_time; 
     }
 
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     { 
       if (activated)
-	log.output ("end_time", filter, end_time);
+	log.output ("end_time", end_time);
     }
 
   ActionWaitDays (const AttributeList& al)

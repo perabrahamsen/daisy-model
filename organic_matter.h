@@ -8,7 +8,6 @@
 class AttributeList;
 class Syntax;
 class Log;
-class Filter;
 class AM;
 class Geometry;
 class Soil;
@@ -30,7 +29,7 @@ public:
   void monthly (const Geometry& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     const Groundwater&, SoilNO3&, SoilNH4&);
-  void output (Log&, Filter&, const Geometry&) const;
+  void output (Log&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
   void swap (const Geometry&, double from, double middle, double to);

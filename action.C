@@ -12,7 +12,7 @@ a farm.  Typically, but not necessarily, the high level management\n\
 strategies are build by combining low level management operations.";
 
 void 
-Action::output (Log&, Filter&) const
+Action::output (Log&) const
 { }
 
 bool

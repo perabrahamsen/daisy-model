@@ -19,6 +19,29 @@ struct Log::Implementation
   list<const Geometry*> geometries;
 };
 
+bool
+Log::check_derived (const string& name, const Library& library) const
+{
+  const string* type = &name;
+  bool looking = true;
+
+  while (looking && !check (*type))
+    {
+      if (library.check (*type))
+	{
+	  const AttributeList alist = library.lookup (*type);
+	  if (alist.check ("type"))
+	    type = &alist.name ("type");
+	  else
+	    looking = false;
+	}
+      else
+	looking = false;
+    }
+  return looking;
+}
+
+
 void 
 Log::open_alist (const string& name, const AttributeList&)
 { open (name); }

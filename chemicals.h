@@ -8,7 +8,6 @@
 #include <set>
 
 class Log;
-class Filter;
 class AttributeList;
 class Chemical;
 
@@ -38,7 +37,7 @@ public:
 
   // Simulation
 public:
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   void add (const string& chemical, double amount); // [g/m^2]
   void set_to (const string& chemical, double amount); // [g/m^2]
   double amount (const string& chemical) const; // [g/m^2]

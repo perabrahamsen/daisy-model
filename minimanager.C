@@ -15,7 +15,7 @@ void MiniManager::doIt (Daisy& d){
 }
 
 void
-MiniManager::output (Log&, Filter&) const
+MiniManager::output (Log&) const
 { }
 
 Event::EventType EventType(const string& s) {

@@ -10,7 +10,6 @@ class Library;
 class Syntax;
 class AttributeList;
 class Log;
-class Filter;
 
 class UZtop
 {
@@ -64,7 +63,7 @@ public:
 		     vector<double>& h,
 		     vector<double>& Theta,
 		     vector<double>& q) = 0;
-  virtual void output (Log&, Filter&) const = 0;
+  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 public:

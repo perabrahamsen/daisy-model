@@ -2052,57 +2052,57 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
 
          } // end tick()
 
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
   {                                                 // var 1-4: yy-mm-dd-hh
-    PT::output (log, filter); // log_only var
-    log.output ("netrad_brunt", filter, netrad_brunt, true);  	// var 5
-    log.output ("netlong_brunt", filter, netlong_brunt, true);  // var 6
-    log.output ("r_a", filter, r_a, true);                      // var 7
-    log.output ("r_astab", filter, r_astab, true);              // var 8
-    log.output ("r_aa", filter, r_aa, true);                    // var 9
-    log.output ("r_aa_dry", filter, r_aa_dry, true);            // var 10
-    log.output ("r_aa_pot", filter, r_aa_pot, true);            // var 11
-    log.output ("r_as", filter, r_as, true);                    // var 12
-    log.output ("r_ac", filter, r_ac, true);                    // var 13
-    log.output ("r_sc_1", filter, r_sc_1, true);                // var 14
-    log.output ("r_sc_2", filter, r_sc_2, true);                // var 15
-    log.output ("tskin", filter, tskin, true);                  // var 16
-    log.output ("tcan", filter, tcan, true);                    // var 17
-    log.output ("tleaf", filter, tleaf, true);                  // var 18
-    log.output ("e_c", filter, e_c, true);                      // var 19
-    log.output ("e_sl", filter, e_sl, true);                    // var 20
-    log.output ("tskin_pot", filter, tskin_pot, true);          // var 21
-    log.output ("tcan_pot", filter, tcan_pot, true);            // var 22
-    log.output ("tleaf_pot", filter, tleaf_pot, true);          // var 23
-    log.output ("e_c_pot", filter, e_c_pot, true);              // var 24
-    log.output ("e_sl_pot", filter, e_sl_pot, true);            // var 25
-    log.output ("ha", filter, ha, true);                        // var 26
-    log.output ("hl", filter, hl, true);                        // var 27
-    log.output ("hs", filter, hs, true);                        // var 28
-    log.output ("lea", filter, lea, true);                      // var 29
-    log.output ("lel", filter, lel, true);                      // var 30
-    log.output ("ha_pot", filter, ha_pot, true);                // var 31
-    log.output ("hl_pot", filter, hl_pot, true);                // var 32
-    log.output ("hs_pot", filter, hs_pot, true);                // var 33
-    log.output ("lea_pot", filter, lea_pot, true);              // var 34
-    log.output ("lel_pot", filter, lel_pot, true);              // var 35
-    log.output ("gflux", filter, gflux, true);                  // var 36
-    log.output ("dtcta", filter, dtcta, true);                  // var 37
-    log.output ("dtltc", filter, dtltc, true);                  // var 38
-    log.output ("dtstc", filter, dtstc, true);                  // var 39
-    log.output ("dtcta_pot", filter, dtcta_pot, true);          // var 40
-    log.output ("dtltc_pot", filter, dtltc_pot, true);          // var 41
-    log.output ("dtstc_pot", filter, dtstc_pot, true);          // var 42
-    log.output ("theta_0_20", filter, theta_0_20, true);        // var 43
-    log.output ("theta_0_50", filter, theta_0_50, true);        // var 44
-    log.output ("theta_0_100", filter, theta_0_100, true);      // var 45
-    log.output ("f_1", filter, f_1, true);                      // var 46
-    log.output ("f_2", filter, f_2, true);                      // var 47
-    log.output ("f_3", filter, f_3, true);                      // var 48
-    log.output ("f_4", filter, f_4, true);                      // var 49
-    log.output ("f_temp", filter, f_temp, true);                // var 50
-    log.output ("f_def", filter, f_def, true);                  // var 51
-    log.output ("f_theta", filter, f_theta, true);              // var 52
+    PT::output (log); // log_only var
+    log.output ("netrad_brunt", netrad_brunt);  	// var 5
+    log.output ("netlong_brunt", netlong_brunt);  // var 6
+    log.output ("r_a", r_a);                      // var 7
+    log.output ("r_astab", r_astab);              // var 8
+    log.output ("r_aa", r_aa);                    // var 9
+    log.output ("r_aa_dry", r_aa_dry);            // var 10
+    log.output ("r_aa_pot", r_aa_pot);            // var 11
+    log.output ("r_as", r_as);                    // var 12
+    log.output ("r_ac", r_ac);                    // var 13
+    log.output ("r_sc_1", r_sc_1);                // var 14
+    log.output ("r_sc_2", r_sc_2);                // var 15
+    log.output ("tskin", tskin);                  // var 16
+    log.output ("tcan", tcan);                    // var 17
+    log.output ("tleaf", tleaf);                  // var 18
+    log.output ("e_c", e_c);                      // var 19
+    log.output ("e_sl", e_sl);                    // var 20
+    log.output ("tskin_pot", tskin_pot);          // var 21
+    log.output ("tcan_pot", tcan_pot);            // var 22
+    log.output ("tleaf_pot", tleaf_pot);          // var 23
+    log.output ("e_c_pot", e_c_pot);              // var 24
+    log.output ("e_sl_pot", e_sl_pot);            // var 25
+    log.output ("ha", ha);                        // var 26
+    log.output ("hl", hl);                        // var 27
+    log.output ("hs", hs);                        // var 28
+    log.output ("lea", lea);                      // var 29
+    log.output ("lel", lel);                      // var 30
+    log.output ("ha_pot", ha_pot);                // var 31
+    log.output ("hl_pot", hl_pot);                // var 32
+    log.output ("hs_pot", hs_pot);                // var 33
+    log.output ("lea_pot", lea_pot);              // var 34
+    log.output ("lel_pot", lel_pot);              // var 35
+    log.output ("gflux", gflux);                  // var 36
+    log.output ("dtcta", dtcta);                  // var 37
+    log.output ("dtltc", dtltc);                  // var 38
+    log.output ("dtstc", dtstc);                  // var 39
+    log.output ("dtcta_pot", dtcta_pot);          // var 40
+    log.output ("dtltc_pot", dtltc_pot);          // var 41
+    log.output ("dtstc_pot", dtstc_pot);          // var 42
+    log.output ("theta_0_20", theta_0_20);        // var 43
+    log.output ("theta_0_50", theta_0_50);        // var 44
+    log.output ("theta_0_100", theta_0_100);      // var 45
+    log.output ("f_1", f_1);                      // var 46
+    log.output ("f_2", f_2);                      // var 47
+    log.output ("f_3", f_3);                      // var 48
+    log.output ("f_4", f_4);                      // var 49
+    log.output ("f_temp", f_temp);                // var 50
+    log.output ("f_def", f_def);                  // var 51
+    log.output ("f_theta", f_theta);              // var 52
   }
 
    ~PT_PMSW() // destructor

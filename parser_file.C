@@ -4,7 +4,6 @@
 #include "csmp.h"
 #include "time.h"
 #include "log.h"
-#include "filter.h"
 #include <fstream.h>
 
 struct ParserFile::Implementation

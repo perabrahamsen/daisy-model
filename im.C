@@ -7,10 +7,10 @@
 #include "submodel.h"
 
 void
-IM::output (Log& log, Filter& filter) const
+IM::output (Log& log) const
 {
-  log.output ("NO3", filter, NO3);
-  log.output ("NH4", filter, NH4);
+  log.output ("NO3", NO3);
+  log.output ("NH4", NH4);
 }
 
 void IM::clear ()

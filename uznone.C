@@ -23,7 +23,7 @@ public:
     { return true; }
   bool accept_bottom (double)
     { return true; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
 public:

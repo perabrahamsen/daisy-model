@@ -26,7 +26,7 @@ struct SoilChemicals::Implementation
   // Simulation
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     const OrganicMatter&, const Chemicals& flux_in);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   void add (const Soil&, const SoilWater&,
 	    double amount, double from, double to);
   void mix (const Soil&, const SoilWater&, double from, double to);
@@ -90,9 +90,9 @@ SoilChemicals::Implementation::tick (const Soil& soil,
 }
 
 void 
-SoilChemicals::Implementation::output (Log& log, Filter& filter) const
+SoilChemicals::Implementation::output (Log& log) const
 {
-  if (filter.check ("solutes"))
+  if (log.check ("solutes"))
     {
       log.open ("solutes");
       for (SoluteMap::const_iterator i = solutes.begin ();
@@ -103,11 +103,11 @@ SoilChemicals::Implementation::output (Log& log, Filter& filter) const
 	  const SoilChemical& solute = *(*i).second;
 
 	  log.open_unnamed ();
-	  log.output ("chemical", filter, name);
-	  if (filter.check ("solute", false))
+	  log.output ("chemical", name);
+	  if (log.check ("solute"))
 	    {
 	      log.open_alist ("solute", solute.chemical.solute_alist ());
-	      solute.output (log, filter.lookup ("solute"));
+	      solute.output (log);
 	      log.close_alist ();
 	    }
 	  log.close_unnamed ();
@@ -207,8 +207,8 @@ SoilChemicals::tick (const Soil& soil, const SoilWater& soil_water,
 { impl.tick (soil, soil_water, soil_heat, organic_matter, flux_in); }
 
 void 
-SoilChemicals::output (Log& log, Filter& filter) const
-{ impl.output (log, filter); }
+SoilChemicals::output (Log& log) const
+{ impl.output (log); }
 
 void 
 SoilChemicals::mix (const Soil& soil, const SoilWater& soil_water,

@@ -2,7 +2,6 @@
 
 #include "soil_water.h"
 #include "log.h"
-#include "filter.h"
 #include "alist.h"
 #include "uzmodel.h"
 #include "soil.h"
@@ -189,18 +188,18 @@ SoilWater::check (unsigned n) const
 }
 
 void 
-SoilWater::output (Log& log, Filter& filter) const
+SoilWater::output (Log& log) const
 {
-  log.output ("S", filter, S_, true);
-  log.output ("S_p", filter, S_p_, true);
-  log.output ("Theta", filter, Theta_);
-  log.output ("h", filter, h_);
-  log.output ("Xi", filter, Xi);
-  log.output ("q", filter, q_, true);
-  log.output ("q_p", filter, q_p_, true);
-  output_derived (*top, "UZtop", log, filter);
+  log.output ("S", S_);
+  log.output ("S_p", S_p_);
+  log.output ("Theta", Theta_);
+  log.output ("h", h_);
+  log.output ("Xi", Xi);
+  log.output ("q", q_);
+  log.output ("q_p", q_p_);
+  output_derived (*top, "UZtop", log);
   if (bottom)
-    output_derived (*bottom, "UZbottom", log, filter);
+    output_derived (*bottom, "UZbottom", log);
 }
 
 double

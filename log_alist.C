@@ -12,20 +12,6 @@ bool
 LogAList::check_derived (const string&, const Library&) const
 { return is_active; }
 
-Filter&
-LogAList::lookup (const string&) const
-{ 
-  // Bug: We should get rid of the filter all together.
-  return const_cast<LogAList&> (*this); 
-}
-
-Filter&
-LogAList::lookup_derived (const string&, const Library&) const
-{ 
-  // Bug: We should get rid of the filter all together.
-  return const_cast<LogAList&> (*this); 
-}
-
 const string&
 LogAList::entry () const
 { 
@@ -370,7 +356,7 @@ LogAList::close_entry ()
 }
 
 void
-LogAList::output (const string& name, Filter&, const Time& value, bool)
+LogAList::output (const string& name, const Time& value)
 { 
   if (!is_active)
     return;
@@ -380,7 +366,7 @@ LogAList::output (const string& name, Filter&, const Time& value, bool)
 }
 
 void
-LogAList::output (const string& name, Filter&, const bool value, bool)
+LogAList::output (const string& name, const bool value)
 { 
   if (!is_active)
     return;
@@ -390,7 +376,7 @@ LogAList::output (const string& name, Filter&, const bool value, bool)
 }
 
 void
-LogAList::output (const string& name, Filter&, const double value, bool)
+LogAList::output (const string& name, const double value)
 { 
   if (!is_active)
     return;
@@ -400,7 +386,7 @@ LogAList::output (const string& name, Filter&, const double value, bool)
 }
 
 void
-LogAList::output (const string& name, Filter&, const int value, bool)
+LogAList::output (const string& name, const int value)
 { 
   if (!is_active)
     return;
@@ -410,7 +396,7 @@ LogAList::output (const string& name, Filter&, const int value, bool)
 }
 
 void
-LogAList::output (const string& name, Filter&, const string& value, bool)
+LogAList::output (const string& name, const string& value)
 { 
   if (!is_active)
     return;
@@ -420,7 +406,7 @@ LogAList::output (const string& name, Filter&, const string& value, bool)
 }
 
 void
-LogAList::output (const string& name, Filter&, const vector<double>& value, bool)
+LogAList::output (const string& name, const vector<double>& value)
 { 
   if (!is_active)
     return;
@@ -430,7 +416,7 @@ LogAList::output (const string& name, Filter&, const vector<double>& value, bool
 }
 
 void
-LogAList::output (const string& name, Filter&, const CSMP& value, bool)
+LogAList::output (const string& name, const CSMP& value)
 { 
   if (!is_active)
     return;

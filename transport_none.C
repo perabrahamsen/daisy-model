@@ -16,7 +16,7 @@ public:
 	     vector<double>& C,
 	     const vector<double>& S,
 	     vector<double>& J);
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
   // Create.

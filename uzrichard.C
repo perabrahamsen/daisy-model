@@ -6,7 +6,6 @@
 #include "alist.h"
 #include "syntax.h"
 #include "common.h"
-#include "filter.h"
 #include "log.h"
 #include "average.h"
 
@@ -42,7 +41,7 @@ public:
     { return true; };
   bool accept_bottom (double)
     { return true; };
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Simulate.
 private:
@@ -519,11 +518,11 @@ UZRichard::tick (const Soil& soil,
 }
 
 void
-UZRichard::output (Log& log, Filter& filter) const
+UZRichard::output (Log& log) const
 {
-  log.output ("q_up", filter, q_up, true);
-  log.output ("q_down", filter, q_down, true);
-  log.output ("iterations", filter, iterations, true);
+  log.output ("q_up", q_up);
+  log.output ("q_down", q_down);
+  log.output ("iterations", iterations);
 }
 
 void

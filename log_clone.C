@@ -8,14 +8,17 @@
 #pragma warn -rvl
 #endif
 
-Filter&
+bool
 LogClone::match (const Daisy&)
-{ assert (false); }
+{ assert (false); return false; }
 
 #ifdef BORLAND_PRAGMA
 #pragma warn +rvl
 #endif
 
+bool 
+LogClone::check (const string &) const
+{ assert (false); return false; }
 void
 LogClone::done ()
 { assert (false); }

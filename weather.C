@@ -139,27 +139,25 @@ Weather::snow () const
 }
 
 void
-Weather::output (Log& log, Filter& filter) const
+Weather::output (Log& log) const
 { 
-  log.output ("hourly_air_temperature", filter, hourly_air_temperature (),
-	      true);
-  log.output ("daily_air_temperature", filter, daily_air_temperature (),
-	      true);
-  log.output ("hourly_global_radiation", filter, 
-	      hourly_global_radiation (), true);
-  log.output ("daily_global_radiation", filter, 
-	      daily_global_radiation (), true);
-  log.output ("daily_extraterrastial_radiation", filter, 
-	      daily_extraterrastial_radiation (), true);
-  log.output ("reference_evapotranspiration", filter, 
-	      reference_evapotranspiration (), true);
-  log.output ("rain", filter, rain (), true);
-  log.output ("snow", filter, snow (), true);
-  log.output ("cloudiness", filter, cloudiness (), true);
-  log.output ("vapor_pressure", filter, vapor_pressure (), true);
-  log.output ("wind", filter, wind (), true); 
-  log.output ("day_length", filter, day_length (), true);
-  log.output ("day_cycle", filter, day_cycle (), true);
+  log.output ("hourly_air_temperature", hourly_air_temperature ());
+  log.output ("daily_air_temperature", daily_air_temperature ());
+  log.output ("hourly_global_radiation", 
+	      hourly_global_radiation ());
+  log.output ("daily_global_radiation", 
+	      daily_global_radiation ());
+  log.output ("daily_extraterrastial_radiation", 
+	      daily_extraterrastial_radiation ());
+  log.output ("reference_evapotranspiration", 
+	      reference_evapotranspiration ());
+  log.output ("rain", rain ());
+  log.output ("snow", snow ());
+  log.output ("cloudiness", cloudiness ());
+  log.output ("vapor_pressure", vapor_pressure ());
+  log.output ("wind", wind ()); 
+  log.output ("day_length", day_length ());
+  log.output ("day_cycle", day_cycle ());
 }
 
 void 

@@ -88,7 +88,7 @@ public:
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest, 
 			  bool kill_off);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   double DS () const;
   double DM () const;
@@ -233,10 +233,10 @@ public:
 
 struct CropOld::Variables
 { 
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   struct RecPhenology
   {
-    void output (Log&, Filter&) const;
+    void output (Log&) const;
     double DS;		// Development Stage
     double Vern;		// Vernalization criterium [C d]
   private:
@@ -245,7 +245,7 @@ struct CropOld::Variables
   } Phenology;
   struct RecCanopy
   {
-    void output (Log&, Filter&) const;
+    void output (Log&) const;
     double Height;		// Crop height [cm]
     double LAI;		// Leaf Area Index
     double LADm;		// Max Leaf Area Density [cm2/cm3]
@@ -256,7 +256,7 @@ struct CropOld::Variables
   } Canopy;
   struct RecRootSys
   {
-    void output (Log&, Filter&) const;
+    void output (Log&) const;
     double Depth;		// Rooting Depth [cm]
     vector<double> Density;	// Root density [cm/cm3] in soil layers
     vector<double> H2OExtraction; // Extraction of H2O in soil layers
@@ -277,7 +277,7 @@ struct CropOld::Variables
   } RootSys;
   struct RecProd
   {
-    void output (Log&, Filter&) const;
+    void output (Log&) const;
     double WLeaf;		// Leaf dry matter weight [g/m2]
     double WhiteStubble;	// Old dead leftover from harvest.
     double WRoot;		// Root dry matter weight [g/m2]
@@ -288,7 +288,7 @@ struct CropOld::Variables
   } Prod;
   struct RecCrpAux
   {
-    void output (Log&, Filter&) const;
+    void output (Log&) const;
     bool InitLAI;		// Initial LAI development ?
     double PotRtDpt;	// Potential Root Penetration Depth [cm]
     double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
@@ -438,18 +438,18 @@ CropOld::Variables::Variables (const Parameters& par, const AttributeList& vl)
 { }
 
 void 
-CropOld::Variables::output (Log& log, Filter& filter) const
+CropOld::Variables::output (Log& log) const
 {
-  if (filter.check ("Phenology"))
-    Phenology.output (log, filter.lookup ("Phenology"));
-  if (filter.check ("Canopy"))
-    Canopy.output (log, filter.lookup ("Canopy"));
-  if (filter.check ("RootSys"))
-    RootSys.output (log, filter.lookup ("RootSys"));
-  if (filter.check ("Prod"))
-    Prod.output (log, filter.lookup ("Prod"));
-  if (filter.check ("CrpAux"))
-    CrpAux.output (log, filter.lookup ("CrpAux"));
+  if (log.check ("Phenology"))
+    Phenology.output (log);
+  if (log.check ("Canopy"))
+    Canopy.output (log);
+  if (log.check ("RootSys"))
+    RootSys.output (log);
+  if (log.check ("Prod"))
+    Prod.output (log);
+  if (log.check ("CrpAux"))
+    CrpAux.output (log);
 }
 
 CropOld::Variables::RecPhenology::RecPhenology (const Parameters& par,
@@ -459,11 +459,11 @@ CropOld::Variables::RecPhenology::RecPhenology (const Parameters& par,
 { }
 
 void 
-CropOld::Variables::RecPhenology::output (Log& log, Filter& filter) const
+CropOld::Variables::RecPhenology::output (Log& log) const
 {
   log.open ("Phenology");
-  log.output ("DS", filter, DS);
-  log.output ("Vern", filter, Vern);
+  log.output ("DS", DS);
+  log.output ("Vern", Vern);
   log.close();
 }
 
@@ -476,13 +476,13 @@ CropOld::Variables::RecCanopy::RecCanopy (const Parameters&,
 { }
 
 void 
-CropOld::Variables::RecCanopy::output (Log& log, Filter& filter) const
+CropOld::Variables::RecCanopy::output (Log& log) const
 {
   log.open ("Canopy");
-  log.output ("Height", filter, Height);
-  log.output ("LAI", filter, LAI);
-  log.output ("LADm", filter, LADm);
-  log.output ("LAIvsH", filter, LAIvsH);
+  log.output ("Height", Height);
+  log.output ("LAI", LAI);
+  log.output ("LADm", LADm);
+  log.output ("LAIvsH", LAIvsH);
   log.close();
 }
 
@@ -502,18 +502,18 @@ CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
 { }
 
 void 
-CropOld::Variables::RecRootSys::output (Log& log, Filter& filter) const
+CropOld::Variables::RecRootSys::output (Log& log) const
 {
   log.open ("RootSys");
-  log.output ("Depth", filter, Depth);
-  log.output ("Density", filter, Density);
-  log.output ("H2OExtraction", filter, H2OExtraction);
-  log.output ("NH4Extraction", filter, NH4Extraction);
-  log.output ("NO3Extraction", filter, NO3Extraction);
-  log.output ("h_x", filter, h_x);
-  log.output ("water_stress", filter, water_stress, true);
-  log.output ("transpiration", filter, transpiration, true);
-  log.output ("Ept", filter, Ept, true);
+  log.output ("Depth", Depth);
+  log.output ("Density", Density);
+  log.output ("H2OExtraction", H2OExtraction);
+  log.output ("NH4Extraction", NH4Extraction);
+  log.output ("NO3Extraction", NO3Extraction);
+  log.output ("h_x", h_x);
+  log.output ("water_stress", water_stress);
+  log.output ("transpiration", transpiration);
+  log.output ("Ept", Ept);
   log.close();
 }
 
@@ -526,13 +526,13 @@ CropOld::Variables::RecProd::RecProd (const Parameters& par,
 { }
 
 void 
-CropOld::Variables::RecProd::output (Log& log, Filter& filter) const
+CropOld::Variables::RecProd::output (Log& log) const
 {
   log.open ("Prod");
-  log.output ("WLeaf", filter, WLeaf);
-  log.output ("WhiteStubble", filter, WhiteStubble);
-  log.output ("WRoot", filter, WRoot);
-  log.output ("NCrop", filter, NCrop);
+  log.output ("WLeaf", WLeaf);
+  log.output ("WhiteStubble", WhiteStubble);
+  log.output ("WRoot", WRoot);
+  log.output ("NCrop", NCrop);
   log.close();
 }
 
@@ -559,25 +559,25 @@ CropOld::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 { }
 
 void 
-CropOld::Variables::RecCrpAux::output (Log& log, Filter& filter) const
+CropOld::Variables::RecCrpAux::output (Log& log) const
 {
   log.open ("CrpAux");
-  log.output ("InitLAI", filter, InitLAI);
-  log.output ("PotRtDpt", filter, PotRtDpt);
-  log.output ("PtNCnt", filter, PtNCnt, true);
-  log.output ("CrNCnt", filter, CrNCnt, true);
-  log.output ("NfNCnt", filter, NfNCnt, true);
-  log.output ("PotTransp", filter, PotTransp);
-  log.output ("PotCanopyAss", filter, PotCanopyAss);
-  log.output ("CanopyAss", filter, CanopyAss);
-  log.output ("LogPotCanopyAss", filter, LogPotCanopyAss, true);
-  log.output ("LogCanopyAss", filter, LogCanopyAss, true);
-  log.output ("IncWLeaf", filter, IncWLeaf, true);
-  log.output ("IncWRoot", filter, IncWRoot, true);
-  log.output ("H2OUpt", filter, H2OUpt, true);
-  log.output ("NH4Upt", filter, NH4Upt, true);
-  log.output ("NO3Upt", filter, NO3Upt, true);
-  log.output ("Fixated", filter, Fixated, true);
+  log.output ("InitLAI", InitLAI);
+  log.output ("PotRtDpt", PotRtDpt);
+  log.output ("PtNCnt", PtNCnt);
+  log.output ("CrNCnt", CrNCnt);
+  log.output ("NfNCnt", NfNCnt);
+  log.output ("PotTransp", PotTransp);
+  log.output ("PotCanopyAss", PotCanopyAss);
+  log.output ("CanopyAss", CanopyAss);
+  log.output ("LogPotCanopyAss", LogPotCanopyAss);
+  log.output ("LogCanopyAss", LogCanopyAss);
+  log.output ("IncWLeaf", IncWLeaf);
+  log.output ("IncWRoot", IncWRoot);
+  log.output ("H2OUpt", H2OUpt);
+  log.output ("NH4Upt", NH4Upt);
+  log.output ("NO3Upt", NO3Upt);
+  log.output ("Fixated", Fixated);
   log.close();
 }
 
@@ -1921,9 +1921,9 @@ CropOld::harvest (const string& column_name,
 }
 
 void
-CropOld::output (Log& log, Filter& filter) const
+CropOld::output (Log& log) const
 {
-  var.output (log, filter);
+  var.output (log);
 }
 
 double

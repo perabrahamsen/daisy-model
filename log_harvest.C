@@ -5,23 +5,11 @@
 #include "harvest.h"
 #include <fstream.h>
 
-struct LogHarvest : public Log, public Filter
+struct LogHarvest : public Log
 {
-  // Filter functions.
-  bool check (const string&, bool) const
+  // Filter function.
+  bool check (const string&) const
     { return false; }
-  bool check (const Library&, int) const
-    { return false; }
-  bool check (const Syntax&, int) const
-    { return false; }
-  bool check (Syntax::type, int) const
-    { return false; }
-
-  Filter& lookup (const string&) const
-    { 
-      // Bug: We should get rid of the filter all together.
-      return const_cast<LogHarvest&> (*this); 
-    }
 
   // Content.
   unsigned int last_size;
@@ -29,7 +17,7 @@ struct LogHarvest : public Log, public Filter
   ofstream out;			// Output stream.
 
   // Checking to see if we should log this time step.
-  Filter& match (const Daisy& daisy)
+  bool match (const Daisy& daisy)
     {
       for (; last_size < daisy.harvest.size (); last_size++)
 	{
@@ -47,11 +35,11 @@ struct LogHarvest : public Log, public Filter
 	      << harvest.sorg_N * 10.0 << "\n";
 	  out.flush ();
 	}
-      return *this;
+      return false;
     }
 
   void done ()
-    { }
+    { assert (false); }
 
   // Open normal items.
   void open (const string&)
@@ -77,19 +65,19 @@ struct LogHarvest : public Log, public Filter
   void close_entry ()
     { assert (false); }
 
-  void output (const string&, Filter&, const Time&, bool)
+  void output (const string&, const Time&)
     { }
-  void output (const string&, Filter&, const bool, bool)
+  void output (const string&, const bool)
     { }
-  void output (const string&, Filter&, const double, bool)
+  void output (const string&, const double)
     { }
-  void output (const string&, Filter&, const int, bool)
+  void output (const string&, const int)
     { }
-  void output (const string&, Filter&, const string&, bool)
+  void output (const string&, const string&)
     { }
-  void output (const string&, Filter&, const vector<double>&, bool)
+  void output (const string&, const vector<double>&)
     { }
-  void output (const string&, Filter&, const CSMP&, bool)
+  void output (const string&, const CSMP&)
     { }
 
   // Create and Destroy.

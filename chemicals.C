@@ -2,7 +2,6 @@
 
 #include "chemicals.h"
 #include "log.h"
-#include "filter.h"
 #include "syntax.h"
 #include "alist.h"
 #include "chemical.h"
@@ -38,7 +37,7 @@ struct Chemicals::Implementation
 		   double canopy_water_out) const;
 
   // Simulation
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   void add (const string& name, double amount) // [g/m^2]
     { add (lookup (name), amount); }
   void add (const Chemical* chemical, double amount) // [g/m^2]
@@ -190,7 +189,7 @@ Chemicals::Implementation::canopy_out (Implementation& out,
 }
 
 void
-Chemicals::Implementation::output (Log& log, Filter& filter) const
+Chemicals::Implementation::output (Log& log) const
 {
   for (chemical_map::const_iterator i = chemicals.begin ();
        i != chemicals.end ();
@@ -201,8 +200,8 @@ Chemicals::Implementation::output (Log& log, Filter& filter) const
       if (amount > 0.0)
 	{
 	  log.open_unnamed ();
-	  log.output ("chemical", filter, name);
-	  log.output ("amount", filter, amount);
+	  log.output ("chemical", name);
+	  log.output ("amount", amount);
 	  log.close_unnamed ();
 	}
     }
@@ -309,8 +308,8 @@ Chemicals::canopy_out (Chemicals& canopy_chemicals_out,
 		   canopy_water_storage, canopy_water_out); }
 
 void
-Chemicals::output (Log& log, Filter& filter) const
-{ impl.output (log, filter); }
+Chemicals::output (Log& log) const
+{ impl.output (log); }
 
 void 
 Chemicals::add (const string& chemical, double amount)

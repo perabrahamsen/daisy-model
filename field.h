@@ -13,7 +13,6 @@ struct IM;
 struct Harvest;
 struct Weather;
 struct Log;
-struct Filter;
 
 class Field
 { 
@@ -64,7 +63,7 @@ public:
 
   // Simulation.
   void tick (const Time&, const Weather&);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Find a specific column.
   const Column* find (const string& name) const;

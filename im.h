@@ -4,7 +4,6 @@
 #define IM_H
 
 struct Log;
-struct Filter;
 struct Syntax;
 struct AttributeList;
 
@@ -17,7 +16,7 @@ public:
 
   // Operations.
 public:
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   void clear ();
   void operator+= (const IM&);
   void operator-= (const IM&);

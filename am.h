@@ -23,7 +23,7 @@ public:
   
   // Simulation.
 public:
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   bool check () const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
   void swap (const Geometry&, double from, double middle, double to);

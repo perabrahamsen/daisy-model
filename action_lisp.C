@@ -30,9 +30,9 @@ struct ActionProgn : public Action
 	}
     }
 
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     { 
-      output_list (actions, "actions", log, filter,
+      output_list (actions, "actions", log,
 		   Librarian<Action>::library ());
     }
 
@@ -65,11 +65,10 @@ struct clause
 {
   const Condition* condition;
   vector<Action*> actions;
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     { 
-      output_derived (*condition, "condition", log, filter);
-      output_list (actions, "actions", log, filter,
-		   Librarian<Action>::library ());
+      output_derived (*condition, "condition", log);
+      output_list (actions, "actions", log, Librarian<Action>::library ());
     }
   clause (const Condition* c, vector<Action*>& a) 
     : condition (c),
@@ -120,18 +119,17 @@ struct ActionCond : public Action
 	    }
 	}
     }
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     { 
-      if (filter.check ("clauses"))
+      if (log.check ("clauses"))
 	{
-	  Filter& f1 = filter.lookup ("clauses");
 	  log.open ("clauses");
 	  for (vector<clause>::const_iterator item = clauses.begin ();
 	       item != clauses.end ();
 	       item++)
 	    {
 	      log.open_unnamed ();
-	      (*item).output (log, f1);
+	      (*item).output (log);
 	      log.close_unnamed ();
 	    }
 	  log.close ();
@@ -186,11 +184,11 @@ struct ActionIf : public Action
 	else_a.doIt (daisy);
     }
 
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     { 
-      output_derived (if_c, "if", log, filter);
-      output_derived (then_a, "then", log, filter);
-      output_derived (else_a, "else", log, filter);
+      output_derived (if_c, "if", log);
+      output_derived (then_a, "then", log);
+      output_derived (else_a, "else", log);
     }
 
   bool check (const Daisy& daisy) const

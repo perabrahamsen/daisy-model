@@ -20,7 +20,7 @@ public:
 	     vector<double>& C,
 	     const vector<double>& S,
 	     vector<double>& J);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Create.
 public:
@@ -31,9 +31,9 @@ public:
 };
 
 void
-TransportCD::output (Log& log, Filter& filter) const
+TransportCD::output (Log& log) const
 {
-  log.output ("ddt", filter, ddt, true);
+  log.output ("ddt", ddt);
 }
 
 void 

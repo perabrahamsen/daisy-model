@@ -15,7 +15,8 @@ struct LogCheckpoint : public LogAList
   Time time;			// Time of current checkpoint.
 
   // Start and end of time step.
-  Filter& match (const Daisy& daisy);
+  bool check(const string&) const;
+  bool match (const Daisy& daisy);
   void done ();
 
   // Create and Destroy.
@@ -23,7 +24,11 @@ struct LogCheckpoint : public LogAList
   ~LogCheckpoint ();
 };
 
-Filter&
+bool 
+LogCheckpoint::check(const string&) const
+{ return true; }
+
+bool
 LogCheckpoint::match (const Daisy& daisy)
 {
   assert (nested == 0);
@@ -33,7 +38,7 @@ LogCheckpoint::match (const Daisy& daisy)
       push ("daisy", *daisy.syntax, daisy.alist);
       time = daisy.time;
     }
-  return *this;
+  return is_active;
 }
 
 void

@@ -24,7 +24,7 @@ struct MacroStandard : public Macro
 	    vector<double>& S_m,
 	    vector<double>& S_p,
 	    vector<double>& q_p);
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
   // Create and Destroy.

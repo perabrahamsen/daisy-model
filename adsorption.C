@@ -10,7 +10,7 @@ which among other things affects how large a fraction can be\n\
 transported with the water.";
 
 void
-Adsorption::output (Log&, Filter&) const
+Adsorption::output (Log&) const
 { }
 
 Adsorption::Adsorption (const string& n)

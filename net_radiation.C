@@ -13,9 +13,9 @@ other meteorological data.";
 // Interface class.
 
 void
-NetRadiation::output (Log& log, Filter& filter) const
+NetRadiation::output (Log& log) const
 {
-  log.output ("net_radiation", filter, net_radiation (), true);
+  log.output ("net_radiation", net_radiation ());
 }
 
 NetRadiation::NetRadiation (const AttributeList& al)

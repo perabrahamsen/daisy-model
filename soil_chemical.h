@@ -28,7 +28,7 @@ public:
   void uptake (const Soil&, const SoilWater&);
   void decompose (const Soil&, const SoilWater&, const SoilHeat&, 
 		  const OrganicMatter&);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   
 public:
   // Substance specific constants.

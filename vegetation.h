@@ -20,7 +20,6 @@ class AttributeList;
 class CSMP;
 class Harvest;
 class Log;
-class Filter;
 class Syntax;
 class AttributeList;
 
@@ -69,7 +68,7 @@ public:
 				  double leaf_harvest, 
 				  double sorg_harvest);
   void sow (const AttributeList& al, const Geometry&, const OrganicMatter&);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Create and Destroy.
 public:

@@ -1,5 +1,17 @@
+1999-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.75 released.
+
 1999-05-04  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* log.h (output): No longer takes an `log_only' parameter.
+	* all: Updated callers.
+	* log.h (output): No longer takes `filter' parameter.
+	* all: Updated callers.
+	* log_file.C, filter.h, filter.C, filter_all.C, filter_array.C,
+	filter_checkpoint.C, filter_none.C, filter_some.C: Removed.
+	* Makefile: Updated.
+	
 	* Version 0.74 released.
 
 1999-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -8,7 +8,6 @@
 
 class Soil;
 class Log;
-class Filter;
 class UZtop;
 
 class Macro
@@ -27,7 +26,7 @@ public:
 		     vector<double>& S,
 		     vector<double>& S_p,
 		     vector<double>& q_p) = 0;
-  virtual void output (Log&, Filter&) const = 0;
+  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 protected:

@@ -16,7 +16,7 @@ public:
 
   // Simulation.
 public:
-  virtual void output (Log&, Filter&) const;
+  virtual void output (Log&) const;
   virtual double C_to_M (const Soil&, double Theta, int i, double C) const = 0;
   virtual double M_to_C (const Soil&, double Theta, int i, double M) const = 0;
 

@@ -38,13 +38,13 @@ OM::OM (const AttributeList& al)
 }
 
 void
-OM::output (Log& log, Filter& filter) const
+OM::output (Log& log) const
 {
-  log.output ("initial_C_per_N", filter, initial_C_per_N); // For checkpoint
-  log.output ("top_C", filter, top_C);
-  log.output ("top_N", filter, top_N);
-  log.output ("C", filter, C);
-  if (filter.check ("N", true))
+  log.output ("initial_C_per_N", initial_C_per_N); // For checkpoint
+  log.output ("top_C", top_C);
+  log.output ("top_N", top_N);
+  log.output ("C", C);
+  if (log.check ("N"))
     {
       vector<double> N;
       unsigned int size = C.size ();
@@ -57,15 +57,15 @@ OM::output (Log& log, Filter& filter) const
 	      N.push_back (C[i] / C_per_N[i]);
 	    }
 	}
-      log.output ("N", filter, N, true);
+      log.output ("N", N);
     }
   // These are sometimes const and should be read from the AM library.
-  log.output ("C_per_N", filter, C_per_N);
+  log.output ("C_per_N", C_per_N);
 #if 0
-  log.output ("turnover_rate", filter, turnover_rate);
-  log.output ("efficiency", filter, efficiency);
-  log.output ("maintenance", filter, maintenance);
-  log.output ("fractions", filter, fractions);
+  log.output ("turnover_rate", turnover_rate);
+  log.output ("efficiency", efficiency);
+  log.output ("maintenance", maintenance);
+  log.output ("fractions", fractions);
 #endif
 }
 

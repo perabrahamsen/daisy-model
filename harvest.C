@@ -6,18 +6,18 @@
 #include "submodel.h"
 
 void 
-Harvest::output (Log& log, Filter& filter) const
+Harvest::output (Log& log) const
 {
-  log.output ("column", filter, column, true);
-  log.output ("time", filter, time, true);
-  log.output ("crop", filter, crop, true);
-  log.output ("stem_DM", filter, stem_DM, true);
-  log.output ("stem_N", filter, stem_N, true);
-  log.output ("leaf_DM", filter, leaf_DM, true);
-  log.output ("leaf_N", filter, leaf_N, true);
-  log.output ("sorg_DM", filter, sorg_DM, true);
-  log.output ("sorg_N", filter, sorg_N, true);
-  output_submodule_log_only (chemicals, "chemicals", log, filter);
+  log.output ("column", column);
+  log.output ("time", time);
+  log.output ("crop", crop);
+  log.output ("stem_DM", stem_DM);
+  log.output ("stem_N", stem_N);
+  log.output ("leaf_DM", leaf_DM);
+  log.output ("leaf_N", leaf_N);
+  log.output ("sorg_DM", sorg_DM);
+  log.output ("sorg_N", sorg_N);
+  output_submodule_log_only (chemicals, "chemicals", log);
 }
 
 void 

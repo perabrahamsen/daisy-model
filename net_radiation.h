@@ -16,7 +16,7 @@ public:
 
   // Simulation.
 public:
-  virtual void output (Log&, Filter&) const;
+  virtual void output (Log&) const;
   virtual double net_radiation () const = 0; // [MJ/m2/d]
   virtual void tick (double Cloudiness /* [0-1] */,
 		     double Temp /* [dg C] */, 

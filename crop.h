@@ -7,7 +7,6 @@
 #include "librarian.h"
 
 struct Log;
-struct Filter;
 struct Time;
 struct AttributeList;
 struct Bioclimate;
@@ -67,7 +66,7 @@ public:
 				  bool kill_off) = 0;
   void kill (const string&, const Time&, const Geometry&, OrganicMatter&,
 	     Bioclimate&);
-  virtual void output (Log&, Filter&) const = 0;
+  virtual void output (Log&) const = 0;
   
   // Queries.
 public:

@@ -9,7 +9,6 @@
 #include "mactrans.h"
 
 struct Log;
-struct Filter;
 struct Syntax;
 struct AttributeList;
 struct Soil;
@@ -59,7 +58,7 @@ protected:
 public:
   void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
-  virtual void output (Log&, Filter&) const;
+  virtual void output (Log&) const;
   void add (const Soil&, const SoilWater&,
 	    double amount, double from, double to);
   void mix (const Soil&, const SoilWater&, double from, double to);

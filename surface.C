@@ -7,7 +7,6 @@
 #include "soil.h"
 #include "log.h"
 #include "common.h"
-#include "filter.h"
 #include "am.h"
 #include "im.h"
 #include "mathlib.h"
@@ -40,7 +39,7 @@ struct Surface::Implementation
 	     const Soil& soil, const SoilWater& soil_water);
   double albedo (const Soil& soil, const SoilWater& soil_water) const;
   void fertilize (const IM& n);
-  void output (Log& log, Filter& filter) const;
+  void output (Log& log) const;
   double exfiltration () const; // [mm/h]
   
 
@@ -242,17 +241,17 @@ Surface::Implementation::fertilize (const IM& n)
 }
 
 void
-Surface::output (Log& log, Filter& filter) const
-{ impl.output (log, filter); }
+Surface::output (Log& log) const
+{ impl.output (log); }
 
 void
-Surface::Implementation::output (Log& log, Filter& filter) const
+Surface::Implementation::output (Log& log) const
 {
-  log.output ("pond", filter, pond);
-  log.output ("flux", filter, flux);
-  log.output ("EvapSoilSurface", filter, EvapSoilSurface, true);
-  log.output ("Eps", filter, Eps, true);
-  output_submodule (im, "IM", log, filter);
+  log.output ("pond", pond);
+  log.output ("flux", flux);
+  log.output ("EvapSoilSurface", EvapSoilSurface);
+  log.output ("Eps", Eps);
+  output_submodule (im, "IM", log);
 }
 
 double

@@ -10,7 +10,6 @@ class Action;
 class Harvest;
 class Weather;
 class Log;
-class Filter;
 class Field;
 class Syntax;
 class AttributeList;

@@ -16,7 +16,6 @@ class SoilWater;
 class Groundwater;
 class Weather;
 class Time;
-class Filter;
 
 class SoilHeat
 {
@@ -32,7 +31,7 @@ public:
 		   double from, double to, double energy);
   void swap (const Soil&, double from, double middle, double to);
   double T (unsigned int i) const; // [dg C]
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   bool check (unsigned n) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const AttributeList&);

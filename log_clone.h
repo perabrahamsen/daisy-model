@@ -9,9 +9,11 @@
 
 class LogClone : public LogAList
 {
+
   // Don't use this as a real log.
 private:
-  Filter& match (const Daisy& daisy);
+  bool check(const string&) const;
+  bool match (const Daisy& daisy);
   void done ();
 
   // Get result.

@@ -4,7 +4,6 @@
 #include "syntax.h"
 #include "alist.h"
 #include "log.h"
-#include "filter.h"
 #include "am.h"
 #include "om.h"
 #include "soil.h"
@@ -40,7 +39,7 @@ struct OrganicMatter::Implementation
     vector<double> N;			// Nitrogen.
     const double turnover_rate;	// Absorption.
     const int where;		// Which SOM pool does it end in?
-    void output (Log& log, Filter& filter) const;
+    void output (Log& log) const;
     void tick (int i, double abiotic_factor, double N_soil, double& N_used,
 	       const vector<OM*>&);
     void mix (const Geometry&, double from, double to);
@@ -65,7 +64,7 @@ struct OrganicMatter::Implementation
 	     SoilNO3&, SoilNH4&);
   void mix (const Geometry&, double from, double to, double penetration);
   void swap (const Geometry&, double from, double middle, double to);
-  void output (Log&, Filter&, const Geometry&) const;
+  void output (Log&, const Geometry&) const;
   bool check () const;
 
   double heat_turnover_factor (double T) const;
@@ -90,12 +89,11 @@ struct OrganicMatter::Implementation
 };
 
 void
-OrganicMatter::Implementation::Buffer::output (Log& log,
-					       Filter& filter) const
+OrganicMatter::Implementation::Buffer::output (Log& log) const
 {
-  log.output ("C", filter, C);
-  log.output ("N", filter, N);
-  // log.output ("turnover_rate", filter, turnover_rate);
+  log.output ("C", C);
+  log.output ("N", N);
+  // log.output ("turnover_rate", turnover_rate);
 } 
 
 void
@@ -235,11 +233,11 @@ OrganicMatter::Implementation::Buffer::Buffer (const AttributeList& al)
 { }
 
 void
-OrganicMatter::Implementation::output (Log& log, Filter& filter,
+OrganicMatter::Implementation::output (Log& log,
 				       const Geometry& geometry) const
 {
-  log.output ("CO2", filter, CO2, true);
-  if (filter.check ("total_N", true) || filter.check ("total_C", true))
+  log.output ("CO2", CO2);
+  if (log.check ("total_N") || log.check ("total_C"))
     {
       const int size = geometry.size ();
 
@@ -272,15 +270,15 @@ OrganicMatter::Implementation::output (Log& log, Filter& filter,
 	  total_C += am[k]->total_C (geometry);
 	  total_N += am[k]->total_N (geometry);
 	}
-      log.output ("total_N", filter, total_N, true);
-      log.output ("total_C", filter, total_C, true);
+      log.output ("total_N", total_N);
+      log.output ("total_C", total_C);
     }
-  output_list (am, "am", log, filter, Librarian<AM>::library ());
-  output_vector (smb, "smb", log, filter);
-  output_vector (som, "som", log, filter);
-  output_submodule (buffer, "buffer", log, filter);
-  log.output ("NO3_source", filter, NO3_source);
-  log.output ("NH4_source", filter, NH4_source);
+  output_list (am, "am", log, Librarian<AM>::library ());
+  output_vector (smb, "smb", log);
+  output_vector (som, "som", log);
+  output_submodule (buffer, "buffer", log);
+  log.output ("NO3_source", NO3_source);
+  log.output ("NH4_source", NH4_source);
 }
 
 bool
@@ -676,9 +674,9 @@ OrganicMatter::get_smb_c_at (unsigned int i) const
 { return impl.get_smb_c_at (i); }
 
 void 
-OrganicMatter::output (Log& log, Filter& filter, const Geometry& geometry) const
+OrganicMatter::output (Log& log, const Geometry& geometry) const
 {
-  impl.output (log, filter, geometry);
+  impl.output (log, geometry);
 }
 
 bool

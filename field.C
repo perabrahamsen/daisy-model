@@ -3,7 +3,6 @@
 #include "field.h"
 #include "column.h"
 #include "log.h"
-#include "filter.h"
 #include "log_clone.h"
 
 struct Field::Implementation
@@ -47,7 +46,7 @@ public:
 
   // Simulation.
   void tick (const Time&, const Weather&);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Find a specific column.
   Column* find (const string& name) const;
@@ -305,7 +304,7 @@ Field::Implementation::tick (const Time& time, const Weather& weather)
 }
 
 void 
-Field::Implementation::output (Log& log, Filter& filter) const
+Field::Implementation::output (Log& log) const
 {
   const Library& library = Librarian<Column>::library ();
 
@@ -313,10 +312,10 @@ Field::Implementation::output (Log& log, Filter& filter) const
        i != columns.end ();
        i++)
     {
-      if (filter.check_derived ((*i)->name, library))
+      if (log.check_derived ((*i)->name, library))
 	{
 	  log.open_entry ((*i)->name, (*i)->alist);
-	  (*i)->output (log, filter.lookup_derived ((*i)->name, library));
+	  (*i)->output (log);
 	  log.close_entry ();
 	}
     }
@@ -349,7 +348,7 @@ Field::Implementation::divide (const string& original, const string& copy,
   const Library& library = Librarian<Column>::library ();
   const Syntax& syntax = library.syntax (old->alist.name ("type"));
   LogClone log_clone ("column", syntax, old->alist);
-  old->output (log_clone, log_clone);
+  old->output (log_clone);
   AttributeList& lib_alist = *new AttributeList ();
   // Remember where we got this object.
   lib_alist.add ("parsed_from_file", "*clone*");
@@ -498,8 +497,8 @@ Field::tick (const Time& time, const Weather& weather)
 { impl.tick (time, weather); }
 
 void 
-Field::output (Log& log, Filter& filter) const
-{ impl.output (log, filter); }
+Field::output (Log& log) const
+{ impl.output (log); }
 
 const Column* 
 Field::find (const string& name) const

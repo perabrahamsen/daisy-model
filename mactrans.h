@@ -9,7 +9,6 @@
 class Soil;
 class SoilWater;
 class Log;
-class Filter;
 
 class Mactrans
 {
@@ -25,7 +24,7 @@ public:
 		     vector<double>& S,
 		     vector<double>& S_p,
 		     vector<double>& J_p) = 0;
-  virtual void output (Log&, Filter&) const = 0;
+  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 protected:

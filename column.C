@@ -12,9 +12,9 @@ soil/crop/atmosphere system.  The column component contains most of\n\
 the other processes in Daisy as submodels.";
 
 void
-Column::output (Log& log, Filter& filter) const
+Column::output (Log& log) const
 {
-  log.output ("size", filter, size);
+  log.output ("size", size);
 }
 
 void

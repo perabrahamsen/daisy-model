@@ -19,9 +19,9 @@ struct ActionWhile : public Action
       return (actions[0]->done (daisy)); 
     }
 
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     { 
-      output_list (actions, "actions", log, filter, 
+      output_list (actions, "actions", log, 
 		   Librarian<Action>::library ());
     }
 

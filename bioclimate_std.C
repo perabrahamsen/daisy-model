@@ -10,7 +10,6 @@
 #include "syntax.h"
 #include "snow.h"
 #include "log.h"
-#include "filter.h"
 #include "mathlib.h"
 #include "pet.h"
 #include "pt.h"
@@ -109,7 +108,7 @@ struct BioclimateStandard : public Bioclimate
   // Simulation
   void tick (Surface&, const Weather&, const Time&, 
 	     Vegetation&, const Soil&, SoilWater&, const SoilHeat&);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   const Chemicals& chemicals_down () const;
 
@@ -518,69 +517,68 @@ BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
 }
 
 void 
-BioclimateStandard::output (Log& log, Filter& filter) const
+BioclimateStandard::output (Log& log) const
 {
-  output_derived (pet, "pet", log, filter);
-  log.output ("total_ep", filter, total_ep, true);
-  log.output ("total_ea", filter, total_ea, true);
-  log.output ("irrigation_top", filter, irrigation_top_old, true);
-  log.output ("irrigation_top_temperature", filter,
-	      irrigation_top_temperature, true);
-  log.output ("irrigation_surface", filter, irrigation_surface_old, true);
-  log.output ("irrigation_surface_temperature", filter,
-	      irrigation_surface_temperature, true);
-  output_submodule (snow, "Snow", log, filter);
-  log.output ("snow_ep", filter, snow_ep, true);
-  log.output ("snow_ea", filter, snow_ea, true);
-  log.output ("snow_water_in", filter, snow_water_in, true);
+  output_derived (pet, "pet", log);
+  log.output ("total_ep", total_ep);
+  log.output ("total_ea", total_ea);
+  log.output ("irrigation_top", irrigation_top_old);
+  log.output ("irrigation_top_temperature", 
+	      irrigation_top_temperature);
+  log.output ("irrigation_surface", irrigation_surface_old);
+  log.output ("irrigation_surface_temperature",
+	      irrigation_surface_temperature);
+  output_submodule (snow, "Snow", log);
+  log.output ("snow_ep", snow_ep);
+  log.output ("snow_ea", snow_ea);
+  log.output ("snow_water_in", snow_water_in);
   log.output ("snow_water_in_temperature", 
-	      filter, snow_water_in_temperature, true);
-  log.output ("snow_water_out", filter, snow_water_out, true);
+	      snow_water_in_temperature);
+  log.output ("snow_water_out", snow_water_out);
   log.output ("snow_water_out_temperature", 
-	      filter, snow_water_out_temperature, true);
-  log.output ("canopy_ep", filter, canopy_ep, true);
-  log.output ("canopy_ea", filter, canopy_ea, true);
-  log.output ("canopy_water_storage", filter, canopy_water_storage);
-  log.output ("canopy_water_temperature", filter,
-	      canopy_water_temperature, true);
-  log.output ("canopy_water_in", filter, canopy_water_in, true);
-  log.output ("canopy_water_out", filter, canopy_water_out, true);
-  log.output ("canopy_water_bypass", filter, canopy_water_bypass, true);
-  log.output ("pond_ep", filter, pond_ep, true);
-  log.output ("pond_ea", filter, pond_ea, true);
-  log.output ("pond_water_in", filter, pond_water_in, true);
+	      snow_water_out_temperature);
+  log.output ("canopy_ep", canopy_ep);
+  log.output ("canopy_ea", canopy_ea);
+  log.output ("canopy_water_storage", canopy_water_storage);
+  log.output ("canopy_water_temperature", canopy_water_temperature);
+  log.output ("canopy_water_in", canopy_water_in);
+  log.output ("canopy_water_out", canopy_water_out);
+  log.output ("canopy_water_bypass", canopy_water_bypass);
+  log.output ("pond_ep", pond_ep);
+  log.output ("pond_ea", pond_ea);
+  log.output ("pond_water_in", pond_water_in);
   log.output ("pond_water_in_temperature", 
-	      filter, pond_water_in_temperature, true);
-  log.output ("soil_ep", filter, soil_ep, true);
-  log.output ("soil_ea", filter, soil_ea, true);
-  output_derived (pt, "pt", log, filter);
-  log.output ("crop_ep", filter, crop_ep, true);
-  log.output ("crop_ea", filter, crop_ea, true);
+	      pond_water_in_temperature);
+  log.output ("soil_ep", soil_ep);
+  log.output ("soil_ea", soil_ea);
+  output_derived (pt, "pt", log);
+  log.output ("crop_ep", crop_ep);
+  log.output ("crop_ea", crop_ea);
 
   // Note: We use snow_chemicals_in instead of spray, since the former
   // is reset after each time step.
-  output_submodule_log_only (snow_chemicals_in, "spray", log, filter);
+  output_submodule_log_only (snow_chemicals_in, "spray", log);
   output_submodule (snow_chemicals_storage, "snow_chemicals_storage",
-		    log, filter);
+		    log);
   output_submodule_log_only (snow_chemicals_in, "snow_chemicals_in",
-			     log, filter);
+			     log);
   output_submodule_log_only (snow_chemicals_out, "snow_chemicals_out",
-			     log, filter);
+			     log);
   output_submodule (canopy_chemicals_storage, "canopy_chemicals_storage",
-		    log, filter);
+		    log);
   output_submodule_log_only (canopy_chemicals_in, "canopy_chemicals_in",
-			     log, filter);
+			     log);
   output_submodule_log_only (canopy_chemicals_dissipate,
 			     "canopy_chemicals_dissipate",
-			     log, filter);
+			     log);
   output_submodule_log_only(canopy_chemicals_out, "canopy_chemicals_out",
-			     log, filter);
+			     log);
   output_submodule (surface_chemicals_storage, "surface_chemicals_storage",
-		    log, filter);
+		    log);
   output_submodule_log_only (surface_chemicals_in, "surface_chemicals_in",
-			     log, filter);
+			     log);
   output_submodule_log_only (surface_chemicals_out, "surface_chemicals_out",
-			     log, filter);
+			     log);
 }
 
 void

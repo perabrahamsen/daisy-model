@@ -9,7 +9,6 @@
 #include <map>
 
 class Log;
-class Filter;
 
 template <class T>
 class Librarian

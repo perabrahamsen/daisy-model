@@ -16,7 +16,7 @@ public:
       && daisy.time.mday () == day 
       && daisy.time.hour () == hour; 
   }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionMMDD (const AttributeList& al)
     : Condition (al),
@@ -43,7 +43,7 @@ public:
 	  && daisy.time.mday () == day
 	  && daisy.time.hour () < hour);
   }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionBeforeMMDD (const AttributeList& al)
     : Condition (al),
@@ -70,7 +70,7 @@ public:
 	  && daisy.time.mday () == day
 	  && daisy.time.hour () > hour);
   }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionAfterMMDD (const AttributeList& al)
     : Condition (al),
@@ -88,7 +88,7 @@ struct ConditionAt : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return time == daisy.time; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionAt (const AttributeList& al)
     : Condition (al),
@@ -104,7 +104,7 @@ struct ConditionBefore : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return time > daisy.time; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionBefore (const AttributeList& al)
     : Condition (al),
@@ -120,7 +120,7 @@ struct ConditionAfter : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return time < daisy.time; }  
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionAfter (const AttributeList& al)
     : Condition (al),
@@ -138,7 +138,7 @@ struct ConditionHourly : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return ((24 * daisy.time.yday () + daisy.time.hour ()) % step) == 0; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionHourly (const AttributeList& al)
     : Condition (al),
@@ -154,7 +154,7 @@ struct ConditionDaily : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionDaily (const AttributeList& al)
     : Condition (al),
@@ -170,7 +170,7 @@ struct ConditionWeekly : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionWeekly (const AttributeList& al)
     : Condition (al),
@@ -186,7 +186,7 @@ struct ConditionMonthly : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionMonthly (const AttributeList& al)
     : Condition (al),
@@ -202,7 +202,7 @@ struct ConditionYearly : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
   { }
   ConditionYearly (const AttributeList& al)
     : Condition (al),
@@ -218,7 +218,7 @@ struct ConditionHour : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.hour () == at; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
   ConditionHour (const AttributeList& al)
     : Condition (al),
@@ -234,7 +234,7 @@ struct ConditionMDay : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.mday () == at; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
   ConditionMDay (const AttributeList& al)
     : Condition (al),
@@ -250,7 +250,7 @@ struct ConditionYDay : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.yday () == at; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
   ConditionYDay (const AttributeList& al)
     : Condition (al),
@@ -266,7 +266,7 @@ struct ConditionMonth : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.month () == at; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
   ConditionMonth (const AttributeList& al)
     : Condition (al),
@@ -282,7 +282,7 @@ struct ConditionYear : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.year () == at; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
   ConditionYear (const AttributeList& al)
     : Condition (al),

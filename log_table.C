@@ -211,7 +211,7 @@ struct LogEntry
 	      for (unsigned int i = 0; i < array.size (); i++)
 		value += array[i];
 #else
-	      // Bug: Stupid Filter::accumulate hides this.
+	      // Global fun hidden by LogEntry::accumulate.
 	      value += ::accumulate (array.begin (), array.end (), 0.0);
 #endif
 	    }
@@ -323,29 +323,15 @@ struct LogEntry
     { delete &condition; }
 };
 
-struct LogTable : public Log, public Filter
+struct LogTable : public Log
 {
   // State. 
   bool is_printing;		// True iff this time step should be logged.
   bool is_active;		// True iff we need values for this time step.
 
   // Filter functions.
-  bool check (const string&, bool) const
+  bool check (const string&) const
     { return is_active; }
-  bool check (const Library& lib, int size) const
-    { return Filter::check (lib, size); }
-  bool check (const Syntax& syntax, int size) const
-    { return Filter::check (syntax, size); }
-  bool check (Syntax::type type, int size) const
-    { return Filter::check (type, size); }
-
-  Filter& lookup (const string&) const
-    { 
-      // Bug: We should get rid of the filter all together.
-      return const_cast<LogTable&> (*this); 
-    }
-
-  // Content.
   const string description;	// Description of table.
   string file;			// Filename.
   ofstream out;			// Output stream.
@@ -363,7 +349,7 @@ struct LogTable : public Log, public Filter
   const double to;		// to here.
 
   // Checking to see if we should log this time step.
-  Filter& match (const Daisy& daisy)
+  bool match (const Daisy& daisy)
     {
       is_printing = condition.match (daisy);
       is_active = is_printing;
@@ -372,7 +358,7 @@ struct LogTable : public Log, public Filter
 	if (entries[i]->match (daisy, is_printing))
 	  is_active = true;
       
-      return *this;
+      return is_active;
     }
 
   void done ()
@@ -424,39 +410,39 @@ struct LogTable : public Log, public Filter
   void close_entry ()
     { close (); }
 
-  void output (const string& name, Filter&, const Time& value, bool)
+  void output (const string& name, const Time& value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
-  void output (const string&, Filter&, const bool, bool)
+  void output (const string&, const bool)
     { }
-  void output (const string& name, Filter&, const double value, bool)
+  void output (const string& name, const double value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
-  void output (const string& name, Filter&, const int value, bool)
+  void output (const string& name, const int value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
-  void output (const string& name, Filter&, const string& value, bool)
+  void output (const string& name, const string& value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
-  void output (const string& name, Filter&, const vector<double>& value, bool)
+  void output (const string& name, const vector<double>& value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value, geometry ());
     }
-  void output (const string&, Filter&, const CSMP&, bool)
+  void output (const string&, const CSMP&)
     { }
 
   // Create and Destroy.
@@ -698,10 +684,10 @@ Number of times the path has matched a variable since the last log entry.");
       syntax.add ("entries", entry_syntax, entry_alist, Syntax::State,
 		  "What to log in each column.");
       syntax.add ("set", Syntax::String, Syntax::Const, Syntax::Sequence, 
-		  "Map path names in the entries.
-The first entry in the sequence is a symbol from the paths (e.g. $crop),
-and the second is the value to replace the symbol with (e.g. Grass).
-The third entry is another symbol to replace, and the fourth is another
+		  "Map path names in the entries.\n\
+The first entry in the sequence is a symbol from the paths (e.g. $crop),\n\
+and the second is the value to replace the symbol with (e.g. Grass).\n\
+The third entry is another symbol to replace, and the fourth is another\n\
 value to replace it with.  And so forth.");
       const vector<string> empty_string_vector;
       alist.add ("set", empty_string_vector);

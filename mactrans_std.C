@@ -14,7 +14,7 @@ struct MactransStandard : public Mactrans
 	    vector<double>& S,
 	    vector<double>& S_p,
 	    vector<double>& J_p);
-  void output (Log& /* log */, Filter& /* filter */) const
+  void output (Log&) const
     { }
 
   // Create and Destroy.

@@ -10,9 +10,9 @@ The `groundwater' component is responsible for specifying the\n\
 groundwater table at each timestep.";
 
 void
-Groundwater::output (Log& log, Filter& filter) const
+Groundwater::output (Log& log) const
 { 
-  log.output ("height", filter, table (), true);
+  log.output ("height", table ());
 }
 
 void

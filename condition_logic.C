@@ -8,7 +8,7 @@ struct ConditionFalse : public Condition
 {
   bool match (const Daisy&) const
     { return false; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
   ConditionFalse (const AttributeList& al)
@@ -23,7 +23,7 @@ struct ConditionTrue : public Condition
 {
   bool match (const Daisy&) const
     { return true; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
   ConditionTrue (const AttributeList& al)
@@ -49,7 +49,7 @@ struct ConditionOr : public Condition
 	}
       return false;
     }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
   ConditionOr (const AttributeList& al)
@@ -81,7 +81,7 @@ struct ConditionAnd : public Condition
 	}
       return true;
     }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
   ConditionAnd (const AttributeList& al)
@@ -104,7 +104,7 @@ struct ConditionNot : public Condition
 
   bool match (const Daisy& daisy) const
     { return !condition.match (daisy); }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
   ConditionNot (const AttributeList& al)
@@ -133,7 +133,7 @@ struct ConditionIf : public Condition
       else
 	return else_c.match (daisy); 
     }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
 
   ConditionIf (const AttributeList& al)

@@ -49,11 +49,11 @@ SoilChemical::decompose (const Soil& soil,
 }
 
 void
-SoilChemical::output (Log& log, Filter& filter) const
+SoilChemical::output (Log& log) const
 {
-  Solute::output (log, filter);
-  log.output ("uptaken", filter, uptaken);
-  log.output ("decomposed", filter, decomposed);
+  Solute::output (log);
+  log.output ("uptaken", uptaken);
+  log.output ("decomposed", decomposed);
 }
 
 double 

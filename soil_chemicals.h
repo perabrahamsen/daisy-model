@@ -9,7 +9,6 @@ struct SoilHeat;
 struct OrganicMatter;
 struct Chemicals;
 struct Log;
-struct Filter;
 struct Syntax;
 struct AttributeList;
 
@@ -24,7 +23,7 @@ private:
 public:
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     const OrganicMatter&, const Chemicals& flux_in);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   void mix (const Soil&, const SoilWater&, double from, double to);
   void swap (const Soil&, const SoilWater&, double from, double middle, double to);
 

@@ -9,7 +9,7 @@ struct ConditionRunning : public Condition
 {
   bool match (const Daisy& daisy) const
     { return daisy.running; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
   ConditionRunning (const AttributeList& al)
     : Condition (al)
@@ -20,7 +20,7 @@ struct ConditionFinished : public Condition
 {
   bool match (const Daisy& daisy) const
     { return !daisy.running; }
-  void output (Log&, Filter&) const
+  void output (Log&) const
     { }
   ConditionFinished (const AttributeList& al)
     : Condition (al)

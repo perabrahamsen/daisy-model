@@ -14,7 +14,7 @@ struct MacroNone : public Macro
 	     vector<double>& /* S_p */,
 	     vector<double>& /* q_p */)
     { }
-  void output (Log& /* log */, Filter& /* filter */) const
+  void output (Log&) const
     { }
 
   // Create and Destroy.

@@ -8,7 +8,6 @@ struct Weather;
 struct Bioclimate;
 struct Syntax;
 struct Log;
-struct Filter;
 struct Soil;
 struct SoilWater;
 struct SoilHeat;
@@ -23,7 +22,7 @@ public:
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
 	     double Si, double q_h, double Prain,
 	     double Psnow, double T, double Epot);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Queries.
 public:

@@ -75,16 +75,16 @@ Solute::check (unsigned) const
 }
 
 void
-Solute::output (Log& log, Filter& filter) const
+Solute::output (Log& log) const
 {
-  output_derived (transport, "transport", log, filter);
-  output_derived (adsorption, "adsorption", log, filter);
-  log.output ("C", filter, C_);
-  log.output ("M", filter, M_);
-  log.output ("S", filter, S, true);
-  log.output ("S_p", filter, S_p, true);
-  log.output ("J", filter, J, true);
-  log.output ("J_p", filter, J_p, true);
+  output_derived (transport, "transport", log);
+  output_derived (adsorption, "adsorption", log);
+  log.output ("C", C_);
+  log.output ("M", M_);
+  log.output ("S", S);
+  log.output ("S_p", S_p);
+  log.output ("J", J);
+  log.output ("J_p", J_p);
 }
 
 void 

@@ -33,10 +33,10 @@ Pet::dry () const
 { return wet (); }
 
 void
-Pet::output (Log& log, Filter& filter) const
+Pet::output (Log& log) const
 {
-  log.output ("wet", filter, wet (), true);
-  log.output ("dry", filter, dry (), true);
+  log.output ("wet", wet ());
+  log.output ("dry", dry ());
 }
 
 void 

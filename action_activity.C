@@ -25,9 +25,9 @@ struct ActionActivity : public Action
   bool done (const Daisy&) const
     { return (actions.size () == 0U); }
 
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     { 
-      output_list (actions, "actions", log, filter, 
+      output_list (actions, "actions", log, 
 		   Librarian<Action>::library ());
     }
 

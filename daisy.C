@@ -14,7 +14,6 @@
 #include "field.h"
 #include "harvest.h"
 #include "action.h"
-#include "filter.h"
 #include "library.h"
 #include "syntax.h"
 #include "condition.h"
@@ -56,7 +55,7 @@ Daisy::check ()
 	all_ok = false;
       }
   }
-  // Check filters.
+  // Check logs.
   {
     bool ok = true;
     for (vector<Log*>::const_iterator i = logs.begin ();
@@ -95,13 +94,15 @@ Daisy::tick_logs ()
   for (unsigned int i = 0; i < logs.size (); i++)
     {
       Log& log = *logs[i];
-      Filter& filter = log.match (*this);
-      log.output ("time", filter, time);
-      output_derived (weather, "weather", log, filter);
-      output_submodule (field, "column", log, filter);
-      output_vector (harvest, "harvest", log, filter);
-      output_derived (action, "manager", log, filter);
-      log.done ();
+      if (log.match (*this))
+	{
+	  log.output ("time", time);
+	  output_derived (weather, "weather", log);
+	  output_submodule (field, "column", log);
+	  output_vector (harvest, "harvest", log);
+	  output_derived (action, "manager", log);
+	  log.done ();
+	}
     }
 }
 

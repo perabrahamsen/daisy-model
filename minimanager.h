@@ -12,7 +12,7 @@ class MiniManager : public Action
   EventQueue *EQ;
 public:
   void doIt (Daisy& daisy);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Create and Destroy.
 public:

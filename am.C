@@ -34,7 +34,7 @@ struct AM::Implementation
   const string crop_part_name () const; // Name of locked crop part.
 
   // Simulation.
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
   bool check () const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
   void swap (const Geometry&, double from, double middle, double to);
@@ -71,7 +71,7 @@ struct AM::Implementation::Lock
   string part;
 
   // Simulation.
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
     
   // Create and Destroy.
   static void load_syntax (Syntax& syntax, AttributeList&);
@@ -80,10 +80,10 @@ struct AM::Implementation::Lock
 };
 
 void 
-AM::Implementation::Lock::output (Log& log, Filter& filter) const
+AM::Implementation::Lock::output (Log& log) const
 {
-  log.output ("crop", filter, crop);
-  log.output ("part", filter, part);
+  log.output ("crop", crop);
+  log.output ("part", part);
 }  
 
 
@@ -278,13 +278,13 @@ AM::Implementation::append_to (vector<OM*>& added)
 }
 
 void
-AM::Implementation::output (Log& log, Filter& filter) const
+AM::Implementation::output (Log& log) const
 { 
-  log.output ("creation", filter, creation);
-  log.output ("name", filter, name);
+  log.output ("creation", creation);
+  log.output ("name", name);
   if (lock)
-    output_submodule (*lock, "lock", log, filter);
-  output_vector (om, "om", log, filter);
+    output_submodule (*lock, "lock", log);
+  output_vector (om, "om", log);
 }
 
 bool 
@@ -380,8 +380,8 @@ AM::Implementation::pour (vector<double>& cc, vector<double>& nn)
 }
 
 void
-AM::output (Log& log, Filter& filter) const
-{ impl.output (log, filter); }
+AM::output (Log& log) const
+{ impl.output (log); }
 
 void 
 AM::append_to (vector<OM*>& added)

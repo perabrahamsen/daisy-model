@@ -10,7 +10,6 @@
 class AttributeList;
 class Syntax;
 class Log;
-class Filter;
 
 class Harvest
 {
@@ -29,7 +28,7 @@ public:
 
   // Simulation:
 public:
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Create and Destroy.
 public:

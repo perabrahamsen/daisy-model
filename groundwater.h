@@ -18,7 +18,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time& time) = 0;
-  virtual void output (Log&, Filter&) const;
+  virtual void output (Log&) const;
 
   // Accessors.
 public:

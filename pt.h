@@ -28,7 +28,7 @@ public:
 		     double canopy_ea, double snow_ea,
 		     double pond_ea, double soil_ea) = 0;
   virtual double potential_transpiration () const = 0; // [mm/h]
-  virtual void output (Log&, Filter&) const;
+  virtual void output (Log&) const;
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

@@ -12,10 +12,10 @@ evaporation from the surface, meteorological data, and the vegetation\n\
 and soil state.";
 
 void
-PT::output (Log& log, Filter& filter) const
+PT::output (Log& log) const
 {
   log.output ("potential_transpiration", 
-	      filter, potential_transpiration (), true);
+	      potential_transpiration ());
 }
 
 void 

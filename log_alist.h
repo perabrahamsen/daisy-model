@@ -6,19 +6,11 @@
 #include "log.h"
 #include <deque.h>
 
-struct LogAList : public Log, public Filter
+struct LogAList : public Log
 {
   // Filter functions.
   bool check (const string&, bool) const;
   bool check_derived (const string&, const Library&) const;
-  Filter& lookup (const string&) const;
-  Filter& lookup_derived (const string&, const Library&) const;
-  bool check (const Library& lib, int size) const
-    { return Filter::check (lib, size); }
-  bool check (const Syntax& syntax, int size) const
-    { return Filter::check (syntax, size); }
-  bool check (Syntax::type type, int size) const
-    { return Filter::check (type, size); }
 
   // Content.
   bool is_active;		// ... store the answer here.
@@ -70,13 +62,13 @@ struct LogAList : public Log, public Filter
   void close_entry ();
 
   // Logging.
-  void output (const string& name, Filter&, const Time& value, bool);
-  void output (const string& name, Filter&, const bool value, bool);
-  void output (const string& name, Filter&, const double value, bool);
-  void output (const string& name, Filter&, const int value, bool);
-  void output (const string& name, Filter&, const string& value, bool);
-  void output (const string& name, Filter&, const vector<double>& value, bool);
-  void output (const string& name, Filter&, const CSMP& value, bool);
+  void output (const string& name, const Time& value);
+  void output (const string& name, const bool value);
+  void output (const string& name, const double value);
+  void output (const string& name, const int value);
+  void output (const string& name, const string& value);
+  void output (const string& name, const vector<double>& value);
+  void output (const string& name, const CSMP& value);
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

@@ -38,13 +38,13 @@ struct PT_standard : public PT
   double potential_transpiration () const
     { return potential_transpiration_; }
 
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     {
-      PT::output (log, filter);
+      PT::output (log);
       log.output ("potential_crop_transpiration", 
-		  filter, potential_crop_transpiration, true);
+		  potential_crop_transpiration);
       log.output ("potential_soil_transpiration", 
-		  filter, potential_soil_transpiration, true);
+		  potential_soil_transpiration);
     }
 
   // Create.

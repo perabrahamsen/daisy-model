@@ -23,7 +23,7 @@ public:
 		     vector<double>& C,
 		     const vector<double>& S,
 		     vector<double>& J) = 0;
-  virtual void output (Log&, Filter&) const = 0;
+  virtual void output (Log&) const = 0;
 
   // Create and Destroy.
 protected:

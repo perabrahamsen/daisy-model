@@ -6,7 +6,6 @@
 #include "mathlib.h"
 #include "harvest.h"
 #include "log.h"
-#include "filter.h"
 #include "submodel.h"
 #include <deque>
 
@@ -71,7 +70,7 @@ struct Vegetation::Implementation
 				  double leaf_harvest, 
 				  double sorg_harvest);
   void sow (const AttributeList& al, const Geometry&, const OrganicMatter&);
-  void output (Log&, Filter&) const;
+  void output (Log&) const;
 
   // Create and destroy.
   void initialize (const Geometry& geometry, const OrganicMatter&);
@@ -342,21 +341,21 @@ Vegetation::Implementation::sow (const AttributeList& al,
 }
 
 void
-Vegetation::Implementation::output (Log& log, Filter& filter) const
+Vegetation::Implementation::output (Log& log) const
 {
-  output_list (crops, "crops", log, filter, Librarian<Crop>::library ());
-  log.output ("LAI", filter, LAI, true);
-  log.output ("height", filter, height, true);
-  log.output ("cover", filter, cover, true);
-  log.output ("LAIvsH", filter, LAIvsH, true);
-  log.output ("HvsLAI", filter, HvsLAI, true);
-  log.output ("ACExt", filter, ACExt, true);
-  log.output ("ACRef", filter, ACRef, true);
-  log.output ("ARExt", filter, ARExt, true);
-  log.output ("ARExt", filter, ARExt, true);
-  log.output ("EpFactor", filter, EpFactor, true);
-  log.output ("albedo", filter, albedo, true);
-  log.output ("interception_capacity", filter, interception_capacity, true);
+  output_list (crops, "crops", log, Librarian<Crop>::library ());
+  log.output ("LAI", LAI);
+  log.output ("height", height);
+  log.output ("cover", cover);
+  log.output ("LAIvsH", LAIvsH);
+  log.output ("HvsLAI", HvsLAI);
+  log.output ("ACExt", ACExt);
+  log.output ("ACRef", ACRef);
+  log.output ("ARExt", ARExt);
+  log.output ("ARExt", ARExt);
+  log.output ("EpFactor", EpFactor);
+  log.output ("albedo", albedo);
+  log.output ("interception_capacity", interception_capacity);
 }
 
 void
@@ -493,8 +492,8 @@ Vegetation::sow (const AttributeList& al, const Geometry& geometry,
 { impl.sow (al, geometry, organic_matter); }
 
 void
-Vegetation::output (Log& log, Filter& filter) const
-{ impl.output (log, filter); }
+Vegetation::output (Log& log) const
+{ impl.output (log); }
 
 void
 Vegetation::initialize (const Geometry& geometry, 

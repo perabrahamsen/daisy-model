@@ -3,7 +3,6 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "filter.h"
 #include "librarian.h"
 
 class Daisy;
@@ -20,10 +19,15 @@ private:
 public:
   static const char *const description;
 
+  // Filter
+public:
+  virtual bool check (const string&) const = 0;
+  virtual bool check_derived (const string&, const Library& library) const;
+
   // Use.  
 public:
   // Called at the start of each time step.
-  virtual Filter& match (const Daisy&) = 0;
+  virtual bool match (const Daisy&) = 0;
   // Called at the end of each time step.
   virtual void done ();
 
@@ -47,20 +51,13 @@ public:
   virtual void open_entry (const string& type, const AttributeList&) = 0;
   virtual void close_entry () = 0;
 
-  virtual void output (const string&, Filter&, const Time&,
-		       bool log_only = false) = 0;
-  virtual void output (const string&, Filter&, const bool,
-		       bool log_only = false) = 0;
-  virtual void output (const string&, Filter&, const double,
-		       bool log_only = false) = 0;
-  virtual void output (const string&, Filter&, const int,
-		       bool log_only = false) = 0;
-  virtual void output (const string&, Filter&, const string&,
-		       bool log_only = false) = 0;
-  virtual void output (const string&, Filter&, const vector<double>&,
-		       bool log_only = false) = 0;
-  virtual void output (const string&, Filter&, const CSMP&,
-		       bool log_only = false) = 0;
+  virtual void output (const string&, const Time&) = 0;
+  virtual void output (const string&, const bool) = 0;
+  virtual void output (const string&, const double) = 0;
+  virtual void output (const string&, const int) = 0;
+  virtual void output (const string&, const string&) = 0;
+  virtual void output (const string&, const vector<double>&) = 0;
+  virtual void output (const string&, const CSMP&) = 0;
 
   void open_geometry (const Geometry&);
   void close_geometry ();
@@ -80,24 +77,23 @@ static Librarian<Log> Log_init ("log");
 
 template <class T> void
 output_submodule (const T& submodule, 
-		  const char* name, Log& log, Filter& filter)
+		  const char* name, Log& log)
 {
-  if (filter.check (name, false))
+  if (log.check (name))
     {
       log.open (name);
-      submodule.output (log, filter.lookup (name));
+      submodule.output (log);
       log.close ();
     }
 }
 
 template <class T> void
-output_submodule_log_only (const T& submodule,
-			   const char* name, Log& log, Filter& filter)
+output_submodule_log_only (const T& submodule, const char* name, Log& log)
 {
-  if (filter.check (name, true))
+  if (log.check (name))
     {
       log.open (name);
-      submodule.output (log, filter.lookup (name));
+      submodule.output (log);
       log.close ();
     }
 }
@@ -105,19 +101,16 @@ output_submodule_log_only (const T& submodule,
 // Output an object.
  
 template <class T> void
-output_derived (const T& submodule,
-		const char* name,
-		Log& log, Filter& filter)
+output_derived (const T& submodule, const char* name, Log& log)
 {
-  if (filter.check (name))
+  if (log.check (name))
     {
-      Filter& f1 = filter.lookup (name);
       const Library& library = Librarian<T>::library ();
 
-      if (f1.check_derived (submodule.name, library))
+      if (log.check_derived (submodule.name, library))
 	{
 	  log.open_derived (name, submodule.name);
-	  submodule.output (log, f1.lookup_derived (submodule.name, library));
+	  submodule.output (log);
 	  log.close_derived ();
 	}
     }
@@ -126,22 +119,20 @@ output_derived (const T& submodule,
 // Output a list of objects.
 
 template <class T> void
-output_list (T const& items,
-	     const char* name, Log& log, Filter& filter, 
+output_list (T const& items, const char* name, Log& log, 
 	     const Library& library)
 {
-  if (filter.check (name))
+  if (log.check (name))
     {
-      Filter& f = filter.lookup (name);
       log.open (name);
       for (typename T::const_iterator item = items.begin(); 
 	   item != items.end();
 	   item++)
 	{
-	  if (f.check_derived ((*item)->name, library))
+	  if (log.check_derived ((*item)->name, library))
 	    {
 	      log.open_entry ((*item)->name, (*item)->alist);
-	      (*item)->output (log, f.lookup_derived ((*item)->name, library));
+	      (*item)->output (log);
 	      log.close_entry ();
 	    }
 	}
@@ -152,19 +143,17 @@ output_list (T const& items,
 // Output a list of unnamed alists.
 
 template <class T> void
-output_vector (T const& items,
-	       const char* name, Log& log, Filter& filter)
+output_vector (T const& items, const char* name, Log& log)
 {
-  if (filter.check (name))
+  if (log.check (name))
     {
-      Filter& f1 = filter.lookup (name);
       log.open (name);
       for (typename T::const_iterator item = items.begin ();
 	   item != items.end ();
 	   item++)
 	{
 	  log.open_unnamed ();
-	  (*item)->output (log, f1);
+	  (*item)->output (log);
 	  log.close_unnamed ();
 	}
       log.close ();

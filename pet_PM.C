@@ -65,10 +65,10 @@ public:
 	     const Surface& surface, const Soil& soil, 
 	     const SoilHeat& soil_heat, const SoilWater& soil_water);
 
-  void output (Log& log, Filter& filter) const
+  void output (Log& log) const
     {
-      Pet::output (log, filter); 
-      output_derived (net_radiation, "net_radiation", log, filter);
+      Pet::output (log); 
+      output_derived (net_radiation, "net_radiation", log);
     }
 
   double wet () const

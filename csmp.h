@@ -12,7 +12,6 @@
 using namespace std;
 
 struct Log;
-struct Filter;
 
 class CSMP
 {
