@@ -2721,4 +2721,3 @@ CropStandard::~CropStandard ()
   delete &var;
   delete &par;
 }
-

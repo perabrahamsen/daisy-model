@@ -89,17 +89,6 @@ output_submodule (const T& submodule,
     }
 }
 
-template <class T> void
-output_submodule_log_only (const T& submodule, const char* name, Log& log)
-{
-  if (log.check (name))
-    {
-      log.open (name);
-      submodule.output (log);
-      log.close ();
-    }
-}
-
 // Output an object.
  
 template <class T> void

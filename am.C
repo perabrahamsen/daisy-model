@@ -53,6 +53,9 @@ struct AM::Implementation
   void add (const Geometry&,	// Add initial dead roots.
 	    double C, /* Fixed C/N */
 	    const vector<double>& density);
+  double top_C () const;
+  double top_N () const;
+  void multiply_top (double fraction);
 
 
   // Create and Destroy.
@@ -138,6 +141,10 @@ void
 AM::Implementation::distribute (double C, vector<double>& om_C, 
 				double N, vector<double>& om_N)
 {
+  assert (C >= 0.0);
+  assert (N >= 0.0);
+  assert (C == 0.0 || N > 0.0);
+
   // Fill out the blanks.
   int missing_fraction = -1;
   int missing_C_per_N = -1;
@@ -182,12 +189,31 @@ AM::Implementation::distribute (double C, vector<double>& om_C,
   // Calculate N in missing C/N.
   if (missing_fraction != missing_C_per_N)
     {
-      const double C_per_N = om[missing_fraction]->C_per_N[0];
+      const double C_per_N = om[missing_fraction]->initial_C_per_N;
       assert (C_per_N >= 0.0);
       om_N[missing_fraction] = om_C[missing_fraction] / C_per_N;
       assert (om_N[missing_fraction] >= 0.0);
     }
   om_N[missing_C_per_N] = N - accumulate (om_N.begin (), om_N.end (), 0.0);
+
+  if (om_N[missing_C_per_N] < 0.0)
+    {
+      // Too little N, distribute evenly.
+      for (unsigned int i = 0; i < om.size (); i++)
+	{
+	  const double fraction = om[i]->initial_fraction;
+	  if (fraction == OM::Unspecified)
+	    {
+	      assert (i == missing_fraction);
+	      om_N[i] = 0.0;
+	    }
+	  else
+	    om_N[i] = N * fraction;
+	}
+      om_N[missing_fraction]
+	= N - accumulate (om_N.begin (), om_N.end (), 0.0);
+      assert (om_N[missing_fraction] >= 0.0);
+    }
 
   assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
   assert (approximate (N, accumulate (om_N.begin (), om_N.end (), 0.0)));
@@ -275,6 +301,34 @@ AM::Implementation::add (const Geometry& geometry,
 
   const double new_C = total_C (geometry);
   assert (approximate (new_C, old_C + C));
+}
+
+double
+AM::Implementation::top_C () const
+{ 
+  double total = 0.0;
+  for (unsigned int i = 0; i < om.size (); i++)
+    total += om[i]->top_C;
+  return total;
+}
+
+double 
+AM::Implementation::top_N () const
+{ 
+  double total = 0.0;
+  for (unsigned int i = 0; i < om.size (); i++)
+    total += om[i]->top_N;
+  return total;
+}
+
+void 
+AM::Implementation::multiply_top (double fraction)
+{ 
+  for (unsigned int i = 0; i < om.size (); i++)
+    {
+      om[i]->top_N *= fraction;
+      om[i]->top_C *= fraction;
+    }
 }
 
 void 
@@ -455,6 +509,18 @@ AM::add (const Geometry& geometry,
 	 double C, double N, 
 	 const vector<double>& density)
 { impl.add (geometry, C, N, density); }
+
+double
+AM::top_C () const
+{ return impl.top_C (); }
+
+double 
+AM::top_N () const
+{ return impl.top_N (); }
+
+void 
+AM::multiply_top (double fraction)
+{ impl.multiply_top (fraction); }
 
 void 
 AM::unlock ()

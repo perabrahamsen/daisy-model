@@ -4,7 +4,6 @@
 #include "time.h"
 #include "geometry.h"
 #include <numeric>
-#include <algorithm>
 #include <set>
 
 Librarian<Select>::Content* Librarian<Select>::content = NULL;

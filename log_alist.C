@@ -9,7 +9,8 @@ LogAList::check_entry (const string&, const Library&) const
 { return is_active; }
 
 bool
-LogAList::check_derived (const string&, const string&, const Library&) const
+LogAList::check_derived (const string&,
+			 const string&, const Library&) const
 { return is_active; }
 
 const string&

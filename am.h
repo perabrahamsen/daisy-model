@@ -36,6 +36,9 @@ public:
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const vector<double>& density);
+  double top_C () const;
+  double top_N () const;
+  void multiply_top (double fraction);
 
   // Crop Locks.
   enum lock_type { Unlocked, Locked };

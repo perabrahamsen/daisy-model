@@ -10,9 +10,6 @@
 #include "tortuosity.h"
 #include <vector>
 #include <map>
-// G++ 2.7.2 has `accumulate' here.
-#include <algorithm>
-// Borland 5.01 has `accumulate' here.
 #include <numeric>
 
 struct Horizon::Implementation

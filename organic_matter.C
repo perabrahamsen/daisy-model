@@ -11,14 +11,12 @@
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include "soil_heat.h"
+#include "bioincorporation.h"
 #include "mathlib.h"
 #include "csmp.h"
 #include "common.h"
 #include "submodel.h"
-
-// G++ 2.7.2 has `accumulate' here.
 #include <algorithm>
-// Borland 5.01 has `accumulate' here.
 #include <numeric>
 
 struct OrganicMatter::Implementation
@@ -29,6 +27,7 @@ struct OrganicMatter::Implementation
   const double K_NH4;		// Immobilization rate of NH4.
   const double K_NO3;		// Immobilization rate of NO3.
   vector<double> CO2;		// CO2 produced per time step.
+  double top_CO2;		// CO2 produced on top of soil.
   vector <AM*> am;		// Added Organic Matter.
   const vector<OM*> smb;	// Living Organic Matter.
   const vector<OM*> som;	// Soil Organic Matter.
@@ -49,10 +48,14 @@ struct OrganicMatter::Implementation
   } buffer;
   const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]
   const double min_AM_N;	// Minimal amount of N in an AM. [g/m²]
+  Bioincorporation bioincorporation;
 
   // Log.
   vector<double> NO3_source;
   vector<double> NH4_source;
+
+  // Utilities.
+  static bool om_compare (const OM* a, const OM* b);
 
   // Simulation.
   void add (AM& om)
@@ -181,6 +184,14 @@ is numbered `1'.");
   alist.add ("where", 1);
 }
 
+bool 
+OrganicMatter::Implementation::om_compare (const OM* a, const OM* b)
+{
+  return (a->C_per_N.size () == 0 ? a->initial_C_per_N : a->C_per_N[0])
+    < (b->C_per_N.size () == 0 ? b->initial_C_per_N : b->C_per_N[0]);
+}
+
+
 double 
 OrganicMatter::Implementation::heat_turnover_factor (double T) const
 {
@@ -235,6 +246,7 @@ OrganicMatter::Implementation::output (Log& log,
 				       const Geometry& geometry) const
 {
   log.output ("CO2", CO2);
+  log.output ("top_CO2", top_CO2);
   if (log.check ("total_N") || log.check ("total_C"))
     {
       const int size = geometry.size ();
@@ -268,6 +280,12 @@ OrganicMatter::Implementation::output (Log& log,
   output_vector (smb, "smb", log);
   output_vector (som, "som", log);
   output_submodule (buffer, "buffer", log);
+  if (log.check ("Bioincorporation"))
+    {
+      log.open ("Bioincorporation");
+      bioincorporation.output (log, geometry);
+      log.close ();
+    }
   log.output ("NO3_source", NO3_source);
   log.output ("NH4_source", NH4_source);
 }
@@ -282,12 +300,6 @@ OrganicMatter::Implementation::check () const
   if (!ok)
     CERR << "in OrganicMatter\n";
   return ok;
-}
-
-static bool om_compare (const OM* a, const OM* b)
-{
-  return (a->C_per_N.size () == 0 ? a->initial_C_per_N : a->C_per_N[0])
-    < (b->C_per_N.size () == 0 ? b->initial_C_per_N : b->C_per_N[0]);
 }
 
 void
@@ -351,13 +363,15 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       NO3_source[i] = 0.0;
       NH4_source[i] = 0.0;
     }
+  top_CO2 = 0.0;
 
   // Setup arrays.
   unsigned int size = soil.size ();
-  if (!active_underground)
-    size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
+  if (!active_underground && soil.zplus (size - 1) < -100.0)
+    size = soil.interval_plus (min (-100.0, soil.MaxRootingDepth ()));
   if (!active_groundwater)
     size = soil_water.first_groundwater_node ();
+  assert (size <= soil.size ());
 
   vector<double> N_soil (size);
   vector<double> N_used (size);
@@ -425,6 +439,9 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   // Update soil solutes.
   soil_NO3.add_to_source (NO3_source);
   soil_NH4.add_to_source (NH4_source);
+
+  // Biological incorporation.
+  bioincorporation.tick (soil, am, soil_heat.T (0), top_CO2);
 }
       
 void 
@@ -619,6 +636,14 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
 	}
     }
   buffer.initialize (soil);
+  
+  // Biological incorporation.
+  bioincorporation.initialize (soil);
+  AM* bioam = find_am ("bio", "incorporation");
+  if (bioam)
+    bioincorporation.set_am (bioam);
+  else
+    am.push_back (bioincorporation.create_am (soil)); 
 }
 
 OrganicMatter::Implementation::Implementation (const AttributeList& al)
@@ -626,13 +651,14 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     active_groundwater (al.flag ("active_groundwater")),
     K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
+    top_CO2 (0.0),
     am (map_create <AM> (al.alist_sequence ("am"))),
     smb (map_construct<OM> (al.alist_sequence ("smb"))),
     som (map_construct<OM> (al.alist_sequence ("som"))),
     buffer (al.alist ("buffer")),
     min_AM_C (al.number ("min_AM_C")),
-    min_AM_N (al.number ("min_AM_N"))
-
+    min_AM_N (al.number ("min_AM_N")),
+    bioincorporation (al.alist ("Bioincorporation"))
 { }
 
 void 
@@ -890,6 +916,7 @@ check_alist (const AttributeList& al)
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<OrganicMatter::Implementation::Buffer>;
 template class add_submodule_sequence<OM>;
+template class add_submodule<Bioincorporation>;
 #endif
 
 void
@@ -911,6 +938,9 @@ Clear this flag to turn off mineralization in groundwater.");
   syntax.add ("K_NO3", "h^-1", Syntax::Const, 
 	      "Maximal immobilization rate for nitrate.");
   alist.add ("K_NO3", 0.020833); // 0.5 / 24.
+  add_submodule<Bioincorporation> ("Bioincorporation", syntax, alist, 
+				   Syntax::State, "\
+Biological incorporation of litter.");
   syntax.add ("NO3_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
 Mineralization this time step (negative numbers mean immobilization).");
   syntax.add ("NH4_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
@@ -920,7 +950,9 @@ Mineralization this time step (negative numbers mean immobilization).");
   syntax.add ("total_N", "g N/cm^2", Syntax::LogOnly, Syntax::Sequence,
 	      "Total organic N in the soil layer.");
   syntax.add ("CO2", "g CO2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "CO2 evolution.");
+	      "CO2 evolution in soil.");
+  syntax.add ("top_CO2", "g CO2-C/cm^2/h", Syntax::LogOnly,
+	      "CO2 evolution at surface.");
   syntax.add ("am", Librarian<AM>::library (), Syntax::Sequence, 
 	      "Added organic matter pools.");
   vector<AttributeList*> am_sequence;

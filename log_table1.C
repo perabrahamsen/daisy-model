@@ -6,7 +6,6 @@
 #include "geometry.h"
 #include <fstream.h>
 #include <numeric>
-#include <algorithm>
 #include <set>
 #include <map>
 

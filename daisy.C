@@ -177,7 +177,7 @@ period.");
   syntax.add ("input", Librarian<Parser>::library (), Syntax::OptionalConst, 
 	      Syntax::Singleton,
 	      "Command to add more information about the simulation.");
-  syntax.add ("manager", Librarian<Action>::library (), Syntax::Const,
+  syntax.add ("manager", Librarian<Action>::library (), Syntax::State,
 	      Syntax::Singleton,
 	      "Specify the management operations to perform during \
 the simulation.");

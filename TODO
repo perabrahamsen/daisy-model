@@ -1,5 +1,3 @@
-* Earthworms and AM
-
 * Stof chemicals ned i jord via macropores.
 
 1. Lav setup + log for surface chemicals.  gem resultat af kørsel.
@@ -20,7 +18,7 @@
 
 ** Nyt `misc' katalog med de to dhi scripts.
 
-** Slet DaisyAll
+** Slet DaisyAll og $(JRI)
 
 * Merge små AM til særlig "rest-am" pulje som ikke forsvinder.
 

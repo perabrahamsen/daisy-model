@@ -1,4 +1,45 @@
+1999-12-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.06 released.
+
+1999-12-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (tick): Don't let `active_underground' stop
+	mineralization above one meter.
+
+	* am.C (distribute): Added assertions.
+	Use `initial_C_per_N' instead of `C_per_N[0]' when 
+	`missing_fraction != missing_C_per_N'.
+	Handle case where there is too little N.
+
+1999-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/grass.dai (Grass): Changed `TLLeafEff'.
+
+	* daisy.C (load_syntax): Made manager `State' instead of `Const'.
+
+	* bioincorporation.C, bioincorporation.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* organic_matter.C (bioincorporation, top_CO2): New members.
+	* lib/log.dai (Bioincorporation): New log model.
+
+	* csmp.C, csmp.h (integrate): New member.
+
+1999-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (multiply_top, top_C, top_N): New member functions.
+
+	* organic_matter.C (om_compare): Made it a member of
+	`OrganicMatter::Implementation'. 
+
+	* om.C (load_syntax): Fixed type for `top_N'.
+
 1999-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (MODELS): Renamed from `COMPONENTS'.
+	(INTERFACES): Split `INTERFACES' into `COMPONENTS', `SUBMODELS',
+	`SPECIALS', `OTHER' and `JRI'.
+	(wc-split): New target.
 
 	* Version 1.05 released.
 

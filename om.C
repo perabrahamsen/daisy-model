@@ -587,7 +587,7 @@ matter, in this case the SMB pools.");
   syntax.add ("top_C", "g C/cm^2", Syntax::State,
 	      "Carbon on top of soil.");
   alist.add ("top_C", 0.0);
-  syntax.add ("top_N", "g C/cm^2", Syntax::State,
+  syntax.add ("top_N", "g N/cm^2", Syntax::State,
 	      "Nitrogen on top of soil.");
   alist.add ("top_N", 0.0);
   syntax.add ("C", "g C/cm^3", Syntax::OptionalState, Syntax::Sequence,

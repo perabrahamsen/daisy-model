@@ -12,6 +12,7 @@ struct CSMP::Implementation
 
   double operator () (const double pos) const;
   CSMP inverse () const;
+  double integrate (const double from, const double to) const;
   CSMP integrate_stupidly () const;
   void clear () 
     { 
@@ -78,6 +79,36 @@ CSMP::Implementation::inverse () const
   return csmp;
 }
 
+double
+CSMP::Implementation::integrate (const double from, const double to) const
+{
+  assert (from < to);
+  const int size = x.size ();
+
+  // First point.
+  double last_y = operator ()(from);
+  double last_x = from;
+
+  // Intermediate points.
+  double total = 0.0;
+  for (unsigned int i = 0; i < size; i++)
+    {
+      if (x[i] < last_x)
+	continue;
+      if (x[i] >= to)
+	break;
+      total += (x[i] - last_x) * (y[i] + last_y) / 2.0;
+      last_x = x[i];
+      last_y = y[i];
+    }
+  assert (last_x < to);
+  
+  // Last point.
+  total += (to - last_x) * (operator ()(to) + last_y) / 2.0;
+
+  return total;
+}
+
 // Integrate a CSMP by pretending that line piece is really a constant
 // with the mean value of the line piece.  That way, the result can be
 // described as a CSMP itself.  
@@ -130,6 +161,12 @@ CSMP
 CSMP::inverse () const
 { 
   return impl.inverse ();
+}
+
+double
+CSMP::integrate (const double from, const double to) const
+{
+  return impl.integrate (from, to);
 }
 
 CSMP 

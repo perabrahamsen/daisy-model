@@ -22,6 +22,7 @@ public:
   // Use.
   double operator ()(double x) const;
   CSMP inverse () const;
+  double integrate (double from, double to) const;
   CSMP integrate_stupidly () const;
 
   static double find (const vector<double>& x, const vector<double>& y,
