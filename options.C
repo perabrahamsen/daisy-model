@@ -108,7 +108,7 @@ Options::Options (int& argc, char**& argv,
       else if (options_finished || arg[0] != '-')
 	{
 	  // Parse the file.
-	  Treelog::Open nest (out, "Parsing");
+	  Treelog::Open nest (out, string ("Parsing ") + arg);
 	  ParserFile parser (syntax, arg, out);
 	  parser.load (alist);
 	  file_found = true;

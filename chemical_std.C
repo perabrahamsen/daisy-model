@@ -62,7 +62,7 @@ class ChemicalStandard : public Chemical
   // Parameters.
 private:
   const double crop_uptake_reflection_factor_;
-  const double canopy_dissipation_rate_coefficient_;
+  const double canopy_dissipation_rate_;
   const double canopy_washoff_coefficient_;
   const double diffusion_coefficient_; // [cm^2/h]
   const AttributeList solute_alist_;
@@ -72,14 +72,15 @@ private:
   const PLF decompose_CO2_factor_;
   const PLF decompose_conc_factor_;
   const PLF decompose_depth_factor_;
+  const PLF decompose_lag_increment_;
   const bool active_groundwater_;
 
   // Queries.
 public:
   double crop_uptake_reflection_factor () const	// [0-1]
     { return crop_uptake_reflection_factor_; }
-  double canopy_dissipation_rate_coefficient () const	// [h^-1]
-    { return canopy_dissipation_rate_coefficient_; }
+  double canopy_dissipation_rate () const	// [h^-1]
+    { return canopy_dissipation_rate_; }
   double canopy_washoff_coefficient () const	// [mm]
     { return canopy_washoff_coefficient_; }
   double diffusion_coefficient () const	// [cm^2/h]
@@ -108,6 +109,8 @@ public:
     { return decompose_conc_factor_ (conc); }
   double decompose_depth_factor (double depth) const
     { return decompose_depth_factor_ (depth); }
+  double decompose_lag_increment (double conc) const
+    { return decompose_lag_increment_ (conc); }
   bool active_groundwater () const
     { return active_groundwater_; }
 
@@ -119,19 +122,26 @@ public:
 
 ChemicalStandard::ChemicalStandard (const AttributeList& al)
   : Chemical (al),
-    crop_uptake_reflection_factor_ (al.number ("\
-crop_uptake_reflection_factor")),
-    canopy_dissipation_rate_coefficient_ (al.number ("\
-canopy_dissipation_rate_coefficient")),
+    crop_uptake_reflection_factor_ 
+  (al.number ("crop_uptake_reflection_factor")),
+    canopy_dissipation_rate_ 
+  (al.check ("canopy_dissipation_rate")
+   ? al.number ("canopy_dissipation_rate")
+   : (al.check ("canopy_dissipation_halftime")
+      ? halftime_to_rate (al.number ("canopy_dissipation_halftime"))
+      : al.number ("canopy_dissipation_rate_coefficient"))),
     canopy_washoff_coefficient_ (al.number ("canopy_washoff_coefficient")),
     diffusion_coefficient_ (al.number ("diffusion_coefficient") * 3600.0),
     solute_alist_ (al.alist ("solute")),
-    decompose_rate_ (al.number ("decompose_rate")),
+    decompose_rate_ (al.check ("decompose_rate")
+		     ? al.number ("decompose_rate")
+		     : halftime_to_rate (al.number ("decompose_halftime"))),
     decompose_heat_factor_ (al.plf ("decompose_heat_factor")),
     decompose_water_factor_ (al.plf ("decompose_water_factor")),
     decompose_CO2_factor_ (al.plf ("decompose_CO2_factor")),
     decompose_conc_factor_ (al.plf ("decompose_conc_factor")),
     decompose_depth_factor_ (al.plf ("decompose_depth_factor")),
+    decompose_lag_increment_ (al.plf ("decompose_lag_increment")),
     active_groundwater_ (al.flag ("active_groundwater"))
 { }
 
@@ -139,58 +149,126 @@ static struct ChemicalStandardSyntax
 {
   static Chemical&
   make (const AttributeList& al)
-    { return *new ChemicalStandard (al); }
+  { return *new ChemicalStandard (al); }
+
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  { 
+    bool ok = true;
+
+    static bool warned = false;
+    if (al.check ("canopy_dissipation_rate_coefficient") && !warned)
+      {
+	err.entry ("OBSOLETE: Use 'canopy_dissipation_rate' instead "
+		   "of 'canopy_dissipation_rate_coefficient'");
+	warned = true;
+      }
+
+    if (!al.check ("canopy_dissipation_rate")
+	&& !al.check ("canopy_dissipation_halftime")
+	&& !al.check ("canopy_dissipation_rate_coefficient"))
+      {
+	err.entry ("\
+You must specify 'canopy_dissipation_rate' or 'canopy_dissipation_halftime'");
+	ok = false;
+      }
+    if (al.check ("canopy_dissipation_rate") 
+	&& al.check ("canopy_dissipation_halftime"))
+      {
+	err.entry ("\
+You may not specify both 'canopy_dissipation_rate' and \
+'canopy_dissipation_halftime'");
+	ok = false;
+      }
+
+    if (!al.check ("decompose_rate") && !al.check ("decompose_halftime"))
+      {
+	err.entry ("\
+You must specify 'decompose_rate' or 'decompose_halftime'");
+	ok = false;
+	
+      }
+    if (al.check ("decompose_rate") && al.check ("decompose_halftime"))
+      {
+	err.entry ("\
+You may not specify both 'decompose_rate' and 'decompose_halftime'");
+	ok = false;
+      }
+    return ok;
+  }
+
   ChemicalStandardSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      syntax.add ("description", Syntax::String, Syntax::OptionalConst,
-		  "Description of this parameterization."); 
-      alist.add ("description", "\
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    syntax.add_check (check_alist);
+    syntax.add ("description", Syntax::String, Syntax::OptionalConst,
+		"Description of this parameterization."); 
+    alist.add ("description", "\
 Read chemical properties as normal Daisy parameters.");
-      syntax.add_fraction ("crop_uptake_reflection_factor", Syntax::Const, "\
+    syntax.add_fraction ("crop_uptake_reflection_factor", Syntax::Const, "\
 How much of the chemical is reflected at crop uptake.");
-      alist.add ("crop_uptake_reflection_factor", 1.0);
-      syntax.add ("canopy_dissipation_rate_coefficient", "h^-1", 
-		  Check::non_negative (), Syntax::Const,
-		  "How fast does the chemical dissipate on canopy.");
-      syntax.add ("canopy_washoff_coefficient", "mm", Check::positive (),
-		  Syntax::Const,
-		  "How fast is the chemical washed off the canopy.");
-      syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
-		  Syntax::Const, "Diffusion coefficient.");
-      syntax.add_submodule ("solute", alist, Syntax::Const,
-			    "Description of chemical in soil.",
-			    SoilChemical::load_syntax);
-      syntax.add ("decompose_rate", "h^-1", Check::non_negative (),
-		  Syntax::Const,
-		  "Fraction of solute being decomposed each hour.");
-      PLF empty;
-      syntax.add ("decompose_heat_factor", "dg C", Syntax::None (),
-		  Syntax::Const, "Heat factor on decomposition.");
-      alist.add ("decompose_heat_factor", empty);
-      syntax.add ("decompose_water_factor", "cm", Syntax::None (),
-		  Syntax::Const,
-		  "Water potential factor on decomposition.");
-      alist.add ("decompose_water_factor", empty);
-      syntax.add ("decompose_CO2_factor", "g C/cm^3", Syntax::None (),
-		  Syntax::Const,
-		  "CO2 development factor on decomposition.");
-      PLF no_factor;
-      no_factor.add (0.0, 1.0);
-      no_factor.add (1.0, 1.0);
-      alist.add ("decompose_CO2_factor", no_factor);
-      syntax.add ("decompose_conc_factor", "g X/cm^3 H2O", Syntax::None (),
-		  Syntax::Const,
-		  "Concentration development factor on decomposition.");
-      alist.add ("decompose_conc_factor", no_factor);
-      syntax.add ("decompose_depth_factor", "cm", Syntax::None (),
-		  Syntax::Const,
-		  "Depth influence on decomposition.");
-      alist.add ("decompose_depth_factor", no_factor);
-      syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
+    alist.add ("crop_uptake_reflection_factor", 1.0);
+    syntax.add ("canopy_dissipation_rate", "h^-1", 
+		Check::fraction (), Syntax::OptionalConst,
+		"How fast does the chemical dissipate on canopy.\n\
+You must specify it with either 'canopy_dissipation_halftime' or\n\
+'canopy_dissipation_rate'.");
+    syntax.add ("canopy_dissipation_halftime", "h", 
+		Check::positive (), Syntax::OptionalConst,
+		"How fast does the chemical dissipate on canopy.\n\
+You must specify it with either 'canopy_dissipation_halftime' or\n\
+'canopy_dissipation_rate'.");
+    syntax.add ("canopy_dissipation_rate_coefficient", "h^-1", 
+		Check::fraction (), Syntax::OptionalConst,
+		"Obsolete alias for 'canopy_dissipation_rate'.");
+    syntax.add ("canopy_washoff_coefficient", "mm", Check::positive (),
+		Syntax::Const,
+		"How fast is the chemical washed off the canopy.");
+    syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
+		Syntax::Const, "Diffusion coefficient.");
+    syntax.add_submodule ("solute", alist, Syntax::Const,
+			  "Description of chemical in soil.",
+			  SoilChemical::load_syntax);
+    syntax.add ("decompose_rate", "h^-1", Check::fraction (),
+		Syntax::OptionalConst,
+		"How fast the solute is being decomposed in the soil.\n\
+You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
+    syntax.add ("decompose_halftime", "h", Check::positive (),
+		Syntax::OptionalConst,
+		"How fast the solute is being decomposed in the soil.\n\
+You must specify it with either 'decompose_rate' or 'decompose_halftime'.");
+    PLF empty;
+    syntax.add ("decompose_heat_factor", "dg C", Syntax::None (),
+		Syntax::Const, "Heat factor on decomposition.");
+    alist.add ("decompose_heat_factor", empty);
+    syntax.add ("decompose_water_factor", "cm", Syntax::None (),
+		Syntax::Const,
+		"Water potential factor on decomposition.");
+    alist.add ("decompose_water_factor", empty);
+    syntax.add ("decompose_CO2_factor", "g CO2-C/cm^3", Syntax::None (),
+		Syntax::Const,
+		"CO2 development factor on decomposition.");
+    PLF no_factor;
+    no_factor.add (0.0, 1.0);
+    no_factor.add (1.0, 1.0);
+    alist.add ("decompose_CO2_factor", no_factor);
+    syntax.add ("decompose_conc_factor", "g/cm^3 H2O", Syntax::None (),
+		Syntax::Const,
+		"Concentration development factor on decomposition.");
+    alist.add ("decompose_conc_factor", no_factor);
+    syntax.add ("decompose_depth_factor", "cm", Syntax::None (),
+		Syntax::Const,
+		"Depth influence on decomposition.");
+    alist.add ("decompose_depth_factor", no_factor);
+    syntax.add ("decompose_lag_increment", 
+		"g/cm^3/h", Syntax::Fraction (), Syntax::Const,
+		"Increment lag with the value of this PLF for the current\n\
+concentration each hour.  When lag in any node reaches 1.0,\n\
+decomposition begins.  It can never be more than 1.0 or less than 0.0.");
+    alist.add ("decompose_lag_increment", no_factor);
+    syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
 Clear this flag to turn off decomposition in groundwater.");
-      alist.add ("active_groundwater", true);
-      Librarian<Chemical>::add_type ("default", alist, syntax, &make);
-    }
+    alist.add ("active_groundwater", true);
+    Librarian<Chemical>::add_type ("default", alist, syntax, &make);
+  }
 } ChemicalStandard_syntax;

@@ -31,6 +31,7 @@
 #include "plf.h"
 #include "log.h"
 #include "submodel.h"
+#include "check.h"
 
 static double f_Theta (double x)
 {
@@ -116,11 +117,11 @@ Clear this flag to turn off denitrification in groundwater.");
   alist.add ("active_groundwater", true);
   syntax.add ("converted", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Amount of denitrification.");
-  syntax.add ("K", "h^-1", Syntax::Const, "\
+  syntax.add ("K", "h^-1", Check::fraction (), Syntax::Const, "\
 Maximum fraction of nitrate converted at each time step.");
   alist.add ("K", 0.020833);
-  syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Syntax::Const, 
-	      "Anaerobic denitrification constant.");
+  syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
+	      Syntax::Const, "Anaerobic denitrification constant.");
   alist.add ("alpha", 0.1);
   PLF empty;
   syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,

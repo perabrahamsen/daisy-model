@@ -606,10 +606,15 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			TmpStream tmp;
 			TreelogStream treelog (tmp ());
 			Treelog::Open nest (treelog, obj);
-			if (!lib.syntax (obj).check (al, treelog))
+			bool ok = lib.syntax (obj).check (al, treelog);
+			if (!ok)
 			  error (string ("Error for member '") + obj 
 				 + "' in library '" + name
 				 + "'\n--- details:\n" + tmp.str () + "---");
+			else if (strlen (tmp.str ()) > 0)
+			  warning (string ("Warning for member '") + obj 
+				   + "' in library '" + name
+				   + "'\n--- details:\n" + tmp.str () + "---");
 		      }
 		    sequence.push_back (&al);
 		  }

@@ -165,6 +165,9 @@ bool approximate (const double a, const double b, const double noise)
   return ((b == 0.0) ? (a == 0.0) : fabs (a / b - 1.0) < noise);
 }
 
+double halftime_to_rate (double rate)
+{ return M_LN2 / rate; }
+
 
 // extern "C" int matherr (struct exception *exc) 
 // {

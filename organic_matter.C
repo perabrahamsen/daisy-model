@@ -38,6 +38,7 @@
 #include "tmpstream.h"
 #include "submodel.h"
 #include "treelog.h"
+#include "check.h"
 #include <algorithm>
 #include <numeric>
 
@@ -200,15 +201,21 @@ OrganicMatter::Implementation::Buffer::load_syntax (Syntax& syntax,
 						    AttributeList& alist)
 {
   const vector<double> empty_vector;
-  syntax.add ("C", "g C/cm^3", Syntax::State, Syntax::Sequence,
+  syntax.add ("C", "g C/cm^3", Check::non_negative (),
+	      Syntax::State, Syntax::Sequence,
 	      "Buffer carbon content.");
   alist.add ("C", empty_vector);
-  syntax.add ("N", "g N/cm^3", Syntax::State, Syntax::Sequence,
+  syntax.add ("N", "g N/cm^3", Check::non_negative (), Syntax::State, Syntax::Sequence,
 	      "Buffer nitrogen content.");
   alist.add ("N", empty_vector);
-  syntax.add ("turnover_rate", "h^-1", Syntax::Const,
-	      "Turnover rate from buffer into SOM.");
+  syntax.add ("turnover_rate", "h^-1", Check::fraction (), Syntax::Const,
+	      "Turnover rate from buffer into SOM.\n\
+Ignored if you specify 'turnover_halftime'.");
   alist.add ("turnover_rate", 1.0);
+  syntax.add ("turnover_halftime", "h", Check::positive (),
+	      Syntax::OptionalConst, 
+	      "Turnover halftime from buffer into SOM.\n\
+Overrules 'turnover_rate' if specified.");
   syntax.add ("where", Syntax::Integer, Syntax::Const,
 	      "The SOM pool to move the buffer content into.\n\
 The first and slow SOM pool is numbered '0', the second and faster\n\
@@ -303,7 +310,9 @@ OrganicMatter::Implementation::Buffer::initialize (const Geometry& geometry)
 OrganicMatter::Implementation::Buffer::Buffer (const AttributeList& al)
   : C (al.number_sequence ("C")),
     N (al.number_sequence ("N")),
-    turnover_rate (al.number ("turnover_rate")),
+    turnover_rate (al.check ("turnover_halftime")
+		   ? halftime_to_rate (al.number ("turnover_halftime"))
+		   : al.number ("turnover_rate")),
     where (al.integer ("where"))
 { }
 
@@ -1129,10 +1138,10 @@ Set this flag to turn on mineralization below the root zone.");
   syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
 Clear this flag to turn off mineralization in groundwater.");
   alist.add ("active_groundwater", true);
-  syntax.add ("K_NH4", "h^-1", Syntax::Const, 
+  syntax.add ("K_NH4", "h^-1", Check::fraction (), Syntax::Const, 
 	      "Maximal immobilization rate for ammonium.");
   alist.add ("K_NH4", 0.020833); // 0.5 / 24.
-  syntax.add ("K_NO3", "h^-1", Syntax::Const, 
+  syntax.add ("K_NO3", "h^-1", Check::fraction (), Syntax::Const, 
 	      "Maximal immobilization rate for nitrate.");
   alist.add ("K_NO3", 0.020833); // 0.5 / 24.
   syntax.add_submodule ("Bioincorporation", alist, Syntax::State, "\
@@ -1240,9 +1249,10 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   
   Syntax& layer_syntax = *new Syntax ();
   AttributeList layer_alist;
-  layer_syntax.add ("end", "cm", Syntax::Const,
+  layer_syntax.add ("end", "cm", Check::negative (), Syntax::Const,
 		    "End point of this layer (a negative number).");
-  layer_syntax.add ("weight", "kg C/m^2", Syntax::Const,
+  layer_syntax.add ("weight", "kg C/m^2", Check::non_negative (),
+		    Syntax::Const,
 		    "organic carbon content of this layer.");
   layer_syntax.order ("end", "weight");
   syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
@@ -1275,11 +1285,11 @@ If no value is given, tillage will have no influence.");
 If no value is given, tillage will have no influence.");
   alist.add ("som_tillage_factor", vector<const PLF*> ());
 
-  syntax.add ("min_AM_C", "g C/m^2", Syntax::Const, 
+  syntax.add ("min_AM_C", "g C/m^2", Check::non_negative (), Syntax::Const, 
 	      "Minimal amount of carbon in AOM ensuring it is not removed.");
   alist.add ("min_AM_C", 0.5);
   //  We require 5 kg C / Ha in order to keep an AM dk:pulje.
-  syntax.add ("min_AM_N", "g N/m^2", Syntax::Const, 
+  syntax.add ("min_AM_N", "g N/m^2", Check::non_negative (), Syntax::Const, 
 	      "Minimal amount of nitrogen in AOM ensuring it is not removed.");
   // We require ½ kg N / Ha in order to keep an AM dk:pulje.
   alist.add ("min_AM_N", 0.05);

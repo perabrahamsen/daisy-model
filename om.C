@@ -533,6 +533,21 @@ static bool check_alist (const AttributeList& al, Treelog& err)
       err.entry ("Initial fraction should be unspecified, or between 0 and 1");
       ok = false;
     }
+  if (!al.check ("turnover_rate") && !al.check ("turnover_halftime"))
+    {
+      err.entry ("\
+You must specify 'turnover_rate' or 'turnover_halftime'");
+      ok = false;
+	
+    }
+  if (al.check ("turnover_rate") && al.check ("turnover_halftime"))
+    {
+      err.entry ("\
+You may not specify both 'turnover_rate' and 'turnover_halftime'");
+      ok = false;
+    }
+
+
   return ok;
 }
 
@@ -561,11 +576,17 @@ matter, in this case the SMB pools.");
 	      "The carbon/nitrogen ratio.");
   syntax.add ("N", "g N/cm^3", Syntax::LogOnly, Syntax::Sequence,
 	      "Nitrogen in each soil interval.");
-  syntax.add ("turnover_rate", "h^-1", Check::non_negative (), Syntax::Const,
-	      "Fraction converted to other pools each hour.");
+  syntax.add ("turnover_rate", "h^-1", Check::fraction (), 
+	      Syntax::OptionalConst,
+	      "Fraction converted to other pools each hour.\n\
+You must specify either this or 'turnover_halftime'.");
+  syntax.add ("turnover_halftime", "h", Check::positive (), 
+	      Syntax::OptionalConst,
+	      "Time until half had been converted to other pools.\n\
+You must specify either this or 'turnover_rate'.");
   syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
 the efficiency this pool can be digested by each of the SMB pools.");
-  syntax.add ("maintenance", "h^-1", Check::non_negative (), Syntax::Const, "\
+  syntax.add ("maintenance", "h^-1", Check::fraction (), Syntax::Const, "\
 The fraction used for staying alive each hour.");
   alist.add ("maintenance", 0.0);
   syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
@@ -605,7 +626,9 @@ OM::OM (const AttributeList& al)
     initial_C_per_N (get_initial_C_per_N (al)),
     top_C (al.number ("top_C")),
     top_N (al.number ("top_N")),
-    turnover_rate (al.number ("turnover_rate")),
+    turnover_rate (al.check ("turnover_rate")
+		   ? al.number ("turnover_rate")
+		   : halftime_to_rate (al.number ("turnover_halftime"))),
     efficiency (al.number_sequence ("efficiency")),
     maintenance (al.number ("maintenance")),
     fractions (al.number_sequence ("fractions"))

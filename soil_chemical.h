@@ -58,8 +58,6 @@ public:
   double diffusion_coefficient () const; // in free solu. [cm² / h]
 
   // Create & Destroy.
-private:
-  static const PLF& no_lag ();
 public:
   static void load_syntax (Syntax&, AttributeList&);
   void initialize (const AttributeList&, const Soil&, const SoilWater&,

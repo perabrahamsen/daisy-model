@@ -169,7 +169,7 @@ Chemicals::Implementation::canopy_update (const Implementation& in,
        i++)
     {
       const Chemical* chemical = (*i).first;
-      const double K = chemical->canopy_dissipation_rate_coefficient ();
+      const double K = chemical->canopy_dissipation_rate ();
       const double Kd = chemical->canopy_washoff_coefficient ();
       const double divisor = 1.0 + dt * (K + water_out / (Kd + water_storage));
       assert (divisor > 0.0);
@@ -187,7 +187,7 @@ Chemicals::Implementation::canopy_dissipate (Implementation& dissipate) const
     {
       const Chemical* chemical = (*i).first;
       const double Sm = (*i).second;
-      const double K = chemical->canopy_dissipation_rate_coefficient ();
+      const double K = chemical->canopy_dissipation_rate ();
       dissipate.add (chemical, K * Sm);
     }
 }

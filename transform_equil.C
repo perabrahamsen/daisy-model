@@ -200,12 +200,14 @@ static struct TransformEquilibriumSyntax
 		"Name of second soil chemical in equilibrium.");
     syntax.add ("equilibrium", Librarian<Equilibrium>::library (),
 		"Function for calculating equilibrioum between A and B.");
-    syntax.add ("k_AB", "h^-1", Syntax::OptionalConst, Syntax::Sequence,
+    syntax.add ("k_AB", "h^-1", Check::fraction (),
+		Syntax::OptionalConst, Syntax::Sequence,
 		"Tranformation rate from soil chemical 'A' to 'B'.");
     syntax.add ("pedo_AB", Librarian<Pedotransfer>::library (),
 		Syntax::OptionalConst, Syntax::Singleton, 
 		"Function to calculate 'k_AB' if not specified.");
-    syntax.add ("k_BA", "h^-1", Syntax::OptionalConst, Syntax::Sequence,
+    syntax.add ("k_BA", "h^-1", Check::fraction (),
+		Syntax::OptionalConst, Syntax::Sequence,
 		"Tranformation rate from soil chemical 'B' to 'A'.");
     syntax.add ("pedo_BA", Librarian<Pedotransfer>::library (),
 		Syntax::OptionalConst, Syntax::Singleton,
@@ -214,7 +216,6 @@ If neither this, nor 'k_BA' are specified, 'k_AB' will be used.");
     syntax.add ("S_AB", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 		"Converted from A to B this timestep (may be negative).");
 
-    syntax.order ("A", "B");
     Librarian<Transform>::add_type ("equilibrium", alist, syntax, &make);
   }
 } TransformEquilibrium_syntax;

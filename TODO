@@ -34,8 +34,6 @@ Udbyg.
 
 ** Appendix listing features not mentioned otherwise.
 
-*** divide and merge,
-
 *** Gennemgå referencemanualen og kig efter ting der bør listes.
 
 ** Permanent vegetation
@@ -111,7 +109,7 @@ from type.
 
 * N respiration
 
-En standard parametrsering på
+En standard parameterisering på
 
     N_fixate_respiration    6.5 [g CH2O-C/g N]
     NO3_uptake_respiration  3.0 [g CH2O-C/g NO3-N]

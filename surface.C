@@ -36,6 +36,7 @@
 #include "plf.h"
 #include "ridge.h"
 #include "tmpstream.h"
+#include "check.h"
 
 struct Surface::Implementation
 {
@@ -525,17 +526,20 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   alist.add ("submodel", "Surface");
   alist.add ("description", "Keep track of things on the soil surface.");
-  syntax.add ("EpFactor", Syntax::None (), Syntax::Const,
+  syntax.add ("EpFactor", Syntax::None (), Check::non_negative (), 
+	      Syntax::Const,
 	      "Convertion of reference evapotranspiration to\n\
 potential evaporation for bare soil.");
   alist.add ("EpFactor", 0.8);
   syntax.add_fraction ("EpInterchange", Syntax::Const, "\
 Canopy adsorbtion fraction of unreached potential soil evaporation.");
   alist.add ("EpInterchange", 0.6);
-  syntax.add ("albedo_dry", Syntax::None (), Syntax::Const,
+  syntax.add ("albedo_dry", Syntax::None (), Check::non_negative (),
+	      Syntax::Const,
 	      "Albedo of dry soil (pF >= 3)");
   alist.add ("albedo_dry", 0.15);
-  syntax.add ("albedo_wet", Syntax::None (), Syntax::Const,
+  syntax.add ("albedo_wet", Syntax::None (), Check::non_negative (),
+	      Syntax::Const,
 	      "Albedo of wet soil (pf <= 1.7)");
   alist.add ("albedo_wet", 0.08);
   syntax.add ("minimal_matter_flux", "mm", Syntax::Const, "\
@@ -562,10 +566,11 @@ Water evaporated from the surface, including the pond and exfiltration.");
 Potential evaporation from the surface.");
   syntax.add ("T", "dg C", Syntax::LogOnly, "\
 Temperature of water or air directly above the surface.");
-  syntax.add ("DetentionCapacity", "mm", Syntax::State, "\
-Amount of ponding the surface can retain.");
+  syntax.add ("DetentionCapacity", "mm", Check::non_negative (),
+	      Syntax::State, "Amount of ponding the surface can retain.");
   alist.add ("DetentionCapacity", 1000.0);
-  syntax.add ("ReservoirConstant", "h^-1", Syntax::Const, "\
+  syntax.add ("ReservoirConstant", "h^-1", Check::fraction (), 
+	      Syntax::Const, "\
 Fraction of ponding above DetentionCapacity that runoffs each hour.");
   alist.add ("ReservoirConstant", 1.0);
   syntax.add ("runoff", "mm/h", Syntax::LogOnly, "\
@@ -576,7 +581,7 @@ Inorganic nitrogen on the surface [g/cm^2].",
   syntax.add_submodule ("IM_runoff", alist, Syntax::LogOnly, "\
 Inorganic nitrogen on the runoff water this hour [g/cm^2/h].",
 			IM::load_syntax);
-  syntax.add ("R_mixing", "h/mm", Syntax::Const, "\
+  syntax.add ("R_mixing", "h/mm", Check::non_negative (), Syntax::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
   alist.add ("R_mixing", 1.0e9);
   Chemicals::add_syntax  ("chemicals_storage", syntax, alist, Syntax::State,

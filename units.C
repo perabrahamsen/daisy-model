@@ -189,6 +189,7 @@ Units::standard_conversions ()
   add ("pF", "cm", *new Convert_pF_cm ());
   add ("cm", "pF", *new Convert_cm_pF ());
   add ("d^-1", "h^-1", 1.0/24.0);
+  add ("d", "h", 24.0);
   add ("mm/d", "mm/h", 1.0/24.0);
   add ("dgWest", "dgEast", -1.0);
   add ("dgSouth", "dgNorth", -1.0);

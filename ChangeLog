@@ -1,3 +1,35 @@
+2002-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.25 released.
+
+xo2002-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transform_equil.C (TransformEquilibriumSyntax): Added checks.
+	(TransformEquilibriumSyntax): Removed order.
+	* surface.C (load_syntax): Added checks.
+	* denitrification.C (load_syntax): Added checks.
+	* om.C (turnover_halftime): New parameter.
+	* organic_matter.C (Buffer::turnover_halftime): New parameter.
+	(Buffer::load_syntax): Added range checks.
+	(load_syntax): Ditto.
+	* chemical_std.C (canopy_dissipation_halftime): New parameter.
+	(decompose_halftime): Ditto.
+	* lib/chemistry.dai (Bentazon, IPU, MCPP): Use it.
+
+2002-03-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemical_soil.C, chemical.h (canopy_dissipation_rate): Dropped
+	trailing coefficent.
+	* chemicals.C (canopy_dissipate): Update caller.
+
+	* chemical_soil.C (lag_increment): Moved from here.
+	* chemical.h, chemical_std.C (decompose_lag_increment): Moved to here. 
+	
+	* txt/tutorial.tex (Defining New Pesticides): New subsubsection. 
+
+	* chemical_std.C (ChemicalStandardSyntax): Narrow range check for
+	`canopy_dissipation_rate_coefficient'. 
+
 2002-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.24 released.
@@ -8,7 +40,7 @@
 
 2002-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* txt: Added directory to cvs. 
+	* txt: Added directory and content to cvs. 
 
 	* average.C (description): Doc fix.
 	* crop_sold.C (CropSoldSyntax): Ditto.

@@ -35,7 +35,7 @@ public:
   // Queries.
 public:
   virtual double crop_uptake_reflection_factor () const	= 0; // [0-1]
-  virtual double canopy_dissipation_rate_coefficient () const = 0; // [h^-1]
+  virtual double canopy_dissipation_rate () const = 0; // [h^-1]
   virtual double canopy_washoff_coefficient () const = 0; // [mm]
   virtual double diffusion_coefficient () const = 0; // in free solu. [cm² / h]
   virtual const AttributeList& solute_alist () const = 0;
@@ -45,6 +45,7 @@ public:
   virtual double decompose_CO2_factor (double CO2) const = 0; // [g C/cm^3 ->]
   virtual double decompose_conc_factor (double conc) const = 0; // [g X/cm^3 H2O->]
   virtual double decompose_depth_factor (double depth) const = 0; // [cm->]
+  virtual double decompose_lag_increment (double conc) const = 0; // [g X/cm^3 H2O->]
   virtual bool active_groundwater () const = 0;
 
   // Create and Destroy.

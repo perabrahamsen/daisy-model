@@ -12,9 +12,45 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
-* 2.24
+* 2.25
 
-No user visisble changes.
+** Changed the equilibrium tranformation model.
+
+The 'A' and 'B' parameters that specify the names of the two chemicals
+are no longer ordered.
+
+** You can now specify 'turnover_halftime' in organic matter pools.
+
+This is an alternative to 'turnover_rate'.
+
+** Changes to the default chemical model.
+
+*** decompose log increment for pesticided moved from solute t chemical.
+
+So now write 
+
+ (defchemical Foo default
+    (lag_increment (0.0 1e-5) (1.0 1e-4))
+    ...)
+
+instead of 
+
+  (defchemical Foo default
+    (solute (lag_increment (0.0 1e-5) (1.0 1e-4))
+            ...) ...)
+
+*** canopy_dissipation_rate_coefficient made obsolete.
+
+Instead, you the new name 'canopy_dissipation_rate' or the new
+parameter 'canopy_dissipation_halftime'.
+
+*** New decompose_halftime parameter
+
+It can be used instead of 'decompose_rate'.
+
+** New [d] to [h] convertion.
+
+Particular useful in konjunktion with the new halftime parameters.
 
 * 2.22
 
@@ -232,7 +268,7 @@ horizon attributes.  Here is an example:
   (offset 0.0))
 	   
 (deftransform "Phosphor Fast<->Slow" equilibrium
-  "Phosphor Fast" "Phosphor Slow"
+  (A "Phosphor Fast") (B "Phosphor Slow")
   (equilibrium Langmuir
 	       (K 1e-5 [g/cm^3])
 	       (pedo_my_max "van der Zee & van Riemsdijk")
@@ -261,7 +297,7 @@ You can now create arbitrary transformations between soil chemicals.
 Example:
 
 (defcolumn test default
-  (Transformations (equilibrium "Phosphor Solute" "Phosphor Solid"
+  (Transformations (equilibrium (A "Phosphor Solute") (B "Phosphor Solid")
 				(equilibrium Langmuir
 					     (K 1e-5 [g/cm^3])
 					     (my_max 1e-2 [g/cm^3]))

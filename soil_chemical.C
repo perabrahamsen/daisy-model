@@ -61,7 +61,7 @@ SoilChemical::decompose (const Soil& soil,
   bool found = false;
   for (unsigned int i = 0; i < size; i++)
     {
-      lag[i] += lag_increment (C_[i]) * dt;
+      lag[i] += chemical.decompose_lag_increment (C_[i]) * dt;
       
       if (lag[i] >= 1.0)
 	{
@@ -116,18 +116,6 @@ SoilChemical::diffusion_coefficient () const
 { return chemical.diffusion_coefficient (); }
 
 
-const PLF& 
-SoilChemical::no_lag ()
-{
-  static PLF plf;
-  if (plf.size () == 0)
-    {
-      plf.add (0.0, 1.0);
-      plf.add (1.0, 1.0);
-    }
-  return plf;
-}
-
 void
 SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
 {
@@ -138,18 +126,12 @@ SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Amount uptaken by crops in this time step.");
   syntax.add ("decomposed", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Amount decomposed in this time step.");
-  // Use "none" adsorption by default.
-  AttributeList none;
-  none.add ("type", "none");
-
-  syntax.add ("lag_increment", "g/cm^3", Syntax::Fraction (), Syntax::Const,
-	      "Increment lag with the value of this PLF for the current\n\
-concentration each timestep.  When lag in any node reaches 1.0,\n\
-decomposition begins.  It can never be more than 1.0 or less than 0.0.");
-  alist.add ("lag_increment", no_lag ());
   syntax.add ("lag", Syntax::None (), Syntax::OptionalState,
 	      "This state variable grows with lag_increment (C) each hour.\n\
 When it reached 1.0, decomposition begins.");
+  // Use "none" adsorption by default.
+  AttributeList none;
+  none.add ("type", "none");
   alist.add ("adsorption", none);
 }
 
@@ -166,8 +148,7 @@ SoilChemical::initialize (const AttributeList& al,
 
 SoilChemical::SoilChemical (const Chemical& chem, const AttributeList& al)
   : Solute (al),
-    chemical (chem),
-    lag_increment (al.plf ("lag_increment"))
+    chemical (chem)
 {
   if (al.check ("lag"))
     lag = al.number_sequence ("lag");
@@ -175,8 +156,7 @@ SoilChemical::SoilChemical (const Chemical& chem, const AttributeList& al)
 
 SoilChemical::SoilChemical (const Chemical& chem)
   : Solute (chem.solute_alist ()),
-    chemical (chem),
-    lag_increment (no_lag ())
+    chemical (chem)
 { }
 
 SoilChemical::~SoilChemical ()

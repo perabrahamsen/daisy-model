@@ -61,10 +61,11 @@ main (int argc, char* argv[])
 	}
 
       // Check the result.
-      Treelog::Open nest (treelog, "Daisy");
-      if (!syntax.check (alist, treelog))
-	return 1;
-
+      { 
+	Treelog::Open nest (treelog, "Daisy");
+	if (!syntax.check (alist, treelog))
+	  return 1;
+      }
       // Create, check and run the simulation.
       Daisy daisy (alist);
       daisy.initialize (syntax, treelog);
