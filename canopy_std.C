@@ -26,11 +26,22 @@
 #include "mathlib.h"
 
 double
-CanopyStandard::CropHeight (double WStem, double DS)
+CanopyStandard::CropHeight (double WStem, double DS) const
 {
   const double H1 = HvsDS (DS) + Offset;
   const double H2 = HvsDS (1.0) * HvsWStem (WStem);
   return min (H1, H2);
+}
+
+double
+CanopyStandard::DS_at_height (double height) const
+{ 
+  assert (height >= 0.0);
+  const PLF DSvsH (HvsDS.inverse_safe ());
+  const double DS = DSvsH (height);
+  assert (DS >= 0.0);
+  assert (DS <= 2.0);
+  return DS;
 }
 
 void

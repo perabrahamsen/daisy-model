@@ -28,6 +28,7 @@
 #include "log.h"
 #include "mathlib.h"
 #include "submodel.h"
+#include "check_range.h"
 
 #include <numeric>
 
@@ -216,9 +217,6 @@ Harvesting::operator() (const string& column_name,
   // Dead or alive?
   if (!kill_off && DS < DSmax && leaf_harvest < 1.0)
     {
-      if (DS > DSnew)
-	DS = DSnew;
-
       // Cut delay.
       const double new_DM = production.DM ();
       const double removed_DM = old_DM - new_DM;
@@ -329,12 +327,15 @@ Valuable fraction of storage organ (DM), e.g. grain or tuber.");
   syntax.add ("EconomicYield_N", Syntax::None (), Syntax::OptionalConst,
                "Valuable fraction of storage organ (N).\n\
 By default the value for DM is used.");
-  syntax.add ("DSmax", Syntax::None (), Syntax::Const, "\
+  static const RangeII range_max (0.0, 2.0);
+  syntax.add ("DSmax", Syntax::None (), range_max, Syntax::Const, "\
 Maximal development stage for which the crop survives harvest.");
   alist.add ("DSmax", 0.80);
-  syntax.add ("DSnew", Syntax::None (), Syntax::Const,
-	       "New development stage after harvest.");
-  alist.add ("DSnew", 0.20);
+  static const RangeII range_new (0.0, 1.0);
+  syntax.add ("DSnew", Syntax::None (), range_new, Syntax::OptionalConst,
+	       "New development stage after harvest.\n\
+If not specified, use the DS where the crop first reached the height\n\
+it now has after the cut.");
   syntax.add ("last_cut", Syntax::Date, Syntax::OptionalState,
 	      "Date of last cut.  Used for calculating cut delay.");
   syntax.add ("production_delay", "d", Syntax::State,
@@ -363,7 +364,7 @@ Harvesting::Harvesting (const AttributeList& al)
                      ? al.number ("EconomicYield_N")
                      : al.number ("EconomicYield_W")),
     DSmax (al.number ("DSmax")),
-    DSnew (al.number ("DSnew")),
+    DSnew (al.check ("DSnew") ? al.number ("DSnew") : -44.0),
     last_cut (al.check ("last_cut") ? new Time (al.time ("last_cut")) : NULL),
     production_delay (al.number ("production_delay")),
     cut_delay (al.plf ("cut_delay")),

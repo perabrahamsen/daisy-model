@@ -650,7 +650,7 @@ Number of vertical intervals in which we partition the canopy.");
       // External water sources and sinks.
       syntax.add ("pet", Librarian<Pet>::library (), 
 		  "Potential Evapotranspiration component.");
-      AttributeList& pet_alist = *new AttributeList;
+      AttributeList pet_alist;
       pet_alist.add ("type", "makkink");
       alist.add ("pet", pet_alist);
       syntax.add ("total_ep", "mm/h", Syntax::LogOnly,

@@ -42,6 +42,7 @@ public:
   // Use.
   double operator ()(double x) const;
   PLF inverse () const;
+  PLF inverse_safe () const;
   double first_interesting () const;
   double last_interesting () const;
   double max_at () const;

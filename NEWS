@@ -12,7 +12,20 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.09
+
+** There is now an index of logable variables in the reference manual.
+
+** The 'default' bioclimate model is now default.
+
+I.e., you don't have to specify it explicitly.
+
+** If you don't specify DSnew in the default crop model, it will use 
+the stub length to calculate the DS after a cut. 
+
 * 2.08
+
+** Fix bug preventing macropores and drainage to be used together.
 
 ** Fix checkpoints.
 

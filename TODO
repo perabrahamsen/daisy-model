@@ -4,6 +4,36 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Make it possible to log a specific entry in an array of unnamed objects.
 
+* Log table
+
+** Add long description for each column in a table log file.
+
+I.e. a new select parameter named "description", plus a table option
+of whether to add it to preamble of the dlf file.
+
+** New log table spec parameter
+
+It should have the format
+
+   library model sumodel* attribute
+
+it would be used to get default dimension and description of the parameter
+from the syntax table, and allow automatic convertions.
+
+* Paramerization library documentation
+
+** Add standard paramterizations to reference manual.
+
+** Tell "superclass" (with reference) and file(s).
+
+** syntax.add_printer ("LaTeX", log_table_pp_LaTeX)
+
+** Differences from superclass.
+
+** Automate generation.
+
+* Add state/log index to manual.
+
 * Organic Matter
 
 ** Add DOM pool
@@ -16,7 +46,20 @@ Dissolved Organic Matter, feed by all the OM pool transformations.
 
 ** Pesticides
 
-* Check dræn + makro porer, specielt makroporer ned i grundvand.
+* Add user defineable convertions.
+
+* New 'spec' log model.
+
+Select attribute with
+
+    library type submodel* attribute
+
+Use filters like
+
+    library type
+
+cutting of branch if it encounter an object from library not derived
+from type.
 
 * QDaisy.
 

@@ -1,3 +1,30 @@
+2002-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.09 released.
+
+2002-02-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.h (DSnew): Made it public.
+	* harvesting.C 	(load_syntax): Made it optional.
+	(operator ()): Don't set DS to DSnew here.
+	(load_syntax): Added range checks to DSmax and DSnew.
+	* plf.C, plf.h (inverse_safe): New function.
+	* canopy_std.C, canopy_std.h (DS_at_height): New function.
+	* crop_std.C (harvest): Call it.
+
+2002-02-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* document_LaTeX.C (print_entry_category): Add index.
+	* Makefile (txt/reference/reference.dvi): Ditto.
+	(txt/reference/reference.pdf): Ditto.
+
+2002-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_base.C (ColumnBase, load_syntax): Made "Bioclimate"
+	optional. 
+
+	* bioclimate_std.C (BioclimateStandardSyntax): Fix minor memory leak.
+
 2002-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.08 released.

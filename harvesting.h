@@ -56,7 +56,9 @@ private:
   const double EconomicYield_N; // Frac. of economic yield (N) in storage org.
   const double DSmax;		// Maximal development stage for which
 				// the crop survives harvest.
+public:
   const double DSnew;		// Maximal development stage after harvest.
+private:
   Time* last_cut;		// Date of last cut.
   double production_delay;	// Production delay after cut [d]
   const PLF cut_delay;		// -||- as function of removed fraction.

@@ -1,7 +1,8 @@
 // document_LaTeX.C --- Support for documenting Daisy in LaTeX format.
 // 
+// Copyright 2002 Per Abrahamsen and KVL
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2000-2001 KVL
 //
 // This file is part of Daisy.
 // 
@@ -313,6 +314,14 @@ DocumentLaTeX::print_entry_category (ostream& out,
 				     const Syntax& syntax,
 				     const AttributeList& alist)
 {
+  if (type == Syntax::Number 
+      && (syntax.is_state (name) || syntax.is_log (name)))
+    {
+      out << "\\index{";
+      print_quoted (out, name);
+      out << "}";
+    }
+
   if (type == Syntax::Object)	// Objects and ALists don't have categories.
     {
       if (syntax.is_optional (name))

@@ -55,7 +55,8 @@ public:
 
   // Functions.
 public:
-  double CropHeight (double Wstem, double DS);
+  double CropHeight (double Wstem, double DS) const;
+  double DS_at_height (double height) const;
 private:
   void InitialCAI (double WLeaf, double DS);
 public:

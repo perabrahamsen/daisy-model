@@ -338,13 +338,35 @@ void
 ColumnBase::output_inner (Log&) const
 { }
 
+static Bioclimate& 
+get_bioclimate (const AttributeList& al)
+{
+  if (al.check ("Bioclimate"))
+    return Librarian<Bioclimate>::create (al.alist ("Bioclimate"));
+  AttributeList alist (Librarian<Bioclimate>::library ().lookup ("default"));
+  alist.add ("type", "default");
+  return Librarian<Bioclimate>::create (alist);
+}
+
+static AttributeList		// Needed for checkpoint.
+add_bioclimate (const AttributeList& al)
+{
+  if (al.check ("Bioclimate"))
+    return al;
+  AttributeList parent (al);
+  AttributeList child (Librarian<Bioclimate>::library ().lookup ("default"));
+  child.add ("type", "default");
+  parent.add ("Bioclimate", child);
+  return parent;
+}
+
 ColumnBase::ColumnBase (const AttributeList& al)
-  : Column (al),
+  : Column (add_bioclimate (al)),
     weather (al.check ("weather") 
 	     ? &Librarian<Weather>::create (al.alist ("weather"))
 	     : NULL), 
     vegetation (Librarian<Vegetation>::create (al.alist ("Vegetation"))),
-    bioclimate (Librarian<Bioclimate>::create (al.alist ("Bioclimate"))),
+    bioclimate (get_bioclimate (al)),
     surface (al.alist ("Surface")),
     soil (al.alist ("Soil")),
     soil_water (al.alist ("SoilWater")),
@@ -406,6 +428,7 @@ the simulation.  If unspecified, used global weather.");
   alist.add ("Vegetation", vegetation_alist);
 
   syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
+	      Syntax::OptionalState, Syntax::Singleton,
 	      "The water and energy distribution among the crops.");
   syntax.add_submodule ("Surface", alist, Syntax::State,
 			"The upper border of the soil.",

@@ -33,6 +33,7 @@ struct PLF::Implementation
 
   double operator () (const double pos) const;
   PLF inverse () const;
+  PLF inverse_safe () const;
   double first_interesting () const;
   double last_interesting () const;
   double max_at () const;
@@ -96,6 +97,26 @@ PLF::Implementation::inverse () const
   for (int i = 0; i < size; i++)
     {
       assert (last <= y[i]);
+      plf.add (y[i], x[i]);
+      last = y[i];
+    }
+  return plf;
+}
+
+// Calculate the inverse function of a PLF.  
+// We only use the first monotonously increasing part, if any.
+
+PLF 
+PLF::Implementation::inverse_safe () const
+{
+  const int size = x.size ();
+  PLF plf;
+
+  double last = y[0] - 1.0;
+  for (int i = 0; i < size; i++)
+    {
+      if (last > y[i])
+	break;
       plf.add (y[i], x[i]);
       last = y[i];
     }
@@ -222,6 +243,10 @@ PLF::operator () (const double x) const
 PLF
 PLF::inverse () const
 { return impl.inverse (); }
+
+PLF
+PLF::inverse_safe () const
+{ return impl.inverse_safe (); }
 
 double
 PLF::first_interesting () const

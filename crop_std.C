@@ -309,6 +309,8 @@ CropStandard::harvest (const string& column_name,
 	  leaf_harvest = (1.0 - stub_CAI / canopy.CAI);
 	  bioclimate.harvest_chemicals (chemicals, canopy.CAI - stub_CAI);
 	}
+      else 
+	leaf_harvest = 0.0;
     }
   else
     {
@@ -330,6 +332,16 @@ CropStandard::harvest (const string& column_name,
 
       if (development.DS > 0.0)
 	{
+	  // Revert development.
+	  if (harvesting.DSnew < 0.0)
+	    {
+	      // Negative value means revert to canopy 
+	      if (stub_length < canopy.Height)
+		development.DS = canopy.DS_at_height (stub_length);
+	    }
+	  else if (development.DS > harvesting.DSnew)
+	    development.DS = harvesting.DSnew;
+	  
 	  // Cut canopy.
 	  canopy.cut (development.DS, stub_length);
 	  assert (approximate (canopy.CropHeight (production.WStem,

@@ -498,12 +498,14 @@ txt/reference/reference.ps:	txt/reference/reference.dvi
 
 txt/reference/reference.dvi:	txt/reference/components.tex
 	(cd txt/reference \
+	 && makeindex reference \
 	 && latex reference.tex < /dev/null )
 
 pdf:	txt/reference/reference.pdf
 
 txt/reference/reference.pdf:	txt/reference/components.tex
 	(cd txt/reference \
+	 && makeindex reference \
 	 && pdflatex reference.tex < /dev/null )
 
 txt/reference/components.tex:	daisy
