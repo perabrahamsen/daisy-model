@@ -152,6 +152,21 @@ PetPM::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
     (Weather::SaturationVapourPressure (Temp) - ea);
   E3 /= Weather::SlopeVapourPressureCurve (Temp) +
     Weather::PsychrometricConstant (AtmPressure, Temp) * (1 + 0.34 * U2);
+ #if 1
+  if (Rn>750.0)
+    {
+      cout << "Rn          " << Rn << "\n";
+      cout << "G           " << G << "\n";
+      cout << "Temp        " << Temp << "\n";
+      cout << "es          " << Weather::SaturationVapourPressure (Temp) << "\n";
+      cout << "ea          " << ea << "\n";
+      cout << "U2          " << U2 << "\n";
+      cout << "AtmPressure " << AtmPressure << "\n";
+      cout << "Delta       " << Weather::SlopeVapourPressureCurve (Temp) << "\n";
+      cout << "Gamma       " << Weather::PsychrometricConstant (AtmPressure, Temp) << "\n";
+      cout << "Ep (mm/d)   " << E3 << "\n";
+    }
+ #endif
   return E3 / 86400.0; // [kg/m2/s]
 }
 

@@ -49,6 +49,15 @@ struct NetRadiationParent : public NetRadiation
       const double Ln
 	= NetLongwaveRadiation (Cloudiness, Temp, VapourPressure);
       net_radiation_ = (1.0 - Albedo) * Si - Ln;
+#if 1
+      if (net_radiation_>750)
+      {
+        cout << "Albedo     " << Albedo << "\n";
+        cout << "Si         " << Si     << "\n";
+        cout << "Ln         " << Ln     << "\n";
+        cout << "Rn         " << net_radiation_ << "\n";
+      }
+#endif
     }
   void tick (const Weather& weather, double Albedo)
     { tick (weather.daily_cloudiness (), weather.daily_air_temperature (),
@@ -78,6 +87,11 @@ struct NetRadiationBrunt : public NetRadiationParent
 			      double VapourPressure) const
     {
       const double NetEmiss = a - b * sqrt (VapourPressure);
+#if 0
+        cout << "NetEmiss       " << NetEmiss << "\n";
+        cout << "VapourPressure " << VapourPressure << "\n";
+        cout << "Cloudiness     " << Cloudiness << "\n";
+#endif
       return (Cloudiness * NetEmiss * SB * pow (Temp + 273, 4));
     }
   

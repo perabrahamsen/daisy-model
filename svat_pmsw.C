@@ -42,7 +42,7 @@ int RAS(double, double, double, double, double, double, double&, double&);
 int RAC(double, double, double , double&, double&, double&, double&, double&);
 int RSC(double , double, double, double, double, double, double , double,
         double, double, double, double, double, double, double, double,
-        double, double, double, double, double, double&, double&, double&,
+        double, double, double, double, double, double, double&, double&, double&,
         double&, double&, double&, double&, double&, double&, double&, double&,
         double&, double&, double&, double&, double&, double&, double&, double&,
         double&, double&, double&, double&);
@@ -431,18 +431,16 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
          double esta, double theta_w, double theta_c, double rcmin,
          double rcmax, double zeta, double f3const, double tref, double spar,
          double tmin, double tmax, double nu_1, double nu_2, double nu_3,
-         double crop_ea_w, double crop_ep_w, double &rfpar, double &rf_1,
-         double &rf_2, double &rf_3, double &rf_4, double &rr_sc_1,
+         double crop_ea_w, double crop_ep_w, double rcmin_star, double &rfpar,
+         double &rf_1,double &rf_2, double &rf_3, double &rf_4, double &rr_sc_1,
          double &/*rr_tot_1*/,double &rbf_temp, double &rf_temp, double &rf_def,
          double &rf_theta, double &rf1_dolman, double &rr_sc_2, double &/*rr_tot_2*/,
          double &rf_etep, double &rr_sc_3, double &/*rr_tot_3*/, double &rr_sc_4,
          double &/*rr_tot_4*/, double &rr_sc_5, double &/*rr_tot_5*/, double &rr_sc_min,
          double &rr_sc_js)
 {
-  assert (rcmin > 0.0);
   assert (LAI > 0.0);
   double tairk,def;
-  double rcmin_LAI;
   const double a4=700.0; // parameter in f1_dolman (for oats)
 
   esta=611.0*exp((17.27*tair)/(tair+237.3)); // saturated vapor pressure
@@ -450,12 +448,11 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
   tairk=tair+273.15; // air temperature in K
   assert (spar > 0.0);
   rfpar=0.55*2*srad/(spar*LAI); // cpar coefficient in rf_1
-  rcmin_LAI=rcmin;   // read from file or calculate from 200/LAI
 
   // constraint functions used in Dickinson (1984) / Noilhan et al. (1991)
   assert (rcmax > 0.0);
   assert (1+rfpar != 0.0);
-  rf_1=(rcmin_LAI/rcmax+rfpar)/(1+rfpar); // related to solar radiation
+  rf_1=(rcmin_star/rcmax+rfpar)/(1+rfpar); // related to solar radiation
   rf_2=1-zeta*(esta-e_pa); // related to vapour pressure deficit
   // tref-tairk > 0
   if (tref-tairk <= 0.0) tref=tairk+1.0;
@@ -496,25 +493,25 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
   assert (rf_2 != 0.0);
   assert (rf_3 != 0.0);
   assert (rf_4 != 0.0);
-  rr_sc_1=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_4);
+  rr_sc_1=(rcmin_star/LAI)/(rf_1*rf_2*rf_3*rf_4);
 
   // ... or using Verma et al. (1993): r_sc_2
   assert (rf_temp != 0.0);
   assert (rf_def != 0.0);
   assert (rf_theta != 0.0);
-  rr_sc_2=(rcmin_LAI/LAI)/(rf_1*rf_temp*rf_def*rf_theta);
+  rr_sc_2=(rcmin_star/LAI)/(rf_1*rf_temp*rf_def*rf_theta);
 
   // ... or using f_etep: eact/epotc: r_sc_3
   assert (rf_etep != 0.0);
-  rr_sc_3=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_etep);
+  rr_sc_3=(rcmin_star/LAI)/(rf_1*rf_2*rf_3*rf_etep);
   /*
     // combine f_etep with f_temp, f_def and f_theta (and f_1): r_sc_4
     rr_sc_4=(rcmin_LAI/LAI)/(rf1_dolman*rf_temp*rf_def*rf_etep);
   */
   // calculate rcmin with f2=f3=f4=1
-  rr_sc_4=(rcmin_LAI/LAI)/rf_1;
+  rr_sc_4=(rcmin_star/LAI)/rf_1;
   // replace f_2 by f_def: r_sc_5
-  rr_sc_5=rcmin_LAI/(rf_1*rf_def*rf_3*rf_4); // No dision by LAI
+  rr_sc_5=rcmin_star/(rf_1*rf_def*rf_3*rf_4); // No dision by LAI
   /*
     // Use Jarvis (1976) & Steward (1988) as referenced in Dolman (1993):
     assert (rf1_dolman != 0.0);
@@ -523,10 +520,10 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
   // Use Jarvis (1976) & Steward (1988) as referenced in Dolman (1993):
   // in combination to f_etep
   assert (rf1_dolman != 0.0);
-  rr_sc_js=(rcmin_LAI/LAI)/(rf1_dolman*rf_def*rf_3*rf_etep);
+  rr_sc_js=(rcmin_star/LAI)/(rf1_dolman*rf_def*rf_3*rf_etep);
 
   // for unstressed canopy resistance r_sc_min is equal to rcmin_LAI
-  rr_sc_min=rcmin_LAI;
+  rr_sc_min=rcmin_star;
 
   return 0;
 }
@@ -599,7 +596,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   if (rrcmin_star > r_sc_star) rrcmin_star=r_sc_star;
   // calculate stress factor
   assert (r_sc_star != 0.0);
-  rpstress=rrcmin_star/r_sc_star;
+  rpstress=min(1.0,rrcmin_star/r_sc_star);
 
   return 0;
 }
@@ -1153,7 +1150,8 @@ public:
   double tcan_prev; // tcan from previous timestep
   double tcan_init; // initial value for tcan
   double e_c_abs,e_sl_abs; // in kg/m**3: e_c and e_sl in Pa
-  double rcmin_star,pstress; // NEW
+  double rcmin_star; // initial value
+  double pstress; // to be returned from svat_pmsw
 
 // matrix elements in ACOEFF with r_sc_star as argument
   double astar_11,astar_12,astar_13,astar_14,astar_15,astar_21,astar_22;
@@ -1224,6 +1222,8 @@ public:
   double tsurf_dt_dry_init; // in RASTAB()
 
   int n_hr; // auxiliary variable for facilitating PG
+  // initial value for rcmin_star
+
 
   // Simulation.
   double production_stress () const;
@@ -1241,11 +1241,11 @@ public:
 
 
 // return Lel in mm/hr, i.e. (1/680) 1 W/m**2 = 0.001471 mm/hr
-double 
+double
 SVAT_PMSW::production_stress () const
 { return pstress; }
 
-void 
+void
 SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
                  const Surface& surface, const Soil& soil, const SoilHeat& soil_heat,
                  const SoilWater& soil_water, const Pet& pet, double canopy_ea ,
@@ -1280,13 +1280,13 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
   // test for missing value and for LAI > 0
   if (LAI > 0.0)
     {
-      if (rcmin_sb_ndvi==9999.0) rcmin=200.0/LAI;
-      else rcmin=rcmin_sb_ndvi; // for barley
+      if (rcmin_sb_ndvi==9999.0) rcmin_star=200.0/LAI;
+      else rcmin_star=rcmin_sb_ndvi; // for barley
       fprintf(fp_rcminsb,"%lf%10.2lf%10.2lf\n",pgtime,200.0/LAI,rcmin_sb_ndvi);
-    } else rcmin=rcmin_sb_ndvi; // or another variable=9999
+    } else rcmin_star=rcmin_sb_ndvi; // or another variable=9999
 #else
   if (LAI > 0.0)
-    rcmin=200.0/LAI;
+    rcmin_star=200.0/LAI;
 #endif
   // potential evapotranspiration from surface and canopy, from tick()
   // pot.evap.above crop canopy [cm/hr]
@@ -1444,9 +1444,9 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       // Verma et al.(1993), return r_sc_js (from f1_dolman, f_def, f_3 and f_etep
       RSC (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,rcmax,
            zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
-           fpar,f_1,f_2,f_3,f_4,r_sc_1,r_tot_1,bf_temp,f_temp,f_def,f_theta,
-           f1_dolman,r_sc_2,r_tot_2,f_etep,r_sc_3,r_tot_3,r_sc_4,r_tot_4,r_sc_5,
-           r_tot_5,r_sc_min,r_sc_js);
+           rcmin_star,fpar,f_1,f_2,f_3,f_4,r_sc_1,r_tot_1,bf_temp,f_temp,f_def,
+           f_theta,f1_dolman,r_sc_2,r_tot_2,f_etep,r_sc_3,r_tot_3,r_sc_4,r_tot_4,
+           r_sc_5,r_tot_5,r_sc_min,r_sc_js);
 
       // Net radiation by brunt's equation
       NETRAD(srad,e_pa,tair,relsun,b1,b2,b3,b4,albedo,netlong_brunt,
@@ -1526,7 +1526,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       // calculate energy balance for sparse crops
       GFLUX(tskin,kh,temp_0,gflux);  // ground heat flux
 
-      LEHFLUX(tair,tskin,tcan,tleaf,r_aastab1,r_ac,r_as,r_sc_js,e_c_abs,e_sl_abs,
+      LEHFLUX(tair,tskin,tcan,tleaf,r_aastab2,r_ac,r_as,r_sc_js,e_c_abs,e_sl_abs,
               e_abs,les,crop_ea_w,hl,ha,hs,lea,lel,hclos,leclos,dtcta,dtltc,dtstc,dtlta,
               r_sc_star);
 
@@ -1604,7 +1604,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
       tcan_prev_star=tcan_star; // save tcan for use in RAASTAB()
 
-      LEHFLUXSTAR(tair,tskin_star,tcan_star,tleaf_star,r_aastab1,r_ac,r_as,
+      LEHFLUXSTAR(tair,tskin_star,tcan_star,tleaf_star,r_aastab2,r_ac,r_as,
                   r_sc_star,e_c_abs_star,e_sl_abs_star,e_abs_star,les_star,hl_star,ha_star,
                   hs_star,lea_star,lel_star,hclos_star,leclos_star,dtcta_star,dtltc_star,
                   dtstc_star,dtlta_star);
