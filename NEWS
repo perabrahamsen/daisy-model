@@ -14,6 +14,8 @@ release.
 
 * 1.45
 
+** Fixed link order dependency crash.
+
 ** Fixed crash related to the am/cleanup AOM introduced in 1.40.
 
 ** Defaults for the `minimum', `from' and `to' precision fertilize params.

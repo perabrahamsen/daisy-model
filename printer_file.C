@@ -535,7 +535,7 @@ PrinterFile::Implementation::print_library_file (const string& filename)
 
   // Print the entries.
   bool first = true;
-
+  const AttributeList empty_alist;
   for (unsigned int i = 0; i < found.size (); i++)
     {
       const string library_name = found[i].library_name;
@@ -558,7 +558,7 @@ PrinterFile::Implementation::print_library_file (const string& filename)
 	    {
 	      out << " ;; unknown superclass\n ";
 	      print_alist (alist, library.syntax (name), 
-			   AttributeList::empty, 2, true);
+			   empty_alist, 2, true);
 	    }
 	  else
 	    {
@@ -570,7 +570,7 @@ PrinterFile::Implementation::print_library_file (const string& filename)
 	{
 	  out << "<unknown>\n  ";
 	  print_alist (alist, library.syntax (name), 
-		       AttributeList::empty, 2, true);
+		       empty_alist, 2, true);
 	}
       out << ")\n";
     }
@@ -611,7 +611,8 @@ PrinterFile::print_comment (const string& comment)
 void 
 PrinterFile::print_alist (const AttributeList& alist, const Syntax& syntax)
 { 
-  impl.print_alist (alist, syntax, AttributeList::empty, 0, false);
+  const AttributeList empty_alist;
+  impl.print_alist (alist, syntax, empty_alist, 0, false);
   impl.out << "\n";
 }
 

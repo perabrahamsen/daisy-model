@@ -1,4 +1,26 @@
+2000-09-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* alist.C, alist.h (empty): Removed.
+	* gmain.C (daisy_add_entry): Fix caller.
+	* printer_file.C (print_alist): Ditto.
+	(print_library_file): Ditto.
+	* syntax.C (default_alist): Use local empty alist.
+
+	* soil_chemicals.h: Fix link dependency.
+
+	* svat_pmsw.C: SH changes.
+
+	* am.C (add): Removed dead code.
+
+2000-09-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (GroundwaterPipeSyntax): Cleanup dimensions.
+
+	* all: Added more newslines to descriptions.
+
 2000-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_crop.C (ActionCropSyntax): Rely on default alists.
 
 	* Version 1.45 released.
 

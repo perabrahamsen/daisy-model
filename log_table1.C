@@ -664,7 +664,7 @@ of the layer, or above to summarize over the entire soil.");
 Give the content of interval at the specified depth, if negative.");
       entry_alist.add ("content_at", 1.0);
       entry_syntax.add ("flux_at", "cm", Syntax::Const,
-			"Specify position to measure flux.  \
+			"Specify position to measure flux. \n\
 The closest interval border will be used.  Ignore if not-negative.");
       entry_alist.add ("flux_at", 1.0);
       entry_syntax.add ("accumulate", Syntax::Boolean, Syntax::Const,

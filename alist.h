@@ -23,8 +23,6 @@ public:				// EGCS require this to be public...
   Implementation& impl;
 
 public:
-  static const AttributeList empty;
-
   // Is `key' an element of this alist?
   bool check (const string& key) const;
   // Is this alist a subset of `other'?

@@ -497,7 +497,7 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Surface");
   alist.add ("description", "Keep track of things on the soil surface.");
   syntax.add ("EpFactor", Syntax::None (), Syntax::Const,
-	      "Convertion of reference evapotranspiration to \n\
+	      "Convertion of reference evapotranspiration to\n\
 potential evaporation for bare soil.");
   alist.add ("EpFactor", 0.8);
   syntax.add ("EpInterchange", Syntax::Fraction (), Syntax::Const,

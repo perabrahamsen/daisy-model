@@ -631,13 +631,13 @@ By default, this is 1/2 L.");
       syntax.add ("pipe_position", "cm", Syntax::Const,
 		  "Height pipes are placed in the soil (a negative number).");
       alist.add ("pipe_position", -110.0);
-      syntax.add ("K_aquitard", " cm/h", Syntax::Const,
+      syntax.add ("K_aquitard", "cm/h", Syntax::Const,
 		  "Conductivity of the aquitard.");
       alist.add ("K_aquitard", 1.0E-5);
-      syntax.add ("Z_aquitard", " cm", Syntax::Const,
+      syntax.add ("Z_aquitard", "cm", Syntax::Const,
 		  "Height of the aquitard.");
       alist.add ("Z_aquitard", 200.0);
-      syntax.add ("h_aquifer", " cm ", Syntax::OptionalConst,
+      syntax.add ("h_aquifer", "cm", Syntax::OptionalConst,
 		  "Pressure potential in the aquifer below the aquitard.\n\
 By default. this is Z_aquitard.");
 

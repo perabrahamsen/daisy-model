@@ -58,7 +58,7 @@ static struct SelectFluxSyntax
 
       alist.add ("description", "Extract flux at specified height.");
       syntax.add ("height", "cm", Syntax::Const,
-		  "Specify height (negative) to measure flux.  \
+		  "Specify height (negative) to measure flux. \n\
 The closest interval border will be used.");
       syntax.add ("value", Syntax::Unknown (), Syntax::State,
 		  "The current accumulated value.");

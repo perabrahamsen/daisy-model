@@ -191,7 +191,7 @@ period.");
 	      "Command to add more information about the simulation.");
   syntax.add ("manager", Librarian<Action>::library (), Syntax::State,
 	      Syntax::Singleton,
-	      "Specify the management operations to perform during \
+	      "Specify the management operations to perform during\n\
 the simulation.");
   syntax.add ("time", Syntax::Date, Syntax::State,
 	      "Current time in the simulation.");
@@ -201,7 +201,7 @@ the simulation.");
 	      "List of columns to use in this simulation.");
   syntax.add ("weather", Librarian<Weather>::library (),
 	      Syntax::OptionalState, Syntax::Singleton,
-	      "Weather model for providing climate information during \
+	      "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");
   vector<AttributeList*> empty_alist_sequence;
   add_submodule_sequence<Harvest> ("harvest", syntax, Syntax::State, 

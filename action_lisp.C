@@ -290,7 +290,7 @@ Perform the actions associated with the first true condition in the list.");
     clauseSyntax.order ("condition", "actions");
     syntax.add ("clauses", clauseSyntax, Syntax::Sequence,
 		"\
-Each clause consist of a condition and a sequence of actions.  \
+Each clause consist of a condition and a sequence of actions.\n\
 The first clause whose condition is true, will have its actions activated.");
     syntax.order ("clauses");
     Librarian<Action>::add_type ("cond", alist, syntax, &make_cond);
@@ -300,8 +300,8 @@ The first clause whose condition is true, will have its actions activated.");
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
-If the condition is true, perform the first action, otherwise perform the \
-second action.");
+If the condition is true, perform the first action,\n\
+otherwise perform the second action.");
     syntax.add ("if", Librarian<Condition>::library (), 
 		"Condition determining which action to perform.");
     syntax.add ("then", Librarian<Action>::library (), 

@@ -254,34 +254,7 @@ AM::Implementation::add (const Geometry& geometry,
       distribute (cc[at], om_C, nn[at], om_N);
 
       for (unsigned int i = 0; i < om.size (); i++)
-	{
-#if 1
-	  om[i]->add (at, om_C[i], om_N[i]);
-#else
-	  const double C_per_N = om[i]->initial_C_per_N;
-	  if (C_per_N == OM::Unspecified)
-	    om[i]->add (at, om_C[i], om_N[i]);
-	  else
-	    {
-	      assert (approximate (om_C[i], C_per_N * om_N[i]));
-	      const double old_N = om[i]->total_N (geometry);
-	      om[i]->add (at, om_C[i]);
-	      const double new_N = om[i]->total_N (geometry);
-	      if (!(om_N[i] * 1e9 < old_N
-		    ? approximate (old_N + om_N[i], new_N)
-		    : (approximate (new_N - old_N, om_N[i]))))
-		{
-		  CERR << "BUG: Merging " << other.name << " into " << name 
-		       << " at " << at << " for pool " << i 
-		       << " gave old N = " << old_N << ", new N " 
-		       << new_N << " added N " << om_N[i] << "\n"
-		       << "C/N other was " << cc[at]/nn[at] 
-		       << " C/N here is " << C_per_N << "\n";
-		}
-	    }
-#endif
-	}
-
+	om[i]->add (at, om_C[i], om_N[i]);
     }
 
   add (other.top_C (), other.top_N ());
@@ -923,9 +896,9 @@ static struct AM_Syntax
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
-Most AM models are only used for initialization, they will be comnverted \
-to this generic model after creation, so this is what you will see in a \
-checkpoint.  This model contains a number (typically 2) of separate \
+Most AM models are only used for initialization, they will be comnverted\n\
+to this generic model after creation, so this is what you will see in a\n\
+checkpoint.  This model contains a number (typically 2) of separate\n\
 pools, each of which have their own turnover rate.");
 
 	syntax.add ("creation", Syntax::Date, Syntax::State, 
@@ -967,11 +940,11 @@ In Denmark, this is governed by legalisation.");
 	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
 				    "The individual AOM pools.");
 	syntax.add ("NO3_fraction", Syntax::Fraction (), Syntax::Const, 
-		    "Nitrate fraction of total N in fertilizer.  \
+		    "Nitrate fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be ammonium or organic.");
 	alist.add ("NO3_fraction", 0.0);
 	syntax.add ("NH4_fraction", Syntax::Fraction (), Syntax::Const, 
-		    "Ammonium fraction of total N in fertilizer.  \
+		    "Ammonium fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be nitrate or organic.");
 	alist.add ("NH4_fraction", 0.0);
 	syntax.add ("NH4_evaporation",
@@ -994,7 +967,7 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 		    "Amount of fertilizer applied.");
 	alist.add ("weight", 0.0);
 	syntax.add ("NH4_fraction", Syntax::Fraction (), Syntax::Const, 
-		    "Ammonium fraction of total N in fertilizer.  \
+		    "Ammonium fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be nitrate.");
 	syntax.add ("NH4_evaporation",
 		    Syntax::Fraction (), Syntax::OptionalConst, 
@@ -1023,7 +996,7 @@ Height where this layer ends (a negative number).");
 			  "Carbon in this layer.");
 	layer_syntax.order ("end", "weight");
 	syntax.add ("layers", layer_syntax, Syntax::Sequence, "\
-Carbon content in different soil layers.  The carbon is assumed to be \
+Carbon content in different soil layers.  The carbon is assumed to be\n\
 uniformly distributed in each layer.");
 	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
 				    "The individual AOM pools.");
@@ -1042,7 +1015,7 @@ uniformly distributed in each layer.");
 	syntax.add ("depth", "cm", Syntax::Const, "\
 How far down does the old root reach? (a negative number)");
 	syntax.add ("dist", "cm", Syntax::Const, "\
-Distance to go down in order to decrease the root density to half the \
+Distance to go down in order to decrease the root density to half the\n\
 original.");
 	syntax.add ("weight", "T DM/ha", Syntax::Const, 
 		    "Total weight of old root dry matter.");

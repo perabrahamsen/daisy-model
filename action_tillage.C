@@ -51,7 +51,7 @@ the interval.");
 		  "How far down to mix the soil (a negative number).");
       syntax.order ("depth");
       syntax.add ("penetration", Syntax::Fraction (), Syntax::Const, "\
-Fraction of organic matter on surface that are incorporated in the soil \
+Fraction of organic matter on surface that are incorporated in the soil\n\
 by this operation.");
       alist.add ("penetration", 0.0);
       Librarian<Action>::add_type ("mix", alist, syntax, &make);

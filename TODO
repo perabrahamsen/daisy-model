@@ -1,14 +1,64 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Opdater filer
+
+sh sbarley, wbarley, wrape, wwheat, fetilizer
+
+* Nye SMB parametre fra SH.
+
+* Test Qt.
+
+** Menu -> View -> Check (Model)
+
+Vis resultatet af syntax check i vindue.
+
+** Menu -> File -> Load
+
+** Menu -> Edit -> Raw (Parameter)
+
+** Menu -> File -> Save
+
+** Menu -> File -> Save as
+
+** Menu -> View -> *
+
+** Menu -> Edit -> Raw (Model)
+
+** Menu -> Edit -> Copy
+
+** Menu -> Edit -> Simulation
+
+** Menu -> Edit -> Inputs
+
+** Specialiced model view.
+
+** Menu -> Edit -> Inherit
+
+** Menu -> Edit -> Delete
+
+** Menu -> File -> Run
+
+** Alle andre views.
+
 * Gødning
 
 ** Fertilizer log.
 
+NO3 NH4 Org-N Org-C DM
+
+** second year utilization
+
+new column state variable
+new fertilizer parameter
+new fertilize parameter
+
+* document LaTeX
+
+** Use the full/partial check for submodels with default values.
+
 * crop_std: RSR
 
 * Test Cygwin compile, specielt høst resultat.
-
-* Test Qt.
 
 * Daisy new user guide.
 

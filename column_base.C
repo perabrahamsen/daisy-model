@@ -311,7 +311,7 @@ ColumnBase::load_syntax (Syntax& syntax, AttributeList& alist)
   Column::load_syntax (syntax, alist);
   syntax.add ("weather", Librarian<Weather>::library (),
 	      Syntax::OptionalState, Syntax::Singleton,
-	      "Weather model for providing climate information during \
+	      "Weather model for providing climate information during\n\
 the simulation.  If unspecified, used global weather.");
   syntax.add ("Vegetation", Librarian<Vegetation>::library (),
 	      Syntax::State, Syntax::Singleton,

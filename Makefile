@@ -266,7 +266,7 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a submodel.
 #
-OTHER = lexer_data.C lexer.C daisy.C alist.C library.C plf.C \
+OTHER = lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
 	submodel.C
 
@@ -312,7 +312,7 @@ all:	$(EXECUTABLES)
 
 # Create the main executable.
 #
-daisy${EXT}:	main${OBJ} syntax.o daisy.so
+daisy${EXT}:	main${OBJ} daisy.so
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.
@@ -337,8 +337,11 @@ gdaisy${EXT}:	gmain${OBJ} daisy.so
 
 # Create executable with Qt.
 #
-qdaisy${EXT}:	qmain${OBJ} daisy.so
+qdaisy${EXT}:	qmain${OBJ} qmain_moc.o daisy.so
 	$(LINK)qdaisy $^ $(QTLIB)
+
+qmain_moc.C:	qmain.h
+	/pack/qt/bin/moc $^ > qmain_moc.C
 
 # Create the C main executable.
 #
@@ -531,9 +534,14 @@ tkmain${OBJ}: tkmain.C
 gmain${OBJ}: gmain.C
 	$(CC) $(GTKMMINCLUDE) $(NOLINK) $<
 
-# Special rule for gmain.o
+# Special rule for qmain.o
 #
 qmain${OBJ}: qmain.C
+	$(CC) $(QTINCLUDE) $(NOLINK) $<
+
+# Special rule for qmain.o
+#
+qmain_moc${OBJ}: qmain_moc.C
 	$(CC) $(QTINCLUDE) $(NOLINK) $<
 
 # Special rule for pmain.o

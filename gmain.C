@@ -500,7 +500,7 @@ AList_Tree::daisy_add_entry (const string& entry)
 	      const AttributeList& child_alist
 		= (alist.check (entry)
 		   ? alist.alist (entry)
-		   : AttributeList::empty);
+		   : syntax.default_alist (entry));
 	      AList_Tree* tree = new AList_Tree (child_syntax, child_alist);
 	      tree->show ();
 	      item->set_subtree (tree);
