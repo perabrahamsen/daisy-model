@@ -381,7 +381,7 @@ AM::unlock ()
 
 bool 
 AM::locked () const
-{ return impl.locked; }
+{ return impl.locked (); }
 
 const string 
 AM::crop_name () const
@@ -527,7 +527,7 @@ AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
 
       // Calculate density.
       vector<double> density (geometry.size (), 0.0);
-      for (int i = 0; 
+      for (unsigned int i = 0; 
 	   i < geometry.size () && geometry.z (i) > -depth;
 	   i++)
 	{
@@ -547,6 +547,12 @@ AM::~AM ()
 
 static bool check_organic (const AttributeList& al)
 { 
+  if (!al.check ("syntax"))
+    {
+      cerr << "no syntax";
+      return false;
+    }
+
   const string syntax = al.name ("syntax");
   assert (syntax == "organic");
   

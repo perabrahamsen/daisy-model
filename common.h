@@ -11,9 +11,13 @@
 #include <assert.h>
 #include <string>
 
+#ifdef EGCS
+#include <math.h>
+#else
 #define exception _BUG_EXCPETION
 #include <math.h>
 #undef exception
+#endif
 
 #ifdef __sparc__
 #include <ieeefp.h>
@@ -28,7 +32,7 @@
 // If you can delete const objects.
 #define CONST_DELETE
 
-#include <osfcn.h>
+#include <unistd.h>
 #include <strstream.h>
 
 #else

@@ -91,7 +91,7 @@ NitrificationSoil::tick (Soil& soil, SoilWater& soil_water,
 {
   converted.erase (converted.begin (), converted.end ());
 
-  for (int i = 0; i < soil.size (); i++)
+  for (unsigned int i = 0; i < soil.size (); i++)
     {
       const double M = soil_NH4.M (i);
       const double h = soil_water.h (i);

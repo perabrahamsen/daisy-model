@@ -1,4 +1,4 @@
-// uzrichard.C
+// uzrichard.C --- Using Richard's Equation to calculate water flow.
 
 #include "uzmodel.h"
 #include "soil.h"
@@ -159,7 +159,7 @@ UZRichard::richard (const Soil& soil,
 		    vector<double>& q)
 {
   // Input variables for solving a tridiagonal matrix.
-  const int size = last - first + 1; 
+  const unsigned int size = last - first + 1; 
   vector<double> a (size);
   vector<double> b (size);
   vector<double> c (size);
@@ -206,7 +206,7 @@ UZRichard::richard (const Soil& soil,
       if (ddt > time_left)
 	ddt = time_left;
 
-      for (int i = 0; i < size; i++)
+      for (unsigned int i = 0; i < size; i++)
 	{
 	  Ksum[i] = 0.0;
 	  Kold[i] = soil.K (first + i, h[i]);
@@ -224,7 +224,7 @@ UZRichard::richard (const Soil& soil,
 	  var.iterations++;
 
 	  // Calculate parameters.
-	  for (int i = 0; i < size; i++)
+	  for (unsigned int i = 0; i < size; i++)
 	    {
 	      
 	      Ksum[i] += soil.K (first + i, h[i]);
@@ -236,7 +236,7 @@ UZRichard::richard (const Soil& soil,
 	  internode (soil, first, last, K, Kplus);
 
 	  // Calcualte nodes.
-	  for (int i = 0; i < size; i++)
+	  for (unsigned int i = 0; i < size; i++)
 	    {
 	      const double Cw1 = soil.Cw1 (first + i, h[i]);
 	      const double Cw2 = soil.Cw2 (first + i, h[i]);
@@ -330,7 +330,7 @@ UZRichard::richard (const Soil& soil,
       else
 	{
 	  // Calculate new water content.
-	  for (int i = 0; i < size; i++)
+	  for (unsigned int i = 0; i < size; i++)
 	    Theta[i] = soil.Theta(first + i, h[i]);
 
 	  bool accepted = true;	// Could the top accept the results?
@@ -439,9 +439,9 @@ UZRichard::richard (const Soil& soil,
     }
 
   // Make it official.
-  assert (h_new.size () >= first + size + 0U);
+  assert (h_new.size () >= first + size);
   copy (h.begin (), h.end (), h_new.begin () + first);
-  assert (Theta_new.size () >= first + size + 0U);
+  assert (Theta_new.size () >= first + size);
   copy (Theta.begin (), Theta.end (), Theta_new.begin () + first);
 
   // Update Theta below groundwater table.

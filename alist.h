@@ -73,6 +73,7 @@ public:
 
   // Create and Destroy.
   void add (string, double);
+  void add (string, const char*);
   void add (string, string);
   void add (string, bool);
   void add (string, int);
@@ -91,105 +92,6 @@ public:
   AttributeList (const AttributeList& old);
   AttributeList ();
   ~AttributeList ();
-};
-
-// This cutie will create a vector of objects from a vector of alists.
-// I'd like it to be a member of AttributeList, but template members
-// wasn't implemented in G++ 2.7.2.
-template <class T> 
-struct map_create
-{
-  vector<T*>& t;
-  map_create (const vector<const AttributeList*>& f)
-    : t (*new vector<T*> ())
-  { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (&Librarian<T>::create (**i));
-  }
-  operator vector<T*>& ()
-  { return t; }
-};
-
-template <class T> 
-struct map_create_const
-{
-  vector<const T*>& t;
-  map_create_const (const vector<const AttributeList*>& f)
-    : t (*new vector<const T*> ())
-  { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (&Librarian<T>::create (**i));
-  }
-  operator vector<const T*>& ()
-  { return t; }
-};
-
-template <class T, class U> 
-struct map_create1
-{
-  vector<T*>& t;
-  map_create1 (const vector<const AttributeList*>& f, U u)
-    : t (*new vector<T*> ())
-  { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (&T::create (**i, u));
-  }
-  operator vector<T*>& ()
-  { return t; }
-};
-
-template <class T> 
-struct map_construct
-{
-  vector<T*>& t;
-  map_construct (const vector<const AttributeList*>& f)
-    : t (*new vector<T*> ())
-  { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (new T (**i));
-  }
-  operator vector<T*>& ()
-  { return t; }
-};
-
-template <class T, class U> 
-struct map_construct1
-{
-  vector<T*>& t;
-  map_construct1 (const vector<const AttributeList*>& f, U u)
-    : t (*new vector<T*> ())
-  { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (new T (**i, u));
-  }
-  operator vector<T*>& ()
-  { return t; }
-};
-
-template <class T> 
-struct map_construct_const
-{
-  vector<const T*>& t;
-  map_construct_const (const vector<const AttributeList*>& f)
-    : t (*new vector<const T*> ())
-  { 
-    for (vector<const AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (new T (**i));
-  }
-  operator vector<const T*>& ()
-  { return t; }
 };
 
 #endif ALIST_H

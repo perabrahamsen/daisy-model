@@ -197,8 +197,8 @@ FilterArray::FilterArray (const AttributeList& al)
       bool error = false;
       string acc_name = members[i]->name ("accumulator");
       string sel_name = members[i]->name ("selector");
-      accumulator acc;
-      selector sel;
+      accumulator acc = Now;
+      selector sel = At;
       double from = members[i]->number ("pos");
       double to = members[i]->check ("end") ? members[i]->number ("end") : 1.0;
 

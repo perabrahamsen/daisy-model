@@ -6,10 +6,10 @@
 #include "mathlib.h"
 #include <assert.h>
 
-int 
+unsigned int 
 Geometry::interval_plus (double z) const
 {
-  int i;
+  unsigned int i;
   for (i = 0; i < size_; i++)
     {
       if (zplus_[i] < z)
@@ -19,10 +19,10 @@ Geometry::interval_plus (double z) const
   return i;
 }
 
-int 
+unsigned int 
 Geometry::interval (double z) const
 {
-  int i;
+  unsigned int i;
   for (i = 0; i < size_; i++)
     {
       if (z_[i] < z)
@@ -42,7 +42,7 @@ Geometry::check () const
       ok = false;
     }
   double last = 0.0;
-  for (int i = 0; i < size_; i++)
+  for (unsigned int i = 0; i < size_; i++)
     if (zplus_[i] > last)
       {
 	cerr << "Intervals should be monotonically decreasing, but "
@@ -59,10 +59,10 @@ Geometry::check () const
 double
 Geometry::total (const vector<double>& v) const
 {
-  assert (v.size () <= size () +0U);
-  const int to = min (v.size (), size () +0U);
+  assert (v.size () <= size ());
+  const unsigned int to = min (v.size (), size ());
   double sum = 0.0;
-  for (int i = 0; i < to; i++)
+  for (unsigned int i = 0; i < to; i++)
     sum += v[i] * dz (i);
   return sum;
 }
@@ -90,7 +90,7 @@ Geometry::add (vector<double>& v, double from, double to, double amount) const
 {
   const double old_total = total (v);
 
-  while (v.size () < size () + 0U)
+  while (v.size () < size ())
     v.push_back (0.0);
   const double density = amount / (from - to);
   double old = 0.0;
@@ -117,7 +117,7 @@ double
 Geometry::extract (vector<double>& v, double from, double to) const
 {
   const double old_total = total (v);
-  while (v.size () < size () + 0U)
+  while (v.size () < size ())
     v.push_back (0.0);
   double amount = 0.0;
   double old = 0.0;
@@ -139,7 +139,7 @@ Geometry::extract (vector<double>& v, double from, double to) const
 void
 Geometry::set (vector<double>& v, double from, double to, double amount) const
 {
-  while (v.size () < size () + 0U)
+  while (v.size () < size ())
     v.push_back (0.0);
   const double density = amount / (from - to);
   double old = 0.0;
@@ -186,7 +186,7 @@ Geometry::Geometry (const AttributeList& al)
     size_ (zplus_.size ())
 {
   double last = 0.0;
-  for (int i = 0; i < size_; i++)
+  for (unsigned int i = 0; i < size_; i++)
     {
       double zplus = zplus_[i];
       double dz = last - zplus;

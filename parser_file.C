@@ -465,8 +465,9 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		}
 	      if (skipped)
 		skip (")");
-	      if (size != Syntax::Sequence && sequence.size () != size + 0U)
-		  {
+	      if (size != Syntax::Sequence 
+		  && (int) sequence.size () != size)
+		{
 		  ostrstream str;
 		  str << "Got " << sequence.size ()
 		      << " array members, expected " << size << '\0';

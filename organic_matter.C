@@ -85,7 +85,11 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 {
   // assert (N_soil * 1.001 >= N_used);
   // How much can we process?
-  double rate = turnover_rate * abiotic_factor;
+  double rate;
+  if (C[i] < 1e-15)
+    rate = 1.0;
+  else 
+    rate = min (turnover_rate * abiotic_factor, 0.1);
   double N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
 
   assert (finite(rate));
@@ -112,6 +116,10 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
   som[where]->C[i] += C[i] * rate;
   C[i] *= (1.0 - rate);
   N[i] *= (1.0 - rate);
+
+  assert (som[where]->C[i] >= 0.0);
+  assert (C[i] >= 0.0);
+  assert (N[i] >= 0.0);
 }
 
 void 
@@ -185,9 +193,9 @@ OrganicMatter::Implementation::Buffer::Buffer (const Soil& soil,
     where (al.integer ("where"))
 { 
   // Make sure the vectors are large enough.
-  while (N.size () < soil.size () +0U)
+  while (N.size () < soil.size ())
     N.push_back (0.0);
-  while (C.size () < soil.size () +0U)
+  while (C.size () < soil.size ())
     C.push_back (0.0);
 }
 
@@ -429,7 +437,7 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
   NH4_source.insert (NH4_source.end (), soil.size(), 0.0);
 
   // Clay.
-  for (int i = 0; i < soil.size (); i++)
+  for (unsigned int i = 0; i < soil.size (); i++)
     {
       const double a = 2.0;
       const double X_c_prime = 0.25;
@@ -455,16 +463,16 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
 	  missing_C_per_N = i;
 	}
       else
-	assert (som[i]->C_per_N.size () == soil.size () + 0U);
-      assert (som[i]->C.size () == soil.size () + 0U);
+	assert (som[i]->C_per_N.size () == soil.size ());
+      assert (som[i]->C.size () == soil.size ());
     }
   for (unsigned int i = 0; i < smb.size (); i++)
     {
       if (smb_al[i]->check ("initial_fraction"))
 	total += smb_al[i]->number ("initial_fraction");
 
-      assert (smb[i]->C_per_N.size () == soil.size () + 0U);
-      assert (som[i]->C.size () == soil.size () + 0U);
+      assert (smb[i]->C_per_N.size () == soil.size ());
+      assert (som[i]->C.size () == soil.size ());
     }
 
   // If any fractions were specified, distribute soil humus.
@@ -473,12 +481,12 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
       if (missing_C_per_N == -1)
 	THROW ("At least one C per N must be left unspecified in OM");
 
-      for (int l = 0; l < soil.size (); l++)
+      for (unsigned int l = 0; l < soil.size (); l++)
 	{
 	  const double C = soil.initial_C (l);
 	  double N = soil.initial_N (l);
 
-	  for (int i = 0; i +0U < som.size (); i++)
+	  for (unsigned int i = 0; i < som.size (); i++)
 	    {
 	      const double fraction 
 		= som_al[i]->check ("initial_fraction")
@@ -486,10 +494,10 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
 		: 0.0;
 
 	      som[i]->C[l] = C * fraction / total;
-	      if (missing_C_per_N != i)
+	      if (missing_C_per_N + 0U != i)
 		N -= som[i]->C[l] / som[i]->C_per_N[l];
 	    }
-	  for (int i = 0; i +0U < smb.size (); i++)
+	  for (unsigned int i = 0; i < smb.size (); i++)
 	    {
 	      const double fraction 
 		= smb_al[i]->check ("initial_fraction")
@@ -499,7 +507,7 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
 	      smb[i]->C[l] = C * fraction / total;
 	      N -= smb[i]->C[l] / smb[i]->C_per_N[l];
 	    }
-	  assert (som[missing_C_per_N]->C_per_N.size () == l + 0U);
+	  assert (som[missing_C_per_N]->C_per_N.size () == l);
 	  if (N <= 0.0)
 	    THROW ("Used up all N in OrganicMatter initialization");
 	  const double missing = som[missing_C_per_N]->C[l] / N;

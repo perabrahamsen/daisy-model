@@ -80,7 +80,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 	THROW (runtime_error ("Groundwater table below lowest node."));
       last = soil.interval (groundwater.table ());
       // Presure at the last + 1 node is equal to the water above it.
-      for (int i = last + 1; i < soil.size (); i++)
+      for (unsigned int i = last + 1; i < soil.size (); i++)
 	{
 	  h_old[i] = groundwater.table () - soil.z (i);
 	  h_[i] = groundwater.table () - soil.z (i);
@@ -116,7 +116,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   
   // Update values in groundwater.
   // Bug: Is this also done somewhere else?   Where?
-  for (int i = last + 1; i < soil.size (); i++)
+  for (unsigned int i = last + 1; i < soil.size (); i++)
     {
       h_[i] = 0.0;
       Theta_[i] = soil.Theta (i, 0.0);
@@ -129,7 +129,7 @@ void
 SoilWater::mix (const Soil& soil, double from, double to)
 {
   soil.mix (Theta_, from, to);
-  for (int i = 0; i < soil.size(); i++)
+  for (unsigned int i = 0; i < soil.size(); i++)
     h_[i] = soil.h (i, Theta_[i]);
 }
 
@@ -138,7 +138,7 @@ SoilWater::swap (const Soil& soil, double from, double middle, double to)
 {
   soil.swap (Theta_, from, middle, to);
 
-  for (int i = 0; i < soil.size(); i++)
+  for (unsigned int i = 0; i < soil.size(); i++)
     {
       const double Theta_sat = soil.Theta (i, 0.0);
       if (Theta_[i] > Theta_sat)

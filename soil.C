@@ -85,7 +85,7 @@ Soil::Soil (const AttributeList& al)
     {
       const Horizon* hor = &Horizon::create ((*layer)->alist ("horizon"));
       double last = 0.0;
-      for (int i = 0; i < size (); i++)
+      for (unsigned int i = 0; i < size (); i++)
 	{
 	  double zpls = zplus (i);
 	  if (zpls < (*layer)->number ("end"))

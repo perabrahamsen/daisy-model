@@ -377,9 +377,9 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
       if (C_.size () == 0U)
 	C_.push_back (0.0);
       // Fill it up.
-      if (C_.size () < soil.size () +0U)
+      if (C_.size () < soil.size ())
 	C_.insert (C_.end (), soil.size () - C_.size (), C_[C_.size () - 1]);
-      else if (C_.size () > soil.size () +0U)
+      else if (C_.size () > soil.size ())
 	THROW ("To many members of C sequence");
     }
   if (al.check ("M"))
@@ -390,7 +390,7 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
       // Fill it up.
       if (M_.size () < soil.size () + 0U)
 	M_.insert (M_.end (), soil.size () - M_.size (), M_[M_.size () - 1]);
-      else if (M_.size () > soil.size () + 0U)
+      else if (M_.size () > soil.size ())
 	THROW ("To many members of M sequence");
     }
   if (!al.check ("C") && !al.check ("M"))
@@ -399,13 +399,13 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
       M_.insert (M_.begin (), soil.size (), 0.0);
     }
   else if (!al.check ("C"))
-    for (int i = 0; i < soil.size (); i++)
+    for (unsigned int i = 0; i < soil.size (); i++)
       C_.push_back (M_to_C (soil, soil_water.Theta (i), i, M_[i]));
   else if (!al.check ("M"))
-    for (int i = 0; i < soil.size (); i++)
+    for (unsigned int i = 0; i < soil.size (); i++)
       M_.push_back (C_to_M (soil, soil_water.Theta (i), i, C_[i]));
 
-  for (int i = 0; i < soil.size (); i++)
+  for (unsigned int i = 0; i < soil.size (); i++)
     {
       if (C_[i] == 0.0)
 	{

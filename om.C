@@ -44,7 +44,7 @@ OM::OM (const AttributeList& al, const Geometry& geometry)
     C_per_N = al.number_sequence ("C_per_N");
 
   // Create initial C.
-  while (C.size () < geometry.size () +0U)
+  while (C.size () < geometry.size ())
     C.push_back (0.0);
 
   // Create initial C/N.
@@ -84,7 +84,7 @@ OM::OM (const AttributeList& al, const Geometry& geometry,
 
   // Create initial C.
   assert (!al.check ("C"));
-  while (C.size () < geometry.size () +0U)
+  while (C.size () < geometry.size ())
     C.push_back (0.0);
 
   // Initialize C/N.
@@ -255,7 +255,7 @@ OM::tock (const double* factor, double fraction, double efficiency,
   // Maintenance.
   for (unsigned int i = 0; i < size; i++)
     {
-      double rate = factor[i] * fraction;
+      double rate = min (factor[i] * fraction, 0.1);
       assert (C[i] >= 0.0);
       assert (finite (rate));
       assert (rate >=0);
@@ -302,6 +302,7 @@ OM::tock (const double* factor, double fraction, double efficiency,
 			< 0.01)));
 	}
       // Update.
+      assert (om.C[i] >= 0.0);
       const double C_use = C[i] * rate;
       CO2[i] += C_use * (1.0 - efficiency);
       om.C[i] += C_use * efficiency;
@@ -311,13 +312,11 @@ OM::tock (const double* factor, double fraction, double efficiency,
       N_used[i] += (N_consume - N_produce);
 
       // Check for NaN.
-#if 0
       assert (finite (N_used[i]));
       assert (finite (rate));
       assert (finite (efficiency));
       // assert (N_soil * 1.001 >= N_used);
       assert (C[i] >= 0.0);
-#endif
     }
 }
 
@@ -396,7 +395,7 @@ OM::tick (const double* abiotic_factor,
   const double factor = turnover_rate * fractions[smb_size];
   for (int i = 0; i < size; i++)
     {
-      const double rate = factor * abiotic_factor[i];
+      const double rate = min (factor * abiotic_factor[i], 0.1);
       som_N[i] += C[i] * rate / C_per_N[i];
       som_C[i] += C[i] * rate;
       C[i] *= (1.0 - rate);
@@ -408,6 +407,9 @@ OM::tick (const double* abiotic_factor,
 	  som_C[i] += C[i];
 	  C[i] = 0.0;
 	}
+      assert (C[i] >= 0.0);
+      assert (som_C[i] >= 0.0);
+      assert (som_N[i] >= 0.0);
     }
 }
 

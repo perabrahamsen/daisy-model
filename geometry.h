@@ -14,19 +14,19 @@ class Geometry
   const vector<double> zplus_;	// Lower boundary of each interval.
   vector<double> z_;		// (c) Center of each interval.
   vector<double> dz_;		// (c) Size of each interval.
-  const int size_;
+  const unsigned int size_;
 public:
   // Accessors.
-  inline int size () const
+  inline unsigned int size () const
   { return size_; }
-  inline double zplus (int i) const
+  inline double zplus (unsigned int i) const
   { return zplus_[i]; }
-  inline double z (int i) const
+  inline double z (unsigned int i) const
   { return z_[i]; }
-  inline double dz (int i) const
+  inline double dz (unsigned int i) const
   { return dz_[i]; }
-  int interval_plus (double z) const;
-  int interval (double z) const;
+  unsigned int interval_plus (double z) const;
+  unsigned int interval (double z) const;
 
   // Simulation.
   bool check () const;

@@ -1288,7 +1288,7 @@ CropOld::ActualWaterUptake (double Ept,
       assert (h_x < 0.001);
       assert (total > 0);
       const double factor = Ept / total;
-      for (int i = 0; i < soil.size (); i++)
+      for (unsigned int i = 0; i < soil.size (); i++)
 	H2OExtraction[i] *= factor;
       total = Ept;
     }
@@ -1328,7 +1328,7 @@ CropOld::PotentialWaterUptake (const double h_x,
   const vector<double>& L = var.RootSys.Density;
   vector<double>& S = var.RootSys.H2OExtraction;
   double total = 0.0;
-  for (int i = 0; i < soil.size () && L[i] > 0.0; i++)
+  for (unsigned int i = 0; i < soil.size () && L[i] > 0.0; i++)
     {
       const double h = h_x - (1 + Rxylem) * soil.z (i);
       const double uptake = max (L[i] * (soil.Theta (i, h) / soil.Theta (i, 0.0))
@@ -1452,7 +1452,7 @@ CropOld::RootDensity (const Soil& soil)
   
   vector<double>& d = var.RootSys.Density;
   
-  int i = 0;
+  unsigned int i = 0;
   for (; i == 0 || -soil.zplus (i-1) < RootSys.Depth; i++)
     d[i] = L0 * exp (a * soil.z (i));
   assert (i < soil.size ());

@@ -20,7 +20,8 @@ MIKEFLAGS=
 #Uncomment these on SPARC
 SPARCSRC = set_exceptions.S
 SPARCOBJ = set_exceptions.o
-CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -pipe $(MIKEFLAGS) -frepo #-O3 -ffast-math -msupersparc -mv8 #-pg
+CC = /pack/egcs/bin/c++ -Wall -fno-exceptions -DEGCS -g -pipe $(MIKEFLAGS) -frepo -pg -O3 -ffast-math -mcpu=ultrasparc
+#CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -pipe $(MIKEFLAGS) -frepo -O3 -ffast-math -mv8 -pg
 # CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
 MATHLIB = -lm
 

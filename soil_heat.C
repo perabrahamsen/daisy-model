@@ -151,7 +151,7 @@ SoilHeat::Implementation::tick (const Time& time,
   assert (T[0] < 50.0);
 
   // Temperature is constant in the groundwater.
-  for (int i = size; i < soil.size (); i++)
+  for (unsigned int i = size; i < soil.size (); i++)
     T[i] = T_bottom;
 }
 
@@ -163,7 +163,7 @@ SoilHeat::Implementation::energy (const Soil& soil,
   double amount = 0.0;
   double old = 0.0;
 
-  for (int i = 0; i < soil.size () && old > to ; i++)
+  for (unsigned int i = 0; i < soil.size () && old > to ; i++)
     {
       if (soil.zplus (i) < from)
 	{
@@ -185,7 +185,7 @@ SoilHeat::Implementation::set_energy (const Soil& soil,
   double capacity = 0.0;
   double old = 0.0;
 
-  for (int i = 0; i < soil.size () && old > to ; i++)
+  for (unsigned int i = 0; i < soil.size () && old > to ; i++)
     {
       if (soil.zplus (i) < from)
 	{
@@ -199,7 +199,7 @@ SoilHeat::Implementation::set_energy (const Soil& soil,
   const double average = energy / capacity / (to - from);
   old = 0.0;
 
-  for (int i = 0; i < soil.size () && old > to ; i++)
+  for (unsigned int i = 0; i < soil.size () && old > to ; i++)
     {
       if (soil.zplus (i) < from)
 	{
@@ -246,10 +246,10 @@ SoilHeat::Implementation::Implementation (const Soil& soil,
   double C = 0;
   
   assert (T.size () > 0);
-  while (T.size () < soil.size () +0U)
+  while (T.size () < soil.size ())
     T.push_back (T[T.size () - 1]);
 
-  for (int i = 0; i < soil.size (); i++)
+  for (unsigned int i = 0; i < soil.size (); i++)
     {
       const double Theta_pF_2_0 = soil.Theta (i, pF_2_0);
       k += soil.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0);

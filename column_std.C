@@ -135,27 +135,45 @@ ColumnStandard::fertilize (const IM& im,
 }
 
 vector<const Harvest*>
-ColumnStandard::harvest (const Time& time, const string name,
+ColumnStandard::harvest (const Time& time, const string crop_name,
 			 double stub_length,
 			 double stem_harvest, double leaf_harvest, 
 			 double sorg_harvest)
 {
   vector<const Harvest*> harvest;
+  
+  // Harvest all crops of this type.
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
-    if ((*crop)->name == name)
-      {
-	harvest.push_back (&(*crop)->harvest (name, time, soil, organic_matter,
-					      stub_length, stem_harvest,
-					      leaf_harvest, sorg_harvest, 
-					      false));
-	if (Crop::ds_remove (*crop))
+    if ((*crop)->name == crop_name)
+      harvest.push_back (&(*crop)->harvest (name, time, 
+					    soil, organic_matter,
+					    stub_length, stem_harvest,
+					    leaf_harvest, sorg_harvest, 
+					    false));
+
+  // Remove all dead crops.  There has to be a better way.
+  bool removed;
+  do
+    {
+      removed = false;
+      for (CropList::iterator crop = crops.begin();
+	   crop != crops.end();
+	   crop++)
+	if ((*crop)->name == crop_name)
 	  {
-	    // BUG? I hope it is allowed to delete members of a list
-	    // while iterating over it.
-	    delete *crop;
-	    crops.erase (crop);
+	    if (Crop::ds_remove (*crop))
+	      {
+		delete *crop;
+		crops.erase (crop); // This invalidates the iterator.
+		// Restart the loop.
+		removed = true;
+		break;
+	      }
 	  }
-      }
+    }
+  while (removed);
+  
+  // Return the result.
   return harvest;
 }
 

@@ -355,6 +355,12 @@ AttributeList::add (string key, double v)
 }
 
 void 
+AttributeList::add (string key, const char* v)
+{
+  impl.add (key, new dValue<string> (v));
+}
+
+void 
 AttributeList::add (string key, string v)
 {
   impl.add (key, new dValue<string> (v));
