@@ -1,14 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* make dist så Michael kan få rettelse.
-
 * EU workshop
 
 ** New "TSum" phenology model.
 
 This models the phenology as a pure temperature sum.
-
-** total irrigation (surface, overhead, subsoil)
 
 ** Kør øvelser igennem.
 
@@ -17,6 +13,10 @@ This models the phenology as a pure temperature sum.
 Used for warming period.
 
 Den skal nok være i .dai filen...
+
+(weather default "weather.dwf"
+  (missing_years (((1987 1990) (1993 1997))
+	          ((2001 2001) (1991 1991)))))
 
 * Forced LAI i planter.
 

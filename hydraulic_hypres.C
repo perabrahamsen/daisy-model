@@ -27,6 +27,7 @@
 #include "check.h"
 #include "treelog.h"
 #include "tmpstream.h"
+#include "mathlib.h"
 
 class HydraulicHypres : public Hydraulic
 {
@@ -132,7 +133,7 @@ HydraulicHypres::Se (double h) const
 }
 
 void
-HydraulicHypres::initialize (double clay, double silt, double /*sand*/,
+HydraulicHypres::initialize (double clay, double silt, double sand,
 			     double humus, double rho_b, bool top_soil,
 			     Treelog& msg)
 {
@@ -144,10 +145,11 @@ You must specify dry_bulk_density in order to use the hypres \
 pedotransfer function");
       rho_b = 1.5;
     }
-
   clay *= 100.0;		// [%]
   silt *= 100.0;		// [%]
+  sand *= 100.0;		// [%]
   humus *= 100.0;		// [%]
+  daisy_assert (approximate (clay + silt + sand + humus, 100.0));
 
   Theta_sat = 0.7919 + 0.001691 * clay - 0.29619 * rho_b 
     - 0.000001491 * silt * silt
@@ -182,7 +184,7 @@ pedotransfer function");
     n_star += 0.00718 * clay;
   n = exp (n_star) + 1.0;
 
-  double l_star 
+  const double l_star 
     = 0.0202 + 0.0006193 * clay * clay - 0.001136 * humus * humus
     - 0.2316 * log (humus) - 0.03544 * rho_b * clay + 0.00283 * rho_b * silt
     + 0.0488 * rho_b * humus;
@@ -199,7 +201,7 @@ pedotransfer function");
       K_sat_star += 0.02986 * clay;
       K_sat_star -= 0.03305 * silt;
     }
-  K_sat = exp (K_sat_star);
+  K_sat = exp (K_sat_star) / 24.0;
   daisy_assert (K_sat > 0.0);
   
   a = -alpha;
@@ -207,11 +209,23 @@ pedotransfer function");
 
   // Debug messages.
   TmpStream tmp;
+  tmp () << "clay = " << clay << "\n";
+  tmp () << "silt = " << silt << "\n";
+  tmp () << "sand = " << sand << "\n";
+  tmp () << "humus = " << humus << "\n";
+  tmp () << "db = " << rho_b << "\n";
   tmp () << "l = " << l << "\n";
+  tmp () << "l* = " << l_star << "\n";
+  tmp () << "ln ((l* + 10)/(10 - l*)) = "
+	 << log ((l_star + 10.0) / (10.0 - l_star)) << "\n";
+  
   tmp () << "m = " << m << "\n";
+  tmp () << "n* = " << n_star << "\n";
   tmp () << "n = " << n << "\n";
+  tmp () << "alpha_star = " << alpha_star << "\n";
   tmp () << "alpha = " << alpha << "\n";
   tmp () << "a = " << a << "\n";
+  tmp () << "K_sat_star = " << K_sat_star << "\n";
   tmp () << "K_sat = " << K_sat << "\n";
   tmp () << "Theta_sat = " << Theta_sat;
   msg.debug (tmp.str ());
@@ -244,11 +258,6 @@ static struct HydraulicHypresSyntax
   static bool check_alist (const AttributeList& al, Treelog& err)
   {
     bool ok = true;
-    if (al.number ("Theta_res") != 0.0)
-      {
-	err.entry ("Theta_res should be 0.0");
-	ok = false;
-      }
     if (al.number ("Theta_sat") != 0.9)
       {
 	err.entry ("Theta_sat should be unspecified");
@@ -268,7 +277,8 @@ See <http://mluri.sari.ac.uk/hypres.html>.\n\
 Don't specify 'Theta_sat' or 'Theta_res'.");
     Hydraulic::load_syntax (syntax, alist);
     alist.add ("Theta_sat", 0.9);
-    
+    alist.add ("There_res", 0.01);
+
     Librarian<Hydraulic>::add_type ("hypres", alist, syntax, 
 				    &HydraulicHypres::make);
   }

@@ -36,46 +36,29 @@ public:
   const string name;
   static const char *const description;
 
-  // Parameters.
-private:
-    double EmrTSum;	   // Soil temp sum at emergence
-    const PLF& EmrSMF;     // Soil moisture effect on emergence
-    double DS_Emr;	   // Development stage (DS) emergence
-    double DSRate1;	   // Development rate [C-1 or d-1],
-    			   // the vegetative stage
-    double DSRate2;	   // Development rate [C-1 or d-1],
-			   // the reproductive stage
-    const PLF& TempEff1;   // Temperature effect, vegetative stage
-    const PLF& TempEff2;   // Temperature effect, reproductive stage
-    const PLF& PhotEff1;   // Ptotoperiode effect, vegetative stage defi. limit
-
-    double DSMature;	   // DS at maturation
-    double DSRepeat;	   // DS where DS is set back (perennial crops)
-    double DSSetBack; 	   // DS set back at DSRepeat
-    double defined_until_ds; // Model invalid after this DS.
-
   // State.
 public:
-    double DS;	        	// Development Stage
-    double partial_day_length;	// Light hours this day until now [0-24 h]
-    double day_length;		// Light hours previous day. [0-24 h]
-    double partial_soil_temperature; // Accumaleted soil temperature. [°C]
-    double soil_temperature;	// Soil temperature previous day. [°C]
-    double soil_h;		// Soil potential [cm]
+  double DS;	        	// Development Stage
+  double partial_day_length;	// Light hours this day until now [0-24 h]
+  double day_length;		// Light hours previous day. [0-24 h]
+  double partial_soil_temperature; // Accumaleted soil temperature. [°C]
+  double soil_temperature;	// Soil temperature previous day. [°C]
+  double soil_h;		// Soil potential [cm]
 
   // Simulation.
 public:
   void light_hour ();
-  void tick_daily (const string& name, double Ta, double WLeaf, 
-		   Production&, Vernalization&, double cut_stress, Treelog&);
-  void emergence ();
+  virtual void tick_daily (const string& name, double Ta, double WLeaf, 
+			   Production&, Vernalization&, 
+			   double cut_stress, Treelog&) = 0;
+  virtual void emergence () = 0;
   void output (Log& log) const;
 
   // Create and Destroy.
 public:
   static void load_syntax (Syntax& syntax, AttributeList& alist);
   Phenology (const AttributeList&);
-  ~Phenology ();
+  virtual ~Phenology ();
 };
 
 static Librarian<Phenology> Phenology_init ("phenology");

@@ -68,7 +68,7 @@ const string			// Return DIM without time.
 Units::Content::crop_time (const string& dim)
 {
   daisy_assert (dim.size () > 0);
-  int end = dim.size () - 1;
+  int end;
   for (end = dim.size () - 1; dim[end] != '/'; end--)
     daisy_assert (end > 0);
   string result;

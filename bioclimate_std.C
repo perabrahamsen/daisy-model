@@ -59,6 +59,7 @@ struct BioclimateStandard : public Bioclimate
   double irrigation_surface;	// Irrigation below canopy [mm/h]
   double irrigation_surface_old; // Old value for logging.
   double irrigation_surface_temperature; // Water temperature [dg C]
+  double irrigation_subsoil;	// Irrigation incorporated in soil.
 
   // Water in snowpack.
   Snow snow;
@@ -152,6 +153,7 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_surface (double flux, double temp);
   void irrigate_overhead (double flux);
   void irrigate_surface (double flux);
+  void set_subsoil_irrigation (double flux);
   void spray (const string& chemical, double amount) // [g/m^2]
     { spray_.add (chemical, amount); }
   void harvest_chemicals (Chemicals& chemicals, double LAI)
@@ -190,6 +192,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     irrigation_surface (0.0),
     irrigation_surface_old (0.0),
     irrigation_surface_temperature (0.0),
+    irrigation_subsoil (al.number ("irrigation_subsoil")),
     snow (al.alist ("Snow")),
     snow_ep (0.0),
     snow_ea (0.0),
@@ -567,6 +570,10 @@ BioclimateStandard::output (Log& log) const
   log.output ("irrigation_surface", irrigation_surface_old);
   log.output ("irrigation_surface_temperature",
 	      irrigation_surface_temperature);
+  log.output ("irrigation_subsoil", irrigation_subsoil);
+  log.output ("irrigation_total", 
+	      irrigation_subsoil + irrigation_surface_old
+	      + irrigation_overhead_old);
   output_submodule (snow, "Snow", log);
   log.output ("snow_ep", snow_ep);
   log.output ("snow_ea", snow_ea);
@@ -636,6 +643,10 @@ void
 BioclimateStandard::irrigate_surface (double flux)
 { irrigate_surface (flux, daily_air_temperature ()); }
 
+void
+BioclimateStandard::set_subsoil_irrigation (double flux)
+{ irrigation_subsoil = flux; }
+
 static struct BioclimateStandardSyntax
 {
   static Bioclimate& make (const AttributeList& al)
@@ -669,6 +680,11 @@ Number of vertical intervals in which we partition the canopy.");
 		  "Irrigation below canopy.");
       syntax.add ("irrigation_surface_temperature", "dg C", Syntax::LogOnly,
 		  "Water temperature.");
+      syntax.add ("irrigation_subsoil", "mm/h", Syntax::State,
+		  "Irrigation below soil surface.");
+      alist.add ("irrigation_subsoil", 0.0);
+      syntax.add ("irrigation_total", "mm/h", Syntax::LogOnly,
+		  "Total irrigation above of below the soil surface.");
 
       // Water in snowpack.
       syntax.add_submodule ("Snow", alist, Syntax::State, 

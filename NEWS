@@ -12,11 +12,22 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.42
+
+** Fixed bug in hypres implementation.
+
+K_sat was 24 times to large.
+
+** irrigation_subsoil and irrigation_total
+
+New log variables in the default bioclimate model.  The total
+irrigation is now included in the "Root Zone Water Balance" log model.
+
 * 2.41
 
 ** New "original" pseudo-model.
 
-This keyword allows you to reuse the original paramets of an component
+This keyword allows you to reuse the original parameters of an component
 attribute, when creating a specialization. 
 
 For example, if we have this definition of a foo parameterization:

@@ -1,4 +1,23 @@
+2003-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.42 released.
+
+2003-01-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_hypres.C (initialize): Fixed K_sat dimension.
+	(check_alist): Allow specifiction of Theta_res.
+	(Theta_res): Default value 1%.
+
 2003-01-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (crop_time): Remove duplicate assignment.
+
+	* bioclimate_std.C (irrigation_subsoil, irrigation_total): New log
+	variables. 
+	* bioclimate_std.C, bioclimate.h (set_subsoil_irrigation): New
+	function. 
+	* column_base.C (set_subsoil_irrigation): Call it.
+	* lib/log.dai ("Root Zone Water Balance"): Log it.
 
 	* Version 2.41 released.
 

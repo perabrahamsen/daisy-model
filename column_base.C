@@ -62,6 +62,7 @@ ColumnBase::set_subsoil_irrigation (double flux, const IM&,
   daisy_assert (from <= 0.0);
   daisy_assert (to < from);
   soil_water.set_external_source (soil, flux * 0.1 /* mm->cm */, from, to);
+  bioclimate.set_subsoil_irrigation (flux);
 }
 
 void
