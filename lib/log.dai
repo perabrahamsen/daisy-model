@@ -833,6 +833,10 @@
 		   (dimension "Ton DM/ha")
 		   (factor 0.01))
 	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod WDead)
+		   (dimension "Ton DM/ha")
+		   (factor 0.01))
+	   (number (path column "$col" Vegetation crops crops "$crop"
 			 CrpAux AccFixated)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
@@ -850,6 +854,10 @@
 		   (factor 10.0))
 	   (number (path column "$col" Vegetation crops crops "$crop"
 			 Prod NRoot)
+		   (dimension "kg N/ha")
+		   (factor 10.0))
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod NDead)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
 	   (number (path column "$col" Vegetation crops crops "$crop"

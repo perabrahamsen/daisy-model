@@ -1,3 +1,11 @@
+2000-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_crop.C (doIt): Don't check for harvest before sowing.
+
+2000-08-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Crop Production"): Added `NDead' and `WDead'.
+
 2000-08-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.32 released.

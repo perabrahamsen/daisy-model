@@ -767,17 +767,21 @@ ActionCrop::doIt (Daisy& daisy)
       if (harvest_annual->done)
 	{
 	  // If annual done, do perennial.
-	  if (harvest_perennial->doIt (daisy, secondary->crop.name ("type")))
+	  if (secondary->done 
+	      && harvest_perennial->doIt (daisy,
+					  secondary->crop.name ("type")))
 	    harvested = true;
 	}
-      else if (harvest_annual->doIt (daisy, primary->crop.name ("type")))
+      else if (primary->done 
+	       && harvest_annual->doIt (daisy, primary->crop.name ("type")))
 	// else do annual.
 	harvested = true;
     }
   else if (harvest_annual)
     {
       // We have only annual crops.  Let `primary' when they are harvested.
-      if (harvest_annual->doIt (daisy, primary->crop.name ("type")))
+      if (primary->done 
+	  && harvest_annual->doIt (daisy, primary->crop.name ("type")))
 	harvested = true;
     }
   else
@@ -787,12 +791,14 @@ ActionCrop::doIt (Daisy& daisy)
       if (secondary)
 	{
 	  // If we have two, let them both control.
-	  if (harvest_perennial->doIt (daisy, 
-				       primary->crop.name ("type"),
-				       secondary->crop.name ("type")))
+	  if ((primary->done || secondary->done)
+	      && harvest_perennial->doIt (daisy, 
+					  primary->crop.name ("type"),
+					  secondary->crop.name ("type")))
 	    harvested = true;
 	}
-      else if (harvest_perennial->doIt (daisy, primary->crop.name ("type")))
+      else if (primary->done 
+	       && harvest_perennial->doIt (daisy, primary->crop.name ("type")))
 	// If we have only one, it is of course in control.
 	harvested = true;
     }
