@@ -1,5 +1,22 @@
 2003-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.87 released.
+
+2003-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (initial_match, initial_done): Move summary
+	initialization to initial_match.
+
+	* denitrification.C (tick): Use it.
+	(f_Theta): Removed.
+	(water_factor_fast, alpha_fast): New parameters.
+	(converted_fast, potential, potential_fast): New log variables.
+	* summary_simple.C (print_sum): New parameter.
+	* lib/log.dai ("Carbon Balance"): Removed CO2_fast.
+	* lib/log.dai ("Denitrification"): New log parameterization.
+
+	* organic_matter.C, organic_matter.h (CO2_fast): New member function.
+
 	* Version 2.86 released.
 
 2003-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -12,6 +12,38 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.87
+
+** CO2_fast is no longr printed in "Carbon Balance".
+
+** Denitrification can now be affected by fast OM pools.
+
+For a definition of "fast OM pools", see entry 2.71.
+
+This is controled by two new parameters to the Denitrification
+submodel, alpha_fast and water_factor_fast. You can set them like
+this:
+
+    (defcolumn Andeby default
+      "The B.And farm, Andeby, 2002."
+      (Denitrification (alpha_fast 0.3)
+                   (water_factor_fast (0.5 0.0) (0.8 0.1)))
+      (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+      (MaxRootingDepth 60.0 [cm]))
+      (Groundwater deep))
+    
+    (output "Denitrification")
+
+These adds to the denitrification just like the old alpha and
+water_factor parameters, but the total denitrification is still
+limited by the K parameter.
+
+By default, CO2 from fast pools have no special effect on
+denitrification.  
+
+You can get detailed information about potential and actual
+denitrification with the new "Denitrification" log parameterization.
+
 * 2.86
 
 ** More information from the "Carbon Balance" log parameterization

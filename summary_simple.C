@@ -34,6 +34,7 @@ struct SummarySimple : public Summary
   static const symbol default_description;
   const symbol description;
   const symbol title;
+  const bool print_sum;
   const symbol sum_name;
   const symbol period;
 
@@ -296,6 +297,7 @@ SummarySimple::SummarySimple (const AttributeList& al)
   : Summary (al),
     description (al.identifier ("description")),
     title (al.check ("title") ? al.identifier ("title") : name),
+    print_sum (al.flag ("print_sum")),
     sum_name (al.identifier ("sum_name")),
     period (al.check ("period") ? al.identifier ("period") : symbol ("")),
     precision (al.integer ("precision")),
@@ -314,7 +316,7 @@ SummarySimple::summarize (const int hours, Treelog& msg)
 
   double total = 0.0;
   const int sum_size = sum_name.name ().size ();
-  int max_size = sum_size;
+  int max_size = print_sum ? sum_size : 0;
   for (unsigned int i = 0; i < fetch.size (); i++)
     max_size = max (max_size, fetch[i]->name_size ());
   int max_digits = 0;
@@ -337,13 +339,16 @@ SummarySimple::summarize (const int hours, Treelog& msg)
       tmp () << string (max_size - fetch[i]->name_size (), ' ');
       fetch[i]->summarize (tmp (), width, period, hours);
     }
-  tmp () << string (max_size + 3 + width + 3 + dim_size, '-') << "\n"
-	 << string (max_size - sum_size, ' ') << sum_name << " = ";
-  tmp ().width (width);
-  tmp () << total;
-  if (same_dim)
-    tmp () << " [" << last_dim << "]";
-  tmp () << "\n" << string (max_size + 3, ' ') << string (width, '=');
+  if (print_sum)
+  {
+    tmp () << string (max_size + 3 + width + 3 + dim_size, '-') << "\n"
+	   << string (max_size - sum_size, ' ') << sum_name << " = ";
+    tmp ().width (width);
+    tmp () << total;
+    if (same_dim)
+      tmp () << " [" << last_dim << "]";
+    tmp () << "\n" << string (max_size + 3, ' ') << string (width, '=');
+  }
   msg.message (tmp.str ());
 }
 
@@ -361,6 +366,9 @@ static struct SummarySimpleSyntax
       syntax.add ("title", Syntax::String, Syntax::OptionalConst,
 		  "Title of this summary.\n\
 By default, use the name of the parameterization.");
+      syntax.add ("print_sum", Syntax::Boolean, Syntax::Const, 
+		  "Print sum of all the summary lines.");
+      alist.add ("print_sum", true);
       syntax.add ("sum_name", Syntax::String, Syntax::Const,
 		  "Name of the sum of all the entries.");
       alist.add ("sum_name", "Sum");	
@@ -373,7 +381,6 @@ List of columns to fetch for the summary.",
       syntax.add ("precision", Syntax::Integer, Syntax::Const,
 		  "Number of digits to print after decimal point.");
       alist.add ("precision", 2);
-	
       Librarian<Summary>::add_type ("simple", alist, syntax, &make);
     }
 } SummarySimple_syntax;

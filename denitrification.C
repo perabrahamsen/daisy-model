@@ -36,16 +36,6 @@
 
 using namespace std;
 
-static double f_Theta (double x)
-{
-  if (x < 0.8)
-    return 0.0;
-  if (x < 0.9)
-    return 2.0 * (x - 0.8);
-  
-  return 0.2 + 8.0 * (x - 0.9);
-}
-
 static double f_T (double T)
 {
   if (T < 2.0)
@@ -64,6 +54,9 @@ void
 Denitrification::output (Log& log) const
 {
   output_variable (converted, log);
+  output_variable (converted_fast, log);
+  output_variable (potential, log);
+  output_variable (potential_fast, log);
 }
 
 void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
@@ -72,6 +65,9 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
 			    const OrganicMatter& organic_matter)
 {
   converted.erase (converted.begin (), converted.end ());
+  converted_fast.erase (converted_fast.begin (), converted_fast.end ());
+  potential.erase (potential.begin (), potential.end ());
+  potential_fast.erase (potential_fast.begin (), potential_fast.end ());
 
   unsigned int size = soil.size ();
   if (!active_underground)
@@ -82,6 +78,7 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
   for (unsigned int i = 0; i < size; i++)
     {
       const double CO2 = organic_matter.CO2 (i);
+      const double CO2_fast = organic_matter.CO2_fast (i);
       const double Theta = soil_water.Theta (i);
       const double Theta_sat = soil_water.Theta (soil, i, 0.0);
       const double Theta_fraction = Theta / Theta_sat;
@@ -91,13 +88,19 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
       const double T_factor = (heat_factor.size () < 1)
 	? f_T (T)
 	: heat_factor (T);
-      const double w_factor = (water_factor.size () < 1)
-	? f_Theta (Theta_fraction)
-	: water_factor (Theta_fraction);
+      const double pot = T_factor * alpha * CO2;
+      const double w_factor = water_factor (Theta_fraction);
+      const double rate = w_factor * pot;
 
-      const double rate = w_factor * T_factor * alpha * CO2 ;
-      const double M = min (rate, K * soil_NO3.M_left (i) / dt);
+      const double pot_fast = T_factor * alpha_fast * CO2_fast;
+      const double w_factor_fast = water_factor_fast (Theta_fraction);
+      const double rate_fast = w_factor_fast * pot_fast;
+
+      const double M = min (rate + rate_fast, K * soil_NO3.M_left (i) / dt);
       converted.push_back (M);
+      converted_fast.push_back (M > rate ? M - rate : 0.0);
+      potential.push_back (pot);
+      potential_fast.push_back (pot_fast);
     }
   soil_NO3.add_to_sink (converted);
 }
@@ -110,7 +113,10 @@ Denitrification::load_syntax (Syntax& syntax, AttributeList& alist)
 of nitrate to atmospheric nitrogen).  In this model, it is made\n\
 proportional to the CO2 development, as specified by the parameter\n\
 alpha, with a maximum rate specified by the parameter 'K'.  The\n\
-denitrification is also affected by temperature and water pressure.");
+denitrification is also affected by temperature and water pressure.\n\
+Additional denitrification from CO2 produced from fast OM pools can\n\
+be triggered by alpha_fast.  This additional denitrification is still\n\
+limited by K.");
   syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
 Set this flag to turn on denitrification below the root zone.");
   alist.add ("active_underground", false);
@@ -119,21 +125,46 @@ Clear this flag to turn off denitrification in groundwater.");
   alist.add ("active_groundwater", true);
   syntax.add ("converted", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Amount of denitrification.");
+  syntax.add ("converted_fast", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Additional denitrification due to turnover in fast pools.");
+  syntax.add ("potential", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Potential amount of denitrification at anarobic conditions.");
+  syntax.add ("potential_fast", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Additional potential due to turnover in fast pools.");
   syntax.add ("K", "h^-1", Check::fraction (), Syntax::Const, "\
 Maximum fraction of nitrate converted at each time step.");
   alist.add ("K", 0.020833);
   syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
 	      Syntax::Const, "Anaerobic denitrification constant.");
   alist.add ("alpha", 0.1);
+  syntax.add ("alpha_fast", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
+	      Syntax::OptionalConst, "Anaerobic denitrification constant.\n\
+This applies to the CO2 produced from turnover of fast OM pools.\n\
+By default, this is identical to alpha.");
+  alist.add ("alpha_fast", 0.0);
   syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
-	      Syntax::Const, "Heat factor.");
-  alist.add ("heat_factor", PLF::empty ());
+	      Syntax::OptionalConst, "Heat factor.\n\
+By default, use a build in function valid for temperate climates.");
   syntax.add ("water_factor", Syntax::Fraction (), Syntax::None (), 
 	      Check::non_negative (),
-	      Syntax::Const,
+	      Syntax::OptionalConst,
 	      "Water potential factor, a function of the current\n\
 water content as a fraction of the maximal water content.");
-  alist.add ("water_factor", PLF::empty ());
+  PLF water_factor;
+  water_factor.add (0.8, 0.0);
+  water_factor.add (0.9, 0.2);
+  water_factor.add (1.0, 1.0);
+  alist.add ("water_factor", water_factor);
+  syntax.add ("water_factor_fast", Syntax::Fraction (), Syntax::None (), 
+	      Check::non_negative (),
+	      Syntax::OptionalConst,
+	      "Water potential factor, a function of the current\n\
+water content as a fraction of the maximal water content.\n\
+This applies to the extra denitrification triggered by fast OM pools.");
+  PLF water_factor_fast;
+  water_factor_fast.add (0.0, 0.0);
+  water_factor_fast.add (1.0, 0.0);
+  alist.add ("water_factor_fast", water_factor_fast);
 }
 
 Denitrification::Denitrification (const AttributeList& al)
@@ -141,8 +172,12 @@ Denitrification::Denitrification (const AttributeList& al)
     active_groundwater (al.flag ("active_groundwater")),
     K (al.number ("K")),
     alpha (al.number ("alpha")),
-    heat_factor (al.plf ("heat_factor")),
-    water_factor (al.plf ("water_factor"))
+    alpha_fast (al.check ("alpha_fast") ? al.number ("alpha_fast") : alpha),
+    heat_factor (al.check ("heat_factor") 
+		 ? al.plf ("heat_factor") 
+		 : PLF::empty ()),
+    water_factor (al.plf ("water_factor")),
+    water_factor_fast (al.plf ("water_factor_fast"))
 { }
 
 static Submodel::Register 

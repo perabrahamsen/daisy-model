@@ -268,15 +268,17 @@ LogTable::done (const Time& time)
 bool 
 LogTable::initial_match (const Daisy& daisy, Treelog& msg)
 {
+  begin = daisy.time;
+
+  for (unsigned int i = 0; i < summary.size (); i++)
+    summary[i]->clear ();
+
   common_match (daisy, msg);
   return LogSelect::initial_match (daisy, msg);
 }
 void 
 LogTable::initial_done (const Time& time)
 { 
-  for (unsigned int i = 0; i < summary.size (); i++)
-    summary[i]->clear ();
-
   LogSelect::initial_done (time);
 
   for (unsigned int i = 0; i < entries.size (); i++)

@@ -43,12 +43,17 @@ private:
   const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double K;
   const double alpha;
+  const double alpha_fast;
   const PLF heat_factor;
   const PLF water_factor;
+  const PLF water_factor_fast;
 
   // Log variable.
 private:
   std::vector<double> converted;
+  std::vector<double> converted_fast;
+  std::vector<double> potential;
+  std::vector<double> potential_fast;
   
   // Simulation.
 public:

@@ -2146,6 +2146,13 @@ OrganicMatter::CO2 (unsigned int i) const
   return impl.CO2_slow[i] + impl.CO2_fast[i];
 }
 
+double
+OrganicMatter::CO2_fast (unsigned int i) const
+{
+  daisy_assert (impl.CO2_fast.size () > i);
+  return impl.CO2_fast[i];
+}
+
 double 
 OrganicMatter::get_smb_c_at (unsigned int i) const
 { return impl.get_smb_c_at (i); }

@@ -53,6 +53,7 @@ public:
   void transport (const Soil&, const SoilWater&, Treelog&);
   void output (Log&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
+  double CO2_fast (unsigned int i) const;	// [g C/cm³]
   void mix (const Soil&, const SoilWater&,
 	    double from, double to, double penetration, 
 	    const Time& time);
