@@ -76,7 +76,7 @@ struct ActionIrrigate : public Action
     bool ok = true;
 
     const int days = alist.integer ("days");
-    const int hours = alist.integer ("hours");
+    const int hours = alist.integer ("hours", (days > 0) ? 0 : 1);
 
     if (days * 24 + hours < 1)
       {

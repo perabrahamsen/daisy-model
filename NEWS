@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.62
+
+Bug fix.
+
 * 3.61
 
 ** In the irrigate actions, 'hours' now defaults to zero if 'days' > 0.
