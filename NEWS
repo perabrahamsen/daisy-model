@@ -14,7 +14,13 @@ release.
 
 * 1.80
 
-** Now compiles with Borland C++ 5.5 via the commandoline.
+** Now compiles with C++Builder 5.0 via the commandoline and Cygwin make
+
+** Now includes a C++Builder 5.0 project file.
+
+** Now compiles out of the box with Cygwin and "make daisy.exe"
+
+** Bug fixes.
 
 * 1.79
 

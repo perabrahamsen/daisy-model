@@ -56,17 +56,26 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	{
 	  // Fraction of water entering the layer through the
 	  // macropore, which also stayes here.
-	  assert (water_in_above > 0.0);
-	  const double water_fraction 
-	    = approximate (delta_water, water_in_above) 
-	    ? 1.0
-	    : delta_water / water_in_above;
-	  assert (water_fraction >= 0.0);
-	  assert (water_fraction <= 1.0);
+	  if (water_in_above > 0.0)
+	    {
+	      const double water_fraction 
+		= approximate (delta_water, water_in_above) 
+		? 1.0
+		: delta_water / water_in_above;
+	      assert (water_fraction >= 0.0);
+	      assert (water_fraction <= 1.0);
 
-	  // Matter stayes with the water.
-	  delta_matter = matter_in_above * water_fraction;
-	  assert (delta_matter >= 0.0);
+	      // Matter stayes with the water.
+	      delta_matter = matter_in_above * water_fraction;
+	      assert (delta_matter >= 0.0);
+	    }
+	  else
+	    {
+	      // Water through macropores from below... too weird.
+	      CERR << "Weirdness: Got " << -water_out_below * 10 
+		   << " mm water from below through macropores\n";
+	      delta_matter = 0.0; // Just assume pure water.
+	    }
 	}
       else
 	delta_matter = 0.0;

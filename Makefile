@@ -326,7 +326,8 @@ HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) version.h
 
 # Find all printable files.
 #
-TEXT =  Makefile ChangeLog TODO NEWS FILES $(HEADERS) $(SOURCES) tlink32.ini
+TEXT =  Makefile ChangeLog TODO NEWS FILES $(HEADERS) $(SOURCES) \
+	tlink32.ini daisy.bpr daisy.bpf daisy.bpg
 
 # The executables.
 #

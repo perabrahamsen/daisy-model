@@ -232,6 +232,7 @@ OM::add (const Geometry& geometry, // Add dead roots.
   const double total = geometry.total (density);
   for (unsigned int i = 0; i < density.size (); i++)
     {
+      assert (approximate (C_per_N[i], initial_C_per_N));
       // We should *not* multiply with dz here.  Reason: We want to
       // divide C on the total depth.  
       C[i] += to_C * density[i] /* * geometry.dz (i) */ / total;

@@ -1,3 +1,19 @@
+2001-10-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.80 released.
+
+2001-10-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (add): Always add both C and N, never rely on a fixed C/N
+	ratio. 
+	(add): Simplified assertions.
+
+	* mactrans_std.C (tick): Handle upstream macropores.
+
+2001-09-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* depend.C (object_desc): Fixed call by value strings.
+
 2001-09-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* all: CVS synched with Cygwin and Borland versions.

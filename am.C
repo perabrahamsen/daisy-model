@@ -284,30 +284,10 @@ AM::Implementation::add (const Geometry& geometry,
   distribute (C, om_C, N, om_N);
 
   for (unsigned int i = 0; i < om.size (); i++)
-    {
-      const double C_per_N = om[i]->initial_C_per_N;
-      if (C_per_N == OM::Unspecified)
-	om[i]->add (geometry, om_C[i], om_N[i], density);
-      else
-	{
-	  assert (approximate (om_C[i], C_per_N * om_N[i]));
-	  const double old_N = om[i]->total_N (geometry);
-	  om[i]->add (geometry, om_C[i], density);
-	  const double new_N = om[i]->total_N (geometry);
-	  assert (om_N[i] * 1e9 < old_N
-		  ? approximate (old_N + om_N[i], new_N)
-		  : (approximate (new_N - old_N, om_N[i])));
-	}
-    }
+    om[i]->add (geometry, om_C[i], om_N[i], density);
 
-  const double new_C = total_C (geometry);
-  const double new_N = total_N (geometry);
-  assert (C * 1e9 < old_C
-	  ? approximate (old_C + C, new_C)
-	  : (approximate (new_C - old_C, C)));
-  assert (N * 1e9 < old_N
-	  ? approximate (old_N + N, new_N)
-	  : (approximate (new_N - old_N, N)));
+  assert (approximate (old_C + C, total_C (geometry)));
+  assert (approximate (old_N + N, total_N (geometry)));
 }
 
 void
