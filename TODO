@@ -1,18 +1,24 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Mikkel
+
+** Fortegn
+
+** uzrichards.
+
+* M_vGp
+
 * Log models
-
-** New Log_Select::time_columns parameter
-
-If true, automatically print four time columns.
-
-By default, it is false iff Select:path[0] == "time" for any select.
 
 ** keep total_accumulated
 
 ** C balance fil.
 
-I den første linie skal "begyndelsesindhold" stå.
+(summary (lines ("Mineralization" (("Min" 1.0)) 1.0 "kg N/ha")
+	        ("Immobilization" (("NH4" -1.0) ("NO3" -1.0)) 1.0 "kg N/ha"))
+	 (from 2000 1 1 1)
+	 (to   2001 1 1 1)
+         (name "C Input"))
 
 * FertOrgaNic
 
@@ -70,6 +76,7 @@ Gør det muligt at give fejl hvis summen er forskellig fra 1.0 (100%).
 Og Lz (DensRtTip) er en fri variabel.
 
 plus line;r fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
+
 * Partit komponent
 
 Skal kunne være afhængig af kvælstof og temperatur.

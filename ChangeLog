@@ -1,5 +1,15 @@
 2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.85 released.
+
+2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_all.C (insert_active): Use iterators.
+	(match): Ditto.
+	(done): Ditto.
+	(initial_match): Ditto.
+	(initial_done): Ditto.
+
 	* Version 2.84 released.
 
 2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
