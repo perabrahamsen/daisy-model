@@ -1,3 +1,11 @@
+2004-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.56 released.
+
+2004-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.C (tick): Set last_cut to now if unset.
+
 2004-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.55 released.

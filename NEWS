@@ -12,6 +12,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.56
+
+** Some planting support.
+
+You can now set the production_delay Harvest parameter without setting
+last_cut.  This can be used to make a plant "rest" just after being
+planted. 
+
 * 3.55
 
 ** The heat related horizon parameters model to new HorHeat submodel.

@@ -449,7 +449,8 @@ Harvesting::tick (const Time& time)
     cut_stress = 0.0;
   else
     {
-      daisy_assert (last_cut);
+      if (!last_cut)
+        last_cut = new Time (time);
       const double days_between 
 	= (0.0 + Time::hours_between (*last_cut, time)) / 24.0;
       daisy_assert (days_between >= 0.0);
