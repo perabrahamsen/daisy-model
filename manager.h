@@ -17,12 +17,12 @@ private:
 
     // Simulation.
 public:
-    const Action* action (ColumnList&, const Wheather&, int day, int hour);
+    const Action* action (const Daisy&);
 
     // Create and Destroy.
 private:
     friend Input; // Only create from Input.
-    Manager (Log&, const AttributeList&);
+    Manager (const AttributeList&);
 public:
     ~Manager ();
 };

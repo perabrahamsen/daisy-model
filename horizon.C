@@ -6,9 +6,8 @@
 struct Horizon::Implementation
 { };
 
-Horizon::Horizon (Log& l, Column& c)
+Horizon::Horizon (Column& c)
     : impl (*new Implementation ()),
-      log (l), 
       column (c)
 { }
 

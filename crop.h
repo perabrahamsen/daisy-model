@@ -16,20 +16,20 @@ public:
 protected:
     const Parameters& par;
     Variables& var;
-    Log& log;
 public:
     const string name;
-    const Column& column;
 
     // Simulation.
 protected:
     // <insert calculation functions here>
 public:
     void tick (const Wheather& wheater, int day, int hour);
+    void output (Log&, const Filter*) const;
 
     // Create and Destroy.
 public:
-    Crop (Log&, const string, const AttributeList&, Column&);
+    Crop (const string, const AttributeList& pl);
+    Crop (const string, const AttributeList& pl, const AttributeList& pl);
     ~Crop ();
 };
 

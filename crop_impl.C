@@ -2,7 +2,10 @@
 
 #include "crop_impl.h"
 #include "syntax.h"
-#include "value.h"
+#include "alist.h"
+#include "csmp.h"
+#include "filter.h"
+#include "log.h"
 
 Crop::Parameters::pList Crop::Parameters::all;
 
@@ -127,10 +130,47 @@ Crop::Variables::Variables (const Parameters& par)
       CrpAux (par)
 { }
 
+Crop::Variables::Variables (const AttributeList& vl)
+    : Phenology (vl.list ("Phenology")),
+      Canopy (vl.list ("Canopy")),
+      RootSys (vl.list ("RootSys")),
+      Prod (vl.list ("Prod")),
+      CrpAux (vl.list ("CrpAux"))
+{ }
+
+void 
+Crop::Variables::output (Log& log, const Filter* filter) const
+{
+    if (filter->check ("Phenology"))
+	Phenology.output (log, filter->lookup ("Phenology"));
+    if (filter->check ("Canopy"))
+	Canopy.output (log, filter->lookup ("Canopy"));
+    if (filter->check ("RootSys"))
+	RootSys.output (log, filter->lookup ("RootSys"));
+    if (filter->check ("Prod"))
+	Prod.output (log, filter->lookup ("Prod"));
+    if (filter->check ("CrpAux"))
+	CrpAux.output (log, filter->lookup ("CrpAux"));
+}
+
 Crop::Variables::RecPhenology::RecPhenology (const Parameters& par)
     : DS (-1.0),
       Vern (par.Vernal.TaSum)
 { }
+
+Crop::Variables::RecPhenology::RecPhenology (const AttributeList& vl)
+    : DS (vl.number ("DS")),
+      Vern (vl.number ("Vern"))
+{ }
+
+void 
+Crop::Variables::RecPhenology::output (Log& log, const Filter* filter) const
+{
+    log.open ("Phenology");
+    log.output ("DS", filter, DS);
+    log.output ("Vern", filter, Vern);
+    log.close();
+}
 
 Crop::Variables::RecCanopy::RecCanopy (const Parameters& /* par */)
     : Height (0.0),
@@ -138,10 +178,48 @@ Crop::Variables::RecCanopy::RecCanopy (const Parameters& /* par */)
 // LADm, LADDist
 { }
 
+Crop::Variables::RecCanopy::RecCanopy (const AttributeList& vl)
+    : Height (vl.number ("Height")),
+      LAI (vl.number ("LAI")),
+      LADm (vl.number ("LADm")),
+      LADDist (vl.array ("LADDist"))
+{ }
+
+void 
+Crop::Variables::RecCanopy::output (Log& log, const Filter* filter) const
+{
+    log.open ("Canopy");
+    log.output ("Height", filter, Height);
+    log.output ("LAI", filter, LAI);
+    log.output ("LADm", filter, LADm);
+    log.output ("LADDist", filter, LADDist);
+    log.close();
+}
+
 Crop::Variables::RecRootSys::RecRootSys (const Parameters& par)
     : Depth (par.Root.DptEmr)
 // Density, H2OExtraction, NH4Extraction, NO3Extraction
 { }
+
+Crop::Variables::RecRootSys::RecRootSys (const AttributeList& vl)
+    : Depth (vl.number ("Depth")),
+      Density (vl.array ("Density")),
+      H2OExtraction (vl.array ("H2OExtraction")),
+      NH4Extraction (vl.array ("NH4Extraction")),
+      NO3Extraction (vl.array ("NO3Extraction"))
+{ }
+
+void 
+Crop::Variables::RecRootSys::output (Log& log, const Filter* filter) const
+{
+    log.open ("RootSys");
+    log.output ("Depth", filter, Depth);
+    log.output ("Density", filter, Density);
+    log.output ("H2OExtraction", filter, H2OExtraction);
+    log.output ("NH4Extraction", filter, NH4Extraction);
+    log.output ("NO3Extraction", filter, NO3Extraction);
+    log.close();
+}
 
 Crop::Variables::RecProd::RecProd (const Parameters& par)
     : WLeaf (0.001),
@@ -151,6 +229,28 @@ Crop::Variables::RecProd::RecProd (const Parameters& par)
       WLDrd (0.000),
       NCrop (par.CrpN.SeedN)
 { }
+
+Crop::Variables::RecProd::RecProd (const AttributeList& vl)
+    : WLeaf (vl.number ("WLeaf")),
+      WStem (vl.number ("WStem")),
+      WRoot (vl.number ("WRoot")),
+      WSOrg (vl.number ("WSOrg")),
+      WLDrd (vl.number ("WLDrd")),
+      NCrop (vl.number ("NCrop"))
+{ }
+
+void 
+Crop::Variables::RecProd::output (Log& log, const Filter* filter) const
+{
+    log.open ("Prod");
+    log.output ("WLeaf", filter, WLeaf);
+    log.output ("WStem", filter, WStem);
+    log.output ("WRoot", filter, WRoot);
+    log.output ("WSOrg", filter, WSOrg);
+    log.output ("WLDrd", filter, WLDrd);
+    log.output ("NCrop", filter, NCrop);
+    log.close();
+}
 
 Crop::Variables::RecCrpAux::RecCrpAux (const Parameters& par)
     : InitLAI (true),
@@ -164,44 +264,6 @@ Crop::Variables::RecCrpAux::RecCrpAux (const Parameters& par)
       IncWRoot (0.0)
 // H2OUpt, NH4Upt, NO3Upt
 { }
-
-Crop::Variables::Variables (const AttributeList& vl)
-    : Phenology (vl.list ("Phenology")),
-      Canopy (vl.list ("Canopy")),
-      RootSys (vl.list ("RootSys")),
-      Prod (vl.list ("Prod")),
-      CrpAux (vl.list ("CrpAux"))
-{ }
-
-Crop::Variables::RecPhenology::RecPhenology (const AttributeList& vl)
-    : DS (vl.number ("DS")),
-      Vern (vl.number ("Vern"))
-{ }
-
-Crop::Variables::RecCanopy::RecCanopy (const AttributeList& vl)
-    : Height (vl.number ("Height")),
-      LAI (vl.number ("LAI")),
-      LADm (vl.number ("LADm")),
-      LADDist (vl.array ("LADDist"))
-{ }
-
-Crop::Variables::RecRootSys::RecRootSys (const AttributeList& vl)
-    : Depth (vl.number ("Depth")),
-      Density (vl.array ("Density")),
-      H2OExtraction (vl.array ("H2OExtraction")),
-      NH4Extraction (vl.array ("NH4Extraction")),
-      NO3Extraction (vl.array ("NO3Extraction"))
-{ }
-     
-Crop::Variables::RecProd::RecProd (const AttributeList& vl)
-    : WLeaf (vl.number ("WLeaf")),
-      WStem (vl.number ("WStem")),
-      WRoot (vl.number ("WRoot")),
-      WSOrg (vl.number ("WSOrg")),
-      WLDrd (vl.number ("WLDrd")),
-      NCrop (vl.number ("NCrop"))
-{ }
-
 
 Crop::Variables::RecCrpAux::RecCrpAux (const AttributeList& vl)
     : InitLAI (vl.flag ("InitLAI")),
@@ -219,6 +281,26 @@ Crop::Variables::RecCrpAux::RecCrpAux (const AttributeList& vl)
       NO3Upt (vl.number ("NO3Upt"))
 { }
 
+void 
+Crop::Variables::RecCrpAux::output (Log& log, const Filter* filter) const
+{
+    log.open ("CrpAux");
+    log.output ("InitLAI", filter, InitLAI);
+    log.output ("PotRtDpt", filter, PotRtDpt);
+    log.output ("PtNCnt", filter, PtNCnt);
+    log.output ("PotTransp", filter, PotTransp);
+    log.output ("PotCanopyAss", filter, PotCanopyAss);
+    log.output ("CanopyAss", filter, CanopyAss);
+    log.output ("IncWLeaf", filter, IncWLeaf);
+    log.output ("IncWStem", filter, IncWStem);
+    log.output ("IncWSOrg", filter, IncWSOrg);
+    log.output ("IncWRoot", filter, IncWRoot);
+    log.output ("H2OUpt", filter, H2OUpt);
+    log.output ("NH4Upt", filter, NH4Upt);
+    log.output ("NO3Upt", filter, NO3Upt);
+    log.close();
+}
+
 Crop::Variables::~Variables ()
 { }
 
@@ -228,21 +310,29 @@ dFTable<CropFun> Crop::Parameters::LeafPhotPar::models;
 // Add the Crop syntax to the syntax table.
 static struct CropSyntax
 {
+    void parameters ();
+    void variables ();
     CropSyntax ();
 } crop_syntax;
 
 CropSyntax::CropSyntax ()
 { 
+    parameters ();
+    variables ();
+}
+
+void CropSyntax::parameters ()
+{ 
     // CropPar
-    Syntax* crop = new Syntax ();
-    syntax_table->add ("crop", crop);
+    Syntax* par = new Syntax ();
+    syntax_table->add ("crop", par);
     
     // DevelPar
     Crop::Parameters::DevelPar::models.add("m1", (CropFun) 0);
     Crop::Parameters::DevelPar::models.add("m2", (CropFun) 0);
     Crop::Parameters::DevelPar::models.add("m3", (CropFun) 0);
     Syntax* Devel = new Syntax ();
-    crop->add ("Devel", Devel);
+    par->add ("Devel", Devel);
 
     Devel->add ("Model", &Crop::Parameters::DevelPar::models);
     Devel->add ("EmrTSum", Syntax::Number);
@@ -255,7 +345,7 @@ CropSyntax::CropSyntax ()
     
     // VernalPar
     Syntax* Vernal = new Syntax ();
-    crop->add ("Vernal", Vernal);
+    par->add ("Vernal", Vernal);
 
     Vernal->add ("required", Syntax::Boolean);
     Vernal->add ("DSLim1", Syntax::Number);
@@ -268,7 +358,7 @@ CropSyntax::CropSyntax ()
     Crop::Parameters::LeafPhotPar::models.add("parabolic", (CropFun) 0);
 
     Syntax* LeafPhot = new Syntax ();
-    crop->add ("LeafPhot", LeafPhot);
+    par->add ("LeafPhot", LeafPhot);
 
     LeafPhot->add ("Model", &Crop::Parameters::LeafPhotPar::models);
     LeafPhot->add ("Qeff", Syntax::Number);
@@ -278,7 +368,7 @@ CropSyntax::CropSyntax ()
 
     // CanopyPar
     Syntax* Canopy = new Syntax ();
-    crop->add ("Canopy", Canopy);
+    par->add ("Canopy", Canopy);
 
     Canopy->add ("DSinit", Syntax::Number);
     Canopy->add ("WLfInit", Syntax::Number);
@@ -293,7 +383,7 @@ CropSyntax::CropSyntax ()
 
     // RootPar
     Syntax* Root = new Syntax ();
-    crop->add ("Root", Root);
+    par->add ("Root", Root);
 
     Root->add ("DptEmr", Syntax::Number);
     Root->add ("PenPar1", Syntax::Number);
@@ -308,7 +398,7 @@ CropSyntax::CropSyntax ()
 
     // PartitPar
     Syntax* Partit = new Syntax ();
-    crop->add ("Partit", Partit);
+    par->add ("Partit", Partit);
 
     Partit->add ("Root", Syntax::CSMP);
     Partit->add ("Leaf", Syntax::CSMP);
@@ -318,7 +408,7 @@ CropSyntax::CropSyntax ()
 
     // RespPar
     Syntax* Resp = new Syntax ();
-    crop->add ("Resp", Resp);
+    par->add ("Resp", Resp);
 
     Resp->add ("E_Root", Syntax::Number);
     Resp->add ("E_Leaf", Syntax::Number);
@@ -332,7 +422,7 @@ CropSyntax::CropSyntax ()
 
     // CrpNPar
     Syntax* CrpN = new Syntax ();
-    crop->add ("CrpN", CrpN);
+    par->add ("CrpN", CrpN);
 
     CrpN->add ("SeedN", Syntax::Number);
     CrpN->add ("PtLeafCnc", Syntax::CSMP);
@@ -343,4 +433,67 @@ CropSyntax::CropSyntax ()
     CrpN->add ("CrRootCnc", Syntax::CSMP);
     CrpN->add ("PtSOrgCnc", Syntax::CSMP);
     CrpN->add ("CrSOrgCnc", Syntax::CSMP);
+}
+
+void CropSyntax::variables ()
+{ 
+    // CropVar
+    Syntax* var = new Syntax ();
+    syntax_table->add ("crop/state", var);
+    
+    // Phenology
+    Syntax* Phenology = new Syntax ();
+    var->add ("Phenology", Phenology);
+
+    Phenology->add ("DS", Syntax::Number);
+    Phenology->add ("Vern", Syntax::Number);
+
+    // Canopy
+    Syntax* Canopy = new Syntax ();
+    var->add ("Canopy", Canopy);
+
+    Canopy->add ("Height", Syntax::Number);
+    Canopy->add ("LAI", Syntax::Number);
+    Canopy->add ("LADm", Syntax::Number);
+    Canopy->add ("LADDist", Syntax::Array);
+
+    // RootSys
+    Syntax* RootSys = new Syntax ();
+    var->add ("RootSys", RootSys);
+
+    RootSys->add ("Depth", Syntax::Number);
+    RootSys->add ("Density", Syntax::Array);   
+    RootSys->add ("H2OExtraction", Syntax::Array);
+    RootSys->add ("NH4Extraction", Syntax::Array);
+    RootSys->add ("NO3Extraction", Syntax::Array);
+
+    // Prod
+    Syntax* Prod = new Syntax ();
+    var->add ("Prod", Prod);
+
+    Prod->add ("WLeaf", Syntax::Number);
+    Prod->add ("WStem", Syntax::Number);
+    Prod->add ("WRoot", Syntax::Number);
+    Prod->add ("WSOrg", Syntax::Number);
+    Prod->add ("WLDrd", Syntax::Number);
+    Prod->add ("NCrop", Syntax::Number);
+
+    // CrpAux
+    Syntax* CrpAux = new Syntax ();
+    var->add ("CrpAux", CrpAux);
+
+    CrpAux->add ("InitLAI", Syntax::Boolean);
+    CrpAux->add ("PotRtDpt", Syntax::Number);
+    CrpAux->add ("PtNCnt", Syntax::Number);
+    CrpAux->add ("CrNCnt", Syntax::Number);
+    CrpAux->add ("PotTransp", Syntax::Number);
+    CrpAux->add ("PotCanopyAss", Syntax::Number);
+    CrpAux->add ("CanopyAss", Syntax::Number);
+    CrpAux->add ("IncWLeaf", Syntax::Number);
+    CrpAux->add ("IncWStem", Syntax::Number);
+    CrpAux->add ("IncWSOrg", Syntax::Number);
+    CrpAux->add ("IncWRoot", Syntax::Number);
+    CrpAux->add ("H2OUpt", Syntax::Number);
+    CrpAux->add ("NH4Upt", Syntax::Number);
+    CrpAux->add ("NO3Upt", Syntax::Number);
 }

@@ -1,7 +1,7 @@
 // library.C
 
 #include "library.h"
-#include "value.h"
+#include "alist.h"
 #include "syntax.h"
 
 struct Library::Implementation
@@ -43,6 +43,12 @@ Library::check (string key) const
 	if (impl.UGLY_key[i] == key)
 	    return true;
     return false;
+}
+
+string
+Library::root (string key) const
+{
+    return syntax_table->find (syntax (key));
 }
 
 void

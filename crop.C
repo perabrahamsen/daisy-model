@@ -1,6 +1,7 @@
 // crop.C
 
 #include "crop_impl.h"
+#include "log.h"
 
 void
 Crop::tick (const Wheather& /* wheater */, int /* day */, int /* hour */)
@@ -8,13 +9,26 @@ Crop::tick (const Wheather& /* wheater */, int /* day */, int /* hour */)
     cout << "Crop `" << name << "' tick\n"; 
 }
 
-Crop::Crop (Log& l, const string n, const AttributeList& vl, Column& c)
+void
+Crop::output (Log& log, const Filter* filter) const
+{
+    log.open (name);
+    var.output (log, filter);
+    log.close ();
+}
+
+Crop::Crop (const string n, const AttributeList& pl)
     : 
-      par (Parameters::get (n, vl)),
+      par (Parameters::get (n, pl)),
       var (*new Variables (par)),
-      log (l), 
-      name (n),
-      column (c)
+      name (n)
+{ }
+
+Crop::Crop (const string n, const AttributeList& pl, const AttributeList& vl)
+    : 
+      par (Parameters::get (n, pl)),
+      var (*new Variables (vl)),
+      name (n)
 { }
 
 Crop::~Crop ()

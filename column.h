@@ -20,7 +20,6 @@ class Column
 	vector<double> CanPTr;
     } CanStr;
 #endif COLUMN_INTERNALS
-    Log& log;
 public:
     string name;
     CropList crops;
@@ -29,11 +28,16 @@ public:
 public:
     void tick (Column* left, Column* rigth, const Wheather& wheater, 
 	       int day, int hour);
-    void sow (const Library& croplib, string crop);
+    void sow (const Library& croplib, string crop, Log&);
+
+    void output (Log&, const Filter*) const;
+    void output_crops (Log&, const Filter*) const;
 
     // Create and Destroy.
 public:
-    Column (Log&, string, const AttributeList&, const Library&);
+    Column (string name, 
+	    const AttributeList& paramenters, const AttributeList& variables, 
+	    const Library& horizons);
     ~Column ();
 };
 

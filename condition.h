@@ -40,3 +40,44 @@ public:
     bool match (ColumnList&, const Wheather&, int d, int h) const;
     ConditionAfter (int d, int h);
 };
+
+class ConditionHourly : public Condition
+{
+    const int step;
+public:
+    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    ConditionHourly (int);
+};
+
+class ConditionDaily : public Condition
+{
+    const int step;
+public:
+    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    ConditionDaily (int);
+};
+
+class ConditionWeekly : public Condition
+{
+    const int step;
+public:
+    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    ConditionWeekly (int);
+};
+
+class ConditionMonthly : public Condition
+{
+    const int step;
+public:
+    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    ConditionMonthly (int);
+};
+
+class ConditionYearly : public Condition
+{
+    const int step;
+public:
+    bool match (ColumnList&, const Wheather&, int d, int h) const;
+    ConditionYearly (int);
+};
+

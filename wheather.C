@@ -2,6 +2,5 @@
 
 #include "wheather.h"
 
-Wheather::Wheather (Log& l)
-    : log(l)
+Wheather::Wheather ()
 { }

@@ -22,12 +22,14 @@ class Syntax
     Implementation& impl;
 public:
     enum type 
-    { Number, List, Rules, CSMP, Function, Array, Boolean, Error };
+    { Number, List, Rules, CSMP, Function, Array, Boolean, 
+      Crops, Columns, Error };
     bool check (string, const AttributeList&, const Log&) const;
     type lookup (string) const;
     const Syntax* syntax (string) const;
     const FTable* function (string) const;
     int  size (string) const;
+    string find (const Syntax*) const;
     void add (string, type);
     void add (string, const Syntax*);
     void add (string, const FTable*);

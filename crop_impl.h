@@ -132,8 +132,10 @@ public:
 
 struct Crop::Variables
 { 
+    void output (Log&, const Filter*) const;
     struct RecPhenology
     {
+	void output (Log&, const Filter*) const;
 	double DS;		// Development Stage
 	double Vern;		// Vernalization criterium [C d]
     private:
@@ -143,6 +145,7 @@ struct Crop::Variables
     } Phenology;
     struct RecCanopy
     {
+	void output (Log&, const Filter*) const;
 	double Height;		// Crop height [cm]
 	double LAI;		// Leaf Area Index
 	double LADm;		// Max Leaf Area Density [cm2/cm3]
@@ -154,6 +157,7 @@ struct Crop::Variables
     } Canopy;
     struct RecRootSys
     {
+	void output (Log&, const Filter*) const;
 	double Depth;		// Rooting Depth [cm]
 	vector<double> Density;	// Root density [cm/cm3] in soil layers
 	vector<double> H2OExtraction; // Extraction of H2O in soil layers
@@ -169,6 +173,7 @@ struct Crop::Variables
     } RootSys;
     struct RecProd
     {
+	void output (Log&, const Filter*) const;
 	double WLeaf;		// Leaf dry matter weight [g/m2]
 	double WStem;		// Stem dry matter weight [g/m2]
 	double WRoot;		// Root dry matter weight [g/m2]
@@ -182,6 +187,7 @@ struct Crop::Variables
     } Prod;
     struct RecCrpAux
     {
+	void output (Log&, const Filter*) const;
 	bool InitLAI;		// Initial LAI development ?
 	double PotRtDpt;	// Potential Root Penetration Depth [cm]
 	double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]

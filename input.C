@@ -6,11 +6,15 @@
 #include "log.h"
 #include "horizon.h"
 #include "column.h"
-#include "value.h"
+#include "crop.h"
+#include "alist.h"
+#include "csmp.h"
+#include "rules.h"
 #include "library.h"
 #include "syntax.h"
 #include "action.h"
 #include "condition.h"
+#include "filter.h"
 #include <fstream.h>
 #include <strstream.h>
 
@@ -44,10 +48,16 @@ struct Input::Implementation
     void skip_token ();
     bool looking_at (char);
     void eof ();
+    void load_log (Log&);
+    void load_columns (ColumnList&);
+    void load_crops (CropList&);
     void load_library (Library& lib);
     void load_list (AttributeList*, const Syntax*);
-    Condition* get_condition ();
-    Action* get_action ();
+    const Condition* get_condition ();
+    const Action* get_action ();
+    const Filter* get_filter (const Syntax*);
+    const Filter* get_filter_columns ();
+    const Filter* get_filter_crops ();
     istream* in;
     ostream& err;
     string file;
@@ -59,14 +69,13 @@ struct Input::Implementation
 Manager& 
 Input::makeManager () const
 { 
-    return *new Manager (impl.log, 
-			 impl.managers.lookup (impl.chief));
+    return *new Manager (impl.managers.lookup (impl.chief));
 }
 
 Wheather& 
 Input::makeWheather () const 
 {     
-    return *new Wheather (impl.log);
+    return *new Wheather ();
 }
 
 Log& 
@@ -109,16 +118,9 @@ Input::Implementation::load ()
 	    else if (item == "chief")
 		chief = get_id ();
 	    else if (item == "field")
-		{
-		    while (!looking_at (')'))
-			{
-			    string name = get_id ();
-			    const AttributeList& values 
-				= columns.lookup (name);
-			    field.push_back (new Column(log, name, 
-							values, horizons));
-			}
-		}
+		load_columns (field);
+	    else if (item == "log")
+		load_log (log);
 	    else
 		{
 		    error (string ("Unknown item `") + item + "'");
@@ -314,6 +316,89 @@ Input::Implementation::eof ()
 }
     
 void
+Input::Implementation::load_log (Log& l)
+{
+    while (!looking_at (')') && good ())
+	{
+	    skip ("(");
+	    string s = get_string ();
+	    const Condition* c = get_condition ();
+	    const Filter* f = get_filter (syntax_table->syntax ("daisy"));
+	    l.add (s, c, f);
+	    skip (")");
+	}
+}
+
+void
+Input::Implementation::load_columns (ColumnList& cl)
+{
+    while (!looking_at (')') && good ())
+	{
+	    skip ("(");
+	    string name = get_id ();
+
+	    if (columns.check (name))
+		{
+		    const string root = columns.root (name);
+		    const AttributeList& par = columns.lookup (name);
+		    const Syntax* syntax
+			= syntax_table->syntax (root + "/state");
+		    AttributeList var;
+		    load_list (&var, syntax);
+		    if (   syntax_table->syntax (root)->check (name, par, log)
+			&& syntax->check (name, var, log)) 
+			{
+			    cl.push_back (new Column(name, par, var, 
+						     horizons));
+			}
+		    else
+			error (string ("Ignoring incomplete column `") 
+			       + name + "'");
+		}
+	    else
+		{
+		    error (string ("Unknown column `") + name + "'");
+		    skip_to_end ();
+		}
+	    skip (")");
+	}
+}
+
+void
+Input::Implementation::load_crops (CropList& cl)
+{
+    while (!looking_at (')') && good ())
+	{
+	    skip ("(");
+	    string name = get_id ();
+
+	    if (crops.check (name))
+		{
+		    const string root = crops.root (name);
+		    const AttributeList& par = crops.lookup (name);
+		    const Syntax* syntax
+			= syntax_table->syntax (root + "/state");
+		    AttributeList var;
+		    load_list (&var, syntax);
+		    if (   syntax_table->syntax (root)->check (name, par, log)
+			&& syntax->check (name, var, log)) 
+			{
+			    cl.push_back (new Crop (name, par, var));
+			}
+		    else
+			error (string ("Ignoring incomplete crop `") 
+			       + name + "'");
+		}
+	    else
+		{
+		    error (string ("Unknown crop `") + name + "'");
+		    skip_to_end ();
+		}
+	    skip (")");
+	}
+}
+
+void
 Input::Implementation::load_library (Library& lib)
 { 
     string name = get_id ();
@@ -358,8 +443,8 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 		    while (!looking_at (')') && good ())
 			{
 			    skip ("(");
-			    Condition* c = get_condition ();
-			    Action* a = get_action ();
+			    const Condition* c = get_condition ();
+			    const Action* a = get_action ();
 			    rules->add (c, a);
 			    skip (")");
 			}
@@ -417,6 +502,20 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 		    atts->add (name, array);
 		    break;
 		}
+		case Syntax::Columns:
+		{
+		    ColumnList* cl = new ColumnList ();
+		    load_columns (*cl);
+		    atts->add (name, cl);
+		    break;
+		}
+		case Syntax::Crops:
+		{
+		    CropList* cl = new CropList ();
+		    load_crops (*cl);
+		    atts->add (name, cl);
+		    break;
+		}
 		case Syntax::Boolean:
 		{
 		    string flag = get_id ();
@@ -442,7 +541,7 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 	}
 }
 
-Condition*
+const Condition*
 Input::Implementation::get_condition ()
 { 
     Condition* condition = &Condition::null;
@@ -466,6 +565,31 @@ Input::Implementation::get_condition ()
 	    int hour = get_integer ();
 	    condition = new ConditionAfter (day, hour);
 	}
+    else if (name == "hourly")
+	{ 
+	    int step = looking_at (')') ? 1 : get_integer ();
+	    condition = new ConditionHourly (step);
+	}
+    else if (name == "daily")
+	{ 
+	    int step = looking_at (')') ? 1 : get_integer ();
+	    condition = new ConditionDaily (step);
+	}
+    else if (name == "weekly")
+	{ 
+	    int step = looking_at (')') ? 1 : get_integer ();
+	    condition = new ConditionWeekly (step);
+	}
+    else if (name == "monthly")
+	{ 
+	    int step = looking_at (')') ? 1 : get_integer ();
+	    condition = new ConditionMonthly (step);
+	}
+    else if (name == "yearly")
+	{ 
+	    int step = looking_at (')') ? 1 : get_integer ();
+	    condition = new ConditionYearly (step);
+	}
     else
 	{
 	    error (string("Unknown condition `") + name + "'");
@@ -475,7 +599,7 @@ Input::Implementation::get_condition ()
     return condition;
 }
 
-Action*
+const Action*
 Input::Implementation::get_action ()
 {
     Action* action = &Action::null;
@@ -487,11 +611,111 @@ Input::Implementation::get_action ()
 	action = new ActionStop ();
     else
 	{
-	    error (string("Unknown action `") + name + "'");
+	    error (string ("Unknown action `") + name + "'");
 	    skip_to_end ();
 	}
     skip (")");
     return action;
+}
+
+const Filter*
+Input::Implementation::get_filter (const Syntax* syntax)
+{
+    if (looking_at ('*'))
+	{
+	    skip ("*");
+	    return Filter::all;
+	}
+    FilterSome* filter = new FilterSome ();
+    while (!looking_at (')') && good ())
+	{
+	    if (looking_at ('('))
+		{
+		    skip ("(");
+		    string name = get_id ();
+		    switch (syntax->lookup (name))
+			{
+			case Syntax::List:
+			{
+			    const Filter* f
+				= get_filter (syntax->syntax (name));
+			    filter->add (name, f);
+			    break;
+			}
+			case Syntax::Columns:
+			{
+			    const Filter* f = get_filter_columns ();
+			    filter->add (name, f);
+			    break;
+			}
+			case Syntax::Crops:
+			{
+			    const Filter* f = get_filter_crops ();
+			    filter->add (name, f);
+			    break;
+			}
+			case Syntax::Error:
+			    error (string ("Unknown attribute `")
+				     + name + "'");
+			    skip_to_end ();   
+			    break;
+			default:
+			    error (string ("Atomic attribute `")
+				   + name + "'");
+			    skip_to_end ();   
+			}
+		    skip (")");
+		}
+	    else 
+		{
+		    string name = get_id ();
+		    if (syntax->lookup (name) != Syntax::Error)
+			filter->add (name);
+		    else
+			error (string ("Attribute `") + name + "' not known");
+		}
+	}
+    return filter;
+}
+
+const Filter*
+Input::Implementation::get_filter_columns ()
+{
+    FilterSome* filter = new FilterSome ();
+
+    while (!looking_at (')') && good ())
+	{	
+	    skip ("(");
+	    string name = get_id ();
+	    if (columns.check (name))
+		{
+		    string root = columns.root (name) + "/state";
+		    const Syntax* syntax = syntax_table->syntax (root);
+		    filter->add (name, get_filter (syntax));
+		}
+	    skip (")");
+	}
+    return filter;
+}
+
+const Filter*
+Input::Implementation::get_filter_crops ()
+{
+    FilterSome* filter = new FilterSome ();
+
+    while (!looking_at (')') && good ())
+	{	
+	    skip ("(");
+	    string name = get_id ();
+	    if (crops.check (name))
+		{
+		    string root = crops.root (name) + "/state";
+		    const Syntax* syntax = syntax_table->syntax (root);
+		    filter->add (name, get_filter (syntax));
+		}
+	    skip (")");
+	}
+    return filter;
 }
 
 Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)

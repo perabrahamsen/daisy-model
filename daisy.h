@@ -15,6 +15,8 @@ class Wheather;
 class Log;
 class Input;
 class Library;
+class Condition;
+class Filter;
 
 typedef list <Column*> ColumnList;
 typedef list <Crop*> CropList;
@@ -51,6 +53,9 @@ public:
     // Simulation.
 public:
     void run();
+    bool match (const Condition*) const;
+    void output (Log&, const Filter*) const;
+    void output_field (Log&, const Filter*) const;
 
     // Create and Destroy.
 public:

@@ -1,9 +1,10 @@
-// value.C
+// alist.C
 
-#include "value.h"
+#include "alist.h"
 #include "action.h"
 #include "condition.h"
 #include <assert.h>
+#include <vector.h>
 
 // @ Value
 //
@@ -20,6 +21,8 @@ public:
     virtual const Rules& rules () const throw (AttributeList::Invalid);
     virtual const CSMP& csmp () const throw (AttributeList::Invalid);
     virtual const AttributeList& list () const throw (AttributeList::Invalid);
+    virtual CropList& crops () const throw (AttributeList::Invalid);
+    virtual ColumnList& columns () const throw (AttributeList::Invalid);
 protected:
     Value ();
     virtual ~Value ();
@@ -83,6 +86,22 @@ public:
     ValueCSMP (const CSMP&);
 };
 
+class ValueColumns : public Value
+{
+    ColumnList& value;
+public:
+    ColumnList& columns () const;
+    ValueColumns (ColumnList&);
+};
+
+class ValueCrops : public Value
+{
+    CropList& value;
+public:
+    CropList& crops () const;
+    ValueCrops (CropList&);
+};
+
 double
 Value::number () const throw (AttributeList::Invalid)
 { 
@@ -115,6 +134,17 @@ Rules& Value::rules () const throw (AttributeList::Invalid)
 
 const
 CSMP& Value::csmp () const throw (AttributeList::Invalid)
+{ 
+    THROW (AttributeList::Invalid ());
+}
+
+
+ColumnList& Value::columns () const throw (AttributeList::Invalid)
+{ 
+    THROW (AttributeList::Invalid ());
+}
+
+CropList& Value::crops () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
 }
@@ -185,6 +215,24 @@ ValueCSMP::csmp () const
 ValueCSMP::ValueCSMP (const CSMP& v) : value (v)
 { }
 
+ColumnList& 
+ValueColumns::columns () const
+{
+    return value;
+}
+
+ValueColumns::ValueColumns (ColumnList& v) : value (v)
+{ }
+
+CropList& 
+ValueCrops::crops () const
+{
+    return value;
+}
+
+ValueCrops::ValueCrops (CropList& v) : value (v)
+{ }
+
 const AttributeList& 
 ValueList::list () const
 {
@@ -193,144 +241,6 @@ ValueList::list () const
 
 ValueList::ValueList (const AttributeList& v) : value (v)
 { }
-
-// @ Rules
-
-struct Rules::Implementation
-{
-    struct Rule
-    {
-	Condition const* condition;
-	Action const* action;
-	Rule (Condition const*, Action const*);
-    };
-    typedef list <Rule*> RuleList;
-    RuleList rules;
-    RuleList super;    
-};
-
-Rules::Implementation::Rule::Rule (Condition const* c, Action const* a) 
-    : condition (c), 
-      action (a)
-{ }
-
-void 
-Rules::add (Condition* c, Action* a)
-{
-    impl.rules.push_front (new Implementation::Rule (c, a));
-}
-
-const Action*
-Rules::match (ColumnList& cl, const Wheather& w, int day, int hour) const
-{
-    for (Implementation::RuleList::iterator i = impl.rules.begin ();
-	 i != impl.rules.end ();
-	 i++)
-	{
-	    if ((*i)->condition->match (cl, w, day, hour))
-		return (*i)->action;
-	}
-    for (Implementation::RuleList::iterator i = impl.super.begin ();
-	 i != impl.super.end ();
-	 i++)
-	{
-	    if ((*i)->condition->match (cl, w, day, hour))
-		return (*i)->action;
-	}
-    return &Action::null;
-}
-
-Rules::Rules (const Rules *const old = NULL)
-    : impl (*new Implementation)
-{ 
-    if (old)
-	{
-	    for (Implementation::RuleList::iterator i 
-		     = old->impl.rules.begin();
-		 i != old->impl.rules.end ();
-		 i++)
-		{
-		    impl.super.push_back (*i);
-		}
-	    for (Implementation::RuleList::iterator i
-		     = old->impl.super.begin();
-		 i != old->impl.super.end ();
-		 i++)
-		{
-		    impl.super.push_back (*i);
-		}
-	}
-}
-
-Rules::~Rules ()
-{ 
-    delete &impl;
-    // I should delete all members of `impl.rules' here, but they
-    // might appear in some other Rules `impl.super'.  Obviously
-    // the solution is to use `list <RefCount <Rules> >' instead of
-    // `list <Rules*>'.  The same is true for the other places I use
-    // STL containers.  I'll experiement with this latter.  BTW: It
-    // isn't a real memory leak, as Rules are created during
-    // initialization, and deleted only when the simulation is over,
-    // after which the program ends. However, it might be useful one
-    // day to run multiple simulations in the same program execution.
-}
-
-// @ CSMP
-
-struct CSMP::Implementation
-{
-    struct pair
-    {
-	double x;
-	double y;
-	pair (double a, double b);
-	pair ();		// Needed by vector<>
-    };
-    typedef vector<pair> PairVector;
-    PairVector points;
-};
-
-CSMP::Implementation::pair::pair (double a, double b)
-    : x(a), y(b)
-{ }
-
-CSMP::Implementation::pair::pair ()
-    : x(0.0), y(0.0)
-{ }
-
-void 
-CSMP::add (double x , double y)
-{
-    impl.points.push_back (Implementation::pair(x, y));
-}
-
-double
-CSMP::operator() (double x) const
-{
-    for (unsigned int i = 0; i < impl.points.size(); i++)
-	{
-	    if (x > impl.points[i].x)
-		{
-		    if (i == 0)
-			return impl.points[i].y;
-		    
-		    return impl.points[i-1].y 
-			+   (impl.points[i].y - impl.points[i-1].y)
-			  / (impl.points[i].x - impl.points[i-1].x)
-			  * (x - impl.points[i-1].x);
-		}
-	}
-    return impl.points[impl.points.size () - 1].y;
-}
-
-CSMP::CSMP ()
-    : impl (*new Implementation)
-{}
-CSMP::~CSMP ()
-{
-    delete &impl;
-}
 
 // @ AttributeList
 
@@ -429,6 +339,18 @@ AttributeList::csmp (string key) const throw2 (Invalid, Uninitialized)
     return impl.lookup (key)->csmp ();
 }
 
+ColumnList& 
+AttributeList::columns (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->columns ();
+}
+
+CropList& 
+AttributeList::crops (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->crops ();
+}
+
 const AttributeList& 
 AttributeList::list (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -472,6 +394,18 @@ AttributeList::add (string key, const CSMP* v)
 }
 
 void 
+AttributeList::add (string key, ColumnList* v)
+{
+    impl.add (key, new ValueColumns (*v));
+}
+
+void 
+AttributeList::add (string key, CropList* v)
+{
+    impl.add (key, new ValueCrops (*v));
+}
+
+void 
 AttributeList::add (string key, const vector<double>& v)
 {
     impl.add (key, new ValueArray (v));
@@ -498,6 +432,3 @@ AttributeList::~AttributeList ()
 }
 
 const AttributeList AttributeList::empty;
-
-
-

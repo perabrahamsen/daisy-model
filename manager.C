@@ -2,31 +2,27 @@
 
 #include "manager.h"
 #include "syntax.h"
-#include "value.h"
+#include "rules.h"
+#include "alist.h"
 
 struct Manager::Implementation
 { 
-    Log& log;
     const Rules& rules;
-    Implementation (Log& l, const AttributeList& vl);
+    Implementation (const AttributeList& vl);
 };
 
-Manager::Implementation::Implementation (Log& l, 
-					 const AttributeList& vl)
-    : log (l),
-      // BUG: SHOULD USE DYNAMIC CAST
-      rules (vl.rules ("rules"))
+Manager::Implementation::Implementation (const AttributeList& vl)
+    : rules (vl.rules ("rules"))
 { }
 
 const Action*
-Manager::action (ColumnList& columns, const Wheather& wheather, 
-		 int day, int hour)
+Manager::action (const Daisy& daisy)
 {
-    return impl.rules.match (columns, wheather, day, hour);
+    return impl.rules.match (daisy);
 }
 
-Manager::Manager (Log& l, const AttributeList& vl)
-    : impl (*new Implementation (l, vl))
+Manager::Manager (const AttributeList& vl)
+    : impl (*new Implementation (vl))
 { }
 
 Manager::~Manager () 

@@ -18,12 +18,12 @@ main (int argc, char* argv[])
     catch (const Usage& usage)
 	{
 	    cerr << usage.what () << "\n";
-	    exit (2);
+	    return 2;
 	}
     catch (const exception& except)
 	{
 	    cerr << except.what () << "\n";
-	    exit (1);
+	    return 1;
 	}
     catch (...)
 	{ 
@@ -32,5 +32,5 @@ main (int argc, char* argv[])
 	    abort ();
 	}
 #endif HANDLE_EXCEPTIONS
-    exit (0);
+    return 0;
 }

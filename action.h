@@ -8,7 +8,8 @@
 class Action
 {
 public:
-    virtual void doIt(ColumnList&, const Wheather&, const Library&) const;
+    virtual void doIt(ColumnList&, const Wheather&, const Library&,
+		      Log&) const;
     virtual bool stop () const;
     static Action null;
 protected:
@@ -21,14 +22,14 @@ class ActionSow : public Action
 {
     const string crop;
 public:
-    void doIt (ColumnList&, const Wheather&, const Library&) const;
+    void doIt (ColumnList&, const Wheather&, const Library&, Log&) const;
     ActionSow (string);
 };
 
 class ActionStop : public Action
 {
 public:
-    void doIt (ColumnList&, const Wheather&, const Library&) const;
+    void doIt (ColumnList&, const Wheather&, const Library&, Log&) const;
     bool stop () const;
 };
 

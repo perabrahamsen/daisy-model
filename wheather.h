@@ -9,12 +9,11 @@ class Wheather
 {
     // Content.
 private:
-    Log& log;
 
     // Create and Destroy.
 private:
     friend Input; // Only create from Input.
-    Wheather (Log&);
+    Wheather ();
 };
 
 #endif WHEATHER_H
