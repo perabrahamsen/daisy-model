@@ -627,9 +627,9 @@ fulfilled once.
   (wait (at 1987 3 20 1))
   (plowing)
   (wait (at 1987 4 4 1))
-  (fertilize mineral 
-             (weight 100.0)             ;kg N/ha
-             (NH4_fraction 0.5))
+  (fertilize (mineral 
+              (weight 100.0)             ;kg N/ha
+              (NH4_fraction 0.5)))
   (wait (at 1987 4 5 1))
   (progn 
     (sow "Grass")
@@ -641,9 +641,9 @@ fulfilled once.
            (stub 15)                    ;Leave 15 cm stub.
            (stem 1.00))                 ;Harvest everything above stub.
   (wait (at 1987 9 8 1))
-  (fertilize mineral
-             (weight 80.0)
-             (NH4_fraction 0.5))
+  (fertilize (mineral
+              (weight 80.0)
+              (NH4_fraction 0.5)))
   (wait (at 1987 10 10 1))
   (harvest "Grass"
            (stub 8.)                    ;Leave 08 cm stub.
