@@ -61,6 +61,7 @@
 #define BORLAND_TEMPLATES
 #define HANDLE_EXCEPTIONS
 #define BORLAND_EOF
+// #define BORLAND_PERMISSIONS
 
 // Needed in BCC for `close'.
 #include <io.h>

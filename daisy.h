@@ -18,6 +18,11 @@ class AttributeList;
 
 class Daisy
 {
+  // Initial content.
+public:
+  const Syntax* syntax;
+  const AttributeList& alist;
+
   // Content.
 public:
   bool running;
@@ -44,10 +49,11 @@ public:
   void tick_logs ();
   void tick ();
   void run ();
-  bool check (const Syntax&);
+  bool check ();
 
   // Create and Destroy.
 public:
+  void initialize (const Syntax&);
   static void load_syntax (Syntax&, AttributeList&);
   Daisy (const AttributeList&);
   ~Daisy ();

@@ -105,6 +105,7 @@ public:
   void output (Log&, Filter&) const;
 
   double DS () const;
+  double DM () const;
 
   // Create and Destroy.
 public:
@@ -1077,7 +1078,7 @@ CropStandard::SoluteUptake (const Soil& soil,
 	uptake[i] = max (0.0, 
 			 min (L * (min (I_zero[i], I_max)
 				   - B_zero[i] * c_root),
-			      solute.M_left (i)));
+			      solute.M_left (i) - 1e-8));
       else
 	uptake[i] = 0.0;
       assert (uptake[i] >= 0.0);
@@ -1127,7 +1128,7 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
       Phenology.DS += (Devel.DSRate1
 		       * Devel.TempEff1 (Ta)
 		       * Devel.PhotEff1 (bioclimate.DayLength ()));
-      if (Phenology.Vern < 0)
+      if (par.Vernal.required && Phenology.Vern < 0)
 	Vernalization (Ta);
     }
   else
@@ -1619,7 +1620,14 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   const double Teff = LeafPhot.TempEff (Ta); // Temperature effect
 
   // One crop: assert (approximate (var.Canopy.LAI, bioclimate.LAI ()));
-  assert (approximate (LAIvsH (var.Canopy.Height), var.Canopy.LAI));
+  if (!approximate (LAIvsH (var.Canopy.Height), var.Canopy.LAI))
+    {
+      cerr << "Bug: LAI below top: " << LAIvsH (var.Canopy.Height)
+	   << " Total LAI: " << var.Canopy.LAI << "\n";
+      CanopyStructure ();
+      cerr << "Adjusted: LAI below top: " << LAIvsH (var.Canopy.Height)
+	   << " Total LAI: " << var.Canopy.LAI << "\n";
+    }
 
  // LAI below the current leaf layer.
   double prevLA = LAIvsH (bioclimate.height (0));
@@ -2094,6 +2102,10 @@ CropStandard::output (Log& log, Filter& filter) const
 double
 CropStandard::DS () const
 { return var.Phenology.DS; }
+
+double
+CropStandard::DM () const	// [g/m² -> kg/ha]
+{ return (var.Prod.WSOrg + var.Prod.WStem + var.Prod.WLeaf) * 10; }
 
 CropStandard::CropStandard (const AttributeList& al)
   : Crop (al.name ("type")),

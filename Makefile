@@ -86,10 +86,9 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-	COMPILE = /pack/egcs-1.0.2/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
+	COMPILE = /pack/egcs-1.0.2/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
 	#COMPILE = /pack/gcc-2.8.1/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
-
 endif
 ifeq ($(COMPILER),gnu)
 	ifeq ($(HOSTTYPE),hp)
@@ -170,7 +169,7 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	adsorbtion_none.C tortuosity_M_Q.C tortuosity_linear.C \
 	adsorbtion_freundlich.C adsorbtion_linear.C adsorbtion_langmuir.C \
 	filter_checkpoint.C bioclimate_std.C condition_crop.C \
-	condition_soil.C log_table.C
+	condition_soil.C log_table.C log_checkpoint.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -532,6 +531,9 @@ condition_soil${OBJ}: condition_soil.C condition.h librarian.h library.h \
  common.h alist.h syntax.h column.h daisy.h frame.h
 log_table${OBJ}: log_table.C log.h filter.h librarian.h library.h common.h \
  alist.h syntax.h condition.h frame.h geometry.h
+log_checkpoint${OBJ}: log_checkpoint.C log.h filter.h librarian.h \
+ library.h common.h alist.h syntax.h condition.h daisy.h frame.h \
+ printer_file.h printer.h
 daisy${OBJ}: daisy.C daisy.h frame.h time.h common.h weather.h librarian.h \
  library.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
  log.h filter.h parser.h am.h nitrification.h bioclimate.h column.h \

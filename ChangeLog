@@ -1,8 +1,51 @@
+1998-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.014 released.
+
+1998-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.h (BORLAND_PERMISSIONS): New flag.
+	* log_table.C (LogTable::LogTable): Obey.
+	* log_file.C (LogFile::print): Ditto.
+	* printer_file.C (PrinterFile::Implementation::Implementation): Ditto.
+
+	* printer_file.C (print_library_file): Remove bogus debug code.
+
+1998-03-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C, cdaisy.h (daisy_alist_set_string_at): Don't uncomment.
+
+	* cdaisy.C (daisy_alist_set_integer_at): Use `<=' instead of `<'.
+	(daisy_alist_set_flag_at): Ditto.
+	(daisy_alist_set_number_at): Ditto.
+	(daisy_alist_set_string_at): Ditto.
+
+	* daisy.h (syntax, alist): New members.
+	* daisy.C, daisy.h (initialize): New function.
+	(check): Remove `syntax' argument.
+	* main.C (main): Update caller.
+	* cdaisy.C, cdaisy.h (daisy_daisy_create): Call `Daisy::initialize'.
+	New `syntax' argument. 
+	(daisy_daisy_check): No `syntax' argument.
+
+	* cmain.c (main): Update caller.
+	* bugmain.c (main): Update caller.
+
 1998-03-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* crop.h (CropList): Make it a deque.
+	* column_std.C (tick): Rotate the queue in each tick.
+
+	* crop.h, crop_std.C, crop_old.C, crop_sold.C (DM): New function. 
+	* column_std.C, column.h (crop_dm): New function.
+	* condition_crop.C (struct ConditionDMOver): New condition.
+
+	* crop_std.C (DevelopmentStage): Only call `Vernalization' when
+	required. 
+	(CanopyPhotosynthesis): Replaces assertion with explict error message.
+	(SoluteUptake): Always leave 1e-8.
+	
 	* Version 0.013 released.
-
-1998-03-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.012 released.
 

@@ -92,6 +92,7 @@ public:
   void output (Log&, Filter&) const;
 
   double DS () const;
+  double DM () const;
 
   // Create and Destroy.
 public:
@@ -1879,6 +1880,10 @@ CropOld::output (Log& log, Filter& filter) const
 double
 CropOld::DS () const
 { return var.Phenology.DS; }
+
+double
+CropOld::DM () const	// [g/m² -> kg/ha]
+{ return (var.Prod.WLeaf) * 10; }
 
 CropOld::CropOld (const AttributeList& al)
   : Crop (al.name ("type")),

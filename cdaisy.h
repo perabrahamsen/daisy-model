@@ -226,11 +226,13 @@ daisy_alist_get_alist_at (const daisy_alist* alist, const char* name,
 void		    	/* Set integer NAME[INDEX] from ALIST to VALUE. */
 daisy_alist_set_integer_at (daisy_alist* alist, const char* name,
 			    int value, unsigned int index);
+#endif
 
 void			/* Set char* NAME[INDEX] from ALIST to VALUE. */
 daisy_alist_set_string_at (daisy_alist* alist, const char* name,
 			   const char* value, unsigned int index);
 
+#ifdef UNINPLEMENTED
 void			/* Set bool NAME[INDEX] from ALIST to VALUE. */
 daisy_alist_set_flag_at (daisy_alist* alist, const char* name,
 			 daisy_bool value, unsigned int index);
@@ -330,13 +332,13 @@ daisy_printer_delete (daisy_printer* printer);
  */
 
 daisy_daisy*			/* Create the daisy object. */
-daisy_daisy_create (const daisy_alist* alist);
+daisy_daisy_create (const daisy_syntax* syntax, const daisy_alist* alist);
 
 void				/* Delete the daisy object. */
 daisy_daisy_delete (daisy_daisy* daisy);
 
 daisy_bool			/* Check context. */
-daisy_daisy_check (const daisy_daisy* daisy, const daisy_syntax* syntax);
+daisy_daisy_check (const daisy_daisy* daisy);
 
 /* @@ Running the simulation.
  * 

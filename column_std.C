@@ -62,6 +62,7 @@ public:
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double crop_ds (const string& crop) const; // {[-1:2], Crop::DSremove}
+  double crop_dm (const string& crop) const; // [kg/ha], negative when no crop
 
   // Simulation.
 public:
@@ -234,6 +235,17 @@ ColumnStandard::crop_ds (const string& name) const
   return Crop::DSremove;
 }
 
+double 
+ColumnStandard::crop_dm (const string& name) const
+{
+  for (CropList::const_iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    if ((*crop)->name == name)
+      return (*crop)->DM ();
+  return -42.42e42;
+}
+
 bool
 ColumnStandard::check () const
 {
@@ -287,6 +299,13 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     (*crop)->tick (time, bioclimate, soil, organic_matter, 
 		   soil_heat, soil_water, soil_NH4, soil_NO3);
+  if (crops.size () > 1U)
+    {
+      // Make sure the crop which took first this time will be last next.
+      crops.push_back (crops.front ());
+      crops.pop_front ();
+    }
+
   organic_matter.tick (soil, soil_water, soil_heat, groundwater, 
 		       soil_NO3, soil_NH4);
   nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4,

@@ -21,7 +21,7 @@ public:
   virtual void print_library_file (const string& filename) = 0;
 
   // True iff no errors have occured.
-  virtual bool good () const = 0;
+  virtual bool good () = 0;
 
   // Create and Destroy.
 protected:

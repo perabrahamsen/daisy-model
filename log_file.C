@@ -151,7 +151,11 @@ LogFile::print (const string& s)
     return;
   if (!stream)
     {
+#ifdef BORLAND_PERMISSIONS
+      stream = new ofstream (name.c_str (), ios::out|ios::trunc, 0666);
+#else
       stream = new ofstream (name.c_str ());
+#endif
       if (!*stream)
 	cerr << "Failed to open `" << name << "'\n";
     }

@@ -16,7 +16,6 @@ main (int argc, char* argv[])
       cerr << "Usage: " << argv[0] << " file\n";
       return 2;
     }
-
   // Initialize syntax and attribute list.
   Syntax syntax;
   AttributeList alist;
@@ -50,7 +49,9 @@ main (int argc, char* argv[])
 
   // Create, check and run the simulation.
   Daisy daisy (alist);
-  if (!daisy.check (syntax))
+  daisy.initialize (syntax);
+
+  if (!daisy.check ())
     return 1;
   daisy.run ();
 

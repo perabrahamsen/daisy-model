@@ -24,7 +24,9 @@
 #include <iostream.h>
 
 Daisy::Daisy (const AttributeList& al)
-  : running (false),
+  : syntax (NULL),
+    alist (al),
+    running (false),
     frame (NULL),
     logs (map_create<Log> (al.alist_sequence ("output"))),
     time (al.time ("time")),
@@ -32,16 +34,12 @@ Daisy::Daisy (const AttributeList& al)
     weather (Librarian<Weather>::create (al.alist ("weather"))), 
     columns (*new ColumnList (al.alist_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
-{ 
-  const vector<AttributeList*>& column_alists = al.alist_sequence ("column");
-  
-  for (unsigned int i = 0; i < columns.size (); i++)
-    columns[i]->initialize (*column_alists[i], time, weather);
-}
+{ }
 
 bool
-Daisy::check (const Syntax& syntax)
+Daisy::check ()
 {
+  assert (syntax);
   bool all_ok = true;
 
   // Check columns.
@@ -68,7 +66,7 @@ Daisy::check (const Syntax& syntax)
 	 i != logs.end ();
 	 i++)
       {
-	if (*i == NULL || !(*i)-> check (syntax))
+	if (*i == NULL || !(*i)-> check (*syntax))
 	  ok = false;
       }
     if (!ok)
@@ -133,6 +131,18 @@ Daisy::run ()
 	     << time.mday () << "\n";
       tick ();
     }
+}
+
+void
+Daisy::initialize (const Syntax& s)
+{ 
+  syntax = & s; 
+
+  const vector<AttributeList*>& column_alists 
+    = alist.alist_sequence ("column");
+  
+  for (unsigned int i = 0; i < columns.size (); i++)
+    columns[i]->initialize (*column_alists[i], time, weather);
 }
 
 #ifdef BORLAND_TEMPLATES

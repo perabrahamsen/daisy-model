@@ -225,13 +225,14 @@ daisy_alist_set_integer_at (AttributeList* alist, const char* name,
   vector<int>& v = alist->check (name)
     ? *new vector<int> (alist->integer_sequence (name))
     : *new vector<int>;
-  if (v.size () < index)
-    while (v.size () < index)
+  if (v.size () <= index)
+    while (v.size () <= index)
       v.push_back (value);
   else
     v[index] = value;
   alist->add (name, v);
 }
+#endif
 
 extern "C" void EXPORT
 daisy_alist_set_string_at (AttributeList* alist, const char* name,
@@ -240,14 +241,15 @@ daisy_alist_set_string_at (AttributeList* alist, const char* name,
   vector<string>& v = alist->check (name)
     ? *new vector<string> (alist->name_sequence (name))
     : *new vector<string>;
-  if (v.size () < index)
-    while (v.size () < index)
+  if (v.size () <= index)
+    while (v.size () <= index)
       v.push_back (value);
   else
     v[index] = value;
   alist->add (name, v);
 }
 
+#ifdef UNINPLEMENTED
 extern "C" void EXPORT
 daisy_alist_set_flag_at (AttributeList* alist, const char* name,
 			 daisy_bool value, unsigned int index)
@@ -255,8 +257,8 @@ daisy_alist_set_flag_at (AttributeList* alist, const char* name,
   vector<bool>& v = alist->check (name)
     ? *new vector<bool> (alist->flag_sequence (name))
     : *new vector<bool>;
-  if (v.size () < index)
-    while (v.size () < index)
+  if (v.size () <= index)
+    while (v.size () <= index)
       v.push_back (value);
   else
     v[index] = value;
@@ -271,8 +273,8 @@ daisy_alist_set_number_at (AttributeList* alist, const char* name,
   vector<double>& v= alist->check (name)
     ? *new vector<double> (alist->number_sequence (name))
     : *new vector<double>;
-  if (v.size () < index)
-    while (v.size () < index)
+  if (v.size () <= index)
+    while (v.size () <= index)
       v.push_back (value);
   else
     v[index] = value;
@@ -406,16 +408,20 @@ daisy_printer_good (Printer* printer)
 // @ The daisy_daisy Type.
 
 extern "C" Daisy* EXPORT
-daisy_daisy_create (const AttributeList* alist)
-{ return new Daisy (*alist); }
+daisy_daisy_create (const Syntax* syntax, const AttributeList* alist)
+{ 
+  Daisy* daisy =  new Daisy (*alist); 
+  daisy->initialize (*syntax);
+  return daisy;
+}
 
 extern "C" void EXPORT
 daisy_daisy_delete (Daisy* daisy)
 { delete daisy; }
 
 extern "C" daisy_bool EXPORT	// Check context.
-daisy_daisy_check (Daisy* daisy, const Syntax* syntax)
-{ return daisy->check (*syntax); }
+daisy_daisy_check (Daisy* daisy)
+{ return daisy->check (); }
 
 // @@ Running the simulation.
 

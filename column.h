@@ -49,6 +49,8 @@ public:
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   virtual double crop_ds (const string& crop) const = 0; 
+  // Drymatter in shoot [kg/ha], or negative if no such crop is present
+  virtual double crop_dm (const string& crop) const = 0; 
   
   // Simulation.
   virtual void tick (const Time&, const Weather&) = 0;

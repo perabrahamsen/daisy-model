@@ -13,9 +13,10 @@
 struct LogEntry
 {
   // Content.
-  const string tag;		// Name of this entry.
-  Condition* condition;	// Should we accumulate now?
+  Condition* condition;		// Should we accumulate now?
   const vector<string> path;	// Content of this entry.
+  string tag;			// Name of this entry.
+  const string missing_value;	// What to print on missing values.
 
   // Calculation parameters.
   const int start_year;	// For gnuplot time.
@@ -172,7 +173,7 @@ struct LogEntry
       if (error)
 	out << "!";
       else if (!count)
-	out << "";
+	out << missing_value;
       else
 	out << (value * factor + offset);
 
@@ -182,11 +183,11 @@ struct LogEntry
     }
   // Create and Destroy.
   LogEntry (const AttributeList& al)
-    : tag (al.name ("tag")),
-      condition (al.check ("when") 
+    : condition (al.check ("when") 
 		 ? &Librarian<Condition>::create (al.alist ("when"))
 		 : NULL),
       path (al.name_sequence ("path")),
+      missing_value (al.name ("missing_value")),
       start_year (al.integer ("start_year")),
       factor (al.number ("factor")),
       offset (al.number ("offset")),
@@ -196,7 +197,14 @@ struct LogEntry
       current_path_index (0U),
       last_valid_path_index (0U),
       is_active (false)
-    { }
+    { 
+      if (al.check ("tag"))
+	tag = al.name ("tag");
+      else if (path.size () > 0)
+	tag = path[path.size () - 1];
+      else 
+	tag = "<none>";
+    }
   ~LogEntry ()
     { delete &condition; }
 };
@@ -325,7 +333,11 @@ struct LogTable : public Log, public Filter
   LogTable (const AttributeList& al)
     : Log (),
       file (al.name ("where")),
+#ifdef BORLAND_PERMISSIONS
+      out (file.c_str (), ios::out|ios::trunc, 0666),
+#else
       out (file.c_str ()),
+#endif
       condition (Librarian<Condition>::create (al.alist ("when"))),
       entries (map_construct<LogEntry> (al.alist_sequence ("entries"))),
       print_tags (al.flag ("print_tags"))
@@ -371,9 +383,11 @@ static struct LogTableSyntax
       
       Syntax& entry_syntax = *new Syntax ();
       AttributeList& entry_alist = *new AttributeList ();
-      entry_syntax.add ("tag", Syntax::String, Syntax::Const);
+      entry_syntax.add ("tag", Syntax::String, Syntax::Optional);
       entry_syntax.add ("path", Syntax::String, Syntax::Const, 
 			Syntax::Sequence);
+      entry_syntax.add ("missing_value", Syntax::String, Syntax::Const);
+      entry_alist.add ("missing_value", "00.00");
       entry_syntax.add ("when", 
 			Librarian<Condition>::library (), Syntax::Optional);
       entry_syntax.add ("start_year", Syntax::Integer, Syntax::Const);

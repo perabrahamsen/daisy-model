@@ -40,7 +40,7 @@ struct PrinterFile::Implementation
   void print_library_file (const string& filename);
   
   // Testing.
-  bool good () const;
+  bool good ();
 
   // Creation.
   Implementation (const string& name);
@@ -126,13 +126,13 @@ PrinterFile::Implementation::is_identifier (const string& name) const
     return false;
 
   const char c = name[0];
-  if (c != '_' && c != '-' && !isalpha (c))
+  if (c != '_' && !isalpha (c))
     return false;
       
   for (unsigned int i = 1; i < name.size (); i++)
     {
       const char c = name[i];
-      if (c != '_' && c != '-' && !isalnum (c))
+      if (c != '_' && !isalnum (c))
 	return false;
     }
   return true;
@@ -530,12 +530,6 @@ PrinterFile::Implementation::print_library_file (const string& filename)
 	    if (alist.check ("parsed_from_file") 
 		&& alist.name ("parsed_from_file") == filename)
 	      {
-		static unsigned int count = 0;
-		assert (count == found.size ());
-		count++;
-		assert (alist.check ("parsed_sequence"));
-		assert (found.begin () <= found.end ());
-		assert (found.size () == (found.end () - found.begin ()));
 		found.push_back (FoundEntry (library_name, element, 
 					     alist.integer ("parsed_sequence")));
 	      }
@@ -589,11 +583,15 @@ PrinterFile::Implementation::print_library_file (const string& filename)
 }
 
 bool
-PrinterFile::Implementation::good () const
+PrinterFile::Implementation::good ()
 { return out.good (); }
 
 PrinterFile::Implementation::Implementation (const string& name)
+#ifdef BORLAND_PERMISSIONS
+  : out (name.c_str (), ios::out|ios::trunc, 0666)
+#else
   : out (name.c_str ())
+#endif
 { }
 
 void
@@ -630,7 +628,7 @@ PrinterFile::print_library_file (const string& filename)
 }
 
 bool
-PrinterFile::good () const
+PrinterFile::good ()
 { return impl.good (); }
   
 PrinterFile::PrinterFile (const string& filename)

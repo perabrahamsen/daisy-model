@@ -36,8 +36,8 @@ main (int argc, char* argv[])
     return 1;
 
   /* Create, check and run the simulation. */
-  daisy = daisy_daisy_create (alist);
-  if (!daisy_daisy_check (daisy, syntax))
+  daisy = daisy_daisy_create (syntax, alist);
+  if (!daisy_daisy_check (daisy))
     return 1;
 
   /* Run the simulation. */

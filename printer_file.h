@@ -22,7 +22,7 @@ public:
   void print_library_file (const string& filename);
 
   // True iff no errors have occured.
-  bool good () const;
+  bool good ();
 
   // Create and Destroy.
 public:

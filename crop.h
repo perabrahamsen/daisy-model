@@ -5,6 +5,7 @@
 
 #include "time.h"
 #include "librarian.h"
+#include <deque>
 
 struct Log;
 struct Filter;
@@ -67,8 +68,9 @@ public:
   // Queries.
 public:
   static bool ds_remove (const Crop*);
-  virtual double DS () const = 0;
+  virtual double DS () const = 0; // Development stage, [-1:2] or DSremove.
   static const double DSremove;
+  virtual double DM () const = 0; // Shoot dry matter, [kg/ha].
 
   // Create and Destroy.
 public:
@@ -81,7 +83,7 @@ public:
 
 static Librarian<Crop> Crop_init ("crop");
 
-class CropList : public list <Crop*> 
+class CropList : public deque <Crop*> 
 { 
 public:
   CropList (const vector<AttributeList*>&);
