@@ -26,6 +26,8 @@ public:
        throw (AttributeList::Invalid);
   virtual operator const CSMP& () const
        throw (AttributeList::Invalid);
+  virtual operator const Filter& () const
+       throw (AttributeList::Invalid);
   virtual operator const AttributeList& () const
        throw (AttributeList::Invalid);
   virtual operator const Time& () const throw (AttributeList::Invalid);
@@ -40,6 +42,8 @@ public:
   virtual operator const vector<int>& () const
        throw (AttributeList::Invalid);
   virtual operator const vector<const CSMP*>& () const
+       throw (AttributeList::Invalid);
+  virtual operator const vector<const Filter*>& () const
        throw (AttributeList::Invalid);
   virtual operator const vector<const AttributeList*>& () const
        throw (AttributeList::Invalid);
@@ -188,6 +192,13 @@ Value::operator const CSMP& () const
   return *((CSMP*) 0); // SHUT UP.
 }
 
+Value::operator const Filter& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((Filter*) 0); // SHUT UP.
+}
+
 Value::operator const AttributeList& () const
      throw (AttributeList::Invalid)
 { 
@@ -228,6 +239,13 @@ Value::operator const vector<const CSMP*>& () const
 { 
   THROW (AttributeList::Invalid ());
   return *((vector<const CSMP*>*) 0);
+}
+
+Value::operator const vector<const Filter*>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<const Filter*>*) 0);
 }
 
 Value::operator const vector<const AttributeList*>& () const
@@ -349,6 +367,12 @@ AttributeList::csmp (string key) const throw2 (Invalid, Uninitialized)
   return *impl.lookup (key);
 }
 
+const Filter& 
+AttributeList::filter (string key) const throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
 const AttributeList& 
 AttributeList::list (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -392,6 +416,13 @@ AttributeList::time_sequence (string key) const
 
 const vector<const CSMP*>& 
 AttributeList::csmp_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
+const vector<const Filter*>& 
+AttributeList::filter_sequence (string key) const
      throw2 (Invalid, Uninitialized)
 {
   return *impl.lookup (key);
@@ -447,6 +478,12 @@ AttributeList::add (string key, const CSMP* v)
 }
 
 void 
+AttributeList::add (string key, const Filter* v)
+{
+  impl.add (key, new dValue<Filter> (*v));
+}
+
+void 
 AttributeList::add (string key, const vector<double>& v)
 {
   impl.add (key, new dValue<vector<double>/**/> (v));
@@ -480,6 +517,12 @@ void
 AttributeList::add (string key, const vector<const CSMP*>& v)
 {
   impl.add (key, new dValue<vector<const CSMP*>/**/> (v));
+}
+
+void 
+AttributeList::add (string key, const vector<const Filter*>& v)
+{
+  impl.add (key, new dValue<vector<const Filter*>/**/> (v));
 }
 
 void 

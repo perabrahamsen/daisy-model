@@ -16,16 +16,14 @@ main (int argc, char* argv[])
 #endif HANDLE_EXCEPTIONS
       Syntax syntax;
       Daisy::load_syntax (syntax);
-      pair<Log*, const AttributeList*> init = parse (syntax, argc, argv);
-      const AttributeList& alist = *init.second;
-      Log& log = *init.first;
-      if (syntax.check ("daisy", alist, log))
+      const AttributeList& alist = parse (syntax, argc, argv);
+      if (syntax.check (alist, "daisy"))
 	{
+	  Log log (alist.list_sequence ("log"));
 	  Daisy daisy (log, alist);
 	  daisy.run ();
 	}
-      delete init.first;
-      delete init.second;
+      delete &alist;
 #ifdef HANDLE_EXCEPTIONS
     }
   catch (const Usage& usage)

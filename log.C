@@ -5,13 +5,13 @@
 #include "filter.h"
 #include "csmp.h"
 #include "daisy.h"
+#include "alist.h"
 #include <list.h>
 #include <fstream.h>
 #include <strstream.h>
 
 struct Log::Implementation
 {
-  ostream& err;
   struct Entry
   {
     string name;
@@ -35,7 +35,7 @@ struct Log::Implementation
   Entry* current;
   void select (EntryList::iterator);
   void deselect ();
-  Implementation (ostream& s);
+  Implementation (const vector<const AttributeList*>& av);
   ~Implementation ();
 };
 
@@ -94,10 +94,20 @@ Log::Implementation::Entry::newline ()
   *stream << "\n" << string (column / 8, '\t') << string (column % 8, ' ');
 }
 
-Log::Implementation::Implementation (ostream& s)
-  : err (s),
-    current (0)
-{ }
+Log::Implementation::Implementation (const vector<const AttributeList*>& av)
+  : current (0)
+{ 
+  for (vector<const AttributeList*>::const_iterator i = av.begin ();
+       i != av.end ();
+       i++)
+    {
+      const AttributeList& al = **i;
+      entries.push_back (new Implementation::Entry 
+			 (al.name ("where"),
+			  &Condition::create (al.list ("when")),
+			  &al.filter ("what")));
+    }
+}					    
 
 Log::Implementation::~Implementation ()
 {
@@ -129,7 +139,6 @@ Log::Implementation::Entry::~Entry ()
       delete stream;
     }
   delete condition;
-  delete filter;
 }
 
 void 
@@ -300,20 +309,8 @@ Log::output_point (double x, double y)
   close ();
 }
 
-ostream& 
-Log::err () const
-{
-  return impl.err;
-}
-
-void
-Log::add (string n, const Condition* c, const Filter* f)
-{
-  impl.entries.push_back (new Implementation::Entry (n, c, f));
-}
-
-Log::Log (ostream& s)
-  : impl (*new Implementation (s))
+Log::Log (const vector<const AttributeList*>& av)
+  : impl (*new Implementation (av))
 { }
 
 Log::~Log ()

@@ -60,13 +60,13 @@ public:
 };
 
 void
-ColumnStandard::sow (const AttributeList& crop, Log& log)
+ColumnStandard::sow (const AttributeList& crop, Log&)
 {
   string name = crop.name ("type");
   if (!Crop::library ().check (name))
-    log.err () << "Cannot sow unknown crop `" << name << "'\n";
-  else if (!Crop::library ().syntax (name).check (name, crop, log))
-    log.err () << "Cannot sow incomplete crop `" << name << "'\n";
+    cerr << "Cannot sow unknown crop `" << name << "'\n";
+  else if (!Crop::library ().syntax (name).check (crop, name))
+    cerr << "Cannot sow incomplete crop `" << name << "'\n";
   else
     crops.push_back (Crop::create (crop, soil.size ()));
 }

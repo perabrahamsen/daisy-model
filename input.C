@@ -1,7 +1,6 @@
 // input.C
 
 #include "input.h"
-#include "log.h"
 #include "alist.h"
 #include "csmp.h"
 #include "library.h"
@@ -22,7 +21,6 @@ Usage::what () const
 
 struct Parser
 {
-  Log& log;
   const AttributeList& load (const Syntax& syntax);
   int get ();
   int peek ();
@@ -53,7 +51,7 @@ struct Parser
   string file;
   int line;
   int column;
-  Parser (int& argc, char**& argv, Log&);
+  Parser (int& argc, char**& argv);
   ~Parser ();
 };
 
@@ -65,7 +63,7 @@ Parser::load (const Syntax& syntax)
   load_list (alist, syntax);
   skip (")");
   eof ();
-  syntax.check ("daisy", alist, log);
+  syntax.check (alist, "daisy");
   return alist;
 }
 
@@ -404,19 +402,8 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	    atts.add (name, get_time ());
 	    break;
 	  case Syntax::Output:
-	    // Handled specially: Put directly in log.
-	    {
-	      while (!looking_at (')') && good ())
-		{
-		  skip ("(");
-		  string s = get_string ();
-		  const Condition* c = get_condition ();
-		  const Filter* f = get_filter (syntax.syntax (name));
-		  log.add (s, c, f);
-		  skip (")");
-		}
-	      break;
-	    }
+	    atts.add (name, get_filter (syntax.syntax (name)));
+	    break;
 	  case Syntax::Class:
 	    // Handled specially: Put directly in global library.
 	    add_derived (syntax.library (name), syntax.derive (name));
@@ -426,7 +413,7 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 	      const Library& lib = syntax.library (name);
 	      AttributeList& al = load_derived (lib, current != end);
 	      const string obj = al.name ("type");
-	      lib.syntax (obj).check (obj, al, log);
+	      lib.syntax (obj).check (al, obj);
 	      atts.add (name, al);
 	    }
 	    break;
@@ -452,7 +439,7 @@ Parser::load_list (AttributeList& atts, const Syntax& syntax)
 		{
 		  const AttributeList& al = load_derived (lib, true);
 		  const string obj = al.name ("type");
-		  lib.syntax (obj).check (obj, al, log);
+		  lib.syntax (obj).check (al, obj);
 		  sequence.push_back (&al);
 		}
 	      atts.add (name, sequence);
@@ -676,9 +663,8 @@ Parser::get_filter_sequence (const Library& library)
   return filter;
 }
 
-Parser::Parser (int& argc, char**& argv, Log& log)
-  : log (log),
-    err (cerr),
+Parser::Parser (int& argc, char**& argv)
+  : err (cerr),
     line (1),
     column (0)
 { 
@@ -693,10 +679,9 @@ Parser::~Parser ()
   delete in;
 }
 
-pair<Log*, const AttributeList*>
+const AttributeList&
 parse (const Syntax& syntax, int& argc, char**& argv)
 {
-  Log& log = *new Log (cerr);
-  Parser parser(argc, argv, log);
-  return make_pair (&log, &parser.load (syntax));
+  Parser parser(argc, argv);
+  return parser.load (syntax);
 }

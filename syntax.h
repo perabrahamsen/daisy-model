@@ -8,7 +8,6 @@
 
 struct FTable;
 struct AttributeList;
-struct Log;
 struct Library;
 
 typedef void (*derive_fun) (string, const AttributeList&, string);
@@ -58,9 +57,9 @@ public:
 
   // These functions will check that an alist conform to the syntax.
   // The first is quite chatty about it.
-  bool check (string, const AttributeList&, const Log&, 
+  bool check (const AttributeList&, 
+	      string = "<unknown>",
 	      bool sparse = false) const;
-  bool check (const AttributeList&) const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 

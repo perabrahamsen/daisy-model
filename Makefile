@@ -1,7 +1,7 @@
 # Makefile -- DAISY 
 
 SHELL = /bin/sh
-CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -frepo # -O2 -fhandle-exceptions -pipe -fno-implicit-templates
+CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -frepo -pipe # -O2 -fhandle-exceptions -pipe -fno-implicit-templates
 SRCONLY = column_std.o manager_rule.o weather_simple.o uzrichard.o \
 	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
 	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o \

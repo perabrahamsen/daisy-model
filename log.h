@@ -7,12 +7,10 @@
 #include <vector.h>
 
 class Filter;
-class Condition;
 class Daisy;
-class Column;
-class Crop;
 class Time;
 class CSMP;
+class AttributeList;
 
 class Log
 {
@@ -29,7 +27,6 @@ public:
   void output (string, const Filter*, const int, bool log_only = false);
   void output (string, const Filter*, const vector<double>&, bool log_only = false);
   void output (string, const Filter*, const CSMP&, bool log_only = false);
-  ostream& err () const;
 
   // Used by CSMP.
 public:
@@ -48,11 +45,8 @@ private:
   Implementation& impl;
 
   // Create and Destroy.
-private:
-  friend class Parser; // Only create from Input.
-  void add (string, const Condition*, const Filter*);
 public:
-  Log (ostream&);
+  Log (const vector<const AttributeList*>&);
   ~Log ();
 };
 
