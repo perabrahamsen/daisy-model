@@ -964,6 +964,8 @@
            (number (path column "$col" Vegetation crops crops "$crop"
                          Root nitrogen_stress))
            (number (path column "$col" Vegetation crops crops "$crop"
+                         Harvest cut_stress))
+           (number (path column "$col" Vegetation crops crops "$crop"
                          Prod CLeaf)
                    (dimension "Ton C/ha")
                    (factor 0.01))
