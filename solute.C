@@ -89,9 +89,9 @@ Solute::tick (const Soil& soil,
   // Permanent source.
   for (unsigned int i = 0; i < soil.size (); i++)
     {
-      S[i] += S_permanent[i];
-      daisy_assert (M_left (i) >= 0.0);
       S_external[i] += S_permanent[i];
+      S[i] += S_external[i];
+      daisy_assert (M_left (i) >= 0.0);
     }
 
   // Upper border.
@@ -295,17 +295,13 @@ Solute::~Solute ()
 }
 
 void 
-Solute::add_external (const Soil& soil, const SoilWater& soil_water, 
-		      double amount, double from, double to)
+Solute::incorporate (const Geometry& geometry, 
+                     double amount, double from, double to)
 { 
-  vector<double> added (M_.size (), 0.0);
-  soil.add (added, from, to, amount);
-  for (unsigned int i = 0; i < C_.size (); i++)
-    {
-      M_[i] += added[i];
-      S_external[i] += added[i];
-      C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
-    }
+  daisy_assert (amount >= 0.0);
+  daisy_assert (from <= 0.0);
+  daisy_assert (to <= from);
+  geometry.add (S_external, from, to, amount);
 }
 
 void 

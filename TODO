@@ -2,17 +2,21 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Fertorganic eksempel
 
-** Lav zip fil og post den
+** Opdater Toves setup
+
+** SH: Post noter til hvad der er ændret i Daisy siden opgaver
+
+** Skriv brev
 
 ** Send brev
 
-* Noter til hvad der er ændret i Daisy siden opgaver
+* automatically calculate background_mineralization.
 
-* irrigate_subsoil (hours)
+Possible?
 
 * crop_ds_above new height parameter
 
-* Lav klimafil
+* Lav superklimafil
 
 ** SH: forklaring
 
@@ -31,6 +35,16 @@ TODO --- things that needs done with Daisy -*- outline -*-
 ** Akademisk bekrivelse?
 
 Til referencemanual?
+
+* Idea: Ignore "ordered" when creating a derived parameterization.
+
+I.e. 
+
+(defaction fertiligation irrigate_subsoil (from -5) (to -10))
+
+instead of 
+
+(defaction fertiligation irrigate_subsoil 0.0 (from -5) (to -10))
 
 * min, max og average log select models skal opføre sig som fluxe.
 

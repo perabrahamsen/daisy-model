@@ -23,6 +23,8 @@
 #ifndef IM_H
 #define IM_H
 
+#include <string>
+
 struct Log;
 struct Syntax;
 struct AttributeList;
@@ -48,12 +50,17 @@ public:
 public:
   IM operator* (double flux) const;
   IM operator+ (const IM&) const;
-  static void load_syntax (Syntax&, AttributeList&);
+  static void define_syntax (Syntax&, AttributeList&, const std::string& dim);
+  static void load_ppm (Syntax&, AttributeList&);
+  static void load_soil (Syntax&, AttributeList&);
+  static void load_soil_flux (Syntax&, AttributeList&);
+  static void load_field_flux (Syntax&, AttributeList&);
   IM (const IM& im);
   IM (const AttributeList&);
   IM (const IM&, double flux);
   IM ();
   ~IM ();
 };
+
 
 #endif // IM_H

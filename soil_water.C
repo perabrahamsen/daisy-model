@@ -46,6 +46,7 @@ struct SoilWater::Implementation
   vector<double> S_drain;
   vector<double> S_p;
   vector<double> S_permanent;
+  vector<double> S_incorp;
   vector<double> Theta_old;
   vector<double> h_old;
   vector<double> Theta;
@@ -77,6 +78,7 @@ public:
   void tick (const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
+  void incorporate (const Geometry&, double amount, double from, double to);
   void mix (const Soil&, double from, double to);
   void swap (Treelog&, const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 
@@ -106,6 +108,7 @@ SoilWater::Implementation::clear (const Geometry&)
   fill (S_drain.begin (), S_drain.end (), 0.0);
   fill (S_root.begin (), S_root.end (), 0.0);
   fill (S_ice.begin (), S_ice.end (), 0.0);
+  fill (S_incorp.begin (), S_incorp.end (), 0.0);
   // We don't clear S_p and S_drain, because they are needed in solute.
 }
 
@@ -223,7 +226,10 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
 
   // External source.
   for (unsigned int i = 0; i < soil.size (); i++)
-    S_sum[i] += S_permanent[i];
+    {
+      S_incorp[i] += S_permanent[i];
+      S_sum[i] += S_incorp[i];
+    }
 
   // Remember old values.
   Theta_old = Theta;
@@ -325,6 +331,14 @@ SoilWater::Implementation::set_external_source (const Geometry& geometry,
   geometry.add (S_permanent, from, to, -amount);
 }
 
+void 
+SoilWater::Implementation::incorporate (const Geometry& geometry, 
+                                        double amount, double from, double to)
+
+{
+  geometry.add (S_incorp, from, to, -amount);
+}
+
 void
 SoilWater::Implementation::mix (const Soil& soil, double from, double to)
 {
@@ -416,6 +430,7 @@ SoilWater::Implementation::output (Log& log) const
   output_variable (S_drain, log);
   output_variable (S_p, log);
   output_variable (S_permanent, log);
+  output_variable (S_incorp, log);
   output_variable (Theta, log);
   output_variable (h, log);
   output_variable (S_ice, log);
@@ -539,9 +554,10 @@ SoilWater::Implementation::initialize (const AttributeList& al,
   S_root.insert (S_root.begin (), size, 0.0);
   S_drain.insert (S_drain.begin (), size, 0.0);
   S_p.insert (S_p.begin (), size, 0.0);
+  S_incorp.insert (S_incorp.begin (), size, 0.0);
   if (S_permanent.size () < size)
-    S_permanent.insert (S_permanent.end (), size - S_permanent.size (),
-			 0.0);
+    S_permanent.insert (S_permanent.end (), size - S_permanent.size (), 0.0);
+
   q.insert (q.begin (), size + 1, 0.0);
   q_p.insert (q_p.begin (), size + 1, 0.0);
   S_ice.insert (S_ice.begin (), size, 0.0);
@@ -726,6 +742,11 @@ SoilWater::set_external_source (const Geometry& geometry,
 				double amount, double from, double to)
 { impl.set_external_source (geometry, amount, from, to); }
 
+void 
+SoilWater::incorporate (const Geometry& geometry, 
+                        double amount, double from, double to)
+{ impl.incorporate (geometry, amount, from, to); }
+
 void
 SoilWater::mix (const Soil& soil, double from, double to)
 { impl.mix (soil, from, to); }
@@ -800,6 +821,8 @@ will be used from there to the bottom.");
 	      "Water sink due to soil drainage.");
   syntax.add ("S_p", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink (due to macropores).");
+  syntax.add ("S_incorp", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Incorporated water sink, typically from subsoil irrigation.");
   syntax.add ("S_permanent", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
 	      "Permanent water sink, e.g. subsoil irrigation.");
   vector<double> empty;

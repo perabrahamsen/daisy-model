@@ -29,6 +29,11 @@
 
 struct ActionIrrigate : public Action
 {
+  const int days;
+  const int hours;
+  bool activated;
+  Time end_time;
+
   static const double at_air_temperature;
 
   const double flux;
@@ -40,14 +45,58 @@ struct ActionIrrigate : public Action
 
   void doIt (Daisy& daisy, Treelog& out)
   {
-    out.message ("Irrigating");      
-    double t = temp;
+    if (!activated)
+      {
+	activated = true;
+	end_time = daisy.time;
+	end_time.tick_hour (hours - 1);
+	end_time.tick_day (days);
+        TmpStream tmp;
+        if (daisy.time == end_time)
+          tmp () << "Irrigating " << flux << " mm";
+        else
+          tmp () << "Irrigating " << flux << " mm/h";
+        out.message (tmp.str ());      
+      }
+    else if (daisy.time == end_time)
+      out.message ("Irrating done");
 
-    irrigate (daisy.field, flux, t, sm);
+    irrigate (daisy.field, flux, temp, sm);
+  }
+
+  bool done (const Daisy& daisy) const
+  {
+    daisy_assert (activated);
+    return daisy.time >= end_time; 
+  }
+
+  static bool check_alist (const AttributeList& alist, Treelog& err)
+  {
+    bool ok = true;
+
+    const int days = alist.integer ("days");
+    const int hours = alist.integer ("hours");
+
+    if (days * 24 + hours < 1)
+      {
+	err.entry ("you must irrigate at least 1 hour");
+	ok = false;
+      }
+    return ok;
   }
 
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
+    syntax.add_check (check_alist);	
+    syntax.add ("days", Syntax::Integer, Syntax::Const, 
+                "Irrigate this number of days.");
+    alist.add ("days", 0);
+    syntax.add ("hours", Syntax::Integer, Syntax::Const, 
+                "Irrigate this number of days.");
+    alist.add ("hours", 1);
+    syntax.add_submodule ("end_time", alist, Syntax::OptionalState,
+                          "Irrigate until this date.\
+Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
     syntax.add ("flux", "mm/h", Check::non_negative (), Syntax::Const, 
 		"Amount of irrigation applied.");
     syntax.order ("flux");
@@ -56,11 +105,15 @@ struct ActionIrrigate : public Action
 		"Temperature of irrigation (default: air temperature).");
     syntax.add_submodule ("solute", alist, Syntax::Const, "\
 Nitrogen content of irrigation water [mg N/l] (default: none).",
-			  IM::load_syntax);
+			  IM::load_ppm);
   }
 
   ActionIrrigate (const AttributeList& al)
     : Action (al),
+      days (al.integer ("days")),
+      hours (al.integer ("hours")),
+      activated (al.check ("end_time")),
+      end_time (1, 1, 1, 1),
       flux (al.number ("flux")),
       temp (al.check ("temperature") 
 	    ? al.number ("temperature")
@@ -101,7 +154,21 @@ struct ActionIrrigateSurface : public ActionIrrigate
   { }
 };
 
-struct ActionIrrigateSubsoil : public Action
+struct ActionIrrigateSubsoil : public ActionIrrigate
+{
+  const double from;
+  const double to;
+
+  void irrigate (Field& f, double flux, double /* temp */, const IM& im) const
+  { f.irrigate_subsoil (flux, im, from, to); }
+  ActionIrrigateSubsoil (const AttributeList& al)
+    : ActionIrrigate (al),
+      from (al.number ("from")),
+      to (al.number ("to"))
+  { }
+};
+
+struct ActionIrrigateSubsoilStart : public Action
 {
   const double flux;
   const double from;
@@ -113,20 +180,20 @@ struct ActionIrrigateSubsoil : public Action
     daisy.field.set_subsoil_irrigation (flux, sm, from, to);
     TmpStream tmp;
     if (flux != 0.0)
-      tmp () << "Subsoil irrigating with " << flux << " mm/h\n";
+      tmp () << "Subsoil irrigating with " << flux << " mm/h";
     else
-      tmp () << "Subsoil irrigating turned off\n";
+      tmp () << "Subsoil irrigating turned off";
     out.message (tmp.str ());
   }
 
-  ActionIrrigateSubsoil (const AttributeList& al)
+  ActionIrrigateSubsoilStart (const AttributeList& al)
     : Action (al),
       flux (al.number ("flux")),
       from (al.number ("from")),
       to (al.number ("to")),
       sm (al.alist ("solute"))
   { }
-  ~ActionIrrigateSubsoil ()
+  ~ActionIrrigateSubsoilStart ()
   { }
 };
 
@@ -213,13 +280,51 @@ static struct ActionIrrigateSubsoilSyntax
     if (from <= to)
       {
 	err.entry ("'from' must be higher than 'to' in"
-		   " the subsoilirrigation zone");
+		   " the subsoil irrigation zone");
 	ok = false;
       }
     return ok;
   }
 
   ActionIrrigateSubsoilSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    ActionIrrigate::load_syntax (syntax, alist);
+    alist.add ("description", "\
+Irrigate the field directly into the soil.\n\
+Currently, the 'temperature' parameter is ignored.");
+    syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
+Height where you want to start the incorporation (a negative number).");
+    alist.add ("from", 0.0);
+    syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
+Height where you want to end the incorporation (a negative number).");
+
+    Librarian<Action>::add_type ("irrigate_subsoil", alist, syntax, &make);
+  }
+
+} ActionIrrigateSubsoil_syntax;
+
+static struct ActionIrrigateSubsoilStartSyntax
+{
+  static Action& make (const AttributeList& al)
+  { return *new ActionIrrigateSubsoilStart (al); }
+
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  { 
+    bool ok = true;
+    const double from = al.number ("from");
+    const double to = al.number ("to");
+    if (from <= to)
+      {
+	err.entry ("'from' must be higher than 'to' in"
+		   " the subsoilirrigation zone");
+	ok = false;
+      }
+    return ok;
+  }
+
+  ActionIrrigateSubsoilStartSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
@@ -238,12 +343,12 @@ Height where you want to end the incorporation (a negative number).");
 
     syntax.add_submodule ("solute", alist, Syntax::Const, "\
 Nitrogen content of irrigation water [mg N/l] (default: none).",
-			  IM::load_syntax);
+			  IM::load_ppm);
 
     Librarian<Action>::add_type ("set_subsoil_irrigation",
 				 alist, syntax, &make);
   }
-} ActionIrrigateSubsoil_syntax;
+} ActionIrrigateSubsoilStart_syntax;
 
 static struct ActionIrrigateStopSyntax
 {

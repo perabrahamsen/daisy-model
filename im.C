@@ -111,18 +111,36 @@ IM::~IM ()
 { }
 
 void 
-IM::load_syntax (Syntax& syntax, AttributeList& alist)
+IM::define_syntax (Syntax& syntax, AttributeList& alist, const string& dim)
 {
   alist.add ("submodel", "IM");
   alist.add ("description", "\
-Inorganic matter, or more precisely, mineral nitrogen.\n\
-The dimensions depend on which model the 'IM' fixed component is used in.");
-  syntax.add ("NH4", Syntax::Unknown (), Syntax::State,
-	      "Ammonium content.");
+Inorganic matter, or more precisely, mineral nitrogen.");
+  syntax.add ("NH4", dim, Syntax::State, "Ammonium content.");
   alist.add ("NH4", 0.0);
-  syntax.add ("NO3", Syntax::Unknown (), Syntax::State,
-	      "Nitrate content.");
+  syntax.add ("NO3", dim, Syntax::State, "Nitrate content.");
   alist.add ("NO3", 0.0);
 }
 
-static Submodel::Register im_submodel ("IM", IM::load_syntax);
+void 
+IM::load_ppm (Syntax& syntax, AttributeList& alist)
+{ define_syntax (syntax, alist, "mg N/l"); }
+
+void 
+IM::load_soil (Syntax& syntax, AttributeList& alist)
+{ define_syntax (syntax, alist, "g N/cm^2"); }
+
+void 
+IM::load_soil_flux (Syntax& syntax, AttributeList& alist)
+{ define_syntax (syntax, alist, "g N/cm^2/h"); }
+
+void 
+IM::load_field_flux (Syntax& syntax, AttributeList& alist)
+{ define_syntax (syntax, alist, "kg N/ha/y"); }
+
+static Submodel::Register im_ppm_submodel ("IM_ppm", IM::load_ppm);
+static Submodel::Register im_field_flux_submodel ("IM_field_flux",
+                                                  IM::load_field_flux);
+static Submodel::Register im_soil_submodel ("IM_soil", IM::load_soil);
+static Submodel::Register im_soil_flux_submodel ("IM_soil_flux", 
+                                                 IM::load_soil_flux);

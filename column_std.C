@@ -72,6 +72,8 @@ public:
   void irrigate_surface (double flux, double temp, const IM&);
   void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
+  void irrigate_subsoil (double flux, const IM& sm, 
+                         double from, double to);
   void set_subsoil_irrigation (double flux, const IM& sm, 
 			       double from, double to);
   void fertilize (const AttributeList&);
@@ -178,6 +180,17 @@ ColumnStandard::irrigate_surface (double flux, const IM& sm)
 static const double irrigate_solute_soil_factor = 1.0e-7;
 
 void
+ColumnStandard::irrigate_subsoil (double flux, const IM& sm, 
+                                  double from, double to)
+{
+  ColumnBase::irrigate_subsoil (flux, sm, from, to);
+  soil_NH4.incorporate (soil, sm.NH4 * (flux * irrigate_solute_soil_factor), 
+                        from, to);
+  soil_NO3.incorporate (soil, sm.NO3 * (flux * irrigate_solute_soil_factor),
+                        from, to);
+}
+
+void
 ColumnStandard::set_subsoil_irrigation (double flux, const IM& sm, 
 					double from, double to)
 {
@@ -249,8 +262,8 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
   IM im (al);
   daisy_assert (im.NH4 >= 0.0);
   daisy_assert (im.NO3 >= 0.0);
-  soil_NO3.add_external (soil, soil_water, im.NO3, from, to);
-  soil_NH4.add_external (soil, soil_water, im.NH4, from, to);
+  soil_NO3.incorporate (soil, im.NO3, from, to);
+  soil_NH4.incorporate (soil, im.NH4, from, to);
   fertilized_NO3_total += im.NO3 / conv; 
   fertilized_NH4_total += im.NH4 / conv + lost_NH4;
 

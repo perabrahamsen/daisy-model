@@ -308,6 +308,6 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_submodule ("deposit", alist, Syntax::LogOnly, 
 			"\
 Total atmospheric deposition of nitrogen this hour [g N/cm^2/h].", 
-			&IM::load_syntax);
+			&IM::load_soil_flux);
 }
 

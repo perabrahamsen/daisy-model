@@ -64,7 +64,7 @@ struct ActionWaitDays : public Action
       {
 	activated = true;
 	end_time = daisy.time;
-	end_time.tick_hour (hours);
+	end_time.tick_hour (hours - 1);
 	end_time.tick_day (days);
       }
   }
@@ -160,6 +160,20 @@ static struct ActionWaitSyntax
       }
     return ok;
   }
+  static bool check_days (const AttributeList& alist, Treelog& err)
+  {
+    bool ok = true;
+
+    const int days = alist.integer ("days");
+    const int hours = alist.integer ("hours");
+
+    if (days * 24 + hours < 1)
+      {
+	err.entry ("you must wait at least 1 hour");
+	ok = false;
+      }
+    return ok;
+  }
 
   ActionWaitSyntax ()
   {
@@ -176,18 +190,36 @@ Wait until the specified condition is true.");
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      syntax.add_check (check_days);	
       alist.add ("description", "\
-Wait the specified number of days.");
+Waits the specified number of days.");
       syntax.add ("days", Syntax::Integer, Syntax::Const, 
 		  "Wait this number of days.");
       syntax.add ("hours", Syntax::Integer, Syntax::Const, 
-		  "Wait this number of days.");
+		  "Wait this number of hours.");
       alist.add ("hours", 0);
       syntax.add_submodule ("end_time", alist, Syntax::OptionalState,
 		  "Wait until this date.\
 Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
       syntax.order ("days");
       Librarian<Action>::add_type ("wait_days", alist, syntax, &make_days);
+    }
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add_check (check_days);	
+      alist.add ("description", "\
+Waits the specified number of hours.");
+      syntax.add ("days", Syntax::Integer, Syntax::Const, 
+		  "Wait this number of days.");
+      alist.add ("days", 0);
+      syntax.add ("hours", Syntax::Integer, Syntax::Const, 
+		  "Wait this number of hours.");
+      syntax.add_submodule ("end_time", alist, Syntax::OptionalState,
+		  "Wait until this date.\
+Setting this overrides the 'days' and 'hours' parameters.", Time::load_syntax);
+      syntax.order ("hours");
+      Librarian<Action>::add_type ("wait_hours", alist, syntax, &make_days);
     }
     {
       Syntax& syntax = *new Syntax ();

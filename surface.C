@@ -576,10 +576,10 @@ Fraction of ponding above DetentionCapacity that runoffs each hour.");
 Amount of water runoff from ponding this hour.");
   syntax.add_submodule ("IM", alist, Syntax::State, "\
 Inorganic nitrogen on the surface [g/cm^2].",
-			IM::load_syntax);
+			IM::load_soil);
   syntax.add_submodule ("IM_runoff", alist, Syntax::LogOnly, "\
 Inorganic nitrogen on the runoff water this hour [g/cm^2/h].",
-			IM::load_syntax);
+			IM::load_soil_flux);
   syntax.add ("R_mixing", "h/mm", Check::non_negative (), Syntax::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
   alist.add ("R_mixing", 1.0e9);

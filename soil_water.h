@@ -79,6 +79,7 @@ public:
   void tick (const Soil&, const SoilHeat&, Surface&, Groundwater&, Treelog&);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
+  void incorporate (const Geometry&, double amount, double from, double to);
   void mix (const Soil&, double from, double to);
   void swap (Treelog&, const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 

@@ -200,10 +200,10 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
 
   syntax.add_submodule ("DryDeposit", alist, Syntax::Const, 
 			"\
-Dry atmospheric deposition of nitrogen [kg N/year/ha].", &IM::load_syntax);
+Dry atmospheric deposition of nitrogen [kg N/ha/y].", &IM::load_field_flux);
   syntax.add_submodule ("WetDeposit", alist, Syntax::Const, 
 			"\
-Deposition of nitrogen solutes with precipitation [ppm].", &IM::load_syntax);
+Deposition of nitrogen solutes with precipitation [ppm].", &IM::load_ppm);
 
   // Division between Rain and Snow.
   syntax.add ("T_rain", "dg C", Syntax::Const, 

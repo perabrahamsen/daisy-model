@@ -1,3 +1,58 @@
+2003-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.14 released.
+
+2003-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (partition): Take new delta_C and delta_N
+	arguments.
+	(initialize): Update caller.
+
+2003-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzlr.C (tick): Handle lysimeter bottom and work better with
+	pressure bottoms.
+
+2003-11-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* units.C (standard_conversions): Accept ppm for mg N/l.
+	* im.C: Handle different dimensions.
+	* weather_old.C, weather.C, surface.C (load_syntax): Update caller.
+	* action_irrigate.C (struct ActionIrrigate) 
+	(ActionIrrigateSubsoilStartSyntax): Ditto.
+
+	* hydraulic_Cosby.C (initialize): Added dimensions to debug
+	message. 
+
+2003-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (incorporate): Renamed from 'add_external'.
+
+	* soil_water.C, soil_water.h (incorporate): New member function.
+	* soil_water.C (S_incorp): New state variable.
+	* lib/log.dai ("Root Zone Water Balance"): Use it.
+
+2003-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_irrigate.C (irrigate_subsoil): New command.
+	* field.C, field.h, column.h, column_base.C, column_base.h
+	(irrigate_subsoil): New function. 
+
+	* hydraulic_hypres.C (initialize): Added checks.
+
+2003-11-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_irrigate.C (ActionIrrigate): Make irrigate commands take
+	'days' and 'hours' arguments and last some time.
+
+	* action_wait.C (ActionWaitDays::doIt): Wait one hour less.
+	(ActionWaitSyntax): New "wait_hours" command.
+
+	* lib/chemistry.dai (Ioxynil): New parameterization.
+
+	* bioincorporation.C (R_max, C_per_N_factor): Made default values
+	faster.
+
 2003-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.13 released.

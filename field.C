@@ -44,6 +44,7 @@ struct Field::Implementation
   void irrigate_surface (double flux, double temp, const IM&);
   void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
+  void irrigate_subsoil (double flux, const IM&, double from, double to);
   void set_subsoil_irrigation (double flux, const IM& sm, 
 			       double from, double to);
   void fertilize (const AttributeList&, double from, double to);  // Organic.
@@ -193,6 +194,18 @@ Field::Implementation::irrigate_surface (double flux, const IM& im)
 	    i != columns.end ();
 	    i++)
     (*i)->irrigate_surface (flux, im);
+}
+
+void 
+Field::Implementation::irrigate_subsoil (double flux, const IM& im, 
+                                         double from, double to)
+{
+  if (selected)
+    selected->irrigate_subsoil (flux, im, from, to);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->irrigate_subsoil (flux, im, from, to);
 }
 
 void 
@@ -622,6 +635,10 @@ Field::irrigate_overhead (double flux, const IM& im)
 void 
 Field::irrigate_surface (double flux, const IM& im)
 { impl.irrigate_surface (flux, im); }
+
+void 
+Field::irrigate_subsoil (double flux, const IM& im, double from, double to)
+{ impl.irrigate_subsoil (flux, im, from, to); }
 
 void 
 Field::set_subsoil_irrigation (double flux, const IM& im, 

@@ -88,8 +88,7 @@ public:
   void tick (const Soil&, const SoilWater&, double J_in, Treelog&);
   bool check (unsigned n, Treelog& err) const;
   virtual void output (Log&) const;
-  void add_external (const Soil&, const SoilWater&,
-		     double amount, double from, double to);
+  void incorporate (const Geometry&, double amount, double from, double to);
   void set_external_source (const Geometry&, 
 			    double amount, double from, double to);
   void mix (const Soil&, const SoilWater&, double from, double to);

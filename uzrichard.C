@@ -225,7 +225,7 @@ UZRichard::richard (Treelog& msg,
 
 	      Ksum[i] += soil.K (first + i, h[i], h_ice[first + i], 
 				 soil_heat.T (first + i));
-	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2;
+	      K[i] = (Ksum[i] / iterations_used + Kold[i]) / 2.0;
 	    }
 	  if (bottom.bottom_type () != UZbottom::pressure)
 	    K[size] = K[size - 1];

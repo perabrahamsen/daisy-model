@@ -287,7 +287,7 @@ Bioincorporation::load_syntax (Syntax& syntax, AttributeList& alist)
   // Incorporation speed.
   syntax.add ("R_max", "g DM/m^2/h", Check::non_negative (), Syntax::Const, 
 	      "Maximal speed of incorporation.");
-  alist.add ("R_max", 0.3);
+  alist.add ("R_max", 0.5);
   syntax.add ("k_half", "g DM/m^2", Check::positive (), Syntax::Const,
 	      "Halflife constant.");
   alist.add ("k_half", 1.0);
@@ -298,8 +298,8 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
 	      Check::non_negative (), Syntax::Const, 
 	      "Limiting factor for high C/N ratio.");
   PLF C_per_N_factor;
-  C_per_N_factor.add (40.0, 1.0);
-  C_per_N_factor.add (50.0, 0.1);
+  C_per_N_factor.add (50.0, 1.0);
+  C_per_N_factor.add (100.0, 0.1);
   C_per_N_factor.add (120.0, 0.01);
   
   alist.add ("C_per_N_factor", C_per_N_factor);

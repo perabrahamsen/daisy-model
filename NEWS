@@ -12,6 +12,69 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.14
+
+** wait_days now wait one hour less.
+
+It use to wait one hour more than the specified amount of time.  This
+is no longer the case.
+
+** New wait_hours command.
+
+Waits the specified number of hours.
+
+** Bioincorporation is now faster by default.
+
+** New pesticide 'Ioxynil' in chemistry.dai.
+
+** Irrigate commands now take 'hour' and 'days' arguments.
+
+These determine how long time the irrigation will last.  By default,
+irrgation will last one hour (which is also the minimum).
+
+For example the command
+
+  (irrigate_surface 1 [mm/h] (hours 24))
+
+will last 24 hours give a total irrigation of 24 mm.
+
+** New command 'irrigate_subsoil'.
+
+This works like the other irrigate commands, except that the water is
+incorporated directly in the soil.  It takes to additional parameters,
+from and to, which determine where in the soil the water is
+incorporated.  Example:
+
+  (irrigate_subsoil 1 [mm/h] (hours 24) (from -5 [cm]) (to -20 [cm]))
+
+
+** Daisy will now check dimensions for the IM submodel.
+
+Example:
+
+  (irrigate_subsoil 1 [mm/h] (hours 24) (from -5 [cm]) (to -20 [cm])
+                    (solute (NH4 300 [mg N/l]) (NO3 50 [mg N/l])))
+
+If you used the "unknown" dimension syntax, [?mg N/l], you must adjust
+your setup by removing the question mark.
+
+** The lr matrix water transport model should work better now.
+
+It should give better results with the lysimeter, fixed and file
+Groundwater models.
+
+** Humus change and background mineralization in daisy.log file
+
+The daisy.log file now contains two new lines:
+
+  Expected humus change: -175.423 [kg C/ha/y], -4.50161e-07 [y^-1].
+  Background mineralization: 15.9476 [kg N/ha/y].
+
+They can work as a quick summary of the organic matter system
+inititalization.  With an unchanged input level, we'd expect the
+amount of humus in the soil to decrease over time, releasing 16 kg
+N/ha/y.
+
 * 3.13
 
 ** "N Blance" log parameterization changes.

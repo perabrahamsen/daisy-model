@@ -213,6 +213,8 @@ struct OrganicMatter::Implementation
 		  int SOM_limit_where,
 		  vector<double>& SOM_results,
 		  vector<double>& SMB_results,
+                  double& delta_C,
+                  double& delta_N,
 		  const double dry_bulk_density,
 		  Treelog& msg,
 		  bool print_equations, bool print_rows,
@@ -1307,6 +1309,8 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 					  const int SOM_limit_where,
 					  vector<double>& SOM_results,
 					  vector<double>& SMB_results,
+                                          double& delta_C,
+                                          double& delta_N,
 					  const double dry_bulk_density,
 					  Treelog& msg,
 					  const bool print_equations,
@@ -1773,6 +1777,36 @@ Setting additional pool to zero");
       for (unsigned int pool = 0; pool < som_size; pool++)
 	SOM_results[pool] = max (0.0, matrix.result (som_column + pool));
 
+
+      // Store changes.
+      delta_N = 0.0;
+      delta_C = 0.0;
+      for (unsigned int pool = 0; pool < smb_size; pool++)
+        {
+          double N_per_C = 0.0;
+          if (smb[pool]->C.size () > lay && smb[pool]->N.size () > lay)
+            {
+              if (isnormal (smb[pool]->C[lay]))
+                N_per_C = smb[pool]->N[lay] / smb[pool]->C[lay];
+            }
+          else 
+            {
+              daisy_assert (smb[pool]->initial_C_per_N > 0.0);
+              N_per_C = 1.0 / smb[pool]->initial_C_per_N;
+            }
+          const double C = matrix.result (dsmb_column + pool);
+          delta_C += C;
+          delta_N += C * N_per_C;
+        }
+      daisy_assert (SOM_C_per_N.size () == som.size ());
+      for (unsigned int pool = 0; pool < som_size; pool++)
+        {
+          const double C = matrix.result (dsom_column + pool);
+          delta_C += C;
+          daisy_assert (isnormal (SOM_C_per_N[pool]));
+          delta_N += C / SOM_C_per_N[pool];
+        }
+
       // Check mass balance, ignoring negative numbers.
       error_found 
 	= !approximate (total_am 
@@ -2063,7 +2097,8 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 		       
   vector<double> SOM_results (som_size, 0.0);
   vector<double> SMB_results (smb_size, 0.0);
-
+  double total_delta_C = 0.0;
+  double total_delta_N = 0.0;
   for (unsigned int lay = 0; lay < soil.size (); lay++)
     {
       vector<double> am_input (smb.size () + 1);
@@ -2078,6 +2113,8 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 	? (init.background_mineralization * kg_per_ha_per_y_to_g_per_cm2_per_h
 	   / -init.end)
 	: -42.42e42;
+      double delta_C;
+      double delta_N;
       partition (am_input, init.T, init.h, 
 		 lay, total_C[lay], init.variable_pool, init.variable_pool_2,
 		 background_mineralization, top_soil,
@@ -2086,16 +2123,36 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 		 init.SOM_limit_lower, init.SOM_limit_upper, 
 		 (top_soil ? init.SOM_limit_where : -1),
 		 SOM_results, SMB_results,
+                 delta_C, delta_N,
 		 soil.dry_bulk_density (lay),
 		 err,
 		 init.print_equations (lay), init.debug_rows, 
 		 init.debug_to_screen);
-
+      total_delta_C += delta_C * soil.dz (lay);
+      total_delta_N += delta_N * soil.dz (lay);
       update_pools (SOM_results, soil.C_per_N (lay), 
 		    soil.SOM_C_per_N (lay), SMB_results, lay);
     }
 
-  //clay affect or SMB turnover and mantenance.
+  // 
+  TmpStream total;
+  total () << "Expected humus change: " 
+           << total_delta_C * g_per_cm2_per_h_to_kg_per_ha_per_y 
+           << " [kg C/ha/y], ";
+  const double all_C = this->total_C (soil);
+  if (isnormal (all_C))
+    total () << total_delta_C / all_C << " [y^-1]";
+  else
+    total () << "all new";
+  total () << ".\nBackground mineralization: "
+           << -total_delta_N * g_per_cm2_per_h_to_kg_per_ha_per_y 
+           << " [kg N/ha/y].";
+  if (init.debug_to_screen)
+    err.message (total.str ());
+  else
+    err.debug (total.str ());  
+
+  // Clay affect or SMB turnover and mantenance.
   clayom.set_rates (soil, smb);
 
   // Initialize DOM.

@@ -141,10 +141,10 @@ Hydraulic_Cosby::initialize (double clay, double silt, double sand,
   // Debug messages.
   TmpStream tmp;
   tmp () << "mod_C\n";
-  tmp () << "(b " << b << ")\n";
-  tmp () << "(h_b " << h_b << ")\n";
-  tmp () << "(K_sat " << K_sat << ")\n";
-  tmp () << "(Theta_sat " << Theta_sat << ")";
+  tmp () << "(b " << b << " [])\n";
+  tmp () << "(h_b " << h_b << " [cm])\n";
+  tmp () << "(K_sat " << K_sat << " [cm/h])\n";
+  tmp () << "(Theta_sat " << Theta_sat << " [])";
   msg.debug (tmp.str ());
 }
 

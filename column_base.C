@@ -58,6 +58,17 @@ ColumnBase::irrigate_surface (double flux, const IM&)
 }
 
 void
+ColumnBase::irrigate_subsoil (double flux, const IM&, 
+                              double from, double to)
+{
+  daisy_assert (flux >= 0.0);
+  daisy_assert (from <= 0.0);
+  daisy_assert (to <= from); 
+  soil_water.incorporate (soil, flux / 10.0 /* mm -> cm */, from, to);
+  bioclimate.irrigate_subsoil (flux);
+}
+
+void
 ColumnBase::set_subsoil_irrigation (double flux, const IM&, 
 				    double from, double to)
 {

@@ -77,7 +77,7 @@ public:
 };
 
 bool
-UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
+UZlr::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const UZtop& top, 
 	    unsigned int last, const UZbottom& bottom, 
 	    const vector<double>& S,
@@ -148,6 +148,19 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       const double h_new = soil.h (i, Theta_new);
       double K_new = soil.K (i, h_new, h_ice[i], soil_heat.T (i));
 
+      // If we have free drainage bottom, we go for field capacity all
+      // the way.  Otherwise, we assume groundwater start at the
+      // bottom of the last node, and attempt equilibrium from there.
+      // This asumption is correct for lysimeter bottom, adequate for
+      // pressure bottom (where groundwater table is in the last
+      // node), and wrong for forced flux (= pipe drained soil) where
+      // the groundwater is usually much higher.  Still, it is better
+      // than using h_fc.
+      const double h_lim = (bottom.bottom_type () == UZbottom::free_drainage) 
+        ? h_fc
+        : max (soil.zplus (last) - soil.z (i), h_fc);
+      daisy_assert (h_lim < 0.0);
+
       if (use_darcy && i < to_darcy)
 	// Dry earth, near top.  Use darcy to move water up.
 	{
@@ -166,7 +179,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	      h[i] = soil.h (i, Theta[i]);
 	    }
 	}
-      else if (h_new < h_fc)
+      else if (h_new <= h_lim)
 	// Dry earth, no water movement.
 	{
 	  daisy_assert (Theta_new <= Theta_sat);
@@ -177,7 +190,6 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       else
 	// Gravitational water movement.
 	{
-	  const double Theta_fc = soil.Theta (i, h_fc, h_ice[i]);
 	  if (i + 1 < soil.size ())
 	    {
 	      // Geometric average K.
@@ -189,15 +201,27 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	    }
 	  else if (bottom.bottom_type () == UZbottom::forced_flux)
 	    K_new = -bottom.q_bottom ();
-	  else
-	    // Use previos value for last node.
-	    { }
-	  double Theta_next = Theta_new - K_new * dt / dz;
-	  if (Theta_next < Theta_fc)
+          
+	  const double Theta_lim = soil.Theta (i, h_lim, h_ice[i]);
+	  const double Theta_next = Theta_new - K_new * dt / dz;
+
+	  if (Theta_next < Theta_lim)
 	    {
-	      q[i+1] = (Theta_fc - Theta_new) * dz / dt;
-	      Theta[i] = Theta_fc;
-	      h[i] = h_fc;
+              if (Theta_lim < Theta_new)
+                {
+                  q[i+1] = (Theta_lim - Theta_new) * dz / dt;
+                  Theta[i] = Theta_lim;
+                  h[i] = h_lim;
+                }
+              else
+                {
+                  TmpStream tmp;
+                  tmp () << "BUG: h_new = " << h_new << " h_lim = " << h_lim;
+                  msg.error (tmp.str ());
+                  q[i+1] = 0.0;
+                  Theta[i] = Theta_new;
+                  h[i] = h_new;
+                }
 	    }
 	  else if (Theta_next >= Theta_sat)
 	    {

@@ -60,6 +60,8 @@ struct BioclimateStandard : public Bioclimate
   double irrigation_surface_old; // Old value for logging.
   double irrigation_surface_temperature; // Water temperature [dg C]
   double irrigation_subsoil;	// Irrigation incorporated in soil.
+  double irrigation_subsoil_old; // Old value for logging.
+  double irrigation_subsoil_permanent;	// Irrigation incorporated in soil.
 
   // Water in snowpack.
   Snow snow;
@@ -154,6 +156,7 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_surface (double flux, double temp);
   void irrigate_overhead (double flux);
   void irrigate_surface (double flux);
+  void irrigate_subsoil (double flux);
   void set_subsoil_irrigation (double flux);
   void spray (symbol chemical, double amount) // [g/m^2]
     { spray_.add (chemical, amount); }
@@ -193,7 +196,9 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     irrigation_surface (0.0),
     irrigation_surface_old (0.0),
     irrigation_surface_temperature (0.0),
-    irrigation_subsoil (al.number ("irrigation_subsoil")),
+    irrigation_subsoil (0.0),
+    irrigation_subsoil_old (0.0),
+    irrigation_subsoil_permanent (al.number ("irrigation_subsoil_permanent")),
     snow (al.alist ("Snow")),
     snow_ep (0.0),
     snow_ea (0.0),
@@ -484,12 +489,15 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   irrigation_overhead = 0.0;
   irrigation_surface_old = irrigation_surface;
   irrigation_surface = 0.0;
-
+  irrigation_subsoil_old = irrigation_subsoil;
+  irrigation_subsoil = 0.0;
+  
   // 8 Check
   // Note: total_ea can be larger than total_ep, as PMSW uses a
   // different method for calculating PET.
   daisy_assert (approximate (total_ea,
-		       snow_ea + canopy_ea + pond_ea + soil_ea + crop_ea));
+                             snow_ea + canopy_ea 
+                             + pond_ea + soil_ea + crop_ea));
 }  
 
 void 
@@ -573,9 +581,12 @@ BioclimateStandard::output (Log& log) const
   output_value (irrigation_surface_old, "irrigation_surface", log);
   output_value (irrigation_surface_temperature,
 	      "irrigation_surface_temperature", log);
-  output_variable (irrigation_subsoil, log);
-  output_value ( irrigation_subsoil + irrigation_surface_old
-		  + irrigation_overhead_old, "irrigation_total", log);
+  output_value (irrigation_subsoil_old + irrigation_subsoil_permanent,
+                "irrigation_subsoil", log);
+  output_variable (irrigation_subsoil_permanent, log);
+  output_value (irrigation_subsoil_old  + irrigation_subsoil_permanent
+                + irrigation_surface_old + irrigation_overhead_old, 
+                "irrigation_total", log);
   output_submodule (snow, "Snow", log);
   output_variable (snow_ep, log);
   output_variable (snow_ea, log);
@@ -645,8 +656,12 @@ BioclimateStandard::irrigate_surface (double flux)
 { irrigate_surface (flux, daily_air_temperature ()); }
 
 void
+BioclimateStandard::irrigate_subsoil (double flux)
+{ irrigation_subsoil += flux; }
+
+void
 BioclimateStandard::set_subsoil_irrigation (double flux)
-{ irrigation_subsoil = flux; }
+{ irrigation_subsoil_permanent = flux; }
 
 static struct BioclimateStandardSyntax
 {
@@ -681,9 +696,11 @@ Number of vertical intervals in which we partition the canopy.");
 		  "Irrigation below canopy.");
       syntax.add ("irrigation_surface_temperature", "dg C", Syntax::LogOnly,
 		  "Water temperature.");
-      syntax.add ("irrigation_subsoil", "mm/h", Syntax::State,
-		  "Irrigation below soil surface.");
-      alist.add ("irrigation_subsoil", 0.0);
+      syntax.add ("irrigation_subsoil", "mm/h", Syntax::LogOnly,
+		  "Irrigation below soil surface this hour.");
+      syntax.add ("irrigation_subsoil_permanent", "mm/h", Syntax::State,
+		  "Long term irrigation below soil surface.");
+      alist.add ("irrigation_subsoil_permanent", 0.0);
       syntax.add ("irrigation_total", "mm/h", Syntax::LogOnly,
 		  "Total irrigation above of below the soil surface.");
 

@@ -148,6 +148,11 @@ HydraulicHypres::initialize (double clay, double silt, double sand,
   else
     daisy_assert (soil_type == unknown);
 
+  // We should check for these earlier.
+  daisy_assert (clay > 0);
+  daisy_assert (humus > 0);
+  daisy_assert (silt > 0);
+
   if (rho_b <= 0.0)
     {
       msg.error ("\
@@ -160,6 +165,7 @@ pedotransfer function");
   sand *= 100.0;		// [%]
   humus *= 100.0;		// [%]
   daisy_assert (approximate (clay + silt + sand + humus, 100.0));
+  
 
   Theta_sat = 0.7919 + 0.001691 * clay - 0.29619 * rho_b 
     - 0.000001491 * silt * silt
