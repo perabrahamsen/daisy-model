@@ -84,11 +84,15 @@ SoilChemicals::Implementation::add_missing (const Soil& soil,
        i++)
     {
       const string& name = *i;
-      assert (solutes.find (name) == solutes.end ());
-      const Chemical& chemical = Chemicals::lookup (name);
-      solutes[name] = new SoilChemical (chemical);
-      solutes[name]->initialize (chemical.solute_alist (), soil, soil_water,
-				 out);
+      // If we are staring from a checkpoint, we might already have it.
+      if (solutes.find (name) == solutes.end ())
+	{
+	  const Chemical& chemical = Chemicals::lookup (name);
+	  solutes[name] = new SoilChemical (chemical);
+	  solutes[name]->initialize (chemical.solute_alist (),
+				     soil, soil_water,
+				     out);
+	}
       all.insert (name);
     }
 }
@@ -181,7 +185,7 @@ SoilChemicals::Implementation::output (Log& log) const
 {
   if (log.check ("solutes"))
     {
-      log.open ("solutes");
+      Log::Open open (log, "solutes");
       for (SoluteMap::const_iterator i = solutes.begin ();
 	   i != solutes.end ();
 	   i++)
@@ -189,17 +193,15 @@ SoilChemicals::Implementation::output (Log& log) const
 	  const string& name = (*i).first;
 	  const SoilChemical& solute = *(*i).second;
 
-	  Log::Unnamed unnamed (log);
-	  Log::Maybe maybe (log, name);
+	  Log::Named named (log, name);
 	  log.output ("chemical", name);
 	  if (log.check ("solute"))
 	    {
-	      log.open_alist ("solute", solute.chemical.solute_alist ());
+	      Log::AList alist (log, "solute", 
+				solute.chemical.solute_alist ());
 	      solute.output (log);
-	      log.close_alist ();
 	    }
 	}
-      log.close ();
     }
 }
 void 

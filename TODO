@@ -1,5 +1,13 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* NEWS
+
+** New log parameterizations "Organic Matter" and "AOM Pools".
+
+These log the content of the individual organic matter pools.
+"Organic Matter" logs SOM, SMB and all the AOM's.  "AOM Pools" log all
+the AOMS, or a specific AOM if "$am" is set.
+
 * Få Søren til at se på groundwater pipe fejl.
 
 * User Manual
@@ -38,19 +46,15 @@ Udbyg.
 
 Start ved specifik dato.
 
+** Permanent vegetation
+
+** Simple Crop Types
+
 * Parser & Printer.
 
 ** Don't order attributes when defining paramterizations.
 
 * Log table
-
-** Log af chemicals
-
-Check at det virker, skriv param, opdater tutorial.
-
-** Make it possible to log a specific entry in an array of unnamed objects.
-
-Give "Log::open_unnamed" a numeric argument.
 
 ** Make it possible to create a small balance or summary
 

@@ -42,7 +42,8 @@ public:
   const string name;
   static const char *const description;
   void append_to (vector<OM*>& added);
-  
+  const string& real_name () const;
+
   // Simulation.
 public:
   void output (Log&) const;

@@ -73,8 +73,6 @@ public:
   bool valid ();		// Currently path entry is valid.
   bool valid (const string& next); // Next path entry is valid.
 
-  void open_maybe (const string& value); // Check special values.
-  void close_maybe ();
   void open_group (const string&); // Open one group level.
   void open (const string&);	// Open one leaf level.
   void close ();		// Close one level.
@@ -92,6 +90,7 @@ public:
 
   // Print result at end of time step.
   virtual void done (Destination& dest) = 0;
+  virtual bool prevent_printing ();
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

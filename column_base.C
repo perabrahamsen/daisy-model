@@ -324,8 +324,8 @@ ColumnBase::tick_base (Treelog& msg)
 void
 ColumnBase::output (Log& log) const
 {
+  Log::Geo geo (log, soil);
   Column::output (log);
-  log.open_geometry (soil);
   if (weather)
     output_derived (*weather, "weather", log);
   output_derived (bioclimate, "Bioclimate", log);
@@ -342,7 +342,6 @@ ColumnBase::output (Log& log) const
   log.output ("harvest_DM", log_harvest_DM);
   log.output ("harvest_N", log_harvest_N);
   log.output ("harvest_C", log_harvest_C);
-  log.close_geometry ();
 }
 
 void

@@ -1,4 +1,63 @@
+2002-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.20 released.
+
+2002-03-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai (AOM): Made it hourly.
+	("AOM Pools", "Organic Matter"): New parameterizations.
+	
+
+	* am.C (output): Output `om' as ordered list.
+	* lib/log.dai ("Total Soil Content", "N Balance") Fix users.
+	(Bioincorporation, AOM, "Carbon Balance"): Ditto.
+
+	* log.h, log.C, log_select.C, log_select.h, select.C, select.h,
+	am.C: Removed Log::Maybe, open_maybe and close_maybe.
+	* lib/log.dai (AOM, Bioincorporation): Fixed users.
+
+	* log.h (open_named_entry, close_named_entry): New abstract
+	virtual member functions.
+	* log_select.h, log_select.C: Implemented them.
+	* log_harvest.C: Ditto.
+	* log_table1.C: Ditto.
+	* log_alist.h, log_alist.C: Ditto.
+	* log.h (NamedEntry): New member class.
+	* organic_matter.C (output): Use it.
+	* log.h (Entry): New member class.
+	(output_list): Use it.
+	* field.C (output): Use it.
+	* log.h (Derived): New member class.
+	(output_derived): Use it.
+	* log.h (AList): New member class.
+	* soil_chemicals.C (mix): Use it.
+	* log.h (Geo): New member class.
+	* column_base.C (output): Use it.
+	* log.h (Open): New member class.
+	(output_submodule, output_list, output_named, output_ordered,
+	output_vector): Use it.
+	* action_lisp.C (ActionCond::output): Use it..
+	* cropold.C, cropsold.C (output): Use it.
+	
 2002-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.h, am.C (real_name): New function.
+	* organic_matter.C (output): Use it.
+
+	* select.h, select.C, select_array.C (prevent_printing): New
+	virtual member function.
+	* log_table.C (done): Use it.
+	* lib/log-old.dai ("Soil Chemical"): Moved from `log.dai'.
+	("Chemical"): Ditto.
+
+	* log.h (Named, open_named, close_named, output_named): Support
+	lists of named items.
+	(Ordered, open_ordered, close_ordered, output_ordered): Support
+	lists of ordered items.
+	* soil_chemicals.C (output): Use it.
+	* chemicals.C (output): Use it.
+	* lib/log.dai ("Surface Chemicals", "Soil Chemicals",
+	"Chemicals"): Updated.
 
 	* Version 2.18 released.
 

@@ -86,6 +86,10 @@ LogTable::done ()
   if (!is_printing)
     return;
 
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->prevent_printing ())
+      return;
+
   if (print_tags)
     {
       // Print the entry names in the first line of the log file..

@@ -177,7 +177,7 @@ struct ActionCond : public Action
   { 
     if (log.check ("clauses"))
       {
-	log.open ("clauses");
+	Log::Open open (log, "clauses");
 	for (vector<clause>::const_iterator item = clauses.begin ();
 	     item != clauses.end ();
 	     item++)
@@ -185,7 +185,6 @@ struct ActionCond : public Action
 	    Log::Unnamed unnamed (log);
 	    (*item).output (log);
 	  }
-	log.close ();
       }
   }
 

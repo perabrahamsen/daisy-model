@@ -379,38 +379,17 @@ AM::Implementation::append_to (vector<OM*>& added)
 void
 AM::Implementation::output (Log& log) const
 { 
-  Log::Maybe maybe (log, name);
   log.output ("creation", creation);
   log.output ("name", name);
   if (lock)
     output_submodule (*lock, "lock", log);
-  output_vector (om, "om", log);
+  output_ordered (om, "om", log);
 }
 
 bool 
 AM::Implementation::check (Treelog& /*err*/) const
 { 
   bool ok = true;
-#if 0
-  for (unsigned int i = 0; i < om.size (); i++)
-    {
-      TmpStream tmp;
-      tmp () << "om[" << i << "]";
-      Treelog::Open nest (err, tmp.str ());
-
-      non_negative (om[i]->top_C, "top_C", ok, err);
-
-      for (unsigned int j = 0; j < om[i]->C_per_N.size (); j++)
-	non_negative (om[i]->C_per_N[j], "C_per_N", ok, err, j);
-
-      non_negative (om[i]->turnover_rate, "turnover_rate", ok, err);
-
-      for (unsigned int j = 0; j < om[i]->efficiency.size (); j++)
-	non_negative (om[i]->efficiency[j], "efficiency", ok, err, j);
-
-      non_negative (om[i]->maintenance, "maintenance", ok, err);
-    }
-#endif
   return ok;
 }
 
@@ -505,6 +484,10 @@ AM::Implementation::~Implementation ()
     delete lock;
   sequence_delete (om.begin (), om.end ()); 
 }
+
+const string&
+AM::real_name () const
+{ return impl.name; }
 
 void
 AM::output (Log& log) const

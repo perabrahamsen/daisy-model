@@ -415,15 +415,16 @@ Solute::initialize (const AttributeList& al,
 
   for (unsigned int i = 0; i < soil.size (); i++)
     {
-      if (C_[i] == 0.0)
+      if (M_[i] == 0.0)
 	{
-	  if (M_[i] != 0.0)
+	  if (C_[i] != 0.0)
 	    throw ("C & M mismatch in solute");
 	}
       else
 	{
-	  if (fabs (M_[i] / C_to_M (soil, soil_water.Theta (i), i, C_[i]) 
-		   - 1.0) >= 0.001)
+	  
+	  if (!approximate (C_[i],
+			    M_to_C (soil, soil_water.Theta (i), i, M_[i])))
 	    throw ("Solute C does not match M");
 	}
     }

@@ -48,25 +48,34 @@ struct LogSelect : public Log
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&);
 
-  // Obey conditionals.
-  void open_maybe (const string& value);
-  void close_maybe ();
-
   // Open normal items.
   void open (const string& name);
   void close ();
 
-  // Ignore unnamed items.
+  // Open named items.
+  void open_named (const string& name);
+  void close_named ();
+
+  // Open ordered items.
+  void open_ordered (int index);
+  void close_ordered ();
+
+  // Unnamed items.
   void open_unnamed ();
   void close_unnamed ();
 
-  // Open derived items two steps a time.
+  // Derived items.
   void open_derived (const string& field, const string& type);
   void close_derived ();
 
-  // Open derived items in list normally.
+  // Derived items in a list.
   void open_entry (const string& type, const AttributeList&);
   void close_entry ();
+
+  // Named derived items in a list.
+  void open_named_entry (const string& name, const string& type, 
+			 const AttributeList&);
+  void close_named_entry ();
 
   void output (const string& name, const Time& value);
   void output (const string&, const bool);

@@ -486,10 +486,9 @@ CropSold::Variables::RecPhenology::RecPhenology (const Parameters& par,
 void 
 CropSold::Variables::RecPhenology::output (Log& log) const
 {
-  log.open ("Phenology");
+  Log::Open open (log, "Phenology");
   log.output ("DS", DS);
   log.output ("Vern", Vern);
-  log.close();
 }
 
 CropSold::Variables::RecCanopy::RecCanopy (const Parameters&,
@@ -503,12 +502,11 @@ CropSold::Variables::RecCanopy::RecCanopy (const Parameters&,
 void 
 CropSold::Variables::RecCanopy::output (Log& log) const
 {
-  log.open ("Canopy");
+  Log::Open open (log, "Canopy");
   log.output ("Height", Height);
   log.output ("LAI", LAI);
   log.output ("LADm", LADm);
   log.output ("LAIvsH", LAIvsH);
-  log.close();
 }
 
 CropSold::Variables::RecRootSys::RecRootSys (const Parameters& par,
@@ -529,7 +527,7 @@ CropSold::Variables::RecRootSys::RecRootSys (const Parameters& par,
 void 
 CropSold::Variables::RecRootSys::output (Log& log) const
 {
-  log.open ("RootSys");
+  Log::Open open (log, "RootSys");
   log.output ("Depth", Depth);
   log.output ("Density", Density);
   log.output ("H2OExtraction", H2OExtraction);
@@ -539,7 +537,6 @@ CropSold::Variables::RecRootSys::output (Log& log) const
   log.output ("water_stress", water_stress);
   log.output ("transpiration", transpiration);
   log.output ("Ept", Ept);
-  log.close();
 }
 
 CropSold::Variables::RecProd::RecProd (const Parameters& par, 
@@ -554,13 +551,12 @@ CropSold::Variables::RecProd::RecProd (const Parameters& par,
 void 
 CropSold::Variables::RecProd::output (Log& log) const
 {
-  log.open ("Prod");
+  Log::Open open (log, "Prod");
   log.output ("WLeaf", WLeaf);
   log.output ("WhiteStubble", WhiteStubble);
   log.output ("WSOrg", WSOrg);
   log.output ("WRoot", WRoot);
   log.output ("NCrop", NCrop);
-  log.close();
 }
 
 CropSold::Variables::RecCrpAux::RecCrpAux (const Parameters& par, 
@@ -587,7 +583,7 @@ CropSold::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 void 
 CropSold::Variables::RecCrpAux::output (Log& log) const
 {
-  log.open ("CrpAux");
+  Log::Open open (log, "CrpAux");
   log.output ("InitLAI", InitLAI);
   log.output ("PotRtDpt", PotRtDpt);
   log.output ("PtNCnt", PtNCnt);
@@ -601,7 +597,6 @@ CropSold::Variables::RecCrpAux::output (Log& log) const
   log.output ("NH4Upt", NH4Upt);
   log.output ("NO3Upt", NO3Upt);
   log.output ("Fixated", Fixated);
-  log.close();
 }
 
 CropSold::Variables::~Variables ()

@@ -12,6 +12,26 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.19
+
+** Change the way to specify chemicals for logging.
+
+You can now use a (set "$chem" Atrazine) parameter for "Surface
+Chemicals", "Soil Chemicals" or "Chemicals" to log Atrazine alone, or
+leave it out to log the sum of all chemicals in the soil.  As part of
+this cleanup, the "Chemical" and "Soil Chemical" parameterizations has
+been moved to 'log-old.dai'.
+
+Also, Daisy will now automatically delay the Chemicals log until the
+chemical enters the soil.  This means the number of columns will be
+correct from start.  
+
+** Change the way to specify organic matter for logging.
+
+Update the "Total Soil Content", "N Balance", AOM and Bioincorporation
+log parameterizations.  For AOM, use like (set "$am" "grass/roots") to
+log a specific AOM.  Compared to before, the "?" is missing.
+
 * 2.18
 
 ** Daisy now creates a daisy.log file.

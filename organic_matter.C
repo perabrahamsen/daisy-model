@@ -343,16 +343,28 @@ OrganicMatter::Implementation::output (Log& log,
       log.output ("total_C", total_C);
     }
   log.output ("tillage_age", tillage_age);
-  output_list (am, "am", log, Librarian<AM>::library ());
-  output_vector (smb, "smb", log);
-  output_vector (som, "som", log);
-  output_submodule (buffer, "buffer", log);
-  if (log.check ("Bioincorporation"))
+  if (log.check ("am"))
     {
-      log.open ("Bioincorporation");
-      bioincorporation.output (log);
-      log.close ();
+      const Library& library = Librarian<AM>::library ();
+      
+      Log::Open open (log, "am");
+      for (vector<AM*>::const_iterator item = am.begin(); 
+	   item != am.end();
+	   item++)
+	{
+	  const string& name = (*item)->real_name ();
+	  if (log.check_entry (name, library))
+	    {
+	      Log::NamedEntry named_entry (log, name,
+					   (*item)->name, (*item)->alist);
+	      (*item)->output (log);
+	    }
+	}
     }
+  output_ordered (smb, "smb", log);
+  output_ordered (som, "som", log);
+  output_submodule (buffer, "buffer", log);
+  output_submodule (bioincorporation, "Bioincorporation", log);
   log.output ("NO3_source", NO3_source);
   log.output ("NH4_source", NH4_source);
 }

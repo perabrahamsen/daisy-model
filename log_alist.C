@@ -373,6 +373,15 @@ LogAList::close_entry ()
 }
 
 void
+LogAList::open_named_entry (const string&, const string& type,
+			    const AttributeList& alist)
+{ open_entry (type, alist); }
+
+void
+LogAList::close_named_entry ()
+{ close_entry (); }
+
+void
 LogAList::output (const string& name, const Time& value)
 { 
   if (!is_active)

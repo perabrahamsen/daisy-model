@@ -405,9 +405,8 @@ ColumnStandard::output_inner (Log& log) const
   output_submodule (soil_NO3, "SoilNO3", log);
   if (log.check ("OrganicMatter"))
     {
-      log.open ("OrganicMatter");
+      Log::Open open (log, "OrganicMatter");
       organic_matter.output (log, soil);
-      log.close ();
     }
   output_derived (nitrification, "Nitrification", log);
   output_submodule (denitrification, "Denitrification", log);

@@ -478,9 +478,8 @@ Field::Implementation::output (Log& log) const
     {
       if (log.check_entry ((*i)->name, library))
 	{
-	  log.open_entry ((*i)->name, (*i)->alist);
+	  Log::Entry open_entry (log, (*i)->name, (*i)->alist);
 	  (*i)->output (log);
-	  log.close_entry ();
 	}
     }
 }

@@ -21,6 +21,7 @@
 
 
 #include "log_select.h"
+#include "tmpstream.h"
 
 bool 
 LogSelect::check (const string& name) const
@@ -67,20 +68,6 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 }
 
 void 
-LogSelect::open_maybe (const string& value)
-{ 
-  for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->open_maybe (value);
-}
-
-void 
-LogSelect::close_maybe ()
-{ 
-  for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->close_maybe ();
-}
-
-void 
 LogSelect::open (const string& name)
 { 
   for (unsigned int i = 0; i < entries.size (); i++)
@@ -103,6 +90,26 @@ LogSelect::close_unnamed ()
 { }
 
 void 
+LogSelect::open_named (const string& name)
+{ open (name); }
+
+void 
+LogSelect::close_named ()
+{ close (); }
+
+void 
+LogSelect::open_ordered (int index)
+{ 
+  TmpStream tmp;
+  tmp () << index;
+  open (tmp.str ());
+}
+
+void 
+LogSelect::close_ordered ()
+{ close (); }
+
+void 
 LogSelect::open_derived (const string& field, const string& type)
 { open (field); open (type); }
 
@@ -116,6 +123,15 @@ LogSelect::open_entry (const string& type, const AttributeList&)
 
 void 
 LogSelect::close_entry ()
+{ close (); }
+
+void 
+LogSelect::open_named_entry (const string& name, const string&, 
+			     const AttributeList&)
+{ open (name); }
+
+void 
+LogSelect::close_named_entry ()
 { close (); }
 
 void 

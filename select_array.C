@@ -66,6 +66,9 @@ struct SelectArray : public Select
       count = 0;
   }
 
+  bool prevent_printing ()
+  { return count == 0; }
+
   const Geometry* geometry () const
   { return last_geometry; }
 

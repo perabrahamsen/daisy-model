@@ -106,28 +106,34 @@ struct LogHarvest : public Log
   void done ()
   { assert (false); }
 
-  // Open normal items.
+  // Normal items.
   void open (const string&)
   { assert (false); }
   void close ()
   { assert (false); }
 
-  // Ignore unnamed items.
+  // Unnamed items.
   void open_unnamed ()
   { assert (false); }
   void close_unnamed ()
   { assert (false); }
 
-  // Open derived items two steps a time.
+  // Derived items.
   void open_derived (const string&, const string&)
   { assert (false); }
   void close_derived ()
   { assert (false); }
 
-  // Open derived items in list normally.
+  // Derived items in a list.
   void open_entry (const string&, const AttributeList&)
   { assert (false); }
   void close_entry ()
+  { assert (false); }
+
+  // Named derived items in a list.
+  void open_named_entry (const string&, const string&, const AttributeList&)
+  { assert (false); }
+  void close_named_entry ()
   { assert (false); }
 
   void output (const string&, const Time&)

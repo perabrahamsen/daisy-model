@@ -218,8 +218,7 @@ Chemicals::Implementation::output (Log& log) const
     { 
       const string& name = (*i).first->name;
       const double amount = (*i).second;
-      Log::Unnamed unnamed (log);
-      Log::Maybe maybe (log, name);
+      Log::Named named (log, name);
       log.output ("chemical", name);
       log.output ("amount", amount);
     }

@@ -81,6 +81,10 @@ struct LogAList : public Log
   void open_entry (const string& type,   // Items in an Object sequence.
 		   const AttributeList& alist);
   void close_entry ();
+  void open_named_entry (const string& name,   // Named items in an Obj seq.
+			 const string& type, 
+			 const AttributeList& alist);
+  void close_named_entry ();
 
   // Logging.
   void output (const string& name, const Time& value);

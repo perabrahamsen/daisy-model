@@ -61,12 +61,20 @@ Log::check_entry (const string& name, const Library& library) const
 
 
 void 
-Log::open_maybe (const string&)
-{ }
+Log::open_named (const string&)
+{ open_unnamed (); }
 
 void 
-Log::close_maybe ()
-{ }
+Log::close_named ()
+{ close_unnamed (); }
+
+void 
+Log::open_ordered (int)
+{ open_unnamed (); }
+
+void 
+Log::close_ordered ()
+{ close_unnamed (); }
 
 void 
 Log::open_alist (const string& name, const AttributeList&)
@@ -91,6 +99,7 @@ Log::close_geometry ()
 const Geometry*
 Log::geometry ()
 {
+  assert (!impl.geometries.empty ());
   return impl.geometries.back ();
 }
 

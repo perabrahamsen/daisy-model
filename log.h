@@ -54,30 +54,27 @@ public:
   // Called at the end of each time step.
   virtual void done ();
 
-  // Conditionals.
+  // Normal items.
 public:
-  struct Maybe
+  struct Open
   {
   private:
     Log& ll;
   public:
-    Maybe (Log& l, const string& value)
+    Open (Log& l, const string& name)
       : ll (l)
-    { ll.open_maybe (value); }
-    ~Maybe ()
-    { ll.close_maybe (); }
+    { ll.open (name); }
+    ~Open ()
+    { ll.close (); }
   };
 private:
-  virtual void open_maybe (const string& value);
-  virtual void close_maybe ();
-  friend struct Log::Maybe;
-
-  // Normal items.
-public:
   virtual void open (const string&) = 0;
   virtual void close () = 0;
+  friend struct Log::Open;
 
-  // Lists.
+public:
+
+  // Backward compatible lists.
 public:
   struct Unnamed
   {
@@ -94,20 +91,120 @@ private:
   virtual void open_unnamed () = 0;
   virtual void close_unnamed () = 0;
   friend struct Log::Unnamed;
+  
+  // Named lists.
+public:
+  struct Named
+  {
+  private:
+    Log& ll;
+  public:
+    Named (Log& l, const string& name)
+      : ll (l)
+    { ll.open_named (name); }
+    ~Named ()
+    { ll.close_named (); }
+  };
+private:
+  virtual void open_named (const string& name);
+  virtual void close_named ();
+  friend struct Log::Named;
+
+  // Ordered lists.
+public:
+  struct Ordered
+  {
+  private:
+    Log& ll;
+  public:
+    Ordered (Log& l, int index)
+      : ll (l)
+    { ll.open_ordered (index); }
+    ~Ordered ()
+    { ll.close_ordered (); }
+  };
+private:
+  virtual void open_ordered (int index);
+  virtual void close_ordered ();
+  friend struct Log::Ordered;
 
   // AList singletons variant.
 public:
+  struct AList
+  {
+  private:
+    Log& ll;
+  public:
+    AList (Log& l, const string& name, const AttributeList& alist)
+      : ll (l)
+    { ll.open_alist (name, alist); }
+    ~AList ()
+    { ll.close_alist (); }
+  };
+private:
   virtual void open_alist (const string& name, const AttributeList& alist);
   virtual void close_alist ();
+  friend struct Log::AList;
 
   // Derived objects.
+public:
+  struct Derived
+  {
+  private:
+    Log& ll;
+  public:
+    Derived (Log& l, const string& field, const string& type)
+      : ll (l)
+    { ll.open_derived (field, type); }
+    ~Derived ()
+    { ll.close_derived (); }
+  };
+private:
   virtual void open_derived (const string& field, const string& type) = 0;
   virtual void close_derived () = 0;
+  friend struct Log::Derived;
 
   // Derived objects in a variable length list.
+public:
+  struct Entry
+  {
+  private:
+    Log& ll;
+  public:
+    Entry (Log& l, const string& type, 
+	   const AttributeList& alist)
+      : ll (l)
+    { ll.open_entry (type, alist); }
+    ~Entry ()
+    { ll.close_entry (); }
+  };
+private:
   virtual void open_entry (const string& type, const AttributeList&) = 0;
   virtual void close_entry () = 0;
+  friend struct Log::Entry;
 
+  // Named derived objects in a variable length list.
+public:
+  struct NamedEntry
+  {
+  private:
+    Log& ll;
+  public:
+    NamedEntry (Log& l, const string& name, const string& type, 
+		const AttributeList& alist)
+      : ll (l)
+    { ll.open_named_entry (name, type, alist); }
+    ~NamedEntry ()
+    { ll.close_named_entry (); }
+  };
+private:
+  virtual void open_named_entry (const string& name, const string& type,
+				 const AttributeList&) = 0;
+  virtual void close_named_entry () = 0;
+  friend struct Log::NamedEntry;
+
+  // The data.
+public:
   virtual void output (const string&, const Time&) = 0;
   virtual void output (const string&, const bool) = 0;
   virtual void output (const string&, const double) = 0;
@@ -116,11 +213,28 @@ public:
   virtual void output (const string&, const vector<double>&) = 0;
   virtual void output (const string&, const PLF&) = 0;
 
+  // Keep track of geometry for logging arrays.
+public:
+  struct Geo
+  {
+  private:
+    Log& ll;
+  public:
+    Geo (Log& l, const Geometry& geo)
+      : ll (l)
+    { ll.open_geometry (geo); }
+    ~Geo ()
+    { ll.close_geometry (); }
+  };
+private:
   void open_geometry (const Geometry&);
   void close_geometry ();
+  friend struct Log::Geo;
+public:
   const Geometry* geometry ();
 
   // Utilities
+public:
   static void print_dlf_header (ostream& out, const AttributeList& al);
 
   // Create and Destroy.
@@ -135,21 +249,18 @@ public:
 static Librarian<Log> Log_init ("log");
 
 // Output an alist.
-
 template <class T> void
 output_submodule (const T& submodule, 
 		  const char* name, Log& log)
 {
   if (log.check (name))
     {
-      log.open (name);
+      Log::Open open (log, name);
       submodule.output (log);
-      log.close ();
     }
 }
 
 // Output an object.
- 
 template <class T> void
 output_derived (const T& submodule, const char* name, Log& log)
 {
@@ -157,44 +268,75 @@ output_derived (const T& submodule, const char* name, Log& log)
 
   if (log.check_derived (name, submodule.name, library))
     {
-      log.open_derived (name, submodule.name);
+      Log::Derived derived (log, name, submodule.name);
       submodule.output (log);
-      log.close_derived ();
     }
 }
 
 // Output a list of objects.
-
 template <class T> void
 output_list (T const& items, const char* name, Log& log, 
 	     const Library& library)
 {
   if (log.check (name))
     {
-      log.open (name);
+      Log::Open open (log, name);
       for (typename T::const_iterator item = items.begin(); 
 	   item != items.end();
 	   item++)
 	{
 	  if (log.check_entry ((*item)->name, library))
 	    {
-	      log.open_entry ((*item)->name, (*item)->alist);
+	      Log::Entry entry (log, (*item)->name, (*item)->alist);
 	      (*item)->output (log);
-	      log.close_entry ();
 	    }
 	}
-      log.close ();
     }
 }
 
-// Output a list of unnamed alists.
+// Output a list of named alists.
+template <class T> void
+output_named (T const& items, const char* name, Log& log)
+{
+  if (log.check (name))
+    {
+      Log::Open open (log, name);
+      for (typename T::const_iterator item = items.begin ();
+	   item != items.end ();
+	   item++)
+	{
+	  Log::Named named (log, (*item)->name);
+	  (*item)->output (log);
+	}
+    }
+}
 
+// Output an ordered list of alists.
+template <class T> void
+output_ordered (T const& items, const char* name, Log& log)
+{
+  if (log.check (name))
+    {
+      Log::Open open (log, name);
+      int i = 0;
+      for (typename T::const_iterator item = items.begin ();
+	   item != items.end ();
+	   item++)
+	{
+	  Log::Ordered ordered (log, i);
+	  (*item)->output (log);
+	  i++;
+	}
+    }
+}
+
+// Output a list of unnamed and unordered alists.
 template <class T> void
 output_vector (T const& items, const char* name, Log& log)
 {
   if (log.check (name))
     {
-      log.open (name);
+      Log::Open open (log, name);
       for (typename T::const_iterator item = items.begin ();
 	   item != items.end ();
 	   item++)
@@ -202,7 +344,6 @@ output_vector (T const& items, const char* name, Log& log)
 	  Log::Unnamed unnamed (log);
 	  (*item)->output (log);
 	}
-      log.close ();
     }
 }
 

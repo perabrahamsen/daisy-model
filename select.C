@@ -60,8 +60,6 @@ struct Select::Implementation
 				// have matched.
   bool valid ();		// If the current path index is valid.
   bool valid (const string& name); // Is the next path index valid?
-  void open_maybe (const string& value);
-  void close_maybe ();		// Close one level.
   void open_group (const string& name);
   void open (const string& name); // Open one leaf level.
   void close ();		// Close one level.
@@ -173,36 +171,6 @@ Select::Implementation::valid (const string& name)
   // Is the next path index valid?
   return valid () && (path[current_path_index] == "*" 
 		      || name == path[current_path_index]); 
-}
-
-void 
-Select::Implementation::open_maybe (const string& value)
-{
-  const string question_mark = "?";
-    
-  if (valid ()
-      && path[current_path_index][0] == '?'
-      && question_mark + value == path[current_path_index])
-    {
-      maybies.push_back (true);
-      last_valid_path_index++;
-      current_path_index++;
-    }
-  else
-    maybies.push_back (false);
-}
-
-void 
-Select::Implementation::close_maybe ()		// Close one level.
-{
-  assert (!maybies.empty ());
-  if (maybies.back ())
-    {
-      assert (current_path_index == last_valid_path_index);
-      last_valid_path_index--;
-      current_path_index--;
-    }
-  maybies.pop_back ();
 }
 
 void 
@@ -329,14 +297,6 @@ bool
 Select::valid (const string& name)
 { return impl.valid (name); }
 
-void
-Select::open_maybe (const string& value)
-{ impl.open_maybe (value); }
-
-void 
-Select::close_maybe ()		// Close one level.
-{ impl.close_maybe (); }
-
 void 
 Select::open_group (const string& name) // Open one group level.
 { impl.open_group (name); }
@@ -380,7 +340,7 @@ Select::output_name (const string& name, const string&)
 
 void 
 Select::output_array (const string& name, const vector<double>&,
-		const Geometry*)
+		      const Geometry*)
 { 
   if (is_active () && valid (name))
     throw ("This log selection can't log arrays."); 
@@ -390,6 +350,10 @@ Select::output_array (const string& name, const vector<double>&,
 bool 
 Select::match (const Daisy& daisy, Treelog& out, bool is_printing)
 { return impl.match (daisy, out, is_printing); }
+
+bool
+Select::prevent_printing ()
+{ return false; }
 
 void 
 Select::load_syntax (Syntax& syntax, AttributeList& alist)
