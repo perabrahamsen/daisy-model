@@ -5,13 +5,21 @@
 
 #include "daisy.h"
 
-struct ValueList;
+struct AttributeList;
 
 class Column
 {
     // Content.
     struct Implementation;
     Implementation& impl;
+#ifdef COLUMN_INTERNALS
+    struct RecCanStr
+    {
+	vector<double> CanLAD;
+	vector<double> CanPAR;
+	vector<double> CanPTr;
+    } CanStr;
+#endif COLUMN_INTERNALS
     Log& log;
 public:
     string name;
@@ -25,7 +33,7 @@ public:
 
     // Create and Destroy.
 public:
-    Column (Log&, string, const ValueList*, const Library&);
+    Column (Log&, string, const AttributeList&, const Library&);
     ~Column ();
 };
 

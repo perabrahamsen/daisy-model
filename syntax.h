@@ -3,7 +3,7 @@
 #include <std/string.h>
 
 struct FTable;
-struct ValueList;
+struct AttributeList;
 struct Log;
 
 // Ensure the syntax table is initialized.
@@ -23,7 +23,7 @@ class Syntax
 public:
     enum type 
     { Number, List, Rules, CSMP, Function, Array, Boolean, Error };
-    bool check (string, const ValueList*, const Log&) const;
+    bool check (string, const AttributeList&, const Log&) const;
     type lookup (string) const;
     const Syntax* syntax (string) const;
     const FTable* function (string) const;

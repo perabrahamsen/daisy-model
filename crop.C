@@ -8,10 +8,10 @@ Crop::tick (const Wheather& /* wheater */, int /* day */, int /* hour */)
     cout << "Crop `" << name << "' tick\n"; 
 }
 
-Crop::Crop (Log& l, const string n, const ValueList* vl, Column& c)
+Crop::Crop (Log& l, const string n, const AttributeList& vl, Column& c)
     : 
-      par (*new Parameters (vl)),
-      var (*new Variables ()),
+      par (Parameters::get (n, vl)),
+      var (*new Variables (par)),
       log (l), 
       name (n),
       column (c)

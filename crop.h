@@ -5,7 +5,7 @@
 
 #include "daisy.h"
 
-struct ValueList;
+struct AttributeList;
 
 class Crop 
 {
@@ -29,7 +29,7 @@ public:
 
     // Create and Destroy.
 public:
-    Crop (Log&, const string, const ValueList*, Column&);
+    Crop (Log&, const string, const AttributeList&, Column&);
     ~Crop ();
 };
 

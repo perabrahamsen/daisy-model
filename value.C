@@ -5,71 +5,125 @@
 #include "condition.h"
 #include <assert.h>
 
-template class vector<double>;
+// @ Value
+//
+// Common abstraction of an attribute value.
 
-const char*
-InvalidValue::what () const
-{ 
-    return "Invalid value";
-}
+class Value
+{
+public:
+    virtual double number () const throw (AttributeList::Invalid);
+    virtual string name () const throw (AttributeList::Invalid);
+    virtual bool flag () const throw (AttributeList::Invalid);
+    virtual const vector<double>& array ()
+        const throw (AttributeList::Invalid);
+    virtual const Rules& rules () const throw (AttributeList::Invalid);
+    virtual const CSMP& csmp () const throw (AttributeList::Invalid);
+    virtual const AttributeList& list () const throw (AttributeList::Invalid);
+protected:
+    Value ();
+    virtual ~Value ();
+};
 
-const char*
-UninitializedValue::what () const
-{ 
-    return "Uninitialized value";
-}
+// Specific attribute values.
+
+class ValueNumber : public Value
+{
+    const double value;
+public:
+    double number () const;
+    ValueNumber (double);
+};
+
+class ValueString : public Value
+{
+    string value;
+public:
+    string name () const;
+    ValueString (string);
+};
+
+class ValueBool : public Value
+{
+    bool value;
+public:
+    bool flag () const;
+    ValueBool (bool);
+};
+
+class ValueArray : public Value
+{
+    vector<double> value;
+public:
+    const vector<double>& array () const;
+    ValueArray (const vector<double>&);
+};
+
+class ValueList : public Value
+{
+    const AttributeList& value;
+public:
+    const AttributeList& list () const;
+    ValueList (const AttributeList&);
+};
+
+class ValueRules : public Value
+{
+    const Rules& value;
+public:
+    const Rules& rules () const;
+    ValueRules (const Rules&);
+};
+
+class ValueCSMP : public Value
+{
+    const CSMP& value;
+public:
+    const CSMP& csmp () const;
+    ValueCSMP (const CSMP&);
+};
 
 double
-Value::number () const throw (InvalidValue)
+Value::number () const throw (AttributeList::Invalid)
 { 
-    THROW (InvalidValue ());
+    THROW (AttributeList::Invalid ());
 }
 
 string
-Value::name () const throw (InvalidValue)
+Value::name () const throw (AttributeList::Invalid)
 { 
-    THROW (InvalidValue ());
+    THROW (AttributeList::Invalid ());
 }
 
 bool
-Value::flag () const throw (InvalidValue)
+Value::flag () const throw (AttributeList::Invalid)
 { 
-    THROW (InvalidValue ());
+    THROW (AttributeList::Invalid ());
 }
 
-#ifdef USE_VIRTUAL_VALUE
-Value* 
-Value::lookup (string) const throw (UninitializedValue, InvalidValue) 
+const
+vector<double>& Value::array () const throw (AttributeList::Invalid)
 { 
-    THROW (InvalidValue ());
+    THROW (AttributeList::Invalid ());
 }
 
-Value* 
-Value::check (string) const throw (InvalidValue)
+const
+Rules& Value::rules () const throw (AttributeList::Invalid)
 { 
-    THROW (InvalidValue ());
+    THROW (AttributeList::Invalid ());
 }
 
-const Action* 
-Value::match (ColumnList&, const Wheather&,
-	      int /* day */, int /* hour */) const throw (InvalidValue)
-{
-    THROW (InvalidValue ());
-}    
-
-double
-Value::y (double /* x */) const throw (InvalidValue)
+const
+CSMP& Value::csmp () const throw (AttributeList::Invalid)
 { 
-    THROW (InvalidValue ());
+    THROW (AttributeList::Invalid ());
 }
 
-double
-Value::operator[] (int) const throw (InvalidValue)
+const
+AttributeList& Value::list () const throw (AttributeList::Invalid)
 { 
-    THROW (InvalidValue ());
+    THROW (AttributeList::Invalid ());
 }
-
-#endif
 
 Value::Value ()
 { }
@@ -86,69 +140,63 @@ ValueNumber::number () const
 ValueNumber::ValueNumber (double n) : value (n)
 { }
 
-struct ValueList::Implementation
+string
+ValueString::name () const
 {
-    // This should be replaced with a STL map.
-    // THIS SHOULD BE REPLACED WITH A STL MAP.
-    // I'm not this stupid.  Honestly.
-    const int UGLY_MAX_SIZE = 1024;
-    string UGLY_key[UGLY_MAX_SIZE];
-    Value* UGLY_value[UGLY_MAX_SIZE];
-    int size;
-    Implementation ();
-};    
+    return value;
+}
 
-ValueList::Implementation::Implementation () : size (0)
+ValueString::ValueString (string s) : value (s)
 { }
 
-Value* 
-ValueList::lookup (string key) const throw (UninitializedValue)
-{ 
-    Value* value = check (key);
-    if (value)
-	return value;
-    THROW (UninitializedValue ());
-}
-
-Value* 
-ValueList::check (string key) const throw0 ()
-{ 
-    for (int i = 0; i < impl.size; i++)
-	if (impl.UGLY_key[i] == key)
-	    return impl.UGLY_value[i];
-    return NULL;
-}
-
-void
-ValueList::add (string key, Value* value)
+bool
+ValueBool::flag () const
 {
-    assert (impl.size < impl.UGLY_MAX_SIZE);
-    impl.UGLY_key[impl.size] = key;
-    impl.UGLY_value[impl.size] = value;
-    impl.size++;
+    return value;
 }
 
-ValueList::ValueList () : impl (*new Implementation ())
+ValueBool::ValueBool (bool b) : value (b)
 { }
 
-ValueList::ValueList (const ValueList& old) : impl (*new Implementation ())
-{ 
-    impl.size = old.impl.size;
-    for (int i = 0; i < impl.size; i++)
-	{
-	    impl.UGLY_key[i] = old.impl.UGLY_key[i];
-	    impl.UGLY_value[i] = old.impl.UGLY_value[i];
-	}
-}
-
-ValueList::~ValueList ()
+const vector<double>&
+ValueArray::array () const
 {
-    delete &impl; 
+    return value;
 }
 
-const ValueList ValueList::empty;
+ValueArray::ValueArray (const vector<double>& v) : value (v)
+{ }
 
-struct ValueRules::Implementation
+const Rules& 
+ValueRules::rules () const
+{
+    return value;
+}
+
+ValueRules::ValueRules (const Rules& v) : value (v)
+{ }
+
+const CSMP& 
+ValueCSMP::csmp () const
+{
+    return value;
+}
+
+ValueCSMP::ValueCSMP (const CSMP& v) : value (v)
+{ }
+
+const AttributeList& 
+ValueList::list () const
+{
+    return value;
+}
+
+ValueList::ValueList (const AttributeList& v) : value (v)
+{ }
+
+// @ Rules
+
+struct Rules::Implementation
 {
     struct Rule
     {
@@ -161,19 +209,19 @@ struct ValueRules::Implementation
     RuleList super;    
 };
 
-ValueRules::Implementation::Rule::Rule (Condition const* c, Action const* a) 
+Rules::Implementation::Rule::Rule (Condition const* c, Action const* a) 
     : condition (c), 
       action (a)
 { }
 
 void 
-ValueRules::add (Condition* c, Action* a)
+Rules::add (Condition* c, Action* a)
 {
     impl.rules.push_front (new Implementation::Rule (c, a));
 }
 
 const Action*
-ValueRules::match (ColumnList& cl, const Wheather& w, int day, int hour) const
+Rules::match (ColumnList& cl, const Wheather& w, int day, int hour) const
 {
     for (Implementation::RuleList::iterator i = impl.rules.begin ();
 	 i != impl.rules.end ();
@@ -192,7 +240,7 @@ ValueRules::match (ColumnList& cl, const Wheather& w, int day, int hour) const
     return &Action::null;
 }
 
-ValueRules::ValueRules (const ValueRules *const old = NULL)
+Rules::Rules (const Rules *const old = NULL)
     : impl (*new Implementation)
 { 
     if (old)
@@ -214,21 +262,23 @@ ValueRules::ValueRules (const ValueRules *const old = NULL)
 	}
 }
 
-ValueRules::~ValueRules ()
+Rules::~Rules ()
 { 
     delete &impl;
     // I should delete all members of `impl.rules' here, but they
-    // might appear in some other ValueRules `impl.super'.  Obviously
+    // might appear in some other Rules `impl.super'.  Obviously
     // the solution is to use `list <RefCount <Rules> >' instead of
     // `list <Rules*>'.  The same is true for the other places I use
     // STL containers.  I'll experiement with this latter.  BTW: It
-    // isn't a real memory leak, as ValueRules are created during
+    // isn't a real memory leak, as Rules are created during
     // initialization, and deleted only when the simulation is over,
     // after which the program ends. However, it might be useful one
     // day to run multiple simulations in the same program execution.
 }
 
-struct ValueCSMP::Implementation
+// @ CSMP
+
+struct CSMP::Implementation
 {
     struct pair
     {
@@ -241,22 +291,22 @@ struct ValueCSMP::Implementation
     PairVector points;
 };
 
-ValueCSMP::Implementation::pair::pair (double a, double b)
+CSMP::Implementation::pair::pair (double a, double b)
     : x(a), y(b)
 { }
 
-ValueCSMP::Implementation::pair::pair ()
+CSMP::Implementation::pair::pair ()
     : x(0.0), y(0.0)
 { }
 
 void 
-ValueCSMP::add (double x , double y)
+CSMP::add (double x , double y)
 {
     impl.points.push_back (Implementation::pair(x, y));
 }
 
 double
-ValueCSMP::y (double x) const
+CSMP::operator() (double x) const
 {
     for (unsigned int i = 0; i < impl.points.size(); i++)
 	{
@@ -274,53 +324,180 @@ ValueCSMP::y (double x) const
     return impl.points[impl.points.size () - 1].y;
 }
 
-ValueCSMP::ValueCSMP ()
+CSMP::CSMP ()
     : impl (*new Implementation)
 {}
-ValueCSMP::~ValueCSMP ()
+CSMP::~CSMP ()
 {
     delete &impl;
 }
 
-void
-ValueArray::add (double d)
+// @ AttributeList
+
+struct AttributeList::Implementation
+{
+    // This should be replaced with a STL map.
+    // THIS SHOULD BE REPLACED WITH A STL MAP.
+    // I'm not this stupid.  Honestly.
+    const int UGLY_MAX_SIZE = 1024;
+    string UGLY_key[UGLY_MAX_SIZE];
+    const Value* UGLY_value[UGLY_MAX_SIZE];
+    int size;
+    const Value* lookup (string key) const throw (Uninitialized);
+    void add (string key, const Value* value);
+    Implementation ();
+};    
+
+AttributeList::Implementation::Implementation () : size (0)
+{ }
+
+const Value* 
+AttributeList::Implementation::lookup (string key) const throw (Uninitialized)
 { 
-    impl.push_back (d);
+    for (int i = 0; i < size; i++)
+	if (UGLY_key[i] == key)
+	    return UGLY_value[i];
+    THROW (UninitializedValue ());
 }
 
-double
-ValueArray::operator[] (int index) const
+void
+AttributeList::Implementation::add (string key, const Value* value)
 {
-    return impl[index];
+    assert (size < UGLY_MAX_SIZE);
+    UGLY_key[size] = key;
+    UGLY_value[size] = value;
+    size++;
 }
 
-ValueArray::ValueArray ()
-{ }
-
-ValueArray::~ValueArray ()
-{ }
-
-string
-ValueString::name () const
-{
-    return impl;
+#ifdef HANDLE_EXCEPTIONS
+const char*
+AttributeList::Invalid::what () const
+{ 
+    return "Invalid value";
 }
 
-ValueString::ValueString (string s) : impl (s)
-{ }
+const char*
+AttributeList::Uninitialized::what () const
+{ 
+    return "Uninitialized value";
+}
 
-ValueString:: ~ValueString ()
-{ }
+#endif
 
 bool
-ValueBool::flag () const
-{
-    return impl;
+AttributeList::check (string key) const throw0 ()
+{ 
+    for (int i = 0; i < impl.size; i++)
+	if (impl.UGLY_key[i] == key)
+	    return true;
+    return false;
 }
 
-ValueBool::ValueBool (bool b) : impl (b)
+double 
+AttributeList::number (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->number ();
+}
+
+string 
+AttributeList::name (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->name ();
+}
+
+bool 
+AttributeList::flag (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->flag ();
+}
+
+const vector<double>& 
+AttributeList::array (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->array ();
+}
+
+const Rules& 
+AttributeList::rules (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->rules ();
+}
+
+const CSMP& 
+AttributeList::csmp (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->csmp ();
+}
+
+const AttributeList& 
+AttributeList::list (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->list ();
+}
+
+void 
+AttributeList::add (string key , double v)
+{
+    impl.add (key, new ValueNumber (v));
+}
+
+void 
+AttributeList::add (string key, string v)
+{
+    impl.add (key, new ValueString (v));
+}
+
+void 
+AttributeList::add (string key, bool v)
+{
+    impl.add (key, new ValueBool (v));
+}
+
+void 
+AttributeList::add (string key, const AttributeList* v)
+{
+    impl.add (key, new ValueList (*v));
+}
+
+void 
+AttributeList::add (string key, const Rules* v)
+{
+    impl.add (key, new ValueRules (*v));
+}
+
+void 
+AttributeList::add (string key, const CSMP* v)
+{
+    impl.add (key, new ValueCSMP (*v));
+}
+
+void 
+AttributeList::add (string key, const vector<double>& v)
+{
+    impl.add (key, new ValueArray (v));
+}
+
+AttributeList::AttributeList ()
+    : impl (*new Implementation ())
 { }
 
-ValueBool:: ~ValueBool ()
-{ }
+AttributeList::AttributeList (const AttributeList& old)
+    : impl (*new Implementation ())
+{ 
+    impl.size = old.impl.size;
+    for (int i = 0; i < impl.size; i++)
+	{
+	    impl.UGLY_key[i] = old.impl.UGLY_key[i];
+	    impl.UGLY_value[i] = old.impl.UGLY_value[i];
+	}
+}
+
+AttributeList::~AttributeList ()
+{
+    delete &impl; 
+}
+
+const AttributeList AttributeList::empty;
+
+
 

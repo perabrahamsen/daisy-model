@@ -35,25 +35,23 @@ struct Syntax::Implementation
 };    
 
 bool 
-Syntax::check (string name, const ValueList* vl, const Log& log) const
+Syntax::check (string name, const AttributeList& vl, const Log& log) const
 {
     bool error = false;
 
     for (int i = 0; i < impl.size; i++)
 	{
 	    string key = impl.UGLY_key[i];
-	    if (!vl->check (key))
+	    if (!vl.check (key))
 		{
 		    cerr << "Attributte " << key << "\n";
 		    error = true;
 		}
 	    else if (impl.UGLY_type[i] == List)
 		{
-		    error |= !impl.UGLY_syntax[i]->check 
-			(key, 
-			 BUG_DYNAMIC_CAST (const ValueList*,
-					   vl->lookup (key)),
-			 log);
+		    error |= !impl.UGLY_syntax[i]->check (key, 
+							  vl.list (key),
+							  log);
 		}
 	}
     if (error)

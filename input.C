@@ -45,7 +45,7 @@ struct Input::Implementation
     bool looking_at (char);
     void eof ();
     void load_library (Library& lib);
-    void load_list (ValueList*, const Syntax*);
+    void load_list (AttributeList*, const Syntax*);
     Condition* get_condition ();
     Action* get_action ();
     istream* in;
@@ -113,7 +113,7 @@ Input::Implementation::load ()
 		    while (!looking_at (')'))
 			{
 			    string name = get_id ();
-			    const ValueList* values 
+			    const AttributeList& values 
 				= columns.lookup (name);
 			    field.push_back (new Column(log, name, 
 							values, horizons));
@@ -324,14 +324,14 @@ Input::Implementation::load_library (Library& lib)
 	    skip_to_end ();
 	    return;
 	}
-    const ValueList* sl = lib.lookup (super);
-    ValueList* atts = new ValueList (*sl);
+    const AttributeList& sl = lib.lookup (super);
+    AttributeList* atts = new AttributeList (sl);
     load_list (atts, lib.syntax (super));
-    lib.add (name, atts, lib.syntax (super));
+    lib.add (name, *atts, lib.syntax (super));
 }
 
 void
-Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
+Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 { 
     while (!looking_at (')') && good ())
 	{
@@ -340,20 +340,20 @@ Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
 	    switch (syntax->lookup (name))
 		{
 		case Syntax::Number:
-		    atts->add (name, new ValueNumber (get_number ()));
+		    atts->add (name, get_number ());
 		    break;
 		case Syntax::List: 
 		{
-		    ValueList* list = new ValueList ();
+		    AttributeList* list = new AttributeList ();
 		    load_list (list, syntax->syntax (name));
 		    atts->add (name, list);
 		    break;
 		}
 		case Syntax::Rules:
 		{
-		    // BUG: SHOULD USE DYNAMIC CAST
-		    ValueRules* rules  
-			= new ValueRules ((ValueRules*) (atts->check (name)));
+		    Rules* rules = atts->check (name) 
+			? new Rules (&atts->rules (name))
+			: new Rules ();
 		    skip ("(");
 		    while (!looking_at (')') && good ())
 			{
@@ -369,7 +369,7 @@ Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
 		}
 		case Syntax::CSMP:
 		{
-		    ValueCSMP* csmp = new ValueCSMP ();
+		    CSMP* csmp = new CSMP ();
 		    double last_x;
 		    int count = 0;
 		    while (!looking_at (')') && good ())
@@ -392,16 +392,16 @@ Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
 		    break;
 		}
 		case Syntax::Function:
-		    atts->add (name, new ValueString (get_id ()));
+		    atts->add (name, get_id ());
 		    break;
 		case Syntax::Array:
 		{
-		    ValueArray* array = new ValueArray ();
+		    vector<double> array;
 		    int count = 0;
 		    int size = syntax->size (name);
 		    while (!looking_at (')') && good ())
 			{
-			    array->add (get_number ());
+			    array.push_back (get_number ());
 			    count++;
 			}
 		    if (size >= 0 && count != size)
@@ -412,7 +412,7 @@ Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
 			    error (str.str ());
 
 			    for (;count < size; count++)
-				array->add (-1.0);
+				array.push_back (-1.0);
 			}
 		    atts->add (name, array);
 		    break;
@@ -422,10 +422,10 @@ Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
 		    string flag = get_id ();
 
 		    if (flag == "true")
-			atts->add (name, new ValueBool (true));
+			atts->add (name, true);
 		    else
 			{
-			    atts->add (name, new ValueBool (false));
+			    atts->add (name, false);
 			    if (flag != "false")
 				error ("Expected `true' or `false'");
 			}

@@ -3,16 +3,16 @@
 #include <std/string.h>
 
 struct Syntax;
-struct ValueList;
+struct AttributeList;
 
 class Library
 {
     struct Implementation;
     Implementation& impl;
 public:
-    const ValueList* lookup (string) const;
+    const AttributeList& lookup (string) const;
     bool check (string) const;
-    void add (string, ValueList*, const Syntax*);
+    void add (string, const AttributeList&, const Syntax*);
     const Syntax* syntax (string) const;
     Library ();
     ~Library ();

@@ -13,7 +13,7 @@ daisy:	$(OBJ)
 	$(CC) -o daisy $(OBJ)
 
 bug: bug.C
-	$(CC) -v -c -o bug bug.C
+	$(CC) -v -c bug.C
 
 wc: $(TEXT)
 	wc $(TEXT)
@@ -66,6 +66,6 @@ action.o: action.C action.h daisy.h column.h
 condition.o: condition.C condition.h daisy.h
 horizon.o: horizon.C horizon.h daisy.h syntax.h
 ftable.o: ftable.C ftable.h
-crop_impl.o: crop_impl.C crop_impl.h crop.h daisy.h ftable.h value.h \
- syntax.h
+crop_impl.o: crop_impl.C crop_impl.h crop.h daisy.h ftable.h syntax.h \
+ value.h
 template.o: template.C ftable.h ftable.t crop_impl.h crop.h daisy.h

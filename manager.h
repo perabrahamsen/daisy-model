@@ -5,7 +5,7 @@
 
 #include "daisy.h"
 
-struct ValueList;
+struct AttributeList;
 struct Action;
 
 class Manager
@@ -22,7 +22,7 @@ public:
     // Create and Destroy.
 private:
     friend Input; // Only create from Input.
-    Manager (Log&, const ValueList*);
+    Manager (Log&, const AttributeList&);
 public:
     ~Manager ();
 };

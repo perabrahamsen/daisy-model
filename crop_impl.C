@@ -1,127 +1,222 @@
 // crop_impl.C
 
 #include "crop_impl.h"
-#include "value.h"
 #include "syntax.h"
+#include "value.h"
 
-Crop::Parameters::Parameters (const ValueList* vl) 
-    : Devel (BUG_DYNAMIC_CAST (const ValueList*, vl->lookup ("Devel"))),
-      Vernal (BUG_DYNAMIC_CAST (const ValueList*, vl->lookup ("Vernal"))),
-      LeafPhot (BUG_DYNAMIC_CAST (const ValueList*,
-				  vl->lookup ("LeafPhot"))),
-      Canopy (BUG_DYNAMIC_CAST (const ValueList*, vl->lookup ("Canopy"))),
-      Root (BUG_DYNAMIC_CAST (const ValueList*, vl->lookup ("Root"))),
-      Partit (BUG_DYNAMIC_CAST (const ValueList*, vl->lookup ("Partit"))),
-      Resp (BUG_DYNAMIC_CAST (const ValueList*, vl->lookup ("Resp"))),
-      CrpN (BUG_DYNAMIC_CAST (const ValueList*, vl->lookup ("CrpN")))
+Crop::Parameters::pList Crop::Parameters::all;
+
+const Crop::Parameters& 
+Crop::Parameters::get (const string n, const AttributeList& vl)
+{
+    for (pList::iterator i = all.begin (); i != all.end (); i++)
+	{
+	    if ((*i)->name == n)
+		return *(*i);
+	}
+    const Parameters* p = new Parameters (n, vl);
+    all.push_back (p);
+    return *p;
+}
+
+Crop::Parameters::Parameters (const string n, const AttributeList& vl) 
+    : Devel (vl.list ("Devel")),
+      Vernal (vl.list ("Vernal")),
+      LeafPhot (vl.list ("LeafPhot")),
+      Canopy (vl.list ("Canopy")),
+      Root (vl.list ("Root")),
+      Partit (vl.list ("Partit")),
+      Resp (vl.list ("Resp")),
+      CrpN (vl.list ("CrpN")),
+      name (n)
+{ }
+
+Crop::Parameters::DevelPar::DevelPar (const AttributeList& vl)
+    : Model    (models.lookup (vl.name ("Model"))),
+      EmrTSum (vl.number ("EmrTSum")),
+      DS_Emr (vl.number ("DS_Emr")),
+      DSRate1 (vl.number ("DSRate1")),
+      DSRate2 (vl.number ("DSRate2")),
+      TempEff1 (vl.csmp ("TempEff1")),
+      TempEff2 (vl.csmp ("TempEff2")),
+      PhotEff1 (vl.csmp ("PhotEff1"))
+{ }
+
+Crop::Parameters::VernalPar::VernalPar (const AttributeList& vl)
+    : required (vl.flag ("required")),
+      DSLim1 (vl.number ("DSLim1")),
+      DSLim2 (vl.number ("DSLim2")),
+      TaLim (vl.number ("TaLim")),
+      TaSum (vl.number ("TaSum"))
+{ }
+
+Crop::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
+    : Model (models.lookup (vl.name ("Model"))),
+      Qeff (vl.number ("Qeff")),
+      Fm (vl.number ("Fm")),
+      TLim1 (vl.number ("TLim1")),
+      TLim2 (vl.number ("TLim2"))
+{ }
+
+Crop::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
+    : DSinit (vl.number ("DSinit")),
+      WLfInit (vl.number ("WLfInit")),
+      SpLAI (vl.number ("SpLAI")),
+      HvsDS (vl.csmp ("HvsDS")),
+      LAIDist0 (vl.array ("LAIDist0")),
+      LAIDist1 (vl.array ("LAIDist1")),
+      LAIDista (vl.number ("LAIDista")),
+      PARref (vl.number ("PARref")),
+      PARext (vl.number ("PARext")),
+      EPext (vl.number ("EPext"))
+{ }
+
+Crop::Parameters::RootPar::RootPar (const AttributeList& vl)
+    : DptEmr (vl.number ("DptEmr")),
+      PenPar1 (vl.number ("PenPar1")),
+      PenPar2 (vl.number ("PenPar2")),
+      MaxPen (vl.number ("MaxPen")),
+      SpRtLength (vl.number ("SpRtLength")),
+      DensRtTip (vl.number ("DensRtTip")),
+      Rad (vl.number ("Rad")),
+      h_wp (vl.number ("h_wp")),
+      MxNH4Up (vl.number ("MxNH4Up")),
+      MxNO3Up (vl.number ("MxNO3Up"))
+{ }
+
+Crop::Parameters::PartitPar::PartitPar (const AttributeList& vl)
+    : Root (vl.csmp ("Root")),
+      Leaf (vl.csmp ("Leaf")),
+      Stem (vl.csmp ("Stem")),
+      LfDR (vl.csmp ("LfDR")),
+      RtDR (vl.csmp ("RtDR"))
+{ }
+
+Crop::Parameters::RespPar::RespPar (const AttributeList& vl)
+    : E_Root (vl.number ("E_Root")),
+      E_Leaf (vl.number ("E_Leaf")),
+      E_Stem (vl.number ("E_Stem")),
+      E_SOrg (vl.number ("E_SOrg")),
+      r_Root (vl.number ("r_Root")),
+      r_Leaf (vl.number ("r_Leaf")),
+      r_Stem (vl.number ("r_Stem")),
+      r_SOrg (vl.number ("r_SOrg")),
+      Q10 (vl.number ("Q10"))     
+{ }
+
+Crop::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
+    : SeedN (vl.number ("SeedN")),
+      PtLeafCnc (vl.csmp ("PtLeafCnc")),
+      CrLeafCnc (vl.csmp ("CrLeafCnc")),
+      PtStemCnc (vl.csmp ("PtStemCnc")),
+      CrStemCnc (vl.csmp ("CrStemCnc")),
+      PtRootCnc (vl.csmp ("PtRootCnc")),
+      CrRootCnc (vl.csmp ("CrRootCnc")),
+      PtSOrgCnc (vl.csmp ("PtSOrgCnc")),
+      CrSOrgCnc (vl.csmp ("CrSOrgCnc"))
 { }
 
 Crop::Parameters::~Parameters ()
 { }
 
-Crop::Parameters::DevelPar::DevelPar (const ValueList* vl)
-    : Model (models.lookup (vl->lookup ("Model")->name ())),
-      EmrTSum (vl->lookup ("EmrTSum")->number ()),
-      DS_Emr (vl->lookup ("DS_Emr")->number ()),
-      DSRate1 (vl->lookup ("DSRate1")->number ()),
-      DSRate2 (vl->lookup ("DSRate2")->number ()),
-      TempEff1 (BUG_DYNAMIC_CAST (const ValueCSMP*, vl->lookup ("TempEff1"))),
-      TempEff2 (BUG_DYNAMIC_CAST (const ValueCSMP*, vl->lookup ("TempEff2"))),
-      PhotEff1 (BUG_DYNAMIC_CAST (const ValueCSMP*, vl->lookup ("PhotEff1")))
+Crop::Variables::Variables (const Parameters& par)
+    : Phenology (par),
+      Canopy (par),
+      RootSys (par),
+      Prod (par),
+      CrpAux (par)
 { }
 
-Crop::Parameters::VernalPar::VernalPar (const ValueList* vl)
-    : required (vl->lookup ("required")->flag ()),
-      DSLim1 (vl->lookup ("DSLim1")->number ()),
-      DSLim2 (vl->lookup ("DSLim2")->number ()),
-      TaLim (vl->lookup ("TaLim")->number ()),
-      TaSum (vl->lookup ("TaSum")->number ())
+Crop::Variables::RecPhenology::RecPhenology (const Parameters& par)
+    : DS (-1.0),
+      Vern (par.Vernal.TaSum)
 { }
 
-Crop::Parameters::LeafPhotPar::LeafPhotPar (const ValueList* vl)
-    : Model (models.lookup (vl->lookup ("Model")->name ())),
-      Qeff (vl->lookup ("Qeff")->number ()),
-      Fm (vl->lookup ("Fm")->number ()),
-      TLim1 (vl->lookup ("TLim1")->number ()),
-      TLim2 (vl->lookup ("TLim2")->number ())
+Crop::Variables::RecCanopy::RecCanopy (const Parameters& /* par */)
+    : Height (0.0),
+      LAI (0.0)
+// LADm, LADDist
 { }
 
-Crop::Parameters::CanopyPar::CanopyPar (const ValueList* vl)
-    : DSinit (vl->lookup ("DSinit")->number ()),
-      WLfInit (vl->lookup ("WLfInit")->number ()),
-      SpLAI (vl->lookup ("SpLAI")->number ()),
-      HvsDS (BUG_DYNAMIC_CAST (const ValueCSMP*, vl->lookup ("HvsDS"))),
-      LAIDista (vl->lookup ("LAIDista")->number ()),
-      PARref (vl->lookup ("PARref")->number ()),
-      PARext (vl->lookup ("PARext")->number ()),
-      EPext (vl->lookup ("EPext")->number ())
-{ 
-    const ValueArray* a0
-	= BUG_DYNAMIC_CAST (const ValueArray*, vl->lookup ("LAIDist0"));
-    const ValueArray* a1
-	= BUG_DYNAMIC_CAST (const ValueArray*, vl->lookup ("LAIDist1"));
-
-    LAIDist0[0] = (*a0)[0];
-    LAIDist0[1] = (*a0)[1];
-    LAIDist0[2] = (*a0)[2];
-    LAIDist1[0] = (*a1)[0];
-    LAIDist1[1] = (*a1)[1];
-    LAIDist1[2] = (*a1)[2];
-}
-
-Crop::Parameters::RootPar::RootPar (const ValueList* vl)
-    : DptEmr (vl->lookup ("DptEmr")->number ()),
-      PenPar1 (vl->lookup ("PenPar1")->number ()),
-      PenPar2 (vl->lookup ("PenPar2")->number ()),
-      MaxPen (vl->lookup ("MaxPen")->number ()),
-      SpRtLength (vl->lookup ("SpRtLength")->number ()),
-      DensRtTip (vl->lookup ("DensRtTip")->number ()),
-      Rad (vl->lookup ("Rad")->number ()),
-      h_wp (vl->lookup ("h_wp")->number ()),
-      MxNH4Up (vl->lookup ("MxNH4Up")->number ()),
-      MxNO3Up (vl->lookup ("MxNO3Up")->number ())
+Crop::Variables::RecRootSys::RecRootSys (const Parameters& par)
+    : Depth (par.Root.DptEmr)
+// Density, H2OExtraction, NH4Extraction, NO3Extraction
 { }
 
-Crop::Parameters::PartitPar::PartitPar (const ValueList* vl)
-    : Root (BUG_DYNAMIC_CAST (const ValueCSMP*, vl->lookup ("Root"))),
-      Leaf (BUG_DYNAMIC_CAST (const ValueCSMP*, vl->lookup ("Leaf"))),
-      Stem (BUG_DYNAMIC_CAST (const ValueCSMP*, vl->lookup ("Stem"))),
-      LfDR (BUG_DYNAMIC_CAST (const ValueCSMP*, vl->lookup ("LfDR")))     
+Crop::Variables::RecProd::RecProd (const Parameters& par)
+    : WLeaf (0.001),
+      WStem (0.000),
+      WRoot (0.001),
+      WSOrg (0.000),
+      WLDrd (0.000),
+      NCrop (par.CrpN.SeedN)
 { }
 
-Crop::Parameters::RespPar::RespPar (const ValueList* vl)
-    : E_Root (vl->lookup ("E_Root")->number ()),
-      E_Leaf (vl->lookup ("E_Leaf")->number ()),
-      E_Stem (vl->lookup ("E_Stem")->number ()),
-      E_SOrg (vl->lookup ("E_SOrg")->number ()),
-      r_Root (vl->lookup ("r_Root")->number ()),
-      r_Leaf (vl->lookup ("r_Leaf")->number ()),
-      r_Stem (vl->lookup ("r_Stem")->number ()),
-      r_SOrg (vl->lookup ("r_SOrg")->number ()),
-      Q10 (vl->lookup ("Q10")->number ())     
+Crop::Variables::RecCrpAux::RecCrpAux (const Parameters& par)
+    : InitLAI (true),
+      PotRtDpt (par.Root.DptEmr),
+      PtNCnt (par.CrpN.SeedN),
+      // PotTransp, PotCanopyAss
+      CanopyAss(0.0),
+      IncWLeaf (0.0),
+      IncWStem (0.0),
+      IncWSOrg (0.0),
+      IncWRoot (0.0)
+// H2OUpt, NH4Upt, NO3Upt
 { }
 
-Crop::Parameters::CrpNPar::CrpNPar (const ValueList* vl)
-    : SeedN (vl->lookup ("SeedN")->number ()),
-      PtLeafCnc (BUG_DYNAMIC_CAST (const ValueCSMP*,
-				   vl->lookup ("PtLeafCnc"))),
-      CrLeafCnc (BUG_DYNAMIC_CAST (const ValueCSMP*,
-				   vl->lookup ("CrLeafCnc"))),
-      PtStemCnc (BUG_DYNAMIC_CAST (const ValueCSMP*,
-				   vl->lookup ("PtStemCnc"))),
-      CrStemCnc (BUG_DYNAMIC_CAST (const ValueCSMP*,
-				   vl->lookup ("CrStemCnc"))),
-      PtRootCnc (BUG_DYNAMIC_CAST (const ValueCSMP*,
-				   vl->lookup ("PtRootCnc"))),
-      CrRootCnc (BUG_DYNAMIC_CAST (const ValueCSMP*,
-				   vl->lookup ("CrRootCnc"))),
-      PtSOrgCnc (BUG_DYNAMIC_CAST (const ValueCSMP*,
-				   vl->lookup ("PtSOrgCnc"))),
-      CrSOrgCnc (BUG_DYNAMIC_CAST (const ValueCSMP*,
-				   vl->lookup ("CrSOrgCnc")))
+Crop::Variables::Variables (const AttributeList& vl)
+    : Phenology (vl.list ("Phenology")),
+      Canopy (vl.list ("Canopy")),
+      RootSys (vl.list ("RootSys")),
+      Prod (vl.list ("Prod")),
+      CrpAux (vl.list ("CrpAux"))
 { }
 
-Crop::Variables::Variables ()
+Crop::Variables::RecPhenology::RecPhenology (const AttributeList& vl)
+    : DS (vl.number ("DS")),
+      Vern (vl.number ("Vern"))
+{ }
+
+Crop::Variables::RecCanopy::RecCanopy (const AttributeList& vl)
+    : Height (vl.number ("Height")),
+      LAI (vl.number ("LAI")),
+      LADm (vl.number ("LADm")),
+      LADDist (vl.array ("LADDist"))
+{ }
+
+Crop::Variables::RecRootSys::RecRootSys (const AttributeList& vl)
+    : Depth (vl.number ("Depth")),
+      Density (vl.array ("Density")),
+      H2OExtraction (vl.array ("H2OExtraction")),
+      NH4Extraction (vl.array ("NH4Extraction")),
+      NO3Extraction (vl.array ("NO3Extraction"))
+{ }
+     
+Crop::Variables::RecProd::RecProd (const AttributeList& vl)
+    : WLeaf (vl.number ("WLeaf")),
+      WStem (vl.number ("WStem")),
+      WRoot (vl.number ("WRoot")),
+      WSOrg (vl.number ("WSOrg")),
+      WLDrd (vl.number ("WLDrd")),
+      NCrop (vl.number ("NCrop"))
+{ }
+
+
+Crop::Variables::RecCrpAux::RecCrpAux (const AttributeList& vl)
+    : InitLAI (vl.flag ("InitLAI")),
+      PotRtDpt (vl.number ("PotRtDpt")),
+      PtNCnt (vl.number ("PtNCnt")),
+      PotTransp (vl.number ("PotTransp")),
+      PotCanopyAss (vl.number ("PotCanopyAss")),
+      CanopyAss (vl.number ("CanopyAss")),
+      IncWLeaf (vl.number ("IncWLeaf")),
+      IncWStem (vl.number ("IncWStem")),
+      IncWSOrg (vl.number ("IncWSOrg")),
+      IncWRoot (vl.number ("IncWRoot")),
+      H2OUpt (vl.number ("H2OUpt")),
+      NH4Upt (vl.number ("NH4Upt")),
+      NO3Upt (vl.number ("NO3Upt"))
 { }
 
 Crop::Variables::~Variables ()
@@ -219,6 +314,7 @@ CropSyntax::CropSyntax ()
     Partit->add ("Leaf", Syntax::CSMP);
     Partit->add ("Stem", Syntax::CSMP);
     Partit->add ("LfDR", Syntax::CSMP);
+    Partit->add ("RtDR", Syntax::CSMP);
 
     // RespPar
     Syntax* Resp = new Syntax ();

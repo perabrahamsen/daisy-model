@@ -1,4 +1,9 @@
 // value.h -- attribute value types
+//
+// This file species a number of new primitive types in daisy, which
+// all can be stored in an AttributeList.
+
+// @ Begin
 
 #ifndef VALUE_H
 #define VALUE_H
@@ -7,115 +12,122 @@
 #include <std/stdexcept.h>
 #include <vector.h>
 
+struct Rules;
+struct CSMP;
+
+// @ AttributeList.
+//
+// A map from attribute names to attribute values.
+
+class AttributeList
+{
+    // Content.
+    struct Implementation;
+    Implementation& impl;
+public:
+    static const AttributeList empty;
+
+    // Exceptions.
+#ifdef HANDLE_EXCEPTIONS
+    struct Invalid : runtime_error
+    { 
+	// Tried to extract the wrong type from a Value object.
+	const char* what () const;
+    };
+
+    struct Uninitialized : runtime_error
+    { 
+	// Tried to lookup an uninitialized value in an AttributeList.
+	const char* what () const;
+    };
+#endif HANDLE_EXCEPTIONS
+
+    // Use.
+    bool check (string) const 
+        throw0 ();
+    double number (string) const
+        throw2 (Invalid, Uninitialized);
+    string name (string) const
+        throw2 (Invalid, Uninitialized);
+    bool flag (string) const
+        throw2 (Invalid, Uninitialized);
+    const vector<double>& array (string) const
+        throw2 (Invalid, Uninitialized);
+    const Rules& rules (string) const
+        throw2 (Invalid, Uninitialized);
+    const CSMP& csmp (string) const 
+       throw2 (Invalid, Uninitialized);
+    const AttributeList& list (string) const
+        throw2 (Invalid, Uninitialized);
+
+    // Create and Destroy.
+    void add (string, double);
+    void add (string, const AttributeList*);
+    void add (string, const Rules*);
+    void add (string, const CSMP*);
+    void add (string, string);
+    void add (string, const vector<double>&);
+    void add (string, bool);
+    AttributeList ();
+    ~AttributeList ();
+};
+
+// @ Rules
+//
+// A Rules object is an ordered list of Condition, Action pairs.
+// 
+// You can match some state in the Rules object, and it will return
+// the Action part of the first pair whose condition evaluates to true
+// for the state.
+//
+// You add one Condition, Action pair a time, the first pair will also
+// be the first in the list.
+//
+// When creating a new Rules object, you may specify it as an
+// extention to an old object.  The rules of the old object will be
+// less significant than any of the new rules.
+
 struct Action;
 struct Condition;
 
-struct InvalidValue : runtime_error
-{ 
-    const char* what () const;
-};
-
-struct UninitializedValue : runtime_error
-{ 
-    const char* what () const;
-};
-
-struct ValueCSMP;
-
-class Value
+class Rules
 {
-public:
-    virtual double number () const throw (InvalidValue);
-    virtual string name () const throw (InvalidValue);
-    virtual bool flag () const throw (InvalidValue);
-#ifdef USE_VIRTUAL_VALUE
-    virtual Value* lookup (string) const 
-      throw (UninitializedValue, InvalidValue);
-    virtual Value* check (string) const throw (InvalidValue);
-    virtual const Action* match (ColumnList&, const Wheather&,
-				 int day, int hour) const throw (InvalidValue);
-    virtual double y (double x) const throw (InvalidValue);
-    virtual double operator[] (int index) const throw (InvalidValue);
-#endif
-protected:
-    Value ();
-    virtual ~Value ();
-};
-
-class ValueNumber : public Value
-{
-    const double value;
-public:
-    double number () const;
-    ValueNumber (double n);
-};
-
-class ValueList : public Value
-{
+    // Content.
     struct Implementation;
     Implementation& impl;
 public:
-    static const ValueList empty;
-    Value* lookup (string) const throw (UninitializedValue);
-    Value* check (string) const throw0 ();
-    void add (string, Value*);
-    ValueList ();
-    ValueList (const ValueList&);
-    ~ValueList ();
-};
-
-class ValueRules : public Value
-{
-    struct Implementation;
-    Implementation& impl;
-    friend class Input;
-    void add (Condition*, Action*);
-public:
+    // Use.
     const Action* match (ColumnList&, const Wheather&, 
 			 int day, int hour) const;
-    ValueRules (const ValueRules* = NULL);
-    ~ValueRules ();
+    // Create and Destroy.
+    void add (Condition*, Action*);
+    Rules (const Rules* = NULL);
+    ~Rules ();
 };
 
-class ValueCSMP : public Value
+// @ CSMP
+// 
+// A CSMP is a function defined by a number of points.  
+//
+// The points must be added by increasing x value, and the function is
+// defined by drawing a straight line from each added point to the next.
+
+class CSMP
 {
+    // Content.
     struct Implementation;
     Implementation& impl;
-    friend class Input;
+public:
+    // Use.
+    double operator ()(double x) const;
+    // Create and Destroy.
     void add (double, double);
-public:
-    double y (double x) const;
-    ValueCSMP ();
-    ~ValueCSMP ();
+    CSMP ();
+    ~CSMP ();
 };
 
-class ValueArray : public Value
-{
-    vector <double> impl;
-    friend class Input;
-    void add (double);
-public:
-    double operator[] (int index) const;
-    ValueArray ();
-    ~ValueArray ();
-};
-
-class ValueString : public Value
-{
-    string impl;
-public:
-    string name () const;
-    ValueString (string);
-    ~ValueString ();
-};
-
-class ValueBool : public Value
-{
-    bool impl;
-public:
-    bool flag () const;
-    ValueBool (bool);
-    ~ValueBool ();
-};
+// @ End
 
 #endif VALUE_H
+
+// value.h ends here
