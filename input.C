@@ -20,6 +20,7 @@ Usage::what () const
 
 struct Parser
 {
+  void load (AttributeList&);
   int get ();
   int peek ();
   bool good ();
@@ -42,19 +43,19 @@ struct Parser
   const Filter& get_filter (const Syntax&);
   const Filter& get_filter_object (const Library&);
   const Filter& get_filter_sequence (const Library&);
-  istream* in;
+  ifstream in;
   string file;
   int line;
   int column;
   const Syntax& global_syntax_table;
-  Parser (int& argc, char**& argv, const Syntax& syntax, AttributeList& alist);
+  Parser (string name, const Syntax& syntax);
   ~Parser ();
 };
 
 int
 Parser::get ()
 {
-  int c = in->get ();
+  int c = in.get ();
 
   switch (c)
     {
@@ -74,13 +75,13 @@ Parser::get ()
 int
 Parser::peek ()
 {
-  return in->peek ();
+  return in.peek ();
 }
 
 bool
 Parser::good ()
 {
-  return in->good ();
+  return in.good ();
 }
 
 string
@@ -141,7 +142,7 @@ Parser::get_number ()
   skip ();
   // Cheat... This doesn't give us the right error handling.
   double d;
-  *in >> d;
+  in >> d;
   return d;
 }
 
@@ -151,7 +152,7 @@ Parser::get_integer ()
   skip ();
   // Cheat... This doesn't give us the right error handling.
   int i;
-  *in >> i;
+  in >> i;
   return i;
 }
 
@@ -230,7 +231,7 @@ void
 Parser::eof ()
 { 
   skip ();
-  if (!in->eof ())
+  if (!in.eof ())
     error ("Expected end of file");
 }
     
@@ -628,30 +629,37 @@ Parser::get_filter_sequence (const Library& library)
   return filter;
 }
 
-Parser::Parser (int& argc, char**& argv, const Syntax& syntax, 
-		AttributeList& alist)
-  : line (1),
+Parser::Parser (string name, const Syntax& syntax)
+  : in (name.data ()),
+    file (name),
+    line (1),
     column (0), 
     global_syntax_table (syntax)
-{ 
-  if (argc != 2)
-    THROW (Usage ());
-  file = argv[1];
-  in = new ifstream (file.data ());
-
-  load_list (alist, syntax);
-  eof ();
-}
+{  }
 
 Parser::~Parser ()
 {
-  delete in;
+  if (in.bad ())
+    cerr << "There were trouble parsing `" << file << "'\n";
 }
+
+void
+Parser::load (AttributeList& alist)
+{
+  load_list (alist, global_syntax_table);
+  eof ();
+}
+
 
 const AttributeList&
 parse (const Syntax& syntax, int& argc, char**& argv)
 {
+  if (argc != 2)
+    THROW (Usage ());
+  string file = argv[1];
+
   AttributeList& alist = *new AttributeList ();
-  Parser parser(argc, argv, syntax, alist);
+  Parser parser(file, syntax);
+  parser.load (alist);
   return alist;
 }
