@@ -263,7 +263,7 @@
 		   (dimension "mm"))
 	   (number (path column "$col" Surface runoff)
 		   (when hourly)
-		   (dimension "mm"))
+		   (dimension "mm/d"))
 	   (number (path column "$col" Bioclimate "*" Snow Ssnow)
 		   (tag "SnowStore")
 		   (dimension "mm"))))
@@ -338,7 +338,7 @@
 		   (dimension "mm/d"))
 	   (number (path column "$col" Surface runoff)
 		   (when hourly)
-		   (dimension "mm"))
+		   (dimension "mm/d"))
 	   (flux_top (path column "$col" SoilWater q)
 		     (tag "Matrix-Inf")
 		     (when hourly)
@@ -397,7 +397,7 @@
 	   (number (path column "$col" Surface IM_runoff NH4)
 		   (when hourly)
 		   (tag "NH4-runoff")
-		   (dimension "kg N/ha")
+		   (dimension "kg N/ha/d")
 		   (factor 1e5))		;g/cm² -> kg/ha
 	   (flux_top (path column "$col" SoilNH4 J)
 		     (tag "NH4-In")
@@ -443,7 +443,7 @@
 	   (number (path column "$col" Surface IM_runoff NO3)
 		   (when hourly)
 		   (tag "NO3-Runoff")
-		   (dimension "kg N/ha")
+		   (dimension "kg N/ha/d")
 		   (factor 1e5))		;g/cm² -> kg/ha
 	   (flux_top (path column "$col" SoilNO3 J)
 		     (when hourly)
@@ -842,6 +842,34 @@
 			 Root nitrogen_stress))
 	   ))
 
+(deflog "Simple Crop Production" table
+  (where "simple_crop_prod.tab")
+  (when (hour 12))
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (number (path column "$col" Vegetation crops "$crop" T_sum)
+		   (dimension "dg C d")
+		   (factor 1.0))	;Temperature sum
+	   (number (path column "$col" Vegetation crops "$crop" day)
+		   (dimension "d")
+		   (factor 1.0))	;Temperature sum
+	   (number (path column "$col" Vegetation crops "$crop" Canopy CAI)
+		   (tag "Crop AI")
+		   (dimension "none")
+		   (factor 1.0))	;Leaf Area Index [0:inf]
+	   (number (path column "$col" Vegetation crops "$crop" Root Depth)
+		   (dimension "cm")
+		   (factor 1.0))	;cm [-inf:0]
+	   (number (path column "$col" Vegetation crops "$crop" N_actual)
+		   (dimension "kg N/ha")
+		   (factor 10.0))
+	   (number (path column "$col" Vegetation crops "$crop" N_demand)
+		   (dimension "kg N/ha")
+		   (factor 10.0))
+	   (number (path column "$col" Vegetation crops "$crop" 
+			 Root water_stress))))
+
 (deflog "Old Crop Production" table
   (where "old_crop_prod.tab")
   (when (hour 0))
@@ -1032,8 +1060,8 @@
 		   (tag "pond_water_storage")
 		   (dimension "mm"))
 	   (number (path column "$col" Surface runoff)
-		   (tag "pond_water_tunoff")
-		   (dimension "mm"))
+		   (tag "pond_water_runoff")
+		   (dimension "mm/h"))
 	   (number (path column "$col" Bioclimate "*"
 			 pond_water_in_temperature)
 		   (dimension "dg C"))
