@@ -1,8 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Log models
+* Kig på Anders C/N forsøg.
 
-** Check at manual ser fornuftig ud.
+** Sørg for at C, N og C_per_N alle kan sætter.
+
+* Log models
 
 ** select: when hourly -> accumulate true
 
@@ -17,8 +19,6 @@ I den første linie skal "begyndelsesindhold" stå.
 * FertOrgaNic
 
 ** Post excersizes and answers
-
-* Kig på profile data.
 
 * K_at_h
 

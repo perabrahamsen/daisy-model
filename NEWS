@@ -16,12 +16,14 @@ release.
 
 ** Logging is much faster.
 
-Having multiple log files should now be significantly faster than
-before.  Lots of stuff was changed in order to achieve this speedup,
-so it is likely than some features have broken.  Please let me know in
-that case.
+Generation of log files is now seven times faster than before.  Lots
+of stuff was changed in order to achieve this speedup, so it is likely
+than some features have broken.  Please let me know in that case.
 
 ** Removed the table1 log model.
+
+The one place it was used in log.dai (the PMSW log parameterization)
+has been converted, fetch a new file.
 
 * 2.75
 

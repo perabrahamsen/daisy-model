@@ -1179,8 +1179,6 @@ the sum of all chemicals."
   (entries (number (path time year))
            (number (path time month))
            (number (path time mday))
-           (number (path column "$col" Vegetation crops crops "*")
-                   (tag "Name"))        ;Crop name.
            (number (path column "$col" Vegetation crops crops "*" Phenology DS)
                    (dimension "none")
                    (factor 1.0))        ;Development stage [-1:2]

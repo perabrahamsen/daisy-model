@@ -39,19 +39,7 @@ LogSelect::check_member (symbol name) const
 bool 
 LogSelect::check_derived (symbol field, symbol /* name */,
 			  const Library& /* library */) const
-{ 
-  if (!check_member (field))
-    return false;
-
-#if 0
-  open (field);
-  bool ok = check_entry (name, library);
-  close (field);
-  return ok;
-#else
-  return true;
-#endif
-}
+{ return check_member (field); }
 
 bool 
 LogSelect::match (const Daisy& daisy, Treelog& out)
@@ -72,14 +60,16 @@ LogSelect::open (symbol name)
 { 
   daisy_assert (is_active);
   for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->open (name);
+    if (entries[i]->is_active)
+      entries[i]->open (name);
 }
 
 void 
 LogSelect::close ()
 { 
   for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->close ();
+    if (entries[i]->is_active)
+      entries[i]->close ();
 }
 
 void 

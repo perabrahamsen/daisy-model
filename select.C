@@ -62,9 +62,6 @@ struct Select::Implementation
   const string tag;		// Name of this entry.
   string dimension;		// Physical dimension of this entry.
 
-  // Intermediate state.
-  bool match (const Daisy& daisy, Treelog&, bool is_printing);
-
   // Create and Destroy.
   static string select_get_tag (const AttributeList& al);
   void initialize (vector<symbol>& path,
@@ -184,19 +181,6 @@ Select::Implementation::convert (double value) const
   if (spec_conv)
     return spec_conv->operator() (value);
   return value * factor + offset; 
-}
-
-// Reset at start of time step.
-bool 
-Select::Implementation::match (const Daisy& daisy, Treelog& out,
-			       bool is_printing)
-{
-  if (condition)
-    {
-      condition->tick (daisy, out);
-      return condition->match (daisy);
-    }
-  return is_printing;
 }
 
 string
@@ -338,6 +322,8 @@ Select::Destination::Destination ()
 Select::Destination::~Destination ()
 { }
 
+const symbol Select::wildcard ("*");
+
 // Output routines.
 void 
 Select::output_number (const double)
@@ -362,7 +348,15 @@ Select::match (const Daisy& daisy, Treelog& out, bool is_printing)
   daisy_assert (current_path_index == 0U);
   daisy_assert (last_valid_path_index == 0U);
   daisy_assert (current_name == path[0]);
-  is_active = impl.match (daisy, out, is_printing); 
+
+  if (condition)
+    {
+      condition->tick (daisy, out);
+      is_active = condition->match (daisy);
+    }
+  else
+    is_active = is_printing;
+
   valid_level = is_active;
   return is_active;
 }
@@ -445,7 +439,7 @@ By default, the values will be calculated once, when the a new log entry\n\
 is written.  If you calculate the values more often, they will be\n\
 accumulated.  This is useful if you for example want to summarize the\n\
 hourly percolation into a daily log.");
-  syntax.add ("factor", Syntax::None (), Check::none (), Syntax::Const, "\
+  syntax.add ("factor", Syntax::Unknown (), Check::none (), Syntax::Const, "\
 Factor to multiply the calculated value with, before logging.");
   alist.add ("factor", 1.0);
   syntax.add ("offset", Syntax::Unknown (), Check::none (), Syntax::Const, "\

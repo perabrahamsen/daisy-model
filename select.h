@@ -76,17 +76,11 @@ private:
   unsigned int current_path_index;// How nested in open's we are.
   unsigned int last_valid_path_index;	// Remember the last valid level.
   symbol current_name;
+  static const symbol wildcard;
   
-  bool valid () const
-  { 
-    // If the current path index is valid.
-    return (current_path_index == last_valid_path_index
-	    && current_path_index < path_size); 
-  }
 public:
   bool valid (symbol name) const
   {
-    static const symbol wildcard ("*");
     // Is the next path index valid?
     return current_name == wildcard || name == current_name; 
   }
@@ -94,27 +88,49 @@ public:
 
   void open (symbol name)	// Open one leaf level.
   { 
+    // Remember nesting.
+    current_path_index++;
+    // If previous level wasn't valid, next one won't be either.
     if (!valid_level)
-      current_path_index++;
-    else
+      return;
+    // Check if next level is also in path.
+    if (!valid (name))
       {
-	if (valid (name))
-	  last_valid_path_index++;
-	current_path_index++;
-	valid_level = is_active && valid ();
-	if (valid_level)
-	  current_name = path[current_path_index];
+	valid_level = false;
+	return;
       }
+    // We may have reached the end of path.
+    if (current_path_index == path_size)
+      {
+	valid_level = false;
+	return;
+      }
+    // This level is also valid.
+    last_valid_path_index++;
+    // Direct acces to new head of path.
+    current_name = path[current_path_index];
   }
   void close ()		// Close one level.
   { 
-    if (current_path_index == last_valid_path_index)
-      last_valid_path_index--;
+    // Decrease nesting.
     current_path_index--;
-    if (!valid_level)
-      valid_level = is_active && valid ();
+
+    // Was it valid?
     if (valid_level)
-      current_name = path[current_path_index];
+      {
+	// If so, decrease valid level.
+	last_valid_path_index--;
+	// And restore direct access to current path.
+	current_name = path[current_path_index];
+      }
+    else
+      {
+	// If not, check if new level is valid.
+	valid_level = current_path_index == last_valid_path_index;
+	// If so, restore direct access to the path.
+	if (valid_level)
+	  current_name = path[current_path_index];
+      }
   }
 
   // Output routines.
@@ -124,9 +140,8 @@ public:
   virtual void output_array (const vector<double>&, const Geometry*);
 
   // Reset at start of time step.
-private:
-  bool is_active;		// Should we be accumulating now?
 public:
+  bool is_active;		// Should we be accumulating now?
   bool match (const Daisy& daisy, Treelog&, bool is_printing);
 
   // Print result at end of time step.
