@@ -46,6 +46,13 @@ Solute::tick (const Soil& soil,
   fill (S_p.begin (), S_p.end (), 0.0);
   fill (J_p.begin (), J_p.end (), 0.0);
 
+  // Permanent source.
+  for (unsigned int i = 0; i < soil.size (); i++)
+    {
+      S[i] += S_permanent[i];
+      S_external[i] += S_permanent[i];
+    }
+
   // Upper border.
   if (soil_water.q_p (0) < 0.0)
     {
@@ -99,6 +106,7 @@ Solute::output (Log& log) const
   log.output ("S_p", S_p);
   log.output ("S_drain", S_drain);
   log.output ("S_external", S_external);
+  log.output ("S_permanent", S_permanent);
   log.output ("J", J);
   log.output ("J_p", J_p);
 }
@@ -128,6 +136,10 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Source term (soil drainage only).");
   syntax.add ("S_external", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "External source, such as incorporated fertilizer.");
+  syntax.add ("S_permanent", "g/cm^3/h", Syntax::State, Syntax::Sequence,
+	      "Permanent external source, e.g. subsoil irrigation.");
+  vector<double> empty;
+  alist.add ("S_permanent", empty);
   syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Transportation in matrix (positive up).");
   syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
@@ -139,7 +151,8 @@ Only used for initialization of the `C' parameter.");
 }
 
 Solute::Solute (const AttributeList& al)
-  : transport (Librarian<Transport>::create (al.alist ("transport"))),
+  : S_permanent (al.number_sequence ("S_permanent")),
+    transport (Librarian<Transport>::create (al.alist ("transport"))),
     mactrans  (Librarian<Mactrans>::create (al.alist ("mactrans"))),
     adsorption (Librarian<Adsorption>::create (al.alist ("adsorption")))
 { }
@@ -165,16 +178,13 @@ Solute::add_external (const Soil& soil, const SoilWater& soil_water,
     }
 }
 
-#if 0
 void 
-Solute::add (const Soil& soil, const SoilWater& soil_water, 
-	     double amount, double from, double to)
-{ 
-  soil.add (M_, from, to, amount);
-  for (unsigned int i = 0; i < C_.size (); i++)
-    C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+Solute::set_external_source (const Geometry& geometry, 
+			     double amount, double from, double to)
+{
+  fill (S_permanent.begin (), S_permanent.end (), 0.0);
+  geometry.add (S_permanent, from, to, amount);
 }
-#endif
 
 void 
 Solute::mix (const Soil& soil, const SoilWater& soil_water, 
@@ -308,6 +318,10 @@ Solute::initialize (const AttributeList& al,
   S_p.insert (S_p.begin (), soil.size (), 0.0);
   S_drain.insert (S_drain.begin (), soil.size (), 0.0);
   S_external.insert (S_external.begin (), soil.size (), 0.0);
+  if (S_permanent.size () < soil.size ())
+    S_permanent.insert (S_permanent.end (), 
+			soil.size () - S_permanent.size (),
+			0.0);
   J.insert (J_p.begin (), soil.size () + 1, 0.0);
   J_p.insert (J_p.begin (), soil.size () + 1, 0.0);
 }

@@ -35,6 +35,16 @@ ColumnBase::irrigate_surface (double flux, const IM&)
 }
 
 void
+ColumnBase::set_subsoil_irrigation (double flux, const IM&, 
+				    double from, double to)
+{
+  assert (flux >= 0.0);
+  assert (from <= 0.0);
+  assert (to < from);
+  soil_water.set_external_source (soil, flux * 0.1 /* mm->cm */, from, to);
+}
+
+void
 ColumnBase::harvest (const Time& time, const string& crop_name,
 		     double stub_length,
 		     double stem_harvest,

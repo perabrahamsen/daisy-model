@@ -40,6 +40,8 @@ public:
   void irrigate_surface (double flux, double temp, const IM&);
   void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
+  void set_subsoil_irrigation (double flux, const IM& im, 
+			       double from, double to);
   void harvest (const Time& time, const string& crop_name,
 		double stub_length,
 		double stem_harvest,

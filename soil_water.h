@@ -23,6 +23,7 @@ class SoilWater
   vector<double> S_root_;
   vector<double> S_drain_;
   vector<double> S_p_;
+  vector<double> S_permanent_;
   vector<double> Theta_old_;
   vector<double> h_old;
   vector<double> Theta_;
@@ -87,12 +88,15 @@ public:
 public:
   void macro_tick (const Soil&, Surface&);
   void tick (const Soil&, Surface&, Groundwater&);
+  void set_external_source (const Geometry&, 
+			    double amount, double from, double to);
   void mix (const Soil&, double from, double to);
   void swap (const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 
 		  unsigned int from, unsigned int to, double Theta);
   bool check (unsigned n) const;
   void output (Log&) const;
+
 
   // Communication with surface.
   double MaxExfiltration (const Soil&) const;

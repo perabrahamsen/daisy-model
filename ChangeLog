@@ -1,4 +1,26 @@
+2000-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.43 released.
+
+2000-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Root Zone Water Balance"): Log external sink.
+
+	* column_std.C, action_irrigate.C: Changed irrigation solute units
+	from g/mm to mg N/liter.
+
+	* action_irrigate.C (ActionIrrigateStop): New model.
+
 2000-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_irrigate.C (ActionIrrigateSubsoil): New model.
+	* field.C, field.h (set_subsoil_irrigation): New function.
+	* column_std.C, column_base.C, column_base.h, column.h
+	(set_subsoil_irrigation): New function.
+	* soil_water.C, soil_water.h (S_permanent): New state variable.
+	(set_external_source): New member function.
+	* solute.C, solute.h (S_permanent): New state variable.
+	(set_external_source): New member function.
 
 	* Version 1.42 released.
 

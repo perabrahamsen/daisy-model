@@ -12,6 +12,35 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.43
+
+** New `set_subsoil_irrigation' action.
+
+For irrigating directly in the soil.  Unlike the other irrigation
+actions, this one specifies a permanent flux.  This means the
+irrigation will continue until you explicitly turn it off by
+specifying a flux of zero.
+
+Use it like this
+
+    (set_subsoil_irrigation 1.5 (from -5.0) (to -10.0)
+                            (solute (NH4 0.1) (NO3 0.7)))
+
+This will specify an irrigation flux of 1.5 mm/h to be incorporated in
+the soil between 5 and 10 cm depth.  The water will contain 0.1 mg
+NH4-N/liter and 0.7 mg NO3-N/liter
+
+If you call `set_subsoil_irrigation' multiple times, the last call
+will have effect.
+
+Use
+
+    (stop_subsoil_irrigation)
+
+to turn off subsoil irrigation.
+
+** Changed irrigation solute units from g/mm to mg N/liter.
+
 * 1.42
 
 ** `irrigate_top' action changed to `irrigate_overhead'.
@@ -58,7 +87,7 @@ soon as it is finished.  If you for example have defined a `sbarley'
 manegement strategy, and you want to keep growing spring barley for
 ever and ever, you can specify the manangement like this
 
-	(manager (repeat sbarley))
+        (manager (repeat sbarley))
 
 More likely, you will use a `while' to limit the repetition.
 

@@ -11,6 +11,7 @@
 struct Log;
 struct Syntax;
 struct AttributeList;
+struct Geometry;
 struct Soil;
 struct SoilWater;
 
@@ -27,6 +28,7 @@ protected:
   vector<double> S_p;		// Source term for macropores only.
   vector<double> S_drain;	// Source term for soil drainage only.
   vector<double> S_external;	// External source term, e.g. incorp. fert.
+  vector<double> S_permanent;	// Permanent external source term.
   vector<double> J;		// Solute transport log in matrix.
   vector<double> J_p;		// Solute transport log in macropores.
   Transport& transport;		// Solute transport model in matrix.
@@ -55,14 +57,14 @@ public:
   void add_to_sink (const vector<double>&);
 
   // Simulation.
-protected:
-  
 public:
   void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
   virtual void output (Log&) const;
   void add_external (const Soil&, const SoilWater&,
 		     double amount, double from, double to);
+  void set_external_source (const Geometry&, 
+			    double amount, double from, double to);
   void mix (const Soil&, const SoilWater&, double from, double to);
   void swap (const Soil&, const SoilWater&, double from, double middle, double to);
 

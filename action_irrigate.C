@@ -22,7 +22,7 @@ struct ActionIrrigate : public Action
 
   void doIt (Daisy& daisy)
   {
-    COUT << "[Irrigating]\n";      
+    COUT << " [Irrigating]\n";      
     double t = temp;
 
     irrigate (daisy.field, flux, t, sm);
@@ -47,7 +47,7 @@ struct ActionIrrigate : public Action
 		"Temperature of irrigation (default: air temperature).");
     add_submodule<IM> ("solute", syntax, alist, Syntax::Const,
 		       "\
-Nitrogen content of irrigation water [g/mm] (default: none).");
+Nitrogen content of irrigation water [mg N/l] (default: none).");
   }
 
   ActionIrrigate (const AttributeList& al)
@@ -61,6 +61,8 @@ Nitrogen content of irrigation water [g/mm] (default: none).");
   ~ActionIrrigate ()
   { }
 };
+
+const double ActionIrrigate::at_air_temperature = -500;
 
 struct ActionIrrigateOverhead : public ActionIrrigate
 {
@@ -90,7 +92,47 @@ struct ActionIrrigateSurface : public ActionIrrigate
   { }
 };
 
-const double ActionIrrigate::at_air_temperature = -500;
+struct ActionIrrigateSubsoil : public Action
+{
+  const double flux;
+  const double from;
+  const double to;
+  const IM& sm;
+
+  void doIt (Daisy& daisy)
+  {
+    daisy.field.set_subsoil_irrigation (flux, sm, from, to);
+    if (flux != 0.0)
+      COUT << " [Subsoil irrigating with " << flux << " mm/h]\n";
+    else
+      COUT << " [Subsoil irrigating turned off]\n";
+  }
+
+  ActionIrrigateSubsoil (const AttributeList& al)
+    : Action (al),
+      flux (al.number ("flux")),
+      from (al.number ("from")),
+      to (al.number ("to")),
+      sm (*new IM (al.alist ("solute")))
+  { }
+  ~ActionIrrigateSubsoil ()
+  { }
+};
+
+struct ActionIrrigateStop : public Action
+{
+  void doIt (Daisy& daisy)
+  {
+    IM sm;
+    daisy.field.set_subsoil_irrigation (0.0, sm, 0.0, -0.1);
+    COUT << " [Subsoil irrigating turned off]\n";
+  }
+  ActionIrrigateStop (const AttributeList& al)
+    : Action (al)
+  { }
+  ~ActionIrrigateStop ()
+  { }
+};
 
 static struct ActionIrrigateOverheadSyntax
 {
@@ -146,3 +188,66 @@ OBSOLETE.  Use `irrigate_overhead' instead.");
     Librarian<Action>::add_type ("irrigate_top", alist, syntax, &make);
   }
 } ActionIrrigateTop_syntax;
+
+static struct ActionIrrigateSubsoilSyntax
+{
+  static Action& make (const AttributeList& al)
+  { return *new ActionIrrigateSubsoil (al); }
+
+  static bool check_alist (const AttributeList& al)
+  { 
+    bool ok = true;
+    const double from = al.number ("from");
+    const double to = al.number ("to");
+    non_negative (al.number ("flux"), "flux", ok);
+    non_positive (from, "from", ok);
+    non_positive (to, "to", ok);
+    if (from <= to)
+      {
+	CERR << "`from' must be higher than `to' in"
+	     << " the subsoilirrigation zone.\n";
+	ok = false;
+      }
+    return ok;
+  }
+
+  ActionIrrigateSubsoilSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList (alist);
+    syntax.add_check (&check_alist);
+    alist.add ("description", "\
+Incorporate irrigation water directly in the soil.\n\
+This command specifies the flux, set it to zero to turn off irrigation.");
+    syntax.add ("flux", "mm/h", Syntax::Const, 
+		"Amount of irrigation applied.");
+    syntax.order ("flux");
+    syntax.add ("from", "cm", Syntax::Const, "\
+Height where you want to start the incorporation (a negative number).");
+    alist.add ("from", 0.0);
+    syntax.add ("to", "cm", Syntax::Const, "\
+Height where you want to end the incorporation (a negative number).");
+
+    add_submodule<IM> ("solute", syntax, alist, Syntax::Const,
+		       "\
+Nitrogen content of irrigation water [mg N/l] (default: none).");
+
+    Librarian<Action>::add_type ("set_subsoil_irrigation",
+				 alist, syntax, &make);
+  }
+} ActionIrrigateSubsoil_syntax;
+
+static struct ActionIrrigateStopSyntax
+{
+  static Action& make (const AttributeList& al)
+  { return *new ActionIrrigateStop (al); }
+
+  ActionIrrigateStopSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList (alist);
+    alist.add ("description", "Stop subsoil irrigation.");
+    Librarian<Action>::add_type ("stop_subsoil_irrigation",
+				 alist, syntax, &make);
+  }
+} ActionIrrigateStop_syntax;

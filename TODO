@@ -1,8 +1,28 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Gød efter hvor meget N der mangler i jorden.
+* Gødning
 
-* Incorporering af vand (irrigate_subsoil).
+** Lad default `weight' for organisk og mineralsk gødning være 0.
+
+** Ny optional `utilization' parameter til organisk gødning.
+
+Dette er førsteårsudnyttelsesgraden.
+
+** Gød efter hvor meget N der mangler i jorden.
+
+Dette kan gøren med en optional
+
+  (precision (target 100) (from 0.0) (to -100.0) (minimum 0.0))
+
+argument til fertilize ordren.
+
+** Ny `equivalent_weight' argument til fertilize.
+
+Denne skal udnytte udnyttelsesgraden.
+
+** Check at mængden kun er specificiret en gang.
+
+Max en af am->weight != 0, precision sat, equivalent_weight sat er sand.
 
 * Test Cygwin compile, specielt høst resultat.
 

@@ -121,6 +121,10 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
       h_ice_[i] = soil.h (i, Theta_sat - X_ice_[i]);
     }
 
+  // External source.
+  for (unsigned int i = 0; i < soil.size (); i++)
+    S_sum_[i] += S_permanent_[i];
+
   // Remember old values.
   Theta_old_ = Theta_;
   h_old = h_;
@@ -217,6 +221,14 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
 			    S_sum_, S_drain_, h_, h_ice_, Theta_, q_, q_p_);
 }
 
+void 
+SoilWater::set_external_source (const Geometry& geometry, 
+				double amount, double from, double to)
+{
+  fill (S_permanent_.begin (), S_permanent_.end (), 0.0);
+  geometry.add (S_permanent_, from, to, -amount);
+}
+
 void
 SoilWater::mix (const Soil& soil, double from, double to)
 {
@@ -294,6 +306,7 @@ SoilWater::output (Log& log) const
   log.output ("S_root", S_root_);
   log.output ("S_drain", S_drain_);
   log.output ("S_p", S_p_);
+  log.output ("S_permanent", S_permanent_);
   log.output ("Theta", Theta_);
   log.output ("h", h_);
   log.output ("S_ice", S_ice_);
@@ -368,6 +381,10 @@ will be used from there to the bottom.");
 	      "Water sink due to soil drainage.");
   syntax.add ("S_p", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Water sink (due to macropores).");
+  syntax.add ("S_permanent", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
+	      "Permanent water sink, e.g. subsoil irrigation.");
+  vector<double> empty;
+  alist.add ("S_permanent", empty);
   Geometry::add_layer (syntax, "Theta", "cm^3/cm^3", "Soil water content.");
   Geometry::add_layer (syntax, "h", "cm", "Soil water pressure.");
   syntax.add ("S_ice", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
@@ -395,7 +412,8 @@ presummed to occupy the large pores, so it is h (Theta_sat - X_ice).");
 }
 
 SoilWater::SoilWater (const AttributeList& al)
-  : top (&Librarian<UZmodel>::create (al.alist ("UZtop"))),
+  : S_permanent_ (al.number_sequence ("S_permanent")),
+    top (&Librarian<UZmodel>::create (al.alist ("UZtop"))),
     bottom (  al.check ("UZbottom") 
 	    ? &Librarian<UZmodel>::create (al.alist ("UZbottom"))
 	    : 0),
@@ -466,6 +484,9 @@ SoilWater::initialize (const AttributeList& al,
   S_root_.insert (S_root_.begin (), size, 0.0);
   S_drain_.insert (S_drain_.begin (), size, 0.0);
   S_p_.insert (S_p_.begin (), size, 0.0);
+  if (S_permanent_.size () < size)
+    S_permanent_.insert (S_permanent_.end (), size - S_permanent_.size (),
+			 0.0);
   q_.insert (q_.begin (), size + 1, 0.0);
   q_p_.insert (q_p_.begin (), size + 1, 0.0);
   S_ice_.insert (S_ice_.begin (), size, 0.0);

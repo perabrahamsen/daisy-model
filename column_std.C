@@ -26,6 +26,8 @@ public:
   void irrigate_surface (double flux, double temp, const IM&);
   void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
+  void set_subsoil_irrigation (double flux, const IM& sm, 
+			       double from, double to);
   void fertilize (const AttributeList&);
   void fertilize (const AttributeList&, double from, double to);
   void fertilize (const IM&);
@@ -68,6 +70,13 @@ void
 ColumnStandard::sow (const AttributeList& al)
 { vegetation.sow (al, soil, organic_matter); }
 
+// We need to convert from mm * mg N / liter to g N/m^2.
+// mm / liter = 1/m^2
+// mg = 1/1000 g
+// Thus, we need to divide flux * solute with 1000 to get the surface input.
+
+static const double irrigate_solute_surface_factor = 1.0 / 1000.0;
+
 void 
 ColumnStandard::irrigate_overhead (double flux, double temp, const IM& sm)
 {
@@ -75,7 +84,7 @@ ColumnStandard::irrigate_overhead (double flux, double temp, const IM& sm)
   assert (flux >= 0.0);
   assert (sm.NH4 >= 0.0);
   assert (sm.NO3 >= 0.0);
-  surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
+  surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
 }
 
 void 
@@ -85,7 +94,7 @@ ColumnStandard::irrigate_surface (double flux, double temp, const IM& sm)
   assert (flux >= 0.0);
   assert (sm.NH4 >= 0.0);
   assert (sm.NO3 >= 0.0);
-  surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
+  surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
 }
 
 void 
@@ -95,7 +104,7 @@ ColumnStandard::irrigate_overhead (double flux, const IM& sm)
   assert (flux >= 0.0);
   assert (sm.NH4 >= 0.0);
   assert (sm.NO3 >= 0.0);
-  surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
+  surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
 }
 
 void 
@@ -105,7 +114,29 @@ ColumnStandard::irrigate_surface (double flux, const IM& sm)
   assert (flux >= 0.0);
   assert (sm.NH4 >= 0.0);
   assert (sm.NO3 >= 0.0);
-  surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
+  surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
+}
+
+// We need to convert from mm * mg N / liter to g N/cm^2.
+// mm / liter = 1/m^2 = 1/(100^2 cm^2) = 1/10000 1/cm^2 = 1.0e-4 1/cm^2
+// mg = 1/1000 g = 1.0e-3 g
+// Thus, we need to divide flux * solute with 1.0e-7 to get the surface input.
+static const double irrigate_solute_soil_factor = 1.0e-7;
+
+void
+ColumnStandard::set_subsoil_irrigation (double flux, const IM& sm, 
+					double from, double to)
+{
+  ColumnBase::set_subsoil_irrigation (flux, sm, from, to);
+  assert (flux >= 0.0);
+  assert (from <= 0.0);
+  assert (to < from);
+  soil_NH4.set_external_source (soil, 
+				sm.NH4 * (flux * irrigate_solute_soil_factor), 
+				from, to);
+  soil_NO3.set_external_source (soil, 
+				sm.NO3 * (flux * irrigate_solute_soil_factor),
+				from, to);
 }
 
 void
