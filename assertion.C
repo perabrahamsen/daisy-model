@@ -36,7 +36,9 @@ Assertion::failure (const char* file, int line, const char* fun,
 {
   TmpStream tmp;
   tmp () << file << ":" << line << ": assertion '" << test << "' failed";
-  tmp () << " in " << fun << "\n";
+  if (fun)
+    tmp () << " in " << fun;
+  tmp () << "\n";
   
   for (unsigned int i = 0; i < logs.size (); i++)
     logs[i]->error (tmp.str ());

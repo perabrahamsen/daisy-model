@@ -40,6 +40,6 @@ namespace Assertion
 
 #define daisy_assert(condition) \
   if (!(condition)) \
-    Assertion::failure (__FILE__, __LINE__, __FUNCTION__, #condition)
+    Assertion::failure (__FILE__, __LINE__, __FUNC__, #condition)
 
 #endif // ASSERTION_H

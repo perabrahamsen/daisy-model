@@ -651,7 +651,7 @@ weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h log.h
 crop${OBJ}: crop.C crop.h time.h librarian.h library.h common.h alist.h \
- syntax.h treelog.h chemicals.h om.h
+ syntax.h treelog.h chemicals.h om.h plf.h
 action${OBJ}: action.C action.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h
 condition${OBJ}: condition.C condition.h librarian.h library.h common.h \
@@ -669,8 +669,8 @@ bioclimate${OBJ}: bioclimate.C bioclimate.h librarian.h library.h common.h \
 groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h log.h
 am${OBJ}: am.C am.h librarian.h library.h common.h alist.h syntax.h \
- treelog.h om.h im.h log.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h check.h tmpstream.h mathlib.h
+ treelog.h om.h plf.h im.h log.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h check.h tmpstream.h mathlib.h
 transport${OBJ}: transport.C transport.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h
 adsorption${OBJ}: adsorption.C adsorption.h librarian.h library.h common.h \
@@ -704,12 +704,12 @@ development${OBJ}: development.C development.h production.h \
  vernalization.h plf.h log.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h submodel.h
 production${OBJ}: production.C production.h crpn.h partition.h plf.h \
- organic_matter.h common.h am.h librarian.h library.h alist.h syntax.h \
- treelog.h log.h submodel.h tmpstream.h
+ organic_matter.h common.h geometry.h am.h librarian.h library.h \
+ alist.h syntax.h treelog.h log.h submodel.h tmpstream.h
 harvesting${OBJ}: harvesting.C harvesting.h time.h plf.h production.h am.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h om.h crop.h \
- harvest.h chemicals.h log.h mathlib.h submodel.h check_range.h \
- check.h
+ harvest.h chemicals.h geometry.h log.h mathlib.h submodel.h \
+ check_range.h check.h
 canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
  log.h librarian.h library.h common.h alist.h syntax.h treelog.h
 canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h \
@@ -744,10 +744,10 @@ soil_NO3${OBJ}: soil_NO3.C soil_NO3.h solute.h adsorption.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h transport.h mactrans.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h submodel.h
 organic_matter${OBJ}: organic_matter.C organic_matter.h common.h syntax.h \
- treelog.h alist.h log.h librarian.h library.h am.h om.h soil.h \
+ treelog.h alist.h log.h librarian.h library.h am.h om.h plf.h soil.h \
  horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h macro.h \
  soil_NH4.h solute.h adsorption.h transport.h mactrans.h soil_NO3.h \
- soil_heat.h bioincorporation.h mathlib.h plf.h tmpstream.h submodel.h \
+ soil_heat.h bioincorporation.h mathlib.h tmpstream.h submodel.h \
  check.h
 nitrification${OBJ}: nitrification.C nitrification.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h
@@ -766,12 +766,13 @@ snow${OBJ}: snow.C snow.h alist.h common.h syntax.h treelog.h log.h \
  tmpstream.h
 im${OBJ}: im.C im.h am.h librarian.h library.h common.h alist.h syntax.h \
  treelog.h log.h submodel.h
-om${OBJ}: om.C om.h common.h syntax.h treelog.h alist.h check.h geometry.h \
- log.h librarian.h library.h mathlib.h tmpstream.h submodel.h
+om${OBJ}: om.C om.h common.h plf.h syntax.h treelog.h alist.h check.h \
+ geometry.h log.h librarian.h library.h mathlib.h tmpstream.h \
+ submodel.h assertion.h
 harvest${OBJ}: harvest.C harvest.h chemicals.h syntax.h common.h treelog.h \
  log.h librarian.h library.h alist.h submodel.h
 chemicals${OBJ}: chemicals.C chemicals.h syntax.h common.h treelog.h log.h \
- librarian.h library.h alist.h chemical.h submodel.h
+ librarian.h library.h alist.h chemical.h submodel.h mathlib.h
 field${OBJ}: field.C field.h common.h column.h librarian.h library.h \
  alist.h syntax.h treelog.h log.h log_clone.h log_alist.h
 soil_chemical${OBJ}: soil_chemical.C soil_chemical.h solute.h adsorption.h \
@@ -818,6 +819,7 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h plf.h transform.h \
  groundwater.h log.h weather.h im.h vegetation.h
+assertion${OBJ}: assertion.C assertion.h treelog.h tmpstream.h common.h
 xref${OBJ}: xref.C xref.h traverse.h library.h common.h syntax.h treelog.h \
  alist.h submodel.h
 treelog_dual${OBJ}: treelog_dual.C treelog_dual.h treelog.h common.h
@@ -858,7 +860,7 @@ librarian${OBJ}: librarian.C librarian.h library.h common.h alist.h \
 cdaisy${OBJ}: cdaisy.C syntax.h common.h treelog.h alist.h daisy.h \
  parser_file.h parser.h librarian.h library.h field.h column.h \
  weather.h im.h action.h horizon.h printer_file.h printer.h version.h \
- chemical.h log_extern.h treelog_stream.h
+ options.h chemical.h log_extern.h treelog_stream.h
 common${OBJ}: common.C common.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
@@ -908,281 +910,4 @@ vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h \
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h crop.h organic_matter.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h plf.h mathlib.h \
- harvest.h chemicals.h log.h tmpstream.h
-crop_simple${OBJ}: crop_simple.C crop.h time.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h root_system.h rootdens.h \
- canopy_simple.h plf.h log.h bioclimate.h soil_water.h macro.h soil.h \
- horizon.h hydraulic.h tortuosity.h geometry.h om.h organic_matter.h \
- soil_heat.h soil_NH4.h solute.h adsorption.h transport.h mactrans.h \
- soil_NO3.h am.h harvest.h chemicals.h mathlib.h check.h
-action_ridge${OBJ}: action_ridge.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h field.h ridge.h
-groundwater_fixed${OBJ}: groundwater_fixed.C groundwater.h uzmodel.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h
-groundwater_deep${OBJ}: groundwater_deep.C groundwater.h uzmodel.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h
-action_heat${OBJ}: action_heat.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h field.h check.h
-hydraulic_M_vG_compact${OBJ}: hydraulic_M_vG_compact.C hydraulic.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h plf.h
-action_crop${OBJ}: action_crop.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h field.h crop.h am.h log.h \
- harvest.h chemicals.h check_range.h check.h im.h tmpstream.h
-groundwater_lysimeter${OBJ}: groundwater_lysimeter.C groundwater.h \
- uzmodel.h librarian.h library.h common.h alist.h syntax.h treelog.h
-select_min${OBJ}: select_min.C select_value.h select.h condition.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h
-select_max${OBJ}: select_max.C select_value.h select.h condition.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h
-select_average${OBJ}: select_average.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h
-action_message${OBJ}: action_message.C action.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h condition.h log.h daisy.h
-weather_std${OBJ}: weather_std.C weather.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h im.h lexer_data.h lexer.h tmpstream.h \
- mathlib.h units.h
-select_flux_top${OBJ}: select_flux_top.C select_value.h select.h \
- condition.h librarian.h library.h common.h alist.h syntax.h treelog.h \
- geometry.h
-select_flux_bottom${OBJ}: select_flux_bottom.C select_value.h select.h \
- condition.h librarian.h library.h common.h alist.h syntax.h treelog.h \
- geometry.h
-groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h uzmodel.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h log.h \
- soil.h horizon.h hydraulic.h tortuosity.h geometry.h soil_heat.h \
- tmpstream.h mathlib.h check.h
-select_index${OBJ}: select_index.C select_value.h select.h condition.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h
-select_content${OBJ}: select_content.C select_value.h select.h condition.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h geometry.h
-select_interval${OBJ}: select_interval.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h geometry.h units.h
-select_number${OBJ}: select_number.C select_value.h select.h condition.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h
-select_date${OBJ}: select_date.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h
-select_array${OBJ}: select_array.C select.h condition.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h
-log_table${OBJ}: log_table.C log_select.h log.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h select.h condition.h geometry.h \
- version.h daisy.h
-log_harvest${OBJ}: log_harvest.C log.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h harvest.h chemicals.h version.h
-action_while${OBJ}: action_while.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h log.h
-action_wait${OBJ}: action_wait.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h condition.h log.h daisy.h tmpstream.h
-action_activity${OBJ}: action_activity.C action.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h log.h
-average_arithmetic${OBJ}: average_arithmetic.C average.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h
-average_harmonic${OBJ}: average_harmonic.C average.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h
-average_geometric${OBJ}: average_geometric.C average.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h
-mactrans_std${OBJ}: mactrans_std.C mactrans.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h soil_water.h macro.h soil.h \
- horizon.h hydraulic.h tortuosity.h geometry.h plf.h mathlib.h \
- tmpstream.h
-macro_std${OBJ}: macro_std.C macro.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h plf.h mathlib.h log.h uzmodel.h check.h tmpstream.h
-macro_none${OBJ}: macro_none.C macro.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h
-document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h xref.h plf.h tmpstream.h \
- version.h
-column_std${OBJ}: column_std.C column_base.h column.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h bioclimate.h surface.h \
- uzmodel.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
- soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
- solute.h adsorption.h transport.h mactrans.h plf.h transform.h \
- groundwater.h log.h weather.h im.h vegetation.h soil_NH4.h soil_NO3.h \
- organic_matter.h nitrification.h denitrification.h am.h
-weather_simple${OBJ}: weather_simple.C weather_old.h weather.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h im.h log.h mathlib.h
-uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h soil_heat.h mathlib.h log.h average.h tmpstream.h
-hydraulic_yolo${OBJ}: hydraulic_yolo.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h plf.h
-hydraulic_M_vG${OBJ}: hydraulic_M_vG.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h plf.h check.h
-hydraulic_B_vG${OBJ}: hydraulic_B_vG.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h plf.h
-hydraulic_M_C${OBJ}: hydraulic_M_C.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h check_range.h check.h
-hydraulic_B_C${OBJ}: hydraulic_B_C.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h check_range.h check.h
-hydraulic_M_BaC${OBJ}: hydraulic_M_BaC.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h
-hydraulic_B_BaC${OBJ}: hydraulic_B_BaC.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h
-groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h
-horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h
-crop_std${OBJ}: crop_std.C crop.h time.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h chemicals.h root_system.h rootdens.h \
- canopy_std.h canopy_simple.h plf.h harvesting.h production.h \
- development.h partition.h vernalization.h photosynthesis.h crpn.h \
- log.h bioclimate.h soil_water.h macro.h soil.h horizon.h hydraulic.h \
- tortuosity.h geometry.h organic_matter.h soil_heat.h am.h mathlib.h
-action_sow${OBJ}: action_sow.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h field.h crop.h
-action_stop${OBJ}: action_stop.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h
-condition_time${OBJ}: condition_time.C condition.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h daisy.h
-condition_logic${OBJ}: condition_logic.C condition.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h
-action_irrigate${OBJ}: action_irrigate.C action.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h daisy.h field.h im.h check.h \
- tmpstream.h
-action_lisp${OBJ}: action_lisp.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h log.h condition.h
-weather_none${OBJ}: weather_none.C weather_old.h weather.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h im.h
-action_tillage${OBJ}: action_tillage.C action.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h daisy.h field.h check.h
-action_harvest${OBJ}: action_harvest.C action.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h daisy.h field.h
-crop_old${OBJ}: crop_old.C crop.h time.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h log.h bioclimate.h plf.h soil_water.h \
- macro.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h om.h \
- organic_matter.h soil_heat.h soil_NH4.h solute.h adsorption.h \
- transport.h mactrans.h soil_NO3.h am.h harvest.h chemicals.h \
- mathlib.h tmpstream.h
-crop_sold${OBJ}: crop_sold.C crop.h time.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h log.h bioclimate.h plf.h soil_water.h \
- macro.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
- organic_matter.h om.h soil_heat.h soil_NH4.h solute.h adsorption.h \
- transport.h mactrans.h soil_NO3.h am.h harvest.h chemicals.h \
- mathlib.h tmpstream.h
-action_with${OBJ}: action_with.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h field.h log.h
-nitrification_soil${OBJ}: nitrification_soil.C nitrification.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h soil_water.h macro.h soil_heat.h \
- soil_NH4.h solute.h adsorption.h transport.h mactrans.h soil_NO3.h \
- mathlib.h log.h plf.h check.h
-nitrification_solute${OBJ}: nitrification_solute.C nitrification.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h soil.h \
- horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h macro.h \
- soil_heat.h soil_NH4.h solute.h adsorption.h transport.h mactrans.h \
- soil_NO3.h log.h mathlib.h plf.h check.h
-hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h check.h
-uzlr${OBJ}: uzlr.C uzmodel.h librarian.h library.h common.h alist.h \
- syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h soil_heat.h log.h mathlib.h
-transport_cd${OBJ}: transport_cd.C transport.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h \
- tortuosity.h geometry.h soil_water.h macro.h solute.h adsorption.h \
- mactrans.h log.h mathlib.h
-transport_none${OBJ}: transport_none.C transport.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h \
- tortuosity.h geometry.h soil_water.h macro.h solute.h adsorption.h \
- mactrans.h log.h mathlib.h tmpstream.h
-transport_convection${OBJ}: transport_convection.C transport.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h soil_water.h macro.h solute.h \
- adsorption.h mactrans.h log.h mathlib.h
-adsorption_vS_S${OBJ}: adsorption_vS_S.C adsorption.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h mathlib.h
-adsorption_none${OBJ}: adsorption_none.C adsorption.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h
-tortuosity_M_Q${OBJ}: tortuosity_M_Q.C tortuosity.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h hydraulic.h
-tortuosity_linear${OBJ}: tortuosity_linear.C tortuosity.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h hydraulic.h
-adsorption_freundlich${OBJ}: adsorption_freundlich.C adsorption.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h soil.h \
- horizon.h hydraulic.h tortuosity.h geometry.h check.h mathlib.h
-adsorption_linear${OBJ}: adsorption_linear.C adsorption.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h check.h soil.h \
- horizon.h hydraulic.h tortuosity.h geometry.h
-adsorption_langmuir${OBJ}: adsorption_langmuir.C adsorption.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h check.h mathlib.h
-bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h surface.h uzmodel.h weather.h \
- im.h plf.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
- soil_heat.h snow.h log.h mathlib.h pet.h svat.h vegetation.h \
- chemicals.h
-condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h crop.h field.h daisy.h
-condition_soil${OBJ}: condition_soil.C condition.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h field.h daisy.h check.h
-log_table1${OBJ}: log_table1.C log.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h condition.h geometry.h
-log_checkpoint${OBJ}: log_checkpoint.C log_alist.h log.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h condition.h daisy.h \
- printer_file.h printer.h tmpstream.h
-uznone${OBJ}: uznone.C uzmodel.h librarian.h library.h common.h alist.h \
- syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h log.h mathlib.h
-condition_daisy${OBJ}: condition_daisy.C condition.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h daisy.h
-chemical_std${OBJ}: chemical_std.C chemical.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h mathlib.h plf.h soil_chemical.h \
- solute.h adsorption.h transport.h mactrans.h check.h
-hydraulic_M_BaC_Bimodal${OBJ}: hydraulic_M_BaC_Bimodal.C hydraulic.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h
-hydraulic_B_BaC_Bimodal${OBJ}: hydraulic_B_BaC_Bimodal.C hydraulic.h \
- librarian.h library.h common.h alist.h syntax.h treelog.h mathlib.h
-pet_makkink${OBJ}: pet_makkink.C pet.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h weather.h im.h log.h
-pet_weather${OBJ}: pet_weather.C pet.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h weather.h im.h log.h
-svat_none${OBJ}: svat_none.C svat.h librarian.h library.h common.h alist.h \
- syntax.h treelog.h
-action_spray${OBJ}: action_spray.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h field.h chemical.h check.h
-pet_PM${OBJ}: pet_PM.C pet.h librarian.h library.h common.h alist.h \
- syntax.h treelog.h weather.h im.h soil.h horizon.h hydraulic.h \
- tortuosity.h geometry.h surface.h uzmodel.h soil_heat.h bioclimate.h \
- net_radiation.h vegetation.h log.h tmpstream.h
-svat_pmsw${OBJ}: svat_pmsw.C surface.h uzmodel.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h weather.h im.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h soil_water.h macro.h soil_heat.h \
- vegetation.h pet.h svat.h log.h nrutil.h
-action_merge${OBJ}: action_merge.C action.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h daisy.h field.h
-action_divide${OBJ}: action_divide.C action.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h daisy.h field.h
-action_surface${OBJ}: action_surface.C action.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h daisy.h field.h check.h
-main${OBJ}: main.C daisy.h time.h syntax.h common.h treelog.h alist.h \
- library.h treelog_dual.h options.h
-tkmain${OBJ}: tkmain.C daisy.h time.h syntax.h common.h treelog.h alist.h \
- library.h
-gmain${OBJ}: gmain.C daisy.h time.h syntax.h common.h treelog.h alist.h \
- library.h
-qmain_edit${OBJ}: qmain_edit.C qmain_edit.h alist.h common.h syntax.h \
- treelog.h library.h plf.h depend.h
-qmain_edit_moc${OBJ}: qmain_edit_moc.C qmain_edit.h alist.h common.h
-qmain${OBJ}: qmain.C qmain.h syntax.h common.h treelog.h alist.h \
- qmain_tree.h qmain_busy.h daisy.h library.h version.h parser_file.h \
- parser.h librarian.h printer_file.h printer.h tmpstream.h
-qmain_moc${OBJ}: qmain_moc.C qmain.h syntax.h common.h treelog.h alist.h
-qmain_tree${OBJ}: qmain_tree.C qmain_tree.h qmain_item.h qmain_populate.h \
- common.h
-qmain_item${OBJ}: qmain_item.C qmain_item.h qmain_edit.h alist.h common.h \
- qmain_tree.h qmain_populate.h qmain_busy.h qmain.h syntax.h treelog.h \
- library.h tmpstream.h treelog_stream.h depend.h traverse_delete.h
-qmain_populate${OBJ}: qmain_populate.C qmain_populate.h qmain_tree.h \
- qmain_item.h qmain.h syntax.h common.h treelog.h alist.h traverse.h \
- tmpstream.h plf.h library.h parser.h librarian.h
-qmain_busy${OBJ}: qmain_busy.C qmain_busy.h
-cmain${OBJ}: cmain.c cdaisy.h
-bugmain${OBJ}: bugmain.c cdaisy.h
-weather_file${OBJ}: weather_file.C weather_old.h weather.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h im.h log.h
-hydraulic_old${OBJ}: hydraulic_old.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h mathlib.h plf.h
-hydraulic_old2${OBJ}: hydraulic_old2.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h mathlib.h plf.h
-weather_hourly${OBJ}: weather_hourly.C weather_old.h weather.h librarian.h \
- library.h common.h alist.h syntax.h treelog.h im.h log.h mathlib.h
+ harvest.h chemical
