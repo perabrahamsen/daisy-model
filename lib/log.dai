@@ -185,9 +185,9 @@ flow to drain pipes, and subsoil irrigation."
   "Summary of evapotranspiration."
   (precision 1)
   (fetch ("RefEvapotranspiration"
-          (name "Evapotranspiration, reference"))
+          (name "Evapotranspiration, reference, dry"))
          ("Potential Evapotranspiration"
-          (name "Evapotranspiration, potential"))
+          (name "Evapotranspiration, potential, wet"))
          ("Actual Evapotranspiration"
           (name "Evapotranspiration, actual"))
          ("Evaporation from snow")
