@@ -15,6 +15,7 @@ CanopySimple::output (Log& log) const
 void 
 CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  alist.add ("submodel", "CanopySimple");
   static const PLF empty_plf;
 
   // Parameters.

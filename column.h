@@ -52,6 +52,8 @@ public:
 public:
   virtual double soil_temperature (double height) const = 0; // [ cm -> dg C]
   virtual double soil_water_potential (double height) const = 0; // [cm -> cm]
+  virtual double soil_inorganic_nitrogen (double from, // [kg N/ha]
+					  double to) const = 0; 
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   virtual double crop_ds (const string& crop) const = 0; 

@@ -49,6 +49,7 @@ public:
   { return C_[i]; }
   double M_left (int i) const
   { return M_[i] + S[i] * dt; }
+  double total (const Geometry&, double from, double to) const;
 
   // Sink.
 public:

@@ -47,6 +47,7 @@ struct Field::Implementation
 public:
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
+  double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   double crop_ds (const string& crop) const; 
@@ -347,6 +348,18 @@ Field::Implementation::soil_water_potential (double height) const // [cm -> cm]
 }
 
 double 
+Field::Implementation::soil_inorganic_nitrogen (double from,  // [kg N/ha]
+						double to) const
+{
+  if (selected)
+    return selected->soil_inorganic_nitrogen (from, to); 
+  if (columns.size () != 1)
+    throw ("Cannot find inorganic nitrogen in multiple columns");
+
+  return columns[0]->soil_inorganic_nitrogen (from, to);
+}
+
+double 
 Field::Implementation::crop_ds (const string& crop) const
 { 
   if (selected)
@@ -592,6 +605,10 @@ Field::soil_temperature (double height) const  // [ cm -> dg C]
 double 
 Field::soil_water_potential (double height) const // [cm -> cm]
 { return impl.soil_water_potential (height); }
+
+double
+Field::soil_inorganic_nitrogen (double from, double to) const // [kg N/ha]
+{ return impl.soil_inorganic_nitrogen (from, to); }
 
 double 
 Field::crop_ds (const string& crop) const

@@ -201,6 +201,7 @@ void
 CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   CanopySimple::load_syntax (syntax, alist);
+  alist.add ("submodel", "CanopyStandard");
 
   // Parameters.
   syntax.add ("DSLAI05", Syntax::None (), Syntax::Const,

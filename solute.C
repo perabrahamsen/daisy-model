@@ -8,6 +8,10 @@
 #include "soil_water.h"
 #include "mathlib.h"
 
+double
+Solute::total (const Geometry& geometry, double from, double to) const
+{ return geometry.total (M_, from, to); }
+
 void
 Solute::clear ()
 {

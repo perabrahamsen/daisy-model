@@ -2,27 +2,27 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Gødning
 
-** Lad default `weight' for organisk og mineralsk gødning være 0.
+** Dist.
 
-** Ny optional `utilization' parameter til organisk gødning.
+** Fertilizer log.
 
-Dette er førsteårsudnyttelsesgraden.
+* Udnyt `default_alist' til at tillade optional submoduler med default værdier.
 
-** Gød efter hvor meget N der mangler i jorden.
+** Ret syntax
 
-Dette kan gøren med en optional
+** Ret parser.
 
-  (precision (target 100) (from 0.0) (to -100.0) (minimum 0.0))
+** Ret pretty printer
 
-argument til fertilize ordren.
+** Ret document_LaTeX.C
 
-** Ny `equivalent_weight' argument til fertilize.
+** Test med `precision'.
 
-Denne skal udnytte udnyttelsesgraden.
+** Fjern "dummy" fra e.g. Ridge.
 
-** Check at mængden kun er specificiret en gang.
+** Test om "AM" kan have en default_alist.
 
-Max en af am->weight != 0, precision sat, equivalent_weight sat er sand.
+* crop_std: RSR
 
 * Test Cygwin compile, specielt høst resultat.
 

@@ -225,7 +225,7 @@ MODELS = action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	groundwater_static.C horizon_std.C \
 	crop_std.C action_sow.C action_stop.C condition_time.C \
 	condition_logic.C action_irrigate.C action_lisp.C \
-	weather_none.C action_fertilize.C weather_file.C action_tillage.C \
+	weather_none.C weather_file.C action_tillage.C \
 	action_harvest.C hydraulic_old.C crop_old.C crop_sold.C \
 	action_with.C hydraulic_old2.C nitrification_soil.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
@@ -311,7 +311,7 @@ all:	$(EXECUTABLES)
 
 # Create the main executable.
 #
-daisy${EXT}:	main${OBJ} daisy.so
+daisy${EXT}:	main${OBJ} action_fertilize.o daisy.so
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.

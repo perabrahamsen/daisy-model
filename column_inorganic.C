@@ -14,6 +14,10 @@ public:
   void fertilize (const IM&, double from, double to);
   void add_residuals (vector<AM*>& residuals);
 
+  // Conditions.
+public:
+  double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
+
   // Communication with external model.
 public:
   void put_no3_m (const vector<double>& v); // [g/cm^3]
@@ -70,6 +74,10 @@ ColumnInorganic::add_residuals (vector<AM*>& residuals)
 {
   sequence_delete (residuals.begin (), residuals.end ());
 }
+
+double
+ColumnInorganic::soil_inorganic_nitrogen (double, double) const
+{ return 0.0; }
 
 void 
 ColumnInorganic::put_no3_m (const vector<double>&) // [g/cm^3]

@@ -1,4 +1,30 @@
+2000-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.44 released.
+
+2000-09-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_fertilize.C ("precision"): New parameter.
+	* field.C, field.h (soil_inorganic_nitrogen): New function.
+	* column_inorganic.C, column_std.C, column.h
+	(soil_inorganic_nitrogen):  New function.
+	* solute.C, solute.h (total): New function.
+	
+	* lib/fertilizer.dai (slurry): Renamed `NH4_evaporation' to
+	`volatilization'. 
+
 2000-09-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_fertilize.C (equivalent_weight): New parameter.
+	* am.C (weight): Gave default value `0.0' for mineral and
+	organic weight.
+	(utilization): New parameter for organic fertilizer. 
+
+	* root_system.C (load_syntax): Made it a submodel.
+	* canopy_std.C (load_syntax): Ditto.
+	* canopy_simple.C (load_syntax): Ditto.
+
+	* lib/log.dai ("N Balance"): Renamed `Total-NO3' to `NO3-Total'.
 
 	* Version 1.43 released.
 

@@ -940,6 +940,11 @@ Organic fertilizer, typically slurry or manure from animals.");
 	alist.add ("syntax", "organic");
 	syntax.add ("weight", "T w.w./ha", Syntax::Const,
 		    "Amount of fertilizer applied.");
+	alist.add ("weight", 0.0);
+	syntax.add ("first_year_utilization", 
+		    Syntax::Fraction (), Syntax::OptionalConst, 
+		    "Estimated useful N fraction for the first year.\n\
+In Denmark, this is governed by legalisation.");
 	syntax.add ("dry_matter_fraction", Syntax::Fraction (), Syntax::Const,
 		    "Dry matter fraction of total weight.");
 	syntax.add ("total_C_fraction", Syntax::Fraction (), Syntax::Const,
@@ -974,6 +979,7 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 	alist.add ("creation", Time (1, 1, 1, 1));
 	syntax.add ("weight", "kg N/ha", Syntax::Const,
 		    "Amount of fertilizer applied.");
+	alist.add ("weight", 0.0);
 	syntax.add ("NH4_fraction", Syntax::Fraction (), Syntax::Const, 
 		    "Ammonium fraction of total N in fertilizer.  \
 The remaining nitrogen is assumed to be nitrate.");

@@ -64,12 +64,12 @@ public:
 public:
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
+  double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
   double crop_ds (const string& crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
   double crop_dm (const string& crop) const; 
-
   // Simulation.
   void tick (const Time&, const Weather*);
   void output (Log&) const;

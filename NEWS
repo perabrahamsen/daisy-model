@@ -12,6 +12,44 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.44
+
+** New `first_year_utilization' fertilizer parameter.
+
+Use this together with the new `equivalent_weight' fertilize
+parameter, to let Daisy calculate the amount on organic fertilizer to
+apply, to get an inorganic nitrogen equivalent.  Example:
+
+  (fertilize (pig_slurry (first_year_utilization 0.20))
+             (equivalent_weight 50.0)) ; kg N/ha
+
+Here, we specify that 20% of the nitrogen (organic or inorganic)
+contained in pig slurry can be utilized the first year, and that we
+want to fertilize with an amount of pig slurry corresponding to 50 kg
+N/ha.  Daisy will then apply, say, 3 ton DM/ha pig slurry, depending
+on the N content of the slurry.
+
+** New `precision' fertilize parameter.
+
+This allows you to let the amount of fertilizer you apply depend on
+the nitrogen content of the soil in a specified zone.  Use it like
+this: 
+
+  (fertilize (n50)
+             (precision (target 150.0) ; kg N/ha
+                        (minimum 50.0) ; kg N/ha
+                        (from 0.0) (to -100.0)))
+
+Daisy will measure the amount af fertlizer in the specified zone (from
+the soil surface to 100 cm depth), and supply enough extra nitrogen to
+reach the specified target (150 kg N/ha).  If less than minimum (50 kg
+N/ha) nitrogen is needed in order to reach the target, no fertilizer
+will be applied.
+
+You can use the `precision' parameter with organic fertilizer as well,
+in that case you must also specify the `first_year_utilization'
+fertilizer parameter. 
+
 * 1.43
 
 ** New `set_subsoil_irrigation' action.

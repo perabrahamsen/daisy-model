@@ -36,6 +36,10 @@ public:
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
 
+  // Conditions.
+public:
+  double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
+
   // Communication with external model.
 public:
   void put_no3_m (const vector<double>& v); // [g/cm^3]
@@ -201,6 +205,13 @@ ColumnStandard::swap (const Time& time, double from, double middle, double to)
   soil_NH4.swap (soil, soil_water, from, middle, to);
   organic_matter.swap (soil, from, middle, to);
 }
+
+double				// [kg N/ha]
+ColumnStandard::soil_inorganic_nitrogen (double from, double to) const
+{
+  return (soil_NH4.total (soil, from, to) 
+	  + soil_NO3.total (soil, from, to)) * 1.0e5; // g N/cm^2 -> kg N/ha
+}  
 
 void 
 ColumnStandard::put_no3_m (const vector<double>& v) // [g/cm^3]

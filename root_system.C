@@ -418,6 +418,7 @@ RootSystem::initialize (unsigned int size)
 void 
 RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  alist.add ("submodel", "RootSystem");
   static const vector<double> empty_array;
 
   syntax.add ("DptEmr", "cm", Syntax::Const,
