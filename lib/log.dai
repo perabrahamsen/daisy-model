@@ -628,6 +628,7 @@ soil increases."
 			  ("CO2 production from fast pools")
 			  ("Denitrification")
 			  ("Denitrification from fast pools")
+			  ("Redox denitrification")
 			  ("Potential denitrification")
 			  ("Potential denitrification from fast pools"))))
   (when hourly)
@@ -648,6 +649,11 @@ soil increases."
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
 	   (interval (path column "$col" Denitrification converted_fast)
                      (tag "Denitrification from fast pools")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+	   (interval (path column "$col" Denitrification converted_redox)
+                     (tag "Redox denitrification")
                      (flux true)
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
