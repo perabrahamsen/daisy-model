@@ -14,67 +14,47 @@
 ;; We have some very sandy soil.
 (defhorizon top default
   (hydraulic M_vG 
-	     (K_sat 19.3)
-	     (Theta_res 0.05)
-	     (Theta_sat 0.424)
-	     (alpha 0.069)
-	     (n 1.527))
-  (SOM_fractions 0.66 0.34)
-  (SOM_C_per_N 11 11)
-  (clay 8.0)
-  (silt 10.5)
-  (humus 1.12)
-  (coarse_sand 63.4)
-  (fine_sand 16.5))
+	     (K_sat 19.3 [cm/h])
+	     (Theta_res 0.05  [cm^3 H2O/cm^3])
+	     (Theta_sat 0.424 [cm^3 H2O/cm^3])
+	     (alpha 0.069 [cm^-1])
+	     (n 1.527 []))
+  (SOM_fractions 0.66 0.34 [])
+  (SOM_C_per_N 11 11 [g C/g N])
+  (clay 8.0 [])
+  (silt 10.5 [])
+  (humus 1.12 [])
+  (coarse_sand 63.4 [])
+  (fine_sand 16.5 []))
 
 (defhorizon bottom default
   (hydraulic M_vG 
-	     (K_sat 64.08)
-	     (Theta_res 0.042)
-	     (Theta_sat 0.438)
-	     (alpha 0.054)
-	     (n 2.416))
-  (SOM_fractions 0.66 0.34)
-  (SOM_C_per_N 11 11)
-  (clay 8.0)
-  (silt 10.5)
-  (humus 0.12)				;Less humus here.
-  (coarse_sand 63.4)
-  (fine_sand 16.5))
+	     (K_sat 64.08 [cm/h])
+	     (Theta_res 0.042 [cm^3 H2O/cm^3])
+	     (Theta_sat 0.438 [cm^3 H2O/cm^3])
+	     (alpha 0.054 [cm^-1])
+	     (n 2.416 []))
+  (SOM_fractions 0.66 0.34 [])
+  (SOM_C_per_N 11 11 [g C/g N])
+  (clay 8.0 [])
+  (silt 10.5 [])
+  (humus 0.12 [])			;Less humus here.
+  (coarse_sand 63.4 [])
+  (fine_sand 16.5 []))
 
-;; We use this column.
+;; We build the column from the horizons.
 (defcolumn JB1_Andeby default
   (Bioclimate default)
-  (Groundwater static)
-  (Soil (horizons (-20 [cm] top) (-250 [cm] bottom))
+  (Groundwater deep)
+  (Soil (horizons (-20 [cm] top) (-2.5 [m] bottom))
 	(zplus -2.5 -5 -10 -15 -20
 	       -25 -30 -40 -50 -60 -70
 	       -80 -90 -100 -125 -150 -175
 	       -200 -225 -250 [cm])
-	(MaxRootingDepth 60.0 [cm])
-	(dispersivity 8.0))
-  (SoilWater (h -100.0 [cm]))
-  (SoilNH4 (M 0.5e-6))
-  (SoilNO3 (M 3.0e-6))
-  (OrganicMatter (initial_SOM   (-20  4.86)
-                                (-40  2.92)
-                                (-60  1.46)
-                                (-80  0.49)
-                                (-100 0.16)
-                                (-120 0.03))))
+	(MaxRootingDepth 60.0 [cm])))
 
-
-
-;; We specialize the JB1_Andeby column to use Richards
-;; equation and linked reservoirs for water transport, respectively.  
-(defcolumn JB1_Richards JB1_Andeby
-  (SoilWater (UZtop richards)))
-
-(defcolumn JB1_lr JB1_Andeby
-  (SoilWater (UZtop lr)))
-
-;; Run simulation with both columns for comparison.
-(column JB1_Richards)
+;; Use it.
+(column JB1_Andeby)
 
 ;; Simulation start date.
 (time 1986 12 1 1)
@@ -84,8 +64,8 @@
   (plowing)
   (wait (at 1987 4 4 1))
   (fertilize mineral 
-	     (weight 100.0)		;kg N/ha
-	     (NH4_fraction 0.5))
+	     (weight 100.0 [kg N/ha])
+	     (NH4_fraction 0.5 []))
   (wait (at 1987 4 5 1))
   (progn 
     (sow "Grass")
@@ -95,26 +75,28 @@
   (harvest "Spring Barley")
   (wait (at 1987 9 8 1))
   (fertilize mineral
-	     (weight 80.0)
-	     (NH4_fraction 0.5))
+	     (weight 80.0 [kg N/ha])
+	     (NH4_fraction 0.5 []))
   (wait (at 1987 10 10 1))
   (harvest "Grass"
-	   (stub 8.)			;Leave 08 cm stub.
-	   (stem 1.00))			;Harvest everything above stub.
+	   (stub 8.0 [cm])		;Leave 8 cm stub.
+	   (stem 1.00 []))	       ;Harvest everything above stub.
   (wait (at 1988 4 1 1))
   (stop))
 
-(deflog "pond" table1
+;; Define a log file format.
+(deflog "pond" table
   (where "pond.tab")
   (when hourly)
-  (entries ((path time year))
-	   ((path time month))
-	   ((path time mday))
-	   ((path column "*" Surface pond)
-	    (dimension "mm"))))
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (hour (path time))
+	   (number (path column "*" Surface pond)
+		   (when hourly)
+		   (dimension "mm"))))
 
 ;; Create these log files.
-(output pond 
-	Harvest)
+(output pond Harvest)
 
 ;;; test.dai ends here.
