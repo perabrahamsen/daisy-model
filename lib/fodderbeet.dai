@@ -1,6 +1,6 @@
 (defcrop "Fodder Beet" default
 
-  (Devel
+  (Devel default
       (EmrTSum  250)
       (DS_Emr   0.01)
       (DSRate1  0.005)

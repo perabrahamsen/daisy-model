@@ -897,6 +897,9 @@ the sum of all chemicals."
            (month (path time))
            (mday (path time))
            (number (when hourly)
+                   (path weather "*" precipitation)
+                   (dimension "mm/&"))
+           (number (when hourly)
                    (path weather "*" rain)
                    (dimension "mm/&"))
            (number (when hourly)
@@ -968,11 +971,11 @@ the sum of all chemicals."
            (month (path time))
            (mday (path time))
            (number (path column "$col" Vegetation crops crops "$crop"
-                         Devel DS)
+                         Devel "*" DS)
                    (dimension "none")
                    (factor 1.0))        ;Development stage [-1:2]
            (number (path column "$col" Vegetation crops crops "$crop"
-                         Devel day_length)
+                         Devel "*" day_length)
                    (dimension "h")
                    (factor 1.0))        ;Light hours previous day.
            (number (path column "$col" Vegetation crops crops "$crop"

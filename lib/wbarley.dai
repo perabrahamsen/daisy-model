@@ -1,6 +1,6 @@
 (defcrop "Winter Barley" default
 
-  (Devel
+  (Devel default
       (EmrTSum  200)
       (DS_Emr   0.01)
       (DSRate1  0.025)
@@ -95,7 +95,7 @@
 
 (defcrop "Winter Barley; Koge" default
     (description "Køge Project")
-  (Devel (EmrTSum  200)
+  (Devel default (EmrTSum  200)
       (DS_Emr   0.01)
       (DSRate1  0.022)
       (TempEff1 (-10.  0.010) ( 0.0  0.030) (20.0  0.900) (25.0  1.00) (35.0  1.20))

@@ -1,5 +1,5 @@
 (defcrop "Winter Wheat" default
-  (Devel (EmrTSum  100)
+  (Devel default (EmrTSum  100)
       (DS_Emr   0.01)
       (DSRate1  0.026)
       (TempEff1 (-10.0  0.01) (0.00  0.01) (20.0  0.90) (25.0  1.00) (35.0  1.20))
@@ -83,7 +83,7 @@
 
 
 (defcrop "Winter Wheat; Eest" "Winter Wheat"
-  (Devel (EmrTSum  200)
+  (Devel original (EmrTSum  200)
       (DSRate1  0.020)
       (DSRate2  0.027)
   )
@@ -132,7 +132,7 @@
 
 (defcrop "Winter Wheat; Foulum" "Winter Wheat"
     (description "RS-Model Project")
-  (Devel (EmrTSum  200)
+  (Devel original (EmrTSum  200)
       (DSRate1  0.022))
 
   (Canopy 

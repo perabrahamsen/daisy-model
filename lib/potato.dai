@@ -1,6 +1,6 @@
 (defcrop "Potato" default
   (description "Køge Project")
-  (Devel (EmrTSum  125)
+  (Devel default (EmrTSum  125)
       (DS_Emr   0.01)
       (DSRate1  0.007)
       (TempEff1 (-1. 0.00) (0.0 0.01) (5.0 0.50) (20. 1.00) (25. 0.50))

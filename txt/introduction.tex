@@ -986,6 +986,12 @@ fixed component, there is a \emph{sample} showing the attributes you
 can specify, and how they should be placed.  The sample is explained in
 section~\ref{sec:sample}. 
 
+Submodels and fixed components are special compared to the other
+attribute values, in that they do not replace the original value.
+Instead, the original value will be amended with the individual
+attributes you specify.  If you don't specify the value for a
+particular attribute, the original value will be used.  
+
 \subsection{Library Components}
 \label{type:object}
 
@@ -1001,6 +1007,11 @@ Each section of each chapter in part~\ref{part:components} describes a
 specific model.  Part of that description is a \emph{sample}, which
 shows how to specify that model in a setup file, and how to set the
 parameters for that model.
+
+If you want to make partial modifications to the original value of the
+library component, you can specify the special keyword ``original''
+instead of a name of a model or parameterization, followed by a list
+of those attribute names and value you want to overwrite.
 
 The format for library component values described here is also used
 when defining named parameterizations.  In the setup file, you
@@ -1196,7 +1207,7 @@ missing parentheses or unknown attributes, Daisy will give you
 information about which file the error was found, the line number, the
 column number, and what the problem was.
 \begin{verbatim}
-  test.dai:15:6: Unknown attribute `kurt'
+  test.dai:15:6: Unknown attribute 'kurt'
 \end{verbatim}
 This is the ``best'' kind of errors, since it will lead you directly
 to the place where the error occurred.  
@@ -1211,8 +1222,8 @@ After parsing the setup files, Daisy will check that all the required
 parameters and state variables are defined, and make some very simple
 consistency checks.  Errors during this phase looks as follows:
 \begin{verbatim}
-  Attribute weather missing
-  in daisy
+  * Daisy
+  time missing
 \end{verbatim}
 
 \subsubsection{Consistency checks}
@@ -1222,9 +1233,10 @@ create the simulation objects, and then perform a more throughout
 consistency check.  Errors found during these phases will be reported
 like the one below.
 \begin{verbatim}
-  You have 20 intervals but 26 T values
-  in column `JB1_Richards'
-  Malformed column(s)
+  * column
+  ** Andeby
+  *** SoilHeat
+  You have 20 intervals but 60 T values
 \end{verbatim}
 
 \subsubsection{Runtime exceptions}
@@ -1243,7 +1255,7 @@ During debugging, a lot of `assert' statements have been added to the
 code.  Each of these statements will check if a certain condition is
 true, and if not, exit the program with a message like
 \begin{verbatim}
-  field.C:71: failed assertion `false'
+  field.C:71: failed assertion 'false'
 \end{verbatim}
 A failed assertion message will always print the file name, the line
 number, and the assertion that failed, but the format may vary between
