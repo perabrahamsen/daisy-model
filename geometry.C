@@ -45,11 +45,11 @@ Geometry::interval_plus (double z) const
 unsigned int
 Geometry::interval_border (double z) const
 {
-  double best = fabs (z - zplus_[0]);
+  double best = fabs (z - 0.0);
   
-  for (unsigned int i = 1; i < size_; i++)
+  for (unsigned int i = 1; i <= size_; i++)
     {
-      double dist = fabs (z - zplus_[i]);
+      double dist = fabs (z - zplus_[i-1]);
       if (dist > best)
 	return i - 1;
       best = dist;
@@ -148,6 +148,17 @@ Geometry::mix (vector<double>& v, double from, double to) const
   daisy_assert (approximate (old_total, total (v)));
 }
 
+void
+Geometry::mix (vector<double>& v, double from, double to, 
+               vector<double>& change) const
+{
+  vector<double> old = v;
+  mix (v, from, to);
+  daisy_assert (v.size () <= change.size ());
+  for (unsigned int i = 0; i < v.size (); i++)
+    change[i] += v[i] - old[i];
+}
+
 double
 Geometry::extract (vector<double>& v, double from, double to) const
 {
@@ -217,6 +228,17 @@ Geometry::swap (vector<double>& v, double from, double middle, double to) const
   add (v, from, new_middle, bottom_content);
   add (v, new_middle, to, top_content);
   daisy_assert (approximate (old_total, total (v)));
+}
+
+void
+Geometry::swap (vector<double>& v, double from, double middle, double to, 
+                vector<double>& change) const
+{
+  vector<double> old = v;
+  swap (v, from, middle, to);
+  daisy_assert (v.size () <= change.size ());
+  for (unsigned int i = 0; i < v.size (); i++)
+    change[i] += v[i] - old[i];
 }
 
 static struct CheckLayers : public VCheck

@@ -47,6 +47,7 @@ struct SoilWater::Implementation
   vector<double> S_p;
   vector<double> S_permanent;
   vector<double> S_incorp;
+  vector<double> tillage;
   vector<double> Theta_old;
   vector<double> h_old;
   vector<double> Theta;
@@ -109,6 +110,7 @@ SoilWater::Implementation::clear (const Geometry&)
   fill (S_root.begin (), S_root.end (), 0.0);
   fill (S_ice.begin (), S_ice.end (), 0.0);
   fill (S_incorp.begin (), S_incorp.end (), 0.0);
+  fill (tillage.begin (), tillage.end (), 0.0);
   // We don't clear S_p and S_drain, because they are needed in solute.
 }
 
@@ -347,7 +349,7 @@ SoilWater::Implementation::incorporate (const Geometry& geometry,
 void
 SoilWater::Implementation::mix (const Soil& soil, double from, double to)
 {
-  soil.mix (Theta, from, to);
+  soil.mix (Theta, from, to, tillage);
   for (unsigned int i = 0; i < soil.size(); i++)
     h[i] = soil.h (i, Theta[i]);
 }
@@ -356,7 +358,7 @@ void
 SoilWater::Implementation::swap (Treelog& msg, const Soil& soil,
 				 double from, double middle, double to)
 {
-  soil.swap (Theta, from, middle, to);
+  soil.swap (Theta, from, middle, to, tillage);
 
   for (unsigned int i = 0; i < soil.size(); i++)
     {
@@ -436,6 +438,7 @@ SoilWater::Implementation::output (Log& log) const
   output_variable (S_p, log);
   output_variable (S_permanent, log);
   output_variable (S_incorp, log);
+  output_variable (tillage, log);
   output_variable (Theta, log);
   output_variable (h, log);
   output_variable (S_ice, log);
@@ -561,6 +564,7 @@ SoilWater::Implementation::initialize (const AttributeList& al,
   S_drain.insert (S_drain.begin (), size, 0.0);
   S_p.insert (S_p.begin (), size, 0.0);
   S_incorp.insert (S_incorp.begin (), size, 0.0);
+  tillage.insert (tillage.begin (), size, 0.0);
   if (S_permanent.size () < size)
     S_permanent.insert (S_permanent.end (), size - S_permanent.size (), 0.0);
 
@@ -831,6 +835,8 @@ will be used from there to the bottom.");
 	      "Water sink (due to macropores).");
   syntax.add ("S_incorp", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Incorporated water sink, typically from subsoil irrigation.");
+  syntax.add ("tillage", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Changes in water content due to tillage operations.");
   syntax.add ("S_permanent", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
 	      "Permanent water sink, e.g. subsoil irrigation.");
   vector<double> empty;

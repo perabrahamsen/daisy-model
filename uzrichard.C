@@ -352,6 +352,7 @@ UZRichard::richard (Treelog& msg,
 	    }
 	  tridia (top.flux_top () ? 0 : 1, size, a, b, c, d, h.begin ());
 
+          daisy_assert (h.size () > 1);
 	  if (h[0] < -1e9 || h[1] < -1e9 || h[size-1] < -1e9)
 	    {
 	      TmpStream tmp;
@@ -445,8 +446,15 @@ UZRichard::richard (Treelog& msg,
 	      // We have a saturated soil, with an upward flux.
 	      throw ("Saturated soil with an upward flux");
 	    }
-	  else if (approximate (switched_top_last, time_left))
-	    throw ("Couldn't drain top flux");
+	  else if (switched_top_last < time_left + ddt / 2.0)
+            {
+              TmpStream tmp;
+              tmp () << "last: " << switched_top_last 
+                     << "; time left: " << time_left << "; h[" << first 
+                     << "] = " << h[first] <<"; q = " << top.q ();
+              msg.debug (tmp.str ());
+              throw ("Couldn't drain top flux");
+            }
 	  else
 	    // We have saturated soil, make it a pressure top.
 	    {

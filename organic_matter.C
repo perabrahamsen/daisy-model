@@ -143,6 +143,12 @@ struct OrganicMatter::Implementation
   // Log.
   vector<double> NO3_source;
   vector<double> NH4_source;
+  double fertilized_N;
+  double fertilized_C;
+  double tillage_N_top;
+  double tillage_C_top;
+  vector<double> tillage_N_soil;
+  vector<double> tillage_C_soil;
 
   // Utilities.
   static bool aom_compare (const AOM* a, const AOM* b);
@@ -151,6 +157,10 @@ struct OrganicMatter::Implementation
 
   // Simulation.
   void add (AM&);
+  void fertilize (const AttributeList&, const Soil&);
+  void fertilize (const AttributeList&, const Soil&,
+                  double from, double to);
+  void clear (); 
   void monthly (const Geometry&);
   template<class DAOM>
   const double* find_abiotic (const DAOM& om, // AOM & DOM
@@ -172,10 +182,10 @@ struct OrganicMatter::Implementation
 	     SoilNO3&, SoilNH4&, Treelog& msg);
   void transport (const Soil&, const SoilWater&, Treelog&);
   void mix (const Soil&, const SoilWater&, 
-	    double from, double to, double penetration, 
+	    double from, double to, double penetration,
 	    const Time& time);
   void swap (const Soil&, const SoilWater&, 
-	     double from, double middle, double to, 
+	     double from, double middle, double to,
 	     const Time& time);
   void output (Log&, const Geometry&) const;
   bool check (Treelog& err) const;
@@ -805,6 +815,12 @@ OrganicMatter::Implementation::output (Log& log,
   output_submodule (bioincorporation, "Bioincorporation", log);
   output_variable (NO3_source, log);
   output_variable (NH4_source, log);
+  output_variable (fertilized_N, log);
+  output_variable (fertilized_C, log);
+  output_variable (tillage_N_top, log);
+  output_variable (tillage_C_top, log);
+  output_variable (tillage_N_soil, log);
+  output_variable (tillage_C_soil, log);
 }
 
 bool
@@ -825,6 +841,41 @@ OrganicMatter::Implementation::add (AM& om)
   for (unsigned int i = 0; i < am.size (); i++)
     daisy_assert (&om != am[i]);
   am.push_back (&om); 
+}
+
+void 
+OrganicMatter::Implementation::fertilize (const AttributeList& al, 
+                                          const Soil& soil)
+{ 
+  AM& om = AM::create (al, soil);
+  fertilized_N += om.total_N (soil); 
+  fertilized_C += om.total_C (soil);
+  add (om);
+}
+
+void 
+OrganicMatter::Implementation::fertilize (const AttributeList& al,
+                                          const Soil& soil,
+                                          double from, double to)
+{ 
+  AM& om = AM::create (al, soil);
+  fertilized_N += om.total_N (soil); 
+  fertilized_C += om.total_C (soil);
+  om.mix (soil, from, to, 1.0,
+          tillage_N_top, tillage_C_top,
+          tillage_N_soil, tillage_C_soil);
+  add (om);
+}
+
+void 
+OrganicMatter::Implementation::clear ()
+{
+  fertilized_N = 0.0;
+  fertilized_C = 0.0;
+  tillage_N_top = 0.0;
+  tillage_C_top = 0.0;
+  fill (tillage_N_soil.begin (), tillage_N_soil.end (), 0.0);
+  fill (tillage_C_soil.begin (), tillage_C_soil.end (), 0.0);
 }
 
 void
@@ -1179,16 +1230,21 @@ OrganicMatter::Implementation::transport (const Soil& soil,
 void 
 OrganicMatter::Implementation::mix (const Soil& soil,
 				    const SoilWater& soil_water,
-				    double from, double to,double penetration, 
+				    double from, double to, 
+                                    double penetration,
 				    const Time&)
 {
   buffer.mix (soil, from, to);
   for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->mix (soil, from, to, penetration);
+    am[i]->mix (soil, from, to, penetration, 
+                tillage_N_top, tillage_C_top, 
+                tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 1; i < smb.size (); i++)
-    smb[i]->mix (soil, from, to);
+    smb[i]->mix (soil, from, to, 
+                 tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 0; i < som.size (); i++)
-    som[i]->mix (soil, from, to);
+    som[i]->mix (soil, from, to, 
+                 tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 0; i < dom.size (); i++)
     dom[i]->mix (soil, soil_water, from, to);
 
@@ -1208,16 +1264,19 @@ OrganicMatter::Implementation::mix (const Soil& soil,
 void 
 OrganicMatter::Implementation::swap (const Soil& soil,
 				     const SoilWater& soil_water,
-				     double from, double middle, double to, 
+				     double from, double middle, double to,
 				     const Time&)
 {
   buffer.swap (soil, from, middle, to);
   for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->swap (soil, from, middle, to);
+    am[i]->swap (soil, from, middle, to, 
+                 tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 1; i < smb.size (); i++)
-    smb[i]->swap (soil, from, middle, to);
+    smb[i]->swap (soil, from, middle, to, 
+                  tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 0; i < som.size (); i++)
-    som[i]->swap (soil, from, middle, to);
+    som[i]->swap (soil, from, middle, to, 
+                  tillage_N_soil, tillage_C_soil);
   for (unsigned int i = 0; i < dom.size (); i++)
     dom[i]->swap (soil, soil_water, from, middle, to);
   // Leave CO2 alone.
@@ -2446,6 +2505,10 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     bioincorporation.set_am (bioam);
   else
     am.push_back (bioincorporation.create_am (soil)); 
+
+  // Log variable.
+  tillage_N_soil.insert (tillage_N_soil.begin (), soil.size (), 0.0);
+  tillage_C_soil.insert (tillage_C_soil.begin (), soil.size (), 0.0);
 }
 
 OrganicMatter::Implementation::Implementation (const AttributeList& al)
@@ -2467,7 +2530,11 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N")),
-    bioincorporation (al.alist ("Bioincorporation"))
+    bioincorporation (al.alist ("Bioincorporation")),
+    fertilized_N (0.0),
+    fertilized_C (0.0),
+    tillage_N_top (0.0),
+    tillage_C_top (0.0)
 { 
   if (al.check ("tillage_age"))
     tillage_age = al.number_sequence ("tillage_age");
@@ -2481,6 +2548,10 @@ OrganicMatter::Implementation::~Implementation ()
   sequence_delete (dom.begin (), dom.end ());
   delete &clayom;
 }
+
+void 
+OrganicMatter::clear ()
+{ impl.clear (); }
 
 void 
 OrganicMatter::monthly (const Geometry& geometry)
@@ -2504,14 +2575,14 @@ OrganicMatter::transport (const Soil& soil,
 void 
 OrganicMatter::mix (const Soil& soil,
 		    const SoilWater& soil_water,
-		    double from, double to, double penetration, 
+		    double from, double to, double penetration,
 		    const Time& time)
 { impl.mix (soil, soil_water, from, to, penetration, time); }
 
 void 
 OrganicMatter::swap (const Soil& soil,
 		     const SoilWater& soil_water,
-		     double from, double middle, double to, 
+		     double from, double middle, double to,
 		     const Time& time)
 { impl.swap (soil, soil_water, from, middle, to, time); }
 
@@ -2590,15 +2661,22 @@ OrganicMatter::som_pools () const
 
 bool
 OrganicMatter::check (Treelog& err) const
-{
-  return impl.check (err);
-}
+{ return impl.check (err); }
 
 void 
 OrganicMatter::add (AM& am)
-{
-  impl.add (am);
-}
+{ impl.add (am); }
+
+void 
+OrganicMatter::fertilize (const AttributeList& al,
+                          const Soil& soil)
+{ impl.fertilize (al, soil); }
+
+void 
+OrganicMatter::fertilize (const AttributeList& al,
+                          const Soil& soil,
+                          double from, double to)
+{ impl.fertilize (al, soil, from, to); }
 
 AM* 
 OrganicMatter::find_am (const symbol sort, const symbol part) const
@@ -2875,6 +2953,24 @@ Biological incorporation of litter.",
 Mineralization this time step (negative numbers mean immobilization).");
   syntax.add ("NH4_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
 Mineralization this time step (negative numbers mean immobilization).");
+  syntax.add ("fertilized_N", "g N/cm^2/h", Syntax::LogOnly,
+              "Amount of organic bound nitrogen applied.\n\
+This includes nitrogen incorporated directly in the soil.");
+  syntax.add ("fertilized_C", "g C/cm^2/h", Syntax::LogOnly,
+              "Amount of organic bound carbon applied.\n\
+This includes carbon incorporated directly in the soil.");
+  syntax.add ("tillage_N_top", "g N/m^2/h", Syntax::LogOnly,
+              "Amount of nitrogen added to surface during tillage.\n\
+This is a negative number.");
+  syntax.add ("tillage_C_top", "g C/m^2/h", Syntax::LogOnly,
+              "Amount of carbon added to surface during tillage.\n\
+This is a negative number.");
+  syntax.add ("tillage_N_soil", "g N/cm^3/h", 
+              Syntax::LogOnly, Syntax::Sequence,
+              "Amount of nitrogen added to soil during tillage.");
+  syntax.add ("tillage_C_soil", "g C/cm^3/h",
+              Syntax::LogOnly, Syntax::Sequence,
+              "Amount of carbon added to surface during tillage.");
   syntax.add ("total_C", "g C/cm^3", Syntax::LogOnly, Syntax::Sequence,
 	      "Total organic C in the soil layer.");
   syntax.add ("total_N", "g N/cm^3", Syntax::LogOnly, Syntax::Sequence,

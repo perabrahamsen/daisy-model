@@ -268,6 +268,15 @@ ColumnBase::clear ()
 { 
   soil_water.clear (soil);
   soil_chemicals.clear ();
+
+  harvest_DM = 0.0;
+  harvest_N = 0.0;
+  harvest_C = 0.0;
+  residuals_DM = 0.0;
+  residuals_N_top = 0.0;
+  residuals_C_top = 0.0;
+  fill (residuals_N_soil.begin (), residuals_N_soil.end (), 0.0);
+  fill (residuals_C_soil.begin (), residuals_C_soil.end (), 0.0);
 }
 
 bool
@@ -330,25 +339,6 @@ ColumnBase::tick_base (Treelog& msg)
        i != transformations.end ();
        i++)
     (*i)->tick (soil, soil_water, soil_chemicals, msg);
-
-  log_harvest_DM = harvest_DM;
-  log_harvest_N = harvest_N;
-  log_harvest_C = harvest_C;
-  harvest_DM = 0.0;
-  harvest_N = 0.0;
-  harvest_C = 0.0;
-  log_residuals_DM = residuals_DM;
-  log_residuals_N_top = residuals_N_top;
-  log_residuals_C_top = residuals_C_top;
-  log_residuals_N_soil = residuals_N_soil;
-  log_residuals_C_soil = residuals_C_soil;
-  residuals_DM = 0.0;
-  residuals_N_top = 0.0;
-  residuals_C_top = 0.0;
-  log_residuals_N_root = soil.total (residuals_N_soil) * cm2_per_m2;
-  log_residuals_C_root = soil.total (residuals_C_soil) * cm2_per_m2;
-  fill (residuals_N_soil.begin (), residuals_N_soil.end (), 0.0);
-  fill (residuals_C_soil.begin (), residuals_C_soil.end (), 0.0);
 }
 
 void
@@ -369,16 +359,21 @@ ColumnBase::output (Log& log) const
   output_derived (groundwater, "Groundwater", log);
   output_derived (vegetation, "Vegetation", log);
   output_inner (log);
-  output_value (log_harvest_DM, "harvest_DM", log);
-  output_value (log_harvest_N, "harvest_N", log);
-  output_value (log_harvest_C, "harvest_C", log);
-  output_value (log_residuals_DM, "residuals_DM", log);
-  output_value (log_residuals_N_top, "residuals_N_top", log);
-  output_value (log_residuals_C_top, "residuals_C_top", log);
-  output_value (log_residuals_N_soil, "residuals_N_soil", log);
-  output_value (log_residuals_C_soil, "residuals_C_soil", log);
-  output_value (log_residuals_N_root, "residuals_N_root", log);
-  output_value (log_residuals_C_root, "residuals_C_root", log);
+  output_value (harvest_DM, "harvest_DM", log);
+  output_value (harvest_N, "harvest_N", log);
+  output_value (harvest_C, "harvest_C", log);
+  output_value (residuals_DM, "residuals_DM", log);
+  output_value (residuals_N_top, "residuals_N_top", log);
+  output_value (residuals_C_top, "residuals_C_top", log);
+  output_value (residuals_N_soil, "residuals_N_soil", log);
+  output_value (residuals_C_soil, "residuals_C_soil", log);
+
+  static const symbol N_symbol ("residuals_N_root");
+  if (log.check_leaf (N_symbol))
+    log.output (N_symbol, soil.total (residuals_N_soil) * cm2_per_m2);
+  static const symbol C_symbol ("residuals_C_root");
+  if (log.check_leaf (C_symbol))
+    log.output (C_symbol, soil.total (residuals_C_soil) * cm2_per_m2);
 }
 
 void
@@ -412,17 +407,9 @@ ColumnBase::ColumnBase (const AttributeList& al)
     transformations (map_create<Transform> (al.alist_sequence 
 					    ("Transformations"))),
     groundwater (Librarian<Groundwater>::create (al.alist ("Groundwater"))),
-    log_harvest_DM (0.0),
-    log_harvest_N (0.0),
-    log_harvest_C (0.0),
     harvest_DM (0.0),
     harvest_N (0.0),
     harvest_C (0.0),
-    log_residuals_DM (0.0),
-    log_residuals_N_top (0.0),
-    log_residuals_C_top (0.0),
-    log_residuals_N_root (0.0),
-    log_residuals_C_root (0.0),
     residuals_DM (0.0),
     residuals_N_top (0.0),
     residuals_C_top (0.0)

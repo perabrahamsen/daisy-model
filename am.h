@@ -51,8 +51,11 @@ public:
 public:
   void output (Log&) const;
   bool check (Treelog& err) const;
-  void mix (const Geometry&, double from, double to, double penetration = 1.0);
-  void swap (const Geometry&, double from, double middle, double to);
+  void mix (const Geometry&, double from, double to, double penetration,
+            double& tillage_N_top, double& tillage_C_top,
+            vector<double>& tillage_N_soil, vector<double>& tillage_C_soil);
+  void swap (const Geometry&, double from, double middle, double to,
+             vector<double>& tillage_N_soil, vector<double>& tillage_C_soil);
   double total_C (const Geometry& geometry) const; // [g C/cm^2]
   double total_N (const Geometry& geometry) const; // [g N/cm^2]
   double C_at (unsigned int at) const;

@@ -1,3 +1,39 @@
+2004-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.40 released.
+
+2004-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C (tillage): New log variable.
+	* lib/log.dai ("Root Zone Water Balance"): Use it.
+	("Total Water Balance"): Balance it.
+
+2004-04-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (mix, swap): Add "change" parameter.
+	(interval_border): Fix "off by one" error.
+	* select_flux_bottom.C (output_array): Removed code that
+	compensated for the error.
+	* solute.h, solute.C (tillage): New log variable.
+	* column_std.C, organic_matter.C, am.C, om.C (swap): Use tillage
+	parameters. 
+	* organic_matter.h, am.h, om.h: Ditto.
+	* lib/log.dai ("Carbon Balance"): Use tillage parameters.
+	("Organic Nitrogen Balance", "Nitrogen Balance", "N Balance"): Ditto.
+	("NH4 Soil Balance", "NO3 Soil Balance"): Ditto.
+
+2004-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* aom.h, aom.C (penetrate): Take tillage parameters.
+	* organic_matter.h, organic_matter.C, am.h, am.C (mix): Ditto.
+	* column_std.C (tillage_Org_N_top, tillage_Org_C_top)
+	(tillage_Org_N_soil, tillage_Org_C_soil): New log variables.
+	
+	* column_base.C, column_std.C (clear): Clear residuals here.
+	(tick_base): Not here.
+	* column_base.h, column_base.C, column_std.C: Removed residuals
+	log variable. 
+
 2004-04-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.39 released.

@@ -1,5 +1,22 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Tillage log
+
+** Log vand
+
+** Vandbalance med from != 0
+
+** Check Anders behov, lav evt ny log.
+
+** lav dist, send brev til Anders.
+
+* Advarsel hvis "from" eller "to" ikke ligger ved et interval.
+
+Alternativt, tilføj grænser.  Men det vil betyde at logging kan ændre
+resultat. 
+
+* En "mindste lys" planteparameter.
+
 * FertOrgaNic 
 
 ** Oganiser polske data.
@@ -17,8 +34,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 ** Slovakiske data
 
 * spec + dimension giver ikke fejl hvis der ikke kan konverteres
-
-* Upload textpad licens til campusnet.
 
 * Mindst tre numeriske lag per horizont.
 

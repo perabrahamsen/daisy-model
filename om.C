@@ -60,7 +60,8 @@ OM::output (Log& log) const
 }
 
 void 
-OM::mix (const Geometry& geometry, double from, double to)
+OM::mix (const Geometry& geometry, double from, double to,
+         vector<double>& N_change, vector<double>& C_change)
 {
   // Ignore tiny pools.
   if (soil_C (geometry) < 1e-20)
@@ -68,15 +69,16 @@ OM::mix (const Geometry& geometry, double from, double to)
 
   // Mix.
   assert_non_negative (C);
-  geometry.mix (C, from, to);
+  geometry.mix (C, from, to, C_change);
   assert_non_negative (C);
   assert_non_negative (N);
-  geometry.mix (N, from, to);
+  geometry.mix (N, from, to, N_change);
   assert_non_negative (N);
 }
 
 void
-OM::swap (const Geometry& geometry, double from, double middle, double to)
+OM::swap (const Geometry& geometry, double from, double middle, double to,
+          vector<double>& N_change, vector<double>& C_change)
 {
   // Ignore tiny pools.
   if (soil_C (geometry) < 1e-20)
@@ -84,10 +86,10 @@ OM::swap (const Geometry& geometry, double from, double middle, double to)
 
   // Swap.
   assert_non_negative (C);
-  geometry.swap (C, from, middle, to);
+  geometry.swap (C, from, middle, to, C_change);
   assert_non_negative (C);
   assert_non_negative (N);
-  geometry.swap (N, from, middle, to);
+  geometry.swap (N, from, middle, to, N_change);
   assert_non_negative (N);
 }
 

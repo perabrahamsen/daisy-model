@@ -54,12 +54,16 @@ public:
 
   // Vector operations.
   void mix (vector<double>& v, double from, double to) const;
+  void mix (vector<double>& v, double from, double to, 
+            vector<double>& change) const;
   void add (vector<double>& v, double from, double to, double amount) const;
   void add (vector<double>& v, const vector<double>& density,
 	    double amount) const;
   double extract (vector<double>& v, double from, double to) const;
   void set (vector<double>& v, double from, double to, double amount) const;
   void swap (vector<double>& v, double from, double middle, double to) const;
+  void swap (vector<double>& v, double from, double middle, double to, 
+             vector<double>& change) const;
   double total (const vector<double>& v) const;
   double total (const vector<double>& v, double from, double to) const;
 

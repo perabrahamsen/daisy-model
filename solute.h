@@ -59,13 +59,15 @@ protected:
   Transport& last_resort;       // Last resort solute transport model.
   Mactrans& mactrans;		// Solute transport model in macropores.
   Adsorption& adsorption;	// Solute adsorption.
-  
+private:
+  vector<double> tillage;       // Changes during tillage.
+
 public:
   virtual double diffusion_coefficient () const = 0; // in free solute. 
   double C_to_M (const Soil& soil, double Theta, int i, double C) const
-    { return adsorption.C_to_M (soil, Theta, i, C); }
+  { return adsorption.C_to_M (soil, Theta, i, C); }
   double M_to_C (const Soil& soil, double Theta, int i, double M) const
-    { return adsorption.M_to_C (soil, Theta, i, M); }
+  { return adsorption.M_to_C (soil, Theta, i, M); }
 
 public:
   double M (int i) const

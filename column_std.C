@@ -42,17 +42,6 @@ private:
 
   // Log variables.
 private:
-  double log_seed_N;
-  double log_fertilized_NO3_total;
-  double log_fertilized_NH4_total;
-  double log_volatilization_total;
-  double log_fertilized_NO3_surface;
-  double log_fertilized_NH4_surface;
-  double log_volatilization_surface;
-  double log_fertilized_Org_N;
-  double log_fertilized_Org_C;
-  double log_fertilized_DM;
-  double log_first_year_utilization;
   double seed_N;
   double fertilized_NO3_total;
   double fertilized_NH4_total;
@@ -60,8 +49,6 @@ private:
   double fertilized_NO3_surface;
   double fertilized_NH4_surface;
   double volatilization_surface;
-  double fertilized_Org_N;
-  double fertilized_Org_C;
   double fertilized_DM;
   double first_year_utilization;
 
@@ -234,12 +221,9 @@ ColumnStandard::fertilize (const AttributeList& al)
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
     {
-      AM& am = AM::create (al, soil);
-      fertilized_Org_N += am.total_N (soil) / conv; 
-      fertilized_Org_C += am.total_C (soil) / conv;
       if (al.check ("weight"))
 	fertilized_DM += al.number ("weight");
-      organic_matter.add (am);
+      organic_matter.fertilize (al, soil);
     }
 }
 
@@ -270,13 +254,9 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
     {
-      AM& am = AM::create (al, soil);
-      fertilized_Org_N += am.total_N (soil) / conv; 
-      fertilized_Org_C += am.total_C (soil) / conv;
       if (al.check ("weight"))
 	fertilized_DM += al.number ("weight");
-      am.mix (soil, from, to);
-      organic_matter.add (am);
+      organic_matter.fertilize (al, soil, from, to);
     }
 }
 
@@ -362,6 +342,18 @@ ColumnStandard::clear ()
 
   soil_NO3.clear ();
   soil_NH4.clear ();
+  
+  organic_matter.clear ();
+
+  seed_N = 0.0;
+  fertilized_NO3_total = 0.0;
+  fertilized_NH4_total = 0.0;
+  fertilized_NO3_surface = 0.0;
+  fertilized_NH4_surface = 0.0;
+  fertilized_DM = 0.0;
+  first_year_utilization = 0.0;
+  volatilization_total = 0.0;
+  volatilization_surface = 0.0;
 }
 
 void
@@ -375,30 +367,6 @@ ColumnStandard::tick (Treelog& out,
   if (weather)
     weather->tick (time, out);
   const Weather& my_weather = *(weather ? weather : global_weather);
-
-  // Save logs.
-  log_seed_N = seed_N;
-  log_fertilized_NO3_total = fertilized_NO3_total;
-  log_fertilized_NH4_total = fertilized_NH4_total;
-  log_fertilized_NO3_surface = fertilized_NO3_surface;
-  log_fertilized_NH4_surface = fertilized_NH4_surface;
-  log_fertilized_Org_N = fertilized_Org_N;
-  log_fertilized_Org_C = fertilized_Org_C;
-  log_fertilized_DM = fertilized_DM;
-  log_first_year_utilization = first_year_utilization;
-  log_volatilization_total = volatilization_total;
-  log_volatilization_surface = volatilization_surface;
-  seed_N = 0.0;
-  fertilized_NO3_total = 0.0;
-  fertilized_NH4_total = 0.0;
-  fertilized_NO3_surface = 0.0;
-  fertilized_NH4_surface = 0.0;
-  fertilized_Org_N = 0.0;
-  fertilized_Org_C = 0.0;
-  fertilized_DM = 0.0;
-  first_year_utilization = 0.0;
-  volatilization_total = 0.0;
-  volatilization_surface = 0.0;
 
   // Early calculation.
   IM soil_top_conc;
@@ -449,17 +417,15 @@ ColumnStandard::output_inner (Log& log) const
   output_derived (nitrification, "Nitrification", log);
   output_submodule (denitrification, "Denitrification", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
-  output_value (log_seed_N, "seed_N", log);
-  output_value (log_fertilized_NO3_total, "fertilized_NO3", log);
-  output_value (log_fertilized_NH4_total, "fertilized_NH4", log);
-  output_value (log_fertilized_NO3_surface, "fertilized_NO3_surface", log);
-  output_value (log_fertilized_NH4_surface, "fertilized_NH4_surface", log);
-  output_value (log_volatilization_total, "volatilization", log);
-  output_value (log_volatilization_surface, "volatilization_surface", log);
-  output_value (log_fertilized_Org_N, "fertilized_Org_N", log);
-  output_value (log_fertilized_Org_C, "fertilized_Org_C", log);
-  output_value (log_fertilized_DM, "fertilized_DM", log);
-  output_value (log_first_year_utilization, "first_year_utilization", log);
+  output_variable (seed_N, log);
+  output_value (fertilized_NO3_total, "fertilized_NO3", log);
+  output_value (fertilized_NH4_total, "fertilized_NH4", log);
+  output_variable (fertilized_NO3_surface, log);
+  output_variable (fertilized_NH4_surface, log);
+  output_value (volatilization_total, "volatilization", log);
+  output_variable (volatilization_surface, log);
+  output_variable (fertilized_DM, log);
+  output_variable (first_year_utilization, log);
 }
 
 bool 
@@ -507,17 +473,6 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
 		   (al.alist ("Nitrification"))),
     denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),
-    log_seed_N (0.0),
-    log_fertilized_NO3_total (0.0),
-    log_fertilized_NH4_total (0.0),
-    log_volatilization_total (0.0),
-    log_fertilized_NO3_surface (0.0),
-    log_fertilized_NH4_surface (0.0),
-    log_volatilization_surface (0.0),
-    log_fertilized_Org_N (0.0),
-    log_fertilized_Org_C (0.0),
-    log_fertilized_DM (0.0),
-    log_first_year_utilization (0.0),
     seed_N (0.0),
     fertilized_NO3_total (0.0),
     fertilized_NH4_total (0.0),
@@ -525,8 +480,6 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     fertilized_NO3_surface (0.0),
     fertilized_NH4_surface (0.0),
     volatilization_surface (0.0),
-    fertilized_Org_N (0.0),
-    fertilized_Org_C (0.0),
     fertilized_DM (0.0),
     first_year_utilization (0.0)
 { }
@@ -616,12 +569,6 @@ This does not include nitrate incorporated in the soil.");
 		"Amount of ammonium applied to surface this time step.\n\
 This includes ammonium lost due to volatilization, but not ammonium\n\
 incorporated in the soil.");
-    syntax.add ("fertilized_Org_N", "kg N/ha", Syntax::LogOnly,
-		"Amount of organic bound nitrogen applied this time step.\n\
-This includes nitrogen incorporated directly in the soil.");
-    syntax.add ("fertilized_Org_C", "kg C/ha", Syntax::LogOnly,
-		"Amount of organic bound carbon applied this time step.\n\
-This includes carbon incorporated directly in the soil.");
     syntax.add ("fertilized_DM", "ton DM/ha", Syntax::LogOnly,
 		"Amount of dry matter applied this time step.\n\
 This includes dry matter incorporated directly in the soil.");

@@ -41,7 +41,9 @@ AOM::output (Log& log) const
 
 void 
 AOM::penetrate (const Geometry& geometry, double from, double to,
-		double penetration)
+		double penetration,
+                double& tillage_N_top, double& tillage_C_top,
+                vector<double>& tillage_N_soil, vector<double>& tillage_C_soil)
 {
   daisy_assert (penetration >= 0.0);
   daisy_assert (penetration <= 1.0);
@@ -49,15 +51,24 @@ AOM::penetrate (const Geometry& geometry, double from, double to,
   // Ignore tiny pools.
   if (top_C < 1e-20 && top_N < 1e-21)
     return;
+  
+  const double C_pen = top_C * penetration;
+  const double N_pen = top_N * penetration;
+
+  static const double cm2_to_m2 = 100 * 100;
 
   // Penetrate.
-  geometry.add (C, from, to, top_C * penetration);
+  geometry.add (C, from, to, C_pen);
+  geometry.add (tillage_C_soil, from, to, C_pen);
   assert_non_negative (C);
-  top_C *= (1.0 - penetration);
+  top_C -= C_pen;
+  tillage_C_top -= C_pen * cm2_to_m2;
   daisy_assert (top_C >= 0.0);
-  geometry.add (N, from, to, top_N * penetration);
+  geometry.add (N, from, to, N_pen);
+  geometry.add (tillage_N_soil, from, to, N_pen);
   assert_non_negative (N);
-  top_N *= (1.0 - penetration);
+  top_N -= N_pen;
+  tillage_N_top -= N_pen * cm2_to_m2;
   daisy_assert (top_N >= 0.0);
 }
 

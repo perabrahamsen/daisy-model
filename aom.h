@@ -23,6 +23,7 @@
 #define AOM_H
 
 #include "om.h"
+#include <vector>
 
 class AOM : public OM
 { 
@@ -38,7 +39,10 @@ public:
   // Simulation.
 public:
   void output (Log&) const;
-  void penetrate (const Geometry&, double from, double to, double penetration);
+  void penetrate (const Geometry&, double from, double to, double penetration,
+                  double& tillage_N_top, double& tillage_C_top,
+                  std::vector<double>& tillage_N_soil,
+                  std::vector<double>& tillage_C_soil);
   double full_C (const Geometry& geometry) const;
   double full_N (const Geometry& geometry) const;
   double C_at (unsigned int at) const;

@@ -34,8 +34,7 @@ struct SelectFluxBottom : public SelectValue
     { 
       int index = ((height > 0.0) 
 		   ? geometry->size ()
-		   : min (geometry->interval_border (height) + 1,
-			  geometry->size ()));
+		   : geometry->interval_border (height));
       daisy_assert (array.size () > index);
       if (count == 0)	 
 	value = array[index];	

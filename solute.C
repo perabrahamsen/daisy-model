@@ -39,6 +39,7 @@ Solute::clear ()
   fill (S.begin (), S.end (), 0.0);
   fill (S_external.begin (), S_external.end (), 0.0);
   fill (S_root.begin (), S_root.end (), 0.0);
+  fill (tillage.begin (), tillage.end (), 0.0);
 }
 
 void
@@ -202,6 +203,7 @@ Solute::output (Log& log) const
   output_variable (S_root, log);
   output_variable (J, log);
   output_variable (J_p, log);
+  output_variable (tillage, log);
 }
 
 static bool check_alist (const AttributeList& al, Treelog& err)
@@ -273,6 +275,8 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 Only for initialization of the 'M' parameter.");
   Geometry::add_layer (syntax, "solute_ppm", "ppm", "Mass in water and soil.\n\
 Only used for initialization of the 'C' parameter.");
+  syntax.add ("tillage", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Changes during tillage.");
 }
 
 Solute::Solute (const AttributeList& al)
@@ -316,7 +320,7 @@ void
 Solute::mix (const Soil& soil, const SoilWater& soil_water, 
 	     double from, double to)
 { 
-  soil.mix (M_, from, to);
+  soil.mix (M_, from, to, tillage);
   for (unsigned int i = 0; i < C_.size (); i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
@@ -325,7 +329,7 @@ void
 Solute::swap (const Soil& soil, const SoilWater& soil_water,
 	      double from, double middle, double to)
 { 
-  soil.swap (M_, from, middle, to);
+  soil.swap (M_, from, middle, to, tillage);
   for (unsigned int i = 0; i < C_.size (); i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
@@ -453,4 +457,5 @@ Solute::initialize (const AttributeList& al,
   S_root.insert (S_root.begin (), soil.size (), 0.0);
   J.insert (J_p.begin (), soil.size () + 1, 0.0);
   J_p.insert (J_p.begin (), soil.size () + 1, 0.0);
+  tillage.insert (tillage.begin (), soil.size (), 0.0);
 }

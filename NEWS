@@ -12,6 +12,26 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.40
+
+** Fixed bug when logging with "from" not equal to 0.
+
+** Movement during tillage operations now logged.
+
+The four OrganicMatter log variables, tillage_Org_N_top,
+tillage_Org_C_top, tillage_Org_N_soil, tillage_Org_C_soil can now give
+information about C and N removed from the top and added to the soil,
+which makes it possible to create a full organic matter balance that
+does not include the surface or the plowing layer.  The "N Balance"
+and "Carbon Balance" log parameterizations have been updated, so has
+the "Organic Nitrogen Balance" summary.
+
+There is a new "tillage" log variable in SoilWater, SoilNH4, SoilNO3
+and the SoilChemical submodels, which mean that the "Total Water
+Balance", "Soil NH4 Balance", "Soil NO3 Balance" and "Nitrogen
+Balance" summaries show a balance, even if you do not log the entire
+plowing layer.
+
 * 3.39
 
 ** Fixed bug in convection transport model.

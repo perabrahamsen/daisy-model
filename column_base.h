@@ -57,20 +57,10 @@ protected:
 
   // Log variables.
 private:
-  double log_harvest_DM;
-  double log_harvest_N;
-  double log_harvest_C;
   double harvest_DM;
   double harvest_N;
   double harvest_C;
 protected:
-  double log_residuals_DM;
-  double log_residuals_N_top;
-  double log_residuals_C_top;
-  vector<double> log_residuals_N_soil;
-  vector<double> log_residuals_C_soil;
-  double log_residuals_N_root;
-  double log_residuals_C_root;
   double residuals_DM;
   double residuals_N_top;
   double residuals_C_top;

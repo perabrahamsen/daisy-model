@@ -55,7 +55,8 @@ struct ActionIrrigate : public Action
         if (daisy.time == end_time)
           tmp () << "Irrigating " << flux << " mm";
         else
-          tmp () << "Irrigating " << flux << " mm/h";
+          tmp () << "Irrigating " << flux << " mm/h for "
+                 << days * 24 + hours << " hours";
         out.message (tmp.str ());      
       }
     else if (daisy.time == end_time)
