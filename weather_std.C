@@ -494,9 +494,9 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	      lex->skip_space ();
 	      const double val = lex->get_number ();
 	      if (val < 0.5)
-		lex->error ("Unreasonable low value");
+		lex->warning ("Unreasonable low value");
 	      else if (val > 1.8)
-		lex->error ("Unreasonable high value");
+		lex->warning ("Unreasonable high value");
 	      precipitation_correction[i] = val;
 	    }
 	}

@@ -12,6 +12,45 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.39
+
+** Changed default dispersivity to 5 from 6.
+
+** New calibration of organic matter model.
+
+Daisy now uses the numbers from Sander Bruun et al, "Calibration and
+Validation of the Soil Organic Matter Dynamics of the Daisy Model with
+Data from the Askrov long-term experiments", Soil Biology &
+Biochemistry, 2003.
+
+###########################################
+# THIS MEANS OLD SETUP FILES ARE INVALID! #
+###########################################
+
+You need to readjust the 'SOM_fractions' horizon parameter in your
+setup files.  For a system in perfect equilibrium (input of organic
+matter equal tuinover), the value will be
+
+  (SOM_fractions 0.49 0.51)
+
+For farms with a long term humus build-up, more of the humus will be
+in the second (fast) pool.  For farms where the amount of humus is
+decreasing, slow first (slow) fraction will be larger.  New farmland
+and farmland using mineral fertilizer tend to have decreasing humus,
+and thus a larger fraction of humus in the slow pool.  Note that we
+are talking changes over decades and centuries, if you switched to
+organic fertilizer five years ago, that is unlikely to have a
+measurable effect on the SOM partitioning.
+
+For horizons below the root zone, if there is any significant amount
+of humus may be leftover from old tree roots, and slowly decreasing.
+In that case, the vast majority (maybe 95\%) is in the first, slow
+pool.  
+
+All added matter must be adjusted to the new parameters, the
+fertlizer.dai file and the crop parameterizations in the daisy-lib.zip
+file have been updated accordingly.
+
 * 2.38
 
 ** You can now use "all" as crop argument to the crop_DM_over condition.

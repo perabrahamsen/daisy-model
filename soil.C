@@ -226,7 +226,7 @@ Layered description of the soil properties.",
 	      "Depth at the end of the root zone (a positive number).");
   syntax.add ("dispersivity", "cm", Check::positive (), 
 	      Syntax::Const, "Dispersion length.");
-  alist.add ("dispersivity", 6.0);
+  alist.add ("dispersivity", 5.0);
 }
   
 Soil::Soil (const AttributeList& al)

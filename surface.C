@@ -27,7 +27,6 @@
 #include "soil.h"
 #include "log.h"
 #include "common.h"
-#include "am.h"
 #include "im.h"
 #include "mathlib.h"
 #include "submodel.h"

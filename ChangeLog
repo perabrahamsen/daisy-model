@@ -1,7 +1,43 @@
+2002-12-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.39 released.
+
+2002-12-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/tutorial.tex (subsection{Horizons}): New description 
+
+	* soil.C (load_syntax): Changed default dispersivity from 5 to 6. 
+
+2002-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C: Don't include `am.h'.
+	* daisy.C: Ditto.
+
+	* lib/fertilizer.dai (slurry): Use Sander parameters.
+	* bioincorporation.C (load_syntax): Ditto
+	* am.C (default_AM): Ditto.
+        * Updated crop parameterizations as well.
+	
+2002-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (load_syntax): New parameters from Sander Bruun.
+
+2002-12-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (load_syntax): Added more documentation to
+	`water_factor'. 
+
+2002-11-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (initialize): Changed errors for unreasonable
+	precipitation corrections to warnings.
+
 2002-10-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* macro_std.C (tick): Fix check.
 
+	* Merged SHA changes.
+	
 2002-10-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* macro_std.C (tick): More debug information.

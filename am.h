@@ -32,6 +32,9 @@ class Time;
 class AOM;
 class Treelog;
 
+// Use new parameters from Sander et.al., 2002.
+#define SANDER_PARAMS
+
 class AM
 {
   // Content.

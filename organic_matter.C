@@ -1420,7 +1420,8 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   alist.add ("submodel", "OrganicMatter");
   alist.add ("description", "\
-Mineralization and immobilization in soil.  Hansen et.al. 1991.");
+Mineralization and immobilization in soil.  Hansen et.al. 1991.\n\
+Recalibrated by Bruun et.al. 2002.");
   syntax.add_check (check_alist);
   syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
 Set this flag to turn on mineralization below the root zone.");
@@ -1513,7 +1514,11 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   SOM::load_syntax (som_syntax, som_alist);
   vector<AttributeList*> SOM;
   AttributeList SOM1 (som_alist);
-  SOM1.add ("turnover_rate", 1.125e-7);
+#ifdef SANDER_PARAMS
+  SOM1.add ("turnover_rate", 4.3e-5 / 24.0 /* 1.7916667e-6 */);
+#else
+  SOM1.add ("turnover_rate", 2.7e-6 / 24.0 /* 1.125e-7 */);
+#endif
   vector<double> SOM1_efficiency;
   SOM1_efficiency.push_back (0.40);
   SOM1_efficiency.push_back (0.40);
@@ -1526,16 +1531,23 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   SOM1.add ("fractions", SOM1_fractions);
   SOM.push_back (&SOM1);
   AttributeList SOM2 (som_alist);
-  SOM2.add ("turnover_rate", 5.83333333333e-6);
+  SOM2.add ("turnover_rate", 1.4e-4 / 24.0 /* 5.83333333333e-6 */);
   vector<double> SOM2_efficiency;
   SOM2_efficiency.push_back (0.50);
   SOM2_efficiency.push_back (0.50);
   SOM2.add ("efficiency", SOM2_efficiency);
   vector<double> SOM2_fractions;
+#ifdef SANDER_PARAMS
+  SOM2_fractions.push_back (0.7);
+  SOM2_fractions.push_back (0.0);
+  SOM2_fractions.push_back (0.3);
+  SOM2_fractions.push_back (0.0);
+#else
   SOM2_fractions.push_back (0.9);
   SOM2_fractions.push_back (0.0);
   SOM2_fractions.push_back (0.1);
   SOM2_fractions.push_back (0.0);
+#endif
   SOM2.add ("fractions", SOM2_fractions);
   SOM.push_back (&SOM2);
   alist.add ("som", SOM);
@@ -1563,7 +1575,9 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
 	      "Default heat factor, used if not specified by OM pool.");
   alist.add ("heat_factor", empty);
   syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const, "\
-Default water potential factor, used if not specified by OM pool.");
+Default water potential factor, used if not specified by OM pool.\n\
+If the PLF is empty, a build-in PLF of pF will be used instead.\n\
+It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
   alist.add ("water_factor", empty);
   syntax.add ("ClayOM", Librarian<ClayOM>::library (), "Clay effect model.");
   AttributeList clay_alist;

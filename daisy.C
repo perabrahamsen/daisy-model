@@ -25,7 +25,6 @@
 #include "horizon.h"
 #include "log.h"
 #include "parser.h"
-#include "am.h"
 #include "nitrification.h"
 #include "bioclimate.h"
 #include "hydraulic.h"
