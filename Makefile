@@ -620,7 +620,7 @@ root_system${OBJ}: root_system.C root_system.h submodel.h soil_heat.h \
  soil_NH4.h solute.h adsorption.h librarian.h library.h common.h \
  alist.h syntax.h tmpstream.h transport.h mactrans.h soil_NO3.h \
  soil_water.h macro.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h log.h
+ geometry.h log.h mathlib.h
 ridge${OBJ}: ridge.C ridge.h soil.h horizon.h librarian.h library.h \
  common.h alist.h syntax.h tmpstream.h hydraulic.h tortuosity.h \
  geometry.h plf.h submodel.h mathlib.h log.h soil_water.h macro.h
@@ -713,10 +713,10 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  geometry.h soil_water.h macro.h soil_heat.h soil_chemicals.h \
  soil_chemical.h solute.h adsorption.h transport.h mactrans.h plf.h \
  groundwater.h log.h weather.h im.h vegetation.h
-traverse_delete${OBJ}: traverse_delete.C traverse_depend.h traverse.h \
+traverse_delete${OBJ}: traverse_delete.C traverse_delete.h traverse.h \
  library.h common.h syntax.h alist.h
-traverse_depend${OBJ}: traverse_depend.C traverse_depend.h traverse.h \
- library.h common.h syntax.h alist.h tmpstream.h treelog.h
+depend${OBJ}: depend.C depend.h traverse.h library.h common.h syntax.h \
+ alist.h tmpstream.h treelog.h
 traverse${OBJ}: traverse.C traverse.h library.h common.h syntax.h alist.h
 treelog${OBJ}: treelog.C treelog.h
 treelog_stream${OBJ}: treelog_stream.C treelog_stream.h treelog.h
@@ -1018,18 +1018,17 @@ main${OBJ}: main.C daisy.h time.h syntax.h common.h alist.h library.h
 tkmain${OBJ}: tkmain.C daisy.h time.h syntax.h common.h alist.h library.h
 gmain${OBJ}: gmain.C daisy.h time.h syntax.h common.h alist.h library.h
 qmain_edit${OBJ}: qmain_edit.C qmain_edit.h alist.h common.h syntax.h \
- plf.h
-qmain_edit_moc${OBJ}: qmain_edit_moc.C qmain_edit.h
+ library.h plf.h depend.h
+qmain_edit_moc${OBJ}: qmain_edit_moc.C qmain_edit.h alist.h common.h
 qmain${OBJ}: qmain.C qmain.h syntax.h common.h alist.h qmain_tree.h \
  qmain_busy.h daisy.h library.h version.h parser_file.h parser.h \
  librarian.h tmpstream.h printer_file.h printer.h
 qmain_moc${OBJ}: qmain_moc.C qmain.h syntax.h common.h alist.h
 qmain_tree${OBJ}: qmain_tree.C qmain_tree.h qmain_item.h qmain_populate.h \
  common.h
-qmain_item${OBJ}: qmain_item.C qmain_item.h qmain_edit.h qmain_tree.h \
- qmain_populate.h qmain_busy.h qmain.h syntax.h common.h alist.h \
- library.h tmpstream.h treelog_stream.h treelog.h traverse_depend.h \
- traverse_delete.h
+qmain_item${OBJ}: qmain_item.C qmain_item.h qmain_edit.h alist.h common.h \
+ qmain_tree.h qmain_populate.h qmain_busy.h qmain.h syntax.h library.h \
+ tmpstream.h treelog_stream.h treelog.h depend.h traverse_delete.h
 qmain_populate${OBJ}: qmain_populate.C qmain_populate.h qmain_tree.h \
  qmain_item.h qmain.h syntax.h common.h alist.h traverse.h tmpstream.h \
  plf.h library.h

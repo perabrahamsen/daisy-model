@@ -1,4 +1,12 @@
+2000-10-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.61 released.
+
 2000-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* depend.C, depend.h: Dumbed down tamplates for Bcc 5.01.
+
+	* traverse_delete.C: Wrong include.
 
 	* Version 1.60 released.
 
