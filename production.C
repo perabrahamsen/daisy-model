@@ -144,7 +144,7 @@ Production::tick (const double AirT, const double SoilT,
 	  ReleaseOfRootReserves = true;
 	  TmpStream tmp;
 	  tmp () << "Released root CH2O: " << RootRelease;
-	  msg.message (tmp.str ());
+	  msg.debug (tmp.str ());
 	}
     }
   double NetAss = CanopyAss;

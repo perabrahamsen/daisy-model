@@ -206,7 +206,7 @@ CropStandard::tick (const Time& time,
       development.emergence ();
       if (development.DS >= 0)
 	{
-	  msg.message ("emerging");
+	  msg.message ("==> emerging");
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development.DS);
 	  nitrogen.content (development.DS, production);
@@ -294,7 +294,7 @@ CropStandard::tick (const Time& time,
   canopy.tick (production.WLeaf, production.WSOrg,
 	       production.WStem, development.DS);
 
-  development.tick_daily (name, bioclimate.daily_air_temperature (), 
+  development.tick_daily (bioclimate.daily_air_temperature (), 
 			  production.WLeaf, production, vernalization,
 			  harvesting.cut_stress, msg);
   root_system.tick (msg, soil, soil_heat, 

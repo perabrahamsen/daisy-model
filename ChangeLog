@@ -1,5 +1,16 @@
 2003-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.43 released.
+
+2003-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/grass.dai (Grass): Allow grass to be harvest after it is
+	ripe. 
+
+	* phenology.h, phenology_TSum.C, phenology_std.C (tick_daily):
+	Don't use name. 
+	* crop_std.C (tick): Update caller.
+
 	* crop_std.C (tick): Modify messages.
 
 	* harvesting.C (load_syntax): Allow DS_max > 2.0.

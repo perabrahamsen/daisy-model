@@ -48,7 +48,7 @@ public:
   // Simulation.
 public:
   void light_hour ();
-  virtual void tick_daily (const string& name, double Ta, double WLeaf, 
+  virtual void tick_daily (double Ta, double WLeaf, 
 			   Production&, Vernalization&, 
 			   double cut_stress, Treelog&) = 0;
   virtual void emergence () = 0;

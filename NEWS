@@ -14,6 +14,15 @@ release.
 
 * 2.43
 
+** "Grass to grain" grass model now regrow after afull cur or after it is ripe.
+
+I.e., this grass need a tillage operation in order to kill.  
+
+WARNING: This also affects regrowth after a "normal" cut, ans the
+paramterization is no longer backed by experimental observations.
+I.e. it produce bogus results!  Use only when bogus results are better
+than no results.  Otherwise, use the "Grass" parameterization.
+
 ** New TSum phenology model.
 
 Simply specify a temeprature sum for each fase:: emergence, vegetative

@@ -48,7 +48,7 @@ private:
 
   // Simulation.
 private:
-  void tick_daily (const string& name, double Ta, double WLeaf, 
+  void tick_daily (double Ta, double WLeaf, 
 		   Production&, Vernalization&, double cut_stress, Treelog&);
   void emergence ();
 
@@ -58,8 +58,7 @@ public:
 };
 
 void
-PhenologyStandard::tick_daily (const string& name, 
-			       const double Ta, const double WLeaf, 
+PhenologyStandard::tick_daily (const double Ta, const double WLeaf, 
 			       Production& production, 
 			       Vernalization& vernalization,
 			       const double cut_stress, Treelog& out)
@@ -79,7 +78,7 @@ PhenologyStandard::tick_daily (const string& name,
       vernalization (Ta, DS);
 
       if (DS >= 1.0)
-	out.message (string (" [") + name + " is flowering]");
+	out.message ("==> flowering");
     }
   else
     {
@@ -90,7 +89,7 @@ PhenologyStandard::tick_daily (const string& name,
        }
       if (DS > DSMature)
        {
-	 out.message (string (" [") + name + " is ripe]");
+	 out.message ("==> ripe");
 	 DS = DSMature;
 	 production.none ();
        }
