@@ -46,6 +46,7 @@
 
 #include <unistd.h>
 #include <strstream.h>
+#include <iostream.h>
 
 // GNU doesn't mind unused global constants.
 #define GLOBAL_CONSTANT

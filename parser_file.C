@@ -333,7 +333,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
     {
       bool skipped = false;
       bool in_order = false;
-      string name;
+      string name = "";
       if (current == end)
 	// Unordered association list, get name.
 	{

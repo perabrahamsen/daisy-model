@@ -26,20 +26,21 @@ protected:
 
   // Communication with Bioclimate.
 public:
-  virtual double AirTemperature () const = 0;
-  virtual double GlobalRadiation () const = 0;
-  virtual double DailyRadiation () const = 0;
-  virtual double ReferenceEvapotranspiration () const = 0;
-  virtual double Rain () const;
-  virtual double Snow () const;
-  virtual IM Deposit () const; // [g [stuff] /cm²/h]
-  virtual double Cloudiness () const; // [0-1]
-  virtual double VaporPressure () const; // [Pa]
-  virtual double Wind () const;	// [m/s]
+  virtual double hourly_air_temperature () const;
+  virtual double daily_air_temperature () const = 0;
+  virtual double hourly_global_radiation () const;
+  virtual double daily_global_radiation () const = 0;
+  virtual double reference_evapotranspiration () const;
+  virtual double rain () const;
+  virtual double snow () const;
+  virtual IM deposit () const; // [g [stuff] /cm²/h]
+  virtual double cloudiness () const; // [0-1]
+  virtual double vapor_pressure () const; // [Pa]
+  virtual double wind () const;	// [m/s]
 
   // Light distribution.
-  double DayLength () const;
-  double DayCycle () const;
+  double day_length () const;
+  double day_cycle () const;
 
   // Communication with external model.
   virtual void put_precipitation (double prec);// [mm/d]
@@ -48,7 +49,7 @@ public:
 
   // Utility.
 public:
-  static double DayLength(double Latitude, const Time& t);
+  static double day_length (double Latitude, const Time& t);
 
   // Average temperature.
 public:

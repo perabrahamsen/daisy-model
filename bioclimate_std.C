@@ -32,9 +32,9 @@ public:
 			  SoilWater& soil_water, const SoilHeat&);
   // Weather.
 public:
-  double temperature;		// Air temperature in canopy.
-  double day_length;		// From weather (does not really belong here).
-  double daily_radiation;	// From weather.
+  double daily_air_temperature_; // Air temperature in canopy.
+  double day_length_;		// From weather (does not really belong here).
+  double daily_global_radiation_; // From weather.
 
   // Manager.
   double irrigation;
@@ -42,6 +42,7 @@ public:
   Column::irrigation_from irrigation_type;
 
   // Status.
+  double water_temperature;	// Temperature of incomming water.
   double intercepted_water;
   Snow snow;
   
@@ -70,12 +71,12 @@ public:
 
   // Weather.
 public:
-  double AirTemperature () const
-    { return temperature; }
-  double DayLength () const
-    { return day_length; }
-  double DailyRadiation () const
-    { return daily_radiation; }
+  double daily_air_temperature () const
+    { return daily_air_temperature_; }
+  double day_length () const
+    { return day_length_; }
+  double daily_global_radiation () const
+    { return daily_global_radiation_; }
 
   // Manager.
 public:
@@ -107,9 +108,6 @@ void
 BioclimateStandard::RadiationDistribution (const Weather& weather, 
 					   const CropList& crops)
 {
-  // Remember this in case the crops should ask.
-  daily_radiation = weather.DailyRadiation ();
-
   // Fraction of Photosynthetically Active Radiation in Shortware
   // incomming radiation. 
   static const double PARinSi = 0.50;	
@@ -178,7 +176,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
   assert (approximate (Height[0], MxH));
   Height[0] = MxH;
 
-  double PAR0 = (1 - ACRef) * PARinSi * weather.GlobalRadiation ();
+  double PAR0 = (1 - ACRef) * PARinSi * weather.hourly_global_radiation ();
   IntensityDistribution (PAR0, ACExt, PAR_);
 }
 
@@ -227,7 +225,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   else
     EpFactor = soil.EpFactor ();
 
-  const double ref_evapo = max (0.0, weather.ReferenceEvapotranspiration ());
+  const double ref_evapo = max (0.0, weather.reference_evapotranspiration ());
   
   PotEvapotranspiration = EpFactor * ref_evapo;
 
@@ -238,7 +236,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   double PotCanopyEvapotranspiration =
     EpFactor * ref_evapo - PotSoilEvaporation;
   
-  double WaterFromAbove = weather.Rain ();
+  double WaterFromAbove = weather.rain ();
   if (irrigation_type == Column::top_irrigation)
     WaterFromAbove += irrigation;
 
@@ -258,16 +256,16 @@ BioclimateStandard::WaterDistribution (Surface& surface,
     Total_through_fall += irrigation;
 
   double temperature;
-  if (Total_through_fall > 0.0)
+  if (Total_through_fall + irrigation > 0.0)
     temperature 
-      = (Through_fall * weather.AirTemperature ()
+      = (Through_fall * weather.hourly_air_temperature ()
 	 + irrigation * irrigation_temperature) / (Through_fall + irrigation);
   else
-    temperature = weather.AirTemperature ();
+    temperature = weather.hourly_air_temperature ();
 
   snow.tick (soil, soil_water, soil_heat, 
-	     weather.GlobalRadiation (), 0.0,
-	     Total_through_fall, weather.Snow (),
+	     weather.hourly_global_radiation (), 0.0,
+	     Total_through_fall, weather.snow (),
 	     temperature, 
 	     PotSoilEvaporation + PotCanopyEvapotranspiration);
   assert (PotSoilEvaporation < 1000.0);
@@ -314,11 +312,13 @@ BioclimateStandard::tick (Surface& surface, const Weather& weather,
 			  SoilWater& soil_water, const SoilHeat& soil_heat)
 {
   // Keep weather information during time step.
-  temperature = weather.AirTemperature ();
-  day_length = weather.DayLength ();
+  // Remember this in case the crops should ask.
+  daily_global_radiation_ = weather.daily_global_radiation ();
+  daily_air_temperature_ = weather.daily_air_temperature ();
+  day_length_ = weather.day_length ();
 
   // Add nitrogen deposit. 
-  surface.fertilize (weather.Deposit ());
+  surface.fertilize (weather.deposit ());
 
   // Calculate total canopy, divide it intervalsm, and distribute PAR.
   RadiationDistribution (weather, crops);

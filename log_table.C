@@ -233,6 +233,7 @@ struct LogTable : public Log, public Filter
 
   // Display.
   bool print_tags;		// Show tags on first line?
+  bool flush;			// Flush after each time step.
 
   // Checking to see if we should log this time step.
   Filter& match (const Frame& frame, const Daisy& daisy)
@@ -262,7 +263,8 @@ struct LogTable : public Log, public Filter
 	  entries[i]->done (out);
 	}
       out << "\n";
-      // out.flush ();
+      if (flush)
+	out.flush ();
     }
 
   // Open normal items.
@@ -340,7 +342,8 @@ struct LogTable : public Log, public Filter
 #endif
       condition (Librarian<Condition>::create (al.alist ("when"))),
       entries (map_construct<LogEntry> (al.alist_sequence ("entries"))),
-      print_tags (al.flag ("print_tags"))
+      print_tags (al.flag ("print_tags")),
+      flush (al.flag ("flush"))
     {
       if (print_tags)
 	{
@@ -406,6 +409,8 @@ static struct LogTableSyntax
       
       syntax.add ("print_tags", Syntax::Boolean, Syntax::Const);
       alist.add ("print_tags", true);
+      syntax.add ("flush", Syntax::Boolean, Syntax::Const);
+      alist.add ("flush", false);
 
       Librarian<Log>::add_type ("table1", alist, syntax, &make);
     }

@@ -22,7 +22,7 @@ struct ActionIrrigate : public Action
     double t = temp;
 
     if (temp == at_air_temperature) 
-      t = daisy.weather.AirTemperature ();
+      t = daisy.weather.hourly_air_temperature ();
 
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)

@@ -36,9 +36,9 @@ public:
   virtual double height (int) const = 0;
   virtual double PAR (int) const = 0;
   virtual double LAI () const = 0;
-  virtual double AirTemperature () const = 0;
-  virtual double DayLength () const = 0;
-  virtual double DailyRadiation () const = 0;
+  virtual double daily_air_temperature () const = 0;
+  virtual double day_length () const = 0;
+  virtual double daily_global_radiation () const = 0;
 
   // Manager.
 public:

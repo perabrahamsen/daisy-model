@@ -9,38 +9,40 @@ class WeatherNone : public Weather
 {
   double air_temperature;
   const double global_radiation;
-  double reference_evapotranspiration;
-  double rain;
-  double snow;
+  double reference_evapotranspiration_;
+  double rain_;
+  double snow_;
 
   // Simulation.
 public:
   void tick (const Time& t)
     { Weather::tick (t); }
-  double AirTemperature () const
+  double hourly_air_temperature () const
     { return air_temperature; }
-  double GlobalRadiation () const
+  double daily_air_temperature () const
+    { return air_temperature; }
+  double hourly_global_radiation () const
     { return global_radiation; }
-  double DailyRadiation () const
-    { return global_radiation * 24.0; }
-  double ReferenceEvapotranspiration () const
-    { return reference_evapotranspiration; }
-  double Rain () const
-    { return rain; }
-  double Snow () const
-    { return snow; }
+  double daily_global_radiation () const
+    { return global_radiation; }
+  double reference_evapotranspiration () const
+    { return reference_evapotranspiration_; }
+  double rain () const
+    { return rain_; }
+  double snow () const
+    { return snow_; }
 
   // Communication with external model.
   void put_precipitation (double prec)
     { 
       Weather::distribute (prec / 24.0); 
-      rain = Weather::Rain ();
-      snow = Weather::Snow ();
+      rain_ = Weather::rain ();
+      snow_ = Weather::snow ();
     }
   void put_air_temperature (double T)
     { air_temperature = T; }
   void put_reference_evapotranspiration (double ref)
-    { reference_evapotranspiration = ref; }
+    { reference_evapotranspiration_ = ref; }
 
   // Create and Destroy.
 private:
@@ -55,9 +57,9 @@ WeatherNone::WeatherNone (const AttributeList& al)
   : Weather (al),
     air_temperature (al.number ("air_temperature")),
     global_radiation (al.number ("global_radiation")),
-    reference_evapotranspiration (al.number ("reference_evapotranspiration")),
-    rain (al.number ("rain")),
-    snow (al.number ("snow"))
+    reference_evapotranspiration_ (al.number ("reference_evapotranspiration")),
+    rain_ (al.number ("rain")),
+    snow_ (al.number ("snow"))
 { }
 
 WeatherNone::~WeatherNone ()

@@ -1030,13 +1030,13 @@ CropSold::DevelopmentStage (const Bioclimate& bioclimate)
   const Parameters::DevelPar& Devel = par.Devel;
   Variables::RecPhenology& Phenology = var.Phenology;
 
-  const double Ta = bioclimate.AirTemperature ();
+  const double Ta = bioclimate.daily_air_temperature ();
 
   if (Phenology.DS < 1)
     {
       Phenology.DS += (Devel.DSRate1
 		       * Devel.TempEff1 (Ta)
-		       * Devel.PhotEff1 (bioclimate.DayLength ()));
+		       * Devel.PhotEff1 (bioclimate.day_length ()));
       if (Phenology.Vern < 0)
 	Vernalization (Ta);
     }
@@ -1549,7 +1549,7 @@ CropSold::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   double F;			// Leaf Photosynthesis [gCO2/m2/h]
   double prevLA = 0.0;		// LAI below the current leaf layer.
   double Ass = 0.0;		// Assimilate produced by canopy photosynthesis
-  double Ta = bioclimate.AirTemperature ();
+  double Ta = bioclimate.daily_air_temperature ();
   
   if (Ta < LeafPhot.TLim1)
     Teff = 0.0;
@@ -1620,10 +1620,10 @@ CropSold::NetProduction (const Bioclimate& bioclimate,
 
   const double RMLeaf
     = MaintenanceRespiration (Resp.r_Leaf (DS), Resp.Q10, Prod.WLeaf, 
-			      bioclimate.AirTemperature ());
+			      bioclimate.daily_air_temperature ());
   const double RMSOrg
     = MaintenanceRespiration (Resp.r_SOrg (DS), Resp.Q10, Prod.WSOrg, 
-			      bioclimate.AirTemperature ());
+			      bioclimate.daily_air_temperature ());
   const double RMRoot
     = MaintenanceRespiration (Resp.r_Root (DS), Resp.Q10, Prod.WRoot, 
 			      soil_heat.T (soil.interval_plus (-Depth / 3)));
@@ -1719,7 +1719,7 @@ CropSold::tick (const Time& time,
   var.RootSys.ws_up = 0.0;
   var.RootSys.ws_down = 0.0;
 
-  const double Ta = bioclimate.AirTemperature ();
+  const double Ta = bioclimate.daily_air_temperature ();
 
   double Teff;
 
@@ -1742,7 +1742,7 @@ CropSold::tick (const Time& time,
   const double beta2 = 0.094;
 
   const double LAI = min (5.0, var.Canopy.LAI);
-  const double Si = bioclimate.DailyRadiation () * (24*60*60); // [J/m²/d]
+  const double Si = bioclimate.daily_global_radiation () * (24*60*60); // [J/m²/d]
   const double Sad = PARinSi * (1.0 - par.Canopy.PARref)
     * (1.0 - exp (-par.Canopy.PARext * LAI)) * Si;
   const double epsilon = 0.15 - (beta1 - beta2 * LAI / (LAI + 3.0))

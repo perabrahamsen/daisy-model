@@ -1121,13 +1121,13 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
   const Parameters::DevelPar& Devel = par.Devel;
   Variables::RecPhenology& Phenology = var.Phenology;
 
-  const double Ta = bioclimate.AirTemperature ();
+  const double Ta = bioclimate.daily_air_temperature ();
 
   if (Phenology.DS < 1)
     {
       Phenology.DS += (Devel.DSRate1
 		       * Devel.TempEff1 (Ta)
-		       * Devel.PhotEff1 (bioclimate.DayLength ()));
+		       * Devel.PhotEff1 (bioclimate.day_length ()));
       if (par.Vernal.required && Phenology.Vern < 0)
 	Vernalization (Ta);
     }
@@ -1616,7 +1616,7 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   // sugar production [gCH2O/m2/h] by canopy photosynthesis.
   const Parameters::LeafPhotPar& LeafPhot = par.LeafPhot;
   const CSMP& LAIvsH = var.Canopy.LAIvsH;
-  const double Ta = bioclimate.AirTemperature ();
+  const double Ta = bioclimate.daily_air_temperature ();
   const double Teff = LeafPhot.TempEff (Ta); // Temperature effect
 
   // One crop: assert (approximate (var.Canopy.LAI, bioclimate.LAI ()));
@@ -1727,7 +1727,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   Variables::RecProd& vProd = var.Prod;
   Variables::RecCrpAux& CrpAux = var.CrpAux;
 
-  const double AirT = bioclimate.AirTemperature ();
+  const double AirT = bioclimate.daily_air_temperature ();
   const double SoilT = soil_heat.T (geometry.interval_plus (-Depth / 3));
   double RMLeaf
     = MaintenanceRespiration (pProd.r_Leaf, vProd.WLeaf, AirT);

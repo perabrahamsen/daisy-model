@@ -82,7 +82,7 @@ void IrrigateEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
    IM sm;
 
    double t = (useairtemperature)?
-               daisy.weather.AirTemperature () :
+               daisy.weather.hourly_air_temperature () :
                temperature;
 
    Column::irrigation_from from = (overheadirrigation) ?

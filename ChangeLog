@@ -1,8 +1,47 @@
+1998-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.015 released.
+
+1998-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+	
+	* biobioclimate.h, bioclimate_std.C, crop_std.C, crop_old.C,
+	* crop_sold.C:
+	(hourly_global_radiation) Renamed from `GlobalRadiation'.
+	(daily_global_radiation) Renamed from `DailyRadiation'.
+	(day_length): Renamed from `DayLength'.
+	
+	* bioclimate_std.C (WaterDistribution): Also use irrigation
+	temperature. 
+
+	* weather.C, weather.h, weather_simple.C, weather_none.C,
+	* weather_file.C, action_irrigate.C, bioclimate_std.C
+	(daily_air_temperature): Renamed from `AirTemperature'.
+	(hourly_air_temperature): Added.
+	(day_length): Renamed from `DayLength'.
+	(day_cycle): Renamed from `DayCycle'.
+	(rain): Renamed from `Rain'.
+	(snow): Renamed from `Snow'.
+	(cloudiness): Renamed from `Cloudiness'.
+	(vapor_pressure): Renamed from `VaporPressure'.
+	(wind): Renamed from `Wind'.
+	
+1998-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C, weather.h, weather_simple.C, weather_none.C,
+	* weather_file.C, bioclimate_std.C:
+	(hourly_global_radiation) Renamed from `GlobalRadiation'.
+	(daily_global_radiation) Renamed from `DailyRadiation'.
+	(Weather::hourly_global_radiation): Added.
+	(WeatherFile::output): Removed.
+	(WeatherFile::GlobalRadiation): Removed.
+	(WeatherFile::A, WeatherFile::B): Removed.
+
+	* weather_none.C (class WeatherNone::DailyRadiation): Don't
+	multiply with 24.
+
 1998-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.014 released.
-
-1998-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* common.h (BORLAND_PERMISSIONS): New flag.
 	* log_table.C (LogTable::LogTable): Obey.
@@ -160,8 +199,8 @@
 	(daisy_daisy_tick_action): Pass dummy `Frame' to `Action::doIt'.
 	* log_file.C (match): Pass dummy `Frame' to `condition::match'.
 	* action_fertilize.C, action_harvest.C, action_irrigate.C,
-	action_lisp.C, action_sow.C, action_stop.C, action_tillage.C,
-	action_with.C, condition_logic.C, condition_time.C: Adjusted
+	* action_lisp.C, action_sow.C, action_stop.C, action_tillage.C,
+	* action_with.C, condition_logic.C, condition_time.C: Adjusted
 	derived objects.
 
 	* condition_logic.C (class ConditionAnd): Fixed logic.

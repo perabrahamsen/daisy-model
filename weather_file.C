@@ -9,31 +9,27 @@
 #include "log.h"
 #include <fstream.h>
 
-class WeatherFile : public Weather
+struct WeatherFile : public Weather
 {
   Time date;
   const string file_name;
   ifstream file;
-  const vector<double>& A;
-  const vector<double>& B;
 
   double precipitation;
-  double reference_evapotranspiration;
+  double reference_evapotranspiration_;
   double hourly_reference_evapotranspiration;
   double global_radiation;
-  double hourly_global_radiation;
   double air_temperature;
   
-  int line;
+  int line;			// Current line number in weather file.
 
   // Simulation.
-public:
   void tick (const Time&);
-  void output (Log&, Filter&) const;
-  double AirTemperature () const;
-  double GlobalRadiation () const;
-  double DailyRadiation () const;
-  double ReferenceEvapotranspiration () const;
+
+  // Communication with Bioclimate.
+  double daily_air_temperature () const;
+  double daily_global_radiation () const;
+  double reference_evapotranspiration () const;
   double Precipitation () const;
 
   // Communication with external model.
@@ -42,11 +38,7 @@ public:
   void put_reference_evapotranspiration (double ref); // [mm/d]
 
   // Create and Destroy.
-private:
-  friend class WeatherFileSyntax;
-  static Weather& make (const AttributeList&);
   WeatherFile (const AttributeList&);
-public:
   ~WeatherFile ();
 };
 
@@ -78,14 +70,14 @@ WeatherFile::tick (const Time& time)
 	THROW ("No more climate data.");
 
       if (end == '\n')
-	reference_evapotranspiration = -42.42e42;
+	reference_evapotranspiration_ = -42.42e42;
       else
 	{
 	  // BCC wants this:
 	  file.putback (end);
 	  // G++ used this:
 	  // file.unget ();
-	  file >> reference_evapotranspiration;
+	  file >> reference_evapotranspiration_;
 	  while (file.good () && file.get () != '\n')
 	    /* do nothing */;
 	}
@@ -93,47 +85,24 @@ WeatherFile::tick (const Time& time)
     }
 
   // Update the hourly values.
-  hourly_global_radiation = DayCycle () * 24.0 * global_radiation;
-  put_reference_evapotranspiration (reference_evapotranspiration);
+  put_reference_evapotranspiration (reference_evapotranspiration_);
   distribute (Precipitation ());
 }
 
-void
-WeatherFile::output (Log& log, Filter& filter) const
-{
-  Weather::output (log, filter);
-  log.output ("air_temperature", filter, air_temperature, true);
-  log.output ("global_radiation", filter, global_radiation, true);
-  log.output ("hourly_global_radiation", filter, 
-	      hourly_global_radiation, true);
-  log.output ("reference_evapotranspiration", filter, 
-	      reference_evapotranspiration, true);
-  log.output ("hourly_reference_evapotranspiration", filter, 
-	      hourly_reference_evapotranspiration, true);
-}
-
 double
-WeatherFile::AirTemperature (void) const // [°C]
+WeatherFile::daily_air_temperature (void) const // [°C]
 {
-  // BUG: No variation over the day? 
   return air_temperature;
 }
 
 double
-WeatherFile::DailyRadiation () const // [W/m²]
+WeatherFile::daily_global_radiation () const // [W/m²]
 {
   return global_radiation;
 }
 
 double
-WeatherFile::GlobalRadiation () const	// [W/m²]
-{
-  return hourly_global_radiation;
-}
-
-
-double
-WeatherFile::ReferenceEvapotranspiration () const // [mm/h]
+WeatherFile::reference_evapotranspiration () const // [mm/h]
 {
   return hourly_reference_evapotranspiration;
 }
@@ -160,18 +129,16 @@ WeatherFile::put_air_temperature (double T)
 void 
 WeatherFile::put_reference_evapotranspiration (double ref)
 {
-  reference_evapotranspiration = ref;
+  reference_evapotranspiration_ = ref;
 
-  if (reference_evapotranspiration < -1.0e11)
+  if (reference_evapotranspiration_ < -1.0e11)
     {
-      const double T = 273.16 + AirTemperature ();
-      const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
       hourly_reference_evapotranspiration 
-	= 1.05e-3 * Delta / (Delta + 66.7) * GlobalRadiation ();
+	= Weather::reference_evapotranspiration ();
     }
   else
     hourly_reference_evapotranspiration 
-      = reference_evapotranspiration * DayCycle ();
+      = reference_evapotranspiration_ * day_cycle ();
 }
 
 WeatherFile::WeatherFile (const AttributeList& al)
@@ -179,10 +146,8 @@ WeatherFile::WeatherFile (const AttributeList& al)
     date (42, 1, 1, 0),
     file_name (al.name ("file")),
     file (Options::find_file (al.name ("file"))),
-    A (al.number_sequence ("A")),
-    B (al.number_sequence ("B")),
     precipitation (-42.42e42),
-    reference_evapotranspiration (-42.42e42),
+    reference_evapotranspiration_ (-42.42e42),
     global_radiation (-42.42e42)
 { }
 
@@ -191,71 +156,18 @@ WeatherFile::~WeatherFile ()
   close (file.rdbuf ()->fd ());
 }
 
-// Add the WeatherFile syntax to the syntax table.
-Weather&
-WeatherFile::make (const AttributeList& al)
-{
-  return *new WeatherFile (al);
-}
-
 static struct WeatherFileSyntax
 {
-  WeatherFileSyntax ()
-  { 
-    static const double A[] = 
-    {
-      -0.916667,
-      -1.687500,
-      -1.681818,
-      -1.468085,
-      -1.387324,
-      -1.377246,
-      -1.389937,
-      -1.518519,
-      -1.629630,
-      -1.631579,
-      -1.333333,
-      -0.900000
-    };
-    static const double B[] = 
-    {
-      -0.166667,
-      -0.437500,
-      -0.454545,
-      -0.382979,
-      -0.338028,
-      -0.335329,
-      -0.389937,
-      -0.407407,
-      -0.358025,
-      -0.236842,
-      -0.166667,
-      -0.200000
-    };
+  static Weather& make (const AttributeList& al)
+    { return *new WeatherFile (al); }
 
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    Weather::load_syntax (syntax, alist);
-    syntax.add ("file", Syntax::String, Syntax::Const);
-    syntax.add ("A", Syntax::Number, Syntax::Const, 12);
-    syntax.add ("B", Syntax::Number, Syntax::Const, 12);
-    vector<double>& a = *new vector<double>;
-    vector<double>& b = *new vector<double>;
-    for (int i = 0; i < 12; i++)
-      {
-	a.push_back (A[i]);
-	b.push_back (B[i]);
-      }
-    alist.add ("A", a);
-    alist.add ("B", b);
-    syntax.add ("air_temperature", Syntax::Number, Syntax::LogOnly);
-    syntax.add ("global_radiation", Syntax::Number, Syntax::LogOnly);
-    syntax.add ("hourly_global_radiation", Syntax::Number, Syntax::LogOnly);
-    syntax.add ("reference_evapotranspiration",
-		Syntax::Number, Syntax::LogOnly);
-    syntax.add ("hourly_reference_evapotranspiration",
-		Syntax::Number, Syntax::LogOnly);
-    syntax.order ("file");
-    Librarian<Weather>::add_type ("file", alist, syntax, &WeatherFile::make);
-  }
+  WeatherFileSyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      Weather::load_syntax (syntax, alist);
+      syntax.add ("file", Syntax::String, Syntax::Const);
+      syntax.order ("file");
+      Librarian<Weather>::add_type ("file", alist, syntax, &make);
+    }
 } WeatherFile_syntax;

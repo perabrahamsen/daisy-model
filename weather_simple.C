@@ -11,20 +11,20 @@ class WeatherSimple : public Weather
 {
   const double precipitation;
   const int interval;
-  double reference_evapotranspiration;
+  double reference_evapotranspiration_;
   Time time;
 
   // Communication with external model.
   void put_reference_evapotranspiration (double ref)
-    { reference_evapotranspiration = ref; }
+    { reference_evapotranspiration_ = ref; }
 
   // Simulation.
 public:
   void tick (const Time&);
-  double AirTemperature () const;
-  double GlobalRadiation () const;
-  double DailyRadiation () const;
-  double ReferenceEvapotranspiration () const;
+  double daily_air_temperature () const;
+  double hourly_global_radiation () const;
+  double daily_global_radiation () const;
+  double reference_evapotranspiration () const;
   double Precipitation () const;
 
   // Create and Destroy.
@@ -42,7 +42,7 @@ WeatherSimple::tick (const Time& t)
 }
 
 double
-WeatherSimple::AirTemperature () const // [C]
+WeatherSimple::daily_air_temperature () const // [C]
 {
   double t = 2 * M_PI / 365 * time.yday ();
   return (7.7 - 7.7 * cos (t) - 3.6 * sin (t));
@@ -64,7 +64,7 @@ static const double B2[] =
 { 11.0, 25.0, 32.0, 29.0, 23.0, 0.0, 0.0, 29.0, 25.0, 15.0, 8.0, 7.0 };
 
 double
-WeatherSimple::GlobalRadiation () const	// [W/m²]
+WeatherSimple::hourly_global_radiation () const	// [W/m²]
 {
   double t = 2 * M_PI / 24 * time.hour ();
   int m = time.month () - 1;
@@ -74,7 +74,7 @@ WeatherSimple::GlobalRadiation () const	// [W/m²]
 }
 
 double
-WeatherSimple::DailyRadiation () const	// [W/m²]
+WeatherSimple::daily_global_radiation () const	// [W/m²]
 {
   int m = time.month () - 1;
   double Si = A0[m];
@@ -82,16 +82,12 @@ WeatherSimple::DailyRadiation () const	// [W/m²]
 }
 
 double
-WeatherSimple::ReferenceEvapotranspiration () const // [mm/h]
+WeatherSimple::reference_evapotranspiration () const // [mm/h]
 {
-  if (reference_evapotranspiration < 0)
-    {
-      const double T = 273.16 + AirTemperature ();
-      const double Delta = 5362.7 / pow (T, 2) * exp (26.042 - 5362.7 / T);
-      return 1.05e-3 * Delta / (Delta + 66.7) * GlobalRadiation ();
-    }
+  if (reference_evapotranspiration_ < 0)
+    return Weather::reference_evapotranspiration ();
   else
-    return reference_evapotranspiration;
+    return reference_evapotranspiration_;
 }
 
 double
@@ -107,7 +103,7 @@ WeatherSimple::WeatherSimple (const AttributeList& al)
   : Weather (al),
     precipitation (al.number ("precipitation")),
     interval (al.integer ("interval")),
-    reference_evapotranspiration (al.number ("reference_evapotranspiration")),
+    reference_evapotranspiration_ (al.number ("reference_evapotranspiration")),
     time (1, 1, 1, 1)
 { }
 
