@@ -47,6 +47,13 @@
 #include <algorithm>
 #include <numeric>
 
+// Convertions
+static const double g_per_cm2_to_kg_per_ha = (10000.0 * 10000.0) / 1000.0;
+static const double g_per_cm2_per_h_to_kg_per_ha_per_y 
+= g_per_cm2_to_kg_per_ha * 24.0 * 365.0;
+static const double kg_per_ha_per_y_to_g_per_cm2_per_h
+= 1.0 / g_per_cm2_per_h_to_kg_per_ha_per_y;
+
 struct OrganicMatter::Implementation
 {
   // Content.
@@ -96,7 +103,9 @@ struct OrganicMatter::Implementation
   public:
     const double T;		// Equilibrium temperature. [dg C]
     const double h;		// Equilibrium pressure. [cm]
-    const int variable_pool;	// Pool not in equilibrium.
+    const int variable_pool;	// First pool not in equilibrium.
+    const int variable_pool_2;	// Second pool not in equilibrium.
+    const double background_mineralization; // Desired min. from SOM and SMB.
     const vector<int> debug_equations;
     const bool debug_rows;
     const bool debug_to_screen;
@@ -111,10 +120,13 @@ struct OrganicMatter::Implementation
     
     // Create and Destroy.
   private:
+    static int find_som_1 (const vector<SOM*>& som);
+    static int find_som_2 (const vector<SOM*>& som);
     static bool check_alist (const AttributeList&, Treelog&);
   public:
     static void load_syntax (Syntax&, AttributeList&);
-    Initialization (const AttributeList&, const Soil& soil, double T_avg);
+    Initialization (const AttributeList&, const Soil& soil, 
+		    const vector<SOM*>& som, double T_avg);
     ~Initialization ();
   };
 
@@ -184,9 +196,11 @@ struct OrganicMatter::Implementation
   double abiotic (const OM& om, double T, double h, 
 		  bool use_clay, int lay) const;
   void partition (const vector<double>& am_input, double T, double h, 
-		  int lay, double total_C, int variable_pool,
-		  bool top_soil,
+		  int lay, double total_C, 
+		  int variable_pool, int variable_pool_2, 
+		  double background_mineralization, bool top_soil,
 		  const vector<double>& SOM_fractions,
+		  const vector<double>& SOM_C_per_N,
 		  vector<double>& SOM_results,
 		  vector<double>& SMB_results,
 		  Treelog& msg,
@@ -365,14 +379,35 @@ By default, the yearly average from the weather component will be used.");
   syntax.add ("h", "cm", Check::non_positive (), Syntax::Const, "\
 Pressure used for equilibrium.");
   alist.add ("h", -100.0);
-  syntax.add ("variable_pool", Syntax::Integer, Syntax::Const, "\
+  syntax.add ("variable_pool", Syntax::Integer, Syntax::OptionalConst, "\
 If neither the C content nor 'SOM_fractions' are specified, equilibrium is\n\
 assumed for all SOM pools except the one specified by this parameter.\n\
 If you set this to -1 (or any number nor corresponding to a SOM pool),\n\
 equilibrium will be assumed for all pools, and instead the humus content\n\
 specified by the horizon will be ignored.\n\
-Note, the numbering is zero-based, so '0' specifies SOM1.");
-  alist.add ("variable_pool", 0);
+Note, the numbering is zero-based, so '0' specifies SOM1.\n\
+By default, the slowest active pool will be used.");
+  syntax.add ("variable_pool_2", Syntax::Integer, Syntax::OptionalConst, "\
+If 'background_mineralization' is specified, this pool is no longer\n\
+assumed to be in equilibrium.\n\
+Note, the numbering is zero-based, so '0' specifies SOM1.\n\
+By default, the second slowest active pool will be used.");
+  static RangeII min_range (-1000.0, 1000.0);
+  syntax.add ("background_mineralization", "kg N/ha/y", 
+	      min_range, Syntax::OptionalConst, "\
+The background mineralization is the mineralization from all SMB and\n\
+SOM pools, but not from the AOM pools.\n\
+\n\
+If neither the C content of individual pools nor 'SOM_fractions' are\n\
+speecified, the SOM and SMB pools will be initialized so all pools in\n\
+the top soil (above 'end', usually the first horizon) are in\n\
+equilibrium except those specified by 'variable_pool' and\n\
+'variable_pool_2', usually SOM1 and SOM2.  These two will be\n\
+initialized so the background mineralization will be the specified number.\n\
+The subsoil is not affected by this parameter.\n\
+\n\
+If the background mineralization is unspecified, 'variable_pool_2' will be\n\
+assumed to be in equilibrium instead.");
   syntax.add ("debug_equations", Syntax::Integer, Syntax::Const, 
 	      Syntax::Sequence, "\
 Print equations used for initialization for the specified intervals.");
@@ -385,14 +420,70 @@ If true, print debug information to screen, else to the 'daisy.log' file.");
   alist.add ("debug_to_screen", false);
 }
 
+int
 OrganicMatter::Implementation::Initialization::
-/**/ Initialization (const AttributeList& al, const Soil& soil, double T_avg)
+/**/find_som_1 (const vector<SOM*>& som)
+{
+  // Find the slowest pool and its rate.
+  int slowest = -1;
+  double slowest_rate = 0.1;
+
+  for (int i = 0; i < som.size (); i++)
+    {
+      const double rate = som[i]->turnover_rate;
+      if (rate > 1e-90 && rate < slowest_rate)
+	{
+	  slowest = i;
+	  slowest_rate = rate;
+	}
+    }
+  return slowest;
+}
+
+int
+OrganicMatter::Implementation::Initialization::
+/**/find_som_2 (const vector<SOM*>& som)
+{
+  // Find the slowest pool and its rate.
+  const int slowest = find_som_1 (som);
+  if (slowest < 0)
+    return -2;
+  daisy_assert (slowest < som.size ());
+  const double slowest_rate = som[slowest]->turnover_rate;
+
+  // Fnd the second slowest pool and its rate.
+  int second = -1;
+  double second_rate = 0.1;
+
+  for (int i = 0; i < som.size (); i++)
+    {
+      const double rate = som[i]->turnover_rate;
+      if (i != slowest && rate >= slowest_rate && rate < second_rate)
+	{
+	  second = i;
+	  second_rate = rate;
+	}
+    }
+  return second;
+}
+
+OrganicMatter::Implementation::Initialization::
+/**/ Initialization (const AttributeList& al, const Soil& soil, 
+		     const vector<SOM*>& som, double T_avg)
   : input (al.check ("input") ? al.number ("input") : -1.0),
     end (al.check ("end") ? al.number ("end") : soil.end_of_first_horizon ()),
     fractions (al.number_sequence ("fractions")),
     T (al.check ("T") ? al.number ("T") : T_avg),
     h (al.number ("h")),
-    variable_pool (al.integer ("variable_pool")),
+    variable_pool (al.check ("variable_pool")
+		   ? al.integer ("variable_pool")
+		   : find_som_1 (som)),
+    variable_pool_2 (al.check ("variable_pool_2")
+		     ? al.integer ("variable_pool_2")
+		     : find_som_2 (som)),
+    background_mineralization (al.check ("background_mineralization")
+			       ? al.number ("background_mineralization")
+			       : -42.42e42),
     debug_equations (al.integer_sequence ("debug_equations")),
     debug_rows (al.flag ("debug_rows")),
     debug_to_screen (al.flag ("debug_to_screen"))
@@ -403,13 +494,6 @@ OrganicMatter::Implementation::Initialization::
   // Per Lay
   daisy_assert (per_lay.size () == 0);
   per_lay.insert (per_lay.end (), soil.size (), 0.0);
-
-  // Convertions
-  const double g_per_cm2_to_kg_per_ha = (10000.0 * 10000.0) / 1000.0;
-  const double g_per_cm2_per_h_to_kg_per_ha_per_y 
-    = g_per_cm2_to_kg_per_ha * 24.0 * 365.0;
-  const double kg_per_ha_per_y_to_g_per_cm2_per_h
-    = 1.0 / g_per_cm2_per_h_to_kg_per_ha_per_y;
 
   // Parameters.
   const double root = al.number ("root");
@@ -1107,8 +1191,12 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 					  const double T, const double h,
 					  const int lay, const double total_C,
 					  const int variable_pool,
+					  const int variable_pool_2,
+					  const double
+					  /**/ background_mineralization,
 					  const bool top_soil,
 					  const vector<double>& SOM_fractions,
+					  const vector<double>& SOM_C_per_N,
 					  vector<double>& SOM_results,
 					  vector<double>& SMB_results,
 					  Treelog& msg,
@@ -1302,6 +1390,36 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 				  fraction - 1.0);
 	      else if (fraction > 1e-100)
 		matrix.set_entry (equation, som_column + i, fraction);
+	    }
+	}
+      else if (background_mineralization > -1e10 && pool == variable_pool_2)
+	{
+	  // The background mineralization equation.
+	  //
+	  // dN = dSMB1 SMB1_N/C + + dSMBn SMBn_N/C 
+	  //      + dSOM1 SOM1_N/C + + dSOMn SOMn_N/C
+	  matrix.set_value (equation, -background_mineralization);
+	  for (unsigned int i = 0; i < smb_size; i++)
+	    {
+	      double N_per_C = 0.0;
+	      if (smb[i]->C.size () > lay && smb[i]->N.size () > lay)
+		{
+		  if (isnormal (smb[i]->C[lay]))
+		    N_per_C = smb[i]->N[lay] / smb[i]->C[lay];
+		}
+	      else 
+		{
+		  daisy_assert (smb[i]->initial_C_per_N > 0.0);
+		  N_per_C = 1.0 / smb[i]->initial_C_per_N;
+		}
+	      matrix.set_entry (equation, dsmb_column + i, N_per_C);
+	    }
+	  daisy_assert (SOM_C_per_N.size () == som.size ());
+	  for (unsigned int i = 0; i < som_size; i++)
+	    {
+	      daisy_assert (isnormal (SOM_C_per_N[i]));
+	      matrix.set_entry (equation, dsom_column + i,
+				1.0 / SOM_C_per_N[i]);
 	    }
 	}
       else if (som[pool]->turnover_rate > 1e-100)
@@ -1499,12 +1617,12 @@ Setting additional pool to zero");
       
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
-	  double value = matrix.result (smb_column + pool);
+	  const double value = matrix.result (smb_column + pool);
 	  tmp ()  << "\t" << 100.0 * value / total_C;
 	}
       for (unsigned int pool = 0; pool < som_size; pool++)
 	{
-	  double value = matrix.result (som_column + pool);
+	  const double value = matrix.result (som_column + pool);
 	  tmp ()  << "\t" << 100.0 * value / total_C;
 	}
       for (unsigned int pool = 0; pool < smb_size; pool++)
@@ -1710,7 +1828,7 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     }
 
   // Partitioning.
-  Initialization init (al.alist ("init"), soil, T_avg);
+  Initialization init (al.alist ("init"), soil, som, T_avg);
 		       
   vector<double> SOM_results (som_size, 0.0);
   vector<double> SMB_results (smb_size, 0.0);
@@ -1723,10 +1841,17 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
       else
 	input_from_am (am_input, init.T, init.h, lay);
       
+      const bool top_soil = soil.z (lay) > init.end;
+      const double background_mineralization = 
+	(top_soil && init.background_mineralization > -1e10)
+	? (init.background_mineralization * kg_per_ha_per_y_to_g_per_cm2_per_h
+	   / -init.end)
+	: -42.42e42;
       partition (am_input, init.T, init.h, 
-		 lay, total_C[lay], init.variable_pool, 
-		 soil.z (lay) > init.end,
+		 lay, total_C[lay], init.variable_pool, init.variable_pool_2,
+		 background_mineralization, top_soil,
 		 soil.SOM_fractions (lay), 
+		 soil.SOM_C_per_N (lay),
 		 SOM_results, SMB_results,
 		 err,
 		 init.print_equations (lay), init.debug_rows, 

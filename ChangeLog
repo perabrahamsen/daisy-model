@@ -1,3 +1,20 @@
+2003-04-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.65 released.
+
+2003-04-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/pea.dai ("Pea"): Ditto.
+
+	* lib/grass.dai ("Grass to grain"): Removed 'EpFac'.
+
+	* organic_matter.C (Initialization::variable_pool_2): New member.
+	(Initialization::net_mineralization): New member.
+	(partition): Use them.
+	(initialize): Update caller.
+
+	* organic_matter.C (partition): Added a few 'const's.
+
 2003-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.64 released.

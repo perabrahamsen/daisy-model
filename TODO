@@ -1,5 +1,9 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* EpFac 1.15 alle afgrøder
+
+* dk-horizon.dai med Sørens tal for Jb jorde.
+
 * soil_h & soil_temperature
 
 Flyt fra phenology til root_system (slet evt. soil_h).
@@ -7,12 +11,6 @@ Flyt fra phenology til root_system (slet evt. soil_h).
 * OrganicMatter
 
 ** Max og min somfractions i initialisering.
-
-** init.mineralization
-
-Al mineralisering fra første horizont.
-
-SH: Brutto, netto, eller valgfrit?
 
 ** Ny horizon->turnover_factor singleton parameter
 

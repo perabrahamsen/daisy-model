@@ -12,6 +12,20 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.65
+
+** You can now initialize organic matter based on background miniralization.
+
+If you specify 'background_mineralization' in OrganicMatter init and
+do not specify 'SOM_fractions', the system will attempt to choose SOM1
+and SOM2 values so the total mineralization from the SOM (and SMB)
+pools, but not the AOM pools, are that amount.
+
+Example
+
+  (OrganicMatter (init (input 1400 [kg C/ha/y])
+                       (background_mineralization 30 [kg N/ha/y])))
+
 * 2.64
 
 ** There is now an inert SOM3 pool by default.
