@@ -348,12 +348,16 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil,
     {
       for (unsigned int i = i_bottom-1; i >= i_GWT; i--)
         {
-           def += S[i] * soil.dz (i) * dt;
-           S[i] = 0.0;
+           def -= S[i+1] * soil.dz (i+1) * dt;
+           S[i+1] = 0.0;
            Percolation[i] = Percolation[i+1];
         }
-      def += S[i_bottom] * soil.dz (i_bottom) * dt;
-      S[i_bottom] = 0.0;
+      for (unsigned int i = i_GWT; i <= i_bottom; i++)
+        {
+           i_drainage = i;
+           def = EquilibriumDrainage(i_drainage, soil, h_ice);
+           if (def >= deficit) break;
+        }
       if (def <= 0.0)
         {
            const double DrainSink = -def /
@@ -383,7 +387,7 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil,
   const double dTheta = (Percolation[i_GWT-1] - Percolation[i_GWT])
                         / soil.dz (i_GWT) * dt;
   if (dTheta >= 0.0)
-    S[i_drainage] = dTheta / dt;
+    S[i_GWT] = dTheta / dt;
   else
     Theta[i_GWT] += dTheta;
   if (Theta[i_GWT] > soil.Theta(i_GWT,0.0,h_ice[i_GWT]))
