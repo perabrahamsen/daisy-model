@@ -287,6 +287,7 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
+# MODELS = horizon_system.C select_pF.C pet_FAO_PM.C 
 MODELS = select_pF.C pet_FAO_PM.C \
 	pet_Hargreaves.C hydraulic_M_vGp.C summary_simple.C select_date.C \
 	phenology_TSum.C phenology_std.C hydraulic_hypres.C clayom_biomod.C \
@@ -621,6 +622,7 @@ version.C:
 	echo "// version.C -- automatically generated file" > version.C
 	echo " " >> version.C
 	echo "extern const char *const version = \"$(TAG)\";" >> version.C
+	echo "extern const char *const version_date = __DATE__;" >> version.C
 
 # Update the CVS repository.
 #

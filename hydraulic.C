@@ -177,9 +177,8 @@ Hydraulic::load_K_sat (Syntax& syntax, AttributeList& alist)
 }
 
 void
-Hydraulic::initialize (double /* clay */, double /* silt */, double /* sand */,
-		       double /* humus */, double /* rho_b */,
-		       bool /* top_soil */, Treelog&)
+Hydraulic::initialize (const Texture&, 
+                       double /* rho_b */, bool /* top_soil */, Treelog&)
 {
   if (K_init)
     {

@@ -23,6 +23,7 @@
 // Parameters specified by the HYPRES transfer function.
 
 #include "hydraulic.h"
+#include "texture.h"
 #include "plf.h"
 #include "treelog.h"
 #include "tmpstream.h"
@@ -61,8 +62,7 @@ private:
   friend class HydraulicHypresSyntax;
   static Hydraulic& make (const AttributeList& al);
   HydraulicHypres (const AttributeList&);
-  void initialize (double clay, double silt, double sand,
-		   double humus, double rho_b, bool top_soil,
+  void initialize (const Texture&, double rho_b, bool top_soil,
 		   Treelog& msg);
 public:
   ~HydraulicHypres ();
@@ -135,11 +135,23 @@ HydraulicHypres::Se (double h) const
 }
 
 void
-HydraulicHypres::initialize (double clay, double silt, double sand,
-			     double humus, double rho_b, bool top_soil,
-			     Treelog& msg)
+HydraulicHypres::initialize (const Texture& texture,
+                             double rho_b, bool top_soil, Treelog& msg)
 {
   Treelog::Open nest (msg, name);
+
+  const double clay_lim 
+    = texture.fraction_of_minerals_smaller_than ( 2.0 /* [um] USDA Clay */);
+  const double silt_lim 
+    = texture.fraction_of_minerals_smaller_than (50.0 /* [um] USDA Silt */);
+  daisy_assert (clay_lim >= 0.0);
+  daisy_assert (silt_lim >= clay_lim);
+  daisy_assert (silt_lim <= 1.0);
+  const double mineral = texture.mineral ();
+  const double clay = mineral * clay_lim * 100 /* [%] */;
+  const double silt = mineral * (silt_lim - clay_lim) * 100 /* [%] */;
+  const double sand = mineral * (1.0 - silt_lim) * 100 /* [%] */;
+  const double humus = texture.humus * 100 /* [%] */;
 
   if (soil_type == top)
     top_soil = true;
@@ -160,10 +172,6 @@ You must specify dry_bulk_density in order to use the hypres \
 pedotransfer function");
       rho_b = 1.5;
     }
-  clay *= 100.0;		// [%]
-  silt *= 100.0;		// [%]
-  sand *= 100.0;		// [%]
-  humus *= 100.0;		// [%]
   daisy_assert (approximate (clay + silt + sand + humus, 100.0));
   
 
@@ -226,7 +234,7 @@ pedotransfer function");
   a = -alpha;
   m = 1.0 - 1.0 / n;
 
-  Hydraulic::initialize (clay, silt, sand, humus, rho_b, top_soil, msg);
+  Hydraulic::initialize (texture, rho_b, top_soil, msg);
   daisy_assert (K_sat > 0.0);
 
 

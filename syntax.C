@@ -377,7 +377,9 @@ Syntax::lookup (const string& key) const
 bool
 Syntax::is_const (const string& key) const
 {
-  daisy_assert (impl.status.find (key) != impl.status.end ());
+  if (impl.status.find (key) == impl.status.end ())
+    return false;
+
   return (impl.status[key] == Const
 	  || impl.status[key] == OptionalConst);
 }
@@ -385,7 +387,9 @@ Syntax::is_const (const string& key) const
 bool
 Syntax::is_state (const string& key) const
 {
-  daisy_assert (impl.status.find (key) != impl.status.end ());
+  if (impl.status.find (key) == impl.status.end ())
+    return false;
+
   return (impl.status[key] == State
 	  || impl.status[key] == OptionalState);
 }
@@ -393,7 +397,9 @@ Syntax::is_state (const string& key) const
 bool
 Syntax::is_optional (const string& key) const
 {
-  daisy_assert (impl.status.find (key) != impl.status.end ());
+  if (impl.status.find (key) == impl.status.end ())
+    return false;
+
   return (impl.status[key] == OptionalState 
 	  || impl.status[key] == OptionalConst);
 }
@@ -401,7 +407,9 @@ Syntax::is_optional (const string& key) const
 bool
 Syntax::is_log (const string& key) const
 {
-  daisy_assert (impl.status.find (key) != impl.status.end ());
+  if (impl.status.find (key) == impl.status.end ())
+    return false;
+  
   return impl.status[key] == LogOnly;
 }
 

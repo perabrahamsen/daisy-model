@@ -66,7 +66,7 @@ void
 Options::copyright (Treelog& out)
 {
   out.message (string ("Daisy crop/soil simulation version ")
-	       + version + ". (" __DATE__ ")\n"
+	       + version + ". (" + version_date + ")\n"
 	       "Copyright 1996 - 2004 Per Abrahamsen, "
 	       "Søren Hansen and KVL.");
 }

@@ -27,6 +27,7 @@
 
 class PLF;
 class Treelog;
+class Texture;
 
 class Hydraulic 
 {
@@ -71,8 +72,7 @@ public:
   static void load_Theta_sat (Syntax&, AttributeList&);
   static void load_K_sat_optional (Syntax&, AttributeList&);
   static void load_K_sat (Syntax&, AttributeList&);
-  virtual void initialize (double clay, double silt, double sand,
-			   double humus, double rho_b, bool top_soil,
+  virtual void initialize (const Texture&, double rho_b, bool top_soil,
 			   Treelog&);
   Hydraulic (const AttributeList&);
   virtual ~Hydraulic ();

@@ -600,6 +600,7 @@ If you want two " + name + " you should rename one of them");
   crops.push_back (&crop);
   seed_N += crop.total_N ();
   seed_C += crop.total_C ();
+  reset_canopy_structure (msg);
 }
 
 void

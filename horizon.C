@@ -633,6 +633,7 @@ Horizon::initialize_base (bool top_soil,
   const double clay_lim = texture_below ( 2.0 /* [um] USDA Clay */);
   fast_clay = texture.mineral () * clay_lim;
   fast_humus = texture.humus;
+#if 0
   const double silt_lim = texture_below (50.0 /* [um] USDA Silt */);
   daisy_assert (clay_lim >= 0.0);
   daisy_assert (silt_lim >= clay_lim);
@@ -643,6 +644,9 @@ Horizon::initialize_base (bool top_soil,
                         mineral * (1.0 - silt_lim),
                         texture.humus,
 			impl.dry_bulk_density, top_soil, msg);
+#else 
+  hydraulic.initialize (texture, impl.dry_bulk_density, top_soil, msg);
+#endif
   impl.initialize (hydraulic, texture, quartz () * texture.mineral (),
                    som_size, msg); 
 }

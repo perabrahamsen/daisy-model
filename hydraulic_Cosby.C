@@ -23,6 +23,7 @@
 // Parameters specified by Cosby et al.
 
 #include "hydraulic.h"
+#include "texture.h"
 #include "treelog.h"
 #include "tmpstream.h"
 #include "mathlib.h"
@@ -52,8 +53,7 @@ private:
   
   // Create and Destroy.
 public:
-  void initialize (double clay, double silt, double sand,
-		   double humus, double rho_b, bool top_soil, Treelog&);
+  void initialize (const Texture&, double rho_b, bool top_soil, Treelog&);
   Hydraulic_Cosby (const AttributeList&);
   ~Hydraulic_Cosby ();
 };
@@ -117,16 +117,24 @@ Hydraulic_Cosby::Sr (double h) const
 }
 
 void
-Hydraulic_Cosby::initialize (double clay, double silt, double sand,
-			     double /* humus */, double /* rho_b */,
+Hydraulic_Cosby::initialize (const Texture& texture, double /* rho_b */,
 			     bool /* top_soil */, Treelog& msg)
 {
   Treelog::Open nest (msg, name);
 
+  const double clay_lim
+    = texture.fraction_of_minerals_smaller_than ( 2.0 /* [um] USDA Clay */);
+  const double silt_lim
+    = texture.fraction_of_minerals_smaller_than (50.0 /* [um] USDA Silt */);
+  daisy_assert (clay_lim >= 0.0);
+  daisy_assert (silt_lim >= clay_lim);
+  daisy_assert (silt_lim <= 1.0);
+  const double mineral = texture.mineral ();
+  const double clay = mineral * clay_lim * 100 /* [%] */;
+  const double silt = mineral * (silt_lim - clay_lim) * 100 /* [%] */;
+  const double sand = mineral * (1.0 - silt_lim) * 100 /* [%] */;
   const double cm_per_inch = 2.54;
-  clay *= 100.0;		// [%]
-  silt *= 100.0;		// [%]
-  sand *= 100.0;		// [%]
+
   b = 3.10 + 0.157 * clay - 0.003 * sand; // []
   daisy_assert (b > 0.0);
   h_b   = -pow (10.0, 1.54 - 0.0095 * sand + 0.0063 * silt); // [cm]

@@ -1,6 +1,6 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* SH: Nulstil PotCanopyAss når der ikke er lys?
+* Øvelser til PC.
 
 * Birgitte + SH EU ark
 
@@ -30,9 +30,7 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 ** New "default" horizon
 
-*** Hydraulic::inititalize should take Texture argument.
-
-Update hydraulic models.
+???
 
 ** USDA. FAO, DIN, DS horizon
 

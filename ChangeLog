@@ -1,3 +1,30 @@
+2004-09-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.52 released.
+
+2004-09-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation_crops.C (sow): Reset canopy structure for planted
+	crops. 
+
+	* horizon_system.C: New models.
+	* Makefile (MODELS): Added it.
+
+2004-09-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_Cosby.C, hydraulic_hypres.C: 
+	* hydraulic.h, hydraulic.C (initialize): Take Texture argument. 
+	* horizon.C (initialize_base): Update caller.
+
+	* version.h (version_date): New global const.
+	* Makefile (version.C): Generate it.
+	* options.C (copyright): Use it.
+
+	* syntax.C (is_const, is_state, is_optional, is_log): Allow
+	calling with non-existing keys.
+	* parser_file.C (load_list): Warn about reading log variable.
+
+
 2004-09-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.51 released.
