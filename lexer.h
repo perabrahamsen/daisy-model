@@ -23,8 +23,8 @@ class Lexer
 {
   // State.
 private:
-  static std::istream& open_file (const string& name);
-  std::istream& in;
+  static istream& open_file (const string& name);
+  istream& in;
 public:
   Treelog& err;
 private:
