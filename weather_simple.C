@@ -3,6 +3,7 @@
 #include "weather_old.h"
 #include "time.h"
 #include "log.h"
+#include "mathlib.h"
 
 class WeatherSimple : public WeatherOld
 {
