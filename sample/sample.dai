@@ -1,0 +1,31 @@
+;;; sample.dai --- This is a small setup using the sample files.
+
+;; Get out sample management, irrigation, and soil.
+(input file "dk-management.dai")
+(input file "irrigation.dai")
+(input file "pedo-soil.dai")
+
+;; Use them.
+(weather default "weather.dwf")
+
+(time 1990 3 1 1)
+(stop 1994 4 1 1)
+
+(column "JB1_Cosby")
+
+(manager activity 
+  ;; A spring barley with mineral fertilizer and unlimited irrigation.
+  (while "SBarley w. MF"
+    (repeat irrigate_30_tensiometer_overhead))
+  ;; A winter barley with organic fertilizer and no irrigation.
+  "WBarley w. OF"
+  ;; A winter rape with mineral fertilizer and some irrigation.
+  (while "WRape w. MF"
+    (activity irrigate_30_content_overhead irrigate_30_content_overhead))
+  ;; A spring barley and pea mixture.
+  "SBarley & Pea")
+
+;; No output
+(output)
+
+;;; sample.dai ends here

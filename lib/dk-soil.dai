@@ -1,36 +1,45 @@
 ;;  Examles of specific Danish Soils 
 (defhorizon "Askov Ap" default
-    (clay 0.113)  (silt 0.277) (fine_sand 0.348) (coarse_sand 0.236)
-    (humus 0.026) (C_per_N 11)
-    (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.392)
-                    (alpha 0.0385)(n 1.211)(K_sat 7.52 [cm/h]))
-    (description "Askov 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S 2030. Statens Planteavlsforsøg.")
-)
+  "Askov 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.113)  (silt 0.277) (fine_sand 0.348) (coarse_sand 0.236)
+  (humus 0.026) (C_per_N 11)
+  (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.392)
+             (alpha 0.0385)(n 1.211)(K_sat 7.52 [cm/h])))
+
 (defhorizon "Askov B" default
-    (clay 0.235)  (silt 0.253) (fine_sand 0.364) (coarse_sand 0.143)
-    (humus 0.005) (C_per_N 11)
-    (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.445)
-                    (alpha 0.2605)(n 1.135)(K_sat 14.5[cm/h]))
-    (description "Askov 50 & 70 cm soil. Data from O.H. Jacobsen (1989): Umættet hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S 2030. Statens Planteavlsforsøg.")
-)
+  "Askov 50 & 70 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.235)  (silt 0.253) (fine_sand 0.364) (coarse_sand 0.143)
+  (humus 0.005) (C_per_N 11)
+  (hydraulic M_vG (Theta_res 0.0)(Theta_sat 0.445)
+             (alpha 0.2605)(n 1.135)(K_sat 14.5[cm/h])))
+
 (defhorizon "Askov C" default
-    (clay 0.244)  (silt 0.283) (fine_sand 0.357) (coarse_sand 0.111)
-    (humus 0.005) (C_per_N 11)
-    (hydraulic M_vG (Theta_res 0.000)(Theta_sat 0.401)
-                    (alpha 0.057)(n 1.131)(K_sat 5.0 [cm/h]))
-    (description "Askov 90 cm soil. Data from O.H. Jacobsen (1989): Umættet hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S 2030. Statens Planteavlsforsøg.")
-)
+  "Askov 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.244)  (silt 0.283) (fine_sand 0.357) (coarse_sand 0.111)
+  (humus 0.005) (C_per_N 11)
+  (hydraulic M_vG (Theta_res 0.000)(Theta_sat 0.401)
+             (alpha 0.057)(n 1.131)(K_sat 5.0 [cm/h])))
 
 (defhorizon "Jyndevad Ap" default
-    (clay 0.038)  (silt 0.072) (fine_sand 0.183) (coarse_sand 0.684)
-    (humus 0.023) (C_per_N 13)
-    (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
-                    (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h]))
-    (description "Jyndevad 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S 2030. Statens Planteavlsforsøg.")
-)
+  "Jyndevad 10 & 30 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde. Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.038)  (silt 0.072) (fine_sand 0.183) (coarse_sand 0.684)
+  (humus 0.023) (C_per_N 13)
+  (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
+             (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h])))
+
 (defhorizon "Jyndevad C" default
-    (clay 0.028)  (silt 0.023) (fine_sand 0.096) (coarse_sand 0.849)
-    (humus 0.004) (C_per_N 13)
-    (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
-                    (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h]))
-    (description "Jyndevad 50 & 90 cm soil. Data from O.H. Jacobsen (1989): Umættet hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S 2030. Statens Planteavlsforsøg.")
+  "Jyndevad 50 & 90 cm soil. Data from O.H. Jacobsen (1989): Umættet
+hydraulisk ledningsevne i nogle danske jorde .Beretning nr. S
+2030. Statens Planteavlsforsøg."
+  (clay 0.028)  (silt 0.023) (fine_sand 0.096) (coarse_sand 0.849)
+  (humus 0.004) (C_per_N 13)
+  (hydraulic M_vG (Theta_res 0.055)(Theta_sat 0.432)
+             (alpha 0.0630)(n 1.641)(K_sat 21.7[cm/h])))

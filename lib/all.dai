@@ -9,6 +9,7 @@
 (input file "vegetation.dai")
 
 (input file "dk-horizon.dai")
+(input file "dk-soil.dai")
 (input file "dk-crop.dai")
 (input file "dk-fertilizer.dai")
 

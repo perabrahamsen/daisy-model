@@ -1,5 +1,6 @@
-DAISY 	= dk-management.dai
-TEXT	= Makefile README
+LIBS 	= pedo-soil.dai irrigation.dai dk-management.dai
+SETUPS  = sample.dai
+TEXT	= Makefile README $(SETUPS) $(LIBS)
 REMOVE 	=  NOTHING
 
 all:
@@ -7,24 +8,24 @@ all:
 
 # Create a ZIP file with all the sources.
 #
-daisy-sample.zip:	$(DAISY) $(TEXT)
+daisy-sample.zip:	$(TEXT)
 	rm -f daisy-sample.zip
-	zip daisy-sample.zip $(DAISY) $(TEXT)
+	zip daisy-sample.zip $(TEXT)
 
 # Move it to ftp.
 #
 dist:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	$(MAKE) daisy-sample.zip
-	mv -f daisy-sample.zip $(FTPDIR)/daisy-sample/daisy-sample-$(TAG).zip
+	mv -f daisy-sample.zip $(FTPDIR)/daisy-lib/daisy-sample-$(TAG).zip
 	rm -f $(FTPDIR)/daisy-sample.zip
-	(cd $(FTPDIR); ln -s daisy-sample/daisy-sample-$(TAG).zip daisy-sample.zip)
+	(cd $(FTPDIR); ln -s daisy-lib/daisy-sample-$(TAG).zip daisy-sample.zip)
 
 # Update the CVS repository.
 #
-cvs: $(DAISY) $(TEXT) $(MSHE) $(CLIMATE)
+cvs: $(TEXT) 
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-cvs add $(DAISY) $(TEXT) $(MSHE) $(CLIMATE)
+	-cvs add $(TEXT) 
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
