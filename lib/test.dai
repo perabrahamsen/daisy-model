@@ -122,10 +122,10 @@
                (sow "Spring Barley")))
        ((at 1987 9 5 1)
          (progn (harvest "Spring Barley")
-;                (harvest "Cut Grass"
-;                    (stub 15)              ;Leave 15 cm stub.
-;                    (stem 1.00))
-                                 ))         ;Harvest everything above stub.
+                (harvest "Cut Grass"
+                    (stub 15)              ;Leave 15 cm stub.
+                    (stem 1.00))
+		))         ;Harvest everything above stub.
        ((at 1987 9 8 1)
         (fertilize mineral
                    (NO3 40.0e-5)        ;[g/cm2] = 40 kg/ha
