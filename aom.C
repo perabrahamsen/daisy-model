@@ -8,6 +8,7 @@
 #include "time.h"
 #include "log.h"
 #include "soil.h"
+#include "mathlib.h"
 #include <algo.h>
 
 static Library* AOM_library = NULL;
@@ -68,11 +69,83 @@ OM::mix (const Soil& soil, double from, double to)
 void
 OM::tick (int i, double turnover_factor, double N_soil, double& N_used,
 	  double& CO2, const vector<OM*>& smb, const vector<OM*>&som)
-{ }
+{
+  // Maintenance.
+  CO2 += C[i] * maintenance;
+  C[i] *= (1.0 - maintenance);
+
+  assert (fractions.size () == smb.size () + som.size ());
+  // Distribute to all biological dk:puljer.
+  const int smb_size = smb.size ();
+  for (int j = 0; j < smb_size; j++)
+    tock (i, turnover_rate * turnover_factor * fractions[j],
+	  N_soil, N_used, CO2, *smb[j]);
+  // Distribute to all soil dk:puljer.
+  const int som_size = som.size ();
+  for (int j = 0; j < som_size; j++)
+    tock (i, turnover_rate * turnover_factor * fractions[smb_size + j],
+	  N_soil, N_used, CO2, *som[j]);
+}
+
 void 
 OM::tick (int i, double turnover_factor, double N_soil, double& N_used,
-	  double& CO2, const vector<OM*>& smb, double& som_C,double& som_N)
-{ }
+	  double& CO2, const vector<OM*>& smb, double& som_C, double& som_N)
+{
+  // Maintenance.
+  CO2 += C[i] * maintenance;
+  C[i] *= (1.0 - maintenance);
+
+  assert (fractions.size () == smb.size () + 1);
+
+  // Distribute to all biological dk:puljer.
+  const int smb_size = smb.size ();
+  for (int j = 0; j < smb_size; j++)
+    tock (i, turnover_rate * turnover_factor * fractions[j],
+	  N_soil, N_used, CO2, *smb[j]);
+  
+  // Distribute to soil buffer.
+  const double rate = turnover_rate * turnover_factor * fractions[smb_size];
+  CO2 += C[i] * rate * (1.0 - efficiency);
+  som_N += C[i] * rate / C_per_N;
+  som_C += C[i] * rate * efficiency;
+}
+
+void
+OM::tock (int i, double rate, 
+	  double N_soil, double& N_used, double& CO2, OM& om)
+{
+  double N_produce = C[i] * rate / C_per_N;
+  double N_consume = C[i] * rate * efficiency / om.C_per_N;
+      
+  if (N_consume - N_produce > N_soil - N_used)
+    {
+      // Lower rate to force 
+      //   N_consume - N_produce == N_soil - N_used 
+      // This is what calc tell me:
+      rate = (N_soil - N_used) 
+	/ (efficiency * C[i] / om.C_per_N - C[i] / C_per_N);
+      // 
+      // Aside: We could also have solved the equation by decresing the 
+      // efficiency.
+      //   efficiency = ((N_soil - N_used) + rate * C[i] / C_per_N)
+      //     * om.C_per_N / rate * C[i];
+      // But we don't
+
+	  // Update the N values.
+      N_produce = C[i] * rate / C_per_N;
+      N_consume = C[i] * rate * efficiency / om.C_per_N;
+      // Check that we calculated the right rate.
+      assert ((N_soil == N_used)
+	      ? (abs (N_consume - N_produce) < 1e-10)
+	      : (abs (1.0 - (N_consume - N_produce) / (N_soil - N_used))
+		 < 0.01));
+    }
+  // Update.
+  CO2 += C[i] * rate * (1.0 - efficiency);
+  N_used += (N_consume - N_produce);
+  om.C[i] += C[i] * rate * efficiency;
+  C[i] *= (1.0 - rate * efficiency);
+}
 
 bool 
 AOM::check (const AttributeList& al)
@@ -153,10 +226,6 @@ AOM::check () const
   
   return ok;
 }
-
-void 
-AOM::tick (const OrganicMatter&)
-{ }
 
 void
 AOM::output (Log& log, const Filter& filter) const

@@ -11,7 +11,9 @@
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include "soil_heat.h"
+#include "mathlib.h"
 #include <algorithm>
+
 
 struct OrganicMatter::Implementation
 {
@@ -76,15 +78,18 @@ OrganicMatter::Implementation::Buffer::tick (int i, double turnover_factor,
 
   // How much can we process?
   double rate = turnover_rate * turnover_factor;
-  const double N_need = C[i] * rate / som[where]->C_per_N;
+  double N_need = C[i] * rate / som[where]->C_per_N  - N[i] * rate;
 
   if (N_need > N_soil - N_used)
     {
-      rate *= (N_soil - N_used) / N_need;
-      N_used = N_soil;
+      rate = (N_soil - N_used) / (N[i] - C[i] / som[where]->C_per_N);
+      N_need = C[i] * rate / som[where]->C_per_N  - N[i] * rate;
+      // Check that we calculated the right rate.
+      assert ((N_soil == N_used)
+	      ? (abs (N_need) < 1e-10)
+	      : (abs (1.0 - N_need / (N_soil - N_used)) < 0.01));
     }
-  else
-    N_used += N_need;
+  N_used += N_need;
 
   // Update it.
   som[where]->C[i] += C[i] * rate;

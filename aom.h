@@ -34,8 +34,12 @@ struct OM  {
 	     double& CO2, const vector<OM*>& smb, const vector<OM*>&som);
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
 	     double& CO2, const vector<OM*>& smb, double& som_C,double& som_N);
-
+private:
+  void tock (int i, double rate, double N_soil, double& N_used,
+	     double& CO2, OM& om);
+  
   // Create & Destroy.
+public:
   static const Syntax& syntax ();
   OM (const AttributeList& al);
   OM (const AttributeList& al, double C, double N);
@@ -51,7 +55,6 @@ public:
 
   // Simulation.
 public:
-  void tick (const OrganicMatter&);
   void output (Log&, const Filter&) const;
   static bool check (const AttributeList&);
   bool check () const;
