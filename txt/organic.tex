@@ -11,8 +11,7 @@
 \begin{document}
 
 \title{\textbf{Initializing organic matter pools}}
-\author{
-    Per Abrahamsen, Søren Hansen and Henrik Svendsen\\
+\author{Per Abrahamsen, Søren Hansen and Henrik Svendsen\\
     The Royal Veterinary and Agricultural University\\
     Department of Agricultural Sciences\\
     Laboratory for Agrohydrology and Bioclimatology
@@ -94,11 +93,11 @@ field.  The original model is depicted in figure~\ref{fig:om1}.
 
 Figure~\ref{fig:om1} has 6 visible boxes, corresponding to the
 \textsc{som}, \textsc{smb} and \textsc{aom} pools.  If you look at the
-\textsc{som1} pool at the botom left corner, you will see that it has
+\textsc{som1} pool at the bottom left corner, you will see that it has
 one line going out from it, marked with the text ``703y''.  This
 indicate the speed the pool is being eaten by the soil biomass.  All
 the pools have such a fully drawn outgoing line.  The amount of carbon
-being eaten is directly propertional with the size of the pool.  We
+being eaten is directly proportional with the size of the pool.  We
 call this the \emph{turnover rate}.  The number is the corresponding
 halftime.  The \textsc{som1} pool thus have a halftime of 703 years,
 meaning if there was no input it would be half the original size after
@@ -118,8 +117,8 @@ variable, the rates given here are just examples.  Also, there can be
 many sets of added organic matter pools, each set corresponding to
 particular fertilizer or residual, and each with its own parameters.
 
-What isn't depicted is the abiotic factors: clay, heat and mositure.
-The halftimes given corespond to 0\% clay, 10$^\circ$C and field
+What isn't depicted is the abiotic factors: clay, heat and moisture.
+The halftimes given correspond to 0\% clay, 10$^\circ$C and field
 capacity (pF 2).  The halftimes will be longer with more clay, lower
 temperature, or dryer soil.  They will be shorter with higher
 temperature.
@@ -133,16 +132,16 @@ fertilizer application and each crop residual type.  It thus provides
 a good basis for experimentation.
 
 The first such experimental change that made it back into \daisy{} was
-made by Torsten Müller \cite{mueller-smb}, who adjusted the turnover rates
-of the \textsc{smb} pools so the biomass content of the soil better
-matched the levels measured at the fields.  The change did not affect
-the long time dynamics of the systen.  The second such change was made
-by Anders Sanders \cite{daisy-somnew}.  The was a complete recalibration
-that took into account the carbon input from rhizodepositions.  This
-change was more radical, involving both turnover rates and directions
-of flow, and made the system much more adaptable to new levels of
-input, another effect which has also been observed emperically (see
-DJF repport on humus levels).
+made by Torsten Müller \cite{mueller-smb}, who adjusted the turnover
+rates of the \textsc{smb} pools so the biomass content of the soil
+better matched the levels measured at the fields.  The change did not
+affect the long time dynamics of the system.  The second such change
+was made by Sander Bruun \cite{daisy-somnew}.  The was a complete
+recalibration that took into account the carbon input from
+rhizodepositions.  This change was more radical, involving both
+turnover rates and directions of flow, and made the system much more
+adaptable to new levels of input, another effect which has also been
+observed empirically \cite{dk-humus-change}.
 
 The current model is depicted in~\ref{fig:om2}.  The purpose of the
 \textsc{som3} pool in that figure will be explained later.
@@ -157,12 +156,12 @@ The current model is depicted in~\ref{fig:om2}.  The purpose of the
 
 Some of the experimental changes affecting soil organic matter that we
 are currently working on, and which may be included in future versions
-of \daisy{}, are dissolved organic matter (see BGJ), another
+of \daisy{}, are dissolved organic matter \cite{bgj-dom}, another
 recalibration based on a larger experimental database and with special
-focus on the effect of clay (see Biomod/Bjørn/AP), and some wishlist
-items include phosphor dynamics and a calibration for forrest soil.
-The conclusion is that the model has changed in the past, and will
-continue to change in the future.
+focus on the effect of clay \cite{biomod,biomod2}, and some wishlist
+items include phosphor dynamics \cite{bgj-ptr} and a calibration for
+forest soil.  The conclusion is that the model has changed in the
+past, and will continue to change in the future.
 
 \section{Expanding user base}
 
@@ -172,13 +171,13 @@ non-research use was made by expert users who evaluated the national
 environmental plans for limiting nitrogen contamination of groundwater
 and surface water (see VMPuse).  Since then, \daisy{} has been used in
 other parts of the environmental and agricultural agencies (see
-NORVANA XXX), as well as increasingly by local authorities for
+\cite{novana} XXX), as well as increasingly by local authorities for
 evaluating regional plans (see Århus Amt og XXX), and recently also
 for evaluation of applications for changed farm practice at an
-individual farm level (see VVM, PLANTINFO).  For the last case,
-\daisy{} has also been used by consulting agencies representing ``the
-other side'', namely farmers seeking permission to change farming
-practice.
+individual farm level (see VVM, \cite{plantinfo-daisy}).  For the last
+case, \daisy{} has also been used by consulting agencies representing
+``the other side'', namely farmers seeking permission to change
+farming practice.
 
 The effect of this increased use has been that we no longer can rely
 on the users being experts.  Therefore, a project was started in order
@@ -187,25 +186,25 @@ As part of this project, most components of \daisy{} was evaluated in
 order to find parameters and submodels which could be initialized
 automatically from default values, or from other parameters.  These
 parameters and submodels are still available to the expert user, but
-will be hidden for the user who do not have the expertice or data
+will be hidden for the user who do not have the expertise or data
 available.  The result is that the software now appears much simpler
 to the user, even though no substantial changes to the model have been
 made.
 
 The partition of the organic matter into the various soil pools have
 been a particular stumbling block for most users, partly because it
-does not reflect an easily identificable property of the system being
+does not reflect an easily identifiable property of the system being
 modelled.  
 
 \section{Equilibrium}
 
-It is common to use an equilibrium assumption for initialising models
+It is common to use an equilibrium assumption for initializing models
 where measurements are not available.  For example, in \daisy{} we
 assume that the soil water in the bottom of the unsaturated zone is in
 equilibrium with the groundwater, as specified by Darcy's equation.
 There are two reasons equilibrium is often a good assumption.  For
-some systems, it will be correct most of the time, because they quicly
-reach equilibrium compared to the externaly imposed changes.  In other
+some systems, it will be correct most of the time, because they quickly
+reach equilibrium compared to the externally imposed changes.  In other
 cases, the dynamic of the system quickly dominate over the initial
 condition, so an equilibrium is good when we just need a reasonable
 initial state, rather than a correct one.
@@ -223,7 +222,7 @@ As part of the standardization project mentioned earlier, We used
 \daisy{} to simulate the effect on soil organic matter of changing
 farming practice.  Figure~\ref{fig:clayom} shows humus content for a
 system that goes from equilibrium at a high level of carbon input, to
-equilibirum at a low level of carbon input.  Danish farming practice
+equilibrium at a low level of carbon input.  Danish farming practice
 has been used, as well as Danish climate and soil.  The soil has a for
 Danish conditions high clay content (12\%).  Figure~\ref{fig:clayom}
 also shows the simulated\footnote{Simulated values are on the dotted
@@ -251,7 +250,7 @@ SANDY SOIL going from a low to high input equilibrium.
   \label{fig:sandom}
 \end{figure}
 
-As can be seen, the time to reach a new equilibirum after a change in
+As can be seen, the time to reach a new equilibrium after a change in
 farming practice can be several centuries, which makes it safe to
 assume that Danish farming land is not in equilibrium.  At such a time
 scale, not only farming practice but also climate is going to change.
@@ -367,7 +366,7 @@ all but the slowest pool have reached a quasi-equilibrium with respect
 to the input, and the size of the slowest pool.  Since the slowest
 pool is still changing (and the other pools will have to change to
 reflect that), this is not a true equilibrium.
-Figure~\ref{fig:clayom} and \ref{fig:sandom} shows that the fast pool
+Figure~\ref{fig:clayom} and~\ref{fig:sandom} shows that the fast pool
 (\textsc{smb2}) does indeed adapt to changes in input much faster than
 the slow pool (\textsc{smb1}), the hump in each graph is due to that
 effect.
@@ -396,7 +395,7 @@ the soil.  The equation is then
   = w
 \end{displaymath}
 Note that the simulated background mineralization will only be the
-specified value ($w$) if the simlated carbon input also corresponds to
+specified value ($w$) if the simulated carbon input also corresponds to
 the specified value ($u$).  If we are simulating the effect of a
 proposed change in management practice, this will not be the
 case\footnote{Another caveat is that \daisy{} treat the $C/N$ for
@@ -418,7 +417,7 @@ to be changed when the model itself is changed.
 
 \section{Abiotic factors}
 
-In the equations \ref{eq:dsmb1} to \ref{eq:dsom2} we used a large number
+In the equations~\ref{eq:dsmb1} to~\ref{eq:dsom2} we used a large number
 of constants, without indicating how we calculate them.  Here is the
 formula for calculating $a$ from the first equation.
 \begin{displaymath}
@@ -430,12 +429,12 @@ formula for calculating $a$ from the first equation.
   F_{\mbox{\tiny\textsc{smb1}}}^\psi (\psi)\,
   F_{\mbox{\tiny\textsc{smb1}}}^C (X_c)
 \end{displaymath}
-The other constants have a simlar form.
+The other constants have a similar form.
 $t_{\mbox{\tiny\textsc{smb1}}}$ is the turnover rate for the
 \textsc{smb1} pool.
 $X_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb1}}}}$
 is the carbon fraction going from \textsc{smb1} back to \textsc{smb1}.
-$E_{\mbox{\tiny\textsc{smb1}}}$ is the efficience of which
+$E_{\mbox{\tiny\textsc{smb1}}}$ is the efficiency of which
 \textsc{smb1} can be digested, the remaining part will be lost as
 CO$_2$.  $m_{\mbox{\tiny\textsc{smb1}}}$ is the maintenance cost of
 the \textsc{smb1} pool. $F_{\mbox{\tiny\textsc{smb1}}}^T$,
@@ -448,7 +447,7 @@ What does change is the soil temperature ($T$), soil moisture
 ($\psi$), and clay content ($X_c$).  The clay content is constant
 during the time-scales we work on, and is specified by the user.  So
 the two problematic terms are $T$ and $\psi$ which are variable during
-the simulation.  For the initialisation we must use constant values.
+the simulation.  For the initialization we must use constant values.
 By default we use the average temperature for the site (which is
 already specified by the user and used elsewhere in the model) for
 $T$, and field capacity (pF 2) for $\psi$.  As $F^T$ is non-linear,
@@ -467,18 +466,19 @@ choose values for $T$ and $\psi$ that give the same effect.
 \section{Inert organic matter}
 
 The current \daisy{} model calibration is based primarily on
-measurements on agriculutural topsoil (SANDER, XXX), where all the
+measurements on agricultural topsoil \cite{daisy-somnew,mueller-smb},
+where all the 
 humus is presumed to be active.  This means the calibration is not
 good for subsoils, nor for some types of humus-rich topsoils.  The
 \textsc{som3} pool you last saw in figure~\ref{fig:om2} exists to
-compensate for these shortcommings.  The \textsc{som3} pool is inert,
+compensate for these shortcomings.  The \textsc{som3} pool is inert,
 so for the soil organic matter system it is as if it didn't exist.  It
 still affects other aspects of \daisy{}, such as the hydraulic and
 adsorption properties of the soil.
 
 For the subsoil, we by default assume the system is in equilibrium
 with the input, and park enough humus in the \textsc{som3} pool so
-that this assumption holds true.  The obervant reader will remember
+that this assumption holds true.  The observant reader will remember
 that we earlier argued that the equilibrium assumption is wrong.  It
 still is, also for the subsoil.  However, the subsoil contribute
 relatively little to the total system (XXX), so we can get away with
@@ -492,15 +492,17 @@ PA: Diskution af fig3 og 4 quasi-eq
 
 PA: Overvej initialisering med ``background mineralization = 0''.
 
+PA: Ref til \cite{daisy-init}.
+
 \section{Limitations}
 
 When using the current input levels, the quasi-equilibrium assumption
 will give very poor, even physically impossible estimates right after
 a large change in input level.  This is because the \textsc{som2} pool
-will not yeat have had any chance to adopt to the new input level.
+will not yet have had any chance to adopt to the new input level.
 With the current model, the \textsc{som2} pool needs several decades
 to catch up with changes in input.  This means the quasi-equilibrium
-assumption is still suspect in a modern agrocultural country like
+assumption is still suspect in a modern agricultural country like
 Denmark, but it is still better than the equilibrium assumption that
 needs centuries rather than decades.
 
@@ -509,7 +511,7 @@ introduced.  Our long term simulations has shown that the
 \textsc{som1} fraction stay within the interval 30\% --- 70\%.  If the
 quasi-equilibrium give a value outside that interval, the
 \textsc{som1} fraction will be set to that nearest boundary, and the
-intitialization will be redone\footnote{More precisely, if the
+initialization will be redone\footnote{More precisely, if the
   quasi-equilibrium gives a \textsc{som1} higher than 70\%,
   equation~\ref{eq:dsom2} will be replaced with the new equation
   \begin{displaymath}
@@ -518,11 +520,11 @@ intitialization will be redone\footnote{More precisely, if the
   and similar for a \textsc{som1} below 30\%.}.
 
 While the humus content in especially figure~\ref{fig:sandom}
-fluctates with rotation, season and climate, the simulated
+fluctuates with rotation, season and climate, the simulated
 \textsc{som1} fraction stay relatively stable.  This is because most
-of the minor fluctations happens in the \textsc{aom} and \textsc{smb}
+of the minor fluctuations happens in the \textsc{aom} and \textsc{smb}
 pools, the slower \textsc{som2} does not have time to adapt.  This
-also explains the relatively noise on the initialisation points, the
+also explains the relatively noise on the initialization points, the
 quasi-equilibrium assumption over-adapts to such short terms changes.
 
 \addcontentsline{toc}{section}{\numberline{}References}
