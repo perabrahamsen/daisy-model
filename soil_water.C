@@ -291,6 +291,11 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
       msg.warning (string ("UZ problem: ") + error);
       ok = false;
     }
+  catch (const string& error)
+    {
+      msg.warning (string ("UZ problem: ") + error);
+      ok = false;
+    }
   if (!ok)
     {
       msg.message ("Using reserve uz model.");
@@ -681,7 +686,9 @@ SoilWater::content (const Geometry& geometry, double from, double to) const
 
 double
 SoilWater::q (int i) const
-{ return impl.q[i]; }
+{ 
+  return impl.q[i]; 
+}
 
 double
 SoilWater::q_p (int i) const

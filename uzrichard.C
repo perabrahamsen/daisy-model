@@ -605,8 +605,15 @@ UZRichard::q_darcy (const Soil& soil,
   const double start_pos = (soil.z (first) + soil.z (last) * 3.0) / 4.0;
   int start = soil.interval_plus (start_pos) - 1;
   if (!(start < last - 2))
-    throw ("We need at least 2 numeric nodes below 3/4 depth for \
-calculating flow with pressure top.");
+    {
+      TmpStream tmp;
+      tmp () << "We need at least 2 numeric nodes below 3/4 depth for \
+calculating flow with pressure top.\n";
+      tmp () << "3/4 depth is " << start_pos << " [cm]\n"
+             << "node " << start << " ends at " << soil.zplus (start) << " [cm]\n"
+             << "last " << last << " ends at " << soil.zplus (last) << " [cm]";
+      throw (string (tmp.str ()));
+    }
   if (!(start > first + 1))
     throw ("We need at least 1 numeric node above 3/4 depth for \
 calculating flow with pressure top.");

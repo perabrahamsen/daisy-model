@@ -68,7 +68,14 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
       
       // Amount of matter entering this layer through macropores.
       const double matter_in_above = -J_p[i]; // [g/cm^2]
-      daisy_assert (matter_in_above >= 0.0);
+      if (matter_in_above < 0.0)
+        {
+          TmpStream tmp;
+          tmp () << "Matter seem to pour out through the top, at a rate of "
+                 << -J_p[i] * (100 * 100) * (100 * 100) 
+                 << " [g/ha/h].  Strange";
+          out.warning (tmp.str ());
+        }
       double delta_matter;	// [g/cm^2]
 
       if (water_out_below < 1.0e-60)
@@ -111,7 +118,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 
 	      // Matter stayes with the water.
 	      delta_matter = -matter_in_above * water_fraction;
-	      daisy_assert (delta_matter <= 0.0);
+	      // daisy_assert (delta_matter <= 0.0);
 	    }
 	  else
 	    {
@@ -139,14 +146,14 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	{
 	  // Everything go to the layer.
 	  J_p[i+1] = 0.0;
-	  daisy_assert (matter_in_above > 0.0);
+	  // daisy_assert (matter_in_above > 0.0);
 	  S_p[i] = matter_in_above / dz / dt;
 	}
       else
 	{
 	  // We split between layer and bottom.
 	  J_p[i+1] = -(matter_in_above + delta_matter);
-	  daisy_assert (J_p[i+1] < 0.0);
+	  // daisy_assert (J_p[i+1] < 0.0);
 	  S_p[i] = -delta_matter / dz / dt;
 	}
       S_m[i] += S_p[i];

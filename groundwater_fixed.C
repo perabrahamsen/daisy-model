@@ -21,6 +21,7 @@
 
 
 #include "groundwater.h"
+#include "check.h"
 
 class GroundwaterFixed : public Groundwater
 {
@@ -63,9 +64,8 @@ static struct GroundwaterFixedSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Fixed high groundwater level.");
     Groundwater::load_syntax (syntax, alist);
-    syntax.add ("table", "cm", Syntax::Const,
-		"Groundwater level.\n\
-Positive numbers indicate free drainage.");
+    syntax.add ("table", "cm", Check::negative (), Syntax::Const,
+		"Groundwater level (a negative number).");
     syntax.order ("table");
     Librarian<Groundwater>::add_type ("fixed", alist, syntax, &make);
   }

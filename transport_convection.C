@@ -135,7 +135,7 @@ TransportConvection::tick (Treelog& msg,
       // Middle nodes.
       for (unsigned int i = 1; i < size; i++)
 	{
-	  const double q = soil_water.q (i+1);
+	  const double q = soil_water.q (i);
 	  if (q < 0)		// Downward flow, take from water above.
 	    dJ[i] = q * C[i-1];
 	  else			// Upward flow, take from water below.

@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.39
+
+** Fixed bug in convection transport model.
+
 * 3.38
 
 ** No changes.

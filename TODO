@@ -16,7 +16,13 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 ** Slovakiske data
 
+* spec + dimension giver ikke fejl hvis der ikke kan konverteres
+
+* Upload textpad licens til campusnet.
+
 * Mindst tre numeriske lag per horizont.
+
+* N stress dage
 
 * Make it possible to specify texture using different systems
 

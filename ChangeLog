@@ -1,3 +1,25 @@
+2004-04-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.39 released.
+
+2004-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport_convection.C (tick): Bug fix, solute flux was offset
+	by one compared to water flux.
+
+2004-04-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Soil NH4-N Concentration", "Soil NH4-N Content"):
+	New parameterizations.
+
+2004-04-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C (tick): Catch string as well as char*.
+	* uzrichard.C (q_darcy): More information for error.
+	* groundwater_fixed.C (GroundwaterFixedSyntax): Only accept
+	negative groundwater table.
+	* mactrans_std.C (tick): Changed assertion to warning.
+
 2004-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.38 released.
