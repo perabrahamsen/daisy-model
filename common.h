@@ -11,6 +11,9 @@
 #include <assert.h>
 #include <string>
 
+#define HANDLE_NAMESPACES
+#define HANDLE_EXCEPTIONS
+
 #ifdef EGCS
 #include <math.h>
 #else
@@ -58,9 +61,7 @@
 #define IMPORT _import
 
 // Define these for Borland C++ 5.0.1
-#define HANDLE_NAMESPACES
 #define BORLAND_TEMPLATES
-#define HANDLE_EXCEPTIONS
 #define BORLAND_EOF
 // #define BORLAND_PERMISSIONS
 

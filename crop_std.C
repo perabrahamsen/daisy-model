@@ -350,6 +350,7 @@ struct CropStandard::Variables
     double IncWStem;	// Stem growth [g DM/m2/d]
     double IncWSOrg;	// Storage organ growth [g DM/m2/d]
     double IncWRoot;	// Root growth [g DM/m2/d]
+    double LAImRat;		// (LAIm - LAI) / LAIm []
     double DeadWLeaf;		// Leaf DM removed [g DM/m2/d]
     double DeadNLeaf;		// Leaf N removed [g N/m2/d]
     double DeadWRoot;		// Root DM removed [g DM/m2/d]
@@ -644,6 +645,7 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     IncWStem (0.0),
     IncWSOrg (0.0),
     IncWRoot (0.0),
+    LAImRat (0.0),
     DeadWLeaf (0.0),
     DeadNLeaf (0.0),
     DeadWRoot (0.0),
@@ -674,6 +676,7 @@ CropStandard::Variables::RecCrpAux::output (Log& log, Filter& filter) const
   log.output ("IncWStem", filter, IncWStem, true);
   log.output ("IncWSOrg", filter, IncWSOrg, true);
   log.output ("IncWRoot", filter, IncWRoot, true);
+  log.output ("LAImRat", filter, LAImRat, true);
   log.output ("DeadWLeaf", filter, DeadWLeaf, true);
   log.output ("DeadNLeaf", filter, DeadNLeaf, true);
   log.output ("DeadWRoot", filter, DeadWRoot, true);
@@ -1341,6 +1344,8 @@ CropStandard::CanopyStructure ()
   LADvsH.add (z2 * Canopy.Height, Canopy.LADm);
   LADvsH.add (     Canopy.Height, 0.0);
   Canopy.LAIvsH = LADvsH.integrate_stupidly ();
+  const double LAIm = - log (0.05) / par.Canopy.PARext;
+  var.CrpAux.LAImRat = max (0.0, (Canopy.LAI - LAIm) / LAIm);
 }
 
 double
@@ -1899,6 +1904,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   // Update dead leafs
   CrpAux.DeadWLeaf = pProd.LfDR (DS) * vProd.WLeaf;
+  CrpAux.DeadWLeaf += vProd.WLeaf * (1.0 / 3.0) * CrpAux.LAImRat;
   CrpAux.DeadNLeaf = par.CrpN.NfLeafCnc (DS) * CrpAux.DeadWLeaf;
   CrpAux.IncWLeaf -= CrpAux.DeadWLeaf;
   vProd.AM_leaf->add (par.Harvest.C_Dead * CrpAux.DeadWLeaf * m2_per_cm2,

@@ -34,15 +34,6 @@ public:
   ColumnList& columns;
   vector<const Harvest*>& harvest;
 
-#ifdef HANDLE_EXCEPTIONS
-  // Exceptions.
-public:
-  struct Initialization : public runtime_error
-  {
-    Initialization (const char* n) : runtime_error (n) { }
-  };
-#endif
-
   // Simulation.
 public:
   void tick_columns ();

@@ -94,7 +94,6 @@ public:
   double get_snow_storage () const // [mm]
     { return snow.get_storage (); }
 
-
   // Create.
 public:
   BioclimateStandard (const AttributeList&);

@@ -1,3 +1,56 @@
+1998-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.32 released.
+
+1998-11-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.h (SoilWater::reserve): New member.
+	* soil_water.C (load_syntax): Define it.
+	(SoilWater): Initialize it.
+	(tick): Use it.
+
+	* uzrichard.C (q_darcy): Throw an exception instead of calling
+	assert when checking for enough nodes around 3/4 depth.
+
+1998-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_B_BaC.C (Cw2): Wrong expression.
+	* hydraulic_M_BaC.C (Cw2): Ditto.
+
+1998-11-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Use `char*' instead of `runtime_error' for exceptions.
+
+	* time.C (valid): Don't specify default parameter here.
+
+	* crop_std.C (NetProduction): Use LAImRat to kill leafs.
+
+1998-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pmain.C: New `limits' window to set axis limits.
+
+	* time.C (valid): New static member function.
+
+	* cmain.c (main): Use `exit' instead of `return' from `main'.
+
+1998-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (richard): Fix pressure top connection.
+	(richard): Make cw2 at least 1e-5, works better in saturated
+	conditions that way.
+
+	* surface.C (accept_top): Always accept exfiltration.
+	Warn only for negative NO3 or NH4.
+
+1998-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile: (daisy-hdr.zip): Removed.
+	(dist): Don't use it.
+
+1998-10-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (dist): Also copy `main.C' and `cmain.c' to ftp.
+
 1998-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.31 released.

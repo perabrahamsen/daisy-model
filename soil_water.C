@@ -55,7 +55,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   if (!groundwater.flux_bottom ())
     {
       if (groundwater.table () < soil.z (last))
-	THROW (runtime_error ("Groundwater table below lowest node."));
+	THROW ("Groundwater table below lowest node.");
       last = soil.interval (groundwater.table ());
       // Presure at the last node is equal to the water above it.
       for (unsigned int i = last; i < soil.size (); i++)
@@ -68,29 +68,46 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   // Limit for ponding.
   const int first = 0;
 
-  if (bottom)
+#ifdef HANDLE_EXCEPTIONS
+  try
     {
-      // We have two UZ models.
-      top->tick (soil, 
-		 first, surface, 
-		 bottom_start - 1, *bottom, 
-		 S, h_old, Theta_old_,
-		 h_, Theta_, q_);
-      bottom->tick (soil,
-		    bottom_start, *top,
-		    last, groundwater,
-		    S, h_old, Theta_old_,
-		    h_, Theta_, q_);
+#endif
+      if (bottom)
+	{
+	  // We have two UZ models.
+	  top->tick (soil, 
+		     first, surface, 
+		     bottom_start - 1, *bottom, 
+		     S, h_old, Theta_old_,
+		     h_, Theta_, q_);
+	  bottom->tick (soil,
+			bottom_start, *top,
+			last, groundwater,
+			S, h_old, Theta_old_,
+			h_, Theta_, q_);
+	}
+      else
+	{
+	  // We have only one UZ model.
+	  top->tick (soil, 
+		     first, surface, 
+		     last, groundwater,
+		     S, h_old, Theta_old_,
+		     h_, Theta_, q_);
+	}
+#ifdef HANDLE_EXCEPTIONS
     }
-  else
+  catch (const char* error)
     {
-      // We have only one UZ model.
-      top->tick (soil, 
-		 first, surface, 
-		 last, groundwater,
-		 S, h_old, Theta_old_,
-		 h_, Theta_, q_);
+      cerr << "UZ problem: " << error << "\n"
+	   << "Using reserve uz model.\n";
+      reserve->tick (soil, 
+		     first, surface, 
+		     last, groundwater,
+		     S, h_old, Theta_old_,
+		     h_, Theta_, q_);
     }
+#endif
   
   // Update flux in groundwater.
   for (unsigned int i = last + 1; i < soil.size (); i++)
@@ -184,11 +201,16 @@ SoilWater::put_h (const Soil& soil, const vector<double>& v) // [cm]
 }
 
 void
-SoilWater::load_syntax (Syntax& syntax, AttributeList&)
+SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("UZtop", Librarian<UZmodel>::library ());
   syntax.add ("UZbottom", Librarian<UZmodel>::library (), Syntax::Optional);
   syntax.add ("UZborder", Syntax::Integer, Syntax::Optional);
+  syntax.add ("UZreserve", Librarian<UZmodel>::library ());
+  // Use lr as UZreserve by default.
+  AttributeList lr (Librarian<UZmodel>::library ().lookup ("lr"));
+  lr.add ("type", "lr");
+  alist.add ("UZreserve", lr);
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   Geometry::add_layer (syntax, "Theta");
   Geometry::add_layer (syntax, "h");
@@ -203,7 +225,8 @@ SoilWater::SoilWater (const AttributeList& al)
 	    : 0),
     bottom_start (  al.check ("UZborder") 
 		  ? al.integer ("UZborder")
-		  : -1)
+		  : -1),
+    reserve (&Librarian<UZmodel>::create (al.alist ("UZreserve")))
 { }
 
 void

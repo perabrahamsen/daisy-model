@@ -86,8 +86,7 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
-	#COMPILE = /pack/gcc-2.8.1/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
+	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),gnu)
@@ -354,16 +353,12 @@ daisy-src.zip:	$(TEXT)
 	rm -f daisy-src.zip
 	zip daisy-src.zip $(TEXT) daisy.ide tlink32.ini
 
-daisy-hdr.zip:	$(HEADERS)
-	rm -f daisy-hdr.zip
-	zip daisy-hdr.zip $(HEADERS)
-
 # Move it to ftp.
 #
 dist:	cvs
-	cp cdaisy.h $(HOME)/.public_ftp/daisy/
-	$(MAKE) daisy-src.zip daisy-hdr.zip
-	mv -f daisy-src.zip daisy-hdr.zip $(HOME)/.public_ftp/daisy/
+	cp cdaisy.h cmain.c $(HOME)/.public_ftp/daisy/
+	$(MAKE) daisy-src.zip
+	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy/
 
 # Update the CVS repository.
 #

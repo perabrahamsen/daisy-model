@@ -43,12 +43,25 @@ Surface::accept_top (double water)
   if (fabs (water) < 1e-99)
     return true;
 
-  water *= 10.0;			// cm -> mm.
+  water *= 10.0;		// cm -> mm.
 
+  if (water >= 0)		// Exfiltration.
+    {
+      pond += water;
+      return true;
+    }
   if (pond + water * dt >= - max (fabs (pond), fabs (water)) / 100.0)
     {
-      assert (im.NO3 >= 0.0);
-      assert (im.NH4 >= 0.0);
+      if (im.NO3 < 0.0)
+	{
+	  cerr << "BUG: Added " << -im.NO3 << " NO3 to surface\n";
+	  im.NO3 = 0.0;
+	}
+      if (im.NH4 < 0.0)
+	{
+	  cerr << "BUG: Added " << -im.NH4 << " NH4 to surface\n";
+	  im.NH4 = 0.0;
+	}
       if (total_matter_flux)
 	{
 	  IM delta_matter (im, 1.0);

@@ -41,6 +41,7 @@ public:
     // Test.
   static bool leap (int year);
   static int month_length (int year, int month);
+  static bool valid (int year, int month, int mday, int hour = 0);
 
     // Compare.
   friend bool operator== (const Time&, const Time&);

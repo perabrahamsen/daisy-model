@@ -207,7 +207,7 @@ UZRichard::richard (const Soil& soil,
 	  for (unsigned int i = 0; i < size; i++)
 	    {
 	      const double Cw1 = soil.Cw1 (first + i, h[i]);
-	      const double Cw2 = soil.Cw2 (first + i, h[i]);
+	      const double Cw2 = max (1e-5, soil.Cw2 (first + i, h[i]));
 	      const double dz = soil.dz (first + i);
 	      const double z = soil.z (first + i);
 
@@ -313,15 +313,17 @@ UZRichard::richard (const Soil& soil,
 		       Kplus, S, ddt, q);
 
 	      // We take water from flux pond first.
-	      delta_top_water = q[first] * ddt + flux_pond * ddt;
+	      delta_top_water = q[first] * ddt + flux_pond;
+	      // !! delta_top_water = q[first] * ddt;
 
 	      if (real_flux_top)
 		{
 		  assert (real_top_q < 0);
 
-		  if (delta_top_water > - real_top_q * ddt * 1.001)
-		    // We can't retrieve water this fast from the flux top.
+		  if (-delta_top_water > - real_top_q * ddt * 1.001)
+		  // !! if (-real_top_q * ddt * 1.001 + flux_pond < -delta_top_water)
 		    {
+		      // We can't retrieve water this fast from the flux top.
 		      top.flux_top_on ();
 		      accepted = false;
 		    }
@@ -330,14 +332,13 @@ UZRichard::richard (const Soil& soil,
 		      const bool ok = top.accept_top (delta_top_water);
 		      assert (ok);
 		      flux_pond += - (real_top_q - q[first]) * ddt;
-		      assert (flux_pond >= real_top_q / 1000);
 		    }
 		}
 	      else if (!top.accept_top (q[first] * ddt))
 		// We don't have more water in the pressure top.
 		{
 		  if (switched_top)
-		    THROW (runtime_error ("Couldn't accept top flux"));
+		    THROW ("Couldn't accept top flux");
 		  else 
 		    {
 		      top.flux_top_on ();
@@ -349,7 +350,7 @@ UZRichard::richard (const Soil& soil,
 	    // We have a flux top, and unsaturated soil.
 	    {
 	      flux_pond = 0.0;
-	      delta_top_water = top.q () * ddt;
+	      delta_top_water = top.q () * (ddt / time_left);
 	      const bool ok = top.accept_top (delta_top_water);
 	      assert (ok);
 	    }
@@ -360,7 +361,7 @@ UZRichard::richard (const Soil& soil,
 	      accepted = false;
 	    }
 	  else
-	    THROW (runtime_error ("Couldn't drain top flux"));
+	    THROW ("Couldn't drain top flux");
 
 	  if (accepted)
 	    {
@@ -495,8 +496,12 @@ UZRichard::q_darcy (const Soil& soil,
   // Start looking 3/4 towards the bottom.
   const double start_pos = (soil.z (first) + soil.z (last) * 3.0) / 4.0;
   int start = soil.interval (start_pos) - 1;
-  assert (start < last - 2);
-  assert (start > first + 1);
+  if (!(start < last - 2))
+    THROW ("We need at least 2 numeric nodess below 3/4 depth for \
+calculating flow with pressure top.");
+  if (!(start > first + 1))
+    THROW ("We need at least 1 numeric node above 3/4 depth for \
+calculating flow with pressure top.");
 
   for (; start > 0; start--)
     {
@@ -504,7 +509,7 @@ UZRichard::q_darcy (const Soil& soil,
 	break;
     }
   if (start == 0)
-    THROW (runtime_error ("We couldn't find an unsaturated area."));
+    THROW ("We couldn't find an unsaturated area.");
   // Use Darcy equation to find flux here.
   q[start + 1] = -Kplus[start - first] 
     * (  (  (h[start - first] - h[start + 1 - first])
@@ -537,7 +542,7 @@ UZRichard::tick (const Soil& soil,
   iterations = 0;
   if (!richard (soil, first, top, last, bottom, 
 		S, h_old, Theta_old, h, Theta, q))
-    THROW (runtime_error ("Richard's Equation doesn't converge."));
+    THROW ("Richard's Equation doesn't converge.");
     
   const bool accepted = bottom.accept_bottom (q[last + 1]);
   assert (accepted);

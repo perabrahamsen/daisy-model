@@ -2,6 +2,7 @@
 
 #include "cdaisy.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int 
 main (int argc, char* argv[])
@@ -16,7 +17,7 @@ main (int argc, char* argv[])
   if (argc != 2)
     {
       fprintf (stderr,"Usage: %s file\n", argv[0]);
-      return 2;
+      exit (2);
     }
 
   /* Link and initialize the daisy subsystem. */
@@ -34,12 +35,12 @@ main (int argc, char* argv[])
   /* Check the result. */
   if (!daisy_syntax_check (syntax, alist, "daisy")
       || daisy_parser_error_count (parser) > 0)
-    return 1;
+    exit (1);
 
   /* Create, check and run the simulation. */
   daisy = daisy_daisy_create (syntax, alist);
   if (!daisy_daisy_check (daisy))
-    return 1;
+    exit (1);
 
   /* Run the simulation. */
   {
@@ -81,5 +82,5 @@ main (int argc, char* argv[])
   daisy_daisy_delete (daisy);
 
   /* All is well. */
-  return 0;
+  exit (0);
 }

@@ -191,6 +191,21 @@ Time::month_length (int year, int month)
     + (month == 2 && leap (year));
 }
 
+bool 
+Time::valid (int year, int month, int mday, int hour)
+{
+  if (1 > year || year > 9999)
+    return false;
+  if (1 > month || month > 12)
+    return false;
+  if (1 > mday || mday > Time::month_length (year, month))
+    return false;
+  if (0 > hour || hour > 23)
+    return false;
+
+  return true;
+}
+
 // @ Construct.
 
 const Time& 

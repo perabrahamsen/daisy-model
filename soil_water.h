@@ -29,6 +29,7 @@ class SoilWater
   UZmodel *const top;
   UZmodel *const bottom;
   const int bottom_start;
+  UZmodel *const reserve;
 
   // Sink.
 public:

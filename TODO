@@ -1,9 +1,12 @@
-* Fix em+s.dai overhead for presentation.
+* Hvorfor kaldes OrganicMatter::check (const AttributeList&) ikke directe 
+  af syntax::check?
 
-* Skriv tekst til hver overhead.
+* Implementer UZreserve.
 
-* Find fejl i minidaisy dai filer.
+* Ændr bioclimate så PM bliver et separat energi-modul.
 
+
+======================================================================
 * PDaisy: limits
 
 * Log of flux at specific depth gives problems, since flux only
