@@ -4,11 +4,12 @@ OLDCROPS = beet-old.dai grass-old.dai pea-old.dai potato-old.dai \
 NEWCROPS = maize.dai pea.dai rye.dai sbarley.dai sugarbeet.dai srape.dai \
 	swheat.dai wbarley.dai wrape.dai wwheat.dai grass.dai
 
-DAISY = crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
+DAISY 	= crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS)
+MSHE	= mshe.dai mshe-standalone.dai
 TEXT	= Makefile test.dai
 CLIMATE = weather.clm
-REMOVE =  cutgrass.dai 
+REMOVE 	=  cutgrass.dai 
 
 all:
 	echo Nothing to do here.
@@ -25,9 +26,9 @@ stdref.dai:	mini.dai $(NEWCROPS) log.dai
 
 # Create a ZIP file with all the sources.
 #
-daisy-lib.zip:	$(TEXT)
+daisy-lib.zip:	$(DAISY) $(CLIMATE) $(TEXT) $(MSHE)
 	rm -f daisy-lib.zip
-	zip daisy-lib.zip $(DAISY) $(CLIMATE) $(TEXT)
+	zip daisy-lib.zip $(DAISY) $(CLIMATE) $(TEXT) $(MSHE)
 
 # Move it to ftp.
 #
@@ -37,9 +38,9 @@ dist:
 
 # Update the CVS repository.
 #
-cvs: $(DAISY) $(TEXT)
+cvs: $(DAISY) $(TEXT) $(MSHE)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-cvs add $(DAISY) $(TEXT)
+	-cvs add $(DAISY) $(TEXT) $(MSHE)
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"

@@ -1,0 +1,33 @@
+;;; mshe.dai --- Models to use with Daisy -- Mike/SHE coupling.
+;;
+;; Use the `mshe' models below instead of `default' in your setup
+;; files, then change the
+;;   (load file "mshe.dai")
+;; to
+;;   (load file "mshe-standalone.dai")
+;; to use the same setup files in a standalone simulation.
+
+
+(defchemical mshe default
+  ;; Solute transport is done by Mike/SHE.
+  (solute (transport none)))
+
+(defcolumn mshe default
+  ;; Usually pesticide enter soil with the water infiltration.  In
+  ;; coupled version,  Mike/SHE takes care of water infiltration, so
+  ;; we just put all pesticides into the soil immediately.
+  (Surface (total_matter_flux true)) 
+  ;; Water transport is done by Mike/SHE.
+  (SoilWater (UZtop none))  ;; if MSHE-cobling: (UZtop none)
+  ;; Mike/SHE doesn't allow nitrification in saturated zone.
+  (Nitrification soil (active_groundwater false))
+  ;; Mike/SHE doesn't allow denitrification in saturated zone.
+  (Denitrification (active_groundwater false))
+  ;; Nitrogen transport is done by Mike/SHE.
+  (SoilNH4 (transport none))
+  (SoilNO3 (transport none))
+  ;; Mike/SHE doesn't allow mineralization or immobilization in
+  ;; saturated zone. 
+  (OrganicMatter (active_groundwater false)))
+
+;;; mshe.dai ends here.
