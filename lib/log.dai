@@ -676,13 +676,13 @@
 		   (path weather "*" reference_evapotranspiration)
 		   (dimension "mm/d"))
 	   (number (path weather "*" daily_global_radiation)
-		   (dimension "W/m²"))
+		   (dimension "W/m^2"))
 	   (number (path weather "*" hourly_global_radiation)
 		   (when hourly)
 		   (factor 0.041666666666) ;h->d
-		   (dimension "W/m²"))
+		   (dimension "W/m^2"))
 	   (number (path weather "*" daily_air_temperature)
-		   (dimension "°C"))))
+		   (dimension "dg C"))))
 
 (deflog "Crop Photosynthesis" table
   (where "crop_phot.tab")
