@@ -33,8 +33,8 @@ public:
 
   // Communication with Bioclimate.
 public:
-  virtual double water_stress () const;	// [0-1] (1 = full production)
-  virtual double nitrogen_stress () const; // [0-1] (0 = no production)
+  virtual double water_stress () const;	// [0-1] (0 = full production)
+  virtual double nitrogen_stress () const; // [0-1] (1 = no production)
   virtual double rs_min () const; // Minimum transpiration resistance.
   virtual double rs_max () const; // Maximum transpiration resistance.
   virtual double height () const = 0;
@@ -49,7 +49,8 @@ public:
   virtual void CanopyStructure () = 0;
   virtual double ActualWaterUptake (double Ept, const Soil&, SoilWater&, 
 				    double EvapInterception) = 0;
-  
+  virtual void force_production_stress  (double pstress);
+
   // Simulation.
 public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&,

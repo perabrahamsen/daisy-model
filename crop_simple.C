@@ -89,6 +89,7 @@ public:
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
 			    double EvapInterception);
+  void force_production_stress  (double pstress);
 
   // Simulation.
 public:
@@ -132,6 +133,10 @@ CropSimple::ActualWaterUptake (double Ept,
 {
   return root_system.water_uptake (Ept, soil, soil_water, EvapInterception);
 }
+
+void 
+CropSimple::force_production_stress  (double pstress)
+{ root_system.production_stress = pstress; }
 
 void
 CropSimple::tick (const Time& time,

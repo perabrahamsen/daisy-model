@@ -71,6 +71,7 @@ struct BioclimateStandard : public Bioclimate
   SVAT& svat;			// Soil Vegetation Atmosphere model.
   double crop_ep;		// Potential transpiration. [mm/h]
   double crop_ea;		// Actual transpiration. [mm/h]
+  double production_stress;	// Stress calculated by SVAT module.
 
   void WaterDistribution (Surface& surface, const Weather& weather, 
 			  Vegetation& vegetation, const Soil& soil,
@@ -191,6 +192,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     svat (Librarian<SVAT>::create (al.alist ("svat"))),
     crop_ep (0.0),
     crop_ea (0.0),
+    production_stress (-1.0),
     spray_ (),
     snow_chemicals_storage (al.alist_sequence ("snow_chemicals_storage")),
     snow_chemicals_in (),
@@ -424,7 +426,6 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   // 6 Transpiration
 
-#if 1
   // Potential transpiration
   const double potential_crop_transpiration = canopy_ep - canopy_ea;
   const double potential_soil_transpiration 
@@ -443,28 +444,8 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   // Production stress
   svat.tick (weather, vegetation, surface, soil, soil_heat, soil_water, pet,
 	     canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
-  const double production_stress = svat.production_stress ();
-
-#if 0
-  if (production_stress >= 0.0)
-    vegetation.force_production_stress (production_stress);
-#endif
-#else
-  // Potential transpiration
-  pt.tick (weather, vegetation, surface, soil, soil_heat, soil_water, pet,
-	   canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
-
-  crop_ep = pt.potential_transpiration ();
-  // Note: crop_ep can be larger than total_ep - total_ea, as PMSW
-  // uses a different method for calculating PET.
-  assert (crop_ep >= 0.0);
-
-  // Actual transpiration
-  crop_ea = vegetation.transpiration (crop_ep, canopy_ea, soil, soil_water) ;
-  assert (crop_ea >= 0.0);
-  total_ea += crop_ea;
-  assert (total_ea >= 0.0);
-#endif
+  production_stress = svat.production_stress ();
+  vegetation.force_production_stress (production_stress);
 
   // 7 Reset irrigation
   irrigation_top_old = irrigation_top;
@@ -587,6 +568,7 @@ BioclimateStandard::output (Log& log) const
   output_derived (svat, "svat", log);
   log.output ("crop_ep", crop_ep);
   log.output ("crop_ea", crop_ea);
+  log.output ("production_stress", production_stress);
 
   // Note: We use snow_chemicals_in instead of spray, since the former
   // is reset after each time step.
@@ -726,6 +708,8 @@ Number of vertical intervals in which we partition the canopy.");
 		  "Potential transpiration.");
       syntax.add ("crop_ea", "mm/h", Syntax::LogOnly,
 		  "Actual transpiration.");
+      syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
+		  "SVAT module induced stress, -1 means use water stress.");
 
       // Chemicals.
       Chemicals::add_syntax  ("spray", syntax, alist, Syntax::LogOnly,

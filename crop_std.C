@@ -40,9 +40,9 @@ public:
 
   // Communication with Bioclimate.
 public:
-  double water_stress () const // [0-1] (1 = full production)
+  double water_stress () const // [0-1] (0 = full production)
   { return root_system.water_stress; }
-  double nitrogen_stress () const // [0-1] (0 = no production)
+  double nitrogen_stress () const // [0-1] (1 = no production)
   { return root_system.nitrogen_stress; }
   double rs_min () const	// Minimum transpiration resistance.
   { return canopy.rs_min; }
@@ -67,6 +67,7 @@ public:
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
 			    double EvapInterception);
+  void force_production_stress  (double pstress);
 
   // Internal functions.
 public:				// Used by external development models.
@@ -1039,6 +1040,10 @@ CropStandard::ActualWaterUptake (double Ept,
   return root_system.water_uptake (Ept, soil, soil_water, EvapInterception);
 }
 
+void 
+CropStandard::force_production_stress  (double pstress)
+{ root_system.production_stress = pstress; }
+
 void
 CropStandard::NitContent ()
 {
@@ -1119,8 +1124,8 @@ CropStandard::NitrogenUptake (int Hour,
 
   // Updating the nitrogen stress
   root_system.nitrogen_stress
-    = max (0.0, min (1.0, ((NCrop - var.CrpAux.NfNCnt)
-			   / (var.CrpAux.CrNCnt - var.CrpAux.NfNCnt))));
+    = 1.0 - max (0.0, min (1.0, ((NCrop - var.CrpAux.NfNCnt)
+				 / (var.CrpAux.CrNCnt - var.CrpAux.NfNCnt))));
   
   // Ensure we have enough N for all the crop parts.
   if (!par.enable_N_stress)
@@ -1493,10 +1498,12 @@ CropStandard::tick (const Time& time,
     {
       double Ass = CanopyPhotosynthesis (bioclimate);
       var.CrpAux.PotCanopyAss = Ass;
-      if (par.enable_water_stress)
-	Ass *= water_stress;
+      if (root_system.production_stress >= 0.0)
+	Ass *= (1.0 - root_system.production_stress);
+      else if (par.enable_water_stress)
+	Ass *= (1.0 - water_stress);
       if (par.enable_N_stress)
-	Ass *= nitrogen_stress;
+	Ass *= (1.0 - nitrogen_stress);
       var.CrpAux.CanopyAss = Ass;
       const double ProdLim = (1.0 - par.Prod.GrowthRateRedFac);
       var.Prod.CH2OPool += ProdLim * Ass;

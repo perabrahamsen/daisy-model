@@ -1,3 +1,28 @@
+2000-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.35 released.
+
+2000-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (NitrogenUptake): Ditto.
+
+	* root_system.C (water_uptake): Ditto.
+
+	* crop.h (water_stress, nitrogen_stress, production_stress):
+	Inverted semantic so 0 is full production, and 1 is no production.
+	* crop_old.C (tick): Ditto.
+	* crop_std.C (tick): Ditto.
+	* crop_sold.C (tick): Ditto.
+	* crop_simple.C (class CropSimple): Ditto.
+
+	* bioclimate_std.C (production_stress): New member.
+	* vegetation.h, vegetation.C, vegetation_crops.C
+	(force_production_stress): New virtual member function.
+	* crop.h, crop.C, crop_std.C, crop_simple.C
+	(force_production_stress): New virtual member function.
+	* root_system.h, root_system.C (production_stress): New member.
+	* crop_std.C (tick): Use it.
+
 2000-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.34 released.

@@ -83,6 +83,7 @@ struct VegetationCrops : public Vegetation
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water);
+  void force_production_stress  (double pstress);
   void kill_all (const string&, const Time&, const Geometry&, OrganicMatter&,
 		 Bioclimate&);
   vector<const Harvest*> harvest (const string& column_name,
@@ -280,6 +281,17 @@ VegetationCrops::transpiration (double potential_transpiration,
 	}
     }
   return value;
+}
+
+void
+VegetationCrops::force_production_stress (double pstress)
+{
+  for (CropList::iterator crop = crops.begin(); 
+       crop != crops.end(); 
+       crop++)
+    {
+      (*crop)->force_production_stress (pstress);
+    }
 }
 
 void

@@ -266,8 +266,8 @@ struct CropOld::Variables
     // [gN/cm³/h]
     double h_x;			// Root extraction at surface.
     double water_stress;	// Fraction of requested water we got.
-    double ws_up;		// Water stress factor
-    double ws_down;		// Water stress denominator (dk:tæller)
+    double ws_up;		// Water stress factor.
+    double ws_down;		// Water stress denominator.
     double Ept;			// Potential evapotranspiration.
     double transpiration;	// Total water uptake.
   private:
@@ -493,7 +493,7 @@ CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
     NH4Extraction (vl.number_sequence ("NH4Extraction")),
     NO3Extraction (vl.number_sequence ("NO3Extraction")),
     h_x (vl.number ("h_x")),
-    water_stress (1.0),
+    water_stress (0.0),
     ws_up (0.0),
     ws_down (0.0),
     Ept (0.0),
@@ -1715,9 +1715,9 @@ CropOld::tick (const Time& time,
   assert (var.RootSys.ws_up <= var.RootSys.ws_down);
   double& water_stress = var.RootSys.water_stress;
   if (var.RootSys.ws_down > 0)
-    water_stress = var.RootSys.ws_up / var.RootSys.ws_down;
+    water_stress = 1.0 - var.RootSys.ws_up / var.RootSys.ws_down;
   else
-    water_stress = 1.0;
+    water_stress = 0.0;
   assert (water_stress >= 0.0 && water_stress <= 1.0);
   var.RootSys.ws_up = 0.0;
   var.RootSys.ws_down = 0.0;
@@ -1760,7 +1760,7 @@ CropOld::tick (const Time& time,
   else if (!par.enable_water_stress || var.CrpAux.InitLAI)
     var.CrpAux.CanopyAss += Ass;
   else
-    var.CrpAux.CanopyAss += water_stress * Ass;
+    var.CrpAux.CanopyAss += (1.0 - water_stress) * Ass;
 
   DevelopmentStage (bioclimate);
   var.Canopy.Height = CropHeight ();

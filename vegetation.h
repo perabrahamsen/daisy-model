@@ -53,6 +53,7 @@ public:
 				double potential_transpiration,	
 				double canopy_evaporation,
 				const Soil& soil, SoilWater& soil_water) = 0;
+  virtual void force_production_stress  (double pstress);
   virtual void kill_all (const string&, const Time&, const Geometry&,
 			 OrganicMatter&, Bioclimate&) = 0;
   virtual vector<const Harvest*> harvest (const string& column_name,

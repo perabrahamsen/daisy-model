@@ -158,9 +158,9 @@ RootSystem::water_uptake (double Ept_,
   soil_water.root_uptake (H2OExtraction);
   // Update water stress factor
   if (Ept < 0.010)
-    water_stress = 1.0;
+    water_stress = 0.0;
   else
-    water_stress = (total + EvapInterception) / (Ept + EvapInterception);
+    water_stress = 1.0 - (total + EvapInterception) / (Ept + EvapInterception);
 
 
   return H2OUpt;
@@ -395,6 +395,7 @@ RootSystem::output (Log& log) const
   log.output ("h_x", h_x);
   log.output ("water_stress", water_stress);
   log.output ("nitrogen_stress", nitrogen_stress);
+  log.output ("production_stress", production_stress);
   log.output ("Ept", Ept);
   log.output ("H2OUpt", H2OUpt);
   log.output ("NH4Upt", NH4Upt);
@@ -475,6 +476,8 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
 	       "Fraction of requested water we got.");
   syntax.add ("nitrogen_stress", Syntax::None (), Syntax::LogOnly,
 	       "Nitrogen stress factor.");
+  syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
+	       "SVAT induced stress, or -1 if not applicable.");
   syntax.add ("Ept", "mm/h", Syntax::LogOnly,
 	       "Potential transpiration.");
   syntax.add ("H2OUpt", "mm/h", Syntax::LogOnly, "H2O uptake.");
@@ -503,8 +506,9 @@ RootSystem::RootSystem (const AttributeList& al)
     NH4Extraction (al.number_sequence ("NH4Extraction")),
     NO3Extraction (al.number_sequence ("NO3Extraction")),
     h_x (al.number ("h_x")),
-    water_stress (1.0),
-    nitrogen_stress (1.0),
+    water_stress (0.0),
+    nitrogen_stress (0.0),
+    production_stress (-1.0),
     Ept (0.0),
     H2OUpt (0.0),
     NH4Upt (0.0),

@@ -1,6 +1,8 @@
-* Omdøb pt* til svat*
+* Implementer production_stress
 
-* Test tre "crop" managegers efter hinanden.  Bliver #2 sprunget over?
+** Sørg for at den kan logges fra bioclimate_std.
+
+** Sørg for at planterne adlyder den.
 
 * Make day/month in log files match the day and month the values have
   been accumulated.  

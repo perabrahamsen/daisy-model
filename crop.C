@@ -44,6 +44,10 @@ Crop::kill (const string& name, const Time& time, const Geometry& geometry,
 	   0.0, 0.0, 0.0, 0.0, true); 
 }
 
+void 
+Crop::force_production_stress  (double)
+{ }
+
 bool
 Crop::ds_remove (const Crop* crop)
 { return crop->DS () == Crop::DSremove; }

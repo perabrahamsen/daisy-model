@@ -8,6 +8,10 @@ Librarian<Vegetation>::Content* Librarian<Vegetation>::content = NULL;
 const char *const Vegetation::description = "\
 That green stuff.";
 
+void 
+Vegetation::force_production_stress  (double)
+{ }
+
 void
 Vegetation::output (Log& log) const
 {
