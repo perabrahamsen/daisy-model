@@ -1161,22 +1161,14 @@
 	   (month (path time))
 	   (mday (path time))
 	   (hour (path time))
-	   (number (path column "$col" OrganicMatter Bioincorporation soil_N)
-		   (tag "SOIL_N")
-		   (dimension "kg N/ha")
-		   (factor 10))		;g/m^2 -> kg/ha
-	   (number (path column "$col" OrganicMatter Bioincorporation soil_C)
-		   (tag "SOIL_C")
-		   (dimension "kg C/ha")
-		   (factor 10))		;g/m^2 -> kg/ha
 	   (interval (path column "$col" OrganicMatter am "*"
 			   "?bio/incorporation" om N)
-		     (tag "SOIL2_N")
+		     (tag "SOIL_N")
 		     (dimension "kg N/ha")
 		     (factor 1e5))		;g/cm^2 -> kg/ha
 	   (interval (path column "$col" OrganicMatter am "*"
 			   "?bio/incorporation" om C) 
-		     (tag "SOIL2_C")
+		     (tag "SOIL_C")
 		     (dimension "kg C/ha")
 		     (factor 1e5))		;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter am "*" om top_N)
@@ -1185,16 +1177,6 @@
 		   (factor 1e5))	;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter am "*" om top_C)
 		   (tag "TOP_C")
-		   (dimension "kg C/ha")
-		   (factor 1e5))	;g/cm^2 -> kg/ha
-	   (number (path column "$col" OrganicMatter am "*"
-			 "?bio/incorporation" om top_N)
-		   (tag "TOP2_N")
-		   (dimension "kg N/ha")
-		   (factor 1e5))	;g/cm^2 -> kg/ha
-	   (number (path column "$col" OrganicMatter am "*"
-			 "?bio/incorporation" om top_C)
-		   (tag "TOP2_C")
 		   (dimension "kg C/ha")
 		   (factor 1e5))	;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter Bioincorporation N)
@@ -1211,30 +1193,30 @@
 		   (factor 4.2))		;g DM/m^2 -> kg C/ha
 	   ))
 
-(deflog AM table
-  (where "am.tab")
+(deflog AOM table
+  (where "aom.tab")
   (when (hour 0))
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
 	   (interval (path column "$col" OrganicMatter am "*"
 			   "$am" om N)
-		     (tag "SOIL2_N")
+		     (tag "SOIL_N")
 		     (dimension "kg N/ha")
 		     (factor 1e5))		;g/cm^2 -> kg/ha
 	   (interval (path column "$col" OrganicMatter am "*"
 			   "$am" om C) 
-		     (tag "SOIL2_C")
+		     (tag "SOIL_C")
 		     (dimension "kg C/ha")
 		     (factor 1e5))		;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter am "*"
 			 "$am" om top_N)
-		   (tag "TOP2_N")
+		   (tag "TOP_N")
 		   (dimension "kg N/ha")
 		   (factor 1e5))	;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter am "*"
 			 "$am" om top_C)
-		   (tag "TOP2_C")
+		   (tag "TOP_C")
 		   (dimension "kg C/ha")
 		   (factor 1e5))))	;g/cm^2 -> kg/ha
 
