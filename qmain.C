@@ -32,6 +32,7 @@
 #include "printer_file.h"
 #include "tmpstream.h"
 #include "treelog_stream.h"
+#include "options.h"
 
 // Q Toolkit includes.
 #include <qapplication.h>
@@ -52,7 +53,7 @@ main (int argc, char** argv)
   MainWindow main_window;
   
   // Initialize it.
-  daisy_initialize ();
+  Options::initialize_path ();
 
   switch (argc)
     {

@@ -98,7 +98,8 @@ struct VegetationCrops : public Vegetation
   void reset_canopy_structure (Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
-			const Soil& soil, SoilWater& soil_water, Treelog&);
+			const Soil& soil, SoilWater& soil_water, 
+			double day_fraction, Treelog&);
   void force_production_stress  (double pstress);
   void kill_all (const string&, const Time&, const Geometry&, 
 		 Bioclimate&, vector<AM*>& residuals, 			 
@@ -327,7 +328,8 @@ double
 VegetationCrops::transpiration (double potential_transpiration,
 				double canopy_evaporation,
 				const Soil& soil, 
-				SoilWater& soil_water, Treelog& msg)
+				SoilWater& soil_water, double day_fraction, 
+				Treelog& msg)
 {
   double value = 0.0;
   
@@ -346,7 +348,8 @@ VegetationCrops::transpiration (double potential_transpiration,
 	{
 	  value += (*crop)->ActualWaterUptake (pt_per_LAI * (*crop)->LAI (), 
 					       soil, soil_water, 
-					       canopy_evaporation, msg);
+					       canopy_evaporation, 
+					       day_fraction, msg);
 	}
     }
   return value;

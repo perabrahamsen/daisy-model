@@ -87,7 +87,7 @@ public:
 				double potential_transpiration,	
 				double canopy_evaporation,
 				const Soil& soil, SoilWater& soil_water,
-				Treelog&) = 0;
+				double day_fraction, Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
   virtual void kill_all (const string&, const Time&, const Geometry&,
 			 Bioclimate&, vector<AM*>& residuals, 

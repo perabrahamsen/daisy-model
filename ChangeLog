@@ -1,3 +1,23 @@
+2002-05-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (harvest): Also cut back development stage for old
+	crops who are low for some reason (lack of WStem).
+
+2002-05-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C, root_system.h (water_uptake): New `day_fraction'
+	parameter.
+	* crop.h, crop_std.C, crop_simple.C, crop_old.C, crop_sold.C
+	(ActualWaterUptake): Ditto.
+	* vegevegetation.h, vegetation_crops.C, vegetation_permanent.C
+	(transpiration): Ditto. 
+	* bioclimate_std.C (WaterDistribution): Update caller.
+
+	* root_system.C, root_system.h (water_stress_days): New state
+	variable. 
+	* root_system.C (water_uptake): Update it.
+	* lib/log.dai ("Crop Production"): Log it.
+
 2002-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.27 released.

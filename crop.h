@@ -70,7 +70,8 @@ public:
   virtual double albedo () const;
   virtual void CanopyStructure () = 0;
   virtual double ActualWaterUptake (double Ept, const Soil&, SoilWater&, 
-				    double EvapInterception, Treelog&) = 0;
+				    double EvapInterception, 
+				    double day_fraction, Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
 
   // Simulation.

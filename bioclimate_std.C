@@ -458,8 +458,12 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 		   max (0.0, pet.dry ()));
 
   // Actual transpiration
+  const double day_fraction
+    = (daily_global_radiation_ > 0.0)
+    ? (weather.hourly_global_radiation () / (24.0 * daily_global_radiation_))
+    : 0.0;
   crop_ea = vegetation.transpiration (crop_ep, canopy_ea, soil, soil_water, 
-				      msg);
+				      day_fraction, msg);
   assert (crop_ea >= 0.0);
   total_ea += crop_ea;
   assert (total_ea >= 0.0);

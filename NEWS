@@ -12,6 +12,15 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.28
+
+** New log variable `water_stress_days' in "Crop Production".
+
+This gives an estimate of the number of days worth of production lost
+due to water stress.  It is created by water stress for each hour with
+the fraction of the daily radiation received that hour, and
+accumulating the result. 
+
 * 2.27
 
 ** Residuals are now logged in "N Balance" and "Carbon Balance".

@@ -556,8 +556,7 @@ dist:	cvs
 	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) dist)
 	(cd txt; $(MAKE) FTPDIR=$(FTPDIR) dist)
-	cp daisy $(FTPDIR)/daisy-$(TAG)-$(HOSTTYPE)
-	strip $(FTPDIR)/daisy-$(TAG)-$(HOSTTYPE)
+	strip -o $(FTPDIR)/daisy-$(TAG)-$(HOSTTYPE) daisy 
 	rm -f $(FTPDIR)/daisy-$(HOSTTYPE)
 	(cd $(FTPDIR); ln -s daisy-$(TAG)-$(HOSTTYPE) daisy-$(HOSTTYPE))
 

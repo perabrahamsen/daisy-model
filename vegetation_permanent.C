@@ -95,7 +95,8 @@ struct VegetationPermanent : public Vegetation
 	     Treelog&);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
-			const Soil& soil, SoilWater& soil_water, Treelog&);
+			const Soil& soil, SoilWater& soil_water, 
+			double day_fraction, Treelog&);
   void kill_all (const string&, const Time&, const Geometry&, Bioclimate&,
 		 vector<AM*>&, double&, double&, double&, 
 		 vector<double>&, vector<double>&, Treelog&)
@@ -219,12 +220,13 @@ double
 VegetationPermanent::transpiration (double potential_transpiration,
 				    double canopy_evaporation,
 				    const Soil& soil, 
-				    SoilWater& soil_water, Treelog& msg)
+				    SoilWater& soil_water,
+				    double day_fraction, Treelog& msg)
 {
   if (canopy.CAI > 0.0)
     return  root_system.water_uptake (potential_transpiration, 
 				      soil, soil_water, 
-				      canopy_evaporation, msg);
+				      canopy_evaporation, day_fraction, msg);
   return 0.0;
 }
 

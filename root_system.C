@@ -85,6 +85,7 @@ RootSystem::water_uptake (double Ept_,
 			  const Soil& soil,
 			  SoilWater& soil_water,
 			  const double EvapInterception,
+			  const double day_fraction,
 			  Treelog& msg)
 {
   assert (EvapInterception >= 0);
@@ -187,7 +188,7 @@ RootSystem::water_uptake (double Ept_,
     water_stress = 0.0;
   else
     water_stress = 1.0 - (total + EvapInterception) / (Ept + EvapInterception);
-
+  water_stress_days += water_stress * day_fraction;
 
   return H2OUpt;
 }
@@ -343,6 +344,7 @@ RootSystem::output (Log& log) const
   log.output ("NO3Extraction", NO3Extraction);
   log.output ("h_x", h_x);
   log.output ("water_stress", water_stress);
+  log.output ("water_stress_days", water_stress_days);
   log.output ("nitrogen_stress", nitrogen_stress);
   log.output ("production_stress", production_stress);
   log.output ("Ept", Ept);
@@ -430,6 +432,12 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("water_stress", Syntax::None (), Check::fraction (),
 	      Syntax::LogOnly,
 	       "Fraction of requested water we got.");
+  syntax.add ("water_stress_days", "d", Check::non_negative (),
+	      Syntax::State,
+	       "Number of days production has halted due to water stress.\n\
+This is the sum of water stress for each hour, multiplied with the\n\
+fraction of the radition of that day that was received that hour.");
+  alist.add ("water_stress_days", 0.0);
   syntax.add ("nitrogen_stress", Syntax::None (), Check::fraction (),
 	      Syntax::LogOnly,
 	       "Nitrogen stress factor.");
@@ -475,6 +483,7 @@ RootSystem::RootSystem (const AttributeList& al)
     NO3Extraction (al.number_sequence ("NO3Extraction")),
     h_x (al.number ("h_x")),
     water_stress (0.0),
+    water_stress_days (al.number ("water_stress_days")),
     nitrogen_stress (0.0),
     production_stress (-1.0),
     Ept (0.0),

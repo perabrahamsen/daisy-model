@@ -73,6 +73,7 @@ private:
   // Log.
 public:
   double water_stress;		// Fraction of requested water we didn't got.
+  double water_stress_days;	// Accumulated water stress.
   double nitrogen_stress;	// Fraction of requested nitrogen didn't got.
   double production_stress;	// SVAT induced stress, -1 if not applicable.
  
@@ -90,7 +91,8 @@ private:
 public:
   double water_uptake (double Ept,
 		       const Soil& soil, SoilWater& soil_water,
-		       const double EvapInterception, Treelog&);
+		       const double EvapInterception, double day_fraction,
+		       Treelog&);
 private:
   double solute_uptake (const Soil&, const SoilWater&, Solute&,
 			double PotNUpt, vector<double>& uptake,

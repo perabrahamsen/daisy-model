@@ -60,7 +60,8 @@ public:
   double EpFac () const; // Convertion to potential evapotransp.
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
-			    double EvapInterception, Treelog&);
+			    double EvapInterception, double day_fraction, 
+			    Treelog&);
   
   // Internal functions.
 protected:
@@ -1305,7 +1306,8 @@ CropOld::CanopyStructure ()
 double
 CropOld::ActualWaterUptake (double Ept,
 			    const Soil& soil, SoilWater& soil_water,
-			    const double EvapInterception, Treelog& out)
+			    const double EvapInterception, 
+			    double /* day_fraction */, Treelog& out)
 {
   if (Ept < 0)
     {

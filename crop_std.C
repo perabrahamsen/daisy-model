@@ -88,9 +88,10 @@ public:
   { canopy.CanopyStructure (development.DS); }
   double ActualWaterUptake (double Ept, 
 			    const Soil& soil, SoilWater& soil_water,
-			    double EvapInterception, Treelog& msg)
+			    double EvapInterception, double day_fraction, 
+			    Treelog& msg)
   { return root_system.water_uptake (Ept, soil, soil_water, EvapInterception, 
-				     msg);}
+				     day_fraction, msg);}
   void force_production_stress  (double pstress)
   { root_system.production_stress = pstress; }
 
@@ -359,9 +360,20 @@ CropStandard::harvest (const string& column_name,
 	  // Revert development.
 	  if (harvesting.DSnew < 0.0)
 	    {
+
+#if 0
 	      // Negative value means revert to canopy 
 	      if (stub_length < canopy.Height)
 		development.DS = canopy.DS_at_height (stub_length);
+#else
+	      // We want a cut to always put back development, even
+	      // for a crop which is so retarded that it has no stem
+	      // worth speaking about, and hence, no height.
+	      const double DS_height = canopy.DS_at_height (stub_length);
+	      if (development.DS > DS_height)
+		development.DS = DS_height;
+#endif
+	      
 	    }
 	  else if (development.DS > harvesting.DSnew)
 	    development.DS = harvesting.DSnew;

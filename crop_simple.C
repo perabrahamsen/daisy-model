@@ -109,7 +109,8 @@ public:
   { return canopy.EpFactor (DS ()); }
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
-			    double EvapInterception, Treelog&);
+			    double EvapInterception, double day_fraction, 
+			    Treelog&);
   void force_production_stress  (double pstress);
 
   // Simulation.
@@ -156,10 +157,11 @@ CropSimple::CanopyStructure ()
 double
 CropSimple::ActualWaterUptake (double Ept,
 			       const Soil& soil, SoilWater& soil_water,
-			       const double EvapInterception, Treelog& msg)
+			       const double EvapInterception, 
+			       const double day_fraction, Treelog& msg)
 {
   return root_system.water_uptake (Ept, soil, soil_water, EvapInterception,
-				   msg);
+				   day_fraction, msg);
 }
 
 void 
