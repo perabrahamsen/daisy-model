@@ -93,6 +93,7 @@
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "$col" residuals_N_soil)
+                  (flux true)
                   (factor 1e5)      ;g/cm^2 -> kg/ha
                   (dimension "kg N/ha/cm/&"))))
 
@@ -102,8 +103,29 @@
   (when hourly)
   (entries ;; Year Month MDay Hour
            (array (path column "$col" residuals_C_soil)
+                  (flux true)
                   (factor 1e5)      ;g/cm^2 -> kg/ha
                   (dimension "kg C/ha/cm/&"))))
+
+(deflog "NO3 Root Uptake" table
+  (where "no3_uptake.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+   (array (path column "$col" SoilNO3 S_root)
+          (tag "NO3-Root")
+          (flux true)
+          (dimension "kg N/ha/cm/&")
+          (factor -1e5))))      ;g/cm^2 -> kg N/ha
+
+(deflog "NH4 Root Uptake" table
+  (where "nh4_uptake.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+   (array (path column "$col" SoilNH4 S_root)
+          (tag "NH4-Root")
+          (flux true)
+          (dimension "kg N/ha/cm/&")
+          (factor -1e5))))      ;g/cm^2 -> kg N/ha
 
 (deflog "Soil NO3 Concentration" table
   "Amount of nitrate in all numeric soil layers.
