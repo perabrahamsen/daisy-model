@@ -197,6 +197,24 @@ OM::total_N (const Geometry& geometry) const
   return total + top_N;
 }
 
+double 
+OM::C_at (unsigned int at) const
+{
+  if (at >= C.size ())
+    return 0.0;
+  return C[at];
+}
+
+double 
+OM::N_at (unsigned int at) const
+{
+  if (at >= C.size ())
+    return 0.0;
+  assert (at < C_per_N.size ());
+  assert ( C_per_N[at] > 0.0);
+  return C[at] / C_per_N[at];
+}
+
 void
 OM::pour (vector<double>& cc, vector<double>& nn)
 {

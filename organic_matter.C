@@ -239,34 +239,27 @@ OrganicMatter::Implementation::output (Log& log,
     {
       const int size = geometry.size ();
 
-      double total_N = 0.0;
-      double total_C = 0.0;
+      vector<double> total_N (size, 0.0);
+      vector<double> total_C (size, 0.0);
       for (int i = 0; i < size; i++)
 	{
-	  double new_total_C = 0.0;
-	  double new_total_N = 0.0;
-
 	  for (unsigned int j = 0; j < smb.size (); j++)
 	    {
-	      new_total_C += smb[j]->C[i];
-	      new_total_N += smb[j]->C[i] / smb[j]->C_per_N[i];
+	      total_C[i] += smb[j]->C[i];
+	      total_N[i] += smb[j]->C[i] / smb[j]->C_per_N[i];
 	    }
 	  for (unsigned int j = 0; j < som.size (); j++)
 	    {
-	      new_total_C += som[j]->C[i];
-	      new_total_N += som[j]->C[i] / som[j]->C_per_N[i];
+	      total_C[i] += som[j]->C[i];
+	      total_N[i] += som[j]->C[i] / som[j]->C_per_N[i];
 	    }
-	  new_total_C += buffer.C[i];
-	  new_total_N += buffer.N[i];
-
-	  total_C += new_total_C * geometry.dz (i);
-	  total_N += new_total_N * geometry.dz (i);
-	}
-      const int all_am_size = am.size ();
-      for (int k = 0; k < all_am_size; k++)
-	{
-	  total_C += am[k]->total_C (geometry);
-	  total_N += am[k]->total_N (geometry);
+	  for (int j = 0; j < am.size (); j++)
+	    {
+	      total_C[i] += am[j]->C_at (i);
+	      total_N[i] += am[j]->N_at (i);
+	    }
+	  total_C[i] += buffer.C[i];
+	  total_N[i] += buffer.N[i];
 	}
       log.output ("total_N", total_N);
       log.output ("total_C", total_C);
@@ -913,10 +906,10 @@ Clear this flag to turn off mineralization in groundwater.");
 Mineralization this time step (negative numbers mean immobilization).");
   syntax.add ("NH4_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
 Mineralization this time step (negative numbers mean immobilization).");
-  syntax.add ("total_C", "g C/cm^2", Syntax::LogOnly,
-	      "Total organic C in the soil.");
-  syntax.add ("total_N", "g N/cm^2", Syntax::LogOnly,
-	      "Total organic N in the soil.");
+  syntax.add ("total_C", "g C/cm^2", Syntax::LogOnly, Syntax::Sequence,
+	      "Total organic C in the soil layer.");
+  syntax.add ("total_N", "g N/cm^2", Syntax::LogOnly, Syntax::Sequence,
+	      "Total organic N in the soil layer.");
   syntax.add ("CO2", "g CO2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "CO2 evolution.");
   syntax.add ("am", Librarian<AM>::library (), Syntax::Sequence, 

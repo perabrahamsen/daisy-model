@@ -29,6 +29,8 @@ public:
   void swap (const Geometry&, double from, double middle, double to);
   double total_C (const Geometry& geometry) const;
   double total_N (const Geometry& geometry) const;
+  double C_at (unsigned int at) const;
+  double N_at (unsigned int at) const;
   void pour (vector<double>& cc, vector<double>& nn);
   void add (double C, double N);// Add dead leafs.
   void add (const Geometry&,	// Add dead roots.

@@ -1,10 +1,12 @@
-* SH: commit
+* Tilføj output til dsftodai.pl
 
-* SH: Cygnus CD
+Send til Jesper <chgl@dadlnet.dk>
 
 * Ny klimafil.
 
-Check om lexeren fra ParserFile kan gengruges.
+* An `assert CONDITION' action.
+
+Gives an error if CONDITION is not true.
 
 * En `forever' aktivitet.  Eller en `until CONDITION activity'.
 

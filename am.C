@@ -40,6 +40,8 @@ struct AM::Implementation
   void swap (const Geometry&, double from, double middle, double to);
   double total_C (const Geometry& geometry) const;
   double total_N (const Geometry& geometry) const;
+  double C_at (unsigned int at) const;
+  double N_at (unsigned int at) const;
   void pour (vector<double>& cc, vector<double>& nn); // Move content to cc&nn.
   void append_to (vector<OM*>& added); // Add OM's to added.
   void distribute (double C, vector<double>& om_C, // Helper for `add' fns.
@@ -372,6 +374,24 @@ AM::Implementation::total_N (const Geometry& geometry) const
   return total;
 }
 
+double 
+AM::Implementation::C_at (const unsigned int at) const
+{
+  double total = 0.0;
+  for (unsigned int i = 0; i < om.size (); i++)
+    total += om[i]->C_at (at);
+  return total;
+}
+
+double 
+AM::Implementation::N_at (const unsigned int at) const
+{
+  double total = 0.0;
+  for (unsigned int i = 0; i < om.size (); i++)
+    total += om[i]->N_at (at);
+  return total;
+}
+
 void 
 AM::Implementation::pour (vector<double>& cc, vector<double>& nn)
 {
@@ -408,6 +428,14 @@ AM::total_C (const Geometry& geometry) const
 double 
 AM::total_N (const Geometry& geometry) const
 { return impl.total_N (geometry); }
+
+double 
+AM::C_at (unsigned int at) const
+{ return impl.C_at (at); }
+
+double 
+AM::N_at (unsigned int at) const
+{ return impl.N_at (at); }
 
 void 
 AM::pour (vector<double>& cc, vector<double>& nn)
