@@ -532,7 +532,7 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax* syntax)
 	case Syntax::CSMP:
 	  {
 	    CSMP* csmp = new CSMP ();
-	    double last_x;
+	    double last_x = -42;
 	    int count = 0;
 	    while (!looking_at (')') && good ())
 	      {

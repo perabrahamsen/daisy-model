@@ -22,11 +22,9 @@ template <class T> class dFTable : public FTable
     {
 	// BUG: Should be outlined in `ftable.C'.
 	// BUG: Should use a STL map!
-	const int UGLY_MAX_SIZE = 1024;
-	string UGLY_key[UGLY_MAX_SIZE];
-	T UGLY_value[UGLY_MAX_SIZE];
-	int size;
-	Implementation () : size (0) { }
+	vector<string> key;
+	vector<T> value;
+	Implementation () { }
     };
 #endif
     Implementation& impl;

@@ -369,6 +369,11 @@ Crop::Variables::RecCrpAux::output (Log& log, const Filter* filter) const
 Crop::Variables::~Variables ()
 { }
 
+// BUG: Should not be necessary.
+void
+NullCropFun(const Bioclimate&, Crop&)
+{ }
+
 dFTable<CropFun> Crop::Parameters::DevelPar::models;
 dFTable<CropFun> Crop::Parameters::LeafPhotPar::models;
 
@@ -419,8 +424,8 @@ void CropSyntax::parameters ()
     Vernal->add ("TaSum", Syntax::Number);
 
     // LeafPhotPar
-    Crop::Parameters::LeafPhotPar::models.add("exponential", (CropFun) 0);
-    Crop::Parameters::LeafPhotPar::models.add("parabolic", (CropFun) 0);
+    Crop::Parameters::LeafPhotPar::models.add("exponential", &NullCropFun);
+    Crop::Parameters::LeafPhotPar::models.add("parabolic", &NullCropFun);
 
     Syntax* LeafPhot = new Syntax ();
     par->add ("LeafPhot", LeafPhot);

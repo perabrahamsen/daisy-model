@@ -1,0 +1,42 @@
+;; test.dai -*- lisp -*-
+ 
+((horizon h1 horizon
+	  (compact false))
+ (column c1 column
+	 (Bioclimate (NoOfIntervals 30))
+	 (Surface)
+	 (Soil (horizons (-40 h1))
+	       (zplus  -1  -2  -3  -4  -5  -6  -7  -8  -9 -10
+		       -11 -12 -13 -14 -15 -16 -17 -18 -19 -20
+		       -21 -22 -23 -24 -25 -26 -27 -28 -29 -30
+		       -31 -32 -33 -34 -35 -36 -37 -38 -39 -40))
+	 (SoilWater (UZtop richards))
+	 (SoilHeat)
+	 (SoilNH4)
+	 (SoilNO3)
+	 (OrganicMatter)
+	 (Nitrification)
+	 (Denitrification))
+ (groundwater)
+ (manager farmer manager
+	  (rules (((after 1990 4 13)
+		   (stop)))))
+ (log ("water.log" (hourly 1)
+       time
+       (columns (c1 (SoilWater Theta)))))
+ (weather (from 1990 4 11)
+	     (file "water.weather"))
+ (time 1990 4 11)
+ (field (c1 (crops)
+	    (Bioclimate)
+	    (Surface)
+	    (Soil)
+            (SoilHeat (T 10.0 * 40))
+	    (SoilWater (h -600.0 * 40)
+		       (Xi 0.0 * 40))
+	    (SoilNH4)
+	    (SoilNO3)
+	    (OrganicMatter)
+	    (Nitrification)
+	    (Denitrification)))
+ (chief farmer))

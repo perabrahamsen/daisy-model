@@ -3,6 +3,23 @@
 #include "groundwater.h"
 #include "syntax.h"
 
+bool 
+Groundwater::flux_bottom () const
+{
+  return true;
+}
+
+double 
+Groundwater::q_bottom () const
+{
+  return 0.0;
+}
+
+bool  
+Groundwater::accept_bottom (double) const
+{ 
+  return true;
+}
 Groundwater::Groundwater (const AttributeList& /* al */)
 { }
 

@@ -46,15 +46,15 @@ Horizon::K (double h) const
 double
 Horizon::Cw1 (double h) const
 {
-  return Theta (h) - Cw2 (h);
+  return Theta (h) - Cw2 (h) * h;
 }
 
 double 
 Horizon::Cw2 (double h) const
 {
   if (h < -1.0)
-    return (  -4 * 274-2 * pow (log (-h), 3) 
-	    / h * pow (739.0 + pow (log (-h), 4), 2));
+    return - (  (-4 * 274.2 * pow (log (-h), 3))
+	      / (-h * pow (739.0 + pow (log (-h), 4), 2)));
   else
     return 0.0;
 }
@@ -62,7 +62,7 @@ Horizon::Cw2 (double h) const
 double 
 Horizon::h (double /* Theta */) const
 {
-  assert (0);
+  THROW (Unimplemented ("Calculate h from Theta"));
   return -1;
 }
 
@@ -127,7 +127,8 @@ HorizonList::horizon (double z) const
   return *impl.horizons[i - 1];
 }
 
-void HorizonList::add (double zplus, const Horizon& horizon)
+void 
+HorizonList::add (double zplus, const Horizon& horizon)
 {
   impl.zplus.push_back (zplus);
   impl.horizons.push_back (&horizon);

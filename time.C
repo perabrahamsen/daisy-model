@@ -6,13 +6,13 @@
 
 struct Time::Implementation
 {
-    static int mlen[];
-    static string mname[];
-    short year;
-    short yday;
-    char hour;
-    Implementation (short, short, char);
-    Implementation (const Implementation&);
+  static int mlen[];
+  static string mname[];
+  short year;
+  short yday;
+  char hour;  
+  Implementation (short, short, char);
+  Implementation (const Implementation&);
 };
 
 int Time::Implementation::mlen[] =
@@ -23,11 +23,11 @@ string Time::Implementation::mname[] =
   "July", "August", "September", "October", "November" , "December" };
 
 Time::Implementation::Implementation (short y, short d, char h)
-    : year (y), yday (d), hour (h)
+  : year (y), yday (d), hour (h)
 { }
 
 Time::Implementation::Implementation (const Implementation& i)
-    : year (i.year), yday (i.yday), hour (i.hour)
+  : year (i.year), yday (i.yday), hour (i.hour)
 { }
 
 // @ Extract.
@@ -35,47 +35,47 @@ Time::Implementation::Implementation (const Implementation& i)
 int
 Time::year () const
 {
-    return impl.year;
+  return impl.year;
 }
 
 int
 Time::month () const
 {
-    return yday2month (impl.year, impl.yday);
+  return yday2month (impl.year, impl.yday);
 }
 
 int
 Time::week () const
 {
-    // BUG: Weekdays are unimplemented.
-    assert (false);
-    return -1; // SHUT UP.
+  // BUG: Weekdays are unimplemented.
+  assert (false);
+  return -1; // SHUT UP.
 }
 
 int
 Time::yday () const
 {
-    return impl.yday;
+  return impl.yday;
 }
 
 int
 Time::mday () const
 {
-    return yday2mday (impl.year, impl.yday);
+  return yday2mday (impl.year, impl.yday);
 }
 
 int
 Time::wday () const
 {
-    // BUG: Weekdays are unimplemented.
-    assert (false);
-    return -1; // SHUT UP.
+  // BUG: Weekdays are unimplemented.
+  assert (false);
+  return -1; // SHUT UP.
 }
 
 int
 Time::hour () const
 {
-    return impl.hour;
+  return impl.hour;
 }
 
 // @ Simulate. 
@@ -83,29 +83,29 @@ Time::hour () const
 void 
 Time::tick ()
 {
-    if (impl.hour < 23)
-	impl.hour++;
-    else
-	{
-	    impl.hour = 0;
+  if (impl.hour < 23)
+    impl.hour++;
+  else
+    {
+      impl.hour = 0;
 	    
-	    switch (impl.yday)
-		{
-		case 365:
-		    if (leap (impl.year))
-			{
-			    impl.yday++;
-			    return;
-			}
-		    /* fallthrough */
-		case 366:
-		    impl.yday = 1;
-		    impl.year++;
-		    break;
-		default:
-		    impl.yday++;
-		}
+      switch (impl.yday)
+	{
+	case 365:
+	  if (leap (impl.year))
+	    {
+	      impl.yday++;
+	      return;
+	    }
+	  /* fallthrough */
+	case 366:
+	  impl.yday = 1;
+	  impl.year++;
+	  break;
+	default:
+	  impl.yday++;
 	}
+    }
 }
 
 // @ Convert.
@@ -113,58 +113,58 @@ Time::tick ()
 string
 Time::month_name (int month)
 {
-    return Implementation::mname[month];
+  return Implementation::mname[month];
 }
 
 string
 Time::wday_name (int /* yday */)
 {
-    // BUG: Weekdays are unimplemented.
-    assert (false);
-    return "yesterday"; // SHUT UP.
+  // BUG: Weekdays are unimplemented.
+  assert (false);
+  return "yesterday"; // SHUT UP.
 }
 
 int
 Time::month_number (string name)
 {
-    for (int month = 1; month < 13; month++)
-	if (Implementation::mname[month] == name)
-	    return month;
-    // Bug: Should probably throw an exception here.
-    return -1;
+  for (int month = 1; month < 13; month++)
+    if (Implementation::mname[month] == name)
+      return month;
+  // Bug: Should probably throw an exception here.
+  return -1;
 }
 
 int
 Time::wday_number (string /* name */)
 {
-    // BUG: Weekdays are unimplemented.
-    assert (false);
+  // BUG: Weekdays are unimplemented.
+  assert (false);
 }
 
 int
 Time::mday2yday (int year, int month, int mday)
 {
-    bool ly = leap (year) && (month > 2);
-    return Implementation::mlen[month] + mday + ly;
+  bool ly = leap (year) && (month > 2);
+  return Implementation::mlen[month] + mday + ly;
 }
 
 int
 Time::yday2mday (int year, int yday)
 {
-    int month = yday2month (year, yday);
-    return yday - Implementation::mlen[month] - (leap (year) && month > 2);
+  int month = yday2month (year, yday);
+  return yday - Implementation::mlen[month] - (leap (year) && month > 2);
 }
 
 int
 Time::yday2month (int year, int yday)
 {
-    int month;
-    bool ly = leap (year);
-    for (month = 1;
-	 Implementation::mlen[month + 1] + (ly && (month > 2)) < yday;
-	 month++)
-	;
-    return month;
+  int month;
+  bool ly = leap (year);
+  for (month = 1;
+       Implementation::mlen[month + 1] + (ly && (month > 2)) < yday;
+       month++)
+    ;
+  return month;
 }
 
 // Test.
@@ -172,14 +172,14 @@ Time::yday2month (int year, int yday)
 bool
 Time::leap (int year)
 {
-    return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
+  return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
 }
 
 int
 Time::month_length (int year, int month)
 {
-    return Implementation::mlen[month + 1] + Implementation::mlen[month] 
-	+ (month == 2 && leap (year));
+  return Implementation::mlen[month + 1] + Implementation::mlen[month] 
+    + (month == 2 && leap (year));
 }
 
 // @ Construct.
@@ -187,26 +187,26 @@ Time::month_length (int year, int month)
 const Time& 
 Time::operator= (const Time& t)
 {
-    this->impl = t.impl;
-    return *this;
+  this->impl = t.impl;
+  return *this;
 }
 
 Time::Time (int y, int m, int md, int h)
-    : impl (*new Implementation (y, mday2yday (y, m, md), h))
+  : impl (*new Implementation (y, mday2yday (y, m, md), h))
 { 
-    assert (m > 0 && m < 13);
-    assert (md > 0 && m == month ());
-    assert (h >= 0 && h < 24);
+  assert (m > 0 && m < 13);
+  assert (md > 0 && m == month ());
+  assert (h >= 0 && h < 24);
 }
     
 Time::Time (const Time&t)
-    : impl (*new Implementation (t.impl))
+  : impl (*new Implementation (t.impl))
 {
 }
 
 Time::~Time ()
 {
-    delete &impl;
+  delete &impl;
 }
 
 // @ Operators.
@@ -214,48 +214,48 @@ Time::~Time ()
 bool 
 operator== (const Time& a, const Time& b)
 {
-    return (a.impl.year == b.impl.year)
-	&& (a.impl.yday == b.impl.yday)
-	&& (a.impl.hour == b.impl.hour);
+  return (a.impl.year == b.impl.year)
+    && (a.impl.yday == b.impl.yday)
+    && (a.impl.hour == b.impl.hour);
 }
 
 bool
 operator!= (const Time& a, const Time& b)
 {
-    return !(a == b);
+  return !(a == b);
 }
     
 bool
 operator<  (const Time& a, const Time& b)
 {
-    if (a.impl.year < b.impl.year)
-	return true;
-    if (a.impl.year > b.impl.year)
-	return false;
-    if (a.impl.yday < b.impl.yday)
-	return true;
-    if (a.impl.yday > b.impl.yday)
-	return false;
-    if (a.impl.hour < b.impl.hour)
-	return true;
+  if (a.impl.year < b.impl.year)
+    return true;
+  if (a.impl.year > b.impl.year)
     return false;
+  if (a.impl.yday < b.impl.yday)
+    return true;
+  if (a.impl.yday > b.impl.yday)
+    return false;
+  if (a.impl.hour < b.impl.hour)
+    return true;
+  return false;
 
 }
 
 bool
 operator<= (const Time& a, const Time& b)
 {
-    return a == b || a < b;
+  return a == b || a < b;
 }
 
 bool
 operator>= (const Time& a, const Time& b)
 {
-    return !(a < b);
+  return !(a < b);
 }
 
 bool
 operator>  (const Time& a, const Time& b)
 {
-    return !(a <= b);
+  return !(a <= b);
 }

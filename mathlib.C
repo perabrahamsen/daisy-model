@@ -39,6 +39,7 @@ tridia (const unsigned int N,
       y[i] = d[i] - amult * y[i - 1];
     }
   // Backward substitution.
+  x[N - 1] = y[N - 1] / beta[N - 1];
   for (int i = N - 2; i >= 0; i--)
     {
       x[i] = (y[i] - c[i] * x[i + 1]) / beta[i];

@@ -56,13 +56,14 @@ Soil::Soil (const AttributeList& al)
   for (int i = 0; i < size_; i++)
     {
       double zplus = zplus_[i];
-      double dz = zplus - last;
+      double dz = last - zplus;
       dz_.push_back (dz);
-      double z = last + dz / 2;
+      double z = last - dz / 2;
       z_.push_back (z);
       horizon_.push_back (&horizons.horizon (z));
       last = zplus;
     }
+  horizon_.push_back (horizon_[size_ - 1]);
 };
 
 Soil::~Soil ()

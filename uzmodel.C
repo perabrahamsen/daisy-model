@@ -18,6 +18,49 @@ UZbottom::~UZbottom ()
 UZmodel::~UZmodel ()
 { }
 
+bool 
+UZRichard::flux_top () const
+{
+  return true;
+}
+
+double 
+UZRichard::q_top () const
+{
+  return q_down;
+}
+void  
+UZRichard::flux_top_on () const
+{ }
+
+void  
+UZRichard::flux_top_off () const
+{ }
+
+bool  
+UZRichard::accept_top (double) const
+{ 
+  return true;
+}
+
+bool 
+UZRichard::flux_bottom () const
+{
+  return true;
+}
+
+double 
+UZRichard::q_bottom () const
+{
+  return q_up;
+}
+
+bool  
+UZRichard::accept_bottom (double) const
+{ 
+  return true;
+}
+
 bool
 UZRichard::richard (const Soil& soil, 
 		    int first, const UZtop& top, 
@@ -26,7 +69,8 @@ UZRichard::richard (const Soil& soil,
 		    const vector<double>& h_old,
 		    const vector<double>& Theta_old,
 		    vector<double>& h_new,
-		    vector<double>& Theta_new) const
+		    vector<double>& Theta_new,
+		    vector<double>& q)
 {
   // Input variables for solving a tridiagonal matrix.
   const int size = last - first + 1; 
@@ -48,8 +92,8 @@ UZRichard::richard (const Soil& soil,
   K[size] = soil.K (last + 1, 0.0);
 
   // First guess is the old value.
-  copy (h_old.begin () + first, h_old.begin () + last, h.begin ());
-  copy (Theta_old.begin () + first, Theta_old.begin () + last, Theta.begin ());
+  copy (h_old.begin () + first, h_old.begin () + size, h.begin ());
+  copy (Theta_old.begin () + first, Theta_old.begin () + size, Theta.begin ());
 
   double time_left = 1.0;	// How much of the large time step left.
   double dt = 1.0;		// We start with small == large time step.
@@ -69,7 +113,7 @@ UZRichard::richard (const Soil& soil,
 	  Kold[i] = soil.K (first + i, h[i]);
 	}
       h_previous = h;
-      
+
       do
 	{
 	  iterations_used++;
@@ -99,7 +143,7 @@ UZRichard::richard (const Soil& soil,
 		{
 		  // Calculate upper boundary.
 		  if (top.flux_top ())
-		    {
+		    {	
 		      b[i] = Cw2 + (dt / dz) * (Kplus[i] / dz_plus);
 		      d[i] = Theta[i] - Cw1 - dt * S[first + i] 
 			+ (dt / dz) * (top.q_top () - Kplus[i]);
@@ -121,12 +165,15 @@ UZRichard::richard (const Soil& soil,
 		  // Calculate lower boundary.
 		  if (bottom.flux_bottom ())
 		    {
+		      double q_bottom = - Kold[i];
 		      b[i] = Cw2 + (dt / dz) * (Kplus[i - 1] / dz_minus);
 		      d[i] = Theta[i] - Cw1 - dt * S[first + i] 
-			+ (dt / dz) * (Kplus[i - 1] - bottom.q_bottom ());
+			+ (dt / dz) * (Kplus[i - 1] + q_bottom);
 		    }
 		  else 
 		    {
+		      b[i] = Cw2 + (dt / dz) * (  Kplus[i - 1] / dz_minus 
+						  + Kplus[i] / dz_plus);
 		      d[i] = Theta[i] - Cw1 - dt * S[first + i] 
 			+ (dt / dz)
 			* (Kplus[i - 1] - Kplus[i] * (1 - h[i + 1] / dz_plus));
@@ -177,9 +224,47 @@ UZRichard::richard (const Soil& soil,
 	}
     }
 
-  // Return result.
+  // Make it official.
+  assert (h_new.size () >= first + size + 0U);
   copy (h.begin (), h.end (), h_new.begin () + first);
+  assert (Theta_new.size () >= first + size + 0U);
   copy (Theta.begin (), Theta.end (), Theta_new.begin () + first);
+
+  // Calculate flux.
+  if (top.flux_top ())
+    {
+      // We know flux on upper border, use mass preservation to
+      // calculate flux below given the change in water content.
+      q[first] = top.q_top ();
+      for (int i = first; i < last; i++)
+	q[i + 1] = (Theta_new[i] - Theta_old[i] + S[i]) 
+	  * (soil.dz (i) / 1.0) + q[i];
+    }
+  else
+    {
+      // Find an unsaturated area.
+      int start;
+      for (start = first; start < last; start++)
+	{
+	  if (h_new[start] < 0.0 && h_new[start + 1] < 0.0)
+	    break;
+	}
+      if (start == last)
+	THROW (Numeric ("We couldn't find an unsaturated area."));
+      // Use Darcy equation to find flux here.
+      q[start + 1] = -Kplus[start] 
+	* (  (  (  (h_new[start + 1] + h_old[start + 1]) / 2 
+	   	 - (h_new[start]     + h_old[start])     / 2)
+	      / soil.dz (start + 1))
+	   + 1);
+      // Use mass preservation to find flux below and above.
+      for (int i = start + 1; i <= last; i++)
+	q[i + 1] = (Theta_new[i] - Theta_old[i] + S[i]) 
+	  * (soil.dz (i) / 1.0) + q[i];
+      for (int i = start; i >= first; i--)
+	q[i] = (Theta_new[i + 1] - Theta_old[i + 1] + S[i + 1]) 
+	  * (soil.dz (i + 1) / 1.0) + q[i + 1];
+    }
   return true;
 }
 
@@ -252,6 +337,45 @@ double
 UZRichard::max_relative_difference () const
 {
   return 0.001;
+}
+
+void 
+UZRichard::tick (const Soil& soil,
+		 int first, const UZtop& top, 
+		 int last, const UZbottom& bottom, 
+		 const vector<double>& S,
+		 const vector<double>& h_old,
+		 const vector<double>& Theta_old,
+		 vector<double>& h,
+		 vector<double>& Theta,
+		 vector<double>& q)
+{
+  if (!richard (soil, first, top, last, bottom, 
+		S, h_old, Theta_old, h, Theta, q))
+    THROW (Runtime ("Richard's Equation doesn't converge."));
+    
+  if (top.flux_top () && h[first] > 0)
+    {
+      top.flux_top_off ();
+      if (!richard (soil, first, top, last, bottom, 
+		    S, h_old, Theta_old, h, Theta, q))
+	THROW (Runtime ("Richard's Equation doesn't converge."));
+      if (!top.accept_top (q[first]))
+	THROW (Numeric ("Couldn't accept top flux"));
+    }
+  else if (!top.flux_top () && !top.accept_top (q[first]))
+    {
+      top.flux_top_on ();
+      if (!richard (soil, first, top, last, bottom, 
+		    S, h_old, Theta_old, h, Theta, q))
+	THROW (Runtime ("Richard's Equation doesn't converge."));
+      if (h[first] < 0)
+	THROW (Numeric ("Couldn't drain top flux"));
+    }
+  bottom.accept_bottom (q[last + 1]);
+
+  q_up = q[first];
+  q_down = q[last + 1];
 }
 
 UZRichard::~UZRichard ()

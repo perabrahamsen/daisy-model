@@ -36,6 +36,8 @@ public:
   { return horizon_[i]->Cw2 (h); }
   inline double Theta (int i, double h) const
   { return horizon_[i]->Theta (h); }
+  inline double h (int i, double h) const
+  { return horizon_[i]->h (h); }
   inline bool compact (int i) const
   { return horizon_[i]->compact (); }
   

@@ -39,7 +39,7 @@ ColumnStandard::tick (const Time& time,
   
   bioclimate.tick (surface, weather, crops);
   soil_heat.tick (surface, bioclimate);
-  soil_water.tick (surface, groundwater);
+  soil_water.tick (surface, groundwater, soil);
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     (*crop)->tick (time, *this, bioclimate);
 }
@@ -48,6 +48,30 @@ void
 ColumnStandard::output (Log& log, const Filter* filter) const
 {
   log.open (name);
+#if 0
+  if (filter->check ("Bioclimate"))
+    bioclimate.output (log, filter->lookup ("Bioclimate"));
+  if (filter->check ("Surface"))
+    surface.output (log, filter->lookup ("Surface"));
+  if (filter->check ("Soil"))
+    soil.output (log, filter->lookup ("Soil"));
+#endif
+  if (filter->check ("SoilWater"))
+    soil_water.output (log, filter->lookup ("SoilWater"));
+#if 0
+  if (filter->check ("SoilHeat"))
+    soil_heat.output (log, filter->lookup ("SoilHeat"));
+  if (filter->check ("SoilNH4"))
+    soil_NH4.output (log, filter->lookup ("SoilNH4"));
+  if (filter->check ("SoilNO3"))
+    soil_NO3.output (log, filter->lookup ("SoilNO3"));
+  if (filter->check ("OrganicMatter"))
+    organic_matter.output (log, filter->lookup ("OrganicMatter"));
+  if (filter->check ("Nitrification"))
+    nitrification.output (log, filter->lookup ("Nitrification"));
+  if (filter->check ("Denitrification"))
+    denitrification.output (log, filter->lookup ("Denitrification"));
+#endif
   if (filter->check ("crops"))
     output_crops (log, filter->lookup ("crops"));
   log.close ();
@@ -86,7 +110,7 @@ ColumnStandard::ColumnStandard (string n,
     bioclimate (par.list ("Bioclimate"), var.list ("Bioclimate")),
     surface (par.list ("Surface"), var.list ("Surface")),
     soil (par.list ("Soil")),
-    soil_water (par.list ("SoilWater"), var.list ("SoilWater")),
+    soil_water (soil, par.list ("SoilWater"), var.list ("SoilWater")),
     soil_heat (par.list ("SoilHeat"), var.list ("SoilHeat")),
     soil_NH4 (par.list ("SoilNH4"), var.list ("SoilNH4")),
     soil_NO3 (par.list ("SoilNO3"), var.list ("SoilNO3")),
@@ -129,9 +153,7 @@ ColumnSyntax::parameters ()
   soil->add ("horizons", Syntax::Soil);
   soil->add ("zplus", Syntax::Array);
   par->add ("Soil", soil);
-  Syntax* soil_water = new Syntax ();
-  soil_water->add ("UZmodel", Syntax::UZmodel);
-  par->add ("SoilWater", soil_water);
+  par->add ("SoilWater", SoilWater::parameter_syntax ());
   Syntax* soil_heat = new Syntax ();
   par->add ("SoilHeat", soil_heat);
   Syntax* soil_NH4 = new Syntax ();
@@ -158,11 +180,7 @@ ColumnSyntax::variables ()
   var->add ("Surface", surface);
   Syntax* soil = new Syntax ();
   var->add ("Soil", soil);
-  Syntax* soil_water = new Syntax ();
-  soil_water->add ("Theta", Syntax::Array);
-  soil_water->add ("h", Syntax::Array);
-  soil_water->add ("Xi", Syntax::Array);
-  var->add ("SoilWater", soil_water);
+  var->add ("SoilWater", SoilWater::variable_syntax ());
   Syntax* soil_heat = new Syntax ();
   soil_heat->add ("T", Syntax::Array);
   var->add ("SoilHeat", soil_heat);
