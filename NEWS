@@ -12,6 +12,12 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.66
+
+** The `weekly' condition should work now.
+
+It never worked before.
+
 * 2.65
 
 ** You can now initialize organic matter based on background miniralization.
@@ -25,6 +31,9 @@ Example
 
   (OrganicMatter (init (input 1400 [kg C/ha/y])
                        (background_mineralization 30 [kg N/ha/y])))
+
+The net mineralization is the background mineralization plus the
+amount of added organic nitrogen.
 
 * 2.64
 

@@ -1,5 +1,11 @@
 2003-04-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.66 released.
+
+2003-04-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_time.C (match): Only match on Sundays.
+
 	* Version 2.65 released.
 
 2003-04-10  Per Abrahamsen  <abraham@dina.kvl.dk>

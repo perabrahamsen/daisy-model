@@ -205,7 +205,9 @@ struct ConditionWeekly : public Condition
     return Condition::timestep ();
   } 
   bool match (const Daisy& daisy) const
-  { return daisy.time.hour () == 23 && (daisy.time.week () % step) == 0; }
+  { return daisy.time.hour () == 23 
+      && daisy.time.wday () == 6
+      && (daisy.time.week () % step) == 0; }
   void output (Log&) const
   { }
   ConditionWeekly (const AttributeList& al)
