@@ -43,8 +43,8 @@ public:
   { return horizon_[i]->hydraulic.Theta (h); }
   inline double Theta_res (int i) const
   { return horizon_[i]->hydraulic.Theta_res; }
-  inline double h (int i, double h) const
-  { return horizon_[i]->hydraulic.h (h); }
+  inline double h (int i, double Theta) const
+  { return horizon_[i]->hydraulic.h (Theta); }
   inline double M (int i, double h) const
   { return horizon_[i]->hydraulic.M (h); }
   inline bool compact (int i) const
@@ -81,7 +81,13 @@ public:
 
   // Simulation.
   bool check () const;
-  void mix (vector<double>& v, double amount, double from, double to) const;
+  
+  // Vector operations.
+  void mix (vector<double>& v, double from, double to) const;
+  void add (vector<double>& v, double from, double to, double amount) const;
+  double extract (vector<double>& v, double from, double to) const;
+  void set (vector<double>& v, double from, double to, double amount) const;
+  void swap (vector<double>& v, double from, double middle, double to) const;
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

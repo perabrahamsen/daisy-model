@@ -22,9 +22,7 @@ HEAD = $(OBJECTS:.o=.h) common.h
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = matter_impl.C matter_impl.h matter.h iom.h iom.C \
-	horizon_yolo.C horizon_M_vG.C horizon_B_vG.C horizon_M_C.C \
-	horizon_B_C.C horizon_M_BaC.C horizon_B_BaC.C 
+REMOVE = none 
 
 .SUFFIXES:	.C .o .h
 

@@ -27,6 +27,9 @@ struct SoilHeat::Implementation
   // Simulation.
   void tick (const Time&, const Soil&, const SoilWater&, 
 	     const Surface&, const Groundwater&);
+  double energy (const Soil&, const SoilWater&, double from, double to) const;
+  void set_energy (const Soil&, const SoilWater&, 
+		   double from, double to, double energy);
   double bottom (const Time&) const;
 
   // Create & Destroy.
@@ -146,6 +149,63 @@ SoilHeat::Implementation::tick (const Time& time,
   for (int i = size; i < soil.size (); i++)
     T[i] = T_bottom;
 }
+
+double 
+SoilHeat::Implementation::energy (const Soil& soil,
+				  const SoilWater& soil_water,
+				  double from, double to) const
+{
+  double amount = 0.0;
+  double old = 0.0;
+
+  for (int i = 0; i < soil.size () && old > to ; i++)
+    {
+      if (soil.zplus (i) < from)
+	{
+	  const double height = (min (old, from) - max (soil.zplus (i), to));
+	  const double C = soil.heat_capacity (i, soil_water.Theta (i));
+	  amount += C * T[i] * height;
+	}
+      old = soil.zplus (i);
+    }
+  return amount;
+}
+
+void
+SoilHeat::Implementation::set_energy (const Soil& soil,
+				      const SoilWater& soil_water, 
+				      double from, double to, double energy)
+{
+  // Find total energy capacity.
+  double capacity = 0.0;
+  double old = 0.0;
+
+  for (int i = 0; i < soil.size () && old > to ; i++)
+    {
+      if (soil.zplus (i) < from)
+	{
+	  const double height = (min (old, from) - max (soil.zplus (i), to));
+	  capacity += soil.heat_capacity (i, soil_water.Theta (i)) * height;
+	}
+      old = soil.zplus (i);
+    }
+  
+  // Distribute temperature evenly.
+  const double average = energy / capacity / (to - from);
+  old = 0.0;
+
+  for (int i = 0; i < soil.size () && old > to ; i++)
+    {
+      if (soil.zplus (i) < from)
+	{
+	  const double height = (min (old, from) - max (soil.zplus (i), to));
+	  T[i] = (height * average + (soil.dz (i) - height)* T[i]) 
+	    / soil.dz (i);
+	}
+      old = soil.zplus (i);
+    }
+}
+
 double 
 SoilHeat::Implementation::bottom (const Time& time) const 
 {
@@ -184,6 +244,28 @@ SoilHeat::tick (const Time& time,
   impl.tick (time, soil, soil_water, surface, groundwater);
 }
 
+double 
+SoilHeat::energy (const Soil& soil,
+		  const SoilWater& soil_water,
+		  double from, double to) const
+{
+  return impl.energy (soil, soil_water, from, to);
+}
+
+void
+SoilHeat::set_energy (const Soil& soil,
+		      const SoilWater& soil_water, 
+		      double from, double to, double energy)
+{
+  impl.set_energy (soil, soil_water, from, to, energy);
+}
+
+void
+SoilHeat::swap (const Soil& soil, double from, double middle, double to)
+{
+  soil.swap (impl.T, from, middle, to);
+}
+  
 double
 SoilHeat::T (int i) const
 {

@@ -78,10 +78,17 @@ OM::output (Log& log, const Filter& filter) const
 }
 
 void 
-OM::mix (const Soil& soil, double from, double to)
+OM::mix (const Soil& soil, double from, double to, double penetration)
 { 
-  soil.mix (C, top_C, from, to);
-  top_C = 0.0;
+  soil.add (C, from, to, top_C * penetration);
+  soil.mix (C, from, to);
+  top_C *= (1.0 - penetration);
+}
+
+void
+OM::swap (const Soil& soil, double from, double middle, double to)
+{
+  soil.swap (C, from, middle, to);
 }
 
 void
@@ -263,10 +270,17 @@ AOM::output (Log& log, const Filter& filter) const
 }
 
 void 
-AOM::mix (const Soil& soil, double from, double to)
+AOM::mix (const Soil& soil, double from, double to, double penetration)
 {
   for (unsigned int i = 0; i < om.size (); i++)
-    om[i]->mix (soil, from, to);
+    om[i]->mix (soil, from, to, penetration);
+}
+
+void
+AOM::swap (const Soil& soil, double from, double middle, double to)
+{
+  for (unsigned int i = 0; i < om.size (); i++)
+    om[i]->swap (soil, from, middle, to);
 }
 
 const Library&

@@ -30,7 +30,8 @@ struct OM
 
   // Simulation.
   void output (Log&, const Filter&) const;
-  void mix (const Soil&, double from, double to);
+  void mix (const Soil&, double from, double to, double penetration = 1.0);
+  void swap (const Soil&, double from, double middle, double to);
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
 	     double& CO2, const vector<OM*>& smb, const vector<OM*>&som);
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
@@ -61,7 +62,8 @@ public:
   void output (Log&, const Filter&) const;
   static bool check (const AttributeList&);
   bool check () const;
-  void mix (const Soil&, double from, double to);
+  void mix (const Soil&, double from, double to, double penetration = 1.0);
+  void swap (const Soil&, double from, double middle, double to);
 
   // Library.
 public:

@@ -79,7 +79,7 @@ Soil::check () const
 }
 
 void
-Soil::mix (vector<double>& v, double amount, double from, double to) const
+Soil::add (vector<double>& v, double from, double to, double amount) const
 {
   while (v.size () < size () + 0U)
     v.push_back (0.0);
@@ -93,6 +93,67 @@ Soil::mix (vector<double>& v, double amount, double from, double to) const
       old = zplus_[i];
     }
 }
+
+void
+Soil::mix (vector<double>& v, double from, double to) const
+{
+  add (v, from, to, extract (v, from, to));
+}
+
+double
+Soil::extract (vector<double>& v, double from, double to) const
+{
+  while (v.size () < size () + 0U)
+    v.push_back (0.0);
+  double amount = 0.0;
+  double old = 0.0;
+
+  for (unsigned i = 0; i < v.size () && old > to ; i++)
+    {
+      if (zplus_[i] < from)
+	{
+	  const double height = (min (old, from) - max (zplus_[i], to));
+	  amount += v[i] * height;
+	  v[i] -= v[i] * height / (old - zplus_[i]);
+	}
+      old = zplus_[i];
+    }
+  return amount;
+}
+
+void
+Soil::set (vector<double>& v, double from, double to, double amount) const
+{
+  while (v.size () < size () + 0U)
+    v.push_back (0.0);
+  const double density = amount / (from - to);
+  double old = 0.0;
+
+  for (unsigned i = 0; i < v.size () && old > to ; i++)
+    {
+      if (zplus_[i] < from)
+	{
+	  const double height = (min (old, from) - max (zplus_[i], to));
+	  v[i] -= v[i] * height / (old - zplus_[i]); // Remove old.
+	  v[i] += density * height; // Add new.
+	}
+      old = zplus_[i];
+    }
+}
+
+void
+Soil::swap (vector<double>& v, double from, double middle, double to) const
+{
+  const double top_content = extract (v, from, middle);
+  const double bottom_content = extract (v, middle, to);
+  const double new_middle = from + to - middle;
+
+  set (v, from, to, 0.0);
+  add (v, from, new_middle, bottom_content);
+  add (v, new_middle, to, top_content);
+}
+
+
 
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)

@@ -27,6 +27,8 @@ public:
 	     SoilNO3&, SoilNH4&);
   void output (Log& log, const Filter& filter) const;
   double CO2 (int i) const;
+  void mix (const Soil&, double from, double to, double penetration = 1.0);
+  void swap (const Soil&, double from, double middle, double to);
 
   static bool check (const AttributeList&);
   bool check () const;

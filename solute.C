@@ -342,12 +342,29 @@ Solute::Solute ()
 { }
 
 void 
-Solute::mix (const Soil& soil, const SoilWater& soil_water, 
+Solute::add (const Soil& soil, const SoilWater& soil_water, 
 	     double amount, double from, double to)
 { 
-  soil.mix (M_, amount, from, to);
+  soil.add (M_, from, to, amount);
   for (unsigned int i = 0; i < C_.size (); i++)
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+}
+
+void 
+Solute::mix (const Soil& soil, const SoilWater& soil_water, 
+	     double from, double to)
+{ 
+  soil.mix (M_, from, to);
+  for (unsigned int i = 0; i < C_.size (); i++)
+    C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
+}
+
+void 
+Solute::swap (const Soil& soil, double from, double middle, double to)
+{ 
+  // Do not ever attempt to call this, without also swaping the water. 
+  soil.swap (M_, from, middle, to);
+  soil.swap (C_, from, middle, to);
 }
 
 void

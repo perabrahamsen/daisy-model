@@ -24,6 +24,10 @@ class SoilHeat
 public:
   void tick (const Time&, const Soil&, const SoilWater&, 
 	     const Surface&, const Groundwater&);
+  double energy (const Soil&, const SoilWater&, double from, double to) const;
+  void set_energy (const Soil&, const SoilWater&, 
+		   double from, double to, double energy);
+  void swap (const Soil&, double from, double middle, double to);
   double T (int i) const;
   void output (Log&, const Filter&) const;
   bool check (unsigned n) const;

@@ -60,8 +60,10 @@ public:
   void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
   void output (Log&, const Filter&) const;
-  void mix (const Soil&, const SoilWater&,
+  void add (const Soil&, const SoilWater&,
 	    double amount, double from, double to);
+  void mix (const Soil&, const SoilWater&, double from, double to);
+  void swap (const Soil&, double from, double middle, double to);
 
   // Create and destroy.
 protected:

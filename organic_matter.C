@@ -33,6 +33,8 @@ struct OrganicMatter::Implementation
     void output (Log& log, const Filter& filter) const;
     void tick (int i, double turnover_factor, double N_soil, double& N_used,
 	       const vector<OM*>&);
+    void mix (const Soil&, double from, double to);
+    void swap (const Soil&, double from, double middle, double to);
     static void load_syntax (Syntax& syntax, AttributeList& alist);
     void initialize (const Soil& soil);
     Buffer (const AttributeList& al);
@@ -43,6 +45,8 @@ struct OrganicMatter::Implementation
   { aom.push_back (&om); }
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&);
+  void mix (const Soil&, double from, double to, double penetration);
+  void swap (const Soil& soil, double from, double middle, double to);
   void output (Log& log, const Filter& filter) const;
   bool check () const;
 
@@ -96,6 +100,24 @@ OrganicMatter::Implementation::Buffer::tick (int i, double turnover_factor,
   som[where]->C[i] += C[i] * rate;
   C[i] *= (1.0 - rate);
   N[i] *= (1.0 - rate);
+}
+
+void 
+OrganicMatter::Implementation::Buffer::mix (const Soil& soil, 
+					    double from, double to)
+{
+  soil.mix (C, from, to);
+  soil.mix (N, from, to);
+}
+
+void
+OrganicMatter::Implementation::Buffer::swap (const Soil& soil,
+					     double from,
+					     double middle, 
+					     double to)
+{
+  soil.swap (C, from, middle, to);
+  soil.swap (N, from, middle, to);
 }
 
 void
@@ -255,6 +277,34 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 }
       
 void 
+OrganicMatter::Implementation::mix (const Soil& soil,
+				    double from, double to, double penetration)
+{
+  buffer.mix (soil, from, to);
+  for (unsigned int i = 0; i < aom.size (); i++)
+    aom[i]->mix (soil, from, to, penetration);
+  for (unsigned int i = 1; i < smb.size (); i++)
+    smb[i]->mix (soil, from, to, penetration);
+  for (unsigned int i = 0; i < som.size (); i++)
+    som[i]->mix (soil, from, to, penetration);
+  // Leave CO2 alone.
+}
+
+void 
+OrganicMatter::Implementation::swap (const Soil& soil,
+				     double from, double middle, double to)
+{
+  buffer.swap (soil, from, middle, to);
+  for (unsigned int i = 0; i < aom.size (); i++)
+    aom[i]->swap (soil, from, middle, to);
+  for (unsigned int i = 1; i < smb.size (); i++)
+    smb[i]->swap (soil, from, middle, to);
+  for (unsigned int i = 0; i < som.size (); i++)
+    som[i]->swap (soil, from, middle, to);
+  // Leave CO2 alone.
+}
+
+void 
 OrganicMatter::Implementation::initialize (const Soil& soil)
 {
   buffer.initialize (soil);
@@ -292,6 +342,19 @@ OrganicMatter::tick (const Soil& soil,
 		     SoilNH4& soil_NH4)
 {
   impl.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
+}
+
+void 
+OrganicMatter::mix (const Soil& soil,
+		    double from, double to, double penetration)
+{
+  impl.mix (soil, from, to, penetration);
+}
+
+void 
+OrganicMatter::swap (const Soil& soil, double from, double middle, double to)
+{
+  impl.swap (soil, from, middle, to);
 }
 
 double

@@ -46,9 +46,8 @@ public:
 		 const SoluteMatter&, irrigation_from);
   void fertilize (AOM&, double from, double to);
   void fertilize (const InorganicMatter&, double from, double to);
-  void mix (double from, double to);
-  void mix_top (double penetration, double to);
-  void swap (double f1, double t1, double f2, double t2);
+  void mix (double from, double to, double penetration = 1.0);
+  void swap (double from, double middle, double to);
 
   // Simulation.
 public:
@@ -105,30 +104,37 @@ ColumnStandard::fertilize (const InorganicMatter& im,
 {
   if (to < from )
     {
-      soil_NO3.mix (soil, soil_water, im.im.NO3, from, to);
-      soil_NH4.mix (soil, soil_water, im.im.NH4, from, to);
+      soil_NO3.add (soil, soil_water, im.im.NO3, from, to);
+      soil_NH4.add (soil, soil_water, im.im.NH4, from, to);
     }
   else
     surface.fertilize (im);
 }
 
 void 
-ColumnStandard::mix (double /* from */, double /* to */)
+ColumnStandard::mix (double from, double to, double penetration)
 {
-  abort ();
+#ifdef TODO
+  crops.kill ()
+#endif
+  soil_NO3.mix (soil, soil_water, from, to);
+  soil_NH4.mix (soil, soil_water, from, to);
+  const double energy = soil_heat.energy (soil, soil_water, from, to);
+  soil_water.mix (soil, from, to);
+  soil_heat.set_energy (soil, soil_water, from, to, energy);
+  organic_matter.mix (soil, from, to, penetration);
 }
 
 void 
-ColumnStandard::mix_top (double /* penetration */, double /* to */)
+ColumnStandard::swap (double from, double middle, double to)
 {
-  abort ();
-}
-
-void 
-ColumnStandard::swap (double /* f1 */, double /* t1 */,
-		      double /* f2 */, double/* t2 */)
-{
-  abort ();
+  mix (from, middle, 1.0);
+  mix (middle, to, 0.0);
+  soil_NO3.swap (soil, from, middle, to);
+  soil_NH4.swap (soil, from, middle, to);
+  soil_heat.swap (soil, from, middle, to);
+  soil_water.swap (soil, from, middle, to);
+  organic_matter.swap (soil, from, middle, to);
 }
 
 bool

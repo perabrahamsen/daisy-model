@@ -33,9 +33,8 @@ public:
 			 const SoluteMatter&, irrigation_from) = 0;
   virtual void fertilize (AOM&, double from, double to) = 0;
   virtual void fertilize (const InorganicMatter&, double from, double to) = 0;
-  virtual void mix (double from, double to) = 0;
-  virtual void mix_top (double penetration, double to) = 0;
-  virtual void swap (double f1, double t1, double f2, double t2) = 0;
+  virtual void mix (double from, double to, double penetration = 1.0) = 0;
+  virtual void swap (double from, double middle, double to) = 0;
   
   // Simulation.
   virtual void tick (const Time&, const Weather&, Groundwater&) = 0;
