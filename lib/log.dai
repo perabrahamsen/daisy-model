@@ -2139,7 +2139,8 @@ To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
                    (factor 4))
            (number (path column "$col" Vegetation crops crops "$crop"
 			 Prod C_Loss)
-                   (dimension "kg C/ha")
+                   (dimension "kg C/ha/&")
+		   (when hourly)
                    (factor 10))
            (number (path column "$col" Vegetation crops crops "$crop"
 			 Prod NetPhotosynthesis)
