@@ -1,0 +1,328 @@
+;;; dk-horizon.dai -- Danish soil types.
+;;
+;; Data from the DJF "Profil Database", median values.
+
+(defhorizon Ap_JB1 default
+  ;; Observations: 206.
+  (clay 3.7)
+  (silt 7.3)
+  (sand 80.3)
+  (humus 2.6)
+  (dry_bulk_density 1.45 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.40)
+	(alpha 0.032 [cm^-1])
+	(n 1.426)
+	(K_sat 42.5 [cm/d])))
+
+(defhorizon B_JB1 default
+  ;; Observations: 284.
+  (clay 3.5)
+  (silt 3.9)
+  (sand 82.8)
+  (humus 0.8)
+  (dry_bulk_density 1.50 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.39)
+	(alpha 0.046 [cm^-1])
+	(n 1.531)
+	(K_sat 25.0 [cm/d])))
+
+(defhorizon C_JB1 default
+  ;; Observations: 359.
+  (clay 2.6)
+  (silt 2.3)
+  (sand 84.3)
+  (humus 0.2)
+  (dry_bulk_density 1.56 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.37)
+	(alpha 0.049 [cm^-1])
+	(n 1.652)
+	(K_sat 6.9 [cm/d])))
+
+(defhorizon Ap_JB2 default
+  ;; Observations: 47.
+  (clay 4.1)
+  (silt 15.7)
+  (sand 71.9)
+  (humus 2.5)
+  (dry_bulk_density 1.42 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.39)
+	(alpha 0.018 [cm^-1])
+	(n 1.445)
+	(K_sat 11.6 [cm/d])))
+
+(defhorizon B_JB2 default
+  ;; Observations: 48.
+  (clay 3.8)
+  (silt 12.1)
+  (sand 77)
+  (humus 0.9)
+  (dry_bulk_density 1.45 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.39)
+	(alpha 0.033 [cm^-1])
+	(n 1.433)
+	(K_sat 20.9 [cm/d])))
+
+(defhorizon C_JB2 default
+  ;; Observations: 97.
+  (clay 3.1)
+  (silt 7.4)
+  (sand 81.5)
+  (humus 0.2)
+  (dry_bulk_density 1.55 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.37)
+	(alpha 0.037 [cm^-1])
+	(n 1.503)
+	(K_sat 9.0 [cm/d])))
+
+(defhorizon Ap_JB3 default
+  ;; Observations: 164.
+  (clay 6.6)
+  (silt 15.9)
+  (sand 71.6)
+  (humus 2.7)
+  (dry_bulk_density 1.44 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.39)
+	(alpha 0.021 [cm^-1])
+	(n 1.408)
+	(K_sat 14.3 [cm/d])))
+
+(defhorizon B_JB3 default
+  ;; Observations: 139.
+  (clay 6.5)
+  (silt 13.5)
+  (sand 75.1)
+  (humus 1.0)
+  (dry_bulk_density 1.44 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.40)
+	(alpha 0.036 [cm^-1])
+	(n 1.421)
+	(K_sat 19.1 [cm/d])))
+
+(defhorizon C_JB3 default
+  ;; Observations: 58.
+  (clay 7.0)
+  (silt 13.3)
+  (sand 72.7)
+  (humus 0.2)
+  (dry_bulk_density 1.63 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.35)
+	(alpha 0.029 [cm^-1])
+	(n 1.441)
+	(K_sat 3.0 [cm/d])))
+
+(defhorizon Ap_JB4 default
+  ;; Observations: 171.
+  (clay 7.7)
+  (silt 25.8)
+  (sand 61.7)
+  (humus 2.6)
+  (dry_bulk_density 1.41 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.03)
+	(Theta_sat 0.40)
+	(alpha 0.013 [cm^-1])
+	(n 1.434)
+	(K_sat 6.8 [cm/d])))
+
+(defhorizon B_JB4 default
+  ;; Observations: 139.
+  (clay 6.8)
+  (silt 23.1)
+  (sand 65)
+  (humus 0.8)
+  (dry_bulk_density 1.51 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.37)
+	(alpha 0.022 [cm^-1])
+	(n 1.413)
+	(K_sat 7.4 [cm/d])))
+
+(defhorizon C_JB4 default
+  ;; Observations: 104.
+  (clay 7.3)
+  (silt 21.6)
+  (sand 61.9)
+  (humus 0.3)
+  (dry_bulk_density 1.65 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.02)
+	(Theta_sat 0.34)
+	(alpha 0.017 [cm^-1])
+	(n 1.430)
+	(K_sat 2.7 [cm/d])))
+
+(defhorizon Ap_JB5 default
+  ;; Observations: 56.
+  (clay 12.2)
+  (silt 25.9)
+  (sand 58.3)
+  (humus 2.5)
+  (dry_bulk_density 1.51 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.03)
+	(Theta_sat 0.38)
+	(alpha 0.010 [cm^-1])
+	(n 1.441)
+	(K_sat 2.8 [cm/d])))
+
+(defhorizon B_JB5 default
+  ;; Observations: 41.
+  (clay 11.7)
+  (silt 19.6)
+  (sand 66)
+  (humus 0.5)
+  (dry_bulk_density 1.62 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.03)
+	(Theta_sat 0.36)
+	(alpha 0.018 [cm^-1])
+	(n 1.410)
+	(K_sat 2.3 [cm/d])))
+
+(defhorizon C_JB5 default
+  ;; Observations: 75.
+  (clay 12.3)
+  (silt 21.8)
+  (sand 48.5)
+  (humus 0.2)
+  (dry_bulk_density 1.79 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.03)
+	(Theta_sat 0.32)
+	(alpha 0.009 [cm^-1])
+	(n 1.416)
+	(K_sat 0.5 [cm/d])))
+
+(defhorizon Ap_JB6 default
+  ;; Observations: 127.
+  (clay 12.3)
+  (silt 29.6)
+  (sand 54.8)
+  (humus 2.5)
+  (dry_bulk_density 1.53 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.03)
+	(Theta_sat 0.37)
+	(alpha 0.008 [cm^-1])
+	(n 1.469)
+	(K_sat 1.9 [cm/d])))
+
+(defhorizon B_JB6 default
+  ;; Observations: 87.
+  (clay 12.2)
+  (silt 25.9)
+  (sand 58.4)
+  (humus 0.5)
+  (dry_bulk_density 1.64 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.03)
+	(Theta_sat 0.35)
+	(alpha 0.012 [cm^-1])
+	(n 1.421)
+	(K_sat 1.6 [cm/d])))
+
+(defhorizon C_JB6 default
+  ;; Observations: 89.
+  (clay 11.9)
+  (silt 26.7)
+  (sand 50.9)
+  (humus 0.2)
+  (dry_bulk_density 1.72 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.03)
+	(Theta_sat 0.33)
+	(alpha 0.010 [cm^-1])
+	(n 1.430)
+	(K_sat 0.7 [cm/d])))
+
+(defhorizon Ap_JB7 default
+  ;; Observations: 114.
+  (clay 17.2)
+  (silt 30)
+  (sand 48.7)
+  (humus 2.4)
+  (dry_bulk_density 1.54 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.04)
+	(Theta_sat 0.38)
+	(alpha 0.006 [cm^-1])
+	(n 1.474)
+	(K_sat 1.1 [cm/d])))
+
+(defhorizon B_JB7 default
+  ;; Observations: 290.
+  (clay 19.5)
+  (silt 25.8)
+  (sand 51.9)
+  (humus 0.4)
+  (dry_bulk_density 1.68 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.04)
+	(Theta_sat 0.35)
+	(alpha 0.008 [cm^-1])
+	(n 1.421)
+	(K_sat 0.5 [cm/d])))
+
+(defhorizon C_JB7 default
+  ;; Observations: 216.
+  (clay 18.5)
+  (silt 26.6)
+  (sand 48.2)
+  (humus 0.2)
+  (dry_bulk_density 1.73 [g/cm^3])
+  (hydraulic M_vG
+	(Theta_res 0.04)
+	(Theta_sat 0.34)
+	(alpha 0.008 [cm^-1])
+	(n 1.424)
+	(K_sat 0.3 [cm/d])))
+
+;;; Original data:
+;; 
+;; 	"Data from the DJF ""Profil Database"" Median values"															
+;; 												Van Genuchten Parameters				
+;; 			Texture									Theta				
+;; JB	Horizon	Obs	Clay	F. Silt	C. Silt	F. Sand			C. Sand	Humus	DBD	Res	Sat	alpha	n	Ksat
+;; 			2	20	63	125	200	500	>500		g/cm3			1/cm		cm/d
+;; 1	Ap	206	3.7	2.9	4.4	6.6	11.2	51.0	11.5	2.6	1.45	0.02	0.40	0.032	1.426	42.5
+;; 	B	284	3.5	1.5	2.4	4.4	11.9	54.7	11.8	0.8	1.50	0.02	0.39	0.046	1.531	25.0
+;; 	C	359	2.6	0.5	1.8	3.6	11.3	57.0	12.4	0.2	1.56	0.02	0.37	0.049	1.652	6.9
+;; 2	Ap	47	4.1	4.3	11.4	23.0	24.9	21.8	2.2	2.5	1.42	0.02	0.39	0.018	1.445	11.6
+;; 	B	48	3.8	3.4	8.7	23.7	25.7	25.4	2.2	0.9	1.45	0.02	0.39	0.033	1.433	20.9
+;; 	C	97	3.1	1.0	6.4	24.0	29.2	27.6	0.7	0.2	1.55	0.02	0.37	0.037	1.503	9.0
+;; 3	Ap	164	6.6	6.6	9.3	10.4	11.0	38.7	11.5	2.7	1.44	0.02	0.39	0.021	1.408	14.3
+;; 	B	139	6.5	4.7	8.8	9.6	10.9	41.8	12.8	1.0	1.44	0.02	0.40	0.036	1.421	19.1
+;; 	C	58	7.0	4.9	8.4	10.4	11.1	39.1	12.1	0.2	1.63	0.02	0.35	0.029	1.441	3.0
+;; 4	Ap	171	7.7	10.0	15.8	16.5	14.3	24.1	6.8	2.6	1.41	0.03	0.40	0.013	1.434	6.8
+;; 	B	139	6.8	8.0	15.1	18.1	15.3	25.6	6.0	0.8	1.51	0.02	0.37	0.022	1.413	7.4
+;; 	C	104	7.3	6.1	15.5	18.9	16.2	22.2	4.6	0.3	1.65	0.02	0.34	0.017	1.430	2.7
+;; 5	Ap	56	12.2	12.3	13.6	12.5	10.1	26.9	8.8	2.5	1.51	0.03	0.38	0.010	1.441	2.8
+;; 	B	41	11.7	7.7	11.9	12.0	11.2	31.8	11.0	0.5	1.62	0.03	0.36	0.018	1.410	2.3
+;; 	C	75	12.3	10.1	11.7	11.9	10.2	19.0	7.4	0.2	1.79	0.03	0.32	0.009	1.416	0.5
+;; 6	Ap	127	12.3	13.5	16.1	15.8	12.7	19.5	6.8	2.5	1.53	0.03	0.37	0.008	1.469	1.9
+;; 	B	87	12.2	10.1	15.8	17.0	13.8	21.1	6.5	0.5	1.64	0.03	0.35	0.012	1.421	1.6
+;; 	C	89	11.9	9.1	17.6	17.1	12.6	16.0	5.2	0.2	1.72	0.03	0.33	0.010	1.430	0.7
+;; 7	Ap	114	17.2	14.8	15.2	14.4	11.0	17.2	6.1	2.4	1.54	0.04	0.38	0.006	1.474	1.1
+;; 	B	290	19.5	11.6	14.2	14.6	11.5	18.8	7.0	0.4	1.68	0.04	0.35	0.008	1.421	0.5
+;; 	C	216	18.5	12.1	14.5	14.4	10.8	16.8	6.2	0.2	1.73	0.04	0.34	0.008	1.424	0.3
+
+;;; dk-horizon.dai ends here.
