@@ -88,6 +88,47 @@ LogSelect::done ()
 #endif
 }
 
+bool
+LogSelect::initial_match (const Daisy&, Treelog&)
+{
+  is_active = false;
+#ifdef NO_LOG_ALL
+  // If we don't have log_all.C, we keep track of the active_stack in
+  // each indidual log file.
+  vector<Select*> current;
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->initial_match ())
+      {
+	if (entries[i]->interesting_content)
+	  is_active = true;
+	current.push_back (entries[i]);
+      }
+  if (is_active)
+      active_stack.push (current);
+#else //!NO_LOG_ALL
+  // If we have log_all.C, we let it keep track of the active_stack.
+  daisy_assert (active_stack.empty ());
+  for (vector<Select*>::const_iterator i = entries.begin (); 
+       i < entries.end (); 
+       i++)
+    if ((*i)->initial_match ())
+      is_active = true;
+#endif
+  is_printing = is_active;
+  return is_active;
+}
+
+void
+LogSelect::initial_done ()
+{ 
+#ifdef NO_LOG_ALL
+  // No log_all.C file, keep track of active_stack here.
+  daisy_assert (is_active);
+  daisy_assert (active_stack.size () == 1);
+  active_stack.pop ();
+#endif
+}
+
 void 
 LogSelect::open (symbol name)
 { 

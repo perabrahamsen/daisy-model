@@ -12,6 +12,23 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.79
+
+** Log files now contain a line with initial content.
+
+This line display the initial content of all non-flux variables.  It
+only affect log parameterizations that has any non-flux variables.
+
+** Changed default for OrganicMatter input root parameter to 800 [kg C/ha/y]
+
+This reflect simulation results made by Henrik Svendsen.
+
+** New duplicate warning.
+
+If you specify the same attribute twice in the same list, you will get
+a warning.  Same if you define a parameterization twice, or try to
+overwrite a build-in model.
+
 * 2.78
 
 ** The old log file syntax is restored.

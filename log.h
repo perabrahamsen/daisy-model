@@ -55,6 +55,11 @@ public:
   // Called at the end of each time step.
   virtual void done ();
 
+  // Initial line.
+public:
+  virtual bool initial_match (const Daisy&, Treelog&);
+  virtual void initial_done ();
+
   // Normal items.
 public:
   struct Open

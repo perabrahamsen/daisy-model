@@ -431,6 +431,10 @@ the log system will need to accumulate the hourly leaching to\n\
 calculate the daily values.  For content variables, no accumulation is\n\
 needed (or desired).  If you log nitrogen content on a daily basis, the\n\
 log will contain the value present at the end of the day.");
+  syntax.add ("interesting_content", Syntax::Boolean, Syntax::Const, "\
+True if the content of this column is interesting enough to warrent an\n\
+initial line in the log file.  This only affects non-flux variables.");
+  alist.add ("interesting_content", true);
   syntax.add ("factor", Syntax::Unknown (), Check::none (), Syntax::Const, "\
 Factor to multiply the calculated value with, before logging.");
   alist.add ("factor", 1.0);
@@ -473,9 +477,11 @@ Select::check (Treelog& err) const
 }
 
 Select::Select (const AttributeList& al)
-  : impl (*new Implementation (al)),
+  : name (al.name ("type")),
+    impl (*new Implementation (al)),
     accumulate (al.flag ("accumulate")),
     flux (al.check ("when") ||  (al.check ("flux") && al.flag ("flux"))),
+    interesting_content (al.flag ("interesting_content")),
     count (al.integer ("count")),
     path (al.identifier_sequence ("path")),
     last_index (path.size () - 1),

@@ -370,7 +370,7 @@ SMB pool, while the last number correspond to the SOM buffer.");
 Amount of carbon added to the organic matter system from dead roots.\n\
 \n\
 This is part of the total amount specified by the 'input' parameter.");
-  alist.add ("root", 1200 * 0.4); // 1.2 t/ha
+  alist.add ("root", 800.0); // According to HSV simulations.
   syntax.add ("dist", "cm", Check::positive (), Syntax::Const, "\
 Distance to go down in order to decrease the root density to half the\n\
 original.");

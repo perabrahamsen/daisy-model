@@ -55,6 +55,39 @@ LogAll::done ()
   active_stack.pop ();
 }
 
+bool 
+LogAll::initial_match (const Daisy& daisy, Treelog& msg)
+{
+  is_active = false;
+  for (unsigned int i = 0; i < slaves.size (); i++)
+    if (slaves[i]->initial_match (daisy, msg))
+      is_active = true;
+
+  if (is_active)
+    {
+      daisy_assert (active_stack.empty ());
+      active_stack.push (vector<Select*> ());
+      vector<Select*>& current = active_stack.top ();
+      daisy_assert (current.size () == 0);
+
+      for (unsigned int i = 0; i < entries.size (); i++)
+	if (entries[i]->is_active)
+	  current.push_back (entries[i]);
+    }
+
+  return is_active;
+}
+
+void 
+LogAll::initial_done ()
+{
+  for (unsigned int i = 0; i < slaves.size (); i++)
+    if (slaves[i]->is_active)
+      slaves[i]->initial_done ();
+
+  active_stack.pop ();
+}
+
 const AttributeList& 
 LogAll::get_alist ()
 {

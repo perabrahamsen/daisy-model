@@ -38,6 +38,14 @@ struct Log::Implementation
   list<const Geometry*> geometries;
 };
 
+bool 
+Log::initial_match (const Daisy&, Treelog&)
+{ return false; }
+
+void
+Log::initial_done ()
+{ }
+
 bool
 Log::check_entry (symbol name, const Library& library) const
 {

@@ -522,6 +522,7 @@ daisy_daisy_tick_action (Daisy* daisy)
   try
     {
       TreelogStream treelog (cerr);
+      daisy->action.tick (*daisy, treelog);
       daisy->action.doIt (*daisy, treelog);
     }
   catch (const char* error)
@@ -625,6 +626,8 @@ daisy_daisy_tick_time (Daisy* daisy)
   try
     {
       daisy->time.tick_hour (); 
+      TreelogStream treelog (cerr);
+      daisy->initial_logs (treelog); // BUG: We lose first hour.
     }
   catch (const char* error)
     {

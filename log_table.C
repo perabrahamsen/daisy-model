@@ -53,8 +53,16 @@ struct LogTable : public LogSelect, public Select::Destination
   const vector<double>* dest_array;
   
   // Log.
+  void common_match (const Daisy& daisy, Treelog& out);
+  void common_done ();
+
+  // Log.
   bool match (const Daisy& daisy, Treelog& out);
   void done ();
+
+  // Initial line.
+  bool initial_match (const Daisy&, Treelog&);
+  void initial_done ();
 
   // Select::Destination
   void error (const string& tag);
@@ -72,28 +80,19 @@ struct LogTable : public LogSelect, public Select::Destination
 const char *const LogTable::default_description = "\
 Each selected variable is represented by a column in the specified log file.";
 
-bool 
-LogTable::match (const Daisy& daisy, Treelog& msg)
+void
+LogTable::common_match (const Daisy& daisy, Treelog&)
 {
   if (print_header)
     {
       print_dlf_header (out, daisy.alist);
       print_header = false;
     }
-  return LogSelect::match (daisy, msg);
 }
+
 void 
-LogTable::done ()
+LogTable::common_done ()
 { 
-  LogSelect::done ();
-
-  if (!is_printing)
-    return;
-
-  for (unsigned int i = 0; i < entries.size (); i++)
-    if (entries[i]->prevent_printing ())
-      return;
-
   if (print_tags)
     {
       // Print the entry names in the first line of the log file..
@@ -224,6 +223,44 @@ LogTable::done ()
   out << record_separator;
   if (flush)
     out.flush ();
+}
+
+bool 
+LogTable::match (const Daisy& daisy, Treelog& msg)
+{
+  common_match (daisy, msg);
+  return LogSelect::match (daisy, msg);
+}
+void 
+LogTable::done ()
+{ 
+  LogSelect::done ();
+
+  if (!is_printing)
+    return;
+
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->prevent_printing ())
+      return;
+
+  common_done ();
+}
+bool 
+LogTable::initial_match (const Daisy& daisy, Treelog& msg)
+{
+  common_match (daisy, msg);
+  return LogSelect::initial_match (daisy, msg);
+}
+void 
+LogTable::initial_done ()
+{ 
+  LogSelect::initial_done ();
+
+  for (unsigned int i = 0; i < entries.size (); i++)
+    if (entries[i]->prevent_printing ())
+      return;
+
+  common_done ();
 }
 
 void 

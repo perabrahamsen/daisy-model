@@ -48,6 +48,7 @@ public:
   // Content.
 public:
   bool running;
+  bool logging;
   const std::vector<Log*> logs;
   LogAll& log_all;
   static const std::vector<Log*> 
@@ -63,6 +64,7 @@ public:
   // Simulation.
 public:
   void tick_columns (Treelog&);
+  void initial_logs (Treelog&);
   void tick_logs (Treelog&);
   void tick (Treelog&);
   void run (Treelog&);

@@ -61,6 +61,7 @@ Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
     alist (al),
     running (false),
+    logging (false),
     logs (map_create<Log> (al.alist_sequence ("output"))),
     log_all (*new LogAll (logs)),
     active_logs (find_active_logs (logs, log_all)),
@@ -119,18 +120,48 @@ Daisy::tick_columns (Treelog& out)
 { field.tick (out, time, weather); }
 
 void
-Daisy::tick_logs (Treelog& out)
+Daisy::initial_logs (Treelog& out)
 {
   activate_output.tick (*this, out);
 
   if (activate_output.match (*this))
+    {
+      if (!logging)
+	{
+	  // get initial values for previous day.
+	  Time previous (time);
+	  previous.tick_hour (-1);
+	  for (unsigned int i = 0; i < active_logs.size (); i++)
+	    {
+	      Log& log = *active_logs[i];
+	      if (log.initial_match (*this, out))
+		{
+		  output_submodule (previous, "time", log);
+		  if (weather)
+		    output_derived (*weather, "weather", log);
+		  output_submodule (field, "column", log);
+		  output_vector (harvest, "harvest", log);
+		  output_derived (action, "manager", log);
+		  log.initial_done ();
+		}
+	    }
+	}
+      logging = true;
+    }
+  else
+    logging = false;
+}
+
+void
+Daisy::tick_logs (Treelog& out)
+{
+  if (logging)
     {
       for (unsigned int i = 0; i < active_logs.size (); i++)
 	{
 	  Log& log = *active_logs[i];
 	  if (log.match (*this, out))
 	    {
-	      output_variable (time, log); // Obsolete.
 	      output_submodule (time, "time", log);
 	      if (weather)
 		output_derived (*weather, "weather", log);
@@ -150,6 +181,7 @@ Daisy::tick_logs (Treelog& out)
 void
 Daisy::tick (Treelog& out)
 { 
+  initial_logs (out);
   if (weather)
     weather->tick (time, out);
   action.tick (*this, out);

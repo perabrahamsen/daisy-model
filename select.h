@@ -38,12 +38,15 @@ typedef map<string, string, less<string>/**/> string_map;
 class Select
 {
   // Content.
+public:
+  const symbol name;
 private:
   struct Implementation;
   Implementation& impl;
 protected:
   const bool accumulate;	// Accumulate numbers over time.
   const bool flux;		// Is this a flux variable?
+  const bool interesting_content; // Is this worth an initial line?
   double convert (double) const; // Convert value.
   int count;			// Number of accumulated values.
 public:
@@ -123,8 +126,12 @@ public:
     is_active = flux || is_printing;
     return is_active;
   }
-
-   // Print result at end of time step.
+  bool initial_match ()
+  { 
+    is_active = !flux;
+    return is_active;
+  }
+  // Print result at end of time step.
   virtual void done (Destination& dest) = 0;
   virtual bool prevent_printing ();
 

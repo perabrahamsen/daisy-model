@@ -660,7 +660,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 }
 
 void
-WeatherStandard::initialize (const Time&, Treelog& err)
+WeatherStandard::initialize (const Time& time, Treelog& err)
 { 
   Treelog::Open nest (err, "Weather: " + name);
 
@@ -912,6 +912,11 @@ WeatherStandard::initialize (const Time&, Treelog& err)
 
   // Start of data.
   end_of_header = lex->position ();
+
+  // Start reading.
+  Time previous (time);
+  previous.tick_hour (-1);
+  tick (previous, err);
 }
 
 WeatherStandard::WeatherStandard (const AttributeList& al)

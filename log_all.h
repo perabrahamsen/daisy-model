@@ -35,6 +35,10 @@ public:
   bool match (const Daisy& daisy, Treelog&);
   void done ();
 
+  // Initial line.
+  bool initial_match (const Daisy&, Treelog&);
+  void initial_done ();
+
   // Create and destroy.
 private:
   static const AttributeList& get_alist ();

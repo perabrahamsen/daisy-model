@@ -963,6 +963,8 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h \
 common${OBJ}: common.C common.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h assertion.h
+select_date${OBJ}: select_date.C select.h condition.h librarian.h common.h \
+ library.h symbol.h alist.h syntax.h treelog.h assertion.h
 phenology_TSum${OBJ}: phenology_TSum.C phenology.h librarian.h common.h \
  library.h symbol.h alist.h syntax.h treelog.h assertion.h \
  production.h vernalization.h plf.h

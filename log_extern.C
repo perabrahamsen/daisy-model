@@ -81,6 +81,10 @@ struct LogExtern : public LogSelect,
   // Log.
   void done ();
 
+  // No initial line.
+  bool initial_match (const Daisy&, Treelog&)
+  { return false; }
+
   // Select::Destination
   void error (const string& tag);
   void missing (const string& tag);

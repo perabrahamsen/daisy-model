@@ -1,32 +1,16 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* horizon texture
-
-Gør det muligt at give fejl hvis summen er forskellig fra 1.0 (100%).
-
 * Log models
 
 ** keep total_accumulated
 
 ** C balance fil.
 
-** april: ekstra linie i output
-
 I den første linie skal "begyndelsesindhold" stå.
-
-* Kig på Anders C/N forsøg.
-
-** Sørg for at C, N og C_per_N alle kan sætter.
 
 * FertOrgaNic
 
 ** Post excersizes and answers
-
-* K_at_h
-
-Ret eksempel så det bliver XXX [m/s].
-
-Svar evt. Merete.
 
 * Weather std:  make "end" two days before specified.
 
@@ -43,8 +27,6 @@ Svar evt. Merete.
 ** Akademisk bekrivelse?
 
 Til referencemanual?
-
-* dk-horizon.dai med Sørens tal for Jb jorde.
 
 * SH: PowerPoint validation slides på hjemmeside.
 
@@ -66,6 +48,16 @@ or use them everywhere.
 (deffoo sub super
   ;; Undo the setting of bar.
   (bar #undef))
+
+* append / prepend command to parse
+
+(append output "N Balance")
+
+will append "N Balance" to the end of the "output" parameter.
+
+* horizon texture
+
+Gør det muligt at give fejl hvis summen er forskellig fra 1.0 (100%).
 
 * biomod: G+P74 rootdens model hvor a er en parameter
 

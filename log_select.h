@@ -51,6 +51,10 @@ struct LogSelect : public Log
   bool match (const Daisy& daisy, Treelog&);
   void done ();
 
+  // Initial line.
+  bool initial_match (const Daisy&, Treelog&);
+  void initial_done ();
+
   // Open normal items.
   void open (symbol name);
   void close ();

@@ -1,5 +1,30 @@
 2003-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.79 released.
+
+2003-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.C, log.h (initial_match, initial_done): New virtual members.
+	* log_all.C, log_all.h (initial_match, initial_done): Implemented.
+	* log_select.C, log_select.h (initial_match, initial_done): Ditto.
+	* daisy.C (initial_logs): New member function.
+	(logging): New member variable.
+	(tick_logs, tick): Use it.
+	* cdaisy.C (daisy_daisy_tick_time): Call it.
+	* weather_std.C (initialize): Read previous hour.
+	* select.h, select.C (interesting_content): New parameter.
+	* lib/log.dai: Specify it.
+
+	* cdaisy.C (daisy_daisy_tick_action): Call 'Action::tick'.
+
+	* parser_file.C (load_list): Add warning for parameters specified
+	twice. 
+	* parser_file.C (add_derived): Ditto for duplicate parameterizations.
+
+	* organic_matter.C (root): Changed default value to 800
+	[kg/ha/y].  It used to be 1.20 Mg * 0.4, but that number did not
+	include rhizodeposition.
+
 	* Version 2.78 released.
 
 2003-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -30,6 +30,9 @@
 #include "units.h"
 #include "mathlib.h"
 
+#include <set>
+using namespace std;
+
 struct ParserFile::Implementation
 {
   // Inputs.
@@ -367,6 +370,17 @@ ParserFile::Implementation::add_derived (Library& lib)
 {
   // Get the name of the class and the existing superclass to derive from.
   const symbol name = get_symbol ();
+  // Check for duplicates.
+  if (lib.check (name))
+    {
+      const AttributeList& old = lib.lookup (name);
+      if (old.check ("parsed_from_file"))
+	warning (name + " is already defined in " 
+		 + old.identifier ("parsed_from_file") + ", overwriting");
+      else
+	warning (name + " is already defined, overwriting");
+      lib.remove (name);
+    }
   const symbol super = get_symbol ();
   if (!lib.check (super))
     {
@@ -444,6 +458,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 { 
   vector<string>::const_iterator current = syntax.order ().begin ();
   const vector<string>::const_iterator end = syntax.order ().end ();
+  set<string> found;
 
   while ( good () && !looking_at (')'))
     {
@@ -464,7 +479,16 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  name = *current;
 	  current++;
 	}
-	
+
+      // Duplicate warning.
+      if (found.find (name) != found.end ())
+	warning (name + " specified twice, last takes precedence");
+      else if (syntax.lookup (name) != Syntax::Library // (deffoo ...)
+	       && (syntax.lookup (name) != Syntax::Object
+		   || (&syntax.library (name) // (input file ...)
+		       != &Librarian<Parser>::library ())))
+	found.insert (name);
+
       if (syntax.size (name) == Syntax::Singleton)
 	switch (syntax.lookup (name))
 	  {
