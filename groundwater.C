@@ -22,6 +22,7 @@
 
 #include "groundwater.h"
 #include "log.h"
+#include "assertion.h"
 
 EMPTY_TEMPLATE
 Librarian<Groundwater>::Content* Librarian<Groundwater>::content = NULL;
@@ -29,6 +30,14 @@ Librarian<Groundwater>::Content* Librarian<Groundwater>::content = NULL;
 const char *const Groundwater::description = "\
 The 'groundwater' component is responsible for specifying the\n\
 groundwater table at each timestep.";
+
+bool 
+Groundwater::is_pipe () const
+{ return false; }
+
+double 
+Groundwater::pipe_height () const
+{ daisy_assert (false); }
 
 void
 Groundwater::update_water (const Soil&, const SoilHeat&,

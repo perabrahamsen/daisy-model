@@ -23,6 +23,7 @@
 #define VCHECK_H
 
 #include <string>
+#include <vector>
 using namespace std;
 
 class AttributeList;
@@ -40,7 +41,7 @@ public:
 public:
   static const VCheck& valid_year ();
 
-  // PLF or Integer sequence.
+  // PLF or Number sequence.
 public:
   static const VCheck& increasing ();
   static const VCheck& non_decreasing ();
@@ -48,6 +49,16 @@ public:
   static const VCheck& decreasing ();
   static const VCheck& sum_equal_0 ();
   static const VCheck& sum_equal_1 ();
+  class SumEqual;
+  class StartValue;
+  class EndValue;
+  
+  // PLF.
+public:
+  class FixedPoint;
+
+  // Logic.
+  class All;
   
   // Create and Destroy.
 private:
@@ -59,7 +70,7 @@ public:
   virtual ~VCheck ();
 };
 
-class SumEqual : public VCheck
+class VCheck::SumEqual : public VCheck
 {
   // Parameters.
 private:
@@ -75,6 +86,80 @@ private:
   // Create and Destroy.
 public:
   SumEqual (double value);
+};
+
+class VCheck::StartValue : public VCheck
+{
+  // Parameters.
+private:
+  const double fixed;
+
+  // Use.
+private:
+  void validate (double value) const throw (string);
+  void validate (const PLF& value) const throw (string);
+  virtual void check (const Syntax&, const AttributeList&, const string& key)
+    const throw (string);
+
+  // Create and Destroy.
+public:
+  StartValue (double value);
+};
+
+class VCheck::EndValue : public VCheck
+{
+  // Parameters.
+private:
+  const double fixed;
+
+  // Use.
+private:
+  void validate (double value) const throw (string);
+  void validate (const PLF& value) const throw (string);
+  virtual void check (const Syntax&, const AttributeList&, const string& key)
+    const throw (string);
+
+  // Create and Destroy.
+public:
+  EndValue (double value);
+};
+
+class VCheck::FixedPoint : public VCheck
+{
+  // Parameters.
+private:
+  const double fixed_x;
+  const double fixed_y;
+
+  // Use.
+private:
+  void validate (const PLF& value) const throw (string);
+  virtual void check (const Syntax&, const AttributeList&, const string& key)
+    const throw (string);
+
+  // Create and Destroy.
+public:
+  FixedPoint (double x, double y);
+};
+
+class VCheck::All : public VCheck
+{
+  // Parameters.
+private:
+  vector<const VCheck*> checks;
+
+  // Use.
+private:
+  virtual void check (const Syntax&, const AttributeList&, const string& key)
+    const throw (string);
+
+  // Create and Destroy.
+public:
+  All (const VCheck& a, const VCheck& b);
+  All (const VCheck& a, const VCheck& b, const VCheck& c);
+  All (const VCheck& a, const VCheck& b, const VCheck& c, const VCheck& d);
+  All (const VCheck& a, const VCheck& b, const VCheck& c, const VCheck& d, 
+       const VCheck& e);
 };
 
 #endif // VCHECK_H

@@ -1,12 +1,24 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* initialiser SOM_fractions fra C_input (== initial AM).
+* april: ekstra linie i output
 
-** Check hvor dSOM2 er underlig i Exercise09.dai
+I den første linie skal "begyndelsesindhold" stå.
+
+* april: automatisk aquitart horizont
+
+Øverste tredjedel af aquitarten.
+
+* OrganicMatter
 
 ** init.mineralization
 
-density = am_input + som_input
+Al mineralisering fra første horizont?
+
+** Inaktiv SOM pulje SOM3 / SOM0?
+
+** turnover rates afhængig af horizont?
+
+** Split SOM C/N i to:  Målt og mål.
 
 ** Tilføj beskrivelse til tutorial.
 
@@ -15,27 +27,6 @@ density = am_input + som_input
 ** Konverter til LaTeX
 
 ** Ret til.
-
-* april: Enable macropores by default
-
-Hvis ler + humus i den øverste horizont er over 5%.
-
-Makroporerne skal gå ned til min (1.5 m,
-	     drænrørsdybde,
-	     første horizont med ler + humus < 5%)
-
-Generelt skal makroporerne gå lige ned til 80 cm, hvorefter de stopper
-lineært ned til 150 cm.  
-
-init = -3 [cm], end = -30 [cm]
-
-* april: ekstra linie i output
-
-I den første linie skal "begyndelsesindhold" stå.
-
-* april: automatisk aquitart horizont
-
-Øverste tredjedel af aquitarten.
 
 * SH: PowerPoint slides på hjemmeside.
 

@@ -23,6 +23,7 @@
 #include "tmpstream.h"
 #include <vector>
 #include <algorithm>
+#include <iostream>
 using namespace std;
 
 namespace Assertion
@@ -33,6 +34,9 @@ namespace Assertion
 void 
 Assertion::message (const string& msg)
 {
+  if (logs.size () == 0)
+    cerr << msg;
+
   for (unsigned int i = 0; i < logs.size (); i++)
     {
       logs[i]->entry (msg);
@@ -50,7 +54,7 @@ Assertion::failure (const char* file, int line, const char* fun,
     tmp () << " in " << fun;
   
   message (tmp.str ());
-  exit (3);
+  throw (3);
 }
 
 void 
@@ -83,7 +87,7 @@ Assertion::panic (const char* file, int line, const char* fun,
 		  const string& msg)
 {
   bug (file, line, fun, msg);
-  exit (3);
+  throw (3);
 }
 
 Assertion::Register::Register (Treelog& log)

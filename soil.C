@@ -308,7 +308,8 @@ Soil::initialize (const Groundwater& groundwater, Treelog& msg)
 	fixed.push_back (last);
       }
   }
-  initialize_zplus (groundwater, fixed, -impl.MaxRootingDepth, msg);
+  initialize_zplus (groundwater, fixed, -impl.MaxRootingDepth, 
+		    2 * impl.dispersivity, msg);
 
   // Initialize horizons.
   layer = begin;

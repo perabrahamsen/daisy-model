@@ -28,6 +28,10 @@ Librarian<Macro>::Content* Librarian<Macro>::content = NULL;
 const char *const Macro::description = "\
 Preferention flow in soil macro pores.";
 
+bool 
+Macro::none () const 
+{ return false; }
+
 Macro::Macro (const AttributeList& al)
   : name (al.name ("type"))
 { }

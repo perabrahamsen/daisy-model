@@ -225,7 +225,7 @@ VCheck::~VCheck ()
 { }
 
 void 
-SumEqual::validate (double value) const throw (string)
+VCheck::SumEqual::validate (double value) const throw (string)
 {
   if (!approximate (value, sum))
     {
@@ -236,7 +236,7 @@ SumEqual::validate (double value) const throw (string)
 }
 
 void 
-SumEqual::validate (const PLF& plf) const throw (string)
+VCheck::SumEqual::validate (const PLF& plf) const throw (string)
 {
   const int end = plf.size () - 1;
   daisy_assert (end >= 0);
@@ -248,8 +248,8 @@ SumEqual::validate (const PLF& plf) const throw (string)
 }
 
 void
-SumEqual::check (const Syntax& syntax, const AttributeList& alist, 
-		 const string& key) const throw (string)
+VCheck::SumEqual::check (const Syntax& syntax, const AttributeList& alist, 
+			 const string& key) const throw (string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -268,9 +268,9 @@ SumEqual::check (const Syntax& syntax, const AttributeList& alist,
 	validate (alist.plf (key));
       else
 	{
-	  const vector<int> plfs = alist.integer_sequence (key);
+	  const vector<const PLF*> plfs = alist.plf_sequence (key);
 	  for (unsigned int i = 0; i < plfs.size (); i++)
-	    validate (plfs[i]);
+	    validate (*plfs[i]);
 	}
       break;
     default:
@@ -278,6 +278,192 @@ SumEqual::check (const Syntax& syntax, const AttributeList& alist,
     }
 }
 
-SumEqual::SumEqual (double value)
+VCheck::SumEqual::SumEqual (double value)
   : sum (value)
 { }
+
+void 
+VCheck::StartValue::validate (double value) const throw (string)
+{
+  if (!approximate (value, fixed))
+    {
+      TmpStream tmp;
+      tmp () << "Start value is " << value << " but should be " << fixed;
+      throw string (tmp.str ());
+    }
+}
+
+void 
+VCheck::StartValue::validate (const PLF& plf) const throw (string)
+{ validate (plf.y (0)); }
+
+void
+VCheck::StartValue::check (const Syntax& syntax, const AttributeList& alist, 
+			   const string& key) const throw (string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  
+  switch (syntax.lookup (key))
+    {
+    case Syntax::Number:
+      {
+	daisy_assert (syntax.size (key) != Syntax::Singleton);
+	const vector<double>& numbers = alist.number_sequence (key);
+	if (numbers.size () > 0)
+	  validate (numbers[0]);
+      }
+      break;
+    case Syntax::PLF:
+      if (syntax.size (key) == Syntax::Singleton)
+	validate (alist.plf (key));
+      else
+	{
+	  const vector<const PLF*> plfs = alist.plf_sequence (key);
+	  for (unsigned int i = 0; i < plfs.size (); i++)
+	    validate (*plfs[i]);
+	}
+      break;
+    default:
+      daisy_assert (false);
+    }
+}
+
+VCheck::StartValue::StartValue (double value)
+  : fixed (value)
+{ }
+
+void 
+VCheck::EndValue::validate (double value) const throw (string)
+{
+  if (!approximate (value, fixed))
+    {
+      TmpStream tmp;
+      tmp () << "End value is " << value << " but should be " << fixed;
+      throw string (tmp.str ());
+    }
+}
+
+void 
+VCheck::EndValue::validate (const PLF& plf) const throw (string)
+{ 
+  daisy_assert (plf.size () > 0);
+  validate (plf.y (plf.size () - 1)); 
+}
+
+void
+VCheck::EndValue::check (const Syntax& syntax, const AttributeList& alist, 
+			   const string& key) const throw (string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  
+  switch (syntax.lookup (key))
+    {
+    case Syntax::Number:
+      {
+	daisy_assert (syntax.size (key) != Syntax::Singleton);
+	const vector<double>& numbers = alist.number_sequence (key);
+	if (numbers.size () > 0)
+	  validate (numbers[numbers.size () - 1]);
+      }
+      break;
+    case Syntax::PLF:
+      if (syntax.size (key) == Syntax::Singleton)
+	validate (alist.plf (key));
+      else
+	{
+	  const vector<const PLF*> plfs = alist.plf_sequence (key);
+	  for (unsigned int i = 0; i < plfs.size (); i++)
+	    validate (*plfs[i]);
+	}
+      break;
+    default:
+      daisy_assert (false);
+    }
+}
+
+VCheck::EndValue::EndValue (double value)
+  : fixed (value)
+{ }
+
+void 
+VCheck::FixedPoint::validate (const PLF& plf) const throw (string)
+{ 
+  if (!approximate (plf (fixed_x), fixed_y))
+    {
+      TmpStream tmp;
+      tmp () << "Value at " << fixed_x << " should be " << fixed_y 
+	     << " but is << " << plf (fixed_x);
+      throw (string (tmp.str ()));
+    }
+}
+
+void
+VCheck::FixedPoint::check (const Syntax& syntax, const AttributeList& alist, 
+			   const string& key) const throw (string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  
+  switch (syntax.lookup (key))
+    {
+    case Syntax::PLF:
+      if (syntax.size (key) == Syntax::Singleton)
+	validate (alist.plf (key));
+      else
+	{
+	  const vector<const PLF*> plfs = alist.plf_sequence (key);
+	  for (unsigned int i = 0; i < plfs.size (); i++)
+	    validate (*plfs[i]);
+	}
+      break;
+    default:
+      daisy_assert (false);
+    }
+}
+
+VCheck::FixedPoint::FixedPoint (double x, double y)
+  : fixed_x (x),
+    fixed_y (y)
+{ }
+
+void
+VCheck::All::check (const Syntax& syntax, const AttributeList& alist, 
+		    const string& key) const throw (string)
+{
+  for (int i = 0; i < checks.size (); i++)
+    checks[i]->check (syntax, alist, key);
+}
+
+VCheck::All::All (const VCheck& a, const VCheck& b)
+{
+  checks.push_back (&a);
+  checks.push_back (&b);
+}
+
+VCheck::All::All (const VCheck& a, const VCheck& b, const VCheck& c)
+{
+  checks.push_back (&a);
+  checks.push_back (&b);
+  checks.push_back (&c);
+}
+
+VCheck::All::All (const VCheck& a, const VCheck& b, const VCheck& c, 
+		  const VCheck& d)
+{
+  checks.push_back (&a);
+  checks.push_back (&b);
+  checks.push_back (&c);
+  checks.push_back (&d);
+}
+
+VCheck::All::All (const VCheck& a, const VCheck& b, const VCheck& c,
+		  const VCheck& d, const VCheck& e)
+{
+  checks.push_back (&a);
+  checks.push_back (&b);
+  checks.push_back (&c);
+  checks.push_back (&d);
+  checks.push_back (&e);
+}

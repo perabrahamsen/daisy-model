@@ -181,7 +181,7 @@ struct OrganicMatter::Implementation
 		      double T, double h, const int lay) const;
   double abiotic (const OM& om, double T, double h, 
 		  bool use_clay, int lay) const;
-  void partition (const vector<double> am_input, double T, double h, 
+  void partition (const vector<double>& am_input, double T, double h, 
 		  int lay, double total_C, 
 		  const vector<double>& SOM_fractions,
 		  const vector<double>& SOM_C_per_N, Treelog& msg,
@@ -1068,9 +1068,9 @@ OrganicMatter::Implementation::abiotic (const OM& om, double T, double h,
 }
 				     
 void
-OrganicMatter::Implementation::partition (const vector<double> am_input, 
-					  double T, double h,
-					  int lay, double total_C,
+OrganicMatter::Implementation::partition (const vector<double>& am_input, 
+					  const double T, const double h,
+					  const int lay, const double total_C,
 					  const vector<double>& SOM_fractions,
 					  const vector<double>& SOM_C_per_N,
 					  Treelog& msg,
@@ -1213,6 +1213,7 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
     }
 
   // Additional SOM equations.
+  bool use_humus_equation = false; // Remember whether we conserve humus.
   for (unsigned int pool = 0; pool < som_size; pool++)
     {
       if (som[pool]->C.size () > lay)
@@ -1233,6 +1234,7 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
 	    matrix.set_entry (equation, smb_column + i, 1.0);
 	  for (unsigned int i = 0; i < som_size; i++)
 	    matrix.set_entry (equation, som_column + i, 1.0);
+	  use_humus_equation = true;
 	}
       else if (SOM_fractions.size () > 0)
 	{
@@ -1362,7 +1364,7 @@ OrganicMatter::Implementation::partition (const vector<double> am_input,
   double total = 0.0;
   for (unsigned int i = 0; i < smb_size + som_size; i++)
     total += matrix.result (i);
-  daisy_assert (approximate (total, total_C));
+  daisy_assert (!use_humus_equation || approximate (total, total_C));
 
   bool error_found = false;
 

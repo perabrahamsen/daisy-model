@@ -1,3 +1,41 @@
+2003-02-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.50 released.
+
+2003-02-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vcheck.C, vcheck.h (SumEqual): Made it a member of VCheck.
+	(StartValue, EndValue, FixedPoint, All): New checks.
+	* macro_std.C (load_syntax): Use them.
+	(check_alist): Removed duplicate check.
+	(check_alist): Added check that end pressure is lower than initial
+	pressure.
+
+	* macro_std.C (pressure_initiate, pressure_end): Added default
+	values. 
+	* macro_std.C, macro.h (create): New function.
+	* soil_water.C (initialize): Use it.
+	* macro.C, macro.h, macro_none.C (none): New predicate.
+	* soil_water.C (initialize): Use it.
+	* groundwater.C, groundwater.h, groundwater_pipe.C (is_pipe,
+	pipe_height): New functions.
+	* geometry.C (initialize_zplus): Use them.
+	* soil_water.C (initialize): Use them.
+
+	* geometry.C, geometry.h (initialize_zplus): New 'max_interval'
+	parameter. 
+	* soil.C (initialize): Update caller.
+
+	* assertion.C (message): Use cerr if no logs are defined.
+	(failure, panic): Throw an int instead of calling exit.
+	* main.C (main): Catch ints.
+
+2003-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.g (Implementation, impl): Moved
+	everything to impl.
+	(macro): Made it optional.
+
 2003-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.49 released.

@@ -331,16 +331,14 @@ void
 Geometry::initialize_zplus (const Groundwater& groundwater,
 			    const vector<double>& fixed,
 			    const double max_rooting_depth,
+			    const double max_interval,
 			    Treelog& msg)
 {
   if (zplus_.empty ())
     {
       Treelog::Open nest (msg, "Geometry");
-      const Library& library = Librarian<Groundwater>::library ();
-      const string name = groundwater.name;
       const bool volatile_bottom = 
-	library.is_derived_from (name, "lysimeter")
-	|| library.is_derived_from (name, "pipe");
+	groundwater.is_lysimeter () || groundwater.is_pipe ();
 
       double last = 0.0;
       for (unsigned int i = 0; i < fixed.size ();)
@@ -378,6 +376,10 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 	      zone_end = current;
 	      zone_size = 20.0;
 	    }
+
+	  // Dispersivity limit.
+	  if (zone_size > max_interval)
+	    zone_size = max_interval;
 
 	  if (current < zone_end - zone_size)
 	    // The zone ends before the next fixed interval limit.

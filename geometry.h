@@ -78,6 +78,7 @@ protected:
   void initialize_zplus (const Groundwater& groundwater,
 			 const vector<double>& fixed,
 			 const double max_rooting_depth,
+			 const double max_interval,
 			 Treelog& msg);
   virtual ~Geometry ();
 };

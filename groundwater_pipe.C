@@ -55,9 +55,15 @@ class GroundwaterPipe : public Groundwater
   // UZbottom.
 public:
   bool flux_bottom () const
-    { return false; }
+  { return false; }
   bool accept_bottom (double)
-    { return true; }
+  { return true; }
+
+  // Identity
+  bool is_pipe () const
+  { return true; }
+  double pipe_height () const
+  { return pipe_position; }
 
   // Simulation.
 public:

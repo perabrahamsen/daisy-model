@@ -12,6 +12,34 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.50
+
+** Macropores now enabled by default for clay soil.
+
+If the combined humus and clay fraction of the top horizon is above
+5%, macropores will be enabled by default.  The macropores will go
+down to 150 cm, or the first non-clay horizon, or the position of any
+drain pipes, which ever is higher.
+
+You can disable macropores like done in this example:
+
+(defcolumn Andeby default
+  "No macropores"
+  (SoilWater (macro none))   ; Disable macropores.
+  (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
+        (MaxRootingDepth 60.0 [cm]))
+  (Groundwater deep))
+
+The macropores will be initiated when the presure go above -3 cm.
+
+** Automatic generated disretition now limited by dispersivity.
+
+No interval size will be more than twice the dispersivity.
+
+** Checkpoints work again.
+
+** More robust error handling.
+
 * 2.49
 
 ** Fixed bug introduced by 2.48 that prevented use of organic fertilizer.

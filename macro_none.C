@@ -24,6 +24,9 @@
 
 struct MacroNone : public Macro
 {
+  bool none () const
+  { return true; }
+
   // Simulation.
   void tick (const Soil& /* soil */, 
 	     unsigned int /* first */, unsigned int /* last */,

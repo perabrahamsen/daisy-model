@@ -128,6 +128,10 @@ main (int argc, char* argv[])
       treelog.error (string ("Standard exception: ") + typeid (e).name ()
 		     + ": " + e.what ());
     }
+  catch (const int error)
+    {
+      return error;
+    }
   catch (...)
     {
       treelog.error ("Unknown exception");

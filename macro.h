@@ -36,6 +36,7 @@ class Macro
 public:
   const string name;
   static const char *const description;
+  virtual bool none () const;
 
   // Simulation.
 public:
@@ -50,6 +51,8 @@ public:
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.
+public:
+  static Macro& create (double depth); // Defined in macro_std.C.
 protected:
   Macro (const AttributeList& al);
 public:

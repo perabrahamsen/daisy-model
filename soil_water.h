@@ -23,12 +23,10 @@
 #ifndef SOIL_WATER_H
 #define SOIL_WATER_H
 
-#include "macro.h"		// Must be included to intitalize the library.
-#include "common.h"
+#include "macro.h"		// Must be initialized.
 #include <vector>
 
 class AttributeList;
-class UZmodel;
 class Surface;
 class Groundwater;
 class Log;
@@ -36,69 +34,38 @@ class Soil;
 class Syntax;
 class Geometry;
 class SoilHeat;
+class Treelog;
 
 class SoilWater
 {
   // Content.
-  vector<double> S_sum_;
-  vector<double> S_root_;
-  vector<double> S_drain_;
-  vector<double> S_p_;
-  vector<double> S_permanent_;
-  vector<double> Theta_old_;
-  vector<double> h_old;
-  vector<double> Theta_;
-  vector<double> h_;
-  vector<double> S_ice_;
-  vector<double> X_ice_;
-  vector<double> X_ice_buffer;
-  vector<double> h_ice_;
-  vector<double> q_;
-  vector<double> q_p_;
-  UZmodel *const top;
-  UZmodel *const bottom;
-  const int bottom_start;
-  UZmodel *const reserve;
-  Macro& macro;
+  struct Implementation;
+  Implementation& impl;
 
   // Sink.
 public:
   void clear (const Geometry&);
-  void root_uptake (const vector<double>&);
-  void freeze (const Soil&, const vector<double>&);
+  void root_uptake (const std::vector<double>&);
+  void freeze (const Soil&, const std::vector<double>&);
   
   // Queries
 public:
-  double h (int i) const
-  { return h_[i]; }
+  double h (int i) const;
   double pF (int i) const;
-  double Theta (int i) const
-  { return Theta_[i]; }
-  double Theta_left (int i) const
-  { return Theta_[i] - S_sum_[i]; }
-  double Theta_old (int i) const
-  { return Theta_old_[i]; }
+  double Theta (int i) const;
+  double Theta_left (int i) const;
+  double Theta_old (int i) const;
   double content (const Geometry&, double from, double to) const; // [cm]
-  double q (int i) const
-  { return q_[i]; }
-  double q_p (int i) const
-  { return q_p_[i]; }
-  double S_sum (int i) const
-  { return S_sum_[i]; }
-  double S_root (int i) const
-  { return S_root_[i]; }
-  double S_drain (int i) const
-  { return S_drain_[i]; }
-  double S_ice (int i) const
-  { return S_ice_[i]; }
-  double S_p (int i) const
-  { return S_p_[i]; }
-  double h_ice (int i) const
-  { return h_ice_[i]; }
-  double X_ice (int i) const
-  { return X_ice_[i]; }
-  double X_ice_total (int i) const
-  { return X_ice_[i] + X_ice_buffer[i]; }
+  double q (int i) const;
+  double q_p (int i) const;
+  double S_sum (int i) const;
+  double S_root (int i) const;
+  double S_drain (int i) const;
+  double S_ice (int i) const;
+  double S_p (int i) const;
+  double h_ice (int i) const;
+  double X_ice (int i) const;
+  double X_ice_total (int i) const;
 
   unsigned int first_groundwater_node () const;
     
@@ -123,9 +90,8 @@ public:
   double MaxExfiltration (const Soil&, double T) const;
 
   // Communication with external model.
-  void put_h (const Soil& soil, const vector<double>& v); // [cm]
-  void get_sink (vector<double>& v) const // [cm^3/cm^3/h]
-    { v = S_sum_; }
+  void put_h (const Soil& soil, const std::vector<double>& v); // [cm]
+  void get_sink (std::vector<double>& v) const; // [cm^3/cm^3/h]
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);
@@ -133,7 +99,7 @@ public:
   void initialize (const AttributeList&, 
 		   const Soil& soil, const Groundwater& groundwater,
 		   Treelog&);
-    ~SoilWater ();
+  ~SoilWater ();
 };
 
 #endif // SOIL_WATER_H
