@@ -14,6 +14,15 @@ release.
 
 * 3.69
 
+** lysimeter bottom may work now.
+
+Use 
+
+  (Groundwater lysimeter)
+
+in the column if you have a lysimeter below the soil (you must define
+the soil down to the lysimeter).
+
 ** New "hydraulic" program.
 
 This program print the retention curve and conductivity curve for the

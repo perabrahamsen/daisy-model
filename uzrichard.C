@@ -217,6 +217,39 @@ UZRichard::richard (Treelog& msg,
       if (!top.flux_top () && !top.soil_top ())
 	h[first] = top.h () - soil.z (first) + top_water;
 
+      // Bottom flux.
+      double q_bottom = 42.42e42;
+      daisy_assert (size > 0);
+      if (bottom.bottom_type () == UZbottom::lysimeter)
+        { 
+          if (h[size - 1] > h_lim)
+            {
+              q_bottom = -Kold[size-1];
+
+#if 0
+              const double Theta_diff 
+                = soil.Theta (last, h[size - 1], h_ice[last])
+                - soil.Theta (last, h_lim - 1.0, h_ice[last]);
+              daisy_assert (Theta_diff > 0);
+              const double dz = soil.dz (last);
+              const double max_K = Theta_diff * dz / ddt;
+
+              if (Kold[size-1] > max_K)
+                ddt = max (1e-5, Theta_diff * dz / Kold[size-1]);
+#endif
+            }
+          else 
+            q_bottom = 0.0;
+        }
+      else if (bottom.bottom_type () == UZbottom::forced_flux)
+        q_bottom = bottom.q_bottom ();
+      else
+        {
+          daisy_assert (bottom.bottom_type ()
+                        == UZbottom::free_drainage);
+          q_bottom = - Kold[size - 1];
+        }
+
       do
 	{
 	  h_conv = h;
@@ -305,30 +338,7 @@ UZRichard::richard (Treelog& msg,
 		  // Calculate lower boundary
 		  const double dz_minus = soil.z (first + i - 1) - z;
 
-		  if (bottom.bottom_type () != pressure)
-		    {
-		      double q_bottom;
-		      if (bottom.bottom_type () == UZbottom::lysimeter)
-			{ 
-			  if (h[i] > h_lim)
-			    q_bottom = -K[i];
-			  else 
-			    q_bottom = 0.0;
-			}
-		      else if (bottom.bottom_type () == UZbottom::forced_flux)
-			q_bottom = bottom.q_bottom ();
-		      else
-			{
-			  daisy_assert (bottom.bottom_type ()
-					== UZbottom::free_drainage);
-			  q_bottom = - Kold[i];
-			}
-
-		      b[i] = Cw2 + (ddt / dz) * (Kplus[i - 1] / dz_minus);
-		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
-			+ (ddt / dz) * (Kplus[i - 1] + q_bottom);
-		    }
-		  else
+		  if (bottom.bottom_type () == pressure)
 		    {
 		      const double dz_plus = z - soil.z (first + i + 1);
 		      //const double bottom_pressure = h[i + 1];
@@ -340,6 +350,27 @@ UZRichard::richard (Treelog& msg,
 			* (Kplus[i - 1]
 			   - Kplus[i] * (1.0 -  bottom_pressure/ dz_plus));
 		    }
+                  else if (bottom.bottom_type () == UZbottom::lysimeter
+                           && isnormal (q_bottom))
+                    {
+                      // Active lysimeter, use fake pressure bottom.
+		      const double dz_plus = z - soil.zplus (first + i);
+                      const double K_sat = soil.K (first + i, 0.0, 
+                                                   h_ice[first + i], 
+                                                   soil_heat.T (first + i));
+                      b[i] = Cw2 + (ddt / dz) * (  Kplus[i - 1] / dz_minus
+						+ K_sat / dz_plus);
+		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
+			+ (ddt / dz) * (Kplus[i - 1] - K_sat);
+                    }
+                  else
+                    {
+                      // Flux bottom.
+		      b[i] = Cw2 + (ddt / dz) * (Kplus[i - 1] / dz_minus);
+		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
+			+ (ddt / dz) * (Kplus[i - 1] + q_bottom);
+		    }
+
 		  a[i] = - (ddt / dz) * (Kplus[i - 1] / dz_minus);
 		  c[i] = 0.0;
 		}
@@ -376,6 +407,7 @@ UZRichard::richard (Treelog& msg,
 
       if (iterations_used > max_iterations)
 	{
+        try_again:
 	  number_of_time_step_reductions++;
 
 	  if (number_of_time_step_reductions > max_time_step_reductions)
@@ -427,14 +459,18 @@ UZRichard::richard (Treelog& msg,
 		{
 		  if (approximate (switched_top_last, time_left))
 		    {
-#if 0
 		      TmpStream tmp;
 		      tmp () << "available_water = " << available_water 
 			     << ", delta_top_water = " << delta_top_water
 			     << ", time left = " << time_left;
-		      msg.error (tmp.str ());
-#endif
+		      msg.debug (tmp.str ());
+#if 0
 		      throw ("Couldn't accept top flux");
+#else
+                      msg.warning ("Couldn't accept top flux");
+                      Theta = Theta_previous;
+                      goto try_again;
+#endif
 		    }
 		  else
 		    {
@@ -451,7 +487,14 @@ UZRichard::richard (Treelog& msg,
 	  else if (top.q () > 0.0)
 	    {
 	      // We have a saturated soil, with an upward flux.
+#if 0
 	      throw ("Saturated soil with an upward flux");
+#else
+              msg.warning ("Saturated soil with an upward flux");
+	      Theta = Theta_previous;
+              goto try_again;
+#endif
+              
 	    }
 	  else if (switched_top_last < time_left + ddt / 2.0)
             {
@@ -460,7 +503,13 @@ UZRichard::richard (Treelog& msg,
                      << "; time left: " << time_left << "; h[" << first 
                      << "] = " << h[first] <<"; q = " << top.q ();
               msg.debug (tmp.str ());
+#if 0
               throw ("Couldn't drain top flux");
+#else
+              msg.warning ("Couldn't drain top flux");
+	      Theta = Theta_previous;
+              goto try_again;
+#endif
             }
 	  else
 	    // We have saturated soil, make it a pressure top.
