@@ -777,7 +777,6 @@ static bool check_root (const AttributeList& al)
   non_positive (al.number ("depth"), "depth", ok);
   non_negative (al.number ("dist"), "dist", ok);
   non_negative (al.number ("weight"), "weight", ok);
-  is_fraction (al.number ("total_C_fraction"), "total_C_fraction", ok);
 
   return ok;
 }
@@ -836,25 +835,26 @@ Organic fertilizer, typically slurry or manure from animals.");
 	alist.add ("syntax", "organic");
 	syntax.add ("weight", "T w.w./ha", Syntax::Const,
 		    "Amount of fertilizer applied.");
-	syntax.add ("dry_matter_fraction", Syntax::None (), Syntax::Const,
+	syntax.add ("dry_matter_fraction", Syntax::Fraction (), Syntax::Const,
 		    "Dry matter fraction of total weight.");
-	syntax.add ("total_C_fraction", Syntax::None (), Syntax::Const,
+	syntax.add ("total_C_fraction", Syntax::Fraction (), Syntax::Const,
 		    "Carbon fraction of dry matter.");
-	syntax.add ("total_N_fraction", Syntax::None (), Syntax::Const,
+	syntax.add ("total_N_fraction", Syntax::Fraction (), Syntax::Const,
 		    "Nitrogen fraction of dry matter");
 	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
 				    "The individual AOM pools.");
-	syntax.add ("NO3_fraction", Syntax::None (), Syntax::Const, 
+	syntax.add ("NO3_fraction", Syntax::Fraction (), Syntax::Const, 
 		    "Nitrate fraction of total N in fertilizer.  \
 The remaining nitrogen is assumed to be ammonium or organic.");
 	alist.add ("NO3_fraction", 0.0);
-	syntax.add ("NH4_fraction", Syntax::None (), Syntax::Const, 
+	syntax.add ("NH4_fraction", Syntax::Fraction (), Syntax::Const, 
 		    "Ammonium fraction of total N in fertilizer.  \
 The remaining nitrogen is assumed to be nitrate or organic.");
 	alist.add ("NH4_fraction", 0.0);
-	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::OptionalConst, 
+	syntax.add ("NH4_evaporation",
+		    Syntax::Fraction (), Syntax::OptionalConst, 
 		    "Obsolete alias for `volatilization'.");
-	syntax.add ("volatilization", Syntax::None (), Syntax::Const, 
+	syntax.add ("volatilization", Syntax::Fraction (), Syntax::Const, 
 		    "Fraction of NH4 that evaporates on application.");
 	alist.add ("volatilization", 0.0);
 	Librarian<AM>::add_type ("organic", alist, syntax, &make);
@@ -869,12 +869,13 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 	alist.add ("creation", Time (1, 1, 1, 1));
 	syntax.add ("weight", "kg N/ha", Syntax::Const,
 		    "Amount of fertilizer applied.");
-	syntax.add ("NH4_fraction", Syntax::None (), Syntax::Const, 
+	syntax.add ("NH4_fraction", Syntax::Fraction (), Syntax::Const, 
 		    "Ammonium fraction of total N in fertilizer.  \
 The remaining nitrogen is assumed to be nitrate.");
-	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::OptionalConst, 
+	syntax.add ("NH4_evaporation",
+		    Syntax::Fraction (), Syntax::OptionalConst, 
 		    "Obsolete alias for `volatilization'.");
-	syntax.add ("volatilization", Syntax::None (), Syntax::Const, 
+	syntax.add ("volatilization", Syntax::Fraction (), Syntax::Const, 
 		    "Fraction of NH4 that evaporates on application.");
 	alist.add ("volatilization", 0.0);
 	alist.add ("syntax", "mineral");
@@ -921,7 +922,7 @@ Distance to go down in order to decrease the root density to half the \
 original.");
 	syntax.add ("weight", "T DM/ha", Syntax::Const, 
 		    "Total weight of old root dry matter.");
-	syntax.add ("total_C_fraction", Syntax::None (), Syntax::Const, 
+	syntax.add ("total_C_fraction", Syntax::Fraction (), Syntax::Const, 
 		    "Carbon fraction of total root dry matter");
 	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
 				    "The individual AOM pools.");

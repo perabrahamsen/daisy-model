@@ -64,7 +64,8 @@ static struct GroundwaterStaticSyntax
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      alist.add ("descriptions", "Fixed groundwater level.");
+      alist.add ("description", "Static groundwater level.\n\
+Provided for backward compatibility, use `deep' or `fixed' instead.");
       Groundwater::load_syntax (syntax, alist);
       syntax.add ("table", "cm", Syntax::Const,
 		  "Groundwater level.\n\

@@ -1,5 +1,27 @@
+2000-03-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.19 released.
+
+2000-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_fixed.C: New model.
+	* groundwater_deep.C: New model.
+	* Makefile (MODELS): Added them.
+	* groundwater_static.C (GroundwaterStaticSyntax): Fixed description.
+
 2000-02-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* syntax.C, syntax.h (Fraction): New dimension.
+	* parser_file.C (load_list): Check for fractions.
+	* action_crop.C, action_tillage.C, am.C, om.C, action_harvest.C,
+ 	action_tillage.C, bioincorporation.C: Updated dimensions. 
+	* chemical_std.C (ChemicalStandardSyntax): Ditto.
+	* weather.C (load_syntax): Ditto.
+	* surface.C (load_syntax): Ditto.
+	* soil_water.C (load_syntax): Ditto.
+	* om.C (load_syntax): Ditto.
+	* horizon.C (load_syntax): Ditto.
+	
 	* Version 1.18 released.
 
 2000-02-29  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -18,10 +18,26 @@
 #ifdef RIDGING
 struct Ridge
 {
-  const CSMP y;			// Ridge geometry function. [->cm]
-  const double dz_bottom;	// Size from surface to bottom ridge layer [cm]
-  const double R_crust;		// Resistance in crust. [???]
-}
+  // State.
+  CSMP y;			// Ridge geometry function. [->cm]
+  double dz_bottom;		// Size from surface to bottom ridge layer [cm]
+  double R_crust;		// Resistance in crust. [???]
+  unsigned int node_below;	// First node below ridge.
+
+  // Manipulators.
+  void set_geometry (const CSMP& value);
+  void set_R_crust (const double R_crust_);
+
+  // Create and Destroy.
+  static void load_syntax (Syntax&, AttributeList&);
+  Ridge (const AttributeList&);
+  ~Ridge ();
+};
+
+void
+Ridge::set_R_crust (const double value)
+{ R_crust = value; }
+
 #endif
 
 struct Surface::Implementation
@@ -223,6 +239,10 @@ Surface::Implementation::ponding () const
 double
 Surface::temperature () const
 { return impl.T; }
+
+unsigned int 
+Surface::node_below () const 
+{ return 0; }
 
 const IM& 
 Surface::matter_flux ()
@@ -433,7 +453,7 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Convertion of reference evapotranspiration to \n\
 potential evaporation for bare soil.");
   alist.add ("EpFactor", 0.8);
-  syntax.add ("EpInterchange", Syntax::None (), Syntax::Const,
+  syntax.add ("EpInterchange", Syntax::Fraction (), Syntax::Const,
 	      "\
 Canopy adsorbtion fraction of unreached potential soil evaporation.");
   alist.add ("EpInterchange", 0.6);

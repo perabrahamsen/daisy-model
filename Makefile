@@ -198,7 +198,8 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = action_heat.C hydraulic_M_vG_compact.C \
+MODELS = groundwater_fixed.C \
+	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
 	action_crop.C groundwater_lysimeter.C select_min.C \
 	select_max.C select_average.C action_message.C weather_std.C \
 	select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
@@ -286,7 +287,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = event.C eventqueue.C minimanager.C 
+REMOVE = event.h eventqueue.h minimanager.h
 
 # These are the file extensions we deal with.
 # 
@@ -649,13 +650,10 @@ common${OBJ}: common.C common.h parser_file.h parser.h librarian.h \
  library.h alist.h syntax.h document.h version.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
-event${OBJ}: event.C alist.h common.h event.h am.h librarian.h library.h \
- syntax.h eventqueue.h minimanager.h action.h field.h im.h daisy.h \
- weather.h crop.h
-eventqueue${OBJ}: eventqueue.C common.h event.h alist.h am.h librarian.h \
- library.h syntax.h eventqueue.h daisy.h
-minimanager${OBJ}: minimanager.C syntax.h common.h minimanager.h action.h \
- librarian.h library.h alist.h event.h am.h eventqueue.h
+action_heat${OBJ}: action_heat.C action.h librarian.h library.h common.h \
+ alist.h syntax.h daisy.h field.h
+hydraulic_M_vG_compact${OBJ}: hydraulic_M_vG_compact.C hydraulic.h \
+ librarian.h library.h common.h alist.h syntax.h csmp.h
 action_crop${OBJ}: action_crop.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h crop.h am.h log.h harvest.h \
  chemicals.h im.h weather.h

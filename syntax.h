@@ -27,6 +27,7 @@ public:
   // A syntax may have a dimension associated.
   static const string& Unknown ();
   static const string& None ();
+  static const string& Fraction ();
 
   // Each syntax entry should have an associated type.
   enum type 

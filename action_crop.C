@@ -317,10 +317,9 @@ ActionCrop::Annual::output (Log& log) const
 }
 
 bool 
-ActionCrop::Annual::check_alist (const AttributeList& al)
+ActionCrop::Annual::check_alist (const AttributeList&)
 {
   bool ok = true;
-  is_fraction (al.number ("loss"), "loss", ok);
   return ok;
 }
 
@@ -328,7 +327,7 @@ void
 ActionCrop::Annual::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("loss", Syntax::None (), Syntax::Const, 
+  syntax.add ("loss", Syntax::Fraction (), Syntax::Const, 
 	      "Fraction lost during harvest.");
   syntax.add ("remove_residuals", Syntax::Boolean, Syntax::Const,
 	      "Remove residuals at harvest.");

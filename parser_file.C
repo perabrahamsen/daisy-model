@@ -292,8 +292,14 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	switch (syntax.lookup (name))
 	  {
 	  case Syntax::Number:
-	    atts.add (name, get_number ());
-	    break;
+	    {
+	      double value = get_number ();
+	      if (syntax.dimension (name) == Syntax::Fraction ()
+		  && (value < 0.0 || value > 1.0))
+		error ("Fraction [0,1] expected");
+	      atts.add (name, value);
+	      break;
+	    }
 	  case Syntax::AList: 
 	    {
 	      AttributeList& list = (atts.check (name) 
@@ -494,6 +500,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    else
 		      {
 			last = get_number ();
+			if (syntax.dimension (name) == Syntax::Fraction ()
+			    && (last < 0.0 || last > 1.0))
+			  error ("Fraction [0,1] expected");
 			array.push_back (last);
 			count++;
 		      }

@@ -276,7 +276,7 @@ Limiting factor for high C/N ratio [(g C/cm^2)/(g N/cm^2) -> [0:1]].");
   alist.add ("T_factor", T_factor);
 
   // Incorporation amounts.
-  syntax.add ("respiration", Syntax::None (), Syntax::Const,
+  syntax.add ("respiration", Syntax::Fraction (), Syntax::Const,
 	      "Fraction of C lost in respiration.");
   alist.add ("respiration", 0.5);
   syntax.add ("DM", "g DM/m^2/h", Syntax::LogOnly, 

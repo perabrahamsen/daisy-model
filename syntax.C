@@ -57,15 +57,14 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name,
     {
       string key = (*i).first;
       bool key_error = false;
-      if ((status[key] == Const || status[key] == State)
-	       && !vl.check (key))
+      if (!vl.check (key))
 	{
-	  CERR << "Attribute " << key << " missing\n";
-	  error = true;
+	  if (status[key] == Const || status[key] == State)
+	    {
+	      CERR << "Attribute " << key << " missing\n";
+	      error = true;
+	    }
 	}
-      else if (!(status[key] == Const || status[key] == State)
-	  && !vl.check (key))
-	/* Missing optional or log, ignore */;
       else if (types[key] == Object)
 	if (size[key] != Singleton)
 	  {
@@ -213,6 +212,13 @@ Syntax::None ()
 {
   static const string none = "<none>";
   return none;
+}
+
+const string&
+Syntax::Fraction ()
+{
+  static const string fraction = "<fraction>";
+  return fraction;
 }
 
 // Each syntax entry should have an associated type.

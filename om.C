@@ -628,13 +628,15 @@ matter, in this case the SMB pools.");
 	      "Nitrogen in each soil interval.");
   syntax.add ("turnover_rate", "h^-1", Syntax::Const,
 	      "Fraction converted to other pools each hour.");
-  syntax.add ("efficiency", Syntax::None (), Syntax::Const, Syntax::Sequence,
+  syntax.add ("efficiency", Syntax::Fraction (),
+	      Syntax::Const, Syntax::Sequence,
 	      "\
 the efficiency this pool can be digested by each of the SMB pools.");
   syntax.add ("maintenance", "h^-1", Syntax::Const, "\
 The fraction used for staying alive each hour.");
   alist.add ("maintenance", 0.0);
-  syntax.add ("fractions", Syntax::None (), Syntax::Const, Syntax::Sequence, "\
+  syntax.add ("fractions", Syntax::Fraction (),
+	      Syntax::Const, Syntax::Sequence, "\
 How this pool is divided into other pools.\n\
 The first numbers corresponds to each of the SMB pools, the remaining\n\
 numbers corresponds to the SOM pools.  The length of the sequence should\n\

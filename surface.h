@@ -25,6 +25,7 @@ public:
   bool accept_top (double);
   double ponding () const;
   double temperature () const;
+  unsigned int node_below () const;
 
   const IM& matter_flux ();
   const Chemicals&  chemicals_down () const;

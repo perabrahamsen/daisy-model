@@ -52,13 +52,13 @@ nothing will happen.");
   syntax.add ("stub", "cm", Syntax::Const, "\
 Leave stem and leafs below this size on the field.");
   alist.add ("stub", 0.0);
-  syntax.add ("stem", Syntax::None (), Syntax::Const, "\
+  syntax.add ("stem", Syntax::Fraction (), Syntax::Const, "\
 Fraction of stem (above stub) to harvest.");
   alist.add ("stem", 1.0);
-  syntax.add ("leaf", Syntax::None (), Syntax::Const, "\
+  syntax.add ("leaf", Syntax::Fraction (), Syntax::Const, "\
 Fraction of leafs (above stub) to harvest.");
   alist.add ("leaf", 1.0);
-  syntax.add ("sorg", Syntax::None (), Syntax::Const, "\
+  syntax.add ("sorg", Syntax::Fraction (), Syntax::Const, "\
 Fraction of storage organ to harvest.");
   alist.add ("sorg", 1.0);
   syntax.order ("name");

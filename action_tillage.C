@@ -31,10 +31,8 @@ static struct ActionMixSyntax
 
   static bool check (const AttributeList& al)
     {
-      const double penetration (al.number ("penetration"));
       const double depth (al.number ("depth"));
       bool ok = true;
-      is_fraction (penetration, "penetration", ok);
       non_positive (depth, "depth", ok);
       if (!ok)
 	CERR << "in mix action\n";
@@ -52,7 +50,7 @@ the interval.");
       syntax.add ("depth", "cm", Syntax::Const,
 		  "How far down to mix the soil (a negative number).");
       syntax.order ("depth");
-      syntax.add ("penetration", Syntax::None (), Syntax::Const, "\
+      syntax.add ("penetration", Syntax::Fraction (), Syntax::Const, "\
 Fraction of organic matter on surface that are incorporated in the soil \
 by this operation.");
       alist.add ("penetration", 0.0);
@@ -171,7 +169,7 @@ static struct ActionSetPorositySyntax
       alist.add ("description", "\
 Set the porosity of the horizon at the specified depth.\n\
 To get useful results, you need to use a hydraulic model that supports this.");
-      syntax.add ("porosity", Syntax::None (), Syntax::Const, "\
+      syntax.add ("porosity", Syntax::Fraction (), Syntax::Const, "\
 Non-solid fraction of soil.");
       syntax.add ("depth", "cm", Syntax::Const, "\
 A point in the horizon to modify (a negative number).");

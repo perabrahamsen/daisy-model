@@ -143,8 +143,8 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
 	}
     }
 
-  // Limit for ponding.
-  const int first = 0;
+  // Limit for ridging.
+  const int first = surface.node_below ();
 
   // Calculate matrix flow next.
   try
@@ -352,7 +352,7 @@ will be used from there to the bottom.");
   Geometry::add_layer (syntax, "h", "cm", "Soil water pressure.");
   syntax.add ("S_ice", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Ice sink (due to thawing or freezing).");
-  syntax.add ("X_ice", Syntax::None (), 
+  syntax.add ("X_ice", Syntax::Fraction (), 
 	      Syntax::OptionalState, Syntax::Sequence,
 	      "Ice volume fraction in soil.");
   syntax.add ("X_ice_buffer", Syntax::None (), 
