@@ -1,0 +1,207 @@
+// uzlr.C --- using linear reservoirs to calculate water flow.
+
+#include "uzmodel.h"
+#include "soil.h"
+#include "log.h"
+
+class UZlr : public UZmodel
+{
+  // Parameters.
+private:
+  const double h_fc;		// Field Capacity. [cm]
+  const double z_top;		// Depth of layer with upwrd water movemnt [cm]
+
+  // Variables.
+private:
+  double q_up;
+  double q_down;
+
+  // UZmodel.
+public:
+  bool flux_top () const;
+  double q () const;
+  void flux_top_on ();
+  void flux_top_off ();
+  bool accept_top (double);
+  bool flux_bottom () const;
+  bool accept_bottom (double);
+  void output (Log&, Filter&) const;
+
+public:
+  void tick (const Soil& soil,
+	     int first, UZtop& top, 
+	     int last, UZbottom& bottom, 
+	     const vector<double>& S,
+	     const vector<double>& h_old,
+	     const vector<double>& Theta_old,
+	     vector<double>& h,
+	     vector<double>& Theta,
+	     vector<double>& q);
+
+  // Create and Destroy.
+public:
+  UZlr (const AttributeList& par);
+  ~UZlr ();
+};
+
+bool 
+UZlr::flux_top () const
+{
+  return true;
+}
+
+double 
+UZlr::q () const
+{
+  return q_down;
+}
+void  
+UZlr::flux_top_on ()
+{ }
+
+void  
+UZlr::flux_top_off ()
+{ }
+
+bool  
+UZlr::accept_top (double)
+{ 
+  return true;
+}
+
+bool 
+UZlr::flux_bottom () const
+{
+  return true;
+}
+
+bool  
+UZlr::accept_bottom (double)
+{ 
+  return true;
+}
+
+void 
+UZlr::tick (const Soil& soil,
+	    int first, UZtop& top, 
+	    int last, UZbottom& bottom, 
+	    const vector<double>& S,
+	    const vector<double>& h_old,
+	    const vector<double>& Theta_old,
+	    vector<double>& h,
+	    vector<double>& Theta,
+	    vector<double>& q)
+{
+  // Upper border.
+  q_up = q[first] = top.q ();
+  const bool ok = top.accept_top (q_up);
+  assert (ok);
+
+  // Use darcy for upward movement in the top.
+  const bool use_darcy = (h[0] < h_fc) && (q_up > 0.0);
+  const int to_darcy = soil.interval (z_top);
+
+  // Intermediate nodes.
+  for (int i = first; i <= last; i++)
+    {
+      const double dz = soil.dz (i);
+      const double Theta_new = Theta[i] - q[i] * dt / dz;
+      const double h_new = soil.h (i, Theta_new);
+      const double K_new = soil.K (i, h_new);
+
+      if (use_darcy && i < to_darcy)
+	// Dry earth, near top.  Use darcy to move water up.
+	{
+	  const double dist = soil.z (i) - soil.z (i+1);
+	  q[i+1] = max (K_new * ((h[i+1] - h_new) / dist - 1.0), 0.0);
+	  Theta[i] = Theta_new + q[i+1] * dt / dz;
+	  h[i] = soil.h (i, Theta[i]);
+	}
+      else if (h_new < h_fc)
+	// Dry earth, no water movement.
+	{
+	  q[i+1] = 0.0;
+	  Theta[i] = Theta_new;
+	  h[i] = h_new;
+	}
+      else
+	// Gravitational water movement.
+	{
+	  const double Theta_sat = soil.Theta (i, 0.0);
+	  const double Theta_fc = soil.Theta (i, h_fc);
+	  const double Theta_next =Theta_new - K_new * dt / dz;
+	  
+	  if (Theta_next < Theta_fc)
+	    {
+	      q[i+1] = (Theta_fc - Theta_new) * dz / dt;
+	      Theta[i] = Theta_fc;
+	      h[i] = h_fc;
+	    }
+	  else if (Theta_next > Theta_sat)
+	    {
+	      q[i+1] = (Theta_new - Theta_sat) * dz / dt;
+	      Theta[i] = Theta_sat;
+	      h[i] = 0.0;
+	    }
+	  else
+	    {
+	      q[i+1] = -K_new;
+	      Theta[i] = Theta_next;
+	      h[i] = soil.h (i, Theta[i]);
+	    }
+	  assert (q[i+1] < 1e-10);
+	}
+    }
+
+  // Lower border.
+  q_down = q[last + 1];
+  const bool accepted = bottom.accept_bottom (q[last + 1]);
+  assert (accepted);
+}
+
+void
+UZlr::output (Log& log, Filter& filter) const
+{
+  log.output ("q_up", filter, q_up);
+  log.output ("q_down", filter, q_down);
+}
+
+UZlr::UZlr (const AttributeList& al)
+  : UZmodel (al.name ("type")),
+    h_fc (al.number ("h_fc")),
+    z_top (al.number ("z_top")),
+    q_up (0.0),
+    q_down (0.0)
+{ }
+
+UZlr::~UZlr ()
+{ }
+
+// Add the UZlr syntax to the syntax table.
+static struct UZlrSyntax
+{
+  static UZmodel& make (const AttributeList& al)
+    {
+      return *new UZlr (al);
+    }
+
+  UZlrSyntax ()
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+
+      // Variables.
+      syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
+      syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);
+
+      // Parameters.
+      syntax.add ("h_fc", Syntax::Number, Syntax::Const);
+      alist.add ("h_fc", -100.0);
+      syntax.add ("z_top", Syntax::Number, Syntax::Const);
+      alist.add ("z_top", -10.0);
+
+      Librarian<UZmodel>::add_type ("lr", alist, syntax, &make);
+    }
+} UZlr_syntax;
+
+

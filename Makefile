@@ -20,7 +20,7 @@ MIKEFLAGS=
 #Uncomment these on SPARC
 SPARCSRC = set_exceptions.S
 SPARCOBJ = set_exceptions.o
-CC = /pack/egcs/bin/c++ -Wall -fno-exceptions -DEGCS -g -pipe $(MIKEFLAGS) -frepo -pg -O3 -ffast-math -mcpu=ultrasparc
+CC = /pack/egcs/bin/c++ -Wall -fno-exceptions -DEGCS -g -pipe $(MIKEFLAGS) -frepo -pg #-O3 -ffast-math -mcpu=ultrasparc
 #CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -pipe $(MIKEFLAGS) -frepo -O3 -ffast-math -mv8 -pg
 # CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
 MATHLIB = -lm
@@ -42,7 +42,7 @@ SRCONLY = filter_array.C filter_all.C filter_none.C filter_some.C \
 	weather_none.C action_fertilize.C weather_file.C action_tillage.C \
 	action_harvest.C hydraulic_old.C $(MIKEONLY) crop_old.C crop_sold.C \
 	action_with.C hydraulic_old2.C nitrification_soil.C \
-	nitrification_solute.C hydraulic_mod_C.C
+	nitrification_solute.C hydraulic_mod_C.C uzlr.C
 OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
 	filter.C csmp.C time.C uzmodel.C parser_file.C hydraulic.C \

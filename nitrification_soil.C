@@ -30,8 +30,6 @@ public:
 
   // Create.
 public:
-  friend class NitrificationSoilSyntax;
-  static Nitrification& make (const AttributeList&);
   NitrificationSoil (const AttributeList&);
 };
 
@@ -111,24 +109,21 @@ NitrificationSoil::NitrificationSoil (const AttributeList& al)
     k_10 (al.number ("k_10"))
 { }
 
-Nitrification&
-NitrificationSoil::make (const AttributeList& al)
-{
-  return *new NitrificationSoil (al);
-}
-
 static struct NitrificationSoilSyntax
 {
+  static Nitrification&
+  make (const AttributeList& al)
+    {
+      return *new NitrificationSoil (al);
+    }
   NitrificationSoilSyntax ()
-  {
-    Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList ();
-    syntax.add ("converted", Syntax::Number, Syntax::LogOnly, 
-		Syntax::Sequence);
-    syntax.add ("k", Syntax::Number, Syntax::Const);
-    syntax.add ("k_10", Syntax::Number, Syntax::Const);
-    Librarian<Nitrification>::add_type ("soil", alist, syntax,
-					&NitrificationSoil::make);
-
-  }
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add ("converted", Syntax::Number, Syntax::LogOnly, 
+		  Syntax::Sequence);
+      syntax.add ("k", Syntax::Number, Syntax::Const);
+      syntax.add ("k_10", Syntax::Number, Syntax::Const);
+      Librarian<Nitrification>::add_type ("soil", alist, syntax, &make);
+    }
 } NitrificationSoil_syntax;

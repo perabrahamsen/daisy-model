@@ -436,15 +436,15 @@ AM::AM (const Geometry& geometry, const Time& t,
 	const string sort, const string part)
   : impl (*new Implementation (t, 
 			       sort + "/" + part,
-			       map_construct1<OM, Geometry> (ol, geometry))),
+			       map_construct<OM> (ol))),
     name ("state")
 { }
 
 AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
   : impl (*new Implementation 
 	  (al.check ("creation") ? al.time ("creation") : time,
-	   al.check ("name") ? al.name ("name"): al.name ("type"),
-	   map_construct1<OM, Geometry> (al.alist_sequence ("om"), geometry))),
+	    al.check ("name") ? al.name ("name"): al.name ("type"),
+	    map_construct<OM> (al.alist_sequence ("om")))),
     name ("state")
 {
   const string syntax = al.name ("syntax");

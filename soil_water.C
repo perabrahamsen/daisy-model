@@ -200,8 +200,8 @@ SoilWater::MaxExfiltration (const Soil& soil) const
 void
 SoilWater::load_syntax (Syntax& syntax, AttributeList&)
 { 
-  syntax.add ("UZtop", UZmodel::library ());
-  syntax.add ("UZbottom", UZmodel::library (), Syntax::Optional);
+  syntax.add ("UZtop", Librarian<UZmodel>::library ());
+  syntax.add ("UZbottom", Librarian<UZmodel>::library (), Syntax::Optional);
   syntax.add ("UZborder", Syntax::Integer, Syntax::Optional);
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("Theta", Syntax::Number, Syntax::Optional, Syntax::Sequence);
@@ -212,9 +212,9 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList&)
 
 SoilWater::SoilWater (const Soil& soil, 
 		      const AttributeList& al)
-  : top (UZmodel::create (al.alist ("UZtop"))),
+  : top (&Librarian<UZmodel>::create (al.alist ("UZtop"))),
     bottom (  al.check ("UZbottom") 
-	    ? UZmodel::create (al.alist ("UZbottom"))
+	    ? &Librarian<UZmodel>::create (al.alist ("UZbottom"))
 	    : 0),
     bottom_start (  al.check ("UZborder") 
 		  ? al.integer ("UZborder")

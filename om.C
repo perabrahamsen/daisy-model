@@ -29,70 +29,6 @@ OM::OM (const AttributeList& al)
     initial_C_per_N = Unspecified;
 }
 
-OM::OM (const AttributeList& al, const Geometry& geometry)
-  : initial_fraction (al.number ("initial_fraction")),
-    top_C (al.number ("top_C")),
-    top_N (al.number ("top_N")),
-    turnover_rate (al.number ("turnover_rate")),
-    efficiency (al.number_sequence ("efficiency")),
-    maintenance (al.number ("maintenance")),
-    fractions (al.number_sequence ("fractions"))
-{
-  if (al.check ("C"))
-    C = al.number_sequence ("C");
-  if (al.check ("C_per_N"))
-    C_per_N = al.number_sequence ("C_per_N");
-
-  // Create initial C.
-  while (C.size () < geometry.size ())
-    C.push_back (0.0);
-
-  // Create initial C/N.
-  if (C_per_N.size () > 0U)
-    {
-      initial_C_per_N = C_per_N[0];
-      while (C_per_N.size () < C.size ())
-	C_per_N.push_back (C_per_N[C_per_N.size () - 1]);
-    }
-  else
-    initial_C_per_N = Unspecified;
-}
-
-OM::OM (const AttributeList& al, const Geometry& geometry, 
-	const double carbon, const double N)
-  : initial_fraction (al.number ("initial_fraction")),
-    initial_C_per_N (Unspecified),
-    top_C (carbon),
-    top_N (N),
-    turnover_rate (al.number ("turnover_rate")),
-    efficiency (al.number_sequence ("efficiency")),
-    maintenance (al.number ("maintenance")),
-    fractions (al.number_sequence ("fractions"))
-{
-  assert (carbon >= 0.0);
-  assert (N >= 0.0);
-  
-  double CpN;
-
-  if (N == 0)
-    {
-      assert (carbon == 0);
-      CpN = 0;
-    }
-  else
-    CpN = carbon / N;
-
-  // Create initial C.
-  assert (!al.check ("C"));
-  while (C.size () < geometry.size ())
-    C.push_back (0.0);
-
-  // Initialize C/N.
-  assert (!al.check ("C_per_N"));
-  while (C_per_N.size () < C.size ())
-    C_per_N.push_back (CpN);
-}
-
 void
 OM::output (Log& log, Filter& filter) const
 {
@@ -195,7 +131,7 @@ OM::add (const Geometry& geometry, // Add dead roots.
     }
   
   // Make sure C is large enough.
-  const int extra_C = density.size () - C_per_N.size ();
+  const int extra_C = density.size () - C.size ();
   if (extra_C > 0)
     C.insert (C.begin (), extra_C, 0.0);
   
@@ -221,7 +157,7 @@ OM::add (const Geometry& geometry, // Add dead roots.
     C_per_N.insert (C_per_N.begin (), extra_C_per_N, 1.0);
   
   // Make sure C is large enough.
-  const int extra_C = density.size () - C_per_N.size ();
+  const int extra_C = density.size () - C.size ();
   if (extra_C > 0)
     {
       assert (extra_C_per_N <= extra_C);
@@ -247,10 +183,11 @@ OM::add (const Geometry& geometry, // Add dead roots.
 }
 
 inline void
-OM::tock (const double* factor, double fraction, double efficiency,
+OM::tock (unsigned int end, const double* factor,
+	  double fraction, double efficiency,
 	  const double* N_soil, double* N_used, double* CO2, OM& om)
 {
-  const unsigned int size = min (C_per_N.size (), C.size ());
+  const unsigned int size = min (min (C_per_N.size (), C.size ()), end);
 
   // Maintenance.
   for (unsigned int i = 0; i < size; i++)
@@ -321,12 +258,12 @@ OM::tock (const double* factor, double fraction, double efficiency,
 }
 
 void
-OM::tick (const double* abiotic_factor, 
+OM::tick (unsigned int end, const double* abiotic_factor, 
 	  const double* N_soil, double* N_used,
 	  double* CO2, const vector<OM*>& smb, const vector<OM*>&som)
 {
-  const int size = C.size ();
-  for (int i = 0; i < size; i++)
+  const unsigned int size = min (C.size (), end);
+  for (unsigned int i = 0; i < size; i++)
     {
       assert (C[i] >= 0.0);
       // assert (N_soil * 1.001 >= N_used);
@@ -339,37 +276,37 @@ OM::tick (const double* abiotic_factor,
     }
   assert (fractions.size () == smb.size () + som.size ());
   // Distribute to all biological dk:puljer.
-  const int smb_size = smb.size ();
-  for (int j = 0; j < smb_size; j++)
+  const unsigned int smb_size = smb.size ();
+  for (unsigned int j = 0; j < smb_size; j++)
     {
       const double fraction = fractions[j];
       if (fraction > 1e-50)
-	tock (abiotic_factor, turnover_rate * fraction, efficiency[j],
+	tock (size, abiotic_factor, turnover_rate * fraction, efficiency[j],
 	      N_soil, N_used, CO2, *smb[j]);
     }
   // Distribute to all soil dk:puljer.
-  const int som_size = som.size ();
-  for (int j = 0; j < som_size; j++)
+  const unsigned int som_size = som.size ();
+  for (unsigned int j = 0; j < som_size; j++)
     {
       const double fraction = fractions[smb_size + j];
       if (fraction > 1e-50)
-	tock (abiotic_factor, turnover_rate * fraction, 1.0,
+	tock (size, abiotic_factor, turnover_rate * fraction, 1.0,
 	      N_soil, N_used, CO2, *som[j]);
     }
   // assert (N_soil * 1.001 >= N_used);
-  for (int i = 0; i < size; i++)
+  for (unsigned int i = 0; i < size; i++)
     assert (C[i] >= 0.0);
 }
 
 void 
-OM::tick (const double* abiotic_factor, 
+OM::tick (unsigned int end, const double* abiotic_factor, 
 	  const double* N_soil, double* N_used,
 	  double* CO2, const vector<OM*>& smb, double* som_C, double* som_N)
 {
-  const int size = min (C.size (), C_per_N.size ());
-
+  const unsigned int size = min (min (C.size (), C_per_N.size ()), end);
+  
   // Maintenance.
-  for (int i = 0; i < size; i++)
+  for (unsigned int i = 0; i < size; i++)
     {
       assert (C[i] >= 0.0);
 
@@ -382,18 +319,18 @@ OM::tick (const double* abiotic_factor,
   assert (fractions.size () == smb.size () + 1);
   
   // Distribute to all biological dk:puljer.
-  const int smb_size = smb.size ();
-  for (int j = 0; j < smb_size; j++)
+  const unsigned int smb_size = smb.size ();
+  for (unsigned int j = 0; j < smb_size; j++)
     {
       const double fraction = fractions[j];
       if (fraction > 1e-50)
-	tock (abiotic_factor, turnover_rate * fraction, efficiency[j],
+	tock (size, abiotic_factor, turnover_rate * fraction, efficiency[j],
 	      N_soil, N_used, CO2, *smb[j]);
     }
 
   // Distribute to soil buffer.
   const double factor = turnover_rate * fractions[smb_size];
-  for (int i = 0; i < size; i++)
+  for (unsigned int i = 0; i < size; i++)
     {
       const double rate = min (factor * abiotic_factor[i], 0.1);
       som_N[i] += C[i] * rate / C_per_N[i];
@@ -413,9 +350,11 @@ OM::tick (const double* abiotic_factor,
     }
 }
 
+#if 0
 OM& 
 OM::create (const AttributeList& al, const Geometry& geometry)
 { return *new OM (al, geometry); }
+#endif
 
 const double OM::Unspecified = -1042.42e42;
 

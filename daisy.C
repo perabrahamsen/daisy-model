@@ -31,7 +31,7 @@ Daisy::Daisy (const AttributeList& al)
     time (al.time ("time")),
     action (Action::create (al.alist ("manager"), NULL)),
     weather (Librarian<Weather>::create (al.alist ("weather"))), 
-    groundwater (Groundwater::create (time, al.alist ("groundwater"))), 
+    groundwater (Librarian<Groundwater>::create (al.alist ("groundwater"))), 
     columns (*new ColumnList (al.alist_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
 { 
@@ -132,6 +132,7 @@ Daisy::run ()
 	  Filter& filter = log.match (*this);
 	  log.output ("time", filter, time);
 	  output_derived (weather, "weather", log, filter);
+	  groundwater.output (log, filter);
 	  output_list (columns, "column", log, filter);
 	  output_vector (harvest, "harvest", log, filter);
 	}
@@ -173,8 +174,10 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 		    Librarian<Weather>::library (), 
 		    Librarian<Weather>::derive_type);
   syntax.add_library ("defgroundwater",
-		    Groundwater::library (), &Groundwater::derive_type);
-  syntax.add_library ("defuzmodel", UZmodel::library (), &UZmodel::derive_type);
+		      Librarian<Groundwater>::library (),
+		      &Librarian<Groundwater>::derive_type);
+  syntax.add_library ("defuzmodel", Librarian<UZmodel>::library (), 
+		      &Librarian<UZmodel>::derive_type);
   syntax.add_library ("defhydraulic",
 		    Hydraulic::library (), &Hydraulic::derive_type);
   syntax.add_library ("defnitrification", 
@@ -193,7 +196,8 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("column", Librarian<Column>::library (), 
 	      Syntax::State, Syntax::Sequence);
   syntax.add ("weather", Librarian<Weather>::library ());
-  syntax.add ("groundwater", Groundwater::library (), Syntax::Const);
+  syntax.add ("groundwater", Librarian<Groundwater>::library (), 
+	      Syntax::Const);
   add_submodule<Harvest> ("harvest", syntax, alist,
 			  Syntax::LogOnly, Syntax::Sequence);
 #ifdef MIKE_SHE

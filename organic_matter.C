@@ -12,6 +12,7 @@
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include "soil_heat.h"
+#include "groundwater.h"
 #include "mathlib.h"
 #include "csmp.h"
 #include "common.h"
@@ -23,6 +24,7 @@
 struct OrganicMatter::Implementation
 {
   // Content.
+  const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double K_NH4;		// Immobilization rate of NH4.
   const double K_NO3;		// Immobilization rate of NO3.
   vector<double> CO2;		// CO2 produced per time step.
@@ -34,7 +36,7 @@ struct OrganicMatter::Implementation
     vector<double> C;			// Carbon.
     vector<double> N;			// Nitrogen.
     const double turnover_rate;	// Absorption.
-    const int where;		// Which SOM dk:pulje does it end in?
+    const int where;		// Which SOM pool does it end in?
     void output (Log& log, Filter& filter) const;
     void tick (int i, double abiotic_factor, double N_soil, double& N_used,
 	       const vector<OM*>&);
@@ -54,7 +56,8 @@ struct OrganicMatter::Implementation
   void add (AM& om)
   { am.push_back (&om); }
   void monthly (const Soil& soil);
-  void tick (const Soil&, const SoilWater&, const SoilHeat&, 
+  void tick (const Soil&, const SoilWater&, const SoilHeat&,
+	     const Groundwater&,
 	     SoilNO3&, SoilNH4&);
   void mix (const Soil&, double from, double to, double penetration);
   void swap (const Soil& soil, double from, double middle, double to);
@@ -192,10 +195,11 @@ OrganicMatter::Implementation::Buffer::Buffer (const Soil& soil,
     turnover_rate (al.number ("turnover_rate")),
     where (al.integer ("where"))
 { 
+  const unsigned int size = soil.interval_plus (soil.MaxRootingDepth ());
   // Make sure the vectors are large enough.
-  while (N.size () < soil.size ())
+  while (N.size () < size)
     N.push_back (0.0);
-  while (C.size () < soil.size ())
+  while (C.size () < size)
     C.push_back (0.0);
 }
 
@@ -312,6 +316,7 @@ void
 OrganicMatter::Implementation::tick (const Soil& soil, 
 				     const SoilWater& soil_water, 
 				     const SoilHeat& soil_heat,
+				     const Groundwater& groundwater,
 				     SoilNO3& soil_NO3,
 				     SoilNH4& soil_NH4)
 {
@@ -322,19 +327,26 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     am[i]->append_to (added);
   sort (added.begin (), added.end (), om_compare);
   
+  // Clear logs.
+  for (unsigned int i = 0; i < soil.size (); i++)
+    {
+      CO2[i] = 0.0;		
+      NO3_source[i] = 0.0;
+      NH4_source[i] = 0.0;
+    }
+
   // Setup arrays.
-  const int size = soil.size ();
+  unsigned int size = soil.interval_plus (soil.MaxRootingDepth ());
+  if (active_groundwater && !groundwater.flux_bottom ())
+    size = min (size, soil.interval_plus (groundwater.table ()));
+
   vector<double> N_soil (size);
   vector<double> N_used (size);
   vector<double> abiotic_factor (size);
   vector<double> clay_factor (size);
   
-  for (int i = 0; i < size; i++)
+  for (unsigned int i = 0; i < size; i++)
     {
-      CO2[i] = 0.0;		
-      NO3_source[i] = 0.0;
-      NH4_source[i] = 0.0;
-
       const double NH4 = soil_NH4.M_left (i) * K_NH4;
       const double NO3 = soil_NO3.M_left (i) * K_NO3;
       assert (NH4 >= 0.0 && NO3 >= 0.0);
@@ -351,17 +363,19 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     }
 
   // Main processing.
-  smb[0]->tick (&clay_factor[0], &N_soil[0], &N_used[0], &CO2[0], smb, som);
+  smb[0]->tick (size, &clay_factor[0],
+		&N_soil[0], &N_used[0], &CO2[0], smb, som);
   for (unsigned int j = 1; j < smb.size (); j++)
-    smb[j]->tick (&abiotic_factor[0], &N_soil[0], &N_used[0], &CO2[0],
-		  smb, som);
+    smb[j]->tick (size, &abiotic_factor[0],
+		  &N_soil[0], &N_used[0], &CO2[0], smb, som);
   for (unsigned int j = 0; j < som.size (); j++)
-    som[j]->tick (&clay_factor[0], &N_soil[0], &N_used[0], &CO2[0], smb, som);
+    som[j]->tick (size, &clay_factor[0],
+		  &N_soil[0], &N_used[0], &CO2[0], smb, som);
   for (unsigned int j = 0; j < added.size (); j++)
-    added[j]->tick (&abiotic_factor[0], &N_soil[0], &N_used[0], &CO2[0],
+    added[j]->tick (size, &abiotic_factor[0], &N_soil[0], &N_used[0], &CO2[0],
 		    smb, &buffer.C[0], &buffer.N[0]);
 
-  for (int i = 0; i < size; i++)
+  for (unsigned int i = 0; i < size; i++)
     {
       const double NH4 = soil_NH4.M_left (i) * K_NH4;
 
@@ -421,11 +435,12 @@ OrganicMatter::Implementation::swap (const Soil& soil,
 
 OrganicMatter::Implementation::Implementation (const Soil& soil, 
 					       const AttributeList& al)
-  : K_NH4 (al.number ("K_NH4")),
+  : active_groundwater (al.flag ("active_groundwater")),
+    K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
     am (map_create1 <AM, const Soil&> (al.alist_sequence ("am"), soil)),
-    smb (map_construct1 <OM, const Soil&> (al.alist_sequence ("smb"), soil)),
-    som (map_construct1 <OM, const Soil&> (al.alist_sequence ("som"), soil)),
+    smb (map_construct<OM> (al.alist_sequence ("smb"))),
+    som (map_construct<OM> (al.alist_sequence ("som"))),
     buffer (soil, al.alist ("buffer")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N"))
@@ -457,22 +472,44 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
     {
       if (som_al[i]->check ("initial_fraction"))
 	total += som_al[i]->number ("initial_fraction");
-      if (som[i]->C_per_N.size () == 0)
+      
+      const unsigned int C_per_N_size = som[i]->C_per_N.size ();
+      if (C_per_N_size == 0)
 	{
 	  assert (missing_C_per_N == -1);
 	  missing_C_per_N = i;
 	}
-      else
-	assert (som[i]->C_per_N.size () == soil.size ());
+      else 
+	{
+	  if (C_per_N_size < soil.size ())
+	    som[i]->C_per_N.insert (som[i]->C_per_N.begin (),
+				    soil.size () - 	C_per_N_size,
+				    som[i]->C_per_N[C_per_N_size - 1]);
+	  assert (som[i]->C_per_N.size () == soil.size ());
+	}
+
+      const unsigned int C_size = som[i]->C.size ();
+      if (C_size < soil.size ())
+	som[i]->C.insert (som[i]->C.begin (), soil.size () - C_size, 0.0);
       assert (som[i]->C.size () == soil.size ());
     }
   for (unsigned int i = 0; i < smb.size (); i++)
     {
       if (smb_al[i]->check ("initial_fraction"))
 	total += smb_al[i]->number ("initial_fraction");
-
+      
+      const unsigned int C_per_N_size = smb[i]->C_per_N.size ();
+      assert (C_per_N_size > 0);
+      if (C_per_N_size < soil.size ())
+	smb[i]->C_per_N.insert (smb[i]->C_per_N.begin (),
+				soil.size () - 	C_per_N_size,
+				smb[i]->C_per_N[C_per_N_size - 1]);
       assert (smb[i]->C_per_N.size () == soil.size ());
-      assert (som[i]->C.size () == soil.size ());
+
+      const unsigned int C_size = smb[i]->C.size ();
+      if (C_size < soil.size ())
+	smb[i]->C.insert (smb[i]->C.begin (), soil.size () - C_size, 0.0);
+      assert (smb[i]->C.size () == soil.size ());
     }
 
   // If any fractions were specified, distribute soil humus.
@@ -527,10 +564,11 @@ void
 OrganicMatter::tick (const Soil& soil, 
 		     const SoilWater& soil_water, 
 		     const SoilHeat& soil_heat,
+		     const Groundwater& groundwater,
 		     SoilNO3& soil_NO3,
 		     SoilNH4& soil_NH4)
 {
-  impl.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
+  impl.tick (soil, soil_water, soil_heat, groundwater, soil_NO3, soil_NH4);
 }
 
 void 
@@ -764,6 +802,8 @@ template class add_submodule<OM>;
 void
 OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const);
+  alist.add ("active_groundwater", true);
   syntax.add ("K_NH4", Syntax::Number, Syntax::Const);
   syntax.add ("K_NO3", Syntax::Number, Syntax::Const);
   syntax.add ("NO3_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);

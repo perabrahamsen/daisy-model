@@ -12,7 +12,7 @@ Geometry::interval_plus (double z) const
   unsigned int i;
   for (i = 0; i < size_; i++)
     {
-      if (zplus_[i] < z)
+      if (zplus_[i] <= z)
 	return i;
     }
   assert (0);
@@ -25,7 +25,7 @@ Geometry::interval (double z) const
   unsigned int i;
   for (i = 0; i < size_; i++)
     {
-      if (z_[i] < z)
+      if (z_[i] <= z)
 	return i;
     }
   assert (0);
@@ -90,12 +90,13 @@ Geometry::add (vector<double>& v, double from, double to, double amount) const
 {
   const double old_total = total (v);
 
-  while (v.size () < size ())
+  const unsigned int last = interval_plus (to);
+  while (v.size () <= last)
     v.push_back (0.0);
   const double density = amount / (from - to);
   double old = 0.0;
 
-  for (unsigned i = 0; i < v.size () && old > to ; i++)
+  for (unsigned i = 0; i <= last; i++)
     {
       if (zplus_[i] < from)
 	v[i] += density * (min (old, from) - max (zplus_[i], to)) / dz_[i];
@@ -117,12 +118,13 @@ double
 Geometry::extract (vector<double>& v, double from, double to) const
 {
   const double old_total = total (v);
-  while (v.size () < size ())
+  const unsigned int last = interval_plus (to);
+  while (v.size () <= last)
     v.push_back (0.0);
   double amount = 0.0;
   double old = 0.0;
 
-  for (unsigned i = 0; i < v.size () && old > to ; i++)
+  for (unsigned i = 0; i <= last; i++)
     {
       if (zplus_[i] < from)
 	{
@@ -139,12 +141,13 @@ Geometry::extract (vector<double>& v, double from, double to) const
 void
 Geometry::set (vector<double>& v, double from, double to, double amount) const
 {
-  while (v.size () < size ())
+  const unsigned int last = interval_plus (to);
+  while (v.size () <= last)
     v.push_back (0.0);
   const double density = amount / (from - to);
   double old = 0.0;
 
-  for (unsigned i = 0; i < v.size () && old > to ; i++)
+  for (unsigned i = 0; i <= last; i++)
     {
       if (zplus_[i] < from)
 	{

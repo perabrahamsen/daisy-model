@@ -3,10 +3,7 @@
 #ifndef UZMODEL_H
 #define UZMODEL_H
 
-
-#include <string>
-#include <vector>
-#include "common.h"
+#include "librarian.h"
 
 class Soil;
 class Library;
@@ -68,29 +65,13 @@ public:
 		     vector<double>& q) = 0;
   virtual void output (Log&, Filter&) const = 0;
 
-  // Library.
-public:
-  static const Library& library ();
-  static UZmodel* create (const AttributeList&);
-  typedef UZmodel* (*constructor) (const AttributeList&);
-  static void add_type (const string, const AttributeList&, const Syntax&,
-			constructor);
-  static void derive_type (const string, const AttributeList&, string super);
-
   // Create and Destroy.
-public:
+protected:
   UZmodel (string name);
+public:
   virtual ~UZmodel ();
 };
 
-// Ensure the UZ library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class UZ_init
-{
-  static int count;
-public:
-  UZ_init ();
-  ~UZ_init ();
-} uz_init;
+static Librarian<UZmodel> UZmodel_init ("uzmodel");
 
 #endif UZMODEL_H

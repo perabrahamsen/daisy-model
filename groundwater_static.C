@@ -1,8 +1,6 @@
 // groundwater_static.C
 
 #include "groundwater.h"
-#include "syntax.h"
-#include "alist.h"
 
 class GroundwaterStatic : public Groundwater
 {
@@ -17,15 +15,12 @@ public:
 
   // Simulation.
 public:
-  void tick ();
+  void tick (const Time&);
   double table () const;
 
   // Create and Destroy.
-private:
-  friend class GroundwaterStaticSyntax;
-  static Groundwater& make (const Time&, const AttributeList&);
-  GroundwaterStatic (const Time&, const AttributeList&);
 public:
+  GroundwaterStatic (const AttributeList&);
   ~GroundwaterStatic ();
 };
 
@@ -42,7 +37,7 @@ GroundwaterStatic::accept_bottom (double)
 }
 
 void
-GroundwaterStatic::tick ()
+GroundwaterStatic::tick (const Time&)
 { }
 
 double
@@ -52,31 +47,28 @@ GroundwaterStatic::table () const
   return depth;
 }
 
-GroundwaterStatic::GroundwaterStatic (const Time& t, const AttributeList& al)
-  : Groundwater (t),
+GroundwaterStatic::GroundwaterStatic (const AttributeList& al)
+  : Groundwater (al.name ("type")),
     depth (al.number ("table"))
 { }
 
 GroundwaterStatic::~GroundwaterStatic ()
 { }
 
-// Add the GroundwaterStatic syntax to the syntax table.
-Groundwater&
-GroundwaterStatic::make (const Time& t, const AttributeList& al)
-{
-  return *new GroundwaterStatic (t, al);
-}
-
 static struct GroundwaterStaticSyntax
 {
-  GroundwaterStaticSyntax ();
+  static Groundwater& make (const AttributeList& al)
+    { 
+      return *new GroundwaterStatic (al);
+    }
+  GroundwaterStaticSyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add ("table", Syntax::Number, Syntax::Const);
+      alist.add ("table", 1.0); // Positive number indicates flux bottom.
+      Librarian<Groundwater>::add_type ("static", alist, syntax, &make);
+    }
 } GroundwaterStatic_syntax;
 
-GroundwaterStaticSyntax::GroundwaterStaticSyntax ()
-{ 
-  Syntax* syntax = new Syntax ();
-  AttributeList* alist = new AttributeList ();
-  syntax->add ("table", Syntax::Number, Syntax::Const);
-  alist->add ("table", 1.0);	// Positive number indicates flux bottom.
-  Groundwater::add_type ("static", *alist, *syntax, &GroundwaterStatic::make);
-}
+

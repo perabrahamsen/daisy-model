@@ -11,12 +11,20 @@
 
 class UZRichard : public UZmodel
 {
-  // UZmodel.
+  // Variables.
 private:
-  struct Parameters;
-  const Parameters& par;
-  struct Variables;
-  Variables& var;
+  double q_up;
+  double q_down;
+  int iterations;
+
+  // Parameters.
+  int max_time_step_reductions;
+  int time_step_reduction;
+  int max_iterations;
+  double max_absolute_difference;
+  double max_relative_difference;
+
+  // UZmodel.
 public:
   bool flux_top () const;
   double q () const;
@@ -53,11 +61,6 @@ private:
 		const vector<double>& S,
 		double ddt,
 		vector<double>& q);
-  int max_time_step_reductions () const;
-  int time_step_reduction () const;
-  int max_iterations () const;
-  double max_absolute_difference () const;
-  double max_relative_difference () const;
 public:
   void tick (const Soil& soil,
 	     int first, UZtop& top, 
@@ -70,45 +73,10 @@ public:
 	     vector<double>& q);
 
   // Create and Destroy.
-private:
-  friend class UZRichardSyntax;
-  static UZmodel* make (const AttributeList&);
-  UZRichard (const AttributeList& par);
 public:
+  UZRichard (const AttributeList& par);
   ~UZRichard ();
 };
-
-struct UZRichard::Variables
-{
-  double q_up;
-  double q_down;
-  int iterations;
-  Variables ();
-};
-
-UZRichard::Variables::Variables ()
-  : q_up (0.0),
-    q_down (0.0),
-    iterations (0)
-{ }
-
-struct UZRichard::Parameters
-{
-  int max_time_step_reductions;
-  int time_step_reduction;
-  int max_iterations;
-  double max_absolute_difference;
-  double max_relative_difference;
-  Parameters (const AttributeList&);
-};
-
-UZRichard::Parameters::Parameters (const AttributeList& al)
-     : max_time_step_reductions (al.integer ("max_time_step_reductions")),
-       time_step_reduction (al.integer ("time_step_reduction")),
-       max_iterations (al.integer ("max_iterations")),
-       max_absolute_difference (al.number ("max_absolute_difference")),
-       max_relative_difference (al.number ("max_relative_difference"))
-{ }
 
 bool 
 UZRichard::flux_top () const
@@ -119,7 +87,7 @@ UZRichard::flux_top () const
 double 
 UZRichard::q () const
 {
-  return var.q_down;
+  return q_down;
 }
 void  
 UZRichard::flux_top_on ()
@@ -221,7 +189,7 @@ UZRichard::richard (const Soil& soil,
 	{
 	  h_conv = h;
 	  iterations_used++;
-	  var.iterations++;
+	  iterations++;
 
 	  // Calculate parameters.
 	  for (unsigned int i = 0; i < size; i++)
@@ -315,16 +283,16 @@ UZRichard::richard (const Soil& soil,
 	  tridia (top.flux_top () ? 0 : 1, size, a, b, c, d, h.begin ());
 	}
       while (   !converges (h_conv, h) 
-	     && iterations_used <= max_iterations ());
+	     && iterations_used <= max_iterations);
 
-      if (iterations_used > max_iterations ())
+      if (iterations_used > max_iterations)
 	{
 	  number_of_time_step_reductions++;
 	  
-	  if (number_of_time_step_reductions > max_time_step_reductions ())
+	  if (number_of_time_step_reductions > max_time_step_reductions)
 	    return false;
 
-	  ddt /= time_step_reduction ();
+	  ddt /= time_step_reduction;
 	  h = h_previous;
 	}
       else
@@ -422,11 +390,11 @@ UZRichard::richard (const Soil& soil,
 	      time_left -= ddt;
 	      iterations_with_this_time_step++;
 
-	      if (iterations_with_this_time_step > time_step_reduction ())
+	      if (iterations_with_this_time_step > time_step_reduction)
 		{
 		  number_of_time_step_reductions--;
 		  iterations_with_this_time_step = 0;
-		  ddt *= time_step_reduction ();
+		  ddt *= time_step_reduction;
 		}
 	    }
 	  else
@@ -476,11 +444,11 @@ UZRichard::converges (const vector<double>& previous,
 
   for (unsigned int i = 0; i < size; i++)
     {
-      if (   fabs (current[i] - previous[i]) > max_absolute_difference ()
+      if (   fabs (current[i] - previous[i]) > max_absolute_difference
 	  && (   previous[i] == 0.0
 	      || current[i] == 0.0
 	      || (  fabs ((current[i] - previous[i]) / previous[i])
-		  > max_relative_difference ())))
+		  > max_relative_difference)))
 	return false;
     }
   return true;
@@ -552,37 +520,6 @@ UZRichard::q_darcy (const Soil& soil,
     }
 }
 
-int 
-UZRichard::max_time_step_reductions () const
-{ 
-  return par.max_time_step_reductions;
-}
-
-int 
-UZRichard::time_step_reduction () const
-{
-  return par.time_step_reduction;
-}
-
-int 
-UZRichard::max_iterations () const
-{
-  return par.max_iterations;
-}
-
-double  
-UZRichard::max_absolute_difference () const
-{
-  return par.max_absolute_difference;
-}
-
-double  
-UZRichard::max_relative_difference () const
-{
-
-  return par.max_relative_difference;
-}
-
 void 
 UZRichard::tick (const Soil& soil,
 		 int first, UZtop& top, 
@@ -594,68 +531,72 @@ UZRichard::tick (const Soil& soil,
 		 vector<double>& Theta,
 		 vector<double>& q)
 {
-  var.iterations = 0;
+  iterations = 0;
   if (!richard (soil, first, top, last, bottom, 
 		S, h_old, Theta_old, h, Theta, q))
     THROW (runtime_error ("Richard's Equation doesn't converge."));
     
-  bottom.accept_bottom (q[last + 1]);
+  const bool accepted = bottom.accept_bottom (q[last + 1]);
+  assert (accepted);
 
-  var.q_up = q[first];
-  var.q_down = q[last + 1];
+  q_up = q[first];
+  q_down = q[last + 1];
 }
 
 void
 UZRichard::output (Log& log, Filter& filter) const
 {
-  log.output ("q_up", filter, var.q_up);
-  log.output ("q_down", filter, var.q_down);
-  log.output ("iterations", filter, var.iterations);
+  log.output ("q_up", filter, q_up);
+  log.output ("q_down", filter, q_down);
+  log.output ("iterations", filter, iterations);
 }
 
 UZRichard::UZRichard (const AttributeList& al)
   : UZmodel (al.name ("type")),
-    par (*new Parameters (al)),
-    var (*new Variables ())
+    // Variables.
+    q_up (0.0),
+    q_down (0.0),
+    iterations (0),
+    // Parameters.
+    max_time_step_reductions (al.integer ("max_time_step_reductions")),
+    time_step_reduction (al.integer ("time_step_reduction")),
+    max_iterations (al.integer ("max_iterations")),
+    max_absolute_difference (al.number ("max_absolute_difference")),
+    max_relative_difference (al.number ("max_relative_difference"))
 { }
 
-
 UZRichard::~UZRichard ()
-{ 
-  delete &var;
-  delete &par;
-}
+{ }
 
 // Add the UZRichard syntax to the syntax table.
-UZmodel* 
-UZRichard::make (const AttributeList& al)
-{
-  return new UZRichard (al);
-}
-
 static struct UZRichardSyntax
 {
-  UZRichardSyntax ();
+  static UZmodel& make (const AttributeList& al)
+    {
+      return *new UZRichard (al);
+    }
+
+  UZRichardSyntax ()
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+
+      syntax.add ("max_time_step_reductions", Syntax::Integer, Syntax::Const);
+      alist.add ("max_time_step_reductions", 4);
+      syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const);
+      alist.add ("time_step_reduction", 4);
+      syntax.add ("max_iterations", Syntax::Integer, Syntax::Const);
+      alist.add ("max_iterations", 25);
+      syntax.add ("max_absolute_difference", Syntax::Number, Syntax::Const);
+      alist.add ("max_absolute_difference", 0.002);
+      syntax.add ("max_relative_difference", Syntax::Number, Syntax::Const);
+      alist.add ("max_relative_difference", 0.001);
+      syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
+      syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);
+      syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly);
+
+      Librarian<UZmodel>::add_type ("richards", alist, syntax, &make);
+    }
 } UZRichard_syntax;
 
-UZRichardSyntax::UZRichardSyntax ()
-{
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  
-  syntax.add ("max_time_step_reductions", Syntax::Integer, Syntax::Const);
-  alist.add ("max_time_step_reductions", 4);
-  syntax.add ("time_step_reduction", Syntax::Integer, Syntax::Const);
-  alist.add ("time_step_reduction", 4);
-  syntax.add ("max_iterations", Syntax::Integer, Syntax::Const);
-  alist.add ("max_iterations", 25);
-  syntax.add ("max_absolute_difference", Syntax::Number, Syntax::Const);
-  alist.add ("max_absolute_difference", 0.002);
-  syntax.add ("max_relative_difference", Syntax::Number, Syntax::Const);
-  alist.add ("max_relative_difference", 0.001);
-  syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly);
-  
-  UZmodel::add_type ("richards", alist, syntax, &UZRichard::make);
-}
+
