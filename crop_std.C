@@ -247,7 +247,8 @@ struct CropStandard::Parameters
     const vector<AttributeList*>& Dead; // Dead AM parameters.
     const vector<AttributeList*>& SOrg; // SOrg AM parameters.
     const vector<AttributeList*>& Root; // Root AM parameters.
-    const double EconomicYield; // Fraction of economic yield in storage organs.
+    const double EconomicYield_W; // Frac. of economic yield (DM) in storage org.
+    const double EconomicYield_N; // Frac. of economic yield (N) in storage org.
     const double C_Stem;	// C fraction of total weight.
     const double C_Leaf;	// C fraction of total weight.
     const double C_Dead;	// C fraction of total weight.
@@ -353,7 +354,7 @@ struct CropStandard::Variables
     double PotTransp;	        // Potential Transpiration [mm/h]
     double PotCanopyAss;	// Potential Canopy Assimilation [g CH2O/m2/h]
     double CanopyAss;	        // Canopy Assimilation [g CH2O/m2/h]
-    double LogPotCanopyAss;	// The above is hourly accumulated values 
+    double LogPotCanopyAss;	// The above is hourly accumulated values
     double LogCanopyAss;	// over the day.  This is last days total.
     double IncWLeaf;     	// Leaf growth [g DM/m2/d]
     double IncWStem;    	// Stem growth [g DM/m2/d]
@@ -502,7 +503,10 @@ CropStandard::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
     Dead (vl.alist_sequence ("Dead")),
     SOrg (vl.alist_sequence ("SOrg")),
     Root (vl.alist_sequence ("Root")),
-    EconomicYield (vl.number ("EconomicYield")),
+    EconomicYield_W (vl.number ("EconomicYield_W")),
+    EconomicYield_N (vl.check ("EconomicYield_N")
+                     ? vl.number ("EconomicYield_N")
+                     : vl.number ("EconomicYield_W")),
     C_Stem (vl.number ("C_Stem")),
     C_Leaf (vl.number ("C_Leaf")),
     C_Dead (vl.number ("C_Dead")),
@@ -955,13 +959,13 @@ CropStandardSyntax::CropStandardSyntax ()
   AttributeList& AOM2 = *new AttributeList (om_alist);
   AOM1.add ("initial_fraction", 0.80);
   vector<double> CN;
-  CN.push_back (100.0);
+  CN.push_back (90.0);
   AOM1.add ("C_per_N", CN);
   vector<double> efficiency1;
   efficiency1.push_back (0.50);
   efficiency1.push_back (0.50);
   AOM1.add ("efficiency", efficiency1);
-  AOM1.add ("turnover_rate", 2.917e-4);
+  AOM1.add ("turnover_rate", 2.0e-4);
   vector<double> fractions1;
   fractions1.push_back (0.50);
   fractions1.push_back (0.50);
@@ -971,7 +975,7 @@ CropStandardSyntax::CropStandardSyntax ()
   efficiency2.push_back (0.50);
   efficiency2.push_back (0.50);
   AOM2.add ("efficiency", efficiency2);
-  AOM2.add ("turnover_rate", 2.917e-3);
+  AOM2.add ("turnover_rate", 2.0e-3);
   vector<double> fractions2;
   fractions2.push_back (0.00);
   fractions2.push_back (1.00);
@@ -990,8 +994,12 @@ CropStandardSyntax::CropStandardSyntax ()
   HarvestList.add ("SOrg", AOM);
   add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const);
   HarvestList.add ("Root", AOM);
-  Harvest.add ("EconomicYield", Syntax::Number, Syntax::Const);
-  HarvestList.add ("EconomicYield", 1.00);
+  Harvest.add ("EconomicYield_W", Syntax::None (), Syntax::Const,
+  	       "Valuable fraction of storage organ (DM), e.g. grain or tuber.");
+  HarvestList.add ("EconomicYield_W", 1.00);
+  Harvest.add ("EconomicYield_N", Syntax::None (), Syntax::OptionalConst,
+               "Valuable fraction of storage organ (N).\n\
+By default the value for DM is used.");
   Harvest.add ("C_Stem", Syntax::Number, Syntax::Const);
   HarvestList.add ("C_Stem", 0.420);
   Harvest.add ("C_Leaf", Syntax::Number, Syntax::Const);
@@ -1191,7 +1199,7 @@ CropStandard::SoluteUptake (const Soil& soil,
 			    const SoilWater& soil_water,
 			    Solute& solute,
 			    double PotNUpt,
-			    vector<double>& uptake,
+ 			    vector<double>& uptake,
 			    double I_max, double r_root)
 {
   PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
@@ -1220,7 +1228,7 @@ CropStandard::SoluteUptake (const Soil& soil,
 	  const double beta_squared = beta * beta;
 	  if (alpha < 1e-10)
 	    {
-	      B_zero[i] = 4.0 * M_PI * D 
+	      B_zero[i] = 4.0 * M_PI * D
 		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
 	      I_zero[i] = B_zero[i] * C_l;
 	    }
@@ -1228,7 +1236,7 @@ CropStandard::SoluteUptake (const Soil& soil,
 	    {
 	      B_zero[i] = q_r * log (beta_squared)
 		/ ((beta_squared - 1.0) - log (beta_squared));
-	      I_zero[i] = q_r * (beta_squared - 1.0) * C_l 
+	      I_zero[i] = q_r * (beta_squared - 1.0) * C_l
 		/ ((beta_squared - 1.0) - log (beta_squared));
 	    }
 	  else
@@ -1253,7 +1261,7 @@ CropStandard::SoluteUptake (const Soil& soil,
     {
       const double L = root_density[i];
       if (solute.M_left (i) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
-	uptake[i] = max (0.0, 
+	uptake[i] = max (0.0,
 			 min (L * (min (I_zero[i], I_max)
 				   - B_zero[i] * c_root),
 			      solute.M_left (i) - 1e-8));
@@ -1279,7 +1287,7 @@ CropStandard::Vernalization (double Ta)
     DS = Vernal.DSLim;
 }
 
-void 
+void
 CropStandard::Emergence ()
 {
   const Parameters::DevelPar& Devel = par.Devel;
@@ -1301,7 +1309,7 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
   if (Phenology.DS < 1.0)
     {
       // Only increase DS if assimilate production covers leaf respiration.
-      if (var.CrpAux.IncWLeaf +  var.CrpAux.DeadWLeaf 
+      if (var.CrpAux.IncWLeaf +  var.CrpAux.DeadWLeaf
 	  >  -var.Prod.WLeaf /1000.0) // It lost 0.1% of its leafs to resp.
 	Phenology.DS += (Devel.DSRate1
 			 * Devel.TempEff1 (Ta)
@@ -1325,7 +1333,7 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 
   assert (Phenology.DS <= Devel.defined_until_ds);
 }
-double 
+double
 CropStandard::CropHeight ()
 {
   const Parameters::CanopyPar& Canopy = par.Canopy;
@@ -1334,7 +1342,7 @@ CropStandard::CropHeight ()
   return Canopy.HvsDS (DS) + var.Canopy.Offset;
 }
 
-void 
+void
 CropStandard::InitialLAI ()
 {
   const Parameters::CanopyPar& Canopy = par.Canopy;
@@ -1569,8 +1577,8 @@ CropStandard::ActualWaterUptake (double Ept,
 		// total = next;
 		h_x = h_next;
 	      }
-	    else 
-	      
+	    else
+
 	    break;
 	  }
 	else
@@ -1579,7 +1587,7 @@ CropStandard::ActualWaterUptake (double Ept,
 	    step /= 2;
 	    continue;
 	  }
-      
+
       total = next;
       h_x = h_next;
       step *= 2;
@@ -1614,7 +1622,7 @@ CropStandard::ActualWaterUptake (double Ept,
 }
 
 double
-CropStandard::PotentialWaterUptake (const double h_x, 
+CropStandard::PotentialWaterUptake (const double h_x,
 				    const Soil& soil, const SoilWater& soil_water)
 {
   const double h_wp = par.Root.h_wp;
@@ -2065,12 +2073,16 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 	}
       if (RMStem <= AssG)
 	{
-	  CrpAux.IncWRoot = 0.0;
+	  CrpAux.IncWStem = 0.0;
 	  AssG -= RMStem;
 	}
       else
 	{
-	  CrpAux.IncWRoot = AssG - RMRoot;
+	  CrpAux.IncWStem = AssG - RMStem - CrpAux.IncWSOrg;
+          if (vProd.WStem > CrpAux.IncWStem)
+            CrpAux.IncWSOrg  = 0.0;
+          else
+            CrpAux.IncWStem += CrpAux.IncWSOrg;
 	  AssG = 0.0;
 	}
       if (RMRoot <= AssG)
@@ -2091,7 +2103,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   CrpAux.DeadWLeaf = pProd.LfDR (DS) * vProd.WLeaf;
   CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * CrpAux.LAImRat;
   double DdLeafCnc;
-  if (vProd.NCrop > CrpAux.PtNCnt)
+  if (vProd.NCrop > 1.05 * CrpAux.PtNCnt)
     DdLeafCnc = vProd.NLeaf/vProd.WLeaf;
   else
     DdLeafCnc = (vProd.NLeaf/vProd.WLeaf - par.CrpN.NfLeafCnc (DS))
@@ -2116,7 +2128,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   CrpAux.DeadWRoot = RtDR * vProd.WRoot;
   double DdRootCnc;
-  if (vProd.NCrop > CrpAux.PtNCnt)
+  if (vProd.NCrop > 1.05 * CrpAux.PtNCnt)
     DdRootCnc = vProd.NRoot/vProd.WRoot;
   else
     DdRootCnc = (vProd.NRoot/vProd.WRoot - par.CrpN.NfRootCnc (DS))
