@@ -515,7 +515,6 @@ dist:	cvs
 	sed -e 's/version [1-9]\.[0-9][0-9]/version $(TAG)/' \
 		< $(WWWINDEX).old > $(WWWINDEX)
 	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
-foo:
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib; $(MAKE) dist)
