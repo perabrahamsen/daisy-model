@@ -11,6 +11,7 @@
 
 struct Log::Implementation
 {
+  ostream& err;
   struct Entry
   {
     string name;
@@ -34,7 +35,7 @@ struct Log::Implementation
   Entry* current;
   void select (EntryList::iterator);
   void deselect ();
-  Implementation ();
+  Implementation (ostream& s);
   ~Implementation ();
 };
 
@@ -93,8 +94,9 @@ Log::Implementation::Entry::newline ()
   *stream << "\n" << string (column / 8, '\t') << string (column % 8, ' ');
 }
 
-Log::Implementation::Implementation ()
-  : current (0)
+Log::Implementation::Implementation (ostream& s)
+  : err (s),
+    current (0)
 { }
 
 Log::Implementation::~Implementation ()
@@ -273,14 +275,20 @@ Log::output_point (double x, double y)
   close ();
 }
 
+ostream& 
+Log::err ()
+{
+  return impl.err;
+}
+
 void
 Log::add (string n, const Condition* c, const Filter* f)
 {
   impl.entries.push_back (new Implementation::Entry (n, c, f));
 }
 
-Log::Log ()
-  : impl (*new Implementation ())
+Log::Log (ostream& s)
+  : impl (*new Implementation (s))
 { }
 
 Log::~Log ()

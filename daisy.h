@@ -9,35 +9,37 @@ class Manager;
 class Weather;
 class Groundwater;
 class Log;
-class Input;
 class Condition;
 class Filter;
 class ColumnList;
+class Syntax;
+class AttributeList;
 
 class Daisy
 {
-    // Content.
-    struct Implementation;
-    Implementation& impl;
+  // Content.
+  struct Implementation;
+  Implementation& impl;
 public:
-    Log& log;
-    Time& time;
-    Manager& manager;
-    Weather& weather;
-    Groundwater& groundwater;
-    ColumnList& columns;
+  Log& log;
+  Time time;
+  Manager& manager;
+  Weather& weather;
+  Groundwater& groundwater;
+  ColumnList& columns;
 
-    // Simulation.
+  // Simulation.
 public:
-    void run();
-    bool match (const Condition*) const;
-    void output (Log&, const Filter*) const;
-    void output_field (Log&, const Filter*) const;
+  void run();
+  bool match (const Condition*) const;
+  void output (Log&, const Filter*) const;
+  void output_field (Log&, const Filter*) const;
 
-    // Create and Destroy.
+  // Create and Destroy.
 public:
-    Daisy (const Input&);
-    ~Daisy ();
+  static void load_syntax (Syntax&);
+  Daisy (Log&, const AttributeList&);
+  ~Daisy ();
 };
 
 #endif DAISY_H

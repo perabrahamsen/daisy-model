@@ -33,8 +33,7 @@ public:
     const Filter* lookup (string) const;
 
     // Create and Destroy.
-private:
-    friend class Filter; // Only create from Filter.
+public:
     FilterAll ();
 };
 
@@ -54,7 +53,7 @@ private:
 public:
     ~FilterSome ();
 private:
-    friend class Input; // Only create from Input.
+    friend class Parser; // Only create from Input.
     void add (string, const Filter* = Filter::all);
     FilterSome ();
 };

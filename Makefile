@@ -94,62 +94,62 @@ ptest: pcrop
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
-main.o: main.C daisy.h time.h input.h
-daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h log.h \
- column.h action.h filter.h library.h syntax.h condition.h
-input.o: input.C input.h daisy.h time.h manager.h weather.h \
- groundwater.h uzmodel.h log.h horizon.h column.h crop.h alist.h \
- csmp.h rules.h library.h syntax.h action.h condition.h filter.h
-log.o: log.C log.h condition.h daisy.h time.h filter.h csmp.h
-weather.o: weather.C weather.h time.h library.h alist.h daisy.h
-manager.o: manager.C manager.h library.h alist.h daisy.h time.h
-column.o: column.C column.h library.h
-crop.o: crop.C crop.h library.h
-alist.o: alist.C alist.h daisy.h time.h action.h condition.h
-syntax.o: syntax.C syntax.h alist.h daisy.h time.h
-library.o: library.C library.h alist.h daisy.h time.h syntax.h
-action.o: action.C action.h daisy.h time.h column.h
-condition.o: condition.C condition.h daisy.h time.h
-horizon.o: horizon.C horizon.h library.h
+main.o: main.C daisy.h time.h input.h syntax.h
+daisy.o: daisy.C daisy.h time.h input.h manager.h weather.h \
+ groundwater.h uzmodel.h horizon.h log.h crop.h column.h action.h \
+ filter.h library.h syntax.h condition.h alist.h common.h
+input.o: input.C input.h log.h alist.h common.h csmp.h rules.h \
+ library.h syntax.h action.h condition.h time.h filter.h crop.h
+log.o: log.C log.h condition.h time.h filter.h csmp.h daisy.h
+weather.o: weather.C weather.h time.h library.h alist.h common.h
+manager.o: manager.C manager.h library.h alist.h common.h
+column.o: column.C column.h library.h alist.h common.h
+crop.o: crop.C crop.h library.h alist.h common.h
+alist.o: alist.C alist.h common.h action.h condition.h time.h
+syntax.o: syntax.C syntax.h alist.h common.h
+library.o: library.C library.h alist.h common.h syntax.h
+action.o: action.C action.h column.h alist.h common.h
+condition.o: condition.C condition.h time.h
+horizon.o: horizon.C horizon.h library.h alist.h common.h
 ftable.o: ftable.C ftable.h
 crop_impl.o: crop_impl.C crop_impl.h crop_std.h crop.h ftable.h csmp.h \
- syntax.h alist.h daisy.h time.h filter.h log.h bioclimate.h
+ syntax.h alist.h common.h filter.h log.h bioclimate.h
 filter.o: filter.C filter.h
 csmp.o: csmp.C csmp.h log.h
 rules.o: rules.C rules.h daisy.h time.h action.h
 time.o: time.C time.h
-column_std.o: column_std.C column_std.h daisy.h time.h column.h \
- bioclimate.h surface.h uzmodel.h soil.h horizon.h soil_water.h \
- soil_heat.h soil_NH4.h soil_NO3.h organic_matter.h nitrification.h \
- denitrification.h alist.h syntax.h library.h log.h filter.h crop.h
-uzmodel.o: uzmodel.C uzmodel.h library.h alist.h daisy.h time.h
-soil.o: soil.C soil.h horizon.h alist.h daisy.h time.h
+column_std.o: column_std.C column_std.h column.h crop.h bioclimate.h \
+ surface.h uzmodel.h soil.h horizon.h soil_water.h soil_heat.h \
+ soil_NH4.h soil_NO3.h organic_matter.h nitrification.h \
+ denitrification.h alist.h common.h syntax.h library.h log.h filter.h
+uzmodel.o: uzmodel.C uzmodel.h library.h alist.h common.h
+soil.o: soil.C soil.h horizon.h alist.h common.h syntax.h
 mathlib.o: mathlib.C mathlib.h
 template.o: template.C ftable.h crop_impl.h crop_std.h crop.h csmp.h \
  ftable.t
-bioclimate.o: bioclimate.C bioclimate.h daisy.h time.h surface.h \
- uzmodel.h weather.h crop.h csmp.h alist.h
+bioclimate.o: bioclimate.C bioclimate.h surface.h uzmodel.h weather.h \
+ time.h crop.h csmp.h alist.h common.h
 surface.o: surface.C surface.h uzmodel.h
-soil_water.o: soil_water.C soil_water.h log.h alist.h daisy.h time.h \
- uzmodel.h soil.h horizon.h surface.h groundwater.h syntax.h
+soil_water.o: soil_water.C soil_water.h log.h alist.h common.h \
+ uzmodel.h soil.h horizon.h surface.h groundwater.h time.h syntax.h
 soil_NH4.o: soil_NH4.C soil_NH4.h
 soil_NO3.o: soil_NO3.C soil_NO3.h
 organic_matter.o: organic_matter.C organic_matter.h
 nitrification.o: nitrification.C nitrification.h
 denitrification.o: denitrification.C denitrification.h
-soil_heat.o: soil_heat.C soil_heat.h daisy.h time.h alist.h \
- bioclimate.h
+soil_heat.o: soil_heat.C soil_heat.h alist.h common.h bioclimate.h
 groundwater.o: groundwater.C groundwater.h time.h uzmodel.h library.h \
- alist.h daisy.h
+ alist.h common.h
 uzrichard.o: uzrichard.C uzrichard.h uzmodel.h soil.h horizon.h \
- mathlib.h alist.h daisy.h time.h syntax.h
+ mathlib.h alist.h common.h syntax.h
 horizon_yolo.o: horizon_yolo.C horizon_yolo.h horizon.h syntax.h \
- alist.h daisy.h time.h
+ alist.h common.h
 crop_std.o: crop_std.C crop_impl.h crop_std.h crop.h ftable.h csmp.h \
- log.h time.h column.h bioclimate.h daisy.h
+ log.h time.h column.h bioclimate.h
 manager_rule.o: manager_rule.C manager_rule.h manager.h syntax.h \
- rules.h alist.h daisy.h time.h
-weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
- daisy.h
+ rules.h alist.h common.h
+weather_simple.o: weather_simple.C weather_simple.h weather.h time.h \
+ syntax.h alist.h common.h
 groundwater_static.o: groundwater_static.C groundwater_static.h \
- groundwater.h time.h uzmodel.h syntax.h alist.h daisy.h
+ groundwater.h time.h uzmodel.h syntax.h alist.h common.h
+common.o: common.C common.h

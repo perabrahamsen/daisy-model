@@ -28,6 +28,7 @@ public:
   void output (string, const Filter*, const vector<double>&);
   void output (string, const Filter*, const CSMP&);
   void output_point (double x, double y);
+  ostream& err ();
 
 private:
   void print (const char*);
@@ -43,10 +44,10 @@ private:
 
   // Create and Destroy.
 private:
-  friend class Input; // Only create from Input.
+  friend class Parser; // Only create from Input.
   void add (string, const Condition*, const Filter*);
-  Log ();
 public:
+  Log (ostream&);
   ~Log ();
 };
 

@@ -4,13 +4,17 @@
 #include "input.h"
 #include "manager.h"
 #include "weather.h"
+#include "groundwater.h"
+#include "horizon.h"
 #include "log.h"
+#include "crop.h"
 #include "column.h"
 #include "action.h"
 #include "filter.h"
 #include "library.h"
 #include "syntax.h"
 #include "condition.h"
+#include "alist.h"
 #include <iostream.h>
 
 struct Daisy::Implementation
@@ -18,14 +22,14 @@ struct Daisy::Implementation
   Implementation () { };
 };
 
-Daisy::Daisy (const Input& input)
+Daisy::Daisy (Log& l, const AttributeList& al)
   : impl (*new Implementation ()), 
-    log (input.makeLog ()), 
-    time (input.makeTime ()),
-    manager (input.makeManager ()),
-    weather (input.makeWeather ()), 
-    groundwater (input.makeGroundwater ()), 
-    columns (input.makeColumns ())
+    log (l), 
+    time (al.time ("time")),
+    manager (Manager::create (al.list ("chief"))),
+    weather (Weather::create (time, al.list ("weather"))), 
+    groundwater (Groundwater::create (time, al.list ("groundwater"))), 
+    columns (*new ColumnList (al.sequence ("field")))
 { }
 
 void 
@@ -87,15 +91,26 @@ Daisy::output_field (Log&, const Filter* filter) const
   log.close ();
 }
 
+void
+Daisy::load_syntax (Syntax& syntax)
+{
+  syntax.add_class ("crop", Crop::par_library (), &Crop::derive_type);
+  syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
+  syntax.add_class ("column", Column::par_library (), &Column::derive_type);
+  syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
+  syntax.add_object ("chief", Manager::library ());
+  syntax.add ("time", Syntax::Date);
+  syntax.add_sequence ("field", Column::var_library ());
+  syntax.add_output ("log", syntax, Syntax::Sparse);
+  syntax.add_object ("weather", Weather::library ());
+  syntax.add_object ("groundwater", Groundwater::library ());
+}
+
 Daisy::~Daisy ()
 {
+  delete &impl;
   delete &manager;
   delete &weather;
-  delete &log;
-  delete &time;
-  delete &impl;
-  for (ColumnList::iterator column = columns.begin();
-       column != columns.end();
-       column++)
-    delete *column;
+  delete &groundwater;
+  delete &columns;
 }

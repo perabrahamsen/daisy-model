@@ -1,13 +1,7 @@
 // input.C
 
 #include "input.h"
-#include "manager.h"
-#include "weather.h"
-#include "groundwater.h"
 #include "log.h"
-#include "horizon.h"
-#include "column.h"
-#include "crop.h"
 #include "alist.h"
 #include "csmp.h"
 #include "rules.h"
@@ -16,6 +10,7 @@
 #include "action.h"
 #include "condition.h"
 #include "filter.h"
+#include "crop.h"
 #include <fstream.h>
 #include <strstream.h>
 
@@ -25,13 +20,10 @@ Usage::what () const
   return "Usage: daisy file";
 }
 
-struct Input::Implementation
+struct Parser
 {
   Log& log;
-  AttributeList alist;
-  Time time;
-  Syntax syntax;
-  void load ();
+  const AttributeList& load (const Syntax& syntax);
   int get ();
   int peek ();
   bool good ();
@@ -62,62 +54,24 @@ struct Input::Implementation
   string file;
   int line;
   int column;
-  Implementation (int& argc, char**& argv, ostream&);
+  Parser (int& argc, char**& argv, Log&);
+  ~Parser ();
 };
 
-Time& 
-Input::makeTime () const
+const AttributeList&
+Parser::load (const Syntax& syntax)
 {
-  impl.time = impl.alist.time ("time");
-  return impl.time;
-}
-Manager& 
-Input::makeManager () const
-{ 
-  
-  return Manager::create (impl.alist.list ("chief"));
-}
-
-Weather& 
-Input::makeWeather () const 
-{     
-  return Weather::create (impl.time, impl.alist.list ("weather"));
-}
-
-Groundwater& 
-Input::makeGroundwater () const 
-{     
-  return Groundwater::create (impl.time, impl.alist.list ("groundwater"));
-}
-
-Log& 
-Input::makeLog () const
-{ 
-  return impl.log;
-}
-
-ColumnList&
-Input::makeColumns () const
-{
-  return *new ColumnList (impl.alist.sequence ("field"));
-}
-
-Input::Input (int& argc, char**& argv, ostream& e)
-  : impl (*new Implementation (argc, argv, e))
-{ }
-
-void 
-Input::Implementation::load ()
-{
+  AttributeList& alist = *new AttributeList ();
   skip ("(");
   load_list (alist, syntax);
   skip (")");
   eof ();
   syntax.check ("daisy", alist, log);
+  return alist;
 }
 
 int
-Input::Implementation::get ()
+Parser::get ()
 {
   int c = in->get ();
 
@@ -137,19 +91,19 @@ Input::Implementation::get ()
 }
 
 int
-Input::Implementation::peek ()
+Parser::peek ()
 {
   return in->peek ();
 }
 
 bool
-Input::Implementation::good ()
+Parser::good ()
 {
   return in->good ();
 }
 
 string
-Input::Implementation::get_string ()
+Parser::get_string ()
 {
   string str ("");
   skip ("\"");
@@ -176,7 +130,7 @@ Input::Implementation::get_string ()
 }
 
 string
-Input::Implementation::get_id ()
+Parser::get_id ()
 {
   skip ();
   int c = peek ();
@@ -201,7 +155,7 @@ Input::Implementation::get_id ()
 }
 
 double
-Input::Implementation::get_number ()
+Parser::get_number ()
 {
   skip ();
   // Cheat... This doesn't give us the right error handling.
@@ -211,7 +165,7 @@ Input::Implementation::get_number ()
 }
 
 int
-Input::Implementation::get_integer ()
+Parser::get_integer ()
 {
   skip ();
   // Cheat... This doesn't give us the right error handling.
@@ -221,13 +175,13 @@ Input::Implementation::get_integer ()
 }
 
 void 
-Input::Implementation::error (string str)
+Parser::error (string str)
 {
   err << file << ":" << line << ":" << column + 1 << ": " << str << "\n";
 }
 
 void
-Input::Implementation::skip (const char* str)
+Parser::skip (const char* str)
 { 
   skip ();
   for (const char* p = str; *p; p++)
@@ -242,7 +196,7 @@ Input::Implementation::skip (const char* str)
 }
 
 void
-Input::Implementation::skip ()
+Parser::skip ()
 { 
   while (true)
     if (!good ())
@@ -257,7 +211,7 @@ Input::Implementation::skip ()
 }
 
 void
-Input::Implementation::skip_token ()
+Parser::skip_token ()
 {
   if (peek () == ';' || isspace (peek ()))
     skip ();
@@ -278,21 +232,21 @@ Input::Implementation::skip_token ()
 }
 
 void
-Input::Implementation::skip_to_end ()
+Parser::skip_to_end ()
 {
   while (peek () != ')' && good ())
     skip_token ();
 }
 
 bool
-Input::Implementation::looking_at (char c)
+Parser::looking_at (char c)
 { 
   skip ();
   return peek () == c;
 }
 
 void
-Input::Implementation::eof ()
+Parser::eof ()
 { 
   skip ();
   if (!in->eof ())
@@ -300,7 +254,7 @@ Input::Implementation::eof ()
 }
     
 const Layers&
-Input::Implementation::load_layers (const Library& lib)
+Parser::load_layers (const Library& lib)
 {
   Layers& layers = *new Layers ();
   double last = 0.0;
@@ -327,7 +281,7 @@ Input::Implementation::load_layers (const Library& lib)
 }
 
 void
-Input::Implementation::load_library (Library& lib)
+Parser::load_library (Library& lib)
 { 
   string name = get_id ();
   string super = get_id ();
@@ -344,7 +298,7 @@ Input::Implementation::load_library (Library& lib)
 }
 
 void
-Input::Implementation::add_derived (const Library& lib, derive_fun derive)
+Parser::add_derived (const Library& lib, derive_fun derive)
 {
 
   const string name = get_id ();
@@ -362,7 +316,7 @@ Input::Implementation::add_derived (const Library& lib, derive_fun derive)
 }
 
 const AttributeList&
-Input::Implementation::load_derived (const Library& lib)
+Parser::load_derived (const Library& lib)
 {
   const string type = get_id ();
   if (lib.check (type))
@@ -380,7 +334,7 @@ Input::Implementation::load_derived (const Library& lib)
 }
 
 void
-Input::Implementation::load_list (AttributeList& atts, const Syntax& syntax)
+Parser::load_list (AttributeList& atts, const Syntax& syntax)
 { 
   while (!looking_at (')') && good ())
     {
@@ -553,7 +507,7 @@ Input::Implementation::load_list (AttributeList& atts, const Syntax& syntax)
 }
 
 Time
-Input::Implementation::get_time ()
+Parser::get_time ()
 {
   int year = get_integer ();
   int month = get_integer ();
@@ -573,7 +527,7 @@ Input::Implementation::get_time ()
 }
 
 const Condition*
-Input::Implementation::get_condition ()
+Parser::get_condition ()
 { 
   Condition* condition = &Condition::null;
   skip ("(");
@@ -625,7 +579,7 @@ Input::Implementation::get_condition ()
 }
 
 const Action*
-Input::Implementation::get_action ()
+Parser::get_action ()
 {
   Action* action = &Action::null;
   skip ("(");
@@ -644,7 +598,7 @@ Input::Implementation::get_action ()
 }
 
 const Filter*
-Input::Implementation::get_filter (const Syntax& syntax)
+Parser::get_filter (const Syntax& syntax)
 {
   if (looking_at ('*'))
     {
@@ -694,7 +648,7 @@ Input::Implementation::get_filter (const Syntax& syntax)
 }
 
 const Filter*
-Input::Implementation::get_filter_object (const Library& library)
+Parser::get_filter_object (const Library& library)
 {
   const Filter* filter = Filter::all;
   skip ("(");
@@ -708,7 +662,7 @@ Input::Implementation::get_filter_object (const Library& library)
 }
 
 const Filter*
-Input::Implementation::get_filter_sequence (const Library& library)
+Parser::get_filter_sequence (const Library& library)
 {
   FilterSome* filter = new FilterSome ();
 
@@ -725,10 +679,9 @@ Input::Implementation::get_filter_sequence (const Library& library)
   return filter;
 }
 
-Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
-  : log (*new Log ()),
-    time (0, 1, 1, 0),
-    err (e),
+Parser::Parser (int& argc, char**& argv, Log& log)
+  : log (log),
+    err (cerr),
     line (1),
     column (0)
 { 
@@ -736,17 +689,18 @@ Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
     THROW (Usage ());
   file = argv[1];
   in = new ifstream (file.data ());
-  syntax.add_class ("crop", Crop::par_library (), &Crop::derive_type);
-  syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
-  syntax.add_class ("column", Column::par_library (), &Column::derive_type);
-  syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
-  syntax.add_object ("chief", Manager::library ());
-  syntax.add ("time", Syntax::Date);
-  syntax.add_sequence ("field", Column::var_library ());
-  syntax.add_output ("log", syntax, Syntax::Sparse);
-  syntax.add_object ("weather", Weather::library ());
-  syntax.add_object ("groundwater", Groundwater::library ());
-  load ();
-  delete in;
-  in = NULL;
 }
+
+Parser::~Parser ()
+{
+  delete in;
+}
+
+pair<Log*, const AttributeList*>
+parse (const Syntax& syntax, int& argc, char**& argv)
+{
+  Log& log = *new Log (cerr);
+  Parser parser(argc, argv, log);
+  return make_pair (&log, &parser.load (syntax));
+}
+  
