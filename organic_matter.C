@@ -91,6 +91,7 @@ struct OrganicMatter::Implementation
   } buffer;
   const PLF heat_factor;
   const PLF water_factor;
+  vector<double> abiotic_factor;
   auto_ptr<ClayOM> clayom;
   vector<double> tillage_age;
   const vector<const PLF*> smb_tillage_factor;
@@ -438,7 +439,7 @@ Pressure used for equilibrium.");
 If neither the C content nor 'SOM_fractions' are specified, equilibrium is\n\
 assumed for all SOM pools except the one specified by this parameter.\n\
 If you set this to -1 (or any number nor corresponding to a SOM pool),\n\
-equilibrium will be assumed for all pools, and instead the humus content\n\
+equilibrium will be assumed for all pools, and the humus content\n\
 specified by the horizon will be ignored.\n\
 Note, the numbering is zero-based, so '0' specifies SOM1.\n\
 By default, the slowest active pool will be used.");
@@ -758,7 +759,10 @@ OrganicMatter::Implementation::output (Log& log,
   output_variable (top_CO2, log);
   static const symbol total_N_symbol ("total_N");
   static const symbol total_C_symbol ("total_C");
-  if (log.check_leaf (total_N_symbol) || log.check_leaf (total_C_symbol))
+  static const symbol humus_symbol ("humus");
+  if (log.check_leaf (total_N_symbol)
+      || log.check_leaf (total_C_symbol)
+      || log.check_leaf (humus_symbol))
     {
       const int size = geometry.size ();
 
@@ -791,7 +795,16 @@ OrganicMatter::Implementation::output (Log& log,
 	}
       output_variable (total_N, log);
       output_variable (total_C, log);
+      if (log.check_leaf (humus_symbol))
+        {
+          static const double c_fraction_in_humus = 0.587;
+          vector<double> humus;
+          for (size_t i = 0; i < total_C.size (); i++)
+            humus.push_back (total_C[i] / c_fraction_in_humus);
+          output_variable (humus, log);
+        }
     }
+  output_variable (abiotic_factor, log);
   output_variable (tillage_age, log);
   static const symbol am_symbol ("am");
   if (log.check_interior (am_symbol))
@@ -1071,7 +1084,6 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   vector<double> N_soil (size);
   vector<double> N_used (size);
-  vector<double> abiotic_factor (size);
   vector<double> clay_factor (size);
   vector<double> soil_factor (size);
   vector<double> tillage_factor (size);
@@ -1853,11 +1865,6 @@ Setting additional pool to zero");
 	    }
 	  equation_string () << "\n";
 	}
-      if (print_equations)
-	if (debug_to_screen)
-	  msg.message (equation_string.str ());
-	else
-	  msg.debug (equation_string.str ());
 
       // Solve.
       try
@@ -2042,6 +2049,11 @@ Setting additional pool to zero");
       else
 	msg.debug (table_string.str ());
     }
+  if (print_equations)
+    if (debug_to_screen)
+      msg.message (equation_string.str ());
+    else
+      msg.debug (equation_string.str ());
   if (error_found)
     {
       if (!print_equations)
@@ -2327,6 +2339,9 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
       soil_turnover_factor.push_back (soil_factor);
       clay_turnover_factor.push_back (soil_factor * clay_factor);
     }
+
+  abiotic_factor.insert (abiotic_factor.end (), soil.size (), 1.0);
+    
 
   // Tillage.
   tillage_age.insert (tillage_age.end (), 
@@ -3002,6 +3017,8 @@ This is a negative number.");
   syntax.add ("tillage_C_soil", "g C/cm^3/h",
               Syntax::LogOnly, Syntax::Sequence,
               "Amount of carbon added to surface during tillage.");
+  syntax.add ("humus", "g/cm^3", Syntax::LogOnly, Syntax::Sequence,
+	      "Total organic matter in the soil layer.");
   syntax.add ("total_C", "g C/cm^3", Syntax::LogOnly, Syntax::Sequence,
 	      "Total organic C in the soil layer.");
   syntax.add ("total_N", "g N/cm^3", Syntax::LogOnly, Syntax::Sequence,
@@ -3158,6 +3175,9 @@ Default water potential factor, used if not specified by OM pool.\n\
 If the PLF is empty, a build-in PLF of pF will be used instead.\n\
 It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
   alist.add ("water_factor", PLF::empty ());
+  syntax.add ("abiotic_factor", Syntax::None (), 
+              Syntax::LogOnly, Syntax::Sequence,
+	      "Product of current heat and water factors."); 
   syntax.add ("ClayOM", Librarian<ClayOM>::library (), "Clay effect model.");
   AttributeList clay_alist;
   clay_alist.add ("type", "old");
