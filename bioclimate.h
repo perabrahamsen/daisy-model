@@ -13,6 +13,8 @@ struct CropList;
 struct Soil;
 struct Syntax;
 struct SoilWater;
+struct Log;
+struct Filter;
 
 class Bioclimate
 { 
@@ -22,6 +24,7 @@ public:
   // Simulation
   void tick (Surface&, const Weather&, const CropList&, 
 	     const Soil&, SoilWater&);
+  void output (Log&, const Filter*) const;
 
   // Canopy.
 public:

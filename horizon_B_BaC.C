@@ -1,4 +1,6 @@
 // horizon_B_BaC.C
+//
+// Brooks and Corey retention curve model with Burdine theory.
 
 #include "horizon.h"
 #include "syntax.h"
@@ -9,7 +11,7 @@ class HorizonB_BaC : public Horizon
 {
   // Content.
   const double Theta_sat;
-  const double Theta_rel;
+  const double Theta_res_;
   const double lambda;
   const double h_b;
   const double K_sat;
@@ -17,6 +19,7 @@ class HorizonB_BaC : public Horizon
   // Use.
 public:
   double Theta (double h) const;
+  double Theta_res () const;
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
@@ -36,7 +39,13 @@ public:
 double 
 HorizonB_BaC::Theta (const double h) const
 {
-  return Se (h) * (Theta_sat - Theta_rel) + Theta_rel;
+  return Se (h) * (Theta_sat - Theta_res_) + Theta_res_;
+}
+
+double 
+HorizonB_BaC::Theta_res () const
+{
+  return Theta_res_;
 }
 
 double 
@@ -58,7 +67,7 @@ double
 HorizonB_BaC::h (const double Theta) const
 {
   if (Theta < Theta_sat)
-    return h_b / pow((Theta_rel - Theta) / (Theta_rel - Theta_sat), 1 / lambda);
+    return h_b / pow((Theta_res_ - Theta) / (Theta_res_ - Theta_sat), 1 / lambda);
   else
     return h_b;
 }
@@ -83,7 +92,7 @@ HorizonB_BaC::Se (double h) const
 
 HorizonB_BaC::HorizonB_BaC (const AttributeList& al)
   : Theta_sat (al.number ("Theta_sat")),
-    Theta_rel (al.number ("Theta_rel")),
+    Theta_res_ (al.number ("Theta_res")),
     lambda (al.number ("lambda")),
     h_b (al.number ("h_b")),
     K_sat (al.number ("K_sat"))
@@ -110,7 +119,7 @@ HorizonB_BaCSyntax::HorizonB_BaCSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   syntax.add ("Theta_sat", Syntax::Number);
-  syntax.add ("Theta_rel", Syntax::Number);
+  syntax.add ("Theta_res", Syntax::Number);
   syntax.add ("lambda", Syntax::Number);
   syntax.add ("h_b", Syntax::Number);
   syntax.add ("K_sat", Syntax::Number);

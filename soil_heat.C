@@ -8,8 +8,7 @@
 void 
 SoilHeat::tick (const Surface&, const Bioclimate& bioclimate)
 {
-  for (vector<double>::iterator i = T.begin (); i != T.end (); i++)
-    *i = bioclimate.AirTemperature ();
+  fill (T.begin (), T.end (), bioclimate.AirTemperature ());
 }
 
 bool

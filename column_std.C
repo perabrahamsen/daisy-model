@@ -50,11 +50,6 @@ private:
 public:
   void tick (const Time&, const Weather&, Groundwater&);
 
-  // Communication with crops.
-public:
-  double SoilTemperature (double depth) const;
-  double MaxRootingDepth () const;
-
   // Create and Destroy.
 private:
   friend class ColumnStandardSyntax;
@@ -73,7 +68,7 @@ ColumnStandard::sow (const AttributeList& crop, Log& log)
   else if (!Crop::library ().syntax (name).check (name, crop, log))
     log.err () << "Cannot sow incomplete crop `" << name << "'\n";
   else
-    crops.push_back (Crop::create (crop));
+    crops.push_back (Crop::create (crop, soil.size ()));
 }
 
 bool
@@ -89,57 +84,31 @@ void
 ColumnStandard::tick (const Time& time, 
 		      const Weather& weather, Groundwater& groundwater)
 {
-  cout << "Column `" << name << "' tick\n"; 
-
   soil_water.clear ();
   bioclimate.tick (surface, weather, crops, soil, soil_water);
   soil_heat.tick (surface, bioclimate);
   soil_water.tick (surface, groundwater, soil);
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
-    (*crop)->tick (time, *this, bioclimate);
+    (*crop)->tick (time, bioclimate, soil, soil_heat);
 }
 
 void
 ColumnStandard::output (Log& log, const Filter* filter) const
 {
   log.open (name);
+  output_submodule (bioclimate, "Bioclimate", log, filter);
+  output_submodule (surface, "Surface", log, filter);
 #if 0
-  if (filter->check ("Bioclimate"))
-    {
-      log.open ("Bioclimate");
-      bioclimate.output (log, filter->lookup ("Bioclimate"));
-      log.close ();
-    }
+  output_submodule (soil, "Soil", log, filter);
 #endif
-  if (filter->check ("Surface"))
-    {
-      log.open ("Surface");
-      surface.output (log, filter->lookup ("Surface"));
-      log.close ();
-    }
+  output_submodule (soil_water, "SoilWater", log, filter);
 #if 0
-  if (filter->check ("Soil"))
-    soil.output (log, filter->lookup ("Soil"));
-#endif
-  if (filter->check ("SoilWater"))
-    {
-      log.open ("SoilWater");
-      soil_water.output (log, filter->lookup ("SoilWater"));
-      log.close ();
-    }
-#if 0
-  if (filter->check ("SoilHeat"))
-    soil_heat.output (log, filter->lookup ("SoilHeat"));
-  if (filter->check ("SoilNH4"))
-    soil_NH4.output (log, filter->lookup ("SoilNH4"));
-  if (filter->check ("SoilNO3"))
-    soil_NO3.output (log, filter->lookup ("SoilNO3"));
-  if (filter->check ("OrganicMatter"))
-    organic_matter.output (log, filter->lookup ("OrganicMatter"));
-  if (filter->check ("Nitrification"))
-    nitrification.output (log, filter->lookup ("Nitrification"));
-  if (filter->check ("Denitrification"))
-    denitrification.output (log, filter->lookup ("Denitrification"));
+  output_submodule (soil_heat, "SoilHeat", log, filter);
+  output_submodule (soil_NH4, "SoilNH4", log, filter);
+  output_submodule (soil_NO3, "SoilNO3", log, filter);
+  output_submodule (organic_matter, "OrganicMatter", log, filter);
+  output_submodule (nitrification, "Nitrification", log, filter);
+  output_submodule (denitrification, "Denitrification", log, filter);
 #endif
   if (filter->check ("crops"))
     output_crops (log, filter->lookup ("crops"));
@@ -158,18 +127,6 @@ ColumnStandard::output_crops (Log& log, const Filter* filter) const
 	(*crop)->output (log, filter->lookup ((*crop)->name));
     }
   log.close ();
-}
-
-double 
-ColumnStandard::SoilTemperature (double depth) const
-{
-  return soil_heat.temperature (soil.interval_plus (depth));
-}
-
-double 
-ColumnStandard::MaxRootingDepth () const
-{
-  return soil.MaxRootingDepth ();
 }
 
 ColumnStandard::ColumnStandard (const AttributeList& al)
@@ -209,16 +166,16 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
 
   syntax.add_sequence ("crops", Crop::library ());
   
-  ADD_SUBMODULE (syntax, alist, Bioclimate);
-  ADD_SUBMODULE (syntax, alist, Surface);
-  ADD_SUBMODULE (syntax, alist, Soil);
-  ADD_SUBMODULE (syntax, alist, SoilWater);
-  ADD_SUBMODULE (syntax, alist, SoilHeat);
-  ADD_SUBMODULE (syntax, alist, SoilNH4);
-  ADD_SUBMODULE (syntax, alist, SoilNO3);
-  ADD_SUBMODULE (syntax, alist, OrganicMatter);
-  ADD_SUBMODULE (syntax, alist, Nitrification);
-  ADD_SUBMODULE (syntax, alist, Denitrification);
+  add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
+  add_submodule<Surface> ("Surface", syntax, alist);
+  add_submodule<Soil> ("Soil", syntax, alist);
+  add_submodule<SoilWater> ("SoilWater", syntax, alist);
+  add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
+  add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
+  add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
+  add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist);
+  add_submodule<Nitrification> ("Nitrification", syntax, alist);
+  add_submodule<Denitrification> ("Denitrification", syntax, alist);
 
   Column::add_type ("column", alist, syntax, &ColumnStandard::make);
 }

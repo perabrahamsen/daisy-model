@@ -3,6 +3,8 @@
 #include "snow.h"
 #include "alist.h"
 #include "syntax.h"
+#include "log.h"
+#include "filter.h"
 
 struct Snow::Implementation
 { 
@@ -63,6 +65,12 @@ Snow::Implementation::tick (const double Si, const double q_h,
 			    const double Prain, const double Psnow,
 			    const double Tair, const double Epot)
 { 
+  assert (Si >= 0.0);
+  assert (Prain >= 0.0);
+  assert (Psnow >= 0.0);
+  assert (Epot >= 0.0);
+  assert (Tair > -374 && Tair <= 100);
+
   static const double dt = 1.0; // Time step [h].
   static const double f = 1.0;	// Melting factor. [mm H2O / (kg H2O / m^2)]
   static const double rho_w = 10e3; // Density of water. [kg / m^3]
@@ -72,7 +80,9 @@ Snow::Implementation::tick (const double Si, const double q_h,
   const double P = Psnow + Prain;
   
   // Relative amount of snow in percolation.
-  const double fs = Psnow / P;
+  const double fs = (P > 0) ? Psnow / P : 0.0;
+  assert (fs >= 0.0);
+
   // Check if snow has become white.
   if (Psnow > Psa && fs > fsa) 
     age = 0;
@@ -84,11 +94,20 @@ Snow::Implementation::tick (const double Si, const double q_h,
   else 
     Esnow = Ssnow / dt + P;
 
-  // Density of snow pack. [kg/m^3]
-  const double rho_p = rho_w + (rho_s + rho_w) * Psnow / P;
+  assert (Esnow >= 0.0);
+  assert (Esnow <= Epot);
+  assert (Esnow <= Ssnow / dt + P);
 
   // Depth of snow fallen this hour. [m]
-  const double dZp = P * dt / (f * rho_p);
+  double dZp = 0.0;
+  if (Psnow > 0.0)
+    {
+      // Density of snow pack. [kg/m^3]
+      const double rho_p = rho_w + (rho_s - rho_w) * Psnow / P;
+      assert (rho_p >= 0.0);
+      dZp = P * dt / (f * rho_p);
+    }
+  assert (dZp >= 0.0);
 
   // Air temperature melting factor. [kg/J]
   const double mt = mtprime * ((Tair < 0.0) ? min (1.0, (dZs + dZp) * mf) : 1);
@@ -114,31 +133,56 @@ Snow::Implementation::tick (const double Si, const double q_h,
     Eprime = Esnow;
   else
     Eprime = Swater / dt + Prain + M;
+  assert (Eprime >= 0.0);
+  assert (Eprime <= Esnow);
   
   // Water storage capacity of snow [mm]
-  const double Scapacity = f_c * (Ssnow + (P - Esnow) / dt);
+  const double Scapacity = f_c * Ssnow;
+  assert (Scapacity >= 0.0);
 
   // We can now calculate how much water is leaking.
   q_s = max (0.0, Swater + (Prain - Esnow + M) * dt - Scapacity) / dt;
+  assert (q_s >= 0.0);
   
   // New snow pack storage [mm].
   const double Ssnow_new = Ssnow + (Psnow + Prain - Esnow - q_s) * dt;
-  
-  // Density of collapsing snow pack [kg/m^3]
-  const double rho_c
-    = max (Ssnow_new / (f * dZs), 
-	   rho_s + rho_1 * Ssnow_new / Scapacity + rho_2 * Ssnow);
-  
-  // Size of collapsed snow pack [m]
-  const double dZs_c = Ssnow / (f * rho_c);
+  assert (Ssnow_new >= 0.0);
 
-  // Density of snow pack with new content [kg/m^3]
-  // BUG: Ask SH what it really should be.
-  dZs = dZs_c + (P - Esnow) * rho_s;
+  // New water content in snow pack [mm].
+  const double Swater_new = Swater + (Prain - Eprime + M - q_s) * dt;
+  assert (Swater_new >= 0.0);
+  assert (Swater_new <= Ssnow_new);
+
+  // Update the snow height,
+  if (Ssnow_new > 0.0)
+    {
+      if (dZs > 0.0)
+	{
+	  // Density of collapsing snow pack [kg/m^3]
+	  assert (Scapacity > 0.0);
+	  const double rho_c
+	    = max (Ssnow / (f * dZs), 
+		   rho_s + rho_1 * Swater_new / Scapacity + rho_2 * Ssnow);
+	  assert (rho_c > 0.0);
+
+	  // Size of collapsed snow pack [m]
+	  const double dZc = (Ssnow + dZp) / (f * rho_c);
+
+	  // Factor in collapsing from passing melting water.
+	  dZs = dZc * Ssnow_new / (Ssnow_new + q_s);
+	}
+      else
+	dZs = dZp;
+    }
+  else
+    dZs = 0.0;
+
+  assert (dZs >= dZp);
+  assert (dZs <= Ssnow_new / rho_s);
 
   // Update snow storage.
   Ssnow = Ssnow_new;
-  Swater += (Prain - Eprime + M - q_s) * dt;
+  Swater = Ssnow_new;
 
   // Update snow age.
   if (Ssnow > 0.0)
@@ -153,6 +197,18 @@ Snow::tick (double Si, double q_h, double Prain,
 	    double Psnow, double Tair, double Epot)
 {
   impl.tick (Si, q_h, Prain, Psnow, Tair, Epot);
+}
+
+void 
+Snow::output (Log& log, const Filter* filter) const
+{
+  log.output ("Esnow", filter, impl.Esnow, true);
+  log.output ("q_s", filter, impl.q_s, true);
+  log.output ("Ssnow", filter, impl.Ssnow);
+  log.output ("Swater", filter, impl.Swater);
+  log.output ("age", filter, impl.age);
+  log.output ("dZs", filter, impl.dZs);
+  log.output ("T", filter, impl.T);
 }
 
 double 

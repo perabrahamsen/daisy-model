@@ -3,6 +3,7 @@
 #include "surface.h"
 #include "syntax.h"
 #include "alist.h"
+#include "soil_water.h"
 #include "log.h"
 
 extern double abs (double);
@@ -64,9 +65,11 @@ Surface::ponding () const
 }
 
 double
-Surface::evaporation (double PotSoilEvaporation, double water, double MaxExfiltration)
+Surface::evaporation (double PotSoilEvaporation, double water, 
+		      const Soil& soil, const SoilWater& soil_water)
 {
   static const double dt = 1.0; // Time step [h].
+  const double MaxExfiltration = soil_water.MaxExfiltration (soil) / 10; // mm -> cm.
   Eps = PotSoilEvaporation;
 
   if (pond + water * dt < Eps * dt)
@@ -86,8 +89,8 @@ Surface::output (Log& log, const Filter* filter) const
 {
   log.output ("pond", filter, pond);
   log.output ("flux", filter, flux);
-  log.output ("Es", filter, Es);
-  log.output ("Eps", filter, Eps);
+  log.output ("Es", filter, Es, true);
+  log.output ("Eps", filter, Eps, true);
 }
 
 void

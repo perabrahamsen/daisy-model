@@ -32,7 +32,7 @@ class SoilWater
   // Simulation.
 public:
   void clear ();
-  void add_to_sink (int, double);
+  void add_to_sink (const vector<double>&);
   double h (int i) const
   { return h_[i]; }
   void tick (Surface&, Groundwater&, const Soil&);

@@ -37,13 +37,13 @@ Crop::derive_type (string name, const AttributeList& al, string super)
 }
 
 Crop*
-Crop::create (const AttributeList& al)
+Crop::create (const AttributeList& al, int layers)
 {
   assert (al.check ("type"));
   string name = al.name ("type");
   assert (library ().check (name));
   assert (library ().syntax (name).check (al));
-  return (*Crop_constructors)[name] (al);
+  return (*Crop_constructors)[name] (al, layers);
 }
 
 Crop::Crop (const string n)
@@ -58,7 +58,7 @@ CropList::CropList (const Sequence& sequence)
   for (Sequence::const_iterator i = sequence.begin ();
        i != sequence.end ();
        i++)
-    push_back (Crop::create (**i));
+    push_back (Crop::create (**i, -1));
 }
 
 CropList::~CropList ()

@@ -7,6 +7,8 @@ struct AttributeList;
 struct Weather;
 struct Bioclimate;
 struct Syntax;
+struct Log;
+struct Filter;
 
 class Snow
 { 
@@ -17,6 +19,7 @@ class Snow
 public:
   void tick (double Si, double q_h, double Prain,
 	     double Psnow, double Tair, double Epot);
+  void output (Log&, const Filter*) const;
   double percolation ();
   double temperature ();
   double evaporation ();

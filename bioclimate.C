@@ -10,8 +10,8 @@
 #include "common.h"
 #include "syntax.h"
 #include "snow.h"
-#include "soil_water.h"
-
+#include "log.h"
+#include "filter.h"
 
 class Bioclimate::Implementation
 {
@@ -179,14 +179,14 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
   if (irrigation_type == top_irrigation)
     WaterFromAbove += irrigation;
 
-  const double Evaporation = min (WaterFromAbove, PotCanopyEvapotranspiration);
-  PotCanopyEvapotranspiration -= Evaporation;
+  const double EvapInterception = min (WaterFromAbove, PotCanopyEvapotranspiration);
+  PotCanopyEvapotranspiration -= EvapInterception;
 
-  const double Through_fall = WaterFromAbove - Evaporation
-    - min (WaterFromAbove - Evaporation, 
+  const double Through_fall = WaterFromAbove - EvapInterception
+    - min (WaterFromAbove - EvapInterception, 
 	   InterceptionCapacity - intercepted_water);
 
-  intercepted_water += WaterFromAbove - Evaporation - Through_fall;
+  intercepted_water += WaterFromAbove - EvapInterception - Through_fall;
 
   double Total_through_fall = Through_fall;
   
@@ -202,9 +202,9 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
     temperature = weather.AirTemperature ();
 
   snow.tick (weather.GlobalRadiation (), 0.0,
-		  Total_through_fall, weather.Snow (),
-		  temperature, 
-		  PotSoilEvaporation + PotCanopyEvapotranspiration);
+	     Total_through_fall, weather.Snow (),
+	     temperature, 
+	     PotSoilEvaporation + PotCanopyEvapotranspiration);
   
   if (snow.evaporation () < PotSoilEvaporation)
     PotSoilEvaporation -= snow.evaporation ();
@@ -217,22 +217,25 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
   PotSoilEvaporation -= 
     surface.evaporation (PotSoilEvaporation, 
 			 snow.percolation (),
-			 // cm -> mm
-			 soil_water.MaxExfiltration (soil) / 10);
+			 soil, soil_water);
 
   PotCanopyEvapotranspiration += PotSoilEvaporation * soil.EpInterchange ();
 
-  // Distribute PotCanopyEvapotranspiration on crops.
-  const double PotTransPerLAI = PotCanopyEvapotranspiration / LAI;
   double TotalCropUptake = 0.0;	// Water uptake by crops.
   
-  for (CropList::const_iterator crop = crops.begin();
-       crop != crops.end();
-       crop++)
+  if (LAI > 0.0)
     {
-      TotalCropUptake 
-	+= (*crop)->ActualWaterUptake (PotTransPerLAI * (*crop)->LAI (), 
-				       soil, soil_water);
+      // Distribute PotCanopyEvapotranspiration on crops.
+      const double PotTransPerLAI =  PotCanopyEvapotranspiration / LAI;
+  
+      for (CropList::const_iterator crop = crops.begin();
+	   crop != crops.end();
+	   crop++)
+	{
+	  TotalCropUptake 
+	    += (*crop)->ActualWaterUptake (PotTransPerLAI * (*crop)->LAI (), 
+					   soil, soil_water, EvapInterception);
+	}
     }
 }
 
@@ -251,6 +254,13 @@ Bioclimate::tick (Surface& surface, const Weather& weather,
   // Distribute water among canopy, snow, and soil.
   impl.WaterDistribution (surface, weather, crops, soil, soil_water);
 
+}
+
+void 
+Bioclimate::output (Log& log, const Filter* filter) const
+{
+  log.output ("intercepted_water", filter, impl.intercepted_water);
+  output_submodule (impl.snow, "Snow", log, filter);
 }
 
 int
@@ -298,7 +308,7 @@ Bioclimate::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("NoOfIntervals", Syntax::Integer);
   syntax.add ("intercepted_water", Syntax::Number);
   alist.add ("intercepted_water", 0.0);
-  ADD_SUBMODULE (syntax, alist, Snow);
+  add_submodule<Snow> ("Snow", syntax, alist);
 }
 
 Bioclimate::Bioclimate (const AttributeList& al)

@@ -40,11 +40,25 @@ Daisy::run ()
       const Action* action = manager.action (*this);
 	    
       if (action->stop ())
-	break;
+	{
+	  if (time.hour () != 0)
+	    cout << "\n";
+	  break;
+	}
 	    
-      cout << "Tick " << time.year () << "-" << time.month () << "-"
-	   << time.mday () << " " << time.hour () << " ";
-
+      switch (time.hour ())
+	{
+	case 0:
+	  cout << "Tick " << time.year () << "-" << time.month () << "-"
+	       << time.mday ();
+	default:
+	  cout << " " << time.hour ();
+	  cout.flush ();
+	  break;
+	case 23:
+	  cout << " " << time.hour () << "\n";
+	  break;
+	}
       action->doIt (columns, weather, log);
 
       for (ColumnList::iterator column = columns.begin ();

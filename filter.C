@@ -1,6 +1,8 @@
 // filter.C
 
 #include "filter.h"
+#include "common.h"
+#include <map.h>
 
 class Value;
 
@@ -13,8 +15,8 @@ Filter::~Filter ()
 { }
 
 bool 
-FilterAll::check (string) const
-{ return true; }
+FilterAll::check (string, bool log_only) const
+{ return !log_only; }
 
 const Filter* 
 FilterAll::lookup (string) const
@@ -25,49 +27,38 @@ FilterAll::FilterAll ()
 
 struct FilterSome::Implementation
 {
-    // BUG: Insert some sorry excuse for not using an STL map.
-    const int UGLY_MAX_SIZE = 1024;
-    string UGLY_key[UGLY_MAX_SIZE];
-    const Filter* UGLY_filter[UGLY_MAX_SIZE];
-    int size;
-    const Filter* lookup (string) const;
-    bool check (string) const;
-    void add (string, const Filter*);
-    Implementation ();
+  typedef map<string, const Filter*, less<string> > filter_map;
+  filter_map filters;
+  const Filter* lookup (string) const;
+  bool check (string) const;
+  void add (string, const Filter*);
 };
-
-FilterSome::Implementation::Implementation () : size (0)
-{ }
 
 const Filter* 
 FilterSome::Implementation::lookup (string key) const
 { 
-    for (int i = 0; i < size; i++)
-	if (UGLY_key[i] == key)
-	    return UGLY_filter[i];
-    assert (false);
+  filter_map::const_iterator i = filters.find (key);
+  
+  if (i != filters.end ())
+    return (*i).second;
+  else
+    THROW (UninitializedValue ());
 }
 
 bool
 FilterSome::Implementation::check (string key) const
 { 
-    for (int i = 0; i < size; i++)
-	if (UGLY_key[i] == key)
-	    return true;
-    return false;
+  return filters.find (key) != filters.end ();
 }
 
 void
 FilterSome::Implementation::add (string key, const Filter* filter)
 {
-    assert (size < UGLY_MAX_SIZE);
-    UGLY_key[size] = key;
-    UGLY_filter[size] = filter;
-    size++;
+  filters[key] = filter;
 }
 
 bool 
-FilterSome::check (string key) const
+FilterSome::check (string key, bool) const
 { return impl.check (key); }
 
 const Filter* 
@@ -77,15 +68,15 @@ FilterSome::lookup (string key) const
 void 
 FilterSome::add (string key, const Filter* filter)
 {
-    impl.add (key, filter);
+  impl.add (key, filter);
 }
 
 FilterSome::FilterSome ()
-    : impl (*new Implementation ())
+  : impl (*new Implementation ())
 { }
 
 FilterSome::~FilterSome ()
 {
-    delete &impl;
+  delete &impl;
 }
 

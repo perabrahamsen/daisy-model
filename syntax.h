@@ -45,18 +45,17 @@ public:
   ~Syntax ();
 };
 
-// Ugly ugly UGLY!  Must change!!! 
-#define ADD_SUBMODULE(s, a, m) \
-do \
-  { \
-    Syntax& _s = *new Syntax (); \
-    AttributeList& _a = *new AttributeList (); \
-    m::load_syntax (_s, _a); \
-    s.add (#m, _s); \
-    a.add (#m, _a); \
-  } \
-while (false)
-
-
+template <class T> 
+struct add_submodule
+{
+  add_submodule(const char* name, Syntax& syntax, AttributeList& alist)
+  {
+    Syntax& s = *new Syntax ();
+    AttributeList& a = *new AttributeList ();
+    T::load_syntax (s, a);
+    syntax.add (name, s);
+    alist.add (name, a);
+  }
+};
 
 #endif SYNTAX_H

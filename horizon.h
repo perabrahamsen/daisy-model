@@ -15,6 +15,7 @@ class Horizon
   // Use.
 public:
   virtual double Theta (double h) const = 0;
+  virtual double Theta_res () const;
   virtual double K (double h) const = 0;
   virtual double Cw2 (double h) const = 0;
   virtual double h (double Theta) const = 0;

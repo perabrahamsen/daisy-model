@@ -31,10 +31,6 @@ public:
   // Simulation.
   virtual void tick (const Time&, const Weather&, Groundwater&) = 0;
 
-  // Communication with crops.
-  virtual double SoilTemperature (double depth) const = 0;
-  virtual double MaxRootingDepth () const = 0;
-
   // Library.
 public:
   static const Library& library ();

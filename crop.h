@@ -9,7 +9,6 @@
 struct Log;
 struct Filter;
 struct Time;
-struct Column;
 struct AttributeList;
 struct Sequence;
 struct Bioclimate;
@@ -18,6 +17,7 @@ struct Library;
 struct Syntax;
 struct SoilWater;
 struct Soil;
+struct SoilHeat;
 
 class Crop 
 {
@@ -36,22 +36,23 @@ public:
   virtual double IntcpCap () const = 0; // Interception Capacity.
   virtual double EpFac () const = 0; // Convertion to potential evapotransp.
   virtual void CanopyStructure () = 0;
-  virtual double ActualWaterUptake (double Ept, const Soil&, SoilWater&) = 0;
+  virtual double ActualWaterUptake (double Ept, const Soil&, SoilWater&, 
+				    double EvapInterception) = 0;
 
   // Simulation.
 public:
-  virtual void tick (const Time& time, const Column&, const Bioclimate&) = 0;
+  virtual void tick (const Time& time, const Bioclimate&, const Soil&, const SoilHeat&) = 0;
   virtual void output (Log&, const Filter*) const = 0;
 
   // Library.
 public:
   static const Library& library ();
-  typedef Crop* (*constructor) (const AttributeList&);
+  typedef Crop* (*constructor) (const AttributeList&, int layers);
   static void add_type (string name, 
 			const AttributeList&, const Syntax&,
 			constructor);
   static void derive_type (string name, const AttributeList& al, string super);
-  static Crop* create (const AttributeList& var);
+  static Crop* create (const AttributeList&, int layers = -1);
 
   // Create and Destroy.
 protected:

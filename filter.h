@@ -11,7 +11,7 @@ class Filter
 {
     // Use.
 public:
-    virtual bool check (string) const = 0;
+    virtual bool check (string, bool log_only = false) const = 0;
     virtual const Filter* lookup (string) const = 0;
 
     // Content.
@@ -29,7 +29,7 @@ class FilterAll : public Filter
 {
     // Use.
 public:
-    bool check (string) const;
+    bool check (string, bool log_only = false) const;
     const Filter* lookup (string) const;
 
     // Create and Destroy.
@@ -41,7 +41,7 @@ class FilterSome : public Filter
 {
     // Use.
 public:
-    bool check (string) const;
+    bool check (string, bool log_only = false) const;
     const Filter* lookup (string) const;
 
     // Content.

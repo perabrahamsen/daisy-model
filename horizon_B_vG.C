@@ -1,4 +1,6 @@
 // horizon_B_vG.C
+//
+// van Gebuchten retention curve model with Burdine theory.
 
 #include "horizon.h"
 #include "syntax.h"
@@ -10,7 +12,7 @@ class HorizonB_vG : public Horizon
 {
   // Content.
   const double Theta_sat;
-  const double Theta_ref;
+  const double Theta_res_;
   const double alpha;
   const double a;		// - alpha
   const double n;
@@ -20,6 +22,7 @@ class HorizonB_vG : public Horizon
   // Use.
 public:
   double Theta (double h) const;
+  double Theta_res () const;
   double K (double h) const;
   double Cw2 (double h) const;
   double h (double Theta) const;
@@ -39,7 +42,13 @@ public:
 double 
 HorizonB_vG::Theta (const double h) const
 {
-  return Se (h) * (Theta_sat - Theta_ref) + Theta_ref;
+  return Se (h) * (Theta_sat - Theta_res_) + Theta_res_;
+}
+
+double 
+HorizonB_vG::Theta_res () const
+{
+  return Theta_res_;
 }
 
 double 
@@ -58,7 +67,7 @@ double
 HorizonB_vG::Cw2 (const double h) const
 {
   if (h < 0)
-    return - (  (Theta_sat - Theta_ref)
+    return - (  (Theta_sat - Theta_res_)
 	      * (m * (  pow (1 / (1 + pow (a * h, n)), m - 1)
 		      * (n * (pow (a * h, n - 1) * a))))
 	      / pow (1 + pow(a * h, n), 2));
@@ -70,8 +79,8 @@ double
 HorizonB_vG::h (const double Theta) const
 {
   if (Theta < Theta_sat)
-    return pow(pow(Theta_ref / (Theta_ref - Theta_sat) 
-		   + Theta / (Theta_sat - Theta_ref), -1 / m) - 1, 1 / n) / a;
+    return pow(pow(Theta_res_ / (Theta_res_ - Theta_sat) 
+		   + Theta / (Theta_sat - Theta_res_), -1 / m) - 1, 1 / n) / a;
   else
     return 0.0;
 }
@@ -98,7 +107,7 @@ HorizonB_vG::Se (double h) const
 
 HorizonB_vG::HorizonB_vG (const AttributeList& al)
      : Theta_sat (al.number ("Theta_sat")),
-       Theta_ref (al.number ("Theta_ref")),
+       Theta_res_ (al.number ("Theta_res")),
        alpha (al.number ("alpha")),
        a (-alpha),
        n (al.number ("n")),
@@ -127,7 +136,7 @@ HorizonB_vGSyntax::HorizonB_vGSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   syntax.add ("Theta_sat", Syntax::Number);
-  syntax.add ("Theta_ref", Syntax::Number);
+  syntax.add ("Theta_res", Syntax::Number);
   syntax.add ("alpha", Syntax::Number);
   syntax.add ("n", Syntax::Number);
   syntax.add ("K_sat", Syntax::Number);

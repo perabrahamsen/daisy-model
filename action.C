@@ -8,9 +8,7 @@
 
 void 
 Action::doIt (ColumnList&, const Weather&, Log&) const
-{
-  cout << "resting...\n";
-}
+{ }
 
 bool
 Action::stop () const
@@ -29,7 +27,7 @@ Action::~Action ()
 void 
 ActionSow::doIt (ColumnList& cl, const Weather&, Log& log) const
 {
-  cout << "Sowing " << crop.name ("type") << "\n";
+  cout << " [Sowing " << crop.name ("type") << "]";
 
   for (ColumnList::iterator i = cl.begin ();
        i != cl.end ();

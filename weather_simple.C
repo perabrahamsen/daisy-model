@@ -10,6 +10,7 @@ class WeatherSimple : public Weather
 {
   const double T1;
   const double T2;
+  const double precipitation;
     // Simulation.
 public:
   void tick ();
@@ -76,7 +77,7 @@ WeatherSimple::ReferenceEvapotranspiration () const // [mm/h]
 double
 WeatherSimple::Precipitation () const
 {
-  return 0.0;
+  return precipitation;
 }
 
 double
@@ -99,7 +100,8 @@ WeatherSimple::Snow () const
 WeatherSimple::WeatherSimple (const Time& t, const AttributeList& al)
   : Weather (t, al.number ("Latitude")),
     T1 (al.number ("T1")),
-    T2 (al.number ("T2"))
+    T2 (al.number ("T2")),
+    precipitation (al.number ("precipitation"))
 { }
 
 WeatherSimple::~WeatherSimple ()
@@ -127,5 +129,7 @@ WeatherSimpleSyntax::WeatherSimpleSyntax ()
   alist.add ("T1", -2.0);
   syntax.add ("T2", Syntax::Number);
   alist.add ("T2", 2.0);
+  syntax.add ("precipitation", Syntax::Number);
+  alist.add ("precipitation", 0.0);
   Weather::add_type ("simple", alist, syntax, &WeatherSimple::make);
 }

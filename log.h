@@ -21,14 +21,19 @@ public:
   void tick (const Daisy&);
 
   void open (string = "");
+  void open (string field, string type);
   void close ();
-  void output (string, const Filter*, const Time&);
-  void output (string, const Filter*, const bool&);
-  void output (string, const Filter*, const double&);
-  void output (string, const Filter*, const vector<double>&);
-  void output (string, const Filter*, const CSMP&);
-  void output_point (double x, double y);
+  void output (string, const Filter*, const Time&, bool log_only = false);
+  void output (string, const Filter*, const bool, bool log_only = false);
+  void output (string, const Filter*, const double, bool log_only = false);
+  void output (string, const Filter*, const int, bool log_only = false);
+  void output (string, const Filter*, const vector<double>&, bool log_only = false);
+  void output (string, const Filter*, const CSMP&, bool log_only = false);
   ostream& err () const;
+
+  // Used by CSMP.
+public:
+  void output_point (double x, double y);
 
 private:
   void print (const char*);
@@ -50,5 +55,16 @@ public:
   Log (ostream&);
   ~Log ();
 };
+
+template <class T> void
+output_submodule (const T& submodule, const char* name, Log& log, const Filter* filter)
+{
+  if (filter->check (name))
+    {
+      log.open (name);
+      submodule.output (log, filter->lookup (name));
+      log.close ();
+    }
+}
 
 #endif LOG_H

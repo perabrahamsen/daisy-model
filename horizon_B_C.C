@@ -1,4 +1,6 @@
 // horizon_B_C.C
+//
+// Campbell retention curve model with Burdine theory.
 
 #include "horizon.h"
 #include "syntax.h"

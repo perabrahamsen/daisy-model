@@ -6,10 +6,15 @@
 #include "syntax.h"
 #include <map.h>
 
+
 UZtop::~UZtop ()
 { }
 
 UZbottom::~UZbottom ()
+{ }
+
+void
+UZmodel::output (const string, Log&, const Filter*) const
 { }
 
 static Library* UZ_library = NULL;

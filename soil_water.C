@@ -16,9 +16,11 @@ SoilWater::clear ()
 }
 
 void
-SoilWater::add_to_sink (int i, double v)
+SoilWater::add_to_sink (const vector<double>& v)
 {
-  S[i] += v;
+  assert (S.size () == v.size ());
+  for (unsigned i = 0; i < S.size (); i++)
+    S[i] += v[i];
 }
 
 void
@@ -106,17 +108,21 @@ SoilWater::check (Log&, unsigned n) const
 void 
 SoilWater::output (Log& log, const Filter* filter) const
 {
-  log.output ("S", filter, S);
+  log.output ("S", filter, S, true);
   log.output ("Theta", filter, Theta);
   log.output ("h", filter, h_);
   log.output ("Xi", filter, Xi);
-  log.output ("q", filter, q);
+  log.output ("q", filter, q, true);
+  top->output ("UZtop", log, filter);
+  if (bottom)
+    bottom->output ("UZbottom", log, filter);
 }
 
 double
 SoilWater::MaxExfiltration (const Soil& soil) const
 {
-  return - (soil.K (0, h_[0]) / soil.Cw2 (0, h_[0])) * (Theta[0] / soil.z(0));
+  return - ((soil.K (0, h_[0]) / soil.Cw2 (0, h_[0])) 
+	    * ((Theta[0] - soil.Theta_res (0)) / soil.z(0)));
 }
 
 void

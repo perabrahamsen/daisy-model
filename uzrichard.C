@@ -6,6 +6,8 @@
 #include "alist.h"
 #include "syntax.h"
 #include "common.h"
+#include "filter.h"
+#include "log.h"
 
 class UZRichard : public UZmodel
 {
@@ -23,6 +25,7 @@ public:
   bool accept_top (double);
   bool flux_bottom () const;
   bool accept_bottom (double);
+  void output (const string, Log&, const Filter*) const;
 
   // Simulate.
 private:
@@ -69,12 +72,14 @@ struct UZRichard::Variables
 {
   double q_up;
   double q_down;
+  int iterations;
   Variables ();
 };
 
 UZRichard::Variables::Variables ()
   : q_up (0.0),
-    q_down (0.0)
+    q_down (0.0),
+    iterations (0)
 { }
 
 struct UZRichard::Parameters
@@ -192,6 +197,7 @@ UZRichard::richard (const Soil& soil,
 	{
 	  h_conv = h;
 	  iterations_used++;
+	  var.iterations++;
 
 	  // Calculate parameters.
 	  for (int i = 0; i < size; i++)
@@ -442,6 +448,7 @@ UZRichard::tick (const Soil& soil,
 		 vector<double>& Theta,
 		 vector<double>& q)
 {
+  var.iterations = 0;
   if (!richard (soil, first, top, last, bottom, 
 		S, h_old, Theta_old, h, Theta, q))
     THROW (Runtime ("Richard's Equation doesn't converge."));
@@ -482,6 +489,24 @@ UZRichard::tick (const Soil& soil,
   var.q_down = q[last + 1];
 }
 
+void
+UZRichard::output (const string name, Log& log, const Filter* filter) const
+{
+  if (filter->check (name))
+    {
+      filter = filter->lookup (name);
+      if (filter->check ("UZRichard"))
+	{
+	  filter = filter->lookup ("UZRichard");
+	  log.open (name, "UZRichard");
+	  log.output ("q_up", filter, var.q_up);
+	  log.output ("q_down", filter, var.q_down);
+	  log.output ("iterations", filter, var.iterations);
+	  log.close ();
+	}
+    }
+}
+
 UZRichard::UZRichard (const AttributeList& al)
   : par (*new Parameters (al)),
     var (*new Variables ())
@@ -508,19 +533,22 @@ static struct UZRichardSyntax
 
 UZRichardSyntax::UZRichardSyntax ()
 {
-  Syntax* syntax = new Syntax ();
-  AttributeList* alist = new AttributeList ();
+  Syntax& syntax = *new Syntax ();
+  AttributeList& alist = *new AttributeList ();
   
-  syntax->add ("max_time_step_reductions", Syntax::Integer);
-  alist->add ("max_time_step_reductions", 4);
-  syntax->add ("time_step_reduction", Syntax::Integer);
-  alist->add ("time_step_reduction", 4);
-  syntax->add ("max_iterations", Syntax::Integer);
-  alist->add ("max_iterations", 25);
-  syntax->add ("max_absolute_difference", Syntax::Number);
-  alist->add ("max_absolute_difference", 0.002);
-  syntax->add ("max_relative_difference", Syntax::Number);
-  alist->add ("max_relative_difference", 0.001);
+  syntax.add ("max_time_step_reductions", Syntax::Integer);
+  alist.add ("max_time_step_reductions", 4);
+  syntax.add ("time_step_reduction", Syntax::Integer);
+  alist.add ("time_step_reduction", 4);
+  syntax.add ("max_iterations", Syntax::Integer);
+  alist.add ("max_iterations", 25);
+  syntax.add ("max_absolute_difference", Syntax::Number);
+  alist.add ("max_absolute_difference", 0.002);
+  syntax.add ("max_relative_difference", Syntax::Number);
+  alist.add ("max_relative_difference", 0.001);
+  syntax.add ("q_up", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("q_down", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("iterations", Syntax::Integer, Syntax::LogOnly);
   
-  UZmodel::add_type ("richards", *alist, *syntax, &UZRichard::make);
+  UZmodel::add_type ("richards", alist, syntax, &UZRichard::make);
 }

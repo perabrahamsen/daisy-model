@@ -5,6 +5,8 @@
 struct AttributeList;
 struct Log;
 struct Filter;
+struct SoilWater;
+struct Soil;
 
 class Surface : public UZtop
 {
@@ -29,7 +31,7 @@ public:
 
   // Communication with bioclimate.
   double evaporation (double PotSoilEvaporation, double Water, 
-		      double MaxExfiltration);
+		      const Soil&, const SoilWater&);
 
   // Create.
   static void load_syntax (Syntax&, AttributeList&);

@@ -149,6 +149,14 @@ Log::tick (const Daisy& daisy)
 }
 
 void 
+Log::open (string field, string type)
+{
+  impl.current->open (field);
+  print (type);
+  print (" ");
+}
+
+void 
 Log::open (string name)
 {
   impl.current->open (name);
@@ -197,9 +205,9 @@ Log::print (bool v)
 }
 
 void
-Log::output (string name, const Filter* filter, const Time& value)
+Log::output (string name, const Filter* filter, const Time& value, bool log_only)
 {
-  if (filter->check (name))
+  if (filter->check (name, log_only))
     {
       open (name);
       print (value.year ());
@@ -214,9 +222,9 @@ Log::output (string name, const Filter* filter, const Time& value)
 }
 
 void
-Log::output (string name, const Filter* filter, const bool& value)
+Log::output (string name, const Filter* filter, const bool value, bool log_only)
 {
-  if (filter->check (name))
+  if (filter->check (name, log_only))
     {
       open (name);
       print (value);
@@ -225,9 +233,9 @@ Log::output (string name, const Filter* filter, const bool& value)
 }
 
 void
-Log::output (string name, const Filter* filter, const double& value)
+Log::output (string name, const Filter* filter, const double value, bool log_only)
 {
-  if (filter->check (name))
+  if (filter->check (name, log_only))
     {
       open (name);
       print (value);
@@ -236,9 +244,20 @@ Log::output (string name, const Filter* filter, const double& value)
 }
 
 void
-Log::output (string name, const Filter* filter, const vector<double>& value)
+Log::output (string name, const Filter* filter, const int value, bool log_only)
 {
-  if (filter->check (name))
+  if (filter->check (name, log_only))
+    {
+      open (name);
+      print (0.0 + value);
+      close ();
+    }
+}
+
+void
+Log::output (string name, const Filter* filter, const vector<double>& value, bool log_only)
+{
+  if (filter->check (name, log_only))
     {
       open (name);
       bool first = true;
@@ -255,9 +274,9 @@ Log::output (string name, const Filter* filter, const vector<double>& value)
 }
 
 void
-Log::output (string name, const Filter* filter, const CSMP& csmp)
+Log::output (string name, const Filter* filter, const CSMP& csmp, bool log_only)
 {
-  if (filter->check (name))
+  if (filter->check (name, log_only))
     {
       open (name);
       csmp.output (*this);

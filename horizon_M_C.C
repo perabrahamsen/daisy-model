@@ -1,4 +1,6 @@
 // horizon_M_C.C
+//
+// Campbell retention curve model with Mualem theory.
 
 #include "horizon.h"
 #include "syntax.h"

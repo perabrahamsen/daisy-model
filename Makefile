@@ -15,12 +15,12 @@ OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 OBJ = $(OBJECTS) $(SRCONLY)
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJECTS:.o=.h) common.h
-TEST = crop.dai old_crop.chp old_crop.log \
-	water.dai old_water.log water.gen water.plot
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = none
+REMOVE = crop.dai old_crop.chp old_crop.log \
+	water.dai old_water.log water.gen water.plot
+
 
 .SUFFIXES:	.C .o .h
 
@@ -51,32 +51,17 @@ TAGS: $(SRC) $(HEAD)
 print:
 	mp -p /home/user_13/fischer/bin/mp.pro.none -a4 $(TEXT) | parr -s | up -n pup | lpr -Pduplex
 
-water-print:	water.log
-	water.gen water.log
-	gnuplot water.plot
-
-water.log:	daisy water.dai
-	daisy water.dai
-
-crop.log:	daisy crop.dai
-	daisy crop.dai
-
-crop.chp:	daisy crop.dai
-	daisy crop.dai
-
-crop-test:	crop.log crop.chp
-	diff old_crop.chp crop.chp
-	diff old_crop.log crop.log
-
-water-test:	water.log
-	diff old_water.log water.log
-
-check:	daisy test.dai
-	daisy test.dai
-
-# diff old_water.chp water.chp
-
 test:	crop-test water-test
+
+water-test:	daisy 
+	(cd test/water; make test )
+
+crop-test:	daisy 
+	(cd test/crop; make test )
+
+check:	daisy
+	(cd exp; make test )
+
 
 clean:
 	rm $(OBJ) *.rpo daisy *~
@@ -87,9 +72,9 @@ depend: $(SRC)
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
 	g++ -I. -MM $(SRC) >> Makefile
 
-cvs: $(TEXT) $(TEST)
+cvs: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-cvs add $(TEXT) $(TEST)
+	-cvs add $(TEXT)
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
@@ -98,19 +83,6 @@ cvs: $(TEXT) $(TEST)
 	$(CC) -c $<
 
 $(OBJ):	daisy.h
-
-pcrop.c: crop.pas
-	/pack/p2c/bin/p2c -a $<
-	mv crop.c pcrop.c
-
-fsnow.c: fsnow.f
-	/pack/f2c/bin/f2c $<
-
-pcrop: pcrop.c
-	gcc -L/pack/p2c/lib -I/pack/p2c/include pcrop.c -g -o pcrop -lm -lp2c
-
-ptest: pcrop
-	pcrop < /dev/null
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
@@ -131,9 +103,10 @@ syntax.o: syntax.C syntax.h alist.h common.h log.h library.h
 library.o: library.C library.h alist.h common.h
 action.o: action.C action.h column.h alist.h common.h
 condition.o: condition.C condition.h time.h
-horizon.o: horizon.C horizon.h library.h alist.h common.h syntax.h
+horizon.o: horizon.C horizon.h library.h alist.h common.h syntax.h \
+ csmp.h
 ftable.o: ftable.C ftable.h
-filter.o: filter.C filter.h
+filter.o: filter.C filter.h common.h
 csmp.o: csmp.C csmp.h log.h
 rules.o: rules.C rules.h daisy.h time.h action.h
 time.o: time.C time.h
@@ -142,9 +115,9 @@ soil.o: soil.C soil.h horizon.h alist.h common.h syntax.h
 mathlib.o: mathlib.C mathlib.h
 bioclimate.o: bioclimate.C bioclimate.h surface.h uzmodel.h weather.h \
  time.h crop.h csmp.h alist.h common.h soil.h horizon.h syntax.h \
- snow.h soil_water.h
+ snow.h log.h filter.h
 surface.o: surface.C surface.h uzmodel.h syntax.h alist.h common.h \
- log.h
+ soil_water.h log.h
 soil_water.o: soil_water.C soil_water.h log.h alist.h common.h \
  uzmodel.h soil.h horizon.h surface.h groundwater.h time.h syntax.h
 soil_NH4.o: soil_NH4.C soil_NH4.h
@@ -156,7 +129,7 @@ soil_heat.o: soil_heat.C soil_heat.h alist.h common.h bioclimate.h \
  syntax.h
 groundwater.o: groundwater.C groundwater.h time.h uzmodel.h library.h \
  alist.h common.h syntax.h
-snow.o: snow.C snow.h alist.h common.h syntax.h
+snow.o: snow.C snow.h alist.h common.h syntax.h log.h filter.h
 column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h soil.h horizon.h soil_water.h soil_heat.h soil_NH4.h \
  soil_NO3.h organic_matter.h nitrification.h denitrification.h alist.h \
@@ -166,15 +139,19 @@ manager_rule.o: manager_rule.C manager.h syntax.h rules.h alist.h \
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
  common.h
 uzrichard.o: uzrichard.C uzmodel.h soil.h horizon.h mathlib.h alist.h \
- common.h syntax.h
-horizon_yolo.o: horizon_yolo.C horizon.h syntax.h alist.h common.h
-horizon_M_vG.o: horizon_M_vG.C horizon.h syntax.h alist.h common.h
-horizon_B_vG.o: horizon_B_vG.C horizon.h syntax.h alist.h common.h
+ common.h syntax.h filter.h log.h
+horizon_yolo.o: horizon_yolo.C horizon.h syntax.h alist.h common.h \
+ csmp.h
+horizon_M_vG.o: horizon_M_vG.C horizon.h syntax.h alist.h common.h \
+ csmp.h
+horizon_B_vG.o: horizon_B_vG.C horizon.h syntax.h alist.h common.h \
+ csmp.h
 horizon_M_C.o: horizon_M_C.C horizon.h syntax.h alist.h common.h
 horizon_B_C.o: horizon_B_C.C horizon.h syntax.h alist.h common.h
 horizon_M_BaC.o: horizon_M_BaC.C horizon.h syntax.h alist.h common.h
 horizon_B_BaC.o: horizon_B_BaC.C horizon.h syntax.h alist.h common.h
 groundwater_static.o: groundwater_static.C groundwater.h time.h \
  uzmodel.h syntax.h alist.h common.h
-crop_std.o: crop_std.C crop.h log.h time.h column.h csmp.h \
- bioclimate.h common.h ftable.h syntax.h alist.h filter.h ftable.t
+crop_std.o: crop_std.C crop.h log.h time.h csmp.h bioclimate.h \
+ common.h ftable.h ftable.t syntax.h alist.h filter.h soil_water.h \
+ soil.h horizon.h soil_heat.h

@@ -46,3 +46,8 @@ tridia (const unsigned int N,
     }
 }
 
+extern "C" int matherr () 
+{
+  abort ();
+}
+

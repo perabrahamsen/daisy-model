@@ -34,7 +34,7 @@ Soil::interval (double z) const
 double
 Soil::MaxRootingDepth () const
 {
-  return 100.0;
+  return max (-100.0, z (size () - 1));
 }
 
 double 
