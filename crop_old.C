@@ -22,6 +22,8 @@
 #include <algo.h>
 #include <ieeefp.h>
 
+// #define USE_HOURLY_PHOTO
+
 class CropOld : public Crop
 {
   // Content.
@@ -150,6 +152,7 @@ struct CropOld::Parameters
     LeafPhotPar (const AttributeList&);
   } LeafPhot;
   const struct CanopyPar {
+    double InitGrowth;		// Initial growth parameter.
     double DSinit;		// DS at end of initial LAI-Development
     double WLfInit;		// WLeaf at end of initial LAI-Development
     double DS1;			// DS state at start of leaf recession.
@@ -277,6 +280,10 @@ struct CropOld::Variables
     // [gN/cm³/h]
     double h_x;			// Root extraction at surface.
     double water_stress;	// Fraction of requested water we got.
+#ifndef USE_HOURLY_PHOTO
+    double ws_up;		// Water stress factor
+    double ws_down;		// Water stress denominator (dk:tæller)
+#endif
     double Ept;			// Potential evapotranspiration.
     double transpiration;	// Total water uptake.
   private:
@@ -363,7 +370,8 @@ CropOld::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
 { }
 
 CropOld::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
-  : DSinit (vl.number ("DSinit")),
+  : InitGrowth (vl.number ("InitGrowth")),
+    DSinit (vl.number ("DSinit")),
     WLfInit (vl.number ("WLfInit")),
     DS1 (vl.number ("DS1")),
     alpha (vl.number ("alpha")),
@@ -503,6 +511,10 @@ CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
     NO3Extraction (vl.number_sequence ("NO3Extraction")),
     h_x (vl.number ("h_x")),
     water_stress (1.0),
+#ifndef USE_HOURLY_PHOTO
+    ws_up (0.0),
+    ws_down (0.0),
+#endif
     Ept (0.0),
     transpiration (0.0)
 { 
@@ -656,6 +668,7 @@ CropOldSyntax::CropOldSyntax ()
   LeafPhot.add ("TLim1", Syntax::Number, Syntax::Const);
   LeafPhot.add ("TLim2", Syntax::Number, Syntax::Const);
 
+  Canopy.add ("InitGrowth", Syntax::Number, Syntax::Const);
   Canopy.add ("DSinit", Syntax::Number, Syntax::Const);
   Canopy.add ("WLfInit", Syntax::Number, Syntax::Const);
   Canopy.add ("DS1", Syntax::Number, Syntax::Const);
@@ -1045,7 +1058,7 @@ CropOld::InitialLAI ()
     }
   else
     {
-      LAI = 0.5 * (exp (4.8 * DS) - 1);
+      LAI = 0.5 * (exp (Canopy.InitGrowth * DS) - 1);
     }
 }
 
@@ -1179,11 +1192,15 @@ CropOld::CanopyStructure ()
 }
 
 double
-CropOld::ActualWaterUptake (const double Ept,
-				 const Soil& soil, SoilWater& soil_water,
-				 const double EvapInterception)
+CropOld::ActualWaterUptake (double Ept,
+			    const Soil& soil, SoilWater& soil_water,
+			    const double EvapInterception)
 {
-  assert (Ept >= 0);
+  if (Ept < 0)
+    {
+      cerr << "\nBUG: Negative EPT (" << Ept << ")\n";
+      Ept = 0.0;
+    }
   assert (EvapInterception >= 0);
   static const double min_step = 1.0;
   const double h_wp = par.Root.h_wp;
@@ -1271,12 +1288,23 @@ CropOld::ActualWaterUptake (const double Ept,
   // Update soil water sink term.
   soil_water.add_to_sink (H2OExtraction);
   // Update water stress factor
+#ifdef USE_HOURLY_PHOTO
   double& water_stress = var.RootSys.water_stress;
   if (Ept < 0.010)
     water_stress = 1.0;
   else
     water_stress = (total + EvapInterception) / (Ept + EvapInterception);
+#else
+  if (Ept >= 0.010)
+    {
+      assert (var.RootSys.ws_up <= var.RootSys.ws_down);
+      assert (total <= Ept);
 
+      var.RootSys.ws_up += (total + EvapInterception);
+      var.RootSys.ws_down += (Ept + EvapInterception);
+      assert (var.RootSys.ws_up <= var.RootSys.ws_down);
+    }
+#endif
   // Update transpiration.
   double& transpiration = var.RootSys.transpiration;
   transpiration = total;
@@ -1418,7 +1446,7 @@ CropOld::RootDensity (const Soil& soil)
   vector<double>& d = var.RootSys.Density;
   
   int i = 0;
-  for (; -soil.zplus (i) < RootSys.Depth; i++)
+  for (; i == 0 || -soil.zplus (i-1) < RootSys.Depth; i++)
     d[i] = L0 * exp (a * soil.z (i));
   assert (i < soil.size ());
   for (; i < soil.size (); i++)
@@ -1467,7 +1495,9 @@ CropOld::NitrogenUptake (int Hour,
       PotNUpt -= CrpAux.NH4Upt;
     }
   else
-    CrpAux.NH4Upt = 0.0;
+    {
+      CrpAux.NH4Upt = 0.0;
+    }
 
   if (PotNUpt > 0)
     {
@@ -1479,8 +1509,9 @@ CropOld::NitrogenUptake (int Hour,
       PotNUpt -= CrpAux.NO3Upt;
     }
   else
-    CrpAux.NO3Upt = 0.0;
-
+    {
+      CrpAux.NO3Upt = 0.0;
+    }
   if (PotNUpt > 0 && var.Phenology.DS > par.CrpN.DS_fixate)
     {
       CrpAux.Fixated = 0.8 * PotNUpt;
@@ -1547,10 +1578,14 @@ CropOld::AssimilatePartitioning (double DS, double& f_Leaf, double& f_Root)
 }
 
 double 
-CropOld::MaintenanceRespiration (double r, double Q10, double w, double T)
+CropOld::MaintenanceRespiration (double r, double /* Q10 */, 
+				 double w, double T)
 {
   if (w > 0)
-    return r * exp ((T - 20) / 10 * log (Q10)) * w;
+    return r * max (0.0, 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
+				   - exp (0.57 - 0.042 * T - 0.0051 * T * T)))
+      * w;
+  // return r * exp ((T - 20.0) / 10.0 * log (Q10)) * w;
   else
     return 0.0;
 }
@@ -1574,30 +1609,42 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
   double AssG, f_Leaf, f_Root;
     
   AssG = CrpAux.CanopyAss 
-    * max (0.0, min (1.0, (  (Prod.NCrop - CrpAux.NfNCnt) 
-			      / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+    * max (0.0, min (1.0, ((Prod.NCrop - CrpAux.NfNCnt) 
+			   / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
   AssimilatePartitioning (DS, f_Leaf, f_Root);
   CrpAux.IncWLeaf = Resp.E_Leaf (DS) * (f_Leaf * AssG - RMLeaf);
+  if (CrpAux.IncWLeaf < 0.0)
+    CrpAux.IncWLeaf = f_Leaf * AssG - RMLeaf;
   CrpAux.IncWRoot = Resp.E_Root (DS) * (f_Root * AssG - RMRoot);
+  if (CrpAux.IncWRoot < 0.0)
+    CrpAux.IncWRoot = f_Root * AssG - RMRoot;
   Prod.WLeaf += CrpAux.IncWLeaf;
   Prod.WRoot += CrpAux.IncWRoot;
 }
 
 void 
 CropOld::tick (const Time& time,
-		    const Bioclimate& bioclimate,
-		    const Soil& soil,
-		    const SoilHeat& soil_heat,
-		    const SoilWater& soil_water, 
-		    SoilNH4& soil_NH4,
-		    SoilNO3& soil_NO3)
+	       const Bioclimate& bioclimate,
+	       const Soil& soil,
+	       const SoilHeat& soil_heat,
+	       const SoilWater& soil_water, 
+	       SoilNH4& soil_NH4,
+	       SoilNO3& soil_NO3)
 {
+  // Clear log.
+  fill (var.RootSys.NO3Extraction.begin (), 
+	var.RootSys.NO3Extraction.end (),
+	0.0);
+  fill (var.RootSys.NH4Extraction.begin (), 
+	var.RootSys.NH4Extraction.end (),
+	0.0);
+
+  // It was a bad winther.
   if (par.Devel.DS_reset 
       && time.month () == 3
       && time.mday () == 1
       && time.hour () == 6)
     {
-      // It was a bad winther.
       var.Phenology.DS = 0.1;
     }
 
@@ -1617,17 +1664,76 @@ CropOld::tick (const Time& time,
     }
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
-  const double water_stress = var.RootSys.water_stress;
   NitrogenUptake (time.hour (), 
 		  soil, soil_water, soil_NH4,soil_NO3);
+#ifdef USE_HOURLY_PHOTO
+  const double water_stress = var.RootSys.water_stress;
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
       double Ass = CanopyPhotosynthesis (bioclimate);
       var.CrpAux.PotCanopyAss += Ass;
-      var.CrpAux.CanopyAss += water_stress * Ass;
+      if (var.CrpAux.InitLAI)
+	var.CrpAux.CanopyAss += Ass;
+      else
+	var.CrpAux.CanopyAss += water_stress * Ass;
     }
+#endif
   if (time.hour () != 0)
     return;
+#ifndef USE_HOURLY_PHOTO
+  assert (var.RootSys.ws_up <= var.RootSys.ws_down);
+  double& water_stress = var.RootSys.water_stress;
+  if (var.RootSys.ws_down > 0)
+    water_stress = var.RootSys.ws_up / var.RootSys.ws_down;
+  else
+    water_stress = 1.0;
+  assert (water_stress >= 0.0 && water_stress <= 1.0);
+  var.RootSys.ws_up = 0.0;
+  var.RootSys.ws_down = 0.0;
+
+  const double Ta = bioclimate.AirTemperature ();
+
+  double Teff;
+
+  if (Ta < par.LeafPhot.TLim1)
+    Teff = 0.0;
+  else
+    {
+      if (Ta > par.LeafPhot.TLim2)
+	Teff = 1.0;
+      else
+	Teff =   (Ta - par.LeafPhot.TLim1)
+	  / (par.LeafPhot.TLim2 - par.LeafPhot.TLim1);
+    }
+
+  // Fraction of Photosynthetically Active Radiation in Shortware
+  // incomming radiation. 
+  const double PARinSi = 0.48;	
+
+  const double beta1 = 0.158;
+  const double beta2 = 0.094;
+
+  const double LAI = min (5.0, var.Canopy.LAI);
+  const double Si = bioclimate.DailyRadiation () * (24*60*60); // [J/m²/d]
+  const double Sad = PARinSi * (1.0 - par.Canopy.PARref)
+    * (1.0 - exp (-par.Canopy.PARext * LAI)) * Si;
+  const double epsilon = 0.15 - (beta1 - beta2 * LAI / (LAI + 3.0))
+    * Sad / (Sad + 7.8e6);
+  const double C = 15.7;	// [MJ/kg]
+  const double Fcd = epsilon * Sad / C;	// [mg CH2O /m²/d]
+  const double Ass = 0.001 * Fcd * Teff; // [g/m²/d]
+  
+  var.CrpAux.PotCanopyAss += Ass;
+  if (Ass <= 0.0)
+    /* do nothing */;
+  else if (var.CrpAux.InitLAI)
+    var.CrpAux.CanopyAss += Ass;
+  else
+    var.CrpAux.CanopyAss += water_stress * Ass;
+
+  
+#endif  
+
   DevelopmentStage (bioclimate);
   var.Canopy.Height = CropHeight ();
   if (var.CrpAux.InitLAI)

@@ -19,10 +19,10 @@ public:
 public:
   void output (Log&, const Filter&) const;
   void clear ();
-  void operator += (const IM&);
-  void operator -= (const IM&);
-  void operator *= (double);
-  void operator /= (double);
+  void operator+= (const IM&);
+  void operator-= (const IM&);
+  void operator*= (double);
+  void operator/= (double);
   bool empty () const;
 
   // Utilities.
@@ -32,8 +32,10 @@ public:
   // Create. 
 public:
   IM operator* (double flux) const;
+  IM operator+ (const IM&) const;
   static void load_syntax (Syntax&, AttributeList&);
   IM ();
+  IM (const IM& im);
   IM (const AttributeList&);
   IM (const IM&, double flux);
   ~IM ();

@@ -23,6 +23,7 @@ private:
   
   // Simulation.
 public:
+  void monthly (const Soil& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&);
   void output (Log&, const Filter&, const Soil&) const;

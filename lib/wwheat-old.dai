@@ -2,13 +2,13 @@
 
 (defcrop WinterWheat old
   (Devel (EmrTSum 100)
-	 (DSRate1 1.29e-3)	;1/775
-	 (DSRate2 1.29e-3)	;1/775
+	 (DSRate1 1.14e-3)	;1/775
+	 (DSRate2 1.14e-3)	;1/775
 	 (DS_Emr 0.01)
 	 (DS_reset true)
-	 (TempEff1 (0 0) (1 1))
-	 (TempEff2 (0 0) (1 1))
-	 (PhotEff1 (0 0) (1 1)))
+	 (TempEff1 (0 1) (100 100))
+	 (TempEff2 (0 1) (100 100))
+	 (PhotEff1 (0 1) (1 1)))
   (Vernal (required false)
 	  (DSLim1 0.0)
 	  (DSLim2 0.0)
@@ -18,7 +18,8 @@
 	    (Fm 3.0)			; g/m²/h
 	    (TLim1 4.0)			; dg C
 	    (TLim2 10.0))		; dg C
-  (Canopy (DSinit 0.07)
+  (Canopy (InitGrowth 4.66)
+	  (DSinit 0.07)
 	  (WLfInit 30)			; g/m²
 	  (DS1 0.514)			; Th
 	  (alpha 1.8)
@@ -38,9 +39,9 @@
 	(DensRtTip 0.1)
 	(Rad 0.005)
 	(h_wp -15000)
-	(Rxylem 10)
-	(MxNH4Up 1)
-	(MxNO3Up 1))
+	(Rxylem 0)
+	(MxNH4Up 2.5e-7)
+	(MxNO3Up 2.5e-8))
   (Partit (Root (0.00 0.60)
 		(0.80 0.10)
 		(2.00 0.10)))
@@ -49,7 +50,7 @@
 	(r_Root (0.914 0.065) (0.9141 0.015))
 	(r_Leaf (0.914 0.015) (0.9141 0.008))
 	(Q10 2.00))
-  (CrpN (SeedN 4.0)
+  (CrpN (SeedN 0.4)
 	(PtLeafCnc (0.114 0.050)
 		   (0.229 0.043)
 		   (0.343 0.038)
@@ -127,15 +128,15 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
-	   (Leaf ((initial_fraction 1.0)
+	   (Leaf ((initial_fraction 0.8)
 		  (C_per_N 100.0)
 		  (efficiency 0.5 0.5)
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (SOrg ((initial_fraction 0.0)
 		  (C_per_N 100.0)
@@ -143,7 +144,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (Root ((initial_fraction 0.8)
 		  (C_per_N 100.0)
@@ -151,7 +152,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (DSmax 0.0)			;Bogus, made up number for testing.
 	   (DSnew 0.0)			;Bogus, made up number for testing.

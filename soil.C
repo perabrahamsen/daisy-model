@@ -5,6 +5,7 @@
 #include "syntax.h"
 #include "mathlib.h"
 #include <assert.h>
+#include <iomanip.h>
 
 int 
 Soil::interval_plus (double z) const
@@ -35,7 +36,7 @@ Soil::interval (double z) const
 double
 Soil::MaxRootingDepth () const
 {
-  return max (-100.0, z (size () - 1));
+  return max (-MaxRootingDepth_, z (size () - 1));
 }
 
 double 
@@ -80,12 +81,12 @@ Soil::check () const
 }
 
 double
-Soil::total (vector<double>& v) const
+Soil::total (const vector<double>& v) const
 {
-  while (v.size () < size () + 0U)
-    v.push_back (0.0);
+  assert (v.size () <= size () +0U);
+  const int to = min (v.size (), size () +0U);
   double sum = 0.0;
-  for (int i = 0; i < size (); i++)
+  for (int i = 0; i < to; i++)
     sum += v[i] * dz (i);
   return sum;
 }
@@ -180,7 +181,19 @@ Soil::swap (vector<double>& v, double from, double middle, double to) const
   assert (approximate (old_total, total (v)));
 }
 
-
+void 
+Soil::make_table (int i)
+{
+  cout << "pF   Theta   Cw2           K           (depth " << z (i) << ").\n";
+  for (double pF = 0.00; pF <= 5.0; pF += 0.01)
+    {
+      const double h = pF2h (pF);
+      cout << setw (4) << setprecision (3) << pF << " "
+	   << setw (6) << setprecision (5) << Theta (i, h) << " "
+	   << setw (12) << setprecision (11) << Cw2 (i, h) * 100.0 << " "
+	   << setw (12) << setprecision (11) << K (i, h) / 3.6e5 << "\n";
+    }
+}
 
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -197,13 +210,16 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("EpFactor", 0.8);
   syntax.add ("EpInterchange", Syntax::Number, Syntax::Const);
   alist.add ("EpInterchange", 0.6);
+  syntax.add ("MaxRootingDepth", Syntax::Number, Syntax::Const);
+  alist.add ("MaxRootingDepth", 100.0);
 }
   
 Soil::Soil (const AttributeList& al)
   : zplus_ (al.number_sequence ("zplus")),
     size_ (zplus_.size ()),
     EpFactor_ (al.number ("EpFactor")),
-    EpInterchange_ (al.number ("EpInterchange"))
+    EpInterchange_ (al.number ("EpInterchange")),
+    MaxRootingDepth_ (al.number ("MaxRootingDepth"))
 {
   vector<const AttributeList*>::const_iterator layer
     = al.list_sequence ("horizons").begin ();

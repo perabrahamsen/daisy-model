@@ -34,6 +34,7 @@ public:
 public:
   double temperature;		// Air temperature in canopy.
   double day_length;		// From weather (does not really belong here).
+  double daily_radiation;	// From weather.
 
   // Manager.
   double irrigation;
@@ -70,6 +71,9 @@ void
 Bioclimate::Implementation::RadiationDistribution (const Weather& weather, 
 						   const CropList& crops)
 {
+  // Remember this in case the crops should ask.
+  daily_radiation = weather.DailyRadiation ();
+
   // Fraction of Photosynthetically Active Radiation in Shortware
   // incomming radiation. 
   static const double PARinSi = 0.50;	
@@ -268,12 +272,16 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 
 void 
 Bioclimate::tick (Surface& surface, const Weather& weather, 
+		  const Time& time,
 		  const CropList& crops, const Soil& soil, 
 		  SoilWater& soil_water, const SoilHeat& soil_heat)
 {
   // Keep weather information during time step.
   impl.temperature = weather.AirTemperature ();
-  impl.day_length = weather.DayLength ();
+  impl.day_length = weather.DayLength (time);
+
+  // Add nitrogen deposit. 
+  surface.fertilize (weather.Deposit ());
 
   // Calculate total canopy, divide it intervalsm, and distribute PAR.
   impl.RadiationDistribution (weather, crops);
@@ -298,33 +306,39 @@ Bioclimate::output (Log& log, const Filter& filter) const
 }
 
 int
-Bioclimate::NumberOfIntervals(void) const
+Bioclimate::NumberOfIntervals () const
 {
   return impl.No;
 }
 
 double
-Bioclimate::height(int i) const
+Bioclimate::height (int i) const
 {
   return impl.Height[i];
 }
 
 double
-Bioclimate::PAR(int i) const
+Bioclimate::PAR (int i) const
 {
   return impl.PAR[i];
 }
 
 double
-Bioclimate::AirTemperature(void) const
+Bioclimate::AirTemperature () const
 {
   return impl.temperature;
 }
 
 double
-Bioclimate::DayLength(void) const
+Bioclimate::DayLength () const
 {
   return impl.day_length;
+}
+
+double
+Bioclimate::DailyRadiation () const
+{
+  return impl.daily_radiation;
 }
 
 void

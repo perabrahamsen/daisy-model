@@ -279,7 +279,7 @@ MikeSHE::put_water_sink (const vector<double>& S)
   for (int i = 0; i < impl.nlay; i++)
     {
       assert (S[i] == 0.0);
-      impl.ruptake[impl.lay (i)] = S[i] / 100.0; // cm/h -> m/h
+      impl.ruptake[impl.lay (i)] = S[i] / (100.0 * 3600.0); // cm/h -> m/s
     }
 }
 
@@ -290,7 +290,7 @@ MikeSHE::get_no3_m (vector<double>& M) const
   assert (M.size () == impl.nlay + 0UL);
   for (int i = 0; i < impl.nlay; i++)
     M[i]
-      = impl.uzconc[impl.lay (i)] * (100.0 * 100.0 * 100.0); // g/m³ -> g/cm³
+      = impl.uzconc[impl.lay (i)] / (100.0 * 100.0 * 100.0); // g/m³ -> g/cm³
 }
 
 void 
@@ -299,7 +299,7 @@ MikeSHE::put_no3_m (const vector<double>& M)
   assert (M.size () == impl.nlay + 0UL);
   for (int i = 0; i < impl.nlay; i++)
     impl.uzconc[impl.lay (i)]
-      = M[i] / (100.0 * 100.0 * 100.0); // g/cm³ -> g/m³
+      = M[i] * (100.0 * 100.0 * 100.0); // g/cm³ -> g/m³
 }
 
 // Communication with Snow.
@@ -313,7 +313,7 @@ MikeSHE::put_snow_height (double mm)
 double 
 MikeSHE::get_precipitation () const
 { 
-  return impl.precip[impl.column] * 1000.0 / (3600.0 * 24.0); // m/s -> mm/d
+  return impl.precip[impl.column] * (3600.0 * 24.0) * 1000.0; // m/s -> mm/d
 }
 double 
 MikeSHE::get_air_temperature () const
@@ -325,7 +325,7 @@ MikeSHE::get_air_temperature () const
 double 
 MikeSHE::get_reference_evapotranspiration () const
 {
-  const double e =  impl.evapo[impl.column] * 1000.0 / (3600.0 * 24.0); 
+  const double e =  impl.evapo[impl.column] * (3600.0 * 24.0) * 1000.0; 
   assert (e < 1000.0);
   return e; // m/s -> mm/d
 }
@@ -335,7 +335,8 @@ void
 MikeSHE::put_evap_interception (double EvapInterception)
 { 
   assert (EvapInterception >= 0.0);
-  impl.cevapo[impl.column] = EvapInterception * 3600.0 / 1000.0; // mm/h -> m/s
+  impl.cevapo[impl.column]
+    = (EvapInterception / 3600.0) / 1000.0; // mm/h -> m/s
 }
 void 
 MikeSHE::put_intercepted_water (double intercepted_water)
@@ -349,7 +350,7 @@ MikeSHE::put_net_precipitation (double NetPrecipitation)
 {
   assert (NetPrecipitation >= 0.0);
   impl.netprec[impl.column] 
-    = NetPrecipitation * 3600.0 / 1000.0; // mm/h -> m/s
+    = (NetPrecipitation / 3600.0) / 1000.0; // mm/h -> m/s
 }
 
 // Communication with Surface.
@@ -357,14 +358,15 @@ void
 MikeSHE::put_evap_soil_surface (double EvapSoilSurface)
 { 
   assert (EvapSoilSurface >= 0.0);
-  impl.sevapo[impl.column] = EvapSoilSurface * 3600.0 / 1000.0;	// mm/h -> m/s
+  impl.sevapo[impl.column]
+    = (EvapSoilSurface / 3600.0) / 1000.0; // mm/h -> m/s
 }
 
 void 
 MikeSHE::put_evap_pond (double EvapPond)
 { 
   assert (EvapPond >= 0.0);
-  impl.pevapo[impl.column] = EvapPond * 3600.0 / 1000.0;	// mm/h -> m/s
+  impl.pevapo[impl.column] = (EvapPond / 3600.0) / 1000.0;	// mm/h -> m/s
 }
 
 double
@@ -376,13 +378,13 @@ MikeSHE::get_ponding () const
 double
 MikeSHE::get_surface_no3 () const
 {
-  return impl.olconc[impl.column] * (100.0 * 100.0); // g/m² -> g/cm²
+  return impl.olconc[impl.column] / (100.0 * 100.0); // g/m² -> g/cm²
 }
 
 void
 MikeSHE::put_surface_no3 (double NO3)
 {
-  impl.olconc[impl.column] = NO3 / (100.0 * 100.0); // g/cm² -> g/m²
+  impl.olconc[impl.column] = NO3 * (100.0 * 100.0); // g/cm² -> g/m²
 }
 
 // Done

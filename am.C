@@ -141,13 +141,29 @@ AM::swap (const Soil& soil, double from, double middle, double to)
     om[i]->swap (soil, from, middle, to);
 }
 
-bool
-AM::empty () const
+double 
+AM::total_C (const Soil& soil) const
+{
+  double total = 0.0;
+  for (unsigned int i = 0; i < om.size (); i++)
+    total += om[i]->total_C (soil);
+  return total;
+}
+
+double 
+AM::total_N (const Soil& soil) const
+{
+  double total = 0.0;
+  for (unsigned int i = 0; i < om.size (); i++)
+    total += om[i]->total_N (soil);
+  return total;
+}
+
+void 
+AM::pour (vector<double>& cc, vector<double>& nn)
 {
   for (unsigned int i = 0; i < om.size (); i++)
-    if (!om.empty ())
-      return false;
-  return true;
+    om[i]->pour (cc, nn);
 }
 
 const Library&

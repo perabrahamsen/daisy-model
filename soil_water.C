@@ -107,6 +107,15 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		 S, h_old, Theta_old_,
 		 h_, Theta_, q_);
     }
+  
+  // Update values in groundwater.
+  // Bug: Is this also done somewhere else?   Where?
+  for (int i = last + 1; i < soil.size (); i++)
+    {
+      h_[i] = 0.0;
+      Theta_[i] = soil.Theta (i, 0.0);
+      q_[i] = q_[i-1];
+    }
 #endif
 }
 

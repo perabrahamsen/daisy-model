@@ -270,7 +270,7 @@ ColumnStandard::tick (const Time& time,
   soil_NH4.clear ();
   surface.clear ();
   
-  bioclimate.tick (surface, weather, crops, soil, soil_water, soil_heat);
+  bioclimate.tick (surface, weather, time, crops, soil, soil_water, soil_heat);
 
   // Uptake and convertion of matter.
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
@@ -285,6 +285,10 @@ ColumnStandard::tick (const Time& time,
   soil_heat.tick (time, soil, soil_water, surface, groundwater);
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4);
+
+  // Once a month we clean up old AM from organic matter.
+  if (time.hour () == 13 && time.mday () == 13)
+    organic_matter.monthly (soil);
 }
 
 void
@@ -363,7 +367,7 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
   add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist);
   syntax.add ("Nitrification", Librarian<Nitrification>::library (),
-	      Syntax::Const);
+	      Syntax::State);
   add_submodule<Denitrification> ("Denitrification", syntax, alist);
 
   Column::add_type ("default", alist, syntax, &ColumnStandard::make);

@@ -57,6 +57,14 @@ IM::operator* (double flux) const
   return IM (*this, flux);
 }
 
+IM
+IM::operator+ (const IM& im) const
+{
+  IM result (*this);
+  result += im;
+  return result;
+}
+
 double 
 IM::N_left (const AttributeList& al)
 {
@@ -106,6 +114,11 @@ static double IM_get_NH4 (const AttributeList& al)
 IM::IM ()
   : NO3 (0.0),
     NH4 (0.0)
+{ }
+
+IM::IM (const IM& im)
+  : NO3 (im.NO3),
+    NH4 (im.NH4)
 { }
 
 IM::IM (const AttributeList& al)

@@ -1,60 +1,37 @@
 // weather.C
 
 #include "weather.h"
+#include "time.h"
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
+#include "mathlib.h"
 #include "common.h"
 #include <map>
 #include <algobase.h>
 
-static Library* Weather_library = NULL;
-typedef map<string, Weather::constructor, less<string> > Weather_map_type;
-static Weather_map_type* Weather_constructors;
+Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 
-const Library&
-Weather::library ()
+struct Weather::Implementation
 {
-  assert (Weather_library);
-  return *Weather_library;
-}
-
-void
-Weather::add_type (const string name, 
-		   const AttributeList& al, 
-		   const Syntax& syntax,
-		   constructor cons)
-{
-  assert (Weather_library);
-  Weather_library->add (name, al, syntax);
-  Weather_constructors->insert(Weather_map_type::value_type (name, cons));
-}
-
-void 
-Weather::derive_type (string name, const AttributeList& al, string super)
-{
-  add_type (name, al, library ().syntax (super), 
-	    (*Weather_constructors)[super]);
-}
-
-Weather&
-Weather::create (const Time& t, const AttributeList& al)
-{
-  assert (al.check ("type"));
-  const string name = al.name ("type");
-  assert (library ().check (name));
-  assert (library ().syntax (name).check (al));
-  return (*Weather_constructors)[name] (t, al);
-}
+  const double Latitude;
+  const IM DryDeposit;
+  const IM SoluteDeposit;
+  Implementation (const AttributeList& al)
+    : Latitude (al.number ("Latitude")),
+      DryDeposit (al.list ("DryDeposit")),
+      SoluteDeposit (al.list ("SoluteDeposit"))
+  { }
+};
 
 void
 Weather::output (Log&, const Filter&) const
 { }
 
 double
-Weather::DayLength () const
+Weather::DayLength (const Time& time) const
 {
-  return DayLength (Latitude, time);
+  return DayLength (impl.Latitude, time);
 }
 
 double
@@ -72,41 +49,63 @@ Weather::DayLength (double Latitude, const Time& time)
 }
 
 double
-Weather::DayCycle () const
+Weather::DayCycle (const Time& time) const
 {
-  return max (0.0, M_PI_2 / DayLength ()
-	      * cos (M_PI * (time.hour () - 12) / DayLength ()));
+  return max (0.0, M_PI_2 / DayLength (time)
+	      * cos (M_PI * (time.hour () - 12) / DayLength (time)));
 }
 
-Weather::Weather (const Time& t, double l, const string n)
-  : time (t),
-    Latitude (l), 
-    name (n)
+IM
+Weather::Deposit() const
+{
+  const double Precipitation = Rain () + Snow (); // [mm]
+  const IM dry (impl.DryDeposit, 0.1/24.0); // [kg/m²/d] -> [g/cm²/h]
+  const IM solute (impl.SoluteDeposit, 0.1); // [kg/m²/mm] -> [g/cm²/mm]
+
+  const IM result = dry + solute * Precipitation;
+
+  assert (approximate (result.NO3, 
+		       impl.DryDeposit.NO3 / 10.0 / 24.0
+		       + Precipitation * impl.SoluteDeposit.NO3 / 10.0));
+  assert (approximate (result.NH4, 
+		       impl.DryDeposit.NH4 / 10.0 / 24.0
+		       + Precipitation * impl.SoluteDeposit.NH4 / 10.0));
+  return result;
+}
+
+void
+Weather::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("Latitude", Syntax::Number, Syntax::Const);
+  alist.add ("Latitude", 56.0);
+  // DryDeposit
+  {
+    Syntax& s = *new Syntax ();
+    AttributeList& a = *new AttributeList ();
+    IM::load_syntax (s, a);
+    a.add ("NH4", 0.6e-6);	// kg/m²/d
+    a.add ("NO3", 0.3e-6);	// kg/m²/d
+    syntax.add ("DryDeposit", s, Syntax::Const, Syntax::Singleton);
+    alist.add ("DryDeposit", a);
+  }
+  // SoluteDeposit
+  {
+    Syntax& s = *new Syntax ();
+    AttributeList& a = *new AttributeList ();
+    IM::load_syntax (s, a);
+    a.add ("NO3", 0.6e-6); // kg/m²/mm
+    a.add ("NH4", 0.9e-6); // kg/m²/mm
+    syntax.add ("SoluteDeposit", s, Syntax::Const, Syntax::Singleton);
+    alist.add ("SoluteDeposit", a);
+  }
+}
+
+Weather::Weather (const AttributeList& al)
+  : impl (*new Implementation (al)),
+    name (al.name ("type"))
 { }
 
 Weather::~Weather ()
-{ }
-
-int Weather_init::count;
-
-Weather_init::Weather_init ()
 { 
-  if (count++ == 0)
-    {
-      Weather_library = new Library ("weather");
-      Weather_constructors = new Weather_map_type ();
-    }
-  assert (count > 0);
-}
-
-Weather_init::~Weather_init ()
-{ 
-  if (--count == 0)
-    {
-      delete Weather_library;
-      Weather_library = NULL;
-      delete Weather_constructors;
-      Weather_constructors = NULL;
-    }
-  assert (count >= 0);
+  delete &impl;
 }

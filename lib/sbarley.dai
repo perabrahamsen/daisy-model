@@ -5,8 +5,8 @@
 	 (DSRate1 0.001666666666667)	;1/600
 	 (DSRate2 0.00133333333333)	;1/750
 	 (DS_Emr 0.01)
-	 (TempEff1 (0 1) (1 1))
-	 (TempEff2 (0 1) (1 1))
+	 (TempEff1 (0 1) (100 100))
+	 (TempEff2 (0 1) (100 100))
 	 (PhotEff1 (0 1) (1 1)))
   (Vernal (required false)
 	  (DSLim1 0.0)
@@ -36,8 +36,8 @@
 	(Rad 0.005)
 	(h_wp -15000)
 	(Rxylem 10)
-	(MxNH4Up 1)
-	(MxNO3Up 1))
+	(MxNH4Up 2.5e-7)
+	(MxNO3Up 2.5e-8))
   (Partit (Root (0.00 0.60)
 		(0.95 0.15)
 		(2.00 0.15))
@@ -116,7 +116,7 @@
 		  (turnover_rate 2.917e-4); 0.700e-02 / 24 [ 1/h ]
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5); 0.700e-01 / 24 [ 1/h ]
+		  (turnover_rate 2.917e-3); 0.700e-01 / 24 [ 1/h ]
 		  (fractions 0.0 1.0 0.0)))
 	   (Stem ((initial_fraction 0.8)
 		  (C_per_N 100.0)
@@ -124,7 +124,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (Leaf ((initial_fraction 0.8)
 		  (C_per_N 100.0)
@@ -132,7 +132,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (SOrg ((initial_fraction 0.0)
 		  (C_per_N 100.0)
@@ -140,7 +140,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (Root ((initial_fraction 0.8)
 		  (C_per_N 100.0)
@@ -148,7 +148,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (DSmax 0.0)			;Bogus, made up number for testing.
 	   (DSnew 0.0)			;Bogus, made up number for testing.

@@ -19,6 +19,7 @@ class Soil
   const int size_;
   const double EpFactor_;
   const double EpInterchange_;
+  const double MaxRootingDepth_;
 public:
   // Geometry.
   inline int size () const
@@ -92,7 +93,10 @@ public:
   double extract (vector<double>& v, double from, double to) const;
   void set (vector<double>& v, double from, double to, double amount) const;
   void swap (vector<double>& v, double from, double middle, double to) const;
-  double total (vector<double>& v) const;
+  double total (const vector<double>& v) const;
+
+  // Debug.
+  void make_table (int i);
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

@@ -31,7 +31,9 @@ public:
   bool check () const;
   void mix (const Soil&, double from, double to, double penetration = 1.0);
   void swap (const Soil&, double from, double middle, double to);
-  bool empty () const;
+  double total_C (const Soil& soil) const;
+  double total_N (const Soil& soil) const;
+  void pour (vector<double>& cc, vector<double>& nn);
 
   // Library.
 public:

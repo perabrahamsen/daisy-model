@@ -15,7 +15,7 @@ FORLIB=
 MIKESRC=
 MIKEFLAGS= 
 
-CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -pipe $(MIKEFLAGS) -frepo -O3 -ffast-math -msupersparc -mv8 -pg
+CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -pipe $(MIKEFLAGS) -frepo -O3 -ffast-math -msupersparc -mv8 #-pg
 # CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
 SRCONLY = column_std.C  weather_simple.C uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \

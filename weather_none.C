@@ -15,7 +15,7 @@ class WeatherNone : public Weather
 
   // Simulation.
 public:
-  void tick ()
+  void tick (const Time&)
   { }
   void output (Log&, const Filter&) const
   { }
@@ -23,6 +23,8 @@ public:
   { return air_temperature; }
   double GlobalRadiation () const
   { return global_radiation; }
+  double DailyRadiation () const
+  { return global_radiation * 24.0; }
   double ReferenceEvapotranspiration () const
   { return reference_evapotranspiration; }
   double Rain () const
@@ -33,14 +35,14 @@ public:
   // Create and Destroy.
 private:
   friend class WeatherNoneSyntax;
-  static Weather& make (const Time&, const AttributeList&);
-  WeatherNone (const Time&, const AttributeList&);
+  static Weather& make (const AttributeList&);
+  WeatherNone (const AttributeList&);
 public:
   ~WeatherNone ();
 };
 
-WeatherNone::WeatherNone (const Time& t, const AttributeList& al)
-  : Weather (t, al.number ("Latitude"), al.name ("type")),
+WeatherNone::WeatherNone (const AttributeList& al)
+  : Weather (al),
     air_temperature (al.number ("air_temperature")),
     global_radiation (al.number ("global_radiation")),
     reference_evapotranspiration (al.number ("reference_evapotranspiration")),
@@ -53,31 +55,28 @@ WeatherNone::~WeatherNone ()
 
 // Add the WeatherNone syntax to the syntax table.
 Weather&
-WeatherNone::make (const Time& t, const AttributeList& al)
+WeatherNone::make (const AttributeList& al)
 {
-  return *new WeatherNone (t, al);
+  return *new WeatherNone (al);
 }
 
 static struct WeatherNoneSyntax
 {
-  WeatherNoneSyntax ();
+  WeatherNoneSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    Weather::load_syntax (syntax, alist);
+    syntax.add ("air_temperature", Syntax::Number, Syntax::Const);
+    alist.add ("air_temperature", 0.0);
+    syntax.add ("global_radiation", Syntax::Number, Syntax::Const);
+    alist.add ("global_radiation", 0.0);
+    syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::Const);
+    alist.add ("reference_evapotranspiration", 0.0);
+    syntax.add ("rain", Syntax::Number, Syntax::Const);
+    alist.add ("rain", 0.0);
+    syntax.add ("snow", Syntax::Number, Syntax::Const);
+    alist.add ("snow", 0.0);
+    Librarian<Weather>::add_type ("none", alist, syntax, &WeatherNone::make);
+  }
 } WeatherNone_syntax;
-
-WeatherNoneSyntax::WeatherNoneSyntax ()
-{ 
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  syntax.add ("Latitude", Syntax::Number, Syntax::Const);
-  alist.add ("Latitude", 56.0);
-  syntax.add ("air_temperature", Syntax::Number, Syntax::Const);
-  alist.add ("air_temperature", 0.0);
-  syntax.add ("global_radiation", Syntax::Number, Syntax::Const);
-  alist.add ("global_radiation", 0.0);
-  syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::Const);
-  alist.add ("reference_evapotranspiration", 0.0);
-  syntax.add ("rain", Syntax::Number, Syntax::Const);
-  alist.add ("rain", 0.0);
-  syntax.add ("snow", Syntax::Number, Syntax::Const);
-  alist.add ("snow", 0.0);
-  Weather::add_type ("none", alist, syntax, &WeatherNone::make);
-}

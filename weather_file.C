@@ -1,6 +1,7 @@
 // weather_file.C
 
 #include "weather.h"
+#include "time.h"
 #include "options.h"
 #include "syntax.h"
 #include "alist.h"
@@ -13,6 +14,7 @@
 class WeatherFile : public Weather
 {
   Time date;
+  Time now;
   const string file_name;
   ifstream file;
   const double T1;
@@ -39,26 +41,26 @@ class WeatherFile : public Weather
   int line;
   // Simulation.
 public:
-  void tick ();
+  void tick (const Time&);
   void output (Log&, const Filter&) const;
   double AirTemperature () const;
   double GlobalRadiation () const;
+  double DailyRadiation () const;
   double ReferenceEvapotranspiration () const;
   double Precipitation () const;
   double Rain () const;
   double Snow () const;
-
   // Create and Destroy.
 private:
   friend class WeatherFileSyntax;
-  static Weather& make (const Time&, const AttributeList&);
-  WeatherFile (const Time&, const AttributeList&);
+  static Weather& make (const AttributeList&);
+  WeatherFile (const AttributeList&);
 public:
   ~WeatherFile ();
 };
 
 void
-WeatherFile::tick ()
+WeatherFile::tick (const Time& time)
 { 
   if (!file.good ())
     {
@@ -93,6 +95,7 @@ WeatherFile::tick ()
 	}
       date = Time (year, month, day, 23);
     }
+  now = time;
 }
 
 void
@@ -121,9 +124,15 @@ WeatherFile::AirTemperature (void) const // [C]
 }
 
 double
+WeatherFile::DailyRadiation () const // [W/m²]
+{
+  return global_radiation;
+}
+
+double
 WeatherFile::GlobalRadiation () const	// [W/m²]
 {
-  hourly_global_radiation = DayCycle () * 24.0 * global_radiation;
+  hourly_global_radiation = DayCycle (now) * 24.0 * global_radiation;
   return hourly_global_radiation;
 }
 
@@ -143,7 +152,7 @@ WeatherFile::ReferenceEvapotranspiration () const // [mm/h]
     }
 
   hourly_reference_evapotranspiration = 
-    reference_evapotranspiration * DayCycle ();
+    reference_evapotranspiration * DayCycle (now);
 
   return hourly_reference_evapotranspiration;
 }
@@ -179,9 +188,10 @@ WeatherFile::Snow () const
   return Psnow;
 }
 
-WeatherFile::WeatherFile (const Time& t, const AttributeList& al)
-  : Weather (t, al.number ("Latitude"), al.name ("type")),
+WeatherFile::WeatherFile (const AttributeList& al)
+  : Weather (al),
     date (42, 1, 1, 0),
+    now (42, 1, 1, 0),
     file_name (al.name ("file")),
     file (Options::find_file (al.name ("file"))),
     T1 (al.number ("T1")),
@@ -202,77 +212,75 @@ WeatherFile::~WeatherFile ()
 
 // Add the WeatherFile syntax to the syntax table.
 Weather&
-WeatherFile::make (const Time& t, const AttributeList& al)
+WeatherFile::make (const AttributeList& al)
 {
-  return *new WeatherFile (t, al);
+  return *new WeatherFile (al);
 }
 
 static struct WeatherFileSyntax
 {
-  WeatherFileSyntax ();
-} WeatherFile_syntax;
-
-WeatherFileSyntax::WeatherFileSyntax ()
-{ 
-  static const double A[] = 
-  {
-    -0.916667,
-    -1.687500,
-    -1.681818,
-    -1.468085,
-    -1.387324,
-    -1.377246,
-    -1.389937,
-    -1.518519,
-    -1.629630,
-    -1.631579,
-    -1.333333,
-    -0.900000
-  };
-  static const double B[] = 
-  {
-    -0.166667,
-    -0.437500,
-    -0.454545,
-    -0.382979,
-    -0.338028,
-    -0.335329,
-    -0.389937,
-    -0.407407,
-    -0.358025,
-    -0.236842,
-    -0.166667,
-    -0.200000
-  };
-
-  Syntax& syntax = *new Syntax ();
-  AttributeList& alist = *new AttributeList ();
-  syntax.add ("Latitude", Syntax::Number, Syntax::Const);
-  alist.add ("Latitude", 56.0);
-  syntax.add ("file", Syntax::String, Syntax::Const);
-  syntax.add ("T1", Syntax::Number, Syntax::Const);
-  alist.add ("T1", -2.0);
-  syntax.add ("T2", Syntax::Number, Syntax::Const);
-  alist.add ("T2", 2.0);
-  syntax.add ("A", Syntax::Number, Syntax::Const, 12);
-  syntax.add ("B", Syntax::Number, Syntax::Const, 12);
-  vector<double>& a = *new vector<double>;
-  vector<double>& b = *new vector<double>;
-  for (int i = 0; i < 12; i++)
+  WeatherFileSyntax ()
+  { 
+    static const double A[] = 
     {
-      a.push_back (A[i]);
-      b.push_back (B[i]);
-    }
-  alist.add ("A", a);
-  alist.add ("B", b);
-  syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("air_temperature", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("global_radiation", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("hourly_global_radiation", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("hourly_reference_evapotranspiration",
-	      Syntax::Number, Syntax::LogOnly);
-  syntax.order ("file");
-  Weather::add_type ("file", alist, syntax, &WeatherFile::make);
-}
+      -0.916667,
+      -1.687500,
+      -1.681818,
+      -1.468085,
+      -1.387324,
+      -1.377246,
+      -1.389937,
+      -1.518519,
+      -1.629630,
+      -1.631579,
+      -1.333333,
+      -0.900000
+    };
+    static const double B[] = 
+    {
+      -0.166667,
+      -0.437500,
+      -0.454545,
+      -0.382979,
+      -0.338028,
+      -0.335329,
+      -0.389937,
+      -0.407407,
+      -0.358025,
+      -0.236842,
+      -0.166667,
+      -0.200000
+    };
+
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    Weather::load_syntax (syntax, alist);
+    syntax.add ("file", Syntax::String, Syntax::Const);
+    syntax.add ("T1", Syntax::Number, Syntax::Const);
+    alist.add ("T1", -2.0);
+    syntax.add ("T2", Syntax::Number, Syntax::Const);
+    alist.add ("T2", 2.0);
+    syntax.add ("A", Syntax::Number, Syntax::Const, 12);
+    syntax.add ("B", Syntax::Number, Syntax::Const, 12);
+    vector<double>& a = *new vector<double>;
+    vector<double>& b = *new vector<double>;
+    for (int i = 0; i < 12; i++)
+      {
+	a.push_back (A[i]);
+	b.push_back (B[i]);
+      }
+    alist.add ("A", a);
+    alist.add ("B", b);
+    syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
+    syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
+    syntax.add ("air_temperature", Syntax::Number, Syntax::LogOnly);
+    syntax.add ("global_radiation", Syntax::Number, Syntax::LogOnly);
+    syntax.add ("hourly_global_radiation", Syntax::Number, Syntax::LogOnly);
+    syntax.add ("reference_evapotranspiration",
+		Syntax::Number, Syntax::LogOnly);
+    syntax.add ("hourly_reference_evapotranspiration",
+		Syntax::Number, Syntax::LogOnly);
+    syntax.order ("file");
+    Librarian<Weather>::add_type ("file", alist, syntax, &WeatherFile::make);
+  }
+} WeatherFile_syntax;

@@ -39,7 +39,9 @@ struct OrganicMatter::Implementation
     static void load_syntax (Syntax& syntax, AttributeList& alist);
     Buffer (const Soil&, const AttributeList& al);
   } buffer;
-  
+  const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]
+  const double min_AM_N;	// Minimal amount of N in an AM. [g/m²]
+
   // Log.
   vector<double> NO3_source;
   vector<double> NH4_source;
@@ -47,6 +49,7 @@ struct OrganicMatter::Implementation
   // Simulation.
   void add (AM& om)
   { am.push_back (&om); }
+  void monthly (const Soil& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&);
   void mix (const Soil&, double from, double to, double penetration);
@@ -86,7 +89,7 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
   
   if (N_need > N_soil - N_used && N[i] > 0.0)
     {
-      rate = (N_soil - N_used) / (N[i] - C[i] / som[where]->C_per_N[i]);
+      rate = (N_soil - N_used) / (C[i] / som[where]->C_per_N[i] - N[i]);
       assert (finite (rate));
       N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
       assert (finite (N_need));
@@ -254,6 +257,54 @@ static bool om_compare (const OM* a, const OM* b)
   return a->C_per_N[0] < b->C_per_N[0];
 }
 
+void
+OrganicMatter::Implementation::monthly (const Soil& soil)
+{
+  const int am_size = am.size ();
+  vector<AM*> new_am;
+  
+  cerr << "\nThere are " << am_size << " AM dk:puljer.\n";
+  
+  for (int i = 0; i < am_size; i++)
+    {
+      bool keep;
+
+      if (min_AM_C == 0.0)
+	if (min_AM_N == 0.0)
+	  // No requirement, keep it.
+	  keep = true;
+	else
+	  // Only require N.
+	  keep = (am[i]->total_N (soil) * (100.0 * 100.0) > min_AM_N);
+      else
+	if (min_AM_N == 0.0)
+	  // Only require C.
+	  keep = (am[i]->total_C (soil) * (100.0 * 100.0) > min_AM_C);
+	else 
+	  // Require either N or C.
+	  keep = (am[i]->total_N (soil) * (100.0 * 100.0) > min_AM_N
+		  || am[i]->total_C (soil) * (100.0 * 100.0) > min_AM_C);
+      
+      cerr << (keep ? "Keeping " : "Removing ") << am[i]->name 
+	   << " (" << am[i]->creation.year ()
+	   << "-" << am[i]->creation.month () 
+	   << "-" << am[i]->creation.mday () << ") N = " 
+	   << am[i]->total_N (soil) * (100.0 * 100.0) 
+	   << ", C = "  << am[i]->total_C (soil) * (100.0 * 100.0) 
+	   << ".\n";
+
+      if (keep)
+	new_am.push_back (am[i]);
+      else
+	{
+	  am[i]->pour (buffer.C, buffer.N);
+	  delete am[i];
+	}
+      am[i] = NULL;
+    }
+  am = new_am;
+}
+
 void 
 OrganicMatter::Implementation::tick (const Soil& soil, 
 				     const SoilWater& soil_water, 
@@ -261,8 +312,6 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 				     SoilNO3& soil_NO3,
 				     SoilNH4& soil_NH4)
 {
-  remove_if (am.begin (), am.end (), &AM::empty);
-
   // Create an array of all AM dk:puljer, sorted by their C_per_N.
   const int all_am_size = am.size ();
   vector<OM*> added;
@@ -378,7 +427,10 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
     am (map_create1 <AM, const Soil&> (al.list_sequence ("am"), soil)),
     smb (map_construct1 <OM, const Soil&> (al.list_sequence ("smb"), soil)),
     som (map_construct1 <OM, const Soil&> (al.list_sequence ("som"), soil)),
-    buffer (soil, al.list ("buffer"))
+    buffer (soil, al.list ("buffer")),
+    min_AM_C (al.number ("min_AM_C")),
+    min_AM_N (al.number ("min_AM_N"))
+
 { 
   // Production.
   CO2.insert (CO2.end(), soil.size(), 0.0);
@@ -464,6 +516,12 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
 	  assert (som[missing_C_per_N]->C_per_N[l] >= 0.0);
 	}
     }
+}
+
+void 
+OrganicMatter::monthly (const Soil& soil)
+{
+  impl.monthly (soil); 
 }
 
 void 
@@ -715,4 +773,9 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   add_submodule<OM> ("som", syntax, alist, Syntax::State, Syntax::Sequence);
   syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);
   syntax.add ("water_turnover_factor", Syntax::CSMP, Syntax::Const);
+  syntax.add ("min_AM_C", Syntax::Number, Syntax::Const);
+  alist.add ("min_AM_C", 0.0);
+  syntax.add ("min_AM_N", Syntax::Number, Syntax::Const);
+  // We require ½ kg N / Ha in order to keep an AM dk:pulje.
+  alist.add ("min_AM_N", 0.05);
 }

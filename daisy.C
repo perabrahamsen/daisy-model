@@ -30,7 +30,7 @@ Daisy::Daisy (const AttributeList& al)
     logs (map_create<Log> (al.list_sequence ("output"))),
     time (al.time ("time")),
     action (Action::create (al.list ("manager"), NULL)),
-    weather (Weather::create (time, al.list ("weather"))), 
+    weather (Librarian<Weather>::create (al.list ("weather"))), 
     groundwater (Groundwater::create (time, al.list ("groundwater"))), 
     columns (*new ColumnList (al.list_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
@@ -80,7 +80,7 @@ Daisy::run ()
 	}
       action.doIt (*this);
 
-      weather.tick ();
+      weather.tick (time);
       for (ColumnList::iterator i = columns.begin ();
 	   i != columns.end ();
 	   i++)
@@ -129,7 +129,9 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_class ("defaction", Action::library (), &Action::derive_type);
   syntax.add_class ("defcondition",
 		    Condition::library (), &Condition::derive_type);
-  syntax.add_class ("defweather", Weather::library (), &Weather::derive_type);
+  syntax.add_class ("defweather", 
+		    Librarian<Weather>::library (), 
+		    Librarian<Weather>::derive_type);
   syntax.add_class ("defgroundwater",
 		    Groundwater::library (), &Groundwater::derive_type);
   syntax.add_class ("defuzmodel", UZmodel::library (), &UZmodel::derive_type);
@@ -145,7 +147,7 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("manager", Action::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::State);
   syntax.add ("column", Column::library (), Syntax::State, Syntax::Sequence);
-  syntax.add ("weather", Weather::library ());
+  syntax.add ("weather", Librarian<Weather>::library ());
   syntax.add ("groundwater", Groundwater::library (), Syntax::Const);
   add_submodule<Harvest> ("harvest", syntax, alist,
 			  Syntax::LogOnly, Syntax::Sequence);

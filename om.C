@@ -116,14 +116,40 @@ OM::swap (const Soil& soil, double from, double middle, double to)
   soil.swap (C, from, middle, to);
 }
 
-bool 
-OM::empty () const
+double 
+OM::total_C (const Soil& soil) const
 {
-  int size = C.size ();
+  return soil.total (C);
+}
+
+double 
+OM::total_N (const Soil& soil) const
+{
+  double total = 0.0;
+  const int size = C.size ();
+  assert (C_per_N.size () == size +0U);
   for (int i = 0; i < size; i++)
-    if (C[i] > 0.0)
-      return false;
-  return true;
+    {
+      assert (C_per_N[i] > 0.0);
+      total += (C[i] / C_per_N[i]) * soil.dz (i);
+    }
+  return total;
+}
+
+void
+OM::pour (vector<double>& cc, vector<double>& nn)
+{
+  const int size = C.size ();
+  assert (C_per_N.size () == size +0U);
+  assert (cc.size () == size +0U);
+  assert (nn.size () == size +0U);
+  for (int i = 0; i < size; i++)
+    {
+      cc[i] += C[i];
+      assert (C_per_N[i] > 0.0);
+      nn[i] += C[i] / C_per_N[i];
+      C[i] = 0.0;
+    }
 }
 
 #if 0

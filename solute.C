@@ -46,7 +46,7 @@ Solute::tick (const Soil& soil,
 	      double J_in)
 {
 #ifdef MIKE_SHE
-  S[0] -= J_in;
+  S[0] -= J_in / soil.dz (0);
   for (int i = 0; i < soil.size (); i++)
     {
       M_[i] += S[i];

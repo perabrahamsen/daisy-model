@@ -79,8 +79,7 @@ protected:
   void AssimilatePartitioning (double DS, 
 			       double& f_Leaf, double& f_Stem,
 			       double& f_Root, double& f_SOrg);
-  double MaintenanceRespiration (double r, double Q10,
-					 double w, double T);
+  double MaintenanceRespiration (double r, double w, double T);
   void NetProduction (const Bioclimate&, const Soil&, const SoilHeat&);
 
   // Simulation.
@@ -198,7 +197,6 @@ struct CropStandard::Parameters
     double r_Leaf;		// Maint. resp. coeff., leaf
     double r_Stem;		// Maint. resp. coeff., stem
     double r_SOrg;		// Maint. resp. coeff., stor. org.
-    double Q10;			// Maint. resp. Q10-value
     double ShldResC;		// Capacity of Shielded Reserves
     double ReMobilDS;		// Remobilization, Initial DS
     double ReMobilRt;		// Remobilization, release rate
@@ -423,7 +421,6 @@ CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
     r_Leaf (vl.number ("r_Leaf")),
     r_Stem (vl.number ("r_Stem")),
     r_SOrg (vl.number ("r_SOrg")),
-    Q10 (vl.number ("Q10")),
     ShldResC (vl.number ("ShldResC")),
     ReMobilDS (vl.number ("ReMobilDS")),
     ReMobilRt (vl.number ("ReMobilRt")),
@@ -744,7 +741,6 @@ CropStandardSyntax::CropStandardSyntax ()
   Prod.add ("r_Leaf", Syntax::Number, Syntax::Const);
   Prod.add ("r_Stem", Syntax::Number, Syntax::Const);
   Prod.add ("r_SOrg", Syntax::Number, Syntax::Const);
-  Prod.add ("Q10", Syntax::Number, Syntax::Const);
   Prod.add ("ShldResC", Syntax::Number, Syntax::Const);
   Prod.add ("ReMobilDS", Syntax::Number, Syntax::Const);
   Prod.add ("ReMobilRt", Syntax::Number, Syntax::Const);
@@ -1233,11 +1229,15 @@ CropStandard::CanopyStructure ()
 }
 
 double
-CropStandard::ActualWaterUptake (const double Ept,
+CropStandard::ActualWaterUptake (double Ept,
 				 const Soil& soil, SoilWater& soil_water,
 				 const double EvapInterception)
 {
-  assert (Ept >= 0);
+  if (Ept < 0)
+    {
+      cerr << "\nBUG: Negative EPT (" << Ept << ")\n";
+      Ept = 0.0;
+    }
   assert (EvapInterception >= 0);
   static const double min_step = 1.0;
   const double h_wp = par.Root.h_wp;
@@ -1469,7 +1469,7 @@ CropStandard::RootDensity (const Soil& soil)
   vector<double>& d = var.RootSys.Density;
   
   int i = 0;
-  for (; -soil.zplus (i) < RootSys.Depth; i++)
+  for (; i == 0 || -soil.zplus (i-1) < RootSys.Depth; i++)
     d[i] = L0 * exp (a * soil.z (i));
   assert (i < soil.size ());
   for (; i < soil.size (); i++)
@@ -1611,13 +1611,14 @@ CropStandard::AssimilatePartitioning (double DS,
 }
 
 double 
-CropStandard::MaintenanceRespiration (double r, double Q10, double w, double T)
+CropStandard::MaintenanceRespiration (double r, double w, double T)
 {
   if (w <= 0.0)
     return 0.0;
 
   return (molWeightCH2O / molWeightCO2) 
-    * r * exp ((T - 20) / 10 * log (Q10)) * w;
+    * r * max (0.0, 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
+			      - exp (0.57 - 0.042 * T - 0.0051 * T * T))) * w;
 }
 
 void 
@@ -1633,13 +1634,13 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   const double AirT = bioclimate.AirTemperature ();
   const double SoilT = soil_heat.T (soil.interval_plus (-Depth / 3));
   double RMLeaf
-    = MaintenanceRespiration (pProd.r_Leaf, pProd.Q10, vProd.WLeaf, AirT);
+    = MaintenanceRespiration (pProd.r_Leaf, vProd.WLeaf, AirT);
   const double RMStem
-    = MaintenanceRespiration (pProd.r_Stem, pProd.Q10, vProd.WStem, AirT);
+    = MaintenanceRespiration (pProd.r_Stem, vProd.WStem, AirT);
   const double RMSOrg
-    = MaintenanceRespiration (pProd.r_SOrg, pProd.Q10, vProd.WSOrg, AirT);
+    = MaintenanceRespiration (pProd.r_SOrg, vProd.WSOrg, AirT);
   const double RMRoot
-    = MaintenanceRespiration (pProd.r_Root, pProd.Q10, vProd.WRoot, SoilT);
+    = MaintenanceRespiration (pProd.r_Root, vProd.WRoot, SoilT);
 
   const double ReMobil = ReMobilization ();
   CrpAux.CanopyAss += ReMobil;
@@ -1728,6 +1729,14 @@ CropStandard::tick (const Time& time,
 		    SoilNH4& soil_NH4,
 		    SoilNO3& soil_NO3)
 {
+  // Clear log.
+  fill (var.RootSys.NO3Extraction.begin (), 
+	var.RootSys.NO3Extraction.end (),
+	0.0);
+  fill (var.RootSys.NH4Extraction.begin (), 
+	var.RootSys.NH4Extraction.end (),
+	0.0);
+
   if (time.hour () == 0 && var.Phenology.DS <= 0)
     {
       Emergence (soil, soil_heat);

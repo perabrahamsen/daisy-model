@@ -2,13 +2,13 @@
 
 (defcrop WinterBarley old
   (Devel (EmrTSum 080)
-	 (DSRate1 1.29e-3)
-	 (DSRate2 1.29e-3)
+	 (DSRate1 1.63e-3)
+	 (DSRate2 1.63e-3)
 	 (DS_Emr 0.01)
 	 (DS_reset true)
-	 (TempEff1 (0 0) (1 1))
-	 (TempEff2 (0 0) (1 1))
-	 (PhotEff1 (0 0) (1 1)))
+	 (TempEff1 (0 1) (100 100))
+	 (TempEff2 (0 1) (100 100))
+	 (PhotEff1 (0 1) (1 1)))
   (Vernal (required false)
 	  (DSLim1 0.0)
 	  (DSLim2 0.0)
@@ -18,9 +18,10 @@
 	    (Fm 3.0)			; g/m²/h
 	    (TLim1 4.0)			; dg C
 	    (TLim2 10.0))		; dg C
-  (Canopy (DSinit 0.07)
+  (Canopy (InitGrowth 3.67)
+	  (DSinit 0.07)
 	  (WLfInit 30)			; g/m²
-	  (DS1 0.536)			; Th
+	  (DS1 0.530)			; Th
 	  (alpha 1.8)
 	  (beta 1.1755)			; Th
 	  (SpLAI 1.4e-2)		; (m²/m²) / (g/m²)
@@ -38,18 +39,18 @@
 	(DensRtTip 0.1)
 	(Rad 0.005)
 	(h_wp -15000)
-	(Rxylem 10)
-	(MxNH4Up 1)
-	(MxNO3Up 1))
+	(Rxylem 0)
+	(MxNH4Up 2.5e-7)
+	(MxNO3Up 2.5e-8))
   (Partit (Root (0.000 0.60)
-		(0.408 0.10)
+		(0.608 0.10)
 		(2.000 0.10)))
   (Resp (E_Root (0.0 0.54) (2.0 0.54))
 	(E_Leaf (0.0 0.72) (2.0 0.72))
-	(r_Root (0.449 0.065) (0.4491 0.015))
-	(r_Leaf (0.449 0.015) (0.4491 0.01))
+	(r_Root (0.898 0.065) (0.8981 0.015))
+	(r_Leaf (0.898 0.015) (0.8981 0.01))
 	(Q10 2.00))
-  (CrpN (SeedN 4.0)
+  (CrpN (SeedN 0.4)
 	(PtLeafCnc (0.163 0.050)
 		   (0.347 0.040)
 		   (0.531 0.031)
@@ -103,7 +104,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (Leaf ((initial_fraction 0.8)
 		  (C_per_N 100.0)
@@ -111,7 +112,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (SOrg ((initial_fraction 0.0)
 		  (C_per_N 100.0)
@@ -119,7 +120,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (Root ((initial_fraction 0.8)
 		  (C_per_N 100.0)
@@ -127,7 +128,7 @@
 		  (turnover_rate 2.917e-4)
 		  (fractions 0.5 0.5 0.0))
 		 ((efficiency 0.5 0.5)
-		  (turnover_rate 2.917e-5)
+		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (DSmax 0.0)			;Bogus, made up number for testing.
 	   (DSnew 0.0)			;Bogus, made up number for testing.

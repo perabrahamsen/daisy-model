@@ -24,7 +24,8 @@ class Bioclimate
   Implementation& impl;
 public:
   // Simulation
-  void tick (Surface&, const Weather&, const CropList&, 
+  void tick (Surface&, const Weather&, const Time&, 
+	     const CropList&, 
 	     const Soil&, SoilWater&, const SoilHeat&);
   void output (Log&, const Filter&) const;
 
@@ -35,6 +36,7 @@ public:
   double PAR (int) const;
   double AirTemperature () const;
   double DayLength () const;
+  double DailyRadiation () const;
 
   // Manager.
 public:
