@@ -1,3 +1,19 @@
+2003-05-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.94 released.
+
+2003-05-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/dk-horizon.dai: Updated.
+
+	* groundwater_pipe.C (EquilibriumDrainFlow): Multiply with
+	anisotropy. 
+
+2003-05-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C, groundwater.C, groundwater.h (update_water):
+	Made 'q_p' and 'h_ice' const. 
+
 2003-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.93 released.

@@ -90,10 +90,10 @@ public:
   		     vector<double>& S_sum,
   		     vector<double>& S_drain,
 		     vector<double>& h,
-		     vector<double>& h_ice,
+		     const vector<double>& h_ice,
 		     vector<double>& Theta,
 		     vector<double>& q,
-		     vector<double>& q_p,
+		     const vector<double>& q_p,
 		     Treelog& msg);
   void output (Log& log) const;
 
@@ -101,20 +101,20 @@ private:
   double DeepPercolation (const Soil&);
   double EquilibriumDrainFlow (const Soil&, const SoilHeat&);
   void RaisingGWT  (const Soil&,
-                    vector<double>& h, vector<double>& h_ice,
+                    vector<double>& h, const vector<double>& h_ice,
                     vector<double>& Theta, const double deficit);
   void FallingGWT1 (const Soil&,
-                    vector<double>& h, vector<double>& h_ice,
+                    vector<double>& h, const vector<double>& h_ice,
                     vector<double>& Theta, const double deficit);
   void FallingGWT2 (const Soil&,
-                    vector<double>& h, vector<double>& h_ice,
+                    vector<double>& h, const vector<double>& h_ice,
                     vector<double>& Theta, const double deficit);
   void Update_GWT  (const Soil&,
-                    vector<double>& h, vector<double>& h_ice,
-                    vector<double>& Theta, vector<double>& q,
-                    vector<double>& q_p);
+                    vector<double>& h, const vector<double>& h_ice,
+                    vector<double>& Theta, const vector<double>& q,
+                    const vector<double>& q_p);
   double EquilibriumDrainage (const int i_drainage, const Soil& soil,
-                    vector<double>& h_ice);
+                    const vector<double>& h_ice);
   double EqlDeficit (const int node, const Soil& soil, const double Theta,
                     const double h_ice, const double GWT);
   double InternalGWTLocation (const Soil& soil, const double theta,
@@ -172,10 +172,10 @@ GroundwaterPipe::update_water (const Soil& soil,
 			       vector<double>& S_sum,
 			       vector<double>& S_drain,
 			       vector<double>& h,
-			       vector<double>& h_ice,
+			       const vector<double>& h_ice,
 			       vector<double>& Theta,
 			       vector<double>& q,
-			       vector<double>& q_p,
+			       const vector<double>& q_p,
 			       Treelog& msg)
 {
   Treelog::Open nest (msg, "Groundwater " + name);
@@ -233,18 +233,8 @@ GroundwaterPipe::update_water (const Soil& soil,
     }
   for (unsigned int i = 1; i <= i_bottom+1; i++)
     {
-       if (-q_p[i]>0 && -q[i]>0)
-	 {
-	   const double x_p = q_p[i]/(q[i] + q_p[i]);
-	   q_p[i] = - x_p * Percolation[i-1];
-	   q[i] = -Percolation[i-1] - q_p[i];
-	 }
-       else
-	 {
-	   q[i] = -Percolation[i-1] - q_p[i];
-	 }
-       daisy_assert (isfinite (q[i]));
-       daisy_assert (isfinite (q_p[i]));
+      q[i] = -Percolation[i-1] - q_p[i];
+      daisy_assert (isfinite (q[i]));
     }
   if (isnormal (extra_water_to_surface))
     {
@@ -326,7 +316,8 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
       const double a = Flow / (Ka*Ha + Kb*Hb);
       for (unsigned int i = i_GWT; i <= i_bottom; i++)
 	{
-          S[i] = a * soil.K (i, 0.0, 0.0, soil_heat.T (i));
+          S[i] = a * soil.K (i, 0.0, 0.0, soil_heat.T (i))
+	    * soil.anisotropy (i);
 	}
       daisy_assert (isfinite (Flow));
       for (unsigned int i = i_bottom; i >= i_GWT; i--)
@@ -348,9 +339,9 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
 
 void
 GroundwaterPipe::Update_GWT (const Soil& soil,
-                             vector<double>& h, vector<double>& h_ice,
-                             vector<double>& Theta, vector<double>& q,
-                             vector<double>& q_p)
+                             vector<double>& h, const vector<double>& h_ice,
+                             vector<double>& Theta, const vector<double>& q,
+                             const vector<double>& q_p)
 {
   const int i_GWT = soil.interval_plus (height) + 1;
   const double z_drain = soil.zplus (i_drain);
@@ -382,7 +373,7 @@ GroundwaterPipe::Update_GWT (const Soil& soil,
 
 void
 GroundwaterPipe::RaisingGWT (const Soil& soil,
-                             vector<double>& h, vector<double>& h_ice,
+                             vector<double>& h, const vector<double>& h_ice,
                              vector<double>& Theta, const double deficit)
 {
   vector<double> WaterDef;
@@ -520,7 +511,7 @@ GroundwaterPipe::EqlDeficit (const int node, const Soil& soil,
 //GWT is above the drain depth
 void
 GroundwaterPipe::FallingGWT1 (const Soil& soil,
-                              vector<double>& h, vector<double>& h_ice,
+                              vector<double>& h, const vector<double>& h_ice,
                               vector<double>& Theta,
                               const double deficit)
 {
@@ -605,7 +596,7 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil,
 
 void
 GroundwaterPipe::FallingGWT2 (const Soil& soil,
-                              vector<double>& h, vector<double>& h_ice,
+                              vector<double>& h, const vector<double>& h_ice,
                               vector<double>& Theta,
                               const double deficit)
 {
@@ -647,7 +638,7 @@ GroundwaterPipe::FallingGWT2 (const Soil& soil,
 // GWT is below the drain depth
 void
 GroundwaterPipe::FallingGWT2 (const Soil& soil,
-                              vector<double>& h, vector<double>& h_ice,
+                              vector<double>& h, const vector<double>& h_ice,
                               vector<double>& Theta, treelog&)
 {
   GWT_new = height;
@@ -698,7 +689,7 @@ GroundwaterPipe::FallingGWT2 (const Soil& soil,
 double
 GroundwaterPipe::EquilibriumDrainage (const int i_drainage,
                                       const Soil& soil,
-                                      vector<double>& h_ice)
+                                      const vector<double>& h_ice)
 {
   const int i_GWT = soil.interval_plus (height) + 1;
   double w = 0;
