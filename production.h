@@ -66,6 +66,7 @@ private:
   const PLF& LfDR;		// Death rate of Leafs
   const PLF& RtDR;		// Death rate of Roots
   const double Large_RtDR;	// Extra death rate for large root/shoot.
+  const PLF& RtDR_T_factor;	// Temperature factor for root death rate.
   const double IntDSRelRtRes;	// Initial DS for the release of root reserves
   const double EndDSRelRtRes;	// End DS for the release of root reserves
   const double RelRateRtRes;	// Release rate of root reserves

@@ -1,26 +1,25 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Check drain source/sink.
-
-Få Søren til at genkøre sin simulering.
-
-* DHI:  Nitrification soil i initial.dai
-
-* Weather default
-
-Precipitaion-Correction: 1.12 1.24 ... for each month.
 
 * User Manual
+
+** Tillage
+
+*** Raunsø: Ridge description
+
+Tillage actio, + log model
+
+*** Soil Compaction
 
 ** SH: Pesticides
 
 To partielle parameteriseringer, "canopy" og "soil"?
 
-** Log paramterizations.
+** Log parameterizations.
 
 Udbyg.
 
-** SH: Check pet PM
+*** SH: "Soil Nitrate Concentration" vs. "Soil Water NO3 Concentration".
 
 * Irrigation
 
@@ -28,49 +27,70 @@ Udbyg.
 
 SH: Check om vi skal starte ved fremspiring, som i Daisy V1.
 
-* Experimental Features Manual.
-
-** Ridge
-
-** PMSW
-
-** Soil Compaction
-
 * Parser & Printer.
 
 ** Don't order attributes when defining paramterizations.
 
-* Make it possible to log a specific entry in an array of unnamed objects.
-
 * Log table
+
+** Make it possible to log a specific entry in an array of unnamed objects.
+
+Give "Log::open_unnamed" a numeric argument.
+
+** Make it possible to create a small balance or summary
+
+(output ("N_balance"
+         (when daily)
+         (to -1 [m])
+         (balance (Ammonium (begin 1965 07 20) (end (2002 03 07)))
+                  (Nitrogen (begin 1965 07 20) (end (2002 03 07)))))
+
+# Ammonium balance for period 20-07-1965 to 07-03-2002
+#
+#            Mineralization:   200 kg N/ha
+#             Nitrification:  -120 kg N/ha
+#         Change in content:   -20 kg N/ha
+#              Plant uptake: -1000 kg N/ha
+#                     Input:  1400 kg N/ha
+#                   Leching:  -200 kg N/ha
+#                            -----
+#                   Balance:    60 kg N/ha
+
+Should they be part of log table?  Should they go to the end of the
+log files?  Should they all be written to a single file?  Or to
+standard output?
 
 ** Add long description for each column in a table log file.
 
 I.e. a new select parameter named "description", plus a table option
 of whether to add it to preamble of the dlf file.
 
-** New log table spec parameter
+** Use new log table spec parameter
 
-It should have the format
+*** Get default dimension
 
-   library model sumodel* attribute
+*** Automatic convertion 
 
-it would be used to get default dimension and description of the parameter
-from the syntax table, and allow automatic convertions.
+*** Default descriptions in ref-doc.
+
+* New 'spec' log model.
+
+Select attribute with
+
+    library type submodel* attribute
+
+Use filters like
+
+    library type
+
+cutting of branch if it encounter an object from library not derived
+from type.
 
 * Paramerization library documentation
-
-** Add standard paramterizations to reference manual.
-
-** Tell "superclass" (with reference) and file(s).
 
 ** syntax.add_printer ("LaTeX", log_table_pp_LaTeX)
 
 ** Differences from superclass.
-
-** Automate generation.
-
-* Add state/log index to manual.
 
 * Organic Matter
 
@@ -85,19 +105,6 @@ Dissolved Organic Matter, feed by all the OM pool transformations.
 ** Pesticides
 
 * Add user defineable convertions.
-
-* New 'spec' log model.
-
-Select attribute with
-
-    library type submodel* attribute
-
-Use filters like
-
-    library type
-
-cutting of branch if it encounter an object from library not derived
-from type.
 
 * QDaisy.
 

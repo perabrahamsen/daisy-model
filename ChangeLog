@@ -1,4 +1,23 @@
+2002-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.16 released.
+
+2002-03-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* production.h, production.C (RtDR_T_factor): New parameter.
+
 2002-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log-old.dai, lib/log.dai. ("Hourly Water Flux", "Daily Water
+	Flux"): Moved to `log-old.dai'.
+	* lib/log.dai ("Soil Temperature", "Surface Water Balance"): Made
+	it hourly. 
+	("Preferential Water Flux"): Store in `pref_water_flux.dlf'.  Fix
+	deminesion. 
+	("Matrix Water Flux"): New model.
+	("Surface Water Balance"): 
+
+	* weather_std.C (PrecipCorrect): New keyword.
 
 	* Version 2.15 released.
 

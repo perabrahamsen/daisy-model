@@ -2,21 +2,50 @@
 
 This file contains an overview of changes between Daisy source
 releases.  Please note that the version numbers for binary releases
-are less accurate, for example a binary version `1.40' may contain
-some of the changes listed here under `1.41'.  You can get the version
-number of the binary with the command `daisy -v', or `cdaisy -v' for
+are less accurate, for example a binary version '1.40' may contain
+some of the changes listed here under '1.41'.  You can get the version
+number of the binary with the command 'daisy -v', or 'cdaisy -v' for
 the daisy DLL.
 
 When you upgrade Daisy, it is recommended that you read at least the
 headlines af the changes since the last version.  For more detailed
-information on changes, read the `ChangeLog' file from the source
+information on changes, read the 'ChangeLog' file from the source
 release.
+
+* 2.16
+
+** New "Prod RtDR_T_factor" parameter to the default crop model.
+
+Temperature dependent factor for root death rate.
+
+Use it like this
+
+(defcrop MyGrass Grass 
+  (Prod (RtDR_T_factor (0.0 0.0) (10.0 1.0))))
+
+The will stop root death when soil soil freeze, and let it gradually
+grow to full power when the soil temeprature reached 10 dg C.
+
+** New Precipitation-Correction keuword for the default weather model.
+
+Add a 
+
+  PrecipCorrect: 1.12 1.10 1.00 1.20 1.40 1.60 1.12 1.10 1.00 1.20 1.40 1.60
+
+to the keyword section of your .dwf file to get mothly correction for
+the precipitation.  The Precip-Correct should be followed by 12
+numbers, each a factor to multiply to the precipitation for that
+month.  The first number corresponds to January, the last to December.
+
+** Made "Soil Temperature" and "Surface Water Balance"log models hourly.
+
+** Moved "Daily Water Flux" and "Hourly Water Flux" to 'log-old.dai'.
 
 * 2.15
 
 ** Amount of solute in drainage was entirely wrong.  Fixed.
 
-** Moved all V1 crop parameterizations to `crop-old.dai'.
+** Moved all V1 crop parameterizations to 'crop-old.dai'.
 
 ** New soil_water_content_above condition.
 
@@ -364,7 +393,7 @@ No user visible changes.
 
 * 1.96
 
-** New `cut_stress' factor in the standard crop model.
+** New 'cut_stress' factor in the standard crop model.
 
 After a cut production may be delayed for some days, depending on how
 large a fraction that was removed.
@@ -402,7 +431,7 @@ A number of log variables have been moved from CrpAux to CrpN in the
 default crop model.  The most likely to be logged are Fixated and
 AccFixated. 
 
-The parameterizations in `log.dai' has been updated.
+The parameterizations in 'log.dai' has been updated.
 
 ** "N Balance" now logs fixation.
 
@@ -553,7 +582,7 @@ Define the crop like below, and use the normal "sow" command.
 
 * 1.76
 
-Fix logging state for `with-column'.
+Fix logging state for 'with-column'.
 
 * 1.75
 
@@ -603,12 +632,12 @@ NH4 Volatilization is now in the Fertilizer log.
 
 * 1.66
 
-Disabled `old' and `old2' hydraulic models, and `file' and `hourly'
+Disabled 'old' and 'old2' hydraulic models, and 'file' and 'hourly'
 weather models.
 
 * 1.60
 
-** New `EpFacDS' Canopy parameter.
+** New 'EpFacDS' Canopy parameter.
 
 This PLF allow the crops potential evapotranspiration adjustment to
 depend on the development stage of the crop.
@@ -621,14 +650,14 @@ depend on the development stage of the crop.
 
 ** Tillage can now affect background mineralization.
 
-See the `som_tillage_factor', `smb_tillage_factor' and `tillage_age'
-xbparameters to `OrganicMatter'.
+See the 'som_tillage_factor', 'smb_tillage_factor' and 'tillage_age'
+xbparameters to 'OrganicMatter'.
 
 * 1.55
 
-** New `density' flag to the `interval' select method for logging.
+** New 'density' flag to the 'interval' select method for logging.
 
-Set `density' to true to make Daisy log the average (in height)
+Set 'density' to true to make Daisy log the average (in height)
 content of the interval, rather than the total content.
 
 ** Fixed bad initialization crash.
@@ -641,19 +670,19 @@ Bugs found by SH.
 
 * 1.54
 
-** Adjusted DSLAI05 in `Grass' parameterization.
+** Adjusted DSLAI05 in 'Grass' parameterization.
 
 Should give larger initial harvest.
 
 ** The ScreenHeight weather parameter is now respected.
 
-This affects the `PM' potential transpiration model.
+This affects the 'PM' potential transpiration model.
 
 * 1.51
 
 ** Checkpoints now include input statements and definitions automatically.
 
-The `libraries' attribute has been removed.
+The 'libraries' attribute has been removed.
 Checkpoints still doesn't work, though.
 
 * 1.50
@@ -664,14 +693,14 @@ It will now state if submodel as a full or partial value.
 
 * 1.48
 
-** Fix `monthly' and `yearly' conditions.
+** Fix 'monthly' and 'yearly' conditions.
 
 Used to match every hour in the month or year, except the last.
 Reversed that.
 
 ** You can now log applied fertilizer.
 
-Use the new `Fertilizer' log model, defined in `log.dai'.
+Use the new 'Fertilizer' log model, defined in 'log.dai'.
 
 ** Fix loading global files (bug introduced in 1.47).
 
@@ -685,7 +714,7 @@ realistic estimate of the size of the SMB pools.
 It *will* have a large effect if you are running without a starting
 period, and have large initial AOM pools.
 
-** New fertilizer types in `fertilizer.dai'.
+** New fertilizer types in 'fertilizer.dai'.
 
 ** More work on the winter wheat and winter barley parameterizations.
 
@@ -697,13 +726,13 @@ period, and have large initial AOM pools.
 
 ** Fixed crash related to the am/cleanup AOM introduced in 1.40.
 
-** Defaults for the `minimum', `from' and `to' precision fertilize params.
+** Defaults for the 'minimum', 'from' and 'to' precision fertilize params.
 
 * 1.44
 
-** New `first_year_utilization' fertilizer parameter.
+** New 'first_year_utilization' fertilizer parameter.
 
-Use this together with the new `equivalent_weight' fertilize
+Use this together with the new 'equivalent_weight' fertilize
 parameter, to let Daisy calculate the amount on organic fertilizer to
 apply, to get an inorganic nitrogen equivalent.  Example:
 
@@ -716,7 +745,7 @@ want to fertilize with an amount of pig slurry corresponding to 50 kg
 N/ha.  Daisy will then apply, say, 3 ton DM/ha pig slurry, depending
 on the N content of the slurry.
 
-** New `precision' fertilize parameter.
+** New 'precision' fertilize parameter.
 
 This allows you to let the amount of fertilizer you apply depend on
 the nitrogen content of the soil in a specified zone.  Use it like
@@ -733,13 +762,13 @@ reach the specified target (150 kg N/ha).  If less than minimum (50 kg
 N/ha) nitrogen is needed in order to reach the target, no fertilizer
 will be applied.
 
-You can use the `precision' parameter with organic fertilizer as well,
-in that case you must also specify the `first_year_utilization'
+You can use the 'precision' parameter with organic fertilizer as well,
+in that case you must also specify the 'first_year_utilization'
 fertilizer parameter. 
 
 * 1.43
 
-** New `set_subsoil_irrigation' action.
+** New 'set_subsoil_irrigation' action.
 
 For irrigating directly in the soil.  Unlike the other irrigation
 actions, this one specifies a permanent flux.  This means the
@@ -755,7 +784,7 @@ This will specify an irrigation flux of 1.5 mm/h to be incorporated in
 the soil between 5 and 10 cm depth.  The water will contain 0.1 mg
 NH4-N/liter and 0.7 mg NO3-N/liter
 
-If you call `set_subsoil_irrigation' multiple times, the last call
+If you call 'set_subsoil_irrigation' multiple times, the last call
 will have effect.
 
 Use
@@ -768,33 +797,33 @@ to turn off subsoil irrigation.
 
 * 1.42
 
-** `irrigate_top' action changed to `irrigate_overhead'.
+** 'irrigate_top' action changed to 'irrigate_overhead'.
 
 The old command is still available for compatibility reasons, but
 marked obsolete and will be removed in at future version.
 
-Also, the `irrigation_top' log variables in the `default' bioclimate
-model hgave been renamed to `irrigation_overhead'.  The `log.dai' file
+Also, the 'irrigation_top' log variables in the 'default' bioclimate
+model hgave been renamed to 'irrigation_overhead'.  The 'log.dai' file
 has been updated accordingly.
 
 * 1.41
 
-** New `NEWS' file.
+** New 'NEWS' file.
 
 Read this to keep track of Daisy.
 
-** Changed default log file ending from `.tab' to `.dlf'.
+** Changed default log file ending from '.tab' to '.dlf'.
 
-Those log files that contains a header now end with `.dlf' instead of
-`.tab'.  This affects the build-in `harvest' log model, as well as all
-the `table' parameterizations found in `log.dai'.  The `PMSW'
-parameterization uses the old `table1' log model, doesn't have a
-header, and still output to `pmsw.tab'.
+Those log files that contains a header now end with '.dlf' instead of
+'.tab'.  This affects the build-in 'harvest' log model, as well as all
+the 'table' parameterizations found in 'log.dai'.  The 'PMSW'
+parameterization uses the old 'table1' log model, doesn't have a
+header, and still output to 'pmsw.tab'.
 
 ** SoilNO3 and SoilNH4 now have default values.
 
 You no longer have to specify the initial nitrate and ammonium content
-when using the `default' column model.
+when using the 'default' column model.
 
 By default, the nitrate concentration in the water will be half of the
 WHO recommended maximum for drinking water, i.e. 50 mg NO3 per liter.
@@ -804,17 +833,17 @@ Suggested by: SH.
 
 * 1.40 
 
-** New `repeat' action.
+** New 'repeat' action.
 
-The `repeat' action take a single unnamed argument, which itself
+The 'repeat' action take a single unnamed argument, which itself
 should be an action.  That action will be repeated from the start, as
-soon as it is finished.  If you for example have defined a `sbarley'
+soon as it is finished.  If you for example have defined a 'sbarley'
 manegement strategy, and you want to keep growing spring barley for
 ever and ever, you can specify the manangement like this
 
         (manager (repeat sbarley))
 
-More likely, you will use a `while' to limit the repetition.
+More likely, you will use a 'while' to limit the repetition.
 
         (manager activity
            (while (wait (at 1998 7 7 1))
@@ -823,9 +852,9 @@ More likely, you will use a `while' to limit the repetition.
 
 This will keep growing spring barley until 7/7 1998.
 
-** New `t' action.
+** New 't' action.
 
-The `t' action will do nothing, just like `nil', but will never be
+The 't' action will do nothing, just like 'nil', but will never be
 "done".  This means that
 
         (while t (activity sbarley stop))
@@ -834,15 +863,15 @@ will do the same as
 
         (activity sbarley stop)
 
-** New `am/cleanup' AOM pool.
+** New 'am/cleanup' AOM pool.
 
-Small AOM pools will be merged into the `am/cleanup' pool instead of
+Small AOM pools will be merged into the 'am/cleanup' pool instead of
 being mineralized instantly.  This way we avoid mysterios "spikes" in
 the mineralization log data when small AOM pools are discarded.  
 
-** Fixed log after `default' crop get ripe.
+** Fixed log after 'default' crop get ripe.
 
-In the `default' crop model, production and respiration halts after
+In the 'default' crop model, production and respiration halts after
 the crop gets ripe.  However, the last active production and
 repsiration values would continue to be logged.  Now, these are
 zeroed.
@@ -855,7 +884,7 @@ Surface irrigation was ignored.  Now it is applied correctly.
 
 Bug found by: Mette Lægdsmand <Mette.Laegdsmand@agrsci.dk>
 
-** Fixed numeric error in the `default' bioclimate model.
+** Fixed numeric error in the 'default' bioclimate model.
 
 The symptom was a rare assertion failure.
 
@@ -863,23 +892,23 @@ Bug found by: SH.
 
 * 1.38
 
-** New `inorganic' column model.
+** New 'inorganic' column model.
 
-Works like the `default' model woth regard to water and soil
+Works like the 'default' model woth regard to water and soil
 chemicals, but does not keep track of organic mater or nitrogen in the
 soil or surface.  The crops will always have potential N uptake.
 
-** `Surface Water Balance' now logs production stress.
+** 'Surface Water Balance' now logs production stress.
 
 * 1.37
 
-** New `vegetation.dai' file, for permanent vegetation parameterizations.
+** New 'vegetation.dai' file, for permanent vegetation parameterizations.
 
-** Fix `PMSW' log, broken by changes in 1.36.
+** Fix 'PMSW' log, broken by changes in 1.36.
 
-** Use `S_external' to log incorporated stuff.
+** Use 'S_external' to log incorporated stuff.
 
-The `N Balance' and `Soil Chemicals' logs are updated to do this.
+The 'N Balance' and 'Soil Chemicals' logs are updated to do this.
 
 * 1.36
 
@@ -887,7 +916,7 @@ The `N Balance' and `Soil Chemicals' logs are updated to do this.
 
 This means that the data in the daily log files now corresponds to the
 day listed.  The used to correspond to the previous day.  Fixed
-`daily', `weekly', `monthly' and `yearly' conditions to always match
+'daily', 'weekly', 'monthly' and 'yearly' conditions to always match
 the last hour in the period.
 
 * 1.35
@@ -895,23 +924,23 @@ the last hour in the period.
 ** A zero stress factor now means no stress.
 
 Previously it went maximum stress.  Specifically, the meaning of
-`water_stress' and `nitrogen_stress' has been inverted.  Zero is no
+'water_stress' and 'nitrogen_stress' has been inverted.  Zero is no
 stress, one is full stress.
 
 ** SVAT model integration changes.
 
-The `PMSW' svat model give feedback
-to the rest of the system, by calculating a `production_stress' which
-will be used instead of `water_stress'.
+The 'PMSW' svat model give feedback
+to the rest of the system, by calculating a 'production_stress' which
+will be used instead of 'water_stress'.
 
 * 1.33
 
 ** SVAT model integration changes.
 
-The `PT' parameter of the `default' bioclimate model is gone, instead
-there now is a `svat' parameter.
+The 'PT' parameter of the 'default' bioclimate model is gone, instead
+there now is a 'svat' parameter.
 
-** The `crop' action fixed so it no longer will harvest before sowing.
+** The 'crop' action fixed so it no longer will harvest before sowing.
 
 The symptom was that a crop was skipped when started at the wrong
 time. 
@@ -920,7 +949,7 @@ Bug found by: HS.
 
 * 1.32
 
-** Optional parameters of the `crop' action wasn't optional.
+** Optional parameters of the 'crop' action wasn't optional.
 
 Now they are.
 
@@ -932,13 +961,13 @@ Bug found by: HS.
 
 * 1.29
 
-** Default value for `dispersivity' (6.0 cm).
+** Default value for 'dispersivity' (6.0 cm).
 
-** Default value for `rs_min' is now 30.0 s/m.
+** Default value for 'rs_min' is now 30.0 s/m.
 
 * 1.28
 
-** New `permanent' vegetation model.
+** New 'permanent' vegetation model.
 
 It is intended for column on a multi-column simulation where we have
 very little knowledge, basically we just need to know the LAI at
@@ -956,19 +985,19 @@ where no weather have been specified.
 
 ** Log files now print a header.
 
-Specifically, the `harvest' and `table' log models will now -- by
+Specifically, the 'harvest' and 'table' log models will now -- by
 default -- create a header containing information about the data.
 
-** New `simple' crop model.
+** New 'simple' crop model.
 
 Intended for crops where we have no knowledge of reactions to water or
 nitrogen stress.
 
 * 1.24
 
-** New Bentazon, IPU, and MCPP parameterization in `chemistry.dai'.
+** New Bentazon, IPU, and MCPP parameterization in 'chemistry.dai'.
 
-** The `crop' action now supports spraying.
+** The 'crop' action now supports spraying.
 
 ** Added support for ridging.
 
@@ -986,40 +1015,40 @@ nitrogen stress.
 
 * 1.19
 
-** New `fixed' and `deep' groundwater models.
+** New 'fixed' and 'deep' groundwater models.
 
 * 1.18
 
-** New `set_heat_source' action.
+** New 'set_heat_source' action.
 
 Use this to make a football field green a larger part of the year.
 
 * 1.17
 
-** New `set_porosity' action.
+** New 'set_porosity' action.
 
 Use this to change the porosity of the soil, to simulate the effect of
 applying heavy machinery on the field.  Works only with the
-`M_vG_compact' hydraulic model. 
+'M_vG_compact' hydraulic model. 
 
-** New `M_vG_compact' hydraulic model.
+** New 'M_vG_compact' hydraulic model.
 
 This one has variable porosity.
 
-** New `set_detention_capacity' action.
+** New 'set_detention_capacity' action.
 
 This one is intended for simulating changed to the soil surface
 ruggedness. 
 
 * 1.14 
 
-** New `AOM' log model.
+** New 'AOM' log model.
 
 To keep track of a specific pool of added organic matter.
 
 * 1.10 
 
-** Use `volatilization' instead of `NH4_evaporation' in AM.
+** Use 'volatilization' instead of 'NH4_evaporation' in AM.
 
 * 1.08
 
@@ -1037,34 +1066,34 @@ Affects mineralization, nitrification, and denitrification.
 
 * 1.05 
 
-** New `crop' action.
+** New 'crop' action.
 
 This action specifies a strategy for managing a specific crop or
-multicrop.  To create a crop rotation, you can combine these `crop'
-action sequenctially using the `activity' action.
+multicrop.  To create a crop rotation, you can combine these 'crop'
+action sequenctially using the 'activity' action.
 
 * 1.04
 
-** New `lysimeter' groundwater model.
+** New 'lysimeter' groundwater model.
 
 * 1.00
 
-** New `max', `min' and `average' selections for the `table' log model.
+** New 'max', 'min' and 'average' selections for the 'table' log model.
 
-** New `assert', `message', `warning', and `error' actions.
+** New 'assert', 'message', 'warning', and 'error' actions.
 
 * 0.99
 
 ** Added surface runoff.
 
-Controlable with the new `DetentionCapacity' and `ReservoirConstant'
+Controlable with the new 'DetentionCapacity' and 'ReservoirConstant'
 surface parameters. 
 
 ** Added mixing of inorganic nitrogen between surface and soil.
 
 * 0.96
 
-** New `fodderbeet' crop parameterization.
+** New 'fodderbeet' crop parameterization.
 
-** New `default' weather model.
+** New 'default' weather model.
 

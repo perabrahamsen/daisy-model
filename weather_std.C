@@ -52,6 +52,7 @@ struct WeatherStandard : public Weather
   int timestep;
   Time begin;
   Time end;
+  vector<double> precipitation_correction;
 
   // Data.
   struct data_description_type
@@ -346,6 +347,10 @@ WeatherStandard::read_line ()
       break;
     }
   lex->next_line ();
+
+  // Precipitation correction.
+  const int month = static_cast<int> (next_time.month ());
+  next_precipitation *= precipitation_correction[month-1];
 }
 void 
 WeatherStandard::read_new_day (const Time& time)
@@ -482,6 +487,19 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	  else
 	    lex->error ("Uknown surface type");
 	}
+      else if (key == "PrecipCorrect")
+	{
+	  for (unsigned int i = 0; i < 12; i++)
+	    {
+	      lex->skip_space ();
+	      const double val = lex->get_number ();
+	      if (val < 0.5)
+		lex->error ("Unreasonable low value");
+	      else if (val > 1.8)
+		lex->error ("Unreasonable high value");
+	      precipitation_correction[i] = val;
+	    }
+	}
       else if (key == "Begin")
 	{
 	  lex->skip_space ();
@@ -497,7 +515,7 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	  lex->skip_space ();
 	  double val = lex->get_number ();
 	  lex->skip_space ();
-	  string dim = lex->get_word ();
+	  const string dim = lex->get_word ();
 	      
 	  if (key == "NH4WetDep")
 	    {
@@ -674,6 +692,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     timestep (0),
     begin (1900, 1, 1, 0),
     end (2100, 1, 1, 0),
+    precipitation_correction (vector<double> (12, 1.0)),
     has_date (false),
     has_hour (false),
     has_temperature (false),

@@ -299,7 +299,7 @@ Production::tick (const double AirT, const double SoilT,
     }
 
   // Update dead roots.
-  double root_death_rate = RtDR (DS);
+  double root_death_rate = RtDR (DS) * RtDR_T_factor (SoilT);
   if (RSR () > 1.1 * partition.RSR (DS))
     root_death_rate += Large_RtDR;
 
@@ -457,6 +457,12 @@ Crop production in the default crop model.");
   syntax.add ("Large_RtDR", "d^-1", Syntax::Const,
 	      "Extra death rate for large root/shoot.");
   alist.add ("Large_RtDR", 0.05);
+  syntax.add ("RtDR_T_factor", "dg C", Syntax::None (), Syntax::Const,
+	      "Temperature dependent factor for root death rate.");
+  PLF none;
+  none.add (  0.0, 1.0);
+  none.add (100.0, 1.0);
+  alist.add ("RtDR_T_factor", none);
   syntax.add ("IntDSRelRtRes", Syntax::None (), Syntax::Const,
 	      "Initial DS for the release of root reserves.");
   alist.add ("IntDSRelRtRes", 0.80);
@@ -608,6 +614,7 @@ Production::Production (const AttributeList& al)
     LfDR (al.plf ("LfDR")),
     RtDR (al.plf ("RtDR")),
     Large_RtDR (al.number ("Large_RtDR")),
+    RtDR_T_factor (al.plf ("RtDR_T_factor")),
     IntDSRelRtRes (al.number ("IntDSRelRtRes")),
     EndDSRelRtRes (al.number ("EndDSRelRtRes")),
     RelRateRtRes (al.number ("RelRateRtRes")),
