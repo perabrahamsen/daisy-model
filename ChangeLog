@@ -1,5 +1,9 @@
 2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.92 released.
+
+2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* lib/log.dai ("N Balance"): Fixated moved to CrpN.
 	("Crop Production"): AccFixated moved to CrpN.
 
