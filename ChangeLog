@@ -1,4 +1,11 @@
+2002-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.05 released.
+
 2002-01-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pedo_linear.C: New model.
+	* Makefile (MODELS): Added it.
 
 	* Version 2.04 released.
 

@@ -1,7 +1,5 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* linear pedotranfer model
-
 * Allow to convert dimensions in the file parser.
 
 * Make it possible to log a specific entry in an array of unnamed objects.

@@ -151,13 +151,13 @@ static struct EquilibriumLangmuirSyntax
     bool ok = true;
 
     if ((!al.check ("K") || al.number_sequence ("K").size () < 1)
-	&& al.check ("pedo_K"))
+	&& !al.check ("pedo_K"))
       {
 	err.entry ("You must specify either 'K' or 'pedo_K'");
 	ok = false;
       }
     if ((!al.check ("my_max") || al.number_sequence ("my_max").size () < 1)
-	&& al.check ("pedo_my_max"))
+	&& !al.check ("pedo_my_max"))
       {
 	err.entry ("You must specify either 'my_max' or 'pedo_my_max'");
 	ok = false;

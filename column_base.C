@@ -281,7 +281,7 @@ ColumnBase::check (bool require_weather,
       {
 	const Transform& transform = **i;
 	Treelog::Open nest (err, transform.name);
-	if (transform.check (soil, err))
+	if (!transform.check (soil, err))
 	  ok = false;
       }
   }

@@ -87,6 +87,15 @@ A location and content of a soil layer.");
   const double MaxRootingDepth;
   const double dispersivity;
 
+  bool has_attribute (const string& name) const
+  { 
+    bool missing = false;
+    for (unsigned int i = 0; i < layers.size (); i++)
+      if (!layers[i]->horizon.has_attribute (name))
+	missing = true;
+    return !missing;
+  }
+  
   // Create and Destroy.
   Implementation (const AttributeList& al)
     : layers (map_construct<Layer> (al.alist_sequence ("horizons"))),
@@ -127,6 +136,10 @@ Soil::Cw2 (int i, double h) const
 double 
 Soil::dispersivity (int) const
 { return impl.dispersivity; }
+
+bool
+Soil::has_attribute (const string& name) const
+{ return impl.has_attribute (name); }
 
 void
 Soil::output (Log& log) const

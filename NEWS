@@ -12,6 +12,40 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.05 
+
+** New 'linear' Pedotransfer model.
+
+This allows you to to specify parameters as a linear function of
+horizon attributes.  Here is an example:
+
+(defpedotransfer "van der Zee & van Riemsdijk" linear
+  (description "0.5 (Al_0 + Fe_O)")
+  (factors ("Al_O" 0.5)
+	   ("Fe_O" 0.5))
+  (offset 0.0))
+	   
+(deftransform "Phosphor Fast<->Slow" equilibrium
+  "Phosphor Fast" "Phosphor Slow"
+  (equilibrium Langmuir
+	       (K 1e-5 [g/cm^3])
+	       (pedo_my_max "van der Zee & van Riemsdijk")
+	       )
+  (k_AB 1e-4))
+
+Currently only the 'K' and 'my_max' attributes to the Langmuir
+equilibrium model, and the 'k_AB' and 'k_BA' attributes to the
+equilibrium transform model can be specified with pedotransfer
+functions. 
+
+The "Al_O" and "Fe_O" attributes must be specified in the horizon,
+like this:
+
+(defhorizon top default
+  (attributes ("Fe_O" 1e-5)
+	      ("Al_O" 5e-6)
+  ...)
+
 * 2.04
 
 ** Transformations.

@@ -251,7 +251,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = adsorption_full.C \
+MODELS = pedo_linear.C adsorption_full.C \
 	equil_langmuir.C transform_equil.C condition_weather.C \
 	rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
 	action_repeat.C column_inorganic.C  vegetation_permanent.C \

@@ -406,11 +406,11 @@ Horizon::heat_capacity (double Theta, double Ice) const
 }
 
 bool
-Horizon::has_attribute (const string& name)
+Horizon::has_attribute (const string& name) const
 { return impl.attributes.find (name) != impl.attributes.end (); }
 
 double 
-Horizon::get_attribute (const string& name)
+Horizon::get_attribute (const string& name) const
 { 
   assert (has_attribute (name));
   return impl.attributes[name];

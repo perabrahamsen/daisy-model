@@ -76,10 +76,10 @@ public:
   { return horizon_[i]->heat_capacity (Theta, Ice); }
   
   // Chemistry.
-  bool has_attribute (int i, const string& name)
+  bool has_attribute (const string& name) const;
+  bool has_attribute (int i, const string& name) const
   { return horizon_[i]->has_attribute (name); }
-    
-  double get_attribute (int i, const string& name)
+  double get_attribute (int i, const string& name) const
   { return horizon_[i]->get_attribute (name); }
 
   // Simulation.

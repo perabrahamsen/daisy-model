@@ -63,8 +63,8 @@ public:
 
   // Chemistry.
 public:
-  bool has_attribute (const string& name);
-  double get_attribute (const string& name);
+  bool has_attribute (const string& name) const;
+  double get_attribute (const string& name) const;
 
   // Simulation.
 public:
