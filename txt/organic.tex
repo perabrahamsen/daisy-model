@@ -68,7 +68,7 @@ experiments and some long time scenarios, a single pool may be enough.
 To simulate input sources from real farming, two pools per source are
 in general needed.
 
-\section{The Daisy Model}
+\section{\Daisy{}}
 
 In several comparisons (see XXX, YYY, ZZZ), \daisy{} (see XYZZY) has
 been among the best models for both short and long term predictions of
@@ -197,7 +197,7 @@ been a particular stumbling block for most users, partly because it
 does not reflect an easily identificable property of the system being
 modelled.  
 
-\section{The equilibrium assumption}
+\section{Equilibrium}
 
 It is common to use an equilibrium assumption for initialising models
 where measurements are not available.  For example, in \daisy{} we
@@ -224,11 +224,13 @@ farming practice.  Figure~\ref{fig:clayom} shows humus content for a
 system that goes from equilibrium at a high level of carbon input, to
 equilibirum at a low level of carbon input.  Danish farming practice
 has been used, as well as Danish climate and soil.  The soil has a for
-Danish conditions high clay content (10\%).  Figure~\ref{fig:clayom}
-shows the \textsc{som1}/\textsc{som2} ratio, which can be used for
-initializing \daisy{}.  Finally, figure~\ref{fig:sandom} shows the a
-simulation on a coarse sandy soil going from a low to high input
-equilibrium.
+Danish conditions high clay content (12\%).  Figure~\ref{fig:clayom}
+also shows the simulated\footnote{Simulated values are on the dotted
+  line.  The $\Diamond$'s and $+$'s indicate the initialization values
+  for the current humus level chosen by two variants of the proposed
+  quasi-equilibrium.} \textsc{som1} fraction of total \textsc{som}.
+Finally, figure~\ref{fig:sandom} shows the a simulation on a coarse
+sandy soil going from a low to high input equilibrium.
 
 \begin{figure}[htbp]
   \centering
@@ -260,7 +262,7 @@ physical properties the user can understand.  And we cannot use the
 most obvious initialization condition, namely an equilibrium
 assumption.
 
-\section{Quasi-equilibrium}
+\section{Basic equations}
 
 In order to find a better way to initialize the organic matter pools,
 we will start by looking at the four equations describing their
@@ -334,6 +336,8 @@ typical root residuals left from a crop.  We now need four more
 equations\footnote{Everybody: Four more equations!  Four more
   equations!}, one for each pool.
 
+\section{Quasi-equilibrium}
+
 The equilibrium assumption corresponds to adding these four equations: 
 \begin{displaymath}
   \Delta\mbox{\textsc{smb1}} = \Delta\mbox{\textsc{smb2}} 
@@ -358,10 +362,14 @@ user to specify the carbon input to the system ($u$).  We then get:
 
 We now have nine equations with nine unknowns, and can initialize the
 system.  The physical interpretation of this initialization is that
-all but the slowest pool have reached a quasi-equilibrium with respect to
-the input, and the size of the slowest pool.  Since the slowest pool
-is still changing (and the other pools will have to change to reflect
-that), this is not a true equilibrium.
+all but the slowest pool have reached a quasi-equilibrium with respect
+to the input, and the size of the slowest pool.  Since the slowest
+pool is still changing (and the other pools will have to change to
+reflect that), this is not a true equilibrium.
+Figure~\ref{fig:clayom} and \ref{fig:sandom} shows that the fast pool
+(\textsc{smb2}) does indeed adapt to changes in input much faster than
+the slow pool (\textsc{smb1}), the hump in each graph is due to that
+effect.
 
 \section{User calibration}
 
@@ -442,33 +450,76 @@ the two problematic terms are $T$ and $\psi$ which are variable during
 the simulation.  For the initialisation we must use constant values.
 By default we use the average temperature for the site (which is
 already specified by the user and used elsewhere in the model) for
-$T$, and field capacity (pF 2) for $\psi$.  As
-$F_{\mbox{\tiny\textsc{smb1}}}^T$ is non-linear, using the average is
-incorrect.  In particular, $F_{\mbox{\tiny\textsc{smb1}}}^T$ is zero
-for $T < 0^\circ$C, so for a cold climate like the Danish the
-significance of frost is overestimated.  On the other hand, using pF 2
-may be acceptable for the wet climate like in Denmark, but may be
+$T$, and field capacity (pF 2) for $\psi$.  As $F^T$ is non-linear,
+using the average is incorrect.  In particular, $F^T$ is zero for $T <
+0^\circ$C, so for a cold climate like the Danish the significance of
+frost is overestimated.  On the other hand, using pF 2 may be
+acceptable for the wet climate like in Denmark, but may be
 unreasonable for a dry climate.  The two factors interact, so a low
-value for $F_{\mbox{\tiny\textsc{smb1}}}^T (T)$ is most significant
-when $F_{\mbox{\tiny\textsc{smb1}}}^\psi (\psi)$ is high, and
-vice-versa.  So in effect we can treat $T$ and $\psi$ as calibration
-parameters when using \daisy{} in a different climate.
+value for $F^T (T)$ is most significant when $F^\psi (\psi)$ is high,
+and vice-versa.  So in effect we can treat $T$ and $\psi$ as
+calibration parameters when using \daisy{} in a different climate.  By
+logging the product of factors in a realistic simulation, \daisy{} can
+be used to calculate the combined effect.  From that, the user can
+choose values for $T$ and $\psi$ that give the same effect.
+
 
 \section{Inert organic matter}
 
--- subsoil, som3
+The current \daisy{} model calibration is based on agriculutural
+topsoil, where all the humus is active.  This means the calibration is
+not good for subsoils, nor for some types of humus-rich topsoils.  The
+\textsc{som3} pool you last saw in figure~\ref{fig:om2} exists to
+compensate for these shortcommings.  The \textsc{som3} pool is inert,
+so for the soil organic matter system it is as if it didn't exist.  It
+still affects other aspects of \daisy{}, such as the hydraulic
+adsorption properties of the soil.  
 
-\section{Results}
+For the subsoil, we by default assume the system is in equilibrium
+with the input, and park enough humus in the \textsc{som3} so that
+this assumption holds true.  Yes, we earlier argued that the
+equilibrium assumption is wrong.  It still is, also for the subsoil.
+Hwoever, the subsoil contribute relatively little to the total system,
+so we can get away with this assumption.  For topsoil, the user can
+explicitly park some of the humus in the \textsc{som3} pool, if he has
+reason to believe it to be necessary.
 
-Validation.  Lange tidsserier af Per og Søren.
+\section{Limitations}
 
-FIG: SOM1/SOM2 ratio (sim + eq)  after change in management high->low, clay
-FIG: SOM1/SOM2 ratio (sim + eq)  after change in management low->high,
-sand
+PA: Diskution af fig3 og 4 quasi-eq
 
-lim 70\%
+PA: Overvej initialisering med ``background mineralization = 0''.
 
-Brug i standardisering.
+When using the current input levels, the quasi-equilibrium assumption
+will give very poor, even physically impossible estimates right after
+a change in input level.  This is because the \textsc{som2} pool will
+not yeat have had any chance to adopt to the new input level.  With
+the current model, the \textsc{som2} pool needs several decades to
+catch up with changes in input.  This means the quasi-equilibrium
+assumption is still suspect in a modern agrocultural country like
+Denmark, but it is still better than the equilibrium assumption that
+needs centuries rather than decades.  
+
+A model specific bound on the relative size of \textsc{som1} has been
+introduced.  Out long term simulations has shown that the
+\textsc{som1} fraction stay within the interval 30\% -- 70\%.  If the
+quasi-equilibrium give a value outside that interval, the
+\textsc{som1} fraction will be set to that nearest boundary, and the
+intitialization will be redone\footnote{More precisely, if the
+  quasi-equilibrium gives a \textsc{som1} higher than 70\%,
+  equation~\ref{eq:dsom2} will be replaced with the new equation 
+  \begin{displaymath}
+    \mbox{\textsc{som1}} = 70\%\> (\mbox{\textsc{som1}} + \mbox{\textsc{som2}})
+  \end{displaymath}
+  and similar for a \textsc{som1} below 30\%.}.
+
+While the humus content in especially figure~\ref{fig:sandom}
+fluctates with rotation, season and climate, the simulated
+\textsc{som1} fraction stay stable.  This is because most of the minor
+fluctations happens in the \textsc{aom} and \textsc{smb} pools, the
+slower \textsc{som2} does not have time to adapt.  This also explains
+the relatively noise on the initialisation points, the
+quasi-equilibrium assumption over-adapts to such short terms changes.
 
 \addcontentsline{toc}{section}{\numberline{}References}
 \bibliography{daisy}
