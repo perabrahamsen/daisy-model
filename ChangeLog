@@ -1,3 +1,7 @@
+2001-10-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.89 released.
+
 2001-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* rootdens.C, rootdens.h: New component.
