@@ -9,7 +9,8 @@
 # HOSTTYPE
 #	sun4	Create code for Solaris-2 / UltraSPARC.
 #	hp	Create code for HP/UX / HP-PA.
-#	i386	Create code for Win32 / Pentium.
+#	win32	Create code for Win32 / Pentium.
+#	cygwin	Create code for Cygwin / Pentium.
 
 # All makefiles should have these.
 #
@@ -19,7 +20,11 @@ MAKEFLAGS =
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
 ifeq ($(OS),Windows_NT)
-	HOSTTYPE = i386
+	ifeq ($(OSTYPE),cygwin)
+		HOSTTYPE = cygwin
+	else
+		HOSTTYPE = win32
+	endif
 endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
@@ -36,6 +41,7 @@ USE_PROFILE = false
 #	sun		Use the unbundled sun compiler.
 #	egcs		Use the experimental GNU compiler.
 #	borland		Use the Borland compiler.
+#
 ifeq ($(HOSTTYPE),sun4)
 	COMPILER = egcs
 #	COMPILER = sun	
@@ -43,8 +49,11 @@ endif
 ifeq ($(HOSTTYPE),hp)
 	COMPILER = egcs
 endif
-ifeq ($(HOSTTYPE),i386)
+ifeq ($(HOSTTYPE),win32)
 	COMPILER = borland
+endif
+ifeq ($(HOSTTYPE),cygwin)
+	COMPILER = egcs
 endif
 
 # On SPARC platforms we trap mathematical exception with some assembler code.
@@ -68,7 +77,7 @@ ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),egcs)
 		ifeq ($(HOSTTYPE),sun4)
 			OPTIMIZE = -O3 -ffast-math -fno-inline
-#`-mcpu=ultrasparc' breaks `IM::IM ()' with egcs 1.1.
+#`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		else
 			OPTIMIZE = -O3 -ffast-math 
 		endif
@@ -78,8 +87,7 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-#	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -DEGCS -g -pipe -frepo
-	COMPILE = /pack.sol64/gcc-2.95.1/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -Wmissing-prototypes -DEGCS -g -pipe -frepo
+	COMPILE = c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -Wmissing-prototypes -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
@@ -103,7 +111,10 @@ endif
 ifeq ($(HOSTTYPE),hp)
 	MATHLIB = -lM
 endif
-ifeq ($(HOSTTYPE),i386)
+ifeq ($(HOSTTYPE),win32)
+	MATHLIB =
+endif
+ifeq ($(HOSTTYPE),cygwin)
 	MATHLIB =
 endif
 
@@ -127,7 +138,7 @@ GTKMMDRAWLIB	= -L$(HOME)/gtk/lib -lgtkmmdraw ${GTKMMLIB}
 
 # Find the right file extension.
 #
-ifeq ($(HOSTTYPE),i386)
+ifeq ($(HOSTTYPE),win32)
 	OBJ = .obj
 	EXT = .exe
 else
@@ -420,6 +431,7 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+lexer${OBJ}: lexer.C lexer.h common.h
 weather_old${OBJ}: weather_old.C weather_old.h weather.h librarian.h \
  library.h common.h alist.h syntax.h im.h mathlib.h
 log_extern${OBJ}: log_extern.C log_select.h log.h librarian.h library.h \
@@ -464,7 +476,7 @@ time${OBJ}: time.C time.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h librarian.h library.h common.h alist.h \
  syntax.h
 parser_file${OBJ}: parser_file.C parser_file.h parser.h librarian.h \
- library.h common.h alist.h syntax.h csmp.h log.h
+ library.h common.h alist.h syntax.h lexer.h csmp.h log.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h librarian.h library.h common.h \
  alist.h syntax.h csmp.h
 soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \

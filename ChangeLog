@@ -1,12 +1,14 @@
 1999-10-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Merged SH changes.
+
 	* Version 0.95 released.
 
 1999-10-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* organic_matter.C (total_C, total_N): Made these log variables
 	arrays. 
-	* am.C, am.h, om.C, om.h (C_at, N_at): new functions.
+	* am.C, am.h, om.C, om.h (C_at, N_at): New functions.
 
 	* lib/fodderbeet.dai ("Fodder Beet"): New file.
 	* lib/crop.dai: Added it.
