@@ -1030,6 +1030,18 @@ static bool check_root (const AttributeList& al, Treelog& err)
   non_negative (al.number ("dist"), "dist", ok, err);
   non_negative (al.number ("weight"), "weight", ok, err);
 
+  // We need exactly one pool with unspecified OM.
+  assert (al.check ("om"));
+  int unspecified = 0;
+  const vector<AttributeList*>& om = al.alist_sequence ("om");
+  for (unsigned int i = 0; i < om.size (); i++)
+    if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
+      unspecified++;
+  if (unspecified != 1)
+    { 
+      err.entry ("You must leave C/N unspecified in exactly one pool.");
+      ok = false;
+    }
   return ok;
 }
 

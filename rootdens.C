@@ -88,22 +88,6 @@ Rootdens::density_distribution_parameter (double a)
   return x;
 }
 
-const AttributeList& 
-Rootdens::default_model ()
-{
-  static AttributeList alist;
-  
-  if (!alist.check ("type"))
-    {
-      alist.add ("type", "default");
-      alist.add ("description", 
-		 "Use exponential function for root density.");
-      alist.add ("SpRtLength", 100.0);
-      alist.add ("DensRtTip", 0.1);
-    }
-  return alist;
-}
-
 Rootdens::Rootdens (const AttributeList& al)
   : name (al.name ("type"))
 { }

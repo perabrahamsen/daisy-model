@@ -598,8 +598,8 @@ allocated to this pool for AOM.  One pool should be left unspecified\n\
   alist.add ("initial_fraction", Unspecified);
 }
 
-static double
-get_initial_C_per_N (const AttributeList& al)
+double
+OM::get_initial_C_per_N (const AttributeList& al)
 {
   if (al.check ("initial_C_per_N"))
     if (al.number ("initial_C_per_N") < 0.0)

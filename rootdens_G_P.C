@@ -1,4 +1,4 @@
-// rootdens_std.C -- Default model for calculating root density.
+// rootdens_G_P.C -- Gerwitz and Page model for calculating root density.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -23,7 +23,7 @@
 #include "rootdens.h"
 #include "geometry.h"
 
-class RootdensStandard : public Rootdens
+class Rootdens_G_P : public Rootdens
 {
   // Parameters.
 private: 
@@ -39,11 +39,11 @@ public:
 
   // Create.
 public:
-  RootdensStandard (const AttributeList&);
+  Rootdens_G_P (const AttributeList&);
 };
 
 void
-RootdensStandard::set_density (vector<double>& Density,
+Rootdens_G_P::set_density (vector<double>& Density,
 			       const Geometry& geometry, 
 			       const double Depth, const double PotRtDpt,
 			       const double WRoot)
@@ -66,23 +66,45 @@ RootdensStandard::set_density (vector<double>& Density,
   unsigned int i = 0;
   for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
     Density[i] = L0 * exp (a * geometry.z (i));
+
   assert (i < geometry.size ());
   for (; i < geometry.size (); i++)
     Density[i] = 0.0;
+
 }
 
-RootdensStandard::RootdensStandard (const AttributeList& al)
+Rootdens_G_P::Rootdens_G_P (const AttributeList& al)
   : Rootdens (al),
     SpRtLength (al.number ("SpRtLength")),
     DensRtTip (al.number ("DensRtTip"))
 { }
 
-static struct RootdensStandardSyntax
+const AttributeList& 
+Rootdens::default_model ()
+{
+  static AttributeList alist;
+  
+  if (!alist.check ("type"))
+    {
+      alist.add ("type", "Gerwitz+Page74");
+      alist.add ("description", 
+		 "Use exponential function for root density.\n\
+\n\
+See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
+to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
+      alist.add ("SpRtLength", 100.0);
+      alist.add ("DensRtTip", 0.1);
+      alist.add ("MinDens", 0.0);
+    }
+  return alist;
+}
+
+static struct Rootdens_G_PSyntax
 {
   static Rootdens&
   make (const AttributeList& al)
-  { return *new RootdensStandard (al); }
-  RootdensStandardSyntax ()
+  { return *new Rootdens_G_P (al); }
+  Rootdens_G_PSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList (Rootdens::default_model ());
@@ -90,7 +112,12 @@ static struct RootdensStandardSyntax
 		"Specific root length");
     syntax.add ("DensRtTip", "cm/cm^3", Syntax::Const,
 		"Root density at (potential) penetration depth.");
-
-    Librarian<Rootdens>::add_type ("default", alist, syntax, &make);
+    syntax.add ("MinDens", "cm/cm^3", Syntax::Const,
+		"Minimal root density\n\
+Root density will never be below this, as long as there is enough root mass.\n\
+Extra root mass will be distributed according to Gerwitz and Page.\n\
+If there are too little root mass, the root will have the same density
+all the way down.");
+    Librarian<Rootdens>::add_type (alist.name ("type"), alist, syntax, &make);
   }
-} RootdensStandard_syntax;
+} Rootdens_G_P_syntax;

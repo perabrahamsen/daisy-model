@@ -1,3 +1,20 @@
+2001-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.90 released.
+
+2001-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.h, weather.C (deposit, tick_after): Made deposit logable.
+	* lib/log.dai ("N Balance"): Log it.
+
+2001-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens_G_P.C: Renamed from `rootdens_std.C'.
+	* Makefile (REMOVE, MODELS): Updated.
+
+	* om.C, m.h (get_initial_C_per_N): Made it a static member.
+	* am.C (check_root): Use it.
+
 2001-10-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.89 released.

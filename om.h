@@ -87,6 +87,11 @@ private:
 	     double factor, double efficiency, 
 	     const double* N_soil, double* N_used,
 	     double* CO2, OM& om);
+
+  // Utilities.
+public:
+  static double get_initial_C_per_N (const AttributeList&);
+
   // Create & Destroy.
 private:
   void grow (unsigned int size);

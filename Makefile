@@ -233,7 +233,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = rootdens_std.C groundwater_file.C action_fertilize.C \
+MODELS = rootdens_G_P.C groundwater_file.C action_fertilize.C \
 	action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
@@ -335,7 +335,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = traverse_depend.h
+REMOVE = rootdens_std.C
 
 # These are the file extensions we deal with.
 # 

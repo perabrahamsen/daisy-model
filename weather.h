@@ -66,6 +66,7 @@ private:
   double day_cycle_;
   double hourly_cloudiness_;
   double daily_cloudiness_;
+  IM deposit_;
 
   // Simulation.
 public:

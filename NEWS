@@ -12,6 +12,12 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.90
+
+** Now give better error old style root AOM initialization.
+
+** Deposition is now logable, and logged in "N Balance".
+
 * 1.89
 
 ** Root density is now a component.
@@ -19,6 +25,25 @@ release.
 This means that the 'SpRtLength' and 'DensRtTip' root parameters have
 changed, and that parameterizations that sets these must be updated.
 
+Instead of 
+
+(defcrop MyCrop default
+  ;; ...
+  (Root (SpRtLength 100.0)
+        (DensRtTip 0.1)
+
+use 
+
+(defcrop MyCrop default
+  ;; ...
+  (Root (rootdens "Gerwitz+Page74"
+		  (SpRtLength 100.0)
+		  (DensRtTip 0.1))
+
+If you don't have any better value for SpRtLength or DensRtTip than
+the above, you don't need to specify them.  They are the default
+values.
+ 
 * 1.88
 
 ** "N Balance" and "Carbon Balance" now contains harvest information.

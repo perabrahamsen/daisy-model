@@ -71,6 +71,28 @@ Weather::tick_after (const Time& time)
 	  assert (daily_cloudiness_ <= 1.0);
 	}
     }
+
+  // Deposition.
+  const double Precipitation = rain () + snow (); // [mm]
+  assert (Precipitation >= 0.0);
+  
+  // [kg N/ha/year -> [g/cm²/h]
+  const double hours_to_years = 365.2425 * 24.0;
+  const double kg_per_ha_to_g_cm2 
+    = 1000.0 / ((100.0 * 100.0) * (100.0 * 100.0));
+  const IM dry (DryDeposit, kg_per_ha_to_g_cm2 / hours_to_years);
+  const IM wet (WetDeposit, 1.0e-7); // [ppm] -> [g/cm²/mm]
+
+  deposit_ = dry + wet * Precipitation;
+  assert (deposit_.NO3 >= 0.0);
+  assert (deposit_.NH4 >= 0.0);
+
+  assert (approximate (deposit_.NO3, 
+		       DryDeposit.NO3 * kg_per_ha_to_g_cm2/hours_to_years
+		       + Precipitation * WetDeposit.NO3 * 1e-7));
+  assert (approximate (deposit_.NH4, 
+		       DryDeposit.NH4 * kg_per_ha_to_g_cm2/hours_to_years
+		       + Precipitation * WetDeposit.NH4 * 1e-7));
 }
 
 void
@@ -92,33 +114,12 @@ Weather::output (Log& log) const
   log.output ("wind", wind ());
   log.output ("day_length", day_length ());
   log.output ("day_cycle", day_cycle ());
+  output_submodule (deposit_, "deposit", log);
 }
 
 IM
 Weather::deposit () const // [g [stuff] /cm²/h]
-{
-  const double Precipitation = rain () + snow (); // [mm]
-  assert (Precipitation >= 0.0);
-  
-  // [kg N/ha/year -> [g/cm²/h]
-  const double hours_to_years = 365.2425 * 24.0;
-  const double kg_per_ha_to_g_cm2 
-    = 1000.0 / ((100.0 * 100.0) * (100.0 * 100.0));
-  const IM dry (DryDeposit, kg_per_ha_to_g_cm2 / hours_to_years);
-  const IM wet (WetDeposit, 1.0e-7); // [ppm] -> [g/cm²/mm]
-
-  const IM result = dry + wet * Precipitation;
-  assert (result.NO3 >= 0.0);
-  assert (result.NH4 >= 0.0);
-
-  assert (approximate (result.NO3, 
-		       DryDeposit.NO3 * kg_per_ha_to_g_cm2/hours_to_years
-		       + Precipitation * WetDeposit.NO3 * 1e-7));
-  assert (approximate (result.NH4, 
-		       DryDeposit.NH4 * kg_per_ha_to_g_cm2/hours_to_years
-		       + Precipitation * WetDeposit.NH4 * 1e-7));
-  return result;
-}
+{ return deposit_; }
 
 double 
 Weather::day_cycle (const Time& time) const	// Sum over a day is 1.0.
@@ -332,7 +333,7 @@ Weather::check (const Time&, const Time&, Treelog&) const
 { return true; }
 
 void
-Weather::load_syntax (Syntax& syntax, AttributeList&)
+Weather::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   // Logs.
   syntax.add ("hourly_air_temperature", "dg C", Syntax::LogOnly,
@@ -359,5 +360,9 @@ Weather::load_syntax (Syntax& syntax, AttributeList&)
 	      "Number of light hours this day.");
   syntax.add ("day_cycle", Syntax::None (), Syntax::LogOnly,
 	      "Fraction of daily radiation received this hour.");
+  syntax.add_submodule ("deposit", alist, Syntax::LogOnly, Syntax::Singleton,
+			"\
+Total atmospheric deposition of nitrogen this hour [g N/cm^2/h].", 
+			&IM::load_syntax);
 }
 
