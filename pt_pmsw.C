@@ -580,19 +580,33 @@ int RAC(double u, double h, double LAI, double c_d, double w, double z_0s,
 // constant, CM (1988) used 0.01, calibration is important (Daamen, 1997), p.212
 // arac (a)=0.00662: used by Jones (1983)
    	const double z_ref=2.0; // [m]
+        double Z; // Auxiliary variable denoting h-rd
 
    	rX=c_d*LAI; // Shaw & Pereira (1982)
-   	rd=1.1*h*log(1+pow(rX,0.25)); // Shaw&Pereira(1982)SG,p.507
+   	rd=1.1*h*log(1.0+pow(rX,0.25)); // Shaw&Pereira(1982)SG,p.507
+	Z=h-rd;
    	if (rX>0.0 && rX<0.2) rz_0=z_0s+0.3*h*sqrt(rX); // SG eq.43a
 		else if (rX>0.2 && rX<1.5) rz_0=0.3*h*(1-rd/h); // SG eq.43b
          		else rz_0=0.13*h; // otherwise
-      	if (z_ref-rd > 0.0) ru_h=u*log((h-rd)/rz_0)/log((z_ref-rd)/rz_0);
-     		 else
+
+        if (Z < 2.0*rz_0)
+        	{
+                Z=2.0*rz_0; // h-rd at least twice z_0
+      		if (z_ref-rd > 0.0) ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
+     		   else
            	   {
            	   rd=0.67*h;
-           	   ru_h=u*log((h-rd)/rz_0)/log((z_ref-rd)/rz_0);
+           	   ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
                    }
-         rr_ac=(alpha_u/(2*LAI*arac))*sqrt((w/ru_h)*1/(1-exp(-alpha_u/2)));
+                } else {
+             	   if (z_ref-rd > 0.0) ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
+     		 	else
+           	   		{
+           	   		rd=0.67*h;
+           	   		ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
+                        	}
+                       }         
+         rr_ac=(alpha_u/(2.0*LAI*arac))*sqrt((w/ru_h)*1/(1-exp(-alpha_u/2)));
 
    	return 0;
    	}
