@@ -40,7 +40,7 @@ Syntax::Implementation::check (const AttributeList& vl, string name,
       required state = status[key];
       if (!vl.check (key))
 	{
-	  if (!sparse && (state == InOut || state == Const || state == Mixed))
+	  if (!sparse && (state == InOut || state == Const))
 	    {
 	      cerr << "Attributte " << key << " missing\n";
 	      error = true;

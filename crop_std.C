@@ -656,7 +656,7 @@ CropStandardSyntax::CropStandardSyntax ()
 
     // Canopy
   Syntax& Canopy = *new Syntax ();
-  syntax.add ("Canopy", Canopy, Syntax::Mixed);
+  syntax.add ("Canopy", Canopy, Syntax::InOut);
 
   // CropPar
 

@@ -40,9 +40,6 @@ public:
     // This a state variable, it must be provided at initialization
     // and can be written to the log.
     InOut,
-    // This is a complex item which can contain both parameters and
-    // state variables. 
-    Mixed,
     // This is a complex object that is not required to be fully
     // specified before the simulation starts.
     Sparse, 
@@ -75,9 +72,9 @@ public:
 
   // Add syntax entries
   void add (string, type, required, int size = Singleton);
-  void add (string, const Syntax&, required = Mixed, int size = Singleton);
+  void add (string, const Syntax&, required = InOut, int size = Singleton);
   void add (string, const FTable*, required, int size = Singleton);
-  void add (string, const Library&, required = Mixed, int size = Singleton);
+  void add (string, const Library&, required = InOut, int size = Singleton);
   void add_filter (string, const Syntax&, required);
   void add_class (string, const Library&, derive_fun);
 
