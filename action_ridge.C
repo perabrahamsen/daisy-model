@@ -22,7 +22,7 @@ struct ActionRidge : public Action
 };
 
 #ifdef BORLAND_TEMPLATES
-template class add_submodule_sequence<Ridge>;
+template class add_submodule<Ridge>;
 #endif
 
 // Add the ActionRidge syntax to the syntax table.
