@@ -271,7 +271,8 @@ CropStandard::tick (const Time& time,
 	       production.WStem, development.DS);
 
   development.tick_daily (name, bioclimate.daily_air_temperature (), 
-			  production.WLeaf, production, vernalization);
+			  production.WLeaf, production, vernalization,
+			  harvesting.cut_stress);
   root_system.tick (soil, soil_heat, production.WRoot, production.IncWRoot);
 }
 

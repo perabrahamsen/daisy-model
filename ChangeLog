@@ -1,4 +1,29 @@
+2001-11-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.99 released.
+
+2001-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.C (load_syntax): Make 'cut_delay' take absolute value.
+	(operator): Update caller.
+
+	* development.C (tick_daily): Support `cut_stress'.
+	* crop_std.C (tick): Update caller.
+
+	* canopy_std.C (CropHeight): Obey 'HvsWStem'.
+
+	* lib/grass2.dai, lib/maize.dai, lib/pea.dai, lib/rye.dai,
+	lib/sbarley.dai, lib/srape.dai, lib/sugarbeet.dai, lib/swheat.dai,
+	lib/wbarley.dai, lib/wrape.dai, lib/wwheat.dai: Fix LAIDist.
+
 2001-11-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Root Density"): New log model.
+
+	* rootdens_G_P.C (set_density): Support MinDens.
+
+	* root_system.C (load_syntax): Added checks.
+	* rootdens_G_P.C (Rootdens_G_PSyntax): Added checks.
 
 	* Version 1.98 released.
 

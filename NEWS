@@ -12,6 +12,37 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.99
+
+** Harvest cut_delay in the default crop model changed.
+
+It is now a function of the amount of dry matter removed (measured in
+kg/ha), rather than of the fraction of dry matter removed.
+
+This affects none of the standard parameterizations.
+
+** Crop height is now limited by WStem in the default crop model.
+
+The Canopy parameter `HvsWStem' put an upper limit on the crop height
+based on WStem, relative to the crop height at flowering.  By default,
+it need 200 g DM / m^2 to reach full height.
+
+This affects stem and leaf harvest for monocrops, and light
+competition for multicrops.
+
+** Change LAI distribution in default crop parameterizations.
+
+LAIDist0 and LAIDist1, which controls how the leafs are distributed
+vertically, have been modified for all parameterizations of default
+crop model to something that makes more sense.  
+
+This will only affect leaf harvest for most simulations, but have
+great effect for grass with multiple cuts, and for multicrops.
+
+** You can now set MinDens in the Gerwitz+Page74 root density model.
+
+** New "Root Density" log model.
+
 * 1.98
 
 ** Better errors for (some) illegal parameter values.

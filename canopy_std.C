@@ -26,15 +26,11 @@
 #include "mathlib.h"
 
 double
-CanopyStandard::CropHeight (double /*WStem*/, double DS)
+CanopyStandard::CropHeight (double WStem, double DS)
 {
-#if 0
   const double H1 = HvsDS (DS) + Offset;
   const double H2 = HvsDS (1.0) * HvsWStem (WStem);
   return min (H1, H2);
-#else
-  return HvsDS (DS) + Offset;
-#endif
 }
 
 void
@@ -281,7 +277,8 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   HvsStem.add (0.00 , 0.10);
   HvsStem.add (200.0, 1.00);
   syntax.add ("HvsWStem", "g DM/m^2", Syntax::Fraction (), Syntax::Const,
-	      "Relative crop height as function of stem weight.");
+	      "Relative crop height as function of stem weight.\n\
+By default, it needs 200 g DM/m^2 to reach full height.");
   alist.add ("HvsWStem", HvsStem);
   syntax.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
 	      "Relative CAI distribution at DS=0.");

@@ -221,8 +221,8 @@ Harvesting::operator() (const string& column_name,
 
       // Cut delay.
       const double new_DM = production.DM ();
-      const double removed_fraction = 1.0 - new_DM / old_DM;
-      production_delay = cut_delay (removed_fraction);
+      const double removed_DM = old_DM - new_DM;
+      production_delay = cut_delay (removed_DM);
       if (!last_cut)
 	last_cut = new Time (time);
       else
@@ -340,10 +340,10 @@ Maximal development stage for which the crop survives harvest.");
   syntax.add ("production_delay", "d", Syntax::State,
 	      "production delay caused by last cut");
   alist.add ("production_delay", 0.0);
-  syntax.add ("cut_delay", Syntax::Fraction (), "d", Syntax::Const,
+  syntax.add ("cut_delay", "kg DM/ha", "d", Syntax::Const,
 	      "\
-Production delay in days as a function of the fraction of the shoot\n\
-removed by harvest.  By default, there is no production delay.");
+Production and development delay in days as a function of the shoot DM.\n\
+removed by harvest.  By default, there is no delay.");
   PLF no_delay;
   no_delay.add (0.0, 0.0);
   no_delay.add (1.0, 0.0);

@@ -34,7 +34,8 @@ Development::light_hour ()
 void
 Development::tick_daily (const string& name, 
 			 const double Ta, const double WLeaf, 
-			 Production& production, Vernalization& vernalization)
+			 Production& production, Vernalization& vernalization,
+			 const double cut_stress)
 {
   // Update final day length.
   day_length = partial_day_length;
@@ -46,7 +47,8 @@ Development::tick_daily (const string& name,
       // Only increase DS if assimilate production covers leaf respiration.
       if (production.IncWLeaf +  production.DeadWLeaf
 	  >  -WLeaf /1000.0) // It lost 0.1% of its leafs to resp.
-	DS += (DSRate1 * TempEff1 (Ta) * PhotEff1 (day_length + 1.0));
+	DS += (DSRate1 * TempEff1 (Ta) * PhotEff1 (day_length + 1.0))
+	  * (1.0 - cut_stress);
       vernalization (Ta, DS);
 
       if (DS >= 1.0)
@@ -54,7 +56,7 @@ Development::tick_daily (const string& name,
     }
   else
     {
-      DS += DSRate2 * TempEff2 (Ta);
+      DS += DSRate2 * TempEff2 (Ta) * (1.0 - cut_stress);
       if (DS > DSRepeat)
        {
          DS -= DSSetBack;

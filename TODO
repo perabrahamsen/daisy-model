@@ -1,10 +1,30 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Checks
+* GCC 
 
-** use numcheck when checking alists.
+** 2.95: 
+
+*** Run 122.50u 0.22s 2:04.63 98.4%
+*** Run 118.52u 0.30s 1:59.80 99.1%
+*** Run 116.96u 0.18s 1:57.75 99.4%
+
+*** Build 3994.84u 127.92s 38:07.51 180.2%
+
+** 3.02:
+
+*** Build 4064.63u 132.32s 37:12.17 188.0%
+*** Run 120.67u 0.68s 2:02.09 99.3%
+
 
 * Rodfordeling.
+
+- DS -> (Dybde -> Mål)
+
+- DS -> ([0-1] -> Mål)
+
+- Dybde -> (Dybde -> Mål)
+
+* Make it possible to log a specific entry in an array of unnamed objects.
 
 * Adsorption
 

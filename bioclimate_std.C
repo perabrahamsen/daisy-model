@@ -263,7 +263,7 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
 
 void 
 BioclimateStandard::RadiationDistribution (const Weather& weather, 
-				      const Vegetation& vegetation)
+					   const Vegetation& vegetation)
 {
   if (LAI () == 0.0)
     {

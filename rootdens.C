@@ -31,6 +31,7 @@ Root density calculations.";
 double
 Rootdens::density_distribution_parameter (double a)
 {
+  assert (a > 1.0);
   double x, y, z, x1, y1, z1, x2, y2, z2;
 
   if (1 + a > exp (1.0))
@@ -51,7 +52,7 @@ Rootdens::density_distribution_parameter (double a)
 	  z2 = 1 + a * x2;
 	}
     }
-  else if (a >= 0.3)
+  else 
     {
       x1 = 0.3;
       y1 = exp (x1);
@@ -60,10 +61,7 @@ Rootdens::density_distribution_parameter (double a)
       y2 = exp (x2);
  //     z2 = 1 + a * x2;
     }
-  else
-    {
-      assert (false /* Invalid Root Distribution */);
-    }
+
   x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
   y = exp (x);
   z = 1 + a * x;

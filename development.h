@@ -65,7 +65,7 @@ public:
 public:
   void light_hour ();
   void tick_daily (const string& name, double Ta, double WLeaf, 
-		   Production&, Vernalization&);
+		   Production&, Vernalization&, double cut_stress);
   void emergence ();
   void output (Log& log) const;
 

@@ -22,6 +22,7 @@
 #include "select.h"
 #include "time.h"
 #include "geometry.h"
+#include "check.h"
 #include <numeric>
 #include <set>
 
@@ -302,10 +303,10 @@ By default, the values will be calculated once, when the a new log entry\n\
 is written.  If you calculate the values more often, they will be\n\
 accumulated.  This is useful if you for example want to summarize the\n\
 hourly percolation into a daily log.");
-  syntax.add ("factor", Syntax::None (), Syntax::Const, "\
+  syntax.add ("factor", Syntax::None (), Check::none (), Syntax::Const, "\
 Factor to multiply the calculated value with, before logging.");
   alist.add ("factor", 1.0);
-  syntax.add ("offset", Syntax::Unknown (), Syntax::Const, "\
+  syntax.add ("offset", Syntax::Unknown (), Check::none (), Syntax::Const, "\
 Offset to add to the calculated value, before logging.");
   alist.add ("offset", 0.0);
   syntax.add ("accumulate", Syntax::Boolean, Syntax::Const,

@@ -29,6 +29,7 @@
 #include "soil_water.h"
 #include "soil.h"
 #include "log.h"
+#include "check.h"
 #include "mathlib.h"
 #include "message.h"
 
@@ -370,63 +371,74 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Root density model.");
   alist.add ("rootdens", Rootdens::default_model ());
 
-  syntax.add ("DptEmr", "cm", Syntax::Const,
+  syntax.add ("DptEmr", "cm", Check::non_negative (), Syntax::Const,
 	    "Penetration at emergence.");
   alist.add ("DptEmr", 10.0);
-  syntax.add ("PenPar1", "cm/dg C/d", Syntax::Const,
+  syntax.add ("PenPar1", "cm/dg C/d", Check::non_negative (), Syntax::Const,
 	    "Penetration rate parameter, coefficient.");
   alist.add ("PenPar1", 0.25);
-  syntax.add ("PenPar2", "dg C", Syntax::Const,
+  syntax.add ("PenPar2", "dg C", Check::none (), Syntax::Const,
 	    "Penetration rate parameter, threshold.");
   alist.add ("PenPar2", 4.0);
-  syntax.add ("MaxPen", "cm", Syntax::Const,
+  syntax.add ("MaxPen", "cm", Check::positive (), Syntax::Const,
 	    "Maximum penetration depth.");
   alist.add ("MaxPen", 100.0);
-  syntax.add ("Rad", "cm", Syntax::Const,
+  syntax.add ("Rad", "cm", Check::positive (), Syntax::Const,
 	    "Root radius.");
   alist.add ("Rad", 0.005);
-  syntax.add ("h_wp", "cm", Syntax::Const,
+  syntax.add ("h_wp", "cm", Check::none (), Syntax::Const,
 	    "Matrix potential at wilting point.");
   alist.add ("h_wp",-15000.0);
-  syntax.add ("MxNH4Up", "g/cm/h", Syntax::Const,
+  syntax.add ("MxNH4Up", "g/cm/h", Check::non_negative (), Syntax::Const,
 	    "Maximum NH4 uptake per unit root length.");
   alist.add ("MxNH4Up", 2.5e-7);
-  syntax.add ("MxNO3Up", "g/cm/h", Syntax::Const,
+  syntax.add ("MxNO3Up", "g/cm/h", Check::non_negative (), Syntax::Const,
 	    "Maximum NO3 uptake per unit root length.");
   alist.add ("MxNO3Up", 2.5e-8);
-  syntax.add ("Rxylem", Syntax::None (), Syntax::Const,
+  syntax.add ("Rxylem", Syntax::None (), Check::non_negative (), Syntax::Const,
 	    "Transport resistence in xyleme.");
   alist.add ("Rxylem", 10.0);
 
-  syntax.add ("PotRtDpt", "cm", Syntax::OptionalState,
+  syntax.add ("PotRtDpt", "cm", Check::non_negative (), Syntax::OptionalState,
 	      "Potential root penetration depth.");
-  syntax.add ("Depth", "cm", Syntax::OptionalState, "Rooting Depth.");
-  syntax.add ("Density", "cm/cm3", Syntax::State, Syntax::Sequence,
+  syntax.add ("Depth", "cm", Check::non_negative (), Syntax::OptionalState,
+	      "Rooting Depth.");
+  syntax.add ("Density", "cm/cm3", Check::non_negative (),
+	      Syntax::State, Syntax::Sequence,
 	       "Root density in soil layers.");
   alist.add ("Density", empty_array);
-  syntax.add ("H2OExtraction", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
+  syntax.add ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 
+	      Syntax::State, Syntax::Sequence,
 	       "Extraction of H2O in soil layers.");
   alist.add ("H2OExtraction", empty_array);
-  syntax.add ("NH4Extraction", "g N/cm^3/h", Syntax::State, Syntax::Sequence,
+  syntax.add ("NH4Extraction", "g N/cm^3/h", Check::non_negative (), 
+	      Syntax::State, Syntax::Sequence,
 	       "Extraction of NH4-N in soil layers.");
   alist.add ("NH4Extraction", empty_array);
-  syntax.add ("NO3Extraction", "g N/cm^3/h", Syntax::State, Syntax::Sequence,
+  syntax.add ("NO3Extraction", "g N/cm^3/h", Check::non_negative (), 
+	      Syntax::State, Syntax::Sequence,
 	       "Extraction of NO3-N in soil layers.");
   alist.add ("NO3Extraction", empty_array);
-  syntax.add ("h_x", "cm", Syntax::State,
+  syntax.add ("h_x", "cm", Check::none (), Syntax::State,
 	       "Root extraction at surface.");
   alist.add ("h_x", 0.0);
-  syntax.add ("water_stress", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("water_stress", Syntax::None (), Check::fraction (),
+	      Syntax::LogOnly,
 	       "Fraction of requested water we got.");
-  syntax.add ("nitrogen_stress", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("nitrogen_stress", Syntax::None (), Check::fraction (),
+	      Syntax::LogOnly,
 	       "Nitrogen stress factor.");
-  syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("production_stress", Syntax::None (), Check::fraction (), 
+	      Syntax::LogOnly,
 	       "SVAT induced stress, or -1 if not applicable.");
-  syntax.add ("Ept", "mm/h", Syntax::LogOnly,
+  syntax.add ("Ept", "mm/h", Check::none (), Syntax::LogOnly,
 	       "Potential transpiration.");
-  syntax.add ("H2OUpt", "mm/h", Syntax::LogOnly, "H2O uptake.");
-  syntax.add ("NH4Upt", "g N/m^2/h", Syntax::LogOnly, "NH4-N uptake.");
-  syntax.add ("NO3Upt", "g N/m^2/h", Syntax::LogOnly, "NO3-N uptake.");
+  syntax.add ("H2OUpt", "mm/h", Check::non_negative (), Syntax::LogOnly,
+	      "H2O uptake.");
+  syntax.add ("NH4Upt", "g N/m^2/h", Check::non_negative (), Syntax::LogOnly,
+	      "NH4-N uptake.");
+  syntax.add ("NO3Upt", "g N/m^2/h", Check::non_negative (), Syntax::LogOnly,
+	      "NO3-N uptake.");
 }
 
 static double
