@@ -419,7 +419,7 @@
 		     (when hourly)
 		     (dimension "kg N/ha/d")
 		     (factor 1e5))		;g/cm²/d -> kg N/ha/d
-	   (number (path column "$col" Vegetation crops "*" Root NH4Upt)
+	   (number (path column "$col" Vegetation crops crops "*" Root NH4Upt)
 		   (when hourly)
 		   (dimension "kg N/ha/d")
 		   (factor 10.0))	;g/m²/d -> kg N/ha/d
@@ -465,7 +465,7 @@
 		     (when hourly)
 		     (dimension "kg N/ha/d")
 		     (factor 1e5))		;g/cm²/d -> kg N/ha/d
-	   (number (path column "$col" Vegetation crops "*" Root NO3Upt)
+	   (number (path column "$col" Vegetation crops crops "*" Root NO3Upt)
 		   (when hourly)
 		   (dimension "kg N/ha/d")
 		   (factor 10.0))		;g/m²/d -> kg N/ha/d
@@ -753,19 +753,19 @@
 	   (month (path time))
 	   (mday (path time))
 	   (hour (path time))
-	   (number (path column "$col" Vegetation crops "$crop"
+	   (number (path column "$col" Vegetation crops crops "$crop"
 			 CrpAux NetPhotosynthesis)
 		   (dimension "g CO2/m^2/h")
 		   (factor 1.0))
-	   (number (path column "$col" Vegetation crops "$crop"
+	   (number (path column "$col" Vegetation crops crops "$crop"
 			 CrpAux RootRespiration)
 		   (dimension "g CO2/m^2/h")
 		   (factor 1.0))
-	   (number (path column "$col" Vegetation crops "$crop"
+	   (number (path column "$col" Vegetation crops crops "$crop"
 			 CrpAux CanopyAss)
 		   (dimension "g CH2O/m^2/h")
 		   (factor 1.0))
-	   (number (path column "$col" Vegetation crops "$crop"
+	   (number (path column "$col" Vegetation crops crops "$crop"
 			 CrpAux PotCanopyAss)
 		   (dimension "g CH2O/m^2/h")
 		   (factor 1.0))
@@ -780,65 +780,81 @@
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
-	   (number (path column "$col" Vegetation crops "$crop" Phenology DS)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Phenology DS)
 		   (dimension "none")
 		   (factor 1.0))	;Development stage [-1:2]
-	   (number (path column "$col" Vegetation crops "$crop"
+	   (number (path column "$col" Vegetation crops crops "$crop"
 			 Phenology day_length)
 		   (dimension "h")
 		   (factor 1.0))	;Light hours previous day.
-	   (number (path column "$col" Vegetation crops "$crop" Canopy CAI)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Canopy CAI)
 		   (tag "Crop AI")
 		   (dimension "none")
 		   (factor 1.0))	;Leaf Area Index [0:inf]
-	   (number (path column "$col" Vegetation crops "$crop" Canopy LeafAI)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Canopy LeafAI)
 		   (tag "Leaf AI")
 		   (dimension "none")
 		   (factor 1.0))	;Leaf Area Index [0:inf]
-	   (number (path column "$col" Vegetation crops "$crop" Canopy StemAI)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Canopy StemAI)
 		   (tag "Stem AI")
 		   (dimension "none")
 		   (factor 1.0))	;Leaf Area Index [0:inf]
-	   (number (path column "$col" Vegetation crops "$crop" Canopy SOrgAI)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Canopy SOrgAI)
 		   (tag "SOrg AI")
 		   (dimension "none")
 		   (factor 1.0))	;Leaf Area Index [0:inf]
-	   (number (path column "$col" Vegetation crops "$crop" Root Depth)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Root Depth)
 		   (dimension "cm")
 		   (factor 1.0))	;cm [-inf:0]
-	   (number (path column "$col" Vegetation crops "$crop" Prod WLeaf)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod WLeaf)
 		   (dimension "Ton DM/ha")
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "$crop" Prod WDead)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod WDead)
 		   (dimension "Ton DM/ha")
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "$crop" Prod WStem)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod WStem)
 		   (dimension "Ton DM/ha")
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "$crop" Prod WSOrg)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod WSOrg)
 		   (dimension "Ton DM/ha")
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "$crop" Prod WRoot)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod WRoot)
 		   (dimension "Ton DM/ha")
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "$crop" CrpAux AccFixated)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 CrpAux AccFixated)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
-	   (number (path column "$col" Vegetation crops "$crop" Prod NLeaf)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod NLeaf)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
-	   (number (path column "$col" Vegetation crops "$crop" Prod NStem)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod NStem)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
-	   (number (path column "$col" Vegetation crops "$crop" Prod NSOrg)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod NSOrg)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
-	   (number (path column "$col" Vegetation crops "$crop" Prod NRoot)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Prod NRoot)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
-	   (number (path column "$col" Vegetation crops "$crop"
+	   (number (path column "$col" Vegetation crops crops "$crop"
 			 Root water_stress))
-	   (number (path column "$col" Vegetation crops "$crop"
+	   (number (path column "$col" Vegetation crops crops "$crop"
 			 Root nitrogen_stress))
 	   ))
 
@@ -848,26 +864,28 @@
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
-	   (number (path column "$col" Vegetation crops "$crop" T_sum)
+	   (number (path column "$col" Vegetation crops crops "$crop" T_sum)
 		   (dimension "dg C d")
 		   (factor 1.0))	;Temperature sum
-	   (number (path column "$col" Vegetation crops "$crop" day)
+	   (number (path column "$col" Vegetation crops crops "$crop" day)
 		   (dimension "d")
 		   (factor 1.0))	;Temperature sum
-	   (number (path column "$col" Vegetation crops "$crop" Canopy CAI)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Canopy CAI)
 		   (tag "Crop AI")
 		   (dimension "none")
 		   (factor 1.0))	;Leaf Area Index [0:inf]
-	   (number (path column "$col" Vegetation crops "$crop" Root Depth)
+	   (number (path column "$col" Vegetation crops crops "$crop"
+			 Root Depth)
 		   (dimension "cm")
 		   (factor 1.0))	;cm [-inf:0]
-	   (number (path column "$col" Vegetation crops "$crop" N_actual)
+	   (number (path column "$col" Vegetation crops crops "$crop" N_actual)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
-	   (number (path column "$col" Vegetation crops "$crop" N_demand)
+	   (number (path column "$col" Vegetation crops crops "$crop" N_demand)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
-	   (number (path column "$col" Vegetation crops "$crop" 
+	   (number (path column "$col" Vegetation crops crops "$crop" 
 			 Root water_stress))))
 
 (deflog "Old Crop Production" table
@@ -876,35 +894,37 @@
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
-	   (number (path column "$col" Vegetation crops "*")
+	   (number (path column "$col" Vegetation crops crops "*")
 		   (tag "Name"))	;Crop name.
-	   (number (path column "$col" Vegetation crops "*" Phenology DS)
+	   (number (path column "$col" Vegetation crops crops "*" Phenology DS)
 		   (dimension "none")
 		   (factor 1.0))	;Development stage [-1:2]
-	   (number (path column "$col" Vegetation crops "*"
+	   (number (path column "$col" Vegetation crops crops "*"
 			 Phenology day_length)
 		   (dimension "h")
 		   (factor 1.0))	;Light hours previous day.
-	   (number (path column "$col" Vegetation crops "*" Canopy LAI)
+	   (number (path column "$col" Vegetation crops crops "*" Canopy LAI)
 		   (dimension "none")
 		   (factor 1.0))	;Leaf Area Index [0:inf]
-	   (number (path column "$col" Vegetation crops "*" RootSys Depth)
+	   (number (path column "$col" Vegetation crops crops "*"
+			 RootSys Depth)
 		   (dimension "cm")
 		   (factor 1.0))	;cm [-inf:0]
-	   (number (path column "$col" Vegetation crops "*" Prod WLeaf)
+	   (number (path column "$col" Vegetation crops crops "*" Prod WLeaf)
 		   (dimension "Ton DM/ha") ;Actually stem + leaf + grain
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "*" Prod WSOrg)
+	   (number (path column "$col" Vegetation crops crops "*" Prod WSOrg)
 		   (dimension "Ton DM/ha") ;Beet & Potatoes only
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "*" Prod WRoot)
+	   (number (path column "$col" Vegetation crops crops "*" Prod WRoot)
 		   (dimension "Ton DM/ha")
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "*" CrpAux Fixated)
+	   (number (path column "$col" Vegetation crops crops "*"
+			 CrpAux Fixated)
 		   (accumulate true)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
-	   (number (path column "$col" Vegetation crops "*" Prod NCrop)
+	   (number (path column "$col" Vegetation crops crops "*" Prod NCrop)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
 	   ))
@@ -915,24 +935,47 @@
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
-	   (number (path column "$col" Vegetation LAI)
+	   (number (path column "$col" Vegetation crops LAI)
 		   (dimension "m2/m2"))
-	   (number (path column "$col" Vegetation height)
+	   (number (path column "$col" Vegetation crops height)
 		   (dimension "cm"))
-	   (number (path column "$col" Vegetation cover)
+	   (number (path column "$col" Vegetation crops cover)
 		   (dimension "0-1"))
-	   (number (path column "$col" Vegetation ACExt)
+	   (number (path column "$col" Vegetation crops ACExt)
 		   (dimension "ACExt"))
-	   (number (path column "$col" Vegetation ACRef)
+	   (number (path column "$col" Vegetation crops ACRef)
 		   (dimension "ACRef"))
-	   (number (path column "$col" Vegetation ARExt)
+	   (number (path column "$col" Vegetation crops ARExt)
 		   (dimension "ARExt"))
-	   (number (path column "$col" Vegetation EpFactor)
+	   (number (path column "$col" Vegetation crops EpFactor)
 		   (dimension "EpFactor"))
-	   (number (path column "$col" Vegetation albedo)
+	   (number (path column "$col" Vegetation crops albedo)
 		   (dimension "albedo"))
-	   (number (path column "$col" Vegetation interception_capacity)
+	   (number (path column "$col" Vegetation crops interception_capacity)
 		   (dimension "mm"))))
+
+(deflog "Permanent Vegetation" table
+  (where "vegetation.tab")
+  (when (hour 0))
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (number (path column "$col" Vegetation permanent LAI)
+		   (dimension "m2/m2"))
+	   (number (path column "$col" Vegetation permanent N_demand)
+		   (dimension "kg N/ha")
+		   (factor 10.0))
+	   (number (path column "$col" Vegetation permanent N_actual)
+		   (dimension "kg N/ha")
+		   (factor 10.0))
+	   (number (path column "$col" Vegetation permanent N_uptake)
+		   (when hourly)
+		   (dimension "kg N/ha/h")
+		   (factor 10.0))
+	   (number (path column "$col" Vegetation permanent N_litter)
+		   (dimension "kg N/ha/h")
+		   (when hourly)
+		   (factor 10.0))))
 
 
 (deflog "Surface Chemicals" table
