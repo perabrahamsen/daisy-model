@@ -2602,24 +2602,27 @@ CropStandard::harvest (const string& column_name,
 		     + NLeaf * leaf_harvest
 		     + NSOrg * sorg_harvest);
 
-      // Adjust canopy for the sake of bioclimate.
-      var.Canopy.Height = min (stub_length, var.Canopy.Height);
-      var.Canopy.Offset
-	= var.Canopy.Height
-	- par.Canopy.HvsDS (var.Phenology.DS) ;
-      assert (approximate (CropHeight (), var.Canopy.Height));
-      var.Canopy.CAI = CropCAI ();
-      CanopyStructure ();
+      if (DS > 0.0)
+	{
+	  // Adjust canopy for the sake of bioclimate.
+	  var.Canopy.Height = min (stub_length, var.Canopy.Height);
+	  var.Canopy.Offset
+	    = var.Canopy.Height
+	    - par.Canopy.HvsDS (var.Phenology.DS) ;
+	  assert (approximate (CropHeight (), var.Canopy.Height));
+	  var.Canopy.CAI = CropCAI ();
+	  CanopyStructure ();
 
-      // Residuals left in the field
-      const double C = C_SOrg * WRsRm;
-      const double N = NRsRm;
-      AM& am = AM::create (geometry, time, SOrg, name, "sorg");
-      assert (C == 0.0 || N > 0.0);
-      am.add ( C * m2_per_cm2, N * m2_per_cm2);
-      organic_matter.add (am);
-      Prod.C_AM += C;
-      Prod.N_AM += N;
+	  // Residuals left in the field
+	  const double C = C_SOrg * WRsRm;
+	  const double N = NRsRm;
+	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
+	  assert (C == 0.0 || N > 0.0);
+	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
+	  organic_matter.add (am);
+	  Prod.C_AM += C;
+	  Prod.N_AM += N;
+	}
     }
   else
     {

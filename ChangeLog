@@ -1,3 +1,21 @@
+1999-07-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.84 released.
+
+1999-07-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.C (update_state): Allow for numeric errors.
+
+1999-07-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C: New file.
+	* Makefile (COMPONENTS): Added it.
+
+1999-07-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (harvest): Don't recreate canopy if crop hasn't
+	emerged. 
+
 1999-07-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.83 released.
