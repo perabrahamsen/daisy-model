@@ -632,10 +632,6 @@ void
 BioclimateStandard::irrigate_surface (double flux)
 { irrigate_surface (flux, daily_air_temperature ()); }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<Snow>;
-#endif // BORLAND_TEMPLATES
-
 static struct BioclimateStandardSyntax
 {
   static Bioclimate& make (const AttributeList& al)
@@ -671,8 +667,9 @@ Number of vertical intervals in which we partition the canopy.");
 		  "Water temperature.");
 
       // Water in snowpack.
-      add_submodule<Snow> ("Snow", syntax, alist, Syntax::State, 
-			   "Surface snow pack.");
+      syntax.add_submodule ("Snow", alist, Syntax::State, 
+			   "Surface snow pack.",
+			    Snow::load_syntax);
       syntax.add ("snow_ep", "mm/h", Syntax::LogOnly,
 		  "Potential snow evaporation.");
       syntax.add ("snow_ea", "mm/h", Syntax::LogOnly,

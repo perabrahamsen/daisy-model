@@ -360,7 +360,7 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Number of light hours this day.");
   syntax.add ("day_cycle", Syntax::None (), Syntax::LogOnly,
 	      "Fraction of daily radiation received this hour.");
-  syntax.add_submodule ("deposit", alist, Syntax::LogOnly, Syntax::Singleton,
+  syntax.add_submodule ("deposit", alist, Syntax::LogOnly, 
 			"\
 Total atmospheric deposition of nitrogen this hour [g N/cm^2/h].", 
 			&IM::load_syntax);

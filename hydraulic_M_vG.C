@@ -24,6 +24,7 @@
 
 #include "hydraulic.h"
 #include "plf.h"
+#include "check_std.h"
 
 class HydraulicM_vG : public Hydraulic
 {
@@ -160,7 +161,7 @@ HydraulicM_vGSyntax::HydraulicM_vGSyntax ()
 	      "van Genuchten alpha.");
   syntax.add ("n", Syntax::None (), Syntax::Const,
 	      "van Genuchten n.");
-  syntax.add ("K_sat", "cm/h", Syntax::Const,
+  syntax.add ("K_sat", "cm/h", NonNegative::value (), Syntax::Const,
 	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("M_vG", alist, syntax, &HydraulicM_vG::make);

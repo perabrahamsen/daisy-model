@@ -24,6 +24,7 @@
 #include "alist.h"
 #include "library.h"
 #include "tmpstream.h"
+#include "check.h"
 #include <map>
 #include <algorithm>
 
@@ -43,6 +44,7 @@ struct Syntax::Implementation
   typedef map<string, ::Library*, less<string> > library_map;
   typedef map<string, string, less<string> > string_map;
   typedef map<string, const AttributeList*, less<string> > alist_map;
+  typedef map<string, const Check*, less<string> > check_map;
 
   type_map types;
   status_map status;
@@ -51,10 +53,12 @@ struct Syntax::Implementation
   library_map libraries;
   string_map domains;
   string_map dimensions;
+  check_map num_checks;
   string_map descriptions;
   alist_map alists;
 
   bool check (const AttributeList& vl, Treelog& err);
+  void check (const string& key, double value) const;
   Syntax::type lookup (const string& key) const;
   int order_number (const string& name) const;
   void entries (vector<string>& result) const;
@@ -196,6 +200,15 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
   return !error;
 }
 
+void
+Syntax::Implementation::check (const string& key, const double value) const
+{
+  check_map::const_iterator i = num_checks.find (key);
+
+  if (i != num_checks.end ())
+    (*i).second->check (value);
+}
+
 Syntax::type 
 Syntax::Implementation::lookup (const string& key) const
 {
@@ -293,15 +306,15 @@ Syntax::category_number (const char* name)
 
 bool
 Syntax::check (const AttributeList& vl, Treelog& err) const
-{
-  return impl.check (vl, err);
-}
+{ return impl.check (vl, err);}
+
+void
+Syntax::check (const string& key, const double value) const
+{ impl.check (key, value); }
 
 Syntax::type 
 Syntax::lookup (const string& key) const
-{
-  return impl.lookup (key);
-}
+{ return impl.lookup (key); }
 
 bool
 Syntax::is_const (const string& key) const
@@ -451,6 +464,14 @@ Syntax::add (const string& key, const string& dim, category req, int sz,
 }
 
 void
+Syntax::add (const string& key, const string& dim, const Check& check,
+	     category req, int sz, const string& d)
+{
+  add (key, dim, req, sz, d);
+  impl.num_checks[key] = &check;
+}
+
+void
 Syntax::add (const string& key, const string& dom, const string& ran,
 	     category req, int sz, const string& d)
 {
@@ -493,8 +514,8 @@ Syntax::add_library (const string& key, ::Library& l)
 }
 
 void 
-Syntax::add_submodule (const char* name, AttributeList& alist,
-		       Syntax::category cat, int sz, const string& description,
+Syntax::add_submodule (const string& name, AttributeList& alist,
+		       Syntax::category cat, const string& description,
 		       load_syntax_fun load_syntax)
 {
     Syntax& s = *new Syntax ();
@@ -527,14 +548,34 @@ Syntax::add_submodule (const char* name, AttributeList& alist,
     // The solution is to treat the three cases separately.
 
     if (cat == Syntax::LogOnly)
-      add (name, s, cat, sz, description);
-    else if (sz == Singleton && (cat == Syntax::Const || cat == Syntax::State))
+      // Log only, ignore default value.
+      add (name, s, cat, Syntax::Singleton, description);
+    else if (cat == Syntax::Const || cat == Syntax::State)
       {
-	add (name, s, cat, sz, description);
+	// Mandatory, store in alist.
+	add (name, s, cat, Syntax::Singleton, description);
 	alist.add (name, a);
       }
     else
-      add (name, s, a, cat, sz, description);
+      // Optional, store as default_alist.
+      add (name, s, a, cat, Syntax::Singleton, description);
+};
+
+void 
+Syntax::add_submodule_sequence (const string& name, Syntax::category cat, 
+				const string& description,
+				load_syntax_fun load_syntax)
+{
+    Syntax& s = *new Syntax ();
+    AttributeList a;
+    (*load_syntax) (s, a);
+
+    if (cat == Syntax::LogOnly)
+      // No default value for log only variables.
+      add (name, s, cat, Syntax::Sequence, description);
+    else
+      // With default value for sequence members.
+      add (name, s, a, cat, Syntax::Sequence, description);
 };
 
 void 
@@ -652,21 +693,6 @@ non_positive (double v, const string& s, bool& ok, Treelog& err, int index)
 	tmp () << "[" << index << "]";
       Treelog::Open nest (err, tmp.str ());
       err.entry ("Positive value not permitted");
-      ok = false;
-    }
-}
-
-void
-is_fraction (double v, const string& s, bool& ok, Treelog& err, int index)
-{
-  if (v < 0.0 || v > 1.0)
-    {
-      TmpStream tmp;
-      tmp () << s;
-      if (index >= 0)
-	tmp () << "[" << index << "]";
-      Treelog::Open nest (err, tmp.str ());
-      err.entry ("Fraction must be between 0 and 1");
       ok = false;
     }
 }

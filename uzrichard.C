@@ -412,9 +412,10 @@ UZRichard::richard (const Soil& soil,
 	  if (accepted)
 	    {
 
-#if 1
+#if 0
 	      // This code checks that darcy and the mass preservation
 	      // code gives the same results.
+	      // Disabled because this is not the case when ice is present.
 	      {
 		bool error_found = false;
                 q[first] = delta_top_water / ddt;

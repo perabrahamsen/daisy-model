@@ -1038,12 +1038,6 @@ check_alist (const AttributeList& al, Treelog& err)
   return ok;
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<OrganicMatter::Implementation::Buffer>;
-template class add_submodule_sequence<OM>;
-template class add_submodule<Bioincorporation>;
-#endif
-
 void
 OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
@@ -1063,9 +1057,9 @@ Clear this flag to turn off mineralization in groundwater.");
   syntax.add ("K_NO3", "h^-1", Syntax::Const, 
 	      "Maximal immobilization rate for nitrate.");
   alist.add ("K_NO3", 0.020833); // 0.5 / 24.
-  add_submodule<Bioincorporation> ("Bioincorporation", syntax, alist, 
-				   Syntax::State, "\
-Biological incorporation of litter.");
+  syntax.add_submodule ("Bioincorporation", alist, Syntax::State, "\
+Biological incorporation of litter.",
+			Bioincorporation::load_syntax);
   syntax.add ("NO3_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
 Mineralization this time step (negative numbers mean immobilization).");
   syntax.add ("NH4_source", "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, "\
@@ -1084,18 +1078,19 @@ Mineralization this time step (negative numbers mean immobilization).");
   AttributeList root (AM::default_root ());
   am.push_back (&root);
   alist.add ("am", am);
-  add_submodule<Implementation::Buffer> ("buffer", syntax, alist,
-					 Syntax::State,
-					 "Buffer between AOM pools and SOM.");
+  syntax.add_submodule ("buffer", alist, Syntax::State,
+			"Buffer between AOM pools and SOM.",
+			Implementation::Buffer::load_syntax);
 
   // Create defaults for som and smb.
   Syntax om_syntax;
   AttributeList om_alist;
   OM::load_syntax (om_syntax, om_alist);
 
-  add_submodule_sequence<OM> ("smb", syntax, Syntax::State,
-			      "Soil MicroBiomass pools.\n\
-Initial value will be estimated based on equilibrium with AM and SOM pools.");
+  syntax.add_submodule_sequence ("smb", Syntax::State, "\
+Soil MicroBiomass pools.\n\
+Initial value will be estimated based on equilibrium with AM and SOM pools.",
+				 OM::load_syntax);
   vector<AttributeList*> SMB;
   AttributeList SMB1 (om_alist);
   vector<double> SMB1_C_per_N;
@@ -1133,8 +1128,9 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.");
   SMB.push_back (&SMB2);
   alist.add ("smb", SMB);
 
-  add_submodule_sequence<OM> ("som", syntax, Syntax::State, 
-			      "Soil Organic Matter pools.");
+  syntax.add_submodule_sequence ("som", Syntax::State, 
+				 "Soil Organic Matter pools.",
+				 OM::load_syntax);
   vector<AttributeList*> SOM;
   AttributeList SOM1 (om_alist);
   SOM1.add ("turnover_rate", 1.125e-7);

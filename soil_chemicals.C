@@ -305,10 +305,6 @@ bool
 SoilChemicals::check (unsigned n, Treelog& err) const
 { return impl.check (n, err); }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<SoilChemical>;
-#endif
-
 void 
 SoilChemicals::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
@@ -318,8 +314,9 @@ SoilChemicals::load_syntax (Syntax& syntax, AttributeList& alist)
   AttributeList entry_alist;
   entry_syntax.add ("chemical", Syntax::String, Syntax::State,
 		    "Name of chemical in solute.");
-  add_submodule<SoilChemical> ("solute", entry_syntax, entry_alist, 
-			       Syntax::State, "State of chemical solute.");
+  entry_syntax.add_submodule ("solute", entry_alist, Syntax::State,
+			      "State of chemical solute.",
+			      SoilChemical::load_syntax);
   syntax.add ("solutes", entry_syntax, entry_alist, Syntax::State,
 	      Syntax::Sequence, "List of chemical solutes in the soil.");
   alist.add ("solutes", vector<AttributeList*> ());

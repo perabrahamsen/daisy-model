@@ -526,13 +526,8 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 	    ok = false;
 	  }
     }
-  const vector<double>& efficiency = al.number_sequence ("efficiency");
-  for (unsigned int i = 0; i < efficiency.size (); i++)
-    is_fraction (efficiency[i], "efficiency", ok, err, i);
   non_negative (al.number ("maintenance"), "maintenance", ok, err);
   const vector<double>& fractions = al.number_sequence ("fractions");
-  for (unsigned int i = 0; i < fractions.size (); i++)
-    is_fraction (fractions[i], "fractions", ok, err, i);
   if (!approximate (accumulate (fractions.begin (), fractions.end (), 0.0),
 		    1.0))
     {

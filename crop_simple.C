@@ -368,12 +368,6 @@ CropSimple::~CropSimple ()
   delete &root_system;
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule_sequence<OM>;
-template class add_submodule<CanopySimple>;
-template class add_submodule<RootSystem>;
-#endif
-
 static struct CropSimpleSyntax
 {
   static Crop& make (const AttributeList& al)
@@ -441,8 +435,8 @@ static struct CropSimpleSyntax
     syntax.add ("forced_LAI", "m^2/m^2", Syntax::State, "\
 Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     alist.add ("forced_LAI", 0.0);
-    add_submodule<CanopySimple>("Canopy", syntax, alist,
-				Syntax::State, "Canopy.");
+    syntax.add_submodule("Canopy", alist, Syntax::State, "Canopy.",
+			 CanopySimple::load_syntax);
     syntax.add ("height_max", "cm", Syntax::Const, 
 		"Maximum height of plant, reached when flowering.");
     alist.add ("height_max", 80.0);
@@ -461,16 +455,16 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     syntax.add ("spring_LAI", "m^2/m^2", Syntax::Const, 
 		"Set 'forced_LAI' to this after spring clearence of 'T_sum'.");
     alist.add ("spring_LAI", 0.1);
-    add_submodule<RootSystem>("Root", syntax, alist,
-			      Syntax::State, "Root system.");
+    syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
+			 RootSystem::load_syntax);
     syntax.add ("root_DM", "T DM/ha", Syntax::Const, 
 		"Fully developed root drymatter.");
     alist.add ("root_DM", 2.0);
     syntax.add ("root_N", "kg N/ha", Syntax::Const,
 		"Fully developed root N content.");
     alist.add ("root_N", 20.0);
-    add_submodule_sequence<OM> ("root_am", syntax, Syntax::Const,
-				"Root AM parameters.");
+    syntax.add_submodule_sequence ("root_am", Syntax::Const, 
+				   "Root AM parameters.", OM::load_syntax);
     alist.add ("root_am", AM::default_AOM ());
     syntax.add ("potential_N", "kg N/ha", Syntax::Const,
 		"Potential N content at harvest.");

@@ -294,7 +294,7 @@ nitrogen.  This requires that the fertilizer has specified the\n\
 		"Minimum amount of nitrogen to fertilize with.");
     alist.add ("minimum_weight", 0.0);
     syntax.add_submodule ("precision", alist, 
-			  Syntax::OptionalConst, Syntax::Singleton, "\
+			  Syntax::OptionalConst, "\
 Let the amount of fertilizer depend on the inorganic nitrogen in the soil.\n\
 The amount of fertilizer will be the specified 'target', minus the amount\n\
 already present in the soil zone between 'from' and 'to'.",

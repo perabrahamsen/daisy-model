@@ -1045,12 +1045,6 @@ static bool check_root (const AttributeList& al, Treelog& err)
   return ok;
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<AM::Implementation::Lock>;
-template class add_submodule_sequence<OM>;
-template class add_submodule<IM>;
-#endif
-
 static struct AM_Syntax
 {
   static AM&
@@ -1079,11 +1073,12 @@ pools, each of which have their own turnover rate.");
 	alist.add ("syntax", "state");
 	syntax.add ("name", Syntax::String, Syntax::State, "\
 A name given to this AOM so you can identify it in for example log files.");
-	add_submodule<AM::Implementation::Lock> ("lock", syntax, alist,
-						 Syntax::OptionalState, "\
-This AM belongs to a still living plant");
-	add_submodule_sequence<OM> ("om", syntax, Syntax::State, 
-				    "The individual AOM pools.");
+	syntax.add_submodule ("lock", alist, Syntax::OptionalState, "\
+This AM belongs to a still living plant",
+			      AM::Implementation::Lock::load_syntax);
+	syntax.add_submodule_sequence ("om", Syntax::State, 
+				       "The individual AOM pools.",
+				       OM::load_syntax);
 	Librarian<AM>::add_type ("state", alist, syntax, &make);
       }
       // Organic fertilizer.
@@ -1116,8 +1111,9 @@ In Denmark, this is governed by legalisation.");
 		    "Carbon fraction of dry matter.");
 	syntax.add ("total_N_fraction", Syntax::Fraction (), Syntax::Const,
 		    "Nitrogen fraction of dry matter");
-	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
-				    "The individual AOM pools.");
+	syntax.add_submodule_sequence ("om", Syntax::State,
+				       "The individual AOM pools.",
+				       OM::load_syntax);
 	syntax.add ("NO3_fraction", Syntax::Fraction (), Syntax::Const, 
 		    "Nitrate fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be ammonium or organic.");
@@ -1179,8 +1175,9 @@ Height where this layer ends (a negative number).");
 	syntax.add ("layers", layer_syntax, Syntax::Sequence, "\
 Carbon content in different soil layers.  The carbon is assumed to be\n\
 uniformly distributed in each layer.");
-	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
-				    "The individual AOM pools.");
+	syntax.add_submodule_sequence ("om", Syntax::State,
+				       "The individual AOM pools.",
+				       OM::load_syntax);
 	Librarian<AM>::add_type ("initial", alist, syntax, &make);
       }
       // Root initialization,
@@ -1202,8 +1199,9 @@ original.");
 		    "Carbon fraction of total root dry matter");
 	syntax.add ("total_N_fraction", Syntax::Fraction (), Syntax::Const, 
 		    "Nitrogen fraction of total root dry matter");
-	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
-				    "The individual AOM pools.");
+	syntax.add_submodule_sequence ("om", Syntax::State,
+				       "The individual AOM pools.",
+				       OM::load_syntax);
 	Librarian<AM>::add_type ("root", alist, syntax, &make);
       }
     }

@@ -198,10 +198,10 @@ WeatherOld::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("UTM_y", Syntax::Unknown (), Syntax::OptionalConst,
 	      "Y position of weather station."); // Unused.
 
-  syntax.add_submodule ("DryDeposit", alist, Syntax::Const, Syntax::Singleton,
+  syntax.add_submodule ("DryDeposit", alist, Syntax::Const, 
 			"\
 Dry atmospheric deposition of nitrogen [kg N/year/ha].", &IM::load_syntax);
-  syntax.add_submodule ("WetDeposit", alist, Syntax::Const, Syntax::Singleton,
+  syntax.add_submodule ("WetDeposit", alist, Syntax::Const, 
 			"\
 Deposition of nitrogen solutes with precipitation [ppm].", &IM::load_syntax);
 

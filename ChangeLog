@@ -1,4 +1,30 @@
+2001-11-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* check.C, check.h, check_std.C, check_std.h: New utility.
+	* Makefile (OTHER): Add them.
+	* syntax.C, syntax.h (check, add): Support them.
+	* parser_file.C (load_list): Call new syntax check.
+	
+	* main.C (main): Accept string exceptions.
+
+	* syntax.h, syntax.C (is_fraction): Removed.
+	* all: Fixed callers.
+
+	* syntax.h (add_submodule): Removed template.
+	* all: Fixed callers.
+
 2001-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C, syntax.h (add_submodule_sequence): New member
+	function. 
+	* syntax.h (add_submodule_sequence):  Removed template.
+x	* vegetation_permanent.C (VegetationPermanentSyntax): Don't use
+	`add_submodule_sequence'. 
+	* organic_matter.C (load_syntax): Ditto.
+	* crop_sold.C (CropSoldSyntax): Ditto.
+	* crop_old.C (CropOldSyntax): Ditto.
+	* crop_simple.C (CropSimpleSyntax): Ditto.
+	* bioincorporation.C (load_syntax): Ditto.
 
 	* organic_matter.C (Buffer::tick): Remove bogus assertion.
 

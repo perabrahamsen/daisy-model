@@ -634,10 +634,6 @@ static struct CropSoldSyntax
   CropSoldSyntax ();
 } old_crop_syntax;
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule_sequence<OM>;
-#endif
-
 CropSoldSyntax::CropSoldSyntax ()
 {
   static const vector<double> empty_array;
@@ -811,12 +807,12 @@ Non-functional lim for N-concentration in roots.");
 	       "N partitioning at harvest parameter.");
   Harvest.add ("Bt", Syntax::None (), Syntax::Const,
 	       "N partitioning at harvest parameter.");
-  add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const,
-			      "Leaf AM parameters.");
-  add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const,
-			      "SOrg AM parameters.");
-  add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const,
-			      "Root AM parameters.");
+  Harvest.add_submodule_sequence ("Leaf", Syntax::Const, 
+				 "Leaf AM parameters.", OM::load_syntax);
+  Harvest.add_submodule_sequence ("SOrg", Syntax::Const,
+				 "SOrg AM parameters.", OM::load_syntax);
+  Harvest.add_submodule_sequence ("Root", Syntax::Const,
+				 "Root AM parameters.", OM::load_syntax);
   Harvest.add ("C_Leaf", Syntax::None (), Syntax::Const,
 	       "C fraction of total weight.");
   Harvest.add ("C_SOrg", Syntax::None (), Syntax::Const,

@@ -34,10 +34,6 @@
 #include <algorithm>
 #include "message.h"
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule_sequence<OM>;
-#endif
-
 struct Bioincorporation::Implementation
 { 
   // Parameters.
@@ -352,8 +348,9 @@ the whole profile.");
   vector<AttributeList*> AOM;
   AOM.push_back (&AOM1);
   AOM.push_back (&AOM2);
-  add_submodule_sequence<OM> ("AOM", syntax, Syntax::Const, 
-			      "Incorporated AM parameters.");
+  syntax.add_submodule_sequence ("AOM", Syntax::Const, 
+				 "Incorporated AM parameters.", 
+				 OM::load_syntax);
   alist.add ("AOM", AOM);
 }
   

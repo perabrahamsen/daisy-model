@@ -119,7 +119,13 @@ static struct HydraulicB_CSyntax
       bool ok = true;
 
       non_positive (al.number ("h_b"), "h_b", ok, err);
-      is_fraction (al.number ("b"), "b", ok, err);
+      const double b = al.number ("b");
+      if (b <= 0.0 || b > 1.0)
+	{
+	  Treelog::Open nest (err, "b");
+	  err.entry ("Value should be between 0 and 1 (but not 0)");
+	  ok = false;
+	}
       non_negative (al.number ("K_sat"), "K_sat", ok, err);
 
       return ok;

@@ -398,25 +398,24 @@ CropStandardSyntax::CropStandardSyntax ()
 	      "Description of this parameterization."); 
   alist.add ("description", "Standard Daisy crop model.  Hansen, 1999.");
 
-  syntax.add_submodule ("Root", alist, Syntax::State, Syntax::Singleton,
+  syntax.add_submodule ("Root", alist, Syntax::State, 
 			"Root system.", RootSystem::load_syntax);
-  syntax.add_submodule ("Canopy", alist, Syntax::State, Syntax::Singleton,
+  syntax.add_submodule ("Canopy", alist, Syntax::State,
 			"Canopy.", CanopyStandard::load_syntax);
-  syntax.add_submodule ("Harvest", alist, Syntax::State, Syntax::Singleton,
+  syntax.add_submodule ("Harvest", alist, Syntax::State,
 			"Harvest parameters.", Harvesting::load_syntax);
-  syntax.add_submodule ("Prod", alist, Syntax::State, Syntax::Singleton,
+  syntax.add_submodule ("Prod", alist, Syntax::State,
 			"Production.", Production::load_syntax);
-  syntax.add_submodule ("Devel", alist, Syntax::State, Syntax::Singleton,
+  syntax.add_submodule ("Devel", alist, Syntax::State,
 			"Development and phenology.", 
 			Development::load_syntax);
-  syntax.add_submodule ("Partit", alist, Syntax::Const, Syntax::Singleton,
+  syntax.add_submodule ("Partit", alist, Syntax::Const,
 			"Assimilate partitioning.", Partition::load_syntax);
-  syntax.add_submodule ("Vernal", alist,
-			Syntax::OptionalState, Syntax::Singleton,
+  syntax.add_submodule ("Vernal", alist, Syntax::OptionalState, 
 			"Vernalization.", Vernalization::load_syntax);
-  syntax.add_submodule ("LeafPhot", alist, Syntax::Const, Syntax::Singleton,
+  syntax.add_submodule ("LeafPhot", alist, Syntax::Const,
 			"Leaf photosynthesis.", Photosynthesis::load_syntax);
-  syntax.add_submodule ("CrpN", alist, Syntax::State, Syntax::Singleton,
+  syntax.add_submodule ("CrpN", alist, Syntax::State,
 			"Nitrogen parameters.", CrpN::load_syntax);
 
   syntax.add ("enable_water_stress", Syntax::Boolean, Syntax::Const,

@@ -80,6 +80,10 @@ main (int argc, char* argv[])
     {
       CERR << "Exception: " << error << "\n";
     }
+  catch (const string& error)
+    {
+      CERR << "Exception: " << error << "\n";
+    }
   catch (const exception& e)
     {
       CERR << "Standard exception: " << typeid (e).name ()

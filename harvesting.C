@@ -306,20 +306,22 @@ Harvesting::output (Log& log) const
 void 
 Harvesting::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add_submodule ("Stem", alist, Syntax::Const, Syntax::Sequence, 
-			"Stem AOM parameters.", OM::load_syntax);
+  syntax.add_submodule_sequence ("Stem", Syntax::Const, 
+				 "Stem AOM parameters.", OM::load_syntax);
   alist.add ("Stem", AM::default_AOM ());
-  syntax.add_submodule ("Leaf", alist, Syntax::Const, Syntax::Sequence,
-			"Leaf AM parameters.", OM::load_syntax);
+  syntax.add_submodule_sequence ("Leaf", Syntax::Const,
+				 "Leaf AM parameters.", OM::load_syntax);
   alist.add ("Leaf", AM::default_AOM ());
-  syntax.add_submodule ("Dead", alist, Syntax::Const, Syntax::Sequence,
-			"Dead leaves AM parameters.", OM::load_syntax);
+  syntax.add_submodule_sequence ("Dead", Syntax::Const,
+				 "Dead leaves AM parameters.",
+				 OM::load_syntax);
   alist.add ("Dead", AM::default_AOM ());
-  syntax.add_submodule ("SOrg", alist, Syntax::Const, Syntax::Sequence,
-			"Storage organ AM parameters.", OM::load_syntax);
+  syntax.add_submodule_sequence ("SOrg", Syntax::Const,
+				 "Storage organ AM parameters.", 
+				 OM::load_syntax);
   alist.add ("SOrg", AM::default_AOM ());
-  syntax.add_submodule ("Root", alist, Syntax::Const, Syntax::Sequence,
-			"Root AM parameters.", OM::load_syntax);
+  syntax.add_submodule_sequence ("Root", Syntax::Const,
+				 "Root AM parameters.", OM::load_syntax);
   alist.add ("Root", AM::default_AOM ());
   syntax.add ("EconomicYield_W", Syntax::None (), Syntax::Const, "\
 Valuable fraction of storage organ (DM), e.g. grain or tuber.");

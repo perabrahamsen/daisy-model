@@ -508,11 +508,6 @@ Surface::get_chemical (const string& name) const // [g/cm^2]
   return impl.chemicals_storage.amount (name) * 1.0e-4;		
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<IM>;
-template class add_submodule<Ridge>;
-#endif
-
 void
 Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
@@ -564,10 +559,12 @@ Fraction of ponding above DetentionCapacity that runoffs each hour.");
   alist.add ("ReservoirConstant", 1.0);
   syntax.add ("runoff", "mm/h", Syntax::LogOnly, "\
 Amount of water runoff from ponding this hour.");
-  add_submodule<IM> ("IM", syntax, alist, Syntax::State, "\
-Inorganic nitrogen on the surface [g/cm^2].");
-  add_submodule<IM> ("IM_runoff", syntax, alist, Syntax::LogOnly, "\
-Inorganic nitrogen on the runoff water this hour [g/cm^2/h].");
+  syntax.add_submodule ("IM", alist, Syntax::State, "\
+Inorganic nitrogen on the surface [g/cm^2].",
+			IM::load_syntax);
+  syntax.add_submodule ("IM_runoff", alist, Syntax::LogOnly, "\
+Inorganic nitrogen on the runoff water this hour [g/cm^2/h].",
+			IM::load_syntax);
   syntax.add ("R_mixing", "h/mm", Syntax::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
   alist.add ("R_mixing", 1.0e9);
@@ -581,9 +578,9 @@ Resistance to mixing inorganic N between soil and ponding.");
 	      Syntax::Boolean, Syntax::Const, "\
 If this is set to false, the chemicals will stay on the surface.");
   alist.add ("chemicals_can_enter_soil", true);
-  AttributeList dummy;		// No default value...
-  add_submodule<Ridge> ("ridge", syntax, dummy, Syntax::OptionalState, "\
-Active ridge system, if any.");
+  syntax.add_submodule ("ridge", alist, Syntax::OptionalState, "\
+Active ridge system, if any.",
+			Ridge::load_syntax);
 }
 
 Surface::Surface (const AttributeList& al)

@@ -200,10 +200,6 @@ Soil::make_table (int i)
     }
 }
 
-#ifdef BORLAND_TEMPLATES
- template class add_submodule_sequence<Soil::Implementation::Layer>;
-#endif
-
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
@@ -212,9 +208,9 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Soil");
   alist.add ("description", "\
 The soil component provides the numeric and physical properties of the soil.");
-  add_submodule_sequence<Implementation::Layer> ("horizons", syntax, 
-						 Syntax::State, "\
-Layered description of the soil properties.");
+  syntax.add_submodule_sequence ("horizons", Syntax::State, "\
+Layered description of the soil properties.",
+				 Implementation::Layer::load_syntax);
   syntax.add ("MaxRootingDepth", "cm", Syntax::Const,
 	      "Depth at the end of the root zone (a positive number).");
   //  alist.add ("MaxRootingDepth", 100.0);

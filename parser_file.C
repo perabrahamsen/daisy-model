@@ -336,7 +336,15 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      double value = get_number ();
 	      if (syntax.dimension (name) == Syntax::Fraction ()
 		  && (value < 0.0 || value > 1.0))
-		error ("Fraction [0,1] expected");
+		error (name + ": Fraction [0,1] expected");
+	      else try
+		{
+		  syntax.check (name, value);
+		}
+	      catch (const string& message)
+		{
+		  error (name + ": " + message);
+		}
 	      atts.add (name, value);
 	      break;
 	    }

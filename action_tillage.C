@@ -164,11 +164,9 @@ static struct ActionSetPorositySyntax
 
   static bool check_alist (const AttributeList& al, Treelog& err)
     {
-      const double porosity (al.number ("porosity"));
       const double depth (al.number ("depth"));
       bool ok = true;
       non_positive (depth, "depth", ok, err);
-      is_fraction (porosity, "porosity", ok, err);
       return ok;
     }
 

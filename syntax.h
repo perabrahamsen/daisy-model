@@ -29,6 +29,7 @@
 
 class AttributeList;
 class Library;
+class Check;
 
 class Syntax
 { 
@@ -84,6 +85,9 @@ public:
 
   // This function will check that an alist conform to the syntax.
   bool check (const AttributeList&, Treelog& err) const;
+  
+  // Check that a numeric value is within the allowed range.
+  void check (const string& key, double value) const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 
@@ -121,7 +125,7 @@ public:
 	    type t, 
 	    category cat,
 	    const string& description)
-    { add (key, t, cat, Singleton, description); }
+  { add (key, t, cat, Singleton, description); }
 
   void add (const string& key, // Number.
 	    const string& dim,
@@ -132,7 +136,19 @@ public:
 	    const string& dim,
 	    category cat,
 	    const string& description)
-    { add (key, dim, cat, Singleton, description); } 
+  { add (key, dim, cat, Singleton, description); } 
+  void add (const string& key,
+	    const string& dim,
+	    const Check& check,
+	    category cat,
+	    int size,
+	    const string& description);
+  void add (const string& key, 
+	    const string& dim,
+	    const Check& check,
+	    category cat,
+	    const string& description)
+  { add (key, dim, check, cat, Singleton, description); } 
 
   void add (const string& key, // PLF.
 	    const string& domain,
@@ -145,17 +161,17 @@ public:
 	    const string& range,
 	    category cat,
 	    const string& description)
-    { add (key, domain, range, cat, Singleton, description); } 
+  { add (key, domain, range, cat, Singleton, description); } 
 
   void add (const string& key,  // AList
 	    const Syntax& syntax,
 	    int size,
 	    const string& description)
-    { add (key, syntax, State, size, description); }
+  { add (key, syntax, State, size, description); }
   void add (const string& key,  // AList
 	    const Syntax& syntax,
 	    const string& description)
-    { add (key, syntax, State, Singleton, description); }
+  { add (key, syntax, State, Singleton, description); }
   void add (const string&, const Syntax&,
 	    category cat, int size, 
 	    const string& description);
@@ -167,20 +183,23 @@ public:
 	    ::Library& lib, 
 	    int size,
 	    const string& description)
-    { add (key, lib, State, size, description); }
+  { add (key, lib, State, size, description); }
   void add (const string& key,
 	    ::Library& lib, 
 	    const string& description)
-    { add (key, lib, State, Singleton, description); }
+  { add (key, lib, State, Singleton, description); }
   void add (const string&, ::Library&,
 	    category, int size, const string& description);
 
   void add_library (const string&, ::Library&);
 
   typedef void (*load_syntax_fun) (Syntax& syntax, AttributeList& alist);
-  void add_submodule (const char* name, AttributeList& alist,
-		      Syntax::category cat, int sz, const string& description,
+  void add_submodule (const string& name, AttributeList& alist,
+		      Syntax::category cat, const string& description,
 		      load_syntax_fun load_syntax);
+  void add_submodule_sequence (const string& name, Syntax::category cat, 
+			       const string& description,
+			       load_syntax_fun load_syntax);
 		      
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user
@@ -210,35 +229,10 @@ private:
   Syntax& operator= (Syntax&);
 };
 
-template <class T> 
-struct add_submodule
-{
-  add_submodule (const char* name, Syntax& syntax, AttributeList& alist,
-		 Syntax::category cat, const string& description)
-  {
-    syntax.add_submodule (name, alist, cat, Syntax::Singleton, description, 
-			  &T::load_syntax);
-  }
-};
-
-template <class T> 
-struct add_submodule_sequence
-{
-  add_submodule_sequence (const char* name, Syntax& syntax, 
-			  Syntax::category cat, const string& description)
-  {
-    AttributeList alist;
-    syntax.add_submodule (name, alist, cat, Syntax::Sequence, description, 
-			  &T::load_syntax);
-  }
-};
-
 void check (const AttributeList& al, const string& s, bool& ok, Treelog& err);
 void non_negative (double v, const string& s, bool& ok, Treelog& err, 
 		   int index = -1);
 void non_positive (double v, const string& s, bool& ok, Treelog& err, 
 		   int index = -1);
-void is_fraction (double v, const string& s, bool& ok, Treelog& err,
-		  int index = -1);
 
 #endif // SYNTAX_H

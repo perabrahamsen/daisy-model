@@ -638,10 +638,6 @@ static struct CropOldSyntax
   CropOldSyntax ();
 } old_crop_syntax;
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule_sequence<OM>;
-#endif
-
 CropOldSyntax::CropOldSyntax ()
 {
   static const vector<double> empty_array;
@@ -808,14 +804,14 @@ Non-functional lim for N-concentration in roots.");
 	       "Sorg concentration at the end of the normal range.");
   Harvest.add ("alpha", Syntax::None (), Syntax::Const,
 	       "Relative increase in straw concentration above normal range.");
-  add_submodule_sequence<OM> ("Stem", Harvest, Syntax::Const,
-			      "Stem AM parameters.");
-  add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const,
-			      "Leaf AM parameters.");
-  add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const,
-			      "SOrg AM parameters.");
-  add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const,
-			      "Root AM parameters.");
+  Harvest.add_submodule_sequence ("Stem", Syntax::Const, 
+				 "Stem AM parameters.", OM::load_syntax);
+  Harvest.add_submodule_sequence ("Leaf", Syntax::Const,
+				 "Leaf AM parameters.", OM::load_syntax);
+  Harvest.add_submodule_sequence ("SOrg", Syntax::Const,
+				 "SOrg AM parameters.", OM::load_syntax);
+  Harvest.add_submodule_sequence ("Root", Syntax::Const,
+				 "Root AM parameters.", OM::load_syntax);
   Harvest.add ("C_Stem", Syntax::None (), Syntax::Const,
 	       "C fraction of total weight.");
   Harvest.add ("C_SOrg", Syntax::None (), Syntax::Const,

@@ -296,7 +296,7 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = path.C message.C options.C traverse_delete.C \
+OTHER = check.C check_std.C path.C message.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
@@ -764,6 +764,8 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h plf.h groundwater.h \
  log.h weather.h im.h vegetation.h
+check${OBJ}: check.C check.h
+check_std${OBJ}: check_std.C check_std.h check.h
 path${OBJ}: path.C path.h common.h
 message${OBJ}: message.C message.h common.h options.h
 options${OBJ}: options.C options.h common.h parser_file.h parser.h \
@@ -788,7 +790,7 @@ daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
 alist${OBJ}: alist.C plf.h library.h common.h alist.h syntax.h treelog.h \
  message.h
 syntax${OBJ}: syntax.C syntax.h common.h treelog.h alist.h library.h \
- tmpstream.h
+ tmpstream.h check.h
 library${OBJ}: library.C library.h common.h alist.h syntax.h treelog.h \
  tmpstream.h
 plf${OBJ}: plf.C plf.h
@@ -927,7 +929,7 @@ uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h common.h \
 hydraulic_yolo${OBJ}: hydraulic_yolo.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h plf.h
 hydraulic_M_vG${OBJ}: hydraulic_M_vG.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h plf.h
+ common.h alist.h syntax.h treelog.h plf.h check_std.h check.h
 hydraulic_B_vG${OBJ}: hydraulic_B_vG.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h plf.h
 hydraulic_M_C${OBJ}: hydraulic_M_C.C hydraulic.h librarian.h library.h \

@@ -134,10 +134,6 @@ canopy_dissipation_rate_coefficient")),
     active_groundwater_ (al.flag ("active_groundwater"))
 { }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<SoilChemical>;
-#endif // BORLAND_TEMPLATES
-
 static struct ChemicalStandardSyntax
 {
   static Chemical&
@@ -159,9 +155,9 @@ Read chemical properties as normal Daisy parameters.");
 		  "How fast is the chemical washed off the canopy.");
       syntax.add ("diffusion_coefficient", "cm^2/s", Syntax::Const,
 		  "Diffusion coefficient.");
-      add_submodule<SoilChemical> ("solute", syntax, alist,
-				   Syntax::Const,
-				   "Description of chemical in soil.");
+      syntax.add_submodule ("solute", alist, Syntax::Const,
+			    "Description of chemical in soil.",
+			    SoilChemical::load_syntax);
       syntax.add ("decompose_rate", "h^-1", Syntax::Const,
 		  "Fraction of solute being decomposed each hour.");
       PLF empty;

@@ -230,12 +230,6 @@ VegetationPermanent::~VegetationPermanent ()
   delete &root_system;
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule_sequence<OM>;
-template class add_submodule<RootSystem>;
-template class add_submodule<CanopySimple>;
-#endif
-
 static struct
 VegetationPermanentSyntax
 {
@@ -250,8 +244,8 @@ VegetationPermanentSyntax
     alist.add ("description", "Permanent (non-crop) vegetation.");
     syntax.add ("LAIvsDAY", "m^2/m^2", "yday", Syntax::Const, 
 		"LAI as a function of Julian day.");
-    add_submodule<CanopySimple>("Canopy", syntax, alist,
-				Syntax::State, "Canopy.");
+    syntax.add_submodule("Canopy", alist, Syntax::State, "Canopy.",
+			 CanopySimple::load_syntax);
     syntax.add ("Height", "cm", Syntax::Const, 
 		"permanent height of vegetation.");
     alist.add ("Height", 80.0);
@@ -269,11 +263,11 @@ VegetationPermanentSyntax
 		"Nitrogen uptake this hour.");
     syntax.add ("N_litter", "g N/m^2/h", Syntax::LogOnly,
 		"Nitrogen in litter this hour.");
-    add_submodule_sequence<OM> ("litter_am", syntax, Syntax::Const,
-				"Litter AM parameters.");
+    syntax.add_submodule_sequence ("litter_am", Syntax::Const,
+				   "Litter AOM parameters.", OM::load_syntax);
     alist.add ("litter_am", AM::default_AOM ());
-    add_submodule<RootSystem>("Root", syntax, alist,
-			      Syntax::State, "Root system.");
+    syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
+			 RootSystem::load_syntax);
     syntax.add ("root_DM", "T DM/ha", Syntax::Const, 
 		"Permanent root drymatter.");
     alist.add ("root_DM", 2.0);

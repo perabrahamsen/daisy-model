@@ -494,13 +494,6 @@ ColumnStandard::~ColumnStandard ()
   delete &nitrification;
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<SoilNH4>;
-template class add_submodule<SoilNO3>;
-template class add_submodule<OrganicMatter>;
-template class add_submodule<Denitrification>;
-#endif
-
 static struct ColumnStandardSyntax
 {
   static Column& make (const AttributeList& al)
@@ -516,13 +509,15 @@ static struct ColumnStandardSyntax
     alist.add ("description", "Hansen et.al. 1990.");
     Librarian<Column>::add_type ("default", alist, syntax, &make);
 
-    add_submodule<SoilNH4> ("SoilNH4", syntax, alist, Syntax::State,
-			    "Ammonium transport and adsorption in soil.");
-    add_submodule<SoilNO3> ("SoilNO3", syntax, alist, Syntax::State,
-			    "Nitrate transport in soil.");
-    add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist,
-				  Syntax::State, "\
-The organic matter in the soil and on the surface.");
+    syntax.add_submodule ("SoilNH4", alist, Syntax::State,
+			  "Ammonium transport and adsorption in soil.",
+			  SoilNH4::load_syntax);
+    syntax.add_submodule ("SoilNO3", alist, Syntax::State,
+			  "Nitrate transport in soil.",
+			  SoilNO3::load_syntax);
+    syntax.add_submodule ("OrganicMatter", alist, Syntax::State, "\
+The organic matter in the soil and on the surface.",
+			  OrganicMatter::load_syntax);
     syntax.add ("Nitrification", Librarian<Nitrification>::library (),
 		"The soil nitrification process.");
     AttributeList nitrification_alist;
@@ -537,9 +532,9 @@ The organic matter in the soil and on the surface.");
     nitrification_alist.add ("clay_factor", empty);
 
     alist.add ("Nitrification", nitrification_alist);
-    add_submodule<Denitrification> ("Denitrification", syntax, alist,
-				    Syntax::State, "\
-The denitrification process.");
+    syntax.add_submodule ("Denitrification", alist, Syntax::State, "\
+The denitrification process.",
+			  Denitrification::load_syntax);
     syntax.add ("second_year_utilization", "kg N/ha", Syntax::State,
 		"Estimated accumulated second year fertilizer effect.");
     alist.add ("second_year_utilization", 0.0);

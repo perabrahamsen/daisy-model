@@ -214,17 +214,6 @@ struct ActionCrop : public Action
   ~ActionCrop ();
 };
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<ActionCrop::MM_DD>;
-template class add_submodule<ActionCrop::Sow>;
-template class add_submodule<ActionCrop::Annual>;
-template class add_submodule<ActionCrop::Perennial>;
-template class add_submodule_sequence<ActionCrop::Fertilize>;
-template class add_submodule_sequence<ActionCrop::Tillage>;
-template class add_submodule_sequence<ActionCrop::Spray>;
-template class add_submodule<ActionCrop::Irrigation>;
-#endif
-
 bool 
 ActionCrop::MM_DD::match (const Time& time) const
 { return time.month () == month 
@@ -311,7 +300,8 @@ void
 ActionCrop::Sow::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  add_submodule<MM_DD> ("date", syntax, alist, Syntax::Const, "Date to sow.");
+  syntax.add_submodule ("date", alist, Syntax::Const, "Date to sow.",
+			MM_DD::load_syntax);
   syntax.add ("crop", Librarian<Crop>::library (), "Crop to sow.");
   syntax.add ("done", Syntax::Boolean, Syntax::State, 
 	      "True iff the crop has been sowed.");
@@ -367,9 +357,10 @@ ActionCrop::Annual::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Fraction lost during harvest.");
   syntax.add ("remove_residuals", Syntax::Boolean, Syntax::Const,
 	      "Remove residuals at harvest.");
-  add_submodule<MM_DD> ("latest", syntax, alist, Syntax::Const, 
+  syntax.add_submodule ("latest", alist, Syntax::Const, 
 			"Latest harvest date.\n\
-If the crop is ripe before this date, it will be harvested at that point.");
+If the crop is ripe before this date, it will be harvested at that point.",
+			MM_DD::load_syntax);
   syntax.add ("done", Syntax::Boolean, Syntax::State, 
 	      "True iff the crop has been sowed.");
   alist.add ("done", false);
@@ -479,8 +470,9 @@ ActionCrop::Perennial::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Number of seasons to harvest crop.\n\
 The crop will be harvested whenever the specified DS or DM are reached.\n\
 The first season is the year the crop management starts.");
-  add_submodule<MM_DD> ("end", syntax, alist, Syntax::Const, 
-			"End management this date the last season.");
+  syntax.add_submodule ("end", alist, Syntax::Const, 
+			"End management this date the last season.",
+			MM_DD::load_syntax);
   syntax.add ("DS", Syntax::None (), Syntax::Const, 
 	      "Development stage at or above which to initiate harvest.");
   syntax.add ("DM", "kg DM/ha", Syntax::Const, 
@@ -734,10 +726,12 @@ void
 ActionCrop::Irrigation::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  add_submodule<MM_DD> ("from", syntax, alist, Syntax::Const, 
-			"Start of irrigation period.");
-  add_submodule<MM_DD> ("to", syntax, alist, Syntax::Const, 
-			"End of irrigation period.");
+  syntax.add_submodule ("from", alist, Syntax::Const, 
+			"Start of irrigation period.",
+			MM_DD::load_syntax);
+  syntax.add_submodule ("to", alist, Syntax::Const, 
+			"End of irrigation period.",
+			MM_DD::load_syntax);
   syntax.add ("amount", "mm", Syntax::Const, 
 	      "Amount of water to apply on irrigation.");
   syntax.add ("potential", "cm", Syntax::Const, 
@@ -1013,20 +1007,21 @@ static struct ActionCropSyntax
     syntax.add_check (check_alist);
     alist.add ("description", "Manage a specific crop or multicrop.");
 
-    add_submodule<ActionCrop::Sow>("primary", syntax, alist, Syntax::State,
-				   "Primary crop.");
-    add_submodule<ActionCrop::Sow>("secondary", syntax, alist,
-				   Syntax::OptionalState, 
-				   "Secondary crop, if any.");
-    add_submodule<ActionCrop::Annual>("harvest_annual", syntax, alist,
-				      Syntax::OptionalState,
-				      "Harvest parameters for annual crops.");
-    add_submodule<ActionCrop::Perennial>("harvest_perennial", syntax, alist,
-					 Syntax::OptionalState, "\
-Harvest conditions for perennial crops.");
-    add_submodule_sequence<ActionCrop::Fertilize>("fertilize_at", syntax, 
-						  Syntax::Const, "\
-Fertilizer application by date.");
+    syntax.add_submodule ("primary", alist, Syntax::State,
+			  "Primary crop.", ActionCrop::Sow::load_syntax);
+    syntax.add_submodule ("secondary", alist, Syntax::OptionalState, 
+			  "Secondary crop, if any.",
+			  ActionCrop::Sow::load_syntax);
+    syntax.add_submodule ("harvest_annual", alist,
+			  Syntax::OptionalState,
+			  "Harvest parameters for annual crops.", 
+			  ActionCrop::Annual::load_syntax);
+    syntax.add_submodule ("harvest_perennial", alist,
+			  Syntax::OptionalState, "\
+Harvest conditions for perennial crops.",
+			  ActionCrop::Perennial::load_syntax);
+    syntax.add_submodule_sequence("fertilize_at", Syntax::Const, "\
+Fertilizer application by date.", ActionCrop::Fertilize::load_syntax);
     alist.add ("fertilize_at", vector<AttributeList*> ());
     syntax.add ("fertilize_at_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'fertilize_at' to execute.");
@@ -1034,27 +1029,25 @@ Fertilizer application by date.");
     syntax.add ("fertilize_incorporate", Syntax::Boolean, Syntax::Const,
 		"Incorporate organic fertilizer in plowing zone.");
     alist.add ("fertilize_incorporate", false);
-    add_submodule_sequence<ActionCrop::Tillage> ("tillage", syntax, 
-						 Syntax::State, "\
-List of tillage operations to apply.");
+    syntax.add_submodule_sequence ("tillage", Syntax::State, "\
+List of tillage operations to apply.", ActionCrop::Tillage::load_syntax);
     alist.add ("tillage", vector<AttributeList*> ());
     syntax.add ("tillage_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'tillage' to execute.");
     alist.add ("tillage_index", 0);
-    add_submodule_sequence<ActionCrop::Spray> ("spray", syntax, 
-						 Syntax::State, "\
-List of chemicals to apply.");
+    syntax.add_submodule_sequence ("spray", Syntax::State, "\
+List of chemicals to apply.", ActionCrop::Spray::load_syntax);
     alist.add ("spray", vector<AttributeList*> ());
     syntax.add ("spray_index", Syntax::Integer, Syntax::State,
 		"Next entry in 'spray' to execute.");
     alist.add ("spray_index", 0);
-    add_submodule<ActionCrop::Irrigation>("irrigation", syntax, alist,
-					  Syntax::OptionalConst, "\
-Irrigation model for first season.  If missing, don't irrigate.");
-    add_submodule<ActionCrop::Irrigation>("irrigation_rest", syntax, alist,
-					  Syntax::OptionalConst, "\
+    syntax.add_submodule ("irrigation", alist, Syntax::OptionalConst, "\
+Irrigation model for first season.  If missing, don't irrigate.", 
+			  ActionCrop::Irrigation::load_syntax);
+    syntax.add_submodule ("irrigation_rest", alist, Syntax::OptionalConst, "\
 Irrigation model for remaining seasons.\n\
-If missing, use the same model as first season.");
+If missing, use the same model as first season.",
+			  ActionCrop::Irrigation::load_syntax);
     syntax.add ("irrigation_year", Syntax::Integer, Syntax::OptionalState, 
 		"Year management started.\n\
 Negative number means it hasn't started yet.");

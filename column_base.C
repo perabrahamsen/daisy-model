@@ -359,15 +359,6 @@ ColumnBase::~ColumnBase ()
   delete &groundwater;
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<Vegetation>;
-template class add_submodule<Surface>;
-template class add_submodule<Soil>;
-template class add_submodule<SoilWater>;
-template class add_submodule<SoilHeat>;
-template class add_submodule<SoilChemicals>;
-#endif
-
 void
 ColumnBase::load_syntax (Syntax& syntax, AttributeList& alist)
 {
@@ -386,17 +377,21 @@ the simulation.  If unspecified, used global weather.");
 
   syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
 	      "The water and energy distribution among the crops.");
-  add_submodule<Surface> ("Surface", syntax, alist, Syntax::State,
-			  "The upper border of the soil.");
-  add_submodule<Soil> ("Soil", syntax, alist, Syntax::State,
-		       "The numeric and physical soil properties.");
-  add_submodule<SoilWater> ("SoilWater", syntax, alist, Syntax::State,
-			    "Soil water content and transportation.");
-  add_submodule<SoilHeat> ("SoilHeat", syntax, alist, Syntax::State,
-			   "Soil heat and flux.");
-  add_submodule<SoilChemicals> ("SoilChemicals", syntax, alist, 
-				Syntax::State,
-				"Chemicals in the soil.");
+  syntax.add_submodule ("Surface", alist, Syntax::State,
+			"The upper border of the soil.",
+			Surface::load_syntax);
+  syntax.add_submodule ("Soil", alist, Syntax::State,
+		       "The numeric and physical soil properties.",
+			Soil::load_syntax);
+  syntax.add_submodule ("SoilWater", alist, Syntax::State,
+			"Soil water content and transportation.",
+			SoilWater::load_syntax);
+  syntax.add_submodule ("SoilHeat", alist, Syntax::State,
+			"Soil heat and flux.",
+			SoilHeat::load_syntax);
+  syntax.add_submodule ("SoilChemicals", alist, Syntax::State,
+			"Chemicals in the soil.",
+			SoilChemicals::load_syntax);
   syntax.add ("Groundwater", Librarian<Groundwater>::library (),
 	      "The groundwater level.");
   syntax.add ("harvest_DM", "g/m^2", Syntax::LogOnly, 

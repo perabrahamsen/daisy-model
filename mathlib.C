@@ -24,12 +24,13 @@
 #include <assert.h>
 #include <math.h>
 
-#ifndef __sparc__
-// Sun has a cbrt function.
+#if defined (__unix) || defined (__CYGWIN__)
+// It is on SunOS 5.8 and Cygwin libc.
+extern "C" double cbrt (double);
+#else
+// But apparently not on Borland C++ 5.0 or 5.5.
 static double cbrt (double x) 
-{
-  return pow (x, 1.0/3.0);
-}
+{ return pow (x, 1.0/3.0); }
 #endif
 
 // See _Computational_Techniques_for_Differential_Equations page 616.
@@ -69,10 +70,8 @@ tridia (int from,
     }
   // Backward substitution.
   x[N - 1] = y[N - 1] / beta[N - 1];
-  {for (int i = N - 2; i >= from; i--)
-    {
-      x[i] = (y[i] - c[i] * x[i + 1]) / beta[i];
-  }}
+  for (int i = N - 2; i >= from; i--)
+    x[i] = (y[i] - c[i] * x[i + 1]) / beta[i];
 }
 
 inline double pow2 (double x)

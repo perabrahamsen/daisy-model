@@ -26,10 +26,6 @@
 #include "im.h"
 #include "message.h"
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<IM>;
-#endif
-
 struct ActionIrrigate : public Action
 {
   static const double at_air_temperature;
@@ -66,9 +62,9 @@ struct ActionIrrigate : public Action
     syntax.order ("flux");
     syntax.add ("temperature", "dg C", Syntax::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
-    add_submodule<IM> ("solute", syntax, alist, Syntax::Const,
-		       "\
-Nitrogen content of irrigation water [mg N/l] (default: none).");
+    syntax.add_submodule ("solute", alist, Syntax::Const, "\
+Nitrogen content of irrigation water [mg N/l] (default: none).",
+			  IM::load_syntax);
   }
 
   ActionIrrigate (const AttributeList& al)
@@ -249,9 +245,9 @@ Height where you want to start the incorporation (a negative number).");
     syntax.add ("to", "cm", Syntax::Const, "\
 Height where you want to end the incorporation (a negative number).");
 
-    add_submodule<IM> ("solute", syntax, alist, Syntax::Const,
-		       "\
-Nitrogen content of irrigation water [mg N/l] (default: none).");
+    syntax.add_submodule ("solute", alist, Syntax::Const, "\
+Nitrogen content of irrigation water [mg N/l] (default: none).",
+			  IM::load_syntax);
 
     Librarian<Action>::add_type ("set_subsoil_irrigation",
 				 alist, syntax, &make);

@@ -164,10 +164,6 @@ Daisy::initialize (const Syntax& s, Treelog& err)
   field.initialize (time, err, weather);
 }
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule_sequence<Harvest>;
-#endif
-
 void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
@@ -210,8 +206,9 @@ the simulation.");
 	      Syntax::OptionalState, Syntax::Singleton,
 	      "Weather model for providing climate information during\n\
 the simulation.  Can be overwritten by column specific weather.");
-  add_submodule_sequence<Harvest> ("harvest", syntax, Syntax::State, 
-				   "Total list of all crop yields.");
+  syntax.add_submodule_sequence ("harvest", Syntax::State, 
+				 "Total list of all crop yields.",
+				 Harvest::load_syntax);
   alist.add ("harvest", vector<AttributeList*> ());
 }
 

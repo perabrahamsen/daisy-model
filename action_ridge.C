@@ -42,10 +42,6 @@ struct ActionRidge : public Action
     { }
 };
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<Ridge>;
-#endif
-
 // Add the ActionRidge syntax to the syntax table.
 static struct ActionRidgeSyntax
 {
@@ -57,8 +53,9 @@ static struct ActionRidgeSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Ridge a ridge on the field.");
-    add_submodule<Ridge> ("ridge", syntax, alist, Syntax::Const,
-			  "Ridge parameters");
+    syntax.add_submodule ("ridge", alist, Syntax::Const,
+			  "Ridge parameters",
+			  Ridge::load_syntax);
     syntax.order ("ridge");
     Librarian<Action>::add_type ("ridge", alist, syntax, &make);
   }
