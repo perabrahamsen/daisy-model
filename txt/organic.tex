@@ -50,7 +50,7 @@ might include organic fertilizer, crop residuals, including
 rhizodeposition and dead leaves incorporated to the soil by
 earthworms.  This fraction is conventionally called \emph{added
   organic matter}, or \textsc{aom}.  Then we have the \emph{soil
-  microbial biomass}, or \textsc(smb), the living part of the organic
+  microbial biomass}, or \textsc{smb}, the living part of the organic
 matter, excluding roots.  Finally we have the humus, the \emph{soil
   organic matter} (\textsc{som}), which can no longer be traced back
 to its origin.  The dynamics of the system consist of input in the
@@ -69,6 +69,8 @@ experiments and some long time scenarios, a single pool may be enough.
 To simulate input sources from real farming, two pools per source are
 in general needed per source.
 
+\section{The Daisy Model}
+
 In several comparisons (see XXX, YYY, ZZZ), \daisy{} (see XYZZY) has
 been among the best models for both short and long term predictions of
 soil matter, and \daisy{} will be the reference for the rest of this
@@ -76,7 +78,6 @@ article.  Apart from soil organic matter, \daisy{} also simulate a
 number of other processes, such as water, heat and nitrogen dynamics
 in the soil, as well as biocliamte, crop development and management.
 
-\section{Evolution of the Daisy model}
 
 The purpose of the \daisy{} model is to simulate real farming
 practice, both on the short and the long term.  Thus, we get a system
@@ -85,12 +86,17 @@ pools for each type of fertilizer applied and crop residual left on the
 field.  The original model is depicted in figure~\ref{fig:om1}.
 \begin{figure}[htbp]
   \centering
-  
+  \includegraphics[width=0.8\hsize]{om1}
+\begin{verbatim}
+SH: check værdier, specielt smb.  Er 50\% efficiency ok med sander (i
+den ny model)?
+\end{verbatim}
   \caption{The original Daisy OM parameterization.}
   \label{fig:om1}
 \end{figure}
-
 PA: turnover rates, fractions, efficiency, maintenance, (abiotic factors).
+
+\section{Evolution of the Daisy model}
 
 The \daisy{} software allows the user to adjust all of these
 parameters.  It also allows the user to specify the number of \textsc{som}
@@ -114,7 +120,7 @@ The current model is depicted in~\ref{fig:om2}.  The purpose of the
 SOM3 pool in that figure will be explained later.
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.8\hsize]{om1}
+  \includegraphics[width=0.8\hsize]{om2}
   
   \caption{New parameterization.}
   \label{fig:om2}
@@ -184,7 +190,7 @@ was a strong tendency that users just picked the equilibrium values.
 \section{Long term simulations}
 
 As part of the standardization project mentioned earlier (see XXX),
-Henrik Svendsen used \daisy{} to simulate the effect on soil organic
+We used \daisy{} to simulate the effect on soil organic
 matter of changing farming practice.  Figure~\ref{fig:clayom} shows a
 system that goes from equilibrium at a high level of carbon input, to
 equilibirum at a low level of carbon input.  Danish farming practice
@@ -268,7 +274,7 @@ pools to \textsc{som1}, so $o$ will always be zero.  The reason we
 include these, is that we are trying to solve the initialization
 problem in a way that is robust with regard to changes in the model.
 The description is also robust with regard to the number of
-pools\footnote{The generalized form is: 
+pools\footnote{The generalized form used by the \daisy{} program is: 
   \begin{displaymath}
     \begin{array}{rclcr}
       \Delta\mbox{\textsc{smb}}i &=& \displaystyle
@@ -283,12 +289,12 @@ pools\footnote{The generalized form is:
       &;&j = 1\ldots\mbox{\#\textsc{som}}\nonumber
     \end{array}
   \end{displaymath}
-}, adding a new pool will just one more equation, and two new unknowns.
+}, adding a new pool will just add one more equation, and two new unknowns.
 
 Back to the two pool example.  We have four equations and nine
 unknowns.  We need more information.  The first piece of information
 we can add is the total organic matter content in the field, which can
-be directly measured.  This give is one new equation, and two new
+be directly measured.  This gives us one new equation, and two new
 variables.
 \begin{equation}
   \label{eq:total}
@@ -297,8 +303,9 @@ variables.
 \end{equation}
 \textsc{total} is measured.  \mbox{\textsc{aom}}, the initial content
 of added organic matter, is given a default value corresponding to
-typical root residuals left from a crop.  We now miss four equations,
-one for each pool.
+typical root residuals left from a crop.  We now need four more
+equations\footnote{Everybody: Four more equations!  Four more
+  equations!}, one for each pool.
 
 The equilibrium assumption corresponds to adding these four equations: 
 \begin{displaymath}
@@ -308,21 +315,22 @@ The equilibrium assumption corresponds to adding these four equations:
 Even though we earlier argued that it was not good for initializing
 the system, we can use it to obtain an estimate of
 $\Delta\mbox{\textsc{aom}}$, the carbon input level required to
-maintain the measured amount of organic matter in the soil.
+maintain the measured amount of organic matter in the soil, which may
+be interesting in itself.
 
-The initializing procedude we ended up using was to allow the slowest
+The initializing procedure we ended up using was to allow the slowest
 pool (which happens to be \textsc{som1}) to change, but require the
 user specify the carbon input to the system ($u$).  We then get:
 \begin{eqnarray}
   \Delta\mbox{\textsc{smb1}} &=& 0\\
   \Delta\mbox{\textsc{smb2}} &=& 0\\
-  \Delta\mbox{\textsc{som2}} &=& 0\\\label{eq:fastpooleq}
+  \Delta\mbox{\textsc{som2}} &=& 0\label{eq:fastpooleq}\\
   \Delta\mbox{\textsc{aom}} &=& u
 \end{eqnarray}
 
 We now have nine equations with nine unknowns, and can initialize the
 system.  The physical interpretation of this initialization is that
-all but the slowest pool has reach a quasi-equilibrium with respect to
+all but the slowest pool have reached a quasi-equilibrium with respect to
 the input, and the size of the slowest pool.  Since the slowest pool
 is still changing (and the other pools will have to change to reflect
 that), this is not a true equilibrium.
@@ -336,7 +344,7 @@ equation~\ref{eq:fastpooleq} with
   \Delta\mbox{\textsc{smb1}} + \Delta\mbox{\textsc{smb2}} 
   + \Delta\mbox{\textsc{som1}} + \Delta\mbox{\textsc{som2}} = v
 \end{displaymath}
-where $v$ is the user specified change in carbon content.  Since out
+where $v$ is the user specified change in carbon content.  Since our
 users are generally more concerned with nitrogen than with carbon, we
 ask them to specify the \emph{background mineralization} ($w$), which
 is the amount of nitrogen the rest of the system gets or loses from
@@ -348,9 +356,10 @@ the soil.  The equation is then
   + \frac{\Delta\mbox{\textsc{som2}}}{{C/N}_{\mbox{\small\textsc{som2}}}}
   = w
 \end{displaymath}
-The simulated background mineralization will only be the specified
-value ($w$) if the simlated carbon input also corresponds to the
-specified value ($u$).
+Note that the simulated background mineralization will only be the
+specified value ($w$) if the simlated carbon input also corresponds to
+the specified value ($u$).  If we are simulating the effect of a
+proposed change in management practice, this will not be the case.
 
 In conclusion, we can now initialize the soil organic matter system
 from two or three numbers supplied by the user.  The two mandatory
@@ -359,9 +368,9 @@ how much carbon has been added to the system per year in the recent
 decades.  The third, optional, number is the estimated background
 mineralization.  The first number is directly measurable, the two
 other can at least be understood by people who have no intimate
-knowledge of the model, and can be estimated by the user from \daisy{}
-simulations.  None of the numbers will have to be changed when the
-model itself is changed.
+knowledge of the model, and can be estimated by the user, for example
+from the use of \daisy{} simulations.  None of the numbers need to be
+changed when the model itself is changed.
 
 \section{Assumptions and limitations}
 
@@ -369,7 +378,7 @@ In the equations we used a large number of constants, without
 indicating how we calculate them.  Here is the formula for calculating
 $a$ from the first equation.
 \begin{displaymath}
-  a = t_{\mbox{\tiny\textsc{smb1}}}\,
+  a = (t_{\mbox{\tiny\textsc{smb1}}}\,
   (X_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb1}}}}\,
   E_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb1}}}}
   - 1) - m_{\mbox{\tiny\textsc{smb1}}})\,
