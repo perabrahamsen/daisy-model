@@ -181,5 +181,3 @@ Parameters estimated from soil texture as specified by Cosby et at.");
     Librarian<Hydraulic>::add_type ("Cosby_et_al", alist, syntax, &make);
   }
 } hydraulic_Cosby_syntax;
-
-

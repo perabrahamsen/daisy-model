@@ -260,7 +260,7 @@ struct WeatherStandard : public Weather
   { return has_reference_evapotranspiration_; }
 
   bool has_vapor_pressure () const
-  { return has_vapor_pressure_; }
+  { return has_vapor_pressure_ || has_relative_humidity; }
 
   bool has_wind () const
   { return has_wind_speed; }

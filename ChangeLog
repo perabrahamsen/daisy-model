@@ -1,3 +1,12 @@
+2005-02-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic.C: New 'hydraulic' program.
+
+2005-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (has_vapor_pressure): Also trigger if
+	has_relative_humidity. 
+
 2005-02-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* program_refdoc.C: Removed.

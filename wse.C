@@ -213,7 +213,7 @@ static struct ProgramWSE_tableSyntax
                 Syntax::Const, Syntax::Singleton, "\
 The water stress effect to show in the table.");
     syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
-Number of intervals in the table");
+Number of intervals in the table.");
     alist.add ("intervals", 10);
     syntax.order ("wse");
     Librarian<Program>::add_type ("wse", alist, syntax, &make);

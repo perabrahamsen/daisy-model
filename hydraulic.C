@@ -26,6 +26,16 @@
 #include "tmpstream.h"
 #include "check_range.h"
 #include "mathlib.h"
+#include "program.h"
+#include "vcheck.h"
+#include <memory>
+
+EMPTY_TEMPLATE
+Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content = NULL;
+
+const char *const Hydraulic::description = "\
+This component is responsible for specifying the soils hydraulic\n\
+properties.";
 
 struct Hydraulic::K_at_h
 {
@@ -199,9 +209,78 @@ Hydraulic::Hydraulic (const AttributeList& al)
 Hydraulic::~Hydraulic ()
 { }
 
-EMPTY_TEMPLATE
-Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content = NULL;
+struct ProgramHydraulic_table : public Program
+{
+  const std::auto_ptr<Hydraulic> hydraulic;
+  const int intervals;
 
-const char *const Hydraulic::description = "\
-This component is responsible for specifying the soils hydraulic\n\
-properties.";
+  void run (Treelog& msg)
+  {
+    TmpStream tmp;
+    tmp () << "pressure\tpressure\tTheta\tK\n";
+    tmp () << "pF\tcm\t%\tcm/h\n";
+    for (int i = 0; i <= intervals; i++)
+      {
+        const double pF = (5.0 * i) / (intervals + 0.0);
+        const double h = pF2h (pF);
+        const double Theta = hydraulic->Theta (h) * 100;
+        const double K = hydraulic->K (h);
+        tmp () << pF << "\t" << h << "\t" << Theta << "\t" << K << "\n";
+      }
+    msg.message (tmp.str ());
+  }
+
+  // Create and Destroy.
+  void initialize (const Syntax*, const AttributeList*, Treelog&)
+  { };
+  bool check (Treelog&)
+  { return true; }
+  ProgramHydraulic_table (const AttributeList& al)
+    : Program (al),
+      hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
+      intervals (al.integer ("intervals"))
+  { }
+  ~ProgramHydraulic_table ()
+  { }
+};
+
+static const class CheckNoPedo : public VCheck
+{
+  void check (const Syntax&, const AttributeList& alist,
+              const std::string& key) const throw (std::string)
+  {
+    daisy_assert (alist.check (key));
+    const AttributeList& hydraulic = alist.alist (key); 
+    daisy_assert (hydraulic.check ("type"));
+    const symbol type = hydraulic.identifier ("type");
+    const Library& library = Librarian<Hydraulic>::library ();
+    daisy_assert (library.check (type));
+
+    if (library.is_derived_from (type, symbol ("hypres"))
+        || library.is_derived_from (type, symbol ("Cosby_et_al")))
+      throw std::string ("You can not print pedotransfer models");
+  }
+} no_pedo;
+
+static struct ProgramHydraulic_tableSyntax
+{
+  static Program&
+  make (const AttributeList& al)
+  { return *new ProgramHydraulic_table (al); }
+  ProgramHydraulic_tableSyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "\
+Generate a table of the rentention curve and hydraulic conductivity.");
+    syntax.add ("hydraulic", Librarian<Hydraulic>::library (), 
+                Syntax::Const, Syntax::Singleton, "\
+The hydraulic model to show in the table.");
+    syntax.add_check ("hydraulic", no_pedo);
+    syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
+Number of intervals in the table.");
+    alist.add ("intervals", 50);
+    syntax.order ("hydraulic");
+    Librarian<Program>::add_type ("hydraulic", alist, syntax, &make);
+  }
+} ProgramHydraulic_table_syntax;

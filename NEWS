@@ -14,16 +14,36 @@ release.
 
 * 3.69
 
+** New "hydraulic" program.
+
+This program print the retention curve and conductivity curve for the
+specified hydraulic model.
+
+  (run hydraulic (M_vG (l -1.56461)
+                       (n 1.36539)
+                       (alpha 0.064593)
+                       (K_sat 4.04833 [cm/h])
+                       (Theta_sat 0.386942)))
+
+Note that you can not do this for the pedotransfer functions (hypres
+and Cosby_et_al).  However, when you actually use one of the
+pedotransfer models in a sumulation, the parameters of the underlying
+model will be written to 'daisy.log'.
+
 ** field seperator now obeyed for time columns in table log.
 
 ** New log-sample.dai file in sample directory.
 
 This file contain additional log model parameterizations, serving as
-examples of how to create your owm, geared towards comparing simulated
+examples of how to create your owr, geared towards comparing simulated
 and measured data.
 
 Since measured data tend to wary a lot, standardized files are less
 useful. 
+
+** Daisy will now choose the FAO_PM pet model by default if RelHum is given.
+
+Rather than just VapPres.  
 
 * 3.68
 

@@ -32,7 +32,6 @@
 #include <vector>
 
 class Soil;
-class Daisy;
 class Time;
 class Treelog;
 
