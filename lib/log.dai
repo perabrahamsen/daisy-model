@@ -2110,7 +2110,8 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
 			  ("Residuals_C_top"
 			   (name "Residuals"))
 			  ("Residuals_C_soil"
-			   (name "Roots")))
+			   (name "Roots"))
+                          ("BioInc CO2" (factor -1.0)))
 		   (sum_name "Total C input")
 		   (period "y")
 		   (precision 0)))
