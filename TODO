@@ -22,6 +22,9 @@ Al mineralisering fra første horizont?
 
 ** Tilføj beskrivelse til tutorial.
 
+** Akademisk bekrivelse?
+
+Til referencemanual?
 * exercises 
 
 ** Konverter til LaTeX
@@ -31,8 +34,6 @@ Al mineralisering fra første horizont?
 * SH: PowerPoint slides på hjemmeside.
 
 * Check let at bruge GUI version of CVS til Windows.
-
-* Soil geometry discretization: max interval 2 * dispersivity
 
 * SH: Ny ref-evap model
 
@@ -56,13 +57,19 @@ Start ved specifik dato.
 
 * horizon.dai 
 
-Indeholder en standard lerjord, dansjord m.m. ligesom hydros2d
+Indeholder en standard lerjord, sandjord m.m. ligesom hydros2d
 
-* stop kommando.
+* top level stop kommando.
 
 * split common.h op i sysdeps.h, stlutils.h og timestep.h
 
 * saml check.? og check_range.?
+
+* units doc
+
+** kapitel med konverteringer til ref.manual
+
+** Foreslå laternativer ved fejl? (højde i pF?)
 
 * DOM
 

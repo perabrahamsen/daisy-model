@@ -1162,7 +1162,6 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 						 clayom.smb_use_clay (i), lay);
 	  const double in = smb[i]->turnover_rate 
 	    * smb[i]->fractions[smb_size + pool]
-	    * smb[i]->efficiency[smb_size + pool]
 	    * abiotic_factor;
 	  
 	  if (in > 1e-100)
@@ -1179,7 +1178,6 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	    : 0.0;
 	  const double in = som[i]->turnover_rate 
 	    * som[i]->fractions[smb_size + pool]
-	    * som[i]->efficiency[smb_size + pool]
 	    * abiotic_factor;
 
 	  if (fabs (in - out) > 1e-100)
@@ -1332,6 +1330,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	      equation_string () << " " << value << " dSOM" << pool + 1;
 	    }
 	}
+      equation_string () << "\n";
     }
   if (print_equations)
     if (debug_to_screen)
