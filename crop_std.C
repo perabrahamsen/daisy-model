@@ -1,5 +1,7 @@
 // crop_std.C
 
+// #define LOG_AT_23
+
 #include "crop.h"
 #include "log.h"
 #include "time.h"
@@ -933,7 +935,7 @@ This parameterization is only valid until the specified development state.");
 	      "Potential evapotranspiration factor.");
   vCanopy.add ("EpFac", 1.0);
   Canopy.add ("rs_max", "s/m", Syntax::Const,
-	      "Maximum transpiiration resistance.");
+	      "Maximum transpiration resistance.");
   vCanopy.add ("rs_max", 1.0e5);
   Canopy.add ("rs_min", "s/m", Syntax::Const,
 	      "Minimum transpiration resistance.");
@@ -1491,9 +1493,9 @@ CropStandard::Emergence ()
 {
   const Parameters::DevelPar& Devel = par.Devel;
   double& DS = var.Phenology.DS;
-  const h = var.Phenology.soil_h;
+  const double h = var.Phenology.soil_h;
 
-  DS += var.Phenology.soil_temperature / Devel.EmrTSum * Devel.EmrSMF(h);
+  DS += var.Phenology.soil_temperature / Devel.EmrTSum * Devel.EmrSMF (h);
   if (DS > 0)
     DS = Devel.DS_Emr;
 }
@@ -2033,6 +2035,10 @@ CropStandard::NitContent ()
         + CrpN.CrSOrgCnc (DS)) * Prod.WSOrg;
       Prod.NRoot = Prod.NCrop - Prod.NLeaf - Prod.NStem - Prod.NSOrg;
     }
+  assert (Prod.NLeaf >= 0.0);
+  assert (Prod.NStem >= 0.0);
+  assert (Prod.NSOrg >= 0.0);
+  assert (Prod.NRoot >= 0.0);
 }
 
 void
@@ -2047,7 +2053,11 @@ CropStandard::NitrogenUptake (int Hour,
   double& NCrop = var.Prod.NCrop;
   Variables::RecRootSys& RootSys = var.RootSys;
 
+#ifdef LOG_AT_23
+  double PotNUpt = (CrpAux.PtNCnt - NCrop) / (24.0 - Hour);
+#else
   double PotNUpt = (CrpAux.PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
+#endif
   if (PotNUpt > 0)
     {
       CrpAux.NH4Upt
@@ -2218,15 +2228,17 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 			     const Geometry& geometry,
 			     const SoilHeat& soil_heat)
 {
+  // Remobilization
+  const double ReMobil = ReMobilization ();
+  var.Prod.CH2OPool += ReMobil;
+
+
   const Parameters::ProdPar& pProd = par.Prod;
   const double DS = var.Phenology.DS;
   const double Depth = var.RootSys.Depth;
   Variables::RecProd& vProd = var.Prod;
   Variables::RecCrpAux& CrpAux = var.CrpAux;
   double NetAss = CrpAux.CanopyAss;
-
-  const double ReMobil = ReMobilization ();
-  var.Prod.CH2OPool += ReMobil;
 
   const double AirT = bioclimate.daily_air_temperature ();
   const double SoilT = soil_heat.T (geometry.interval_plus (-Depth / 3));
@@ -2292,10 +2304,10 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 	{
 	  CrpAux.IncWStem = var.Prod.CH2OPool - RMStem - ReMobil;
           if (vProd.WStem + CrpAux.IncWStem + CrpAux.IncWSOrg >= 0.0
-            && vProd.WStem > vProd.WSOrg)
+	      && vProd.WStem > vProd.WSOrg)
             {
-            CrpAux.IncWStem += CrpAux.IncWSOrg;
-            CrpAux.IncWSOrg  = 0.0;
+	      CrpAux.IncWStem += CrpAux.IncWSOrg;
+	      CrpAux.IncWSOrg  = 0.0;
             }
 	  var.Prod.CH2OPool = 0.0;
 	}
@@ -2318,24 +2330,36 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   // Update dead leafs
   CrpAux.DeadWLeaf = pProd.LfDR (DS) / 24.0 * vProd.WLeaf;
   CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * CrpAux.CAImRat / 24.0;
+  assert (CrpAux.DeadWLeaf >= 0.0);
   double DdLeafCnc;
   if (vProd.NCrop > 1.05 * CrpAux.PtNCnt)
     DdLeafCnc = vProd.NLeaf/vProd.WLeaf;
   else
     DdLeafCnc = (vProd.NLeaf/vProd.WLeaf - par.CrpN.NfLeafCnc (DS))
       * ( 1.0 - par.CrpN.TLLeafEff (DS)) +  par.CrpN.NfLeafCnc (DS);
+  assert (DdLeafCnc >= 0.0);
+  assert (CrpAux.DeadWLeaf >= 0.0);
   CrpAux.DeadNLeaf = DdLeafCnc * CrpAux.DeadWLeaf;
+  assert (CrpAux.DeadNLeaf >= 0.0);
   CrpAux.IncWLeaf -= CrpAux.DeadWLeaf;
   assert (CrpAux.DeadWLeaf >= 0.0);
   vProd.WDead += (1.0 - par.Prod.ExfoliationFac) * CrpAux.DeadWLeaf;
   vProd.NDead += (1.0 - par.Prod.ExfoliationFac) * CrpAux.DeadNLeaf;
+  assert (vProd.NDead >= 0.0);
+
   const double C_foli = par.Harvest.C_Dead *
                         par.Prod.ExfoliationFac * CrpAux.DeadWLeaf;
   const double N_foli = par.Prod.ExfoliationFac * CrpAux.DeadNLeaf;
-  assert (C_foli == 0.0 || N_foli > 0.0);
-  vProd.AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
-  vProd.C_AM += C_foli;
-  vProd.N_AM += N_foli;
+  assert (N_foli >= 0.0);
+  if (C_foli < 1e-50)
+    assert (N_foli < 1e-40);
+  else
+    {
+      assert (N_foli > 0.0);
+      vProd.AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
+      vProd.C_AM += C_foli;
+      vProd.N_AM += N_foli;
+    }
 
   // Update dead roots.
   double RtDR = pProd.RtDR (DS);
@@ -2402,7 +2426,12 @@ CropStandard::tick (const Time& time,
   var.Phenology.soil_h =
     soil_water.h (soil.interval_plus (-par.Root.DptEmr/2.));
 
-  if (time.hour () == 0 && var.Phenology.DS <= 0)
+  if 
+#ifdef LOG_AT_23
+    (time.hour () == 23 && var.Phenology.DS <= 0)
+#else
+    (time.hour () == 0 && var.Phenology.DS <= 0)
+#endif
     {
       // Calculate average soil temperature.
       var.Phenology.soil_temperature =
@@ -2453,9 +2482,13 @@ CropStandard::tick (const Time& time,
       var.Prod.CH2OPool += ProdLim * Ass;
     }
   NetProduction (bioclimate, soil, soil_heat);
+#ifdef LOG_AT_23
+  if (time.hour () != 23)
+    return;
+#else
   if (time.hour () != 0)
     return;
-
+#endif
   // Update final daylength.
   var.Phenology.day_length = var.Phenology.partial_day_length;
   var.Phenology.partial_day_length = 0.0;

@@ -22,8 +22,7 @@ public:
 	  (*i)->doIt (daisy);
 	}
     }
-
-  bool check (Daisy& daisy) const
+  bool check (const Daisy& daisy) const
     { 
       bool ok = true;
       for (vector<const Action*>::const_iterator i = actions.begin ();
@@ -42,7 +41,7 @@ public:
     }
 
   ActionWithColumn (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       column (al.name ("column")),
       actions (map_create<Action> (al.alist_sequence ("actions")))
     { }

@@ -45,7 +45,7 @@ struct BioclimateStandard : public Bioclimate
   double snow_ep;		// Potential snow evaporation [mm/h]
   double snow_ea;		// Actual snow evaporation [mm/h]
   double snow_water_in;		// Water entering snow pack [mm/h]
-  double snow_water_in_temperature; // Incomming water temperature [dg C]
+  double snow_water_in_temperature; // Incoming water temperature [dg C]
   double snow_water_out;	// Water leaving snow pack [mm/h]
   double snow_water_out_temperature; // Temperature of water leaving [dg C]
 
@@ -53,7 +53,7 @@ struct BioclimateStandard : public Bioclimate
   double canopy_ep;		// Potential canopy evaporation [mm/h]
   double canopy_ea;		// Actual canopy evaporation [mm/h]
   double canopy_water_storage;	// Intercepted water on canopy [mm]
-  double canopy_water_temperature; // Temperature of incomming water [dg C]
+  double canopy_water_temperature; // Temperature of incoming water [dg C]
   double canopy_water_in;	// Water entering canopy [mm/h]
   double canopy_water_out;	// Canopy drip throughfall [mm/h]
   double canopy_water_bypass;	// Water from above bypassing the canopy [mm/h]
@@ -268,7 +268,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
     }
 
   // Fraction of Photosynthetically Active Radiation in Shortware
-  // incomming radiation. 
+  // incoming radiation. 
   static const double PARinSi = 0.50;	
 
   // Average Canopy Extinction coefficient
@@ -665,7 +665,7 @@ Number of vertical intervals in which we partition the canopy.");
 		  "Intercepted water on canopy.");
       alist.add ("canopy_water_storage", 0.0);
       syntax.add ("canopy_water_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of incomming water.");
+		  "Temperature of incoming water.");
       syntax.add ("canopy_water_in", "mm/h", Syntax::LogOnly,
 		  "Water entering canopy.");
       syntax.add ("canopy_water_out", "mm/h", Syntax::LogOnly,

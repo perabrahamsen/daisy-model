@@ -665,7 +665,7 @@ static struct AM_Syntax
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
-Most AM models are only used for initializaing, they will be comnverted \
+Most AM models are only used for initialization, they will be comnverted \
 to this generic model after creation, so this is what you will see in a \
 checkpoint.  This model contains a number (typically 2) of separate \
 pools, each of which have their own turnover rate.");
@@ -763,7 +763,7 @@ uniformly distributed in each layer.");
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
-	alist.add ("description", "Initializaition of old root remains.");
+	alist.add ("description", "Initialization of old root remains.");
 	syntax.add ("creation", Syntax::Date, Syntax::State,
 		    "Start of simulation.");
 	alist.add ("creation", Time (1, 1, 1, 1));
@@ -771,7 +771,7 @@ uniformly distributed in each layer.");
 	syntax.add ("depth", "cm", Syntax::Const, "\
 How far down does the old root reach? (a negative number)");
 	syntax.add ("dist", "cm", Syntax::Const, "\
-Distance to go down in order to decrate the root density to half the \
+Distance to go down in order to decrease the root density to half the \
 original.");
 	syntax.add ("weight", "T DM/ha", Syntax::Const, 
 		    "Total weight of old root dry matter.");

@@ -34,7 +34,7 @@ struct ActionFertilize : public Action
 	}
     }
 
-  bool check (Daisy& daisy) const
+  bool check (const Daisy& daisy) const
     {
       bool ok = true;
       if (am.name ("syntax") != "mineral" && !daisy.field.check_am (am))
@@ -43,7 +43,7 @@ struct ActionFertilize : public Action
     }
 
   ActionFertilize (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       am (al.alist ("am")), 
       from (al.number ("from")),
       to (al.number ("to"))
@@ -81,16 +81,16 @@ static struct ActionFertilizeSyntax
     syntax.add_check (check);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Apply fertilizer to the soil.\n\
-If you want to incoorperate the fertilizer directly in the soil, specify\n\
+If you want to incorporate the fertilizer directly in the soil, specify\n\
 the `from' and `to' parameters.  By default, the fertilizer will be\n\
 left on the surface.");
     syntax.add ("am", Librarian<AM>::library (), "\
 The type of fertilizer you want to apply.");
     syntax.add ("from", "cm", Syntax::Const, "\
-Height where you want to start the incoorperation (a negative number).");
+Height where you want to start the incorporation (a negative number).");
     alist.add ("from", 0.0);
     syntax.add ("to", "cm", Syntax::Const, "\
-Height where you want to end the incoorperation (a negative number).");
+Height where you want to end the incorporation (a negative number).");
     alist.add ("to", 0.0);
     syntax.order ("am");
     Librarian<Action>::add_type ("fertilize", alist, syntax, &make);

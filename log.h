@@ -159,8 +159,8 @@ output_vector (T const& items,
     {
       Filter& f1 = filter.lookup (name);
       log.open (name);
-      for (typename T::const_iterator item = items.begin();
-	   item != items.end();
+      for (typename T::const_iterator item = items.begin ();
+	   item != items.end ();
 	   item++)
 	{
 	  log.open_unnamed ();

@@ -8,8 +8,11 @@ struct ConditionFalse : public Condition
 {
   bool match (const Daisy&) const
     { return false; }
+  void output (Log&, Filter&) const
+    { }
 
-  ConditionFalse (const AttributeList&)
+  ConditionFalse (const AttributeList& al)
+    : Condition (al)
     { }
 
   ~ConditionFalse ()
@@ -20,8 +23,11 @@ struct ConditionTrue : public Condition
 {
   bool match (const Daisy&) const
     { return true; }
+  void output (Log&, Filter&) const
+    { }
 
-  ConditionTrue (const AttributeList&)
+  ConditionTrue (const AttributeList& al)
+    : Condition (al)
     { }
 
   ~ConditionTrue ()
@@ -43,9 +49,12 @@ struct ConditionOr : public Condition
 	}
       return false;
     }
+  void output (Log&, Filter&) const
+    { }
 
   ConditionOr (const AttributeList& al)
-    : conditions (map_create_const<Condition> (al.alist_sequence ("operands")))
+    : Condition (al),
+      conditions (map_create_const<Condition> (al.alist_sequence ("operands")))
     { }
 
   ~ConditionOr ()
@@ -72,9 +81,12 @@ struct ConditionAnd : public Condition
 	}
       return true;
     }
+  void output (Log&, Filter&) const
+    { }
 
   ConditionAnd (const AttributeList& al)
-    : conditions (map_create_const<Condition> (al.alist_sequence ("operands")))
+    : Condition (al),
+      conditions (map_create_const<Condition> (al.alist_sequence ("operands")))
     { }
 
   ~ConditionAnd ()
@@ -92,9 +104,12 @@ struct ConditionNot : public Condition
 
   bool match (const Daisy& daisy) const
     { return !condition.match (daisy); }
+  void output (Log&, Filter&) const
+    { }
 
   ConditionNot (const AttributeList& al)
-    : condition (Librarian<Condition>::create (al.alist ("operand")))
+    : Condition (al),
+      condition (Librarian<Condition>::create (al.alist ("operand")))
     { }
 
   ~ConditionNot ()
@@ -118,9 +133,12 @@ struct ConditionIf : public Condition
       else
 	return else_c.match (daisy); 
     }
+  void output (Log&, Filter&) const
+    { }
 
   ConditionIf (const AttributeList& al)
-    : if_c (Librarian<Condition>::create (al.alist ("if"))),
+    : Condition (al),
+      if_c (Librarian<Condition>::create (al.alist ("if"))),
       then_c (Librarian<Condition>::create (al.alist ("then"))),
       else_c (Librarian<Condition>::create (al.alist ("else")))
     { }

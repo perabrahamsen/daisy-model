@@ -4,14 +4,95 @@
 #include "time.h"
 #include "daisy.h"
 
+struct ConditionMMDD : public Condition
+{
+  const int month;
+  const int day;
+  const int hour;
+public:
+  bool match (const Daisy& daisy) const
+  {
+    return daisy.time.month () == month
+      && daisy.time.mday () == day 
+      && daisy.time.hour () == hour; 
+  }
+  void output (Log&, Filter&) const
+  { }
+  ConditionMMDD (const AttributeList& al)
+    : Condition (al),
+      month (al.integer ("month")),
+      day (al.integer ("day")),
+      hour (al.integer ("hour"))
+  { }
+  static Condition& make (const AttributeList& al)
+  { return *new ConditionMMDD (al); }
+};
+
+struct ConditionBeforeMMDD : public Condition
+{
+  const int month;
+  const int day;
+  const int hour;
+public:
+  bool match (const Daisy& daisy) const
+  {
+    return daisy.time.month () < month
+      || (daisy.time.month () == month
+	  && daisy.time.mday () < day)
+      || (daisy.time.month () == month
+	  && daisy.time.mday () == day
+	  && daisy.time.hour () < hour);
+  }
+  void output (Log&, Filter&) const
+  { }
+  ConditionBeforeMMDD (const AttributeList& al)
+    : Condition (al),
+      month (al.integer ("month")),
+      day (al.integer ("day")),
+      hour (al.integer ("hour"))
+  { }
+  static Condition& make (const AttributeList& al)
+  { return *new ConditionBeforeMMDD (al); }
+};
+
+struct ConditionAfterMMDD : public Condition
+{
+  const int month;
+  const int day;
+  const int hour;
+public:
+  bool match (const Daisy& daisy) const
+  {
+    return daisy.time.month () > month
+      || (daisy.time.month () == month
+	  && daisy.time.mday () > day)
+      || (daisy.time.month () == month
+	  && daisy.time.mday () == day
+	  && daisy.time.hour () > hour);
+  }
+  void output (Log&, Filter&) const
+  { }
+  ConditionAfterMMDD (const AttributeList& al)
+    : Condition (al),
+      month (al.integer ("month")),
+      day (al.integer ("day")),
+      hour (al.integer ("hour"))
+  { }
+  static Condition& make (const AttributeList& al)
+  { return *new ConditionAfterMMDD (al); }
+};
+
 struct ConditionAt : public Condition
 {
   const Time time;
 public:
   bool match (const Daisy& daisy) const
   { return time == daisy.time; }
+  void output (Log&, Filter&) const
+  { }
   ConditionAt (const AttributeList& al)
-    : time (al.time ("time"))
+    : Condition (al),
+      time (al.time ("time"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionAt (al); }
@@ -23,8 +104,11 @@ struct ConditionBefore : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return time > daisy.time; }
+  void output (Log&, Filter&) const
+  { }
   ConditionBefore (const AttributeList& al)
-    : time (al.time ("time"))
+    : Condition (al),
+      time (al.time ("time"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionBefore (al); }
@@ -36,8 +120,11 @@ struct ConditionAfter : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return time < daisy.time; }  
+  void output (Log&, Filter&) const
+  { }
   ConditionAfter (const AttributeList& al)
-    : time (al.time ("time"))
+    : Condition (al),
+      time (al.time ("time"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionAfter (al); }
@@ -51,8 +138,11 @@ struct ConditionHourly : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return ((24 * daisy.time.yday () + daisy.time.hour ()) % step) == 0; }
+  void output (Log&, Filter&) const
+  { }
   ConditionHourly (const AttributeList& al)
-    : step (al.integer ("step"))
+    : Condition (al),
+      step (al.integer ("step"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionHourly (al); }
@@ -64,8 +154,11 @@ struct ConditionDaily : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
+  void output (Log&, Filter&) const
+  { }
   ConditionDaily (const AttributeList& al)
-    : step (al.integer ("step"))
+    : Condition (al),
+      step (al.integer ("step"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionDaily (al); }
@@ -77,8 +170,11 @@ struct ConditionWeekly : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
+  void output (Log&, Filter&) const
+  { }
   ConditionWeekly (const AttributeList& al)
-    : step (7 * al.integer ("step"))
+    : Condition (al),
+      step (7 * al.integer ("step"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionWeekly (al); }
@@ -90,8 +186,11 @@ struct ConditionMonthly : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
+  void output (Log&, Filter&) const
+  { }
   ConditionMonthly (const AttributeList& al)
-    : step (30 * al.integer ("step"))
+    : Condition (al),
+      step (30 * al.integer ("step"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionMonthly (al); }
@@ -103,8 +202,11 @@ struct ConditionYearly : public Condition
 public:
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 0 && (daisy.time.yday () % step) == 0; }
+  void output (Log&, Filter&) const
+  { }
   ConditionYearly (const AttributeList& al)
-    : step (365 * al.integer ("step"))
+    : Condition (al),
+      step (365 * al.integer ("step"))
   { }
   static Condition& make (const AttributeList& al)
   { return *new ConditionYearly (al); }
@@ -116,8 +218,11 @@ struct ConditionHour : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.hour () == at; }
+  void output (Log&, Filter&) const
+    { }
   ConditionHour (const AttributeList& al)
-    : at (al.integer ("at"))
+    : Condition (al),
+      at (al.integer ("at"))
     { }
   static Condition& make (const AttributeList& al)
     { return *new ConditionHour (al); }
@@ -129,8 +234,11 @@ struct ConditionMDay : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.mday () == at; }
+  void output (Log&, Filter&) const
+    { }
   ConditionMDay (const AttributeList& al)
-    : at (al.integer ("at"))
+    : Condition (al),
+      at (al.integer ("at"))
     { }
   static Condition& make (const AttributeList& al)
     { return *new ConditionMDay (al); }
@@ -142,8 +250,11 @@ struct ConditionYDay : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.yday () == at; }
+  void output (Log&, Filter&) const
+    { }
   ConditionYDay (const AttributeList& al)
-    : at (al.integer ("at"))
+    : Condition (al),
+      at (al.integer ("at"))
     { }
   static Condition& make (const AttributeList& al)
     { return *new ConditionYDay (al); }
@@ -155,8 +266,11 @@ struct ConditionMonth : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.month () == at; }
+  void output (Log&, Filter&) const
+    { }
   ConditionMonth (const AttributeList& al)
-    : at (al.integer ("at"))
+    : Condition (al),
+      at (al.integer ("at"))
     { }
   static Condition& make (const AttributeList& al)
     { return *new ConditionMonth (al); }
@@ -168,8 +282,11 @@ struct ConditionYear : public Condition
 public:
   bool match (const Daisy& daisy) const
     { return daisy.time.year () == at; }
+  void output (Log&, Filter&) const
+    { }
   ConditionYear (const AttributeList& al)
-    : at (al.integer ("at"))
+    : Condition (al),
+      at (al.integer ("at"))
     { }
   static Condition& make (const AttributeList& al)
     { return *new ConditionYear (al); }
@@ -182,6 +299,35 @@ static struct ConditionTimeSyntax
 
 ConditionTimeSyntax::ConditionTimeSyntax ()
 { 
+  // Month and day.
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& at_alist = *new AttributeList ();
+    at_alist.add ("description", "\
+True a specific month, day and hour in the year.");
+    at_alist.add ("hour", 8);
+    AttributeList& before_alist = *new AttributeList ();
+    before_alist.add ("description", "\
+True before specific month, day and hour in the year.");
+    before_alist.add ("hour", 8);
+    AttributeList& after_alist = *new AttributeList ();
+    after_alist.add ("description", "\
+True after specific month, day and hour in the year.");
+    after_alist.add ("hour", 8);
+    syntax.add ("month", Syntax::Integer, Syntax::Const, 
+		"Month to test for.");
+    syntax.add ("day", Syntax::Integer, Syntax::Const, 
+		"Day in the month to test for.");
+    syntax.add ("hour", Syntax::Integer, Syntax::Const, 
+		"Hour to test for.");
+    syntax.order ("month", "day");
+    Librarian<Condition>::add_type ("mm_dd", at_alist, syntax,
+				    &ConditionMMDD::make);
+    Librarian<Condition>::add_type ("before_mm_dd", before_alist, syntax,
+				    &ConditionBeforeMMDD::make);
+    Librarian<Condition>::add_type ("after_mm_dd", after_alist, syntax,
+				    &ConditionAfterMMDD::make);
+  }
   // At, before, or after a given time.
   {
     Syntax& syntax = *new Syntax ();
@@ -217,7 +363,7 @@ Warning, this may be imprecise around new year.");
 Warning, this may be imprecise around new year.");
     AttributeList& alist_month = *new AttributeList ();
     alist_month.add ("description", "True every `step' month.\n\
-A month is concidered to be 30 days.\n\
+A month is considered to be 30 days.\n\
 Warning, this may be imprecise around new year.");
     AttributeList& alist_year = *new AttributeList ();
     alist_year.add ("description", "True every `step' year.");

@@ -323,7 +323,7 @@ static struct TransportCDSyntax
     alist.add ("description", 
 	       "Solute transport using convection-dispersion.");
     syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
-		"Time step used in the numeric solultion.");
+		"Time step used in the numeric solution.");
     Librarian<Transport>::add_type ("cd", alist, syntax, &make);
   }
 } TransportCD_syntax;

@@ -2,7 +2,7 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "field.h"
+#include "log.h"
 // We need to initialize the Condition library.
 #include "condition.h"
 
@@ -12,7 +12,7 @@ struct ActionNil : public Action
     { }
 
   ActionNil (const AttributeList& al)
-    : Action (al.name ("type"))
+    : Action (al)
     { }
 };
 
@@ -30,7 +30,13 @@ struct ActionProgn : public Action
 	}
     }
 
-  bool check (Daisy& daisy) const
+  void output (Log& log, Filter& filter) const
+    { 
+      output_list (actions, "actions", log, filter,
+		   Librarian<Action>::library ());
+    }
+
+  bool check (const Daisy& daisy) const
     { 
       bool ok = true;
       for (vector<const Action*>::const_iterator i = actions.begin ();
@@ -44,7 +50,7 @@ struct ActionProgn : public Action
     }
 
   ActionProgn (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       actions (map_create<Action> (al.alist_sequence ("actions")))
     { }
 
@@ -59,6 +65,12 @@ struct clause
 {
   const Condition* condition;
   vector<Action*> actions;
+  void output (Log& log, Filter& filter) const
+    { 
+      output_derived (*condition, "condition", log, filter);
+      output_list (actions, "actions", log, filter,
+		   Librarian<Action>::library ());
+    }
   clause (const Condition* c, vector<Action*>& a) 
     : condition (c),
       actions (a)
@@ -108,8 +120,25 @@ struct ActionCond : public Action
 	    }
 	}
     }
-  
-  bool check (Daisy& daisy) const
+  void output (Log& log, Filter& filter) const
+    { 
+      if (filter.check ("clauses"))
+	{
+	  Filter& f1 = filter.lookup ("clauses");
+	  log.open ("clauses");
+	  for (vector<clause>::const_iterator item = clauses.begin ();
+	       item != clauses.end ();
+	       item++)
+	    {
+	      log.open_unnamed ();
+	      (*item).output (log, f1);
+	      log.close_unnamed ();
+	    }
+	  log.close ();
+	}
+    }
+
+  bool check (const Daisy& daisy) const
     { 
       bool ok = true;
       for (vector<clause>::const_iterator i = clauses.begin (); 
@@ -125,7 +154,7 @@ struct ActionCond : public Action
     }
 
   ActionCond (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       clauses (make_clauses (al.alist_sequence ("clauses")))
     { }
 
@@ -157,7 +186,14 @@ struct ActionIf : public Action
 	else_a.doIt (daisy);
     }
 
-  bool check (Daisy& daisy) const
+  void output (Log& log, Filter& filter) const
+    { 
+      output_derived (if_c, "if", log, filter);
+      output_derived (then_a, "then", log, filter);
+      output_derived (else_a, "else", log, filter);
+    }
+
+  bool check (const Daisy& daisy) const
     { 
       bool ok = true; 
       if (!then_a.check (daisy))
@@ -168,7 +204,7 @@ struct ActionIf : public Action
     }
 
   ActionIf (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       if_c (Librarian<Condition>::create (al.alist ("if"))),
       then_a (Librarian<Action>::create (al.alist ("then"))),
       else_a (Librarian<Action>::create (al.alist ("else")))
@@ -211,7 +247,8 @@ ActionLispSyntax::ActionLispSyntax ()
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
-Perform all the specified actions in the sequence listed.");
+Perform all the specified actions in the sequence listed.\n\
+All the actions will be performed in the same time step.");
     syntax.add ("actions", Librarian<Action>::library (), Syntax::Sequence,
 		"List of actions to perform.");
     syntax.order ("actions");

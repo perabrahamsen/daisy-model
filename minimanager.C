@@ -14,6 +14,10 @@ void MiniManager::doIt (Daisy& d){
    EQ->DoTick(d);
 }
 
+void
+MiniManager::output (Log&, Filter&) const
+{ }
+
 Event::EventType EventType(const string& s) {
 	static string start("Start"),
                  end("End"),
@@ -43,7 +47,7 @@ Event::EventType EventType(const string& s) {
 }
 
 MiniManager::MiniManager (const AttributeList& alist) 
-  : Action (alist.name ("type"))
+  : Action (alist)
 {
   vector<AttributeList*> actions =  alist.alist_sequence ("Action");
   vector<Event *> events(actions.size());

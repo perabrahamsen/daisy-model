@@ -1,3 +1,9 @@
+* Opdater manual med `activity' action.
+
+* Nye `crop', `column' og `chemical' log_table attributer.
+
+* Ny klimafil.
+
 * Simulation:
 
 ** Macroporer.

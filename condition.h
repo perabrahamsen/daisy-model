@@ -11,15 +11,17 @@ class Condition
 {  
   // Content.
 public:
+  const string name;
   static const char *const description;
 
   // Simulation.
 public:
   virtual bool match (const Daisy&) const = 0;
+  virtual void output (Log&, Filter&) const = 0;
 
   // Create & Destroy.
 protected:
-  Condition ();
+  Condition (const AttributeList& al);
 public:
   virtual ~Condition ();
 };

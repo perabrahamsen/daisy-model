@@ -240,7 +240,7 @@ Geometry::add_layer (Syntax& syntax, const string& name,
 	      Syntax::OptionalConst, Syntax::Sequence, 
 	      string ("Initial value of the `") + name + "' parameter.\n\
 The initial value is given as a sequence of (END VALUE) pairs, starting\n\
-from the top and going down.  The parameter will be initializated to\n\
+from the top and going down.  The parameter will be initialized to\n\
 VALUE from the END of the previous layer, to the END of the current layer.");
   syntax.add (name, dimension, Syntax::OptionalState, Syntax::Sequence, 
 	      description);

@@ -17,9 +17,12 @@ struct ConditionSoilTemperature : public Condition
 	return true;
       return false;
     }
+  void output (Log&, Filter&) const
+    { }
 
   ConditionSoilTemperature (const AttributeList& al)
-    : temperature (al.number ("temperature")),
+    : Condition (al),
+      temperature (al.number ("temperature")),
       height (al.number ("height"))
     { }
 };
@@ -31,9 +34,12 @@ struct ConditionSoilPotential : public Condition
 
   bool match (const Daisy& daisy) const
     { return (daisy.field.soil_water_potential (height) > potential); }
+  void output (Log&, Filter&) const
+    { }
 
   ConditionSoilPotential (const AttributeList& al)
-    : potential (al.number ("potential")),
+    : Condition (al),
+      potential (al.number ("potential")),
       height (al.number ("height"))
     { }
 };

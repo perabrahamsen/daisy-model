@@ -109,7 +109,7 @@ HydraulicM_CSyntax::HydraulicM_CSyntax ()
 	     "Campbell retention curve model with Mualem theory.");
   Hydraulic::load_syntax (syntax, alist);
   syntax.add ("h_b", "cm", Syntax::Const,
-	      "Bubling pressure.");
+	      "Bubbling pressure.");
   syntax.add ("b", Syntax::None (), Syntax::Const,
 	      "Campbell parameter.");
   syntax.add ("K_sat", "cm/h", Syntax::Const,

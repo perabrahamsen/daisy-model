@@ -15,7 +15,8 @@ whether the water pressure in a specific depth is above a given\n\
 threshold.  Logic conditions like `and' and `or' can be used for\n\
 testing whether multiple conditions are fulfilled simultaneously.";
 
-Condition::Condition ()
+Condition::Condition (const AttributeList& al)
+  : name (al.name ("type"))
 { }
 
 Condition::~Condition ()

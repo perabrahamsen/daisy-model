@@ -137,7 +137,7 @@ static struct TransportConvectionSyntax
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Transport using convection alone.");
     syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
-		"Time step used in the numeric solultion.");
+		"Time step used in the numeric solution.");
     Librarian<Transport>::add_type ("convection", alist, syntax, &make);
   }
 } TransportConvection_syntax;

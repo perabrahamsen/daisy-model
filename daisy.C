@@ -100,6 +100,7 @@ Daisy::tick_logs ()
       output_derived (weather, "weather", log, filter);
       output_submodule (field, "column", log, filter);
       output_vector (harvest, "harvest", log, filter);
+      output_derived (action, "manager", log, filter);
       log.done ();
     }
 }
@@ -107,12 +108,12 @@ Daisy::tick_logs ()
 void
 Daisy::tick ()
 { 
-  action.doIt (*this);
   weather.tick (time);
+  action.doIt (*this);
 
   tick_columns ();
-  time.tick_hour ();
   tick_logs ();
+  time.tick_hour ();
 }
 
 void 

@@ -109,7 +109,7 @@ struct CropSold::Parameters
   {
     double EmrTSum;		// Soil temp sum at emergence
     double DS_Emr;		// Development stage (DS) emergence
-    bool DS_reset;		// True for winther crops.
+    bool DS_reset;		// True for winter crops.
     double DSRate1;		// Development rate [C-1 or d-1],
     // the vegetative stage
     double DSRate2;		// Development rate [C-1 or d-1],
@@ -167,7 +167,7 @@ struct CropSold::Parameters
     double h_wp;		// Matrix potential at wilting
     double MxNH4Up;		// Max NH4 uptake per unit root length
     double MxNO3Up;		// Max NO3 uptake per unit root length
-    double Rxylem;		// Transport resistence in xyleme
+    double Rxylem;		// Transport resistance in xyleme
   private:
     friend struct CropSold::Parameters;
     RootPar (const AttributeList&);
@@ -649,7 +649,7 @@ CropSoldSyntax::CropSoldSyntax ()
   Devel.add ("DS_Emr", Syntax::None (), Syntax::Const,
 	     "Development stage at emergence.");
   Devel.add ("DS_reset", Syntax::Boolean, Syntax::Const,
-	     "True for winther crops.");
+	     "True for winter crops.");
   Devel.add ("DSRate1", Syntax::None (), Syntax::Const,
 	     "Development rate in the vegetative stage.");
   Devel.add ("DSRate2", Syntax::None (), Syntax::Const,
@@ -735,7 +735,7 @@ CropSoldSyntax::CropSoldSyntax ()
   Root.add ("MxNO3Up", "g/cm/h", Syntax::Const,
 	    "Maximum NO3 uptake per unit root length.");
   Root.add ("Rxylem", Syntax::None (), Syntax::Const,
-	    "Transport resistence in xyleme.");
+	    "Transport resistance in xyleme.");
 
   // PartitPar
   Partit.add ("Root", Syntax::CSMP, Syntax::Const,
@@ -784,11 +784,11 @@ Non-functional lim for N-concentration in roots [DS -> g N/g DM].");
 
   // HarvestPar
   Harvest.add ("beta", "sqrt ((g N/m^2)/(g DM/m^2))", Syntax::Const,
-	       "N partioning at harvest parameter.");
+	       "N partitioning at harvest parameter.");
   Harvest.add ("At", "(g N/m^2)/(g DM/m^2)", Syntax::Const,
-	       "N partioning at harvest parameter.");
+	       "N partitioning at harvest parameter.");
   Harvest.add ("Bt", Syntax::None (), Syntax::Const,
-	       "N partioning at harvest parameter.");
+	       "N partitioning at harvest parameter.");
   add_submodule_sequence<OM> ("Stem", Harvest, Syntax::Const,
 			      "Stem AM parameters.");
   add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const,
@@ -1695,7 +1695,7 @@ CropSold::tick (const Time& time,
       && time.mday () == 1
       && time.hour () == 6)
     {
-      // It was a bad winther.
+      // It was a bad winter.
       var.Phenology.DS = 0.1;
     }
 

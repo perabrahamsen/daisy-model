@@ -414,7 +414,7 @@ static struct ColumnStandardSyntax
     add_submodule<Soil> ("Soil", syntax, alist, Syntax::Const, 
 			 "The numeric and physical soil properties.");
     add_submodule<SoilWater> ("SoilWater", syntax, alist, Syntax::State,
-			      "Soil water content and transportaion.");
+			      "Soil water content and transportation.");
     add_submodule<SoilHeat> ("SoilHeat", syntax, alist, Syntax::State,
 			     "Soil heat and flux.");
     add_submodule<SoilNH4> ("SoilNH4", syntax, alist, Syntax::State,

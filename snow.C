@@ -38,7 +38,7 @@ struct Snow::Implementation
 				// for snow to become new.
   const double fsa;		// Relative amount of snow required
 				// for snow to become new.
-  const double K_snow_factor;	// Factor related to termal conductivity
+  const double K_snow_factor;	// Factor related to thermal conductivity
 				// for snow water mix [W m^4 / Kg²]
 
   void output (Log& log, Filter& filter) const;
@@ -363,7 +363,7 @@ _Snow Hydrology_, U.S. Corps of Engineers, 1956.");
 	      "Relative amount of snow required for snow to become new.");
   alist.add ("fsa", 0.9);
   syntax.add ("K_snow_factor", "W m^4 / Kg^2", Syntax::Const,
-	      "Factor related to termal conductivity for snow water mix.");
+	      "Factor related to thermal conductivity for snow water mix.");
   alist.add ("K_snow_factor", 2.86e6);
 }
   

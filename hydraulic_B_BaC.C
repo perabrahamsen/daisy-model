@@ -112,7 +112,7 @@ HydraulicB_BaCSyntax::HydraulicB_BaCSyntax ()
   syntax.add ("lambda", Syntax::None (), Syntax::Const,
 	      "Pore size index.");
   syntax.add ("h_b", "cm", Syntax::Const,
-	      "Bubling pressure.");
+	      "Bubbling pressure.");
   syntax.add ("K_sat", "cm/h", Syntax::Const,
 	      "Water conductivity of saturated soil.");
 

@@ -18,7 +18,7 @@ struct ActionMix : public Action
     }
 
   ActionMix (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       depth (al.number ("depth")),
       penetration (al.number ("penetration"))
     { }
@@ -53,7 +53,7 @@ the interval.");
 		  "How far down to mix the soil (a negative number).");
       syntax.order ("depth");
       syntax.add ("penetration", Syntax::None (), Syntax::Const, "\
-Fraction of organic matter on surface that are incoorperated in the soil \
+Fraction of organic matter on surface that are incorporated in the soil \
 by this operation.");
       alist.add ("penetration", 0.0);
       Librarian<Action>::add_type ("mix", alist, syntax, &make);
@@ -74,7 +74,7 @@ struct ActionSwap : public Action
   }
 
   ActionSwap (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       middle (al.number ("middle")),
       depth (al.number ("depth"))
     { }

@@ -176,7 +176,7 @@ OrganicMatter::Implementation::Buffer::load_syntax (Syntax& syntax,
 	      "Buffer nitrogen content.");
   alist.add ("N", empty_vector);
   syntax.add ("turnover_rate", "h^-1", Syntax::Const,
-	      "Turover rate from buffer into SOM.");
+	      "Turnover rate from buffer into SOM.");
   alist.add ("turnover_rate", 1.0);
   syntax.add ("where", Syntax::Integer, Syntax::Const,
 	      "The SOM pool to move the buffer content into.\n\

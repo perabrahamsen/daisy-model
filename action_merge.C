@@ -16,7 +16,7 @@ struct ActionMerge : public Action
     }
 
   ActionMerge (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       combine (al.name ("combine")), 
       remove (al.name ("remove"))
     { }
@@ -31,7 +31,7 @@ static struct ActionMergeSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
-Merge two columns.  After the merge, only the first columnn will remain,\n\
+Merge two columns.  After the merge, only the first column will remain,\n\
 but its state will be a average of the the columns, weighted after size.");
       syntax.add ("combine", Syntax::String, Syntax::Const,
 		  "Column to merge into.");

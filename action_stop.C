@@ -9,7 +9,7 @@ struct ActionStop : public Action
     { daisy.running = false; }
 
   ActionStop (const AttributeList& al)
-    : Action (al.name ("type"))
+    : Action (al)
     { }
 };
 

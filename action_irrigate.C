@@ -30,7 +30,7 @@ struct ActionIrrigate : public Action
   }
 
   ActionIrrigate (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       flux (al.number ("flux")),
       temp (al.number ("temperature")),
       sm (*new IM (al.alist ("solute")))

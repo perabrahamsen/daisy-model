@@ -16,11 +16,8 @@ struct ActionSpray : public Action
       daisy.field.spray (chemical, amount); 
     }
 
-  bool check (Daisy&) const
-    { return true; }
-
   ActionSpray (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       chemical (al.name ("chemical")),
       amount (al.number ("amount"))
     { }
@@ -62,7 +59,7 @@ static struct ActionSpraySyntax
     syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
-Spray a chemical (typically a pesticid) on the field.");
+Spray a chemical (typically a pesticide) on the field.");
     syntax.add ("chemical", Syntax::String, Syntax::Const,
 		"Name of pesticide to spray.");
     syntax.add ("amount", "g/ha", Syntax::Const,

@@ -9,7 +9,10 @@ struct ConditionRunning : public Condition
 {
   bool match (const Daisy& daisy) const
     { return daisy.running; }
-  ConditionRunning (const AttributeList&)
+  void output (Log&, Filter&) const
+    { }
+  ConditionRunning (const AttributeList& al)
+    : Condition (al)
     { }
 };
 
@@ -17,7 +20,10 @@ struct ConditionFinished : public Condition
 {
   bool match (const Daisy& daisy) const
     { return !daisy.running; }
-  ConditionFinished (const AttributeList&)
+  void output (Log&, Filter&) const
+    { }
+  ConditionFinished (const AttributeList& al)
+    : Condition (al)
     { }
 };
 
@@ -37,7 +43,7 @@ static struct ConditionDaisySyntax
 			 "True iff the simulation is still running.");
       AttributeList& alist_finished = *new AttributeList ();
       alist_finished.add ("description", 
-			  "True iff the simulation has finsihed.");
+			  "True iff the simulation has finished.");
       Librarian<Condition>::add_type ("running",
 				      alist_running, syntax, &make_running);
       Librarian<Condition>::add_type ("finished",

@@ -22,7 +22,7 @@ struct ActionHarvest : public Action
     }
 
   ActionHarvest (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       name (al.name ("name")), 
       stub (al.number ("stub")),
       stem (al.number ("stem")),

@@ -17,7 +17,7 @@ struct ActionDivide : public Action
     }
 
   ActionDivide (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       original (al.name ("original")), 
       copy (al.name ("copy")),
       size (al.number ("size"))

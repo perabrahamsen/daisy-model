@@ -15,11 +15,8 @@ struct ActionSow : public Action
       daisy.field.sow (crop); 
     }
 
-  bool check (Daisy&) const
-    { return true; }
-
   ActionSow (const AttributeList& al)
-    : Action (al.name ("type")),
+    : Action (al),
       crop (al.alist ("crop"))
     { }
 };

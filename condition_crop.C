@@ -19,9 +19,12 @@ struct ConditionDSAfter : public Condition
 	return true;
       return false;
     }
+  void output (Log&, Filter&) const
+    { }
 
   ConditionDSAfter (const AttributeList& al)
-    : crop (al.name ("crop")),
+    : Condition (al),
+      crop (al.name ("crop")),
       ds (al.number ("ds"))
     { }
 };
@@ -33,9 +36,12 @@ struct ConditionDMOver : public Condition
 
   bool match (const Daisy& daisy) const
     { return (daisy.field.crop_dm (crop) >= weight); }
+  void output (Log&, Filter&) const
+    { }
 
   ConditionDMOver (const AttributeList& al)
-    : crop (al.name ("crop")),
+    : Condition (al),
+      crop (al.name ("crop")),
       weight (al.number ("weight"))
     { }
 };

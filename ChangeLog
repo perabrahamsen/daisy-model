@@ -1,6 +1,67 @@
-1999-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+1999-04-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 0.72 released.
+	* Version 0.73 released.
+
+1999-04-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_time.C (ConditionBeforeMMDD, ConditionAfterMMDD): new
+	conditions. 
+
+1999-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_while.C: New model.
+
+1999-04-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_time.C (ConditionMMDD): New condition.
+	* action_wait.C: New model.
+	* Makefile (COMPONENTS): Added it.
+
+1999-04-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action.h, action.C (done): New virtual member.
+	* action_activity.C: New model.
+	* Makefile (COMPONENTS): Added it.
+
+1999-04-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition.C, condition_crop.C, condition_daisy.C,
+	condition_logic.C, condition_soil.C, condition_time.C (output):
+	Nem vitual member function.
+	* action_lisp.C: Updated caller.
+
+1999-04-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (NitrogenUptake): Update all at 23:00 not 0:00.
+	(tick): Do daily stuff at 23:00 not 0:00.
+
+	* daisy.C (tick): Update hour _after_ logging.
+
+	* weather_hourly.C (WeatherHourlySyntax): Made `file' ordered.
+
+1999-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action.h (output): New virtual member function.
+	(name) Made public.
+	(alist) new member.
+	(Action) Constructor takes alist argument.
+	* action.C, action_divide.C, action_fertilize.C, action_harvest.C,
+	action_irrigate.C, action_lisp.C, action_merge.C, action_sow.C,
+	action_spray.C, action_stop.C, action_tillage.C, action_with.C:
+	Updated callers.
+
+
+1999-04-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Merged SH changes.
+
+1999-04-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (NetProduction): More numeric robust handling of C_foli.
+
+1999-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Ran ispell on descriptions.
 
 1999-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
 

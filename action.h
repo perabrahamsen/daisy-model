@@ -10,18 +10,22 @@ class Daisy;
 class Action
 {
   // Content.
+public:
   const string name;
+  const AttributeList alist;
 
   // Simulation.
 public:
   virtual void doIt (Daisy&) = 0;
+  virtual bool done (const Daisy&) const;
+  virtual void output (Log&, Filter&) const;
 
   // Create and Destroy.
 public: 
-  virtual bool check (Daisy&) const;
+  virtual bool check (const Daisy&) const;
   static const char *const description;
 protected:
-  Action (const string& name);
+  Action (const AttributeList& al);
 public:
   virtual ~Action ();
 };

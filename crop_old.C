@@ -108,7 +108,7 @@ struct CropOld::Parameters
   {
     double EmrTSum;		// Soil temp sum at emergence
     double DS_Emr;		// Development stage (DS) emergence
-    bool DS_reset;		// True for winther crops.
+    bool DS_reset;		// True for winter crops.
     double DSRate1;		// Development rate [C-1 or d-1],
     // the vegetative stage
     double DSRate2;		// Development rate [C-1 or d-1],
@@ -648,7 +648,7 @@ CropOldSyntax::CropOldSyntax ()
   Devel.add ("DS_Emr", Syntax::None (), Syntax::Const,
 	     "Development stage at emergence.");
   Devel.add ("DS_reset", Syntax::Boolean, Syntax::Const,
-	     "True for winther crops.");
+	     "True for winter crops.");
   Devel.add ("DSRate1", Syntax::None (), Syntax::Const,
 	     "Development rate in the vegetative stage.");
   Devel.add ("DSRate2", Syntax::None (), Syntax::Const,
@@ -1683,7 +1683,7 @@ CropOld::tick (const Time& time,
 	var.RootSys.NH4Extraction.end (),
 	0.0);
 
-  // It was a bad winther.
+  // It was a bad winter.
   if (par.Devel.DS_reset 
       && time.month () == 3
       && time.mday () == 1

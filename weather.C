@@ -402,7 +402,7 @@ Deposition of nitrogen solutes with precipitation [ppm].");
 	      "How much the temperature change during the year.");
   alist.add ("amplitude", 8.5);
   syntax.add ("omega", "d^-1", Syntax::Const,
-	      "Fraction of a full yearly cyclus (2 pi) covered in a day.\n\
+	      "Fraction of a full yearly cycle (2 pi) covered in a day.\n\
 The default value corresponds to Earths orbit around the Sun.\n\
 Martian take note: You must change this for your home planet.");
   alist.add ("omega", 2.0 * M_PI / 365.0);
