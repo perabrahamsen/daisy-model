@@ -46,7 +46,7 @@
       transport_none.obj traverse.obj traverse_delete.obj treelog.obj 
       treelog_stream.obj uzlr.obj uzmodel.obj uznone.obj uzrichard.obj 
       vegetation.obj vegetation_crops.obj vegetation_permanent.obj weather.obj 
-      weather_none.obj weather_old.obj weather_simple.obj weather_std.obj"/>
+      weather_none.obj weather_old.obj weather_simple.obj weather_std.obj path.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
