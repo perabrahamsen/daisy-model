@@ -581,7 +581,6 @@ AttributeList::size (const string& key)	const
       daisy_assert (false);
     }
   // Not reached.
-  return Syntax::Unspecified;
 }
 
 double 

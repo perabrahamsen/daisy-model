@@ -1,5 +1,7 @@
 2002-05-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* all: Fixed lots of BCC warnings.
+
 	* mathlib.h (finite): Moved here from `common.h'.
 
 	* Version 2.31 released.
