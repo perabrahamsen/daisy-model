@@ -1,3 +1,17 @@
+1998-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.022 released.
+
+1998-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_heat.C (tick): Limit size of calculation to unsaturated
+	zone.  Don't trust groundwater module on this.
+
+1998-05-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): Count snow and irrigation
+	as part of net precipitation.
+
 1998-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.021 released.

@@ -42,6 +42,8 @@ main (int argc, char* argv[])
 
   /* Run the simulation. */
   {
+    
+    daisy_weather* weather = daisy_daisy_get_weather (daisy);
     const daisy_time *const time = daisy_daisy_get_time (daisy);
     const int columns = daisy_daisy_count_columns (daisy);
     int i;
@@ -56,12 +58,16 @@ main (int argc, char* argv[])
 	
 	for (i = 0; i < columns; i++)
 	  {
-	    fprintf (stderr, "Column %d has %d layers", i,
-		     daisy_column_count_layers 
-		     (daisy_daisy_get_column (daisy, i)));
+	    daisy_column* column = daisy_daisy_get_column (daisy, i);
+
+	    daisy_weather_put_precipitation (weather, 5.0);
 
 	    /* daisy_column* column = daisy_daisy_get_column (daisy, i); */
 	    daisy_daisy_tick_column (daisy, i);
+
+	    fprintf (stdout, "%d: %g\n", i, 
+		     daisy_column_get_net_precipitation (column));
+	    
 	  }
 
 	daisy_daisy_tick_logs (daisy);

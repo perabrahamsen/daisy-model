@@ -63,6 +63,9 @@ SoilHeat::Implementation::tick (const Time& time,
 	THROW (runtime_error ("Groundwater table below lowest node."));
       size = soil.interval (groundwater.table ()) + 1;
     }
+  // Maybe the groundwater module lied...
+  while (size > 0 && soil_water.h (size - 1) >= 0)
+    size--;
 
   // Tridiagonal matrix.
   vector<double> a (size, 0.0);

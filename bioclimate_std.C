@@ -269,7 +269,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
     Total_through_fall += irrigation;
 
   // Store this for external model.
-  net_precipitation = Total_through_fall - irrigation;
+  net_precipitation = Total_through_fall + weather.snow ();
 
   double temperature;
   if (Total_through_fall + irrigation > 0.0)
