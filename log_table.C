@@ -2,6 +2,7 @@
 
 #include "log_select.h"
 #include "select.h"
+#include "geometry.h"
 #include <fstream.h>
 
 struct LogTable : public LogSelect, public Select::Destination
@@ -15,7 +16,9 @@ struct LogTable : public LogSelect, public Select::Destination
   const string error_string;	// String to print on errors.
   const string missing_value;	// String to print for missing values.
   const string array_separator;	// String to print between array entries.
-  
+  bool print_tags;		// Set if tags should be printed.
+  bool print_dimension;		// Set if dimensions should be printed.
+
   // Destination Content.
   enum { Error, Missing, Number, Name, Array } type;
   double dest_number;
@@ -43,17 +46,100 @@ LogTable::done ()
   if (!is_printing)
     return;
 
-  bool first = true;
+  if (print_tags)
+    {
+      // Print the entry names in the first line of the log file..
+      for (unsigned int i = 0; i < entries.size (); i++)
+	{
+	  if (i != 0)
+	    out << field_separator;
+
+	  const Geometry* geometry = entries[i]->geometry ();
+	  const int size = entries[i]->size ();
+	  const string tag = entries[i]->tag;
+
+	  if (geometry && size >= 0)
+	    {
+	      if (geometry->size () == size)
+		{
+		  // Content.
+		  for (unsigned j = 0; j < size; j++)
+		    {
+		      if (j != 0)
+			out << array_separator;
+		      if (tag != "")
+			out << tag << " @ ";
+		      out << geometry->z (j);
+		    }
+		}
+	      else if (geometry->size () + 1 == size)
+		{
+		  // Flux
+		  double last = 0.0;
+		  
+		  for (unsigned j = 0; j < size; j++)
+		    {
+		      if (j != 0)
+			out << array_separator;
+		      if (tag != "")
+			out << tag << " @ ";
+		      out << last;
+		      if (j <  geometry->size ())
+			last = geometry->zplus (j);
+		    }
+		}
+	      else
+		{
+		  // Other arrays (buggy if other array have same size as geo.)
+		  for (unsigned j = 0; j < size; j++)
+		    {
+		      if (j != 0)
+			out << array_separator;
+		      out << tag << "[" << j << "]";
+		    }
+		}
+	    }
+	  else
+	    out << entries[i]->tag;
+	}
+      out << record_separator;
+      print_tags = false;
+    }
+  if (print_dimension)
+    {
+      // Print the entry names in the first line of the log file..
+      for (unsigned int i = 0; i < entries.size (); i++)
+	{
+	  if (i != 0)
+	    out << field_separator;
+
+	  const Geometry* geometry = entries[i]->geometry ();
+	  const int size = entries[i]->size ();
+	  const string dimension = entries[i]->dimension;
+
+	  if (geometry && size >= 0)
+	    {
+	      for (unsigned j = 0; j < size; j++)
+		{
+		  if (j != 0)
+		    out << array_separator;
+		  out << dimension;
+		}
+	    }
+	  else
+	    out << entries[i]->dimension;
+	}
+      out << record_separator;
+      print_dimension = false;
+    }
+
   for (unsigned int i = 0; i < entries.size (); i++)
     {
-
-      entries[i]->done (*this);
-
-      if (first)
-	first = false;
-      else
+      if (i != 0)
 	out << field_separator;
       
+      entries[i]->done (*this);
+
       switch (type)
 	{
 	case Error:
@@ -135,6 +221,9 @@ LogTable::LogTable (const AttributeList& al)
     error_string (al.name ("error_string")),
     missing_value (al.name ("missing_value")),
     array_separator (al.name ("array_separator")),
+    print_tags (al.flag ("print_tags")),
+    print_dimension (al.flag ("print_dimension")),
+    
     type (Error)
 {
 #if 0      
@@ -142,34 +231,6 @@ LogTable::LogTable (const AttributeList& al)
     // Print description in start of file.
     out << description << "\n";
 #endif
-  if (al.flag ("print_tags"))
-    {
-      // Print the entry names in the first line of the log file..
-      bool first = true;
-      for (unsigned int i = 0; i < entries.size (); i++)
-	{
-	  if (first)
-	    first = false;
-	  else
-	    out << field_separator;
-	  out << entries[i]->tag;
-	}
-      out << record_separator;
-    }
-  if (al.flag ("print_dimension"))
-    {
-      // Print the entry names in the first line of the log file..
-      bool first = true;
-      for (unsigned int i = 0; i < entries.size (); i++)
-	{
-	  if (first)
-	    first = false;
-	  else
-	    out << field_separator;
-	  out << entries[i]->dimension;
-	}
-      out << record_separator;
-    }
 }
 
 LogTable::~LogTable ()

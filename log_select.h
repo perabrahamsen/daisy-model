@@ -28,6 +28,10 @@ struct LogSelect : public Log
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy);
 
+  // Obey conditionals.
+  void open_maybe (const string& value);
+  void close_maybe ();
+
   // Open normal items.
   void open (const string& name);
   void close ();

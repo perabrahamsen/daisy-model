@@ -27,6 +27,8 @@ public:
   static const char *const description;
   const string tag;		// Name of this entry.
   const string dimension;	// Physical dimension of this entry.
+  virtual const Geometry* geometry () const; // For array tags.
+  virtual int size () const;	// For array tags.
   
   // Destination
   class Destination
@@ -51,6 +53,8 @@ public:
   bool valid ();		// Currently path entry is valid.
   bool valid (const string& next); // Next path entry is valid.
 
+  void open_maybe (const string& value); // Check special values.
+  void close_maybe ();
   void open_group (const string&); // Open one group level.
   void open (const string&);	// Open one leaf level.
   void close ();		// Close one level.

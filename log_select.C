@@ -46,6 +46,20 @@ LogSelect::match (const Daisy& daisy)
 }
 
 void 
+LogSelect::open_maybe (const string& value)
+{ 
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->open_maybe (value);
+}
+
+void 
+LogSelect::close_maybe ()
+{ 
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->close_maybe ();
+}
+
+void 
 LogSelect::open (const string& name)
 { 
   for (unsigned int i = 0; i < entries.size (); i++)

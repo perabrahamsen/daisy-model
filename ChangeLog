@@ -1,4 +1,32 @@
+2000-02-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.12 released.
+
+2000-02-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.h, select.C (open_maybe, close_maybe): New member
+	functions. 
+	* log.h, log.C, log_select.h, log_select.C (open_maybe,
+	close_maybe): New virtual member functions.
+	* log.h (Maybe): New member class.
+	* soil_chemicals.C, chemicals.C, am.C (output): Use it.
+
+2000-02-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_array.C, select.C, select.h (size): New virtual member
+	function.
+	* log_table.C (done): Use it.
+
 2000-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (print_dimension, print_tags): New data member.
+	(done): Use them.
+	(LogTable): Initialize them.
+	* select.C, select.h (geometry): New virtual member function.
+	* select_array.C (last_geometry): New data member.
+	(output_array): Set it.
+	(SelectArray): Initialize it.
+	(geometry): New member function.
 
 	* Version 1.11 released.
 

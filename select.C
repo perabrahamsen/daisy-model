@@ -5,6 +5,7 @@
 #include "geometry.h"
 #include <numeric>
 #include <set>
+#include <stack>
 
 Librarian<Select>::Content* Librarian<Select>::content = NULL;
 
@@ -20,75 +21,104 @@ struct Select::Implementation
   unsigned int current_path_index;// How nested in open's we are.
   unsigned int last_valid_path_index;	// Remember the last valid level.
   bool is_active;		// Should we be accumulating now?
-
+  stack<bool, vector<bool>/**/> maybies; // Keep track of which maybies 
+                                         // have matched.
   bool valid ()		// If the current path index is valid.
-    { 
-      return (current_path_index == last_valid_path_index
-	      && current_path_index < path.size ()); 
-    }
+  { 
+    return (current_path_index == last_valid_path_index
+	    && current_path_index < path.size ()); 
+  }
 
   bool valid (const string& name) // Is the next path index valid?
-    { 
-      return valid () && (path[current_path_index] == "*" 
-			  || name == path[current_path_index]); 
-    }
+  { 
+    return valid () && (path[current_path_index] == "*" 
+			|| name == path[current_path_index]); 
+  }
+
+  void open_maybe (const string& value)
+  {
+    static const string question_mark = "?";
+    
+    if (valid ()
+	&& path[current_path_index][0] == '?'
+	&& question_mark + value == path[current_path_index])
+      {
+	maybies.push (true);
+	last_valid_path_index++;
+	current_path_index++;
+      }
+    else
+      maybies.push (false);
+  }
+
+  void close_maybe ()		// Close one level.
+  {
+    assert (!maybies.empty ());
+    if (maybies.top ())
+      {
+	assert (current_path_index == last_valid_path_index);
+	last_valid_path_index--;
+	current_path_index--;
+      }
+    maybies.pop ();
+  }
 
   void open_group (const string& name) // Open one group level.
-    {
-      if (valid (name))
-	{
+  {
+    if (valid (name))
+      {
 #if 0
-	  if (is_active && last_valid_path_index == path.size () -1)
-	    {
-	      names.insert (name);
-	      count++;
-	    }
+	if (is_active && last_valid_path_index == path.size () -1)
+	  {
+	    names.insert (name);
+	    count++;
+	  }
 #endif
-	  last_valid_path_index++;
-	}
-      current_path_index++;
-    }
+	last_valid_path_index++;
+      }
+    current_path_index++;
+  }
 
   void open (const string& name) // Open one leaf level.
-    {
-      if (valid (name))
-	last_valid_path_index++;
-      current_path_index++;
-    }
+  {
+    if (valid (name))
+      last_valid_path_index++;
+    current_path_index++;
+  }
 
   void close ()		// Close one level.
-    {
-      if (current_path_index == last_valid_path_index)
-	last_valid_path_index--;
-      current_path_index--;
-    }
+  {
+    if (current_path_index == last_valid_path_index)
+      last_valid_path_index--;
+    current_path_index--;
+  }
 
   // Reset at start of time step.
   bool match (const Daisy& daisy, bool is_printing)
-    {
-      assert (current_path_index == 0U);
-      assert (last_valid_path_index == 0U);
+  {
+    assert (current_path_index == 0U);
+    assert (last_valid_path_index == 0U);
 
-      if (condition)
-	is_active = condition->match (daisy);
-      else
-	is_active = is_printing;
-      return is_active;
-    }
+    if (condition)
+      is_active = condition->match (daisy);
+    else
+      is_active = is_printing;
+    return is_active;
+  }
 
   // Create and Destroy.
   void initialize (const string_map conv)
-    {
-      // Convert path according to mapping in `conv'.
-      for (unsigned int i = 0; i < path.size (); i++)
-	{
-	  string_map::const_iterator entry = conv.find (path[i]);
-	  if (entry != conv.end ())
-	    path[i] = (*entry).second;
-	  else if (path[i].size () > 0 && path[i][0] == '$')
-	    path[i] = "*";
-	}
-    }
+  {
+    // Convert path according to mapping in `conv'.
+    for (unsigned int i = 0; i < path.size (); i++)
+      {
+	string_map::const_iterator entry = conv.find (path[i]);
+	if (entry != conv.end ())
+	  path[i] = (*entry).second;
+	else if (path[i].size () > 0 && path[i][0] == '$')
+	  path[i] = "*";
+      }
+  }
 
   Implementation (const AttributeList& al)
     : condition (al.check ("when") 
@@ -98,10 +128,19 @@ struct Select::Implementation
       current_path_index (0U),
       last_valid_path_index (0U),
       is_active (false)
-    { }
+  { }
   ~Implementation ()
-    { delete &condition; }
+  { delete &condition; }
 };
+
+const Geometry* 
+Select::geometry () const
+{ return NULL; }
+
+int 
+Select::size () const
+{ return -1; }
+
 
 Select::Destination::Destination ()
 { }
@@ -120,6 +159,14 @@ Select::valid ()
 bool 
 Select::valid (const string& name)
 { return impl.valid (name); }
+
+void
+Select::open_maybe (const string& value)
+{ impl.open_maybe (value); }
+
+void 
+Select::close_maybe ()		// Close one level.
+{ impl.close_maybe (); }
 
 void 
 Select::open_group (const string& name) // Open one group level.

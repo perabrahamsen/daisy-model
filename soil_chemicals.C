@@ -148,6 +148,7 @@ SoilChemicals::Implementation::output (Log& log) const
 	  const SoilChemical& solute = *(*i).second;
 
 	  log.open_unnamed ();
+	  Log::Maybe maybe (log, name);
 	  log.output ("chemical", name);
 	  if (log.check ("solute"))
 	    {

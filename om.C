@@ -313,13 +313,7 @@ OM::add (const Geometry& geometry, // Add dead roots.
 
   // Check that we computed the correct value.
   const double new_C = total_C (geometry);
-#if 0
-  assert (approximate (new_C, old_C + to_C));
-#else
-  if (to_C > 0 && fabs (to_C / (new_C - old_C) - 1.0) > 0.001)
-    CERR << "Fix Bug: Added C (" << to_C << ") got ("
-	 << new_C - old_C << ")\n";
-#endif
+  assert (approximate (new_C - old_C, to_C));
 }
 
 void 
@@ -369,18 +363,8 @@ OM::add (const Geometry& geometry, // Add dead roots.
   // Check that we computed the correct value.
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
-#if 0
-  assert (approximate (new_C, old_C + to_C));
-  assert (approximate (new_N, old_N + to_N));
-#else
-  if (to_N > 0 && fabs (to_N / (new_N - old_N) - 1.0) > 0.001)
-    CERR << "Var Bug: Added N (" << to_N << ") got (" << new_N - old_N 
-	 << ") fraction (" << to_N / (new_N - old_N) << ") C/N ("
-	 << to_C/to_N << "\n";
-  if (to_C > 0 && fabs (to_C / (new_C - old_C) - 1.0) > 0.001)
-    CERR << "Var Bug: Added C (" << to_C << ") got ("
-	 << new_C - old_C << ")\n";
-#endif
+  assert (approximate (new_C - old_C, to_C));
+  assert (approximate (new_N - old_N, to_N));
 }
 
 inline void

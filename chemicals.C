@@ -200,6 +200,7 @@ Chemicals::Implementation::output (Log& log) const
       if (amount > 0.0)
 	{
 	  log.open_unnamed ();
+	  Log::Maybe maybe (log, name);
 	  log.output ("chemical", name);
 	  log.output ("amount", amount);
 	  log.close_unnamed ();

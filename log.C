@@ -43,6 +43,14 @@ Log::check_entry (const string& name, const Library& library) const
 
 
 void 
+Log::open_maybe (const string&)
+{ }
+
+void 
+Log::close_maybe ()
+{ }
+
+void 
 Log::open_alist (const string& name, const AttributeList&)
 { open (name); }
 

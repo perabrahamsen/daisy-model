@@ -33,7 +33,26 @@ public:
   // Called at the end of each time step.
   virtual void done ();
 
+  // Conditionals.
+public:
+  struct Maybe
+  {
+  private:
+    Log& ll;
+  public:
+    Maybe (Log& l, const string& value)
+      : ll (l)
+    { ll.open_maybe (value); }
+    ~Maybe ()
+    { ll.close_maybe (); }
+  };
+private:
+  virtual void open_maybe (const string& value);
+  virtual void close_maybe ();
+  friend struct Log::Maybe;
+
   // Normal items.
+public:
   virtual void open (const string&) = 0;
   virtual void close () = 0;
 
@@ -66,10 +85,11 @@ public:
   const Geometry* geometry ();
 
   // Create and Destroy.
+public:
+  virtual bool check (const Syntax&) const = 0;
 protected:
   Log ();
 public:
-  virtual bool check (const Syntax&) const = 0;
   virtual ~Log ();
 };
 
