@@ -226,7 +226,7 @@ To find the absolute root density, Daisy will interpolate the relative\n\
 root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
-				  Rootdens_DS_Depth::Entry::load_syntax);
+				  Rootdens_PLF::Entry::load_syntax);
 
     Librarian<Rootdens>::add_type ("DS_Depth", alist, syntax, make);
   }
@@ -276,7 +276,7 @@ To find the absolute root density, Daisy will interpolate the relative\n\
 root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
-				  Rootdens_DS_Rel::Entry::load_syntax);
+				  Rootdens_PLF::Entry::load_syntax);
 
     Librarian<Rootdens>::add_type ("DS_Rel", alist, syntax, make);
   }
@@ -324,7 +324,7 @@ To find the absolute root density, Daisy will interpolate the relative\n\
 root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
-				  Rootdens_Depth_Depth::Entry::load_syntax);
+				  Rootdens_PLF::Entry::load_syntax);
 
     Librarian<Rootdens>::add_type ("Depth_Depth", alist, syntax, make);
   }
