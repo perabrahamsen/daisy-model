@@ -1,3 +1,16 @@
+2000-01-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.09 released.
+
+2000-01-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C: (RootSystem): New submodule.
+	* lib/log.dai ("Crop Production"): Updated caller.
+
+	* horizon.C (load_syntax): Updated default values for
+	`quarts_in_clay', `quarts_in_silt', `quarts_in_sand',
+	`quarts_form_factor' and `mineral_form_factor'. 
+
 2000-01-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.08 released.

@@ -423,13 +423,13 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 // Data adopted from Møberg et al. 1988 (Tinglev & Roskilde Soil)
   syntax.add ("quarts_in_clay", Syntax::None (), Syntax::Const,
 	      "Quarts fraction in clay.");
-  alist.add ("quarts_in_clay", 0.10);
+  alist.add ("quarts_in_clay", 0.15);
   syntax.add ("quarts_in_silt", Syntax::None (), Syntax::Const,
 	      "Quarts fraction in silt.");
   alist.add ("quarts_in_silt", 0.60);
   syntax.add ("quarts_in_sand", Syntax::None (), Syntax::Const,
 	      "Quarts fraction in sand.");
-  alist.add ("quarts_in_sand", 0.75);
+  alist.add ("quarts_in_sand", 0.70);
   syntax.add ("dry_bulk_density", "g/cm^3", Syntax::OptionalConst,
 	      "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");
@@ -440,10 +440,10 @@ By default, this is calculated from the soil constituents.");
 	      "Fraction of humus in each SOM pool, from fastest to slowest.");
   syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
-  alist.add ("quarts_form_factor", 3.5);
+  alist.add ("quarts_form_factor", 2.0);
   syntax.add ("mineral_form_factor", Syntax::None (), Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
-  alist.add ("mineral_form_factor", 3.5);
+  alist.add ("mineral_form_factor", 4.0);
   syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");
   alist.add ("intervals", 100);

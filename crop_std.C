@@ -1,7 +1,5 @@
 // crop_std.C
 
-// #define LOG_AT_23
-
 #include "crop.h"
 #include "log.h"
 #include "time.h"
@@ -22,6 +20,7 @@
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
+static const double m_per_cm = 0.01;
 
 // Chemical constants affecting the crop.
 const double molWeightCH2O = 30.0; // [gCH2O/mol]
@@ -31,6 +30,9 @@ class CropStandard : public Crop
 {
   // Content.
 public:
+  struct RootSystem;
+  RootSystem& root_system;
+
   struct Parameters;
   struct Variables;
   const Parameters& par;
@@ -55,16 +57,6 @@ public:
 			    double EvapInterception);
 
   // Internal functions.
-protected:
-  double PotentialWaterUptake (const double h,
-			       const Soil& soil, const SoilWater& soil_water);
-  double SoluteUptake (const Soil&,
-		       const SoilWater&,
-		       Solute&,
-		       double /* PotNUpt */,
-		       vector<double>& uptake,
-		       double /* I_Mx */, double /* Rad */);
-
 public:				// Used by external development models.
   void Vernalization (double Ta);
 protected:
@@ -73,9 +65,6 @@ protected:
   double CropHeight ();
   void InitialCAI ();
   double CropCAI ();
-  void RootPenetration (const Soil&, const SoilHeat&);
-  double RootDensDistPar (double a);
-  void RootDensity (const Soil& soil);
   void NitContent ();
   void NitrogenUptake (int Hour,
 		       const Soil& soil,
@@ -117,6 +106,568 @@ public:
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
+
+class CropStandard::RootSystem
+{
+  // Parameters.
+public:
+  double DptEmr;		// Penetration at emergence
+private:
+  double PenPar1;		// Penetration rate parameter, coefficient
+  double PenPar2;		// Penetration rate parameter, threshold
+  double MaxPen;		// Max penetration depth
+  double SpRtLength;		// Specific root length [m/g]
+  double DensRtTip;		// Root density at (pot) penetration depth
+  double Rad;			// Root radius [cm]
+  double h_wp;			// Matrix potential at wilting
+  double MxNH4Up;		// Max NH4 uptake per unit root length
+  double MxNO3Up;		// Max NO3 uptake per unit root length
+  double Rxylem;		// Transport resistence in xyleme
+
+  // State.
+private:
+  double PotRtDpt;	        // Potential Root Penetration Depth [cm]
+public:
+  double Depth;			// Rooting Depth [cm]
+  vector<double> Density;	// Root density [cm/cm3] in soil layers
+private:
+  vector<double> H2OExtraction; // Extraction of H2O in soil [cm³/cm³/h]
+  vector<double> NH4Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
+  vector<double> NO3Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
+  double h_x;			// Root extraction at surface.
+
+  // Log.
+public:
+  double water_stress;		// Fraction of requested water we got.
+  double nitrogen_stress;	// Fraction of requested nitrogen we got.
+
+private:
+  double Ept;			// Potential evapotranspiration.
+  double H2OUpt;		// H2O uptake [mm/h]
+  double NH4Upt;		// NH4-N uptake [g/m2/h]
+  double NO3Upt;		// NO3-N uptake [g/m2/h]
+
+  // Uptake.
+private:
+  double potential_water_uptake (double h_x,
+				 const Soil& soil,
+				 const SoilWater& soil_water);
+public:
+  double water_uptake (double Ept,
+		       const Soil& soil, SoilWater& soil_water,
+		       const double EvapInterception);
+private:
+  double solute_uptake (const Soil&, const SoilWater&, Solute&,
+			double PotNUpt, vector<double>& uptake,
+			double i_max);
+public:
+  double nitrogen_uptake (const Soil& soil,
+			  const SoilWater& soil_water,
+			  SoilNH4& soil_NH4,
+			  SoilNO3& soil_NO3,
+			  double PotNUpt);
+
+  // Simulation.
+private:
+  static double density_distribution_parameter (double a);
+public:
+  void tick (const Soil&, const SoilHeat&, double WRoot, double IncWRoot);
+  void output (Log& log) const;
+
+  // Create and Destroy
+public:
+  void initialize (unsigned int size);
+  static void load_syntax (Syntax& syntax, AttributeList& alist);
+  RootSystem (const AttributeList& al);
+  ~RootSystem ();
+};
+
+double 
+CropStandard::RootSystem::potential_water_uptake (const double h_x,
+						  const Soil& soil,
+						  const SoilWater& soil_water)
+{
+  const vector<double>& L = Density;
+  vector<double>& S = H2OExtraction;
+
+  const double area = M_PI * Rad * Rad;
+  double total = 0.0;
+  for (unsigned int i = 0; i < soil.size () && L[i] > 0.0; i++)
+    {
+      if (soil_water.h (i) >= 0.0)
+	{
+	  S[i] = 0.0;
+	  continue;
+	}
+      const double h = h_x - (1 + Rxylem) * soil.z (i);
+      assert (soil_water.Theta_left (i) >= 0.0);
+      assert (soil_water.Theta (soil, i, h_wp) >= soil.Theta_res (i));
+      const double max_uptake
+	= (soil_water.Theta_left (i) - soil_water.Theta (soil, i, h_wp)) / dt;
+      const double uptake
+	= max (min (2 * M_PI * L[i]
+		    * (soil_water.Theta (soil, i, h) 
+		       / soil_water.Theta (soil, i, 0.0))
+		    * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
+		    / (- 0.5 * log (area * L[i])),
+		    max_uptake),
+	       0.0);
+      assert (soil_water.h (i) > h_wp || uptake == 0.0);
+      assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
+      assert (L[i] >= 0.0);
+      assert (soil_water.Theta (soil, i, h) > 0.0);
+      assert (soil_water.Theta (soil, i, 0.0) > 0.0);
+      assert (soil.M (i, soil_water.h (i)) >= 0.0);
+      assert (soil.M (i, h) >= 0.0);
+      assert (area * L[i] > 0.0);
+      assert ((- 0.5 * log (area * L[i])) != 0.0);
+      assert (uptake >= 0.0);
+      S[i] = uptake;
+      total += uptake * soil.dz (i) * 10; // mm/cm.
+    }
+  return total;
+}
+
+double
+CropStandard::RootSystem::water_uptake (double Ept_,
+					const Soil& soil,
+					SoilWater& soil_water,
+					const double EvapInterception)
+{
+  assert (EvapInterception >= 0);
+  if (Ept_ < 0)
+    {
+      CERR << "\nBUG: Negative EPT (" << Ept_ << ")\n";
+      Ept_ = 0.0;
+    }
+  Ept = Ept_;
+
+  static const double min_step = 1.0;
+  double total = potential_water_uptake (h_x, soil, soil_water);
+  double step = min_step;
+
+  while (total < Ept && h_x > h_wp)
+    {
+      const double h_next = max (h_x - step, h_wp);
+      const double next = potential_water_uptake (h_next, soil, soil_water);
+
+      if (next < total)
+	// We are past the top of the curve.
+	if (step <= min_step)
+	  // We cannot go any closer to the top, skip it.
+	  {
+	    h_x = h_wp;
+	    total = potential_water_uptake (h_x, soil, soil_water);
+	    break;
+	  }
+	else
+	  // Try again a little close.
+	  {
+	    step /= 2;
+	    continue;
+	  }
+      total = next;
+      h_x = h_next;
+      step *= 2;
+    }
+  if (h_x < h_wp)
+    h_x = h_wp;
+
+  step = min_step;
+  assert (h_x < 0.001);
+  while (total > Ept && h_x < 0.0)
+    {
+      assert (h_x < 0.001);
+      const double h_next = min (h_x + step, 0.0);
+      const double next = potential_water_uptake (h_next, soil, soil_water);
+
+      if (next < Ept)
+	// We went too far.
+	if (step <= min_step)
+	  {
+	    // We can't get any closer.
+	    assert (next <= total);
+	    if (next >= Ept)
+	      {
+		// total = next;
+		h_x = h_next;
+	      }
+	    else
+
+	    break;
+	  }
+	else
+	  // Try again a little closer.
+	  {
+	    step /= 2;
+	    continue;
+	  }
+
+      total = next;
+      h_x = h_next;
+      step *= 2;
+    }
+
+  // We need this to make sure H2OExtraction corresponds to `h_x'.
+  const double total2 = potential_water_uptake (h_x, soil, soil_water);
+  assert (total == total2);
+  assert (h_x >= h_wp);
+
+  if (total > Ept)
+    {
+      assert (h_x < 0.001);
+      assert (total > 0);
+      const double factor = Ept / total;
+      for (unsigned int i = 0; i < soil.size (); i++)
+	H2OExtraction[i] *= factor;
+      total = Ept;
+    }
+  H2OUpt = total;
+
+  // Update soil water sink term.
+  soil_water.root_uptake (H2OExtraction);
+  // Update water stress factor
+  if (Ept < 0.010)
+    water_stress = 1.0;
+  else
+    water_stress = (total + EvapInterception) / (Ept + EvapInterception);
+
+
+  return H2OUpt;
+}
+
+double
+CropStandard::RootSystem::solute_uptake (const Soil& soil,
+					 const SoilWater& soil_water,
+					 Solute& solute,
+					 double PotNUpt,
+					 vector<double>& uptake,
+					 double const I_max)
+{
+  if (PotNUpt <= 0.0)
+    {
+      fill (uptake.begin (), uptake.end (), 0.0);
+      return 0.0;
+    }
+
+  assert (PotNUpt > 0.0);
+  PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
+  const int size = soil.size ();
+  vector<double> I_zero (size, 0.0);
+  vector<double> B_zero (size, 0.0);
+  double U_zero = 0.0;
+  double B = 0.0;
+  double c_root = 0.0;
+
+  for (int i = 0; i < size; i++)
+    {
+      const double C_l = solute.C (i);
+      const double Theta = soil_water.Theta_old (i);
+      const double L = Density[i];
+      if (L > 0 && soil_water.h (i) <= 0.0)
+	{
+	  const double q_r = H2OExtraction[i] / L;
+	  const double D = solute.diffusion_coefficient ()
+	    * soil.tortuosity_factor (i, Theta)
+	    * Theta;
+	  const double alpha = q_r / ( 2 * M_PI * D);
+	  const double beta = 1.0 / (Rad * sqrt (M_PI * L));
+	  const double beta_squared = beta * beta;
+	  if (alpha < 1e-10)
+	    {
+	      B_zero[i] = 4.0 * M_PI * D
+		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
+	      I_zero[i] = B_zero[i] * C_l;
+	    }
+	  else if (alpha == 2.0)
+	    {
+	      B_zero[i] = q_r * log (beta_squared)
+		/ ((beta_squared - 1.0) - log (beta_squared));
+	      I_zero[i] = q_r * (beta_squared - 1.0) * C_l
+		/ ((beta_squared - 1.0) - log (beta_squared));
+	    }
+	  else
+	    {
+	      B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
+		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+		   - (pow (beta, 2.0 - alpha) - 1.0));
+	      I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha) * C_l
+		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
+		   - (pow (beta, 2.0 - alpha) - 1.0));
+	    }
+	  assert (finite (I_zero[i]));
+	  assert (finite (B_zero[i]));
+	  B += L * soil.dz (i) * B_zero[i];
+	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
+	}
+    }
+  if (U_zero > PotNUpt)
+    c_root = (U_zero - PotNUpt) / B;
+
+  for (int i = 0; i < size; i++)
+    {
+      const double L = Density[i];
+      if (solute.M_left (i) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
+	uptake[i] = max (0.0,
+			 min (L * (min (I_zero[i], I_max)
+				   - B_zero[i] * c_root),
+			      solute.M_left (i) - 1e-8));
+      else
+	uptake[i] = 0.0;
+      assert (uptake[i] >= 0.0);
+    }
+  solute.add_to_sink (uptake);
+
+  // gN/cm³/h -> gN/m²/h
+  return soil.total (uptake) * 1.0e4;
+}
+
+double
+CropStandard::RootSystem::nitrogen_uptake (const Soil& soil,
+					   const SoilWater& soil_water,
+					   SoilNH4& soil_NH4,
+					   SoilNO3& soil_NO3,
+					   const double PotNUpt)
+{
+  NH4Upt = solute_uptake (soil, soil_water, soil_NH4, 
+			  PotNUpt, NH4Extraction, MxNH4Up);
+  NO3Upt = solute_uptake (soil, soil_water, soil_NO3, 
+			  PotNUpt - NH4Upt, NO3Extraction, MxNO3Up);
+
+  assert (NH4Upt >= 0.0);
+  assert (NO3Upt >= 0.0);
+
+  return NH4Upt + NO3Upt;
+}
+
+double
+CropStandard::RootSystem::density_distribution_parameter (double a)
+{
+  double x, y, z, x1, y1, z1, x2, y2, z2;
+
+  if (1 + a > exp (1.0))
+    {
+      x1 = 1.0;
+      y1 = exp (x1);
+      z1 = 1 + a * x1;
+      x2 = 20.0;
+      y2 = exp (x2);
+      z2 = 1 + a * x2;
+      while ((z1 - y1) * (z2 - y2) > 0)
+	{
+	  x1 = x2;
+	  y1 = y2;
+	  z1 = z2;
+	  x2++;
+	  y2 = exp (x2);
+	  z2 = 1 + a * x2;
+	}
+    }
+  else if (a >= 0.3)
+    {
+      x1 = 0.3;
+      y1 = exp (x1);
+ //     z1 = 1 + a * x1;
+      x2 = 1.0;
+      y2 = exp (x2);
+ //     z2 = 1 + a * x2;
+    }
+  else
+    {
+      assert (false /* Invalid Root Distribution */);
+    }
+  x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
+  y = exp (x);
+  z = 1 + a * x;
+  while (fabs (2 * (z - y) / (z + y)) > 1.0e-5)
+    {
+      if (z - y > 0)
+	{
+	  x1 = x;
+	  y1 = y;
+	  // z1 = z;
+	}
+      else
+	{
+	  x2 = x;
+	  y2 = y;
+	  // z2 = z;
+	}
+      x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
+      y = exp (x);
+      z = 1 + a * x;
+    }
+  return x;
+}
+
+void
+CropStandard::RootSystem::tick (const Soil& soil, 
+				const SoilHeat& soil_heat, 
+				const double WRoot,
+				const double IncWRoot)
+{
+  // Penetration.
+  if (IncWRoot > 0)
+    {
+      double Ts = soil_heat.T (soil.interval_plus (-Depth));
+      double dp = PenPar1 * max (0.0, Ts - PenPar2);
+      PotRtDpt = min (PotRtDpt + dp, MaxPen);
+      /*max depth determined by crop*/
+      Depth = min (Depth + dp, MaxPen);
+      /*max depth determined by crop*/
+      Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
+    }
+
+  // Density.
+  const double LengthPrArea
+    = max (m_per_cm * SpRtLength * WRoot, 0.12 * PotRtDpt); /*cm/cm2*/
+  double a = density_distribution_parameter (LengthPrArea / 
+					     (PotRtDpt * DensRtTip));
+  double L0 = DensRtTip * exp (a);
+  a /= PotRtDpt;
+  if (Depth < PotRtDpt)
+    {
+      double Lz = L0 * exp (-a * Depth);
+      a = density_distribution_parameter (LengthPrArea / (Depth * Lz)) / Depth;
+    }
+
+  unsigned int i = 0;
+  for (; i == 0 || -soil.zplus (i-1) < Depth; i++)
+    Density[i] = L0 * exp (a * soil.z (i));
+  assert (i < soil.size ());
+  for (; i < soil.size (); i++)
+    Density[i] = 0.0;
+}
+
+void
+CropStandard::RootSystem::output (Log& log) const
+{
+  log.output ("PotRtDpt", PotRtDpt);
+  log.output ("Depth", Depth);
+  log.output ("Density", Density);
+  log.output ("H2OExtraction", H2OExtraction);
+  log.output ("NH4Extraction", NH4Extraction);
+  log.output ("NO3Extraction", NO3Extraction);
+  log.output ("h_x", h_x);
+  log.output ("water_stress", water_stress);
+  log.output ("nitrogen_stress", nitrogen_stress);
+  log.output ("Ept", Ept);
+  log.output ("H2OUpt", H2OUpt);
+  log.output ("NH4Upt", NH4Upt);
+  log.output ("NO3Upt", NO3Upt);
+}
+
+void
+CropStandard::RootSystem::initialize (unsigned int size)
+{
+  while (Density.size () < size)
+    Density.push_back (0.0);
+  while (H2OExtraction.size () < size)
+    H2OExtraction.push_back (0.0);
+  while (NH4Extraction.size () < size)
+    NH4Extraction.push_back (0.0);
+  while (NO3Extraction.size () < size)
+    NO3Extraction.push_back (0.0);
+}
+
+void 
+CropStandard::RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  static const vector<double> empty_array;
+
+  syntax.add ("DptEmr", "cm", Syntax::Const,
+	    "Penetration at emergence.");
+  alist.add ("DptEmr", 10.0);
+  syntax.add ("PenPar1", "cm/dg C/h", Syntax::Const,
+	    "Penetration rate parameter, coefficient.");
+  alist.add ("PenPar1", 0.25);
+  syntax.add ("PenPar2", "dg C", Syntax::Const,
+	    "Penetration rate parameter, threshold.");
+  alist.add ("PenPar2", 4.0);
+  syntax.add ("MaxPen", "cm", Syntax::Const,
+	    "Maximum penetration depth.");
+  syntax.add ("SpRtLength", "m/g", Syntax::Const,
+	    "Specific root length");
+  alist.add ("SpRtLength", 100.0);
+  syntax.add ("DensRtTip", "cm/cm^3", Syntax::Const,
+	    "Root density at (potential) penetration depth.");
+  alist.add ("DensRtTip", 0.1);
+  syntax.add ("Rad", "cm", Syntax::Const,
+	    "Root radius.");
+  alist.add ("Rad", 0.005);
+  syntax.add ("h_wp", "cm", Syntax::Const,
+	    "Matrix potential at wilting point.");
+  alist.add ("h_wp",-15000.0);
+  syntax.add ("MxNH4Up", "g/cm/h", Syntax::Const,
+	    "Maximum NH4 uptake per unit root length.");
+  alist.add ("MxNH4Up", 2.5e-7);
+  syntax.add ("MxNO3Up", "g/cm/h", Syntax::Const,
+	    "Maximum NO3 uptake per unit root length.");
+  alist.add ("MxNO3Up", 2.5e-8);
+  syntax.add ("Rxylem", Syntax::None (), Syntax::Const,
+	    "Transport resistence in xyleme.");
+  alist.add ("Rxylem", 10.0);
+
+  syntax.add ("PotRtDpt", "cm", Syntax::OptionalState,
+	      "Potential root penetration depth.");
+  syntax.add ("Depth", "cm", Syntax::OptionalState, "Rooting Depth.");
+  syntax.add ("Density", "cm/cm3", Syntax::State, Syntax::Sequence,
+	       "Root density in soil layers.");
+  alist.add ("Density", empty_array);
+  syntax.add ("H2OExtraction", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
+	       "Extraction of H2O in soil layers.");
+  alist.add ("H2OExtraction", empty_array);
+  syntax.add ("NH4Extraction", "g N/cm^3/h", Syntax::State, Syntax::Sequence,
+	       "Extraction of NH4-N in soil layers.");
+  alist.add ("NH4Extraction", empty_array);
+  syntax.add ("NO3Extraction", "g N/cm^3/h", Syntax::State, Syntax::Sequence,
+	       "Extraction of NO3-N in soil layers.");
+  alist.add ("NO3Extraction", empty_array);
+  syntax.add ("h_x", "cm", Syntax::State,
+	       "Root extraction at surface.");
+  alist.add ("h_x", 0.0);
+  syntax.add ("water_stress", Syntax::None (), Syntax::LogOnly,
+	       "Fraction of requested water we got.");
+  syntax.add ("nitrogen_stress", Syntax::None (), Syntax::LogOnly,
+	       "Nitrogen stress factor.");
+  syntax.add ("Ept", "mm/h", Syntax::LogOnly,
+	       "Potential transpiration.");
+  syntax.add ("H2OUpt", "mm/h", Syntax::LogOnly, "H2O uptake.");
+  syntax.add ("NH4Upt", "g N/m^2/h", Syntax::LogOnly, "NH4-N uptake.");
+  syntax.add ("NO3Upt", "g N/m^2/h", Syntax::LogOnly, "NO3-N uptake.");
+}
+
+CropStandard::RootSystem::RootSystem (const AttributeList& al)
+  : DptEmr (al.number ("DptEmr")),
+    PenPar1 (al.number ("PenPar1")),
+    PenPar2 (al.number ("PenPar2")),
+    MaxPen (al.number ("MaxPen")),
+    SpRtLength (al.number ("SpRtLength")),
+    DensRtTip (al.number ("DensRtTip")),
+    Rad (al.number ("Rad")),
+    h_wp (al.number ("h_wp")),
+    MxNH4Up (al.number ("MxNH4Up")),
+    MxNO3Up (al.number ("MxNO3Up")),
+    Rxylem (al.number ("Rxylem")),
+    PotRtDpt (  al.check ("PotRtDpt")
+	      ? al.number ("PotRtDpt")
+	      : al.number ("DptEmr")),
+    Depth (al.check ("Depth") ? al.number ("Depth") : al.number ("DptEmr")),
+    Density (al.number_sequence ("Density")),
+    H2OExtraction (al.number_sequence ("H2OExtraction")),
+    NH4Extraction (al.number_sequence ("NH4Extraction")),
+    NO3Extraction (al.number_sequence ("NO3Extraction")),
+    h_x (al.number ("h_x")),
+    water_stress (1.0),
+    nitrogen_stress (1.0),
+    Ept (0.0),
+    H2OUpt (0.0),
+    NH4Upt (0.0),
+    NO3Upt (0.0)
+{ }
+
+CropStandard::RootSystem::~RootSystem ()
+{ }
 
 struct CropStandard::Parameters
 {
@@ -182,22 +733,6 @@ struct CropStandard::Parameters
     friend struct CropStandard::Parameters;
     CanopyPar (const AttributeList&);
   } Canopy;
-  const struct RootPar {
-    double DptEmr;		// Penetration at emergence
-    double PenPar1;		// Penetration rate parameter, coefficient
-    double PenPar2;		// Penetration rate parameter, threshold
-    double MaxPen;		// Max penetration depth
-    double SpRtLength;		// Specific root length [m/g]
-    double DensRtTip;		// Root density at (pot) penetration depth
-    double Rad;			// Root radius [ cm ]
-    double h_wp;		// Matrix potential at wilting
-    double MxNH4Up;		// Max NH4 uptake per unit root length
-    double MxNO3Up;		// Max NO3 uptake per unit root length
-    double Rxylem;		// Transport resistence in xyleme
-  private:
-    friend struct CropStandard::Parameters;
-    RootPar (const AttributeList&);
-  } Root;
   const struct PartitPar {
     const CSMP& Root;		// Partitioning functions for root
     const CSMP& Leaf;		//   leaf, and stem as function of DS
@@ -315,25 +850,6 @@ struct CropStandard::Variables
     friend struct CropStandard::Variables;
     RecCanopy (const Parameters&, const AttributeList&);
   } Canopy;
-  struct RecRootSys
-  {
-    void output (Log&) const;
-    double Depth;		// Rooting Depth [cm]
-    vector<double> Density;	// Root density [cm/cm3] in soil layers
-    vector<double> H2OExtraction; // Extraction of H2O in soil layers
-    // [cm³/cm³/h]
-    vector<double> NH4Extraction; // Extraction of NH4-N in soil layers
-    // [gN/cm³/h]
-    vector<double> NO3Extraction; // Extraction of NH4-N in soil layers
-    // [gN/cm³/h]
-    double h_x;			// Root extraction at surface.
-    double water_stress;	// Fraction of requested water we got.
-    double nitrogen_stress;	// Fraction of requested nitrogen we got.
-    double Ept;			// Potential evapotranspiration.
-  private:
-    friend struct CropStandard::Variables;
-    RecRootSys (const Parameters&, const AttributeList&);
-  } RootSys;
   struct RecProd
   {
     void output (Log&) const;
@@ -363,7 +879,6 @@ struct CropStandard::Variables
     void output (Log&) const;
     bool InitCAI;		// Initial CAI development ?
     double StemRes;		// Shielded Reserves in Stems
-    double PotRtDpt;	        // Potential Root Penetration Depth [cm]
     double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
     double CrNCnt;		// Critical Nitrogen Content in Crop [g/m2]
     double NfNCnt;		// Non-func Nitrogen Content in Crop [g/m2]
@@ -381,9 +896,6 @@ struct CropStandard::Variables
     double DeadNLeaf;		// Leaf N removed [g N/m2/d]
     double DeadWRoot;		// Root DM removed [g DM/m2/d]
     double DeadNRoot;		// Root N removed [g N/m2/d]
-    double H2OUpt;		// H2O uptake [mm/h]
-    double NH4Upt;		// NH4-N uptake [g/m2/h]
-    double NO3Upt;		// NO3-N uptake [g/m2/h]
     double Fixated;		// N fixation from air. [g/m2/h]
     double DS_start_fixate;	// Start fixation at this DS.
   private:
@@ -402,7 +914,6 @@ CropStandard::Parameters::Parameters (const AttributeList& vl)
     Vernal (vl.check ("Vernal") ? vl.alist ("Vernal") : *VernalPar::none),
     LeafPhot (vl.alist ("LeafPhot")),
     Canopy (vl.alist ("Canopy")),
-    Root (vl.alist ("Root")),
     Partit (vl.alist ("Partit")),
     Prod (vl.alist ("Prod")),
     CrpN (vl.alist ("CrpN")),
@@ -458,20 +969,6 @@ CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
     EpFac (vl.number ("EpFac")),
     rs_max (vl.number ("rs_max")),
     rs_min (vl.number ("rs_min"))
-{ }
-
-CropStandard::Parameters::RootPar::RootPar (const AttributeList& vl)
-  : DptEmr (vl.number ("DptEmr")),
-    PenPar1 (vl.number ("PenPar1")),
-    PenPar2 (vl.number ("PenPar2")),
-    MaxPen (vl.number ("MaxPen")),
-    SpRtLength (vl.number ("SpRtLength")),
-    DensRtTip (vl.number ("DensRtTip")),
-    Rad (vl.number ("Rad")),
-    h_wp (vl.number ("h_wp")),
-    MxNH4Up (vl.number ("MxNH4Up")),
-    MxNO3Up (vl.number ("MxNO3Up")),
-    Rxylem (vl.number ("Rxylem"))
 { }
 
 CropStandard::Parameters::PartitPar::PartitPar (const AttributeList& vl)
@@ -548,7 +1045,6 @@ CropStandard::Variables::Variables (const Parameters& par,
 				    const AttributeList& vl)
   : Phenology (par, vl.alist ("Phenology")),
     Canopy (par, vl.alist ("Canopy")),
-    RootSys (par, vl.alist ("RootSys")),
     Prod (par, vl.alist ("Prod")),
     CrpAux (par, vl.alist ("CrpAux"))
 { }
@@ -560,8 +1056,6 @@ CropStandard::Variables::output (Log& log) const
     Phenology.output (log);
   if (log.check ("Canopy"))
     Canopy.output (log);
-  if (log.check ("RootSys"))
-    RootSys.output (log);
   if (log.check ("Prod"))
     Prod.output (log);
   if (log.check ("CrpAux"))
@@ -621,35 +1115,6 @@ CropStandard::Variables::RecCanopy::output (Log& log) const
   log.close();
 }
 
-CropStandard::Variables::RecRootSys::RecRootSys (const Parameters& par,
-						 const AttributeList& vl)
-  : Depth (vl.check ("Depth") ? vl.number ("Depth") : par.Root.DptEmr),
-    Density (vl.number_sequence ("Density")),
-    H2OExtraction (vl.number_sequence ("H2OExtraction")),
-    NH4Extraction (vl.number_sequence ("NH4Extraction")),
-    NO3Extraction (vl.number_sequence ("NO3Extraction")),
-    h_x (vl.number ("h_x")),
-    water_stress (1.0),
-    nitrogen_stress (1.0),
-    Ept (0.0)
-{ }
-
-void
-CropStandard::Variables::RecRootSys::output (Log& log) const
-{
-  log.open ("RootSys");
-  log.output ("Depth", Depth);
-  log.output ("Density", Density);
-  log.output ("H2OExtraction", H2OExtraction);
-  log.output ("NH4Extraction", NH4Extraction);
-  log.output ("NO3Extraction", NO3Extraction);
-  log.output ("h_x", h_x);
-  log.output ("water_stress", water_stress);
-  log.output ("nitrogen_stress", nitrogen_stress);
-  log.output ("Ept", Ept);
-  log.close();
-}
-
 CropStandard::Variables::RecProd::RecProd (const Parameters& par,
 					   const AttributeList& vl)
   : CH2OPool (vl.number ("CH2OPool")),
@@ -695,9 +1160,6 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 					       const AttributeList& vl)
   : InitCAI (vl.flag ("InitCAI")),
     StemRes (vl.number ("StemRes")),
-    PotRtDpt (  vl.check ("PotRtDpt")
-	      ? vl.number ("PotRtDpt")
-	      : par.Root.DptEmr),
     PtNCnt (0.0),
     CrNCnt (0.0),
     NfNCnt (0.0),
@@ -715,9 +1177,6 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     DeadNLeaf (0.0),
     DeadWRoot (0.0),
     DeadNRoot (0.0),
-    H2OUpt (0.0),
-    NH4Upt (0.0),
-    NO3Upt (0.0),
     Fixated (0.0),
     DS_start_fixate (vl.check ("DS_start_fixate")
 		     ? vl.number ("DS_start_fixate")
@@ -730,7 +1189,6 @@ CropStandard::Variables::RecCrpAux::output (Log& log) const
   log.open ("CrpAux");
   log.output ("InitCAI", InitCAI);
   log.output ("StemRes", StemRes);
-  log.output ("PotRtDpt", PotRtDpt);
   log.output ("PtNCnt", PtNCnt);
   log.output ("CrNCnt", CrNCnt);
   log.output ("NfNCnt", NfNCnt);
@@ -748,9 +1206,6 @@ CropStandard::Variables::RecCrpAux::output (Log& log) const
   log.output ("DeadNLeaf", DeadNLeaf);
   log.output ("DeadWRoot", DeadWRoot);
   log.output ("DeadNRoot", DeadNRoot);
-  log.output ("H2OUpt", H2OUpt);
-  log.output ("NH4Upt", NH4Upt);
-  log.output ("NO3Upt", NO3Upt);
   log.output ("Fixated", Fixated);
   log.output ("DS_start_fixate", DS_start_fixate);
   log.close();
@@ -763,17 +1218,7 @@ void
 CropStandard::initialize (const Geometry& geometry,
 			  const OrganicMatter& organic_matter)
 {
-  unsigned int size = geometry.size ();
-
-  // Fill rootsys arrays.
-  while (var.RootSys.Density.size () < size)
-    var.RootSys.Density.push_back (0.0);
-  while (var.RootSys.H2OExtraction.size () < size)
-    var.RootSys.H2OExtraction.push_back (0.0);
-  while (var.RootSys.NH4Extraction.size () < size)
-    var.RootSys.NH4Extraction.push_back (0.0);
-  while (var.RootSys.NO3Extraction.size () < size)
-    var.RootSys.NO3Extraction.push_back (0.0);
+  root_system.initialize (geometry.size ());
 
   if (var.Phenology.DS >= 0)
     {
@@ -794,11 +1239,11 @@ static struct CropStandardSyntax
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule_sequence<OM>;
+template class add_submodule<RootSystem>;
 #endif
 
 CropStandardSyntax::CropStandardSyntax ()
 {
-  static const vector<double> empty_array;
   static const CSMP empty_csmp;
 
   Syntax& Devel = *new Syntax ();
@@ -808,8 +1253,6 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& LeafPhot = *new Syntax ();
   Syntax& Canopy = *new Syntax ();
   AttributeList& vCanopy = *new AttributeList ();
-  Syntax& Root = *new Syntax ();
-  AttributeList& vRoot = *new AttributeList ();
   Syntax& Partit = *new Syntax ();
   Syntax& Prod = *new Syntax ();
   AttributeList& vProd = *new AttributeList ();
@@ -819,8 +1262,6 @@ CropStandardSyntax::CropStandardSyntax ()
   AttributeList& HarvestList = *new AttributeList ();
   Syntax& Phenology = *new Syntax ();
   AttributeList& vPhenology = *new AttributeList ();
-  Syntax& RootSys = *new Syntax ();
-  AttributeList& vRootSys = *new AttributeList ();
   Syntax& CrpAux = *new Syntax ();
   AttributeList& vCrpAux = *new AttributeList ();
 
@@ -940,40 +1381,6 @@ This parameterization is only valid until the specified development state.");
   Canopy.add ("rs_min", "s/m", Syntax::Const,
 	      "Minimum transpiration resistance.");
   vCanopy.add ("rs_min", 0.0);
-
-  // RootPar
-  Root.add ("DptEmr", "cm", Syntax::Const,
-	    "Penetration at emergence.");
-  Root.add ("PenPar1", "cm/dg C/h", Syntax::Const,
-	    "Penetration rate parameter, coefficient.");
-  Root.add ("PenPar2", "dg C", Syntax::Const,
-	    "Penetration rate parameter, threshold.");
-  Root.add ("MaxPen", "cm", Syntax::Const,
-	    "Maximum penetration depth.");
-  Root.add ("SpRtLength", "m/g", Syntax::Const,
-	    "Specific root length");
-  Root.add ("DensRtTip", "cm/cm^3", Syntax::Const,
-	    "Root density at (potential) penetration depth.");
-  Root.add ("Rad", "cm", Syntax::Const,
-	    "Root radius.");
-  Root.add ("h_wp", "cm", Syntax::Const,
-	    "Matrix potential at wilting point.");
-  Root.add ("MxNH4Up", "g/cm/h", Syntax::Const,
-	    "Maximum NH4 uptake per unit root length.");
-  Root.add ("MxNO3Up", "g/cm/h", Syntax::Const,
-	    "Maximum NO3 uptake per unit root length.");
-  Root.add ("Rxylem", Syntax::None (), Syntax::Const,
-	    "Transport resistence in xyleme.");
-  vRoot.add ("DptEmr", 10.0);
-  vRoot.add ("PenPar1", 0.25);
-  vRoot.add ("PenPar2", 4.0);
-  vRoot.add ("SpRtLength", 100.0);
-  vRoot.add ("DensRtTip", 0.1);
-  vRoot.add ("Rad", 0.005);
-  vRoot.add ("h_wp",-15000.0);
-  vRoot.add ("MxNH4Up", 2.5e-7);
-  vRoot.add ("MxNO3Up", 2.5e-8);
-  vRoot.add ("Rxylem", 10.0);
 
   // PartitPar
   Partit.add ("Root", Syntax::CSMP, Syntax::Const,
@@ -1201,30 +1608,6 @@ Maximal development stage for which the crop survives harvest.");
 	      "Accumulated Leaf Area Index at Height.");
   vCanopy.add ("LAIvsH", empty_csmp);
 
-  // RootSys
-  RootSys.add ("Depth", "cm", Syntax::OptionalState, "Rooting Depth.");
-  RootSys.add ("Density", "cm/cm3", Syntax::State, Syntax::Sequence,
-	       "Root density in soil layers.");
-  vRootSys.add ("Density", empty_array);
-  RootSys.add ("H2OExtraction", "cm^3/cm^3/h", Syntax::State, Syntax::Sequence,
-	       "Extraction of H2O in soil layers.");
-  vRootSys.add ("H2OExtraction", empty_array);
-  RootSys.add ("NH4Extraction", "g N/cm^3/h", Syntax::State, Syntax::Sequence,
-	       "Extraction of NH4-N in soil layers.");
-  vRootSys.add ("NH4Extraction", empty_array);
-  RootSys.add ("NO3Extraction", "g N/cm^3/h", Syntax::State, Syntax::Sequence,
-	       "Extraction of NO3-N in soil layers.");
-  vRootSys.add ("NO3Extraction", empty_array);
-  RootSys.add ("h_x", "cm", Syntax::State,
-	       "Root extraction at surface.");
-  vRootSys.add ("h_x", 0.0);
-  RootSys.add ("water_stress", Syntax::None (), Syntax::LogOnly,
-	       "Fraction of requested water we got.");
-  RootSys.add ("nitrogen_stress", Syntax::None (), Syntax::LogOnly,
-	       "Nitrogen stress factor.");
-  RootSys.add ("Ept", "mm/h", Syntax::LogOnly,
-	       "Potential transpiration.");
-
   // Prod
   // Warning: Uses same syntax as `ProdPar'.
   Prod.add ("CH2OPool", "g DM/m^2", Syntax::State, "CH2O Pool.");
@@ -1269,8 +1652,6 @@ Maximal development stage for which the crop survives harvest.");
   CrpAux.add ("InitCAI", Syntax::Boolean, Syntax::State,
 	      "Initial CAI development.");
   vCrpAux.add ("InitCAI", true);
-  CrpAux.add ("PotRtDpt", "cm", Syntax::OptionalState,
-	      "Potential root penetration depth.");
   CrpAux.add ("StemRes", "g DM/m^2", Syntax::State,
 	      "Shielded reserves in stems.");
   vCrpAux.add ("StemRes", 0.0);
@@ -1311,9 +1692,6 @@ Maximal development stage for which the crop survives harvest.");
 	      "Root DM removed.");
   CrpAux.add ("DeadNRoot", "g N/m2/d", Syntax::LogOnly,
 	      "Root N removed.");
-  CrpAux.add ("H2OUpt", "mm/h", Syntax::LogOnly, "H2O uptake.");
-  CrpAux.add ("NH4Upt", "g N/m^2/h", Syntax::LogOnly, "NH4-N uptake.");
-  CrpAux.add ("NO3Upt", "g N/m^2/h", Syntax::LogOnly, "NO3-N uptake.");
   CrpAux.add ("Fixated", "g N/m^2/h", Syntax::LogOnly, " fixation from air.");
   CrpAux.add ("DS_start_fixate", Syntax::None (), Syntax::OptionalState,
 	      "Development stage at which to restart fixation after a cut.");
@@ -1333,13 +1711,14 @@ Maximal development stage for which the crop survives harvest.");
   alist.add ("enable_N_stress", true);
 
   // Submodels.
+  add_submodule<CropStandard::RootSystem>("Root", syntax, alist,
+					  Syntax::State, "Root system.");
+
   syntax.add ("Devel", Devel, "Crop development.");
   alist.add ("Devel", vDevel);
   syntax.add ("Vernal", Vernal, Syntax::OptionalConst, Syntax::Singleton,
 	      "Vernalization.");
   syntax.add ("LeafPhot", LeafPhot, "Leaf photosynthesis.");
-  syntax.add ("Root", Root, "The root system.");
-  alist.add ("Root", vRoot);
   syntax.add ("Partit", Partit, "Assimilate partitioning.");
   syntax.add ("CrpN", CrpN, "Nitrogen content in the crop.");
   alist.add ("CrpN", CrpNList);
@@ -1349,8 +1728,6 @@ Maximal development stage for which the crop survives harvest.");
   alist.add ("Phenology", vPhenology);
   syntax.add ("Canopy", Canopy, "Canopy structure.");
   alist.add ("Canopy", vCanopy);
-  syntax.add ("RootSys", RootSys, "Root system state.");
-  alist.add ("RootSys", vRootSys);
   syntax.add ("Prod", Prod, "Crop production.");
   alist.add ("Prod", vProd);
   syntax.add ("CrpAux", CrpAux, "Miscellaneous crop state variables.");
@@ -1360,10 +1737,10 @@ Maximal development stage for which the crop survives harvest.");
 }
 
 double CropStandard::water_stress () const // [0-1] (1 = full production)
-{ return var.RootSys.water_stress; }
+{ return root_system.water_stress; }
 
 double CropStandard::nitrogen_stress () const // [0-1] (0 = no production)
-{ return var.RootSys.nitrogen_stress; }
+{ return root_system.nitrogen_stress; }
 
 double CropStandard::rs_min () const // Minimum trasnpiration resistance.
 { return par.Canopy.rs_min; }
@@ -1394,87 +1771,6 @@ double CropStandard::IntcpCap () const // Interception Capacity.
 
 double CropStandard::EpFac () const // Convertion to potential evapotransp.
 { return par.Canopy.EpFac; }
-
-double
-CropStandard::SoluteUptake (const Soil& soil,
-			    const SoilWater& soil_water,
-			    Solute& solute,
-			    double PotNUpt,
- 			    vector<double>& uptake,
-			    double I_max, double r_root)
-{
-  PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
-  const vector<double>& root_density = var.RootSys.Density;
-  const vector<double>& S = var.RootSys.H2OExtraction;
-  const int size = soil.size ();
-  vector<double> I_zero (size, 0.0);
-  vector<double> B_zero (size, 0.0);
-  double U_zero = 0.0;
-  double B = 0.0;
-  double c_root = 0.0;
-
-  for (int i = 0; i < size; i++)
-    {
-      const double C_l = solute.C (i);
-      const double Theta = soil_water.Theta_old (i);
-      const double L = root_density[i];
-      if (L > 0 && soil_water.h (i) <= 0.0)
-	{
-	  const double q_r = S[i] / L;
-	  const double D = solute.diffusion_coefficient ()
-	    * soil.tortuosity_factor (i, Theta)
-	    * Theta;
-	  const double alpha = q_r / ( 2 * M_PI * D);
-	  const double beta = 1.0 / (r_root * sqrt (M_PI * L));
-	  const double beta_squared = beta * beta;
-	  if (alpha < 1e-10)
-	    {
-	      B_zero[i] = 4.0 * M_PI * D
-		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
-	      I_zero[i] = B_zero[i] * C_l;
-	    }
-	  else if (alpha == 2.0)
-	    {
-	      B_zero[i] = q_r * log (beta_squared)
-		/ ((beta_squared - 1.0) - log (beta_squared));
-	      I_zero[i] = q_r * (beta_squared - 1.0) * C_l
-		/ ((beta_squared - 1.0) - log (beta_squared));
-	    }
-	  else
-	    {
-	      B_zero[i] = q_r * (pow (beta, 2.0 - alpha) - 1.0)
-		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-		   - (pow (beta, 2.0 - alpha) - 1.0));
-	      I_zero[i] = q_r * (beta_squared - 1.0) * (1.0 - 0.5 * alpha) * C_l
-		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
-		   - (pow (beta, 2.0 - alpha) - 1.0));
-	    }
-	  assert (finite (I_zero[i]));
-	  assert (finite (B_zero[i]));
-	  B += L * soil.dz (i) * B_zero[i];
-	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
-	}
-    }
-  if (U_zero > PotNUpt)
-    c_root = (U_zero - PotNUpt) / B;
-
-  for (int i = 0; i < size; i++)
-    {
-      const double L = root_density[i];
-      if (solute.M_left (i) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
-	uptake[i] = max (0.0,
-			 min (L * (min (I_zero[i], I_max)
-				   - B_zero[i] * c_root),
-			      solute.M_left (i) - 1e-8));
-      else
-	uptake[i] = 0.0;
-      assert (uptake[i] >= 0.0);
-    }
-  solute.add_to_sink (uptake);
-
-  // gN/cm³/h -> gN/m²/h
-  return soil.total (uptake) * 1.0e4;
-}
 
 void
 CropStandard::Vernalization (double Ta)
@@ -1730,264 +2026,7 @@ CropStandard::ActualWaterUptake (double Ept,
 				 const Soil& soil, SoilWater& soil_water,
 				 const double EvapInterception)
 {
-  if (Ept < 0)
-    {
-      CERR << "\nBUG: Negative EPT (" << Ept << ")\n";
-      Ept = 0.0;
-    }
-  assert (EvapInterception >= 0);
-  static const double min_step = 1.0;
-  const double h_wp = par.Root.h_wp;
-  double& h_x = var.RootSys.h_x;
-  double total = PotentialWaterUptake (h_x, soil, soil_water);
-  double step = min_step;
-  var.RootSys.Ept = Ept;
-
-  while (total < Ept && h_x > h_wp)
-    {
-      const double h_next = max (h_x - step, h_wp);
-      const double next = PotentialWaterUptake (h_next, soil, soil_water);
-
-      if (next < total)
-	// We are past the top of the curve.
-	if (step <= min_step)
-	  // We cannot go any closer to the top, skip it.
-	  {
-	    h_x = h_wp;
-	    total = PotentialWaterUptake (h_x, soil, soil_water);
-	    break;
-	  }
-	else
-	  // Try again a little close.
-	  {
-	    step /= 2;
-	    continue;
-	  }
-      total = next;
-      h_x = h_next;
-      step *= 2;
-    }
-  if (h_x < h_wp)
-    h_x = h_wp;
-
-  step = min_step;
-  assert (h_x < 0.001);
-  while (total > Ept && h_x < 0.0)
-    {
-      assert (h_x < 0.001);
-      const double h_next = min (h_x + step, 0.0);
-      const double next = PotentialWaterUptake (h_next, soil, soil_water);
-
-      if (next < Ept)
-	// We went too far.
-	if (step <= min_step)
-	  {
-	    // We can't get any closer.
-	    assert (next <= total);
-	    if (next >= Ept)
-	      {
-		// total = next;
-		h_x = h_next;
-	      }
-	    else
-
-	    break;
-	  }
-	else
-	  // Try again a little closer.
-	  {
-	    step /= 2;
-	    continue;
-	  }
-
-      total = next;
-      h_x = h_next;
-      step *= 2;
-    }
-
-  // We need this to make sure H2OExtraction corresponds to `h_x'.
-  const double total2 = PotentialWaterUptake (h_x, soil, soil_water);
-  assert (total == total2);
-  assert (h_x >= h_wp);
-
-  vector<double>& H2OExtraction = var.RootSys.H2OExtraction;
-  if (total > Ept)
-    {
-      assert (h_x < 0.001);
-      assert (total > 0);
-      const double factor = Ept / total;
-      for (unsigned int i = 0; i < soil.size (); i++)
-	H2OExtraction[i] *= factor;
-      total = Ept;
-    }
-  // Update soil water sink term.
-  soil_water.root_uptake (H2OExtraction);
-  // Update water stress factor
-  double& water_stress = var.RootSys.water_stress;
-  if (Ept < 0.010)
-    water_stress = 1.0;
-  else
-    water_stress = (total + EvapInterception) / (Ept + EvapInterception);
-
-  var.CrpAux.H2OUpt = total;
-  return total;
-}
-
-double
-CropStandard::PotentialWaterUptake (const double h_x,
-				    const Soil& soil, const SoilWater& soil_water)
-{
-  const double h_wp = par.Root.h_wp;
-  const double Rxylem = par.Root.Rxylem;
-  const double area = M_PI * par.Root.Rad * par.Root.Rad;
-  const vector<double>& L = var.RootSys.Density;
-  vector<double>& S = var.RootSys.H2OExtraction;
-  double total = 0.0;
-  for (unsigned int i = 0; i < soil.size () && L[i] > 0.0; i++)
-    {
-      if (soil_water.h (i) >= 0.0)
-	{
-	  S[i] = 0.0;
-	  continue;
-	}
-      const double h = h_x - (1 + Rxylem) * soil.z (i);
-      assert (soil_water.Theta_left (i) >= 0.0);
-      assert (soil_water.Theta (soil, i, h_wp) >= soil.Theta_res (i));
-      const double max_uptake
-	= (soil_water.Theta_left (i) - soil_water.Theta (soil, i, h_wp)) / dt;
-      const double uptake
-	= max (min (2 * M_PI * L[i]
-		    * (soil_water.Theta (soil, i, h) 
-		       / soil_water.Theta (soil, i, 0.0))
-		    * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
-		    / (- 0.5 * log (area * L[i])),
-		    max_uptake),
-	       0.0);
-      assert (soil_water.h (i) > h_wp || uptake == 0.0);
-      assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
-      assert (L[i] >= 0.0);
-      assert (soil_water.Theta (soil, i, h) > 0.0);
-      assert (soil_water.Theta (soil, i, 0.0) > 0.0);
-      assert (soil.M (i, soil_water.h (i)) >= 0.0);
-      assert (soil.M (i, h) >= 0.0);
-      assert (area * L[i] > 0.0);
-      assert ((- 0.5 * log (area * L[i])) != 0.0);
-      assert (uptake >= 0.0);
-      S[i] = uptake;
-      total += uptake * soil.dz (i) * 10; // mm/cm.
-    }
-  return total;
-}
-
-void
-CropStandard::RootPenetration (const Soil& soil, const SoilHeat& soil_heat)
-{
-  const Parameters::RootPar& Root = par.Root;
-  // const double DS = var.Phenology.DS;
-  const double IncWRoot = var.CrpAux.IncWRoot;
-  double& PotRtDpt = var.CrpAux.PotRtDpt;
-  double& Depth = var.RootSys.Depth;
-
-  if (IncWRoot <= 0)
-    return;
-
-  double Ts = soil_heat.T (soil.interval_plus (-Depth));
-  double dp = Root.PenPar1 * max (0.0, Ts - Root.PenPar2);
-  PotRtDpt = min (PotRtDpt + dp, Root.MaxPen);
-  /*max depth determined by crop*/
-  Depth = min (Depth + dp, Root.MaxPen);
-  /*max depth determined by crop*/
-  Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
-}
-
-double
-CropStandard::RootDensDistPar (double a)
-{
-  double x, y, z, x1, y1, z1, x2, y2, z2;
-
-  if (1 + a > exp (1.0))
-    {
-      x1 = 1.0;
-      y1 = exp (x1);
-      z1 = 1 + a * x1;
-      x2 = 20.0;
-      y2 = exp (x2);
-      z2 = 1 + a * x2;
-      while ((z1 - y1) * (z2 - y2) > 0)
-	{
-	  x1 = x2;
-	  y1 = y2;
-	  z1 = z2;
-	  x2++;
-	  y2 = exp (x2);
-	  z2 = 1 + a * x2;
-	}
-    }
-  else if (a >= 0.3)
-    {
-      x1 = 0.3;
-      y1 = exp (x1);
- //     z1 = 1 + a * x1;
-      x2 = 1.0;
-      y2 = exp (x2);
- //     z2 = 1 + a * x2;
-    }
-  else
-    {
-      assert (false /* Invalid Root Distribution */);
-    }
-  x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
-  y = exp (x);
-  z = 1 + a * x;
-  while (fabs (2 * (z - y) / (z + y)) > 1.0e-5)
-    {
-      if (z - y > 0)
-	{
-	  x1 = x;
-	  y1 = y;
-	  // z1 = z;
-	}
-      else
-	{
-	  x2 = x;
-	  y2 = y;
-	  // z2 = z;
-	}
-      x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
-      y = exp (x);
-      z = 1 + a * x;
-    }
-  return x;
-}
-
-void
-CropStandard::RootDensity (const Soil& soil)
-{
-  const Parameters::RootPar& Root = par.Root;
-  const double WRoot = var.Prod.WRoot;
-  const double PotRtDpt = var.CrpAux.PotRtDpt;
-  Variables::RecRootSys& RootSys = var.RootSys;
-  const double m_per_cm = 0.01;
-  const double LengthPrArea
-    = max (m_per_cm * Root.SpRtLength * WRoot, 0.12 * PotRtDpt); /*cm/cm2*/
-  double a = RootDensDistPar (LengthPrArea / (PotRtDpt * Root.DensRtTip));
-  double L0 = Root.DensRtTip * exp (a);
-  a /= PotRtDpt;
-  if (RootSys.Depth < PotRtDpt)
-    {
-      double Lz = L0 * exp (-a * RootSys.Depth);
-      a =   RootDensDistPar (LengthPrArea / (RootSys.Depth * Lz))
-	/ RootSys.Depth;
-    }
-
-  vector<double>& d = var.RootSys.Density;
-
-  unsigned int i = 0;
-  for (; i == 0 || -soil.zplus (i-1) < RootSys.Depth; i++)
-    d[i] = L0 * exp (a * soil.z (i));
-  assert (i < soil.size ());
-  for (; i < soil.size (); i++)
-    d[i] = 0.0;
+  return root_system.water_uptake (Ept, soil, soil_water, EvapInterception);
 }
 
 void
@@ -2049,57 +2088,32 @@ CropStandard::NitrogenUptake (int Hour,
 			      SoilNH4& soil_NH4,
 			      SoilNO3& soil_NO3)
 {
-  const Parameters::RootPar& Root = par.Root;
-  Variables::RecCrpAux& CrpAux = var.CrpAux;
   double& NCrop = var.Prod.NCrop;
-  Variables::RecRootSys& RootSys = var.RootSys;
+  double PotNUpt = (var.CrpAux.PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
 
-#ifdef LOG_AT_23
-  double PotNUpt = (CrpAux.PtNCnt - NCrop) / (24.0 - Hour);
-#else
-  double PotNUpt = (CrpAux.PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
-#endif
-  if (PotNUpt > 0)
-    {
-      CrpAux.NH4Upt
-	= SoluteUptake (soil, soil_water, soil_NH4, PotNUpt,
-			RootSys.NH4Extraction, Root.MxNH4Up, Root.Rad);
-      assert (CrpAux.NH4Upt >= 0.0);
-
-      NCrop += CrpAux.NH4Upt;
-      PotNUpt -= CrpAux.NH4Upt;
-    }
-  else
-    CrpAux.NH4Upt = 0.0;
-  if (PotNUpt > 0)
-    {
-      CrpAux.NO3Upt
-	= SoluteUptake (soil, soil_water, soil_NO3, PotNUpt,
-			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad);
-      assert (CrpAux.NO3Upt >= 0.0);
-      NCrop += CrpAux.NO3Upt;
-      PotNUpt -= CrpAux.NO3Upt;
-    }
-  else
-    CrpAux.NO3Upt = 0.0;
+  const double NUpt = root_system.nitrogen_uptake (soil, soil_water, 
+						   soil_NH4, soil_NO3,
+						   PotNUpt);
+  NCrop += NUpt;
+  PotNUpt -= NUpt;
 
   if (PotNUpt > 0 && var.Phenology.DS > var.CrpAux.DS_start_fixate)
     {
-      CrpAux.Fixated = par.CrpN.fixate_factor * PotNUpt;
-      NCrop += CrpAux.Fixated;
-      // PotNUpt -= CrpAux.Fixated;
+      var.CrpAux.Fixated = par.CrpN.fixate_factor * PotNUpt;
+      NCrop += var.CrpAux.Fixated;
+      // PotNUpt -= var.CrpAux.Fixated;
     }
   else
-    CrpAux.Fixated = 0.0;
+    var.CrpAux.Fixated = 0.0;
 
   // Updating the nitrogen stress
-  RootSys.nitrogen_stress
-	  = max (0.0, min (1.0, ((NCrop - CrpAux.NfNCnt)
-				 / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+  root_system.nitrogen_stress
+    = max (0.0, min (1.0, ((NCrop - var.CrpAux.NfNCnt)
+			   / (var.CrpAux.CrNCnt - var.CrpAux.NfNCnt))));
   
   // Ensure we have enough N for all the crop parts.
   if (!par.enable_N_stress)
-    NCrop = max (NCrop, CrpAux.CrNCnt);
+    NCrop = max (NCrop, var.CrpAux.CrNCnt);
 }
 
 double
@@ -2240,7 +2254,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   const Parameters::ProdPar& pProd = par.Prod;
   const double DS = var.Phenology.DS;
-  const double Depth = var.RootSys.Depth;
+  const double Depth = root_system.Depth;
   Variables::RecProd& vProd = var.Prod;
   Variables::RecCrpAux& CrpAux = var.CrpAux;
   double NetAss = CrpAux.CanopyAss;
@@ -2383,7 +2397,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   const double C_Root = par.Harvest.C_Root * CrpAux.DeadWRoot;
   vProd.AM_root->add (geometry, C_Root * m2_per_cm2,
 		      CrpAux.DeadNRoot * m2_per_cm2,
-		      var.RootSys.Density);
+		      root_system.Density);
   assert (C_Root == 0.0 || CrpAux.DeadNRoot > 0.0);
   vProd.C_AM += C_Root;
   vProd.N_AM += CrpAux.DeadNRoot;
@@ -2417,26 +2431,14 @@ CropStandard::tick (const Time& time,
 		    SoilNH4& soil_NH4,
 		    SoilNO3& soil_NO3)
 {
-  // Clear log.
-  fill (var.RootSys.NO3Extraction.begin (),
-	var.RootSys.NO3Extraction.end (),
-	0.0);
-  fill (var.RootSys.NH4Extraction.begin (),
-	var.RootSys.NH4Extraction.end (),
-	0.0);
-
   // Update partial_soil_temperature and pressure potential.
   var.Phenology.partial_soil_temperature +=
-    soil_heat.T (soil.interval_plus (-par.Root.DptEmr));
+    soil_heat.T (soil.interval_plus (-root_system.DptEmr));
   var.Phenology.soil_h =
-    soil_water.h (soil.interval_plus (-par.Root.DptEmr/2.));
+    soil_water.h (soil.interval_plus (-root_system.DptEmr/2.));
 
   if 
-#ifdef LOG_AT_23
-    (time.hour () == 23 && var.Phenology.DS <= 0)
-#else
     (time.hour () == 0 && var.Phenology.DS <= 0)
-#endif
     {
       // Calculate average soil temperature.
       var.Phenology.soil_temperature =
@@ -2451,7 +2453,7 @@ CropStandard::tick (const Time& time,
 	  InitialCAI ();
 	  var.Canopy.Height = CropHeight ();
 	  NitContent ();
-	  RootDensity (soil);
+	  root_system.tick (soil, soil_heat, var.Prod.WRoot, 0.0);
 
 	  if (!var.Prod.AM_root)
 	    var.Prod.AM_root
@@ -2470,10 +2472,10 @@ CropStandard::tick (const Time& time,
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
 
-  const double water_stress = var.RootSys.water_stress;
+  const double water_stress = root_system.water_stress;
   NitrogenUptake (time.hour (),
 		  soil, soil_water, soil_NH4,soil_NO3);
-  const double nitrogen_stress = var.RootSys.nitrogen_stress;
+  const double nitrogen_stress = root_system.nitrogen_stress;
 
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
@@ -2489,13 +2491,9 @@ CropStandard::tick (const Time& time,
     }
   NetProduction (bioclimate, soil, soil_heat);
   NitContent ();
-#ifdef LOG_AT_23
-  if (time.hour () != 23)
-    return;
-#else
   if (time.hour () != 0)
     return;
-#endif
+
   // Update final daylength.
   var.Phenology.day_length = var.Phenology.partial_day_length;
   var.Phenology.partial_day_length = 0.0;
@@ -2506,8 +2504,7 @@ CropStandard::tick (const Time& time,
   else
     var.Canopy.CAI = CropCAI ();
   DevelopmentStage (bioclimate);
-  RootPenetration (soil, soil_heat);
-  RootDensity (soil);
+  root_system.tick (soil, soil_heat, var.Prod.WRoot, var.CrpAux.IncWRoot);
 }
 
 const Harvest&
@@ -2563,7 +2560,7 @@ CropStandard::harvest (const string& column_name,
   const vector<AttributeList*>& Leaf = Hp.Leaf;
   const vector<AttributeList*>& SOrg = Hp.SOrg;
 
-  const vector<double>& density = var.RootSys.Density;
+  const vector<double>& density = root_system.Density;
   const double length = height ();
 
   Chemicals chemicals;
@@ -2699,6 +2696,7 @@ CropStandard::harvest (const string& column_name,
 void
 CropStandard::output (Log& log) const
 {
+  output_submodule<RootSystem> (root_system, "Root", log);
   var.output (log);
 }
 
@@ -2712,12 +2710,14 @@ CropStandard::DM () const	// [g/m² -> kg/ha]
 
 CropStandard::CropStandard (const AttributeList& al)
   : Crop (al),
+    root_system (*new RootSystem (al.alist ("Root"))),
     par (*new Parameters (al)),
     var (*new Variables (par, al))
 { }
 
 CropStandard::~CropStandard ()
 {
+  delete &root_system;
   delete &var;
   delete &par;
 }
