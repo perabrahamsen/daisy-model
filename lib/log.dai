@@ -487,6 +487,19 @@
 	   ((path weather "*" daily_air_temperature)
 	    (dimension "°C"))))
 
+(deflog "Crop Photosynthesis" table1
+  (where "crop_phot.tab")
+  (when hourly)
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "$col" Vegetation crops "$crop" CrpAux NetPhotosynthesis)
+	    (dimension "g CO2/m^2/h")
+	    (factor 1.0))
+	   ((path column "$col" Vegetation crops "$crop" CrpAux RootRespiration)
+	    (dimension "g CO2/m^2/h")
+	    (factor 1.0))))
+
 (deflog "Crop Production" table1
   (where "crop_prod.tab")
   (when (hour 12))			;When the stress is highest.
