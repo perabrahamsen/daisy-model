@@ -1,3 +1,17 @@
+1998-03-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.016 released.
+
+1998-03-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_PM.C: New file.
+	* Makefile (COMPONENTS): Added.
+
+	* weather_hourly.C: New file.
+	* Makefile (COMPONENTS): Added.
+
+	* weather_file.C (WeatherFile): Initialize `line'.
+
 1998-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.015 released.

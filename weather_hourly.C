@@ -1,0 +1,141 @@
+// weather_hourly.C
+
+#include "weather.h"
+#include "time.h"
+#include "options.h"
+#include "syntax.h"
+#include "alist.h"
+#include "common.h"
+#include "log.h"
+#include <fstream.h>
+
+struct WeatherHourly : public Weather
+{
+  Time date;
+  const string file_name;
+  ifstream file;
+  int line;			// Current line number in weather file.
+
+  // Read values.
+  double precipitation;
+  double global_radiation;
+  double air_temperature;
+  double cloudiness_;
+  double vapor_pressure_;
+  double wind_;
+
+  // Accumulated values.
+  double accumulated_global_radiation;
+  double accumulated_air_temperature;
+  double daily_global_radiation_;
+  double daily_air_temperature_;
+
+  // Simulation.
+  void tick (const Time&);
+
+  // Communication with Bioclimate.
+  double daily_air_temperature () const
+    { return daily_air_temperature_; }
+  double daily_global_radiation () const
+    { return daily_global_radiation_; }
+  double hourly_air_temperature () const
+    { return air_temperature; }
+  double hourly_global_radiation () const
+    { return global_radiation; }
+  double cloudiness () const
+    { return cloudiness_; }
+  double vapor_pressure () const
+    { return vapor_pressure_; }
+  double wind () const 
+    { return wind_; }
+
+  WeatherHourly (const AttributeList& al)
+    : Weather (al),
+      date (42, 1, 1, 0),
+      file_name (al.name ("file")),
+      file (Options::find_file (al.name ("file"))),
+      line (0),
+      precipitation (-42.42e42),
+      global_radiation (-42.42e42),
+      air_temperature (-42.42e42),
+      cloudiness_ (-42.42e42),
+      vapor_pressure_ (-42.42e42),
+      wind_ (-42.42e42),
+      accumulated_global_radiation (0.0),
+      accumulated_air_temperature (0.0),
+      daily_global_radiation_ (-42.42e42),
+      daily_air_temperature_ (-42.42e42)
+    { }
+
+  ~WeatherHourly ()
+    { close (file.rdbuf ()->fd ()); }
+};
+
+void
+WeatherHourly::tick (const Time& time)
+{ 
+  Weather::tick (time);
+
+  if (!file.good ())
+    {
+      cerr << file_name << ":" << line << ": file error";
+      THROW ("read error");
+    }
+  int year;
+  int month; 
+  int day;
+  int hour;
+  char end;
+
+  while (date < time)
+    {
+      file >> year >> month >> day >> hour
+	   >> global_radiation >> air_temperature >> precipitation
+	   >> cloudiness_ >> vapor_pressure_ >> wind_
+	   >> end;
+      if (year < 100)
+	year += 1900;
+      while (file.good () && strchr ("\n \t", end))
+	file >> end;
+      
+      if (!file.good ())
+	THROW ("No more climate data.");
+
+      while (file.good () && end != '\n')
+	end = file.get ();
+
+      date = Time (year, month, day, hour);
+
+      if (hour == 0)
+	{
+	  daily_global_radiation_ = accumulated_global_radiation / 24.0;
+	  daily_air_temperature_ = accumulated_air_temperature / 24.0;
+	  accumulated_global_radiation = 0.0;
+	  accumulated_air_temperature = 0.0;
+	}
+      else
+	{
+	  accumulated_global_radiation += global_radiation;
+	  accumulated_air_temperature += air_temperature;
+	}
+    }
+
+  // Update the hourly values.
+  distribute (precipitation);
+}
+
+static struct WeatherHourlySyntax
+{
+  static Weather& make (const AttributeList& al)
+    { return *new WeatherHourly (al); }
+
+  WeatherHourlySyntax ()
+    { 
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      Weather::load_syntax (syntax, alist);
+      syntax.add ("file", Syntax::String, Syntax::Const);
+      syntax.order ("file");
+      Librarian<Weather>::add_type ("hourly", alist, syntax, &make);
+    }
+} WeatherHourly_syntax;
