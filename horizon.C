@@ -104,7 +104,7 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     anisotropy (al.number ("anisotropy")),
     nitrification (Librarian<Nitrification>::create 
 		   (al.alist ("Nitrification"))),
-    hor_heat (al)
+    hor_heat (al.alist ("HorHeat"))
 { }
 
 Horizon::Implementation::~Implementation ()
@@ -314,7 +314,9 @@ this horizon.");
 
   alist.add ("Nitrification", nitrification_alist);
 
-  HorHeat::load_syntax (syntax, alist);
+  syntax.add_submodule ("HorHeat", alist, Syntax::State, 
+                        "Heat capacity and conductivity.",
+                        HorHeat::load_syntax);
 
   Syntax& attSyntax = *new Syntax ();
   attSyntax.add ("key", Syntax::String, Syntax::Const,
