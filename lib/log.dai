@@ -84,15 +84,18 @@
                   (factor 4.43e6))))     ;g NO3-N/cm³ -> mg NO3/l
 
 (deflog "Soil Temperature" table
+  "Temperature in all numeric soil layers."
   (where "soil_temperature.dlf")
-  (when daily)
+  (when hourly)
   (entries (year (path time))
            (month (path time))
            (mday (path time))
+	   (hour (path time))
            (array (path column "$col" SoilHeat T)
                   (dimension "dg C"))))
 
 (deflog "Soil Water Potential" table
+  "Water potential in all numeric soil layers."
   (where "soil_water_potential.dlf")
   (when hourly)
   (entries (year (path time))
@@ -103,6 +106,9 @@
                   (dimension "cm"))))
 
 (deflog "Soil Water Sink" table
+  "The water sink in all numeric soil layers.
+The water sink is an aggregate of root uptake, preferential flow,
+flow to drain pipes, and subsoil irrigation."
   (where "soil_water_sink.dlf")
   (when hourly)
   (entries (year (path time))
@@ -114,7 +120,8 @@
                   (dimension "cm^3/cm^3/&"))))
 
 (deflog "Preferential Water Flux" table
-  (where "pref_flux.dlf")
+  "The preferential water flux between all numeric soil layers."
+  (where "pref_water_flux.dlf")
   (when hourly)
   (entries (year (path time))
            (month (path time))
@@ -122,12 +129,12 @@
            (hour (path time))
            (array (path column "$col" SoilWater q_p)
                   (factor -10)          ;cm->mm
-                  (dimension "cm"))))
+                  (dimension "mm/&"))))
 
-(deflog "Hourly Water Flux" table
-  (where "hourly_water_flux.dlf")
+(deflog "Matrix Water Flux" table
+  "The matrix water flux between all numeric soil layers."
+  (where "matrix_water_flux.dlf")
   (when (hourly))
-  ;; (array_separator " ")
   (entries (year (path time))
            (month (path time))
            (mday (path time))
@@ -137,19 +144,8 @@
 		  (when hourly)
                   (dimension "mm/&"))))
 
-(deflog "Daily Water Flux" "Hourly Water Flux"
-  (where "daily_water_flux.dlf")
-  (when daily)
-  ;; (array_separator " ")
-  (entries (year (path time))
-           (month (path time))
-           (mday (path time))
-           (array (path column "$col" SoilWater q)
-                  (factor -10)          ;cm->mm
-                  (when hourly)
-                  (dimension "mm/&"))))
-
 (deflog "Preferential NO3 Transport" table
+  "The preferential nitrogen transport between all numeric soil layers."
   (where "pref_NO3.dlf")
   (when hourly)
   (entries (year (path time))
@@ -164,6 +160,7 @@
            ))
 
 (deflog "Preferential NH4 Transport" table
+  "The preferential ammonium transport between all numeric soil layers."
   (where "pref_NH4.dlf")
   (when hourly)
   (entries (year (path time))
@@ -178,11 +175,13 @@
            ))
 
 (deflog "Surface Water Balance" table
+  "Enough information to create a water balance for the soil surface."
   (where "surface_water_balance.dlf")
-  (when daily)
+  (when hourly)
   (entries (year (path time))
            (month (path time))
            (mday (path time))
+           (hour (path time))
            (number (path weather "*" rain)
                    (when hourly)
                    (dimension "mm"))

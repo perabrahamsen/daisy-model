@@ -58,4 +58,17 @@
   (from -90)
   (to  -100))
 
+(deflog "Hourly Water Flux" "Matrix Water Flux")
+
+(deflog "Daily Water Flux" "Hourly Water Flux"
+  (where "daily_water_flux.dlf")
+  (when daily)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (array (path column "$col" SoilWater q)
+                  (factor -10)          ;cm->mm
+                  (when hourly)
+                  (dimension "mm/&"))))
+
 ;;; log-old.dai ends here.
