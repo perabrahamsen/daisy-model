@@ -2,24 +2,29 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * QDaisy.
 
-** Delete value.
-
 ** Filter setup
 
 Only show a few buildin libraries and models.
 
 ** Treelog_Qt
 
-** Menu -> Edit -> Delete
-
-*** Library::undepend_dependencies (lib, model)
-
-For alle alister hvor "type" == "model"
-   Sæt "type" til "model".type
-
-Hydr.  Simulationen vil fortsat kunne køre!
-
 ** Menu -> Edit -> Parameters
+
+NumberSeq, IntSeq, NameSew:
+
+[ LineEditor ]
+
+[Before] [At] [After] [Remove]
+
+[ ListView ]
+
+PLFSeq:
+
+[ PLF Editor ]
+
+[Before] [At] [After] [Remove]
+
+[ ComboBox ]: #PLF
 
 ** Library::resequence_with_dependencies (lib, model)
 
@@ -28,8 +33,6 @@ Giv model nyt sequence number
 Giv alt der afhænger af model nyt sequence number (rekursivt).
 
 ** Menu -> Edit -> Copy
-
-** Menu -> Edit -> Simulation
 
 ** Menu -> Edit -> Inputs
 

@@ -12,9 +12,12 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
-* 1.57
+* 1.58
 
-No user visisble changes.
+** Tillage can now affect background mineralization.
+
+See the `som_tillage_factor', `smb_tillage_factor' and `tillage_age'
+xbparameters to `OrganicMatter'.
 
 * 1.55
 

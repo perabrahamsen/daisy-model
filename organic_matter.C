@@ -50,6 +50,9 @@ struct OrganicMatter::Implementation
   const PLF heat_factor;
   const PLF water_factor;
   const PLF clay_factor;
+  vector<double> tillage_age;
+  const vector<const PLF*> smb_tillage_factor;
+  const vector<const PLF*> som_tillage_factor;
   const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]
   const double min_AM_N;	// Minimal amount of N in an AM. [g/m²]
   Bioincorporation bioincorporation;
@@ -67,8 +70,10 @@ struct OrganicMatter::Implementation
   void monthly (const Geometry& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
 	     SoilNO3&, SoilNH4&);
-  void mix (const Geometry&, double from, double to, double penetration);
-  void swap (const Geometry&, double from, double middle, double to);
+  void mix (const Geometry&, double from, double to, double penetration, 
+	    const Time& time);
+  void swap (const Geometry&, double from, double middle, double to, 
+	     const Time& time);
   void output (Log&, const Geometry&) const;
   bool check (ostream& err) const;
 
@@ -285,6 +290,7 @@ OrganicMatter::Implementation::output (Log& log,
       log.output ("total_N", total_N);
       log.output ("total_C", total_C);
     }
+  log.output ("tillage_age", tillage_age);
   output_list (am, "am", log, Librarian<AM>::library ());
   output_vector (smb, "smb", log);
   output_vector (som, "som", log);
@@ -398,6 +404,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   vector<double> N_used (size);
   vector<double> abiotic_factor (size);
   vector<double> clay_factor (size);
+  vector<double> tillage_factor (size);
   
   for (unsigned int i = 0; i < size; i++)
     {
@@ -419,15 +426,32 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 	* water_turnover_factor (soil_water.h (i));
       clay_factor[i] = abiotic_factor[i] * clay_turnover_factor [i];
     }
+  
   // Main processing.
-  smb[0]->tick (size, &clay_factor[0],
+  tillage_factor = clay_factor;
+  if (smb_tillage_factor.size () > 0)
+    for (unsigned int i = 0; i < size; i++)
+      tillage_factor[i] *= (*smb_tillage_factor[0]) (tillage_age[i]) ;
+  smb[0]->tick (size, &tillage_factor[0],
 		&N_soil[0], &N_used[0], &CO2[0], smb, som);
   for (unsigned int j = 1; j < smb.size (); j++)
-    smb[j]->tick (size, &abiotic_factor[0],
+  {
+    tillage_factor = abiotic_factor;
+    if (smb_tillage_factor.size () > j)
+      for (unsigned int i = 0; i < size; i++)
+	tillage_factor[i] *= (*smb_tillage_factor[j]) (tillage_age[i]);
+    smb[j]->tick (size, &tillage_factor[0],
 		  &N_soil[0], &N_used[0], &CO2[0], smb, som);
+  }
   for (unsigned int j = 0; j < som.size (); j++)
-    som[j]->tick (size, &clay_factor[0],
+  {
+    tillage_factor = clay_factor;
+    if (som_tillage_factor.size () > j)
+      for (unsigned int i = 0; i < size; i++)
+	tillage_factor[i] *= (*som_tillage_factor[j]) (tillage_age[i]);
+    som[j]->tick (size, &tillage_factor[0],
 		  &N_soil[0], &N_used[0], &CO2[0], smb, som);
+  }
   for (unsigned int j = 0; j < added.size (); j++)
     added[j]->tick (size, &abiotic_factor[0], &N_soil[0], &N_used[0], &CO2[0],
 		    smb, &buffer.C[0], &buffer.N[0]);
@@ -463,11 +487,16 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 
   // Biological incorporation.
   bioincorporation.tick (soil, am, soil_heat.T (0), top_CO2);
+
+  // Tillage time.
+  for (unsigned int i = 0; i < size; i++)
+    tillage_age[i] += 1.0/24.0;
 }
       
 void 
 OrganicMatter::Implementation::mix (const Geometry& geometry,
-				    double from, double to, double penetration)
+				    double from, double to,double penetration, 
+				    const Time&)
 {
   buffer.mix (geometry, from, to);
   for (unsigned int i = 0; i < am.size (); i++)
@@ -476,12 +505,24 @@ OrganicMatter::Implementation::mix (const Geometry& geometry,
     smb[i]->mix (geometry, from, to, penetration);
   for (unsigned int i = 0; i < som.size (); i++)
     som[i]->mix (geometry, from, to, penetration);
+
   // Leave CO2 alone.
+
+  // Reset tillage age.
+  double previous = 0.0;
+  for (unsigned int i = 0; i < tillage_age.size (); i++)
+    {
+      const double next = geometry.zplus (i);
+      if (previous > to && next < from)
+	tillage_age[i] = 0.0;
+      previous = next;
+    }
 }
 
 void 
 OrganicMatter::Implementation::swap (const Geometry& geometry,
-				     double from, double middle, double to)
+				     double from, double middle, double to, 
+				     const Time&)
 {
   buffer.swap (geometry, from, middle, to);
   for (unsigned int i = 0; i < am.size (); i++)
@@ -522,6 +563,10 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   for (unsigned int i = 0; i < soil.size (); i++)
     clay_turnover_factor.push_back (clay_factor (soil.clay (i)));
   
+  // Tillage.
+  tillage_age.insert (tillage_age.end (), 
+		      soil.size () - tillage_age.size (), 1000000.0);
+
   // Fill SMB C_per_N array with last value.
   for (unsigned int pool = 0; pool < som_size; pool++)
     {
@@ -686,6 +731,11 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     heat_factor (al.plf ("heat_factor")),
     water_factor (al.plf ("water_factor")),
     clay_factor (al.plf ("clay_factor")),
+    tillage_age (al.check ("tillage_age") 
+		 ? al.number_sequence ("tillage_age") 
+		 : vector<double> ()),
+    smb_tillage_factor (al.plf_sequence ("smb_tillage_factor")),
+    som_tillage_factor (al.plf_sequence ("som_tillage_factor")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N")),
     bioincorporation (al.alist ("Bioincorporation"))
@@ -709,15 +759,18 @@ OrganicMatter::tick (const Soil& soil,
 
 void 
 OrganicMatter::mix (const Geometry& geometry,
-		    double from, double to, double penetration)
+		    double from, double to, double penetration, 
+		    const Time& time)
 {
-  impl.mix (geometry, from, to, penetration);
+  impl.mix (geometry, from, to, penetration, time);
 }
 
 void 
-OrganicMatter::swap (const Geometry& geometry, double from, double middle, double to)
+OrganicMatter::swap (const Geometry& geometry,
+		     double from, double middle, double to, 
+		    const Time& time)
 {
-  impl.swap (geometry, from, middle, to);
+  impl.swap (geometry, from, middle, to, time);
 }
 
 double
@@ -1089,6 +1142,19 @@ Mineralization this time step (negative numbers mean immobilization).");
   clay.add (0.25, 0.5);
   clay.add (1.00, 0.5);
   alist.add ("clay_factor", clay);
+  syntax.add ("tillage_age", "days", Syntax::OptionalState, Syntax::Sequence,
+	      "Time since the latest tillage operation was performed."); 
+  syntax.add ("smb_tillage_factor", "days", Syntax::None (), 
+	      Syntax::Const, Syntax::Sequence,
+	      "Tillage influence on turnover rates for each SMB pool.\n\
+If no value is given, tillage will have no influence.");
+  alist.add ("smb_tillage_factor", vector<const PLF*> ());
+  syntax.add ("som_tillage_factor", "days", Syntax::None (), 
+	      Syntax::Const, Syntax::Sequence,
+	      "Tillage influence on SOM turnover rates for each SOM pool.\n\
+If no value is given, tillage will have no influence.");
+  alist.add ("som_tillage_factor", vector<const PLF*> ());
+
   syntax.add ("min_AM_C", "g C/m^2", Syntax::Const, 
 	      "Minimal amount of carbon in AOM ensuring it is not removed.");
   alist.add ("min_AM_C", 0.5);

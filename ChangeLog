@@ -1,4 +1,22 @@
+2000-10-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.58 released.
+
 2000-10-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (load_list): Implement PLF sequences.
+
+	* organic_matter.C (smb_tillage_factor, som_tillage_factor,
+	tillage_age): New attributes.
+
+	* alist.C (struct Value): Fix PLF sequence value.
+	* column_std.C (swap, mix): Pass time to organic matter.
+
+	* qmain_item.h, qmain_item.C (SimulationItem): New item.
+	* qmain_populate.C, qmain_populate.h (populate_tree): Use it.
+	* qmain_tree.C, qmain_tree.h (populate): Update caller.
+	* qmain.C (populate_tree): Update caller.
+	(MainWindow): Removed `Edit Simulation...' menu item.
 
 	* Version 1.57 released.
 

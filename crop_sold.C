@@ -1058,7 +1058,7 @@ CropSold::SoluteUptake (const Soil& soil,
 	uptake[i] = bound (0.0, 
 			   L * (min (I_zero[i], I_max)
 				- B_zero[i] * c_root),
-			   solute.M_left (i) - 1e-8);
+			   max (0.0, solute.M_left (i) - 1e-8));
       else
 	uptake[i] = 0.0;
       assert (uptake[i] >= 0.0);

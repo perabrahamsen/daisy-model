@@ -33,9 +33,6 @@ TreeItem::setSelected (bool s)
 
   if (s)
     {
-      if (editable ())
-	main ()->set_selection_deletable (true);
-
       set_selected ();
     }
 
@@ -122,7 +119,7 @@ LibraryItem::set_selected ()
 
 QString 
 LibraryItem::key (int, bool) const
-{ return entry; }
+{ return QString ("2") + entry; }
 
 LibraryItem::LibraryItem (QListView* i, const QString& e, const QString& v)
   : TreeItem (i, e, v)
@@ -166,6 +163,9 @@ AtomItem::edit_child ()
 void
 AtomItem::set_selected ()
 {
+  if (editable ())
+    main ()->set_selection_deletable (true);
+
   const AListItem* c = dynamic_cast<const AListItem*> (parent ());
   assert (c);
   main ()->set_description (c->description (entry));
@@ -289,6 +289,16 @@ AListItem::AListItem (const Syntax& syn, AttributeList& al,
     view_defaults (false)
 { assert (&al != &def_al); }
 
+AListItem::AListItem (const Syntax& syn, AttributeList& al,
+		      const AttributeList& al_def,
+		      QListView* tree, const QString& name)
+  : TreeItem (tree, name, ""),
+    syntax (syn),
+    alist (al),
+    default_alist (al_def),
+    view_defaults (false)
+{ assert (&al != &al_def); }
+
 bool 
 ModelItem::editable () const
 { return editable_; }
@@ -297,6 +307,8 @@ void
 ModelItem::set_selected ()
 {
   AListItem::set_selected ();
+  if (editable ())
+    main ()->set_selection_deletable (true);
   main ()->set_selection_depable (true);  
   main ()->set_selection_copyable (true);
   if (alist.check ("description"))
@@ -422,6 +434,9 @@ SubmodelItem::editable () const
 void
 SubmodelItem::set_selected ()
 {
+  AListItem::set_selected ();
+  if (editable ())
+    main ()->set_selection_deletable (true);
   const AListItem* c = dynamic_cast<const AListItem*> (parent ());
   assert (c); 
   main ()->set_description (c->description (entry));
@@ -429,7 +444,6 @@ SubmodelItem::set_selected ()
   const Syntax::type type = c->syntax.lookup (parameter);
   assert (type == Syntax::AList || type == Syntax::Object);
   assert (c->syntax.size (parameter) == Syntax::Singleton);
-  AListItem::set_selected ();
 }
 
 bool
@@ -449,12 +463,18 @@ SubmodelItem::SubmodelItem (const Syntax& syn, AttributeList& al,
   : AListItem (syn, al, al_def, i, e, t, v, c, o)
 { assert (dynamic_cast<AListItem*> (i)); }
 
+SubmodelItem::SubmodelItem (const Syntax& syn, AttributeList& al,
+			    const AttributeList& al_def,
+			    QListView* tree, const QString& name)
+  : AListItem (syn, al, al_def, tree, name)
+{ } 
+
 void
 ObjectItem::set_selected ()
 {
+  SubmodelItem::set_selected ();
   if (editable ())
     main ()->set_selection_raw_editable (true);
-  SubmodelItem::set_selected ();
 }
 bool
 ObjectItem::edit_raw ()
@@ -471,6 +491,32 @@ ObjectItem::ObjectItem (const Syntax& syn, AttributeList& al,
 			const QString& v, const QString& c,
 			int o)
   : SubmodelItem (syn, al, al_def, i, e, t, v, c, o)
+{ }
+
+bool
+SimulationItem::editable () const
+{ return true; }
+
+void
+SimulationItem::set_selected ()
+{
+  AListItem::set_selected ();
+  main ()->set_description (alist.name ("description").c_str ());
+}
+
+bool
+SimulationItem::edit_delete ()
+{ assert (false); }
+
+QString 
+SimulationItem::key (int, bool) const
+{ return QString ("1") + entry; }
+
+
+SimulationItem::SimulationItem (const Syntax& syn, AttributeList& al,
+				const AttributeList& al_def,
+				QListView* tree, const QString& name)
+  : SubmodelItem (syn, al, al_def, tree, name)
 { }
 
 bool
@@ -494,6 +540,7 @@ SequenceItem::edit_delete ()
 void
 SequenceItem::set_selected ()
 {
+  AListItem::set_selected ();
   const AtomItem* c = dynamic_cast<const AtomItem*> (parent ());
   assert (c);
   const AListItem* cc = dynamic_cast<const AListItem*> (c->parent ());
@@ -501,10 +548,10 @@ SequenceItem::set_selected ()
   const string parameter = c->entry.latin1 ();
   Syntax::type type = cc->syntax.lookup (parameter);
   assert (type == Syntax::AList || type == Syntax::Object);
-  main ()->set_selection_deletable (true);
+  if (editable ())
+    main ()->set_selection_deletable (true);
   main ()->set_selection_afterable (true);
   main ()->set_description ("Item in sequence.");
-  AListItem::set_selected ();
 }
 
 SequenceItem::SequenceItem (const Syntax& syn, AttributeList& al,

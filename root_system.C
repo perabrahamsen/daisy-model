@@ -34,7 +34,8 @@ RootSystem::potential_water_uptake (const double h_x,
       assert (soil_water.Theta_left (i) >= 0.0);
       assert (soil_water.Theta (soil, i, h_wp) >= soil.Theta_res (i));
       const double max_uptake
-	= (soil_water.Theta_left (i) - soil_water.Theta (soil, i, h_wp)) / dt;
+	= max (0.0, (soil_water.Theta_left (i) 
+		     - soil_water.Theta (soil, i, h_wp)) / dt);
       const double uptake
 	= bound (0.0, 
 		 (2 * M_PI * L[i]
@@ -242,7 +243,7 @@ RootSystem::solute_uptake (const Soil& soil,
 	uptake[i] = bound (0.0,
 			   L * (min (I_zero[i], I_max)
 				- B_zero[i] * c_root),
-			   solute.M_left (i) - 1e-8);
+			   max (solute.M_left (i) - 1e-8, 0.0));
       else
 	uptake[i] = 0.0;
       assert (uptake[i] >= 0.0);

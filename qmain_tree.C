@@ -98,10 +98,11 @@ MainTree::item () const
 }
 
 void
-MainTree::populate (bool check_composite)
+MainTree::populate (bool check_composite, const Syntax& syntax, 
+		    AttributeList& alist, const AttributeList& default_alist)
 {
   TreeState state (this);
-  ::populate_tree (main, check_composite);
+  ::populate_tree (main, check_composite, syntax, alist, default_alist);
   state.recreate (this);
 }
 

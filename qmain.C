@@ -119,9 +119,6 @@ MainWindow::MainWindow ()
   menu_edit_delete_id 
     = menu_edit->insertItem ("&Delete...", this, SLOT (edit_delete ()));
   menu_edit->insertSeparator ();
-  int menu_edit_simulation_id 
-    = menu_edit->insertItem ("&Simulation...", this, SLOT (menu_action ()));
-  menu_edit->setItemEnabled (menu_edit_simulation_id, false);
   int menu_edit_inputs_id 
     = menu_edit->insertItem ("&Inputs...", this, SLOT (menu_action ()));
   menu_edit->setItemEnabled (menu_edit_inputs_id, false);
@@ -371,7 +368,8 @@ MainWindow::populate_tree ()
   Busy busy (this, "Populating tree...");
   clear_description ();
   clear_selection ();
-  tree->populate (check_composite);
+  tree->populate (check_composite, daisy_syntax, daisy_alist, 
+		  daisy_default_alist);
 }
 
 void 
@@ -380,7 +378,7 @@ MainWindow::set_description (const QString& s)
 
 void 
 MainWindow::clear_description ()
-{ description->setText (daisy_alist.name ("description").c_str ()); }
+{ description->setText (daisy_default_alist.name ("description").c_str ()); }
 
 void 
 MainWindow::menu_action ()

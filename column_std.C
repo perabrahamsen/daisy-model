@@ -244,7 +244,7 @@ ColumnStandard::mix (const Time& time,
   ColumnBase::mix (time, from, to, penetration);
   soil_NO3.mix (soil, soil_water, from, to);
   soil_NH4.mix (soil, soil_water, from, to);
-  organic_matter.mix (soil, from, to, penetration);
+  organic_matter.mix (soil, from, to, penetration, time);
 }
 
 void 
@@ -253,7 +253,7 @@ ColumnStandard::swap (const Time& time, double from, double middle, double to)
   ColumnBase::swap (time, from, middle, to);
   soil_NO3.swap (soil, soil_water, from, middle, to);
   soil_NH4.swap (soil, soil_water, from, middle, to);
-  organic_matter.swap (soil, from, middle, to);
+  organic_matter.swap (soil, from, middle, to, time);
 }
 
 double				// [kg N/ha]

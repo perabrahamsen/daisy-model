@@ -61,44 +61,21 @@ OM::set_N (vector<double>& N)
 {
   assert (N.size () == C.size ());
 
-#if 0
-  if (initial_C_per_N != Unspecified)
-    {
-      // Fixed C/N.
-     for (unsigned i = 0; i < C.size (); i++)
-	{
-	  if (N[i] == 0.0)
-	    assert (C[i] == 0.0);
-	  else if (!approximate (initial_C_per_N, C[i] / N[i]))
-	    CERR << "Bug: init C/N (" << initial_C_per_N 
-		 << ") != " << C[i] << "/" << N[i] << " (" << C[i]/N[i] 
-		 << ") for layer " << i << ".\n";
-	  
-	  if (i < C_per_N.size ())
-	    assert (approximate (C_per_N[i], initial_C_per_N));
-	  else
-	    C_per_N.push_back (initial_C_per_N);
-	}
-    }
-  else
-#endif
-    {
-      // Calculate C/N.
-      C_per_N.erase (C_per_N.begin (), C_per_N.end ());
+  // Calculate C/N.
+  C_per_N.erase (C_per_N.begin (), C_per_N.end ());
 
-      for (unsigned i = 0; i < C.size (); i++)
+  for (unsigned i = 0; i < C.size (); i++)
+    {
+      if (C[i] == 0.0)
 	{
-	  if (C[i] == 0.0)
-	    {
-	      assert (N[i] == 0.0);
-	      C_per_N.push_back (1.0); // Arbitrary.
-	    }
-	  else
-	    {
-	      assert (C[i] > 0.0);
-	      assert (N[i] > 0.0);
-	      C_per_N.push_back (C[i] / N[i]);
-	    }
+	  assert (N[i] == 0.0);
+	  C_per_N.push_back (1.0); // Arbitrary.
+	}
+      else
+	{
+	  assert (C[i] > 0.0);
+	  assert (N[i] > 0.0);
+	  C_per_N.push_back (C[i] / N[i]);
 	}
     }
 }

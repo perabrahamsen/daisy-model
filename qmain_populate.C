@@ -27,9 +27,10 @@ private:
   const bool view_defaults;
 
   // Accessors.
-private:
+public:
   void enter (TreeItem* item);
   void leave ();
+private:
   bool buildin () const;
   TreeItem* item () const;
 
@@ -598,12 +599,20 @@ TraverseQtTree::~TraverseQtTree ()
 { }
 
 void 
-populate_tree (MainWindow* main, bool check_alists)
+populate_tree (MainWindow* main, bool check_alists,
+	       const Syntax& syntax, AttributeList& alist, 
+	       const AttributeList& default_alist)
 {
   main->tree->clear();
   
   TraverseQtTree build (main, check_alists);
   build.traverse_all_libraries ();
+
+  // Add simulation.
+  build.enter (new SimulationItem (syntax, alist, default_alist,
+			     main->tree, "Daisy"));
+  build.traverse_alist (syntax, alist, default_alist, "Daisy");
+  build.leave ();
 }
 
 void 

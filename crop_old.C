@@ -1059,7 +1059,7 @@ CropOld::SoluteUptake (const Soil& soil,
       if (solute.M_left (i) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
 	uptake[i] = bound (0.0, 
 			   L * (min (I_zero[i], I_max) - B_zero[i] * c_root),
-			   solute.M_left (i) - 1e-8);
+			   max (solute.M_left (i) - 1e-8, 0.0));
       else
 	uptake[i] = 0.0;
       assert (uptake[i] >= 0.0);

@@ -126,7 +126,7 @@ struct Value
   }
   Value (const vector<const PLF*>& v)
     : plf_sequence (copy_plfs (v)),
-      type (Syntax::Date),
+      type (Syntax::PLF),
       is_sequence (true),
       ref_count (new int (1))
     { }

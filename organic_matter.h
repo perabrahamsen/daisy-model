@@ -15,6 +15,7 @@ class SoilWater;
 class SoilHeat;
 class SoilNO3;
 class SoilNH4;
+class Time;
 
 class OrganicMatter
 {
@@ -30,8 +31,10 @@ public:
 	     SoilNO3&, SoilNH4&);
   void output (Log&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
-  void mix (const Geometry&, double from, double to, double penetration = 1.0);
-  void swap (const Geometry&, double from, double middle, double to);
+  void mix (const Geometry&, double from, double to, double penetration, 
+	    const Time& time);
+  void swap (const Geometry&, double from, double middle, double to, 
+	     const Time& time);
 
   // Communication with external model.
   double get_smb_c_at (unsigned int i) const; // [g C/cm³]

@@ -498,6 +498,51 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		sequence_delete (sequence.begin (), sequence.end ());
 		break;
 	      }
+	    case Syntax::PLF:
+	      {
+		vector<const PLF*> plfs;
+		int total = 0;
+		int size = syntax.size (name);
+		while (good () && !looking_at (')'))
+		  {
+		    skip ("(");
+		    PLF& plf = *new PLF ();
+		    double last_x = -42;
+		    int count = 0;
+		    while (!looking_at (')') && good ())
+		      {
+			skip ("(");
+			double x = get_number ();
+			{
+			  if (count > 0 && x <= last_x)
+			    error ("Non increasing x value");
+			  last_x = x;
+			  count++;
+			}
+			double y = get_number ();
+			skip (")");
+			plf.add (x, y);
+		      }
+		    if (count < 2)
+		      error ("Need at least 2 points");
+		    total++;
+		    skip (")");
+		    plfs.push_back (&plf);
+		  }
+		if (size != Syntax::Sequence && total != size)
+		  {
+		    TmpStream str;
+		    str () << "Got " << total
+			   << " array members, expected " << size;
+		    error (str.str ());
+
+		    for (;total < size; total++)
+		      plfs.push_back (new PLF ());
+		  }
+		atts.add (name, plfs);
+		sequence_delete (plfs.begin (), plfs.end ());
+		break;
+	      }
 	    case Syntax::Number:
 	      {
 		vector<double>& array = *new vector<double> ();
