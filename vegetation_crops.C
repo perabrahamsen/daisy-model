@@ -581,10 +581,12 @@ void
 VegetationCrops::initialize (const Time&, const Soil& soil, 
 			     OrganicMatter *const organic_matter, Treelog& msg)
 {
-  reset_canopy_structure (msg);
-  if (organic_matter)
-    for (unsigned int i = 0; i < crops.size (); i++)
+  for (unsigned int i = 0; i < crops.size (); i++)
+    if (organic_matter)
       crops[i]->initialize_organic (msg, soil, *organic_matter);
+    else
+      crops[i]->initialize_inorganic (msg, soil);
+  reset_canopy_structure (msg);
 }
 
 VegetationCrops::VegetationCrops (const AttributeList& al)

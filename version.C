@@ -1,3 +1,3 @@
 // version.C -- automatically generated file
  
-extern const char *const version = "3.19";
+extern const char *const version = "3.20";
