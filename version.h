@@ -1,3 +1,3 @@
-// version.h -- automatically generated file
+// version.h -- Daisy version number interface.
  
-static const char *const version = "3.18";
+extern const char *const version;

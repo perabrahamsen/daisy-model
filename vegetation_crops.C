@@ -153,7 +153,8 @@ struct VegetationCrops : public Vegetation
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (Treelog& msg, const Soil& soil, OrganicMatter&);
+  void initialize (const Time&, const Soil& soil, OrganicMatter *const,
+                   Treelog& msg);
   VegetationCrops (const AttributeList&);
   ~VegetationCrops ();
 };
@@ -577,12 +578,13 @@ VegetationCrops::output (Log& log) const
 }
 
 void
-VegetationCrops::initialize (Treelog& msg, const Soil& soil, 
-			     OrganicMatter& organic_matter)
+VegetationCrops::initialize (const Time&, const Soil& soil, 
+			     OrganicMatter *const organic_matter, Treelog& msg)
 {
-  for (unsigned int i = 0; i < crops.size (); i++)
-    crops[i]->initialize_organic (msg, soil, organic_matter);
   reset_canopy_structure (msg);
+  if (organic_matter)
+    for (unsigned int i = 0; i < crops.size (); i++)
+      crops[i]->initialize_organic (msg, soil, *organic_matter);
 }
 
 VegetationCrops::VegetationCrops (const AttributeList& al)

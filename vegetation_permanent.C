@@ -82,7 +82,10 @@ struct VegetationPermanent : public Vegetation
   double height () const
   { return canopy.Height; }
   double cover () const
-  { return cover_; }
+  { 
+    daisy_assert (cover_ >= 0.0);
+    return cover_; 
+  }
   const PLF& LAIvsH () const
   { return canopy.LAIvsH; }
   const PLF& HvsLAI () const
@@ -108,6 +111,7 @@ struct VegetationPermanent : public Vegetation
   { return 0.0; }
 
   // Simulation.
+  void reset_canopy_structure (const Time& time);
   void tick (const Time& time,
 	     const Bioclimate& bioclimate,
 	     const Soil& soil,
@@ -144,7 +148,8 @@ struct VegetationPermanent : public Vegetation
   void output (Log&) const;
 
   // Create and destroy.
-  void initialize (Treelog&, const Soil& soil, OrganicMatter&);
+  void initialize (const Time& time, const Soil& soil, OrganicMatter *const, 
+                   Treelog&);
   VegetationPermanent (const AttributeList&);
   ~VegetationPermanent ();
 };
@@ -192,6 +197,20 @@ VegetationPermanent::YearlyLAI::YearlyLAI (const vector<AttributeList*>& als)
 }
 
 void
+VegetationPermanent::reset_canopy_structure (const Time& time)
+{
+  canopy.CAI = yearly_LAI (time.year (), time.yday ());
+  if (canopy.CAI < 0.0)
+    canopy.CAI = LAIvsDAY (time.yday ());
+  cover_ =  1.0 - exp (-(canopy.EPext * canopy.CAI));
+  daisy_assert (cover_ >= 0.0);
+  daisy_assert (cover_ <= 1.0);
+  canopy.LAIvsH.clear ();
+  canopy.LAIvsH.add (0.0, 0.0);
+  canopy.LAIvsH.add (canopy.Height, canopy.CAI);
+  HvsLAI_ = canopy.LAIvsH.inverse ();
+}
+void
 VegetationPermanent::tick (const Time& time,
 			   const Bioclimate&,
 			   const Soil& soil,
@@ -208,16 +227,7 @@ VegetationPermanent::tick (const Time& time,
 {
   // Canopy.
   const double old_LAI = canopy.CAI;
-  canopy.CAI = yearly_LAI (time.year (), time.yday ());
-  if (canopy.CAI < 0.0)
-    canopy.CAI = LAIvsDAY (time.yday ());
-  cover_ =  1.0 - exp (-(canopy.EPext * canopy.CAI));
-  daisy_assert (cover_ >= 0.0);
-  daisy_assert (cover_ <= 1.0);
-  canopy.LAIvsH.clear ();
-  canopy.LAIvsH.add (0.0, 0.0);
-  canopy.LAIvsH.add (canopy.Height, canopy.CAI);
-  HvsLAI_ = canopy.LAIvsH.inverse ();
+  reset_canopy_structure (time);
 
   // Nitrogen uptake.
   if (organic_matter)
@@ -301,14 +311,19 @@ VegetationPermanent::output (Log& log) const
 }
 
 void
-VegetationPermanent::initialize (Treelog& msg, const Soil& soil, 
-				 OrganicMatter& organic_matter)
+VegetationPermanent::initialize (const Time& time, const Soil& soil, 
+				 OrganicMatter *const organic_matter,
+                                 Treelog& msg)
 {
+  reset_canopy_structure (time);
   root_system.initialize (soil.size ());
   root_system.full_grown (msg, soil, WRoot);
-  static const symbol vegetation_symbol ("vegetation");
-  static const symbol litter_symbol ("litter");
-  litter = organic_matter.find_am (vegetation_symbol, litter_symbol);
+  if (organic_matter)
+    {
+      static const symbol vegetation_symbol ("vegetation");
+      static const symbol litter_symbol ("litter");
+      litter = organic_matter->find_am (vegetation_symbol, litter_symbol);
+    }
 }
 
 VegetationPermanent::VegetationPermanent (const AttributeList& al)
@@ -316,6 +331,7 @@ VegetationPermanent::VegetationPermanent (const AttributeList& al)
     yearly_LAI (al.alist_sequence ("YearlyLAI")),
     LAIvsDAY (al.plf ("LAIvsDAY")),
     canopy (*new CanopySimple (al.alist ("Canopy"))),
+    cover_ (-42.42e42),
     N_per_LAI (al.number ("N_per_LAI") * 0.1), // [kg N / ha] -> [g N / m^2]
     DM_per_LAI (al.number ("DM_per_LAI")),
     N_demand (0.0),

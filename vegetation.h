@@ -117,7 +117,8 @@ public:
   
   // Create and Destroy.
 public:
-  virtual void initialize (Treelog&, const Soil& soil, OrganicMatter&) = 0;
+  virtual void initialize (const Time&, const Soil& soil, OrganicMatter *const,
+                           Treelog&) = 0;
   static void load_syntax (Syntax&, AttributeList&);
   Vegetation (const AttributeList&);
   virtual ~Vegetation ();

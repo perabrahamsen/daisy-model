@@ -420,6 +420,8 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
 
   const double canopy_water_capacity = vegetation.interception_capacity ();
   daisy_assert (canopy_water_capacity >= 0.0);
+  
+  daisy_assert (snow_ea <= total_ep);
   canopy_ep = (total_ep - snow_ea) * vegetation.cover ();
   daisy_assert (canopy_ep >= 0.0);
   if (snow_water_out < 0.0)

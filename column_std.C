@@ -548,7 +548,7 @@ ColumnStandard::initialize (const Time& time, Treelog& err,
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water, err);
   organic_matter.initialize (alist.alist ("OrganicMatter"), soil, soil_water, 
 			     T_avg, err);
-  vegetation.initialize (err, soil, organic_matter);
+  vegetation.initialize (time, soil, &organic_matter, err);
 }
 
 ColumnStandard::~ColumnStandard ()

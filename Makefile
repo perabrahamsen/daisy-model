@@ -360,7 +360,7 @@ SPECIALS = log_all.C om.C select_value.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = texture.C destination.C symbol.C \
+OTHER = version.C texture.C destination.C symbol.C \
 	fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
@@ -390,7 +390,7 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
 	cmain.c bugmain.c $(DISABLED)
-HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) version.h
+HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h)
 
 # Find all printable files.
 #
@@ -617,15 +617,18 @@ dist:	cvs
 foo:
 	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
 
+version.C:
+	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
+	echo "// version.C -- automatically generated file" > version.C
+	echo " " >> version.C
+	echo "extern const char *const version = \"$(TAG)\";" >> version.C
+
 # Update the CVS repository.
 #
 cvs: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	rm -f version.h
-	echo "// version.h -- automatically generated file" > version.h
-	echo " " >> version.h
-	echo "static const char *const version = \"$(TAG)\";" >> version.h
-	mv ChangeLog ChangeLog.old
+	rm -f version.C
+	$(MAKE) version.C
 	echo `date "+%Y-%m-%d "` \
 	     " Per Abrahamsen  <abraham@dina.kvl.dk>" > ChangeLog
 	echo >> ChangeLog

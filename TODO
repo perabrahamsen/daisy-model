@@ -1,9 +1,8 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* FAO_PM der altid bruger refpenmanmonteith
+* Kig på JKL tal.
 
-Surface: field -> PM
-Surface: reference -> FAO_PM
+* Kør test-perm.dai, ret fejl, check rs_min, svar Eva
 
 * Make it possible to specify texture using different systems
 
