@@ -1,7 +1,7 @@
 /****************************************************************************
 ** MainWindow meta object code from reading C++ file 'qmain.h'
 **
-** Created: Tue Oct 3 13:31:28 2000
+** Created: Fri Oct 20 18:06:18 2000
 **      by: The Qt MOC ($Id$)
 **
 ** WARNING! All changes made in this file will be lost!

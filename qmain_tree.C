@@ -122,17 +122,17 @@ void
 MainTree::edit_after ()
 { item ()->edit_after (); }
 
-void
+bool
 MainTree::edit_child ()
-{ item ()->edit_child (); }
+{ return item ()->edit_child (); }
 
-void
+bool
 MainTree::edit_copy ()
-{ item ()->edit_copy (); }
+{ return item ()->edit_copy (); }
 
-void
+bool
 MainTree::edit_inherit ()
-{ item ()->edit_inherit (); }
+{ return item ()->edit_inherit (); }
 
 bool
 MainTree::edit_delete ()

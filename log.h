@@ -58,10 +58,25 @@ public:
   virtual void close () = 0;
 
   // Lists.
+public:
+  struct Unnamed
+  {
+  private:
+    Log& ll;
+  public:
+    Unnamed (Log& l)
+      : ll (l)
+    { ll.open_unnamed (); }
+    ~Unnamed ()
+    { ll.close_unnamed (); }
+  };
+private:
   virtual void open_unnamed () = 0;
   virtual void close_unnamed () = 0;
+  friend struct Log::Unnamed;
 
   // AList singletons variant.
+public:
   virtual void open_alist (const string& name, const AttributeList& alist);
   virtual void close_alist ();
 
@@ -164,9 +179,8 @@ output_vector (T const& items, const char* name, Log& log)
 	   item != items.end ();
 	   item++)
 	{
-	  log.open_unnamed ();
+	  Log::Unnamed unnamed (log);
 	  (*item)->output (log);
-	  log.close_unnamed ();
 	}
       log.close ();
     }

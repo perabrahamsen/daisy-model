@@ -7,6 +7,7 @@
 #include "library.h"
 #include "plf.h"
 #include "time.h"
+#include "depend.h"
 
 #include <qdialog.h>
 #include <qlayout.h>
@@ -688,7 +689,9 @@ EditObject::change ()
 EditObject::EditObject (QWidget* parent, 
 			const Syntax& syn, AttributeList& al, 
 			const AttributeList& def_al, 
-			const string& par)
+			const string& par,
+			const string& component,
+			const string& parameterization)
   : EditEntry (parent, syn, al, def_al, par)
 {
   button = new QPushButton ("Edit", this);
@@ -696,12 +699,21 @@ EditObject::EditObject (QWidget* parent,
   connect (button, SIGNAL (clicked ()), this, SLOT (edit ()));
   connect (choice, SIGNAL (activated (int)), this, SLOT (activate (int)));
 
+  dep_map dependencies;
+  if (component.length () > 0)
+    {
+      find_dependencies (component, parameterization, dependencies);
+      resequence (component, parameterization, dependencies);
+    }
+
   const Library& library = syntax.library (parameter);
   vector<string> models;
   library.entries (models);
   assert (models.size () > 0);
   for (unsigned int i = 0; i < models.size (); i++)
-    choice->insertItem (models[i].c_str ());
+    if (dependencies[component].find (models[i]) 
+	== dependencies[component].end ())
+      choice->insertItem (models[i].c_str ());
 
   reset ();
   change ();
@@ -719,6 +731,344 @@ EditObject::activate (int index)
   value = library.lookup (type);
   value.add ("type", type);
 }
+
+struct ListItem : public QListViewItem
+{
+  // Content.
+  int order;
+
+  // Sort.
+  QString key (int, bool) const
+  { 
+    QString tmp;
+    tmp.sprintf ("%8d", order);
+    return tmp;
+  }
+
+  // Create.
+  ListItem (QListView* main, const QString& content, int o)
+    : QListViewItem (main, content),
+      order (o)
+  { }
+};
+
+EditList::EditList (QWidget* parent, 
+		  const Syntax& syn, AttributeList& al, 
+		  const AttributeList& def_al, 
+		  const string& par, const string& dim)
+  : EditEntry (parent, syn, al, def_al, par)
+{
+  vbox = new QVBox (this);
+  if (dim.length () > 0)
+    {
+      QHBox* hbox = new QHBox (vbox);
+      edit = new QLineEdit (hbox);
+      new QLabel (dim.c_str (), hbox);
+    }
+  else
+    edit = new QLineEdit (vbox);
+      
+  QHBox* buttons = new QHBox (vbox);
+  QPushButton* before = new QPushButton ("Before", buttons);
+  connect (before, SIGNAL (clicked ()), this, SLOT (before ()));
+  QPushButton* at = new QPushButton ("At", buttons);
+  connect (at, SIGNAL (clicked ()), this, SLOT (at ()));
+  QPushButton* after = new QPushButton ("After", buttons);
+  connect (after, SIGNAL (clicked ()), this, SLOT (after ()));
+  QPushButton* remove = new QPushButton ("Delete", buttons);
+  connect (remove, SIGNAL (clicked ()), this, SLOT (remove ()));
+  table = new QListView (vbox);
+  table->addColumn ("List");
+  connect (table, SIGNAL (selectionChanged (QListViewItem*)), 
+	   this, SLOT (select (QListViewItem*)));
+
+};
+
+bool
+EditList::valid ()
+{ return true; }
+
+void
+EditList::insert (double order)
+{
+  QString value = edit->text ();
+  int pos = 0;
+  if (edit->validator ()
+      && edit->validator ()->validate (value, pos) != QValidator::Acceptable)
+    QMessageBox::warning (this, "QDaisy: List operation", "Invalid entry");
+
+  // Insert correct place.
+  vector<QString> items;
+  bool found = false;
+  for (QListViewItem* i = table->firstChild (); i; i = i->nextSibling ())
+    {
+      ListItem* ii = dynamic_cast<ListItem*> (i);
+      assert (ii);
+
+      if (ii->order < order)
+	{
+	  assert (!found);
+	  items.push_back (i->text (0));
+	}
+      else if (ii->order == order)
+	{
+	  assert (!found);
+	  items.push_back (edit->text ());
+	  found = true;
+	}
+      else if (!found)
+	{
+	  items.push_back (edit->text ());
+	  items.push_back (i->text (0));
+	  found = true;
+	}
+      else
+	items.push_back (i->text (0));
+    }
+  if (!found)
+    items.push_back (edit->text ());
+  
+  // Recreate.
+  table->clear ();
+  for (unsigned int i = 0; i < items.size (); i++)
+    new ListItem (table, items[i], i);
+}
+
+void
+EditList::before ()
+{ 
+  double order = -1.0;
+  if (ListItem* selected = dynamic_cast<ListItem*> (table->selectedItem ()))
+    order = selected->order - 0.5;
+  insert (order);
+}
+
+void
+EditList::at ()
+{ 
+  if (ListItem* selected = dynamic_cast<ListItem*> (table->selectedItem ()))
+    insert (selected->order);
+  else
+    QMessageBox::warning (this, "QDaisy: remove", "No selection.");
+}
+
+void
+EditList::after ()
+{ 
+  double order = 1e100;
+  if (ListItem* selected = dynamic_cast<ListItem*> (table->selectedItem ()))
+    order = selected->order + 0.5;
+  insert (order);
+}
+
+void
+EditList::remove ()
+{
+  QListViewItem* selected = table->selectedItem ();
+  if (selected)
+    delete selected;
+  else
+    QMessageBox::warning (this, "QDaisy: remove", "No selection.");
+}
+
+void 
+EditList::select (QListViewItem* item)
+{
+  assert (item);
+  edit->setText (item->text (0));
+}
+
+class EditNumbers : public EditList
+{ 
+  void get_value (vector<double>& value)
+  {
+    for (QListViewItem* i = table->firstChild (); i; i = i->nextSibling ())
+      value.push_back (i->text (0).toDouble ());
+  }
+
+  // Use.
+  void reset ()
+  {
+    vector<double> value;
+    if (alist.check (parameter))
+      value = alist.number_sequence (parameter);
+    else if (default_alist.check (parameter))
+      value = default_alist.number_sequence (parameter);
+
+    table->clear ();
+    for (unsigned int i = 0; i < value.size (); i++)
+      new ListItem (table, QString::number (value[i]), i);
+  }    
+  void apply ()
+  { 
+    if (check->isChecked ())
+      {
+	vector<double> value;
+	get_value (value);
+	alist.add (parameter, value); 
+      }
+    else if (default_alist.check (parameter))
+      alist.add (parameter, default_alist.number_sequence (parameter));
+    else
+      alist.remove (parameter);
+  }
+  void change ()
+  { 
+    edit->setEnabled (check->isChecked ());
+
+    if (check->isChecked ())
+      return;
+
+    vector<double> value ;
+    if (default_alist.check (parameter))
+      value = default_alist.number_sequence (parameter);
+
+    table->clear ();
+    for (unsigned int i = 0; i < value.size (); i++)
+      new ListItem (table, QString::number (value[i]), i);
+  }
+
+  // Create and Destroy.
+public:
+  EditNumbers (QWidget* parent, 
+	       const Syntax& syn, AttributeList& al, 
+	       const AttributeList& def_al, 
+	       const string& par)
+    : EditList (parent, syn, al, def_al, par, 
+		syn.dimension (par))
+  {
+    reset ();
+    edit->setValidator (new QDoubleValidator (this));
+    change ();
+  };
+};
+
+class EditIntegers : public EditList
+{ 
+  void get_value (vector<int>& value)
+  {
+    for (QListViewItem* i = table->firstChild (); i; i = i->nextSibling ())
+      value.push_back (i->text (0).toInt ());
+  }
+
+  // Use.
+  void reset ()
+  {
+    vector<int> value;
+    if (alist.check (parameter))
+      value = alist.integer_sequence (parameter);
+    else if (default_alist.check (parameter))
+      value = default_alist.integer_sequence (parameter);
+
+    table->clear ();
+    for (unsigned int i = 0; i < value.size (); i++)
+      new ListItem (table, QString::number (value[i]), i);
+  }    
+  void apply ()
+  { 
+    if (check->isChecked ())
+      {
+	vector<int> value;
+	get_value (value);
+	alist.add (parameter, value); 
+      }
+    else if (default_alist.check (parameter))
+      alist.add (parameter, default_alist.integer_sequence (parameter));
+    else
+      alist.remove (parameter);
+  }
+  void change ()
+  { 
+    edit->setEnabled (check->isChecked ());
+
+    if (check->isChecked ())
+      return;
+
+    vector<int> value ;
+    if (default_alist.check (parameter))
+      value = default_alist.integer_sequence (parameter);
+
+    table->clear ();
+    for (unsigned int i = 0; i < value.size (); i++)
+      new ListItem (table, QString::number (value[i]), i);
+  }
+
+  // Create and Destroy.
+public:
+  EditIntegers (QWidget* parent, 
+		const Syntax& syn, AttributeList& al, 
+		const AttributeList& def_al, 
+		const string& par)
+    : EditList (parent, syn, al, def_al, par)
+  {
+    reset ();
+    edit->setValidator (new QIntValidator (this));
+    change ();
+  };
+};
+
+class EditNames : public EditList
+{ 
+  void get_value (vector<string>& value)
+  {
+    for (QListViewItem* i = table->firstChild (); i; i = i->nextSibling ())
+      value.push_back (i->text (0).latin1 ());
+  }
+
+  // Use.
+  void reset ()
+  {
+    vector<string> value;
+    if (alist.check (parameter))
+      value = alist.name_sequence (parameter);
+    else if (default_alist.check (parameter))
+      value = default_alist.name_sequence (parameter);
+
+    table->clear ();
+    for (unsigned int i = 0; i < value.size (); i++)
+      new ListItem (table, value[i].c_str (), i);
+  }    
+  void apply ()
+  { 
+    if (check->isChecked ())
+      {
+	vector<string> value;
+	get_value (value);
+	alist.add (parameter, value); 
+      }
+    else if (default_alist.check (parameter))
+      alist.add (parameter, default_alist.name_sequence (parameter));
+    else
+      alist.remove (parameter);
+  }
+  void change ()
+  { 
+    edit->setEnabled (check->isChecked ());
+
+    if (check->isChecked ())
+      return;
+
+    vector<string> value ;
+    if (default_alist.check (parameter))
+      value = default_alist.name_sequence (parameter);
+
+    table->clear ();
+    for (unsigned int i = 0; i < value.size (); i++)
+      new ListItem (table, value[i].c_str (), i);
+  }
+
+  // Create and Destroy.
+public:
+  EditNames (QWidget* parent, 
+	       const Syntax& syn, AttributeList& al, 
+	       const AttributeList& def_al, 
+	       const string& par)
+    : EditList (parent, syn, al, def_al, par)
+  {
+    reset ();
+    change ();
+  };
+};
 
 class EditOther : public EditEntry
 { 
@@ -770,7 +1120,9 @@ public:
 ItemDialog::ItemDialog (QWidget* parent, 
 			const Syntax& syntax, AttributeList& alist, 
 			const AttributeList& default_alist, 
-			const string& parameter)
+			const string& parameter,
+			const string& component, 
+			const string& parameterization)
   : QDialog (parent, 0, true)
 { 
   assert (&alist != &default_alist);
@@ -805,13 +1157,29 @@ ItemDialog::ItemDialog (QWidget* parent,
 	  = new EditBoolean (this, syntax, alist, default_alist, parameter);
 	break;
       case Syntax::Object:
-	entry = new EditObject (this, syntax, alist, default_alist, parameter);
+	entry = new EditObject (this, syntax, alist, default_alist, parameter,
+				component, parameterization);
 	break;
       default:
 	entry = new EditOther (this, syntax, alist, default_alist, parameter);
       }
   else
-    entry = new EditOther (this, syntax, alist, default_alist, parameter);
+    switch (type)
+      {
+      case Syntax::Number:
+	entry 
+	  = new EditNumbers (this, syntax, alist, default_alist, parameter);
+	break;
+      case Syntax::Integer:
+	entry 
+	  = new EditIntegers (this, syntax, alist, default_alist, parameter);
+	break;
+      case Syntax::String:
+	entry = new EditNames (this, syntax, alist, default_alist, parameter);
+	break;
+      default:
+	entry = new EditOther (this, syntax, alist, default_alist, parameter);
+      }
 
   QHBox* buttons = new QHBox (this);
   QPushButton* apply = new QPushButton ("Apply", buttons);

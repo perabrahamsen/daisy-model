@@ -280,6 +280,8 @@ ColumnBase::ColumnBase (const AttributeList& al)
 void 
 ColumnBase::initialize (const Time& time, const Weather* global_weather)
 {
+  if (weather)
+    weather->initialize (time);
   if (!global_weather && !weather)
     return;
   const Weather& my_weather = *(weather ? weather : global_weather);

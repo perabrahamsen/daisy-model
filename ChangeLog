@@ -1,4 +1,73 @@
+2000-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.59 released.
+
+2000-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* chemicals.C (output): Always log, even when amount is 0.
+
+	* log.h (Log::Unnamed): New member class.
+	(output_vector): Use it.
+	* action_lisp.C (ActionCond::output): Use it.
+	* soil_chemicals.C (mix): Use it.
+
+2000-10-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* printer_file.C (print_object): Always use `print_string' to
+	print element.
+
+	* weather.C, weather.h (initialize): New virtual member function.
+	* weather_std.C (initialize): Implement it.
+	* column_base.C (initialize): Call it.
+	* daisy.C (initialize): Ditto.
+
+	* log_checkpoint.C (done): Start checkpoint from next timestep.
+
+	* om.C (OM): Initialize `C' array if present.
+
+2000-10-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (output): Log `initial_C_per_N' even when unspecified. 
+	(check_alist): Allow negative numbers.
+	(load_syntax): Document negative numbers.
+	(get_initial_C_per_N): Obey negative numbers.
+
+	* qmain_item.C (edit_child): Implemented.
+
+2000-10-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* qmain.C (edit_copy, edit_inherit): Populate tree.
+
+2000-10-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* qmain.C (set_selection_copyable): Don't set inheritable.
+	* qmain.C, qmain.h (set_selection_inheritable): New function.
+	* qmain.C (clear_selection): Use it.
+	* qmain_item.C (ModelItem::set_selected): Use it.
+	(ModelItem::edit_copy): Implemented.
+	(ModelItem::edit_inherit): Implemented.
+
+2000-10-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* depend.h: Renamed from `traverse_depend.h'.
+	* depend.C: Renamed from `traverse_depend.C'.
+	* Makefile (OTHER): Update.
+	* qmain_item.C: Update.
+	* qmain_edit.C: Update.
+
+	* qmain_item.C, qmain_item.h (container): New method to find the
+	library and object a tree item.
+
+	* traverse_depend.C, traverse_depend.h (had_dependencies,
+	check_dependencies): New functions. 
+	* traverse_depend.h (dep_map): New type.
+	* traverse_depend.C (TraverseDepend):  Support it.
+
 2000-10-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* qmain_edit.C, qmain_edit.h (EditList): New helper class.
+	* qmain_edit.C (EditNumbers, EditIntegers, EditNames): New editors.
+	(ItemDialog): Use them.
 
 	* Version 1.58 released.
 

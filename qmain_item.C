@@ -10,10 +10,11 @@
 #include "library.h"
 #include "tmpstream.h"
 #include "treelog_stream.h"
-#include "traverse_depend.h"
+#include "depend.h"
 #include "traverse_delete.h"
 
 #include <qmessagebox.h>
+#include <qinputdialog.h>
 
 MainWindow* 
 TreeItem::main () const
@@ -47,6 +48,14 @@ TreeItem::key (int, bool) const
   return tmp;
 }
 
+bool
+TreeItem::container (string& component, string& parameterization)
+{
+  TreeItem* p = dynamic_cast<TreeItem*> (parent ());
+  assert (p);
+  return p->container (component, parameterization);
+};
+
 void
 TreeItem::edit_edit ()
 { assert (false); }
@@ -59,15 +68,15 @@ void
 TreeItem::edit_after ()
 { assert (false); }
 
-void
+bool
 TreeItem::edit_child ()
 { assert (false); }
 
-void
+bool
 TreeItem::edit_copy ()
 { assert (false); }
 
-void
+bool
 TreeItem::edit_inherit ()
 { assert (false); }
 
@@ -149,15 +158,61 @@ AtomItem::edit_delete ()
   return c->delete_item (this); 
 }
 
-void
+bool
 AtomItem::edit_child ()
 { 
   const AListItem* c = dynamic_cast<const AListItem*> (parent ());
   assert (c); 
   const string parameter = entry.latin1 ();
   const Syntax::type type = c->syntax.lookup (parameter);
-  assert (type == Syntax::AList || type == Syntax::Object);
   assert (c->syntax.size (parameter) != Syntax::Singleton);
+  vector<AttributeList*> alists = c->alist.alist_sequence (parameter);
+  if (type == Syntax::AList)
+    {
+      AttributeList alist (c->syntax.default_alist (parameter));
+      vector<AttributeList*> entry;
+      entry.push_back (&alist);
+      entry.insert (entry.end (), alists.begin (), alists.end ());
+      c->alist.add (parameter, entry);
+    }
+  else
+    {
+      assert (type == Syntax::Object);
+      string component;
+      string parameterization;
+      dep_map dependencies;
+      if (container (component, parameterization))
+	{
+	  assert (component.length () > 0);
+	  find_dependencies (component, parameterization, dependencies);
+	  resequence (component, parameterization, dependencies);
+	}
+
+      const Library& library = c->syntax.library (parameter);
+      QStringList choices;
+      vector<string> models;
+      library.entries (models);
+      assert (models.size () > 0);
+      for (unsigned int i = 0; i < models.size (); i++)
+	if (dependencies[component].find (models[i]) 
+	    == dependencies[component].end ())
+	  choices += models[i].c_str ();
+      bool ok; 
+      QString choice 
+	= QInputDialog::getItem ("QDaisy: Insert child",
+				 "Type:", choices, 0, false, &ok,
+				 main ());
+      const string name = choice.latin1 ();
+      if (!ok || !library.check (name))
+	return false;
+      AttributeList alist (library.lookup (name));
+      alist.add ("type", name);
+      vector<AttributeList*> entry;
+      entry.push_back (&alist);
+      entry.insert (entry.end (), alists.begin (), alists.end ());
+      c->alist.add (parameter, entry);
+    }
+  return true;
 }
 
 void
@@ -244,7 +299,11 @@ bool
 AListItem::edit_item (TreeItem* item)
 { 
   const string parameter = item->entry.latin1 ();
-  ItemDialog edit_item (main (), syntax, alist, default_alist, parameter);
+  string component;
+  string parameterization;
+  container (component, parameterization);
+  ItemDialog edit_item (main (), syntax, alist, default_alist, parameter,
+			component, parameterization);
 
   switch (edit_item.exec ())
     {
@@ -300,6 +359,16 @@ AListItem::AListItem (const Syntax& syn, AttributeList& al,
 { assert (&al != &al_def); }
 
 bool 
+ModelItem::container (string& component, string& parameterization)
+{
+  LibraryItem* p = dynamic_cast<LibraryItem*> (parent ());
+  assert (p);
+  component = p->entry.latin1 ();
+  parameterization = entry.latin1 ();
+  return true;
+}
+
+bool 
 ModelItem::editable () const
 { return editable_; }
 
@@ -307,23 +376,107 @@ void
 ModelItem::set_selected ()
 {
   AListItem::set_selected ();
+
+  string component;
+  string parameterization;
+  container (component, parameterization);
+  Library& library = Library::find (component);
+  assert (library.check (parameterization));
+  const AttributeList& alist = library.lookup (parameterization);
+
   if (editable ())
     main ()->set_selection_deletable (true);
   main ()->set_selection_depable (true);  
-  main ()->set_selection_copyable (true);
+  main ()->set_selection_copyable (alist.check ("type"));
+  main ()->set_selection_inheritable (true);
+  
   if (alist.check ("description"))
     main ()->set_description (alist.name ("description").c_str ());
   else
     main ()->set_description ("Model with no description.");
 }
 
-void
+bool
 ModelItem::edit_copy ()
-{ }
+{ 
+  // Where are we.
+  string component;
+  string parameterization;
+  container (component, parameterization);
+  
+  // Get new name.
+  bool ok;
+  QString name = QInputDialog::getText ("QDaisy: Inherit model", 
+					"Name of new parameterization",
+					entry, &ok, main ());
+  if (!ok || name.isEmpty ())
+    return false;
+  
+  // Check that it doesn't already exists.
+  string child = name.latin1 ();
+  Library& library = Library::find (component);
+  if (library.check (child))
+    {
+      QMessageBox::warning (main (), 
+			    "QDaisy: Can't create new parameterization",
+			    "The name is already in use.");
+      return false;
+    }
 
-void
+  // Find superclass.
+  assert (library.check (parameterization));
+  const AttributeList& alist = library.lookup (parameterization);
+  assert (alist.check ("type"));
+  const string& super = alist.name ("type");
+
+  // Create new attribute derived from its superclass.
+  const AttributeList& sl = library.lookup (parameterization);
+  AttributeList& atts = *new AttributeList (sl);
+  // Pretent we got this parameterization from the current file..
+  atts.add ("parsed_from_file", main ()->file_name.latin1 ());
+  atts.add ("parsed_sequence", Library::get_sequence ());
+  // Add new object to library.
+  library.add_derived (child, atts, super);
+  return true;
+}
+
+bool
 ModelItem::edit_inherit ()
-{ }
+{ 
+  // Where are we.
+  string component;
+  string parameterization;
+  container (component, parameterization);
+  
+  // Get new name.
+  bool ok;
+  QString name = QInputDialog::getText ("QDaisy: Inherit model", 
+					"Name of new parameterization",
+					entry, &ok, main ());
+  if (!ok || name.isEmpty ())
+    return false;
+  
+  // Check that it doesn't already exists.
+  string child = name.latin1 ();
+  Library& library = Library::find (component);
+  if (library.check (child))
+    {
+      QMessageBox::warning (main (), 
+			    "QDaisy: Can't create new parameterization",
+			    "The name is already in use.");
+      return false;
+    }
+
+  // Create new attribute derived from its superclass.
+  const AttributeList& sl = library.lookup (parameterization);
+  AttributeList& atts = *new AttributeList (sl);
+  // Pretent we got this parameterization from the current file..
+  atts.add ("parsed_from_file", main ()->file_name.latin1 ());
+  atts.add ("parsed_sequence", Library::get_sequence ());
+  // Add new object to library.
+  library.add_derived (child, atts, parameterization);
+  return true;
+}
 
 bool
 ModelItem::edit_delete ()
@@ -333,8 +486,6 @@ ModelItem::edit_delete ()
   const string& component = par->entry.latin1 ();
   const string& model = entry.latin1 ();
   
-  TmpStream deps;
-  TreelogStream treelog (deps ());
   QString title = QString ("QDaisy: Removing ") + entry;
   
   bool found = false;
@@ -342,22 +493,21 @@ ModelItem::edit_delete ()
   // Check Libraries.
   {
     Busy busy (main (), "Checking libraries...");
-    Treelog::Open nest (treelog, "Libraries");
-    if (check_dependencies (component, model, treelog))
+    if (has_dependencies (component, model))
       found = true;
   }
   // Check simulation.
   {
     Busy busy (main (), "Checking simulation...");
-    if (check_dependencies (component, model, 
-			    main ()->daisy_syntax, main ()->daisy_alist, 
-			    "Daisy", treelog))
+    if (has_dependencies (component, model, 
+			  main ()->daisy_syntax, main ()->daisy_alist, 
+			  "Daisy"))
       found = true;
   }
   if (found)
     {
       switch (QMessageBox::warning (main (), "Deleting parameterization", "\
-There are other object depending on this one.\n\
+There are other objects depending on this one.\n\
 Really delete?",
 			   "Yes", "No", 0, 1))
 	{
@@ -512,6 +662,9 @@ QString
 SimulationItem::key (int, bool) const
 { return QString ("1") + entry; }
 
+bool 
+SimulationItem::container (string&, string&)
+{ return false; }
 
 SimulationItem::SimulationItem (const Syntax& syn, AttributeList& al,
 				const AttributeList& al_def,
@@ -531,11 +684,16 @@ SequenceItem::editable () const
 
 void
 SequenceItem::edit_after ()
-{ }
+{ 
+  // TODO
+}
 
 bool
 SequenceItem::edit_delete ()
-{ return false; }
+{ 
+  // TODO
+  return false; 
+}
 
 void
 SequenceItem::set_selected ()

@@ -121,6 +121,8 @@ public:
   // Create and Destroy.
 private:
   Weather (const Weather&);
+public:
+  virtual void initialize (const Time& time);
 protected:
   Weather (const AttributeList&);
 public:

@@ -12,8 +12,7 @@
 void
 OM::output (Log& log) const
 {
-  if (initial_C_per_N != Unspecified)
-    log.output ("initial_C_per_N", initial_C_per_N); // For checkpoint
+  log.output ("initial_C_per_N", initial_C_per_N); // For checkpoint
   log.output ("top_C", top_C);
   log.output ("top_N", top_N);
   log.output ("C", C);
@@ -516,12 +515,6 @@ static bool check_alist (const AttributeList& al, ostream& err)
       err << "Sum of `fractions' must be 1.0\n";
       ok = false;
     }
-  if (al.check ("initial_C_per_N"))
-    if (al.number ("initial_C_per_N") <= 0.0)
-      {
-	err << "`initial_C_per_N' must be positive\n";
-	ok = false;
-      }
   const double initial_fraction = al.number ("initial_fraction");
   if (initial_fraction != OM::Unspecified
       && initial_fraction < 0.0 || initial_fraction > 1.0)
@@ -572,7 +565,8 @@ The first numbers corresponds to each of the SMB pools, the remaining\n\
 numbers corresponds to the SOM pools.  The length of the sequence should\n\
 thus be the number of SMB pools plus the number of SOM pools.");
   syntax.add ("initial_C_per_N", "g C/g N", Syntax::OptionalState, "\
-The initial C/N ratio when this pool is created.");
+The initial C/N ratio when this pool is created.\n\
+Negative numbers mean unspecified.");
   syntax.add ("initial_fraction", Syntax::None (), Syntax::Const, "\
 The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified\n\
@@ -584,7 +578,10 @@ static double
 get_initial_C_per_N (const AttributeList& al)
 {
   if (al.check ("initial_C_per_N"))
-    return al.number ("initial_C_per_N");
+    if (al.number ("initial_C_per_N") < 0.0)
+      return OM::Unspecified;
+    else
+      return al.number ("initial_C_per_N");
   if (al.check ("C_per_N"))
     {
       const vector<double>& C_per_N = al.number_sequence ("C_per_N");
@@ -606,6 +603,8 @@ OM::OM (const AttributeList& al)
 { 
   if (al.check ("C_per_N"))
     C_per_N = al.number_sequence ("C_per_N");
+  if (al.check ("C"))
+    C = al.number_sequence ("C");
 }
 
 static Submodel::Register om_submodel ("OM", OM::load_syntax);

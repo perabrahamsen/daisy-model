@@ -462,9 +462,13 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
     }
 
   // Library element with additional attributes.
-  out << element << " ";
+  print_string (element);
+  out << " ";
   print_alist (value, element_syntax, element_alist, 
-	       indent + 1 + element.length (), false);
+	       indent + 1 + element.length ()
+	       // Buglet: Wrong indentation for elements with strange chars.
+	       + (is_identifier (element) ? 0 : 2),
+	       false);
 }
 
 // We store all matching entries here.

@@ -277,6 +277,10 @@ Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [W/m2]
             (sin(Lat)*sin(Dec) + cos(Lat)*cos(Dec)*cos(SunHourAngle)));
 }
 
+void
+Weather::initialize (const Time&)
+{ }
+
 Weather::Weather (const AttributeList& al)
   : name (al.name ("type")),
     latitude (-42.42e42),

@@ -199,14 +199,10 @@ Chemicals::Implementation::output (Log& log) const
     { 
       const string& name = (*i).first->name;
       const double amount = (*i).second;
-      if (amount > 0.0)
-	{
-	  log.open_unnamed ();
-	  Log::Maybe maybe (log, name);
-	  log.output ("chemical", name);
-	  log.output ("amount", amount);
-	  log.close_unnamed ();
-	}
+      Log::Unnamed unnamed (log);
+      Log::Maybe maybe (log, name);
+      log.output ("chemical", name);
+      log.output ("amount", amount);
     }
 }
 

@@ -1,7 +1,7 @@
-// traverse_depend.h -- Check dependencies in Daisy datastructures.
+// depend.h -- Check dependencies in Daisy datastructures.
 
-#ifndef TRAVERSE_DEPEND_H
-#define TRAVERSE_DEPEND_H
+#ifndef DEPEND_H
+#define DEPEND_H
 
 #include <string>
 #include <set>
@@ -33,5 +33,9 @@ bool
 find_dependencies (const string& component, const string& parameterization, 
 		   dep_map& dependencies);
 
+void
+resequence (const string& component, const string& parameterization, 
+	    const dep_map& dependencies);
 
-#endif TRAVERSE_DEPEND_H
+
+#endif DEPEND_H

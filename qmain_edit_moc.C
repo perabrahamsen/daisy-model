@@ -1,7 +1,7 @@
 /****************************************************************************
 ** EditEntry meta object code from reading C++ file 'qmain_edit.h'
 **
-** Created: Tue Oct 10 16:13:54 2000
+** Created: Fri Oct 13 15:08:08 2000
 **      by: The Qt MOC ($Id$)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -267,6 +267,86 @@ QMetaObject* EditObject::staticMetaObject()
     metaObj = QMetaObject::new_metaobject(
 	"EditObject", "EditEntry",
 	slot_tbl, 2,
+	0, 0,
+#ifndef QT_NO_PROPERTIES
+	0, 0,
+	0, 0,
+#endif // QT_NO_PROPERTIES
+	0, 0 );
+    metaObj->set_slot_access( slot_tbl_access );
+#ifndef QT_NO_PROPERTIES
+#endif // QT_NO_PROPERTIES
+    return metaObj;
+}
+
+
+const char *EditList::className() const
+{
+    return "EditList";
+}
+
+QMetaObject *EditList::metaObj = 0;
+
+void EditList::initMetaObject()
+{
+    if ( metaObj )
+	return;
+    if ( qstrcmp(EditEntry::className(), "EditEntry") != 0 )
+	badSuperclassWarning("EditList","EditEntry");
+    (void) staticMetaObject();
+}
+
+#ifndef QT_NO_TRANSLATION
+
+QString EditList::tr(const char* s)
+{
+    return qApp->translate( "EditList", s, 0 );
+}
+
+QString EditList::tr(const char* s, const char * c)
+{
+    return qApp->translate( "EditList", s, c );
+}
+
+#endif // QT_NO_TRANSLATION
+
+QMetaObject* EditList::staticMetaObject()
+{
+    if ( metaObj )
+	return metaObj;
+    (void) EditEntry::staticMetaObject();
+#ifndef QT_NO_PROPERTIES
+#endif // QT_NO_PROPERTIES
+    typedef void(EditList::*m1_t0)();
+    typedef void(EditList::*m1_t1)();
+    typedef void(EditList::*m1_t2)();
+    typedef void(EditList::*m1_t3)();
+    typedef void(EditList::*m1_t4)(QListViewItem*);
+    m1_t0 v1_0 = Q_AMPERSAND EditList::before;
+    m1_t1 v1_1 = Q_AMPERSAND EditList::at;
+    m1_t2 v1_2 = Q_AMPERSAND EditList::after;
+    m1_t3 v1_3 = Q_AMPERSAND EditList::remove;
+    m1_t4 v1_4 = Q_AMPERSAND EditList::select;
+    QMetaData *slot_tbl = QMetaObject::new_metadata(5);
+    QMetaData::Access *slot_tbl_access = QMetaObject::new_metaaccess(5);
+    slot_tbl[0].name = "before()";
+    slot_tbl[0].ptr = (QMember)v1_0;
+    slot_tbl_access[0] = QMetaData::Public;
+    slot_tbl[1].name = "at()";
+    slot_tbl[1].ptr = (QMember)v1_1;
+    slot_tbl_access[1] = QMetaData::Public;
+    slot_tbl[2].name = "after()";
+    slot_tbl[2].ptr = (QMember)v1_2;
+    slot_tbl_access[2] = QMetaData::Public;
+    slot_tbl[3].name = "remove()";
+    slot_tbl[3].ptr = (QMember)v1_3;
+    slot_tbl_access[3] = QMetaData::Public;
+    slot_tbl[4].name = "select(QListViewItem*)";
+    slot_tbl[4].ptr = (QMember)v1_4;
+    slot_tbl_access[4] = QMetaData::Public;
+    metaObj = QMetaObject::new_metaobject(
+	"EditList", "EditEntry",
+	slot_tbl, 5,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
 	0, 0,

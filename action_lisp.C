@@ -141,9 +141,8 @@ struct ActionCond : public Action
 	       item != clauses.end ();
 	       item++)
 	    {
-	      log.open_unnamed ();
+	      Log::Unnamed unnamed (log);
 	      (*item).output (log);
-	      log.close_unnamed ();
 	    }
 	  log.close ();
 	}

@@ -163,6 +163,7 @@ struct WeatherStandard : public Weather
     }
 
   // Create and Destroy.
+  void initialize (const Time& time);
   WeatherStandard (const AttributeList&);
   ~WeatherStandard ();
   bool check (const Time& from, const Time& to, ostream& err) const;
@@ -442,6 +443,15 @@ WeatherStandard::read_new_day (const Time& time)
       for (int hour = 0; hour < 24; hour++)
 	vapor_pressure_[hour] = SaturationVapourPressure (T_min);
     }
+}
+
+void
+WeatherStandard::initialize (const Time& time)
+{ 
+  if (time.hour () == 0)
+    return;
+  Time midnight (time.year (), time.month (), time.mday (), 0);
+  read_new_day (midnight);
 }
 
 WeatherStandard::WeatherStandard (const AttributeList& al)

@@ -506,6 +506,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
 	}
       break;
     case Syntax::Library:
+      return false;
     case Syntax::Error:
     default:
       assert (false);

@@ -154,6 +154,8 @@ void
 Daisy::initialize (const Syntax& s)
 { 
   syntax = &s; 
+  if (weather)
+    weather->initialize (time);
   field.initialize (time, weather);
 }
 

@@ -269,7 +269,7 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 # Various utility code that are neither a component or a (sub)model.
 #
 OTHER = traverse_delete.C \
-	traverse_depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
+	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
 	submodel.C
@@ -308,7 +308,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = pt.C pt.h pt_pmsw.C pt_std.C
+REMOVE = traverse_depend.C
 
 # These are the file extensions we deal with.
 # 

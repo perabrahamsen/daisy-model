@@ -2,58 +2,36 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * QDaisy.
 
+** Copy/Inherit: Rebuild model.
+
+** Menu -> Edit -> Inputs
+
+Tilføj inputs til træ?
+
+** Insert child, insert after.
+
+** Menu -> File -> Run
+
+Maybe show events in tree, like BCC?
+
 ** Filter setup
 
 Only show a few buildin libraries and models.
 
 ** Treelog_Qt
 
-** Menu -> Edit -> Parameters
-
-NumberSeq, IntSeq, NameSew:
-
-[ LineEditor ]
-
-[Before] [At] [After] [Remove]
-
-[ ListView ]
-
-PLFSeq:
-
-[ PLF Editor ]
-
-[Before] [At] [After] [Remove]
-
-[ ComboBox ]: #PLF
-
-** Library::resequence_with_dependencies (lib, model)
-
-Giv model nyt sequence number
-
-Giv alt der afhænger af model nyt sequence number (rekursivt).
-
-** Menu -> Edit -> Copy
-
-** Menu -> Edit -> Inputs
+** EditPLFs
 
 ** Specialiced model view.
 
 ** View model as text.
-
-** Menu -> Edit -> Inherit
-
-resequence, suggest among lower numbered.
-
-** Menu -> File -> Run
-
-Maybe show events in tree, like BCC?
 
 ** Interest groups
 
 libraries, models, parameterizations and parameters should belong to a
 number of "interest groups", which can be use by QDaisy for filtering.
 
-** Make drag and drop and "qdaisy file" work.
+** Make drag and drop of "file.dai" work.
 
 ** Use radio buttons for filters in menu.
 

@@ -59,7 +59,13 @@ LogCheckpoint::done ()
 		 << "-" << time.year () << "-" << time.month () << "-" 
 	      << time.mday () << "+" << time.hour () << ".dai";
       const string filename (scratch.str ());
-      
+
+      // Start checkpoint from next timestep.
+      assert (alist ().check ("time"));
+      Time time (alist ().time ("time"));
+      time.tick_hour ();
+      alist ().add ("time", time);
+
       // Open log file.
       PrinterFile printer (filename);
       printer.print_comment (description);

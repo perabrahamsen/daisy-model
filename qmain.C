@@ -299,7 +299,12 @@ void
 MainWindow::set_selection_copyable (bool copyable)
 {
   menu_edit->setItemEnabled (menu_edit_copy_id, copyable);
-  menu_edit->setItemEnabled (menu_edit_inherit_id, copyable);
+}
+
+void
+MainWindow::set_selection_inheritable (bool inheritable)
+{
+  menu_edit->setItemEnabled (menu_edit_inherit_id, inheritable);
 }
 
 void
@@ -346,6 +351,7 @@ MainWindow::clear_selection ()
   set_selection_afterable (false);
   set_selection_childable (false);
   set_selection_copyable (false);
+  set_selection_inheritable (false);
   set_selection_deletable (false);
   set_selection_viewable (false);
   set_selection_checkable (false);
@@ -440,15 +446,24 @@ MainWindow::edit_after ()
 
 void
 MainWindow::edit_child ()
-{ tree->edit_child (); }
+{ 
+  if (tree->edit_child ())
+    populate_tree ();
+}
 
 void
 MainWindow::edit_copy ()
-{ tree->edit_copy (); }
+{ 
+  if (tree->edit_copy ())
+    populate_tree ();
+}
 
 void
 MainWindow::edit_inherit ()
-{ tree->edit_inherit (); }
+{ 
+  if (tree->edit_inherit ())
+    populate_tree ();
+}
 
 void
 MainWindow::edit_delete ()
