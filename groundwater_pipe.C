@@ -205,7 +205,7 @@ GroundwaterPipe::Update_GWT (const Soil& soil,
   const int i_GWT = soil.interval_plus (height) + 1;
   if (Percolation[i_GWT] - Percolation[i_bottom+1] > EquilibriumFlow)
     RaisingGWT (soil, h, h_ice, Theta, q);
-  else if (height>z_drain)
+  else if (height<=z_drain)
     FallingGWT1 (soil, h, h_ice, Theta);
   else
     FallingGWT2 (soil, h, h_ice, Theta);
