@@ -837,6 +837,9 @@ cdaisy${OBJ}: cdaisy.C syntax.h common.h treelog.h alist.h daisy.h \
 common${OBJ}: common.C common.h message.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
+pedo_linear${OBJ}: pedo_linear.C pedo.h librarian.h library.h common.h \
+ alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
+ geometry.h
 adsorption_full${OBJ}: adsorption_full.C adsorption.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h
 equil_langmuir${OBJ}: equil_langmuir.C equil.h librarian.h library.h \
@@ -846,7 +849,7 @@ transform_equil${OBJ}: transform_equil.C transform.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h \
  tortuosity.h geometry.h soil_water.h macro.h soil_chemicals.h \
  soil_chemical.h solute.h adsorption.h transport.h mactrans.h plf.h \
- pedo.h equil.h check.h mathlib.h
+ pedo.h equil.h check.h log.h mathlib.h
 condition_weather${OBJ}: condition_weather.C condition.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h field.h daisy.h check.h \
  log.h tmpstream.h

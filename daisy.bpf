@@ -192,6 +192,12 @@ USEUNIT("check.C");
 USEUNIT("check_range.C");
 USEUNIT("rootdens_PLF.C");
 USEUNIT("condition_weather.C");
+USEUNIT("transform_equil.C");
+USEUNIT("equil.C");
+USEUNIT("equil_langmuir.C");
+USEUNIT("pedo.C");
+USEUNIT("pedo_linear.C");
+USEUNIT("transform.C");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 

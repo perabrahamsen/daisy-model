@@ -50,7 +50,8 @@
       path.obj rootdens.obj rootdens_G_P.obj development.obj crpn.obj 
       partition.obj photosynthesis.obj production.obj harvesting.obj 
       vernalization.obj check.obj check_range.obj rootdens_PLF.obj 
-      condition_weather.obj"/>
+      condition_weather.obj transform_equil.obj equil.obj equil_langmuir.obj 
+      pedo.obj pedo_linear.obj transform.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>

@@ -34,7 +34,6 @@ struct PedotransferLinear : public Pedotransfer
 
   // Create.
   bool check (const Soil&, Treelog& err) const;
-  void initialize (const Soil&);
   PedotransferLinear (const AttributeList& al);
 };
 
