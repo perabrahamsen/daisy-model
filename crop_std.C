@@ -154,6 +154,7 @@ struct CropStandard::Parameters
     double Qeff;		// Quantum efficiency at low light
     double Fm;			// Max assimilation rate
     const PLF& TempEff;	// Temperature effect, photosynthesis
+    const PLF& DSEff;	// Development stage effect, photosynthesis
   private:
     friend struct CropStandard::Parameters;
     LeafPhotPar (const AttributeList&);
@@ -352,7 +353,8 @@ CropStandard::Parameters::VernalPar::VernalPar (const AttributeList& vl)
 CropStandard::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
   : Qeff (vl.number ("Qeff")),
     Fm (vl.number ("Fm")),
-    TempEff (vl.plf ("TempEff"))
+    TempEff (vl.plf ("TempEff")),
+    DSEff (vl.plf ("DSEff"))
 { }
 
 CropStandard::Parameters::PartitPar::PartitPar (const AttributeList& vl)
@@ -613,6 +615,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& Vernal = *new Syntax ();
   // WARNING: Don't add an Vernal alist, or the 'Optional' idea is lost.
   Syntax& LeafPhot = *new Syntax ();
+  AttributeList& vLeafPhot = *new AttributeList ();
   Syntax& Partit = *new Syntax ();
   Syntax& Prod = *new Syntax ();
   AttributeList& vProd = *new AttributeList ();
@@ -624,6 +627,10 @@ CropStandardSyntax::CropStandardSyntax ()
   AttributeList& vPhenology = *new AttributeList ();
   Syntax& CrpAux = *new Syntax ();
   AttributeList& vCrpAux = *new AttributeList ();
+
+  PLF DS_null_eff;
+  DS_null_eff.add (0.0, 1.00);
+  DS_null_eff.add (2.0, 1.00);
 
   // DevelPar
   Devel.add ("EmrTSum", "dg C d", Syntax::Const,
@@ -678,6 +685,9 @@ This parameterization is only valid until the specified development state.");
 		"Maximum assimilation rate.");
   LeafPhot.add ("TempEff", "dg C", Syntax::None (), Syntax::Const,
 		"Temperature effect, photosynthesis.");
+  LeafPhot.add ("DSEff", "-", Syntax::None (), Syntax::Const,
+		"Development Stage effect, photosynthesis.");
+  vLeafPhot.add ("DSEff",DS_null_eff);
 
   // PartitPar
   Partit.add ("Root", "DS", Syntax::None (), Syntax::Const,
@@ -932,7 +942,7 @@ Maximal development stage for which the crop survives harvest.");
 	      "Root DM removed.");
   CrpAux.add ("DeadNRoot", "g N/m2/d", Syntax::LogOnly,
 	      "Root N removed.");
-  CrpAux.add ("Fixated", "g N/m^2/h", Syntax::LogOnly, 
+  CrpAux.add ("Fixated", "g N/m^2/h", Syntax::LogOnly,
 	      "N fixation from air.");
   CrpAux.add ("AccFixated", "g N/m^2", Syntax::LogOnly, 
 	      "Accumuated N fixation from air.");
@@ -965,6 +975,7 @@ Maximal development stage for which the crop survives harvest.");
   syntax.add ("Vernal", Vernal, Syntax::OptionalConst, Syntax::Singleton,
 	      "Vernalization.");
   syntax.add ("LeafPhot", LeafPhot, "Leaf photosynthesis.");
+  alist.add ("LeafPhot", vLeafPhot);
   syntax.add ("Partit", Partit, "Assimilate partitioning.");
   syntax.add ("CrpN", CrpN, "Nitrogen content in the crop.");
   alist.add ("CrpN", CrpNList);
@@ -1151,7 +1162,9 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   const Parameters::LeafPhotPar& LeafPhot = par.LeafPhot;
   const PLF& LAIvsH = canopy.LAIvsH;
   const double Ta = bioclimate.daily_air_temperature ();
-  const double Teff = LeafPhot.TempEff (Ta); // Temperature effect
+  const double DS = var.Phenology.DS;
+  // Temperature effect and development stage effect
+  const double Teff = LeafPhot.TempEff (Ta) * LeafPhot.DSEff (DS);
 
   // One crop: assert (approximate (canopy.CAI, bioclimate.CAI ()));
   if (!approximate (LAIvsH (canopy.Height), canopy.CAI))
@@ -1379,12 +1392,23 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * canopy.CAImRat / 24.0;
   assert (CrpAux.DeadWLeaf >= 0.0);
   double DdLeafCnc;
-  assert (vProd.WLeaf > 0.0);
+  assert (vProd.WLeaf >= 0.0);
   if (vProd.NCrop > 1.05 * CrpAux.PtNCnt)
-    DdLeafCnc = vProd.NLeaf/vProd.WLeaf;
+    {
+      if (vProd.WLeaf > 0.0)
+        DdLeafCnc = vProd.NLeaf/vProd.WLeaf;
+      else
+        DdLeafCnc = vProd.NStem/vProd.WStem;
+    }
   else
-    DdLeafCnc = (vProd.NLeaf/vProd.WLeaf - par.CrpN.NfLeafCnc (DS))
-      * ( 1.0 - par.CrpN.TLLeafEff (DS)) +  par.CrpN.NfLeafCnc (DS);
+    {
+      if (vProd.WLeaf > 0.0)
+        DdLeafCnc = (vProd.NLeaf/vProd.WLeaf - par.CrpN.NfLeafCnc (DS))
+         * ( 1.0 - par.CrpN.TLLeafEff (DS)) +  par.CrpN.NfLeafCnc (DS);
+      else
+        DdLeafCnc = vProd.NStem/vProd.WStem;
+    }
+
   assert (DdLeafCnc >= 0.0);
   assert (CrpAux.DeadWLeaf >= 0.0);
   CrpAux.DeadNLeaf = DdLeafCnc * CrpAux.DeadWLeaf;
@@ -1679,8 +1703,8 @@ CropStandard::harvest (const string& column_name,
 	  canopy.Offset
 	    = canopy.Height
 	    - canopy.HvsDS (var.Phenology.DS) ;
-	  assert (approximate (canopy.CropHeight (var.Phenology.DS),
-			       canopy.Height));
+	  assert (approximate (canopy.CropHeight (var.Prod.WStem,
+                               var.Phenology.DS), canopy.Height));
 	  canopy.CropCAI (var.Prod.WLeaf, var.Prod.WSOrg,
 			  var.Prod.WStem, var.Phenology.DS);
 	  CanopyStructure ();

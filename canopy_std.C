@@ -6,9 +6,11 @@
 #include "mathlib.h"
 
 double
-CanopyStandard::CropHeight (double DS)
+CanopyStandard::CropHeight (double WStem, double DS)
 {
-  return HvsDS (DS) + Offset;
+  const double H1 = HvsDS (DS) + Offset;
+  const double H2 = HvsDS (1.0) * HvsWStem (WStem);
+  return min (H1, H2);
 }
 
 void
@@ -176,7 +178,7 @@ CanopyStandard::CanopyStructure (double DS)
 void
 CanopyStandard::tick (double WLeaf, double WSOrg, double WStem, double DS)
 {
-  Height = CropHeight (DS);
+  Height = CropHeight (WStem, DS);
   if (InitCAI)
     InitialCAI (WLeaf, DS);
   else
@@ -238,6 +240,12 @@ CanopyStandard::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("StemPhotEff", 1.0);
   syntax.add ("HvsDS", Syntax::None (), "cm", Syntax::Const,
 	      "Crop height as function of DS.");
+  PLF HvsStem;
+  HvsStem.add (0.00 , 0.10);
+  HvsStem.add (200.0, 1.00);
+  syntax.add ("HvsWStem", Syntax::None (), "-", Syntax::Const,
+	      "Relative crop height as function of stem weight.");
+  alist.add ("HvsWStem", HvsStem);
   syntax.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
 	      "Relative CAI distribution at DS=0.");
   syntax.add ("LAIDist1", Syntax::None (), Syntax::Const, 3,
@@ -280,6 +288,7 @@ CanopyStandard::CanopyStandard (const AttributeList& vl)
     StemAIMod (vl.plf ("StemAIMod")),
     StemPhotEff (vl.number ("StemPhotEff")),
     HvsDS (vl.plf ("HvsDS")),
+    HvsWStem (vl.plf ("HvsWStem")),
     LAIDist0 (vl.number_sequence ("LAIDist0")),
     LAIDist1 (vl.number_sequence ("LAIDist1")),
     PARrel (vl.number ("PARrel")),

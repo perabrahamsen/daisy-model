@@ -18,6 +18,7 @@ private:
   const double StemPhotEff;	// Relative photosynthetic effiency of stem.
 public:
   const PLF& HvsDS;		// Crop height as function of DS
+  const PLF& HvsWStem;		// Relative Crop height as function of stem weight
 private:
   const vector<double>& LAIDist0; // Relative CAI distribution at DS=0
   const vector<double>& LAIDist1; // Relative CAI distribution at DS=1
@@ -38,7 +39,7 @@ public:
 
   // Functions.
 public:
-  double CropHeight (double DS);
+  double CropHeight (double Wstem, double DS);
 private:
   void InitialCAI (double WLeaf, double DS);
 public:
