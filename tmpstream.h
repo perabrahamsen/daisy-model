@@ -25,13 +25,12 @@
 #ifndef TMPSTREAM_H
 #define TMPSTREAM_H
 
-#include "common.h"
-
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
-struct ostream;
+#include <iostream>
 #else
-#include <iosfwd>
+#include <ostream>
 #endif
+using namespace std;
 
 class TmpStream
 {
