@@ -23,7 +23,6 @@ public:
 		     double VapourPressure /* [kPa] */,
 		     double Si /* [W/m2] */, 
 		     double Albedo /* [0-1] */) = 0;
-  void tick (const Weather& weather, double Albedo);
 
   // Create and Destroy.
 protected:

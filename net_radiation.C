@@ -46,6 +46,7 @@ struct NetRadiationParent : public NetRadiation
 	     double VapourPressure, double Si,
 	     double Albedo)
     {
+      VapourPressure *= 0.001;	// Pa -> kPa
       const double Ln
 	= NetLongwaveRadiation (Cloudiness, Temp, VapourPressure);
       net_radiation_ = (1.0 - Albedo) * Si - Ln;
@@ -59,11 +60,6 @@ struct NetRadiationParent : public NetRadiation
       }
 #endif
     }
-  void tick (const Weather& weather, double Albedo)
-    { tick (weather.daily_cloudiness (), weather.daily_air_temperature (),
-	    weather.vapor_pressure () * 0.001, // Pa -> kPa
-            weather.daily_global_radiation (),
-	    Albedo); }
 
   // Create & Destroy.
   NetRadiationParent (const AttributeList& al)

@@ -1,3 +1,11 @@
+2001-01-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.69 released.
+
+2001-01-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* net_radiation.C, net_radiation.h (tick): Removed extra tick.
+
 2000-12-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.68 released.
