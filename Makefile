@@ -22,8 +22,8 @@ MAKEFLAGS =
 #
 ifeq ($(OS),Windows_NT)
 	ifeq ($(OSTYPE),cygwin)
-#		HOSTTYPE = cygwin
-		HOSTTYPE = mingw
+		HOSTTYPE = cygwin
+#		HOSTTYPE = mingw
 	else
 		HOSTTYPE = win32
 	endif
@@ -439,16 +439,14 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
-	cp cdaisy.h cmain.c $(HOME)/.public_ftp/daisy
+	cp cdaisy.h cmain.c /home/ftp/pub/daisy
 	$(MAKE) daisy-src.zip
-	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy
+	mv -f daisy-src.zip /home/ftp/pub/daisy
 	(cd lib; $(MAKE) dist)
 	$(MAKE) pdf
-	mv -f txt/reference/reference.pdf \
-		$(HOME)/.public_ftp/daisy/daisy-ref.pdf
+	mv -f txt/reference/reference.pdf /home/ftp/pub/daisy/daisy-ref.pdf
 	$(MAKE) ps
-	mv -f txt/reference/reference.ps \
-		$(HOME)/.public_ftp/daisy/daisy-ref.ps
+	mv -f txt/reference/reference.ps /home/ftp/pub/daisy/daisy-ref.ps
 
 
 # Update the CVS repository.
