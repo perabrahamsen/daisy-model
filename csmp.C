@@ -1,10 +1,8 @@
 // csmp.C
 
 #include "csmp.h"
-#include "log.h"
 #include <vector>
-// Doesn't exists in Borland C++ 5.01.
-// #include <algo.h>
+#include <list>
 #include <assert.h>
 
 struct CSMP::Implementation
@@ -80,17 +78,26 @@ CSMP
 CSMP::Implementation::integrate_stupidly () const
 {
   CSMP csmp;
-  
-  const int size = x.size ();
+  const unsigned int intervals = 10;
+  const unsigned int size = x.size ();
   double sum = 0.0;
   double last_x = 0.0;
   double last_y = 0.0;
   
   csmp.add (0.0, 0.0);
-  for (int i = 0; i < size; i++)
+  for (unsigned int i = 0; i < size; i++)
     {
       if (x[i] > last_x)
 	{
+	  // Add intervals-1 intermediate points.
+	  const double dx = (x[i] - last_x) / intervals;
+	  for (unsigned int j = 1; j < intervals; j++)
+	    {
+	      const double x = last_x + j * dx;
+	      const double y = this->operator ()(x);
+	      csmp.add (x, sum + (last_y + y) * 0.5 * (x - last_x));
+	    }
+	  // Add final point.
 	  sum += (last_y + y[i]) * 0.5 * (x[i] - last_x);
 	  csmp.add (x[i], sum);
 	}
@@ -144,24 +151,13 @@ CSMP::find (const vector<double>& x, const vector<double>& y, double value)
   return y[y.size () - 1];
 }
 
-void 
-CSMP::output (Log& log) const
-{
-  const int size = impl.x.size ();
-
-  for (int i = 0; i < size; i++)
-    {
-      log.output_point (impl.x[i], impl.y[i]);
-    }
-}
-
 unsigned int 
 CSMP::size () const
 { return impl.x.size (); }
+
 double 
 CSMP::x (unsigned int i) const
 { return impl.x[i]; }
-  
 
 double 
 CSMP::y (unsigned int i) const

@@ -6,9 +6,9 @@ class FilterCheckpoint : public Filter
 {
   // Use.
 public:
-  bool check (string, bool log_only = false) const
+  bool check (const string&, bool log_only = false) const
     { return !log_only; }
-  Filter& lookup (string) const
+  Filter& lookup (const string&) const
     { 
       static Filter* all = NULL;
       if (!all)

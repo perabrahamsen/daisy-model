@@ -34,6 +34,7 @@ public:
   int NumberOfIntervals () const;
   double height (int) const;
   double PAR (int) const;
+  double LAI () const;
   double AirTemperature () const;
   double DayLength () const;
   double DailyRadiation () const;

@@ -1,12 +1,24 @@
-* System til rename af dupplicate object ved parsing.
+* Implementer SWAT interface
 
-* OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
+* Standard filtre
+
+** OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
+
+** Implementer minidaisy filtre
+
+** Implementer HS filtre.
+
+* clone column idea:  log + parse!  
+
+* System til rename af dupplicate object ved parsing.
 
 * daisy_alist_check skal ikke altid skrive fejl ud på cout.
 
 * Try out "SWIFT"
 
 * Try out gtk--
+
+* Få "union" valeret AList til at virke.
 
 * Remove exception handling.
 

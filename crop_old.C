@@ -21,10 +21,6 @@
 #include "harvest.h"
 #include "mathlib.h"
 #include <list>
-// #include <algo.h>
-// #include <ieeefp.h>
-
-// #define USE_HOURLY_PHOTO
 
 class CropOld : public Crop
 {
@@ -240,6 +236,8 @@ struct CropOld::Parameters
   // Dunno where these belongs...
   double IntcpCap;
   double EpFac;
+  bool enable_water_stress;
+  bool enable_N_stress;
 private:
   friend class CropOld;
   Parameters (const AttributeList&);
@@ -283,10 +281,8 @@ struct CropOld::Variables
     // [gN/cm³/h]
     double h_x;			// Root extraction at surface.
     double water_stress;	// Fraction of requested water we got.
-#ifndef USE_HOURLY_PHOTO
     double ws_up;		// Water stress factor
     double ws_down;		// Water stress denominator (dk:tæller)
-#endif
     double Ept;			// Potential evapotranspiration.
     double transpiration;	// Total water uptake.
   private:
@@ -315,6 +311,8 @@ struct CropOld::Variables
     double PotTransp;	// Potential Transpiration [mm/h]
     double PotCanopyAss;	// Potential Canopy Assimilation [g CH2O/m2/h]
     double CanopyAss;	// Canopy Assimilation [g CH2O/m2/h]
+    double LogPotCanopyAss;	// The above is hourly accumulated values 
+    double LogCanopyAss;	// over the day.  This is last days total.
     double IncWLeaf;	// Leaf growth [g DM/m2/d]
     double IncWRoot;	// Root growth [g DM/m2/d]
     // double H2OUpt;		// H2O uptake [mm/h]
@@ -343,7 +341,9 @@ CropOld::Parameters::Parameters (const AttributeList& vl)
     CrpN (vl.alist ("CrpN")),
     Harvest (vl.alist ("Harvest")),
     IntcpCap (vl.number ("IntcpCap")),
-    EpFac (vl.number ("EpFac"))
+    EpFac (vl.number ("EpFac")),
+    enable_water_stress (vl.flag ("enable_water_stress")),
+    enable_N_stress (vl.flag ("enable_N_stress"))
 { }
 
 CropOld::Parameters::DevelPar::DevelPar (const AttributeList& vl)
@@ -514,10 +514,8 @@ CropOld::Variables::RecRootSys::RecRootSys (const Parameters& par,
     NO3Extraction (vl.number_sequence ("NO3Extraction")),
     h_x (vl.number ("h_x")),
     water_stress (1.0),
-#ifndef USE_HOURLY_PHOTO
     ws_up (0.0),
     ws_down (0.0),
-#endif
     Ept (0.0),
     transpiration (0.0)
 { 
@@ -581,6 +579,8 @@ CropOld::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     PotTransp (vl.number ("PotTransp")),
     PotCanopyAss (vl.number ("PotCanopyAss")),
     CanopyAss (vl.number ("CanopyAss")),
+    LogPotCanopyAss (0.0),
+    LogCanopyAss (0.0),
     IncWLeaf (0.0),
     IncWRoot (0.0),
     // H2OUpt (vl.number ("H2OUpt")),
@@ -601,6 +601,8 @@ CropOld::Variables::RecCrpAux::output (Log& log, Filter& filter) const
   log.output ("PotTransp", filter, PotTransp);
   log.output ("PotCanopyAss", filter, PotCanopyAss);
   log.output ("CanopyAss", filter, CanopyAss);
+  log.output ("LogPotCanopyAss", filter, LogPotCanopyAss, true);
+  log.output ("LogCanopyAss", filter, LogCanopyAss, true);
   log.output ("IncWLeaf", filter, IncWLeaf, true);
   log.output ("IncWRoot", filter, IncWRoot, true);
   // log.output ("H2OUpt", filter, H2OUpt);
@@ -769,6 +771,10 @@ CropOldSyntax::CropOldSyntax ()
    // I don't know where these belong.
   syntax.add ("IntcpCap", Syntax::Number, Syntax::Const);
   syntax.add ("EpFac", Syntax::Number, Syntax::Const);
+  syntax.add ("enable_water_stress", Syntax::Boolean, Syntax::Const);
+  alist.add ("enable_water_stress", true);
+  syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::Const);
+  alist.add ("enable_N_stress", true);
 
   // Variables.
 
@@ -848,6 +854,8 @@ CropOldSyntax::CropOldSyntax ()
   vCrpAux.add ("PotCanopyAss", 0.0);
   CrpAux.add ("CanopyAss", Syntax::Number, Syntax::State);
   vCrpAux.add ("CanopyAss", 0.0);
+  CrpAux.add ("LogPotCanopyAss", Syntax::Number, Syntax::LogOnly);
+  CrpAux.add ("LogCanopyAss", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWLeaf", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWRoot", Syntax::Number, Syntax::LogOnly);
   // CrpAux.add ("H2OUpt", Syntax::Number, Syntax::State);
@@ -1295,13 +1303,6 @@ CropOld::ActualWaterUptake (double Ept,
   // Update soil water sink term.
   soil_water.add_to_sink (H2OExtraction);
   // Update water stress factor
-#ifdef USE_HOURLY_PHOTO
-  double& water_stress = var.RootSys.water_stress;
-  if (Ept < 0.010)
-    water_stress = 1.0;
-  else
-    water_stress = (total + EvapInterception) / (Ept + EvapInterception);
-#else
   if (Ept >= 0.010)
     {
       assert (var.RootSys.ws_up <= var.RootSys.ws_down);
@@ -1311,7 +1312,6 @@ CropOld::ActualWaterUptake (double Ept,
       var.RootSys.ws_down += (Ept + EvapInterception);
       assert (var.RootSys.ws_up <= var.RootSys.ws_down);
     }
-#endif
   // Update transpiration.
   double& transpiration = var.RootSys.transpiration;
   transpiration = total;
@@ -1599,7 +1599,7 @@ CropOld::MaintenanceRespiration (double r, double /* Q10 */,
 
 void 
 CropOld::NetProduction (const Bioclimate& bioclimate,
-			     const Soil& soil, const SoilHeat& soil_heat)
+			const Soil& soil, const SoilHeat& soil_heat)
 {
   const Parameters::RespPar& Resp = par.Resp;
   const double DS = var.Phenology.DS;
@@ -1615,9 +1615,11 @@ CropOld::NetProduction (const Bioclimate& bioclimate,
 			      soil_heat.T (soil.interval_plus (-Depth / 3)));
   double AssG, f_Leaf, f_Root;
     
-  AssG = CrpAux.CanopyAss 
-    * max (0.0, min (1.0, ((Prod.NCrop - CrpAux.NfNCnt) 
-			   / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+  AssG = CrpAux.CanopyAss;
+  if (par.enable_N_stress)
+    AssG *= max (0.0, min (1.0, ((Prod.NCrop - CrpAux.NfNCnt) 
+				 / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+  
   AssimilatePartitioning (DS, f_Leaf, f_Root);
   CrpAux.IncWLeaf = Resp.E_Leaf (DS) * (f_Leaf * AssG - RMLeaf);
   if (CrpAux.IncWLeaf < 0.0)
@@ -1674,21 +1676,8 @@ CropOld::tick (const Time& time,
     return;
   NitrogenUptake (time.hour (), 
 		  soil, soil_water, soil_NH4,soil_NO3);
-#ifdef USE_HOURLY_PHOTO
-  const double water_stress = var.RootSys.water_stress;
-  if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
-    {
-      double Ass = CanopyPhotosynthesis (bioclimate);
-      var.CrpAux.PotCanopyAss += Ass;
-      if (var.CrpAux.InitLAI)
-	var.CrpAux.CanopyAss += Ass;
-      else
-	var.CrpAux.CanopyAss += water_stress * Ass;
-    }
-#endif
   if (time.hour () != 0)
     return;
-#ifndef USE_HOURLY_PHOTO
   assert (var.RootSys.ws_up <= var.RootSys.ws_down);
   double& water_stress = var.RootSys.water_stress;
   if (var.RootSys.ws_down > 0)
@@ -1734,13 +1723,10 @@ CropOld::tick (const Time& time,
   var.CrpAux.PotCanopyAss += Ass;
   if (Ass <= 0.0)
     /* do nothing */;
-  else if (var.CrpAux.InitLAI)
+  else if (!par.enable_water_stress || var.CrpAux.InitLAI)
     var.CrpAux.CanopyAss += Ass;
   else
     var.CrpAux.CanopyAss += water_stress * Ass;
-
-  
-#endif  
 
   DevelopmentStage (bioclimate);
   var.Canopy.Height = CropHeight ();
@@ -1752,6 +1738,8 @@ CropOld::tick (const Time& time,
   RootPenetration (soil, soil_heat);
   RootDensity (soil);
   NitContent ();
+  var.CrpAux.LogPotCanopyAss = var.CrpAux.PotCanopyAss;
+  var.CrpAux.LogCanopyAss = var.CrpAux.CanopyAss;
   var.CrpAux.PotCanopyAss = 0.0;
   var.CrpAux.CanopyAss = 0.0;
 }

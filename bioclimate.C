@@ -300,39 +300,31 @@ Bioclimate::output (Log& log, Filter& filter) const
 
 int
 Bioclimate::NumberOfIntervals () const
-{
-  return impl.No;
-}
+{ return impl.No; }
 
 double
 Bioclimate::height (int i) const
-{
-  return impl.Height[i];
-}
+{ return impl.Height[i]; }
 
 double
 Bioclimate::PAR (int i) const
-{
-  return impl.PAR[i];
-}
+{ return impl.PAR[i]; }
+
+double
+Bioclimate::LAI () const
+{ return impl.LAI; }
 
 double
 Bioclimate::AirTemperature () const
-{
-  return impl.temperature;
-}
+{ return impl.temperature; }
 
 double
 Bioclimate::DayLength () const
-{
-  return impl.day_length;
-}
+{ return impl.day_length; }
 
 double
 Bioclimate::DailyRadiation () const
-{
-  return impl.daily_radiation;
-}
+{ return impl.daily_radiation; }
 
 void
 Bioclimate::irrigate (double flux, double temp, 

@@ -100,7 +100,8 @@ Daisy::tick_logs ()
       Filter& filter = log.match (*this);
       log.output ("time", filter, time);
       output_derived (weather, "weather", log, filter);
-      output_list (columns, "column", log, filter);
+      output_list (columns, "column", log, filter, 
+		   Librarian<Column>::library ());
       output_vector (harvest, "harvest", log, filter);
     }
 }

@@ -1,4 +1,65 @@
+1998-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.006 released.
+
+1998-03-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (CanopyPhotosynthesis): Added assertions.
+
+	* csmp.C (integrate_stupidly): Add 10 extra intervals.
+
+1998-03-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* filter.C, filter.h (check_derived): New function.
+	(lookup_derived): New function.
+	* log.h (output_derived): use them
+	(output_list): Ditto, add library argument.
+	* daisy.C (tick_logs): Ovey new calling convention.
+	* organic_matter.C (output): Ditto.
+	* column_std.C (output): Ditto.
+	Filter names can now match superclasses as well.
+	
+	* filter.h, filter.C, filter_all.C, filter_array.C,
+	filter_checkpoint.C, filter_none.C, filter_some.C: Pass strings
+	per reference. 
+
+	* cdaisy.C, cdaisy.h (daisy_alist_clone): New function.
+
+	* crop_old.C (output): Don't checkpoint `LogPotCanopyAss' and
+	`LogCanopyAss'.
+
+	* crop_std.C: Added `enable_water_stress', 
+	`enable_N_stress', `LogPotCanopyAss', and `LogCanopyAss'.
+
+1998-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_file.C (output_point): Removed.
+	(output (CSMP)): Don't call.  Use csmp directly instead.
+	(class LogFile): Removed from interface.
+	* log.h (class Log): Ditto.
+	* csmp.C (output): Removed.
+	* csmp.C: Removed unnecessary includes.
+	* csmp.h: Ditto.
+
 1998-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_old.C: (Parameters): Added `enable_water_stress' and
+	`enable_N_stress'.
+	(CropOldSyntax): Ditto.
+	(tick): Obey `enable_water_stress'.
+	(NetProduction): Obey `enable_N_stress'.
+	(Variables): Added `LogPotCanopyAss' and `LogCanopyAss'.
+	(output): Ditto.
+	(RecCrpAux): Ditto.
+	(CropOldSyntax): Ditto.
+	(tick): Ditto.
+
+	* crop_old.C: Removed compile time flag `USE_HOURLY_PHOTO'.
+
+	* snow.C (tick): Use `approximate' to compare floating point
+	values. 
+
+	* cdaisy.h: Typo.
 
 	* Version 0.005 released.
 

@@ -8,8 +8,8 @@
 #ifndef CSMP_H
 #define CSMP_H
 
-#include "common.h"
 #include <vector>
+using namespace std;
 
 struct Log;
 struct Filter;

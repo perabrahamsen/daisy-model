@@ -314,7 +314,7 @@ ColumnStandard::output (Log& log, Filter& filter) const
   output_derived (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
   output_derived (groundwater, "Groundwater", log, filter);
-  output_list (crops, "crops", log, filter);
+  output_list (crops, "crops", log, filter, Crop::library ());
   log.close_geometry ();
 }
 

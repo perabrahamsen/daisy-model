@@ -54,10 +54,6 @@ public:
 
   virtual bool printing () const = 0;
 
-  // Used by CSMP.
-public:
-  virtual void output_point (double x, double y) = 0;
-
   // Create and Destroy.
 protected:
   Log ();
@@ -88,10 +84,12 @@ output_derived (const T& submodule,
   if (filter.check (name))
     {
       Filter& f1 = filter.lookup (name);
-      if (f1.check (submodule.name))
+      const Library& library = Librarian<T>::library ();
+
+      if (f1.check_derived (submodule.name, library))
 	{
 	  log.open (name, submodule.name);
-	  submodule.output (log, f1.lookup (submodule.name));
+	  submodule.output (log, f1.lookup_derived (submodule.name, library));
 	  log.close ();
 	}
     }
@@ -99,7 +97,8 @@ output_derived (const T& submodule,
 
 template <class T> void
 output_list (T const& items,
-	     const char* name, Log& log, Filter& filter)
+	     const char* name, Log& log, Filter& filter, 
+	     const Library& library)
 {
   if (filter.check (name))
     {
@@ -109,10 +108,10 @@ output_list (T const& items,
 	   item != items.end();
 	   item++)
 	{
-	  if (f.check ((*item)->name))
+	  if (f.check_derived ((*item)->name, library))
 	    {
 	      log.open_entry ((*item)->name);
-	      (*item)->output (log, f.lookup ((*item)->name));
+	      (*item)->output (log, f.lookup_derived ((*item)->name, library));
 	      log.close_entry ();
 	    }
 	}

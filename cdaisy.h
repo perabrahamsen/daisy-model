@@ -122,6 +122,9 @@ daisy_type_name (int number);
 daisy_alist*			/* Create an empty alist object. */
 daisy_alist_create (void);
 
+daisy_alist*			/* Clone an existing alist object. */
+daisy_alist_clone (const daisy_alist* alist);
+
 void				/* Delete alist object. */
 daisy_alist_delete (daisy_alist* alist);
 
@@ -309,7 +312,7 @@ daisy_printer_comment (daisy_printer* printer, const char* comment);
 
 void				/* Print ALIST. */
 daisy_printer_alist (daisy_printer* printer, 
-		     const daisy_alist* alist, const daisy_syntax* synatx);
+		     const daisy_alist* alist, const daisy_syntax* syntax);
 
 /* Save all elements in all libraries that are associated with FILE. */
 void

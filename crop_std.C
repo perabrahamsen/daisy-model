@@ -254,6 +254,8 @@ struct CropStandard::Parameters
   // Dunno where these belongs...
   double IntcpCap;
   double EpFac;
+  bool enable_water_stress;
+  bool enable_N_stress;
 private:
   friend class CropStandard;
   Parameters (const AttributeList&);
@@ -329,6 +331,8 @@ struct CropStandard::Variables
     double PotTransp;	// Potential Transpiration [mm/h]
     double PotCanopyAss;	// Potential Canopy Assimilation [g CH2O/m2/h]
     double CanopyAss;	// Canopy Assimilation [g CH2O/m2/h]
+    double LogPotCanopyAss;	// The above is hourly accumulated values 
+    double LogCanopyAss;	// over the day.  This is last days total.
     double IncWLeaf;	// Leaf growth [g DM/m2/d]
     double IncWStem;	// Stem growth [g DM/m2/d]
     double IncWSOrg;	// Storage organ growth [g DM/m2/d]
@@ -364,7 +368,9 @@ CropStandard::Parameters::Parameters (const AttributeList& vl)
     CrpN (vl.alist ("CrpN")),
     Harvest (vl.alist ("Harvest")),
     IntcpCap (vl.number ("IntcpCap")),
-    EpFac (vl.number ("EpFac"))
+    EpFac (vl.number ("EpFac")),
+    enable_water_stress (vl.flag ("enable_water_stress")),
+    enable_N_stress (vl.flag ("enable_N_stress"))
 { }
 
 CropStandard::Parameters::DevelPar::DevelPar (const AttributeList& vl)
@@ -616,6 +622,8 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     PotTransp (vl.number ("PotTransp")),
     PotCanopyAss (vl.number ("PotCanopyAss")),
     CanopyAss (vl.number ("CanopyAss")),
+    LogPotCanopyAss (0.0),
+    LogCanopyAss (0.0),
     IncWLeaf (0.0),
     IncWStem (0.0),
     IncWSOrg (0.0),
@@ -644,6 +652,8 @@ CropStandard::Variables::RecCrpAux::output (Log& log, Filter& filter) const
   log.output ("PotTransp", filter, PotTransp);
   log.output ("PotCanopyAss", filter, PotCanopyAss);
   log.output ("CanopyAss", filter, CanopyAss);
+  log.output ("LogPotCanopyAss", filter, LogPotCanopyAss, true);
+  log.output ("LogCanopyAss", filter, LogCanopyAss, true);
   log.output ("IncWLeaf", filter, IncWLeaf, true);
   log.output ("IncWStem", filter, IncWStem, true);
   log.output ("IncWSOrg", filter, IncWSOrg, true);
@@ -835,6 +845,10 @@ CropStandardSyntax::CropStandardSyntax ()
    // I don't know where these belong.
   syntax.add ("IntcpCap", Syntax::Number, Syntax::Const);
   syntax.add ("EpFac", Syntax::Number, Syntax::Const);
+  syntax.add ("enable_water_stress", Syntax::Boolean, Syntax::Const);
+  alist.add ("enable_water_stress", true);
+  syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::Const);
+  alist.add ("enable_N_stress", true);
 
   // Variables.
 
@@ -917,6 +931,8 @@ CropStandardSyntax::CropStandardSyntax ()
   vCrpAux.add ("PotCanopyAss", 0.0);
   CrpAux.add ("CanopyAss", Syntax::Number, Syntax::State);
   vCrpAux.add ("CanopyAss", 0.0);
+  CrpAux.add ("LogPotCanopyAss", Syntax::Number, Syntax::LogOnly);
+  CrpAux.add ("LogCanopyAss", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWLeaf", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWStem", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWSOrg", Syntax::Number, Syntax::LogOnly);
@@ -1595,21 +1611,26 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   const double Ta = bioclimate.AirTemperature ();
   const double Teff = LeafPhot.TempEff (Ta); // Temperature effect
 
+  assert (approximate (var.Canopy.LAI, bioclimate.LAI ()));
+  assert (approximate (LAIvsH (var.Canopy.Height), var.Canopy.LAI));
 
   double prevLA = 0.0;		// LAI below the current leaf layer.
   double Ass = 0.0;	// Assimilate produced by canopy photosynthesis
-
-  int No = bioclimate.NumberOfIntervals ();
+  double accLAI =0.0;
+  const int No = bioclimate.NumberOfIntervals ();
+  const double dLAI = bioclimate.LAI () / No;
   for (int i = 0; i < No; i++)
     {
       const double height = bioclimate.height (i);
       // Leaf Area index for a given leaf layer
       const double LA = LAIvsH (height) - prevLA;
       prevLA = LAIvsH (height);
+      accLAI += LA;
+
       if (LA > 0)
 	{
 	  const double dPAR
-	    = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / LA;
+	    = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / dLAI;
 
 	  // Leaf Photosynthesis [gCO2/m2/h]
 	  const double F = LeafPhot.Fm * 
@@ -1618,6 +1639,8 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
 	  Ass += LA * F;
 	}
     }
+  assert (approximate (accLAI, var.Canopy.LAI));
+
   return (molWeightCH2O / molWeightCO2) * Teff * Ass;
 }
 
@@ -1642,7 +1665,7 @@ CropStandard::ReMobilization ()
   else
     {
       const double ReMobilization = Prod.ReMobilRt * StemRes;
-      StemRes = StemRes-ReMobilization;
+      StemRes -= ReMobilization;
       return ReMobilization;
     }
 }
@@ -1702,9 +1725,14 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   if (CrpAux.CanopyAss >= RM)
     {
       const double AssG = CrpAux.CanopyAss - RM;
-      const double Stress 
-	= max (0.0, min (1.0, ((vProd.NCrop - CrpAux.NfNCnt) 
-			       / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+      double Stress;
+      if (par.enable_N_stress)
+	Stress 
+	  = max (0.0, min (1.0, ((vProd.NCrop - CrpAux.NfNCnt) 
+				 / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
+      else
+	Stress = 1.0;
+
       double f_Leaf, f_Stem, f_SOrg, f_Root;
       AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
       CrpAux.IncWLeaf = Stress * pProd.E_Leaf * f_Leaf * AssG;
@@ -1836,7 +1864,10 @@ CropStandard::tick (const Time& time,
     {
       double Ass = CanopyPhotosynthesis (bioclimate);
       var.CrpAux.PotCanopyAss += Ass;
-      var.CrpAux.CanopyAss += water_stress * Ass;
+      if (par.enable_water_stress)
+	var.CrpAux.CanopyAss += water_stress * Ass;
+      else
+	var.CrpAux.CanopyAss += Ass;
     }
   if (time.hour () != 0)
     return;
@@ -1850,6 +1881,8 @@ CropStandard::tick (const Time& time,
   RootPenetration (soil, soil_heat);
   RootDensity (soil);
   NitContent ();
+  var.CrpAux.LogPotCanopyAss = var.CrpAux.PotCanopyAss;
+  var.CrpAux.LogCanopyAss = var.CrpAux.CanopyAss;
   var.CrpAux.PotCanopyAss = 0.0;
   var.CrpAux.CanopyAss = 0.0;
 }

@@ -38,8 +38,8 @@ class FilterArray : public Filter
     
   // Use.
 public:
-  bool check (string, bool) const;
-  Filter& lookup (string) const;
+  bool check (const string&, bool) const;
+  Filter& lookup (const string&) const;
 
   bool accumulating () const;
   void accumulate (const Geometry&, const vector<double>&);
@@ -58,13 +58,13 @@ public:
 
 #pragma warn -rvl
 bool 
-FilterArray::check (string, bool) const
+FilterArray::check (const string&, bool) const
 { 
   assert (false); 
 }
 
 Filter& 
-FilterArray::lookup (string) const
+FilterArray::lookup (const string&) const
 { 
   assert (false); 
 }

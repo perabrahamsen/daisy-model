@@ -11,8 +11,11 @@ class Filter
 {
   // Use.
 public:
-  virtual bool check (string, bool log_only = false) const = 0;
-  virtual Filter& lookup (string) const = 0;
+  virtual bool check (const string&, bool log_only = false) const = 0;
+  virtual bool check_derived (const string&, const Library& library) const;
+
+  virtual Filter& lookup (const string&) const = 0;
+  virtual Filter& lookup_derived (const string&, const Library&) const;
   virtual const vector<double> select (const Geometry&,
 				       const vector<double>&);
   virtual void accumulate (const Geometry&,

@@ -6,9 +6,9 @@ class FilterAll : public Filter
 {
   // Use.
 public:
-  bool check (string, bool) const
+  bool check (const string&, bool) const
   { return true; }
-  Filter& lookup (string) const
+  Filter& lookup (const string&) const
   { 
     static Filter* all = NULL;
     if (!all)

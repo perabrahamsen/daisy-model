@@ -6,9 +6,9 @@ class FilterNone : public Filter
 {
   // Use.
 public:
-  bool check (string, bool) const
+  bool check (const string&, bool) const
   { return false; }
-  Filter& lookup (string) const
+  Filter& lookup (const string&) const
   { assert (false); }
 
     // Create and Destroy.

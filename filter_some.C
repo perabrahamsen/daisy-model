@@ -12,9 +12,9 @@ class FilterSome : public Filter
 
   // Use.
 public:
-  bool check (string key, bool) const;
-  Filter& lookup (string key) const;
-  void add (string key, Filter& filter);
+  bool check (const string& key, bool) const;
+  Filter& lookup (const string& key) const;
+  void add (const string& key, Filter& filter);
 
   bool accumulating () const
   { return accumulating_; }
@@ -29,13 +29,13 @@ public:
 };
 
 bool
-FilterSome::check (string key, bool) const
+FilterSome::check (const string& key, bool) const
 { 
   return filters.find (key) != filters.end ();
 }
 
 Filter& 
-FilterSome::lookup (string key) const
+FilterSome::lookup (const string& key) const
 { 
   filter_map::const_iterator i = filters.find (key);
   
@@ -48,7 +48,7 @@ FilterSome::lookup (string key) const
 }
 
 void 
-FilterSome::add (string key, Filter& filter)
+FilterSome::add (const string& key, Filter& filter)
 {
   filters[key] = &filter;
 }

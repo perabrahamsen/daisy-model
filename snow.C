@@ -117,7 +117,7 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 
   assert (EvapSnowPack >= 0.0);
   assert (EvapSnowPack <= Epot);
-  assert (EvapSnowPack <= Ssnow / dt + P);
+  assert (EvapSnowPack <= (Ssnow / dt + P) * 1.0001);
 
   // Depth of snow fallen this hour. [m]
   double dZp = 0.0;
@@ -197,8 +197,10 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 	    = max (Ssnow / (f * dZs), 
 		   rho_s + rho_1 * Swater_new / Scapacity + rho_2 * Ssnow);
 	  assert (rho_c > 0.0);
-	  assert (rho_c == Ssnow / (f * dZs)
-		  || rho_c == rho_s + rho_1 * Swater_new / Scapacity + rho_2 * Ssnow);
+	  assert (approximate (rho_c, Ssnow / (f * dZs))
+		  || approximate (rho_c, rho_s 
+				  + rho_1 * Swater_new / Scapacity 
+				  + rho_2 * Ssnow));
 	  // Size of collapsed snow pack [m]
 	  const double dZc = Ssnow / (f * rho_c) + dZp;
 

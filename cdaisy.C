@@ -73,6 +73,11 @@ extern "C" AttributeList* EXPORT
 daisy_alist_create ()
 { return new AttributeList (); }
 
+
+extern "C" AttributeList* EXPORT
+daisy_alist_clone (const AttributeList* alist)
+{ return new AttributeList (*alist); }
+
 extern "C" void EXPORT
 daisy_alist_delete (AttributeList* alist)
 { delete alist; }

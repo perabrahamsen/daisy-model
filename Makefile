@@ -87,6 +87,7 @@ endif
 #
 ifeq ($(COMPILER),egcs)
 	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
+	#COMPILE = /pack/gcc-2.8.1/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 
 endif
@@ -307,7 +308,7 @@ balance:	daisy
 	(cd test; make balance)
 
 check:	daisy
-	(cd exp; make test )
+	(cd karup; make check )
 
 # Remove all the temporary files.
 #
@@ -531,7 +532,7 @@ weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h
 crop${OBJ}: crop.C crop.h time.h common.h syntax.h alist.h library.h
-alist${OBJ}: alist.C csmp.h common.h library.h alist.h syntax.h
+alist${OBJ}: alist.C csmp.h library.h common.h alist.h syntax.h
 syntax${OBJ}: syntax.C syntax.h common.h alist.h library.h
 library${OBJ}: library.C library.h common.h alist.h syntax.h
 action${OBJ}: action.C action.h common.h syntax.h alist.h library.h
@@ -541,8 +542,7 @@ horizon${OBJ}: horizon.C horizon.h librarian.h library.h common.h alist.h \
  syntax.h csmp.h hydraulic.h mathlib.h
 filter${OBJ}: filter.C filter.h librarian.h library.h common.h alist.h \
  syntax.h
-csmp${OBJ}: csmp.C csmp.h common.h log.h filter.h librarian.h library.h \
- alist.h syntax.h
+csmp${OBJ}: csmp.C csmp.h
 time${OBJ}: time.C time.h common.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h librarian.h library.h common.h alist.h \
  syntax.h

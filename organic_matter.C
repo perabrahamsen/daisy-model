@@ -245,7 +245,8 @@ OrganicMatter::Implementation::output (Log& log, Filter& filter,
       log.output ("total_N", filter, total_N, true);
       log.output ("total_C", filter, total_C, true);
     }
-  output_list (am, "am", log, filter);
+  static Library empty ("empty"); // BUG: AM should be a library, but isn't.
+  output_list (am, "am", log, filter, empty);
   output_vector (smb, "smb", log, filter);
   output_vector (som, "som", log, filter);
   output_submodule (buffer, "buffer", log, filter);

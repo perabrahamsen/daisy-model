@@ -60,7 +60,6 @@ public:
   void output (string, Filter&, const string, bool log_only = false);
   void output (string, Filter&, const vector<double>&, bool log_only = false);
   void output (string, Filter&, const CSMP&, bool log_only = false);
-  void output_point (double x, double y);
 
   // Create and Destroy.
 private:
@@ -336,19 +335,16 @@ LogFile::output (string name, Filter& filter, const CSMP& csmp, bool log_only)
   if (filter.check (name, log_only))
     {
       open (name);
-      csmp.output (*this);
+      for (unsigned int i = 0; i < csmp.size (); i++)
+	{
+	  open ();
+	  print (csmp.x (i));
+	  print (" ");
+	  print (csmp.y (i));
+	  close ();
+	} 
       close ();
     }
-}
-
-void
-LogFile::output_point (double x, double y)
-{
-  open ();
-  print (x);
-  print (" ");
-  print (y);
-  close ();
 }
 
 bool
