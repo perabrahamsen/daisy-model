@@ -32,12 +32,9 @@ TARGETTYPE = i586-mingw32msvc
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
 ifeq ($(OS),Windows_NT)
-	ifeq ($(OSTYPE),cygwin)
-		HOSTTYPE = cygwin
-#		HOSTTYPE = mingw
-	else
-		HOSTTYPE = win32
-	endif
+#	HOSTTYPE = cygwin
+	HOSTTYPE = mingw
+#	HOSTTYPE = win32
 endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
@@ -68,9 +65,6 @@ ifeq ($(HOSTTYPE),hp)
 endif
 ifeq ($(HOSTTYPE),win32)
 	COMPILER = borland
-endif
-ifeq ($(OSTYPE),cygwin)
-	COMPILER = gcc
 endif
 ifeq ($(HOSTTYPE),mingw)
 	COMPILER = gcc
@@ -417,7 +411,7 @@ all:	#(EXECUTABLES)
 # Create the main executable.
 #
 daisy.exe:	main${OBJ} $(LIBOBJ)
-	$(LINK)daisy.exe $^ $(MATHLIB)
+	$(LINK)daisy.exe $^ -lstdc++ $(MATHLIB)
 
 daisy:	main${OBJ} $(LIBOBJ) #daisy.so
 	$(LINK)daisy $^ $(CPPLIB) $(MATHLIB)
