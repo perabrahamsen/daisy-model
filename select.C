@@ -65,9 +65,6 @@ struct Select::Implementation
 
   // Create and Destroy.
   static symbol select_get_tag (const AttributeList& al);
-  void initialize (vector<symbol>& path,
-		   const map<symbol, symbol>& conv, const string& spec_dim,
-		   const string& timestep);
   bool check (const string& spec_dim, Treelog& err) const;
   Implementation (const AttributeList& al);
   ~Implementation ();
@@ -200,65 +197,6 @@ Select::Implementation::select_get_tag (const AttributeList& al)
 }
 
 // Create and Destroy.
-void 
-Select::Implementation::initialize (vector<symbol>& path,
-				    const map<symbol,symbol>& conv, 
-				    const string& spec_dim, 
-				    const string& timestep)
-{
-  // Convert path according to mapping in 'conv'.
-  for (unsigned int i = 0; i < path.size (); i++)
-    {
-      const string& sname = path[i].name ();
-      const map<symbol, symbol>::const_iterator entry = conv.find (path[i]);
-      if (entry != conv.end ())
-	path[i] = (*entry).second;
-      else if (sname.size () > 0 && sname[0] == '$')
-	path[i] = Select::wildcard;
-    }
-
-  if (dimension == Syntax::Unknown ())
-    dimension = spec_dim;
-
-  // Attempt to find convertion with original dimension.
-  if (spec)
-    if (Units::can_convert (spec_dim, dimension))
-      spec_conv = &Units::get_convertion (spec_dim, dimension);
-    else
-      spec_conv = special_convert (spec_dim, dimension);
-
-  // Replace '&' with timestep.
-  string new_dim;
-  for (unsigned int i = 0; i < dimension.length (); i++)
-    if (dimension[i] == '&')
-      new_dim += timestep;
-    else
-      new_dim += dimension[i];
-
-  // Attempt to find convertion with new dimension.
-  if (spec && !spec_conv)
-    {
-      if (Units::can_convert (spec_dim, new_dim))
-	spec_conv = &Units::get_convertion (spec_dim, new_dim);
-      else
-	{
-	  // Try with 'h' for timestep.
-	  string hour_dim;
-	  for (unsigned int i = 0; i < dimension.length (); i++)
-	    if (dimension[i] == '&')
-	      hour_dim += "h";
-	    else
-	      hour_dim += dimension[i];
-
-	  if (Units::can_convert (spec_dim, hour_dim))
-	    spec_conv = &Units::get_convertion (spec_dim, hour_dim);
-	}
-    }
-
-  // Use new dimension.
-  dimension = new_dim;
-}
-
 bool 
 Select::Implementation::check (const string& spec_dim, Treelog& err) const
 {
@@ -451,7 +389,7 @@ Select::default_dimension (const string& spec_dim) const
 { return spec_dim; }
 
 const Units::Convert*
-Select::special_convert (const string& has, const string& want)
+Select::special_convert (const string&, const string&)
 { return NULL; }
 
 void 
@@ -467,7 +405,58 @@ Select::initialize (const map<symbol, symbol>& conv, double, double,
     spec_dim = default_dimension (impl.spec->dimension ());
   else
     spec_dim = Syntax::Unknown ();
-  impl.initialize (path, conv, spec_dim, timestep); 
+
+  // Convert path according to mapping in 'conv'.
+  for (unsigned int i = 0; i < path.size (); i++)
+    {
+      const string& sname = path[i].name ();
+      const map<symbol, symbol>::const_iterator entry = conv.find (path[i]);
+      if (entry != conv.end ())
+	path[i] = (*entry).second;
+      else if (sname.size () > 0 && sname[0] == '$')
+	path[i] = Select::wildcard;
+    }
+
+  if (impl.dimension == Syntax::Unknown ())
+    impl.dimension = spec_dim;
+
+  // Attempt to find convertion with original dimension.
+  if (impl.spec)
+    if (Units::can_convert (spec_dim, impl.dimension))
+      impl.spec_conv = &Units::get_convertion (spec_dim, impl.dimension);
+    else
+      impl.spec_conv = special_convert (spec_dim, impl.dimension);
+
+  // Replace '&' with timestep.
+  string new_dim;
+  for (unsigned int i = 0; i < impl.dimension.length (); i++)
+    if (impl.dimension[i] == '&')
+      new_dim += timestep;
+    else
+      new_dim += impl.dimension[i];
+
+  // Attempt to find convertion with new dimension.
+  if (impl.spec && !impl.spec_conv)
+    {
+      if (Units::can_convert (spec_dim, new_dim))
+	impl.spec_conv = &Units::get_convertion (spec_dim, new_dim);
+      else
+	{
+	  // Try with 'h' for timestep.
+	  string hour_dim;
+	  for (unsigned int i = 0; i < impl.dimension.length (); i++)
+	    if (impl.dimension[i] == '&')
+	      hour_dim += "h";
+	    else
+	      hour_dim += impl.dimension[i];
+
+	  if (Units::can_convert (spec_dim, hour_dim))
+	    impl.spec_conv = &Units::get_convertion (spec_dim, hour_dim);
+	}
+    }
+
+  // Use new dimension.
+  impl.dimension = new_dim;
 }
 
 bool 

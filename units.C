@@ -341,6 +341,8 @@ Units::standard_conversions ()
   add ("g N/cm^2", "kg N/ha", 1e5); // Organic N.
   add ("g C/cm^2", "kg C/ha", 1e5);
   add ("g/cm^3", "mg/l", 1e6);
+  add ("g C/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
+  add ("g N/cm^2", "g/cm^2", 1.0);	// For "per dry matter" logging.
 }
 
 Units::Units ()

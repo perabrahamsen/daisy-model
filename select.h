@@ -27,6 +27,7 @@
 #include "condition.h"		// Needed for proper initialization.
 #include "librarian.h"
 #include "symbol.h"
+#include "units.h"
 #include <map>
 #include <vector>
 
@@ -34,8 +35,6 @@ class Soil;
 class Daisy;
 class Time;
 class Treelog;
-class Units;
-class Units::Convert;
 
 class Select
 {
@@ -117,8 +116,8 @@ public:
 protected:
   virtual const std::string 
   /**/ default_dimension (const std::string& spec_dim) const;
-  virtual Units::Convert& 
-  /**/ special_convert (const string& has, const string& want);
+  virtual const Units::Convert* 
+  /**/ special_convert (const std::string& has, const std::string& want);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (const std::map<symbol, symbol>& conv, 
