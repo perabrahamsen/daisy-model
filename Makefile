@@ -411,7 +411,7 @@ all:	#(EXECUTABLES)
 # Create the main executable.
 #
 daisy.exe:	main${OBJ} $(LIBOBJ)
-	$(LINK)daisy.exe $^ -lstdc++ $(MATHLIB)
+	$(LINK)daisy.exe $^ $(CPPLIB) $(MATHLIB)
 
 daisy:	main${OBJ} $(LIBOBJ) #daisy.so
 	$(LINK)daisy $^ $(CPPLIB) $(MATHLIB)

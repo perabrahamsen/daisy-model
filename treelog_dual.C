@@ -130,6 +130,7 @@ void
 TreelogDual::Implementation::entry (const string& text)
 {
   print (two, touched_two, text);
+  two.flush ();
   init_one ();
   print (*one, touched_one, text); 
 }
@@ -176,6 +177,7 @@ void
 TreelogDual::touch ()
 { 
   impl.touch (impl.two, impl.touched_two);
+  impl.two.flush ();
   impl.init_one ();
   impl.touch (*impl.one, impl.touched_one); 
 }
