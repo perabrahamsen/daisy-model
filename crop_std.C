@@ -210,6 +210,7 @@ struct CropStandard::Parameters
     double ReMobilDS;		// Remobilization, Initial DS
     double ReMobilRt;		// Remobilization, release rate
     double ExfoliationFac;      // Exfoliation factor, 0-1
+    double GrowthRateRedFac;    // Growth rate reduction factor, 0-1
     const CSMP& LfDR;		// Death rate of Leafs
     const CSMP& RtDR;		// Death rate of Roots
     const double Large_RtDR;	// Extra death rate for large root/shoot.
@@ -467,6 +468,7 @@ CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
     ReMobilDS (vl.number ("ReMobilDS")),
     ReMobilRt (vl.number ("ReMobilRt")),
     ExfoliationFac (vl.number ("ExfoliationFac")),
+    GrowthRateRedFac (vl.number ("GrowthRateRedFac")),
     LfDR (vl.csmp ("LfDR")),
     RtDR (vl.csmp ("RtDR")),
     Large_RtDR (vl.number ("Large_RtDR"))
@@ -900,6 +902,8 @@ CropStandardSyntax::CropStandardSyntax ()
   vProd.add ("ReMobilRt", 0.1);
   Prod.add ("ExfoliationFac", Syntax::Number, Syntax::Const);
   vProd.add ("ExfoliationFac", 1.0);
+  Prod.add ("GrowthRateRedFac", Syntax::Number, Syntax::Const);
+  vProd.add ("GrowthRateRedFac", 0.0);
   Prod.add ("LfDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("RtDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("Large_RtDR", Syntax::Number, Syntax::Const);
@@ -1975,18 +1979,18 @@ CropStandard::AssimilatePartitioning (double DS,
     }
 }
 
-double 
+double
 CropStandard::MaintenanceRespiration (double r, double w, double T)
 {
   if (w <= 0.0)
     return 0.0;
 
-  return (molWeightCH2O / molWeightCO2) 
+  return (molWeightCH2O / molWeightCO2)
     * r * max (0.0, 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
 			      - exp (0.57 - 0.042 * T - 0.0051 * T * T))) * w;
 }
 
-void 
+void
 CropStandard::NetProduction (const Bioclimate& bioclimate,
 			     const Geometry& geometry,
 			     const SoilHeat& soil_heat)
@@ -2026,12 +2030,13 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
       else
 	Stress = 1.0;
 
+      const double PLim = Stress  * (1.0 - par.Prod.GrowthRateRedFac);
       double f_Leaf, f_Stem, f_SOrg, f_Root;
       AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
-      CrpAux.IncWLeaf = Stress * pProd.E_Leaf * f_Leaf * AssG;
-      CrpAux.IncWStem = Stress * pProd.E_Stem * f_Stem * AssG - ReMobil;
-      CrpAux.IncWSOrg = Stress * pProd.E_SOrg * f_SOrg * AssG;
-      CrpAux.IncWRoot = Stress * pProd.E_Root * f_Root * AssG;
+      CrpAux.IncWLeaf = PLim * pProd.E_Leaf * f_Leaf * AssG;
+      CrpAux.IncWStem = PLim * pProd.E_Stem * f_Stem * AssG - ReMobil;
+      CrpAux.IncWSOrg = PLim * pProd.E_SOrg * f_SOrg * AssG;
+      CrpAux.IncWRoot = PLim * pProd.E_Root * f_Root * AssG;
     }
   else
     {
