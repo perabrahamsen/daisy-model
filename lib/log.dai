@@ -501,7 +501,20 @@
 	   ((path column "*" Vegetation crops "*" Phenology day_length)
 	    (dimension "h")
 	    (factor 1.0))		;Light hours previous day.
-	   ((path column "*" Vegetation crops "*" Canopy LAI)
+	   ((path column "*" Vegetation crops "*" Canopy CAI)
+            (tag "Crop AI")
+	    (dimension "none")
+	    (factor 1.0))		;Leaf Area Index [0:inf]
+	   ((path column "*" Vegetation crops "*" Canopy LeafAI)
+            (tag "Leaf AI")
+	    (dimension "none")
+	    (factor 1.0))		;Leaf Area Index [0:inf]
+	   ((path column "*" Vegetation crops "*" Canopy StemAI)
+            (tag "Stem AI")
+	    (dimension "none")
+	    (factor 1.0))		;Leaf Area Index [0:inf]
+	   ((path column "*" Vegetation crops "*" Canopy SOrgAI)
+            (tag "SOrg AI")
 	    (dimension "none")
 	    (factor 1.0))		;Leaf Area Index [0:inf]
 	   ((path column "*" Vegetation crops "*" RootSys Depth)

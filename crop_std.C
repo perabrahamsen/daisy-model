@@ -69,8 +69,8 @@ protected:
   void Emergence ();
   void DevelopmentStage (const Bioclimate&);
   double CropHeight ();
-  void InitialLAI ();
-  double CropLAI ();
+  void InitialCAI ();
+  double CropCAI ();
   void RootPenetration (const Soil&, const SoilHeat&);
   double RootDensDistPar (double a);
   void RootDensity (const Soil& soil);
@@ -154,12 +154,17 @@ struct CropStandard::Parameters
     LeafPhotPar (const AttributeList&);
   } LeafPhot;
   const struct CanopyPar {
-    double DSLAI05;		// DS at LAI=0.5; forced development
+    double DSLAI05;		// DS at CAI=0.5; forced development
     double SpLAI;		// Specific leaf weight [ (m²/m²) / (g/m²) ]
+    const CSMP& LeafAIMod;      // Specific leaf area index modifier
     double SpLAIfac;            // Factor defining max Specific leaf weight
+    double SpSOrgAI;            // Specific storage organ area index
+    const CSMP& SOrgAIMod;      // Specific storage organ area index modifier
+    double SpStemAI;            // Specific stem area index
+    const CSMP& StemAIMod;      // Specific stem area index modifier
     const CSMP& HvsDS;		// Crop height as function of DS
-    const vector<double>& LAIDist0; // Relative LAI distribution at DS=0
-    const vector<double>& LAIDist1; // Relative LAI distribution at DS=1
+    const vector<double>& LAIDist0; // Relative CAI distribution at DS=0
+    const vector<double>& LAIDist1; // Relative CAI distribution at DS=1
     double PARref;		// PAR reflectance
     double PARext;		// PAR extinction coefficient
     double PARrel;              // Relative PAR below the canopy
@@ -221,7 +226,7 @@ struct CropStandard::Parameters
   struct CrpNPar {
     double SeedN;		// N-content in seed [ g N/m² ]
     double DS_fixate;		// Fixation of atmospheric N. after this DS
-    double DS_cut_fixate;	// Restore fixation this DS after cut. 
+    double DS_cut_fixate;	// Restore fixation this DS after cut.
     double fixate_factor;	// Fraction of N need covered by fixation.
     const CSMP& PtLeafCnc;	// Upper limit for N-conc in leaves
     const CSMP& CrLeafCnc;	// Critical lim f. N-conc in leaves
@@ -273,7 +278,7 @@ public:
 const AttributeList* CropStandard::Parameters::VernalPar::none;
 
 struct CropStandard::Variables
-{ 
+{
   void output (Log&, Filter&) const;
   struct RecPhenology
   {
@@ -293,9 +298,12 @@ struct CropStandard::Variables
     void output (Log&, Filter&) const;
     double Height;		// Crop height [cm]
     double Offset;		// Extra height after harvest [cm]
-    double LAI;	        	// Leaf Area Index
+    double CAI;	        	// Crop Area Index
+    double LeafAI;              // Leaf Area Index
+    double StemAI;              // Stem Area Index
+    double SOrgAI;              // Storage organ Area Index
     double LADm;		// Max Leaf Area Density [cm2/cm3]
-    CSMP LAIvsH;		// Accumulated Leaf Area Index at Height
+    CSMP LAIvsH;		// Accumulated Crop Area Index at Height
   private:
     friend struct CropStandard::Variables;
     RecCanopy (const Parameters&, const AttributeList&);
@@ -345,7 +353,7 @@ struct CropStandard::Variables
   struct RecCrpAux
   {
     void output (Log&, Filter&) const;
-    bool InitLAI;		// Initial LAI development ?
+    bool InitCAI;		// Initial CAI development ?
     double StemRes;		// Shielded Reserves in Stems
     double PotRtDpt;	        // Potential Root Penetration Depth [cm]
     double PtNCnt;		// Potential Nitrogen Content in Crop [g/m2]
@@ -360,7 +368,7 @@ struct CropStandard::Variables
     double IncWStem;    	// Stem growth [g DM/m2/d]
     double IncWSOrg;    	// Storage organ growth [g DM/m2/d]
     double IncWRoot;    	// Root growth [g DM/m2/d]
-    double LAImRat;		// (LAIm - LAI) / LAIm []
+    double CAImRat;		// (CAIm - CAI) / CAIm []
     double DeadWLeaf;		// Leaf DM removed [g DM/m2/d]
     double DeadNLeaf;		// Leaf N removed [g N/m2/d]
     double DeadWRoot;		// Root DM removed [g DM/m2/d]
@@ -381,7 +389,7 @@ public:
   ~Variables ();
 };
 
-CropStandard::Parameters::Parameters (const AttributeList& vl) 
+CropStandard::Parameters::Parameters (const AttributeList& vl)
   : Devel (vl.alist ("Devel")),
     Vernal (vl.check ("Vernal") ? vl.alist ("Vernal") : *VernalPar::none),
     LeafPhot (vl.alist ("LeafPhot")),
@@ -422,7 +430,12 @@ CropStandard::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
 CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
   : DSLAI05 (vl.number ("DSLAI05")),
     SpLAI (vl.number ("SpLAI")),
+    LeafAIMod (vl.csmp ("LeafAIMod")),
     SpLAIfac (vl.number ("SpLAIfac")),
+    SpSOrgAI (vl.number ("SpSOrgAI")),
+    SOrgAIMod (vl.csmp ("SOrgAIMod")),
+    SpStemAI (vl.number ("SpStemAI")),
+    StemAIMod (vl.csmp ("StemAIMod")),
     HvsDS (vl.csmp ("HvsDS")),
     LAIDist0 (vl.number_sequence ("LAIDist0")),
     LAIDist1 (vl.number_sequence ("LAIDist1")),
@@ -571,7 +584,10 @@ CropStandard::Variables::RecCanopy::RecCanopy (const Parameters&,
 					       const AttributeList& vl)
   : Height (vl.number ("Height")),
     Offset (vl.number ("Offset")),
-    LAI (vl.number ("LAI")),
+    CAI    (vl.number ("CAI")),
+    LeafAI (vl.number ("LeafAI")),
+    StemAI (vl.number ("StemAI")),
+    SOrgAI (vl.number ("SOrgAI")),
     LADm (vl.number ("LADm")),
     LAIvsH (vl.csmp ("LAIvsH"))
 { }
@@ -582,7 +598,10 @@ CropStandard::Variables::RecCanopy::output (Log& log, Filter& filter) const
   log.open ("Canopy");
   log.output ("Height", filter, Height);
   log.output ("Offset", filter, Offset);
-  log.output ("LAI", filter, LAI);
+  log.output ("CAI", filter, CAI);
+  log.output ("LeafAI", filter, LeafAI);
+  log.output ("StemAI", filter, StemAI);
+  log.output ("SOrgAI", filter, SOrgAI);
   log.output ("LADm", filter, LADm);
   log.output ("LAIvsH", filter, LAIvsH);
   log.close();
@@ -658,7 +677,7 @@ CropStandard::Variables::RecProd::output (Log& log, Filter& filter) const
 
 CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 					       const AttributeList& vl)
-  : InitLAI (vl.flag ("InitLAI")),
+  : InitCAI (vl.flag ("InitCAI")),
     StemRes (vl.number ("StemRes")),
     PotRtDpt (  vl.check ("PotRtDpt")
 	      ? vl.number ("PotRtDpt")
@@ -675,7 +694,7 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     IncWStem (0.0),
     IncWSOrg (0.0),
     IncWRoot (0.0),
-    LAImRat (0.0),
+    CAImRat (0.0),
     DeadWLeaf (0.0),
     DeadNLeaf (0.0),
     DeadWRoot (0.0),
@@ -684,7 +703,7 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     NH4Upt (0.0),
     NO3Upt (0.0),
     Fixated (0.0),
-    DS_start_fixate (vl.check ("DS_start_fixate") 
+    DS_start_fixate (vl.check ("DS_start_fixate")
 		     ? vl.number ("DS_start_fixate")
 		     : par.CrpN.DS_fixate)
 { }
@@ -693,7 +712,7 @@ void
 CropStandard::Variables::RecCrpAux::output (Log& log, Filter& filter) const
 {
   log.open ("CrpAux");
-  log.output ("InitLAI", filter, InitLAI);
+  log.output ("InitCAI", filter, InitCAI);
   log.output ("StemRes", filter, StemRes);
   log.output ("PotRtDpt", filter, PotRtDpt);
   log.output ("PtNCnt", filter, PtNCnt, true);
@@ -708,7 +727,7 @@ CropStandard::Variables::RecCrpAux::output (Log& log, Filter& filter) const
   log.output ("IncWStem", filter, IncWStem, true);
   log.output ("IncWSOrg", filter, IncWSOrg, true);
   log.output ("IncWRoot", filter, IncWRoot, true);
-  log.output ("LAImRat", filter, LAImRat, true);
+  log.output ("CAImRat", filter, CAImRat, true);
   log.output ("DeadWLeaf", filter, DeadWLeaf, true);
   log.output ("DeadNLeaf", filter, DeadNLeaf, true);
   log.output ("DeadWRoot", filter, DeadWRoot, true);
@@ -837,19 +856,37 @@ This parameterization is only valid until the specified development state.");
 
   // Canopy
   Canopy.add ("DSLAI05", Syntax::None (), Syntax::Const,
-	      "DS at LAI=0.5; forced development.");
+	      "DS at CAI=0.5; forced development.");
   vCanopy.add ("DSLAI05", 0.15);
   Canopy.add ("SpLAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
 	      " Specific leaf weight.");
+  Canopy.add ("LeafAIMod", Syntax::CSMP, Syntax::Const,
+	      "Specific leaf weight modifier (func. of DS)");
+  CSMP AIDef;
+  AIDef.add (0.00, 1.00);
+  AIDef.add (2.00, 1.00);
+  vCanopy.add ("LeafAIMod", AIDef);
   Canopy.add ("SpLAIfac", Syntax::None (), Syntax::Const,
 	      "Factor defining maximum Specific leaf weight.");
   vCanopy.add ("SpLAIfac", 2.0);
+  Canopy.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
+	      " Specific storage organ weight.");
+  vCanopy.add ("SpSOrgAI", 0.0);
+  Canopy.add ("SOrgAIMod", Syntax::CSMP, Syntax::Const,
+	      "Specific storage organ weight modifier (func. of DS)");
+  vCanopy.add ("SOrgAIMod", AIDef);
+  Canopy.add ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
+	      " Specific stem weight.");
+  vCanopy.add ("SpStemAI", 0.0);
+  Canopy.add ("StemAIMod", Syntax::CSMP, Syntax::Const,
+	      "Specific stem weight modifier (func. of DS)");
+  vCanopy.add ("StemAIMod", AIDef);
   Canopy.add ("HvsDS", Syntax::CSMP, Syntax::Const,
 	      "Crop height as function of DS [->cm].");
   Canopy.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
-	      "Relative LAI distribution at DS=0.");
+	      "Relative CAI distribution at DS=0.");
   Canopy.add ("LAIDist1", Syntax::None (), Syntax::Const, 3,
-	      "Relative LAI distribution at DS=1.");
+	      "Relative CAI distribution at DS=1.");
   Canopy.add ("PARref", Syntax::None (), Syntax::Const,
 	      "PAR reflectance.");
   vCanopy.add ("PARref", 0.06);
@@ -1113,9 +1150,15 @@ Maximal development stage for which the crop survives harvest.");
   vCanopy.add ("Height", 0.0);
   Canopy.add ("Offset", "cm", Syntax::State, "Extra height after harvest.");
   vCanopy.add ("Offset", 0.0);
-  Canopy.add ("LAI", "m^2/m^2", Syntax::State, "Leaf Area Index.");
-  vCanopy.add ("LAI", 0.0);
-  Canopy.add ("LADm", "cm^2/cm^3", Syntax::State, 
+  Canopy.add ("CAI", "m^2/m^2", Syntax::State, "Crop Area Index.");
+  vCanopy.add ("CAI", 0.0);
+  Canopy.add ("LeafAI", "m^2/m^2", Syntax::State, "Leaf Area Index.");
+  vCanopy.add ("LeafAI", 0.0);
+  Canopy.add ("StemAI", "m^2/m^2", Syntax::State, "Stem Area Index.");
+  vCanopy.add ("StemAI", 0.0);
+  Canopy.add ("SOrgAI", "m^2/m^2", Syntax::State, "Storage Organ Area Index.");
+  vCanopy.add ("SOrgAI", 0.0);
+  Canopy.add ("LADm", "cm^2/cm^3", Syntax::State,
 	      "Maximal Leaf Area Density.");
   vCanopy.add ("LADm", -9999.99);
   Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::State,
@@ -1185,9 +1228,9 @@ Maximal development stage for which the crop survives harvest.");
   vProd.add ("N_AM", 0.000);
 
   // CrpAux
-  CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::State,
-	      "Initial LAI development.");
-  vCrpAux.add ("InitLAI", true);
+  CrpAux.add ("InitCAI", Syntax::Boolean, Syntax::State,
+	      "Initial CAI development.");
+  vCrpAux.add ("InitCAI", true);
   CrpAux.add ("PotRtDpt", "cm", Syntax::OptionalState,
 	      "Potential root penetration depth.");
   CrpAux.add ("StemRes", "g DM/m^2", Syntax::State,
@@ -1220,8 +1263,8 @@ Maximal development stage for which the crop survives harvest.");
 	      "Storage organ growth.");
   CrpAux.add ("IncWRoot", "g DM/m^2/d", Syntax::LogOnly,
 	      "Root growth.");
-  CrpAux.add ("LAImRat", Syntax::None (), Syntax::LogOnly,
-	      "(LAIm - LAI) / LAIm.");
+  CrpAux.add ("CAImRat", Syntax::None (), Syntax::LogOnly,
+	      "(CAIm - CAI) / CAIm.");
   CrpAux.add ("DeadWLeaf", "g DM/m^2/d", Syntax::LogOnly,
 	      "Leaf DM removed.");
   CrpAux.add ("DeadNLeaf", "g N/m2/d", Syntax::LogOnly,
@@ -1294,7 +1337,7 @@ double CropStandard::height () const // Crop height [cm]
 { return var.Canopy.Height; }
 
 double CropStandard::LAI () const
-{ return var.Canopy.LAI; }
+{ return var.Canopy.CAI; }
 
 const CSMP& CropStandard::LAIvsH () const
 { return var.Canopy.LAIvsH; }
@@ -1463,66 +1506,75 @@ CropStandard::CropHeight ()
 }
 
 void
-CropStandard::InitialLAI ()
+CropStandard::InitialCAI ()
 {
   const Parameters::CanopyPar& Canopy = par.Canopy;
   const double WLeaf = var.Prod.WLeaf;
   double& DS = var.Phenology.DS;
-  double& LAI = var.Canopy.LAI;
-  double  LAI2;
-  bool& InitLAI = var.CrpAux.InitLAI;
+  double& CAI = var.Canopy.CAI;
+  double  CAI2;
+  bool& InitCAI = var.CrpAux.InitCAI;
 
 //  if (WLeaf >= Canopy.WLfInit)
 //    {
-//      LAI = Canopy.SpLAI * WLeaf;
-//      InitLAI = false;
+//      CAI = Canopy.SpCAI * WLeaf;
+//      InitCAI = false;
 //    }
 //  else
 //    {
 //#if 0
 //      if (DS > Canopy.DSinit)
 //	DS = Canopy.DSinit;
-//      LAI = 0.5 * (exp (Canopy.InitGrowth * DS) - 1);
+//      CAI = 0.5 * (exp (Canopy.InitGrowth * DS) - 1);
 //#else
-//      LAI = 0.5 * (exp (Canopy.InitGrowth * min (DS, Canopy.DSinit)) - 1);
+//      CAI = 0.5 * (exp (Canopy.InitGrowth * min (DS, Canopy.DSinit)) - 1);
 //#endif
 //    }
-  const double LAI1 = Canopy.SpLAI * WLeaf;
+  const double CAI1 = Canopy.SpLAI * WLeaf;
   if (DS<0.07)
     {
-      LAI2 = 10.;
+      CAI2 = 10.;
     }
   else
     {
-     LAI2 = max( 0.01, Canopy.SpLAIfac * Canopy.SpLAI * WLeaf);
+     CAI2 = max( 0.01, Canopy.SpLAIfac * Canopy.SpLAI * WLeaf);
     }
-  const double LAI3 = min ( LAI2, 1.0/(1.0+exp(-15.0*(DS-Canopy.DSLAI05))));
-  if (LAI1 >= LAI3)
+  const double CAI3 = min ( CAI2, 1.0/(1.0+exp(-15.0*(DS-Canopy.DSLAI05))));
+  if (CAI1 >= CAI3)
     {
-      LAI = LAI1;
-      InitLAI = false;
+      CAI = CAI1;
+      InitCAI = false;
     }
   else
-    LAI = LAI3;
+    CAI = CAI3;
+  var.Canopy.LeafAI = CAI;
+  var.Canopy.StemAI = 0.0;
+  var.Canopy.SOrgAI = 0.0;
 }
 
 double
-CropStandard::CropLAI ()
+CropStandard::CropCAI ()
 {
   const Parameters::CanopyPar& Canopy = par.Canopy;
   // const double DS = var.Phenology.DS;
   const double WLeaf = var.Prod.WLeaf;
+  const double WSOrg = var.Prod.WSOrg;
+  const double WStem = var.Prod.WStem;
+  double& DS = var.Phenology.DS;
+  var.Canopy.LeafAI = Canopy.SpLAI    * Canopy.LeafAIMod (DS) * WLeaf;
+  var.Canopy.SOrgAI = Canopy.SpSOrgAI * Canopy.SOrgAIMod (DS) * WSOrg;
+  var.Canopy.StemAI = Canopy.SpStemAI * Canopy.StemAIMod (DS) * WStem;
 
-  return Canopy.SpLAI * WLeaf;
+  return var.Canopy.LeafAI + var.Canopy.StemAI + var.Canopy.SOrgAI;
 }
 
-void 
+void
 CropStandard::CanopyStructure ()
 {
   const Parameters::CanopyPar& CanopyPar = par.Canopy;
   const double DS = var.Phenology.DS;
   Variables::RecCanopy& Canopy = var.Canopy;
-  
+
   // The leaf density is assumed to from the group up to height z0,
   // then increase linearly until height z1, continue at that
   // density until z2, and then decrease linearly until the top of
@@ -1551,7 +1603,7 @@ CropStandard::CanopyStructure ()
       Area = (1.0 + z2 - z1 - z0) / 2.0;
       assert (Area > 0.0);
       assert (Canopy.Height > 0.0);
-      Canopy.LADm = Canopy.LAI / (Area * Canopy.Height);
+      Canopy.LADm = Canopy.CAI / (Area * Canopy.Height);
     }
   else
     {
@@ -1561,10 +1613,10 @@ CropStandard::CanopyStructure ()
       z1 = CanopyPar.LAIDist1[1];
       z2 = CanopyPar.LAIDist1[2];
       double Area = (1.0 + z2 - z1 - z0) / 2.0;
-      double MaxLAD = Canopy.LAI / (Area * Canopy.Height);
-	    
+      double MaxLAD = Canopy.CAI / (Area * Canopy.Height);
+
       if (MaxLAD > Canopy.LADm)
-	// After DS = 1 LAI may increase for some time, keeping
+	// After DS = 1 CAI may increase for some time, keeping
 	// z0, z1, and z2 constant but adding to MaxLAD.
 	Canopy.LADm = MaxLAD;
       else
@@ -1574,7 +1626,7 @@ CropStandard::CanopyStructure ()
 	  // increasing z1 and z0.
 
 	  // Need is the Area we want after moving z1 and z0.
-	  double Need = Canopy.LAI / Canopy.Height / Canopy.LADm;
+	  double Need = Canopy.CAI / Canopy.Height / Canopy.LADm;
 
 	  if (approximate (Area, Need))
 	    Need = Area;
@@ -1585,24 +1637,24 @@ CropStandard::CanopyStructure ()
 	    // We have to move z1 beyond z2.
 	    {
 	      // Let x0 be the height where the canopy starts, x1 the
-	      // height where the canopy top, and y1 the canopy at x1. 
+	      // height where the canopy top, and y1 the canopy at x1.
 	      //
 	      // We know the area of the triangle:
 	      // (1):  Need = (1 - x0) * y1 / 2
-	      // 
+	      //
 	      // We assume that the slope of the canopy increase and
 	      // descrease is unchanged:
 	      // (2):   (1 - x1) / y1 =  (1 - z2) / 1
 	      // (3):  (x1 - x0) / y1 = (z1 - z0) / 1
 	      //
-	      // This gives us three equations with three unknown.  
+	      // This gives us three equations with three unknown.
 	      // We can solve them to get x0, x1, and y1.
 
 	      double x0 = 1.0 - sqrt (2.0 * Need * (z1 - z2 - z0 + 1.0));
-	      double x1 
+	      double x1
 		= 1.0 + (z2 - 1) * sqrt (2.0 * Need / (z1 - z2 - z0 + 1.0));
 	      double y1 = sqrt (2.0 * Need / (z1 - z2 - z0 + 1.0));
-			    
+
 	      // Check the results.
 	      assert (approximate (Need, (1.0 - x0) * y1 / 2.0));
 	      assert (approximate ((1.0 - x1) / y1, (1.0 - z2)));
@@ -1621,7 +1673,7 @@ CropStandard::CanopyStructure ()
 	  z0 += Area - Need;
 	}
     }
-    
+
   // Create CSMP for standard "z0, z1, z2" distribution.
   CSMP LADvsH;
   LADvsH.add (z0 * Canopy.Height, 0.0);
@@ -1629,8 +1681,8 @@ CropStandard::CanopyStructure ()
   LADvsH.add (z2 * Canopy.Height, Canopy.LADm);
   LADvsH.add (     Canopy.Height, 0.0);
   Canopy.LAIvsH = LADvsH.integrate_stupidly ();
-  const double LAIm = - log (par.Canopy.PARrel) / par.Canopy.PARext;
-  var.CrpAux.LAImRat = max (0.0, (Canopy.LAI - LAIm) / LAIm);
+  const double CAIm = - log (par.Canopy.PARrel) / par.Canopy.PARext;
+  var.CrpAux.CAImRat = max (0.0, (Canopy.CAI - CAIm) / CAIm);
 }
 
 double
@@ -1794,7 +1846,7 @@ CropStandard::RootPenetration (const Soil& soil, const SoilHeat& soil_heat)
   const double IncWRoot = var.CrpAux.IncWRoot;
   double& PotRtDpt = var.CrpAux.PotRtDpt;
   double& Depth = var.RootSys.Depth;
-    
+
   if (IncWRoot <= 0)
     return;
 
@@ -2001,26 +2053,26 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   const double Ta = bioclimate.daily_air_temperature ();
   const double Teff = LeafPhot.TempEff (Ta); // Temperature effect
 
-  // One crop: assert (approximate (var.Canopy.LAI, bioclimate.LAI ()));
-  if (!approximate (LAIvsH (var.Canopy.Height), var.Canopy.LAI))
+  // One crop: assert (approximate (var.Canopy.CAI, bioclimate.CAI ()));
+  if (!approximate (LAIvsH (var.Canopy.Height), var.Canopy.CAI))
     {
-      CERR << "Bug: LAI below top: " << LAIvsH (var.Canopy.Height)
-	   << " Total LAI: " << var.Canopy.LAI << "\n";
+      CERR << "Bug: CAI below top: " << LAIvsH (var.Canopy.Height)
+	   << " Total CAI: " << var.Canopy.CAI << "\n";
       CanopyStructure ();
-      CERR << "Adjusted: LAI below top: " << LAIvsH (var.Canopy.Height)
-	   << " Total LAI: " << var.Canopy.LAI << "\n";
+      CERR << "Adjusted: CAI below top: " << LAIvsH (var.Canopy.Height)
+	   << " Total CAI: " << var.Canopy.CAI << "\n";
     }
 
- // LAI below the current leaf layer.
+ // CAI below the current leaf layer.
   double prevLA = LAIvsH (bioclimate.height (0));
   // Assimilate produced by canopy photosynthesis
   double Ass = 0.0;
-  // Accumulated LAI, for testing purposes.
-  double accLAI =0.0;
+  // Accumulated CAI, for testing purposes.
+  double accCAI =0.0;
   // Number of computational intervals in the canopy.
   const int No = bioclimate.NumberOfIntervals ();
-  // LAI in each interval.
-  const double dLAI = bioclimate.LAI () / No;
+  // CAI in each interval.
+  const double dCAI = bioclimate.LAI () / No;
 
   // True, if we haven't reached the top of the crop yet.
   bool top_crop = true;
@@ -2043,10 +2095,10 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
       if (LA > 0)
 	{
 	  prevLA = LAIvsH (height);
-	  accLAI += LA;
+	  accCAI += LA;
 
 	  const double dPAR
-	    = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / dLAI;
+	    = (bioclimate.PAR (i) - bioclimate.PAR (i + 1)) / dCAI;
 
 	  // Leaf Photosynthesis [gCO2/m2/h]
 	  const double F = LeafPhot.Fm * 
@@ -2055,7 +2107,7 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
 	  Ass += LA * F;
 	}
     }
-  assert (approximate (accLAI, var.Canopy.LAI));
+  assert (approximate (accCAI, var.Canopy.CAI));
 
   return (molWeightCH2O / molWeightCO2) * Teff * Ass;
 }
@@ -2221,7 +2273,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   // Update dead leafs
   CrpAux.DeadWLeaf = pProd.LfDR (DS) * vProd.WLeaf;
-  CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * CrpAux.LAImRat;
+  CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * CrpAux.CAImRat;
   double DdLeafCnc;
   if (vProd.NCrop > 1.05 * CrpAux.PtNCnt)
     DdLeafCnc = vProd.NLeaf/vProd.WLeaf;
@@ -2316,7 +2368,7 @@ CropStandard::tick (const Time& time,
 	{
 	  COUT << " [" << name << " is emerging]\n";
 
-	  InitialLAI ();
+	  InitialCAI ();
 	  var.Canopy.Height = CropHeight ();
 	  NitContent ();
 	  var.CrpAux.PotCanopyAss = 0.0;
@@ -2358,10 +2410,10 @@ CropStandard::tick (const Time& time,
   var.Phenology.partial_day_length = 0.0;
 
   var.Canopy.Height = CropHeight ();
-  if (var.CrpAux.InitLAI)
-    InitialLAI ();
+  if (var.CrpAux.InitCAI)
+    InitialCAI ();
   else
-    var.Canopy.LAI = CropLAI ();
+    var.Canopy.CAI = CropCAI ();
   NetProduction (bioclimate, soil, soil_heat);
   DevelopmentStage (bioclimate);
   RootPenetration (soil, soil_heat);
@@ -2422,12 +2474,12 @@ CropStandard::harvest (const string& column_name,
     {
       stem_harvest *= (1.0 - stub_length / length);
 
-      const double total_LAI = LAI ();
-      if (total_LAI > 0.0)
+      const double total_CAI = LAI ();
+      if (total_CAI > 0.0)
 	{
-	  const double stub_LAI = LAIvsH ()(stub_length);
-	  leaf_harvest *= (1.0 - stub_LAI / total_LAI);
-	  bioclimate.harvest_chemicals (chemicals, total_LAI - stub_LAI);
+	  const double stub_CAI = LAIvsH ()(stub_length);
+	  leaf_harvest *= (1.0 - stub_CAI / total_CAI);
+	  bioclimate.harvest_chemicals (chemicals, total_CAI - stub_CAI);
 	}
     }
 
@@ -2456,7 +2508,7 @@ CropStandard::harvest (const string& column_name,
 	= var.Canopy.Height
 	- par.Canopy.HvsDS (var.Phenology.DS) ;
       assert (approximate (CropHeight (), var.Canopy.Height));
-      var.Canopy.LAI = CropLAI ();
+      var.Canopy.CAI = CropCAI ();
       CanopyStructure ();
     }
   else
