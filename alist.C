@@ -67,7 +67,7 @@ public:
   { };
 };
 
-// Primitive types are stored directly, though.
+// Primitive and simple types are stored directly, though.
 class dValue<double> : public Value
 {
   double value;
@@ -437,7 +437,7 @@ AttributeList::add (string key, const Time& v)
 }
 
 void 
-AttributeList::add (string key, AttributeList& v)
+AttributeList::add (string key, const AttributeList& v)
 {
   impl.add (key, new dValue<AttributeList> (v));
 }
