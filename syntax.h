@@ -3,6 +3,8 @@
 #include <std/string.h>
 
 struct FTable;
+struct ValueList;
+struct Log;
 
 // Ensure the syntax table is initialized.
 // See TC++PL, 2ed, 10.5.1, for an explanation.
@@ -20,13 +22,16 @@ class Syntax
     Implementation& impl;
 public:
     enum type 
-    { Number, List, Rules, CSMP, Function, Array, Error };
+    { Number, List, Rules, CSMP, Function, Array, Boolean, Error };
+    bool check (string, const ValueList*, const Log&) const;
     type lookup (string) const;
     const Syntax* syntax (string) const;
     const FTable* function (string) const;
+    int  size (string) const;
     void add (string, type);
     void add (string, const Syntax*);
     void add (string, const FTable*);
+    void add (string, const int);
     Syntax ();
     ~Syntax ();
 };

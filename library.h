@@ -11,6 +11,7 @@ class Library
     Implementation& impl;
 public:
     const ValueList* lookup (string) const;
+    bool check (string) const;
     void add (string, ValueList*, const Syntax*);
     const Syntax* syntax (string) const;
     Library ();

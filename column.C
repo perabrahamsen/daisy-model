@@ -29,13 +29,15 @@ void Column::tick (Column* /* left */, Column* /* rigth */,
 
 void Column::sow (const Library& croplib, string crop)
 {
-    try {
-	const ValueList* values = croplib.lookup (crop);
-	crops.push_back (new Crop (log, crop, values, *this));
-    }
-    catch (UninitializedValue) { 
+    if (croplib.check (crop))
+	{
+	    const ValueList* values = croplib.lookup (crop);
+
+	    if (syntax_table->syntax ("crop")->check (crop, values, log))
+		crops.push_back (new Crop (log, crop, values, *this));
+	}
+    else
 	cerr << "Cannot sow unknow crop `" << crop << "'\n";
-    }
 }
 
 Column::Column (Log& l, string n, const ValueList*, const Library&)

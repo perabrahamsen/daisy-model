@@ -12,6 +12,7 @@
 #include "action.h"
 #include "condition.h"
 #include <fstream.h>
+#include <strstream.h>
 
 const char*
 Usage::what () const
@@ -317,7 +318,14 @@ Input::Implementation::load_library (Library& lib)
 { 
     string name = get_id ();
     string super = get_id ();
-    ValueList* atts = new ValueList (*lib.lookup (super));
+    if (!lib.check (super))
+	{
+	    error (string ("Unknown superclass `") + super + "'");
+	    skip_to_end ();
+	    return;
+	}
+    const ValueList* sl = lib.lookup (super);
+    ValueList* atts = new ValueList (*sl);
     load_list (atts, lib.syntax (super));
     lib.add (name, atts, lib.syntax (super));
 }
@@ -337,10 +345,8 @@ Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
 		case Syntax::List: 
 		{
 		    ValueList* list = new ValueList ();
-		    skip ("(");
 		    load_list (list, syntax->syntax (name));
 		    atts->add (name, list);
-		    skip (")");
 		    break;
 		}
 		case Syntax::Rules:
@@ -364,9 +370,8 @@ Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
 		case Syntax::CSMP:
 		{
 		    ValueCSMP* csmp = new ValueCSMP ();
-		    skip ("(");
 		    double last_x;
-		    bool count = 0;
+		    int count = 0;
 		    while (!looking_at (')') && good ())
 			{
 			    skip ("(");
@@ -384,20 +389,46 @@ Input::Implementation::load_list (ValueList* atts, const Syntax* syntax)
 		    if (count < 2)
 			error ("Need at least 2 points");
 		    atts->add (name, csmp);
-		    skip (")");
 		    break;
 		}
 		case Syntax::Function:
-		    atts->add (name, new ValueString (get_id));
+		    atts->add (name, new ValueString (get_id ()));
 		    break;
 		case Syntax::Array:
 		{
 		    ValueArray* array = new ValueArray ();
-		    skip ("(");
+		    int count = 0;
+		    int size = syntax->size (name);
 		    while (!looking_at (')') && good ())
-			array->add (get_number ());
+			{
+			    array->add (get_number ());
+			    count++;
+			}
+		    if (size >= 0 && count != size)
+			{
+			    ostrstream str;
+			    str << "Got " << count 
+				<< " array members, expected " << size;
+			    error (str.str ());
+
+			    for (;count < size; count++)
+				array->add (-1.0);
+			}
 		    atts->add (name, array);
-		    skip (")");
+		    break;
+		}
+		case Syntax::Boolean:
+		{
+		    string flag = get_id ();
+
+		    if (flag == "true")
+			atts->add (name, new ValueBool (true));
+		    else
+			{
+			    atts->add (name, new ValueBool (false));
+			    if (flag != "false")
+				error ("Expected `true' or `false'");
+			}
 		    break;
 		}
 		case Syntax::Error:
@@ -474,7 +505,7 @@ Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
       column (0)
 { 
     if (argc != 2)
-	throw new Usage ();
+	THROW (Usage ());
     file = argv[1];
     in = new ifstream (file.data ());
     load ();

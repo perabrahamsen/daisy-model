@@ -20,47 +20,56 @@ UninitializedValue::what () const
 }
 
 double
-Value::number ()
+Value::number () const throw (InvalidValue)
 { 
-    throw InvalidValue ();
+    THROW (InvalidValue ());
 }
 
+string
+Value::name () const throw (InvalidValue)
+{ 
+    THROW (InvalidValue ());
+}
+
+bool
+Value::flag () const throw (InvalidValue)
+{ 
+    THROW (InvalidValue ());
+}
+
+#ifdef USE_VIRTUAL_VALUE
 Value* 
 Value::lookup (string) const throw (UninitializedValue, InvalidValue) 
 { 
-    throw InvalidValue ();
+    THROW (InvalidValue ());
 }
 
 Value* 
 Value::check (string) const throw (InvalidValue)
 { 
-    throw InvalidValue ();
+    THROW (InvalidValue ());
 }
 
 const Action* 
 Value::match (ColumnList&, const Wheather&,
 	      int /* day */, int /* hour */) const throw (InvalidValue)
 {
-    throw InvalidValue ();
+    THROW (InvalidValue ());
 }    
 
 double
 Value::y (double /* x */) const throw (InvalidValue)
 { 
-    throw InvalidValue ();
+    THROW (InvalidValue ());
 }
 
 double
 Value::operator[] (int) const throw (InvalidValue)
 { 
-    throw InvalidValue ();
+    THROW (InvalidValue ());
 }
 
-string
-Value::name () const throw (InvalidValue)
-{ 
-    throw InvalidValue ();
-}
+#endif
 
 Value::Value ()
 { }
@@ -69,7 +78,7 @@ Value::~Value ()
 { }
 
 double 
-ValueNumber::number ()
+ValueNumber::number () const
 {
     return value;
 }
@@ -98,11 +107,11 @@ ValueList::lookup (string key) const throw (UninitializedValue)
     Value* value = check (key);
     if (value)
 	return value;
-    throw UninitializedValue ();
+    THROW (UninitializedValue ());
 }
 
 Value* 
-ValueList::check (string key) const throw ()
+ValueList::check (string key) const throw0 ()
 { 
     for (int i = 0; i < impl.size; i++)
 	if (impl.UGLY_key[i] == key)
@@ -280,7 +289,7 @@ ValueArray::add (double d)
 }
 
 double
-ValueArray::operator[] (int index)
+ValueArray::operator[] (int index) const
 {
     return impl[index];
 }
@@ -292,11 +301,26 @@ ValueArray::~ValueArray ()
 { }
 
 string
-ValueString::name ();
+ValueString::name () const
+{
+    return impl;
+}
 
 ValueString::ValueString (string s) : impl (s)
 { }
 
 ValueString:: ~ValueString ()
+{ }
+
+bool
+ValueBool::flag () const
+{
+    return impl;
+}
+
+ValueBool::ValueBool (bool b) : impl (b)
+{ }
+
+ValueBool:: ~ValueBool ()
 { }
 

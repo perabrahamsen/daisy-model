@@ -30,7 +30,19 @@ Library::lookup (string key) const
     for (int i = 0; i < impl.UGLY_MAX_SIZE; i++)
 	if (impl.UGLY_key[i] == key)
 	    return impl.UGLY_value[i];
-    throw UninitializedValue ();
+    THROW (UninitializedValue ());
+}
+
+bool
+Library::check (string key) const
+{ 
+    if (syntax_table->lookup (key) == Syntax::List)
+	return true;
+
+    for (int i = 0; i < impl.UGLY_MAX_SIZE; i++)
+	if (impl.UGLY_key[i] == key)
+	    return true;
+    return false;
 }
 
 void
@@ -52,7 +64,7 @@ Library::syntax (string key) const
     for (int i = 0; i < impl.UGLY_MAX_SIZE; i++)
 	if (impl.UGLY_key[i] == key)
 	    return impl.UGLY_syntax[i];
-    throw UninitializedValue ();    
+    THROW (UninitializedValue ());    
 }
 
 Library::Library () : impl (*new Implementation ())

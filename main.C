@@ -6,11 +6,14 @@
 int 
 main (int argc, char* argv[])
 {
+#ifdef HANDLE_EXCEPTIONS
     try 
 	{
+#endif HANDLE_EXCEPTIONS
 	    Input input (argc, argv, cerr);
 	    Daisy daisy (input);
 	    daisy.run ();
+#ifdef HANDLE_EXCEPTIONS
 	}
     catch (const Usage& usage)
 	{
@@ -28,5 +31,6 @@ main (int argc, char* argv[])
 	    cerr.flush ();
 	    abort ();
 	}
+#endif HANDLE_EXCEPTIONS
     exit (0);
 }

@@ -10,14 +10,20 @@ struct ValueList;
 class Crop 
 {
     // Content.
-    struct Implementation;
-    Implementation& impl;
+public:
+    struct Parameters;
+    struct Variables;
+protected:
+    const Parameters& par;
+    Variables& var;
     Log& log;
 public:
     const string name;
     const Column& column;
 
     // Simulation.
+protected:
+    // <insert calculation functions here>
 public:
     void tick (const Wheather& wheater, int day, int hour);
 

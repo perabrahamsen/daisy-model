@@ -20,10 +20,15 @@ struct UninitializedValue : runtime_error
     const char* what () const;
 };
 
+struct ValueCSMP;
+
 class Value
 {
 public:
-    virtual double number ();
+    virtual double number () const throw (InvalidValue);
+    virtual string name () const throw (InvalidValue);
+    virtual bool flag () const throw (InvalidValue);
+#ifdef USE_VIRTUAL_VALUE
     virtual Value* lookup (string) const 
       throw (UninitializedValue, InvalidValue);
     virtual Value* check (string) const throw (InvalidValue);
@@ -31,7 +36,7 @@ public:
 				 int day, int hour) const throw (InvalidValue);
     virtual double y (double x) const throw (InvalidValue);
     virtual double operator[] (int index) const throw (InvalidValue);
-    virtual string name () const throw (InvalidValue);
+#endif
 protected:
     Value ();
     virtual ~Value ();
@@ -41,7 +46,7 @@ class ValueNumber : public Value
 {
     const double value;
 public:
-    double number ();
+    double number () const;
     ValueNumber (double n);
 };
 
@@ -52,7 +57,7 @@ class ValueList : public Value
 public:
     static const ValueList empty;
     Value* lookup (string) const throw (UninitializedValue);
-    Value* check (string) const throw ();
+    Value* check (string) const throw0 ();
     void add (string, Value*);
     ValueList ();
     ValueList (const ValueList&);
@@ -90,7 +95,7 @@ class ValueArray : public Value
     friend class Input;
     void add (double);
 public:
-    double operator[] (int index);
+    double operator[] (int index) const;
     ValueArray ();
     ~ValueArray ();
 };
@@ -99,9 +104,18 @@ class ValueString : public Value
 {
     string impl;
 public:
-    string name ();
-    ValueString (string s);
+    string name () const;
+    ValueString (string);
     ~ValueString ();
+};
+
+class ValueBool : public Value
+{
+    bool impl;
+public:
+    bool flag () const;
+    ValueBool (bool);
+    ~ValueBool ();
 };
 
 #endif VALUE_H
