@@ -130,7 +130,10 @@ Select::Implementation::Spec::leaf_syntax (Syntax& buffer) const
 
 const string&
 Select::Implementation::Spec::leaf_name () const
-{ return submodels_and_attribute.back ().name (); }
+{ 
+  daisy_assert (submodels_and_attribute.size () > 0);
+  return submodels_and_attribute.back ().name (); 
+}
 
 const string&
 Select::Implementation::Spec::dimension () const
@@ -154,7 +157,7 @@ void
 Select::Implementation::Spec::refer (Format& format) const
 {
   format.text (" ");
-  const bool is_fixed = library_name == symbol ("fixed");
+  const bool is_fixed = (library_name == symbol ("fixed"));
   if (!is_fixed)
     {
       format.text (library_name.name ());
@@ -170,7 +173,7 @@ Select::Implementation::Spec::refer (Format& format) const
   else
     format.ref ("model", aref);
   format.text (")");
-  for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
+  for (unsigned int i = 0; i < submodels_and_attribute.size (); i++)
     {
       const string name = submodels_and_attribute[i].name ();
       aref += "-" + name;
@@ -210,6 +213,7 @@ Select::Implementation::Spec::check_path (const vector<symbol>& path,
 	{
 	  err.entry ("'" + name + "': no such attribute");
 	  ok = false;
+	  break;
 	}
     }
   return ok;
@@ -235,7 +239,7 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
     {
       if (!Submodel::registered (model_name.name ()))
 	{
-	  err.entry ("'" + model_name + "': no such model");
+	  err.entry ("'" + model_name + "': no such submodel");
 	  ok = false;
 	}
       else
