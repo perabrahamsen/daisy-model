@@ -32,7 +32,7 @@ using namespace std;
 
 struct Lexer::Implementation
 {
-  istream& in;
+  std::istream& in;
   int line;
   int column;
   
