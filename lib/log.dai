@@ -568,6 +568,10 @@
                      (path column "$col" OrganicMatter smb N)
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
+	   (interval (tag "Buffer")
+		     (path column "$col" OrganicMatter buffer N)
+		     (dimension "kg N/ha")
+		     (factor 1e5))      ;g/cm^2 -> kg/ha
            ))
 
 (deflog "N Balance 0-100 cm" "N Balance"
