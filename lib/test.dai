@@ -10,10 +10,10 @@
 
 ;; Weather data.
 (weather file "weather.clm"
-  (DryDeposit (NO3 0.3e-6)	;[kg/m²/d]
-	      (NH4 0.6e-6))
-  (WetDeposit (NO3 0.6e-6)	;[kg/m²/mm]
-	      (NH4 0.9e-6)))
+  (DryDeposit (NO3 1.1)			;[kg/ha/year]
+	      (NH4 2.2))
+  (WetDeposit (NO3 0.6)			;[ppm]
+	      (NH4 0.9)))
 
 ;; We have some very sandy soil.
 (defhorizon top default
@@ -92,14 +92,13 @@
 		   (weight 100.0)	;kg N/ha
                    (NH4_fraction 0.5)))
        ((at 1987 4 5 1)
-        (progn (sow "Cut Grass")
-               (sow "Spring Barley")))
+        (sow "Cut Grass")
+	(sow "Spring Barley"))
        ((at 1987 9 5 1)
-         (progn (harvest "Spring Barley")
-                (harvest "Cut Grass"
-                    (stub 15)              ;Leave 15 cm stub.
-                    (stem 1.00))
-		))         ;Harvest everything above stub.
+        (harvest "Spring Barley")
+	(harvest "Cut Grass"
+		 (stub 15)              ;Leave 15 cm stub.
+		 (stem 1.00)))         ;Harvest everything above stub.
        ((at 1987 9 8 1)
         (fertilize mineral
 		   (weight 80.0)

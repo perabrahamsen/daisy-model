@@ -14,9 +14,7 @@
 	  (DSLim2 0.0)
 	  (TaLim 0.0)
 	  (TaSum 0.0))
-  (LeafPhot (Qeff 5.0E-2)		; (g/m²/h) / (W/m²)
-	    (Fm 3.0)			; g/m²/h
-	    (TLim1 4.0)			; dg C
+  (LeafPhot (TLim1 4.0)			; dg C
 	    (TLim2 10.0))		; dg C
   (Canopy (InitGrowth 3.67)
 	  (DSinit 0.07)
@@ -48,8 +46,7 @@
   (Resp (E_Root (0.0 0.54) (2.0 0.54))
 	(E_Leaf (0.0 0.72) (2.0 0.72))
 	(r_Root (0.898 0.065) (0.8981 0.015))
-	(r_Leaf (0.898 0.015) (0.8981 0.01))
-	(Q10 2.00))
+	(r_Leaf (0.898 0.015) (0.8981 0.01)))
   (CrpN (SeedN 0.4)
 	(PtLeafCnc (0.163 0.050)
 		   (0.347 0.040)
