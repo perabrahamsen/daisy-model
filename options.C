@@ -29,6 +29,9 @@
 #include "version.h"
 #include "path.h"
 
+#include <iostream>
+using namespace std;
+
 #if defined (__unix) 
 #define PATH_SEPARATOR ":"
 #else
