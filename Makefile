@@ -274,6 +274,13 @@ OTHER = traverse_delete.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
 	submodel.C
 
+MSOURCES = common.C submodel.C mathlib.C librarian.C alist.C syntax.C \
+	library.C plf.C time.C traverse.C treelog.C treelog_stream.C \
+	tmpstream.C lexer_data.C lexer.C parser_file.C parser.C \
+	printer_file.C printer.C document_LaTeX.C document.C mmain.C
+
+MOBJECTS = $(MSOURCES:.C=${OBJ}) $(SPARCOBJ)
+
 # Everything that has an interface.
 #
 INTERFACES = $(COMPONENTS) $(SUBMODELS) $(SPECIALS) $(OTHER)
@@ -384,6 +391,11 @@ pdaisy${EXT}: pmain${OBJ} time.o
 dlldaisy${EXT}:	cmain${OBJ} daisy.dll
 	$(LINK)dlldaisy $^ $(MATHLIB)
 
+
+# Create the MMM executable.
+
+mmm${EXT}:	$(MOBJECTS)
+	$(LINK)mmm $(CRTLIB) $^ $(MATHLIB)
 
 # Count the size of daisy.
 #
@@ -719,8 +731,8 @@ depend${OBJ}: depend.C depend.h traverse.h library.h common.h syntax.h \
  alist.h tmpstream.h treelog.h
 traverse${OBJ}: traverse.C traverse.h library.h common.h syntax.h alist.h
 treelog${OBJ}: treelog.C treelog.h
-treelog_stream${OBJ}: treelog_stream.C treelog_stream.h treelog.h
-tmpstream${OBJ}: tmpstream.C tmpstream.h
+treelog_stream${OBJ}: treelog_stream.C treelog_stream.h treelog.h common.h
+tmpstream${OBJ}: tmpstream.C tmpstream.h common.h
 lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h common.h
 lexer${OBJ}: lexer.C lexer.h common.h
 daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
@@ -1031,7 +1043,7 @@ qmain_item${OBJ}: qmain_item.C qmain_item.h qmain_edit.h alist.h common.h \
  tmpstream.h treelog_stream.h treelog.h depend.h traverse_delete.h
 qmain_populate${OBJ}: qmain_populate.C qmain_populate.h qmain_tree.h \
  qmain_item.h qmain.h syntax.h common.h alist.h traverse.h tmpstream.h \
- plf.h library.h
+ plf.h library.h parser.h librarian.h
 qmain_busy${OBJ}: qmain_busy.C qmain_busy.h
 cmain${OBJ}: cmain.c cdaisy.h
 bugmain${OBJ}: bugmain.c cdaisy.h

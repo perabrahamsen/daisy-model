@@ -13,28 +13,28 @@ void
 Treelog::entry (const string&)
 { count++; }
 
+class TreelogNull : public Treelog
+{
+  // Nesting.
+public:
+  void open (const string&)
+  { }
+  void close ()
+  { }
+
+  // Create and Destroy.
+public:
+  TreelogNull ()
+  { }
+  ~TreelogNull ()
+  { }
+};
+
+static TreelogNull nulllog;
+
 Treelog&
 Treelog::null ()
-{
-  static class TreelogNull : public Treelog
-  {
-    // Nesting.
-  public:
-    virtual void open (const string&)
-    { }
-    virtual void close ()
-    { }
-
-    // Create and Destroy.
-  public:
-    TreelogNull ()
-    { }
-    ~TreelogNull ()
-    { }
-  } nulllog;
-
-  return nulllog;
-}
+{ return nulllog; }
 
 Treelog::Treelog ()
 { }

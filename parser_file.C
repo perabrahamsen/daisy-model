@@ -4,7 +4,6 @@
 #include "lexer.h"
 #include "plf.h"
 #include "time.h"
-#include "log.h"
 #include "tmpstream.h"
 
 struct ParserFile::Implementation

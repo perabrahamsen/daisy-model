@@ -1,4 +1,27 @@
+2000-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.63 released.
+
+2000-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C: Don't include "log.h".
+
 2000-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* mathlib.h (M_LN2, M_PI, M_PI_2): Define if undefined.
+	(min, max): Define for Visual C++ 6.0.
+
+	* time.C, time.h (operator=): Made it a member instead of a friend.
+	(operator!=): Ditto.
+	(operator<): Ditto.
+	(operator<=): Ditto.
+	(operator>=): Ditto.
+	(operator>): Ditto.
+
+	* librarian.h (map_create): Make it a function.
+	(map_create_const): Ditto.
+	(map_construct): Ditto.
+	(map_construct_const): Ditto.
 
 	* all: Comment out text after `#endif'.
 
