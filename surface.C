@@ -41,7 +41,7 @@ struct Surface::Implementation
   double Eps;
   double T;
   IM im;
-  const double DetentionCapacity;
+  double DetentionCapacity;
   const double ReservoirConstant;
   double runoff;
   IM im_runoff;
@@ -336,6 +336,10 @@ Surface::spray (const Chemicals& chemicals_in)
 { impl.spray (chemicals_in); }
 
 void
+Surface::set_detention_capacity (const double height)
+{ impl.DetentionCapacity = height; }
+
+void
 Surface::Implementation::spray (const Chemicals& chemicals_in)
 {
   chemicals_storage += chemicals_in;
@@ -463,7 +467,7 @@ Water evaporated from the surface, including the pond and exfiltration.");
 Potential evaporation from the surface.");
   syntax.add ("T", "dg C", Syntax::LogOnly, "\
 Temperature of water or air directly above the surface.");
-  syntax.add ("DetentionCapacity", "mm", Syntax::Const, "\
+  syntax.add ("DetentionCapacity", "mm", Syntax::State, "\
 Amount of ponding the surface can retain.");
   alist.add ("DetentionCapacity", 1000.0);
   syntax.add ("ReservoirConstant", "h^-1", Syntax::Const, "\

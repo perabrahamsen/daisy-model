@@ -455,13 +455,12 @@ UZRichard::internode (const Soil& soil, int first, int last,
     Kplus[i] = (*K_average)(K[i], K[i + 1]);
   
   for (int i = 0; i < size; i++)
-    if (!soil.compact (first + i))
-      {
-	double Ksat = soil.K (first + i, 0.0, h_ice[first + i]);
-	Kplus[i] = min (Ksat, Kplus[i]);
-	if (i > 0)
-	  Kplus[i - 1] = min (Ksat, Kplus[i - 1]);
-      }
+    {
+      double Ksat = soil.K (first + i, 0.0, h_ice[first + i]);
+      Kplus[i] = min (Ksat, Kplus[i]);
+      if (i > 0)
+	Kplus[i - 1] = min (Ksat, Kplus[i - 1]);
+    }
 }
 
 void

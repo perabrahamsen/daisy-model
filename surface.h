@@ -37,6 +37,7 @@ public:
   // Manager.
   void fertilize (const IM&);
   void spray (const Chemicals& chemicals_in);
+  void set_detention_capacity (double);
 
   // Simulation.
   void output (Log&) const;

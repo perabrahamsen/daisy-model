@@ -11,14 +11,16 @@ class Hydraulic
 {
   // Content.
 public:
+  const string name;
   static const char *const description;
 
   // Standard parameters.
 public:
-  const double Theta_sat;
+  double Theta_sat;
   const double Theta_res;
   inline double porosity () const
   { return Theta_sat; }
+  virtual void set_porosity (double Theta);
 
   // Convertion functions.
 public:
@@ -27,7 +29,10 @@ public:
   virtual double Cw2 (double h) const = 0;
   virtual double h (double Theta) const = 0;
   virtual double M (double h) const = 0;
-  virtual bool compact () const;
+
+  // Simulation.
+public:
+  virtual void output (Log&) const;
 
   // Tools for derived classes.
 protected:

@@ -12,9 +12,11 @@ struct AttributeList;
 
 class Soil : public Geometry
 {
-  vector<const Horizon*> horizon_;
-  const double MaxRootingDepth_;
-  double dispersivity_;
+  // Content.
+  struct Implementation;
+  Implementation& impl;
+  // Cache for fast inline access.
+  const vector<Horizon*> horizon_;
 
 public:
   // Water.
@@ -29,10 +31,10 @@ public:
   { return horizon_[i]->hydraulic.h (Theta); }
   inline double M (int i, double h) const
   { return horizon_[i]->hydraulic.M (h); }
-  inline bool compact (int i) const
-  { return horizon_[i]->hydraulic.compact (); }
-  inline double dispersivity (int) const
-  { return dispersivity_; }
+  double dispersivity (int) const;
+  void set_porosity (int i, double Theta)
+  { horizon_[i]->hydraulic.set_porosity (Theta); }
+
   
   // Texture.
   inline double tortuosity_factor (int i, double Theta) const
@@ -54,6 +56,10 @@ public:
   double heat_capacity (int i, double Theta, double Ice) const
   { return horizon_[i]->heat_capacity (Theta, Ice); }
   
+  // Simulation.
+public:
+  void output (Log&) const;
+
   // Calculations.
   double MaxRootingDepth () const;
 

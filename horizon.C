@@ -8,6 +8,7 @@
 #include "hydraulic.h"
 #include "mathlib.h"
 #include "tortuosity.h"
+#include "log.h"
 #include <vector>
 #include <map>
 #include <numeric>
@@ -395,6 +396,11 @@ check_alist (const AttributeList& al)
   return ok;
 }
 
+void 
+Horizon::output (Log& log) const
+{ output_derived (hydraulic, "hydraulic", log); }
+
+
 void
 Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 {
@@ -462,6 +468,7 @@ By default, this is calculated from the soil constituents.");
 
 Horizon::Horizon (const AttributeList& al)
   : impl (*new Implementation (al)),
+    name (al.name ("type")),
     hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
     tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
 { 

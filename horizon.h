@@ -23,11 +23,12 @@ private:
   struct Implementation;
   Implementation& impl;
 public:
+  const string name;
   static const char *const description;
 
   // Water.
 public:
-  const Hydraulic& hydraulic;
+  Hydraulic& hydraulic;
   double heat_conductivity (double Theta, double Ice) const; // [erg/cm/h/dg C]
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
   
@@ -39,6 +40,9 @@ public:
   double humus () const;
   double SOM_C (unsigned int pool) const;
   double SOM_C_per_N (unsigned int pool) const;
+
+  // Simulation.
+  void output (Log&) const;
 
   // Create and Destroy.
 public:

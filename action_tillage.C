@@ -114,10 +114,68 @@ Swap two soil layers.  The top layer start at the surface and goes down to\n\
 organic matter) will be averaged in each layer, and the bottom layer will\n\
 be placed on top of what used to be the top layer.");
       syntax.add ("middle", "cm", Syntax::Const, "\
-the end of the first layer and the start of the second layer to swap\n\
+The end of the first layer and the start of the second layer to swap\n\
 \(a negative number).");
       syntax.add ("depth", "cm", Syntax::Const, "\
 The end of the second layer to swap (a negative number).");
       Librarian<Action>::add_type ("swap", alist, syntax, &make);
     }
 } ActionSwap_syntax;
+
+
+struct ActionSetPorosity : public Action
+{
+  // Content.
+  const double porosity;
+  const double depth;
+
+  // Simulation.
+  void doIt (Daisy& daisy)
+  {
+    daisy.field.set_porosity (depth, porosity);
+  }
+
+  ActionSetPorosity (const AttributeList& al)
+    : Action (al),
+      porosity (al.number ("porosity")),
+      depth (al.number ("depth"))
+    { }
+};
+
+static struct ActionSetPorositySyntax
+{
+  static Action& make (const AttributeList& al)
+    { return *new ActionSetPorosity (al); }
+
+  static bool check (const AttributeList& al)
+    {
+      const double porosity (al.number ("porosity"));
+      const double depth (al.number ("depth"));
+      bool ok = true;
+      non_positive (depth, "depth", ok);
+      if (porosity <= 0 || porosity >= 1.0)
+	{
+	  CERR << "porosity should be larger than 0 and less than 1\n";
+	  ok = false;
+	}
+      if (!ok)
+	CERR << "in swap action\n";
+      return ok;
+    }
+
+  ActionSetPorositySyntax ()
+    {
+      Syntax& syntax = *new Syntax ();
+      syntax.add_check (check);
+      AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
+Set the porosity of the horizon at the specified depth.\n\
+To get useful results, you need to use a hydraulic model that supports this.");
+      syntax.add ("porosity", Syntax::None (), Syntax::Const, "\
+Non-solid fraction of soil.");
+      syntax.add ("depth", "cm", Syntax::Const, "\
+A point in the horizon to modify (a negative number).");
+      alist.add ("depth", 0.0);
+      Librarian<Action>::add_type ("set_porosity", alist, syntax, &make);
+    }
+} ActionSetPorosity_syntax;

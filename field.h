@@ -49,7 +49,9 @@ public:
   void mix (const Time&,
 		    double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
+  void set_porosity (double at, double Theta);
   void spray (const string& chemical, double amount); // [g/ha]
+  void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
 public:

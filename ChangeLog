@@ -1,3 +1,40 @@
+2000-02-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.17 released.
+
+2000-02-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_M_vG_compact.C: New model.
+	* hydraulic.C, hydraulic.h (set_porosity): New function.
+	* soil.h (set_porosity): New function.
+	* column.h, column_std.C (set_porosity): New function.
+	* field.C, field.h (set_porosity): New function.
+	* action_tillage.C (ActionSetPorosity): New model.
+
+2000-02-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic.C, hydraulic.h (name): New data member.
+	* hydraulic.C, hydraulic.h (compact): Removed.
+	* uzrichard.C (internode): Remove caller.
+	* soil.h (compact): Remove caller.
+	* soil.C, soil.h (Implementation): New member class.
+	(impl): New member.
+	* hydraulic.C, hydraulic.h (output): New function.
+	* horizon.C (output): New function.
+	* soil.C, soil.h (output): New function.
+	* column_std.C (output): Call it.
+
+2000-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C, column.h (set_surface_detention_capacity): New
+	function. 
+	* field.C, field.h (set_surface_detention_capacity): New function.
+	* surface.C (DetentionCapacity): Made it a state variable instead
+	of a constant.
+	* surface.C, surface.h (set_detention_capacity): New function.
+	* action_surface.C: New file.
+	* Makefile (MODELS): Add it.
+
 2000-02-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.16 released.

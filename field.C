@@ -32,7 +32,9 @@ struct Field::Implementation
   void mix (const Time&,
 		    double from, double to, double penetration);
   void swap (const Time&, double from, double middle, double to);
+  void set_porosity (double at, double Theta);
   void spray (const string& chemical, double amount); // [g/ha]
+  void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
 public:
@@ -230,6 +232,17 @@ Field::Implementation::swap (const Time& time, double from, double middle, doubl
 }
 
 void 
+Field::Implementation::set_porosity (double at, double Theta)
+{
+  if (selected)
+    selected->set_porosity (at, Theta);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->set_porosity (at, Theta);
+}
+
+void 
 Field::Implementation::spray (const string& chemical, double amount) // [g/ha]
 {
   if (selected)
@@ -240,6 +253,16 @@ Field::Implementation::spray (const string& chemical, double amount) // [g/ha]
     (*i)->spray (chemical, amount);
 }
 
+void 
+Field::Implementation::set_surface_detention_capacity (double height) // [mm]
+{
+  if (selected)
+    selected->set_surface_detention_capacity (height);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->set_surface_detention_capacity (height);
+}
 
 double 
 Field::Implementation::soil_temperature (double height) const  // [ cm -> dg C]
@@ -468,8 +491,16 @@ Field::swap (const Time& time, double from, double middle, double to)
 { impl.swap (time, from, middle, to); }
 
 void 
+Field::set_porosity (double at, double Theta)
+{ impl.set_porosity (at, Theta); }
+
+void 
 Field::spray (const string& chemical, double amount) // [g/ha]
 { impl.spray (chemical, amount); }
+
+void 
+Field::set_surface_detention_capacity (double height) // [mm]
+{ impl.set_surface_detention_capacity (height); }
 
 double 
 Field::soil_temperature (double height) const  // [ cm -> dg C]

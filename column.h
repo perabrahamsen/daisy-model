@@ -37,7 +37,9 @@ public:
   virtual void mix (const Time&,
 		    double from, double to, double penetration = 1.0) = 0;
   virtual void swap (const Time&, double from, double middle, double to) = 0;
+  virtual void set_porosity (double at, double Theta) = 0;
   virtual void spray (const string& chemical, double amount) = 0; // [g/ha]
+  virtual void set_surface_detention_capacity (double height) = 0; // [mm]
 
   // Conditions.
 public:

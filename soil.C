@@ -5,8 +5,76 @@
 #include "syntax.h"
 #include "mathlib.h"
 #include "submodel.h"
+#include "log.h"
 #include <assert.h>
 #include <iomanip.h>
+
+struct Soil::Implementation
+{
+  // Layers.
+  struct Layer
+  {
+    // Content.
+    const double end;
+    Horizon& horizon;
+
+    // Simulation.
+    void output (Log& log) const
+    { output_derived (horizon, "horizon", log); }
+
+    // Create and Destroy.
+    static void load_syntax (Syntax& syntax, AttributeList& alist)
+    { 
+      alist.add ("description", "\
+A location and content of a soil layer.");
+      syntax.add ("end", "cm", Syntax::Const,
+		  "End point of this layer (a negative number).");
+      syntax.add ("horizon", Librarian<Horizon>::library (), 
+		  "Soil properties of this layer.");
+      syntax.order ("end", "horizon");
+    }
+    Layer (const AttributeList& al)
+      : end (al.number ("end")),
+	horizon (Librarian<Horizon>::create (al.alist ("horizon")))
+    { }
+    ~Layer ()
+    { delete &horizon; }
+  };
+  const vector<Layer*> layers;
+
+  vector<Horizon*> make_horizons (const Geometry& geometry)
+  {
+    vector<Horizon*> result;
+
+    vector<Layer*>::const_iterator layer = layers.begin ();
+    const vector<Layer*>::const_iterator end = layers.end ();
+
+    assert (layer != end);
+    for (unsigned int i = 0; i < geometry.size (); i++)
+      {
+	if (geometry.zplus (i) < (*layer)->end)
+	  {
+	    layer++;
+	    assert (layer != end);
+	  }
+	result.push_back (&((*layer)->horizon));
+      }
+    return result;
+  }
+  
+  // Parameters
+  const double MaxRootingDepth;
+  const double dispersivity;
+
+  // Create and Destroy.
+  Implementation (const AttributeList& al)
+    : layers (map_construct<Layer> (al.alist_sequence ("horizons"))),
+      MaxRootingDepth (al.number ("MaxRootingDepth")),
+      dispersivity (al.number ("dispersivity"))
+  { }
+  ~Implementation ()
+  { sequence_delete (layers.begin (), layers.end ()); }
+};
 
 double 
 Soil::K (int i, double h, double h_ice) const
@@ -35,10 +103,18 @@ Soil::Cw2 (int i, double h) const
   return 1.0e-8;
 }
 
+double 
+Soil::dispersivity (int) const
+{ return impl.dispersivity; }
+
+void
+Soil::output (Log& log) const
+{ output_vector (impl.layers, "horizons", log); }
+
 double
 Soil::MaxRootingDepth () const
 {
-  return max (-MaxRootingDepth_, z (size () - 1));
+  return max (-impl.MaxRootingDepth, z (size () - 1));
 }
 
 bool 
@@ -88,7 +164,6 @@ check_alist (const AttributeList& al)
     }
   return ok;
 }  
-  
 
 void 
 Soil::make_table (int i)
@@ -104,6 +179,9 @@ Soil::make_table (int i)
     }
 }
 
+#ifdef BORLAND_TEMPLATES
+ template class add_submodule_sequence<Soil::Implementation::Layer>;
+#endif
 
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -113,20 +191,9 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "Soil");
   alist.add ("description", "\
 The soil component provides the numeric and physical properties of the soil.");
-  Syntax& layer_syntax = *new Syntax ();
-#if 0
-  AttributeList& layer_alist = *new AttributeList ();
-#endif
-  layer_syntax.add ("end", "cm", Syntax::Const,
-		    "End point of this layer (a negative number).");
-  layer_syntax.add ("horizon", Librarian<Horizon>::library (), 
-		    "Soil properties of this layer.");
-  layer_syntax.order ("end", "horizon");
-  syntax.add ("horizons", layer_syntax, Syntax::Sequence,
-	      "Layered description of the soil properties.");
-#if 0
-  alist.add ("horizons", layer_alist);
-#endif
+  add_submodule_sequence<Implementation::Layer> ("horizons", syntax, 
+						 Syntax::State, "\
+Layered description of the soil properties.");
   syntax.add ("MaxRootingDepth", "cm", Syntax::Const,
 	      "Depth at the end of the root zone (a positive number).");
   //  alist.add ("MaxRootingDepth", 100.0);
@@ -135,37 +202,12 @@ The soil component provides the numeric and physical properties of the soil.");
   
 Soil::Soil (const AttributeList& al)
   : Geometry (al),
-    MaxRootingDepth_ (al.number ("MaxRootingDepth")),
-    dispersivity_ (al.number ("dispersivity"))
-{
-  vector<const AttributeList*>::const_iterator layer
-    = al.alist_sequence ("horizons").begin ();
-  const vector<const AttributeList*>::const_iterator end 
-    = al.alist_sequence ("horizons").end ();
-
-  if (layer != end)
-    {
-      const Horizon* hor 
-	= &Librarian<Horizon>::create ((*layer)->alist ("horizon"));
-      // double last = 0.0;
-      for (unsigned int i = 0; i < size (); i++)
-	{
-	  double zpls = zplus (i);
-	  if (zpls < (*layer)->number ("end"))
-	    {
-	      layer++;
-	      assert (layer != end);
-	      hor = &Librarian<Horizon>::create ((*layer)->alist ("horizon"));
-	    }
-	  horizon_.push_back (hor);
-	  // last = zpls;
-	}
-      horizon_.push_back (hor);
-    }
-};
+    impl (*new Implementation (al)),
+    horizon_ (impl.make_horizons (*this))
+{ };
 
 Soil::~Soil ()
-{ }
+{ delete &impl; }
 
 static Submodel::Register 
 soil_submodel ("Soil", Soil::load_syntax);

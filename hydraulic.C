@@ -1,17 +1,20 @@
 // hydraulic.C
 
 #include "hydraulic.h"
-#include "library.h"
-#include "alist.h"
-#include "syntax.h"
 #include "csmp.h"
-#include <vector>
-#include <map>
+#include "log.h"
 
-bool 
-Hydraulic::compact () const
+void 
+Hydraulic::set_porosity (double Theta)
+{ 
+  assert (Theta > Theta_res);
+  Theta_sat = Theta; 
+}
+
+void 
+Hydraulic::output (Log& log) const
 {
-  return false;
+  log.output ("Theta_sat", Theta_sat); 
 }
 
 void
@@ -65,7 +68,7 @@ void
 Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("Theta_sat", "cm^3 H2O/cm^3", Syntax::Const,
+  syntax.add ("Theta_sat", "cm^3 H2O/cm^3", Syntax::State,
 	      "Saturation point.");
   syntax.add ("Theta_res", "cm^3 H2O/cm^3", Syntax::Const,
 	      "Soil residual water.");
@@ -73,7 +76,8 @@ Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Hydraulic::Hydraulic (const AttributeList& al)
-  : Theta_sat (al.number ("Theta_sat")),
+  : name (al.name ("type")),
+    Theta_sat (al.number ("Theta_sat")),
     Theta_res (al.number ("Theta_res"))
 { }
 

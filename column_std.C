@@ -45,7 +45,7 @@ private:
   // Actions.
 public:
   void sow (const AttributeList& al)
-    { vegetation.sow (al, soil, organic_matter); }
+  { vegetation.sow (al, soil, organic_matter); }
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
   void fertilize (const AttributeList&);
@@ -57,22 +57,24 @@ public:
 				  double stem_harvest,
 				  double leaf_harvest, 
 				  double sorg_harvest)
-    { return vegetation.harvest (name, crop_name, time, soil, organic_matter,
-				 bioclimate,
-				 stub_length, 
-				 stem_harvest, leaf_harvest, sorg_harvest); }
+  { return vegetation.harvest (name, crop_name, time, soil, organic_matter,
+			       bioclimate,
+			       stub_length, 
+			       stem_harvest, leaf_harvest, sorg_harvest); }
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
+  void set_porosity (double at, double Theta);
   void spray (const string& chemical, double amount) // [g/ha]
-    { bioclimate.spray (chemical, amount / (100.0 * 100.0) /* ha->m^2 */); }
-
+  { bioclimate.spray (chemical, amount / (100.0 * 100.0) /* ha->m^2 */); }
+  void set_surface_detention_capacity (double height) // [mm]
+  { surface.set_detention_capacity (height); }
   // Conditions.
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double  crop_ds (const string& name) const // {[-1:2], Crop::DSremove}
-    { return vegetation.DS_by_name (name); }
+  { return vegetation.DS_by_name (name); }
   double crop_dm (const string& name) const // [kg/ha], negative when no crop
-    { return vegetation.DM_by_name (name); }
+  { return vegetation.DM_by_name (name); }
 
   // Simulation.
 public:
@@ -85,70 +87,70 @@ public:
 
   // Communication with external model.
   unsigned int count_layers () const // Number of num. layers.
-    { return soil.size (); }
+  { return soil.size (); }
   double get_dz (unsigned int i) const // Size of layer `i'. [cm]
-    { return soil.dz (i); }
+  { return soil.dz (i); }
   void put_water_pressure (const vector<double>& v) // [cm]
-    { soil_water.put_h (soil, v); }
+  { soil_water.put_h (soil, v); }
   void get_water_sink (vector<double>& v) const // [cm^3/cm^3/h]
-    { soil_water.get_sink (v); }
+  { soil_water.get_sink (v); }
   void put_no3_m (const vector<double>& v) // [g/cm^3]
-    { soil_NO3.put_M (soil, soil_water, v); }
+  { soil_NO3.put_M (soil, soil_water, v); }
   void get_no3_m (vector<double>& v) const // [g/cm^3]
-    { 
-      const unsigned int size = soil.size ();
+  { 
+    const unsigned int size = soil.size ();
 
-      v.erase (v.begin (), v.end ());
-      for (unsigned int i = 0; i < size; i++)
-	v.push_back (soil_NO3.M (i));
-    }
+    v.erase (v.begin (), v.end ());
+    for (unsigned int i = 0; i < size; i++)
+      v.push_back (soil_NO3.M (i));
+  }
   double get_evap_interception () const // [mm/h]
-    { return bioclimate.get_evap_interception (); }
+  { return bioclimate.get_evap_interception (); }
   double get_intercepted_water () const // [mm]
-    { return bioclimate.get_intercepted_water (); }
+  { return bioclimate.get_intercepted_water (); }
   double get_net_throughfall () const // [mm/h]
-    { return bioclimate.get_net_throughfall (); }
+  { return bioclimate.get_net_throughfall (); }
   double get_snow_storage () const // [mm]
-    { return bioclimate.get_snow_storage (); }
+  { return bioclimate.get_snow_storage (); }
   double get_exfiltration () const // [mm/h]
-    { return surface.exfiltration (); }
+  { return surface.exfiltration (); }
   double get_evap_soil_surface () const // [mm/h]
-    { return surface.evap_soil_surface (); }
+  { return surface.evap_soil_surface (); }
   void put_ponding (double pond)	// [mm]
-    { surface.put_ponding (pond); }
+  { surface.put_ponding (pond); }
   void put_surface_no3 (double no3) // [g/cm^2]
-    { surface.put_no3 (no3); }
+  { surface.put_no3 (no3); }
   double get_surface_no3 () const // [g/cm^2]
-    { return surface.get_no3 (); }
+  { return surface.get_no3 (); }
   void put_surface_chemical (const string& name, double amount) // [g/cm^2]
-    { surface.put_chemical (name, amount); }
+  { surface.put_chemical (name, amount); }
   double get_surface_chemical (const string& name) const // [g/cm^2]
-    { return surface.get_chemical (name); }
+  { return surface.get_chemical (name); }
   double get_smb_c_at (unsigned int i) const //[g C/cm³]
-    { return organic_matter.get_smb_c_at (i); }
+  { return organic_matter.get_smb_c_at (i); }
   double get_co2_production_at (unsigned int i) const // [g C/cm³]
-    { return organic_matter.CO2 (i); }
+  { return organic_matter.CO2 (i); }
   double get_temperature_at (unsigned int i) const // [°C]
-    { return soil_heat.T (i); }
+  { return soil_heat.T (i); }
   double get_crop_h2o_uptake_at (unsigned int i) const // [cm³/cm³/h]
-    { 
-      vector<double> v;
-      soil_water.get_sink (v);
-      assert (v.size () > i);
-      return v[i];
-    }
+  { 
+    vector<double> v;
+    soil_water.get_sink (v);
+    assert (v.size () > i);
+    return v[i];
+  }
   double get_water_content_at (unsigned int i) const // [cm³/cm³]
-    { return soil_water.Theta (i); }
+  { return soil_water.Theta (i); }
 
   // Create and Destroy.
 public:
   Column& clone (const string& name) const
-    { 
-      AttributeList new_alist (alist);
-      // BUG: TODO: Log state of `this' to new_alist.
-      new_alist.add ("type", name);
-      return *new ColumnStandard (new_alist); 
-    }
+  { 
+    AttributeList new_alist (alist);
+    // BUG: TODO: Log state of `this' to new_alist.
+    new_alist.add ("type", name);
+    return *new ColumnStandard (new_alist); 
+  }
   ColumnStandard (const AttributeList&);
   void initialize (const Time& time, const Weather& weather);
   ~ColumnStandard ();
@@ -236,6 +238,10 @@ ColumnStandard::swap (const Time& time, double from, double middle, double to)
   soil_NH4.swap (soil, soil_water, from, middle, to);
   organic_matter.swap (soil, from, middle, to);
 }
+
+void 
+ColumnStandard::set_porosity (double at, double Theta)
+{ soil.set_porosity (soil.interval_plus (at), Theta); }
 
 double 
 ColumnStandard::soil_temperature (double height) const
@@ -325,9 +331,7 @@ ColumnStandard::output (Log& log) const
   log.open_geometry (soil);
   output_derived (bioclimate, "Bioclimate", log);
   output_submodule (surface, "Surface", log);
-#if 0
   output_submodule (soil, "Soil", log);
-#endif
   output_submodule (soil_water, "SoilWater", log);
   output_submodule (soil_heat, "SoilHeat", log);
   output_submodule (soil_NH4, "SoilNH4", log);
@@ -415,7 +419,7 @@ static struct ColumnStandardSyntax
 		"The water and energy distribution among the crops.");
     add_submodule<Surface> ("Surface", syntax, alist, Syntax::State,
 			    "The upper border of the soil.");
-    add_submodule<Soil> ("Soil", syntax, alist, Syntax::Const, 
+    add_submodule<Soil> ("Soil", syntax, alist, Syntax::State,
 			 "The numeric and physical soil properties.");
     add_submodule<SoilWater> ("SoilWater", syntax, alist, Syntax::State,
 			      "Soil water content and transportation.");
