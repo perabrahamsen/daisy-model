@@ -12,6 +12,19 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.02
+
+** You can now check on temperature sums.
+
+To sow spring barley after the temperature sum reaches 110 dg C d,
+write:
+
+    (wait (TSum_above 110))
+    (sow SpringBarley)
+
+TSum is the sum of the daily average air temperature, ignoring frosty
+days.  By default, it is reset March 1 every year.  
+
 * 2.01
 
 ** New root density models

@@ -28,6 +28,9 @@ struct ActionRepeat : public Action
   const AttributeList repeat;
   Action* action;
 
+  void tick (const Daisy& daisy)
+  { action->tick (daisy); }
+    
   void doIt (Daisy& daisy)
   { 
     if (action && action->done (daisy))

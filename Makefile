@@ -251,7 +251,8 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
+MODELS = condition_weather.C \
+	rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
 	action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
@@ -605,9 +606,9 @@ pmain${OBJ}: pmain.C
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
 rootdens${OBJ}: rootdens.C rootdens.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h
+ alist.h syntax.h treelog.h check.h
 select${OBJ}: select.C select.h condition.h librarian.h library.h common.h \
- alist.h syntax.h treelog.h geometry.h
+ alist.h syntax.h treelog.h geometry.h check.h
 average${OBJ}: average.C average.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h
 mactrans${OBJ}: mactrans.C mactrans.h librarian.h library.h common.h \
@@ -691,7 +692,7 @@ root_system${OBJ}: root_system.C root_system.h rootdens.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h submodel.h soil_heat.h \
  soil_NH4.h solute.h adsorption.h transport.h mactrans.h soil_NO3.h \
  soil_water.h macro.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h log.h mathlib.h message.h
+ geometry.h log.h check.h mathlib.h message.h
 ridge${OBJ}: ridge.C ridge.h soil.h horizon.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h hydraulic.h tortuosity.h \
  geometry.h plf.h submodel.h mathlib.h log.h soil_water.h macro.h
@@ -803,7 +804,7 @@ traverse${OBJ}: traverse.C traverse.h library.h common.h syntax.h \
 treelog${OBJ}: treelog.C treelog.h
 treelog_stream${OBJ}: treelog_stream.C treelog_stream.h treelog.h common.h
 tmpstream${OBJ}: tmpstream.C tmpstream.h common.h
-lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h time.h
+lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h
 lexer${OBJ}: lexer.C lexer.h tmpstream.h common.h treelog.h path.h
 daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h im.h groundwater.h uzmodel.h \
@@ -828,8 +829,14 @@ cdaisy${OBJ}: cdaisy.C syntax.h common.h treelog.h alist.h daisy.h \
 common${OBJ}: common.C common.h message.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
+condition_weather${OBJ}: condition_weather.C condition.h librarian.h \
+ library.h common.h alist.h syntax.h treelog.h field.h daisy.h check.h \
+ log.h tmpstream.h
+rootdens_PLF${OBJ}: rootdens_PLF.C rootdens.h librarian.h library.h \
+ common.h alist.h syntax.h treelog.h geometry.h plf.h check.h \
+ mathlib.h
 rootdens_G_P${OBJ}: rootdens_G_P.C rootdens.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h geometry.h
+ common.h alist.h syntax.h treelog.h geometry.h check.h message.h
 groundwater_file${OBJ}: groundwater_file.C groundwater.h uzmodel.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h \
  lexer_data.h lexer.h
@@ -1101,7 +1108,6 @@ action_divide${OBJ}: action_divide.C action.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h daisy.h field.h message.h
 action_surface${OBJ}: action_surface.C action.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h daisy.h field.h check.h message.h
-set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h time.h syntax.h common.h treelog.h alist.h \
  library.h treelog_stream.h options.h message.h
 tkmain${OBJ}: tkmain.C daisy.h time.h syntax.h common.h treelog.h alist.h \

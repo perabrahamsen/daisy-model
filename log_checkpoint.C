@@ -52,6 +52,7 @@ bool
 LogCheckpoint::match (const Daisy& daisy)
 {
   assert (nested == 0);
+  condition.tick (daisy);
   is_active = condition.match (daisy);
   if (is_active)
     {

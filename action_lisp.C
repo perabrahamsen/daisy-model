@@ -29,87 +29,97 @@
 struct ActionNil : public Action
 {
   void doIt (Daisy&)
-    { }
+  { }
 
   ActionNil (const AttributeList& al)
     : Action (al)
-    { }
+  { }
 };
 
 struct ActionT : public Action
 {
   void doIt (Daisy&)
-    { }
+  { }
 
   bool done (const Daisy&) const
-    { return false; }
+  { return false; }
 
   ActionT (const AttributeList& al)
     : Action (al)
-    { }
+  { }
 };
 
 struct ActionProgn : public Action
 {
   vector<Action*>& actions;
 
+  void tick (const Daisy& daisy)
+  { 
+    for (vector<Action*>::iterator i = actions.begin ();
+	 i != actions.end ();
+	 i++)
+      {
+	(*i)->tick (daisy);
+      }
+  }
+
   void doIt (Daisy& daisy)
-    { 
-      for (vector<Action*>::iterator i = actions.begin ();
-	   i != actions.end ();
-	   i++)
-	{
-	  (*i)->doIt (daisy);
-	}
-    }
+  { 
+    for (vector<Action*>::iterator i = actions.begin ();
+	 i != actions.end ();
+	 i++)
+      {
+	(*i)->doIt (daisy);
+      }
+  }
 
   void output (Log& log) const
-    { 
-      output_list (actions, "actions", log,
-		   Librarian<Action>::library ());
-    }
+  { 
+    output_list (actions, "actions", log,
+		 Librarian<Action>::library ());
+  }
 
   bool check (const Daisy& daisy, Treelog& err) const
-    { 
-      bool ok = true;
-      for (vector<Action*>::const_iterator i = actions.begin ();
-	   i != actions.end ();
-	   i++)
-	{
-	  if (!(*i)->check (daisy, err))
-	    ok = false;
-	}
-      return ok;
-    }
+  { 
+    bool ok = true;
+    for (vector<Action*>::const_iterator i = actions.begin ();
+	 i != actions.end ();
+	 i++)
+      {
+	if (!(*i)->check (daisy, err))
+	  ok = false;
+      }
+    return ok;
+  }
 
   ActionProgn (const AttributeList& al)
     : Action (al),
       actions (map_create<Action> (al.alist_sequence ("actions")))
-    { }
+  { }
 
   ~ActionProgn ()
-    { 
-      sequence_delete (actions.begin (), actions.end ());
-      delete &actions;
-    }
+  { 
+    sequence_delete (actions.begin (), actions.end ());
+    delete &actions;
+  }
 };
 
 struct clause
 {
-  const Condition* condition;
+  Condition* condition;
   vector<Action*> actions;
   void output (Log& log) const
-    { 
-      output_derived (*condition, "condition", log);
-      output_list (actions, "actions", log, Librarian<Action>::library ());
-    }
-  clause (const Condition* c, vector<Action*>& a) 
+  { 
+    output_derived (*condition, "condition", log);
+    output_list (actions, "actions", log, Librarian<Action>::library ());
+  }
+  clause (Condition* c, vector<Action*>& a) 
     : condition (c),
       actions (a)
-    { }
+  { }
   clause ()
     : condition (NULL)
-    { }
+  { }
 };
 
 #ifdef BORLAND_TEMPLATES
@@ -124,7 +134,7 @@ vector<clause>& make_clauses (const vector<AttributeList*>& s)
        i != s.end ();
        i++)
     {
-      const Condition& condition 
+      Condition& condition 
 	= Librarian<Condition>::create ((*i)->alist ("condition"));
       vector<Action*> actions 
 	= map_create<Action> ((*i)->alist_sequence ("actions"));
@@ -137,131 +147,152 @@ struct ActionCond : public Action
 {
   vector<clause>& clauses;
 
+  void tick (const Daisy& daisy)
+  { 
+    for (vector<clause>::iterator i = clauses.begin (); 
+	 i != clauses.end ();
+	 i++)
+      {
+	(*i).condition->tick (daisy);
+	vector<Action*>& actions = (*i).actions;
+	for (unsigned int j = 0; j < actions.size (); j++)
+	  actions[j]->tick (daisy);
+      }
+  }
+
   void doIt (Daisy& daisy)
-    { 
-      for (vector<clause>::iterator i = clauses.begin (); 
-	   i != clauses.end ();
-	   i++)
-	{
-	  if ((*i).condition->match (daisy))
-	    {
-	      vector<Action*>& actions = (*i).actions;
-	      for (unsigned int j = 0; j < actions.size (); j++)
-		actions[j]->doIt (daisy);
-	      break;
-	    }
-	}
-    }
+  { 
+    for (vector<clause>::iterator i = clauses.begin (); 
+	 i != clauses.end ();
+	 i++)
+      {
+	if ((*i).condition->match (daisy))
+	  {
+	    vector<Action*>& actions = (*i).actions;
+	    for (unsigned int j = 0; j < actions.size (); j++)
+	      actions[j]->doIt (daisy);
+	    break;
+	  }
+      }
+  }
+
   void output (Log& log) const
-    { 
-      if (log.check ("clauses"))
-	{
-	  log.open ("clauses");
-	  for (vector<clause>::const_iterator item = clauses.begin ();
-	       item != clauses.end ();
-	       item++)
-	    {
-	      Log::Unnamed unnamed (log);
-	      (*item).output (log);
-	    }
-	  log.close ();
-	}
-    }
+  { 
+    if (log.check ("clauses"))
+      {
+	log.open ("clauses");
+	for (vector<clause>::const_iterator item = clauses.begin ();
+	     item != clauses.end ();
+	     item++)
+	  {
+	    Log::Unnamed unnamed (log);
+	    (*item).output (log);
+	  }
+	log.close ();
+      }
+  }
 
   bool check (const Daisy& daisy, Treelog& err) const
-    { 
-      bool ok = true;
-      for (vector<clause>::const_iterator i = clauses.begin (); 
-	   i != clauses.end ();
-	   i++)
-	{
-	  const vector<Action*>& actions = (*i).actions;
-	  for (unsigned int j = 0; j < actions.size (); j++)
-	    if (!actions[j]->check (daisy, err))
-	      ok = false;
-	}
-      return ok;
-    }
+  { 
+    bool ok = true;
+    for (vector<clause>::const_iterator i = clauses.begin (); 
+	 i != clauses.end ();
+	 i++)
+      {
+	const vector<Action*>& actions = (*i).actions;
+	for (unsigned int j = 0; j < actions.size (); j++)
+	  if (!actions[j]->check (daisy, err))
+	    ok = false;
+      }
+    return ok;
+  }
 
   ActionCond (const AttributeList& al)
     : Action (al),
       clauses (make_clauses (al.alist_sequence ("clauses")))
-    { }
+  { }
 
   ~ActionCond ()
-    { 
-      for (vector<clause>::const_iterator i = clauses.begin (); 
-	   i != clauses.end ();
-	   i++)
-	{
+  { 
+    for (vector<clause>::const_iterator i = clauses.begin (); 
+	 i != clauses.end ();
+	 i++)
+      {
 #ifdef CONST_DELETE
-	  delete (*i).condition;
+	delete (*i).condition;
 #endif
-	}
-      delete &clauses;
-    }
+      }
+    delete &clauses;
+  }
 };
 
 struct ActionIf : public Action
 {
-  const Condition& if_c;
+  Condition& if_c;
   Action& then_a;
   Action& else_a;
 
+  void tick (const Daisy& daisy)
+  { 
+    if_c.tick (daisy);
+    then_a.tick (daisy);
+    else_a.tick (daisy);
+  }
+
   void doIt (Daisy& daisy)
-    { 
-      if (if_c.match (daisy))
-	then_a.doIt (daisy);
-      else
-	else_a.doIt (daisy);
-    }
+  { 
+    if (if_c.match (daisy))
+      then_a.doIt (daisy);
+    else
+      else_a.doIt (daisy);
+  }
 
   void output (Log& log) const
-    { 
-      output_derived (if_c, "if", log);
-      output_derived (then_a, "then", log);
-      output_derived (else_a, "else", log);
-    }
+  { 
+    output_derived (if_c, "if", log);
+    output_derived (then_a, "then", log);
+    output_derived (else_a, "else", log);
+  }
 
   bool check (const Daisy& daisy, Treelog& err) const
-    { 
-      bool ok = true; 
-      if (!then_a.check (daisy, err))
-	ok = false;
-      if (!else_a.check (daisy, err))
-	ok = false;
-      return ok;
-    }
+  { 
+    bool ok = true; 
+    if (!then_a.check (daisy, err))
+      ok = false;
+    if (!else_a.check (daisy, err))
+      ok = false;
+    return ok;
+  }
 
   ActionIf (const AttributeList& al)
     : Action (al),
       if_c (Librarian<Condition>::create (al.alist ("if"))),
       then_a (Librarian<Action>::create (al.alist ("then"))),
       else_a (Librarian<Action>::create (al.alist ("else")))
-    { }
+  { }
 
   ~ActionIf ()
-    { 
+  { 
 #ifdef CONST_DELETE
-      delete &if_c;
+    delete &if_c;
 #endif
-      delete &then_a;
-      delete &else_a;
-    }
+    delete &then_a;
+    delete &else_a;
+  }
 };
 
 static struct ActionLispSyntax
 {
   static Action& make_nil (const AttributeList& al)
-    { return *new ActionNil (al); }
+  { return *new ActionNil (al); }
   static Action& make_t (const AttributeList& al)
-    { return *new ActionT (al); }
+  { return *new ActionT (al); }
   static Action& make_progn (const AttributeList& al)
-    { return *new ActionProgn (al); }
+  { return *new ActionProgn (al); }
   static Action& make_cond (const AttributeList& al)
-    { return *new ActionCond (al); }
+  { return *new ActionCond (al); }
   static Action& make_if (const AttributeList& al)
-    { return *new ActionIf (al); }
+  { return *new ActionIf (al); }
   ActionLispSyntax ();
 } ActionLisp_syntax;
 

@@ -65,6 +65,7 @@ struct Field::Implementation
 
   // Conditions.
 public:
+  double daily_air_temperature () const; // [ dg C]
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]
@@ -330,6 +331,17 @@ Field::Implementation::set_surface_detention_capacity (double height) // [mm]
 	    i != columns.end ();
 	    i++)
     (*i)->set_surface_detention_capacity (height);
+}
+
+double 
+Field::Implementation::daily_air_temperature () const // [ dg C ]
+{
+  if (selected)
+    return selected->daily_air_temperature (); 
+  if (columns.size () != 1)
+    throw ("Cannot find daily air_temperatur for multiple columns");
+
+  return columns[0]->daily_air_temperature ();
 }
 
 double 
@@ -628,7 +640,11 @@ Field::set_surface_detention_capacity (double height) // [mm]
 { impl.set_surface_detention_capacity (height); }
 
 double 
-Field::soil_temperature (double height) const  // [ cm -> dg C]
+Field::daily_air_temperature () const  // [dg C]
+{ return impl.daily_air_temperature (); }
+
+double 
+Field::soil_temperature (double height) const  // [cm -> dg C]
 { return impl.soil_temperature (height); }
 
 double 

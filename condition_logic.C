@@ -27,166 +27,194 @@
 struct ConditionFalse : public Condition
 {
   bool match (const Daisy&) const
-    { return false; }
+  { return false; }
   void output (Log&) const
-    { }
+  { }
 
   ConditionFalse (const AttributeList& al)
     : Condition (al)
-    { }
+  { }
 
   ~ConditionFalse ()
-    { }
+  { }
 };
 
 struct ConditionTrue : public Condition
 {
   bool match (const Daisy&) const
-    { return true; }
+  { return true; }
   void output (Log&) const
-    { }
+  { }
 
   ConditionTrue (const AttributeList& al)
     : Condition (al)
-    { }
+  { }
 
   ~ConditionTrue ()
-    { }
+  { }
 };
 
 struct ConditionOr : public Condition
 {
-  const vector<const Condition*>& conditions;
+  const vector<Condition*>& conditions;
 
+  void tick (const Daisy& daisy)
+  {
+    for (vector<Condition*>::const_iterator i = conditions.begin ();
+	 i != conditions.end ();
+	 i++)
+      {
+	(*i)->tick (daisy);
+      }
+  }
   bool match (const Daisy& daisy) const
-    {
-      for (vector<const Condition*>::const_iterator i = conditions.begin ();
-	   i != conditions.end ();
-	   i++)
-	{
-	  if ((*i)->match (daisy))
-	    return true;
-	}
-      return false;
-    }
+  {
+    for (vector<Condition*>::const_iterator i = conditions.begin ();
+	 i != conditions.end ();
+	 i++)
+      {
+	if ((*i)->match (daisy))
+	  return true;
+      }
+    return false;
+  }
   void output (Log&) const
-    { }
+  { }
 
   ConditionOr (const AttributeList& al)
     : Condition (al),
-      conditions (map_create_const<Condition> (al.alist_sequence ("operands")))
-    { }
+      conditions (map_create<Condition> (al.alist_sequence ("operands")))
+  { }
 
   ~ConditionOr ()
-    {
+  {
 #ifdef CONST_DELETE
-      sequence_delete (conditions.begin (), conditions.end ());
+    sequence_delete (conditions.begin (), conditions.end ());
 #endif
-      delete &conditions;
-    }
+    delete &conditions;
+  }
 };
 
 struct ConditionAnd : public Condition
 {
-  const vector<const Condition*>& conditions;
+  const vector<Condition*>& conditions;
 
+  void tick (const Daisy& daisy)
+  {
+    for (vector<Condition*>::const_iterator i = conditions.begin ();
+	 i != conditions.end ();
+	 i++)
+      {
+	(*i)->tick (daisy);
+      }
+  }
   bool match (const Daisy& daisy) const
-    {
-      for (vector<const Condition*>::const_iterator i = conditions.begin ();
-	   i != conditions.end ();
-	   i++)
-	{
-	  if (!(*i)->match (daisy))
-	    return false;
-	}
-      return true;
-    }
+  {
+    for (vector<Condition*>::const_iterator i = conditions.begin ();
+	 i != conditions.end ();
+	 i++)
+      {
+	if (!(*i)->match (daisy))
+	  return false;
+      }
+    return true;
+  }
   void output (Log&) const
-    { }
+  { }
 
   ConditionAnd (const AttributeList& al)
     : Condition (al),
-      conditions (map_create_const<Condition> (al.alist_sequence ("operands")))
-    { }
+      conditions (map_create<Condition> (al.alist_sequence ("operands")))
+  { }
 
   ~ConditionAnd ()
-    {
+  {
 #ifdef CONST_DELETE
-      sequence_delete (conditions.begin (), conditions.end ());
+    sequence_delete (conditions.begin (), conditions.end ());
 #endif
-      delete &conditions;
-    }
+    delete &conditions;
+  }
 };
 
 struct ConditionNot : public Condition
 {
-  const Condition& condition;
+  Condition& condition;
 
   bool match (const Daisy& daisy) const
-    { return !condition.match (daisy); }
+  { return !condition.match (daisy); }
+
+  void tick (const Daisy& daisy)
+  { condition.tick (daisy); }
+
   void output (Log&) const
-    { }
+  { }
 
   ConditionNot (const AttributeList& al)
     : Condition (al),
       condition (Librarian<Condition>::create (al.alist ("operand")))
-    { }
+  { }
 
   ~ConditionNot ()
-    {
+  {
 #ifdef CONST_DELETE
-      delete &condition; 
+    delete &condition; 
 #endif
-    }
+  }
 };
 
 struct ConditionIf : public Condition
 {
-  const Condition& if_c;
-  const Condition& then_c;
-  const Condition& else_c;
+  Condition& if_c;
+  Condition& then_c;
+  Condition& else_c;
 
+  void tick (const Daisy& daisy)
+  { 
+    if_c.tick (daisy);
+    then_c.tick (daisy);
+    else_c.tick (daisy);
+  }
   bool match (const Daisy& daisy) const
-    { 
-      if (if_c.match (daisy))
-	return then_c.match (daisy);
-      else
-	return else_c.match (daisy); 
-    }
+  { 
+    if (if_c.match (daisy))
+      return then_c.match (daisy);
+    else
+      return else_c.match (daisy); 
+  }
   void output (Log&) const
-    { }
+  { }
 
   ConditionIf (const AttributeList& al)
     : Condition (al),
       if_c (Librarian<Condition>::create (al.alist ("if"))),
       then_c (Librarian<Condition>::create (al.alist ("then"))),
       else_c (Librarian<Condition>::create (al.alist ("else")))
-    { }
+  { }
 
   ~ConditionIf ()
-    {
+  {
 #ifdef CONST_DELETE
-      delete &if_c;
-      delete &then_c;
-      delete &else_c;
+    delete &if_c;
+    delete &then_c;
+    delete &else_c;
 #endif
-    }
+  }
 };
 
 static struct ConditionLogicSyntax
 {
   static Condition& make_false (const AttributeList& al)
-    { return *new ConditionFalse (al); }
+  { return *new ConditionFalse (al); }
   static Condition& make_true (const AttributeList& al)
-    { return *new ConditionTrue (al); }
+  { return *new ConditionTrue (al); }
   static Condition& make_or (const AttributeList& al)
-    { return *new ConditionOr (al); }
+  { return *new ConditionOr (al); }
   static Condition& make_and (const AttributeList& al)
-    { return *new ConditionAnd (al); }
+  { return *new ConditionAnd (al); }
   static Condition& make_not (const AttributeList& al)
-    { return *new ConditionNot (al); }
+  { return *new ConditionNot (al); }
   static Condition& make_if (const AttributeList& al)
-    { return *new ConditionIf (al); }
+  { return *new ConditionIf (al); }
   ConditionLogicSyntax ();
 } ConditionLogic_syntax;
 

@@ -55,6 +55,7 @@ LogSelect::check_derived (const string& field, const string& /* name */,
 bool 
 LogSelect::match (const Daisy& daisy)
 {
+  condition.tick (daisy);
   is_printing = condition.match (daisy);
   is_active = is_printing;
 

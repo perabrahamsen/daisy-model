@@ -247,7 +247,10 @@ struct LogEntry
       assert (last_valid_path_index == 0U);
 
       if (condition)
-	is_active = condition->match (daisy);
+	{
+	  condition->tick (daisy);
+	  is_active = condition->match (daisy);
+	}
       else
 	is_active = is_printing;
       return is_active;
@@ -373,6 +376,7 @@ struct LogTable1 : public Log
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy)
     {
+      condition.tick (daisy);
       is_printing = condition.match (daisy);
       is_active = is_printing;
 

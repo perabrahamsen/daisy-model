@@ -205,6 +205,7 @@ struct ActionCrop : public Action
   int irrigation_delay;
 
   // Simulation.
+  void tick (const Daisy&);
   void doIt (Daisy&);
   bool done (const Daisy&) const;
   void output (Log&) const;
@@ -272,6 +273,15 @@ ActionCrop::MM_DD::MM_DD (const AttributeList& al)
 
 ActionCrop::MM_DD::~MM_DD ()
 { }
+
+void 
+ActionCrop::tick (const Daisy& daisy)
+{ 
+  for (vector<const Tillage*>::const_iterator i = tillage.begin ();
+       i != tillage.end ();
+       i++)
+    (*i)->operation.tick (daisy);
+}
 
 void 
 ActionCrop::Sow::doIt (Daisy& daisy)

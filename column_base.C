@@ -132,6 +132,10 @@ ColumnBase::set_surface_detention_capacity (double height) // [mm]
 { surface.set_detention_capacity (height); }
 
 double 
+ColumnBase::daily_air_temperature () const
+{ return bioclimate.daily_air_temperature (); }
+
+double 
 ColumnBase::soil_temperature (double height) const
 {
   assert (height < 0);

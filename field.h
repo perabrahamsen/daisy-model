@@ -82,6 +82,7 @@ public:
 
   // Conditions.
 public:
+  double daily_air_temperature () const; // [ dg C]
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double soil_inorganic_nitrogen (double from, double to) const; // [kg N/ha]

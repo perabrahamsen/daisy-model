@@ -31,6 +31,10 @@ whether the water pressure in a specific depth is above a given\n\
 threshold.  Logic conditions like 'and' and 'or' can be used for\n\
 testing whether multiple conditions are fulfilled simultaneously.";
 
+void
+Condition::tick (const Daisy&)
+{ }
+
 const string
 Condition::timestep ()
 { return "dt"; } 

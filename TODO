@@ -1,18 +1,22 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* GCC 
+* ConditionTemperatureSum
 
-* Rodfordeling.
+* Phospher
 
-- DS -> (Dybde -> Mål)
+** Transform component
 
-- DS -> ([0-1] -> Mål)
+** TransformEquilibrium model
 
-- Dybde -> (Dybde -> Mål)
+** Equilibrium component
+
+** Equilibrium Langmuir model
+
+** Pedotransfer component
+
+* Allow specifying dimensions for numbers in the file parser.
 
 * Make it possible to log a specific entry in an array of unnamed objects.
-
-* Adsorption
 
 * Check dræn + makro porer, specielt makroporer ned i grundvand.
 

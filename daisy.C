@@ -106,6 +106,8 @@ Daisy::tick_columns ()
 void
 Daisy::tick_logs ()
 {
+  activate_output.tick (*this);
+
   if (activate_output.match (*this))
     {
       for (unsigned int i = 0; i < logs.size (); i++)
@@ -134,6 +136,7 @@ Daisy::tick ()
 { 
   if (weather)
     weather->tick (time);
+  action.tick (*this);
   action.doIt (*this);
 
   tick_columns ();

@@ -1,3 +1,32 @@
+2002-01-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.02 released.
+
+2002-01-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_base.C, column_base.h, column.h (daily_air_temperatur):
+	New member function. 
+	* field.C, field.h (daily_air_temperatur): New member function.
+	* condition.h, condition.C (tick): New virtual member function.
+	* condition_logic.C (ConditionOr::tick, ConditionAnd::tick,
+	ConditionNot::tick, ConditionIf::tick): Define it.
+	* action.h, action.C (tick): New virtual member function.
+	* action_activity.C (tick): Define it.
+	* action_crop.C (tick): Ditto.
+	* action_lisp.C (ActionProgn::tick, ActionCond::tick,
+	ActionIf::tick): Ditto.
+	* action_message.C (tick): Ditto.
+	* action_repeat.C (tick): Ditto.
+	* action_wait.C (ActionWait::tick): Ditto.
+	* action_while.C (tick): Ditto.
+	* action_with.C (tick): Ditto.
+	* daisy.C (tick): Call it.
+	* log_checkpoint.C (match): Ditto.
+	* log_select.C (match): Ditto.
+	* log_table1.C (LogTable1::match, LogEntry::match): Dittto.
+	* select.C (match): Ditto.
+	* condition_weather.C (TSum): New model.
+
 2001-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.01 released.

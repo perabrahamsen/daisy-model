@@ -172,6 +172,31 @@ bool approximate (const double a, const double b, const double noise)
 //   abort ();
 // }
 
+#if 0
+// A GNU extension, requires a new glibc.
+#include <fenv.h>
+
+struct set_gnu99_exceptions
+{
+  set_gnu99_exceptions ()
+  {
+    int rc;
+#ifdef FE_DIVBYZERO
+    rc = feenableexcept (FE_DIVBYZERO);
+    assert (rc);
+#endif
+#ifdef FE_OVERFLOW
+    rc = feenableexcept (FE_OVERFLOW);
+    assert (rc);
+#endif
+#ifdef FE_INVALID
+    rc = feenableexcept (FE_INVALID);
+    assert (rc);
+#endif
+  }
+}  set_gnu99_exceptions_dummy;
+#endif
+
 #ifdef __sparc__
 
 #include <sys/fsr.h>
@@ -210,3 +235,4 @@ set_exceptions:
 
 */
 #endif /* __sparc */
+

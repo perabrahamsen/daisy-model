@@ -120,7 +120,10 @@ struct Select::Implementation
     assert (last_valid_path_index == 0U);
 
     if (condition)
-      is_active = condition->match (daisy);
+      {
+	condition->tick (daisy);
+	is_active = condition->match (daisy);
+      }
     else
       is_active = is_printing;
     return is_active;
