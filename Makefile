@@ -27,8 +27,8 @@ WWWINDEX = /home/user_32/daisy/.public_html/index.html
 #
 ifeq ($(OS),Windows_NT)
 	ifeq ($(OSTYPE),cygwin)
-#		HOSTTYPE = cygwin
-		HOSTTYPE = mingw
+		HOSTTYPE = cygwin
+#		HOSTTYPE = mingw
 	else
 		HOSTTYPE = win32
 	endif
@@ -112,8 +112,8 @@ ifeq ($(COMPILER),gcc)
 		DEBUG = 
 	endif
 	ifeq ($(HOSTTYPE),mingw)
-		OSFLAGS = -DMINGW -mno-cygwin \
-		          -I/home/mingw/include -L/home/mingw/lib
+		OSFLAGS = -DMINGW -mno-cygwin
+#		          -I/home/mingw/include -L/home/mingw/lib
 		DEBUG =
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
