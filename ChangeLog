@@ -4,6 +4,10 @@
 
 2003-02-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.47 released.
+
+2003-02-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* parser_file.C (load_list): Be more strict with parentheses.
 	* txt/introduction.tex (subsection{Management}): Fixed example.
 

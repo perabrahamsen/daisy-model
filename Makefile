@@ -596,6 +596,8 @@ dist:	cvs
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
+
+foo:
 	(cd txt; $(MAKE) FTPDIR=$(FTPDIR) dist)
 	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
 	rm -f $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe
