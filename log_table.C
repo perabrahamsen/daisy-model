@@ -509,6 +509,6 @@ String to print between array entries.");
 		  "Summaries for this log file.");
       alist.add ("summary", vector<AttributeList*> ());
       Librarian<Log>::add_type ("table", alist, syntax, &make);
-      Librarian<Log>::library ().add_doc_fun (document_entries);
+      Librarian<Log>::library ().add_doc_fun (LogSelect::document_entries);
     }
 } LogTable_syntax;

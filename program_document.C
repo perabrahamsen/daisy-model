@@ -32,6 +32,29 @@
 #include <iostream>
 #include <memory>
 
+static bool 
+has_interesting_description (const Library& library, 
+                             const AttributeList& alist)
+{
+  // A missing description is boring.
+  if (!alist.check ("description"))
+    return false;
+  
+  // The description of models are always interesting.
+  if (!alist.check ("type"))
+    return true;
+  
+  // If the model has no description, this one is interesting.
+  const symbol type = alist.identifier ("type");
+  daisy_assert (library.check (type));
+  const AttributeList& super = library.lookup (type);
+  if (!super.check ("description"))
+    return true;
+  
+  // If the model description is different, this one is interesting.
+  return alist.name ("description") != super.name ("description");
+}
+
 struct ProgramDocument : public Program
 {
   
@@ -1098,21 +1121,14 @@ ProgramDocument::print_model (const symbol name, const Library& library)
 	  format->text (".\n");
 	}
 
-      if (alist.check ("description"))
-	{
-	  daisy_assert (library.check (type));
-	  const AttributeList& super = library.lookup (type);
-	  const std::string description = alist.name ("description");
-	  
-	  if (!super.check ("description") 
-	      || super.name ("description") != description)
-	    print_description (description);
-	}
+      if (has_interesting_description (library, alist))
+        print_description (alist.name ("description"));
+
       print_users (xref.models[used]);
       const std::vector<doc_fun>& doc_funs 
 	= library.doc_funs ();
-      for (size_t i = 0; i < doc.funs.size ();i++)
-	doc_funs[i](format, alist);
+      for (size_t i = 0; i < doc_funs.size ();i++)
+	doc_funs[i](*format, alist);
       if (print_parameterizations)
 	{
 	  TmpStream tmp;
