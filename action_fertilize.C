@@ -6,7 +6,6 @@
 #include "column.h"
 #include "am.h"
 #include "im.h"
-#include "options.h"
 
 struct ActionFertilize : public Action
 {

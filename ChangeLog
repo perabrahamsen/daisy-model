@@ -1,3 +1,89 @@
+1998-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.45 released.
+
+1998-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C: Import Filter::check functions.
+	* filter_none.C: Ditto.
+	* filter_all.C: Ditto.
+
+	* weather_file.C (tick): Make `end' an `int' instead of `char'.
+
+	* soil.C, soil.h, geometry.C, geometry.h (check_alist): Renamed
+	from `check'. 
+
+	* common.C (Options): Give up on parser errors.
+
+	* pmain.C: Support hourly values.
+
+	* crop_std.C (harvest): Remove debug message.
+
+	* action_harvest.C (struct ActionHarvest): Fix outout message.
+
+1998-12-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Merged SH changes.
+	* geometry.C (check): Add static check for zplus.
+	* soil.C (check): Call it.  Add static check for horizon.
+	* column_std.C (ColumnStandardSyntax): Call it.
+
+	* bioclimate_std.C, bioclimate_new.C: Removed the original
+	`bioclimate_std.C', and replaced it with `bioclimate_new.C'. 
+	* bioclimate_PM.C: Removed.
+
+	* crop.C (CropList::cover): New function.
+	* bioclimate_new.C (CanopyStructure): Use it.
+
+	* pt.h, pt.C: New component.
+	* Makefile (INTERFACES): Added it.
+	* pt_std.C: New model.
+	* Makefile (COMPONENTS): Added it.
+	* bioclimate_new.C: Added it.
+
+1998-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* surface.C (tick): Renamed from `evaporation'.
+	(exfiltration): Renamed from `get_exfiltration'.
+	(evap_soil_surface): Renamed from `get_evap_soil_surface'.
+	(evap_pond): New function.
+	* bioclimate_PM.C, bioclimate_std.C (WaterDistribution): Ditto. 
+	* column_std.C: Ditto.
+	* surface.C (evap_pond): New function.
+
+	* column.h (irrigate_top, irrigate_surface): Replace `irrigate'. 
+	* column_std.C (irrigate_top, irrigate_surface): Ditto.
+	* bioclimate.h (irrigate_top, irrigate_surface): Ditto.
+	* bioclimate_PM.C (irrigate_top, irrigate_surface): Ditto.
+	* bioclimate_std.C (irrigate_top, irrigate_surface): Ditto.
+	* action_irrigate.C: Update callers.
+	* event.C (IrrigateEvent::Do_It): Ditto.
+
+1998-12-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pet_PM.C: New model.
+	* pet_weather.C: New model.
+
+	* bioclimate.C, bioclimate.h (CanopyResistance,
+	RefCanopyResistance, ZeroPlaneDisplacement,
+	RoughnessHeight_Momentum, RoughnessHeight_Heat,
+	AerodynamicResistance, RefAerodynamicResistance): Added FAO
+	utility functions. 
+	* weather.C, weather.h (LatentHeatVaporization,
+	PsychrometricConstant, AtmosphericPressure, AirDensity,
+	SaturationVapourPressure, SlopeVapourPressureCurve,
+	CloudinessFactor_Arid, CloudinessFactor_Humid, RefNetRadiation):
+	Ditto. 
+
+	* net_radiation.C, net_radiation.h: new component.
+
+1998-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop.C, crop.h (Crop::albedo): New virtual member function.
+
+	* surface.C, surface.h, soil.C, soil.h: Moved `EpFactor' and
+	`EpInterchange' from soil.C to surface.C.
+
 1998-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.44 released.

@@ -11,7 +11,6 @@
 #include "time.h"
 #include "mathlib.h"
 #include "log.h"
-#include "options.h"
 
 struct SoilHeat::Implementation
 {
@@ -286,6 +285,14 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
   assert (T.size () == soil.size ());
 }
 
+
+double 
+SoilHeat::top_flux (const Soil& soil, const SoilWater& soil_water) const
+{
+  const double k = soil.heat_conductivity (0, soil_water.Theta (0))
+    * 1e4 / 3600.0;		// J/h/ cm/ K -> W/m^2/K
+  return k * (T (0) - T (1)) / (soil.z (0) - soil.z (1));
+}
 
 void 
 SoilHeat::tick (const Time& time, 

@@ -7,7 +7,6 @@
 #include "column.h"
 #include "am.h"
 #include "im.h"
-#include "options.h"
 
 struct ActionIrrigate : public Action
 {
@@ -17,7 +16,8 @@ struct ActionIrrigate : public Action
   const double temp;
   const IM& sm;
   
-  virtual Column::irrigation_from irrigation_type () const = 0;
+  virtual void irrigate (Column&,
+			 double flux, double temp, const IM&) const = 0;
 
   void doIt (const Frame& frame, Daisy& daisy)
   {
@@ -31,7 +31,7 @@ struct ActionIrrigate : public Action
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
       {
 	if (frame.match_column (**i))
-	  (*i)->irrigate (flux, t, sm, irrigation_type ());
+	  irrigate (**i, flux, t, sm);
       }
   }
 
@@ -48,8 +48,8 @@ public:
 
 struct ActionIrrigateTop : public ActionIrrigate
 {
-  Column::irrigation_from irrigation_type () const
-    { return Column::top_irrigation; }
+  void irrigate (Column& c, double flux, double temp, const IM& im) const
+    { c.irrigate_top (flux, temp, im); }
   ActionIrrigateTop (const AttributeList& al)
     : ActionIrrigate (al)
     { }
@@ -57,8 +57,8 @@ struct ActionIrrigateTop : public ActionIrrigate
 
 struct ActionIrrigateSurface : public ActionIrrigate
 {
-  Column::irrigation_from irrigation_type () const
-    { return Column::surface_irrigation; }
+  void irrigate (Column& c, double flux, double temp, const IM& im) const
+    { c.irrigate_surface (flux, temp, im); }
   ActionIrrigateSurface (const AttributeList& al)
     : ActionIrrigate (al)
     { }

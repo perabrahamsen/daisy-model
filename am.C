@@ -9,7 +9,6 @@
 #include "log.h"
 #include "geometry.h"
 #include "mathlib.h"
-#include "options.h"
 #include <numeric>
 
 static Library* AM_library = NULL;

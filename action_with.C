@@ -6,7 +6,6 @@
 #include "syntax.h"
 #include "alist.h"
 #include "column.h"
-#include "options.h"
 
 struct FrameWith : public Frame 
 {

@@ -2,8 +2,25 @@
 
 #include "pet.h"
 #include "log.h"
+#include "crop.h"
+#include "surface.h"
 
 Librarian<Pet>::Content* Librarian<Pet>::content = NULL;
+
+double
+Pet::reference_to_potential (const CropList& crops, 
+			     const Surface& surface,
+			     double ref)
+{
+  const double LAI = crops.LAI ();
+  double EpFactor = crops.CanopySum (&Crop::EpFac);
+  if (LAI > 1.0)
+    EpFactor /= LAI;
+  else
+    EpFactor += (1.0 - LAI) * surface.EpFactor ();
+
+  return EpFactor * max (0.0, ref);
+}
 
 double
 Pet::dry () const 

@@ -8,7 +8,6 @@
 #include "common.h"
 #include "filter.h"
 #include "log.h"
-#include "options.h"
 
 class UZRichard : public UZmodel
 {

@@ -3,7 +3,6 @@
 #include "printer_file.h"
 #include "csmp.h"
 #include "time.h"
-#include "options.h"
 #include <fstream.h>
 #include <algorithm>
 #include <numeric>

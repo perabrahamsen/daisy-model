@@ -1,7 +1,6 @@
 // parser_file.C
 
 #include "parser_file.h"
-#include "options.h"
 #include "csmp.h"
 #include "time.h"
 #include "log.h"

@@ -26,8 +26,8 @@ public:
 public:
   enum irrigation_from { top_irrigation, surface_irrigation };
   virtual void sow (const AttributeList& crop) = 0;
-  virtual void irrigate (double flux, double temp, 
-			 const IM&, irrigation_from) = 0;
+  virtual void irrigate_top (double flux, double temp, const IM&) = 0;
+  virtual void irrigate_surface (double flux, double temp, const IM&) = 0;
   virtual void fertilize (const AttributeList&, const Time&, // Organic.
 			  double from, double to) = 0;
   virtual void fertilize (const AttributeList&, const Time&) = 0;

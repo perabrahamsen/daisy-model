@@ -1,7 +1,7 @@
-// pet.h -- Potential evopotranspiration
+// pt.h --- Potential transpiration
 
-#ifndef PET_H
-#define PET_H
+#ifndef PT_H
+#define PT_H
 
 #include "librarian.h"
 
@@ -11,35 +11,34 @@ class SoilWater;
 class Weather;
 class CropList;
 class Surface;
+class Pet;
 
-class Pet
+class PT
 {
   // Content.
 public:
   const string name;
 
-  // Utilities.
-public:
-  static double reference_to_potential (const CropList&, const Surface&, 
-					double ref);
-
   // Simulation.
 public:
   virtual void tick (const Weather&, const CropList&,
 		     const Surface&, const Soil&, const SoilHeat&, 
-		     const SoilWater&) = 0;
-  virtual double wet () const = 0; // [mm/h]
-  virtual double dry () const; // [mm/h]
+		     const SoilWater&, const Pet&, 
+		     double canopy_ea, double snow_ea,
+		     double pond_ea, double soil_ea) = 0;
+  virtual double potential_transpiration () const = 0; // [mm/h]
   virtual void output (Log&, Filter&) const;
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
 protected:
-  Pet (const AttributeList&);
+  PT (const AttributeList&);
 public:
-  virtual ~Pet ();
+  virtual ~PT ();
 };
 
-static Librarian<Pet> Pet_init ("pet");
+static Librarian<PT> PT_init ("pt");
 
-#endif PET_H
+#endif PT_H
+
+// pt.h ends here.

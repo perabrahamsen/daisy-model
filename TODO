@@ -1,10 +1,12 @@
-* Ændr bioclimate så PM bliver et separat energi-modul.
+* Flyt "BioclimateNew::CanopyStructure" til "CropList::tick".
 
-  - Indsæt PET i BioclaimteNew.
+* Opdater BioclimateNew::WaterDistribution til at bruge dem.
 
-  - RN (netto raditation) component 
+* PT model til PvdK.
 
-  - Crop::albedo og Soil:albedo parametre.
+* Infør stof på overfladen.
+
+======================================================================
 
 * Plot retentionskurve fra gdaisy.
 

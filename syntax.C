@@ -3,7 +3,6 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
-#include "options.h"
 #include <map>
 #include <algorithm>
 

@@ -4,7 +4,6 @@
 #include "daisy.h"
 #include "frame.h"
 #include "column.h"
-#include "options.h"
 
 struct ActionMix : public Action
 {

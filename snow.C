@@ -14,7 +14,8 @@ struct Snow::Implementation
   // Flux variables.
   double EvapSnowPack;			// Evaporation from snowpack [mm]
   double q_s;			// Leaking water [mm]
-  
+  double temperature;		// temperature of leaking water [dg C]
+
   // State variables.
   double Ssnow;			// Snow storage expressed as water [mm]
   double Swater;		// Water in snow storage [mm]
@@ -43,7 +44,7 @@ struct Snow::Implementation
   void tick (const Soil& soil, const SoilWater& soil_water,
 	     const SoilHeat& soil_heat,
 	     double Si, double q_h, double Prain,
-	     double Psnow, double& T, double Epot);
+	     double Psnow, double T, double Epot);
   Implementation (const AttributeList& al);
 };
 
@@ -84,7 +85,7 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    const double Si, const double q_h,
 			    const double Prain, const double Psnow,
-			    double& T, const double Epot)
+			    double T, const double Epot)
 { 
   assert (Si >= 0.0);
   assert (Prain >= 0.0);
@@ -245,13 +246,14 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
 	       0.0);
       assert (T > -100.0 && T < 50.0);
     } 
+  temperature = T;
 }
   
 void 
 Snow::tick (const Soil& soil, const SoilWater& soil_water,
 	    const SoilHeat& soil_heat,
 	    double Si, double q_h, double Prain,
-	    double Psnow, double& T, double Epot)
+	    double Psnow, double T, double Epot)
 {
   if (impl.Ssnow > 0.0 || Psnow > 0.0)
     impl.tick (soil, soil_water, soil_heat, Si, q_h, Prain, Psnow, T, Epot);
@@ -259,6 +261,7 @@ Snow::tick (const Soil& soil, const SoilWater& soil_water,
     {
       impl.EvapSnowPack = 0.0;
       impl.q_s = Prain;
+      impl.temperature = T;
     }
 }
 
@@ -272,6 +275,12 @@ double
 Snow::percolation ()
 {
   return impl.q_s;
+}
+
+double 
+Snow::temperature ()
+{
+  return impl.temperature;
 }
 
 double 

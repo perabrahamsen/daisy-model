@@ -7,7 +7,6 @@
 #include "csmp.h"
 #include "hydraulic.h"
 #include "mathlib.h"
-#include "options.h"
 #include <vector>
 #include <map>
 // G++ 2.7.2 has `accumulate' here.

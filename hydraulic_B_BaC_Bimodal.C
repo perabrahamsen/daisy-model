@@ -4,7 +4,6 @@
 // Bimodal hydraulic conductivity curve
 
 #include "hydraulic.h"
-#include "options.h"
 #include "mathlib.h"
 
 class HydraulicB_BaC_Bimodal : public Hydraulic

@@ -2,7 +2,6 @@
 
 #include "filter.h"
 #include "geometry.h"
-#include "options.h"
 
 class FilterArray : public Filter
 {

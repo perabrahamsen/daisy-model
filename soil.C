@@ -4,7 +4,6 @@
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
-#include "options.h"
 #include <assert.h>
 #include <iomanip.h>
 
@@ -24,29 +23,54 @@ Soil::MaxRootingDepth () const
   return max (-MaxRootingDepth_, z (size () - 1));
 }
 
-double 
-Soil::EpFactor () const
-{
-  return EpFactor_;
-}
-
-double
-Soil::EpInterchange () const
-{
-  return EpInterchange_;
-}
-
 bool 
 Soil::check () const
 {
   bool ok = Geometry::check ();
-  if (horizon_.size () < 1)
+  return ok;
+}
+
+bool
+Soil::check_alist (const AttributeList& al)
+{
+  bool ok = Geometry::check_alist (al);
+
+  const vector<AttributeList*>& layers = al.alist_sequence ("horizons");
+
+  if (layers.size () < 1U)
     {
       CERR << "You need at least one horizon\n";
       ok = false;
     }
+  double last = 0.0;
+
+  for (unsigned int i = 0; i < layers.size (); i++)
+    {
+      double end = layers[i]->number ("end");
+      if (end >= last)
+	{
+	  CERR << "Horizon endpoints must be monotonically decreasing\n";
+	  ok = false;
+	  break;
+	}
+      last = end;
+    }
+
+  if (ok)
+    {
+      // This check is only meaningful if zplus and layers are ok.
+      const vector<double> zplus = al.number_sequence ("zplus");
+  
+      if (last != zplus[zplus.size() - 1])
+	{
+	  CERR <<
+	    "The last horizon must end the same place as the last interval\n";
+	  ok = false;
+	}
+    }
   return ok;
-}
+}  
+  
 
 void 
 Soil::make_table (int i)
@@ -61,6 +85,7 @@ Soil::make_table (int i)
 	   << setw (12) << setprecision (11) << K (i, h) / 3.6e5 << "\n";
     }
 }
+
 
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -77,10 +102,6 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 #if 0
   alist.add ("horizons", layer_alist);
 #endif
-  syntax.add ("EpFactor", Syntax::Number, Syntax::Const);
-  alist.add ("EpFactor", 0.8);
-  syntax.add ("EpInterchange", Syntax::Number, Syntax::Const);
-  alist.add ("EpInterchange", 0.6);
   syntax.add ("MaxRootingDepth", Syntax::Number, Syntax::Const);
   //  alist.add ("MaxRootingDepth", 100.0);
   syntax.add ("dispersivity", Syntax::Number, Syntax::Const);
@@ -88,8 +109,6 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
   
 Soil::Soil (const AttributeList& al)
   : Geometry (al),
-    EpFactor_ (al.number ("EpFactor")),
-    EpInterchange_ (al.number ("EpInterchange")),
     MaxRootingDepth_ (al.number ("MaxRootingDepth")),
     dispersivity_ (al.number ("dispersivity"))
 {

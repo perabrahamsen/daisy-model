@@ -4,7 +4,6 @@
 #include "syntax.h"
 #include "alist.h"
 #include "mathlib.h"
-#include "options.h"
 #include <assert.h>
 
 unsigned int 
@@ -37,23 +36,33 @@ bool
 Geometry::check () const
 {
   bool ok = true;
-  if (zplus_.size () < 1)
+  return ok;
+}
+
+bool 
+Geometry::check_alist (const AttributeList& al)
+{
+  bool ok = true;
+  const vector<double> zplus = al.number_sequence ("zplus");
+  
+  if (zplus.size () < 1)
     {
       CERR << "You need at least one interval\n";
       ok = false;
     }
   double last = 0.0;
-  for (unsigned int i = 0; i < size_; i++)
-    if (zplus_[i] > last)
-      {
-	CERR << "Intervals should be monotonically decreasing, but "
-	     << zplus_[i] << " > " << last << "\n";
-	ok = false;
-	break;
-      }
-  else 
-    last = zplus_[i];
-
+  for (unsigned int i = 0; i < zplus.size (); i++)
+    {
+      if (zplus[i] > last)
+	{
+	  CERR << "Intervals should be monotonically decreasing, but "
+	       << zplus[i] << " > " << last << "\n";
+	  ok = false;
+	  break;
+	}
+      else 
+	last = zplus[i];
+    }
   return ok;
 }
 

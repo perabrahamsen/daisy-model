@@ -13,6 +13,10 @@ class Surface : public UZtop
 {
   const double minimal_matter_flux;
   const bool total_matter_flux;
+  const double EpFactor_;
+  const double EpInterchange_;
+  const double albedo_wet;
+  const double albedo_dry;
   const double lake;
   double pond;
   bool flux;
@@ -42,15 +46,20 @@ public:
   // Manager.
   void fertilize (const IM&);
 
+  // Simulation.
   void output (Log&, Filter&) const;
+  void tick (double PotSoilEvaporation, double Water, double temp,
+	     const Soil&, const SoilWater&);
 
   // Communication with bioclimate.
-  double evaporation (double PotSoilEvaporation, double Water, double temp,
-		      const Soil&, const SoilWater&);
+  double EpFactor () const;
+  double EpInterchange () const;
+  double albedo (const Soil& soil, const SoilWater& soil_water) const;
+  double exfiltration () const; // [mm/h]
+  double evap_soil_surface () const; // [mm/h]
+  double evap_pond () const; // [mm/h]
 
   // Communication with external model.
-  double get_exfiltration () const; // [mm/h]
-  double get_evap_soil_surface () const; // [mm/h]
   void put_ponding (double pond);	// [mm]
   void put_no3 (double no3); // [g/cm^2]
   double get_no3 () const; // [g/cm^2]

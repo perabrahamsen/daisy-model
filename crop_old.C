@@ -17,7 +17,6 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
-#include "options.h"
 
 class CropOld : public Crop
 {

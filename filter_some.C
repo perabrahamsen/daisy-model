@@ -1,7 +1,6 @@
 // filter_some.C
 
 #include "filter.h"
-#include "options.h"
 #include <map>
 
 class FilterSome : public Filter

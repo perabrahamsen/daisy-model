@@ -2,7 +2,6 @@
 
 #include "weather.h"
 #include "time.h"
-#include "options.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
@@ -74,7 +73,7 @@ WeatherFile::tick (const Time& time)
   int year;
   int month; 
   int day;
-  char end;
+  int end;
 
   double global_radiation;
 

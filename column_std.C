@@ -21,7 +21,6 @@
 #include "crop.h"
 #include "im.h"
 #include "am.h"
-#include "options.h"
 #include "weather.h"
 
 class Groundwater;
@@ -46,8 +45,8 @@ private:
   // Actions.
 public:
   void sow (const AttributeList& crop);
-  void irrigate (double flux, double temp, 
-		 const IM&, irrigation_from);
+  void irrigate_top (double flux, double temp, const IM&);
+  void irrigate_surface (double flux, double temp, const IM&);
   void fertilize (const AttributeList&, const Time&);
   void fertilize (const AttributeList&, const Time&, double from, double to);
   void fertilize (const IM&);
@@ -103,9 +102,9 @@ public:
   double get_snow_storage () const // [mm]
     { return bioclimate.get_snow_storage (); }
   double get_exfiltration () const // [mm/h]
-    { return surface.get_exfiltration (); }
+    { return surface.exfiltration (); }
   double get_evap_soil_surface () const // [mm/h]
-    { return surface.get_evap_soil_surface (); }
+    { return surface.evap_soil_surface (); }
   void put_ponding (double pond)	// [mm]
     { surface.put_ponding (pond); }
   void put_surface_no3 (double no3) // [g/cm^2]
@@ -149,11 +148,17 @@ ColumnStandard::sow (const AttributeList& al)
 }
 
 void 
-ColumnStandard::irrigate (double flux, double temp, 
-		 const IM& sm, irrigation_from from)
+ColumnStandard::irrigate_top (double flux, double temp, const IM& sm)
 {
   surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
-  bioclimate.irrigate (flux, temp, from);
+  bioclimate.irrigate_top (flux, temp);
+}
+
+void 
+ColumnStandard::irrigate_surface (double flux, double temp, const IM& sm)
+{
+  surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
+  bioclimate.irrigate_surface (flux, temp);
 }
 
 void
@@ -470,7 +475,14 @@ static struct ColumnStandardSyntax
     syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
 		Syntax::State);
     add_submodule<Surface> ("Surface", syntax, alist);
-    add_submodule<Soil> ("Soil", syntax, alist);
+    {
+      Syntax& s = *new Syntax (&Soil::check_alist);
+      AttributeList& a = *new AttributeList ();
+      Soil::load_syntax (s, a);
+      syntax.add ("Soil", s, Syntax::State, Syntax::Singleton, 
+		  "The soil model.");
+      alist.add ("Soil", a);
+    }
     add_submodule<SoilWater> ("SoilWater", syntax, alist);
     add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
     add_submodule<SoilNH4> ("SoilNH4", syntax, alist);

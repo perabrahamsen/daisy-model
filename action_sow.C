@@ -6,7 +6,6 @@
 #include "column.h"
 // We need to initialize the Crop library.
 #include "crop.h"
-#include "options.h"
 
 struct ActionSow : public Action
 {

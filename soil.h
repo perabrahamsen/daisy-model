@@ -13,8 +13,6 @@ struct AttributeList;
 class Soil : public Geometry
 {
   vector<const Horizon*> horizon_;
-  const double EpFactor_;
-  const double EpInterchange_;
   const double MaxRootingDepth_;
   double dispersivity_;
 
@@ -52,22 +50,19 @@ public:
 
   // Thermic.
   double heat_conductivity (int i, double Theta, double Ice = 0.0) const
-  { return horizon_[i]->heat_conductivity (Theta, Ice); }
+    { return horizon_[i]->heat_conductivity (Theta, Ice); }
   double heat_capacity (int i, double Theta, double Ice = 0.0) const
   { return horizon_[i]->heat_capacity (Theta, Ice); }
   
   // Calculations.
   double MaxRootingDepth () const;
-  double EpFactor () const;
-  double EpInterchange () const;
 
-  // Simulation.
-  bool check () const;
-  
   // Debug.
   void make_table (int i);
 
   // Creation.
+  bool check () const;
+  static bool check_alist (const AttributeList&);
   static void load_syntax (Syntax&, AttributeList&);
   Soil (const AttributeList&);
   ~Soil ();

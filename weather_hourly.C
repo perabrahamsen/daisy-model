@@ -2,7 +2,6 @@
 
 #include "weather.h"
 #include "time.h"
-#include "options.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"

@@ -4,6 +4,7 @@
 #include "log.h"
 #include "time.h"
 #include "mathlib.h"
+#include "net_radiation.h"
 
 Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 
@@ -11,6 +12,7 @@ struct Weather::Implementation
 {
   // Parameters.
   const double Latitude;
+  const double Elevation;
   const IM DryDeposit;
   const IM WetDeposit;
   const double T1;
@@ -21,15 +23,24 @@ struct Weather::Implementation
   const double max_Ta_yday;	// Warmest day in the year [yday]
 
   // State.
+  double daily_extraterrastial_radiation; // [MJ/m2/d]
   double daily_global_radiation; // [W/m²]
   double Prain;
   double Psnow;
   double day_length;
   double day_cycle;
+  Time time;
+
+  // Astronomic utilities.
+  static double SolarDeclination (const Time& time); // [rad]
+  static double RelativeSunEarthDistance (const Time& time);
+  static double SunsetHourAngle (double Dec, double Lat); // [rad]
+  double ExtraterrestrialRadiation (const Time& time); // [MJ/m2/d]
 
   // Create and Destroy.
   Implementation (const AttributeList& al)
     : Latitude (al.number ("Latitude")),
+      Elevation (al.number ("Elevation")),
       DryDeposit (al.alist ("DryDeposit")),
       WetDeposit (al.alist ("WetDeposit")),
       T1 (al.number ("T1")),
@@ -42,19 +53,61 @@ struct Weather::Implementation
       Prain (0.0),
       Psnow (0.0),
       day_length (-42.42e42),
-      day_cycle (42.42e42)
+      day_cycle (42.42e42),
+      time (1, 1, 1, 1)
     { }
 };
+
+double 
+Weather::Implementation::SolarDeclination (const Time& time) // [rad]
+{
+  return (0.409 * sin (2.0 * M_PI * time.yday () / 365.0 - 1.39));
+}
+
+
+double 
+Weather::Implementation::RelativeSunEarthDistance (const Time& time)
+{
+  return (1.0 + 0.033 * cos (2.0 * M_PI * time.yday () / 365.0));
+}
+
+
+double 
+Weather::Implementation::SunsetHourAngle (double Dec, double Lat) // [rad]
+{
+  return (acos (-tan (Dec) * tan (Lat)));
+}
+
+
+double 
+Weather::Implementation::ExtraterrestrialRadiation (const Time& time)
+  // [MJ/m2/d]
+{
+  const double Dec = SolarDeclination (time);
+  const double Lat = M_PI / 180 * Latitude;
+  const double x1 = SunsetHourAngle (Dec, Lat) * sin (Lat) * sin (Dec);
+  const double x2 = cos (Lat) * cos (Dec) * sin (SunsetHourAngle (Dec, Lat));
+  return (37.6 * RelativeSunEarthDistance (time) * (x1 + x2));
+}
 
 void 
 Weather::tick (const Time& time)
 {
-  impl.day_length = day_length (impl.Latitude, time);
+  impl.day_length = day_length (time);
+  assert (impl.day_length >= 0.0);
+  assert (impl.day_length <= 24.0);
 
-  impl.day_cycle =max (0.0, M_PI_2 / day_length ()
-		       * cos (M_PI * (time.hour () - 12) / day_length ()));
+  impl.day_cycle = max (0.0, M_PI_2 / day_length ()
+			* cos (M_PI * (time.hour () - 12) / day_length ()));
+  assert (impl.day_cycle >= 0.0);
+  assert (impl.day_cycle <= 1.0);
+
+  impl.daily_extraterrastial_radiation 
+    = impl.ExtraterrestrialRadiation (time);
+  assert (impl.daily_extraterrastial_radiation >= 0.0);
+
+  impl.time = time;
 }
-
 
 double
 Weather::hourly_global_radiation () const
@@ -63,6 +116,10 @@ Weather::hourly_global_radiation () const
 double
 Weather::daily_global_radiation () const
 { return impl.daily_global_radiation; }
+
+double 
+Weather::daily_extraterrastial_radiation () const
+{ return impl.daily_extraterrastial_radiation; }
 
 double
 Weather::rain () const
@@ -87,6 +144,8 @@ Weather::output (Log& log, Filter& filter) const
 	      hourly_global_radiation (), true);
   log.output ("daily_global_radiation", filter, 
 	      daily_global_radiation (), true);
+  log.output ("daily_extraterrastial_radiation", filter, 
+	      daily_extraterrastial_radiation (), true);
   log.output ("reference_evapotranspiration", filter, 
 	      reference_evapotranspiration (), true);
   log.output ("rain", filter, rain (), true);
@@ -134,7 +193,7 @@ Weather::day_length () const
 }
 
 double
-Weather::day_length (double Latitude, const Time& time)
+Weather::day_length (const Time& time) const
 {
   double t = 2 * M_PI / 365 * time.yday ();
   
@@ -143,7 +202,7 @@ Weather::day_length (double Latitude, const Time& time)
 		+ 0.03838 * sin (2 * t) - 0.15870 * cos (3 * t) 
 		+ 0.07659 * sin (3 * t) - 0.01021 * cos (4 * t));
   t = (24 / M_PI
-       * acos (-tan (M_PI / 180 * Dec) * tan (M_PI / 180 * Latitude)));
+       * acos (-tan (M_PI / 180 * Dec) * tan (M_PI / 180 * impl.Latitude)));
   return (t < 0) ? t + 24.0 : t;
 }
 
@@ -154,7 +213,7 @@ Weather::day_cycle () const
 }
 
 IM
-Weather::deposit() const
+Weather::deposit () const
 {
   const double Precipitation = rain () + snow (); // [mm]
   const IM dry (impl.DryDeposit, 0.1/24.0); // [kg/m²/d] -> [g/cm²/h]
@@ -173,11 +232,22 @@ Weather::deposit() const
 
 double 
 Weather::cloudiness () const
-{ return 0.0; }
-
+{ 
+  const double Si = daily_global_radiation () 
+    * (60.0 * 60.0 * 24.0) / 1e6; // W/m^2 -> MJ/m^2/d
+  const double reference_cloudiness 
+    = CloudinessFactor_Humid (impl.time, Si);
+  assert (reference_cloudiness >= 0.0);
+  assert (reference_cloudiness <= 1.0);
+  return reference_cloudiness;
+}
+ 
 double 
 Weather::vapor_pressure () const
-{ return 0.0; }
+{ 
+  const double T_min = daily_air_temperature () - 5.0;
+  return SaturationVapourPressure (T_min);
+}
 
 double 
 Weather::wind () const
@@ -215,6 +285,68 @@ double
 Weather::max_Ta_yday () const
 { return impl.max_Ta_yday; }
 
+double
+Weather::LatentHeatVaporization (double Temp) // [MJ/kg]
+{ return (2.501 - 2.361e-3 * Temp); }
+
+double 
+Weather::PsychrometricConstant (double AtmPressure, double Temp) // [kPa/K]
+{ return (0.00163 * AtmPressure / LatentHeatVaporization (Temp)); }
+
+double 
+Weather::AtmosphericPressure ()	const // [kPa]
+{ return (101.3 * pow ((293 - 0.0065 * impl.Elevation) / 293, 5.26)); }
+
+double 
+Weather::AirDensity (double AtmPressure, double Temp) // [kg/m3]
+{
+  const double Tvirtuel = 1.01 * (Temp + 273);
+  return (3.486 * AtmPressure / Tvirtuel);
+}
+
+double 
+Weather::SaturationVapourPressure (double Temp) // [kPa]
+{ return (0.611 * exp (17.27 * Temp / (Temp + 237.3))); }
+
+double 
+Weather::SlopeVapourPressureCurve (double Temp) // [kPa/K]
+{ return (4098 * SaturationVapourPressure (Temp) / pow (Temp + 237.3, 2)); }
+
+double 
+Weather::CloudinessFactor_Arid (const Time& time, double Si) const
+{
+  const double a = 1.35;
+  const double x = Si / 0.75 / impl.ExtraterrestrialRadiation (time);
+  return (a * min (1.0, x) + 1 - a);
+}
+
+double 
+Weather::CloudinessFactor_Humid (const Time& time, double Si) const
+{
+  const double a = 1.00;
+  const double x = Si / 0.75 / impl.ExtraterrestrialRadiation (time);
+  const double cfh = (a * min (1.0, x) + 1 - a);
+  return cfh;
+}
+
+double 
+Weather::RefNetRadiation (const Time& time, double Si,
+			  double Temp, double ea) const
+{
+  static NetRadiation* net_radiation = NULL;
+  if (net_radiation == NULL)
+    {
+      Syntax syntax;
+      AttributeList alist;
+      NetRadiation::load_syntax (syntax, alist);
+      net_radiation = &Librarian<NetRadiation>::create (alist);
+    }
+
+  const double albedo = 0.23;
+  net_radiation->tick (CloudinessFactor_Arid (time, Si),
+		       Temp, ea, Si, albedo);
+  return net_radiation->net_radiation ();
+}
 
 void
 Weather::load_syntax (Syntax& syntax, AttributeList& alist)
@@ -223,7 +355,9 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("Latitude", Syntax::Number, Syntax::Const);
   alist.add ("Latitude", 56.0);
 
-  syntax.add ("Elevation", Syntax::Number, Syntax::Optional); // Unused.
+  syntax.add ("Elevation", "m", Syntax::Const,
+	      "Heigh above sea level.");
+  alist.add ("Elevation", 0.0);
   syntax.add ("UTM_x", Syntax::Number, Syntax::Optional); // Unused.
   syntax.add ("UTM_y", Syntax::Number, Syntax::Optional); // Unused.
 

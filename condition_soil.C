@@ -6,7 +6,6 @@
 #include "column.h"
 #include "daisy.h"
 #include "frame.h"
-#include "options.h"
 
 struct ConditionSoilTemperature : public Condition
 {

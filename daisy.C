@@ -21,7 +21,6 @@
 #include "alist.h"
 #include "frame.h"
 #include "common.h"
-#include "options.h"
 
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),

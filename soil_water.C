@@ -10,7 +10,6 @@
 #include "groundwater.h"
 #include "syntax.h"
 #include "mathlib.h"
-#include "options.h"
 
 void
 SoilWater::clear (const Geometry&)

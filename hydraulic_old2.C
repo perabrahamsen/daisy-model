@@ -1,7 +1,6 @@
 // hydraulic_old2.C
 
 #include "hydraulic.h"
-#include "options.h"
 #include "mathlib.h"
 #include "csmp.h"
 #include <fstream.h>

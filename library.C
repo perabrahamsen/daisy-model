@@ -3,7 +3,6 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
-#include "options.h"
 #include <map>
 
 struct Library::Implementation

@@ -17,7 +17,6 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
-#include "options.h"
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
@@ -258,8 +257,8 @@ struct CropStandard::Parameters
     friend struct CropStandard::Parameters;
     HarvestPar (const AttributeList&);
   } Harvest;
-  bool enable_water_stress;
-  bool enable_N_stress;
+  const bool enable_water_stress;
+  const bool enable_N_stress;
 private:
   friend class CropStandard;
   Parameters (const AttributeList&);
@@ -2257,11 +2256,6 @@ CropStandard::harvest (const string& column_name,
 	  leaf_harvest *= (1.0 - stub_LAI / total_LAI);
 	}
     }
-
-  CERR << "Got (stem_harvest " << stem_harvest << ")\n";
-  CERR << "Got (leaf_harvest " << leaf_harvest << ")\n";
-  CERR << "Got (total_LAI " << LAI () << ")\n";
-  CERR << "Got (stub_LAI " << LAIvsH ()(stub_length) << ")\n";
 
   if (!kill_off && DS < DSmax)
     {

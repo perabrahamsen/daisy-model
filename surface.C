@@ -4,12 +4,12 @@
 #include "syntax.h"
 #include "alist.h"
 #include "soil_water.h"
+#include "soil.h"
 #include "log.h"
 #include "common.h"
 #include "filter.h"
 #include "am.h"
 #include "mathlib.h"
-#include "options.h"
 
 bool 
 Surface::flux_top () const
@@ -116,9 +116,9 @@ Surface::matter_flux ()
   return im_flux;
 }
 
-double
-Surface::evaporation (double PotSoilEvaporation, double water, double temp,
-		      const Soil& soil, const SoilWater& soil_water)
+void
+Surface::tick (double PotSoilEvaporation, double water, double temp,
+	       const Soil& soil, const SoilWater& soil_water)
 {
   static const double dt = 1.0; // Time step [h].
   const double MaxExfiltration
@@ -142,7 +142,30 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
   assert (T > -100.0 && T < 50.0);
   pond = pond - EvapSoilSurface * dt + water * dt;
   assert (EvapSoilSurface < 1000.0);
-  return EvapSoilSurface;
+}
+
+double 
+Surface::EpFactor () const
+{ return EpFactor_; }
+
+double
+Surface::EpInterchange () const
+{ return EpInterchange_; }
+
+double
+Surface::albedo (const Soil& soil, const SoilWater& soil_water) const
+{ 
+  const double Theta_pf_3 = soil.Theta (0, pF2h (3.0));
+  const double Theta_pf_1_7 = soil.Theta (0, pF2h (1.7));
+  const double Theta = soil_water.Theta (0);
+
+  if (Theta < Theta_pf_3)
+    return albedo_dry;
+  if (Theta > Theta_pf_1_7)
+    return albedo_wet;
+
+  return albedo_dry + (albedo_wet - albedo_dry)
+    * (Theta - Theta_pf_3) / (Theta_pf_1_7 - Theta_pf_3);
 }
 
 void 
@@ -165,7 +188,7 @@ Surface::output (Log& log, Filter& filter) const
 }
 
 double
-Surface::get_exfiltration () const // [mm/h]
+Surface::exfiltration () const // [mm/h]
 {
   // Negative pond == amount extracted from soil.
   if (pond < 0.0)
@@ -175,8 +198,12 @@ Surface::get_exfiltration () const // [mm/h]
 }
 
 double
-Surface::get_evap_soil_surface () const // [mm/h]
+Surface::evap_soil_surface () const // [mm/h]
 { return EvapSoilSurface; }
+
+double 
+Surface::evap_pond () const	// [mm/h]
+{ return evap_soil_surface () - exfiltration (); }
 
 void
 Surface::put_ponding (double p)	// [mm]
@@ -197,6 +224,20 @@ template class add_submodule<IM>;
 void
 Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add ("EpFactor", Syntax::None (), Syntax::Const,
+	      "Convertion of reference evapotranspiration to \
+potential evaporation for bare soil.");
+  alist.add ("EpFactor", 0.8);
+  syntax.add ("EpInterchange", Syntax::None (), Syntax::Const,
+	      "\
+Canopy adsorbtion fraction of unreached potential soil evaporation.");
+  alist.add ("EpInterchange", 0.6);
+  syntax.add ("albedo_dry", Syntax::None (), Syntax::Const,
+	      "Albedo of dry soil (pF >= 3)");
+  alist.add ("albedo_dry", 0.15);
+  syntax.add ("albedo_wet", Syntax::None (), Syntax::Const,
+	      "Albedo of wet soil (pf <= 1.7)");
+  alist.add ("albedo_wet", 0.08);
   syntax.add ("minimal_matter_flux", Syntax::Number, Syntax::Const);
   alist.add ("minimal_matter_flux", 1.0e-10);
   syntax.add ("total_matter_flux", Syntax::Boolean, Syntax::Const);
@@ -216,6 +257,10 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 Surface::Surface (const AttributeList& al)
   : minimal_matter_flux (al.number ("minimal_matter_flux")),
     total_matter_flux (al.flag ("total_matter_flux")),
+    EpFactor_ (al.number ("EpFactor")),
+    EpInterchange_ (al.number ("EpInterchange")),
+    albedo_wet (al.number ("albedo_wet")),
+    albedo_dry (al.number ("albedo_dry")),
     lake (al.number ("lake")),
     pond (al.number ("pond")),
     flux (al.flag ("flux")),

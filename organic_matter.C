@@ -16,7 +16,6 @@
 #include "mathlib.h"
 #include "csmp.h"
 #include "common.h"
-#include "options.h"
 
 // G++ 2.7.2 has `accumulate' here.
 #include <algorithm>

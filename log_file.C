@@ -8,7 +8,6 @@
 #include "alist.h"
 #include "syntax.h"
 #include "common.h"
-#include "options.h"
 #include <list>
 #include <fstream.h>
 

@@ -23,6 +23,17 @@ class Bioclimate
 public:
   const string name;
 
+  // FAO utility functions.
+  static double CanopyResistance (double LAI /* [m^2/m^2] */); // [s/m]
+  static double RefCanopyResistance (void); // [s/m]
+  static double ZeroPlaneDisplacement (double CropHeight /* [m] */); // [m]
+  static double RoughnessHeight_Momentum (double CropHeight /* [m] */); // [m]
+  static double RoughnessHeight_Heat (double CropHeight /* [m] */); // [m]
+  static double AerodynamicResistance (double CropHeight /* [m] */,
+				       double ScreenHeight /* [m] */,
+				       double U /* [m/s] */); // [s/m]
+  static double RefAerodynamicResistance (double U2 /* [m/s] */); // [s/m]
+
   // Simulation.
 public:
   virtual void tick (Surface&, const Weather&, const Time&, 
@@ -42,8 +53,8 @@ public:
 
   // Manager.
 public:
-  virtual void irrigate (double flux, double temp, 
-			 Column::irrigation_from from) = 0;
+  virtual void irrigate_top (double flux, double temp) = 0;
+  virtual void irrigate_surface (double flux, double temp) = 0;
 
   // Communication with external model.
   virtual double get_evap_interception () const; // [mm/h]

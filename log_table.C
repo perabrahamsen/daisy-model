@@ -5,7 +5,6 @@
 #include "time.h"
 #include "frame.h"
 #include "geometry.h"
-#include "options.h"
 #include <fstream.h>
 #include <numeric>
 #include <algorithm>
@@ -269,6 +268,13 @@ struct LogTable : public Log, public Filter
   // Filter functions.
   bool check (const string&, bool) const
     { return is_active; }
+  bool check (const Library& lib, int size) const
+    { return Filter::check (lib, size); }
+  bool check (const Syntax& syntax, int size) const
+    { return Filter::check (syntax, size); }
+  bool check (Syntax::type type, int size) const
+    { return Filter::check (type, size); }
+
   Filter& lookup (const string&) const
     { 
       // Bug: We should get rid of the filter all together.

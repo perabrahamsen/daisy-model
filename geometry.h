@@ -28,9 +28,6 @@ public:
   unsigned int interval_plus (double z) const;
   unsigned int interval (double z) const;
 
-  // Simulation.
-  bool check () const;
-  
   // Vector operations.
   void mix (vector<double>& v, double from, double to) const;
   void add (vector<double>& v, double from, double to, double amount) const;
@@ -47,6 +44,8 @@ public:
 			 const string& name) const;
 
   // Creation.
+  bool check () const;
+  static bool check_alist (const AttributeList&);
   static void load_syntax (Syntax&, AttributeList&);
   Geometry (const AttributeList&);
   virtual ~Geometry ();

@@ -10,7 +10,6 @@
 #include "weather.h"
 #include "crop.h"
 #include "library.h"
-#include "options.h"
 
 void Event::Udfoer(Daisy& daisy,const Time& dato, EventQueue& EQ) {
    // Wrapper to make sure Visit is done
@@ -91,15 +90,15 @@ void IrrigateEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
                daisy.weather.hourly_air_temperature () :
                temperature;
 
-   Column::irrigation_from from = (overheadirrigation) ?
-                                   Column::top_irrigation :
-                                   Column::surface_irrigation;
-
    ColumnList& cl = daisy.columns;
    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
       if (match (**i)) {
-	      (*i)->irrigate (howmuch, t, sm, from);
-         COUT << "[(not really) Irrigating]\n";
+	if (overheadirrigation)
+	  (*i)->irrigate_top (howmuch, t, sm);
+	else
+	  (*i)->irrigate_surface (howmuch, t, sm);
+	  
+	COUT << "[(really) Irrigating]\n";
       }
    }
 }
