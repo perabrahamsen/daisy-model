@@ -24,6 +24,7 @@
 #include "horizon.h"
 #include "hydraulic.h"
 #include "tortuosity.h"
+#include "groundwater.h"
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
@@ -68,9 +69,11 @@ A location and content of a soil layer.");
     ~Layer ()
     { delete &horizon; }
   };
-  const vector<Layer*> layers;
+  /* const */ vector<Layer*> layers;
+  const int original_layer_size; // Size before adding aquitard, for logging.
 
   // Parameters
+  const bool has_zplus;
   const double MaxRootingDepth;
   const double dispersivity;
 
@@ -86,6 +89,8 @@ A location and content of a soil layer.");
   // Create and Destroy.
   Implementation (const AttributeList& al)
     : layers (map_construct<Layer> (al.alist_sequence ("horizons"))),
+      original_layer_size (layers.size ()),
+      has_zplus (al.check ("zplus")),
       MaxRootingDepth (al.number ("MaxRootingDepth")),
       dispersivity (al.number ("dispersivity"))
   { }
@@ -219,7 +224,17 @@ Soil::get_attribute (int i, const std::string& name) const
 
 void
 Soil::output (Log& log) const
-{ output_vector (impl.layers, "horizons", log); }
+{
+  if (log.check_member ("horizons"))
+    {
+      Log::Open open (log, "horizons");
+      for (int i = 0; i < impl.original_layer_size; i++)
+	{
+	  Log::Unnamed unnamed (log);
+	  impl.layers[i]->output (log);
+	}
+    }
+}
 
 double
 Soil::MaxRootingDepth () const
@@ -351,9 +366,51 @@ Soil::Soil (const AttributeList& al)
 { }
 
 void
-Soil::initialize (const Groundwater& groundwater, int som_size, Treelog& msg)
+Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
 {
   Treelog::Open nest (msg, "Soil");
+
+  // Extra aquitard layer.
+  if (!impl.has_zplus && groundwater.is_pipe ())
+    {
+      // Find parameters.
+      const double Z_aquitard = groundwater.Z_aquitard ();
+      const double K_aquitard = groundwater.K_aquitard ();
+      const double old_end = impl.layers[impl.layers.size () - 1]->end;
+      const double Z_horizon
+	= (Z_aquitard > 5.0) ? round (Z_aquitard / 3.0)	: (Z_aquitard / 3.0);
+      const double new_end = old_end - Z_horizon;
+      groundwater.set_Z_aquitard (Z_aquitard - Z_horizon);
+
+      // Add layer.
+      Library& library = Librarian<Horizon>::library ();
+      if (!library.check ("aquitard"))
+	{
+	  // Create aquitard horizon.
+	  AttributeList& alist 
+	    = *new AttributeList (library.lookup ("default"));
+	  alist.add ("clay", 50.0);
+	  alist.add ("silt", 20.0);
+	  alist.add ("sand", 29.99);
+	  alist.add ("humus", 0.01);
+	  alist.add ("dry_bulk_density", 2.0);
+	  library.add_derived ("aquitard", alist, "default");
+	}
+      daisy_assert (library.check ("aquitard"));
+      AttributeList horizon_alist (library.lookup ("aquitard"));
+      horizon_alist.add ("type", "aquitard");
+      AttributeList hydraulic_alist (horizon_alist.alist ("hydraulic"));
+      hydraulic_alist.add ("K_sat", K_aquitard);
+      horizon_alist.add ("hydraulic", hydraulic_alist);
+      daisy_assert (library.syntax ("aquitard").check (horizon_alist, msg));
+      Syntax layer_syntax;
+      AttributeList layer_alist;
+      Implementation::Layer::load_syntax (layer_syntax, layer_alist);
+      layer_alist.add ("end", new_end);
+      layer_alist.add ("horizon", horizon_alist);
+      daisy_assert (layer_syntax.check (layer_alist, msg));
+      impl.layers.push_back (new Implementation::Layer (layer_alist));
+    }
 
   const vector<Implementation::Layer*>::const_iterator begin
     = impl.layers.begin ();

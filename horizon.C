@@ -529,8 +529,6 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "The hydraulic propeties of the soil.");
   AttributeList hydraulic_alist;
   hydraulic_alist.add ("type", "hypres");
-  hydraulic_alist.add ("Theta_res", 0.0);
-  hydraulic_alist.add ("Theta_sat", 0.9);
   alist.add ("hydraulic", hydraulic_alist);
   syntax.add ("tortuosity", Librarian<Tortuosity>::library (), 
 	      "The soil tortuosity.");

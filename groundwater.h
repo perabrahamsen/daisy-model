@@ -38,6 +38,9 @@ public:
   static const char *const description;
   virtual bool is_pipe () const;
   virtual double pipe_height () const;
+  virtual double Z_aquitard () const;
+  virtual double K_aquitard () const;
+  virtual void set_Z_aquitard (double);
 
   // Simulation.
 public:

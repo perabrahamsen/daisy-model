@@ -35,11 +35,19 @@ class GroundwaterPipe : public Groundwater
   const double L;		// Distance between pipes. [cm]
   const double x;		// Distance to nearest pipe. [cm]
   const double pipe_position;	// Height pipes are placed above surface. [cm]
-  const double K_aquitard;	// Conductivity of the aquitard [cm h^-1]
-  const double Z_aquitard;	// Vertical length of the aquitard [cm]
+  const double K_aquitard_;	// Conductivity of the aquitard [cm h^-1]
+  /*const*/ double Z_aquitard_;	// Vertical length of the aquitard [cm]
   const double h_aquifer;	// Pressure potential in the aquifer [cm]
   int i_bottom;			// Node, bottom layer
   int i_drain;			// Node, drain
+
+  // Accessors.
+  double Z_aquitard () const
+  { return Z_aquitard_; }
+  double K_aquitard () const
+  { return K_aquitard_; }
+  void set_Z_aquitard (double value)
+  { Z_aquitard_ = value; }
 
   // Data.
   double height;		// Groundwater table height above surface. [cm]
@@ -140,9 +148,9 @@ public:
       L (al.number ("L")),
       x (al.check ("x") ? al.number ("x") : L / 2.0),
       pipe_position (al.number ("pipe_position")),
-      K_aquitard (al.number ("K_aquitard")),
-      Z_aquitard (al.number ("Z_aquitard")),
-      h_aquifer (al.check ("h_aquifer") ? al.number ("h_aquifer") : Z_aquitard),
+      K_aquitard_ (al.number ("K_aquitard")),
+      Z_aquitard_ (al.number ("Z_aquitard")),
+      h_aquifer (al.check ("h_aquifer") ? al.number ("h_aquifer") : Z_aquitard_),
       height (al.check ("height") ? al.number ("height") : pipe_position)
     { }
   ~GroundwaterPipe ()
@@ -238,7 +246,7 @@ GroundwaterPipe::DeepPercolation(const Soil& soil)
 {
   const double hb = height - soil.zplus(i_bottom);
   if (hb > 0)
-    return K_aquitard * (1.0 + (hb - h_aquifer) / Z_aquitard);
+    return K_aquitard_ * (1.0 + (hb - h_aquifer) / Z_aquitard_);
   else
     return 0;
 }

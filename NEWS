@@ -12,6 +12,18 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.74
+
+** New automatic aquitard horizon.
+
+Drained soil will now automatically get an aquitard horizon, unless
+you specify the discretization (zplus).  The aquitard horizon is a
+third of the size of the aquitard itself.
+
+This affect logging, since the log models by default log down to the
+end of the last horizon.  I therefore suggest you always specify the
+'to' parameter when using the 'pipe' groundwater model.
+
 * 2.73
 
 ** Log file syntax changed.

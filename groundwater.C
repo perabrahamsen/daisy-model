@@ -39,6 +39,18 @@ double
 Groundwater::pipe_height () const
 { daisy_assert (false); }
 
+double 
+Groundwater::Z_aquitard () const
+{ daisy_assert (false); }
+
+double 
+Groundwater::K_aquitard () const
+{ daisy_assert (false); }
+
+void 
+Groundwater::set_Z_aquitard (double)
+{ daisy_assert (false); }
+
 void
 Groundwater::update_water (const Soil&, const SoilHeat&,
 			   vector<double>& /* S_sum */,

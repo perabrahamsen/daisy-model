@@ -460,6 +460,8 @@ SoilWater::Implementation::initialize (const AttributeList& al,
 				       const Groundwater& groundwater, 
 				       Treelog& out)
 {
+  Treelog::Open nest (out, "SoilWater");
+
   const unsigned int size = soil.size ();
 
   if (al.check ("X_ice"))
@@ -495,6 +497,18 @@ SoilWater::Implementation::initialize (const AttributeList& al,
   soil.initialize_layer (Theta, al, "Theta", out);
   soil.initialize_layer (h, al, "h", out);
 
+  for (int i = 0; i < Theta.size () && i < h.size (); i++)
+    {
+      const double Theta_h = soil.Theta (i, h[i], h_ice[i]);
+      if (!approximate (Theta[i], Theta_h))
+	{
+	  TmpStream tmp;
+	  tmp () << "Theta[" << i << "] (" << Theta[i] << ") != Theta (" 
+		 << h[i] << ") (" << Theta_h << ")";
+	  out.error (tmp.str ());
+	}
+      Theta[i] = Theta_h;
+    }
   if (Theta.size () > 0)
     {
       while (Theta.size () < size)

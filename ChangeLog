@@ -1,3 +1,22 @@
+2003-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.74 released.
+
+2003-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C (initialize): Give error if h and Theta does not
+	match, and use h.
+
+	* horizon_std.C: Fixed comment.
+
+	* horizon.C (load_syntax): Removed 'Theta_res' and 'Theta_sat'
+	from hypres alist.
+
+	* groundwater.h, grgroundwater.C, groundwater_pipe.C
+	(Z_aquitard, K_aquitard, set_Z_aquitard): New virtual members.
+	* soil.C, soil.h (initialize): Made groundwater non-const.
+	* soil.C (initialize): New automatic aquitard horizon.
+	
 2003-04-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.73 released.
