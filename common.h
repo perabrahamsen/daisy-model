@@ -92,8 +92,6 @@
 
 // Needed in BCC for 'close'.
 #include <io.h>
-// Needed in BCC for 'chdir'.
-#include <dir.h>
 
 // BC++ 5.01 hasn't <ostream.h>
 #define MISSING_OSTREAM

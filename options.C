@@ -9,6 +9,11 @@
 #include "version.h"
 #include "message.h"
 
+#ifdef __BORLANDC__
+// Needed in BCC for 'chdir'.
+#include <dir.h>
+#endif
+
 const char *const Options::log_name = "DAISY_LOG";
 const char *const Options::path_name = "DAISYPATH";
 

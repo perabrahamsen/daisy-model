@@ -1845,8 +1845,9 @@ CropStandard::harvest (const string& column_name,
   const double SOrg_N_Yield = sorg_harvest_frac * sorg_harvest * NSOrg;
 
   // Part of economic yield removed at harvest
-  const double WEYRm = Hp.EconomicYield_W * SOrg_W_Yield;
-  const double NEYRm = Hp.EconomicYield_N * SOrg_N_Yield;
+  const double WEYRm = Hp.EconomicYield_W * SOrg_W_Yield; // W is used for both
+  const double NEYRm = Hp.EconomicYield_N * SOrg_N_Yield; // DM and C.
+  const double CEYRm = Hp.EconomicYield_W * SOrg_C_Yield;
 
   const double Crop_N_Yield = Stem_N_Yield + Dead_N_Yield + Leaf_N_Yield + NEYRm;
 
@@ -2062,7 +2063,7 @@ CropStandard::harvest (const string& column_name,
 		       Stem_W_Yield, Stem_N_Yield, Stem_C_Yield,
 		       Dead_W_Yield, Dead_N_Yield, Dead_C_Yield,
 		       Leaf_W_Yield, Leaf_N_Yield, Leaf_C_Yield,
-		       WEYRm, NEYRm, SOrg_C_Yield, chemicals);
+		       WEYRm, NEYRm, CEYRm, chemicals);
 }
 
 void

@@ -1,3 +1,9 @@
+2001-10-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.h: Distinguish between Borland C++ 5.0 and 5.5.
+
+	* crop_std.C (harvest): Log economic yield for C.
+
 2001-10-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.82 released.
