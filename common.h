@@ -11,15 +11,12 @@
 #include <assert.h>
 #include <string>
 
-#if !defined (__GNUC__) && !defined (VISUALCPP)
-#define BORLAND
-#endif
-
-#if (defined (__GNUC__) && __GNUC__ < 3) || defined (BORLAND)
+#if (defined (__GNUC__) && __GNUC__ < 3) \
+ || (defined (__BORLAND) && __BORLANDC__ < 0x0550
 #define BROKEN_HEADERS
 #endif
 
-#if !defined (__CYGWIN__) && !defined (MINGW) && !defined (VISUALCPP) && !defined (BORLAND)
+#if !defined (__CYGWIN__) && !defined (MINGW) && !defined (VISUALCPP) && !defined (__BORLANDC__)
 // Doesn't work under cygwin
 #define pow(x, y) (assert (x >= 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))
@@ -34,7 +31,7 @@
 // Only gcc has a C++ safe <math.h>.
 #include <math.h>
 #else
-#define exception _BUG_EXCPETION
+#define exception _BUG_EXCEPTION
 #include <math.h>
 #undef exception
 #endif
@@ -81,6 +78,7 @@
 #define EXPORT _export
 #define IMPORT _import
 
+#if __BORLANDC__ < 0x0550
 // Define these for Borland C++ 5.0.1
 #define BORLAND_TEMPLATES
 #define BORLAND_EOF
