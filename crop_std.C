@@ -820,7 +820,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Root.add ("MaxPen", Syntax::Number, Syntax::Const);
   Root.add ("SpRtLength", "m/g", Syntax::Const,
 	    "Specific root length");
-  vRoot.add ("SpRtLength", 0.1);
+  vRoot.add ("SpRtLength", 100);
   Root.add ("DensRtTip", Syntax::Number, Syntax::Const);
   vRoot.add ("DensRtTip", 0.1);
   Root.add ("Rad", Syntax::Number, Syntax::Const);

@@ -1,6 +1,16 @@
 1998-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 0.42 released.
+
+1998-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (CropStandardSyntax): Fix default for `SpRtLength'. 
+
 	* Version 0.41 released.
+
+	* crop_std.C (CropStandardSyntax): Add description and default for
+	`SpRtLength'. 
+	(RootDensity): Multiply SpRtLength with 100 instead of 10.
 
 1998-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
