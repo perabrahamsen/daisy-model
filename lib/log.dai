@@ -139,6 +139,16 @@
   	     (array (path column "$col" SoilWater h)
 	            (dimension "cm"))))
 
+(deflog "Soil Water Sink" table
+  (where "soil_water_sink.tab")
+  (when hourly)
+  (entries (year (path time))
+	     (month (path time))
+	     (mday (path time))
+	     (hour (path time))
+  	     (array (path column "$col" SoilWater S_sum)
+	            (dimension "cm^3/cm^3/h"))))
+
 (deflog "Preferential Water Flux" table
   (where "pref_flux.tab")
   (when hourly)
@@ -257,6 +267,35 @@
 	   (number (path column "$col" Bioclimate "*" Snow Ssnow)
 		   (tag "SnowStore")
 		   (dimension "mm"))))
+
+(deflog "Ridge" table
+  (where "ridge.tab")
+  (when hourly)
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (hour (path time))
+	   (number (path column "$col" Surface ridge Theta_pre)
+		   (dimension "cm^3/cm^3"))
+	   (number (path column "$col" Surface ridge Theta)
+		   (dimension "cm^3/cm^3"))
+	   (number (path column "$col" Surface ridge h)
+		   (dimension "cm"))
+	   (number (path column "$col" Surface ridge z_pond)
+		   (dimension "cm"))
+	   (number (path column "$col" Surface ridge x_pond))
+	   (number (path column "$col" Surface ridge internal_ponding)
+		   (dimension "cm"))
+	   (number (path column "$col" Surface ridge R_bottom)
+		   (dimension "h"))
+	   (number (path column "$col" Surface ridge R_wall)
+		   (dimension "h"))
+	   (number (path column "$col" Surface ridge I_bottom)
+		   (dimension "cm/h"))
+	   (number (path column "$col" Surface ridge I_wall)
+		   (dimension "cm/h"))
+	   (number (path column "$col" Surface ridge I)
+		   (dimension "cm/h"))))
 
 (deflog "Root Zone Water Balance" table
   (where "root_zone_water_balance.tab")
@@ -439,7 +478,7 @@
 		     (when hourly)
 		     (dimension "kg N/ha/d")
 		     (factor 1e5))		;g/cm²/d -> kg N/ha/d
-	   (interval (tag "NO3")
+	   (interval (tag "Total-NO3")
 		     (path column "$col" SoilNO3 M)
 		     (dimension "kg N/ha")
 		     (factor 1e5))		;g/cm² -> kg/ha
@@ -782,8 +821,7 @@
 	   (number (path column "$col" Vegetation crops "$crop" Prod WRoot)
 		   (dimension "Ton DM/ha")
 		   (factor 0.01))
-	   (number (path column "$col" Vegetation crops "$crop" CrpAux Fixated)
-		   (accumulate true)
+	   (number (path column "$col" Vegetation crops "$crop" CrpAux AccFixated)
 		   (dimension "kg N/ha")
 		   (factor 10.0))
 	   (number (path column "$col" Vegetation crops "$crop" Prod NLeaf)
