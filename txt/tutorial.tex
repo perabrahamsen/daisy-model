@@ -365,9 +365,9 @@ In this example, we do both.
     (wait (at 1987 3 20 1))
     (plowing)
     (wait (at 1987 4 4 1))
-    (fertilize mineral
-               (weight 100.0 [kg N/ha])
-               (NH4_fraction 0.5 []))
+    (fertilize (mineral
+                (weight 100.0 [kg N/ha])
+                (NH4_fraction 0.5 [])))
     (wait (at 1987 4 5 1))
     (progn
       (sow "Grass")
@@ -376,9 +376,9 @@ In this example, we do both.
               (at 1987 9 5 1)))
     (harvest "Spring Barley")
     (wait (at 1987 9 8 1))
-    (fertilize mineral
-               (weight 80.0 [kg N/ha])
-               (NH4_fraction 0.5 []))
+    (fertilize (mineral
+                (weight 80.0 [kg N/ha])
+                (NH4_fraction 0.5 [])))
     (wait (at 1987 10 10 1))
     (harvest "Grass"
              (stub 8.0 [cm])              ;Leave 8 cm stub.
@@ -411,9 +411,9 @@ examples of management actions can be found in
 section~\ref{sec:management}.
 
 \begin{verbatim}
-    (fertilize mineral
-               (weight 100.0 [kg N/ha])
-               (NH4_fraction 0.5 []))
+    (fertilize (mineral
+                (weight 100.0 [kg N/ha])
+                (NH4_fraction 0.5 [])))
 \end{verbatim}
 
 This is an order to fertilize.  The fertilization type is
@@ -926,7 +926,7 @@ specific crop, as in the example below.
     (wait_mm_dd 3 20)
     (plowing)
     (wait_mm_dd 4 10)
-    (fertilize pig_slurry (weight 100.0 [T w.w./ha]))
+    (fertilize (pig_slurry (weight 100.0 [T w.w./ha])))
     (wait_mm_dd 4 15)
     (seed_bed_preparation)
     (sow "Spring Barley")
@@ -1105,7 +1105,7 @@ grass to grow old or big enough, and then cut it.
   (defaction cut_grass_fertilize activity
     (cut_grass)
     (wait_days 1)
-    (fertilize N25S (weight 100.0 [kg N/ha])))
+    (fertilize (N25S (weight 100.0 [kg N/ha]))))
 \end{verbatim}
 Here, we extend the \texttt{cut\_grass} operation by fertilizing after
 the cut.
@@ -1117,7 +1117,7 @@ Now we can define our grass management action:
     (wait trafficable)
     (plowing)
     (wait_mm_dd 4 10)
-    (fertilize N25S (weight 100.0 [kg N/ha]))
+    (fertilize (N25S (weight 100.0 [kg N/ha])))
     (wait_mm_dd 4 15)
     (seed_bed_preparation)
     (sow "Grass")
@@ -1176,9 +1176,9 @@ followed by examples of some more advanced types of fertilization.
 
 In section~\ref{sec:ex-man} we used mineral fertilizer, as below:
 \begin{verbatim}
-    (fertilize mineral
-               (weight 100.0 [kg N/ha])
-               (NH4_fraction 0.5 []))
+    (fertilize (mineral
+                (weight 100.0 [kg N/ha])
+                (NH4_fraction 0.5 [])))
 \end{verbatim}
 If we used this fertilizer type often, it might be nice to give it a
 name.  We could do this with the following definition:
@@ -1188,7 +1188,7 @@ name.  We could do this with the following definition:
 \end{verbatim}
 To use it, we would write:
 \begin{verbatim}
-  (fertilize SuperGrow (weight 100.0 [kg N/ha]))
+  (fertilize (SuperGrow (weight 100.0 [kg N/ha])))
 \end{verbatim}
 It only saves one line, but the producers of SuperGrow\texttrademark{}
 will be eternally grateful.  The \texttt{fertilizer.dai} file already
@@ -1271,12 +1271,11 @@ To use this information, we can write the following
 \end{verbatim}
 in our management specification.  We let \daisy{} calculate the amount
 of wet weight to apply, to get a first year utilization of 100 kg
-N/ha.  Note the parentheses around the \texttt{"Andeby Pig Slurry"}.
-When we specify \texttt{weight} directly, these should not be there,
-but here, they must, for reasons to embarrassing to mention
-here\footnote{Well, not really.  The \texttt{weight} parameter is a
-  property of the fertilizer itself, while \texttt{equivalent\_weight}
-  is a property of the fertilize action.  Thus, the difference.}.
+N/ha.  Note that \texttt{equivalent\_weight} is outside the
+parentheses around the \texttt{"Andeby Pig Slurry"}, unlike
+\texttt{weight}.  The \texttt{weight} parameter is a property of the
+fertilizer itself, while \texttt{equivalent\_weight} is a property of
+the fertilize action.  Thus, the difference.
 
 To use the \texttt{second\_year\_utilization} parameter, we should let
 one harvest operation (usually the first) the next year have the form
@@ -2016,9 +2015,9 @@ to log a particular crop alone as below:
     (wait (at 1987 3 20 1))
     (plowing)
     (wait (at 1987 4 4 1))
-    (fertilize mineral
-               (weight 100.0 [kg N/ha])
-               (NH4_fraction 0.5 []))
+    (fertilize (mineral
+                (weight 100.0 [kg N/ha])
+                (NH4_fraction 0.5 [])))
     (wait (at 1987 4 5 1))
     (progn
       (sow "Grass")
@@ -2027,9 +2026,9 @@ to log a particular crop alone as below:
               (at 1987 9 5 1)))
     (harvest "Spring Barley")
     (wait (at 1987 9 8 1))
-    (fertilize mineral
-               (weight 80.0 [kg N/ha])
-               (NH4_fraction 0.5 []))
+    (fertilize (mineral
+                (weight 80.0 [kg N/ha])
+                (NH4_fraction 0.5 [])))
     (wait (at 1987 10 10 1))
     (harvest "Grass"
              (stub 8.0 [cm])              ;Leave 8 cm stub.

@@ -41,9 +41,9 @@
   (wait (at 1987 3 20 1))
   (plowing)
   (wait (at 1987 4 4 1))
-  (fertilize mineral
-             (weight 100.0 [kg N/ha])
-             (NH4_fraction 0.5 []))
+  (fertilize (mineral
+              (weight 100.0 [kg N/ha])
+              (NH4_fraction 0.5 [])))
   (wait (at 1987 4 5 1))
   (progn
     (sow "Grass")
@@ -52,9 +52,9 @@
             (at 1987 9 5 1)))
   (harvest "Spring Barley")
   (wait (at 1987 9 8 1))
-  (fertilize mineral
-             (weight 80.0 [kg N/ha])
-             (NH4_fraction 0.5 []))
+  (fertilize (mineral
+              (weight 80.0 [kg N/ha])
+              (NH4_fraction 0.5 [])))
   (wait (at 1987 10 10 1))
   (harvest "Grass"
            (stub 8.0 [cm])              ;Leave 8 cm stub.
