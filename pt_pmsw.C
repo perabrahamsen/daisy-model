@@ -1312,7 +1312,9 @@ class PT_PMSW : public PT
 public:
 
 // *******************TEMPORARY*********************
+#ifdef USE_FILES
 	FILE *fp_rcmin, *fp_rcminsb, *fp_rcminww;
+#endif
         double rcmin;
    	double rcmin_sb_ndvi,rcmin_sb_savi;
    	double rcmin_ww_ndvi,rcmin_ww_savi;
@@ -1532,7 +1534,7 @@ public:
         teller=0;
 // temporary input: rcmin_ww.dat or rcmin_sb.dat
 
-/*
+#ifdef USE_FILES
 //.............WHEAT..............
   	if ((fp_rcmin=fopen("rcmin_ww.dat", "r"))==NULL)
    	{
@@ -1546,7 +1548,6 @@ public:
         exit(1);
       	}
 
-*/
 //.............BARLEY...........
   	if ((fp_rcmin=fopen("rcmin_sb.dat", "r"))==NULL)
    	{
@@ -1559,6 +1560,7 @@ public:
    	printf("cannot open output file\n");
         exit(1);
       	}
+#endif
 
 
       	} // end PM_svat() implementation
@@ -1567,7 +1569,7 @@ public:
 	double  potential_transpiration_ ;
 // return Lel in mm/hr, i.e. (1/680) 1 W/m**2 = 0.001471 mm/hr
   	double potential_transpiration () const
-	{ return /* potential_transpiration_ */ 0.001471*lel_pot; }
+  { return potential_transpiration_ /* 0.001471*lel_pot */; }
 
 void tick (const Weather& weather, const Vegetation& crops,
 	const Surface& surface, const Soil& soil, const SoilHeat& soil_heat,
@@ -1595,6 +1597,7 @@ cout << "LAI is\t" << LAI << "\n";
 cout << "LAI is\t" << LAI << "\n";
 
 // READ FROM TEMPORARY RCMIN_WW.DAT OR RCMIN_SB.DAT FILE
+#ifdef USE_FILES
 	fscanf(fp_rcmin,"%lf%lf%lf%lf%lf\n",
    	&pgtime,&rcmin_ww_ndvi,&rcmin_ww_savi,&rcmin_sb_ndvi,&rcmin_sb_savi);
 /*
@@ -1617,6 +1620,7 @@ if (LAI > 0.0)
 	fprintf(fp_rcminsb,"%lf%10.2lf%10.2lf\n",pgtime,200.0/LAI,rcmin_sb_ndvi);
         } else rcmin=rcmin_sb_ndvi; // or another variable=9999
 
+#endif
 // potential evapotranspiration from surface and canopy, from tick()
 // pot.evap.above crop canopy [cm/hr]
 	epotc=0.1*canopy_ep;
@@ -2090,10 +2094,11 @@ cout << "past RAASTABWET_1()\n";
 
    ~PT_PMSW() // destructor
    	{
+#ifdef USE_FILES
    fclose(fp_rcmin);
    fclose(fp_rcminsb);
    fclose(fp_rcminww);
-
+#endif
   	free_matrix(t,1,NP,1,MP);
   	free_matrix(x,1,NP,1,MP);
   	free_matrix(b,1,NP,1,MP);
