@@ -24,9 +24,10 @@ public:
 public:
   virtual void tick (const Weather&, const Vegetation&,
 		     const Surface&, const Soil&, const SoilHeat&, 
-		     const SoilWater&, const Pet&, 
+		     const SoilWater&, const Pet&,
 		     double canopy_ea, double snow_ea,
-		     double pond_ea, double soil_ea) = 0;
+		     double pond_ea, double soil_ea, double crop_ea,
+                     double crop_ep) = 0;
   virtual double potential_transpiration () const = 0; // [mm/h]
   virtual void output (Log&) const;
 

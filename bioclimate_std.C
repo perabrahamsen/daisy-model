@@ -73,7 +73,7 @@ struct BioclimateStandard : public Bioclimate
   double crop_ea;		// Actual transpiration. [mm/h]
 
   void WaterDistribution (Surface& surface, const Weather& weather, 
-			  Vegetation& vegetation, const Soil& soil, 
+			  Vegetation& vegetation, const Soil& soil,
 			  SoilWater& soil_water, const SoilHeat&);
 
   // Chemicals.
@@ -274,7 +274,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
   // (how fast the light dim as a  function of LAI passed).
   const double ACExt = vegetation.ACExt ();
 
-  // Average Canopy Reflection coefficient 
+  // Average Canopy Reflection coefficient
   const double ACRef =  vegetation.ACRef ();
 
 #if 0
@@ -412,14 +412,15 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   // Potential transpiration
   pt.tick (weather, vegetation, surface, soil, soil_heat, soil_water, pet,
-	   canopy_ea, snow_ea, pond_ea, soil_ea);
+	   canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
+
   crop_ep = pt.potential_transpiration ();
   assert (crop_ep < total_ep - total_ea + 1e-8);
-				
+
   // Actual transpiration
   crop_ea = vegetation.transpiration (crop_ep, canopy_ea, soil, soil_water) ;
   total_ea += crop_ea;
-  
+
   // 7 Reset irrigation
   irrigation_top_old = irrigation_top;
   irrigation_top = 0.0;

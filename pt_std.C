@@ -18,9 +18,10 @@ struct PT_standard : public PT
   // Simulation.
   void tick (const Weather&, const Vegetation& crops,
 	     const Surface& surface, const Soil&, const SoilHeat&,
-	     const SoilWater&, const Pet& pet, 
+	     const SoilWater&, const Pet& pet,
 	     double canopy_ea, double snow_ea,
-	     double pond_ea, double soil_ea)
+	     double pond_ea, double soil_ea,
+             double crop_ea, double crop_ep)
     {
       const double divide_ep = pet.wet () - snow_ea;
       const double canopy_ep = divide_ep * crops.cover ();

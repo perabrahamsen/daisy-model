@@ -1,4 +1,5 @@
-// Status: revised 01-02-1999
+// Status: revised feb-1999
+// important for sensitivity studies: Do not alter !
 
 // description of functions
 # include "surface.h"
@@ -51,7 +52,7 @@ int RSC(double , double, double, double, double, double, double , double,
         double, double, double, double, double, double&, double&, double&,
         double&, double&, double&, double&, double&, double&, double&, double&,
         double&, double&, double&, double&, double&, double&, double&, double&,
-        double&, double&);
+        double&, double&, double&, double&);
 int EPA2ABS(double, double, double&);
 int EABS2PA(double, double, double&);
 int NETRAD(double, double, double, double, double , double, double, double,
@@ -634,22 +635,24 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 	double esta, double theta_w, double theta_c, double rcmin_LAI,
         double rcmax, double zeta, double f3const, double tref, double spar,
 	double tmin, double tmax, double nu_1, double nu_2, double nu_3,
-        double eact_w, double epotc_w, double &rfpar, double &rf_1,
+        double crop_ea_w, double crop_ep_w, double &rfpar, double &rf_1,
         double &rf_2, double &rf_3, double &rf_4, double &rr_sc_1,
         double &rr_tot_1,double &rbf_temp, double &rf_temp, double &rf_def,
-        double &rf_theta, double &rr_sc_2, double &rr_tot_2, double &rf_etep,
-        double &rr_sc_3, double &rr_tot_3, double &rr_sc_4, double &rr_tot_4,
-        double &rr_sc_5, double &rr_tot_5, double &rr_sc_min)
+        double &rf_theta, double &rf1_dolman, double &rr_sc_2, double &rr_tot_2,
+        double &rf_etep, double &rr_sc_3, double &rr_tot_3, double &rr_sc_4,
+        double &rr_tot_4, double &rr_sc_5, double &rr_tot_5, double &rr_sc_min,
+	double &rr_sc_js)
 	{
    	double tairk,def;
+        const double a4=700.0; // parameter in f1_dolman (for oats)
 
-   	esta=611*exp((17.27*tair)/(tair+237.3)); // saturated vapor pressure
+   	esta=611.0*exp((17.27*tair)/(tair+237.3)); // saturated vapor pressure
    	def=0.001*(esta-e_pa); // vapor deficit in kPa
 	tairk=tair+273.15; // air temperature in K
 	rfpar=0.55*2*srad/(spar*LAI); // cpar coefficient in rf_1
-	rcmin_LAI=200/LAI;   // FAO
+	rcmin_LAI=200.0/LAI;   // FAO
 
-// constraint functions used in Noilhan et al.(1991)
+// constraint functions used in Dickinson (1984) / Noilhan et al. (1991)
 	rf_1=(rcmin_LAI/rcmax+rfpar)/(1+rfpar); // related to solar radiation
    	rf_2=1-zeta*(esta-e_pa); // related to vapour pressure deficit
 // tref-tairk > 0
@@ -660,6 +663,9 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 // rf_4 should not be zero
 	if (rf_4==0.0) rf_4=0.01;
 
+// f1 function Dolman (1991) referenced in Dolman (1993)
+	if (srad==0.0) srad=srad+1.0;
+	rf1_dolman=(srad/(a4+srad))/(1000.0/(1000.0+a4));
 // constraint functions used in Verma et al.(1993)
    	rbf_temp=(tmax-nu_1)/(nu_1-tmin); // used in f_temp
 	if (tair==tmin) tair=tmin+0.1;
@@ -669,44 +675,27 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 
 // Stewart (1988), Kim & Verma (1991) as referenced in Verma et al. (1993)
    	rf_theta=1.0-exp(-nu_3*100.0*theta_0_20);
-	if (epotc_w==0.0) epotc_w=epotc_w+1.0; // no division by 0 in f_etep
-   	if (eact_w==0.0) eact_w=eact_w+1.0; // no division by 0 in rr_sc_3
-	rf_etep=eact_w/epotc_w;
+
+// calculate contraint function F4 as canopy_ea/canopy_ep
+	rf_etep=crop_ea_w/crop_ep_w;
 
 // canopy resistance using Noilhan et al.(1991)...: r_sc_1
-	if (LAI*rf_1*rf_2*rf_3*rf_4 <= 1.0)
-        {
    	rr_sc_1=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_4);
-      	} else rr_sc_1=rcmin_LAI;
-   	rr_tot_1=rf_1*rf_2*rf_3*rf_4;
 
 // ... or using Verma et al. (1993): r_sc_2
-	if (LAI*rf_1*rf_temp*rf_def*rf_theta <= 1.0)
-   	{      // still using f_1...
 	rr_sc_2=(rcmin_LAI/LAI)/(rf_1*rf_temp*rf_def*rf_theta);
-      	} else rr_sc_2=rcmin_LAI;
-   	rr_tot_2=rf_1*rf_temp*rf_def*rf_theta; // still using f_1...
 
 // ... or using f_etep: eact/epotc: r_sc_3
-	if (LAI*rf_1*rf_2*rf_3*rf_etep <= 1.0)
-   	{
        	rr_sc_3=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_etep);
-      	} else rr_sc_3=rcmin_LAI;
-   	rr_tot_3=rf_1*rf_2*rf_3*rf_etep;
 
 // combine f_etep with f_temp, f_def and f_theta (and f_1): r_sc_4
-	if (LAI*rf_1*rf_temp*rf_def*rf_etep <= 1.0)
-     	{
-	rr_sc_4=(rcmin_LAI/LAI)/(rf_1*rf_temp*rf_def*rf_etep);
-      	} else rr_sc_4=rcmin_LAI;
-   	rr_tot_4=rf_1*rf_temp*rf_def*rf_etep;
+	rr_sc_4=(rcmin_LAI/LAI)/(rf1_dolman*rf_temp*rf_def*rf_etep);
 
 // replace f_2 by f_def: r_sc_5
-	if (LAI*rf_1*rf_def*rf_3*rf_4 <= 1.0)
-     	{
-	rr_sc_5=(rcmin_LAI/LAI)/(rf_1*rf_def*rf_3*rf_4);
-      	} else rr_sc_5=rcmin_LAI;
-   	rr_tot_5=rf_1*rf_def*rf_3*rf_4;
+	rr_sc_5=rcmin_LAI/(rf_1*rf_def*rf_3*rf_4); // No dision by LAI
+
+// Use Jarvis (1976) & Steward (1988) as referenced in Dolman (1993):
+	rr_sc_js=(rcmin_LAI/LAI)/(rf1_dolman*rf_def*rf_3*rf_4);
 
 // for unstressed canopy resistance r_sc_min is equal to rcmin_LAI
 	rr_sc_min=rcmin_LAI;
@@ -772,7 +761,7 @@ int AVENER(double netrad_satt,double LAI,double alpha_r,double gflux,
 
 // calculation of energy fluxes using SW and SG: stressed conditions
 int LEHFLUX(double tair,double tskin,double tcan,double tleaf,
-	double r_aa_dry,double r_ac,double r_as,double r_sc_5,double e_c_abs,
+	double r_aa_dry,double r_ac,double r_as,double r_sc_js,double e_c_abs,
         double e_sl_abs,double e_abs,double les,double &rhl,double &rha,
         double &rhs,double &rlea,double &rlel,double &rhclos,double &rleclos,
         double &rdtcta,double &rdtltc,double &rdtstc,double &rdtlta)
@@ -785,7 +774,7 @@ int LEHFLUX(double tair,double tskin,double tcan,double tleaf,
    	rhl=rho_a*c_p*(tleaf-tcan)/r_ac; // H: leaf - source height
    	rhs=rho_a*c_p*(tskin-tcan)/r_as; // H: surface - source height
    	rlea=lambda*(e_c_abs-e_abs)/r_aa_dry; // LE: source height - reference
-   	rlel=lambda*(e_sl_abs-e_c_abs)/(r_sc_5+r_ac); // LE: leaf - source height
+   	rlel=lambda*(e_sl_abs-e_c_abs)/(r_sc_js+r_ac); // LE: leaf - source height
    	rdtcta=tcan-tair;
    	rdtltc=tleaf-tcan;
    	rdtstc=tskin-tcan;
@@ -877,7 +866,7 @@ int VAPOR(double tair, double &resta, double &resta_abs,
 // use of r_sc_x (combination of different constraint functions
 int ACOEFF(double tair, double e_abs, double netrad, double LAI, double les,
 	double temp_0, double kh, double r_aa, double r_ac, double r_as,
-   	double r_sc_5, double alpha_r, double &ra_11, double &ra_12,
+   	double r_sc_js, double alpha_r, double &ra_11, double &ra_12,
         double &ra_13, double &rb_1, double &ra_24, double &ra_25, double &rb_2,
    	double &ra_31, double &ra_33, double &ra_34, double &ra_35,
         double &rb_3, double &ra_41, double &ra_42, double &rb_4)
@@ -891,13 +880,13 @@ int ACOEFF(double tair, double e_abs, double netrad, double LAI, double les,
 	ra_12=-1.0/r_as;
    	ra_13=-1.0/r_ac;
    	rb_1=(tair+273.15)/r_aa;
-   	ra_24=lambda/r_aa+lambda/(r_sc_5+r_ac);
-   	ra_25=-lambda/(r_sc_5+r_ac);
+   	ra_24=lambda/r_aa+lambda/(r_sc_js+r_ac);
+   	ra_25=-lambda/(r_sc_js+r_ac);
    	rb_2=les+e_abs*lambda/r_aa;
    	ra_31=-rho_a*c_p/r_ac;
    	ra_33=rho_a*c_p/r_ac;
-   	ra_34=-lambda/(r_sc_5+r_ac);
-   	ra_35=lambda/(r_sc_5+r_ac);
+   	ra_34=-lambda/(r_sc_js+r_ac);
+   	ra_35=lambda/(r_sc_js+r_ac);
    	rb_3=netrad*(1.0-exp(-alpha_r*LAI));
    	ra_41=-rho_a*c_p/r_as;
    	ra_42=rho_a*c_p/r_as+kh/z_sz;
@@ -1103,7 +1092,7 @@ void EBAL_NR(double dt,double tair,double e_pa,double srad,double relsun,
 // solving for dt=tsurf-tair by closure(dt)=netrad-le(dt)-h(dt)-g(dt)
 int EBAL_DT(double tair, double e_pa, double netrad_brunt, double esta,
 	double desta, double kh, double temp_0, double r_a, double r_ac,
-        double r_sc_5,double r_sc_min,double &ra_dt_dry,double &rb_dt,
+        double r_sc_js,double r_sc_min,double &ra_dt_dry,double &rb_dt,
         double &rc_dt_dry,double &ra_dt_wet, double &rc_dt_wet,
         double &ra_dt_pot,double &rc_dt_pot,double &rdt_dt_dry,
         double &rdt_dt_wet,double &rdt_dt_pot,double &rtsurf_dt_dry,
@@ -1121,11 +1110,11 @@ int EBAL_DT(double tair, double e_pa, double netrad_brunt, double esta,
 // closure(dt)=netrad-le(dt)-h(dt)-g(dt) is solved for dt (=tsurf-tair)
 
 // calculate coefficients a_dt,b_dt and c_dt (dry, wet, potential)
-   	ra_dt_dry=(rho_a*c_p/gamma)*(e_pa-esta)/(r_a+r_ac+r_sc_5); // dry
+   	ra_dt_dry=(rho_a*c_p/gamma)*(e_pa-esta)/(r_a+r_ac+r_sc_js); // dry
    	ra_dt_wet=(rho_a*c_p/gamma)*(e_pa-esta)/(r_a+r_ac); // wet: r_sc=0
    	ra_dt_pot=(rho_a*c_p/gamma)*(e_pa-esta)/(r_a+r_ac+r_sc_min);
    	rb_dt=kh*(temp_0-tair)/z_sz;
-   	rc_dt_dry=-rho_a*c_p*desta/((r_a+r_ac+r_sc_5)*gamma)-rho_a*c_p/
+   	rc_dt_dry=-rho_a*c_p*desta/((r_a+r_ac+r_sc_js)*gamma)-rho_a*c_p/
         (r_a+r_ac)-kh/z_sz;
 	rc_dt_wet=-rho_a*c_p*desta/((r_a+r_ac)*gamma)-rho_a*c_p/(r_a+r_ac)-
         kh/z_sz;
@@ -1146,7 +1135,7 @@ int EBAL_DT(double tair, double e_pa, double netrad_brunt, double esta,
    	rh_dt_pot=rho_a*c_p*rdt_dt_pot/(r_a+r_ac);
 // Latent heat fluxes
 	rle_dt_dry=(rho_a*c_p/gamma)*(esta+desta*rdt_dt_dry-e_pa)/
-        (r_a+r_ac+r_sc_5);
+        (r_a+r_ac+r_sc_js);
    	rle_dt_wet=(rho_a*c_p/gamma)*(esta+desta*rdt_dt_wet-e_pa)/
         (r_a+r_ac);
 	rle_dt_pot=(rho_a*c_p/gamma)*(esta+desta*rdt_dt_pot-e_pa)/
@@ -1306,11 +1295,13 @@ public:
 
 // I/O files
 // FILE *fp_ebal_pm;
-	FILE *fp_parcheck, *fp_lehflux, *fp_theta;
+	FILE *fp_parcheck, *fp_lehflux, *fp_theta, *fp_ebal_dt, *fp_etep;
    	FILE *fp_solcheck, *fp_axainv, *fp_mat_a, *fp_mat_b; // for gaussj ()
 
 // meteorological- and derived variables
    	double srad,tair,e_abs,e_pa,u,u_ref,relsun,prec; // metinput
+        double relsun_day,relsun_last; // daytime- and last daytime value
+        double relsun_cld;
    	double esta,esta_abs,desta,desta_abs,ests; // saturated vapor pressures
    	double netrad_brunt,netlong_brunt,netrad_satt,netlong_satt,netshort;
 	double albedo,b1,b2,b3,b4;
@@ -1332,11 +1323,12 @@ public:
    	double theta_w,theta_c,fpar,f_1,f_2,f_3,f_4,r_tot_1; //Noilhan e.a.(1991)
    	double bf_temp,f_temp,f_def,f_theta,r_tot_2; // in Verma et al. (1993)
 	double tmin,tmax,nu_1,nu_2,nu_3; // in Verma et al. (1993)
-   	double f_etep,r_sc_3,r_tot_3; // using f_etep=eact/epotc
+   	double f_etep,r_sc_3,r_tot_3; // using f_etep=ea/epot
    	double r_sc_4,r_tot_4; // using f_temp, f_def, f_etep (and f_1)
    	double r_sc_5,r_tot_5; // replacing f_2 by f_def
 	double rcmin_LAI,rcmin_const,rcmax,tref,zeta,f3const,spar; // from daisy.par
    	double r_sc_min; // unstressed canopy resistance in RSC()
+	double r_sc_js,f1_dolman; // Jarvis & Steward & Dolman (1993) F1
    	double r_tot; // as r_tot_x, x=1..5
 
 // matrix elements in ACOEFF for stressed conditions
@@ -1403,6 +1395,7 @@ public:
    	double eact; // actual evapotranspiration from tick()
    	double epotc_w,epots_w,eact_w; // fluxes from cm/hr to W/m**2
 	double pond_ea_w,soil_ea_w,pond_ep_w,canopy_ep_w,canopy_ea_w;// in tick
+        double crop_ea_w,crop_ep_w; // actual & potential transpiration (f_etep)
 	double lat_s; // latent heat at soil surface , e.g. Nichols eq.7
    	double temp_0; // soil temperature T(0) from soil_heat.h
    	double LAI; // equals LAI_ in PM_bioclimate.C
@@ -1439,85 +1432,98 @@ public:
        b2 (al.number ("b2")),
        b3 (al.number ("b3")),
        b4 (al.number ("b4")),
-       alpha_r (al.number ("alpha_r")),
        ndif (al.number ("ndif")),
        c_d (al.number ("c_d")),
        z_0s (al.number ("z_0s")),
        z0_def (al.number ("z0_def")),
        w (al.number ("w")),
        alpha_u (al.number ("alpha_u")),
-       arac (al.number ("arac")),
        alpha_k (al.number ("alpha_k")),
+       alpha_r (al.number ("alpha_r")),
        theta_w (al.number ("theta_w")),
        theta_c (al.number ("theta_c")),
+       rcmin_const (al.number ("rcmin_const")),
+       rcmax (al.number ("rcmax")),
+       tref (al.number ("tref")),
+       zeta (al.number ("zeta")),
+       arac (al.number ("arac")),
+       f3const (al.number ("f3const")),
+       spar (al.number ("spar")),
        tmin (al.number ("tmin")),
        tmax (al.number ("tmax")),
        nu_1 (al.number ("nu_1")),
        nu_2 (al.number ("nu_2")),
        nu_3 (al.number ("nu_3")),
-       rcmin_const (al.number ("rcmin_const")),
-       rcmax (al.number ("rcmax")),
-       tref (al.number ("tref")),
-       zeta (al.number ("zeta")),
-       f3const (al.number ("f3const")),
-       spar (al.number ("spar")),
        dt1 (al.number ("dt1")),
        dt2 (al.number ("dt2")),
        acc (al.number ("acc"))
 #endif
    	{
-      n_hr=0;  // counter for output files
-      les_tmp=-9999.0; // not in use
+      	n_hr=0;  // counter for output files
+      	les_tmp=-9999.0; // not in use
 
 // initialize canopy temperatures (first value)
-      tcan_init=10.0; // initial value for tcan stressed
-      tcan_pot_init=10.0; // initial value for tcan unstressed
-      tcan_wet_init=10.0; // initial value for tcan wet
-      tsurf_dt_dry_init=10.0;
-      tcan_prev=tcan_init;
-      tcan_prev_pot=tcan_pot_init;
-      tcan_prev_wet=tcan_wet_init;
-      tsurf_dt_dry=tsurf_dt_dry_init;
+      	tcan_init=10.0; // initial value for tcan stressed
+      	tcan_pot_init=10.0; // initial value for tcan unstressed
+      	tcan_wet_init=10.0; // initial value for tcan wet
+      	tsurf_dt_dry_init=10.0;
+      	tcan_prev=tcan_init;
+      	tcan_prev_pot=tcan_pot_init;
+      	tcan_prev_wet=tcan_wet_init;
+      	tsurf_dt_dry=tsurf_dt_dry_init;
+
+// set relsun_cld for cloudy weather: relsun_cld=0.0
+	relsun_cld=0.0;
 
 // initialize some parameters in RAASTAB_2 not used when RAASTAB_1() is active
 	L_pot=L_wet=0.0;
         y_pot=y_wet=0.0;
 
 // temporary output
+  	if ((fp_etep=fopen("etep.out", "w"))==NULL)
+   	{
+   	printf("cannot open output file\n");
+      	exit(1);
+      	}
   	if ((fp_lehflux=fopen("lehflux.out", "w"))==NULL)
    	{
    	printf("cannot open output file\n");
-      exit(1);
-      }
+      	exit(1);
+      	}
   	if ((fp_theta=fopen("theta.out", "w"))==NULL)
    	{
    	printf("cannot open output file\n");
-      exit(1);
-      }
+      	exit(1);
+      	}
+  	if ((fp_ebal_dt=fopen("ebal_dt.out", "w"))==NULL)
+   	{
+   	printf("cannot open output file\n");
+      	exit(1);
+      	}
 
 // control files:
   	if ((fp_solcheck=fopen("solcheck.out", "w"))==NULL)
    	{
    	printf("cannot open output file\n");
-      exit(1);
-      }
+      	exit(1);
+      	}
   	if ((fp_axainv=fopen("axainv.out", "w"))==NULL)
    	{
    	printf("cannot open output file\n");
-      exit(1);
-      }
+      	exit(1);
+      	}
   	if ((fp_mat_a=fopen("mat_a.out", "w"))==NULL)
    	{
    	printf("cannot open output file\n");
-      exit(1);
-      }
-      if ((fp_mat_b=fopen("mat_b.out", "w"))==NULL)
+      	exit(1);
+      	}
+      	if ((fp_mat_b=fopen("mat_b.out", "w"))==NULL)
    	{
    	printf("cannot open output file\n");
-      exit(1);
-      }
+      	exit(1);
+      	}
 
-      } // end PM_svat() implementation
+      	} // end PM_svat() implementation
 
 
 	double  potential_transpiration_ ;
@@ -1528,8 +1534,9 @@ public:
 
 void tick (const Weather& weather, const Vegetation& crops,
 	const Surface& surface, const Soil& soil, const SoilHeat& soil_heat,
-	const SoilWater& soil_water, const Pet& pet,
-	double canopy_ea , double snow_ea, double pond_ea, double soil_ea)
+	const SoilWater& soil_water, const Pet& pet, double canopy_ea ,
+        double snow_ea, double pond_ea, double soil_ea, double crop_ea,
+        double crop_ep)
        	{
       	const double divide_ep = pet.wet () - snow_ea;
       	const double canopy_ep = divide_ep * crops.cover ();
@@ -1542,10 +1549,10 @@ void tick (const Weather& weather, const Vegetation& crops,
         	min (max (0.0, potential_crop_transpiration
 		   + potential_soil_transpiration),pet.dry ());
 
+
 	LAI =crops.LAI (); // Leaf Areal Index
     	h   =0.01*crops.height (); // max crop height [m]
 
-cout << "at timestep:\t" << n_hr << "\n";
 // potential evapotranspiration from surface and canopy, from tick()
 // pot.evap.above crop canopy [cm/hr]
 	epotc=0.1*canopy_ep;
@@ -1554,7 +1561,7 @@ cout << "at timestep:\t" << n_hr << "\n";
 // surface evaporation
         evaps=0.1*(pond_ea + soil_ea); // soil evaporation  ???? CHECK
 
-// actual evapotranspiration from tick()
+// actual evapotranspiration, from soil and canopy, from tick()
 	eact=0.1*soil_ea;
 
 // convert epotc, epots and eact etc. from cm/hr to W/m**2
@@ -1567,6 +1574,13 @@ cout << "at timestep:\t" << n_hr << "\n";
         pond_ep_w=680.0*pond_ep;
         canopy_ep_w=680.0*canopy_ep;
         canopy_ea_w=680.0*canopy_ea;
+        crop_ep_w=680.0*crop_ep;
+        crop_ea_w=680.0*crop_ea;
+
+// no division by 0 in fprintf (fp_etep,..) and in RSC()
+        if (crop_ea_w==0.0) crop_ea_w=crop_ea_w+1.0;
+        if (crop_ep_w==0.0) crop_ep_w=crop_ep_w+1.0;
+
 // Check crop development: if either h or LAI (or both) are zero, do nothing
 // otherwise: calculate resistances and then energy balance
 	if (LAI > 0.0)
@@ -1583,9 +1597,16 @@ cout << "at timestep:\t" << n_hr << "\n";
         tair = weather.hourly_air_temperature (); // [C]
         srad = weather.hourly_global_radiation (); // [W/m**2]
         u_ref = weather.wind (); // u_ref from reference plane [m/s]
-        relsun = weather.cloudiness();  // [-]
+        relsun_day = weather.cloudiness();  // [-]
         prec = 1.10*weather.rain(); // [mm] corrected by 10 %
+
+
 // cout << "past met variables\n";
+// use daytime values for relsun, otherwise use the last daytime value
+	if (srad > 20.0)
+        	{
+                 relsun=relsun_day; // from weather()
+                } else relsun=relsun_cld;
 
 // convert from u_ref_2m at reference plane (h=0.12 m, FAO) to u_2m_ww at
 // winter wheat field: use eq.26 FAO, p.10, and d=0.27*h and z0=0.123*h
@@ -1712,10 +1733,10 @@ cout << "past RAASTABWET_1()\n";
 // mean stomatal resistance following Jacquemin & Noilhan (1990) and
 // Verma et al.(1993)
 	RSC (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin_LAI,rcmax,
-        zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,eact_w,epotc_w,fpar,f_1,
-        f_2,f_3,f_4,r_sc_1,r_tot_1,bf_temp,f_temp,f_def,f_theta,r_sc_2,r_tot_2,
-        f_etep,r_sc_3,r_tot_3,r_sc_4,r_tot_4,r_sc_5,r_tot_5,r_sc_min);
-// cout << "past RSC()\n";
+        zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
+        fpar,f_1,f_2,f_3,f_4,r_sc_1,r_tot_1,bf_temp,f_temp,f_def,f_theta,
+        f1_dolman,r_sc_2,r_tot_2,f_etep,r_sc_3,r_tot_3,r_sc_4,r_tot_4,r_sc_5,
+        r_tot_5,r_sc_min,r_sc_js);
 
 // Net radiation by brunt's equation
       	NETRAD(srad,e_pa,tair,relsun,b1,b2,b3,b4,albedo,netlong_brunt,
@@ -1724,7 +1745,7 @@ cout << "past RAASTABWET_1()\n";
 
 // Compute matrix elements for assigning to A matrix and set all others to zero
 	ACOEFF(tair,e_abs,netrad_brunt,LAI,les,temp_0,kh,r_aa_dry,r_ac,r_as,
-        r_sc_5,alpha_r,a_11,a_12,a_13,b_1,a_24,a_25,b_2,a_31,a_33,a_34,a_35,
+        r_sc_js,alpha_r,a_11,a_12,a_13,b_1,a_24,a_25,b_2,a_31,a_33,a_34,a_35,
         b_3,a_41,a_42,b_4);
 
 // cout << "past ACOEFF()\n";
@@ -1986,7 +2007,7 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
 
 // calculate energy balance for sparse crops
 	GFLUX(tskin,kh,temp_0,gflux);  // ground heat flux
-	LEHFLUX(tair,tskin,tcan,tleaf,r_aa_dry,r_ac,r_as,r_sc_5,e_c_abs,e_sl_abs,
+	LEHFLUX(tair,tskin,tcan,tleaf,r_aa_dry,r_ac,r_as,r_sc_js,e_c_abs,e_sl_abs,
         e_abs,les,hl,ha,hs,lea,lel,hclos,leclos,dtcta,dtltc,dtstc,dtlta);
 	LEHFLUXPOT(tair,tskin_pot,tcan_pot,tleaf_pot,r_aa_pot,r_ac,r_as,r_sc_min,
       	e_c_abs_pot,e_sl_abs_pot,e_abs,les,hl_pot,ha_pot,hs_pot,lea_pot,lel_pot,
@@ -2008,14 +2029,14 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
 // solve directly for dt by closure(dt)=netrad-le(dt)-h(dt)-g(dt)
 // One layer model: use r_a from RASTAB ()
 	EBAL_DT(tair,e_pa,netrad_brunt,esta,desta,kh,temp_0,r_astab,r_ac,
-        r_sc_5,r_sc_min,a_dt_dry,b_dt,c_dt_dry,a_dt_wet,c_dt_wet,a_dt_pot,
+        r_sc_js,r_sc_min,a_dt_dry,b_dt,c_dt_dry,a_dt_wet,c_dt_wet,a_dt_pot,
         c_dt_pot,dt_dt_dry,dt_dt_wet,dt_dt_pot,tsurf_dt_dry,tsurf_dt_wet,
         tsurf_dt_pot,g_dt_dry,h_dt_dry,h_dt_wet,h_dt_pot,g_dt_wet,g_dt_pot,
         le_dt_dry,le_dt_wet,le_dt_pot,closure_dt_dry,closure_dt_wet,
         closure_dt_pot);
 // cout << "past EBAL_DT()\n";
 
-// print results   // 78 var
+// print results   // 81 var
 	fprintf(fp_lehflux,"%5d\t"
         "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
         "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
@@ -2024,9 +2045,9 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
         "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
         "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
 	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t"
-        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
+        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
         n_hr,
-        tair,tskin,tcan,tleaf,r_aa_dry,r_ac,r_as,r_sc_5,e_c_abs,e_sl_abs, //10
+        tair,tskin,tcan,tleaf,r_aa_dry,r_ac,r_as,r_sc_4,e_c_abs,e_sl_abs, //10
         e_abs,les,hl,ha,hs,lea,lel,hclos,leclos,dtcta,dtltc,dtstc,dtlta, //23
         tskin_pot,tcan_pot,tleaf_pot,r_aa_pot,r_ac,r_as,r_sc_min,    //30
       	e_c_abs_pot,e_sl_abs_pot,e_abs,hl_pot,ha_pot,hs_pot,lea_pot,lel_pot,//38
@@ -2034,8 +2055,20 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
         r_aa_wet,r_ac,r_as,e_c_abs_wet,e_sl_abs_wet,e_abs,hl_wet,ha_wet,hs_wet,//54
         lea_wet,lel_wet,dtcta_wet,dtltc_wet,dtstc_wet,dtlta_wet,les_q,les, // 62
         evaps_w, soil_ea_w,pond_ea_w,pond_ep_w,epots_w,epotc_w,eact_w, // 69
-        canopy_ea_w,canopy_ep_w,hclos,leclos,hclos_pot,leclos_pot,hclos_wet,
-        leclos_wet); // 77
+        canopy_ea_w,canopy_ep_w,hclos,leclos,hclos_pot,leclos_pot,hclos_wet,//76
+        leclos_wet,z0_aa,d_aa,u); // 80
+
+ 	fprintf(fp_ebal_dt,"%5d\t"              // 16 var
+        "%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n"
+	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n"
+	"%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
+        n_hr,
+        tsurf_dt_dry,tsurf_dt_wet,tsurf_dt_pot,g_dt_dry,h_dt_dry,    // 5
+        h_dt_wet,h_dt_pot,g_dt_wet,g_dt_pot,le_dt_dry,le_dt_wet,le_dt_pot, // 12
+        closure_dt_dry,closure_dt_wet,closure_dt_pot);   // 15
+
+ 	fprintf(fp_etep,"%5d\t%7.2g\t%7.2g\t%7.2g\n",
+        n_hr,crop_ea_w,crop_ep_w,crop_ea_w/crop_ep_w);
 
 // print soil moisture content for validation in rmse_smc.c
 	fprintf(fp_theta,
@@ -2047,8 +2080,26 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
 
 	} else
    		{
-      		if (n_hr % 1000 == 0) printf("nog geen gewas aanwezig....\n");
+      		if (n_hr % 10000 == 0) printf("nog geen gewas aanwezig....\n");
       		} // end if
+ 	free_matrix(a,1,NP,1,NP);
+	free_matrix(ai,1,NP,1,NP);
+	free_matrix(um,1,NP,1,NP);
+	free_matrix(b,1,NP,1,MP);
+	free_matrix(x,1,NP,1,MP);
+	free_matrix(t,1,NP,1,MP);
+	free_matrix(a_pot,1,NP,1,NP);
+	free_matrix(ai_pot,1,NP,1,NP);
+	free_matrix(um_pot,1,NP,1,NP);
+	free_matrix(b_pot,1,NP,1,MP);
+	free_matrix(x_pot,1,NP,1,MP);
+	free_matrix(t_pot,1,NP,1,MP);
+	free_matrix(a_wet,1,NP,1,NP);
+	free_matrix(ai_wet,1,NP,1,NP);
+	free_matrix(um_wet,1,NP,1,NP);
+	free_matrix(b_wet,1,NP,1,MP);
+	free_matrix(x_wet,1,NP,1,MP);
+	free_matrix(t_wet,1,NP,1,MP);
 
          } // end tick()
 
@@ -2109,6 +2160,8 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
    	{
       fclose(fp_lehflux);
       fclose(fp_theta);
+      fclose(fp_ebal_dt);
+      fclose(fp_etep);
       fclose(fp_solcheck);
       fclose(fp_axainv);
       fclose(fp_mat_a);
@@ -2133,7 +2186,6 @@ static struct PT_PMSWSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Penman-Monteith and Shuttleworth-Wallace");
       PT::load_syntax (syntax, alist);
 #if 1
 syntax.add ("netrad_brunt", "W/m**2", Syntax::LogOnly,
@@ -2230,8 +2282,8 @@ syntax.add ("f_temp", "NA", Syntax::LogOnly,
 		"Constraint function (Verma) related to air temperature");
 syntax.add ("f_def", "NA", Syntax::LogOnly,
 		"Constraint function (Verma) related to vapor pressure");
-syntax.add ("f_theta", "NA", Syntax::LogOnly,
-		"Constraint function (Verma) related to soil water content");
+syntax.add ("f_etep", "NA", Syntax::LogOnly,
+		"Constraint function defined by crop_ea/crop_ep");
 syntax.add ("albedo", "NA", Syntax::Const,
 		"Bulk albedo");
 alist.add ("albedo", 0.2);
