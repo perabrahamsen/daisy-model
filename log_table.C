@@ -174,10 +174,8 @@ LogTable::LogTable (const AttributeList& al)
 
 LogTable::~LogTable ()
 {
-#ifdef CONST_DELETE
   if (!out.good ())
     CERR << "Problems writing to `" << file << "'\n";
-#endif
 }
 
 static struct LogTableSyntax

@@ -3,6 +3,7 @@
 #include "weather_old.h"
 #include "time.h"
 #include "log.h"
+#include "mathlib.h"
 #include <fstream.h>
 
 struct WeatherHourly : public WeatherOld
@@ -16,7 +17,6 @@ struct WeatherHourly : public WeatherOld
   double precipitation;
   double global_radiation;
   double air_temperature;
-  double cloudiness_;
   double vapor_pressure_;
   double wind_;
 
@@ -36,8 +36,6 @@ struct WeatherHourly : public WeatherOld
     { return air_temperature; }
   double hourly_global_radiation () const
     { return global_radiation; }
-  double cloudiness () const
-    { return cloudiness_; }
   double vapor_pressure () const
     { return vapor_pressure_; }
   double wind () const 
@@ -52,7 +50,6 @@ struct WeatherHourly : public WeatherOld
       precipitation (-42.42e42),
       global_radiation (-42.42e42),
       air_temperature (-42.42e42),
-      cloudiness_ (-42.42e42),
       vapor_pressure_ (-42.42e42),
       wind_ (-42.42e42),
       accumulated_global_radiation (0.0),
@@ -82,6 +79,8 @@ WeatherHourly::tick (const Time& time)
 
   while (date < time)
     {
+      double cloudiness_;
+
       file >> year >> month >> day >> hour
 	   >> global_radiation >> air_temperature >> precipitation
 	   >> cloudiness_ >> vapor_pressure_ >> wind_;
@@ -99,6 +98,9 @@ WeatherHourly::tick (const Time& time)
       assert (air_temperature >= -70 && air_temperature < 60);
       assert (precipitation >= 0 && precipitation < 300);
       assert (cloudiness_ >= 0 && cloudiness_ <= 1);
+      if (!approximate (cloudiness_, hourly_cloudiness ()))
+	CERR << "Warning: claudiness read (" << cloudiness_ 
+	     << ") != calculated (" << hourly_cloudiness () << ")\n";
       assert (vapor_pressure_ >= 0 && vapor_pressure_ <= 5000);
       assert (wind_ >= 0 && wind_ <= 40);
 
@@ -120,6 +122,8 @@ WeatherHourly::tick (const Time& time)
 
   // Update the hourly values.
   distribute (precipitation);
+
+  Weather::tick_after (time);
 }
 
 static struct WeatherHourlySyntax

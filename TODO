@@ -1,21 +1,17 @@
-* Artikel / Diskussion
-
 * Ny klimafil.
+
+-- data dreven keyword parsing.
+-- check af fejl og range før start
+
+* Nyt `utils' katalog med de to dhi scripts.
+
+* Artikel / Diskussion
 
 * An `assert CONDITION' action.
 
 Gives an error if CONDITION is not true.
 
 * En `forever' aktivitet.  Eller en `until CONDITION activity'.
-
-* cygwin compile
-
-* Makefile
-
-If you absolutely want to use the library, and use are using GNU ld, you
-can say
-
-g++ -o a Main.C -L. -Wl,--whole-archive -lA -Wl,--no-whole-archive
 
 * Simulation:
 

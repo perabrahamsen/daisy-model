@@ -6,26 +6,27 @@
 #include "common.h"
 #include <fstream.h>
 
-struct Lexer
+class Lexer
 {
+  // State.
+private:
+  ifstream in;
+  int line;
+  int column;
+public:
+  const string file;
+  int error_count;
+
+  // Operations.
+public:
   int get ();
   int peek ();
   bool good ();
-  string get_string ();
-  int get_integer ();
-  double get_number ();
   void error (string str);
-  void skip (const char*);
-  void skip ();
-  void skip_to_end ();
-  void skip_token ();
-  bool looking_at (char);
   void eof ();
-  ifstream in;
-  string file;
-  int line;
-  int column;
-  int error_count;
+
+  // Create and destroy.
+public:
   Lexer (const string&);
   ~Lexer ();
 };

@@ -2,20 +2,14 @@
 
 #include "weather_old.h"
 #include "time.h"
-#include "mathlib.h"
 
 struct WeatherOld::Implementation
 {
-  // Parameters.
-  const IM DryDeposit;
-  const IM WetDeposit;
-
   // Snow Model.
   const double T_rain;
   const double T_snow;
 
   // State.
-  double daily_extraterrastial_radiation; // [MJ/m2/d]
   double daily_global_radiation; // [W/m²]
   double Prain;
   double Psnow;
@@ -23,11 +17,8 @@ struct WeatherOld::Implementation
 
   // Create and Destroy.
   Implementation (const AttributeList& al)
-    : DryDeposit (al.alist ("DryDeposit")),
-      WetDeposit (al.alist ("WetDeposit")),
-      T_rain (al.number ("T_rain")),
+    : T_rain (al.number ("T_rain")),
       T_snow (al.number ("T_snow")),
-      daily_extraterrastial_radiation (-42.42e42),
       daily_global_radiation (-42.42e42),
       Prain (0.0),
       Psnow (0.0),
@@ -39,11 +30,6 @@ void
 WeatherOld::tick (const Time& time)
 {
   Weather::tick (time);
-
-  impl.daily_extraterrastial_radiation 
-    = ExtraterrestrialRadiation (time);
-  assert (impl.daily_extraterrastial_radiation >= 0.0);
-
   impl.time = time;
 }
 
@@ -58,10 +44,6 @@ WeatherOld::hourly_global_radiation () const
 double
 WeatherOld::daily_global_radiation () const
 { return impl.daily_global_radiation; }
-
-double 
-WeatherOld::daily_extraterrastial_radiation () const
-{ return impl.daily_extraterrastial_radiation; }
 
 double
 WeatherOld::rain () const
@@ -100,49 +82,10 @@ WeatherOld::hourly_air_temperature () const
 double
 WeatherOld::reference_evapotranspiration () const
 {
-  const double T = 273.16 + daily_air_temperature ();
-  const double Delta = 5362.7 / pow (T, 2.0) * exp (26.042 - 5362.7 / T);
-  return 1.05e-3 * Delta / (Delta + 66.7) * hourly_global_radiation ();
+  return Weather::Makkink (hourly_air_temperature (),
+			   hourly_global_radiation ());
 }
 
-IM
-WeatherOld::deposit () const
-{
-  const double Precipitation = rain () + snow (); // [mm]
-  assert (Precipitation >= 0.0);
-  
-  // [kg N/ha/year -> [g/cm²/h]
-  const double hours_to_years = 365.2425 * 24.0;
-  const double kg_per_ha_to_g_cm2 
-    = 1000.0 / ((100.0 * 100.0) * (100.0 * 100.0));
-  const IM dry (impl.DryDeposit, kg_per_ha_to_g_cm2 / hours_to_years);
-  const IM wet (impl.WetDeposit, 1.0e-7); // [ppm] -> [g/cm²/mm]
-
-  const IM result = dry + wet * Precipitation;
-  assert (result.NO3 >= 0.0);
-  assert (result.NH4 >= 0.0);
-
-  assert (approximate (result.NO3, 
-		       impl.DryDeposit.NO3 * kg_per_ha_to_g_cm2/hours_to_years
-		       + Precipitation * impl.WetDeposit.NO3 * 1e-7));
-  assert (approximate (result.NH4, 
-		       impl.DryDeposit.NH4 * kg_per_ha_to_g_cm2/hours_to_years
-		       + Precipitation * impl.WetDeposit.NH4 * 1e-7));
-  return result;
-}
-
-double 
-WeatherOld::cloudiness () const
-{ 
-  const double Si = daily_global_radiation () 
-    * (60.0 * 60.0 * 24.0) / 1e6; // W/m^2 -> MJ/m^2/d
-  const double reference_cloudiness 
-    = CloudinessFactor_Humid (impl.time, Si);
-  assert (reference_cloudiness >= 0.0);
-  assert (reference_cloudiness <= 1.0);
-  return reference_cloudiness;
-}
- 
 double 
 WeatherOld::vapor_pressure () const
 { 
@@ -152,7 +95,7 @@ WeatherOld::vapor_pressure () const
 
 double 
 WeatherOld::wind () const
-{ return 0.0; }
+{ return 3.0; }
 
 void 
 WeatherOld::put_precipitation (double prec)
@@ -179,10 +122,11 @@ WeatherOld::WeatherOld (const AttributeList& al)
   elevation = al.number ("Elevation");
   timezone = al.number ("TimeZone");
   screen_height = al.number ("ScreenHeight");
-  T_average_ = al.number ("average");
-  T_amplitude_ = al.number ("amplitude");
-  rad_per_day_ = al.number ("omega");
-  max_Ta_yday_ = al.number ("max_Ta_yday");
+  T_average = al.number ("average");
+  T_amplitude = al.number ("amplitude");
+  max_Ta_yday = al.number ("max_Ta_yday");
+  DryDeposit = IM (al.alist ("DryDeposit"));
+  WetDeposit = IM (al.alist ("WetDeposit"));
 }
 
 WeatherOld::~WeatherOld ()
@@ -239,11 +183,6 @@ Deposition of nitrogen solutes with precipitation [ppm].");
   syntax.add ("amplitude", "dg C", Syntax::Const,
 	      "How much the temperature change during the year.");
   alist.add ("amplitude", 8.5);
-  syntax.add ("omega", "d^-1", Syntax::Const,
-	      "Fraction of a full yearly cycle (2 pi) covered in a day.\n\
-The default value corresponds to Earths orbit around the Sun.\n\
-Martian take note: You must change this for your home planet.");
-  alist.add ("omega", 2.0 * M_PI / 365.0);
   syntax.add ("max_Ta_yday", "d", Syntax::Const,
 	      "Julian day where the highest temperature is expected.");
   alist.add ("max_Ta_yday", 209.0);

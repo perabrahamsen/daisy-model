@@ -4,6 +4,7 @@
 #include "time.h"
 #include "net_radiation.h"
 #include "log.h"
+#include "mathlib.h"
 
 Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 
@@ -15,17 +16,36 @@ data from a file.  The meteorological data are common to all columns.";
 void 
 Weather::tick (const Time& time)
 {
+  // Day length.
   day_length_ = day_length (time);
-  assert (day_length_ >= 0.0);
-  assert (day_length_ <= 24.0);
+  day_cycle_ = day_cycle (time);
+}
 
-  if (time.hour () > 12 + day_length () || time.hour () < 12 - day_length ())
-    day_cycle_ = 0.0;
-  else
-    day_cycle_ = max (0.0, M_PI_2 / day_length ()
-		     * cos (M_PI * (time.hour () - 12) / day_length ()));
-  assert (day_cycle_ >= 0.0);
-  assert (day_cycle_ <= 1.0);
+void 
+Weather::tick_after (const Time& time)
+{
+  // Hourly claudiness.
+  const double Si = hourly_global_radiation () 
+    * (60.0 * 60.0 * 24.0) / 1e6; // W/m^2 -> MJ/m^2/d
+  if (Si > 0.0)
+    {
+      hourly_cloudiness_ = CloudinessFactor_Humid (time, Si);
+      assert (hourly_cloudiness_ >= 0.0);
+      assert (hourly_cloudiness_ <= 1.0);
+    }
+
+  // Daily claudiness.
+  if (time.hour () == 0.0)
+    {
+      const double Si = daily_global_radiation () 
+	* (60.0 * 60.0 * 24.0) / 1e6; // W/m^2 -> MJ/m^2/d
+      if (Si > 0.0)
+	{
+	  daily_cloudiness_ = CloudinessFactor_Humid (time, Si);
+	  assert (daily_cloudiness_ >= 0.0);
+	  assert (daily_cloudiness_ <= 1.0);
+	}
+    }
 }
 
 void
@@ -37,17 +57,64 @@ Weather::output (Log& log) const
 	      hourly_global_radiation ());
   log.output ("daily_global_radiation", 
 	      daily_global_radiation ());
-  log.output ("daily_extraterrastial_radiation", 
-	      daily_extraterrastial_radiation ());
   log.output ("reference_evapotranspiration", 
 	      reference_evapotranspiration ());
   log.output ("rain", rain ());
   log.output ("snow", snow ());
-  log.output ("cloudiness", cloudiness ());
+  log.output ("hourly_cloudiness", hourly_cloudiness ());
+  log.output ("daily_cloudiness", daily_cloudiness ());
   log.output ("vapor_pressure", vapor_pressure ());
   log.output ("wind", wind ()); 
   log.output ("day_length", day_length ());
   log.output ("day_cycle", day_cycle ());
+}
+
+IM
+Weather::deposit () const // [g [stuff] /cm²/h]
+{
+  const double Precipitation = rain () + snow (); // [mm]
+  assert (Precipitation >= 0.0);
+  
+  // [kg N/ha/year -> [g/cm²/h]
+  const double hours_to_years = 365.2425 * 24.0;
+  const double kg_per_ha_to_g_cm2 
+    = 1000.0 / ((100.0 * 100.0) * (100.0 * 100.0));
+  const IM dry (DryDeposit, kg_per_ha_to_g_cm2 / hours_to_years);
+  const IM wet (WetDeposit, 1.0e-7); // [ppm] -> [g/cm²/mm]
+
+  const IM result = dry + wet * Precipitation;
+  assert (result.NO3 >= 0.0);
+  assert (result.NH4 >= 0.0);
+
+  assert (approximate (result.NO3, 
+		       DryDeposit.NO3 * kg_per_ha_to_g_cm2/hours_to_years
+		       + Precipitation * WetDeposit.NO3 * 1e-7));
+  assert (approximate (result.NH4, 
+		       DryDeposit.NH4 * kg_per_ha_to_g_cm2/hours_to_years
+		       + Precipitation * WetDeposit.NH4 * 1e-7));
+  return result;
+}
+
+double 
+Weather::day_cycle (const Time& time) const	// Sum over a day is 1.0.
+{
+  // Day length.
+  const double dl = day_length (time);
+  assert (dl >= 0.0);
+  assert (dl <= 24.0);
+  
+  const int hour = time.hour ();
+
+  // Day cycle.
+  double dc;
+  if (hour > 12 + dl || hour < 12 - dl)
+    dc = 0.0;
+  else
+    dc = max (0.0, M_PI_2 / dl * cos (M_PI * (hour - 12) / dl));
+  assert (dc >= 0.0);
+  assert (dc <= 1.0);  
+
+  return dc;
 }
 
 double
@@ -61,7 +128,21 @@ Weather::day_length (const Time& time) const
 		+ 0.07659 * sin (3 * t) - 0.01021 * cos (4 * t));
   t = (24 / M_PI
        * acos (-tan (M_PI / 180 * Dec) * tan (M_PI / 180 * latitude)));
-  return (t < 0) ? t + 24.0 : t;
+  const double dl = (t < 0) ? t + 24.0 : t;
+  assert (dl >= 0.0);
+  assert (dl <= 24.0);
+  return dl;
+}
+
+double 
+Weather::T_normal (const Time& time, double delay) const
+{
+  const double rad_per_day = 2.0 * M_PI / 365.0;
+
+  return T_average
+    + T_amplitude 
+    * exp (delay)
+    * cos (rad_per_day * (time.yday () - max_Ta_yday) + delay);
 }
 
 double
@@ -156,6 +237,17 @@ Weather::ExtraterrestrialRadiation (const Time& time) const // [MJ/m2/d]
 }
 
 double
+Weather::Makkink (double air_temperature /* dg C */,
+		  double global_radiation /* W/m^2 */) /* mm/h */
+{
+  // Use Makkink's equation for calculating reference_evapotranspiration.
+  const double T = 273.16 + air_temperature; // dg C -> K
+  const double Delta = 5362.7 / pow (T, 2.0) * exp (26.042 - 5362.7 / T);
+  return 1.05e-3 
+    * Delta / (Delta + 66.7) * global_radiation;
+}
+
+double
 Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [MJ/m2/h]
 {
   static const double EQT0   = 0.002733;
@@ -182,13 +274,22 @@ Weather::Weather (const AttributeList& al)
     latitude (-42.42e42),
     longitude (-42.42e42),
     elevation (-42.42e42),
-    T_average_ (-42.42e42),
-    T_amplitude_ (-42.42e42),
-    rad_per_day_ (2.0 * M_PI / 365.0),
-    max_Ta_yday_ (-42.42e42),
+    timezone (-42.42e42),
+    surface (Surface::reference),
+    screen_height (2.0),
+    T_average (-42.42e42),
+    T_amplitude (-42.42e42),
+    max_Ta_yday (-42.42e42),
     day_length_ (-42.42e42),
-    day_cycle_ (-42.42e42)
-{ }
+    day_cycle_ (-42.42e42),
+    hourly_cloudiness_ (0.0),	// It may be dark at the start.
+    daily_cloudiness_ (0.0)
+{ 
+  WetDeposit.NO3 = -42.42e42;
+  WetDeposit.NH4 = -42.42e42;
+  DryDeposit.NO3 = -42.42e42;
+  DryDeposit.NH4 = -42.42e42;
+}
 
 Weather::~Weather ()
 { }
@@ -207,11 +308,11 @@ Weather::load_syntax (Syntax& syntax, AttributeList&)
 	      "Average radiation this day.");
   syntax.add ("reference_evapotranspiration", "mm/h", Syntax::LogOnly,
 	      "Reference evapotranspiration this hour");
-  syntax.add ("daily_extraterrastial_radiation", "MJ/m^2/d", Syntax::LogOnly,
-	      "Extraterrestrial radiation this day.");
   syntax.add ("rain", "mm/h", Syntax::LogOnly, "Rain this hour.");
   syntax.add ("snow", "mm/h", Syntax::LogOnly, "Snow this hour.");
-  syntax.add ("cloudiness", Syntax::None (), Syntax::LogOnly,
+  syntax.add ("hourly_cloudiness", Syntax::None (), Syntax::LogOnly,
+	      "Fraction of sky covered by clouds [0-1].");
+  syntax.add ("daily_cloudiness", Syntax::None (), Syntax::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
   syntax.add ("vapor_pressure", "Pa", Syntax::LogOnly, "Humidity.");
   syntax.add ("wind", "m/s", Syntax::LogOnly, "Wind speed.");

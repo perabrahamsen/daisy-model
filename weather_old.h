@@ -24,12 +24,9 @@ public:
   double hourly_air_temperature () const; // [dg C]
   double hourly_global_radiation () const; // [W/m2]
   double daily_global_radiation () const; // [W/m2]
-  double daily_extraterrastial_radiation () const; // [MJ/m2/d]
   double reference_evapotranspiration () const; // [mm/h]
   double rain () const;	// [mm/h]
   double snow () const;	// [mm/h]
-  IM deposit () const; // [g [stuff] /cm²/h]
-  double cloudiness () const; // [0-1]
   double vapor_pressure () const; // [Pa]
   double wind () const;	// [m/s]
 
@@ -38,13 +35,6 @@ public:
   void put_air_temperature (double T); // [°C]
   void put_reference_evapotranspiration (double ref); // [mm/d]
   void put_global_radiation (double radiation); // [W/m²]
-
-  // Average temperature.
-public:
-  double average () const;
-  double amplitude () const;
-  double omega () const;
-  double max_Ta_yday () const;
 
   // Create and Destroy.
 protected:

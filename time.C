@@ -92,6 +92,14 @@ Time::tick_hour (int hours)
 	impl.hour = 0;
 	tick_day (1);
       }
+  for (; hours < 0; ++hours)
+    if (impl.hour > 0)
+      impl.hour--;
+    else
+      {
+	impl.hour = 23;
+	tick_day (-1);
+      }
 }
 
 void 
@@ -113,6 +121,14 @@ Time::tick_day (int days)
 	break;
       default:
 	impl.yday++;
+      }
+  for (; days < 0; ++days)
+    if (impl.yday > 1)
+      impl.yday--;
+    else
+      {
+	impl.year--;
+	impl.yday = leap (impl.year) ? 366 : 365;
       }
 }
 
@@ -231,6 +247,12 @@ Time::days_between (const Time& first, const Time& last)
 
   // ... and thats it!
   return days;
+}
+
+int
+Time::hours_between (const Time& first, const Time& last)
+{
+  return last.hour () - first.hour () + 24 * days_between (first, last);
 }
 
 // @ Construct.

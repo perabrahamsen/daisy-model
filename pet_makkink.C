@@ -14,13 +14,9 @@ struct PetMakkink : public Pet
 	     const Surface& surface, const Soil&, const SoilHeat&,
 	     const SoilWater&)
     {
-      // Use Makkink's equation for calculating reference_evapotranspiration.
-      const double T = 273.16 + weather.daily_air_temperature ();
-      const double Delta = 5362.7 / pow (T, 2.0) * exp (26.042 - 5362.7 / T);
       reference_evapotranspiration 
-	= 1.05e-3 
-	* Delta / (Delta + 66.7) * weather.hourly_global_radiation ();
-
+	= Weather::Makkink (weather.hourly_air_temperature (),
+			    weather.hourly_global_radiation ());
       potential_evapotranspiration 
 	= reference_to_potential (crops, surface, 
 				  reference_evapotranspiration);

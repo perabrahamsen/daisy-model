@@ -161,7 +161,8 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all components of some library.
 #
-COMPONENTS = select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
+COMPONENTS = weather_std.C \
+	select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
 	select_index.C select_content.C select_interval.C select_flux.C \
 	select_number.C select_date.C select_array.C log_table.C \
 	log_harvest.C action_while.C action_wait.C action_activity.C \
@@ -189,7 +190,7 @@ COMPONENTS = select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
 
 # Select the C files with a corresponding header file from the library.
 #
-INTERFACES = lexer.C weather_old.C \
+INTERFACES = lexer_data.C lexer.C weather_old.C \
 	log_extern.C log_select.C select.C average.C mactrans.C macro.C \
 	document.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
@@ -431,9 +432,10 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h common.h
 lexer${OBJ}: lexer.C lexer.h common.h
 weather_old${OBJ}: weather_old.C weather_old.h weather.h librarian.h \
- library.h common.h alist.h syntax.h im.h mathlib.h
+ library.h common.h alist.h syntax.h im.h
 log_extern${OBJ}: log_extern.C log_select.h log.h librarian.h library.h \
  common.h alist.h syntax.h select.h condition.h log_extern.h
 log_select${OBJ}: log_select.C log_select.h log.h librarian.h library.h \
@@ -457,7 +459,7 @@ parser${OBJ}: parser.C parser.h librarian.h library.h common.h alist.h \
  syntax.h
 log${OBJ}: log.C log.h librarian.h library.h common.h alist.h syntax.h
 weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
- syntax.h im.h net_radiation.h log.h
+ syntax.h im.h net_radiation.h log.h mathlib.h
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h log.h
 crop${OBJ}: crop.C crop.h time.h librarian.h library.h common.h alist.h \
@@ -585,6 +587,8 @@ soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  organic_matter.h chemical.h chemicals.h log.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h csmp.h submodel.h
 submodel${OBJ}: submodel.C submodel.h common.h
+weather_std${OBJ}: weather_std.C weather.h librarian.h library.h common.h \
+ alist.h syntax.h im.h lexer_data.h lexer.h
 select_flux_top${OBJ}: select_flux_top.C select.h condition.h librarian.h \
  library.h common.h alist.h syntax.h geometry.h
 select_flux_bottom${OBJ}: select_flux_bottom.C select.h condition.h \
@@ -765,7 +769,7 @@ log_checkpoint${OBJ}: log_checkpoint.C log_alist.h log.h librarian.h \
  library.h common.h alist.h syntax.h condition.h daisy.h \
  printer_file.h printer.h
 weather_hourly${OBJ}: weather_hourly.C weather_old.h weather.h librarian.h \
- library.h common.h alist.h syntax.h im.h log.h
+ library.h common.h alist.h syntax.h im.h log.h mathlib.h
 uznone${OBJ}: uznone.C uzmodel.h librarian.h library.h common.h alist.h \
  syntax.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h log.h \
  mathlib.h

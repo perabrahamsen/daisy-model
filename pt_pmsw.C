@@ -1589,7 +1589,7 @@ void tick (const Weather& weather, const Vegetation& crops,
         tair = weather.hourly_air_temperature (); // [C]
         srad = weather.hourly_global_radiation (); // [W/m**2]
         u_ref = weather.wind (); // u_ref from reference plane [m/s]
-        relsun_day = weather.cloudiness();  // [-]
+        relsun_day = weather.hourly_cloudiness ();  // [-]
         prec = 1.10*weather.rain(); // [mm] corrected by 10 %
 
 

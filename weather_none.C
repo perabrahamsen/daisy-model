@@ -13,7 +13,7 @@ class WeatherNone : public WeatherOld
   // Simulation.
 public:
   void tick (const Time& t)
-    { WeatherOld::tick (t); }
+    { WeatherOld::tick (t); Weather::tick_after (t); }
   double hourly_air_temperature () const
     { return air_temperature; }
   double daily_air_temperature () const

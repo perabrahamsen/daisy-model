@@ -320,7 +320,7 @@ struct LogEntry
 	tag = "<none>";
     }
   ~LogEntry ()
-    { delete &condition; }
+    { delete condition; }
 };
 
 struct LogTable1 : public Log
@@ -525,12 +525,10 @@ struct LogTable1 : public Log
 
   ~LogTable1 ()
     {
-#ifdef CONST_DELETE
       if (!out.good ())
 	CERR << "Problems writing to `" << file << "'\n";
       delete &condition;
       sequence_delete (entries.begin (), entries.end ());
-#endif
     }
 };
 

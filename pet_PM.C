@@ -171,7 +171,7 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water)
 {
   // Weather.
-  const double Cloudiness = weather.cloudiness ();
+  const double Cloudiness = weather.hourly_cloudiness ();
   const double Temp = weather.hourly_air_temperature ();
   const double VaporPressure = 0.001 * weather.vapor_pressure (); // Pa -> kPa
   const double Si = weather.hourly_global_radiation () 

@@ -12,8 +12,6 @@
 #include "log.h"
 #include "submodel.h"
 
-#define WATER_FLUX_HEAT
-
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
 
 
@@ -402,13 +400,8 @@ SoilHeat::Implementation::solve (const Time& time,
       
       // Computational,
       const double Cx = gradient
-#ifndef WATER_FLUX_HEAT
-	// BUG!
-	;
-#else
 	+ water_heat_capacity
 	* (soil_water.q (i) + soil_water.q (next)) / 2.0;
-#endif
 
       // Heat capacity including thawing/freezing.
       C_apparent[i] = capacity[i];
@@ -555,16 +548,7 @@ double
 SoilHeat::Implementation::bottom (const Time& time, 
 				  const Weather& weather) const 
 {
-  // Fetch average temperatur.
-  const double average = weather.T_average ();
-  const double amplitude = weather.T_amplitude (); 
-  const double omega = weather.rad_per_day (); 
-  const double max_Ta_yday = weather.max_Ta_yday (); 
-
-  return average 
-    + amplitude 
-    * exp (delay)
-    * cos (omega * (time.yday () - max_Ta_yday) + delay);
+  return weather.T_normal (time, delay);
 }
 
 bool
@@ -602,7 +586,7 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
   C_apparent.insert (C_apparent.end (), soil.size (), 0.0);
 
   // Fetch average temperatur.
-  const double omega = weather.rad_per_day (); 
+  const double rad_per_day = 2.0 * M_PI / 365.0;
 
   // Fetch initial T.
   soil.initialize_layer (T, al, "T");
@@ -618,7 +602,7 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
       k += soil.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0, 0.0);
       C += soil.dz (i) * soil.heat_capacity (i, Theta_pF_2_0, 0.0);
       const double a = k / C;
-      delay = soil.zplus (i) / sqrt (24.0 * 2.0 * a / omega);
+      delay = soil.zplus (i) / sqrt (24.0 * 2.0 * a / rad_per_day);
 
       // Fill out T if necessary.
       if (T.size () <= i)

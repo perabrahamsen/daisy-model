@@ -9,15 +9,202 @@
 
 struct ParserFile::Implementation : public Lexer
 {
+  // Lisp lexer.
+  string get_string ();
+  int get_integer ();
+  double get_number ();
+  void skip (const char*);
+  void skip ();
+  void skip_to_end ();
+  void skip_token ();
+  bool looking_at (char);
+
+  // Daisy parser.
   void add_derived (Library&);
   AttributeList& load_derived (const Library& lib, bool in_sequence = false);
   void load_list (AttributeList&, const Syntax&);
   Time get_time ();
   const Syntax* global_syntax_table;
+
+  // Create and destroy.
   void initialize (const Syntax&);
   Implementation (const string&);
   ~Implementation ();
 };
+
+string
+ParserFile::Implementation::get_string ()
+{
+  skip ();
+  int c = peek ();
+  
+  if (c == '"')
+    {
+      // Get a string.
+      string str ("");
+      skip ("\"");
+
+      for (c = get (); good() && c != '"'; c = get ())
+	{
+	  if (c == '\\')
+	    {
+	      c = get ();
+	      switch (c)
+		{
+		case '\\':
+		case '"':
+		  break;
+		default:
+		  error (string ("Unknown character escape '")
+			 // BUG: SHOULD USE DYNAMIC CAST!
+			 + char (c) + "'");
+		}
+	    }
+	  str += static_cast<char> (c);
+	}
+      return str;
+    }
+  else if (c != '_' && c != '-' && !isalpha (c))
+    {
+      error ("Identifier or string expected");
+      skip_to_end ();
+      return "error";
+    }
+  else
+    {
+      // Get an identifier.
+      string str ("");
+      do
+	{
+	  str += char (c);
+	  get ();
+	  c = peek ();
+	}
+      while (good() && (c == '_' || c == '-' || isalnum (c)));
+    
+      return str;
+    }
+}
+
+double
+ParserFile::Implementation::get_number ()
+{
+  skip ();
+  string str;
+  int c = peek ();
+
+  while (good () && (isdigit (c) 
+		     || c == '.' || c == '-' || c == '+' 
+		     || c == 'e' || c == 'E'))
+    {
+      str += static_cast<char> (c);
+      get ();
+      c = peek ();
+    }
+  // Empty number?
+  if (str.size () < 1U)
+    {
+      error ("Number expected");
+      skip_to_end ();
+      return -42.42e42;
+    }
+  const char *c_str = str.c_str ();
+  const char *endptr = c_str;
+  const double value = strtod (c_str, (char**) &endptr);
+  
+  if (*endptr != '\0')
+    error (string ("Junk at end of number `") + endptr + "'");
+
+  return value;
+}
+
+int
+ParserFile::Implementation::get_integer ()
+{
+  skip ();
+  string str;
+  int c = peek ();
+
+  while (isdigit (c) || c == '-' || c == '+')
+    {
+      str += static_cast<char> (c);
+      get ();
+      c = peek ();
+    }
+  // Empty number?
+  if (str.size () < 1U)
+    {
+      error ("Integer expected");
+      skip_to_end ();
+      return -42;
+    }
+  return atoi (str.c_str ());
+}
+
+void
+ParserFile::Implementation::skip (const char* str)
+{ 
+  skip ();
+  for (const char* p = str; *p; p++)
+    if (*p != peek ())
+      {
+	error (string("Expected `") + str + "'");
+	skip_token ();
+	break;
+      }
+    else
+      get ();
+}
+
+void
+ParserFile::Implementation::skip ()
+{ 
+  while (true)
+    if (!good ())
+      return;
+    else if (isspace (peek ()))
+      get ();
+    else if (peek () == ';')
+      while (good () && get () != '\n')
+      ;
+    else
+      return;
+}
+
+void
+ParserFile::Implementation::skip_token ()
+{
+  if (peek () == ';' || isspace (peek ()))
+    skip ();
+  if (peek () == '"')
+    get_string ();
+  else if (peek () == '.' || isdigit (peek ()))
+    get_number ();
+  else if (peek () == '(') 
+    {
+      get ();
+      skip_to_end ();
+      skip (")");
+    }
+  else if (isalnum (peek ()) || peek () == '_' || peek () == '-')
+    get_string ();
+  else
+    get ();
+}
+
+void
+ParserFile::Implementation::skip_to_end ()
+{
+  while (peek () != ')' && good ())
+    skip_token ();
+}
+
+bool
+ParserFile::Implementation::looking_at (char c)
+{ 
+  skip ();
+  return peek () == c;
+}
 
 void
 ParserFile::Implementation::add_derived (Library& lib)
@@ -399,6 +586,7 @@ ParserFile::load (AttributeList& alist)
 {
   impl.skip ();
   impl.load_list (alist, *impl.global_syntax_table);
+  impl.skip ();
   impl.eof ();
 }
 

@@ -120,6 +120,8 @@ WeatherFile::tick (const Time& time)
 
   // Hourly value.
   distribute (precipitation / 24.0);
+
+  Weather::tick_after (time);
 }
 
 static struct WeatherFileSyntax

@@ -43,6 +43,7 @@ public:
   static int month_length (int year, int month);
   static bool valid (int year, int month, int mday, int hour = 0);
   static int days_between (const Time& first, const Time& last);
+  static int hours_between (const Time& first, const Time& last);
 
   // Compare.
   friend bool operator== (const Time&, const Time&);

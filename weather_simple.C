@@ -36,6 +36,7 @@ WeatherSimple::tick (const Time& t)
   WeatherOld::tick (t);
   time = t;
   WeatherOld::distribute (Precipitation ());
+  Weather::tick_after (time);
 }
 
 double

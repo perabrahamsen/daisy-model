@@ -11,6 +11,9 @@
  * member functions in C++. 
  */
 
+#ifndef CDAISY_H
+#define CDAISY_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -664,6 +667,8 @@ daisy_version (void);
 #ifdef __cplusplus
 }
 #endif
+
+#endif CDAISY_H
 
 /* @ Emacs Information.
  *

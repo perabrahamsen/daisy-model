@@ -1,3 +1,48 @@
+1999-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.96 released.
+
+1999-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C, weather.h (tick_after): New function.
+	* weather_file.C, weather_hourly.C, weather_none.C, weather_old.C,
+	weather_simple.C, weather_std.C: (tick): Call it.
+
+	* weather.C, weather.h (T_normal): New function.
+	(T_amplitude, T_average, max_Ta_yday): Removed functions.
+	* soil_heat.C (bottom): Updated caller.
+
+	* time.C, time.h (hours_between): New function.
+
+1999-11-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lexer_data.C, lexer_data.h: New files.
+	* Makefile (INTERFACES): Add it.
+	* weather_std.C: New model.
+	* Makefile (COMPONENTS): Add it.
+
+1999-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C, weather.h (hourly_cloudiness, daily_cloudiness): New
+	functions.
+	* weather.h, weather_old.h, weather_old.C, weather_hourly
+	(cloudiness): Removed. 
+	* pt_pmsw.C, pet_PM.C, net_radiation.C (tick): Updated callers.
+
+1999-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather.C, weather.h: (daily_extraterrastial_radiation): Removed.
+
+	* weather_old.C (wind): Changed default wind from 0 to 3.
+
+1999-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.h: Added header file protection.
+
+	* log_table1.C (~LogEntry): Deleted address of pointer.
+
+	* lib/Makefile (NEWCROPS): Added fodderbeet.dai.
+
 1999-10-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Merged SH changes.
