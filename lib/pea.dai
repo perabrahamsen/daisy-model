@@ -37,7 +37,6 @@
       (PARext   0.55)
       (EPext    0.50)
       (HvsDS  (0.00    1)    (1.00  100)    (2.00  100) )
-      (EpFac 1.0)
       (IntcpCap 0.5)
   )
 

@@ -29,7 +29,6 @@
 	  (PARref 0.06)
 	  (PARext 0.60)
 	  (EPext 0.50)
-	  (EpFac 1.0)
 	  (IntcpCap 0.5))
   (Root (DptEmr 10)
 	(PenPar1 0.20)
