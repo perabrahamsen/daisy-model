@@ -87,6 +87,24 @@
                      (spec column default OrganicMatter buffer C)
                      (dimension "kg C/ha"))))
 
+(deflog "Soil N Residuals" table
+  "Added N from crop residual in all numeric soil layers."
+  (where "soil_N_res.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "$col" residuals_N_soil)
+                  (factor 1e5)      ;g/cm^2 -> kg/ha
+                  (dimension "kg N/ha/&"))))
+
+(deflog "Soil C Residuals" table
+  "Added C from crop residual in all numeric soil layers."
+  (where "soil_C_res.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "$col" residuals_C_soil)
+                  (factor 1e5)      ;g/cm^2 -> kg/ha
+                  (dimension "kg C/ha/&"))))
+
 (deflog "Soil NO3 Concentration" table
   "Amount of nitrate in all numeric soil layers.
 This include both the nitrogen and oxygen atoms of the nitrate."
