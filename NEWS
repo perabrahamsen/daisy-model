@@ -12,7 +12,37 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
-* 2.13
+* 2.15
+
+** Amount of solute in drainage was entirely wrong.  Fixed.
+
+** Moved all V1 crop parameterizations to `crop-old.dai'.
+
+** New soil_water_content_above condition.
+
+See the section about irrigation in the tutorial for an example.
+
+** Updated the pig_slurry and cattle_slurry parameterizations. 
+
+** New pig_manure, cattle_manure, and horse_manure parameterizations.
+
+** Updated Rye, Sugar Beet, and Spring Rape parameterizations.
+
+** Renamed Maize to Pioneer Maize, and added new Maize parameterization.
+
+The new maize is a sort common in Denmark.
+
+** New Pendimethalin pesticide.
+
+** New Potato crop parameterization.
+
+** The reference manual is improved.
+
+It now list standard parameterizations, and index all component,
+model, submodel, attribute and parameterization names.  The
+introduction is also updated.
+
+* 2.14
 
 ** Fixed bug introduced in previous version that disabled macropores.
 
@@ -697,7 +727,7 @@ this:
                         (minimum 50.0) ; kg N/ha
                         (from 0.0) (to -100.0)))
 
-Daisy will measure the amount af fertlizer in the specified zone (from
+Daisy will measure the amount of fertlizer in the specified zone (from
 the soil surface to 100 cm depth), and supply enough extra nitrogen to
 reach the specified target (150 kg N/ha).  If less than minimum (50 kg
 N/ha) nitrogen is needed in order to reach the target, no fertilizer

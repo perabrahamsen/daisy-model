@@ -23,6 +23,8 @@
 #include "submodel.h"
 #include "common.h"
 
+#include <algorithm>
+
 EMPTY_TEMPLATE
 Librarian<Document>::Content* Librarian<Document>::content = NULL;
 
@@ -106,18 +108,46 @@ Document::print_sample (ostream& out, const string& name,
 
 void
 Document::print_model (ostream& out, const string& name, 
-		       const Syntax& syntax,
-		       const AttributeList& alist)
+		       const Library& library)
 {
-  print_model_header (out, name);
+  
+  const Syntax& syntax = library.syntax (name);
+  const AttributeList& alist = library.lookup (name);  
 
-  // Print description, if any.
-  if (alist.check ("description"))
-    print_model_description (out, alist.name ("description"));
+  if (alist.check ("type"))
+    {
+      const string type = alist.name ("type");
+      print_parameterization_header (out, name, type);
+      
+      if (alist.check ("parsed_from_file"))
+	print_parameterization_file (out, alist.name ("parsed_from_file"));
+      else
+	print_parameterization_no_file (out);
 
-  print_sample (out, name, syntax, alist);
-  print_submodel (out, name, 0, syntax, alist);
-  print_model_trailer (out, name);
+      if (alist.check ("description"))
+	{
+	  assert (library.check (type));
+	  const AttributeList& super = library.lookup (type);
+	  const string description = alist.name ("description");
+	  
+	  if (!super.check ("description") 
+	      || super.name ("description") != description)
+	    print_parameterization_description (out, description);
+	}
+      print_parameterization_trailer (out, name);
+    }
+  else
+    {
+      print_model_header (out, name);
+
+      // Print description, if any.
+      if (alist.check ("description"))
+	print_model_description (out, alist.name ("description"));
+
+      print_sample (out, name, syntax, alist);
+      print_submodel (out, name, 0, syntax, alist);
+      print_model_trailer (out, name);
+    }
 }
 
 void
@@ -136,9 +166,58 @@ Document::print_fixed (ostream& out, const string& name,
   print_fixed_trailer (out, name);
 }
 
+class ModelCompare
+{ 
+  const Library& library;
+
+  const string find_next_in_line (const string& root, const string& leaf) const
+  {
+    // Find the child of root that leaf is descended from.
+    assert (root != leaf);
+    const AttributeList& al = library.lookup (leaf);
+    assert (al.check ("type"));
+    const string type = al.name ("type");
+    if (type == root)
+      return leaf;
+    
+    return find_next_in_line (root, type);
+  }
+
+public:
+  bool operator() (const string& a, const string& b) const
+  { 
+    // They may be the same.
+    if (a == b)
+      return false;
+
+    // One may be a derivative of the other.  Sort base first.
+    if (library.is_derived_from (a, b))
+      return false;
+    if (library.is_derived_from (b, a))
+      return true;
+
+    string base_a = library.base_model (a);
+    string base_b = library.base_model (b);
+    
+    // They may be otherwise related.
+    while (base_a == base_b)
+      {
+	// Find place where tree branches,
+	base_a = find_next_in_line (base_a, a);
+	base_b = find_next_in_line (base_b, b);
+      }
+    // Unrelated, sort according to their base classes.
+    return  base_a < base_b;
+  }
+  ModelCompare (const Library& lib)
+    : library (lib)
+  { }
+};
+
 void
 Document::print_component (ostream& out, const Library& library)
 {
+
   const string& name = library.name ();
   print_component_header (out, name);
 
@@ -149,10 +228,10 @@ Document::print_component (ostream& out, const Library& library)
   // For all members...
   vector<string> entries;
   library.entries (entries);
+  ModelCompare model_compare (library);
+  sort (entries.begin (), entries.end (), model_compare);
   for (unsigned int i = 0; i < entries.size (); i++)
-    print_model (out, entries[i], 
-		   library.syntax (entries[i]),
-		   library.lookup (entries[i]));
+    print_model (out, entries[i], library);
 
   print_component_trailer (out, name);
 }

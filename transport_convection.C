@@ -29,6 +29,10 @@
 
 class TransportConvection : public Transport
 {
+  // Parameters.
+private:
+  int max_time_step_reductions;
+
   // Log variable.
 private:
   vector<double> J;		// Upward matter flux [g/cm²].
@@ -47,6 +51,7 @@ public:
 public:
   TransportConvection (const AttributeList& al)
     : Transport (al.name ("type")),
+      max_time_step_reductions (al.integer ("max_time_step_reductions")),
       ddt (dt)
     { }
 };
@@ -66,6 +71,10 @@ TransportConvection::tick (const Soil& soil, const SoilWater& soil_water,
 			   vector<double>& J)
 {
   const double J_in = J[0];
+
+  // Remember old values.
+  const vector<double> C_prev = C;
+  const vector<double> M_prev = M;
 
   // Number of soil layers.
   const unsigned int size = soil.size ();
@@ -99,6 +108,10 @@ TransportConvection::tick (const Soil& soil, const SoilWater& soil_water,
 	    ddt = dd_down;
 	}
     }
+
+  // We restart from here if anything goes wrong.
+  int time_step_reductions = 0;
+ try_again:;
   assert (ddt > 0.0);
   assert (ddt <= dt);
 
@@ -138,10 +151,24 @@ TransportConvection::tick (const Soil& soil, const SoilWater& soil_water,
 	  C[i] = solute.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 	}
     }
+  assert (approximate (J_in, J[0]));
 
+  for (unsigned int i = 0; i < size; i++)
+    if (M[i] < 0.0)
+      {
+	ddt *= 0.5;
+	C = C_prev;
+	M = M_prev;
+	time_step_reductions++;
+	if (time_step_reductions > max_time_step_reductions)
+	  throw ("convection gave negative solution");
+	goto try_again;
+      }
+  
   // Check mass conservation.
   const double new_total = soil.total (M);
   assert (approximate (old_total - J[0] * dt + J[size] * dt, new_total));
+  assert (approximate (- J[0] * dt + J[size] * dt, new_total - old_total));
 }
 
 static struct TransportConvectionSyntax
@@ -158,6 +185,10 @@ static struct TransportConvectionSyntax
     alist.add ("description", "Transport using convection alone.");
     syntax.add ("ddt", "h", Syntax::LogOnly, Syntax::Singleton,
 		"Time step used in the numeric solution.");
+    syntax.add ("max_time_step_reductions",
+		Syntax::Integer, Syntax::Const, "\
+Number of times we may reduce the time step before giving up");
+    alist.add ("max_time_step_reductions", 10);
     Librarian<Transport>::add_type ("convection", alist, syntax, &make);
   }
 } TransportConvection_syntax;

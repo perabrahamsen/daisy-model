@@ -31,6 +31,7 @@ struct MactransStandard : public Mactrans
 {
   // Simulation.
  void tick (const Soil& soil, const SoilWater&,
+	    const vector<double>& M,
 	    const vector<double>& C,
 	    vector<double>& S,
 	    vector<double>& S_p,
@@ -48,6 +49,7 @@ struct MactransStandard : public Mactrans
 
 void 
 MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
+			const vector<double>& M,
 			const vector<double>& C,
 			vector<double>& S_m,
 			vector<double>& S_p,
@@ -76,7 +78,9 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	{
 	  // More is going out below of the pore than comming in above.  
 	  // Water enter here from the matrix with the local concentration.
-	  delta_matter = -C[i] * delta_water;
+	  delta_matter = min (-C[i] * delta_water, M[i] + S_m[i] * dt - 1e-8);
+	  if (delta_matter < 0.0)
+	    delta_matter = 0.0;
 	}
       else if (delta_water > 1.0e-60)
 	{

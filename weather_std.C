@@ -25,6 +25,7 @@
 #include "time.h"
 #include "tmpstream.h"
 #include "mathlib.h"
+#include "units.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -32,18 +33,6 @@
 
 struct WeatherStandard : public Weather
 {
-  // Units.
-  struct unit_type
-  {
-    const char* from;
-    const char* to;
-    double factor;
-  };
-  static const unit_type unit_table[];
-  static const int unit_table_size;
-  bool has_conversion (const string& from, const string& to);
-  double convert_unit (const string& from, const string& to);
-
   // Snow Model.
   const double T_rain;
   const double T_snow;
@@ -70,7 +59,7 @@ struct WeatherStandard : public Weather
     const char* name;
     const char* dim;
     double WeatherStandard::* value;
-    double WeatherStandard::* factor;
+    string WeatherStandard::* read;
     double min;
     double max;
     bool required;
@@ -87,14 +76,14 @@ struct WeatherStandard : public Weather
   bool has_wind_speed;
   bool has_reference_evapotranspiration;
 
-  // Factors.
-  double air_temperature_factor;
-  double global_radiation_factor;
-  double precipitation_factor;
-  double vapor_pressure_factor;
-  double relative_humidity_factor;
-  double wind_speed_factor;
-  double reference_evapotranspiration_factor;
+  // Convertion.
+  string air_temperature_read;
+  string global_radiation_read;
+  string precipitation_read;
+  string vapor_pressure_read;
+  string relative_humidity_read;
+  string wind_speed_read;
+  string reference_evapotranspiration_read;
 
   // Parsing.
   const string where;
@@ -191,44 +180,6 @@ struct WeatherStandard : public Weather
   bool check (const Time& from, const Time& to, Treelog& err) const;
 };
 
-const WeatherStandard::unit_type 
-WeatherStandard::unit_table[] = 
-{ { "mm/d", "mm/h", 0.0416666667 },
-  { "dgWest", "dgEast", -1},
-  { "dgSouth", "dgNorth", -1},
-  { "%", "fraction", 0.01 } };
-  
-const int 
-WeatherStandard::unit_table_size = 
-/**/ sizeof (WeatherStandard::unit_table)
-  /**/ / sizeof (WeatherStandard::unit_type); 
-
-bool
-WeatherStandard::has_conversion (const string& from, const string& to)
-{
-  if (from == to)
-    return true;
-  
-  for (unsigned int i = 0; i < unit_table_size; i++)
-    if (unit_table[i].from == from && unit_table[i].to == to)
-      return true;
-  return false;
-}
-
-double
-WeatherStandard::convert_unit (const string& from, const string& to)
-{
-  if (from == to)
-    return 1.0;
-  
-  for (unsigned int i = 0; i < unit_table_size; i++)
-    if (unit_table[i].from == from && unit_table[i].to == to)
-      return unit_table[i].factor;
-
-  assert (false);
-  return -42.42e42;
-}
-
 WeatherStandard::keyword_description_type 
 WeatherStandard::keyword_description[] =
 { { "Latitude", "dgNorth", &WeatherStandard::latitude, -90, 90, true },
@@ -256,25 +207,25 @@ WeatherStandard::data_description[] =
   { "Hour", "hour", &WeatherStandard::next_hour, NULL,
     0, 23, false },
   { "GlobRad", "W/m^2", &WeatherStandard::next_global_radiation,
-    &WeatherStandard::global_radiation_factor,
+    &WeatherStandard::global_radiation_read,
     0, 1400, true },
   { "AirTemp", "dgC", &WeatherStandard::next_air_temperature,
-    &WeatherStandard::air_temperature_factor,
+    &WeatherStandard::air_temperature_read,
     -70, 60, false },
   { "Precip", "mm/h", &WeatherStandard::next_precipitation,
-    &WeatherStandard::precipitation_factor,
+    &WeatherStandard::precipitation_read,
     0, 300, true },
   { "RefEvap", "mm/h", &WeatherStandard::next_reference_evapotranspiration,
-    &WeatherStandard::reference_evapotranspiration_factor,
+    &WeatherStandard::reference_evapotranspiration_read,
     -10, 20, false },
   { "VapPres", "Pa", &WeatherStandard::next_vapor_pressure,
-    &WeatherStandard::vapor_pressure_factor,
+    &WeatherStandard::vapor_pressure_read,
     0, 5000, false },
   { "RelHum", "fraction", &WeatherStandard::next_relative_humidity,
-    &WeatherStandard::relative_humidity_factor,
+    &WeatherStandard::relative_humidity_read,
     0, 5000, false },
   { "Wind", "m/s", &WeatherStandard::next_wind_speed,
-    &WeatherStandard::wind_speed_factor,
+    &WeatherStandard::wind_speed_read,
     0, 40, false } };
 
 const int 
@@ -352,9 +303,10 @@ WeatherStandard::read_line ()
 	  const int index = data_index[i];
 	  if (index < 0)
 	    continue;
-	  const double factor = data_description[index].factor
-	    ? this->*(data_description[index].factor) : 1.0;
-	  const double value =  factor * lex->get_number ();
+	  const string dim = data_description[index].dim;
+	  const string read = data_description[index].read
+	    ? this->*(data_description[index].read) : dim;
+	  const double value =  Units::convert (read, dim, lex->get_number ());
 	  this->*(data_description[index].value) = value;
 	  if (value < data_description[index].min)
 	    lex->error (string ("Column ") 
@@ -549,8 +501,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	      
 	  if (key == "NH4WetDep")
 	    {
-	      if (has_conversion (dim, "ppm"))
-		val *= convert_unit (dim, "ppm");
+	      if (Units::can_convert (dim, "ppm"))
+		val = Units::convert (dim, "ppm", val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -559,8 +511,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	    }
 	  else if (key == "NH4DryDep")
 	    {
-	      if (has_conversion (dim, "kgN/year"))
-		val *= convert_unit (dim, "kgN/year");
+	      if (Units::can_convert (dim, "kgN/year"))
+		val = Units::convert (dim, "kgN/year", val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -569,8 +521,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	    }
 	  else if (key == "NO3WetDep")
 	    {
-	      if (has_conversion (dim, "ppm"))
-		val *= convert_unit (dim, "ppm");
+	      if (Units::can_convert (dim, "ppm"))
+		val = Units::convert (dim, "ppm", val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -579,8 +531,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	    }
 	  else if (key == "NO3DryDep")
 	    {
-	      if (has_conversion (dim, "kgN/year"))
-		val *= convert_unit (dim, "kgN/year");
+	      if (Units::can_convert (dim, "kgN/year"))
+		val = Units::convert (dim, "kgN/year", val);
 	      else
 		lex->error ("Unknown dimension");
 	      if (val < 0.0 || val > 100.0)
@@ -589,8 +541,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	    }
 	  else if (key == "Timestep")
 	    {
-	      if (has_conversion (dim, "hours"))
-		val *= convert_unit (dim, "hours");
+	      if (Units::can_convert (dim, "hours"))
+		val = Units::convert (dim, "hours", val);
 	      else
 		lex->error ("Unknown dimension");
 	      timestep = static_cast<int> (val);
@@ -604,8 +556,9 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 		{
 		  if (key == keyword_description[i].name)
 		    {
-		      if (has_conversion (dim, keyword_description[i].dim))
-			val *= convert_unit (dim, keyword_description[i].dim);
+		      if (Units::can_convert (dim, keyword_description[i].dim))
+			val = Units::convert (dim, keyword_description[i].dim,
+					      val);
 		      else
 			lex->error ("Unknown dimension");
 		      if (val < keyword_description[i].min)
@@ -692,11 +645,10 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
     {
       const string dimension = lex->get_word ();
       const int index = data_index[i];
-      if (has_conversion (dimension, data_description[index].dim))
+      if (Units::can_convert (dimension, data_description[index].dim))
 	{
-	  if (data_description[index].factor)
-	    this->*(data_description[index].factor) 
-	      = convert_unit (dimension, data_description[index].dim);
+	  if (data_description[index].read)
+	    this->*(data_description[index].read) = dimension;
 	}
       else
 	lex->error ("Bad unit");
@@ -729,13 +681,6 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     has_relative_humidity (false),
     has_wind_speed (false),
     has_reference_evapotranspiration (false),
-    air_temperature_factor (1.0),
-    global_radiation_factor (1.0),
-    precipitation_factor (1.0),
-    vapor_pressure_factor (1.0),
-    relative_humidity_factor (1.0),
-    wind_speed_factor (1.0),
-    reference_evapotranspiration_factor (1.0),
     where (al.name ("where")),
     lex (NULL),
     last_time (end),

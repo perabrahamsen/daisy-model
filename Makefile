@@ -510,7 +510,7 @@ txt/reference/reference.pdf:	txt/reference/components.tex
 
 txt/reference/components.tex:	daisy
 	(cd txt/reference \
-	 && ../../daisy -p LaTeX > components.tex)
+	 && ../../daisy all.dai -p LaTeX > components.tex)
 
 # Remove all the temporary files.
 #

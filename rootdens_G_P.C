@@ -187,11 +187,6 @@ Rootdens::default_model ()
       Syntax dummy;
       Rootdens::load_syntax (dummy, alist);
       alist.add ("type", "Gerwitz+Page74");
-      alist.add ("description", 
-		 "Use exponential function for root density.\n\
-\n\
-See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
-to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
       alist.add ("DensRtTip", 0.1);
       alist.add ("MinDens", 0.0);
     }
@@ -206,7 +201,15 @@ static struct Rootdens_G_PSyntax
   Rootdens_G_PSyntax ()
   {
     Syntax& syntax = *new Syntax ();
-    AttributeList& alist = *new AttributeList (Rootdens::default_model ());
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", 
+	       "Use exponential function for root density.\n\
+\n\
+See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
+to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
+    alist.add ("DensRtTip", 0.1);
+    alist.add ("MinDens", 0.0);
+
     Rootdens::load_syntax (syntax, alist);
     syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
 		"Root density at (potential) penetration depth.");
@@ -216,6 +219,6 @@ Root density will never be below this, as long as there is enough root mass.\n\
 Extra root mass will be distributed according to Gerwitz and Page.\n\
 If there are too little root mass, the root will have the same density\n\
 all the way down.");
-    Librarian<Rootdens>::add_type (alist.name ("type"), alist, syntax, &make);
+    Librarian<Rootdens>::add_type ("Gerwitz+Page74", alist, syntax, &make);
   }
 } Rootdens_G_P_syntax;

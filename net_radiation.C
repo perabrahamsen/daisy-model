@@ -216,7 +216,7 @@ static struct NetRadiationSyntax
 			"Brunt 'b' parameter (vapor pressure factor).");
       AttributeList& alist_brunt = *new AttributeList ();
       alist_brunt.add ("description", "\
-Brunt, 1932.  Default parametrization by Jensen et.al., 1990.\n\
+Brunt, 1932.  Default parameterization by Jensen et.al., 1990.\n\
 FAO recommendation.");
       // We add the values here so they appear in the manual.
       alist_brunt.add ("a", 0.34);

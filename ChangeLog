@@ -1,3 +1,119 @@
+2002-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.15 released.
+
+2002-03-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/all.dai: New file.
+	* lib/Makefile (TEXT): Added it.
+
+2002-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* nitrification_soil.C (NitrificationSoilSyntax): Added range checks.
+	* nitrification_solute.C (NitrificationSoluteSyntax): Ditto.
+
+	* lib/log.dai: Changed sign for solute drainage.
+
+2002-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (tick): Added more assertions.
+	(tick): Fixed bogus drainage calculation.
+
+	* transport_cd.C (tick): Reset M when lowering timestep.
+
+	* mactrans_std.C, mactrans.h (tick): Added `M' parameter.
+
+	* solute.C (last_resort): Transport model if reserve fails.
+
+	* transport_convection.C (tick): Decrease timestep if we get
+	negative values.
+
+2002-03-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* library.C, library.h (is_derived_from, base_model): New member
+	functions. 
+	* document.C (ModelCompare): New class.
+	(print_component): Use it.
+	* document_LaTeX.C (print_index): New function.
+	(print_model_header): Use it.
+	(print_fixed_header): Use it.
+	(print_component_header): Use it.
+	(print_submodel_entry): Use it.
+	(print_entry_category): Don't print index here.
+	* document_LaTeX.C, document.h: (print_parameterization_header(
+	(print_parameterization_file) 
+	(print_parameterization_no_file) 
+	(print_parameterization_description) 
+	(print_parameterization_trailer): New virtual functions.
+	* document.C (print_model): Use them.
+
+	* options.C (Options): Don't run simulation if we printed a manual.
+
+	* organic_matter.C (tick): Allow zero NH4 or NO3.
+
+2002-03-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C (Spec): New member.
+
+	* library.C, library.h (exist): New function.
+
+	* lib/log.dai ("Total Soil Content"): Gave it a description and
+	made it hourly. 
+
+2002-03-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/crop-old.dai: New file..
+	* lib/crop.dai: Moved old V1 crop parameterizations to
+	crop/old.dai. 
+	* lib/log-old.dai: New file.
+	* lib/Makefile (DAISY): Added them.
+
+	* net_radiation.C (NetRadiationSyntax): Spelling error.
+
+	* units.C (standard_conversions): Added convertions used by
+	`weather_std.C'. 
+	* weather_std.C: Converted to use `units.h'.
+
+2002-02-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* parser_file.C (get_string): Ignore escaped newlines, and let \n
+	mean newline.
+
+	* lib/maize.dai ("Pioneer Maize"): Renamed from "Maize Pioneer".
+
+2002-02-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_fertilize.C (ActionFertilizeSyntax): Added range checks.
+
+	* soil_water.C, soil_water.h (content): New function.
+	* column_base.C, column_base.h, column.h (soil_water_content): New
+	function. 
+	* field.C, field.h (soil_water_content): New function.
+	* condition_soil.C (ConditionSoilWater): New condition. 
+
+2002-02-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/chemistry.dai (Pendimethalin): New chemical.
+
+	* lib/fertilizer.dai (cattle_slurry): Updated.
+	(pig_slurry): Updated.
+	(cattle_manure): New.
+	(pig_manure): New.
+	(horse_manure): New.
+
+	* lib/rye.dai ("Rye"): Update from hsv.
+	* lib/sugarbeet.dai ("Sugar Beet"): Ditto.
+	* lib/srape.dai ("Spring Rape"): Ditto.
+	* lib/potato.dai: New file.
+	* lib/Makefile (NEWCROPS): Added it.
+	* lib/crop.dai: Input it.
+	* lib/maize.dai ("Maize"): Use "Roskilde" parameterizations.
+	("Maize Pioneer"): Renamed from "Maize".
+
+2002-02-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (AM_Syntax): Use `add_fraction' for "first_year_utilization".
+
 2002-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.14 released.

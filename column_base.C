@@ -151,6 +151,15 @@ ColumnBase::soil_water_potential (double height) const
   return soil_water.h (soil.interval_plus (height));
 }
 
+double 
+ColumnBase::soil_water_content (double from, double to) const
+{
+  assert (to <= from);
+  assert (to <= 0.0);
+  assert (to > soil.z (soil.size () - 1));
+  return soil_water.content (soil, from, to);
+}
+
 double  
 ColumnBase::crop_ds (const string& name) const // {[-1:2], Crop::DSremove}
 { return vegetation.DS_by_name (name); }

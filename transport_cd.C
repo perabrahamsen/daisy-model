@@ -73,8 +73,8 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   double J_in = J[0];
 
   // Remember old values.
-  vector<double> C_prev = C;
-  vector<double> M_prev = M;
+  const vector<double> C_prev = C;
+  const vector<double> M_prev = M;
 
   // Constants.
   const unsigned int size = soil.size (); // Number of soil layers.
@@ -193,7 +193,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
     ddt = min (ddt, pow (soil.dz (i), 2) / (2 * D[i + 1]));
   int time_step_reductions = 0;
 
-  // We rstart from here if anything goes wrong.
+  // We restart from here if anything goes wrong.
  try_again:;
 
   // Loop through small time steps.
@@ -326,6 +326,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 	  {
 	    ddt *= 0.5;
 	    C = C_prev;
+	    M = M_prev;
 	    time_step_reductions++;
 	    if (time_step_reductions > max_time_step_reductions)
 	      throw ("convection-dispersion gave negative solution");

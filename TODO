@@ -1,6 +1,44 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* User Manual for specifying manager.
+* Check drain source/sink.
+
+Få Søren til at genkøre sin simulering.
+
+* DHI:  Nitrification soil i initial.dai
+
+* Weather default
+
+Precipitaion-Correction: 1.12 1.24 ... for each month.
+
+* User Manual
+
+** SH: Pesticides
+
+To partielle parameteriseringer, "canopy" og "soil"?
+
+** Log paramterizations.
+
+Udbyg.
+
+** SH: Check pet PM
+
+* Irrigation
+
+** Deficit
+
+SH: Check om vi skal starte ved fremspiring, som i Daisy V1.
+
+* Experimental Features Manual.
+
+** Ridge
+
+** PMSW
+
+** Soil Compaction
+
+* Parser & Printer.
+
+** Don't order attributes when defining paramterizations.
 
 * Make it possible to log a specific entry in an array of unnamed objects.
 

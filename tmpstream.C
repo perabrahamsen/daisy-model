@@ -46,7 +46,7 @@ struct TmpStream::Implementation
   ~Implementation ()
   { 
     if (str)
-      delete str;
+      delete [] str;
   }
 };
 

@@ -48,6 +48,7 @@ Solute::add_to_source (const vector<double>& v)
     {
       S[i] += v[i];
       assert (finite (S[i]));
+      assert (M_left (i) >= 0.0);
     }
 }
 
@@ -59,6 +60,7 @@ Solute::add_to_sink (const vector<double>& v)
     {
       S[i] -= v[i];
       assert (finite (S[i]));
+      assert (M_left (i) >= 0.0);
     }
 }
 
@@ -67,6 +69,9 @@ Solute::tick (const Soil& soil,
 	      const SoilWater& soil_water, 
 	      double J_in)
 {
+  for (unsigned i = 0; i < soil.size (); i++)
+    assert (M_left (i) >= 0.0);
+
   // Initialize.
   fill (S_p.begin (), S_p.end (), 0.0);
   fill (J_p.begin (), J_p.end (), 0.0);
@@ -75,6 +80,7 @@ Solute::tick (const Soil& soil,
   for (unsigned int i = 0; i < soil.size (); i++)
     {
       S[i] += S_permanent[i];
+      assert (M_left (i) >= 0.0);
       S_external[i] += S_permanent[i];
     }
 
@@ -103,25 +109,38 @@ Solute::tick (const Soil& soil,
   // Drainage.
   for (unsigned int i = 0; i < soil.size (); i++)
     {
-      const double Theta = soil_water.Theta (i);
-      const double fraction = soil_water.S_drain (i) * dt / Theta;
-      
-      S_drain[i] = C_to_M (soil, Theta, i, fraction * C (i));
+      S_drain[i] = -soil_water.S_drain (i) * dt * C (i);
       S[i] += S_drain[i];
+      assert (M_left (i) >= 0.0);
     }
 
   // Flow.
   const double old_content = soil.total (M_);
-  mactrans.tick (soil, soil_water, C_, S, S_p, J_p);
+  mactrans.tick (soil, soil_water, M_, C_, S, S_p, J_p);
 
   try
     {
+      for (unsigned i = 0; i < soil.size (); i++)
+	assert (M_left (i) >= 0.0);
       transport.tick (soil, soil_water, *this, M_, C_, S, J);
     }
   catch (const char* error)
     {
-      CERR << "Transport problem: " << error << "\n";
-      reserve.tick (soil, soil_water, *this, M_, C_, S, J);
+      CERR << "Transport problem: " << error << ", trying reserve.\n";
+      try
+	{
+	  for (unsigned i = 0; i < soil.size (); i++)
+	    assert (M_left (i) >= 0.0);
+	  reserve.tick (soil, soil_water, *this, M_, C_, S, J);
+	}
+      catch (const char* error)
+	{
+	  CERR << "Reserve transport problem: " << error
+	       << ", trying last resort.\n";
+	  for (unsigned i = 0; i < soil.size (); i++)
+	    assert (M_left (i) >= 0.0);
+	  last_resort.tick (soil, soil_water, *this, M_, C_, S, J);
+	}
     }
   const double new_content = soil.total (M_);
   const double delta_content = new_content - old_content;
@@ -191,7 +210,13 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Reserve transport model if the primary model fails.");
   AttributeList convection;
   convection.add ("type", "convection");
+  convection.add ("max_time_step_reductions", 10);
   alist.add ("reserve", convection);
+  syntax.add ("last_resort", Librarian<Transport>::library (),
+	      "Last resort transport model if the reserve model fails.");
+  AttributeList none;
+  none.add ("type", "none");
+  alist.add ("last_resort", none);
 
   syntax.add ("mactrans", Librarian<Mactrans>::library (), 
 	      "Solute transport model in macropores.");
@@ -229,6 +254,7 @@ Solute::Solute (const AttributeList& al)
     S_permanent (al.number_sequence ("S_permanent")),
     transport (Librarian<Transport>::create (al.alist ("transport"))),
     reserve (Librarian<Transport>::create (al.alist ("reserve"))),
+    last_resort (Librarian<Transport>::create (al.alist ("last_resort"))),
     mactrans  (Librarian<Mactrans>::create (al.alist ("mactrans"))),
     adsorption (Librarian<Adsorption>::create (al.alist ("adsorption")))
 { }

@@ -40,6 +40,7 @@ struct DocumentLaTeX : public Document
   void print_quoted (ostream&, const string&);
 
   // Private functions.
+  void print_index (ostream& out, const string& name);
   void print_entry_name (ostream& out, const string& name);
   void print_entry_type (ostream& out,
 			 const string& name,
@@ -86,6 +87,13 @@ struct DocumentLaTeX : public Document
   void print_model_header (ostream& out, const string& name);
   void print_model_description (ostream& out, const string& description);
   void print_model_trailer (ostream& out, const string& name);
+  void print_parameterization_header (ostream& out,
+  				      const string& name, const string& type);
+  void print_parameterization_file (ostream& out, const string& name);
+  void print_parameterization_no_file (ostream& out);
+  void print_parameterization_description (ostream& out, 
+					   const string& description);
+  void print_parameterization_trailer (ostream& out, const string& name);
   void print_fixed_header (ostream&, const string& name);
   void print_fixed_trailer (ostream&, const string& name);
   void print_component_header (ostream& out, const string& name);
@@ -154,6 +162,14 @@ DocumentLaTeX::print_quoted (ostream& out, const string& name)
       default:
 	out << name[i];
       }
+}
+
+void
+DocumentLaTeX::print_index (ostream& out, const string& name)
+{
+  out << "\\index{";
+  print_quoted (out, name);
+  out << "}";
 }
 
 void 
@@ -306,7 +322,7 @@ DocumentLaTeX::print_entry_submodel (ostream& out,
 	submodel = false;
     }
 }
-
+    
 void 
 DocumentLaTeX::print_entry_category (ostream& out,
 				     const string& name, 
@@ -314,14 +330,6 @@ DocumentLaTeX::print_entry_category (ostream& out,
 				     const Syntax& syntax,
 				     const AttributeList& alist)
 {
-  if (type == Syntax::Number 
-      && (syntax.is_state (name) || syntax.is_log (name)))
-    {
-      out << "\\index{";
-      print_quoted (out, name);
-      out << "}";
-    }
-
   if (type == Syntax::Object)	// Objects and ALists don't have categories.
     {
       if (syntax.is_optional (name))
@@ -476,6 +484,7 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
 
   // Print name.
   print_entry_name (out, name);
+  print_index (out, name);
 
   // Print type.
   print_entry_type (out, name, type, size, syntax, alist);
@@ -603,6 +612,7 @@ DocumentLaTeX::print_model_header (ostream& out, const string& name)
   out << "\n\\section{";
   print_quoted (out, name);
   out << "}\n\\label{model:" << current_component << "-" << name << "}\n";
+  print_index (out, name);
 }
 
 void
@@ -618,12 +628,51 @@ void
 DocumentLaTeX::print_model_trailer (ostream&, const string&)
 { }
 
+void 
+DocumentLaTeX::print_parameterization_header (ostream& out,
+					      const string& name, 
+					      const string& type)
+{
+  out << "\n\\section{";
+  print_quoted (out, name);
+  out << "}\n\\label{model:" << current_component << "-" << name << "}\n";
+  print_index (out, name);
+  out << "A `";
+  print_quoted (out, type);
+  out << "' parameterization ";
+}
+
+void 
+DocumentLaTeX::print_parameterization_file (ostream& out, 
+					    const string& name)
+{ 
+  out << "defined in `";
+  print_quoted (out, name);
+  out << "'.\n";
+}
+
+void 
+DocumentLaTeX::print_parameterization_no_file (ostream& out)
+{ 
+  out << "build into \\daisy{}.\n";
+}
+
+void 
+DocumentLaTeX::print_parameterization_description (ostream& out, 
+						   const string& description)
+{ print_model_description (out, description); }
+
+void 
+DocumentLaTeX::print_parameterization_trailer (ostream&, const string&)
+{ }
+
 void
 DocumentLaTeX::print_fixed_header (ostream& out, const string& name)
 { 
   out << "\n\\section{";
   print_quoted (out, name);
   out << "}\n\\label{fixed:" << name << "}\n";
+  print_index (out, name);
 }
 
 void
@@ -637,6 +686,7 @@ DocumentLaTeX::print_component_header (ostream& out, const string& name)
   out << "\n\\chapter{";
   print_quoted (out, name);
   out << "}\n\\label{component:" << name << "}\n";
+  print_index (out, name);
 }
 
 void

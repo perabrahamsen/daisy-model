@@ -68,6 +68,10 @@ SoilWater::freeze (const Soil&, const vector<double>& v)
     }
 }
 
+double 
+SoilWater::content (const Geometry& geometry, double from, double to) const
+{ return geometry.total (Theta_, from, to); }
+
 double
 SoilWater::pF (int i) const
 {

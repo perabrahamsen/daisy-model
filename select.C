@@ -33,6 +33,21 @@ const char *const Select::description = "Select part of state.";
   
 struct Select::Implementation
 {
+  // Spec.
+  struct Spec
+  {
+    // Content.
+    const string library_name;
+    const string model_name;
+    const vector<string> submodels_and_attribute;
+    
+    // Create and Destroy.
+    static bool check_alist (const AttributeList& al, Treelog& err);
+    static void load_syntax (Syntax& syntax, AttributeList&);
+    Spec (const AttributeList&);
+    ~Spec ();
+  } *spec;
+
   // Content.
   Condition* condition;		// Should we accumulate now?
   vector<string> path;		// Content of this entry.
@@ -42,128 +57,244 @@ struct Select::Implementation
   unsigned int last_valid_path_index;	// Remember the last valid level.
   bool is_active;		// Should we be accumulating now?
   vector<bool> maybies;		// Keep track of which maybies 
-                                         // have matched.
-  bool valid ()		// If the current path index is valid.
-  { 
-    return (current_path_index == last_valid_path_index
-	    && current_path_index < path.size ()); 
-  }
+				// have matched.
+  bool valid ();		// If the current path index is valid.
+  bool valid (const string& name); // Is the next path index valid?
+  void open_maybe (const string& value);
+  void close_maybe ();		// Close one level.
+  void open_group (const string& name);
+  void open (const string& name); // Open one leaf level.
+  void close ();		// Close one level.
 
-  bool valid (const string& name) // Is the next path index valid?
-  { 
-    return valid () && (path[current_path_index] == "*" 
-			|| name == path[current_path_index]); 
-  }
-
-  void open_maybe (const string& value)
-  {
-    const string question_mark = "?";
-    
-    if (valid ()
-	&& path[current_path_index][0] == '?'
-	&& question_mark + value == path[current_path_index])
-      {
-	maybies.push_back (true);
-	last_valid_path_index++;
-	current_path_index++;
-      }
-    else
-      maybies.push_back (false);
-  }
-
-  void close_maybe ()		// Close one level.
-  {
-    assert (!maybies.empty ());
-    if (maybies.back ())
-      {
-	assert (current_path_index == last_valid_path_index);
-	last_valid_path_index--;
-	current_path_index--;
-      }
-    maybies.pop_back ();
-  }
-
-  void open_group (const string& name) // Open one group level.
-  {
-    if (valid (name))
-      {
-#if 0
-	if (is_active && last_valid_path_index == path.size () -1)
-	  {
-	    names.insert (name);
-	    count++;
-	  }
-#endif
-	last_valid_path_index++;
-      }
-    current_path_index++;
-  }
-
-  void open (const string& name) // Open one leaf level.
-  {
-    if (valid (name))
-      last_valid_path_index++;
-    current_path_index++;
-  }
-
-  void close ()		// Close one level.
-  {
-    if (current_path_index == last_valid_path_index)
-      last_valid_path_index--;
-    current_path_index--;
-  }
-
-  // Reset at start of time step.
-  bool match (const Daisy& daisy, bool is_printing)
-  {
-    assert (current_path_index == 0U);
-    assert (last_valid_path_index == 0U);
-
-    if (condition)
-      {
-	condition->tick (daisy);
-	is_active = condition->match (daisy);
-      }
-    else
-      is_active = is_printing;
-    return is_active;
-  }
+  bool match (const Daisy& daisy, bool is_printing);
 
   // Create and Destroy.
   void initialize (const string_map& conv, const string& timestep, 
-		   string& dimension)
-  {
-    // Convert path according to mapping in 'conv'.
-    for (unsigned int i = 0; i < path.size (); i++)
-      {
-	string_map::const_iterator entry = conv.find (path[i]);
-	if (entry != conv.end ())
-	  path[i] = (*entry).second;
-	else if (path[i].size () > 0 && path[i][0] == '$')
-	  path[i] = "*";
-      }
-    // Replace '&' with timestep.
-    string new_dim;
-    for (unsigned int i = 0; i < dimension.length (); i++)
-      if (dimension[i] == '&')
-	new_dim += timestep;
-      else
-	new_dim += dimension[i];
-    dimension = new_dim;
-  }
-
-  Implementation (const AttributeList& al)
-    : condition (al.check ("when") 
-		 ? &Librarian<Condition>::create (al.alist ("when"))
-		 : NULL),
-      path (al.name_sequence ("path")),
-      current_path_index (0U),
-      last_valid_path_index (0U),
-      is_active (false)
-  { }
-  ~Implementation ()
-  { delete &condition; }
+		   string& dimension);
+  Implementation (const AttributeList& al);
+  ~Implementation ();
 };
+
+bool 
+Select::Implementation::Spec::check_alist (const AttributeList& al,
+					   Treelog& err)
+{
+  bool ok = true;
+  
+  const string library_name = al.name ("library");
+  const string model_name = al.name ("model");
+  const vector<string> submodels_and_attribute 
+    = al.name_sequence ("submodels_and_attribute");
+
+  if (submodels_and_attribute.size () < 1)
+    {
+      err.entry ("You must specify an attribute");
+      ok = false;
+    }
+  if (!Library::exist (library_name))
+    {
+      err.entry (string ("'") + library_name + "': no such library");
+      ok = false;
+    }
+  else
+    {
+      const Library& library = Library::find (library_name);
+      
+      if (!library.check (model_name))
+	{
+	  err.entry (string ("'") + model_name + "': no such model");
+	  ok = false;
+	}
+      else
+	{
+	  const Syntax* syntax = &library.syntax (model_name);
+	  
+	  for (unsigned int i = 0; i < submodels_and_attribute.size (); i++)
+	    {
+	      const string& name = submodels_and_attribute[i];
+	      bool last = (i + 1 == submodels_and_attribute.size ());
+	      const Syntax::type type = syntax->lookup (name);
+
+	      if (!last)
+		{
+		  if (type != Syntax::AList)
+		    {
+		      err.entry (string ("'") + name + "': no such submodel");
+		      ok = false;
+		      break;
+		    }
+		  syntax = &syntax->syntax (name);
+		}
+	      else if (type == Syntax::Error)
+		{
+		  err.entry (string ("'") + name + "': no such attribute");
+		  ok = false;
+		}
+	    }
+	}
+    }
+  return ok;
+}
+
+void 
+Select::Implementation::Spec::load_syntax (Syntax& syntax, AttributeList&)
+{ 
+  syntax.add_check (check_alist);
+  syntax.add ("library", Syntax::String, Syntax::Const, "\
+Name of library where the attribute belong.");
+  syntax.add ("model", Syntax::String, Syntax::Const, "\
+Name of model where the attribute belong.");
+  syntax.add ("submodels_and_attribute", Syntax::String, 
+	      Syntax::Const, Syntax::Sequence, "\
+Name of submodels and attribute.");
+  syntax.order ("library", "model", "submodels_and_attribute");
+}
+
+Select::Implementation::Spec::Spec (const AttributeList& al)
+  : library_name (al.name ("library")),
+    model_name (al.name ("model")),
+    submodels_and_attribute (al.name_sequence ("submodels_and_attribute"))
+{ }
+
+Select::Implementation::Spec::~Spec ()
+{ }
+
+bool 
+Select::Implementation::valid ()
+{ 
+  // If the current path index is valid.
+  return (current_path_index == last_valid_path_index
+	  && current_path_index < path.size ()); 
+}
+
+bool 
+Select::Implementation::valid (const string& name)
+{ 
+  // Is the next path index valid?
+  return valid () && (path[current_path_index] == "*" 
+		      || name == path[current_path_index]); 
+}
+
+void 
+Select::Implementation::open_maybe (const string& value)
+{
+  const string question_mark = "?";
+    
+  if (valid ()
+      && path[current_path_index][0] == '?'
+      && question_mark + value == path[current_path_index])
+    {
+      maybies.push_back (true);
+      last_valid_path_index++;
+      current_path_index++;
+    }
+  else
+    maybies.push_back (false);
+}
+
+void 
+Select::Implementation::close_maybe ()		// Close one level.
+{
+  assert (!maybies.empty ());
+  if (maybies.back ())
+    {
+      assert (current_path_index == last_valid_path_index);
+      last_valid_path_index--;
+      current_path_index--;
+    }
+  maybies.pop_back ();
+}
+
+void 
+Select::Implementation::open_group (const string& name)
+{ 
+  // Open one group level.
+  if (valid (name))
+    {
+#if 0
+      if (is_active && last_valid_path_index == path.size () -1)
+	{
+	  names.insert (name);
+	  count++;
+	}
+#endif
+      last_valid_path_index++;
+    }
+  current_path_index++;
+}
+
+void 
+Select::Implementation::open (const string& name) // Open one leaf level.
+{
+  if (valid (name))
+    last_valid_path_index++;
+  current_path_index++;
+}
+
+void 
+Select::Implementation::close ()		// Close one level.
+{
+  if (current_path_index == last_valid_path_index)
+    last_valid_path_index--;
+  current_path_index--;
+}
+
+// Reset at start of time step.
+bool 
+Select::Implementation::match (const Daisy& daisy, bool is_printing)
+{
+  assert (current_path_index == 0U);
+  assert (last_valid_path_index == 0U);
+
+  if (condition)
+    {
+      condition->tick (daisy);
+      is_active = condition->match (daisy);
+    }
+  else
+    is_active = is_printing;
+  return is_active;
+}
+
+// Create and Destroy.
+void 
+Select::Implementation::initialize (const string_map& conv, const string& timestep, 
+				    string& dimension)
+{
+  // Convert path according to mapping in 'conv'.
+  for (unsigned int i = 0; i < path.size (); i++)
+    {
+      string_map::const_iterator entry = conv.find (path[i]);
+      if (entry != conv.end ())
+	path[i] = (*entry).second;
+      else if (path[i].size () > 0 && path[i][0] == '$')
+	path[i] = "*";
+    }
+  // Replace '&' with timestep.
+  string new_dim;
+  for (unsigned int i = 0; i < dimension.length (); i++)
+    if (dimension[i] == '&')
+      new_dim += timestep;
+    else
+      new_dim += dimension[i];
+  dimension = new_dim;
+}
+
+  
+Select::Implementation::Implementation (const AttributeList& al)
+  : spec (al.check ("spec") ? new Spec (al.alist ("spec")) : NULL),
+    condition (al.check ("when") 
+	       ? &Librarian<Condition>::create (al.alist ("when"))
+	       : NULL),
+    path (al.name_sequence ("path")),
+    current_path_index (0U),
+    last_valid_path_index (0U),
+    is_active (false)
+{ }
+  
+Select::Implementation::~Implementation ()
+{ delete &condition; }
+
 
 const Geometry* 
 Select::geometry () const
@@ -297,6 +428,16 @@ level, for example all crops.  This way the path can specify multiple\n\
 values, they will be added before they are printed in the log file.\n\
 All values that start with a \"$\" will work like \"*\".  They are intended\n\
 to be mapped with the 'set' attribute in the 'table' log model.");
+  syntax.add_submodule ("spec", alist, Syntax::OptionalConst, "\
+Specification for the attribute to be logged of the form\n\
+\n\
+  library model submodel* attribute\n\
+\n\
+Unlike path, the attribute may occur several different places in the\n\
+simulation, if the model is used at several places.  Also, there is no\n\
+wildcards, so only a single model can be matches.  The spec is used for\n\
+helping Daisy establish a unique dimension and description for the\n\
+attribute.", Select::Implementation::Spec::load_syntax);
   syntax.add ("when", 
 	      Librarian<Condition>::library (),
 	      Syntax::OptionalConst, Syntax::Singleton,

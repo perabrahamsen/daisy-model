@@ -101,6 +101,12 @@ ParserFile::Implementation::get_string ()
 	      c = get ();
 	      switch (c)
 		{
+		case 'n':
+		  c = '\n';
+		  break;
+		case '\n':
+		  c = get ();
+		  break;
 		case '\\':
 		case '"':
 		  break;
@@ -361,14 +367,18 @@ ParserFile::Implementation::add_derived (Library& lib)
       skip_to_end ();
       return;
     }
+  const Syntax& syntax = lib.syntax (super);
   // Create new attribute derived from its superclass.
   const AttributeList& sl = lib.lookup (super);
   AttributeList& atts = *new AttributeList (sl);
   // Remember where we got this object.
   atts.add ("parsed_from_file", file);
   atts.add ("parsed_sequence", Library::get_sequence ());
+  // Doc string.
+  if (!syntax.ordered () && looking_at ('"'))
+    atts.add ("description", get_string ());
   // Add separate attributes for this object.
-  load_list (atts, lib.syntax (super));
+  load_list (atts, syntax);
   // Add new object to library.
   lib.add_derived (name, atts, super);
 }

@@ -41,6 +41,7 @@ class Library
 
 public:
   // Find a specific library.
+  static bool exist (const string& name);
   static Library& find (const string& name);
   static void all (vector<string>& libraries);
   static int get_sequence ();
@@ -55,6 +56,8 @@ public:
 		    const string& super);
   const Syntax& syntax (const string&) const;
   void entries (vector<string>&) const;
+  bool is_derived_from (const string& a, const string& b) const;
+  const string base_model (const string& parameterization) const;
 
   // Dependencies.
   void remove (const string&);

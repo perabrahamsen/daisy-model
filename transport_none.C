@@ -57,7 +57,7 @@ TransportNone::tick (const Soil& soil, const SoilWater& soil_water,
 {
   for (unsigned int i = 0; i < soil.size (); i++)
     {
-      M[i] += S[i];
+      M[i] += S[i] *dt;
 
       if (i == 0)
 	M[i] -= J[0] / soil.dz (0);
@@ -68,10 +68,9 @@ TransportNone::tick (const Soil& soil, const SoilWater& soil_water,
       if (!(M[i] >= 0.0))
 	{
 	  CERR << "BUG: M[" << i << "] = " << M[i] 
-	       << "(J_in = " << J[i] << ") S[" << i << "] = " << S[i] << "\n";
+	       << " (J_in = " << J[0] << ") S[" << i << "] = " << S[i] << "\n";
 
 	}
-
       assert (M[i] >= 0.0);
       assert (C[i] >= 0.0);
     }

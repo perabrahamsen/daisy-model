@@ -1,4 +1,4 @@
-// condition_soil.C
+// condition_soil.C --- Checking soil state.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -19,9 +19,6 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-//
-// Checking soil state.
-
 #include "condition.h"
 #include "field.h"
 #include "daisy.h"
@@ -29,74 +26,127 @@
 
 struct ConditionSoilTemperature : public Condition
 {
-  double temperature;
-  double height;
+  const double temperature;
+  const double height;
 
   bool match (const Daisy& daisy) const
-    { 
-      if (daisy.field.soil_temperature (height) > temperature)
-	return true;
-      return false;
-    }
+  { 
+    if (daisy.field.soil_temperature (height) > temperature)
+      return true;
+    return false;
+  }
   void output (Log&) const
-    { }
+  { }
 
   ConditionSoilTemperature (const AttributeList& al)
     : Condition (al),
       temperature (al.number ("temperature")),
       height (al.number ("height"))
-    { }
+  { }
 };
 
 struct ConditionSoilPotential : public Condition
 {
-  double potential;
-  double height;
+  const double potential;
+  const double height;
 
   bool match (const Daisy& daisy) const
-    { return (daisy.field.soil_water_potential (height) > potential); }
+  { return (daisy.field.soil_water_potential (height) > potential); }
   void output (Log&) const
-    { }
+  { }
 
   ConditionSoilPotential (const AttributeList& al)
     : Condition (al),
       potential (al.number ("potential")),
       height (al.number ("height"))
-    { }
+  { }
+};
+
+struct ConditionSoilWater : public Condition
+{
+  const double water;		// [mm]
+  const double from;		// [cm]
+  const double to;		// [cm]
+
+  bool match (const Daisy& daisy) const
+  { return (daisy.field.soil_water_content (from, to) * 10 > water); }
+  void output (Log&) const
+  { }
+
+  ConditionSoilWater (const AttributeList& al)
+    : Condition (al),
+      water (al.number ("water")),
+      from (al.number ("from")),
+      to (al.number ("to"))
+  { }
 };
 
 static struct ConditionSoilSyntax
 {
   static Condition& make_temperature (const AttributeList& al)
-    { return *new ConditionSoilTemperature (al); }
+  { return *new ConditionSoilTemperature (al); }
   static Condition& make_potential (const AttributeList& al)
-    { return *new ConditionSoilPotential (al); }
+  { return *new ConditionSoilPotential (al); }
+  static Condition& make_water (const AttributeList& al)
+  { return *new ConditionSoilWater (al); }
+
+  static bool check_water_content (const AttributeList& al, Treelog& err)
+  {
+    bool ok = true;
+
+    const double from = al.number ("from");
+    const double to = al.number ("to");
+    if (from < to)
+      {
+	err.entry ("'from' must be higher than 'to' in"
+		   " the measured area");
+	ok = false;
+      }
+    return ok;
+  }
 
   ConditionSoilSyntax ()
+  {
     {
-      {
-	Syntax& syntax = *new Syntax ();
-	AttributeList& alist = *new AttributeList ();
-	alist.add ("description", "\
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
 Test if the soil is warmer than the specified temperature.");
-	syntax.add ("temperature", "dg C", Syntax::Const, "\
+      syntax.add ("temperature", "dg C", Syntax::Const, "\
 Lowest soil temperature for which the condition is true.");
-	syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
+      syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
 Soil depth in which to test the temperature.");
-	Librarian<Condition>::add_type ("soil_temperature_above",
-					alist, syntax, &make_temperature);
-      }
-      {
-	Syntax& syntax = *new Syntax ();
-	AttributeList& alist = *new AttributeList ();
-	alist.add ("description", "\
-Test if the soil is wetter than the specified pressure potential.");
-	syntax.add ("potential", "cm", Syntax::Const, "\
-The soil should be wetter than this for the condition to be true.");
-	syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
-Depth at which to example the pressure potential.");
-	Librarian<Condition>::add_type ("soil_water_pressure_above",
-					alist, syntax, &make_potential);
-      }
+      Librarian<Condition>::add_type ("soil_temperature_above",
+				      alist, syntax, &make_temperature);
     }
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      alist.add ("description", "\
+Test if the soil is wetter than the specified pressure potential.");
+      syntax.add ("potential", "cm", Syntax::Const, "\
+The soil should be wetter than this for the condition to be true.");
+      syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
+Depth at which to example the pressure potential.");
+      Librarian<Condition>::add_type ("soil_water_pressure_above",
+				      alist, syntax, &make_potential);
+    }
+    {
+      Syntax& syntax = *new Syntax ();
+      AttributeList& alist = *new AttributeList ();
+      syntax.add_check (check_water_content);
+      alist.add ("description", "\
+Test if the soil contains more water than the specified amount.");
+      syntax.add ("water", "mm", Check::non_negative (), Syntax::Const, "\
+The soil should contain more water than this for the condition to be true.");
+      syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
+Top of interval to measure soil water content in.");
+      alist.add ("from", 0.0);
+      syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
+Bottom of interval to measure soil water content in.");
+      syntax.order ("water");
+      Librarian<Condition>::add_type ("soil_water_content_above",
+				      alist, syntax, &make_water);
+    }
+  }
 } ConditionSoil_syntax;

@@ -27,6 +27,7 @@
 #include "im.h"
 #include "tmpstream.h"
 #include "message.h"
+#include "check.h"
 
 struct ActionFertilize : public Action
 {
@@ -278,19 +279,21 @@ the 'from' and 'to' parameters.  By default, the fertilizer will be\n\
 left on the surface.");
     syntax.add ("am", Librarian<AM>::library (), "\
 The fertilizer you want to apply.");
-    syntax.add ("from", "cm", Syntax::Const, "\
+    syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
 Height where you want to start the incorporation (a negative number).");
     alist.add ("from", 0.0);
-    syntax.add ("to", "cm", Syntax::Const, "\
+    syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
 Height where you want to end the incorporation (a negative number).");
     alist.add ("to", 0.0);
-    syntax.add ("equivalent_weight", "kg N/ha", Syntax::OptionalConst, 
+    syntax.add ("equivalent_weight", "kg N/ha", Check::non_negative (),
+		Syntax::OptionalConst, 
 		"\
 When fertilizing with organic matter, you may let Daisy calculate the\n\
 amount of dry matter that corresponds to the specified amount of\n\
 nitrogen.  This requires that the fertilizer has specified the\n\
 'first_year_utilization' parameter, but not the 'weight' parameter.");
-    syntax.add ("minimum_weight", "kg N/ha", Syntax::Const,
+    syntax.add ("minimum_weight", "kg N/ha", Check::non_negative (),
+		Syntax::Const,
 		"Minimum amount of nitrogen to fertilize with.");
     alist.add ("minimum_weight", 0.0);
     syntax.add_submodule ("precision", alist, 

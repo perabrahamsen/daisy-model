@@ -91,6 +91,7 @@ public:
   double daily_air_temperature () const; // [ dg C]
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
+  double soil_water_content (double from, double to) const; // [cm]
   double crop_ds (const string& name) const ;// {[-1:2], Crop::DSremove}
   double crop_dm (const string& name) const; // [kg/ha], negative when no crop
 

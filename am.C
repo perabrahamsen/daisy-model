@@ -1076,20 +1076,20 @@ Organic fertilizer, typically slurry or manure from animals.");
 		    Syntax::Const,
 		    "Amount of fertilizer applied.");
 	alist.add ("weight", 0.0);
-	syntax.add ("first_year_utilization", 
-		    Syntax::Fraction (), Syntax::OptionalConst, 
-		    "Estimated useful N fraction for the first year.\n\
+	syntax.add_fraction ("first_year_utilization", Syntax::OptionalConst, 
+			     "\
+Estimated useful N fraction for the first year.\n\
 In Denmark, this is governed by legalisation.");
 	syntax.add_fraction ("second_year_utilization", 
 			     Syntax::OptionalConst, "\
 Estimated useful N fraction for the second year.\n\
 In Denmark, this is governed by legalisation.");
 	syntax.add_fraction ("dry_matter_fraction", Syntax::Const,
-			     "Dry matter fraction of total weight.");
+			     "Dry matter fraction of total (wet) weight.");
 	syntax.add_fraction ("total_C_fraction", Syntax::Const,
 			     "Carbon fraction of dry matter.");
 	syntax.add_fraction ("total_N_fraction", Syntax::Const,
-			     "Nitrogen fraction of dry matter");
+			     "Nitrogen fraction of dry matter.");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
 				       OM::load_syntax);
@@ -1161,6 +1161,7 @@ uniformly distributed in each layer.");
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList (AM::default_root ());
+	alist.remove ("type");
 	syntax.add_check (check_root);
 	syntax.add ("creation", Syntax::Date, Syntax::State,
 		    "Start of simulation.");

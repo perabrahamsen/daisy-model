@@ -94,6 +94,7 @@ Options::Options (int& argc, char**& argv,
   initialize_path ();
   bool file_found = false;
   bool options_finished = false;
+  bool prevent_run = false;
   int errors_found = 0;
   while (argc > 1)
     {
@@ -156,6 +157,7 @@ Options::Options (int& argc, char**& argv,
 			  document.print_document (COUT);
 			  delete &document;
 			}
+		      prevent_run = true;
 		    }
 		  else
 		    {
@@ -189,7 +191,7 @@ Options::Options (int& argc, char**& argv,
   if (errors_found > 0)
     argc = -1;
 
-  if (!file_found)
+  if (argc > 0 && (!file_found || prevent_run))
     // Done.
     argc = 0;
 }

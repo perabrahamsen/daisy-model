@@ -76,8 +76,8 @@ public:
   double Theta_left (int i) const
   { return Theta_[i] - S_sum_[i]; }
   double Theta_old (int i) const
-
   { return Theta_old_[i]; }
+  double content (const Geometry&, double from, double to) const; // [cm]
   double q (int i) const
   { return q_[i]; }
   double q_p (int i) const

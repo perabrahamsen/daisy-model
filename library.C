@@ -181,6 +181,10 @@ Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
     }
 }
 
+bool
+Library::exist (const string& name)
+{ return Implementation::all->find (name) != Implementation::all->end (); }
+
 Library& 
 Library::find (const string& name)
 { return *(*Implementation::all)[name]; }
@@ -235,6 +239,37 @@ Library::syntax (const string& key) const
 void
 Library::entries (vector<string>& result) const
 { impl.entries (result); }
+
+bool 
+Library::is_derived_from (const string& a, const string& b) const
+{
+  const AttributeList& al = lookup (a);
+
+  if (!al.check ("type"))
+    return false;
+
+  const string& type = al.name ("type");
+
+  if (type == b)
+    return true;
+
+  assert (check (type));
+  assert (type != a);
+
+  return is_derived_from (type, b);
+}
+  
+const string 
+Library::base_model (const string& parameterization) const
+{
+  const AttributeList& al = lookup (parameterization);
+
+  if (!al.check ("type"))
+    return parameterization;
+
+  return base_model (al.name ("type"));
+}
+
 
 void
 Library::remove (const string& key)

@@ -48,6 +48,17 @@ protected:
   virtual void print_model_header (ostream&, const string& name) = 0;
   virtual void print_model_description (ostream&, const string&) = 0;
   virtual void print_model_trailer (ostream&, const string& name) = 0;
+  virtual void print_parameterization_header (ostream& out,
+					      const string& name, 
+					      const string& type) = 0;
+  virtual void print_parameterization_file (ostream& out, 
+					    const string& name) = 0;
+  virtual void print_parameterization_no_file (ostream& out) = 0;
+  virtual void print_parameterization_description (ostream& out, 
+						   const string&
+						   description) = 0;
+  virtual void print_parameterization_trailer (ostream& out, 
+					       const string& name) = 0;
   virtual void print_fixed_header (ostream&, const string& name) = 0;
   virtual void print_fixed_trailer (ostream&, const string& name) = 0;
   virtual void print_component_header (ostream&, const string& name) = 0;
@@ -68,8 +79,7 @@ protected:
 		     const AttributeList& alist);
 private:
   void print_model (ostream& out, const string& name, 
-		    const Syntax& syntax,
-		    const AttributeList& alist);
+		    const Library& library);
   void print_fixed (ostream& out, const string& name, 
 		    const Syntax& syntax,
 		    const AttributeList& alist);

@@ -106,12 +106,14 @@ static struct WeatherNoneSyntax
     syntax.add ("global_radiation", "W/m^2", Syntax::Const,
 		"Constant global radiation.");
     alist.add ("global_radiation", 0.0);
-    syntax.add ("reference_evapotranspiration", "mm/h", Syntax::Const,
+    // These must be Syntax::State because they are logged in
+    // Weather::output.  Otherwise, we get an error at checkpoins.
+    syntax.add ("reference_evapotranspiration", "mm/h", Syntax::State,
 		"Constant reference evapotranspiration.");
     alist.add ("reference_evapotranspiration", 0.0);
-    syntax.add ("rain", "mm/h", Syntax::Const, "Constant rain.");
+    syntax.add ("rain", "mm/h", Syntax::State, "Constant rain.");
     alist.add ("rain", 0.0);
-    syntax.add ("snow", "mm/h", Syntax::Const, "Constant snow.");
+    syntax.add ("snow", "mm/h", Syntax::State, "Constant snow.");
     alist.add ("snow", 0.0);
     Librarian<Weather>::add_type ("none", alist, syntax, &WeatherNone::make);
   }

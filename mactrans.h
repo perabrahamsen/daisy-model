@@ -40,6 +40,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Soil& soil, const SoilWater&,
+		     const vector<double>& M,
 		     const vector<double>& C,
 		     vector<double>& S,
 		     vector<double>& S_p,
