@@ -29,8 +29,8 @@
 #include <iostream>
 #else
 #include <ostream>
-#endif
 using namespace std;
+#endif
 
 class TmpStream
 {
