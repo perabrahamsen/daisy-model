@@ -40,9 +40,6 @@ public:
     // This a state variable, it must be provided at initialization
     // and can be written to the log.
     InOut,
-    // This is a complex object that is not required to be fully
-    // specified before the simulation starts.
-    Sparse, 
     // This is a state variable that can be computer from other state
     // variables, and therefore does not need to be specified before
     // the simulation starts. 
@@ -54,9 +51,7 @@ public:
 
   // These functions will check that an alist conform to the syntax.
   // The first is quite chatty about it.
-  bool check (const AttributeList&, 
-	      string = "<unknown>",
-	      bool sparse = false) const;
+  bool check (const AttributeList&, string = "<unknown>") const;
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 

@@ -22,13 +22,12 @@ struct Syntax::Implementation
   size_map size;
   library_map libraries;
   derive_map derived;
-  bool check (const AttributeList& vl, string name, bool sparse);
+  bool check (const AttributeList& vl, string name);
   Syntax::type lookup (string key) const;
 };    
 
 bool 
-Syntax::Implementation::check (const AttributeList& vl, string name, 
-			       bool sparse)
+Syntax::Implementation::check (const AttributeList& vl, string name)
 {
   bool error = false;
 
@@ -37,14 +36,12 @@ Syntax::Implementation::check (const AttributeList& vl, string name,
        i++)
     {
       string key = (*i).first;
-      required state = status[key];
-      if (!vl.check (key))
+      if(status[key] != Const && status[key] != InOut)
+	/* Do nothing */;
+      else if (!vl.check (key))
 	{
-	  if (!sparse && (state == InOut || state == Const))
-	    {
 	      cerr << "Attributte " << key << " missing\n";
 	      error = true;
-	    }
 	}
       else if (types[key] == Object)
 	if (size[key] != Singleton)
@@ -61,8 +58,7 @@ Syntax::Implementation::check (const AttributeList& vl, string name,
 		    cerr << "Non object found \n";
 		    error = true;
 		  }
-		else if (!lib.syntax (al.name ("type")) .check
-			 (al, key, sparse  || (state == Sparse)))
+		else if (!lib.syntax (al.name ("type")) .check (al, key))
 		  error = true;
 	      }
 	  }
@@ -87,13 +83,11 @@ Syntax::Implementation::check (const AttributeList& vl, string name,
 		 j++)
 	      {
 		const AttributeList& al = **j;
-		if (!syntax[key]->check (al, key, 
-					 sparse || (state == Sparse)))
+		if (!syntax[key]->check (al, key))
 		  error = true;
 	      }
 	  }
-	else if (!syntax[key]->check (vl.list (key), key, 
-				      sparse || (state == Sparse)))
+	else if (!syntax[key]->check (vl.list (key), key))
 	  error = true;
     }
   if (error)
@@ -114,9 +108,9 @@ Syntax::Implementation::lookup (string key) const
 }
 
 bool
-Syntax::check (const AttributeList& vl, string name, bool sparse) const
+Syntax::check (const AttributeList& vl, string name) const
 {
-  return impl.check (vl, name, sparse);
+  return impl.check (vl, name);
 }
 
 Syntax::type 
