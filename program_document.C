@@ -32,6 +32,7 @@
 #include <iostream>
 #include <memory>
 #include <algorithm>
+
 static bool 
 has_interesting_description (const Library& library, 
                              const AttributeList& alist)
@@ -623,7 +624,15 @@ ProgramDocument::print_sample_entry (const std::string& name,
 	      {
 		format->special ("nbsp");
 		TmpStream tmp;
-		tmp () << alist.number (name) << ")";
+		tmp () << alist.number (name);
+                const std::string& dimension = syntax.dimension (name);
+                if (dimension == Syntax::None ())
+                  tmp () << " []";
+                else if (dimension == Syntax::Unknown ())
+                  tmp () << " [?]";
+                else
+                  tmp () << " [" << dimension << "]";
+                tmp () << ")";
 		format->text (tmp.str ());
 		print_name = false;
 	      }

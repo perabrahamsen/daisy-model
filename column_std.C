@@ -88,6 +88,7 @@ public:
                          double from, double to);
   void set_subsoil_irrigation (double flux, const IM& sm, 
 			       double from, double to);
+  void fertilize (const IM&);
   void fertilize (const AttributeList&);
   void fertilize (const AttributeList&, double from, double to);
   void clear_second_year_utilization ();
@@ -201,12 +202,11 @@ void
 ColumnStandard::sow (Treelog& msg, const AttributeList& al)
 { vegetation->sow (msg, al, soil, organic_matter, seed_N, seed_C); }
 
-// We need to convert from mm * mg N / liter to g N/m^2.
-// mm / liter = 1/m^2
-// mg = 1/1000 g
-// Thus, we need to divide flux * solute with 1000 to get the surface input.
-
-static const double irrigate_solute_surface_factor = 1.0 / 1000.0;
+// We need to convert from mm * mg N / liter to g N/cm^2.
+// mm / liter = 1/m^2 = 1/(100^2 cm^2) = 1/10000 1/cm^2 = 1.0e-4 1/cm^2
+// mg = 1/1000 g = 1.0e-3 g
+// Thus, we need to divide flux * solute with 1.0e-7 to get the surface input.
+static const double irrigate_solute_factor = 1.0e-7;
 
 void 
 ColumnStandard::irrigate_overhead (double flux, double temp, const IM& sm)
@@ -215,7 +215,7 @@ ColumnStandard::irrigate_overhead (double flux, double temp, const IM& sm)
   daisy_assert (flux >= 0.0);
   daisy_assert (sm.NH4 >= 0.0);
   daisy_assert (sm.NO3 >= 0.0);
-  surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
+  fertilize (sm * (flux * irrigate_solute_factor));
 }
 
 void 
@@ -225,7 +225,7 @@ ColumnStandard::irrigate_surface (double flux, double temp, const IM& sm)
   daisy_assert (flux >= 0.0);
   daisy_assert (sm.NH4 >= 0.0);
   daisy_assert (sm.NO3 >= 0.0);
-  surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
+  fertilize (sm * (flux * irrigate_solute_factor));
 }
 
 void 
@@ -235,7 +235,7 @@ ColumnStandard::irrigate_overhead (double flux, const IM& sm)
   daisy_assert (flux >= 0.0);
   daisy_assert (sm.NH4 >= 0.0);
   daisy_assert (sm.NO3 >= 0.0);
-  surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
+  fertilize (sm * (flux * irrigate_solute_factor));
 }
 
 void 
@@ -245,23 +245,17 @@ ColumnStandard::irrigate_surface (double flux, const IM& sm)
   daisy_assert (flux >= 0.0);
   daisy_assert (sm.NH4 >= 0.0);
   daisy_assert (sm.NO3 >= 0.0);
-  surface.fertilize (sm * (flux * irrigate_solute_surface_factor));
+  fertilize (sm * (flux * irrigate_solute_factor));
 }
-
-// We need to convert from mm * mg N / liter to g N/cm^2.
-// mm / liter = 1/m^2 = 1/(100^2 cm^2) = 1/10000 1/cm^2 = 1.0e-4 1/cm^2
-// mg = 1/1000 g = 1.0e-3 g
-// Thus, we need to divide flux * solute with 1.0e-7 to get the surface input.
-static const double irrigate_solute_soil_factor = 1.0e-7;
 
 void
 ColumnStandard::irrigate_subsoil (double flux, const IM& sm, 
                                   double from, double to)
 {
   ColumnBase::irrigate_subsoil (flux, sm, from, to);
-  soil_NH4.incorporate (soil, sm.NH4 * (flux * irrigate_solute_soil_factor), 
+  soil_NH4.incorporate (soil, sm.NH4 * (flux * irrigate_solute_factor), 
                         from, to);
-  soil_NO3.incorporate (soil, sm.NO3 * (flux * irrigate_solute_soil_factor),
+  soil_NO3.incorporate (soil, sm.NO3 * (flux * irrigate_solute_factor),
                         from, to);
 }
 
@@ -274,19 +268,31 @@ ColumnStandard::set_subsoil_irrigation (double flux, const IM& sm,
   daisy_assert (from <= 0.0);
   daisy_assert (to < from);
   soil_NH4.set_external_source (soil, 
-				sm.NH4 * (flux * irrigate_solute_soil_factor), 
+				sm.NH4 * (flux * irrigate_solute_factor), 
 				from, to);
   soil_NO3.set_external_source (soil, 
-				sm.NO3 * (flux * irrigate_solute_soil_factor),
+				sm.NO3 * (flux * irrigate_solute_factor),
 				from, to);
+}
+
+void
+ColumnStandard::fertilize (const IM& im)
+{
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+
+  daisy_assert (im.NH4 >= 0.0);
+  daisy_assert (im.NO3 >= 0.0);
+  surface.fertilize (im);
+  fertilized_NO3_total += im.NO3 / conv; 
+  fertilized_NH4_total += im.NH4 / conv;
+  fertilized_NO3_surface += im.NO3 / conv; 
+  fertilized_NH4_surface += im.NH4 / conv;
 }
 
 void
 ColumnStandard::fertilize (const AttributeList& al)
 {
-  // kg/ha -> g/cm^2
-  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
-
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
   second_year_utilization_ += AM::second_year_utilization (al);
@@ -297,19 +303,14 @@ ColumnStandard::fertilize (const AttributeList& al)
   volatilization_surface += lost_NH4;
 
   // Add inorganic matter.
-  IM im (al);
-  daisy_assert (im.NH4 >= 0.0);
-  daisy_assert (im.NO3 >= 0.0);
-  surface.fertilize (im);
-  fertilized_NO3_total += im.NO3 / conv; 
-  fertilized_NH4_total += im.NH4 / conv + lost_NH4;
-  fertilized_NO3_surface += im.NO3 / conv; 
-  fertilized_NH4_surface += im.NH4 / conv + lost_NH4;
-  fertilized_DM += AM::get_DM (al);
+  fertilize (IM (al));
+  fertilized_NH4_total += lost_NH4;
+  fertilized_NH4_surface += lost_NH4;
 
   // Add organic matter, if any.
   if (al.name ("syntax") != "mineral")
     organic_matter.fertilize (al, soil);
+  fertilized_DM += AM::get_DM (al);
 }
 
 void 

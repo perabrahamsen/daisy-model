@@ -1,4 +1,21 @@
+2005-02-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.70 released.
+
+2005-02-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* program_document.C (print_sample_entry): Print dimension.
+
+	* action_irrigate.C (struct ActionIrrigate): Write N amount.
+
+	* column_std.C (fertilize): Split out variant that takes an 'IM'
+	object.
+	(irrigate_surface, irrigate_overhead): Use it.
+
 2005-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* xref.C (use_model): Don't use components here.
+	(enter_parameter): Always use them here.
 
 	* Version 3.69 released.
 

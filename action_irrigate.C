@@ -57,6 +57,14 @@ struct ActionIrrigate : public Action
         else
           tmp () << "Irrigating " << flux << " mm/h for "
                  << days * 24 + hours << " hours";
+        // [kg/ha] -> [g/cm^2]
+        const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+        // [mm * mg N/ l] = [l/m^2 * mg N/l] = [mg/m^2] -> [g N/cm^2]
+        static const double irrigate_solute_factor = 1.0e-7;
+        double N = (sm.NO3 + sm.NH4) * flux * (days * 24 + hours) 
+          * irrigate_solute_factor / conv;
+        if (N > 1e-10)
+          tmp () << "; " << N << " kg N/ha";
         out.message (tmp.str ());      
       }
     else if (daisy.time == end_time)

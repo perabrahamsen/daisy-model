@@ -51,14 +51,14 @@ public:
   const IM& matter_flux ();
   const Chemicals&  chemicals_down () const;
 
-  void mixture (const IM& soil_im /* g/cm^2/mm */);
+  void mixture (const IM& soil_im /* [g/cm^2/mm] */);
   void mixture (const SoilChemicals& soil_chemicals);
   void update_water (const Soil&, const std::vector<double>& S_,
 		     std::vector<double>& h_, std::vector<double>& Theta_,
 		     std::vector<double>& q, const std::vector<double>& q_p);
 
   // Manager.
-  void fertilize (const IM&);
+  void fertilize (const IM& /* [g/cm^2] */);
   void spray (const Chemicals& chemicals_in);
   void set_detention_capacity (double);
   void ridge (const Soil& soil, const SoilWater& soil_water,

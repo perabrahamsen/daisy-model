@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.70
+
+** Solute in overhead and surface irrigation was wrong unit.
+
+** doc fixes.
+
 * 3.69
 
 ** lysimeter bottom may work now.

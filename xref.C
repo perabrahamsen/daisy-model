@@ -146,7 +146,6 @@ void
 TraverseXRef::use_model (const Library& library, const symbol model)
 {
   daisy_assert (library.check (model));
-  use_component (library);
   const symbol component = library.name ();
   XRef::Users& moi = xref.models[XRef::ModelUsed (component, model)];
   
@@ -326,8 +325,9 @@ TraverseXRef::enter_parameter (const Syntax& syntax, AttributeList& alist,
     }
   path.push_back (name);
 
-  if (syntax.lookup (name) == Syntax::Object && !alist.check (name))
-    // An object attribute with no value is ignored by Traverse.
+  if (syntax.lookup (name) == Syntax::Object)
+    // We always use the component, even if it has no value, or a
+    // value that is an empty sequence.
     use_component (syntax.library (name));
 
   return true; 

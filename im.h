@@ -56,9 +56,9 @@ public:
   static void load_soil_flux (Syntax&, AttributeList&);
   static void load_field_flux (Syntax&, AttributeList&);
   IM (const IM& im);
-  IM (const AttributeList&);
-  IM (const IM&, double flux);
-  IM ();
+  explicit IM (const AttributeList&);
+  explicit IM (const IM&, double flux);
+  explicit IM ();
   ~IM ();
 };
 
