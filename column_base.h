@@ -69,6 +69,8 @@ protected:
   double log_residuals_C_top;
   vector<double> log_residuals_N_soil;
   vector<double> log_residuals_C_soil;
+  double log_residuals_N_root;
+  double log_residuals_C_root;
   double residuals_DM;
   double residuals_N_top;
   double residuals_C_top;

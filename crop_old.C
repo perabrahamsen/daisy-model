@@ -1085,7 +1085,7 @@ CropOld::SoluteUptake (const Soil& soil,
 	uptake[i] = 0.0;
       daisy_assert (uptake[i] >= 0.0);
     }
-  solute.add_to_sink (uptake);
+  solute.add_to_root_sink (uptake);
   
   for (int i = 0; i < size; i++)
     daisy_assert (solute.M_left (i) >= 0.0);

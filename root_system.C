@@ -277,7 +277,7 @@ RootSystem::solute_uptake (const Soil& soil,
 	uptake[i] = 0.0;
       daisy_assert (uptake[i] >= 0.0);
     }
-  solute.add_to_sink (uptake);
+  solute.add_to_root_sink (uptake);
 
   // gN/cm³/h -> gN/m²/h
   return soil.total (uptake) * 1.0e4;

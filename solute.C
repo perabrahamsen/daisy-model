@@ -38,6 +38,7 @@ Solute::clear ()
 {
   fill (S.begin (), S.end (), 0.0);
   fill (S_external.begin (), S_external.end (), 0.0);
+  fill (S_root.begin (), S_root.end (), 0.0);
 }
 
 void
@@ -62,6 +63,15 @@ Solute::add_to_sink (const vector<double>& v)
       daisy_assert (isfinite (S[i]));
       daisy_assert (M_left (i) >= 0.0);
     }
+}
+
+void
+Solute::add_to_root_sink (const vector<double>& v)
+{
+  daisy_assert (S_root.size () >= v.size ());
+  for (unsigned i = 0; i < v.size (); i++)
+    S_root[i] -= v[i];
+  add_to_sink (v);
 }
 
 void 
@@ -189,6 +199,7 @@ Solute::output (Log& log) const
   output_variable (S_drain, log);
   output_variable (S_external, log);
   output_variable (S_permanent, log);
+  output_variable (S_root, log);
   output_variable (J, log);
   output_variable (J_p, log);
 }
@@ -252,6 +263,8 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Permanent external source, e.g. subsoil irrigation.");
   vector<double> empty;
   alist.add ("S_permanent", empty);
+  syntax.add ("S_root", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Source term (root uptake only, always negative).");
   syntax.add ("J", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Transportation in matrix (positive up).");
   syntax.add ("J_p", "g/cm^2/h", Syntax::LogOnly, Syntax::Sequence,
@@ -441,6 +454,7 @@ Solute::initialize (const AttributeList& al,
     S_permanent.insert (S_permanent.end (), 
 			soil.size () - S_permanent.size (),
 			0.0);
+  S_root.insert (S_root.begin (), soil.size (), 0.0);
   J.insert (J_p.begin (), soil.size () + 1, 0.0);
   J_p.insert (J_p.begin (), soil.size () + 1, 0.0);
 }

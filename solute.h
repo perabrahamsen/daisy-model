@@ -51,6 +51,7 @@ protected:
   vector<double> S_drain;	// Source term for soil drainage only.
   vector<double> S_external;	// External source term, e.g. incorp. fert.
   vector<double> S_permanent;	// Permanent external source term.
+  vector<double> S_root;	// Root uptake source term (negative).
   vector<double> J;		// Solute transport log in matrix.
   vector<double> J_p;		// Solute transport log in macropores.
   Transport& transport;		// Solute transport model in matrix.
@@ -80,6 +81,7 @@ public:
   void clear ();
   void add_to_source (const vector<double>&);
   void add_to_sink (const vector<double>&);
+  void add_to_root_sink (const vector<double>&);
 
   // Simulation.
 public:

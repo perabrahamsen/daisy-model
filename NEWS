@@ -12,6 +12,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.09
+
+** Log summaries now handle logging a soil interval.
+
+This involves better tracking of bioincorporation (it might be
+incorporated outside the soil interval), root uptake (from outside the
+soil interval) and root death (outside the soil interval).
+
 * 3.08
 
 ** The "N Balance" log model now produce a total nitrogen summary.
@@ -24,7 +32,7 @@ This is needed for the above balance.
 
 * 3.07
 
-** Handle high temeperature soil.
+** Handle high temperature soil.
 
 Daisy used to give an error when the soil temperature got over 
 40 dg C because the heat factor for various processes were not defined

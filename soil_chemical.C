@@ -40,7 +40,7 @@ SoilChemical::uptake (const Soil& soil,
   for (unsigned int i = 0; i < soil.size (); i++)
     uptaken[i] = C (i) * soil_water.S_root (i) * rate;
   
-  add_to_sink (uptaken);
+  add_to_root_sink (uptaken);
 }
 
 void 

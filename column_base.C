@@ -22,6 +22,9 @@
 
 #include "column_base.h"
 
+static const double m2_per_cm2 = 0.0001;
+static const double cm2_per_m2 = 1.0 / m2_per_cm2;
+
 void 
 ColumnBase::ridge (const AttributeList& al)
 { surface.ridge (soil, soil_water, al); }
@@ -326,6 +329,8 @@ ColumnBase::tick_base (Treelog& msg)
   residuals_DM = 0.0;
   residuals_N_top = 0.0;
   residuals_C_top = 0.0;
+  log_residuals_N_root = soil.total (residuals_N_soil) * cm2_per_m2;
+  log_residuals_C_root = soil.total (residuals_C_soil) * cm2_per_m2;
   fill (residuals_N_soil.begin (), residuals_N_soil.end (), 0.0);
   fill (residuals_C_soil.begin (), residuals_C_soil.end (), 0.0);
 }
@@ -356,6 +361,8 @@ ColumnBase::output (Log& log) const
   output_value (log_residuals_C_top, "residuals_C_top", log);
   output_value (log_residuals_N_soil, "residuals_N_soil", log);
   output_value (log_residuals_C_soil, "residuals_C_soil", log);
+  output_value (log_residuals_N_root, "residuals_N_root", log);
+  output_value (log_residuals_C_root, "residuals_C_root", log);
 }
 
 void
@@ -414,7 +421,9 @@ ColumnBase::ColumnBase (const AttributeList& al)
     log_residuals_C_top (0.0),
     residuals_DM (0.0),
     residuals_N_top (0.0),
-    residuals_C_top (0.0)
+    residuals_C_top (0.0),
+    log_residuals_N_root (0.0),
+    log_residuals_C_root (0.0)
 { }
 
 void 
@@ -513,5 +522,11 @@ This includes loss as harvest, as well as loss of old leaves.");
 This includes loss as harvest, as well as loss of old roots.");
   syntax.add ("residuals_C_soil", "g/cm^3", Syntax::LogOnly, Syntax::Sequence, 
 	      "Amount of carbon removed from crops in soil this hour.\n\
+This includes loss as harvest, as well as loss of old roots.");
+  syntax.add ("residuals_N_root", "g/m^2", Syntax::LogOnly, 
+	      "Amount of nitrogen removed from crops to soil this hour.\n\
+This includes loss as harvest, as well as loss of old roots.");
+  syntax.add ("residuals_C_root", "g/m^2", Syntax::LogOnly, 
+	      "Amount of carbon removed from crops to surface this hour.\n\
 This includes loss as harvest, as well as loss of old roots.");
 }

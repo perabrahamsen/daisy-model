@@ -51,8 +51,10 @@ struct Bioincorporation::Implementation
   AM* aom;
 
   // Log.
-  double C;
-  double N;
+  double C_removed;
+  double N_removed;
+  vector<double> C_added;
+  vector<double> N_added;  
   double speed;
 
   // Utitlites.
@@ -107,8 +109,10 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     return;
 
   // Clear old log variables.
-  C = 0.0;
-  N = 0.0;
+  C_removed = 0.0;
+  N_removed = 0.0;
+  fill (C_added.begin (), C_added.end (), 0.0);
+  fill (N_added.begin (), N_added.end (), 0.0);
 
   // Check available bioincorporation.
   const double R_total = R_max * T_factor (T) * surface_to_soil;// [g C/cm^2/h]
@@ -147,15 +151,15 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
 	am[i]->multiply_top (0.0);
 	daisy_assert (am[i]->top_C () == 0.0);
 	daisy_assert (am[i]->top_N () == 0.0);
-	C += top_C * (1.0 - respiration);
-	N += top_N;
+	C_removed += top_C;
+	N_removed += top_N;
       }
     else
       {
 	// Take some.
 	const double fraction = speed * dt / top_C;
-	C += speed * dt * (1.0 - respiration);
-	N += top_N * fraction;
+	C_removed += speed * dt;
+	N_removed += top_N * fraction;
 	am[i]->multiply_top (1.0 - fraction);
 	daisy_assert (approximate (am[i]->top_C (), top_C - speed * dt));
 	daisy_assert (approximate (am[i]->top_N (), top_N * (1.0 - fraction)));
@@ -170,16 +174,21 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
     last_C_per_N = C_per_N;
   }
 
+  const double C_to_add = C_removed * (1.0 - respiration);
+  const double N_to_add = N_removed;
+
   // Add bioincorporation to soil.
   daisy_assert (aom);
-  aom->add (geometry, C, N, density);
-  
+  aom->add (geometry, C_to_add, N_to_add, density);
+  geometry.add (C_added, density, C_to_add);
+  geometry.add (N_added, density, N_to_add);  
+
   // Update CO2.
-  CO2 += respiration * C / (1.0 - respiration);
+  CO2 += (C_removed - C_to_add);
 
   // Update log variables.
-  C *= cm2_per_m2;
-  N *= cm2_per_m2;
+  C_removed *= cm2_per_m2;
+  N_removed *= cm2_per_m2;
 }
   
 void 
@@ -187,10 +196,12 @@ Bioincorporation::Implementation::output (Log& log) const
 { 
   static const symbol CO2_symbol ("CO2");
   if (log.check_leaf (CO2_symbol))
-    output_value (respiration * C / (1.0 - respiration), "CO2", log);
-  output_value (C * C_to_DM, "DM", log);
-  output_variable (C, log);
-  output_variable (N, log);
+    output_value (respiration * C_removed / (1.0 - respiration), "CO2", log);
+  output_value (C_removed * C_to_DM, "DM", log);
+  output_variable (C_removed, log);
+  output_variable (N_removed, log);
+  output_variable (C_added, log);
+  output_variable (N_added, log);
   output_variable (speed, log);
 }
 
@@ -210,6 +221,8 @@ Bioincorporation::Implementation::initialize (const Soil& soil)
       density.push_back (total / dz);
       last = next;
     }
+  C_added.insert (C_added.end (), soil.size (), 0.0);
+  N_added.insert (N_added.end (), soil.size (), 0.0);
 }
 
 AM*
@@ -234,8 +247,8 @@ Bioincorporation::Implementation::Implementation (const AttributeList& al)
     respiration (al.number ("respiration")),
     distribution (al.plf ("distribution")), 
     aom_alists (al.alist_sequence ("AOM")),
-    C (0.0),
-    N (0.0)
+    C_removed (0.0),
+    N_removed (0.0)
 { }
 
 void 
@@ -302,10 +315,16 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
 		       "Fraction of C lost in respiration.");
   alist.add ("respiration", 0.5);
   syntax.add ("DM", "g DM/m^2/h", Syntax::LogOnly, 
-	      "DM incorporated this hour.");
-  syntax.add ("C", "g C/m^2/h", Syntax::LogOnly, "C incorporated this hour.");
-  syntax.add ("N", "g N/m^2/h", Syntax::LogOnly, "N incorporated this hour.");
-  syntax.add ("CO2", "g C/m^2/h", Syntax::LogOnly, "C respirated this hour.");
+	      "DM removed from surface.");
+  syntax.add ("C_removed", "g C/m^2/h", Syntax::LogOnly,
+              "C removed from surface.");
+  syntax.add ("N_removed", "g N/m^2/h", Syntax::LogOnly, 
+              "N removed from surface.");
+  syntax.add ("CO2", "g C/m^2/h", Syntax::LogOnly, "C respirated.");
+  syntax.add ("C_added", "g C/m^2/h", Syntax::LogOnly, Syntax::Sequence,
+              "C added to soil.");
+  syntax.add ("N_added", "g N/m^2/h", Syntax::LogOnly, Syntax::Sequence,
+              "N added to soil.");
 
   // Incorporation location.
   syntax.add ("distribution", "cm", Syntax::None (), Check::non_negative (),

@@ -1,3 +1,51 @@
+2003-10-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.09 released.
+
+2003-10-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_base.C (residuals_N_root, residuals_C_root): New log
+	variables. 
+	* lib/log.dai ("N Balance"): Log them.
+	("Carbon Balance"): Ditto.
+	("Organic Nitrogen Balance"): Use them.
+	("Nitrogen Balance"): Ditto.
+
+	* bioincorporation.C (C_removed, N_removed): Renamed from C and N.
+	(C_added, N_added): New log variables.
+	* lib/log.dai (Bioincorporation): Update caller.
+	("N Balance"): Log them.
+	("Nitrogen Balance"): Use it.
+	("Organic Nitrogen Balance"): Use it.
+	("Carbon Balance"): Update caller.
+
+	* solute.C, solute.h (add_to_root_sink): New member function.
+	* soil_chemical.C (uptake): Call it.
+	* root_system.C (solute_uptake): Ditto.
+	* crop_sold.C (SoluteUptake): Ditto.
+	* crop_old.C (SoluteUptake): Ditto.
+	* solute.C, solute.h (S_root): New member variable.
+	* solute.C (output): Log it.
+	(initialize): Initialize it.
+	(load_syntax): Register it.
+	(clear): Clear it.
+	* lib/log.dai ("NH4 Soil Balance"): Use it.
+	("NO3 Soil Balance"): Use it.
+	("Nitrogen Balance"): Use it.
+	("N Balance"): Log it.
+	("N Balance"): Renamed NO3Upt and NH4Upt to NO3-Crop and
+	NH4-Crop. 
+	("Organic Nitrogen Balance"): Update user.
+
+	* lib/log.dai ("Total Water Balance"): Added "Transpiration" and
+	"Root Extraction". 
+
+2003-10-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Organic Nitrogen Balance"): New summary.
+	("N Balance"): Use it.
+	("Nitrogen Balance"): Add caveat about zones.
+
 2003-10-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.08 released.
