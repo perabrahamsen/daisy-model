@@ -78,7 +78,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	  // macropore, which also stayes here.
 	  if (water_in_above > 0.0)
 	    {
-	      const double water_fraction 
+	      /*const*/ double water_fraction 
 		= approximate (delta_water, water_in_above) 
 		? 1.0
 		: delta_water / water_in_above;

@@ -1,5 +1,8 @@
 2001-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* harvesting.C (load_syntax): Removed duplicate definition of
+	"Stem" syntax. 
+
 	* organic_matter.C (tick): Added debug information.
 
 	* mactrans_std.C (tick): Changed assertion to warning.

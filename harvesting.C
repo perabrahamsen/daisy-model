@@ -33,9 +33,6 @@ Harvesting::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_submodule ("Stem", alist, Syntax::Const, Syntax::Sequence, 
 			"Stem AOM parameters.", OM::load_syntax);
-
-  add_submodule_sequence<OM> ("Stem", syntax, Syntax::Const,
-			      "Stem AM parameters.");
   alist.add ("Stem", AM::default_AOM ());
   syntax.add_submodule ("Leaf", alist, Syntax::Const, Syntax::Sequence,
 			"Leaf AM parameters.", OM::load_syntax);
