@@ -32,9 +32,9 @@
 struct MacroStandard : public Macro
 {
   // Parameters.
+  const PLF distribution;		// Where they end [cm ->]
   const double height_start;	// Height macropores start [cm]
   const double height_end;	// Height macropores end [cm]
-  const PLF distribution;		// Where they end [cm ->]
   const double pressure_initiate; // Pressure needed to init pref.flow [cm]
   const double pressure_end;	// Pressure after pref.flow has been init [cm]
   const double pond_max;	// Pond height before activating pref.flow [mm]
@@ -54,9 +54,13 @@ struct MacroStandard : public Macro
   // Create and Destroy.
   MacroStandard (const AttributeList& al)
     : Macro (al),
-      height_start (al.number ("height_start")),
-      height_end (al.number ("height_end")),
       distribution (al.plf ("distribution")),
+      height_start (al.check ("height_start") 
+		    ? al.number ("height_start")
+		    : distribution.y (distribution.size () - 1)),
+      height_end (al.check ("height_end")
+		  ? al.number ("height_end")
+		  : distribution.y (0)),
       pressure_initiate (al.number ("pressure_initiate")),
       pressure_end (al.number ("pressure_end")),
       pond_max (al.number ("pond_max"))
@@ -263,40 +267,103 @@ MacroStandard::tick (const Soil& soil,
 
 static struct MacroStandardSyntax
 {
-  static Macro&
-  make (const AttributeList& al)
-    { return *new MacroStandard (al); }
+  static Macro& make (const AttributeList& al)
+  { return *new MacroStandard (al); }
+
+  static bool check_alist (const AttributeList& al, Treelog& err)
+  {
+    bool ok = true;
+    const PLF& distribution = al.plf ("distribution");
+    const int size = distribution.size ();
+
+    if (size < 2)
+      {
+	err.entry ("You must specify at least two points in distribution");
+	return false;
+      }
+
+    double height_start;
+    if (al.check ("height_start"))
+      {
+	height_start = al.number ("height_start");
+	if (distribution (height_start) != 0.0)
+	  {
+	    err.entry ("distribution (height_start) should be 0.0");
+	    ok = false;
+	  }
+      }
+    else
+      height_start = distribution.y (size - 1);
+
+    double height_end;
+    if (al.check ("height_end"))
+      {
+	height_end = al.number ("height_end");
+	if (distribution (height_end) != 1.0)
+	  {
+	    err.entry ("distribution (height_end) should be 1.0");
+	    ok = false;
+	  }
+      }
+    else
+      height_end = distribution.y (0);
+
+    if (height_end >= height_start)
+      {
+	err.entry ("height_end should be below height_start");
+	ok = false;
+      }
+
+    double last_y = distribution.y (0);
+    for (int i = 1; i < size; i++)
+      {
+	if (distribution.y (i) > last_y)
+	  {
+	    err.entry ("distribution should be non-increasing");
+	    ok = false;
+	    break;
+	  }
+      }
+
+    return ok;
+  }
+
   MacroStandardSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+  {
+    Syntax& syntax = *new Syntax ();
+    syntax.add_check (check_alist);
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "\
 The area between 'height_start' and 'height_end' contains macropores,\n\
 which are initiated when the water potential reach 'pressure_initiate',\n\
 and then immediately emptied down to 'pressure_end'.  The water entering\n\
 the macropore is distributed in soil below as a source term, according\n\
 to the 'distribution' parameter.");
 
-      syntax.add ("height_start", "cm", Check::non_positive (), Syntax::Const, 
-		  "Macropores starts at this depth (a negative number)");
-      syntax.add ("height_end", "cm", Check::non_positive (), Syntax::Const, 
-		  "Macropores ends at this depth (a negative number)");
-      syntax.add ("distribution", "cm", Syntax::Fraction (), Syntax::Const, "\
+    syntax.add ("height_start", "cm", Check::non_positive (), 
+		Syntax::OptionalConst, 
+		"Macropores starts at this depth (a negative number).\n\
+If not specified, use the last point in 'distribution'.");
+    syntax.add ("height_end", "cm", Check::non_positive (),
+		Syntax::OptionalConst, 
+		"Macropores ends at this depth (a negative number).\n\
+If not specified, use the first point in 'distribution'.");
+    syntax.add ("distribution", "cm", Syntax::Fraction (), Syntax::Const, "\
 Distribution of macropore end points as a function of height.\n\
 The function should start with '1' at 'height_end', and then decrease to\n\
 '0' at 'height_start'.  It can be constant, but may never increase.\n\
 The value indicates the fraction of macropores which ends at the given\n\
 where all macropores is assumed to start at the top.");
-      syntax.add ("pressure_initiate", "cm", Syntax::Const, 
-		  "Pressure needed to init pref.flow");
-      syntax.add ("pressure_end", "cm", Syntax::Const, 
-		  "Pressure after pref.flow has been init");
-      syntax.add ("S_p", "h-1", Syntax::LogOnly,
-		  "Macropore sink term.");
-      syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
+    syntax.add ("pressure_initiate", "cm", Syntax::Const, 
+		"Pressure needed to init pref.flow");
+    syntax.add ("pressure_end", "cm", Syntax::Const, 
+		"Pressure after pref.flow has been init");
+    syntax.add ("S_p", "h-1", Syntax::LogOnly,
+		"Macropore sink term.");
+    syntax.add ("pond_max", "mm", Check::non_negative (), Syntax::Const, "\
 Maximum height of ponding before spilling into macropores.\n\
 After macropores are activated pond will havethis height.");
-      alist.add ("pond_max", 0.5);
-      Librarian<Macro>::add_type ("default", alist, syntax, &make);
-    }
+    alist.add ("pond_max", 0.5);
+    Librarian<Macro>::add_type ("default", alist, syntax, &make);
+  }
 } MacroStandard_syntax;

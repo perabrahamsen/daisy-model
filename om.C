@@ -346,7 +346,7 @@ OM::tock (unsigned int end, const double* factor,
 	  if (rate < 0)
 	    rate = 0;
 
-	  // Aside: We could also have solved the equation by decresing the 
+	  // Aside: We could also have solved the equation by decreasing the 
 	  // efficiency.
 	  //   efficiency = ((N_soil - N_used) + rate * C[i] / C_per_N[i])
 	  //     * om.C_per_N / rate * C[i];
@@ -602,13 +602,10 @@ The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified\
 \n(which corresponds to the default value, a large negative number).");
   alist.add ("initial_fraction", Unspecified);
-  PLF empty;
-  syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
+  syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
-  alist.add ("heat_factor", empty);
-  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const, "\
+  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::OptionalConst, "\
 Water potential factor.  If empty, use default from 'OrganicMatter'.");
-  alist.add ("heat_factor", empty);
 }
 
 double
@@ -631,8 +628,6 @@ OM::get_initial_C_per_N (const AttributeList& al)
 OM::OM (const AttributeList& al)
   : initial_fraction (al.number ("initial_fraction")),
     initial_C_per_N (get_initial_C_per_N (al)),
-    heat_factor (al.plf ("heat_factor")),
-    water_factor (al.plf ("water_factor")),
     top_C (al.number ("top_C")),
     top_N (al.number ("top_N")),
     turnover_rate (al.check ("turnover_rate")
@@ -642,6 +637,10 @@ OM::OM (const AttributeList& al)
     maintenance (al.number ("maintenance")),
     fractions (al.number_sequence ("fractions"))
 { 
+  if (al.check ("heat_factor"))
+    heat_factor = al.plf ("heat_factor");
+  if (al.check ("water_factor"))
+    water_factor = al.plf ("water_factor");
   if (al.check ("C_per_N"))
     C_per_N = al.number_sequence ("C_per_N");
   if (al.check ("C"))

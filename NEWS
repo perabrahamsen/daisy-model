@@ -12,11 +12,18 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.29
+
+** Made 'height_start' and 'height_end' optional in default macropore model.
+
+It will now use the last and first point of the 'distribution'
+parameter as defaults.  Also, some consistency checks have been added.
+
 * 2.28
 
 ** You can now specify heat_factor and water_factor for individual OM pools.
 
-This allows you to specify that heat and water affect some rypes of
+This allows you to specify that heat and water affect some types of
 organic matter more than it affects other types.
 
 Here is an example where heat factor has been specified for AOM1 and

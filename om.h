@@ -39,8 +39,8 @@ public:
   static const double Unspecified;// No initial fraction specified.
   const double initial_fraction; // Relative fraction for this om.
   const double initial_C_per_N;	// Initial value for C/N.
-  const PLF heat_factor;
-  const PLF water_factor;
+  /* const */ PLF heat_factor;
+  /* const */ PLF water_factor;
 
   // Content.
 public:

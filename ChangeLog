@@ -1,3 +1,10 @@
+2002-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* macro_std.C (height_start, height_end): Made them optional.
+	(check_alist): New checks.
+
+	* om.C (tock): Spelling fix in comment.
+
 2002-05-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.28 released.
