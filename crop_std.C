@@ -2351,6 +2351,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * CrpAux.CAImRat / 24.0;
   assert (CrpAux.DeadWLeaf >= 0.0);
   double DdLeafCnc;
+  assert (vProd.WLeaf > 0.0);
   if (vProd.NCrop > 1.05 * CrpAux.PtNCnt)
     DdLeafCnc = vProd.NLeaf/vProd.WLeaf;
   else
@@ -2578,6 +2579,11 @@ CropStandard::harvest (const string& column_name,
 	  leaf_harvest *= (1.0 - stub_CAI / total_CAI);
 	  bioclimate.harvest_chemicals (chemicals, total_CAI - stub_CAI);
 	}
+    }
+  else
+    {
+      stem_harvest = 0.0;
+      leaf_harvest = 0.0;
     }
 
   if (!kill_off && DS < DSmax && stub_length > 0.0)
