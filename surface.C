@@ -14,6 +14,15 @@
 #include "chemicals.h"
 #include "soil_chemicals.h"
 
+#ifdef RIDGING
+struct Ridge
+{
+  const CSMP y;			// Ridge geometry function. [->cm]
+  const double dz_bottom;	// Size from surface to bottom ridge layer [cm]
+  const double R_crust;		// Resistance in crust. [???]
+}
+#endif
+
 struct Surface::Implementation
 {
   // Content.

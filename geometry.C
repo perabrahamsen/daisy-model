@@ -68,7 +68,7 @@ check_alist (const AttributeList& al)
   double last = 0.0;
   for (unsigned int i = 0; i < zplus.size (); i++)
     {
-      if (zplus[i] > last)
+      if (zplus[i] >= last)
 	{
 	  CERR << "Intervals should be monotonically decreasing, but "
 	       << zplus[i] << " > " << last << "\n";

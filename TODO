@@ -16,9 +16,13 @@
 
 * Daisy new user guide.
 
-* Gør det muligt at logge individuelle AM puljer.
+* Log 
 
-* Gør det muligt at logge individuelle kemikalier.
+** Skriv z værdier i første linie ved soil arrays.
+
+** Gør det muligt at logge individuelle AM puljer.
+
+** Gør det muligt at logge individuelle kemikalier.
 
 * CVS
 
