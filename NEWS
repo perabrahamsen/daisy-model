@@ -12,6 +12,45 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.72
+
+** New 'C_per_N' horizon parameter.
+
+The intent of this parameter is to represent the measured C/N ration
+of the soil in the horizon.  Use it like this:
+
+(defhorizon Ap default
+  ;; Insert other parameters here.
+  (C_per_N 16.0))
+
+Note that the effect of setting this parameter is entirely unproven,
+so use it with great caution.
+
+The idea is that the varlues in the old 'SOM_C_per_N' parameter now
+represent the "goal" C/N for the SOM pools, but not necessarily the
+initial value.  The idea is that the farmland always end up with a C/N
+ration of 11, but that newly cultivated land may have a different
+ratio.  We model this by saying that C/N entering the pool will always
+have the ration given in 'SOM_C_per_N', but C/N leaves the pool with
+the current ratio, initially very close to the value specified by
+'C_per_N'.
+
+Note that the initial C/N ration will not be identical to the number
+spcified by the 'C_per_N' parameter, as 'C_per_N' represent the
+average of all initial pools, including the AOM and the SMB pools.
+The SOM pools will get what is left after the AOM and SMB pools have
+been initialized.  This number will usually be very close to 'C_per_N'
+though, as the SOM pools tend to much larger than the other pools.
+
+Setting 'C_per_N' instead of 'SOM_C_per_N' for a soil with a high
+measured C/N ration will give significantly less mineralization, as
+add organic matter will no longer for forced to have the same high C/N
+ratio as the original content.
+
+Currently all SOM pools will have the same initial C/N ratio when you
+specify the 'C_per_N' parameter, but we might chang this so fast pools
+ar closer to the goals specified in 'SOM_C_per_N' than slow pools.
+
 * 2.71
 
 ** New CO2_fast log variable in OrganicMatter.

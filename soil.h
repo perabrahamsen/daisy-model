@@ -57,6 +57,7 @@ public:
   double humus_C (int i) const;
   const std::vector<double>& SOM_fractions (int i) const;
   const std::vector<double>& SOM_C_per_N (int i) const;
+  double C_per_N (int i) const;
   double turnover_factor (int i) const;
 
   // Thermic.

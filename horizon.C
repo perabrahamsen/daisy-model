@@ -59,6 +59,7 @@ struct Horizon::Implementation
 
   // Organic matter.
   /* const */ vector<double> SOM_C_per_N;
+  const double C_per_N;
   /* const */ vector<double> SOM_fractions;
   const double turnover_factor;
 
@@ -364,6 +365,7 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     quarts_in_silt (al.number ("quarts_in_silt")),
     quarts_in_sand (al.number ("quarts_in_sand")),
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
+    C_per_N (al.check ("C_per_N") ? al.number ("C_per_N") : -42.42e42),
     SOM_fractions (al.check ("SOM_fractions") 
 		   ? al.number_sequence ("SOM_fractions")
 		   : empty_sequence),
@@ -415,6 +417,10 @@ Horizon::SOM_fractions () const
 const std::vector<double>& 
 Horizon::SOM_C_per_N () const
 { return impl.SOM_C_per_N; }
+
+double
+Horizon::C_per_N () const
+{ return impl.C_per_N; }
 
 double
 Horizon::turnover_factor () const
@@ -562,12 +568,23 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 By default, this is calculated from the soil constituents.");
   syntax.add ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
 	      Syntax::Const, Syntax::Sequence,
-	      "C/N ratio for each SOM pool in this soil.");
+	      "C/N ratio for each SOM pool in this soil.\n\
+If 'C_per_N' is specified, this is used as a goal only.  If 'C_per_N' is\n\
+unspecified, the SOM pools will be initialized with this value.");
   vector<double> SOM_C_per_N;
   SOM_C_per_N.push_back (11.0);
   SOM_C_per_N.push_back (11.0);
   SOM_C_per_N.push_back (11.0);
   alist.add ("SOM_C_per_N", SOM_C_per_N);
+  syntax.add ("C_per_N", "g C/g N", Check::positive (), Syntax::OptionalConst,
+	      "Total C/N ratio for this horizon.\n\
+This is the combined initial C/N ratio for all organic matter pools in the\n\
+horizon.  The C/N ration of the AOM and SMB pools is assumed to be known,\n\
+given that this number is used to find the common C/N ration for the SOM\n\
+pools.  The C/N ration for the SOM pools will then gradually move towards\n\
+the values specified by 'SOM_C_per_N'.\n\
+By default, the values given by 'SOM_C_per_N' will be used for\n\
+initialization.");
   syntax.add_fraction ("SOM_fractions", 
 		       Syntax::OptionalConst, Syntax::Sequence, "\
 Fraction of humus in each SOM pool, from slowest to fastest.");

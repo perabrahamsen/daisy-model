@@ -2,8 +2,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * OrganicMatter
 
-** Split SOM C/N i to:  Målt og mål.
-
 ** Tilføj beskrivelse til tutorial.
 
 ** Akademisk bekrivelse?
@@ -38,13 +36,22 @@ Og Lz (DensRtTip) er en fri variabel.
 
 or use them everywhere.
 
+* Gør det muligt at udefinere parametre 
+
+(deffoo super default
+  (bar 42))
+
+(deffoo sub super
+  ;; Undo the setting of bar.
+  (bar #default))
+
 * Partit komponent
 
 Skal kunne være afhængig af kvælstof og temperatur.
 
 * Dokumentation for output filer.
 
-* Make it possible to specify texture using differnet systems
+* Make it possible to specify texture using different systems
 
 Different sizes for sand, silt, and clay, plus allow other types.
 

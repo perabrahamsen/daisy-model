@@ -216,7 +216,8 @@ struct OrganicMatter::Implementation
 		  bool print_equations, bool print_rows,
 		  bool debug_to_screen) const;
   void update_pools (const vector<double>& SOM_results,
-		     const vector<double>& SOM_C_per_N,
+		     const double total_C_per_N,
+		     const vector<double>& SOM_C_per_N_goal,
 		     const vector<double>& SMB_results, int lay);
   void initialize (const AttributeList&, const Soil&, const SoilWater&,
 		   double T_avg, Treelog& err);
@@ -1810,11 +1811,14 @@ Setting additional pool to zero");
 void
 OrganicMatter::Implementation::update_pools 
 /**/ (const vector<double>& SOM_results,
-      const vector<double>& SOM_C_per_N,
+      const double total_C_per_N,
+      const vector<double>& SOM_C_per_N_goal,
       const vector<double>& SMB_results, 
       int lay)
 {
   // Update SMB pools.
+  double SMB_C = 0.0;
+  double SMB_N = 0.0;
   for (unsigned int pool = 0; pool < smb.size (); pool++)
     {
       const double value = SMB_results[pool];
@@ -1825,6 +1829,7 @@ OrganicMatter::Implementation::update_pools
 	  daisy_assert (smb[pool]->C.size () == lay);
 	  smb[pool]->C.push_back (value);
 	}
+      SMB_C += smb[pool]->C[lay];
       if (smb[pool]->N.size () == lay)
 	{
 	  daisy_assert (smb[pool]->initial_C_per_N > 0);
@@ -1832,16 +1837,17 @@ OrganicMatter::Implementation::update_pools
 	    / smb[pool]->initial_C_per_N;
 	  smb[pool]->N.push_back (N_content);
 	}
+      SMB_N += smb[pool]->N[lay];
       if (smb[pool]->C_per_N_goal.size () == lay)
 	{
 	  daisy_assert (smb[pool]->initial_C_per_N > 0);
 	  smb[pool]->C_per_N_goal.push_back (smb[pool]->initial_C_per_N);
 	}
     }
-  
+
   // Update SOM pools.
-  daisy_assert (SOM_C_per_N.size () == som.size ());
-  
+  daisy_assert (SOM_C_per_N_goal.size () == som.size ());
+  double SOM_C = 0.0;
   for (unsigned int pool = 0; pool < som.size (); pool++)
     {
       const double value = SOM_results[pool];
@@ -1852,10 +1858,32 @@ OrganicMatter::Implementation::update_pools
 	  daisy_assert (som[pool]->C.size () == lay);
 	  som[pool]->C.push_back (value);
 	}
-      if (som[pool]->N.size () == lay)
-	som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N[pool]);
+      SOM_C += som[pool]->C[lay];
+      if (som[pool]->N.size () == lay && total_C_per_N <= 0)
+	som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N_goal[pool]);
       if (som[pool]->C_per_N_goal.size () == lay)
-	som[pool]->C_per_N_goal.push_back (SOM_C_per_N[pool]);
+	som[pool]->C_per_N_goal.push_back (SOM_C_per_N_goal[pool]);
+    }
+
+  // Update SOM N.
+  if (total_C_per_N > 0)
+    {
+      double AOM_C = 0.0;
+      double AOM_N = 0.0;
+      for (unsigned int i = 0; i < am.size (); i++)
+	{
+	  AOM_C += am[i]->C_at (lay);
+	  AOM_N += am[i]->N_at (lay);
+	}
+      const double total_C = AOM_C + SMB_C + SOM_C;
+      const double total_N = total_C / total_C_per_N;
+      const double SOM_N = total_N - AOM_N - SMB_N;
+      daisy_assert (SOM_N > 0.0);
+      const double SOM_C_per_N = SOM_C / SOM_N;
+
+      for (unsigned int pool = 0; pool < som.size (); pool++)
+	if (som[pool]->N.size () == lay)
+	  som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N);
     }
 }
 
@@ -2011,7 +2039,8 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 		 init.print_equations (lay), init.debug_rows, 
 		 init.debug_to_screen);
 
-      update_pools (SOM_results, soil.SOM_C_per_N (lay), SMB_results, lay);
+      update_pools (SOM_results, soil.C_per_N (lay), 
+		    soil.SOM_C_per_N (lay), SMB_results, lay);
     }
 
   //clay affect or SMB turnover and mantenance.

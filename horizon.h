@@ -57,6 +57,7 @@ public:
   double humus_C () const;
   const std::vector<double>& SOM_fractions () const;
   const std::vector<double>& SOM_C_per_N () const;
+  double C_per_N () const;
   double turnover_factor () const;
 
   // Chemistry.

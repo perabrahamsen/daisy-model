@@ -1,5 +1,15 @@
 2003-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.72 released.
+
+2003-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C, horizon.h (C_per_N): New parameter and member function.
+	* soil.C, soil.h (C_per_N): New member function.
+	* organic_matter.C (update_pools): Take new 'total_C_per_N'
+	argument.
+	(initialize): Update caller.
+
 	* Version 2.71 released.
 
 2003-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>

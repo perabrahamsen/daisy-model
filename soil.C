@@ -189,6 +189,10 @@ const std::vector<double>&
 Soil::SOM_C_per_N (int i) const
 { return horizon_[i]->SOM_C_per_N (); }
 
+double
+Soil::C_per_N (int i) const
+{ return horizon_[i]->C_per_N (); }
+
 double 
 Soil::turnover_factor(int i) const
 { return horizon_[i]->turnover_factor (); }
