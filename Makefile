@@ -329,7 +329,7 @@ SPECIALS = select_value.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = xref.C treelog_dual.C units.C \
+OTHER = assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
@@ -371,7 +371,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = select_flux.C
+REMOVE = message.h
 
 # These are the file extensions we deal with.
 # 

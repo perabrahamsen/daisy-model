@@ -679,7 +679,9 @@ parameter.  Here, we specify that all the macropores have ended at 2
 meters depth, 10\% of the macropores end above 80 cm depth, and none
 end above the surface (doh!).  We use linear interpolation between
 these points, so we can conclude that 5\% of the macropores end above
-40 cm depth.
+40 cm depth.  You do not have to specify \texttt{height\_start} and
+\texttt{height\_end} explicitly, if you don't, the last and first
+value point of \texttt{distribution} will be used.
 
 The macropores can be activated in two different ways.  Macropores
 that, like here, reach the surface, can be activated by ponding.  The

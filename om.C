@@ -29,6 +29,7 @@
 #include "mathlib.h"
 #include "tmpstream.h"
 #include "submodel.h"
+#include "assertion.h"
 #include <numeric>
 
 void
@@ -84,6 +85,9 @@ OM::set_N (vector<double>& N)
 
   // Calculate C/N.
   C_per_N.erase (C_per_N.begin (), C_per_N.end ());
+
+  daisy_assert (true);
+  daisy_assert (false);
 
   for (unsigned i = 0; i < C.size (); i++)
     {

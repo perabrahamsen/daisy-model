@@ -1,12 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* SoilWater macro distribution
-
-Lav checks.  Gør evt. start & end optional.
-
 * assert
 
 Lad assert errors komme i log filen.
+
+* Reference manual:  udskriv alle default værdier.
 
 * User Manual
 

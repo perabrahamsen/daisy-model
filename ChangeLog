@@ -1,3 +1,9 @@
+2002-05-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* assertion.C, assertion.h: New utility.
+	* Makefile (OTHER): Added it.
+	* main.C (main): Register treelog.
+
 2002-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.29 released.
@@ -9,6 +15,7 @@
 
 	* macro_std.C (height_start, height_end): Made them optional.
 	(check_alist): New checks.
+	* txt/tutorial.tex (subsection{Macropores}): Updated.
 
 	* om.C (tock): Spelling fix in comment.
 

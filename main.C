@@ -25,6 +25,7 @@
 #include "library.h"
 #include "treelog_dual.h"
 #include "options.h"
+#include "assertion.h"
 #include <stdexcept>
 #include <typeinfo>
 #include <iostream>
@@ -33,6 +34,7 @@ int
 main (int argc, char* argv[])
 {
   TreelogDual treelog ("daisy.log", cerr);
+  Assertion::Register reg (treelog);
 
   try
     {
