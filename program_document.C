@@ -76,9 +76,10 @@ struct ProgramDocument : public Program
                                  const symbol name, 
                                  std::vector<std::string>& entries);
   void print_sample (const std::string& name,
-		     const Syntax& syntax, const AttributeList& alist);
+		     const Syntax& syntax, const AttributeList& alist,
+		     bool top_level);
   void print_sample (const symbol name, const Library&);
-  void print_sample_name (const std::string& name);
+  void print_sample_name (const std::string& name, bool top_level);
   void print_sample_end ();
   void print_sample_entries (const std::string& name,
                              const Syntax& syntax,
@@ -86,7 +87,8 @@ struct ProgramDocument : public Program
                              const std::vector<std::string>& order,
                              const std::vector<std::string>& own_entries,
                              const std::string& lib_name,
-                             const std::vector<std::string>& base_entries);
+                             const std::vector<std::string>& base_entries,
+			     bool top_level);
   void print_submodel (const std::string& name, int level,
 		       const Syntax& syntax,
 		       const AttributeList& alist);
@@ -238,7 +240,7 @@ ProgramDocument::print_entry_submodel (const std::string& name,
 	: alist.alist (name);
       if (!nested.check ("submodel"))
 	{
-	  print_sample (name, child, nested);
+	  print_sample (name, child, nested, false);
 	  print_submodel (name, level, child, nested);
 	}
     }
@@ -750,13 +752,15 @@ ProgramDocument::inherited_entries (const Library& library, const symbol name,
 void 
 ProgramDocument::print_sample (const std::string& name,
 			       const Syntax& syntax,
-			       const AttributeList& alist)
+			       const AttributeList& alist,
+			       const bool top_level)
 {
   const std::vector<std::string>& order = syntax.order ();
   std::vector<std::string> own;
   syntax.entries (own);
   const std::vector<std::string> base;
-  print_sample_entries (name, syntax, alist, order, own, "dummy", base);
+  print_sample_entries (name, syntax, alist, order, own, "dummy", base, 
+			top_level);
 }
 
 void 
@@ -772,16 +776,17 @@ ProgramDocument::print_sample (const symbol name, const Library& library)
   inherited_entries (library, name, base);
 
   print_sample_entries (name.name (), syntax, alist, order, own, 
-                        library.name ().name (), base);
+                        library.name ().name (), base, true);
 }
 
 void 
-ProgramDocument::print_sample_name (const std::string& name)
+ProgramDocument::print_sample_name (const std::string& name, 
+				    const bool top_level)
 {
   Format::TableCell dummy (*format);
   format->text ("<");
   format->special ("nbsp");
-  if (!submodel)
+  if (top_level)
     {
       print_string (name);
       format->special ("nbsp");
@@ -805,7 +810,8 @@ ProgramDocument::print_sample_entries (const std::string& name,
                                        /**/ own_entries,
                                        const std::string& lib_name,
                                        const std::vector<std::string>& 
-                                       /**/ base_entries)
+                                       /**/ base_entries, 
+				       const bool top_level)
 {
   // Remove uninteresting entries
   std::vector<std::string> own; 
@@ -834,7 +840,7 @@ ProgramDocument::print_sample_entries (const std::string& name,
   if (count == 0)
     {
       Format::TableRow d3 (*format);
-      print_sample_name (name);
+      print_sample_name (name, top_level);
       Format::TableCell d4 (*format);
       print_sample_end ();
     }
@@ -843,7 +849,7 @@ ProgramDocument::print_sample_entries (const std::string& name,
   if (order.size () > 0)
     {
       Format::TableRow d3 (*format);
-      print_sample_name (name);
+      print_sample_name (name, top_level);
       Format::TableCell d4 (*format);
       for (unsigned int i = 0; i < order.size (); i++)
 	{ 
@@ -862,7 +868,7 @@ ProgramDocument::print_sample_entries (const std::string& name,
     {
       Format::TableRow row (*format);
       if (left == count)
-	print_sample_name (name);
+	print_sample_name (name, top_level);
       else
 	Format::TableCell empty (*format);
 	  
@@ -877,7 +883,7 @@ ProgramDocument::print_sample_entries (const std::string& name,
 	Format::TableRow row (*format);
 	
 	if (left == count)
-	  print_sample_name (name);
+	  print_sample_name (name, top_level);
 	else
 	  { Format::TableCell empty (*format); }
 	
@@ -1115,7 +1121,7 @@ ProgramDocument::print_fixed (const std::string& name,
 
   print_users (xref.submodels[name]);
 
-  print_sample (name, syntax, alist);
+  print_sample (name, syntax, alist, true);
   print_submodel (name, 0, syntax, alist);
 }
 

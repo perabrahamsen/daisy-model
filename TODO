@@ -1,5 +1,15 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+At the time of writing, Daisy contains 200 different models of 40
+different processes in the agro-ecological system.  The support
+library contain 275 parameterizations.  We have both the knowledge of
+the Daisy code and model, and experience with writing a one-domain 2D
+hydraulic model.  The Daisy model is also known and used by our
+contacts in research and administration.  On this basis we believe the
+best course of action is to add 2D support to Daisy, rather than
+adding the agro-ecological processes plus a second domain to one of
+the existing 2D hydraulic models.
+
 * CZ data
 
 ** crash?

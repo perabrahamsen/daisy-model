@@ -1,7 +1,7 @@
 // select.C --- Select a state variable.
 // 
-// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2002 KVL.
+// Copyright 1996-2002, 2005 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002, 2005 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -433,6 +433,7 @@ Select::document (Format& format) const
     {
       format.soft_linebreak ();
       format.text (impl.description);
+      format.soft_linebreak ();
     }
   else if (impl.spec)
     {
@@ -444,6 +445,7 @@ Select::document (Format& format) const
       impl.spec->refer (format);
       format.soft_linebreak ();
       format.text (impl.spec->description ());
+      format.soft_linebreak ();
     }
 }
 

@@ -1,3 +1,12 @@
+2005-03-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C (Spec::description, Spec::refer): New member function.
+	(Spec::check_path): Ditto.
+	(Spec::check_alist): Call it.
+	(document): New member function.
+
+	* program_document.C (submodel): Removed member variable.
+
 2005-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* library.C, library.h (has_interesting_description): New member
