@@ -263,7 +263,21 @@ include these, is that we are trying to solve the initialization
 problem in a way that is robust with regard to changes in the model.
 The description is also robust with regard to the number of pools,
 adding a new pool will just add another equation, and another term in
-all the existing equations.  
+all the existing equations.  The general form is:
+\begin{eqnarray}
+  \Delta\mbox{\textsc{smb}}i &=& 
+  \Sigma_{k=1}^{\mbox{\#\textsc{smb}}} a_{i,k}\mbox{\textsc{smb}}k + 
+  \Sigma_{l=1}^{\mbox{\#\textsc{som}}} b_{i,l}\mbox{\textsc{som}}l +
+  c_i\, \Delta\mbox{\textsc{aom}} 
+  \hspace{1cm};i = 1\ldots\mbox{\#\textsc{smb}}\nonumber\\
+  \Delta\mbox{\textsc{som}}j &=& 
+  \Sigma_{k=1}^{\mbox{\#\textsc{smb}}} d_{j,k}\> \mbox{\textsc{smb}}k + 
+  \Sigma_{l=1}^{\mbox{\#\textsc{som}}} e_{j,l}\> \mbox{\textsc{som}}l +
+  f_j\, \Delta\mbox{\textsc{aom}} 
+  \hspace{1cm};j = 1\ldots\mbox{\#\textsc{som}}\nonumber
+\end{eqnarray}
+
+
 
 \begin{verbatim}
 SH: Genereliseret udtryk? 
