@@ -12,6 +12,17 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.71
+
+** New CO2_fast log variable in OrganicMatter.
+
+It is logged in the "Carbon Balance" log model.
+
+It tells the CO2 produced by fast pools, where fast mean it has a
+turnover rate larger than CO2_threshold, a new OrganicMatter
+parameter.  The default value of 1e-4 means the SMB2 pool and all AOM
+pools are considered fast with the default parameterization.
+
 * 2.70
 
 ** New turnover_factor horizon parameter.

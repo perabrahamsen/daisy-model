@@ -2,10 +2,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * OrganicMatter
 
-** Ny horizon->turnover_factor singleton parameter
-
-Påvirker alle puljer.
-
 ** Split SOM C/N i to:  Målt og mål.
 
 ** Tilføj beskrivelse til tutorial.
@@ -13,10 +9,6 @@ Påvirker alle puljer.
 ** Akademisk bekrivelse?
 
 Til referencemanual?
-
-** Lav en "fast CO2" pulje.
-
-Den skal indeholde CO2 fra puljer med end turnover_rate > XXX.
 
 * dk-horizon.dai med Sørens tal for Jb jorde.
 

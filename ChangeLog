@@ -1,3 +1,16 @@
+2003-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.71 released.
+
+2003-04-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Carbon Balance"): Added fast CO2.
+
+2003-04-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (CO2_fast): New log variable.
+	(CO2_threshold): New parameter.
+
 2003-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.70 released.

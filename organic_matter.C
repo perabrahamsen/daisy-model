@@ -61,7 +61,9 @@ struct OrganicMatter::Implementation
   const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double K_NH4;		// Immobilization rate of NH4.
   const double K_NO3;		// Immobilization rate of NO3.
-  vector<double> CO2;		// CO2 produced per time step.
+  vector<double> CO2_slow;	// CO2 produced per time step from slow pools.
+  vector<double> CO2_fast;	// Ditto from fast pools.
+  const double CO2_threshold; // Turnover rate over which CO2 is fast.
   double top_CO2;		// CO2 produced on top of soil.
   vector <AM*> am;		// Added Organic Matter.
   const vector<SMB*> smb;	// Living Organic Matter.
@@ -684,7 +686,15 @@ void
 OrganicMatter::Implementation::output (Log& log,
 				       const Geometry& geometry) const
 {
-  log.output ("CO2", CO2);
+  if (log.check_member ("CO2"))
+    {
+      vector<double> CO2 (CO2_slow);
+      daisy_assert (CO2.size () == CO2_fast.size ());
+      for (unsigned int i =0; i < CO2.size(); i++)
+	CO2[i] += CO2_fast[i];
+      log.output ("CO2", CO2);
+    }
+  log.output ("CO2_fast", CO2_fast);
   log.output ("top_CO2", top_CO2);
   if (log.check_member ("total_N") || log.check_member ("total_C"))
     {
@@ -943,7 +953,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   sort (added.begin (), added.end (), aom_compare);
   
   // Clear logs.
-  fill (CO2.begin (), CO2.end (), 0.0);
+  fill (CO2_slow.begin (), CO2_slow.end (), 0.0);
+  fill (CO2_fast.begin (), CO2_fast.end (), 0.0);
   fill (NO3_source.begin (), NO3_source.end (), 0.0);
   fill (NH4_source.begin (), NH4_source.end (), 0.0);
   top_CO2 = 0.0;
@@ -991,11 +1002,14 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   // Main processing.
   for (unsigned int j = 0; j < dom.size (); j++)
-      dom[j]->turnover (size,
-			find_abiotic (*dom[j], size, soil_heat, 
-				      temp_factor, tillage_factor),
-			&N_soil[0], &N_used[0], &CO2[0], smb);
-
+    {
+      const double *const abiotic 
+	= find_abiotic (*dom[j], size, soil_heat, temp_factor, tillage_factor);
+      double *const CO2 = dom[j]->turnover_rate > CO2_threshold 
+	? &CO2_fast[0] 
+	: &CO2_slow[0];
+      dom[j]->turnover (size, abiotic, &N_soil[0], &N_used[0], CO2, smb);
+    }
   for (unsigned int j = 0; j < smb.size (); j++)
     {
       const bool use_clay = clayom.smb_use_clay (j);
@@ -1005,28 +1019,38 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 	= find_abiotic (*smb[j], size, soil_water, soil_heat,
 			smb_tillage_factor, j,
 			default_factor, use_clay, tillage_factor);
-      smb[j]->maintain (size, abiotic, &N_used[0], &CO2[0]);
-      smb[j]->tick (size, abiotic, &N_soil[0], &N_used[0], &CO2[0],
-		    smb, som, dom);
+      double *const CO2 = smb[j]->turnover_rate > CO2_threshold 
+	? &CO2_fast[0] 
+	: &CO2_slow[0];
+      smb[j]->maintain (size, abiotic, &N_used[0], CO2);
+      smb[j]->tick (size, abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom);
     }
   for (unsigned int j = 0; j < som.size (); j++)
     {
       const bool use_clay = clayom.som_use_clay (j);
       const vector<double>& default_factor = 
 	use_clay ? clay_factor : soil_factor;
-      som[j]->tick (size, find_abiotic (*som[j], size, soil_water, soil_heat,
-					som_tillage_factor, j,
-					default_factor, use_clay, 
-					tillage_factor),
-		    &N_soil[0], &N_used[0], &CO2[0], smb, som, dom);
+      const double *const abiotic 
+	= find_abiotic (*som[j], size, soil_water, soil_heat,
+			som_tillage_factor, j,
+			default_factor, use_clay, tillage_factor);
+      double *const CO2 = som[j]->turnover_rate > CO2_threshold 
+	? &CO2_fast[0] 
+	: &CO2_slow[0];
+      som[j]->tick (size, abiotic, &N_soil[0], &N_used[0], CO2, smb, som, dom);
     }
 
   for (unsigned int j = 0; j < added.size (); j++)
-    added[j]->tick (size, find_abiotic (*added[j],
-					size, soil_water, soil_heat,
-					soil_factor, tillage_factor),
-		    &N_soil[0], &N_used[0], &CO2[0],
-		    smb, &buffer.C[0], &buffer.N[0], dom);
+    {
+      const double *const abiotic 
+	= find_abiotic (*added[j], size, soil_water, soil_heat,
+			soil_factor, tillage_factor);
+      double *const CO2 = added[j]->turnover_rate > CO2_threshold 
+	? &CO2_fast[0] 
+	: &CO2_slow[0];
+      added[j]->tick (size, abiotic, &N_soil[0], &N_used[0], &CO2[0],
+		      smb, &buffer.C[0], &buffer.N[0], dom);
+    }
 
   // Update buffer.
   for (unsigned int i = 0; i < size; i++)
@@ -1091,16 +1115,17 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     C_to_DOM += dom[j]->C_source (soil) * dt;
   const double new_C = total_C (soil) + C_to_DOM;
   const double delta_C = old_C - new_C;
-  const double C_source = soil.total (CO2) + top_CO2;
+  const double C_source 
+    = soil.total (CO2_slow) + soil.total (CO2_fast) + top_CO2;
   
   if (!approximate (delta_C, C_source)
       && !approximate (old_C, new_C, 1e-10))
     {
       TmpStream tmp;
       tmp () << "BUG: OrganicMatter: "
-	"delta_C != soil_CO2 + top_CO2 [g C/cm^2]\n"
-	     << delta_C << " != " 
-	     << soil.total (CO2) << " + " << top_CO2;
+	"delta_C != soil_CO2_slow + soil_CO2_fast + top_CO2 [g C/cm^2]\n"
+	     << delta_C << " != " << soil.total (CO2_slow) << " + " 
+	     << soil.total (CO2_fast) << " + " << top_CO2;
       msg.error (tmp.str ());
     }
 
@@ -1860,7 +1885,8 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
     }
 
   // Production.
-  CO2.insert (CO2.end (), soil.size (), 0.0);
+  CO2_slow.insert (CO2_slow.end (), soil.size (), 0.0);
+  CO2_fast.insert (CO2_fast.end (), soil.size (), 0.0);
   NO3_source.insert (NO3_source.end (), soil.size (), 0.0);
   NH4_source.insert (NH4_source.end (), soil.size (), 0.0);
   
@@ -2012,6 +2038,7 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     active_groundwater (al.flag ("active_groundwater")),
     K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
+    CO2_threshold (al.number ("CO2_threshold")),
     top_CO2 (0.0),
     am (map_create <AM> (al.alist_sequence ("am"))),
     smb (map_construct<SMB> (al.alist_sequence ("smb"))),
@@ -2076,8 +2103,9 @@ OrganicMatter::swap (const Soil& soil,
 double
 OrganicMatter::CO2 (unsigned int i) const
 {
-  daisy_assert (impl.CO2.size () > i);
-  return impl.CO2[i];
+  daisy_assert (impl.CO2_slow.size () > i);
+  daisy_assert (impl.CO2_fast.size () > i);
+  return impl.CO2_slow[i] + impl.CO2_fast[i];
 }
 
 double 
@@ -2430,7 +2458,12 @@ Mineralization this time step (negative numbers mean immobilization).");
   syntax.add ("total_N", "g N/cm^3", Syntax::LogOnly, Syntax::Sequence,
 	      "Total organic N in the soil layer.");
   syntax.add ("CO2", "g CO_2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
-	      "CO2 evolution in soil.");
+	      "CO2 evolution in soil from all pools.");
+  syntax.add ("CO2_fast", "g CO_2-C/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "CO2 evolution in soil from pools faster than 'CO2_threshold'.");
+  syntax.add ("CO2_threshold", "h^-1", Check::fraction (), Syntax::Const, "\
+Turnover rate above which pools will contribute to 'CO2_fast'.");
+  alist.add ("CO2_threshold", 1e-4); // SMB2 and default AOM pools.
   syntax.add ("top_CO2", "g CO_2-C/cm^2/h", Syntax::LogOnly,
 	      "CO2 evolution at surface.");
   syntax.add ("am", Librarian<AM>::library (), Syntax::Sequence, 
