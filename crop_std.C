@@ -154,13 +154,10 @@ struct CropStandard::Parameters
     LeafPhotPar (const AttributeList&);
   } LeafPhot;
   const struct CanopyPar {
-    double InitGrowth;		// Initial growth parameter.
-    double DSinit;		// DS at end of initial LAI-Development
     double DSLAI05;		// DS at LAI=0.5; forced development
-    double WLfInit;		// WLeaf at end of initial LAI-Development
     double SpLAI;		// Specific leaf weight [ (m²/m²) / (g/m²) ]
     double SpLAIfac;            // Factor defining max Specific leaf weight
-    const CSMP& HvsDS;	// Crop height as function of DS
+    const CSMP& HvsDS;		// Crop height as function of DS
     const vector<double>& LAIDist0; // Relative LAI distribution at DS=0
     const vector<double>& LAIDist1; // Relative LAI distribution at DS=1
     double PARref;		// PAR reflectance
@@ -414,10 +411,7 @@ CropStandard::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
 { }
 
 CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
-  : InitGrowth (vl.number ("InitGrowth")),
-    DSinit (vl.number ("DSinit")),
-    DSLAI05 (vl.number ("DSLAI05")),
-    WLfInit (vl.number ("WLfInit")),
+  : DSLAI05 (vl.number ("DSLAI05")),
     SpLAI (vl.number ("SpLAI")),
     SpLAIfac (vl.number ("SpLAIfac")),
     HvsDS (vl.csmp ("HvsDS")),
@@ -792,12 +786,8 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& Canopy = *new Syntax ();
   AttributeList& vCanopy = *new AttributeList ();
 
-  Canopy.add ("InitGrowth", Syntax::Number, Syntax::Const);
-  Canopy.add ("DSinit", Syntax::Number, Syntax::Const);
   Canopy.add ("DSLAI05", Syntax::Number, Syntax::Const);
   vCanopy.add ("DSLAI05", 0.15);
-  Canopy.add ("WLfInit", Syntax::Number, Syntax::Const);
-  vCanopy.add ("WLfInit", 30.0);
   Canopy.add ("SpLAI", Syntax::Number, Syntax::Const);
   Canopy.add ("SpLAIfac", Syntax::Number, Syntax::Const);
   vCanopy.add ("SpLAIfac", 2.0);
@@ -823,8 +813,11 @@ CropStandardSyntax::CropStandardSyntax ()
   AttributeList& vRoot = *new AttributeList ();
 
   Root.add ("DptEmr", Syntax::Number, Syntax::Const);
+  vRoot.add ("DptEmr", 10);
   Root.add ("PenPar1", Syntax::Number, Syntax::Const);
+  vRoot.add ("PenPar1", 0.25);
   Root.add ("PenPar2", Syntax::Number, Syntax::Const);
+  vRoot.add ("PenPar2", 4.0);
   Root.add ("MaxPen", Syntax::Number, Syntax::Const);
   Root.add ("SpRtLength", "m/g", Syntax::Const,
 	    "Specific root length");
@@ -832,6 +825,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Root.add ("DensRtTip", Syntax::Number, Syntax::Const);
   vRoot.add ("DensRtTip", 0.1);
   Root.add ("Rad", Syntax::Number, Syntax::Const);
+  vRoot.add ("Rad", 0.005);
   Root.add ("h_wp", Syntax::Number, Syntax::Const);
   vRoot.add ("h_wp",-15000.0);
   Root.add ("MxNH4Up", Syntax::Number, Syntax::Const);
@@ -1580,7 +1574,7 @@ CropStandard::PotentialWaterUptake (const double h_x,
       const double h = h_x - (1 + Rxylem) * soil.z (i);
       assert (soil_water.Theta_left (i) >= 0.0);
       assert (soil.Theta (i, h_wp) >= soil.Theta_res (i));
-      const double max_uptake 
+      const double max_uptake
 	= (soil_water.Theta_left (i) - soil.Theta (i, h_wp)) / dt;
       const double uptake
 	= max (min (2 * M_PI * L[i]
@@ -1694,7 +1688,7 @@ CropStandard::RootDensity (const Soil& soil)
   Variables::RecRootSys& RootSys = var.RootSys;
 
   double LengthPrArea
-    = max (100 * Root.SpRtLength * WRoot, 3 * PotRtDpt); /*cm/cm2*/
+    = max (0.01 * Root.SpRtLength * WRoot, 0.05 * PotRtDpt); /*cm/cm2*/
   double a = RootDensDistPar (LengthPrArea / (PotRtDpt * Root.DensRtTip));
   double L0 = Root.DensRtTip * exp (a);
   a /= PotRtDpt;
@@ -1721,7 +1715,6 @@ CropStandard::NitContent ()
   const Parameters::CrpNPar& CrpN = par.CrpN;
   const double DS = var.Phenology.DS;
   Variables::RecProd& Prod = var.Prod;
-  double x;
 
   var.CrpAux.PtNCnt = CrpN.PtLeafCnc (DS) * Prod.WLeaf
     + CrpN.PtStemCnc (DS) * Prod.WStem
@@ -1740,7 +1733,7 @@ CropStandard::NitContent ()
 
   if (Prod.NCrop >= var.CrpAux.CrNCnt)
     {
-      x = (Prod.NCrop - var.CrpAux.CrNCnt)
+      const double x = (Prod.NCrop - var.CrpAux.CrNCnt)
         / (var.CrpAux.PtNCnt - var.CrpAux.CrNCnt);
       Prod.NLeaf = ((CrpN.PtLeafCnc (DS) - CrpN.CrLeafCnc (DS)) * x
         + CrpN.CrLeafCnc (DS)) * Prod.WLeaf;
@@ -1752,7 +1745,7 @@ CropStandard::NitContent ()
     }
   else
     {
-      x = (Prod.NCrop - var.CrpAux.CrNCnt)
+      const double x = (Prod.NCrop - var.CrpAux.CrNCnt)
         / (var.CrpAux.NfNCnt - var.CrpAux.CrNCnt);
       Prod.NLeaf = ((CrpN.NfLeafCnc (DS) - CrpN.CrLeafCnc (DS)) * x
         + CrpN.CrLeafCnc (DS)) * Prod.WLeaf;
@@ -1776,11 +1769,11 @@ CropStandard::NitrogenUptake (int Hour,
   double& NCrop = var.Prod.NCrop;
   Variables::RecRootSys& RootSys = var.RootSys;
 
-  double PotNUpt = (CrpAux.PtNCnt - NCrop) / ((Hour == 0) ? 1 : (25 - Hour));
+  double PotNUpt = (CrpAux.PtNCnt - NCrop) / ((Hour == 0) ? 1.0 : (25.0 - Hour));
   if (PotNUpt > 0)
     {
       CrpAux.NH4Upt
-	= SoluteUptake (soil, soil_water, soil_NH4, PotNUpt, 
+	= SoluteUptake (soil, soil_water, soil_NH4, PotNUpt,
 			RootSys.NH4Extraction, Root.MxNH4Up, Root.Rad);
       assert (CrpAux.NH4Upt >= 0.0);
 
@@ -1793,7 +1786,7 @@ CropStandard::NitrogenUptake (int Hour,
     {
       CrpAux.NO3Upt
 	= SoluteUptake (soil, soil_water, soil_NO3, PotNUpt,
-			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad); 
+			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad);
       assert (CrpAux.NO3Upt >= 0.0);
       NCrop += CrpAux.NO3Upt;
       PotNUpt -= CrpAux.NO3Upt;
@@ -1905,7 +1898,7 @@ CropStandard::ReMobilization ()
     }
 }
 
-void 
+void
 CropStandard::AssimilatePartitioning (double DS, 
 			      double& f_Leaf, double& f_Stem,
 			      double& f_Root, double& f_SOrg)
@@ -2133,7 +2126,7 @@ CropStandard::tick (const Time& time,
     return;
 
   const double water_stress = var.RootSys.water_stress;
-  NitrogenUptake (time.hour (), 
+  NitrogenUptake (time.hour (),
 		  soil, soil_water, soil_NH4,soil_NO3);
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
