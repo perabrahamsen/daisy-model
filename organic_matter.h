@@ -8,6 +8,11 @@ class Syntax;
 class Log;
 class Filter;
 class AOM;
+class Soil;
+class SoilWater;
+class SoilHeat;
+class SoilNO3;
+class SoilNH4;
 
 class OrganicMatter
 {
@@ -18,10 +23,12 @@ private:
   
   // Simulation.
 public:
-  void add (AOM&);
+  void tick (const Soil&, const SoilWater&, const SoilHeat&, 
+	     SoilNO3&, SoilNH4&);
   void output (Log& log, const Filter& filter) const;
   static bool check (const AttributeList&);
   bool check () const;
+  void add (AOM&);
 
   // Create & Destroy.
 public:

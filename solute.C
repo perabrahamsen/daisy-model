@@ -27,12 +27,12 @@ Solute::add_to_source (const vector<double>& v)
 void 
 Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 {
-  for (unsigned int i = 0; i < C.size(); i++)
+  for (unsigned int i = 0; i < C_.size(); i++)
     {
-      if (C[i] == 0.0)
+      if (C_[i] == 0.0)
 	assert (M[i] == 0.0);
       else
-	assert (abs (M[i] / (C[i] * soil_water.Theta_old (i)) - 1.0) < 0.001);
+	assert (abs (M[i] / (C_[i] * soil_water.Theta_old (i)) - 1.0) < 0.001);
     }
   // Note: q, D, and alpha depth indexes are all [j-1/2].
   
@@ -108,7 +108,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       for (int j = 0; j < size; j++)
 	{
 	  // dA/dC in the present soil water solute.
-	  const double beta = this->beta (soil, soil_water, j, C[j]);
+	  const double beta = this->beta (soil, soil_water, j, C_[j]);
       
 	  const double dz_minus	// Size of layer above current node.
 	    = (j < 1) ? - 2.0 * soil.z (j) : soil.z (j-1) - soil.z (j);
@@ -131,8 +131,8 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 	    = soil_water.Theta_old (j) + Theta_ratio * old_t;
       
 	  // Concentration above and below current node.
-	  const double C_minus = (j < 1) ? C[j] : C[j-1];
-	  const double C_plus = (j == size - 1) ? C[j] : C[j+1];
+	  const double C_minus = (j < 1) ? C_[j] : C_[j-1];
+	  const double C_plus = (j == size - 1) ? C_[j] : C_[j+1];
       
 	  a[j] = - D_minus / (2.0 * dz_minus * dz) 
 	    + (alpha_minus * q_minus) / (2.0 * dz);
@@ -143,13 +143,13 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 		  - (alpha_plus * q_plus) / (2.0 * dz));
 	  c[j] = - D_plus / (2.0 * dz_plus * dz)
 	    - ((1.0 - alpha_plus) * q_plus) / (2.0 * dz);
-	  d[j] = ((Theta_old + beta) * C[j] / (t - old_t)
+	  d[j] = ((Theta_old + beta) * C_[j] / (t - old_t)
 		  + S[j]
-		  + ((D_minus * (C_minus - C[j])) / (2.0 * dz_minus * dz))
-		  - ((D_plus * (C[j] - C_plus)) / (2.0 * dz_plus * dz))
-		  - (q_minus * (alpha_minus * C_minus + (1.0 - alpha_minus) * C[j])
+		  + ((D_minus * (C_minus - C_[j])) / (2.0 * dz_minus * dz))
+		  - ((D_plus * (C_[j] - C_plus)) / (2.0 * dz_plus * dz))
+		  - (q_minus * (alpha_minus * C_minus + (1.0 - alpha_minus) * C_[j])
 		     / (2.0 * dz))
-		  + (q_plus * (alpha_plus * C[j] + (1.0 - alpha_plus) * C_plus)
+		  + (q_plus * (alpha_plus * C_[j] + (1.0 - alpha_plus) * C_plus)
 		     / (2.0 * dz)));
 	}
       // Adjust for upper boundary condition.
@@ -159,7 +159,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 	= (D[0] / dz_minus + soil_water.q (0) * alpha[0]) * 0.5
 	/ (D[0] / dz_minus + soil_water.q (0) * (1 - alpha[0]));
       const double d_in 
-	= (- J_in + (D[0] / dz_minus + soil_water.q (0) * alpha[0]) * 0.5 * C[0])
+	= (- J_in + (D[0] / dz_minus + soil_water.q (0) * alpha[0]) * 0.5 * C_[0])
 	/ (D[0] / dz_minus + soil_water.q (0) * (1 - alpha[0]));
       d[0] -= a[0] * d_in;
       b[0] += a[0] * b_in;
@@ -169,7 +169,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       const double Dz = - D[0] / (2 * dz_x);
       const double q0 = soil_water.q (0);
       
-      const double d_x = J_in - (1 - alpha[0]) * C[0] * q0 / 2.0 + Dz * C[0];
+      const double d_x = J_in - (1 - alpha[0]) * C_[0] * q0 / 2.0 + Dz * C_[0];
       const double a_x = alpha[0] * q0 + 2 * Dz;
       const double b_x = (1 - alpha[0]) * q0 / 2.0 - Dz;
       d[0] -= a[0] * d_x / a_x;
@@ -178,7 +178,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 #else
       {
 	const int j = 0;
-	const double beta = this->beta (soil, soil_water, j, C[j]);
+	const double beta = this->beta (soil, soil_water, j, C_[j]);
 	const double dz_plus	// Size of layer below current node.
 	  = soil.z (j) - soil.z (j+1);
 	const double dz = soil.dz (j); // Size of current node.
@@ -192,17 +192,17 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 	const double Theta_old // Old water content.
 	  = soil_water.Theta_old (j) + Theta_ratio * old_t;
 
-	const double C_plus = (j == size - 1) ? C[j] : C[j+1];
+	const double C_plus = (j == size - 1) ? C_[j] : C_[j+1];
 
 	a[0] = 42.42e42;
 	b[0] = ((Theta_new + beta) / (t - old_t)
 		+ D_plus / (2.0 * dz_plus * dz)
 		- (alpha_plus * q_plus) / (2.0 * dz));
-	d[0] = ((Theta_old + beta) * C[j] / (t - old_t)
+	d[0] = ((Theta_old + beta) * C_[j] / (t - old_t)
 		+ S[j]
 		- J_in / dz
-		- ((D_plus * (C[j] - C_plus)) / (2.0 * dz_plus * dz))
-		+ (q_plus * (alpha_plus * C[j] + (1.0 - alpha_plus) * C_plus) 
+		- ((D_plus * (C_[j] - C_plus)) / (2.0 * dz_plus * dz))
+		+ (q_plus * (alpha_plus * C_[j] + (1.0 - alpha_plus) * C_plus) 
 		   / (2.0 * dz)));
       }
 #endif
@@ -211,18 +211,18 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       c[size - 1] = -42.42e42;
 
 #ifdef CALCULATE_FLUX_FLOW
-      const vector<double> C_old = C;
+      const vector<double> C_old = C_;
 #endif
 
       // Calculate new concentration.
-      tridia (0, size, a, b, c, d, C.begin ());
+      tridia (0, size, a, b, c, d, C_.begin ());
 
 #ifdef CALCULATE_FLUX_FLOW
       Jf[0] += J_in * (t - old_t);
       for (int i = 0; i < size - 1; i++)
 	{
-	  const double C_minus = (C[i] + C_old[i]) / 2.0;
-	  const double C_plus = (C[i+1] + C_old[i+1]) / 2.0;
+	  const double C_minus = (C_[i] + C_old[i]) / 2.0;
+	  const double C_plus = (C_[i+1] + C_old[i+1]) / 2.0;
 	  const double dz_plus = soil.z (i) - soil.z (i+1);
 	  const double q_plus = soil_water.q (i + 1);
 	  const double alpha_plus = alpha[i+1];
@@ -241,7 +241,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
     {
       const double M_old = M[i];
       assert (S[i] == 0.0);
-      M[i] = C_to_M (soil, soil_water, i, C[i]);
+      M[i] = C_to_M (soil, soil_water, i, C_[i]);
       J[i + 1] = (((M[i] - M_old) / dt) - S[i]) * soil.dz (i) + J[i];
     }
 #ifdef CALCULATE_FLUX_FLOW
@@ -277,10 +277,10 @@ Solute::check (unsigned n) const
 {
   bool ok = true;
 
-  if (C.size () != n)
+  if (C_.size () != n)
     {
       cerr << "You have " << n 
-	   << " intervals but " << C.size () << " C values\n";
+	   << " intervals but " << C_.size () << " C values\n";
       ok = false;
     }
   if (M.size () != n)
@@ -295,7 +295,7 @@ Solute::check (unsigned n) const
 void
 Solute::output (Log& log, const Filter& filter) const
 {
-  log.output ("C", filter, C);
+  log.output ("C", filter, C_);
   log.output ("M", filter, M);
   log.output ("S", filter, S, true);
   log.output ("J", filter, J, true);
@@ -321,8 +321,8 @@ Solute::mix (const Soil& soil, const SoilWater& soil_water,
 	     double amount, double from, double to)
 { 
   soil.mix (M, amount, from, to);
-  for (unsigned int i = 0; i < C.size (); i++)
-    C[i] = M_to_C (soil, soil_water, i, M[i]);
+  for (unsigned int i = 0; i < C_.size (); i++)
+    C_[i] = M_to_C (soil, soil_water, i, M[i]);
 }
 
 void
@@ -333,8 +333,8 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
   
   if (al.check ("C"))
     {
-      C = al.number_sequence ("C");
-      size = C.size ();
+      C_ = al.number_sequence ("C");
+      size = C_.size ();
     }
   if (al.check ("M"))
     {
@@ -345,18 +345,18 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
 
   if (!al.check ("C"))
     for (int i = 0; i < size; i++)
-      C.push_back (M_to_C (soil, soil_water, i, M[i]));
+      C_.push_back (M_to_C (soil, soil_water, i, M[i]));
 
   if (!al.check ("M"))
     for (int i = 0; i < size; i++)
-      M.push_back (C_to_M (soil, soil_water, i, C[i]));
+      M.push_back (C_to_M (soil, soil_water, i, C_[i]));
 
   for (int i = 0; i < size; i++)
     {
-      if (C[i] == 0.0)
+      if (C_[i] == 0.0)
 	assert (M[i] == 0.0);
       else
-	assert (abs (M[i] / (C[i] * soil_water.Theta (i)) - 1.0) < 0.001);
+	assert (abs (M[i] / (C_[i] * soil_water.Theta (i)) - 1.0) < 0.001);
     }
   S.insert (S.begin (), size, 0.0);
   J.insert (J.begin (), size + 1, 0.0);

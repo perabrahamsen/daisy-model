@@ -103,9 +103,7 @@ ColumnStandard::fertilize (const InorganicMatter& im,
   if (to < from )
     {
       soil_NO3.mix (soil, soil_water, im.im.NO3, from, to);
-#if 0
       soil_NH4.mix (soil, soil_water, im.im.NH4, from, to);
-#endif
     }
   else
     surface.fertilize (im);
@@ -142,6 +140,8 @@ ColumnStandard::check () const
     ok = false;
   if (!soil_NO3.check (n))
     ok = false;
+  if (!soil_NH4.check (n))
+    ok = false;
   if (!organic_matter.check ())
     ok = false;
 
@@ -169,6 +169,7 @@ ColumnStandard::tick (const Time& time,
 {
   soil_water.clear ();
   soil_NO3.clear ();
+  soil_NH4.clear ();
   surface.clear ();
   bioclimate.tick (surface, weather, crops, soil, soil_water);
   soil_heat.tick (surface, bioclimate);
@@ -176,6 +177,7 @@ ColumnStandard::tick (const Time& time,
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     (*crop)->tick (time, bioclimate, soil, soil_heat);
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().im.NO3);
+  soil_NH4.tick (soil, soil_water, surface.matter_flux ().im.NH4);
 }
 
 void
@@ -190,8 +192,8 @@ ColumnStandard::output (Log& log, const Filter& filter) const
   output_submodule (soil_water, "SoilWater", log, filter);
 #if 0
   output_submodule (soil_heat, "SoilHeat", log, filter);
-  output_submodule (soil_NH4, "SoilNH4", log, filter);
 #endif
+  output_submodule (soil_NH4, "SoilNH4", log, filter);
   output_submodule (soil_NO3, "SoilNO3", log, filter);
   output_submodule (organic_matter, "OrganicMatter", log, filter);
 #if 0

@@ -30,6 +30,10 @@ struct OM  {
   // Simulation.
   void output (Log&, const Filter&) const;
   void mix (const Soil&, double from, double to);
+  void tick (int i, double turnover_factor, double N_soil, double& N_used,
+	     double& CO2, const vector<OM*>& smb, const vector<OM*>&som);
+  void tick (int i, double turnover_factor, double N_soil, double& N_used,
+	     double& CO2, const vector<OM*>& smb, double& som_C,double& som_N);
 
   // Create & Destroy.
   static const Syntax& syntax ();

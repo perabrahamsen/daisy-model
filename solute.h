@@ -19,7 +19,7 @@ class Solute
 protected:
   // State variables.
   vector<double> M;		// Concentration in soil [g / cm^3]
-  vector<double> C;		// Concentration in soil solution [g / cm^3]
+  vector<double> C_;		// Concentration in soil solution [g / cm^3]
 
   // Flux variables.
   vector<double> S;		// Sink-source term [kg / m^3 / s]
@@ -36,6 +36,10 @@ protected:
 			 int i, double C) const = 0;
   virtual double M_to_C (const Soil&, const SoilWater&,
 			 int i, double M) const = 0;
+
+public:
+  double C (int i)
+  { return C_[i]; }
 
   // Sink.
 public:

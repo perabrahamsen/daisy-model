@@ -13,6 +13,7 @@ class IM
   // Content.
 public:
   double NO3;
+  double NH4;
 
   // Operations.
 public:

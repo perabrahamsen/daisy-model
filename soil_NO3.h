@@ -14,6 +14,9 @@ public:
   double C_to_M (const Soil&, const SoilWater&, int i, double C) const;
   double M_to_C (const Soil&, const SoilWater&, int i, double M) const;
 
+  // Communication.
+  
+  
 public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilNO3 (const Soil&, const SoilWater&, const AttributeList&);

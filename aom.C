@@ -65,6 +65,15 @@ OM::mix (const Soil& soil, double from, double to)
   top_C = 0.0;
 }
 
+void
+OM::tick (int i, double turnover_factor, double N_soil, double& N_used,
+	  double& CO2, const vector<OM*>& smb, const vector<OM*>&som)
+{ }
+void 
+OM::tick (int i, double turnover_factor, double N_soil, double& N_used,
+	  double& CO2, const vector<OM*>& smb, double& som_C,double& som_N)
+{ }
+
 bool 
 AOM::check (const AttributeList& al)
 { 
