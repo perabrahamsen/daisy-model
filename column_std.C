@@ -22,9 +22,9 @@ private:
   // Actions.
 public:
   void sow (const AttributeList&);
-  void irrigate_top (double flux, double temp, const IM&);
+  void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
-  void irrigate_top (double flux, const IM&);
+  void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
   void fertilize (const AttributeList&);
   void fertilize (const AttributeList&, double from, double to);
@@ -69,9 +69,9 @@ ColumnStandard::sow (const AttributeList& al)
 { vegetation.sow (al, soil, organic_matter); }
 
 void 
-ColumnStandard::irrigate_top (double flux, double temp, const IM& sm)
+ColumnStandard::irrigate_overhead (double flux, double temp, const IM& sm)
 {
-  ColumnBase::irrigate_top (flux, temp, sm);
+  ColumnBase::irrigate_overhead (flux, temp, sm);
   assert (flux >= 0.0);
   assert (sm.NH4 >= 0.0);
   assert (sm.NO3 >= 0.0);
@@ -89,9 +89,9 @@ ColumnStandard::irrigate_surface (double flux, double temp, const IM& sm)
 }
 
 void 
-ColumnStandard::irrigate_top (double flux, const IM& sm)
+ColumnStandard::irrigate_overhead (double flux, const IM& sm)
 {
-  ColumnBase::irrigate_top (flux, sm);
+  ColumnBase::irrigate_overhead (flux, sm);
   assert (flux >= 0.0);
   assert (sm.NH4 >= 0.0);
   assert (sm.NO3 >= 0.0);

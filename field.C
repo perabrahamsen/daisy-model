@@ -19,9 +19,9 @@ struct Field::Implementation
   // Actions.
   void sow (const AttributeList& crop);
   void ridge (const AttributeList& ridge);
-  void irrigate_top (double flux, double temp, const IM&);
+  void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
-  void irrigate_top (double flux, const IM&);
+  void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
   void fertilize (const AttributeList&, double from, double to);  // Organic.
   void fertilize (const AttributeList&);
@@ -121,14 +121,14 @@ Field::Implementation::ridge (const AttributeList& ridge)
 }
 
 void 
-Field::Implementation::irrigate_top (double flux, double temp, const IM& im)
+Field::Implementation::irrigate_overhead (double flux, double temp, const IM& im)
 {
   if (selected)
-    selected->irrigate_top (flux, temp, im);
+    selected->irrigate_overhead (flux, temp, im);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->irrigate_top (flux, temp, im);
+    (*i)->irrigate_overhead (flux, temp, im);
 }
 
 void 
@@ -143,14 +143,14 @@ Field::Implementation::irrigate_surface (double flux, double temp, const IM& im)
 }
 
 void 
-Field::Implementation::irrigate_top (double flux, const IM& im)
+Field::Implementation::irrigate_overhead (double flux, const IM& im)
 {
   if (selected)
-    selected->irrigate_top (flux, im);
+    selected->irrigate_overhead (flux, im);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->irrigate_top (flux, im);
+    (*i)->irrigate_overhead (flux, im);
 }
 
 void 
@@ -499,16 +499,16 @@ Field::ridge (const AttributeList& al)
 { impl.ridge (al); }
 
 void 
-Field::irrigate_top (double flux, double temp, const IM& im)
-{ impl.irrigate_top (flux, temp, im); }
+Field::irrigate_overhead (double flux, double temp, const IM& im)
+{ impl.irrigate_overhead (flux, temp, im); }
 
 void 
 Field::irrigate_surface (double flux, double temp, const IM& im)
 { impl.irrigate_surface (flux, temp, im); }
 
 void 
-Field::irrigate_top (double flux, const IM& im)
-{ impl.irrigate_top (flux, im); }
+Field::irrigate_overhead (double flux, const IM& im)
+{ impl.irrigate_overhead (flux, im); }
 
 void 
 Field::irrigate_surface (double flux, const IM& im)

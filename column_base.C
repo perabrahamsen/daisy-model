@@ -7,10 +7,10 @@ ColumnBase::ridge (const AttributeList& al)
 { surface.ridge (soil, soil_water, al); }
 
 void 
-ColumnBase::irrigate_top (double flux, double temp, const IM&)
+ColumnBase::irrigate_overhead (double flux, double temp, const IM&)
 {
   assert (flux >= 0.0);
-  bioclimate.irrigate_top (flux, temp);
+  bioclimate.irrigate_overhead (flux, temp);
 }
 
 void 
@@ -21,10 +21,10 @@ ColumnBase::irrigate_surface (double flux, double temp, const IM&)
 }
 
 void 
-ColumnBase::irrigate_top (double flux, const IM&)
+ColumnBase::irrigate_overhead (double flux, const IM&)
 {
   assert (flux >= 0.0);
-  bioclimate.irrigate_top (flux);
+  bioclimate.irrigate_overhead (flux);
 }
 
 void 

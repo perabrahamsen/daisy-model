@@ -24,9 +24,9 @@ public:
 public:
   virtual void sow (const AttributeList& crop) = 0;
   virtual void ridge (const AttributeList& ridge) = 0;
-  virtual void irrigate_top (double flux, double temp, const IM&) = 0;
+  virtual void irrigate_overhead (double flux, double temp, const IM&) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&) = 0;
-  virtual void irrigate_top (double flux, const IM&) = 0;
+  virtual void irrigate_overhead (double flux, const IM&) = 0;
   virtual void irrigate_surface (double flux, const IM&) = 0;
   virtual void fertilize (const AttributeList&, double from, double to) = 0;
   virtual void fertilize (const AttributeList&) = 0;

@@ -699,7 +699,7 @@ ActionCrop::Irrigation::doIt (Daisy& daisy) const
     return false;
 
   COUT << " [Irrigating " << amount << " mm]\n";
-  daisy.field.irrigate_top (amount, IM ());
+  daisy.field.irrigate_overhead (amount, IM ());
   return true;
 }
 

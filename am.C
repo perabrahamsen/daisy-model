@@ -816,6 +816,13 @@ static bool check_organic (const AttributeList& al)
 
   const string syntax = al.name ("syntax");
   assert (syntax == "organic");
+
+  static bool warned = false;
+  if (al.check ("NH4_evaporation") && !warned)
+    {
+      CERR << "OBSOLETE: Use `volatilization' instead of `NH4_evaporation'.\n";
+      warned = true;
+    }
   
   bool ok = true;
   ::check (al, "dry_matter_fraction", ok);

@@ -12,6 +12,17 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.42
+
+** `irrigate_top' action changed to `irrigate_overhead'.
+
+The old command is still available for compatibility reasons, but
+marked obsolete and will be removed in at future version.
+
+Also, the `irrigation_top' log variables in the `default' bioclimate
+model hgave been renamed to `irrigation_overhead'.  The `log.dai' file
+has been updated accordingly.
+
 * 1.41
 
 ** New `NEWS' file.
@@ -23,7 +34,7 @@ Read this to keep track of Daisy.
 Those log files that contains a header now end with `.dlf' instead of
 `.tab'.  This affects the build-in `harvest' log model, as well as all
 the `table' parametrizations found in `log.dai'.  The `PMSW'
-paramterization uses the old `table1' log model, doesn't have a
+parameterization uses the old `table1' log model, doesn't have a
 header, and still output to `pmsw.tab'.
 
 ** SoilNO3 and SoilNH4 now have default values.
@@ -96,10 +107,6 @@ The symptom was a rare assertion failure.
 
 Bug found by: SH.
 
-* 1.39
-
-No user visible changes.
-
 * 1.38
 
 ** New `inorganic' column model.
@@ -112,7 +119,7 @@ soil or surface.  The crops will always have potential N uptake.
 
 * 1.37
 
-** New `vegetation.dai' file, for permanent vegetation paramterizations.
+** New `vegetation.dai' file, for permanent vegetation parameterizations.
 
 ** Fix `PMSW' log, broken by changes in 1.36.
 
@@ -143,10 +150,6 @@ The `PMSW' svat model give feedback
 to the rest of the system, by calculating a `production_stress' which
 will be used instead of `water_stress'.
 
-* 1.34
-
-No changes.
-
 * 1.33
 
 ** SVAT model integration changes.
@@ -168,10 +171,6 @@ Bug found by: HS.
 Now they are.
 
 Bug found by: HS.
-
-* 1.31
-
-No user visible changes.
 
 * 1.30
 
@@ -211,13 +210,9 @@ default -- create a header containing information about the data.
 Intended for crops where we have no knowledge of reactions to water or
 nitrogen stress.
 
-* 1.25
-
-No significant changes.
-
 * 1.24
 
-** New Bentazon, IPU, and MCPP paramterization in `chemistry.dai'.
+** New Bentazon, IPU, and MCPP parameterization in `chemistry.dai'.
 
 ** The `crop' action now supports spraying.
 
@@ -234,10 +229,6 @@ No significant changes.
 * 1.21
 
 ** Renamed CSMP to PLF.
-
-* 1.20 
-
-No significant changes.
 
 * 1.19
 
@@ -266,38 +257,60 @@ This one has variable porosity.
 This one is intended for simulating changed to the soil surface
 ruggedness. 
 
-* 1.16
-
-No significant changes.
-
-* 1.15
-
-No significant changes.
-
 * 1.14 
 
 ** New `AOM' log model.
 
 To keep track of a specific pool of added organic matter.
 
-* 1.13
-
-No significant changes.
-
-* 1.12
-
-No significant changes.
-
-* 1.11
-
-No significant changes.
-
 * 1.10 
 
 ** Use `volatilization' instead of `NH4_evaporation' in AM.
 
-* 1.09
+* 1.08
 
-No significant changes.
+** Made heat and moisture influence user setable.
 
+Affects mineralization, nitrification, and denitrification.
+
+* 1.07 
+
+** Made soil chemicals mix with surface chemicals.
+
+* 1.06
+
+** Added bioincorporation of organic matter from surface to soil.
+
+* 1.05 
+
+** New `crop' action.
+
+This action specifies a strategy for managing a specific crop or
+multicrop.  To create a crop rotation, you can combine these `crop'
+action sequenctially using the `activity' action.
+
+* 1.04
+
+** New `lysimeter' groundwater model.
+
+* 1.00
+
+** New `max', `min' and `average' selections for the `table' log model.
+
+** New `assert', `message', `warning', and `error' actions.
+
+* 0.99
+
+** Added surface runoff.
+
+Controlable with the new `DetentionCapacity' and `ReservoirConstant'
+surface parameters. 
+
+** Added mixing of inorganic nitrogen between surface and soil.
+
+* 0.96
+
+** New `fodderbeet' crop parameterization.
+
+** New `default' weather model.
 

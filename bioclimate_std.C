@@ -32,9 +32,9 @@ struct BioclimateStandard : public Bioclimate
   double total_ep;		// Potential evapotranspiration [mm/h]
   double total_ea;		// Actual evapotranspiration [mm/h]
 
-  double irrigation_top;	// Irrigation above canopy [mm/h]
-  double irrigation_top_old;	// Old value for logging.
-  double irrigation_top_temperature; // Water temperature [dg C]
+  double irrigation_overhead;	// Irrigation above canopy [mm/h]
+  double irrigation_overhead_old;	// Old value for logging.
+  double irrigation_overhead_temperature; // Water temperature [dg C]
   double irrigation_surface;	// Irrigation below canopy [mm/h]
   double irrigation_surface_old; // Old value for logging.
   double irrigation_surface_temperature; // Water temperature [dg C]
@@ -127,9 +127,9 @@ struct BioclimateStandard : public Bioclimate
     { return daily_global_radiation_; }
 
   // Manager.
-  void irrigate_top (double flux, double temp);
+  void irrigate_overhead (double flux, double temp);
   void irrigate_surface (double flux, double temp);
-  void irrigate_top (double flux);
+  void irrigate_overhead (double flux);
   void irrigate_surface (double flux);
   void spray (const string& chemical, double amount) // [g/m^2]
     { spray_.add (chemical, amount); }
@@ -163,9 +163,9 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     pet (Librarian<Pet>::create (al.alist ("pet"))),
     total_ep (0.0),
     total_ea (0.0),
-    irrigation_top (0.0),
-    irrigation_top_old (0.0),
-    irrigation_top_temperature (0.0),
+    irrigation_overhead (0.0),
+    irrigation_overhead_old (0.0),
+    irrigation_overhead_temperature (0.0),
     irrigation_surface (0.0),
     irrigation_surface_old (0.0),
     irrigation_surface_temperature (0.0),
@@ -325,11 +325,11 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   snow_ep = total_ep - total_ea;
   assert (snow_ep >= 0.0);
-  snow_water_in = rain + irrigation_top;
+  snow_water_in = rain + irrigation_overhead;
   assert (snow_water_in >= 0.0);
-  if (irrigation_top > 0.01)
+  if (irrigation_overhead > 0.01)
     snow_water_in_temperature 
-      = (irrigation_top * irrigation_top_temperature
+      = (irrigation_overhead * irrigation_overhead_temperature
 	 + rain * air_temperature) / snow_water_in;
   else
     snow_water_in_temperature = air_temperature;
@@ -450,8 +450,8 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   vegetation.force_production_stress (production_stress);
 
   // 7 Reset irrigation
-  irrigation_top_old = irrigation_top;
-  irrigation_top = 0.0;
+  irrigation_overhead_old = irrigation_overhead;
+  irrigation_overhead = 0.0;
   irrigation_surface_old = irrigation_surface;
   irrigation_surface = 0.0;
 
@@ -538,9 +538,9 @@ BioclimateStandard::output (Log& log) const
   output_derived (pet, "pet", log);
   log.output ("total_ep", total_ep);
   log.output ("total_ea", total_ea);
-  log.output ("irrigation_top", irrigation_top_old);
-  log.output ("irrigation_top_temperature", 
-	      irrigation_top_temperature);
+  log.output ("irrigation_overhead", irrigation_overhead_old);
+  log.output ("irrigation_overhead_temperature", 
+	      irrigation_overhead_temperature);
   log.output ("irrigation_surface", irrigation_surface_old);
   log.output ("irrigation_surface_temperature",
 	      irrigation_surface_temperature);
@@ -587,12 +587,12 @@ BioclimateStandard::output (Log& log) const
 }
 
 void
-BioclimateStandard::irrigate_top (double flux, double temp)
+BioclimateStandard::irrigate_overhead (double flux, double temp)
 {
-  double new_top = irrigation_top + flux;
-  irrigation_top_temperature 
-    = (temp * flux + irrigation_top * irrigation_top_temperature) / new_top;
-  irrigation_top = new_top;
+  double new_top = irrigation_overhead + flux;
+  irrigation_overhead_temperature 
+    = (temp * flux + irrigation_overhead * irrigation_overhead_temperature) / new_top;
+  irrigation_overhead = new_top;
 }
 
 void
@@ -606,8 +606,8 @@ BioclimateStandard::irrigate_surface (double flux, double temp)
 }
 
 void
-BioclimateStandard::irrigate_top (double flux)
-{ irrigate_top (flux, daily_air_temperature ()); }
+BioclimateStandard::irrigate_overhead (double flux)
+{ irrigate_overhead (flux, daily_air_temperature ()); }
 
 void
 BioclimateStandard::irrigate_surface (double flux)
@@ -642,9 +642,9 @@ Number of vertical intervals in which we partition the canopy.");
 		  "Potential evapotranspiration.");
       syntax.add ("total_ea", "mm/h", Syntax::LogOnly,
 		  "Actual evapotranspiration.");
-      syntax.add ("irrigation_top", "mm/h", Syntax::LogOnly,
+      syntax.add ("irrigation_overhead", "mm/h", Syntax::LogOnly,
 		  "Irrigation above canopy.");
-      syntax.add ("irrigation_top_temperature", "dg C", Syntax::LogOnly,
+      syntax.add ("irrigation_overhead_temperature", "dg C", Syntax::LogOnly,
 		  "Water temperature.");
       syntax.add ("irrigation_surface", "mm/h", Syntax::LogOnly,
 		  "Irrigation below canopy.");

@@ -18,6 +18,11 @@
 SHELL = /bin/sh
 MAKEFLAGS =
 
+# Some non-local files and directories.
+
+FTPDIR = /home/ftp/pub/daisy
+WWWINDEX = /home/user_32/daisy/.public_html/index.html
+
 # HOSTTYPE is not defined in the native win32 Emacs.
 #
 ifeq ($(OS),Windows_NT)
@@ -442,7 +447,7 @@ depend: $(SOURCES)
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	c++ -I. $(TKINCLUDE) $(GTKMMINCLUDE) \
+	c++ -I. $(TKINCLUDE) $(GTKMMINCLUDE)  $(QTINCLUDE) \
 	        -MM $(SOURCES) | sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
@@ -454,14 +459,17 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
-	cp cdaisy.h cmain.c ChangeLog NEWS /home/ftp/pub/daisy
+	mv -f $(WWWINDEX) $(WWWINDEX).old
+	sed -e 's/version [1-9]\.[0-9][0-9]/version $(TAG)/' \
+		< $(WWWINDEX).old > $(WWWINDEX)
+	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
 	$(MAKE) daisy-src.zip
-	mv -f daisy-src.zip /home/ftp/pub/daisy
+	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib; $(MAKE) dist)
 	$(MAKE) pdf
-	mv -f txt/reference/reference.pdf /home/ftp/pub/daisy/daisy-ref.pdf
+	mv -f txt/reference/reference.pdf $(FTPDIR)/daisy-ref.pdf
 	$(MAKE) ps
-	mv -f txt/reference/reference.ps /home/ftp/pub/daisy/daisy-ref.ps
+	mv -f txt/reference/reference.ps $(FTPDIR)/daisy-ref.ps
 
 
 # Update the CVS repository.
@@ -611,9 +619,12 @@ soil_water${OBJ}: soil_water.C soil_water.h macro.h librarian.h library.h \
  hydraulic.h tortuosity.h geometry.h surface.h groundwater.h mathlib.h \
  submodel.h
 soil_NH4${OBJ}: soil_NH4.C soil_NH4.h solute.h adsorption.h librarian.h \
- library.h common.h alist.h syntax.h transport.h mactrans.h submodel.h
+ library.h common.h alist.h syntax.h transport.h mactrans.h soil.h \
+ horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h macro.h \
+ submodel.h
 soil_NO3${OBJ}: soil_NO3.C soil_NO3.h solute.h adsorption.h librarian.h \
- library.h common.h alist.h syntax.h transport.h mactrans.h submodel.h
+ library.h common.h alist.h syntax.h transport.h mactrans.h soil.h \
+ horizon.h hydraulic.h tortuosity.h geometry.h submodel.h
 organic_matter${OBJ}: organic_matter.C organic_matter.h common.h syntax.h \
  alist.h log.h librarian.h library.h am.h om.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h soil_water.h macro.h soil_NH4.h \
@@ -679,10 +690,8 @@ log_clone${OBJ}: log_clone.C log_clone.h log_alist.h log.h librarian.h \
 column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  library.h common.h alist.h syntax.h bioclimate.h surface.h uzmodel.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
- macro.h soil_heat.h soil_NH4.h solute.h adsorption.h transport.h \
- mactrans.h soil_NO3.h soil_chemicals.h organic_matter.h \
- nitrification.h denitrification.h plf.h groundwater.h log.h im.h am.h \
- weather.h vegetation.h
+ macro.h soil_heat.h soil_chemicals.h groundwater.h log.h weather.h \
+ im.h vegetation.h
 lexer_data${OBJ}: lexer_data.C lexer_data.h lexer.h common.h
 lexer${OBJ}: lexer.C lexer.h common.h
 daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
@@ -705,21 +714,21 @@ common${OBJ}: common.C common.h parser_file.h parser.h librarian.h \
  library.h alist.h syntax.h document.h version.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
+action_repeat${OBJ}: action_repeat.C action.h librarian.h library.h \
+ common.h alist.h syntax.h log.h
 column_inorganic${OBJ}: column_inorganic.C column_base.h column.h \
  librarian.h library.h common.h alist.h syntax.h bioclimate.h \
  surface.h uzmodel.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h soil_water.h macro.h soil_heat.h soil_NH4.h solute.h \
- adsorption.h transport.h mactrans.h soil_NO3.h soil_chemicals.h \
- organic_matter.h nitrification.h denitrification.h plf.h \
- groundwater.h log.h im.h am.h weather.h vegetation.h
+ geometry.h soil_water.h macro.h soil_heat.h soil_chemicals.h \
+ groundwater.h log.h weather.h im.h vegetation.h am.h
 vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h \
  librarian.h library.h common.h alist.h syntax.h plf.h mathlib.h log.h \
  root_system.h canopy_simple.h soil.h horizon.h hydraulic.h \
  tortuosity.h geometry.h crop.h am.h om.h organic_matter.h
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h librarian.h \
- library.h common.h alist.h syntax.h crop.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h plf.h mathlib.h harvest.h \
- chemicals.h log.h
+ library.h common.h alist.h syntax.h crop.h organic_matter.h soil.h \
+ horizon.h hydraulic.h tortuosity.h geometry.h plf.h mathlib.h \
+ harvest.h chemicals.h log.h
 crop_simple${OBJ}: crop_simple.C crop.h time.h librarian.h library.h \
  common.h alist.h syntax.h root_system.h canopy_simple.h plf.h log.h \
  bioclimate.h soil_water.h macro.h soil.h horizon.h hydraulic.h \
@@ -801,10 +810,10 @@ document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h library.h \
 column_std${OBJ}: column_std.C column_base.h column.h librarian.h \
  library.h common.h alist.h syntax.h bioclimate.h surface.h uzmodel.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
- macro.h soil_heat.h soil_NH4.h solute.h adsorption.h transport.h \
- mactrans.h soil_NO3.h soil_chemicals.h organic_matter.h \
- nitrification.h denitrification.h plf.h groundwater.h log.h im.h am.h \
- weather.h vegetation.h
+ macro.h soil_heat.h soil_chemicals.h groundwater.h log.h weather.h \
+ im.h vegetation.h soil_NH4.h solute.h adsorption.h transport.h \
+ mactrans.h soil_NO3.h organic_matter.h nitrification.h \
+ denitrification.h plf.h am.h
 weather_simple${OBJ}: weather_simple.C weather_old.h weather.h librarian.h \
  library.h common.h alist.h syntax.h im.h log.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h common.h \
@@ -972,5 +981,6 @@ set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h time.h syntax.h common.h alist.h library.h
 tkmain${OBJ}: tkmain.C daisy.h time.h syntax.h common.h alist.h library.h
 gmain${OBJ}: gmain.C daisy.h time.h syntax.h common.h alist.h library.h
+qmain${OBJ}: qmain.C daisy.h time.h syntax.h common.h alist.h library.h
 cmain${OBJ}: cmain.c cdaisy.h
 bugmain${OBJ}: bugmain.c cdaisy.h

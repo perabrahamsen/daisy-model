@@ -1,4 +1,26 @@
-2000-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+2000-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.42 released.
+
+2000-09-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (check_organic): Warn of obsolete parameter
+	`NH4_evaporation' is used. 
+
+	* action_irrigate.C (check_alist): Check for negative numbers.
+
+	* groundwater_static.C (check_alist): New function, warn that this
+	model is obsolete.
+
+	* All: Renamed `top irrigation' to `overhead irrigation'.
+	* action_irrigate.C: Created an obsolete `irrigate_top' action.
+
+	* Makefile (FTPDIR): New macro.
+	(dist): Use it.
+	(WWWINDEX): New macro.
+	(dist): Use it.
+
+'2000-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.41 released.
 

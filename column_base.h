@@ -36,9 +36,9 @@ protected:
   // Actions.
 public:
   void ridge (const AttributeList& al);
-  void irrigate_top (double flux, double temp, const IM&);
+  void irrigate_overhead (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
-  void irrigate_top (double flux, const IM&);
+  void irrigate_overhead (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
   void harvest (const Time& time, const string& crop_name,
 		double stub_length,

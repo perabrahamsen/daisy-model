@@ -3,8 +3,11 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
-#include "am.h"
 #include "im.h"
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<IM>;
+#endif
 
 struct ActionIrrigate : public Action
 {
@@ -25,6 +28,28 @@ struct ActionIrrigate : public Action
     irrigate (daisy.field, flux, t, sm);
   }
 
+  static bool check_alist (const AttributeList& alist)
+  {
+    bool ok = true;
+    non_negative (alist.number ("flux"), "flux", ok);
+    if (alist.check ("temperature"))
+      non_negative (alist.number ("temperature"), "temperature", ok);
+    return ok;
+  }
+
+  static void load_syntax (Syntax& syntax, AttributeList& alist)
+  {
+    syntax.add_check (&check_alist);
+    syntax.add ("flux", "mm/h", Syntax::Const, 
+		"Amount of irrigation applied.");
+    syntax.order ("flux");
+    syntax.add ("temperature", "dg C", Syntax::OptionalConst,
+		"Temperature of irrigation (default: air temperature).");
+    add_submodule<IM> ("solute", syntax, alist, Syntax::Const,
+		       "\
+Nitrogen content of irrigation water [g/mm] (default: none).");
+  }
+
   ActionIrrigate (const AttributeList& al)
     : Action (al),
       flux (al.number ("flux")),
@@ -33,70 +58,91 @@ struct ActionIrrigate : public Action
 	    : at_air_temperature),
       sm (*new IM (al.alist ("solute")))
   { }
-public:
   ~ActionIrrigate ()
   { }
 };
 
-struct ActionIrrigateTop : public ActionIrrigate
+struct ActionIrrigateOverhead : public ActionIrrigate
 {
   void irrigate (Field& f, double flux, double temp, const IM& im) const
-    { 
-      if (temp == at_air_temperature)
-	f.irrigate_top (flux, im); 
-      else
-	f.irrigate_top (flux, temp, im); 
-    }
-  ActionIrrigateTop (const AttributeList& al)
+  { 
+    if (temp == at_air_temperature)
+      f.irrigate_overhead (flux, im); 
+    else
+      f.irrigate_overhead (flux, temp, im); 
+  }
+  ActionIrrigateOverhead (const AttributeList& al)
     : ActionIrrigate (al)
-    { }
+  { }
 };
 
 struct ActionIrrigateSurface : public ActionIrrigate
 {
   void irrigate (Field& f, double flux, double temp, const IM& im) const
-    {
-      if (temp == at_air_temperature)
-	f.irrigate_surface (flux, im);
-      else
-	f.irrigate_surface (flux, temp, im); 
-    }
+  {
+    if (temp == at_air_temperature)
+      f.irrigate_surface (flux, im);
+    else
+      f.irrigate_surface (flux, temp, im); 
+  }
   ActionIrrigateSurface (const AttributeList& al)
     : ActionIrrigate (al)
-    { }
+  { }
 };
-
 
 const double ActionIrrigate::at_air_temperature = -500;
 
-#ifdef BORLAND_TEMPLATES
-template class add_submodule<IM>;
-#endif
-
-static struct ActionIrrigateSyntax
+static struct ActionIrrigateOverheadSyntax
 {
-  static Action& make_top (const AttributeList& al)
-    { return *new ActionIrrigateTop (al); }
-  static Action& make_surface (const AttributeList& al)
-    { return *new ActionIrrigateSurface (al); }
-  ActionIrrigateSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
-Irrigate the field.  Irrigation can either be applied from the top, in\n\
-which case it will typically hit the canopy, or directly on the surface,\n\
-bypassing the canopy.");
-      syntax.add ("flux", "mm/h", Syntax::Const, 
-		  "Amount of irrigation applied");
-      syntax.order ("flux");
-      syntax.add ("temperature", "dg C", Syntax::OptionalConst,
-		  "Temperature of irrigation (default: air temperature)");
-      add_submodule<IM> ("solute", syntax, alist, Syntax::Const,
-			 "\
-Nitrogen content of irrigation water [g/mm] (default: none).");
-      Librarian<Action>::add_type ("irrigate_top", alist, syntax, &make_top);
-      Librarian<Action>::add_type ("irrigate_surface", alist, syntax,
-				   &make_surface);
-    }
-} ActionIrrigate_syntax;
+  static Action& make (const AttributeList& al)
+  { return *new ActionIrrigateOverhead (al); }
+  ActionIrrigateOverheadSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    ActionIrrigate::load_syntax (syntax, alist);
+    alist.add ("description", "\
+Irrigate the field from above.");
+    Librarian<Action>::add_type ("irrigate_overhead", alist, syntax, &make);
+  }
+} ActionIrrigateOverhead_syntax;
+
+static struct ActionIrrigateSurfaceSyntax
+{
+  static Action& make (const AttributeList& al)
+  { return *new ActionIrrigateSurface (al); }
+  ActionIrrigateSurfaceSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    ActionIrrigate::load_syntax (syntax, alist);
+    alist.add ("description", "\
+Irrigate the field directly on the soil surface, bypassing the canopy.");
+    Librarian<Action>::add_type ("irrigate_surface", alist, syntax, &make);
+  }
+} ActionIrrigateSurface_syntax;
+
+static struct ActionIrrigateTopSyntax
+{
+  static Action& make (const AttributeList& al)
+  { return *new ActionIrrigateOverhead (al); }
+  static bool check_alist (const AttributeList&)
+  {
+    static bool warned = false;
+    if (warned)
+      return true;
+    warned = true;
+    CERR << "OBSOLETE: Use `irrigate_overhead' instead of `irrigate_top'.\n";
+    return true;
+  }
+  ActionIrrigateTopSyntax ()
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    ActionIrrigate::load_syntax (syntax, alist);
+    syntax.add_check (&check_alist);
+    alist.add ("description", "\
+OBSOLETE.  Use `irrigate_overhead' instead.");
+    Librarian<Action>::add_type ("irrigate_top", alist, syntax, &make);
+  }
+} ActionIrrigateTop_syntax;
