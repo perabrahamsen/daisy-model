@@ -427,7 +427,13 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 	   canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
 
   crop_ep = pt.potential_transpiration ();
-  assert (crop_ep < total_ep - total_ea + 1e-8);
+  if (crop_ep > total_ep - total_ea)
+    {
+      if (crop_ep > total_ep - total_ea + 1e-8)
+	CERR << "BUG: crop_ep (" << crop_ep << ") > total_ep (" << total_ep 
+	     << ") - total_ea (" << total_ea << ")\n";
+      crop_ep = max (0.0, total_ep - total_ea);
+    }
   assert (crop_ep >= 0.0);
 
   // Actual transpiration
