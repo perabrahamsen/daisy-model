@@ -11,6 +11,7 @@ class WeatherSimple : public Weather
   const double T1;
   const double T2;
   const double precipitation;
+  const int interval;
     // Simulation.
 public:
   void tick ();
@@ -77,7 +78,10 @@ WeatherSimple::ReferenceEvapotranspiration () const // [mm/h]
 double
 WeatherSimple::Precipitation () const
 {
-  return precipitation;
+  if (((time.yday () * 24 + time.hour ()) % interval) == 0)
+    return precipitation;
+  else 
+    return 0.0;
 }
 
 double
@@ -101,7 +105,8 @@ WeatherSimple::WeatherSimple (const Time& t, const AttributeList& al)
   : Weather (t, al.number ("Latitude")),
     T1 (al.number ("T1")),
     T2 (al.number ("T2")),
-    precipitation (al.number ("precipitation"))
+    precipitation (al.number ("precipitation")),
+    interval (al.integer ("interval"))
 { }
 
 WeatherSimple::~WeatherSimple ()
@@ -131,5 +136,7 @@ WeatherSimpleSyntax::WeatherSimpleSyntax ()
   alist.add ("T2", 2.0);
   syntax.add ("precipitation", Syntax::Number, Syntax::Const);
   alist.add ("precipitation", 0.0);
+  syntax.add ("interval", Syntax::Integer, Syntax::Const);
+  alist.add ("interval", 1);
   Weather::add_type ("simple", alist, syntax, &WeatherSimple::make);
 }

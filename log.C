@@ -185,7 +185,9 @@ Log::print (double v)
 {
   ostrstream scratch;
   scratch << v << '\0';
-  print (scratch.str ());
+  const char* s = scratch.str ();
+  print (s);
+  delete s;
 }
 
 void
@@ -193,7 +195,9 @@ Log::print (int v)
 {
   ostrstream scratch;
   scratch << v << '\0';
-  print (scratch.str ());
+  const char* s = scratch.str ();
+  print (s);
+  delete s;
 }
 
 void
@@ -201,7 +205,9 @@ Log::print (bool v)
 {
   ostrstream scratch;
   scratch << v << '\0';
-  print (scratch.str ());
+  const char* s = scratch.str ();
+  print (s);
+  delete s;
 }
 
 void

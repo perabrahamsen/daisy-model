@@ -13,7 +13,7 @@ class Surface : public UZtop
   const double lake;
   double pond;
   bool flux;
-  double Es;
+  double EvapSoilSurface;
   double Eps;
 public:
 

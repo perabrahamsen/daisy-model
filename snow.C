@@ -9,7 +9,7 @@
 struct Snow::Implementation
 { 
   // Flux variables.
-  double Esnow;			// Evaporation from snowpack [mm]
+  double EvapSnowPack;			// Evaporation from snowpack [mm]
   double q_s;			// Leaking water [mm]
   
   // State variables.
@@ -41,7 +41,7 @@ struct Snow::Implementation
 };
 
 Snow::Implementation::Implementation (const AttributeList& al)
-  : Esnow (0.0),
+  : EvapSnowPack (0.0),
     q_s (0.0),
     Ssnow (al.number ("Ssnow")),
     Swater (al.number ("Swater")),
@@ -90,13 +90,13 @@ Snow::Implementation::tick (const double Si, const double q_h,
   // We evaporate as much of the water as we can.  If we can evaporate
   // more than that, evaporate all the snow too.
   if (Epot <= Swater / dt + P)
-    Esnow = Epot;
+    EvapSnowPack = Epot;
   else 
-    Esnow = Ssnow / dt + P;
+    EvapSnowPack = Ssnow / dt + P;
 
-  assert (Esnow >= 0.0);
-  assert (Esnow <= Epot);
-  assert (Esnow <= Ssnow / dt + P);
+  assert (EvapSnowPack >= 0.0);
+  assert (EvapSnowPack <= Epot);
+  assert (EvapSnowPack <= Ssnow / dt + P);
 
   // Depth of snow fallen this hour. [m]
   double dZp = 0.0;
@@ -129,23 +129,23 @@ Snow::Implementation::tick (const double Si, const double q_h,
 
   // Evaporation from snow pack. [mm/h]
   double Eprime;
-  if (Esnow <= Ssnow / dt + Prain + M)
-    Eprime = Esnow;
+  if (EvapSnowPack <= Ssnow / dt + Prain + M)
+    Eprime = EvapSnowPack;
   else
     Eprime = Swater / dt + Prain + M;
   assert (Eprime >= 0.0);
-  assert (Eprime <= Esnow);
+  assert (Eprime <= EvapSnowPack);
   
   // Water storage capacity of snow [mm]
   const double Scapacity = f_c * Ssnow;
   assert (Scapacity >= 0.0);
 
   // We can now calculate how much water is leaking.
-  q_s = max (0.0, Swater + (Prain - Esnow + M) * dt - Scapacity) / dt;
+  q_s = max (0.0, Swater + (Prain - EvapSnowPack + M) * dt - Scapacity) / dt;
   assert (q_s >= 0.0);
   
   // New snow pack storage [mm].
-  const double Ssnow_new = Ssnow + (Psnow + Prain - Esnow - q_s) * dt;
+  const double Ssnow_new = Ssnow + (Psnow + Prain - EvapSnowPack - q_s) * dt;
   assert (Ssnow_new >= 0.0);
 
   // New water content in snow pack [mm].
@@ -196,13 +196,20 @@ void
 Snow::tick (double Si, double q_h, double Prain,
 	    double Psnow, double Tair, double Epot)
 {
-  impl.tick (Si, q_h, Prain, Psnow, Tair, Epot);
+  if (impl.Ssnow > 0.0 || Psnow > 0.0)
+    impl.tick (Si, q_h, Prain, Psnow, Tair, Epot);
+  else
+    {
+      impl.EvapSnowPack = 0.0;
+      impl.q_s = Prain;
+      impl.T = Tair;
+    }
 }
 
 void 
 Snow::output (Log& log, const Filter* filter) const
 {
-  log.output ("Esnow", filter, impl.Esnow, true);
+  log.output ("EvapSnowPack", filter, impl.EvapSnowPack, true);
   log.output ("q_s", filter, impl.q_s, true);
   log.output ("Ssnow", filter, impl.Ssnow);
   log.output ("Swater", filter, impl.Swater);
@@ -229,7 +236,7 @@ Snow::temperature ()
 double 
 Snow::evaporation ()
 {
-  return impl.Esnow;
+  return impl.EvapSnowPack;
 }
 
 void
@@ -237,7 +244,7 @@ Snow::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   static const double hours_per_day = 24.0; // [h/d]
   
-  syntax.add ("Esnow", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("EvapSnowPack", Syntax::Number, Syntax::LogOnly);
   syntax.add ("q_s", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Ssnow", Syntax::Number, Syntax::InOut);
   alist.add ("Ssnow", 0.0);

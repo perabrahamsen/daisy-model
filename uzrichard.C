@@ -477,7 +477,7 @@ UZRichard::tick (const Soil& soil,
       if (!richard (soil, first, top, last, bottom, 
 		    S, h_old, Theta_old, h, Theta, q))
 	THROW (Runtime ("Richard's Equation doesn't converge."));
-      if (h[first] < 0)
+      if (h[first] > 0)
 	THROW (Numeric ("Couldn't drain top flux"));
       assert (top.q () == q[first]);
       const bool ok = top.accept_top (q[first]);

@@ -246,6 +246,7 @@ struct CropStandard::Variables
     double h_x;			// Root extraction at surface.
     double water_stress;	// Fraction of requested water we got.
     double Ept;			// Potential evapotranspiration.
+    double transpiration;	// Total water uptake.
   private:
     friend struct CropStandard::Variables;
     RecRootSys (const Parameters&, const AttributeList&, int layers);
@@ -526,7 +527,8 @@ CropStandard::Variables::RecRootSys::RecRootSys (const Parameters& par,
     NO3Extraction (vl.array ("NO3Extraction")),
     h_x (vl.number ("h_x")),
     water_stress (1.0),
-    Ept (0.0)
+    Ept (0.0),
+    transpiration (0.0)
 { 
   if (layers > 0)
     {
@@ -552,6 +554,7 @@ CropStandard::Variables::RecRootSys::output (Log& log, const Filter* filter) con
   log.output ("NO3Extraction", filter, NO3Extraction);
   log.output ("h_x", filter, h_x);
   log.output ("water_stress", filter, water_stress, true);
+  log.output ("transpiration", filter, transpiration, true);
   log.output ("Ept", filter, Ept, true);
   log.close();
 }
@@ -809,6 +812,7 @@ CropStandardSyntax::CropStandardSyntax ()
   RootSys.add ("h_x", Syntax::Number, Syntax::InOut);
   vRootSys.add ("h_x", 0.0);
   RootSys.add ("water_stress", Syntax::Number, Syntax::LogOnly);
+  RootSys.add ("transpiration", Syntax::Number, Syntax::LogOnly);
   RootSys.add ("Ept", Syntax::Number, Syntax::LogOnly);
 
   // Prod
@@ -1106,7 +1110,8 @@ CropStandard::CanopyStructure ()
 }
 
 double
-CropStandard::ActualWaterUptake (const double Ept, const Soil& soil, SoilWater& soil_water,
+CropStandard::ActualWaterUptake (const double Ept,
+				 const Soil& soil, SoilWater& soil_water,
 				 const double EvapInterception)
 {
   assert (Ept >= 0);
@@ -1120,7 +1125,8 @@ CropStandard::ActualWaterUptake (const double Ept, const Soil& soil, SoilWater& 
 
   while (total < Ept && h_x > h_wp)
     {
-      const double next = PotentialWaterUptake (max (h_x - step, h_wp), soil, soil_water);
+      const double h_next = max (h_x - step, h_wp);
+      const double next = PotentialWaterUptake (h_next, soil, soil_water);
       
       if (next < total)
 	// We are past the top of the curve.
@@ -1138,23 +1144,32 @@ CropStandard::ActualWaterUptake (const double Ept, const Soil& soil, SoilWater& 
 	    continue;
 	  }
       total = next;
-      h_x -= step;
+      h_x = h_next;
       step *= 2;
     }
   if (h_x < h_wp)
     h_x = h_wp;
 
+  step = min_step;
   assert (h_x < 0.001);
   while (total > Ept && h_x < 0.0)
     {
       assert (h_x < 0.001);
-      const double next = PotentialWaterUptake (min (h_x + step, 0.0), soil, soil_water);
+      const double h_next = min (h_x + step, 0.0);
+      const double next = PotentialWaterUptake (h_next, soil, soil_water);
 
       if (next < Ept)
 	// We went too far.
 	if (step <= min_step)
-	  // We can't get any closer.
-	  break;
+	  {
+	    // We can't get any closer.
+	    if (next < total)
+	      {
+		total = next;
+		h_x = h_next;
+	      }
+	    break;
+	  }
 	else
 	  // Try again a little closer.
 	  {
@@ -1163,25 +1178,32 @@ CropStandard::ActualWaterUptake (const double Ept, const Soil& soil, SoilWater& 
 	  }
       
       total = next;
-      h_x += step;
+      h_x = h_next;
       step *= 2;
     }
 
   vector<double>& H2OExtraction = var.RootSys.H2OExtraction;
-  if (h_x >= 0.0)
+  if (total > Ept)
     {
-      h_x = 0.0;
-      fill (H2OExtraction.begin (), H2OExtraction.end (), 0.0);
-      total = 0.0;
+      assert (h_x > -0.001);
+      assert (total > 0);
+      const double factor = Ept / total;
+      for (int i = 0; i < soil.size (); i++)
+	H2OExtraction[i] *= factor;
+      total = Ept;
     }
   // Update soil water sink term.
   soil_water.add_to_sink (H2OExtraction);
   // Update water stress factor
   double& water_stress = var.RootSys.water_stress;
-  if (Ept < 0.005)
+  if (Ept < 0.010)
     water_stress = 1.0;
   else
     water_stress = (total + EvapInterception) / (Ept + EvapInterception);
+
+  // Update transpiration.
+  double& transpiration = var.RootSys.transpiration;
+  transpiration = total;
 
   return total;
 }
@@ -1212,7 +1234,7 @@ CropStandard::PotentialWaterUptake (const double h_x,
       assert ((- 0.5 * log (area * L[i])) != 0.0);
       assert (uptake >= 0.0);
       S[i] = uptake;
-      total += uptake;
+      total += uptake * soil.dz (i) * 10; // mm/cm.
     }
   return total;
 }
@@ -1548,17 +1570,15 @@ CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
 	{
 	  InitialLAI ();
 	  var.Canopy.Height = CropHeight ();
+	  NitContent ();
+	  var.CrpAux.PotCanopyAss = 0.0;
+	  var.CrpAux.CanopyAss = 0.0;
+	  RootDensity (soil);
 	}
       return;
     }
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
-  if (time.hour () == 1)
-    {
-      NitContent ();
-      var.CrpAux.PotCanopyAss = 0.0;
-      var.CrpAux.CanopyAss = 0.0;
-    }
   const double water_stress = var.RootSys.water_stress;
   NitrogenUptake (time.hour ());
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
@@ -1578,6 +1598,9 @@ CropStandard::tick (const Time& time, const Bioclimate& bioclimate,
   NetProduction (bioclimate, soil, soil_heat);
   RootPenetration (soil, soil_heat);
   RootDensity (soil);
+  NitContent ();
+  var.CrpAux.PotCanopyAss = 0.0;
+  var.CrpAux.CanopyAss = 0.0;
 }
 
 void

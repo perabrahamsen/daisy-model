@@ -43,6 +43,10 @@ public:
   double intercepted_water;
   Snow snow;
   
+  // Log.
+  double PotEvapotranspiration;
+  double EvapInterception;
+  
   // Construct.
   Implementation (const AttributeList& al);
 };
@@ -54,7 +58,9 @@ Bioclimate::Implementation::Implementation (const AttributeList& al)
     irrigation (0.0),
     irrigation_temperature (0.0),
     intercepted_water (al.number ("intercepted_water")),
-    snow (al.list ("Snow"))
+    snow (al.list ("Snow")),
+    PotEvapotranspiration (0.0),
+    EvapInterception (0.0)
 { }
 
 void 
@@ -143,6 +149,8 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
 					       const Soil& soil, 
 					       SoilWater& soil_water)
 {
+  static const double dt = 1.0;
+
   // Calculate total interception.
   double InterceptionCapacity = 0.0;
   double EpExtinction = 0.0;
@@ -167,9 +175,9 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
   else
     EpFactor = soil.EpFactor ();
 
-  double PotSoilEvaporation = 
-      EpFactor
-    * weather.ReferenceEvapotranspiration () 
+  PotEvapotranspiration = EpFactor * weather.ReferenceEvapotranspiration ();
+
+  double PotSoilEvaporation = PotEvapotranspiration
     * exp (- EpExtinction * LAI);
   
   double PotCanopyEvapotranspiration =
@@ -179,7 +187,8 @@ Bioclimate::Implementation::WaterDistribution (Surface& surface,
   if (irrigation_type == top_irrigation)
     WaterFromAbove += irrigation;
 
-  const double EvapInterception = min (WaterFromAbove, PotCanopyEvapotranspiration);
+  EvapInterception
+    = min (WaterFromAbove + intercepted_water / dt, PotCanopyEvapotranspiration);
   PotCanopyEvapotranspiration -= EvapInterception;
 
   const double Through_fall = WaterFromAbove - EvapInterception
@@ -260,6 +269,8 @@ void
 Bioclimate::output (Log& log, const Filter* filter) const
 {
   log.output ("intercepted_water", filter, impl.intercepted_water);
+  log.output ("EvapInterception", filter, impl.EvapInterception, true);
+  log.output ("PotEvapotranspiration", filter, impl.PotEvapotranspiration);
   output_submodule (impl.snow, "Snow", log, filter);
 }
 
@@ -307,6 +318,8 @@ Bioclimate::load_syntax (Syntax& syntax, AttributeList& alist)
   
   syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const);
   syntax.add ("intercepted_water", Syntax::Number, Syntax::InOut);
+  syntax.add ("EvapInterception", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("PotEvapotranspiration", Syntax::Number, Syntax::LogOnly);
   alist.add ("intercepted_water", 0.0);
   add_submodule<Snow> ("Snow", syntax, alist);
 }

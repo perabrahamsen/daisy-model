@@ -76,12 +76,12 @@ Surface::evaporation (double PotSoilEvaporation, double water,
     flux_top_on ();
 
   if (pond + water * dt + MaxExfiltration * dt < Eps * dt)
-    Es = pond / dt + water + MaxExfiltration;
+    EvapSoilSurface = pond / dt + water + MaxExfiltration;
   else
-    Es = Eps;
+    EvapSoilSurface = Eps;
 
-  pond = pond - Es * dt + water * dt;
-  return Es;
+  pond = pond - EvapSoilSurface * dt + water * dt;
+  return EvapSoilSurface;
 }
 
 void
@@ -89,7 +89,7 @@ Surface::output (Log& log, const Filter* filter) const
 {
   log.output ("pond", filter, pond);
   log.output ("flux", filter, flux);
-  log.output ("Es", filter, Es, true);
+  log.output ("EvapSoilSurface", filter, EvapSoilSurface, true);
   log.output ("Eps", filter, Eps, true);
 }
 
@@ -102,7 +102,7 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("pond", 0.0);
   syntax.add ("flux", Syntax::Boolean, Syntax::InOut);
   alist.add ("flux", true);
-  syntax.add ("Es", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
 }
 
@@ -110,6 +110,6 @@ Surface::Surface (const AttributeList& al)
   : lake (al.number ("lake")),
     pond (al.number ("pond")),
     flux (al.flag ("flux")),
-    Es (0.0),
+    EvapSoilSurface (0.0),
     Eps (0.0)
 { }
