@@ -95,8 +95,8 @@ HydraulicOld::HydraulicOld (const AttributeList& al)
       if (Theta_sat < 0.0)
 	const_cast<double&> (Theta_sat) = Theta;
       
-      const double h_minus = (pF < 1.0e-10) ? 0.0 : pow (10.0, pF);
-
+      const double h_minus = (pF < 1.0e-10) ? 0.0 : - pF2h (pF);
+      
       Thetam_.add (h_minus, -Theta);
       Cw2_.add (h_minus, Cw2 * 1.0e-2);
       K_.add (h_minus, K * 3.6e5);
@@ -109,6 +109,8 @@ HydraulicOld::HydraulicOld (const AttributeList& al)
     }
   hm_ = Thetam_.inverse ();
   K_to_M (M_, M_intervals);
+
+  close (file.rdbuf ()->fd ());
 }
 
 HydraulicOld::~HydraulicOld ()

@@ -31,6 +31,8 @@ public:
   void distribute (const Soil&, const vector<double>& density);
   void swap (const Soil&, double from, double middle, double to);
   bool empty () const;
+#if 0
+public:
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
 	     double& CO2, const vector<OM*>& smb, const vector<OM*>&som);
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
@@ -39,7 +41,20 @@ private:
   void tock (int i, double rate, double efficiency, 
 	     double N_soil, double& N_used,
 	     double& CO2, OM& om);
-  
+#else
+public:
+  void tick (const double* turnover_factor, 
+	     const double* N_soil, double* N_used,
+	     double* CO2, const vector<OM*>& smb, const vector<OM*>&som);
+  void tick (const double* turnover_factor,
+	     const double* N_soil, double* N_used,
+	     double* CO2, const vector<OM*>& smb, 
+	     double* som_C, double* som_N);
+private:
+  void tock (const double* rate, double factor, double efficiency, 
+	     const double* N_soil, double* N_used,
+	     double* CO2, OM& om);
+#endif  
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);

@@ -80,11 +80,11 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
     + (fine_sand + coarse_sand) * quarts_in_sand;
 
   // Above this pF heat is mostly tranfered by Air.
-  Theta_pF_high = hydraulic->Theta (-pow (10, 4.2));
+  Theta_pF_high = hydraulic->Theta (pF2h (4.2));
       
   // Below this pf heat is mostly transfered by Water or Ice.
   const double Theta_pF_low
-    = (hydraulic->Theta (-pow (10, 2.0)) + Theta_pF_high) / 2.0;
+    = (hydraulic->Theta (pF2h (2.0)) + Theta_pF_high) / 2.0;
 
   // Water that won't freeze.
   const double LiquidWater = Theta_pF_high; 

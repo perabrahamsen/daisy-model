@@ -126,6 +126,7 @@ OM::empty () const
   return true;
 }
 
+#if 0
 void
 OM::tick (int i, double abiotic_factor, double N_soil, double& N_used,
 	  double& CO2, const vector<OM*>& smb, const vector<OM*>&som)
@@ -143,14 +144,22 @@ OM::tick (int i, double abiotic_factor, double N_soil, double& N_used,
   // Distribute to all biological dk:puljer.
   const int smb_size = smb.size ();
   for (int j = 0; j < smb_size; j++)
-    tock (i, turnover_rate * abiotic_factor * fractions[j], efficiency[j],
-	  N_soil, N_used, CO2, *smb[j]);
+    {
+      const double fraction = fractions[j];
+      if (fraction > 1e-50)
+	tock (i, turnover_rate * abiotic_factor * fraction, efficiency[j],
+	      N_soil, N_used, CO2, *smb[j]);
+    }
 #if 1 /* BUG: WHY WHY WHY IS THIS UNCOMMENTED? */
   // Distribute to all soil dk:puljer.
   const int som_size = som.size ();
   for (int j = 0; j < som_size; j++)
-    tock (i, turnover_rate * abiotic_factor * fractions[smb_size + j], 1.0,
-	  N_soil, N_used, CO2, *som[j]);
+    {
+      const double fraction = fractions[smb_size + j];
+      if (fraction > 1e-50)
+	tock (i, turnover_rate * abiotic_factor * fraction, 1.0,
+	      N_soil, N_used, CO2, *som[j]);
+    }
   // assert (N_soil * 1.001 >= N_used);
   assert (C[i] >= 0.0);
 #endif
@@ -173,9 +182,12 @@ OM::tick (int i, double abiotic_factor, double N_soil, double& N_used,
       // Distribute to all biological dk:puljer.
       const int smb_size = smb.size ();
       for (int j = 0; j < smb_size; j++)
-	tock (i, turnover_rate * abiotic_factor * fractions[j], efficiency[j],
-	      N_soil, N_used, CO2, *smb[j]);
-  
+	{
+	  const double fraction = fractions[j];
+	  if (fraction > 1e-50)
+	    tock (i, turnover_rate * abiotic_factor * fraction, efficiency[j],
+		  N_soil, N_used, CO2, *smb[j]);
+	}
       // Distribute to soil buffer.
       const double rate = turnover_rate * abiotic_factor * fractions[smb_size];
       som_N += C[i] * rate / C_per_N[i];
@@ -259,6 +271,183 @@ OM::tock (int i, double rate, double efficiency,
   // assert (N_soil * 1.001 >= N_used);
   assert (C[i] >= 0.0);
 }
+#else
+inline void
+OM::tock (const double* factor, double fraction, double efficiency,
+	  const double* N_soil, double* N_used, double* CO2, OM& om)
+{
+  const int size = C.size ();
+
+  // Maintenance.
+  for (int i = 0; i < size; i++)
+    {
+      double rate = factor[i] * fraction;
+#if 0
+      assert (C[i] >= 0.0);
+      assert (finite (rate));
+      assert (rate >=0);
+      assert (C_per_N.size () > 0U);
+      // assert (N_soil * 1.001 >= N_used);
+      assert (C_per_N[i] > 0.0);
+      assert (om.C_per_N[i] > 0.0);
+#endif
+      double N_produce = C[i] * rate / C_per_N[i];
+      double N_consume = C[i] * rate * efficiency / om.C_per_N[i];
+#if 0
+      assert (finite (N_produce));
+      assert (finite (N_consume));
+#endif
+      if (N_consume - N_produce > N_soil - N_used
+	  // && N_soil * 1.001 >= N_used
+	  && ((N_consume - N_produce) - (N_soil[i] - N_used[i])
+	      > 1.0e-10) // Lose 1 g / ha / year
+	  && rate > 0.0)
+	{
+	  // Lower rate to force 
+	  //   N_consume - N_produce == N_soil - N_used 
+	  // This is what calc tell me:
+	  rate = (N_soil[i] - N_used[i]) 
+	    / (efficiency * C[i] / om.C_per_N[i] - C[i] / C_per_N[i]);
+#if 0
+	  assert (finite (rate));
+#endif
+	  if (rate < 0)
+	    rate = 0;
+
+	  // Aside: We could also have solved the equation by decresing the 
+	  // efficiency.
+	  //   efficiency = ((N_soil - N_used) + rate * C[i] / C_per_N[i])
+	  //     * om.C_per_N / rate * C[i];
+	  // But we don't
+
+	  // Update the N values.
+	  N_produce = C[i] * rate / C_per_N[i];
+	  N_consume = C[i] * rate * efficiency / om.C_per_N[i];
+#if 0
+	  assert (finite (N_produce));
+	  assert (finite (N_consume));
+	  // Check that we calculated the right rate.
+	  assert ((rate == 0)
+		  ? true 
+		  : ((N_soil[i] == N_used[i])
+		     ? (abs (N_consume - N_produce) < 1e-10)
+		     : (abs (1.0 - (N_consume - N_produce) 
+			     / (N_soil[i] - N_used[i]))
+			< 0.01)));
+#endif
+	}
+      // Update.
+      const double C_use = C[i] * rate;
+      CO2[i] += C_use * (1.0 - efficiency);
+      om.C[i] += C_use * efficiency;
+      C[i] -= C_use;
+#if 0
+      assert (om.C[i] >= 0.0);
+      assert (C[i] >= 0.0);
+#endif
+      N_used[i] += (N_consume - N_produce);
+
+      // Check for NaN.
+#if 0
+      assert (finite (N_used[i]));
+      assert (finite (rate));
+      assert (finite (efficiency));
+      // assert (N_soil * 1.001 >= N_used);
+      assert (C[i] >= 0.0);
+#endif
+    }
+}
+
+void
+OM::tick (const double* abiotic_factor, 
+	  const double* N_soil, double* N_used,
+	  double* CO2, const vector<OM*>& smb, const vector<OM*>&som)
+{
+  const int size = C.size ();
+  for (int i = 0; i < size; i++)
+    {
+      assert (C[i] >= 0.0);
+      // assert (N_soil * 1.001 >= N_used);
+      // Maintenance.
+      const double C_use = C[i] * maintenance * abiotic_factor[i];
+      CO2[i] += C_use;
+      C[i] -= C_use;
+      N_used[i] -= C_use / C_per_N[i];
+      // assert (N_soil * 1.001 >= N_used);
+    }
+  assert (fractions.size () == smb.size () + som.size ());
+  // Distribute to all biological dk:puljer.
+  const int smb_size = smb.size ();
+  for (int j = 0; j < smb_size; j++)
+    {
+      const double fraction = fractions[j];
+      if (fraction > 1e-50)
+	tock (abiotic_factor, turnover_rate * fraction, efficiency[j],
+	      N_soil, N_used, CO2, *smb[j]);
+    }
+  // Distribute to all soil dk:puljer.
+  const int som_size = som.size ();
+  for (int j = 0; j < som_size; j++)
+    {
+      const double fraction = fractions[smb_size + j];
+      if (fraction > 1e-50)
+	tock (abiotic_factor, turnover_rate * fraction, 1.0,
+	      N_soil, N_used, CO2, *som[j]);
+    }
+  // assert (N_soil * 1.001 >= N_used);
+  for (int i = 0; i < size; i++)
+    assert (C[i] >= 0.0);
+}
+
+void 
+OM::tick (const double* abiotic_factor, 
+	  const double* N_soil, double* N_used,
+	  double* CO2, const vector<OM*>& smb, double* som_C, double* som_N)
+{
+  const int size = C.size ();
+
+  // Maintenance.
+  for (int i = 0; i < size; i++)
+    {
+      assert (C[i] >= 0.0);
+
+      if (C[i] > 0.0)
+	{
+	  CO2[i] += C[i] * maintenance;
+	  C[i] *= (1.0 - maintenance);
+	}
+    }
+  assert (fractions.size () == smb.size () + 1);
+  
+  // Distribute to all biological dk:puljer.
+  const int smb_size = smb.size ();
+  for (int j = 0; j < smb_size; j++)
+    {
+      const double fraction = fractions[j];
+      if (fraction > 1e-50)
+	tock (abiotic_factor, turnover_rate * fraction, efficiency[j],
+	      N_soil, N_used, CO2, *smb[j]);
+    }
+
+  // Distribute to soil buffer.
+  const double factor = turnover_rate * fractions[smb_size];
+  for (int i = 0; i < size; i++)
+    {
+      const double rate = factor * abiotic_factor[i];
+      som_N[i] += C[i] * rate / C_per_N[i];
+      som_C[i] += C[i] * rate;
+      C[i] *= (1.0 - rate);
+      // assert (N_soil * 1.001 >= N_used);
+      
+      if (C[i] < 1e-9)
+	{
+	  assert (C[i] > -1e9);
+	  som_C[i] += C[i];
+	  C[i] = 0.0;
+	}
+    }
+}
+#endif
 
 void
 OM::load_syntax (Syntax& syntax, AttributeList& alist)

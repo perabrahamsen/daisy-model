@@ -196,7 +196,9 @@ WeatherFile::WeatherFile (const Time& t, const AttributeList& al)
 { }
 
 WeatherFile::~WeatherFile ()
-{ }
+{
+  close (file.rdbuf ()->fd ());
+}
 
 // Add the WeatherFile syntax to the syntax table.
 Weather&

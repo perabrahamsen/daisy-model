@@ -7,6 +7,7 @@
 #include "log.h"
 #include "parser.h"
 #include "am.h"
+#include "nitrification.h"
 #include "hydraulic.h"
 #include "crop.h"
 #include "column.h"
@@ -134,6 +135,9 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_class ("defuzmodel", UZmodel::library (), &UZmodel::derive_type);
   syntax.add_class ("defhydraulic",
 		    Hydraulic::library (), &Hydraulic::derive_type);
+  syntax.add_class ("defnitrification", 
+		    Librarian<Nitrification>::library (),
+		    &Librarian<Nitrification>::derive_type);
   // The actual data.
   syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
   syntax.add ("input", Parser::library (), Syntax::Optional, 

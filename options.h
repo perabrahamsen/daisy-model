@@ -4,6 +4,10 @@
 #define OPTIONS_H
 
 #include <string>
+// #include <sys/types.h>
+// #include <sys/stat.h>
+// #include <fcntl.h>
+#include <osfcn.h>
 
 class Options
 {

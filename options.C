@@ -2,9 +2,6 @@
 
 #include "options.h"
 #include <vector>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 int
 Options::find_file (const string name)

@@ -15,7 +15,7 @@ FORLIB=
 MIKESRC=
 MIKEFLAGS= 
 
-CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -pipe $(MIKEFLAGS) -frepo -O2
+CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -pipe $(MIKEFLAGS) -frepo -O3 -ffast-math -msupersparc -mv8 -pg
 # CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
 SRCONLY = column_std.C  weather_simple.C uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
@@ -25,7 +25,8 @@ SRCONLY = column_std.C  weather_simple.C uzrichard.C \
 	condition_logic.C log_file.C action_irrigate.C action_lisp.C \
 	weather_none.C action_fertilize.C weather_file.C action_tillage.C \
 	action_harvest.C hydraulic_old.C $(MIKEONLY) crop_old.C crop_sold.C \
-	action_with.C
+	action_with.C hydraulic_old2.C nitrification_soil.C \
+	nitrification_solute.C
 OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
 	filter.C csmp.C time.C uzmodel.C parser_file.C hydraulic.C \
@@ -35,7 +36,7 @@ OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
 	am.C im.C om.C harvest.C $(MIKESHE) options.C
 OBJ = $(OBJECTS:.C=.o) $(SRCONLY:.C=.o) set_exceptions.o 
 SRC = $(OBJECTS) $(SRCONLY) set_exceptions.S
-HEAD = $(OBJECTS:.C=.h) common.h 
+HEAD = $(OBJECTS:.C=.h) common.h librarian.h
 TEXT =  Makefile $(HEAD) $(SRC) 
 
 # To be removed by the next cvs update.
@@ -50,7 +51,7 @@ mshe/mshe.a:
 	(cd mshe; $(MAKE) mshe.a) 
 
 set_exceptions.o: set_exceptions.S
-	as set_exceptions.S
+	as -o set_exceptions.o set_exceptions.S
 
 wc: $(TEXT)
 	wc -l $(TEXT)
@@ -106,7 +107,7 @@ daisy.zip:	$(TEXT)
 	zip daisy.zip $(TEXT)
 
 cvs: $(TEXT)
-	(cd lib; $(MAKE) CVS);
+	(cd lib; $(MAKE) cvs);
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(TEXT)
 	rm -f $(REMOVE) 
@@ -124,9 +125,9 @@ cvs: $(TEXT)
 main.o: main.C daisy.h time.h parser_file.h parser.h syntax.h alist.h \
  common.h
 daisy.o: daisy.C daisy.h time.h weather.h groundwater.h uzmodel.h \
- common.h horizon.h log.h filter.h parser.h am.h om.h hydraulic.h \
- crop.h column.h harvest.h action.h library.h syntax.h condition.h \
- alist.h mike_she.h
+ common.h horizon.h log.h filter.h parser.h am.h om.h nitrification.h \
+ librarian.h library.h alist.h syntax.h hydraulic.h crop.h column.h \
+ harvest.h action.h condition.h mike_she.h
 parser.o: parser.C parser.h alist.h common.h library.h syntax.h
 log.o: log.C log.h filter.h alist.h common.h library.h syntax.h
 weather.o: weather.C weather.h time.h library.h alist.h common.h \
@@ -146,7 +147,7 @@ csmp.o: csmp.C csmp.h log.h filter.h
 time.o: time.C time.h
 uzmodel.o: uzmodel.C uzmodel.h common.h library.h alist.h syntax.h
 parser_file.o: parser_file.C parser_file.h parser.h options.h syntax.h \
- alist.h common.h library.h csmp.h time.h log.h filter.h
+ alist.h common.h library.h csmp.h log.h filter.h
 hydraulic.o: hydraulic.C hydraulic.h library.h alist.h common.h \
  syntax.h csmp.h
 soil.o: soil.C soil.h horizon.h hydraulic.h alist.h common.h syntax.h \
@@ -169,9 +170,8 @@ organic_matter.o: organic_matter.C organic_matter.h syntax.h alist.h \
  common.h log.h filter.h am.h time.h om.h soil.h horizon.h hydraulic.h \
  soil_water.h soil_NH4.h solute.h soil_NO3.h soil_heat.h mathlib.h \
  csmp.h
-nitrification.o: nitrification.C nitrification.h alist.h common.h \
- syntax.h soil.h horizon.h hydraulic.h soil_water.h soil_heat.h \
- soil_NH4.h solute.h soil_NO3.h csmp.h log.h filter.h
+nitrification.o: nitrification.C nitrification.h librarian.h library.h \
+ alist.h common.h syntax.h
 denitrification.o: denitrification.C denitrification.h alist.h \
  common.h syntax.h soil.h horizon.h hydraulic.h soil_water.h \
  soil_heat.h organic_matter.h soil_NO3.h solute.h csmp.h log.h \
@@ -195,8 +195,8 @@ options.o: options.C options.h
 column_std.o: column_std.C column.h crop.h time.h bioclimate.h \
  surface.h uzmodel.h common.h im.h soil.h horizon.h hydraulic.h \
  soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
- organic_matter.h nitrification.h denitrification.h alist.h syntax.h \
- library.h log.h filter.h am.h om.h
+ organic_matter.h nitrification.h librarian.h library.h alist.h \
+ syntax.h denitrification.h log.h filter.h am.h om.h
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
  common.h log.h filter.h
 uzrichard.o: uzrichard.C uzmodel.h common.h soil.h horizon.h \
@@ -238,14 +238,14 @@ weather_none.o: weather_none.C weather.h time.h syntax.h alist.h \
  common.h
 action_fertilize.o: action_fertilize.C action.h daisy.h time.h \
  column.h syntax.h alist.h common.h am.h om.h im.h library.h
-weather_file.o: weather_file.C weather.h time.h syntax.h alist.h \
- common.h log.h filter.h mike_she.h
+weather_file.o: weather_file.C weather.h time.h options.h syntax.h \
+ alist.h common.h log.h filter.h mike_she.h
 action_tillage.o: action_tillage.C action.h daisy.h time.h weather.h \
  column.h syntax.h alist.h common.h
 action_harvest.o: action_harvest.C action.h daisy.h time.h column.h \
  syntax.h alist.h common.h library.h
-hydraulic_old.o: hydraulic_old.C hydraulic.h syntax.h alist.h common.h \
- csmp.h
+hydraulic_old.o: hydraulic_old.C hydraulic.h options.h syntax.h \
+ alist.h common.h csmp.h
 crop_old.o: crop_old.C crop.h time.h log.h filter.h csmp.h \
  bioclimate.h column.h common.h syntax.h alist.h soil_water.h soil.h \
  horizon.h hydraulic.h soil_heat.h soil_NH4.h solute.h soil_NO3.h am.h \
@@ -256,4 +256,14 @@ crop_sold.o: crop_sold.C crop.h time.h log.h filter.h csmp.h \
  om.h harvest.h mathlib.h
 action_with.o: action_with.C action.h daisy.h time.h syntax.h alist.h \
  common.h column.h
+hydraulic_old2.o: hydraulic_old2.C hydraulic.h options.h syntax.h \
+ alist.h common.h csmp.h
+nitrification_soil.o: nitrification_soil.C nitrification.h librarian.h \
+ library.h alist.h common.h syntax.h soil.h horizon.h hydraulic.h \
+ soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h csmp.h log.h \
+ filter.h
+nitrification_solute.o: nitrification_solute.C nitrification.h \
+ librarian.h library.h alist.h common.h syntax.h soil.h horizon.h \
+ hydraulic.h soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
+ csmp.h log.h filter.h
 set_exceptions.o: set_exceptions.S

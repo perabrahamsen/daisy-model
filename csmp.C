@@ -8,118 +8,65 @@
 
 struct CSMP::Implementation
 {
-  struct pair
-  {
-    double x;
-    double y;
-#if 0
-    bool operator < (const pair&) const;
-    { return (x < pair.x /* || (x == pair.x && y < pair.y) */); }
-#endif
-    pair (double a, double b) : x (a), y (b) { };
-    pair () : x (0.0), y (0.0) { };	// Needed by vector<>
-  };
-  typedef vector<pair> PairVector;
-  PairVector points;
-  Implementation (const PairVector& pts) : points (pts) { };
+  vector<double> x;
+  vector<double> y;
+
+  double operator () (const double pos) const;
+  CSMP inverse () const;
+  CSMP integrate_stupidly () const;
+  void operator = (CSMP::Implementation& impl)
+  { 
+    x = impl.x;
+    y = impl.y;
+  }
   Implementation () { };
+  Implementation (CSMP::Implementation& impl) : x (impl.x), y (impl.y) { };
 };
 
-double
-CSMP::operator() (const double x) const
+double 
+CSMP::Implementation::operator () (const double pos) const
 {
-#if 1
   int min = 0;
-  int max = impl.points.size () - 1;
+  int max = x.size () - 1;
 
-  if (x <= impl.points[min].x)
-    return impl.points[min].y;
-  else if (x >= impl.points[max].x)
-    return impl.points[max].y;
+  if (pos <= x[min])
+    return y[min];
+  else if (pos >= x[max])
+    return y[max];
 
   while (true)
     {
       if (max - min == 1)
-	return impl.points[min].y 
-	  +   (impl.points[max].y - impl.points[min].y)
-	/ (impl.points[max].x - impl.points[min].x)
-	* (x - impl.points[min].x);
-      
+	return y[min] 
+	  + (y[max] - y[min]) / (x[max] - x[min]) * (pos - x[min]);
+
       int guess = (max + min) / 2;
-      if (impl.points[guess].x < x)
+
+      if (x[guess] < pos)
 	min = guess;
-      else if (impl.points[guess].x > x)
+      else if (x[guess] > pos)
 	max = guess;
       else 
-	return impl.points[guess].y;
+	return y[guess];
       assert (max > min);
     }
-#elif 1
-  for (unsigned int i = 0; i < impl.points.size(); i++)
-    {
-      if (x <= impl.points[i].x)
-	{
-	  if (i == 0)
-	    return impl.points[i].y;
-		    
-	  return impl.points[i-1].y 
-	    +   (impl.points[i].y - impl.points[i-1].y)
-	    / (impl.points[i].x - impl.points[i-1].x)
-	    * (x - impl.points[i-1].x);
-	}
-    }
-  return impl.points[impl.points.size () - 1].y;
-#else
-  assert (impl.points.size () > 0);
-  if (x <= impl.points[0].x)
-    return impl.points[0].y;
-  else if (x >= impl.points[impl.points.size () - 1].x)
-    return impl.points[impl.points.size () - 1].y;
-  else
-    {
-      const Implementation::pair p(x, 0.0);
-      Implementation::PairVector::const_iterator lower 
-	= lower_bound (impl.points.begin (), impl.points.end (), p);
-      Implementation::PairVector::const_iterator upper
-	= upper_bound (impl.points.begin (), impl.points.end (), p);
-      assert (upper != impl.points.end ());
-      assert (lower != impl.points.end ());
-      if (upper == lower)
-	return upper->y;
-      else
-	{
-	  assert (upper - lower == 1);
-	  assert (upper->x > lower->x);
-	  assert (upper->x >= x);
-	  assert (x >= lower->x);
-	  assert (upper->y >= lower->y);
-	  const double r = (lower->y
-			    + (upper->y - lower->y) / (upper->x - lower->x)
-			    * (x - lower->x));
-	  assert (r >= lower->y && r <= upper->y);
-	  return r;
-	}
-    }
-#endif
 }
 
 // Calculate the inverse function of a CSMP.  
 // We assume that the original CSMP is monotonously increasing.
-
-CSMP
-CSMP::inverse () const
-{ 
+CSMP 
+CSMP::Implementation::inverse () const
+{
+  const int size = x.size ();
   CSMP csmp;
 
   double last = -1.0;
-  for (Implementation::PairVector::iterator i = impl.points.begin ();
-       i != impl.points.end ();
-       i++)
-    if (last != i->y)
+  for (int i = 0; i < size; i++)
+    if (last != y[i])
       {
-	assert (last <= i->y);
-	csmp.add (i->y, i->x);
-	last = i->y;
+	assert (last <= y[i]);
+	csmp.add (y[i], x[i]);
+	last = y[i];
       }
   return csmp;
 }
@@ -128,33 +75,51 @@ CSMP::inverse () const
 // with the mean value of the line piece.  That way, the result can be
 // described as a CSMP itself.  
 // We assume that the first point of the CSMP is (0.0, 0.0).
-
 CSMP 
-CSMP::integrate_stupidly () const
+CSMP::Implementation::integrate_stupidly () const
 {
   CSMP csmp;
   
+  const int size = x.size ();
   double sum = 0.0;
-  Implementation::pair last (0.0, 0.0);
+  double last_x = 0.0;
+  double last_y = 0.0;
   
   csmp.add (0.0, 0.0);
-  for (Implementation::PairVector::iterator i = impl.points.begin ();
-       i != impl.points.end ();
-       i++)
+  for (int i = 0; i < size; i++)
     {
-      if (i->x > last.x)
+      if (x[i] > last_x)
 	{
-	  sum += (last.y + i->y) * 0.5 * (i->x - last.x);
-	  csmp.add (i->x, sum);
+	  sum += (last_y + y[i]) * 0.5 * (x[i] - last_x);
+	  csmp.add (x[i], sum);
 	}
       else
 	{
 	  // The CSMP is discontinues at this point.
-	  assert (i->x == last.x);
+	  assert (x[i] == last_x);
 	}
-      last = *i;
+      last_x = x[i];
+      last_y = y[i];
     }
   return csmp;
+}
+
+double
+CSMP::operator () (const double x) const
+{
+  return impl (x);
+}
+
+CSMP
+CSMP::inverse () const
+{ 
+  return impl.inverse ();
+}
+
+CSMP 
+CSMP::integrate_stupidly () const
+{
+  return impl.integrate_stupidly ();
 }
 
 double 
@@ -181,19 +146,21 @@ CSMP::find (const vector<double>& x, const vector<double>& y, double value)
 void 
 CSMP::output (Log& log) const
 {
-  for (Implementation::PairVector::iterator i = impl.points.begin ();
-       i != impl.points.end ();
-       i++)
+  const int size = impl.x.size ();
+
+  for (int i = 0; i < size; i++)
     {
-      log.output_point (i->x, i->y);
+      log.output_point (impl.x[i], impl.y[i]);
     }
 }
 
 void 
 CSMP::add (double x, double y)
 {
-  assert (impl.points.size () == 0 || x >= impl.points[impl.points.size () - 1].x);
-  impl.points.push_back (Implementation::pair(x, y));
+  const int size = impl.x.size ();
+  assert (size == 0 || x >= impl.x[size - 1]);
+  impl.x.push_back (x);
+  impl.y.push_back (y);
 }
 
 // Add two CSMPs a and b giving c so that c (x) == a (x) + b (x).
@@ -201,17 +168,19 @@ CSMP::add (double x, double y)
 void
 CSMP::operator += (const CSMP& csmp)
 {
-  if (impl.points.size () == 0)
+  if (impl.x.size () == 0)
     {
-      impl.points = csmp.impl.points;
+      impl.x = csmp.impl.x;
+      impl.y = csmp.impl.y;
       return;
     }
-  if (csmp.impl.points.size () == 0)
+  if (csmp.impl.x.size () == 0)
     return;
-
+  
   // This does not work yet.
   assert (false);
 
+#if 0
   // Loop variables.
   Implementation::PairVector::iterator i = impl.points.begin ();
   Implementation::PairVector::iterator i_end = impl.points.end ();
@@ -272,22 +241,23 @@ CSMP::operator += (const CSMP& csmp)
 	}
     }
   impl.points = out.impl.points; 
+#endif
 }
 
 void 
 CSMP::operator = (const CSMP& csmp)
 {
-  impl.points = csmp.impl.points;
+  impl = csmp.impl;
 }
 
 
 CSMP::CSMP (const CSMP& csmp)
-  : impl (*new Implementation (csmp.impl.points))
-{}
+  : impl (*new Implementation (csmp.impl))
+{ }
 
 CSMP::CSMP ()
-  : impl (*new Implementation)
-{}
+  : impl (*new Implementation ())
+{ }
 
 CSMP::~CSMP ()
 {

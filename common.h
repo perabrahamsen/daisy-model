@@ -38,4 +38,14 @@ void sequence_delete (ForwardIterator first, ForwardIterator last) {
     delete *first++;
 }
 
+inline double pF2h (double pF)
+{ 
+  return -pow (10, pF);
+}
+
+inline double h2pF (double h)
+{
+  return log10 (-h);
+}
+
 #endif COMMON_H

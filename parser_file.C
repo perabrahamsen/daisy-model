@@ -664,6 +664,7 @@ ParserFile::Implementation::~Implementation ()
   cerr << "Close `" << file << "'\n";
   if (in.bad ())
     cerr << "There were trouble parsing `" << file << "'\n";
+  close (in.rdbuf ()->fd ());
 }
 
 void

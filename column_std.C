@@ -37,7 +37,7 @@ private:
   SoilNH4 soil_NH4;
   SoilNO3 soil_NO3;
   OrganicMatter organic_matter;
-  Nitrification nitrification;
+  Nitrification& nitrification;
   Denitrification denitrification;
 
   // Actions.
@@ -299,8 +299,13 @@ ColumnStandard::output (Log& log, const Filter& filter) const
   output_submodule (soil_heat, "SoilHeat", log, filter);
   output_submodule (soil_NH4, "SoilNH4", log, filter);
   output_submodule (soil_NO3, "SoilNO3", log, filter);
-  output_submodule (organic_matter, "OrganicMatter", log, filter);
-  output_submodule (nitrification, "Nitrification", log, filter);
+  if (filter.check ("OrganicMatter"))
+    {
+      log.open ("OrganicMatter");
+      organic_matter.output (log, filter.lookup ("OrganicMatter"), soil);
+      log.close ();
+    }
+  output_derived (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
   output_list (crops, "crops", log, filter);
 }
@@ -316,12 +321,15 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     soil_NH4 (soil, soil_water, al.list ("SoilNH4")),
     soil_NO3 (soil, soil_water, al.list ("SoilNO3")),
     organic_matter (soil, al.list ("OrganicMatter")),
-    nitrification (al.list ("Nitrification")),
+    nitrification (Librarian<Nitrification>::create 
+		   (al.list ("Nitrification"))),
     denitrification (al.list ("Denitrification"))
 { }
 
 ColumnStandard::~ColumnStandard ()
-{ }
+{ 
+  delete &nitrification;
+}
 
 // Add the Column syntax to the syntax table.
 Column*
@@ -354,7 +362,8 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
   add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
   add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist);
-  add_submodule<Nitrification> ("Nitrification", syntax, alist);
+  syntax.add ("Nitrification", Librarian<Nitrification>::library (),
+	      Syntax::Const);
   add_submodule<Denitrification> ("Denitrification", syntax, alist);
 
   Column::add_type ("default", alist, syntax, &ColumnStandard::make);
