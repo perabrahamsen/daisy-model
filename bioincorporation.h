@@ -47,6 +47,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Soil&);
+  void add_input (const Soil& soil, std::vector<double>& input, double amount);
   AM* create_am (const Geometry&);
   void set_am (AM*);
   static void load_syntax (Syntax&, AttributeList&);

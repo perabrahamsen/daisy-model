@@ -4,6 +4,8 @@
 \usepackage{a4}
 \usepackage{verbatim}
 \input{macro}
+\usepackage{natbib}
+%\bibliographystyle{plainnat}
 \bibliographystyle{apalike}
 \usepackage{graphicx}
 \usepackage{latexsym}
@@ -68,8 +70,8 @@ from real farming, two pools per source are in general needed.
 
 \section{\Daisy{}}
 
-In several comparisons \cite{vereecken91-compar, willigen91-compar,
-  diekkruger95-compar, smith97-compar} \daisy{} \cite{daisy-def,
+In several comparisons \citep{vereecken91-compar, willigen91-compar,
+  diekkruger95-compar, smith97-compar} \daisy{} \citep{daisy-def,
   daisy-fertilizer, daisy-ems} has been among the best models for both
 short and long term predictions of soil matter, and \daisy{} will be
 the reference for the rest of this article.  Apart from soil organic
@@ -132,16 +134,16 @@ fertilizer application and each crop residual type.  It thus provides
 a good basis for experimentation.
 
 The first such experimental change that made it back into \daisy{} was
-made by Torsten Müller \cite{mueller-smb}, who adjusted the turnover
+made by Torsten Müller \citep{mueller-smb}, who adjusted the turnover
 rates of the \textsc{smb} pools so the biomass content of the soil
 better matched the levels measured at the fields.  The change did not
 affect the long time dynamics of the system.  The second such change
-was made by Sander Bruun \cite{daisy-somnew}.  The was a complete
+was made by Sander Bruun \citep{daisy-somnew}.  The was a complete
 recalibration that took into account the carbon input from
 rhizodepositions.  This change was more radical, involving both
 turnover rates and directions of flow, and made the system much more
 adaptable to new levels of input, another effect which has also been
-observed empirically \cite{dk-humus-change}.
+observed empirically \citep{dk-humus-change}.
 
 The current model is depicted in figure~\ref{fig:om2}.  The purpose of
 the \textsc{som3} pool in that figure will be explained later.
@@ -156,25 +158,25 @@ the \textsc{som3} pool in that figure will be explained later.
 
 Some of the experimental changes affecting soil organic matter that we
 are currently working on, and which may be included in future versions
-of \daisy{}, are dissolved organic matter \cite{bgj-dom}, another
+of \daisy{}, are dissolved organic matter \citep{bgj-dom}, another
 recalibration based on a larger experimental database and with special
-focus on the effect of clay \cite{biomod,biomod2}, and some wishlist
-items include phosphor dynamics \cite{bgj-ptr} and a calibration for
+focus on the effect of clay \citep{biomod,biomod2}, and some wishlist
+items include phosphor dynamics \citep{bgj-ptr} and a calibration for
 forest soil.  The conclusion is that the model has changed in the
 past, and will continue to change in the future.
 
 \section{Expanding user base}
 
 The original development of \daisy{} was founded by the Danish
-environmental protection agency \cite{daisy-def}, and the first
+environmental protection agency \citep{daisy-def}, and the first
 non-research use was made by expert users who evaluated the national
 environmental plans for limiting nitrogen contamination of groundwater
 and surface water (see VMPuse).  Since then, \daisy{} has been used in
 other parts of the environmental and agricultural agencies (see
-\cite{novana} XXX), as well as increasingly by local authorities for
+\citep{novana} XXX), as well as increasingly by local authorities for
 evaluating regional plans (see Århus Amt og XXX), and recently also
 for evaluation of applications for changed farm practice at an
-individual farm level (see VVM, \cite{plantinfo-daisy}).  For the last
+individual farm level (see VVM, \citep{plantinfo-daisy}).  For the last
 case, \daisy{} has also been used by consulting agencies representing
 ``the other side'', namely farmers seeking permission to change
 farming practice.
@@ -466,7 +468,7 @@ choose values for $T$ and $\psi$ that give the same effect.
 \section{Inert organic matter}
 
 The current \daisy{} model calibration is based primarily on
-measurements on agricultural topsoil \cite{daisy-somnew,mueller-smb},
+measurements on agricultural topsoil \citep{daisy-somnew,mueller-smb},
 where all the humus is presumed to be active.  This means the
 calibration is not good for subsoils, nor for some types of humus-rich
 topsoils.  The \textsc{som3} pool you last saw in figure~\ref{fig:om2}
@@ -492,7 +494,7 @@ PA: Diskution af fig3 og 4 quasi-eq
 
 PA: Overvej initialisering med ``background mineralization = 0''.
 
-PA: Ref til \cite{daisy-init}.
+PA: Ref til \citep{daisy-init}.
 
 \section{Limitations}
 

@@ -374,11 +374,12 @@ OrganicMatter::Implementation::Initialization::
   if (al.check ("input"))
     {
       const double root = al.number ("root");
-      const double input = al.number ("root");
+      const double bioinc = al.number ("bioinc");
+      const double input = al.number ("input");
 
-      if (root > input)
+      if (root + bioinc > input)
 	{
-	  msg.error ("Root input larger than total input");
+	  msg.error ("Root and bioinc input larger than total input");
 	  ok = false;
 	}
     }
@@ -428,6 +429,11 @@ The input will distributes uniformly down to this size, after\n\
 subtracting the part of the input allocated to the 'root' parameter.\n\
 \n\
 By default, the end of the first horizon will be used.");
+  syntax.add ("bioinc", "kg C/ha/y", Check::non_negative (), Syntax::Const, "\
+Amount of carbon added to the organic matter system from bioincorporation.\n\
+\n\
+This is part of the total amount specified by the 'input' parameter.");
+  alist.add ("bioinc", 0.0);
   syntax.add ("T", "dg C", Temperature, Syntax::OptionalConst, "\
 Temperature used for equilibrium.\n\
 \n\
@@ -564,6 +570,7 @@ OrganicMatter::Implementation::Initialization::
 
 OrganicMatter::Implementation::Initialization::
 /**/ Initialization (const AttributeList& al, const Soil& soil, 
+                     const Bioincorporation& bioincorporation,
 		     const vector<SOM*>& som, double T_avg)
   : input (al.number ("input", -1.0)),
     end (al.number ("end", soil.end_of_first_horizon ())),
@@ -596,10 +603,11 @@ OrganicMatter::Implementation::Initialization::
 
   // Parameters.
   const double root = al.number ("root");
+  const double bioinc = al.number ("bioinc");
 
   // Add top.
-  daisy_assert (input >= root);
-  const double top = input - root;
+  daisy_assert (input >= root + bioinc);
+  const double top = input - root - bioinc;
   soil.add (per_lay, 0.0, end, top * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Add roots
@@ -613,6 +621,10 @@ OrganicMatter::Implementation::Initialization::
       density[i] = k * exp (k * soil.z (i));
     }
   soil.add (per_lay, density, root * kg_per_ha_per_y_to_g_per_cm2_per_h);
+
+  // Add bioincorporation
+  bioincorporation.add_input (per_lay,
+                              bioinc * kg_per_ha_per_y_to_g_per_cm2_per_h);
 
   // Mix roots in top.
   soil.mix (per_lay, 0.0, end);
@@ -2351,6 +2363,16 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   for (unsigned int i = 0; i < am.size (); i++)
     am[i]->initialize (soil);
 
+  // Biological incorporation.
+  bioincorporation.initialize (soil);
+  static const symbol bio_symbol ("bio");
+  static const symbol incorporation_symbol ("incorporation");
+  AM* bioam = find_am (bio_symbol, incorporation_symbol);
+  if (bioam)
+    bioincorporation.set_am (bioam);
+  else
+    am.push_back (bioincorporation.create_am (soil)); 
+
   // Warnings in case of explicit SOM or SMB initialization.
   for (unsigned int pool = 0; pool < som_size; pool++)
     {
@@ -2535,16 +2557,6 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
 
   // Initialize buffer.
   buffer.initialize (soil);
-
-  // Biological incorporation.
-  bioincorporation.initialize (soil);
-  static const symbol bio_symbol ("bio");
-  static const symbol incorporation_symbol ("incorporation");
-  AM* bioam = find_am (bio_symbol, incorporation_symbol);
-  if (bioam)
-    bioincorporation.set_am (bioam);
-  else
-    am.push_back (bioincorporation.create_am (soil)); 
 
   // Log variable.
   tillage_N_soil.insert (tillage_N_soil.end (), soil.size (), 0.0);
