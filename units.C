@@ -25,8 +25,8 @@
 
 struct Units::Content
 {
-  typedef map<string, Convert*> to_type;
-  typedef map<string, to_type> table_type;
+  typedef map<string, Convert*, less<string>/**/> to_type;
+  typedef map<string, to_type, less<string>/**/> table_type;
   table_type table;
   
   double convert (const string& from, const string& to, double value) const;
