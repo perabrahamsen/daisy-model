@@ -23,6 +23,7 @@ int main( int argc, char **argv )
   // QPushButton hello ("Hello world!", 0);
   // hello.resize (100, 30);
   QListView libs (0, 0);
+  new QListViewItem (&libs, "Libraries");
   app.setMainWidget (&libs);
   libs.show ();
   return app.exec ();

@@ -178,12 +178,12 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
     }
   catch (const char* error)
     {
+      CERR << "UZ problem: " << error << "\n";
       ok = false;
     }
   if (!ok)
     {
-      CERR << "UZ problem: " << error << "\n"
-           << "Using reserve uz model.\n";
+      CERR << "Using reserve uz model.\n";
       reserve->tick (soil,
                      first, surface,
                      last, groundwater,
