@@ -54,14 +54,17 @@ public:
 
   // Canopy.
 public:
-  virtual int NumberOfIntervals () const = 0;
-  virtual double height (int) const = 0;
-  virtual double PAR (int) const = 0;
+  virtual const vector<double>& height () const = 0;
+  virtual const vector<double>& PAR () const = 0;
   virtual double LAI () const = 0;
+  virtual double shared_light_fraction () const = 0;
+
+  // Weather.
   virtual double daily_air_temperature () const = 0;
   virtual double day_length () const = 0;
   virtual double daily_global_radiation () const = 0;
-
+  virtual double hourly_global_radiation () const = 0;
+  
   // Manager.
 public:
   virtual void irrigate_overhead (double flux, double temp) = 0;
@@ -78,6 +81,18 @@ public:
   virtual double get_intercepted_water () const; // [mm]
   virtual double get_net_throughfall () const; // [mm/h]
   virtual double get_snow_storage () const; // [mm]
+
+  // Utilities.
+public:
+  static void radiation_distribution (const int No, const double LAI,
+                                      const double Ref,
+                                      const double Si,
+                                      const double Ext,
+                                      vector <double>& Rad);
+private:
+  static void intensity_distribution (int No, double LAI,
+                                      double Rad0, double Ext, 
+                                      vector <double>& Rad);
 
   // Create.
 public:

@@ -142,6 +142,7 @@ public:
   double DS () const;
   double DM (double height) const;
   double total_N () const;
+  double total_C () const;
 
   // Create and Destroy.
 public:
@@ -370,6 +371,11 @@ CropSimple::total_N () const
   return N_actual / conv;
 }
 
+double
+CropSimple::total_C () const
+{ 
+  return 0.0; 
+}
 void
 CropSimple::initialize_inorganic (Treelog&, const Geometry& geometry)
 {

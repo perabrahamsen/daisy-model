@@ -49,6 +49,7 @@ public:
 
   // Canopy queries.
 public:
+  virtual double shared_light_fraction () const;
   virtual double rs_min () const = 0; // Minimum transpiration resistance.
   virtual double rs_max () const = 0; // Maximum transpiration resistance.
   virtual double LAI () const = 0; // Total LAI of all crops [0-]
@@ -111,9 +112,11 @@ public:
 			vector<double>& residuals_N_soil,
 			vector<double>& residuals_C_soil,
 			Treelog&) = 0;
-  virtual double sow (Treelog& msg, 
-		      const AttributeList& al, // Return kg N/ha in seed.
-		      const Geometry&, OrganicMatter&) = 0;
+  virtual void sow (Treelog& msg, 
+                    const AttributeList& al, 
+                    const Geometry&, OrganicMatter&, 
+                    double& seed_N /* kg/ha */,
+                    double& seed_C /* kg/ha */) = 0;
   virtual void sow (Treelog& msg, const AttributeList& al,
 		    const Geometry&) = 0;
   virtual void output (Log&) const;

@@ -124,6 +124,7 @@ public:
   double DS () const;
   double DM (double height) const;
   double total_N () const;
+  double total_C () const;
 
   // Create and Destroy.
 public:
@@ -1972,6 +1973,27 @@ CropSold::total_N () const
   // kg/ha -> g/cm^2
   const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
   return var.Prod.NCrop / conv;
+}
+
+double
+CropSold::total_C () const
+{
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+
+  const Parameters::HarvestPar& Hp = par.Harvest;
+  const Variables::RecProd& Prod = var.Prod;
+
+  const double WLeaf = Prod.WLeaf;
+  const double WRoot = Prod.WRoot;
+  const double WSOrg = Prod.WSOrg;
+
+  const double C_Leaf = Hp.C_Leaf;
+  const double C_Root = Hp.C_Root;
+  const double C_SOrg = Hp.C_SOrg;
+
+  const double total = WLeaf * C_Leaf + WSOrg * C_SOrg + WRoot * C_Root;
+  return total / conv;
 }
 
 CropSold::CropSold (const AttributeList& al)

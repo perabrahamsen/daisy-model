@@ -1,4 +1,46 @@
+2004-05-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.41 released.
+
+2004-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation.h, vegetation.C, vegetation_crops.C
+	(shared_light_fraction): New virtual member.
+	* vegetation_crops.C (reset_canopy_structure): Set it.
+	* bioclimate_std.C (CanopyStructure): Set it.
+	* bioclimate_std.C, bioclimate.h (shared_light_fraction,
+	hourly_global_radiation): New virtual member.
+	* crop_std.C, crop.h, crop.C (minimum_ligth_fraction): New
+	virtual member. 
+	(min_light_fraction): New parameter.
+
+	* lib/dk-wrape.dai: New file.
+	* lib/Makefile (DKCROPS): Add it.
+	* lib/dk-crop.dai: Input it.
+
+	* geometry.C (add): Changed assertion to warning.
+
+2004-04-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+	
+	* vegetation_crops.C, vegetation_permanent.C, vegetation.h (sow):
+	Take seed_C parameter. 
+	* column_std.C (sow): Update caller.
+	(seed_C): New log variable.
+
+	* production.C, production.h (total_C): New function.
+	* crop.h (total_N): New virtual function.
+	* crop_std.C (total_C): Implement it.
+	* crop_sold.C (total_C): Ditto.
+	* crop_simple.C (total_C): Ditto.
+	* crop_old.C (total_C): Ditto.
+
 2004-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* harvesting.C (operator ()): Added missing "+".
+
+	* lib/log.dai ("Total Carbon Balance"): New summary.
+	("C Input"): New summary.
+	("Carbon Balance"): Use them.
 
 	* Version 3.40 released.
 

@@ -30,7 +30,7 @@
 #include "mathlib.h"
 #include "submodel.h"
 #include "check_range.h"
-
+#include "tmpstream.h"
 #include <numeric>
 
 // Dimensional conversion.
@@ -92,7 +92,10 @@ Harvesting::operator() (const symbol column_name,
     + production.WLeaf * C_C_Leaf
     + production.WDead * C_C_Dead
     + production.WRoot * C_C_Root;
-  
+
+  daisy_assert (approximate (production.CCrop,
+                             total_old_C + production.CH2OPool * 12./30.));
+
   // Part of crop we attempt to harvest.
   const double dead_harvest = 1.0;
   const double sorg_harvest = 1.0;
@@ -162,6 +165,12 @@ Harvesting::operator() (const symbol column_name,
   production.NSOrg -= (NEYRm + SOrg_N_Loss);
   production.NCrop -= 
     (Crop_N_Yield + Crop_N_Loss - (Dead_N_Yield + Dead_N_Loss));
+  production.CStem -= (Stem_C_Yield + Stem_C_Loss);
+  production.CDead -= (Dead_C_Yield + Dead_C_Loss);
+  production.CLeaf -= (Leaf_C_Yield + Leaf_C_Loss);
+  production.CSOrg -= (CEYRm + SOrg_C_Loss);
+  production.CCrop -= 
+    (Crop_C_Yield + Crop_C_Loss - (Dead_C_Yield + Dead_C_Loss));
 
   production.WStem = max(0.0, production.WStem);
   production.WDead = max(0.0, production.WDead);
@@ -262,15 +271,18 @@ Harvesting::operator() (const symbol column_name,
   // Check mass balance so far.
   double total_new_W = production.WSOrg + production.WStem
     + production.WLeaf + production.WDead + production.WRoot;
-  daisy_assert (approximate (total_old_W, total_new_W + Crop_W_Yield + Crop_W_Loss));
+  daisy_assert (approximate (total_old_W,
+                             total_new_W + Crop_W_Yield + Crop_W_Loss));
   double total_new_C = production.WSOrg * C_C_SOrg 
     + production.WStem * C_C_Stem
     + production.WLeaf * C_C_Leaf
     + production.WDead * C_C_Dead
     + production.WRoot * C_C_Root;
-  daisy_assert (approximate (total_old_C, total_new_C + Crop_C_Yield + Crop_C_Loss));
+  daisy_assert (approximate (total_old_C,
+                             total_new_C + Crop_C_Yield + Crop_C_Loss));
   double total_new_N = production.NCrop + production.NDead;
-  daisy_assert (approximate (total_old_N, total_new_N + Crop_N_Yield + Crop_N_Loss));
+  daisy_assert (approximate (total_old_N,
+                             total_new_N + Crop_N_Yield + Crop_N_Loss));
 
   // Dead or alive?
   if (!kill_off && DS < DSmax
@@ -299,7 +311,17 @@ Harvesting::operator() (const symbol column_name,
 
 
       // Add crop to residuals.
+#if 0
+      TmpStream tmp;
+      tmp () << "CH2OPool = " << production.CH2OPool << "g CH2O/m^2";
+      Assertion::message (tmp.str ());
+
+      double extra_C = production.CH2OPool * (12./30.);
+#else
+      // The CH2O pool is missing.
       double extra_C = 0.0;
+#endif
+
       double extra_N = 0.0;
       if (production.WStem < 0.1)
 	{
@@ -326,8 +348,8 @@ Harvesting::operator() (const symbol column_name,
       Dead_N_Loss += production.NDead;
       if (production.WLeaf < 0.1)
 	{
-	  extra_C = C_C_Leaf * production.WLeaf;
-	  extra_N = production.NLeaf;
+	  extra_C += C_C_Leaf * production.WLeaf;
+	  extra_N += production.NLeaf;
 	}
       else
 	AM_leaf.add (C_C_Leaf * production.WLeaf * m2_per_cm2, 
@@ -337,8 +359,8 @@ Harvesting::operator() (const symbol column_name,
       Leaf_N_Loss += production.NLeaf;
       if (production.WSOrg < 0.1)
 	{
-	  extra_C = C_C_SOrg * production.WSOrg;
-	  extra_N = production.NSOrg;
+	  extra_C += C_C_SOrg * production.WSOrg;
+	  extra_N += production.NSOrg;
 	}
       else
 	AM_sorg.add (C_C_SOrg * production.WSOrg * m2_per_cm2, 
@@ -346,23 +368,26 @@ Harvesting::operator() (const symbol column_name,
       SOrg_W_Loss += production.WSOrg;
       SOrg_C_Loss += production.WSOrg * C_C_SOrg;
       SOrg_N_Loss += production.NSOrg;
+
       daisy_assert (WRoot == 0.0 || NRoot > 0.0);
+      const double Root_C = (WRoot * C_C_Root + extra_C) * m2_per_cm2;
+      const double Root_N = (NRoot + extra_N) * m2_per_cm2;
       if (accumulate (density.begin (), density.end (), 0.0) > 0.0)
 	{
-	  production.AM_root->add (geometry,
-				   (WRoot * C_C_Root + extra_C) * m2_per_cm2,
-				   (NRoot + extra_N) * m2_per_cm2,
-				   density);
-	  geometry.add (residuals_N_soil, density, NRoot * m2_per_cm2);
-	  geometry.add (residuals_C_soil, density, 
-			WRoot * C_C_Root * m2_per_cm2);
+	  production.AM_root->add (geometry, Root_C, Root_N, density);
+	  geometry.add (residuals_N_soil, density, Root_N);
+	  geometry.add (residuals_C_soil, density, Root_C);
+#if 0
+          TmpStream tmp;
+          tmp () << "Adding " << extra_C << " g C/cm^2 dead roots to soil";
+          Assertion::message (tmp.str ());
+#endif
 	}
       else
 	{
-	  production.AM_root->add ((WRoot * C_C_Root + extra_C) * m2_per_cm2,
-				   (NRoot + extra_N) * m2_per_cm2);
-	  residuals_N_top += NRoot;
-	  residuals_C_top += WRoot * C_C_Root;
+	  production.AM_root->add (Root_C, Root_N);
+	  residuals_N_top += NRoot + extra_N;
+	  residuals_C_top += WRoot * C_C_Root + extra_C;
 	}
       Root_W_Loss = production.WRoot;
       Root_C_Loss = production.WRoot * C_C_Root;

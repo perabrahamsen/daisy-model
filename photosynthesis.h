@@ -22,7 +22,6 @@
 #ifndef PHOTOSYNTHESIS_H
 #define PHOTOSYNTHESIS_H
 
-class Bioclimate;
 class CanopyStandard;
 class Phenology;
 class AttributeList;
@@ -30,6 +29,8 @@ class Syntax;
 class Log;
 class PLF;
 class Treelog;
+
+#include <vector>
 
 class Photosynthesis 
 {
@@ -42,7 +43,10 @@ private:
 
   // Simulation.
 public:
-  double operator () (const Bioclimate& bioclimate, 
+  double operator () (double Ta,
+                      const std::vector<double>& PAR,
+                      const std::vector<double>& PAR_Height,
+                      const double PAR_LAI,
 		      CanopyStandard& canopy,
 		      Phenology& development, Treelog&) const;
 

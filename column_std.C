@@ -43,6 +43,7 @@ private:
   // Log variables.
 private:
   double seed_N;
+  double seed_C;
   double fertilized_NO3_total;
   double fertilized_NH4_total;
   double volatilization_total;
@@ -111,7 +112,7 @@ public:
 
 void 
 ColumnStandard::sow (Treelog& msg, const AttributeList& al)
-{ seed_N += vegetation.sow (msg, al, soil, organic_matter); }
+{ vegetation.sow (msg, al, soil, organic_matter, seed_N, seed_C); }
 
 // We need to convert from mm * mg N / liter to g N/m^2.
 // mm / liter = 1/m^2
@@ -346,6 +347,7 @@ ColumnStandard::clear ()
   organic_matter.clear ();
 
   seed_N = 0.0;
+  seed_C = 0.0;
   fertilized_NO3_total = 0.0;
   fertilized_NH4_total = 0.0;
   fertilized_NO3_surface = 0.0;
@@ -418,6 +420,7 @@ ColumnStandard::output_inner (Log& log) const
   output_submodule (denitrification, "Denitrification", log);
   output_value (second_year_utilization_, "second_year_utilization", log);
   output_variable (seed_N, log);
+  output_variable (seed_C, log);
   output_value (fertilized_NO3_total, "fertilized_NO3", log);
   output_value (fertilized_NH4_total, "fertilized_NH4", log);
   output_variable (fertilized_NO3_surface, log);
@@ -474,6 +477,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),
     seed_N (0.0),
+    seed_C (0.0),
     fertilized_NO3_total (0.0),
     fertilized_NH4_total (0.0),
     volatilization_total (0.0),
@@ -553,30 +557,32 @@ The denitrification process.",
     syntax.add ("second_year_utilization", "kg N/ha", Syntax::State,
 		"Estimated accumulated second year fertilizer effect.");
     alist.add ("second_year_utilization", 0.0);
-    syntax.add ("seed_N", "kg N/ha", Syntax::LogOnly,
+    syntax.add ("seed_N", "kg N/ha/h", Syntax::LogOnly,
 		"Amount of nitrogen in seed applied this time step.");
-    syntax.add ("fertilized_NO3", "kg N/ha", Syntax::LogOnly,
+    syntax.add ("seed_C", "kg C/ha/h", Syntax::LogOnly,
+		"Amount of carbon in seed applied this time step.");
+    syntax.add ("fertilized_NO3", "kg N/ha/h", Syntax::LogOnly,
 		"Amount of nitrate applied to surface this time step.\n\
 This does include nitrate incorporated in the soil.");
-    syntax.add ("fertilized_NH4", "kg N/ha", Syntax::LogOnly,
+    syntax.add ("fertilized_NH4", "kg N/ha/h", Syntax::LogOnly,
 		"Amount of ammonium applied to surface this time step.\n\
 This includes both ammonium lost due to volatilization, and ammonium\n\
 incorporated in the soil.");
-    syntax.add ("fertilized_NO3_surface", "kg N/ha", Syntax::LogOnly,
+    syntax.add ("fertilized_NO3_surface", "kg N/ha/h", Syntax::LogOnly,
 		"Amount of nitrate applied to surface this time step.\n\
 This does not include nitrate incorporated in the soil.");
-    syntax.add ("fertilized_NH4_surface", "kg N/ha", Syntax::LogOnly,
+    syntax.add ("fertilized_NH4_surface", "kg N/ha/h", Syntax::LogOnly,
 		"Amount of ammonium applied to surface this time step.\n\
 This includes ammonium lost due to volatilization, but not ammonium\n\
 incorporated in the soil.");
-    syntax.add ("fertilized_DM", "ton DM/ha", Syntax::LogOnly,
+    syntax.add ("fertilized_DM", "ton DM/ha/h", Syntax::LogOnly,
 		"Amount of dry matter applied this time step.\n\
 This includes dry matter incorporated directly in the soil.");
-    syntax.add ("first_year_utilization", "kg N/ha", Syntax::LogOnly,
+    syntax.add ("first_year_utilization", "kg N/ha/h", Syntax::LogOnly,
 		"Estimated first year fertilizer effect.");
-    syntax.add ("volatilization", "kg N/ha", Syntax::LogOnly, "\
+    syntax.add ("volatilization", "kg N/ha/h", Syntax::LogOnly, "\
 Amount of NH4 volatilization, also from incorporated fertilizer.");
-    syntax.add ("volatilization_surface", "kg N/ha", Syntax::LogOnly, "\
+    syntax.add ("volatilization_surface", "kg N/ha/h", Syntax::LogOnly, "\
 Amount of NH4 volatilization, only from surface applied fertilizer.");
   }
 } column_syntax;

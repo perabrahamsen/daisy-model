@@ -55,6 +55,7 @@ struct VegetationCrops : public Vegetation
   } forced_LAI;
 
   // Canopy structure.
+  double shared_light_fraction_; // Light not reserved a specific crop.
   double LAI_;			// Total LAI of all crops on this column [0-]
   double height_;		// Max crop height in canopy [cm]
   double cover_;		// Fraction of soil covered by crops [0-1]
@@ -74,6 +75,8 @@ struct VegetationCrops : public Vegetation
   double interception_capacity_;// Canopy water storage capacity [mm]
 
   // Queries.
+  double shared_light_fraction () const
+  { return shared_light_fraction_; }
   double rs_min () const	// Minimum transpiration resistance.
   { return CanopyAverage (&Crop::rs_min) ; }
   double rs_max () const	// Maximum transpiration resistance.
@@ -148,8 +151,9 @@ struct VegetationCrops : public Vegetation
 		vector<double>& residuals_N_soil,
 		vector<double>& residuals_C_soil,
 		Treelog&);
-  double sow (Treelog& msg, 
-	      const AttributeList& al, const Geometry&, OrganicMatter&);
+  void sow (Treelog& msg, 
+            const AttributeList& al, const Geometry&, OrganicMatter&, 
+            double& seed_N /* kg/ha */, double& seed_C /* kg/ha */);
   void sow (Treelog& msg, const AttributeList& al, const Geometry&);
   void output (Log&) const;
 
@@ -297,7 +301,6 @@ VegetationCrops::tick (const Time& time,
 	ForcedLAI = -1.0;
     }
   
-
   // Uptake and convertion of matter.
   for (CropList::iterator crop = crops.begin(); 
        crop != crops.end(); 
@@ -329,6 +332,9 @@ VegetationCrops::tick (const Time& time,
 void 
 VegetationCrops::reset_canopy_structure (Treelog& msg)
 {
+  // Shared light.
+  shared_light_fraction_= 1.0;
+      
   // Reset vegetation state.
   LAI_ = 0.0;
   height_ = 0.0;
@@ -339,6 +345,7 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
        crop != crops.end(); 
        crop++)
     {
+      shared_light_fraction_ -= (*crop)->minimum_light_fraction ();
       const double crop_LAI = (*crop)->LAI ();
       if (crop_LAI > 0.0)
 	{
@@ -350,6 +357,9 @@ VegetationCrops::reset_canopy_structure (Treelog& msg)
 	}
     }
   
+  if (shared_light_fraction_ < -1e-20)
+    throw ("Sum of minumum light fraction greater than 1");
+
   if (LAI_ > 0.0)
     {
       // Check that we calculated LAIvsH right.
@@ -548,10 +558,11 @@ VegetationCrops::harvest (const symbol column_name,
   reset_canopy_structure (msg);
 }
 
-double
+void
 VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      const Geometry& geometry,
-		      OrganicMatter& organic_matter)
+		      OrganicMatter& organic_matter, 
+                      double& seed_N, double& seed_C)
 {
   Crop& crop = Librarian<Crop>::create (al);
   const symbol name = crop.name;
@@ -563,7 +574,8 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 If you want two " + name + " you should rename one of them");
   crop.initialize_organic (msg, geometry, organic_matter);
   crops.push_back (&crop);
-  return crop.total_N ();
+  seed_N += crop.total_N ();
+  seed_C += crop.total_C ();
 }
 
 void
@@ -605,6 +617,7 @@ VegetationCrops::VegetationCrops (const AttributeList& al)
   : Vegetation (al),
     crops (),			// deque, so we can't use map_create.
     forced_LAI (al.alist_sequence ("ForcedLAI")),
+    shared_light_fraction_ (1.0),
     LAI_ (0.0),
     height_ (0.0),
     cover_ (0.0),

@@ -45,6 +45,7 @@ struct BioclimateStandard : public Bioclimate
   double LAI_;			// Total LAI of all crops on this column. [0-]
   vector<double> Height;	// Height in cm of each endpoint in c.d.
   vector<double> PAR_;		// PAR of each interval of c.d.
+  double shared_light_fraction_; // Fraction of field with light competition.
 
   // Canopy Tick.
   void CanopyStructure (const Vegetation&);
@@ -126,14 +127,13 @@ struct BioclimateStandard : public Bioclimate
   void ChemicalDistribution (Surface& surface, const Vegetation&);
 
   // Radiation.
-  void RadiationDistribution (const Weather&, const Vegetation&);
-  void IntensityDistribution (double Rad0, double Ext, 
-			      vector <double>& Rad) const;
+  void RadiationDistribution (const Vegetation&);
 
   // Weather.
   double daily_air_temperature_; // Air temperature in canopy. [dg C]
   double day_length_;		// From weather (does not belong here) [h].
   double daily_global_radiation_; // From weather [W/m2].
+  double hourly_global_radiation_; // From weather [W/m2].
 
   // Simulation
   void tick (const Time&, Surface&, const Weather&, 
@@ -141,22 +141,24 @@ struct BioclimateStandard : public Bioclimate
   void output (Log&) const;
 
   // Canopy.
-  int NumberOfIntervals () const
-    { return No; }
-  double height (int i) const
-    { return Height[i]; }
-  double PAR (int i) const
-    { return PAR_[i]; }
+  const vector<double>& height () const
+  { return Height; }
+  const vector<double>& PAR () const
+  { return PAR_; }
   double LAI () const
-    { return LAI_; }
+  { return LAI_; }
+  double shared_light_fraction () const
+ { return shared_light_fraction_; }
 
   // Weather.
   double daily_air_temperature () const
-    { return daily_air_temperature_; }
+  { return daily_air_temperature_; }
   double day_length () const
-    { return day_length_; }
+  { return day_length_; }
   double daily_global_radiation () const
-    { return daily_global_radiation_; }
+  { return daily_global_radiation_; }
+  double hourly_global_radiation () const
+  { return hourly_global_radiation_; }
 
   // Manager.
   void irrigate_overhead (double flux, double temp);
@@ -166,23 +168,23 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_subsoil (double flux);
   void set_subsoil_irrigation (double flux);
   void spray (symbol chemical, double amount) // [g/m^2]
-    { spray_.add (chemical, amount); }
+  { spray_.add (chemical, amount); }
   void harvest_chemicals (Chemicals& chemicals, double LAI)
-    { 
-      if (LAI_ > 0.0)
-	Chemicals::move_fraction (canopy_chemicals_storage, chemicals,
-				  LAI / LAI_);
-    }
+  { 
+    if (LAI_ > 0.0)
+      Chemicals::move_fraction (canopy_chemicals_storage, chemicals,
+                                LAI / LAI_);
+  }
   
   // Communication with external model.
   double get_evap_interception () const // [mm/h]
-    { return canopy_ea; }
+  { return canopy_ea; }
   double get_intercepted_water () const // [mm]
-    { return canopy_water_storage; }
+  { return canopy_water_storage; }
   double get_net_throughfall () const // [mm/h]
-    { return litter_water_out; }
+  { return litter_water_out; }
   double get_snow_storage () const // [mm]
-    { return snow.storage (); }
+  { return snow.storage (); }
   // Create.
   void initialize (const Weather&, Treelog&);
   BioclimateStandard (const AttributeList&);
@@ -228,8 +230,9 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
   : Bioclimate (al),
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
-    Height (al.integer ("NoOfIntervals") + 1),
-    PAR_ (al.integer ("NoOfIntervals") + 1),
+    Height (No + 1),
+    PAR_ (No + 1),
+    shared_light_fraction_ (1.0),
     pet (al.check ("pet") 
          ? &Librarian<Pet>::create (al.alist ("pet"))
          : NULL),
@@ -285,7 +288,8 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     surface_chemicals_in (),
     daily_air_temperature_ (0.0),
     day_length_ (0.0),
-    daily_global_radiation_ (0.0)
+    daily_global_radiation_ (0.0),
+    hourly_global_radiation_ (0.0)
 { }
 
 BioclimateStandard::~BioclimateStandard ()
@@ -298,6 +302,7 @@ void
 BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
   // Calculate values for the total crop canopy.
 {
+  shared_light_fraction_ = vegetation.shared_light_fraction ();
 
   // Update vegetation state.
   const PLF& HvsLAI = vegetation.HvsLAI ();
@@ -321,18 +326,13 @@ BioclimateStandard::CanopyStructure (const Vegetation& vegetation)
 }
 
 void 
-BioclimateStandard::RadiationDistribution (const Weather& weather, 
-					   const Vegetation& vegetation)
+BioclimateStandard::RadiationDistribution (const Vegetation& vegetation)
 {
   if (LAI () == 0.0)
     {
       fill (&PAR_[0], &PAR_[No+1], 0.0);
       return;
     }
-
-  // Fraction of Photosynthetically Active Radiation in Shortware
-  // incoming radiation. 
-  static const double PARinSi = 0.50;	
 
   // Average Canopy Extinction coefficient
   // (how fast the light dim as a  function of LAI passed).
@@ -347,21 +347,8 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
   const double ARExt = vegetation.EPext ();
 #endif 
 
-  const double PAR0 
-    = (1 - ACRef) * PARinSi * weather.hourly_global_radiation ();
-  IntensityDistribution (PAR0, ACExt, PAR_);
-}
-
-void
-BioclimateStandard::IntensityDistribution (const double Rad0,
-				      const double Ext,
-				      vector <double>& Rad) const
-{
-  daisy_assert (Rad.size () == No + 1);
-  const double dLAI = (LAI_ / No);
-    
-  for (int i = 0; i <= No; i++)
-    Rad[i] = Rad0 * exp (- Ext * dLAI * i);
+  radiation_distribution (No, LAI_, ACRef, hourly_global_radiation (),
+                          ACExt, PAR_);
 }
 
 void
@@ -623,10 +610,11 @@ BioclimateStandard::tick (const Time& time,
 {
   // Keep weather information during time step.
   // Remember this in case the crops should ask.
+  hourly_global_radiation_ = weather.hourly_global_radiation ();
   daily_global_radiation_ = weather.daily_global_radiation ();
   daily_air_temperature_ = weather.daily_air_temperature ();
   day_length_ = weather.day_length ();
-
+  
   // Add nitrogen deposit. 
   surface.fertilize (weather.deposit ());
 
@@ -634,7 +622,7 @@ BioclimateStandard::tick (const Time& time,
   CanopyStructure (vegetation);
 
   // Calculate total canopy, divide it intervalsm, and distribute PAR.
-  RadiationDistribution (weather, vegetation);
+  RadiationDistribution (vegetation);
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (time, surface, weather, vegetation,
@@ -692,10 +680,10 @@ BioclimateStandard::output (Log& log) const
   output_variable (total_ea, log);
   output_value (irrigation_overhead_old, "irrigation_overhead", log);
   output_value (irrigation_overhead_temperature, 
-	      "irrigation_overhead_temperature", log);
+                "irrigation_overhead_temperature", log);
   output_value (irrigation_surface_old, "irrigation_surface", log);
   output_value (irrigation_surface_temperature,
-	      "irrigation_surface_temperature", log);
+                "irrigation_surface_temperature", log);
   output_value (irrigation_subsoil_old + irrigation_subsoil_permanent,
                 "irrigation_subsoil", log);
   output_variable (irrigation_subsoil_permanent, log);
@@ -709,7 +697,7 @@ BioclimateStandard::output (Log& log) const
   output_variable (snow_water_in_temperature, log);
   output_variable (snow_water_out, log);
   output_value (snow_water_out_temperature, 
-	      "snow_water_out_temperature", log);
+                "snow_water_out_temperature", log);
   output_variable (canopy_ep, log);
   output_variable (canopy_ea, log);
   output_variable (canopy_water_storage, log);
@@ -784,22 +772,22 @@ BioclimateStandard::set_subsoil_irrigation (double flux)
 static struct BioclimateStandardSyntax
 {
   static Bioclimate& make (const AttributeList& al)
-    { return *new BioclimateStandard (al); }
+  { return *new BioclimateStandard (al); }
   
   BioclimateStandardSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
   
-      // Canopy structure.
-      syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const, "\
+    // Canopy structure.
+    syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const, "\
 Number of vertical intervals in which we partition the canopy.");
-      alist.add ("NoOfIntervals", 30);
+    alist.add ("NoOfIntervals", 30);
 
-      // External water sources and sinks.
-      syntax.add ("pet", Librarian<Pet>::library (), 
-                  Syntax::OptionalState, Syntax::Singleton, 
-		  "Potential Evapotranspiration component.\n\
+    // External water sources and sinks.
+    syntax.add ("pet", Librarian<Pet>::library (), 
+                Syntax::OptionalState, Syntax::Singleton, 
+                "Potential Evapotranspiration component.\n\
 \n\
 By default, choose depending on available climate date.\n\
 \n\
@@ -812,134 +800,134 @@ If the timestep is larger than 12, and daily minimum and maximum\n\
 temperature are available,  Samani and Hargreaves (Hargreaves).\n\
 \n\
 As a last resort,  Makkink (makkink) will be used.");
-      syntax.add ("total_ep", "mm/h", Syntax::LogOnly,
-		  "Potential evapotranspiration.");
-      syntax.add ("total_ea", "mm/h", Syntax::LogOnly,
-		  "Actual evapotranspiration.");
-      syntax.add ("irrigation_overhead", "mm/h", Syntax::LogOnly,
-		  "Irrigation above canopy.");
-      syntax.add ("irrigation_overhead_temperature", "dg C", Syntax::LogOnly,
-		  "Water temperature.");
-      syntax.add ("irrigation_surface", "mm/h", Syntax::LogOnly,
-		  "Irrigation below canopy.");
-      syntax.add ("irrigation_surface_temperature", "dg C", Syntax::LogOnly,
-		  "Water temperature.");
-      syntax.add ("irrigation_subsoil", "mm/h", Syntax::LogOnly,
-		  "Irrigation below soil surface this hour.");
-      syntax.add ("irrigation_subsoil_permanent", "mm/h", Syntax::State,
-		  "Long term irrigation below soil surface.");
-      alist.add ("irrigation_subsoil_permanent", 0.0);
-      syntax.add ("irrigation_total", "mm/h", Syntax::LogOnly,
-		  "Total irrigation above of below the soil surface.");
+    syntax.add ("total_ep", "mm/h", Syntax::LogOnly,
+                "Potential evapotranspiration.");
+    syntax.add ("total_ea", "mm/h", Syntax::LogOnly,
+                "Actual evapotranspiration.");
+    syntax.add ("irrigation_overhead", "mm/h", Syntax::LogOnly,
+                "Irrigation above canopy.");
+    syntax.add ("irrigation_overhead_temperature", "dg C", Syntax::LogOnly,
+                "Water temperature.");
+    syntax.add ("irrigation_surface", "mm/h", Syntax::LogOnly,
+                "Irrigation below canopy.");
+    syntax.add ("irrigation_surface_temperature", "dg C", Syntax::LogOnly,
+                "Water temperature.");
+    syntax.add ("irrigation_subsoil", "mm/h", Syntax::LogOnly,
+                "Irrigation below soil surface this hour.");
+    syntax.add ("irrigation_subsoil_permanent", "mm/h", Syntax::State,
+                "Long term irrigation below soil surface.");
+    alist.add ("irrigation_subsoil_permanent", 0.0);
+    syntax.add ("irrigation_total", "mm/h", Syntax::LogOnly,
+                "Total irrigation above of below the soil surface.");
 
-      // Water in snowpack.
-      syntax.add_submodule ("Snow", alist, Syntax::State, 
-			   "Surface snow pack.",
-			    Snow::load_syntax);
-      syntax.add ("snow_ep", "mm/h", Syntax::LogOnly,
-		  "Potential snow evaporation.");
-      syntax.add ("snow_ea", "mm/h", Syntax::LogOnly,
-		  "Actual snow evaporation.");
-      syntax.add ("snow_water_in", "mm/h", Syntax::LogOnly,
-		  "Water entering snow pack.");
-      syntax.add ("snow_water_in_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of water entering snow pack.");
-      syntax.add ("snow_water_out", "mm/h", Syntax::LogOnly,
-		  "Water leaving snow pack");
-      syntax.add ("snow_water_out_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of water leaving snow pack.");
+    // Water in snowpack.
+    syntax.add_submodule ("Snow", alist, Syntax::State, 
+                          "Surface snow pack.",
+                          Snow::load_syntax);
+    syntax.add ("snow_ep", "mm/h", Syntax::LogOnly,
+                "Potential snow evaporation.");
+    syntax.add ("snow_ea", "mm/h", Syntax::LogOnly,
+                "Actual snow evaporation.");
+    syntax.add ("snow_water_in", "mm/h", Syntax::LogOnly,
+                "Water entering snow pack.");
+    syntax.add ("snow_water_in_temperature", "dg C", Syntax::LogOnly,
+                "Temperature of water entering snow pack.");
+    syntax.add ("snow_water_out", "mm/h", Syntax::LogOnly,
+                "Water leaving snow pack");
+    syntax.add ("snow_water_out_temperature", "dg C", Syntax::LogOnly,
+                "Temperature of water leaving snow pack.");
 
-      // Water intercepted on canopy.
-      syntax.add ("canopy_ep", "mm/h", Syntax::LogOnly,
-		  "Potential canopy evaporation.");
-      syntax.add ("canopy_ea", "mm/h", Syntax::LogOnly,
-		  "Actual canopy evaporation.");
-      syntax.add ("canopy_water_storage", "mm", Syntax::State,
-		  "Intercepted water on canopy.");
-      alist.add ("canopy_water_storage", 0.0);
-      syntax.add ("canopy_water_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of incoming water.");
-      syntax.add ("canopy_water_in", "mm/h", Syntax::LogOnly,
-		  "Water entering canopy.");
-      syntax.add ("canopy_water_out", "mm/h", Syntax::LogOnly,
-		  "Canopy drip throughfall.");
-      syntax.add ("canopy_water_bypass", "mm/h", Syntax::LogOnly,
-		  "Water from above bypassing the canopy.");
+    // Water intercepted on canopy.
+    syntax.add ("canopy_ep", "mm/h", Syntax::LogOnly,
+                "Potential canopy evaporation.");
+    syntax.add ("canopy_ea", "mm/h", Syntax::LogOnly,
+                "Actual canopy evaporation.");
+    syntax.add ("canopy_water_storage", "mm", Syntax::State,
+                "Intercepted water on canopy.");
+    alist.add ("canopy_water_storage", 0.0);
+    syntax.add ("canopy_water_temperature", "dg C", Syntax::LogOnly,
+                "Temperature of incoming water.");
+    syntax.add ("canopy_water_in", "mm/h", Syntax::LogOnly,
+                "Water entering canopy.");
+    syntax.add ("canopy_water_out", "mm/h", Syntax::LogOnly,
+                "Canopy drip throughfall.");
+    syntax.add ("canopy_water_bypass", "mm/h", Syntax::LogOnly,
+                "Water from above bypassing the canopy.");
   
-      // Water intercepted by litter.
-      syntax.add ("litter_ep", "mm/h", Syntax::LogOnly,
-		  "Potential evaporation litter.");
-      syntax.add ("litter_ea", "mm/h", Syntax::LogOnly,
-		  "Actual litter evaporation.");
-      syntax.add ("litter_water_storage", "mm", Syntax::State,
-		  "Intercepted water on litter.");
-      alist.add ("litter_water_storage", 0.0);
-      syntax.add ("litter_water_temperature", "dg C", Syntax::LogOnly,
-		  "Temperature of incoming water.");
-      syntax.add ("litter_water_in", "mm/h", Syntax::LogOnly,
-		  "Water entering litter.");
-      syntax.add ("litter_water_out", "mm/h", Syntax::LogOnly,
-		  "Litter drip throughfall.");
+    // Water intercepted by litter.
+    syntax.add ("litter_ep", "mm/h", Syntax::LogOnly,
+                "Potential evaporation litter.");
+    syntax.add ("litter_ea", "mm/h", Syntax::LogOnly,
+                "Actual litter evaporation.");
+    syntax.add ("litter_water_storage", "mm", Syntax::State,
+                "Intercepted water on litter.");
+    alist.add ("litter_water_storage", 0.0);
+    syntax.add ("litter_water_temperature", "dg C", Syntax::LogOnly,
+                "Temperature of incoming water.");
+    syntax.add ("litter_water_in", "mm/h", Syntax::LogOnly,
+                "Water entering litter.");
+    syntax.add ("litter_water_out", "mm/h", Syntax::LogOnly,
+                "Litter drip throughfall.");
   
-      // Water in pond.
-      syntax.add ("pond_ep", "mm/h", Syntax::LogOnly,
-		  "Potential evaporation from pond.");
-      syntax.add ("pond_ea", "mm/h", Syntax::LogOnly,
-		  "Actual evaporation from pond.");
+    // Water in pond.
+    syntax.add ("pond_ep", "mm/h", Syntax::LogOnly,
+                "Potential evaporation from pond.");
+    syntax.add ("pond_ea", "mm/h", Syntax::LogOnly,
+                "Actual evaporation from pond.");
 
-      // Water going through soil surface.
-      syntax.add ("svat", Librarian<SVAT>::library (), 
-		  "Soil Vegetation Atmosphere component.");
-      AttributeList svat_alist;
-      svat_alist.add ("type", "none");
-      alist.add ("svat", svat_alist);
-      syntax.add ("soil_ep", "mm/h", Syntax::LogOnly,
-		  "Potential exfiltration.");
-      syntax.add ("soil_ea", "mm/h", Syntax::LogOnly,
-		  "Actual exfiltration.");
+    // Water going through soil surface.
+    syntax.add ("svat", Librarian<SVAT>::library (), 
+                "Soil Vegetation Atmosphere component.");
+    AttributeList svat_alist;
+    svat_alist.add ("type", "none");
+    alist.add ("svat", svat_alist);
+    syntax.add ("soil_ep", "mm/h", Syntax::LogOnly,
+                "Potential exfiltration.");
+    syntax.add ("soil_ea", "mm/h", Syntax::LogOnly,
+                "Actual exfiltration.");
 
-      // Water transpirated through plant roots.
-      syntax.add ("crop_ep", "mm/h", Syntax::LogOnly,
-		  "Potential transpiration.");
-      syntax.add ("crop_ea", "mm/h", Syntax::LogOnly,
-		  "Actual transpiration.");
-      syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
-		  "SVAT module induced stress, -1 means use water stress.");
+    // Water transpirated through plant roots.
+    syntax.add ("crop_ep", "mm/h", Syntax::LogOnly,
+                "Potential transpiration.");
+    syntax.add ("crop_ea", "mm/h", Syntax::LogOnly,
+                "Actual transpiration.");
+    syntax.add ("production_stress", Syntax::None (), Syntax::LogOnly,
+                "SVAT module induced stress, -1 means use water stress.");
 
-      // Chemicals.
-      Chemicals::add_syntax  ("spray", syntax, alist, Syntax::LogOnly,
-			      "Chemicals sprayed on field this time step.");
+    // Chemicals.
+    Chemicals::add_syntax  ("spray", syntax, alist, Syntax::LogOnly,
+                            "Chemicals sprayed on field this time step.");
 
-      Chemicals::add_syntax  ("snow_chemicals_storage", 
-			      syntax, alist, Syntax::State,
-			      "Chemicals stored in the snow pack.");
-      Chemicals::add_syntax  ("snow_chemicals_in",
-			      syntax, alist, Syntax::LogOnly,
-			      "Chemicals entering snow pack.");
-      Chemicals::add_syntax  ("snow_chemicals_out",
-			      syntax, alist, Syntax::LogOnly,
-			      "Chemicals leaking from snow pack.");
+    Chemicals::add_syntax  ("snow_chemicals_storage", 
+                            syntax, alist, Syntax::State,
+                            "Chemicals stored in the snow pack.");
+    Chemicals::add_syntax  ("snow_chemicals_in",
+                            syntax, alist, Syntax::LogOnly,
+                            "Chemicals entering snow pack.");
+    Chemicals::add_syntax  ("snow_chemicals_out",
+                            syntax, alist, Syntax::LogOnly,
+                            "Chemicals leaking from snow pack.");
 
-      Chemicals::add_syntax  ("canopy_chemicals_storage", 
-			      syntax, alist, Syntax::State,
-			      "Chemicals stored on canopy.");
-      Chemicals::add_syntax  ("canopy_chemicals_in",
-			      syntax, alist, Syntax::LogOnly,
-			      "Chemicals entering canopy.");
-      Chemicals::add_syntax  ("canopy_chemicals_dissipate",
-			      syntax, alist, Syntax::LogOnly,
-			      "Chemicals dissipating from canopy.");
-      Chemicals::add_syntax  ("canopy_chemicals_out",
-			      syntax, alist, Syntax::LogOnly,
-			      "Chemicals falling through canopy.");
+    Chemicals::add_syntax  ("canopy_chemicals_storage", 
+                            syntax, alist, Syntax::State,
+                            "Chemicals stored on canopy.");
+    Chemicals::add_syntax  ("canopy_chemicals_in",
+                            syntax, alist, Syntax::LogOnly,
+                            "Chemicals entering canopy.");
+    Chemicals::add_syntax  ("canopy_chemicals_dissipate",
+                            syntax, alist, Syntax::LogOnly,
+                            "Chemicals dissipating from canopy.");
+    Chemicals::add_syntax  ("canopy_chemicals_out",
+                            syntax, alist, Syntax::LogOnly,
+                            "Chemicals falling through canopy.");
 
-      Chemicals::add_syntax  ("surface_chemicals_in",
-			      syntax, alist, Syntax::LogOnly,
-			      "Chemicals entering soil surface.");
+    Chemicals::add_syntax  ("surface_chemicals_in",
+                            syntax, alist, Syntax::LogOnly,
+                            "Chemicals entering soil surface.");
 
-      // Add to library.
-      Librarian<Bioclimate>::add_type ("default", alist, syntax, &make);
-    }
+    // Add to library.
+    Librarian<Bioclimate>::add_type ("default", alist, syntax, &make);
+  }
 } BioclimateStandard_syntax;
 
 // bioclimate_std.C ends here

@@ -82,7 +82,8 @@ Geometry::total (const vector<double>& v) const
 }
 
 double
-Geometry::total (const vector<double>& v, double from, double to) const
+Geometry::total (const vector<double>& v, 
+                 const double from, const double to) const
 {
   double amount = 0.0;
   double old = 0.0;
@@ -100,7 +101,8 @@ Geometry::total (const vector<double>& v, double from, double to) const
 }
 
 void
-Geometry::add (vector<double>& v, double from, double to, double amount) const
+Geometry::add (vector<double>& v, const double from, const double to, 
+               const double amount) const
 {
   daisy_assert (to < from);
   const double old_total = total (v);
@@ -123,7 +125,15 @@ Geometry::add (vector<double>& v, double from, double to, double amount) const
       old = zplus_[i];
     }
 
-  daisy_assert (approximate (old_total + amount, total (v)));
+  const double new_total = total (v);
+  if (!approximate (old_total + amount, new_total))
+    {
+      TmpStream tmp;
+      tmp () << "Olt total (" << old_total << ") + amount (" << amount
+             << ") != new total (" << total (v) 
+             << "); [" << from << ":" << to << "]";
+      daisy_warning (tmp.str ());
+    }
 }
 
 void

@@ -90,6 +90,14 @@ Production::total_N () const
 }
 
 double
+Production::total_C () const
+{
+  // kg/ha -> g/m^2
+  const double conv = 1000.0 / (100.0 * 100.0);
+  return CCrop / conv;
+}
+
+double
 Production::maintenance_respiration (double r, double w, double T)
 {
   if (w <= 0.0)
@@ -182,15 +190,12 @@ Production::tick (const double AirT, const double SoilT,
       IncWSOrg = E_SOrg * f_SOrg * AssG;
       IncWRoot = E_Root * f_Root * AssG;
       CH2OPool -= AssG;
-      NetAss -= LeafGrowthRespCoef * f_Leaf * AssG
-        + StemGrowthRespCoef * f_Stem * AssG
-        + SOrgGrowthRespCoef * f_SOrg * AssG
-        + RootGrowthRespCoef * f_Root * AssG;
-      RootResp += RootGrowthRespCoef * f_Root * AssG;
       GrowthRespiration = LeafGrowthRespCoef * f_Leaf * AssG
         + StemGrowthRespCoef * f_Stem * AssG
         + SOrgGrowthRespCoef * f_SOrg * AssG
         + RootGrowthRespCoef * f_Root * AssG;
+      NetAss -= GrowthRespiration;
+      RootResp += RootGrowthRespCoef * f_Root * AssG;
       Respiration += GrowthRespiration;
     }
   else
@@ -395,12 +400,12 @@ Production::output (Log& log) const
   output_variable (WRoot, log);
   output_variable (WSOrg, log);
   output_variable (WDead, log);
-  output_variable (CCrop, log);
   output_variable (CLeaf, log);
   output_variable (CStem, log);
   output_variable (CRoot, log);
   output_variable (CSOrg, log);
   output_variable (CDead, log);
+  output_variable (CCrop, log);
   output_variable (NLeaf, log);
   output_variable (NStem, log);
   output_variable (NRoot, log);
@@ -506,7 +511,7 @@ Crop production in the default crop model.");
   alist.add ("LfRtRelRtRes", 0.80);
 
   // Variables.
-  syntax.add ("CH2OPool", "g DM/m^2", Syntax::State, "CH2O Pool.");
+  syntax.add ("CH2OPool", "g CH2O/m^2", Syntax::State, "CH2O Pool.");
   alist.add ("CH2OPool", 0.001);
   syntax.add ("WLeaf", "g DM/m^2", Syntax::State, "Leaf dry matter weight.");
   alist.add ("WLeaf", 0.001);
@@ -520,12 +525,12 @@ Crop production in the default crop model.");
   syntax.add ("WDead", "g DM/m^2", Syntax::State,
 	      "Dead leaves dry matter weight.");
   alist.add ("WDead", 0.000);
-  syntax.add ("CCrop", "g C/m^2", Syntax::LogOnly, "Crop C weight.");
   syntax.add ("CLeaf", "g C/m^2", Syntax::LogOnly, "Leaf C weight.");
   syntax.add ("CStem", "g C/m^2", Syntax::LogOnly, "Stem C weight.");
   syntax.add ("CRoot", "g C/m^2", Syntax::LogOnly, "Root C weight.");
   syntax.add ("CSOrg", "g C/m^2", Syntax::LogOnly, "Storage organ C weight.");
   syntax.add ("CDead", "g C/m^2", Syntax::LogOnly, "Dead leaves C weight.");
+  syntax.add ("CCrop", "g C/m^2", Syntax::LogOnly, "Crop C weight.");
   syntax.add ("NLeaf", "g N/m^2", Syntax::State,
 	      "Nitrogen stored in the leaves.");
   alist.add ("NLeaf", 0.000);
@@ -659,12 +664,12 @@ Production::Production (const AttributeList& al)
     WRoot (al.number ("WRoot")),
     WSOrg (al.number ("WSOrg")),
     WDead (al.number ("WDead")),
-    CCrop (0.0),
-    CLeaf (0.0),
-    CStem (0.0),
-    CRoot (0.0),
-    CSOrg (0.0),
-    CDead (0.0),
+    CLeaf (WLeaf * DM_to_C_factor (E_Leaf)),
+    CStem (WStem * DM_to_C_factor (E_Stem)),
+    CRoot (WRoot * DM_to_C_factor (E_Root)),
+    CSOrg (WSOrg * DM_to_C_factor (E_SOrg)),
+    CDead (WDead * DM_to_C_factor (E_Leaf)),
+    CCrop (CLeaf + CStem + CSOrg + CRoot + CDead + CH2OPool * 12./30.),
     NCrop (al.number ("NCrop", -42.42e42)),
     NLeaf (al.number ("NLeaf")),
     NStem (al.number ("NStem")),

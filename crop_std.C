@@ -1,7 +1,7 @@
 // crop_std.C
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2004 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2004 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -57,9 +57,13 @@ public:
   CrpN& nitrogen;
   const bool enable_water_stress;
   const bool enable_N_stress;
+  const double min_light_fraction;
 
   // Communication with Bioclimate.
 public:
+  double minimum_light_fraction () const
+  { return min_light_fraction; }
+
 #if 0
   double water_stress () const // [0-1] (0 = full production)
   { return root_system.water_stress; }
@@ -136,6 +140,8 @@ public:
   double DM (double height) const;
   double total_N () const
   { return production.total_N (); }
+  double total_C () const
+  { return production.total_C (); }
 
   // Create and Destroy.
 public:
@@ -294,9 +300,36 @@ CropStandard::tick (const Time& time,
   const double nitrogen_stress = root_system.nitrogen_stress;
   const double water_stress = root_system.water_stress;
 
-  if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
+  if (bioclimate.hourly_global_radiation () > 1e-10)
     {
-      double Ass = photosynthesis (bioclimate, canopy, development, msg);
+      double Ass = 0.0;
+
+      if (bioclimate.shared_light_fraction () > 1e-10)
+        {
+          // Shared light.
+          const vector<double>& PAR = bioclimate.PAR ();
+          daisy_assert (PAR.size () > 1);
+          Ass += photosynthesis (bioclimate.daily_air_temperature (),
+                                 PAR, bioclimate.height (),
+                                 bioclimate.LAI (),
+                                 canopy, development, msg)
+            * bioclimate.shared_light_fraction ();
+        }
+      if (min_light_fraction > 1e-10)
+        {
+          // Private light.
+          const int No = 30;
+          vector<double> PAR (No + 1, 0.0);
+          Bioclimate::radiation_distribution 
+            (No, LAI (), PARref (), bioclimate.hourly_global_radiation (),
+             PARext (), PAR); 
+          Ass += photosynthesis (bioclimate.daily_air_temperature (),
+                                 PAR, bioclimate.height (),
+                                 bioclimate.LAI (),
+                                 canopy, development, msg)
+            * min_light_fraction;
+        }
+
       production.PotCanopyAss = Ass;
       if (root_system.production_stress >= 0.0)
 	Ass *= (1.0 - root_system.production_stress);
@@ -469,7 +502,8 @@ CropStandard::CropStandard (const AttributeList& al)
     photosynthesis (*new Photosynthesis (al.alist ("LeafPhot"))),
     nitrogen (*new CrpN (al.alist ("CrpN"))),
     enable_water_stress (al.flag ("enable_water_stress")),
-    enable_N_stress (al.flag ("enable_N_stress"))
+    enable_N_stress (al.flag ("enable_N_stress")),
+    min_light_fraction (al.number ("min_light_fraction"))
 { }
 
 CropStandard::~CropStandard ()
@@ -525,6 +559,13 @@ CropStandardSyntax::CropStandardSyntax ()
   syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::Const,
 	      "Set this true to let nitrogen stress limit production.");
   alist.add ("enable_N_stress", true);
-
+  syntax.add_fraction ("min_light_fraction", Syntax::Const, "\n\
+When multiple crops are competing for light, this parameter specifies\n\
+a minumum amount of the light this crop will receive.  The idea is\n\
+that the field has patches where one crop is dominating, as specified\n\
+by this parameter, and in these patches the crop will not have to\n\
+compete for light.  The crop still needs LAI in order to catch the\n\
+light though.  Competition for water and nutrients are unaffected.");
+  alist.add ("min_light_fraction", 0.0);
   Librarian<Crop>::add_type ("default", alist, syntax, &make);
 }

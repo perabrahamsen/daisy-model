@@ -17,6 +17,10 @@ interest is water and nitrogen uptake at different depths, and the\n\
 vertical leaf area distribution, which are used for competition with\n\
 other crops.";
 
+double 
+Crop::minimum_light_fraction () const
+{ return 0.0; }
+
 #if 0
 double 
 Crop::water_stress () const

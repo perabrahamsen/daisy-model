@@ -48,6 +48,34 @@ double
 Bioclimate::get_snow_storage () const
 { daisy_assert (false); }
 
+void
+Bioclimate::radiation_distribution (const int No, const double LAI,
+                                    const double Ref,
+                                    const double Si,
+                                    const double Ext,
+                                    vector <double>& Rad)
+{
+  // Fraction of Photosynthetically Active Radiation in Shortware
+  // incoming radiation. 
+  static const double PARinSi = 0.50;	
+
+  const double PAR0 = (1 - Ref) * PARinSi * Si;
+  intensity_distribution (No, LAI, PAR0, Ext, Rad);
+}
+
+void
+Bioclimate::intensity_distribution (const int No, const double LAI,
+                                    const double Rad0,
+                                    const double Ext,
+                                    vector <double>& Rad)
+{
+  daisy_assert (Rad.size () == No + 1);
+  const double dLAI = (LAI / No);
+    
+  for (int i = 0; i <= No; i++)
+    Rad[i] = Rad0 * exp (- Ext * dLAI * i);
+}
+
 Bioclimate::Bioclimate (const AttributeList& al)
   : name (al.identifier ("type")),
     alist (al)

@@ -82,12 +82,12 @@ public:
   double WRoot;			// Root dry matter weight [g/m2]
   double WSOrg;			// Storage organ dry matter weight [g/m2]
   double WDead;			// Dead plant material [g/m2]
-  double CCrop;			// C stored in dry matter [g/m2]
   double CLeaf;			// Leaf C weight [g/m2]
   double CStem;			// Stem C weight [g/m2]
   double CRoot;			// Root C weight [g/m2]
   double CSOrg;			// Storage organ C weight [g/m2]
   double CDead;			// Dead plant material C [g/m2]
+  double CCrop;			// C stored in dry matter [g/m2]
   double NCrop;			// Nitrogen stored in dry matter [g/m2]
   double NLeaf;			// Leaf nitrogen [g/m2]
   double NStem;			// Stem nitrogen [g/m2]
@@ -130,6 +130,7 @@ private:
 public:
   double DM () const;		// Shoot dry matter, [kg DM/ha].
   double total_N () const;	// N content [kg N/ha]
+  double total_C () const;	// C content [kg N/ha]
 
   // Simulation.
 private:

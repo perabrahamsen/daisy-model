@@ -55,6 +55,7 @@ public:
 
   // Communication with Bioclimate.
 public:
+  virtual double minimum_light_fraction () const;
 #if 0
   virtual double water_stress () const = 0;	// [0-1] (0 = full production)
   virtual double nitrogen_stress () const = 0; // [0-1] (1 = no production)
@@ -120,6 +121,7 @@ public:
   static const double DSremove;
   virtual double DM (double height) const = 0; // Shoot dry matter, [kg DM/ha].
   virtual double total_N () const = 0; // N content [kg N/ha]
+  virtual double total_C () const = 0; // C content [kg C/ha]
 
   // Create and Destroy.
 public:

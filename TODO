@@ -1,21 +1,11 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Tillage log
-
-** Log vand
-
-** Vandbalance med from != 0
-
-** Check Anders behov, lav evt ny log.
-
-** lav dist, send brev til Anders.
+* En "mindste lys" planteparameter.
 
 * Advarsel hvis "from" eller "to" ikke ligger ved et interval.
 
 Alternativt, tilføj grænser.  Men det vil betyde at logging kan ændre
 resultat. 
-
-* En "mindste lys" planteparameter.
 
 * FertOrgaNic 
 
@@ -110,6 +100,8 @@ Inputs, Outputs og Pool changes
 Balance = Input - Output - Pool changes
 
 * Carbon balance.
+
+Få den til at passe ved høst.
 
 * Select::method { current, sum, max, min, average }
 

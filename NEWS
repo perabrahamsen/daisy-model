@@ -12,6 +12,33 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.41
+
+** New "Vinterraps" parameterization by Christian Thirup.
+
+This is a winter rape that give yields corresponding to Danish
+averages. 
+
+** Seed_C is now logged.
+
+** New carbon summaries: "Litter Carbon Balance" and "Soil Carbon Balance".
+
+** New "min_light_fraction" crop parameter.
+
+You can now specify that a certain fraction of the crop in a mixed
+crop field get exclusive access to the light.  For example
+
+  (progn
+    (sow "Spring Barley" )
+    (sow ("Grass to grain" (min_light_fraction 0.2))))
+
+Here, 20% of the light will be reserved for the grass, for the
+remaining 80% the grass and barley will compete, with the highest crop
+shadowing for the other.
+
+This is intended to emulate small "patches" in the field, where one
+crop dominates for some reason.
+
 * 3.40
 
 ** Fixed bug when logging with "from" not equal to 0.

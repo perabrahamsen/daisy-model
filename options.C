@@ -1,7 +1,7 @@
 // options.C --- Parsing command line options.
 // 
-// Copyright 1996-2003 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2003 KVL.
+// Copyright 1996-2004 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2004 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -67,7 +67,7 @@ Options::copyright (Treelog& out)
 {
   out.message (string ("Daisy crop/soil simulation version ")
 	       + version + ". (" __DATE__ ")\n"
-	       "Copyright 1996 - 2003 Per Abrahamsen, "
+	       "Copyright 1996 - 2004 Per Abrahamsen, "
 	       "Søren Hansen and KVL.");
 }
 

@@ -148,7 +148,8 @@ struct VegetationPermanent : public Vegetation
 		double&, double&, double&, vector<double>&, vector<double>&,
 		Treelog&)
   { }
-  double sow (Treelog&, const AttributeList&, const Geometry&, OrganicMatter&)
+  void sow (Treelog&, const AttributeList&, const Geometry&, OrganicMatter&, 
+            double& /* kg/ha */, double& /* kg/ha */)
   { throw "Can't sow on permanent vegetation"; }
   void sow (Treelog&, const AttributeList&, const Geometry&)
   { throw "Can't sow on permanent vegetation"; }

@@ -29,6 +29,10 @@ Librarian<Vegetation>::Content* Librarian<Vegetation>::content = NULL;
 const char *const Vegetation::description = "\
 That green stuff.";
 
+double 
+Vegetation::shared_light_fraction () const
+{ return 1.0; }
+
 double
 Vegetation::EpInterchange () const
 { return EpInterchange_; }
