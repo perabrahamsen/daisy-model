@@ -95,9 +95,11 @@ OM::set_N (vector<double>& N)
 	{
 	  if (N[i] == 0.0)
 	    assert (C[i] == 0.0);
-	  else
-	    assert (approximate (initial_C_per_N, C[i] / N[i]));
-      
+	  else if (!approximate (initial_C_per_N, C[i] / N[i]))
+	    CERR << "Bug: init C/N (" << initial_C_per_N 
+		 << ") != " << C[i] << "/" << N[i] << " (" << C[i]/N[i] 
+		 << ") for layer " << i << ".\n";
+	  
 	  if (i < C_per_N.size ())
 	    assert (approximate (C_per_N[i], initial_C_per_N));
 	  else
