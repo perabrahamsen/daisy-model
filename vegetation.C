@@ -66,13 +66,13 @@ Vegetation::load_syntax (Syntax& syntax, AttributeList&)
   syntax.add ("HvsLAI", "cm", "m^2/m^2", Syntax::LogOnly, "\
 Height in which there is a given LAI below in total canopy");
   syntax.add ("ACExt", Syntax::None (), Syntax::LogOnly,
-	      "Canopy extinction coefficient\n\
-\(how fast the light dim as a function of LAI passed)");
-  syntax.add ("ACRef", Syntax::None (), Syntax::LogOnly,
+	      "Canopy extinction coefficient\
+\n(how fast the light dim as a function of LAI passed)");
+   syntax.add ("ACRef", Syntax::None (), Syntax::LogOnly,
 	      "Canopy reflection coefficient");
   syntax.add ("ARExt", Syntax::None (), Syntax::LogOnly,
-	      "Radiation Extinction coefficient\n\
-\(like ACExt, but for all radiation, not just light)");
+	      "Radiation Extinction coefficient\
+\n(like ACExt, but for all radiation, not just light)");
   syntax.add ("EpFactor", Syntax::None (), Syntax::LogOnly,
 	      "Reference to potential evapotranspiration");
   syntax.add ("albedo", Syntax::None (), Syntax::LogOnly,

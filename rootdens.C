@@ -21,6 +21,7 @@
 
 
 #include "rootdens.h"
+#include "check.h"
 
 EMPTY_TEMPLATE
 Librarian<Rootdens>::Content* Librarian<Rootdens>::content = NULL;
@@ -28,8 +29,17 @@ Librarian<Rootdens>::Content* Librarian<Rootdens>::content = NULL;
 const char *const Rootdens::description = "\
 Root density calculations.";
 
+void
+Rootdens::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("SpRtLength", "m/g", Check::positive (), Syntax::Const,
+	      "Specific root length");
+  alist.add ("SpRtLength", 100.0);
+}
+
 Rootdens::Rootdens (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.name ("type")),
+    SpRtLength (al.number ("SpRtLength"))
 { }
 
 Rootdens::~Rootdens ()

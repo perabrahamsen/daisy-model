@@ -565,8 +565,8 @@ The initial C/N ratio when this pool is created.\n\
 Negative numbers mean unspecified.");
   syntax.add ("initial_fraction", Syntax::None (), Syntax::Const, "\
 The initial fraction of the total available carbon\n\
-allocated to this pool for AOM.  One pool should be left unspecified\n\
-\(which corresponds to the default value, a large negative number).");
+allocated to this pool for AOM.  One pool should be left unspecified\
+\n(which corresponds to the default value, a large negative number).");
   alist.add ("initial_fraction", Unspecified);
 }
 

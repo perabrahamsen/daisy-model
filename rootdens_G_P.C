@@ -28,7 +28,6 @@
 struct Rootdens_G_P : public Rootdens
 {
   // Parameters.
-  const double SpRtLength;	// Specific root length [m/g]
   const double DensRtTip;	// Root density at (pot) pen. depth [cm/cm^3]
   const double MinDens;		// Minimal root density [cm/cm^3]
 
@@ -161,6 +160,7 @@ Rootdens_G_P::set_density (vector<double>& Density,
 	}
     }
 
+  assert (Density.size () == geometry.size ());
   unsigned int i = 0;
   for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
     Density[i] = extra + L0 * exp (a * geometry.z (i));
@@ -173,7 +173,6 @@ Rootdens_G_P::set_density (vector<double>& Density,
 
 Rootdens_G_P::Rootdens_G_P (const AttributeList& al)
   : Rootdens (al),
-    SpRtLength (al.number ("SpRtLength")),
     DensRtTip (al.number ("DensRtTip")),
     MinDens (al.number ("MinDens"))
 { }
@@ -185,13 +184,14 @@ Rootdens::default_model ()
   
   if (!alist.check ("type"))
     {
+      Syntax dummy;
+      Rootdens::load_syntax (dummy, alist);
       alist.add ("type", "Gerwitz+Page74");
       alist.add ("description", 
 		 "Use exponential function for root density.\n\
 \n\
 See Gerwitz, S. and E.R. Page (1974): An empirical mathematical model\n\
 to describe plant root systems.  J. Appl. Ecol. 11, 773-781.");
-      alist.add ("SpRtLength", 100.0);
       alist.add ("DensRtTip", 0.1);
       alist.add ("MinDens", 0.0);
     }
@@ -207,8 +207,7 @@ static struct Rootdens_G_PSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList (Rootdens::default_model ());
-    syntax.add ("SpRtLength", "m/g", Check::positive (), Syntax::Const,
-		"Specific root length");
+    Rootdens::load_syntax (syntax, alist);
     syntax.add ("DensRtTip", "cm/cm^3", Check::positive (), Syntax::Const,
 		"Root density at (potential) penetration depth.");
     syntax.add ("MinDens", "cm/cm^3", Check::non_negative (), Syntax::Const,

@@ -22,105 +22,159 @@
 
 #include "rootdens.h"
 #include "geometry.h"
+#include "plf.h"
 #include "check.h"
-#include "message.h"
+#include "mathlib.h"
 
-struct Rootdens_PLF : public Rootdens
+class Rootdens_PLF : public Rootdens
 {
   // Parameters.
+private:
   struct Entry
   {
     // Parameters.
-    const double value;
-    const PLF& plf;
+    const double index;
+    const PLF& density;
     
     // Create and Destroy.
     static void load_syntax (Syntax&, AttributeList&);
+    static bool check_alists (const vector<AttributeList*>&, Treelog& err);
     Entry (const AttributeList&);
     ~Entry ();
   };
   vector<const Entry*> entries;
-  
+
   // Simulation.
-  void set_density (vector<double>& Density,
+protected:
+  void get_density (vector<double>& Density,
 		    const Geometry& geometry, 
-		    double Depth, double PotRtDpt,
-		    double WRoot, double DS);
+		    double WRoot, double value, double z_factor,
+		    double max_depth = 1e100);
 
   // Create.
+protected:
   Rootdens_PLF (const AttributeList&);
   ~Rootdens_PLF ();
 };
 
-void
-Rootdens_PLF::set_density (vector<double>& Density,
-			   const Geometry& geometry, 
-			   const double Depth, const double PotRtDpt,
-			   const double WRoot, const double)
+void 
+Rootdens_PLF::Entry::load_syntax (Syntax& syntax, AttributeList&)
 {
-#if 0
-  // Dimensional conversion.
-  static const double m_per_cm = 0.01;
+  syntax.add_check (check_alists);
+  syntax.add ("index", Syntax::Unknown (), Check::none (), Syntax::Const, 
+	      "Index for specifying root density.");
+  syntax.add ("density", Syntax::Unknown (), Syntax::None (), Syntax::Const, "\
+Relative root density as a function of root depth .");
+  syntax.order ("index", "density");
+}
 
-  const double MinLengthPrArea = (DensRtTip * 1.2) * PotRtDpt;
-  const double LengthPrArea
-    = max (m_per_cm * SpRtLength * WRoot, MinLengthPrArea); // [cm/cm^2]
-  double a = density_distribution_parameter (LengthPrArea / 
-					     (PotRtDpt * DensRtTip));
-  double L0 = DensRtTip * exp (a);
-  a /= PotRtDpt;
-  if (Depth < PotRtDpt)
+bool 
+Rootdens_PLF::Entry::check_alists (const vector<AttributeList*>& alists,
+				   Treelog& err)
+{ 
+  bool ok = true;
+
+  if (alists.size () < 1)
     {
-      double Lz = L0 * exp (-a * Depth);
-      a = density_distribution_parameter (LengthPrArea / (Depth * Lz)) / Depth;
+      err.entry ("You must specify at least one entry");
+      ok = false;
+    }
+  else
+    {
+      double last_index = alists[0]->number ("index");
+      
+      for (unsigned int i = 1; i < alists.size (); i++)
+	{
+	  const double new_index = alists[i]->number ("index");
+	  
+	  if (new_index <= last_index)
+	    {
+	      err.entry ("Index should be monotonically increasing");
+	      ok = false;
+	    }
+	  last_index = new_index;
+	}
+    }
+  return ok;
+}
+
+Rootdens_PLF::Entry::Entry (const AttributeList& al)
+  : index (al.number ("index")),
+    density (al.plf ("density"))
+{ }
+
+Rootdens_PLF::Entry::~Entry ()
+{ }
+	
+void 
+Rootdens_PLF::get_density (vector<double>& abs_dens,
+			   const Geometry& geometry, 
+			   const double WRoot,
+			   const double index, const double z_factor, 
+			   const double max_depth)
+{ 
+  assert (abs_dens.size () == geometry.size ());
+
+  // Find entries before and after current index.
+  const Entry* before = NULL;
+  const Entry* after = NULL;
+
+  for (unsigned int i = 0; i < entries.size (); i++)
+    {
+      const Entry* entry = entries[i];
+      
+      if (entry->index <= index)
+	before = entry;
+      else if (entry->index >= index && after == NULL)
+	after = entry;
     }
 
-  // Check minimum density
-  double extra = 0.0;
-  if (MinDens > 0.0 && WRoot > 0.0)
-    {
-      assert (L0 > 0.0);
-      assert (a > 0.0);
-      const double too_low = -log (MinDens / L0) / a; // [cm]
+  // Find relative distibution.
+  if (before == NULL)
+    {				// Current index is after last entry.
+      assert (after != NULL);
+      for (unsigned int i = 0; i < geometry.size (); i++)
+	abs_dens[i] = after->density (geometry.z (i) * z_factor);
+    }
+  else if (after == NULL)
+    {				// Current index is before first entry.
+      assert (before != NULL);
+      for (unsigned int i = 0; i < geometry.size (); i++)
+	abs_dens[i] = before->density (geometry.z (i) * z_factor);
+    }
+  else
+    {				// Current index is between two entries.
+      assert (after != NULL);
+      assert (before != NULL);
+      assert (after->index > before->index);
 
-      if (too_low < Depth)
+      const double rel_dist 
+	= (index - before->index) / (after->index - before->index);
+      for (unsigned int i = 0; i < geometry.size (); i++)
 	{
-	  // We don't have MinDens all the way down.
-	  const double NewLengthPrArea 
-	    =  LengthPrArea - MinDens * Depth; // [cm/cm^2]
-#if 1
-	  CERR << "too_low = " << too_low 
-	       << ", NewLengthPrArea = " << NewLengthPrArea
-	       << "MinLengthPrArea = " << MinLengthPrArea << "\n";
-#endif	    
-	  if (too_low > 0.0 && NewLengthPrArea > too_low * DensRtTip * 1.2)
+	  const double z = geometry.z (i) * z_factor;
+	  if (z < max_depth || i == 1)
 	    {
-	      // There is enough to have MinDens all the way, spend
-	      // the rest using the standard model until the point
-	      // where the standard model would give too little..
-	      a = density_distribution_parameter (NewLengthPrArea
-						  / (too_low * DensRtTip));
-	      L0 = DensRtTip * exp (a);
-	      a /= too_low;
-	      extra = MinDens;
+	      const double a = before->density (z);
+	      const double b = after->density (z);
+	      abs_dens[i] = a + (b-a) * rel_dist;
 	    }
 	  else
-	    {
-	      // There is too little, use uniform density all the way.
-	      L0 = 0.0;
-	      extra = LengthPrArea / Depth;
-	    }
+	    abs_dens[i] = 0.0;
 	}
     }
 
-  unsigned int i = 0;
-  for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
-    Density[i] = extra + L0 * exp (a * geometry.z (i));
-
-  assert (i < geometry.size ());
-  for (; i < geometry.size (); i++)
-    Density[i] = 0.0;
-#endif
+  // Find absolute distribution.
+  assert (WRoot > 0.0);
+  assert (SpRtLength > 0.0);
+  static const double m_per_cm = 0.01;
+  const double LengthPrArea = m_per_cm * SpRtLength * WRoot; // [cm/cm^2]
+  const double sum = geometry.total (abs_dens);
+  assert (sum > 0.0);
+  const double factor = LengthPrArea / sum;
+  for (unsigned int i = 0; i < abs_dens.size (); i++)
+    abs_dens[i] *= factor;
+  assert (approximate (LengthPrArea, geometry.total (abs_dens)));
 }
 
 Rootdens_PLF::Rootdens_PLF (const AttributeList& al)
@@ -128,33 +182,151 @@ Rootdens_PLF::Rootdens_PLF (const AttributeList& al)
     entries (map_construct_const<Entry> (al.alist_sequence ("entries")))
 { }
 
-static struct Rootdens_PLFSyntax
+Rootdens_PLF::~Rootdens_PLF ()
+{ sequence_delete (entries.begin (), entries.end ()); }
+
+struct Rootdens_DS_Depth : public Rootdens_PLF
+{
+  // Simulation.
+  void set_density (vector<double>& abs_dens,
+		    const Geometry& geometry, 
+		    double /* Depth */, double /* PotRtDpt */,
+		    double WRoot, double DS)
+  { get_density (abs_dens, geometry, WRoot, DS, -1.0); }
+  
+  // Create.
+  Rootdens_DS_Depth (const AttributeList& al)
+    : Rootdens_PLF (al)
+  { }
+  ~Rootdens_DS_Depth ()
+  { }
+};
+
+static struct Rootdens_DS_Depth_Syntax
 {
   static Rootdens&
-  make_DS_Depth (const AttributeList& al)
+  make (const AttributeList& al)
   { return *new Rootdens_DS_Depth (al); }
-  static Rootdens&
-  make_Depth_Depth (const AttributeList& al)
-  { return *new Rootdens_Depth_Depth (al); }
-  static Rootdens&
-  make_DS_Fraction (const AttributeList& al)
-  { return *new Rootdens_DS_Fraction (al); }
 
-  Rootdens_PLFSyntax ()
+  Rootdens_DS_Depth_Syntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
 
     Rootdens::load_syntax (syntax, alist);
-
+    alist.add ("description", "\
+Specify root density as a function of development stage.");
     syntax.add_submodule_sequence("entries", Syntax::Const, "\
-PLF Sequence.", Rootdens_PLF::Entry::load_syntax);
+A list of pairs, where the first element of each pair is a development\n\
+stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
+second element is a PLF specifying the relative root density as a\n\
+function of soil depth in cm (a positive number).\n\
+\n\
+To find the absolute root density, Daisy will interpolate the relative\n\
+root density distribution specified for the entries before and after\n\
+the current development stage, and scale them to match the current\n\
+total root mass.",
+				  Rootdens_DS_Depth::Entry::load_syntax);
 
-    Librarian<Rootdens>::add_type ("DS_Depth", alist, syntax, make_DS_Depth);
-    Librarian<Rootdens>::add_type ("Depth_Depth", alist, syntax,
-				   make_Depth_Depth);
-    Librarian<Rootdens>::add_type ("DS_Fraction", alist, syntax,
-				   make_DS_Fraction);
+    Librarian<Rootdens>::add_type ("DS_Depth", alist, syntax, make);
   }
-} Rootdens_PLF_syntax;
+} Rootdens_DS_Depth_syntax;
+
+struct Rootdens_DS_Rel : public Rootdens_PLF
+{
+  // Simulation.
+  void set_density (vector<double>& abs_dens,
+		    const Geometry& geometry, 
+		    double Depth, double /* PotRtDpt */,
+		    double WRoot, double DS)
+  { 
+    assert (Depth > 0.0);
+    get_density (abs_dens, geometry, WRoot, DS, -1.0 / Depth); 
+  }
+
+  // Create.
+  Rootdens_DS_Rel (const AttributeList& al)
+    : Rootdens_PLF (al)
+  { }
+  ~Rootdens_DS_Rel ()
+  { }
+};
+
+static struct Rootdens_DS_Rel_Syntax
+{
+  static Rootdens&
+  make (const AttributeList& al)
+  { return *new Rootdens_DS_Rel (al); }
+
+  Rootdens_DS_Rel_Syntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    Rootdens::load_syntax (syntax, alist);
+    alist.add ("description", "\
+Specify root density as a function of development stage.");
+    syntax.add_submodule_sequence("entries", Syntax::Const, "\
+A list of pairs, where the first element of each pair is a development\n\
+stage (usually a number between 0 (emergence) and 2 (ripe), and the\n\
+second element is a PLF specifying the relative root density as a\n\
+function of soil depth relative to the total root depth.\n\
+\n\
+To find the absolute root density, Daisy will interpolate the relative\n\
+root density distribution specified for the entries before and after\n\
+the current development stage, and scale them to match the current\n\
+total root mass.",
+				  Rootdens_DS_Rel::Entry::load_syntax);
+
+    Librarian<Rootdens>::add_type ("DS_Rel", alist, syntax, make);
+  }
+} Rootdens_DS_Rel_syntax;
+
+struct Rootdens_Depth_Depth : public Rootdens_PLF
+{
+  // Simulation.
+  void set_density (vector<double>& abs_dens,
+		    const Geometry& geometry, 
+		    double Depth, double PotRtDpt,
+		    double WRoot, double /* DS */)
+  { 
+    get_density (abs_dens, geometry, WRoot, -PotRtDpt, -1.0, -Depth); 
+  }
+
+  // Create.
+  Rootdens_Depth_Depth (const AttributeList& al)
+    : Rootdens_PLF (al)
+  { }
+  ~Rootdens_Depth_Depth ()
+  { }
+};
+
+static struct Rootdens_Depth_Depth_Syntax
+{
+  static Rootdens&
+  make (const AttributeList& al)
+  { return *new Rootdens_Depth_Depth (al); }
+
+  Rootdens_Depth_Depth_Syntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+
+    Rootdens::load_syntax (syntax, alist);
+    alist.add ("description", "\
+Specify root density as a function of development stage.");
+    syntax.add_submodule_sequence("entries", Syntax::Const, "\
+A list of pairs, where the first element of each pair is the root depth,\
+\n(a positive number), and the second element is a PLF specifying the\n\
+relative root density as a function of soil depth in cm (a positive number).\n\
+\n\
+To find the absolute root density, Daisy will interpolate the relative\n\
+root density distribution specified for the entries before and after\n\
+the current development stage, and scale them to match the current\n\
+total root mass.",
+				  Rootdens_Depth_Depth::Entry::load_syntax);
+
+    Librarian<Rootdens>::add_type ("Depth_Depth", alist, syntax, make);
+  }
+} Rootdens_Depth_Depth_syntax;
 

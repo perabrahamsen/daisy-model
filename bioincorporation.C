@@ -304,8 +304,8 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
 
   // Incorporation location.
   syntax.add ("distribution", "cm", Syntax::None (), Syntax::Const,
-	      "Distribution of incorporated matter in the soil.\n\
-\(X, Y), where X is the depth (negative numbers), and Y is the relative\n\
+	      "Distribution of incorporated matter in the soil.\
+\n(X, Y), where X is the depth (negative numbers), and Y is the relative\n\
 weight in that depth.  To get the fraction in a specific interval [a:b], we\n\
 integrate the plf over that interval, and divide by the integration over\n\
 the whole profile.");

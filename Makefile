@@ -97,6 +97,9 @@ ifeq ($(USE_OPTIMIZE),true)
 			OPTIMIZE = -O2 -ffast-math -mcpu=v8 -mtune=ultrasparc
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
+		ifeq ($(HOSTTYPE),i386-linux)
+		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
+		endif
 		ifeq ($(HOSTTYPE),cygwin)
 		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
 		endif
@@ -108,6 +111,9 @@ endif
 
 # Do we want to create a dynamic library?
 #
+ifeq ($(HOSTTYPE),i386-linux)
+	USE_DYNLIB = false
+endif
 ifeq ($(HOSTTYPE),sun4)
 	USE_DYNLIB = false
 endif
@@ -135,6 +141,10 @@ ifeq ($(COMPILER),gcc)
 		OSFLAGS = 
 		DEBUG = -g
 	endif
+	ifeq ($(HOSTTYPE),i386-linux)
+		OSFLAGS = 
+		DEBUG = -g
+	endif
 	ifeq ($(HOSTTYPE),cygwin)
 		OSFLAGS =
 		DEBUG = 
@@ -145,8 +155,8 @@ ifeq ($(COMPILER),gcc)
 		DEBUG =
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
-		  -Wconversion -Wno-uninitialized -Wmissing-prototypes 
-	COMPILE = "c++" -ansi $(WARNING) $(DEBUG) $(OSFLAGS)
+		  -Wconversion -Wmissing-prototypes 
+	COMPILE = "c++" -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
@@ -170,6 +180,9 @@ ifeq ($(HOSTTYPE),sun4)
 endif
 ifeq ($(HOSTTYPE),hp)
 	MATHLIB = -lM
+endif
+ifeq ($(HOSTTYPE),i386-linux)
+	MATHLIB =
 endif
 ifeq ($(HOSTTYPE),win32)
 	MATHLIB =
@@ -238,7 +251,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = rootdens_G_P.C groundwater_file.C action_fertilize.C \
+MODELS = rootdens_PLF.C rootdens_G_P.C groundwater_file.C action_fertilize.C \
 	action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
@@ -333,7 +346,7 @@ HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) version.h
 
 # Find all printable files.
 #
-TEXT =  Makefile ChangeLog TODO NEWS FILES COPYING COPYING.LIB \
+TEXT =  ChangeLog.1 Makefile ChangeLog TODO NEWS FILES COPYING COPYING.LIB \
 	$(HEADERS) $(SOURCES) tlink32.ini daisy.bpr daisy.bpf daisy.bpg
 
 # The executables.
@@ -527,7 +540,10 @@ dist:	cvs
 	mv -f txt/reference/reference.pdf $(FTPDIR)/daisy-ref.pdf
 	$(MAKE) ps
 	mv -f txt/reference/reference.ps $(FTPDIR)/daisy-ref.ps
-
+	cp daisy $(FTPDIR)/daisy-$(TAG)-$(HOSTTYPE)
+	strip $(FTPDIR)/daisy-$(TAG)-$(HOSTTYPE)
+	rm -f $(FTPDIR)/daisy-$(HOSTTYPE)
+	(cd $(FTPDIR); ln -s daisy-$(TAG)-$(HOSTTYPE) daisy-$(HOSTTYPE))
 
 # Update the CVS repository.
 #

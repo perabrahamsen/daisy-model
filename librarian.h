@@ -68,7 +68,7 @@ public:
 			constructor cons)
   {
     library ().add (name, al, syntax);
-    content->constructors.insert(map_type::value_type (name, cons));
+    content->constructors.insert(make_pair (name, cons));
   }
   static void derive_type (const string& name, AttributeList& al,
 			   const string& super)

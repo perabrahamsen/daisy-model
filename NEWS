@@ -12,9 +12,66 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.01
+
+** New root density models
+
+*** DS_Depth
+
+Example:
+
+    (sow "Spring Barley"
+	 (Root (rootdens "DS_Depth" 
+			 (entries (0.0 (0.0 1.0) (10.0 0.0))
+				  (1.0 (0.0 1.0) (50.0 0.0))
+				  (2.0 (0.0 1.0) (40.0 1.0) (50.0 0.0))))))
+
+This specifies the root distribution at DS 0.0 (emergence), 1.0
+(flowering) and 2.0 (ripe) respectively.  At all times, the highest
+density is at the top.  At emergence, the density diminish linearly
+until 10 cms depth, below that there is no root.  At flowering, it
+still diminish linearly, now down to 50 cm.  At ripe, it has maximum
+desnity down to 40 cm, at which point it diminish linearly downto 50
+cm. 
+
+Daisy will interpolate between these three development stages.
+
+*** DS_Rel
+
+Example:
+
+    (sow "Spring Barley"
+	 (Root (rootdens "DS_Rel" 
+			 (entries (0.0 (0.0 1.0) (1.0 0.0))
+				  (1.0 (0.0 1.0) (1.0 0.0))
+				  (2.0 (0.0 1.0) (0.8 1.0) (1.0 0.0))))))
+
+This works like DS_Depth, except that instead of using absolute
+numbers for soil depth, we now use numbers relative to the current
+potential root depth, as calculated by the root submodel.  With
+DS_Depth, the calculated root depth is ignored.
+
+*** Depth_Depth
+
+    (sow "Spring Barley"
+	 (Root (rootdens "Depth_Depth" 
+			 (entries (00.0 (0.0 1.0) (10.0 0.0))
+				  (50.0 (0.0 1.0) (50.0 0.0))
+				  (75.0 (0.0 1.0) (40.0 1.0) (75.0 0.0))))))
+
+This works like DS_Depth, except that instead of using the development
+stage as index, we now use the calculated root depth.  Obviously, this
+doesn't work when the root distribution change while the root depth
+remain constant, as implied by the DS_Depth example.
+
+In general, it is recommended that DS_Depth or Depth_Depth is used
+when actual measurements has been made, and DS_Rel is used for general
+xscrop parameterizations since soil conditions may prevent the root from
+reaching the same depth as the measured values.
+
 * 2.00
 
-No changes.
+** GNU/Linux i386 port.
 
 * 1.99
 

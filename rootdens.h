@@ -33,6 +33,8 @@ class Rootdens
 public:
   const string name;
   static const char *const description;
+protected:
+  const double SpRtLength;	// Specific root length [m/g]
 
   // Simulation.
 public:
@@ -44,6 +46,7 @@ public:
   // Create and Destroy.
 public:
   static const AttributeList& default_model ();
+  static void load_syntax (Syntax&, AttributeList&);
 protected:
   Rootdens (const AttributeList&);
 public:
