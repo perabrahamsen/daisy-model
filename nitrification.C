@@ -2,7 +2,7 @@
 
 #include "nitrification.h"
 
-template<>
+EMPTY_TEMPLATE
 Librarian<Nitrification>::Content* Librarian<Nitrification>::content = NULL;
 
 const char *const Nitrification::description = "\

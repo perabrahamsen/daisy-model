@@ -27,6 +27,12 @@
 
 #define WORKING_EXCEPTIONS
 
+#if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
+#define EMPTY_TEMPLATE
+#else
+#define EMPTY_TEMPLATE template<>
+#endif
+
 #ifdef __GNUC__
 // Only gcc has a C++ safe <math.h>.
 #include <math.h>

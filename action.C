@@ -3,7 +3,7 @@
 #include "action.h"
 #include "common.h"
 
-template<>
+EMPTY_TEMPLATE
 Librarian<Action>::Content* Librarian<Action>::content = NULL;
 
 const char *const Action::description = "\

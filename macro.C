@@ -2,7 +2,7 @@
 
 #include "macro.h"
 
-template<>
+EMPTY_TEMPLATE
 Librarian<Macro>::Content* Librarian<Macro>::content = NULL;
 
 const char *const Macro::description = "\

@@ -2,7 +2,7 @@
 
 #include "mactrans.h"
 
-template<>
+EMPTY_TEMPLATE
 Librarian<Mactrans>::Content* Librarian<Mactrans>::content = NULL;
 
 const char *const Mactrans::description = "\

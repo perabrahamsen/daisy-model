@@ -87,7 +87,7 @@ Hydraulic::Hydraulic (const AttributeList& al)
 Hydraulic::~Hydraulic ()
 { }
 
-template<>
+EMPTY_TEMPLATE
 Librarian<Hydraulic>::Content* Librarian<Hydraulic>::content = NULL;
 
 const char *const Hydraulic::description = "\

@@ -6,7 +6,7 @@
 #include <numeric>
 #include <set>
 
-template<>
+EMPTY_TEMPLATE
 Librarian<Select>::Content* Librarian<Select>::content = NULL;
 
 const char *const Select::description = "Select part of state.";

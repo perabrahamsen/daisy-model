@@ -486,7 +486,7 @@ Horizon::~Horizon ()
 { }
 
 // Create Horizon library.
-template<>
+EMPTY_TEMPLATE
 Librarian<Horizon>::Content* Librarian<Horizon>::content = NULL;
 
 const char *const Horizon::description = "\
