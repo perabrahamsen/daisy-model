@@ -4,7 +4,8 @@ OLDCROPS = beet-old.dai grass-old.dai pea-old.dai potato-old.dai \
 NEWCROPS = maize.dai pea.dai rye.dai sbarley.dai sugarbeet.dai srape.dai \
 	swheat.dai wbarley.dai wrape.dai wwheat.dai grass.dai fodderbeet.dai
 
-DAISY 	= crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
+DAISY 	= vegetation.dai \
+	crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS)
 MSHE	= mshe.dai mshe-standalone.dai
 TEXT	= Makefile test.dai

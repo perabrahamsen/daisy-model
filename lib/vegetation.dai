@@ -1,0 +1,17 @@
+;;; vegetation.dai --- Permanent vegetation parameterizations.
+
+(defvegetation Coniferous permanent
+  (description "Evergreen forest, Kirsten Schelde <Kirsten.Schelde@agrsci.dk>.
+
+WJ Massman and MR Kaufmann 1991: Stomatal response to certain environmental
+factors: a comparison of models for subalpine trees in the Rocky Mountains.
+Agric For Meteor 54, 155-167.
+
+FM Kelliher, R Leuning, MR Raupach, E-D Schulze 1995: Maximum conductances
+for evaporation from global vegetation types. Agric For Meteor 73, 1-16.")
+  (LAIvsDAY (120 5.0) (150 5.0) (180 5.5) (210 6.0) (240 5.5) (300 5.0))
+  (Canopy (IntcpCap 0.33)
+	  (rs_min 45.0))
+  (Height 1000.0)
+  (Albedo 0.12)
+  (Root (MaxPen 100.0)))
