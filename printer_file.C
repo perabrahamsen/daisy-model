@@ -34,7 +34,7 @@ struct PrinterFile::Implementation
 {
   // Data.
   Path::Output* output;
-  ostream& out;
+  std::ostream& out;
 
   // String utilities.
   bool is_identifier (const string& name) const;
@@ -67,7 +67,7 @@ struct PrinterFile::Implementation
 
   // Creation.
   Implementation (const string& name);
-  Implementation (ostream& stream);
+  Implementation (std::ostream& stream);
   ~Implementation ();
 };
 
@@ -621,7 +621,7 @@ PrinterFile::Implementation::Implementation (const string& name)
     out (output->stream ())
 { }
 
-PrinterFile::Implementation::Implementation (ostream& stream)
+PrinterFile::Implementation::Implementation (std::ostream& stream)
   : output (NULL),
     out (stream)
 { }
@@ -701,7 +701,7 @@ PrinterFile::PrinterFile (const string& filename)
     impl (*new Implementation (filename))
 { }
     
-PrinterFile::PrinterFile (ostream& stream)
+PrinterFile::PrinterFile (std::ostream& stream)
   : Printer ("stream"),
     impl (*new Implementation (stream))
 { }

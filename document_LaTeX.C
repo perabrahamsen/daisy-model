@@ -39,35 +39,35 @@ struct DocumentLaTeX : public Document
   bool submodel;
 
   // LaTeX functions.
-  void print_quoted (ostream&, const string&);
+  void print_quoted (std::ostream&, const string&);
 
   // Private functions.
   bool is_submodel (const Syntax&, const AttributeList&, const string&);
   string find_submodel (const Syntax&, const AttributeList&, const string&);
-  void print_index (ostream& out, const string& name);
-  void print_entry_name (ostream& out, const string& name);
-  void print_entry_type (ostream& out,
+  void print_index (std::ostream& out, const string& name);
+  void print_entry_name (std::ostream& out, const string& name);
+  void print_entry_type (std::ostream& out,
 			 const string& name,
 			 const Syntax::type type,
 			 const Syntax& syntax,
 			 const AttributeList& alist);
-  void print_entry_size (ostream& out, const string&, int size);
-  void print_entry_description (ostream& out,
+  void print_entry_size (std::ostream& out, const string&, int size);
+  void print_entry_description (std::ostream& out,
 				const string& name, 
 				const string& description);
-  void print_entry_submodel (ostream& out,
+  void print_entry_submodel (std::ostream& out,
 			     const string& name, 
 			     const Syntax::type type, 
 			     int size,
 			     int level,
 			     const Syntax& syntax,
 			     const AttributeList& alist);
-  void print_entry_category (ostream& out,
+  void print_entry_category (std::ostream& out,
 			     const string& name, 
 			     const Syntax::type type, 
 			     const Syntax& syntax,
 			     const AttributeList& alist);
-  void print_entry_value (ostream& out,
+  void print_entry_value (std::ostream& out,
 			  const string& name, 
 			  const Syntax::type type, 
 			  int size,
@@ -75,38 +75,38 @@ struct DocumentLaTeX : public Document
 			  const AttributeList& alist);
 
   // Document functions.
-  void print_users (ostream&, const XRef::Users&);
-  void print_submodel_entry (ostream&, const string&, int level,
+  void print_users (std::ostream&, const XRef::Users&);
+  void print_submodel_entry (std::ostream&, const string&, int level,
 			     const Syntax& syntax,
 			     const AttributeList& alist);
-  void print_submodel_empty (ostream&, const string&, int level);
-  void print_submodel_header (ostream& out, const string&, int level);
-  void print_submodel_trailer (ostream& out, const string&, int level);
-  void print_sample_ordered (ostream& out, const string& name, bool seq);
-  void print_log_header (ostream& out, const string&, int level);
-  void print_log_trailer (ostream& out, const string&, int level);
-  void print_sample_entry (ostream& out, const string& name, bool seq);
-  void print_sample_header (ostream& out, const string& name);
-  void print_sample_trailer (ostream& out, const string&);
-  void print_model_header (ostream& out, const string& name);
-  void print_model_description (ostream& out, const string& description);
-  void print_model_trailer (ostream& out, const string& name);
-  void print_parameterization_header (ostream& out,
+  void print_submodel_empty (std::ostream&, const string&, int level);
+  void print_submodel_header (std::ostream& out, const string&, int level);
+  void print_submodel_trailer (std::ostream& out, const string&, int level);
+  void print_sample_ordered (std::ostream& out, const string& name, bool seq);
+  void print_log_header (std::ostream& out, const string&, int level);
+  void print_log_trailer (std::ostream& out, const string&, int level);
+  void print_sample_entry (std::ostream& out, const string& name, bool seq);
+  void print_sample_header (std::ostream& out, const string& name);
+  void print_sample_trailer (std::ostream& out, const string&);
+  void print_model_header (std::ostream& out, const string& name);
+  void print_model_description (std::ostream& out, const string& description);
+  void print_model_trailer (std::ostream& out, const string& name);
+  void print_parameterization_header (std::ostream& out,
   				      const string& name, const string& type);
-  void print_parameterization_file (ostream& out, const string& name);
-  void print_parameterization_no_file (ostream& out);
-  void print_parameterization_description (ostream& out, 
+  void print_parameterization_file (std::ostream& out, const string& name);
+  void print_parameterization_no_file (std::ostream& out);
+  void print_parameterization_description (std::ostream& out, 
 					   const string& description);
-  void print_parameterization_trailer (ostream& out, const string& name);
-  void print_fixed_header (ostream&, const string& name);
-  void print_fixed_trailer (ostream&, const string& name);
-  void print_component_header (ostream& out, const string& name);
-  void print_component_description (ostream& out, const string& description);
-  void print_component_trailer (ostream& out, const string& name);
-  void print_fixed_all_header (ostream&) ;
-  void print_fixed_all_trailer (ostream&);
-  void print_document_header (ostream& out);
-  void print_document_trailer (ostream& out);
+  void print_parameterization_trailer (std::ostream& out, const string& name);
+  void print_fixed_header (std::ostream&, const string& name);
+  void print_fixed_trailer (std::ostream&, const string& name);
+  void print_component_header (std::ostream& out, const string& name);
+  void print_component_description (std::ostream& out, const string& description);
+  void print_component_trailer (std::ostream& out, const string& name);
+  void print_fixed_all_header (std::ostream&) ;
+  void print_fixed_all_trailer (std::ostream&);
+  void print_document_header (std::ostream& out);
+  void print_document_trailer (std::ostream& out);
   
   // Create & Destroy.
   DocumentLaTeX (const AttributeList& al)
@@ -120,7 +120,7 @@ struct DocumentLaTeX : public Document
 };
 
 void
-DocumentLaTeX::print_quoted (ostream& out, const string& name)
+DocumentLaTeX::print_quoted (std::ostream& out, const string& name)
 {
   for (unsigned int i = 0; i < name.length (); i++)
     switch (name[i])
@@ -207,7 +207,7 @@ DocumentLaTeX::find_submodel (const Syntax& syntax, const AttributeList& alist,
 }
 
 void
-DocumentLaTeX::print_index (ostream& out, const string& name)
+DocumentLaTeX::print_index (std::ostream& out, const string& name)
 {
   out << "\\index{";
   print_quoted (out, name);
@@ -215,7 +215,7 @@ DocumentLaTeX::print_index (ostream& out, const string& name)
 }
 
 void 
-DocumentLaTeX::print_entry_name (ostream& out, const string& name)
+DocumentLaTeX::print_entry_name (std::ostream& out, const string& name)
 {
   out << "\n\\item \\textit{";
   print_quoted (out, name);
@@ -223,7 +223,7 @@ DocumentLaTeX::print_entry_name (ostream& out, const string& name)
 }
 
 void 
-DocumentLaTeX::print_entry_type (ostream& out,
+DocumentLaTeX::print_entry_type (std::ostream& out,
 				 const string& name,
 				 const Syntax::type type, 
 				 const Syntax& syntax,
@@ -301,7 +301,7 @@ DocumentLaTeX::print_entry_type (ostream& out,
 }
 
 void 
-DocumentLaTeX::print_entry_size (ostream& out, const string&, int size)
+DocumentLaTeX::print_entry_size (std::ostream& out, const string&, int size)
 {
   if (size == Syntax::Singleton)
     /* do nothing */;
@@ -312,7 +312,7 @@ DocumentLaTeX::print_entry_size (ostream& out, const string&, int size)
 }
 
 void 
-DocumentLaTeX::print_entry_description (ostream& out,
+DocumentLaTeX::print_entry_description (std::ostream& out,
 					const string&, 
 					const string& description)
 {
@@ -325,7 +325,7 @@ DocumentLaTeX::print_entry_description (ostream& out,
 }
 
 void 
-DocumentLaTeX::print_entry_submodel (ostream& out,
+DocumentLaTeX::print_entry_submodel (std::ostream& out,
 				     const string& name, 
 				     const Syntax::type type, 
 				     int size,
@@ -352,7 +352,7 @@ DocumentLaTeX::print_entry_submodel (ostream& out,
 }
     
 void 
-DocumentLaTeX::print_entry_category (ostream& out,
+DocumentLaTeX::print_entry_category (std::ostream& out,
 				     const string& name, 
 				     const Syntax::type type, 
 				     const Syntax& syntax,
@@ -397,7 +397,7 @@ DocumentLaTeX::print_entry_category (ostream& out,
 }
 
 void 
-DocumentLaTeX::print_entry_value (ostream& out,
+DocumentLaTeX::print_entry_value (std::ostream& out,
 				  const string& name, 
 				  const Syntax::type type, 
 				  int size,
@@ -534,7 +534,7 @@ DocumentLaTeX::print_entry_value (ostream& out,
 }
 
 void 
-DocumentLaTeX::print_users (ostream& out, const XRef::Users& users)
+DocumentLaTeX::print_users (std::ostream& out, const XRef::Users& users)
 {
   if (users.models.empty () && users.submodels.empty ())
     return;
@@ -589,7 +589,7 @@ DocumentLaTeX::print_users (ostream& out, const XRef::Users& users)
 }
 
 void 
-DocumentLaTeX::print_submodel_entry (ostream& out,
+DocumentLaTeX::print_submodel_entry (std::ostream& out,
 				     const string& name, int level,
 				     const Syntax& syntax,
 				     const AttributeList& alist)
@@ -631,7 +631,7 @@ DocumentLaTeX::print_submodel_entry (ostream& out,
 
 
 void
-DocumentLaTeX::print_submodel_empty (ostream& out,
+DocumentLaTeX::print_submodel_empty (std::ostream& out,
 				     const string& name, int)
 { 
   out << "\n\n";
@@ -640,7 +640,7 @@ DocumentLaTeX::print_submodel_empty (ostream& out,
 }
 
 void
-DocumentLaTeX::print_sample_ordered (ostream& out, 
+DocumentLaTeX::print_sample_ordered (std::ostream& out, 
 				     const string& name, bool sequence)
 { 
   ordered = true;
@@ -653,7 +653,7 @@ DocumentLaTeX::print_sample_ordered (ostream& out,
 }
 
 void
-DocumentLaTeX::print_sample_entry (ostream& out,
+DocumentLaTeX::print_sample_entry (std::ostream& out,
 				   const string& name, bool sequence)
 { 
   if (ordered)
@@ -672,7 +672,7 @@ DocumentLaTeX::print_sample_entry (ostream& out,
 }
 
 void
-DocumentLaTeX::print_sample_header (ostream& out, const string& name)
+DocumentLaTeX::print_sample_header (std::ostream& out, const string& name)
 { 
   daisy_assert (ordered == false);
   out << "\n\\noindent\n\\begin{tt}\n\\begin{tabbing}\n$<$~";
@@ -685,14 +685,14 @@ DocumentLaTeX::print_sample_header (ostream& out, const string& name)
 }
 
 void
-DocumentLaTeX::print_sample_trailer (ostream& out, const string&)
+DocumentLaTeX::print_sample_trailer (std::ostream& out, const string&)
 { 
   out << "$>$\n\\end{tabbing}\n\\end{tt}";
   ordered = false;
 }
 
 void
-DocumentLaTeX::print_submodel_header (ostream& out,
+DocumentLaTeX::print_submodel_header (std::ostream& out,
 				      const string&, int level)
 { 
   if (level > 3)
@@ -702,7 +702,7 @@ DocumentLaTeX::print_submodel_header (ostream& out,
 }
 
 void
-DocumentLaTeX::print_submodel_trailer (ostream& out,
+DocumentLaTeX::print_submodel_trailer (std::ostream& out,
 				       const string&, int level)
 { 
   if (level > 3)
@@ -712,7 +712,7 @@ DocumentLaTeX::print_submodel_trailer (ostream& out,
 }
 
 void
-DocumentLaTeX::print_log_header (ostream& out, const string& name, int level)
+DocumentLaTeX::print_log_header (std::ostream& out, const string& name, int level)
 { 
   if (level == 0)
     out << "\n\\subsection*{Log Variables}\n";
@@ -723,11 +723,11 @@ DocumentLaTeX::print_log_header (ostream& out, const string& name, int level)
 }
 
 void
-DocumentLaTeX::print_log_trailer (ostream& out, const string& name, int level)
+DocumentLaTeX::print_log_trailer (std::ostream& out, const string& name, int level)
 {  print_submodel_trailer (out, name, level); }
 
 void
-DocumentLaTeX::print_model_header (ostream& out, const string& name)
+DocumentLaTeX::print_model_header (std::ostream& out, const string& name)
 { 
   out << "\n\\section{";
   print_quoted (out, name);
@@ -736,7 +736,7 @@ DocumentLaTeX::print_model_header (ostream& out, const string& name)
 }
 
 void
-DocumentLaTeX::print_model_description (ostream& out, 
+DocumentLaTeX::print_model_description (std::ostream& out, 
 					const string& description)
 { 
   out << "\n";
@@ -745,11 +745,11 @@ DocumentLaTeX::print_model_description (ostream& out,
 }
 
 void
-DocumentLaTeX::print_model_trailer (ostream&, const string&)
+DocumentLaTeX::print_model_trailer (std::ostream&, const string&)
 { }
 
 void 
-DocumentLaTeX::print_parameterization_header (ostream& out,
+DocumentLaTeX::print_parameterization_header (std::ostream& out,
 					      const string& name, 
 					      const string& type)
 {
@@ -763,7 +763,7 @@ DocumentLaTeX::print_parameterization_header (ostream& out,
 }
 
 void 
-DocumentLaTeX::print_parameterization_file (ostream& out, 
+DocumentLaTeX::print_parameterization_file (std::ostream& out, 
 					    const string& name)
 { 
   out << "defined in `";
@@ -772,22 +772,22 @@ DocumentLaTeX::print_parameterization_file (ostream& out,
 }
 
 void 
-DocumentLaTeX::print_parameterization_no_file (ostream& out)
+DocumentLaTeX::print_parameterization_no_file (std::ostream& out)
 { 
   out << "build into \\daisy{}.\n";
 }
 
 void 
-DocumentLaTeX::print_parameterization_description (ostream& out, 
+DocumentLaTeX::print_parameterization_description (std::ostream& out, 
 						   const string& description)
 { print_model_description (out, description); }
 
 void 
-DocumentLaTeX::print_parameterization_trailer (ostream&, const string&)
+DocumentLaTeX::print_parameterization_trailer (std::ostream&, const string&)
 { }
 
 void
-DocumentLaTeX::print_fixed_header (ostream& out, const string& name)
+DocumentLaTeX::print_fixed_header (std::ostream& out, const string& name)
 { 
   out << "\n\\section{";
   print_quoted (out, name);
@@ -796,11 +796,11 @@ DocumentLaTeX::print_fixed_header (ostream& out, const string& name)
 }
 
 void
-DocumentLaTeX::print_fixed_trailer (ostream&, const string&)
+DocumentLaTeX::print_fixed_trailer (std::ostream&, const string&)
 { }
 
 void
-DocumentLaTeX::print_component_header (ostream& out, const string& name)
+DocumentLaTeX::print_component_header (std::ostream& out, const string& name)
 { 
   current_component = name;
   out << "\n\\chapter{";
@@ -810,7 +810,7 @@ DocumentLaTeX::print_component_header (ostream& out, const string& name)
 }
 
 void
-DocumentLaTeX::print_component_description (ostream& out, 
+DocumentLaTeX::print_component_description (std::ostream& out, 
 					    const string& description)
 { 
   out << "\n";
@@ -819,13 +819,13 @@ DocumentLaTeX::print_component_description (ostream& out,
 }
 
 void
-DocumentLaTeX::print_component_trailer (ostream&, const string&)
+DocumentLaTeX::print_component_trailer (std::ostream&, const string&)
 { 
   current_component = "Daisy";
 }
 
 void
-DocumentLaTeX::print_fixed_all_header (ostream& out)
+DocumentLaTeX::print_fixed_all_header (std::ostream& out)
 { 
   out << "\
 \\chapter{Fixed Components}\n\
@@ -838,11 +838,11 @@ standard parameterizations for the model.\n\
 "; }
 
 void
-DocumentLaTeX::print_fixed_all_trailer (ostream&)
+DocumentLaTeX::print_fixed_all_trailer (std::ostream&)
 { }
 
 void
-DocumentLaTeX::print_document_header (ostream& out)
+DocumentLaTeX::print_document_header (std::ostream& out)
 { 
   out << "\
 %%% components.tex --- Description of Daisy components.\n\
@@ -850,7 +850,7 @@ DocumentLaTeX::print_document_header (ostream& out)
 %%% This file is automatically generated, do not edit.\n"; }
 
 void
-DocumentLaTeX::print_document_trailer (ostream& out)
+DocumentLaTeX::print_document_trailer (std::ostream& out)
 { 
   time_t now = time (NULL);
   out << "\

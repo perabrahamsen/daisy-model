@@ -27,6 +27,7 @@
 
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
 struct ostream;
+namespace std { typedef ostream ostream; }
 #else
 #include <iosfwd>
 #endif
@@ -59,7 +60,7 @@ public:
 public:
   PrinterFile (const AttributeList& al);
   PrinterFile (const string& filename);
-  PrinterFile (ostream& out);
+  PrinterFile (std::ostream& out);
   ~PrinterFile ();
 };
 
