@@ -41,6 +41,7 @@ public:
   // Create and Destroy.
 public:
   void clear ();
+  void cleanup (Chemicals& out);
   void operator += (const Chemicals&);
   void operator = (const Chemicals&);
   Chemicals (const Chemicals&);

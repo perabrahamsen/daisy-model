@@ -87,6 +87,7 @@ public:
 	     SoilNO3&);
   const Harvest& harvest (const string& column_name, const Time&,
 			  const Geometry& geometry, OrganicMatter&,
+			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off);
@@ -1783,6 +1784,7 @@ const Harvest&
 CropSold::harvest (const string& column_name,
 		   const Time& time, const Geometry& geometry,
 		   OrganicMatter& organic_matter,
+		   Bioclimate&,
 		   double,
 		   double, double leaf_harvest, double sorg_harvest, 
 		   bool)
@@ -1865,10 +1867,12 @@ CropSold::harvest (const string& column_name,
 		NRoot * m2_per_cm2);
       organic_matter.add (am);
     }
+  Chemicals chemicals;
   return *new Harvest (column_name, time, name, 
 		       WLeaf * leaf_harvest, NLeaf * leaf_harvest,
 		       0.0, 0.0,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest);
+		       WSOrg * sorg_harvest, NSOrg * sorg_harvest,
+		       chemicals);
 }
 
 void

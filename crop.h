@@ -57,12 +57,14 @@ public:
   virtual const Harvest& harvest (const string& column_name,
 				  const Time&, const Geometry&, 
 				  OrganicMatter&,
+				  Bioclimate& bioclimate,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
 				  double sorg_harvest,
 				  bool kill_off) = 0;
-  void kill (const string&, const Time&, const Geometry&, OrganicMatter&);
+  void kill (const string&, const Time&, const Geometry&, OrganicMatter&,
+	     Bioclimate&);
   virtual void output (Log&, Filter&) const = 0;
   
   // Queries.

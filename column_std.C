@@ -56,6 +56,7 @@ public:
 				  double leaf_harvest, 
 				  double sorg_harvest)
     { return vegetation.harvest (name, crop_name, time, soil, organic_matter,
+				 bioclimate,
 				 stub_length, 
 				 stem_harvest, leaf_harvest, sorg_harvest); }
   void mix (const Time&, double from, double to, double penetration = 1.0);
@@ -195,7 +196,7 @@ void
 ColumnStandard::mix (const Time& time,
 		     double from, double to, double penetration)
 {
-  vegetation.kill_all (name, time, soil, organic_matter);
+  vegetation.kill_all (name, time, soil, organic_matter, bioclimate);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
   soil_heat.set_energy (soil, soil_water, from, to, energy);

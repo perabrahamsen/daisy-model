@@ -8,10 +8,14 @@
 #include <fstream.h>
 #include <numeric>
 #include <algorithm>
+#include <set>
 
 // Entries
 struct LogEntry
 {
+  // Types.
+  typedef set<string, less<string>/**/> string_set;
+
   // Content.
   Condition* condition;		// Should we accumulate now?
   const vector<string> path;	// Content of this entry.
@@ -36,6 +40,7 @@ struct LogEntry
   int count;			// Number of accumulated values.
   bool error;			// If an error occured.
   vector<double> full_value;	// Total array.
+  string_set names;		// For logging strings.
 
   // Intermediate state.
   unsigned int current_path_index;// How nested in open's we are.
@@ -48,7 +53,22 @@ struct LogEntry
 	      && current_path_index < path.size ()); 
     }
 
-  void open (const string& name) // Open one level.
+  void open_group (const string& name) // Open one group level.
+    {
+      if (valid () && (path[current_path_index] == "*" 
+		       || name == path[current_path_index]))
+	{
+	  if (is_active && last_valid_path_index == path.size () -1)
+	    {
+	      names.insert (name);
+	      count++;
+	    }
+	  last_valid_path_index++;
+	}
+      current_path_index++;
+    }
+
+  void open (const string& name) // Open one leaf level.
     {
       if (valid () && (path[current_path_index] == "*" 
 		       || name == path[current_path_index]))
@@ -130,6 +150,20 @@ struct LogEntry
       if (current_path_index == last_valid_path_index)
 	{
 	  value += integer;
+	  count++;
+	}
+      close ();
+    }
+
+  void output (const string& name, const string& a_name)
+    {
+      if (!is_active)
+	return;
+
+      open (name);
+      if (current_path_index == last_valid_path_index)
+	{
+	  names.insert (a_name);
 	  count++;
 	}
       close ();
@@ -217,6 +251,18 @@ struct LogEntry
 	    }
 	  if (!accumulate)
 	    fill (full_value.begin (), full_value.end (), 0.0);
+	}
+      else if (names.size () > 0)
+	{
+	  for (string_set::const_iterator i = names.begin ();
+		  i != names.end ();
+		  i++)
+	    {
+	      if (i != names.begin ())
+		out << " + ";
+	      out << (*i);
+	    }
+  	  names.erase (names.begin (), names.end ());
 	}
       else
 	{
@@ -338,7 +384,7 @@ struct LogTable : public Log, public Filter
   void open (const string& name)
     { 
       for (unsigned int i = 0; i < entries.size (); i++)
-	entries[i]->open (name);
+	entries[i]->open_group (name);
     }
   void close ()
     { 
@@ -384,8 +430,12 @@ struct LogTable : public Log, public Filter
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
-  void output (const string&, Filter&, const string&, bool)
-    { }
+  void output (const string& name, Filter&, const string& value, bool)
+    { 
+      if (is_active)
+	for (unsigned int i = 0; i < entries.size (); i++)
+	  entries[i]->output (name, value);
+    }
   void output (const string& name, Filter&, const vector<double>& value, bool)
     { 
       if (is_active)

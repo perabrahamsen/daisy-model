@@ -16,10 +16,11 @@ Harvest::output (Log& log, Filter& filter) const
   log.output ("leaf_N", filter, leaf_N, true);
   log.output ("sorg_DM", filter, sorg_DM, true);
   log.output ("sorg_N", filter, sorg_N, true);
+  output_submodule (chemicals, "chemicals", log, filter, true);
 }
 
 void 
-Harvest::load_syntax (Syntax& syntax, AttributeList&)
+Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("column", Syntax::String, Syntax::LogOnly,
 	      "Name of column where the harvest were harvested.");
@@ -39,11 +40,14 @@ Harvest::load_syntax (Syntax& syntax, AttributeList&)
 	      "Total storage organ dry matter in harvest.");
   syntax.add ("sorg_N", "g/m²", Syntax::LogOnly,
 	      "Total storage organ nitrogen in harvest.");
+  Chemicals::add_syntax  ("chemicals",
+			  syntax, alist, Syntax::LogOnly,
+			  "Chemicals in harvest.");
 }
 
 Harvest::Harvest (string col, Time t, string crp, 
 		  double sC, double sN, double lC, double lN, 
-		  double oC, double oN)
+		  double oC, double oN, const Chemicals& chem)
   : column (col),
     time (t),
     crop (crp),
@@ -52,5 +56,6 @@ Harvest::Harvest (string col, Time t, string crp,
     leaf_DM (lC),
     leaf_N (lN),
     sorg_DM (oC),
-    sorg_N (oN)
+    sorg_N (oN),
+    chemicals (chem)
 { }

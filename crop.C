@@ -1,6 +1,7 @@
  // crop.C
 
 #include "crop.h"
+#include "chemicals.h"
 
 const double Crop::DSremove = -5001.0;
 
@@ -28,8 +29,12 @@ Crop::albedo () const
 
 void
 Crop::kill (const string& name, const Time& time, const Geometry& geometry,
-	    OrganicMatter& organic_matter)
-{ harvest (name, time, geometry, organic_matter, 0.0, 0.0, 0.0, 0.0, true); }
+	    OrganicMatter& organic_matter, Bioclimate& bioclimate)
+{ 
+  Chemicals chemicals;
+  harvest (name, time, geometry, organic_matter, bioclimate,
+	   0.0, 0.0, 0.0, 0.0, true); 
+}
 
 bool
 Crop::ds_remove (const Crop* crop)

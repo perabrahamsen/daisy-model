@@ -1,11 +1,3 @@
-* Indfør stof på overfladen.
-
-** Kør test.
-
-** Fjern stof under 1e-18 (et molekyle per kvadratmeter)
-
-** Høst stof fra canopy.
-
 * Indfør stof i jorden.
 
 * Tilføj "Field" abstraction i stil med "Vegetation".
@@ -14,7 +6,9 @@
 
 * Check pet_pm sammen med PvdK.
 
-* Log af crop navne.
+* Gør det muligt at vælge array/entry/string separators.
+
+** Brug tab (per default) til at skelne array entries.
 
 ======================================================================
 

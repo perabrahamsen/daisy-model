@@ -58,11 +58,13 @@ struct Vegetation::Implementation
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water);
-  void kill_all (const string&, const Time&, const Geometry&, OrganicMatter&);
+  void kill_all (const string&, const Time&, const Geometry&, OrganicMatter&,
+		 Bioclimate&);
   vector<const Harvest*> harvest (const string& column_name,
 				  const string& crop_name,
 				  const Time&, const Geometry&, 
 				  OrganicMatter&,
+				  Bioclimate&,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
@@ -240,13 +242,14 @@ Vegetation::Implementation::transpiration (double potential_transpiration,
 void
 Vegetation::Implementation::kill_all (const string& name, const Time& time, 
 				      const Geometry& geometry, 
-				      OrganicMatter& organic_matter)
+				      OrganicMatter& organic_matter,
+				      Bioclimate& bioclimate)
 {
   for (CropList::iterator crop = crops.begin(); 
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->kill (name, time, geometry, organic_matter);
+      (*crop)->kill (name, time, geometry, organic_matter, bioclimate);
       delete *crop;
     }
   crops.erase (crops.begin (), crops.end ());
@@ -261,6 +264,7 @@ Vegetation::Implementation::harvest (const string& column_name,
 				     const Time& time, 
 				     const Geometry& geometry, 
 				     OrganicMatter& organic_matter,
+				     Bioclimate& bioclimate,
 				     double stub_length,
 				     double stem_harvest, double leaf_harvest, 
 				     double sorg_harvest)
@@ -274,6 +278,7 @@ Vegetation::Implementation::harvest (const string& column_name,
     if ((*crop)->name == crop_name)
       harvest.push_back (&(*crop)->harvest (column_name, time, 
 					    geometry, organic_matter,
+					    bioclimate,
 					    stub_length, stem_harvest,
 					    leaf_harvest, sorg_harvest, 
 					    false));
@@ -433,8 +438,9 @@ Vegetation::transpiration (double potential_transpiration,
 			     soil, soil_water); }
 void
 Vegetation::kill_all (const string& name, const Time& time, 
-		      const Geometry& geometry, OrganicMatter& organic_matter)
-{ impl.kill_all (name, time, geometry, organic_matter); }
+		      const Geometry& geometry, OrganicMatter& organic_matter,
+		      Bioclimate& bioclimate)
+{ impl.kill_all (name, time, geometry, organic_matter, bioclimate); }
 
 vector<const Harvest*>
 Vegetation::harvest (const string& column_name,
@@ -442,11 +448,12 @@ Vegetation::harvest (const string& column_name,
 		     const Time& time, 
 		     const Geometry& geometry, 
 		     OrganicMatter& organic_matter,
+		     Bioclimate& bioclimate,
 		     double stub_length,
 		     double stem_harvest, double leaf_harvest, 
 		     double sorg_harvest)
 { return impl.harvest (column_name, crop_name, time, geometry, organic_matter,
-		       stub_length, 
+		       bioclimate, stub_length, 
 		       stem_harvest, leaf_harvest, sorg_harvest); }
 
 void

@@ -1,4 +1,26 @@
+1998-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.51 released.
+
+1998-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C: Make it possible to log strings.
+
 1998-12-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C, bioclimate.h (harvest_chemicals): New
+	function.
+	* crop_std.C (harvest): Call it. 
+	* vegetation.h, vegetation.C (harvest): New bioclamate argument.
+	* crop.h, crop_std.C, crop_old.C, crop_sold.C (harvest): Pass it.
+	* column_std.C: Pass it.
+
+	* harvest.C, harvest.h: Add chemicals to harvest.
+
+	* chemicals.C, chemicals.h (cleanup): New function.
+	* bioclimate_std.C (ChemicalDistribution): Call it.
+
+	* chemicals.C (output): Don't log nothing.
 
 	* Version 0.50 released.
 

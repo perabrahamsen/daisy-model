@@ -100,6 +100,7 @@ public:
 	     SoilNO3&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&, OrganicMatter&,
+			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
 			  bool kill_off);
@@ -1370,7 +1371,7 @@ CropStandard::CanopyStructure ()
   const Parameters::CanopyPar& CanopyPar = par.Canopy;
   const double DS = var.Phenology.DS;
   Variables::RecCanopy& Canopy = var.Canopy;
-    
+  
   // The leaf density is assumed to from the group up to height z0,
   // then increase linearly until height z1, continue at that
   // density until z2, and then decrease linearly until the top of
@@ -2220,6 +2221,7 @@ CropStandard::harvest (const string& column_name,
 		       const Time& time,
 		       const Geometry& geometry,
 		       OrganicMatter& organic_matter,
+		       Bioclimate& bioclimate,
 		       double stub_length,
 		       double stem_harvest,
 		       double leaf_harvest,
@@ -2254,6 +2256,8 @@ CropStandard::harvest (const string& column_name,
   const vector<double>& density = var.RootSys.Density;
   const double length = height ();
 
+  Chemicals chemicals;
+
   // Leave stem and leaf below stub alone.
 
   if (stub_length < length)
@@ -2265,10 +2269,11 @@ CropStandard::harvest (const string& column_name,
 	{
 	  const double stub_LAI = LAIvsH ()(stub_length);
 	  leaf_harvest *= (1.0 - stub_LAI / total_LAI);
+	  bioclimate.harvest_chemicals (chemicals, total_LAI - stub_LAI);
 	}
     }
 
-  if (!kill_off && DS < DSmax)
+  if (!kill_off && DS < DSmax && stub_length > 0.0)
     {
       // Cut back development stage and production.
       const double DSnew = Hp.DSnew;
@@ -2362,7 +2367,8 @@ CropStandard::harvest (const string& column_name,
   return *new Harvest (column_name, time, name,
 		       WStem * stem_harvest, NStem * stem_harvest,
 		       WLeaf * leaf_harvest, NLeaf * leaf_harvest,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest);
+		       WSOrg * sorg_harvest, NSOrg * sorg_harvest, 
+		       chemicals);
 }
 
 void

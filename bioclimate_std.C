@@ -15,12 +15,7 @@
 #include "pet.h"
 #include "pt.h"
 #include "vegetation.h"
-
-#define HANDLE_CHEMICALS
-
-#ifdef HANDLE_CHEMICALS
 #include "chemicals.h"
-#endif HANDLE_CHEMICALS
 
 struct BioclimateStandard : public Bioclimate
 { 
@@ -82,7 +77,6 @@ struct BioclimateStandard : public Bioclimate
 			  Vegetation& vegetation, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat&);
 
-#ifdef HANDLE_CHEMICALS
   // Chemicals.
   Chemicals spray_;
 
@@ -100,7 +94,7 @@ struct BioclimateStandard : public Bioclimate
   Chemicals surface_chemicals_out;
 
   void ChemicalDistribution (const Vegetation&);
-#endif
+
   // Radiation.
   void RadiationDistribution (const Weather&, const Vegetation&);
   void IntensityDistribution (double Rad0, double Ext, 
@@ -138,10 +132,12 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_top (double flux, double temp);
   void irrigate_surface (double flux, double temp);
   void spray (const string& chemical, double amount) // [g/m^2]
+    { spray_.add (chemical, amount); }
+  void harvest_chemicals (Chemicals& chemicals, double LAI)
     { 
-#ifdef HANDLE_CHEMICALS
-      spray_.add (chemical, amount); 
-#endif
+      if (LAI_ > 0.0)
+	Chemicals::move_fraction (canopy_chemicals_storage, chemicals,
+				  LAI / LAI_);
     }
   
   // Communication with external model.
@@ -197,7 +193,6 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     pt (Librarian<PT>::create (al.alist ("pt"))),
     crop_ep (0.0),
     crop_ea (0.0),
-#ifdef HANDLE_CHEMICALS
     spray_ (),
     snow_chemicals_storage (al.alist_sequence ("snow_chemicals_storage")),
     snow_chemicals_in (),
@@ -212,7 +207,6 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
 			       ("surface_chemicals_storage")),
     surface_chemicals_in (),
     surface_chemicals_out (),
-#endif
     daily_air_temperature_ (0.0),
     day_length_ (0.0),
     daily_global_radiation_ (0.0)
@@ -451,12 +445,10 @@ BioclimateStandard::tick (Surface& surface, const Weather& weather,
   WaterDistribution (surface, weather, vegetation,
 		     soil, soil_water, soil_heat);
 
-#ifdef HANDLE_CHEMICALS
+  // Let the chemicals follow the water.
   ChemicalDistribution (vegetation);
-#endif HANDLE_CHEMICALS
 }
 
-#ifdef HANDLE_CHEMICALS
 void 
 BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
 {
@@ -485,6 +477,7 @@ BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
   canopy_chemicals_storage.canopy_out (canopy_chemicals_out,
 				       canopy_water_storage,
 				       canopy_water_out);
+  canopy_chemicals_storage.cleanup (canopy_chemicals_out);
   
   // Surface
   surface_chemicals_in.clear ();
@@ -497,7 +490,6 @@ BioclimateStandard::ChemicalDistribution (const Vegetation& vegetation)
   // Reset spray.
   spray_.clear ();
 }
-#endif
 
 void 
 BioclimateStandard::output (Log& log, Filter& filter) const
@@ -539,7 +531,6 @@ BioclimateStandard::output (Log& log, Filter& filter) const
   log.output ("crop_ep", filter, crop_ep, true);
   log.output ("crop_ea", filter, crop_ea, true);
 
-#ifdef HANDLE_CHEMICALS
   // Note: We use snow_chemicals_in instead of spray, since the former
   // is reset after each time step.
   output_submodule (snow_chemicals_in, "spray", log, filter, true);
@@ -563,7 +554,6 @@ BioclimateStandard::output (Log& log, Filter& filter) const
 		    log, filter, true);
   output_submodule (surface_chemicals_out, "surface_chemicals_out",
 		    log, filter, true);
-#endif HANDLE_CHEMICALS
 }
 
 void
@@ -683,7 +673,6 @@ Number of vertical intervals in which we partition the canopy");
       syntax.add ("crop_ea", "mm/h", Syntax::LogOnly,
 		  "Actual transpiration.");
 
-#ifdef HANDLE_CHEMICALS
       // Chemicals.
       Chemicals::add_syntax  ("spray", syntax, alist, Syntax::LogOnly,
 			      "Chemicals sprayed on field this time step.");
@@ -720,7 +709,6 @@ Number of vertical intervals in which we partition the canopy");
       Chemicals::add_syntax  ("surface_chemicals_out",
 			      syntax, alist, Syntax::LogOnly,
 			      "Chemicals entering the soil.");
-#endif HANDLE_CHEMICALS
       // Add to library.
       Librarian<Bioclimate>::add_type ("default", alist, syntax, &make);
     }

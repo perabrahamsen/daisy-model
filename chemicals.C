@@ -45,6 +45,7 @@ struct Chemicals::Implementation
 
   // Create and Destroy.
   void clear ();
+  void cleanup (Implementation& out);
   void operator += (const Implementation&);
   Implementation ()
     : chemicals ()
@@ -79,9 +80,11 @@ Chemicals::Implementation::lookup (const string& name)
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
   assert (syntax.check (alist));
-  
+  AttributeList child (alist);
+  child.add ("type", name);
+
   // Then add it.
-  const Chemical* chemical = &Librarian<Chemical>::create (alist);
+  const Chemical* chemical = &Librarian<Chemical>::create (child);
   (*chemistry)[name] = chemical;
   return chemical;
 }
@@ -184,7 +187,12 @@ Chemicals::Implementation::output (Log& log, Filter& filter) const
   for (chemical_map::const_iterator i = chemicals.begin ();
        i != chemicals.end ();
        i++)
-    log.output ((*i).first->name, filter, (*i).second);
+    { 
+      const string& name = (*i).first->name;
+      const double amount = (*i).second;
+      if (amount > 0.0)
+	log.output (name, filter, amount);
+    }
 }
 
 void
@@ -194,6 +202,24 @@ Chemicals::Implementation::clear ()
        i != chemicals.end ();
        i++)
     (*i).second = 0.0;
+}
+
+void
+Chemicals::Implementation::cleanup (Implementation& out)
+{ 
+  for (chemical_map::iterator i = chemicals.begin ();
+       i != chemicals.end ();
+       i++)
+    {
+      const Chemical* chemical = (*i).first;
+      const double amount = (*i).second;
+      
+      if (amount > 0.0 && amount < 1.e-18) // Less than one molecule...
+	{
+	  out.add (chemical, amount);
+	  (*i).second = 0.0;
+	}
+    }
 }
 
 void
@@ -249,6 +275,10 @@ Chemicals::add (const string& chemical, double amount)
 void 
 Chemicals::clear ()
 { impl.clear (); }
+
+void
+Chemicals::cleanup (Chemicals& out)
+{ impl.cleanup (out.impl); }
 
 void 
 Chemicals::operator += (const Chemicals& other)

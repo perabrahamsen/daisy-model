@@ -16,6 +16,7 @@ struct SoilWater;
 struct SoilHeat;
 struct Log;
 struct Filter;
+struct Chemicals;
 
 class Bioclimate
 { 
@@ -55,7 +56,8 @@ public:
   virtual void irrigate_top (double flux, double temp) = 0;
   virtual void irrigate_surface (double flux, double temp) = 0;
   virtual void spray (const string& chemical, double amount) = 0; // [g/m^2]
-
+  virtual void harvest_chemicals (Chemicals& chemicals, double LAI) = 0;
+		       
   // Communication with external model.
   virtual double get_evap_interception () const; // [mm/h]
   virtual double get_intercepted_water () const; // [mm]

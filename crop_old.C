@@ -86,6 +86,7 @@ public:
 	     SoilNO3&);
   const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&, OrganicMatter&,
+			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest, 
 			  bool kill_off);
@@ -1755,6 +1756,7 @@ const Harvest&
 CropOld::harvest (const string& column_name,
 		  const Time& time, const Geometry& geometry, 
 		  OrganicMatter& organic_matter,
+		  Bioclimate&,
 		  double stub_length,
 		  double stem_harvest, double, double sorg_harvest, 
 		  bool kill_off)
@@ -1884,10 +1886,12 @@ CropOld::harvest (const string& column_name,
        << "\n\tRoot N = " << NRoot << " W = " << WRoot
        << "\n";
 
+  Chemicals chemicals;
   return *new Harvest (column_name, time, name, 
 		       WStraw * stem_harvest, NStraw * stem_harvest,
 		       0.0, 0.0,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest);
+		       WSOrg * sorg_harvest, NSOrg * sorg_harvest,
+		       chemicals);
 }
 
 void

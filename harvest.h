@@ -3,6 +3,7 @@
 #ifndef HARVEST_H
 #define HARVEST_H
 
+#include "chemicals.h"
 #include "time.h"
 #include <string>
 
@@ -24,6 +25,7 @@ private:
   const double leaf_N;
   const double sorg_DM;
   const double sorg_N;
+  const Chemicals chemicals;
 
   // Simulation:
 public:
@@ -34,7 +36,8 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   Harvest (string col, Time t, string crp, 
 	   double sC, double sN, double lC, double lN, 
-	   double oC, double oN);
+	   double oC, double oN,
+	   const Chemicals& chem);
 };      
 
 #endif HARVEST_H

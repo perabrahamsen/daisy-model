@@ -57,11 +57,13 @@ public:
   double transpiration (double potential_transpiration,	// Actual trans. [mm/h]
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water);
-  void kill_all (const string&, const Time&, const Geometry&, OrganicMatter&);
+  void kill_all (const string&, const Time&, const Geometry&, OrganicMatter&, 
+		 Bioclimate&);
   vector<const Harvest*> harvest (const string& column_name,
 				  const string& crop_name,
 				  const Time&, const Geometry&, 
 				  OrganicMatter&,
+				  Bioclimate& bioclimate,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
