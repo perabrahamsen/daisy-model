@@ -95,7 +95,7 @@ WeatherFile::tick (const Time& time)
       else
 	{
 	  // BCC wants this:
-	  file.putback (end);
+	  file.putback ((char) end);
 	  // G++ used this:
 	  // file.unget ();
 	  file >> reference_evapotranspiration_;

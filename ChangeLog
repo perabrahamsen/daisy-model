@@ -1,15 +1,39 @@
+1998-12-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.48 released.
+
+1998-12-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C (check_alist): Check that `humus > 0'.
+	(load_syntax): Register it.
+
 1998-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C (add_check): New functions.
+	(Implementation): Use lists of check functions.
+	* geometry.C (load_syntax, check_alist): Use it.
+	* soil.C (load_syntax, check_alist): Ditto.
+	* organic_matter.C (load_syntax, check_alist): Ditto.
+	* column_std.C (ColumnStandardSyntax): Call them.
 
 	* Version 0.47 released.
 
 1998-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.h (add_submodule_sequence): Allocate alist on
+	stack instead of heap.
+	(add_submodule): Ditto.
+	* syntax.C (add): Copy alist to heap.
+
+	* hydraulic_B_BaC_Bimodal.C (Theta): Check for `h > 0'.
+	* hydraulic_M_BaC_Bimodal.C (Theta): Ditto.
 
 	* Version 0.46 released.
 
 1998-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* uzrichard.C (richard): Don't try for convergence if tridia gives
-	absurds results.  Set down the time step instead.
+	absurd results.  Set down the time step instead.
 
 	* lib/log.dai: Update logs for new bioclimate and vegetation
 	models. 

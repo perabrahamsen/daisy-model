@@ -39,8 +39,8 @@ Geometry::check () const
   return ok;
 }
 
-bool 
-Geometry::check_alist (const AttributeList& al)
+static bool 
+check_alist (const AttributeList& al)
 {
   bool ok = true;
   const vector<double> zplus = al.number_sequence ("zplus");
@@ -254,6 +254,7 @@ Geometry::initialize_layer (vector<double>& array,
 void
 Geometry::load_syntax (Syntax& syntax, AttributeList&)
 { 
+  syntax.add_check (check_alist);
   syntax.add ("zplus", Syntax::Number, Syntax::Const, Syntax::Sequence);
 }
   

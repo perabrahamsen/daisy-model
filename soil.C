@@ -30,10 +30,10 @@ Soil::check () const
   return ok;
 }
 
-bool
-Soil::check_alist (const AttributeList& al)
+static bool
+check_alist (const AttributeList& al)
 {
-  bool ok = Geometry::check_alist (al);
+  bool ok = true;
 
   const vector<AttributeList*>& layers = al.alist_sequence ("horizons");
 
@@ -91,6 +91,7 @@ void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   Geometry::load_syntax (syntax, alist);
+  syntax.add_check (check_alist);
   Syntax& layer_syntax = *new Syntax ();
 #if 0
   AttributeList& layer_alist = *new AttributeList ();

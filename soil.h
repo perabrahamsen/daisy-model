@@ -62,7 +62,6 @@ public:
 
   // Creation.
   bool check () const;
-  static bool check_alist (const AttributeList&);
   static void load_syntax (Syntax&, AttributeList&);
   Soil (const AttributeList&);
   ~Soil ();

@@ -379,9 +379,23 @@ Horizon::heat_capacity (double Theta, double Ice) const
     + impl.heat_capacity[Implementation::Ice] * Ice;
 }
 
+static bool
+check_alist (const AttributeList& al)
+{
+  bool ok = true;
+
+  if (!(al.number ("humus") > 0.0))
+    {
+      CERR << "humus must be a positive number\n";
+      ok = false;
+    }
+  return ok;
+}
+
 void
 Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add_check (check_alist);
   syntax.add ("description", Syntax::String, Syntax::Optional);
   syntax.add ("hydraulic", Librarian<Hydraulic>::library (), Syntax::Const);
   syntax.add ("tortuosity", Librarian<Tortuosity>::library (), Syntax::Const);

@@ -12,8 +12,8 @@ const int Syntax::Unspecified = -666;
 
 struct Syntax::Implementation
 {
-  check_fun checker;
-  check_list_fun list_checker;
+  vector<check_fun> checker;
+  vector<check_list_fun> list_checker;
   vector<string> order;
   typedef map<string, type, less<string> > type_map;
   typedef map<string, category, less<string> > status_map;
@@ -37,10 +37,16 @@ struct Syntax::Implementation
   int order_number (const string& name) const;
   void dump (int indent) const;
   void entries (vector<string>& result) const;
-  Implementation (check_fun c1, check_list_fun c2)
-    : checker (c1),
-      list_checker (c2)
+  Implementation ()
   { }
+  ~Implementation ()
+  { 
+#if 0
+    // BUG: Memory leak.  Need to delete alists we have allocated.
+    for (alist_map::iterator i = alists.begin (); i < alists.end (); i++)
+      delete (*i).second;
+#endif
+  }
 };    
 
 bool 
@@ -104,13 +110,17 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 	  {
 	    assert (vl.size (key) != Syntax::Singleton);
 	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
-	    if (syntax[key]->impl.list_checker)
-	      if (!syntax[key]->impl.list_checker (seq))
-		{
-		  error = true;
-		  CERR << "in " << key << "\n";
-		}
-		
+	    for (unsigned int j = 0;
+		 j < syntax[key]->impl.list_checker.size ();
+		 j++)
+	      {
+		if (!syntax[key]->impl.list_checker[j] (seq))
+		  {
+		    error = true;
+		    CERR << "in " << key << "\n";
+		    break;
+		  }
+	      }
 	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
@@ -123,9 +133,17 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 	else if (!syntax[key]->check (vl.alist (key), key))
 	  error = true;
     }
-  if (!error && checker && !checker (vl))
-    error = true;
-
+  if (!error)
+    {
+      for (unsigned int j = 0; j < checker.size (); j++)
+	{
+	  if (!checker[j] (vl))
+	    {
+	      error = true;
+	      break;
+	    }
+	}
+    }
   if (error)
     CERR << "in " << name << "\n";
 
@@ -513,25 +531,27 @@ Syntax::entries () const
 { return impl.types.size (); }
 
 void 
-Syntax::add_check (check_fun)
-{ }
+Syntax::add_check (check_fun fun)
+{ impl.checker.push_back (fun); }
 
 void 
-Syntax::add_check (check_list_fun)
+Syntax::add_check (check_list_fun fun)
+{ impl.list_checker.push_back (fun); }
+
+Syntax::Syntax ()
+  : impl (*new Implementation ())
 { }
 
-Syntax::Syntax () : impl (*new Implementation (NULL, NULL))
-{ }
+Syntax::Syntax (check_fun fun) 
+  : impl (*new Implementation ())
+{ add_check (fun); }
 
-Syntax::Syntax (check_fun c) : impl (*new Implementation (c, NULL))
-{ }
+Syntax::Syntax (check_list_fun fun) 
+  : impl (*new Implementation ())
+{ add_check (fun); }
 
-Syntax::Syntax (check_list_fun c) : impl (*new Implementation (NULL, c))
-{ }
 Syntax::~Syntax ()
-{
-  delete &impl;
-}
+{ delete &impl; }
 
 void
 check (const AttributeList& al, const string& s, bool& ok)

@@ -649,7 +649,73 @@ OrganicMatter::output (Log& log, Filter& filter, const Soil& soil) const
 }
 
 bool
-OrganicMatter::check_alist (const AttributeList& al)
+OrganicMatter::check_am (const AttributeList& am) const
+{
+  bool ok = true;
+  ::check (am, "om", ok);
+  if (ok)
+    {
+      const vector<AttributeList*>& om_alist
+	= am.alist_sequence ("om");
+      
+      for (unsigned int i = 0; i < om_alist.size(); i++)
+	{
+	  bool om_ok = true;
+	  ::check (*om_alist[i], "fractions", ok);
+	  if (om_ok)
+	    {
+	      vector<double> fractions
+		= om_alist[i]->number_sequence ("fractions");
+	      if (fractions.size () != impl.smb.size () + 1)
+		{
+		  CERR << "You have " << fractions.size ()
+		       << " fractions but " << impl.smb.size ()
+		       << " smb and one buffer.\n";
+		  om_ok = false;
+		}
+	      double sum
+		= accumulate (fractions.begin (), fractions.end (), 0.0);
+	      if (fabs (sum - 1.0) > 0.0001)
+		{
+		  CERR << "The sum of all fractions is " << sum << "\n";
+		  om_ok = false;
+		}
+	    }
+	  if (!om_ok)
+	    {
+	      CERR << "in om[" << i << "]\n";
+	      ok = false;
+	    }
+	}
+    }
+  if (!ok)
+    CERR << "in added matter `" << am.name ("type") << "'\n";
+  return ok;
+}
+
+bool
+OrganicMatter::check () const
+{
+  return impl.check ();
+}
+
+void 
+OrganicMatter::add (AM& am)
+{
+  impl.add (am);
+}
+
+OrganicMatter::OrganicMatter (const Soil& soil, const AttributeList& al)
+  : impl (*new Implementation (soil, al))
+{ }
+
+OrganicMatter::~OrganicMatter ()
+{
+  delete &impl;
+}
+
+static bool 
+check_alist (const AttributeList& al)
 {
   bool ok = true;
 
@@ -780,72 +846,6 @@ OrganicMatter::check_alist (const AttributeList& al)
   return ok;
 }
 
-bool
-OrganicMatter::check_am (const AttributeList& am) const
-{
-  bool ok = true;
-  ::check (am, "om", ok);
-  if (ok)
-    {
-      const vector<AttributeList*>& om_alist
-	= am.alist_sequence ("om");
-      
-      for (unsigned int i = 0; i < om_alist.size(); i++)
-	{
-	  bool om_ok = true;
-	  ::check (*om_alist[i], "fractions", ok);
-	  if (om_ok)
-	    {
-	      vector<double> fractions
-		= om_alist[i]->number_sequence ("fractions");
-	      if (fractions.size () != impl.smb.size () + 1)
-		{
-		  CERR << "You have " << fractions.size ()
-		       << " fractions but " << impl.smb.size ()
-		       << " smb and one buffer.\n";
-		  om_ok = false;
-		}
-	      double sum
-		= accumulate (fractions.begin (), fractions.end (), 0.0);
-	      if (fabs (sum - 1.0) > 0.0001)
-		{
-		  CERR << "The sum of all fractions is " << sum << "\n";
-		  om_ok = false;
-		}
-	    }
-	  if (!om_ok)
-	    {
-	      CERR << "in om[" << i << "]\n";
-	      ok = false;
-	    }
-	}
-    }
-  if (!ok)
-    CERR << "in added matter `" << am.name ("type") << "'\n";
-  return ok;
-}
-
-bool
-OrganicMatter::check () const
-{
-  return impl.check ();
-}
-
-void 
-OrganicMatter::add (AM& am)
-{
-  impl.add (am);
-}
-
-OrganicMatter::OrganicMatter (const Soil& soil, const AttributeList& al)
-  : impl (*new Implementation (soil, al))
-{ }
-
-OrganicMatter::~OrganicMatter ()
-{
-  delete &impl;
-}
-
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<OrganicMatter::Implementation::Buffer>;
 template class add_submodule_sequence<OM>;
@@ -854,6 +854,7 @@ template class add_submodule_sequence<OM>;
 void
 OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add_check (check_alist);
   syntax.add ("active_underground", Syntax::Boolean, Syntax::Const);
   alist.add ("active_underground", false);
   syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const);

@@ -390,26 +390,15 @@ static struct ColumnStandardSyntax
     syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
 		Syntax::State);
     add_submodule<Surface> ("Surface", syntax, alist);
-    {
-      Syntax& s = *new Syntax (&Soil::check_alist);
-      AttributeList& a = *new AttributeList ();
-      Soil::load_syntax (s, a);
-      syntax.add ("Soil", s, Syntax::State, Syntax::Singleton, 
-		  "The soil model.");
-      alist.add ("Soil", a);
-    }
+    add_submodule<Soil> ("Soil", syntax, alist, Syntax::Const, 
+			 "The soil model");
     add_submodule<SoilWater> ("SoilWater", syntax, alist);
     add_submodule<SoilHeat> ("SoilHeat", syntax, alist);
     add_submodule<SoilNH4> ("SoilNH4", syntax, alist);
     add_submodule<SoilNO3> ("SoilNO3", syntax, alist);
-    {
-      Syntax& s = *new Syntax (&OrganicMatter::check_alist);
-      AttributeList& a = *new AttributeList ();
-      OrganicMatter::load_syntax (s, a);
-      syntax.add ("OrganicMatter", s, Syntax::State, Syntax::Singleton, 
-		  "The soil organic matter.");
-      alist.add ("OrganicMatter", a);
-    }
+    add_submodule<OrganicMatter> ("OrganicMatter", syntax, alist,
+				  Syntax::State, 
+				  "The soil organic matter");
     syntax.add ("Nitrification", Librarian<Nitrification>::library (),
 		Syntax::State);
     add_submodule<Denitrification> ("Denitrification", syntax, alist);
