@@ -181,6 +181,13 @@ USEUNIT("weather_std.C");
 USEUNIT("path.C");
 USEUNIT("rootdens.C");
 USEUNIT("rootdens_G_P.C");
+USEUNIT("development.C");
+USEUNIT("crpn.C");
+USEUNIT("partition.C");
+USEUNIT("photosynthesis.C");
+USEUNIT("production.C");
+USEUNIT("harvesting.C");
+USEUNIT("vernalization.C");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 

@@ -47,7 +47,9 @@
       treelog_stream.obj uzlr.obj uzmodel.obj uznone.obj uzrichard.obj 
       vegetation.obj vegetation_crops.obj vegetation_permanent.obj weather.obj 
       weather_none.obj weather_old.obj weather_simple.obj weather_std.obj 
-      path.obj rootdens.obj rootdens_G_P.obj"/>
+      path.obj rootdens.obj rootdens_G_P.obj development.obj crpn.obj 
+      partition.obj photosynthesis.obj production.obj harvesting.obj 
+      vernalization.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
