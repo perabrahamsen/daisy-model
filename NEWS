@@ -12,6 +12,18 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.13
+
+** "N Blance" log parameterization changes.
+
+New NH4-fertilizer-Surface, Volatilization-Surface and
+NO3-fertilizer-Surface columns which ignore incorporated fertilizer,
+and fertilizer in subsoil irrigation.
+
+The "Nitrogen Blance" log summary has been updated to use these.  You
+should now get a correct balance when using subsoil irrigation with
+mineral fertilizer.
+
 * 3.12
 
 ** You can now specify daily max and min temperature.

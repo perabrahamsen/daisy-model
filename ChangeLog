@@ -1,5 +1,20 @@
+2003-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.13 released.
+
+2003-11-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C (fertilized_NO3_surface, fertilized_NH4_surface)
+	(volatilization_surface): New log variables. 
+	* lib/log.dai ("N Balance"): Use them.
+	("Nitrogen Balance"): Ditto.
+
 2003-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* column_std.C (fertilize): Don't add incorporated mineral
+	fertilizer to fertilized_NO3 and fertilized_NH4.
+	* lib/log.dai ("Nitrogen Balance"): Add incorporated to balance.
+	
 	* Version 3.12 released.
 
 2003-10-27  Per Abrahamsen  <abraham@dina.kvl.dk>
