@@ -554,22 +554,18 @@ ActionCrop::fertilize (Daisy& daisy, const AttributeList& am) const
 {
   COUT << " [Fertilizing " << am.name ("type") << "]\n";
 
-  // Add inorganic matter.
-  daisy.field.fertilize (IM (am));
-
-  // Add organic matter, if any.
+#if 0
   if (am.name ("syntax") != "mineral")
-    {
-      const double from = 0.0;
-      const double to = -18.0;
+    am.add ("creation", daisy.time);
+#endif
 
-      AttributeList am_creation (am);
-      am_creation.add ("creation", daisy.time);
-      if (fertilize_incorporate)
-	daisy.field.fertilize (am, from, to);
-      else
-	daisy.field.fertilize (am);
-    }
+  const double from = 0.0;
+  const double to = -18.0;
+      
+  if (fertilize_incorporate)
+    daisy.field.fertilize (am, from, to);
+  else
+    daisy.field.fertilize (am);
 }
 
 void 

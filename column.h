@@ -32,8 +32,6 @@ public:
 				       double from, double to) = 0;
   virtual void fertilize (const AttributeList&, double from, double to) = 0;
   virtual void fertilize (const AttributeList&) = 0;
-  virtual void fertilize (const IM&, double from, double to) = 0; // Mineral.
-  virtual void fertilize (const IM&) = 0;
   virtual void clear_second_year_utilization () = 0;
   virtual void harvest (const Time&, const string& name,
 			double stub_length, 

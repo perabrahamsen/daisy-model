@@ -27,8 +27,6 @@ struct Field::Implementation
 			       double from, double to);
   void fertilize (const AttributeList&, double from, double to);  // Organic.
   void fertilize (const AttributeList&);
-  void fertilize (const IM&, double from, double to); // Mineral.
-  void fertilize (const IM&);
   void clear_second_year_utilization ();
   void harvest (const Time&, const string& name,
 		double stub_length, 
@@ -213,28 +211,6 @@ Field::Implementation::fertilize (const AttributeList& al)
 	}
       CERR << "\n";
     }
-}
-
-void 
-Field::Implementation::fertilize (const IM& im, double from, double to) // Mineral.
-{
-  if (selected)
-    selected->fertilize (im, from, to);
-  else for (ColumnList::iterator i = columns.begin ();
-	    i != columns.end ();
-	    i++)
-    (*i)->fertilize (im, from, to);
-}
-
-void 
-Field::Implementation::fertilize (const IM& im)
-{
-  if (selected)
-    selected->fertilize (im);
-  else for (ColumnList::iterator i = columns.begin ();
-	    i != columns.end ();
-	    i++)
-    (*i)->fertilize (im);
 }
 
 void 
@@ -577,14 +553,6 @@ Field::fertilize (const AttributeList& al, double from, double to)
 void 
 Field::fertilize (const AttributeList& al)
 { impl.fertilize (al); }
-
-void 
-Field::fertilize (const IM& im, double from, double to) // Mineral.
-{ impl.fertilize (im, from, to); }
-
-void 
-Field::fertilize (const IM& im)
-{ impl.fertilize (im); }
 
 void 
 Field::clear_second_year_utilization ()

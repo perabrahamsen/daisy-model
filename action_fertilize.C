@@ -139,22 +139,13 @@ ActionFertilize::doIt (Daisy& daisy)
   else
     COUT << " [Fertilizing " << am.name ("type") << "]\n";
 
-  // Add inorganic matter.
-  if (to < from)
-    daisy.field.fertilize (IM (am), from, to);
-  else 
-    daisy.field.fertilize (IM (am));
-
-  // Add organic matter, if any.
   if (syntax != "mineral")
-    {
-      AttributeList am_creation (am);
-      am_creation.add ("creation", daisy.time);
-      if (to < from)
-	daisy.field.fertilize (am, from, to);
-      else
-	daisy.field.fertilize (am);
-    }
+    am.add ("creation", daisy.time);
+
+  if (to < from)
+    daisy.field.fertilize (am, from, to);
+  else
+    daisy.field.fertilize (am);
 }
 
 bool 

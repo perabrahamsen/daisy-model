@@ -10,8 +10,6 @@ public:
   void sow (const AttributeList&);
   void fertilize (const AttributeList&);
   void fertilize (const AttributeList&, double from, double to);
-  void fertilize (const IM&);
-  void fertilize (const IM&, double from, double to);
   void clear_second_year_utilization ();
   void add_residuals (vector<AM*>& residuals);
 
@@ -61,14 +59,6 @@ ColumnInorganic::fertilize (const AttributeList&)
 
 void 
 ColumnInorganic::fertilize (const AttributeList&, double, double)
-{ }
-
-void 
-ColumnInorganic::fertilize (const IM&)
-{ }
-
-void 
-ColumnInorganic::fertilize (const IM&, double, double)
 { }
 
 void 

@@ -44,8 +44,6 @@ public:
 			       double from, double to);
   void fertilize (const AttributeList&, double from, double to); // Organic.
   void fertilize (const AttributeList&);
-  void fertilize (const IM&, double from, double to); // Mineral.
-  void fertilize (const IM&);
   void clear_second_year_utilization ();
   void harvest (const Time&, const string& name,
 		double stub_length, 

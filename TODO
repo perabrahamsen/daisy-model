@@ -1,9 +1,5 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Gødning
-
-** Get rid of inorganic variants of field/column::feritlize
-
 * Test Qt.
 
 ** Menu -> View -> Check (Model)
@@ -42,6 +38,11 @@ Vis resultatet af syntax check i vindue.
 
 libraries, models, parameterizations and parameters should belong to a
 number of "interest groups", which can be use by QDaisy for filtering.
+
+** repopulate tree
+
+Avoid losing all open/close/selected information when changing tree
+view og loading files.
 
 * document LaTeX
 

@@ -46,8 +46,6 @@ public:
 			       double from, double to);
   void fertilize (const AttributeList&);
   void fertilize (const AttributeList&, double from, double to);
-  void fertilize (const IM&);
-  void fertilize (const IM&, double from, double to);
   void clear_second_year_utilization ();
 
   void add_residuals (vector<AM*>& residuals);
@@ -165,67 +163,64 @@ ColumnStandard::set_subsoil_irrigation (double flux, const IM& sm,
 void
 ColumnStandard::fertilize (const AttributeList& al)
 {
-  first_year_utilization += AM::utilized_weight (al);
-  second_year_utilization_ += AM::second_year_utilization (al);
-  AM& am = AM::create (al, soil);
   // kg/ha -> g/cm^2
   const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
-  fertilized_Org_N += am.total_N (soil) / conv; 
-  fertilized_Org_C += am.total_C (soil) / conv;
 
-  if (al.check ("weight"))
-    fertilized_DM += al.number ("weight");
+  // Utilization log.
+  first_year_utilization += AM::utilized_weight (al);
+  second_year_utilization_ += AM::second_year_utilization (al);
 
-  organic_matter.add (am);
+  // Add inorganic matter.
+  IM im (al);
+  assert (im.NH4 >= 0.0);
+  assert (im.NO3 >= 0.0);
+  surface.fertilize (im);
+  fertilized_NO3 += im.NO3 / conv; 
+  fertilized_NH4 += im.NH4 / conv;
+
+  // Add organic matter, if any.
+  if (al.name ("syntax") != "mineral")
+    {
+      AM& am = AM::create (al, soil);
+      fertilized_Org_N += am.total_N (soil) / conv; 
+      fertilized_Org_C += am.total_C (soil) / conv;
+      if (al.check ("weight"))
+	fertilized_DM += al.number ("weight");
+      organic_matter.add (am);
+    }
 }
 
 void 
 ColumnStandard::fertilize (const AttributeList& al, double from, double to)
 {
   assert (to < from);
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+
+  // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
   second_year_utilization_ += AM::second_year_utilization (al);
-  AM& am = AM::create (al, soil);
 
-  // kg/ha -> g/cm^2
-  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
-  fertilized_Org_N += am.total_N (soil) / conv; 
-  fertilized_Org_C += am.total_C (soil) / conv;
-
-  if (al.check ("weight"))
-    fertilized_DM += al.number ("weight");
-
-  am.mix (soil, from, to);
-  organic_matter.add (am);
-}
-
-void 
-ColumnStandard::fertilize (const IM& im)
-{
-
+  // Add inorganic matter.
+  IM im (al);
   assert (im.NH4 >= 0.0);
   assert (im.NO3 >= 0.0);
-  surface.fertilize (im);
-
-  // kg/ha -> g/cm^2
-  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
-  fertilized_NO3 += im.NO3 / conv; 
-  fertilized_NH4 += im.NH4 / conv;
-}
-
-void 
-ColumnStandard::fertilize (const IM& im, double from, double to)
-{
-  assert (im.NH4 >= 0.0);
-  assert (im.NO3 >= 0.0);
-  assert (to < from);
   soil_NO3.add_external (soil, soil_water, im.NO3, from, to);
   soil_NH4.add_external (soil, soil_water, im.NH4, from, to);
-
-  // kg/ha -> g/cm^2
-  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
   fertilized_NO3 += im.NO3 / conv; 
   fertilized_NH4 += im.NH4 / conv;
+
+  // Add organic matter, if any.
+  if (al.name ("syntax") != "mineral")
+    {
+      AM& am = AM::create (al, soil);
+      fertilized_Org_N += am.total_N (soil) / conv; 
+      fertilized_Org_C += am.total_C (soil) / conv;
+      if (al.check ("weight"))
+	fertilized_DM += al.number ("weight");
+      am.mix (soil, from, to);
+      organic_matter.add (am);
+    }
 }
 
 void 

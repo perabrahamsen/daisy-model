@@ -1,5 +1,14 @@
 2000-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.49 released.
+
+2000-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C (fertilize): Merged inorganic and organic
+	function variants. 
+	* action_fertilize.C (doIt): Update caller
+	* action_crop.C (fertilize): Ditto.
+
 	* Version 1.48 released.
 
 2000-09-21  Per Abrahamsen  <abraham@dina.kvl.dk>
