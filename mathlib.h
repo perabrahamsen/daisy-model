@@ -42,6 +42,8 @@ T max (T a, T b)
 
 #if defined (finite)
 /* do nothing */
+#elif defined (__finite)
+#define finite(x) __finite(x)
 #elif defined (__sparc__)
 #include <ieeefp.h>
 #elif defined (isfinite)
