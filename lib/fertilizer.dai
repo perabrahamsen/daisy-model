@@ -1,5 +1,20 @@
 ;; fertilizer.dai -*- lisp -*-
 
+(defam Ammonia mineral
+  (NH4_fraction 1.000))
+
+(defam AmmoniumNitrate mineral
+  (NH4_fraction 0.500))
+
+(defam Nitrate mineral
+  (NH4_fraction 0.000))
+
+(defam NPK mineral
+  (NH4_fraction 0.000))
+
+(defam N25S mineral
+  (NH4_fraction 0.508))
+
 (defam slurry organic
   (volatilization 0.15)
   (om ((initial_fraction 0.72)
@@ -27,3 +42,9 @@
   (total_N_fraction 0.0495)
   (total_C_fraction 0.445)
   (NH4_fraction 0.58))
+
+(defam Foulum_slurry slurry
+  (dry_matter_fraction 0.0341)
+  (total_N_fraction 0.0615)
+  (total_C_fraction 0.323)
+  (NH4_fraction 0.57))
