@@ -1,3 +1,36 @@
+2003-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.62 released.
+
+2003-03-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* fao.C, fao.h: New utility.
+	* Makefile (OTHER): Added it.
+	* pet_PM.C, pet_PM.h: Move FAO utilites.
+	* bioclimate.C, bioclimate.h: Ditto.
+	* weather.C, weather.h: Ditto.
+	(elevation): New function.
+	* pet_makkink.C: Update caller.
+	* weather_old.C: Ditto.
+	* weather_std.C: Ditto.
+
+	* weather.C (tick_after): Use hourly extraterrestrial radiation
+	for hourly claudiness. 
+
+2003-03-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gaussj.C (solve): Check for non-finite numbers.
+
+	* svat_pmsw.C (tick): Give error if crop height > 2.5 m.
+	(gaussj): Commented out.
+	(tick): Use GaussJordan instead of gaussj.
+	Added many checks.
+	
+2003-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* svat_pmsw.C (gaussj): Throw instead of exit on error.
+	(tick): Catch errors here.
+
 2003-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.61 released.

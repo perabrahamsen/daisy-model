@@ -357,7 +357,7 @@ SPECIALS = om.C select_value.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
+OTHER = fao.C gaussj.C vcheck.C assertion.C xref.C treelog_dual.C units.C \
 	check.C check_range.C path.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
@@ -599,8 +599,9 @@ dist:	cvs
 	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
-	(cd lib; $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
-	(cd txt; $(MAKE) FTPDIR=$(FTPDIR) dist)
+	(cd lib && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
+	(cd txt && $(MAKE) FTPDIR=$(FTPDIR) dist)
+	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
 	rm -f $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
 	$(STRIP) -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) \
 		$(OBJHOME)/$(HOSTTYPE)/daisy
@@ -610,11 +611,7 @@ dist:	cvs
 	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
 
 foo:
-	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe
-	$(CROSSSTRIP) -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe \
-		$(OBJHOME)/$(TARGETTYPE)/daisy
-	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
-
+	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
 
 # Update the CVS repository.
 #
@@ -707,7 +704,7 @@ parser${OBJ}: parser.C parser.h librarian.h common.h library.h alist.h \
 log${OBJ}: log.C log.h librarian.h common.h library.h alist.h syntax.h \
  treelog.h assertion.h daisy.h tmpstream.h
 weather${OBJ}: weather.C weather.h librarian.h common.h library.h alist.h \
- syntax.h treelog.h assertion.h im.h net_radiation.h log.h mathlib.h
+ syntax.h treelog.h assertion.h im.h fao.h log.h mathlib.h
 column${OBJ}: column.C column.h librarian.h common.h library.h alist.h \
  syntax.h treelog.h assertion.h log.h
 crop${OBJ}: crop.C crop.h time.h librarian.h common.h library.h alist.h \
@@ -730,7 +727,8 @@ groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h \
  common.h library.h alist.h syntax.h treelog.h assertion.h log.h
 am${OBJ}: am.C am.h librarian.h common.h library.h alist.h syntax.h \
  treelog.h assertion.h aom.h om.h plf.h im.h log.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h check.h tmpstream.h mathlib.h
+ hydraulic.h tortuosity.h geometry.h check.h vcheck.h tmpstream.h \
+ mathlib.h
 transport${OBJ}: transport.C transport.h librarian.h common.h library.h \
  alist.h syntax.h treelog.h assertion.h
 adsorption${OBJ}: adsorption.C adsorption.h librarian.h common.h library.h \
@@ -862,14 +860,14 @@ soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil_chemical.h \
 bioincorporation${OBJ}: bioincorporation.C bioincorporation.h alist.h \
  syntax.h treelog.h log.h librarian.h common.h library.h assertion.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h am.h submodel.h \
- plf.h aom.h om.h mathlib.h
+ plf.h aom.h om.h check.h vcheck.h mathlib.h
 om${OBJ}: om.C om.h plf.h som.h smb.h dom.h adsorption.h librarian.h \
  common.h library.h alist.h syntax.h treelog.h assertion.h transport.h \
  mactrans.h check.h vcheck.h geometry.h log.h mathlib.h tmpstream.h
 select_value${OBJ}: select_value.C select_value.h select.h condition.h \
  librarian.h common.h library.h alist.h syntax.h treelog.h assertion.h
 weather_old${OBJ}: weather_old.C weather_old.h weather.h librarian.h \
- common.h library.h alist.h syntax.h treelog.h assertion.h im.h \
+ common.h library.h alist.h syntax.h treelog.h assertion.h im.h fao.h \
  tmpstream.h
 log_extern${OBJ}: log_extern.C log_select.h log.h librarian.h common.h \
  library.h alist.h syntax.h treelog.h assertion.h select.h condition.h \
@@ -885,8 +883,8 @@ solute${OBJ}: solute.C solute.h adsorption.h librarian.h common.h \
  mactrans.h log.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  soil_water.h macro.h mathlib.h tmpstream.h
 geometry${OBJ}: geometry.C geometry.h syntax.h treelog.h alist.h \
- tmpstream.h mathlib.h assertion.h check.h groundwater.h uzmodel.h \
- librarian.h common.h library.h
+ tmpstream.h mathlib.h assertion.h check.h vcheck.h groundwater.h \
+ uzmodel.h librarian.h common.h library.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
  common.h library.h alist.h syntax.h treelog.h assertion.h plf.h \
  parser.h path.h tmpstream.h
@@ -901,10 +899,12 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  soil_chemicals.h soil_chemical.h solute.h adsorption.h transport.h \
  mactrans.h plf.h transform.h groundwater.h log.h weather.h im.h \
  vegetation.h
-gaussj${OBJ}: gaussj.C gaussj.h tmpstream.h assertion.h
+fao${OBJ}: fao.C fao.h net_radiation.h librarian.h common.h library.h \
+ alist.h syntax.h treelog.h assertion.h tmpstream.h
+gaussj${OBJ}: gaussj.C gaussj.h mathlib.h assertion.h tmpstream.h
 vcheck${OBJ}: vcheck.C vcheck.h syntax.h treelog.h alist.h plf.h \
  tmpstream.h assertion.h mathlib.h
-assertion${OBJ}: assertion.C assertion.h treelog.h tmpstream.h
+assertion${OBJ}: assertion.C assertion.h treelog.h tmpstream.h mathlib.h
 xref${OBJ}: xref.C xref.h traverse.h library.h syntax.h treelog.h alist.h \
  submodel.h assertion.h
 treelog_dual${OBJ}: treelog_dual.C treelog_dual.h treelog.h assertion.h
@@ -987,7 +987,7 @@ condition_weather${OBJ}: condition_weather.C condition.h librarian.h \
  daisy.h check.h log.h tmpstream.h
 rootdens_PLF${OBJ}: rootdens_PLF.C rootdens.h librarian.h common.h \
  library.h alist.h syntax.h treelog.h assertion.h geometry.h plf.h \
- check.h mathlib.h
+ check.h vcheck.h mathlib.h
 rootdens_G_P${OBJ}: rootdens_G_P.C rootdens.h librarian.h common.h \
  library.h alist.h syntax.h treelog.h assertion.h geometry.h check.h \
  tmpstream.h
@@ -1049,8 +1049,8 @@ action_message${OBJ}: action_message.C action.h librarian.h common.h \
  library.h alist.h syntax.h treelog.h assertion.h condition.h log.h \
  daisy.h
 weather_std${OBJ}: weather_std.C weather.h librarian.h common.h library.h \
- alist.h syntax.h treelog.h assertion.h im.h lexer_data.h lexer.h \
- tmpstream.h mathlib.h units.h vcheck.h
+ alist.h syntax.h treelog.h assertion.h im.h fao.h lexer_data.h \
+ lexer.h tmpstream.h mathlib.h units.h vcheck.h
 select_flux_top${OBJ}: select_flux_top.C select_value.h select.h \
  condition.h librarian.h common.h library.h alist.h syntax.h treelog.h \
  assertion.h geometry.h
@@ -1077,10 +1077,10 @@ select_array${OBJ}: select_array.C select.h condition.h librarian.h \
  common.h library.h alist.h syntax.h treelog.h assertion.h
 log_table${OBJ}: log_table.C log_select.h log.h librarian.h common.h \
  library.h alist.h syntax.h treelog.h assertion.h select.h condition.h \
- geometry.h version.h daisy.h
+ geometry.h version.h daisy.h tmpstream.h
 log_harvest${OBJ}: log_harvest.C log.h librarian.h common.h library.h \
  alist.h syntax.h treelog.h assertion.h daisy.h harvest.h chemicals.h \
- version.h
+ version.h tmpstream.h
 action_while${OBJ}: action_while.C action.h librarian.h common.h library.h \
  alist.h syntax.h treelog.h assertion.h log.h
 action_wait${OBJ}: action_wait.C action.h librarian.h common.h library.h \
@@ -1239,7 +1239,8 @@ condition_soil${OBJ}: condition_soil.C condition.h librarian.h common.h \
  library.h alist.h syntax.h treelog.h assertion.h field.h daisy.h \
  check.h
 log_table1${OBJ}: log_table1.C log.h librarian.h common.h library.h \
- alist.h syntax.h treelog.h assertion.h condition.h geometry.h
+ alist.h syntax.h treelog.h assertion.h condition.h geometry.h \
+ tmpstream.h
 log_checkpoint${OBJ}: log_checkpoint.C log_alist.h log.h librarian.h \
  common.h library.h alist.h syntax.h treelog.h assertion.h condition.h \
  daisy.h printer_file.h printer.h tmpstream.h
@@ -1257,7 +1258,7 @@ hydraulic_B_BaC_Bimodal${OBJ}: hydraulic_B_BaC_Bimodal.C hydraulic.h \
  librarian.h common.h library.h alist.h syntax.h treelog.h assertion.h \
  mathlib.h
 pet_makkink${OBJ}: pet_makkink.C pet.h librarian.h common.h library.h \
- alist.h syntax.h treelog.h assertion.h weather.h im.h log.h
+ alist.h syntax.h treelog.h assertion.h weather.h im.h fao.h log.h
 pet_weather${OBJ}: pet_weather.C pet.h librarian.h common.h library.h \
  alist.h syntax.h treelog.h assertion.h weather.h im.h log.h
 svat_none${OBJ}: svat_none.C svat.h librarian.h common.h library.h alist.h \
@@ -1266,13 +1267,14 @@ action_spray${OBJ}: action_spray.C action.h librarian.h common.h library.h \
  alist.h syntax.h treelog.h assertion.h daisy.h field.h chemical.h \
  check.h
 pet_PM${OBJ}: pet_PM.C pet.h librarian.h common.h library.h alist.h \
- syntax.h treelog.h assertion.h weather.h im.h soil.h horizon.h \
+ syntax.h treelog.h assertion.h fao.h weather.h im.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h surface.h uzmodel.h soil_heat.h \
- bioclimate.h net_radiation.h vegetation.h log.h tmpstream.h
-svat_pmsw${OBJ}: svat_pmsw.C surface.h uzmodel.h librarian.h common.h \
- library.h alist.h syntax.h treelog.h assertion.h weather.h im.h \
- soil.h horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
- macro.h soil_heat.h vegetation.h pet.h svat.h log.h nrutil.h
+ net_radiation.h vegetation.h log.h tmpstream.h
+svat_pmsw${OBJ}: svat_pmsw.C mathlib.h assertion.h svat.h librarian.h \
+ common.h library.h alist.h syntax.h treelog.h surface.h uzmodel.h \
+ weather.h im.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
+ soil_water.h macro.h soil_heat.h vegetation.h pet.h log.h fao.h \
+ gaussj.h tmpstream.h nrutil.h
 action_merge${OBJ}: action_merge.C action.h librarian.h common.h library.h \
  alist.h syntax.h treelog.h assertion.h daisy.h field.h
 action_divide${OBJ}: action_divide.C action.h librarian.h common.h \
@@ -1286,12 +1288,10 @@ tkmain${OBJ}: tkmain.C daisy.h time.h syntax.h treelog.h alist.h library.h
 gmain${OBJ}: gmain.C daisy.h time.h syntax.h treelog.h alist.h library.h
 qmain_edit${OBJ}: qmain_edit.C qmain_edit.h alist.h syntax.h treelog.h \
  library.h plf.h depend.h
-qmain_edit_moc${OBJ}: qmain_edit_moc.C qmain_edit.h alist.h
 qmain${OBJ}: qmain.C qmain.h syntax.h treelog.h alist.h qmain_tree.h \
  qmain_busy.h daisy.h library.h version.h parser_file.h parser.h \
  librarian.h common.h assertion.h printer_file.h printer.h tmpstream.h \
  treelog_stream.h options.h
-qmain_moc${OBJ}: qmain_moc.C qmain.h syntax.h treelog.h alist.h
 qmain_tree${OBJ}: qmain_tree.C qmain_tree.h qmain_item.h qmain_populate.h \
  common.h
 qmain_item${OBJ}: qmain_item.C qmain_item.h qmain_edit.h alist.h \

@@ -21,8 +21,8 @@
 
 
 #include "weather.h"
+#include "fao.h"
 #include "time.h"
-#include "net_radiation.h"
 #include "log.h"
 #include "mathlib.h"
 
@@ -35,6 +35,10 @@ responsibility of the 'weather' component, typically be reading the\n\
 data from a file.  The meteorological data are common to all columns.";
 
 const double SolarConstant = 1366.7; // {W/m2]
+
+double
+Weather::elevation () const	// [m];
+{ return elevation_; }
 
 double
 Weather::screen_height () const	// [m];
@@ -53,9 +57,10 @@ Weather::tick_after (const Time& time, Treelog&)
 {
   // Hourly claudiness.
   const double Si = hourly_global_radiation (); 
-  if (Si > 25.0)
+  const double rad = HourlyExtraterrestrialRadiation (time);
+  if (Si > 25.0 && rad > 25.0)
     {
-      hourly_cloudiness_ = CloudinessFactor_Humid (time, Si);
+      hourly_cloudiness_ = FAO::CloudinessFactor_Humid (Si, rad);
       daisy_assert (hourly_cloudiness_ >= 0.0);
       daisy_assert (hourly_cloudiness_ <= 1.0);
     }
@@ -64,9 +69,10 @@ Weather::tick_after (const Time& time, Treelog&)
   if (time.hour () == 0.0)
     {
       const double Si = daily_global_radiation () ;
-      if (Si > 25.0)
+      const double rad = ExtraterrestrialRadiation (time);
+      if (Si > 25.0 && rad > 25.0)
 	{
-	  daily_cloudiness_ = CloudinessFactor_Humid (time, Si);
+	  daily_cloudiness_ = FAO::CloudinessFactor_Humid (Si, rad);
 	  daisy_assert (daily_cloudiness_ >= 0.0);
 	  daisy_assert (daily_cloudiness_ <= 1.0);
 	}
@@ -167,14 +173,6 @@ Weather::day_length (const Time& time) const
 }
 
 double
-Weather::LatentHeatVaporization (double Temp) // [J/kg]
-{ return ((2.501 - 2.361e-3 * Temp) * 1.0e6); }
-
-double
-Weather::PsychrometricConstant (double AtmPressure, double Temp) // [Pa/K]
-{ return (1.63e3 * AtmPressure / LatentHeatVaporization (Temp)); }
-
-double
 Weather::T_normal (const Time& time, double delay) const
 {
   const double rad_per_day = 2.0 * M_PI / 365.0;
@@ -188,61 +186,6 @@ Weather::T_normal (const Time& time, double delay) const
 double 
 Weather::average_temperature () const
 { return T_average; }
-
-double
-Weather::AirDensity (double AtmPressure, double Temp) // [kg/m3]
-{
-  const double Tvirtuel = 1.01 * (Temp + 273);
-  return (3.486 * AtmPressure / Tvirtuel);
-}
-
-double
-Weather::SaturationVapourPressure (double Temp) // [Pa]
-{ return (611.0 * exp (17.27 * Temp / (Temp + 237.3))); }
-
-double
-Weather::SlopeVapourPressureCurve (double Temp) // [Pa/K]
-{ return (4.098E3 * SaturationVapourPressure (Temp) / pow (Temp + 237.3, 2)); }
-
-double
-Weather::AtmosphericPressure ()	const // [Pa]
-{ return (101300. * pow ((293 - 0.0065 * elevation) / 293, 5.26)); }
-
-double
-Weather::CloudinessFactor_Arid (const Time& time, double Si) const
-{
-  const double a = 1.35;
-  const double x = Si / 0.75 / ExtraterrestrialRadiation (time);
-  return (a * min (1.0, x) + 1 - a);
-}
-
-double
-Weather::CloudinessFactor_Humid (const Time& time, double Si) const
-{
-  const double a = 1.00;
-  const double x = Si / 0.75 / ExtraterrestrialRadiation (time);
-  const double cfh = (a * min (1.0, x) + 1 - a);
-  return cfh;
-}
-
-double
-Weather::RefNetRadiation (const Time& time, double Si,
-			  double Temp, double ea, Treelog& out) const
-{
-  static NetRadiation* net_radiation = NULL;
-  if (net_radiation == NULL)
-    {
-      Syntax syntax;
-      AttributeList alist;
-      alist.add ("type", "brunt");
-      net_radiation = &Librarian<NetRadiation>::create (alist);
-    }
-
-  const double albedo = 0.23;
-  net_radiation->tick (CloudinessFactor_Arid (time, Si),
-		       Temp, ea, Si, albedo, out);
-  return net_radiation->net_radiation ();
-}
 
 double
 Weather::SolarDeclination (const Time& time) // [rad]
@@ -270,17 +213,6 @@ Weather::ExtraterrestrialRadiation (const Time& time) const // [W/m2]
   const double x1 = SunsetHourAngle (Dec, Lat) * sin (Lat) * sin (Dec);
   const double x2 = cos (Lat) * cos (Dec) * sin (SunsetHourAngle (Dec, Lat));
   return (SolarConstant * RelativeSunEarthDistance (time) * (x1 + x2) / M_PI);
-}
-
-double
-Weather::Makkink (double air_temperature /* dg C */,
-		  double global_radiation /* W/m^2 */) /* mm/h */
-{
-  // Use Makkink's equation for calculating reference_evapotranspiration.
-  const double T = 273.16 + air_temperature; // dg C -> K
-  const double Delta = 5362.7 / pow (T, 2.0) * exp (26.042 - 5362.7 / T);
-  return 1.05e-3
-    * Delta / (Delta + 66.7) * global_radiation;
 }
 
 double
@@ -312,7 +244,7 @@ Weather::Weather (const AttributeList& al)
   : name (al.name ("type")),
     latitude (-42.42e42),
     longitude (-42.42e42),
-    elevation (-42.42e42),
+    elevation_ (-42.42e42),
     timezone (-42.42e42),
     surface (Surface::reference),
     screen_height_ (2.0),

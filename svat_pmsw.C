@@ -24,8 +24,9 @@
 // important for sensitivity studies: Do not alter !
 
 // description of functions
+#include "mathlib.h"
+# include "svat.h"
 # include "surface.h"
-# include <math.h>
 # include <fstream>
 # include <stdio.h>
 # include <stdlib.h>
@@ -36,8 +37,13 @@
 # include "soil_heat.h"
 # include "vegetation.h"
 # include "pet.h"
-# include "svat.h"
 # include "log.h"
+#include "fao.h"
+#ifndef NRGAUSS
+#include "gaussj.h"
+#include "tmpstream.h"
+#endif
+# include "assertion.h"
 # define NRANSI // from xgaussj
 #define vector _my_vector
 # include "nrutil.h"  // from Num Rec
@@ -46,25 +52,34 @@
 # define NP 20 // from xgaussj driver program
 # define MP 20 // from xgaussj driver program
 
+#if !defined (isnormal)
+inline bool isnormal (double x)
+{ return finite (x) && x != 0.0; }
+#endif
+
 // prototypes
-int RA(double, double, double&);
-int RAA(double, double, double, double, double, double, double, double&,
-        double&, double&, double&);
-int RASTAB (double, double, double, double, double, double, double, double,
-            double&, double&, double&, double&, double&, double&);
-int RAASTAB_1 (double, double, double, double, double, double, double, double,
-               double&, double&, double&, double&, double&, double&, double&);
-int RAASTAB_2 (double, double, double, double, double, double, double, double,
+int RA(double, double, double, double&);
+int RAA(double, double, double, double, double, double, double, double,
+	double&, double&, double&, double&);
+int RASTAB (double, double, double, double, double, double, double, double, 
+	    double, double&, double&, double&, double&, double&, double&);
+int RAASTAB_1 (double, double, double, double, double, double, double, double, 
+	       double, double&, double&, double&, double&, double&, double&, 
+	       double&);
+int RAASTAB_2 (double,
+	       double, double, double, double, double, double, double, double,
                double, double&, double&, double&, double&, double&, double&,
                double&, double&);
-int RAS(double, double, double, double, double, double, double&, double&);
-int RAC(double, double, double , double&, double&, double&, double&, double&);
-int RSC(double , double, double, double, double, double, double , double,
+int RAC(double, 
+	double, double, double , double&, double&, double&, double&, double&);
+int RAS(double,
+	double, double, double, double, double, double, double&, double&);
+int RSC(double, double, double, double, double, double, double , double,
         double, double, double, double, double, double, double, double,
-        double, double, double, double, double, double, double&, double&, double&,
-        double&, double&, double&, double&, double&, double&, double&, double&,
-        double&, double&, double&, double&, double&, double&, double&, double&,
-        double&, double&, double&, double&);
+        double, double, double, double, double, double, double&, double&,
+	double&, double&, double&, double&, double&, double&, double&, double&,
+	double&, double&, double&, double&, double&, double&, double&, double&,
+	double&, double&, double&, double&, double&);
 int RSCSTAR (double, double, double, double, double, double, double, double,
              double, double, double, double, double, double, double, double,
              double, double, double, double, double, double, double, double&,
@@ -115,7 +130,7 @@ int EBAL_PM(double, double, double, double, double, double, double, double,
 
 // RA() simple 'standard' model for neutral conditions
 
-int RA(double u, double h, double &rr_a)
+int RA(double z_ref, double u, double h, double &rr_a)
 {
   // z0: roughness length, d: zero plane displacement
   // z0=0.1*h (rule of thumb) and d=0.67*h
@@ -123,7 +138,6 @@ int RA(double u, double h, double &rr_a)
   // u: measured windspeed
   // von Karmans constant & reference height
   const double kappa=0.41;
-  const double z_ref=2.0;
 
   if (h==0.0)
     {
@@ -140,12 +154,11 @@ int RA(double u, double h, double &rr_a)
 
 // aerodynamic resistance from mean source to reference height without
 // stability correction
-int RAA (double u, double h, double LAI, double ndif, double c_d, double z_0s,
+int RAA (double z_ref, double u, double h, double LAI, double ndif, double c_d, double z_0s,
          double z0_def, double &rd, double &rz0, double &ru_f, double &rr_aa)
 {
   double d_p,Z0_p,Kh,X; // _p = 'preferred' in SG
   const double kappa=0.41;  // von Karmans constant
-  const double z_ref=2.0;
   // const double ndif=2.5: eddy diffusivity decay constant in crop (SG,p.505)
   // const double c_d=0.05: Daamen, p.211 used 0.2
   // const double z_0s=0.01; z_0* for bare soil SW p.847
@@ -178,13 +191,12 @@ int RAA (double u, double h, double LAI, double ndif, double c_d, double z_0s,
 }
 
 // returns r_a for EBAL_DT()
-int RASTAB (double u, double tair, double tsurf_prev, double h, double LAI,
+int RASTAB (double z_ref, double u, double tair, double tsurf_prev, double h, double LAI,
             double c_d, double z_0s, double z0_def, double &rd, double &rz0,
             double &ry, double &rL_s, double &rR_i_s, double &rr_astab)
 {
   double psi_m,psi_h; // stability correction functions
   const double kappa=0.41;  // von Karmans constant
-  const double z_ref=2.0;
   const double g=9.81; // gravitational accelleration
 
   // ndif=2.5: eddy diffusivity decay constant in crop (SG,p.505)
@@ -239,38 +251,42 @@ int RASTAB (double u, double tair, double tsurf_prev, double h, double LAI,
 
 // From SG(1990): Aerodyn. resistance between canopy source heigth and ref.level
 // Mahrt & Ek (1984), cited by Seen et al. (1997)
-int RAASTAB_1 (double u, double tair, double tcan_prev, double h,
+int RAASTAB_1 (double z_ref, double u, double tair, double tcan_prev, double h,
                double LAI, double c_d, double z_0s, double z0_def, double &rd,
-               double &rz0, double &rC, double &rC_q, double &rR_i, double &rr_aa,
-               double &ru_f)
+               double &rz0, double &rC, double &rC_q, double &rR_i, 
+	       double &rr_aa, double &ru_f)
 {
   const double kappa=0.41;  // von Karmans constant
-  const double z_ref=2.0; // screen height
   const double g=9.81; // gravitation constant
 
   // Stability corrected aerodynamic resistance following Mahrt & Ek (1984)
 
+#define Z_REF z_ref // SH BUG: These were 2.0, I believe they should be z_ref
   if (h==0.0 || LAI==0.0)
     {
       rz0=z0_def; // between 0.01 and 0.001 (Oke, p.57)
       rd=0.0;
-      ru_f=kappa*u/log((2.0-rd)/rz0);
-    } else { // else 1
+      ru_f=kappa*u/log((Z_REF-rd)/rz0);
+    }
+  else
+    { // else 1
       rd=1.1*h*log(1+pow(c_d*LAI,0.25)); // Shaw & pereira (1982)
       // SG eq.43a and Daamen eq.16
-      if (c_d*LAI>0.0 && c_d*LAI<0.2) {
-        rz0=z_0s+0.3*h*sqrt(c_d*LAI);
-        ru_f=kappa*u/log((2.0-rd)/rz0);
-      }
+      if (c_d*LAI>0.0 && c_d*LAI<0.2) 
+	{
+	  rz0=z_0s+0.3*h*sqrt(c_d*LAI);
+	  ru_f=kappa*u/log((Z_REF-rd)/rz0);
+	}
       // SG eq. 43b
       else if (c_d*LAI>0.2 && c_d*LAI<1.5) {
         rz0=0.3*h*(1-rd/h);
-        ru_f=kappa*u/log((2.0-rd)/rz0);
+        ru_f=kappa*u/log((Z_REF-rd)/rz0);
       }
-      else {  // otherwise...
-        rz0=0.13*h;
-        ru_f=kappa*u/log((2.0-rd)/rz0);
-      }
+      else
+	{  // otherwise...
+	  rz0=0.13*h;
+	  ru_f=kappa*u/log((Z_REF-rd)/rz0);
+	}
       // Calculate Richardson number Ri (Seen et al., 1997)...
       rR_i=g*(tair-tcan_prev)*(z_ref-rd)/(tair*pow(u,2.0));
       // ... and auxiliary variable C
@@ -282,11 +298,12 @@ int RAASTAB_1 (double u, double tair, double tcan_prev, double h,
     {
       rC_q=pow(kappa/(log((z_ref-rd+rz0)/rz0)),2.0)*
         (1.0-15.0*rR_i/(1.0+rC*sqrt(-rR_i)));
-    } else  // stable: Ts < Ta
-      {
-        rC_q=pow(kappa/(log((z_ref-rd+rz0)/rz0)),2.0)*
-          (1.0/((1.0+15*rR_i)*sqrt(1.0+5.0*rR_i)));
-      }
+    } 
+  else  // stable: Ts < Ta
+    {
+      rC_q=pow(kappa/(log((z_ref-rd+rz0)/rz0)),2.0)*
+	(1.0/((1.0+15*rR_i)*sqrt(1.0+5.0*rR_i)));
+    }
   rr_aa=1.0/(rC_q*u);
 
   return 0;
@@ -295,7 +312,8 @@ int RAASTAB_1 (double u, double tair, double tcan_prev, double h,
 
 // Dolman (1993) and Zhang et al. (1995)
 // stressed conditions
-int RAASTAB_2 (double u, double tair, double tcan_prev, double h, double LAI,
+int RAASTAB_2 (double z_ref,
+	       double u, double tair, double tcan_prev, double h, double LAI,
                double ndif, double c_d, double z_0s, double z0_def, double &rd,
                double &rz0, double &ru_f, double &ry, double &rL, double &rR_i,
                double &rr_aa)
@@ -303,7 +321,6 @@ int RAASTAB_2 (double u, double tair, double tcan_prev, double h, double LAI,
   double Kh;
   double psi_m,psi_mm,psi_h,psi_hm; // stability correction functions
   const double kappa=0.41;  // von Karmans constant
-  const double z_ref=2.0;
   const double g=9.81;
   // ndif=2.5: eddy diffusivity decay constant in crop (SG,p.505)
   // c_d=0.05: Daamen, p.211 used 0.2
@@ -366,10 +383,19 @@ int RAASTAB_2 (double u, double tair, double tcan_prev, double h, double LAI,
 // leaf boundary-layer resistance between leaves and canopy air space as
 // formulated in Daamen (1997) p.212 (r_b) based on Choudhury & Monteith (1988)
 // and Jones (1983)
-int RAC(double u, double h, double LAI, double c_d, double w, double z_0s,
+int RAC(double z_ref, 
+	double u, double h, double LAI, double c_d, double w, double z_0s,
         double alpha_u, double arac, double &rd, double &rX, double &rz_0,
         double &ru_h, double &rr_ac)
 {
+  daisy_assert (finite (u));
+  daisy_assert (u >= 0.0);
+  daisy_assert (isnormal (LAI));
+  daisy_assert (LAI > 0.0);
+  daisy_assert (isnormal (h));
+  daisy_assert (h > 0.0);
+  daisy_assert (isnormal (arac));
+
   // ru_h: windspeed at cropheight h, i.e. above crop [m/s]
   // z_0, d roughness and zero displacement height [m]
   // w: average leaf width, from SG(1990), p.512 [m]
@@ -380,34 +406,45 @@ int RAC(double u, double h, double LAI, double c_d, double w, double z_0s,
   // alpha_u=3.0: alpha_u=3 (Choudhury and Monteith, 1988)
   // constant, CM (1988) used 0.01, calibration is important (Daamen, 1997), p.212
   // arac (a)=0.00662: used by Jones (1983)
-  const double z_ref=2.0; // [m]
   double Z; // Auxiliary variable denoting h-rd
 
   rX=c_d*LAI; // Shaw & Pereira (1982)
   rd=1.1*h*log(1.0+pow(rX,0.25)); // Shaw&Pereira(1982)SG,p.507
+  daisy_assert (rd < z_ref);
   Z=h-rd;
-  if (rX>0.0 && rX<0.2) rz_0=z_0s+0.3*h*sqrt(rX); // SG eq.43a
-  else if (rX>0.2 && rX<1.5) rz_0=0.3*h*(1-rd/h); // SG eq.43b
-  else rz_0=0.13*h; // otherwise
+  if (rX>0.0 && rX<0.2)
+    rz_0=z_0s+0.3*h*sqrt(rX); // SG eq.43a
+  else if (rX>0.2 && rX<1.5) 
+    {
+      daisy_assert (isnormal (h));
+      rz_0=0.3*h*(1-rd/h); // SG eq.43b
+    }
+  else 
+    rz_0=0.13*h; // otherwise
+  daisy_assert (isnormal (rz_0));
 
   if (Z < 2.0*rz_0)
     {
       Z=2.0*rz_0; // h-rd at least twice z_0
-      if (z_ref-rd > 0.0) ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
+      if (z_ref-rd > 0.0)
+	ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
       else
         {
           rd=0.67*h;
           ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
         }
-    } else
-      {
-        if (z_ref-rd > 0.0) ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
-        else
-          {
-            rd=0.67*h;
-            ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
-          }
-      }
+    }
+  else
+    {
+      if (z_ref-rd > 0.0) 
+	ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
+      else
+	{
+	  rd=0.67*h;
+	  ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
+	}
+    }
+  daisy_assert (isnormal (ru_h));
   rr_ac=(alpha_u/(2.0*LAI*arac))*sqrt((w/ru_h)*1/(1-exp(-alpha_u/2)));
 
   return 0;
@@ -416,8 +453,8 @@ int RAC(double u, double h, double LAI, double c_d, double w, double z_0s,
 // Resistance between soil surface and canopy air, r_scan: defined by
 // CM (1988), neutral conditions are assumed (Daamen, 1997,eq.22 & 23)
 
-int RAS(double u, double h, double LAI, double z_0s, double alpha_k, double c_d,
-        double &rk_h, double &rr_as)
+int RAS(double z_ref, double u, double h, double LAI, double z_0s, 
+	double alpha_k, double c_d, double &rk_h, double &rr_as)
 {
   // rk_h and rr_as as in Daamen, eq.22 &23 (r_scan)
   double z_0, d; // roughness and zero displacement height [m]
@@ -427,7 +464,6 @@ int RAS(double u, double h, double LAI, double z_0s, double alpha_k, double c_d,
   // const double z_0s=0.01: z_0 substrate SW p.847
   // c_d=0.05: SG p.507
   const double kappa=0.41;  // von Karmans constant
-  const double z_ref=2.0; // [m]
   X=c_d*LAI; // Shaw & Pereira (1982)
   d=1.1*h*log(1+pow(X,0.25)); // Shaw & Pereira (1982)
   if (X>0.0 && X<0.2) z_0=z_0s+0.3*h*sqrt(X); // SG eq.43a
@@ -803,6 +839,9 @@ int ACOEFF(double tair, double e_abs, double netrad, double LAI, double les,
   const double c_p=1010.0;
   const double z_sz=0.02;
 
+  daisy_assert (isnormal (r_aa));
+  daisy_assert (isnormal (r_ac));
+  daisy_assert (isnormal (r_as));
   ra_11=1.0/r_aa+1.0/r_ac+1.0/r_as;
   ra_12=-1.0/r_as;
   ra_13=-1.0/r_ac;
@@ -822,6 +861,7 @@ int ACOEFF(double tair, double e_abs, double netrad, double LAI, double les,
   return 0;
 }
 
+#ifdef NRGAUSS
 // Gaussj function from Num. rec. **a,**b are matrices, n and m dimensions
 void gaussj(float **a, int n, float **b, int m)
 {
@@ -847,7 +887,7 @@ void gaussj(float **a, int n, float **b, int m)
               icol=k;
             }
           } else if (ipiv[k] > 1){
-            nrerror("gaussj: Singular Matrix-1");
+            throw ("gaussj: Singular Matrix-1");
           }
         }
     ++(ipiv[icol]);
@@ -857,7 +897,7 @@ void gaussj(float **a, int n, float **b, int m)
                                                 }
     indxr[i]=irow;
     indxc[i]=icol;
-    if (a[icol][icol] == 0.0) nrerror("gaussj: Singular Matrix-2");
+    if (a[icol][icol] == 0.0) throw("gaussj: Singular Matrix-2");
     pivinv=1.0/a[icol][icol];
     a[icol][icol]=1.0;
     for (l=1;l<=n;l++) a[icol][l] *= pivinv;
@@ -879,6 +919,7 @@ void gaussj(float **a, int n, float **b, int m)
   free_ivector(indxr,1,n);
   free_ivector(indxc,1,n);
 }
+#endif // NRGAUSS
 
 // solving energy balance with dt (=tsurf-tair) from RT_SAFE (Newton-Raphson)
 // EBAL_NR( ) is an argument in RT_SAFE (), which solves for dt. When dt is
@@ -1319,6 +1360,16 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
   LAI =1.0*crops.LAI (); // Leaf Areal Index
   h   =0.01*crops.height (); // max crop height [m]
+  const double z_ref = weather.screen_height ();
+
+  if (h > z_ref)
+    {
+      TmpStream tmp;
+      tmp () << "Current crop height is " << h 
+	     << " [m].\nMax for svat model PMSW is screen height ("
+	     << z_ref << " [m])";
+      throw (string (tmp.str ()));
+    }
 
   //cout << "LAI is\t" << LAI << "\n";
 
@@ -1396,6 +1447,8 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       tair = weather.hourly_air_temperature (); // [C]
       srad = weather.hourly_global_radiation (); // [W/m^2]
       u_ref = weather.wind (); // u_ref from reference plane [m/s]
+      daisy_assert (finite (u_ref));
+      daisy_assert (u_ref >= 0.0);
       relsun_day = weather.hourly_cloudiness ();  // [-]
       prec = 1.10*weather.rain(); // [mm] corrected by 10 %
 
@@ -1408,7 +1461,9 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
       // convert from u_ref_2m at reference plane (h=0.12 m, FAO) to u_2m_ww at
       // winter wheat field: use eq.26 FAO, p.10, and d=0.27*h and z0=0.123*h
-      u=0.205*u_ref*log((2.0-0.67*h)/(0.123*h));
+      u=0.205*u_ref*log((z_ref-0.67*h)/(0.123*h));
+      daisy_assert (finite (u));
+      daisy_assert (u >= 0.0);
       //  cout << "u and u_ref are:\t" << u << "\t" << u_ref << "\n";
 
       // cout << "past u\n";
@@ -1475,42 +1530,44 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       EPA2ABS(e_pa,tair,e_abs);
 
       // Like RASTAB, but no stability
-      RA(u,h,r_a);
+      RA(z_ref, u,h,r_a);
 
       // Like RAASTAB(), but without stability
-      RAA (u,h,LAI,ndif,c_d,z_0s,z0_def,d_aa,z0_aa,ustar_raa,r_aa);
+      RAA (z_ref, u,h,LAI,ndif,c_d,z_0s,z0_def,d_aa,z0_aa,ustar_raa,r_aa);
 
       // r_a for one-layer approach and correcting for thermal instability
 
-      RASTAB (u,tair,tsurf_dt_dry,h,LAI,c_d,z_0s,z0_def,d_a,z0_a,y_s,L_s,
+      RASTAB (z_ref, 
+	      u,tair,tsurf_dt_dry,h,LAI,c_d,z_0s,z0_def,d_a,z0_a,y_s,L_s,
               R_i_s,r_astab);
 
       // r_aa with stability correction, following Mahrt & Ek (1984)
       // stressed conditions
-      RAASTAB_1 (u,tcan_prev,tair,h,LAI,c_d,z_0s,z0_def,d_aa,z0_aa,
+      RAASTAB_1 (z_ref, u,tcan_prev,tair,h,LAI,c_d,z_0s,z0_def,d_aa,z0_aa,
                  C,C_q,R_i,r_aastab1,ustar_raastab1);
 
       // r_aa with stability correction, following Dolman (1993)
       // stressed conditions
-      RAASTAB_2 (u,tair,tcan_prev,h,LAI,ndif,c_d,z_0s,z0_def,d_aa,z0_aa,
+      RAASTAB_2 (z_ref, u,tair,tcan_prev,h,LAI,ndif,c_d,z_0s,z0_def,d_aa,z0_aa,
                  ustar_raastab2,y,L,R_i,r_aastab2);
 
       // aerodynamic resistance from canopy to mean source height
-      RAC (u,h,LAI,c_d,w,z_0s,alpha_u,arac,d_ac,X_ac,z0_ac,uh,r_ac);
+      RAC (z_ref, u,h,LAI,c_d,w,z_0s,alpha_u,arac,d_ac,X_ac,z0_ac,uh,r_ac);
 
       // aerodynamic resistance between soil surface and mean source height
-      RAS(u,h,LAI,z_0s,alpha_k,c_d,k_h,r_as);
+      RAS (z_ref, u,h,LAI,z_0s,alpha_k,c_d,k_h,r_as);
 
-/*
+#if 0
       // mean stomatal resistance following Jacquemin & Noilhan (1990) and
       // Verma et al.(1993), return r_sc_js (from f1_dolman, f_def, f_3 and f_etep
-      RSC (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,rcmax,
+      RSC (z_ref, LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,
+           rcmax,
            zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
            rcmin_star,fpar,f_1,f_2,f_3,f_4,r_sc_1,r_tot_1,bf_temp,
            f_temp,f_def,f_theta,f1_dolman,r_sc_2,r_tot_2,f_etep,r_sc_3,r_tot_3,
            r_sc_4,r_tot_4,r_sc_5,r_tot_5,r_sc_min,r_sc_js);
 
-*/
+#endif
       // Net radiation by brunt's equation
       NETRAD(srad,e_pa,tair,relsun,b1,b2,b3,b4,albedo,netlong_brunt,
              netlong_satt,netshort,netrad_brunt,netrad_satt);
@@ -1649,6 +1706,7 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
       b[5][1]=(tair+273.15)*desta_abs-esta_abs;
       b_5=b[5][1]; // for the control matrix
 
+#ifdef NRGAUSS
       for (l=1;l<=n;l++)
         {
           for (k=1;k<=n;k++)
@@ -1663,7 +1721,35 @@ SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
 
       // invert matrix a, a_pot and a_wet
       gaussj(ai,n,x,m);
-
+#else
+      GaussJordan equations (n);
+      
+      TmpStream tmp;
+      tmp () << "Equations\n";
+      for (int l = 1; l <= n; l++)
+	{
+	  for (k = 1; k <= n; k++)
+	    {
+	      equations.set_entry (l-1, k-1, a[l][k]);
+	      if (k > 1)
+		tmp () << " + ";
+	      tmp () << a[l][k];
+	    }
+	  equations.set_value (l-1, b[l][1]);
+	  tmp () << " = " << b[l][1] << "\n";
+	}
+      try
+	{
+	  equations.solve ();
+	}
+      catch (const char* error)
+	{
+	  tmp () << "Error: " << error;
+	  throw string (tmp.str ());
+	}
+      for (int l = 1; l <= n; l++)
+	x[l][1] = equations.result (l-1);
+#endif
       // write solution vector for x (stressed conditions)
       tcan=x[1][1]-273.15;  // in degrees C
       tskin=x[2][1]-273.15; // in degrees C

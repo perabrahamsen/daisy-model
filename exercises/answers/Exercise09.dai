@@ -2,9 +2,13 @@
 ;;  Daisy writes a Daisy.log-file during execution. 
 ;;  This log-file contains any error messages
 ;;  If the working directory is set correctly the log-file will be found here
-(directory "C:/DaisySim/W")
+;;(directory "C:/DaisySim/W")
+(directory "/tmp")
 ;;  Setting search path for library-files 
-(path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
+;; (path "." "C:/Daisy/Lib" "C:/Daisy/Weather")
+(path "/home/user_2/abraham/daisy/exercises/answers" 
+      "/home/user_2/abraham/daisy/exercises" 
+      "/home/user_2/abraham/daisy/lib")
 
 ;; Including external library-files
 (input file "tillage.dai")
@@ -105,7 +109,7 @@
 (defaction wbarley_P_F_R activity
   (wait_mm_dd 9 01)(plowing)
   (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Barley")
-  (wait_mm_dd 3 25)(fertilize N25S (weight 68 [kg N/ha]))
+  (wait_mm_dd 3 25)(fertilize (N25S (weight 68 [kg N/ha])))
   (wait_mm_dd 4 20)(fertilize ("Slurry10%" (weight 20 [T w.w./ha]))(to -5 [cm]))
   (wait (or (crop_ds_after "Winter Barley" 2.0)(mm_dd 8 9)))
     (harvest "Winter Barley" (stub 8 [cm]))
@@ -116,7 +120,7 @@
   (fertilize ("Slurry05%" (weight 20 [T w.w./ha]))(to -5 [cm]))
   (plowing)
   (wait_mm_dd 8 20)(seed_bed_preparation)(sow "Winter Rape")
-  (wait_mm_dd 3 05)(fertilize N25S (weight 024 [kg N/ha]))
+  (wait_mm_dd 3 05)(fertilize (N25S (weight 024 [kg N/ha])))
   (wait_mm_dd 3 20)(fertilize ("Slurry10%" (weight 20 [T w.w./ha]))(to -5 [cm]))
   (wait (or (crop_ds_after "Winter Rape" 2.0)(mm_dd 8 9)))
     (harvest "Winter Rape" (stub 8 [cm])(stem 0.0)(leaf 0.0))
@@ -126,7 +130,7 @@
   (wait_mm_dd 9 01)(plowing)
   (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Wheat")
   (wait_mm_dd 4 20)(fertilize ("Slurry10%" (weight 18 [T w.w./ha]))(to -5 [cm]))
-  (wait_mm_dd 5 05)(fertilize N25S (weight 63 [kg N/ha])) 
+  (wait_mm_dd 5 05)(fertilize (N25S (weight 63 [kg N/ha]))) 
   (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
     (harvest "Winter Wheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))
 )
@@ -134,7 +138,7 @@
 (defaction wwheat_P_F_R_2 activity
   (wait_mm_dd 9 01)(plowing)
   (wait_mm_dd 9 10)(seed_bed_preparation)(sow "Winter Wheat")
-  (wait_mm_dd 4 05)(fertilize N25S (weight 095 [kg N/ha])) 
+  (wait_mm_dd 4 05)(fertilize (N25S (weight 095 [kg N/ha]))) 
   (wait_mm_dd 4 20)(fertilize ("Slurry10%" (weight 18 [T w.w./ha]))(to -5 [cm]))
   (wait (or (crop_ds_after "Winter Wheat" 2.0)(mm_dd 9 1)))
     (harvest "Winter Wheat" (stub 8 [cm])(stem 0.0)(leaf 0.0))

@@ -21,6 +21,7 @@
 
 
 #include "weather.h"
+#include "fao.h"
 #include "lexer_data.h"
 #include "time.h"
 #include "tmpstream.h"
@@ -343,7 +344,7 @@ WeatherStandard::keyword_description_type
 WeatherStandard::keyword_description[] =
 { { "Latitude", "dgNorth", &WeatherStandard::latitude, -90, 90, true },
   { "Longitude", "dgEast", &WeatherStandard::longitude, -360, 360, true },
-  { "Elevation", "m", &WeatherStandard::elevation, 0, 10000, true },
+  { "Elevation", "m", &WeatherStandard::elevation_, 0, 10000, true },
   { "TimeZone", "dgEast", &WeatherStandard::timezone, -360, 360, true },
   { "ScreenHeight", "m", &WeatherStandard::screen_height_, 0, 100, true },
   { "TAverage", "dgC", &WeatherStandard::T_average, -10, 40, true },
@@ -617,7 +618,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	    vapor_pressure_[hour] = last_vapor_pressure;
 	  else if (has_relative_humidity)
 	    vapor_pressure_[hour] 
-	      = SaturationVapourPressure (air_temperature_[hour])
+	      = FAO::SaturationVapourPressure (air_temperature_[hour])
 	      * last_relative_humidity;
 	  if (has_wind_speed)
 	    wind_speed_[hour] = last_wind_speed;
@@ -632,8 +633,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	    }
 	  else
 	    reference_evapotranspiration_[hour] 
-	      = Weather::Makkink (air_temperature_[hour],
-				  global_radiation_[hour]);
+	      = FAO::Makkink (air_temperature_[hour], global_radiation_[hour]);
 	}
       // BC5 sucks // if (next_time >= tomorrow)
       if (!(next_time < tomorrow))
@@ -655,7 +655,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
       if (T_min == T_max)
 	T_min -= 5.0;
       for (int hour = 0; hour < 24; hour++)
-	vapor_pressure_[hour] = SaturationVapourPressure (T_min);
+	vapor_pressure_[hour] = FAO::SaturationVapourPressure (T_min);
     }
 }
 

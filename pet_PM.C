@@ -21,11 +21,12 @@
 
 
 #include "pet.h"
+#include "fao.h"
 #include "weather.h"
 #include "soil.h"
 #include "surface.h"
 #include "soil_heat.h"
-#include "bioclimate.h"
+#include "fao.h"
 #include "net_radiation.h"
 #include "vegetation.h"
 #include "log.h"
@@ -34,46 +35,6 @@
 class PetPM : public Pet
 {
 public:
-  // FAO utilities.
-  static double ETaero (double AtmPressure /* [Pa] */,
-			double Temp /* [dg C] */,
-			double ea /* [Pa] */,
-			double ra /* [s/m] */,
-			double rc); // [kg/m2/s]
-  static double RefETaero (double AtmPressure /* [Pa] */,
-			   double Temp /* [dg C] */,
-			   double ea /* [Pa] */,
-			   double U2);// [kg/m2/s]
-  static double ETrad (double AtmPressure /* [Pa] */,
-		       double Temp /* [dg C] */,
-		       double Rn /* [W/m2] */,
-		       double G /* [W/m2] */,
-		       double ra /* [s/m] */,
-		       double rc); // [kg/m2/s]
-  static double PenmanMonteith (double CropHeight /* [m] */,
-				double ScreenHeight /* [m] */,
-				double LAI /* [m^2/m^2] */,
-				double Rn /* [W/m2] */,
-				double G /* [W/m2] */,
-				double Temp /* [dg C] */,
-				double ea /* [Pa] */,
-				double U2 /* [m/s] */,
-				double AtmPressure); // [kg/m2/s]
-  static double RefPenmanMonteith (double Rn /* [W/m2/] */,
-				   double G /* [W/m2] */,
-				   double Temp /* [dg C] */,
-				   double ea /* [Pa] */,
-				   double U2 /* [m/s] */,
-				   double AtmPressure, // [kg/m2/s]
-				   Treelog&);
-  static double RefPenmanMonteithWet (double Rn /* [W/m2] */,
-				      double G /* [W/m2] */,
-				      double Temp /* [dg C] */,
-				      double ea /* [Pa] */,
-				      double U2 /* [m/s] */,
-				      double AtmPressure); // [kg/m2/s]
-
-
   // State.
   double reference_evapotranspiration_wet;
   double reference_evapotranspiration_dry;
@@ -118,98 +79,6 @@ public:
     }
 };
 
-double
-PetPM::ETaero (double AtmPressure, double Temp, double ea, double ra,
-	       double rc)
-{
-  const double x1 = Weather::SlopeVapourPressureCurve (Temp) +
-    Weather::PsychrometricConstant (AtmPressure, Temp) * (1 + rc / ra);
-  const double x2 = Weather::AirDensity (AtmPressure, Temp) * 1.013 /
-    Weather::LatentHeatVaporization (Temp);
-  const double x3 = (Weather::SaturationVapourPressure (Temp) - ea) / ra;
-  return (1.0 / x1) * x2 * x3;   // [kg/m2/s]
-}
-
-double
-PetPM::RefETaero (double AtmPressure, double Temp, double ea, double U2)
-{
-  double x1 = Weather::SlopeVapourPressureCurve (Temp)
-    / Weather::PsychrometricConstant (AtmPressure, Temp);
-  x1 = 1 / (x1 + 1 + 0.34 * U2);
-  const double x2 = 0.9 / (Temp + 273) * U2
-    * (Weather::SaturationVapourPressure (Temp) - ea);
-  return (x1 * x2) / 86400.0; // [kg/m2/s]
-}
-
-double
-PetPM::ETrad (double AtmPressure, double Temp, double Rn, double G,
-	      double ra, double rc)
-{
-  double x1 = Weather::SlopeVapourPressureCurve (Temp)
-    / Weather::PsychrometricConstant (AtmPressure, Temp);
-  x1 /= x1 + 1 + rc / ra;
-  const double x2 = (Rn - G) / Weather::LatentHeatVaporization (Temp);
-  return (x1 * x2);
-}
-
-double
-PetPM::PenmanMonteith (double CropHeight, double ScreenHeight, 
-		       double LAI, double Rn,
-		       double G, double Temp, double ea, double U2,
-		       double AtmPressure)
-{
-  const double ra = Bioclimate::AerodynamicResistance (CropHeight, 
-						       ScreenHeight, U2);
-  const double rc = Bioclimate::CanopyResistance (LAI);
-  const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
-  const double E2 = ETaero (AtmPressure, Temp, ea, ra, rc);
-  return (E1 + E2);
-}
-
-double
-PetPM::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
-			  double U2, double AtmPressure, Treelog& out)
-{
-  double E3 = 0.03525 * Weather::SlopeVapourPressureCurve (Temp) * (Rn - G) +
-    Weather::PsychrometricConstant (AtmPressure, Temp)
-    * 0.9 / (Temp + 273) * U2 *
-    (Weather::SaturationVapourPressure (Temp) - ea);
-  E3 /= Weather::SlopeVapourPressureCurve (Temp) +
-    Weather::PsychrometricConstant (AtmPressure, Temp) * (1 + 0.34 * U2);
-#if 1
-  if (Rn>750.0)
-    {
-      TmpStream tmp;
-      tmp () << "Rn          " << Rn << "\n"
-	     << "G           " << G << "\n"
-	     << "Temp        " << Temp << "\n"
-	     << "es          " 
-	     << Weather::SaturationVapourPressure (Temp) << "\n"
-	     << "ea          " << ea << "\n"
-	     << "U2          " << U2 << "\n"
-	     << "AtmPressure " << AtmPressure << "\n"
-	     << "Delta       "
-	     << Weather::SlopeVapourPressureCurve (Temp) << "\n"
-	     << "Gamma       "
-	     << Weather::PsychrometricConstant (AtmPressure, Temp) << "\n"
-	     << "Ep (mm/d)   " << E3;
-      out.warning (tmp.str ());
-    }
-#endif
-  return E3 / 86400.0; // [kg/m2/s]
-}
-
-double
-PetPM::RefPenmanMonteithWet (double Rn, double G, double Temp, double ea,
-			     double U2, double AtmPressure)
-{
-  const double ra = Bioclimate::RefAerodynamicResistance (U2);
-  const double rc = 0.0;
-  const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
-  const double E2 = ETaero (AtmPressure, Temp, ea, ra, rc);
-  return (E1 + E2);
-}
-
 void
 PetPM::tick (const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil& soil,
@@ -222,7 +91,8 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
   const double VaporPressure = weather.vapor_pressure ();
   const double Si = weather.hourly_global_radiation ();
   const double U2 = weather.wind ();
-  const double AtmPressure = weather.AtmosphericPressure ();
+  const double elevation = weather.elevation ();
+  const double AtmPressure = FAO::AtmosphericPressure (elevation);
 
   // Albedo.
   const double LAI = crops.LAI ();
@@ -250,7 +120,7 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
       const double ScreenHeight = weather.screen_height ();
       // Dry.
       reference_evapotranspiration_dry
-	= PenmanMonteith (CropHeight, ScreenHeight, 
+	= FAO::PenmanMonteith (CropHeight, ScreenHeight, 
 			  LAI, Rn, G, Temp, VaporPressure,
 			  U2, AtmPressure) * 3600;
       potential_evapotranspiration_dry
@@ -258,10 +128,10 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
 
       // Wet.
       const double ra
-	= Bioclimate::AerodynamicResistance (CropHeight, ScreenHeight, U2);
+	= FAO::AerodynamicResistance (CropHeight, ScreenHeight, U2);
       const double rc = 0.0;
-      const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
-      const double E2 = ETaero (AtmPressure, Temp, VaporPressure, ra, rc);
+      const double E1 = FAO::ETrad (AtmPressure, Temp, Rn, G, ra, rc);
+      const double E2 = FAO::ETaero (AtmPressure, Temp, VaporPressure, ra, rc);
       reference_evapotranspiration_wet = (E1 + E2) * 3600;
       potential_evapotranspiration_wet
 	= max (0.0, reference_evapotranspiration_wet);
@@ -270,7 +140,8 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
   else
     {
       reference_evapotranspiration_dry
-	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure, out)
+	= FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
+				  AtmPressure, out)
 	* 3600;
 
       potential_evapotranspiration_dry
@@ -278,7 +149,8 @@ PetPM::tick (const Weather& weather, const Vegetation& crops,
 				  reference_evapotranspiration_dry);
 
       reference_evapotranspiration_wet
-	= RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2, AtmPressure, out)
+	= FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
+				  AtmPressure, out)
 	* 3600;
       potential_evapotranspiration_wet
 	= reference_to_potential (crops, surface,
@@ -290,20 +162,20 @@ static struct PetPMSyntax
 {
   static Pet&
   make (const AttributeList& al)
-    { return *new PetPM (al); }
+  { return *new PetPM (al); }
   PetPMSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description",
-		 "Potential evopotranspiration using Penman-Monteith.");
-      Pet::load_syntax (syntax, alist);
-      Syntax Rn_syntax;
-      AttributeList Rn_alist;
-      Rn_alist.add ("type", "brunt");
-      syntax.add ("net_radiation", Librarian<NetRadiation>::library (),
-		  "Net radiation.");
-      alist.add ("net_radiation", Rn_alist);
-      Librarian<Pet>::add_type ("PM", alist, syntax, &make);
-    }
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description",
+	       "Potential evopotranspiration using Penman-Monteith.");
+    Pet::load_syntax (syntax, alist);
+    Syntax Rn_syntax;
+    AttributeList Rn_alist;
+    Rn_alist.add ("type", "brunt");
+    syntax.add ("net_radiation", Librarian<NetRadiation>::library (),
+		"Net radiation.");
+    alist.add ("net_radiation", Rn_alist);
+    Librarian<Pet>::add_type ("PM", alist, syntax, &make);
+  }
 } PetPM_syntax;

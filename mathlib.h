@@ -25,6 +25,7 @@
 
 #include "assertion.h"
 #include <vector>
+#define __USE_ISOC99 1
 #include <math.h>
 
 #ifdef _MSC_VER
@@ -49,9 +50,8 @@ T max (T a, T b)
 #define finite(x) __finite(x)
 #elif defined (__sparc__)
 #include <ieeefp.h>
-// This bugs out Linux -> MingW cross-compilations somehow
-// #elif defined (isfinite)
-// #define finite(x) isfinite(x)
+#elif defined (isfinite)
+#define finite(x) isfinite(x)
 #else
 inline bool finite (double x)
 { return x <= 0.0 || x >= 0.0; }

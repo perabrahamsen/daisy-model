@@ -43,17 +43,6 @@ public:
   const string name;
   static const char *const description;
 
-  // FAO utility functions.
-  static double CanopyResistance (double LAI /* [m^2/m^2] */); // [s/m]
-  static double RefCanopyResistance (void); // [s/m]
-  static double ZeroPlaneDisplacement (double CropHeight /* [m] */); // [m]
-  static double RoughnessHeight_Momentum (double CropHeight /* [m] */); // [m]
-  static double RoughnessHeight_Heat (double CropHeight /* [m] */); // [m]
-  static double AerodynamicResistance (double CropHeight /* [m] */,
-				       double ScreenHeight /* [m] */,
-				       double U /* [m/s] */); // [s/m]
-  static double RefAerodynamicResistance (double U2 /* [m/s] */); // [s/m]
-
   // Simulation.
 public:
   virtual void tick (Surface&, const Weather&, Vegetation&, 

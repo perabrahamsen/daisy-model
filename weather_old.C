@@ -21,6 +21,7 @@
 
 
 #include "weather_old.h"
+#include "fao.h"
 #include "time.h"
 #include "tmpstream.h"
 
@@ -103,15 +104,14 @@ WeatherOld::hourly_air_temperature () const
 double
 WeatherOld::reference_evapotranspiration () const
 {
-  return Weather::Makkink (hourly_air_temperature (),
-			   hourly_global_radiation ());
+  return FAO::Makkink (hourly_air_temperature (), hourly_global_radiation ());
 }
 
 double 
 WeatherOld::vapor_pressure () const
 { 
   const double T_min = daily_air_temperature () - 5.0;
-  return SaturationVapourPressure (T_min);
+  return FAO::SaturationVapourPressure (T_min);
 }
 
 double 
@@ -140,7 +140,7 @@ WeatherOld::WeatherOld (const AttributeList& al)
 { 
   latitude = al.number ("Latitude");
   longitude = al.number ("Longitude");
-  elevation = al.number ("Elevation");
+  elevation_ = al.number ("Elevation");
   timezone = al.number ("TimeZone");
   screen_height_ = al.number ("ScreenHeight");
   T_average = al.number ("average");

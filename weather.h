@@ -40,13 +40,14 @@ public:
 protected:
   /* const */ double latitude;
   /* const */ double longitude;
-  /* const */ double elevation;
+  /* const */ double elevation_;
   /* const */ double timezone;
   struct Surface
   { enum type { reference, field }; };
   /* const */ Surface::type surface;
   /* const */ double screen_height_;
 public:
+  double elevation () const; // [m]
   double screen_height () const; // [m]
 
   // Deposit.
@@ -117,25 +118,6 @@ public:
   virtual void put_air_temperature (double T) = 0; // [°C]
   virtual void put_reference_evapotranspiration (double ref) = 0; // [mm/d]
   virtual void put_global_radiation (double radiation) = 0; // [W/m^2]
-
-  // FAO atmospheric utilities.
-public:
-  static double LatentHeatVaporization (double Temp /* [dg C] */); // [J/kg]
-  static double PsychrometricConstant (double AtmPressure /* [Pa] */,
-				       double Temp /* [dg C] */); // [Pa/K]
-  static double AirDensity (double AtmPressure /* [Pa] */,
-			    double Temp /* [dg C] */); // [kg/m3]
-  static double SaturationVapourPressure (double Temp /* [dg C] */); // [Pa]
-  static double SlopeVapourPressureCurve (double Temp /* [dg C] */); // [Pa/K]
-  double AtmosphericPressure () const; // [Pa]
-  double CloudinessFactor_Arid (const Time&, double Si /* [W/m2] */) const;
-  double CloudinessFactor_Humid (const Time&, double Si /* [W/m2] */) const;
-  double RefNetRadiation (const Time& time, double Si /* [W/m2] */,
-			  double Temp /* [dg C] */,
-			  double ea /* [Pa] */,
-			  Treelog&) const;// [W/m2]
-  static double Makkink (double air_temperature /* [dg C] */,
- 		         double global_radiation /* [W/m^2] */); /* [mm/h] */
 
   // Astronomic utilities.
 public:

@@ -22,6 +22,7 @@
 
 #include "pet.h"
 #include "weather.h"
+#include "fao.h"
 #include "log.h"
 
 struct PetMakkink : public Pet
@@ -36,8 +37,8 @@ struct PetMakkink : public Pet
 	     const SoilWater&, Treelog&)
     {
       reference_evapotranspiration 
-	= Weather::Makkink (weather.hourly_air_temperature (),
-			    weather.hourly_global_radiation ());
+	= FAO::Makkink (weather.hourly_air_temperature (),
+			weather.hourly_global_radiation ());
       potential_evapotranspiration 
 	= reference_to_potential (crops, surface, 
 				  reference_evapotranspiration);
