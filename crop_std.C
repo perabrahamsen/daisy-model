@@ -986,7 +986,7 @@ This parameterization is only valid until the specified development state.");
   // ProdPar
   Prod.add ("CH2OReleaseRate", Syntax::None (), Syntax::Const,
 	    "CH2O Release Rate constant.");
-  vProd.add ("CH2OReleaseRate", 0.02);
+  vProd.add ("CH2OReleaseRate", 0.04);
   Prod.add ("E_Root", Syntax::None (), Syntax::Const,
 	    "Conversion efficiency, root.");
   vProd.add ("E_Root", 0.69);
