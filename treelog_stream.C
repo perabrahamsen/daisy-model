@@ -54,9 +54,7 @@ TreelogStream::entry (const string& text)
 	  impl.out << " " << impl.path[i] << "\n";
 	}
     }
-  for (unsigned int i = 0; i <= impl.touched.size (); i++)
-    impl.out << " ";
-  impl.out << "  "<< text << "\n";
+  impl.out << text << "\n";
 }
 
 TreelogStream::TreelogStream (ostream& out)

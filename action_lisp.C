@@ -49,7 +49,7 @@ struct ActionProgn : public Action
 		   Librarian<Action>::library ());
     }
 
-  bool check (const Daisy& daisy, ostream& err) const
+  bool check (const Daisy& daisy, Treelog& err) const
     { 
       bool ok = true;
       for (vector<const Action*>::const_iterator i = actions.begin ();
@@ -148,7 +148,7 @@ struct ActionCond : public Action
 	}
     }
 
-  bool check (const Daisy& daisy, ostream& err) const
+  bool check (const Daisy& daisy, Treelog& err) const
     { 
       bool ok = true;
       for (vector<clause>::const_iterator i = clauses.begin (); 
@@ -203,7 +203,7 @@ struct ActionIf : public Action
       output_derived (else_a, "else", log);
     }
 
-  bool check (const Daisy& daisy, ostream& err) const
+  bool check (const Daisy& daisy, Treelog& err) const
     { 
       bool ok = true; 
       if (!then_a.check (daisy, err))

@@ -9,6 +9,7 @@
 #include "log.h"
 #include "harvest.h"
 #include "im.h"
+#include "tmpstream.h"
 
 struct ActionCrop : public Action
 {
@@ -24,7 +25,7 @@ struct ActionCrop : public Action
     bool match (const Time& time) const;
     
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, ostream&);
+    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     MM_DD (const AttributeList&);
     ~MM_DD ();
@@ -44,7 +45,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, ostream&);
+    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     Sow (const AttributeList&);
     ~Sow ();
@@ -67,7 +68,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, ostream&);
+    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     Annual (const AttributeList&);
     ~Annual ();
@@ -98,7 +99,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, ostream&);
+    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     Perennial (const AttributeList&);
     ~Perennial ();
@@ -111,7 +112,7 @@ struct ActionCrop : public Action
     const int day;
     const AttributeList& what;
     
-    static bool check_alist (const AttributeList& al, ostream&);
+    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     Fertilize (const AttributeList&);
     ~Fertilize ();
@@ -132,7 +133,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, ostream&);
+    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     Tillage (const AttributeList&);
     ~Tillage ();
@@ -152,7 +153,7 @@ struct ActionCrop : public Action
     void output (Log&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, ostream&);
+    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     Spray (const AttributeList&);
     ~Spray ();
@@ -172,7 +173,7 @@ struct ActionCrop : public Action
     bool doIt (Daisy&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, ostream&);
+    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     Irrigation (const AttributeList&);
     ~Irrigation ();
@@ -210,7 +211,7 @@ ActionCrop::MM_DD::match (const Time& time) const
     && time.hour () == hour; }
 
 bool 
-ActionCrop::MM_DD::check_alist (const AttributeList& alist, ostream& err)
+ActionCrop::MM_DD::check_alist (const AttributeList& alist, Treelog& err)
 {
   bool ok = true;
 
@@ -220,19 +221,20 @@ ActionCrop::MM_DD::check_alist (const AttributeList& alist, ostream& err)
 
   if (mm < 1 || mm > 12)
     {
-      err << "month should be between 1 and 12\n";
+      err.entry ("month should be between 1 and 12");
       ok = false;
     }
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      err << "day should be between 1 and " 
-	   << Time::month_length (1, mm) << "\n";
+      TmpStream tmp;
+      tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+      err.entry (tmp.str ());
       ok = false;
     }
   if (hh < 0 || hh > 23)
     {
-      err << "hour should be between 0 and 23\n";
+      err.entry ("hour should be between 0 and 23");
       ok = false;
     }
   return ok;
@@ -278,7 +280,7 @@ ActionCrop::Sow::output (Log& log) const
 }
 
 bool 
-ActionCrop::Sow::check_alist (const AttributeList&, ostream&)
+ActionCrop::Sow::check_alist (const AttributeList&, Treelog&)
 {
   bool ok = true;
   return ok;
@@ -330,7 +332,7 @@ ActionCrop::Annual::output (Log& log) const
 }
 
 bool 
-ActionCrop::Annual::check_alist (const AttributeList&, ostream&)
+ActionCrop::Annual::check_alist (const AttributeList&, Treelog&)
 {
   bool ok = true;
   return ok;
@@ -428,20 +430,20 @@ ActionCrop::Perennial::output (Log& log) const
 }
 
 bool 
-ActionCrop::Perennial::check_alist (const AttributeList& al, ostream& err)
+ActionCrop::Perennial::check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
   if (al.integer ("seasons") < 1)
     {
-      err << "Perennial harvest should last at least 1 season\n";
+      err.entry ("Perennial harvest should last at least 1 season");
       ok = false;
     }
   non_negative (al.number ("DS"), "DS", ok, err);
   non_negative (al.number ("DM"), "DM", ok, err);
   if (al.check ("fertilize_rest") && !al.check ("fertilize"))
     {
-      err << "`fertilize_rest' specified, but `fertilize' isn't\n";
+      err.entry ("`fertilize_rest' specified, but `fertilize' isn't");
       ok = false;
     }
   
@@ -507,7 +509,7 @@ ActionCrop::Perennial::~Perennial ()
 { }
 
 bool 
-ActionCrop::Fertilize::check_alist (const AttributeList& al, ostream& err)
+ActionCrop::Fertilize::check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
   const int mm = al.integer ("month");
@@ -515,14 +517,15 @@ ActionCrop::Fertilize::check_alist (const AttributeList& al, ostream& err)
 
   if (mm < 1 || mm > 12)
     {
-      err << "month should be between 1 and 12\n";
+      err.entry ("month should be between 1 and 12");
       ok = false;
     }
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      err << "day should be between 1 and " 
-	   << Time::month_length (1, mm) << "\n";
+      TmpStream tmp;
+      tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+      err.entry (tmp.str ());
       ok = false;
     }
   return ok;
@@ -575,7 +578,7 @@ ActionCrop::Tillage::output (Log& log) const
 }
 
 bool 
-ActionCrop::Tillage::check_alist (const AttributeList& al, ostream& err)
+ActionCrop::Tillage::check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
   const int mm = al.integer ("month");
@@ -583,14 +586,15 @@ ActionCrop::Tillage::check_alist (const AttributeList& al, ostream& err)
 
   if (mm < 1 || mm > 12)
     {
-      err << "month should be between 1 and 12\n";
+      err.entry ("month should be between 1 and 12");
       ok = false;
     }
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      err << "day should be between 1 and " 
-	   << Time::month_length (1, mm) << "\n";
+      TmpStream tmp;
+      tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+      err.entry (tmp.str ());
       ok = false;
     }
   return ok;
@@ -623,7 +627,7 @@ ActionCrop::Spray::output (Log&) const
 { }
 
 bool 
-ActionCrop::Spray::check_alist (const AttributeList& al, ostream& err)
+ActionCrop::Spray::check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
   const int mm = al.integer ("month");
@@ -631,14 +635,15 @@ ActionCrop::Spray::check_alist (const AttributeList& al, ostream& err)
 
   if (mm < 1 || mm > 12)
     {
-      err << "month should be between 1 and 12\n";
+      err.entry ("month should be between 1 and 12");
       ok = false;
     }
   // don't test for bad month.
   else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
     {
-      err << "day should be between 1 and " 
-	   << Time::month_length (1, mm) << "\n";
+      TmpStream tmp;
+      tmp ()<< "day should be between 1 and " << Time::month_length (1, mm);
+      err.entry (tmp.str ());
       ok = false;
     }
   non_negative (al.number ("amount"), "amount", ok, err);
@@ -696,7 +701,7 @@ ActionCrop::Irrigation::doIt (Daisy& daisy) const
 }
 
 bool 
-ActionCrop::Irrigation::check_alist (const AttributeList& al, ostream& err)
+ActionCrop::Irrigation::check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
   non_negative (al.number ("amount"), "amount", ok, err);
@@ -956,25 +961,25 @@ static struct ActionCropSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionCrop (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
   {
     bool ok = true;
 
     if (al.check ("irrigation_rest") && !al.check ("irrigation"))
       {
-	err << "`irrigation_rest' specified, but `irrigation' isn't\n";
+	err.entry ("`irrigation_rest' specified, but `irrigation' isn't");
 	ok = false;
       }
     if (!al.check ("harvest_annual") && !al.check ("harvest_perennial"))
       {
-	err << "No harvest specified\n";
+	err.entry ("No harvest specified");
 	ok = false;
       }
     if (al.check ("harvest_annual") && al.check ("harvest_perennial")
 	&& !al.check ("secondary"))
       {
-	err << "You must specify a secondary crop when you specify both "
-	    << "annual and perennial harvest\n";
+	err.entry ("You must specify a secondary crop when you specify both "
+		   "annual and perennial harvest");
 	ok = false;
       }
     return ok;

@@ -20,7 +20,7 @@ Action::done (const Daisy&) const
 { return true; }
 
 bool
-Action::check (const Daisy&, ostream&) const
+Action::check (const Daisy&, Treelog&) const
 { return true; }
 
 Action::Action (const AttributeList& al)

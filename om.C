@@ -6,6 +6,7 @@
 #include "geometry.h"
 #include "log.h"
 #include "mathlib.h"
+#include "tmpstream.h"
 #include "submodel.h"
 #include <numeric>
 
@@ -479,7 +480,7 @@ OM::grow (unsigned int size)
 
 const double OM::Unspecified = -1042.42e42;
 
-static bool check_alist (const AttributeList& al, ostream& err)
+static bool check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
@@ -498,7 +499,9 @@ static bool check_alist (const AttributeList& al, ostream& err)
       for (unsigned int i = 0; i < C_per_N.size (); i++)
 	if (C_per_N[i] <= 0.0)
 	  {
-	    err << "C_per_N[" << i << "] is not positive\n";
+	    TmpStream tmp;
+	    tmp () << "C_per_N[" << i << "] is not positive\n";
+	    err.entry (tmp.str ());
 	    ok = false;
 	  }
     }
@@ -512,14 +515,14 @@ static bool check_alist (const AttributeList& al, ostream& err)
   if (!approximate (accumulate (fractions.begin (), fractions.end (), 0.0),
 		    1.0))
     {
-      err << "Sum of `fractions' must be 1.0\n";
+      err.entry ("Sum of `fractions' must be 1.0");
       ok = false;
     }
   const double initial_fraction = al.number ("initial_fraction");
   if (initial_fraction != OM::Unspecified
       && initial_fraction < 0.0 || initial_fraction > 1.0)
     {
-      err << "Initial fraction should be unspecified, or between 0 and 1\n";
+      err.entry ("Initial fraction should be unspecified, or between 0 and 1");
       ok = false;
     }
   return ok;

@@ -4,6 +4,7 @@
 #include "column.h"
 #include "log.h"
 #include "log_clone.h"
+#include "treelog.h"
 
 struct Field::Implementation
 {
@@ -68,8 +69,8 @@ public:
 
   // Create and destroy.
   bool check (bool require_weather, const Time& from, const Time& to, 
-	      ostream& err) const;
-  bool check_am (const AttributeList& am, ostream& err) const;
+	      Treelog& err) const;
+  bool check_am (const AttributeList& am, Treelog& err) const;
   void initialize (const Time&, const Weather*);
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
@@ -458,30 +459,34 @@ Field::Implementation::merge (const string& /*combine*/,
 bool 
 Field::Implementation::check (bool require_weather,
 			      const Time& from, const Time& to, 
-			      ostream& err) const
+			      Treelog& err) const
 { 
   bool ok = true;
-
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    if ((*i) == NULL || !(*i)->check (require_weather, from, to, err))
-      ok = false;
-
+    {
+      Treelog::Open nest (err, (*i) ? (*i)->name : "error");
+      if ((*i) == NULL || !(*i)->check (require_weather, from, to, err))
+	ok = false;
+    }
   return ok;
 }
 
 bool 
-Field::Implementation::check_am (const AttributeList& am, ostream& err) const
+Field::Implementation::check_am (const AttributeList& am, Treelog& err) const
 { 
-  bool ok = true;
+  Treelog::Open nest (err, am.name ("type"));
 
+  bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    if (!(*i)->check_am (am, err))
-      ok = false;
-
+    {
+      Treelog::Open nest (err, (*i)->name);
+      if (!(*i)->check_am (am, err))
+	ok = false;
+    }
   return ok;
 }
 
@@ -646,11 +651,11 @@ Field::merge (const string& combine, const string& remove)
 
 bool 
 Field::check (bool require_weather, const Time& from, const Time& to, 
-	      ostream& err) const
+	      Treelog& err) const
 { return impl.check (require_weather, from, to, err); }
 
 bool 
-Field::check_am (const AttributeList& am, ostream& err) const
+Field::check_am (const AttributeList& am, Treelog& err) const
 { return impl.check_am (am, err); }
 
 void 

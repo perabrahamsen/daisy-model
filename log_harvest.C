@@ -108,7 +108,7 @@ struct LogHarvest : public Log
     { }
 
   // Create and Destroy.
-  bool check (const Syntax&, ostream&) const
+  bool check (const Syntax&, Treelog&) const
     { return true; }
 
   LogHarvest (const AttributeList& al)

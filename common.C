@@ -6,6 +6,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "version.h"
+#include "treelog_stream.h"
 #include <vector>
 #include <fcntl.h>
 #include <iostream>
@@ -197,7 +198,9 @@ Options::Options (int& argc, char**& argv,
 		      const Syntax& syntax = library.syntax (name);
 		      AttributeList alist;
 		      alist.add ("type", name);
-		      if (syntax.check (alist, CERR, name))
+		      TreelogStream treelog (CERR);
+		      Treelog::Open nest (treelog, name);
+		      if (syntax.check (alist, treelog))
 			{
 			  Document& document = 
 			    Librarian<Document>::create (alist);

@@ -3,6 +3,7 @@
 #include "geometry.h"
 #include "syntax.h"
 #include "alist.h"
+#include "tmpstream.h"
 #include "mathlib.h"
 #include <assert.h>
 
@@ -35,21 +36,21 @@ Geometry::interval_border (double z) const
 }
 
 bool 
-Geometry::check (ostream&) const
+Geometry::check (Treelog&) const
 {
   bool ok = true;
   return ok;
 }
 
 static bool 
-check_alist (const AttributeList& al, ostream& err)
+check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
   const vector<double> zplus = al.number_sequence ("zplus");
   
   if (zplus.size () < 1)
     {
-      err << "You need at least one interval\n";
+      err.entry ("You need at least one interval");
       ok = false;
     }
   double last = 0.0;
@@ -57,8 +58,10 @@ check_alist (const AttributeList& al, ostream& err)
     {
       if (zplus[i] >= last)
 	{
-	  err << "Intervals should be monotonically decreasing, but "
-	       << zplus[i] << " > " << last << "\n";
+	  TmpStream tmp;
+	  tmp () << "Intervals should be monotonically decreasing, but "
+		 << zplus[i] << " > " << last;
+	  err.entry (tmp.str ());
 	  ok = false;
 	  break;
 	}
@@ -191,7 +194,7 @@ Geometry::swap (vector<double>& v, double from, double middle, double to) const
 }
 
 static bool 
-check_layers (const vector<AttributeList*>& layers, ostream& err)
+check_layers (const vector<AttributeList*>& layers, Treelog& err)
 {
   double last = 0.0;
   for (unsigned int i = 0; i < layers.size (); i++)
@@ -201,8 +204,10 @@ check_layers (const vector<AttributeList*>& layers, ostream& err)
 	last = next;
       else
 	{
-	  err << "Layer ending at " << next 
-	      << " should be below " << last << "\n";
+	  TmpStream tmp;
+	  tmp () << "Layer ending at " << next 
+		 << " should be below " << last;
+	  err.entry (tmp.str ());
 	  return false;
 	}
     }

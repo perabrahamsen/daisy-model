@@ -8,6 +8,7 @@
 #include "time.h"
 #include "log.h"
 #include "geometry.h"
+#include "tmpstream.h"
 #include "mathlib.h"
 #include <numeric>
 
@@ -35,7 +36,7 @@ struct AM::Implementation
 
   // Simulation.
   void output (Log&) const;
-  bool check (ostream& err) const;
+  bool check (Treelog& err) const;
   void mix (const Geometry&, double from, double to, double penetration = 1.0);
   void swap (const Geometry&, double from, double middle, double to);
   double total_C (const Geometry& geometry) const;
@@ -391,35 +392,28 @@ AM::Implementation::output (Log& log) const
 }
 
 bool 
-AM::Implementation::check (ostream& err) const
+AM::Implementation::check (Treelog& err) const
 { 
   bool ok = true;
 
   for (unsigned int i = 0; i < om.size (); i++)
     {
-      bool om_ok = true;
-      
-      non_negative (om[i]->top_C, "top_C", om_ok, err);
+      TmpStream tmp;
+      tmp () << "om[" << i << "]";
+      Treelog::Open nest (err, tmp.str ());
+
+      non_negative (om[i]->top_C, "top_C", ok, err);
 
       for (unsigned int j = 0; j < om[i]->C_per_N.size (); j++)
-	non_negative (om[i]->C_per_N[j], "C_per_N", om_ok, err, j);
+	non_negative (om[i]->C_per_N[j], "C_per_N", ok, err, j);
 
-      non_negative (om[i]->turnover_rate, "turnover_rate", om_ok, err);
+      non_negative (om[i]->turnover_rate, "turnover_rate", ok, err);
 
       for (unsigned int j = 0; j < om[i]->efficiency.size (); j++)
-	non_negative (om[i]->efficiency[j], "efficiency", om_ok, err, j);
+	non_negative (om[i]->efficiency[j], "efficiency", ok, err, j);
 
-      non_negative (om[i]->maintenance, "maintenance", om_ok, err);
-
-      if (!om_ok)
-	{
-	  err << "in om[" << i << "]\n";
-	  ok = false;
-	}
-      }
-  if (!ok)
-    err << "in am\n";
-  
+      non_negative (om[i]->maintenance, "maintenance", ok, err);
+    }
   return ok;
 }
 
@@ -517,7 +511,7 @@ AM::append_to (vector<OM*>& added)
 { impl.append_to (added); }
 
 bool 
-AM::check (ostream& err) const
+AM::check (Treelog& err) const
 { return impl.check (err); }
 
 void 
@@ -905,11 +899,11 @@ AM::~AM ()
   delete &impl;
 }
 
-static bool check_organic (const AttributeList& al, ostream& err)
+static bool check_organic (const AttributeList& al, Treelog& err)
 { 
   if (!al.check ("syntax"))
     {
-      err << "no syntax";
+      err.entry ("no syntax");
       return false;
     }
 
@@ -919,7 +913,8 @@ static bool check_organic (const AttributeList& al, ostream& err)
   static bool warned = false;
   if (al.check ("NH4_evaporation") && !warned)
     {
-      err << "OBSOLETE: Use `volatilization' instead of `NH4_evaporation'.\n";
+      err.entry ("OBSOLETE: Use `volatilization' instead "
+		 "of `NH4_evaporation'");
       warned = true;
     }
   
@@ -932,47 +927,42 @@ static bool check_organic (const AttributeList& al, ostream& err)
   bool has_all_C_per_N = true;
   for (unsigned int i = 0; i < om_alist.size(); i++)
     {
-      bool om_ok = true;
+      TmpStream tmp;
+      tmp () << "[" << i << "]";
+      Treelog::Open nest (err, tmp.str ());
       if (has_all_initial_fraction)
 	{
 	  if (om_alist[i]->number ("initial_fraction") == OM::Unspecified)
 	    has_all_initial_fraction = false;
 	}
       else
-	::check (*om_alist[i], "initial_fraction", om_ok, err);
+	::check (*om_alist[i], "initial_fraction", ok, err);
       if (has_all_C_per_N)
 	{
 	  if (!om_alist[i]->check ("C_per_N"))
 	    has_all_C_per_N = false;
 	}
       else
-	::check (*om_alist[i], "C_per_N", om_ok, err);
-      ::check (*om_alist[i], "turnover_rate", om_ok, err);
-      ::check (*om_alist[i], "efficiency", om_ok, err);
-      if (!om_ok)
-	{
-	  err << "in om[" << i << "]\n";
-	  ok = false;
-	}
+	::check (*om_alist[i], "C_per_N", ok, err);
+      ::check (*om_alist[i], "turnover_rate", ok, err);
+      ::check (*om_alist[i], "efficiency", ok, err);
       }
   if (has_all_initial_fraction)
     {
-      err << "you should leave initial_fraction in one om unspecified\n";
+      err.entry ("you should leave initial_fraction in one om unspecified");
       ok = false;
     }
   if (has_all_C_per_N)
     {
-      err << "you should leave C_per_N in one om unspecified\n";
+      err.entry ("you should leave C_per_N in one om unspecified");
       ok = false;
     }
   ::check (al, "weight", ok, err);
-  if (!ok)
-    err << "in am\n";
   
   return ok;
 }
 
-static bool check_root (const AttributeList& al, ostream& err)
+static bool check_root (const AttributeList& al, Treelog& err)
 { 
   assert (al.name ("syntax") == "root");
   

@@ -6,8 +6,9 @@
 #include "common.h"
 #include <vector>
 
-struct AttributeList;
-struct Syntax;
+class AttributeList;
+class Syntax;
+class Treelog;
 
 class Geometry
 {
@@ -45,7 +46,7 @@ public:
 			 const string& name) const;
 
   // Creation.
-  bool check (ostream&) const;
+  bool check (Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);
   Geometry (const AttributeList&);
   virtual ~Geometry ();

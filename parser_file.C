@@ -5,6 +5,7 @@
 #include "plf.h"
 #include "time.h"
 #include "tmpstream.h"
+#include "treelog_stream.h"
 
 struct ParserFile::Implementation
 {
@@ -394,9 +395,15 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  const string obj = al.name ("type");
 		  if (obj == "error")
 		    break;
-		  if (!lib.syntax (obj).check (al, lexer->err, obj))
+		  // We can only use complete objects as attribute
+		  // values.
+		  TmpStream tmp;
+		  TreelogStream treelog (tmp ());
+		  Treelog::Open nest (treelog, obj);
+		  if (!lib.syntax (obj).check (al, treelog))
 		    error (string ("Error for member `") + obj 
-				+ "' in library `" + name + "'");
+			   + "' in library `" + name + "'\n--- details:\n"
+			   + tmp.str () + "---");
 		  atts.add (name, al);
 		  delete &al;
 		}
@@ -440,7 +447,17 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    AttributeList& al = load_derived (lib, true);
 		    const string obj = al.name ("type");
 		    if (obj != "error")
-		      lib.syntax (obj).check (al, lexer->err, obj);
+		      {
+			// We can only use complete objects as attribute
+			// values.
+			TmpStream tmp;
+			TreelogStream treelog (tmp ());
+			Treelog::Open nest (treelog, obj);
+			if (!lib.syntax (obj).check (al, treelog))
+			  error (string ("Error for member `") + obj 
+				 + "' in library `" + name
+				 + "'\n--- details:\n" + tmp.str () + "---");
+		      }
 		    sequence.push_back (&al);
 		  }
 		atts.add (name, sequence);

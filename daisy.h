@@ -14,6 +14,7 @@ class Field;
 class Syntax;
 class AttributeList;
 class Condition;
+class Treelog;
 
 class Daisy
 {
@@ -40,7 +41,7 @@ public:
   void tick_logs ();
   void tick ();
   void run ();
-  bool check (ostream& err);
+  bool check (Treelog& err);
 
   // Create and Destroy.
 public:

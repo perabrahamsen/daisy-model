@@ -86,8 +86,8 @@ public:
   void output (Log&) const;
   virtual void output_inner (Log&) const;
   bool check (bool require_weather, const Time& from, const Time& to, 
-	      ostream& err) const;
-  virtual bool check_inner (ostream& err) const;
+	      Treelog& err) const;
+  virtual bool check_inner (Treelog& err) const;
 
   // Create and Destroy.
 public:

@@ -25,8 +25,9 @@ struct ActionWhile : public Action
 		   Librarian<Action>::library ());
     }
 
-  bool check (const Daisy& daisy, ostream& err) const
+  bool check (const Daisy& daisy, Treelog& err) const
     { 
+      Treelog::Open nest (err, "while");
       bool ok = true;
       for (vector<Action*>::const_iterator i = actions.begin ();
 	   i != actions.end ();
@@ -55,13 +56,13 @@ static struct ActionWhileSyntax
   static Action& make (const AttributeList& al)
     { return *new ActionWhile (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
     {
       bool ok = true;
 
       if (al.size ("actions") < 1)
 	{
-	  err << "You must specify at least one action\n";
+	  err.entry ("You must specify at least one action");
 	  ok = false;
 	}
       return ok;

@@ -4,6 +4,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
+#include "treelog_stream.h"
 #include <stdexcept>
 #include <typeinfo>
 
@@ -37,14 +38,16 @@ main (int argc, char* argv[])
 	}
 
       // Check the result.
-      if (!syntax.check (alist, CERR, "daisy"))
+      TreelogStream treelog (CERR);
+      Treelog::Open nest (treelog, "Daisy");
+      if (!syntax.check (alist, treelog))
 	return 1;
 
       // Create, check and run the simulation.
       Daisy daisy (alist);
       daisy.initialize (syntax);
 
-      if (!daisy.check (CERR))
+      if (!daisy.check (treelog))
 	return 1;
       daisy.run ();
 

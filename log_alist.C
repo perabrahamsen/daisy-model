@@ -423,7 +423,7 @@ LogAList::output (const string& name, const PLF& value)
 }
 
 bool
-LogAList::check (const Syntax&, ostream&) const
+LogAList::check (const Syntax&, Treelog&) const
 { return true; }
 
 void

@@ -3,6 +3,7 @@
 #include "hydraulic.h"
 #include "plf.h"
 #include "log.h"
+#include "tmpstream.h"
 
 void 
 Hydraulic::set_porosity (double Theta)
@@ -40,7 +41,7 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 }
 
 static bool
-check_alist (const AttributeList& al, ostream& err)
+check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
@@ -51,13 +52,15 @@ check_alist (const AttributeList& al, ostream& err)
 
   if (Theta_sat >= 0.9)
     {
-      err << "Theta_sat should be below 0.9 (is " << Theta_sat << ")\n";
+      TmpStream tmp;
+      tmp () << "Theta_sat should be below 0.9 (is " << Theta_sat << ")";
+      err.entry (tmp.str ());
       ok = false;
     }
 
   if (Theta_res >= Theta_sat)
     {
-      err << "Theta_sat should be above Theta_res\n";
+      err.entry ("Theta_sat should be above Theta_res");
       ok = false;
     }
   return ok;

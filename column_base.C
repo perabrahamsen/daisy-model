@@ -206,37 +206,48 @@ ColumnBase::get_water_content_at (unsigned int i) const // [cm³/cm³]
 
 bool
 ColumnBase::check (bool require_weather,
-		   const Time& from, const Time& to, ostream& err) const
+		   const Time& from, const Time& to, Treelog& err) const
 {
   const int n = soil.size ();
   bool ok = true;
 
   if (require_weather && !weather)
     {
-      err << "Weather unspecified\n";
+      err.entry ("Weather unspecified");
       ok = false;
     }
-  if (weather && !weather->check (from, to, err))
-    ok = false;
-  if (!soil.check (err))
-    ok = false;
-  if (!soil_water.check (n, err))
-    ok = false;
-  if (!soil_heat.check (n, err))
-    ok = false;
-  if (!soil_chemicals.check (n, err))
-    ok = false;
+  {
+    Treelog::Open nest (err, "Weather");
+    if (weather && !weather->check (from, to, err))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (err, "Soil");
+    if (!soil.check (err))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (err, "SoilWater");
+    if (!soil_water.check (n, err))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (err, "SoilHeat");
+    if (!soil_heat.check (n, err))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (err, "SoilChemicals");
+    if (!soil_chemicals.check (n, err))
+      ok = false;
+  }
   if (!check_inner (err))
     ok = false;
-
-  if (!ok)
-    err << "in column `" << name << "'\n";
-
   return ok;
 }
 
 bool
-ColumnBase::check_inner (ostream&) const
+ColumnBase::check_inner (Treelog&) const
 { return true; }
 
 void

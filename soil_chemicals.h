@@ -38,7 +38,7 @@ public:
 public:
   void clear ();
   void initialize (const AttributeList&, const Soil&, const SoilWater&);
-  bool check (unsigned n, ostream&) const;
+  bool check (unsigned n, Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilChemicals (const AttributeList&);
   ~SoilChemicals ();

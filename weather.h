@@ -126,7 +126,7 @@ public:
 protected:
   Weather (const AttributeList&);
 public:
-  virtual bool check (const Time& from, const Time& to, ostream& err) const;
+  virtual bool check (const Time& from, const Time& to, Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
   virtual ~Weather ();
 };

@@ -67,7 +67,7 @@ public:
   void make_table (int i);
 
   // Creation.
-  bool check (ostream&) const;
+  bool check (Treelog&) const;
   static void load_syntax (Syntax&, AttributeList&);
   Soil (const AttributeList&);
   ~Soil ();

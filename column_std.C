@@ -70,8 +70,8 @@ public:
 public:
   void tick (const Time&, const Weather*);
   void output_inner (Log&) const;
-  bool check_am (const AttributeList& am, ostream& err) const;
-  bool check_inner (ostream& err) const;
+  bool check_am (const AttributeList& am, Treelog& err) const;
+  bool check_inner (Treelog&) const;
 
   // Create and Destroy.
 public:
@@ -381,21 +381,33 @@ ColumnStandard::output_inner (Log& log) const
 }
 
 bool 
-ColumnStandard::check_am (const AttributeList& am, ostream& err) const 
-{ return organic_matter.check_am (am, err); }
+ColumnStandard::check_am (const AttributeList& am, Treelog& err) const 
+{ 
+  Treelog::Open nest (err, name);
+  return organic_matter.check_am (am, err); 
+}
 
 bool
-ColumnStandard::check_inner (ostream& err) const
+ColumnStandard::check_inner (Treelog& err) const
 {
   const int n = soil.size ();
   bool ok = true;
 
-  if (!soil_NO3.check (n, err))
-    ok = false;
-  if (!soil_NH4.check (n, err))
-    ok = false;
-  if (!organic_matter.check (err))
-    ok = false;
+  {
+    Treelog::Open nest (err, "SoilNO3");
+    if (!soil_NO3.check (n, err))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (err, "SoilNH4");
+    if (!soil_NH4.check (n, err))
+      ok = false;
+  }
+  {
+    Treelog::Open nest (err, "OrganicMatter");
+    if (!organic_matter.check (err))
+      ok = false;
+  }
   return ok;
 }
 

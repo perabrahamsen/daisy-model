@@ -29,7 +29,7 @@ static struct ActionSpraySyntax
   static Action& make (const AttributeList& al)
   { return *new ActionSpray (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
     {
       bool ok = true;
       const string chemical = al.name ("chemical");
@@ -38,7 +38,7 @@ static struct ActionSpraySyntax
       const Library& library = Librarian<Chemical>::library ();
       if (!library.check (chemical))
 	{
-	  err << "Unknown chemical `" << chemical << "'\n";
+	  err.entry (string ("Unknown chemical `") + chemical + "'");
 	  ok = false;
 	}
       else
@@ -47,7 +47,7 @@ static struct ActionSpraySyntax
 	  const AttributeList& alist = library.lookup (chemical);
 	  if (!syntax.check (alist, err))
 	    {
-	      err << "Incomplete chemical `" << chemical << "'\n";
+	      err.entry (string ("Incomplete chemical `") + chemical + "'");
 	      ok = false;
 	    }
 	}

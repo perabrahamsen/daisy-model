@@ -4,6 +4,7 @@
 #include "condition.h"
 #include "log.h"
 #include "daisy.h"
+#include "tmpstream.h"
 
 struct ActionWait : public Action
 {
@@ -108,7 +109,7 @@ static struct ActionWaitSyntax
   static Action& make_mm_dd (const AttributeList& al)
   { return *new ActionWaitMMDD (al); }
 
-  static bool check_mm_dd (const AttributeList& alist, ostream& err)
+  static bool check_mm_dd (const AttributeList& alist, Treelog& err)
   {
     bool ok = true;
 
@@ -118,19 +119,20 @@ static struct ActionWaitSyntax
 
     if (mm < 1 || mm > 12)
       {
-	err << "month should be between 1 and 12\n";
+	err.entry ("month should be between 1 and 12");
 	ok = false;
       }
     // don't test for bad month.
     else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
       {
-	err << "day should be between 1 and " 
-	    << Time::month_length (1, mm) << "\n";
+	TmpStream tmp;
+	tmp () << "day should be between 1 and " << Time::month_length (1, mm);
+	err.entry (tmp.str ());
 	ok = false;
       }
     if (hh < 0 || hh > 23)
       {
-	err << "hour should be between 0 and 23\n";
+	err.entry ("hour should be between 0 and 23");
 	ok = false;
       }
     return ok;

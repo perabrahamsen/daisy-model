@@ -15,7 +15,7 @@
 #include "time.h"
 #include "mathlib.h"
 #include "plf.h"
-#include "common.h"
+#include "tmpstream.h"
 #include "submodel.h"
 #include <algorithm>
 #include <numeric>
@@ -75,7 +75,7 @@ struct OrganicMatter::Implementation
   void swap (const Geometry&, double from, double middle, double to, 
 	     const Time& time);
   void output (Log&, const Geometry&) const;
-  bool check (ostream& err) const;
+  bool check (Treelog& err) const;
 
   double heat_turnover_factor (double T) const;
   double water_turnover_factor (double h) const;
@@ -306,14 +306,12 @@ OrganicMatter::Implementation::output (Log& log,
 }
 
 bool
-OrganicMatter::Implementation::check (ostream& err) const
+OrganicMatter::Implementation::check (Treelog& err) const
 {
   bool ok = true;
   for (unsigned int i = 0; i < am.size (); i++)
     if (!am[i]->check (err))
       ok = false;
-  if (!ok)
-    err << "in OrganicMatter\n";
   return ok;
 }
 
@@ -791,7 +789,7 @@ OrganicMatter::output (Log& log, const Geometry& geometry) const
 }
 
 bool
-OrganicMatter::check_am (const AttributeList& am, ostream& err) const
+OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 {
   bool ok = true;
   ::check (am, "om", ok, err);
@@ -802,41 +800,42 @@ OrganicMatter::check_am (const AttributeList& am, ostream& err) const
       
       for (unsigned int i = 0; i < om_alist.size(); i++)
 	{
+	  TmpStream tmp;
+	  tmp () << "[" << i << "]";
+	  Treelog::Open nest (err, tmp.str ());
 	  bool om_ok = true;
-	  ::check (*om_alist[i], "fractions", ok, err);
+	  ::check (*om_alist[i], "fractions", om_ok, err);
 	  if (om_ok)
 	    {
 	      vector<double> fractions
 		= om_alist[i]->number_sequence ("fractions");
 	      if (fractions.size () != impl.smb.size () + 1)
 		{
-		  err << "You have " << fractions.size ()
-		      << " fractions but " << impl.smb.size ()
-		      << " smb and one buffer.\n";
-		  om_ok = false;
+		  TmpStream tmp;
+		  tmp () << "You have " << fractions.size ()
+			 << " fractions but " << impl.smb.size ()
+			 << " smb and one buffer";
+		  err.entry (tmp.str ());
+		  ok = false;
 		}
 	      double sum
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
 	      if (fabs (sum - 1.0) > 0.0001)
 		{
-		  err << "The sum of all fractions is " << sum << "\n";
-		  om_ok = false;
+		  TmpStream tmp;
+		  tmp () << "The sum of all fractions is " << sum;
+		  err.entry (tmp.str ());
+		  ok = false;
 		}
 	    }
-	  if (!om_ok)
-	    {
-	      err << "in om[" << i << "]\n";
-	      ok = false;
-	    }
+	  else ok = false;
 	}
     }
-  if (!ok)
-    err << "in added matter `" << am.name ("type") << "'\n";
   return ok;
 }
 
 bool
-OrganicMatter::check (ostream& err) const
+OrganicMatter::check (Treelog& err) const
 {
   return impl.check (err);
 }
@@ -865,7 +864,7 @@ OrganicMatter::~OrganicMatter ()
 }
 
 static bool 
-check_alist (const AttributeList& al, ostream& err)
+check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
@@ -875,6 +874,9 @@ check_alist (const AttributeList& al, ostream& err)
 
   for (unsigned int j = 0; j < am_alist.size(); j++)
     {
+      TmpStream tmp;
+      tmp () << "am[" << j << "]";
+      Treelog::Open nest (err, tmp.str ());
       bool am_ok = true;
       ::check (*am_alist[j], "om", am_ok, err);
       if (am_ok)
@@ -884,6 +886,9 @@ check_alist (const AttributeList& al, ostream& err)
 	    = am_alist[j]->alist_sequence ("om");
 	  for (unsigned int i = 0; i < smb_alist.size(); i++)
 	    {
+	      TmpStream tmp;
+	      tmp () << "om[" << i << "]";
+	      Treelog::Open nest (err, tmp.str ());
 #if 0
 	      ::check (*om_alist[i], "C_per_N", om_ok, err);
 #endif
@@ -893,34 +898,35 @@ check_alist (const AttributeList& al, ostream& err)
 		= om_alist[i]->number_sequence ("fractions");
 	      if (fractions.size () != smb_alist.size () + 1)
 		{
-		  err << "You have " << fractions.size ()
-		      << " fractions but " << smb_alist.size ()
-		      << " smb and one buffer.\n";
+		  TmpStream tmp;
+		  tmp () << "You have " << fractions.size ()
+			 << " fractions but " << smb_alist.size ()
+			 << " smb and one buffer";
+		  err.entry (tmp.str ());
 		  om_ok = false;
 		}
 	      double sum
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
 	      if (fabs (sum - 1.0) > 0.0001)
 		{
-		  err << "The sum of all fractions is " << sum << "\n";
+		  TmpStream tmp;
+		  tmp () << "The sum of all fractions is " << sum;
+		  err.entry (tmp.str ());
 		  om_ok = false;
 		}
 	      if (!om_ok)
-		{
-		  err << "in om[" << i << "]\n";
-		  am_ok = false;
-		}
+		am_ok = false;
 	    }
 	}
       if (!am_ok)
-	{
-	  err << "in am[" << j << "]\n";
-	  ok = false;
-	}
+	ok = false;
     }
 
   for (unsigned int i = 0; i < smb_alist.size(); i++)
     {
+      TmpStream tmp;
+      tmp () << "smb[" << i << "]";
+      Treelog::Open nest (err, tmp.str ());
       bool om_ok = true;
 #if 0
       ::check (*smb_alist[i], "C_per_N", om_ok, err);
@@ -930,33 +936,39 @@ check_alist (const AttributeList& al, ostream& err)
       vector<double> fractions = smb_alist[i]->number_sequence ("fractions");
       if (fractions.size () != smb_alist.size () + som_alist.size ())
 	{
-	  err << "You have " << fractions.size () << " fractions but " 
-	      << smb_alist.size () << " smb and " << som_alist.size ()
-	      << " som.\n";
+	  TmpStream tmp;
+	  tmp () << "You have " << fractions.size () << " fractions but " 
+		 << smb_alist.size () << " smb and " << som_alist.size ()
+		 << " som";
+	  err.entry (tmp.str ());
 	  om_ok = false;
 	}
       vector<double> efficiency = smb_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  err << "You have " << efficiency.size () << " efficiency but " 
-	      << smb_alist.size () << " smb.\n";
+	  TmpStream tmp;
+	  tmp () << "You have " << efficiency.size () << " efficiency but " 
+		 << smb_alist.size () << " smb";
+	  err.entry (tmp.str ());
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  err << "The sum of all fractions is " << sum << "\n";
+	  TmpStream tmp;
+	  tmp () << "The sum of all fractions is " << sum;
+	  err.entry (tmp.str ());
 	  om_ok = false;
 	}
       if (!om_ok)
-	{
-	  err << "in smb[" << i << "]\n";
-	  ok = false;
-	}
+	ok = false;
     }
 
   for (unsigned int i = 0; i < som_alist.size(); i++)
     {
+      TmpStream tmp;
+      tmp () << "som[" << i << "]";
+      Treelog::Open nest (err, tmp.str ());
       bool om_ok = true;
 #if 0
       ::check (*som_alist[i], "C_per_N", om_ok, err);
@@ -965,33 +977,33 @@ check_alist (const AttributeList& al, ostream& err)
       vector<double> efficiency = som_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  err << "You have " << efficiency.size () << " efficiency but " 
-	      << smb_alist.size () << " smb.\n";
+	  TmpStream tmp;
+	  tmp () << "You have " << efficiency.size () << " efficiency but " 
+		 << smb_alist.size () << " smb";
+	  err.entry (tmp.str ());
 	  om_ok = false;
 	}
       vector<double> fractions = som_alist[i]->number_sequence ("fractions");
       if (fractions.size () != smb_alist.size () + som_alist.size ())
 	{
-	  err << "You have " << fractions.size () << " fractions but " 
-	      << smb_alist.size () << " smb and " << som_alist.size ()
-	      << " som.\n";
+	  TmpStream tmp;
+	  tmp () << "You have " << fractions.size () << " fractions but " 
+		 << smb_alist.size () << " smb and " << som_alist.size ()
+		 << " som";
+	  err.entry (tmp.str ());
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  err << "The sum of all fractions is " << sum << "\n";
+	  TmpStream tmp;
+	  tmp () << "The sum of all fractions is " << sum;
+	  err.entry (tmp.str ());
 	  om_ok = false;
 	}
       if (!om_ok)
-	{
-	  err << "in som[" << i << "]\n";
-	  ok = false;
-	}
+	ok = false;
     }
-
-  if (!ok)
-    err << "in OrganicMatter\n";
 
   return ok;
 }

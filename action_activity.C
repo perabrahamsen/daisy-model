@@ -31,7 +31,7 @@ struct ActionActivity : public Action
 		   Librarian<Action>::library ());
     }
 
-  bool check (const Daisy& daisy, ostream& err) const
+  bool check (const Daisy& daisy, Treelog& err) const
     { 
       bool ok = true;
       for (vector<const Action*>::const_iterator i = actions.begin ();

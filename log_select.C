@@ -146,7 +146,7 @@ LogSelect::output (const string&, const PLF&)
 { }
 
 bool 
-LogSelect::check (const Syntax&, ostream&) const
+LogSelect::check (const Syntax&, Treelog&) const
 { return true; }
 
 LogSelect::LogSelect (const AttributeList& al)
@@ -180,13 +180,13 @@ LogSelect::~LogSelect ()
   sequence_delete (entries.begin (), entries.end ());
 }
 
-static bool check_alist (const AttributeList& al, ostream& err)
+static bool check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
   if ((al.size ("set") % 2) == 1)
     {
-      err << "`set' should contain an even number of arguments.\n";
+      err.entry ("`set' should contain an even number of arguments");
       ok = false;
     }
 

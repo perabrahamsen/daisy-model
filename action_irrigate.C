@@ -28,7 +28,7 @@ struct ActionIrrigate : public Action
     irrigate (daisy.field, flux, t, sm);
   }
 
-  static bool check_alist (const AttributeList& alist, ostream& err)
+  static bool check_alist (const AttributeList& alist, Treelog& err)
   {
     bool ok = true;
     non_negative (alist.number ("flux"), "flux", ok, err);
@@ -168,13 +168,13 @@ static struct ActionIrrigateTopSyntax
 {
   static Action& make (const AttributeList& al)
   { return *new ActionIrrigateOverhead (al); }
-  static bool check_alist (const AttributeList&, ostream& err)
+  static bool check_alist (const AttributeList&, Treelog& err)
   {
     static bool warned = false;
     if (warned)
       return true;
     warned = true;
-    err << "OBSOLETE: Use `irrigate_overhead' instead of `irrigate_top'.\n";
+    err.entry ("OBSOLETE: Use `irrigate_overhead' instead of `irrigate_top'");
     return true;
   }
   ActionIrrigateTopSyntax ()
@@ -194,7 +194,7 @@ static struct ActionIrrigateSubsoilSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionIrrigateSubsoil (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
   { 
     bool ok = true;
     const double from = al.number ("from");
@@ -204,8 +204,8 @@ static struct ActionIrrigateSubsoilSyntax
     non_positive (to, "to", ok, err);
     if (from <= to)
       {
-	err << "`from' must be higher than `to' in"
-	    << " the subsoilirrigation zone.\n";
+	err.entry ("`from' must be higher than `to' in"
+		   " the subsoilirrigation zone");
 	ok = false;
       }
     return ok;

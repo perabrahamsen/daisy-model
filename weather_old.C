@@ -2,6 +2,7 @@
 
 #include "weather_old.h"
 #include "time.h"
+#include "tmpstream.h"
 
 struct WeatherOld::Implementation
 {
@@ -135,14 +136,18 @@ WeatherOld::~WeatherOld ()
 }
 
 static bool 
-check_alist (const AttributeList& al, ostream& err)
+check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
   const double latitude = al.number ("Latitude");
   
   if (latitude > 66 || latitude < -66)
-    err << "Warning, Daisy is untested under arctic conditions (Latitude = "
-	<< latitude << ")\n";
+    {
+      TmpStream tmp;
+      tmp () << "Warning, Daisy is untested under arctic conditions "
+	     << "(Latitude = " << latitude << ")";
+      err.entry (tmp.str ());
+    }
 
   return ok;
 }

@@ -9,6 +9,7 @@
 #include "groundwater.h"
 #include "syntax.h"
 #include "mathlib.h"
+#include "tmpstream.h"
 #include "submodel.h"
 
 void
@@ -268,33 +269,41 @@ SoilWater::set_Theta (const Soil& soil,
 
 
 bool 
-SoilWater::check (unsigned n, ostream& err) const
+SoilWater::check (unsigned n, Treelog& err) const
 {
   bool ok = true;
 
   if (Theta_.size () != n)
     {
-      err << "You have " << n 
-	  << " intervals but " << Theta_.size () << " Theta values\n";
+      TmpStream tmp;
+      tmp () << "You have " << n 
+	     << " intervals but " << Theta_.size () << " Theta values";
+      err.entry (tmp.str ());
       ok = false;
     }
   if (h_.size () != n)
     {
-      err << "You have " << n 
-	  << " intervals but " << h_.size () << " h values\n";
+      TmpStream tmp;
+      tmp () << "You have " << n 
+	     << " intervals but " << h_.size () << " h values";
+      err.entry (tmp.str ());
       ok = false;
     }
   if (X_ice_.size () != n)
     {
-      err << "You have " << n 
-	  << " intervals but " << X_ice_.size () << " X_ice values\n";
+      TmpStream tmp;
+      tmp () << "You have " << n 
+	     << " intervals but " << X_ice_.size () << " X_ice values";
+      err.entry (tmp.str ());
       ok = false;
     }
   if (X_ice_buffer.size () != n)
     {
-      err << "You have " << n 
-	  << " intervals but " << X_ice_buffer.size () 
-	  << " X_ice_buffer values\n";
+      TmpStream tmp;
+      tmp () << "You have " << n 
+	     << " intervals but " << X_ice_buffer.size () 
+	     << " X_ice_buffer values";
+      err.entry (tmp.str ());
       ok = false;
     }
   return ok;

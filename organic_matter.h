@@ -16,6 +16,7 @@ class SoilHeat;
 class SoilNO3;
 class SoilNH4;
 class Time;
+class Treelog;
 
 class OrganicMatter
 {
@@ -40,8 +41,8 @@ public:
   double get_smb_c_at (unsigned int i) const; // [g C/cm³]
 
   // Create and Destroy.
-  bool check (ostream& err) const;
-  bool check_am (const AttributeList& am, ostream& err) const;
+  bool check (Treelog& err) const;
+  bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
   AM* find_am (const string& sort, const string& part) const;
 public:

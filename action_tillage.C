@@ -29,13 +29,11 @@ static struct ActionMixSyntax
   static Action& make (const AttributeList& al)
     { return *new ActionMix (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
     {
       const double depth (al.number ("depth"));
       bool ok = true;
       non_positive (depth, "depth", ok, err);
-      if (!ok)
-	err << "in mix action\n";
       return ok;
     }
   ActionMixSyntax ()
@@ -83,7 +81,7 @@ static struct ActionSwapSyntax
   static Action& make (const AttributeList& al)
     { return *new ActionSwap (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
     {
       const double middle (al.number ("middle"));
       const double depth (al.number ("depth"));
@@ -92,11 +90,9 @@ static struct ActionSwapSyntax
       non_positive (depth, "depth", ok, err);
       if (middle <= depth)
 	{
-	  err << "swap middle should be above the depth\n";
+	  err.entry ("swap middle should be above the depth");
 	  ok = false;
 	}
-      if (!ok)
-	err << "in swap action\n";
       return ok;
     }
 
@@ -145,19 +141,13 @@ static struct ActionSetPorositySyntax
   static Action& make (const AttributeList& al)
     { return *new ActionSetPorosity (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
     {
       const double porosity (al.number ("porosity"));
       const double depth (al.number ("depth"));
       bool ok = true;
       non_positive (depth, "depth", ok, err);
-      if (porosity <= 0 || porosity >= 1.0)
-	{
-	  err << "porosity should be larger than 0 and less than 1\n";
-	  ok = false;
-	}
-      if (!ok)
-	err << "in swap action\n";
+      is_fraction (porosity, "porosity", ok, err);
       return ok;
     }
 

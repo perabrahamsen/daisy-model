@@ -3,6 +3,7 @@
 #include "weather.h"
 #include "lexer_data.h"
 #include "time.h"
+#include "tmpstream.h"
 #include "mathlib.h"
 #include <vector>
 #include <algorithm>
@@ -166,7 +167,7 @@ struct WeatherStandard : public Weather
   void initialize (const Time& time);
   WeatherStandard (const AttributeList&);
   ~WeatherStandard ();
-  bool check (const Time& from, const Time& to, ostream& err) const;
+  bool check (const Time& from, const Time& to, Treelog& err) const;
 };
 
 const WeatherStandard::unit_type 
@@ -742,28 +743,32 @@ WeatherStandard::~WeatherStandard ()
 { }
 
 bool
-WeatherStandard::check (const Time& from, const Time& to, ostream& err) const
+WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 { 
   bool ok = true;
   if (lex.error_count > 0)
     {
-      err << lex.error_count << " parser errors encountered\n";
+      TmpStream tmp;
+      tmp () << lex.error_count << " parser errors encountered";
+      err.entry (tmp.str ());
       ok = false;
     }
   if (from < begin)
     {
-      err << "Simulation starts before weather data\n";
+      err.entry ("Simulation starts before weather data");
       ok = false;
     }
   if (to > end)
     {
-      err << "Simulation ends after weather data\n";
+      err.entry ("Simulation ends after weather data");
       ok = false;
     }
   if (latitude < -66 || latitude > 66)
     {
-      err << "Researching arctic agriculture? (latitude = "
-	   << latitude << ")\n";
+      TmpStream tmp;
+      tmp () << "Researching arctic agriculture? (latitude = " << 
+	latitude << ")";
+      err.entry (tmp.str ());
     }
   return ok;
 }

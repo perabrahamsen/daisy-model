@@ -349,10 +349,9 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	    break;
 	  case Syntax::AList:
 	    {
-	      TmpStream dummy_stream;
 	      const bool has_errors
 		= !syntax.syntax (name).check (alist.alist (name), 
-					       dummy_stream (), name);
+					       Treelog::null ());
 	      if (has_errors)
 		out << " (has partially specified default value)";
 	      else 

@@ -64,9 +64,9 @@ public:
   virtual void tick (const Time&, const Weather*) = 0;
 
   virtual bool check (bool require_weather,
-		      const Time& from, const Time& to,
-		      ostream& err) const = 0;
-  virtual bool check_am (const AttributeList& am, ostream& err) const = 0;
+		      const Time& from, const Time& to, 
+		      Treelog& err) const = 0;
+  virtual bool check_am (const AttributeList& am, Treelog& err) const = 0;
   virtual void output (Log&) const;
 
   // Communication with external model.

@@ -1,4 +1,10 @@
+2000-11-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.65 released.
+
 2000-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all (check): Use Treelog instead of ostream for errors.
 
 	* Version 1.64 released.
 

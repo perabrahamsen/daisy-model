@@ -3,6 +3,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
+#include "tmpstream.h"
 #include <map>
 #include <algorithm>
 
@@ -33,8 +34,7 @@ struct Syntax::Implementation
   string_map descriptions;
   alist_map alists;
 
-  bool check (const AttributeList& vl, 
-	      ostream& err, const string& name, unsigned int level);
+  bool check (const AttributeList& vl, Treelog& err);
   Syntax::type lookup (const string& key) const;
   int order_number (const string& name) const;
   void entries (vector<string>& result) const;
@@ -48,9 +48,7 @@ struct Syntax::Implementation
 };    
 
 bool 
-Syntax::Implementation::check (const AttributeList& vl,
-			       ostream& err, const string& name,
-			       unsigned int level)
+Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 {
   bool error = false;
 
@@ -59,12 +57,11 @@ Syntax::Implementation::check (const AttributeList& vl,
        i++)
     {
       string key = (*i).first;
-      bool key_error = false;
       if (!vl.check (key))
 	{
 	  if (status[key] == Const || status[key] == State)
 	    {
-	      err << "Attribute " << key << " missing\n";
+	      err.entry (key + " missing");
 	      error = true;
 	    }
 	}
@@ -73,30 +70,41 @@ Syntax::Implementation::check (const AttributeList& vl,
 	  {
 	    const ::Library& lib = *libraries[key];
 	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
+	    int j_index = 0;
 	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
 	      {
+		TmpStream tmp;
+		tmp () << key << "[" << j_index << "]: ";
+		j_index++;
 		const AttributeList& al = **j;
 		if (!al.check ("type"))
 		  {
-		    err << "Non object found\n";
-		    key_error = true;
+		    tmp () << "Non object found";
+		    err.entry (tmp.str ());
+		    error = true;
 		  }
 		else if (al.name ("type") == "error")
 		  {
-		    err << "Error node found\n";
-		    key_error = true;
+		    tmp () << "Error node found";
+		    error = true;
+		    err.entry (tmp.str ());
 		  }
 		else if (!lib.check (al.name ("type")))
 		  {
-		    err << "Unknown library member `" << al.name ("type")
-			 << "'\n";
-		    key_error = true;
+		    tmp () << "Unknown library member `"
+			   << al.name ("type") + "'";
+		    err.entry (tmp.str ());
+		    error = true;
 		  }
-		else if (!lib.syntax (al.name ("type")).impl.check
-			 (al, err, key, level + 1))
-		  key_error = true;
+		else 
+		  {
+		    tmp () << al.name ("type");
+		    Treelog::Open nest (err, tmp.str ());
+		    if (!lib.syntax (al.name ("type")).impl.check (al, err))
+		      error = true;
+		  }
 	      }
 	  }
 	else 
@@ -105,46 +113,54 @@ Syntax::Implementation::check (const AttributeList& vl,
 	    const AttributeList& al = vl.alist (key);
 	    if (!al.check ("type"))
 	      {
-		err << "Non object found\n";
-		key_error = true;
+		err.entry (key + "Non object found");
+		error = true;
 	      }
-	    else if (!lib.syntax (al.name ("type")).check (al, err))
-	      key_error = true;
+	    else 
+	      {
+		Treelog::Open nest (err, key + ": " + al.name ("type"));
+		if (!lib.syntax (al.name ("type")).check (al, err))
+		  error = true;
+	      }
 	  }
       else if (types[key] == AList)
 	if (size[key] != Singleton)
 	  {
 	    assert (vl.size (key) != Syntax::Singleton);
 	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
-	    for (unsigned int j = 0;
-		 j < syntax[key]->impl.list_checker.size ();
-		 j++)
-	      {
-		if (!syntax[key]->impl.list_checker[j] (seq, err))
-		  {
-		    key_error = true;
-		    break;
-		  }
-	      }
+	    {
+	      Treelog::Open nest (err, key);
+	      for (unsigned int j = 0;
+		   j < syntax[key]->impl.list_checker.size ();
+		   j++)
+		{
+		  if (!syntax[key]->impl.list_checker[j] (seq, err))
+		    {
+		      error = true;
+		      break;
+		    }
+		}
+	    }
+	    int j_index = 0;
 	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
 	      {
+		TmpStream tmp;
+		tmp () << key << " [" << j_index << "]";
+		Treelog::Open nest (err, tmp.str ());
+		j_index++;
 		const AttributeList& al = **j;
-		if (!syntax[key]->impl.check (al, err, key, level + 1))
-		  key_error = true;
+		if (!syntax[key]->impl.check (al, err))
+		  error = true;
 	      }
 	  }
-	else if (!syntax[key]->impl.check (vl.alist (key), err, 
-					   key, level + 1))
-	  key_error = true;
-      if (key_error)
-	{
-	  error = true;
-	  for (unsigned l = 0; l < level; l++)
-	    err << "* ";
-	  err << "with key " << key << "\n";
-	}
+	else 
+	  {
+	    Treelog::Open nest (err, key);
+	    if (!syntax[key]->impl.check (vl.alist (key), err))
+	      error = true;
+	  }
     }
   if (!error)
     {
@@ -157,13 +173,6 @@ Syntax::Implementation::check (const AttributeList& vl,
 	    }
 	}
     }
-  if (error)
-    {
-      for (unsigned l = 0; l < level; l++)
-	err << "* ";
-      err << "in " << name << "\n";
-    }
-
   return !error;
 }
 
@@ -263,9 +272,9 @@ Syntax::category_number (const char* name)
 }
 
 bool
-Syntax::check (const AttributeList& vl, ostream& err, const string& name) const
+Syntax::check (const AttributeList& vl, Treelog& err) const
 {
-  return impl.check (vl, err, name, 0U);
+  return impl.check (vl, err);
 }
 
 Syntax::type 
@@ -587,50 +596,57 @@ Syntax::~Syntax ()
 { delete &impl; }
 
 void
-check (const AttributeList& al, const string& s, bool& ok, ostream& err)
+check (const AttributeList& al, const string& s, bool& ok, Treelog& err)
 {
   if (!al.check (s))
     {
-      err << "Missing " << s << "\n";
+      Treelog::Open nest (err, s); 
+      err.entry ("Missing attribute");
       ok = false;
     }
 }
 
 void
-non_negative (double v, const string& s, bool& ok, ostream& err, int index)
+non_negative (double v, const string& s, bool& ok, Treelog& err, int index)
 {
   if (v < 0.0)
     {
-      err << "Negative " << s;
+      TmpStream tmp;
+      tmp () << s;
       if (index >= 0)
-	err << "[" << index << "]";
-      err << "\n";
+	tmp () << "[" << index << "]";
+      Treelog::Open nest (err, tmp.str ());
+      err.entry ("Negative value not permitted");
       ok = false;
     }
 }
 
 void
-non_positive (double v, const string& s, bool& ok, ostream& err, int index)
+non_positive (double v, const string& s, bool& ok, Treelog& err, int index)
 {
   if (v > 0.0)
     {
-      err << "Positive " << s;
+      TmpStream tmp;
+      tmp () << s;
       if (index >= 0)
-	err << "[" << index << "]";
-      err << "\n";
+	tmp () << "[" << index << "]";
+      Treelog::Open nest (err, tmp.str ());
+      err.entry ("Positive value not permitted");
       ok = false;
     }
 }
 
 void
-is_fraction (double v, const string& s, bool& ok, ostream& err, int index)
+is_fraction (double v, const string& s, bool& ok, Treelog& err, int index)
 {
   if (v < 0.0 || v > 1.0)
     {
-      err << "fraction " << s << " must be between 0 and 1";
+      TmpStream tmp;
+      tmp () << s;
       if (index >= 0)
-	err << "[" << index << "]";
-      err << "\n";
+	tmp () << "[" << index << "]";
+      Treelog::Open nest (err, tmp.str ());
+      err.entry ("Fraction must be between 0 and 1");
       ok = false;
     }
 }

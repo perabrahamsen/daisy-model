@@ -6,7 +6,7 @@
 #include "alist.h"
 #include "chemical.h"
 #include "submodel.h"
-#include "tmpstream.h"
+#include "treelog.h"
 #include <map>
 
 struct Chemicals::Implementation
@@ -87,8 +87,7 @@ Chemicals::Implementation::lookup (const string& name)
   assert (library.check (name));
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
-  TmpStream dummy_stream;
-  assert (syntax.check (alist, dummy_stream ()));
+  assert (syntax.check (alist, Treelog::null ()));
   AttributeList child (alist);
   child.add ("type", name);
 
@@ -347,7 +346,7 @@ Chemicals::Chemicals (const Chemicals& other)
 { }
 
 static bool
-check_alist_entry (const AttributeList& al, ostream& err)
+check_alist_entry (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
   
@@ -357,7 +356,7 @@ check_alist_entry (const AttributeList& al, ostream& err)
 
   if (!library.check (chemical))
     {
-      err << "Unknown chemical `" << chemical << "'\n";
+      err.entry (string ("Unknown chemical `") + chemical + "'");
       ok = false;
     }
   else
@@ -369,7 +368,7 @@ check_alist_entry (const AttributeList& al, ostream& err)
     }
   if (!(amount >= 0.0))
     {
-      err << "Amount must be non-negative\n";
+      err.entry ("Amount must be non-negative");
       ok = false;
     }
   return ok;

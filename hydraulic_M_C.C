@@ -94,7 +94,7 @@ static struct HydraulicM_CSyntax
       return *new HydraulicM_C (al);
     }
 
-  static bool check (const AttributeList& al, ostream& err)
+  static bool check (const AttributeList& al, Treelog& err)
     { 
       bool ok = true;
 

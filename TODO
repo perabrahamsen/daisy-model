@@ -41,8 +41,6 @@ number of "interest groups", which can be use by QDaisy for filtering.
 
 for weather std, file, hourly, and for hydraulic old, old2
 
-** Convert Syntax::check og Daisy::check to use Treelog.
-
 ** Beskriv fordele ved min GUI implementation.
 
 - Virker med næsten alle `.dai' filer.

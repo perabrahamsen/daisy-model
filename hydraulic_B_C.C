@@ -94,7 +94,7 @@ static struct HydraulicB_CSyntax
       return *new HydraulicB_C (al);
     }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
     { 
       bool ok = true;
 

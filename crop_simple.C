@@ -346,17 +346,17 @@ static struct CropSimpleSyntax
   static Crop& make (const AttributeList& al)
   { return *new CropSimple (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
   { 
     bool ok = true;
     if (!al.check ("LAIvsTS") && !al.check ("LAIvsDay"))
       {
-	err << "Must specify either `LAIvsTS' or `LAIvsDay'\n";
+	err.entry ("Must specify either `LAIvsTS' or `LAIvsDay'");
 	ok = false;
       }
     else if (al.check ("LAIvsTS") && al.check ("LAIvsDay"))
       {
-	err << "Cannot specify both `LAIvsTS' or `LAIvsDay'\n";
+	err.entry ("Cannot specify both `LAIvsTS' or `LAIvsDay'");
 	ok = false;
       }
     else
@@ -371,8 +371,9 @@ static struct CropSimpleSyntax
 	  }
 	catch (...)
 	  {
-	    err << "`" << (al.check ("LAIvsTS") ? "LAIvsTS" : "LAIvsDay")
-		 << "' has bogus value.";
+	    err.entry (string ("`")
+		       + (al.check ("LAIvsTS") ? "LAIvsTS" : "LAIvsDay")
+		       + "' has bogus value");
 	    ok = false;
 	  }
       }

@@ -94,7 +94,7 @@ public:
   void swap (const Soil&, double from, double middle, double to);
   void set_Theta (const Soil& soil, 
 		  unsigned int from, unsigned int to, double Theta);
-  bool check (unsigned n, ostream& err) const;
+  bool check (unsigned n, Treelog& err) const;
   void output (Log&) const;
 
 

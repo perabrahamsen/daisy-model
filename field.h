@@ -6,13 +6,14 @@
 #include "common.h"
 #include <vector>
 
-struct Column;
-struct AttributeList;
-struct Time;
-struct IM;
-struct Harvest;
-struct Weather;
-struct Log;
+class Column;
+class AttributeList;
+class Time;
+class IM;
+class Harvest;
+class Weather;
+class Log;
+class Treelog;
 
 class Field
 { 
@@ -86,8 +87,8 @@ public:
 	       const Time&, const Weather*);
   void merge (const string& combine, const string& remove);
   bool check (bool require_weather, const Time& from, const Time& to, 
-	      ostream& err) const;
-  bool check_am (const AttributeList& am, ostream& err) const;
+	      Treelog& err) const;
+  bool check_am (const AttributeList& am, Treelog& err) const;
   void initialize (const Time&, const Weather*);
   Field (const vector<AttributeList*>&);
   ~Field ();

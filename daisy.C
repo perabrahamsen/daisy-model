@@ -41,40 +41,27 @@ Daisy::Daisy (const AttributeList& al)
 { }
 
 bool
-Daisy::check (ostream& err)
+Daisy::check (Treelog& err)
 {
   assert (syntax);
-  bool all_ok = true;
+  bool ok = true;
 
   // Check weather.
   {
-    bool ok = true;
+    Treelog::Open nest (err, "weather");
     if (weather && !weather->check (time, time, err))
       ok = false;
-
-    if (!ok)
-      {
-	err << "Weather problems\n";
-	all_ok = false;
-      }
   }
 
   // Check field.
   {
-    bool ok = true;
-    // This was ::const_iterator in g++
+    Treelog::Open nest (err, "column");
     if (!field.check (weather == NULL, time, time, err))
       ok = false;
-
-    if (!ok)
-      {
-	err << "Malformed column(s)\n";
-	all_ok = false;
-      }
   }
   // Check logs.
   {
-    bool ok = true;
+    Treelog::Open nest (err, "output");
     for (vector<Log*>::const_iterator i = logs.begin ();
 	 i != logs.end ();
 	 i++)
@@ -82,20 +69,14 @@ Daisy::check (ostream& err)
 	if (*i == NULL || !(*i)-> check (*syntax, err))
 	  ok = false;
       }
-    if (!ok)
-      {
-	err << "Malformed log(s)\n";
-	all_ok = false;
-      }
   }
   // Check actions.
-  if (!action.check (*this, err))
-    {
-      err << "Malformed action(s)\n";
-      all_ok = false;
-    }
-
-  return all_ok;
+  {
+    Treelog::Open nest (err, "manager");
+    if (!action.check (*this, err))
+      ok = false;
+  }
+  return ok;
 }
 
 void

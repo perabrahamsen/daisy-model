@@ -105,7 +105,7 @@ public:
 
   // Create and Destroy.
 public:
-  virtual bool check (const Syntax&, ostream& err) const = 0;
+  virtual bool check (const Syntax&, Treelog& err) const = 0;
 protected:
   Log (const AttributeList& al);
 public:

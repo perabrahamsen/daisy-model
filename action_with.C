@@ -22,8 +22,9 @@ public:
 	  (*i)->doIt (daisy);
 	}
     }
-  bool check (const Daisy& daisy, ostream& err) const
+  bool check (const Daisy& daisy, Treelog& err) const
     { 
+      Treelog::Open nest (err, string ("with") + column);
       bool ok = true;
       for (vector<const Action*>::const_iterator i = actions.begin ();
 	   i != actions.end ();
@@ -34,7 +35,7 @@ public:
 	}
       if (!daisy.field.find (column))
 	{
-	  err << "No column `" << column << "'\n";
+	  err.entry (string ("No column `") + column + "'");
 	  ok = false;
 	}
       return ok;

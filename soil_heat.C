@@ -10,6 +10,7 @@
 #include "time.h"
 #include "mathlib.h"
 #include "log.h"
+#include "tmpstream.h"
 #include "submodel.h"
 
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
@@ -62,7 +63,7 @@ struct SoilHeat::Implementation
   double bottom (const Time&, const Weather& weather) const;
 
   // Create & Destroy.
-  bool check (unsigned n, ostream& err) const;
+  bool check (unsigned n, Treelog& err) const;
   void initialize (const AttributeList& al, 
 		   const Soil& soil, const Time& time, const Weather& weather);
   Implementation (const AttributeList&);
@@ -556,13 +557,15 @@ SoilHeat::Implementation::bottom (const Time& time,
 }
 
 bool
-SoilHeat::Implementation::check (unsigned n, ostream& err) const
+SoilHeat::Implementation::check (unsigned n, Treelog& err) const
 {
   bool ok = true;
   if (T.size () != n)
     {
-      err << "You have " << n << " intervals but " 
-	   << T.size () << " T values\n";
+      TmpStream tmp;
+      tmp () << "You have " << n << " intervals but " 
+	     << T.size () << " T values";
+      err.entry (tmp.str ());
       ok = false;
     }
   return ok;
@@ -700,7 +703,7 @@ SoilHeat::output (Log& log) const
 }
 
 bool
-SoilHeat::check (unsigned n, ostream& err) const
+SoilHeat::check (unsigned n, Treelog& err) const
 {
   return impl.check (n, err);
 }

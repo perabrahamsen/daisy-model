@@ -17,7 +17,7 @@
 #include "version.h"
 #include "chemical.h"
 #include "log_extern.h"
-
+#include "treelog_stream.h"
 #include <fstream.h>
 
 typedef int daisy_bool;
@@ -35,7 +35,11 @@ daisy_syntax_delete (Syntax* syntax)
 extern "C" int EXPORT
 daisy_syntax_check (const Syntax* syntax, const AttributeList* alist, 
 		    const char* name)
-{ return syntax->check (*alist, CERR, name); }
+{ 
+  TreelogStream treelog (CERR);
+  Treelog::Open nest (treelog, name);
+  return syntax->check (*alist, treelog); 
+}
 
 extern "C" void EXPORT
 daisy_syntax_add (Syntax* syntax, const char* name,
@@ -432,7 +436,11 @@ daisy_daisy_delete (Daisy* daisy)
 
 extern "C" daisy_bool EXPORT	// Check context.
 daisy_daisy_check (Daisy* daisy)
-{ return daisy->check (CERR); }
+{ 
+  TreelogStream treelog (CERR);
+  Treelog::Open nest (treelog, "Daisy");
+  return daisy->check (treelog); 
+}
 
 // @@ Running the simulation.
 

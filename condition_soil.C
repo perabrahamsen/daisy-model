@@ -51,14 +51,11 @@ static struct ConditionSoilSyntax
   static Condition& make_potential (const AttributeList& al)
     { return *new ConditionSoilPotential (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
     {
       const double height (al.number ("height"));
       bool ok = true;
       non_positive (height, "height", ok, err);
-
-      if (!ok)
-	err << "in soil condition\n";
       return ok;
     }
 

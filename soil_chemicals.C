@@ -42,7 +42,7 @@ struct SoilChemicals::Implementation
   void clear ();
   void initialize (const vector<AttributeList*>,
 		   const Soil&, const SoilWater&);
-  bool check (unsigned n, ostream&) const;
+  bool check (unsigned n, Treelog&) const;
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
 };
@@ -214,13 +214,14 @@ SoilChemicals::Implementation::initialize (const vector<AttributeList*> al,
 }
 
 bool 
-SoilChemicals::Implementation::check (unsigned n, ostream& err) const
+SoilChemicals::Implementation::check (unsigned n, Treelog& err) const
 { 
   bool ok = true; 
   for (SoluteMap::const_iterator i = solutes.begin ();
        i != solutes.end ();
        i++)
     {
+      Treelog::Open nest (err, (*i).first);
       const SoilChemical& solute = *(*i).second;
       if (!solute.check (n, err))
 	ok = false;
@@ -281,7 +282,7 @@ SoilChemicals::initialize (const AttributeList& al,
 { impl.initialize (al.alist_sequence ("solutes"), soil, soil_water); }
 
 bool 
-SoilChemicals::check (unsigned n, ostream& err) const
+SoilChemicals::check (unsigned n, Treelog& err) const
 { return impl.check (n, err); }
 
 #ifdef BORLAND_TEMPLATES

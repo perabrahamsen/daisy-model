@@ -94,7 +94,7 @@ Solute::tick (const Soil& soil,
 }
 
 bool 
-Solute::check (unsigned, ostream&) const
+Solute::check (unsigned, Treelog&) const
 {
   bool ok = true;
   return ok;

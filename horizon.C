@@ -384,18 +384,18 @@ Horizon::heat_capacity (double Theta, double Ice) const
 }
 
 static bool
-check_alist (const AttributeList& al, ostream& err)
+check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
   if (!(al.number ("humus") > 0.0))
     {
-      err << "humus must be a positive number\n";
+      err.entry ("humus must be a positive number");
       ok = false;
     }
   if (al.size ("SOM_C_per_N") < 1)
     {
-      err << "must specify at least one SOM_C_per_N\n";
+      err.entry ("must specify at least one SOM_C_per_N");
       ok = false;
     }
   return ok;

@@ -5,6 +5,7 @@
 #include "field.h"
 #include "am.h"
 #include "im.h"
+#include "tmpstream.h"
 
 struct ActionFertilize : public Action
 {
@@ -23,7 +24,7 @@ struct ActionFertilize : public Action
     const double to;
     
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, ostream& err);
+    static bool check_alist (const AttributeList& al, Treelog& err);
     static void load_syntax (Syntax& syntax, AttributeList& alist);
     Precision (const AttributeList& al);
     ~Precision ();
@@ -34,13 +35,13 @@ struct ActionFertilize : public Action
   void doIt (Daisy& daisy);
 
   // Create and Destroy.
-  bool check (const Daisy& daisy, ostream& err) const;
+  bool check (const Daisy& daisy, Treelog& err) const;
   ActionFertilize (const AttributeList& al);
   ~ActionFertilize ();
 };
 
 bool 
-ActionFertilize::Precision::check_alist (const AttributeList& al, ostream& err)
+ActionFertilize::Precision::check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true; 
 
@@ -50,18 +51,18 @@ ActionFertilize::Precision::check_alist (const AttributeList& al, ostream& err)
 
   if (target <= 0.0)
     {
-      err << "You must specify a positive nitrogen target.\n";
+      err.entry ("You must specify a positive nitrogen target");
       ok = false;
     }
   if (from > 0.0 || to > 0.0)
     {
-      err << "You can only measure nitrogen below the ground.\n";
+      err.entry ("You can only measure nitrogen below the ground");
       ok = false;
     }
   if (from < to)
     {
-      err << "`from' must be higher than `to' in"
-	  << " the measurement area.\n";
+      err.entry ("`from' must be higher than `to' in"
+		 " the measurement area");
       ok = false;
     }
   return ok;
@@ -149,7 +150,7 @@ ActionFertilize::doIt (Daisy& daisy)
 }
 
 bool 
-ActionFertilize::check (const Daisy& daisy, ostream& err) const
+ActionFertilize::check (const Daisy& daisy, Treelog& err) const
 {
   bool ok = true;
   if (am.name ("syntax") != "mineral" && !daisy.field.check_am (am, err))
@@ -184,20 +185,20 @@ static struct ActionFertilizeSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionFertilize (al); }
 
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
   { 
     bool ok = true;
     const double from = al.number ("from");
     const double to = al.number ("to");
     if (from > 0.0 || to > 0.0)
       {
-	err << "You can only fertilize on or below the ground.\n";
+	err.entry ("You can only fertilize on or below the ground");
 	ok = false;
       }
     if (from < to)
       {
-	err << "`from' must be higher than `to' in"
-	     << " the fertilization area.\n";
+	err.entry ("`from' must be higher than `to' in"
+		   " the fertilization area");
 	ok = false;
       }
 
@@ -210,14 +211,14 @@ static struct ActionFertilizeSyntax
 
     if (second_year_compensation && precision)
       {
-	err << "You cannot use `second_year_compensation' "
-	    << "with `precision'.\n";
+	err.entry ("You cannot use `second_year_compensation' "
+		   "with `precision'");
 	ok = false;
       }
     if (fertilizer_weight + equivalent_weight + precision != 1)
       {
-	err << "You must specify exactly one of `weight', "
-	    << "`equivalent_weight' and `precision'.\n";
+	err.entry ("You must specify exactly one of `weight', "
+		   "`equivalent_weight' and `precision'");
 	ok = false;
       }
 
@@ -228,14 +229,16 @@ static struct ActionFertilizeSyntax
 	  {
 	    if (!am.check ("first_year_utilization"))
 	      {
-		err << "You must specify `first_year_utilization' for "
-		    << "the organic fertilizer.\n";
+		err.entry ("You must specify `first_year_utilization' for "
+			   "the organic fertilizer");
 		ok = false;
 	      }
 	    if (!am.check ("weight") || !am.check ("total_N_fraction"))
 	      {
-		err << "You cannot use `equivalent_weight' with "
-		    << syntax << " fertilizer.\n";
+		TmpStream tmp;
+		tmp () << "You cannot use `equivalent_weight' with "
+		       << syntax << " fertilizer";
+		err.entry (tmp.str ());
 	      }
 	  }
 	

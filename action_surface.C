@@ -27,13 +27,11 @@ static struct ActionSurfaceSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionSetSurfaceDetentionCapacity (al); }
   
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
   {
     const double height  = al.number ("height");
     bool ok = true;
     non_negative (height, "height", ok, err);
-    if (!ok)
-      err << "in set_surface_detention_capacity action\n";
     return ok;
   }
   ActionSurfaceSyntax ()

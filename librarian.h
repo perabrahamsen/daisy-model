@@ -6,7 +6,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
-#include "tmpstream.h"
+#include "treelog.h"
 #include <map>
 
 class Log;
@@ -40,8 +40,7 @@ public:
     assert (al.check ("type"));
     const string name = al.name ("type");
     assert (library ().check (name));
-    TmpStream dummy_stream;
-    assert (library ().syntax (name).check (al, dummy_stream ()));
+    assert (library ().syntax (name).check (al, Treelog::null ()));
     return (content->constructors)[name] (al);
   }
   static void add_type (const string& name, AttributeList& al,

@@ -29,15 +29,13 @@ static struct ActionHeatSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionSetHeatSource (al); }
   
-  static bool check_alist (const AttributeList& al, ostream& err)
+  static bool check_alist (const AttributeList& al, Treelog& err)
   {
     const double height  = al.number ("height");
     const double value  = al.number ("value");
     bool ok = true;
     non_positive (height, "height", ok, err);
     non_negative (value, "value", ok, err);
-    if (!ok)
-      err << "in set_heat_source action\n";
     return ok;
   }
   ActionHeatSyntax ()
