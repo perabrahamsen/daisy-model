@@ -3,6 +3,7 @@
 #include <vector>
 using namespace std;
 
+struct Geometry;
 struct Soil;
 struct SoilWater;
 struct Solute;
@@ -79,6 +80,8 @@ private:
   static double density_distribution_parameter (double a);
 public:
   void tick (const Soil&, const SoilHeat&, double WRoot, double IncWRoot);
+  void set_density (const Geometry& geometry, const double WRoot);
+  void full_grown (const Soil& soil, const double WRoot);
   void output (Log& log) const;
 
   // Create and Destroy

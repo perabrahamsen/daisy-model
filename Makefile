@@ -198,7 +198,8 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = crop_simple.C action_ridge.C groundwater_fixed.C \
+MODELS = vegetation_permanent.C \
+	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
 	action_crop.C groundwater_lysimeter.C select_min.C \
 	select_max.C select_average.C action_message.C weather_std.C \
@@ -236,14 +237,14 @@ COMPONENTS = select.C average.C mactrans.C macro.C \
 	action.C condition.C horizon.C 	uzmodel.C hydraulic.C \
 	bioclimate.C groundwater.C am.C transport.C \
 	adsorption.C tortuosity.C printer.C chemical.C \
-	pet.C net_radiation.C pt.C 
+	pet.C net_radiation.C pt.C vegetation.C 
 
 # Submodels are combined models and components.
 #
 SUBMODELS = canopy_simple.C canopy_std.C root_system.C \
 	ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
 	organic_matter.C nitrification.C denitrification.C soil_heat.C \
-	snow.C im.C om.C harvest.C vegetation.C chemicals.C field.C \
+	snow.C im.C om.C harvest.C chemicals.C field.C \
 	soil_chemical.C soil_chemicals.C bioincorporation.C
 
 

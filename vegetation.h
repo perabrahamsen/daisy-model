@@ -3,10 +3,9 @@
 #ifndef VEGETATION_H
 #define VEGETATION_H
 
-#include "common.h"
+#include "librarian.h"
 #include <vector>
 
-class Crop;
 class Time;
 class Bioclimate;
 class Geometry;
@@ -16,66 +15,67 @@ class SoilHeat;
 class SoilWater;
 class SoilNH4;
 class SoilNO3;
-class AttributeList;
 class PLF;
 class Harvest;
-class Log;
-class Syntax;
-class AttributeList;
 
 class Vegetation
 { 
   // Content.
-  struct Implementation;	// Top secret internal state.
-  Implementation& impl;
+public:
+  const string name;
+  static const char *const description;
 
   // Canopy queries.
 public:
-  double LAI () const;		// Total LAI of all crops on this column [0-]
-  double height () const;	// Max crop height in canopy [cm]
-  double cover () const;	// Fraction of soil covered by crops [0-1]
-  const PLF& LAIvsH () const;	// LAI below given height [f: cm -> R]
-  const PLF& HvsLAI () const;	// Height with LAI below [f: R -> cm]
-  double ACExt () const;	// Canopy extinction coefficient
-  double ACRef () const;	// Canopy reflection coefficient 
-  double ARExt () const;	// Radiation Extinction coefficient
-  double EpFactor () const;	// Reference to potential evapotranspiration.
-  double albedo () const;	// Another reflection factor.
-  double interception_capacity () const;// Canopy water storage capacity [mm]
+  virtual double LAI () const = 0; // Total LAI of all crops [0-]
+  virtual double height () const = 0; // Max crop height in canopy [cm]
+  virtual double cover () const = 0; // Fraction of soil covered by crops [0-1]
+  virtual const PLF& LAIvsH () const = 0; // LAI below height [f: cm -> R]
+  virtual const PLF& HvsLAI () const = 0; // Height with LAI below [f: R -> cm]
+  virtual double ACExt () const = 0;	// Canopy extinction coefficient
+  virtual double ACRef () const = 0;	// Canopy reflection coefficient 
+  virtual double ARExt () const = 0;	// Radiation Extinction coefficient
+  virtual double EpFactor () const = 0;	// Reference to pot. evapotransp
+  virtual double albedo () const = 0;	// Another reflection factor
+  virtual double interception_capacity () const = 0;// Canopy water cap. [mm]
 
   // Individual crop queries.
 public:
-  double DS_by_name (const string& name) const;// Dev stage [-1:2] or DSremove.
-  double DM_by_name (const string& name) const;// Shoot dry matter, [kg/ha].
+  virtual double DS_by_name (const string& name) const = 0;// [-1:2]/DSremove
+  virtual double DM_by_name (const string& name) const = 0;// Shoot DM [kg/ha]
 
   // Simulation
 public:
-  void tick (const Time&, const Bioclimate&, const Soil&,
-	     OrganicMatter&, const SoilHeat&, const SoilWater&,
-	     SoilNH4&, SoilNO3&); // Allow plants to grow (hourly).
-  double transpiration (double potential_transpiration,	// Actual trans. [mm/h]
-			double canopy_evaporation,
-			const Soil& soil, SoilWater& soil_water);
-  void kill_all (const string&, const Time&, const Geometry&, OrganicMatter&, 
-		 Bioclimate&);
-  vector<const Harvest*> harvest (const string& column_name,
-				  const string& crop_name,
-				  const Time&, const Geometry&, 
-				  OrganicMatter&,
-				  Bioclimate& bioclimate,
-				  double stub_length,
-				  double stem_harvest,
-				  double leaf_harvest, 
-				  double sorg_harvest);
-  void sow (const AttributeList& al, const Geometry&, const OrganicMatter&);
-  void output (Log&) const;
+  virtual void tick (const Time&, const Bioclimate&, const Soil&,
+		     OrganicMatter&, const SoilHeat&, const SoilWater&,
+		     SoilNH4&, SoilNO3&) = 0; // Allow plants to grow (hourly).
+  virtual double transpiration (// Actual trans. [mm/h]
+				double potential_transpiration,	
+				double canopy_evaporation,
+				const Soil& soil, SoilWater& soil_water) = 0;
+  virtual void kill_all (const string&, const Time&, const Geometry&,
+			 OrganicMatter&, Bioclimate&) = 0;
+  virtual vector<const Harvest*> harvest (const string& column_name,
+					  const string& crop_name,
+					  const Time&, const Geometry&, 
+					  OrganicMatter&,
+					  Bioclimate& bioclimate,
+					  double stub_length,
+					  double stem_harvest,
+					  double leaf_harvest, 
+					  double sorg_harvest) = 0;
+  virtual void sow (const AttributeList& al,
+		    const Geometry&, const OrganicMatter&) = 0;
+  virtual void output (Log&) const;
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry, const OrganicMatter&);
+  virtual void initialize (const Soil& soil, const OrganicMatter&) = 0;
   static void load_syntax (Syntax&, AttributeList&);
   Vegetation (const AttributeList&);
-  ~Vegetation ();
+  virtual ~Vegetation ();
 };
+
+static Librarian<Vegetation> Vegetation_init ("vegetation");
 
 #endif VEGETATION_H

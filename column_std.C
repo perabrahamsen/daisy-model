@@ -29,7 +29,7 @@ class ColumnStandard : public Column
   // Content.
 private:
   Weather* weather;
-  Vegetation vegetation;
+  Vegetation& vegetation;
   Bioclimate& bioclimate;
   Surface surface;
   Soil soil;
@@ -401,7 +401,7 @@ ColumnStandard::output (Log& log) const
   output_derived (nitrification, "Nitrification", log);
   output_submodule (denitrification, "Denitrification", log);
   output_derived (groundwater, "Groundwater", log);
-  output_submodule (vegetation, "Vegetation", log);
+  output_derived (vegetation, "Vegetation", log);
   log.close_geometry ();
 }
 
@@ -410,7 +410,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     weather (al.check ("weather") 
 	     ? &Librarian<Weather>::create (al.alist ("weather"))
 	     : NULL), 
-    vegetation (al.alist ("Vegetation")),
+    vegetation (Librarian<Vegetation>::create (al.alist ("Vegetation"))),
     bioclimate (Librarian<Bioclimate>::create (al.alist ("Bioclimate"))),
     surface (al.alist ("Surface")),
     soil (al.alist ("Soil")),
@@ -444,9 +444,12 @@ void ColumnStandard::initialize (const Time& time,
 
 ColumnStandard::~ColumnStandard ()
 { 
-  delete &nitrification;
   if (weather)
     delete weather;
+  delete &vegetation;
+  delete &bioclimate;
+  delete &nitrification;
+  delete &groundwater;
 }
 
 #ifdef BORLAND_TEMPLATES
@@ -481,8 +484,14 @@ static struct ColumnStandardSyntax
 		Syntax::OptionalState, Syntax::Singleton,
 		"Weather model for providing climate information during \
 the simulation.  If unspecified, used global weather.");
-    add_submodule<Vegetation> ("Vegetation", syntax, alist, Syntax::State,
-			       "The crops on the field.");
+    syntax.add ("Vegetation", Librarian<Vegetation>::library (),
+		Syntax::State, Syntax::Singleton,
+		"The crops on the field.");
+    AttributeList vegetation_alist;
+    vegetation_alist.add ("type", "crops");
+    vegetation_alist.add ("crops", *new vector<AttributeList*>);
+    alist.add ("Vegetation", vegetation_alist);
+
     syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
 		"The water and energy distribution among the crops.");
     add_submodule<Surface> ("Surface", syntax, alist, Syntax::State,

@@ -1,3 +1,35 @@
+2000-06-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.28 released.
+
+2000-06-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("N Balance"): Use crops vegetation model.
+	("Crop Photosynthesis"): Ditto.
+	("Crop Production"): Ditto.
+	("Simple Crop Production"): Ditto.
+	("Old Crop Production"): Ditto.
+	("Permanent Vegetation"): New model.
+
+2000-05-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation_permanent.C: New model.
+
+	* vegetation_crops.C, vegetation.h (initialize): Make it take a
+	soil argument. 
+
+	* root_system.C (set_density, full_grown): New functions.
+
+2000-05-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation.h, vegetation.C: Made it a component instead of a
+	submodel.
+	* vegetation.C: New model.
+
+	* Makefile (SUBMODEL): Removed `vegetation.C'.
+	(COMPONENTS): Added `vegetation.C'.
+	(MODELS): Added `vegetation_crops.C'.
+
 2000-05-27  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.27 released.

@@ -347,8 +347,13 @@ RootSystem::tick (const Soil& soil,
       /*max depth determined by crop*/
       Depth = min (Depth, -soil.MaxRootingDepth ()); /*or by soil conditions*/
     }
+  set_density (soil, WRoot);
+}
 
-  // Density.
+void
+RootSystem::set_density (const Geometry& geometry, 
+			 const double WRoot)
+{
   const double LengthPrArea
     = max (m_per_cm * SpRtLength * WRoot, 0.12 * PotRtDpt); /*cm/cm2*/
   double a = density_distribution_parameter (LengthPrArea / 
@@ -362,11 +367,20 @@ RootSystem::tick (const Soil& soil,
     }
 
   unsigned int i = 0;
-  for (; i == 0 || -soil.zplus (i-1) < Depth; i++)
-    Density[i] = L0 * exp (a * soil.z (i));
-  assert (i < soil.size ());
-  for (; i < soil.size (); i++)
+  for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
+    Density[i] = L0 * exp (a * geometry.z (i));
+  assert (i < geometry.size ());
+  for (; i < geometry.size (); i++)
     Density[i] = 0.0;
+}
+
+void
+RootSystem::full_grown (const Soil& soil, 
+			const double WRoot)
+{
+  PotRtDpt = MaxPen;
+  Depth = min (MaxPen, -soil.MaxRootingDepth ());
+  set_density (soil, WRoot);
 }
 
 void
