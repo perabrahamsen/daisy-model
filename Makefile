@@ -5,7 +5,8 @@ CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -frepo -pipe # -O2 -fhandle-exceptions -pi
 SRCONLY = column_std.o manager_rule.o weather_simple.o uzrichard.o \
 	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
 	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o \
-	crop_std.o action_sow.o action_stop.o condition_time.o
+	crop_std.o action_sow.o action_stop.o condition_time.o \
+	condition_logic.o
 OBJECTS = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o time.o uzmodel.o \
@@ -25,13 +26,6 @@ REMOVE = rules.C rules.h
 
 daisy:	$(OBJ)
 	$(CC) -o daisy $(OBJ) -lm
-
-bug: bug.o
-	$(CC) -o bug bug.o
-	bug
-
-bug.o:	bug.C
-	$(CC) -v -c bug.C
 
 wc: $(TEXT)
 	wc -l $(TEXT)
@@ -170,3 +164,5 @@ action_sow.o: action_sow.C action.h daisy.h time.h column.h crop.h \
 action_stop.o: action_stop.C action.h syntax.h alist.h common.h
 condition_time.o: condition_time.C condition.h time.h syntax.h alist.h \
  common.h daisy.h
+condition_logic.o: condition_logic.C condition.h syntax.h alist.h \
+ common.h

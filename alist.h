@@ -73,8 +73,8 @@ public:
        throw2 (Invalid, Uninitialized);
   const vector<const AttributeList*>& list_sequence (string key) const
        throw2 (Invalid, Uninitialized);
-       
-    // Create and Destroy.
+
+  // Create and Destroy.
   void add (string, double);
   void add (string, string);
   void add (string, bool);
@@ -96,6 +96,25 @@ public:
   AttributeList (const AttributeList& old);
   AttributeList ();
   ~AttributeList ();
+};
+
+// This cutie will create a vector of objects from a vector of alists.
+// I'd like it to be a member of AttributeList, but template members
+// wasn't implemented in G++ 2.7.2.
+template <class T> 
+struct map_create
+{
+  vector<T*>& t;
+  map_create (const vector<const AttributeList*>& f)
+    : t (*new vector<T*> ())
+  { 
+    for (vector<const AttributeList*>::const_iterator i = f.begin ();
+	 i != f.end ();
+	 i++)
+      t.push_back (&T::create (**i));
+  }
+  operator vector<T*>& ()
+  { return t; }
 };
 
 #endif ALIST_H
