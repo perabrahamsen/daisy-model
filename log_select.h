@@ -80,6 +80,10 @@ struct LogSelect : public Log
   void open_derived (symbol field, symbol type);
   void close_derived ();
 
+  // Object singletons with alist.
+  void open_object (symbol field, symbol type, const AttributeList&); 
+  void close_object ();
+
   // Derived items in a list.
   void open_entry (symbol type, const AttributeList&);
   void close_entry ();

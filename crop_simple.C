@@ -138,7 +138,7 @@ public:
   void output (Log&) const;
 
   double DS () const;
-  double DM () const;
+  double DM (double height) const;
   double total_N () const;
 
   // Create and Destroy.
@@ -357,7 +357,7 @@ CropSimple::DS () const
 }
 
 double
-CropSimple::DM () const	
+CropSimple::DM (double) const	
 { throw ("Can't take DM of simple crop model"); }
 
 double

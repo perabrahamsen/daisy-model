@@ -1,36 +1,30 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Fertorganic eksempel
+* Make it possible to specify texture using different systems
 
-** Opdater Toves setup
+Different sizes for sand, silt, and clay, plus allow other types.
 
-** SH: Post noter til hvad der er ændret i Daisy siden opgaver
+* Irrigation
 
-** Skriv brev
+** Deficit
 
-** Send brev
+Start ved specifik dato.
 
-* automatically calculate background_mineralization.
+* biomod: G+P74 rootdens model hvor a er en parameter
 
-Possible?
+Og Lz (DensRtTip) er en fri variabel.
 
-* crop_ds_above new height parameter
+plus line;r fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
+
+* Partit komponent
+
+Skal kunne være afhængig af kvælstof og temperatur.
 
 * Lav superklimafil
 
 ** SH: forklaring
 
-* SH: Ret Hourly ExtraterrestrialRadiation
-
-* Opdater tutorial
-
-** OrganicMatter
-
-** Aquitard
-
 * OrganicMatter
-
-** Tilføj beskrivelse til tutorial.
 
 ** Akademisk bekrivelse?
 
@@ -50,6 +44,8 @@ instead of
 
 * Ny (set foo 3.4) pseudo-attribut.
 
+* seperate harvest and cut actions
+
 * SH: Salg af referencemanual på www-siden?
 
 * UZmodel top_t
@@ -67,8 +63,6 @@ Balance = Input - Output - Pool changes
 * Select::method { current, sum, max, min, average }
 
 Use by summary.
-
-* Vælg pet automatisk?
 
 * SH: PowerPoint validation slides på hjemmeside.
 
@@ -97,21 +91,7 @@ will append "N Balance" to the end of the "output" parameter.
 
 Gør det muligt at give fejl hvis summen er forskellig fra 1.0 (100%).
 
-* biomod: G+P74 rootdens model hvor a er en parameter
-
-Og Lz (DensRtTip) er en fri variabel.
-
-plus line;r fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
-
-* Partit komponent
-
-Skal kunne være afhængig af kvælstof og temperatur.
-
 * Dokumentation for output filer.
-
-* Make it possible to specify texture using different systems
-
-Different sizes for sand, silt, and clay, plus allow other types.
 
 * SH: genvækst af græs
 
@@ -120,16 +100,6 @@ Different sizes for sand, silt, and clay, plus allow other types.
 Move cvs, dll, cdaisy, api, programmers guide, header, source.
 
 Explain about different compilers, and making me update.
-
-* Irrigation
-
-** Deficit
-
-Start ved specifik dato.
-
-* horizon.dai 
-
-Indeholder en standard lerjord, sandjord m.m. ligesom hydros2d
 
 * top level stop kommando.
 
@@ -143,58 +113,9 @@ Indeholder en standard lerjord, sandjord m.m. ligesom hydros2d
 
 ** Foreslå aternativer ved fejl? (højde i pF?)
 
-* DOM
-
-** Testkørsel
-
-Homogen jord, konstant klima.
-
-Log samlet C, N og C/N for hvert lag, og for hvert tidsskridt.
-
-*** Forsøg et.
-
-**** Dag 1: Tilsæt C/N: 200/21
-
-**** Dag 2: Tilsæt C/N: 200/21
-
-*** Forsøg to.
-
-**** Dag 1: Tilsæt C/N: 200/21
-
-**** Dag 2: Tilsæt C/N: 100/1 + 100/20
-
-** Snak P med Birgitte
-
-** Fosfat PO4---
-
 * Check af PLF'er.
 
 ** LeafAIMod skal altid være > 0.0
-
-* Biomod
-
-** Fordel C/N mellem AOM1 og AOM2 som func. af N/C forhold.
-
-C/N skal være ens i begge puljer.
-
-** Lav AM om til et rigtigt komponent?  Planterest model?
-
-** To stk lerfunktioner.
-
-Den "normale" lerfunktion skal påvirke begge smb puljer.
-
-Den anden ser sådan her ud:
-
-  f1 * r_s = r
-
-  m + d = c
-  d / (m + d) = r
-
-f1 er lerfunktionen.
-r_s er en konstant
-c er en konstant.
-m er maintenance
-d er death rate (== turnover rate)
 
 * User Manual
 

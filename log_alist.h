@@ -77,6 +77,9 @@ struct LogAList : public Log
   void open_derived (symbol field, // Object singletons.
 		     symbol type); 
   void close_derived ();
+  void open_object (symbol field, // Object singletons with alist.
+                    symbol type, const AttributeList&); 
+  void close_object ();
   void open_entry (symbol type,   // Items in an Object sequence.
 		   const AttributeList& alist);
   void close_entry ();

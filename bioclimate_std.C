@@ -49,7 +49,7 @@ struct BioclimateStandard : public Bioclimate
   void CanopyStructure (const Vegetation&);
 
   // External water sinks and sources.
-  Pet& pet;			// Potential Evapotranspiration model.
+  Pet* pet;			// Potential Evapotranspiration model.
   double total_ep;		// Potential evapotranspiration [mm/h]
   double total_ea;		// Actual evapotranspiration [mm/h]
 
@@ -177,9 +177,40 @@ struct BioclimateStandard : public Bioclimate
   double get_snow_storage () const // [mm]
     { return snow.storage (); }
   // Create.
+  void initialize (const Weather&, Treelog&);
   BioclimateStandard (const AttributeList&);
   ~BioclimateStandard ();
 };
+
+void 
+BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
+{
+  if (pet)                      // Explicit.
+    return;
+
+  Treelog::Open nest (msg, "Bioclimate: " + name);
+
+  symbol type;
+
+  if (weather.has_reference_evapotranspiration ())
+    type = symbol ("weather");
+  else if (weather.has_vapor_pressure () && weather.has_wind ())
+    type = symbol ("PM");
+  else if (weather.has_min_max_temperature ())
+    type = symbol ("Hargreaves");
+  else
+    type = symbol ("makkink");
+
+  const Library& library = Librarian<Pet>::library ();
+  daisy_assert (library.exist (type));
+  
+  AttributeList alist (library.lookup (type));
+  alist.add ("type", type);
+  daisy_assert (library.syntax (type).check (alist, msg));
+  pet = &Librarian<Pet>::create (alist);
+
+  msg.debug ("Pet choosen: " + type);
+}
 
 BioclimateStandard::BioclimateStandard (const AttributeList& al)
   : Bioclimate (al),
@@ -187,7 +218,9 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
     LAI_ (0.0),
     Height (al.integer ("NoOfIntervals") + 1),
     PAR_ (al.integer ("NoOfIntervals") + 1),
-    pet (Librarian<Pet>::create (al.alist ("pet"))),
+    pet (al.check ("pet") 
+         ? &Librarian<Pet>::create (al.alist ("pet"))
+         : NULL),
     total_ep (0.0),
     total_ea (0.0),
     irrigation_overhead (0.0),
@@ -241,7 +274,7 @@ BioclimateStandard::BioclimateStandard (const AttributeList& al)
 
 BioclimateStandard::~BioclimateStandard ()
 { 
-  delete &pet;
+  delete pet;
   delete &svat;
 }
 
@@ -338,9 +371,10 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   // 1 External water sinks and sources. 
 
   // 1.1 Evapotranspiration
-  pet.tick (time, 
-            weather, vegetation, surface, soil, soil_heat, soil_water, msg);
-  total_ep = pet.wet ();
+  daisy_assert (pet != NULL);
+  pet->tick (time, 
+             weather, vegetation, surface, soil, soil_heat, soil_water, msg);
+  total_ep = pet->wet ();
   daisy_assert (total_ep >= 0.0);
   total_ea = 0.0;		// To be calculated.
 
@@ -465,7 +499,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
     = (pond_ep - pond_ea - soil_ea) * surface.EpInterchange ();
   crop_ep = bound (0.0, 
 		   potential_crop_transpiration + potential_soil_transpiration,
-		   max (0.0, pet.dry ()));
+		   max (0.0, pet->dry ()));
 
   // Actual transpiration
   const double day_fraction
@@ -479,7 +513,7 @@ BioclimateStandard::WaterDistribution (const Time& time, Surface& surface,
   daisy_assert (total_ea >= 0.0);
 
   // Production stress
-  svat.tick (weather, vegetation, surface, soil, soil_heat, soil_water, pet,
+  svat.tick (weather, vegetation, surface, soil, soil_heat, soil_water, *pet,
 	     canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
   production_stress = svat.production_stress ();
   vegetation.force_production_stress (production_stress);
@@ -572,7 +606,8 @@ BioclimateStandard::ChemicalDistribution (Surface& surface,
 void 
 BioclimateStandard::output (Log& log) const
 {
-  output_derived (pet, "pet", log);
+  daisy_assert (pet != NULL);
+  output_object (*pet, "pet", log);
   output_variable (total_ep, log);
   output_variable (total_ea, log);
   output_value (irrigation_overhead_old, "irrigation_overhead", log);
@@ -680,10 +715,21 @@ Number of vertical intervals in which we partition the canopy.");
 
       // External water sources and sinks.
       syntax.add ("pet", Librarian<Pet>::library (), 
-		  "Potential Evapotranspiration component.");
-      AttributeList pet_alist;
-      pet_alist.add ("type", "makkink");
-      alist.add ("pet", pet_alist);
+                  Syntax::OptionalState, Syntax::Singleton, 
+		  "Potential Evapotranspiration component.\n\
+\n\
+By default, choose depending on available climate date.\n\
+\n\
+If reference evaporation is available in the climate data, Daisy will\n\
+use these (the weather pet model).\n\
+\n\
+If vapor pressure and wind are available, it will use Penman-Monteith\n\
+(PM).\n\
+\n\
+If the timestep is larger than 12, and daily minimum and maximum\n\
+temperature are available,  Samani and Hargreaves (Hargreaves).\n\
+\n\
+As a last resort,  Makkink (makkink) will be used.");
       syntax.add ("total_ep", "mm/h", Syntax::LogOnly,
 		  "Potential evapotranspiration.");
       syntax.add ("total_ea", "mm/h", Syntax::LogOnly,

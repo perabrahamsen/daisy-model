@@ -118,10 +118,10 @@ struct WeatherStandard : public Weather
   bool has_temperature;
   bool has_min_temperature;
   bool has_max_temperature;
-  bool has_vapor_pressure;
+  bool has_vapor_pressure_;
   bool has_relative_humidity;
   bool has_wind_speed;
-  bool has_reference_evapotranspiration;
+  bool has_reference_evapotranspiration_;
 
   // Convertion.
   string air_temperature_read;
@@ -193,82 +193,94 @@ struct WeatherStandard : public Weather
   // Simulation.
   void tick (const Time& time, Treelog&);
   void output (Log& log) const
-    { Weather::output (log); }
+  { Weather::output (log); }
   void read_line ();
   void read_new_day (const Time&, Treelog&);
 
   // Communication with Bioclimate.
   double hourly_air_temperature () const // [dg C]
-    { 
-      daisy_assert (initialized);
-      return air_temperature_[hour]; 
-    }
+  { 
+    daisy_assert (initialized);
+    return air_temperature_[hour]; 
+  }
   double daily_air_temperature () const // [dg C]
-    { 
-      daisy_assert (initialized);
-      return daily_air_temperature_; 
-    }
+  { 
+    daisy_assert (initialized);
+    return daily_air_temperature_; 
+  }
   double daily_max_air_temperature () const // [dg C]
-    { 
-      daisy_assert (initialized);
-      return daily_max_air_temperature_; 
-    }
+  { 
+    daisy_assert (initialized);
+    return daily_max_air_temperature_; 
+  }
   double daily_min_air_temperature () const // [dg C]
-    { 
-      daisy_assert (initialized);
-      return daily_min_air_temperature_; 
-    }
+  { 
+    daisy_assert (initialized);
+    return daily_min_air_temperature_; 
+  }
   double hourly_global_radiation () const // [W/m2]
-    { 
-      daisy_assert (initialized);
-      return global_radiation_[hour]; 
-    }
+  { 
+    daisy_assert (initialized);
+    return global_radiation_[hour]; 
+  }
   double daily_global_radiation () const // [W/m2]
-    { 
-      daisy_assert (initialized);
-      return daily_global_radiation_; 
-    }
+  { 
+    daisy_assert (initialized);
+    return daily_global_radiation_; 
+  }
   double reference_evapotranspiration () const // [mm/h]
-    { 
-      daisy_assert (initialized);
-      return reference_evapotranspiration_[hour]; 
-    }
+  { 
+    daisy_assert (initialized);
+    return reference_evapotranspiration_[hour]; 
+  }
   double rain () const	// [mm/h]
-    { 
-      daisy_assert (initialized);
-      return precipitation_[hour] * rain_fraction; 
-    }
+  { 
+    daisy_assert (initialized);
+    return precipitation_[hour] * rain_fraction; 
+  }
   double snow () const	// [mm/h]
-    { 
-      daisy_assert (initialized);
-      return precipitation_[hour] * snow_fraction; 
-    }
+  { 
+    daisy_assert (initialized);
+    return precipitation_[hour] * snow_fraction; 
+  }
   double vapor_pressure () const // [Pa]
-    { 
-      daisy_assert (initialized);
-      return vapor_pressure_[hour]; 
-    }
+  { 
+    daisy_assert (initialized);
+    return vapor_pressure_[hour]; 
+  }
   double wind () const	// [m/s]
-    { 
-      daisy_assert (initialized);
-      return wind_speed_[hour]; 
-    }
+  { 
+    daisy_assert (initialized);
+    return wind_speed_[hour]; 
+  }
+
+  bool has_reference_evapotranspiration () const
+  { return has_reference_evapotranspiration_; }
+
+  bool has_vapor_pressure () const
+  { return has_vapor_pressure_; }
+
+  bool has_wind () const
+  { return has_wind_speed; }
+
+  bool has_min_max_temperature () const
+  { return has_min_temperature && has_max_temperature; }
 
   // Communication with external model.
   void put_precipitation (double prec) // [mm/d]
-    { precipitation_[hour] = prec / 24.0; }
+  { precipitation_[hour] = prec / 24.0; }
   void put_air_temperature (double T) // [°C]
-    { 
-      air_temperature_[hour] = T; 
-      daily_air_temperature_ = T;
-    }
+  { 
+    air_temperature_[hour] = T; 
+    daily_air_temperature_ = T;
+  }
   void put_reference_evapotranspiration (double ref) // [mm/d]
-    { reference_evapotranspiration_[hour] = ref; }
+  { reference_evapotranspiration_[hour] = ref; }
   void put_global_radiation (double radiation) // [W/m²]
-    { 
-      global_radiation_[hour] = radiation;
-      daily_global_radiation_ = radiation; 
-    }
+  { 
+    global_radiation_[hour] = radiation;
+    daily_global_radiation_ = radiation; 
+  }
 
   // Create and Destroy.
   void initialize (const Time& time, Treelog& err);
@@ -370,14 +382,14 @@ WeatherStandard::find_map (const Time& time) const
 
 WeatherStandard::keyword_description_type 
 WeatherStandard::keyword_description[] =
-{ { "Latitude", "dgNorth", &WeatherStandard::latitude, -90, 90, true },
-  { "Longitude", "dgEast", &WeatherStandard::longitude, -360, 360, true },
-  { "Elevation", "m", &WeatherStandard::elevation_, 0, 10000, true },
-  { "TimeZone", "dgEast", &WeatherStandard::timezone, -360, 360, true },
-  { "ScreenHeight", "m", &WeatherStandard::screen_height_, 0, 100, true },
-  { "TAverage", "dgC", &WeatherStandard::T_average, -10, 40, true },
-  { "TAmplitude", "dgC", &WeatherStandard::T_amplitude, 0, 100, true },
-  { "MaxTDay", "yday", &WeatherStandard::max_Ta_yday, 1, 365, true } };
+  { { "Latitude", "dgNorth", &WeatherStandard::latitude, -90, 90, true },
+    { "Longitude", "dgEast", &WeatherStandard::longitude, -360, 360, true },
+    { "Elevation", "m", &WeatherStandard::elevation_, 0, 10000, true },
+    { "TimeZone", "dgEast", &WeatherStandard::timezone, -360, 360, true },
+    { "ScreenHeight", "m", &WeatherStandard::screen_height_, 0, 100, true },
+    { "TAverage", "dgC", &WeatherStandard::T_average, -10, 40, true },
+    { "TAmplitude", "dgC", &WeatherStandard::T_amplitude, 0, 100, true },
+    { "MaxTDay", "yday", &WeatherStandard::max_Ta_yday, 1, 365, true } };
 
 const int 
 WeatherStandard::keyword_description_size 
@@ -386,41 +398,41 @@ WeatherStandard::keyword_description_size
 
 WeatherStandard::data_description_type 
 WeatherStandard::data_description[] =
-{ { "Year", "year", &WeatherStandard::next_year, NULL,
-    1, 9999, false },
-  { "Month", "month", &WeatherStandard::next_month, NULL,
-    1, 12, false },
-  { "Day", "mday", &WeatherStandard::next_day, NULL,
-    1, 31, false },
-  { "Hour", "hour", &WeatherStandard::next_hour, NULL,
-    0, 23, false },
-  { "GlobRad", "W/m^2", &WeatherStandard::next_global_radiation,
-    &WeatherStandard::global_radiation_read,
-    0, 1400, true },
-  { "AirTemp", "dgC", &WeatherStandard::next_air_temperature,
-    &WeatherStandard::air_temperature_read,
-    -70, 60, false },
-  { "T_min", "dgC", &WeatherStandard::next_min_air_temperature,
-    &WeatherStandard::min_air_temperature_read,
-    -70, 60, false },
-  { "T_max", "dgC", &WeatherStandard::next_max_air_temperature,
-    &WeatherStandard::max_air_temperature_read,
-    -70, 60, false },
-  { "Precip", "mm/h", &WeatherStandard::next_precipitation,
-    &WeatherStandard::precipitation_read,
-    0, 300, true },
-  { "RefEvap", "mm/h", &WeatherStandard::next_reference_evapotranspiration,
-    &WeatherStandard::reference_evapotranspiration_read,
-    -10, 20, false },
-  { "VapPres", "Pa", &WeatherStandard::next_vapor_pressure,
-    &WeatherStandard::vapor_pressure_read,
-    0, 5000, false },
-  { "RelHum", "fraction", &WeatherStandard::next_relative_humidity,
-    &WeatherStandard::relative_humidity_read,
-    0, 5000, false },
-  { "Wind", "m/s", &WeatherStandard::next_wind_speed,
-    &WeatherStandard::wind_speed_read,
-    0, 40, false } };
+  { { "Year", "year", &WeatherStandard::next_year, NULL,
+      1, 9999, false },
+    { "Month", "month", &WeatherStandard::next_month, NULL,
+      1, 12, false },
+    { "Day", "mday", &WeatherStandard::next_day, NULL,
+      1, 31, false },
+    { "Hour", "hour", &WeatherStandard::next_hour, NULL,
+      0, 23, false },
+    { "GlobRad", "W/m^2", &WeatherStandard::next_global_radiation,
+      &WeatherStandard::global_radiation_read,
+      0, 1400, true },
+    { "AirTemp", "dgC", &WeatherStandard::next_air_temperature,
+      &WeatherStandard::air_temperature_read,
+      -70, 60, false },
+    { "T_min", "dgC", &WeatherStandard::next_min_air_temperature,
+      &WeatherStandard::min_air_temperature_read,
+      -70, 60, false },
+    { "T_max", "dgC", &WeatherStandard::next_max_air_temperature,
+      &WeatherStandard::max_air_temperature_read,
+      -70, 60, false },
+    { "Precip", "mm/h", &WeatherStandard::next_precipitation,
+      &WeatherStandard::precipitation_read,
+      0, 300, true },
+    { "RefEvap", "mm/h", &WeatherStandard::next_reference_evapotranspiration,
+      &WeatherStandard::reference_evapotranspiration_read,
+      -10, 20, false },
+    { "VapPres", "Pa", &WeatherStandard::next_vapor_pressure,
+      &WeatherStandard::vapor_pressure_read,
+      0, 5000, false },
+    { "RelHum", "fraction", &WeatherStandard::next_relative_humidity,
+      &WeatherStandard::relative_humidity_read,
+      0, 5000, false },
+    { "Wind", "m/s", &WeatherStandard::next_wind_speed,
+      &WeatherStandard::wind_speed_read,
+      0, 40, false } };
 
 const int 
 WeatherStandard::data_description_size 
@@ -519,10 +531,10 @@ WeatherStandard::read_line ()
 	  this->*(data_description[index].value) = value;
 	  if (value < data_description[index].min)
 	    lex->error (string ("Column ") 
-		       + data_description[index].name + " value too low");
+                        + data_description[index].name + " value too low");
 	  else if (value > data_description[index].max)
 	    lex->error (string ("Column ") 
-		       + data_description[index].name + " value too hight");
+                        + data_description[index].name + " value too hight");
 	  if (next_precipitation < 0.0)
 	    next_precipitation = 0.0;
 	  if (!lex->good ())
@@ -689,7 +701,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	  if (long_timestep)
 	    global_radiation_[hour] *= day_cycle (now) * 24.0;
 	  precipitation_[hour] = last_precipitation;
-	  if (has_vapor_pressure)
+	  if (has_vapor_pressure_)
 	    vapor_pressure_[hour] = last_vapor_pressure;
 	  else if (has_relative_humidity)
 	    vapor_pressure_[hour] 
@@ -699,7 +711,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 	    wind_speed_[hour] = last_wind_speed;
 	  else
 	    wind_speed_[hour] = 3.0;
-	  if (has_reference_evapotranspiration)
+	  if (has_reference_evapotranspiration_)
 	    {
 	      reference_evapotranspiration_[hour] 
 		= last_reference_evapotranspiration;
@@ -733,7 +745,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
     ? last_min_air_temperature
     : *min_element (&air_temperature_[0], &air_temperature_[24]);
 
-  if (!has_vapor_pressure && !has_relative_humidity)
+  if (!has_vapor_pressure_ && !has_relative_humidity)
     {
       double T_min = daily_min_air_temperature_;
       const double T_max = daily_max_air_temperature_;
@@ -925,11 +937,11 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
     if (keyword_description[i].required 
 	&& keywords.find (keyword_description[i].name) == keywords.end ())
       lex->error (string ("Keyword ") 
-		 + keyword_description[i].name + " missing");
+                  + keyword_description[i].name + " missing");
 
   static const string required[] = 
-  { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep", "Station",
-    "Surface", "Begin", "End" };
+    { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep", "Station",
+      "Surface", "Begin", "End" };
   static const int required_size = sizeof (required) / sizeof (string);
   
   for (unsigned int i = 0; i < required_size; i++)
@@ -975,16 +987,16 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
   has_temperature = has_data ("AirTemp");
   has_min_temperature = has_data ("T_min");
   has_max_temperature = has_data ("T_max");
-  has_vapor_pressure = has_data ("VapPres");
+  has_vapor_pressure_ = has_data ("VapPres");
   has_relative_humidity = has_data ("RelHum");
-  if (has_relative_humidity && has_vapor_pressure)
+  if (has_relative_humidity && has_vapor_pressure_)
     lex->error ("You should only specify one of VapPres or RelHum");
   has_wind_speed = has_data ("Wind");
-  has_reference_evapotranspiration = has_data ("RefEvap");
+  has_reference_evapotranspiration_ = has_data ("RefEvap");
   for (unsigned int j = 0; j < data_description_size; j++)
     if (data_description[j].required && !has_data (data_description[j].name))
       lex->error (string ("Required data column '") 
-		 + data_description[j].name + "' missing");
+                  + data_description[j].name + "' missing");
 
   // Dimensions.
   for (unsigned int i = 0; i < data_index.size (); i++)
@@ -1029,10 +1041,10 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     has_temperature (false),
     has_min_temperature (false),
     has_max_temperature (false),
-    has_vapor_pressure (false),
+    has_vapor_pressure_ (false),
     has_relative_humidity (false),
     has_wind_speed (false),
-    has_reference_evapotranspiration (false),
+    has_reference_evapotranspiration_ (false),
     where (al.name ("where")),
     lex (NULL),
     end_of_header (Lexer::no_position ()),

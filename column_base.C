@@ -186,8 +186,9 @@ ColumnBase::crop_ds (const symbol name) const // {[-1:2], Crop::DSremove}
 { return vegetation.DS_by_name (name); }
 
 double 
-ColumnBase::crop_dm (const symbol name) const //[kg/ha], negative when no crop
-{ return vegetation.DM_by_name (name); }
+ColumnBase::crop_dm (const symbol name, const double height) const
+  //[kg/ha], negative when no crop
+{ return vegetation.DM_by_name (name, height); }
 
 unsigned int 
 ColumnBase::count_layers () const // Number of num. layers.
@@ -353,7 +354,7 @@ ColumnBase::output (Log& log) const
   Column::output (log);
   if (weather)
     output_derived (*weather, "weather", log);
-  output_derived (bioclimate, "Bioclimate", log);
+  output_object (bioclimate, "Bioclimate", log);
   output_submodule (surface, "Surface", log);
   output_submodule (soil, "Soil", log);
   output_submodule (soil_water, "SoilWater", log);
@@ -392,22 +393,8 @@ get_bioclimate (const AttributeList& al)
   return Librarian<Bioclimate>::create (alist);
 }
 
-static AttributeList		// Needed for checkpoint.
-add_bioclimate (const AttributeList& al)
-{
-  if (al.check ("Bioclimate"))
-    return al;
-  AttributeList parent (al);
-  static const symbol default_symbol ("default");
-  AttributeList child (Librarian<Bioclimate>::library ()
-		       .lookup (default_symbol));
-  child.add ("type", "default");
-  parent.add ("Bioclimate", child);
-  return parent;
-}
-
 ColumnBase::ColumnBase (const AttributeList& al)
-  : Column (add_bioclimate (al)),
+  : Column (al),
     weather (al.check ("weather") 
 	     ? &Librarian<Weather>::create (al.alist ("weather"))
 	     : NULL), 
@@ -450,6 +437,7 @@ ColumnBase::initialize_common (const Time& time, Treelog& err,
   if (!global_weather && !weather)
     return;
   const Weather& my_weather = *(weather ? weather : global_weather);
+  bioclimate.initialize (my_weather, err);
   groundwater.initialize (soil, time, err);
   soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, my_weather, err);
   soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater, err);

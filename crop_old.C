@@ -119,7 +119,7 @@ public:
   void output (Log&) const;
 
   double DS () const;
-  double DM () const;
+  double DM (double height) const;
   double total_N () const;
 
   // Create and Destroy.
@@ -2003,8 +2003,13 @@ CropOld::DS () const
 { return var.Phenology.DS; }
 
 double
-CropOld::DM () const	// [g/m² -> kg/ha]
-{ return (var.Prod.WLeaf) * 10; }
+CropOld::DM (double above) const
+{ 
+  if (above > height ())
+    return 0.0;
+  return var.Prod.WLeaf * (1.0 - above / height ())
+    * 10;                       // [g/m^2 -> kg/ha]
+}
 
 double
 CropOld::total_N () const

@@ -94,7 +94,7 @@ public:
   // Crop::DSremove if no such crop is present.
   double crop_ds (symbol crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
-  double crop_dm (symbol crop) const; 
+  double crop_dm (symbol crop, double height) const; 
   // Simulation.
   void clear ();
   void tick (Treelog&, const Time&, const Weather*);

@@ -130,6 +130,22 @@ IM
 Weather::deposit () const // [g [stuff] /cm²/h]
 { return deposit_; }
 
+bool 
+Weather::has_reference_evapotranspiration () const
+{ return false; }
+
+bool 
+Weather::has_vapor_pressure () const
+{ return false; }
+
+bool 
+Weather::has_wind () const
+{ return false; }
+
+bool 
+Weather::has_min_max_temperature () const
+{ return false; }
+
 double 
 Weather::day_cycle (const Time& time) const	// Sum over a day is 1.0.
 {
@@ -138,7 +154,7 @@ Weather::day_cycle (const Time& time) const	// Sum over a day is 1.0.
   daisy_assert (dl >= 0.0);
   daisy_assert (dl <= 24.0);
   
-  const int hour = time.hour ();
+  const double hour = time.hour () + 0.5; // Value in the middle of time step.
 
   // Day cycle.
   double dc;
@@ -233,7 +249,8 @@ Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [W/m2]
        EQT += EQT1[i] * sin(P) + EQT2[i] * cos(P);
     }
   EQT /= 60.0;
-  const double SunHourAngle = M_PI / 12.0 * (time.hour() + 1 + EQT - timelag);
+  const double SunHourAngle = M_PI / 12.0 
+    * (time.hour() + 0.5 + EQT - timelag + 12);
   return ( SolarConstant * RelativeSunEarthDistance (time) *
             (sin(Lat)*sin(Dec) + cos(Lat)*cos(Dec)*cos(SunHourAngle)));
 }

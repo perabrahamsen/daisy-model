@@ -1,3 +1,49 @@
+2003-11-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.16 released.
+
+2003-11-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation_permanent.C (tick): Fix C input.
+
+	* log_alist.C, log_alist.h, log_select.h, log_select.C, log.h
+	* log_harvest.C: (open_object, close_object): New function.
+	* log.h (output_object): New template
+	(Object): New member class.
+	* pet.h (alist): New const member variable.
+	* weather.h, weather.C, weather_std.C
+	(has_reference_evapotranspiration): New function.
+	(has_vapor_pressure, has_wind, has_min_max_temperature): New functions.
+	* bioclimate_std.C (pet): Made it a pointer.
+	* bioclimate_std.C, bioclimate.h (initialize): New function.
+	* column_base.C (initialize_common): Call it.
+	(add_bioclimate): Removed.
+	(ColumnBase): Update caller.
+	(output): Use 'output_object'.
+
+2003-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_crop.C (doIt): Update caller.
+
+	* condition_crop.C (ConditionDMOver): New 'height' parameter.
+	* field.C, field.h (crop_dm): Ditto.
+	* column.h, column_base.h, column_base.C (crop_dm): Ditto.
+	* vegetation.h, vegetation_permanent.C, vegetation_crops.C
+	(DM_by_name):  Ditto.
+	* crop.h, crop_old.C, crop_sold.C, crop_std.C (DM): Ditto.
+
+	* weather.C (day_cycle): Use value for middle of time step.
+	(HourlyExtraterrestrialRadiation): Ditto.
+	Add 12 hour offset to get max at noon, not midnight.
+
+2003-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/introduction.tex: Added dimensions.
+
+	* txt/tutorial.tex: Updated organic matter initialization and
+	automatic aquitard horizon.
+	* lib/test.dai: Updated.
+	
 2003-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.15 released.

@@ -72,7 +72,8 @@ Pet::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 Pet::Pet (const AttributeList& al)
-  : name (al.identifier ("type"))
+  : name (al.identifier ("type")),
+    alist (al)
 { }
 
 Pet::~Pet ()

@@ -110,7 +110,7 @@ public:
   double soil_water_potential (double height) const; // [cm -> cm]
   double soil_water_content (double from, double to) const; // [cm]
   double crop_ds (symbol name) const ;// {[-1:2], Crop::DSremove}
-  double crop_dm (symbol name) const; // [kg/ha], negative when no crop
+  double crop_dm (symbol name, double height) const; // [kg/ha], negative when no crop
 
   // Communication with external model.
 public:

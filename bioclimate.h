@@ -44,6 +44,7 @@ class Bioclimate
 public:
   const symbol name;
   static const char *const description;
+  const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Simulation.
 public:
@@ -79,6 +80,8 @@ public:
   virtual double get_snow_storage () const; // [mm]
 
   // Create.
+public:
+  virtual void initialize (const Weather&, Treelog&) = 0;
 protected:
   Bioclimate (const AttributeList&);
 public:

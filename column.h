@@ -83,7 +83,7 @@ public:
   // Crop::DSremove if no such crop is present.
   virtual double crop_ds (symbol crop) const = 0; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
-  virtual double crop_dm (symbol crop) const = 0; 
+  virtual double crop_dm (symbol crop, double height) const = 0; 
   
   // Simulation.
   virtual void clear () = 0;

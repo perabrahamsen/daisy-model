@@ -130,8 +130,7 @@ public:
   // Queries.
   double DS () const
   { return development.DS; }
-  double DM () const
-  { return production.DM (); }
+  double DM (double height) const;
   double total_N () const
   { return production.total_N (); }
 
@@ -142,6 +141,24 @@ public:
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
+
+double 
+CropStandard::DM (double height) const
+{
+  if (canopy.Height < height)
+    return 0.0;
+
+  const double stem_harvest = (1.0 - height / canopy.Height);
+  const double stub_CAI = (canopy.CAI > 0.0)
+    ? canopy.LAIvsH (height)
+    : 0.0;
+  const double leaf_harvest = (1.0 - stub_CAI / canopy.CAI);
+  const double total = stem_harvest * (production.WStem + production.WDead)
+    + leaf_harvest * production.WLeaf 
+    + production.WSOrg;      // We shouldn't add this for root fruits.
+
+  return total * 10.0;          // [g/m^2 -> kg/ha]
+}
 
 void
 CropStandard::initialize_organic (Treelog& msg, const Geometry& geometry,

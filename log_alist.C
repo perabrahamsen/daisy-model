@@ -322,6 +322,19 @@ LogAList::close_alist ()
 void
 LogAList::open_derived (symbol field, symbol type)
 { 
+  const string& sfield = field.name ();
+  daisy_assert (alist ().check (sfield));
+  open_object (field, type, alist ().alist (sfield));
+}
+	
+void
+LogAList::close_derived ()
+{ close_object (); }
+
+void
+LogAList::open_object (symbol field, symbol type, 
+                       const AttributeList& alist)
+{ 
   if (is_active)
     {
       const string& sfield = field.name ();
@@ -330,15 +343,14 @@ LogAList::open_derived (symbol field, symbol type)
       const Library& library = syntax ().library (sfield);
       daisy_assert (library.check (type));
       const Syntax& syntax = library.syntax (type);
-      daisy_assert (alist ().check (sfield));
-      push (field, syntax, alist ().alist (sfield));
+      push (field, syntax, alist);
     }
   else
     open_ignore ();
 }
 	
 void
-LogAList::close_derived ()
+LogAList::close_object ()
 { 
   if (is_active)
     {

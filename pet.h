@@ -39,6 +39,7 @@ class Pet
 public:
   const symbol name;
   static const char *const description;
+  const AttributeList alist;	// Remember attributes for checkpoint.
 
   // Utilities.
 public:

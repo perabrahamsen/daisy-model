@@ -401,10 +401,13 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& out)
 bool
 ActionCrop::Perennial::doIt (Daisy& daisy, Treelog& out, symbol name)
 {
+  const double stub = 8.0;
+
   if (year_of_last_harvest < 0)
     year_of_last_harvest = daisy.time.year () + seasons - 1;
 
-  if (daisy.field.crop_ds (name) >= DS || daisy.field.crop_dm (name) >= DM)
+  if (daisy.field.crop_ds (name) >= DS 
+      || daisy.field.crop_dm (name, stub) >= DM)
     {
       harvest (daisy, out);
       return true;
@@ -416,13 +419,15 @@ bool
 ActionCrop::Perennial::doIt (Daisy& daisy, Treelog& out,
 			     symbol primary, symbol secondary)
 {
+  const double stub = 8.0;
+
   if (year_of_last_harvest < 0)
     year_of_last_harvest = daisy.time.year () + seasons - 1;
 
   if (daisy.field.crop_ds (primary) >= DS 
       || daisy.field.crop_ds (secondary) >= DS 
-      || (daisy.field.crop_dm (primary)
-	  + daisy.field.crop_dm (secondary)) >= DM)
+      || (daisy.field.crop_dm (primary, stub)
+	  + daisy.field.crop_dm (secondary, stub)) >= DM)
     {
       harvest (daisy, out);
       return true;

@@ -94,6 +94,13 @@ public:
   virtual double vapor_pressure () const = 0; // [Pa]
   virtual double wind () const = 0;	// [m/s]
 
+  // Initializing bioclimate.
+public:
+  virtual bool has_reference_evapotranspiration () const;
+  virtual bool has_vapor_pressure () const;
+  virtual bool has_wind () const;
+  virtual bool has_min_max_temperature () const;
+
   // Light distribution.
 public:
   double day_length () const	// [h]

@@ -118,6 +118,14 @@ LogSelect::close_derived ()
 { close (); close (); }
 
 void 
+LogSelect::open_object (symbol field, symbol type, const AttributeList&)
+{ open_derived (field, type); }
+
+void 
+LogSelect::close_object ()
+{ close_derived (); }
+
+void 
 LogSelect::open_entry (symbol type, const AttributeList&)
 { open (type); }
 

@@ -31,6 +31,7 @@
 #include "am.h"
 #include "aom.h"
 #include "organic_matter.h"
+#include "tmpstream.h"
 #include <deque>
 
 struct VegetationPermanent : public Vegetation
@@ -85,7 +86,7 @@ struct VegetationPermanent : public Vegetation
   // Individual crop queries.
   double DS_by_name (symbol) const
   {   return Crop::DSremove; }
-  double DM_by_name (symbol) const
+  double DM_by_name (symbol, double) const
   { return 0.0; }
 
   // Simulation.
@@ -174,12 +175,14 @@ VegetationPermanent::tick (const Time& time,
     {
       // Litter.
       static const double C_per_DM = 0.420;
+      static const double g_per_Mg = 1.0e6;
       static const double ha_per_cm2 = 1.0e-8;
       static const double m2_per_cm2 = 1.0e-4;
       
       const double dLAI = old_LAI - canopy.CAI;
-      const double DM = dLAI * DM_per_LAI * ha_per_cm2 / m2_per_cm2;
-      const double C = DM * C_per_DM;
+      const double DM = dLAI * DM_per_LAI * g_per_Mg 
+        *ha_per_cm2 / m2_per_cm2; // [g DM/m^2]
+      const double C = DM * C_per_DM; // [g C/m^2]
       if (organic_matter)
 	{
 	  N_litter = N_actual * (dLAI / old_LAI);

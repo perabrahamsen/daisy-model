@@ -63,7 +63,7 @@ public:
   // Individual crop queries.
 public:
   virtual double DS_by_name (symbol name) const = 0;// [-1:2]/DSremove
-  virtual double DM_by_name (symbol name) const = 0;// Shoot DM [kg/ha]
+  virtual double DM_by_name (symbol name, double height) const = 0;// Shoot DM [kg/ha]
 
   // Simulation
 public:

@@ -127,6 +127,12 @@ struct LogHarvest : public Log
   void close_derived ()
   { daisy_assert (false); }
 
+  // Derived items with their own alist
+  void open_object (symbol, symbol, const AttributeList&)
+  { daisy_assert (false); }
+  void close_object ()
+  { daisy_assert (false); }
+
   // Derived items in a list.
   void open_entry (symbol, const AttributeList&)
   { daisy_assert (false); }

@@ -12,6 +12,58 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.16
+
+** Automatic choice of pet model
+
+If you do not specify the pet model (potential evapotranspiration) in
+Bioclimate, Daisy will choose one for you depending on the available
+climate dats.
+
+If reference evaporation is available in the climate data, Daisy will
+use these (the "weather" pet model).
+
+Else, if vapor pressure and wind are available, Daisy will use
+Penman-Monteith (PM).
+
+Else, if daily minimum and maximum temperature are specified, Samani
+and Hargreaves (Hargreaves) will be used.
+ 
+As a last resort, Makkink (makkink) will be used.
+
+** New height parameter to crop_DM_over condition
+
+Using this will only count DM above the specified height.  The default
+value is 0.0, which corresponds to the old behaviour.  Example
+
+Example:
+
+    (wait (crop_dm_over "Grass" 4000 [kg DM/ha] (height 10.0 [cm])))
+    (harvest "Grass" (stub 10.0 [cm])))
+
+should result in a harvest of 4 Mg/ha.  Without the height parameter
+you would get an earlier but smaller harvest, as the lowest 10 cm
+grass would be counted in the total DM for the test, even though it
+was not actually harvested.
+
+** Updated tutorial.
+
+It now describes the new organic matter initialization.
+
+** New permanent vegetation parameterizations in vegetaion.dai.
+
+Coniferous has been updated, Hardwood, Grass and Bush are new.  The
+parameterizations are based on satelite meausrements for all of
+Denmark.
+
+Thanks to Eva Bøgh <Evb@geogr.ku.dk> for the parameterizations.
+
+** Bug fixes.
+
+Hourly values should work better now.
+
+Organic matter in permanent vegetation should work less bad now.
+
 * 3.15
 
 ** wait_days now wait one hour less.

@@ -76,7 +76,7 @@ public:
   // Crop::DSremove if no such crop is present.
   double crop_ds (symbol crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
-  double crop_dm (symbol crop) const; 
+  double crop_dm (symbol crop, double height) const; 
 
   // Simulation.
   void clear ();
@@ -451,17 +451,17 @@ Field::Implementation::crop_ds (symbol crop) const
 } 
 
 double 
-Field::Implementation::crop_dm (symbol crop) const
+Field::Implementation::crop_dm (const symbol crop, const double height) const
 {
   if (selected)
-    return selected->crop_dm (crop);
+    return selected->crop_dm (crop, height);
   
   // We find the total DM for all the columns.
   double DM = 0.0;
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    DM += (*i)->crop_dm (crop);
+    DM += (*i)->crop_dm (crop, height);
   return DM;
 }
   
@@ -719,12 +719,12 @@ Field::second_year_utilization () const // [kg N/ha]
 { return impl.second_year_utilization (); }
 
 double 
-Field::crop_ds (symbol crop) const
+Field::crop_ds (const symbol crop) const
 { return impl.crop_ds (crop); } 
 
 double 
-Field::crop_dm (symbol crop) const
-{ return impl.crop_dm (crop); } 
+Field::crop_dm (const symbol crop, const double height) const
+{ return impl.crop_dm (crop, height); } 
 
 void
 Field::clear ()

@@ -172,6 +172,26 @@ private:
   virtual void close_derived () = 0;
   friend struct Log::Derived;
 
+  // Derived objects with their own alist.
+public:
+  struct Object
+  {
+  private:
+    Log& ll;
+  public:
+    Object (Log& l, const symbol field, const symbol type, 
+            const AttributeList& alist)
+      : ll (l)
+    { ll.open_object (field, type, alist); }
+    ~Object ()
+    { ll.close_object (); }
+  };
+private:
+  virtual void open_object (symbol field, symbol type, 
+                            const AttributeList& alist) = 0;
+  virtual void close_object () = 0;
+  friend struct Log::Object;
+
   // Derived objects in a variable length list.
 public:
   struct Entry
@@ -299,6 +319,27 @@ output_derived_ (const T& submodule, const symbol name, Log& log)
   if (log.check_derived (name, submodule.name, library))
     {
       Log::Derived derived (log, name, submodule.name);
+      submodule.output (log);
+    }
+}
+
+// Like output_derived, except that SUBMODULE contain its own alist member.
+// Useful for dynamically created object singletons, where the alist can't
+// be found in the parent.
+#define output_object(submodule, key, log) \
+do { \
+  static const symbol MACRO_name (key); \
+  output_object_ ((submodule), MACRO_name, (log)); \
+} while (false)
+
+template <class T> void
+output_object_ (const T& submodule, const symbol name, Log& log)
+{
+  const Library& library = Librarian<T>::library ();
+
+  if (log.check_derived (name, submodule.name, library))
+    {
+      Log::Object object (log, name, submodule.name, submodule.alist);
       submodule.output (log);
     }
 }
