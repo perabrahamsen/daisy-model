@@ -29,7 +29,9 @@
 #include "check.h"
 #include "plf.h"
 #include "tmpstream.h"
+#if !(defined (__BORLANDC__) && __BORLANDC__ < 0x0550)
 #include <iomanip>
+#endif
 #include <iostream>
 
 struct Soil::Implementation
@@ -237,6 +239,7 @@ void
 Soil::make_table (int i)
 {
   cout << "pF   Theta   Cw2           K           (depth " << z (i) << ").\n";
+#if !(defined (__BORLANDC__) && __BORLANDC__ < 0x0550)
   for (double pF = 0.00; pF <= 5.0; pF += 0.01)
     {
       const double h = pF2h (pF);
@@ -246,6 +249,7 @@ Soil::make_table (int i)
 	   << setw (12) << setprecision (11) << K (i, h, 0.0, 20.0) / 3.6e5
 	   << "\n";
     }
+#endif
 }
 
 void
