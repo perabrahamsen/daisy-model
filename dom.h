@@ -28,6 +28,7 @@
 #include "mactrans.h"
 #include "plf.h"
 #include "smb.h"
+#include <memory>
 
 struct Log;
 struct Syntax;

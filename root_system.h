@@ -24,8 +24,8 @@
 
 #include "rootdens.h"
 #include "plf.h"
-
 #include <vector>
+#include <memory>
 
 struct Geometry;
 struct Soil;

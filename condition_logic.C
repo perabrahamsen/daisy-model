@@ -23,6 +23,7 @@
 // Logical operators.
 
 #include "condition.h"
+#include <memory>
 
 using namespace std;
 

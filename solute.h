@@ -28,6 +28,7 @@
 #include "transport.h"
 #include "mactrans.h"
 #include <string>
+#include <memory>
 
 struct Log;
 struct Syntax;

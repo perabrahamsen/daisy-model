@@ -29,6 +29,7 @@
 #include <map>
 #include <vector>
 #include <stack>
+#include <memory>
 
 struct Select;
 struct Condition;

@@ -25,6 +25,7 @@
 
 #include "librarian.h"
 #include <vector>
+#include <memory>
 
 class Hydraulic;
 class Tortuosity;

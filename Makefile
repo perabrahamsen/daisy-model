@@ -619,6 +619,27 @@ dist:	cvs
 	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
 	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
 
+more:
+	$(MAKE) native cross
+	mv -f $(WWWINDEX) $(WWWINDEX).old
+	sed -e 's/Daisy version [1-9]\.[0-9][0-9]/Daisy version $(TAG)/' \
+		< $(WWWINDEX).old > $(WWWINDEX)
+	cp cdaisy.h cmain.c ChangeLog NEWS $(FTPDIR)
+	$(MAKE) daisy-src.zip
+	mv -f daisy-src.zip $(FTPDIR)
+	(cd lib && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
+	(cd sample && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
+	(cd txt && $(MAKE) FTPDIR=$(FTPDIR) dist)
+	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
+	rm -f $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
+	$(STRIP) -o $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG) \
+		$(OBJHOME)/$(HOSTTYPE)/daisy
+	rm -f $(FTPDIR)/daisy.exe $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe
+	$(CROSSSTRIP) -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe \
+		$(OBJHOME)/$(TARGETTYPE)/daisy
+	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
+	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
+
 version.C:
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	echo "// version.C -- automatically generated file" > version.C

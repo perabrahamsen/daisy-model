@@ -25,6 +25,7 @@
 
 #include "time.h"
 #include <vector>
+#include <memory>
 
 class Action;
 class Harvest;

@@ -2,6 +2,10 @@
 
 	* Version 3.60 released.
 
+2004-10-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.60 released.
+
 2004-09-30  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* vcheck.C (valid_hour, valid_mday, valid_month): New checks.
