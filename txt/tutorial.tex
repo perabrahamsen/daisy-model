@@ -74,7 +74,8 @@ items:
 \end{description}
 
 Store all the files in the same directory, unzip the parameter
-library, open a shell or command prompt, and run the command
+library, open a shell or command prompt, change directory to the where
+the parameter library files were stored, and run the command
 \texttt{daisy test.dai} to check that everything works.  It should
 start printing dates to show the progress of the simulation.  After
 simulation has finished, you can browse the `\texttt{daisy.log}' file
@@ -148,7 +149,6 @@ can read weather data in several different formats, the
 
 \subsection{Horizons}
 \label{sec:ex-hor}
-\label{sec:background}
 
 Now we get to main part of the simulation, namely the soil profile, or
 \emph{column}.  In \daisy{}, the column is a one dimensional
@@ -1271,8 +1271,7 @@ Therefore, we start by defining two simpler actions.
   (defaction cut_grass activity
     (wait (or (crop_ds_after "Grass" 0.7 [])
               (crop_dm_over "Grass" 4000 [kg DM/ha] (height 10.0 [cm]))))
-    (harvest "Grass"
-             (stub 10.0 [cm])))
+    (harvest "Grass" (stub 10.0 [cm])))
 \end{verbatim}
 Here, we define a \texttt{cut\_grass} operation which wait for the
 grass to grow old or big enough, and then cut it.

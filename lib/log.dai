@@ -148,6 +148,25 @@ This include only nitrogen atoms of the nitrate."
                   (spec column default SoilNO3 C)
                   (dimension "mg/l"))))
 
+(deflog "Soil NH4-N Concentration" table
+  "Amount of dissolved ammonium nitrogen in all numeric soil layers.
+This include only nitrogen atoms of the ammonium."
+  (where "soil_NH4-N_conc.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "$col" SoilNH4 C)
+                  (spec column default SoilNH4 C)
+                  (dimension "mg/l"))))
+
+(deflog "Soil NH4-N Content" table
+  "Total amount of ammonium nitrogen in all numeric soil layers.
+This include only nitrogen atoms of the ammonium."
+  (where "soil_NH4-N_content.dlf")
+  (when hourly)
+  (entries ;; Year Month MDay Hour
+           (array (path column "$col" SoilNH4 M)
+                  (spec column default SoilNH4 M))))
+
 (deflog "Soil Temperature" table
   "Temperature in all numeric soil layers."
   (where "soil_temperature.dlf")
