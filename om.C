@@ -602,6 +602,10 @@ The initial fraction of the total available carbon\n\
 allocated to this pool for AOM.  One pool should be left unspecified\
 \n(which corresponds to the default value, a large negative number).");
   alist.add ("initial_fraction", Unspecified);
+  syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::OptionalConst,
+	      "Heat factor.");
+  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::OptionalConst,
+	      "Water potential factor.");
 }
 
 double
@@ -624,6 +628,10 @@ OM::get_initial_C_per_N (const AttributeList& al)
 OM::OM (const AttributeList& al)
   : initial_fraction (al.number ("initial_fraction")),
     initial_C_per_N (get_initial_C_per_N (al)),
+    heat_factor (al.check ("heat_factor") ? al.plf ("heat_factor") : PLF ()),
+    water_factor (al.check ("water_factor") 
+		  ? al.plf ("water_factor") 
+		  : PLF ()),
     top_C (al.number ("top_C")),
     top_N (al.number ("top_N")),
     turnover_rate (al.check ("turnover_rate")

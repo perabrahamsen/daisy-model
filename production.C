@@ -593,7 +593,9 @@ Production::initialize (const string& name,
 			OrganicMatter& organic_matter)
 {
   // Hotstart, find pool in organic matter.
+  assert (AM_root == NULL);
   AM_root = organic_matter.find_am (name, "root");
+  assert (AM_leaf == NULL);
   AM_leaf = organic_matter.find_am (name, "dead");
 
   // If not found, we is planting emerged crops.  Create pools.

@@ -1440,7 +1440,7 @@ Here is an example:
   (defchemical Atrazine default
     "From a FAO sponsored field experiment near Andeby, 2002."
     (canopy_dissipation_rate 8e-3 [h^-1])
-    (canopy_washoff_coefficient 100.0 [mm])
+    (canopy_washoff_coefficient 1.0 [])
     (crop_uptake_reflection_factor 0.8 [])
     (decompose_rate 7e-5 [h^-1])
     (diffusion_coefficient 8e-6 [cm^2/s])
@@ -1464,9 +1464,11 @@ surface by rain or irrigation.
 
 The parameter \texttt{canopy\_dissipation\_rate} indicates how large a
 fraction of the pesticide dissipate from the canopy each hour, while
-\linebreak{}\texttt{canopy\_washoff\_coefficient} can (roughly) be
-thought of as the amount of water that must fall off the canopy, in
-order to wash half the pesticide off.
+\linebreak{}\texttt{canopy\_washoff\_coefficient} is a measure of how
+the pesticide disolve in the intercepted water.  If you set it 0.0 is
+does not disolve at all, and will never be washed off.  If you set it
+to 1.0 it will be fully disolved, and thus follow any water that fall
+off the canopy.
 
 \subsubsection{Soil Surface and Root Uptake}
 

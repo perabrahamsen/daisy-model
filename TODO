@@ -1,10 +1,8 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* water stress days
+* user manual.
 
-* Ændr parameter til canopy chemicals washoff.
-
-Hvad med tema projekt?
+** Update daisy-tut.pdf when distributing 2.28.
 
 * SoilWater macro distribution
 
@@ -130,13 +128,9 @@ Bloker for begge når der ikke er assimilat nok.
 
 for nogen planter, i følge Søren.
 
-* Organic Matter
-
 ** Add DOM pool
 
 Dissolved Organic Matter, feed by all the OM pool transformations.
-
-** Separate abiotic factors for each OM pool transformation
 
 ** Phosphor
 

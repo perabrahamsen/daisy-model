@@ -466,6 +466,13 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      OrganicMatter& organic_matter)
 {
   Crop& crop = Librarian<Crop>::create (al);
+  const string& name = crop.name;
+  for (CropList::iterator i = crops.begin();
+       i != crops.end();
+       i++)
+    if ((*i)->name == name)
+      msg.error (string ("There is already an ") + name + " on the field.\n\
+If you want two " + name + " you should rename one of them");
   crop.initialize (msg, geometry, organic_matter);
   crops.push_back (&crop);
   return crop.total_N ();
@@ -476,6 +483,13 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      const Geometry& geometry)
 {
   Crop& crop = Librarian<Crop>::create (al);
+  const string& name = crop.name;
+  for (CropList::iterator i = crops.begin();
+       i != crops.end();
+       i++)
+    if ((*i)->name == name)
+      msg.error (string ("There is already an ") + name + " on the field.\n\
+If you want two " + name + " you should rename one of them");
   crop.initialize (msg, geometry);
   crops.push_back (&crop);
 }

@@ -4,14 +4,14 @@
   "Non-dissolvable chemicals"
   (crop_uptake_reflection_factor 1 [])
   (canopy_dissipation_rate 0 [h^-1])
-  (canopy_washoff_coefficient 1 [mm])
+  (canopy_washoff_coefficient 1 [])
   (diffusion_coefficient 1 [cm^2/s])
   (solute (adsorption full) (transport none))
   (decompose_rate 0 [h^-1]))
   
 (defchemical Atrazine default
   (canopy_dissipation_rate 8e-3 [h^-1])
-  (canopy_washoff_coefficient 100.0 [mm])
+  (canopy_washoff_coefficient 1.0 [])
   (crop_uptake_reflection_factor 0.8 [])
   (decompose_rate 7e-5 [h^-1])
   (diffusion_coefficient 8e-6 [cm^2/s])
@@ -19,7 +19,7 @@
 
 (defchemical Bentazon default
   (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 100.0 [mm])
+  (canopy_washoff_coefficient 1.0 [])
   (crop_uptake_reflection_factor 1 [])
   (decompose_halftime 40 [d])		; at 10 dg C
   (diffusion_coefficient 4.6e-6 [cm^2/s])
@@ -27,7 +27,7 @@
 
 (defchemical IPU default
   (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 100.0 [mm])
+  (canopy_washoff_coefficient 1.0 [])
   (crop_uptake_reflection_factor 1 [])
   (decompose_halftime 29 [d])
   (diffusion_coefficient 4.6e-6 [cm^2/s])	
@@ -35,7 +35,7 @@
 
 (defchemical MCPP default
   (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 100.0 [mm])
+  (canopy_washoff_coefficient 1.0 [])
   (crop_uptake_reflection_factor 1 [])
   (decompose_halftime 7 [d])
   (diffusion_coefficient 4.6e-6 [cm^2/s])
@@ -43,7 +43,7 @@
 
 (defchemical Pendimethalin default
   (canopy_dissipation_rate 0.0083 [h^-1])
-  (canopy_washoff_coefficient 100.0 [mm])
+  (canopy_washoff_coefficient 1.0 [])
   (crop_uptake_reflection_factor 1 [])
   (decompose_rate 0.0004 [h^-1])
   (diffusion_coefficient 4.6e-6 [cm^2/s])

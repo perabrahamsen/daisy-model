@@ -1,7 +1,35 @@
+2002-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_tillage.C (ActionMixSyntax): Fix default value for
+	penetration (used to be 0 for some reason). 
+
+2002-05-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (find_abiotic): New functions.
+	(tick): Use it.
+
+2002-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.h, om.C (heat_factor, water_factor): New parameters.
+	(heat_turnover_factor, water_turnover_factor): New member functions.
+
+	* production.C (initialize): Added assertions.
+	* organic_matter.C (add): Check that we don't add the same am twice.
+	* crop_std.C (tick): Only add am pools to organic matter if
+	newly created.
+	* vegetation_crops.C (sow): Add error for duplicate crops.
+
+2002-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/chemistry.dai: Update all parameterizations.
+
+	* chemicals.C (canopy_update): New formula.
+	* chemical_std.C (canopy_washoff_coefficient): Update dimension. 
+
 2002-05-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* crop_std.C (harvest): Also cut back development stage for old
-	crops who are low for some reason (lack of WStem).
+	crops who are low for some reason (like lack of WStem).
 
 2002-05-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 

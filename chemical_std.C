@@ -221,9 +221,8 @@ You must specify it with either 'canopy_dissipation_halftime' or\n\
     syntax.add ("canopy_dissipation_rate_coefficient", "h^-1", 
 		Check::fraction (), Syntax::OptionalConst,
 		"Obsolete alias for 'canopy_dissipation_rate'.");
-    syntax.add ("canopy_washoff_coefficient", "mm", Check::positive (),
-		Syntax::Const,
-		"How fast is the chemical washed off the canopy.");
+    syntax.add_fraction ("canopy_washoff_coefficient", Syntax::Const, "\
+Fracxftion of the chemical that follows the water off the canopy.");
     syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
 		Syntax::Const, "Diffusion coefficient.");
     syntax.add_submodule ("solute", alist, Syntax::Const,

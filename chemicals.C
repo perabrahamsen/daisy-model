@@ -27,6 +27,7 @@
 #include "chemical.h"
 #include "submodel.h"
 #include "treelog.h"
+#include "mathlib.h"
 #include <map>
 
 struct Chemicals::Implementation
@@ -162,54 +163,36 @@ Chemicals::Implementation::canopy_update (const Implementation& in,
        i++)
     add ((*i).first, (*i).second * dt);
 
-  // Divide with the divisor.
-  for (chemical_map::iterator i = chemicals.begin ();
-       i != chemicals.end ();
-       i++)
-    {
-      const Chemical* chemical = (*i).first;
-      const double K = chemical->canopy_dissipation_rate ();
-      const double Kd = chemical->canopy_washoff_coefficient ();
-      const double divisor = 1.0 + dt * (K + water_out / (Kd + water_storage));
-      assert (divisor > 0.0);
-      (*i).second /= divisor;
-    }
-  
-  // Dissipitaion.
+
+  // Dissipitaion and washoff.
   dissipate.clear ();
-  for (chemical_map::const_iterator i = chemicals.begin ();
-       i != chemicals.end ();
-       i++)
-    {
-      const Chemical* chemical = (*i).first;
-      const double Sm = (*i).second;
-      const double K = chemical->canopy_dissipation_rate ();
-      dissipate.add (chemical, K * Sm);
-    }
-
-  // Output.
   out.clear ();
-  for (chemical_map::const_iterator i = chemicals.begin ();
-       i != chemicals.end ();
-       i++)
-    {
-      const Chemical* chemical = (*i).first;
-      const double Sm = (*i).second;
-      const double Kd = chemical->canopy_washoff_coefficient ();
-      out.add (chemical, water_out * Sm / (Kd + water_storage));
-    }
-
   for (chemical_map::iterator i = chemicals.begin ();
        i != chemicals.end ();
        i++)
     {
       const Chemical* chemical = (*i).first;
-      const double amount = (*i).second;
-      
-      if (amount > 0.0 && amount < 1.e-18) // Less than one molecule...
+      const double old_amount = (*i).second;
+      const double k_1 = chemical->canopy_dissipation_rate ();
+      const double f_w = chemical->canopy_washoff_coefficient ();
+      const double washoff_fraction = f_w * 
+	(water_storage > 0.0) ? water_out / water_storage : 0.0;
+      const double new_amount 
+	= old_amount / (1.0 + dt * (k_1 + washoff_fraction));
+      const double dissipated = k_1 * new_amount * dt;
+      const double washedoff = new_amount * washoff_fraction * dt;
+      assert (approximate (new_amount, old_amount - washedoff - dissipated));
+
+      dissipate.add (chemical, dissipated);
+      if (new_amount > 0.0 && new_amount < 1.e-18) // Less than one molecule...
 	{
-	  out.add (chemical, amount);
 	  (*i).second = 0.0;
+	  out.add (chemical, new_amount);
+	}
+      else
+	{
+	  (*i).second = new_amount;
+	  out.add (chemical, washedoff);
 	}
     }
 }

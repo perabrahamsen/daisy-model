@@ -1302,7 +1302,7 @@ double
 CropSold::ActualWaterUptake (double Ept,
 			     const Soil& soil, SoilWater& soil_water,
 			     const double EvapInterception, 
-			     const double day_fraction, Treelog& out)
+			     const double /*day_fraction*/, Treelog& out)
 {
   if (Ept < 0)
     {

@@ -214,16 +214,19 @@ CropStandard::tick (const Time& time,
 	  if (organic_matter)
 	    {
 	      if (!production.AM_root)
-		production.AM_root
-		  = &AM::create (soil, time, harvesting.Root,
-				 name, "root", AM::Locked);
+		{
+		  production.AM_root
+		    = &AM::create (soil, time, harvesting.Root,
+				   name, "root", AM::Locked);
+		  organic_matter->add (*production.AM_root);
+		}
 	      if (!production.AM_leaf)
-		production.AM_leaf
-		  = &AM::create (soil, time, harvesting.Dead,
-				 name, "dead", AM::Locked);
-
-	      organic_matter->add (*production.AM_root);
-	      organic_matter->add (*production.AM_leaf);
+		{
+		  production.AM_leaf
+		    = &AM::create (soil, time, harvesting.Dead,
+				   name, "dead", AM::Locked);
+		  organic_matter->add (*production.AM_leaf);
+		}
 	    }
 	  else
 	    {

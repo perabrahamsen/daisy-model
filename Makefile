@@ -583,6 +583,10 @@ cvs: $(TEXT)
 	cvs commit -m "Version $(TAG)"
 	cvs tag release_`echo $(TAG) | sed -e 's/[.]/_/g'`
 
+cast:
+	fgrep _cast $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN)
+	wc -l  $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN)
+
 # How to compile the assembler file.
 #
 set_exceptions${OBJ}: set_exceptions.S

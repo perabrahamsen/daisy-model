@@ -64,7 +64,7 @@ the interval.");
       syntax.add_fraction ("penetration", Syntax::Const, "\
 Fraction of organic matter on surface that are incorporated in the soil\n\
 by this operation.");
-      alist.add ("penetration", 0.0);
+      alist.add ("penetration", 1.0);
       Librarian<Action>::add_type ("mix", alist, syntax, &make);
     }
 } ActionMix_syntax;

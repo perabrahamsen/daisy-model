@@ -89,9 +89,23 @@ struct OrganicMatter::Implementation
   double total_C (const Geometry& ) const;
 
   // Simulation.
-  void add (AM& om)
-  { am.push_back (&om); }
-  void monthly (const Geometry& soil);
+  void add (AM&);
+  void monthly (const Geometry&);
+  const double* find_abiotic (const OM& om,
+			       const int size, 
+			       const SoilWater& soil_water, 
+			       const SoilHeat& soil_heat,
+			       const vector<double>& default_value,
+			       vector<double>& scratch) const;
+  const double* find_abiotic (const OM& om,
+			      const int size, 
+			      const SoilWater& soil_water, 
+			      const SoilHeat& soil_heat,
+			      const vector<const PLF*> tillage_factor,
+			      const int pool,
+			      const vector<double>& default_value,
+			      bool use_clay,
+			      vector<double>& scratch) const;
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
 	     SoilNO3&, SoilNH4&, Treelog& msg);
   void mix (const Geometry&, double from, double to, double penetration, 
@@ -388,6 +402,14 @@ OrganicMatter::Implementation::check (Treelog& err) const
   return ok;
 }
 
+void 
+OrganicMatter::Implementation::add (AM& om)
+{ 
+  for (unsigned int i = 0; i < am.size (); i++)
+    assert (&om != am[i]);
+  am.push_back (&om); 
+}
+
 void
 OrganicMatter::Implementation::monthly (const Geometry& geometry)
 {
@@ -404,6 +426,8 @@ OrganicMatter::Implementation::monthly (const Geometry& geometry)
   
   for (int i = 0; i < am_size; i++)
     {
+      assert (am[i]);
+
       bool keep;
       
       if (am[i]->locked ())
@@ -439,6 +463,91 @@ OrganicMatter::Implementation::monthly (const Geometry& geometry)
     }
   am = new_am;
 }
+
+const double*
+OrganicMatter::Implementation::find_abiotic (const OM& om,
+					     const int size, 
+					     const SoilWater& soil_water, 
+					     const SoilHeat& soil_heat,
+					     const vector<double>& 
+					     /**/ default_value,
+					     vector<double>& scratch) const
+{
+  const bool use_om_heat = (om.heat_factor.size () > 0);
+  const bool use_om_water = (om.water_factor.size () > 0);
+  
+  if (!use_om_heat && !use_om_water)
+    return &default_value[0];
+  
+  for (unsigned int i = 0; i < size; i++)
+    {
+      const double T = soil_heat.T (i);
+      if (use_om_heat)
+	scratch[i] = om.heat_factor (T);
+      else
+	scratch[i] = heat_turnover_factor (T);
+
+      const double h = soil_water.h (i);
+      if (use_om_water)
+	scratch[i] *= om.water_factor (h);
+      else
+	scratch[i] *= water_turnover_factor (h);
+    }
+  return &scratch[0];
+}
+
+const double*
+OrganicMatter::Implementation::find_abiotic (const OM& om,
+					     const int size, 
+					     const SoilWater& soil_water, 
+					     const SoilHeat& soil_heat,
+					     const vector<const PLF*> 
+					     /**/ tillage_factor,
+					     const int pool,
+					     const vector<double>&
+					     /**/ default_value,
+					     bool use_clay,
+					     vector<double>& scratch) const
+{
+  const bool use_om_heat = (om.heat_factor.size () > 0);
+  const bool use_om_water = (om.water_factor.size () > 0);
+  const bool use_tillage = (tillage_factor.size () > pool);
+
+  if (!use_om_heat && !use_om_water && !use_tillage)
+    return &default_value[0];
+  
+  if (use_om_heat || use_om_water)
+    {
+      for (unsigned int i = 0; i < size; i++)
+	{
+	  if (use_clay)
+	    scratch[i] = clay_turnover_factor[i];
+	  else
+	    scratch[i] = 1.0;
+
+	  const double T = soil_heat.T (i);
+	  if (use_om_heat)
+	    scratch[i] *= om.heat_factor (T);
+	  else
+	    scratch[i] *= heat_turnover_factor (T);
+
+	  const double h = soil_water.h (i);
+	  if (use_om_water)
+	    scratch[i] *= om.water_factor (h);
+	  else
+	    scratch[i] *= water_turnover_factor (h);
+	}
+    }
+  else
+    scratch = default_value;
+
+  if (use_tillage)
+    for (unsigned int i = 0; i < size; i++)
+      scratch[i] *= (*tillage_factor[pool]) (tillage_age[i]);
+
+  return &scratch[0];
+}
+				     
 
 void 
 OrganicMatter::Implementation::tick (const Soil& soil, 
@@ -499,32 +608,27 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     }
   
   // Main processing.
-  tillage_factor = clay_factor;
-  if (smb_tillage_factor.size () > 0)
-    for (unsigned int i = 0; i < size; i++)
-      tillage_factor[i] *= (*smb_tillage_factor[0]) (tillage_age[i]) ;
-  smb[0]->tick (size, &tillage_factor[0],
+  smb[0]->tick (size, find_abiotic (*smb[0], size, soil_water, soil_heat,
+				    smb_tillage_factor, 0,
+				    clay_factor, true, tillage_factor),
 		&N_soil[0], &N_used[0], &CO2[0], smb, som);
   for (unsigned int j = 1; j < smb.size (); j++)
-  {
-    tillage_factor = abiotic_factor;
-    if (smb_tillage_factor.size () > j)
-      for (unsigned int i = 0; i < size; i++)
-	tillage_factor[i] *= (*smb_tillage_factor[j]) (tillage_age[i]);
-    smb[j]->tick (size, &tillage_factor[0],
+    smb[j]->tick (size, find_abiotic (*smb[j], size, soil_water, soil_heat,
+				      smb_tillage_factor, j,
+				      abiotic_factor, false, tillage_factor),
 		  &N_soil[0], &N_used[0], &CO2[0], smb, som);
-  }
+
   for (unsigned int j = 0; j < som.size (); j++)
-  {
-    tillage_factor = clay_factor;
-    if (som_tillage_factor.size () > j)
-      for (unsigned int i = 0; i < size; i++)
-	tillage_factor[i] *= (*som_tillage_factor[j]) (tillage_age[i]);
-    som[j]->tick (size, &tillage_factor[0],
+    som[j]->tick (size, find_abiotic (*som[j], size, soil_water, soil_heat,
+				      som_tillage_factor, j,
+				      clay_factor, true, tillage_factor),
 		  &N_soil[0], &N_used[0], &CO2[0], smb, som);
-  }
+
   for (unsigned int j = 0; j < added.size (); j++)
-    added[j]->tick (size, &abiotic_factor[0], &N_soil[0], &N_used[0], &CO2[0],
+    added[j]->tick (size, find_abiotic (*added[j],
+					size, soil_water, soil_heat,
+					abiotic_factor, tillage_factor),
+		    &N_soil[0], &N_used[0], &CO2[0],
 		    smb, &buffer.C[0], &buffer.N[0]);
 
   // Update buffer.
@@ -1260,10 +1364,10 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
 	      "Layered initialization of soil SOM content.");
   PLF empty;
   syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
-	      "Heat factor.");
+	      "Default heat factor, used if not specified by OM pool.");
   alist.add ("heat_factor", empty);
-  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const,
-	      "Water potential factor.");
+  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const, "\
+Default water potential factor, used if not specified by OM pool.");
   alist.add ("water_factor", empty);
   syntax.add ("clay_factor", Syntax::Fraction (), Syntax::None (), 
 	      Syntax::Const, "Clay fraction factor.");

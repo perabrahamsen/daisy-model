@@ -122,6 +122,7 @@ Field::Implementation::sow (Treelog& msg, const AttributeList& crop)
 {
   if (selected)
     {
+      Treelog::Open nest (msg, selected->name);
       selected->sow (msg, crop);
     }
   else 
@@ -129,7 +130,10 @@ Field::Implementation::sow (Treelog& msg, const AttributeList& crop)
       for (ColumnList::iterator i = columns.begin ();
 	   i != columns.end ();
 	   i++)
-	(*i)->sow (msg, crop);
+	{
+	  Treelog::Open nest (msg, (*i)->name);
+	  (*i)->sow (msg, crop);
+	}
     }
 }
 
