@@ -58,8 +58,9 @@ HorizonYolo::~HorizonYolo ()
 { }
 
 // Add the HorizonYolo syntax to the syntax table.
-static Horizon*
-HorizonYolo_constructor (AttributeList& al)
+
+Horizon*
+HorizonYolo::make (AttributeList& al)
 {
   return new HorizonYolo (al);
 }
@@ -73,5 +74,5 @@ HorizonYoloSyntax::HorizonYoloSyntax ()
 { 
   Syntax* syntax = new Syntax ();
   AttributeList* alist = new AttributeList ();
-  Horizon::add_type ("yolo", *alist, syntax, &HorizonYolo_constructor);
+  Horizon::add_type ("yolo", *alist, syntax, &HorizonYolo::make);
 }

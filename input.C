@@ -29,7 +29,6 @@ Usage::what () const
 struct Input::Implementation
 {
   Log& log;
-  Library crops;
   Library managers;
   Weather* weather;
   Groundwater* groundwater;
@@ -109,11 +108,6 @@ Input::makeColumns () const
   return impl.field;
 }
 
-const Library& Input::makeCrops () const
-{ 
-  return impl.crops;
-}
-
 Input::Input (int& argc, char**& argv, ostream& e)
   : impl (*new Implementation (argc, argv, e))
 { }
@@ -127,7 +121,7 @@ Input::Implementation::load ()
       skip ("(");
       string item = get_id ();
       if (item == "crop")
-	load_library (crops);
+	add_derived (Crop::par_library (), &Crop::derive_type);
       else if (item == "horizon")
 	add_derived (Horizon::library (), &Horizon::derive_type);
       else if (item == "column")
@@ -448,18 +442,17 @@ Input::Implementation::load_crops (CropList& cl)
       skip ("(");
       string name = get_id ();
 
-      if (crops.check (name))
+      if (Crop::par_library ().check (name))
 	{
-	  const string root = crops.root (name);
-	  const AttributeList& par = crops.lookup (name);
-	  const Syntax* syntax
-	    = syntax_table->syntax (root + "/state");
-	  AttributeList var;
-	  load_list (&var, syntax);
-	  if (   syntax_table->syntax (root)->check (name, par, log)
-		 && syntax->check (name, var, log)) 
+	  const Syntax* parSyntax = Crop::par_library ().syntax (name);
+	  const AttributeList& parList = Crop::par_library ().lookup (name);
+	  const Syntax* varSyntax = Crop::var_library ().syntax (name);
+	  AttributeList varList (Crop::var_library ().lookup (name));
+	  load_list (&varList, varSyntax);
+	  if (   parSyntax->check (name, parList, log) 
+	      && varSyntax->check (name, varList, log))
 	    {
-	      cl.push_back (new Crop (name, par, var));
+	      cl.push_back (Crop::create (name, varList));
 	    }
 	  else
 	    error (string ("Ignoring incomplete crop `") 
@@ -857,12 +850,13 @@ Input::Implementation::get_filter_crops ()
     {	
       skip ("(");
       string name = get_id ();
-      if (crops.check (name))
+      if (Crop::par_library ().check (name))
 	{
-	  string root = crops.root (name) + "/state";
-	  const Syntax* syntax = syntax_table->syntax (root);
+	  const Syntax* syntax = Crop::var_library ().syntax (name);
 	  filter->add (name, get_filter (syntax));
 	}
+      else 
+	error (string ("Unknown crop `") + name + "' in filter");
       skip (")");
     }
   return filter;
@@ -870,7 +864,6 @@ Input::Implementation::get_filter_crops ()
 
 Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
   : log (*new Log ()),
-    crops (),
     chief ("manager"),
     time (0, 1, 1, 0),
     err (e),

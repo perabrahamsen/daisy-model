@@ -9,14 +9,16 @@
 #include "crop.h"
 
 void
-ColumnStandard::sow (const Library& croplib, string crop, Log& log)
+ColumnStandard::sow (string crop, Log& log)
 {
-  if (croplib.check (crop))
+  if (Crop::par_library ().check (crop))
     {
-      const AttributeList& values = croplib.lookup (crop);
+      const AttributeList& values = Crop::var_library ().lookup (crop);
 	
-      if (syntax_table->syntax ("crop")->check (crop, values, log))
-	crops.push_back (new Crop (crop, values));
+      if (Crop::var_library ().syntax (crop)->check (crop, values, log))
+	crops.push_back (Crop::create (crop, values));
+      else
+	cerr << "Cannot sow incomplete crop `" << crop << "'\n";
     }
   else
     cerr << "Cannot sow unknow crop `" << crop << "'\n";
@@ -126,31 +128,31 @@ ColumnStandard::~ColumnStandard ()
 { }
 
 // Add the Column syntax to the syntax table.
-static Column*
-ColumnStandard_constructor (string name, 
-			    const AttributeList& par, 
-			    const AttributeList& var)
+Column*
+ColumnStandard::make (string name, 
+		      const AttributeList& par, 
+		      const AttributeList& var)
 {
   return new ColumnStandard (name, par, var);
 }
 
-static struct ColumnSyntax
+static struct ColumnStandardSyntax
 {
   const Syntax* parameters ();
   const Syntax* variables ();
-  ColumnSyntax ();
+  ColumnStandardSyntax ();
 } column_syntax;
 
-ColumnSyntax::ColumnSyntax ()
+ColumnStandardSyntax::ColumnStandardSyntax ()
 { 
   Column::add_type ("column",
 		    AttributeList::empty, parameters (),
 		    AttributeList::empty, variables (),
-		    &ColumnStandard_constructor);
+		    &ColumnStandard::make);
 }
 
 const Syntax*
-ColumnSyntax::parameters ()
+ColumnStandardSyntax::parameters ()
 { 
   Syntax* par = new Syntax ();
 
@@ -181,7 +183,7 @@ ColumnSyntax::parameters ()
 }
 
 const Syntax*
-ColumnSyntax::variables ()
+ColumnStandardSyntax::variables ()
 { 
   Syntax* var = new Syntax ();
 

@@ -4,15 +4,15 @@
 #include "column.h"
 
 void 
-Action::doIt (ColumnList&, const Weather&, const Library&, Log&) const
+Action::doIt (ColumnList&, const Weather&, Log&) const
 {
-    cout << "resting...\n";
+  cout << "resting...\n";
 }
 
 bool
 Action::stop () const
 { 
-    return false;
+  return false;
 }
 
 Action Action::null;
@@ -24,30 +24,29 @@ Action::~Action ()
 { }
 
 void 
-ActionSow::doIt (ColumnList& cl, const Weather&, const Library& crops,
-		 Log& log) const
+ActionSow::doIt (ColumnList& cl, const Weather&, Log& log) const
 {
-    cout << "Sowing " << crop << "\n";
+  cout << "Sowing " << crop << "\n";
 
-    for (ColumnList::iterator i = cl.begin ();
-	 i != cl.end ();
-	 i++)
-	{
-	    (*i)->sow (crops, crop, log);
-	}
+  for (ColumnList::iterator i = cl.begin ();
+       i != cl.end ();
+       i++)
+    {
+      (*i)->sow (crop, log);
+    }
 }
 
 ActionSow::ActionSow (string c) : crop (c)
 { }
 
 void 
-ActionStop::doIt (ColumnList&, const Weather&, const Library&, Log&) const
+ActionStop::doIt (ColumnList&, const Weather&, Log&) const
 {
-    assert (false);
+  assert (false);
 }
 
 bool
 ActionStop::stop () const
 { 
-    return true;
+  return true;
 }

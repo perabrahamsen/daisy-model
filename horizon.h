@@ -34,8 +34,9 @@ public:
   static Horizon& create (string);
 
   // Create and Destroy.
-public:
+protected:
   Horizon (const AttributeList&);
+public:
   virtual ~Horizon ();
 };
 

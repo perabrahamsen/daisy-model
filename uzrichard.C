@@ -428,8 +428,8 @@ UZRichard::~UZRichard ()
 }
 
 // Add the UZRichard syntax to the syntax table.
-static UZmodel* 
-UZRichard_constructor (const AttributeList& al)
+UZmodel* 
+UZRichard::make (const AttributeList& al)
 {
   return new UZRichard (al);
 }
@@ -455,5 +455,5 @@ UZRichardSyntax::UZRichardSyntax ()
   syntax->add ("max_relative_difference", Syntax::Number);
   alist->add ("max_relative_difference", 0.001);
   
-  UZmodel::add_type ("richards", *alist, syntax, &UZRichard_constructor);
+  UZmodel::add_type ("richards", *alist, syntax, &UZRichard::make);
 }

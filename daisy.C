@@ -25,8 +25,7 @@ Daisy::Daisy (const Input& input)
     manager (input.makeManager ()),
     weather (input.makeWeather ()), 
     groundwater (input.makeGroundwater ()), 
-    columns (input.makeColumns ()),
-    crops (input.makeCrops ())
+    columns (input.makeColumns ())
 { }
 
 void 
@@ -42,7 +41,7 @@ Daisy::run ()
       cout << "Tick " << time.year () << "-" << time.month () << "-"
 	   << time.mday () << " " << time.hour () << " ";
 
-      action->doIt (columns, weather, crops, log);
+      action->doIt (columns, weather, log);
 
       for (ColumnList::iterator column = columns.begin ();
 	   column != columns.end ();

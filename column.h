@@ -21,7 +21,7 @@ public:
 
   // Actions.
 public:
-  virtual void sow (const Library& croplib, string crop, Log&) = 0;
+  virtual void sow (string crop, Log&) = 0;
 
   virtual bool check (Log&) const = 0;
   virtual void output (Log&, const Filter*) const = 0;
@@ -48,8 +48,9 @@ public:
   static Column* create (string, const AttributeList& var);
 
   // Create and Destroy.
-public:
+protected:
   Column (string name);
+public:
   virtual ~Column ();
 };
 

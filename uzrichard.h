@@ -55,8 +55,11 @@ public:
 	     vector<double>& q);
 
   // Create and Destroy.
-public:
+private:
+  friend class UZRichardSyntax;
+  static UZmodel* make (const AttributeList&);
   UZRichard (const AttributeList& par);
+public:
   ~UZRichard ();
 };
 

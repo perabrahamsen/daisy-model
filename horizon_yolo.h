@@ -18,8 +18,11 @@ public:
   double h (double Theta) const;
 
   // Create and Destroy.
-public:
+private:
+  friend class HorizonYoloSyntax;
+  static Horizon* make (AttributeList& al);
   HorizonYolo (const AttributeList&);
+public:
   virtual ~HorizonYolo ();
 };
 

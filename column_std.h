@@ -36,7 +36,7 @@ private:
 
   // Actions.
 public:
-  void sow (const Library& croplib, string crop, Log&);
+  void sow (string crop, Log&);
 
   bool check (Log&) const;
   void output (Log&, const Filter*) const;
@@ -53,9 +53,12 @@ public:
   double MaxRootingDepth () const;
 
   // Create and Destroy.
-public:
+private:
+  friend class ColumnStandardSyntax;
+  static Column* make (string, const AttributeList&, const AttributeList&);
   ColumnStandard (string name, 
 		  const AttributeList& par, const AttributeList& var);
+public:
   ~ColumnStandard ();
 };
 

@@ -3,15 +3,17 @@
 #ifndef CROP_IMPL_H
 #define CROP_IMPL_H
 
-#include "crop.h"
+#include "crop_std.h"
 #include "ftable.h"
 #include "csmp.h"
 
+#include <list.h>
+
 struct Bioclimate;
 
-typedef void (*CropFun)(const Bioclimate&, Crop&);
+typedef void (*CropFun)(const Bioclimate&, CropStandard&);
 
-struct Crop::Parameters
+struct CropStandard::Parameters
 { 
     const struct DevelPar
     {
@@ -27,7 +29,7 @@ struct Crop::Parameters
 	const CSMP& TempEff2;   // Temperature effect, reproductive stage
 	const CSMP& PhotEff1;   // Ptotoperiode effect, vegetative stage
     private:
-	friend struct Crop::Parameters;
+	friend struct CropStandard::Parameters;
 	DevelPar (const AttributeList&);
     } Devel;
     const struct VernalPar {
@@ -37,7 +39,7 @@ struct Crop::Parameters
         double TaLim;		// Vernalization temp threshold
         double TaSum;		// Vernalization T-sum requirement
     private:
-	friend struct Crop::Parameters;
+	friend struct CropStandard::Parameters;
 	VernalPar (const AttributeList&);
     } Vernal;
     const struct LeafPhotPar {
@@ -48,7 +50,7 @@ struct Crop::Parameters
         double TLim1;		// Lowest temp for photosynthesis
         double TLim2;		// Lowest temp for unrestricted phot.
     private:
-	friend struct Crop::Parameters;
+	friend struct CropStandard::Parameters;
 	LeafPhotPar (const AttributeList&);
     } LeafPhot;
     const struct CanopyPar {
@@ -62,7 +64,7 @@ struct Crop::Parameters
         double PARext;		// PAR extinction coefficient
         double EPext;		// EP extinction coefficient
     private:
-	friend struct Crop::Parameters;
+	friend struct CropStandard::Parameters;
 	CanopyPar (const AttributeList&);
     } Canopy;
     const struct RootPar {
@@ -77,7 +79,7 @@ struct Crop::Parameters
         double MxNH4Up;		// Max NH4 uptake per unit root length
         double MxNO3Up;		// Max NO3 uptake per unit root length
     private:
-	friend struct Crop::Parameters;
+	friend struct CropStandard::Parameters;
 	RootPar (const AttributeList&);
     } Root;
     const struct PartitPar {
@@ -87,7 +89,7 @@ struct Crop::Parameters
 	const CSMP& LfDR;	// Death rate of Leafs
 	const CSMP& RtDR;	// Death rate of Roots
     private:
-	friend struct Crop::Parameters;
+	friend struct CropStandard::Parameters;
 	PartitPar (const AttributeList&);
     } Partit;
     struct RespPar {
@@ -101,7 +103,7 @@ struct Crop::Parameters
         double r_SOrg;		// Maint. resp. coeff., stor. org.
         double Q10;		// Maint. resp. Q10-value
     private:
-	friend struct Crop::Parameters;
+	friend struct CropStandard::Parameters;
 	RespPar (const AttributeList&);
     } Resp;
     struct CrpNPar {
@@ -115,7 +117,7 @@ struct Crop::Parameters
 	const CSMP& PtSOrgCnc;	// Upper limit for N-conc in stor org
 	const CSMP& CrSOrgCnc;	// Critical lim f. N-conc in stor org
     private:
-	friend struct Crop::Parameters;
+	friend struct CropStandard::Parameters;
 	CrpNPar (const AttributeList&);
     } CrpN;
     static const Parameters& get (const string, const AttributeList&);
@@ -130,7 +132,7 @@ public:
     ~Parameters ();
 };
 
-struct Crop::Variables
+struct CropStandard::Variables
 { 
     void output (Log&, const Filter*) const;
     struct RecPhenology
@@ -139,9 +141,8 @@ struct Crop::Variables
 	double DS;		// Development Stage
 	double Vern;		// Vernalization criterium [C d]
     private:
-	friend struct Crop::Variables;
-	RecPhenology (const AttributeList&);
-	RecPhenology (const Parameters&);
+	friend struct CropStandard::Variables;
+	RecPhenology (const Parameters&, const AttributeList&);
     } Phenology;
     struct RecCanopy
     {
@@ -151,9 +152,8 @@ struct Crop::Variables
 	double LADm;		// Max Leaf Area Density [cm2/cm3]
 	CSMP LAIvsH;		// Accumulated Leaf Area Index at Height
     private:
-	friend struct Crop::Variables;
-	RecCanopy (const AttributeList&);
-	RecCanopy (const Parameters&);
+	friend struct CropStandard::Variables;
+	RecCanopy (const Parameters&, const AttributeList&);
     } Canopy;
     struct RecRootSys
     {
@@ -167,9 +167,8 @@ struct Crop::Variables
 	vector<double> NO3Extraction; // Extraction of NH4-N in soil layers
 				      // [mg/m2/h]
     private:
-	friend struct Crop::Variables;
-	RecRootSys (const AttributeList&);
-	RecRootSys (const Parameters&);
+	friend struct CropStandard::Variables;
+	RecRootSys (const Parameters&, const AttributeList&);
     } RootSys;
     struct RecProd
     {
@@ -181,9 +180,8 @@ struct Crop::Variables
 	double WLDrd;		// Inactive canopy dry matter weight [g/m2]
 	double NCrop;		// Nitrogen stored in dry matter [g/m2]
     private:
-	friend struct Crop::Variables;
-	RecProd (const AttributeList&);
-	RecProd (const Parameters&);
+	friend struct CropStandard::Variables;
+	RecProd (const Parameters&, const AttributeList&);
     } Prod;
     struct RecCrpAux
     {
@@ -203,14 +201,12 @@ struct Crop::Variables
 	double NH4Upt;		// NH4-N uptake [g/m2/h]
 	double NO3Upt;		// NO3-N uptake [g/m2/h]
     private:
-	friend struct Crop::Variables;
-	RecCrpAux (const AttributeList&);
-	RecCrpAux (const Parameters&);
+	friend struct CropStandard::Variables;
+	RecCrpAux (const Parameters&, const AttributeList&);
     } CrpAux;
 private:
-    friend class Crop;
-    Variables (const AttributeList&);
-    Variables (const Parameters&);
+    friend class CropStandard;
+    Variables (const Parameters&, const AttributeList&);
 public:
     ~Variables ();
 };

@@ -53,7 +53,6 @@ public:
     Weather& weather;
     Groundwater& groundwater;
     ColumnList& columns;
-    const Library& crops;
 
     // Simulation.
 public:

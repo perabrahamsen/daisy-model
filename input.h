@@ -26,7 +26,6 @@ public:
   Groundwater& makeGroundwater () const;
   Log& makeLog () const;
   ColumnList& makeColumns () const;
-  const Library& makeCrops () const;
 
   // Create.
 public:
