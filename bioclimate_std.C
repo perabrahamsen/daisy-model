@@ -106,7 +106,7 @@ struct BioclimateStandard : public Bioclimate
   double daily_global_radiation_; // From weather [W/m2].
 
   // Simulation
-  void tick (Surface&, const Weather&, const Time&, 
+  void tick (Surface&, const Weather&, 
 	     Vegetation&, const Soil&, SoilWater&, const SoilHeat&);
   void output (Log&) const;
 
@@ -469,7 +469,6 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
 void 
 BioclimateStandard::tick (Surface& surface, const Weather& weather, 
-			  const Time&,
 			  Vegetation& vegetation, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat& soil_heat)
 {

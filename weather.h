@@ -73,6 +73,7 @@ public:
     { return day_length_; }
   double day_cycle () const	// Sum over a day is 1.0.
     { return day_cycle_; }
+
 protected:
   double day_cycle (const Time&) const;	// Sum over a day is 1.0.
 private:

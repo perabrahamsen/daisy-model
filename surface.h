@@ -28,7 +28,7 @@ public:
 
   void SoilSurfaceConditions (double Theta, double h);
 
-  void clear ();
+  void mixture (const IM& soil_im /* g/cm^2/mm */);
 
   // Manager.
   void fertilize (const IM&);

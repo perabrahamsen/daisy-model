@@ -286,9 +286,12 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   soil_chemicals.clear ();
   soil_NO3.clear ();
   soil_NH4.clear ();
-  surface.clear ();
+  IM soil_top_conc;
+  soil_top_conc.NO3 = soil_NO3.C (0);
+  soil_top_conc.NH4 = soil_NH4.C (0);
+  surface.mixture (soil_top_conc);
   
-  bioclimate.tick (surface, weather, time,
+  bioclimate.tick (surface, weather, 
 		   vegetation, soil, soil_water, soil_heat);
   vegetation.tick (time, bioclimate, soil, organic_matter, 
 		   soil_heat, soil_water, soil_NH4, soil_NO3);

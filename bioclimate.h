@@ -36,7 +36,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (Surface&, const Weather&, const Time&, Vegetation&, 
+  virtual void tick (Surface&, const Weather&, Vegetation&, 
 		     const Soil&, SoilWater&, const SoilHeat&) = 0;
   virtual void output (Log&) const = 0;
   virtual const Chemicals& chemicals_down () const = 0;

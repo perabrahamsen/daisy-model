@@ -1,87 +1,30 @@
-* Nyt `utils' katalog med de to dhi scripts.
+* Nyt `misc' katalog med de to dhi scripts.
 
 * An `assert CONDITION' action.
 
 Gives an error if CONDITION is not true.
 
-* Simulation:
-
-** Stof chemicals ned i jord via macropores.
-
-** Nedføring af OM i jord.
-
-* Teknik:
-
-** column::merge 
-
-** Merge små AM til særlig "rest-am" pulje som ikke forsvinder.
-
-* Ryd op i Log struktur.
-
-** LogCheckpoint
-
-*** Sørg for at inkludere `def*' og `input' automatisk.
-
-** Hutig måde at skippe log på i Daisy::output, hvis condition er falsk.
-
 * LogTable: Gør det muligt at logge min/max værdier i tidsinterval.
+
+* Earthworms and AM
+
+* Stof chemicals ned i jord via macropores.
+
+* Merge små AM til særlig "rest-am" pulje som ikke forsvinder.
+
+* CheckPoint: Sørg for at inkludere `def*' og `input' automatisk.
 
 * Cloning.
 
 ** Check af clone af vegetation virker.
 
-** Sørg for at cdaisy bruger de nye funktion til clone of merge.
+** Sørg for at cdaisy bruger de nye funktion til clone og merge.
 
 ** Implementer merge.
 
-* Check kemikalier i jorden.
-
-* Check pet_pm sammen med PvdK.
-
-* Gør det muligt at vælge array/entry/string separators.
-
-* Check field abstraction for flere søjler.
-
-* Check om AM root/initial initializering virker.
-
-* Virker flere chemicals?
-
-======================================================================
-
-* Plot retentionskurve fra gdaisy.
-
-======================================================================
-
 * GodeGuard errors
 
-======================================================================
-
-* Clone og Merge column til Nick
-
-Date: Møde med Nich i august.
-
-* organisk stof på overfladen (nick og os)
-
-Date: vent på SH
-
-======================================================================
-
-
-* Standard filtre
-
-** Generaliser Frame.
-
-*** Gør det til et library.
-
-*** Tilføj `name' og `number' queries (med default value)
-
-*** Flyt `column' query til global funktion i column.h eller daisy.h
-
-** OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
-
 * Døde blade skal tælle med i lysfordelingen.
-
-* clone column idea:  log + parse!  
 
 * System til rename af duplicate object ved parsing.
 
@@ -89,18 +32,7 @@ Date: vent på SH
 
 * Try out "SWIFT"
 
-* Implement in parser and pretty printer:
-
-	(define LIBRARY ELEMENT SUPER (NAME VALUE)...)
-
-* Create `log_checkpoint.C' og slet `filter*.[Ch]'.
-
-LogCheckpoint skal gå ud fra et kopi af den syntax/alist som startede
-simularingen,  lade Daisy::output tilføje nye værdier for state
-variable (samt evt. nyt objekter, specielt AM og Crop, der så skal
-huske deres egen syntax), og så bruge PrinterFile til at udskrive de
-nye alister.  Efter at have udskrevet de objecter der var defineret i
-input filen.
+* Plot retentionskurve fra gdaisy.
 
 * tkdaisy:
 
@@ -118,19 +50,7 @@ input filen.
 
   Lav functioner der viser data statisk og dynamisk.
 
-* Do something about category.h, and expression.X.
-
-* Missing:
-
-** Solute transport for groundwater.
-
-** Make plant competition work.
-
-** Make output of OrganicMatter total_[NC] work.
-
 * Make it possible to specify Soil geometry with dz.
-
-* A filter should know the syntax table.
 
 * Output syntax.
 
@@ -143,26 +63,9 @@ Manager.
 
 * Split Crop in submodules the same way as is done with Soil.
 
-* Make everything use error_log instead of cout and cerr.
-
 * Use reference counting.
 
-* Make CropStandard::get work.
-
-Use a STL set for this.
-
-Compare alist members that are Syntax::Const
-
-Make sharing of parameters for other objects work.
-
 * Make CSMP::find use binary search.
-
-* Make it possible to add rules, not just overwrite them.
-
-Create Syntax::Prepend and Syntax::Append variations of
-Syntax::Sequence.  Make rules use Syntax::Prepend.
-
-* Try to understand N extraction by crops.
 
 * Rename Daisy to Simulation.
 

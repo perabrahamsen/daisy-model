@@ -1,3 +1,26 @@
+1999-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.99 released.
+
+1999-11-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Surface Water Balance", "Root Zone Water Balance",
+	"N Balance", "Bioclimate"): Added surface runoff.
+
+1999-11-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C, bioclimate.h (tick): Removed `time' argument.
+	* column_std.C (tick): Updated caller.
+
+	* surface.C (DetentionCapacity, ReservoirConstant, runoff,
+	im_runoff): New parameters and log variables.
+	(tick, output): Use them.
+	(R_mixture): New parameter.
+	* surface.C, surface.h (mixture): New function.
+	(clear): Removed.
+	* column_std.C (tick): Call it.
+
+
 1999-11-05  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.98 released.

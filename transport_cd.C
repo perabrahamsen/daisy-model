@@ -132,15 +132,18 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 
   double C_top = 0.0;
   double S_top = 0.0;
+#ifdef DISABLE_MIXING
   if (J_in > 0.0)
     {
       CERR << "\nBug: Positive J_in (" << J_in << ")\n";
       J_in = 0.0;
     }
+#endif
   if (J_in != 0.0)
     {
+#ifdef DISABLE_MIXING
       assert (J_in < 0.0);
-
+#endif
       if (soil_water.q (0) < 0.0)
 	// Normal condition, stuff is in solute.
 	C_top = J_in / soil_water.q (0);

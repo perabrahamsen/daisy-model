@@ -29,8 +29,14 @@ struct Surface::Implementation
   double Eps;
   double T;
   IM im;
+  const double DetentionCapacity;
+  const double ReservoirConstant;
+  double runoff;
+  IM im_runoff;
+  const double R_mixing;
 
   // Functions.
+  void mixture (const IM& soil_im /* g/cm^2/mm */);
   bool flux_top () const;
   void  flux_top_on () const;
   bool accept_top (double water);
@@ -48,6 +54,27 @@ struct Surface::Implementation
   ~Implementation ();
 };
 
+void
+Surface::mixture (const IM& soil_im /* g/cm^2/mm */)
+{
+  impl.mixture (soil_im);
+}
+
+void
+Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
+{
+  if (pond > 1e-6 && R_mixing > 0.0)
+    {
+      // [g/cm^2/h] = ([g/cm^2/mm] - [g/cm^2] / [mm]) * [mm/h]
+      im_flux.NO3 = max (-im.NO3 / dt,
+			 (soil_im.NO3 - im.NO3 / pond) * R_mixing);
+      im_flux.NH4 = max (-im.NH4 / dt,
+			 (soil_im.NH4 - im.NH4 / pond) * R_mixing);
+      im += im_flux * dt;
+    }
+  else
+    im_flux.clear ();
+}
 
 bool 
 Surface::flux_top () const
@@ -127,8 +154,10 @@ Surface::Implementation::accept_top (double water)
 	  delta_matter /= dt;
 	  im_flux -= delta_matter;
 	}
+#ifdef DISABLE_MIXING
       assert (im_flux.NO3 <= 0.0);
       assert (im_flux.NH4 <= 0.0);
+#endif 
       pond += water * dt;
       return true;
     }
@@ -156,10 +185,6 @@ double
 Surface::temperature () const
 { return impl.T; }
 
-void
-Surface::clear ()
-{ impl.im_flux.clear (); }
-
 const IM& 
 Surface::matter_flux ()
 { return impl.im_flux; }
@@ -174,7 +199,19 @@ Surface::Implementation::tick (double PotSoilEvaporation,
 			       double water, double temp,
 			       const Soil& soil, const SoilWater& soil_water)
 {
-  static const double dt = 1.0; // Time step [h].
+  if (pond > DetentionCapacity)
+    {
+      runoff = (pond - DetentionCapacity) * ReservoirConstant;
+      im_runoff = im * (runoff / pond);
+      pond -= runoff;
+      im -= im_runoff;
+    }
+  else
+    {
+      im_runoff = IM ();
+      runoff = 0.0;
+    }
+
   const double MaxExfiltration
     = soil_water.MaxExfiltration (soil) * 10.0; // cm -> mm.
 
@@ -260,7 +297,9 @@ Surface::Implementation::output (Log& log) const
   log.output ("flux", flux);
   log.output ("EvapSoilSurface", EvapSoilSurface);
   log.output ("Eps", Eps);
+  log.output ("runoff", runoff);
   output_submodule (im, "IM", log);
+  output_submodule (im_runoff, "IM_runoff", log);
 }
 
 double
@@ -351,8 +390,21 @@ Water evaporated from the surface, including the pond and exfiltration.");
 Potential evaporation from the surface.");
   syntax.add ("T", "dg C", Syntax::LogOnly, "\
 Temperature of water or air directly above the surface.");
+  syntax.add ("DetentionCapacity", "mm", Syntax::Const, "\
+Amount of ponding the surface can retain.");
+  alist.add ("DetentionCapacity", 1000.0);
+  syntax.add ("ReservoirConstant", "h^-1", Syntax::Const, "\
+Fraction of ponding above DetentionCapacity that runoffs each hour.");
+  alist.add ("ReservoirConstant", 1.0);
+  syntax.add ("runoff", "mm", Syntax::LogOnly, "\
+Amount of water runoff from ponding this hour.");
   add_submodule<IM> ("IM", syntax, alist, Syntax::State, "\
-Inorganic nitrogen on the surface.");
+Inorganic nitrogen on the surface [g/cm^2].");
+  add_submodule<IM> ("IM_runoff", syntax, alist, Syntax::LogOnly, "\
+Inorganic nitrogen on the runoff water this hour [g/cm^2].");
+  syntax.add ("R_mixing", "mm/h", Syntax::Const, "\
+Resistance to mixing inorganic N between soil and ponding.");
+  alist.add ("R_mixing", 0.0);
 }
 
 Surface::Surface (const AttributeList& al)
@@ -373,7 +425,13 @@ Surface::Implementation::Implementation (const AttributeList& al)
     EvapSoilSurface (0.0),
     Eps (0.0),
     T (0.0),
-    im (al.alist ("IM"))
+    im (al.alist ("IM")),
+    DetentionCapacity (al.number ("DetentionCapacity")),
+    ReservoirConstant (al.number ("ReservoirConstant")),
+    runoff (0.0),
+    im_runoff (),
+    R_mixing (al.number ("R_mixing"))
+  
 {
   assert (im_flux.NO3 == 0.0);
   assert (im_flux.NH4 == 0.0);
