@@ -168,9 +168,11 @@ Rootdens_G_P::set_density (Treelog& msg,
   daisy_assert (Density.size () == geometry.size ());
   unsigned int i = 0;
   for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
-    Density[i] = extra + L0 * exp (a * geometry.z (i));
+    {
+      daisy_assert (i < geometry.size ());
+      Density[i] = extra + L0 * exp (a * geometry.z (i));
+    }
 
-  daisy_assert (i < geometry.size ());
   for (; i < geometry.size (); i++)
     Density[i] = 0.0;
 

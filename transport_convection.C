@@ -26,6 +26,7 @@
 #include "adsorption.h"
 #include "log.h"
 #include "mathlib.h"
+#include "tmpstream.h"
 
 class TransportConvection : public Transport
 {
@@ -64,7 +65,7 @@ TransportConvection::output (Log& log) const
 }
 
 void 
-TransportConvection::tick (Treelog&, 
+TransportConvection::tick (Treelog& msg, 
 			   const Soil& soil, const SoilWater& soil_water,
 			   const Adsorption& adsorption, double,
 			   vector<double>& M, 
@@ -171,8 +172,18 @@ TransportConvection::tick (Treelog&,
   // Check mass conservation.
   const double new_total = soil.total (M);
   daisy_assert (approximate (old_total - J[0] * dt + J[size] * dt, new_total));
-  daisy_assert (approximate (- J[0] * dt + J[size] * dt, new_total - old_total,
-			     0.05));
+  if (!approximate (- J[0] * dt + J[size] * dt, new_total - old_total,
+                    0.05))
+    {
+      Treelog::Open nest (msg, name);
+      const double total_S = soil.total (S) * dt;
+      TmpStream tmp;
+      tmp () << "In (" << - J[0] << ") - out (" << J[size] 
+             << " != new (" << new_total 
+             << ") - old (" << (old_total - total_S) 
+             << ") - source (" << total_S << ")";
+      msg.error (tmp.str ());
+    };
 }
 
 static struct TransportConvectionSyntax

@@ -584,14 +584,14 @@ The organic matter in the soil and on the surface.",
 		"The soil nitrification process.");
     AttributeList nitrification_alist;
     nitrification_alist.add ("type", "soil");
-    nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-5/24 [1/h]
+    nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-6/24 [1/h]
     nitrification_alist.add ("k", 5.0e-5); // [g N/cm^3]
     nitrification_alist.add ("active_underground", false);
     nitrification_alist.add ("active_groundwater", false);
     nitrification_alist.add ("heat_factor", PLF::empty ());
     nitrification_alist.add ("water_factor", PLF::empty ());
     nitrification_alist.add ("clay_factor", PLF::empty ());
-    nitrification_alist.add ("N2O_fraction", 0.04);
+    nitrification_alist.add ("N2O_fraction", 0.02);
 
     alist.add ("Nitrification", nitrification_alist);
     syntax.add_submodule ("Denitrification", alist, Syntax::State, "\
