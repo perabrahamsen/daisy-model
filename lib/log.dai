@@ -2095,7 +2095,12 @@ To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (path column "$col" OrganicMatter CO2)
-                     (tag "SMB-CO2") 
+                     (tag "SMB-CO2-total") 
+                     (dimension "kg CO2-C/ha/&")
+	               (when hourly)
+                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
+           (interval (path column "$col" OrganicMatter CO2_fast)
+                     (tag "SMB-CO2-fast") 
                      (dimension "kg CO2-C/ha/&")
 	               (when hourly)
                      (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
