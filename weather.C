@@ -15,6 +15,10 @@ struct Weather::Implementation
   const double T2;
   double Prain;
   double Psnow;
+  const double average;		// Average temperature at bottom [C]
+  const double amplitude;	// Variation in bottom temperature [C]
+  const double omega;		// Period length for above [ rad / day]
+  const double omega_offset;	// Period start for above [rad]
   Implementation (const AttributeList& al)
     : Latitude (al.number ("Latitude")),
       DryDeposit (al.alist ("DryDeposit")),
@@ -22,8 +26,12 @@ struct Weather::Implementation
       T1 (al.number ("T1")),
       T2 (al.number ("T2")),
       Prain (0.0),
-      Psnow (0.0)
-  { }
+      Psnow (0.0),
+      average (al.number ("average")),
+      amplitude (al.number ("amplitude")),
+      omega (al.number ("omega")),
+      omega_offset (al.number ("omega_offset"))
+    { }
 };
 
 double
@@ -115,6 +123,23 @@ void
 Weather::put_reference_evapotranspiration (double)
 { assert (false); }
 
+double
+Weather::average () const
+{ return impl.average; }
+
+double
+Weather::amplitude () const
+{ return impl.amplitude; }
+
+double
+Weather::omega () const
+{ return impl.omega; }
+
+double
+Weather::omega_offset () const
+{ return impl.omega_offset; }
+
+
 void
 Weather::load_syntax (Syntax& syntax, AttributeList& alist)
 {
@@ -150,6 +175,16 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("T2", 2.0);
   syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
+
+  // Yearly average temperatures.
+  syntax.add ("average", Syntax::Number, Syntax::Const);
+  alist.add ("average", 7.8);
+  syntax.add ("amplitude", Syntax::Number, Syntax::Const);
+  alist.add ("amplitude", 8.5);
+  syntax.add ("omega", Syntax::Number, Syntax::Const);
+  alist.add ("omega", 2.0 * M_PI / 365.0);
+  syntax.add ("omega_offset", Syntax::Number, Syntax::Const);
+  alist.add ("omega_offset", -209.0);
 }
 
 Weather::Weather (const AttributeList& al)

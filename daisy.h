@@ -10,7 +10,6 @@
 class Action;
 class Harvest;
 class Weather;
-class Groundwater;
 class Log;
 class Filter;
 class ColumnList;
@@ -26,7 +25,6 @@ public:
   Time time;
   Action& action;
   Weather& weather;
-  Groundwater& groundwater;
   ColumnList& columns;
   vector<const Harvest*>& harvest;
 

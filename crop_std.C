@@ -21,6 +21,8 @@
 #include "harvest.h"
 #include "mathlib.h"
 
+static const double m2_per_cm2 = 0.0001;
+
 class CropStandard : public Crop
 {
   // Content.
@@ -758,7 +760,7 @@ CropStandardSyntax::CropStandardSyntax ()
 
   // ProdPar
   Syntax& Prod = *new Syntax ();
-  syntax.add ("Prod", Prod, Syntax::Const);
+  syntax.add ("Prod", Prod, Syntax::State);
 
   Prod.add ("E_Root", Syntax::Number, Syntax::Const);
   Prod.add ("E_Leaf", Syntax::Number, Syntax::Const);
@@ -1762,14 +1764,16 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   CrpAux.DeadWLeaf = pProd.LfDR (DS) * vProd.WLeaf;
   CrpAux.DeadNLeaf = par.CrpN.NfLeafCnc (DS) * CrpAux.DeadWLeaf;
   CrpAux.IncWLeaf -= CrpAux.DeadWLeaf;
-  vProd.AM_leaf->add (par.Harvest.C_Dead * CrpAux.DeadWLeaf, CrpAux.DeadNLeaf);
+  vProd.AM_leaf->add (par.Harvest.C_Dead * CrpAux.DeadWLeaf * m2_per_cm2,
+		      CrpAux.DeadNLeaf * m2_per_cm2);
 
   // Update dead roots.
   CrpAux.DeadWRoot = pProd.RtDR (DS) * vProd.WRoot;
   CrpAux.DeadNRoot = par.CrpN.DdRootCnc (DS) * CrpAux.DeadWRoot;
   CrpAux.IncWRoot -= CrpAux.DeadWRoot;
   vProd.AM_root->add (geometry, 
-		      par.Harvest.C_Root * CrpAux.DeadWRoot, CrpAux.DeadNRoot,
+		      par.Harvest.C_Root * CrpAux.DeadWRoot * m2_per_cm2,
+		      CrpAux.DeadNRoot * m2_per_cm2,
 		      var.RootSys.Density);
 
   // Update production.
@@ -1980,22 +1984,22 @@ CropStandard::harvest (const string column_name,
       if (stem_harvest < 1.0 && WStem > 0.0)
 	{
 	  AM& am = AM::create (geometry, time, Stem, name, "stem");
-	  am.add (WStem * C_Stem * (1.0 - stem_harvest), 
-		  NStem * (1.0 - stem_harvest));
+	  am.add (WStem * C_Stem * (1.0 - stem_harvest) * m2_per_cm2, 
+		  NStem * (1.0 - stem_harvest) * m2_per_cm2);
 	  organic_matter.add (am);
 	}
       if (leaf_harvest < 1.0 && WLeaf > 0.0)
 	{
 	  AM& am = AM::create (geometry, time, Leaf, name, "leaf");
-	  am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest), 
-		  NLeaf * (1.0 - leaf_harvest));
+	  am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest) * m2_per_cm2, 
+		  NLeaf * (1.0 - leaf_harvest) * m2_per_cm2);
 	  organic_matter.add (am);
 	}
       if (sorg_harvest < 1.0 && WSOrg > 0.0)
 	{
 	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
-	  am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest),
-		  NSOrg * (1.0 - sorg_harvest));
+	  am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
+		  NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
 	  organic_matter.add (am);
 	}
 
@@ -2003,9 +2007,13 @@ CropStandard::harvest (const string column_name,
       if (var.Prod.AM_root)
 	{
 	  if (geometry.total (density) > 0.0)
-	    var.Prod.AM_root->add (geometry, WRoot * C_Root, NRoot, density);
+	    var.Prod.AM_root->add (geometry,
+				   WRoot * C_Root * m2_per_cm2,
+				   NRoot * m2_per_cm2,
+				   density);
 	  else
-	    var.Prod.AM_root->add (WRoot * C_Root, NRoot);
+	    var.Prod.AM_root->add (WRoot * C_Root * m2_per_cm2,
+				   NRoot * m2_per_cm2);
 	  var.Prod.AM_root->unlock ();
 	  var.Prod.AM_root = NULL;
 	}

@@ -73,6 +73,10 @@ void				/* Add element to syntax table. */
 daisy_syntax_add (daisy_syntax* syntax, const char* name,
 		  int cat, int type, int size);
 
+void				/* Add alist type to syntax table. */
+daisy_syntax_add_alist (daisy_syntax* syntax, const char* name,
+			int cat, daisy_syntax* nested, int size);
+
 /* The following functions return "magic" values used by the `cat',
    `type', and `size' arguments to `daisy_syntax_add'.
 
@@ -141,29 +145,37 @@ daisy_alist_get_number (const daisy_alist* alist, const char* name);
 const char*			/* Get char* NAME from ALIST. */
 daisy_alist_get_string (const daisy_alist* alist, const char* name);
 
+
 daisy_bool			/* Get bool NAME from ALIST. */
 daisy_alist_get_flag (const daisy_alist* alist, const char* name);
+
+daisy_time*			/* Get time NAME from ALIST. */
+daisy_alist_get_time (const daisy_alist* alist, const char* name);
 
 const daisy_alist*		/* Get alist NAME from ALIST. */
 daisy_alist_get_alist (const daisy_alist* alist, const char* name);
 
-int				/* Set integer NAME from ALIST to VALUE. */
+void				/* Set integer NAME from ALIST to VALUE. */
 daisy_alist_set_integer (daisy_alist* alist, const char* name,
 			 int value);
 
-double				/* Set double NAME from ALIST to VALUE. */
+void				/* Set double NAME from ALIST to VALUE. */
 daisy_alist_set_number (daisy_alist* alist, const char* name,
 			double value);
 
-const char*			/* Set char* NAME from ALIST to VALUE. */
+void				/* Set char* NAME from ALIST to VALUE. */
 daisy_alist_set_string (daisy_alist* alist, const char* name,
 			const char* value);
 
-daisy_bool			/* Set bool NAME from ALIST to VALUE. */
+void				/* Set bool NAME from ALIST to VALUE. */
 daisy_alist_set_flag (daisy_alist* alist, const char* name,
 		      daisy_bool value);
 
-daisy_alist*			/* Set alist NAME from ALIST to VALUE. */
+void				/* Set time NAME from ALIST to VALUE. */
+daisy_alist_set_time (daisy_alist* alist, const char* name,
+		      daisy_time* value);
+
+void				/* Set alist NAME from ALIST to VALUE. */
 daisy_alist_set_alist (daisy_alist* alist, const char* name,
 		       daisy_alist* value);
 
@@ -172,28 +184,27 @@ daisy_alist_set_alist (daisy_alist* alist, const char* name,
    array will grow automatically if you `set' values outside its upper
    bound. The lower array bound is zero. */
 
+#ifdef UNINPLEMENTED
 unsigned int			/* Size of integer array. */
 daisy_alist_size_integer (const daisy_alist* alist, const char* name);
-
-unsigned int			/* Size of number array. */
-daisy_alist_size_number (const daisy_alist* alist, const char* name);
 
 unsigned int			/* Size of string array. */
 daisy_alist_size_string (const daisy_alist* alist, const char* name);
 
 unsigned int			/* Size of flag array. */
 daisy_alist_size_flag (const daisy_alist* alist, const char* name);
+#endif
+
+unsigned int			/* Size of number array. */
+daisy_alist_size_number (const daisy_alist* alist, const char* name);
 
 unsigned int			/* Size of alist array. */
 daisy_alist_size_alist (const daisy_alist* alist, const char* name);
 
+#ifdef UNINPLEMENTED
 unsigned int			/* Get integer NAME[INDEX] from ALIST. */
 daisy_alist_get_integer_at (const daisy_alist* alist, const char* name,
 			    unsigned int index);
-
-double				/* Get double NAME[INDEX] from ALIST. */
-daisy_alist_get_number_at (const daisy_alist* alist, const char* name,
-			   unsigned int index);
 
 const char*			/* Get char* NAME[INDEX] from ALIST. */
 daisy_alist_get_string_at (const daisy_alist* alist, const char* name,
@@ -202,28 +213,35 @@ daisy_alist_get_string_at (const daisy_alist* alist, const char* name,
 daisy_bool			/* Get bool NAME[INDEX] from ALIST. */
 daisy_alist_get_flag_at (const daisy_alist* alist, const char* name,
 			 unsigned int index);
+#endif
+
+double				/* Get double NAME[INDEX] from ALIST. */
+daisy_alist_get_number_at (const daisy_alist* alist, const char* name,
+			   unsigned int index);
 
 daisy_alist*			/* Get alist NAME[INDEX] from ALIST. */
 daisy_alist_get_alist_at (const daisy_alist* alist, const char* name,
 			  unsigned int index);
 
-int		    	/* Set integer NAME[INDEX] from ALIST to VALUE. */
+#ifdef UNINPLEMENTED
+void		    	/* Set integer NAME[INDEX] from ALIST to VALUE. */
 daisy_alist_set_integer_at (daisy_alist* alist, const char* name,
 			    int value, unsigned int index);
 
-double			/* Set double NAME[INDEX] from ALIST to VALUE. */
-daisy_alist_set_number_at (daisy_alist* alist, const char* name,
-			   double value, unsigned int index);
-
-const char*		/* Set char* NAME[INDEX] from ALIST to VALUE. */
+void			/* Set char* NAME[INDEX] from ALIST to VALUE. */
 daisy_alist_set_string_at (daisy_alist* alist, const char* name,
 			   const char* value, unsigned int index);
 
-daisy_bool		/* Set bool NAME[INDEX] from ALIST to VALUE. */
+void			/* Set bool NAME[INDEX] from ALIST to VALUE. */
 daisy_alist_set_flag_at (daisy_alist* alist, const char* name,
 			 daisy_bool value, unsigned int index);
+#endif
 
-daisy_alist*		/* Set alist NAME[INDEX] from ALIST to VALUE. */
+void			/* Set double NAME[INDEX] from ALIST to VALUE. */
+daisy_alist_set_number_at (daisy_alist* alist, const char* name,
+			   double value, unsigned int index);
+
+void			/* Set alist NAME[INDEX] from ALIST to VALUE. */
 daisy_alist_set_alist_at (daisy_alist* alist, const char* name,
 			  daisy_alist* value, unsigned int index);
 
@@ -307,9 +325,9 @@ daisy_daisy_check (const daisy_daisy* daisy, const daisy_syntax* syntax);
  * There are three basic ways to run the simulation.  Run the entire
  * simulation to end, run a the entire simulation for a single time
  * step, or manually run each component of the simulation.  Running
- * the `action', `weather', `groundwater', `columns', `logs', and
- * `time' tick functions in that sequence is equivalent to running the
- * main daisy `tick' function.  
+ * the `action', `weather', `columns', `logs', and `time' tick
+ * functions in that sequence is equivalent to running the  main daisy
+ * `tick' function.   
  */
 
 void				/* Run the Daisy simulation to the end. */
@@ -326,9 +344,6 @@ daisy_daisy_tick_action (daisy_daisy* daisy);
 
 void				/* Run weather a single time step. */
 daisy_daisy_tick_weather (daisy_daisy* daisy);
-
-void				/* Run groundwater a single time step. */
-daisy_daisy_tick_groundwater (daisy_daisy* daisy);
 
 void				/* Run all columns a single time step. */
 daisy_daisy_tick_columns (daisy_daisy* daisy);
@@ -373,6 +388,12 @@ daisy_daisy_remove_column (daisy_daisy* daisy, daisy_column* column);
  *
  * The time type keeps track of time in the simulation.
  */
+
+daisy_time*			/* Create an initialized time object. */
+daisy_time_create (int year, int month, int mday, int hour);
+
+void				/* Delete time object. */
+daisy_time_delete (daisy_time* time);
 
 int				/* Hour of day, starting with 0. */
 daisy_time_get_hour (const daisy_time* time);

@@ -11,7 +11,6 @@
 #include "weather.h"
 #include "common.h"
 #include "action.h"
-#include "groundwater.h"
 #include "horizon.h"
 
 #include <fstream.h>
@@ -37,6 +36,11 @@ extern "C" void EXPORT
 daisy_syntax_add (Syntax* syntax, const char* name,
 		  Syntax::category cat, Syntax::type type, int size)
 { syntax->add (name, type, cat, size); }
+
+extern "C" void EXPORT
+daisy_syntax_add_alist (Syntax* syntax, const char* name,
+			Syntax::category cat, Syntax* nested, int size)
+{ syntax->add (name, *nested, cat, size); }
 
 extern "C" int EXPORT
 daisy_category_number (const char* name)
@@ -112,6 +116,12 @@ daisy_alist_get_flag (const AttributeList* alist, const char* name)
   return alist->flag (name);
 }
 
+extern "C" const Time* EXPORT
+daisy_alist_get_time (const AttributeList* alist, const char* name)
+{
+  return &alist->time(name);
+}
+
 extern "C" const AttributeList* EXPORT
 daisy_alist_get_alist (const AttributeList* alist, const char* name)
 { 
@@ -143,7 +153,14 @@ extern "C" void EXPORT
 daisy_alist_set_flag (AttributeList* alist, const char* name,
 		      daisy_bool value)
 { 
-  alist->add (name, value);
+  alist->add (name, bool (value));
+}
+
+extern "C" void EXPORT
+daisy_alist_set_time (AttributeList* alist, const char* name,
+		      Time* value)
+{
+  alist->add (name, *value);
 }
 
 extern "C" void EXPORT
@@ -153,13 +170,10 @@ daisy_alist_set_alist (AttributeList* alist, const char* name,
   alist->add (name, *value);
 }
 
+#ifdef UNINPLEMENTED
 extern "C" unsigned int EXPORT
 daisy_alist_size_integer (const AttributeList* alist, const char* name)
 { return alist->integer_sequence (name).size (); }
-
-extern "C" unsigned int EXPORT
-daisy_alist_size_number (const AttributeList* alist, const char* name)
-{ return alist->number_sequence (name).size (); }
 
 extern "C" unsigned int EXPORT
 daisy_alist_size_string (const AttributeList* alist, const char* name)
@@ -168,20 +182,21 @@ daisy_alist_size_string (const AttributeList* alist, const char* name)
 extern "C" unsigned int EXPORT
 daisy_alist_size_flag (const AttributeList* alist, const char* name)
 { return alist->flag_sequence (name).size (); }
+#endif
+
+extern "C" unsigned int EXPORT
+daisy_alist_size_number (const AttributeList* alist, const char* name)
+{ return alist->number_sequence (name).size (); }
 
 extern "C" unsigned int EXPORT
 daisy_alist_size_alist (const AttributeList* alist, const char* name)
 { return alist->alist_sequence (name).size (); }
 
+#ifdef UNINPLEMENTED
 extern "C" int EXPORT
 daisy_alist_get_integer_at (const AttributeList* alist, const char* name,
 			    unsigned int index)
 { return alist->integer_sequence (name)[index]; }
-
-extern "C" double EXPORT
-daisy_alist_get_number_at (const AttributeList* alist, const char* name,
-			    unsigned int index)
-{ return alist->number_sequence (name)[index]; }
 
 extern "C" const char* EXPORT
 daisy_alist_get_string_at (const AttributeList* alist, const char* name,
@@ -192,34 +207,26 @@ extern "C" daisy_bool EXPORT
 daisy_alist_get_flag_at (const AttributeList* alist, const char* name,
 			    unsigned int index)
 { return alist->flag_sequence (name)[index]; }
+#endif
+
+extern "C" double EXPORT
+daisy_alist_get_number_at (const AttributeList* alist, const char* name,
+			    unsigned int index)
+{ return alist->number_sequence (name)[index]; }
 
 extern "C" AttributeList* EXPORT
 daisy_alist_get_alist_at (const AttributeList* alist, const char* name,
 			  unsigned int index)
 { return alist->alist_sequence (name)[index]; }
 
+#ifdef UNINPLEMENTED
 extern "C" void EXPORT
 daisy_alist_set_integer_at (AttributeList* alist, const char* name,
 			    int value, unsigned int index)
 { 
-  vector<int> v = alist->check (name)
-    ? alist->integer_sequence (name)
+  vector<int>& v = alist->check (name)
+    ? *new vector<int> (alist->integer_sequence (name))
     : *new vector<int>;
-  if (v.size () < index)
-    while (v.size () < index)
-      v.push_back (value);
-  else
-    v[index] = value;
-  alist->add (name, v);
-}
-
-extern "C" void EXPORT
-daisy_alist_set_number_at (AttributeList* alist, const char* name,
-			   double value, unsigned int index)
-{
-  vector<double> v = alist->check (name)
-    ? alist->number_sequence (name)
-    : *new vector<double>;
   if (v.size () < index)
     while (v.size () < index)
       v.push_back (value);
@@ -232,8 +239,8 @@ extern "C" void EXPORT
 daisy_alist_set_string_at (AttributeList* alist, const char* name,
 			   const char* value, unsigned int index)
 {
-  vector<string> v = alist->check (name)
-    ? alist->name_sequence (name)
+  vector<string>& v = alist->check (name)
+    ? *new vector<string> (alist->name_sequence (name))
     : *new vector<string>;
   if (v.size () < index)
     while (v.size () < index)
@@ -247,9 +254,25 @@ extern "C" void EXPORT
 daisy_alist_set_flag_at (AttributeList* alist, const char* name,
 			 daisy_bool value, unsigned int index)
 { 
-  vector<bool> v = alist->check (name)
-    ? alist->flag_sequence (name)
+  vector<bool>& v = alist->check (name)
+    ? *new vector<bool> (alist->flag_sequence (name))
     : *new vector<bool>;
+  if (v.size () < index)
+    while (v.size () < index)
+      v.push_back (value);
+  else
+    v[index] = value;
+  alist->add (name, v);
+}
+#endif
+
+extern "C" void EXPORT
+daisy_alist_set_number_at (AttributeList* alist, const char* name,
+			   double value, unsigned int index)
+{
+  vector<double>& v= alist->check (name)
+    ? *new vector<double> (alist->number_sequence (name))
+    : *new vector<double>;
   if (v.size () < index)
     while (v.size () < index)
       v.push_back (value);
@@ -262,11 +285,11 @@ extern "C" void EXPORT
 daisy_alist_set_alist_at (AttributeList* alist, const char* name,
 			  AttributeList* value, unsigned int index)
 { 
-  vector<AttributeList*> v = alist->check (name)
-    ? alist->alist_sequence (name)
+  vector<AttributeList*>& v = alist->check (name)
+    ? *new vector<AttributeList*> (alist->alist_sequence (name))
     : *new vector<AttributeList*>;
-  if (v.size () < index)
-    while (v.size () < index)
+  if (v.size () <= index)
+    while (v.size () <= index)
       v.push_back (value);
   else
     {
@@ -335,6 +358,10 @@ daisy_library_derive (Library* library,
     Librarian<Horizon>::derive_type (name, *alist, super);
   else if (library == &Librarian<Column>::library ())
     Librarian<Column>::derive_type (name, *alist, super);
+  else if (library == &Action::library ())
+    Action::derive_type (name, *alist, super);
+  else if (library == &Librarian<Weather>::library ())
+    Librarian<Weather>::derive_type (name, *alist, super);
   else 
     abort ();
 }
@@ -438,10 +465,6 @@ daisy_daisy_tick_weather (Daisy* daisy)
 { daisy->weather.tick (daisy->time); }
 
 extern "C" void EXPORT
-daisy_daisy_tick_groundwater (Daisy* daisy)
-{ daisy->groundwater.tick (daisy->time); }
-
-extern "C" void EXPORT
 daisy_daisy_tick_columns (Daisy* daisy)
 {
   daisy->tick_columns ();
@@ -451,8 +474,7 @@ extern "C" void EXPORT
 daisy_daisy_tick_column (Daisy* daisy, int col)
 { 
   daisy->columns[col]->tick (daisy->time, 
-			     daisy->weather,
-			     daisy->groundwater); 
+			     daisy->weather); 
 }
 
 extern "C" void EXPORT
@@ -462,9 +484,6 @@ daisy_daisy_tick_logs (Daisy* daisy)
 extern "C" void EXPORT		// Run time a single time step.
 daisy_daisy_tick_time (Daisy* daisy)
 { daisy->time.tick_hour (); }
-
-extern "C" daisy_bool EXPORT	// Check if simulation is still active.
-daisy_daisy_is_running (Daisy* daisy);
 
 // @@ Manipulating the simulation.
 
@@ -491,6 +510,14 @@ extern "C" void EXPORT
 daisy_daisy_remove_column (Daisy* daisy, Column* column);
 
 // @ The daisy_time Type.
+
+extern "C" Time* EXPORT
+daisy_time_create (int year, int month, int mday, int hour)
+{ return new Time (year, month, mday, hour); }
+
+extern "C" void EXPORT 
+daisy_time_delete (Time* time)
+{ delete time; }
 
 extern "C" int EXPORT
 daisy_time_get_hour (Time* time)

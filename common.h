@@ -47,6 +47,9 @@
 #include <unistd.h>
 #include <strstream.h>
 
+// GNU doesn't mind unused global constants.
+#define GLOBAL_CONSTANT
+
 #else
 
 // WIN32 DLL keywords.
@@ -63,6 +66,9 @@
 #include <io.h>
 // Borland C++ 5.01 doesn't spell stream with an m.
 #include <strstrea.h>
+
+// Borland complains about unused global constants unless "extern".
+#define GLOBAL_CONSTANT extern
 
 #endif
 
@@ -91,7 +97,7 @@ using namespace std;
 
 // Shared code.
 
-const double dt = 1.0;	// time step.
+GLOBAL_CONSTANT const double dt = 1.0;	// time step.
 
 // From Mumit's STL newbie guide.
 template <class ForwardIterator>

@@ -11,7 +11,7 @@ struct Time::Implementation
   short year;
   short yday;
   char hour;  
-  Implementation (short, short, char);
+  Implementation (int, int, int);
   Implementation (const Implementation&);
 };
 
@@ -22,8 +22,8 @@ string Time::Implementation::mname[] =
 { "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November" , "December" };
 
-Time::Implementation::Implementation (short y, short d, char h)
-  : year (y), yday (d), hour (h)
+Time::Implementation::Implementation (int y, int d, int h)
+  : year (short (y)), yday (short (d)), hour (char (h))
 { }
 
 Time::Implementation::Implementation (const Implementation& i)

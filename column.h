@@ -10,7 +10,6 @@ class Filter;
 class Time;
 class Log;
 class Weather;
-class Groundwater;
 class AttributeList;
 class Syntax;
 class OrganicMatter;
@@ -49,7 +48,7 @@ public:
   virtual double soil_water_potential (double height) = 0; // [cm -> cm]
   
   // Simulation.
-  virtual void tick (const Time&, const Weather&, Groundwater&) = 0;
+  virtual void tick (const Time&, const Weather&) = 0;
 
   virtual bool check () const = 0;
   virtual bool check_am (const AttributeList& am) const = 0;
@@ -60,8 +59,8 @@ protected:
   Column (const string& name);
 public:
   virtual Column& clone (const string& name) const = 0;
-  virtual void initialize (const AttributeList& al,
-			   const Time& time, const Groundwater&) = 0;
+  virtual void initialize (const AttributeList&, const Time&, 
+			   const Weather&) = 0;
 
   virtual ~Column ();
 };

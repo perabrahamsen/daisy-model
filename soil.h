@@ -36,7 +36,7 @@ public:
   { return horizon_[i]->hydraulic.M (h); }
   inline bool compact (int i) const
   { return horizon_[i]->hydraulic.compact (); }
-  inline double dispersivity (int i) const
+  inline double dispersivity (int) const
   { return dispersivity_; }
   
   // Texture.

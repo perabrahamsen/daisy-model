@@ -126,7 +126,7 @@ ParserFile::Implementation::get_string ()
       string str ("");
       do
 	{
-	  str += c;
+	  str += char (c);
 	  get ();
 	  c = peek ();
 	}

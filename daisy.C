@@ -27,14 +27,13 @@ Daisy::Daisy (const AttributeList& al)
     time (al.time ("time")),
     action (Action::create (al.alist ("manager"), NULL)),
     weather (Librarian<Weather>::create (al.alist ("weather"))), 
-    groundwater (Librarian<Groundwater>::create (al.alist ("groundwater"))), 
     columns (*new ColumnList (al.alist_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
 { 
   const vector<AttributeList*>& column_alists = al.alist_sequence ("column");
   
   for (unsigned int i = 0; i < columns.size (); i++)
-    columns[i]->initialize (*column_alists[i], time, groundwater);
+    columns[i]->initialize (*column_alists[i], time, weather);
 }
 
 bool
@@ -89,7 +88,7 @@ void
 Daisy::tick_columns ()
 {
   for (unsigned int i = 0; i < columns.size (); i++)
-    columns[i]->tick (time, weather, groundwater);
+    columns[i]->tick (time, weather);
 }
 
 void
@@ -101,7 +100,6 @@ Daisy::tick_logs ()
       Filter& filter = log.match (*this);
       log.output ("time", filter, time);
       output_derived (weather, "weather", log, filter);
-      groundwater.output (log, filter);
       output_list (columns, "column", log, filter);
       output_vector (harvest, "harvest", log, filter);
     }
@@ -113,7 +111,6 @@ Daisy::tick ()
   action.doIt (*this);
 
   weather.tick (time);
-  groundwater.tick (time);
   tick_columns ();
   tick_logs ();
   time.tick_hour ();
@@ -168,8 +165,6 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 	      Librarian<Column>::library (), 
 	      Syntax::State, Syntax::Sequence);
   syntax.add ("weather", Librarian<Weather>::library ());
-  syntax.add ("groundwater", Librarian<Groundwater>::library (), 
-	      Syntax::Const);
   add_submodule<Harvest> ("harvest", syntax, alist,
 			  Syntax::LogOnly, Syntax::Sequence);
 }
@@ -180,7 +175,6 @@ Daisy::~Daisy ()
   delete &logs;
   delete &action;
   delete &weather;
-  delete &groundwater;
 #if 0
   delete &columns;
 #endif

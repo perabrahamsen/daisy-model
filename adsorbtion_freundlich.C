@@ -45,7 +45,7 @@ AdsorbtionFreundlich::M_to_C (const Soil& soil,
   // Find upper boundary by doubling repeatedly.
   while (max_M < M)
     {
-      max_M *= 2;
+      max_C *= 2;
       max_M = C_to_M (soil, Theta, i, max_C);
     }
 

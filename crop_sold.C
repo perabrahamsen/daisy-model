@@ -1835,28 +1835,34 @@ CropSold::harvest (const string column_name,
 
   var.Phenology.DS = DSremove;
 
+  const double m2_per_cm2 = 0.0001;
+
   // Add crop remains to the soil.
   if (leaf_harvest < 1.0 && WLeaf > 0.0)
     {
       AM& am = AM::create (geometry, time, Leaf, name, "leaf");
-      am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest), 
-	      NLeaf * (1.0 - leaf_harvest));
+      am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest) * m2_per_cm2, 
+	      NLeaf * (1.0 - leaf_harvest) * m2_per_cm2);
       organic_matter.add (am);
     }
   if (sorg_harvest < 1.0 && WSOrg > 0.0)
     {
       AM& am = AM::create (geometry, time, SOrg, name, "sorg");
-      am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest),
-	      NSOrg * (1.0 - sorg_harvest));
+      am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
+	      NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
       organic_matter.add (am);
     }
   if (WRoot > 0.0)
     {
       AM& am = AM::create (geometry, time, Root, name, "root");
       if (geometry.total (density) > 0.0)
-	am.add (geometry, WRoot * C_Root, NRoot, density);
+	am.add (geometry,
+		WRoot * C_Root * m2_per_cm2,
+		NRoot * m2_per_cm2,
+		density);
       else
-	am.add (WRoot * C_Root, NRoot);
+	am.add (WRoot * C_Root * m2_per_cm2,
+		NRoot * m2_per_cm2);
       organic_matter.add (am);
     }
   return *new Harvest (column_name, time, name, 

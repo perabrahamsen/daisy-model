@@ -4,6 +4,7 @@
 #include "alist.h"
 #include "surface.h"
 #include "groundwater.h"
+#include "weather.h"
 #include "soil_water.h"
 #include "soil.h"
 #include "syntax.h"
@@ -17,29 +18,20 @@ struct SoilHeat::Implementation
   vector<double> T;
   double T_top;
 
-  // BUG:  These should move to groundwater module.
-  // Parameters.
-  const double average;		// Average temperature at bottom [C]
-  const double amplitude;	// Variation in bottom temperature [C]
-  const double omega;		// Period length for above [ rad / day]
-  const double omega_offset;	// Period start for above [rad]
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
-
-  // Calculate season delay [C/cm] at pF 2.
-  static double calculate_delay (const Soil& soil, double omega);
 
   // Simulation.
   void tick (const Time&, const Soil&, const SoilWater&, 
-	     const Surface&, const Groundwater&);
+	     const Surface&, const Groundwater&, const Weather&);
   double energy (const Soil&, const SoilWater&, double from, double to) const;
   void set_energy (const Soil&, const SoilWater&, 
 		   double from, double to, double energy);
-  double bottom (const Time&, const double depth) const;
+  double bottom (const Time&, const Weather& weather) const;
 
   // Create & Destroy.
   bool check (unsigned n) const;
   void initialize (const AttributeList& al, 
-		   const Soil& soil, const Time& time);
+		   const Soil& soil, const Time& time, const Weather& weather);
   Implementation (const AttributeList&);
 };
 
@@ -48,7 +40,8 @@ SoilHeat::Implementation::tick (const Time& time,
 				const Soil& soil,
 				const SoilWater& soil_water,
 				const Surface& surface,
-				const Groundwater& groundwater)
+				const Groundwater& groundwater,
+				const Weather& weather)
 {
 #ifdef WATER_FLUX_HEAT
   const double water_heat_capacity = 4.2; // [J/cm³/K]
@@ -56,7 +49,7 @@ SoilHeat::Implementation::tick (const Time& time,
 
   // Border conditions.
   const double T_bottom = bottom (time, // BUGLET: Should be time - 1 hour.
-				  -soil.zplus (soil.size () - 1));
+				  weather);
   const double T_top_new = surface.temperature ();
   
   if (T_top < -400.0)
@@ -218,36 +211,20 @@ SoilHeat::Implementation::set_energy (const Soil& soil,
     }
 }
 
-double
-SoilHeat::Implementation::calculate_delay (const Soil& soil, double omega)
-{
-  // BUG: When this is calculated it gives an average delay for the
-  // whole profile.  The numbers are thus only correct at the bottom
-  // of the profile.
-
-  const double pF_2_0 = -100.0;
-  double k = 0;
-  double C = 0;
-  
-  for (unsigned int i = 0; i < soil.size (); i++)
-    {
-      const double Theta_pF_2_0 = soil.Theta (i, pF_2_0);
-      k += soil.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0);
-      C += soil.dz (i) * soil.heat_capacity (i, Theta_pF_2_0);
-    }
-  const double a = k / C;
-  return sqrt (24.0 * 2.0 * a / omega);
-}
-
 double 
-SoilHeat::Implementation::bottom (const Time& time, double depth) const 
+SoilHeat::Implementation::bottom (const Time& time, 
+				  const Weather& weather) const 
 {
+  // Fetch average temperatur.
+  const double average = weather.average ();
+  const double amplitude = weather.amplitude (); 
+  const double omega = weather.omega (); 
+  const double omega_offset = weather.omega_offset (); 
+
   return average 
     + amplitude 
-    * exp (-depth / delay)
-    * cos (omega * time.yday () 
-	   + omega_offset 
-	   - depth / delay);
+    * exp (delay)
+    * cos (omega * time.yday () + omega_offset + delay);
 }
 
 bool
@@ -264,23 +241,38 @@ SoilHeat::Implementation::check (unsigned n) const
 }
 
 SoilHeat::Implementation::Implementation (const AttributeList& al)
-  : T_top (al.number ("T_top")),
-    average (al.number ("average")),
-    amplitude (al.number ("amplitude")),
-    omega (al.number ("omega")),
-    omega_offset (al.number ("omega_offset"))
+  : T_top (al.number ("T_top"))
 { }
 
 void
 SoilHeat::Implementation::initialize (const AttributeList& al, 
-				      const Soil& soil, const Time& time)
+				      const Soil& soil, 
+				      const Time& time, 
+				      const Weather& weather)
 {
-  delay  = calculate_delay (soil, omega);
-  soil.initialize_layer (T, al, "T");
-  // Fill out with T calculated numbers if necessary.
-  for (unsigned int i = T.size (); i < soil.size (); i++)
-    T.push_back (bottom (time, -soil.zplus (i)));
+  // Fetch average temperatur.
+  const double omega = weather.omega (); 
 
+  // Fetch initial T.
+  soil.initialize_layer (T, al, "T");
+
+  // Calculate delay.
+  const double pF_2_0 = -100.0;
+  double k = 0;
+  double C = 0;
+  
+  for (unsigned int i = 0; i < soil.size (); i++)
+    {
+      const double Theta_pF_2_0 = soil.Theta (i, pF_2_0);
+      k += soil.dz (i) * soil.heat_conductivity (i, Theta_pF_2_0);
+      C += soil.dz (i) * soil.heat_capacity (i, Theta_pF_2_0);
+      const double a = k / C;
+      delay = soil.zplus (i) / sqrt (24.0 * 2.0 * a / omega);
+
+      // Fill out T if necessary.
+      if (T.size () <= i)
+	T.push_back (bottom (time, weather));
+    }
   assert (T.size () == soil.size ());
 }
 
@@ -290,9 +282,10 @@ SoilHeat::tick (const Time& time,
 		const Soil& soil,
 		const SoilWater& soil_water,
 		const Surface& surface,
-		const Groundwater& groundwater)
+		const Groundwater& groundwater,
+		const Weather& weather)
 {
-  impl.tick (time, soil, soil_water, surface, groundwater);
+  impl.tick (time, soil, soil_water, surface, groundwater, weather);
 }
 
 double 
@@ -345,14 +338,6 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
   Geometry::add_layer (syntax, "T");
   syntax.add ("T_top", Syntax::Number, Syntax::State);
   alist.add ("T_top", -500.0);	// Use surface temperature.
-  syntax.add ("average", Syntax::Number, Syntax::Const);
-  alist.add ("average", 7.8);
-  syntax.add ("amplitude", Syntax::Number, Syntax::Const);
-  alist.add ("amplitude", 8.5);
-  syntax.add ("omega", Syntax::Number, Syntax::Const);
-  alist.add ("omega", 2.0 * M_PI / 365.0);
-  syntax.add ("omega_offset", Syntax::Number, Syntax::Const);
-  alist.add ("omega_offset", -209.0);
 }
 
 SoilHeat::SoilHeat (const AttributeList& al)
@@ -362,8 +347,9 @@ SoilHeat::SoilHeat (const AttributeList& al)
 
 void
 SoilHeat::initialize (const AttributeList& al, 
-		      const Soil& soil, const Time& time)
-{ impl.initialize (al, soil, time); }
+		      const Soil& soil, const Time& time, 
+		      const Weather& weather)
+{ impl.initialize (al, soil, time, weather); }
 
 SoilHeat::~SoilHeat ()
 {

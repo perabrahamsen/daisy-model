@@ -9,10 +9,10 @@ struct Hydraulic;
 struct Tortuosity;
 
 // Weigth of mineral particles. [g / cm³]
-const double rho_mineral = 2.65;	
+GLOBAL_CONSTANT const double rho_mineral = 2.65;	
 // Weight of humus. [g / cm³]
-const double rho_humus = 1.3; 
-const double c_fraction_in_humus = 0.587;
+GLOBAL_CONSTANT const double rho_humus = 1.3; 
+GLOBAL_CONSTANT const double c_fraction_in_humus = 0.587;
 
 class Horizon 
 {

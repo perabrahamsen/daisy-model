@@ -83,6 +83,7 @@ public:
   void add (const string&, AttributeList&);
   void add (const string&, const CSMP&);
   void add (const string&, const Time&);
+#if 1
   void add (const string&, const vector<double>&);
   void add (const string&, const vector<string>&);
   void add (const string&, const vector<bool>&);
@@ -90,7 +91,7 @@ public:
   void add (const string&, const vector<AttributeList*>&);
   void add (const string&, const vector<const CSMP*>&);
   void add (const string&, const vector<const Time*>&);
-
+#endif
   void operator += (const AttributeList&);
   AttributeList (const AttributeList& old);
   AttributeList ();

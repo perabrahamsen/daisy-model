@@ -90,7 +90,7 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-	COMPILE = /pack/egcs/bin/c++ -Wall -fno-exceptions -DEGCS -g -pipe -frepo
+	COMPILE = /pack/egcs/bin/c++ -W -Wall -fno-exceptions -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 
 endif
@@ -183,7 +183,8 @@ INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
 	soil_NH4.C soil_NO3.C organic_matter.C nitrification.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
 	am.C im.C om.C harvest.C options.C geometry.C transport.C \
-	librarian.C cdaisy.C adsorbtion.C tortuosity.C
+	librarian.C cdaisy.C adsorbtion.C tortuosity.C event.C eventqueue.C \
+	minimanager.C
 
 # Select the C files that are not part of the library.
 #
@@ -224,10 +225,15 @@ all:	$(EXECUTABLES)
 daisy${EXT}:	main${OBJ} $(FORLIB) $(LIBOBJ)
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
-# Create the main executable.
+# Create manager test executable.
 #
 mandaisy${EXT}:	manmain${OBJ} $(FORLIB) $(LIBOBJ)
 	$(LINK)mandaisy $(CRTLIB) $^ $(MATHLIB)
+
+# Create bug test executable.
+#
+bugdaisy${EXT}:	bugmain${OBJ} $(FORLIB) $(LIBOBJ)
+	$(LINK)bugdaisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create executable with embedded tcl/tk.
 #
@@ -286,7 +292,8 @@ dump:	daisy
 
 # Various test targets.
 #
-test:	crop-test water-test evapo-test
+xtest:	test/test.dai daisy
+	(cd test; ../daisy test.dai)
 
 bless:
 	(cd test; make bless )
@@ -317,20 +324,20 @@ depend: $(SOURCES)
 	rm -f Makefile.old
 	mv Makefile Makefile.old
 	sed -e '/^# AUTOMATIC/q' < Makefile.old > Makefile
-	c++ -I. $(TKINCLUDE) -MM $(SOURCES) \
+	/pack/egcs/bin/c++ -DEGCS -I. $(TKINCLUDE) -MM $(SOURCES) \
 		| sed -e 's/\.o:/$${OBJ}:/' >> Makefile
 
 # Create a ZIP file with all the sources.
 #
-daisy.zip:	$(TEXT)
-	rm -f daisy.zip
-	zip daisy.zip $(TEXT) daisy.ide
+daisy-src.zip:	$(TEXT)
+	rm -f daisy-src.zip
+	zip daisy-src.zip $(TEXT) daisy.ide
 
 # Move it to ftp.
 #
 dist:	cvs
-	$(MAKE) daisy.zip
-	mv -f daisy.zip $(HOME)/.public_ftp/daisy/
+	$(MAKE) daisy-src.zip
+	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy/
 
 # Update the CVS repository.
 #
@@ -392,8 +399,8 @@ column_std${OBJ}: column_std.C column.h librarian.h library.h common.h \
  alist.h syntax.h crop.h bioclimate.h surface.h uzmodel.h im.h soil.h \
  horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
  soil_heat.h soil_NH4.h solute.h adsorbtion.h soil_NO3.h \
- organic_matter.h nitrification.h denitrification.h log.h filter.h \
- am.h
+ organic_matter.h nitrification.h denitrification.h groundwater.h \
+ log.h filter.h am.h
 weather_simple${OBJ}: weather_simple.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h log.h filter.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h common.h \
@@ -507,6 +514,8 @@ adsorbtion_linear${OBJ}: adsorbtion_linear.C adsorbtion.h librarian.h \
 adsorbtion_langmuir${OBJ}: adsorbtion_langmuir.C adsorbtion.h librarian.h \
  library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
  tortuosity.h geometry.h mathlib.h
+filter_checkpoint${OBJ}: filter_checkpoint.C filter.h librarian.h \
+ library.h common.h alist.h syntax.h
 daisy${OBJ}: daisy.C daisy.h common.h weather.h librarian.h library.h \
  alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h log.h \
  filter.h parser.h am.h nitrification.h hydraulic.h crop.h column.h \
@@ -571,7 +580,7 @@ denitrification${OBJ}: denitrification.C denitrification.h common.h \
  soil_NO3.h solute.h adsorbtion.h groundwater.h uzmodel.h csmp.h log.h \
  filter.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h common.h surface.h \
- uzmodel.h librarian.h library.h syntax.h im.h groundwater.h \
+ uzmodel.h librarian.h library.h syntax.h im.h groundwater.h weather.h \
  soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  mathlib.h log.h filter.h
 groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h \
@@ -598,11 +607,18 @@ librarian${OBJ}: librarian.C librarian.h library.h common.h alist.h \
  syntax.h
 cdaisy${OBJ}: cdaisy.C syntax.h common.h alist.h daisy.h parser_file.h \
  parser.h column.h librarian.h library.h weather.h im.h action.h \
- groundwater.h uzmodel.h horizon.h
+ horizon.h
 adsorbtion${OBJ}: adsorbtion.C adsorbtion.h librarian.h library.h common.h \
  alist.h syntax.h
 tortuosity${OBJ}: tortuosity.C tortuosity.h librarian.h library.h common.h \
  alist.h syntax.h
+event${OBJ}: event.C alist.h common.h event.h am.h library.h eventqueue.h \
+ minimanager.h action.h column.h librarian.h syntax.h im.h daisy.h \
+ weather.h crop.h
+eventqueue${OBJ}: eventqueue.C common.h event.h alist.h am.h library.h \
+ eventqueue.h daisy.h
+minimanager${OBJ}: minimanager.C syntax.h common.h minimanager.h action.h \
+ event.h alist.h am.h library.h eventqueue.h
 set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h common.h parser_file.h parser.h syntax.h \
  alist.h version.h

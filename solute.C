@@ -61,9 +61,12 @@ Solute::output (Log& log, Filter& filter) const
 }
 
 void 
-Solute::load_syntax (Syntax& syntax, AttributeList&)
+Solute::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("transport", Librarian<Transport>::library (), Syntax::State);
+  AttributeList& cd = *new AttributeList ();
+  cd.add ("type", "cd");
+  alist.add ("transport", cd);
   syntax.add ("adsorbtion", Librarian<Adsorbtion>::library (), Syntax::Const);
   Geometry::add_layer (syntax, "C");
   Geometry::add_layer (syntax, "M");

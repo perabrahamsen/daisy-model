@@ -16,7 +16,7 @@ public:
   Filter& lookup (string key) const;
   void add (string key, Filter& filter);
 
-  bool accumulating ()
+  bool accumulating () const
   { return accumulating_; }
 
   // Create and Destroy.

@@ -12,6 +12,7 @@
 #include "organic_matter.h"
 #include "nitrification.h"
 #include "denitrification.h"
+#include "groundwater.h"
 #include "alist.h"
 #include "syntax.h"
 #include "library.h"
@@ -20,8 +21,6 @@
 #include "crop.h"
 #include "im.h"
 #include "am.h"
-// Not in BCC 5.01
-// #include <algo.h>
 
 class Groundwater;
 
@@ -40,6 +39,7 @@ private:
   OrganicMatter organic_matter;
   Nitrification& nitrification;
   Denitrification denitrification;
+  Groundwater& groundwater;
 
   // Actions.
 public:
@@ -64,7 +64,7 @@ public:
 
   // Simulation.
 public:
-  void tick (const Time&, const Weather&, Groundwater&);
+  void tick (const Time&, const Weather&);
 
   bool check () const;
   static bool check (const AttributeList&);
@@ -79,8 +79,8 @@ public:
 
   ColumnStandard (const AttributeList&);
   ColumnStandard (const ColumnStandard& column, const string& name);
-  void initialize (const AttributeList& al, 
-		   const Time& time, const Groundwater&);
+  void initialize (const AttributeList& al, const Time& time, 
+		   const Weather& weather);
   ~ColumnStandard ();
 };
 
@@ -259,8 +259,7 @@ ColumnStandard::check (const AttributeList& al)
 }
 
 void
-ColumnStandard::tick (const Time& time, 
-		      const Weather& weather, Groundwater& groundwater)
+ColumnStandard::tick (const Time& time, const Weather& weather)
 {
   // Remove old source sink terms. 
   soil_water.clear (soil);
@@ -280,10 +279,11 @@ ColumnStandard::tick (const Time& time,
 		      groundwater);
   denitrification.tick (soil, soil_water, soil_heat, soil_NO3, 
 			organic_matter, groundwater);
+  groundwater.tick (time);
 
   // Transport.
   soil_water.tick (surface, groundwater, soil);
-  soil_heat.tick (time, soil, soil_water, surface, groundwater);
+  soil_heat.tick (time, soil, soil_water, surface, groundwater, weather);
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4);
 
@@ -313,6 +313,7 @@ ColumnStandard::output (Log& log, Filter& filter) const
     }
   output_derived (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
+  output_derived (groundwater, "Groundwater", log, filter);
   output_list (crops, "crops", log, filter);
   log.close_geometry ();
 }
@@ -331,7 +332,8 @@ ColumnStandard::ColumnStandard (const ColumnStandard& column,
     soil_NO3 (column.soil_NO3),
     organic_matter (column.organic_matter),
     nitrification (column.nitrification),
-    denitrification (column.denitrification)
+    denitrification (column.denitrification),
+    groundwater (column.groundwater)
 { }
     
 
@@ -348,14 +350,14 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     organic_matter (soil, al.alist ("OrganicMatter")),
     nitrification (Librarian<Nitrification>::create 
 		   (al.alist ("Nitrification"))),
-    denitrification (al.alist ("Denitrification"))
+    denitrification (al.alist ("Denitrification")),
+    groundwater (Librarian<Groundwater>::create (al.alist ("Groundwater")))
 { }
 
-void ColumnStandard::initialize (const AttributeList& al, 
-				 const Time& time, 
-				 const Groundwater& groundwater)
+void ColumnStandard::initialize (const AttributeList& al, const Time& time,
+				 const Weather& weather)
 {
-  soil_heat.initialize (al.alist ("SoilHeat"), soil, time);
+  soil_heat.initialize (al.alist ("SoilHeat"), soil, time, weather);
   soil_water.initialize (al.alist ("SoilWater"), soil, groundwater);
   soil_NH4.initialize (al.alist ("SoilNH4"), soil, soil_water);
   soil_NO3.initialize (al.alist ("SoilNO3"), soil, soil_water);
@@ -405,7 +407,9 @@ static struct ColumnStandardSyntax
     syntax.add ("Nitrification", Librarian<Nitrification>::library (),
 		Syntax::State);
     add_submodule<Denitrification> ("Denitrification", syntax, alist);
-
+    syntax.add ("Groundwater", Librarian<Groundwater>::library (),
+		Syntax::State);
+    
     Librarian<Column>::add_type ("default", alist, syntax, &make);
   }
 } column_syntax;

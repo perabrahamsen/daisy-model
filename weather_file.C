@@ -95,6 +95,7 @@ WeatherFile::tick (const Time& time)
   // Update the hourly values.
   hourly_global_radiation = DayCycle (now) * 24.0 * global_radiation;
   put_reference_evapotranspiration (reference_evapotranspiration);
+  distribute (Precipitation ());
 }
 
 void

@@ -79,7 +79,7 @@ class dValue : public Value
   const T& value;
 public:
   void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
+	     const string& key, int)
     { out << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
   operator const T& () const throw1 (AttributeList::Invalid)
   { return value; }
@@ -93,8 +93,7 @@ class dValue<double> : public Value
 {
   double value;
 public:
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
+  void dump (ostream& out, const Syntax&, const string&, int)
     { out << value; }
   operator double () const throw1 (AttributeList::Invalid)
   { return value; }
@@ -107,8 +106,7 @@ class dValue<int> : public Value
 {
   int value;
 public:
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
+  void dump (ostream& out, const Syntax&, const string&, int)
     { out << value; }
   operator int () const
     throw1 (AttributeList::Invalid)
@@ -122,8 +120,7 @@ class dValue<bool> : public Value
 {
   bool value;
 public:
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
+  void dump (ostream& out, const Syntax&, const string&, int)
     { out << (value ? "true" : "false"); }
   operator bool () const throw1 (AttributeList::Invalid)
   { return value; }
@@ -170,8 +167,7 @@ public:
 	  }
       out << "\"";
     }
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
+  void dump (ostream& out, const Syntax&, const string&, int)
     { 
       if (is_identifier (value))
 	out << value; 
@@ -189,8 +185,7 @@ class dValue<Time> : public Value
 {
   const Time& value;
 public:
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
+  void dump (ostream& out, const Syntax&, const string&, int)
     { out << value.year () << " " << value.month () << " " 
 	  << value.mday () << " " << value.hour (); }
   operator const Time& () const throw1 (AttributeList::Invalid)
@@ -223,10 +218,9 @@ public:
 // Sequences of Attribute Lists and numbers can be dumped.
 class dValue<vector<double>/**/> : public Value
 {
-  const vector<double>& value;
+  const vector<double> value;
 public:
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
+  void dump (ostream& out, const Syntax&, const string&, int)
     { 
       for (unsigned int i = 0; i < value.size (); i++)
 	{
@@ -244,16 +238,23 @@ public:
 
 class dValue<vector<AttributeList*>/**/> : public Value
 {
-  const vector<AttributeList*>& value;
+  const vector<AttributeList*> value;
 public:
   void dump (ostream& out, const Syntax& syntax,
 	     const string& key, int indent)
     { 
+      if (syntax.lookup (key) != Syntax::AList)
+	{
+	  out << "[" << key << ": AList != " 
+	      << Syntax::type_name (syntax.lookup (key)) << "]";
+	  return;
+	}
+      
       const Syntax& child = syntax.syntax (key);
       for (unsigned int i = 0; i < value.size (); i++)
 	{
 	  if (i > 0) 
-	    out << "\n" + string (indent, ' ');
+	    out << "\n" << string (indent, ' ');
 	  out << "(";
 	  value[i]->dump (out, child, indent + 1); 
 	  out << ")";

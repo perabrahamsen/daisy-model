@@ -14,6 +14,7 @@ class Syntax;
 class Soil;
 class SoilWater;
 class Groundwater;
+class Weather;
 class Time;
 class Filter;
 
@@ -24,7 +25,7 @@ class SoilHeat
 
 public:
   void tick (const Time&, const Soil&, const SoilWater&, 
-	     const Surface&, const Groundwater&);
+	     const Surface&, const Groundwater&, const Weather& weather);
   double energy (const Soil&, const SoilWater&, double from, double to) const;
   void set_energy (const Soil&, const SoilWater&, 
 		   double from, double to, double energy);
@@ -35,7 +36,7 @@ public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const AttributeList&);
   void initialize (const AttributeList& al, 
-		   const Soil& soil, const Time& time);
+		   const Soil& soil, const Time& time, const Weather& weather);
   ~SoilHeat ();
 };
 

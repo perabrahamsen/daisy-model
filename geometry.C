@@ -205,7 +205,7 @@ void Geometry::initialize_layer (vector<double>& array,
   else if (al.check (initial))
     {
       // Initialize by layers.
-      vector<AttributeList*>& layers = al.alist_sequence (initial);
+      const vector<AttributeList*>& layers = al.alist_sequence (initial);
       array.insert (array.begin (), size (), 0.0);
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)

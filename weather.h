@@ -47,7 +47,14 @@ public:
 public:
   static double DayLength(double Latitude, const Time& t);
 
-    // Create and Destroy.
+  // Average temperature.
+public:
+  double average () const;
+  double amplitude () const;
+  double omega () const;
+  double omega_offset () const;
+
+  // Create and Destroy.
 protected:
   Weather (const AttributeList& al);
 public:
