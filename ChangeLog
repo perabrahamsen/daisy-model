@@ -1,8 +1,10 @@
 1998-03-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 0.012 released.
+	* Version 0.013 released.
 
 1998-03-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.012 released.
 
 	* log_table.C (struct LogEntry): Check "*" with path, not name.
 	(struct LogTable): [CONST_DELETE] Don't delete members.

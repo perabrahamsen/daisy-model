@@ -348,9 +348,9 @@ struct LogTable : public Log, public Filter
 
   ~LogTable ()
     {
+#ifdef CONST_DELETE
       if (!out.good ())
 	cerr << "Problems writing to `" << file << "'\n";
-#ifdef CONST_DELETE
       delete &condition;
       sequence_delete (entries.begin (), entries.end ());
 #endif
