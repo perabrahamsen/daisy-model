@@ -96,7 +96,7 @@
 
 )
 
-(defcrop "Spring Barley, Foulum" "Spring Barley"
+(defcrop "Spring Barley; Foulum" "Spring Barley"
   (description "RS-Model Projekt")
 
   (Devel 

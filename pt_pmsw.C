@@ -1,4 +1,4 @@
-// Status: revised feb-1999
+// Status: revised October 1999
 // important for sensitivity studies: Do not alter !
 
 // description of functions
@@ -580,33 +580,34 @@ int RAC(double u, double h, double LAI, double c_d, double w, double z_0s,
 // constant, CM (1988) used 0.01, calibration is important (Daamen, 1997), p.212
 // arac (a)=0.00662: used by Jones (1983)
    	const double z_ref=2.0; // [m]
-        double Z; // Auxiliary variable denoting h-rd
+      double Z; // Auxiliary variable denoting h-rd
 
    	rX=c_d*LAI; // Shaw & Pereira (1982)
    	rd=1.1*h*log(1.0+pow(rX,0.25)); // Shaw&Pereira(1982)SG,p.507
-	Z=h-rd;
+		Z=h-rd;
    	if (rX>0.0 && rX<0.2) rz_0=z_0s+0.3*h*sqrt(rX); // SG eq.43a
 		else if (rX>0.2 && rX<1.5) rz_0=0.3*h*(1-rd/h); // SG eq.43b
          		else rz_0=0.13*h; // otherwise
 
         if (Z < 2.0*rz_0)
         	{
-                Z=2.0*rz_0; // h-rd at least twice z_0
+            Z=2.0*rz_0; // h-rd at least twice z_0
       		if (z_ref-rd > 0.0) ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
      		   else
            	   {
            	   rd=0.67*h;
            	   ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
-                   }
-                } else {
-             	   if (z_ref-rd > 0.0) ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
-     		 	else
+               }
+         } else
+         	   {
+              	if (z_ref-rd > 0.0) ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
+     		 	  		else
            	   		{
            	   		rd=0.67*h;
            	   		ru_h=u*log(Z/rz_0)/log((z_ref-rd)/rz_0);
-                        	}
-                       }
-         rr_ac=(alpha_u/(2.0*LAI*arac))*sqrt((w/ru_h)*1.0/(1-exp(-alpha_u/2.0)));
+                     }
+         		}
+         rr_ac=(alpha_u/(2.0*LAI*arac))*sqrt((w/ru_h)*1/(1-exp(-alpha_u/2)));
 
    	return 0;
    	}
@@ -646,28 +647,29 @@ int RAS(double u, double h, double LAI, double z_0s, double alpha_k, double c_d,
 // rcmin could be passed as a parameter through RS measurements
 
 int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
-	double esta, double theta_w, double theta_c, double rcmin_LAI,
-        double rcmax, double zeta, double f3const, double tref, double spar,
+	double esta, double theta_w, double theta_c, double rcmin,
+   double rcmax, double zeta, double f3const, double tref, double spar,
 	double tmin, double tmax, double nu_1, double nu_2, double nu_3,
-        double crop_ea_w, double crop_ep_w, double &rfpar, double &rf_1,
-        double &rf_2, double &rf_3, double &rf_4, double &rr_sc_1,
-	 double &/*rr_tot_1*/,double &rbf_temp, double &rf_temp, double &rf_def,
-	 double &rf_theta, double &rf1_dolman, double &rr_sc_2, double &/*rr_tot_2*/,
-	 double &rf_etep, double &rr_sc_3, double &/*rr_tot_3*/, double &rr_sc_4,
-	 double &/*rr_tot_4*/, double &rr_sc_5, double &/*rr_tot_5*/, double &rr_sc_min,
+   double crop_ea_w, double crop_ep_w, double &rfpar, double &rf_1,
+   double &rf_2, double &rf_3, double &rf_4, double &rr_sc_1,
+	double &/*rr_tot_1*/,double &rbf_temp, double &rf_temp, double &rf_def,
+	double &rf_theta, double &rf1_dolman, double &rr_sc_2, double &/*rr_tot_2*/,
+	double &rf_etep, double &rr_sc_3, double &/*rr_tot_3*/, double &rr_sc_4,
+	double &/*rr_tot_4*/, double &rr_sc_5, double &/*rr_tot_5*/, double &rr_sc_min,
 	double &rr_sc_js)
 	{
    	double tairk,def;
-        const double a4=700.0; // parameter in f1_dolman (for oats)
+      double rcmin_LAI;
+      const double a4=700.0; // parameter in f1_dolman (for oats)
 
    	esta=611.0*exp((17.27*tair)/(tair+237.3)); // saturated vapor pressure
    	def=0.001*(esta-e_pa); // vapor deficit in kPa
 	tairk=tair+273.15; // air temperature in K
 	rfpar=0.55*2*srad/(spar*LAI); // cpar coefficient in rf_1
-	rcmin_LAI=(200.0/LAI);   // FAO: change for rcmin sensitivity
+	rcmin_LAI=rcmin;   // read from file or calculate from 200/LAI
 
 // constraint functions used in Dickinson (1984) / Noilhan et al. (1991)
-	rf_1=(rcmin_LAI/rcmax+rfpar)/(1+rfpar); // related to solar radiation
+		rf_1=(rcmin_LAI/rcmax+rfpar)/(1+rfpar); // related to solar radiation
    	rf_2=1-zeta*(esta-e_pa); // related to vapour pressure deficit
 // tref-tairk > 0
 	if (tref-tairk <= 0.0) tref=tairk+1.0;
@@ -688,23 +690,25 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 	rf_def=1.0/(1.0+nu_2*def); // Lohammar (1980)
 
 // Stewart (1988), Kim & Verma (1991) as referenced in Verma et al. (1993)
-   	rf_theta=1.0-exp(-nu_3*100.0*theta_0_20);
+   rf_theta=1.0-exp(-nu_3*100.0*theta_0_20);
 
 // calculate contraint function F4 as canopy_ea/canopy_ep
 	rf_etep=crop_ea_w/crop_ep_w;
 
 // canopy resistance using Noilhan et al.(1991)...: r_sc_1
-   	rr_sc_1=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_4);
+   rr_sc_1=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_4);
 
 // ... or using Verma et al. (1993): r_sc_2
 	rr_sc_2=(rcmin_LAI/LAI)/(rf_1*rf_temp*rf_def*rf_theta);
 
 // ... or using f_etep: eact/epotc: r_sc_3
-       	rr_sc_3=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_etep);
-
+   rr_sc_3=(rcmin_LAI/LAI)/(rf_1*rf_2*rf_3*rf_etep);
+/*
 // combine f_etep with f_temp, f_def and f_theta (and f_1): r_sc_4
 	rr_sc_4=(rcmin_LAI/LAI)/(rf1_dolman*rf_temp*rf_def*rf_etep);
-
+*/
+// calculate rcmin with f2=f3=f4=1
+	rr_sc_4=(rcmin_LAI/LAI)/rf_1;
 // replace f_2 by f_def: r_sc_5
 	rr_sc_5=rcmin_LAI/(rf_1*rf_def*rf_3*rf_4); // No dision by LAI
 
@@ -803,7 +807,7 @@ int LEHFLUX(double tair,double tskin,double tcan,double tleaf,
 // calculation of energy fluxes using SW and SG: unstressed conditions
 // r_sc = r_scmin
 int LEHFLUXPOT(double tair, double tskin_pot, double tcan_pot, double tleaf_pot,
-	double r_aa_pot, double r_ac, double r_as, double r_sc_min,
+	double r_aa_pot, double r_ac, double r_as, double r_sc_4,
         double e_c_abs_pot, double e_sl_abs_pot, double e_abs, double les,
         double &rhl_pot, double &rha_pot, double &rhs_pot, double &rlea_pot,
         double &rlel_pot, double &rhclos_pot, double &rleclos_pot,
@@ -818,7 +822,7 @@ int LEHFLUXPOT(double tair, double tskin_pot, double tcan_pot, double tleaf_pot,
    	rhl_pot=rho_a*c_p*(tleaf_pot-tcan_pot)/r_ac;
    	rhs_pot=rho_a*c_p*(tskin_pot-tcan_pot)/r_as;
    	rlea_pot=lambda*(e_c_abs_pot-e_abs)/r_aa_pot;
-   	rlel_pot=lambda*(e_sl_abs_pot-e_c_abs_pot)/(r_sc_min+r_ac);
+   	rlel_pot=lambda*(e_sl_abs_pot-e_c_abs_pot)/(r_sc_4+r_ac);
    	rdtcta_pot=tcan_pot-tair;
    	rdtltc_pot=tleaf_pot-tcan_pot;
    	rdtstc_pot=tskin_pot-tcan_pot;
@@ -910,10 +914,10 @@ int ACOEFF(double tair, double e_abs, double netrad, double LAI, double les,
    	}
 
 // calculation of coefficient needed in gaussj matrix solution:
-// use of r_sc_min for potential processes
+// use of r_sc_4 for potential evapotranspiration for DAISY feedback
 int ACOEFFPOT(double tair, double e_abs, double netrad, double LAI, double les,
 	double temp_0, double kh, double r_aa_pot, double r_ac, double r_as,
-   	double r_sc_min, double alpha_r, double &ra_11, double &ra_12,
+   	double r_sc_4, double alpha_r, double &ra_11, double &ra_12,
         double &ra_13, double &rb_1, double &ra_24_pot, double &ra_25_pot,
         double &rb_2, double &ra_31, double &ra_33, double &ra_34_pot,
         double &ra_35_pot, double &rb_3, double &ra_41, double &ra_42,
@@ -928,13 +932,13 @@ int ACOEFFPOT(double tair, double e_abs, double netrad, double LAI, double les,
 	ra_12=-1.0/r_as;
    	ra_13=-1.0/r_ac;
    	rb_1=(tair+273.15)/r_aa_pot;
-   	ra_24_pot=lambda/r_aa_pot+lambda/(r_sc_min+r_ac);
-   	ra_25_pot=-lambda/(r_sc_min+r_ac);
+   	ra_24_pot=lambda/r_aa_pot+lambda/(r_sc_4+r_ac);
+   	ra_25_pot=-lambda/(r_sc_4+r_ac);
    	rb_2=les+e_abs*lambda/r_aa_pot;
    	ra_31=-rho_a*c_p/r_ac;
    	ra_33=rho_a*c_p/r_ac;
-   	ra_34_pot=-lambda/(r_sc_min+r_ac);
-   	ra_35_pot=lambda/(r_sc_min+r_ac);
+   	ra_34_pot=-lambda/(r_sc_4+r_ac);
+   	ra_35_pot=lambda/(r_sc_4+r_ac);
    	rb_3=netrad*(1.0-exp(-alpha_r*LAI));
    	ra_41=-rho_a*c_p/r_as;
    	ra_42=rho_a*c_p/r_as+kh/z_sz;
@@ -1307,6 +1311,15 @@ class PT_PMSW : public PT
 
 public:
 
+// *******************TEMPORARY*********************
+	FILE *fp_rcmin, *fp_rcminsb, *fp_rcminww;
+        double rcmin;
+   	double rcmin_sb_ndvi,rcmin_sb_savi;
+   	double rcmin_ww_ndvi,rcmin_ww_savi;
+   	double pgtime;
+        int teller;
+// **************************************************
+
 // meteorological- and derived variables
    	double srad,tair,e_abs,e_pa,u,u_ref,relsun,prec; // metinput
         double relsun_day,relsun_last; // daytime- and last daytime value
@@ -1514,14 +1527,47 @@ public:
 	L_pot=L_wet=0.0;
         y_pot=y_wet=0.0;
 
+// initialize pgtime and teller for rcmin_ww.dat and rcmin_sb.dat
+	pgtime=0.0;
+        teller=0;
+// temporary input: rcmin_ww.dat or rcmin_sb.dat
+
+/*
+//.............WHEAT..............
+  	if ((fp_rcmin=fopen("rcmin_ww.dat", "r"))==NULL)
+   	{
+   	printf("cannot open input file\n");
+        exit(1);
+      	}
+// Auxiliary output
+  	if ((fp_rcminww=fopen("rcminww.dat", "w"))==NULL)
+   	{
+   	printf("cannot open output file\n");
+        exit(1);
+      	}
+
+*/
+//.............BARLEY...........
+  	if ((fp_rcmin=fopen("rcmin_sb.dat", "r"))==NULL)
+   	{
+   	printf("cannot open input file\n");
+      	exit(1);
+      	}
+// Auxiliary output
+  	if ((fp_rcminsb=fopen("rcminsb.dat", "w"))==NULL)
+   	{
+   	printf("cannot open output file\n");
+        exit(1);
+      	}
+
 
       	} // end PM_svat() implementation
 
 
 	double  potential_transpiration_ ;
-// return Lel in mm/hr, i.e. (1/680) * W/m**2 = 0.001471 mm/hr
+// return Lel in mm/hr, i.e. (1/680) 1 W/m**2 = 0.001471 mm/hr
   	double potential_transpiration () const
-//    { return /* potential_transpiration_ */ 0.001471*lel; }
+        { return /* potential_transpiration_ */ 0.001471*lel_pot; }
     	{ return potential_transpiration_; }
 
 void tick (const Weather& weather, const Vegetation& crops,
@@ -1544,6 +1590,33 @@ void tick (const Weather& weather, const Vegetation& crops,
 
 	LAI =crops.LAI (); // Leaf Areal Index
     	h   =0.01*crops.height (); // max crop height [m]
+
+cout << "LAI is\t" << LAI << "\n";
+
+cout << "LAI is\t" << LAI << "\n";
+
+// READ FROM TEMPORARY RCMIN_WW.DAT OR RCMIN_SB.DAT FILE
+	fscanf(fp_rcmin,"%lf%lf%lf%lf%lf\n",
+   	&pgtime,&rcmin_ww_ndvi,&rcmin_ww_savi,&rcmin_sb_ndvi,&rcmin_sb_savi);
+/*
+// ............WHEAT..................
+// test for missing value and for LAI > 0
+if (LAI > 0.0)
+	{
+	if (rcmin_ww_ndvi==9999.0) rcmin=200.0/LAI;
+   	else rcmin=rcmin_ww_ndvi; // for wheat
+	fprintf(fp_rcminww,"%lf%10.2lf%10.2lf\n",pgtime,200.0/LAI,rcmin_ww_ndvi);
+        } else rcmin=rcmin_ww_ndvi; // or another variable=9999
+
+*/
+// ............BARLEY..................
+// test for missing value and for LAI > 0
+if (LAI > 0.0)
+	{
+	if (rcmin_sb_ndvi==9999.0) rcmin=200.0/LAI;
+   	else rcmin=rcmin_sb_ndvi; // for barley
+	fprintf(fp_rcminsb,"%lf%10.2lf%10.2lf\n",pgtime,200.0/LAI,rcmin_sb_ndvi);
+        } else rcmin=rcmin_sb_ndvi; // or another variable=9999
 
 // potential evapotranspiration from surface and canopy, from tick()
 // pot.evap.above crop canopy [cm/hr]
@@ -1577,6 +1650,7 @@ void tick (const Weather& weather, const Vegetation& crops,
 // otherwise: calculate resistances and then energy balance
 	if (LAI > 0.0)
    	{
+	teller++;
 // communication with time.C
 #if 0
 	year = time.year();
@@ -1591,7 +1665,6 @@ void tick (const Weather& weather, const Vegetation& crops,
         u_ref = weather.wind (); // u_ref from reference plane [m/s]
         relsun_day = weather.hourly_cloudiness ();  // [-]
         prec = 1.10*weather.rain(); // [mm] corrected by 10 %
-
 
 // cout << "past met variables\n";
 // use daytime values for relsun, otherwise use the last daytime value
@@ -1663,7 +1736,7 @@ void tick (const Weather& weather, const Vegetation& crops,
 
 // communication with soil.h
 	kh=soil.heat_conductivity(0, theta_0, soil_water.X_ice (0))
-	  * 1e-7 * 3600.0 / 100.0; // [erg/cm/h/dg C] -> [W/m/dg C] 
+	  * 1e-7 * 3600.0 / 100.0; // [erg/cm/h/dg C] -> [W/m/dg C]
 
 // convert from e_pa to e_abs
  	EPA2ABS(e_pa,tair,e_abs);
@@ -1725,7 +1798,7 @@ cout << "past RAASTABWET_1()\n";
 
 // mean stomatal resistance following Jacquemin & Noilhan (1990) and
 // Verma et al.(1993)
-	RSC (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin_LAI,rcmax,
+	RSC (LAI,tair,srad,e_pa,theta_0_20,esta,theta_w,theta_c,rcmin,rcmax,
         zeta,f3const,tref,spar,tmin,tmax,nu_1,nu_2,nu_3,crop_ea_w,crop_ep_w,
         fpar,f_1,f_2,f_3,f_4,r_sc_1,r_tot_1,bf_temp,f_temp,f_def,f_theta,
         f1_dolman,r_sc_2,r_tot_2,f_etep,r_sc_3,r_tot_3,r_sc_4,r_tot_4,r_sc_5,
@@ -1737,15 +1810,16 @@ cout << "past RAASTABWET_1()\n";
 // cout << "past NETRAD()\n";
 
 // Compute matrix elements for assigning to A matrix and set all others to zero
+// include r_sc_xx as defined in RSC()
 	ACOEFF(tair,e_abs,netrad_brunt,LAI,les,temp_0,kh,r_aa_dry,r_ac,r_as,
         r_sc_js,alpha_r,a_11,a_12,a_13,b_1,a_24,a_25,b_2,a_31,a_33,a_34,a_35,
         b_3,a_41,a_42,b_4);
 
 // cout << "past ACOEFF()\n";
 
-// idem for unstressed conditions, i.e. r_sc=r_sc_min
+// idem for unstressed conditions, i.e. r_sc=r_sc_4 with f2=f3=f4=1
 	ACOEFFPOT(tair,e_abs,netrad_brunt,LAI,les,temp_0,kh,r_aa_pot,r_ac,r_as,
-        r_sc_min,alpha_r,a_11_pot,a_12_pot,a_13_pot,b_1_pot,a_24_pot,a_25_pot,
+        r_sc_4,alpha_r,a_11_pot,a_12_pot,a_13_pot,b_1_pot,a_24_pot,a_25_pot,
         b_2_pot,a_31_pot,a_33_pot,a_34_pot,a_35_pot,b_3_pot,a_41_pot,a_42_pot,
         b_4_pot);
 // cout << "past ACOEFFPOT()\n";
@@ -1927,7 +2001,7 @@ cout << "past RAASTABWET_1()\n";
 	GFLUX(tskin,kh,temp_0,gflux);  // ground heat flux
 	LEHFLUX(tair,tskin,tcan,tleaf,r_aa_dry,r_ac,r_as,r_sc_js,e_c_abs,e_sl_abs,
         e_abs,les,hl,ha,hs,lea,lel,hclos,leclos,dtcta,dtltc,dtstc,dtlta);
-	LEHFLUXPOT(tair,tskin_pot,tcan_pot,tleaf_pot,r_aa_pot,r_ac,r_as,r_sc_min,
+	LEHFLUXPOT(tair,tskin_pot,tcan_pot,tleaf_pot,r_aa_pot,r_ac,r_as,r_sc_4,
       	e_c_abs_pot,e_sl_abs_pot,e_abs,les,hl_pot,ha_pot,hs_pot,lea_pot,lel_pot,
       	hclos_pot,leclos_pot,dtcta_pot,dtltc_pot,dtstc_pot,dtlta_pot);
 	LEHFLUXWET(tair,tskin_wet,tcan_wet,tleaf_wet,r_aa_wet,r_ac,r_as,
@@ -2017,13 +2091,16 @@ cout << "past RAASTABWET_1()\n";
 
    ~PT_PMSW() // destructor
    	{
-//    fclose(fp_ebal_pm);
-       	free_matrix(t,1,NP,1,MP);
-      	free_matrix(x,1,NP,1,MP);
-      	free_matrix(b,1,NP,1,MP);
-      	free_matrix(um,1,NP,1,NP);
-      	free_matrix(ai,1,NP,1,NP);
-      	free_matrix(a,1,NP,1,NP);
+   fclose(fp_rcmin);
+   fclose(fp_rcminsb);
+   fclose(fp_rcminww);
+
+  	free_matrix(t,1,NP,1,MP);
+  	free_matrix(x,1,NP,1,MP);
+  	free_matrix(b,1,NP,1,MP);
+  	free_matrix(um,1,NP,1,NP);
+  	free_matrix(ai,1,NP,1,NP);
+  	free_matrix(a,1,NP,1,NP);
 	free_matrix(a_pot,1,NP,1,NP);
 	free_matrix(ai_pot,1,NP,1,NP);
 	free_matrix(um_pot,1,NP,1,NP);
