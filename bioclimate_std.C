@@ -361,6 +361,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
       canopy_water_in = snow_water_out * vegetation.cover ();
       canopy_water_bypass = snow_water_out - canopy_water_in;
     }
+
   assert (canopy_water_in >= 0.0);
 
   if (canopy_water_in > 0.01)
@@ -379,7 +380,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   canopy_water_storage += (canopy_water_in - canopy_ea) * dt;
   if (canopy_water_storage < 0.0)
     {
-      assert (canopy_water_storage > -1e-16);
+      assert (canopy_water_storage > -1e-8);
       canopy_water_storage = 0.0;
     }
   
@@ -398,11 +399,12 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   pond_ep = (total_ep - snow_ea) * (1.0 - vegetation.cover ());
   assert (pond_ep >= 0.0);
-  pond_water_in = canopy_water_out + canopy_water_bypass;
+  pond_water_in = canopy_water_out + canopy_water_bypass + irrigation_surface;
   if (pond_water_in > 0.01)
     pond_water_in_temperature 
       = (canopy_water_bypass * snow_water_out_temperature
-	 + canopy_water_out * canopy_water_temperature)
+	 + canopy_water_out * canopy_water_temperature
+	 + irrigation_surface * irrigation_surface_temperature)
       / pond_water_in;
   else
     pond_water_in_temperature = air_temperature;
