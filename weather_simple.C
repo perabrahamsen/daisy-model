@@ -6,7 +6,8 @@
 #include "alist.h"
 #include "common.h"
 #include "log.h"
-#include <algobase.h>
+// Not in BCC 5.01
+// #include <algobase.h>
 
 class WeatherSimple : public Weather
 {

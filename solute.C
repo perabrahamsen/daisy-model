@@ -8,7 +8,6 @@
 #include "soil_water.h"
 #include "mathlib.h"
 #include "common.h"
-#include <ieeefp.h>
 
 void
 Solute::clear ()

@@ -3,12 +3,12 @@
 #ifndef CONDITION_H
 #define CONDITION_H
 
+#include "common.h"
+
 class Daisy;
 class AttributeList;
 class Library;
 class Syntax;
-
-#include <string>
 
 class Condition
 {  

@@ -6,6 +6,8 @@
 #include "syntax.h"
 #include <map>
 
+const double Crop::DSremove = -5001.0;
+
 static Library* Crop_library = NULL;
 typedef map<string, Crop::constructor, less<string> > Crop_map_type;
 static Crop_map_type* Crop_constructors;
@@ -69,7 +71,8 @@ CropList::CropList (const vector<const AttributeList*>& sequence)
 
 CropList::~CropList ()
 {
-  for (const_iterator i = begin (); i != end (); i++)
+  // Borland C++ don't want a const iterator here.
+  for (iterator i = begin (); i != end (); i++)
     delete *i;
 }
 
@@ -96,8 +99,6 @@ Crop_init::~Crop_init ()
     }
   assert (count >= 0);
 }
-
-const double Crop::DSremove;
 
 bool
 Crop::ds_remove (const Crop* crop)

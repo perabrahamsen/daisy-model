@@ -28,7 +28,9 @@ public:
   { }
   ~ConditionOr ()
   {
+#ifdef CONST_DELETE
     sequence_delete (conditions.begin (), conditions.end ());
+#endif
     delete &conditions;
   }
   static Condition& make (const AttributeList& al)
@@ -55,7 +57,9 @@ public:
   { }
   ~ConditionAnd ()
   {
+#ifdef CONST_DELETE
     sequence_delete (conditions.begin (), conditions.end ());
+#endif
     delete &conditions;
   }
   static Condition& make (const AttributeList& al)
@@ -72,7 +76,11 @@ public:
     : condition (Condition::create (al.list ("operand")))
   { }
   ~ConditionNot ()
-  { delete &condition; }
+  {
+#ifdef CONST_DELETE
+    delete &condition; 
+#endif
+  }
   static Condition& make (const AttributeList& al)
   { return *new ConditionNot (al); }
 };
@@ -92,9 +100,11 @@ public:
   { }
   ~ConditionIf ()
   {
+#ifdef CONST_DELETE
     delete &if_c;
     delete &then_c;
     delete &else_c;
+#endif
   }
   static Condition& make (const AttributeList& al)
   { return *new ConditionIf (al); }

@@ -28,7 +28,7 @@ Library::Implementation::lookup (string key) const
   alist_map::const_iterator i = alists.find (key);
 
   if (i == alists.end ())
-    THROW (UninitializedValue ());
+    THROW (AttributeList::Uninitialized ());
 
   return *(*i).second;
 }
@@ -57,7 +57,7 @@ Library::Implementation::syntax (string key) const
   syntax_map::const_iterator i = syntaxen.find (key);
 
   if (i == syntaxen.end ())
-    THROW (UninitializedValue ());
+    THROW (AttributeList::Uninitialized ());
 
   return *(*i).second;
 }

@@ -19,8 +19,8 @@
 #include "harvest.h"
 #include "mathlib.h"
 #include <list>
-#include <algo.h>
-#include <ieeefp.h>
+// BCC 5.01 don't like this
+// #include <algo.h>
 
 class CropStandard : public Crop
 {
@@ -650,6 +650,10 @@ static struct CropStandardSyntax
   CropStandardSyntax ();
 } standard_crop_syntax;
 
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<OM>;
+#endif
+
 CropStandardSyntax::CropStandardSyntax ()
 {
   static const vector<double> empty_array;
@@ -1074,7 +1078,6 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 	Phenology.DS = 2.0;
     }
 }
-
 double 
 CropStandard::CropHeight ()
 {
@@ -1925,3 +1928,4 @@ CropStandard::~CropStandard ()
 { 
   delete &var;
 }
+

@@ -401,4 +401,3 @@ MikeSHE::~MikeSHE ()
 {
   delete &impl;
 }
-

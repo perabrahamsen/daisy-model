@@ -3,7 +3,7 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include <string>
+#include "common.h"
 
 class Time
 {

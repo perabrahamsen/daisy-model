@@ -5,6 +5,9 @@
 #include "library.h"
 #include <map>
 
+const int Syntax::Singleton = -117;
+const int Syntax::Sequence = -3212;
+
 struct Syntax::Implementation
 {
   check_fun checker;
@@ -157,17 +160,21 @@ Syntax::Implementation::dump (int indent) const
       switch (t)
 	{
 	case List:
-	  cout << "\n";
-	  for (unsigned int j = 0; j < indent + name.length () + 2; j++)
-	    cout << " ";
-	  (*syntax.find (name)).second->dump (indent + name.length () + 2);
-	  break;
+	  {
+	    cout << "\n";
+	    for (unsigned int j = 0; j < indent + name.length () + 2; j++)
+	      cout << " ";
+	    (*syntax.find (name)).second->dump (indent + name.length () + 2);
+	    break;
+	  }
 	case Class: 
-	  cout << "\n";
-	  for (unsigned int j = 0; j < indent + name.length () + 2; j++)
-	    cout << " ";
-	  (*libraries.find (name)).second->dump (indent + name.length () + 2);
-	  break;
+	  {
+	    cout << "\n";
+	    for (unsigned int j = 0; j < indent + name.length () + 2; j++)
+	      cout << " ";
+	    (*libraries.find (name)).second->dump (indent + name.length () + 2);
+	    break;
+	  }
 	case Object:
 	  cout << " " << (*libraries.find (name)).second->name ();
 	  break;

@@ -3,7 +3,7 @@
 #ifndef HORIZON_H
 #define HORIZON_H
 
-#include <string>
+#include "common.h"
 
 struct AttributeList;
 struct Library;

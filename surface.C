@@ -154,6 +154,10 @@ Surface::output (Log& log, const Filter& filter) const
   output_submodule (im, "IM", log, filter);
 }
 
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<IM>;
+#endif
+
 void
 Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {

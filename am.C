@@ -11,8 +11,10 @@
 #include "log.h"
 #include "soil.h"
 #include "mathlib.h"
-#include <algo.h>
+// Borland C++ 5.01 doesn't have this.
+// #include <algo.h>
 #include <map>
+#include <numeric>
 
 static Library* AM_library = NULL;
 
@@ -396,6 +398,11 @@ static bool check_organic (const AttributeList& al)
 }
 
 int AM_init::count;
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<OM>;
+template class add_submodule<IM>;
+#endif
 
 AM_init::AM_init ()
 { 

@@ -3,7 +3,8 @@
 #include "csmp.h"
 #include "log.h"
 #include <vector>
-#include <algo.h>
+// Doesn't exists in Borland C++ 5.01.
+// #include <algo.h>
 #include <assert.h>
 
 struct CSMP::Implementation

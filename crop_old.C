@@ -19,8 +19,8 @@
 #include "harvest.h"
 #include "mathlib.h"
 #include <list>
-#include <algo.h>
-#include <ieeefp.h>
+// #include <algo.h>
+// #include <ieeefp.h>
 
 // #define USE_HOURLY_PHOTO
 
@@ -621,6 +621,10 @@ static struct CropOldSyntax
 {
   CropOldSyntax ();
 } old_crop_syntax;
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<OM>;
+#endif
 
 CropOldSyntax::CropOldSyntax ()
 {

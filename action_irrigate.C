@@ -14,7 +14,7 @@
 class ActionIrrigate : public Action
 {
 public:
-  static const double at_air_temperature = -500;
+  static const double at_air_temperature;
 
 private:
   const double flux;
@@ -56,9 +56,13 @@ public:
   { }
 };
 
-const double ActionIrrigate::at_air_temperature;
+const double ActionIrrigate::at_air_temperature = -500;
 
 // Add the ActionIrrigate syntax to the syntax table.
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<IM>;
+#endif
 
 static struct ActionIrrigateSyntax
 {

@@ -71,7 +71,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   if (!groundwater.flux_bottom ())
     {
       if (groundwater.table () < soil.z (last))
-	THROW (Runtime ("Groundwater table below lowest node."));
+	THROW (runtime_error ("Groundwater table below lowest node."));
       last = soil.interval (groundwater.table ());
       // Presure at the last + 1 node is equal to the water above it.
       for (int i = last + 1; i < soil.size (); i++)

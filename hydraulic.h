@@ -3,7 +3,7 @@
 #ifndef HYDRAULIC_H
 #define HYDRAULIC_H
 
-#include <string>
+#include "common.h"
 
 struct AttributeList;
 struct Library;
@@ -48,8 +48,10 @@ public:
 protected:
   void initialize ();
   Hydraulic (const AttributeList&);
+#if 0
 private:
   Hydraulic () { };
+#endif
 public:
   virtual ~Hydraulic ();
 };

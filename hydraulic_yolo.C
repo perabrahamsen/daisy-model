@@ -20,7 +20,7 @@ public:
   // Create and Destroy.
 private:
   friend class HydraulicYoloSyntax;
-  static Hydraulic& make (AttributeList& al);
+  static Hydraulic& make (const AttributeList& al);
   HydraulicYolo (const AttributeList&);
 public:
   virtual ~HydraulicYolo ();
@@ -91,7 +91,7 @@ HydraulicYolo::~HydraulicYolo ()
 // Add the HydraulicYolo syntax to the syntax table.
 
 Hydraulic&
-HydraulicYolo::make (AttributeList& al)
+HydraulicYolo::make (const AttributeList& al)
 {
   return *new HydraulicYolo (al);
 }

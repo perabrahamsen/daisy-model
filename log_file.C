@@ -10,7 +10,8 @@
 #include "common.h"
 #include <list>
 #include <fstream.h>
-#include <strstream.h>
+// Missing m in BCC.
+#include <strstrea.h>
 
 class LogFile : public Log, public Filter
 {
@@ -32,7 +33,11 @@ private:
 	filter (al.filter ("what"))
     { }
     ~Entry ()
-    { delete condition; }
+    {
+#ifdef CONST_DELETE
+      delete condition; 
+#endif
+    }
   };
   typedef list<Entry*> EntryList;
   EntryList entries;
@@ -101,7 +106,11 @@ LogFile::print (string s)
 {
   if (!stream)
     {
-      stream = new ofstream (name.c_str ());
+      const char* n = name.c_str ();
+      stream = new ofstream (n);
+#ifndef BORLAND_C_STR
+      delete n;
+#endif
       if (!*stream)
 	cerr << "Failed to open `" << name << "'\n";
     }
@@ -119,7 +128,8 @@ const Filter&
 LogFile::match (const Daisy& daisy)
 {
   bool found = false;
-  for (EntryList::const_iterator i = entries.begin ();
+  // No const_iterator in BCC.
+  for (EntryList::iterator i = entries.begin ();
        i != entries.end ();
        i++)
     {

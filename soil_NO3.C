@@ -6,7 +6,7 @@
 
 #include "mike_she.h"
 void
-SoilNO3::clear (const Soil& soil, const SoilWater& soil_water)
+SoilNO3::clear (const Soil& /*soil */, const SoilWater& /* soil_water */)
 {
 #ifdef MIKE_SHE
   mike_she->get_no3_m (M_);

@@ -6,8 +6,9 @@
 #include "soil.h"
 #include "log.h"
 #include "mathlib.h"
-#include <algo.h>
-#include <ieeefp.h>
+// Not in BCC 5.01.
+// #include <algo.h>
+#include <numeric>
 
 OM::OM (const AttributeList& al)
   : top_C (al.number ("top_C")),

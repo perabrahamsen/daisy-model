@@ -3,7 +3,7 @@
 #ifndef DENITRIFICATION_H
 #define DENITRIFICATION_H
 
-#include <string>
+#include "common.h"
 #include <vector>
 class AttributeList;
 class Syntax;

@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-#include <std/stdexcept.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <list>
@@ -27,14 +27,16 @@ public:
 #ifdef HANDLE_EXCEPTIONS
   struct Invalid : runtime_error
   { 
-    // Tried to extract the wrong type from a Value object.
-    const char* what () const;
+    Invalid () 
+      : runtime_error ("Tried to extract the wrong type from a Value object")
+    { }
   };
 
   struct Uninitialized : runtime_error
   { 
-    // Tried to lookup an uninitialized value in an AttributeList.
-    const char* what () const;
+    Uninitialized ()
+      : runtime_error ("Tried to lookup an uninitialized value in an alist")
+    { }
   };
 #endif HANDLE_EXCEPTIONS
 

@@ -63,7 +63,8 @@ ColumnList::ColumnList (const vector<const AttributeList*>& sequence)
 
 ColumnList::~ColumnList ()
 {
-  for (const_iterator i = begin (); i != end (); i++)
+  // Borland C++ don't want a const_iterator here.
+  for (iterator i = begin (); i != end (); i++)
     delete *i;
 }
 

@@ -1,6 +1,7 @@
 // filter.C
 
 #include "filter.h"
+#include "alist.h"
 #include "common.h"
 #include <map>
 
@@ -34,6 +35,7 @@ const Filter&
 FilterNone::lookup (string) const
 { 
   assert (false);
+  // Shut up Borland C++ 5.01.
 }
 
 FilterNone::FilterNone ()
@@ -56,7 +58,7 @@ FilterSome::Implementation::lookup (string key) const
   if (i != filters.end ())
     return *(*i).second;
   else
-    THROW (UninitializedValue ());
+    THROW (AttributeList::Uninitialized ());
 }
 
 bool

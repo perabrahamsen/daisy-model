@@ -108,7 +108,7 @@ Bioclimate::Implementation::RadiationDistribution (const Weather& weather,
   // Calculate averages.
   ACExt /= LAI;
   ACRef /= LAI;
-  ARExt /= LAI;
+  // ARExt /= LAI;
 
   // Calculate the total Leaf Area Density as a function of the height
   // above the ground.
@@ -349,6 +349,10 @@ Bioclimate::irrigate (double flux, double temp,
   impl.irrigation_temperature = temp;
   impl.irrigation_type = type;
 }
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<Snow>;
+#endif
 
 void
 Bioclimate::load_syntax (Syntax& syntax, AttributeList& alist)

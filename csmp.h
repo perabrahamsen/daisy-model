@@ -8,7 +8,7 @@
 #ifndef CSMP_H
 #define CSMP_H
 
-#include <string>
+#include "common.h"
 #include <vector>
 
 struct Log;

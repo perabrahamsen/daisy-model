@@ -3,7 +3,14 @@
 #include "mathlib.h"
 #include <assert.h>
 #include <math.h>
-#include <sys/fsr.h>
+
+#ifndef __sparc__
+// Sun has a cbrt function.
+static double cbrt (double x) 
+{
+  return pow (x, 1.0/3.0);
+}
+#endif
 
 // See _Computational_Techniques_for_Differential_Equations page 616.
 void
@@ -104,6 +111,9 @@ bool approximate (const double a, const double b, const double noise)
 //   abort ();
 // }
 
+#ifdef __sparc__
+
+#include <sys/fsr.h>
 extern "C" set_exceptions ();
 
 struct set_sparc_exceptions
@@ -138,3 +148,4 @@ set_exceptions:
 	restore
 
 */
+#endif /* __sparc */

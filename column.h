@@ -3,7 +3,7 @@
 #ifndef COLUMN_H
 #define COLUMN_H
 
-#include <string>
+#include "common.h"
 #include <list>
 #include <vector>
 

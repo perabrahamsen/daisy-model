@@ -74,37 +74,53 @@ public:
   }
 };
 
+struct clause
+{
+  const Condition* condition;
+  Action* action;
+  clause (const Condition *const c, Action *const a) 
+    : condition (c),
+      action (a)
+  { }
+  clause ()
+    : condition (NULL),
+      action (NULL)
+  { }
+};
+
+#ifdef BORLAND_TEMPLATES
+template class vector<clause>;
+#endif
+
+vector<clause>& make_clauses (const vector<const AttributeList*>& s, 
+			      const Action *const p)
+{
+  vector<clause>& c = *new vector<clause>;
+  
+  for (vector<const AttributeList*>::const_iterator i = s.begin ();
+       i != s.end ();
+       i++)
+    {
+      c.push_back (clause (&Condition::create ((*i)->list ("condition")),
+			   &Action::create ((*i)->list ("action"), p)));
+    }
+  return c;
+}
+
 class ActionCond : public Action
 {
-  typedef vector<pair<const Condition*, Action*>/**/> clause_t;
-  clause_t& make_clauses (const vector<const AttributeList*>& s, 
-			  const Action *const p)
-  {
-    clause_t& c = *new clause_t;
-
-    for (vector<const AttributeList*>::const_iterator i = s.begin ();
-	 i != s.end ();
-	 i++)
-      {
-	c.push_back (pair<const Condition*, Action*>
-		     (&Condition::create ((*i)->list ("condition")),
-		      &Action::create ((*i)->list ("action"), p)));
-      }
-    return c;
-  }
-    
-  clause_t& clauses;
+  vector<clause>& clauses;
 
 public:
   void doIt (Daisy& daisy)
   { 
-    for (clause_t::iterator i = clauses.begin (); 
+    for (vector<clause>::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	if ((*i).first->match (daisy))
+	if ((*i).condition->match (daisy))
 	  {
-	    (*i).second->doIt (daisy);
+	    (*i).action->doIt (daisy);
 	    break;
 	  }
       }
@@ -115,11 +131,11 @@ public:
   bool check (Daisy& daisy) const
   { 
     bool ok = true;
-    for (clause_t::const_iterator i = clauses.begin (); 
+    for (vector<clause>::const_iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	if (!(*i).second->check (daisy))
+	if (!(*i).action->check (daisy))
 	  ok = false;
       }
     return ok;
@@ -135,12 +151,14 @@ private:
 public:
   ~ActionCond ()
   { 
-    for (clause_t::const_iterator i = clauses.begin (); 
+    for (vector<clause>::const_iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
-	delete (*i).first;
-	delete (*i).second;
+#ifdef CONST_DELETE
+	delete (*i).condition;
+	delete (*i).action;
+#endif
       }
     delete &clauses;
   }
@@ -185,9 +203,11 @@ private:
 public:
   ~ActionIf ()
   { 
+#ifdef CONST_DELETE
     delete &if_c;
     delete &then_a;
     delete &else_a;
+#endif
   }
 };
 

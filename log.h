@@ -109,7 +109,7 @@ output_list (T const& items,
     {
       const Filter& f = filter.lookup (name);
       log.open (name);
-      for (T::const_iterator item = items.begin(); 
+      for (typename T::const_iterator item = items.begin(); 
 	   item != items.end();
 	   item++)
 	{
@@ -132,7 +132,7 @@ output_vector (T const& items,
     {
       Filter const& f1 = filter.lookup (name);
       log.open (name);
-      for (T::const_iterator item = items.begin();
+      for (typename T::const_iterator item = items.begin();
 	   item != items.end();
 	   item++)
 	{

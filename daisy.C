@@ -41,7 +41,8 @@ Daisy::Daisy (const AttributeList& al)
 #endif
   
   bool ok = true;
-  for (ColumnList::const_iterator i = columns.begin ();
+  // This was ::const_iterator in g++
+  for (ColumnList::iterator i = columns.begin ();
        i != columns.end ();
        i++)
     {
@@ -115,6 +116,10 @@ Daisy::run ()
   if (time.hour () != 0)
     cout << "\n";
 }
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<Harvest>;
+#endif
 
 void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)

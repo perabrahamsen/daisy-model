@@ -10,7 +10,11 @@
 #include "log.h"
 #include "filter.h"
 #include <fstream.h>
-#include <strstream.h>
+// Borland C++ 5.01 doesn't spell stream with an m.
+#include <strstrea.h>
+
+// Borland C++ 5.01 gets `close' here.
+#include "io.h"
 
 struct ParserFile::Implementation
 {
@@ -73,7 +77,17 @@ ParserFile::Implementation::peek ()
 bool
 ParserFile::Implementation::good ()
 {
+#ifdef BORLAND_EOF  
+// BCC requires that you try to read beyond the eof to detect eof.
+  char c;
+  in.get (c);
+  bool ok = in.good ();
+  if (ok)
+    in.putback (c);
+  return ok;
+#else
   return in.good ();
+#endif
 }
 
 string
@@ -267,7 +281,7 @@ ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
 AttributeList&
 ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence)
 {
-  AttributeList* alist = NULL;
+  AttributeList* alist /* = NULL */;
   bool skipped = false;
   if (looking_at ('('))
     {
@@ -299,7 +313,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
   list<string>::const_iterator current = syntax.order ().begin ();
   const list<string>::const_iterator end = syntax.order ().end ();
 
-  while (!looking_at (')') && good ())
+  while ( good () && !looking_at (')'))
     {
       bool skipped = false;
       string name;
@@ -527,6 +541,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	  }
       if (skipped)
 	skip (")");
+      skip ();
     }
 }
 

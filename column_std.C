@@ -20,7 +20,8 @@
 #include "crop.h"
 #include "im.h"
 #include "am.h"
-#include <algo.h>
+// Not in BCC 5.01
+// #include <algo.h>
 
 class Groundwater;
 
@@ -349,6 +350,18 @@ static struct ColumnStandardSyntax
 {
   ColumnStandardSyntax ();
 } column_syntax;
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<Bioclimate>;
+template class add_submodule<Surface>;
+template class add_submodule<Soil>;
+template class add_submodule<SoilWater>;
+template class add_submodule<SoilHeat>;
+template class add_submodule<SoilNH4>;
+template class add_submodule<SoilNO3>;
+template class add_submodule<OrganicMatter>;
+template class add_submodule<Denitrification>;
+#endif
 
 ColumnStandardSyntax::ColumnStandardSyntax ()
 { 

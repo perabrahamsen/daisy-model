@@ -3,7 +3,7 @@
 #ifndef SOIL_WATER_H
 #define SOIL_WATER_H
 
-#include <string>
+#include "common.h"
 #include <vector>
 
 class AttributeList;

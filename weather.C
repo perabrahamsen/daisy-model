@@ -8,7 +8,8 @@
 #include "mathlib.h"
 #include "common.h"
 #include <map>
-#include <algobase.h>
+// Doesn't exist in Borland C++ 5.0.1
+// #include <algobase.h>
 
 Librarian<Weather>::Content* Librarian<Weather>::content = NULL;
 

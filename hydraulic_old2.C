@@ -8,6 +8,9 @@
 #include "csmp.h"
 #include <fstream.h>
 
+// Needed by BCC for `close'.
+#include "io.h"
+
 class HydraulicOld2 : public Hydraulic
 {
   // We cheat and use h_minus instead of h in all the CSMP except M_.
@@ -41,7 +44,7 @@ public:
   // Create and Destroy.
 private:
   friend class HydraulicOld2Syntax;
-  static Hydraulic& make (AttributeList& al);
+  static Hydraulic& make (const AttributeList& al);
   HydraulicOld2 (const AttributeList&);
 public:
   virtual ~HydraulicOld2 ();
@@ -155,7 +158,7 @@ HydraulicOld2::~HydraulicOld2 ()
 // Add the HydraulicOld2 syntax to the syntax table.
 
 Hydraulic&
-HydraulicOld2::make (AttributeList& al)
+HydraulicOld2::make (const AttributeList& al)
 {
   return *new HydraulicOld2 (al);
 }

@@ -3,7 +3,7 @@
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
-#include <string>
+#include "common.h"
 
 struct Syntax;
 struct AttributeList;

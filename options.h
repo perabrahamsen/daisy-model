@@ -3,11 +3,9 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-#include <string>
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <fcntl.h>
-#include <osfcn.h>
+#include "common.h"
+// Doesn't exists in Borland C++ 5.01.
+// #include <osfcn.h>
 
 class Options
 {

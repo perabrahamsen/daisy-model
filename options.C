@@ -3,15 +3,19 @@
 #include "options.h"
 #include <vector>
 
+// BCC 5.01 needs this for `open'.
+#include <io.h>
+#include <fcntl.h>
+
 int
 Options::find_file (const string name)
 {
   static vector<string> path;
-
   if (path.size () == 0)
     {
       // Initialize path.
-      const string colon_path = getenv ("DAISYPATH") ?: ".";
+      const string colon_path
+	= getenv ("DAISYPATH") ? getenv ("DAISYPATH") : ".";
       int last = 0;
       for (;;)
 	{
@@ -24,12 +28,13 @@ Options::find_file (const string name)
       path.push_back (colon_path.substr (last));
     }
   assert (path.size () > 0);
-
   if (name[0] == '.' || name[0] == '/')
     {
       const char *const str = name.c_str ();
       const int fd = open (str, O_RDONLY);
+#ifndef BORLAND_C_STR
       delete str;
+#endif
       return fd;
     }
   for (unsigned int i = 0; i < path.size (); i++)
@@ -37,7 +42,9 @@ Options::find_file (const string name)
       const string file = path[i] + "/" + name;
       const char *const str = file.c_str ();
       const int fd = open (str, O_RDONLY);
+#ifndef BORLAND_C_STR
       delete str;
+#endif
       if (fd >= 0)
 	return fd;
     }

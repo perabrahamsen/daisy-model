@@ -3,7 +3,7 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
 
-#include <string>
+#include "common.h"
 #include <list>
 
 struct FTable;
@@ -22,8 +22,8 @@ public:
   // default size `Singleton' indicating that the syntax entry match a
   // single item of the specified type, while the `Sequence' used for
   // entries that contain an array of unspecified length. 
-  const int Singleton = -117;	
-  const int Sequence = -3212;	
+  static const int Singleton;	
+  static const int Sequence;	
 
   // Each syntax entry should have an associated type.
   enum type 

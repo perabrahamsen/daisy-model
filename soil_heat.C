@@ -58,7 +58,7 @@ SoilHeat::Implementation::tick (const Time& time,
   if (!groundwater.flux_bottom ())
     {
       if (groundwater.table () < soil.z (size - 1))
-	THROW (Runtime ("Groundwater table below lowest node."));
+	THROW (runtime_error ("Groundwater table below lowest node."));
       size = soil.interval (groundwater.table ()) + 1;
     }
 

@@ -7,9 +7,13 @@
 #include "alist.h"
 #include "common.h"
 #include "log.h"
-#include <algobase.h>
+// Not in BCC.
+// #include <algobase.h>
 #include <fstream.h>
 #include "mike_she.h"
+
+// Needed in BCC for `close'.
+#include "io.h"
 
 class WeatherFile : public Weather
 {
@@ -88,7 +92,10 @@ WeatherFile::tick (const Time& time)
 	reference_evapotranspiration = -42.42e42;
       else
 	{
-	  file.unget ();
+	  // BCC wants this:
+	  file.putback (end);
+	  // G++ used this:
+	  // file.unget ();
 	  file >> reference_evapotranspiration;
 	  while (file.good () && file.get () != '\n')
 	    /* do nothing */;

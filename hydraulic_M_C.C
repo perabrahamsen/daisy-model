@@ -27,7 +27,7 @@ private:
   // Create and Destroy.
 private:
   friend class HydraulicM_CSyntax;
-  static Hydraulic& make (AttributeList& al);
+  static Hydraulic& make (const AttributeList& al);
   HydraulicM_C (const AttributeList&);
 public:
   ~HydraulicM_C ();
@@ -94,7 +94,7 @@ HydraulicM_C::~HydraulicM_C ()
 // Add the HydraulicM_C syntax to the syntax table.
 
 Hydraulic&
-HydraulicM_C::make (AttributeList& al)
+HydraulicM_C::make (const AttributeList& al)
 {
   return *new HydraulicM_C (al);
 }

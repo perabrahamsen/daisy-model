@@ -65,7 +65,7 @@ public:
   static bool ds_remove (const Crop*);
 protected:
   virtual double DS () const = 0;
-  static const double DSremove = -5001.0;
+  static const double DSremove;
 
   // Library.
 public:

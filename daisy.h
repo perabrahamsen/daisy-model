@@ -3,6 +3,7 @@
 #ifndef DAISY_H
 #define DAISY_H
 
+#include "common.h"
 #include "time.h"
 #include <vector>
 
@@ -28,6 +29,15 @@ public:
   Groundwater& groundwater;
   ColumnList& columns;
   vector<const Harvest*>& harvest;
+
+#ifdef HANDLE_EXCEPTIONS
+  // Exceptions.
+public:
+  struct Initialization : public runtime_error
+  {
+    Initialization (const char* n) : runtime_error (n) { }
+  };
+#endif
 
   // Simulation.
 public:

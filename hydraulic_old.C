@@ -7,6 +7,8 @@
 #include "common.h"
 #include "csmp.h"
 #include <fstream.h>
+// BCC
+#include <io.h>
 
 class HydraulicOld : public Hydraulic
 {
@@ -27,7 +29,7 @@ public:
   // Create and Destroy.
 private:
   friend class HydraulicOldSyntax;
-  static Hydraulic& make (AttributeList& al);
+  static Hydraulic& make (const AttributeList& al);
   HydraulicOld (const AttributeList&);
 public:
   virtual ~HydraulicOld ();
@@ -119,7 +121,7 @@ HydraulicOld::~HydraulicOld ()
 // Add the HydraulicOld syntax to the syntax table.
 
 Hydraulic&
-HydraulicOld::make (AttributeList& al)
+HydraulicOld::make (const AttributeList& al)
 {
   return *new HydraulicOld (al);
 }

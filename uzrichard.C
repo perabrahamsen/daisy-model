@@ -367,7 +367,7 @@ UZRichard::richard (const Soil& soil,
 		// We don't have more water in the pressure top.
 		{
 		  if (switched_top)
-		    THROW (Numeric ("Couldn't accept top flux"));
+		    THROW (runtime_error ("Couldn't accept top flux"));
 		  else 
 		    {
 		      top.flux_top_on ();
@@ -390,7 +390,7 @@ UZRichard::richard (const Soil& soil,
 	      accepted = false;
 	    }
 	  else
-	    THROW (Numeric ("Couldn't drain top flux"));
+	    THROW (runtime_error ("Couldn't drain top flux"));
 
 	  if (accepted)
 	    {
@@ -533,7 +533,7 @@ UZRichard::q_darcy (const Soil& soil,
 	break;
     }
   if (start == 0)
-    THROW (Numeric ("We couldn't find an unsaturated area."));
+    THROW (runtime_error ("We couldn't find an unsaturated area."));
   // Use Darcy equation to find flux here.
   q[start + 1] = -Kplus[start - first] 
     * (  (  (h[start - first] - h[start + 1 - first])
@@ -597,7 +597,7 @@ UZRichard::tick (const Soil& soil,
   var.iterations = 0;
   if (!richard (soil, first, top, last, bottom, 
 		S, h_old, Theta_old, h, Theta, q))
-    THROW (Runtime ("Richard's Equation doesn't converge."));
+    THROW (runtime_error ("Richard's Equation doesn't converge."));
     
   bottom.accept_bottom (q[last + 1]);
 

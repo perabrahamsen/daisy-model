@@ -3,7 +3,7 @@
 #ifndef OM_H
 #define OM_H
 
-#include <string>
+#include "common.h"
 #include <vector>
 
 class AttributeList;

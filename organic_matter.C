@@ -13,8 +13,11 @@
 #include "soil_heat.h"
 #include "mathlib.h"
 #include "csmp.h"
+#include "common.h"
+// G++ 2.7.2 has `accumulate' here.
 #include <algorithm>
-#include <ieeefp.h>
+// Borland 5.01 has `accumulate' here.
+#include <numeric>
 
 struct OrganicMatter::Implementation
 {
@@ -84,7 +87,7 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
   double rate = turnover_rate * abiotic_factor;
   double N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
 
-  assert (finite (rate));
+  assert (finite(rate));
   assert (finite (N_need));
   
   if (N_need > N_soil - N_used && N[i] > 0.0)
@@ -756,6 +759,11 @@ OrganicMatter::~OrganicMatter ()
 {
   delete &impl;
 }
+
+#ifdef BORLAND_TEMPLATES
+template class add_submodule<OrganicMatter::Implementation::Buffer>;
+template class add_submodule<OM>;
+#endif
 
 void
 OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
