@@ -538,7 +538,7 @@ double                          /* [mm/h] */
 daisy_column_get_evap_soil_surface (const daisy_column* column);
 
 double                          /* [mm/h] */
-daisy_column_get_evap_pond (const daisy_column* column);
+daisy_column_get_exfiltration (const daisy_column* column);
 
 void                            /* [mm] */
 daisy_column_put_ponding (daisy_column* column, double pond);
@@ -550,7 +550,7 @@ double                          /* [g/cm^2] */
 daisy_column_get_surface_no3 (const daisy_column* column);
 
 double                          /* [mm] */
-daisy_column_get_snow_height (const daisy_column* column);
+daisy_column_get_snow_storage (const daisy_column* column);
 
 /* @ Miscellaneous.
  *

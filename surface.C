@@ -134,9 +134,9 @@ Surface::output (Log& log, Filter& filter) const
 }
 
 double
-Surface::get_evap_soil_surface () const // [mm/h]
+Surface::get_exfiltration () const // [mm/h]
 {
-  // egative pond == amount extracted from soil.
+  // Negative pond == amount extracted from soil.
   if (pond < 0.0)
     return -pond;
   else
@@ -144,14 +144,8 @@ Surface::get_evap_soil_surface () const // [mm/h]
 }
 
 double
-Surface::get_evap_pond () const // [mm/h]
-{
-  // Negative pond == amount extracted from soil.
-  if (pond < 0.0)
-    return EvapSoilSurface + pond;
-  else 
-    return EvapSoilSurface;
-}
+Surface::get_evap_soil_surface () const // [mm/h]
+{ return EvapSoilSurface; }
 
 void
 Surface::put_ponding (double p)	// [mm]

@@ -43,7 +43,6 @@ main (int argc, char* argv[])
   /* Run the simulation. */
   {
     
-    daisy_weather* weather = daisy_daisy_get_weather (daisy);
     const daisy_time *const time = daisy_daisy_get_time (daisy);
     const int columns = daisy_daisy_count_columns (daisy);
     int i;

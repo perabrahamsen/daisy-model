@@ -99,12 +99,12 @@ public:
     { return bioclimate.get_intercepted_water (); }
   double get_net_precipitation () const // [mm/h]
     { return bioclimate.get_net_precipitation (); }
-  double get_snow_height () const // [mm]
-    { return bioclimate.get_snow_height (); }
+  double get_snow_storage () const // [mm]
+    { return bioclimate.get_snow_storage (); }
+  double get_exfiltration () const // [mm/h]
+    { return surface.get_exfiltration (); }
   double get_evap_soil_surface () const // [mm/h]
     { return surface.get_evap_soil_surface (); }
-  double get_evap_pond () const // [mm/h]
-    { return surface.get_evap_pond (); }
   void put_ponding (double pond)	// [mm]
     { surface.put_ponding (pond); }
   void put_surface_no3 (double no3) // [g/cm^2]

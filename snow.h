@@ -29,7 +29,7 @@ public:
   double evaporation ();
 
   // Communication with external model.
-  double get_h2o () const;
+  double get_storage () const;
 
   // Create & Destroy.
 public:

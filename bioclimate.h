@@ -49,7 +49,7 @@ public:
   virtual double get_evap_interception () const; // [mm/h]
   virtual double get_intercepted_water () const; // [mm]
   virtual double get_net_precipitation () const; // [mm/h]
-  virtual double get_snow_height () const; // [mm]
+  virtual double get_snow_storage () const; // [mm]
 
   // Create.
 protected:

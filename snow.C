@@ -281,7 +281,7 @@ Snow::evaporation ()
 }
 
 double 
-Snow::get_h2o () const
+Snow::get_storage () const
 {
   return impl.Ssnow;
 }

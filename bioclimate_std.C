@@ -91,8 +91,8 @@ public:
     { return intercepted_water; }
   double get_net_precipitation () const // [mm/h]
     { return net_precipitation; }
-  double get_snow_height () const // [mm]
-    { return snow.get_h2o (); }
+  double get_snow_storage () const // [mm]
+    { return snow.get_storage (); }
 
 
   // Create.
@@ -274,9 +274,6 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   if (irrigation_type == Column::surface_irrigation)
     Total_through_fall += irrigation;
 
-  // Store this for external model.
-  net_precipitation = Total_through_fall + weather.snow ();
-
   double temperature;
   if (Total_through_fall + irrigation > 0.0)
     temperature 
@@ -303,6 +300,11 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 						      snow.percolation (), 
 						      temperature,
 						      soil, soil_water);
+
+  // Store this for external model.
+  net_precipitation = snow.percolation () 
+    - (surface.get_evap_soil_surface () - surface.get_exfiltration ());
+
   PotSoilEvaporation -= EvapSoilSurface;
 
   PotCanopyEvapotranspiration += PotSoilEvaporation * soil.EpInterchange ();

@@ -671,8 +671,8 @@ daisy_column_get_evap_soil_surface (const Column* column)
 { return column->get_evap_soil_surface (); }
 
 extern "C" double EXPORT	// [mm/h]
-daisy_column_get_evap_pond (const Column* column)
-{ return column->get_evap_pond (); }
+daisy_column_get_exfiltration (const Column* column)
+{ return column->get_exfiltration (); }
 
 extern "C" void EXPORT		// [mm]
 daisy_column_put_ponding (Column* column, double pond)
@@ -687,8 +687,8 @@ daisy_column_get_surface_no3 (const Column* column)
 { return column->get_surface_no3 (); }
 
 extern "C" double EXPORT	// [mm]
-daisy_column_get_snow_height (const Column* column)
-{ return column->get_snow_height (); }
+daisy_column_get_snow_storage (const Column* column)
+{ return column->get_snow_storage (); }
 
 // @ Miscellaneous.
 //

@@ -17,7 +17,7 @@ Bioclimate::get_net_precipitation () const
 { assert (false); return 0.0; }
 
 double 
-Bioclimate::get_snow_height () const
+Bioclimate::get_snow_storage () const
 { assert (false); return 0.0; }
 
 Bioclimate::Bioclimate (const string& n)

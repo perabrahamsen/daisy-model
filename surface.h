@@ -48,8 +48,8 @@ public:
 		      const Soil&, const SoilWater&);
 
   // Communication with external model.
+  double get_exfiltration () const; // [mm/h]
   double get_evap_soil_surface () const; // [mm/h]
-  double get_evap_pond () const; // [mm/h]
   void put_ponding (double pond);	// [mm]
   void put_no3 (double no3); // [g/cm^2]
   double get_no3 () const; // [g/cm^2]
