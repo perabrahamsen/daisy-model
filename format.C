@@ -46,9 +46,25 @@ Format::pop (const std::string& name)
   nest.pop ();
 }
 
+Format::List::List (Format& f)
+  : format (f)
+{ 
+  format.push ("list");
+  format.list_open ();
+}
+
+Format::List::~List ()
+{ 
+  format.pop ("list");
+  format.list_close (); 
+}
+
 Format::Item::Item (Format& f, const std::string& name)
   : format (f)
 { 
+  daisy_assert (!format.nest.empty ());
+  daisy_assert (format.nest.top () == "list");
+
   format.push ("item");
   format.item_open (name); 
 }
@@ -64,6 +80,10 @@ Format::Section::Section (Format& f,
 			  const std::string& scope, const std::string& label)
   : format (f)
 { 
+  daisy_assert (!format.nest.empty ());
+  daisy_assert (format.nest.top () == "document"
+		|| format.nest.top () == "section");
+
   format.push ("section");
   format.section_open (type, title, scope, label); 
 }

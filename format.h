@@ -41,6 +41,20 @@ private:
   void push (const std::string& name);
   void pop (const std::string& name);
   
+  // List.
+  virtual void list_open () = 0;
+  virtual void list_close () = 0;
+public:
+  class List
+  {
+  private:
+    Format& format;
+    List (const List&);
+  public:
+    List (Format&);
+    ~List ();  
+  };
+
   // Item.
   virtual void item_open (const std::string& name) = 0;
   virtual void item_close () = 0;

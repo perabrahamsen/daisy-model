@@ -49,7 +49,8 @@ struct ProgramDocument : public Program
   // Private functions.
   void print_string (const std::string&);
   bool is_submodel (const Syntax&, const AttributeList&, const std::string&);
-  std::string find_submodel (const Syntax&, const AttributeList&, const std::string&);
+  std::string find_submodel (const Syntax&, const AttributeList&, 
+			     const std::string&);
 
   // Document functions.
   void print_entry_type (const std::string& name,
@@ -68,8 +69,6 @@ struct ProgramDocument : public Program
 			  const AttributeList& alist);
 
   void print_users (const XRef::Users&);
-  void print_submodel_header (std::ostream& out, const std::string&, int level);
-  void print_submodel_trailer (std::ostream& out, const std::string&, int level);
   void print_sample_ordered (const std::string& name, bool seq);
   void print_sample_entry (std::ostream& out, const std::string& name, 
 			   const Syntax& syntax,
@@ -763,26 +762,6 @@ ProgramDocument::print_sample_trailer (std::ostream& out, const std::string&)
 }
 
 void
-ProgramDocument::print_submodel_header (std::ostream& out,
-				      const std::string&, int level)
-{ 
-  if (level > 3)
-    out << "\n\\begin{enumerate}";
-  else
-    out << "\n\\begin{itemize}";
-}
-
-void
-ProgramDocument::print_submodel_trailer (std::ostream& out,
-				       const std::string&, int level)
-{ 
-  if (level > 3)
-    out << "\\end{enumerate}\n";
-  else
-    out << "\\end{itemize}\n";
-}
-
-void
 ProgramDocument::own_entries (const Library& library, const symbol name, 
 			      std::vector<std::string>& entries)
 {
@@ -943,7 +922,7 @@ ProgramDocument::print_submodel_entries (std::ostream& out,
       // Print normal attributes.
       if (log_count < entries.size ())
 	{
-	  print_submodel_header (out, name, level);
+	  Format::List dummy (*format);
 
 	  // Ordered members first.
 	  for (unsigned int i = 0; i < order.size (); i++)
@@ -953,8 +932,6 @@ ProgramDocument::print_submodel_entries (std::ostream& out,
 	  for (unsigned int i = 0; i < entries.size (); i++)
 	    if (syntax.order (entries[i]) < 0 && !syntax.is_log (entries[i]))
 	      print_submodel_entry (out, entries[i], level, syntax, alist);
-
-	  print_submodel_trailer (out, name, level);
 	}
 
       // Print log variables.
@@ -965,14 +942,10 @@ ProgramDocument::print_submodel_entries (std::ostream& out,
 	  else
 	    out << "\n\\textbf{Log Variables}\n";
 	  
-	  print_submodel_header (out, name, level);
-
+	  Format::List dummy (*format);
 	  for (unsigned int i = 0; i < entries.size (); i++)
 	    if (syntax.is_log (entries[i]))
 	      print_submodel_entry (out, entries[i], level, syntax, alist);
-
-	  print_submodel_trailer (out, name, level); 
-
 	}
     }
 }

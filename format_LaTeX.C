@@ -27,6 +27,9 @@
 struct FormatLaTeX : public Format
 {
   // Nesting.
+  int list_level;
+  void list_open ();
+  void list_close ();
   void item_open (const std::string& name);
   void item_close ();
   void section_open (const std::string& type, const std::string& title,
@@ -52,9 +55,30 @@ struct FormatLaTeX : public Format
 
   // Create and Destroy.
   explicit FormatLaTeX (const AttributeList& al)
-    : Format (al)
+    : Format (al),
+      list_level (0)
   { }
 };
+
+void
+FormatLaTeX::list_open ()
+{ 
+  list_level++;
+  if (list_level > 3)
+    out () << "\n\\begin{enumerate}";
+  else
+    out () << "\n\\begin{itemize}";
+}
+
+void
+FormatLaTeX::list_close ()
+{ 
+  if (list_level > 3)
+    out () << "\\end{enumerate}\n";
+  else
+    out () << "\\end{itemize}\n";
+  list_level--;
+}
 
 void 
 FormatLaTeX::item_open (const std::string& name)
