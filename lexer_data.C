@@ -137,6 +137,7 @@ LexerData::skip_hyphens ()
 {
   while (good () && peek () == '-')
     get ();
+  skip_space ();
   if (get () != '\n')
     {
       error ("Expected line of hyphens only");

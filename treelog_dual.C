@@ -93,13 +93,28 @@ TreelogDual::Implementation::touch (std::ostream& out, deque<bool>& touched)
 	}
     }
 }
+// Indenting make Emacs not parse error messages.
+// #define INDENT
 
 void
 TreelogDual::Implementation::print (std::ostream& out, deque<bool>& touched, 
 				    const string& text)
 {
   touch (out, touched);
+#ifdef INDENT
+  const string indent (touched.size () + 3 * (touched.size () > 0), ' ');
+  out << indent;
+  for (unsigned int i = 0; i < text.size (); i++)
+    {
+      out << text[i];
+      if (text[i] == '\n')
+        out << indent;
+    }
+  out << "\n";
+#else // !INDENT
   out << text << "\n";
+#endif
+
 }
 
 void

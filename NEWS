@@ -12,6 +12,17 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.31
+
+** The exercises have been updated.
+
+The now reflect the new organic matter initialization model and
+automatic aquitard horizon.
+
+The answers have only been partly updated.
+
+** Allow spaces at end of hyphen-only line for default weather model.
+
 * 3.30
 
 ** Renamed "Majs" to "Silomajs" and adjusted parameters.

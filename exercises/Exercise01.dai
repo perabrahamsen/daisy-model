@@ -25,37 +25,33 @@
     (silt 0.277 [])
     (sand 0.584 [])
     (humus 0.026 [])
-    (SOM_fractions 0.60 0.40 [])
-    (SOM_C_per_N 11.0 11.0 [g C/g N])
-)
+    (C_per_N 11.0 [g C/g N]))
+
 (defhorizon "B F.S.L." default
     (dry_bulk_density 1.51 [g/cm^3]) 
     (clay 0.235 [])
     (silt 0.253 [])
     (sand 0.507 [])
     (humus 0.005 [])
-    (SOM_fractions 0.90 0.10 [])
-    (SOM_C_per_N 11.0 11.0 [g C/g N])
-)
+    (C_per_N 11.0 [g C/g N]))
+
 (defhorizon "C F.S.L." default
     (dry_bulk_density 1.57 [g/cm^3]) 
     (clay 0.244 [])
     (silt 0.283 [])
     (sand 0.471 [])
     (humus 0.002 [])
-    (SOM_fractions 0.950 0.050) ; note that the dimention is omittet
-    (SOM_C_per_N  11.0 11.0)    ; note that the dimention is omittet
-)
+    (C_per_N  11.0))    ; Note that the dimension is omittet
 
 ;;  Parameterisation of column (Fine sandy loam)
 (defcolumn "Fine sandy loam" default
-     (Soil
-          (MaxRootingDepth 100 [cm])
-          (horizons (  -30 [cm] "Ap F.S.L.")
-                    (  -80 [cm] "B F.S.L.")
-                    ( -400 [cm] "C F.S.L."))
-     (Groundwater deep)
-)
+     (Soil (MaxRootingDepth 100 [cm])
+           (horizons (  -30 [cm] "Ap F.S.L.")
+                     (  -80 [cm] "B F.S.L.")
+                     ( -400 [cm] "C F.S.L.")))
+     (OrganicMatter (init (input 3000 [kg C/ha/y])))
+     (Groundwater deep))
+
 ;; Spring Barley setup.
 (defaction SBarley_management activity
   (wait_mm_dd 3 20)

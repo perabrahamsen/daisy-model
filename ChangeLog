@@ -1,8 +1,17 @@
-2004-02-02  Per Abrahamsen  <Per Abrahamsen@CHURCH>
+2004-02-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.31 released.
+
+2004-02-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lexer_data.C (skip_hyphens): Allow space at end of line with
+	hyphens. 
+
+2004-02-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Makefile (daisy.exe): Add CPPLIB.
 
-2004-02-02  Per Abrahamsen  <Per Abrahamsen@CHURCH>
+2004-02-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* treelog_dual.C (touch, entry): Flush two.
 

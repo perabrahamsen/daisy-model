@@ -29,8 +29,7 @@
     (silt 0.072 [])
     (sand 0.866 [])
     (humus 0.023 [])
-    (SOM_fractions 0.60 0.40 [])
-    (SOM_C_per_N 11.0 11.0 [g C/g N])
+    (C_per_N 11.0 [g C/g N])
     (hydraulic M_vG (Theta_res 0.070 [cm^3 H2O/cm^3])
                     (Theta_sat 0.400 [cm^3 H2O/cm^3])
                     (alpha 0.0308 [cm^-1])
@@ -44,8 +43,7 @@
     (silt 0.023 [])
     (sand 0.944 [])
     (humus 0.004 [])
-    (SOM_fractions 0.90 0.10 [])
-    (SOM_C_per_N 11.0 11.0 [g C/g N])
+    (C_per_N 11.0 [g C/g N])
     (hydraulic M_vG (Theta_res 0.018 [cm^3 H2O/cm^3])
                     (Theta_sat 0.453 [cm^3 H2O/cm^3])
                     (alpha 0.0723 [cm^-1])
@@ -63,6 +61,7 @@
                  -55 -60 -65 -70 -75 -80 -85 -90 -95 -100 -110 -120 -130
                  -140 -150 -160 -170 -180 -190 -200 -210 -220 -230 
                  -240 -250 -260 -270 [cm]))
+     (OrganicMatter (init (input 3000 [kg C/ha/y])))
      (Groundwater deep)
 )
 ;; Spring Barley setup.

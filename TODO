@@ -1,24 +1,24 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* SH: Standarddaisykursus?
+* Textpad licens:  Giv til institut.
+
+* SH: Oversæt Daisy under cygwin
 
 * SH: Arbejdsplan
 
 ** Polish setup
 
-** wp1 vs wp3?
-
-** README file
+** Italian setup
 
 ** .bat fil for windoz
+
+** README file
 
 ** upload, announce
 
 ** ny kartoffel
 
-* stop attribut
-
-Skal bruge wether end som default
+* Update answers
 
 * Make it possible to specify texture using different systems
 
@@ -31,8 +31,6 @@ Update hydraulic models.
 ** USDA. FAO, DIN, DS horizon
 
 ** numeric horizon
-
-* Log pF
 
 * Slides til Dina årsmøde
 

@@ -29,8 +29,7 @@
     (silt 0.277 [])
     (sand 0.584 [])
     (humus 0.026 [])
-    (SOM_fractions 0.60 0.40 [])
-    (SOM_C_per_N 11.0 11.0 [g C/g N])
+    (C_per_N 11.0 [g C/g N])
     (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
                     (Theta_sat 0.403 [cm^3 H2O/cm^3])
                     (alpha 0.0385 [cm^-1])
@@ -44,8 +43,7 @@
     (silt 0.253 [])
     (sand 0.507 [])
     (humus 0.005 [])
-    (SOM_fractions 0.90 0.10 [])
-    (SOM_C_per_N 11.0 11.0 [g C/g N])
+    (C_per_N 11.0 [g C/g N])
     (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
                     (Theta_sat 0.421 [cm^3 H2O/cm^3])
                     (alpha 0.2605 [cm^-1])
@@ -59,8 +57,7 @@
     (silt 0.283 [])
     (sand 0.471 [])
     (humus 0.002 [])
-    (SOM_fractions 0.950 0.050) ; note that the dimention is omittet
-    (SOM_C_per_N  11.0 11.0)    ; note that the dimention is omittet
+    (C_per_N 11.0 [g C/g N])
     (hydraulic M_vG (Theta_res 0.000 [cm^3 H2O/cm^3])
                     (Theta_sat 0.401 [cm^3 H2O/cm^3])
                     (alpha 0.0570 [cm^-1])
@@ -70,7 +67,6 @@
 )
 (defhorizon "Aquitard" default
     (clay 0.700)(silt 0.199)(fine_sand 0.05)(coarse_sand 0.05)(humus 0.001)
-    (SOM_fractions 0.950 0.050)(SOM_C_per_N  11.0 11.0)
     (hydraulic M_vG (Theta_res 0.00)(Theta_sat 0.40)(alpha 0.01)(n 1.11)(K_sat 0.0015 [cm/h]))
 )
 
@@ -87,6 +83,7 @@
                  -55 -60 -65 -70 -75 -80 -85 -90 -95 -100 -110 -120 -130
                  -140 -150 -160 -170 -180 -190 -200 -210 -220 -230 
                  -240 -250 -260 -270 [cm]))
+     (OrganicMatter (init (input 3000 [kg C/ha/y])))
      (Groundwater pipe (pipe_position -1.1 [m])(L 18 [m])(h_aquifer 2.50 [m])
           (Z_aquitard 1.70 [m])(K_aquitard 0.0015 [cm/h]))
 )
