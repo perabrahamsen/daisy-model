@@ -1,0 +1,91 @@
+* System til rename af dupplicate object ved parsing.
+
+* OrganicMatter output Total C/N of AM, SOM, and SMB respectively.
+
+* daisy_alist_check skal ikke altid skrive fejl ud på cout.
+
+* Try out "SWIFT"
+
+* Try out gtk--
+
+* Remove exception handling.
+
+* tkdaisy:
+
+  Create pseudo TkDaisyEntry top level as an syntax+alist containing a
+  single "daisy" element.  Use this make the step function always
+  contain the syntax/alist whe name belongs to.
+
+  Lav function til at browse en syntax, alist par.
+
+  Lav function til at loade en dai fil
+
+  Lav function(er) til at instantiere, test, og køre daisy object.
+
+  Lav filter/log som sender data tilbage til tcl.
+
+  Lav functioner der viser data statisk og dynamisk.
+
+* Do something about category.h, and expression.X.
+
+* Missing:
+
+** Solute transport for groundwater.
+
+** Make plant competition work.
+
+** Make output of OrganicMatter total_[NC] work.
+
+** Funktionshøst
+
+   HVIS crop(gras)->dm > tal ELLER crop(gras)->ds > tal SÅ høst.
+
+* Figure out why inline spec of specialized horizon doesn't work.
+
+* Make it possible to specify Soil geometry with dz.
+
+* A filter should know the syntax table.
+
+* Output syntax.
+
+Having multiple output statements that all added to a single list
+might be nice.  Create a Syntax::size `Multiple' for this.  Use it on
+Input as well to be consistent.  
+
+Consider how this fits into the desired ability to add rules to a
+Manager. 
+
+* add text to syntax
+
+Each syntax should have an associated static const table with text
+strings giving a name, short description, long description, and unit
+of each parameter.
+
+* Split Crop in submodules the same way as is done with Soil.
+
+* Make everything use error_log instead of cout and cerr.
+
+* Use reference counting.
+
+* Make CropStandard::get work.
+
+Use a STL set for this.
+
+Compare alist members that are Syntax::Const
+
+Make sharing of parameters for other objects work.
+
+* Make CSMP::find use binary search.
+
+* Make it possible to add rules, not just overwrite them.
+
+Create Syntax::Prepend and Syntax::Append variations of
+Syntax::Sequence.  Make rules use Syntax::Prepend.
+
+* Try to understand N extraction by crops.
+
+* Rename Daisy to Simulation.
+
+This will allow us to ship Condition and Action as part of the Daisy
+independent library.
+

@@ -40,22 +40,22 @@ public:
   { return dispersivity_; }
   
   // Texture.
-  double tortuosity_factor (int i, double Theta) const
+  inline double tortuosity_factor (int i, double Theta) const
     { return horizon_[i]->tortuosity.factor (horizon_[i]->hydraulic, Theta); }
-
-  // Thermic.
-  double heat_conductivity (int i, double Theta, double Ice = 0.0) const
-  { return horizon_[i]->heat_conductivity (Theta, Ice); }
-  double heat_capacity (int i, double Theta, double Ice = 0.0) const
-  { return horizon_[i]->heat_capacity (Theta, Ice); }
-  
-  // Content.
+  inline double dry_bulk_density (int i) const
+    { return horizon_[i]->dry_bulk_density (); }
   inline double clay (int i) const
   { return horizon_[i]->clay (); }
   inline double SOM_C (int i, unsigned int pool) const
   { return horizon_[i]->SOM_C (pool); }
   inline double SOM_C_per_N (int i, unsigned int pool) const
   { return horizon_[i]->SOM_C_per_N (pool); }
+
+  // Thermic.
+  double heat_conductivity (int i, double Theta, double Ice = 0.0) const
+  { return horizon_[i]->heat_conductivity (Theta, Ice); }
+  double heat_capacity (int i, double Theta, double Ice = 0.0) const
+  { return horizon_[i]->heat_capacity (Theta, Ice); }
   
   // Calculations.
   double MaxRootingDepth () const;

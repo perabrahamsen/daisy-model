@@ -13,6 +13,15 @@ public:
 
   // Interface.
 public:
+  // Print comment.
+  virtual void print_comment (const string& comment) = 0;
+  // Print content of alist.
+  virtual void print_alist (const AttributeList& alist, const Syntax&) = 0;
+  // Print all elements in all libraries associated with `filename'.
+  virtual void print_library_file (const string& filename) = 0;
+
+  // True iff no errors have occured.
+  virtual bool good () const = 0;
 
   // Create and Destroy.
 protected:

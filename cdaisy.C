@@ -77,17 +77,6 @@ extern "C" void EXPORT
 daisy_alist_delete (AttributeList* alist)
 { delete alist; }
 
-
-extern "C" int EXPORT
-daisy_alist_save (const AttributeList* alist, const Syntax* syntax,
-		  const char* file)
-{ 
-  PrinterFile printer (file);
-  printer.print_comment ("Automatic dump of Daisy alist.");
-  printer.print_alist (*alist, *syntax);
-  return printer.good () ? 0 : -1;
-}
-
 extern "C" daisy_bool EXPORT
 daisy_alist_check (const AttributeList* alist, const char* name)
 { 
@@ -375,16 +364,6 @@ extern "C" void EXPORT
 daisy_library_remove (Library* library, const char* name)
 { library->remove (name); }
 
-extern "C" int EXPORT
-daisy_library_save_file (const char* filename)
-{
-  PrinterFile printer (filename);
-  printer.print_comment (string ("Automated dump of daisy libraries to `")
-			 + filename + "'.");
-  printer.print_library_file (filename);
-  return printer.good () ? 0 : -1;
-}
-
 // @ The daisy_parser Type.
 
 extern "C" Parser* EXPORT
@@ -398,6 +377,33 @@ daisy_parser_delete (Parser* parser)
 extern "C" void EXPORT
 daisy_parser_load (Parser* parser, AttributeList* alist)
 { parser->load (*alist); }
+
+// @ The daisy_printer Type.
+
+extern "C" Printer* EXPORT
+daisy_printer_create_file (const char* filename)
+{ return new PrinterFile (filename); }
+
+extern "C" void EXPORT
+daisy_printer_comment (Printer* printer, const char* comment)
+{ printer->print_comment (comment); }
+
+extern "C" void EXPORT
+daisy_printer_alist (Printer* printer, 
+		     const AttributeList* alist, const Syntax* syntax)
+{ printer->print_alist (*alist, *syntax); }
+
+extern "C" void EXPORT
+daisy_printer_library_file (Printer* printer, const char* filename)
+{ printer->print_library_file (filename); }
+
+extern "C" void EXPORT
+daisy_printer_delete (Printer* printer)
+{ delete printer; }
+
+extern "C" bool
+daisy_printer_good (Printer* printer)
+{ return printer->good (); }
 
 // @ The daisy_daisy Type.
 

@@ -22,7 +22,7 @@ public:
 
   // Retrieve data (Singletons).
   virtual operator double () const
-       throw1 (AttributeList::Invalid)
+    throw1 (AttributeList::Invalid)
     { THROW (AttributeList::Invalid ()); }
   virtual operator const string& () const
        throw1 (AttributeList::Invalid)
@@ -267,26 +267,24 @@ typedef map <string, Value*, less<string> > value_map;
 struct AttributeList::Implementation
 {
   value_map values;
-  bool check (const string& key) const throw0 ();
-  Value* lookup (const string& key) const throw1 (Uninitialized);
+  bool check (const string& key) const;
+  Value* lookup (const string& key) const;
   void add (const string& key, Value* value);
 };    
 
 bool
-AttributeList::Implementation::check (const string& key) const throw0 ()
+AttributeList::Implementation::check (const string& key) const
 { 
   return values.find (key) != values.end ();
 }
 
 Value* 
-AttributeList::Implementation::lookup (const string& key) const throw1 (AttributeList::Uninitialized)
+AttributeList::Implementation::lookup (const string& key) const
 { 
   value_map::const_iterator i = values.find (key);
   
-  if (i != values.end ())
-    return (*i).second;
-  else
-    THROW (Uninitialized ());
+  assert (i != values.end ());
+  return (*i).second;
 }
 
 void
@@ -308,7 +306,7 @@ AttributeList::Implementation::add (const string& key, Value* value)
 }
 
 bool
-AttributeList::check (const string& key) const throw0 ()
+AttributeList::check (const string& key) const
 { 
   return impl.check (key);
 }
@@ -367,92 +365,85 @@ AttributeList::size (const string& key)	const // BUG: UNIMPLEMENTED.
 }
 
 double 
-AttributeList::number (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
+AttributeList::number (string key) const
 {
   return *impl.lookup (key);
 }
 
 const string& 
-AttributeList::name (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
+AttributeList::name (string key) const
 {
   return *impl.lookup (key);
 }
 
 bool 
-AttributeList::flag (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
+AttributeList::flag (string key) const
 {
   return *impl.lookup (key);
 }
 
 int
-AttributeList::integer (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
+AttributeList::integer (string key) const
 {
   return *impl.lookup (key);
 }
 
 const Time&
-AttributeList::time (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
+AttributeList::time (string key) const
 {
   return *impl.lookup (key);
 }
 
 const CSMP& 
-AttributeList::csmp (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
+AttributeList::csmp (string key) const
 {
   return *impl.lookup (key);
 }
 
 AttributeList& 
-AttributeList::alist (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
+AttributeList::alist (string key) const
 {
   return *impl.lookup (key);
 }
 
 const vector<double>& 
 AttributeList::number_sequence (string key) const
-     throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
 }
 
 const vector<string>& 
 AttributeList::name_sequence (string key) const
-     throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
 }
 
 const vector<bool>& 
 AttributeList::flag_sequence (string key) const
-     throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
 }
 
 const vector<int>& 
 AttributeList::integer_sequence (string key) const
-     throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
 }
 
 const vector<const Time*>& 
 AttributeList::time_sequence (string key) const
-     throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
 }
 
 const vector<const CSMP*>& 
 AttributeList::csmp_sequence (string key) const
-     throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
 }
 
 const vector<AttributeList*>& 
 AttributeList::alist_sequence (string key) const
-     throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
 }

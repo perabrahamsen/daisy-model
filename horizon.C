@@ -311,6 +311,10 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     cerr << "Horizon: No C fractions given.\n";
 }
 
+double
+Horizon::dry_bulk_density () const
+{ return impl.dry_bulk_density; }
+
 double 
 Horizon::clay () const 
 { return impl.clay; }

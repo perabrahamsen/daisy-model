@@ -24,6 +24,7 @@ typedef struct daisy_alist daisy_alist;
 typedef struct daisy_library daisy_library;
 typedef struct daisy_daisy daisy_daisy;
 typedef struct daisy_parser daisy_parser;
+typedef struct daisy_printer daisy_printer;
 typedef struct daisy_time daisy_time;
 typedef struct daisy_column daisy_column;
 typedef struct daisy_weather daisy_weather;
@@ -123,11 +124,6 @@ daisy_alist_create (void);
 
 void				/* Delete alist object. */
 daisy_alist_delete (daisy_alist* alist);
-
-/* Pretty-print alist to file. Return -1 on errors. */
-int
-daisy_alist_save (const daisy_alist* alist, const daisy_syntax* syntax,
-		  const char* file);
 
 daisy_bool			/* Check that NAME is defined in ALIST. */
 daisy_alist_check (const daisy_alist* alist, const char* name);
@@ -286,12 +282,6 @@ daisy_library_derive (daisy_library* library,
 void				/* Remove object NAME from LIBRARY */
 daisy_library_remove (daisy_library* library, const char* name);
 
-/* Save all elements in all libraries that are associated with FILE.
-   Return -1 on errors. */
-int
-daisy_library_save_file (const char* file);
-
-
 /* @ The daisy_parser Type.
  *
  * A parser fills an alist based on a syntax.  
@@ -305,6 +295,31 @@ daisy_parser_delete (daisy_parser* parser);
 
 void				/* Load file. */
 daisy_parser_load (daisy_parser* parser, daisy_alist* alist);
+
+/* @ The daisy_printer Type.
+ *
+ * A printer pretty print the content of alists and library objects.
+ */
+
+daisy_printer*			/* Print to FILENAME. */
+daisy_printer_create_file (const char* filename);
+
+void				/* Print COMMENT */
+daisy_printer_comment (daisy_printer* printer, const char* comment);
+
+void				/* Print ALIST. */
+daisy_printer_alist (daisy_printer* printer, 
+		     const daisy_alist* alist, const daisy_syntax* synatx);
+
+/* Save all elements in all libraries that are associated with FILE. */
+void
+daisy_printer_library_file (daisy_printer* printer, const char* file);
+
+daisy_bool			/* Return false iff errors have occured. */
+daisy_printer_good (daisy_printer* printer);
+
+void				/* Delete the PRINTER object. */
+daisy_printer_delete (daisy_printer* printer);
 
 /* @ The daisy_daisy Type.
  *

@@ -25,26 +25,8 @@ public:				// EGCS require this to be public...
 public:
   static const AttributeList empty;
 
-  // Exceptions.
-#ifdef HANDLE_EXCEPTIONS
-  struct Invalid : runtime_error
-  { 
-    Invalid () 
-      : runtime_error ("Tried to extract the wrong type from a Value object")
-    { }
-  };
-
-  struct Uninitialized : runtime_error
-  { 
-    Uninitialized ()
-      : runtime_error ("Tried to lookup an uninitialized value in an alist")
-    { }
-  };
-#endif HANDLE_EXCEPTIONS
-
   // Is `key' an element of this alist?
-  bool check (const string& key) const 
-       throw0 ();
+  bool check (const string& key) const;
   // Is this alist a subset of `other'?
   bool subset (const AttributeList& other, const Syntax& syntax) const;
   // Is the element `key' in this alist a subset of the correspi
@@ -52,34 +34,20 @@ public:
 	       const string& key) const;
   int size (const string& key) const; // BUG: UNIMPLEMENTED.
 
-  double number (string) const
-       throw2 (Invalid, Uninitialized);
-  const string& name (string) const
-       throw2 (Invalid, Uninitialized);
-  bool flag (string) const
-       throw2 (Invalid, Uninitialized);
-  const CSMP& csmp (string) const 
-       throw2 (Invalid, Uninitialized);
-  AttributeList& alist (string) const
-       throw2 (Invalid, Uninitialized);
-  int integer (string) const
-       throw2 (Invalid, Uninitialized);
-  const Time& time (string) const
-       throw2 (Invalid, Uninitialized);
-  const vector<double>& number_sequence (string) const
-       throw2 (Invalid, Uninitialized);
-  const vector<string>& name_sequence (string key) const
-       throw2 (Invalid, Uninitialized);
-  const vector<bool>& flag_sequence (string key) const
-       throw2 (Invalid, Uninitialized);
-  const vector<int>& integer_sequence (string key) const
-       throw2 (Invalid, Uninitialized);
-  const vector<const Time*>& time_sequence (string key) const
-       throw2 (Invalid, Uninitialized);
-  const vector<const CSMP*>& csmp_sequence (string key) const
-       throw2 (Invalid, Uninitialized);
-  const vector<AttributeList*>& alist_sequence (string key) const
-       throw2 (Invalid, Uninitialized);
+  double number (string) const;
+  const string& name (string) const;
+  bool flag (string) const;
+  const CSMP& csmp (string) const;
+  AttributeList& alist (string) const;
+  int integer (string) const;
+  const Time& time (string) const;
+  const vector<double>& number_sequence (string) const;
+  const vector<string>& name_sequence (string key) const;
+  const vector<bool>& flag_sequence (string key) const;
+  const vector<int>& integer_sequence (string key) const;
+  const vector<const Time*>& time_sequence (string key) const;
+  const vector<const CSMP*>& csmp_sequence (string key) const;
+  const vector<AttributeList*>& alist_sequence (string key) const;
 
   // Create and Destroy.
   void add (const string&, double);

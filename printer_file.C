@@ -572,7 +572,21 @@ PrinterFile::Implementation::Implementation (const string& name)
 void
 PrinterFile::print_comment (const string& comment)
 {
-  impl.out << ";; " << comment << "\n\n";
+  vector<string> text;
+
+  int last = 0;
+  for (;;)
+    {
+      const int next = comment.find ('\n', last);
+      if (next < 0)
+	break;
+      text.push_back (comment.substr (last, next - last));
+      last = next + 1;
+    }
+  text.push_back (comment.substr (last));
+
+  for (unsigned int i = 0; i < text.size (); i++)
+    impl.out << ";; " << text[i] << "\n";
 }
 
 void 

@@ -1,0 +1,37 @@
+1998-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.004 released.
+
+1998-03-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* printer_file.C (print_comment): Support multiline comments.
+
+	* printer.h (class Printer): Added `print_comment', `print_alist',
+	`print_library_file', and `good' as pure virtual members.
+
+	* cdaisy.C, cdaisy.h (daisy_alist_save): Deleted.
+	(daisy_library_save_file): Ditto.
+	(daisy_printer_create_file): New function.
+	(daisy_printer_comment): Ditto.
+	(daisy_printer_alist): Ditto.
+	(daisy_printer_library_file): Ditto.
+	(daisy_printer_delete): Ditto.
+	(daisy_printer_good): Ditto.
+
+1998-03-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile (cvs): Add version to ChangeLog.
+	(TEXT): Add `TODO' and `ChangeLog'.
+	(wc): Only count sources.
+
+	* solute.C (initialize): Initialize M from ppm and
+	dry_bulk_density. 
+
+	* horizon.C (dry_bulk_density): New function.
+	* horizon.h: Ditto.
+	* soil.h: Ditto.
+
+	* Makefile: Removed DHI comments.
+
+	* ChangeLog: New file.
+

@@ -10,10 +10,6 @@
 #	sun4	Create code for Solaris-2 / UltraSPARC.
 #	hp	Create code for HP/UX / HP-PA.
 #	i386	Create code for Win32 / Pentium.
-#
-# USER
-#	jaj0kvl	Setup defaults for use at DHI.
-#
 
 # All makefiles should have these.
 #
@@ -202,7 +198,7 @@ HEADERS = $(INTERFACES:.C=.h) common.h version.h
 
 # Find all printable files.
 #
-TEXT =  Makefile $(HEADERS) $(SOURCES) 
+TEXT =  Makefile ChangeLog TODO $(HEADERS) $(SOURCES) 
 
 # The executables.
 #
@@ -258,7 +254,7 @@ dlldaisy${EXT}:	cmain${OBJ} daisy.dll
 
 # Count the size of daisy.
 #
-wc: $(TEXT)
+wc: $(HEADERS) $(SOURCES) 
 	wc -l $(TEXT) | sort -nr
 
 wc-h: $(HEADERS)
@@ -347,6 +343,13 @@ cvs: $(TEXT)
 	echo "// version.h -- automatically generated file" > version.h
 	echo " " >> version.h
 	echo "static const char *const version = \"$(TAG)\";" >> version.h
+	mv ChangeLog ChangeLog.old
+	echo `date "+%Y-%m-%d "` \
+	     " Per Abrahamsen  <abraham@dina.kvl.dk>" > ChangeLog
+	echo >> ChangeLog
+	echo "	* Version" $(TAG) released. >> ChangeLog
+	echo >> ChangeLog
+	cat ChangeLog.old >> ChangeLog
 	(cd lib; $(MAKE) cvs);
 	-cvs add $(TEXT)
 	rm -f $(REMOVE) 
@@ -622,7 +625,7 @@ minimanager${OBJ}: minimanager.C syntax.h common.h minimanager.h action.h \
 printer${OBJ}: printer.C printer.h librarian.h library.h common.h alist.h \
  syntax.h
 printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
- library.h common.h alist.h syntax.h options.h
+ library.h common.h alist.h syntax.h csmp.h options.h
 set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h common.h parser_file.h parser.h syntax.h \
  alist.h version.h

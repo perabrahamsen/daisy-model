@@ -71,20 +71,7 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
   Geometry::add_layer (syntax, "C");
   Geometry::add_layer (syntax, "M");
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-
-  // Kludge to allow M to be initialized based on "ppm".
-  {
-    Syntax& layer = *new Syntax ();
-    if (!layer.ordered ())
-      {
-	// Initialize as first call.
-	layer.add ("size", Syntax::Number, Syntax::Const);
-	layer.add ("value", Syntax::Number, Syntax::Const);
-	layer.order ("size", "value");
-      }
-    syntax.add (string ("initial_ppm"), layer,
-		Syntax::Optional, Syntax::Sequence);
-  }
+  Geometry::add_layer (syntax, "ppm");
 }
 
 Solute::Solute (const AttributeList& al)
@@ -129,8 +116,11 @@ void
 Solute::initialize (const AttributeList& al, 
 		    const Soil& soil, const SoilWater& soil_water)
 {
+  vector<double> ppm;
   soil.initialize_layer (C_, al, "C");
   soil.initialize_layer (M_, al, "M");
+  soil.initialize_layer (ppm, al, "ppm");
+
   if (C_.size () > 0)
     {
       // Fill it up.
@@ -147,11 +137,30 @@ Solute::initialize (const AttributeList& al,
       else if (M_.size () > soil.size ())
 	THROW ("To many members of M sequence");
     }
-  // TODO: Initalize M based on "ppm".
+  if (ppm.size () > 0)
+    {
+      // Fill it up.
+      if (ppm.size () < soil.size () + 0U)
+	ppm.insert (ppm.end (), soil.size () - ppm.size (), 
+		    ppm[ppm.size () - 1]);
+      else if (ppm.size () > soil.size ())
+	THROW ("To many members of M sequence");
+    }
   if (M_.size () == 0 && C_.size () == 0)
     {
-      C_.insert (C_.begin (), soil.size (), 0.0);
-      M_.insert (M_.begin (), soil.size (), 0.0);
+      if (ppm.size () != 0)
+	{
+	  assert (ppm.size () == soil.size ());
+
+	  for (unsigned int i = M_.size (); i < C_.size (); i++)
+	    // ppm -> g / cm^3.
+	    M_.push_back (1.0e-6 * ppm[i] * soil.dry_bulk_density (i));
+	}
+      else
+	{
+	  C_.insert (C_.begin (), soil.size (), 0.0);
+	  M_.insert (M_.begin (), soil.size (), 0.0);
+	}
     }
   for (unsigned int i = C_.size (); i < M_.size (); i++)
     C_.push_back (M_to_C (soil, soil_water.Theta (i), i, M_[i]));

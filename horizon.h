@@ -21,9 +21,6 @@ private:
   struct Implementation;
   Implementation& impl;
 public:
-  double clay () const;
-  double SOM_C (unsigned int pool) const;
-  double SOM_C_per_N (unsigned int pool) const;
 
   // Water.
 public:
@@ -34,6 +31,10 @@ public:
   // Texture.
 public:
   const Tortuosity& tortuosity;
+  double dry_bulk_density () const;
+  double clay () const;
+  double SOM_C (unsigned int pool) const;
+  double SOM_C_per_N (unsigned int pool) const;
 
   // Create and Destroy.
 public:
