@@ -52,7 +52,7 @@ public:
   void CanopyStructure ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
 			    double EvapInterception);
-  
+
   // Internal functions.
 protected:
   double PotentialWaterUptake (const double h,
@@ -96,7 +96,7 @@ public:
   void tick (const Time& time, const Bioclimate&, const Soil&,
 	     OrganicMatter&,
 	     const SoilHeat&,
-	     const SoilWater&, 
+	     const SoilWater&,
 	     SoilNH4&,
 	     SoilNO3&);
   const Harvest& harvest (const string& column_name,
@@ -162,6 +162,7 @@ struct CropStandard::Parameters
     const vector<double>& LAIDist1; // Relative LAI distribution at DS=1
     double PARref;		// PAR reflectance
     double PARext;		// PAR extinction coefficient
+    double PARrel;              // Relative PAR below the canopy
     double EPext;		// EP extinction coefficient
     double IntcpCap;
     double EpFac;
@@ -208,6 +209,7 @@ struct CropStandard::Parameters
     double ShldResC;		// Capacity of Shielded Reserves
     double ReMobilDS;		// Remobilization, Initial DS
     double ReMobilRt;		// Remobilization, release rate
+    double ExfoliationFac;      // Exfoliation factor, 0-1
     const CSMP& LfDR;		// Death rate of Leafs
     const CSMP& RtDR;		// Death rate of Roots
     const double Large_RtDR;	// Extra death rate for large root/shoot.
@@ -321,14 +323,18 @@ struct CropStandard::Variables
     double WStem;		// Stem dry matter weight [g/m2]
     double WRoot;		// Root dry matter weight [g/m2]
     double WSOrg;		// Storage organ dry matter weight [g/m2]
+    double WDead;               // Dead plant material [g/m2]
     double NCrop;		// Nitrogen stored in dry matter [g/m2]
     double NLeaf;		// Leaf nitrogen [g/m2]
     double NStem;		// Stem nitrogen [g/m2]
     double NRoot;		// Root nitrogen [g/m2]
     double NSOrg;		// Storage organ nitrogen [g/m2]
+    double NDead;               // N in dead plant material [g/m2]
+    double C_AM;                // Added C in plant material [g/m2]
+    double N_AM;                // Added N in plant material [g/m2]
     AM* AM_root;		// Dead organic root matter.
     AM* AM_leaf;		// Dead organic leaf matter.
-    
+
   private:
     friend struct CropStandard::Variables;
     RecProd (const Parameters&, const AttributeList&);
@@ -419,6 +425,7 @@ CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
     LAIDist1 (vl.number_sequence ("LAIDist1")),
     PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
+    PARrel (vl.number ("PARrel")),
     EPext (vl.number ("EPext")),
     IntcpCap (vl.number ("IntcpCap")),
     EpFac (vl.number ("EpFac")),
@@ -459,6 +466,7 @@ CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
     ShldResC (vl.number ("ShldResC")),
     ReMobilDS (vl.number ("ReMobilDS")),
     ReMobilRt (vl.number ("ReMobilRt")),
+    ExfoliationFac (vl.number ("ExfoliationFac")),
     LfDR (vl.csmp ("LfDR")),
     RtDR (vl.csmp ("RtDR")),
     Large_RtDR (vl.number ("Large_RtDR"))
@@ -607,11 +615,15 @@ CropStandard::Variables::RecProd::RecProd (const Parameters& par,
     WStem (vl.number ("WStem")),
     WRoot (vl.number ("WRoot")),
     WSOrg (vl.number ("WSOrg")),
+    WDead (vl.number ("WDead")),
     NCrop (vl.check ("NCrop") ? vl.number ("NCrop") : par.CrpN.SeedN),
     NLeaf (vl.number ("NLeaf")),
     NStem (vl.number ("NStem")),
     NRoot (vl.number ("NRoot")),
     NSOrg (vl.number ("NSOrg")),
+    NDead (vl.number ("NDead")),
+    C_AM  (vl.number ("C_AM")),
+    N_AM  (vl.number ("N_AM")),
     AM_root (NULL),
     AM_leaf (NULL)
 { }
@@ -624,19 +636,23 @@ CropStandard::Variables::RecProd::output (Log& log, Filter& filter) const
   log.output ("WStem", filter, WStem);
   log.output ("WRoot", filter, WRoot);
   log.output ("WSOrg", filter, WSOrg);
+  log.output ("WDead", filter, WDead);
   log.output ("NLeaf", filter, NLeaf);
   log.output ("NStem", filter, NStem);
   log.output ("NRoot", filter, NRoot);
   log.output ("NSOrg", filter, NSOrg);
+  log.output ("NDead", filter, NDead);
   log.output ("NCrop", filter, NCrop);
+  log.output ("C_AM", filter, C_AM);
+  log.output ("N_AM", filter, N_AM);
   log.close();
 }
 
-CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par, 
+CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 					       const AttributeList& vl)
   : InitLAI (vl.flag ("InitLAI")),
     StemRes (vl.number ("StemRes")),
-    PotRtDpt (  vl.check ("PotRtDpt") 
+    PotRtDpt (  vl.check ("PotRtDpt")
 	      ? vl.number ("PotRtDpt")
 	      : par.Root.DptEmr),
     PtNCnt (0.0),
@@ -797,6 +813,8 @@ CropStandardSyntax::CropStandardSyntax ()
   Canopy.add ("PARref", Syntax::Number, Syntax::Const);
   vCanopy.add ("PARref", 0.06);
   Canopy.add ("PARext", Syntax::Number, Syntax::Const);
+  Canopy.add ("PARrel", Syntax::Number, Syntax::Const);
+  vCanopy.add ("PARrel", 0.05);
   Canopy.add ("EPext", Syntax::Number, Syntax::Const);
   vCanopy.add ("EPext", 0.5);
   Canopy.add ("IntcpCap", Syntax::Number, Syntax::Const);
@@ -863,6 +881,8 @@ CropStandardSyntax::CropStandardSyntax ()
   Prod.add ("ShldResC", Syntax::Number, Syntax::Const);
   Prod.add ("ReMobilDS", Syntax::Number, Syntax::Const);
   Prod.add ("ReMobilRt", Syntax::Number, Syntax::Const);
+  Prod.add ("ExfoliationFac", Syntax::Number, Syntax::Const);
+  vProd.add ("ExfoliationFac", 1.0);
   Prod.add ("LfDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("RtDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("Large_RtDR", Syntax::Number, Syntax::Const);
@@ -1044,6 +1064,8 @@ CropStandardSyntax::CropStandardSyntax ()
   vProd.add ("WRoot", 0.001);
   Prod.add ("WSOrg", Syntax::Number, Syntax::State);
   vProd.add ("WSOrg", 0.000);
+  Prod.add ("WDead", Syntax::Number, Syntax::State);
+  vProd.add ("WDead", 0.000);
   Prod.add ("NLeaf", Syntax::Number, Syntax::State);
   vProd.add ("NLeaf", 0.000);
   Prod.add ("NStem", Syntax::Number, Syntax::State);
@@ -1052,7 +1074,13 @@ CropStandardSyntax::CropStandardSyntax ()
   vProd.add ("NRoot", 0.000);
   Prod.add ("NSOrg", Syntax::Number, Syntax::State);
   vProd.add ("NSOrg", 0.000);
+  Prod.add ("NDead", Syntax::Number, Syntax::State);
+  vProd.add ("NDead", 0.000);
   Prod.add ("NCrop", Syntax::Number, Syntax::Optional);
+  Prod.add ("C_AM", Syntax::Number, Syntax::State);
+  vProd.add ("C_AM", 0.000);
+  Prod.add ("N_AM", Syntax::Number, Syntax::State);
+  vProd.add ("N_AM", 0.000);
 
   alist.add ("Prod", vProd);
   syntax.add ("Prod", Prod, Syntax::State);
@@ -1443,7 +1471,7 @@ CropStandard::CanopyStructure ()
   LADvsH.add (z2 * Canopy.Height, Canopy.LADm);
   LADvsH.add (     Canopy.Height, 0.0);
   Canopy.LAIvsH = LADvsH.integrate_stupidly ();
-  const double LAIm = - log (0.05) / par.Canopy.PARext;
+  const double LAIm = - log (par.Canopy.PARrel) / par.Canopy.PARext;
   var.CrpAux.LAImRat = max (0.0, (Canopy.LAI - LAIm) / LAIm);
 }
 
@@ -1469,7 +1497,7 @@ CropStandard::ActualWaterUptake (double Ept,
     {
       const double h_next = max (h_x - step, h_wp);
       const double next = PotentialWaterUptake (h_next, soil, soil_water);
-      
+
       if (next < total)
 	// We are past the top of the curve.
 	if (step <= min_step)
@@ -1959,7 +1987,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   const double RM = RMLeaf + RMStem + RMSOrg + RMRoot;
 
   double& Stress = var.RootSys.nitrogen_stress;
-    
+
   if (CrpAux.CanopyAss >= RM)
     {
       const double AssG = CrpAux.CanopyAss - RM;
@@ -2038,8 +2066,14 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   CrpAux.DeadNLeaf = DdLeafCnc * CrpAux.DeadWLeaf;
   CrpAux.IncWLeaf -= CrpAux.DeadWLeaf;
   assert (CrpAux.DeadWLeaf >= 0.0);
-  vProd.AM_leaf->add (par.Harvest.C_Dead * CrpAux.DeadWLeaf * m2_per_cm2,
-		      CrpAux.DeadNLeaf * m2_per_cm2);
+  vProd.WDead += (1.0 - par.Prod.ExfoliationFac) * CrpAux.DeadWLeaf;
+  vProd.NDead += (1.0 - par.Prod.ExfoliationFac) * CrpAux.DeadNLeaf;
+  const double C_foli = par.Harvest.C_Dead *
+                        par.Prod.ExfoliationFac * CrpAux.DeadWLeaf;
+  const double N_foli = par.Prod.ExfoliationFac * CrpAux.DeadNLeaf;
+  vProd.AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
+  vProd.C_AM += C_foli;
+  vProd.N_AM += N_foli;
 
   // Update dead roots.
   double RtDR = pProd.RtDR (DS);
@@ -2055,10 +2089,12 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
       * ( 1.0 - par.CrpN.TLRootEff (DS)) +  par.CrpN.NfRootCnc (DS);
   CrpAux.DeadNRoot = DdRootCnc * CrpAux.DeadWRoot;
   CrpAux.IncWRoot -= CrpAux.DeadWRoot;
-  vProd.AM_root->add (geometry,
-		      par.Harvest.C_Root * CrpAux.DeadWRoot * m2_per_cm2,
+  const double C_Root = par.Harvest.C_Root * CrpAux.DeadWRoot;
+  vProd.AM_root->add (geometry, C_Root * m2_per_cm2,
 		      CrpAux.DeadNRoot * m2_per_cm2,
 		      var.RootSys.Density);
+  vProd.C_AM += C_Root;
+  vProd.N_AM += CrpAux.DeadNRoot;
 
   // Update production.
   vProd.NCrop -= (CrpAux.DeadNLeaf + CrpAux.DeadNRoot);
@@ -2079,26 +2115,26 @@ CropStandard::RSR () const
   return root/shoot;
 }
 
-void 
+void
 CropStandard::tick (const Time& time,
 		    const Bioclimate& bioclimate,
 		    const Soil& soil,
 		    OrganicMatter& organic_matter,
 		    const SoilHeat& soil_heat,
-		    const SoilWater& soil_water, 
+		    const SoilWater& soil_water,
 		    SoilNH4& soil_NH4,
 		    SoilNO3& soil_NO3)
 {
   // Clear log.
-  fill (var.RootSys.NO3Extraction.begin (), 
+  fill (var.RootSys.NO3Extraction.begin (),
 	var.RootSys.NO3Extraction.end (),
 	0.0);
-  fill (var.RootSys.NH4Extraction.begin (), 
+  fill (var.RootSys.NH4Extraction.begin (),
 	var.RootSys.NH4Extraction.end (),
 	0.0);
 
   // Update partial_soil_temperature.
-  var.Phenology.partial_soil_temperature += 
+  var.Phenology.partial_soil_temperature +=
     soil_heat.T (soil.interval_plus (-par.Root.DptEmr));
 
   if (time.hour () == 0 && var.Phenology.DS <= 0)
@@ -2117,7 +2153,7 @@ CropStandard::tick (const Time& time,
 	  var.CrpAux.PotCanopyAss = 0.0;
 	  var.CrpAux.CanopyAss = 0.0;
 	  RootDensity (soil);
-	  
+
 	  var.Prod.AM_root
 	    = &AM::create (soil, time, par.Harvest.Root,
 			   name, "root", AM::Locked);
@@ -2190,10 +2226,12 @@ CropStandard::harvest (const string& column_name,
   const double WLeaf = Prod.WLeaf;
   const double WSOrg = Prod.WSOrg;
   const double WRoot = Prod.WRoot;
+  const double WDead = Prod.WDead;
   const double NStem = Prod.NStem;
   const double NLeaf = Prod.NLeaf;
   const double NSOrg = Prod.NSOrg;
   const double NRoot = Prod.NRoot;
+  const double NDead = Prod.NDead;
   const double C_Stem = Hp.C_Stem;
   const double C_Leaf = Hp.C_Leaf;
   const double C_SOrg = Hp.C_SOrg;
@@ -2207,6 +2245,7 @@ CropStandard::harvest (const string& column_name,
   const double length = height ();
 
   // Leave stem and leaf below stub alone.
+
   if (stub_length < length)
     {
       stem_harvest *= (1.0 - stub_length / length);
@@ -2259,24 +2298,35 @@ CropStandard::harvest (const string& column_name,
       // Add crop remains to the soil.
       if (stem_harvest < 1.0 && WStem > 0.0)
 	{
+          const double C = (WDead+WStem) * C_Stem * (1.0 - stem_harvest);
+          const double N = (NDead+NStem) * (1.0 - stem_harvest);
 	  AM& am = AM::create (geometry, time, Stem, name, "stem");
-	  am.add (WStem * C_Stem * (1.0 - stem_harvest) * m2_per_cm2,
-		  NStem * (1.0 - stem_harvest) * m2_per_cm2);
+	  am.add (C * m2_per_cm2, N * m2_per_cm2);
 	  organic_matter.add (am);
+          Prod.C_AM += C;
+          Prod.N_AM += N;
+          Prod.WDead = 0;
+          Prod.NDead = 0;
 	}
       if (leaf_harvest < 1.0 && WLeaf > 0.0)
 	{
+          const double C = WLeaf * C_Leaf * (1.0 - leaf_harvest);
+          const double N = NLeaf * (1.0 - leaf_harvest);
 	  AM& am = AM::create (geometry, time, Leaf, name, "leaf");
-	  am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest) * m2_per_cm2,
-		  NLeaf * (1.0 - leaf_harvest) * m2_per_cm2);
+	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
 	  organic_matter.add (am);
+          Prod.C_AM += C;
+          Prod.N_AM += N;
 	}
       if (sorg_harvest < 1.0 && WSOrg > 0.0)
 	{
+          const double C = WSOrg * C_SOrg * (1.0 - sorg_harvest);
+          const double N = NSOrg * (1.0 - sorg_harvest);
 	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
-	  am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
-		  NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
+	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
 	  organic_matter.add (am);
+          Prod.C_AM += C;
+          Prod.N_AM += N;
 	}
 
       // Update and unlock locked AMs.
@@ -2292,6 +2342,8 @@ CropStandard::harvest (const string& column_name,
 				   NRoot * m2_per_cm2);
 	  var.Prod.AM_root->unlock ();
 	  var.Prod.AM_root = NULL;
+          Prod.C_AM += C_Root * WRoot;
+          Prod.N_AM += NRoot;
 	}
       else
 	assert (WRoot == 0.0);
