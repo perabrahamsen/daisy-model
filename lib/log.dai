@@ -205,11 +205,11 @@ flow to drain pipes, and subsoil irrigation."
                    (flux true)
                    (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" total_ep)
-                   (tag "Potential Evapotransipration")            
+                   (tag "Potential Evapotranspiration")            
                    (flux true)
                    (dimension "mm"))
            (number (path column "$col" Bioclimate "*" total_ea)
-                   (tag "Actual Evapotransipration")            
+                   (tag "Actual Evapotranspiration")            
                    (flux true)
                    (dimension "mm"))
            (number (path column "$col" Bioclimate "*" crop_ea)
@@ -287,25 +287,45 @@ flow to drain pipes, and subsoil irrigation."
                    (flux true)
                    (dimension "cm/&"))))
 
+(defsummary "Total Water Balance" simple
+  "Water balance for the complete system.
+
+Note that negative deltas means the amount of water increases."
+  (precision 1)
+  (fetch (rain (name "Rain"))
+	 (snow (name "Snow"))
+	 ("Total Irrigation" (name "Irrigation"))
+	 ("Evapotranspiration" (factor -1.0))
+	 ("Matrix Percolation" (factor -1.0))
+	 ("Macropore Percolation" (factor -1.0))
+	 ("Drain flow" (factor -1.0))
+	 ("Soil Water Content" (name "Soil Water") (factor -1.0))
+	 ("Surface Ponding" (name "Ponding") (factor -1.0))
+	 ("Surface Runoff" (factor -1.0))
+	 ("Interception Storage" (name "Stored on leafs") (factor -1.0))
+	 ("Snow Storage" (name "Snow Pack") (factor -1.0)))
+  (sum_name "Balance"))
+	 
 (deflog "Root Zone Water Balance" table
   "Enough information to create a water balance for the root zone."
   (where "root_zone_water_balance.dlf")
   (when hourly)
+  (summary "Total Water Balance")
   (entries ;; Year Month MDay Hour
            (number (path weather "*" rain)
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (number (path weather "*" snow)
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" irrigation_overhead)
                    (tag "Overhead Irrigation")
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" irrigation_surface)
                    (tag "Surface Irrigation")
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (interval (path column "$col" SoilWater S_permanent)
                      (tag "Subsoil Irrigation")
                      (flux true)
@@ -314,36 +334,36 @@ flow to drain pipes, and subsoil irrigation."
            (number (path column "$col" Bioclimate "*" irrigation_total)
                    (tag "Total Irrigation")
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" pet "*" reference_evapotranspiration)
                    (tag "Ref. Evapotranspiration")
                    (flux true)
                    (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" total_ep)
-                   (tag "Pot. Evapotransipration")            
+                   (tag "Pot. Evapotranspiration")            
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" total_ea)
-                   (tag "Evapotransipration")            
+                   (tag "Evapotranspiration")            
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" crop_ea)
                    (tag "Transipration")            
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (number (path column "$col" Bioclimate "*" soil_ea)
                    (tag "Evaporation of soil water")            
                    (flux true)
-                   (dimension "mm"))
+                   (dimension "mm/&"))
            (flux_top (path column "$col" SoilWater q)
                      (tag "Matrix Infiltration")
                      (flux true)
-                     (dimension "mm")
+                     (dimension "mm/&")
                      (factor -10))      ;cm -> mm
            (flux_top (path column "$col" SoilWater q_p)
                      (tag "Macropore Infiltration")
                      (flux true)
-                     (dimension "mm")
+                     (dimension "mm/&")
                      (factor -10))      ;cm -> mm
            (flux_bottom (path column "$col" SoilWater q)
                         (tag "Matrix Percolation")
@@ -373,11 +393,60 @@ flow to drain pipes, and subsoil irrigation."
            (interval (path column "$col" SoilWater Theta)
                      (tag "Soil Water Content")
                      (dimension "mm")
-                     (factor 10))))     ;cm -> mm
+                     (factor 10))     ;cm -> mm
+           (number (path column "$col" Surface pond)
+                   (tag "Surface Ponding")            
+                   (dimension "mm"))
+           (number (path column "$col" Surface runoff)
+                   (tag "Surface Runoff")            
+                   (flux true)
+                   (dimension "mm/&"))
+           (number (path column "$col" Bioclimate "*" canopy_water_storage)
+                   (tag "Interception Storage")            
+                   (dimension "mm"))
+           (number (path column "$col" Bioclimate "*" Snow Ssnow)
+                   (tag "Snow Storage")
+                   (dimension "mm"))))
 
+(defsummary "NH4 Soil Balance" simple
+  "Mass balance for NH4 in soil.
+
+Note that a negative delta Content means that the amount of NH4 in the
+soil increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch ("NH4-Incorp" (name "Incorporated"))
+	 ("NH4-In" (name "From surface"))
+	 ("NH4-Leak-Matrix" (name "Matrix leak") (factor -1.0))
+	 ("NH4-Leak-Macro" (name "Macropores leak") (factor -1.0))
+	 ("NH4-Drain" (name "Drain pipes leak") (factor -1.0))
+	 (NH4Upt (name "Root uptake") (factor -1.0))
+	 ("Nitrification" (factor -1.0))
+	 ("NH4-mineralization" (name "Mineralization"))
+	 ("NH4-Total" (name "Content") (factor -1.0))))
+	 
+(defsummary "NO3 Soil Balance" simple
+  "Mass balance for NO3 in soil.
+
+Note that a negative delta Content means that the amount of NO3 in the
+soil increases."
+  (sum_name "Balance")
+  (precision 3)
+  (fetch ("NO3-Incorp" (name "Incorporated"))
+	 ("NO3-In" (name "From surface"))
+	 ("NO3-Leak-Matrix" (name "Matrix leak") (factor -1.0))
+	 ("NO3-Leak-Macro" (name "Macropores leak") (factor -1.0))
+	 ("NO3-Drain" (name "Drain pipes leak") (factor -1.0))
+	 (NO3Upt (name "Root uptake") (factor -1.0))
+	 ("Nitrification")
+	 ("Denit" (name Denitrification) (factor -1.0))
+	 ("NO3-immobilization" (name "Immobilization") (factor -1.0))
+	 ("NO3-Total" (name "Content") (factor -1.0))))
+	 
 (deflog "N Balance" table
   "Enough information to create a balance for the soil nitrogen."
   (where "N_balance.dlf")
+  (summary "NH4 Soil Balance" "NO3 Soil Balance")
   (when hourly)
   (entries ;; Year Month MDay Hour
            (number (path column "$col" fertilized_NH4)
@@ -1981,6 +2050,21 @@ To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
 (deflog "Carbon Balance" table
   (where "C_Bal.dlf")
   (when hourly)
+  (summary (simple (title "C Input")
+		   (description "\
+This summary provides the information needed by the OrganicMatter init
+submodel.  The amount printed under 'Total C Input' corresponds to the
+'input' parameter, and the amount under 'Roots' corresponds to the
+'root' parameter.")
+		   (fetch ("Fertilizer_C"
+			   (name "Fertilizer"))
+			  ("Residuals_C_top"
+			   (name "Residuals"))
+			  ("Residuals_C_soil"
+			   (name "Roots")))
+		   (sum_name "Total C input")
+		   (period "y")
+		   (precision 0)))
   (entries ;; Year Month MDay Hour
            (interval (path column "$col" OrganicMatter total_C)
                      (tag "Soil_C")
