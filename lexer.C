@@ -92,6 +92,41 @@ Lexer::Implementation::~Implementation ()
     delete &in;
 }
 
+bool 
+Lexer::Position::operator== (const Position& pos)
+{ return column == pos.column && line == pos.line; }
+
+const Lexer::Position& 
+Lexer::Position::operator= (const Position& pos)
+{ line = pos.line; column = pos.column; return *this; }
+
+Lexer::Position::Position (const Position& pos)
+{ *this = pos; }
+
+Lexer::Position::Position (int l, int c)
+  : line (l),
+    column (c)
+{ }
+  
+Lexer::Position::Position ()
+  : line (-42),
+    column (-42)
+{ }
+   
+Lexer::Position::~Position ()
+{ }
+
+Lexer::Position 
+Lexer::position ()
+{ return Position (impl.line, impl.column); }
+
+const Lexer::Position& 
+Lexer::no_position ()
+{ 
+  static Position none;
+  return none;
+}
+
 int
 Lexer::get ()
 { return impl.get (); }
@@ -103,6 +138,22 @@ Lexer::peek ()
 bool
 Lexer::good ()
 { return impl.good (); }
+
+void 
+Lexer::warning (const string& str, const Position& pos)
+{
+  TmpStream tmp;
+  tmp () << file << ":" << pos.line << ":"
+	 << (pos.column + 1) << ": " << str;
+  err.entry (tmp.str ());
+}
+
+void 
+Lexer::error (const string& str, const Position& pos)
+{
+  error_count++;
+  warning (str, pos);
+}
 
 void 
 Lexer::warning (const string& str)

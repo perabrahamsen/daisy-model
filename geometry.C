@@ -26,6 +26,7 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 #include "message.h"
+#include "check.h"
 #include <assert.h>
 
 unsigned int 
@@ -244,7 +245,7 @@ Geometry::add_layer (Syntax& syntax, const string& name,
   if (!layer.ordered ())
     {
       // Initialize as first call.
-      layer.add ("end", "cm", Syntax::Const, 
+      layer.add ("end", "cm", Check::negative (), Syntax::Const, 
 		 "End point of this layer (a negative number).");
       layer.add ("value", dimension, Syntax::Const, description);
       layer.order ("end", "value");
@@ -298,7 +299,7 @@ void
 Geometry::load_syntax (Syntax& syntax, AttributeList&)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("zplus", "cm", Syntax::Const, Syntax::Sequence,
+  syntax.add ("zplus", "cm", Check::negative (), Syntax::Const, Syntax::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
 }

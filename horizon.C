@@ -29,6 +29,7 @@
 #include "mathlib.h"
 #include "tortuosity.h"
 #include "log.h"
+#include "check.h"
 #include <vector>
 #include <map>
 #include <numeric>
@@ -454,15 +455,18 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   AttributeList& tortuosity = *new AttributeList ();
   tortuosity.add ("type", "M_Q");
   alist.add ("tortuosity", tortuosity);
-  syntax.add ("clay", Syntax::None (), Syntax::Const,
+  syntax.add ("clay", Syntax::None (), Check::non_negative (), Syntax::Const,
 	      "Relative fraction of clay in soil.");
-  syntax.add ("silt", Syntax::None (), Syntax::Const,
+  syntax.add ("silt", Syntax::None (), Check::non_negative (), Syntax::Const,
 	      "Relative fraction of silt in soil.");
-  syntax.add ("fine_sand", Syntax::None (), Syntax::Const,
+  syntax.add ("fine_sand", Syntax::None (), Check::non_negative (), 
+	      Syntax::Const,
 	      "Relative fraction of fine sand in soil.");
-  syntax.add ("coarse_sand", Syntax::None (), Syntax::Const,
+  syntax.add ("coarse_sand", Syntax::None (), Check::non_negative (), 
+	      Syntax::Const,
 	      "Relative fraction of coarse sand in soil.");
-  syntax.add ("humus", Syntax::None (), Syntax::Const,
+  syntax.add ("humus", Syntax::None (), Check::non_negative (), 
+	      Syntax::Const,
 	      "Relative fraction of humus in soil.");
 // Data adopted from Møberg et al. 1988 (Tinglev & Roskilde Soil)
   syntax.add_fraction ("quarts_in_clay", Syntax::Const,
@@ -477,7 +481,8 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("dry_bulk_density", "g/cm^3", Syntax::OptionalConst,
 	      "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");
-  syntax.add ("SOM_C_per_N", "g C/g N", Syntax::Const, Syntax::Sequence,
+  syntax.add ("SOM_C_per_N", "g C/g N", Check::non_negative (), 
+	      Syntax::Const, Syntax::Sequence,
 	      "C/N ratio for each SOM pool in this soil.");
   syntax.add_fraction ("SOM_fractions", Syntax::Const, Syntax::Sequence, "\
 Fraction of humus in each SOM pool, from slowest to fastest.");
@@ -490,15 +495,18 @@ Fraction of humus in each SOM pool, from slowest to fastest.");
   syntax.add ("intervals", Syntax::Integer, Syntax::Const, "\
 Number of numeric intervals to use in the heat coductivity table.");
   alist.add ("intervals", 100);
-  syntax.add ("C_soil", "erg/cm^3/dg C", Syntax::OptionalConst,
+  syntax.add ("C_soil", "erg/cm^3/dg C", Check::positive (), 
+	      Syntax::OptionalConst,
 	      "The soils heat capacity.\n\
 By default, this is calculated from the soil constituents.");
   syntax.add ("K_water",
-	      "erg/s/cm/dg C", Syntax::OptionalConst, Syntax::Sequence,
+	      "erg/s/cm/dg C", Check::positive (),
+	      Syntax::OptionalConst, Syntax::Sequence,
 	      "Heat conductivity table for water in soil.\n\
 By default, this is calculated from the soil constituents.");
   syntax.add ("K_ice",
-	      "erg/s/cm/dg C", Syntax::OptionalConst, Syntax::Sequence,
+	      "erg/s/cm/dg C", Check::positive (),
+	      Syntax::OptionalConst, Syntax::Sequence,
 	      "Heat conductivity table for solid frozen soil.\n\
 By default, this is calculated from the soil constituents.");
 

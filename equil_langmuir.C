@@ -1,7 +1,6 @@
-// equil_langmuir.C
+// equil_langmuir.C --- Lagmuir model for calculating equilibrium (doh).
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2002 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 

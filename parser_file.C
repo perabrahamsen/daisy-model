@@ -28,6 +28,7 @@
 #include "treelog_stream.h"
 #include "message.h"
 #include "path.h"
+#include "units.h"
 
 struct ParserFile::Implementation
 {
@@ -46,6 +47,8 @@ struct ParserFile::Implementation
   { return lexer->good (); }
   void error (const string& str)
   { lexer->error (str); }
+  void error (const string& str, const Lexer::Position& pos)
+  { lexer->error (str, pos); }
   void warning (const string& str)
   { lexer->warning (str); }
   void eof ()
@@ -57,8 +60,9 @@ struct ParserFile::Implementation
   double get_number ();
   string get_dimension ();
   double get_number (const string& dim);
-  bool check_dimention (const string& syntax, const string& read);
-  double convert (double value, const string& syntax, const string& read);
+  bool check_dimension (const string& syntax, const string& read);
+  double convert (double value, const string& syntax, const string& read, 
+		  const Lexer::Position&);
   void skip (const char*);
   void skip ();
   void skip_to_end ();
@@ -207,18 +211,19 @@ double
 ParserFile::Implementation::get_number (const string& syntax_dim)
 {
   double value = get_number ();
+  Lexer::Position pos = lexer->position ();
 
   if (looking_at ('['))
     {
       const string read_dim = get_dimension ();
-      if (check_dimention (syntax_dim, read_dim))
-	value = convert (value, syntax_dim, read_dim);
+      if (check_dimension (syntax_dim, read_dim))
+	value = convert (value, syntax_dim, read_dim, pos);
     }
   return value;
 }
 
 bool 
-ParserFile::Implementation::check_dimention (const string& syntax,
+ParserFile::Implementation::check_dimension (const string& syntax,
 					     const string& read)
 {
   if (syntax != read)
@@ -237,7 +242,7 @@ ParserFile::Implementation::check_dimention (const string& syntax,
 	      return false;
 	    }
 	}
-      else if (syntax != read)
+      else if (!Units::can_convert (read, syntax))
 	{
 	  error (string ("expected [") + syntax + "] got ["
 		 + read + "]");
@@ -249,9 +254,30 @@ ParserFile::Implementation::check_dimention (const string& syntax,
 
 double 
 ParserFile::Implementation::convert (double value,
-				     const string& /* syntax */, 
-				     const string& /* read */)
-{ return value; }
+				     const string& syntax, 
+				     const string& read, 
+				     const Lexer::Position& pos)
+{ 
+  if (syntax == Syntax::Unknown ())
+    return value; 
+  if (syntax == read)
+    return value;
+  
+  try
+    {
+      if (syntax == Syntax::None () || syntax == Syntax::Fraction ())
+	if (read == "")
+	  return value;
+	else
+	  return Units::convert (read, "", value);
+      return Units::convert (read, syntax, value);
+    }
+  catch (const string& message)
+    { 
+      error (message, pos); 
+      return value;
+    }
+}
 
 void
 ParserFile::Implementation::skip (const char* str)
@@ -673,50 +699,69 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    case Syntax::Number:
 	      {
 		vector<double> array;
+		vector<Lexer::Position> positions;
 		int count = 0;
 		int size = syntax.size (name);
-		double last = 0.0;
 		const string syntax_dim = syntax.dimension (name);
-		string read_dim = syntax.dimension (name);
+		unsigned int first_unchecked = 0;
 		while (good () && !looking_at (')'))
 		  {
 		    if (looking_at ('*'))
 		      {
 			skip ("*");
-			int same = get_integer ();
-			// Append same - 1 copies of last value.
-			for (int i = 1; i < same; i++)
+			const int same = get_integer ();
+			if (array.size () == 0)
+			  error ("must specify number before '*'");
+			else
 			  {
-			    array.push_back (last);
-			    count++;
+			    // Append same - 1 copies of last value.
+			    for (int i = 1; i < same; i++)
+			      {
+				array.push_back (array.back ());
+				positions.push_back (Lexer::no_position ());
+				count++;
+			      }
 			  }
 		      }
 		    else
 		      {
-			last = get_number ();
-
+			array.push_back (get_number ());
+			positions.push_back (lexer->position ());
+			count++;
+			
 			if (looking_at ('['))
 			  {
-			    read_dim = get_dimension ();
-			    if (!check_dimention (syntax_dim, read_dim))
-			      read_dim = syntax_dim;
-			  }			
-			last = convert (last, syntax_dim, read_dim);
-
-			try
-			  {
-			    syntax.check (name, last);
+			    const string read_dim = get_dimension ();
+			    if (check_dimension (syntax_dim, read_dim))
+			      {
+				assert (positions.size () == array.size ());
+				for (unsigned int i = first_unchecked;
+				     i < array.size ();
+				     i++)
+				  {
+				    array[i] = convert (array[i],
+							syntax_dim, read_dim, 
+							positions[i]);
+				  }
+				first_unchecked = array.size ();
+			      }
 			  }
-			catch (const string& message)
-			  {
-			    TmpStream str;
-			    str () << name << "[" << array.size () << "]: "
-				   << message;
-			    error (str.str ());
-			  }
-			array.push_back (last);
-			count++;
 		      }
+		  }
+		assert (positions.size () == array.size ());
+		for (unsigned int i = 0; i < array.size (); i++)
+		  {
+		    if (positions[i] != Lexer::no_position ())
+		      try
+			{
+			  syntax.check (name, array[i]);
+			}
+		      catch (const string& message)
+			{
+			  TmpStream str;
+			  str () << name << "[" << i << "]: " << message;
+			  error (str.str (), positions[i]);
+			}
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {

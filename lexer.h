@@ -39,11 +39,39 @@ public:
   const string file;
   int error_count;
 
+  // Position
+  class Position
+  {
+    // Content.
+  private:
+    int line;
+    int column;
+
+    // Use.
+  public:
+    bool operator== (const Position&);
+    bool operator!= (const Position& pos)
+    { return !(*this == pos); }
+
+    // Create and Destroy.
+    friend class Lexer;
+  public:
+    const Position& operator= (const Position&);
+    Position (const Position&);
+    Position (int line, int column);
+    Position ();
+    ~Position ();
+  };
+  Position position ();
+  static const Position& no_position ();
+
   // Operations.
 public:
   int get ();
   int peek ();
   bool good ();
+  void warning (const string& str, const Position&);
+  void error (const string& str, const Position&);
   void warning (const string& str);
   void error (const string& str);
   void eof ();

@@ -317,7 +317,8 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = check.C check_range.C path.C message.C options.C traverse_delete.C \
+OTHER = units.C \
+	check.C check_range.C path.C message.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
@@ -776,7 +777,7 @@ log_select${OBJ}: log_select.C log_select.h log.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h select.h condition.h
 parser_file${OBJ}: parser_file.C parser_file.h parser.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h lexer.h plf.h \
- tmpstream.h treelog_stream.h message.h path.h
+ tmpstream.h treelog_stream.h message.h path.h units.h
 solute${OBJ}: solute.C solute.h adsorption.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h transport.h mactrans.h log.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
@@ -795,6 +796,7 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h \
  soil_water.h macro.h soil_heat.h soil_chemicals.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h plf.h transform.h \
  groundwater.h log.h weather.h im.h vegetation.h
+units${OBJ}: units.C units.h mathlib.h common.h
 check${OBJ}: check.C check.h
 check_range${OBJ}: check_range.C check_range.h check.h tmpstream.h \
  common.h

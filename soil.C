@@ -27,6 +27,7 @@
 #include "submodel.h"
 #include "log.h"
 #include "message.h"
+#include "check.h"
 #include <assert.h>
 #include <iomanip.h>
 
@@ -48,7 +49,7 @@ struct Soil::Implementation
     { 
       alist.add ("description", "\
 A location and content of a soil layer.");
-      syntax.add ("end", "cm", Syntax::Const,
+      syntax.add ("end", "cm", Check::negative (), Syntax::Const,
 		  "End point of this layer (a negative number).");
       syntax.add ("horizon", Librarian<Horizon>::library (), 
 		  "Soil properties of this layer.");
@@ -224,10 +225,11 @@ The soil component provides the numeric and physical properties of the soil.");
   syntax.add_submodule_sequence ("horizons", Syntax::State, "\
 Layered description of the soil properties.",
 				 Implementation::Layer::load_syntax);
-  syntax.add ("MaxRootingDepth", "cm", Syntax::Const,
+  syntax.add ("MaxRootingDepth", "cm", Check::positive (), Syntax::Const,
 	      "Depth at the end of the root zone (a positive number).");
   //  alist.add ("MaxRootingDepth", 100.0);
-  syntax.add ("dispersivity", "cm", Syntax::Const, "Dispersion length.");
+  syntax.add ("dispersivity", "cm", Check::positive (), 
+	      Syntax::Const, "Dispersion length.");
   alist.add ("dispersivity", 6.0);
 }
   

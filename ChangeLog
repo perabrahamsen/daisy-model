@@ -1,3 +1,23 @@
+2002-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.06 released.
+
+2002-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C (load_syntax): Added checks.
+	* soil.C (load_syntax): Added checks.
+	* geometry.C (add_layer): Added check.
+	(load_syntax): Ditto.
+
+	* lexer.h, lexer.C (Lexer::Position): New class member.
+	* lexer.h, lexer.C (error): Use it.
+	* parser_file.C (load_list, convert, get_number, error): Use it.
+
+
+	* units.C, units.h: New utility.
+	* Makefile (OTHER): Add it.
+	* parser_file.C (check_dimention, convert): Use it.
+
 2002-01-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.05 released.

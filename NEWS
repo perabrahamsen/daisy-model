@@ -12,6 +12,20 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.06 
+
+** You can now specify [m] or [pF] instead of [cm].
+
+** Syntax for specifying dimensions in arrays changes.
+
+Dimensions now applies only to numbers before them.  For example:
+
+  (foo 10.0 20.0 [cm] 1.0 1.5 [m] 100.0)
+
+Here the two first entries (10.0 and 20.0) are in cm,  the two next
+(1.0 and 1.5) are m, and the last is whatever the default dimension
+for foo is.
+
 * 2.05 
 
 ** New 'linear' Pedotransfer model.
