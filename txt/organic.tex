@@ -1,6 +1,7 @@
 \documentclass[a4paper]{article}
 \usepackage[latin1]{inputenc}
 \usepackage{hyperref}
+\usepackage{a4}
 \usepackage{verbatim}
 \input{macro}
 \bibliographystyle{apalike}
@@ -41,8 +42,6 @@
 
 \section{Soil organic matter modelling}
 
-SH: referencer til vigtigste org.matter modeller.
-
 It is conventional to divide the organic matter in the soil into three
 fractions.  First we have the freshly entered organic matter, which
 can still be traced back to its origin.  For a cultivated soil, this
@@ -78,7 +77,6 @@ article.  Apart from soil organic matter, \daisy{} also simulate a
 number of other processes, such as water, heat and nitrogen dynamics
 in the soil, as well as biocliamte, crop development and management.
 
-
 The purpose of the \daisy{} model is to simulate real farming
 practice, both on the short and the long term.  Thus, we get a system
 with two pools for each of \textsc{som} and \textsc{smb}, and two
@@ -87,40 +85,42 @@ field.  The original model is depicted in figure~\ref{fig:om1}.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\hsize]{om1}
-\begin{verbatim}
-SH: check værdier, specielt smb.  Er 50\% efficiency ok med sander (i
-den ny model)?
-\end{verbatim}
+
   \caption{The original Daisy OM parameterization.}
   \label{fig:om1}
 \end{figure}
+
 Figure~\ref{fig:om1} has 6 visible boxes, corresponding to the
 \textsc{som}, \textsc{smb} and \textsc{aom} pools.  If you look at the
 \textsc{som1} pool at the botom left corner, you will see that it has
 one line going out from it, marked with the text ``703y''.  This
 indicate the speed the pool is being eaten by the soil biomass.  All
 the pools have such a dk:fuldt optrukken outgoing line.  The amount of
-carbon being eaten is directly propertional with the size of the
-pool.  We call this the \emph{turnover rate}.  The number is the
+carbon being eaten is directly propertional with the size of the pool.
+We call this the \emph{turnover rate}.  The number is the
 corresponding halftime.  The \textsc{som1} pool thus have a halftime
 of 703 years, meaning if there was no input it would be half the
 original size after 703 years.  For some pools this time is given in
-days, e.g.\ the \textsc{smb2} pool has a turnover halftime of 69
-days.  
+days, e.g.\ the \textsc{smb2} pool has a turnover halftime of 69 days.
   
 If we follow the line from \textsc{som1} it split into two parts.
 40\% is lost in digestion as CO$_2$, the rest is going to be new
 biomass in the \textsc{smb1} pool.  If we look at the line going out
 of the \textsc{som2} pool, we see that only 70\% of the carbon not
 lost as CO$_2$ become biomass, the remaining 30\% end up in
-\textsc{som1}.  
+\textsc{som1}.  The biomass pools has a turnover rate like the other
+pools, but also a maintenance rate.  This is the price of staying
+alive, and is indicated by a stippled line out of the \textsc{smb}
+pools.  The rates and even the number of \textsc{aom} pools is
+variable, the rates given here is just examples.  Also, there can be
+many sets of added organic matter pools, each set corresponding to
+particular fertilizer or residual, and each with its own parameters.
 
-The biomass pools has a turnover rate like the other pools, but also a
-maintenance rate.  This is the price of staying alive, and is
-indicated by a stippled line out of the \textsc{smb} pools.  The rates
-and even number of \textsc{aom} pools
-
-PA: turnover rates, fractions, efficiency, maintenance, (abiotic factors).
+What isn't depicted is the abiotic factors, clay, heat and mositure.
+The halftimes given coresponds to 0\% clay, 10$^\circ$C and field
+capacity (pF 2).  The halftimes will be longer with more clay, lower
+temperature, og dryer soil.  They will be shorter with higher
+temperature.
 
 \section{Evolution of the Daisy model}
 
@@ -260,7 +260,7 @@ physical properties the user can understand.  And we cannot use the
 most obvious initialization condition, namely an equilibrium
 assumption.
 
-\section{Equations}
+\section{Quasi-equilibrium}
 
 In order to find a better way to initialize the organic matter pools,
 we will start by looking at their internal relationships.
@@ -361,6 +361,8 @@ the input, and the size of the slowest pool.  Since the slowest pool
 is still changing (and the other pools will have to change to reflect
 that), this is not a true equilibrium.
 
+\section{User calibration}
+
 We also have a model independent knob for users who want to calibrate
 the system.  If the user can estimate the total rate of change in
 carbon content, i.e.\ is the soil gaining or losing organic matter
@@ -398,7 +400,7 @@ knowledge of the model, and can be estimated by the user, for example
 from the use of \daisy{} simulations.  None of the numbers need to be
 changed when the model itself is changed.
 
-\section{Assumptions and limitations}
+\section{Abiotic factors}
 
 In the equations we used a large number of constants, without
 indicating how we calculate them.  Here is the formula for calculating
@@ -412,13 +414,42 @@ $a$ from the first equation.
   F_{\mbox{\tiny\textsc{smb1}}}^\psi (\psi)\,
   F_{\mbox{\tiny\textsc{smb1}}}^C (X_c)
 \end{displaymath}
+The other constants have a simlar form.
+$t_{\mbox{\tiny\textsc{smb1}}}$ is the turnover rate for the
+\textsc{smb1} pool.
+$X_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb1}}}}$
+is the carbon fraction going from \textsc{smb1} back to \textsc{smb1}.
+$E_{\mbox{\tiny\textsc{smb1}}}$ is the efficience of which
+\textsc{smb1} can eat itself, the remaining part will be lost as
+CO$_2$.  $m_{\mbox{\tiny\textsc{smb1}}}$ is the maintenance cost of
+the \textsc{smb1} pool. $F_{\mbox{\tiny\textsc{smb1}}}^T$,
+$F_{\mbox{\tiny\textsc{smb1}}}^\psi$, and
+$F_{\mbox{\tiny\textsc{smb1}}}^C$ are the abiotic factors for soil
+heat, moisture and clay respectively.  All of these are part of the
+model calibration, and unchanged for all normal use of the model.
 
+What does change is the soil temperature ($T$), soil moisture
+($\psi$), and clay content ($X_c$).  The clay content is constnt
+during the time-scaled we work with, and is specified by the user.  So
+the two problematic terms are $T$ and $\psi$ which are variable during
+the simulation.  For the initialisation we must use constant values.
+By default we use the average temperature for the site (which is
+already specified by the user and used elsewhere in the model) for
+$T$, and field capacity (pF 2) for $\psi$.  As
+$F_{\mbox{\tiny\textsc{smb1}}}^T$ is non-linear, using the average is
+incorrect.  In particular, $F_{\mbox{\tiny\textsc{smb1}}}^T$ is zero
+for $T < 10^\circ$C, so for a cold climate like the Danish the
+significance of frost is overestimated.  On the other hand, using pF 2
+may be acceptable for the wet climate like in Denmark, but may be
+unreasonable for a dry climate.  The two factors interact, so a low
+value for $F_{\mbox{\tiny\textsc{smb1}}}^T (T)$ is most significant
+when $F_{\mbox{\tiny\textsc{smb1}}}^\psi (\psi)$ is high, and
+vice-versa.  So in effect we can treat $T$ and $\psi$ as calibration
+parameters when using \daisy{} in a different climate.
 
--- clay, T og h
+\section{Inert organic matter}
 
-T=10 dg
-
--- top horizons.
+-- subsoil, som3
 
 \section{Results}
 
@@ -432,7 +463,8 @@ lim 70\%
 
 Brug i standardisering.
 
-\section{Bibliography}
+\section*{Bibliography}
+\addcontentsline{toc}{section}{\numberline{}Bibliography}
 \bibliography{daisy}
 
 \end{document}

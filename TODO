@@ -1,5 +1,15 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Organic Matter Article
+
+** SH referencer til udbredte modeller.
+
+** Er 50% efficiency i orden med Sander?
+
+** Hvad er de oprindelige (pre-Müller) rater?  69d m½ dor smb1 virker lavt.
+
+Til referencemanual?
+
 * Fertorganic
 
 ** PL: Venter på data.
@@ -10,7 +20,7 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 ** IT: Bed om seneste opsætninger...
 
-** PT: Brev til joao not jose kommer tilbage
+** PT: Brev til joao når jose kommer tilbage
 
 ** CZ: ?
 
@@ -116,12 +126,6 @@ Skal kunne være afhængig af kvælstof og temperatur.
 * Lav superklimafil
 
 ** SH: forklaring
-
-* OrganicMatter
-
-** Akademisk bekrivelse?
-
-Til referencemanual?
 
 * Make "daisy" a program model.
 
