@@ -83,6 +83,7 @@ SoilChemicals::Implementation::add_missing (const Soil& soil,
        i++)
     {
       const string& name = *i;
+      assert (solutes.find (name) == solutes.end ());
       const Chemical& chemical = Chemicals::lookup (name);
       solutes[name] = new SoilChemical (chemical);
       solutes[name]->initialize (chemical.solute_alist (), soil, soil_water);
@@ -100,6 +101,7 @@ SoilChemicals::Implementation::find (const Soil& soil,
       const Chemical& chemical = Chemicals::lookup (name);
       solutes[name] = new SoilChemical (chemical);
       solutes[name]->initialize (chemical.solute_alist (), soil, soil_water);
+      all.insert (name);
     }
   return *solutes[name];
 }

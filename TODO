@@ -2,12 +2,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * Få Søren til at se på groundwater pipe fejl.
 
-* Test at Library::~Library virker med BCC.
-
-* TestJyndevad.dai
-
-Fortæl Birgitte hvordan C skal initialiseres.
-
 * User Manual
 
 ** Tillage
@@ -49,6 +43,10 @@ Start ved specifik dato.
 ** Don't order attributes when defining paramterizations.
 
 * Log table
+
+** Log af chemicals
+
+Check at det virker, skriv param, opdater tutorial.
 
 ** Make it possible to log a specific entry in an array of unnamed objects.
 
@@ -108,6 +106,23 @@ from type.
 ** syntax.add_printer ("LaTeX", log_table_pp_LaTeX)
 
 ** Differences from superclass.
+
+* N respiration
+
+En standard parametrsering på
+
+    N_fixate_respiration    6.5 [g CH2O-C/g N]
+    NO3_uptake_respiration  3.0 [g CH2O-C/g NO3-N]
+
+ville være biologisk korrekt.
+
+Henning Hoeg.
+
+Bloker for begge når der ikke er assimilat nok.
+
+    NO3_uptake_respiration  0.0 [g CH2O-C/g NO3-N]
+
+for nogen planter, i følge Søren.
 
 * Organic Matter
 

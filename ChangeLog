@@ -1,3 +1,23 @@
+2002-03-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Chemical"): Fix dimension.
+	("Chemicals"): New parameterization.
+
+2002-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_chemicals.C (find): Add to 'all'.
+
+	* lib/chemistry.dai (solid): Obey range checks.
+
+	* chemical_std.C (ChemicalStandardSyntax): Added range checks.
+
+	* partition.h (Root, Leaf, Stem, RSR): Made them non-references.
+
+	* librarian.h (Librarian, ~Librarian): Pointless change in
+	handling content.
+
+	* action_irrigate.C: Fix memory leak.
+
 2002-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* library.C (~Implementation): More agressive cleanup.

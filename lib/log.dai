@@ -765,7 +765,7 @@ You cannot log individual chemicals with this model."
                      (factor 1e8))))    ;g/cm^2 -> g/ha
 
 (deflog "Soil Chemical" table
-  "Information about a specific chemical in the soil.
+  "Summary information about a specific chemical in the soil.
 Use like (\"Soil Chemical\" (set \"$chem\" Atrazine)) to log the content of
 'Atrazine' in the soil."
   (where "soil_chemical.dlf")
@@ -822,7 +822,23 @@ Use like (\"Soil Chemical\" (set \"$chem\" Atrazine)) to log the content of
                      (dimension "g/ha")
                      (factor 1e8))))    ;g/cm^2 -> g/ha
 
+(deflog "Chemicals" table
+  "Combined amount of chemicals in each numeric soil layer."
+  (where "chemicals.dlf")
+  (when hourly)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+           (hour (path time))
+           (array (path column "$col" SoilChemicals solutes solute M)
+		  (when hourly)
+                  (dimension "g/cm^3"))
+           ))
+
 (deflog "Chemical" table
+  "Amount of specified chemical in each numeric soil layer.
+You specify the chemical with (set \"$chem\" \"?<name>\"), where <name> is the 
+name of the chemical to log."
   (where "chemical.dlf")
   (when hourly)
   (entries (year (path time))
@@ -831,8 +847,7 @@ Use like (\"Soil Chemical\" (set \"$chem\" Atrazine)) to log the content of
            (hour (path time))
            (array (path column "$col" SoilChemicals solutes "$chem" solute M)
 		  (when hourly)
-                  (dimension "g/ha/&")
-                  (factor 1e8))        ;g/cm^2 -> g/ha
+                  (dimension "g/cm^3"))
            ))
 
 (deflog "Transform" table

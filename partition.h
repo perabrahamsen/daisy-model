@@ -22,11 +22,11 @@
 #ifndef PARTITION_H
 #define PARTITION_H
 
-class PLF;
 class AttributeList;
 class Syntax;
 class Log;
 
+#include "plf.h"
 #include <vector>
 using namespace std;
 
@@ -34,11 +34,11 @@ class Partition
 {
   // Parameters.
 private:
-  const PLF& Root;		// Partitioning functions for root
-  const PLF& Leaf;		//   leaf, and stem as function of DS
-  const PLF& Stem;
+  const PLF Root;		// Partitioning functions for root
+  const PLF Leaf;		//   leaf, and stem as function of DS
+  const PLF Stem;
 public:
-  const PLF& RSR;		// Root/Shoot ratio.
+  const PLF RSR;		// Root/Shoot ratio.
 
   // Utilities.
 public:

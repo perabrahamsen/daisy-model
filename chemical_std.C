@@ -1,7 +1,7 @@
 // chemical_std.C
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2002 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2002 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -24,6 +24,7 @@
 #include "mathlib.h"
 #include "plf.h"
 #include "soil_chemical.h"
+#include "check.h"
 
 static double
 heat_turnover_factor (double T)
@@ -150,16 +151,19 @@ Read chemical properties as normal Daisy parameters.");
       syntax.add_fraction ("crop_uptake_reflection_factor", Syntax::Const, "\
 How much of the chemical is reflected at crop uptake.");
       alist.add ("crop_uptake_reflection_factor", 1.0);
-      syntax.add ("canopy_dissipation_rate_coefficient", "h^-1", Syntax::Const,
+      syntax.add ("canopy_dissipation_rate_coefficient", "h^-1", 
+		  Check::non_negative (), Syntax::Const,
 		  "How fast does the chemical dissipate on canopy.");
-      syntax.add ("canopy_washoff_coefficient", "mm", Syntax::Const,
+      syntax.add ("canopy_washoff_coefficient", "mm", Check::positive (),
+		  Syntax::Const,
 		  "How fast is the chemical washed off the canopy.");
-      syntax.add ("diffusion_coefficient", "cm^2/s", Syntax::Const,
-		  "Diffusion coefficient.");
+      syntax.add ("diffusion_coefficient", "cm^2/s", Check::positive (),
+		  Syntax::Const, "Diffusion coefficient.");
       syntax.add_submodule ("solute", alist, Syntax::Const,
 			    "Description of chemical in soil.",
 			    SoilChemical::load_syntax);
-      syntax.add ("decompose_rate", "h^-1", Syntax::Const,
+      syntax.add ("decompose_rate", "h^-1", Check::non_negative (),
+		  Syntax::Const,
 		  "Fraction of solute being decomposed each hour.");
       PLF empty;
       syntax.add ("decompose_heat_factor", "dg C", Syntax::None (),

@@ -29,8 +29,6 @@
 #include "log.h"
 #include "submodel.h"
 
-PLF* SoilChemical::no_lag = NULL;
-
 void 
 SoilChemical::uptake (const Soil& soil, 
 		      const SoilWater& soil_water)
@@ -117,6 +115,19 @@ double
 SoilChemical::diffusion_coefficient () const
 { return chemical.diffusion_coefficient (); }
 
+
+const PLF& 
+SoilChemical::no_lag ()
+{
+  static PLF plf;
+  if (plf.size () == 0)
+    {
+      plf.add (0.0, 1.0);
+      plf.add (1.0, 1.0);
+    }
+  return plf;
+}
+
 void
 SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
 {
@@ -135,13 +146,7 @@ SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Increment lag with the value of this PLF for the current\n\
 concentration each timestep.  When lag in any node reaches 1.0,\n\
 decomposition begins.  It can never be more than 1.0 or less than 0.0.");
-  if (!no_lag)
-    {
-      no_lag = new PLF ();
-      no_lag->add (0.0, 1.0);
-      no_lag->add (1.0, 1.0);
-    }
-  alist.add ("lag_increment", *no_lag);
+  alist.add ("lag_increment", no_lag ());
   syntax.add ("lag", Syntax::None (), Syntax::OptionalState,
 	      "This state variable grows with lag_increment (C) each hour.\n\
 When it reached 1.0, decomposition begins.");
@@ -150,7 +155,7 @@ When it reached 1.0, decomposition begins.");
 
 void
 SoilChemical::initialize (const AttributeList& al,
-		    const Soil& soil, const SoilWater& soil_water)
+			  const Soil& soil, const SoilWater& soil_water)
 {
   Solute::initialize (al, soil, soil_water);
   uptaken.insert (uptaken.begin (), soil.size (), 0.0);
@@ -170,7 +175,10 @@ SoilChemical::SoilChemical (const Chemical& chem, const AttributeList& al)
 SoilChemical::SoilChemical (const Chemical& chem)
   : Solute (chem.solute_alist ()),
     chemical (chem),
-    lag_increment (*no_lag)
+    lag_increment (no_lag ())
+{ }
+
+SoilChemical::~SoilChemical ()
 { }
 
 static Submodel::Register soil_chemical_submodel ("SoilChemical",

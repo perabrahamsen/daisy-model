@@ -49,7 +49,7 @@ private:
 	     const char *const description)
       : lib (name, derive, description),
 	constructors (),
-	count (1)
+	count (0)
     { }
   } *content;
 
@@ -86,18 +86,22 @@ public:
 public:
   Librarian (const char *const name)
   { 
-    if (content)
-      content->count++;
-    else 
+    if (!content)
       content = new Content (name, &derive_type, T::description);
+    content->count++;
+
   }
   ~Librarian ()
   { 
-    if (--content->count == 0)
+    assert (content);
+    content->count--;
+    if (content->count == 0)
       {
 	delete content;
 	content = 0;
       }
+    else
+      assert (content->count > 0);
   }
 };
 

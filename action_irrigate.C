@@ -33,7 +33,7 @@ struct ActionIrrigate : public Action
 
   const double flux;
   const double temp;
-  const IM& sm;
+  const IM sm;
   
   virtual void irrigate (Field&,
 			 double flux, double temp, const IM&) const = 0;
@@ -65,7 +65,7 @@ Nitrogen content of irrigation water [mg N/l] (default: none).",
       temp (al.check ("temperature") 
 	    ? al.number ("temperature")
 	    : at_air_temperature),
-      sm (*new IM (al.alist ("solute")))
+      sm (al.alist ("solute"))
   { }
   ~ActionIrrigate ()
   { }
@@ -106,7 +106,7 @@ struct ActionIrrigateSubsoil : public Action
   const double flux;
   const double from;
   const double to;
-  const IM& sm;
+  const IM sm;
 
   void doIt (Daisy& daisy)
   {
@@ -122,7 +122,7 @@ struct ActionIrrigateSubsoil : public Action
       flux (al.number ("flux")),
       from (al.number ("from")),
       to (al.number ("to")),
-      sm (*new IM (al.alist ("solute")))
+      sm (al.alist ("solute"))
   { }
   ~ActionIrrigateSubsoil ()
   { }

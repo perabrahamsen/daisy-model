@@ -44,8 +44,7 @@ private:
   vector<double> decomposed;
   vector<double> uptaken;
   vector<double> lag;
-  static PLF* no_lag;
-  const PLF& lag_increment;
+  const PLF lag_increment;
 
   // Simulation.
 public:
@@ -59,11 +58,14 @@ public:
   double diffusion_coefficient () const; // in free solu. [cm² / h]
 
   // Create & Destroy.
+private:
+  static const PLF& no_lag ();
 public:
   static void load_syntax (Syntax&, AttributeList&);
   void initialize (const AttributeList&, const Soil&, const SoilWater&);
   SoilChemical (const Chemical&, const AttributeList&);	// From parser.
   SoilChemical (const Chemical&); // From influx.
+  ~SoilChemical ();
 private:
   SoilChemical (const SoilChemical&);
 };

@@ -65,7 +65,10 @@ struct Syntax::Implementation
   Implementation ()
   { }
   ~Implementation ()
-  { map_delete (alists.begin (), alists.end ()); }
+  {
+    map_delete (syntax.begin (), syntax.end ());
+    map_delete (alists.begin (), alists.end ()); 
+  }
 };    
 
 bool 

@@ -371,9 +371,15 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 	       assert (j >= 0);
 	       assert (j < WaterDef.size ());
                def -= WaterDef[j];
-	       assert (j > 0);
-	       assert (j <= Percolation.size ());
-               Percolation[j-1] = Percolation[j-1] - def / dt;
+	       if (j > 0)
+		 {
+		   assert (j <= Percolation.size ());
+		   Percolation[j-1] = Percolation[j-1] - def / dt;
+		 }
+	       else
+		 CERR << "BUG: Groundwater pipe: percolation[" << j - 1 
+		      << "] = " << def / dt << " (dw < def)\n";
+
                if (def<=0.0) break;
              }
            break;
@@ -395,11 +401,17 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 	       assert (j >= 0);
 	       assert (j < WaterDef.size ());
                def -= WaterDef[j];
-	       assert (j > 0);
-	       assert (j <= Percolation.size ());
-               Percolation[j-1] -= def / dt;
+	       if (j > 0)
+		 {
+		   assert (j <= Percolation.size ());
+		   Percolation[j-1] -= def / dt;
+		 }
+	       else
+		 CERR << "BUG: Groundwater pipe: percolation[" << j - 1 
+		      << "] = " << def / dt << "\n";
                if (def<=0.0) break;
              }
+	   assert (i > 0);
            GWT_new = soil.zplus (i-1);
            Theta[i] = soil.Theta(i,0.0,h_ice[i]);
            Percolation[i-1] -= dw / dt;
@@ -427,7 +439,7 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil,
                               vector<double>& Theta,
                               const double deficit)
 {
-  int i_drainage;
+  int i_drainage = -42;		// Shut up gcc.
   GWT_new = height;
   const int i_GWT = soil.interval_plus (height) + 1;
   for (unsigned int i = i_GWT; i <= i_bottom; i++)
@@ -503,7 +515,7 @@ GroundwaterPipe::FallingGWT2 (const Soil& soil,
                               vector<double>& Theta,
                               const double deficit)
 {
-  int i_drainage;
+  int i_drainage = -42;		// Shut up GCC.
   GWT_new = height;
   const int i_GWT = soil.interval_plus (height) + 1;
   for (unsigned int i = i_GWT; i <= i_bottom; i++)

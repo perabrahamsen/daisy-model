@@ -689,12 +689,13 @@ partition${OBJ}: partition.C partition.h plf.h submodel.h syntax.h \
 development${OBJ}: development.C development.h production.h \
  vernalization.h plf.h log.h librarian.h library.h common.h alist.h \
  syntax.h treelog.h message.h submodel.h
-production${OBJ}: production.C production.h crpn.h partition.h \
+production${OBJ}: production.C production.h crpn.h partition.h plf.h \
  organic_matter.h common.h am.h librarian.h library.h alist.h syntax.h \
- treelog.h log.h plf.h message.h submodel.h
+ treelog.h log.h message.h submodel.h
 harvesting${OBJ}: harvesting.C harvesting.h time.h plf.h production.h am.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h om.h crop.h \
- harvest.h chemicals.h log.h mathlib.h submodel.h
+ harvest.h chemicals.h log.h mathlib.h submodel.h check_range.h \
+ check.h
 canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
  log.h librarian.h library.h common.h alist.h syntax.h treelog.h
 canopy_std${OBJ}: canopy_std.C canopy_std.h canopy_simple.h plf.h \
@@ -762,12 +763,12 @@ soil_chemical${OBJ}: soil_chemical.C soil_chemical.h solute.h adsorption.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h transport.h \
  mactrans.h plf.h chemical.h soil.h horizon.h hydraulic.h tortuosity.h \
  geometry.h soil_heat.h soil_water.h macro.h organic_matter.h log.h \
- submodel.h
+ submodel.h message.h
 soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil_chemical.h \
  solute.h adsorption.h librarian.h library.h common.h alist.h syntax.h \
  treelog.h transport.h mactrans.h plf.h soil.h horizon.h hydraulic.h \
  tortuosity.h geometry.h soil_water.h macro.h soil_heat.h \
- organic_matter.h chemical.h chemicals.h log.h submodel.h
+ organic_matter.h chemical.h chemicals.h log.h submodel.h message.h
 bioincorporation${OBJ}: bioincorporation.C bioincorporation.h common.h \
  alist.h syntax.h treelog.h log.h librarian.h library.h soil.h \
  horizon.h hydraulic.h tortuosity.h geometry.h am.h submodel.h plf.h \
@@ -829,7 +830,7 @@ alist${OBJ}: alist.C plf.h library.h common.h alist.h syntax.h treelog.h \
 syntax${OBJ}: syntax.C syntax.h common.h treelog.h alist.h library.h \
  tmpstream.h check.h
 library${OBJ}: library.C library.h common.h alist.h syntax.h treelog.h \
- tmpstream.h
+ tmpstream.h message.h
 plf${OBJ}: plf.C plf.h
 time${OBJ}: time.C time.h
 mathlib${OBJ}: mathlib.C mathlib.h common.h
@@ -843,7 +844,7 @@ common${OBJ}: common.C common.h message.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
 hydraulic_Cosby${OBJ}: hydraulic_Cosby.C hydraulic.h librarian.h library.h \
- common.h alist.h syntax.h treelog.h horizon.h
+ common.h alist.h syntax.h treelog.h
 pedo_linear${OBJ}: pedo_linear.C pedo.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
  geometry.h
@@ -870,7 +871,7 @@ groundwater_file${OBJ}: groundwater_file.C groundwater.h uzmodel.h \
  lexer_data.h lexer.h
 action_fertilize${OBJ}: action_fertilize.C action.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h daisy.h field.h am.h im.h \
- tmpstream.h message.h
+ tmpstream.h message.h check.h
 action_repeat${OBJ}: action_repeat.C action.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h log.h
 column_inorganic${OBJ}: column_inorganic.C column_base.h column.h \
@@ -922,7 +923,7 @@ action_message${OBJ}: action_message.C action.h librarian.h library.h \
  message.h
 weather_std${OBJ}: weather_std.C weather.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h im.h lexer_data.h lexer.h tmpstream.h \
- mathlib.h
+ mathlib.h units.h
 select_flux_top${OBJ}: select_flux_top.C select.h condition.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h geometry.h
 select_flux_bottom${OBJ}: select_flux_bottom.C select.h condition.h \
@@ -930,7 +931,7 @@ select_flux_bottom${OBJ}: select_flux_bottom.C select.h condition.h \
 groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h uzmodel.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h log.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h tmpstream.h \
- mathlib.h message.h
+ mathlib.h message.h check.h
 select_index${OBJ}: select_index.C select.h condition.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h
 select_content${OBJ}: select_content.C select.h condition.h librarian.h \
@@ -969,7 +970,7 @@ mactrans_std${OBJ}: mactrans_std.C mactrans.h librarian.h library.h \
  message.h
 macro_std${OBJ}: macro_std.C macro.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h plf.h mathlib.h log.h uzmodel.h message.h
+ geometry.h plf.h mathlib.h log.h uzmodel.h message.h check.h
 macro_none${OBJ}: macro_none.C macro.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h
 document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h library.h \
@@ -1048,12 +1049,12 @@ nitrification_soil${OBJ}: nitrification_soil.C nitrification.h librarian.h \
  library.h common.h alist.h syntax.h treelog.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h soil_water.h macro.h soil_heat.h \
  soil_NH4.h solute.h adsorption.h transport.h mactrans.h soil_NO3.h \
- mathlib.h log.h plf.h
+ mathlib.h log.h plf.h check.h
 nitrification_solute${OBJ}: nitrification_solute.C nitrification.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h soil.h \
  horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h macro.h \
  soil_heat.h soil_NH4.h solute.h adsorption.h transport.h mactrans.h \
- soil_NO3.h log.h mathlib.h plf.h
+ soil_NO3.h log.h mathlib.h plf.h check.h
 hydraulic_mod_C${OBJ}: hydraulic_mod_C.C hydraulic.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h check.h
 uzlr${OBJ}: uzlr.C uzmodel.h librarian.h library.h common.h alist.h \
