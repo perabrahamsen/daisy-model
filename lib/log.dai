@@ -252,6 +252,9 @@
 		     (factor -10))	;cm -> mm
 	   (number (path column "$col" Surface pond)
 		   (dimension "mm"))
+	   (number (path column "$col" Surface runoff)
+		   (when hourly)
+		   (dimension "mm"))
 	   (number (path column "$col" Bioclimate "*" Snow Ssnow)
 		   (tag "SnowStore")
 		   (dimension "mm"))))
@@ -295,6 +298,9 @@
 	   (number (path column "$col" Bioclimate "*" soil_ea)
 		   (when hourly)
 		   (dimension "mm/d"))
+	   (number (path column "$col" Surface runoff)
+		   (when hourly)
+		   (dimension "mm"))
 	   (flux_top (path column "$col" SoilWater q)
 		     (tag "Matrix-Inf")
 		     (when hourly)
@@ -350,6 +356,11 @@
 		   (tag "NH4-Surface")
 		   (dimension "kg N/ha")
 		   (factor 1e5))		;g/cm² -> kg/ha
+	   (number (path column "$col" Surface IM_runoff NH4)
+		   (when hourly)
+		   (tag "NH4-runoff")
+		   (dimension "kg N/ha")
+		   (factor 1e5))		;g/cm² -> kg/ha
 	   (flux_top (path column "$col" SoilNH4 J)
 		     (tag "NH4-In")
 		     (when hourly)
@@ -389,6 +400,11 @@
 		     (factor 1e5))		;g/cm² -> kg/ha
 	   (number (path column "$col" Surface IM NO3)
 		   (tag "NO3-Surface")
+		   (dimension "kg N/ha")
+		   (factor 1e5))		;g/cm² -> kg/ha
+	   (number (path column "$col" Surface IM_runoff NO3)
+		   (when hourly)
+		   (tag "NO3-Runoff")
 		   (dimension "kg N/ha")
 		   (factor 1e5))		;g/cm² -> kg/ha
 	   (flux_top (path column "$col" SoilNO3 J)
@@ -965,6 +981,9 @@
 		   (dimension "mm/h"))
 	   (number (path column "$col" Surface pond)
 		   (tag "pond_water_storage")
+		   (dimension "mm"))
+	   (number (path column "$col" Surface runoff)
+		   (tag "pond_water_tunoff")
 		   (dimension "mm"))
 	   (number (path column "$col" Bioclimate "*"
 			 pond_water_in_temperature)
