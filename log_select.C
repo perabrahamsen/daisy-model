@@ -228,6 +228,16 @@ static bool check_alist (const AttributeList& al, Treelog& err)
   return ok;
 }
 
+// GCC 2.95 doesn't allow classes nested in functions.
+struct DocSelect : public LogSelect 
+{
+  void initialize (Treelog&)
+  { }
+  DocSelect (const AttributeList& al)
+    : LogSelect (al)
+  { }
+};
+
 void
 LogSelect::document_entries (Format& format, const AttributeList& alist)
 {
@@ -278,14 +288,6 @@ LogSelect::document_entries (Format& format, const AttributeList& alist)
       return;
     }
   // Complete log.
-  struct DocSelect : public LogSelect 
-  {
-    void initialize (Treelog&)
-    { }
-    DocSelect (const AttributeList& al)
-      : LogSelect (al)
-    { }
-  };
   DocSelect select (alist);
 
   format.bold ("Table columns:");
