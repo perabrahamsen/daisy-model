@@ -1,12 +1,8 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Check VALOUT fil.
-
 * exercises 
 
-** Konverter til LaTeX
-
-** Ret til.
+** ???
 
 * MMM: Test om man kan linke hugin fra Linux.
 
@@ -35,6 +31,10 @@ Påvirker alle puljer.
 ** Akademisk bekrivelse?
 
 Til referencemanual?
+
+** Lav en "fast CO2" pulje.
+
+Den skal indeholde CO2 fra puljer med end turnover_rate > XXX.
 
 * april: ekstra linie i output
 

@@ -355,7 +355,7 @@ hypothetical situation.  The difference is that in the first case, we
 (hopefully) \emph{know} what the manager did, and when.  In the second
 case, we need to build in some intelligence in the system, so the
 actions of the hypothetical manager depend on the state of the system.
-E.g. the manager is likely to wait for a crop to become ripe before
+E.g.\ the manager is likely to wait for a crop to become ripe before
 harvesting it.
 
 In this example, we do both.
@@ -402,7 +402,7 @@ mean wait until the simulation time is exactly 1:00~AM, March the
 \texttt{at}.
 
 The next action is \texttt{plowing}.  This happens one hour later, so
-our poor farmer is out in the field plowing at 2:00~AM.  This activity
+our poor farmer is out in the field plowing at 2:00~AM\@.  This activity
 last (in the simulation) exactly one hour, after which he can go to
 the next activity, which involves waiting once again.
 
@@ -469,7 +469,7 @@ The third conditions is named \texttt{or}.
               (at 1987 9 5 1))
 \end{verbatim}
 
-It is true when any of the specified conditions are true.  I.e. it is
+It is true when any of the specified conditions are true.  I.e.\ it is
 true when there is a ripe spring barley on the field, or when the
 simulation has reached 1:00~AM, September the 5'th, 1987.
 
@@ -665,7 +665,7 @@ where
 \item[\texttt{K\_aquitard}] Conductivity of the aquitard.
 \item[\texttt{Z\_aquitard}] Thickness of the aquitard.
 \item[\texttt{h\_aquifer}] Pressure potential in the aquifer below the
-  aquitard. By default. this is equal to \texttt{Z\_aquitard}.
+  aquitard. By default this is equal to \texttt{Z\_aquitard}.
 \end{description}
 The above numbers are the default values, i.e.\ what you get if you
 don't specify anything.  \texttt{L} and \texttt{pipe\_position} are
@@ -1320,7 +1320,7 @@ as well, in that case you must also specify the
 By default, fertilizer will be applied directly on the soil surface.
 There, organic fertilizer will be incorporated gardually by bioloical
 means (earth worms and the like), or suddenly by machanical means,
-i.e. by a tillage operation.  Inorganic fertilizer will penetrate the
+i.e.\ by a tillage operation.  Inorganic fertilizer will penetrate the
 soil along with the rain or irrigation water.
 
 However, if a farmer has the equipment for it, he will prefer
@@ -1623,7 +1623,7 @@ Here are some log models that are useful when dealing with pesticides:
 \end{description}
 
 In general, you will get the sum of all chemicals.  To log the content
-of a specific pesticide, such as 'Atrazine', specify the \verb|$chem|%$
+of a specific pesticide, such as `Atrazine', specify the \verb|$chem|%$
 parameter, as in:
 \begin{verbatim}
     ("Soil Chemical" (set "$chem" Atrazine))
@@ -1739,9 +1739,9 @@ three or more different directories.
   backup in case anything is horrible wrong with the new version.
 \item A directory containing files with those parameterizations that
   are not specific to a single simulation.  In that directory you can
-  organize the parameterizations by locations (e.g. put all horizon
+  organize the parameterizations by locations (e.g.\ put all horizon
   and column parameterizations containing data measured in Andeby in a
-  single \texttt{andeby.dai} file) or by type (e.g. put all crop
+  single \texttt{andeby.dai} file) or by type (e.g.\ put all crop
   management specifications in a single \texttt{crop-man.dai} file) or
   both, depending on taste.
 \item A directory for each simulation, containing a setup file, extra
@@ -1939,23 +1939,23 @@ use liniear interpolation between these two points, so in day 150 it
 will be 4.0.  Before day 100 and after day 200 we use the simulated
 CAI values.  In 1988 we start day 100 at CAI 0.0, increase linearly to
 1.5 day 150, and from there again linearly to 5.0 day 200, where we
-switch back to using simulated CAI.  All other years we use simulated
+switch back to using simulated CAI\@.  All other years we use simulated
 LAI.
 
 Only paramterizations of the \texttt{default} crop model will be
 affected by the \texttt{ForcedLAI} attribute.
 
 If there are mulitple crops, the forced CAI will be distributed among
-them corresponding to the relative size of their simulated CAI.  When
-forced CAI is active, this is the only use of the simulated CAI.  
+them corresponding to the relative size of their simulated CAI\@.  When
+forced CAI is active, this is the only use of the simulated CAI\@.  
 
 \subsubsection{Log models}
 
 The simulated CAI will be calculated anyway and can be logged.  Most
 log files will only log the CAI actually used which, when Forced LAI
-is in effect, will not be the sum of Leaf, Stem and SOrg AI.  The new
+is in effect, will not be the sum of Leaf, Stem and SOrg AI\@.  The new
 "Forced LAI" log model will log both the used, forced and simulated
-CAI.  By default, it will log the sum of all crops, set
+CAI\@.  By default, it will log the sum of all crops, set
 \verb|$crop|%$
 to log a particular crop alone as below:
 
