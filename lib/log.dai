@@ -905,13 +905,14 @@
 			 surface_chemicals_in amount)
 		   (tag surface_chemicals_in)
 		   (dimension "g/m^2/h"))
-	   (number (path column "$col" Bioclimate "*"
-			 surface_chemicals_storage amount)
+	   (number (path column "$col" Surface chemicals_storage amount)
 		   (tag surface_chemicals_storage)
 		   (dimension "g/m^2"))
-	   (number (path column "$col" Bioclimate "*"
-			 surface_chemicals_out amount)
+	   (number (path column "$col" Surface chemicals_out amount)
 		   (tag surface_chemicals_out)
+		   (dimension "g/m^2/h"))
+	   (number (path column "$col" Surface chemicals_runoff amount)
+		   (tag surface_chemicals_runoff)
 		   (dimension "g/m^2/h"))))
 
 (deflog "Bioclimate" table
