@@ -1,5 +1,14 @@
 1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 0.37 released.
+
+1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (CanopyStructure): Insert checks.
+
+	* bioclimate_new.C (CanopyStructure): Only call if LAI > 0.0.
+	* bioclimate_std.C (RadiationDistribution): Ditto.
+
 	* Version 0.36 released.
 
 1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -1287,6 +1287,7 @@ CropStandard::CanopyStructure ()
   double z2;			// Max height of the MaxLAD area [0 - 1].
   double Area;		        // Area spanned by z0, z1, and z2.
 
+  assert (DS > 0.0);
   if (DS <= 1)
     {
       // LAIDist0 is the leaf density at DS = 0, and LAIDist 1
@@ -1300,7 +1301,9 @@ CropStandard::CanopyStructure ()
 	(CanopyPar.LAIDist1[1] - CanopyPar.LAIDist0[1]) * DS;
       z2 = CanopyPar.LAIDist0[2] +
 	(CanopyPar.LAIDist1[2] - CanopyPar.LAIDist0[2]) * DS;
-      Area = (1 + z2 - z1 - z0) / 2;
+      Area = (1.0 + z2 - z1 - z0) / 2.0;
+      assert (Area > 0.0);
+      assert (Canopy.Height > 0.0);
       Canopy.LADm = Canopy.LAI / (Area * Canopy.Height);
     }
   else
@@ -1310,7 +1313,7 @@ CropStandard::CanopyStructure ()
       z0 = CanopyPar.LAIDist1[0];
       z1 = CanopyPar.LAIDist1[1];
       z2 = CanopyPar.LAIDist1[2];
-      double Area = (1 + z2 - z1 - z0) / 2;
+      double Area = (1.0 + z2 - z1 - z0) / 2.0;
       double MaxLAD = Canopy.LAI / (Area * Canopy.Height);
 	    
       if (MaxLAD > Canopy.LADm)
@@ -1348,13 +1351,14 @@ CropStandard::CanopyStructure ()
 	      // This gives us three equations with three unknown.  
 	      // We can solve them to get x0, x1, and y1.
 
-	      double x0 = 1 - sqrt (2 * Need * (z1 - z2 - z0 + 1));
-	      double x1 = 1 + (z2 - 1) * sqrt (2 * Need / (z1 - z2 - z0 + 1));
-	      double y1 = sqrt (2 * Need / (z1 - z2 - z0 + 1));
+	      double x0 = 1.0 - sqrt (2.0 * Need * (z1 - z2 - z0 + 1.0));
+	      double x1 
+		= 1.0 + (z2 - 1) * sqrt (2.0 * Need / (z1 - z2 - z0 + 1.0));
+	      double y1 = sqrt (2.0 * Need / (z1 - z2 - z0 + 1.0));
 			    
 	      // Check the results.
-	      assert (approximate (Need, (1 - x0) * y1 / 2));
-	      assert (approximate ((1 - x1) / y1, (1 - z2)));
+	      assert (approximate (Need, (1.0 - x0) * y1 / 2.0));
+	      assert (approximate ((1.0 - x1) / y1, (1.0 - z2)));
 	      assert (approximate ((x1 - x0) / y1, (z1 - z0)));
 
 	      // Insert this special distribution, and return.

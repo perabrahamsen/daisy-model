@@ -164,9 +164,11 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
        crop != crops.end();
        crop++)
     {
-      (*crop)->CanopyStructure ();
       if ((*crop)->LAI () > 0.0)
-	LAIvsH += (*crop)->LAIvsH ();
+	{
+	  (*crop)->CanopyStructure ();
+	  LAIvsH += (*crop)->LAIvsH ();
+	}
     }
   // There are no leafs below the ground.
   assert (LAIvsH (0.0) == 0.0);
