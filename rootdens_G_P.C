@@ -33,6 +33,7 @@ struct Rootdens_G_P : public Rootdens
   const double MinDens;		// Minimal root density [cm/cm^3]
 
   // Simulation.
+  static double density_distribution_parameter (double a);
   void set_density (vector<double>& Density,
 		    const Geometry& geometry, 
 		    double Depth, double PotRtDpt,
@@ -41,6 +42,64 @@ struct Rootdens_G_P : public Rootdens
   // Create.
   Rootdens_G_P (const AttributeList&);
 };
+
+double
+Rootdens_G_P::density_distribution_parameter (double a)
+{
+  assert (a > 1.0);
+  double x, y, z, x1, y1, z1, x2, y2, z2;
+
+  if (1 + a > exp (1.0))
+    {
+      x1 = 1.0;
+      y1 = exp (x1);
+      z1 = 1 + a * x1;
+      x2 = 20.0;
+      y2 = exp (x2);
+      z2 = 1 + a * x2;
+      while ((z1 - y1) * (z2 - y2) > 0)
+	{
+	  x1 = x2;
+	  y1 = y2;
+	  z1 = z2;
+	  x2++;
+	  y2 = exp (x2);
+	  z2 = 1 + a * x2;
+	}
+    }
+  else 
+    {
+      x1 = 0.3;
+      y1 = exp (x1);
+ //     z1 = 1 + a * x1;
+      x2 = 1.0;
+      y2 = exp (x2);
+ //     z2 = 1 + a * x2;
+    }
+
+  x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
+  y = exp (x);
+  z = 1 + a * x;
+  while (fabs (2 * (z - y) / (z + y)) > 1.0e-5)
+    {
+      if (z - y > 0)
+	{
+	  x1 = x;
+	  y1 = y;
+	  // z1 = z;
+	}
+      else
+	{
+	  x2 = x;
+	  y2 = y;
+	  // z2 = z;
+	}
+      x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
+      y = exp (x);
+      z = 1 + a * x;
+    }
+  return x;
+}
 
 void
 Rootdens_G_P::set_density (vector<double>& Density,
@@ -79,7 +138,7 @@ Rootdens_G_P::set_density (vector<double>& Density,
 	    =  LengthPrArea - MinDens * Depth; // [cm/cm^2]
 #if 1
 	  CERR << "too_low = " << too_low 
-xb	       << ", NewLengthPrArea = " << NewLengthPrArea
+	       << ", NewLengthPrArea = " << NewLengthPrArea
 	       << "MinLengthPrArea = " << MinLengthPrArea << "\n";
 #endif	    
 	  if (too_low > 0.0 && NewLengthPrArea > too_low * DensRtTip * 1.2)

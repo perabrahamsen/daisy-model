@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.00
+
+No changes.
+
 * 1.99
 
 ** Harvest cut_delay in the default crop model changed.
@@ -21,9 +25,11 @@ kg/ha), rather than of the fraction of dry matter removed.
 
 This affects none of the standard parameterizations.
 
+** Harvest cut_delay now limits development as well as production.
+
 ** Crop height is now limited by WStem in the default crop model.
 
-The Canopy parameter `HvsWStem' put an upper limit on the crop height
+The Canopy parameter 'HvsWStem' put an upper limit on the crop height
 based on WStem, relative to the crop height at flowering.  By default,
 it need 200 g DM / m^2 to reach full height.
 

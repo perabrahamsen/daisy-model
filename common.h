@@ -36,8 +36,7 @@
 #define BROKEN_HEADERS
 #endif
 
-#if !defined (__CYGWIN__) && !defined (MINGW) && !defined (VISUALCPP) && !defined (__BORLANDC__)
-// Doesn't work under cygwin
+#ifdef __sun__
 #define pow(x, y) (assert (x >= 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))
 #define log(x) (assert (x > 0), (log)(x))

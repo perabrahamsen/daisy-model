@@ -28,64 +28,6 @@ Librarian<Rootdens>::Content* Librarian<Rootdens>::content = NULL;
 const char *const Rootdens::description = "\
 Root density calculations.";
 
-double
-Rootdens::density_distribution_parameter (double a)
-{
-  assert (a > 1.0);
-  double x, y, z, x1, y1, z1, x2, y2, z2;
-
-  if (1 + a > exp (1.0))
-    {
-      x1 = 1.0;
-      y1 = exp (x1);
-      z1 = 1 + a * x1;
-      x2 = 20.0;
-      y2 = exp (x2);
-      z2 = 1 + a * x2;
-      while ((z1 - y1) * (z2 - y2) > 0)
-	{
-	  x1 = x2;
-	  y1 = y2;
-	  z1 = z2;
-	  x2++;
-	  y2 = exp (x2);
-	  z2 = 1 + a * x2;
-	}
-    }
-  else 
-    {
-      x1 = 0.3;
-      y1 = exp (x1);
- //     z1 = 1 + a * x1;
-      x2 = 1.0;
-      y2 = exp (x2);
- //     z2 = 1 + a * x2;
-    }
-
-  x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
-  y = exp (x);
-  z = 1 + a * x;
-  while (fabs (2 * (z - y) / (z + y)) > 1.0e-5)
-    {
-      if (z - y > 0)
-	{
-	  x1 = x;
-	  y1 = y;
-	  // z1 = z;
-	}
-      else
-	{
-	  x2 = x;
-	  y2 = y;
-	  // z2 = z;
-	}
-      x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
-      y = exp (x);
-      z = 1 + a * x;
-    }
-  return x;
-}
-
 Rootdens::Rootdens (const AttributeList& al)
   : name (al.name ("type"))
 { }

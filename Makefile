@@ -7,11 +7,12 @@
 # The following envirnoment variables are used:
 #
 # HOSTTYPE
-#	sun4	Create code for Solaris-2 / UltraSPARC.
-#	hp	Create code for HP/UX / HP-PA.
-#	win32	Create code for Win32 / Pentium.
-#	cygwin	Create code for Cygwin / Pentium.
-#	mingw	Create code for Mingw / Pentium.
+#	sun4		Create code for Solaris-2 / UltraSPARC.
+#	i386-linux	Create code for ia32 / Linux.
+#	hp		Create code for HP/UX / HP-PA.
+#	win32		Create code for Win32 / Pentium.
+#	cygwin		Create code for Cygwin / Pentium.
+#	mingw		Create code for Mingw / Pentium.
 
 # All makefiles should have these.
 #
@@ -52,6 +53,10 @@ USE_PROFILE = false
 #	borland		Use the Borland compiler.
 #
 ifeq ($(HOSTTYPE),sun4)
+	COMPILER = gcc
+#	COMPILER = sun	
+endif
+ifeq ($(HOSTTYPE),i386-linux)
 	COMPILER = gcc
 #	COMPILER = sun	
 endif
@@ -141,7 +146,7 @@ ifeq ($(COMPILER),gcc)
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
 		  -Wconversion -Wno-uninitialized -Wmissing-prototypes 
-	COMPILE = "c++-3.0.2" -ansi $(WARNING) $(DEBUG) $(OSFLAGS)
+	COMPILE = "c++" -ansi $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)

@@ -1,3 +1,12 @@
+2001-12-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.00 released.
+
+2001-12-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Makefile: Support i386-linux.
+	* common.h: Ditto.
+
 2001-11-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* rootdens_G_P.C (Rootdens_G_P): Made it a struct.
@@ -7,6 +16,12 @@
 	* root_system.C, root_system.h (tick, full_grown): Take DS arguments.
 	* crop_std.C (initialize, tick): Update callers.
 	* crop_simple.C (tick): Ditto.
+
+2001-11-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens.C, rootdens.h (density_distribution_parameter): Moved
+	from here.
+	* rootdens_G_P.C (density_distribution_parameter): To here.
 
 2001-11-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 

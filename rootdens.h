@@ -35,8 +35,6 @@ public:
   static const char *const description;
 
   // Simulation.
-protected:
-  static double density_distribution_parameter (double a);
 public:
   virtual void set_density (vector<double>& Density,
 			    const Geometry& geometry, 
