@@ -468,10 +468,18 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
   lex.skip_line ();
   lex.next_line ();
 
+  set<string> keywords;
+
   // Read keywords.
   while (lex.good () && lex.peek () != '-')
     {
       const string key = lex.get_word ();
+
+      if (keywords.member (key))
+	lex.error (string ("Duplicate keyword `") + key + "'");
+      else
+	keywords.add (key);
+
       lex.skip_space ();
 
       if (key == "Station:")

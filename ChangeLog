@@ -2,6 +2,10 @@
 
 	* Version 0.96 released.
 
+1999-11-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.96 released.
+
 1999-11-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* weather.C, weather.h (tick_after): New function.
