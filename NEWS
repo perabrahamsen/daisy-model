@@ -12,6 +12,12 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.59
+
+** Bug fixes and cleanups.
+
+** Daisy will now refuse to run unless it can open an daisy.log file.
+
 * 2.58
 
 ** No user visible changes.

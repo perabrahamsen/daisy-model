@@ -25,6 +25,7 @@
 #include "geometry.h"
 #include "version.h"
 #include "daisy.h"
+#include "tmpstream.h"
 #include <fstream>
 #include <time.h>
 
@@ -63,6 +64,7 @@ struct LogTable : public LogSelect, public Select::Destination
   void add (const string& tag, const string& value);
 
   // Create and destroy.
+  bool check (const Syntax&, Treelog& msg) const;
   LogTable (const AttributeList& al);
   ~LogTable ();
 };
@@ -253,6 +255,20 @@ LogTable::add (const string&, const string& value)
 { 
   type = Name;
   dest_name = value;
+}
+
+bool LogTable::check (const Syntax&, Treelog& msg) const
+{ 
+  Treelog::Open nest (msg, name);
+  bool ok = true;
+  if (!out.good ())
+    {
+      TmpStream tmp;
+      tmp () << "Write error for '" << file << "'";
+      msg.error (tmp.str ());
+      ok = false;
+    }
+  return ok; 
 }
 
 LogTable::LogTable (const AttributeList& al)

@@ -1,4 +1,28 @@
+2003-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.59 released.
+
 2003-03-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C (add_checks): Renamed from 'add_check'.
+
+	* geometry.C (add_layer): Update caller.
+	* rootdens_PLF.C (load_syntax): Ditto.
+
+	* assertion.C, assertion.h (error, warning, debug): New functions.
+	* assertion.C (failure, bug, warning): Use them.
+
+	* assertion.C (failure, panic): Removed unnecessary parentheses.
+	
+	* organic_matter.C (input_from_am): The som buffer does not have
+	an efficiency.
+
+	* log_harvest.C (check): Check for write error.
+	* log_table1.C (check): Ditto.
+	* log_table.C (check): Ditto.
+	* log_checkpoint.C (done): Warn for write error.
+
+	* lib/log.dai ("Carbon Balance"): Accumulate C_Loss.
 
 	* Version 2.58 released.
 

@@ -37,6 +37,9 @@ class Treelog;
 namespace Assertion
 {
   void message (const std::string&);
+  void warning (const std::string&);
+  void error (const std::string&);
+  void debug (const std::string&);
   void failure (const char* file, int line, const char* fun,
 		const char* test) NORETURN;
   void bug (const char* file, int line, const char* fun, 

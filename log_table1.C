@@ -24,6 +24,7 @@
 #include "condition.h"
 #include "time.h"
 #include "geometry.h"
+#include "tmpstream.h"
 #include <fstream>
 #include <numeric>
 #include <set>
@@ -478,8 +479,20 @@ struct LogTable1 : public Log
     { }
 
   // Create and Destroy.
-  bool check (const Syntax&, Treelog&) const
-    { return true; }
+  // Create and Destroy.
+  bool check (const Syntax&, Treelog& msg) const
+  { 
+    Treelog::Open nest (msg, name);
+    bool ok = true;
+    if (!out.good ())
+      {
+	TmpStream tmp;
+	tmp () << "Write error for '" << file << "'";
+	msg.error (tmp.str ());
+	ok = false;
+      }
+    return ok; 
+  }
 
   LogTable1 (const AttributeList& al)
     : Log (al),

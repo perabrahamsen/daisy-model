@@ -1,5 +1,11 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Check VALOUT fil.
+
+* Get rid of add_checks.
+
+Or make AOM use it.
+
 * exercises 
 
 ** Konverter til LaTeX
@@ -49,6 +55,10 @@ I den første linie skal "begyndelsesindhold" stå.
 * Min & max T i klimafil, udregn average.
 
 * Check let at bruge GUI version of CVS til Windows.
+
+* Cleanup: Get rid of Path:Output and Path:Input
+
+or use them everywhere.
 
 * Partit komponent
 

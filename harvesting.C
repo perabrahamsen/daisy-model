@@ -377,12 +377,12 @@ Harvesting::operator() (const string& column_name,
 
       // Check mass balance.
       daisy_assert (approximate (total_old_W, 
-			   total_new_W + Crop_W_Yield + Crop_W_Loss));
+				 total_new_W + Crop_W_Yield + Crop_W_Loss));
       daisy_assert (approximate (total_old_C, 
-			   total_new_C + Crop_C_Yield + Crop_C_Loss));
+				 total_new_C + Crop_C_Yield + Crop_C_Loss));
 
       daisy_assert (approximate (total_old_N,
-			   total_new_N + Crop_N_Yield + Crop_N_Loss));
+				 total_new_N + Crop_N_Yield + Crop_N_Loss));
 
 
       // Unlock and remove locked AM's.

@@ -35,11 +35,50 @@ void
 Assertion::message (const string& msg)
 {
   if (logs.size () == 0)
+    cout << msg;
+
+  for (unsigned int i = 0; i < logs.size (); i++)
+    {
+      logs[i]->message (msg);
+      logs[i]->flush ();
+    }
+}
+
+void 
+Assertion::error (const string& msg)
+{
+  if (logs.size () == 0)
     cerr << msg;
 
   for (unsigned int i = 0; i < logs.size (); i++)
     {
-      logs[i]->entry (msg);
+      logs[i]->error (msg);
+      logs[i]->flush ();
+    }
+}
+
+void 
+Assertion::warning (const string& msg)
+{
+  if (logs.size () == 0)
+    cerr << msg;
+
+  for (unsigned int i = 0; i < logs.size (); i++)
+    {
+      logs[i]->warning (msg);
+      logs[i]->flush ();
+    }
+}
+
+void 
+Assertion::debug (const string& msg)
+{
+  if (logs.size () == 0)
+    cerr << msg;
+
+  for (unsigned int i = 0; i < logs.size (); i++)
+    {
+      logs[i]->debug (msg);
       logs[i]->flush ();
     }
 }
@@ -53,8 +92,8 @@ Assertion::failure (const char* file, int line, const char* fun,
   if (fun)
     tmp () << " in " << fun;
   
-  message (tmp.str ());
-  throw (3);
+  error (tmp.str ());
+  throw 3;
 }
 
 void 
@@ -66,7 +105,7 @@ Assertion::bug (const char* file, int line, const char* fun,
   if (fun)
     tmp () << " in " << fun;
 
-  message (tmp.str ());
+  error (tmp.str ());
 }
 
 void 
@@ -79,7 +118,7 @@ Assertion::warning (const char* file, int line, const char* fun,
     tmp () << "(" << fun << ") ";
   tmp () << "warning: " << msg;
 
-  message (tmp.str ());
+  warning (tmp.str ());
 }
 
 void 
@@ -87,7 +126,7 @@ Assertion::panic (const char* file, int line, const char* fun,
 		  const string& msg)
 {
   bug (file, line, fun, msg);
-  throw (3);
+  throw 3;
 }
 
 Assertion::Register::Register (Treelog& log)

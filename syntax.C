@@ -744,7 +744,7 @@ Syntax::add_check (check_fun fun)
 { impl.checker.push_back (fun); }
 
 void 
-Syntax::add_check (check_list_fun fun)
+Syntax::add_checks (check_list_fun fun)
 { impl.list_checker.push_back (fun); }
 
 Syntax::Syntax ()

@@ -101,8 +101,7 @@ ifeq ($(USE_OPTIMIZE),true)
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
 		ifeq ($(HOSTTYPE),i386-linux)
-		  OPTIMIZE = -O2 -mcpu=pentiumpro -march=pentium
-# -ffast-math 
+		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
 	        endif
 		ifeq ($(HOSTTYPE),cygwin)
 		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium

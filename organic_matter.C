@@ -1050,7 +1050,6 @@ OrganicMatter::Implementation::input_from_am (vector<double>& destination,
 	destination[som_pool] += added[i]->C[lay] 
 	  * added[i]->turnover_rate 
 	  * added[i]->fractions[som_pool]
-	  * added[i]->efficiency[som_pool]
 	  * abiotic_factor;
       }
 }

@@ -24,6 +24,7 @@
 #include "daisy.h"
 #include "harvest.h"
 #include "version.h"
+#include "tmpstream.h"
 #include <fstream>
 #include <time.h>
 
@@ -152,8 +153,19 @@ struct LogHarvest : public Log
   { }
 
   // Create and Destroy.
-  bool check (const Syntax&, Treelog&) const
-  { return true; }
+  bool check (const Syntax&, Treelog& msg) const
+  { 
+    Treelog::Open nest (msg, name);
+    bool ok = true;
+    if (!out.good ())
+      {
+	TmpStream tmp;
+	tmp () << "Write error for '" << file << "'";
+	msg.error (tmp.str ());
+	ok = false;
+      }
+    return ok; 
+  }
 
   LogHarvest (const AttributeList& al)
     : Log (al),

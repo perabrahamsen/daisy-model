@@ -133,7 +133,13 @@ LogCheckpoint::done ()
 	Daisy::load_syntax (dummy_syntax, default_alist);
 
       printer.print_alist (alist (), syntax (), default_alist);
-	  
+
+      if (!printer.good ())
+	{
+	  TmpStream tmp;
+	  tmp () << "Error writing to '" << filename << "'";
+	  Assertion::error (tmp.str ());
+	}
       // Close stack.
       delete &alist ();
       pop ();

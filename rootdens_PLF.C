@@ -57,7 +57,7 @@ struct Rootdens_PLF : public Rootdens
 void 
 Rootdens_PLF::Entry::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add_check (check_alists);
+  syntax.add_checks (check_alists);
   syntax.add ("index", Syntax::Unknown (), Check::none (), Syntax::Const, 
 	      "Index for specifying root density.");
   syntax.add ("density", Syntax::Unknown (), Syntax::None (), Syntax::Const, "\
