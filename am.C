@@ -256,14 +256,29 @@ AM::Implementation::add (const Geometry& geometry,
       else
 	{
 	  assert (approximate (om_C[i], C_per_N * om_N[i]));
+	  const double old_N = om[i]->total_N (geometry);
 	  om[i]->add (geometry, om_C[i], density);
+	  const double new_N = om[i]->total_N (geometry);
+	  const double N = om_N[i];
+	  if (N > 0 && fabs (N / (new_N - old_N) - 1.0) > 0.001)
+	    CERR << "Bug3: Added N (" << N << ") got (" << new_N - old_N 
+		 << ") fraction (" << N / (new_N - old_N) << ") C/N (" 
+		 << C/N << "\n";
 	}
     }
 
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
+#if 0 
   assert (approximate (new_C, old_C + C));
   assert (approximate (new_N, old_N + N));
+#else
+  if (N > 0 && fabs (N / (new_N - old_N) - 1.0) > 0.001)
+    CERR << "Bug: Added N (" << N << ") got (" << new_N - old_N 
+	 << ") fraction (" << N / (new_N - old_N) << ") C/N (" << C/N << "\n";
+  if (C > 0 && fabs (C / (new_C - old_C) - 1.0) > 0.001)
+    CERR << "Bug: Added C (" << C << ") got (" << new_C - old_C << ")\n";
+#endif
 }
 
 void

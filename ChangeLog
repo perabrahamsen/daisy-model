@@ -1,3 +1,11 @@
+2000-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.11 released.
+
+2000-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (set_N): Don't set C/N to one when already specified.
+
 2000-01-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.10 released.

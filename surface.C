@@ -13,6 +13,7 @@
 #include "submodel.h"
 #include "chemicals.h"
 #include "soil_chemicals.h"
+#include "csmp.h"
 
 #ifdef RIDGING
 struct Ridge

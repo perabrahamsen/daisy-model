@@ -86,24 +86,44 @@ OM::get_N () const
 void
 OM::set_N (vector<double>& N) 
 {
-  // Calculate C/N.
   assert (N.size () == C.size ());
-  C_per_N.erase (C_per_N.begin (), C_per_N.end ());
 
-  for (unsigned i = 0; i < C.size (); i++)
-  {
-    if (C[i] == 0.0)
-      {
-	assert (N[i] == 0.0);
-	C_per_N.push_back (1.0); // Arbitrary.
-      }
-    else
-      {
-	assert (C[i] > 0.0);
-	assert (N[i] > 0.0);
-	C_per_N.push_back (C[i] / N[i]);
-      }
-  }
+  if (initial_C_per_N != Unspecified)
+    {
+      // Fixed C/N.
+     for (unsigned i = 0; i < C.size (); i++)
+	{
+	  if (N[i] == 0.0)
+	    assert (C[i] == 0.0);
+	  else
+	    assert (approximate (initial_C_per_N, C[i] / N[i]));
+      
+	  if (i < C_per_N.size ())
+	    assert (approximate (C_per_N[i], initial_C_per_N));
+	  else
+	    C_per_N.push_back (initial_C_per_N);
+	}
+    }
+  else
+    {
+      // Calculate C/N.
+      C_per_N.erase (C_per_N.begin (), C_per_N.end ());
+
+      for (unsigned i = 0; i < C.size (); i++)
+	{
+	  if (C[i] == 0.0)
+	    {
+	      assert (N[i] == 0.0);
+	      C_per_N.push_back (1.0); // Arbitrary.
+	    }
+	  else
+	    {
+	      assert (C[i] > 0.0);
+	      assert (N[i] > 0.0);
+	      C_per_N.push_back (C[i] / N[i]);
+	    }
+	}
+    }
 }
 
 void 
@@ -293,7 +313,13 @@ OM::add (const Geometry& geometry, // Add dead roots.
 
   // Check that we computed the correct value.
   const double new_C = total_C (geometry);
+#if 0
   assert (approximate (new_C, old_C + to_C));
+#else
+  if (to_C > 0 && fabs (to_C / (new_C - old_C) - 1.0) > 0.001)
+    CERR << "Fix Bug: Added C (" << to_C << ") got ("
+	 << new_C - old_C << ")\n";
+#endif
 }
 
 void 
@@ -343,8 +369,18 @@ OM::add (const Geometry& geometry, // Add dead roots.
   // Check that we computed the correct value.
   const double new_C = total_C (geometry);
   const double new_N = total_N (geometry);
+#if 0
   assert (approximate (new_C, old_C + to_C));
   assert (approximate (new_N, old_N + to_N));
+#else
+  if (to_N > 0 && fabs (to_N / (new_N - old_N) - 1.0) > 0.001)
+    CERR << "Var Bug: Added N (" << to_N << ") got (" << new_N - old_N 
+	 << ") fraction (" << to_N / (new_N - old_N) << ") C/N ("
+	 << to_C/to_N << "\n";
+  if (to_C > 0 && fabs (to_C / (new_C - old_C) - 1.0) > 0.001)
+    CERR << "Var Bug: Added C (" << to_C << ") got ("
+	 << new_C - old_C << ")\n";
+#endif
 }
 
 inline void
