@@ -1,3 +1,7 @@
+2003-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: BCC 5.0.1 fixes.
+
 2003-02-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* am.C (AM_Syntax): Use Mg instead of T (or t).

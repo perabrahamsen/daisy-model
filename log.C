@@ -109,7 +109,7 @@ Log::done ()
 { }
 
 void
-Log::print_dlf_header (ostream& out, const AttributeList& al)
+Log::print_dlf_header (std::ostream& out, const AttributeList& al)
 {
   if (al.check ("parser_files"))
   {

@@ -325,6 +325,8 @@ Horizon::Implementation::weight (const AttributeList& al, string name)
   return al.number (name) / total;
 }
 
+static const vector<double> empty_sequence;
+
 Horizon::Implementation::Implementation (const AttributeList& al)
   : clay (weight (al, "clay")),
     silt (weight (al, "silt")),
@@ -338,7 +340,7 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     SOM_C_per_N (al.number_sequence ("SOM_C_per_N")),
     SOM_fractions (al.check ("SOM_fractions") 
 		   ? al.number_sequence ("SOM_fractions")
-		   : vector<double> ()),
+		   : empty_sequence),
     quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
     intervals (al.integer ("intervals"))
