@@ -1291,7 +1291,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	      else
 		equation_string () << " +";
 
-	      equation_string () << " " << value << " SMB" << pool + 1;
+	      equation_string () << " " << value << " SMB" << (pool + 1);
 	    }
 	}
       for (unsigned int pool = 0; pool < som_size; pool++)
@@ -1303,7 +1303,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 		first = false;
 	      else
 		equation_string () << " +";
-	      equation_string () << " " << value << " SOM" << pool + 1;
+	      equation_string () << " " << value << " SOM" << (pool + 1);
 	    }
 	}
       for (unsigned int pool = 0; pool < smb_size; pool++)
@@ -1315,7 +1315,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 		first = false;
 	      else
 		equation_string () << " +";
-	      equation_string () << " " << value << " dSMB" << pool + 1;
+	      equation_string () << " " << value << " dSMB" << (pool + 1);
 	    }
 	}
       for (unsigned int pool = 0; pool < som_size; pool++)
@@ -1327,7 +1327,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 		first = false;
 	      else
 		equation_string () << " +";
-	      equation_string () << " " << value << " dSOM" << pool + 1;
+	      equation_string () << " " << value << " dSOM" << (pool + 1);
 	    }
 	}
       equation_string () << "\n";
@@ -1373,7 +1373,6 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
       const double value = matrix.result (smb_column + pool);
       if (value < 0)
 	{
-	  throw 
 	  error_found = true;
 	  continue;
 	}
@@ -1438,20 +1437,20 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 	  // Tag line.
 	  tmp () << "lay\thumus\tinput\tinput [%]";
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
-	    tmp () << "\tSMB" << pool + 1;
+	    tmp () << "\tSMB" << (pool + 1);
 	  for (unsigned int pool = 0; pool < som_size; pool++)
-	    tmp () << "\tSOM" << pool + 1;
+	    tmp () << "\tSOM" << (pool + 1);
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
-	    tmp () << "\tdSMB" << pool + 1 << "\tdSMB" << pool + 1;
+	    tmp () << "\tdSMB" << (pool + 1) << "\tdSMB" << (pool + 1);
 	  for (unsigned int pool = 0; pool < som_size; pool++)
-	    tmp () << "\tdSOM" << pool + 1 << "\tdSOM" << pool + 1;
+	    tmp () << "\tdSOM" << (pool + 1) << "\tdSOM" << (pool + 1);
 	  tmp () << "\n";
 	  // Dimension line.
 	  tmp () << "\tkg C/ha/cm\tkg C/ha/cm/y\t%";
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
-	    tmp () << "\t%" << pool + 1;
+	    tmp () << "\t%" << (pool + 1);
 	  for (unsigned int pool = 0; pool < som_size; pool++)
-	    tmp () << "\t%" << pool + 1;
+	    tmp () << "\t%" << (pool + 1);
 	  for (unsigned int pool = 0; pool < smb_size; pool++)
 	    tmp () << "\tkg C/ha/cm/y\ty^-1";
 	  for (unsigned int pool = 0; pool < som_size; pool++)
