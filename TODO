@@ -1,21 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Dario: check at groundwater file virker
+* SH: Nulstil PotCanopyAss når der ikke er lys?
 
-* Omdøb lib/weather.dwf to sample/taastrup.dwf
-
-... og lib/test.dai to sample/test.dai
+* Birgitte + SH EU ark
 
 * crop simple med nit
-
-* Tove
-
-denit og nit parametre.
-
-* Advarsel hvis "from" eller "to" ikke ligger ved et interval.
-
-Alternativt, tilføj grænser.  Men det vil betyde at logging kan ændre
-resultat. 
 
 * FertOrgaNic 
 
@@ -34,8 +23,6 @@ resultat.
 ** Slovakiske data
 
 * spec + dimension giver ikke fejl hvis der ikke kan konverteres
-
-* Mindst tre numeriske lag per horizont.
 
 * Make it possible to specify texture using different systems
 

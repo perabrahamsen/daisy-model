@@ -33,6 +33,7 @@
 class Geometry;
 class Daisy;
 class Time;
+class Treelog;
 
 class Select
 {
@@ -89,7 +90,7 @@ public:
   virtual void output_number (double);
   virtual void output_integer (int);
   virtual void output_name (symbol);
-  virtual void output_array (const vector<double>&, const Geometry*);
+  virtual void output_array (const vector<double>&, const Geometry*, Treelog&);
   virtual void output_time (const Time&); // Obsolete
 
   // Reset at start of time step.

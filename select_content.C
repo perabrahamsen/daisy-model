@@ -30,7 +30,7 @@ struct SelectContent : public SelectValue
 
   // Output routines.
   void output_array (const vector<double>& array, 
-		     const Geometry* geometry)
+		     const Geometry* geometry, Treelog&)
     { 
       if (count == 0)	 
 	value = array[geometry->interval_plus (height)];	

@@ -493,6 +493,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		       != &Librarian<Parser>::library ())))
 	found.insert (name);
 
+      // Log variable warning.
+      if (syntax.is_log (name))
+        warning (name + " is a log only variable, value will be ignored");
+
       if (syntax.size (name) == Syntax::Singleton)
 	switch (syntax.lookup (name))
 	  {

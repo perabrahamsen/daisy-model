@@ -22,17 +22,39 @@
 
 #include "select_value.h"
 #include "geometry.h"
+#include "mathlib.h"
+#include "tmpstream.h"
+#include "treelog.h"
 
 struct SelectFluxTop : public SelectValue
 {
   // Content.
   double height;
+  const Geometry* last;
+  int index;
 
   // Output routines.
   void output_array (const vector<double>& array, 
-		     const Geometry* geometry)
+		     const Geometry* geometry, Treelog& msg)
     { 
-      int index = geometry->interval_border (height);
+    if (geometry != last)
+      {
+        last = geometry;
+        index = geometry->interval_border (height);
+
+        if ((index == 0 && height < -1e-8)
+            || !approximate (height, geometry->zplus (index-1)))
+          {
+            TmpStream tmp;
+            tmp () << "Log column " << name 
+                   << ": No interval near from = " << height 
+                   << " [cm]; closest match is " 
+                   << ((index == 0) ? 0 : geometry->zplus (index-1))
+                   << " [cm]";
+            msg.warning (tmp.str ());
+          }
+        daisy_assert (array.size () > index);
+      }
 
       if (count == 0)	 
 	value = array[index];	
@@ -54,7 +76,9 @@ struct SelectFluxTop : public SelectValue
     }
   SelectFluxTop (const AttributeList& al)
     : SelectValue (al),
-      height (0.0)
+      height (0.0),
+      last (NULL),
+      index (-1)
     { }
 };
 

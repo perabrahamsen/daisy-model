@@ -12,6 +12,21 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.49
+
+** test.dai moved to daisy-sample.zip
+
+** weather.dwf renamed taastrup.dwf and moved to daisy-sample.zip
+
+** Daisy will now complain if you try to log fluxes not at interval borders.
+
+** Each horizon now gets at least three numeric intervals.
+
+** The checkpoints may now contain the "original" keyword.
+
+A couple of crop variables have also been removed, so old checkpoints
+will not run (not that they usually can run on newer version).
+
 * 3.48
 
 ** Nitrification parameter moved.

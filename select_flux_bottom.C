@@ -22,59 +22,85 @@
 
 #include "select_value.h"
 #include "geometry.h"
+#include "mathlib.h"
+#include "tmpstream.h"
+#include "treelog.h"
 
 struct SelectFluxBottom : public SelectValue
 {
   // Content.
   double height;
+  const Geometry* last;
+  int index;
 
   // Output routines.
   void output_array (const vector<double>& array, 
-		     const Geometry* geometry)
-    { 
-      int index = ((height > 0.0) 
-		   ? geometry->size ()
-		   : geometry->interval_border (height));
-      daisy_assert (array.size () > index);
-      if (count == 0)	 
-	value = array[index];	
-      else
-	value += array[index];	
-      count++;
-    }
+		     const Geometry* geometry, Treelog& msg)
+  { 
+    if (geometry != last)
+      {
+        last = geometry;
+        if (height > 0.0) 
+          index = geometry->size ();
+        else
+          {
+            index = geometry->interval_border (height);
+            if ((index == 0 && height < -1e-8)
+                || !approximate (height, geometry->zplus (index-1)))
+              {
+                TmpStream tmp;
+                tmp () << "Log column " << name 
+                       << ": No interval near to = " << height 
+                       << " [cm]; closest match is " 
+                       << ((index == 0) ? 0 : geometry->zplus (index-1))
+                       << " [cm]";
+                msg.warning (tmp.str ());
+              }
+          }
+        daisy_assert (array.size () > index);
+      }
+
+    if (count == 0)	 
+      value = array[index];	
+    else
+      value += array[index];	
+    count++;
+  }
 
   // Create and Destroy.
   void initialize (const map<symbol, symbol>& conv, 
 		   double default_from, double default_to, 
 		   const string& timestep )
-    {
-      Select::initialize (conv, default_from, default_to, timestep);
+  {
+    Select::initialize (conv, default_from, default_to, timestep);
 
-      // Overwrite default height.
-      if (default_to < 0.0)
-	height = default_to;
-    }
+    // Overwrite default height.
+    if (default_to < 0.0)
+      height = default_to;
+  }
   SelectFluxBottom (const AttributeList& al)
     : SelectValue (al),
-      height (1.0)
-    { }
+      height (1.0),
+      last (NULL),
+      index (-1)
+  { }
 };
 
 static struct SelectFluxBottomSyntax
 {
   static Select& make (const AttributeList& al)
-    { return *new SelectFluxBottom (al); }
+  { return *new SelectFluxBottom (al); }
 
   SelectFluxBottomSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      SelectValue::load_syntax (syntax, alist);
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    SelectValue::load_syntax (syntax, alist);
 
-      alist.add ("description", 
-		 "Extract flux at bottom of specified interval.\n\
+    alist.add ("description", 
+               "Extract flux at bottom of specified interval.\n\
 By default, log the first member of the sequence.");
 
-      Librarian<Select>::add_type ("flux_bottom", alist, syntax, &make);
-    }
+    Librarian<Select>::add_type ("flux_bottom", alist, syntax, &make);
+  }
 } Select_syntax;

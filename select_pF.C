@@ -35,7 +35,7 @@ struct SelectPF : public Select
     
   // Output routines.
   void output_array (const vector<double>& array, 
-		     const Geometry* geometry)
+		     const Geometry* geometry, Treelog&)
   { 
     if (geometry)
       last_geometry = geometry;

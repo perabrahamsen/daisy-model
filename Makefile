@@ -392,7 +392,8 @@ HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h)
 
 # Find all printable files.
 #
-TEXT =  ChangeLog.1 Makefile ChangeLog TODO NEWS FILES COPYING COPYING.LIB \
+TEXT =  ChangeLog.2 ChangeLog.1 \
+	Makefile ChangeLog TODO NEWS FILES COPYING COPYING.LIB \
 	$(HEADERS) $(SOURCES) tlink32.ini daisy.bpr daisy.bpf daisy.bpg \
 	Daisy.vcproj
 

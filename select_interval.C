@@ -36,7 +36,7 @@ struct SelectInterval : public Select
   // Output routines.
 
   void output_array (const vector<double>& array, 
-		     const Geometry* geometry)
+		     const Geometry* geometry, Treelog&)
   { 
     double result;
     if (to > 0.0)

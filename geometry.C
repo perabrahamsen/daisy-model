@@ -372,8 +372,10 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
       const bool volatile_bottom = 
 	groundwater.bottom_type () == UZbottom::lysimeter 
 	|| groundwater.is_pipe ();
-
+      
+      bool warn_about_small_intervals = true;
       double last = 0.0;
+      double last_fixed = 0.0;
       for (unsigned int i = 0; i < fixed.size ();)
 	{
 	  const double current = fixed[i];
@@ -407,6 +409,18 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 	      zone_end = current;
 	      zone_size = 20.0;
 	    }
+
+          zone_size = min (zone_size, (last_fixed - current) / 3.0);
+
+          if (warn_about_small_intervals && zone_size < 0.99)
+            {
+              warn_about_small_intervals = false;
+              TmpStream tmp;
+              tmp () << "\
+Can't automatically make discretizations less than 1 [cm], needed at " 
+                     << last << " [cm].\nPlease set zplus manually.";
+              msg.warning (tmp.str ());
+            }
 
 	  // Dispersivity limit.
 	  if (zone_size > max_interval)
@@ -449,6 +463,7 @@ Geometry::initialize_zplus (const Groundwater& groundwater,
 		  zplus_.push_back (current);
 		}
 	      // Next fixed limit.
+              last_fixed = current;
 	      i++;
 	    }
 	}

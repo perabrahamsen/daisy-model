@@ -394,8 +394,6 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "RootSystem");
   alist.add ("description", "Standard root system model.");
 
-  static const vector<double> empty_array;
-
   syntax.add ("rootdens", Librarian<Rootdens>::library (),
 	      "Root density model.");
   alist.add ("rootdens", Rootdens::default_model ());
@@ -440,21 +438,17 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("Depth", "cm", Check::non_negative (), Syntax::OptionalState,
 	      "Rooting Depth.");
   syntax.add ("Density", "cm/cm3", Check::non_negative (),
-	      Syntax::State, Syntax::Sequence,
+	      Syntax::LogOnly, Syntax::Sequence,
 	       "Root density in soil layers.");
-  alist.add ("Density", empty_array);
   syntax.add ("H2OExtraction", "cm^3/cm^3/h", Check::non_negative (), 
-	      Syntax::State, Syntax::Sequence,
+	      Syntax::LogOnly, Syntax::Sequence,
 	       "Extraction of H2O in soil layers.");
-  alist.add ("H2OExtraction", empty_array);
   syntax.add ("NH4Extraction", "g N/cm^3/h", Check::non_negative (), 
-	      Syntax::State, Syntax::Sequence,
+	      Syntax::LogOnly, Syntax::Sequence,
 	       "Extraction of NH4-N in soil layers.");
-  alist.add ("NH4Extraction", empty_array);
   syntax.add ("NO3Extraction", "g N/cm^3/h", Check::non_negative (), 
-	      Syntax::State, Syntax::Sequence,
+	      Syntax::LogOnly, Syntax::Sequence,
 	       "Extraction of NO3-N in soil layers.");
-  alist.add ("NO3Extraction", empty_array);
   syntax.add ("h_x", "cm", Check::none (), Syntax::State,
 	       "Root extraction at surface.");
   alist.add ("h_x", 0.0);
@@ -509,10 +503,6 @@ RootSystem::RootSystem (const AttributeList& al)
     Rxylem (al.number ("Rxylem")),
     PotRtDpt (get_PotRtDpt (al)),
     Depth (al.check ("Depth") ? al.number ("Depth") : al.number ("DptEmr")),
-    Density (al.number_sequence ("Density")),
-    H2OExtraction (al.number_sequence ("H2OExtraction")),
-    NH4Extraction (al.number_sequence ("NH4Extraction")),
-    NO3Extraction (al.number_sequence ("NO3Extraction")),
     h_x (al.number ("h_x")),
     partial_soil_temperature (al.number ("partial_soil_temperature")),
     soil_temperature (al.number ("soil_temperature")),

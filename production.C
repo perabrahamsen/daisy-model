@@ -615,12 +615,10 @@ For initialization, set this to the amount of N in the seed.");
   alist.add ("N_AM", 0.000);
   
   // Auxiliary.
-  syntax.add ("PotCanopyAss", "g CH2O/m^2", Syntax::State,
-	      "Potential canopy assimilation this day until now.");
-  alist.add ("PotCanopyAss", 0.0);
-  syntax.add ("CanopyAss", "g CH2O/m^2", Syntax::State,
-	      "Canopy assimilation this day until now.");
-  alist.add ("CanopyAss", 0.0);
+  syntax.add ("PotCanopyAss", "g CH2O/m^2/h", Syntax::LogOnly,
+	      "Potential canopy assimilation, i.e. stressfree production.");
+  syntax.add ("CanopyAss", "g CH2O/m^2/h", Syntax::LogOnly,
+	      "Canopy assimilation.");
   syntax.add ("NetPhotosynthesis", "g CO2/m^2/h", Syntax::LogOnly,
 	      "Net Photosynthesis.");
   syntax.add ("AccNetPhotosynthesis", "g CO2/m^2", Syntax::LogOnly,
@@ -739,8 +737,8 @@ Production::Production (const AttributeList& al)
     AM_root (NULL),
     AM_leaf (NULL),
     // Auxiliary.
-    PotCanopyAss (al.number ("PotCanopyAss")),
-    CanopyAss (al.number ("CanopyAss")),
+    PotCanopyAss (0.0),
+    CanopyAss (0.0),
     NetPhotosynthesis (0.0),
     AccNetPhotosynthesis (0.0),
     Respiration (0.0),

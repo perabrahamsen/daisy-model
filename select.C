@@ -327,7 +327,7 @@ Select::output_name (const symbol)
 { throw ("This log selection can't log names."); }
 
 void 
-Select::output_array (const vector<double>&, const Geometry*)
+Select::output_array (const vector<double>&, const Geometry*, Treelog&)
 { throw ("This log selection can't log arrays."); }
 
 void 

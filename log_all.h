@@ -31,6 +31,7 @@ private:
   vector<LogSelect*> slaves;
   stack<vector<Select*>/**/> active_leafs;
   stack<vector<Select*>/**/> active_interiors;
+  Treelog* msg;
 
   // Filter functions.
   bool check_leaf (symbol) const;

@@ -61,7 +61,8 @@ struct PrinterFile::Implementation
   void print_plf (const PLF&, int indent); 
   void print_alist (const AttributeList& alist, const Syntax&,
 		   const AttributeList& super, int indent, bool skip);
-  void print_object (const AttributeList&, const Library& library, int indent);
+  void print_object (const AttributeList&, const Library& library,
+                     const AttributeList&, int indent);
 
   // Top level print functions.
   void print_library_file (const string& filename);
@@ -222,7 +223,12 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  out << alist.integer (key);
 	  break;
 	case Syntax::Object:
-	  print_object (alist.alist (key), syntax.library (key), indent);
+	  if (super.check (key))
+	    print_object (alist.alist (key), syntax.library (key), 
+                          super.alist (key), indent);
+	  else
+            print_object (alist.alist (key), syntax.library (key), 
+                          AttributeList (), indent);
 	  break;
 	case Syntax::Library:
 	case Syntax::Error:
@@ -321,16 +327,17 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
+                const AttributeList empty;
 		if (i > 0)
 		  out << "\n" << string (indent, ' ');
 		if (is_complex_object (*value[i], library))
 		  {
 		    out << "(";
-		    print_object (*value[i], library, indent + 1);
+		    print_object (*value[i], library, empty, indent + 1);
 		    out << ")";
 		  }
 		else 
-		  print_object (*value[i], library, indent);
+		  print_object (*value[i], library, empty, indent);
 	      }
 	  }
 	  break;
@@ -457,7 +464,9 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
 
 void 
 PrinterFile::Implementation::print_object (const AttributeList& value,
-					   const Library& library, int indent)
+                                           const Library& library, 
+                                           const AttributeList& original, 
+                                           int indent)
 {
   daisy_assert (value.check ("type"));
   const symbol element = value.identifier ("type");
@@ -477,14 +486,28 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
       return;
     }
 
+  // Check original.
+  if (original.check ("type") && original.identifier ("type") == element)
+    {
+      out << "original";
+      // Check if we added something over the original.
+      if (value.subset (original, element_syntax))
+        return;
+      out << " ";
+      print_alist (value, element_syntax, original, 
+                   indent + 9,
+                   false);
+      return;
+
+    }
   // Library element with additional attributes.
   print_symbol (element);
   out << " ";
   print_alist (value, element_syntax, element_alist, 
-	       indent + 1 + element.name ().length ()
-	       // Buglet: Wrong indentation for elements with strange chars.
-	       + (is_identifier (element) ? 0 : 2),
-	       false);
+               indent + 1 + element.name ().length ()
+               // Buglet: Wrong indentation for elements with strange chars.
+               + (is_identifier (element) ? 0 : 2),
+               false);
 }
 
 // We store all matching entries here.

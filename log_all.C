@@ -81,13 +81,14 @@ LogAll::insert_active ()
 
 
 bool 
-LogAll::match (const Daisy& daisy, Treelog& msg)
+LogAll::match (const Daisy& daisy, Treelog& out)
 {
+  msg = &out;
   is_active = false;
   for (vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
-    if ((*i)->match (daisy, msg))
+    if ((*i)->match (daisy, out))
       is_active = true;
 
   if (is_active)
@@ -99,6 +100,7 @@ LogAll::match (const Daisy& daisy, Treelog& msg)
 void 
 LogAll::done (const Time& time)
 {
+  msg = NULL;
   for (vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
@@ -110,13 +112,14 @@ LogAll::done (const Time& time)
 }
 
 bool 
-LogAll::initial_match (const Daisy& daisy, Treelog& msg)
+LogAll::initial_match (const Daisy& daisy, Treelog& out)
 {
+  msg = &out;
   is_active = false;
   for (vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
-    if ((*i)->initial_match (daisy, msg))
+    if ((*i)->initial_match (daisy, out))
       is_active = true;
 
   if (is_active)
@@ -128,6 +131,7 @@ LogAll::initial_match (const Daisy& daisy, Treelog& msg)
 void 
 LogAll::initial_done (const Time& time)
 {
+  msg = NULL;
   for (vector<LogSelect*>::const_iterator i = slaves.begin (); 
        i != slaves.end (); 
        i++)
@@ -233,7 +237,7 @@ LogAll::output (symbol name, const vector<double>& value)
        i != sels.end ();
        i++)
     if (name == (*i)->current_name)
-      (*i)->output_array (value, geometry ());
+      (*i)->output_array (value, geometry (), *msg);
 }
 
 void 
@@ -271,7 +275,8 @@ LogAll::get_alist ()
 }
 
 LogAll::LogAll (const vector<Log*>& logs)
-  : LogSelect (get_alist ())
+  : LogSelect (get_alist ()),
+    msg (NULL)
 {
   // Combine entries.
   for (unsigned int i = 0; i != logs.size (); i++)

@@ -29,7 +29,7 @@
 class Daisy;
 class PLF;
 class Geometry;
-class Time;			// Obsolete.
+class Time;
 class Treelog;
 
 class Log
