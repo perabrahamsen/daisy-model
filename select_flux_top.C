@@ -44,8 +44,9 @@ struct SelectFluxTop : public SelectValue
         last = soil;
         index = soil->interval_border (height);
 
-        if ((index == 0 && height < -1e-8)
-            || !approximate (height, soil->zplus (index-1)))
+        if ((index == 0)
+            ? height < -1e-8
+            : !approximate (height, soil->zplus (index-1)))
           {
             TmpStream tmp;
             tmp () << "Log column " << name 

@@ -1,5 +1,17 @@
 2004-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.65 released.
+
+2004-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_flux_top.C (output_array): Fix off by one array check
+	(found by valgrind).
+
+	* select_array.C (result): Make it persistent, since log_table.C
+	requires that.
+	* log_table.C (dest_array, dest_number, dest_name): Initialize.
+	(common_done): Add check.
+
 	* Version 3.64 released.
 
 2004-12-09  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -229,6 +229,7 @@ LogTable::common_done (const Time& time)
 	  break;
 	case Array:
 	  {
+            daisy_assert (dest_array);
 	    const vector<double> array = *dest_array;
 	    for (unsigned int i = 0; i < array.size (); i++)
 	      {
@@ -382,7 +383,10 @@ LogTable::LogTable (const AttributeList& al)
     summary (map_create<Summary> (al.alist_sequence ("summary"))),
     begin (1, 1, 1, 1),
     end (1, 1, 1, 1),
-    type (Error)
+    type (Error),
+    dest_number (-42.42e42),
+    dest_name ("Daisy bug"),
+    dest_array (NULL)
 {
   for (unsigned int i = 0; i < entries.size (); i++)
     entries[i]->add_dest (this);

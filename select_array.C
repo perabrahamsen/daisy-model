@@ -28,6 +28,8 @@ struct SelectArray : public Select
 {
   // Content.
   vector<double> value;		// Total array.
+  vector<double> result;        // For logging (need to be persistent!).
+
   const Soil* last_soil; // For printing dimensions;
 
   // Output routines.
@@ -72,19 +74,24 @@ struct SelectArray : public Select
   {
     if (count == 0)
       dest.missing ();
-    else if (handle == Handle::average)
+    else 
       {
-        vector<double> result;
-        for (size_t i = 0; i < value.size (); i++)
-          result.push_back (convert (value[i] / count));
-        dest.add (result);
-      }
-    else
-      {
-        vector<double> result;
-        for (size_t i = 0; i < value.size (); i++)
-          result.push_back (convert (value[i]));
-        dest.add (result);
+        // Make sure result has the right size.
+        if (result.size () != value.size ())
+          result = value;
+
+        if (handle == Handle::average)
+          {
+            for (size_t i = 0; i < value.size (); i++)
+              result[i] = convert (value[i] / count);
+            dest.add (result);
+          }
+        else
+          {
+            for (size_t i = 0; i < value.size (); i++)
+              result[i] = convert (value[i]);
+            dest.add (result);
+          }
       }
     if (!accumulate)
       count = 0;
