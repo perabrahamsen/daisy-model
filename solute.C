@@ -164,14 +164,16 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
       d[0] -= a[0] * d_in;
       b[0] += a[0] * b_in;
       a[0] = 42.42e42;
-#elif 0
-      const double dz_x = - 2.0 * soil.z (0);
-      const double d_x = 4 * J_in + 2 * D[0] / dz_x * C[0] 
-	- soil_water.q (0) * C[0];
-      const double b_x = 2 * (soil_water.q (0) - 2 * D[0] / dz_x);
-      const double a_x = soil_water.q (0) + 2 * D[0] / dz_x;
-      d[0] -= a[0] * d_x / b_x;
-      b[0] -= a[0] * a_x / b_x;
+#elif 1
+      const double dz_x = soil.z (0) - soil.z(1);
+      const double Dz = - D[0] / (2 * dz_x);
+      const double q0 = soil_water.q (0);
+      
+      const double d_x = J_in - (1 - alpha[0]) * C[0] * q0 / 2.0 + Dz * C[0];
+      const double a_x = alpha[0] * q0 + 2 * Dz;
+      const double b_x = (1 - alpha[0]) * q0 / 2.0 - Dz;
+      d[0] -= a[0] * d_x / a_x;
+      b[0] -= a[0] * b_x / a_x;
       a[0] = 42.42e42;
 #else
       {
@@ -244,6 +246,29 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
     }
 #ifdef CALCULATE_FLUX_FLOW
   S = Jf;
+#endif
+
+#if 1
+  static double t = 0;
+
+  if (abs (J[0]) > 0.1e-7)
+    {
+      t += dt;
+      const double C0 =  J[0] / soil_water.q (0);
+      for (int i = 0; i < size; i++)
+	{
+	  const double v = - soil_water.q (i) / soil_water.Theta (i);
+	  const double z = - soil.z (i);
+	  const double d = D[i] / soil_water.Theta (i);
+	  S[i] = (C0 / 2.0) * (erfc ((z - v * t) / (2.0 * sqrt (d * t)))
+			       + exp (v * z / d)
+			       * erfc ((z + v * t) / (2.0 * sqrt (d * t))));
+	}
+    }
+  else
+    {
+      assert (t < 0.1e-7);
+    }
 #endif
 }
 

@@ -6,7 +6,8 @@ SRCONLY = column_std.o  weather_simple.o uzrichard.o \
 	horizon_yolo.o horizon_M_vG.o horizon_B_vG.o horizon_M_C.o \
 	horizon_B_C.o horizon_M_BaC.o horizon_B_BaC.o groundwater_static.o \
 	crop_std.o action_sow.o action_stop.o condition_time.o \
-	condition_logic.o log_file.o action_irrigate.o action_lisp.o
+	condition_logic.o log_file.o action_irrigate.o action_lisp.o \
+	weather_none.o
 OBJECTS = main.o daisy.o parser.o log.o weather.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o time.o uzmodel.o parser_file.o \

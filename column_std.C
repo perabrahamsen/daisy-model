@@ -84,7 +84,7 @@ void
 ColumnStandard::irrigate (double flux, double temp, 
 		 const SoluteMatter& sm, irrigation_from from)
 {
-  surface.fertilize (sm * flux);
+  surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
   bioclimate.irrigate (flux, temp, from);
 }
 
