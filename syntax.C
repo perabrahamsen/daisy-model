@@ -103,7 +103,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name,
 	    const AttributeList& al = vl.alist (key);
 	    if (!al.check ("type"))
 	      {
-		CERR << "Non object found \n";
+		CERR << "Non object found\n";
 		key_error = true;
 	      }
 	    else if (!lib.syntax (al.name ("type")).check (al))
@@ -389,10 +389,12 @@ Syntax::total_order () const
 const AttributeList& 
 Syntax::default_alist (const string& key) const
 {
+  static const AttributeList empty_alist;
+
   Implementation::alist_map::const_iterator i = impl.alists.find (key);
 
   if (i == impl.alists.end ())
-    return AttributeList::empty;
+    return empty_alist;
   else
     return *((*i).second);
 }
