@@ -76,7 +76,7 @@ main (int argc, char* argv[])
       const string when = string ("Simulation started ") + ctime (&start_time);
       TmpStream start_msg;
       start_msg () << when.substr (0, when.size () - 1);
-      start_msg () << ", " << (time (NULL) - start_time) << " seconds ago";
+      start_msg () << ", " << (time (NULL) - start_time) << " seconds ago.";
       treelog.message (start_msg.str ());
       Daisy daisy (alist);
       daisy.initialize (syntax, treelog);
@@ -96,10 +96,10 @@ main (int argc, char* argv[])
 	end_msg () << hours << " hours, ";
       if (minutes == 1)
 	end_msg () << " 1 minute and ";
-      else 
+      else if (hours > 0 || minutes > 0)
 	end_msg () << minutes << " minutes and ";
       if (seconds == 1)
-	end_msg () << "1 seconds.";
+	end_msg () << "1 second.";
       else
 	end_msg () << seconds << " seconds.";
       treelog.message (end_msg.str ());
