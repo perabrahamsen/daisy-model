@@ -86,10 +86,10 @@ struct LogAList : public Log
   void close_named_entry ();
 
   // Logging.
-  void output (symbol name, const bool value);
-  void output (symbol name, const double value);
-  void output (symbol name, const int value);
-  void output (symbol name, const string& value);
+  void output (symbol name, bool value);
+  void output (symbol name, double value);
+  void output (symbol name, int value);
+  void output (symbol name, symbol value);
   void output (symbol name, const vector<double>& value);
   void output (symbol name, const PLF& value);
   void output (symbol name, const Time& value);

@@ -22,6 +22,7 @@
 
 #include "log_select.h"
 #include "select.h"
+#include "summary.h"
 #include "geometry.h"
 #include "version.h"
 #include "daisy.h"
@@ -29,7 +30,7 @@
 #include <fstream>
 #include <time.h>
 
-struct LogTable : public LogSelect, public Select::Destination
+struct LogTable : public LogSelect, public Destination
 {
   static const char *const default_description;
 
@@ -46,11 +47,14 @@ struct LogTable : public LogSelect, public Select::Destination
   bool print_tags;		// Set if tags should be printed.
   bool print_dimension;		// Set if dimensions should be printed.
   const bool time_columns;	// Add year, month, day and hour columns.
+  const vector<Summary*> summary; // Summarize this log file.
+  Time begin;			// First log entry.
+  Time end;			// Last log entry.
 
-  // Destination Content.
+  // destination Content.
   enum { Error, Missing, Number, Name, Array } type;
   double dest_number;
-  string dest_name;
+  symbol dest_name;
   const vector<double>* dest_array;
   
   // Log.
@@ -66,16 +70,18 @@ struct LogTable : public LogSelect, public Select::Destination
   void initial_done (const Time& time);
 
   // Select::Destination
-  void error (const string& tag);
-  void missing (const string& tag);
-  void add (const string& tag, const vector<double>& value);
-  void add (const string& tag, double value);
-  void add (const string& tag, const string& value);
+  void error ();
+  void missing ();
+  void add (const vector<double>& value);
+  void add (double value);
+  void add (symbol value);
 
   // Create and destroy.
   bool check (const Syntax&, Treelog& msg) const;
   static bool contain_time_columns (const vector<Select*>& entries);
+  void initialize (Treelog&);
   LogTable (const AttributeList& al);
+  void summarize (Treelog&);
   ~LogTable ();
 };
 
@@ -108,7 +114,8 @@ LogTable::common_done (const Time& time)
 
 	  const Geometry* geometry = entries[i]->geometry ();
 	  const int size = entries[i]->size ();
-	  const string tag = entries[i]->tag ();
+	  const symbol tag = entries[i]->tag ();
+	  static const symbol empty_symbol ("");
 
 	  if (geometry && size >= 0)
 	    {
@@ -119,7 +126,7 @@ LogTable::common_done (const Time& time)
 		    {
 		      if (j != 0)
 			out << array_separator;
-		      if (tag != "")
+		      if (tag != empty_symbol)
 			out << tag << " @ ";
 		      out << geometry->z (j);
 		    }
@@ -133,7 +140,7 @@ LogTable::common_done (const Time& time)
 		    {
 		      if (j != 0)
 			out << array_separator;
-		      if (tag != "")
+		      if (tag != empty_symbol)
 			out << tag << " @ ";
 		      out << last;
 		      if (j <  geometry->size ())
@@ -201,7 +208,7 @@ LogTable::common_done (const Time& time)
       if (i != 0)
 	out << field_separator;
       
-      entries[i]->done (*this);
+      entries[i]->done ();
 
       switch (type)
 	{
@@ -256,6 +263,7 @@ LogTable::done (const Time& time)
       return;
 
   common_done (time);
+  end = time;
 }
 bool 
 LogTable::initial_match (const Daisy& daisy, Treelog& msg)
@@ -266,6 +274,9 @@ LogTable::initial_match (const Daisy& daisy, Treelog& msg)
 void 
 LogTable::initial_done (const Time& time)
 { 
+  for (unsigned int i = 0; i < summary.size (); i++)
+    summary[i]->clear ();
+
   LogSelect::initial_done (time);
 
   for (unsigned int i = 0; i < entries.size (); i++)
@@ -273,36 +284,37 @@ LogTable::initial_done (const Time& time)
       return;
 
   common_done (time);
+  begin = time;
 }
 
 void 
-LogTable::error (const string&)
+LogTable::error ()
 { 
   type = Error;
 }
 
 void 
-LogTable::missing (const string&)
+LogTable::missing ()
 { 
   type = Missing;
 }
 
 void 
-LogTable::add (const string&, const vector<double>& value)
+LogTable::add (const vector<double>& value)
 { 
   type = Array;
   dest_array = &value;
 }
 
 void 
-LogTable::add (const string&, double value)
+LogTable::add (const double value)
 { 
   type = Number;
   dest_number = value;
 }
 
 void 
-LogTable::add (const string&, const string& value)
+LogTable::add (const symbol value)
 { 
   type = Name;
   dest_name = value;
@@ -332,6 +344,14 @@ LogTable::contain_time_columns (const vector<Select*>& entries)
   return false;
 }
 
+void
+LogTable::initialize (Treelog& msg)
+{
+  Treelog::Open nest (msg, name);
+  for (unsigned int i = 0; i < summary.size (); i++)
+    summary[i]->initialize (entries, msg);
+}
+
 LogTable::LogTable (const AttributeList& al)
   : LogSelect (al),
     file (al.name ("where")),
@@ -346,11 +366,17 @@ LogTable::LogTable (const AttributeList& al)
     print_tags (al.flag ("print_tags")),
     print_dimension (al.flag ("print_dimension")),
     time_columns (!contain_time_columns (entries)),
+    summary (map_create<Summary> (al.alist_sequence ("summary"))),
+    begin (1, 1, 1, 1),
+    end (1, 1, 1, 1),
     type (Error)
 {
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->add_dest (this);
+
   if (print_header)
     {
-      out << "dlf-0.0 -- " << name.name ();
+      out << "dlf-0.0 -- " << name;
       if (al.check ("parsed_from_file"))
 	out << " (defined in '" << al.name ("parsed_from_file") << "').";
       out << "\n";
@@ -359,11 +385,8 @@ LogTable::LogTable (const AttributeList& al)
       out << "LOGFILE: " << file  << "\n";
       time_t now = time (NULL);
       out << "RUN: " << ctime (&now);
-      const double from  = al.number ("from");
-      const double to = al.number ("to");
       if (to < from)
 	out << "INTERVAL: [" << from << ";" << to << "]\n";
-      const vector<symbol>& conv_vector = al.identifier_sequence ("set");
       for (unsigned int i = 0; i < conv_vector.size (); i += 2)
 	out << "SET: " << conv_vector[i] << " = " << conv_vector[i+1] << "\n";
       if (description != default_description)
@@ -379,6 +402,32 @@ LogTable::LogTable (const AttributeList& al)
       out << "\n";
     }
   out.flush ();
+}
+
+void
+LogTable::summarize (Treelog& msg)
+{
+  if (summary.size () > 0)
+    {
+      Treelog::Open nest (msg, name);
+      TmpStream tmp;
+
+      tmp () << "LOGFILE: " << file  << "\n";
+      if (to < from)
+	tmp () << "INTERVAL: [" << from << ";" << to << "]\n";
+      tmp () << "TIME: " 
+	     << begin.year () << "-" << begin.month () << "-" << begin.mday () 
+	     << ":" << begin.hour () << " to "
+	     << end.year () << "-" << end.month () << "-" << end.mday () 
+	     << ":" << end.hour ();
+      for (unsigned int i = 0; i < conv_vector.size (); i += 2)
+	tmp () << "\nSET: " << conv_vector[i] << " = "
+	       << conv_vector[i+1];
+      msg.message (tmp.str ());
+      
+      for (unsigned int i = 0; i < summary.size (); i++)
+	summary[i]->summarize (Time::hours_between (begin, end), msg);
+    }
 }
 
 LogTable::~LogTable ()
@@ -429,6 +478,10 @@ no crops on the field.");
       syntax.add ("array_separator", Syntax::String, Syntax::Const, "\
 String to print between array entries.");
       alist.add ("array_separator", "\t");
+      syntax.add ("summary", Librarian<Summary>::library (),
+		  Syntax::Const, Syntax::Sequence,
+		  "Summaries for this log file.");
+      alist.add ("summary", vector<AttributeList*> ());
       Librarian<Log>::add_type ("table", alist, syntax, &make);
     }
 } LogTable_syntax;

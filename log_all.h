@@ -52,10 +52,10 @@ public:
   void open (symbol name);
   void close ();
 
-  void output (symbol name, const bool);
-  void output (symbol name, const double value);
-  void output (symbol name, const int value);
-  void output (symbol name, const string& value);
+  void output (symbol name, bool);
+  void output (symbol name, double);
+  void output (symbol name, int);
+  void output (symbol name, symbol);
   void output (symbol name, const vector<double>& value);
   void output (symbol name, const PLF&);
   void output (symbol name, const Time&); // Obsolete.

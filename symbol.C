@@ -87,7 +87,7 @@ symbol::DB::name2id (const string& name)
 int
 symbol::DB::int2id (const int value)
 {
-  if (value < fast_ints)
+  if (value >= 0 && value < fast_ints)
     return value;
   
   int_map_t::const_iterator i = int_map.find (value);
@@ -114,9 +114,6 @@ symbol::name () const
 bool
 symbol::alphabetical (symbol a, symbol b)
 { return a.name () < b.name (); }
-
-symbol::symbol ()
-{ daisy_assert (false); }
 
 symbol::symbol (const string& name)
   : id (data->name2id (name))

@@ -92,10 +92,6 @@ void
 Log::close_alist ()
 { close (); }
 
-void
-Log::output (symbol name, symbol value)
-{ output (name, value.name ()); }
-
 void 
 Log::open_geometry (const Geometry& g)
 { 
@@ -143,9 +139,17 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
   out << "\n--------------------\n";
 }
 
+void
+Log::initialize (Treelog&)
+{ }
+
 Log::Log (const AttributeList& al)
   : impl (*new Implementation ()),
     name (al.identifier ("type"))
+{ }
+
+void
+Log::summarize (Treelog&)
 { }
 
 Log::~Log ()

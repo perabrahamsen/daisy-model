@@ -923,20 +923,22 @@ daisy_chemical_reflection_factor (const Chemical* chemical)
 
 extern "C" LogExternSource::type EXPORT
 daisy_log_lookup (const char* log, const char* tag)
-{ return LogExternSource::find (log).lookup (tag); }
+{ return LogExternSource::find (symbol (log)).lookup (symbol (tag)); }
 
 extern "C" double  EXPORT
 daisy_log_get_number (const char* log, const char* tag)
-{ return LogExternSource::find (log).number (tag); }
+{ return LogExternSource::find (symbol (log)).number (symbol (tag)); }
 
 extern "C" const char*  EXPORT
 daisy_log_get_name (const char* log, const char* tag)
-{ return LogExternSource::find (log).name (tag).c_str (); }
+{ return LogExternSource::find (symbol (log))
+    .name (symbol (tag)).name ().c_str (); }
 
 extern "C" void EXPORT
 daisy_log_get_array (const char* log, const char* tag, double value[])
 { 
-  const vector<double>& array =  LogExternSource::find (log).array (tag); 
+  const vector<double>& array 
+    = LogExternSource::find (symbol (log)).array (symbol (tag)); 
   
   copy (array.begin (), array.end (), value);
 }

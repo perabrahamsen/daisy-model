@@ -24,12 +24,12 @@
 
   // Print result at end of time step.
 void 
-SelectValue::done (Destination& dest)
+SelectValue::done ()
 {
   if (count == 0)
-    dest.missing (tag ());
+    dest.missing ();
   else 
-    dest.add (tag (), convert (value));
+    dest.add (convert (value));
 
   if (!accumulate)
     count = 0;

@@ -213,7 +213,7 @@ LogAll::output (symbol name, const int value)
 }
 
 void 
-LogAll::output (symbol name, const string& value)
+LogAll::output (symbol name, const symbol value)
 { 
   const vector<Select*>& sels = active_leafs.top ();
 

@@ -48,14 +48,14 @@ struct SelectInterval : public Select
     }
 
   // Print result at end of time step.
-  void done (Destination& dest)
+  void done ()
     {
       if (count == 0)
-	dest.missing (tag ());
+	dest.missing ();
       else if (density)
-	dest.add (tag (), convert (value / (from - to)));
+	dest.add (convert (value / (from - to)));
       else
-	dest.add (tag (), convert (value));
+	dest.add (convert (value));
 
       if (!accumulate)
 	count = 0;
@@ -70,7 +70,7 @@ struct SelectInterval : public Select
     return Units::multiply (spec_dim, "cm");
   }
 
-  void initialize (const string_map& conv, 
+  void initialize (const map<symbol, symbol>& conv, 
 		   double default_from, double default_to, 
 		   const string& timestep)
     {

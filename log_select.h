@@ -35,6 +35,14 @@ struct Condition;
 
 struct LogSelect : public Log
 {
+  // Parameters.
+  const string description;	// Description of log file.
+  Condition& condition;	// Should we print a log now?
+  std::vector<Select*> entries;
+  const std::vector<symbol> conv_vector;
+  const double from;
+  const double to;
+
   // State. 
   bool is_printing;		// True iff this time step should be logged.
   bool is_active;		// True iff we need values for this time step.
@@ -43,9 +51,6 @@ struct LogSelect : public Log
   bool check_leaf (symbol) const;
   bool check_interior (symbol) const;
   bool check_derived (symbol field, symbol name, const Library&) const;
-  const string description;	// Description of log file.
-  Condition& condition;	// Should we print a log now?
-  vector<Select*> entries;
 
   // Checking to see if we should log this time step.
   bool match (const Daisy& daisy, Treelog&);
@@ -84,11 +89,11 @@ struct LogSelect : public Log
 			 const AttributeList&);
   void close_named_entry ();
 
-  void output (symbol name, const bool);
-  void output (symbol name, const double value);
-  void output (symbol name, const int value);
-  void output (symbol name, const string& value);
-  void output (symbol name, const vector<double>& value);
+  void output (symbol name, bool);
+  void output (symbol name, double);
+  void output (symbol name, int);
+  void output (symbol name, symbol);
+  void output (symbol name, const std::vector<double>&);
   void output (symbol name, const PLF&);
   void output (symbol name, const Time&); // Obsolete.
 

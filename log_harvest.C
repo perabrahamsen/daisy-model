@@ -147,7 +147,7 @@ struct LogHarvest : public Log
   { }
   void output (symbol, const int)
   { }
-  void output (symbol, const string&)
+  void output (symbol, const symbol)
   { }
   void output (symbol, const vector<double>&)
   { }

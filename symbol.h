@@ -52,16 +52,17 @@ public:
   { return id == other.id; }
   bool operator< (const symbol& other) const
   { return id < other.id; }
-  const string& name () const;
+  const std::string& name () const;
 
   // Utilities.
 public:
   static bool alphabetical (symbol, symbol); // Sort function.
 
   // Create and destroy.
-private: 
-  symbol ();
 public:
+  explicit symbol ()
+    : id (-1)
+  { }
   explicit symbol (const char*);
   explicit symbol (const std::string&);
   explicit symbol (int);
@@ -76,8 +77,8 @@ public:
 
 std::string operator+ (symbol, const char*);
 std::string operator+ (const char*, symbol);
-std::string operator+ (symbol, const string&);
-std::string operator+ (const string&, symbol);
+std::string operator+ (symbol, const std::string&);
+std::string operator+ (const std::string&, symbol);
 std::string operator+ (symbol, symbol);
 std::ostream& operator<< (ostream&, symbol);
 

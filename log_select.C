@@ -147,7 +147,7 @@ LogSelect::output (symbol, const int)
 { daisy_assert (false); }
 
 void 
-LogSelect::output (symbol, const string&)
+LogSelect::output (symbol, const symbol)
 { daisy_assert (false); }
 
 void 
@@ -177,20 +177,18 @@ LogSelect::LogSelect (const AttributeList& al)
   : Log (al),
     description (al.name ("description")),
     condition (Librarian<Condition>::create (al.alist ("when"))),
-    entries (map_create<Select> (al.alist_sequence ("entries")))
+    entries (map_create<Select> (al.alist_sequence ("entries"))),
+    conv_vector (al.identifier_sequence ("set")),
+    from (al.number ("from")),
+    to (al.number ("to"))
 {
   // Create path convertion map.
-  const vector<symbol>& conv_vector = al.identifier_sequence ("set");
-  string_map conv_map;
+  map<symbol, symbol> conv_map;
   for (unsigned int i = 0; i < conv_vector.size (); i += 2)
     {
       daisy_assert (i+1 < conv_vector.size ());
-      conv_map[conv_vector[i].name ()] = conv_vector[i+1].name ();
+      conv_map[conv_vector[i]] = conv_vector[i+1];
     }
-
-  // Find default range.
-  const double from  = al.number ("from");
-  const double to = al.number ("to");
 
   // Initialize entries.
   for (unsigned int i = 0; i < entries.size (); i++)

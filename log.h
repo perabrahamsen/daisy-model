@@ -30,6 +30,7 @@ class Daisy;
 class PLF;
 class Geometry;
 class Time;			// Obsolete.
+class Treelog;
 
 class Log
 {
@@ -212,11 +213,10 @@ private:
 
   // The data.
 public:
-  virtual void output (symbol, const bool) = 0;
-  virtual void output (symbol, const double) = 0;
-  virtual void output (symbol, const int) = 0;
-  virtual void output (symbol, const string&) = 0;
-  void output (symbol name, symbol value);
+  virtual void output (symbol, bool) = 0;
+  virtual void output (symbol, double) = 0;
+  virtual void output (symbol, int) = 0;
+  virtual void output (symbol, symbol) = 0;
   virtual void output (symbol, const vector<double>&) = 0;
   virtual void output (symbol, const PLF&) = 0;
   virtual void output (symbol, const Time&) = 0; // Obsolete.
@@ -248,9 +248,11 @@ public:
   // Create and Destroy.
 public:
   virtual bool check (const Syntax&, Treelog& err) const = 0;
+  virtual void initialize (Treelog& out);
 protected:
   Log (const AttributeList& al);
 public:
+  virtual void summarize (Treelog& out);
   virtual ~Log ();
 };
 

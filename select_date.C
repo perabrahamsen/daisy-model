@@ -36,12 +36,12 @@ struct SelectDate : public Select
     }
 
   // Print result at end of time step.
-  void done (Destination& dest)
+  void done ()
     {
       if (count == 0)
-	dest.missing (tag ());
+	dest.missing ();
       else 
-	dest.add (tag (), extract_date_component ());
+	dest.add (extract_date_component ());
 
       if (!accumulate)
 	count = 0;

@@ -23,6 +23,7 @@
 #ifndef SELECT_H
 #define SELECT_H
 
+#include "destination.h"
 #include "condition.h"		// Needed for proper initialization.
 #include "librarian.h"
 #include "symbol.h"
@@ -33,8 +34,6 @@ struct Geometry;
 struct Daisy;
 struct Time;
 
-typedef map<string, string, less<string>/**/> string_map;
-
 class Select
 {
   // Content.
@@ -44,35 +43,21 @@ private:
   struct Implementation;
   Implementation& impl;
 protected:
+  MultiDest dest;
+public:
   const bool accumulate;	// Accumulate numbers over time.
   const bool flux;		// Is this a flux variable?
+protected:
   const bool interesting_content; // Is this worth an initial line?
   double convert (double) const; // Convert value.
   int count;			// Number of accumulated values.
 public:
   static const char *const description;
   virtual const string& dimension () const;
-  virtual const string& tag () const;
+  virtual symbol tag () const;
   symbol log_name () const;
   virtual const Geometry* geometry () const; // For array tags.
   virtual int size () const;	// For array tags.
-  
-  // Destination
-  class Destination
-  {
-    // Add data.
-  public:
-    virtual void error (const string& tag) = 0;
-    virtual void missing (const string& tag) = 0;
-    virtual void add (const string& tag, const vector<double>& value) = 0;
-    virtual void add (const string& tag, double value) = 0;
-    virtual void add (const string& tag, const string& value) = 0;
-
-    // Create and Destroy
-  public:
-    Destination ();
-    virtual ~Destination ();
-  };
 
   // Nesting.
 public:
@@ -101,9 +86,9 @@ public:
   }
 
   // Output routines.
-  virtual void output_number (const double);
-  virtual void output_integer (const int);
-  virtual void output_name (const string&);
+  virtual void output_number (double);
+  virtual void output_integer (int);
+  virtual void output_name (symbol);
   virtual void output_array (const vector<double>&, const Geometry*);
   virtual void output_time (const Time&); // Obsolete
 
@@ -121,7 +106,7 @@ public:
     return is_active;
   }
   // Print result at end of time step.
-  virtual void done (Destination& dest) = 0;
+  virtual void done () = 0;
   virtual bool prevent_printing ();
 
   // Create and Destroy.
@@ -129,8 +114,9 @@ protected:
   virtual const string default_dimension (const string& spec_dim) const;
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const string_map& conv, double from, double to,
-			   const string& timestep);
+  virtual void initialize (const map<symbol, symbol>& conv, 
+			   double from, double to, const string& timestep);
+  void add_dest (Destination* dest);
   virtual bool check (Treelog& err) const;
 protected:
   Select (const AttributeList& al);

@@ -417,7 +417,7 @@ LogAList::output (symbol name, const int value)
 }
 
 void
-LogAList::output (symbol name, const string& value)
+LogAList::output (symbol name, symbol value)
 { 
   if (!is_active)
     return;

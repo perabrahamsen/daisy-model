@@ -58,13 +58,13 @@ struct Select::Implementation
   const double factor;		// - || -
   const double offset;		// - || -
   double convert (double) const; // - || -
-  const string tag;		// Name of this entry.
+  const symbol tag;		// Name of this entry.
   string dimension;		// Physical dimension of this entry.
 
   // Create and Destroy.
-  static string select_get_tag (const AttributeList& al);
+  static symbol select_get_tag (const AttributeList& al);
   void initialize (vector<symbol>& path,
-		   const string_map& conv, const string& spec_dim,
+		   const map<symbol, symbol>& conv, const string& spec_dim,
 		   const string& timestep);
   bool check (const string& spec_dim, Treelog& err) const;
   Implementation (const AttributeList& al);
@@ -182,24 +182,25 @@ Select::Implementation::convert (double value) const
   return value * factor + offset; 
 }
 
-string
+symbol
 Select::Implementation::select_get_tag (const AttributeList& al)
 {
   if (al.check ("tag"))
-    return al.name ("tag");
+    return al.identifier ("tag");
 
   vector<symbol> path  = al.identifier_sequence ("path");
   
   if (path.size () > 0)
-    return path[path.size () - 1].name ();
+    return path[path.size () - 1];
 
-  return "<none>";
+  static const symbol none_symbol ("<none>");
+  return none_symbol;
 }
 
 // Create and Destroy.
 void 
 Select::Implementation::initialize (vector<symbol>& path,
-				    const string_map& conv, 
+				    const map<symbol,symbol>& conv, 
 				    const string& spec_dim, 
 				    const string& timestep)
 {
@@ -207,11 +208,11 @@ Select::Implementation::initialize (vector<symbol>& path,
   for (unsigned int i = 0; i < path.size (); i++)
     {
       const string& sname = path[i].name ();
-      string_map::const_iterator entry = conv.find (sname);
+      const map<symbol, symbol>::const_iterator entry = conv.find (path[i]);
       if (entry != conv.end ())
-	path[i] = symbol ((*entry).second);
+	path[i] = (*entry).second;
       else if (sname.size () > 0 && sname[0] == '$')
-	path[i] = symbol ("*");
+	path[i] = Select::wildcard;
     }
 
   if (dimension == Syntax::Unknown ())
@@ -290,7 +291,7 @@ const string&
 Select::dimension () const
 { return impl.dimension; }
 
-const string& 
+symbol
 Select::tag () const
 { return impl.tag; }
 
@@ -310,12 +311,6 @@ Select::size () const
 { return -1; }
 
 
-Select::Destination::Destination ()
-{ }
-
-Select::Destination::~Destination ()
-{ }
-
 const symbol Select::wildcard ("*");
 
 // Output routines.
@@ -328,7 +323,7 @@ Select::output_integer (const int)
 { throw ("This log selection can't log integers."); }
 
 void 
-Select::output_name (const string&)
+Select::output_name (const symbol)
 { throw ("This log selection can't log names."); }
 
 void 
@@ -454,7 +449,11 @@ Select::default_dimension (const string& spec_dim) const
 { return spec_dim; }
 
 void 
-Select::initialize (const string_map& conv, double, double, 
+Select::add_dest (Destination* d)
+{ dest.add_dest (d); }
+
+void 
+Select::initialize (const map<symbol, symbol>& conv, double, double, 
 		    const string& timestep)
 { 
   string spec_dim;

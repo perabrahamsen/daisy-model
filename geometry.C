@@ -256,14 +256,11 @@ Geometry::add_layer (Syntax& syntax, const string& name,
 		     const string& dimension, const string& description)
 {
   Syntax& layer = *new Syntax ();
-  if (!layer.ordered ())
-    {
-      // Initialize as first call.
-      layer.add ("end", "cm", Check::negative (), Syntax::Const, 
-		 "End point of this layer (a negative number).");
-      layer.add ("value", dimension, Syntax::Const, description);
-      layer.order ("end", "value");
-    }
+  layer.add ("end", "cm", Check::negative (), Syntax::Const, 
+	     "End point of this layer (a negative number).");
+  layer.add ("value", dimension, Syntax::Const, description);
+  layer.order ("end", "value");
+
   const string iname = "initial_" + name;
   syntax.add (iname, layer,
 	      Syntax::OptionalConst, Syntax::Sequence, 

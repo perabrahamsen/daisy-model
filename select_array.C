@@ -49,12 +49,12 @@ struct SelectArray : public Select
   }
 
   // Print result at end of time step.
-  void done (Destination& dest)
+  void done ()
   {
     if (count == 0)
-      dest.missing (tag ());
+      dest.missing ();
     else 
-      dest.add (tag (), value);
+      dest.add (value);
 
     if (!accumulate)
       count = 0;

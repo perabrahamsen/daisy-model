@@ -25,13 +25,12 @@
 #include "select.h"
 #include <map>
 
-typedef map<string, const LogExternSource*, 
-  less<string>/**/> log_extern_map_type; 
+typedef map<symbol, const LogExternSource*> log_extern_map_type; 
 log_extern_map_type* log_extern_map = NULL;
 int log_extern_count = 0;
 
 const LogExternSource& 
-LogExternSource::find (const string& name)
+LogExternSource::find (const symbol name)
 { 
   daisy_assert (log_extern_map);
   daisy_assert (log_extern_count > 0);
@@ -40,8 +39,8 @@ LogExternSource::find (const string& name)
 
 LogExternSource::LogExternSource (const AttributeList& al)
 { 
-  const string name 
-    = al.check ("where") ? al.name ("where") : al.name ("type");
+  const symbol name 
+    = al.check ("where") ? al.identifier ("where") : al.identifier ("type");
 
   if (!log_extern_map)
     {
@@ -65,20 +64,21 @@ LogExternSource::~LogExternSource ()
 
 
 struct LogExtern : public LogSelect,
-		   public Select::Destination, 
+		   public Destination, 
 		   public LogExternSource
 {
   // Destination Content.
-  typedef map<string, type, less<string>/**/> type_map;
-  typedef map<string, double, less<string>/**/> number_map;
-  typedef map<string, string, less<string>/**/> name_map;
-  typedef map<string, const vector<double>*, less<string>/**/> array_map;
+  typedef map<symbol, type> type_map;
+  typedef map<symbol, double> number_map;
+  typedef map<symbol, symbol> name_map;
+  typedef map<symbol, const vector<double>*> array_map;
   type_map types;
   number_map numbers;
   name_map names;
   array_map arrays;
   
   // Log.
+  symbol tag;
   void done (const Time&);
 
   // No initial line.
@@ -86,17 +86,17 @@ struct LogExtern : public LogSelect,
   { return false; }
 
   // Select::Destination
-  void error (const string& tag);
-  void missing (const string& tag);
-  void add (const string& tag, const vector<double>& value);
-  void add (const string& tag, double value);
-  void add (const string& tag, const string& value);
+  void error ();
+  void missing ();
+  void add (const vector<double>& value);
+  void add (double value);
+  void add (symbol value);
 
   // LogExternSource
-  type lookup (const string& tag) const;
-  double number (const string& tag) const;
-  const string& name (const string& tag) const;
-  const vector<double>& array (const string& tag) const;
+  type lookup (symbol tag) const;
+  double number (symbol tag) const;
+  symbol name (symbol tag) const;
+  const vector<double>& array (symbol tag) const;
 
   // Create and destroy.
   LogExtern (const AttributeList& al);
@@ -112,44 +112,47 @@ LogExtern::done (const Time& time)
     return;
 
   for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->done (*this);
+    {
+      tag = entries[i]->tag ();
+      entries[i]->done ();
+    }
 }
 
 void 
-LogExtern::error (const string& tag)
+LogExtern::error ()
 { 
   types[tag] = Error;
 }
 
 void 
-LogExtern::missing (const string& tag)
+LogExtern::missing ()
 { 
   types[tag] = Missing;
 }
 
 void 
-LogExtern::add (const string& tag, const vector<double>& value)
+LogExtern::add (const vector<double>& value)
 { 
   types[tag] = Array;
   arrays[tag] = &value;
 }
 
 void 
-LogExtern::add (const string& tag, double value)
+LogExtern::add (double value)
 { 
   types[tag] = Number;
   numbers[tag] = value;
 }
 
 void 
-LogExtern::add (const string& tag, const string& value)
+LogExtern::add (symbol value)
 { 
   types[tag] = Name;
   names[tag] = value;
 }
 
 LogExternSource::type 
-LogExtern::lookup (const string& tag) const
+LogExtern::lookup (symbol tag) const
 { 
   type_map::const_iterator i = types.find (tag);
   
@@ -160,7 +163,7 @@ LogExtern::lookup (const string& tag) const
 }
 
 double 
-LogExtern::number (const string& tag) const
+LogExtern::number (symbol tag) const
 {
   number_map::const_iterator i = numbers.find (tag);
   
@@ -168,8 +171,8 @@ LogExtern::number (const string& tag) const
   return (*i).second;
 }
 
-const string& 
-LogExtern::name (const string& tag) const
+symbol
+LogExtern::name (symbol tag) const
 { 
   name_map::const_iterator i = names.find (tag);
   
@@ -178,7 +181,7 @@ LogExtern::name (const string& tag) const
 }
 
 const vector<double>&
-LogExtern::array (const string& tag) const
+LogExtern::array (symbol tag) const
 { 
   array_map::const_iterator i = arrays.find (tag);
   
@@ -189,7 +192,10 @@ LogExtern::array (const string& tag) const
 LogExtern::LogExtern (const AttributeList& al)
   : LogSelect (al),
     LogExternSource (al)
-{ }
+{ 
+  for (unsigned int i = 0; i < entries.size (); i++)
+    entries[i]->add_dest (this);
+}
 
 LogExtern::~LogExtern ()
 { }

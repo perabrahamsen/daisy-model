@@ -1,24 +1,8 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Mikkel
-
-** Fortegn
-
-** uzrichards.
+* fast denitrification
 
 * M_vGp
-
-* Log models
-
-** keep total_accumulated
-
-** C balance fil.
-
-(summary (lines ("Mineralization" (("Min" 1.0)) 1.0 "kg N/ha")
-	        ("Immobilization" (("NH4" -1.0) ("NO3" -1.0)) 1.0 "kg N/ha"))
-	 (from 2000 1 1 1)
-	 (to   2001 1 1 1)
-         (name "C Input"))
 
 * FertOrgaNic
 

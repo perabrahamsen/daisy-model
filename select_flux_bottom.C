@@ -45,7 +45,7 @@ struct SelectFluxBottom : public SelectValue
     }
 
   // Create and Destroy.
-  void initialize (const string_map& conv, 
+  void initialize (const map<symbol, symbol>& conv, 
 		   double default_from, double default_to, 
 		   const string& timestep )
     {

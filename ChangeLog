@@ -1,3 +1,41 @@
+2003-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.86 released.
+
+2003-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Total Water Balance"): New summary.
+	("Root Zone Water Balance"): Us it.
+	("NH4 Soil Balance", "NO3 Soil Balance"): New summaries.
+	("N Balance"): Use them.
+	("Carbon Balance"): Added summary.
+
+2003-05-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* symbol.C (int2id): Negative integers are not fast.
+	* log.h (output): Removed possibility of outputing strings.
+	* all: Updated.
+
+	* geometry.C (add_layer): Removed superflous check.
+
+	* select.h: Use symbol instead of string for destination tags.
+	* log_extern.C, log_table.C: Update implementors.
+	* log_table.h: Use symbol instead of string for source tags.
+	* cdaisy.C: Update caller.
+
+	* log.h, log.C, log_table.C (summarize, initialize): New virtual
+	member functions. 
+	* daisy.C (run): Call it.
+	* symbol.h, symbol.C (symbol): Allow default initializer.
+	* destination.C, destination.h: New utility.
+	* Makefile (OTHER): Added it.
+	* summary.C, summary.h: New component.
+	* Makefile (COMPONENTS): Added it.
+	(SUBMODELS): Moved nitrification.C to COMPONENTS.
+	* summary_simple.C: New model.
+	* Makefile (MODELS): Added it.
+	* log_table.C: Use it.
+
 2003-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.85 released.

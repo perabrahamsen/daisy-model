@@ -208,6 +208,12 @@ Daisy::run (Treelog& out)
 	}
       tick (out);
     }
+  // Print log file summaries at end of simulation.
+  {
+    Treelog::Open nest (out, "Summary");
+    for (unsigned int i = 0; i < logs.size (); i++)
+      logs[i]->summarize (out);
+  }
 }
 
 void
@@ -217,6 +223,11 @@ Daisy::initialize (const Syntax& s, Treelog& err)
   if (weather)
     weather->initialize (time, err);
   field.initialize (time, err, weather);
+  {
+    Treelog::Open nest (err, "output");
+    for (unsigned int i = 0; i < logs.size (); i++)
+      logs[i]->initialize (err);
+  }
 }
 
 void

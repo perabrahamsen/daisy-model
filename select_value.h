@@ -32,7 +32,7 @@ protected:
 
   // Output routines.
 public:
-  void done (Destination& dest);
+  void done ();
 
   // Create and Destroy.
 public:

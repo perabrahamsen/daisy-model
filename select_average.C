@@ -39,12 +39,12 @@ struct SelectAverage : public Select
     }
 
   // Print result at end of time step.
-  void done (Destination& dest)
+  void done ()
     {
       if (count == 0)
-	dest.missing (tag ());
+	dest.missing ();
       else 
-	dest.add (tag (), convert (value / int2double (count)));
+	dest.add (convert (value / int2double (count)));
 
       if (!accumulate)
 	count = 0;

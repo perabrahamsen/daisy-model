@@ -1,7 +1,6 @@
-// log_extern.h --- Logging to external model.
+// summary.h
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2003 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -20,31 +19,38 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef LOG_EXTERN_H
-#define LOG_EXTERN_H
+#ifndef SUMMARY_H
+#define SUMMARY_H
 
+#include "librarian.h"
 #include <vector>
 
-struct AttributeList;
+struct Select;
+struct Treelog;
 
-class LogExternSource
+class Summary
 {
-  // Interface.
+  // Content.
 public:
-  typedef enum { Error, Missing, Number, Name, Array } type;
-  virtual type lookup (symbol tag) const = 0;
-  virtual double number (symbol tag) const = 0;
-  virtual symbol name (symbol tag) const = 0;
-  virtual const vector<double>& array (symbol tag) const = 0;
-
-  // Library.
-  static const LogExternSource& find (symbol name);
+  const symbol name;
+  static const char *const description;
 
   // Create and Destroy.
 public:
-  LogExternSource (const AttributeList&);
-  virtual ~LogExternSource ();
+  virtual void clear () = 0;
+  virtual void initialize (std::vector<Select*>&, Treelog&) = 0;
+protected:
+  Summary (const AttributeList& al);
+public:
+  virtual void summarize (int hours, Treelog&) = 0;
+  virtual ~Summary ();
 };
 
-#endif // LOG_EXTERN_H
+#if !defined (__BORLANDC__)
+EMPTY_TEMPLATE
+Librarian<Summary>::Content* Librarian<Summary>::content;
+#endif
 
+static Librarian<Summary> Summary_init ("summary");
+
+#endif // SUMMARY_H
