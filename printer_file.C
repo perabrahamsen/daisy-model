@@ -636,11 +636,12 @@ void
 PrinterFile::print_entry (const AttributeList& alist, const Syntax& syntax,
 			  const string& key)
 { 
-  if (alist.check ("key"))
+  if (alist.check (key))
     {
       const AttributeList empty_alist;
+      impl.out << "(" << key << " ";
       impl.print_entry (alist, syntax, empty_alist, key, 0, false);
-      impl.out << "\n";
+      impl.out << ")\n";
     }
 }
 

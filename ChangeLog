@@ -1,5 +1,9 @@
 2001-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.85 released.
+
+2001-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* printer.h, printer_file.h, printer_file.C (print_entry): New
 	member function.
 
