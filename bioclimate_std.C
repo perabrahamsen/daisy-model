@@ -424,6 +424,30 @@ BioclimateStandard::WaterDistribution (Surface& surface,
 
   // 6 Transpiration
 
+#if 0
+  // Potential transpiration
+  const double potential_crop_transpiration = canopy_ep - canopy_ea;
+  const double potential_soil_transpiration 
+    = (pond_ep - pond_ea - soil_ea) * surface.EpInterchange ();
+  crop_ep = min (max (0.0, 
+		      potential_crop_transpiration
+		      + potential_soil_transpiration),
+		 pet.dry ());
+
+  // Actual transpiration
+  crop_ea = vegetation.transpiration (crop_ep, canopy_ea, soil, soil_water);
+  assert (crop_ea >= 0.0);
+  total_ea += crop_ea;
+  assert (total_ea >= 0.0);
+
+  // Production stress
+  svat.tick (weather, vegetation, surface, soil, soil_heat, soil_water, pet,
+	     canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
+  production_stress = svat.production_stress ();
+
+  if (production_stress >= 0.0)
+    vegetation.force_production_stress (production_stress);
+#else
   // Potential transpiration
   pt.tick (weather, vegetation, surface, soil, soil_heat, soil_water, pet,
 	   canopy_ea, snow_ea, pond_ea, soil_ea, crop_ea, crop_ep);
@@ -438,6 +462,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   assert (crop_ea >= 0.0);
   total_ea += crop_ea;
   assert (total_ea >= 0.0);
+#endif
 
   // 7 Reset irrigation
   irrigation_top_old = irrigation_top;

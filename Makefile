@@ -99,7 +99,7 @@ endif
 
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
-		OSFLAGS = -pipe
+		OSFLAGS = 
 		DEBUG = -g
 	endif
 	ifeq ($(HOSTTYPE),cygwin)
@@ -395,10 +395,26 @@ xtest:	test/test.dai daisy
          && ../daisy test.dai \
 	 && diff -u harvest_weather.log harvest.log)
 
-reference:	daisy
+ps:	txt/reference/reference.ps
+
+
+txt/reference/reference.ps:	txt/reference/reference.dvi
 	(cd txt/reference \
-	 && ../../daisy -p LaTeX > components.tex \
+	 && dvips -f reference.dvi )
+
+txt/reference/reference.dvi:	txt/reference/components.tex
+	(cd txt/reference \
 	 && latex reference.tex < /dev/null )
+
+pdf:	txt/reference/reference.pdf
+
+txt/reference/reference.pdf:	txt/reference/components.tex
+	(cd txt/reference \
+	 && pdflatex reference.tex < /dev/null )
+
+txt/reference/components.tex:	daisy
+	(cd txt/reference \
+	 && ../../daisy -p LaTeX > components.tex)
 
 # Remove all the temporary files.
 #
@@ -426,7 +442,14 @@ dist:	cvs
 	cp cdaisy.h cmain.c $(HOME)/.public_ftp/daisy
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy
-	(cd lib; $(MAKE) dist);
+	(cd lib; $(MAKE) dist)
+	$(MAKE) pdf
+	mv -f txt/reference/reference.pdf \
+		$(HOME)/.public_ftp/daisy/daisy-ref.pdf
+	$(MAKE) ps
+	mv -f txt/reference/reference.ps \
+		$(HOME)/.public_ftp/daisy/daisy-ref.ps
+
 
 # Update the CVS repository.
 #

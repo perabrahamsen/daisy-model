@@ -1,3 +1,12 @@
+2000-08-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.30 released.
+
+2000-07-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vegetation_permanent.C: Added forward declarations of templates.
+	* action_ridge.C: Ditto.
+
 2000-06-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.29 released.

@@ -1,4 +1,11 @@
-DETTE ER EN TEST
+* Make day/month in log files match the day and month the values have
+  been accumulated.  
+
+** Make "daily" always match hour 23.
+
+** Check that it works.
+
+** Make "monthly" always match hour 23 the last day in the month.
 
 * Organic/N switch-off
 
