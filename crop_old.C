@@ -6,8 +6,6 @@
 #include "csmp.h"
 #include "bioclimate.h"
 #include "common.h"
-#include "ftable.h"
-#include "ftable.t"
 #include "csmp.h"
 #include "syntax.h"
 #include "alist.h"
@@ -118,8 +116,6 @@ struct CropOld::Parameters
 { 
   const struct DevelPar
   {
-    static dFTable<CropFun> models;
-    CropFun Model;		// Phenological development model ID
     double EmrTSum;		// Soil temp sum at emergence
     double DS_Emr;		// Development stage (DS) emergence
     bool DS_reset;		// True for winther crops.
@@ -145,8 +141,6 @@ struct CropOld::Parameters
     VernalPar (const AttributeList&);
   } Vernal;
   const struct LeafPhotPar {
-    static dFTable<CropFun> models;
-    CropFun Model;		// exponential or parabolic
     double Qeff;		// Quantum efficiency at low light
     double Fm;		// Max assimilation rate
     double TLim1;		// Lowest temp for photosynthesis
@@ -328,71 +322,6 @@ public:
   ~Variables ();
 };
 
-static void 
-devel_m1 (const Bioclimate& bioclimate, CropOld& crop)
-{
-  const CropOld::Parameters::DevelPar& Devel = crop.par.Devel;
-  CropOld::Variables::RecPhenology& Phenology = crop.var.Phenology;
-  double Ta = bioclimate.AirTemperature ();
-
-  if (Phenology.DS < 1)
-    {
-      Phenology.DS += Devel.DSRate1 * max (0.0, Ta);
-      if (Phenology.Vern < 0)
-	crop.Vernalization (Ta);
-    }
-  else
-    {
-      Phenology.DS += Devel.DSRate2 * Ta;
-      if (Phenology.DS > 2)
-	Phenology.DS = 2.0;
-    }
-}
-
-static void 
-devel_m2 (const Bioclimate& bioclimate, CropOld& crop)
-{
-  const CropOld::Parameters::DevelPar& Devel = crop.par.Devel;
-  CropOld::Variables::RecPhenology& Phenology = crop.var.Phenology;
-  double Ta = bioclimate.AirTemperature ();
-
-  if (Phenology.DS < 1)
-    {
-      Phenology.DS += Devel.DSRate1 * Devel.TempEff1 (Ta);
-      if (Phenology.Vern < 0)
-	crop. Vernalization (Ta);
-    }
-  else
-    {
-      Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
-      if (Phenology.DS > 2)
-	Phenology.DS = 2.0;
-    }
-}
-
-static void 
-devel_m3 (const Bioclimate& bioclimate, CropOld& crop)
-{
-  const CropOld::Parameters::DevelPar& Devel = crop.par.Devel;
-  CropOld::Variables::RecPhenology& Phenology = crop.var.Phenology;
-  double Ta = bioclimate.AirTemperature ();
-
-  if (Phenology.DS < 1)
-    {
-      Phenology.DS += (Devel.DSRate1
-		       * Devel.TempEff1 (Ta)
-		       * Devel.PhotEff1 (bioclimate.DayLength ()));
-      if (Phenology.Vern < 0)
-	crop.Vernalization (Ta);
-    }
-  else
-    {
-      Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
-      if (Phenology.DS > 2)
-	Phenology.DS = 2.0;
-    }
-}
-
 CropOld::Parameters::Parameters (const AttributeList& vl) 
   : Devel (vl.list ("Devel")),
     Vernal (vl.list ("Vernal")),
@@ -408,8 +337,7 @@ CropOld::Parameters::Parameters (const AttributeList& vl)
 { }
 
 CropOld::Parameters::DevelPar::DevelPar (const AttributeList& vl)
-  : Model    (models.lookup (vl.name ("Model"))),
-    EmrTSum (vl.number ("EmrTSum")),
+  : EmrTSum (vl.number ("EmrTSum")),
     DS_Emr (vl.number ("DS_Emr")),
     DS_reset (vl.flag ("DS_reset")),
     DSRate1 (vl.number ("DSRate1")),
@@ -428,8 +356,7 @@ CropOld::Parameters::VernalPar::VernalPar (const AttributeList& vl)
 { }
 
 CropOld::Parameters::LeafPhotPar::LeafPhotPar (const AttributeList& vl)
-  : Model (models.lookup (vl.name ("Model"))),
-    Qeff (vl.number ("Qeff")),
+  : Qeff (vl.number ("Qeff")),
     Fm (vl.number ("Fm")),
     TLim1 (vl.number ("TLim1")),
     TLim2 (vl.number ("TLim2"))
@@ -671,14 +598,6 @@ CropOld::Variables::RecCrpAux::output (Log& log, const Filter& filter) const
 CropOld::Variables::~Variables ()
 { }
 
-// BUG: Should not be necessary.
-static void
-NullCropFun(const Bioclimate&, Crop&)
-{ }
-
-dFTable<CropFun> CropOld::Parameters::DevelPar::models;
-dFTable<CropFun> CropOld::Parameters::LeafPhotPar::models;
-
 // Add the Crop syntax to the syntax table.
 Crop*
 CropOld::make (const AttributeList& vl, int layers)
@@ -706,13 +625,9 @@ CropOldSyntax::CropOldSyntax ()
   // CropPar
 
   // DevelPar
-  CropOld::Parameters::DevelPar::models.add("m1", &devel_m1);
-  CropOld::Parameters::DevelPar::models.add("m2", &devel_m2);
-  CropOld::Parameters::DevelPar::models.add("m3", &devel_m3);
   Syntax& Devel = *new Syntax ();
   syntax.add ("Devel", Devel, Syntax::Const);
 
-  Devel.add ("Model", &CropOld::Parameters::DevelPar::models, Syntax::Const);
   Devel.add ("EmrTSum", Syntax::Number, Syntax::Const);
   Devel.add ("DS_Emr", Syntax::Number, Syntax::Const);
   Devel.add ("DS_reset", Syntax::Boolean, Syntax::Const);
@@ -733,15 +648,9 @@ CropOldSyntax::CropOldSyntax ()
   Vernal.add ("TaSum", Syntax::Number, Syntax::Const);
 
   // LeafPhotPar
-  CropOld::Parameters::LeafPhotPar::models.add("exponential",
-						    &NullCropFun);
-  CropOld::Parameters::LeafPhotPar::models.add("parabolic",
-						    &NullCropFun);
-
   Syntax& LeafPhot = *new Syntax ();
   syntax.add ("LeafPhot", LeafPhot, Syntax::Const);
 
-  LeafPhot.add ("Model", &CropOld::Parameters::LeafPhotPar::models, Syntax::Const);
   LeafPhot.add ("Qeff", Syntax::Number, Syntax::Const);
   LeafPhot.add ("Fm", Syntax::Number, Syntax::Const);
   LeafPhot.add ("TLim1", Syntax::Number, Syntax::Const);
@@ -1089,8 +998,24 @@ void
 CropOld::DevelopmentStage (const Bioclimate& bioclimate)
 {
   const Parameters::DevelPar& Devel = par.Devel;
+  Variables::RecPhenology& Phenology = var.Phenology;
 
-  Devel.Model (bioclimate, *this);
+  const double Ta = bioclimate.AirTemperature ();
+
+  if (Phenology.DS < 1)
+    {
+      Phenology.DS += (Devel.DSRate1
+		       * Devel.TempEff1 (Ta)
+		       * Devel.PhotEff1 (bioclimate.DayLength ()));
+      if (Phenology.Vern < 0)
+	Vernalization (Ta);
+    }
+  else
+    {
+      Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
+      if (Phenology.DS > 2)
+	Phenology.DS = 2.0;
+    }
 }
 
 double 
@@ -1244,7 +1169,7 @@ CropOld::CanopyStructure ()
 	}
     }
     
-  // Create CSMP for old "z0, z1, z2" distribution.
+  // Create CSMP for standard "z0, z1, z2" distribution.
   CSMP LADvsH;
   LADvsH.add (z0 * Canopy.Height, 0.0);
   LADvsH.add (z1 * Canopy.Height, Canopy.LADm);
@@ -1738,7 +1663,10 @@ CropOld::harvest (const Time& time, Column& column,
   const double WRoot = Prod.WRoot;
   const double NCrop = Prod.NCrop;
 
-  const double WStub = WLeaf * stub_length / height ();
+  const double WStub = (stub_length < height () 
+			? WLeaf * stub_length / height ()
+			: WLeaf);
+			
   const double WSOrg = index * (WLeaf - WStub);
   const double WStraw = WLeaf - WSOrg - WStub;
 

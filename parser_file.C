@@ -1,6 +1,7 @@
 // parser_file.C
 
 #include "parser_file.h"
+#include "options.h"
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
@@ -648,15 +649,19 @@ ParserFile::Implementation::get_filter_sequence (const Library& library)
 }
 
 ParserFile::Implementation::Implementation (const Syntax& syntax, string name)
-  : in (name.data ()),
+  : in (Options::find_file (name)),
     file (name),
     line (1),
     column (0), 
     global_syntax_table (syntax)
-{  }
+{  
+  if (!in.good ())
+    cerr << "Open `" << file << "' failed\n";
+}
 
 ParserFile::Implementation::~Implementation ()
 {
+  cerr << "Close `" << file << "'\n";
   if (in.bad ())
     cerr << "There were trouble parsing `" << file << "'\n";
 }

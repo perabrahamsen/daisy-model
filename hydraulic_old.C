@@ -1,6 +1,7 @@
 // hydraulic_old.C
 
 #include "hydraulic.h"
+#include "options.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
@@ -72,7 +73,7 @@ HydraulicOld::HydraulicOld (const AttributeList& al)
   const int M_intervals (al.integer ("M_intervals"));
   const string name (al.name ("file"));
   
-  ifstream file (name.c_str ());
+  ifstream file (Options::find_file (name));
   if (!file.good ())
     {
       cerr << name << ": file open error";

@@ -1,6 +1,7 @@
 // weather_file.C
 
 #include "weather.h"
+#include "options.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
@@ -182,7 +183,7 @@ WeatherFile::WeatherFile (const Time& t, const AttributeList& al)
   : Weather (t, al.number ("Latitude"), al.name ("type")),
     date (42, 1, 1, 0),
     file_name (al.name ("file")),
-    file (al.name ("file").c_str()),
+    file (Options::find_file (al.name ("file"))),
     T1 (al.number ("T1")),
     T2 (al.number ("T2")),
     A (al.number_sequence ("A")),

@@ -92,6 +92,8 @@ single_positive_root_of_cubic_equation
 
 bool approximate (const double a, const double b, const double noise)
 {
+  if (fabs (a) < 1.0e-100)
+    return fabs (b) < 1.0e-100;
   return ((b == 0.0) ? (a == 0.0) : fabs (a / b - 1.0) < noise);
 }
 

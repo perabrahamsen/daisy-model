@@ -167,7 +167,12 @@ Soil::swap (vector<double>& v, double from, double middle, double to) const
   
   const double old_total = total (v);
   const double top_content = extract (v, from, middle);
-  const double bottom_content = extract (v, middle, to);
+  double bottom_content = extract (v, middle, to);
+  // We want to extract 100% of the interval containing middle, since
+  // we already extracted the rest into top_content.
+  const int middle_interval = interval (middle);
+  bottom_content += v[middle_interval] * dz (middle_interval);
+  v[middle_interval] = 0.0;
   const double new_middle = from + to - middle;
 
   add (v, from, new_middle, bottom_content);

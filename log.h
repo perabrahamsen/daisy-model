@@ -5,8 +5,8 @@
 
 #include <string>
 #include <vector>
+#include "filter.h"
 
-class Filter;
 class Daisy;
 class Time;
 class CSMP;

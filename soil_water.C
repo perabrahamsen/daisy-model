@@ -122,8 +122,18 @@ void
 SoilWater::swap (const Soil& soil, double from, double middle, double to)
 {
   soil.swap (Theta_, from, middle, to);
+
   for (int i = 0; i < soil.size(); i++)
-    h_[i] = soil.h (i, Theta_[i]);
+    {
+      const double Theta_sat = soil.Theta (i, 0.0);
+      if (Theta_[i] > Theta_sat)
+	{
+	  cerr << "\nBUG: Theta[ " << i << "] (" << Theta_[i]
+	       << ") > Theta_sat (" << Theta_sat << ")\n";
+	  Theta_[i] = Theta_sat;
+	}
+      h_[i] = soil.h (i, Theta_[i]);
+    }
 }
   
 bool 

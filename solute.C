@@ -137,6 +137,11 @@ Solute::tick (const Soil& soil,
   // Or: soil.z (0) - soil.z(1)
 
   double C_top = 0.0;
+  if (J_in > 0.0)
+    {
+      cerr << "\nBug: Positive J_in (" << J_in << ")\n";
+      J_in = 0.0;
+    }
   if (J_in != 0.0)
     {
       assert (J_in < 0.0);
@@ -266,8 +271,8 @@ Solute::tick (const Soil& soil,
 	    const double q0 = soil_water.q (0);
 	    assert (J_in < 0.0);
 	    assert (q0 < 0.0);
-	    cerr << "J_in == " << J_in << "\n";
-	    cerr << "C_in == " << J_in / q0 << "\n";
+	    // cerr << "J_in == " << J_in << "\n";
+	    // cerr << "C_in == " << J_in / q0 << "\n";
 	  }
 	d[0] -= a[0] * C_top;
       }
@@ -283,6 +288,13 @@ Solute::tick (const Soil& soil,
 	{
 	  // We use the old absorbed stuff plus the new dissolved stuff.
 	  M_[j] = A[j] + Theta_new[j] * C_[j];
+
+	  if (M_[j] < 0.0)
+	    { 
+	      cerr << "\nBUG: M[" << j << "] = " << M_[j] 
+		   << " after transport\n";
+	      M_[j] = 0.0;
+	    }
 	  // We calculate new C by assumining instant absorption.
 	  C_[j] = M_to_C (soil, Theta_new[j], j, M_[j]);
 	}
