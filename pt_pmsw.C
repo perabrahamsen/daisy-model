@@ -658,14 +658,15 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 	double &/*rr_tot_4*/, double &rr_sc_5, double &/*rr_tot_5*/, double &rr_sc_min,
 	double &rr_sc_js)
 	{
+	  assert (rcmin > 0.0);
+	  assert (LAI > 0.0);
    	double tairk,def;
-      double rcmin_LAI;
-      const double a4=700.0; // parameter in f1_dolman (for oats)
+	double rcmin_LAI;
+	const double a4=700.0; // parameter in f1_dolman (for oats)
 
    	esta=611.0*exp((17.27*tair)/(tair+237.3)); // saturated vapor pressure
    	def=0.001*(esta-e_pa); // vapor deficit in kPa
 	tairk=tair+273.15; // air temperature in K
-	assert (LAI > 0.0);
 	assert (spar > 0.0);
 	rfpar=0.55*2*srad/(spar*LAI); // cpar coefficient in rf_1
 	rcmin_LAI=rcmin;   // read from file or calculate from 200/LAI
@@ -1339,10 +1340,13 @@ public:
 	FILE *fp_rcmin, *fp_rcminsb, *fp_rcminww;
 #endif
         double rcmin;
+#ifdef USE_FILES
    	double rcmin_sb_ndvi,rcmin_sb_savi;
    	double rcmin_ww_ndvi,rcmin_ww_savi;
    	double pgtime;
         int teller;
+#endif
+
 // **************************************************
 
 // meteorological- and derived variables
@@ -1553,8 +1557,10 @@ public:
         y_pot=y_wet=0.0;
 
 // initialize pgtime and teller for rcmin_ww.dat and rcmin_sb.dat
+#ifdef USE_FILES
 	pgtime=0.0;
         teller=0;
+#endif
 // temporary input: rcmin_ww.dat or rcmin_sb.dat
 
 #ifdef USE_FILES
@@ -1642,7 +1648,8 @@ if (LAI > 0.0)
    	else rcmin=rcmin_sb_ndvi; // for barley
 	fprintf(fp_rcminsb,"%lf%10.2lf%10.2lf\n",pgtime,200.0/LAI,rcmin_sb_ndvi);
         } else rcmin=rcmin_sb_ndvi; // or another variable=9999
-
+#else
+        rcmin=200.0/LAI;
 #endif
 // potential evapotranspiration from surface and canopy, from tick()
 // pot.evap.above crop canopy [cm/hr]
@@ -1676,7 +1683,9 @@ if (LAI > 0.0)
 // otherwise: calculate resistances and then energy balance
 	if (LAI > 0.0)
    	{
+#ifdef USE_FILES
 	teller++;
+#endif
 // communication with time.C
 #if 0
 	year = time.year();

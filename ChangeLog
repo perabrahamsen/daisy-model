@@ -1,6 +1,7 @@
 1999-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* pt_pmsw.C (RSC): Added assertions.
+	(tick): Initialize rcmin to LAI/200.
 
 	* Version 1.02 released.
 
