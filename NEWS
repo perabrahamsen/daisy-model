@@ -12,9 +12,13 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.75
+
+No user visible changes.
+
 * 1.74
 
-** More flexible
+** More flexible dimensions in logs.
 
 The character & in a dimension string in a log description will be
 replaced by "h" if you use "hourly" (with no arguments) as a log
@@ -31,6 +35,8 @@ This means that if you for example put
 
 in your setup, "N Balance" will be logged weekly, and the flux
 dimensions will be correct.
+
+** Fixed off-by-one error for flux bottom in logs.
 
 * 1.73
 

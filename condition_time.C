@@ -135,11 +135,10 @@ public:
 struct ConditionHourly : public Condition
 {
   const int step;
-  const string& timestep ()
+  const string timestep ()
   { 
-    static const string timestep = "h";
     if (step == 1)
-      return timestep;
+      return "h";
     return Condition::timestep ();
   } 
   bool match (const Daisy& daisy) const
@@ -158,11 +157,10 @@ struct ConditionHourly : public Condition
 struct ConditionDaily : public Condition
 {
   const int step;
-  const string& timestep ()
+  const string timestep ()
   { 
-    static const string timestep = "d";
     if (step == 1)
-      return timestep;
+      return "d";
     return Condition::timestep ();
   } 
   bool match (const Daisy& daisy) const
@@ -180,11 +178,10 @@ struct ConditionDaily : public Condition
 struct ConditionWeekly : public Condition
 {
   const int step;
-  const string& timestep ()
+  const string timestep ()
   { 
-    static const string timestep = "w";
     if (step == 1)
-      return timestep;
+      return "w";
     return Condition::timestep ();
   } 
   bool match (const Daisy& daisy) const
@@ -202,11 +199,10 @@ struct ConditionWeekly : public Condition
 struct ConditionMonthly : public Condition
 {
   const int step;
-  const string& timestep ()
+  const string timestep ()
   { 
-    static const string timestep = "m";
     if (step == 1)
-      return timestep;
+      return "m";
     return Condition::timestep ();
   } 
   bool match (const Daisy& daisy) const
@@ -231,11 +227,10 @@ struct ConditionMonthly : public Condition
 struct ConditionYearly : public Condition
 {
   const int step;
-  const string& timestep ()
+  const string timestep ()
   { 
-    static const string timestep = "y";
     if (step == 1)
-      return timestep;
+      return "y";
     return Condition::timestep ();
   } 
   bool match (const Daisy& daisy) const
@@ -261,11 +256,8 @@ struct ConditionYearly : public Condition
 struct ConditionHour : public Condition
 {
   const int at;
-  const string& timestep ()
-  { 
-    static const string timestep = "d";
-    return timestep;
-  } 
+  const string timestep ()
+  { return "d"; } 
   bool match (const Daisy& daisy) const
     { return daisy.time.hour () == at; }
   void output (Log&) const

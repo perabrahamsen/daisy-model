@@ -10,12 +10,9 @@ whether the water pressure in a specific depth is above a given\n\
 threshold.  Logic conditions like 'and' and 'or' can be used for\n\
 testing whether multiple conditions are fulfilled simultaneously.";
 
-const string& 
+const string
 Condition::timestep ()
-{ 
-  static const string timestep = "dt";
-  return timestep;
-} 
+{ return "dt"; } 
 
 Condition::Condition (const AttributeList& al)
   : name (al.name ("type"))
