@@ -419,11 +419,11 @@ ColumnBase::ColumnBase (const AttributeList& al)
     log_residuals_DM (0.0),
     log_residuals_N_top (0.0),
     log_residuals_C_top (0.0),
+    log_residuals_N_root (0.0),
+    log_residuals_C_root (0.0),
     residuals_DM (0.0),
     residuals_N_top (0.0),
-    residuals_C_top (0.0),
-    log_residuals_N_root (0.0),
-    log_residuals_C_root (0.0)
+    residuals_C_top (0.0)
 { }
 
 void 

@@ -28,6 +28,7 @@
 #include "assertion.h"
 #include "symbol.h"
 #include "common.h"
+#include "options.h"
 #include <map>
 #include <set>
 
@@ -45,8 +46,10 @@ struct Library::Implementation
   const char *const description;
   typedef map<symbol, AttributeList*> alist_map;
   typedef map<symbol, const Syntax*> syntax_map;
+  typedef map<symbol, command_fun> command_map;
   alist_map alists;
   syntax_map syntaxen;
+  command_map commands;
   static void all_entries (vector<symbol>& libraries);
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
@@ -54,6 +57,7 @@ struct Library::Implementation
   const Syntax& syntax (symbol) const;
   void entries (vector<symbol>&) const;
   void remove (symbol);
+  void command (int& argc, char**& argv, Treelog& out) const;
   void clear_parsed ();
   void refile_parsed (const string& from, const string& to);
   static void load_syntax (Syntax&, AttributeList&);
@@ -131,6 +135,46 @@ Library::Implementation::remove (const symbol key)
 {
   alists.erase (alists.find (key));
   syntaxen.erase (syntaxen.find (key));
+}
+
+void 
+Library::Implementation::command (int& argc, char**& argv, Treelog& out) const
+{
+  const string program_name = argv[0];
+
+  if (argc < 2)
+    {
+      // Usage.
+      argc = -2;
+      return;
+    }
+  if (commands.empty ())
+    {
+      out.error (program_name + ": " + "Library " + name + " has no commands");
+      argc = -2;
+      return;
+    }
+  const symbol key = symbol (Options::get_arg (argc, argv));
+  command_map::const_iterator i = commands.find (key);
+
+  if (i == commands.end ())
+    {
+      TmpStream tmp;
+      tmp () << program_name << "Library " << name << "has no command " << key
+             << ".\nAvailable commands are";
+
+      for (command_map::const_iterator j = commands.begin ();
+           j != commands.end ();
+           j++)
+        tmp () << " " << (*i).first;
+      
+      out.error (tmp.str ());
+      argc = -2;
+      return;
+    }
+
+  const command_fun fun = *(*i).second;
+  fun (argc, argv, out);
 }
 
 void
@@ -321,6 +365,14 @@ Library::base_model (const symbol parameterization) const
 void
 Library::remove (const symbol key)
 { impl.remove (key); }
+
+void 
+Library::command (int& argc, char**& argv, Treelog& out) const
+{ impl.command (argc, argv, out); }
+  
+void 
+Library::add_command (symbol name, command_fun fun)
+{ impl.commands[name] = fun; }
 
 void 
 Library::clear_all_parsed ()

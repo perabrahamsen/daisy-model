@@ -87,6 +87,8 @@ struct AM::Implementation
   double top_N () const;
   void multiply_top (double fraction);
 
+  // Command.
+  static void command_table (int& argc, char**& argv, Treelog& out);
 
   // Create and Destroy.
   Implementation (const Time& c, symbol n, const vector<AOM*>& o);
@@ -485,6 +487,54 @@ AM::Implementation::pour (vector<double>& cc, vector<double>& nn)
 {
   for (unsigned int i = 0; i < om.size (); i++)
     om[i]->pour (cc, nn);
+}
+
+void 
+AM::Implementation::command_table (int&, char**&, Treelog& out)
+{
+  const Library& library = Librarian<AM>::library ();
+  vector<symbol> entries;
+  library.entries (entries);
+  TmpStream tmp;
+  tmp () << "Name\tClass\tSuper\tFile\tNH4\tNO3\tvolatilization\tN\tC\tDM";
+  for (vector<symbol>::const_iterator i = entries.begin ();
+       i != entries.end ();
+       i++)
+    {
+      tmp () << "\n";
+      const symbol name = *i;
+      daisy_assert (library.check (name));
+      const AttributeList& alist = library.lookup (name);
+      // const Syntax& syntax = library.syntax (name);
+      daisy_assert (alist.check ("syntax"));
+      const symbol type = alist.identifier ("syntax");
+      static const symbol buildin ("build-in");
+      const symbol super = alist.check ("type") 
+        ? alist.identifier ("type")
+        : buildin;
+      tmp () << name << "\t" << type << "\t" << super << "\t";
+      if (alist.check ("parsed_from_file"))
+        tmp () << alist.identifier ("parsed_from_file");
+      tmp () << "\t";
+      if (alist.check ("NH4_fraction"))
+        tmp () << alist.number ("NH4_fraction");
+      tmp () << "\t";
+      if (alist.check ("NO3_fraction"))
+        tmp () << alist.number ("NO3_fraction");
+      tmp () << "\t";
+      if (alist.check ("volatilization"))
+        tmp () << alist.number ("volatilization");
+      tmp () << "\t";
+      if (alist.check ("total_N_fraction"))
+        tmp () << alist.number ("total_N_fraction");
+      tmp () << "\t";
+      if (alist.check ("total_C_fraction"))
+        tmp () << alist.number ("total_C_fraction");
+      tmp () << "\t";
+      if (alist.check ("dry_matter_fraction"))
+        tmp () << alist.number ("dry_matter_fraction");
+    }
+  out.message (tmp.str ());
 }
 
 AM::Implementation::Implementation (const Time& c, const symbol n,
@@ -1177,5 +1227,10 @@ original.");
 				       AOM::load_syntax);
 	Librarian<AM>::add_type ("root", alist, syntax, &make);
       }
+      
+      // Commands.
+      Library& library = Librarian<AM>::library ();
+      static const symbol table ("table");
+      library.add_command (table, AM::Implementation::command_table);
     }
 } am_syntax;

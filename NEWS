@@ -12,6 +12,34 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.10
+
+** New parameterizations and parameter files.
+
+dk-crop.dai and dk-fertilizer.dai are new to the distribution, they
+contain parameterizations developed from the Daisy standardization
+project.  They are based on average numbers for Danish farms, rather
+than specific field experiments.  All names are in Danish.
+
+** New mineral fertilizers.
+
+A number of new mineral fertilizer parameterizations have been added
+to fertilizer.dai.
+
+** New command line option.
+
+From the command line
+
+  daisy setup.dai -l am table
+
+will generate a tab seperated table containing all the fertilizers
+that are either build-in or loaded from the file setup.dai (just an
+example, substitute with the files you want to summarize).
+
+** Bug fixes.
+
+Fixes crashes on some situations with low mineral nitrogen content.
+
 * 3.09
 
 ** Log summaries now handle logging a soil interval.

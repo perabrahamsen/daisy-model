@@ -152,6 +152,7 @@ TransportConvection::tick (Treelog&,
 	  M[i] += (-dJ[i] + dJ[i+1]) * ddt / soil.dz (i) + S[i] * ddt;
 	  C[i] = adsorption.M_to_C (soil, soil_water.Theta (i), i, M[i]);
 	}
+      J[size] += dJ[size] * ddt;
     }
   daisy_assert (approximate (J_in, J[0]));
 

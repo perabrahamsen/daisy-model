@@ -59,6 +59,8 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 
   for (unsigned int i = 0; i < soil.size (); i++)
     {
+      const double dz = soil.dz (i);
+
       // Amount of water entering this layer through macropores.
       const double water_in_above = -soil_water.q_p (i); // [cm]
       const double water_out_below = -soil_water.q_p (i+1); // [cm]
@@ -78,7 +80,8 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	{
 	  // More is going out below of the pore than comming in above.  
 	  // Water enter here from the matrix with the local concentration.
-	  delta_matter = min (-C[i] * delta_water, M[i] + S_m[i] * dt - 1e-16);
+	  delta_matter = min (-C[i] * delta_water,
+                              (M[i] + S_m[i] * dt) * dz - 1e-16);
 	  if (delta_matter < 0.0)
 	    delta_matter = 0.0;
 	}
@@ -123,7 +126,7 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
       if (abs_delta_matter > max_delta_matter)
 	max_delta_matter = abs_delta_matter;
       if (matter_in_above > max_delta_matter)
-	max_delta_matter = max_delta_matter;
+	max_delta_matter = matter_in_above;
 
       // Find amount of stuff leaving the layer.
       if (abs_delta_matter < 1e-60)
@@ -137,14 +140,14 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	  // Everything go to the layer.
 	  J_p[i+1] = 0.0;
 	  daisy_assert (matter_in_above > 0.0);
-	  S_p[i] = matter_in_above / soil.dz (i) / dt;
+	  S_p[i] = matter_in_above / dz / dt;
 	}
       else
 	{
 	  // We split between layer and bottom.
 	  J_p[i+1] = -(matter_in_above + delta_matter);
 	  daisy_assert (J_p[i+1] < 0.0);
-	  S_p[i] = -delta_matter / soil.dz (i) / dt;
+	  S_p[i] = -delta_matter / dz / dt;
 	}
       S_m[i] += S_p[i];
     }

@@ -65,6 +65,11 @@ public:
   // Dependencies.
   void remove (symbol);
 
+  // Command line parsing.
+  typedef void (*command_fun) (int& argc, char**& argv, Treelog& out);
+  void command (int& argc, char**& argv, Treelog& out) const;
+  void add_command (symbol name, command_fun fun);
+
   // File handling.
   static void clear_all_parsed ();
   static void refile_parsed (const string& from, const string& to);

@@ -59,7 +59,7 @@ void
 Options::usage (Treelog& out) const
 {
   out.error (string ("Usage: ")
-	     + program_name + " [-p type] [-v] [-d dir] file...");
+	     + program_name + " [-p type] [-v] [-d dir] [-l lib command args...] file...");
 }
 
 void
@@ -156,39 +156,59 @@ Options::Options (int& argc, char**& argv,
 		// Usage.
 		argc = -2;
               break;
+            case 'l':
+              {
+                if (argc < 2)
+                  {
+                    // We need a library name.
+                    argc = -2;
+                    break;
+                  }
+                const symbol name = symbol (get_arg (argc, argv));
+                if (!Library::exist (name))
+                  {
+                    out.error (program_name + ": '" + name 
+                               + "' unknown library");
+                    argc = -2;
+                    break;
+                  }
+                const Library& library = Library::find (name);
+                library.command (argc, argv, out);
+              }
+              break;
 	    case 'p':
-	      if (argc > 1)
-		{
-		  const Library& library 
-		    = Librarian<Document>::library ();
-		  const symbol name = symbol (get_arg (argc, argv));
-		  if (library.check (name))
-		    {
-		      const Syntax& syntax = library.syntax (name);
-		      AttributeList alist;
-		      alist.add ("type", name);
-		      Treelog::Open nest (out, name);
-		      if (syntax.check (alist, out))
-			{
-			  Document& document = 
-			    Librarian<Document>::create (alist);
-			  document.print_document (cout);
-			  delete &document;
-			}
-		      prevent_run = true;
-		    }
-		  else
-		    {
-		      out.error (program_name + ": '" + name 
-				 + "' unknown document type");
-		      argc = -2;
-		    }
-		}
-	      else
-		argc = -2;
-
-	      break;
-	    case 'v':
+              {
+                if (argc < 2)
+                  {
+                    // We need a library name.
+                    argc = -2;
+                    break;
+                  }
+                const Library& library 
+                  = Librarian<Document>::library ();
+                const symbol name = symbol (get_arg (argc, argv));
+                if (!library.check (name))
+                  {
+                    out.error (program_name + ": '" + name 
+                               + "' unknown document type");
+                    argc = -2;
+                    break;
+                  }
+                const Syntax& syntax = library.syntax (name);
+                AttributeList alist;
+                alist.add ("type", name);
+                Treelog::Open nest (out, name);
+                if (syntax.check (alist, out))
+                  {
+                    Document& document = 
+                      Librarian<Document>::create (alist);
+                    document.print_document (cout);
+                    delete &document;
+                  }
+                prevent_run = true;
+              }
+              break;
+            case 'v':
 	      // Print version.
 	      copyright (out);
 	      break;

@@ -31,8 +31,8 @@ class Treelog;
 
 class Options
 {
-  static std::string get_arg (int& argc, char**& argv);
 public: 
+  static std::string get_arg (int& argc, char**& argv);
   static void initialize_path ();
   static const char *const log_name;
   const std::string program_name;

@@ -1,3 +1,38 @@
+2003-10-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.10 released.
+
+2003-10-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* transport_convection.C (tick): Update J[size].
+
+	* mactrans_std.C (tick): Multiply with dz.
+
+2003-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_base.C (ColumnBase): Fix initialization order.
+
+	* options.C (Options): Support new '-l' argument.
+	* options.h (get_arg): Made it public.
+	* library.C, library.h (add_command, command): New functions.
+	* library.h (command_fun): New typedef.
+	* am.C (command_table): New function.
+	(AM_Syntax): Add it.
+
+2003-10-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+
+	* lib/dk-wbarley.dai, lib/dk-wwheat.dai, lib/dk-sbarley.dai: 
+	* lib/dk-rye.dai, lib/dk-crop.dai, lib/dk-fertilizer.dai: New files.
+	* lib/all.dai: Include them.
+	* lib/Makefile (DKCROPS): New macro.
+	(DAISY): Use it.
+	* lib/fertilizer.dai (NPK01, NPK02, NP, CalciumNitrate): New
+	parameterizations. 
+	* lib/dk-horizon.dai: Fix comment.
+	
+	* crop_std.C (harvest): Added some consts.
+
 2003-10-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.09 released.
