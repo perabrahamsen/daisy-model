@@ -459,6 +459,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  in_order = true;
 	  name = *current;
 	  current++;
+	  // BUG:: We use current != end several places below, where
+	  // we probably should use in_order.  However, fixing this
+	  // would outlaw the (fertilize mineral (weight 10)) action.
 	}
 	
       if (syntax.size (name) == Syntax::Singleton)
@@ -481,16 +484,22 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    }
 	  case Syntax::AList: 
 	    {
+	      if (in_order)
+		skip ("(");
 	      AttributeList list (atts.check (name) 
 				  ? atts.alist (name)
 				  : syntax.default_alist (name));
 	      
 	      load_list (list, syntax.syntax (name));
 	      atts.add (name, list);
+	      if (in_order)
+		skip (")");
 	      break;
 	    }
 	  case Syntax::PLF:
 	    {
+	      if (in_order)
+		skip ("(");
 	      PLF plf;
 	      double last_x = -42;
 	      int count = 0;
@@ -521,6 +530,8 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      if (count < 2)
 		error ("Need at least 2 points");
 	      atts.add (name, plf);
+	      if (in_order)
+		skip (")");
 	      break;
 	    }
 	  case Syntax::String:

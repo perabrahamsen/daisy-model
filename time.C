@@ -155,6 +155,10 @@ Time::tick_day (int days)
       }
 }
 
+void
+Time::tick_year (int years)
+{ impl.year += years; }
+
 // @ Convert.
 
 string
@@ -376,4 +380,15 @@ bool
 Time::operator>  (const Time& other) const
 {
   return !(*this <= other);
+}
+
+bool 
+Time::between (const Time& from, const Time& to) const
+{ 
+  daisy_assert (from <= to);
+  if (*this  < from)
+    return false;
+  if (to < *this)
+    return false;
+  return true;
 }

@@ -47,6 +47,7 @@ public:
 public:
   void tick_hour (int hours = 1);
   void tick_day (int days = 1);
+  void tick_year (int years = 1);
 
   // Convert.
 public:
@@ -73,6 +74,7 @@ public:
   bool operator<= (const Time&) const;
   bool operator>= (const Time&) const;
   bool operator>  (const Time&) const;
+  bool between (const Time&, const Time&) const;
 
   // Construct.
 public:

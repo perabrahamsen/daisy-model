@@ -49,9 +49,10 @@ public:
 
     // Use.
   public:
-    bool operator== (const Position&);
-    bool operator!= (const Position& pos)
+    bool operator== (const Position&) const;
+    bool operator!= (const Position& pos) const
     { return !(*this == pos); }
+    bool operator< (const Position&) const;
 
     // Create and Destroy.
     friend class Lexer;
@@ -64,6 +65,7 @@ public:
   };
   Position position ();
   static const Position& no_position ();
+  void seek (const Position&);
 
   // Operations.
 public:

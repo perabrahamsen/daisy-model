@@ -12,6 +12,34 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.45
+
+** New missing_years attribute for the default weather model.
+
+This allows you to reuse the weather data for additional years.  For
+example, if you have weather data for 1991 to 2000 in a file named
+"weather.dlf", but want to run a simulation from 1987 to 2001, you can
+specify the weather model like this.
+
+(weather default "weather.dwf"
+         (missing_years ((1987 1990) (1993 1996))
+                        ((2001 2001) (1991 1991))))
+
+This should be read as an order to Daisy to, in the period from 1987
+to 1990, use the weather data from 1993 to 1996, and for 2001 use the
+weather data from 1991.
+
+This is particularly useful for running Daisy with a "warming up"
+period where we don't have actual measurements.
+
+In the example above we map two periods (1987-1990 and 2001), but you
+can have as many periods as you like, so you can e.g. run a 100 year
+simulation with just 10 years worth of climate data.
+
+Note that Daisy will always use the actual data when available, so if
+you in the example above have some data from 2001 but not all, Daisy
+will not switch to 1991 data before it have used up the real data.
+
 * 2.44
 
 ** New "ForcedLAI" vegetation attribute.
@@ -24,8 +52,8 @@ interception capacity).  Here is an example:
 (defcolumn Andeby default
   "The B.And farm, Andeby, 2003."
   (Vegetation crops
-	      (ForcedLAI (1987 (100 2.0) (200 4.0))
-			 (1988 (100 0.0) (150 1.5) (200 5.0))))
+              (ForcedLAI (1987 (100 2.0) (200 4.0))
+                         (1988 (100 0.0) (150 1.5) (200 5.0))))
   (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
         (MaxRootingDepth 60.0 [cm]))
   (Groundwater deep))
@@ -54,11 +82,11 @@ simulated CAI.  By default, it will log the sum of all crops, set
 $crop to log a particular crop alone as below:
 
 (output "Forced LAI"
-	("Forced LAI"
-	 (set "$crop" "Spring Barley")
+        ("Forced LAI"
+         (set "$crop" "Spring Barley")
          (where "sbarley.dlf"))
-	("Forced LAI"
-	 (set "$crop" "Grass to grain")
+        ("Forced LAI"
+         (set "$crop" "Grass to grain")
          (where "grass.dlf")))
 
 ** Bug fix for permanent vegetation.
@@ -117,9 +145,9 @@ Simply specify a temeprature sum for each fase:: emergence, vegetative
 and reproductive.
 
  (Devel TSum 
-	(EmrTSum 100.0 [dg C d])
-	(VegTSum 760.0 [dg C d])
-	(RepTSum 740.0 [dg C d]))
+        (EmrTSum 100.0 [dg C d])
+        (VegTSum 760.0 [dg C d])
+        (RepTSum 740.0 [dg C d]))
 
 * 2.42
 
@@ -294,29 +322,29 @@ By default, Daisy has no DOM pools.
 
 Here is an example of OrganicMatter with one pool:
 
-	  (OrganicMatter (smb ((C_per_N 6.7)
-			       (efficiency 0.6 0.6)
-			       (fractions 0 0.6 0 0.4 0.0)
-			       (maintenance 7.5e-05)
-			       (turnover_rate 7.708e-06))
-			      ((C_per_N 6.7)
-			       (efficiency 0.6 0.6)
-			       (fractions 0 0.4 0 0.6 0.0)
-			       (maintenance 0.000416667)
-			       (turnover_rate 0.000416667)))
-			 (som ((efficiency 0.4 0.4)
-			       (fractions 1 0 0 0 0)
-			       (turnover_rate 1.125e-07))
-			      ((efficiency 0.5 0.5)
-			       (fractions 0.9 0 0.1 0 0)
-			       (turnover_rate 5.83333e-06)))
-			 (dom ((C (M 0.0 [g/cm^3]))
-			       (N (M 0.0 [g/cm^3]))
-			       (adsorption none)
-			       (diffusion_coefficient 4.6e-6 [cm^2/s])
-			       (efficiency 0.0 0.4)
-			       (fractions 1 0)
-			       (turnover_rate 0 [h^-1]))))
+          (OrganicMatter (smb ((C_per_N 6.7)
+                               (efficiency 0.6 0.6)
+                               (fractions 0 0.6 0 0.4 0.0)
+                               (maintenance 7.5e-05)
+                               (turnover_rate 7.708e-06))
+                              ((C_per_N 6.7)
+                               (efficiency 0.6 0.6)
+                               (fractions 0 0.4 0 0.6 0.0)
+                               (maintenance 0.000416667)
+                               (turnover_rate 0.000416667)))
+                         (som ((efficiency 0.4 0.4)
+                               (fractions 1 0 0 0 0)
+                               (turnover_rate 1.125e-07))
+                              ((efficiency 0.5 0.5)
+                               (fractions 0.9 0 0.1 0 0)
+                               (turnover_rate 5.83333e-06)))
+                         (dom ((C (M 0.0 [g/cm^3]))
+                               (N (M 0.0 [g/cm^3]))
+                               (adsorption none)
+                               (diffusion_coefficient 4.6e-6 [cm^2/s])
+                               (efficiency 0.0 0.4)
+                               (fractions 1 0)
+                               (turnover_rate 0 [h^-1]))))
 
 And here is an example of an AOM pool that goes directly to DOM:
 
@@ -416,17 +444,17 @@ You can also specify heat and water factor for the SOM and SMB pools.
    (smb ((C_per_N 6)           ; SMB1
          (heat_factor (0.0 0.0) (20.0 1.0))
          (water_factor (-10000.0 0.0) (-100.0 1.0) (0.00 0.0))
-	 (efficiency 0.6 0.6)
-	 (turnover_rate 7.708e-6)
-	 (maintenance 7.500e-5)
-	 (fractions 0 0.6 0 0.4 ))
-	((C_per_N 10)          ; SMB2
+         (efficiency 0.6 0.6)
+         (turnover_rate 7.708e-6)
+         (maintenance 7.500e-5)
+         (fractions 0 0.6 0 0.4 ))
+        ((C_per_N 10)          ; SMB2
          (heat_factor (0.0 0.0) (20.0 1.0))
          (water_factor (-10000.0 0.0) (-100.0 1.0) (0.00 0.0))
-	 (efficiency 0.6 0.6)
-	 (maintenance 4.16666666667e-4)
-	 (turnover_rate  4.16666666667e-4)
-	 (fractions 0 0.6 0 0.4))))
+         (efficiency 0.6 0.6)
+         (maintenance 4.16666666667e-4)
+         (turnover_rate  4.16666666667e-4)
+         (fractions 0 0.6 0 0.4))))
 
 And similarily for SOM.
 
@@ -741,15 +769,15 @@ horizon attributes.  Here is an example:
 (defpedotransfer "van der Zee & van Riemsdijk" linear
   (description "0.5 (Al_0 + Fe_O)")
   (factors ("Al_O" 0.5)
-	   ("Fe_O" 0.5))
+           ("Fe_O" 0.5))
   (offset 0.0))
-	   
+           
 (deftransform "Phosphor Fast<->Slow" equilibrium
   (A "Phosphor Fast") (B "Phosphor Slow")
   (equilibrium Langmuir
-	       (K 1e-5 [g/cm^3])
-	       (pedo_my_max "van der Zee & van Riemsdijk")
-	       )
+               (K 1e-5 [g/cm^3])
+               (pedo_my_max "van der Zee & van Riemsdijk")
+               )
   (k_AB 1e-4))
 
 Currently only the 'K' and 'my_max' attributes to the Langmuir
@@ -762,7 +790,7 @@ like this:
 
 (defhorizon top default
   (attributes ("Fe_O" 1e-5)
-	      ("Al_O" 5e-6)
+              ("Al_O" 5e-6)
   ...)
 
 * 2.04
@@ -775,10 +803,10 @@ Example:
 
 (defcolumn test default
   (Transformations (equilibrium (A "Phosphor Solute") (B "Phosphor Solid")
-				(equilibrium Langmuir
-					     (K 1e-5 [g/cm^3])
-					     (my_max 1e-2 [g/cm^3]))
-				(k_AB 1e-2 [h^-1])))
+                                (equilibrium Langmuir
+                                             (K 1e-5 [g/cm^3])
+                                             (my_max 1e-2 [g/cm^3]))
+                                (k_AB 1e-2 [h^-1])))
   ...)
 
 Right now, "equilibrium" is the only implemented transform model.  It
@@ -819,11 +847,11 @@ The dimensions are in brackets, like this:
 
 (defhorizon top default
   (hydraulic M_vG 
-	     (K_sat 19.3 [cm/h])
-	     (Theta_res 0.05 [cm^3 H2O/cm^3])
-	     (Theta_sat 0.424 [cm^3 H2O/cm^3])
-	     (alpha 0.069 [cm^-1])
-	     (n 1.527 []))
+             (K_sat 19.3 [cm/h])
+             (Theta_res 0.05 [cm^3 H2O/cm^3])
+             (Theta_sat 0.424 [cm^3 H2O/cm^3])
+             (alpha 0.069 [cm^-1])
+             (n 1.527 []))
   (SOM_fractions 0.66 [] 0.34 [])
   (SOM_C_per_N 11 [g C/g N] 11))
 
@@ -865,10 +893,10 @@ days.  By default, it is reset March 1 every year.
 Example:
 
     (sow "Spring Barley"
-	 (Root (rootdens "DS_Depth" 
-			 (entries (0.0 (0.0 1.0) (10.0 0.0))
-				  (1.0 (0.0 1.0) (50.0 0.0))
-				  (2.0 (0.0 1.0) (40.0 1.0) (50.0 0.0))))))
+         (Root (rootdens "DS_Depth" 
+                         (entries (0.0 (0.0 1.0) (10.0 0.0))
+                                  (1.0 (0.0 1.0) (50.0 0.0))
+                                  (2.0 (0.0 1.0) (40.0 1.0) (50.0 0.0))))))
 
 This specifies the root distribution at DS 0.0 (emergence), 1.0
 (flowering) and 2.0 (ripe) respectively.  At all times, the highest
@@ -885,10 +913,10 @@ Daisy will interpolate between these three development stages.
 Example:
 
     (sow "Spring Barley"
-	 (Root (rootdens "DS_Rel" 
-			 (entries (0.0 (0.0 1.0) (1.0 0.0))
-				  (1.0 (0.0 1.0) (1.0 0.0))
-				  (2.0 (0.0 1.0) (0.8 1.0) (1.0 0.0))))))
+         (Root (rootdens "DS_Rel" 
+                         (entries (0.0 (0.0 1.0) (1.0 0.0))
+                                  (1.0 (0.0 1.0) (1.0 0.0))
+                                  (2.0 (0.0 1.0) (0.8 1.0) (1.0 0.0))))))
 
 This works like DS_Depth, except that instead of using absolute
 numbers for soil depth, we now use numbers relative to the current
@@ -898,10 +926,10 @@ DS_Depth, the calculated root depth is ignored.
 *** Depth_Depth
 
     (sow "Spring Barley"
-	 (Root (rootdens "Depth_Depth" 
-			 (entries (00.0 (0.0 1.0) (10.0 0.0))
-				  (50.0 (0.0 1.0) (50.0 0.0))
-				  (75.0 (0.0 1.0) (40.0 1.0) (75.0 0.0))))))
+         (Root (rootdens "Depth_Depth" 
+                         (entries (00.0 (0.0 1.0) (10.0 0.0))
+                                  (50.0 (0.0 1.0) (50.0 0.0))
+                                  (75.0 (0.0 1.0) (40.0 1.0) (75.0 0.0))))))
 
 This works like DS_Depth, except that instead of using the development
 stage as index, we now use the calculated root depth.  Obviously, this
@@ -1036,8 +1064,8 @@ use
 (defcrop MyCrop default
   ;; ...
   (Root (rootdens "Gerwitz+Page74"
-		  (SpRtLength 100.0)
-		  (DensRtTip 0.1))
+                  (SpRtLength 100.0)
+                  (DensRtTip 0.1))
 
 If you don't have any better value for SpRtLength or DensRtTip than
 the above, you don't need to specify them.  They are the default

@@ -61,13 +61,19 @@ struct WeatherStandard : public Weather
     // Parameters.
     const YearInterval from;
     const YearInterval to;
-    
+
+    // Use.
+    bool contain (const Time& time) const;
+    void map_time (Time& time) const;
+
     // Create and Destroy.
     static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     YearMap (const AttributeList&);
   };
   const vector<const YearMap*> missing_years;
+  int active_map;
+  int find_map (const Time& time) const;
 
   // Keywords
   struct keyword_description_type
@@ -121,6 +127,7 @@ struct WeatherStandard : public Weather
   // Parsing.
   const string where;
   LexerData* lex;
+  Lexer::Position end_of_header;
 
   // These are the last read values for today.
   Time last_time;
@@ -133,6 +140,7 @@ struct WeatherStandard : public Weather
   double last_reference_evapotranspiration;
 
   // These are the first values after today.
+  bool initialized;
   Time next_time;
   double next_year;
   double next_month;
@@ -168,7 +176,7 @@ struct WeatherStandard : public Weather
   void output (Log& log) const
     { Weather::output (log); }
   void read_line ();
-  void read_new_day (const Time&);
+  void read_new_day (const Time&, Treelog&);
 
   // Communication with Bioclimate.
   double hourly_air_temperature () const // [dg C]
@@ -250,6 +258,15 @@ WeatherStandard::YearMap::YearInterval::YearInterval (const AttributeList& al)
     to (al.integer ("to"))
 { }
     
+bool WeatherStandard::YearMap::contain (const Time& time) const
+{
+  const int year = time.year ();
+  return from.from <= year && year <= from.to;
+}
+
+void WeatherStandard::YearMap::map_time (Time& time) const
+{ time.tick_year (to.from - from.from); }
+
 bool
 WeatherStandard::YearMap::check_alist (const AttributeList& al, Treelog& msg)
 {
@@ -278,12 +295,22 @@ WeatherStandard::YearMap::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add_submodule ("to", alist, Syntax::Const, 
 			"Interval of years to map to.",
 			YearInterval::load_syntax);
+  syntax.order ("from", "to");
 }
 
 WeatherStandard::YearMap::YearMap (const AttributeList& al)
   : from (al.alist ("from")),
     to (al.alist ("to"))
 { }
+
+int 
+WeatherStandard::find_map (const Time& time) const
+{ 
+  for (int i = 0; i < missing_years.size (); i++)
+    if (missing_years[i]->contain (time))
+      return i;
+  return -1;
+}
 
 WeatherStandard::keyword_description_type 
 WeatherStandard::keyword_description[] =
@@ -351,14 +378,16 @@ WeatherStandard::has_data (const string& name)
 }
 
 void
-WeatherStandard::tick (const Time& time, Treelog& out)
+WeatherStandard::tick (const Time& time, Treelog& msg)
 {
-  Weather::tick (time, out);
+  Treelog::Open nest (msg, string ("Weather: ") + name);
+
+  Weather::tick (time, msg);
 
   hour = time.hour ();
   
   if (hour == 0)
-    read_new_day (time);
+    read_new_day (time, msg);
 
   // Snow and rain fractions.
   const double T = hourly_air_temperature ();
@@ -381,13 +410,19 @@ WeatherStandard::tick (const Time& time, Treelog& out)
   daisy_assert (snow_fraction >= 0 && snow_fraction <= 1);
   daisy_assert (approximate (rain_fraction + snow_fraction, 1.0));
 
-  Weather::tick_after (time, out);
+  Weather::tick_after (time, msg);
 }
 
 void 
 WeatherStandard::read_line ()
 {
   daisy_assert (lex);
+
+  if (!lex->good ())
+    {
+      next_time.tick_hour ();
+      return;
+    }
 
   // Remember old values.
   last_time = next_time;
@@ -419,12 +454,15 @@ WeatherStandard::read_line ()
 	  else if (value > data_description[index].max)
 	    lex->error (string ("Column ") 
 		       + data_description[index].name + " value too hight");
-	  if (!lex->good ())
-	    throw ("no more climate data");
 	  if (next_precipitation < 0.0)
 	    next_precipitation = 0.0;
+	  if (!lex->good ())
+	    {
+	      lex->error ("No more climate data, reusing last values");
+	      return;
+	    }
 	}
-
+      
       // Update time.
       if (timestep > 0)
 	next_time.tick_hour (timestep);
@@ -456,13 +494,66 @@ WeatherStandard::read_line ()
   const int month = double2int (next_time.month ());
   next_precipitation *= precipitation_correction[month-1];
 }
+
 void 
-WeatherStandard::read_new_day (const Time& time)
+WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 { 
   daisy_assert (time.hour () == 0);
+
+  // Handle missing years.
+  bool find_new_map = false;
+  if (active_map >= 0)
+    {
+      if (time.between (begin, end))
+	{
+	  msg.message ("Using current data");
+	  active_map = -1;
+	  initialized = false;
+	}
+      else if (!missing_years[active_map]->contain (time))
+	find_new_map = true;
+    }
+  else if (!time.between (begin, end))
+    find_new_map = true;
+
+  if (find_new_map)
+    {
+      active_map = find_map (time);
+      if (active_map < 0)
+	{
+	  TmpStream tmp;
+	  tmp () << "No weather data for " << time.year () 
+		 << "-" << time.month ()
+		 << "-" << time.mday () << ":" << time.hour ();
+	  msg.debug (tmp.str ());
+	  msg.flush ();
+	  throw string (tmp.str ());
+	}
+      TmpStream tmp;
+      tmp () << "Using data from [" << missing_years[active_map]->to.from
+	     << "-" << missing_years[active_map]->to.to << "] for years ["
+	     << missing_years[active_map]->from.from << "-"
+	     << missing_years[active_map]->from.to << "]";
+      msg.message (tmp.str ());
+      initialized = false;
+    }
+
+  // Now and tomorrow.
   Time now = time;
-  Time tomorrow = time;
+  if (active_map >= 0)
+    missing_years[active_map]->map_time (now);
+  Time tomorrow = now;
   tomorrow.tick_day ();
+
+  // Initialize.
+  if (!initialized)
+    {
+      initialized = true;
+      lex->seek (end_of_header);
+      next_time = begin;
+      next_time.tick_hour (-timestep);
+      read_line ();
+    }
 
   // BC5 sucks // while (next_time <= now)
   while (!(now < next_time))
@@ -531,8 +622,10 @@ WeatherStandard::read_new_day (const Time& time)
 }
 
 void
-WeatherStandard::initialize (const Time& time, Treelog& err)
+WeatherStandard::initialize (const Time&, Treelog& err)
 { 
+  Treelog::Open nest (err, string ("Weather: ") + name);
+
   daisy_assert (lex == NULL);
   lex = new LexerData (where, err);
   // Open errors?
@@ -779,14 +872,8 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
     }
   lex->next_line ();
 
-  // Time.
-  next_time = begin;
-  next_time.tick_hour (-timestep);
-
-  if (time.hour () == 0)
-    return;
-  Time midnight (time.year (), time.month (), time.mday (), 0);
-  read_new_day (midnight);
+  // Start of data.
+  end_of_header = lex->position ();
 }
 
 WeatherStandard::WeatherStandard (const AttributeList& al)
@@ -795,6 +882,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     T_snow (al.number ("T_snow")),
     missing_years (map_construct_const<YearMap> 
 		   (al.alist_sequence ("missing_years"))),
+    active_map (-1),
     timestep (0),
     begin (1900, 1, 1, 0),
     end (2100, 1, 1, 0),
@@ -808,6 +896,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     has_reference_evapotranspiration (false),
     where (al.name ("where")),
     lex (NULL),
+    end_of_header (Lexer::no_position ()),
     last_time (end),
     last_air_temperature (-42.42e42),
     last_global_radiation (-42.42e42),
@@ -816,6 +905,7 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     last_relative_humidity (-42.42e42),
     last_wind_speed (-42.42e42),
     last_reference_evapotranspiration (-42.42e42),
+    initialized (false),
     next_time (begin),
     next_year (-42.42e42),
     next_month (-42.42e42),
@@ -836,11 +926,16 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
 { }
 
 WeatherStandard::~WeatherStandard ()
-{ delete lex; }
+{ 
+  sequence_delete (missing_years.begin (), missing_years.end ());
+  delete lex; 
+}
 
 bool
 WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 { 
+  Treelog::Open nest (err, name);
+
   daisy_assert (lex);
   bool ok = true;
   if (!lex->good ())
@@ -855,15 +950,41 @@ WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
       err.error (tmp.str ());
       return false;
     }
-  if (from < begin)
+  if (from < begin && find_map (from) < 0)
     {
       err.error ("Simulation starts before weather data");
       ok = false;
     }
-  if (to > end)
+  if (to > end && find_map (to) < 0)
     {
       err.error ("Simulation ends after weather data");
       ok = false;
+    }
+  for (unsigned int i = 0; i < missing_years.size (); i++)
+    {
+      TmpStream tmp;
+      tmp () << "missing_year[" << i << "]";
+      Treelog::Open nest (err, tmp.str ());
+      const int from_from = missing_years[i]->from.from;
+      const int from_to = missing_years[i]->from.to;
+      if (from_from > begin.year () && from_to < end.year ())
+	{
+	  TmpStream tmp;
+	  tmp () << "domain [" << from_from << "-" << from_to 
+		 << "] fully within [" << begin.year () << "-" << end.year ()
+		 << "]";
+	  err.warning (tmp.str ());
+	}
+      const int to_from = missing_years[i]->to.from;
+      const int to_to = missing_years[i]->to.to;
+      if (to_from < begin.year () || to_to > end.year ())
+	{
+	  TmpStream tmp;
+	  tmp () << "range [" << to_from << "-" << to_to << "] not within [" 
+		 << begin.year () << "-" << end.year () << "]";
+	  err.error (tmp.str ());
+	  ok = false;
+	}
     }
   if (latitude < -66 || latitude > 66)
     {

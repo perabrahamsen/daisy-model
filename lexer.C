@@ -93,8 +93,12 @@ Lexer::Implementation::~Implementation ()
 }
 
 bool 
-Lexer::Position::operator== (const Position& pos)
+Lexer::Position::operator== (const Position& pos) const
 { return column == pos.column && line == pos.line; }
+
+bool 
+Lexer::Position::operator< (const Position& pos) const
+{ return line < pos.line || (column < pos.column && line == pos.line); }
 
 const Lexer::Position& 
 Lexer::Position::operator= (const Position& pos)
@@ -126,6 +130,19 @@ Lexer::no_position ()
   static Position none;
   return none;
 }
+
+void Lexer::seek (const Lexer::Position& pos)
+{
+  if (pos == position ())
+    return;
+
+  impl.in.seekg (0, ios::beg);
+  impl.column = 0;
+  impl.line = 1;
+  while (good () && position () < pos)
+    (void) get ();
+}
+
 
 int
 Lexer::get ()
