@@ -1,3 +1,22 @@
+2001-05-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.74 released.
+
+2001-05-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (tick): Less debug output.
+
+	* select_flux_bottom.C (output_array): Use interval_border + 1.
+
+	* condition.h, condition.C, condition_time.C (timestep): New
+	member function.
+	* select.h, select.C, select_flux_bottom.C, select_flux_top.C,
+	select_interval.C (initialize): New `timestep' parameter. 
+	Made `conv' a reference. 
+	* log_select.C (LogSelect): Use them.
+	* lib/log.dai: Use it.
+	("Fertilizer Yearly"): Use crop seasons instead of calendar years.
+
 2001-04-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.73 released.

@@ -106,7 +106,8 @@ struct Select::Implementation
   }
 
   // Create and Destroy.
-  void initialize (const string_map conv)
+  void initialize (const string_map& conv, const string& timestep, 
+		   string& dimension)
   {
     // Convert path according to mapping in 'conv'.
     for (unsigned int i = 0; i < path.size (); i++)
@@ -117,6 +118,14 @@ struct Select::Implementation
 	else if (path[i].size () > 0 && path[i][0] == '$')
 	  path[i] = "*";
       }
+    // Replace '&' with timestep.
+    string new_dim;
+    for (unsigned int i = 0; i < dimension.length (); i++)
+      if (dimension[i] == '&')
+	new_dim += timestep;
+      else
+	new_dim += dimension[i];
+    dimension = new_dim;
   }
 
   Implementation (const AttributeList& al)
@@ -230,7 +239,8 @@ These will be printed in the first line of the log file.\n\
 The default tag is the last element in the path.");
   syntax.add ("dimension", Syntax::String, Syntax::Const,
 	      "The unit for numbers in this column.\n\
-These will be printed in the second line of the log file.");
+These will be printed in the second line of the log file.\n\
+The character '&' will be replaced with the log timestep.");
   alist.add ("dimension", "");
   syntax.add ("description", Syntax::String, Syntax::Const,
 	      "A description of this column.");
@@ -287,8 +297,9 @@ Number of times the path has matched a variable since the last log entry.");
 }
 
 void 
-Select::initialize (const string_map conv, double, double)
-{ impl.initialize (conv); }
+Select::initialize (const string_map& conv, double, double, 
+		    const string& timestep)
+{ impl.initialize (conv, timestep, dimension); }
 
 static string
 select_get_tag (const AttributeList& al)

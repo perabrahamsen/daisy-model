@@ -26,7 +26,7 @@ protected:
 public:
   static const char *const description;
   const string tag;		// Name of this entry.
-  const string dimension;	// Physical dimension of this entry.
+  string dimension;		// Physical dimension of this entry.
   virtual const Geometry* geometry () const; // For array tags.
   virtual int size () const;	// For array tags.
   
@@ -75,7 +75,8 @@ public:
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const string_map conv, double from, double to);
+  virtual void initialize (const string_map& conv, double from, double to,
+			   const string& timestep);
   Select (const AttributeList& al);
   virtual ~Select ();
 };

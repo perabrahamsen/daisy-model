@@ -297,8 +297,9 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 
 	  if (M[j] < 0.0)
 	    { 
-	      CERR << "\nBUG: M[" << j << "] = " << M[j] 
-		   << " after transport\n";
+	      if (M[j] < -1e-18)
+		CERR << "\nBUG: M[" << j << "] = " << M[j] 
+		     << " after transport\n";
 	      M[j] = 0.0;
 	    }
 	  // We calculate new C by assumining instant absorption.

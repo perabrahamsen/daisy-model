@@ -14,7 +14,23 @@ release.
 
 * 1.74
 
-No user visible changes.
+** More flexible
+
+The character & in a dimension string in a log description will be
+replaced by "h" if you use "hourly" (with no arguments) as a log
+condition, "d" if you use "daily" (with no arguments) as a log
+condition, "w" if you use "weekly" (with no arguments) as a log
+condition, "m" if you use "monthly" (with no arguments) as a log
+condition, "y" if you use "yearly" (with no arguments) as a log
+condition, and "dt" otherwise.  All the standard log descriptions
+have been updated to use "&".
+
+This means that if you for example put
+
+  (output ("N Balance" (when weekly)))
+
+in your setup, "N Balance" will be logged weekly, and the flux
+dimensions will be correct.
 
 * 1.73
 

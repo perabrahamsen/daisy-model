@@ -46,10 +46,11 @@ struct SelectInterval : public Select
 	count = 0;
     }
   // Create and Destroy.
-  void initialize (const string_map conv, 
-		   double default_from, double default_to)
+  void initialize (const string_map& conv, 
+		   double default_from, double default_to, 
+		   const string& timestep)
     {
-      Select::initialize (conv, default_from, default_to);
+      Select::initialize (conv, default_from, default_to, timestep);
 
       // Set default range.
       if (default_from <= 0.0 && from > 0.0)

@@ -135,7 +135,13 @@ public:
 struct ConditionHourly : public Condition
 {
   const int step;
-public:
+  const string& timestep ()
+  { 
+    static const string timestep = "h";
+    if (step == 1)
+      return timestep;
+    return Condition::timestep ();
+  } 
   bool match (const Daisy& daisy) const
   { return ((24 * daisy.time.yday ()
 	     + (daisy.time.hour () + 1)) % step) == 0; }
@@ -152,7 +158,13 @@ public:
 struct ConditionDaily : public Condition
 {
   const int step;
-public:
+  const string& timestep ()
+  { 
+    static const string timestep = "d";
+    if (step == 1)
+      return timestep;
+    return Condition::timestep ();
+  } 
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 23 && (daisy.time.yday () % step) == 0; }
   void output (Log&) const
@@ -168,7 +180,13 @@ public:
 struct ConditionWeekly : public Condition
 {
   const int step;
-public:
+  const string& timestep ()
+  { 
+    static const string timestep = "w";
+    if (step == 1)
+      return timestep;
+    return Condition::timestep ();
+  } 
   bool match (const Daisy& daisy) const
   { return daisy.time.hour () == 23 && (daisy.time.week () % step) == 0; }
   void output (Log&) const
@@ -184,7 +202,13 @@ public:
 struct ConditionMonthly : public Condition
 {
   const int step;
-public:
+  const string& timestep ()
+  { 
+    static const string timestep = "m";
+    if (step == 1)
+      return timestep;
+    return Condition::timestep ();
+  } 
   bool match (const Daisy& daisy) const
   { 
     int month = daisy.time.month ();
@@ -207,7 +231,13 @@ public:
 struct ConditionYearly : public Condition
 {
   const int step;
-public:
+  const string& timestep ()
+  { 
+    static const string timestep = "y";
+    if (step == 1)
+      return timestep;
+    return Condition::timestep ();
+  } 
   bool match (const Daisy& daisy) const
   { 
     int year = daisy.time.year ();
@@ -231,7 +261,11 @@ public:
 struct ConditionHour : public Condition
 {
   const int at;
-public:
+  const string& timestep ()
+  { 
+    static const string timestep = "d";
+    return timestep;
+  } 
   bool match (const Daisy& daisy) const
     { return daisy.time.hour () == at; }
   void output (Log&) const
@@ -247,7 +281,6 @@ public:
 struct ConditionMDay : public Condition
 {
   const int at;
-public:
   bool match (const Daisy& daisy) const
     { return daisy.time.mday () == at; }
   void output (Log&) const

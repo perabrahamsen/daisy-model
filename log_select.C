@@ -170,7 +170,7 @@ LogSelect::LogSelect (const AttributeList& al)
 
       // Initialize entries.
   for (unsigned int i = 0; i < entries.size (); i++)
-    entries[i]->initialize (conv_map, from, to);
+    entries[i]->initialize (conv_map, from, to, condition.timestep ());
 }
 
   

@@ -10,6 +10,7 @@ struct SelectFlux : public Select
   double value;	
 
   // Output routines.
+#if 0
   void output_array (const string& name, const vector<double>& array, 
 		     const Geometry* geometry)
     { 
@@ -25,6 +26,7 @@ struct SelectFlux : public Select
 	  count++;
 	}
     }
+#endif
 
   // Print result at end of time step.
   void done (Destination& dest)

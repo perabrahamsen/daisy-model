@@ -13,6 +13,7 @@ class Condition
 public:
   const string name;
   static const char *const description;
+  virtual const string& timestep ();
 
   // Simulation.
 public:

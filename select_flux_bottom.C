@@ -20,7 +20,8 @@ struct SelectFluxBottom : public Select
 	{
 	  int index = ((height > 0.0) 
 		       ? geometry->size ()
-		       : geometry->interval_border (height));
+		       : min (geometry->interval_border (height) + 1,
+			      geometry->size ()));
 	  assert (array.size () > index);
 	  if (count == 0)	 
 	    value = array[index];	
@@ -42,10 +43,11 @@ struct SelectFluxBottom : public Select
 	count = 0;
     }
   // Create and Destroy.
-  void initialize (const string_map conv, 
-		   double default_from, double default_to)
+  void initialize (const string_map& conv, 
+		   double default_from, double default_to, 
+		   const string& timestep )
     {
-      Select::initialize (conv, default_from, default_to);
+      Select::initialize (conv, default_from, default_to, timestep);
 
       // Overwrite default height.
       if (default_to < 0.0)
