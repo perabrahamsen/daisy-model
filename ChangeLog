@@ -1,3 +1,7 @@
+2002-05-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.30 released.
+
 2002-05-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* treelog.h, treelog_dual.h, treelog_dual.C, treelog_stream.h,

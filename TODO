@@ -1,5 +1,15 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* daisy.log
+
+** Indsæt start og sluttidpunkt i daisy.log.
+
+Husk, det skal være efter (direactory "foo") er parset.
+
+** Indsæt kommandolineargumenter i daisy.log.
+
+** Sørg for at diskretisering kun kommer i daisy.log, ikke til skærm.
+
 * Reference manual:  udskriv alle default værdier.
 
 * User Manual
