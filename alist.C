@@ -12,9 +12,6 @@
 class Value
 {
 public:
-  // True if we could successfully merge values.
-  virtual bool merge (const Value*);
-  
   // Retrieve data (Singletons).
   virtual operator double () const
        throw (AttributeList::Invalid);
@@ -125,30 +122,6 @@ public:
     : value (*new Time (v))
   { };
 };
-
-// AttributeList is special, because further definitions are merged
-// rather than overwritten.
-class dValue<AttributeList> : public Value
-{
-  AttributeList& value;
-public:
-  bool merge (const Value* other)
-  {
-    value += *other;
-    return true;
-  }
-  operator const AttributeList& () const
-  { return value; }
-  dValue (AttributeList& v)
-    : value (v)
-  { };
-};
-
-bool 
-Value::merge (const Value*)
-{
-  return false;
-}
 
 Value::operator double () const
      throw (AttributeList::Invalid)
@@ -297,8 +270,6 @@ AttributeList::Implementation::add (string key, Value* value)
 
   if (i == values.end ())
     values[key] = value;
-  else if ((*i).second->merge (value))
-    delete value;
   else
     {
       // BUG: Memory leak: We can't delete the old value, as it might

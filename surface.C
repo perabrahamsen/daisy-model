@@ -47,10 +47,10 @@ Surface::accept_top (double water)
     {
       if (-water > minimal_matter_flux)
 	{
-	  InorganicMatter delta_matter (iom, (water * dt) / pond);
+	  InorganicMatter delta_matter (iom, (-water * dt) / pond);
 	  iom -= delta_matter;
 	  delta_matter /= dt;
-	  iom_flux += delta_matter;
+	  iom_flux -= delta_matter;
 	}
       pond += water * dt;
       return true;

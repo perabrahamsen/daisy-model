@@ -323,7 +323,10 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	    break;
 	  case Syntax::List: 
 	    {
-	      AttributeList& list = *new AttributeList ();
+	      AttributeList& list = (atts.check (name) 
+				     ? *new AttributeList (atts.list (name))
+				     : *new AttributeList ());
+	      
 	      load_list (list, syntax.syntax (name));
 	      atts.add (name, list);
 	      break;
