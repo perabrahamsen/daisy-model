@@ -184,9 +184,9 @@ void Geometry::add_layer (Syntax& syntax, const string& name)
   if (!layer.ordered ())
     {
       // Initialize as first call.
-      layer.add ("size", Syntax::Number, Syntax::Const);
+      layer.add ("end", Syntax::Number, Syntax::Const);
       layer.add ("value", Syntax::Number, Syntax::Const);
-      layer.order ("size", "value");
+      layer.order ("end", "value");
     }
   syntax.add (string ("initial_") + name, layer,
 	      Syntax::Optional, Syntax::Sequence);
@@ -210,7 +210,7 @@ void Geometry::initialize_layer (vector<double>& array,
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)
 	{
-	  const double next = last - layers[i]->number ("size");
+	  const double next = layers[i]->number ("end");
 	  const double value = layers[i]->number ("value");
 	  add (array, last, next, value);
 	  last = next;

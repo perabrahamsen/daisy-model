@@ -2,8 +2,6 @@
 
 Clear value også når der ikke er nogen match.
 
-* Status rapport med igangværende og fremtidge projekter.
-
 * Ændr Geometry::layers 
 
 Brug `end' i hvert lag i stedet for `size'.
@@ -83,12 +81,6 @@ input filen.
 ** Make plant competition work.
 
 ** Make output of OrganicMatter total_[NC] work.
-
-** Funktionshøst
-
-   HVIS crop(gras)->dm > tal ELLER crop(gras)->ds > tal SÅ høst.
-
-* Figure out why inline spec of specialized horizon doesn't work.
 
 * Make it possible to specify Soil geometry with dz.
 

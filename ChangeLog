@@ -1,3 +1,13 @@
+1998-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.018 released.
+
+1998-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* geometry.C (add_layer): Use layer `end' instead of `size' for
+	specifying layers.
+	(initialize_layer): Ditto.
+
 1998-03-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.017 released.
