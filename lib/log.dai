@@ -2,7 +2,7 @@
 
 (deflog "Total Soil Content" table
   (where "soil_content.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -112,7 +112,7 @@
 
 (deflog "Soil Nitrate Concentration" table
   (where "soil_nitrate_conc.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -122,7 +122,7 @@
 
 (deflog "Soil Temperature" table
   (where "soil_temperature.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -174,7 +174,7 @@
 
 (deflog "Daily Water Flux" table
   (where "daily_water_flux.tab")
-  (when (hour 0))
+  (when daily)
 ;  (array_separator " ")
   (entries (year (path time))
 	   (month (path time))
@@ -212,7 +212,7 @@
 
 (deflog "Surface Water Balance" table
   (where "surface_water_balance.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -299,7 +299,7 @@
 
 (deflog "Root Zone Water Balance" table
   (where "root_zone_water_balance.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -386,7 +386,7 @@
 
 (deflog "N Balance" table
   (where "N_balance.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -675,7 +675,7 @@
 
 (deflog "Soil Chemicals" table
   (where "soil_chemicals.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -722,10 +722,16 @@
 
 (deflog "Weather" table
   (where "weather.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
+	   (number (when hourly)
+		   (path weather "*" rain)
+		   (dimension "mm/d"))
+	   (number (when hourly)
+		   (path weather "*" snow)
+		   (dimension "mm/d"))
 	   (number (when hourly)
 		   (path weather "*" reference_evapotranspiration)
 		   (dimension "mm/d"))
@@ -898,7 +904,7 @@
 
 (deflog "Old Crop Production" table
   (where "old_crop_prod.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -939,7 +945,7 @@
 
 (deflog "Vegetation" table
   (where "vegetation.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -964,7 +970,7 @@
 
 (deflog "Permanent Vegetation" table
   (where "vegetation.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -1237,7 +1243,7 @@
 
 (deflog "Groundwater" table
   (where "groundwater.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
@@ -1315,7 +1321,7 @@
 
 (deflog AOM table
   (where "aom.tab")
-  (when (hour 0))
+  (when daily)
   (entries (year (path time))
 	   (month (path time))
 	   (mday (path time))
