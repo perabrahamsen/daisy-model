@@ -1,8 +1,6 @@
 // nitrification_soil.C
 
 #include "nitrification.h"
-#include "alist.h"
-#include "syntax.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_heat.h"
@@ -11,11 +9,14 @@
 #include "csmp.h"
 #include "mathlib.h"
 #include "log.h"
+#include "groundwater.h"
 
 class NitrificationSoil : public Nitrification
 {
   // Parameters.
 private: 
+  const bool active_underground; // True, iff turnover happens below rootzone.
+  const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double k;
   const double k_10;
 
@@ -26,7 +27,8 @@ private:
   // Simulation.
 public:
   void output (Log&, Filter&) const;
-  void tick (Soil&, SoilWater&, SoilHeat&, SoilNO3&, SoilNH4&);
+  void tick (const Soil&, const SoilWater&, const SoilHeat&, 
+	     SoilNO3&, SoilNH4&, const Groundwater&);
 
   // Create.
 public:
@@ -83,13 +85,20 @@ NitrificationSoil::output (Log& log, Filter& filter) const
 }
 
 void 
-NitrificationSoil::tick (Soil& soil, SoilWater& soil_water,
-			 SoilHeat& soil_heat,
-			 SoilNO3& soil_NO3, SoilNH4& soil_NH4)
+NitrificationSoil::tick (const Soil& soil, const SoilWater& soil_water,
+			 const SoilHeat& soil_heat,
+			 SoilNO3& soil_NO3, SoilNH4& soil_NH4,
+			 const Groundwater& groundwater)
 {
   converted.erase (converted.begin (), converted.end ());
 
-  for (unsigned int i = 0; i < soil.size (); i++)
+  unsigned int size = soil.size ();
+  if (!active_underground)
+    size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
+  if (!active_groundwater && !groundwater.flux_bottom ())
+    size = min (size, soil.interval_plus (groundwater.table ()));
+
+  for (unsigned int i = 0; i < size; i++)
     {
       const double M = soil_NH4.M (i);
       const double h = soil_water.h (i);
@@ -105,6 +114,8 @@ NitrificationSoil::tick (Soil& soil, SoilWater& soil_water,
 
 NitrificationSoil::NitrificationSoil (const AttributeList& al)
   : Nitrification (al.name ("type")),
+    active_underground (al.flag ("active_underground")),
+    active_groundwater (al.flag ("active_groundwater")),
     k (al.number ("k")),
     k_10 (al.number ("k_10"))
 { }
@@ -120,6 +131,10 @@ static struct NitrificationSoilSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
+      syntax.add ("active_underground", Syntax::Boolean, Syntax::Const);
+      alist.add ("active_underground", false);
+      syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const);
+      alist.add ("active_groundwater", false);
       syntax.add ("converted", Syntax::Number, Syntax::LogOnly, 
 		  Syntax::Sequence);
       syntax.add ("k", Syntax::Number, Syntax::Const);

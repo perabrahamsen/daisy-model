@@ -49,55 +49,139 @@ OM::output (Log& log, Filter& filter) const
 #endif
 }
 
+vector<double>
+OM::get_N () const
+{
+  assert (C_per_N.size () >= C.size ());
+  vector<double> N;
+  
+  for (unsigned i = 0; i < C.size (); i++)
+  {
+    assert (C_per_N[i] >= 0.0);
+    N.push_back (C[i] / C_per_N[i]);
+  }
+  return N;
+}
+
+void
+OM::set_N (vector<double>& N) 
+{
+  // Calculate C/N.
+  assert (N.size () == C.size ());
+  C_per_N.erase (C_per_N.begin (), C_per_N.end ());
+
+  for (unsigned i = 0; i < C.size (); i++)
+  {
+    if (C[i] == 0.0)
+      {
+	assert (N[i] == 0.0);
+	C_per_N.push_back (1.0); // Arbitrary.
+      }
+    else
+      {
+	assert (C[i] > 0.0);
+	assert (N[i] > 0.0);
+	C_per_N.push_back (C[i] / N[i]);
+      }
+  }
+}
+
 void 
 OM::mix (const Geometry& geometry, double from, double to, double penetration)
-{ 
+{
+  // Ignore tiny pools.
+  if (total_C (geometry) < 1e-20)
+    return;
+
+  // Calcaluate N.
+  vector<double> N = get_N ();
+
+  // Mix C.
   geometry.add (C, from, to, top_C * penetration);
   geometry.mix (C, from, to);
   top_C *= (1.0 - penetration);
+
+  // Mix N.
+  geometry.add (N, from, to, top_N * penetration);
+  geometry.mix (N, from, to);
+  top_N *= (1.0 - penetration);
+
+  // Calculate C/N.
+  set_N (N);
 }
 
 void 
 OM::distribute (const Geometry& geometry, const vector<double>& content)
 {
+  // Ignore empty pools.
+  if (top_C == 0.0)
+    return;
+
+  // Prepare.
+  assert (C.size () == content.size ());
   const double total = accumulate (content.begin (), content.end (), 0.0);
 
-  assert (C.size () == content.size ());
+  // Calcaluate N.
+  vector<double> N = get_N ();
 
+  // Distribute C.
   for (unsigned int i = 0; i < content.size (); i++)
     C[i] += top_C * content[i] / total / geometry.dz (i);
   top_C = 0;
+
+  // Distribute N.
+  for (unsigned int i = 0; i < content.size (); i++)
+    N[i] += top_N * content[i] / total / geometry.dz (i);
+  top_N = 0;
+
+  // Calculate C/N.
+  set_N (N);
 }
 
 void
 OM::swap (const Geometry& geometry, double from, double middle, double to)
 {
+  // Ignore tiny pools.
+  if (total_C (geometry) < 1e-20)
+    return;
+
+  // Calcaluate N.
+  vector<double> N = get_N ();
+
+  // Swap.
   geometry.swap (C, from, middle, to);
+  geometry.swap (N, from, middle, to);
+
+  // Calculate C/N.
+  set_N (N);
 }
 
 double 
 OM::total_C (const Geometry& geometry) const
 {
-  return geometry.total (C);
+  return geometry.total (C) + top_C;
 }
 
 double 
 OM::total_N (const Geometry& geometry) const
 {
   double total = 0.0;
-  const unsigned int size = min (C_per_N.size (), C.size ());
+  const unsigned int size = C.size ();
+  assert (C_per_N.size () >= size);
+
   for (unsigned int i = 0; i < size; i++)
     {
       assert (C_per_N[i] > 0.0);
       total += (C[i] / C_per_N[i]) * geometry.dz (i);
     }
-  return total;
+  return total + top_N;
 }
 
 void
 OM::pour (vector<double>& cc, vector<double>& nn)
 {
-  const unsigned int size = min (C.size (), C_per_N.size ());
+  const unsigned int size = C.size ();
+  assert (C_per_N.size () >= size);
   assert (cc.size () >= size);
   assert (nn.size () >= size);
   for (unsigned int i = 0; i < size; i++)
@@ -153,7 +237,7 @@ OM::add (const Geometry& geometry, // Add dead roots.
   // Make sure C/N is large enough.
   const int extra_C_per_N = density.size () - C_per_N.size ();
   if (extra_C_per_N > 0)
-    // It doesn't matter what number we use, ad C will be 0.
+    // It doesn't matter what number we use, add C will be 0.
     C_per_N.insert (C_per_N.begin (), extra_C_per_N, 1.0);
   
   // Make sure C is large enough.
@@ -187,7 +271,8 @@ OM::tock (unsigned int end, const double* factor,
 	  double fraction, double efficiency,
 	  const double* N_soil, double* N_used, double* CO2, OM& om)
 {
-  const unsigned int size = min (min (C_per_N.size (), C.size ()), end);
+  const unsigned int size = min (C.size (), end);
+  assert (C_per_N.size () >= size);
 
   // Maintenance.
   for (unsigned int i = 0; i < size; i++)
@@ -263,6 +348,8 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	  double* CO2, const vector<OM*>& smb, const vector<OM*>&som)
 {
   const unsigned int size = min (C.size (), end);
+  assert (C_per_N.size () >= size);
+
   for (unsigned int i = 0; i < size; i++)
     {
       assert (C[i] >= 0.0);
@@ -303,7 +390,8 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	  const double* N_soil, double* N_used,
 	  double* CO2, const vector<OM*>& smb, double* som_C, double* som_N)
 {
-  const unsigned int size = min (min (C.size (), C_per_N.size ()), end);
+  const unsigned int size = min (C.size (), end);
+  assert (C_per_N.size () >= size);
   
   // Maintenance.
   for (unsigned int i = 0; i < size; i++)

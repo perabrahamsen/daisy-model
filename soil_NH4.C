@@ -60,6 +60,7 @@ SoilNH4::load_syntax (Syntax& syntax, AttributeList& alist)
 
 SoilNH4::SoilNH4 (const Soil& soil, const SoilWater& soil_water,
 		  const AttributeList& al)
+  : Solute (al)
 { 
   Solute::initialize (soil, soil_water, al);
 }

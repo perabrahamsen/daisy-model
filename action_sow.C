@@ -31,6 +31,28 @@ public:
   }
   // Create and Destroy.
 private:
+  bool check (Daisy& daisy) const
+  { 
+    const string name = crop.name ("type");
+
+    // Does it exists?
+    const Library& library = Crop::library ();
+    if (!library.check (name))
+      {
+	cerr << "Cannot sow unknown crop `" << name << "'\n";
+	return false;
+      }
+
+    // Is it complete?
+    const Syntax& syntax = library.syntax (name);
+    if (!syntax.check (crop, name))
+      {
+	cerr << "Cannot sow incomplete crop `" << name << "'\n";
+	return false;
+      }
+
+    return true;
+  }
   friend class ActionSowSyntax;
   static Action& make (const AttributeList& al, const Action *const p)
   { return *new ActionSow (al, p); }

@@ -170,9 +170,13 @@ FilterSome::make (const AttributeList& al)
 FilterSome::FilterSome (const AttributeList& al)
   : accumulating_ (false)
 { 
-  AttributeList all_alist;
-  all_alist.add ("type", "all");
-  Filter& all = Librarian<Filter>::create (all_alist);
+  static Filter* all = NULL;
+  if (!all)
+    {
+      AttributeList all_alist;
+      all_alist.add ("type", "all");
+      all = &Librarian<Filter>::create (all_alist);
+    }
     
   const vector<const AttributeList*>& members = al.alist_sequence ("members");
   for (unsigned int i = 0; i < members.size (); i++)
@@ -188,7 +192,7 @@ FilterSome::FilterSome (const AttributeList& al)
 	    accumulating_ = true;
 	}
       else
-	add (name, all);
+	add (name, *all);
     }
 }
 

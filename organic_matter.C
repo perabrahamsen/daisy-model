@@ -24,6 +24,7 @@
 struct OrganicMatter::Implementation
 {
   // Content.
+  const bool active_underground; // True, iff turnover happens below rootzone.
   const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double K_NH4;		// Immobilization rate of NH4.
   const double K_NO3;		// Immobilization rate of NO3.
@@ -195,7 +196,7 @@ OrganicMatter::Implementation::Buffer::Buffer (const Soil& soil,
     turnover_rate (al.number ("turnover_rate")),
     where (al.integer ("where"))
 { 
-  const unsigned int size = soil.interval_plus (soil.MaxRootingDepth ());
+  const unsigned int size = soil.size ();
   // Make sure the vectors are large enough.
   while (N.size () < size)
     N.push_back (0.0);
@@ -336,8 +337,10 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     }
 
   // Setup arrays.
-  unsigned int size = soil.interval_plus (soil.MaxRootingDepth ());
-  if (active_groundwater && !groundwater.flux_bottom ())
+  unsigned int size = soil.size ();
+  if (!active_underground)
+    size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
+  if (!active_groundwater && !groundwater.flux_bottom ())
     size = min (size, soil.interval_plus (groundwater.table ()));
 
   vector<double> N_soil (size);
@@ -361,7 +364,6 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 	* water_turnover_factor (soil_water.h (i));
       clay_factor[i] = abiotic_factor[i] * clay_turnover_factor [i];
     }
-
   // Main processing.
   smb[0]->tick (size, &clay_factor[0],
 		&N_soil[0], &N_used[0], &CO2[0], smb, som);
@@ -435,7 +437,8 @@ OrganicMatter::Implementation::swap (const Soil& soil,
 
 OrganicMatter::Implementation::Implementation (const Soil& soil, 
 					       const AttributeList& al)
-  : active_groundwater (al.flag ("active_groundwater")),
+  : active_underground (al.flag ("active_underground")),
+    active_groundwater (al.flag ("active_groundwater")),
     K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
     am (map_create1 <AM, const Soil&> (al.alist_sequence ("am"), soil)),
@@ -802,6 +805,8 @@ template class add_submodule<OM>;
 void
 OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
+  syntax.add ("active_underground", Syntax::Boolean, Syntax::Const);
+  alist.add ("active_underground", false);
   syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const);
   alist.add ("active_groundwater", true);
   syntax.add ("K_NH4", Syntax::Number, Syntax::Const);

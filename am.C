@@ -431,7 +431,7 @@ AM::create (const Geometry& geometry, const Time& time,
   return *am;
 }
 
-AM::AM (const Geometry& geometry, const Time& t, 
+AM::AM (const Geometry& /* geometry */, const Time& t, 
 	vector<const AttributeList*> ol,
 	const string sort, const string part)
   : impl (*new Implementation (t, 

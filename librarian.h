@@ -62,6 +62,10 @@ public:
     assert (content);
     return content->lib;
   }
+  static void add_library (Syntax& syntax, const string name)
+  {
+    syntax.add_library (name, library (), &derive_type);
+  }
 
   // Create and Destroy.
 public:

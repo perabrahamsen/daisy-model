@@ -21,7 +21,7 @@ MIKEFLAGS=
 SPARCSRC = set_exceptions.S
 SPARCOBJ = set_exceptions.o
 CC = /pack/egcs/bin/c++ -Wall -fno-exceptions -DEGCS -g -pipe $(MIKEFLAGS) -frepo -pg #-O3 -ffast-math -mcpu=ultrasparc
-#CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -pipe $(MIKEFLAGS) -frepo -O3 -ffast-math -mv8 -pg
+#CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -pipe $(MIKEFLAGS) -frepo #-O3 -ffast-math -mv8 -pg
 # CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
 MATHLIB = -lm
 
@@ -42,14 +42,15 @@ SRCONLY = filter_array.C filter_all.C filter_none.C filter_some.C \
 	weather_none.C action_fertilize.C weather_file.C action_tillage.C \
 	action_harvest.C hydraulic_old.C $(MIKEONLY) crop_old.C crop_sold.C \
 	action_with.C hydraulic_old2.C nitrification_soil.C \
-	nitrification_solute.C hydraulic_mod_C.C uzlr.C
+	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
+	transport_none.C transport_convection.C
 OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
 	filter.C csmp.C time.C uzmodel.C parser_file.C hydraulic.C \
 	soil.C mathlib.C bioclimate.C surface.C soil_water.C \
 	soil_NH4.C soil_NO3.C organic_matter.C nitrification.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
-	am.C im.C om.C harvest.C $(MIKESHE) options.C geometry.C
+	am.C im.C om.C harvest.C $(MIKESHE) options.C geometry.C transport.C
 OBJ = $(SRCONLY:.C=.o) $(OBJECTS:.C=.o) $(SPARCOBJ)
 SRC = $(SRCONLY) $(OBJECTS) $(SPARCSRC) 
 HEAD = $(OBJECTS:.C=.h) common.h librarian.h
@@ -162,9 +163,9 @@ column_std.o: column_std.C column.h librarian.h library.h common.h \
  denitrification.h log.h filter.h am.h
 weather_simple.o: weather_simple.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h log.h filter.h
-uzrichard.o: uzrichard.C uzmodel.h common.h soil.h horizon.h \
- hydraulic.h geometry.h mathlib.h alist.h syntax.h filter.h \
- librarian.h library.h log.h
+uzrichard.o: uzrichard.C uzmodel.h librarian.h library.h common.h \
+ alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h mathlib.h \
+ filter.h log.h
 hydraulic_yolo.o: hydraulic_yolo.C hydraulic.h common.h syntax.h \
  alist.h csmp.h
 hydraulic_M_vG.o: hydraulic_M_vG.C hydraulic.h common.h syntax.h \
@@ -177,8 +178,8 @@ hydraulic_M_BaC.o: hydraulic_M_BaC.C hydraulic.h common.h syntax.h \
  alist.h
 hydraulic_B_BaC.o: hydraulic_B_BaC.C hydraulic.h common.h syntax.h \
  alist.h
-groundwater_static.o: groundwater_static.C groundwater.h time.h \
- common.h uzmodel.h syntax.h alist.h
+groundwater_static.o: groundwater_static.C groundwater.h uzmodel.h \
+ librarian.h library.h common.h alist.h syntax.h
 horizon_std.o: horizon_std.C horizon.h common.h syntax.h alist.h
 crop_std.o: crop_std.C crop.h time.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h csmp.h bioclimate.h column.h \
@@ -228,13 +229,24 @@ hydraulic_old2.o: hydraulic_old2.C hydraulic.h common.h options.h \
 nitrification_soil.o: nitrification_soil.C nitrification.h librarian.h \
  library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
  geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
- csmp.h mathlib.h log.h filter.h
+ csmp.h mathlib.h log.h filter.h groundwater.h uzmodel.h
 nitrification_solute.o: nitrification_solute.C nitrification.h \
  librarian.h library.h common.h alist.h syntax.h soil.h horizon.h \
  hydraulic.h geometry.h soil_water.h soil_heat.h soil_NH4.h solute.h \
- soil_NO3.h csmp.h log.h filter.h mathlib.h
+ soil_NO3.h csmp.h log.h filter.h mathlib.h groundwater.h uzmodel.h
 hydraulic_mod_C.o: hydraulic_mod_C.C hydraulic.h common.h syntax.h \
  alist.h
+uzlr.o: uzlr.C uzmodel.h librarian.h library.h common.h alist.h \
+ syntax.h soil.h horizon.h hydraulic.h geometry.h log.h filter.h
+transport_cd.o: transport_cd.C transport.h librarian.h library.h \
+ common.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
+ soil_water.h solute.h log.h filter.h mathlib.h
+transport_none.o: transport_none.C transport.h librarian.h library.h \
+ common.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
+ soil_water.h solute.h log.h filter.h mathlib.h
+transport_convection.o: transport_convection.C transport.h librarian.h \
+ library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
+ geometry.h soil_water.h solute.h log.h filter.h mathlib.h
 main.o: main.C daisy.h common.h parser_file.h parser.h syntax.h \
  alist.h
 daisy.o: daisy.C daisy.h common.h weather.h librarian.h library.h \
@@ -262,7 +274,8 @@ filter.o: filter.C filter.h librarian.h library.h common.h alist.h \
 csmp.o: csmp.C csmp.h common.h log.h filter.h librarian.h library.h \
  alist.h syntax.h
 time.o: time.C time.h common.h
-uzmodel.o: uzmodel.C uzmodel.h common.h library.h alist.h syntax.h
+uzmodel.o: uzmodel.C uzmodel.h librarian.h library.h common.h alist.h \
+ syntax.h
 parser_file.o: parser_file.C parser_file.h parser.h common.h options.h \
  syntax.h alist.h library.h csmp.h log.h filter.h librarian.h
 hydraulic.o: hydraulic.C hydraulic.h common.h library.h alist.h \
@@ -274,8 +287,8 @@ bioclimate.o: bioclimate.C bioclimate.h column.h librarian.h library.h \
  common.h alist.h syntax.h surface.h uzmodel.h im.h weather.h crop.h \
  csmp.h soil.h horizon.h hydraulic.h geometry.h snow.h log.h filter.h \
  mike_she.h
-surface.o: surface.C surface.h uzmodel.h common.h im.h syntax.h \
- alist.h soil_water.h log.h filter.h librarian.h library.h am.h \
+surface.o: surface.C surface.h uzmodel.h librarian.h library.h \
+ common.h alist.h syntax.h im.h soil_water.h log.h filter.h am.h \
  mathlib.h mike_she.h
 soil_water.o: soil_water.C soil_water.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h uzmodel.h soil.h horizon.h \
@@ -288,25 +301,25 @@ soil_NO3.o: soil_NO3.C soil_NO3.h solute.h common.h soil_water.h \
 organic_matter.o: organic_matter.C organic_matter.h syntax.h common.h \
  alist.h log.h filter.h librarian.h library.h am.h om.h soil.h \
  horizon.h hydraulic.h geometry.h soil_water.h soil_NH4.h solute.h \
- soil_NO3.h soil_heat.h mathlib.h csmp.h
+ soil_NO3.h soil_heat.h groundwater.h uzmodel.h mathlib.h csmp.h
 nitrification.o: nitrification.C nitrification.h librarian.h library.h \
  common.h alist.h syntax.h
 denitrification.o: denitrification.C denitrification.h common.h \
  alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h soil_water.h \
- soil_heat.h organic_matter.h soil_NO3.h solute.h csmp.h log.h \
- filter.h librarian.h library.h
+ soil_heat.h organic_matter.h soil_NO3.h solute.h groundwater.h \
+ uzmodel.h librarian.h library.h csmp.h log.h filter.h
 soil_heat.o: soil_heat.C soil_heat.h alist.h common.h surface.h \
- uzmodel.h im.h groundwater.h soil_water.h soil.h horizon.h \
- hydraulic.h geometry.h syntax.h mathlib.h log.h filter.h librarian.h \
- library.h
-groundwater.o: groundwater.C groundwater.h time.h common.h uzmodel.h \
- library.h alist.h syntax.h
+ uzmodel.h librarian.h library.h syntax.h im.h groundwater.h \
+ soil_water.h soil.h horizon.h hydraulic.h geometry.h mathlib.h log.h \
+ filter.h
+groundwater.o: groundwater.C groundwater.h uzmodel.h librarian.h \
+ library.h common.h alist.h syntax.h
 snow.o: snow.C snow.h alist.h common.h syntax.h log.h filter.h \
  librarian.h library.h soil.h horizon.h hydraulic.h geometry.h \
  soil_water.h soil_heat.h mathlib.h mike_she.h
 solute.o: solute.C solute.h common.h log.h filter.h librarian.h \
  library.h alist.h syntax.h soil.h horizon.h hydraulic.h geometry.h \
- soil_water.h mathlib.h
+ soil_water.h mathlib.h transport.h
 am.o: am.C am.h common.h om.h im.h library.h alist.h syntax.h log.h \
  filter.h librarian.h geometry.h mathlib.h
 im.o: im.C im.h log.h filter.h librarian.h library.h common.h alist.h \
@@ -317,4 +330,6 @@ harvest.o: harvest.C harvest.h time.h common.h syntax.h log.h filter.h \
  librarian.h library.h alist.h
 options.o: options.C options.h common.h
 geometry.o: geometry.C geometry.h common.h syntax.h alist.h mathlib.h
+transport.o: transport.C transport.h librarian.h library.h common.h \
+ alist.h syntax.h
 set_exceptions.o: set_exceptions.S

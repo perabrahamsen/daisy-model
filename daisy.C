@@ -155,37 +155,26 @@ template class add_submodule<Harvest>;
 void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  // Libraries.
   syntax.add_library ("defcrop", Crop::library (), &Crop::derive_type);
-  syntax.add_library ("defhorizon", Horizon::library (), &Horizon::derive_type);
-  syntax.add_library ("defcolumn",
-		      Librarian<Column>::library (),
-		      &Librarian<Column>::derive_type);
-  syntax.add_library ("deflog", 
-		    Librarian<Log>::library (), 
-		    &Librarian<Log>::derive_type);
+  syntax.add_library ("defhorizon", Horizon::library (), 
+		      &Horizon::derive_type);
+  
+  Librarian<Column>::add_library (syntax, "defcolumn");
+  Librarian<Log>::add_library (syntax, "deflog");
   syntax.add_library ("defparser", Parser::library (), &Parser::derive_type);
   syntax.add_library ("defam", AM::library (), &AM::derive_type);
-  // These are mostly for making 
+
   syntax.add_library ("defaction", Action::library (), &Action::derive_type);
-  syntax.add_library ("defcondition",
-		    Librarian<Condition>::library (),
-		    &Librarian<Condition>::derive_type);
-  syntax.add_library ("defweather", 
-		    Librarian<Weather>::library (), 
-		    Librarian<Weather>::derive_type);
-  syntax.add_library ("defgroundwater",
-		      Librarian<Groundwater>::library (),
-		      &Librarian<Groundwater>::derive_type);
-  syntax.add_library ("defuzmodel", Librarian<UZmodel>::library (), 
-		      &Librarian<UZmodel>::derive_type);
-  syntax.add_library ("defhydraulic",
-		    Hydraulic::library (), &Hydraulic::derive_type);
-  syntax.add_library ("defnitrification", 
-		    Librarian<Nitrification>::library (),
-		    &Librarian<Nitrification>::derive_type);
-  syntax.add_library ("deffilter", 
-		    Librarian<Filter>::library (),
-		    &Librarian<Filter>::derive_type);
+  Librarian<Condition>::add_library (syntax, "defcondition");
+  Librarian<Weather>::add_library (syntax, "defweather");
+  Librarian<Groundwater>::add_library (syntax, "defgroundwater");
+  Librarian<UZmodel>::add_library (syntax, "defuzmodel");
+  syntax.add_library ("defhydraulic", 
+		      Hydraulic::library (), &Hydraulic::derive_type);
+  Librarian<Nitrification>::add_library (syntax, "defnitrification");
+  Librarian<Filter>::add_library (syntax, "deffilter");
+
   // The actual data.
   syntax.add ("output", Librarian<Log>::library (),
 	      Syntax::Const, Syntax::Sequence);
@@ -193,7 +182,8 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 	      Syntax::Singleton);
   syntax.add ("manager", Action::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::State);
-  syntax.add ("column", Librarian<Column>::library (), 
+  syntax.add ("column",
+	      Librarian<Column>::library (), 
 	      Syntax::State, Syntax::Sequence);
   syntax.add ("weather", Librarian<Weather>::library ());
   syntax.add ("groundwater", Librarian<Groundwater>::library (), 

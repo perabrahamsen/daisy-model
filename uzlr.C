@@ -3,6 +3,7 @@
 #include "uzmodel.h"
 #include "soil.h"
 #include "log.h"
+#include "mathlib.h"
 
 class UZlr : public UZmodel
 {
@@ -98,14 +99,14 @@ UZlr::tick (const Soil& soil,
   assert (ok);
 
   // Use darcy for upward movement in the top.
-  const bool use_darcy = (h[0] < h_fc) && (q_up > 0.0);
+  const bool use_darcy = (h_old[0] < h_fc) && (q_up > 0.0);
   const int to_darcy = soil.interval (z_top);
 
   // Intermediate nodes.
   for (int i = first; i <= last; i++)
     {
       const double dz = soil.dz (i);
-      const double Theta_new = Theta[i] - q[i] * dt / dz;
+      const double Theta_new = Theta_old[i] - q[i] * dt / dz - S[i] * dt;
       const double h_new = soil.h (i, Theta_new);
       const double K_new = soil.K (i, h_new);
 
@@ -113,7 +114,7 @@ UZlr::tick (const Soil& soil,
 	// Dry earth, near top.  Use darcy to move water up.
 	{
 	  const double dist = soil.z (i) - soil.z (i+1);
-	  q[i+1] = max (K_new * ((h[i+1] - h_new) / dist - 1.0), 0.0);
+	  q[i+1] = max (K_new * ((h_old[i+1] - h_new) / dist - 1.0), 0.0);
 	  Theta[i] = Theta_new + q[i+1] * dt / dz;
 	  h[i] = soil.h (i, Theta[i]);
 	}
@@ -157,6 +158,12 @@ UZlr::tick (const Soil& soil,
   q_down = q[last + 1];
   const bool accepted = bottom.accept_bottom (q[last + 1]);
   assert (accepted);
+
+  // Check mass conservation.
+  assert (approximate (soil.total (Theta_old)
+		       - q_up * dt + q_down * dt
+		       - soil.total (S), 
+		       soil.total (Theta)));
 }
 
 void

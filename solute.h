@@ -13,6 +13,7 @@ struct Syntax;
 struct AttributeList;
 struct Soil;
 struct SoilWater;
+struct Transport;
 
 class Solute
 {
@@ -23,15 +24,11 @@ protected:
 
   // Flux variables.
 protected:
-  vector<double> S;		// Sink-source term 
-  vector<double> J;		// Flux density 
-
-  // FYI variables.
-  double ddt;			// Calculated time step.
+  vector<double> S;		// Sink-source term.
+  Transport& transport;		// Solute transport.
 
 public:
   virtual double diffusion_coefficient () const = 0; // in free solu. 
-protected:
   virtual double C_to_M (const Soil&, double Theta, int i, double C) const = 0;
   virtual double M_to_C (const Soil&, double Theta, int i, double M) const = 0;
 
@@ -64,7 +61,7 @@ public:
   // Create and destroy.
 protected:
   static void load_syntax (Syntax&, AttributeList&);
-  Solute ();
+  Solute (const AttributeList& al);
   void initialize (const Soil&, const SoilWater&, const AttributeList&);
 public:
   virtual ~Solute ();

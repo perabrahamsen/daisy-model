@@ -1005,7 +1005,7 @@ CropStandard::SoluteUptake (const Soil& soil,
       const double C_l = solute.C (i);
       const double Theta = soil_water.Theta_old (i);
       const double L = root_density[i];
-      if (L > 0)
+      if (L > 0 && soil_water.h (i) <= 0.0)
 	{
 	  const double q_r = S[i] / L;
 	  const double D = solute.diffusion_coefficient ()
@@ -1048,7 +1048,7 @@ CropStandard::SoluteUptake (const Soil& soil,
   for (int i = 0; i < size; i++)
     {
       const double L = root_density[i];
-      if (solute.M_left (i) > 1e-8 && L > 0)
+      if (solute.M_left (i) > 1e-8 && L > 0 && soil_water.h (i) <= 0.0)
 	uptake[i] = max (0.0, 
 			 min (L * (min (I_zero[i], I_max)
 				   - B_zero[i] * c_root),
@@ -2001,7 +2001,10 @@ CropStandard::harvest (const string column_name,
       // Update and unlock locked AMs.
       if (var.Prod.AM_root)
 	{
-	  var.Prod.AM_root->add (geometry, WRoot * C_Root, NRoot, density);
+	  if (geometry.total (density) > 0.0)
+	    var.Prod.AM_root->add (geometry, WRoot * C_Root, NRoot, density);
+	  else
+	    var.Prod.AM_root->add (WRoot * C_Root, NRoot);
 	  var.Prod.AM_root->unlock ();
 	  var.Prod.AM_root = NULL;
 	}

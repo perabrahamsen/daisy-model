@@ -58,6 +58,7 @@ SoilNO3::load_syntax (Syntax& syntax, AttributeList& alist)
 
 SoilNO3::SoilNO3 (const Soil& soil, const SoilWater& soil_water,
 		  const AttributeList& al)
+  : Solute (al)
 { 
   Solute::initialize (soil, soil_water, al);
 }

@@ -15,11 +15,14 @@ class OrganicMatter;
 class CSMP;
 class Log;
 class Filter;
+class Groundwater;
 
 class Denitrification
 {
   // Parameters.
 private: 
+  const bool active_underground; // True, iff turnover happens below rootzone.
+  const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double K;
   const double alpha;
 
@@ -30,7 +33,8 @@ private:
   // Simulation.
 public:
   void output (Log&, Filter&) const;
-  void tick (Soil&, SoilWater&, SoilHeat&, SoilNO3&, OrganicMatter&);
+  void tick (const Soil&, const SoilWater&, const SoilHeat&, SoilNO3&,
+	     const OrganicMatter&, const Groundwater&);
 
   // Create.
 public:

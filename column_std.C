@@ -81,17 +81,9 @@ public:
 void
 ColumnStandard::sow (const AttributeList& crop)
 {
-  string name = crop.name ("type");
-  if (!Crop::library ().check (name))
-    cerr << "Cannot sow unknown crop `" << name << "'\n";
-  else if (!Crop::library ().syntax (name).check (crop, name))
-    cerr << "Cannot sow incomplete crop `" << name << "'\n";
-  else
-    {
-      assert (crops.size () == 0); // Multiple crops not implemented.
-      crops.push_back (Crop::create (crop, soil.size ()));
-      assert (crops.size () == 1); // Multiple crops not implemented.
-    }
+  assert (crops.size () == 0); // Multiple crops not implemented.
+  crops.push_back (Crop::create (crop, soil.size ()));
+  assert (crops.size () == 1); // Multiple crops not implemented.
 }
 
 void 
@@ -280,8 +272,10 @@ ColumnStandard::tick (const Time& time,
 		   soil_heat, soil_water, soil_NH4, soil_NO3);
   organic_matter.tick (soil, soil_water, soil_heat, groundwater, 
 		       soil_NO3, soil_NH4);
-  nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
-  denitrification.tick (soil, soil_water, soil_heat, soil_NO3, organic_matter);
+  nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4,
+		      groundwater);
+  denitrification.tick (soil, soil_water, soil_heat, soil_NO3, 
+			organic_matter, groundwater);
 
   // Transport.
   soil_water.tick (surface, groundwater, soil);

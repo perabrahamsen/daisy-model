@@ -25,11 +25,14 @@ public:
   double top_C;			// Carbon on the ground.
   double top_N;			// Nitrogen on the ground;
   vector<double> C;		// Carbon in each node.
-  /* const */ vector<double> C_per_N;	// Ratio of carbon per nitrogen.
+  vector<double> C_per_N;	// Ratio of carbon per nitrogen.
   const double turnover_rate;	// How fast this is it turned over?
   const vector <double> efficiency;	// How digestible is this?
   const double maintenance;	// How fast does it eat itself?
   const vector<double> fractions;	// How much is turned into SMB and SOM?
+private:
+  vector<double> get_N () const;
+  void set_N (vector<double>&);
 
   // Simulation.
 public:

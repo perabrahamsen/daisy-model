@@ -8,6 +8,7 @@
 #include "soil_heat.h"
 #include "organic_matter.h"
 #include "soil_NO3.h"
+#include "groundwater.h"
 #include "csmp.h"
 #include "log.h"
 
@@ -41,13 +42,21 @@ Denitrification::output (Log& log, Filter& filter) const
   log.output ("converted", filter, converted, true);
 }
 
-void Denitrification::tick (Soil& soil, SoilWater& soil_water,
-			  SoilHeat& soil_heat,
-			  SoilNO3& soil_NO3, OrganicMatter& organic_matter)
+void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
+			    const SoilHeat& soil_heat,
+			    SoilNO3& soil_NO3, 
+			    const OrganicMatter& organic_matter,
+			    const Groundwater& groundwater)
 {
   converted.erase (converted.begin (), converted.end ());
 
-  for (unsigned int i = 0; i < soil.size (); i++)
+  unsigned int size = soil.size ();
+  if (!active_underground)
+    size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
+  if (!active_groundwater && !groundwater.flux_bottom ())
+    size = min (size, soil.interval_plus (groundwater.table ()));
+
+  for (unsigned int i = 0; i < size; i++)
     {
       const double CO2 = organic_matter.CO2 (i);
       const double Theta = soil_water.Theta (i);
@@ -61,14 +70,20 @@ void Denitrification::tick (Soil& soil, SoilWater& soil_water,
 }
 
 void
-Denitrification::load_syntax (Syntax& syntax, AttributeList&)
+Denitrification::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add ("active_underground", Syntax::Boolean, Syntax::Const);
+  alist.add ("active_underground", false);
+  syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const);
+  alist.add ("active_groundwater", true);
   syntax.add ("converted", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("K", Syntax::Number, Syntax::Const);
   syntax.add ("alpha", Syntax::Number, Syntax::Const);
 }
 
 Denitrification::Denitrification (const AttributeList& al)
-  : K (al.number ("K")),
+  : active_underground (al.flag ("active_underground")),
+    active_groundwater (al.flag ("active_groundwater")),
+    K (al.number ("K")),
     alpha (al.number ("alpha"))
 { }

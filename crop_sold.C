@@ -925,11 +925,11 @@ CropSold::EpFac () const
 
 double
 CropSold::SoluteUptake (const Soil& soil,
-			    const SoilWater& soil_water,
-			    Solute& solute,
-			    double PotNUpt,
-			    vector<double>& uptake,
-			    double I_max, double r_root)
+			const SoilWater& soil_water,
+			Solute& solute,
+			double PotNUpt,
+			vector<double>& uptake,
+			double I_max, double r_root)
 {
   PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
   const vector<double>& root_density = var.RootSys.Density;
@@ -946,7 +946,7 @@ CropSold::SoluteUptake (const Soil& soil,
       const double C_l = solute.C (i);
       const double Theta = soil_water.Theta_old (i);
       const double L = root_density[i];
-      if (L > 0)
+      if (L > 0 && soil_water.h (i) <= 0.0)
 	{
 	  const double q_r = S[i] / L;
 	  const double D = solute.diffusion_coefficient ()
@@ -989,7 +989,7 @@ CropSold::SoluteUptake (const Soil& soil,
   for (int i = 0; i < size; i++)
     {
       const double L = root_density[i];
-      if (L > 0)
+      if (L > 0  && soil_water.h (i) <= 0.0)
 	uptake[i] = max (0.0, 
 			 min (L * (min (I_zero[i], I_max)
 				   - B_zero[i] * c_root),
@@ -1853,7 +1853,10 @@ CropSold::harvest (const string column_name,
   if (WRoot > 0.0)
     {
       AM& am = AM::create (geometry, time, Root, name, "root");
-      am.add (geometry, WRoot * C_Root, NRoot, density);
+      if (geometry.total (density) > 0.0)
+	am.add (geometry, WRoot * C_Root, NRoot, density);
+      else
+	am.add (WRoot * C_Root, NRoot);
       organic_matter.add (am);
     }
   return *new Harvest (column_name, time, name, 
