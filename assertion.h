@@ -40,11 +40,11 @@ namespace Assertion
 
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
 #define daisy_assert(condition) \
-  if (!(condition)) \
+  while (!(condition)) \
     Assertion::failure (__FILE__, __LINE__, NULL, #condition)
 #else
 #define daisy_assert(condition) \
-  if (!(condition)) \
+  while (!(condition)) \
     Assertion::failure (__FILE__, __LINE__, __FUNCTION__, #condition)
 #endif
 
