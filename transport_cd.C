@@ -146,7 +146,13 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 #endif
       if (soil_water.q (0) < 0.0)
 	// Normal condition, stuff is in solute.
-	C_top = J_in / soil_water.q (0);
+	if (J_in < 0.0)
+	  C_top = J_in / soil_water.q (0);
+	else
+	  {
+	    S_top = -J_in / soil.dz (0);
+	    J_in = 0.0;
+	  }
       else
 	{
 	  // This should only happen if Surface::total_matter_flux.

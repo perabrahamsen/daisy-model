@@ -1,14 +1,22 @@
+* Stof chemicals ned i jord via macropores.
+
+1. Lav setup + log for surface chemicals.  gem resultat af kørsel.
+
+2. Flyt surface chemcials fra bioclimate til surface.
+
+3. opdater log, check at resultat er det samme.
+
+4. Implementer matrix indtrænging.  sammenlign resultat.
+
+5. Implementer macro indtrænging. sammenlign resultat.
+
+6. Implementer mixture.  sammenlign resultat.
+
+* Transpiration/Water Uptake component
+
 * Nyt `misc' katalog med de to dhi scripts.
 
-* An `assert CONDITION' action.
-
-Gives an error if CONDITION is not true.
-
-* LogTable: Gør det muligt at logge min/max værdier i tidsinterval.
-
 * Earthworms and AM
-
-* Stof chemicals ned i jord via macropores.
 
 * Merge små AM til særlig "rest-am" pulje som ikke forsvinder.
 

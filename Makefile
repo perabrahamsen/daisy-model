@@ -198,7 +198,8 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all components of some library.
 #
-COMPONENTS = weather_std.C \
+COMPONENTS = select_min.C \
+	select_max.C select_average.C action_message.C weather_std.C \
 	select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
 	select_index.C select_content.C select_interval.C select_flux.C \
 	select_number.C select_date.C select_array.C log_table.C \

@@ -68,8 +68,17 @@ SoilWater::Theta (const Soil& soil, int i, double h) const
 { return soil.Theta (i, h, h_ice_[i]); }
 
 void
-SoilWater::tick (Surface& surface, Groundwater& groundwater,
-		 const Soil& soil)
+SoilWater::macro_tick (const Soil& soil, Surface& surface)
+{
+  // Calculate preferential flow first.
+  fill (S_p_.begin (), S_p_.end (), 0.0);
+  fill (q_p_.begin (), q_p_.end (), 0.0);
+  macro.tick (soil, 0, soil.size () - 1, surface, h_ice_, h_, Theta_,
+	      S_sum_, S_p_, q_p_);
+}
+
+void
+SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
 {
   // Ice first.
   for (unsigned int i = 0; i < soil.size (); i++)
@@ -135,12 +144,6 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 
   // Limit for ponding.
   const int first = 0;
-
-  // Calculate preferential flow first.
-  fill (S_p_.begin (), S_p_.end (), 0.0);
-  fill (q_p_.begin (), q_p_.end (), 0.0);
-  macro.tick (soil, first, last, surface, h_ice_, h_, Theta_,
-	      S_sum_, S_p_, q_p_);
 
   // Calculate matrix flow next.
   try

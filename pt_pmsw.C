@@ -1567,8 +1567,7 @@ public:
 	double  potential_transpiration_ ;
 // return Lel in mm/hr, i.e. (1/680) 1 W/m**2 = 0.001471 mm/hr
   	double potential_transpiration () const
-        { return /* potential_transpiration_ */ 0.001471*lel_pot; }
-    	{ return potential_transpiration_; }
+	{ return /* potential_transpiration_ */ 0.001471*lel_pot; }
 
 void tick (const Weather& weather, const Vegetation& crops,
 	const Surface& surface, const Soil& soil, const SoilHeat& soil_heat,

@@ -65,11 +65,11 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
 {
   if (pond > 1e-6 && R_mixing > 0.0)
     {
-      // [g/cm^2/h] = ([g/cm^2/mm] - [g/cm^2] / [mm]) * [mm/h]
+      // [g/cm^2/h] = ([g/cm^2/mm] - [g/cm^2] / [mm]) / [h/mm]
       im_flux.NO3 = max (-im.NO3 / dt,
-			 (soil_im.NO3 - im.NO3 / pond) * R_mixing);
+			 (soil_im.NO3 - im.NO3 / pond) / R_mixing);
       im_flux.NH4 = max (-im.NH4 / dt,
-			 (soil_im.NH4 - im.NH4 / pond) * R_mixing);
+			 (soil_im.NH4 - im.NH4 / pond) / R_mixing);
       im += im_flux * dt;
     }
   else
@@ -402,9 +402,9 @@ Amount of water runoff from ponding this hour.");
 Inorganic nitrogen on the surface [g/cm^2].");
   add_submodule<IM> ("IM_runoff", syntax, alist, Syntax::LogOnly, "\
 Inorganic nitrogen on the runoff water this hour [g/cm^2].");
-  syntax.add ("R_mixing", "mm/h", Syntax::Const, "\
+  syntax.add ("R_mixing", "h/mm", Syntax::Const, "\
 Resistance to mixing inorganic N between soil and ponding.");
-  alist.add ("R_mixing", 0.0);
+  alist.add ("R_mixing", 1.0e9);
 }
 
 Surface::Surface (const AttributeList& al)

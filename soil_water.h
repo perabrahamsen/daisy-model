@@ -84,7 +84,8 @@ public:
  
   // Simulation.
 public:
-  void tick (Surface&, Groundwater&, const Soil&);
+  void macro_tick (const Soil&, Surface&);
+  void tick (const Soil&, Surface&, Groundwater&);
   void mix (const Soil&, double from, double to);
   void swap (const Soil&, double from, double middle, double to);
   bool check (unsigned n) const;

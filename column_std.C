@@ -286,11 +286,14 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   soil_chemicals.clear ();
   soil_NO3.clear ();
   soil_NH4.clear ();
+
+  // Early calculation.
   IM soil_top_conc;
-  soil_top_conc.NO3 = soil_NO3.C (0);
-  soil_top_conc.NH4 = soil_NH4.C (0);
+  soil_top_conc.NO3 = soil_NO3.C (0) / 10.0; // [g/cm^3] -> [g/cm^2/mm]
+  soil_top_conc.NH4 = soil_NH4.C (0) / 10.0; // [g/cm^3] -> [g/cm^2/mm]
   surface.mixture (soil_top_conc);
-  
+  soil_water.macro_tick (soil, surface);
+
   bioclimate.tick (surface, weather, 
 		   vegetation, soil, soil_water, soil_heat);
   vegetation.tick (time, bioclimate, soil, organic_matter, 
@@ -304,7 +307,7 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
 
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, weather);
-  soil_water.tick (surface, groundwater, soil);
+  soil_water.tick (soil, surface, groundwater);
   soil_chemicals.tick (soil, soil_water, soil_heat, organic_matter,
 		       bioclimate.chemicals_down ());
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
