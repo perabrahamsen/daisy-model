@@ -80,7 +80,7 @@ void
 TreelogStream::flush ()
 { impl.out.flush (); }
 
-TreelogStream::TreelogStream (tmp::ostream& out)
+TreelogStream::TreelogStream (ostream& out)
   : impl (*new Implementation (out))
 { }
 

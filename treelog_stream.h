@@ -26,8 +26,7 @@
 #include "treelog.h"
 
 #if defined (__BORLANDC__) && __BORLANDC__ < 0x0550
-#include <iostream>
-namespace std { typedef ostream ostream; }
+struct ostream;
 #else
 #include <iosfwd>
 #endif
