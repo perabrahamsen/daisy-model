@@ -78,7 +78,7 @@ struct ActionSwap : public Action
   // Simulation.
   void doIt (Daisy& daisy, Treelog& out)
   {
-    out.message (string (" [") + name + "]");
+    out.message (" [" + name + "]");
     daisy.field.swap (out, daisy.time, 0.0, middle, depth);
   }
 

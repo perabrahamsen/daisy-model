@@ -26,19 +26,19 @@
 
 struct ActionMerge : public Action
 {
-  const string combine;
-  const string remove;
+  const symbol combine;
+  const symbol remove;
 
   void doIt (Daisy& daisy, Treelog& out)
   {
-    out.message (string (" [Merging ") + remove + " into " + combine + "]");
+    out.message (" [Merging " + remove + " into " + combine + "]");
     daisy.field.merge (combine, remove);
   }
   
   ActionMerge (const AttributeList& al)
     : Action (al),
-      combine (al.name ("combine")), 
-      remove (al.name ("remove"))
+      combine (al.identifier ("combine")), 
+      remove (al.identifier ("remove"))
   { }
 };
 

@@ -32,7 +32,7 @@ class Pedotransfer
   // Content.
 public:
   static const char *const description;
-  const string name;
+  const symbol name;
 
   // Simulation.
 public:

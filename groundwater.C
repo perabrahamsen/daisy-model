@@ -65,7 +65,7 @@ Groundwater::update_water (const Soil&, const SoilHeat&,
 void
 Groundwater::output (Log& log) const
 { 
-  log.output ("height", table ());
+  output_value (table (), "height", log);
 }
 
 void
@@ -80,7 +80,7 @@ Groundwater::initialize (const Time&, const Soil&, Treelog&)
 { }
 
 Groundwater::Groundwater (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 Groundwater::~Groundwater ()

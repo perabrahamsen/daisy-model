@@ -161,7 +161,7 @@ Options::Options (int& argc, char**& argv,
 		{
 		  const Library& library 
 		    = Librarian<Document>::library ();
-		  const string name = get_arg (argc, argv);
+		  const symbol name = symbol (get_arg (argc, argv));
 		  if (library.check (name))
 		    {
 		      const Syntax& syntax = library.syntax (name);

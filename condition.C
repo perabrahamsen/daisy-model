@@ -40,7 +40,7 @@ Condition::timestep ()
 { return "dt"; } 
 
 Condition::Condition (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 Condition::~Condition ()

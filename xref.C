@@ -34,8 +34,8 @@ class TraverseXRef : public Traverse
   XRef& xref;
 
   // State.
-  string current_component;
-  string current_model;
+  symbol current_component;
+  symbol current_model;
   enum { is_model, is_parameterization, is_submodel, is_invalid = -1 } type;
   string current_submodel;
   vector<string> path;
@@ -44,7 +44,7 @@ class TraverseXRef : public Traverse
 private:
   void use_submodel (const string& submodel);
   void use_component (const Library& library);
-  void use_model (const Library& library, const string& model);
+  void use_model (const Library& library, symbol model);
 
   // Create & Destroy.
 public:
@@ -53,12 +53,11 @@ public:
 
 private:
   // Implementation.
-  bool enter_library (Library& library, 
-		      const string& component);
+  bool enter_library (Library& library, symbol component);
   void leave_library ();
   bool enter_model (const Syntax&, AttributeList&, 
-		    const string& component, const string& model);
-  void leave_model (const string& component, const string& name);
+		    symbol component, symbol model);
+  void leave_model (symbol component, symbol name);
   bool enter_submodel (const Syntax& syntax, AttributeList& alist,
   		       const AttributeList& default_alist,
   		       const string& name);
@@ -120,7 +119,7 @@ TraverseXRef::use_submodel (const string& submodel)
 void 
 TraverseXRef::use_component (const Library& library)
 {
-  const string component = library.name ();
+  const symbol component = library.name ();
   XRef::Users& moi = xref.components[component];
   
   switch (type)
@@ -142,11 +141,11 @@ TraverseXRef::use_component (const Library& library)
 }
 
 void 
-TraverseXRef::use_model (const Library& library, const string& model)
+TraverseXRef::use_model (const Library& library, const symbol model)
 {
   daisy_assert (library.check (model));
   use_component (library);
-  const string component = library.name ();
+  const symbol component = library.name ();
   XRef::Users& moi = xref.models[XRef::ModelUsed (component, model)];
   
   switch (type)
@@ -167,7 +166,7 @@ TraverseXRef::use_model (const Library& library, const string& model)
 }
 
 bool
-TraverseXRef::enter_library (Library&, const string& component)
+TraverseXRef::enter_library (Library&, symbol component)
 {
   daisy_assert (type == is_invalid);
   current_component = component;
@@ -183,7 +182,7 @@ TraverseXRef::leave_library ()
 
 bool
 TraverseXRef::enter_model (const Syntax&, AttributeList& alist,
-			   const string& component, const string& name)
+			   const symbol component, const symbol name)
 {
   daisy_assert (component == current_component);
   daisy_assert (type == is_invalid);
@@ -196,7 +195,7 @@ TraverseXRef::enter_model (const Syntax&, AttributeList& alist,
 }
 
 void
-TraverseXRef::leave_model (const string& component, const string& name)
+TraverseXRef::leave_model (const symbol component, const symbol name)
 { 
   daisy_assert (path.empty ());
   daisy_assert (component == current_component);
@@ -276,7 +275,7 @@ TraverseXRef::enter_object (const Library& library,
 			    const string&)
 {
   daisy_assert (alist.check ("type"));
-  use_model (library, alist.name ("type"));
+  use_model (library, alist.identifier ("type"));
   return false; 
 }
 
@@ -316,6 +315,8 @@ TraverseXRef::leave_parameter ()
 
 TraverseXRef::TraverseXRef (XRef& xr)
   : xref (xr),
+    current_component ("Daisy"),
+    current_model ("invalid"),
     type (is_invalid)
 {
   traverse_all_libraries ();
@@ -328,12 +329,9 @@ TraverseXRef::~TraverseXRef ()
   daisy_assert (path.empty ());
 }
 
-XRef::ModelUsed::ModelUsed (const string& comp, const string& mod)
+XRef::ModelUsed::ModelUsed (const symbol comp, const symbol mod)
   : component (comp),
     model (mod)
-{ }
-
-XRef::ModelUsed::ModelUsed ()
 { }
 
 bool
@@ -341,14 +339,11 @@ XRef::ModelUsed::operator< (const ModelUsed& other) const
 { return component < other.component
     || (component == other.component && model < other.model); }
 
-XRef::ModelUser::ModelUser (const string& comp, const string& mod,
+XRef::ModelUser::ModelUser (const symbol comp, const symbol mod,
 			    const vector<string>& p)
   : component (comp),
     model (mod),
     path (p)
-{ }
-
-XRef::ModelUser::ModelUser ()
 { }
 
 XRef::SubmodelUser::SubmodelUser (const string& sub, const vector<string>& p)

@@ -31,9 +31,9 @@
 struct LogHarvest : public Log
 {
   // Filter function.
-  bool check_member (const string&) const
+  bool check_member (symbol) const
   { return false; }
-  bool check_derived (const string&, const string&, const Library&) const
+  bool check_derived (symbol, symbol, const Library&) const
   { return false; }
 
   // Content.
@@ -108,7 +108,7 @@ struct LogHarvest : public Log
   { daisy_assert (false); }
 
   // Normal items.
-  void open (const string&)
+  void open (symbol)
   { daisy_assert (false); }
   void close ()
   { daisy_assert (false); }
@@ -120,36 +120,36 @@ struct LogHarvest : public Log
   { daisy_assert (false); }
 
   // Derived items.
-  void open_derived (const string&, const string&)
+  void open_derived (symbol, symbol)
   { daisy_assert (false); }
   void close_derived ()
   { daisy_assert (false); }
 
   // Derived items in a list.
-  void open_entry (const string&, const AttributeList&)
+  void open_entry (symbol, const AttributeList&)
   { daisy_assert (false); }
   void close_entry ()
   { daisy_assert (false); }
 
   // Named derived items in a list.
-  void open_named_entry (const string&, const string&, const AttributeList&)
+  void open_named_entry (symbol, symbol, const AttributeList&)
   { daisy_assert (false); }
   void close_named_entry ()
   { daisy_assert (false); }
 
-  void output (const string&, const Time&)
+  void output (symbol, const Time&)
   { }
-  void output (const string&, const bool)
+  void output (symbol, const bool)
   { }
-  void output (const string&, const double)
+  void output (symbol, const double)
   { }
-  void output (const string&, const int)
+  void output (symbol, const int)
   { }
-  void output (const string&, const string&)
+  void output (symbol, const string&)
   { }
-  void output (const string&, const vector<double>&)
+  void output (symbol, const vector<double>&)
   { }
-  void output (const string&, const PLF&)
+  void output (symbol, const PLF&)
   { }
 
   // Create and Destroy.

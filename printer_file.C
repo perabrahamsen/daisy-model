@@ -38,6 +38,8 @@ struct PrinterFile::Implementation
 
   // String utilities.
   static bool is_identifier (const string& name);
+  static bool is_identifier (const symbol name)
+  { return is_identifier (name.name ()); }
   static void print_quoted_string (std::ostream& out,
 				   const string& name);
 
@@ -53,6 +55,8 @@ struct PrinterFile::Implementation
 
   // Print support for specific types.
   void print_string (const string& value); 
+  void print_symbol (const symbol value)
+  { print_string (value.name ()); }
   void print_bool (bool); 
   void print_plf (const PLF&, int indent); 
   void print_alist (const AttributeList& alist, const Syntax&,
@@ -119,7 +123,7 @@ PrinterFile::Implementation::is_complex_object (const AttributeList& value,
 						const Library& library) const
 {
   daisy_assert (value.check ("type"));
-  const string element = value.name ("type");
+  const symbol element = value.identifier ("type");
   if (!library.check (element))
     return false;
 
@@ -287,13 +291,14 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  break;
 	case Syntax::String:
 	  {
-	    const vector<string>& value = alist.name_sequence (key);
+	    const vector<symbol>& value 
+	      = alist.identifier_sequence (key);
 	    
 	    for (unsigned int i = 0; i < value.size (); i++)
 	      {
 		if (i > 0) 
 		  out << " ";
-		print_string (value[i]);
+		print_symbol (value[i]);
 	      }
 	  }
 	  break;
@@ -455,7 +460,7 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
 					   const Library& library, int indent)
 {
   daisy_assert (value.check ("type"));
-  const string element = value.name ("type");
+  const symbol element = value.identifier ("type");
   if (!library.check (element))
     {
       out << "<unknown " << element << ">";
@@ -468,15 +473,15 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
   if (value.subset (element_alist, element_syntax))
     {
       // We didn't.
-      print_string (element);
+      print_symbol (element);
       return;
     }
 
   // Library element with additional attributes.
-  print_string (element);
+  print_symbol (element);
   out << " ";
   print_alist (value, element_syntax, element_alist, 
-	       indent + 1 + element.length ()
+	       indent + 1 + element.name ().length ()
 	       // Buglet: Wrong indentation for elements with strange chars.
 	       + (is_identifier (element) ? 0 : 2),
 	       false);
@@ -485,25 +490,23 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
 // We store all matching entries here.
 struct FoundEntry
 {
-  string library_name;
-  string element;
+  symbol library_name;
+  symbol element;
   int sequence;
 
   bool operator < (const FoundEntry& e) const
-    { return sequence < e.sequence; }
+  { return sequence < e.sequence; }
 
-  FoundEntry ()
-    { }
-  FoundEntry (const string& l, const string& e, const int s)
+  FoundEntry (const symbol l, const symbol e, const int s)
     : library_name (l),
       element (e),
       sequence (s)
-    { }
+  { }
   FoundEntry (const FoundEntry& e)
     : library_name (e.library_name),
       element (e.element),
       sequence (e.sequence)
-    { }
+  { }
 };
 
 void
@@ -513,19 +516,19 @@ PrinterFile::Implementation::print_library_file (const string& filename)
   
   // Search all the libraries for matching entries.
   {
-    vector<string> all;
+    vector<symbol> all;
     Library::all (all);
 
     for (unsigned int i = 0; i < all.size (); i++)
       {
-	const string& library_name = all[i];
+	const symbol library_name = all[i];
 	Library& library = Library::find (library_name);
-	vector<string> elements;
+	vector<symbol> elements;
 	library.entries (elements);
       
 	for (unsigned int j = 0; j < elements.size (); j++)
 	  {
-	    const string element = elements[j];
+	    const symbol element = elements[j];
 	    const AttributeList& alist = library.lookup (element);
 
 	    if (alist.check ("parsed_from_file") 
@@ -545,8 +548,8 @@ PrinterFile::Implementation::print_library_file (const string& filename)
   const AttributeList empty_alist;
   for (unsigned int i = 0; i < found.size (); i++)
     {
-      const string library_name = found[i].library_name;
-      const string name = found[i].element;
+      const symbol library_name = found[i].library_name;
+      const symbol name = found[i].element;
       Library& library = Library::find (library_name);
       const AttributeList& alist = library.lookup (name);
 
@@ -555,12 +558,12 @@ PrinterFile::Implementation::print_library_file (const string& filename)
       else
 	out << "\n";
       out << "(def" << library_name << " ";
-      print_string (name);
+      print_symbol (name);
       out << " ";
       if (alist.check ("type"))
 	{
-	  const string super = alist.name ("type");
-	  print_string (super);
+	  const symbol super = alist.identifier ("type");
+	  print_symbol (super);
 	  if (!library.check (super))
 	    {
 	      out << " ;; unknown superclass\n ";
@@ -665,7 +668,7 @@ void
 PrinterFile::print_input (const AttributeList& alist)
 {
   daisy_assert (alist.check ("type"));
-  const string type = alist.name ("type");
+  const symbol type = alist.identifier ("type");
   const Syntax& syntax = Librarian<Parser>::library ().syntax (type);
 
   impl.out << "(input " << type << " ";
@@ -677,18 +680,35 @@ bool
 PrinterFile::good ()
 { return impl.good (); }
   
+static const AttributeList& 
+get_file_alist ()
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    alist.add ("type", "file");
+  return alist;
+}
+    
 PrinterFile::PrinterFile (const string& filename)
-  : Printer ("file"),
+  : Printer (get_file_alist ()),
     impl (*new Implementation (filename))
 { }
     
+static const AttributeList& 
+get_stream_alist ()
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    alist.add ("type", "stream");
+  return alist;
+}
 PrinterFile::PrinterFile (std::ostream& stream)
-  : Printer ("stream"),
+  : Printer (get_stream_alist ()),
     impl (*new Implementation (stream))
 { }
     
 PrinterFile::PrinterFile (const AttributeList& al)
-  : Printer (al.name ("type")),
+  : Printer (al),
     impl (*new Implementation (al.name ("where")))
 { }
     

@@ -102,11 +102,11 @@ public:
 
   // Create and Destroy.
 public:
-  Column& clone (const string& name) const
+  Column& clone (symbol name) const
   { 
     AttributeList new_alist (alist);
     // BUG: TODO: Log state of 'this' to new_alist.
-    new_alist.add ("type", name);
+    new_alist.add ("type", name.name ());
     return *new ColumnStandard (new_alist); 
   }
   ColumnStandard (const AttributeList& al);
@@ -409,22 +409,23 @@ ColumnStandard::output_inner (Log& log) const
 {
   output_submodule (soil_NH4, "SoilNH4", log);
   output_submodule (soil_NO3, "SoilNO3", log);
-  if (log.check_member ("OrganicMatter"))
+  static const symbol OrganicMatter_symbol ("OrganicMatter");
+  if (log.check_member (OrganicMatter_symbol))
     {
-      Log::Open open (log, "OrganicMatter");
+      Log::Open open (log, OrganicMatter_symbol);
       organic_matter.output (log, soil);
     }
   output_derived (nitrification, "Nitrification", log);
   output_submodule (denitrification, "Denitrification", log);
-  log.output ("second_year_utilization", second_year_utilization_);
-  log.output ("seed_N", log_seed_N);
-  log.output ("fertilized_NO3", log_fertilized_NO3);
-  log.output ("fertilized_NH4", log_fertilized_NH4);
-  log.output ("volatilization", log_volatilization);
-  log.output ("fertilized_Org_N", log_fertilized_Org_N);
-  log.output ("fertilized_Org_C", log_fertilized_Org_C);
-  log.output ("fertilized_DM", log_fertilized_DM);
-  log.output ("first_year_utilization", log_first_year_utilization);
+  output_value (second_year_utilization_, "second_year_utilization", log);
+  output_value (log_seed_N, "seed_N", log);
+  output_value (log_fertilized_NO3, "fertilized_NO3", log);
+  output_value (log_fertilized_NH4, "fertilized_NH4", log);
+  output_value (log_volatilization, "volatilization", log);
+  output_value (log_fertilized_Org_N, "fertilized_Org_N", log);
+  output_value (log_fertilized_Org_C, "fertilized_Org_C", log);
+  output_value (log_fertilized_DM, "fertilized_DM", log);
+  output_value (log_first_year_utilization, "first_year_utilization", log);
 }
 
 bool 

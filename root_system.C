@@ -353,23 +353,23 @@ RootSystem::full_grown (Treelog& msg, const Soil& soil,
 void
 RootSystem::output (Log& log) const
 {
-  log.output ("PotRtDpt", PotRtDpt);
-  log.output ("Depth", Depth);
-  log.output ("Density", Density);
-  log.output ("H2OExtraction", H2OExtraction);
-  log.output ("NH4Extraction", NH4Extraction);
-  log.output ("NO3Extraction", NO3Extraction);
-  log.output ("h_x", h_x);
-  log.output ("partial_soil_temperature", partial_soil_temperature);
-  log.output ("soil_temperature", soil_temperature);
-  log.output ("water_stress", water_stress);
-  log.output ("water_stress_days", water_stress_days);
-  log.output ("nitrogen_stress", nitrogen_stress);
-  log.output ("production_stress", production_stress);
-  log.output ("Ept", Ept);
-  log.output ("H2OUpt", H2OUpt);
-  log.output ("NH4Upt", NH4Upt);
-  log.output ("NO3Upt", NO3Upt);
+  output_variable (PotRtDpt, log);
+  output_variable (Depth, log);
+  output_variable (Density, log);
+  output_variable (H2OExtraction, log);
+  output_variable (NH4Extraction, log);
+  output_variable (NO3Extraction, log);
+  output_variable (h_x, log);
+  output_variable (partial_soil_temperature, log);
+  output_variable (soil_temperature, log);
+  output_variable (water_stress, log);
+  output_variable (water_stress_days, log);
+  output_variable (nitrogen_stress, log);
+  output_variable (production_stress, log);
+  output_variable (Ept, log);
+  output_variable (H2OUpt, log);
+  output_variable (NH4Upt, log);
+  output_variable (NO3Upt, log);
 }
 
 void

@@ -23,8 +23,8 @@
 #ifndef FIELD_H
 #define FIELD_H
 
+#include "symbol.h"
 #include <vector>
-#include <string>
 using namespace std;
 
 class Column;
@@ -49,7 +49,7 @@ public:
   private:
     Field& field;
   public:
-    Restrict (Field&, const string& column);
+    Restrict (Field&, symbol column);
     ~Restrict ();
   };
   friend class Restrict;
@@ -67,7 +67,7 @@ public:
   void fertilize (const AttributeList&, double from, double to); // Organic.
   void fertilize (const AttributeList&);
   void clear_second_year_utilization ();
-  void harvest (const Time&, const string& name,
+  void harvest (const Time&, symbol name,
 		double stub_length, 
 		double stem_harvest, 
 		double leaf_harvest, 
@@ -78,7 +78,7 @@ public:
   void swap (Treelog&, const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
-  void spray (const string& chemical, double amount); // [g/ha]
+  void spray (symbol chemical, double amount); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
@@ -91,25 +91,25 @@ public:
   double second_year_utilization () const;// [kg N/ha]
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
-  double crop_ds (const string& crop) const; 
+  double crop_ds (symbol crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
-  double crop_dm (const string& crop) const; 
+  double crop_dm (symbol crop) const; 
   // Simulation.
   void clear ();
   void tick (Treelog&, const Time&, const Weather*);
   void output (Log&) const;
 
   // Find a specific column.
-  const Column* find (const string& name) const;
+  const Column* find (symbol name) const;
 
   // Communication with external model.
   Column* find (unsigned int pos) const;
   unsigned int size () const;
 
   // Create and destroy.
-  void divide (const string& original, const string& copy, double copy_size,
+  void divide (symbol original, symbol copy, double copy_size,
 	       const Time&, const Weather*);
-  void merge (const string& combine, const string& remove);
+  void merge (symbol combine, symbol remove);
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;

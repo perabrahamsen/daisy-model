@@ -39,30 +39,29 @@ struct Log::Implementation
 };
 
 bool
-Log::check_entry (const string& name, const Library& library) const
+Log::check_entry (symbol name, const Library& library) const
 {
-  const string* type = &name;
   bool looking = true;
 
-  while (looking && !check_member (*type))
+  while (looking && !check_member (name))
     {
-      if (library.check (*type))
+      if (library.check (name))
 	{
-	  const AttributeList alist = library.lookup (*type);
+	  const AttributeList alist = library.lookup (name);
 	  if (alist.check ("type"))
-	    type = &alist.name ("type");
+	    name = alist.identifier ("type");
 	  else
 	    looking = false;
 	}
       else
 	looking = false;
-    }
+   }
   return looking;
 }
 
 
 void 
-Log::open_named (const string&)
+Log::open_named (symbol)
 { open_unnamed (); }
 
 void 
@@ -78,12 +77,16 @@ Log::close_ordered ()
 { close_unnamed (); }
 
 void 
-Log::open_alist (const string& name, const AttributeList&)
+Log::open_alist (symbol name, const AttributeList&)
 { open (name); }
 
 void 
 Log::close_alist ()
 { close (); }
+
+void
+Log::output (symbol name, symbol value)
+{ output (name, value.name ()); }
 
 void 
 Log::open_geometry (const Geometry& g)
@@ -113,7 +116,7 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
 {
   if (al.check ("parser_files"))
   {
-    const vector<string>& files = al.name_sequence ("parser_files");
+    const vector<symbol>& files = al.identifier_sequence ("parser_files");
     for (unsigned int i = 0; i < files.size (); i++)
       out << "SIMFILE: " << files[i] << "\n";
   }
@@ -134,7 +137,7 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
 
 Log::Log (const AttributeList& al)
   : impl (*new Implementation ()),
-    name (al.name ("type"))
+    name (al.identifier ("type"))
 { }
 
 Log::~Log ()

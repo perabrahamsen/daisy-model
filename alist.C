@@ -33,18 +33,20 @@
 //
 // Common abstraction of an attribute value.
 
+
+
 struct Value
 {
   union
   {
     double number;
-    string* name;
+    symbol* name;
     bool flag;
     PLF* plf;
     AttributeList* alist;
     int integer;
     vector<double>* number_sequence;
-    vector<string>* name_sequence;
+    vector<symbol>* name_sequence;
     vector<bool>* flag_sequence;
     vector<int>* integer_sequence;
     vector<const PLF*>* plf_sequence;
@@ -62,14 +64,20 @@ struct Value
       is_sequence (false),
       ref_count (new int (1))
     { }
+  Value (const symbol v)
+    : name (new symbol (v)),
+      type (Syntax::String),
+      is_sequence (false),
+      ref_count (new int (1))
+  { }
   Value (const string& v)
-    : name (new string (v)),
+    : name (new symbol (v)),
       type (Syntax::String),
       is_sequence (false),
       ref_count (new int (1))
     { }
   Value (const char* v)
-    : name (new string (v)),
+    : name (new symbol (v)),
       type (Syntax::String),
       is_sequence (false),
       ref_count (new int (1))
@@ -104,8 +112,21 @@ struct Value
       is_sequence (true),
       ref_count (new int (1))
     { }
+  Value (const vector<symbol>& v)
+    : name_sequence (new vector<symbol> (v)),
+      type (Syntax::String),
+      is_sequence (true),
+      ref_count (new int (1))
+    { }
+  static vector<symbol>* new_symbol_vector (const vector<string>& org)
+  {
+    vector<symbol>* copy = new vector<symbol> ();
+    for (unsigned int i = 0; i < org.size (); i++)
+      copy->push_back (symbol (org[i]));
+    return copy;
+  }
   Value (const vector<string>& v)
-    : name_sequence (new vector<string> (v)),
+    : name_sequence (new_symbol_vector (v)),
       type (Syntax::String),
       is_sequence (true),
       ref_count (new int (1))
@@ -122,7 +143,7 @@ struct Value
       is_sequence (true),
       ref_count (new int (1))
     { }
-  vector<const PLF*>* copy_plfs (const vector<const PLF*>& org)
+  static vector<const PLF*>* copy_plfs (const vector<const PLF*>& org)
   {
     vector<const PLF*>* copy = new vector<const PLF*> ();
     for (unsigned int i = 0; i < org.size (); i++)
@@ -195,8 +216,8 @@ Value::subset (const Value& v, const Syntax& syntax,
 	  daisy_assert (value.check ("type"));
 	  if (!other.check ("type"))
 	    return false;
-	  const string element = value.name ("type");
-	  if (element != other.name ("type"))
+	  const symbol element = value.identifier ("type");
+	  if (element != other.identifier ("type"))
 	    return false;
 	  if (!library.check (element))
 	    return false;
@@ -246,8 +267,8 @@ Value::subset (const Value& v, const Syntax& syntax,
 	      daisy_assert (value[i]->check ("type"));
 	      if (!other[i]->check ("type"))
 		return false;
-	      const string element = value[i]->name ("type");
-	      if (element != other[i]->name ("type"))
+	      const symbol element = value[i]->identifier ("type");
+	      if (element != other[i]->identifier ("type"))
 		return false;
 	      if (!library.check (element))
 		return false;
@@ -563,6 +584,14 @@ AttributeList::number (const char* key) const
 
 const string& 
 AttributeList::name (const string& key) const
+{ return identifier (key).name (); }
+
+const string& 
+AttributeList::name (const char *const key) const
+{ return identifier (key).name (); }
+
+symbol
+AttributeList::identifier (const string& key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::String);
@@ -570,8 +599,8 @@ AttributeList::name (const string& key) const
   return *value.name;
 }
 
-const string& 
-AttributeList::name (const char* key) const
+symbol
+AttributeList::identifier (const char* key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::String);
@@ -669,8 +698,8 @@ AttributeList::number_sequence (const char* key) const
   return *value.number_sequence;
 }
 
-const vector<string>& 
-AttributeList::name_sequence (const string& key) const
+const vector<symbol>&
+AttributeList::identifier_sequence (const string& key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::String);
@@ -678,8 +707,8 @@ AttributeList::name_sequence (const string& key) const
   return *value.name_sequence;
 }
 
-const vector<string>& 
-AttributeList::name_sequence (const char* key) const
+const vector<symbol>&
+AttributeList::identifier_sequence (const char *const key) const
 {
   const Value& value = impl.lookup (key);
   daisy_assert (value.type == Syntax::String);
@@ -765,13 +794,15 @@ AttributeList::add (const string& key, double v)
 
 void 
 AttributeList::add (const string& key, const char* v)
-{ 
-  impl.add (key, Value (v)); 
-}
+{ impl.add (key, Value (v)); }
 
 void 
 AttributeList::add (const string& key, const string& v)
 { impl.add (key, Value (v)); }
+
+void 
+AttributeList::add (const string& key, const symbol sym)
+{ add (key, sym.name ()); }
 
 void 
 AttributeList::add (const string& key, bool v)
@@ -794,7 +825,7 @@ AttributeList::add (const string& key, const vector<double>& v)
 { impl.add (key, Value (v)); }
 
 void 
-AttributeList::add (const string& key, const vector<string>& v)
+AttributeList::add (const string& key, const vector<symbol>& v)
 { impl.add (key, Value (v)); }
 
 void 
@@ -879,7 +910,7 @@ AttributeList::revert (const string& key,
 	add (key, default_alist.plf_sequence (key));
         break;
       case Syntax::String:
-	add (key, default_alist.name_sequence (key));
+	add (key, default_alist.identifier_sequence (key));
         break;
       case Syntax::Library:
       case Syntax::Error:

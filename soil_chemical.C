@@ -107,8 +107,8 @@ void
 SoilChemical::output (Log& log) const
 {
   Solute::output (log);
-  log.output ("uptaken", uptaken);
-  log.output ("decomposed", decomposed);
+  output_variable (uptaken, log);
+  output_variable (decomposed, log);
 }
 
 double

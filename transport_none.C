@@ -44,7 +44,7 @@ public:
   // Create.
 public:
   TransportNone (const AttributeList& al)
-    : Transport (al.name ("type"))
+    : Transport (al)
     { }
 };
 

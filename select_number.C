@@ -25,11 +25,8 @@
 struct SelectNumber : public SelectValue
 {
   // Output routines.
-  void output_number (const string& name, double number)
+  void output_number (symbol name, double number)
   { 
-    if (!is_active ())
-      return;
-
     if (!valid (name))
       return;
 
@@ -39,7 +36,7 @@ struct SelectNumber : public SelectValue
       value += number;
     count++;
   }
-  void output_integer (const string& name, int integer)
+  void output_integer (symbol name, int integer)
   { output_number (name, integer); }
 
   // Create and Destroy.

@@ -84,7 +84,7 @@ public:
   void irrigate_surface (double flux, const IM&);
   void set_subsoil_irrigation (double flux, const IM& im, 
 			       double from, double to);
-  void harvest (const Time& time, const string& crop_name,
+  void harvest (const Time& time, symbol crop_name,
 		double stub_length,
 		double stem_harvest,
 		double leaf_harvest, 
@@ -97,7 +97,7 @@ public:
 	     double from, double middle, double to);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]
-  void spray (const string& chemical, double amount); // [g/ha]
+  void spray (symbol chemical, double amount); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
@@ -105,8 +105,8 @@ public:
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
   double soil_water_content (double from, double to) const; // [cm]
-  double crop_ds (const string& name) const ;// {[-1:2], Crop::DSremove}
-  double crop_dm (const string& name) const; // [kg/ha], negative when no crop
+  double crop_ds (symbol name) const ;// {[-1:2], Crop::DSremove}
+  double crop_dm (symbol name) const; // [kg/ha], negative when no crop
 
   // Communication with external model.
 public:
@@ -121,8 +121,8 @@ public:
   double get_exfiltration () const; // [mm/h]
   double get_evap_soil_surface () const; // [mm/h]
   void put_ponding (double pond); // [mm]
-  void put_surface_chemical (const string& name, double amount); // [g/cm^2]
-  double get_surface_chemical (const string& name) const; // [g/cm^2]
+  void put_surface_chemical (symbol name, double amount); // [g/cm^2]
+  double get_surface_chemical (symbol name) const; // [g/cm^2]
   double get_temperature_at (unsigned int i) const; // [°C]
   double get_crop_h2o_uptake_at (unsigned int i) const; // [cm³/cm³/h]
   double get_water_content_at (unsigned int i) const; // [cm³/cm³]

@@ -29,16 +29,16 @@
 struct LogAList : public Log
 {
   // Filter functions.
-  bool check_member (const string&) const = 0;
-  bool check_entry (const string&, const Library&) const;
-  bool check_derived (const string&, const string&, const Library&) const;
+  bool check_member (symbol) const = 0;
+  bool check_entry (symbol, const Library&) const;
+  bool check_derived (symbol, symbol, const Library&) const;
 
   // Content.
   bool is_active;		// ... store the answer here.
   unsigned int nested;		// Nesting iff active.
 
   // Stacks.
-  deque<string> entry_stack;	// Name of the entity we are logging.
+  deque<symbol> entry_stack;	// Name of the entity we are logging.
   deque<const Library*> library_stack; // Library of the object we are logging.
   deque<const Syntax*> syntax_stack; // Syntax of the alist we are logging.
   deque<AttributeList*> alist_stack; // State and parameters of entity.
@@ -46,7 +46,7 @@ struct LogAList : public Log
   deque<int> unnamed_stack;	// Current element of AList sequence.
 
   // Stack Accessors.
-  const string& entry () const;
+  symbol entry () const;
   const Library& library () const;
   const Syntax& syntax () const;
   AttributeList& alist () const;
@@ -54,11 +54,11 @@ struct LogAList : public Log
   int unnamed ();
 
   // Stack Constructors.
-  void push (const string& entry, 
+  void push (symbol entry, 
 	     const Library& library, const AttributeList& alist);
-  void push (const string& entry, 
+  void push (symbol entry, 
 	     const Syntax& syntax, const AttributeList& alist);
-  void push (const string& entry, 
+  void push (symbol entry, 
 	     const Syntax& syntax, 
 	     const AttributeList& default_alist,
 	     vector<AttributeList*> alist_sequence);
@@ -67,32 +67,32 @@ struct LogAList : public Log
   // Nesting.
   void open_ignore ();		// Ignored items.
   void close_ignore ();
-  void open (const string& name); // AList singletons. 
+  void open (symbol name); // AList singletons. 
   void close ();
   void open_unnamed ();		// Items in a AList sequence.
   void close_unnamed ();	
-  void open_alist (const string& name, // AList singletons variant.
+  void open_alist (symbol name, // AList singletons variant.
 		   const AttributeList& alist);
   void close_alist ();
 
-  void open_derived (const string& field, // Object singletons.
-		     const string& type); 
+  void open_derived (symbol field, // Object singletons.
+		     symbol type); 
   void close_derived ();
-  void open_entry (const string& type,   // Items in an Object sequence.
+  void open_entry (symbol type,   // Items in an Object sequence.
 		   const AttributeList& alist);
   void close_entry ();
-  void open_named_entry (const string& name,   // Named items in an Obj seq.
-			 const string& type, 
+  void open_named_entry (symbol name,   // Named items in an Obj seq.
+			 symbol type, 
 			 const AttributeList& alist);
   void close_named_entry ();
 
   // Logging.
-  void output (const string& name, const bool value);
-  void output (const string& name, const double value);
-  void output (const string& name, const int value);
-  void output (const string& name, const string& value);
-  void output (const string& name, const vector<double>& value);
-  void output (const string& name, const PLF& value);
+  void output (symbol name, const bool value);
+  void output (symbol name, const double value);
+  void output (symbol name, const int value);
+  void output (symbol name, const string& value);
+  void output (symbol name, const vector<double>& value);
+  void output (symbol name, const PLF& value);
 
   // Create and Destroy.
   static void load_syntax (Syntax&, AttributeList&);

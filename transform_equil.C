@@ -33,8 +33,8 @@
 struct TransformEquilibrium : public Transform
 {
   // Parameters.
-  const string name_A;
-  const string name_B;
+  const symbol name_A;
+  const symbol name_B;
   /* const */ Equilibrium& equilibrium;
   vector<double> k_AB;
   vector<double> k_BA;
@@ -58,7 +58,7 @@ struct TransformEquilibrium : public Transform
 void
 TransformEquilibrium::output (Log& log) const
 { 
-  log.output ("S_AB", S_AB);
+  output_variable (S_AB, log);
 }
 
 void 
@@ -144,8 +144,8 @@ TransformEquilibrium::initialize (const Soil& soil)
 
 TransformEquilibrium::TransformEquilibrium (const AttributeList& al)
   : Transform (al),
-    name_A (al.name ("A")),
-    name_B (al.name ("B")),
+    name_A (al.identifier ("A")),
+    name_B (al.identifier ("B")),
     equilibrium (Librarian<Equilibrium>::create (al.alist ("equilibrium"))),
     pedo_AB (al.check ("pedo_AB") 
 	     ? &Librarian<Pedotransfer>::create (al.alist ("pedo_AB"))

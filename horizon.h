@@ -37,7 +37,7 @@ private:
   struct Implementation;
   Implementation& impl;
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Water.

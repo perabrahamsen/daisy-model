@@ -104,23 +104,21 @@ Weather::tick_after (const Time& time, Treelog&)
 void
 Weather::output (Log& log) const
 {
-  log.output ("hourly_air_temperature", hourly_air_temperature ());
-  log.output ("daily_air_temperature", daily_air_temperature ());
-  log.output ("hourly_global_radiation",
-	      hourly_global_radiation ());
-  log.output ("daily_global_radiation",
-	      daily_global_radiation ());
-  log.output ("reference_evapotranspiration",
-	      reference_evapotranspiration ());
-  log.output ("rain", rain ());
-  log.output ("snow", snow ());
-  log.output ("precipitation", rain () + snow ());
-  log.output ("hourly_cloudiness", hourly_cloudiness ());
-  log.output ("daily_cloudiness", daily_cloudiness ());
-  log.output ("vapor_pressure", vapor_pressure ());
-  log.output ("wind", wind ());
-  log.output ("day_length", day_length ());
-  log.output ("day_cycle", day_cycle ());
+  output_value (hourly_air_temperature (), "hourly_air_temperature", log);
+  output_value (daily_air_temperature (), "daily_air_temperature", log);
+  output_value (hourly_global_radiation (), "hourly_global_radiation", log);
+  output_value (daily_global_radiation (), "daily_global_radiation", log);
+  output_value (reference_evapotranspiration (), 
+		"reference_evapotranspiration", log);
+  output_value (rain (), "rain", log);
+  output_value (snow (), "snow", log);
+  output_value (rain () + snow (), "precipitation", log);
+  output_value (hourly_cloudiness (), "hourly_cloudiness", log);
+  output_value (daily_cloudiness (), "daily_cloudiness", log);
+  output_value (vapor_pressure (), "vapor_pressure", log);
+  output_value (wind (), "wind", log);
+  output_value (day_length (), "day_length", log);
+  output_value (day_cycle (), "day_cycle", log);
   output_submodule (deposit_, "deposit", log);
 }
 
@@ -241,7 +239,7 @@ Weather::initialize (const Time&, Treelog &)
 { }
 
 Weather::Weather (const AttributeList& al)
-  : name (al.name ("type")),
+  : name (al.identifier ("type")),
     latitude (-42.42e42),
     longitude (-42.42e42),
     elevation_ (-42.42e42),

@@ -154,7 +154,7 @@ struct BioclimateStandard : public Bioclimate
   void irrigate_overhead (double flux);
   void irrigate_surface (double flux);
   void set_subsoil_irrigation (double flux);
-  void spray (const string& chemical, double amount) // [g/m^2]
+  void spray (symbol chemical, double amount) // [g/m^2]
     { spray_.add (chemical, amount); }
   void harvest_chemicals (Chemicals& chemicals, double LAI)
     { 
@@ -178,7 +178,7 @@ struct BioclimateStandard : public Bioclimate
 };
 
 BioclimateStandard::BioclimateStandard (const AttributeList& al)
-  : Bioclimate (al.name ("type")),
+  : Bioclimate (al),
     No (al.integer ("NoOfIntervals")),
     LAI_ (0.0),
     Height (al.integer ("NoOfIntervals") + 1),
@@ -562,45 +562,43 @@ void
 BioclimateStandard::output (Log& log) const
 {
   output_derived (pet, "pet", log);
-  log.output ("total_ep", total_ep);
-  log.output ("total_ea", total_ea);
-  log.output ("irrigation_overhead", irrigation_overhead_old);
-  log.output ("irrigation_overhead_temperature", 
-	      irrigation_overhead_temperature);
-  log.output ("irrigation_surface", irrigation_surface_old);
-  log.output ("irrigation_surface_temperature",
-	      irrigation_surface_temperature);
-  log.output ("irrigation_subsoil", irrigation_subsoil);
-  log.output ("irrigation_total", 
-	      irrigation_subsoil + irrigation_surface_old
-	      + irrigation_overhead_old);
+  output_variable (total_ep, log);
+  output_variable (total_ea, log);
+  output_value (irrigation_overhead_old, "irrigation_overhead", log);
+  output_value (irrigation_overhead_temperature, 
+	      "irrigation_overhead_temperature", log);
+  output_value (irrigation_surface_old, "irrigation_surface", log);
+  output_value (irrigation_surface_temperature,
+	      "irrigation_surface_temperature", log);
+  output_variable (irrigation_subsoil, log);
+  output_value ( irrigation_subsoil + irrigation_surface_old
+		  + irrigation_overhead_old, "irrigation_total", log);
   output_submodule (snow, "Snow", log);
-  log.output ("snow_ep", snow_ep);
-  log.output ("snow_ea", snow_ea);
-  log.output ("snow_water_in", snow_water_in);
-  log.output ("snow_water_in_temperature", 
-	      snow_water_in_temperature);
-  log.output ("snow_water_out", snow_water_out);
-  log.output ("snow_water_out_temperature", 
-	      snow_water_out_temperature);
-  log.output ("canopy_ep", canopy_ep);
-  log.output ("canopy_ea", canopy_ea);
-  log.output ("canopy_water_storage", canopy_water_storage);
-  log.output ("canopy_water_temperature", canopy_water_temperature);
-  log.output ("canopy_water_in", canopy_water_in);
-  log.output ("canopy_water_out", canopy_water_out);
-  log.output ("canopy_water_bypass", canopy_water_bypass);
-  log.output ("pond_ep", pond_ep);
-  log.output ("pond_ea", pond_ea);
-  log.output ("pond_water_in", pond_water_in);
-  log.output ("pond_water_in_temperature", 
-	      pond_water_in_temperature);
-  log.output ("soil_ep", soil_ep);
-  log.output ("soil_ea", soil_ea);
+  output_variable (snow_ep, log);
+  output_variable (snow_ea, log);
+  output_variable (snow_water_in, log);
+  output_variable (snow_water_in_temperature, log);
+  output_variable (snow_water_out, log);
+  output_value (snow_water_out_temperature, 
+	      "snow_water_out_temperature", log);
+  output_variable (canopy_ep, log);
+  output_variable (canopy_ea, log);
+  output_variable (canopy_water_storage, log);
+  output_variable (canopy_water_temperature, log);
+  output_variable (canopy_water_in, log);
+  output_variable (canopy_water_out, log);
+  output_variable (canopy_water_bypass, log);
+  output_variable (pond_ep, log);
+  output_variable (pond_ea, log);
+  output_variable (pond_water_in, log);
+  output_value (pond_water_in_temperature, 
+	      "pond_water_in_temperature", log);
+  output_variable (soil_ep, log);
+  output_variable (soil_ea, log);
   output_derived (svat, "svat", log);
-  log.output ("crop_ep", crop_ep);
-  log.output ("crop_ea", crop_ea);
-  log.output ("production_stress", production_stress);
+  output_variable (crop_ep, log);
+  output_variable (crop_ea, log);
+  output_variable (production_stress, log);
 
   // Note: We use snow_chemicals_in instead of spray, since the former
   // is reset after each time step.

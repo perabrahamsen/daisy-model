@@ -24,12 +24,20 @@
 
 using namespace std;
 
+Treelog::Open::Open (Treelog& l, const symbol name)
+  : log (l)
+{ log.open (name.name ()); }
+
 Treelog::Open::Open (Treelog& l, const string& name)
   : log (l)
 { log.open (name); }
 
 Treelog::Open::~Open ()
 { log.close (); }
+
+void
+Treelog::open (const symbol name)
+{ open (name.name ()); }
 
 void
 Treelog::debug (const string&)

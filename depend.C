@@ -40,8 +40,8 @@ private:
   dep_map& dependencies;
 
   // What depend on this parameterization?
-  const string dep_lib;
-  const string dep_par;
+  const symbol dep_lib;
+  const symbol dep_par;
   
   // Find _all_ depencied?
   const bool find_all;
@@ -53,18 +53,17 @@ public:
 
   // Create & Destroy.
 public:
-  TraverseDepend (const string& component, const string& parameterization, 
+  TraverseDepend (symbol component, symbol parameterization, 
 		  Treelog& treelog, dep_map& dependencies, bool find_all);
   ~TraverseDepend ();
 
 private:
   // Implementation.
-  bool enter_library (Library& library, 
-		      const string& component);
+  bool enter_library (Library& library, symbol component);
   void leave_library ();
   bool enter_model (const Syntax&, AttributeList&, 
-		    const string& component, const string& model);
-  void leave_model (const string& component, const string& name);
+		    symbol component, symbol model);
+  void leave_model (symbol component, symbol name);
   bool enter_submodel (const Syntax& syntax, AttributeList& alist,
   		       const AttributeList& default_alist,
   		       const string& name);
@@ -100,7 +99,7 @@ private:
 };
 
 bool
-TraverseDepend::enter_library (Library&, const string& component)
+TraverseDepend::enter_library (Library&, const symbol component)
 {
   if (found_any && !find_all)
     return false;
@@ -114,12 +113,12 @@ TraverseDepend::leave_library ()
 
 bool
 TraverseDepend::enter_model (const Syntax&, AttributeList& alist,
-			     const string& component, const string& name)
+			     const symbol component, const symbol name)
 {
   // Check if this model is inherited from the model we are examining.
   if (dep_lib == component
       && alist.check ("type") 
-      && alist.name ("type") == dep_par)
+      && alist.identifier ("type") == dep_par)
     { 
       Treelog::Open nest1 (treelog, name);
       treelog.entry (dep_par + " inherited by " + name);
@@ -143,7 +142,7 @@ TraverseDepend::enter_model (const Syntax&, AttributeList& alist,
 }
 
 void
-TraverseDepend::leave_model (const string& component, const string& name)
+TraverseDepend::leave_model (const symbol component, const symbol name)
 { 
   if (found && find_all)
     {
@@ -215,7 +214,7 @@ TraverseDepend::enter_object (const Library& library,
 			      const string& name)
 {
   daisy_assert (alist.check ("type"));
-  const string super = alist.name ("type");
+  const symbol super = alist.identifier ("type");
   if (dep_lib == library.name () && super == dep_par)
     { 
       treelog.entry (name + " inherits " + dep_par);
@@ -258,8 +257,8 @@ void
 TraverseDepend::leave_parameter ()
 { }
 
-TraverseDepend::TraverseDepend (const string& component,
-				const string& parameterization,
+TraverseDepend::TraverseDepend (const symbol component,
+				const symbol parameterization,
 				Treelog& tlog,
 				dep_map& deps, bool fa)
   : treelog (tlog),
@@ -275,7 +274,7 @@ TraverseDepend::~TraverseDepend ()
 { }
 
 bool
-has_dependencies (const string& component, const string& parameterization)
+has_dependencies (const symbol component, const symbol parameterization)
 {
   dep_map dependencies;
   TraverseDepend depend (component, parameterization,
@@ -286,7 +285,7 @@ has_dependencies (const string& component, const string& parameterization)
 }
 
 bool
-has_dependencies (const string& component, const string& parameterization, 
+has_dependencies (const symbol component, const symbol parameterization, 
 		  const Syntax& syntax, AttributeList& alist,
 		  const string& name)
 {
@@ -299,7 +298,7 @@ has_dependencies (const string& component, const string& parameterization,
 }
 
 bool
-check_dependencies (const string& component, const string& parameterization, 
+check_dependencies (const symbol component, const symbol parameterization, 
 		    Treelog& treelog)
 {
   dep_map dependencies;
@@ -311,7 +310,7 @@ check_dependencies (const string& component, const string& parameterization,
 }
 
 bool
-check_dependencies (const string& component, const string& parameterization, 
+check_dependencies (const symbol component, const symbol parameterization, 
 		    const Syntax& syntax, AttributeList& alist,
 		    const string& name, Treelog& treelog)
 {
@@ -324,7 +323,7 @@ check_dependencies (const string& component, const string& parameterization,
 }
 
 bool
-find_dependencies (const string& component, const string& parameterization, 
+find_dependencies (const symbol component, const symbol parameterization, 
 		   dep_map& dependencies)
 {
   TraverseDepend depend (component, parameterization, 
@@ -335,7 +334,7 @@ find_dependencies (const string& component, const string& parameterization,
 }
 
 static int
-sequence_number (const string& component, const string& parameterization)
+sequence_number (const symbol component, const symbol parameterization)
 {
   const Library& library = Library::find (component);
   daisy_assert (library.check (parameterization));
@@ -348,20 +347,18 @@ sequence_number (const string& component, const string& parameterization)
 
 struct object_desc
 {
-  string comp;
-  string par;
+  symbol comp;
+  symbol par;
   void operator= (const object_desc& other)
   { 
     comp = other.comp;
     par = other.par;
   }
-  object_desc ()
-  { }
   object_desc (const object_desc& other)
     : comp (other.comp),
       par (other.par)
   { }
-  object_desc (const string& c, const string& p)
+  object_desc (const symbol c, const symbol p)
     : comp (c),
       par (p)
   { }
@@ -374,7 +371,7 @@ sort_by_sequence (const object_desc& one, const object_desc& two)
     < sequence_number (two.comp, two.par); }
 
 void
-resequence (const string& component, const string& parameterization, 
+resequence (const symbol component, const symbol parameterization, 
 	    const dep_map& dependencies)
 { 
   // Vector with all object to resequence.
@@ -388,9 +385,9 @@ resequence (const string& component, const string& parameterization,
        i != dependencies.end ();
        i++)
     {
-      const string component = (*i).first;
-      const string_set& pars = (*i).second;
-      for (string_set::const_iterator j = pars.begin ();
+      const symbol component = (*i).first;
+      const symbol_set& pars = (*i).second;
+      for (symbol_set::const_iterator j = pars.begin ();
 	   j != pars.end ();
 	   j++)
 	deps.push_back (object_desc (component, *j));
@@ -402,8 +399,8 @@ resequence (const string& component, const string& parameterization,
   // Resequence them.
   for (unsigned int i = 0; i < deps.size (); i++)
     {
-      const string& component = deps[i].comp;
-      const string& parameterization = deps[i].par;
+      const symbol component = deps[i].comp;
+      const symbol parameterization = deps[i].par;
        
        Library& library = Library::find (component);
        daisy_assert (library.check (parameterization));

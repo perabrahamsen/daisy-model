@@ -29,7 +29,7 @@ class Average
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Simulation.

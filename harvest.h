@@ -25,7 +25,7 @@
 
 #include "chemicals.h"
 #include "time.h"
-#include <string>
+#include "symbol.h"
 
 class AttributeList;
 class Syntax;
@@ -35,9 +35,9 @@ class Harvest
 {
   // Content:
 public:
-  const std::string column;
+  const symbol column;
   const Time time;
-  const std::string crop;
+  const symbol crop;
   const double stem_DM;
   const double stem_N;
   const double stem_C;
@@ -63,7 +63,7 @@ public:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   Harvest (const AttributeList& al);
-  Harvest (std::string col, Time t, std::string crp, 
+  Harvest (symbol col, Time t, symbol crp, 
 	   double sDM, double sN, double sC, double dDM, double dN, double dC,
 	   double lDM, double lN, double lC, double oDM, double oN, double oC,
 	   const Chemicals& chem);

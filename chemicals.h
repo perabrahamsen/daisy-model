@@ -23,6 +23,7 @@
 #ifndef CHEMICALS_H
 #define CHEMICALS_H
 
+#include "symbol.h"
 #include "syntax.h"
 #include <vector>
 #include <set>
@@ -41,7 +42,7 @@ private:
 
   // Utilities.
 public:
-  static const Chemical& lookup (const std::string& name);
+  static const Chemical& lookup (symbol name);
   static void move_fraction (Chemicals& from, Chemicals& to, double fraction);
   static void copy_fraction (const Chemicals& from, Chemicals& to,
 			     double fraction);
@@ -57,11 +58,11 @@ public:
   // Simulation
 public:
   void output (Log&) const;
-  void add (const std::string& chemical, double amount); // [g/m^2]
-  void set_to (const std::string& chemical, double amount); // [g/m^2]
-  double amount (const std::string& chemical) const; // [g/m^2]
-  typedef std::set<std::string, std::less<std::string>/**/> string_set;
-  void find_missing (const string_set& all, string_set& missing) const;
+  void add (symbol chemical, double amount); // [g/m^2]
+  void set_to (symbol chemical, double amount); // [g/m^2]
+  double amount (symbol chemical) const; // [g/m^2]
+  typedef std::set<symbol> symbol_set;
+  void find_missing (const symbol_set& all, symbol_set& missing) const;
 
   // Create and Destroy.
 public:
@@ -72,7 +73,7 @@ public:
   static void add_syntax (const char* name, Syntax& syntax, 
 			  AttributeList& alist,
 			  Syntax::category cat, 
-			  const std::string& description);
+			  const char* description);
   Chemicals ();
   Chemicals (const std::vector<AttributeList*>&);
   ~Chemicals ();

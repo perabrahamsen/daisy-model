@@ -402,19 +402,19 @@ SoilWater::Implementation::check (unsigned n, Treelog& err) const
 void 
 SoilWater::Implementation::output (Log& log) const
 {
-  log.output ("S_sum", S_sum);
-  log.output ("S_root", S_root);
-  log.output ("S_drain", S_drain);
-  log.output ("S_p", S_p);
-  log.output ("S_permanent", S_permanent);
-  log.output ("Theta", Theta);
-  log.output ("h", h);
-  log.output ("S_ice", S_ice);
-  log.output ("X_ice", X_ice);
-  log.output ("X_ice_buffer", X_ice_buffer);
-  log.output ("h_ice", h_ice);
-  log.output ("q", q);
-  log.output ("q_p", q_p);
+  output_variable (S_sum, log);
+  output_variable (S_root, log);
+  output_variable (S_drain, log);
+  output_variable (S_p, log);
+  output_variable (S_permanent, log);
+  output_variable (Theta, log);
+  output_variable (h, log);
+  output_variable (S_ice, log);
+  output_variable (X_ice, log);
+  output_variable (X_ice_buffer, log);
+  output_variable (h_ice, log);
+  output_variable (q, log);
+  output_variable (q_p, log);
   output_derived (*top, "UZtop", log);
   if (bottom)
     output_derived (*bottom, "UZbottom", log);

@@ -229,12 +229,12 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 void
 UZlr::output (Log& log) const
 {
-  log.output ("q_up", q_up);
-  log.output ("q_down", q_down);
+  output_variable (q_up, log);
+  output_variable (q_down, log);
 }
 
 UZlr::UZlr (const AttributeList& al)
-  : UZmodel (al.name ("type")),
+  : UZmodel (al),
     h_fc (al.number ("h_fc")),
     z_top (al.number ("z_top")),
     q_up (0.0),

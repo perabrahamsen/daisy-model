@@ -29,8 +29,8 @@ const char *const Transport::description = "\
 This component handles the transportation of solute in the soil with\n\
 the water.";
 
-Transport::Transport (const string& n)
-  : name (n)
+Transport::Transport (const AttributeList& al)
+  : name (al.identifier ("type"))
 { }
 
 Transport::~Transport ()

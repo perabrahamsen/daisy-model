@@ -31,7 +31,7 @@ class Action
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   const AttributeList alist;
 
   // Simulation.

@@ -694,10 +694,10 @@ void
 GroundwaterPipe::output (Log& log) const
 {
   Groundwater::output (log);
-  log.output ("DrainFlow", DrainFlow);
-  log.output ("EqDrnFlow", EqDrnFlow);
-  log.output ("DeepPercolation", Percolation[i_bottom]);
-  log.output ("S", S);
+  output_variable (DrainFlow, log);
+  output_variable (EqDrnFlow, log);
+  output_value (Percolation[i_bottom], "DeepPercolation", log);
+  output_variable (S, log);
 }
 
 static struct GroundwaterPipeSyntax

@@ -445,12 +445,12 @@ Surface::output (Log& log) const
 void
 Surface::Implementation::output (Log& log) const
 {
-  log.output ("T", T);
-  log.output ("pond", pond);
-  log.output ("flux", flux);
-  log.output ("EvapSoilSurface", EvapSoilSurface);
-  log.output ("Eps", Eps);
-  log.output ("runoff", runoff);
+  output_variable (T, log);
+  output_variable (pond, log);
+  output_variable (flux, log);
+  output_variable (EvapSoilSurface, log);
+  output_variable (Eps, log);
+  output_variable (runoff, log);
   output_submodule (im, "IM", log);
   output_submodule (im_runoff, "IM_runoff", log);
   output_submodule (chemicals_storage, "chemicals_storage", log);
@@ -507,14 +507,14 @@ Surface::get_no3 () const // [g/cm^2]
 { return impl.im.NO3; }
 
 void 
-Surface::put_chemical (const string& name , double amount) // [g/cm^2]
+Surface::put_chemical (symbol name , double amount) // [g/cm^2]
 {
   // [g/cm^2] -> [g/m^2]
   impl.chemicals_storage.set_to (name, amount * 1.0e4);
 }
 
 double 
-Surface::get_chemical (const string& name) const // [g/cm^2]
+Surface::get_chemical (symbol name) const // [g/cm^2]
 { 
   // [g/m^2] -> [g/cm^2]
   return impl.chemicals_storage.amount (name) * 1.0e-4;		

@@ -29,7 +29,7 @@ class Printer
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Interface.
@@ -52,7 +52,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Printer (const string& name);
+  Printer (const AttributeList& name);
 public:
   virtual ~Printer ();
 };

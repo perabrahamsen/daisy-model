@@ -22,6 +22,7 @@
 #ifndef XREF_H
 #define XREF_H
 
+#include "symbol.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -33,20 +34,18 @@ class XRef
 public:
   struct ModelUsed
   {
-    const string component;
-    const string model;
+    const symbol component;
+    const symbol model;
     bool operator< (const ModelUsed&) const;
-    ModelUsed (const string& comp, const string& mod);
-    ModelUsed ();
+    ModelUsed (symbol comp, symbol mod);
   };
 
   struct ModelUser
   {
-    string component;
-    string model;
+    symbol component;
+    symbol model;
     vector<string> path;
-    ModelUser (const string& com, const string& mod, const vector<string>& p);
-    ModelUser ();
+    ModelUser (symbol com, symbol mod, const vector<string>& p);
   };
 
   struct SubmodelUser
@@ -66,7 +65,7 @@ public:
 
   map<string, Users, less<string>/**/> submodels;
   map<ModelUsed, Users, less<ModelUsed>/**/> models;
-  map<string, Users, less<string>/**/> components;
+  map<symbol, Users> components;
 
   // Create and Destroy.
 public:

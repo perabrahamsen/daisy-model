@@ -46,7 +46,7 @@ private:
 public:
   SoilChemical& find (const Soil& soil, 
 		      const SoilWater& soil_water,
-		      const string& name, Treelog&);
+		      symbol name, Treelog&);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     const OrganicMatter*, const Chemicals& flux_in, Treelog&);
   void mixture (Chemicals& storage, // [g/m^2]

@@ -34,7 +34,7 @@ class Groundwater : public UZbottom
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
   virtual bool is_pipe () const;
   virtual double pipe_height () const;

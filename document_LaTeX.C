@@ -34,18 +34,22 @@
 struct DocumentLaTeX : public Document
 {
   // remember this for models.
-  string current_component;
+  symbol current_component;
   bool ordered;
   bool submodel;
 
   // LaTeX functions.
   void print_quoted (std::ostream&, const string&);
+  void print_quoted (std::ostream& out, const symbol sym)
+  { print_quoted (out, sym.name ()); }
 
   // Private functions.
   void print_string (std::ostream&, const string&);
   bool is_submodel (const Syntax&, const AttributeList&, const string&);
   string find_submodel (const Syntax&, const AttributeList&, const string&);
   void print_index (std::ostream& out, const string& name);
+  void print_index (std::ostream& out, const symbol sym)
+  { print_index (out, sym.name ()); }
   void print_entry_name (std::ostream& out, const string& name);
   void print_entry_type (std::ostream& out,
 			 const string& name,
@@ -85,21 +89,21 @@ struct DocumentLaTeX : public Document
 			   const AttributeList& alist);
   void print_sample_header (std::ostream& out, const string& name);
   void print_sample_trailer (std::ostream& out, const string&);
-  void print_model_header (std::ostream& out, const string& name);
+  void print_model_header (std::ostream& out, symbol name);
   void print_model_description (std::ostream& out, const string& description);
-  void print_model_trailer (std::ostream& out, const string& name);
+  void print_model_trailer (std::ostream& out, symbol name);
   void print_parameterization_header (std::ostream& out,
-  				      const string& name, const string& type);
+  				      symbol name, symbol type);
   void print_parameterization_file (std::ostream& out, const string& name);
   void print_parameterization_no_file (std::ostream& out);
   void print_parameterization_description (std::ostream& out, 
 					   const string& description);
-  void print_parameterization_trailer (std::ostream& out, const string& name);
+  void print_parameterization_trailer (std::ostream& out, symbol name);
   void print_fixed_header (std::ostream&, const string& name);
   void print_fixed_trailer (std::ostream&, const string& name);
-  void print_component_header (std::ostream& out, const string& name);
+  void print_component_header (std::ostream& out, symbol name);
   void print_component_description (std::ostream& out, const string& description);
-  void print_component_trailer (std::ostream& out, const string& name);
+  void print_component_trailer (std::ostream& out, symbol name);
   void print_fixed_all_header (std::ostream&) ;
   void print_fixed_all_trailer (std::ostream&);
   void print_document_header (std::ostream& out);
@@ -289,7 +293,7 @@ DocumentLaTeX::print_entry_type (std::ostream& out,
       break;
     case Syntax::Object:
       {
-	const string& component = syntax.library (name).name ();
+	const symbol component = syntax.library (name).name ();
 	out << "\\textbf{";
 	print_quoted (out, component);
 	out << "} component (see chapter~\\ref{component:"
@@ -479,7 +483,7 @@ DocumentLaTeX::print_entry_value (std::ostream& out,
 	    {
 	      const AttributeList& object = alist.alist (name);
 	      daisy_assert (object.check ("type"));
-	      const string& type = object.name ("type");
+	      const symbol type = object.identifier ("type");
 	      out << " (default `";
 	      print_quoted (out, type);
 	      out << "')";
@@ -546,8 +550,8 @@ DocumentLaTeX::print_users (std::ostream& out, const XRef::Users& users)
 	out << ", and \n";
       else 
 	out << ",\n";
-      const string component = users.models[i].component;
-      const string model = users.models[i].model;
+      const symbol component = users.models[i].component;
+      const symbol model = users.models[i].model;
       const vector<string>& path = users.models[i].path;
       print_quoted (out, component);
       out << " ";
@@ -828,7 +832,7 @@ DocumentLaTeX::print_log_trailer (std::ostream& out, const string& name, int lev
 {  print_submodel_trailer (out, name, level); }
 
 void
-DocumentLaTeX::print_model_header (std::ostream& out, const string& name)
+DocumentLaTeX::print_model_header (std::ostream& out, const symbol name)
 { 
   out << "\n\\section{";
   print_quoted (out, name);
@@ -846,13 +850,13 @@ DocumentLaTeX::print_model_description (std::ostream& out,
 }
 
 void
-DocumentLaTeX::print_model_trailer (std::ostream&, const string&)
+DocumentLaTeX::print_model_trailer (std::ostream&, const symbol)
 { }
 
 void 
 DocumentLaTeX::print_parameterization_header (std::ostream& out,
-					      const string& name, 
-					      const string& type)
+					      const symbol name, 
+					      const symbol type)
 {
   out << "\n\\section{";
   print_quoted (out, name);
@@ -884,7 +888,7 @@ DocumentLaTeX::print_parameterization_description (std::ostream& out,
 { print_model_description (out, description); }
 
 void 
-DocumentLaTeX::print_parameterization_trailer (std::ostream&, const string&)
+DocumentLaTeX::print_parameterization_trailer (std::ostream&, const symbol)
 { }
 
 void
@@ -901,7 +905,7 @@ DocumentLaTeX::print_fixed_trailer (std::ostream&, const string&)
 { }
 
 void
-DocumentLaTeX::print_component_header (std::ostream& out, const string& name)
+DocumentLaTeX::print_component_header (std::ostream& out, const symbol name)
 { 
   current_component = name;
   out << "\n\\chapter{";
@@ -920,9 +924,10 @@ DocumentLaTeX::print_component_description (std::ostream& out,
 }
 
 void
-DocumentLaTeX::print_component_trailer (std::ostream&, const string&)
+DocumentLaTeX::print_component_trailer (std::ostream&, const symbol)
 { 
-  current_component = "Daisy";
+  static const symbol Daisy_symbol ("Daisy");
+  current_component = Daisy_symbol;
 }
 
 void
@@ -975,13 +980,13 @@ static struct DocumentLaTeXSyntax
 {
   static Document&
   make (const AttributeList& al)
-    { return *new DocumentLaTeX (al); }
+  { return *new DocumentLaTeX (al); }
   DocumentLaTeXSyntax ()
-    {
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Output Daisy components as LaTeX chapters.");
-      Librarian<Document>::add_type ("LaTeX", alist, syntax, &make);
-    }
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "Output Daisy components as LaTeX chapters.");
+    Librarian<Document>::add_type ("LaTeX", alist, syntax, &make);
+  }
 } DocumentLaTeX_syntax;
 

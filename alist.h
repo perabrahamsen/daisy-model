@@ -23,6 +23,7 @@
 #ifndef ALIST_H
 #define ALIST_H
 
+#include "symbol.h"
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -57,6 +58,8 @@ public:
   double number (const char*) const;
   const string& name (const string&) const;
   const string& name (const char*) const;
+  symbol identifier (const string&) const;
+  symbol identifier (const char*) const;
   bool flag (const string&) const;
   bool flag (const char*) const;
   const PLF& plf (const string&) const;
@@ -67,8 +70,8 @@ public:
   int integer (const char*) const;
   const vector<double>& number_sequence (const string&) const;
   const vector<double>& number_sequence (const char*) const;
-  const vector<string>& name_sequence (const string& key) const;
-  const vector<string>& name_sequence (const char* key) const;
+  const vector<symbol>& identifier_sequence (const string& key) const;
+  const vector<symbol>& identifier_sequence (const char* key) const;
   const vector<bool>& flag_sequence (const string& key) const;
   const vector<bool>& flag_sequence (const char* key) const;
   const vector<int>& integer_sequence (const string& key) const;
@@ -82,12 +85,13 @@ public:
   void add (const string&, double);
   void add (const string&, const char*);
   void add (const string&, const string&);
+  void add (const string&, symbol);
   void add (const string&, bool);
   void add (const string&, int);
   void add (const string&, const AttributeList&);
   void add (const string&, const PLF&);
   void add (const string&, const vector<double>&);
-  void add (const string&, const vector<string>&);
+  void add (const string&, const vector<symbol>&);
   void add (const string&, const vector<bool>&);
   void add (const string&, const vector<int>&);
   void add (const string&, const vector<AttributeList*>&);

@@ -44,7 +44,7 @@ Transform::load_syntax (Syntax&, AttributeList&)
 { }
 
 Transform::Transform (const AttributeList& al)
-  : name (al.name ("type")),
+  : name (al.identifier ("type")),
     alist (al)
 { }
 

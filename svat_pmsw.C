@@ -1790,57 +1790,57 @@ void
 SVAT_PMSW::output (Log& log) const
 {                                                 // var 1-4: yy-mm-dd-hh
   SVAT::output (log); // log_only var
-  log.output ("netrad_brunt", netrad_brunt);    // var 5
-  log.output ("netlong_brunt", netlong_brunt);  // var 6
-  log.output ("r_a", r_a);                      // var 7
-  log.output ("r_astab", r_astab);              // var 8
-  log.output ("r_aa", r_aa);                    // var 9
-  log.output ("r_aastab1", r_aastab1);          // var 10
-  log.output ("r_aastab2", r_aastab2);          // var 11
-  log.output ("r_as", r_as);                    // var 12
-  log.output ("r_ac", r_ac);                    // var 13
-  log.output ("r_sc_1", r_sc_1);                // var 14
-  log.output ("r_sc_2", r_sc_2);                // var 15
-  log.output ("tskin", tskin);                  // var 16
-  log.output ("tcan", tcan);                    // var 17
-  log.output ("tleaf", tleaf);                  // var 18
-  log.output ("e_c_abs", e_c_abs);              // var 19
-  log.output ("e_sl_abs", e_sl_abs);            // var 20
-  log.output ("ha", ha);                        // var 21
-  log.output ("hl", hl);                        // var 22
-  log.output ("hs", hs);                        // var 23
-  log.output ("lea", lea);                      // var 24
-  log.output ("lel", lel);                      // var 25
-  log.output ("gflux", gflux);                  // var 26
-  log.output ("dtcta", dtcta);                  // var 27
-  log.output ("dtltc", dtltc);                  // var 28
-  log.output ("dtstc", dtstc);                  // var 29
-  log.output ("theta_0_20", theta_0_20);        // var 30
-  log.output ("theta_0_50", theta_0_50);        // var 31
-  log.output ("theta_0_100", theta_0_100);      // var 32
-  log.output ("f_1", f_1);                      // var 33
-  log.output ("f1_dolman", f1_dolman);          // var 34
-  log.output ("f_2", f_2);                      // var 35
-  log.output ("f_3", f_3);                      // var 36
-  log.output ("f_4", f_4);                      // var 37
-  log.output ("f_temp", f_temp);                // var 38
-  log.output ("f_def", f_def);                  // var 39
-  log.output ("f_theta", f_theta);              // var 40
-  log.output ("f_etep", f_etep);                // var 41
-  log.output ("r_sc_js", r_sc_js);              // var 42
-  log.output ("r_sc", r_sc);                    // var 43
-  log.output ("rcmin_star", rcmin_star);        // var 44
-  log.output ("pstress", pstress);              // var 45
-  log.output ("ustar_raa", ustar_raa);          // var 46
-  log.output ("ustar_raastab1", ustar_raastab1);// var 47
-  log.output ("ustar_raastab2", ustar_raastab2);// var 48
-  log.output ("env_lai_factor", env_lai_factor);// var 49
-  log.output ("e_pa", e_pa);                    // var 50
-  log.output ("e_abs", e_abs);                  // var 51
-  log.output ("tair", tair);                    // var 52
-  log.output ("srad", srad);                    // var 53
-  log.output ("u_ref", u_ref);                  // var 54
-  log.output ("prec", prec);                    // var 55
+  output_variable (netrad_brunt, log);    // var 5
+  output_variable (netlong_brunt, log);  // var 6
+  output_variable (r_a, log);                      // var 7
+  output_variable (r_astab, log);              // var 8
+  output_variable (r_aa, log);                    // var 9
+  output_variable (r_aastab1, log);          // var 10
+  output_variable (r_aastab2, log);          // var 11
+  output_variable (r_as, log);                    // var 12
+  output_variable (r_ac, log);                    // var 13
+  output_variable (r_sc_1, log);                // var 14
+  output_variable (r_sc_2, log);                // var 15
+  output_variable (tskin, log);                  // var 16
+  output_variable (tcan, log);                    // var 17
+  output_variable (tleaf, log);                  // var 18
+  output_variable (e_c_abs, log);              // var 19
+  output_variable (e_sl_abs, log);            // var 20
+  output_variable (ha, log);                        // var 21
+  output_variable (hl, log);                        // var 22
+  output_variable (hs, log);                        // var 23
+  output_variable (lea, log);                      // var 24
+  output_variable (lel, log);                      // var 25
+  output_variable (gflux, log);                  // var 26
+  output_variable (dtcta, log);                  // var 27
+  output_variable (dtltc, log);                  // var 28
+  output_variable (dtstc, log);                  // var 29
+  output_variable (theta_0_20, log);        // var 30
+  output_variable (theta_0_50, log);        // var 31
+  output_variable (theta_0_100, log);      // var 32
+  output_variable (f_1, log);                      // var 33
+  output_variable (f1_dolman, log);          // var 34
+  output_variable (f_2, log);                      // var 35
+  output_variable (f_3, log);                      // var 36
+  output_variable (f_4, log);                      // var 37
+  output_variable (f_temp, log);                // var 38
+  output_variable (f_def, log);                  // var 39
+  output_variable (f_theta, log);              // var 40
+  output_variable (f_etep, log);                // var 41
+  output_variable (r_sc_js, log);              // var 42
+  output_variable (r_sc, log);                    // var 43
+  output_variable (rcmin_star, log);        // var 44
+  output_variable (pstress, log);              // var 45
+  output_variable (ustar_raa, log);          // var 46
+  output_variable (ustar_raastab1, log);// var 47
+  output_variable (ustar_raastab2, log);// var 48
+  output_variable (env_lai_factor, log);// var 49
+  output_variable (e_pa, log);                    // var 50
+  output_variable (e_abs, log);                  // var 51
+  output_variable (tair, log);                    // var 52
+  output_variable (srad, log);                    // var 53
+  output_variable (u_ref, log);                  // var 54
+  output_variable (prec, log);                    // var 55
 }
 
 SVAT_PMSW::SVAT_PMSW (const AttributeList& al)

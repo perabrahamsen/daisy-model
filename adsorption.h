@@ -32,7 +32,7 @@ class Adsorption
   // Content.
 public:
   static const char *const description;
-  const string name;
+  const symbol name;
 
   // Simulation.
 public:
@@ -42,7 +42,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Adsorption (const string& name);
+  Adsorption (const AttributeList& al);
 public:
   virtual ~Adsorption ();
 };

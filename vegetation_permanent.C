@@ -83,9 +83,9 @@ struct VegetationPermanent : public Vegetation
 
 
   // Individual crop queries.
-  double DS_by_name (const string&) const
+  double DS_by_name (symbol) const
   {   return Crop::DSremove; }
-  double DM_by_name (const string&) const
+  double DM_by_name (symbol) const
   { return 0.0; }
 
   // Simulation.
@@ -105,11 +105,11 @@ struct VegetationPermanent : public Vegetation
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water, 
 			double day_fraction, Treelog&);
-  void kill_all (const string&, const Time&, const Geometry&, Bioclimate&,
+  void kill_all (symbol, const Time&, const Geometry&, Bioclimate&,
 		 vector<AM*>&, double&, double&, double&, 
 		 vector<double>&, vector<double>&, Treelog&)
   { }
-  void harvest (const string&, const string&,
+  void harvest (symbol, symbol,
 		const Time&, const Geometry&, Bioclimate&,
 		double, double, double, double, 
 		vector<const Harvest*>&,
@@ -185,8 +185,12 @@ VegetationPermanent::tick (const Time& time,
 	  N_litter = N_actual * (dLAI / old_LAI);
 	  if (!litter)
 	    {
+	      static const symbol vegetation_symbol ("vegetation");
+	      static const symbol dead_symbol ("dead");
+	      
 	      litter = &AM::create (soil, time, litter_am,
-				    "vegetation", "dead", AM::Locked);
+				    vegetation_symbol, dead_symbol,
+				    AM::Locked);
 	      organic_matter->add (*litter);
 
 	    }
@@ -222,10 +226,10 @@ VegetationPermanent::output (Log& log) const
 {
   Vegetation::output (log);
   output_submodule (canopy, "Canopy", log);
-  log.output ("N_demand", N_demand);
-  log.output ("N_actual", N_actual);
-  log.output ("N_uptake", N_uptake);
-  log.output ("N_litter", N_litter);
+  output_variable (N_demand, log);
+  output_variable (N_actual, log);
+  output_variable (N_uptake, log);
+  output_variable (N_litter, log);
   output_submodule (root_system, "Root", log);
 }
 
@@ -235,7 +239,9 @@ VegetationPermanent::initialize (Treelog& msg, const Soil& soil,
 {
   root_system.initialize (soil.size ());
   root_system.full_grown (msg, soil, WRoot);
-  litter = organic_matter.find_am ("vegetation", "litter");
+  static const symbol vegetation_symbol ("vegetation");
+  static const symbol litter_symbol ("litter");
+  litter = organic_matter.find_am (vegetation_symbol, litter_symbol);
 }
 
 VegetationPermanent::VegetationPermanent (const AttributeList& al)

@@ -38,7 +38,7 @@ Rootdens::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Rootdens::Rootdens (const AttributeList& al)
-  : name (al.name ("type")),
+  : name (al.identifier ("type")),
     SpRtLength (al.number ("SpRtLength"))
 { }
 

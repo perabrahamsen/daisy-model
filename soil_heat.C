@@ -708,19 +708,20 @@ SoilHeat::T (unsigned int i) const
 void
 SoilHeat::output (Log& log) const
 {
-  log.output ("T", impl.T);
-  log.output ("T_top", impl.T_top);
-  log.output ("T_freezing", impl.T_freezing);
-  log.output ("T_thawing", impl.T_thawing);
-  log.output ("q", impl.q);
-  log.output ("capacity", impl.capacity);
-  log.output ("C_apparent", impl.C_apparent);
-  if (log.check_member ("state"))
+  output_value (impl.T, "T", log);
+  output_value (impl.T_top, "T_top", log);
+  output_value (impl.T_freezing, "T_freezing", log);
+  output_value (impl.T_thawing, "T_thawing", log);
+  output_value (impl.q, "q", log);
+  output_value (impl.capacity, "capacity", log);
+  output_value (impl.C_apparent, "C_apparent", log);
+  static const symbol state_symbol ("state");
+  if (log.check_member (state_symbol))
     {
       vector<double> tmp (impl.state.size (), -1.0);
       for (unsigned int i = 0; i < impl.state.size (); i++)
 	tmp[i] = static_cast<double> (impl.state[i]);
-      log.output ("state", tmp);
+      output_value (tmp, "state", log);
     }
 }
 

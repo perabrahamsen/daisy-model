@@ -31,7 +31,7 @@ class Parser
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Interface.
@@ -44,7 +44,7 @@ public:
 public:
   virtual void initialize (const Syntax&, Treelog&) = 0;
 protected:
-  Parser (const string& name);
+  Parser (const AttributeList&);
 public:
   virtual ~Parser ();
 };

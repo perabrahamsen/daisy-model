@@ -62,11 +62,11 @@ public:
     Treelog::Open nest (err, name);
     initialize_common (time, err, global_weather);
   }
-  Column& clone (const string& name) const
+  Column& clone (symbol name) const
   { 
     AttributeList new_alist (alist);
     // BUG: TODO: Log state of 'this' to new_alist.
-    new_alist.add ("type", name);
+    new_alist.add ("type", name.name ());
     return *new ColumnInorganic (new_alist); 
   }
   ColumnInorganic (const AttributeList& al)

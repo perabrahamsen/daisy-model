@@ -408,7 +408,7 @@ WeatherStandard::has_data (const string& name)
 void
 WeatherStandard::tick (const Time& time, Treelog& msg)
 {
-  Treelog::Open nest (msg, string ("Weather: ") + name);
+  Treelog::Open nest (msg, "Weather: " + name);
 
   Weather::tick (time, msg);
 
@@ -662,7 +662,7 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
 void
 WeatherStandard::initialize (const Time&, Treelog& err)
 { 
-  Treelog::Open nest (err, string ("Weather: ") + name);
+  Treelog::Open nest (err, "Weather: " + name);
 
   daisy_assert (lex == NULL);
   lex = new LexerData (where, err);

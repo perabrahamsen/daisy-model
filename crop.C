@@ -43,7 +43,7 @@ Crop::albedo () const
 { return 0.20; }
 
 void
-Crop::kill (const string& name, const Time& time, const Geometry& geometry,
+Crop::kill (const symbol name, const Time& time, const Geometry& geometry,
 	    Bioclimate& bioclimate, vector<AM*>& residuals,
 	    double& residuals_DM,
 	    double& residuals_N_top, double& residuals_C_top,
@@ -71,7 +71,7 @@ Crop::initialize_organic (Treelog& msg, const Geometry& geometry,
 
 Crop::Crop (const AttributeList& al)
   : alist (al),
-    name (al.name ("type"))
+    name (al.identifier ("type"))
 { }
 
 Crop::~Crop ()

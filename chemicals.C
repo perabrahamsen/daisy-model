@@ -36,11 +36,11 @@ struct Chemicals::Implementation
 { 
   // Types.
   typedef map<const Chemical*, double, less<const Chemical*>/**/> chemical_map;
-  typedef map<string, const Chemical*, less<string>/**/> chemistry_map;
+  typedef map<symbol, const Chemical*> chemistry_map;
   
   // Class variables.
   static chemistry_map* chemistry;
-  static const Chemical* lookup (const string& name);
+  static const Chemical* lookup (symbol name);
 
   // Instance variables.
   chemical_map chemicals;
@@ -60,17 +60,17 @@ struct Chemicals::Implementation
 
   // Simulation
   void output (Log&) const;
-  void add (const string& name, double amount) // [g/m^2]
+  void add (symbol name, double amount) // [g/m^2]
     { add (lookup (name), amount); }
   void add (const Chemical* chemical, double amount) // [g/m^2]
     { chemicals[chemical] += amount; }
-  void set_to (const string& name, double amount) // [g/m^2]
+  void set_to (symbol name, double amount) // [g/m^2]
     { set_to (lookup (name), amount); }
   void set_to (const Chemical* chemical, double amount) // [g/m^2]
     { chemicals[chemical] = amount; }
-  double amount (const string& name) const; // [g/m^2]
-  typedef set<string, less<string>/**/> string_set;
-  void find_missing (const string_set& all, string_set& missing) const;
+  double amount (symbol name) const; // [g/m^2]
+  typedef Chemicals::symbol_set symbol_set;
+  void find_missing (const symbol_set& all, symbol_set& missing) const;
 
   // Create and Destroy.
   void clear ();
@@ -91,7 +91,7 @@ Chemicals::Implementation::chemistry_map*
 Chemicals::Implementation::chemistry = NULL;
 
 const Chemical* 
-Chemicals::Implementation::lookup (const string& name)
+Chemicals::Implementation::lookup (symbol name)
 {
   // Create map first time.
   if (chemistry == NULL)
@@ -206,16 +206,16 @@ Chemicals::Implementation::output (Log& log) const
        i != chemicals.end ();
        i++)
     { 
-      const string& name = (*i).first->name;
+      const symbol name = (*i).first->name;
       const double amount = (*i).second;
       Log::Named named (log, name);
-      log.output ("chemical", name);
-      log.output ("amount", amount);
+      output_value (name, "chemical", log);
+      output_variable (amount, log);
     }
 }
 
 double
-Chemicals::Implementation::amount (const string& name) const
+Chemicals::Implementation::amount (symbol name) const
 {
   const Chemical* chemical = lookup (name);
 
@@ -228,15 +228,15 @@ Chemicals::Implementation::amount (const string& name) const
 }
 
 void 
-Chemicals::Implementation::find_missing (const string_set& all,
-					 string_set& missing) const
+Chemicals::Implementation::find_missing (const symbol_set& all,
+					 symbol_set& missing) const
 {
   for (chemical_map::const_iterator i = chemicals.begin ();
        i != chemicals.end ();
        i++)
     {
-      const string name = (*i).first->name;
-      string_set::const_iterator found = all.find (name);
+      const symbol name = (*i).first->name;
+      symbol_set::const_iterator found = all.find (name);
       if (found == all.end ())
 	missing.insert (name);
     }
@@ -263,11 +263,11 @@ Chemicals::Implementation::operator += (const Implementation& other)
 Chemicals::Implementation::Implementation (const vector<AttributeList*>& al)
 {
   for (unsigned int i = 0; i < al.size (); i++)
-    add (al[i]->name ("chemical"), al[i]->number ("amount"));
+    add (al[i]->identifier ("chemical"), al[i]->number ("amount"));
 }
 
 const Chemical&
-Chemicals::lookup (const string& name)
+Chemicals::lookup (symbol name)
 { return *Implementation::lookup (name); }
 
 void
@@ -295,19 +295,19 @@ Chemicals::output (Log& log) const
 { impl.output (log); }
 
 void 
-Chemicals::add (const string& chemical, double amount)
+Chemicals::add (symbol chemical, double amount)
 { impl.add (chemical, amount); }
 
 void 
-Chemicals::set_to (const string& chemical, double amount)
+Chemicals::set_to (symbol chemical, double amount)
 { impl.set_to (chemical, amount); }
 
 double
-Chemicals::amount (const string& chemical) const
+Chemicals::amount (symbol chemical) const
 { return impl.amount (chemical); }
 
 void 
-Chemicals::find_missing (const string_set& all, string_set& missing) const
+Chemicals::find_missing (const symbol_set& all, symbol_set& missing) const
 { impl.find_missing (all, missing); }
 
 void 
@@ -332,12 +332,12 @@ check_alist_entry (const AttributeList& al, Treelog& err)
   bool ok = true;
   
   const Library& library = Librarian<Chemical>::library ();
-  const string chemical = al.name ("chemical");
+  const symbol chemical = al.identifier ("chemical");
   const double amount = al.number ("amount");
 
   if (!library.check (chemical))
     {
-      err.entry (string ("Unknown chemical '") + chemical + "'");
+      err.entry ("Unknown chemical '" + chemical + "'");
       ok = false;
     }
   else
@@ -371,10 +371,10 @@ static void chemicals_load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 void 
-Chemicals::add_syntax (const char* name,
+Chemicals::add_syntax (const char *const name,
 		       Syntax& syntax, AttributeList& alist,
 		       Syntax::category cat, 
-		       const string& description)
+		       const char *const description)
 {
   // KLUDGE: Ugly hack to be able to use the standard 'load_syntax' form.
   chemicals_default_category = cat;

@@ -103,8 +103,8 @@ struct VegetationCrops : public Vegetation
   double CanopyAverage (CropFun fun) const;
 
   // Individual crop queries.
-  double DS_by_name (const string& name) const;
-  double DM_by_name (const string& name) const;
+  double DS_by_name (symbol name) const;
+  double DM_by_name (symbol name) const;
 
   // Simulation.
   void tick (const Time& time,
@@ -125,14 +125,14 @@ struct VegetationCrops : public Vegetation
 			const Soil& soil, SoilWater& soil_water, 
 			double day_fraction, Treelog&);
   void force_production_stress  (double pstress);
-  void kill_all (const string&, const Time&, const Geometry&, 
+  void kill_all (symbol, const Time&, const Geometry&, 
 		 Bioclimate&, vector<AM*>& residuals, 			 
 		 double& residuals_DM,
 		 double& residuals_N_top, double& residuals_C_top,
 		 vector<double>& residuals_N_soil,
 		 vector<double>& residuals_C_soil,
 		 Treelog&);
-  void harvest (const string& column_name, const string& crop_name,
+  void harvest (symbol column_name, symbol crop_name,
 		const Time&, const Geometry&, Bioclimate&,
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
@@ -218,7 +218,7 @@ VegetationCrops::CanopyAverage (CropFun fun) const
 
 
 double 
-VegetationCrops::DS_by_name (const string& name) const
+VegetationCrops::DS_by_name (symbol name) const
 {
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
@@ -229,9 +229,10 @@ VegetationCrops::DS_by_name (const string& name) const
 }
 
 double 
-VegetationCrops::DM_by_name (const string& name) const
+VegetationCrops::DM_by_name (symbol name) const
 {
-  if (name == "all")
+  static const symbol all_symbol ("all");
+  if (name == all_symbol)
     {
       double sum = 0.0;
 
@@ -434,7 +435,7 @@ VegetationCrops::force_production_stress (double pstress)
 }
 
 void
-VegetationCrops::kill_all (const string& name, const Time& time, 
+VegetationCrops::kill_all (symbol name, const Time& time, 
 			   const Geometry& geometry, 
 			   Bioclimate& bioclimate, vector<AM*>& residuals,
 			   double& residuals_DM,
@@ -458,8 +459,8 @@ VegetationCrops::kill_all (const string& name, const Time& time,
 }
 
 void
-VegetationCrops::harvest (const string& column_name,
-			  const string& crop_name,
+VegetationCrops::harvest (const symbol column_name,
+			  const symbol crop_name,
 			  const Time& time, 
 			  const Geometry& geometry, 
 			  Bioclimate& bioclimate,
@@ -476,7 +477,8 @@ VegetationCrops::harvest (const string& column_name,
 			  vector<double>& residuals_C_soil,
 			  Treelog& msg)
 {
-  const bool all = (crop_name == "all");
+  static const symbol all_symbol ("all");
+  const bool all = (crop_name == all_symbol);
 
   // Harvest all crops of this type.
   for (CropList::iterator crop = crops.begin();
@@ -533,12 +535,12 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      OrganicMatter& organic_matter)
 {
   Crop& crop = Librarian<Crop>::create (al);
-  const string& name = crop.name;
+  const symbol name = crop.name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
        i++)
     if ((*i)->name == name)
-      msg.error (string ("There is already an ") + name + " on the field.\n\
+      msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
   crop.initialize_organic (msg, geometry, organic_matter);
   crops.push_back (&crop);
@@ -550,12 +552,12 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
 		      const Geometry& geometry)
 {
   Crop& crop = Librarian<Crop>::create (al);
-  const string& name = crop.name;
+  const symbol name = crop.name;
   for (CropList::iterator i = crops.begin();
        i != crops.end();
        i++)
     if ((*i)->name == name)
-      msg.error (string ("There is already an ") + name + " on the field.\n\
+      msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
   crop.initialize_inorganic (msg, geometry);
   crops.push_back (&crop);

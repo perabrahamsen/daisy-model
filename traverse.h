@@ -23,6 +23,8 @@
 #ifndef TRAVERSE_H
 #define TRAVERSE_H
 
+#include "symbol.h"
+
 #include <string>
 using namespace std;
 
@@ -36,8 +38,8 @@ class Traverse
 public:
   void traverse_all_libraries ();
   void traverse_all_submodels ();
-  void traverse_library (const string& component);
-  void traverse_model (const string& component, const string& model);
+  void traverse_library (const symbol component);
+  void traverse_model (const symbol component, const symbol model);
   void traverse_submodel (const Syntax& syntax, AttributeList& alist,
 			  const AttributeList& default_alist,
 			  const string& name);
@@ -70,11 +72,11 @@ public:
 
   // Subclass Responsibility.
 protected:
-  virtual bool enter_library (Library&, const string& component) = 0;
+  virtual bool enter_library (Library&, symbol component) = 0;
   virtual void leave_library () = 0;
   virtual bool enter_model (const Syntax&, AttributeList&,
-			    const string& component, const string& model) = 0;
-  virtual void leave_model (const string& component, const string& name) = 0;
+			    symbol component, symbol model) = 0;
+  virtual void leave_model (symbol component, symbol name) = 0;
   virtual bool enter_submodel (const Syntax& syntax, AttributeList& alist,
 			       const AttributeList& default_alist,
 			       const string& name) = 0;

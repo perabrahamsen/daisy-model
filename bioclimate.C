@@ -48,8 +48,8 @@ double
 Bioclimate::get_snow_storage () const
 { daisy_assert (false); }
 
-Bioclimate::Bioclimate (const string& n)
-  : name (n)
+Bioclimate::Bioclimate (const AttributeList& al)
+  : name (al.identifier ("type"))
 { }
 
 Bioclimate::~Bioclimate ()

@@ -29,12 +29,9 @@ struct SelectFluxTop : public SelectValue
   double height;
 
   // Output routines.
-  void output_array (const string& name, const vector<double>& array, 
+  void output_array (symbol name, const vector<double>& array, 
 		     const Geometry* geometry)
     { 
-      if (!is_active ())
-	return;
-
       if (valid (name))
 	{
 	  int index = geometry->interval_border (height);

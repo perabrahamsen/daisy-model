@@ -196,7 +196,7 @@ struct OrganicMatter::Implementation
       return total;
     }
   // Create & Destroy.
-  AM* find_am (const string& sort, const string& part) const;
+  AM* find_am (symbol sort, symbol part) const;
   void input_from_am (vector<double>& destination, 
 		      double T, double h, const int lay) const;
   double abiotic (const OM& om, double T, double h, 
@@ -228,9 +228,8 @@ struct OrganicMatter::Implementation
 void
 OrganicMatter::Implementation::Buffer::output (Log& log) const
 {
-  log.output ("C", C);
-  log.output ("N", N);
-  // log.output ("turnover_rate", turnover_rate);
+  output_variable (C, log);
+  output_variable (N, log);
 } 
 
 void
@@ -688,17 +687,20 @@ void
 OrganicMatter::Implementation::output (Log& log,
 				       const Geometry& geometry) const
 {
-  if (log.check_member ("CO2"))
+  static const symbol CO2_symbol ("CO2");
+  if (log.check_member (CO2_symbol))
     {
       vector<double> CO2 (CO2_slow);
       daisy_assert (CO2.size () == CO2_fast.size ());
       for (unsigned int i =0; i < CO2.size(); i++)
 	CO2[i] += CO2_fast[i];
-      log.output ("CO2", CO2);
+      output_variable (CO2, log);
     }
-  log.output ("CO2_fast", CO2_fast);
-  log.output ("top_CO2", top_CO2);
-  if (log.check_member ("total_N") || log.check_member ("total_C"))
+  output_variable (CO2_fast, log);
+  output_variable (top_CO2, log);
+  static const symbol total_N_symbol ("total_N");
+  static const symbol total_C_symbol ("total_C");
+  if (log.check_member (total_N_symbol) || log.check_member (total_C_symbol))
     {
       const int size = geometry.size ();
 
@@ -729,24 +731,25 @@ OrganicMatter::Implementation::output (Log& log,
 	  total_C[i] += buffer.C[i];
 	  total_N[i] += buffer.N[i];
 	}
-      log.output ("total_N", total_N);
-      log.output ("total_C", total_C);
+      output_variable (total_N, log);
+      output_variable (total_C, log);
     }
-  log.output ("tillage_age", tillage_age);
-  if (log.check_member ("am"))
+  output_variable (tillage_age, log);
+  static const symbol am_symbol ("am");
+  if (log.check_member (am_symbol))
     {
       const Library& library = Librarian<AM>::library ();
       
-      Log::Open open (log, "am");
+      Log::Open open (log, am_symbol);
       for (vector<AM*>::const_iterator item = am.begin(); 
 	   item != am.end();
 	   item++)
 	{
-	  const string& name = (*item)->real_name ();
+	  const symbol name = (*item)->real_name ();
 	  if (log.check_entry (name, library))
 	    {
-	      Log::NamedEntry named_entry (log, name,
-					   (*item)->name, (*item)->alist);
+	      Log::NamedEntry named_entry (log, name, (*item)->name,
+					   (*item)->alist);
 	      (*item)->output (log);
 	    }
 	}
@@ -756,8 +759,8 @@ OrganicMatter::Implementation::output (Log& log,
   output_ordered (dom, "dom", log);
   output_submodule (buffer, "buffer", log);
   output_submodule (bioincorporation, "Bioincorporation", log);
-  log.output ("NO3_source", NO3_source);
-  log.output ("NH4_source", NH4_source);
+  output_variable (NO3_source, log);
+  output_variable (NH4_source, log);
 }
 
 bool
@@ -783,11 +786,13 @@ OrganicMatter::Implementation::add (AM& om)
 void
 OrganicMatter::Implementation::monthly (const Geometry& geometry)
 {
-  AM* remainder = find_am ("am", "cleanup");
+  static const symbol am_symbol ("am");
+  static const symbol cleanup_symbol ("cleanup");
+  AM* remainder = find_am (am_symbol, cleanup_symbol);
   if (!remainder)
     {
       remainder = &AM::create (geometry, Time (1, 1, 1, 1), AM::default_AM (),
-			       "am", "cleanup", AM::Locked);
+			       am_symbol, cleanup_symbol, AM::Locked);
       add (*remainder);
     }
 
@@ -1196,8 +1201,8 @@ OrganicMatter::Implementation::swap (const Soil& soil,
 }
 
 AM* 
-OrganicMatter::Implementation::find_am (const string& sort,
-					const string& part) const
+OrganicMatter::Implementation::find_am (const symbol sort,
+					const symbol part) const
 {
   for (unsigned int i = 0; i < am.size (); i++)
     if (am[i]->locked () 
@@ -2057,7 +2062,9 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
   
   // Biological incorporation.
   bioincorporation.initialize (soil);
-  AM* bioam = find_am ("bio", "incorporation");
+  static const symbol bio_symbol ("bio");
+  static const symbol incorporation_symbol ("incorporation");
+  AM* bioam = find_am (bio_symbol, incorporation_symbol);
   if (bioam)
     bioincorporation.set_am (bioam);
   else
@@ -2210,7 +2217,7 @@ OrganicMatter::add (AM& am)
 }
 
 AM* 
-OrganicMatter::find_am (const string& sort, const string& part) const
+OrganicMatter::find_am (const symbol sort, const symbol part) const
 { return impl.find_am (sort, part); }
 
 void

@@ -24,6 +24,7 @@
 
 #include "time.h"
 #include "plf.h"
+#include "symbol.h"
 
 #include <vector>
 #include <string>
@@ -67,8 +68,8 @@ public:
 
   // Simulation.
 public:
-  const Harvest& operator() (const string& column_name,
-			     const string& crop_name,
+  const Harvest& operator() (symbol column_name,
+			     symbol crop_name,
 			     const vector<double>& density,
 			     const Time& time,
 			     const Geometry& geometry,

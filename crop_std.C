@@ -113,7 +113,7 @@ public:
 	     vector<double>& residuals_C_soil,
 	     double ForcedCAI,
 	     Treelog&);
-  const Harvest& harvest (const string& column_name,
+  const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
@@ -219,20 +219,22 @@ CropStandard::tick (const Time& time,
 	  root_system.tick_daily (msg, soil, production.WRoot, 0.0,
 				  development.DS);
 
+	  static const symbol root_symbol ("root");
+	  static const symbol dead_symbol ("dead");
 	  if (organic_matter)
 	    {
 	      if (!production.AM_root)
 		{
 		  production.AM_root
 		    = &AM::create (soil, time, harvesting.Root,
-				   name, "root", AM::Locked);
+				   name, root_symbol, AM::Locked);
 		  organic_matter->add (*production.AM_root);
 		}
 	      if (!production.AM_leaf)
 		{
 		  production.AM_leaf
 		    = &AM::create (soil, time, harvesting.Dead,
-				   name, "dead", AM::Locked);
+				   name, dead_symbol, AM::Locked);
 		  organic_matter->add (*production.AM_leaf);
 		}
 	    }
@@ -241,11 +243,11 @@ CropStandard::tick (const Time& time,
 	      if (!production.AM_root)
 		production.AM_root
 		  = &AM::create (soil, time, harvesting.Root,
-				 name, "root", AM::Unlocked);
+				 name, root_symbol, AM::Unlocked);
 	      if (!production.AM_leaf)
 		production.AM_leaf
 		  = &AM::create (soil, time, harvesting.Dead,
-				 name, "dead", AM::Unlocked);
+				 name, dead_symbol, AM::Unlocked);
 	    }
 	}
       return;
@@ -308,7 +310,7 @@ CropStandard::tick (const Time& time,
 }
 
 const Harvest&
-CropStandard::harvest (const string& column_name,
+CropStandard::harvest (const symbol column_name,
 		       const Time& time,
 		       const Geometry& geometry,
 		       Bioclimate& bioclimate,
@@ -415,9 +417,10 @@ CropStandard::output (Log& log) const
   output_submodule (canopy, "Canopy", log);
   output_submodule (harvesting, "Harvest", log);
 #if 1
-  if (log.check_member ("Prod"))
+  static const symbol Prod_symbol ("Prod");
+  if (log.check_member (Prod_symbol))
     {
-      Log::Open open (log, "Prod");
+      Log::Open open (log, Prod_symbol);
       production.output (log);
     }
 #else

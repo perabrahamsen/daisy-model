@@ -51,7 +51,7 @@ public:
   // Create.
 public:
   TransportConvection (const AttributeList& al)
-    : Transport (al.name ("type")),
+    : Transport (al),
       max_time_step_reductions (al.integer ("max_time_step_reductions")),
       ddt (dt)
     { }
@@ -60,7 +60,7 @@ public:
 void
 TransportConvection::output (Log& log) const
 {
-  log.output ("ddt", ddt);
+  output_variable (ddt, log);
 }
 
 void 

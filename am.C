@@ -54,7 +54,7 @@ struct AM::Implementation
 
   // Content.
   const Time creation;		// When it was created.
-  const string name;		// What is was.
+  const symbol name;		// What is was.
   const vector<AOM*> om;		// Organic matter pool.
 
   // Use this if a living crop is adding to this AM.
@@ -62,8 +62,8 @@ struct AM::Implementation
   const Lock* lock;
   void unlock ();		// Crop died.
   bool locked () const;		// Test if this AM can be safely removed.
-  const string crop_name () const; // Name of locked crop.
-  const string crop_part_name () const; // Name of locked crop part.
+  symbol crop_name () const; // Name of locked crop.
+  symbol crop_part_name () const; // Name of locked crop part.
 
   // Simulation.
   void output (Log&) const;
@@ -89,7 +89,7 @@ struct AM::Implementation
 
 
   // Create and Destroy.
-  Implementation (const Time& c, const string& n, const vector<AOM*>& o);
+  Implementation (const Time& c, symbol n, const vector<AOM*>& o);
   ~Implementation ();
 };
 
@@ -138,23 +138,23 @@ AM::Implementation::Check_OM_Pools::check (const Syntax& syntax,
 struct AM::Implementation::Lock
 { 
   // Content.
-  string crop;
-  string part;
+  symbol crop;
+  symbol part;
 
   // Simulation.
   void output (Log&) const;
     
   // Create and Destroy.
   static void load_syntax (Syntax& syntax, AttributeList&);
-  Lock (string c, string p);
+  Lock (symbol c, symbol p);
   Lock (const AttributeList& al);
 };
 
 void 
 AM::Implementation::Lock::output (Log& log) const
 {
-  log.output ("crop", crop);
-  log.output ("part", part);
+  output_variable (crop, log);
+  output_variable (part, log);
 }  
 
 
@@ -167,14 +167,14 @@ AM::Implementation::Lock::load_syntax (Syntax& syntax, AttributeList&)
 	      "Crop part to which this am is locked");
 }
 
-AM::Implementation::Lock::Lock (string c, string p)
+AM::Implementation::Lock::Lock (symbol c, symbol p)
   : crop (c),
     part (p)
 { }
   
 AM::Implementation::Lock::Lock (const AttributeList& al)
-  : crop (al.name ("crop")),
-    part (al.name ("part"))
+  : crop (al.identifier ("crop")),
+    part (al.identifier ("part"))
 { }
 
 void 
@@ -189,14 +189,14 @@ bool
 AM::Implementation::locked () const
 { return lock != NULL; }
 
-const string 
+symbol
 AM::Implementation::crop_name () const
 { 
   daisy_assert (lock);
   return lock->crop;
 }
 
-const string 
+symbol
 AM::Implementation::crop_part_name () const
 {
   daisy_assert (lock);
@@ -395,7 +395,7 @@ AM::Implementation::output (Log& log) const
 { 
   if (creation != Time (1, 1, 1, 1))
     output_submodule (creation, "creation", log);
-  log.output ("name", name);
+  output_variable (name, log);
   if (lock)
     output_submodule (*lock, "lock", log);
   output_ordered (om, "om", log);
@@ -487,7 +487,7 @@ AM::Implementation::pour (vector<double>& cc, vector<double>& nn)
     om[i]->pour (cc, nn);
 }
 
-AM::Implementation::Implementation (const Time& c, const string& n,
+AM::Implementation::Implementation (const Time& c, const symbol n,
 				    const vector<AOM*>& o)
   : creation (c),
     name (n),
@@ -502,7 +502,7 @@ AM::Implementation::~Implementation ()
   sequence_delete (om.begin (), om.end ()); 
 }
 
-const string&
+symbol
 AM::real_name () const
 { return impl.name; }
 
@@ -582,11 +582,11 @@ bool
 AM::locked () const
 { return impl.locked (); }
 
-const string 
+symbol
 AM::crop_name () const
 { return impl.crop_name (); }
 
-const string
+symbol
 AM:: crop_part_name () const
 { return impl.crop_part_name (); }
 
@@ -603,7 +603,7 @@ AM::create (const AttributeList& al1 , const Soil& soil)
   AttributeList al2 (al1);
   al2.add ("type", "state");
   if (!al2.check ("name"))
-    al2.add ("name", al1.name ("type"));
+    al2.add ("name", al1.identifier ("type"));
   AM& am = *new AM (al2); 
   am.initialize (soil);
   return am;
@@ -613,7 +613,7 @@ AM::create (const AttributeList& al1 , const Soil& soil)
 AM& 
 AM::create (const Geometry& /*geometry*/, const Time& time,
 	    const vector<AttributeList*>& ol,
-	    const string& sort, const string& part,
+	    const symbol sort, const symbol part,
 	    AM::lock_type lock)
 {
   AttributeList al;
@@ -843,7 +843,7 @@ AM::AM (const AttributeList& al)
 	  (al.check ("creation")
 	   ? Time (al.alist ("creation"))
 	   : Time (1, 1, 1, 1),
-	   al.name ("name"),
+	   al.identifier ("name"),
 	   map_construct<AOM> (al.alist_sequence ("om")))),
     alist (al),
     name ("state")
@@ -974,7 +974,7 @@ static struct AM_Syntax
     AttributeList al2 (al1);
     al2.add ("type", "state");
     if (!al2.check ("name"))
-      al2.add ("name", al1.name ("type"));
+      al2.add ("name", al1.identifier ("type"));
     return *new AM (al2); 
   }
 

@@ -1,4 +1,27 @@
+2003-05-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C, select_number.C, select_average.C, select_min.C, 
+	select_max.C (output_number): Removed call to 'is_active'.
+	* select.C, select_array.C, select_content.C, select_flux_botton.C,
+	select_flux_top.C, select_index.C, select_interval.C
+	(output_array): Ditto.
+
+	* select.h (valid_level): New public data member.
+	* select.C (open_group, open, close): Update it.
+	* log_select.C (output): Use it.
+
+2003-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* action_harvest.C (name, crop): Renamed 'name' to 'crop'.
+
 2003-05-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* symbol.h, symbol.C: New utility.
+	* Makefile (OTHER): Added it.
+
+	* log_table1.C: No longer in use.
+	(MODELS): Removed.
+	(REMOVE): Added log_table1.C.
 
 	* Version 2.75 released.
 

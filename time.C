@@ -111,13 +111,13 @@ Time::hour () const
 void 
 Time::output (Log& log) const
 { 
-  log.output ("year", year ());
-  log.output ("month", month ());
-  log.output ("week", week ());
-  log.output ("yday", yday ());
-  log.output ("mday", mday ());
-  log.output ("wday", wday ());
-  log.output ("hour", hour ());
+  output_value (year (), "year", log);
+  output_value (month (), "month", log);
+  output_value (week (), "week", log);
+  output_value (yday (), "yday", log);
+  output_value (mday (), "mday", log);
+  output_value (wday (), "wday", log);
+  output_value (hour (), "hour", log);
 }
 
 void 

@@ -34,7 +34,7 @@ public:
   // Create.
 public:
   AdsorptionNone (const AttributeList& al)
-    : Adsorption (al.name ("type"))
+    : Adsorption (al)
     { }
 };
 

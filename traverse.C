@@ -31,12 +31,12 @@ void
 Traverse::traverse_all_libraries ()
   // Traverse through all libraries.
 {
-  vector<string> components;
+  vector<symbol> components;
   Library::all (components);
 
   for (unsigned int i = 0; i < components.size (); i++)
     {
-      const string& component = components[i];
+      const symbol component = components[i];
       traverse_library (component);
     }
 }
@@ -59,19 +59,19 @@ Traverse::traverse_all_submodels ()
 }
 
 void 
-Traverse::traverse_library (const string& component)
+Traverse::traverse_library (const symbol component)
   // Traverse through a specific library.
 {
   Library& library = Library::find (component);
 
   if (enter_library (library, component))
     {
-      vector<string> models;
+      vector<symbol> models;
       library.entries (models);
 
       for (unsigned int i = 0; i < models.size (); i++)
 	{
-	  const string& model = models[i];
+	  const symbol model = models[i];
 	  traverse_model (component, model);
 	}
       leave_library ();
@@ -79,7 +79,7 @@ Traverse::traverse_library (const string& component)
 }  
 
 void 
-Traverse::traverse_model (const string& component, const string& model)
+Traverse::traverse_model (const symbol component, const symbol model)
   // Traverse through a specific library member.
 {
   Library& library = Library::find (component);
@@ -91,15 +91,15 @@ Traverse::traverse_model (const string& component, const string& model)
       if (alist.check ("type"))
 	{
 	  // Derived parameterization, has default values.
-	  const string& super = alist.name ("type");
+	  const symbol super = alist.identifier ("type");
 	  const AttributeList& default_alist = library.lookup (super);
-	  traverse_alist (syntax, alist, default_alist, model);
+	  traverse_alist (syntax, alist, default_alist, model.name ());
 	}
       else
 	{
 	  // Buildin, no default values.
 	  static const AttributeList empty_alist;
-	  traverse_alist (syntax, alist, empty_alist, model);
+	  traverse_alist (syntax, alist, empty_alist, model.name ());
 	}	
       leave_model (component, model);
     }
@@ -284,7 +284,7 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 		  {
 		    AttributeList& entry_alist = alist.alist (parameter);
 		    daisy_assert (entry_alist.check ("type"));
-		    const string& type = entry_alist.name ("type");
+		    const symbol type = entry_alist.identifier ("type");
 		    const Library& library = syntax.library (parameter);
 		    const AttributeList& entry_default_alist 
 		      = library.lookup (type);
@@ -302,7 +302,7 @@ Traverse::traverse_parameter (const Syntax& syntax, AttributeList& alist,
 		      {
 			AttributeList& entry_alist = *sequence[i];
 			daisy_assert (entry_alist.check ("type"));
-			const string& type = entry_alist.name ("type");
+			const symbol type = entry_alist.identifier ("type");
 			const Library& library = syntax.library (parameter);
 			const AttributeList& entry_default_alist 
 			  = library.lookup (type);

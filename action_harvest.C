@@ -26,7 +26,7 @@
 
 struct ActionHarvest : public Action
 {
-  const string name;
+  const symbol crop;
   const double stub;
   const double stem;
   const double leaf;
@@ -34,23 +34,23 @@ struct ActionHarvest : public Action
 
   void doIt (Daisy& daisy, Treelog& out)
   {
-    if (daisy.field.crop_ds (name) < 0.0)
+    if (daisy.field.crop_ds (crop) < 0.0)
       {
-	out.warning (string ("Attempting to harvest ") + name 
+	out.warning ("Attempting to harvest " + crop 
 		     + " which has not emerged on the field");
 	return;
       }
-    daisy.field.harvest (daisy.time, name, stub, stem, leaf, sorg,
+    daisy.field.harvest (daisy.time, crop, stub, stem, leaf, sorg,
 			 daisy.harvest, out);
-    if (daisy.field.crop_ds (name) < 0.0)
-      out.message (string(" [Harvesting ") + name + "]");
+    if (daisy.field.crop_ds (crop) < 0.0)
+      out.message (string(" [Harvesting ") + crop + "]");
     else
-      out.message (string(" [Cutting ") + name + "]");
+      out.message (string(" [Cutting ") + crop + "]");
   }
 
   ActionHarvest (const AttributeList& al)
     : Action (al),
-      name (al.name ("name")), 
+      crop (al.identifier ("crop")), 
       stub (al.number ("stub")),
       stem (al.number ("stem")),
       leaf (al.number ("leaf")),
@@ -70,12 +70,12 @@ ActionHarvestSyntax::ActionHarvestSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
   alist.add ("description", "Harvest a crop.");
-  syntax.add ("name", Syntax::String, Syntax::Const, 
+  syntax.add ("crop", Syntax::String, Syntax::Const, 
 	      "Name of the crop to harvest.\n\
 If you specify 'all', all crops will be harvested.\n\
 If there are no crop on the field with the specified name,\n\
 nothing will happen.");
-  alist.add ("name", "all");
+  alist.add ("crop", "all");
   syntax.add ("stub", "cm", Syntax::Const, "\
 Leave stem and leafs below this size on the field.");
   alist.add ("stub", 0.0);
@@ -88,6 +88,6 @@ Fraction of leafs (above stub) to harvest.");
   syntax.add_fraction ("sorg", Syntax::Const, "\
 Fraction of storage organ to harvest.");
   alist.add ("sorg", 1.0);
-  syntax.order ("name");
+  syntax.order ("crop");
   Librarian<Action>::add_type ("harvest", alist, syntax, &make);
 }

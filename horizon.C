@@ -629,7 +629,7 @@ Intended for use with pedotransfer functions.");
 
 Horizon::Horizon (const AttributeList& al)
   : impl (*new Implementation (al)),
-    name (al.name ("type")),
+    name (al.identifier ("type")),
     hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
     tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
 { 

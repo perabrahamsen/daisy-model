@@ -37,11 +37,11 @@ other meteorological data.";
 void
 NetRadiation::output (Log& log) const
 {
-  log.output ("net_radiation", net_radiation ());
+  output_value (net_radiation (), "net_radiation", log);
 }
 
 NetRadiation::NetRadiation (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 NetRadiation::~NetRadiation ()

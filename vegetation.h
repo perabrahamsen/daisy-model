@@ -43,7 +43,7 @@ class Vegetation
 { 
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Canopy queries.
@@ -62,8 +62,8 @@ public:
 
   // Individual crop queries.
 public:
-  virtual double DS_by_name (const string& name) const = 0;// [-1:2]/DSremove
-  virtual double DM_by_name (const string& name) const = 0;// Shoot DM [kg/ha]
+  virtual double DS_by_name (symbol name) const = 0;// [-1:2]/DSremove
+  virtual double DM_by_name (symbol name) const = 0;// Shoot DM [kg/ha]
 
   // Simulation
 public:
@@ -82,15 +82,15 @@ public:
 				const Soil& soil, SoilWater& soil_water,
 				double day_fraction, Treelog&) = 0;
   virtual void force_production_stress  (double pstress);
-  virtual void kill_all (const string&, const Time&, const Geometry&,
+  virtual void kill_all (symbol, const Time&, const Geometry&,
 			 Bioclimate&, vector<AM*>& residuals, 
 			 double& residuals_DM,
 			 double& residuals_N_top, double& residuals_C_top,
 			 vector<double>& residuals_N_soil,
 			 vector<double>& residuals_C_soil,
 			 Treelog&) = 0;
-  virtual void harvest (const string& column_name,
-			const string& crop_name,
+  virtual void harvest (symbol column_name,
+			symbol crop_name,
 			const Time&, const Geometry&, 
 			Bioclimate& bioclimate,
 			double stub_length,

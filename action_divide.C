@@ -26,20 +26,20 @@
 
 struct ActionDivide : public Action
 {
-  const string original;
-  const string copy;
+  const symbol original;
+  const symbol copy;
   const double size;
 
   void doIt (Daisy& daisy, Treelog& out)
     {
-      out.message (string ("[Dividing ") + original + " into " + copy + "]");
+      out.message ("[Dividing " + original + " into " + copy + "]");
       daisy.field.divide (original, copy, size, daisy.time, daisy.weather);
     }
 
   ActionDivide (const AttributeList& al)
     : Action (al),
-      original (al.name ("original")), 
-      copy (al.name ("copy")),
+      original (al.identifier ("original")), 
+      copy (al.identifier ("copy")),
       size (al.number ("size"))
     { }
 };

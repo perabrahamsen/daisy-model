@@ -29,7 +29,7 @@ const char *const Average::description = "\
 Find the average of two numbers.";
 
 Average::Average (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 Average::~Average ()

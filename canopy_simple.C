@@ -31,9 +31,9 @@ CanopySimple::EpFactor (double DS) const
 void
 CanopySimple::output (Log& log) const
 {
-  log.output ("Height", Height);
-  log.output ("CAI", CAI);
-  log.output ("LAIvsH", LAIvsH);
+  output_variable (Height, log);
+  output_variable (CAI, log);
+  output_variable (LAIvsH, log);
 }
 
 void 

@@ -12,6 +12,17 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.76
+
+** Removed the table1 log model.
+
+** Logging is faster.
+
+Having multiple log files should now be significantly faster than
+before.  Lots of stuff was changed in order to achieve this speedup,
+so it is likeyl than some features have broken.  Please let me know in
+that case.
+
 * 2.75
 
 ** Minor fix in organic matter initialization.
@@ -179,9 +190,9 @@ will not be in equilibrium.
 
 This is an alternative way of specifying K_sat.
 
-  (K_at_h 2 [pF] 3 [cm/h])
+  (K_at_h 2 [pF] 5e-8 [m/s])
 
-will mean the hydraulic conductivity have been measured to 3 cm/h at
+will mean the hydraulic conductivity have been measured to 5e-8 m/s at
 pF 2.  From this, Daisy will find K_sat automatically.
 
 ** Changed EpFac for the simple and default crop models to 1.15.

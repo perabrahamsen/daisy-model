@@ -25,11 +25,8 @@
 struct SelectMax : public SelectValue
 {
   // Output routines.
-  void output_number (const string& name, double number)
+  void output_number (symbol name, double number)
     { 
-      if (!is_active ())
-	return;
-
       if (!valid (name))
 	return;
 

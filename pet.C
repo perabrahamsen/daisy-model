@@ -56,8 +56,8 @@ Pet::dry () const
 void
 Pet::output (Log& log) const
 {
-  log.output ("wet", wet ());
-  log.output ("dry", dry ());
+  output_value (wet (), "wet", log);
+  output_value (dry (), "dry", log);
 }
 
 void 
@@ -72,7 +72,7 @@ Pet::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 Pet::Pet (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 Pet::~Pet ()

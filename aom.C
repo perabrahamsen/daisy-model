@@ -35,8 +35,8 @@ void
 AOM::output (Log& log) const
 {
   OM::output (log);
-  log.output ("top_C", top_C);
-  log.output ("top_N", top_N);
+  output_variable (top_C, log);
+  output_variable (top_N, log);
 }
 
 void 

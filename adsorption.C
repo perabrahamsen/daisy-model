@@ -34,8 +34,8 @@ void
 Adsorption::output (Log&) const
 { }
 
-Adsorption::Adsorption (const string& n)
-  : name (n)
+Adsorption::Adsorption (const AttributeList& al)
+  : name (al.identifier ("type"))
 { }
 
 Adsorption::~Adsorption ()

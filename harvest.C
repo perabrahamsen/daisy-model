@@ -41,21 +41,21 @@ Harvest::total_DM () const
 void 
 Harvest::output (Log& log) const
 {
-  log.output ("column", column);
+  output_variable (column, log);
   output_submodule (time, "time", log);
-  log.output ("crop", crop);
-  log.output ("stem_DM", stem_DM);
-  log.output ("stem_N", stem_N);
-  log.output ("stem_C", stem_C);
-  log.output ("dead_DM", dead_DM);
-  log.output ("dead_N", dead_N);
-  log.output ("dead_C", dead_C);
-  log.output ("leaf_DM", leaf_DM);
-  log.output ("leaf_N", leaf_N);
-  log.output ("leaf_C", leaf_C);
-  log.output ("sorg_DM", sorg_DM);
-  log.output ("sorg_N", sorg_N);
-  log.output ("sorg_C", sorg_C);
+  output_variable (crop, log);
+  output_variable (stem_DM, log);
+  output_variable (stem_N, log);
+  output_variable (stem_C, log);
+  output_variable (dead_DM, log);
+  output_variable (dead_N, log);
+  output_variable (dead_C, log);
+  output_variable (leaf_DM, log);
+  output_variable (leaf_N, log);
+  output_variable (leaf_C, log);
+  output_variable (sorg_DM, log);
+  output_variable (sorg_N, log);
+  output_variable (sorg_C, log);
   output_submodule (chemicals, "chemicals", log);
 }
 
@@ -99,9 +99,9 @@ Harvest::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Harvest::Harvest (const AttributeList& alist)
-  : column (alist.name ("column")),
+  : column (alist.identifier ("column")),
     time (alist.alist ("time")),
-    crop (alist.name("crop")),
+    crop (alist.identifier ("crop")),
     stem_DM (alist.number ("stem_DM")),
     stem_N (alist.number ("stem_N")),
     stem_C (alist.number ("stem_C")),
@@ -118,7 +118,7 @@ Harvest::Harvest (const AttributeList& alist)
 { }
   
 
-Harvest::Harvest (string col, Time t, string crp, 
+Harvest::Harvest (const symbol col, Time t, const symbol crp, 
 		  double sDM, double sN, double sC, 
 		  double dDM, double dN, double dC,
 		  double lDM, double lN, double lC, 

@@ -107,7 +107,7 @@ Document::print_sample (ostream& out, const string& name,
 }
 
 void
-Document::print_model (ostream& out, const string& name, 
+Document::print_model (ostream& out, const symbol name, 
 		       const Library& library)
 {
   
@@ -117,7 +117,7 @@ Document::print_model (ostream& out, const string& name,
   const XRef::ModelUsed used (library.name (), name);
   if (alist.check ("type"))
     {
-      const string type = alist.name ("type");
+      const symbol type = alist.identifier ("type");
       print_parameterization_header (out, name, type);
       
       if (alist.check ("parsed_from_file"))
@@ -147,8 +147,8 @@ Document::print_model (ostream& out, const string& name,
 	print_model_description (out, alist.name ("description"));
 
       print_users (out, xref.models[used]);
-      print_sample (out, name, syntax, alist);
-      print_submodel (out, name, 0, syntax, alist);
+      print_sample (out, name.name (), syntax, alist);
+      print_submodel (out, name.name (), 0, syntax, alist);
       print_model_trailer (out, name);
     }
 }
@@ -175,13 +175,13 @@ class ModelCompare
 { 
   const Library& library;
 
-  const string find_next_in_line (const string& root, const string& leaf) const
+  const symbol find_next_in_line (const symbol root, const symbol leaf) const
   {
     // Find the child of root that leaf is descended from.
     daisy_assert (root != leaf);
     const AttributeList& al = library.lookup (leaf);
     daisy_assert (al.check ("type"));
-    const string type = al.name ("type");
+    const symbol type = al.identifier ("type");
     if (type == root)
       return leaf;
     
@@ -189,7 +189,7 @@ class ModelCompare
   }
 
 public:
-  bool operator() (const string& a, const string& b) const
+  bool operator() (const symbol a, const symbol b) const
   { 
     // They may be the same.
     if (a == b)
@@ -201,8 +201,8 @@ public:
     if (library.is_derived_from (b, a))
       return true;
 
-    string base_a = library.base_model (a);
-    string base_b = library.base_model (b);
+    symbol base_a = library.base_model (a);
+    symbol base_b = library.base_model (b);
     
     // They may be otherwise related.
     while (base_a == base_b)
@@ -223,7 +223,7 @@ void
 Document::print_component (ostream& out, const Library& library)
 {
 
-  const string& name = library.name ();
+  const symbol name = library.name ();
   print_component_header (out, name);
 
   const char *const description = library.description ();
@@ -233,7 +233,7 @@ Document::print_component (ostream& out, const Library& library)
   print_users (out, xref.components[name]);
 
   // For all members...
-  vector<string> entries;
+  vector<symbol> entries;
   library.entries (entries);
   ModelCompare model_compare (library);
   sort (entries.begin (), entries.end (), model_compare);
@@ -249,7 +249,7 @@ Document::print_document (ostream& out)
   print_document_header (out);
 
   // For all components...
-  vector<string> entries;
+  vector<symbol> entries;
   Library::all (entries);
   for (unsigned int i = 0; i < entries.size (); i++)
     print_component (out, Library::find (entries[i]));

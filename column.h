@@ -37,7 +37,7 @@ class Column
 {
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
-  string name;
+  const symbol name;
   double size;
   static const char *const description;
 
@@ -54,7 +54,7 @@ public:
   virtual void fertilize (const AttributeList&, double from, double to) = 0;
   virtual void fertilize (const AttributeList&) = 0;
   virtual void clear_second_year_utilization () = 0;
-  virtual void harvest (const Time&, const string& name,
+  virtual void harvest (const Time&, symbol name,
 			double stub_length, 
 			double stem_harvest, 
 			double leaf_harvest, 
@@ -66,7 +66,7 @@ public:
 		     const Time&, double from, double middle, double to) = 0;
   virtual void set_porosity (double at, double Theta) = 0;
   virtual void set_heat_source (double at, double value) = 0; // [W/m^2]
-  virtual void spray (const string& chemical, double amount) = 0; // [g/ha]
+  virtual void spray (symbol chemical, double amount) = 0; // [g/ha]
   virtual void set_surface_detention_capacity (double height) = 0; // [mm]
 
   // Conditions.
@@ -80,9 +80,9 @@ public:
   virtual double second_year_utilization () const = 0;
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
-  virtual double crop_ds (const string& crop) const = 0; 
+  virtual double crop_ds (symbol crop) const = 0; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
-  virtual double crop_dm (const string& crop) const = 0; 
+  virtual double crop_dm (symbol crop) const = 0; 
   
   // Simulation.
   virtual void clear () = 0;
@@ -110,8 +110,8 @@ public:
   virtual void put_ponding (double pond) = 0;	// [mm]
   virtual void put_surface_no3 (double no3) = 0; // [g/cm^2]
   virtual double get_surface_no3 () const = 0; // [g/cm^2]
-  virtual void put_surface_chemical (const string&, double) = 0; // [g/cm^2]
-  virtual double get_surface_chemical (const string&) const = 0; // [g/cm^2]
+  virtual void put_surface_chemical (symbol, double) = 0; // [g/cm^2]
+  virtual double get_surface_chemical (symbol) const = 0; // [g/cm^2]
   virtual double get_smb_c_at (unsigned int i) const = 0; // [g C/cm³]
   virtual double get_co2_production_at (unsigned int i) const = 0; // [g C/cm³]
   virtual double get_temperature_at (unsigned int i) const = 0; // [°C]
@@ -123,7 +123,7 @@ protected:
   Column (const AttributeList&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual Column& clone (const string& name) const = 0;
+  virtual Column& clone (symbol) const = 0;
   virtual void initialize (const Time&, Treelog& err, const Weather*) = 0;
 
   virtual ~Column ();

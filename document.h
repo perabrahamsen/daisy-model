@@ -51,12 +51,11 @@ protected:
 				   const AttributeList& alist) = 0;
   virtual void print_sample_header (ostream& out, const string& name) = 0;
   virtual void print_sample_trailer (ostream& out, const string&) = 0;
-  virtual void print_model_header (ostream&, const string& name) = 0;
+  virtual void print_model_header (ostream&, symbol name) = 0;
   virtual void print_model_description (ostream&, const string&) = 0;
-  virtual void print_model_trailer (ostream&, const string& name) = 0;
-  virtual void print_parameterization_header (ostream& out,
-					      const string& name, 
-					      const string& type) = 0;
+  virtual void print_model_trailer (ostream&, symbol name) = 0;
+  virtual void print_parameterization_header (ostream& out, 
+					      symbol name, symbol type) = 0;
   virtual void print_parameterization_file (ostream& out, 
 					    const string& name) = 0;
   virtual void print_parameterization_no_file (ostream& out) = 0;
@@ -64,12 +63,12 @@ protected:
 						   const string&
 						   description) = 0;
   virtual void print_parameterization_trailer (ostream& out, 
-					       const string& name) = 0;
+					       symbol name) = 0;
   virtual void print_fixed_header (ostream&, const string& name) = 0;
   virtual void print_fixed_trailer (ostream&, const string& name) = 0;
-  virtual void print_component_header (ostream&, const string& name) = 0;
+  virtual void print_component_header (ostream&, symbol name) = 0;
   virtual void print_component_description (ostream&, const string&) = 0;
-  virtual void print_component_trailer (ostream&, const string& name) = 0;
+  virtual void print_component_trailer (ostream&, symbol name) = 0;
   virtual void print_fixed_all_header (ostream&) = 0;
   virtual void print_fixed_all_trailer (ostream&) = 0;
   virtual void print_document_header (ostream&) = 0;
@@ -84,7 +83,7 @@ protected:
 		     const Syntax& syntax,
 		     const AttributeList& alist);
 private:
-  void print_model (ostream& out, const string& name, 
+  void print_model (ostream& out, symbol name, 
 		    const Library& library);
   void print_fixed (ostream& out, const string& name, 
 		    const Syntax& syntax,

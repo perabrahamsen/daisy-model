@@ -31,7 +31,7 @@ class Rootdens
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 protected:
   const double SpRtLength;	// Specific root length [m/g]

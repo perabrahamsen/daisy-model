@@ -50,7 +50,7 @@ class Crop
   // Content.
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Communication with Bioclimate.
@@ -88,7 +88,7 @@ public:
 		     vector<double>& residuals_C_soil,
 		     double ForcedCAI,
 		     Treelog&) = 0;
-  virtual const Harvest& harvest (const string& column_name,
+  virtual const Harvest& harvest (symbol column_name,
 				  const Time&, const Geometry&, 
 				  Bioclimate& bioclimate,
 				  double stub_length,
@@ -103,7 +103,7 @@ public:
 				  vector<double>& residuals_N_soil,
 				  vector<double>& residuals_C_soil,
 				  Treelog&) = 0;
-  void kill (const string&, const Time&, const Geometry&, Bioclimate&,
+  void kill (symbol, const Time&, const Geometry&, Bioclimate&,
 	     vector<AM*>& residuals, 
 	     double& residuals_DM, 
 	     double& residuals_N_top, double& residuals_C_top,

@@ -68,7 +68,7 @@ public:
   bool check (Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
   void add (AM&);
-  AM* find_am (const string& sort, const string& part) const;
+  AM* find_am (symbol sort, symbol part) const;
 public:
   void initialize (const AttributeList&, const Soil&, const SoilWater&, 
 		   double T_avg, Treelog&);

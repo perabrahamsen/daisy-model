@@ -369,19 +369,19 @@ Ridge::output (Log& log) const
 void 
 Ridge::Implementation::output (Log& log) const
 {
-  log.output ("Theta", Theta);
-  log.output ("Theta_pre", Theta_pre);
-  log.output ("h", h);
-  log.output ("z_pond", z_pond);
-  log.output ("x_pond", x_pond);
-  log.output ("internal_ponding", internal_ponding);
+  output_variable (Theta, log);
+  output_variable (Theta_pre, log);
+  output_variable (h, log);
+  output_variable (z_pond, log);
+  output_variable (x_pond, log);
+  output_variable (internal_ponding, log);
   if (R_bottom >= 0.0)
-  log.output ("R_bottom", R_bottom);
+    output_variable (R_bottom, log);
   if (R_wall >= 0.0)
-    log.output ("R_wall", R_wall);
-  log.output ("I_bottom", I_bottom);
-  log.output ("I_wall", I_wall);
-  log.output ("I", I);
+    output_variable (R_wall, log);
+  output_variable (I_bottom, log);
+  output_variable (I_wall, log);
+  output_variable (I, log);
 }
 
 int 

@@ -32,8 +32,8 @@ moved in absolute coordinates, when it has moved a given distance\n\
 along the curved line.  This component is responsible for calculating\n\
 the soils tortuosity factor.";
 
-Tortuosity::Tortuosity (const string& n)
-  : name (n)
+Tortuosity::Tortuosity (const AttributeList& al)
+  : name (al.identifier ("type"))
 { }
 
 Tortuosity::~Tortuosity ()

@@ -123,7 +123,7 @@ public:
 	     double&, double&, double&, vector<double>&, vector<double>&,
 	     double ForcedCAI,
 	     Treelog&);
-  const Harvest& harvest (const string& column_name,
+  const Harvest& harvest (symbol column_name,
 			  const Time&, const Geometry&, 
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
@@ -277,7 +277,7 @@ CropSimple::tick (const Time& time,
 }
 
 const Harvest&
-CropSimple::harvest (const string& column_name,
+CropSimple::harvest (const symbol column_name,
 		     const Time& time,
 		     const Geometry& geometry,
 		     Bioclimate& bioclimate,
@@ -302,7 +302,8 @@ CropSimple::harvest (const string& column_name,
       const double T_growth = T_flowering - T_emergence;
       const double this_far = min (1.0, (T - T_emergence) / T_growth);
 
-      AM& am = AM::create (geometry, time, root_am, name, "root");
+      static const symbol root_symbol ("root");
+      AM& am = AM::create (geometry, time, root_am, name, root_symbol);
       daisy_assert (geometry.total (root_system.Density) > 0.0);
       am.add (geometry, 
 	      this_far * WRoot * 0.420 * m2_per_cm2,
@@ -331,13 +332,13 @@ CropSimple::harvest (const string& column_name,
 void
 CropSimple::output (Log& log) const
 {
-  log.output ("forced_LAI", forced_LAI);
+  output_variable (forced_LAI, log);
   output_submodule (canopy, "Canopy", log);
-  log.output ("T_sum", T_sum);
-  log.output ("day", day);
+  output_variable (T_sum, log);
+  output_variable (day, log);
   output_submodule (root_system, "Root", log);
-  log.output ("N_demand", N_demand);
-  log.output ("N_actual", N_actual);
+  output_variable (N_demand, log);
+  output_variable (N_actual, log);
 }
 
 double

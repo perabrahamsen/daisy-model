@@ -456,7 +456,7 @@ ModelItem::edit_copy ()
   daisy_assert (library.check (parameterization));
   const AttributeList& alist = library.lookup (parameterization);
   daisy_assert (alist.check ("type"));
-  const string& super = alist.name ("type");
+  const string& super = alist.identifier ("type");
 
   // Create new attribute derived from its superclass.
   const AttributeList& sl = library.lookup (parameterization);
@@ -549,8 +549,8 @@ Really delete?",
 	  daisy_assert (false);
 	}
     }
-  remove_dependencies (component, model);
-  remove_dependencies (component, model, 
+  remove_dependencies (symbol (component), symbol (model));
+  remove_dependencies (symbol (component), symbol (model), 
 		       main ()->daisy_syntax, main ()->daisy_alist);
   Library& library = Library::find (component);
   library.remove (model);

@@ -288,7 +288,7 @@ LogTable::LogTable (const AttributeList& al)
 {
   if (print_header)
     {
-      out << "dlf-0.0 -- " << name;
+      out << "dlf-0.0 -- " << name.name ();
       if (al.check ("parsed_from_file"))
 	out << " (defined in '" << al.name ("parsed_from_file") << "').";
       out << "\n";
@@ -301,7 +301,7 @@ LogTable::LogTable (const AttributeList& al)
       const double to = al.number ("to");
       if (to < from)
 	out << "INTERVAL: [" << from << ";" << to << "]\n";
-      const vector<string>& conv_vector = al.name_sequence ("set");
+      const vector<symbol>& conv_vector = al.identifier_sequence ("set");
       for (unsigned int i = 0; i < conv_vector.size (); i += 2)
 	out << "SET: " << conv_vector[i] << " = " << conv_vector[i+1] << "\n";
       if (description != default_description)

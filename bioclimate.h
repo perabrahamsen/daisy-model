@@ -24,6 +24,7 @@
 #define BIOCLIMATE_H
 
 #include "librarian.h"
+#include "symbol.h"
 
 struct Surface;
 struct Weather;
@@ -40,7 +41,7 @@ class Bioclimate
 { 
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Simulation.
@@ -66,7 +67,7 @@ public:
   virtual void irrigate_overhead (double flux) = 0;
   virtual void irrigate_surface (double flux) = 0;
   virtual void set_subsoil_irrigation (double flux) = 0;
-  virtual void spray (const string& chemical, double amount) = 0; // [g/m^2]
+  virtual void spray (symbol chemical, double amount) = 0; // [g/m^2]
   virtual void harvest_chemicals (Chemicals& chemicals, double LAI) = 0;
 		       
   // Communication with external model.
@@ -77,7 +78,7 @@ public:
 
   // Create.
 protected:
-  Bioclimate (const string& name);
+  Bioclimate (const AttributeList&);
 public:
   virtual ~Bioclimate ();
 };

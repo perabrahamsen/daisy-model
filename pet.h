@@ -36,7 +36,7 @@ class Pet
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Utilities.

@@ -35,7 +35,7 @@ the other processes in Daisy as submodels.";
 void
 Column::output (Log& log) const
 {
-  log.output ("size", size);
+  output_variable (size, log);
 }
 
 void
@@ -49,7 +49,7 @@ The dimension is up to you, as long as all columns use the same unit.");
 
 Column::Column (const AttributeList& al)
   : alist (al),
-    name (al.name ("type")),
+    name (al.identifier ("type")),
     size (alist.number ("size"))
 { }
 

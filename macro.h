@@ -34,7 +34,7 @@ class Macro
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
   virtual bool none () const;
 

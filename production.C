@@ -388,44 +388,44 @@ Production::none ()
 void 
 Production::output (Log& log) const
 {
-  log.output ("StemRes", StemRes);
-  log.output ("CH2OPool", CH2OPool);
-  log.output ("WLeaf", WLeaf);
-  log.output ("WStem", WStem);
-  log.output ("WRoot", WRoot);
-  log.output ("WSOrg", WSOrg);
-  log.output ("WDead", WDead);
-  log.output ("CCrop", CCrop);
-  log.output ("CLeaf", CLeaf);
-  log.output ("CStem", CStem);
-  log.output ("CRoot", CRoot);
-  log.output ("CSOrg", CSOrg);
-  log.output ("CDead", CDead);
-  log.output ("NLeaf", NLeaf);
-  log.output ("NStem", NStem);
-  log.output ("NRoot", NRoot);
-  log.output ("NSOrg", NSOrg);
-  log.output ("NDead", NDead);
-  log.output ("NCrop", NCrop);
-  log.output ("C_AM", C_AM);
-  log.output ("N_AM", N_AM);
-  log.output ("PotCanopyAss", PotCanopyAss);
-  log.output ("CanopyAss", CanopyAss);
-  log.output ("NetPhotosynthesis", NetPhotosynthesis);
-  log.output ("AccNetPhotosynthesis", AccNetPhotosynthesis);
-  log.output ("Respiration", Respiration);
-  log.output ("MaintRespiration", MaintRespiration);
-  log.output ("GrowthRespiration", GrowthRespiration);
-  log.output ("RootRespiration", RootRespiration);
-  log.output ("IncWLeaf", IncWLeaf);
-  log.output ("IncWStem", IncWStem);
-  log.output ("IncWSOrg", IncWSOrg);
-  log.output ("IncWRoot", IncWRoot);
-  log.output ("DeadWLeaf", DeadWLeaf);
-  log.output ("DeadNLeaf", DeadNLeaf);
-  log.output ("DeadWRoot", DeadWRoot);
-  log.output ("DeadNRoot", DeadNRoot);
-  log.output ("C_Loss", C_Loss);
+  output_variable (StemRes, log);
+  output_variable (CH2OPool, log);
+  output_variable (WLeaf, log);
+  output_variable (WStem, log);
+  output_variable (WRoot, log);
+  output_variable (WSOrg, log);
+  output_variable (WDead, log);
+  output_variable (CCrop, log);
+  output_variable (CLeaf, log);
+  output_variable (CStem, log);
+  output_variable (CRoot, log);
+  output_variable (CSOrg, log);
+  output_variable (CDead, log);
+  output_variable (NLeaf, log);
+  output_variable (NStem, log);
+  output_variable (NRoot, log);
+  output_variable (NSOrg, log);
+  output_variable (NDead, log);
+  output_variable (NCrop, log);
+  output_variable (C_AM, log);
+  output_variable (N_AM, log);
+  output_variable (PotCanopyAss, log);
+  output_variable (CanopyAss, log);
+  output_variable (NetPhotosynthesis, log);
+  output_variable (AccNetPhotosynthesis, log);
+  output_variable (Respiration, log);
+  output_variable (MaintRespiration, log);
+  output_variable (GrowthRespiration, log);
+  output_variable (RootRespiration, log);
+  output_variable (IncWLeaf, log);
+  output_variable (IncWStem, log);
+  output_variable (IncWSOrg, log);
+  output_variable (IncWRoot, log);
+  output_variable (DeadWLeaf, log);
+  output_variable (DeadNLeaf, log);
+  output_variable (DeadWRoot, log);
+  output_variable (DeadNRoot, log);
+  output_variable (C_Loss, log);
 }
 
 void 
@@ -597,7 +597,7 @@ Production::initialize (const double SeedN)
 }
 
 void
-Production::initialize (const string& name, 
+Production::initialize (const symbol name, 
 			const vector<AttributeList*>& root,
 			const vector<AttributeList*>& dead,
 			const Geometry& geometry,
@@ -605,22 +605,24 @@ Production::initialize (const string& name,
 {
   // Hotstart, find pool in organic matter.
   daisy_assert (AM_root == NULL);
-  AM_root = organic_matter.find_am (name, "root");
+  static const symbol root_symbol ("root");
+  AM_root = organic_matter.find_am (name, root_symbol);
   daisy_assert (AM_leaf == NULL);
-  AM_leaf = organic_matter.find_am (name, "dead");
+  static const symbol dead_symbol ("dead");
+  AM_leaf = organic_matter.find_am (name, dead_symbol);
 
   // If not found, we is planting emerged crops.  Create pools.
   if (!AM_root)
     {
       AM_root = &AM::create (geometry, Time (1, 1, 1, 1), root,
-			     name, "root", AM::Locked);
+			     name, root_symbol, AM::Locked);
       organic_matter.add (*AM_root);
     }
 	  
   if (!AM_leaf)
     {
       AM_leaf = &AM::create (geometry, Time (1, 1, 1, 1), dead,
-			     name, "dead", AM::Locked);
+			     name, dead_symbol, AM::Locked);
       organic_matter.add (*AM_leaf);
     }
 }

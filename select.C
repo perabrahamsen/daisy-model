@@ -23,6 +23,7 @@
 #include "geometry.h"
 #include "check.h"
 #include "units.h"
+#include "symbol.h"
 #include <numeric>
 #include <set>
 
@@ -37,9 +38,9 @@ struct Select::Implementation
   struct Spec
   {
     // Content.
-    const string library_name;
-    const string model_name;
-    const vector<string> submodels_and_attribute;
+    const symbol library_name;
+    const symbol model_name;
+    const vector<symbol> submodels_and_attribute;
     
     // Use.
     const string& dimension () const;
@@ -53,7 +54,7 @@ struct Select::Implementation
 
   // Content.
   Condition* condition;		// Should we accumulate now?
-  vector<string> path;		// Content of this entry.
+  vector<symbol> path;		// Content of this entry.
   const Units::Convert* spec_conv; // Convert value.
   const double factor;		// - || -
   const double offset;		// - || -
@@ -68,9 +69,9 @@ struct Select::Implementation
   vector<bool> maybies;		// Keep track of which maybies 
 				// have matched.
   bool valid ();		// If the current path index is valid.
-  bool valid (const string& name); // Is the next path index valid?
-  void open_group (const string& name);
-  void open (const string& name); // Open one leaf level.
+  bool valid (symbol name); // Is the next path index valid?
+  void open_group (symbol name);
+  void open (symbol name); // Open one leaf level.
   void close ();		// Close one level.
 
   bool match (const Daisy& daisy, Treelog&, bool is_printing);
@@ -91,9 +92,9 @@ Select::Implementation::Spec::dimension () const
   const Syntax* syntax = &library.syntax (model_name);
 
   for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
-    syntax = &syntax->syntax (submodels_and_attribute[i]);
+    syntax = &syntax->syntax (submodels_and_attribute[i].name ());
   
-  const string& attribute_name = submodels_and_attribute.back ();
+  const string& attribute_name = submodels_and_attribute.back ().name ();
   const Syntax::type type = syntax->lookup (attribute_name);
 
   if (type == Syntax::Number)
@@ -108,10 +109,10 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
 {
   bool ok = true;
   
-  const string library_name = al.name ("library");
-  const string model_name = al.name ("model");
-  const vector<string> submodels_and_attribute 
-    = al.name_sequence ("submodels_and_attribute");
+  const symbol library_name = al.identifier ("library");
+  const symbol model_name = al.identifier ("model");
+  const vector<symbol> submodels_and_attribute 
+    = al.identifier_sequence ("submodels_and_attribute");
 
   if (submodels_and_attribute.size () < 1)
     {
@@ -120,7 +121,7 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
     }
   if (!Library::exist (library_name))
     {
-      err.entry (string ("'") + library_name + "': no such library");
+      err.entry ("'" + library_name + "': no such library");
       ok = false;
     }
   else
@@ -129,7 +130,7 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
       
       if (!library.check (model_name))
 	{
-	  err.entry (string ("'") + model_name + "': no such model");
+	  err.entry ("'" + model_name + "': no such model");
 	  ok = false;
 	}
       else
@@ -138,23 +139,23 @@ Select::Implementation::Spec::check_alist (const AttributeList& al,
 	  
 	  for (unsigned int i = 0; i < submodels_and_attribute.size (); i++)
 	    {
-	      const string& name = submodels_and_attribute[i];
+	      const symbol name = submodels_and_attribute[i];
 	      bool last = (i + 1 == submodels_and_attribute.size ());
-	      const Syntax::type type = syntax->lookup (name);
+	      const Syntax::type type = syntax->lookup (name.name ());
 
 	      if (!last)
 		{
 		  if (type != Syntax::AList)
 		    {
-		      err.entry (string ("'") + name + "': no such submodel");
+		      err.entry ("'" + name + "': no such submodel");
 		      ok = false;
 		      break;
 		    }
-		  syntax = &syntax->syntax (name);
+		  syntax = &syntax->syntax (name.name ());
 		}
 	      else if (type == Syntax::Error)
 		{
-		  err.entry (string ("'") + name + "': no such attribute");
+		  err.entry ("'" + name + "': no such attribute");
 		  ok = false;
 		}
 	    }
@@ -178,9 +179,10 @@ Name of submodels and attribute.");
 }
 
 Select::Implementation::Spec::Spec (const AttributeList& al)
-  : library_name (al.name ("library")),
-    model_name (al.name ("model")),
-    submodels_and_attribute (al.name_sequence ("submodels_and_attribute"))
+  : library_name (al.identifier ("library")),
+    model_name (al.identifier ("model")),
+    submodels_and_attribute (al.identifier_sequence
+			     ("submodels_and_attribute"))
 { }
 
 Select::Implementation::Spec::~Spec ()
@@ -203,15 +205,16 @@ Select::Implementation::valid ()
 }
 
 bool 
-Select::Implementation::valid (const string& name)
+Select::Implementation::valid (symbol name)
 { 
+  static const symbol wildcard ("*");
   // Is the next path index valid?
-  return valid () && (path[current_path_index] == "*" 
+  return valid () && (path[current_path_index] == wildcard 
 		      || name == path[current_path_index]); 
 }
 
 void 
-Select::Implementation::open_group (const string& name)
+Select::Implementation::open_group (symbol name)
 { 
   // Open one group level.
   if (valid (name))
@@ -229,7 +232,7 @@ Select::Implementation::open_group (const string& name)
 }
 
 void 
-Select::Implementation::open (const string& name) // Open one leaf level.
+Select::Implementation::open (symbol name) // Open one leaf level.
 {
   if (valid (name))
     last_valid_path_index++;
@@ -272,10 +275,10 @@ Select::Implementation::select_get_tag (const AttributeList& al)
   if (al.check ("tag"))
     return al.name ("tag");
 
-  vector<string> path  = al.name_sequence ("path");
+  vector<symbol> path  = al.identifier_sequence ("path");
   
   if (path.size () > 0)
-    return path[path.size () - 1];
+    return path[path.size () - 1].name ();
 
   return "<none>";
 }
@@ -289,11 +292,12 @@ Select::Implementation::initialize (const string_map& conv,
   // Convert path according to mapping in 'conv'.
   for (unsigned int i = 0; i < path.size (); i++)
     {
-      string_map::const_iterator entry = conv.find (path[i]);
+      const string& sname = path[i].name ();
+      string_map::const_iterator entry = conv.find (sname);
       if (entry != conv.end ())
-	path[i] = (*entry).second;
-      else if (path[i].size () > 0 && path[i][0] == '$')
-	path[i] = "*";
+	path[i] = symbol ((*entry).second);
+      else if (sname.size () > 0 && sname[0] == '$')
+	path[i] = symbol ("*");
     }
 
   if (dimension == Syntax::Unknown ())
@@ -353,7 +357,7 @@ Select::Implementation::Implementation (const AttributeList& al)
     condition (al.check ("when") 
 	       ? &Librarian<Condition>::create (al.alist ("when"))
 	       : NULL),
-    path (al.name_sequence ("path")),
+    path (al.identifier_sequence ("path")),
     spec_conv (NULL),
     factor (al.number ("factor")),
     offset (al.number ("offset")),
@@ -409,55 +413,77 @@ Select::valid ()
 { return impl.valid (); }
 
 bool 
-Select::valid (const string& name)
+Select::valid (symbol name)
 { return impl.valid (name); }
 
 void 
-Select::open_group (const string& name) // Open one group level.
-{ impl.open_group (name); }
+Select::open_group (symbol name) // Open one group level.
+{ 
+  if (!valid_level)
+    impl.current_path_index++;
+  else
+    {
+      impl.open_group (name); 
+      valid_level = is_active () && valid ();
+    }
+}
 
 void 
-Select::open (const string& name)	// Open one leaf level.
-{ impl.open (name); }
+Select::open (symbol name)	// Open one leaf level.
+{ 
+  if (!valid_level)
+    impl.current_path_index++;
+  else
+    {
+      impl.open (name); 
+      valid_level = is_active () && valid ();
+    }
+}
 
 void 
 Select::close ()		// Close one level.
-{ impl.close (); }
+{ 
+  impl.close (); 
+  valid_level = is_active () && valid ();
+}
 
 // Output routines.
 void 
-Select::output_number (const string& name, const double)
+Select::output_number (symbol name, const double)
 { 
-  if (is_active () && valid (name))
+  if (valid (name))
     throw ("This log selection can't log numbers."); 
 }
 
 void 
-Select::output_integer (const string& name, const int)
+Select::output_integer (symbol name, const int)
 { 
-  if (is_active () && valid (name))
+  if (valid (name))
     throw ("This log selection can't log integers."); 
 }
 
 void 
-Select::output_name (const string& name, const string&)
+Select::output_name (symbol name, const string&)
 { 
-  if (is_active () && valid (name))
+  if (valid (name))
     throw ("This log selection can't log names.");
 }
 
 void 
-Select::output_array (const string& name, const vector<double>&,
+Select::output_array (symbol name, const vector<double>&,
 		      const Geometry*)
 { 
-  if (is_active () && valid (name))
+  if (valid (name))
     throw ("This log selection can't log arrays."); 
 }
 
 // Reset at start of time step.
 bool 
 Select::match (const Daisy& daisy, Treelog& out, bool is_printing)
-{ return impl.match (daisy, out, is_printing); }
+{ 
+  valid_level = impl.match (daisy, out, is_printing); 
+  return valid_level;
+}
 
 bool
 Select::prevent_printing ()
@@ -580,7 +606,8 @@ Select::check (Treelog& err) const
 Select::Select (const AttributeList& al)
   : impl (*new Implementation (al)),
     accumulate (al.flag ("accumulate")),
-    count (al.integer ("count"))
+    count (al.integer ("count")),
+    valid_level (true)
 { }
 
 Select::~Select ()

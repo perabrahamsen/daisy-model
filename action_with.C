@@ -29,7 +29,7 @@
 
 struct ActionWithColumn : public Action
 {
-  const string column;
+  const symbol column;
   vector<Action*> actions;
 
 public:
@@ -83,7 +83,7 @@ public:
 
   ActionWithColumn (const AttributeList& al)
     : Action (al),
-      column (al.name ("column")),
+      column (al.identifier ("column")),
       actions (map_create<Action> (al.alist_sequence ("actions")))
   { }
 public:

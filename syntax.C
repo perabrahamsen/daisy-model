@@ -163,7 +163,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		    error = true;
 		    err.error (tmp.str ());
 		  }
-		else if (!lib.check (al.name ("type")))
+		else if (!lib.check (al.identifier ("type")))
 		  {
 		    tmp () << "Unknown library member '"
 			   << al.name ("type") << "'";
@@ -174,7 +174,8 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 		  {
 		    tmp () << al.name ("type");
 		    Treelog::Open nest (err, tmp.str ());
-		    if (!lib.syntax (al.name ("type")).impl.check (al, err))
+		    if (!lib.syntax (al.identifier ("type")).impl.check (al,
+									 err))
 		      error = true;
 		  }
 	      }
@@ -191,7 +192,7 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 	    else 
 	      {
 		Treelog::Open nest (err, key + ": " + al.name ("type"));
-		if (!lib.syntax (al.name ("type")).check (al, err))
+		if (!lib.syntax (al.identifier ("type")).check (al, err))
 		  error = true;
 	      }
 	  }

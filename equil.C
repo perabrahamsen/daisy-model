@@ -43,7 +43,7 @@ Equilibrium::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 Equilibrium::Equilibrium (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 Equilibrium::~Equilibrium ()

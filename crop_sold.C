@@ -104,7 +104,7 @@ public:
 	     double&, double&, double&, vector<double>&, vector<double>&, 
 	     double ForcedCAI,
 	     Treelog&);
-  const Harvest& harvest (const string& column_name, const Time&,
+  const Harvest& harvest (symbol column_name, const Time&,
 			  const Geometry& geometry, 
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
@@ -332,7 +332,6 @@ struct CropSold::Variables
     double IncWLeaf;	// Leaf growth [g DM/m2/d]
     double IncWSOrg;	// Storage organ growth [g DM/m2/d]
     double IncWRoot;	// Root growth [g DM/m2/d]
-    // double H2OUpt;		// H2O uptake [mm/h]
     double NH4Upt;		// NH4-N uptake [g/m2/h]
     double NO3Upt;		// NO3-N uptake [g/m2/h]
     double Fixated;		// N fixation from air. [g/m2/h]
@@ -472,15 +471,15 @@ CropSold::Variables::Variables (const Parameters& par,
 void 
 CropSold::Variables::output (Log& log) const
 {
-  if (log.check_member ("Phenology"))
+  if (log.check_member (symbol ("Phenology")))
     Phenology.output (log);
-  if (log.check_member ("Canopy"))
+  if (log.check_member (symbol ("Canopy")))
     Canopy.output (log);
-  if (log.check_member ("RootSys"))
+  if (log.check_member (symbol ("RootSys")))
     RootSys.output (log);
-  if (log.check_member ("Prod"))
+  if (log.check_member (symbol ("Prod")))
     Prod.output (log);
-  if (log.check_member ("CrpAux"))
+  if (log.check_member (symbol ("CrpAux")))
     CrpAux.output (log);
 }
 
@@ -493,9 +492,9 @@ CropSold::Variables::RecPhenology::RecPhenology (const Parameters& par,
 void 
 CropSold::Variables::RecPhenology::output (Log& log) const
 {
-  Log::Open open (log, "Phenology");
-  log.output ("DS", DS);
-  log.output ("Vern", Vern);
+  Log::Open open (log, symbol ("Phenology"));
+  output_variable (DS, log);
+  output_variable (Vern, log);
 }
 
 CropSold::Variables::RecCanopy::RecCanopy (const Parameters&,
@@ -509,11 +508,11 @@ CropSold::Variables::RecCanopy::RecCanopy (const Parameters&,
 void 
 CropSold::Variables::RecCanopy::output (Log& log) const
 {
-  Log::Open open (log, "Canopy");
-  log.output ("Height", Height);
-  log.output ("LAI", LAI);
-  log.output ("LADm", LADm);
-  log.output ("LAIvsH", LAIvsH);
+  Log::Open open (log, symbol ("Canopy"));
+  output_variable (Height, log);
+  output_variable (LAI, log);
+  output_variable (LADm, log);
+  output_variable (LAIvsH, log);
 }
 
 CropSold::Variables::RecRootSys::RecRootSys (const Parameters& par,
@@ -534,16 +533,16 @@ CropSold::Variables::RecRootSys::RecRootSys (const Parameters& par,
 void 
 CropSold::Variables::RecRootSys::output (Log& log) const
 {
-  Log::Open open (log, "RootSys");
-  log.output ("Depth", Depth);
-  log.output ("Density", Density);
-  log.output ("H2OExtraction", H2OExtraction);
-  log.output ("NH4Extraction", NH4Extraction);
-  log.output ("NO3Extraction", NO3Extraction);
-  log.output ("h_x", h_x);
-  log.output ("water_stress", water_stress);
-  log.output ("transpiration", transpiration);
-  log.output ("Ept", Ept);
+  Log::Open open (log, symbol ("RootSys"));
+  output_variable (Depth, log);
+  output_variable (Density, log);
+  output_variable (H2OExtraction, log);
+  output_variable (NH4Extraction, log);
+  output_variable (NO3Extraction, log);
+  output_variable (h_x, log);
+  output_variable (water_stress, log);
+  output_variable (transpiration, log);
+  output_variable (Ept, log);
 }
 
 CropSold::Variables::RecProd::RecProd (const Parameters& par, 
@@ -558,12 +557,12 @@ CropSold::Variables::RecProd::RecProd (const Parameters& par,
 void 
 CropSold::Variables::RecProd::output (Log& log) const
 {
-  Log::Open open (log, "Prod");
-  log.output ("WLeaf", WLeaf);
-  log.output ("WhiteStubble", WhiteStubble);
-  log.output ("WSOrg", WSOrg);
-  log.output ("WRoot", WRoot);
-  log.output ("NCrop", NCrop);
+  Log::Open open (log, symbol ("Prod"));
+  output_variable (WLeaf, log);
+  output_variable (WhiteStubble, log);
+  output_variable (WSOrg, log);
+  output_variable (WRoot, log);
+  output_variable (NCrop, log);
 }
 
 CropSold::Variables::RecCrpAux::RecCrpAux (const Parameters& par, 
@@ -581,7 +580,6 @@ CropSold::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     IncWLeaf (0.0),
     IncWSOrg (0.0),
     IncWRoot (0.0),
-    // H2OUpt (vl.number ("H2OUpt")),
     NH4Upt (0.0),
     NO3Upt (0.0),
     Fixated (0.0)
@@ -590,20 +588,19 @@ CropSold::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
 void 
 CropSold::Variables::RecCrpAux::output (Log& log) const
 {
-  Log::Open open (log, "CrpAux");
-  log.output ("InitLAI", InitLAI);
-  log.output ("PotRtDpt", PotRtDpt);
-  log.output ("PtNCnt", PtNCnt);
-  log.output ("PotTransp", PotTransp);
-  log.output ("PotCanopyAss", PotCanopyAss);
-  log.output ("CanopyAss", CanopyAss);
-  log.output ("IncWLeaf", IncWLeaf);
-  log.output ("IncWSOrg", IncWSOrg);
-  log.output ("IncWRoot", IncWRoot);
-  // log.output ("H2OUpt", H2OUpt);
-  log.output ("NH4Upt", NH4Upt);
-  log.output ("NO3Upt", NO3Upt);
-  log.output ("Fixated", Fixated);
+  Log::Open open (log, symbol ("CrpAux"));
+  output_variable (InitLAI, log);
+  output_variable (PotRtDpt, log);
+  output_variable (PtNCnt, log);
+  output_variable (PotTransp, log);
+  output_variable (PotCanopyAss, log);
+  output_variable (CanopyAss, log);
+  output_variable (IncWLeaf, log);
+  output_variable (IncWSOrg, log);
+  output_variable (IncWRoot, log);
+  output_variable (NH4Upt, log);
+  output_variable (NO3Upt, log);
+  output_variable (Fixated, log);
 }
 
 CropSold::Variables::~Variables ()
@@ -1832,7 +1829,7 @@ CropSold::tick (const Time& time,
 }
 
 const Harvest&
-CropSold::harvest (const string& column_name,
+CropSold::harvest (const symbol column_name,
 		   const Time& time, const Geometry& geometry,
 		   Bioclimate&,
 		   double,
@@ -1898,7 +1895,8 @@ CropSold::harvest (const string& column_name,
   // Add crop remains to the soil.
   if (leaf_harvest < 1.0 && WLeaf > 0.0)
     {
-      AM& am = AM::create (geometry, time, Leaf, name, "leaf");
+      static const symbol leaf_symbol ("leaf");
+      AM& am = AM::create (geometry, time, Leaf, name, leaf_symbol);
       am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest) * m2_per_cm2, 
 	      NLeaf * (1.0 - leaf_harvest) * m2_per_cm2);
       residuals.push_back (&am);
@@ -1908,7 +1906,8 @@ CropSold::harvest (const string& column_name,
     }
   if (sorg_harvest < 1.0 && WSOrg > 0.0)
     {
-      AM& am = AM::create (geometry, time, SOrg, name, "sorg");
+      static const symbol sorg_symbol ("sorg");
+      AM& am = AM::create (geometry, time, SOrg, name, sorg_symbol);
       am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
 	      NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
       residuals.push_back (&am);
@@ -1918,7 +1917,8 @@ CropSold::harvest (const string& column_name,
     }
   if (WRoot > 0.0)
     {
-      AM& am = AM::create (geometry, time, Root, name, "root");
+      static const symbol root_symbol ("root");
+      AM& am = AM::create (geometry, time, Root, name, root_symbol);
       residuals_DM += WRoot;
       if (geometry.total (density) > 0.0)
 	{

@@ -38,7 +38,7 @@ public:
   // Create.
 public:
   AdsorptionFull (const AttributeList& al)
-    : Adsorption (al.name ("type"))
+    : Adsorption (al)
   { }
 };
 

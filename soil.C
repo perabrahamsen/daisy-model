@@ -226,9 +226,10 @@ Soil::get_attribute (int i, const std::string& name) const
 void
 Soil::output (Log& log) const
 {
-  if (log.check_member ("horizons"))
+  static const symbol horizons_symbol ("horizons");
+  if (log.check_member (horizons_symbol))
     {
-      Log::Open open (log, "horizons");
+      Log::Open open (log, horizons_symbol);
       for (int i = 0; i < impl.original_layer_size; i++)
 	{
 	  Log::Unnamed unnamed (log);
@@ -387,25 +388,28 @@ Soil::initialize (Groundwater& groundwater, const int som_size, Treelog& msg)
 
       // Add layer.
       Library& library = Librarian<Horizon>::library ();
-      if (!library.check ("aquitard"))
+      static const symbol aquitard_symbol ("aquitard");
+      static const symbol default_symbol ("default");
+      if (!library.check (aquitard_symbol))
 	{
 	  // Create aquitard horizon.
 	  AttributeList& alist 
-	    = *new AttributeList (library.lookup ("default"));
+	    = *new AttributeList (library.lookup (default_symbol));
 	  alist.add ("clay", 50.0);
 	  alist.add ("silt", 20.0);
 	  alist.add ("sand", 29.99);
 	  alist.add ("humus", 0.01);
 	  alist.add ("dry_bulk_density", 2.0);
-	  library.add_derived ("aquitard", alist, "default");
+	  library.add_derived (aquitard_symbol, alist, default_symbol);
 	}
-      daisy_assert (library.check ("aquitard"));
-      AttributeList horizon_alist (library.lookup ("aquitard"));
+      daisy_assert (library.check (aquitard_symbol));
+      AttributeList horizon_alist (library.lookup (aquitard_symbol));
       horizon_alist.add ("type", "aquitard");
       AttributeList hydraulic_alist (horizon_alist.alist ("hydraulic"));
       hydraulic_alist.add ("K_sat", K_aquitard);
       horizon_alist.add ("hydraulic", hydraulic_alist);
-      daisy_assert (library.syntax ("aquitard").check (horizon_alist, msg));
+      daisy_assert (library.syntax (aquitard_symbol).check (horizon_alist,
+							    msg));
       Syntax layer_syntax;
       AttributeList layer_alist;
       Implementation::Layer::load_syntax (layer_syntax, layer_alist);

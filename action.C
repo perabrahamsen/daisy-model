@@ -49,7 +49,7 @@ Action::check (const Daisy&, Treelog&) const
 { return true; }
 
 Action::Action (const AttributeList& al)
-  : name (al.name ("type")),
+  : name (al.identifier ("type")),
     alist (al)
 { }
 

@@ -71,13 +71,13 @@ public:
 void 
 DOM::Element::output (Log& log) const
 {
-  log.output ("M", M);
-  log.output ("C", C);
-  log.output ("S", S);
-  log.output ("S_p", S_p);
-  log.output ("S_drain", S_drain);
-  log.output ("J", J);
-  log.output ("J_p", J_p);
+  output_variable (M, log);
+  output_variable (C, log);
+  output_variable (S, log);
+  output_variable (S_p, log);
+  output_variable (S_drain, log);
+  output_variable (J, log);
+  output_variable (J_p, log);
 }
 
 void 

@@ -34,7 +34,7 @@ struct Field::Implementation
 
   // Restrictions.
   Column* selected;
-  void restrict (const string& name);
+  void restrict (symbol name);
   void unrestrict ();
 
   // Actions.
@@ -49,7 +49,7 @@ struct Field::Implementation
   void fertilize (const AttributeList&, double from, double to);  // Organic.
   void fertilize (const AttributeList&);
   void clear_second_year_utilization ();
-  void harvest (const Time&, const string& name,
+  void harvest (const Time&, symbol name,
 		double stub_length, 
 		double stem_harvest, 
 		double leaf_harvest, 
@@ -60,7 +60,7 @@ struct Field::Implementation
   void swap (Treelog&, const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value);
-  void spray (const string& chemical, double amount); // [g/ha]
+  void spray (symbol chemical, double amount); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
   // Conditions.
@@ -73,9 +73,9 @@ public:
   double second_year_utilization () const;// [kg N/ha]
   // Current development stage for the crop named "crop", or
   // Crop::DSremove if no such crop is present.
-  double crop_ds (const string& crop) const; 
+  double crop_ds (symbol crop) const; 
   // Drymatter in shoot [kg/ha], or negative if no such crop is present
-  double crop_dm (const string& crop) const; 
+  double crop_dm (symbol crop) const; 
 
   // Simulation.
   void clear ();
@@ -83,12 +83,12 @@ public:
   void output (Log&) const;
 
   // Find a specific column.
-  Column* find (const string& name) const;
+  Column* find (symbol name) const;
 
   // Changing the field.
-  void divide (const string& original, const string& copy, double copy_size, 
+  void divide (symbol original, symbol copy, double copy_size, 
 	       const Time&, const Weather*);
-  void merge (const string& combine, const string& remove);
+  void merge (symbol combine, symbol remove);
 
   // Create and destroy.
   bool check (bool require_weather, const Time& from, const Time& to, 
@@ -100,7 +100,7 @@ public:
 };
 
 void 
-Field::Implementation::restrict (const string& name)
+Field::Implementation::restrict (symbol name)
 {
   if (selected)
     throw ("Cannot restrict already restricted field");
@@ -249,7 +249,7 @@ Field::Implementation::clear_second_year_utilization ()
 }
 
 void
-Field::Implementation::harvest (const Time& time, const string& name,
+Field::Implementation::harvest (const Time& time, symbol name,
 				double stub_length, 
 				double stem_harvest, 
 				double leaf_harvest, 
@@ -337,7 +337,7 @@ Field::Implementation::set_heat_source (double at, double value)
 }
 
 void 
-Field::Implementation::spray (const string& chemical, double amount) // [g/ha]
+Field::Implementation::spray (symbol chemical, double amount) // [g/ha]
 {
   if (selected)
     selected->spray (chemical, amount);
@@ -427,7 +427,7 @@ Field::Implementation::second_year_utilization () const
 }
 
 double 
-Field::Implementation::crop_ds (const string& crop) const
+Field::Implementation::crop_ds (symbol crop) const
 { 
   if (selected)
     return selected->crop_ds (crop);
@@ -438,7 +438,7 @@ Field::Implementation::crop_ds (const string& crop) const
 } 
 
 double 
-Field::Implementation::crop_dm (const string& crop) const
+Field::Implementation::crop_dm (symbol crop) const
 {
   if (selected)
     return selected->crop_dm (crop);
@@ -482,14 +482,14 @@ Field::Implementation::output (Log& log) const
     {
       if (log.check_entry ((*i)->name, library))
 	{
-	  Log::Entry open_entry (log, (*i)->name, (*i)->alist);
+	  Log::Entry open_entry (log, symbol ((*i)->name), (*i)->alist);
 	  (*i)->output (log);
 	}
     }
 }
 
 Column* 
-Field::Implementation::find (const string& name) const
+Field::Implementation::find (symbol name) const
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
@@ -502,7 +502,7 @@ Field::Implementation::find (const string& name) const
 }
 
 void 
-Field::Implementation::divide (const string& original, const string& copy,
+Field::Implementation::divide (symbol original, symbol copy,
 			       double copy_size,
 			       const Time& time, const Weather* weather)
 { 
@@ -513,17 +513,17 @@ Field::Implementation::divide (const string& original, const string& copy,
     throw ("Attempt to divide column into fraction larger than the original");
   old->size -= copy_size;
   const Library& library = Librarian<Column>::library ();
-  const Syntax& syntax = library.syntax (old->alist.name ("type"));
+  const Syntax& syntax = library.syntax (old->alist.identifier ("type"));
   LogClone log_clone ("column", syntax, old->alist);
   old->output (log_clone);
   AttributeList& lib_alist = *new AttributeList ();
   // Remember where we got this object.
   lib_alist.add ("parsed_from_file", "*clone*");
   lib_alist.add ("parsed_sequence", Library::get_sequence ());
-  lib_alist.add ("type", original);
+  lib_alist.add ("type", original.name ());
   Librarian<Column>::derive_type (copy, lib_alist, original);
   AttributeList copy_alist (log_clone.result ());
-  copy_alist.add ("type", copy);
+  copy_alist.add ("type", copy.name ());
   copy_alist.add ("size", copy_size);
   Column* result = &Librarian<Column>::create (copy_alist);
   result->initialize (time, Treelog::null (), weather);
@@ -531,8 +531,8 @@ Field::Implementation::divide (const string& original, const string& copy,
 }
   
 void
-Field::Implementation::merge (const string& /*combine*/,
-			      const string& /*remove*/)
+Field::Implementation::merge (symbol /*combine*/,
+			      symbol /*remove*/)
 { throw ("Merge is not yet implemented"); } 
 
 bool 
@@ -545,7 +545,7 @@ Field::Implementation::check (bool require_weather,
        i != columns.end ();
        i++)
     {
-      Treelog::Open nest (err, (*i) ? (*i)->name.c_str () : "error");
+      Treelog::Open nest (err, (*i) ? (*i)->name.name ().c_str () : "error");
       if ((*i) == NULL || !(*i)->check (require_weather, from, to, err))
 	ok = false;
     }
@@ -555,7 +555,7 @@ Field::Implementation::check (bool require_weather,
 bool 
 Field::Implementation::check_am (const AttributeList& am, Treelog& err) const
 { 
-  Treelog::Open nest (err, am.name ("type"));
+  Treelog::Open nest (err, am.identifier ("type"));
 
   bool ok = true;
   for (ColumnList::const_iterator i = columns.begin ();
@@ -590,7 +590,7 @@ Field::Implementation::~Implementation ()
   sequence_delete (columns.begin (), columns.end ()); 
 }
 
-Field::Restrict::Restrict (Field& f, const string& name)
+Field::Restrict::Restrict (Field& f, symbol name)
   : field (f)
 { 
   field.impl.restrict (name); 
@@ -641,7 +641,7 @@ Field::clear_second_year_utilization ()
 { impl.clear_second_year_utilization (); }
 
 void
-Field::harvest (const Time& time, const string& name,
+Field::harvest (const Time& time, symbol name,
 		double stub_length, 
 		double stem_harvest, 
 		double leaf_harvest, 
@@ -670,7 +670,7 @@ Field::set_heat_source (double at, double value)
 { impl.set_heat_source (at, value); }
 
 void 
-Field::spray (const string& chemical, double amount) // [g/ha]
+Field::spray (symbol chemical, double amount) // [g/ha]
 { impl.spray (chemical, amount); }
 
 void 
@@ -702,11 +702,11 @@ Field::second_year_utilization () const // [kg N/ha]
 { return impl.second_year_utilization (); }
 
 double 
-Field::crop_ds (const string& crop) const
+Field::crop_ds (symbol crop) const
 { return impl.crop_ds (crop); } 
 
 double 
-Field::crop_dm (const string& crop) const
+Field::crop_dm (symbol crop) const
 { return impl.crop_dm (crop); } 
 
 void
@@ -722,7 +722,7 @@ Field::output (Log& log) const
 { impl.output (log); }
 
 const Column* 
-Field::find (const string& name) const
+Field::find (symbol name) const
 { return impl.find (name); }
 
 Column* 
@@ -734,12 +734,12 @@ Field::size () const
 { return impl.columns.size (); }
 
 void 
-Field::divide (const string& original, const string& copy, double copy_size,
+Field::divide (symbol original, symbol copy, double copy_size,
 	       const Time& time, const Weather* weather)
 { impl.divide (original, copy, copy_size, time, weather); }
 
 void 
-Field::merge (const string& combine, const string& remove)
+Field::merge (symbol combine, symbol remove)
 { impl.merge (combine, remove); }
 
 bool 

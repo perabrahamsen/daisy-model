@@ -25,6 +25,7 @@
 
 #include "condition.h"		// Needed for proper initialization.
 #include "librarian.h"
+#include "symbol.h"
 #include <map>
 
 struct Geometry;
@@ -70,17 +71,18 @@ public:
 public:
   bool is_active ();		// Active time step.
   bool valid ();		// Currently path entry is valid.
-  bool valid (const string& next); // Next path entry is valid.
+  bool valid (symbol next); // Next path entry is valid.
+  bool valid_level;		// Fast, unsafe alternative to valid.
 
-  void open_group (const string&); // Open one group level.
-  void open (const string&);	// Open one leaf level.
+  void open_group (symbol); // Open one group level.
+  void open (symbol);	// Open one leaf level.
   void close ();		// Close one level.
 
   // Output routines.
-  virtual void output_number (const string& name, const double number);
-  virtual void output_integer (const string& name, const int integer);
-  virtual void output_name (const string& name, const string& a_name);
-  virtual void output_array (const string& name, const vector<double>& array,
+  virtual void output_number (symbol name, const double number);
+  virtual void output_integer (symbol name, const int integer);
+  virtual void output_name (symbol name, const string& a_name);
+  virtual void output_array (symbol name, const vector<double>& array,
 			     const Geometry* geometry);
 
   // Reset at start of time step.

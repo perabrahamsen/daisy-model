@@ -33,7 +33,7 @@ class Transport
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Simulation.
@@ -49,7 +49,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Transport (const string& name);
+  Transport (const AttributeList&);
 public:
   virtual ~Transport ();
 };

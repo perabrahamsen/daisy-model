@@ -39,10 +39,11 @@ using namespace std;
 void
 OM::output (Log& log) const
 {
-  log.output ("initial_C_per_N", initial_C_per_N); // For checkpoint
-  log.output ("C", C);
-  log.output ("N", N);
-  if (log.check_member ("C_per_N"))
+  output_variable (initial_C_per_N, log); // For checkpoint
+  output_variable (C, log);
+  output_variable (N, log);
+  static const symbol C_per_N_symbol ("C_per_N");
+  if (log.check_member (C_per_N_symbol))
     {
       vector<double> C_per_N;
       unsigned int size = N.size ();
@@ -54,7 +55,7 @@ OM::output (Log& log) const
 	  else
 	    C_per_N.push_back (C[i] / N[i]);
 	}
-      log.output ("C_per_N", C_per_N);
+      output_variable (C_per_N, log);
     }
 }
 

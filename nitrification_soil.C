@@ -103,7 +103,7 @@ static double f_T (double T)
 void
 NitrificationSoil::output (Log& log) const
 {
-  log.output ("converted", converted);
+  output_variable (converted, log);
 }
 
 void 
@@ -157,7 +157,7 @@ NitrificationSoil::tick (const Soil& soil, const SoilWater& soil_water,
 }
 
 NitrificationSoil::NitrificationSoil (const AttributeList& al)
-  : Nitrification (al.name ("type")),
+  : Nitrification (al),
     active_underground (al.flag ("active_underground")),
     active_groundwater (al.flag ("active_groundwater")),
     k (al.number ("k")),

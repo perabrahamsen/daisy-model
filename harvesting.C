@@ -43,8 +43,8 @@ static double DM_to_C_factor (double E)
 }
 
 const Harvest&
-Harvesting::operator() (const string& column_name,
-			const string& crop_name,
+Harvesting::operator() (const symbol column_name,
+			const symbol crop_name,
 			const vector<double>& density,
 			const Time& time,
 			const Geometry& geometry,
@@ -203,7 +203,8 @@ Harvesting::operator() (const string& column_name,
     }
 
   // Add crop remains to the soil.
-  AM& AM_stem = AM::create (geometry, time, Stem, crop_name, "stem");
+  static const symbol stem_symbol ("stem");
+  AM& AM_stem = AM::create (geometry, time, Stem, crop_name, stem_symbol);
   residuals.push_back (&AM_stem);
   if (Stem_W_Loss > 0.0)
     {
@@ -216,9 +217,12 @@ Harvesting::operator() (const string& column_name,
     }
 
   if (!production.AM_leaf)
-    production.AM_leaf
-      = &AM::create (geometry, time, Dead, crop_name, "dead", 
-		     AM::Unlocked /* no organic matter */);
+    {
+      static const symbol dead_symbol ("dead");
+      production.AM_leaf
+	= &AM::create (geometry, time, Dead, crop_name, dead_symbol, 
+		       AM::Unlocked /* no organic matter */);
+    }
   if (Dead_W_Loss > 0.0)
     {
       const double C = C_C_Dead * Dead_W_Loss;
@@ -229,7 +233,8 @@ Harvesting::operator() (const string& column_name,
       production.N_AM += N;
     }
 
-  AM& AM_leaf = AM::create (geometry, time, Leaf, crop_name, "leaf");
+  static const symbol leaf_symbol ("leaf");
+  AM& AM_leaf = AM::create (geometry, time, Leaf, crop_name, leaf_symbol);
   residuals.push_back (&AM_leaf);
   if (Leaf_W_Loss > 0.0)
     {
@@ -241,7 +246,8 @@ Harvesting::operator() (const string& column_name,
       production.N_AM += N;
     }
 
-  AM& AM_sorg = AM::create (geometry, time, SOrg, crop_name, "sorg");
+  static const symbol sorg_symbol ("sorg");
+  AM& AM_sorg = AM::create (geometry, time, SOrg, crop_name, sorg_symbol);
   residuals.push_back (&AM_sorg);
   if (SOrg_W_Loss > 0.0)
     {
@@ -285,9 +291,10 @@ Harvesting::operator() (const string& column_name,
       DS = Crop::DSremove;
 
       // Create root AM if missing.
+      static const symbol root_symbol ("root");
       if (!production.AM_root)
 	production.AM_root = &AM::create (geometry, time, Root,
-					  crop_name, "root", 
+					  crop_name, root_symbol, 
 					  AM::Unlocked /* inorganic */);
 
 
@@ -444,8 +451,8 @@ Harvesting::output (Log& log) const
 { 
   if (last_cut)
     output_submodule (*last_cut, "last_cut", log);
-  log.output ("production_delay", production_delay);
-  log.output ("cut_stress", cut_stress);
+  output_variable (production_delay, log);
+  output_variable (cut_stress, log);
 }
 
 void 

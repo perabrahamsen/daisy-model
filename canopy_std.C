@@ -235,17 +235,17 @@ CanopyStandard::output (Log& log) const
 {
   CanopySimple::output (log);
   
-  log.output ("InitCAI", InitCAI);
-  log.output ("Offset", Offset);
-  log.output ("LeafAI", LeafAI);
-  log.output ("StemAI", StemAI);
-  log.output ("SOrgAI", SOrgAI);
-  log.output ("LADm", LADm);
+  output_variable (InitCAI, log);
+  output_variable (Offset, log);
+  output_variable (LeafAI, log);
+  output_variable (StemAI, log);
+  output_variable (SOrgAI, log);
+  output_variable (LADm, log);
   if (ForcedCAI >= 0.0)
-    log.output ("ForcedCAI", ForcedCAI);
+    output_variable (ForcedCAI, log);
   if (SimCAI >= 0.0)
-    log.output ("SimCAI", SimCAI);
-  log.output ("CAImRat", CAImRat);
+    output_variable (SimCAI, log);
+  output_variable (CAImRat, log);
 }
 
 void 

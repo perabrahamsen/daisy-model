@@ -198,7 +198,7 @@ daisy_alist_size_integer (const AttributeList* alist, const char* name)
 
 extern "C" unsigned int EXPORT
 daisy_alist_size_string (const AttributeList* alist, const char* name)
-{ return alist->name_sequence (name).size (); }
+{ return alist->identifier_sequence (name).size (); }
 
 extern "C" unsigned int EXPORT
 daisy_alist_size_flag (const AttributeList* alist, const char* name)
@@ -228,7 +228,7 @@ daisy_alist_get_integer_at (const AttributeList* alist, const char* name,
 extern "C" const char* EXPORT
 daisy_alist_get_string_at (const AttributeList* alist, const char* name,
 			    unsigned int index)
-{ return alist->name_sequence (name)[index].c_str (); }
+{ return alist->identifier_sequence (name)[index].name ().c_str (); }
 
 extern "C" daisy_bool EXPORT
 daisy_alist_get_flag_at (const AttributeList* alist, const char* name,
@@ -267,14 +267,14 @@ extern "C" void EXPORT
 daisy_alist_set_string_at (AttributeList* alist, const char* name,
 			   const char* value, unsigned int index)
 {
-  vector<string>& v = alist->check (name)
-    ? *new vector<string> (alist->name_sequence (name))
-    : *new vector<string>;
+  vector<symbol> v;
+  if (alist->check (name))
+    v = alist->identifier_sequence (name);
   if (v.size () <= index)
     while (v.size () <= index)
-      v.push_back (value);
+      v.push_back (symbol (value));
   else
-    v[index] = value;
+    v[index] = symbol (value);
   alist->add (name, v);
 }
 
@@ -339,12 +339,12 @@ daisy_alist_set_alist_at (AttributeList* alist, const char* name,
 
 extern "C" Library* EXPORT
 daisy_library_find (const char* name)
-{ return &Library::find (name); }
+{ return &Library::find (symbol (name)); }
 
 extern "C" int EXPORT
 daisy_library_size (const Library* library)
 {
-  vector<string> entries;
+  vector<symbol> entries;
   library->entries (entries);
   return entries.size ();
 }
@@ -352,23 +352,23 @@ daisy_library_size (const Library* library)
 extern "C" const char* EXPORT
 daisy_library_name (const Library* library, const unsigned int index)
 {
-  vector<string> entries;
+  vector<symbol> entries;
   library->entries (entries);
-  return entries[index].c_str ();
+  return entries[index].name ().c_str ();
 }
 
 extern "C" const Syntax* EXPORT
 daisy_library_syntax (const Library* library, const char* name)
-{ return &library->syntax (name); }
+{ return &library->syntax (symbol (name)); }
 
 extern "C" const AttributeList* EXPORT
 daisy_library_alist (const Library* library, const char* name)
-{ return &library->lookup (name); }
+{ return &library->lookup (symbol (name)); }
 
 extern "C" const char* EXPORT
 daisy_library_file (const Library* library, const char* name)
 { 
-  const AttributeList& alist = library->lookup (name);
+  const AttributeList& alist = library->lookup (symbol (name));
   if (alist.check ("parsed_from_file"))
     return alist.name ("parsed_from_file").c_str ();
   
@@ -385,12 +385,12 @@ daisy_library_derive (Library* library,
       alist->add ("parsed_from_file", filename);
       alist->add ("parsed_sequence", Library::get_sequence ());
     }
-  library->add_derived (name, *alist, super);
+  library->add_derived (symbol (name), *alist, symbol (super));
 }
 
 extern "C" void EXPORT
 daisy_library_remove (Library* library, const char* name)
-{ library->remove (name); }
+{ library->remove (symbol (name)); }
 
 // @ The daisy_parser Type.
 
@@ -728,7 +728,7 @@ daisy_column_merge (Column* /*column*/, const Column* /*other*/, double /*weight
 
 extern "C" const char* EXPORT
 daisy_column_get_name (const Column* column)
-{ return column->name.c_str (); }
+{ return column->name.name ().c_str (); }
 
 // @@@ Soil Geometry.
 
@@ -860,12 +860,12 @@ daisy_column_get_snow_storage (const Column* column)
 extern "C" void EXPORT		// [g/cm^2]
 daisy_column_put_surface_chemical (Column* column, 
 				   const char* name, double amount)
-{ column->put_surface_chemical (name, amount); }
+{ column->put_surface_chemical (symbol (name), amount); }
 
 extern "C" double EXPORT	// [g/cm^2]
 daisy_column_get_surface_chemical (const Column* column,
 				   const char* name)
-{ return column->get_surface_chemical (name); }
+{ return column->get_surface_chemical (symbol (name)); }
 
 
 // @@@ Organic Matter.
@@ -904,9 +904,9 @@ daisy_column_get_crop_h2o_uptake_at (Column* column, unsigned int index)
 extern "C" Chemical* EXPORT		// Return the chemical named NAME.
 daisy_chemical_find (const char* name)
 {
-  const Library& chemlib = Library::find ("chemical");
-  if (chemlib.check (name))
-    return &Librarian<Chemical>::create (chemlib.lookup (name));
+  const Library& chemlib = Library::find (symbol ("chemical"));
+  if (chemlib.check (symbol (name)))
+    return &Librarian<Chemical>::create (chemlib.lookup (symbol (name)));
   return NULL;
 }
 

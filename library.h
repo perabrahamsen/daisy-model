@@ -23,6 +23,7 @@
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
+#include "symbol.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -31,8 +32,7 @@ class Syntax;
 class AttributeList;
 class Treelog;
 
-typedef void (*derive_fun) (const string& name, AttributeList& al,
-			    const string& super);
+typedef void (*derive_fun) (symbol name, AttributeList& al, symbol super);
 
 class Library
 {
@@ -44,26 +44,26 @@ private:
 
 public:
   // Find a specific library.
-  static bool exist (const string& name);
-  static Library& find (const string& name);
-  static void all (vector<string>& libraries);
+  static bool exist (symbol name);
+  static Library& find (symbol name);
+  static void all (vector<symbol>& libraries);
   static int get_sequence ();
 
   // Use.
-  const string& name () const;
+  symbol name () const;
   const char* description () const;
-  AttributeList& lookup (const string&) const;
-  bool check (const string&) const;
-  void add (const string&, AttributeList&, const Syntax&);
-  void add_derived (const string& name, AttributeList& al,
-		    const string& super);
-  const Syntax& syntax (const string&) const;
-  void entries (vector<string>&) const;
-  bool is_derived_from (const string& a, const string& b) const;
-  const string base_model (const string& parameterization) const;
+  AttributeList& lookup (symbol) const;
+  bool check (symbol) const;
+  void add (symbol, AttributeList&, const Syntax&);
+  void add_derived (symbol name, AttributeList& al,
+		    symbol super);
+  const Syntax& syntax (symbol) const;
+  void entries (vector<symbol>&) const;
+  bool is_derived_from (symbol a, symbol b) const;
+  const symbol base_model (symbol parameterization) const;
 
   // Dependencies.
-  void remove (const string&);
+  void remove (symbol);
 
   // File handling.
   static void clear_all_parsed ();

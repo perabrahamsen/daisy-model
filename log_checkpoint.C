@@ -35,7 +35,7 @@ struct LogCheckpoint : public LogAList
   Time time;			// Time of current checkpoint.
 
   // Start and end of time step.
-  bool check_member (const string&) const;
+  bool check_member (symbol) const;
   bool match (const Daisy& daisy, Treelog& out);
   void done ();
 
@@ -45,7 +45,7 @@ struct LogCheckpoint : public LogAList
 };
 
 bool 
-LogCheckpoint::check_member (const string&) const
+LogCheckpoint::check_member (symbol) const
 { return true; }
 
 bool
@@ -56,7 +56,8 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& out)
   is_active = condition.match (daisy);
   if (is_active)
     {
-      push ("daisy", *daisy.syntax, daisy.alist);
+      static const symbol daisy_symbol ("daisy");
+      push (daisy_symbol, *daisy.syntax, daisy.alist);
       time = daisy.time;
     }
   return is_active;
@@ -115,14 +116,15 @@ LogCheckpoint::done ()
       // Print included files.
       if (alist ().check ("parser_files"))
 	{
-	  const vector<string> files (alist ().name_sequence ("parser_files"));
+	  const vector<symbol> files (alist ()
+				      .identifier_sequence ("parser_files"));
 	  const string lib_start = "From file '";
 	  const string lib_end = "':";
 	  for (unsigned int i = 0; i < files.size (); i++)
 	    {
-	      const string library = files[i];
+	      const symbol library = files[i];
 	      printer.print_comment (lib_start + library + lib_end);
-	      printer.print_library_file (library);
+	      printer.print_library_file (library.name ());
 	    }
 	}
 

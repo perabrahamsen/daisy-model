@@ -41,7 +41,7 @@ SVAT::load_syntax (Syntax&, AttributeList&)
 { }
 
 SVAT::SVAT (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 SVAT::~SVAT ()

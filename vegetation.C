@@ -36,18 +36,18 @@ Vegetation::force_production_stress  (double)
 void
 Vegetation::output (Log& log) const
 {
-  log.output ("LAI", LAI ());
-  log.output ("height", height ());
-  log.output ("cover", cover ());
-  log.output ("LAIvsH", LAIvsH ());
-  log.output ("HvsLAI", HvsLAI ());
-  log.output ("ACExt", ACExt ());
-  log.output ("ACRef", ACRef ());
-  log.output ("ARExt", ARExt ());
-  log.output ("ARExt", ARExt ());
-  log.output ("EpFactor", EpFactor ());
-  log.output ("albedo", albedo ());
-  log.output ("interception_capacity", interception_capacity ());
+  output_value (LAI (), "LAI", log);
+  output_value (height (), "height", log);
+  output_value (cover (), "cover", log);
+  output_value (LAIvsH (), "LAIvsH", log);
+  output_value (HvsLAI (), "HvsLAI", log);
+  output_value (ACExt (), "ACExt", log);
+  output_value (ACRef (), "ACRef", log);
+  output_value (ARExt (), "ARExt", log);
+  output_value (ARExt (), "ARExt", log);
+  output_value (EpFactor (), "EpFactor", log);
+  output_value (albedo (), "albedo", log);
+  output_value (interception_capacity (), "interception_capacity", log);
 }
 
 void
@@ -82,7 +82,7 @@ Height in which there is a given LAI below in total canopy");
 }
 
 Vegetation::Vegetation (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 Vegetation::~Vegetation ()

@@ -33,7 +33,7 @@ Macro::none () const
 { return false; }
 
 Macro::Macro (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 Macro::~Macro ()

@@ -31,7 +31,7 @@ class Condition
 {  
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
   virtual const string timestep ();
 

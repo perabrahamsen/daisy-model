@@ -29,12 +29,9 @@ struct SelectContent : public SelectValue
   const double height;
 
   // Output routines.
-  void output_array (const string& name, const vector<double>& array, 
+  void output_array (symbol name, const vector<double>& array, 
 		     const Geometry* geometry)
     { 
-      if (!is_active ())
-	return;
-
       if (valid (name))
 	{
 	  if (count == 0)	 

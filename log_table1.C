@@ -74,7 +74,7 @@ struct LogEntry
 	      && current_path_index < path.size ()); 
     }
 
-  void open_group (const string& name) // Open one group level.
+  void open_group (int name) // Open one group level.
     {
       if (valid () && (path[current_path_index] == "*" 
 		       || name == path[current_path_index]))
@@ -89,7 +89,7 @@ struct LogEntry
       current_path_index++;
     }
 
-  void open (const string& name) // Open one leaf level.
+  void open (int name) // Open one leaf level.
     {
       if (valid () && (path[current_path_index] == "*" 
 		       || name == path[current_path_index]))
@@ -104,53 +104,8 @@ struct LogEntry
       current_path_index--;
     }
 
-#if 0
-  // Output routines.
-  void output (const string& name, const Time& time)
-    {
-      if (!is_active)
-	return;
 
-      open (name);
-      if (valid ())
-	{
-	  const string& type = path[current_path_index];
-
-	  if (type == "year")
-	    value += time.year ();
-	  else if (type == "month")
-	    value += time.month ();
-	  else if (type == "mday")
-	    value += time.mday ();
-	  else if (type == "yday")
-	    value += time.yday ();
-	  else if (type == "hour")
-	    value += time.hour ();
-	  else if (type == "week")
-	    value += time.week ();
-	  else if (type == "wday")
-	    value += time.wday ();
-	  else
-	    error = true;
-
-	  count++;
-	}
-      else if (current_path_index == last_valid_path_index)
-	{
-	  double year = time.year () - start_year;
-	  double month = time.month ();
-	  double mday = time.mday ();
-	  double hour = time.hour ();
-	  double mlen = Time::month_length (time.year (), time.month ());
-
-	  value += year * 12.0 + month + (mday - 1.0 + hour / 24.0) / mlen;
-	  count++;
-	}
-      close ();
-    }
-#endif
-
-  void output (const string& name, const double number)
+  void output (int name, const double number)
     { 
       if (!is_active)
 	return;
@@ -164,7 +119,7 @@ struct LogEntry
       close ();
     }
 
-  void output (const string& name, const int integer)
+  void output (int name, const int integer)
     { 
       if (!is_active)
 	return;
@@ -178,7 +133,7 @@ struct LogEntry
       close ();
     }
 
-  void output (const string& name, const string& a_name)
+  void output (int name, const string& a_name)
     {
       if (!is_active)
 	return;
@@ -192,7 +147,7 @@ struct LogEntry
       close ();
     }
 
-  void output (const string& name, const vector<double>& array,
+  void output (int name, const vector<double>& array,
 	       const Geometry* geometry)
     { 
       if (!is_active)
@@ -445,40 +400,40 @@ struct LogTable1 : public Log
     { close (); }
 
 #if 0
-  void output (const string& name, const Time& value)
+  void output (int name, const Time& value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
 #endif
-  void output (const string&, const bool)
+  void output (int, const bool)
     { }
-  void output (const string& name, const double value)
+  void output (int name, const double value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
-  void output (const string& name, const int value)
+  void output (int name, const int value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
-  void output (const string& name, const string& value)
+  void output (int name, const string& value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value);
     }
-  void output (const string& name, const vector<double>& value)
+  void output (int name, const vector<double>& value)
     { 
       if (is_active)
 	for (unsigned int i = 0; i < entries.size (); i++)
 	  entries[i]->output (name, value, geometry ());
     }
-  void output (const string&, const PLF&)
+  void output (int, const PLF&)
     { }
 
   // Create and Destroy.

@@ -23,17 +23,16 @@
 #ifndef TRAVERSE_DELETE_H
 #define TRAVERSE_DELETE_H
 
-#include <string>
-using namespace std;
+#include "symbol.h"
 
 class Syntax;
 class AttributeList;
 
 void
-remove_dependencies (const string& component, const string& parameterization);
+remove_dependencies (symbol component, symbol parameterization);
 
 void
-remove_dependencies (const string& component, const string& parameterization, 
+remove_dependencies (symbol component, symbol parameterization, 
 		     const Syntax& syntax, AttributeList& alist);
 
 #endif // TRAVERSE_DELETE_H

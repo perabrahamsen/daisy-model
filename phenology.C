@@ -35,9 +35,9 @@ Phenology::light_hour ()
 void 
 Phenology::output (Log& log) const
 {
-  log.output ("DS", DS);
-  log.output ("partial_day_length", partial_day_length);
-  log.output ("day_length", day_length);
+  output_variable (DS, log);
+  output_variable (partial_day_length, log);
+  output_variable (day_length, log);
 }
 
 void 
@@ -56,7 +56,7 @@ Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 Phenology::Phenology (const AttributeList& al)
-  : name (al.name ("type")),
+  : name (al.identifier ("type")),
     // State.
     DS (al.number ("DS")),
     partial_day_length (al.number ("partial_day_length")),

@@ -30,8 +30,8 @@
 void
 IM::output (Log& log) const
 {
-  log.output ("NO3", NO3);
-  log.output ("NH4", NH4);
+  output_variable (NO3, log);
+  output_variable (NH4, log);
 }
 
 void IM::clear ()

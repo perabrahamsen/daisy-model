@@ -59,7 +59,7 @@ class UZmodel : public UZtop, public UZbottom
 {
   // Content.
 public: 
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // UZtop.
@@ -93,7 +93,7 @@ public:
 public:
   virtual void has_macropores (bool); // Tell UZ that there is macropores.
 protected:
-  UZmodel (string name);
+  UZmodel (const AttributeList&);
 public:
   virtual ~UZmodel ();
 };

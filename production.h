@@ -22,6 +22,7 @@
 #ifndef PRODUCTION_H
 #define PRODUCTION_H
 
+#include "symbol.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -152,7 +153,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const double SeedN);
-  void initialize (const string& name,
+  void initialize (symbol name,
 		   const vector<AttributeList*>& root,
 		   const vector<AttributeList*>& dead,
 		   const Geometry&, OrganicMatter&);

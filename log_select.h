@@ -37,9 +37,8 @@ struct LogSelect : public Log
   bool is_active;		// True iff we need values for this time step.
 
   // Filter functions.
-  bool check_member (const string&) const;
-  bool check_derived (const string& field, const string& name,
-		      const Library&) const;
+  bool check_member (symbol) const;
+  bool check_derived (symbol field, symbol name, const Library&) const;
   const string description;	// Description of log file.
   Condition& condition;	// Should we print a log now?
 
@@ -49,11 +48,11 @@ struct LogSelect : public Log
   bool match (const Daisy& daisy, Treelog&);
 
   // Open normal items.
-  void open (const string& name);
+  void open (symbol name);
   void close ();
 
   // Open named items.
-  void open_named (const string& name);
+  void open_named (symbol name);
   void close_named ();
 
   // Open ordered items.
@@ -65,24 +64,24 @@ struct LogSelect : public Log
   void close_unnamed ();
 
   // Derived items.
-  void open_derived (const string& field, const string& type);
+  void open_derived (symbol field, symbol type);
   void close_derived ();
 
   // Derived items in a list.
-  void open_entry (const string& type, const AttributeList&);
+  void open_entry (symbol type, const AttributeList&);
   void close_entry ();
 
   // Named derived items in a list.
-  void open_named_entry (const string& name, const string& type, 
+  void open_named_entry (symbol name, symbol type, 
 			 const AttributeList&);
   void close_named_entry ();
 
-  void output (const string&, const bool);
-  void output (const string& name, const double value);
-  void output (const string& name, const int value);
-  void output (const string& name, const string& value);
-  void output (const string& name, const vector<double>& value);
-  void output (const string&, const PLF&);
+  void output (symbol name, const bool);
+  void output (symbol name, const double value);
+  void output (symbol name, const int value);
+  void output (symbol name, const string& value);
+  void output (symbol name, const vector<double>& value);
+  void output (symbol name, const PLF&);
 
   // Create and Destroy.
   bool check (const Syntax&, Treelog& err) const;

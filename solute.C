@@ -182,15 +182,15 @@ Solute::output (Log& log) const
 {
   output_derived (transport, "transport", log);
   output_derived (adsorption, "adsorption", log);
-  log.output ("C", C_);
-  log.output ("M", M_);
-  log.output ("S", S);
-  log.output ("S_p", S_p);
-  log.output ("S_drain", S_drain);
-  log.output ("S_external", S_external);
-  log.output ("S_permanent", S_permanent);
-  log.output ("J", J);
-  log.output ("J_p", J_p);
+  output_value (C_, "C", log);
+  output_value (M_, "M", log);
+  output_variable (S, log);
+  output_variable (S_p, log);
+  output_variable (S_drain, log);
+  output_variable (S_external, log);
+  output_variable (S_permanent, log);
+  output_variable (J, log);
+  output_variable (J_p, log);
 }
 
 static bool check_alist (const AttributeList& al, Treelog& err)

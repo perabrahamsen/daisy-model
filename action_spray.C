@@ -28,18 +28,18 @@
 
 struct ActionSpray : public Action
 {
-  const string chemical;
+  const symbol chemical;
   const double amount;
 
   void doIt (Daisy& daisy, Treelog& out)
     {
-      out.message (string (" [Spraying ") + chemical + "]");
+      out.message (" [Spraying " + chemical + "]");
       daisy.field.spray (chemical, amount); 
     }
 
   ActionSpray (const AttributeList& al)
     : Action (al),
-      chemical (al.name ("chemical")),
+      chemical (al.identifier ("chemical")),
       amount (al.number ("amount"))
     { }
 };
@@ -53,12 +53,12 @@ static struct ActionSpraySyntax
   static bool check_alist (const AttributeList& al, Treelog& err)
     {
       bool ok = true;
-      const string chemical = al.name ("chemical");
+      const symbol chemical = al.identifier ("chemical");
 
       const Library& library = Librarian<Chemical>::library ();
       if (!library.check (chemical))
 	{
-	  err.entry (string ("Unknown chemical '") + chemical + "'");
+	  err.entry ("Unknown chemical '" + chemical + "'");
 	  ok = false;
 	}
       else
@@ -67,7 +67,7 @@ static struct ActionSpraySyntax
 	  const AttributeList& alist = library.lookup (chemical);
 	  if (!syntax.check (alist, err))
 	    {
-	      err.entry (string ("Incomplete chemical '") + chemical + "'");
+	      err.entry ("Incomplete chemical '" + chemical + "'");
 	      ok = false;
 	    }
 	}

@@ -66,7 +66,7 @@ ColumnBase::set_subsoil_irrigation (double flux, const IM&,
 }
 
 void
-ColumnBase::harvest (const Time& time, const string& crop_name,
+ColumnBase::harvest (const Time& time, const symbol crop_name,
 		     double stub_length,
 		     double stem_harvest,
 		     double leaf_harvest, 
@@ -131,7 +131,7 @@ ColumnBase::set_heat_source (double at, double value) // [W/m^2]
 }
 
 void 
-ColumnBase::spray (const string& chemical, double amount) // [g/ha]
+ColumnBase::spray (symbol chemical, double amount) // [g/ha]
 { bioclimate.spray (chemical, amount / (100.0 * 100.0) /* ha->m^2 */); }
 
 void 
@@ -168,11 +168,11 @@ ColumnBase::soil_water_content (double from, double to) const
 }
 
 double  
-ColumnBase::crop_ds (const string& name) const // {[-1:2], Crop::DSremove}
+ColumnBase::crop_ds (const symbol name) const // {[-1:2], Crop::DSremove}
 { return vegetation.DS_by_name (name); }
 
 double 
-ColumnBase::crop_dm (const string& name) const //[kg/ha], negative when no crop
+ColumnBase::crop_dm (const symbol name) const //[kg/ha], negative when no crop
 { return vegetation.DM_by_name (name); }
 
 unsigned int 
@@ -220,11 +220,11 @@ ColumnBase::put_ponding (double pond)	// [mm]
 { surface.put_ponding (pond); }
 
 void 
-ColumnBase::put_surface_chemical (const string& name, double amount) //[g/cm^2]
+ColumnBase::put_surface_chemical (symbol name, double amount) //[g/cm^2]
 { surface.put_chemical (name, amount); }
 
 double 
-ColumnBase::get_surface_chemical (const string& name) const // [g/cm^2]
+ColumnBase::get_surface_chemical (symbol name) const // [g/cm^2]
 { return surface.get_chemical (name); }
 
 double 
@@ -348,14 +348,14 @@ ColumnBase::output (Log& log) const
   output_derived (groundwater, "Groundwater", log);
   output_derived (vegetation, "Vegetation", log);
   output_inner (log);
-  log.output ("harvest_DM", log_harvest_DM);
-  log.output ("harvest_N", log_harvest_N);
-  log.output ("harvest_C", log_harvest_C);
-  log.output ("residuals_DM", log_residuals_DM);
-  log.output ("residuals_N_top", log_residuals_N_top);
-  log.output ("residuals_C_top", log_residuals_C_top);
-  log.output ("residuals_N_soil", log_residuals_N_soil);
-  log.output ("residuals_C_soil", log_residuals_C_soil);
+  output_value (log_harvest_DM, "harvest_DM", log);
+  output_value (log_harvest_N, "harvest_N", log);
+  output_value (log_harvest_C, "harvest_C", log);
+  output_value (log_residuals_DM, "residuals_DM", log);
+  output_value (log_residuals_N_top, "residuals_N_top", log);
+  output_value (log_residuals_C_top, "residuals_C_top", log);
+  output_value (log_residuals_N_soil, "residuals_N_soil", log);
+  output_value (log_residuals_C_soil, "residuals_C_soil", log);
 }
 
 void
@@ -367,7 +367,9 @@ get_bioclimate (const AttributeList& al)
 {
   if (al.check ("Bioclimate"))
     return Librarian<Bioclimate>::create (al.alist ("Bioclimate"));
-  AttributeList alist (Librarian<Bioclimate>::library ().lookup ("default"));
+  static const symbol default_symbol ("default");
+  AttributeList alist (Librarian<Bioclimate>::library ()
+		       .lookup (default_symbol));
   alist.add ("type", "default");
   return Librarian<Bioclimate>::create (alist);
 }
@@ -378,7 +380,9 @@ add_bioclimate (const AttributeList& al)
   if (al.check ("Bioclimate"))
     return al;
   AttributeList parent (al);
-  AttributeList child (Librarian<Bioclimate>::library ().lookup ("default"));
+  static const symbol default_symbol ("default");
+  AttributeList child (Librarian<Bioclimate>::library ()
+		       .lookup (default_symbol));
   child.add ("type", "default");
   parent.add ("Bioclimate", child);
   return parent;

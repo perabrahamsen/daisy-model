@@ -24,7 +24,7 @@
 #include "tmpstream.h"
 
 bool 
-LogSelect::check_member (const string& name) const
+LogSelect::check_member (symbol name) const
 { 
   if (!is_active)
     return false;
@@ -37,7 +37,7 @@ LogSelect::check_member (const string& name) const
 }
 
 bool 
-LogSelect::check_derived (const string& field, const string& /* name */,
+LogSelect::check_derived (symbol field, symbol /* name */,
 			  const Library& /* library */) const
 { 
   if (!check_member (field))
@@ -68,7 +68,7 @@ LogSelect::match (const Daisy& daisy, Treelog& out)
 }
 
 void 
-LogSelect::open (const string& name)
+LogSelect::open (symbol name)
 { 
   for (unsigned int i = 0; i < entries.size (); i++)
     entries[i]->open_group (name);
@@ -90,7 +90,7 @@ LogSelect::close_unnamed ()
 { }
 
 void 
-LogSelect::open_named (const string& name)
+LogSelect::open_named (const symbol name)
 { open (name); }
 
 void 
@@ -100,9 +100,7 @@ LogSelect::close_named ()
 void 
 LogSelect::open_ordered (int index)
 { 
-  TmpStream tmp;
-  tmp () << index;
-  open (tmp.str ());
+  open (symbol (index));
 }
 
 void 
@@ -110,7 +108,7 @@ LogSelect::close_ordered ()
 { close (); }
 
 void 
-LogSelect::open_derived (const string& field, const string& type)
+LogSelect::open_derived (symbol field, symbol type)
 { open (field); open (type); }
 
 void 
@@ -118,7 +116,7 @@ LogSelect::close_derived ()
 { close (); close (); }
 
 void 
-LogSelect::open_entry (const string& type, const AttributeList&)
+LogSelect::open_entry (symbol type, const AttributeList&)
 { open (type); }
 
 void 
@@ -126,7 +124,7 @@ LogSelect::close_entry ()
 { close (); }
 
 void 
-LogSelect::open_named_entry (const string& name, const string&, 
+LogSelect::open_named_entry (symbol name, symbol, 
 			     const AttributeList&)
 { open (name); }
 
@@ -135,43 +133,47 @@ LogSelect::close_named_entry ()
 { close (); }
 
 void 
-LogSelect::output (const string&, const bool)
+LogSelect::output (symbol, const bool)
 { }
 
 void 
-LogSelect::output (const string& name, const double value)
+LogSelect::output (symbol name, const double value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output_number (name, value);
+      if (entries[i]->valid_level)
+	entries[i]->output_number (name, value);
 }
 
 void 
-LogSelect::output (const string& name, const int value)
+LogSelect::output (symbol name, const int value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output_integer (name, value);
+      if (entries[i]->valid_level)
+	entries[i]->output_integer (name, value);
 }
 
 void 
-LogSelect::output (const string& name, const string& value)
+LogSelect::output (symbol name, const string& value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output_name (name, value);
+      if (entries[i]->valid_level)
+	entries[i]->output_name (name, value);
 }
 
 void 
-LogSelect::output (const string& name, const vector<double>& value)
+LogSelect::output (symbol name, const vector<double>& value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output_array (name, value, geometry ());
+      if (entries[i]->valid_level)
+	entries[i]->output_array (name, value, geometry ());
 }
 
 void 
-LogSelect::output (const string&, const PLF&)
+LogSelect::output (symbol, const PLF&)
 { }
 
 bool 
@@ -192,12 +194,12 @@ LogSelect::LogSelect (const AttributeList& al)
     entries (map_create<Select> (al.alist_sequence ("entries")))
 {
   // Create path convertion map.
-  const vector<string>& conv_vector = al.name_sequence ("set");
+  const vector<symbol>& conv_vector = al.identifier_sequence ("set");
   string_map conv_map;
   for (unsigned int i = 0; i < conv_vector.size (); i += 2)
     {
       daisy_assert (i+1 < conv_vector.size ());
-      conv_map[conv_vector[i]] = conv_vector[i+1];
+      conv_map[conv_vector[i].name ()] = conv_vector[i+1].name ();
     }
 
   // Find default range.
@@ -248,8 +250,8 @@ The first entry in the sequence is a symbol from the paths (e.g. $crop),\n\
 and the second is the value to replace the symbol with (e.g. Grass).\n\
 The third entry is another symbol to replace, and the fourth is another\n\
 value to replace it with.  And so forth.");
-  const vector<string> empty_string_vector;
-  alist.add ("set", empty_string_vector);
+  const vector<symbol> empty_symbol_vector;
+  alist.add ("set", empty_symbol_vector);
   syntax.add ("from", "cm", Syntax::Const,
 	      "Default 'from' value for all entries.");
   alist.add ("from", 0.0);

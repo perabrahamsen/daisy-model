@@ -532,7 +532,7 @@ AList_Tree::daisy_add_entry (const string& entry)
 	  const AttributeList& child_alist = alist.alist (entry);
 	  if (child_alist.check ("type"))
 	    {
-	      const string& child_type = child_alist.name ("type");
+	      const symbol child_type = child_alist.identifier ("type");
 	      const Library& child_library = syntax.library (entry);
 	      const Syntax& child_syntax = child_library.syntax (child_type);
 	      if (child_syntax.entries () > 0U)

@@ -23,6 +23,7 @@
 #ifndef TREELOG_H
 #define TREELOG_H
 
+#include "symbol.h"
 #include <string>
 
 class Treelog
@@ -38,10 +39,12 @@ public:
   private:
     Treelog& log;
   public:
+    Open (Treelog& l, const symbol name);
     Open (Treelog& l, const std::string& name);
     ~Open ();
   };
   virtual void open (const std::string& name) = 0;
+  void open (symbol name);
   virtual void close () = 0;
   
   // Use.

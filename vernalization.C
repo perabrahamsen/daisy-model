@@ -45,7 +45,7 @@ Vernalization::output (Log& log) const
   if (!required)
     return;
 
-  log.output ("TaSum", TaSum);
+  output_variable (TaSum, log);
 }
 
 const AttributeList& 

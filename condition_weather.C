@@ -56,7 +56,7 @@ struct ConditionTSum : public Condition
   { return TSum_now > TSum_limit; }
 
   void output (Log& log) const
-  { log.output ("TSum_now", TSum_now); }
+  { output_variable (TSum_now, log); }
 
   ConditionTSum (const AttributeList& al)
     : Condition (al),

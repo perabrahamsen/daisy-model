@@ -57,7 +57,7 @@ public:
   // Create.
 public:
   Adsorption_vS_S (const AttributeList& al)
-    : Adsorption (al.name ("type"))
+    : Adsorption (al)
     { }
 };
 

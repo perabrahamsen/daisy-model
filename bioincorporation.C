@@ -185,13 +185,13 @@ Bioincorporation::Implementation::tick (const Geometry& geometry,
 void 
 Bioincorporation::Implementation::output (Log& log) const
 { 
-  if (log.check_member ("CO2"))
-    log.output ("CO2", respiration * C / (1.0 - respiration));
-  if (log.check_member ("DM"))
-    log.output ("DM", C * C_to_DM);
-  log.output ("C", C);
-  log.output ("N", N);
-  log.output ("speed", speed);
+  static const symbol CO2_symbol ("CO2");
+  if (log.check_member (CO2_symbol))
+    output_value (respiration * C / (1.0 - respiration), "CO2", log);
+  output_value (C * C_to_DM, "DM", log);
+  output_variable (C, log);
+  output_variable (N, log);
+  output_variable (speed, log);
 }
 
 void 
@@ -215,8 +215,10 @@ Bioincorporation::Implementation::initialize (const Soil& soil)
 AM*
 Bioincorporation::Implementation::create_am (const Geometry& geometry)
 { 
+  static const symbol bio_symbol ("bio");
+  static const symbol incorporation_symbol ("incorporation");
   aom = &AM::create (geometry, Time (1, 1, 1, 1), aom_alists,
-		     "bio", "incorporation", AM::Locked); 
+		     bio_symbol, incorporation_symbol, AM::Locked); 
   return aom;
 }
 

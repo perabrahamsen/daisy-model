@@ -29,7 +29,7 @@ LogClone::match (const Daisy&, Treelog&)
 { daisy_assert (false); }
 
 bool 
-LogClone::check_member (const string &) const
+LogClone::check_member (symbol) const
 { daisy_assert (false); }
 void
 LogClone::done ()
@@ -43,7 +43,7 @@ LogClone::LogClone (const string& name,
 		    const Syntax& syntax, const AttributeList& alist)
   : LogAList (alist)
 { 
-  push (name, syntax, alist);
+  push (symbol (name), syntax, alist);
 }
 
 LogClone::~LogClone ()

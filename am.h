@@ -42,10 +42,10 @@ class AM
 
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
-  const string name;
+  const symbol name;
   static const char *const description;
   void append_to (vector<AOM*>& added);
-  const string& real_name () const;
+  symbol real_name () const;
 
   // Simulation.
 public:
@@ -71,8 +71,8 @@ public:
   enum lock_type { Unlocked, Locked };
   void unlock ();		// Crop died.
   bool locked () const;		// Test if this AM can be safely removed.
-  const string crop_name () const;	// Name of locked crop.
-  const string crop_part_name () const; // Name of locked crop part.
+  symbol crop_name () const;	// Name of locked crop.
+  symbol crop_part_name () const; // Name of locked crop part.
 
   // Create and Destroy.
 public:
@@ -82,8 +82,7 @@ public:
   // Crop part.
   static AM& create (const Geometry&, const Time&,
 		     const vector<AttributeList*>&,
-		     const string& sort, const string& part,
-		     lock_type lock = Unlocked);
+		     symbol sort, symbol part, lock_type lock = Unlocked);
   void initialize (const Soil&);
   static const vector<AttributeList*>& default_AM ();
   static const AttributeList& default_root ();

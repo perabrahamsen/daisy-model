@@ -23,7 +23,7 @@
 #ifndef DEPEND_H
 #define DEPEND_H
 
-#include <string>
+#include "symbol.h"
 #include <set>
 #include <map>
 using namespace std;
@@ -32,8 +32,8 @@ class Treelog;
 class Syntax;
 class AttributeList;
 
-typedef set<string, less<string>/**/> string_set;
-typedef map<string, string_set, less<string>/**/> dep_map;
+typedef set<symbol> symbol_set;
+typedef map<symbol, symbol_set> dep_map;
 
 bool
 has_dependencies (const string& component, const string& parameterization);

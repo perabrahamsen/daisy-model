@@ -615,9 +615,9 @@ UZRichard::tick (Treelog& msg, const Soil& soil, const SoilHeat& soil_heat,
 void
 UZRichard::output (Log& log) const
 {
-  log.output ("q_up", q_up);
-  log.output ("q_down", q_down);
-  log.output ("iterations", iterations);
+  output_variable (q_up, log);
+  output_variable (q_down, log);
+  output_variable (iterations, log);
 }
 
 void
@@ -643,7 +643,7 @@ UZRichard::has_macropores (bool has_them)
 }
 
 UZRichard::UZRichard (const AttributeList& al)
-  : UZmodel (al.name ("type")),
+  : UZmodel (al),
     // Variables.
     q_up (0.0),
     q_down (0.0),

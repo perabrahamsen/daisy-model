@@ -70,7 +70,7 @@ public:
   // Create and Destroy.
 public:
   UZNone (const AttributeList& al)
-    : UZmodel (al.name ("type"))
+    : UZmodel (al)
     { }
   ~UZNone ()
     { }

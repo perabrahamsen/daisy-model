@@ -35,7 +35,7 @@ class Nitrification
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Simulation.
@@ -46,7 +46,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Nitrification (const string& name);
+  Nitrification (const AttributeList& al);
 public:
   virtual ~Nitrification ();
 };

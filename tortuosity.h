@@ -31,7 +31,7 @@ class Tortuosity
 {
   // Content.
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Simulation.
@@ -40,7 +40,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Tortuosity (const string& name);
+  Tortuosity (const AttributeList&);
 public:
   virtual ~Tortuosity ();
 };

@@ -34,7 +34,7 @@ class Phenology
 {
   // Content.
 public:
-  const std::string name;
+  const symbol name;
   static const char *const description;
 
   // State.

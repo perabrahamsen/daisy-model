@@ -44,7 +44,7 @@ public:
   // Create.
 public:
   TortuosityLinear (const AttributeList& al)
-    : Tortuosity (al.name ("type")),
+    : Tortuosity (al),
       a_maybe (al.check ("a") ? al.number ("a") : -42.0),
       b (al.number ("b"))
     { }

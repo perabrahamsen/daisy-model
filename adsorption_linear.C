@@ -50,7 +50,7 @@ public:
   // Create.
 public:
   AdsorptionLinear (const AttributeList& al)
-    : Adsorption (al.name ("type")),
+    : Adsorption (al),
       K_clay (al.check ("K_clay") ? al.number ("K_clay") : 0.0),
       K_OC (al.check ("K_OC") ? al.number ("K_OC") : al.number ("K_clay"))
     { }

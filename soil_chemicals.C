@@ -38,10 +38,10 @@
 struct SoilChemicals::Implementation
 {
   // Content
-  typedef map<string, SoilChemical*, less<string>/**/> SoluteMap;
+  typedef map<symbol, SoilChemical*> SoluteMap;
   SoluteMap solutes;
-  typedef set<string, less<string>/**/> string_set;
-  string_set all;
+  typedef set<symbol> symbol_set;
+  symbol_set all;
 
   // Utilities
   void add_missing (const Soil& soil, 
@@ -49,7 +49,7 @@ struct SoilChemicals::Implementation
 		    const Chemicals& chemicals, Treelog&);
   SoilChemical& find (const Soil& soil, 
 		      const SoilWater& soil_water,
-		      const string& name, Treelog&);
+		      symbol name, Treelog&);
 
   // Simulation
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
@@ -76,14 +76,14 @@ SoilChemicals::Implementation::add_missing (const Soil& soil,
 					    const Chemicals& chemicals,
 					    Treelog& out)
 {
-  string_set missing;
+  symbol_set missing;
   chemicals.find_missing (all, missing);
 
-  for (string_set::const_iterator i = missing.begin (); 
+  for (symbol_set::const_iterator i = missing.begin (); 
        i != missing.end ();
        i++)
     {
-      const string& name = *i;
+      symbol name = *i;
       // If we are staring from a checkpoint, we might already have it.
       if (solutes.find (name) == solutes.end ())
 	{
@@ -100,7 +100,7 @@ SoilChemicals::Implementation::add_missing (const Soil& soil,
 SoilChemical& 
 SoilChemicals::Implementation::find (const Soil& soil, 
 				     const SoilWater& soil_water,
-				     const string& name, Treelog& out)
+				     symbol name, Treelog& out)
 {
   if (solutes.find (name) == solutes.end ())
     {
@@ -141,7 +141,7 @@ SoilChemicals::Implementation::tick (const Soil& soil,
        i != solutes.end ();
        i++)
     {
-      const string& name = (*i).first;
+      symbol name = (*i).first;
       SoilChemical& solute = *(*i).second;
       // [g/m^2/h ned -> g/cm^2/h op]
       const double J_in = -flux_in.amount (name) / (100.0 * 100.0);
@@ -166,7 +166,7 @@ SoilChemicals::Implementation::mixture (Chemicals& storage, // [g/m^2]
        i != solutes.end ();
        i++)
     {
-      const string& name = (*i).first;
+      symbol name = (*i).first;
       SoilChemical& solute = *(*i).second;
 
       const double soil_conc = solute.C (0)
@@ -183,21 +183,23 @@ SoilChemicals::Implementation::mixture (Chemicals& storage, // [g/m^2]
 void 
 SoilChemicals::Implementation::output (Log& log) const
 {
-  if (log.check_member ("solutes"))
+  static const symbol solutes_symbol ("solutes");
+  if (log.check_member (solutes_symbol))
     {
-      Log::Open open (log, "solutes");
+      Log::Open open (log, solutes_symbol);
       for (SoluteMap::const_iterator i = solutes.begin ();
 	   i != solutes.end ();
 	   i++)
 	{
-	  const string& name = (*i).first;
+	  symbol name = (*i).first;
 	  const SoilChemical& solute = *(*i).second;
 
-	  Log::Named named (log, name);
-	  log.output ("chemical", name);
-	  if (log.check_member ("solute"))
-	    {
-	      Log::AList alist (log, "solute", 
+	  Log::Named named (log, symbol (name));
+	  output_value (name, "chemical", log);
+	  static const symbol solute_symbol ("solute");
+	  if (log.check_member (solute_symbol))
+	  {
+	      Log::AList alist (log, solute_symbol, 
 				solute.chemical.solute_alist ());
 	      solute.output (log);
 	    }
@@ -253,7 +255,7 @@ SoilChemicals::Implementation::initialize (const vector<AttributeList*> al,
 {
   for (unsigned int i = 0; i < al.size (); i++)
     {
-      const string& name = al[i]->name ("chemical");
+      symbol name = al[i]->identifier ("chemical");
       const AttributeList& alist = al[i]->alist ("solute");
       solutes[name]->initialize (alist, soil, soil_water, out);
     }
@@ -280,7 +282,7 @@ SoilChemicals::Implementation::Implementation (const
 {
   for (unsigned int i = 0; i < al.size (); i++)
     {
-      const string& name = al[i]->name ("chemical");
+      symbol name = al[i]->identifier ("chemical");
       const AttributeList& alist = al[i]->alist ("solute");
       const Chemical& chemical = Chemicals::lookup (name);
       solutes[name] = new SoilChemical (chemical, alist);
@@ -293,7 +295,7 @@ SoilChemicals::Implementation::~Implementation ()
 SoilChemical& 
 SoilChemicals::find (const Soil& soil, 
 		     const SoilWater& soil_water,
-		     const string& name, Treelog& out)
+		     symbol name, Treelog& out)
 { return impl.find (soil, soil_water, name, out); }
 
 void 

@@ -57,6 +57,8 @@ struct ParserFile::Implementation
 
   // Lisp lexer.
   string get_string ();
+  symbol get_symbol ()
+  { return symbol (get_string ()); }
   int get_integer ();
   double get_number ();
   string get_dimension ();
@@ -364,8 +366,8 @@ void
 ParserFile::Implementation::add_derived (Library& lib)
 {
   // Get the name of the class and the existing superclass to derive from.
-  const string name = get_string ();
-  const string super = get_string ();
+  const symbol name = get_symbol ();
+  const symbol super = get_symbol ();
   if (!lib.check (super))
     {
       error (string ("Unknown '") + lib.name () + "' model '" + super + "'");
@@ -399,16 +401,17 @@ ParserFile::Implementation::load_derived (const Library& lib, bool in_sequence,
       skip ("(");
       skipped = true;
     }
-  string type = get_string ();
+  symbol type = get_symbol ();
   try
     {
-      if (type == "original")
+      static const symbol original_symbol ("original");
+      if (type == original_symbol)
 	{
 	  if (!original)
 	    throw (string ("No original value"));
 	  alist = new AttributeList (*original);
 	  daisy_assert (alist->check ("type"));
-	  type = alist->name ("type");
+	  type = alist->identifier ("type");
 	  daisy_assert (lib.check (type));
 	}
       else
@@ -885,13 +888,13 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	      }
 	    case Syntax::String:
 	      {
-		vector<string> array;
+		vector<symbol> array;
 		int count = 0;
 		const int size = syntax.size (name);
 
 		while (!looking_at (')') && good ())
 		  {
-		    array.push_back (get_string ());
+		    array.push_back (get_symbol ());
 		    count++;
 		  }
 		if (size != Syntax::Sequence && count != size)
@@ -902,12 +905,19 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    error (str.str ());
 
 		    for (;count < size; count++)
-		      array.push_back ("<error>");
+		      array.push_back (symbol ("<error>"));
 		  }
 		atts.add (name, array);
 		// Handle "path" immediately.
 		if (&syntax == global_syntax_table && name == "path")
-		  Path::set_path (atts.name_sequence (name));
+		  {
+		    const vector<symbol>& symbols 
+		      = atts.identifier_sequence (name);
+		    vector<string> names;
+		    for (unsigned int i = 0; i < symbols.size (); i++)
+		      names.push_back (symbols[i].name ());
+		    Path::set_path (names);
+		  }
 		break;
 	      }
 	    case Syntax::Integer:
@@ -1023,10 +1033,10 @@ ParserFile::load (AttributeList& alist)
   impl.inputs.erase (impl.inputs.begin (), impl.inputs.end ());
 
   // Remember filename.
-  vector<string> files;
+  vector<symbol> files;
   if (alist.check ("parser_files"))
-    files = alist.name_sequence ("parser_files");
-  files.push_back (impl.file);
+    files = alist.identifier_sequence ("parser_files");
+  files.push_back (symbol (impl.file));
   alist.add ("parser_files", files);
 }
 
@@ -1040,13 +1050,22 @@ void
 ParserFile::initialize (const Syntax& syntax, Treelog& out)
 { impl.initialize (syntax, out); }
 
+static const AttributeList& 
+get_alist ()
+{
+  static AttributeList alist;
+  if (!alist.check ("type"))
+    alist.add ("type", "file");
+  return alist;
+}
+    
 ParserFile::ParserFile (const Syntax& syntax, const string& name, Treelog& out)
-  : Parser ("file"),
+  : Parser (get_alist ()),
     impl (*new Implementation (name))
 { initialize (syntax, out); }
 
 ParserFile::ParserFile (const AttributeList& al)
-  : Parser (al.name ("type")),
+  : Parser (al),
     impl (*new Implementation (al.name ("where")))
 {  }
 

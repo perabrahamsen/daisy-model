@@ -24,6 +24,7 @@
 #define LOG_H
 
 #include "librarian.h"
+#include "symbol.h"
 
 class Daisy;
 class PLF;
@@ -36,14 +37,14 @@ private:
   struct Implementation;
   Implementation& impl;
 public:
-  const string name;
+  const symbol name;
   static const char *const description;
 
   // Filter
 public:
-  virtual bool check_member (const string&) const = 0;
-  virtual bool check_entry (const string&, const Library& library) const;
-  virtual bool check_derived (const string& field, const string& name, 
+  virtual bool check_member (symbol) const = 0;
+  virtual bool check_entry (symbol, const Library& library) const;
+  virtual bool check_derived (symbol field, symbol name, 
 			      const Library& library) const = 0;
 
   // Use.  
@@ -60,14 +61,14 @@ public:
   private:
     Log& ll;
   public:
-    Open (Log& l, const string& name)
+    Open (Log& l, symbol name)
       : ll (l)
     { ll.open (name); }
     ~Open ()
     { ll.close (); }
   };
 private:
-  virtual void open (const string&) = 0;
+  virtual void open (symbol) = 0;
   virtual void close () = 0;
   friend struct Log::Open;
 
@@ -98,14 +99,14 @@ public:
   private:
     Log& ll;
   public:
-    Named (Log& l, const string& name)
+    Named (Log& l, const symbol name)
       : ll (l)
     { ll.open_named (name); }
     ~Named ()
     { ll.close_named (); }
   };
 private:
-  virtual void open_named (const string& name);
+  virtual void open_named (symbol name);
   virtual void close_named ();
   friend struct Log::Named;
 
@@ -134,14 +135,14 @@ public:
   private:
     Log& ll;
   public:
-    AList (Log& l, const string& name, const AttributeList& alist)
+    AList (Log& l, symbol name, const AttributeList& alist)
       : ll (l)
     { ll.open_alist (name, alist); }
     ~AList ()
     { ll.close_alist (); }
   };
 private:
-  virtual void open_alist (const string& name, const AttributeList& alist);
+  virtual void open_alist (symbol name, const AttributeList& alist);
   virtual void close_alist ();
   friend struct Log::AList;
 
@@ -152,14 +153,14 @@ public:
   private:
     Log& ll;
   public:
-    Derived (Log& l, const string& field, const string& type)
+    Derived (Log& l, const symbol field, const symbol type)
       : ll (l)
     { ll.open_derived (field, type); }
     ~Derived ()
     { ll.close_derived (); }
   };
 private:
-  virtual void open_derived (const string& field, const string& type) = 0;
+  virtual void open_derived (symbol field, symbol type) = 0;
   virtual void close_derived () = 0;
   friend struct Log::Derived;
 
@@ -170,7 +171,7 @@ public:
   private:
     Log& ll;
   public:
-    Entry (Log& l, const string& type, 
+    Entry (Log& l, symbol type, 
 	   const AttributeList& alist)
       : ll (l)
     { ll.open_entry (type, alist); }
@@ -178,7 +179,7 @@ public:
     { ll.close_entry (); }
   };
 private:
-  virtual void open_entry (const string& type, const AttributeList&) = 0;
+  virtual void open_entry (symbol type, const AttributeList&) = 0;
   virtual void close_entry () = 0;
   friend struct Log::Entry;
 
@@ -189,7 +190,7 @@ public:
   private:
     Log& ll;
   public:
-    NamedEntry (Log& l, const string& name, const string& type, 
+    NamedEntry (Log& l, symbol name, symbol type, 
 		const AttributeList& alist)
       : ll (l)
     { ll.open_named_entry (name, type, alist); }
@@ -197,19 +198,20 @@ public:
     { ll.close_named_entry (); }
   };
 private:
-  virtual void open_named_entry (const string& name, const string& type,
+  virtual void open_named_entry (symbol name, symbol type,
 				 const AttributeList&) = 0;
   virtual void close_named_entry () = 0;
   friend struct Log::NamedEntry;
 
   // The data.
 public:
-  virtual void output (const string&, const bool) = 0;
-  virtual void output (const string&, const double) = 0;
-  virtual void output (const string&, const int) = 0;
-  virtual void output (const string&, const string&) = 0;
-  virtual void output (const string&, const vector<double>&) = 0;
-  virtual void output (const string&, const PLF&) = 0;
+  virtual void output (symbol, const bool) = 0;
+  virtual void output (symbol, const double) = 0;
+  virtual void output (symbol, const int) = 0;
+  virtual void output (symbol, const string&) = 0;
+  void output (symbol name, symbol value);
+  virtual void output (symbol, const vector<double>&) = 0;
+  virtual void output (symbol, const PLF&) = 0;
 
   // Keep track of geometry for logging arrays.
 public:
@@ -251,21 +253,36 @@ Librarian<Log>::Content* Librarian<Log>::content;
 
 static Librarian<Log> Log_init ("log");
 
+// Output atom.
+#define output_value(value, key, log)\
+do { \
+  static const symbol MACRO_name (key); \
+  (log).output (MACRO_name, (value)); \
+} while (false)
+
+// Shorthand for when the C++ and log variable are named the same.
+#define output_variable(var, log) output_value (var, #var, log)
+
 // Output an alist.
-template <class T> void
-output_submodule (const T& submodule, 
-		  const char* name, Log& log)
-{
-  if (log.check_member (name))
-    {
-      Log::Open open (log, name);
-      submodule.output (log);
-    }
-}
+#define output_submodule(submodule, key, log)\
+do { \
+  static const symbol MACRO_name (key); \
+  if (log.check_member (MACRO_name)) \
+    { \
+      Log::Open open (log, MACRO_name); \
+      (submodule).output (log); \
+    } \
+} while (false)
 
 // Output an object.
+#define output_derived(submodule, key, log) \
+do { \
+  static const symbol MACRO_name (key); \
+  output_derived_ ((submodule), MACRO_name, (log)); \
+} while (false)
+
 template <class T> void
-output_derived (const T& submodule, const char* name, Log& log)
+output_derived_ (const T& submodule, const symbol name, Log& log)
 {
   const Library& library = Librarian<T>::library ();
 
@@ -277,9 +294,14 @@ output_derived (const T& submodule, const char* name, Log& log)
 }
 
 // Output a list of objects.
+#define output_list(items, key, log, lib) \
+do { \
+  static const symbol MACRO_name (key); \
+  output_list_ ((items), MACRO_name, (log), (lib)); \
+} while (false)
+
 template <class T> void
-output_list (T const& items, const char* name, Log& log, 
-	     const Library& library)
+output_list_ (T const& items, const symbol name, Log& log, const Library& library)
 {
   if (log.check_member (name))
     {
@@ -290,7 +312,8 @@ output_list (T const& items, const char* name, Log& log,
 	{
 	  if (log.check_entry ((*item)->name, library))
 	    {
-	      Log::Entry entry (log, (*item)->name, (*item)->alist);
+	      Log::Entry entry (log, symbol ((*item)->name),
+				(*item)->alist);
 	      (*item)->output (log);
 	    }
 	}
@@ -298,8 +321,14 @@ output_list (T const& items, const char* name, Log& log,
 }
 
 // Output a list of named alists.
+#define output_named(items, key, log) \
+do { \
+  static const symbol MACRO_name (key); \
+  output_named_ ((items), MACRO_name, (log)); \
+} while (false)
+
 template <class T> void
-output_named (T const& items, const char* name, Log& log)
+output_named_ (T const& items, const symbol name, Log& log)
 {
   if (log.check_member (name))
     {
@@ -315,8 +344,14 @@ output_named (T const& items, const char* name, Log& log)
 }
 
 // Output an ordered list of alists.
+#define output_ordered(items, key, log) \
+do { \
+  static const symbol MACRO_name (key); \
+  output_ordered_ ((items), MACRO_name, (log)); \
+} while (false)
+
 template <class T> void
-output_ordered (T const& items, const char* name, Log& log)
+output_ordered_ (T const& items, const symbol name, Log& log)
 {
   if (log.check_member (name))
     {
@@ -334,8 +369,14 @@ output_ordered (T const& items, const char* name, Log& log)
 }
 
 // Output a list of unnamed and unordered alists.
+#define output_vector(items, key, log) \
+do { \
+  static const symbol MACRO_name (key); \
+  output_ordered_ ((items), MACRO_name, (log)); \
+} while (false)
+
 template <class T> void
-output_vector (T const& items, const char* name, Log& log)
+output_vector_ (T const& items, const symbol name, Log& log)
 {
   if (log.check_member (name))
     {

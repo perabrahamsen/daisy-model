@@ -218,7 +218,7 @@ TraverseQtTree::enter_model (const Syntax& syntax, AttributeList& alist,
   if (alist.check ("type"))
     {
       const Library& library = library.find (component);
-      const string& type = alist.name ("type");
+      const string& type = alist.identifier ("type");
       const AttributeList& default_alist = library.lookup (type);
       enter (new ModelItem (syntax, alist, default_alist,
 			    item (), model.c_str (), value, from,
@@ -574,7 +574,7 @@ TraverseQtTree::enter_parameter (const Syntax& syntax, AttributeList& alist,
       const Library& library = syntax.library (parameter);
       AttributeList& child_alist = alist.alist (parameter);
       daisy_assert (child_alist.check ("type"));
-      const string& type = child_alist.name ("type");
+      const string& type = child_alist.identifier ("type");
       const Syntax& child_syntax = library.syntax (type);
       const AttributeList& child_default = library.lookup (type);
       enter (new ObjectItem (child_syntax, child_alist, child_default,
@@ -643,7 +643,7 @@ populate_tree (MainWindow* main, bool check_alists,
       name.sprintf ("[%d]", i);
       AttributeList& alist = *inputs[i];
       daisy_assert (alist.check ("type"));
-      string type = alist.name ("type");
+      string type = alist.identifier ("type");
       daisy_assert (library.check (type));
       const Syntax& syntax = library.syntax (type);
       const AttributeList& default_alist = library.lookup (type);

@@ -47,8 +47,8 @@ struct PetMakkink : public Pet
   void output (Log& log) const
     {
       Pet::output (log);
-      log.output ("reference_evapotranspiration", 
-		  reference_evapotranspiration);
+      output_value (reference_evapotranspiration, 
+		  "reference_evapotranspiration", log);
     }
 
   double wet () const

@@ -43,7 +43,7 @@ Pedotransfer::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 Pedotransfer::Pedotransfer (const AttributeList& al)
-  : name (al.name ("type"))
+  : name (al.identifier ("type"))
 { }
 
 Pedotransfer::~Pedotransfer ()

@@ -94,12 +94,12 @@ Snow::Implementation::Implementation (const AttributeList& al)
 void 
 Snow::Implementation::output (Log& log) const
 {
-  log.output ("EvapSnowPack", EvapSnowPack);
-  log.output ("q_s", q_s);
-  log.output ("Ssnow", Ssnow);
-  log.output ("Swater", Swater);
-  log.output ("age", age);
-  log.output ("dZs", dZs);
+  output_variable (EvapSnowPack, log);
+  output_variable (q_s, log);
+  output_variable (Ssnow, log);
+  output_variable (Swater, log);
+  output_variable (age, log);
+  output_variable (dZs, log);
 }
 
 void

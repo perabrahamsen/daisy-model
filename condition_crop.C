@@ -29,7 +29,7 @@
 
 struct ConditionDSAfter : public Condition
 {
-  const string crop;
+  const symbol crop;
   const double ds;
 
   bool match (const Daisy& daisy) const
@@ -44,14 +44,14 @@ struct ConditionDSAfter : public Condition
 
   ConditionDSAfter (const AttributeList& al)
     : Condition (al),
-      crop (al.name ("crop")),
+      crop (al.identifier ("crop")),
       ds (al.number ("ds"))
     { }
 };
 
 struct ConditionDMOver : public Condition
 {
-  const string crop;
+  const symbol crop;
   const double weight;
 
   bool match (const Daisy& daisy) const
@@ -61,7 +61,7 @@ struct ConditionDMOver : public Condition
 
   ConditionDMOver (const AttributeList& al)
     : Condition (al),
-      crop (al.name ("crop")),
+      crop (al.identifier ("crop")),
       weight (al.number ("weight"))
     { }
 };

@@ -58,7 +58,7 @@ Hydraulic::set_porosity (double Theta)
 void 
 Hydraulic::output (Log& log) const
 {
-  log.output ("Theta_sat", Theta_sat); 
+  output_variable (Theta_sat, log); 
 }
 
 void
@@ -193,7 +193,7 @@ Hydraulic::initialize (double /* clay */, double /* silt */, double /* sand */,
 }
 
 Hydraulic::Hydraulic (const AttributeList& al)
-  : name (al.name ("type")),
+  : name (al.identifier ("type")),
     K_init (al.check ("K_at_h")
 	    ? new K_at_h (al.alist ("K_at_h"))
 	    : NULL),

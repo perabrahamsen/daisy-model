@@ -29,7 +29,6 @@
 #include "syntax.h"
 #include "treelog.h"
 #include "assertion.h"
-#include <string>
 #include <map>
 
 class Log;
@@ -40,7 +39,7 @@ class Librarian
   // Types.
 private:
   typedef T& (*constructor) (const AttributeList&);
-  typedef std::map<std::string, constructor, less<std::string>/**/> map_type;
+  typedef std::map<symbol, constructor> map_type;
 
   // Content.
 private:
@@ -64,20 +63,23 @@ public:
   static T& create (const AttributeList& al)
   {
     daisy_assert (al.check ("type"));
-    const std::string name = al.name ("type");
+    const symbol name = al.identifier ("type");
     daisy_assert (library ().check (name));
     daisy_assert (library ().syntax (name).check (al, Treelog::null ()));
     return (content->constructors)[name] (al);
   }
-  static void add_type (const std::string& name, AttributeList& al,
+  static void add_type (const symbol name, AttributeList& al,
 			const Syntax& syntax,
 			constructor cons)
   {
     library ().add (name, al, syntax);
     content->constructors.insert(make_pair (name, cons));
   }
-  static void derive_type (const std::string& name, AttributeList& al,
-			   const std::string& super)
+  static void add_type (const char *const name, AttributeList& al,
+			const Syntax& syntax,
+			constructor cons)
+  { add_type (symbol (name), al, syntax, cons); }
+  static void derive_type (symbol name, AttributeList& al, symbol super)
   {
     add_type (name, al, library ().syntax (super),
 	      (content->constructors)[super]);

@@ -122,12 +122,12 @@ CrpN::update (const int Hour, double& NCrop, const double DS,
 void
 CrpN::output (Log& log) const
 {
-  log.output ("PtNCnt", PtNCnt);
-  log.output ("CrNCnt", CrNCnt);
-  log.output ("NfNCnt", NfNCnt);
-  log.output ("Fixated", Fixated);
-  log.output ("AccFixated", AccFixated);
-  log.output ("DS_start_fixate", DS_start_fixate);
+  output_variable (PtNCnt, log);
+  output_variable (CrNCnt, log);
+  output_variable (NfNCnt, log);
+  output_variable (Fixated, log);
+  output_variable (AccFixated, log);
+  output_variable (DS_start_fixate, log);
 }
 
 bool 

@@ -37,7 +37,7 @@ public:
   // Create.
 public:
   TortuosityM_Q (const AttributeList& al)
-    : Tortuosity (al.name ("type"))
+    : Tortuosity (al)
     { }
 };
 

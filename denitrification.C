@@ -63,7 +63,7 @@ static double f_T (double T)
 void
 Denitrification::output (Log& log) const
 {
-  log.output ("converted", converted);
+  output_variable (converted, log);
 }
 
 void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,

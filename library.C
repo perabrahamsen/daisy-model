@@ -26,33 +26,34 @@
 #include "treelog.h"
 #include "tmpstream.h"
 #include "assertion.h"
+#include "symbol.h"
 #include "common.h"
 #include <map>
 #include <set>
 
 struct Library::Implementation
 {
-  typedef map<string, Library*, less<string>/**/> library_map;
+  typedef map<symbol, Library*> library_map;
   static library_map* all;
   static int all_count;
 
   // We give each parsed object an increasing sequence number.
   static int sequence;
 
-  const string name;
+  const symbol name;
   derive_fun derive;
   const char *const description;
-  typedef map<string, AttributeList*, less<string> > alist_map;
-  typedef map<string, const Syntax*, less<string> > syntax_map;
+  typedef map<symbol, AttributeList*> alist_map;
+  typedef map<symbol, const Syntax*> syntax_map;
   alist_map alists;
   syntax_map syntaxen;
-  static void all_entries (vector<string>& libraries);
-  AttributeList& lookup (const string&) const;
-  bool check (const string&) const;
-  void add (const string&, AttributeList&, const Syntax&);
-  const Syntax& syntax (const string&) const;
-  void entries (vector<string>&) const;
-  void remove (const string&);
+  static void all_entries (vector<symbol>& libraries);
+  AttributeList& lookup (symbol) const;
+  bool check (symbol) const;
+  void add (symbol, AttributeList&, const Syntax&);
+  const Syntax& syntax (symbol) const;
+  void entries (vector<symbol>&) const;
+  void remove (symbol);
   void clear_parsed ();
   void refile_parsed (const string& from, const string& to);
   static void load_syntax (Syntax&, AttributeList&);
@@ -60,22 +61,21 @@ struct Library::Implementation
   ~Implementation ();
 };
 
-// map<string, Library*, less<string> >* Library::Implementation::all;
 Library::Implementation::library_map* Library::Implementation::all = NULL;
 int Library::Implementation::all_count = 0;
 int Library::Implementation::sequence = 0;
 
 void
-Library::Implementation::all_entries (vector<string>& libraries)
+Library::Implementation::all_entries (vector<symbol>& libraries)
 { 
   for (library_map::const_iterator i = all->begin (); 
        i != all->end ();
        i++)
-    libraries.push_back ((*i).first); 
+    libraries.push_back (symbol ((*i).first)); 
 }
 
 AttributeList&
-Library::Implementation::lookup (const string& key) const
+Library::Implementation::lookup (const symbol key) const
 { 
   alist_map::const_iterator i = alists.find (key);
 
@@ -86,7 +86,7 @@ Library::Implementation::lookup (const string& key) const
 }
 
 bool
-Library::Implementation::check (const string& key) const
+Library::Implementation::check (const symbol key) const
 { 
   alist_map::const_iterator i = alists.find (key);
 
@@ -97,7 +97,7 @@ Library::Implementation::check (const string& key) const
 }
 
 void
-Library::Implementation::add (const string& key, AttributeList& value,
+Library::Implementation::add (const symbol key, AttributeList& value,
 			      const Syntax& syntax)
 {
   alists[key] = &value;
@@ -105,18 +105,18 @@ Library::Implementation::add (const string& key, AttributeList& value,
 }
 
 const Syntax& 
-Library::Implementation::syntax (const string& key) const
+Library::Implementation::syntax (const symbol key) const
 { 
   syntax_map::const_iterator i = syntaxen.find (key);
 
   if (i == syntaxen.end ())
-    daisy_panic (string ("'") + key + "' not found");
+    daisy_panic ("'" + key + "' not found");
 
   return *(*i).second;
 }
 
 void
-Library::Implementation::entries (vector<string>& result) const
+Library::Implementation::entries (vector<symbol>& result) const
 {
   for (syntax_map::const_iterator i = syntaxen.begin ();
        i != syntaxen.end ();
@@ -127,7 +127,7 @@ Library::Implementation::entries (vector<string>& result) const
 }
 
 void
-Library::Implementation::remove (const string& key)
+Library::Implementation::remove (const symbol key)
 {
   alists.erase (alists.find (key));
   syntaxen.erase (syntaxen.find (key));
@@ -142,7 +142,7 @@ Library::Implementation::clear_parsed ()
       AttributeList& alist = *((*i).second);
       if (alist.check ("parsed_from_file"))
 	{
-	  string key = (*i).first;
+	  const symbol key = (*i).first;
 	  syntax_map::iterator j = syntaxen.find (key);
 	  daisy_assert (j != syntaxen.end ());
 	  syntaxen.erase (j);
@@ -176,7 +176,7 @@ Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
        i != all->end ();
        i++)
     { 
-      const string& name = (*i).first;
+      const symbol name = (*i).first;
       Library& library = *((*i).second);
       syntax.add_library (def + name, library);
     }
@@ -184,7 +184,7 @@ Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
 
 Library::Implementation::Implementation (const char* n, derive_fun d,
 					 const char* des) 
-  : name (n),
+  : name (symbol (n)),
     derive (d),
     description (des)
 {
@@ -226,15 +226,15 @@ Library::Implementation::~Implementation ()
 }
 
 bool
-Library::exist (const string& name)
+Library::exist (const symbol name)
 { return Implementation::all->find (name) != Implementation::all->end (); }
 
 Library& 
-Library::find (const string& name)
+Library::find (const symbol name)
 { return *(*Implementation::all)[name]; }
 
 void
-Library::all (vector<string>& libraries)
+Library::all (vector<symbol>& libraries)
 { 
   Implementation::all_entries (libraries);
 }
@@ -248,7 +248,7 @@ Library::get_sequence ()
   return Implementation::sequence;
 }
 
-const string&
+symbol
 Library::name () const
 { return impl.name; }
 
@@ -257,35 +257,35 @@ Library::description () const
 { return impl.description; }
 
 AttributeList&
-Library::lookup (const string& key) const
+Library::lookup (const symbol key) const
 { return impl.lookup (key); }
 
 bool
-Library::check (const string& key) const
+Library::check (const symbol key) const
 { return impl.check (key); }
 
 void
-Library::add (const string& key, AttributeList& value, const Syntax& syntax)
+Library::add (const symbol key, AttributeList& value, const Syntax& syntax)
 { impl.add (key, value, syntax); }
 
 void 
-Library::add_derived (const string& name, AttributeList& al,
-		      const string& super)
+Library::add_derived (const symbol name, AttributeList& al,
+		      const symbol super)
 { 
   al.add ("type", super);
   impl.derive (name, al, super); 
 }
 
 const Syntax& 
-Library::syntax (const string& key) const
+Library::syntax (const symbol key) const
 { return impl.syntax (key); }
 
 void
-Library::entries (vector<string>& result) const
+Library::entries (vector<symbol>& result) const
 { impl.entries (result); }
 
 bool 
-Library::is_derived_from (const string& a, const string& b) const
+Library::is_derived_from (const symbol a, const symbol b) const
 {
   if (a == b)
     return true;
@@ -295,7 +295,7 @@ Library::is_derived_from (const string& a, const string& b) const
   if (!al.check ("type"))
     return false;
 
-  const string& type = al.name ("type");
+  const symbol type = al.identifier ("type");
 
   if (type == b)
     return true;
@@ -306,31 +306,31 @@ Library::is_derived_from (const string& a, const string& b) const
   return is_derived_from (type, b);
 }
   
-const string 
-Library::base_model (const string& parameterization) const
+const symbol
+Library::base_model (const symbol parameterization) const
 {
   const AttributeList& al = lookup (parameterization);
 
   if (!al.check ("type"))
     return parameterization;
 
-  return base_model (al.name ("type"));
+  return base_model (al.identifier ("type"));
 }
 
 
 void
-Library::remove (const string& key)
+Library::remove (const symbol key)
 { impl.remove (key); }
 
 void 
 Library::clear_all_parsed ()
 {
-  vector<string> components;
+  vector<symbol> components;
   Library::all (components);
 
   for (unsigned int i = 0; i < components.size (); i++)
     {
-      const string& component = components[i];
+      const symbol component = components[i];
       const Library& library = Library::find (component);
       
       library.impl.clear_parsed ();
@@ -340,12 +340,12 @@ Library::clear_all_parsed ()
 void 
 Library::refile_parsed (const string& from, const string& to)
 {
-  vector<string> components;
+  vector<symbol> components;
   Library::all (components);
 
   for (unsigned int i = 0; i < components.size (); i++)
     {
-      const string& component = components[i];
+      const symbol component = components[i];
       const Library& library = Library::find (component);
       
       library.impl.refile_parsed (from, to);
@@ -360,7 +360,7 @@ Library::Library (const char* name, derive_fun derive,
 		  const char* description) 
   : impl (*new Implementation (name, derive, description))
 { 
-  (*Implementation::all)[name] = this; 
+  (*Implementation::all)[symbol (name)] = this; 
   daisy_assert (Implementation::all->size () == Implementation::all_count);
 }
 

@@ -28,15 +28,8 @@ struct SelectIndex : public SelectValue
   const int index;
 
   // Output routines.
-  void output_array (const string& name, const vector<double>& array, 
-		     const Geometry*)
-  { output (name, array); }
-
-  void output (const string& name, const vector<double>& array)
+  void output_array (symbol name, const vector<double>& array, const Geometry*)
   { 
-    if (!is_active ())
-      return;
-
     if (valid (name))
       {
 	if (count == 0)	 
