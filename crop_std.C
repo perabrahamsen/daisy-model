@@ -2248,6 +2248,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
       CrpAux.IncWStem = pProd.E_Stem * f_Stem * AssG;
       CrpAux.IncWSOrg = pProd.E_SOrg * f_SOrg * AssG;
       CrpAux.IncWRoot = pProd.E_Root * f_Root * AssG;
+      var.Prod.CH2OPool -= AssG;
     }
   else
     {
