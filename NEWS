@@ -12,6 +12,10 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.75
+
+** Minor fix in organic matter initialization.
+
 * 2.74
 
 ** New automatic aquitard horizon.
@@ -23,6 +27,24 @@ third of the size of the aquitard itself.
 This affect logging, since the log models by default log down to the
 end of the last horizon.  I therefore suggest you always specify the
 'to' parameter when using the 'pipe' groundwater model.
+
+The aquitard has the following parameters
+
+(defhorizon aquitard default
+  "Aquitard horizon used by drained soil."
+  (hydraulic hypres (K_sat *K_aquitard*))
+  (clay 50)
+  (silt 20)
+  (sand 29.99)
+  (humus 0.01)
+  (dry_bulk_density 2.0 [g/cm^3]))
+
+where *K_aquitard* is the value of that parameter in the pipe
+groundwater model.  
+
+If you define your own horizon named "aquitard", that will be used
+instead of the above.  The only requirement is that the hydraulic
+model used must accept a 'K_sat' parameter.  Most do.
 
 * 2.73
 

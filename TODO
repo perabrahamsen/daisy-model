@@ -1,5 +1,33 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Kig på profile data.
+
+* K_at_h
+
+Ret eksempel så det bliver XXX [m/s].
+
+Svar evt. Merete.
+
+* Weather std:  make "end" two days before specified.
+
+* Log models
+
+select: when hourly -> accumulate true
+
+keep total_accumulated
+
+** C balance fil.
+
+** april: ekstra linie i output
+
+I den første linie skal "begyndelsesindhold" stå.
+
+* Opdater tutorial
+
+** OrganicMatter
+
+** Aquitard
+
 * OrganicMatter
 
 ** Tilføj beskrivelse til tutorial.
@@ -8,17 +36,7 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 Til referencemanual?
 
-* april: automatisk aquitard horizont
-
-Tilføj til groundwater pipe doc string.
-
 * dk-horizon.dai med Sørens tal for Jb jorde.
-
-* C balance fil.
-
-* april: ekstra linie i output
-
-I den første linie skal "begyndelsesindhold" stå.
 
 * SH: PowerPoint validation slides på hjemmeside.
 

@@ -1,6 +1,19 @@
-2003-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+2003-05-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 2.74 released.
+	* Version 2.75 released.
+
+2003-04-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (update_pools): Fix initialization order.
+
+	* txt/introduction.tex (subsection{Log File Generation}): Updated
+	example. 
+
+2003-04-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (GroundwaterPipeSyntax): Explain about
+	aquitart horizon.
+	* soil.C (load_syntax): Ditto.
 
 2003-04-28  Per Abrahamsen  <abraham@dina.kvl.dk>
 

@@ -1860,10 +1860,11 @@ OrganicMatter::Implementation::update_pools
 	  som[pool]->C.push_back (value);
 	}
       SOM_C += som[pool]->C[lay];
-      if (som[pool]->N.size () == lay && total_C_per_N <= 0)
-	som[pool]->N.push_back (som[pool]->C[lay] / SOM_C_per_N_goal[pool]);
       if (som[pool]->C_per_N_goal.size () == lay)
 	som[pool]->C_per_N_goal.push_back (SOM_C_per_N_goal[pool]);
+      if (som[pool]->N.size () == lay && total_C_per_N <= 0)
+	som[pool]->N.push_back (som[pool]->C[lay] 
+				/ som[pool]->C_per_N_goal[lay]);
     }
 
   // Update SOM N.

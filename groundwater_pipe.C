@@ -710,7 +710,12 @@ static struct GroundwaterPipeSyntax
     {
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "Groundwater for pipe (tile) drained soil.");
+      alist.add ("description", "Groundwater for pipe (tile) drained soil.\n\
+If you specify this groundwater model, and does not specify the 'zplus' Soil\n\
+discretion parameter, an extra aquitard soil horizon approximately a third\n\
+of the size of 'Z_aquitart' will be added.  This will allow the grounwater\n\
+level to sink into the aquitart.  The model cannot handle groundwater levels\n\
+below the last node, or above the soil surface.");
       Groundwater::load_syntax (syntax, alist);
 
       syntax.add ("L", "cm", Check::positive (), Syntax::Const,

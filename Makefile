@@ -399,7 +399,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = development.C development.h
+REMOVE = select_date.C
 
 # These are the file extensions we deal with.
 # 
@@ -420,7 +420,7 @@ daisy:	main${OBJ} $(LIBOBJ) #daisy.so
 
 exp:	
 	(cd $(OBJHOME)/exp \
-         && $(MAKE) VPATH=$(SRCDIR) COMPILER=icc -f $(SRCDIR)/Makefile daisy)
+         && $(MAKE) VPATH=$(SRCDIR) USE_PROFILE=true -f $(SRCDIR)/Makefile daisy)
 
 native:	
 	(cd $(OBJHOME)/$(HOSTTYPE) \

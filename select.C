@@ -254,8 +254,12 @@ Select::Implementation::match (const Daisy& daisy, Treelog& out,
 
   if (condition)
     {
+#if 1
       condition->tick (daisy, out);
       is_active = condition->match (daisy);
+#else
+      is_active = true;
+#endif
     }
   else
     is_active = is_printing;
