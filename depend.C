@@ -329,8 +329,13 @@ template pair<string, string>;
 
 struct object_desc
 {
-  const string comp;
-  const string par;
+  string comp;
+  string par;
+  void operator= (const object_desc& other)
+  { 
+    comp = other.comp;
+    par = other.par;
+  }
   object_desc ()
   { }
   object_desc (const object_desc& other)
@@ -345,7 +350,7 @@ struct object_desc
 
 
 static bool
-sort_by_sequence (object_desc& one, object_desc& two)
+sort_by_sequence (const object_desc& one, const object_desc& two)
 { return sequence_number (one.comp, one.par) 
     < sequence_number (two.comp, two.par); }
 
