@@ -1,5 +1,34 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Ændr parameter til canopy chemicals washoff.
+
+Hvad med tema projekt?
+
+* Høst fejl
+
+Ved høst deles planten i tre:
+
+1) Den del der fjernes ved høst.
+2) Den del der tabes ved høst.
+3) Den del der bliver i planten.
+
+Hvis planten dør blived rødder og blade fra gruppe 3 flyttet til
+residuals.  Men ikke stem, sorg og dead.
+
+* Log residuals
+
+Vi skal have 6 nye log variable, 
+
+** 3 * number: C, N, og DM efterladt i toppen.
+
+Dette skal omfatte afstødning af døde blade under kørslen, og
+eftrladte planterester ved både slet og høst.
+
+** 3 * array: C, N, og DM efterladt i jorden.
+
+Dette skal omfatte rodafstødning under simuleringen, samt de efterladt
+rødder ved høst.
+
 * User Manual
 
 ** Tillage
