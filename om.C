@@ -97,7 +97,7 @@ OM::goal_C_per_N (unsigned int at) const // Desired C/N ratio.
 
 void
 OM::turnover (const double from_C, const double from_N, 
-	      const double to_C_per_N, const double N_avail,
+	      const double to_C_per_N, double N_avail,
 	      double rate, const double efficiency,
 	      double& C_use, double& N_produce, double& N_consume)
 {
@@ -124,6 +124,7 @@ OM::turnover (const double from_C, const double from_N,
   // Lower rate to force 
   //   N_consume - N_produce == N_avail
   // This is what calc tell me:
+  N_avail -= 1e-12;		// Leave 1 [ug/l].
   rate = N_avail / (efficiency * from_C / to_C_per_N - from_N);
   daisy_assert (finite (rate));
   if (rate < 0)
