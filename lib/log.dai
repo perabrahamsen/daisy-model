@@ -1,0 +1,405 @@
+;;; log.dai --- standard log files
+
+(deflog "Total Soil Content" table1
+  (where "soil_content.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "*" SoilWater Theta)
+	    (tag "Water")
+	    (dimension "mm")
+	    (factor 10))		;cm -> mm
+	   ((tag "NH4")
+	    (path column "*" SoilNH4 M)
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((tag "NO3")
+	    (path column "*" SoilNO3 M)
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter total_N)
+	    (tag "ORG_N")
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter total_C)
+	    (tag "ORG_C")
+	    (dimension "kg C/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter som N)
+	    (tag "SOM_N")
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter som C)
+	    (tag "SOM_C")
+	    (dimension "kg C/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter smb N)
+	    (tag "SMB_N")
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter smb C)
+	    (tag "SMB_C")
+	    (dimension "kg C/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter aom "*" om N)
+	    (tag "AOM_N")
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" OrganicMatter aom "*" om C)
+	    (tag "AOM_C")
+	    (dimension "kg C/ha")
+	    (factor 1e5))))		;g/cm² -> kg/ha
+
+(deflog "Soil Content 0-10 cm" "Total Soil Content"
+  (where "soil_content_00-10.tab")
+  (from   0)
+  (to   -10))
+
+(deflog "Soil Content 10-20 cm" "Total Soil Content"
+  (where "soil_content_10-20.tab")
+  (from -10)
+  (to   -20))
+
+(deflog "Soil Content 20-30 cm" "Total Soil Content"
+  (where "soil_content_20-30.tab")
+  (from -20)
+  (to   -30))
+
+(deflog "Soil Content 30-40 cm" "Total Soil Content"
+  (where "soil_content_30-40.tab")
+  (from -30)
+  (to   -40))
+
+(deflog "Soil Content 40-50 cm" "Total Soil Content"
+  (where "soil_content_40-50.tab")
+  (from -40)
+  (to   -50))
+
+(deflog "Soil Content 50-60 cm" "Total Soil Content"
+  (where "soil_content_50-60.tab")
+  (from -50)
+  (to   -60))
+
+(deflog "Soil Content 60-70 cm" "Total Soil Content"
+  (where "soil_content_60-70.tab")
+  (from -60)
+  (to   -70))
+
+(deflog "Soil Content 70-80 cm" "Total Soil Content"
+  (where "soil_content_70-80.tab")
+  (from -70)
+  (to   -80))
+
+(deflog "Soil Content 80-90 cm" "Total Soil Content"
+  (where "soil_content_80-90.tab")
+  (from -80)
+  (to   -90))
+
+(deflog "Soil Content 90-100 cm" "Total Soil Content"
+  (where "soil_content_90-100.tab")
+  (from -90)
+  (to  -100))
+
+(deflog "Soil Nitrate Concentration" table1
+  (where "soil_nitrate_conc.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "*" SoilNO3 C)
+	    (full true)			;show value in all nodes.
+	    (dimension "mg/l")
+	    (factor 1.0e6))))		;g/cm³ -> mg/l
+
+(deflog "Soil Temperature" table1
+  (where "soil_temperature.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "*" SoilHeat T)
+	    (full true)			;show value in all nodes.
+	    (dimension "°C"))))
+
+(deflog "Soil Water Potential" table1
+  (where "soil_water_potential.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "*" SoilWater h)
+	    (full true)			;show value in all nodes.
+	    (dimension "cm"))))
+
+(deflog "Surface Water Balance" table1
+  (where "surface_water_balance.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path weather "*" rain)
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path weather "*" snow)
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" irrigation)
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" PotEvapotranspiration)
+	    (tag "PotEvap")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" ActualEvapotranspiration)
+	    (tag "ActEvap")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" crops "*" CrpAux H2OUpt)
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" EvapInterception)
+	    (tag "EvapInter")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" Snow EvapSnowPack)
+	    (tag "EvapSnow")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Surface EvapSoilSurface)
+	    (tag "EvapSoil")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" SoilWater q)
+	    (tag "Infiltration")
+	    (when hourly)
+	    (at 0.0)
+	    (dimension "mm")
+	    (factor -10))		;cm -> mm
+	   ((path column "*" Surface pond)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" Snow Ssnow)
+	    (tag "SnowStore")
+	    (dimension "mm"))))
+
+(deflog "Root Zone Water Balance" table1
+  (where "root_zone_water_balance.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path weather "*" rain)
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path weather "*" snow)
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" irrigation)
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" PotEvapotranspiration)
+	    (tag "PotEvap")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" ActualEvapotranspiration)
+	    (tag "ActEvap")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" crops "*" CrpAux H2OUpt)
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" EvapInterception)
+	    (tag "EvapInter")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Bioclimate "*" Snow EvapSnowPack)
+	    (tag "EvapSnow")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" Surface EvapSoilSurface)
+	    (tag "EvapSoil")
+	    (when hourly)
+	    (dimension "mm"))
+	   ((path column "*" SoilWater q)
+	    (tag "Infilt")
+	    (when hourly)
+	    (at 0.0)
+	    (dimension "mm")
+	    (factor -10))		;cm -> mm
+	   ((path column "*" SoilWater q)
+	    (tag "Percolation")
+	    (when hourly)
+	    (at -100.0)
+	    (dimension "mm")
+	    (factor -10))		;cm -> mm
+	   ((path column "*" SoilWater Theta)
+	    (tag "Content")
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "mm")
+	    (factor 10))))		;cm -> mm
+
+(deflog "N Balance" table1
+  (where "N_balance.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "*" Surface IM NH4)
+	    (tag "NH4-Surface")
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" SoilNH4 transport  "*" J)
+	    (tag "NH4-In")
+	    (when hourly)
+	    (at 0.0)
+	    (dimension "kg N/ha/d")
+	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" SoilNH4 transport  "*" J)
+	    (when hourly)
+	    (tag "NH4-Leak")
+	    (at -100.0)
+	    (dimension "kg N/ha/d")
+	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" crops "*" CrpAux NH4Upt)
+	    (when hourly)
+	    (dimension "kg N/ha/d")
+	    (factor 1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" Nitrification "*" converted)
+	    (when hourly)
+	    (tag "Nit")
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha/d")
+	    (factor 1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" OrganicMatter NH4_source)
+	    (when hourly)
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha/d")
+	    (factor 1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" SoilNH4 M)
+	    (tag "NH4-Total")
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" Surface IM NO3)
+	    (tag "NO3-Surface")
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((path column "*" SoilNO3 transport "*" J)
+	    (when hourly)
+	    (tag "NO3-In")
+	    (at 0.0)
+	    (dimension "kg N/ha/d")
+	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" SoilNO3 transport  "*" J)
+	    (tag "NO3-Leak")
+	    (when hourly)
+	    (at -100.0)
+	    (dimension "kg N/ha/d")
+	    (factor -1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" crops "*" CrpAux NO3Upt)
+	    (when hourly)
+	    (dimension "kg N/ha/d")
+	    (factor 1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" Denitrification converted)
+	    (tag "Denit")
+	    (when hourly)
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha/d")
+	    (factor 1e5))		;g/cm²/d -> kg N/ha/d
+	   ((path column "*" OrganicMatter NO3_source)
+	    (when hourly)
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha/d")
+	    (factor 1e5))		;g/cm²/d -> kg N/ha/d
+	   ((tag "NO3")
+	    (path column "*" SoilNO3 M)
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((tag "AOM")
+	    (path column "*" OrganicMatter am "*" om N)
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((tag "SOM")
+	    (path column "*" OrganicMatter som N)
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha")
+	    (factor 1e5))		;g/cm² -> kg/ha
+	   ((tag "SMB")
+	    (path column "*" OrganicMatter smb N)
+	    (from 0.0)
+	    (to -100.0)
+	    (dimension "kg N/ha")
+	    (factor 1e5))))		;g/cm² -> kg/ha
+
+(deflog "Weather" table1 
+  (where "weather.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((when hourly)
+	    (path weather "*" reference_evapotranspiration)
+	    (dimension "mm/d"))
+	   ((path weather "*" daily_global_radiation)
+	    (dimension "W/m²"))
+	   ((when hourly)
+	    (path weather "*" hourly_global_radiation)
+	    (factor 0.041666666666)	;h->d
+	    (dimension "W/m²"))
+	   ((path weather "*" daily_air_temperature)
+	    (dimension "°C"))))
+
+(deflog "Crop Production" table1
+  (where "crop_prod.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "*" crops "*")
+	    (tag "Name"))		;Crop name.
+	   ((path column "*" crops "*" Phenology DS)
+	    (dimension "none")
+	    (factor 1.0))		;Development stage [-1:2]
+	   ((path column "*" crops "*" Phenology day_length)
+	    (dimension "h")
+	    (factor 1.0))		;Light hours previous day.
+	   ((path column "*" crops "*" Canopy LAI)
+	    (dimension "none")
+	    (factor 1.0))		;Leaf Area Index [0:inf]
+	   ((path column "*" crops "*" RootSys Depth)
+	    (dimension "cm")
+	    (factor 1.0))		;cm [-inf:0]
+	   ((path column "*" crops "*" Prod WLeaf)
+	    (dimension "Ton DM/ha")
+	    (factor 0.01))
+	   ((path column "*" crops "*" Prod WStem)
+	    (dimension "Ton DM/ha")
+	    (factor 0.01))
+	   ((path column "*" crops "*" Prod WSOrg)
+	    (dimension "Ton DM/ha")
+	    (factor 0.01))
+	   ((path column "*" crops "*" Prod WRoot)
+	    (dimension "Ton DM/ha")
+	    (factor 0.01))
+	   ((path column "*" crops "*" CrpAux Fixated)
+	    (accumulate true)
+	    (dimension "kg N/ha")
+	    (factor 10.0))
+	   ((path column "*" crops "*"Prod NCrop)
+	    (dimension "kg N/ha")
+	    (factor 10.0))
+	   ))
+
+(deflog "Harvest" file "harvest.log" (not (running))
+  (some (harvest)))
