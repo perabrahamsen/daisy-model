@@ -44,7 +44,7 @@ exercises.pdf:	reference.pdf
 	pdflatex exercises.tex < /dev/null
 
 components.tex:	/usr/local/daisy/$(HOSTTYPE)/daisy
-	/usr/local/daisy/$(HOSTTYPE)/daisy all.dai -p LaTeX > components.tex
+	/usr/local/daisy/$(HOSTTYPE)/daisy  -p LaTeX > components.tex
 
 dist: reference.pdf reference.ps exercises.pdf
 	cp -f reference.pdf $(FTPDIR)/daisy-ref.pdf

@@ -2,7 +2,8 @@
 
 (input file "crop.dai")
 (input file "crop-old.dai")
-(input file "log.dai")
+(input file "log-old.dai")
+(input file "log-std.dai")
 ;; (input file "fertilizer.dai")
 (input file "tillage.dai")
 (input file "chemistry.dai")

@@ -1,0 +1,198 @@
+;;; log-std.dai --- Standard log parameterizations.
+;;
+;; This file contain the log parameterizations providing the summary
+;; information relevant to non-expert users of Daisy.
+
+(defsummary "System water balance" balance
+  "Water balance for the complete system."
+  (precision 1)
+  (require_top true)
+  (input "Precipitation" "Irrigation")
+  (output "Actual evapotranspiration"
+          "Matrix percolation" "Macropore percolation"
+          "Drain flow" "Runoff")
+  (content "Soil water" "Surface water"))
+
+(deflog "System water" table
+  "Information about water input, output and content for the system."
+  (where "system_water.dlf")
+  (when hourly)
+  (summary "System water balance")
+  (entries (number (tag "Precipitation")
+                   (path weather "*" precipitation)
+                   (spec weather common precipitation)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Irrigation")
+                   (path column "$col" Bioclimate "*" irrigation_total)
+                   (spec bioclimate default irrigation_total)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Potential evapotranspiration")
+                   (path column "$col" Bioclimate "*" total_ep)
+                   (spec bioclimate default total_ep)            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (number (tag "Actual evapotranspiration")
+                   (path column "$col" Bioclimate "*" total_ea)
+                   (spec bioclimate default total_ea)            
+                   (handle sum)
+                   (dimension "mm/&"))
+           (flux_bottom (tag "Matrix percolation")
+                        (path column "$col" SoilWater q)
+                        (spec column default SoilWater q)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm/&"))
+           (flux_bottom (tag "Macropore percolation")
+                        (path column "$col" SoilWater q_p)
+                        (spec column default SoilWater q_p)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm/&"))
+           (interval (tag "Drain flow")
+                     (path column "$col" SoilWater S_drain)
+                     (spec column default SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (number (tag "Runoff")
+                   (path column "$col" Surface runoff)
+                   (spec column default Surface runoff)
+                   (handle sum)
+                   (dimension "mm/&"))
+           (interval (tag "Soil water")
+                     (path column "$col" SoilWater Theta)
+                     (spec column default SoilWater Theta)
+                     (dimension "mm"))
+           (number (tag "Surface water")
+                   (path column "$col" surface_water) 
+                   (spec column default surface_water)
+                   (dimension "mm"))))
+
+(defsummary "Soil water balance" balance
+  "Water balance for the soil."
+  (precision 1)
+  (input "Matrix infiltration" "Macropore infiltration" "Subsoil irrigation")
+  (output "Matrix percolation" "Macropore percolation"
+          "Drain flow" "Root extraction" "Freezing" "Tillage")
+  (content "Soil water"))
+
+(deflog "Soil water" table
+  "Information about water input, output and content for the soil."
+  (where "soil_water.dlf")
+  (when hourly)
+  (summary "Soil water balance")
+  (entries (flux_top (tag "Matrix infiltration")
+                     (description "\
+Amount of water entering the soil through the matrix system.
+
+This is the normal infiltration channel.")
+                     (path column "$col" SoilWater q)
+                     (spec column default SoilWater q)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm/&"))
+           (flux_top (tag "Macropore infiltration")
+                     (description "\
+Amount of water entering the soil through preferential flow.
+
+Preferential flow can occur if the soil has macropores, and the
+water pressure in an area with macropores is above a given threshold.
+If the macropores that are activated within the soil interval is not
+included in this number.")
+                     (path column "$col" SoilWater q_p)
+                     (spec column default SoilWater q_p)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm/&"))
+           (interval (tag "Subsoil irrigation")
+                     (description "\
+Amount of water incorporated directly into the soil.
+
+This include both subsoil irrigation and any water in fertilizer
+directly incorporated into the soil.")
+                     (path column "$col" SoilWater S_incorp)
+                     (spec column default SoilWater S_incorp)
+                     (handle sum)
+                     (negate true)
+                     (dimension "mm/&"))
+           (flux_bottom (tag "Matrix percolation")
+                     (description "\
+Amount of water leaving the soil through the matrix system.
+
+This is the normal percolation channel.")
+                        (path column "$col" SoilWater q)
+                        (spec column default SoilWater q)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm/&"))
+           (flux_bottom (tag "Macropore percolation")
+                     (description "\
+Amount of water leaving the soil interval through macropores.
+
+Water that leaves the macropores within the soil interval will not be
+included in this number.  
+
+This means that macropore flow that is purely internal to the soil
+interval will not be logged.  This is the common case if you are
+logging the entire interval of the soil where there are macropores.")
+                        (path column "$col" SoilWater q_p)
+                        (spec column default SoilWater q_p)
+                        (handle sum)
+                        (negate true)
+                        (dimension "mm/&"))
+           (interval (tag "Drain flow")
+                     (description "\
+Water in the soil interval that flows to the drain pipes.
+
+Note that water flow to the drain pipes from all soil layers, both
+above and below the pipes, and even from the automatically inserted
+aquitard horizon that lies below the normal soil horizons.  So if you
+have specified less than the full soil profile, that is, if you have
+set the 'from' or 'to' parameters, the amount you see logged here will
+be less than the total amount of water in the drain pipes.
+
+If the soil is not drained, that is, if the specified groundwater model
+is not 'pipe', this amount will be zero.")
+                     (path column "$col" SoilWater S_drain)
+                     (spec column default SoilWater S_drain)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "Root extraction")
+                     (description "\
+Water in the soil interval extracted by the roots.
+
+This number will be equal to the transpiration if the soil interval
+being logged includes the entire root zone.")
+                     (path column "$col" SoilWater S_root)
+                     (spec column default SoilWater S_root)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "Freezing")
+                     (description "\
+Water in the soil interval turned into ice.
+
+This number will be zero unless the 'enable_ice' SoilHeat parameter
+has been set.")
+                     (path column "$col" SoilWater S_ice)
+                     (spec column default SoilWater S_ice)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "Tillage")
+                     (description "\
+Net amount of water being removed from the soil interval by tillage operations.
+
+This number will be zero if the soil interval includes the all the
+soil affected by the tillage operation, which is the normal case.  The
+number will be negative if more water have been added than removed by
+the tillage operation.")
+                     (path column "$col" SoilWater tillage)
+                     (spec column default SoilWater tillage)
+                     (handle sum)
+                     (dimension "mm/&"))
+           (interval (tag "Soil water")
+                     (description "\
+The total amount of water in the soil interval")
+                     (path column "$col" SoilWater Theta)
+                     (spec column default SoilWater Theta)
+                     (dimension "mm"))))

@@ -109,8 +109,6 @@
   "Summary information about all soil chemicals."
   (where "soil_chemical.dlf"))
 
-(deflog "Chemical" "Chemicals")
-
 (deflog "Soil Chemicals 0-100 cm" "Soil Chemicals"
   (where "soil_chemicals_000-100.dlf")
   (from   0)
