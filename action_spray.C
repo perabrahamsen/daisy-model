@@ -24,6 +24,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "chemical.h"
+#include "check.h"
 #include "message.h"
 
 struct ActionSpray : public Action
@@ -54,7 +55,6 @@ static struct ActionSpraySyntax
     {
       bool ok = true;
       const string chemical = al.name ("chemical");
-      non_negative (al.number ("amount"), "amount", ok, err);
 
       const Library& library = Librarian<Chemical>::library ();
       if (!library.check (chemical))
@@ -83,7 +83,7 @@ static struct ActionSpraySyntax
 Spray a chemical (typically a pesticide) on the field.");
     syntax.add ("chemical", Syntax::String, Syntax::Const,
 		"Name of pesticide to spray.");
-    syntax.add ("amount", "g/ha", Syntax::Const,
+    syntax.add ("amount", "g/ha", Check::non_negative (), Syntax::Const,
 		"Amount of pesticide to spray.");
     syntax.order ("chemical", "amount");
     Librarian<Action>::add_type ("spray", alist, syntax, &make);

@@ -334,10 +334,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	  case Syntax::Number:
 	    {
 	      double value = get_number ();
-	      if (syntax.dimension (name) == Syntax::Fraction ()
-		  && (value < 0.0 || value > 1.0))
-		error (name + ": Fraction [0,1] expected");
-	      else try
+	      try
 		{
 		  syntax.check (name, value);
 		}
@@ -617,9 +614,17 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    else
 		      {
 			last = get_number ();
-			if (syntax.dimension (name) == Syntax::Fraction ()
-			    && (last < 0.0 || last > 1.0))
-			  error ("Fraction [0,1] expected");
+			try
+			  {
+			    syntax.check (name, last);
+			  }
+			catch (const string& message)
+			  {
+			    TmpStream str;
+			    str () << name << "[" << array.size () << "]: "
+				   << message;
+			    error (str.str ());
+			  }
 			array.push_back (last);
 			count++;
 		      }

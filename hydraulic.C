@@ -24,6 +24,7 @@
 #include "plf.h"
 #include "log.h"
 #include "tmpstream.h"
+#include "check_range.h"
 
 void 
 Hydraulic::set_porosity (double Theta)
@@ -68,16 +69,6 @@ check_alist (const AttributeList& al, Treelog& err)
   const double Theta_res = al.number ("Theta_res");
   const double Theta_sat = al.number ("Theta_sat");
 
-  non_negative (Theta_res, "Theta_res", ok, err);
-
-  if (Theta_sat >= 0.9)
-    {
-      TmpStream tmp;
-      tmp () << "Theta_sat should be below 0.9 (is " << Theta_sat << ")";
-      err.entry (tmp.str ());
-      ok = false;
-    }
-
   if (Theta_res >= Theta_sat)
     {
       err.entry ("Theta_sat should be above Theta_res");
@@ -91,9 +82,10 @@ void
 Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("Theta_sat", "cm^3 H2O/cm^3", Syntax::State,
+  static RangeEI K_sat_range (0.0, 0.9);
+  syntax.add ("Theta_sat", "cm^3 H2O/cm^3", K_sat_range, Syntax::State,
 	      "Saturation point.");
-  syntax.add ("Theta_res", "cm^3 H2O/cm^3", Syntax::Const,
+  syntax.add ("Theta_res", "cm^3 H2O/cm^3", Check::fraction (), Syntax::Const,
 	      "Soil residual water.");
   alist.add ("Theta_res", 0.0);
 }

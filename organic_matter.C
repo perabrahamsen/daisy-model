@@ -822,7 +822,6 @@ bool
 OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 {
   bool ok = true;
-  ::check (am, "om", ok, err);
   if (ok)
     {
       const vector<AttributeList*>& om_alist
@@ -834,7 +833,6 @@ OrganicMatter::check_am (const AttributeList& am, Treelog& err) const
 	  tmp () << "[" << i << "]";
 	  Treelog::Open nest (err, tmp.str ());
 	  bool om_ok = true;
-	  ::check (*om_alist[i], "fractions", om_ok, err);
 	  if (om_ok)
 	    {
 	      vector<double> fractions
@@ -908,7 +906,6 @@ check_alist (const AttributeList& al, Treelog& err)
       tmp () << "am[" << j << "]";
       Treelog::Open nest (err, tmp.str ());
       bool am_ok = true;
-      ::check (*am_alist[j], "om", am_ok, err);
       if (am_ok)
 	{
 	  bool om_ok = true;
@@ -919,11 +916,6 @@ check_alist (const AttributeList& al, Treelog& err)
 	      TmpStream tmp;
 	      tmp () << "om[" << i << "]";
 	      Treelog::Open nest (err, tmp.str ());
-#if 0
-	      ::check (*om_alist[i], "C_per_N", om_ok, err);
-#endif
-	      ::check (*om_alist[i], "turnover_rate", om_ok, err);
-	      ::check (*om_alist[i], "efficiency", om_ok, err);
 	      vector<double> fractions
 		= om_alist[i]->number_sequence ("fractions");
 	      if (fractions.size () != smb_alist.size () + 1)
@@ -958,11 +950,6 @@ check_alist (const AttributeList& al, Treelog& err)
       tmp () << "smb[" << i << "]";
       Treelog::Open nest (err, tmp.str ());
       bool om_ok = true;
-#if 0
-      ::check (*smb_alist[i], "C_per_N", om_ok, err);
-#endif
-      ::check (*smb_alist[i], "turnover_rate", om_ok, err);
-      ::check (*smb_alist[i], "maintenance", om_ok, err);
       vector<double> fractions = smb_alist[i]->number_sequence ("fractions");
       if (fractions.size () != smb_alist.size () + som_alist.size ())
 	{
@@ -1000,10 +987,6 @@ check_alist (const AttributeList& al, Treelog& err)
       tmp () << "som[" << i << "]";
       Treelog::Open nest (err, tmp.str ());
       bool om_ok = true;
-#if 0
-      ::check (*som_alist[i], "C_per_N", om_ok, err);
-#endif
-      ::check (*som_alist[i], "turnover_rate", om_ok, err);
       vector<double> efficiency = som_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{

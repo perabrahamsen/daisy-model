@@ -430,8 +430,7 @@ maximal distance.  The ridge is assumed to be symmetric.\n\
 z (x) is measured in centimeter above the unridged soil surface, which\n\
 means it is in the same reference system as the rest of the model.");
   syntax.add ("R_crust", "h", Syntax::Const, "Resistance in crust.");
-  syntax.add ("switch", Syntax::Fraction (), Syntax::Const,
-	      "\
+  syntax.add_fraction ("switch", Syntax::Const, "\
 Fraction of ridge height where we switch from bottom regime to wall regime.");
   alist.add ("switch", 1.0/3.0);
 

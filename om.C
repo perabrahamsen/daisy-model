@@ -23,6 +23,7 @@
 #include "om.h"
 #include "syntax.h"
 #include "alist.h"
+#include "check.h"
 #include "geometry.h"
 #include "log.h"
 #include "mathlib.h"
@@ -505,28 +506,6 @@ static bool check_alist (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
-  non_negative (al.number ("top_C"), "top_C", ok, err);
-  non_negative (al.number ("top_N"), "top_N", ok, err);
-  non_negative (al.number ("turnover_rate"), "turnover_rate", ok, err);
-  if (al.check ("C"))
-    {
-      const vector<double>& C = al.number_sequence ("C");
-      for (unsigned int i = 0; i < C.size (); i++)
-	non_negative (C[i], "C", ok, err, i);
-    }
-  if (al.check ("C_per_N"))
-    {
-      const vector<double>& C_per_N = al.number_sequence ("C_per_N");
-      for (unsigned int i = 0; i < C_per_N.size (); i++)
-	if (C_per_N[i] <= 0.0)
-	  {
-	    TmpStream tmp;
-	    tmp () << "C_per_N[" << i << "] is not positive\n";
-	    err.entry (tmp.str ());
-	    ok = false;
-	  }
-    }
-  non_negative (al.number ("maintenance"), "maintenance", ok, err);
   const vector<double>& fractions = al.number_sequence ("fractions");
   if (!approximate (accumulate (fractions.begin (), fractions.end (), 0.0),
 		    1.0))
@@ -555,30 +534,28 @@ MicroBiomass), SOM (Soil Organic Matter) and AOM (Added Organic Matter)\n\
 pools.  That is, all the organic matter in the soil.  Some attributes,\n\
 such as 'maintenance', are only meaningful for certain kinds of organic\n\
 matter, in this case the SMB pools.");
-  syntax.add ("top_C", "g C/cm^2", Syntax::State,
+  syntax.add ("top_C", "g C/cm^2", Check::non_negative (), Syntax::State,
 	      "Carbon on top of soil.");
   alist.add ("top_C", 0.0);
-  syntax.add ("top_N", "g N/cm^2", Syntax::State,
+  syntax.add ("top_N", "g N/cm^2", Check::non_negative (), Syntax::State,
 	      "Nitrogen on top of soil.");
   alist.add ("top_N", 0.0);
-  syntax.add ("C", "g C/cm^3", Syntax::OptionalState, Syntax::Sequence,
+  syntax.add ("C", "g C/cm^3", Check::non_negative (),
+	      Syntax::OptionalState, Syntax::Sequence,
 	      "Carbon in each soil interval.");
-  syntax.add ("C_per_N", "(g C/cm^3)/(g N/cm^3)",
+  syntax.add ("C_per_N", "(g C/cm^3)/(g N/cm^3)", Check::positive (), 
 	      Syntax::OptionalState, Syntax::Sequence, 
 	      "The carbon/nitrogen ratio.");
   syntax.add ("N", "g N/cm^3", Syntax::LogOnly, Syntax::Sequence,
 	      "Nitrogen in each soil interval.");
-  syntax.add ("turnover_rate", "h^-1", Syntax::Const,
+  syntax.add ("turnover_rate", "h^-1", Check::non_negative (), Syntax::Const,
 	      "Fraction converted to other pools each hour.");
-  syntax.add ("efficiency", Syntax::Fraction (),
-	      Syntax::Const, Syntax::Sequence,
-	      "\
+  syntax.add_fraction ("efficiency", Syntax::Const, Syntax::Sequence, "\
 the efficiency this pool can be digested by each of the SMB pools.");
-  syntax.add ("maintenance", "h^-1", Syntax::Const, "\
+  syntax.add ("maintenance", "h^-1", Check::non_negative (), Syntax::Const, "\
 The fraction used for staying alive each hour.");
   alist.add ("maintenance", 0.0);
-  syntax.add ("fractions", Syntax::Fraction (),
-	      Syntax::Const, Syntax::Sequence, "\
+  syntax.add_fraction ("fractions", Syntax::Const, Syntax::Sequence, "\
 How this pool is divided into other pools.\n\
 The first numbers corresponds to each of the SMB pools, the remaining\n\
 numbers corresponds to the SOM pools.  The length of the sequence should\n\

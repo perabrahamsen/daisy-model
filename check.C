@@ -1,4 +1,4 @@
-// check.C -- Check validity of alist members.
+// check.C -- Check validity of numeric alist members.
 // 
 // Copyright 2001 Per Abrahamsen and KVL.
 //
@@ -19,6 +19,113 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "check.h"
+
+// GCC 2.95 -O2 dislike declaring these classes local.
+struct None : public Check
+{
+  void check (const double) const throw (string)
+  { }
+};
+
+const Check& 
+Check::none ()
+{
+  static None none;
+  return none;
+}
+
+struct Unknown : public Check
+{
+  void check (const double) const throw (string)
+  { }
+};
+
+const Check& 
+Check::unknown ()
+{
+  static Unknown unknown;
+  return unknown;
+}
+
+struct NonNegative : public Check
+{
+  void check (const double value) const throw (string)
+  {
+    if (value < 0.0)
+      throw string ("Negative value not permitted");
+  }
+};
+
+const Check& 
+Check::non_negative ()
+{
+  static NonNegative non_negative;
+  return non_negative;
+}
+
+struct NonPositive : public Check
+{
+  void check (const double value) const throw (string)
+  {
+    if (value > 0.0)
+      throw string ("Positive value not permitted");
+  }
+};
+
+const Check& 
+Check::non_positive ()
+{
+  static NonPositive non_positive;
+  return non_positive;
+}
+
+struct Negative : public Check
+{
+  void check (const double value) const throw (string)
+  {
+    if (value >= 0.0)
+      throw string ("Value must be negative");
+  }
+};
+
+const Check& 
+Check::negative ()
+{
+  static Negative negative;
+  return negative;
+}
+
+struct Positive : public Check
+{
+  void check (const double value) const throw (string)
+  {
+    if (value <= 0.0)
+      throw string ("Value must be positive");
+  }
+};
+
+const Check& 
+Check::positive ()
+{
+  static Positive positive;
+  return positive;
+}
+
+struct Fraction : public Check
+{
+  void check (const double value) const throw (string)
+  {
+    if (value < 0.0 || value > 1.0)
+      throw string ("Value must be fraction [0;1]");
+  }
+};
+
+const Check& 
+Check::fraction ()
+{
+  static Fraction fraction;
+  return fraction;
+}
 
 Check::Check ()
 { }

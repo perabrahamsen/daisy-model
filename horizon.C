@@ -451,23 +451,22 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("humus", Syntax::None (), Syntax::Const,
 	      "Relative fraction of humus in soil.");
 // Data adopted from Møberg et al. 1988 (Tinglev & Roskilde Soil)
-  syntax.add ("quarts_in_clay", Syntax::Fraction (), Syntax::Const,
-	      "Quarts fraction in clay.");
+  syntax.add_fraction ("quarts_in_clay", Syntax::Const,
+		       "Quarts fraction in clay.");
   alist.add ("quarts_in_clay", 0.15);
-  syntax.add ("quarts_in_silt", Syntax::Fraction (), Syntax::Const,
-	      "Quarts fraction in silt.");
+  syntax.add_fraction ("quarts_in_silt", Syntax::Const,
+		       "Quarts fraction in silt.");
   alist.add ("quarts_in_silt", 0.60);
-  syntax.add ("quarts_in_sand", Syntax::Fraction (), Syntax::Const,
-	      "Quarts fraction in sand.");
+  syntax.add_fraction ("quarts_in_sand", Syntax::Const,
+		       "Quarts fraction in sand.");
   alist.add ("quarts_in_sand", 0.70);
   syntax.add ("dry_bulk_density", "g/cm^3", Syntax::OptionalConst,
 	      "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");
   syntax.add ("SOM_C_per_N", "g C/g N", Syntax::Const, Syntax::Sequence,
 	      "C/N ratio for each SOM pool in this soil.");
-  syntax.add ("SOM_fractions",
-	      Syntax::Fraction (), Syntax::Const, Syntax::Sequence,
-	      "Fraction of humus in each SOM pool, from slowest to fastest.");
+  syntax.add_fraction ("SOM_fractions", Syntax::Const, Syntax::Sequence, "\
+Fraction of humus in each SOM pool, from slowest to fastest.");
   syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("quarts_form_factor", 2.0);

@@ -293,8 +293,8 @@ The formula is speed = (R_max * litter) / (k_half + litter).");
   alist.add ("T_factor", T_factor);
 
   // Incorporation amounts.
-  syntax.add ("respiration", Syntax::Fraction (), Syntax::Const,
-	      "Fraction of C lost in respiration.");
+  syntax.add_fraction ("respiration", Syntax::Const,
+		       "Fraction of C lost in respiration.");
   alist.add ("respiration", 0.5);
   syntax.add ("DM", "g DM/m^2/h", Syntax::LogOnly, 
 	      "DM incorporated this hour.");

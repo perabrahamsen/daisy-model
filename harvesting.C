@@ -348,8 +348,8 @@ removed by harvest.  By default, there is no production delay.");
   no_delay.add (0.0, 0.0);
   no_delay.add (1.0, 0.0);
   alist.add ("cut_delay", no_delay);
-  syntax.add ("cut_stress", Syntax::Fraction (), Syntax::LogOnly,
-	      "Stress induced due to last cut.");
+  syntax.add_fraction ("cut_stress", Syntax::LogOnly, 
+		       "Stress induced due to last cut.");
 }
 
 Harvesting::Harvesting (const AttributeList& al)

@@ -23,6 +23,7 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
+#include "check.h"
 #include "message.h"
 
 struct ActionMix : public Action
@@ -50,26 +51,18 @@ static struct ActionMixSyntax
   static Action& make (const AttributeList& al)
     { return *new ActionMix (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
-    {
-      const double depth (al.number ("depth"));
-      bool ok = true;
-      non_positive (depth, "depth", ok, err);
-      return ok;
-    }
   ActionMixSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
-      syntax.add_check (check_alist);
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Mix soil content down to the specified depth.\n\
 The effect is that nitrogen, water, temperature and such are averaged in\n\
 the interval.");
-      syntax.add ("depth", "cm", Syntax::Const,
+      syntax.add ("depth", "cm", Check::negative (), Syntax::Const,
 		  "How far down to mix the soil (a negative number).");
       syntax.order ("depth");
-      syntax.add ("penetration", Syntax::Fraction (), Syntax::Const, "\
+      syntax.add_fraction ("penetration", Syntax::Const, "\
 Fraction of organic matter on surface that are incorporated in the soil\n\
 by this operation.");
       alist.add ("penetration", 0.0);
@@ -107,8 +100,6 @@ static struct ActionSwapSyntax
       const double middle (al.number ("middle"));
       const double depth (al.number ("depth"));
       bool ok = true;
-      non_positive (middle, "middle", ok, err);
-      non_positive (depth, "depth", ok, err);
       if (middle <= depth)
 	{
 	  err.entry ("swap middle should be above the depth");
@@ -128,11 +119,10 @@ Swap two soil layers.  The top layer start at the surface and goes down to\n\
  'depth'.  After the operation, the content (such as heat, water, and\n\
 organic matter) will be averaged in each layer, and the bottom layer will\n\
 be placed on top of what used to be the top layer.");
-      syntax.add ("middle", "cm", Syntax::Const, "\
-The end of the first layer and the start of the second layer to swap\n\
-\(a negative number).");
-      syntax.add ("depth", "cm", Syntax::Const, "\
-The end of the second layer to swap (a negative number).");
+      syntax.add ("middle", "cm", Check::negative (), Syntax::Const, "\
+The end of the first layer and the start of the second layer to swap.");
+      syntax.add ("depth", "cm", Check::negative (), Syntax::Const, "\
+The end of the second layer to swap.");
       Librarian<Action>::add_type ("swap", alist, syntax, &make);
     }
 } ActionSwap_syntax;
@@ -162,26 +152,17 @@ static struct ActionSetPorositySyntax
   static Action& make (const AttributeList& al)
     { return *new ActionSetPorosity (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
-    {
-      const double depth (al.number ("depth"));
-      bool ok = true;
-      non_positive (depth, "depth", ok, err);
-      return ok;
-    }
-
   ActionSetPorositySyntax ()
     {
       Syntax& syntax = *new Syntax ();
-      syntax.add_check (check_alist);
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Set the porosity of the horizon at the specified depth.\n\
 To get useful results, you need to use a hydraulic model that supports this.");
-      syntax.add ("porosity", Syntax::Fraction (), Syntax::Const, "\
+      syntax.add_fraction ("porosity", Syntax::Const, "\
 Non-solid fraction of soil.");
-      syntax.add ("depth", "cm", Syntax::Const, "\
-A point in the horizon to modify (a negative number).");
+      syntax.add ("depth", "cm", Check::non_positive (), Syntax::Const, "\
+A point in the horizon to modify.");
       alist.add ("depth", 0.0);
       Librarian<Action>::add_type ("set_porosity", alist, syntax, &make);
     }

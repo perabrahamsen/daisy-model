@@ -28,6 +28,7 @@
 #include "am.h"
 #include "log.h"
 #include "harvest.h"
+#include "check_range.h"
 #include "im.h"
 #include "tmpstream.h"
 #include "message.h"
@@ -194,7 +195,6 @@ struct ActionCrop : public Action
     bool doIt (Daisy&) const;
 
     // Create and Destroy.
-    static bool check_alist (const AttributeList& al, Treelog&);
     static void load_syntax (Syntax&, AttributeList&);
     Irrigation (const AttributeList&);
     ~Irrigation ();
@@ -353,8 +353,7 @@ void
 ActionCrop::Annual::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add_check (check_alist);
-  syntax.add ("loss", Syntax::Fraction (), Syntax::Const, 
-	      "Fraction lost during harvest.");
+  syntax.add_fraction ("loss", Syntax::Const, "Fraction lost during harvest.");
   syntax.add ("remove_residuals", Syntax::Boolean, Syntax::Const,
 	      "Remove residuals at harvest.");
   syntax.add_submodule ("latest", alist, Syntax::Const, 
@@ -451,8 +450,6 @@ ActionCrop::Perennial::check_alist (const AttributeList& al, Treelog& err)
       err.entry ("Perennial harvest should last at least 1 season");
       ok = false;
     }
-  non_negative (al.number ("DS"), "DS", ok, err);
-  non_negative (al.number ("DM"), "DM", ok, err);
   if (al.check ("fertilize_rest") && !al.check ("fertilize"))
     {
       err.entry ("'fertilize_rest' specified, but 'fertilize' isn't");
@@ -473,9 +470,10 @@ The first season is the year the crop management starts.");
   syntax.add_submodule ("end", alist, Syntax::Const, 
 			"End management this date the last season.",
 			MM_DD::load_syntax);
-  syntax.add ("DS", Syntax::None (), Syntax::Const, 
+  static RangeEI ds_range (0.0, 2.0);
+  syntax.add ("DS", Syntax::None (), ds_range, Syntax::Const, 
 	      "Development stage at or above which to initiate harvest.");
-  syntax.add ("DM", "kg DM/ha", Syntax::Const, 
+  syntax.add ("DM", "kg DM/ha", Check::positive (), Syntax::Const, 
 	      "Dry matter at or above which to initiate harvest.");
   syntax.add ("year_of_last_harvest", Syntax::Integer, Syntax::OptionalState, 
 	      "Year of last season.");
@@ -659,7 +657,6 @@ ActionCrop::Spray::check_alist (const AttributeList& al, Treelog& err)
       err.entry (tmp.str ());
       ok = false;
     }
-  non_negative (al.number ("amount"), "amount", ok, err);
 
   return ok;
 }
@@ -674,7 +671,7 @@ ActionCrop::Spray::load_syntax (Syntax& syntax, AttributeList&)
 	      "Day in the month.");
   syntax.add ("name", Syntax::String, Syntax::Const,
 	      "Name of chemichal to spray.");
-  syntax.add ("amount", "g/ha", Syntax::Const,
+  syntax.add ("amount", "g/ha", Check::non_negative (), Syntax::Const,
 	      "Amount of chemichal to spray.");
   syntax.order ("month", "day", "name", "amount");
 }
@@ -713,28 +710,18 @@ ActionCrop::Irrigation::doIt (Daisy& daisy) const
   return true;
 }
 
-bool 
-ActionCrop::Irrigation::check_alist (const AttributeList& al, Treelog& err)
-{
-  bool ok = true;
-  non_negative (al.number ("amount"), "amount", ok, err);
-  non_positive (al.number ("potential"), "potential", ok, err);
-  return ok;
-}
-
 void 
 ActionCrop::Irrigation::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add_check (check_alist);
   syntax.add_submodule ("from", alist, Syntax::Const, 
 			"Start of irrigation period.",
 			MM_DD::load_syntax);
   syntax.add_submodule ("to", alist, Syntax::Const, 
 			"End of irrigation period.",
 			MM_DD::load_syntax);
-  syntax.add ("amount", "mm", Syntax::Const, 
+  syntax.add ("amount", "mm", Check::non_negative (), Syntax::Const, 
 	      "Amount of water to apply on irrigation.");
-  syntax.add ("potential", "cm", Syntax::Const, 
+  syntax.add ("potential", "cm", Check::negative (), Syntax::Const, 
 	      "Soil potential at which to irrigate.");
 }
 

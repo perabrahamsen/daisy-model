@@ -89,6 +89,43 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 	      error = true;
 	    }
 	}
+      else if (types[key] == Number)
+	{
+	  // This should already be checked by the file parse, but you
+	  // never know... better safe than sorry...  don't drink and
+	  // drive...  Well, theoretically the alist could come from
+	  // another source (like one of the many other parser :/), or
+	  // be one of the build in ones.
+	  
+	  check_map::const_iterator i = num_checks.find (key);
+
+	  if (i != num_checks.end ())
+	    {
+	      const Check *const check = (*i).second;
+
+	      if (size[key] != Singleton)
+		{
+		  const vector<double>& array = vl.number_sequence (key);
+		  for (unsigned int i = 0; i < array.size (); i++)
+		    try 
+		      { check->check (array[i]); }
+		    catch (const string& message)
+		      {
+			TmpStream str;
+			str () << key << "[" << i << "]: " << message;
+			err.entry (str.str ());
+			error = true;
+		      }
+		}
+	      else try 
+		{ check->check (vl.number (key)); }
+	      catch (const string& message)
+		{
+		  err.entry (key + ": " + message);
+		  error = true;
+		}
+	    }
+	}
       else if (types[key] == Object)
 	if (size[key] != Singleton)
 	  {
@@ -471,6 +508,19 @@ Syntax::add (const string& key, const string& dim, const Check& check,
   impl.num_checks[key] = &check;
 }
 
+void 
+Syntax::add_fraction (const string& key, 
+		      category cat,
+		      int size,
+		      const string& description)
+{ add (key, Fraction (), Check::fraction (), cat, size, description); } 
+
+void 
+Syntax::add_fraction (const string& key, 
+		      category cat,
+		      const string& description)
+{ add (key, Fraction (), Check::fraction (), cat, Singleton, description); } 
+
 void
 Syntax::add (const string& key, const string& dom, const string& ran,
 	     category req, int sz, const string& d)
@@ -655,44 +705,3 @@ Syntax::Syntax ()
 
 Syntax::~Syntax ()
 { delete &impl; }
-
-void
-check (const AttributeList& al, const string& s, bool& ok, Treelog& err)
-{
-  if (!al.check (s))
-    {
-      Treelog::Open nest (err, s); 
-      err.entry ("Missing attribute");
-      ok = false;
-    }
-}
-
-void
-non_negative (double v, const string& s, bool& ok, Treelog& err, int index)
-{
-  if (v < 0.0)
-    {
-      TmpStream tmp;
-      tmp () << s;
-      if (index >= 0)
-	tmp () << "[" << index << "]";
-      Treelog::Open nest (err, tmp.str ());
-      err.entry ("Negative value not permitted");
-      ok = false;
-    }
-}
-
-void
-non_positive (double v, const string& s, bool& ok, Treelog& err, int index)
-{
-  if (v > 0.0)
-    {
-      TmpStream tmp;
-      tmp () << s;
-      if (index >= 0)
-	tmp () << "[" << index << "]";
-      Treelog::Open nest (err, tmp.str ());
-      err.entry ("Positive value not permitted");
-      ok = false;
-    }
-}

@@ -1,4 +1,4 @@
-// hydraulic_M_C.C
+// hydraulic_M_C.C -- Campbell retention curve model with Mualem theory.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
 // Copyright 2000-2001 KVL.
@@ -23,6 +23,7 @@
 // Campbell retention curve model with Mualem theory.
 
 #include "hydraulic.h"
+#include "check_range.h"
 
 class HydraulicM_C : public Hydraulic
 {
@@ -110,43 +111,26 @@ HydraulicM_C::~HydraulicM_C ()
 static struct HydraulicM_CSyntax
 {
   static Hydraulic& make (const AttributeList& al)
-    {
-      return *new HydraulicM_C (al);
-    }
-
-  static bool check (const AttributeList& al, Treelog& err)
-    { 
-      bool ok = true;
-
-      non_positive (al.number ("h_b"), "h_b", ok, err);
-      const double b = al.number ("b");
-      if (b <= 0.0 || b > 1.0)
-	{
-	  Treelog::Open nest (err, "b");
-	  err.entry ("Value should be between 0 and 1 (but not 0)");
-	  ok = false;
-	}
-      non_negative (al.number ("K_sat"), "K_sat", ok, err);
-
-      return ok;
-    }
+  {
+    return *new HydraulicM_C (al);
+  }
 
   HydraulicM_CSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      syntax.add_check (check);
-      alist.add ("description", 
-		 "Campbell retention curve model with Mualem theory.");
-      Hydraulic::load_syntax (syntax, alist);
-      syntax.add ("h_b", "cm", Syntax::Const,
-		  "Bubbling pressure.");
-      syntax.add ("b", Syntax::None (), Syntax::Const,
-		  "Campbell parameter.");
-      syntax.add ("K_sat", "cm/h", Syntax::Const,
-		  "Water conductivity of saturated soil.");
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", 
+	       "Campbell retention curve model with Mualem theory.");
+    Hydraulic::load_syntax (syntax, alist);
+    syntax.add ("h_b", "cm", Check::non_positive (), Syntax::Const,
+		"Bubbling pressure.");
+    static RangeEI b_range (0.0, 1.0);
+    syntax.add ("b", Syntax::None (), b_range, Syntax::Const,
+		"Campbell parameter.");
+    syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::Const,
+		"Water conductivity of saturated soil.");
 
-      Librarian<Hydraulic>::add_type ("M_C", alist, syntax, &make);
-    }
+    Librarian<Hydraulic>::add_type ("M_C", alist, syntax, &make);
+  }
 } hydraulicM_C_syntax;
 

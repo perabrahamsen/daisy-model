@@ -23,6 +23,7 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
+#include "check.h"
 #include "message.h"
 
 struct ActionSetHeatSource : public Action
@@ -50,25 +51,15 @@ static struct ActionHeatSyntax
   static Action& make (const AttributeList& al)
   { return *new ActionSetHeatSource (al); }
   
-  static bool check_alist (const AttributeList& al, Treelog& err)
-  {
-    const double height  = al.number ("height");
-    const double value  = al.number ("value");
-    bool ok = true;
-    non_positive (height, "height", ok, err);
-    non_negative (value, "value", ok, err);
-    return ok;
-  }
   ActionHeatSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Set external point heat source at height to value.");
-    syntax.add ("height", "cm", Syntax::Const,
+    syntax.add ("height", "cm", Check::non_positive (), Syntax::Const,
 		"Height of heat source (a negative number).");
-    syntax.add ("value", "W/m^2", Syntax::Const,
+    syntax.add ("value", "W/m^2", Check::non_negative (), Syntax::Const,
 		"Value of heat source.");
     syntax.order ("height", "value");
     Librarian<Action>::add_type ("set_heat_source", 

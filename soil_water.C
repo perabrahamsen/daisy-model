@@ -421,9 +421,8 @@ will be used from there to the bottom.");
   Geometry::add_layer (syntax, "h", "cm", "Soil water pressure.");
   syntax.add ("S_ice", "cm^3/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Ice sink (due to thawing or freezing).");
-  syntax.add ("X_ice", Syntax::Fraction (), 
-	      Syntax::OptionalState, Syntax::Sequence,
-	      "Ice volume fraction in soil.");
+  syntax.add_fraction ("X_ice", Syntax::OptionalState, Syntax::Sequence,
+		       "Ice volume fraction in soil.");
   syntax.add ("X_ice_buffer", Syntax::None (), 
 	      Syntax::OptionalState, Syntax::Sequence,
 	      "Ice volume that didn't fit the soil durin freezing.");

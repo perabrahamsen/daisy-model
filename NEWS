@@ -12,6 +12,15 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.98
+
+** Better errors for (some) illegal parameter values.
+
+You now get line and column number for where they appeared.  
+
+Lots of code was changed to do this, so if some of the errors seem
+wrong, let me know.
+
 * 1.97
 
 No user visible changes.

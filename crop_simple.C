@@ -38,6 +38,7 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
+#include "check.h"
 #include "message.h"
 
 // Dimensional conversion.
@@ -404,17 +405,6 @@ static struct CropSimpleSyntax
 	    ok = false;
 	  }
       }
-    non_negative (al.number ("forced_LAI"), "forced_LAI", ok, err);
-    non_negative (al.number ("height_max"), "height_max", ok, err);
-    non_negative (al.number ("T_sum"), "T_sum", ok, err);
-    non_negative (al.number ("day"), "day", ok, err);
-    non_negative (al.number ("spring_LAI"), "spring_LAI", ok, err);
-    non_negative (al.number ("root_DM"), "root_DM", ok, err);
-    non_negative (al.number ("root_N"), "root_N", ok, err);
-    non_negative (al.number ("potential_N"), "potential_N", ok, err);
-    non_negative (al.number ("N_actual"), "N_actual", ok, err);
-    non_negative (al.number ("N_b"), "N_b", ok, err);
-    non_negative (al.number ("N_flowering"), "N_flowering", ok, err);
 
     return ok;
   }
@@ -432,18 +422,19 @@ static struct CropSimpleSyntax
 		"LAI as a function of T_sum");
     syntax.add ("LAIvsDay", "m^2/m^2", "d", Syntax::OptionalConst, 
 		"LAI as a function of number of days since sowing.");
-    syntax.add ("forced_LAI", "m^2/m^2", Syntax::State, "\
+    syntax.add ("forced_LAI", "m^2/m^2", Check::non_negative (), 
+		Syntax::State, "\
 Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     alist.add ("forced_LAI", 0.0);
     syntax.add_submodule("Canopy", alist, Syntax::State, "Canopy.",
 			 CanopySimple::load_syntax);
-    syntax.add ("height_max", "cm", Syntax::Const, 
+    syntax.add ("height_max", "cm", Check::non_negative (), Syntax::Const, 
 		"Maximum height of plant, reached when flowering.");
     alist.add ("height_max", 80.0);
-    syntax.add ("T_sum", "dg C d", Syntax::State, 
+    syntax.add ("T_sum", "dg C d", Check::non_negative (), Syntax::State, 
 		"Temperature sum since sowing (or spring).");
     alist.add ("T_sum", 0.0);
-    syntax.add ("day", "d", Syntax::State, 
+    syntax.add ("day", "d", Check::non_negative (), Syntax::State, 
 		"Number of days since sowing (or spring).");
     alist.add ("day", 0.0);
     syntax.add ("spring", Syntax::Integer, Syntax::Const, 2,
@@ -452,31 +443,32 @@ Minimum LAI, automatically cleared when exceeded by 'LAIvsTS'.");
     spring_time.push_back (3);
     spring_time.push_back (1);
     alist.add ("spring", spring_time);
-    syntax.add ("spring_LAI", "m^2/m^2", Syntax::Const, 
+    syntax.add ("spring_LAI", "m^2/m^2", Check::non_negative (), Syntax::Const, 
 		"Set 'forced_LAI' to this after spring clearence of 'T_sum'.");
     alist.add ("spring_LAI", 0.1);
     syntax.add_submodule("Root", alist, Syntax::State, "Root system.",
 			 RootSystem::load_syntax);
-    syntax.add ("root_DM", "T DM/ha", Syntax::Const, 
+    syntax.add ("root_DM", "T DM/ha", Check::non_negative (), Syntax::Const, 
 		"Fully developed root drymatter.");
     alist.add ("root_DM", 2.0);
-    syntax.add ("root_N", "kg N/ha", Syntax::Const,
+    syntax.add ("root_N", "kg N/ha", Check::non_negative (), Syntax::Const,
 		"Fully developed root N content.");
     alist.add ("root_N", 20.0);
     syntax.add_submodule_sequence ("root_am", Syntax::Const, 
 				   "Root AM parameters.", OM::load_syntax);
     alist.add ("root_am", AM::default_AOM ());
-    syntax.add ("potential_N", "kg N/ha", Syntax::Const,
+    syntax.add ("potential_N", "kg N/ha", Check::non_negative (), Syntax::Const,
 		"Potential N content at harvest.");
     syntax.add ("N_demand", "g N/m^2", Syntax::LogOnly,
 		"Current potential N content.");
-    syntax.add ("N_actual", "g N/m^2", Syntax::State,
+    syntax.add ("N_actual", "g N/m^2", Check::non_negative (), Syntax::State,
 		"N uptake until now.");
     alist.add ("N_actual", 0.0);
-    syntax.add ("N_b", "kg N/ha", Syntax::Const, "N uptake form parameter.");
+    syntax.add ("N_b", "kg N/ha", Check::non_negative (), Syntax::Const,
+		"N uptake form parameter.");
     alist.add ("N_b", 10.0);
-    syntax.add ("N_flowering", Syntax::Fraction (), Syntax::Const, 
-		"Fraction of potential N uptake reached at flowering.");
+    syntax.add_fraction ("N_flowering", Syntax::Const, "\
+Fraction of potential N uptake reached at flowering.");
     alist.add ("N_flowering", 0.9);
 
     Librarian<Crop>::add_type ("simple", alist, syntax, &make);

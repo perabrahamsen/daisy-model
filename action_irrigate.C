@@ -24,6 +24,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "im.h"
+#include "check.h"
 #include "message.h"
 
 struct ActionIrrigate : public Action
@@ -45,22 +46,13 @@ struct ActionIrrigate : public Action
     irrigate (daisy.field, flux, t, sm);
   }
 
-  static bool check_alist (const AttributeList& alist, Treelog& err)
-  {
-    bool ok = true;
-    non_negative (alist.number ("flux"), "flux", ok, err);
-    if (alist.check ("temperature"))
-      non_negative (alist.number ("temperature"), "temperature", ok, err);
-    return ok;
-  }
-
   static void load_syntax (Syntax& syntax, AttributeList& alist)
   {
-    syntax.add_check (&check_alist);
-    syntax.add ("flux", "mm/h", Syntax::Const, 
+    syntax.add ("flux", "mm/h", Check::non_negative (), Syntax::Const, 
 		"Amount of irrigation applied.");
     syntax.order ("flux");
-    syntax.add ("temperature", "dg C", Syntax::OptionalConst,
+    syntax.add ("temperature", "dg C", 
+		Check::positive (), Syntax::OptionalConst,
 		"Temperature of irrigation (default: air temperature).");
     syntax.add_submodule ("solute", alist, Syntax::Const, "\
 Nitrogen content of irrigation water [mg N/l] (default: none).",
@@ -216,9 +208,6 @@ static struct ActionIrrigateSubsoilSyntax
     bool ok = true;
     const double from = al.number ("from");
     const double to = al.number ("to");
-    non_negative (al.number ("flux"), "flux", ok, err);
-    non_positive (from, "from", ok, err);
-    non_positive (to, "to", ok, err);
     if (from <= to)
       {
 	err.entry ("'from' must be higher than 'to' in"
@@ -236,13 +225,13 @@ static struct ActionIrrigateSubsoilSyntax
     alist.add ("description", "\
 Incorporate irrigation water directly in the soil.\n\
 This command specifies the flux, set it to zero to turn off irrigation.");
-    syntax.add ("flux", "mm/h", Syntax::Const, 
+    syntax.add ("flux", "mm/h", Check::non_negative (), Syntax::Const, 
 		"Amount of irrigation applied.");
     syntax.order ("flux");
-    syntax.add ("from", "cm", Syntax::Const, "\
+    syntax.add ("from", "cm", Check::non_positive (), Syntax::Const, "\
 Height where you want to start the incorporation (a negative number).");
     alist.add ("from", 0.0);
-    syntax.add ("to", "cm", Syntax::Const, "\
+    syntax.add ("to", "cm", Check::non_positive (), Syntax::Const, "\
 Height where you want to end the incorporation (a negative number).");
 
     syntax.add_submodule ("solute", alist, Syntax::Const, "\

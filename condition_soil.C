@@ -25,6 +25,7 @@
 #include "condition.h"
 #include "field.h"
 #include "daisy.h"
+#include "check.h"
 
 struct ConditionSoilTemperature : public Condition
 {
@@ -71,39 +72,29 @@ static struct ConditionSoilSyntax
   static Condition& make_potential (const AttributeList& al)
     { return *new ConditionSoilPotential (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
-    {
-      const double height (al.number ("height"));
-      bool ok = true;
-      non_positive (height, "height", ok, err);
-      return ok;
-    }
-
   ConditionSoilSyntax ()
     {
       {
 	Syntax& syntax = *new Syntax ();
-	syntax.add_check (check_alist);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Test if the soil is warmer than the specified temperature.");
 	syntax.add ("temperature", "dg C", Syntax::Const, "\
 Lowest soil temperature for which the condition is true.");
-	syntax.add ("height", "cm", Syntax::Const, "\
-Soil depth in which to test the temperature (a negative number).");
+	syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
+Soil depth in which to test the temperature.");
 	Librarian<Condition>::add_type ("soil_temperature_above",
 					alist, syntax, &make_temperature);
       }
       {
 	Syntax& syntax = *new Syntax ();
-	syntax.add_check (check_alist);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Test if the soil is wetter than the specified pressure potential.");
 	syntax.add ("potential", "h", Syntax::Const, "\
 The soil should be wetter than this for the condition to be true.");
-	syntax.add ("height", "cm", Syntax::Const, "\
-Depth at which to example the pressure potential (a negative number).");
+	syntax.add ("height", "cm", Check::non_positive (), Syntax::Const, "\
+Depth at which to example the pressure potential.");
 	Librarian<Condition>::add_type ("soil_water_pressure_above",
 					alist, syntax, &make_potential);
       }

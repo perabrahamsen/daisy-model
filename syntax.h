@@ -149,6 +149,13 @@ public:
 	    category cat,
 	    const string& description)
   { add (key, dim, check, cat, Singleton, description); } 
+  void add_fraction (const string& key, 
+		     category cat,
+		     int size,
+		     const string& description);
+  void add_fraction (const string& key, 
+		     category cat,
+		     const string& description);
 
   void add (const string& key, // PLF.
 	    const string& domain,
@@ -228,11 +235,5 @@ private:
   Syntax (Syntax&);
   Syntax& operator= (Syntax&);
 };
-
-void check (const AttributeList& al, const string& s, bool& ok, Treelog& err);
-void non_negative (double v, const string& s, bool& ok, Treelog& err, 
-		   int index = -1);
-void non_positive (double v, const string& s, bool& ok, Treelog& err, 
-		   int index = -1);
 
 #endif // SYNTAX_H

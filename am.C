@@ -28,10 +28,11 @@
 #include "time.h"
 #include "log.h"
 #include "soil.h"
+#include "check.h"
 #include "tmpstream.h"
+#include "message.h"
 #include "mathlib.h"
 #include <numeric>
-#include "message.h"
 
 EMPTY_TEMPLATE
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
@@ -394,10 +395,10 @@ AM::Implementation::output (Log& log) const
 }
 
 bool 
-AM::Implementation::check (Treelog& err) const
+AM::Implementation::check (Treelog& /*err*/) const
 { 
   bool ok = true;
-
+#if 0
   for (unsigned int i = 0; i < om.size (); i++)
     {
       TmpStream tmp;
@@ -416,6 +417,7 @@ AM::Implementation::check (Treelog& err) const
 
       non_negative (om[i]->maintenance, "maintenance", ok, err);
     }
+#endif
   return ok;
 }
 
@@ -976,46 +978,27 @@ static bool check_organic (const AttributeList& al, Treelog& err)
     }
   
   bool ok = true;
-  ::check (al, "dry_matter_fraction", ok, err);
-  ::check (al, "total_C_fraction", ok, err);
-  ::check (al, "total_N_fraction", ok, err);
   const vector<AttributeList*>& om_alist = al.alist_sequence ("om");
-  bool has_all_initial_fraction = true;
-  bool has_all_C_per_N = true;
+  int missing_initial_fraction = 0;
+  int missing_C_per_N = 0;
+
   for (unsigned int i = 0; i < om_alist.size(); i++)
     {
-      TmpStream tmp;
-      tmp () << "[" << i << "]";
-      Treelog::Open nest (err, tmp.str ());
-      if (has_all_initial_fraction)
-	{
-	  if (om_alist[i]->number ("initial_fraction") == OM::Unspecified)
-	    has_all_initial_fraction = false;
-	}
-      else
-	::check (*om_alist[i], "initial_fraction", ok, err);
-      if (has_all_C_per_N)
-	{
-	  if (!om_alist[i]->check ("C_per_N"))
-	    has_all_C_per_N = false;
-	}
-      else
-	::check (*om_alist[i], "C_per_N", ok, err);
-      ::check (*om_alist[i], "turnover_rate", ok, err);
-      ::check (*om_alist[i], "efficiency", ok, err);
-      }
-  if (has_all_initial_fraction)
+      if (om_alist[i]->number ("initial_fraction") == OM::Unspecified)
+	missing_initial_fraction++;
+      if (!om_alist[i]->check ("C_per_N"))
+	missing_C_per_N++;
+    }
+  if (missing_initial_fraction != 1)
     {
       err.entry ("you should leave initial_fraction in one om unspecified");
       ok = false;
     }
-  if (has_all_C_per_N)
+  if (missing_C_per_N != 1)
     {
-      err.entry ("you should leave C_per_N in one om unspecified");
+      err.entry ("You must leave C/N unspecified in exactly one pool.");
       ok = false;
     }
-  ::check (al, "weight", ok, err);
-  
   return ok;
 }
 
@@ -1024,11 +1007,6 @@ static bool check_root (const AttributeList& al, Treelog& err)
   assert (al.name ("syntax") == "root");
   
   bool ok = true;
-
-  if (al.check ("depth"))
-    non_positive (al.number ("depth"), "depth", ok, err);
-  non_negative (al.number ("dist"), "dist", ok, err);
-  non_negative (al.number ("weight"), "weight", ok, err);
 
   // We need exactly one pool with unspecified OM.
   assert (al.check ("om"));
@@ -1094,39 +1072,39 @@ Organic fertilizer, typically slurry or manure from animals.");
 		    "Time of application.");
 	alist.add ("creation", Time (1, 1, 1, 1));
 	alist.add ("syntax", "organic");
-	syntax.add ("weight", "T w.w./ha", Syntax::Const,
+	syntax.add ("weight", "T w.w./ha", Check::non_negative (),
+		    Syntax::Const,
 		    "Amount of fertilizer applied.");
 	alist.add ("weight", 0.0);
 	syntax.add ("first_year_utilization", 
 		    Syntax::Fraction (), Syntax::OptionalConst, 
 		    "Estimated useful N fraction for the first year.\n\
 In Denmark, this is governed by legalisation.");
-	syntax.add ("second_year_utilization", 
-		    Syntax::Fraction (), Syntax::OptionalConst, 
-		    "Estimated useful N fraction for the second year.\n\
+	syntax.add_fraction ("second_year_utilization", 
+			     Syntax::OptionalConst, "\
+Estimated useful N fraction for the second year.\n\
 In Denmark, this is governed by legalisation.");
-	syntax.add ("dry_matter_fraction", Syntax::Fraction (), Syntax::Const,
-		    "Dry matter fraction of total weight.");
-	syntax.add ("total_C_fraction", Syntax::Fraction (), Syntax::Const,
-		    "Carbon fraction of dry matter.");
-	syntax.add ("total_N_fraction", Syntax::Fraction (), Syntax::Const,
-		    "Nitrogen fraction of dry matter");
+	syntax.add_fraction ("dry_matter_fraction", Syntax::Const,
+			     "Dry matter fraction of total weight.");
+	syntax.add_fraction ("total_C_fraction", Syntax::Const,
+			     "Carbon fraction of dry matter.");
+	syntax.add_fraction ("total_N_fraction", Syntax::Const,
+			     "Nitrogen fraction of dry matter");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
 				       OM::load_syntax);
-	syntax.add ("NO3_fraction", Syntax::Fraction (), Syntax::Const, 
+	syntax.add_fraction ("NO3_fraction", Syntax::Const, 
 		    "Nitrate fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be ammonium or organic.");
 	alist.add ("NO3_fraction", 0.0);
-	syntax.add ("NH4_fraction", Syntax::Fraction (), Syntax::Const, 
-		    "Ammonium fraction of total N in fertilizer. \n\
+	syntax.add_fraction ("NH4_fraction", Syntax::Const, "\
+Ammonium fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be nitrate or organic.");
 	alist.add ("NH4_fraction", 0.0);
-	syntax.add ("NH4_evaporation",
-		    Syntax::Fraction (), Syntax::OptionalConst, 
-		    "Obsolete alias for 'volatilization'.");
-	syntax.add ("volatilization", Syntax::Fraction (), Syntax::Const, 
-		    "Fraction of NH4 that evaporates on application.");
+	syntax.add_fraction ("NH4_evaporation", Syntax::OptionalConst, 
+			     "Obsolete alias for 'volatilization'.");
+	syntax.add_fraction ("volatilization", Syntax::Const, "\
+Fraction of NH4 that evaporates on application.");
 	alist.add ("volatilization", 0.0);
 	Librarian<AM>::add_type ("organic", alist, syntax, &make);
       }
@@ -1140,17 +1118,16 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 	syntax.add ("creation", Syntax::Date, Syntax::State, 
 		    "Time of application.");
 	alist.add ("creation", Time (1, 1, 1, 1));
-	syntax.add ("weight", "kg N/ha", Syntax::Const,
+	syntax.add ("weight", "kg N/ha", Check::non_negative (), Syntax::Const,
 		    "Amount of fertilizer applied.");
 	alist.add ("weight", 0.0);
-	syntax.add ("NH4_fraction", Syntax::Fraction (), Syntax::Const, 
-		    "Ammonium fraction of total N in fertilizer. \n\
+	syntax.add_fraction ("NH4_fraction", Syntax::Const, "\
+Ammonium fraction of total N in fertilizer. \n\
 The remaining nitrogen is assumed to be nitrate.");
-	syntax.add ("NH4_evaporation",
-		    Syntax::Fraction (), Syntax::OptionalConst, 
-		    "Obsolete alias for 'volatilization'.");
-	syntax.add ("volatilization", Syntax::Fraction (), Syntax::Const, 
-		    "Fraction of NH4 that evaporates on application.");
+	syntax.add_fraction ("NH4_evaporation", Syntax::OptionalConst, "\
+Obsolete alias for 'volatilization'.");
+	syntax.add_fraction ("volatilization", Syntax::Const, "\
+Fraction of NH4 that evaporates on application.");
 	alist.add ("volatilization", 0.0);
 	alist.add ("syntax", "mineral");
 	Librarian<AM>::add_type ("mineral", alist, syntax, &make);
@@ -1166,11 +1143,11 @@ Initial added organic matter at the start of the simulation.");
 	alist.add ("creation", Time (1, 1, 1, 1));
 	alist.add ("syntax", "initial");
 	Syntax& layer_syntax = *new Syntax ();
-	layer_syntax.add ("end", "cm", Syntax::Const,
+	layer_syntax.add ("end", "cm", Check::negative (), Syntax::Const,
 			  "\
 Height where this layer ends (a negative number).");
-	layer_syntax.add ("weight", "kg C/m^2", Syntax::Const,
-			  "Carbon in this layer.");
+	layer_syntax.add ("weight", "kg C/m^2", Check::non_negative (),
+			  Syntax::Const, "Carbon in this layer.");
 	layer_syntax.order ("end", "weight");
 	syntax.add ("layers", layer_syntax, Syntax::Sequence, "\
 Carbon content in different soil layers.  The carbon is assumed to be\n\
@@ -1187,18 +1164,19 @@ uniformly distributed in each layer.");
 	syntax.add_check (check_root);
 	syntax.add ("creation", Syntax::Date, Syntax::State,
 		    "Start of simulation.");
-	syntax.add ("depth", "cm", Syntax::OptionalConst, "\
+	syntax.add ("depth", "cm", Check::negative (), 
+		    Syntax::OptionalConst, "\
 How far down does the old root reach? (a negative number)\n\
 By default, the soils maximal rooting depth will be used.");
-	syntax.add ("dist", "cm", Syntax::Const, "\
+	syntax.add ("dist", "cm", Check::positive (), Syntax::Const, "\
 Distance to go down in order to decrease the root density to half the\n\
 original.");
-	syntax.add ("weight", "T DM/ha", Syntax::Const, 
+	syntax.add ("weight", "T DM/ha", Check::non_negative (), Syntax::Const, 
 		    "Total weight of old root dry matter.");
-	syntax.add ("total_C_fraction", Syntax::Fraction (), Syntax::Const, 
-		    "Carbon fraction of total root dry matter");
-	syntax.add ("total_N_fraction", Syntax::Fraction (), Syntax::Const, 
-		    "Nitrogen fraction of total root dry matter");
+	syntax.add_fraction ("total_C_fraction", Syntax::Const, 
+			     "Carbon fraction of total root dry matter");
+	syntax.add_fraction ("total_N_fraction", Syntax::Const, 
+			     "Nitrogen fraction of total root dry matter");
 	syntax.add_submodule_sequence ("om", Syntax::State,
 				       "The individual AOM pools.",
 				       OM::load_syntax);

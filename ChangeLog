@@ -1,3 +1,36 @@
+2001-11-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.98 released.
+
+2001-11-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C (check): Add numeric checks.
+
+	* check_range.C, check_range.h:  Renamed from check_std.
+	* Makefile (OTHER, REMOVE): Ditto.
+
+2001-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.C, syntax.h (non_negative, non_positive, check): Removed.
+
+	* check_std.h, check_std.C (NonPositive, Negative, Positive,
+	RangeII, RangeIE, RangeEI, RangeEE, Below, BelowOrEqual, Above,
+	AboveOrEqual): New classes. 
+	* am.C (AM_Syntax): Use them.
+	* adsorption_langmuir.C (AdsorptionLangmuirSyntax): Use them.
+	* adsorption_freundlich.C (AdsorptionFreundlichSyntax): Use them.
+	* action_tillage.C (ActionSetPorositySyntax): Use them.
+	* action_surface.C (ActionSurfaceSyntax): Use them.
+	* action_spray.C (ActionSpraySyntax): Use them.
+	* action_irrigate.C (load_syntax): Use them.
+	* action_heat.C (ActionHeatSyntax): Use them.
+	* action_crop.C (check_alist): Use them.
+	* crop_simple.C (CropSimpleSyntax): Use them.
+	* om.C (load_syntax): Use them.
+	* hydraulic_M_C.C (HydraulicM_CSyntax): Use it.
+	* hydraulic_B_C.C (HydraulicB_CSyntax): Use it.
+	* hydraulic.C (load_syntax): Use them.
+
 2001-11-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.97 released.

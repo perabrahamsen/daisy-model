@@ -21,6 +21,7 @@
 
 
 #include "adsorption.h"
+#include "check.h"
 #include "soil.h"
 
 class AdsorptionLinear : public Adsorption
@@ -73,11 +74,6 @@ static struct AdsorptionLinearSyntax
 	  err.entry ("You must specify either 'K_clay' or 'K_OC'");
 	  ok = false;
 	}
-      if (has_K_clay)
-	non_negative (al.number ("K_clay"), "K_clay", ok, err);
-      if (has_K_OC)
-	non_negative (al.number ("K_OC"), "K_OC", ok, err);
-      
       return ok;
     }
   AdsorptionLinearSyntax ()
@@ -86,11 +82,13 @@ static struct AdsorptionLinearSyntax
     syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "M = rho K C + Theta C");
-    syntax.add ("K_clay", "g/cm^3", Syntax::OptionalConst, 
+    syntax.add ("K_clay", "g/cm^3", Check::non_negative (), 
+		Syntax::OptionalConst, 
 		"Clay dependent distribution parameter.\n\
 It is multiplied with the soil clay fraction to get the clay part of\n\
 the 'K' factor.  If 'K_OC' is specified, 'K_clay' defaults to 0.");
-    syntax.add ("K_OC", "g/cm^3", Syntax::OptionalConst, 
+    syntax.add ("K_OC", "g/cm^3", Check::non_negative (), 
+		Syntax::OptionalConst, 
 		"Humus dependent distribution parameter.\n\
 It is multiplied with the soil organic carbon fraction to get the\n\
 carbon part of the 'K' factor.  By default, 'K_OC' is equal to 'K_clay'.");

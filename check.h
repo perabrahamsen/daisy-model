@@ -1,4 +1,4 @@
-// check.h -- Check validity of alist members.
+// check.h -- Check validity of numeric alist members.
 // 
 // Copyright 2001 Per Abrahamsen and KVL.
 //
@@ -30,6 +30,16 @@ class Check
   // Use.
 public:
   virtual void check (double value) const throw (string) = 0;
+
+  // Utilities.
+public:
+  static const Check& none ();
+  static const Check& unknown ();
+  static const Check& non_negative ();
+  static const Check& non_positive ();
+  static const Check& negative ();
+  static const Check& positive ();
+  static const Check& fraction ();
 
   // Create and Destroy.
 private:

@@ -23,6 +23,7 @@
 // Campbell retention curve model with Burdine theory.
 
 #include "hydraulic.h"
+#include "check_range.h"
 
 class HydraulicB_C : public Hydraulic
 {
@@ -114,36 +115,19 @@ static struct HydraulicB_CSyntax
       return *new HydraulicB_C (al);
     }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
-    { 
-      bool ok = true;
-
-      non_positive (al.number ("h_b"), "h_b", ok, err);
-      const double b = al.number ("b");
-      if (b <= 0.0 || b > 1.0)
-	{
-	  Treelog::Open nest (err, "b");
-	  err.entry ("Value should be between 0 and 1 (but not 0)");
-	  ok = false;
-	}
-      non_negative (al.number ("K_sat"), "K_sat", ok, err);
-
-      return ok;
-    }
-
   HydraulicB_CSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
-      syntax.add_check (check_alist);
       alist.add ("description", 
 		 "Campbell retention curve model with Burdine theory.");
       Hydraulic::load_syntax (syntax, alist);
-      syntax.add ("h_b", "cm", Syntax::Const,
+      syntax.add ("h_b", "cm", Check::non_positive (), Syntax::Const,
 		  "Bubbling pressure.");
-      syntax.add ("b", Syntax::None (), Syntax::Const,
+      static RangeEI b_range (0.0, 1.0);
+      syntax.add ("b", Syntax::None (), b_range, Syntax::Const,
 		  "Campbell parameter.");
-      syntax.add ("K_sat", "cm/h", Syntax::Const,
+      syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::Const,
 		  "Water conductivity of saturated soil.");
 
       Librarian<Hydraulic>::add_type ("B_C", alist, syntax, &make);

@@ -517,8 +517,7 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Convertion of reference evapotranspiration to\n\
 potential evaporation for bare soil.");
   alist.add ("EpFactor", 0.8);
-  syntax.add ("EpInterchange", Syntax::Fraction (), Syntax::Const,
-	      "\
+  syntax.add_fraction ("EpInterchange", Syntax::Const, "\
 Canopy adsorbtion fraction of unreached potential soil evaporation.");
   alist.add ("EpInterchange", 0.6);
   syntax.add ("albedo_dry", Syntax::None (), Syntax::Const,

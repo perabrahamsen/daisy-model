@@ -350,9 +350,9 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Extraterrestrial radiation this day.");
   syntax.add ("rain", "mm/h", Syntax::LogOnly, "Rain this hour.");
   syntax.add ("snow", "mm/h", Syntax::LogOnly, "Snow this hour.");
-  syntax.add ("hourly_cloudiness", Syntax::Fraction (), Syntax::LogOnly,
+  syntax.add_fraction ("hourly_cloudiness", Syntax::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
-  syntax.add ("daily_cloudiness", Syntax::Fraction(), Syntax::LogOnly,
+  syntax.add_fraction ("daily_cloudiness", Syntax::LogOnly,
 	      "Fraction of sky covered by clouds [0-1].");
   syntax.add ("vapor_pressure", "Pa", Syntax::LogOnly, "Humidity.");
   syntax.add ("wind", "m/s", Syntax::LogOnly, "Wind speed.");
