@@ -6,6 +6,7 @@
 #include "syntax.h"
 #include "csmp.h"
 #include "hydraulic.h"
+#include "mathlib.h"
 #include <vector>
 #include <map>
 
@@ -419,7 +420,7 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 
 Horizon::Horizon (const AttributeList& al)
   : impl (*new Implementation (al)),
-    hydraulic (Hydraulic::create (al.list ("hydraulic")))
+    hydraulic (Hydraulic::create (al.alist ("hydraulic")))
 { 
   if (impl.K_water.size () == 0)
     {

@@ -370,8 +370,8 @@ LogFile::LogFile (const AttributeList& al)
     stream (0),
     opening (true),
     column (0),
-    condition (Librarian<Condition>::create (al.list ("when"))), 
-    filter (Librarian<Filter>::create (al.list ("what"))),
+    condition (Librarian<Condition>::create (al.alist ("when"))), 
+    filter (Librarian<Filter>::create (al.alist ("what"))),
     compact (al.flag ("compact")),
     accumulating (filter.accumulating ()),
     matching (false)

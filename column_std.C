@@ -251,7 +251,7 @@ ColumnStandard::check (const AttributeList& al)
 {
   bool ok = true;
 
-  const AttributeList& om = al.list ("OrganicMatter");
+  const AttributeList& om = al.alist ("OrganicMatter");
   if (!OrganicMatter::check (om))
     ok = false;
 
@@ -266,7 +266,7 @@ ColumnStandard::tick (const Time& time,
 		      const Weather& weather, Groundwater& groundwater)
 {
   // Remove old source sink terms. 
-  soil_water.clear ();
+  soil_water.clear (soil);
   soil_NO3.clear (soil, soil_water);
   soil_NH4.clear ();
   surface.clear ();
@@ -319,18 +319,18 @@ ColumnStandard::output (Log& log, Filter& filter) const
 
 ColumnStandard::ColumnStandard (const AttributeList& al)
   : Column (al.name ("type")),
-    crops (al.list_sequence ("crops")),
-    bioclimate (al.list ("Bioclimate")),
-    surface (al.list ("Surface")),
-    soil (al.list ("Soil")),
-    soil_water (soil, al.list ("SoilWater")),
-    soil_heat (soil, soil_water, al.list ("SoilHeat")),
-    soil_NH4 (soil, soil_water, al.list ("SoilNH4")),
-    soil_NO3 (soil, soil_water, al.list ("SoilNO3")),
-    organic_matter (soil, al.list ("OrganicMatter")),
+    crops (al.alist_sequence ("crops")),
+    bioclimate (al.alist ("Bioclimate")),
+    surface (al.alist ("Surface")),
+    soil (al.alist ("Soil")),
+    soil_water (soil, al.alist ("SoilWater")),
+    soil_heat (soil, soil_water, al.alist ("SoilHeat")),
+    soil_NH4 (soil, soil_water, al.alist ("SoilNH4")),
+    soil_NO3 (soil, soil_water, al.alist ("SoilNO3")),
+    organic_matter (soil, al.alist ("OrganicMatter")),
     nitrification (Librarian<Nitrification>::create 
-		   (al.list ("Nitrification"))),
-    denitrification (al.list ("Denitrification"))
+		   (al.alist ("Nitrification"))),
+    denitrification (al.alist ("Denitrification"))
 { }
 
 ColumnStandard::~ColumnStandard ()

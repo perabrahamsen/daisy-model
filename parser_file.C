@@ -329,10 +329,10 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	  case Syntax::Number:
 	    atts.add (name, get_number ());
 	    break;
-	  case Syntax::List: 
+	  case Syntax::AList: 
 	    {
 	      AttributeList& list = (atts.check (name) 
-				     ? *new AttributeList (atts.list (name))
+				     ? *new AttributeList (atts.alist (name))
 				     : *new AttributeList ());
 	      
 	      load_list (list, syntax.syntax (name));
@@ -386,7 +386,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	  case Syntax::Date:
 	    atts.add (name, get_time ());
 	    break;
-	  case Syntax::Class:
+	  case Syntax::Library:
 	    // Handled specially: Put directly in global library.
 	    add_derived (syntax.library (name), syntax.derive (name));
 	    break;
@@ -439,7 +439,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      atts.add (name, sequence);
 	      break;
 	    }
-	  case Syntax::List:
+	  case Syntax::AList:
 	    {
 	      int size = syntax.size (name);
 	      const Syntax& syn = syntax.syntax (name);
@@ -456,7 +456,7 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		  skip ("(");
 		  // AttributeList& al = *new AttributeList ();
 		  AttributeList& al = (atts.check (name) 
-				       ? *new AttributeList (atts.list (name))
+				       ? *new AttributeList (atts.alist (name))
 				       : *new AttributeList ());
 
 		  load_list (al, syn);

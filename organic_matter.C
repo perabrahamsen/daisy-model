@@ -427,10 +427,10 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
 					       const AttributeList& al)
   : K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
-    am (map_create1 <AM, const Soil&> (al.list_sequence ("am"), soil)),
-    smb (map_construct1 <OM, const Soil&> (al.list_sequence ("smb"), soil)),
-    som (map_construct1 <OM, const Soil&> (al.list_sequence ("som"), soil)),
-    buffer (soil, al.list ("buffer")),
+    am (map_create1 <AM, const Soil&> (al.alist_sequence ("am"), soil)),
+    smb (map_construct1 <OM, const Soil&> (al.alist_sequence ("smb"), soil)),
+    som (map_construct1 <OM, const Soil&> (al.alist_sequence ("som"), soil)),
+    buffer (soil, al.alist ("buffer")),
     min_AM_C (al.number ("min_AM_C")),
     min_AM_N (al.number ("min_AM_N"))
 
@@ -450,8 +450,8 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
     }
   
   // Humus.
-  const vector<const AttributeList*>& som_al = al.list_sequence ("som");
-  const vector<const AttributeList*>& smb_al = al.list_sequence ("smb");
+  const vector<const AttributeList*>& som_al = al.alist_sequence ("som");
+  const vector<const AttributeList*>& smb_al = al.alist_sequence ("smb");
 
   // Find total of fractions and missing C per N.
   double total = 0.0;
@@ -567,9 +567,9 @@ OrganicMatter::check (const AttributeList& al)
 {
   bool ok = true;
 
-  const vector<const AttributeList*>& am_alist = al.list_sequence ("am");
-  const vector<const AttributeList*>& smb_alist = al.list_sequence ("smb");
-  const vector<const AttributeList*>& som_alist = al.list_sequence ("som");
+  const vector<const AttributeList*>& am_alist = al.alist_sequence ("am");
+  const vector<const AttributeList*>& smb_alist = al.alist_sequence ("smb");
+  const vector<const AttributeList*>& som_alist = al.alist_sequence ("som");
 
   for (unsigned int j = 0; j < am_alist.size(); j++)
     {
@@ -579,7 +579,7 @@ OrganicMatter::check (const AttributeList& al)
 	{
 	  bool om_ok = true;
 	  const vector<const AttributeList*>& om_alist
-	    = am_alist[j]->list_sequence ("om");
+	    = am_alist[j]->alist_sequence ("om");
 	  for (unsigned int i = 0; i < smb_alist.size(); i++)
 	    {
 #if 0
@@ -702,7 +702,7 @@ OrganicMatter::check_am (const AttributeList& am) const
   if (ok)
     {
       const vector<const AttributeList*>& om_alist
-	= am.list_sequence ("om");
+	= am.alist_sequence ("om");
       
       for (unsigned int i = 0; i < om_alist.size(); i++)
 	{

@@ -42,17 +42,26 @@ Hydraulic_mod_C::Theta (const double h) const
 double 
 Hydraulic_mod_C::K (const double h) const
 {
-  return K_sat * pow (Sr (h), (2 + 3/b) * b);
+  return K_sat * pow (Sr (h), (2 + 3 / b) * b);
 }
 
 double 
 Hydraulic_mod_C::Cw2 (const double h) const
 {
-  if (h < 0)
-    return - (Theta_sat
-	      * (b * (pow (1.0 / (1 + pow ((1.0/h_b) * h, 5)), b - 1)
-		      * (5 * (pow ((1.0/h_b) * h, 5 - 1) * (1.0/h_b)))))
-	      / pow (1 + pow((1.0/h_b) * h, 5), 2));
+  if (h < 0.0)
+    {
+#if 0 
+      return - (Theta_sat
+		* (pow (1.0 / (1 + pow ((1.0/h_b) * h, 5)), 1.0/b - 1.0)
+		   * (5 * (pow ((1.0/h_b) * h, 5 - 1) * (1.0/h_b))))
+		/ (b * pow (1 + pow((1.0/h_b) * h, 5), 2)));
+#else
+      return -(Theta_sat 
+	       * pow (h / h_b, 4.) 
+	       * pow (1. / (pow (h / h_b, 5.) + 1.), 0.2 / b - 1) 
+	       / (b * h_b * pow (pow (h / h_b, 5.) + 1., 2)));
+#endif
+    }
   else
     return 0.0;
 }
@@ -61,7 +70,7 @@ double
 Hydraulic_mod_C::h (const double Theta) const
 {
   if (Theta < Theta_sat)
-    return h_b * pow (pow (Theta / Theta_sat, -5.0 / b) - 1.0, 1.0/5.0);
+    return h_b * pow (pow (Theta / Theta_sat, -5.0 * b) - 1.0, 1.0/5.0);
   else
     return 0.0;
 }
@@ -69,8 +78,8 @@ Hydraulic_mod_C::h (const double Theta) const
 double 
 Hydraulic_mod_C::M (double h) const
 {
-  if (h < h_b)
-    return K_sat * (-h_b / (1 + 3/b)) * pow (h_b / h, 1 + 3/b);
+  if (h < 0.0)
+    return K_sat * (-h_b / (1 + 3 * b)) * pow (h_b / h, 1 + 3 * b);
   else
     return K_sat * h;
 }
@@ -78,8 +87,8 @@ Hydraulic_mod_C::M (double h) const
 double 
 Hydraulic_mod_C::Sr (double h) const
 {
-  if (h < h_b)
-    return pow (1.0 / (1.0 + pow (h / h_b, 5.0)), 6.0/5.0);
+  if (h < 0.0)
+    return pow (1.0 / (1.0 + pow (h / h_b, 5.0)), 1.0 / (b * 5.0));
   else
     return 1;
 }

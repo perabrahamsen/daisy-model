@@ -13,12 +13,11 @@
 	  (DSLim2 0.0)
 	  (TaLim 0.0)
 	  (TaSum 0.0))
-  (LeafPhot (Model exponential)
-	    (Qeff 4.0E-2)		; (g/m²/h) / (W/m²)
+  (LeafPhot (Qeff 4.0E-2)		; (g/m²/h) / (W/m²)
 	    (Fm 3.5)			; g/m²/h
-	    (TLim1 4.0)			; dg C
-	    (TLim2 10.0))		; dg C
-  (Canopy (DSinit 0.07)
+	    (TempEff (4.0 0.0) (10.0 1.0))) ;dg C
+  (Canopy (InitGrowth 4.65)
+	  (DSinit 0.07)
 	  (WLfInit 10)			; g/m²
 	  (SpLAI 2.5e-2)		; (m²/m²) / (g/m²)
 	  (HvsDS (0 001) (1 100) (2 100))
@@ -57,14 +56,14 @@
 		(0.83 0.99)
 		(0.95 1.00)
 		(1.21 0.00)
-		(2.00 0.00))
-	  (LfDR (0.00 0.00)
-		(0.60 0.00)
-		(1.20 5E-3)
-		(2.00 5E-3))
-	  ;; RtDR is not implemented yet.
-	  (RtDR (0 0) (1 1)))
-  (Resp (E_Root 0.54)			;SH: 0.69
+		(2.00 0.00)))
+  (Prod (LfDR (0.00 0.00)
+	      (0.60 0.00)
+	      (1.20 5E-3)
+	      (2.00 5E-3))
+	;; RtDR is not implemented yet.
+	(RtDR (0 0) (1 1))
+	(E_Root 0.54)			;SH: 0.69
 	(E_Leaf 0.68)
 	(E_Stem 0.66)
 	(E_SOrg 0.70)
@@ -72,7 +71,9 @@
 	(r_Leaf 0.03)
 	(r_Stem 0.01)
 	(r_SOrg 0.01)
-	(Q10 2.00))
+	(ShldResC 0.0)			; Capacity of Shielded Reserves
+	(ReMobilDS 0.0)			; Remobilization, Initial DS
+	(ReMobilRt 0.0))		; Remobilization, release rate
   (CrpN (SeedN 0.2)
 	(PtRootCnc (0.00 0.020)
 		   (1.00 0.012)

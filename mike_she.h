@@ -9,6 +9,7 @@
 struct Syntax;
 struct AttributeList;
 struct Time;
+struct Geometry;
 
 class MikeSHE
 {
@@ -25,7 +26,7 @@ public:
 
   // Communication with SoilWater.
   void get_water_pressure (vector<double>& h) const;
-  void put_water_sink (const vector<double>& S);
+  void put_water_sink (const Geometry&, const vector<double>& S);
 
   // Communication with SoilNO3.
   void get_no3_m (vector<double>& M) const;

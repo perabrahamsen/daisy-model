@@ -24,4 +24,13 @@ single_positive_root_of_cubic_equation
 
 extern bool approximate (double a, double b, double noise = 0.0001);
 
+inline double pF2h (double pF)
+{ 
+  return -pow (10, pF);
+}
+
+inline double h2pF (double h)
+{
+  return log10 (-h);
+}
 #endif MATHLIB_H

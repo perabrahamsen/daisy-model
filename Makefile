@@ -4,21 +4,33 @@ SHELL = /bin/sh
 MAKEFLAGS =
 
 # change these to enable/disable mike she connection
+#FORHOME = /pack/f2c
+#FORHOME = /usr1/jaj0kvl
 #FOROBJ = $(FORTRAN:.f=.o) $(MIKESRC:.c=.o) 
 #FOROBJ = mshe/mshe.a
-#FORLIB =  -L/pack/f2c/lib -lI77 -lF77 
+#FORLIB =  -L$(FORHOME)/lib -lI77 -lF77 
 #MIKESHE=mike_she.C
 #MIKEONLY=
-#MIKEFLAGS=-I/pack/f2c/include -DMIKE_SHE
+#MIKEFLAGS=-I$(FORHOME)/include -DMIKE_SHE
 FOROBJ=
 FORLIB=
 MIKESRC=
 MIKEFLAGS= 
+
+#Uncomment these on SPARC
 SPARCSRC = set_exceptions.S
-#CC = /bc5/bin/bcc32 -P -v -WC
-#CC = c++ -g $(MIKEFLAGS) -frepo
+SPARCOBJ = set_exceptions.o
 CC = /pack/gcc-2.7.1/bin/c++ -Wall -g -pipe $(MIKEFLAGS) -frepo #-O3 -ffast-math -msupersparc -mv8 #-pg
 # CC = /pack/devpro/SUNWspro/bin/CC $(MIKEFLAGS)
+MATHLIB = -lm
+
+#Use these on HPUX (repo doesn't work)
+#MATHLLIB = -lM
+#CC = c++ -Wall -Wcast-qual -pipe $(MIKEFLAGS) -O2 
+
+#Use these on Borland C++ 5.01
+#CC = /bc5/bin/bcc32 -P -v -WC
+
 SRCONLY = filter_array.C filter_all.C filter_none.C filter_some.C \
 	column_std.C  weather_simple.C uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
@@ -37,13 +49,13 @@ OBJECTS = main.C daisy.C parser.C log.C weather.C column.C crop.C \
 	soil_NH4.C soil_NO3.C organic_matter.C nitrification.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
 	am.C im.C om.C harvest.C $(MIKESHE) options.C geometry.C
-OBJ = $(SRCONLY:.C=.o) $(OBJECTS:.C=.o) set_exceptions.o 
+OBJ = $(SRCONLY:.C=.o) $(OBJECTS:.C=.o) $(SPARCOBJ)
 SRC = $(SRCONLY) $(OBJECTS) $(SPARCSRC) 
 HEAD = $(OBJECTS:.C=.h) common.h librarian.h
 TEXT =  Makefile $(HEAD) $(SRC) 
 
 # To be removed by the next cvs update.
-REMOVE = ftable.C ftable.t ftable.h
+REMOVE = none 
 
 .SUFFIXES:	.C .o .h .c
 

@@ -6,8 +6,14 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+// Portability code.
+
 #include <assert.h>
 #include <string>
+
+#define exception _BUG_EXCPETION
+#include <math.h>
+#undef exception
 
 #ifdef __sparc__
 #include <ieeefp.h>
@@ -16,14 +22,6 @@
 // ((x) <= 0.0 ¦¦ (x) >= 0.0)
 #define rint(x) ((int)x)
 #endif
-
-
-// Comment out for NT.
-// #include <std/typeinfo.h>
-
-#define exception _BUG_EXCPETION
-#include <math.h>
-#undef exception
 
 #ifdef __unix
 
@@ -72,6 +70,8 @@ using namespace std;
 #define BUG_DYNAMIC_CAST(T, V) (T) V
 #endif
 
+// Shared code.
+
 static const double dt = 1.0;	// time step.
 
 // From Mumit's STL newbie guide.
@@ -79,16 +79,6 @@ template <class ForwardIterator>
 void sequence_delete (ForwardIterator first, ForwardIterator last) {
   while (first != last)
     delete *first++;
-}
-
-inline double pF2h (double pF)
-{ 
-  return -pow (10, pF);
-}
-
-inline double h2pF (double h)
-{
-  return log10 (-h);
 }
 
 #endif COMMON_H

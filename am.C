@@ -210,7 +210,7 @@ create_om (const AttributeList& al, const Soil& soil)
   const string syntax = al.name ("syntax");
   
   if (syntax == "state")
-    return map_construct1<OM, const Soil&> (al.list_sequence ("om"), soil);
+    return map_construct1<OM, const Soil&> (al.alist_sequence ("om"), soil);
   else if (syntax == "organic")
     {
       // Get initialization parameters.
@@ -220,7 +220,7 @@ create_om (const AttributeList& al, const Soil& soil)
       const double C = weight * al.number ("total_C_fraction");
       const double N = weight * IM::N_left (al);
       
-      const vector<const AttributeList*>& oms = al.list_sequence ("om");
+      const vector<const AttributeList*>& oms = al.alist_sequence ("om");
       vector<double> content;
 	
       return create_om (oms, soil, C, N, content);
@@ -231,10 +231,10 @@ create_om (const AttributeList& al, const Soil& soil)
     assert (0);
   else if (syntax == "initial")
     {
-      const vector<const AttributeList*>& oms = al.list_sequence ("om");
+      const vector<const AttributeList*>& oms = al.alist_sequence ("om");
       vector<OM*>& om = map_construct1<OM, const Soil&> (oms, soil);
       
-      const vector<const AttributeList*>& layers = al.list_sequence ("layers");
+      const vector<const AttributeList*>& layers = al.alist_sequence ("layers");
       
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)
@@ -277,7 +277,7 @@ create_om (const AttributeList& al, const Soil& soil)
     }
   else if (syntax == "root")
     {
-      const vector<const AttributeList*>& oms = al.list_sequence ("om");
+      const vector<const AttributeList*>& oms = al.alist_sequence ("om");
       vector<OM*>& om
 	= map_construct1<OM, const Soil&> (oms, soil);
 
@@ -352,7 +352,7 @@ static bool check_organic (const AttributeList& al)
   ::check (al, "dry_matter_fraction", ok);
   ::check (al, "total_C_fraction", ok);
   ::check (al, "total_N_fraction", ok);
-  const vector<const AttributeList*>& om_alist = al.list_sequence ("om");
+  const vector<const AttributeList*>& om_alist = al.alist_sequence ("om");
   bool has_all_initial_fraction = true;
   bool has_all_C_per_N = true;
   for (unsigned int i = 0; i < om_alist.size(); i++)

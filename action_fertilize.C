@@ -72,7 +72,7 @@ ActionFertilize::check (Daisy& daisy) const
 ActionFertilize::ActionFertilize (const AttributeList& al,
 				  const Action *const p)
   : Action (p),
-    am (al.list ("am")), 
+    am (al.alist ("am")), 
     from (al.number ("from")),
     to (al.number ("to"))
 { }

@@ -9,27 +9,39 @@
 int 
 main (int argc, char* argv[])
 {
+  // We need exactly one argument.
   if (argc != 2)
     {
       cerr << "Usage: " << argv[0] << " file\n";
       return 2;
     }
+
+  // Initialize syntax and attribute list.
   Syntax syntax;
   AttributeList alist;
   Daisy::load_syntax (syntax, alist);
   
+  // Dump syntax, if specified.
   if (strcmp (argv[1], "-p") == 0)
     {
       syntax.dump ();
       return 0;
     }
+
+  // Parse the file.
   ParserFile parser (syntax, argv[1]);
   parser.load (alist);
+
+  // Check the result.
   if (!syntax.check (alist, "daisy"))
     return 1;
+
+  // Create, check and run the simulation.
   Daisy daisy (alist);
   if (!daisy.check (syntax))
     return 1;
   daisy.run ();
+
+  // All is well.
   return 0;
 }

@@ -27,17 +27,17 @@
 
 Daisy::Daisy (const AttributeList& al)
   : running (false),
-    logs (map_create<Log> (al.list_sequence ("output"))),
+    logs (map_create<Log> (al.alist_sequence ("output"))),
     time (al.time ("time")),
-    action (Action::create (al.list ("manager"), NULL)),
-    weather (Librarian<Weather>::create (al.list ("weather"))), 
-    groundwater (Groundwater::create (time, al.list ("groundwater"))), 
-    columns (*new ColumnList (al.list_sequence ("column"))),
+    action (Action::create (al.alist ("manager"), NULL)),
+    weather (Librarian<Weather>::create (al.alist ("weather"))), 
+    groundwater (Groundwater::create (time, al.alist ("groundwater"))), 
+    columns (*new ColumnList (al.alist_sequence ("column"))),
     harvest (*new vector<const Harvest*>)
 { 
 #ifdef MIKE_SHE
   assert (!mike_she);
-  mike_she = new MikeSHE (al.list ("MikeSHE"), time);
+  mike_she = new MikeSHE (al.alist ("MikeSHE"), time);
 #endif
 }
 
@@ -154,31 +154,31 @@ template class add_submodule<Harvest>;
 void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add_class ("defcrop", Crop::library (), &Crop::derive_type);
-  syntax.add_class ("defhorizon", Horizon::library (), &Horizon::derive_type);
-  syntax.add_class ("defcolumn", Column::library (), &Column::derive_type);
-  syntax.add_class ("deflog", 
+  syntax.add_library ("defcrop", Crop::library (), &Crop::derive_type);
+  syntax.add_library ("defhorizon", Horizon::library (), &Horizon::derive_type);
+  syntax.add_library ("defcolumn", Column::library (), &Column::derive_type);
+  syntax.add_library ("deflog", 
 		    Librarian<Log>::library (), 
 		    &Librarian<Log>::derive_type);
-  syntax.add_class ("defparser", Parser::library (), &Parser::derive_type);
-  syntax.add_class ("defam", AM::library (), &AM::derive_type);
+  syntax.add_library ("defparser", Parser::library (), &Parser::derive_type);
+  syntax.add_library ("defam", AM::library (), &AM::derive_type);
   // These are mostly for making 
-  syntax.add_class ("defaction", Action::library (), &Action::derive_type);
-  syntax.add_class ("defcondition",
+  syntax.add_library ("defaction", Action::library (), &Action::derive_type);
+  syntax.add_library ("defcondition",
 		    Librarian<Condition>::library (),
 		    &Librarian<Condition>::derive_type);
-  syntax.add_class ("defweather", 
+  syntax.add_library ("defweather", 
 		    Librarian<Weather>::library (), 
 		    Librarian<Weather>::derive_type);
-  syntax.add_class ("defgroundwater",
+  syntax.add_library ("defgroundwater",
 		    Groundwater::library (), &Groundwater::derive_type);
-  syntax.add_class ("defuzmodel", UZmodel::library (), &UZmodel::derive_type);
-  syntax.add_class ("defhydraulic",
+  syntax.add_library ("defuzmodel", UZmodel::library (), &UZmodel::derive_type);
+  syntax.add_library ("defhydraulic",
 		    Hydraulic::library (), &Hydraulic::derive_type);
-  syntax.add_class ("defnitrification", 
+  syntax.add_library ("defnitrification", 
 		    Librarian<Nitrification>::library (),
 		    &Librarian<Nitrification>::derive_type);
-  syntax.add_class ("deffilter", 
+  syntax.add_library ("deffilter", 
 		    Librarian<Filter>::library (),
 		    &Librarian<Filter>::derive_type);
   // The actual data.

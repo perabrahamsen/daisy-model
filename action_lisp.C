@@ -64,7 +64,7 @@ private:
   ActionProgn (const AttributeList& al, const Action *const p)
     : Action (p),
       actions (map_create1<Action, const Action *const>
-	       (al.list_sequence ("actions"), this))
+	       (al.alist_sequence ("actions"), this))
   { }
 public:
   ~ActionProgn ()
@@ -101,8 +101,8 @@ vector<clause>& make_clauses (const vector<const AttributeList*>& s,
        i != s.end ();
        i++)
     {
-      c.push_back (clause (&Librarian<Condition>::create ((*i)->list ("condition")),
-			   &Action::create ((*i)->list ("action"), p)));
+      c.push_back (clause (&Librarian<Condition>::create ((*i)->alist ("condition")),
+			   &Action::create ((*i)->alist ("action"), p)));
     }
   return c;
 }
@@ -146,7 +146,7 @@ private:
   { return *new ActionCond (al, p); }
   ActionCond (const AttributeList& al, const Action *const p)
     : Action (p),
-      clauses (make_clauses (al.list_sequence ("clauses"), this))
+      clauses (make_clauses (al.alist_sequence ("clauses"), this))
   { }
 public:
   ~ActionCond ()
@@ -196,9 +196,9 @@ private:
   { return *new ActionIf (al, p); }
   ActionIf (const AttributeList& al, const Action *const p)
     : Action (p),
-      if_c (Librarian<Condition>::create (al.list ("if"))),
-      then_a (Action::create (al.list ("then"), this)),
-      else_a (Action::create (al.list ("else"), this))
+      if_c (Librarian<Condition>::create (al.alist ("if"))),
+      then_a (Action::create (al.alist ("then"), this)),
+      else_a (Action::create (al.alist ("else"), this))
   { }
 public:
   ~ActionIf ()

@@ -14,6 +14,7 @@ class Log;
 class Soil;
 class Syntax;
 class Filter;
+class Geometry;
 
 class SoilWater
 {
@@ -31,7 +32,7 @@ class SoilWater
 
   // Sink.
 public:
-  void clear ();
+  void clear (const Geometry&);
   void add_to_sink (const vector<double>&);
   void add_to_sink (const vector<double>&, const Soil&);
 

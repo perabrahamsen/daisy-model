@@ -330,15 +330,15 @@ public:
 };
 
 CropOld::Parameters::Parameters (const AttributeList& vl) 
-  : Devel (vl.list ("Devel")),
-    Vernal (vl.list ("Vernal")),
-    LeafPhot (vl.list ("LeafPhot")),
-    Canopy (vl.list ("Canopy")),
-    Root (vl.list ("Root")),
-    Partit (vl.list ("Partit")),
-    Resp (vl.list ("Resp")),
-    CrpN (vl.list ("CrpN")),
-    Harvest (vl.list ("Harvest")),
+  : Devel (vl.alist ("Devel")),
+    Vernal (vl.alist ("Vernal")),
+    LeafPhot (vl.alist ("LeafPhot")),
+    Canopy (vl.alist ("Canopy")),
+    Root (vl.alist ("Root")),
+    Partit (vl.alist ("Partit")),
+    Resp (vl.alist ("Resp")),
+    CrpN (vl.alist ("CrpN")),
+    Harvest (vl.alist ("Harvest")),
     IntcpCap (vl.number ("IntcpCap")),
     EpFac (vl.number ("EpFac"))
 { }
@@ -428,10 +428,10 @@ CropOld::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
     CStem (vl.number ("CStem")),
     CSOrg (vl.number ("CSOrg")),
     alpha (vl.number ("alpha")),
-    Stem (vl.list_sequence ("Stem")),
-    Leaf (vl.list_sequence ("Leaf")),
-    SOrg (vl.list_sequence ("SOrg")),
-    Root (vl.list_sequence ("Root")),
+    Stem (vl.alist_sequence ("Stem")),
+    Leaf (vl.alist_sequence ("Leaf")),
+    SOrg (vl.alist_sequence ("SOrg")),
+    Root (vl.alist_sequence ("Root")),
     C_Stem (vl.number ("C_Stem")),
     C_SOrg (vl.number ("C_SOrg")),
     C_Root (vl.number ("C_Root")),
@@ -445,11 +445,11 @@ CropOld::Parameters::~Parameters ()
 CropOld::Variables::Variables (const Parameters& par, 
 				    const AttributeList& vl,
 				    int layers)
-  : Phenology (par, vl.list ("Phenology")),
-    Canopy (par, vl.list ("Canopy")),
-    RootSys (par, vl.list ("RootSys"), layers),
-    Prod (par, vl.list ("Prod")),
-    CrpAux (par, vl.list ("CrpAux"))
+  : Phenology (par, vl.alist ("Phenology")),
+    Canopy (par, vl.alist ("Canopy")),
+    RootSys (par, vl.alist ("RootSys"), layers),
+    Prod (par, vl.alist ("Prod")),
+    CrpAux (par, vl.alist ("CrpAux"))
 { }
 
 void 
@@ -936,7 +936,7 @@ CropOld::SoluteUptake (const Soil& soil,
 	  const double alpha = q_r / ( 2 * M_PI * D);
 	  const double beta = 1.0 / (r_root * sqrt (M_PI * L));
 	  const double beta_squared = beta * beta;
-	  if (alpha == 0.0)
+	  if (alpha < 1e-10)
 	    {
 	      B_zero[i] = 4.0 * M_PI * D 
 		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);

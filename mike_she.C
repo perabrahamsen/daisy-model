@@ -10,6 +10,8 @@
 #include "alist.h"
 #include "time.h"
 #include "common.h"
+#include "geometry.h"
+
 extern "C"
 {
 #include <f2c.h>
@@ -38,7 +40,7 @@ struct MikeSHE::Implementation
   
   int lay (int i)
     // I hope this is right.
-  { return column * nlay + i; } 
+  { return (column + 1) * nlay - i - 1; } 
 
   // Data.
   real time;			// hours after start [h]
@@ -273,13 +275,14 @@ MikeSHE::get_water_pressure (vector<double>& h) const
 }
 
 void 
-MikeSHE::put_water_sink (const vector<double>& S)
+MikeSHE::put_water_sink (const Geometry& geometry, const vector<double>& S)
 {   
   assert (S.size () == impl.nlay + 0UL);
   for (int i = 0; i < impl.nlay; i++)
     {
-      assert (S[i] == 0.0);
-      impl.ruptake[impl.lay (i)] = S[i] / (100.0 * 3600.0); // cm/h -> m/s
+      assert (S[i] >= 0.0);
+      const double dz = geometry.dz (i) / 100.0; // cm -> m
+      impl.ruptake[impl.lay (i)] = S[i] * dz / 3600.0; // m/h -> m/s
     }
 }
 

@@ -26,8 +26,8 @@ public:
 
   // Each syntax entry should have an associated type.
   enum type 
-  { Number, List, CSMP, Boolean, String,
-    Date, Integer, Class, Object, Error };
+  { Number, AList, CSMP, Boolean, String,
+    Date, Integer, Object, Library, Error };
   static const char* type_name (type);
     
   // The requirements with regard to input and output varies with each
@@ -60,7 +60,7 @@ public:
   type lookup (string) const;
   const Syntax& syntax (string) const;
 public:
-  const Library& library (string) const;
+  const ::Library& library (string) const;
   derive_fun derive (string) const;
   int  size (string) const;
   bool ordered () const;
@@ -69,8 +69,8 @@ public:
   // Add syntax entries
   void add (string, type, category, int size = Singleton);
   void add (string, const Syntax&, category = State, int size = Singleton);
-  void add (string, const Library&, category = State, int size = Singleton);
-  void add_class (string, const Library&, derive_fun);
+  void add (string, const ::Library&, category = State, int size = Singleton);
+  void add_library (string, const ::Library&, derive_fun);
 
   // It is possible to impose an order on the syntax entries, which
   // will allow the input module to parse the entries without the user

@@ -208,6 +208,8 @@ struct CropStandard::Parameters
   } Prod;
   struct CrpNPar {
     double SeedN;		// N-content in seed [ g N/m² ]
+    double DS_fixate;		// Fixation of atmospheric N. after this DS
+    double DS_cut_fixate;	// Restore fixation this DS after cut. 
     const CSMP& PtLeafCnc;	// Upper limit for N-conc in leaves
     const CSMP& CrLeafCnc;	// Critical lim f. N-conc in leaves
     const CSMP& NfLeafCnc;	// Non-func lim f. N-conc in leaves
@@ -242,6 +244,7 @@ struct CropStandard::Parameters
     const double DSmax;		// Maximal development stage for which
 				// the crop survives harvest.
     const double DSnew;		// Maximal development stage after harvest.
+    const bool stem_harvest;	// True iff the stem can be havested at a cut.
   private:
     friend struct CropStandard::Parameters;
     HarvestPar (const AttributeList&);
@@ -330,6 +333,8 @@ struct CropStandard::Variables
     double H2OUpt;		// H2O uptake [mm/h]
     double NH4Upt;		// NH4-N uptake [g/m2/h]
     double NO3Upt;		// NO3-N uptake [g/m2/h]
+    double Fixated;		// N fixation from air. [g/m2/h]
+    double DS_start_fixate;	// Start fixation at this DS.
   private:
     friend struct CropStandard::Variables;
     RecCrpAux (const Parameters&, const AttributeList&);
@@ -342,15 +347,15 @@ public:
 };
 
 CropStandard::Parameters::Parameters (const AttributeList& vl) 
-  : Devel (vl.list ("Devel")),
-    Vernal (vl.list ("Vernal")),
-    LeafPhot (vl.list ("LeafPhot")),
-    Canopy (vl.list ("Canopy")),
-    Root (vl.list ("Root")),
-    Partit (vl.list ("Partit")),
-    Prod (vl.list ("Prod")),
-    CrpN (vl.list ("CrpN")),
-    Harvest (vl.list ("Harvest")),
+  : Devel (vl.alist ("Devel")),
+    Vernal (vl.alist ("Vernal")),
+    LeafPhot (vl.alist ("LeafPhot")),
+    Canopy (vl.alist ("Canopy")),
+    Root (vl.alist ("Root")),
+    Partit (vl.alist ("Partit")),
+    Prod (vl.alist ("Prod")),
+    CrpN (vl.alist ("CrpN")),
+    Harvest (vl.alist ("Harvest")),
     IntcpCap (vl.number ("IntcpCap")),
     EpFac (vl.number ("EpFac"))
 { }
@@ -430,6 +435,8 @@ CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
 
 CropStandard::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
   : SeedN (vl.number ("SeedN")),
+    DS_fixate (vl.number ("DS_fixate")),
+    DS_cut_fixate (vl.number ("DS_cut_fixate")),
     PtLeafCnc (vl.csmp ("PtLeafCnc")),
     CrLeafCnc (vl.csmp ("CrLeafCnc")),
     NfLeafCnc (vl.csmp ("NfLeafCnc")),
@@ -449,18 +456,19 @@ CropStandard::Parameters::HarvestPar::HarvestPar (const AttributeList& vl)
     CStraw (vl.number ("CStraw")),
     CSOrg (vl.number ("CSOrg")),
     alpha (vl.number ("alpha")),
-    Stem (vl.list_sequence ("Stem")),
-    Leaf (vl.list_sequence ("Leaf")),
-    Dead (vl.list_sequence ("Dead")),
-    SOrg (vl.list_sequence ("SOrg")),
-    Root (vl.list_sequence ("Root")),
+    Stem (vl.alist_sequence ("Stem")),
+    Leaf (vl.alist_sequence ("Leaf")),
+    Dead (vl.alist_sequence ("Dead")),
+    SOrg (vl.alist_sequence ("SOrg")),
+    Root (vl.alist_sequence ("Root")),
     C_Stem (vl.number ("C_Stem")),
     C_Leaf (vl.number ("C_Leaf")),
     C_Dead (vl.number ("C_Dead")),
     C_SOrg (vl.number ("C_SOrg")),
     C_Root (vl.number ("C_Root")),
     DSmax (vl.number ("DSmax")),
-    DSnew (vl.number ("DSnew"))
+    DSnew (vl.number ("DSnew")),
+    stem_harvest (vl.flag ("stem_harvest"))
 { }
 
 CropStandard::Parameters::~Parameters ()
@@ -469,11 +477,11 @@ CropStandard::Parameters::~Parameters ()
 CropStandard::Variables::Variables (const Parameters& par, 
 				    const AttributeList& vl,
 				    int layers)
-  : Phenology (par, vl.list ("Phenology")),
-    Canopy (par, vl.list ("Canopy")),
-    RootSys (par, vl.list ("RootSys"), layers),
-    Prod (par, vl.list ("Prod")),
-    CrpAux (par, vl.list ("CrpAux"))
+  : Phenology (par, vl.alist ("Phenology")),
+    Canopy (par, vl.alist ("Canopy")),
+    RootSys (par, vl.alist ("RootSys"), layers),
+    Prod (par, vl.alist ("Prod")),
+    CrpAux (par, vl.alist ("CrpAux"))
 { }
 
 void 
@@ -609,7 +617,9 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     IncWRoot (0.0),
     H2OUpt (0.0),
     NH4Upt (0.0),
-    NO3Upt (0.0)
+    NO3Upt (0.0),
+    Fixated (0.0),
+    DS_start_fixate (par.CrpN.DS_fixate)
 { }
 
 void 
@@ -632,6 +642,8 @@ CropStandard::Variables::RecCrpAux::output (Log& log, Filter& filter) const
   log.output ("H2OUpt", filter, H2OUpt, true);
   log.output ("NH4Upt", filter, NH4Upt, true);
   log.output ("NO3Upt", filter, NO3Upt, true);
+  log.output ("Fixated", filter, Fixated, true);
+  log.output ("DS_start_fixate", filter, DS_start_fixate, true);
   log.close();
 }
 
@@ -753,9 +765,15 @@ CropStandardSyntax::CropStandardSyntax ()
 
   // CrpNPar
   Syntax& CrpN = *new Syntax ();
+  AttributeList& CrpNList = *new AttributeList ();
   syntax.add ("CrpN", CrpN, Syntax::Const);
+  alist.add ("CrpN", CrpNList);
 
   CrpN.add ("SeedN", Syntax::Number, Syntax::Const);
+  CrpN.add ("DS_fixate", Syntax::Number, Syntax::Const);
+  CrpNList.add ("DS_fixate", 42000.0);
+  CrpN.add ("DS_cut_fixate", Syntax::Number, Syntax::Const);
+  CrpNList.add ("DS_cut_fixate", 0.0);
   CrpN.add ("PtLeafCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("CrLeafCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("NfLeafCnc", Syntax::CSMP, Syntax::Const);
@@ -799,6 +817,8 @@ CropStandardSyntax::CropStandardSyntax ()
   HarvestList.add ("DSmax", 0.0);
   Harvest.add ("DSnew", Syntax::Number, Syntax::Const);
   HarvestList.add ("DSnew", 0.0);
+  Harvest.add ("stem_harvest", Syntax::Boolean, Syntax::Const);
+  HarvestList.add ("stem_harvest", true);
 
    // I don't know where these belong.
   syntax.add ("IntcpCap", Syntax::Number, Syntax::Const);
@@ -829,7 +849,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::State);
   vCanopy.add ("LAIvsH", empty_csmp);
 
-    // RootSys
+  // RootSys
   Syntax& RootSys = *new Syntax ();
   AttributeList& vRootSys = *new AttributeList ();
   syntax.add ("RootSys", RootSys, Syntax::State);
@@ -838,11 +858,14 @@ CropStandardSyntax::CropStandardSyntax ()
   RootSys.add ("Depth", Syntax::Number, Syntax::Optional);
   RootSys.add ("Density", Syntax::Number, Syntax::State, Syntax::Sequence);
   vRootSys.add ("Density", empty_array);
-  RootSys.add ("H2OExtraction", Syntax::Number, Syntax::State, Syntax::Sequence);
+  RootSys.add ("H2OExtraction", Syntax::Number,
+	       Syntax::State, Syntax::Sequence);
   vRootSys.add ("H2OExtraction", empty_array);
-  RootSys.add ("NH4Extraction", Syntax::Number, Syntax::State, Syntax::Sequence);
+  RootSys.add ("NH4Extraction", Syntax::Number,
+	       Syntax::State, Syntax::Sequence);
   vRootSys.add ("NH4Extraction", empty_array);
-  RootSys.add ("NO3Extraction", Syntax::Number, Syntax::State, Syntax::Sequence);
+  RootSys.add ("NO3Extraction", Syntax::Number,
+	       Syntax::State, Syntax::Sequence);
   vRootSys.add ("NO3Extraction", empty_array);
   RootSys.add ("h_x", Syntax::Number, Syntax::State);
   vRootSys.add ("h_x", 0.0);
@@ -850,24 +873,23 @@ CropStandardSyntax::CropStandardSyntax ()
   RootSys.add ("Ept", Syntax::Number, Syntax::LogOnly);
 
   // Prod
-  Syntax& sProd = *new Syntax ();
+  // Warning: Uses same syntax as `ProdPar'.
   AttributeList& vProd = *new AttributeList ();
-  syntax.add ("Prod", sProd, Syntax::State);
   alist.add ("Prod", vProd);
 
-  sProd.add ("WLeaf", Syntax::Number, Syntax::State);
+  Prod.add ("WLeaf", Syntax::Number, Syntax::State);
   vProd.add ("WLeaf", 0.001);
-  sProd.add ("WStem", Syntax::Number, Syntax::State);
+  Prod.add ("WStem", Syntax::Number, Syntax::State);
   vProd.add ("WStem", 0.000);
-  sProd.add ("WRoot", Syntax::Number, Syntax::State);
+  Prod.add ("WRoot", Syntax::Number, Syntax::State);
   vProd.add ("WRoot", 0.001);
-  sProd.add ("WSOrg", Syntax::Number, Syntax::State);
+  Prod.add ("WSOrg", Syntax::Number, Syntax::State);
   vProd.add ("WSOrg", 0.000);
-  sProd.add ("WLDrd", Syntax::Number, Syntax::State);
+  Prod.add ("WLDrd", Syntax::Number, Syntax::State);
   vProd.add ("WLDrd", 0.000);
-  sProd.add ("WRDrd", Syntax::Number, Syntax::State);
+  Prod.add ("WRDrd", Syntax::Number, Syntax::State);
   vProd.add ("WRDrd", 0.000);
-  sProd.add ("NCrop", Syntax::Number, Syntax::Optional);
+  Prod.add ("NCrop", Syntax::Number, Syntax::Optional);
 
   // CrpAux
   Syntax& CrpAux = *new Syntax ();
@@ -896,6 +918,8 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpAux.add ("H2OUpt", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("NH4Upt", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("NO3Upt", Syntax::Number, Syntax::LogOnly);
+  CrpAux.add ("Fixated", Syntax::Number, Syntax::LogOnly);
+  CrpAux.add ("DS_start_fixate", Syntax::Number, Syntax::LogOnly);
 
   Crop::add_type ("default", alist, syntax, &CropStandard::make);
 }
@@ -980,7 +1004,7 @@ CropStandard::SoluteUptake (const Soil& soil,
 	  const double alpha = q_r / ( 2 * M_PI * D);
 	  const double beta = 1.0 / (r_root * sqrt (M_PI * L));
 	  const double beta_squared = beta * beta;
-	  if (alpha == 0.0)
+	  if (alpha < 1e-10)
 	    {
 	      B_zero[i] = 4.0 * M_PI * D 
 		/ (beta_squared * log (beta_squared) / (beta_squared - 1.0) - 1.0);
@@ -1534,9 +1558,19 @@ CropStandard::NitrogenUptake (int Hour,
 			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad); 
       assert (CrpAux.NO3Upt >= 0.0);
       NCrop += CrpAux.NO3Upt;
+      PotNUpt -= CrpAux.NO3Upt;
     }
   else
     CrpAux.NO3Upt = 0.0;
+
+  if (PotNUpt > 0 && var.Phenology.DS > var.CrpAux.DS_start_fixate)
+    {
+      CrpAux.Fixated = 0.8 * PotNUpt;
+      NCrop += CrpAux.Fixated;
+      PotNUpt -= CrpAux.Fixated;
+    }
+  else
+    CrpAux.Fixated = 0.0;
 }
 
 double 
@@ -1855,7 +1889,15 @@ CropStandard::harvest (const Time& time, Column& column,
   const vector<double>& density = var.RootSys.Density;
   const double length = height ();
 
-  if (stub_length < length)
+  if (!par.Harvest.stem_harvest)
+    { 
+      if (stem_harvest > 0.0)
+	{
+	  cerr << "\nAttempting to harvest " << name << " stem denied.\n";
+	  stem_harvest = 0.0;
+	}
+    }
+  else if (stub_length < length)
     stem_harvest *= (1.0 - stub_length / length);
 
   const double DSmax = Hp.DSmax;
@@ -1867,6 +1909,10 @@ CropStandard::harvest (const Time& time, Column& column,
 
       if (DS > DSnew)
 	var.Phenology.DS = DSnew;
+      
+      // Stop fixation after cut.
+      if (DS > var.CrpAux.DS_start_fixate)
+	var.CrpAux.DS_start_fixate = par.CrpN.DS_cut_fixate;
 
       Prod.WStem *= (1.0 - stem_harvest); 
       Prod.WLeaf *= (1.0 - leaf_harvest);

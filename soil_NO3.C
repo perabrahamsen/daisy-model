@@ -4,17 +4,24 @@
 #include "soil_water.h"
 #include "soil.h"
 
-#include "mike_she.h"
-void
-SoilNO3::clear (const Soil& /*soil */, const SoilWater& /* soil_water */)
-{
 #ifdef MIKE_SHE
+#include "mike_she.h"
+ 
+void
+SoilNO3::clear (const Soil& soil, const SoilWater& soil_water)
+{
   mike_she->get_no3_m (M_);
   for (int i = 0; i < soil.size (); i++)
     C_[i] = M_[i] / soil_water.Theta (i);
-#endif
   Solute::clear ();
 }
+#else
+void
+SoilNO3::clear (const Soil& /*soil */, const SoilWater& /* soil_water */)
+{
+  Solute::clear ();
+}
+#endif
 
 void 
 SoilNO3::tick (const Soil& soil, const SoilWater& soil_water, double J_in)

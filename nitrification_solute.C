@@ -9,8 +9,8 @@
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include "csmp.h"
-#include "common.h"
 #include "log.h"
+#include "mathlib.h"
 
 class NitrificationSolute : public Nitrification
 {
@@ -30,8 +30,6 @@ public:
 
   // Create.
 public:
-  friend class NitrificationSoluteSyntax;
-  static Nitrification& make (const AttributeList&);
   NitrificationSolute (const AttributeList&);
 };
 
@@ -111,14 +109,13 @@ NitrificationSolute::NitrificationSolute (const AttributeList& al)
     k_10 (al.number ("k_10"))
 { }
 
-Nitrification&
-NitrificationSolute::make (const AttributeList& al)
-{
-  return *new NitrificationSolute (al);
-}
-
 static struct NitrificationSoluteSyntax
 {
+  static Nitrification& make (const AttributeList& al)
+  {
+    return *new NitrificationSolute (al);
+  }
+
   NitrificationSoluteSyntax ()
   {
     Syntax& syntax = *new Syntax ();
@@ -127,7 +124,6 @@ static struct NitrificationSoluteSyntax
 		Syntax::Sequence);
     syntax.add ("k", Syntax::Number, Syntax::Const);
     syntax.add ("k_10", Syntax::Number, Syntax::Const);
-    Librarian<Nitrification>::add_type ("solute", alist, syntax,
-					&NitrificationSolute::make);
+    Librarian<Nitrification>::add_type ("solute", alist, syntax, &make);
   }
 } NitrificationSolute_syntax;

@@ -61,7 +61,7 @@ Bioclimate::Implementation::Implementation (const AttributeList& al)
     irrigation (0.0),
     irrigation_temperature (0.0),
     intercepted_water (al.number ("intercepted_water")),
-    snow (al.list ("Snow")),
+    snow (al.alist ("Snow")),
     PotEvapotranspiration (0.0),
     ActualEvapotranspiration (0.0),
     EvapInterception (0.0)

@@ -69,7 +69,7 @@ double
 IM::N_left (const AttributeList& al)
 {
   const double N = al.number ("total_N_fraction");
-  const AttributeList& im  = al.list ("im");
+  const AttributeList& im  = al.alist ("im");
   return N * (1.0 - im.number ("NO3") - im.number ("NH4"));
 }
 
@@ -84,7 +84,7 @@ static double IM_get_NO3 (const AttributeList& al)
 	* 0.1;			// kg / m² --> g / cm²
       const double N = weight * al.number ("total_N_fraction");
 
-      IM im (al.list ("im"));
+      IM im (al.alist ("im"));
       
       return N * im.NO3;
     }
@@ -103,7 +103,7 @@ static double IM_get_NH4 (const AttributeList& al)
 	* 0.1;			// kg / m² --> g / cm²
       const double N = weight * al.number ("total_N_fraction");
 
-      IM im (al.list ("im"));
+      IM im (al.alist ("im"));
       
       return N * im.NH4;
     }

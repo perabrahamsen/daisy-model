@@ -183,6 +183,6 @@ Surface::Surface (const AttributeList& al)
     EvapSoilSurface (0.0),
     Eps (0.0),
     T (0.0),
-    im (al.list ("IM")),
+    im (al.alist ("IM")),
     im_flux ()
 { }

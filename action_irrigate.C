@@ -49,7 +49,7 @@ private:
     : Action (p),
       flux (al.number ("flux")),
       temp (al.number ("temperature")),
-      sm (*new IM (al.list ("solute")))
+      sm (*new IM (al.alist ("solute")))
   { }
 public:
   ~ActionIrrigate ()

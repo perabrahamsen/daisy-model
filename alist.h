@@ -50,7 +50,7 @@ public:
        throw2 (Invalid, Uninitialized);
   const CSMP& csmp (string) const 
        throw2 (Invalid, Uninitialized);
-  const AttributeList& list (string) const
+  const AttributeList& alist (string) const
        throw2 (Invalid, Uninitialized);
   int integer (string) const
        throw2 (Invalid, Uninitialized);
@@ -68,7 +68,7 @@ public:
        throw2 (Invalid, Uninitialized);
   const vector<const CSMP*>& csmp_sequence (string key) const
        throw2 (Invalid, Uninitialized);
-  const vector<const AttributeList*>& list_sequence (string key) const
+  const vector<const AttributeList*>& alist_sequence (string key) const
        throw2 (Invalid, Uninitialized);
 
   // Create and Destroy.

@@ -16,7 +16,7 @@ struct Syntax::Implementation
   typedef map<string, category, less<string> > status_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   typedef map<string, int, less<string> > size_map;
-  typedef map<string, const Library*, less<string> > library_map;
+  typedef map<string, const ::Library*, less<string> > library_map;
   typedef map<string, derive_fun, less<string> > derive_map;
   type_map types;
   status_map status;
@@ -52,8 +52,8 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
       else if (types[key] == Object)
 	if (size[key] != Singleton)
 	  {
-	    const Library& lib = *libraries[key];
-	    const vector<const AttributeList*>& seq = vl.list_sequence (key);
+	    const ::Library& lib = *libraries[key];
+	    const vector<const AttributeList*>& seq = vl.alist_sequence (key);
 	    for (vector<const AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
@@ -70,8 +70,8 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
 	  }
 	else 
 	  {
-	    const Library& lib = *libraries[key];
-	    const AttributeList& al = vl.list (key);
+	    const ::Library& lib = *libraries[key];
+	    const AttributeList& al = vl.alist (key);
 	    if (!al.check ("type"))
 	      {
 		cerr << "Non object found \n";
@@ -80,10 +80,10 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
 	    else if (!lib.syntax (al.name ("type")).check (al))
 	      error = true;
 	  }
-      else if (types[key] == List)
+      else if (types[key] == AList)
 	if (size[key] != Singleton)
 	  {
-	    const vector<const AttributeList*>& seq = vl.list_sequence (key);
+	    const vector<const AttributeList*>& seq = vl.alist_sequence (key);
 	    for (vector<const AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
 		 j++)
@@ -93,7 +93,7 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
 		  error = true;
 	      }
 	  }
-	else if (!syntax[key]->check (vl.list (key), key))
+	else if (!syntax[key]->check (vl.alist (key), key))
 	  error = true;
     }
   if (!error && checker && !checker (vl))
@@ -157,7 +157,7 @@ Syntax::Implementation::dump (int indent) const
 	}
       switch (t)
 	{
-	case List:
+	case AList:
 	  {
 	    cout << "\n";
 	    for (unsigned int j = 0; j < indent + name.length () + 2; j++)
@@ -165,7 +165,7 @@ Syntax::Implementation::dump (int indent) const
 	    (*syntax.find (name)).second->dump (indent + name.length () + 2);
 	    break;
 	  }
-	case Class: 
+	case Library: 
 	  {
 	    cout << "\n";
 	    for (unsigned int j = 0; j < indent + name.length () + 2; j++)
@@ -188,8 +188,8 @@ const char*
 Syntax::type_name (type t)
 {
   static const char * const names[] = 
-  { "Number", "List", "CSMP", "Boolean", "String",
-    "Date", "Integer", "Class", "Object", "Error" };
+  { "Number", "AList", "CSMP", "Boolean", "String",
+    "Date", "Integer", "Object", "Library", "Error" };
 
   assert (sizeof (names) / sizeof  (const char*) == Error);
   return names[t];
@@ -228,7 +228,7 @@ Syntax::syntax (string key) const
   return *impl.syntax[key];
 }
 
-const Library&
+const ::Library&
 Syntax::library (string key) const
 {
   assert (impl.libraries.find (key) != impl.libraries.end ());
@@ -276,21 +276,21 @@ Syntax::add (string key, type t, category req, int s)
 void
 Syntax::add (string key, const Syntax& s, category req, int sz)
 {
-  add (key, List, req, sz);
+  add (key, AList, req, sz);
   impl.syntax[key] = &s;
 }
 
 void 
-Syntax::add (string key, const Library& l, category req, int s)
+Syntax::add (string key, const ::Library& l, category req, int s)
 {
   add (key, Object, req, s);
   impl.libraries[key] = &l;
 }
 
 void 
-Syntax::add_class (string key, const Library& l, derive_fun fun)
+Syntax::add_library (string key, const ::Library& l, derive_fun fun)
 {
-  add (key, Class, Optional);
+  add (key, Library, Optional);
   impl.libraries[key] = &l;
   impl.derived[key] = fun;
 }

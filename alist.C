@@ -294,7 +294,7 @@ AttributeList::csmp (string key) const throw2 (AttributeList::Invalid, Attribute
 }
 
 const AttributeList& 
-AttributeList::list (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
+AttributeList::alist (string key) const throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);
 }
@@ -342,7 +342,7 @@ AttributeList::csmp_sequence (string key) const
 }
 
 const vector<const AttributeList*>& 
-AttributeList::list_sequence (string key) const
+AttributeList::alist_sequence (string key) const
      throw2 (AttributeList::Invalid, AttributeList::Uninitialized)
 {
   return *impl.lookup (key);

@@ -53,6 +53,7 @@ public:
 
   static Filter& make (const AttributeList& al);
   FilterArray (const AttributeList& al);
+  ~FilterArray () { }
 };
 
 bool 
@@ -190,7 +191,7 @@ FilterArray::make (const AttributeList& al)
 
 FilterArray::FilterArray (const AttributeList& al)
 { 
-  const vector<const AttributeList*>& members = al.list_sequence ("members");
+  const vector<const AttributeList*>& members = al.alist_sequence ("members");
   for (unsigned int i = 0; i < members.size (); i++)
     {
       bool error = false;

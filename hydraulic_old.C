@@ -4,7 +4,7 @@
 #include "options.h"
 #include "syntax.h"
 #include "alist.h"
-#include "common.h"
+#include "mathlib.h"
 #include "csmp.h"
 #include <fstream.h>
 

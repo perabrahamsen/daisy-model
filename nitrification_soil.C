@@ -9,7 +9,7 @@
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include "csmp.h"
-#include "common.h"
+#include "mathlib.h"
 #include "log.h"
 
 class NitrificationSoil : public Nitrification

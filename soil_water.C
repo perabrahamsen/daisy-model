@@ -12,15 +12,21 @@
 #include "mathlib.h"
 #include "mike_she.h"
 
-void
-SoilWater::clear ()
-{
 #ifdef MIKE_SHE
-  mike_she->put_water_sink (S);
-#endif
+void
+SoilWater::clear (const Geometry& geometry)
+{
+  mike_she->put_water_sink (geometry, S);
 
   fill (S.begin (), S.end (), 0.0);
 }
+#else
+void
+SoilWater::clear (const Geometry&)
+{
+  fill (S.begin (), S.end (), 0.0);
+}
+#endif
 
 void
 SoilWater::add_to_sink (const vector<double>& v)
@@ -206,9 +212,9 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList&)
 
 SoilWater::SoilWater (const Soil& soil, 
 		      const AttributeList& al)
-  : top (UZmodel::create (al.list ("UZtop"))),
+  : top (UZmodel::create (al.alist ("UZtop"))),
     bottom (  al.check ("UZbottom") 
-	    ? UZmodel::create (al.list ("UZbottom"))
+	    ? UZmodel::create (al.alist ("UZbottom"))
 	    : 0),
     bottom_start (  al.check ("UZborder") 
 		  ? al.integer ("UZborder")

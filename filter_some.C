@@ -122,7 +122,7 @@ FilterSome::check (const Syntax& syntax, int /* size */) const
 	      ok = false;
 	    }
 	  break;
-	case Syntax::List:
+	case Syntax::AList:
 	  if (!filter->check (syntax.syntax (name), size))
 	    {
 	      cerr << "- in";
@@ -136,7 +136,7 @@ FilterSome::check (const Syntax& syntax, int /* size */) const
 	      ok = false;
 	    }
 	  break;
-	case Syntax::Class:
+	case Syntax::Library:
 	  cerr << "Class";
 	  ok = false;
 	  break;
@@ -174,7 +174,7 @@ FilterSome::FilterSome (const AttributeList& al)
   all_alist.add ("type", "all");
   Filter& all = Librarian<Filter>::create (all_alist);
     
-  const vector<const AttributeList*>& members = al.list_sequence ("members");
+  const vector<const AttributeList*>& members = al.alist_sequence ("members");
   for (unsigned int i = 0; i < members.size (); i++)
     { 
       const string name = members[i]->name ("name");
@@ -182,7 +182,7 @@ FilterSome::FilterSome (const AttributeList& al)
       if (members[i]->check ("filter"))
 	{
 	  Filter& filter 
-	    = Librarian<Filter>::create (members[i]->list ("filter")); 
+	    = Librarian<Filter>::create (members[i]->alist ("filter")); 
 	  add (name, filter);
 	  if (!accumulating_ && filter.accumulating ())
 	    accumulating_ = true;

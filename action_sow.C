@@ -36,7 +36,7 @@ private:
   { return *new ActionSow (al, p); }
   ActionSow (const AttributeList& al, const Action *const p)
   : Action (p),
-    crop (al.list ("crop"))
+    crop (al.alist ("crop"))
   { }
 public:
   ~ActionSow ()

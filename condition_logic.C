@@ -24,7 +24,7 @@ public:
     return false;
   }
   ConditionOr (const AttributeList& al)
-    : conditions (map_create_const<Condition> (al.list_sequence ("operands")))
+    : conditions (map_create_const<Condition> (al.alist_sequence ("operands")))
   { }
   ~ConditionOr ()
   {
@@ -53,7 +53,7 @@ public:
     return false;
   }
   ConditionAnd (const AttributeList& al)
-    : conditions (map_create_const<Condition> (al.list_sequence ("operands")))
+    : conditions (map_create_const<Condition> (al.alist_sequence ("operands")))
   { }
   ~ConditionAnd ()
   {
@@ -73,7 +73,7 @@ public:
   bool match (const Daisy& daisy) const
   { return !condition.match (daisy); }
   ConditionNot (const AttributeList& al)
-    : condition (Librarian<Condition>::create (al.list ("operand")))
+    : condition (Librarian<Condition>::create (al.alist ("operand")))
   { }
   ~ConditionNot ()
   {
@@ -94,9 +94,9 @@ public:
   bool match (const Daisy& daisy) const
   { return if_c.match (daisy) ? then_c.match (daisy) : else_c.match (daisy); }
   ConditionIf (const AttributeList& al)
-    : if_c (Librarian<Condition>::create (al.list ("if"))),
-      then_c (Librarian<Condition>::create (al.list ("then"))),
-      else_c (Librarian<Condition>::create (al.list ("else")))
+    : if_c (Librarian<Condition>::create (al.alist ("if"))),
+      then_c (Librarian<Condition>::create (al.alist ("then"))),
+      else_c (Librarian<Condition>::create (al.alist ("else")))
   { }
   ~ConditionIf ()
   {

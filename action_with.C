@@ -48,7 +48,7 @@ private:
     : Action (p),
       column (al.name ("column")),
       actions (map_create1<Action, const Action *const>
-	       (al.list_sequence ("actions"), this))
+	       (al.alist_sequence ("actions"), this))
   { }
 public:
   ~ActionWithColumn ()

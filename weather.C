@@ -20,8 +20,8 @@ struct Weather::Implementation
   const IM SoluteDeposit;
   Implementation (const AttributeList& al)
     : Latitude (al.number ("Latitude")),
-      DryDeposit (al.list ("DryDeposit")),
-      SoluteDeposit (al.list ("SoluteDeposit"))
+      DryDeposit (al.alist ("DryDeposit")),
+      SoluteDeposit (al.alist ("SoluteDeposit"))
   { }
 };
 
