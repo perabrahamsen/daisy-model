@@ -3,23 +3,23 @@
 (defcrop Grass default
   (Devel (EmrTSum 125)
 	 (DS_Emr 0.01)
-	 (DSRate1 0.0180)
+	 (DSRate1 0.012)		;[Was: 0.018]
 	 (TempEff1 (-10 0.01) (0 0.01) (20 0.90) (25 1.00) (35 1.20))
 	 (PhotEff1 (00 0.10) (10 0.29) (11 0.55) (12 0.75) (13 0.89) (14 1.00)
 		   (15 1.08) (16 1.14) (17 1.18) (24 1.18))
 	 (DSRate2 0.0275)
 	 (TempEff2 (00 0.00) (10 0.14) (15 0.66) (20 1.00) (25 1.23))
-	 (defined_until_ds 0.9))
+	 (defined_until_ds 2.5))	;[Was: 0.9]
   (Vernal (required true)
-	 (DSLim1 0.10)
-	 (DSLim2 0.11)
-	 (TaLim  5.0)
-	 (TaSum  -50.0))
+	  (DSLim1 0.80)			;[Was: 0.10]
+	  (DSLim2 0.81)			;[Was: 0.11]
+	  (TaLim  5.0)
+	  (TaSum  -50.0))
   (LeafPhot (Qeff 5.0E-2)		; (g/m²/h) / (W/m²)
 	 (Fm   3.0)	      		; g/m²/h
 	 (TempEff (-20 0.0001) (05 0.0001) (10 0.90) 
 		  (25 1.00) (35 0.01) (50 0.0))) ;°C
-  (Canopy (InitGrowth 4.65)
+  (Canopy (InitGrowth 2.3)		;[Was: 4.65 ]
 	 (DSinit 0.07)
 	 (WLfInit 10)			; g/m²
 	 (SpLAI 1.7e-2)		; (m²/m²) / (g/m²)
@@ -30,16 +30,16 @@
 	 (PARext 0.60)
 	 (EPext 0.50))
   (Root (DptEmr 10)
-    (PenPar1 0.20)
-	 (PenPar2 4.0)
-	 (MaxPen 70)
-	 (SpRtLength 10)
-	 (DensRtTip 0.1)
-	 (Rad 0.005)
-	 (h_wp -15000)
-	 (Rxylem 10)
-	 (MxNH4Up 2.5e-7)
-	 (MxNO3Up 2.5e-8))
+	(PenPar1 0.20)
+	(PenPar2 4.0)
+	(MaxPen 70)
+	(SpRtLength 10)
+	(DensRtTip 0.1)
+	(Rad 0.005)
+	(h_wp -15000)
+	(Rxylem 10)
+	(MxNH4Up 2.5e-7)
+	(MxNO3Up 2.5e-8))
   (Partit (Root (0.00 0.50) (0.33 0.25) (0.53 0.20) (1.00 0.00) (2.00 0.00))
 	  (Leaf (0.00 0.90)
 		(0.33 0.85)
@@ -133,7 +133,7 @@
 		 ((efficiency 0.5 0.5)
 		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
-	   (DSmax 0.8)
+	   (DSmax 0.9)			;[Was 0.8]
 	   (DSnew 0.2)
 	   (C_Stem 0.420)
 	   (C_Leaf 0.420)
