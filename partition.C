@@ -24,11 +24,14 @@
 #include "submodel.h"
 #include "syntax.h"
 #include "alist.h"
+#include "check.h"
+#include "mathlib.h"
+#include "tmpstream.h"
 
 void
-Partition::operator () (double DS, double current_RSR,
-			double& f_Leaf, double& f_Stem,
-			double& f_Root, double& f_SOrg) const
+Partition::operator() (double DS, double current_RSR,
+		       double& f_Leaf, double& f_Stem,
+		       double& f_Root, double& f_SOrg) const
 {
   if (current_RSR > RSR (DS))
     f_Root = 0.0;
@@ -37,27 +40,66 @@ Partition::operator () (double DS, double current_RSR,
   f_Leaf = (1 - f_Root) * Leaf (DS);
   f_Stem = (1 - f_Root) * Stem (DS);
   f_SOrg = max (0.0, 1 - f_Root - f_Leaf - f_Stem);
+  daisy_assert (f_SOrg > -1e-5);
   if (f_SOrg < 1e-5)
     {
       f_Root += f_SOrg;
       f_SOrg = 0.0;
     }
+  daisy_assert (approximate (f_Root + f_Leaf + f_Stem + f_SOrg, 1.0));
+  daisy_assert (bound (0.0, f_Leaf, 1.0));
+  daisy_assert (bound (0.0, f_Stem, 1.0));
+  daisy_assert (bound (0.0, f_Root, 1.0));
+  daisy_assert (bound (0.0, f_SOrg, 1.0));
+}
+
+static bool check_alist (const AttributeList& al, Treelog& err)
+{
+  bool ok = true;
+
+  const PLF& Leaf = al.plf ("Leaf");
+  const PLF& Stem = al.plf ("Stem");
+
+  PLF Shoot = Stem;
+  Shoot += Leaf;
+
+  if (Shoot.max () > 1.0001)
+    {
+      TmpStream tmp;
+      tmp () << "Leaf and Stem fractions must be <= 1.0 combined.\n"
+	     << "They are " << Shoot.max () << " at " << Shoot.max_at ();
+      err.error (tmp.str ());
+      ok = false;
+    }
+  return ok;
 }
 
 void 
 Partition::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add_check (check_alist);
   alist.add ("submodel", "Partition");
   alist.add ("description", "\
-Assimilate partitioning in the default crop model.");
-  syntax.add ("Root", "DS", Syntax::None (), Syntax::Const,
-	      "Partitioning functions for root.");
-  syntax.add ("Leaf", "DS", Syntax::None (), Syntax::Const,
-	      "Partitioning functions for leaves.");
-  syntax.add ("Stem", "DS", Syntax::None (), Syntax::Const,
-	      "Partitioning functions for stem.");
-  syntax.add ("RSR", "DS", Syntax::None (), Syntax::Const,
-	      "Root/Shoot ratio as a function of development state.");
+Assimilate partitioning in the default crop model.\n\
+The 'Root' parameter determine what fraction of the assimilate for growth\n\
+goes to roots at a given development stage.  The remaining assimilate goes\n\
+to the shoot.  The 'Leaf' and 'Stem' parameters determine what fraction of\n\
+the shoot assimilate goes to the leaf and stem respectively.  The remaining\n\
+shoot assimilate will go to the storage organ.");
+  syntax.add ("Root", "DS", Syntax::Fraction (), Check::fraction (),
+	      Syntax::Const, "\
+Fraction of assimilate for growth that goes to the roots, as a function of\n\
+the crop development stage.  The remaining growth assimilate goes to the\n\
+shoot.");
+  syntax.add ("Leaf", "DS", Syntax::Fraction (), Check::fraction (),
+	      Syntax::Const,
+	      "Fraction of shoot assimilate that goes to the leafs.");
+  syntax.add ("Stem", "DS", Syntax::Fraction (), Check::fraction (),
+	      Syntax::Const,
+	      "Fraction of shoot assimilate that goes to the stem.");
+  syntax.add ("RSR", "DS", Syntax::None (), Check::positive (), Syntax::Const,
+	      "Maximal root/shoot ratio as a function of development state.\n\
+If the root/shoot ratio is above this, the roots will srtart dying.");
 }
 
 Partition::Partition (const AttributeList& al)

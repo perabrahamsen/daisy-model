@@ -169,6 +169,20 @@ public:
 	    category cat,
 	    const string& description)
   { add (key, domain, range, cat, Singleton, description); } 
+  void add (const string& key,
+	    const string& domain,
+	    const string& range,
+	    const Check& check,
+	    category cat,
+	    int size,
+	    const string& description);
+  void add (const string& key, 
+	    const string& domain,
+	    const string& range,
+	    const Check& check,
+	    category cat,
+	    const string& description)
+  { add (key, domain, range, check, cat, Singleton, description); } 
 
   void add (const string& key,  // AList
 	    const Syntax& syntax,

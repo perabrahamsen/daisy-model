@@ -36,6 +36,8 @@ struct PLF::Implementation
   PLF inverse_safe () const;
   double first_interesting () const;
   double last_interesting () const;
+  double min () const;
+  double max () const;
   double max_at () const;
   double integrate (const double from, const double to) const;
   PLF integrate_stupidly () const;
@@ -143,6 +145,38 @@ PLF::Implementation::last_interesting () const
     if (y[i] != y[i+1])
       return x[i+1];
   throw invalid_argument ("PLF::last_interesting: constant function");
+}
+
+// Find the functions minimum value.
+double
+PLF::Implementation::min () const
+{
+  const int size = x.size ();
+  if (size < 1)
+    throw invalid_argument ("PLF::min: empty function");
+  double min_y = y[0];
+  
+  for (unsigned int i = 1; i < size; i++)
+    if (y[i] < min_y)
+      min_y = y[i];
+
+  return min_y;
+}
+
+// Find the functions maximum value.
+double
+PLF::Implementation::max () const
+{
+  const int size = x.size ();
+  if (size < 1)
+    throw invalid_argument ("PLF::max: empty function");
+  double max_y = y[0];
+  
+  for (unsigned int i = 1; i < size; i++)
+    if (y[i] > max_y)
+      max_y = y[i];
+
+  return max_y;
 }
 
 // Find an x value where the function reach its maximum value.
@@ -255,6 +289,14 @@ PLF::first_interesting () const
 double
 PLF::last_interesting () const
 { return impl.last_interesting (); }
+
+double
+PLF::min () const
+{ return impl.min (); }
+
+double
+PLF::max () const
+{ return impl.max (); }
 
 double
 PLF::max_at () const

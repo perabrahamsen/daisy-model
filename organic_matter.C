@@ -1576,10 +1576,12 @@ Initial value will be estimated based on equilibrium with AM and SOM pools.",
   alist.add ("dom", DOM);
 
   PLF empty;
-  syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
+  syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
+	      Syntax::Const,
 	      "Default heat factor, used if not specified by OM pool.");
   alist.add ("heat_factor", empty);
-  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::Const, "\
+  syntax.add ("water_factor", "cm", Syntax::None (), Check::non_negative (),
+	      Syntax::Const, "\
 Default water potential factor, used if not specified by OM pool.\n\
 If the PLF is empty, a build-in PLF of pF will be used instead.\n\
 It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
@@ -1595,13 +1597,13 @@ It is 0.6 at pF < 0, 1.0 at 1.5 < pF < 2.5, and 0 at pF > 6.5.");
   alist.add ("ClayOM", clay_alist);
   syntax.add ("tillage_age", "days", Syntax::OptionalState, Syntax::Sequence,
 	      "Time since the latest tillage operation was performed."); 
-  syntax.add ("smb_tillage_factor", "days", Syntax::None (), 
-	      Syntax::Const, Syntax::Sequence,
+  syntax.add ("smb_tillage_factor", "d", Syntax::None (), 
+	      Check::non_negative (), Syntax::Const, Syntax::Sequence,
 	      "Tillage influence on turnover rates for each SMB pool.\n\
 If no value is given, tillage will have no influence.");
   alist.add ("smb_tillage_factor", vector<const PLF*> ());
-  syntax.add ("som_tillage_factor", "days", Syntax::None (), 
-	      Syntax::Const, Syntax::Sequence,
+  syntax.add ("som_tillage_factor", "d", Syntax::None (), 
+	      Check::non_negative (), Syntax::Const, Syntax::Sequence,
 	      "Tillage influence on SOM turnover rates for each SOM pool.\n\
 If no value is given, tillage will have no influence.");
   alist.add ("som_tillage_factor", vector<const PLF*> ());

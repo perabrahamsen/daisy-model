@@ -29,7 +29,7 @@
 #include "plf.h"
 #include "mathlib.h"
 #include "submodel.h"
-
+#include "check.h"
 void
 CrpN::cut (const double DS)
 {
@@ -154,37 +154,51 @@ Default crop nitrogen parameters.");
 Obsolete: Use 'Prod NCrop' instead.");
 
   // Content.
-  syntax.add ("PtLeafCnc", "DS", " g N/g DM", Syntax::Const,
+  syntax.add ("PtLeafCnc", "DS", " g N/g DM", Check::non_negative (),
+	      Syntax::Const,
 	      "Upper limit for N-concentration in leaves.");
-  syntax.add ("CrLeafCnc", "DS", " g N/g DM", Syntax::Const,
+  syntax.add ("CrLeafCnc", "DS", " g N/g DM", Check::non_negative (),
+	      Syntax::Const,
 	      "Critical limit for N-concentration in leaves.");
-  syntax.add ("NfLeafCnc", "DS", " g N/g DM", Syntax::Const, "\
+  syntax.add ("NfLeafCnc", "DS", " g N/g DM", Check::non_negative (),
+	      Syntax::Const, "\
 Non-functional limit for N-concentration in leaves.");
-  syntax.add ("PtStemCnc", "DS", " g N/g DM", Syntax::Const,
+  syntax.add ("PtStemCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const,
 	      "Upper limit for N-concentration in stem.");
-  syntax.add ("CrStemCnc", "DS", " g N/g DM", Syntax::Const,
+  syntax.add ("CrStemCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const,
 	      "Critical limit for N-concentration in stem.");
-  syntax.add ("NfStemCnc", "DS", " g N/g DM", Syntax::Const, "\
+  syntax.add ("NfStemCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const, "\
 Non-functional limit for N-concentration in stem.");
-  syntax.add ("PtSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+  syntax.add ("PtSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const, "\
 Upper limit for N-concentration in storage organ.");
-  syntax.add ("CrSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+  syntax.add ("CrSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const, "\
 Critical limit for N-concentration in storage organ.");
-  syntax.add ("NfSOrgCnc", "DS", " g N/g DM", Syntax::Const, "\
+  syntax.add ("NfSOrgCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const, "\
 Non-functional limit for N-concentration in storage organ.");
-  syntax.add ("PtRootCnc", "DS", " g N/g DM", Syntax::Const,
+  syntax.add ("PtRootCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const,
 	      "Upper limit for N-concentration in roots.");
-  syntax.add ("CrRootCnc", "DS", " g N/g DM", Syntax::Const,
+  syntax.add ("CrRootCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const,
 	      "Critical limit for N-concentration in roots.");
-  syntax.add ("NfRootCnc", "DS", " g N/g DM", Syntax::Const, "\
+  syntax.add ("NfRootCnc", "DS", " g N/g DM", Check::non_negative (),
+              Syntax::Const, "\
 Non-functional lim for N-concentration in roots.");
-  syntax.add ("TLLeafEff", "DS", Syntax::Fraction (), Syntax::Const,
+  syntax.add ("TLLeafEff", "DS", Syntax::Fraction (), Check::fraction (),
+	      Syntax::Const,
 	      "Translocation effiency, Leaf.");
   PLF TLLeafEff;
   TLLeafEff.add (0.00, 0.90);
   TLLeafEff.add (2.00, 0.90);
   alist.add ("TLLeafEff", TLLeafEff);
-  syntax.add ("TLRootEff", "DS", Syntax::Fraction (), Syntax::Const,
+  syntax.add ("TLRootEff", "DS", Syntax::Fraction (), Check::fraction (),
+	      Syntax::Const,
 	      "Translocation effiency, Root.");
   PLF TLRootEff;
   TLRootEff.add (0.00, 0.10);

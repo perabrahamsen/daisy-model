@@ -12,6 +12,33 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.44
+
+** You can now overwrite individual parameters in lists of submodels
+
+For example, if you want to create a version pig_slurry (form
+fertilizer.dai) with faster turnover, you can do it
+
+  (defam my_slurry pig_slurry
+    "Pig slurry with faster turnover rates."
+    (om ((turnover_rate 5.0e-4))
+        ((turnover_rate 3.0e-3)) 
+        ()))
+
+This specifies a slurry with three OM pools.  The pools have the same
+parameters as pig_slurry, except that the first two pools have a
+faster turnover rate.  Note that pig_slurry itself have three OM
+pools, a slow pool, a fast pool, and a pool that go directly to SOM2.
+
+If my_slurry had more OM pools than pig_slurry, you would have had to
+specify all parameters for the additional OM pools.
+
+The last empty set of parantheses in the definition of my_slurry is
+needed, otherwise you would not have got a copy of the third pool from
+pig_slurry. 
+
+** New checks and better descriptions for many parameters.
+
 * 2.43
 
 ** "Grass to grain" grass model now regrow after afull cur or after it is ripe.

@@ -458,12 +458,14 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil,
   int i_drainage = -42;		// Shut up gcc.
   GWT_new = height;
   const int i_GWT = soil.interval_plus (height) + 1;
+  daisy_assert (i_GWT <= i_bottom);
   for (unsigned int i = i_GWT; i <= i_bottom; i++)
     {
        i_drainage = i;
        const double def = EquilibriumDrainage(i_drainage, soil, h_ice);
        if (def >= deficit) break;
     }
+  daisy_assert (i_drainage >= 0);
   double def = deficit - S[i_GWT] * soil.dz (i_GWT) * dt;
   S[i_GWT] = 0.0;
   for (unsigned int i = i_drainage; i > i_GWT; i--)
@@ -545,8 +547,11 @@ GroundwaterPipe::FallingGWT2 (const Soil& soil,
     {
        i_drainage = i;
        const double def = EquilibriumDrainage(i_drainage, soil, h_ice);
-       if (def >= deficit) break;
+       if (def >= deficit) 
+	 goto found;
     }
+  throw ("Groundwater falling below last node, need aquitard horizon");
+ found:
   GWT_new = soil.zplus (i_drainage);
   for (unsigned int i = i_drainage; i > i_GWT; i--)
     {
@@ -707,7 +712,8 @@ By default, this is 1/2 L.");
 		  "Conductivity of the aquitard.");
       alist.add ("K_aquitard", 1.0E-5);
       syntax.add ("Z_aquitard", "cm", Check::positive (), Syntax::Const,
-		  "Height of the aquitard.");
+		  "Thickness of the aquitard.\n\
+The aquitard begins below the bottommost soil horizon.");
       alist.add ("Z_aquitard", 200.0);
       syntax.add ("h_aquifer", "cm", Check::positive (), Syntax::OptionalConst,
 		  "Pressure potential in the aquifer below the aquitard.\n\

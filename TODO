@@ -1,24 +1,12 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Læg svar på øvelser på hjemmeside.
+* pea.dai, wwheat.dai: BUG Partit Leaf + Stem > 1.0
 
-* SH: 
+* SH: Læg svar på øvelser på hjemmeside.
+
+* SH: PowerPoint slides på hjemmeside.
 
 * Forced LAI i planter.
-
-* Øvelser:
-
-** groundwater pipe
-
-*** ref: Forklar at aquitard stopper efter nederste horisont
-
-*** ref: z_aquitard: Thickness, not height
-
-*** tut: forklar hvordan og hvornår man laver en aquitard horizont.
-
-** CanopyStandard Partit
-
-Forklar hvor meget går til hvilke steder.
 
 * weather default year
 
@@ -30,9 +18,7 @@ Den skal nok være i .dai filen...
   (missing_years (((1987 1990) (1993 1997))
 	          ((2001 2001) (1991 1991)))))
 
-* OrganicMatter XOM
-
-Gør det muligt at overskrive turnover_rate uden at sætte fractions m.m.
+* Soil geometry discretization: max interval 2 * dispersivity
 
 * DOM
 

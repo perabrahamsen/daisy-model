@@ -29,6 +29,7 @@
 #include "submodel.h"
 #include "mathlib.h"
 #include "tmpstream.h"
+#include "check.h"
 
 // Chemical constants affecting the crop.
 const double molWeightCH2O = 30.0; // [gCH2O/mol]
@@ -121,12 +122,13 @@ Default leaf photosynthesis parameters.");
 
   syntax.add ("Qeff", "(g CO2/m^2/h)/(W/m^2)", Syntax::Const,
 	      "Quantum efficiency at low light.");
-  syntax.add ("Fm", "g CO2/m^2/h", Syntax::Const,
+  syntax.add ("Fm", "g CO2/m^2/h", Check::positive (), Syntax::Const,
 	      "Maximum assimilation rate.");
-  syntax.add ("TempEff", "dg C", Syntax::None (), Syntax::Const,
+  syntax.add ("TempEff", "dg C", Syntax::None (), Check::non_negative (),
+	      Syntax::Const,
 	      "Temperature effect, photosynthesis.");
-  syntax.add ("DSEff", "-", Syntax::None (), Syntax::Const,
-	      "Development Stage effect, photosynthesis.");
+  syntax.add ("DSEff", "DS", Syntax::None (), Check::non_negative (),
+	      Syntax::Const, "Development Stage effect, photosynthesis.");
   alist.add ("DSEff",DS_null_eff);
 }
 

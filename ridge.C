@@ -30,6 +30,7 @@
 #include "log.h"
 #include "soil.h"
 #include "soil_water.h"
+#include "check.h"
 
 struct Ridge::Implementation
 {
@@ -426,14 +427,15 @@ Ridge::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("description", "Surface model after ridging.");
   
   // Parameters.
-  syntax.add ("z", Syntax::Fraction (), "cm", Syntax::Const, "\
+  syntax.add ("z", Syntax::Fraction (), "cm", Check::none (), Syntax::Const, "\
 The basic ridge parameter is the height, formulated as z (x),\n\
 where x is the relative distance from the middle of the ridge.\n\
 x = 0.0 is in the middle of a ridge, while x = 1.0 is at the\n\
 maximal distance.  The ridge is assumed to be symmetric.\n\
 z (x) is measured in centimeter above the unridged soil surface, which\n\
 means it is in the same reference system as the rest of the model.");
-  syntax.add ("R_crust", "h", Syntax::Const, "Resistance in crust.");
+  syntax.add ("R_crust", "h", Check::non_negative (), Syntax::Const,
+	      "Resistance in crust.");
   syntax.add_fraction ("switch", Syntax::Const, "\
 Fraction of ridge height where we switch from bottom regime to wall regime.");
   alist.add ("switch", 1.0/3.0);

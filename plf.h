@@ -45,6 +45,8 @@ public:
   PLF inverse_safe () const;
   double first_interesting () const;
   double last_interesting () const;
+  double min () const;
+  double max () const;
   double max_at () const;
   double integrate (double from, double to) const;
   PLF integrate_stupidly () const;

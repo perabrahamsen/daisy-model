@@ -523,7 +523,7 @@ Syntax::add_fraction (const string& key,
 { add (key, Fraction (), Check::fraction (), cat, Singleton, description); } 
 
 void
-Syntax::add (const string& key, const string& dom, const string& ran,
+Syntax::add (const string& key, const string& dom, const string& ran, 
 	     category req, int sz, const string& d)
 {
   add (key, PLF, req, sz, d);
@@ -531,6 +531,14 @@ Syntax::add (const string& key, const string& dom, const string& ran,
     impl.domains[key] = dom;
   if (ran != Unknown ())
     impl.dimensions[key] = ran;
+}
+
+void
+Syntax::add (const string& key, const string& dom, const string& ran, 
+	     const Check& check, category req, int sz, const string& d)
+{
+  add (key, dom, ran, req, sz, d);
+  impl.num_checks[key] = &check;
 }
 
 void

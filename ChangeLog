@@ -1,4 +1,27 @@
+2003-01-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* partition.C (operator()): Added checks.
+
+2003-01-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* partition.C (operator()): Add check.
+
+	* syntax.C, syntax.h (add): Add range check for PLF.
+	* parser_file.C (load_list): Add range check for PLF.
+	* photosynthesis.C (load_syntax): Added checks.
+	* crpn.C (load_syntax): Ditto.
+	* denitrification.C (load_syntax): Ditto.
+	* organic_matter.C (load_syntax): Ditto.
+	* ridge.C (load_syntax): Ditto.
+
+	* plf.C, plf.h (min, max): New functions.
+	* partition.C (load_syntax): Better descriptions.
+	(check_alist): New function.
+	(load_syntax): Use it.
+
 2003-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C (Z_aquitard): Improved description.
 
 	* Version 2.43 released.
 

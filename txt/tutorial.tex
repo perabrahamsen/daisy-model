@@ -663,15 +663,15 @@ where
   this is $1/2 \mathtt{L}$, i.e.\ in the middle between the pipes.
 \item[\texttt{pipe\_position}] Height pipes are placed in the soil.
 \item[\texttt{K\_aquitard}] Conductivity of the aquitard.
-\item[\texttt{Z\_aquitard}] Height of the aquitard.
+\item[\texttt{Z\_aquitard}] Thickness of the aquitard.
 \item[\texttt{h\_aquifer}] Pressure potential in the aquifer below the
   aquitard. By default. this is equal to \texttt{Z\_aquitard}.
 \end{description}
 The above numbers are the default values, i.e.\ what you get if you
 don't specify anything.  \texttt{L} and \texttt{pipe\_position} are
-standard values for Danish fields.  The aquitard is explained
-in~\cite{daisy-new}, the \texttt{K\_aquitard} parameter is what
-you usually want to calibrate.
+standard values for Danish fields.  The aquitard is water blocking
+layer explained in~\cite{daisy-new}, the \texttt{K\_aquitard}
+parameter is what you usually want to calibrate.
 
 \textbf{Note:} When using drained soil, all numerical nodes will
 contribute to the drain sink term, not just the node containing the
@@ -679,6 +679,42 @@ pipe.  This is because the pipe is assumed to be at some distance from
 our node (as specified by the \texttt{x} or \texttt{L} parameter), and
 the sink term is actually the simulated horizontal movement of water
 towards the pipe.
+
+\subsubsection{Aquitard horizons}
+\label{sec:aquitard}
+
+For some soils the groundwater table can fall into the aquitard on dry
+years.  When this happens, \daisy{} will stop with an error.  In order
+to proceed, you need to make the top of the aquitard part of the soil
+profile.  You do this by defining an ``aquitard'' horizon, and place
+that below your lowest horizon.  The only important parameter for the
+aquitard horizon is \texttt{K\_sat}, which must be identical to
+\texttt{\texttt{K\_aquitard}}.  You also need to \texttt{Z\_aquitard}
+corresponding to the thickness of your new aquitard horizon.
+
+\begin{verbatim}
+  (defhorizon aquitard C
+    (hydraulic M_vG
+       ;; These parameters are not important.
+       (Theta_res 0.05 [cm^3 H2O/cm^3])
+       (Theta_sat 0.424 [cm^3 H2O/cm^3])
+       (alpha 0.069 [cm^-1])
+       (n 1.527)
+       ;; Note: same as K_aquitard
+       (K_sat 1.0e-5 [cm/h])))
+
+  (defcolumn Andeby default
+    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C) 
+                    ;; Top 50 cm of aquitard.
+                    (-3.0 [m] aquitard))
+          (MaxRootingDepth 60.0 [cm]))
+    (Groundwater pipe
+                 ;; Use same K_sat as the aquitard horizon.
+                 (K_aquitard 1.0e-5 [cm/h])
+                 ;; Decrease thickness with 50 cm from default 
+                 ;; of 2.0 m to compensate for aquitard horizon.
+                 (Z_aquitard 1.5 [m]))) 
+\end{verbatim}
 
 \subsection{Macropores}
 \label{sec:macro}

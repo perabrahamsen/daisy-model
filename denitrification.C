@@ -123,10 +123,11 @@ Maximum fraction of nitrate converted at each time step.");
 	      Syntax::Const, "Anaerobic denitrification constant.");
   alist.add ("alpha", 0.1);
   PLF empty;
-  syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,
-	      "Heat factor.");
+  syntax.add ("heat_factor", "dg C", Syntax::None (), Check::non_negative (),
+	      Syntax::Const, "Heat factor.");
   alist.add ("heat_factor", empty);
-  syntax.add ("water_factor", Syntax::Fraction (), Syntax::None (),
+  syntax.add ("water_factor", Syntax::Fraction (), Syntax::None (), 
+	      Check::non_negative (),
 	      Syntax::Const,
 	      "Water potential factor, a function of the current\n\
 water content as a fraction of the maximal water content.");

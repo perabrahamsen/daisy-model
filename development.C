@@ -25,6 +25,7 @@
 #include "plf.h"
 #include "log.h"
 #include "submodel.h"
+#include "check.h"
 
 void
 Development::light_hour ()
@@ -109,26 +110,30 @@ Crop development and phenology in the default crop model.");
   SMF.add (-50.00, 1.00);
   SMF.add (-30.00, 1.00);
   alist.add("EmrSMF",SMF);
-  syntax.add ("DS_Emr", Syntax::None (), Syntax::Const,
+  syntax.add ("DS_Emr", Syntax::None (), Check::none (), Syntax::Const,
 	      "Development stage at emergence.");
   alist.add ("DS_Emr", 0.01);
-  syntax.add ("DSRate1", Syntax::None (), Syntax::Const,
+  syntax.add ("DSRate1", Syntax::None (), Check::non_negative (),
+	      Syntax::Const,
 	      "Development rate in the vegetative stage.");
-  syntax.add ("DSRate2", Syntax::None (), Syntax::Const,
+  syntax.add ("DSRate2", Syntax::None (), Check::non_negative (),
+	      Syntax::Const,
 	      "Development rate in the reproductive stage.");
-  syntax.add ("TempEff1", "dg C", Syntax::None (), Syntax::Const,
+  syntax.add ("TempEff1", "dg C", Syntax::None (), Check::none (),
+	      Syntax::Const,
 	      "Temperature effect, vegetative stage.");
-  syntax.add ("TempEff2", "dg C", Syntax::None (), Syntax::Const,
+  syntax.add ("TempEff2", "dg C", Syntax::None (), Check::none (),
+	      Syntax::Const,
 	      "Temperature effect, reproductive stage.");
-  syntax.add ("PhotEff1", "h", Syntax::None (), Syntax::Const,
+  syntax.add ("PhotEff1", "h", Syntax::None (), Check::none (), Syntax::Const,
 	      "Photoperiode effect, vegetative stage.");
-  syntax.add ("DSMature", Syntax::None (), Syntax::Const,
+  syntax.add ("DSMature", Syntax::None (), Check::none (), Syntax::Const,
 	      "Development stage at maturation.");
   alist.add ("DSMature", 2.0);
-  syntax.add ("DSRepeat", Syntax::None (), Syntax::Const,
+  syntax.add ("DSRepeat", Syntax::None (), Check::none (), Syntax::Const,
 	      "Development stage when DS set back is activated.");
   alist.add ("DSRepeat", 4.0);
-  syntax.add ("DSSetBack", Syntax::None (), Syntax::Const,
+  syntax.add ("DSSetBack", Syntax::None (), Check::none (), Syntax::Const,
 	      "Development stage set babk at DSRepeat.");
   alist.add ("DSSetBack", 1.7);
   syntax.add ("defined_until_ds", Syntax::None (), Syntax::Const,
@@ -140,19 +145,19 @@ This parameterization is only valid until the specified development state.");
   syntax.add ("DS", Syntax::None (), Syntax::State,
 	      "Development Stage.");
   alist.add ("DS", -1.0);
-  syntax.add ("partial_day_length", "h", Syntax::State,
+  syntax.add ("partial_day_length", "h", Check::non_negative (), Syntax::State,
 	      "Number of light hours this day, so far.");
   alist.add ("partial_day_length", 0.0);
-  syntax.add ("day_length", "h", Syntax::State,
+  syntax.add ("day_length", "h", Check::non_negative (), Syntax::State,
 	      "Number of light hours yesterday.");
   alist.add ("day_length", 0.0);
-  syntax.add ("partial_soil_temperature", "dg C h", Syntax::State,
-	      "Soil temperature hours this day, so far.");
+  syntax.add ("partial_soil_temperature", "dg C h", Check::none (), 
+	      Syntax::State, "Soil temperature hours this day, so far.");
   alist.add ("partial_soil_temperature", 0.0);
-  syntax.add ("soil_temperature", "dg C", Syntax::State,
+  syntax.add ("soil_temperature", "dg C", Check::none (), Syntax::State,
 	      "Average soil temperature yesterday.");
   alist.add ("soil_temperature", 0.0);
-  syntax.add ("soil_h", "cm", Syntax::State,
+  syntax.add ("soil_h", "cm", Check::none (), Syntax::State,
 	      "Soil pressure potential.");
   alist.add ("soil_h", -100.0);
 

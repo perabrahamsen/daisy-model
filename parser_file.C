@@ -506,7 +506,15 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    last_x = x;
 		    count++;
 		  }
-		  double y = get_number (range);
+		  const double y = get_number (range);
+		  try
+		    {
+		      syntax.check (name, y);
+		    }
+		  catch (const string& message)
+		    {
+		      error (name + ": " + message);
+		    }
 		  skip (")");
 		  plf.add (x, y);
 		}
@@ -569,7 +577,7 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  const string obj = al.name ("type");
 		  if (obj == "error")
 		    break;
-#if 1
+#if 0
 		  // We can only use complete objects as attribute
 		  // values.
 		  // NO LONGER TRUE with the "original" type.
@@ -622,20 +630,31 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		// We don't support fixed sized object arrays yet.
 		daisy_assert (syntax.size (name) == Syntax::Sequence);
 		const Library& lib = syntax.library (name);
+		static const vector<AttributeList*> no_sequence;
 		vector<AttributeList*> sequence;
+		const vector<AttributeList*>& old_sequence
+		  = atts.check (name) 
+		  ? atts.alist_sequence (name) 
+		  : no_sequence;
 		while (!looking_at (')') && good ())
 		  {
-		    AttributeList& al = load_derived (lib, true, NULL);
+		    const int element = sequence.size ();
+		    AttributeList& al 
+		      = (old_sequence.size () > element
+			 ? load_derived (lib, true, old_sequence[element])
+			 : load_derived (lib, true, NULL));
 		    const string obj = al.name ("type");
 		    if (obj != "error")
 		      {
+#if 0
 			// We can only use complete objects as attribute
 			// values.
 			TmpStream tmp;
 			TreelogStream treelog (tmp ());
 			Treelog::Open nest (treelog, obj);
-			bool ok = lib.syntax (obj).check (al, treelog);
+			const bool ok = lib.syntax (obj).check (al, treelog);
 			if (!ok)
+			  // Maybe don't put it on the list?
 			  error (string ("Error for member '") + obj 
 				 + "' in library '" + name
 				 + "'\n--- details:\n" + tmp.str () + "---");
@@ -643,8 +662,9 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			  warning (string ("Warning for member '") + obj 
 				   + "' in library '" + name
 				   + "'\n--- details:\n" + tmp.str () + "---");
+#endif
+			sequence.push_back (&al);
 		      }
-		    sequence.push_back (&al);
 		  }
 		atts.add (name, sequence);
 		sequence_delete (sequence.begin (), sequence.end ());
@@ -653,7 +673,12 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 	    case Syntax::AList:
 	      {
 		int size = syntax.size (name);
+		static const vector<AttributeList*> no_sequence;
 		const Syntax& syn = syntax.syntax (name);
+		const vector<AttributeList*>& old_sequence
+		  = atts.check (name) 
+		  ? atts.alist_sequence (name) 
+		  : no_sequence;
 		vector<AttributeList*> sequence;
 		bool skipped = false;
 		// Design bug:  We do not force parentheses around the
@@ -677,8 +702,11 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		while (!looking_at (')') && good ())
 		  {
 		    skip ("(");
+		    const int element = sequence.size ();
 		    AttributeList& al
-		      = *new AttributeList (syntax.default_alist (name));
+		      = *new AttributeList (old_sequence.size () > element
+					    ? *old_sequence[element]
+					    : syntax.default_alist (name));
 		    load_list (al, syn);
 		    sequence.push_back (&al);
 		    skip (")");
@@ -721,6 +749,14 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 			  count++;
 			}
 			double y = get_number (range);
+			try
+			  {
+			    syntax.check (name, y);
+			  }
+			catch (const string& message)
+			  {
+			    error (name + ": " + message);
+			  }
 			skip (")");
 			plf.add (x, y);
 		      }
