@@ -41,7 +41,8 @@ public:
   // Use.
 public:
   void entry (const string&);
-  
+  void flush ();
+
   // Create and Destroy.
 public:
   TreelogDual (const string& file, ostream&);

@@ -41,8 +41,10 @@ Assertion::failure (const char* file, int line, const char* fun,
   tmp () << "\n";
   
   for (unsigned int i = 0; i < logs.size (); i++)
-    logs[i]->error (tmp.str ());
-
+    {
+      logs[i]->error (tmp.str ());
+      logs[i]->flush ();
+    }
   exit (3);
 };
 

@@ -54,6 +54,9 @@ public:
   void close ()
   { }
 
+  // Use.
+  void flush ();
+
   // Create and Destroy.
 public:
   TreelogNull ()

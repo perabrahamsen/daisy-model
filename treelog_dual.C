@@ -44,6 +44,8 @@ struct TreelogDual::Implementation
 
   void entry (const string& text);
 
+  void flush ();
+
   Implementation (const string& filename, ostream& second)
     : file (filename),
       one (NULL),
@@ -96,6 +98,14 @@ TreelogDual::Implementation::entry (const string& text)
   two << text << "\n";
 }
 
+void 
+TreelogDual::Implementation::flush ()
+{
+  if (one)
+    one->flush ();
+  two.flush ();
+}
+
 void
 TreelogDual::open (const string& name)
 { 
@@ -116,6 +126,10 @@ TreelogDual::entry (const string& text)
   impl.entry (text);
   Treelog::entry (text);
 }
+
+void
+TreelogDual::flush ()
+{ impl.flush (); }
 
 TreelogDual::TreelogDual (const string& file, ostream& two)
   : impl (*new Implementation (file, two))

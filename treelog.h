@@ -51,6 +51,7 @@ public:
   virtual void message (const string&);
   virtual void warning (const string&);
   virtual void error (const string&);
+  virtual void flush () = 0;
   
   // Create and Destroy.
 public:
