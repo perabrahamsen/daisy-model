@@ -42,9 +42,13 @@ struct WeatherHourly : public WeatherOld
 
   // Accumulated values.
   double accumulated_global_radiation;
+  double accumulated_max_air_temperature;
+  double accumulated_min_air_temperature;
   double accumulated_air_temperature;
   unsigned int accumulated_count;
   double daily_air_temperature_;
+  double daily_max_air_temperature_;
+  double daily_min_air_temperature_;
 
   // Simulation.
   void tick (const Time&, Treelog&);
@@ -52,6 +56,10 @@ struct WeatherHourly : public WeatherOld
   // Communication with Bioclimate.
   double daily_air_temperature () const
     { return daily_air_temperature_; }
+  double daily_max_air_temperature () const
+    { return daily_max_air_temperature_; }
+  double daily_min_air_temperature () const
+    { return daily_min_air_temperature_; }
   double hourly_air_temperature () const
     { return air_temperature; }
   double hourly_global_radiation () const
@@ -80,8 +88,12 @@ struct WeatherHourly : public WeatherOld
       wind_ (-42.42e42),
       accumulated_global_radiation (0.0),
       accumulated_air_temperature (0.0),
+      accumulated_max_air_temperature (-1000.0),
+      accumulated_min_air_temperature (1000.0),
       accumulated_count (0),
       daily_air_temperature_ (-42.42e42)
+      daily_air_max_temperature_ (-42.42e42)
+      daily_air_min_temperature_ (42.42e42)
     { }
 
   ~WeatherHourly ()
@@ -138,6 +150,11 @@ WeatherHourly::tick (const Time& time, Treelog& out)
 
       accumulated_global_radiation += global_radiation;
       accumulated_air_temperature += air_temperature;
+      if (air_temperature > accumulated_max_air_temperature)
+	accumulated_max_air_temperature = air_temperature;
+      if (air_temperature < accumulated_min_air_temperature)
+	accumulated_min_air_temperature = air_temperature;
+
       accumulated_count++;	// BUGLET: We ignore missing values.
 
       if (hour == 0)
@@ -148,6 +165,8 @@ WeatherHourly::tick (const Time& time, Treelog& out)
 	    = accumulated_air_temperature / accumulated_count;
 	  accumulated_global_radiation = 0.0;
 	  accumulated_air_temperature = 0.0;
+	  accumulated_max_air_temperature = -1000.0;
+	  accumulated_min_air_temperature = 1000.0;
 	  accumulated_count = 0;
 	}
     }

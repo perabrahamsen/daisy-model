@@ -46,6 +46,7 @@ struct TreelogDual::Implementation
   deque<bool> touched_one;
   deque<bool> touched_two;
 
+  void touch (std::ostream& out, deque<bool>& touched);
   void print (std::ostream& out, deque<bool>& touched,
 	      const string& text);
   void init_one ();
@@ -78,8 +79,7 @@ struct TreelogDual::Implementation
 };
 
 void
-TreelogDual::Implementation::print (std::ostream& out, deque<bool>& touched, 
-				    const string& text)
+TreelogDual::Implementation::touch (std::ostream& out, deque<bool>& touched)
 {
   for (unsigned int i = 0; i < touched.size (); i++)
     {
@@ -92,6 +92,13 @@ TreelogDual::Implementation::print (std::ostream& out, deque<bool>& touched,
 	  out << " " << path[i] << "\n";
 	}
     }
+}
+
+void
+TreelogDual::Implementation::print (std::ostream& out, deque<bool>& touched, 
+				    const string& text)
+{
+  touch (out, touched);
   out << text << "\n";
 }
 
@@ -163,6 +170,14 @@ TreelogDual::entry (const string& text)
 {
   impl.entry (text);
   Treelog::entry (text);
+}
+
+void
+TreelogDual::touch ()
+{ 
+  impl.touch (impl.two, impl.touched_two);
+  impl.init_one ();
+  impl.touch (*impl.one, impl.touched_one); 
 }
 
 void

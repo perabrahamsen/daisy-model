@@ -232,7 +232,7 @@ CropSimple::tick (const Time& time,
       else if (T < T_flowering)
 	{
 	  if (old_T < T_emergence)
-	    msg.message ("==> emerging");
+	    msg.message ("Emerging");
 
 	  const double T_growth = T_flowering - T_emergence;
 	  const double step = T_air / T_growth;
@@ -245,14 +245,14 @@ CropSimple::tick (const Time& time,
 	}
       else if (old_T < T_flowering)
 	{
-	  msg.message ("==> flowering");
+	  msg.message ("Flowering");
 	  root_system.tick_daily (msg, soil, WRoot,
 				  WRoot * (1.0 - old_T / T_flowering), DS ());
 	}
       else if (T < T_ripe)
 	/* do nothing */;
       else if (old_T < T_ripe)
-	msg.message ("==> ripe");
+	msg.message ("Ripe");
     }
 
   // Nitrogen uptake.

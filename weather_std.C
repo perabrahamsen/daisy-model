@@ -166,6 +166,8 @@ struct WeatherStandard : public Weather
 
   // Daily averages.
   double daily_air_temperature_;
+  double daily_max_air_temperature_;
+  double daily_min_air_temperature_;
   double daily_global_radiation_;
   
   // Fractions this hour.
@@ -189,6 +191,16 @@ struct WeatherStandard : public Weather
     { 
       daisy_assert (initialized);
       return daily_air_temperature_; 
+    }
+  double daily_max_air_temperature () const // [dg C]
+    { 
+      daisy_assert (initialized);
+      return daily_max_air_temperature_; 
+    }
+  double daily_min_air_temperature () const // [dg C]
+    { 
+      daisy_assert (initialized);
+      return daily_min_air_temperature_; 
     }
   double hourly_global_radiation () const // [W/m2]
     { 
@@ -646,6 +658,10 @@ WeatherStandard::read_new_day (const Time& time, Treelog& msg)
     = accumulate (&global_radiation_[0], &global_radiation_[24], 0.0) / 24.0;
   daily_air_temperature_
     = accumulate (&air_temperature_[0], &air_temperature_[24], 0.0) / 24.0;
+  daily_max_air_temperature_
+    = *max_element (&air_temperature_[0], &air_temperature_[24]);
+  daily_min_air_temperature_
+    = *min_element (&air_temperature_[0], &air_temperature_[24]);
 
   if (!has_vapor_pressure && !has_relative_humidity)
     {
@@ -964,6 +980,8 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     next_reference_evapotranspiration (-42.42e42),
     hour (-42),
     daily_air_temperature_ (-42.42e42),
+    daily_max_air_temperature_ (-42.42e42),
+    daily_min_air_temperature_ (42.42e42),
     daily_global_radiation_ (-42.42e42),
     snow_fraction (-42.42e42),
     rain_fraction (-42.42e42)

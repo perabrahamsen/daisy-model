@@ -68,7 +68,7 @@ PhenologyTSum::tick_daily (const double Ta, const double /*WLeaf*/,
       vernalization (Ta, DS);
 
       if (DS >= 1.0)
-	out.message ("==> flowering");
+	out.message ("Flowering");
     }
   else if (Ta > RepThrs)
     {
@@ -76,7 +76,7 @@ PhenologyTSum::tick_daily (const double Ta, const double /*WLeaf*/,
       
       if (DS > 2.0)
        {
-	 out.message ("==> ripe");
+	 out.message ("Ripe");
 	 DS = 2.0;
 	 production.none ();
        }

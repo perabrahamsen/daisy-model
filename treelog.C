@@ -69,6 +69,8 @@ public:
   { }
 
   // Use.
+  void touch ()
+  { }
   void flush ()
   { }
 

@@ -1,10 +1,10 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Ny dk-horizon.dai
-
 * Weather
 
 ** Min & max T i klimafil, udregn average.
+
+* SH: Ny ref-evap model
 
 * Opdater tutorial
 
@@ -29,8 +29,6 @@ Use by summary.
 ** Post excersizes and answers
 
 * SH: PowerPoint validation slides på hjemmeside.
-
-* SH: Ny ref-evap model
 
 * Check let at bruge GUI version of CVS til Windows.
 

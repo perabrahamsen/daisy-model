@@ -12,6 +12,26 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.91
+
+** Daisy now only print the date on the screen when something happens.
+
+To restore the old behaviour, add
+
+  (print_time daily)
+
+to your setup file.
+
+You can use any condition, so e.g. 
+
+  (print_time hourly)
+
+and
+
+  (print_time (weekly 2))
+
+will print time each our or every second week, respectively.
+
 * 2.90
 
 ** Updated dk-horizon.dai with nw conductivity parameters.

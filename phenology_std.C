@@ -79,7 +79,7 @@ PhenologyStandard::tick_daily (const double Ta, const double WLeaf,
       vernalization (Ta, DS);
 
       if (DS >= 1.0)
-	out.message ("==> flowering");
+	out.message ("Flowering");
     }
   else
     {
@@ -90,7 +90,7 @@ PhenologyStandard::tick_daily (const double Ta, const double WLeaf,
        }
       if (DS > DSMature)
        {
-	 out.message ("==> ripe");
+	 out.message ("Ripe");
 	 DS = DSMature;
 	 production.none ();
        }

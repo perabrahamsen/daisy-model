@@ -47,6 +47,7 @@ public:
   // Use.
 public:
   void entry (const std::string&);
+  void touch ();
   void flush ();
 
   // Create and Destroy.

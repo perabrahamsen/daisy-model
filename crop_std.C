@@ -212,7 +212,7 @@ CropStandard::tick (const Time& time,
 			     root_system.soil_temperature);
       if (development.DS >= 0)
 	{
-	  msg.message ("==> emerging");
+	  msg.message ("Emerging");
 	  canopy.tick (production.WLeaf, production.WSOrg,
 		       production.WStem, development.DS, -1.0);
 	  nitrogen.content (development.DS, production);

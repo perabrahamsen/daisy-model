@@ -38,6 +38,10 @@ public:
     { return air_temperature; }
   double daily_air_temperature () const
     { return air_temperature; }
+  double daily_max_air_temperature () const
+  { return air_temperature; }
+  double daily_min_air_temperature () const
+  { return air_temperature; }
   double hourly_global_radiation () const
     { return global_radiation; }
   double daily_global_radiation () const

@@ -79,6 +79,8 @@ public:
 public:
   virtual double hourly_air_temperature () const = 0; // [dg C]
   virtual double daily_air_temperature () const = 0; // [dg C]
+  virtual double daily_max_air_temperature () const = 0; // [dg C]
+  virtual double daily_min_air_temperature () const = 0; // [dg C]
   virtual double hourly_global_radiation () const = 0; // [W/m2]
   virtual double daily_global_radiation () const = 0; // [W/m2]
   virtual double reference_evapotranspiration () const = 0; // [mm/h]

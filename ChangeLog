@@ -1,5 +1,40 @@
 2003-05-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.91 released.
+
+2003-05-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_simple.C (tick): Remove "==> " from messages.
+	* phenology_std.C (tick_daily): Ditto.
+	* phenology_TSum.C (tick_daily): Ditto.
+	* crop_std.C (tick): Ditto.
+
+	* daisy.h, daisy.C (print_time): New parameter.
+	* daisy.C (run): Obey it.
+
+	* action_crop.C (output, doIt, harvest, doIt, doIt): Remove brackets.
+	* action_tillage.C (doIt): Ditto.
+	* action_surface.C (doIt): Ditto.
+	* action_spray.C (doIt): Ditto.
+	* action_ridge.C (doIt): Ditto.
+	* action_sow.C (doIt): Ditto.
+	* action_merge.C (doIt): Ditto.
+	* action_irrigate.C (doIt) Ditto.
+	* action_heat.C (doIt): Ditto.
+	* action_harvest.C (doIt): Ditto.
+	* action_fertilize.C (doIt): Ditto.
+	
+	* treelog.h (touch): New abstract function.
+	* treelog_dual.C (touch): Implemented it.
+	* treelog_stream.C (touch): Ditto.
+
+	* weather.h (daily_max_air_temperatur, daily_min_air_temperatur):
+	New abstract functions.
+	* weather_hourly.C: Implement them.
+	* weather_none.C: Ditto.
+	* weather_simple.C: Ditto.
+	* weather_std.C: Ditto.
+
 	* Version 2.90 released.
 
 2003-05-21  Per Abrahamsen  <abraham@dina.kvl.dk>

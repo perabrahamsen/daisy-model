@@ -287,7 +287,7 @@ ActionCrop::Sow::doIt (Daisy& daisy, Treelog& out)
 {
   if (!done && date.match (daisy.time))
     {
-      out.message (" [Sowing " + crop.name ("type") + "]");      
+      out.message ("Sowing " + crop.name ("type"));      
       daisy.field.sow (out, crop); 
       done = true;
     }
@@ -339,7 +339,7 @@ ActionCrop::Annual::doIt (Daisy& daisy, Treelog& out, symbol name)
       static const symbol all_symbol ("all");
       daisy.field.harvest (daisy.time, all_symbol, stub, stem, leaf, sorg, 
 			   daisy.harvest, out);
-      out.message (" [Annual harvest of " + name + "]");
+      out.message ("Annual harvest of " + name);
       done = true;
       return true;
     }
@@ -395,7 +395,7 @@ ActionCrop::Perennial::harvest (Daisy& daisy, Treelog& out)
   static const symbol all_symbol ("all");
   daisy.field.harvest (daisy.time, all_symbol, stub, stem, leaf, sorg, 
 		       daisy.harvest, out);
-  out.message (" [Perennial harvest]");
+  out.message ("Perennial harvest");
 }
 
 bool
@@ -718,7 +718,7 @@ ActionCrop::Irrigation::doIt (Daisy& daisy, Treelog& out) const
     return false;
 
   TmpStream tmp;
-  tmp () << " [Irrigating " << amount << " mm]";
+  tmp () << "Irrigating " << amount << " mm";
   out.message (tmp.str ());
   daisy.field.irrigate_overhead (amount, IM ());
   return true;
@@ -878,7 +878,7 @@ ActionCrop::doIt (Daisy& daisy, Treelog& out)
     {
       symbol chemical = spray[spray_index]->name;
       const double amount = spray[spray_index]->amount;
-      out.message (" [Spraying " + chemical + "]");
+      out.message ("Spraying " + chemical);
       daisy.field.spray (chemical, amount); 
 
       spray_index++;

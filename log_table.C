@@ -419,9 +419,9 @@ LogTable::summarize (Treelog& msg)
 	tmp () << "INTERVAL: [" << from << ";" << to << "]\n";
       tmp () << "TIME: " 
 	     << begin.year () << "-" << begin.month () << "-" << begin.mday () 
-	     << ":" << begin.hour () << " to "
+	     << "h" << begin.hour () << " to "
 	     << end.year () << "-" << end.month () << "-" << end.mday () 
-	     << ":" << end.hour ();
+	     << "h" << end.hour ();
       for (unsigned int i = 0; i < conv_vector.size (); i += 2)
 	tmp () << "\nSET: " << conv_vector[i] << " = "
 	       << conv_vector[i+1];

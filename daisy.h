@@ -55,6 +55,7 @@ public:
   /**/ find_active_logs (const std::vector<Log*>& logs, LogAll& log_all);
   const std::vector<Log*> active_logs;
   Condition& activate_output;
+  Condition& print_time;
   Time time;
   Action& action;
   Weather* weather;

@@ -67,6 +67,8 @@ Daisy::Daisy (const AttributeList& al)
     active_logs (find_active_logs (logs, log_all)),
     activate_output (Librarian<Condition>::create
 		     (al.alist ("activate_output"))),
+    print_time (Librarian<Condition>::create
+		     (al.alist ("print_time"))),
     time (al.alist ("time")),
     action (Librarian<Action>::create (al.alist ("manager"))),
     weather (al.check ("weather") 
@@ -128,6 +130,7 @@ Daisy::initial_logs (Treelog& out)
     {
       if (!logging)
 	{
+	  out.message ("Start logging");
 	  // get initial values for previous day.
 	  Time previous (time);
 	  previous.tick_hour (-1);
@@ -148,8 +151,11 @@ Daisy::initial_logs (Treelog& out)
 	}
       logging = true;
     }
-  else
-    logging = false;
+  else if (logging)
+    {
+      out.message ("End logging");
+      logging = false;
+    }
 }
 
 void
@@ -195,19 +201,38 @@ Daisy::tick (Treelog& out)
 void 
 Daisy::run (Treelog& out)
 { 
-  running = true;
+  // Run simulation.
+  {
+    Treelog::Open nest (out, "Running");
 
-  while (running)
-    {
-      if (time.hour () == 0)
-	{
-	  TmpStream tmp;
-	  tmp () << time.year () << "-" << time.month () << "-" 
-		 << time.mday ();
-	  out.entry (tmp.str ());
-	}
-      tick (out);
-    }
+    running = false;
+
+    do
+      {
+	TmpStream tmp;
+	tmp () << time.year () << "-" << time.month () << "-" 
+	       << time.mday () << "h" << time.hour ();
+	Treelog::Open nest (out, tmp.str ());
+
+	if (!running)
+	  {
+	    running = true;
+	    out.message ("Begin simulation");
+	  }
+
+	print_time.tick (*this, out);
+	const bool force_print = print_time.match (*this);
+
+	tick (out);
+
+	if (!running)
+	  out.message ("End simulation");
+	print_time.tick (*this, out);
+	if (force_print)
+	  out.touch ();
+      }
+    while (running);
+  }
   // Print log file summaries at end of simulation.
   {
     Treelog::Open nest (out, "Summary");
@@ -248,6 +273,15 @@ period.");
   AttributeList true_alist;
   true_alist.add ("type", "true");
   alist.add ("activate_output", true_alist);
+  syntax.add ("print_time", Librarian<Condition>::library (),
+	      "Print simulation time whenever this condition is true.\n\
+The simulation time will also be printed whenever there are any news\n\
+to report, like emergence of crop or various management operations.\n\
+Good values for this parameter would be hourly, daily or monthly.");
+  AttributeList false_alist;
+  false_alist.add ("type", "false");
+  alist.add ("print_time", false_alist);
+
   syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
 	      "Run simulation in this directory.\n\
 This can affect both where input files are found and where log files\n\
@@ -283,6 +317,7 @@ Daisy::~Daisy ()
   sequence_delete (logs.begin (), logs.end ());
   delete &log_all;
   delete &activate_output;
+  delete &print_time;
   delete &action;
   if (weather)
     delete weather;

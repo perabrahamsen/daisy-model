@@ -34,7 +34,7 @@ struct ActionMix : public Action
   // Simulation.
   void doIt (Daisy& daisy, Treelog& out)
     {
-      out.message (" [Tillage]");
+      out.message ("Tillage operation " + name);
       daisy.field.mix (out, daisy.time, 0.0, depth, penetration);
     }
 
@@ -78,7 +78,7 @@ struct ActionSwap : public Action
   // Simulation.
   void doIt (Daisy& daisy, Treelog& out)
   {
-    out.message (" [" + name + "]");
+    out.message ("Tillage operation " + name);
     daisy.field.swap (out, daisy.time, 0.0, middle, depth);
   }
 
@@ -136,7 +136,7 @@ struct ActionSetPorosity : public Action
   // Simulation.
   void doIt (Daisy& daisy, Treelog& out)
   {
-    out.message (" [Setting porosity]");
+    out.message ("Adjusting porosity");
     daisy.field.set_porosity (depth, porosity);
   }
 

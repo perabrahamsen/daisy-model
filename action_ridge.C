@@ -31,7 +31,7 @@ struct ActionRidge : public Action
 
   void doIt (Daisy& daisy, Treelog& out)
     { 
-      out.message (" [Ridging]");      
+      out.message ("Ridging");      
       daisy.field.ridge (ridge); 
     }
 

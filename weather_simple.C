@@ -40,6 +40,10 @@ class WeatherSimple : public WeatherOld
 public:
   void tick (const Time&, Treelog&);
   double daily_air_temperature () const;
+  double daily_max_air_temperature () const
+  { return daily_air_temperature (); }
+  double daily_min_air_temperature () const
+  { return daily_air_temperature (); }
   double hourly_global_radiation () const;
   double daily_global_radiation () const;
   double reference_evapotranspiration () const;

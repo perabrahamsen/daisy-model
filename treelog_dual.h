@@ -48,6 +48,7 @@ public:
 public:
   void debug (const std::string&);
   void entry (const std::string&);
+  void touch ();
   void flush ();
 
   // Create and Destroy.

@@ -125,7 +125,7 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
       
       if (weight <= minimum_weight)
 	{
-	  out.message (" [Not fertilizing due to precision farming]");
+	  out.message ("Not fertilizing due to precision farming");
 	  return;
 	}
       AM::set_utilized_weight (am, weight);
@@ -138,7 +138,7 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
 
       if (weight - compensation <= minimum_weight)
 	{
-	  out.message (" [Not fertilizing due to second year effect]");
+	  out.message ("Not fertilizing due to second year effect");
 	  return;
 	}
       else
@@ -147,20 +147,20 @@ ActionFertilize::doIt (Daisy& daisy, Treelog& out)
   else if (minimum_weight > 0.0
 	   && minimum_weight > AM::utilized_weight (am))
     {
-      out.message (" [Not fertilizing due to minimum weight]");
+      out.message ("Not fertilizing due to minimum weight");
       return;
     }
 
   const string syntax = am.name ("syntax");
   TmpStream tmp;
   if (syntax == "mineral")
-    tmp () << " [Fertilizing " << am.number ("weight") 
-	   << " kg "<< am.name ("type") << "-N/ha]";
+    tmp () << "Fertilizing " << am.number ("weight") 
+	   << " kg "<< am.name ("type") << "-N/ha";
   else if (syntax == "organic")
-    tmp () << " [Fertilizing " << am.number ("weight") 
-	   << " ton "<< am.name ("type") << " ww/ha]";
+    tmp () << "Fertilizing " << am.number ("weight") 
+	   << " ton "<< am.name ("type") << " ww/ha";
   else
-    tmp () << " [Fertilizing " << am.name ("type") << "]";
+    tmp () << "Fertilizing " << am.name ("type");
   out.message (tmp.str ());
   if (syntax != "mineral")
     {

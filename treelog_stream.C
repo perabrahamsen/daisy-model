@@ -60,9 +60,8 @@ TreelogStream::close ()
 }
 
 void
-TreelogStream::entry (const string& text)
+TreelogStream::touch ()
 {
-  Treelog::entry (text);
   for (unsigned int i = 0; i < impl.touched.size (); i++)
     {
       if (!impl.touched[i])
@@ -73,6 +72,12 @@ TreelogStream::entry (const string& text)
 	  impl.out << " " << impl.path[i] << "\n";
 	}
     }
+}
+void
+TreelogStream::entry (const string& text)
+{
+  Treelog::entry (text);
+  touch ();
   impl.out << text << "\n";
 }
 

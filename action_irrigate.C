@@ -40,7 +40,7 @@ struct ActionIrrigate : public Action
 
   void doIt (Daisy& daisy, Treelog& out)
   {
-    out.message (" [Irrigating]");      
+    out.message ("Irrigating");      
     double t = temp;
 
     irrigate (daisy.field, flux, t, sm);
@@ -113,9 +113,9 @@ struct ActionIrrigateSubsoil : public Action
     daisy.field.set_subsoil_irrigation (flux, sm, from, to);
     TmpStream tmp;
     if (flux != 0.0)
-      tmp () << " [Subsoil irrigating with " << flux << " mm/h]\n";
+      tmp () << "Subsoil irrigating with " << flux << " mm/h\n";
     else
-      tmp () << " [Subsoil irrigating turned off]\n";
+      tmp () << "Subsoil irrigating turned off\n";
     out.message (tmp.str ());
   }
 
@@ -136,7 +136,7 @@ struct ActionIrrigateStop : public Action
   {
     IM sm;
     daisy.field.set_subsoil_irrigation (0.0, sm, 0.0, -0.1);
-    out.message (" [Subsoil irrigating turned off]");
+    out.message ("Subsoil irrigating turned off");
   }
   ActionIrrigateStop (const AttributeList& al)
     : Action (al)
