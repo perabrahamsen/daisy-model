@@ -65,11 +65,12 @@ public:
   { return root_system.water_stress; }
   double nitrogen_stress () const // [0-1] (1 = no production)
   { return root_system.nitrogen_stress; }
+#endif
   double rs_min () const	// Minimum transpiration resistance.
   { return canopy.rs_min; }
   double rs_max () const	// Maximum transpiration resistance.
   { return canopy.rs_max; }
-#endif
+
   double height () const	// Crop height [cm]
   { return canopy.Height; }
   double LAI () const

@@ -1,7 +1,7 @@
-// pet_PM.C -- Potential evopotranspiration using Penman-Monteith.
+// pet_FAO_PM.C -- FAO potential evopotranspiration using Penman-Monteith.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2001, 2003 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2001, 2003 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -32,7 +32,7 @@
 #include "log.h"
 #include "tmpstream.h"
 
-class PetPM : public Pet
+class PetFAO_PM : public Pet
 {
 public:
   // State.
@@ -50,37 +50,31 @@ public:
 	     const SoilHeat& soil_heat, const SoilWater& soil_water, Treelog&);
 
   void output (Log& log) const
-    {
-      Pet::output (log);
-      output_value (reference_evapotranspiration_dry,
-		    "reference_evapotranspiration", log);
-      output_derived (net_radiation, "net_radiation", log);
-    }
+  {
+    Pet::output (log);
+    output_value (reference_evapotranspiration_dry,
+                  "reference_evapotranspiration", log);
+    output_derived (net_radiation, "net_radiation", log);
+  }
 
   double wet () const
-    {
-      return potential_evapotranspiration_wet;
-    }
+  { return potential_evapotranspiration_wet; }
 
   double dry () const
-    {
-      return potential_evapotranspiration_dry;
-    }
+  { return potential_evapotranspiration_dry; }
 
   // Create & Destroy.
-  PetPM (const AttributeList& al)
+  PetFAO_PM (const AttributeList& al)
     : Pet (al),
       net_radiation (Librarian<NetRadiation>::create
 		     (al.alist ("net_radiation")))
-    { }
-  ~PetPM ()
-    {
-      delete &net_radiation;
-    }
+  { }
+  ~PetFAO_PM ()
+  { delete &net_radiation; }
 };
 
 void
-PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
+PetFAO_PM::tick (const Time&, const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil& soil,
 	     const SoilHeat& soil_heat, const SoilWater& soil_water,
 	     Treelog& out)
@@ -114,55 +108,30 @@ PetPM::tick (const Time&, const Weather& weather, const Vegetation& crops,
   const double G = soil_heat.top_flux (soil, soil_water);
 
 
-  if (LAI > 0.0)
-    {
-      const double CropHeight = 0.01 * crops.height (); //cm -> m
-      const double ScreenHeight = weather.screen_height ();
+  reference_evapotranspiration_dry
+    = FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
+                              AtmPressure, out)
+    * 3600;
 
-      // Dry.
-      reference_evapotranspiration_dry
-	= FAO::PenmanMonteith (CropHeight, ScreenHeight, 
-                               LAI, crops.rs_min (),
-                               Rn, G, Temp, VaporPressure,
-                               U2, AtmPressure) * 3600;
-      potential_evapotranspiration_dry
-	= max (0.0, reference_evapotranspiration_dry);
+  potential_evapotranspiration_dry
+    = reference_to_potential (crops, surface, 
+                              reference_evapotranspiration_dry);
 
-      // Wet.
-      reference_evapotranspiration_wet
-	= FAO::PenmanMonteith (CropHeight, ScreenHeight, 
-                               LAI, 0.0, Rn, G, Temp, VaporPressure,
-                               U2, AtmPressure) * 3600;
-      potential_evapotranspiration_wet
-	= max (0.0, reference_evapotranspiration_wet);
-    }
-  else
-    {
-      reference_evapotranspiration_dry
-	= FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
-				  AtmPressure, out)
-	* 3600;
-
-      potential_evapotranspiration_dry
-	= reference_to_potential (crops, surface,
-				  reference_evapotranspiration_dry);
-
-      reference_evapotranspiration_wet
-	= FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
-				  AtmPressure, out)
-	* 3600;
-      potential_evapotranspiration_wet
-	= reference_to_potential (crops, surface,
-				  reference_evapotranspiration_wet);
-    }
+  reference_evapotranspiration_wet
+    = FAO::RefPenmanMonteith (Rn, G, Temp, VaporPressure, U2,
+                              AtmPressure, out)
+    * 3600;
+  potential_evapotranspiration_wet
+    = reference_to_potential (crops, surface,
+                              reference_evapotranspiration_wet);
 }
 
-static struct PetPMSyntax
+static struct PetFAO_PMSyntax
 {
   static Pet&
   make (const AttributeList& al)
-  { return *new PetPM (al); }
-  PetPMSyntax ()
+  { return *new PetFAO_PM (al); }
+  PetFAO_PMSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
@@ -175,6 +144,6 @@ static struct PetPMSyntax
     syntax.add ("net_radiation", Librarian<NetRadiation>::library (),
 		"Net radiation.");
     alist.add ("net_radiation", Rn_alist);
-    Librarian<Pet>::add_type ("PM", alist, syntax, &make);
+    Librarian<Pet>::add_type ("FAO_PM", alist, syntax, &make);
   }
-} PetPM_syntax;
+} PetFAO_PM_syntax;

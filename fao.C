@@ -28,10 +28,10 @@
 #include "mathlib.h"
 
 double 
-FAO::CanopyResistance (double LAI)
+FAO::CanopyResistance (const double LAI, const double rs_min)
 { 
   daisy_assert (LAI > 0.0);
-  return (200 / LAI); 
+  return (rs_min / LAI); 
 }
 
 double 
@@ -194,13 +194,12 @@ FAO::ETrad (double AtmPressure, double Temp, double Rn, double G,
 
 double
 FAO::PenmanMonteith (double CropHeight, double ScreenHeight, 
-		     double LAI, double Rn,
+		     double LAI, double rs_min, double Rn,
 		     double G, double Temp, double ea, double U2,
 		     double AtmPressure)
 {
-  const double ra = AerodynamicResistance (CropHeight, 
-						       ScreenHeight, U2);
-  const double rc = CanopyResistance (LAI);
+  const double ra = AerodynamicResistance (CropHeight, ScreenHeight, U2);
+  const double rc = CanopyResistance (LAI, rs_min);
   const double E1 = ETrad (AtmPressure, Temp, Rn, G, ra, rc);
   const double E2 = ETaero (AtmPressure, Temp, ea, ra, rc);
   return (E1 + E2);

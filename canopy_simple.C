@@ -68,7 +68,7 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("rs_max", 1.0e5);
   syntax.add ("rs_min", "s/m", Syntax::Const,
 	      "Minimum transpiration resistance.");
-  alist.add ("rs_min", 30.0);
+  alist.add ("rs_min", 100.0);
 
   // Variables.
   syntax.add ("Height", "cm", Syntax::State, "Crop height.");

@@ -1,3 +1,24 @@
+2003-12-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.18 released.
+
+2003-12-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pet_FAO_PM.C: New model.
+	* Makefile (MODELS): Added it.
+	* bioclimate_std.C (initialize): Call it.
+
+	* crop.C, crop.h, crop_std.C (rs_min, rs_max): Uncommented.
+	* vegetation.h, vegetation_crops.C, vegetation_permanent.C
+	(rs_min, rs_max): New functions.
+	* canopy_simple.C (rs_min): Changed default value to 100.0
+	* fao.C, fao.h (CanopyResistance, PenmanMonteith): New `rs_min'
+	argument. 
+	* pet_PM.C (tick): Update caller.
+
+	* vegetation_permanent.C (interception_capacity): Multiply with
+	LAI.
+
 2003-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.17 released.

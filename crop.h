@@ -58,9 +58,9 @@ public:
 #if 0
   virtual double water_stress () const = 0;	// [0-1] (0 = full production)
   virtual double nitrogen_stress () const = 0; // [0-1] (1 = no production)
+#endif
   virtual double rs_min () const; // Minimum transpiration resistance.
   virtual double rs_max () const; // Maximum transpiration resistance.
-#endif
   virtual double height () const = 0;
   virtual double LAI () const = 0;
   virtual double SimLAI () const;

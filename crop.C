@@ -24,6 +24,7 @@ Crop::water_stress () const
 double 
 Crop::nitrogen_stress () const
 { daisy_assert (false); }
+#endif
 
 double 
 Crop::rs_min () const
@@ -32,7 +33,6 @@ Crop::rs_min () const
 double 
 Crop::rs_max () const
 { daisy_assert (false); }
-#endif
 
 double 
 Crop::SimLAI () const

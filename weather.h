@@ -42,11 +42,14 @@ protected:
   /* const */ double longitude;
   /* const */ double elevation_;
   /* const */ double timezone;
-  struct Surface
-  { enum type { reference, field }; };
-  /* const */ Surface::type surface;
+public:
+  enum surface_t { reference, field };
+protected:
+  /* const */ surface_t surface_;
   /* const */ double screen_height_;
 public:
+  surface_t surface () const 
+  { return surface_; }
   double elevation () const; // [m]
   double screen_height () const; // [m]
 
@@ -150,7 +153,7 @@ public:
 };
 
 #if !defined (__BORLANDC__)
-EMPTY_TEMPLATE
+  EMPTY_TEMPLATE
 Librarian<Weather>::Content* Librarian<Weather>::content;
 #endif
 

@@ -819,9 +819,9 @@ WeatherStandard::initialize (const Time& time, Treelog& err)
 	  lex->skip_space ();
 	  const string type = lex->get_word ();
 	  if (type == "reference")
-	    surface = Surface::reference;
+	    surface_ = reference;
 	  else if (type == "field")
-	    surface = Surface::field;
+	    surface_ = field;
 	  else
 	    lex->error ("Uknown surface type");
 	}

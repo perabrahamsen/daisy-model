@@ -28,7 +28,8 @@ struct Treelog;
 namespace FAO
 { 
   // Bioclimate.
-  double CanopyResistance (double LAI /* [m^2/m^2] */); // [s/m]
+  double CanopyResistance (double LAI /* [m^2/m^2] */,
+                           double rs_min /* [s/m] */); // [s/m]
   double RefCanopyResistance (void); // [s/m]
   double ZeroPlaneDisplacement (double CropHeight /* [m] */); // [m]
   double RoughnessHeight_Momentum (double CropHeight /* [m] */); // [m]
@@ -79,6 +80,7 @@ namespace FAO
   double PenmanMonteith (double CropHeight /* [m] */,
 			 double ScreenHeight /* [m] */,
 			 double LAI /* [m^2/m^2] */,
+                         double rs_min /* [s/m] */,
 			 double Rn /* [W/m2] */,
 			 double G /* [W/m2] */,
 			 double Temp /* [dg C] */,

@@ -1,36 +1,17 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* RNP:  Forced LAI for permanent vegetation
+* FAO_PM der altid bruger refpenmanmonteith
 
-For det tilfælde at man har målinger for nogen år.
-
-* Lav nyt release.
-
-* Anders Søgaard
-
-** skriv: Fejl ikke fundet, men den kører her, vejrfil?
-
-* Eva Bøgh
-
-** skriv: Fejl ikke fundet, men workaround lavet.
-
-* Søren Hansen:  Spørg efter interception capacity vs LAI
+Surface: field -> PM
+Surface: reference -> FAO_PM
 
 * Make it possible to specify texture using different systems
 
 ** New "default" horizon
 
-*** fast_clay, fast_humus in horizon
-
 *** Hydraulic::inititalize should take Texture argument.
 
 Update hydrailic models.
-
-*** Horizon::inititalize pure virutal 
-
-split out Horizon::inititalize_base
-
-create HorizonStandard::inititalize
 
 ** USDA. FAO, DIN, DS horizon
 

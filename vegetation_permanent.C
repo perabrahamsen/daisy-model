@@ -73,6 +73,10 @@ struct VegetationPermanent : public Vegetation
   const double albedo_;		// Another reflection factor.
 
   // Queries.
+  double rs_min () const	// Minimum transpiration resistance.
+  { return canopy.rs_min; }
+  double rs_max () const	// Maximum transpiration resistance.
+  { return canopy.rs_max; }
   double LAI () const
   { return canopy.CAI; }
   double height () const
@@ -94,7 +98,7 @@ struct VegetationPermanent : public Vegetation
   double albedo () const
   { return albedo_; }
   double interception_capacity () const
-  { return canopy.IntcpCap; }
+  { return canopy.IntcpCap * LAI (); }
 
 
   // Individual crop queries.

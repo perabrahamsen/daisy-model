@@ -74,6 +74,10 @@ struct VegetationCrops : public Vegetation
   double interception_capacity_;// Canopy water storage capacity [mm]
 
   // Queries.
+  double rs_min () const	// Minimum transpiration resistance.
+  { return CanopyAverage (&Crop::rs_min) ; }
+  double rs_max () const	// Maximum transpiration resistance.
+  { return CanopyAverage (&Crop::rs_max) ; }
   double LAI () const
   { return LAI_; }
   double height () const

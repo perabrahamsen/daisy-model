@@ -196,7 +196,12 @@ BioclimateStandard::initialize (const Weather& weather, Treelog& msg)
   if (weather.has_reference_evapotranspiration ())
     type = symbol ("weather");
   else if (weather.has_vapor_pressure () && weather.has_wind ())
-    type = symbol ("PM");
+    {
+      if (weather.surface () == Weather::field)
+        type = symbol ("PM");
+      else
+        type = symbol ("FAO_PM");    
+    }
   else if (weather.has_min_max_temperature ())
     type = symbol ("Hargreaves");
   else

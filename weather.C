@@ -265,7 +265,7 @@ Weather::Weather (const AttributeList& al)
     longitude (-42.42e42),
     elevation_ (-42.42e42),
     timezone (-42.42e42),
-    surface (Surface::reference),
+    surface_ (reference),
     screen_height_ (2.0),
     T_average (10.0),           // May be used before Weather::check.
     T_amplitude (-42.42e42),

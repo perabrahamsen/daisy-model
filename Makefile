@@ -289,7 +289,8 @@ NOLINK = -c
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = pet_Hargreaves.C hydraulic_M_vGp.C summary_simple.C select_date.C \
+MODELS = pet_FAO_PM.C \
+	pet_Hargreaves.C hydraulic_M_vGp.C summary_simple.C select_date.C \
 	phenology_TSum.C phenology_std.C hydraulic_hypres.C clayom_biomod.C \
         clayom_old.C hydraulic_Cosby.C pedo_linear.C adsorption_full.C \
 	equil_langmuir.C transform_equil.C condition_weather.C \

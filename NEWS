@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.18 
+
+** Interception capacity for permanent vegetation now depends on LAI.
+
+** The rs_min canopy parameter now affects the the PM pet model.
+
+** New FAO_PM pet model.
+
+This model calculates PM on a reference surface.  
+
 * 3.17
 
 ** New parameter yearlyLAI in permanent vegetation.
