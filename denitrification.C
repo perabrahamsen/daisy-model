@@ -98,7 +98,7 @@ void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
       const double w_factor_fast = water_factor_fast (Theta_fraction);
       const double rate_fast = w_factor_fast * pot_fast;
 
-      const double M = min (rate + rate_fast, K * NO3);
+      const double M = min (rate, K * NO3) + min (rate_fast, K_fast * NO3);
       if (redox_height <= 0 && height < redox_height)
 	{
 	  converted.push_back (NO3);
@@ -127,7 +127,7 @@ alpha, with a maximum rate specified by the parameter 'K'.  The\n\
 denitrification is also affected by temperature and water pressure.\n\
 Additional denitrification from CO2 produced from fast OM pools can\n\
 be triggered by setting alpha_fast or water_factor_fast different.\n\
-This additional denitrification is still limited by K.");
+This additional denitrification is limited by K_fast.");
   syntax.add ("active_underground", Syntax::Boolean, Syntax::Const, "\
 Set this flag to turn on denitrification below the root zone.");
   alist.add ("active_underground", false);
@@ -145,8 +145,11 @@ Clear this flag to turn off denitrification in groundwater.");
   syntax.add ("potential_fast", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
 	      "Additional potential due to turnover in fast pools.");
   syntax.add ("K", "h^-1", Check::fraction (), Syntax::Const, "\
-Maximum fraction of nitrate converted at each time step.");
+Maximum fraction of nitrate converted at each time step from slow pools.");
   alist.add ("K", 0.020833);
+  syntax.add ("K_fast", "h^-1", Check::fraction (), Syntax::OptionalConst, "\
+Maximum fraction of nitrate converted at each time step from fast pools.\n\
+By default this is identical to 'K'.");
   syntax.add ("alpha", "(g NO3-N/h)/(g CO2-C/h)", Check::non_negative (),
 	      Syntax::Const, "\
 Anaerobic denitrification constant for slow pools.");
@@ -186,6 +189,7 @@ Denitrification::Denitrification (const AttributeList& al)
   : active_underground (al.flag ("active_underground")),
     active_groundwater (al.flag ("active_groundwater")),
     K (al.number ("K")),
+    K_fast (al.check ("K_fast") ? al.number ("K_fast") : K),
     alpha (al.number ("alpha")),
     alpha_fast (al.check ("alpha_fast") ? al.number ("alpha_fast") : alpha),
     heat_factor (al.check ("heat_factor") 

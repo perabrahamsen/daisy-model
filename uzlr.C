@@ -25,6 +25,7 @@
 #include "soil_heat.h"
 #include "log.h"
 #include "mathlib.h"
+#include "tmpstream.h"
 
 class UZlr : public UZmodel
 {
@@ -75,10 +76,6 @@ public:
   ~UZlr ();
 };
 
-#if 0
-#include "tmpstream.h"
-#endif
-
 bool
 UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	    unsigned int first, const UZtop& top, 
@@ -95,32 +92,43 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 #ifdef USE_Q_MAX
   // Find max fluxes.
   vector<double> q_max (last + 2);
-  double K_old = soil.K (last, h[last], h_ice[last], soil_heat.T (last));
+
+  // Bottom.
   if (bottom.type () == UZbottom::forced_flux)
     q_max[last+1] = bottom.q_bottom ();
   else
-    q_max[last+1] = -K_old;
+    q_max[last+1] = -soil.K (last, h_old[last], h_ice[last], 
+			     soil_heat.T (last));
 
   for (int i = last; i >= int (first); i--)
     {
       
       const double dz = soil.dz (i);
-      // Extra pressure from saturated zone.
-      const double dhdz = h[i] > 0.0 ? h[i] / dz : 0.0;
       const double Theta_sat = soil.Theta (i, 0.0, h_ice[i]);
       const double Theta = Theta_old[i];
       const double space 
-	= (Theta_sat - Theta) * dz + S[i] * dt - q_max[i+1] * dt;
-      q_max[i] = -min (space, K_old * (1.0 + dhdz));
-      K_old = soil.K (i, h[i], h_ice[i], soil_heat.T (i));
-#if 0
-      TmpStream tmp;
-      tmp () << "q_max[" << i << "] = " << q_max[i] << " first = " << first
-	     << " last = " << last;
-      Assertion::message (tmp.str ());
-#endif
+	= (Theta_sat - Theta) * dz + S[i] * dz * dt - q_max[i+1] * dt;
+      const double K = (i == 0)
+	? soil.K (i, 0.0, h_ice[i], soil_heat.T (i))
+	: soil.K (i-1, h_old[i-1], h_ice[i-1], soil_heat.T (i-1));
+      q_max[i] = -min (space / dt, K);
+
+      if (q_max[i] > 1e-10)
+	{
+	  TmpStream tmp;
+	  tmp () << " q_max[" << i << "] == " << q_max[i]
+		 << " q_max[" << i + 1 << "] == " << q_max[i+1]
+		 << " space  = " << space
+		 << " K  = " << K
+		 << " Theta_sat  = " << Theta_sat
+		 << " Theta  = " << Theta
+		 << " S  = " << S[i] * dz
+	    ;
+	  daisy_warning (tmp.str ());
+	}
     }
 #endif
+
   if (top.soil_top ())
     {
       daisy_assert (!top.flux_top ());
@@ -147,7 +155,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
   else
     {
       // Limit flux by soil capacity.
-      const double K_sat = soil.K (first, 0.0, h_ice[first],
+      const double K_sat = soil.K (first, 0.0, h_ice[first], 
 				   soil_heat.T (first));
       daisy_assert (K_sat > 0.0);
 
@@ -165,6 +173,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	q_up = q[first] = max (top.q (), -K_sat);
     }
 #ifdef USE_Q_MAX
+  daisy_assert (q_max[first] < 0.0);
   if (q[first] < q_max[first])
     q_up = q[first] = q_max[first];
 #endif
@@ -221,16 +230,25 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	      if (h_ice[i+1] < h_fc) // Blocked by ice.
 		K_new = 0.0;
 	      else
-		K_new = sqrt (K_new * soil.K (i+1, h[i+1], h_ice[i+1],
+		K_new = sqrt (K_new * soil.K (i+1, h_old[i+1], h_ice[i+1],
 					      soil_heat.T (i+1)));
+#ifdef USE_Q_MAX
+	      if (K_new > -q_max[i+1])
+		K_new = -q_max[i+1];
+#endif // USE_Q_MAX
 	      Theta_next = Theta_new - K_new * dt / dz;
 	    }
 	  else if (bottom.type () == UZbottom::forced_flux)
-	    Theta_next = Theta_new - bottom.q_bottom () * dt;
+	    Theta_next = Theta_new + bottom.q_bottom () * dt;
 	  else
-	    // Use previos value for last node.
-	    Theta_next = Theta_new - K_new * dt / dz;
-	  
+	    {
+	      // Use previos value for last node.
+#ifdef USE_Q_MAX
+	      if (K_new > -q_max[i+1])
+		K_new = -q_max[i+1];
+#endif // USE_Q_MAX
+	      Theta_next = Theta_new - K_new * dt / dz;
+	    }
 	  if (Theta_next < Theta_fc)
 	    {
 	      q[i+1] = (Theta_fc - Theta_new) * dz / dt;
@@ -249,7 +267,30 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
 	      Theta[i] = Theta_next;
 	      h[i] = soil.h (i, Theta[i]);
 	    }
-	  daisy_assert (q[i+1] < 1e-10);
+	  if (q[i+1] > 1e-10)
+	    {
+	      TmpStream tmp;
+	      tmp () << "q[" << i + 1 << "] == " << q[i+1]
+		     << " Theta_next  = " << Theta_next
+		     << " Theta_sat  = " << Theta_sat
+		     << " Theta_fc  = " << Theta_fc
+		     << " Theta_new  = " << Theta_new
+		     << " K_new  = " << K_new
+#ifdef USE_Q_MAX
+		     << " q_max[" << i + 1 << "] == " << q_max[i+1]
+#endif // USE_Q_MAX
+		;
+	      daisy_warning (tmp.str ());
+	    }
+#ifdef USE_Q_MAX
+	  if (q[i+1] < q_max[i+1] * 1.01)
+	    {
+	      TmpStream tmp;
+	      tmp () << "q[" << i + 1 << "] < q_max[" << i + 1 << "], "
+		     << q[i+1] << " < " << q_max[i+1];
+	      daisy_warning (tmp.str ());
+	    }
+#endif // USE_Q_MAX
 	}
       daisy_assert (isfinite (h[i]));
       daisy_assert (isfinite (Theta[i]));
@@ -261,6 +302,8 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
   // Lower border.
   q_down = q[last + 1];
 
+
+#ifndef USE_Q_MAX
   if (bottom.type () == UZbottom::forced_flux
       && !approximate (q_down, bottom.q_bottom ()))
     {
@@ -287,6 +330,7 @@ UZlr::tick (Treelog&, const Soil& soil, const SoilHeat& soil_heat,
       q_up = q[first];
       q_down = q[last + 1];
     }
+#endif // !USE_Q_MAX
 
   // Check mass conservation.
 #ifndef _NDEBUG

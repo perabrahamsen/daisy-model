@@ -301,7 +301,7 @@ UZRichard::richard (Treelog& msg,
 		      if (bottom.type () == UZbottom::lysimeter)
 			{ 
 			  if (h[i] > h_lim)
-			    q_bottom = K[i];
+			    q_bottom = -K[i];
 			  else 
 			    q_bottom = 0.0;
 			}

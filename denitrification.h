@@ -42,6 +42,7 @@ private:
   const bool active_underground; // True, iff turnover happens below rootzone.
   const bool active_groundwater; // True, iff turnover happens in groundwater.
   const double K;
+  const double K_fast;
   const double alpha;
   const double alpha_fast;
   const PLF heat_factor;

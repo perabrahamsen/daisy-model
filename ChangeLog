@@ -1,3 +1,18 @@
+2003-06-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.97 released.
+
+2003-06-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater.h, groundwater.C, groundwater_pipe.C (update_water):
+	Removed. 
+	* soil_water.C (tick): Update caller.
+	* groundwater_pipe.C: Removed unused helper functions.
+	
+	* uzlr.C (tick): Pre-calculate q_max.
+
+	* denitrification.C, denitrification.h (K_fast): New parameter.
+
 2003-06-01  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.96 released.

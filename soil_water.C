@@ -314,36 +314,6 @@ SoilWater::Implementation::tick (const Soil& soil, const SoilHeat& soil_heat,
   const bool bottom_accepted 
     = groundwater.accept_bottom ((q[last + 1] + q_p[last + 1]) * dt);
   daisy_assert (bottom_accepted);
-
-  // Update flux in surface and groundwater.
-  surface.update_water (soil, S_sum, h, Theta, q, q_p);
-  const double old_in = -(q[0] + q_p[0]);
-  const double old_out = -(q[soil.size ()] + q_p[soil.size ()]);
-  const double old_sink = soil.total (S_sum);
-  const double old_drain = soil.total (S_drain);
-  const double old_total = soil.total (Theta);
-  const double old_balance = old_total + old_in - old_sink - old_out;
-  groundwater.update_water (soil, soil_heat, surface,
-			    S_sum, S_drain, h, h_ice, Theta, q, q_p, msg);
-  const double new_in = -(q[0] + q_p[0]);
-  const double new_out = -(q[soil.size ()] + q_p[soil.size ()]);
-  const double new_sink = soil.total (S_sum);
-  const double new_total = soil.total (Theta);
-  const double new_balance = new_total + new_in - new_sink - new_out;
-  if (!approximate (old_balance, new_balance))
-    {
-      Treelog::Open nest (msg, "Groundwater::update_water");
-      TmpStream tmp;
-      tmp () << "old_balance (" << old_balance << ") = old_total ("
-	     << old_total << ") + old_in (" << old_in << ") - old_sink (" 
-	     << old_sink << ") - old_out (" << old_out << "); drain = " 
-	     << old_drain << "\n";
-      tmp () << "new_balance (" << new_balance << ") = new_total ("
-	     << new_total << ") + new_in (" << new_in << ") - new_sink (" 
-	     << new_sink << ") - new_out (" << new_out << "); drain = " 
-	     << soil.total (S_drain);
-      msg.error (tmp.str ());
-    }
 }
 
 void 

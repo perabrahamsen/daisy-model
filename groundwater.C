@@ -52,18 +52,6 @@ Groundwater::set_Z_aquitard (double)
 { daisy_assert (false); }
 
 void
-Groundwater::update_water (const Soil&, const SoilHeat&, UZtop&,
-			   vector<double>& /* S_sum */,
-			   vector<double>& /* S_drain */,
-			   vector<double>& /* h */,
-			   const vector<double>& /* h_ice */,
-			   vector<double>& /* Theta */,
-			   vector<double>& /* q */,
-			   const vector<double>& /* q_p */,
-			   Treelog&)
-{ }
-
-void
 Groundwater::output (Log& log) const
 { 
   output_value (table (), "height", log);

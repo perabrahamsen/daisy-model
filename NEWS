@@ -12,6 +12,16 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.97
+
+** New K_fast denitrification parameter.
+
+This parameter limits denitrification based on activity in fast OM
+pools.  By default, it is identical to K.  K now only limit the slow
+pools. 
+
+This may mean slightly faster denitrification in some situations.
+
 * 2.96
 
 ** Smother groundwater pipe table curves.  

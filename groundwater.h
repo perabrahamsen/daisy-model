@@ -48,15 +48,6 @@ public:
 public:
   virtual void tick (const Soil&, SoilWater&, double h_surface /* [cm] */,
 		     const SoilHeat&, const Time&, Treelog&) = 0;
-  virtual void update_water (const Soil&, const SoilHeat&, UZtop&,
-			     vector<double>& S_sum,
-			     vector<double>& S_drain,
-			     vector<double>& h,
-			     const vector<double>& h_ice,
-			     vector<double>& Theta,
-			     vector<double>& q,
-			     const vector<double>& q_p,
-			     Treelog& msg);
   virtual void output (Log&) const;
 
   // Accessors.
