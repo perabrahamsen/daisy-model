@@ -121,6 +121,7 @@ struct CropStandard::Parameters
   const struct DevelPar
   {
     double EmrTSum;		// Soil temp sum at emergence
+    const CSMP& EmrSMF;         // Soil moisture effect on emergence
     double DS_Emr;		// Development stage (DS) emergence
     double DSRate1;		// Development rate [C-1 or d-1],
     				// the vegetative stage
@@ -160,8 +161,10 @@ struct CropStandard::Parameters
     double SpLAIfac;            // Factor defining max Specific leaf weight
     double SpSOrgAI;            // Specific storage organ area index
     const CSMP& SOrgAIMod;      // Specific storage organ area index modifier
+    double SOrgPhotEff;         // Relative photosynthetic effiency of stor. org.
     double SpStemAI;            // Specific stem area index
     const CSMP& StemAIMod;      // Specific stem area index modifier
+    double StemPhotEff;         // Relative photosynthetic effiency of stem.
     const CSMP& HvsDS;		// Crop height as function of DS
     const vector<double>& LAIDist0; // Relative CAI distribution at DS=0
     const vector<double>& LAIDist1; // Relative CAI distribution at DS=1
@@ -283,12 +286,13 @@ struct CropStandard::Variables
   struct RecPhenology
   {
     void output (Log&, Filter&) const;
-    double DS;		// Development Stage
+    double DS;	        	// Development Stage
     double Vern;		// Vernalization criterium [C d]
     double partial_day_length;	// Light hours this day until now [0-24 h]
     double day_length;		// Light hours previous day. [0-24 h]
     double partial_soil_temperature; // Accumaleted soil temperature. [°C]
     double soil_temperature;	// Soil temperature previous day. [°C]
+    double soil_h;		// Soil potential [cm]
   private:
     friend struct CropStandard::Variables;
     RecPhenology (const Parameters&, const AttributeList&);
@@ -405,6 +409,7 @@ CropStandard::Parameters::Parameters (const AttributeList& vl)
 
 CropStandard::Parameters::DevelPar::DevelPar (const AttributeList& vl)
   : EmrTSum (vl.number ("EmrTSum")),
+    EmrSMF (vl.csmp ("EmrSMF")),
     DS_Emr (vl.number ("DS_Emr")),
     DSRate1 (vl.number ("DSRate1")),
     DSRate2 (vl.number ("DSRate2")),
@@ -434,8 +439,10 @@ CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
     SpLAIfac (vl.number ("SpLAIfac")),
     SpSOrgAI (vl.number ("SpSOrgAI")),
     SOrgAIMod (vl.csmp ("SOrgAIMod")),
+    SOrgPhotEff (vl.number ("SOrgPhotEff")),
     SpStemAI (vl.number ("SpStemAI")),
     StemAIMod (vl.csmp ("StemAIMod")),
+    StemPhotEff (vl.number ("StemPhotEff")),
     HvsDS (vl.csmp ("HvsDS")),
     LAIDist0 (vl.number_sequence ("LAIDist0")),
     LAIDist1 (vl.number_sequence ("LAIDist1")),
@@ -563,7 +570,8 @@ CropStandard::Variables::RecPhenology::RecPhenology (const Parameters& par,
     partial_day_length (vl.number ("partial_day_length")),
     day_length (vl.number ("day_length")),
     partial_soil_temperature (vl.number ("partial_soil_temperature")),
-    soil_temperature (vl.number ("soil_temperature"))
+    soil_temperature (vl.number ("soil_temperature")),
+    soil_h (vl.number ("soil_h"))
 
 { }
 
@@ -577,6 +585,7 @@ CropStandard::Variables::RecPhenology::output (Log& log, Filter& filter) const
   log.output ("day_length", filter, day_length);
   log.output ("partial_soil_temperature", filter, partial_soil_temperature);
   log.output ("soil_temperature", filter, soil_temperature);
+  log.output ("soil_h", filter, soil_h);
   log.close();
 }
 
@@ -811,6 +820,14 @@ CropStandardSyntax::CropStandardSyntax ()
   // DevelPar
   Devel.add ("EmrTSum", "dg C d", Syntax::Const,
 	     "Soil temperature sum at emergence.");
+  Devel.add ("EmrSMF", Syntax::CSMP, Syntax::Const,
+	     "Soil moisture (h-function) effect on emergense.");
+  CSMP SMF;
+  SMF.add (-15000.0, 0.00);
+  SMF.add (-200.00, 1.00);
+  SMF.add (-50.00, 1.00);
+  SMF.add (-0.00, 0.00);
+  vDevel.add("EmrSMF",SMF);
   Devel.add ("DS_Emr", Syntax::None (), Syntax::Const,
 	     "Development stage at emergence.");
   Devel.add ("DSRate1", Syntax::None (), Syntax::Const,
@@ -870,17 +887,23 @@ This parameterization is only valid until the specified development state.");
 	      "Factor defining maximum Specific leaf weight.");
   vCanopy.add ("SpLAIfac", 2.0);
   Canopy.add ("SpSOrgAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
-	      " Specific storage organ weight.");
+	      "Specific storage organ weight.");
   vCanopy.add ("SpSOrgAI", 0.0);
   Canopy.add ("SOrgAIMod", Syntax::CSMP, Syntax::Const,
 	      "Specific storage organ weight modifier (func. of DS)");
   vCanopy.add ("SOrgAIMod", AIDef);
+  Canopy.add ("SOrgPhotEff", Syntax::None (), Syntax::Const,
+	      "Relative photosynthetic efficiency of storage organ.");
+  vCanopy.add ("SOrgPhotEff", 1.0);
   Canopy.add ("SpStemAI", "(m^2/m^2)/(g DM/m^2)", Syntax::Const,
-	      " Specific stem weight.");
+	      "Specific stem weight.");
   vCanopy.add ("SpStemAI", 0.0);
   Canopy.add ("StemAIMod", Syntax::CSMP, Syntax::Const,
 	      "Specific stem weight modifier (func. of DS)");
   vCanopy.add ("StemAIMod", AIDef);
+  Canopy.add ("StemPhotEff", Syntax::None (), Syntax::Const,
+	      "Relative photosynthetic efficiency of stem.");
+  vCanopy.add ("StemPhotEff", 1.0);
   Canopy.add ("HvsDS", Syntax::CSMP, Syntax::Const,
 	      "Crop height as function of DS [->cm].");
   Canopy.add ("LAIDist0", Syntax::None (), Syntax::Const, 3,
@@ -1144,6 +1167,9 @@ Maximal development stage for which the crop survives harvest.");
   Phenology.add ("soil_temperature", "dg C", Syntax::State,
 		 "Average soil temperature yesterday.");
   vPhenology.add ("soil_temperature", 0.0);
+  Phenology.add ("soil_h", "cm", Syntax::State,
+		 "Soil pressure potential.");
+  vPhenology.add ("soil_h", -100.0);
 
   // Canopy
   Canopy.add ("Height", "cm", Syntax::State, "Crop height.");
@@ -1197,7 +1223,7 @@ Maximal development stage for which the crop survives harvest.");
   vProd.add ("WStem", 0.000);
   Prod.add ("WRoot", "g DM/m^2", Syntax::State, "Root dry matter weight.");
   vProd.add ("WRoot", 0.001);
-  Prod.add ("WSOrg", "g DM/m^2", Syntax::State, 
+  Prod.add ("WSOrg", "g DM/m^2", Syntax::State,
 	    "Storage organ dry matter weight.");
   vProd.add ("WSOrg", 0.000);
   Prod.add ("WDead", "g DM/m^2", Syntax::State,
@@ -1455,8 +1481,9 @@ CropStandard::Emergence ()
 {
   const Parameters::DevelPar& Devel = par.Devel;
   double& DS = var.Phenology.DS;
+  const h = var.Phenology.soil_h;
 
-  DS += var.Phenology.soil_temperature / Devel.EmrTSum;
+  DS += var.Phenology.soil_temperature / Devel.EmrTSum * Devel.EmrSMF(h);
   if (DS > 0)
     DS = Devel.DS_Emr;
 }
@@ -1565,7 +1592,8 @@ CropStandard::CropCAI ()
   var.Canopy.SOrgAI = Canopy.SpSOrgAI * Canopy.SOrgAIMod (DS) * WSOrg;
   var.Canopy.StemAI = Canopy.SpStemAI * Canopy.StemAIMod (DS) * WStem;
 
-  return var.Canopy.LeafAI + var.Canopy.StemAI + var.Canopy.SOrgAI;
+  return var.Canopy.LeafAI + Canopy.StemPhotEff * var.Canopy.StemAI
+                           + Canopy.SOrgPhotEff * var.Canopy.SOrgAI;
 }
 
 void
@@ -2352,9 +2380,11 @@ CropStandard::tick (const Time& time,
 	var.RootSys.NH4Extraction.end (),
 	0.0);
 
-  // Update partial_soil_temperature.
+  // Update partial_soil_temperature and pressure potential.
   var.Phenology.partial_soil_temperature +=
     soil_heat.T (soil.interval_plus (-par.Root.DptEmr));
+  var.Phenology.soil_h =
+    soil_water.h (soil.interval_plus (-par.Root.DptEmr/2.));
 
   if (time.hour () == 0 && var.Phenology.DS <= 0)
     {
@@ -2449,11 +2479,27 @@ CropStandard::harvest (const string& column_name,
   const double WSOrg = Prod.WSOrg;
   const double WRoot = Prod.WRoot;
   const double WDead = Prod.WDead;
+  // Part of economic yield removed at harvest
+  const double WEYRm = Hp.EconomicYield_W * sorg_harvest * WSOrg;
+  // Part of economic yield left in the field at harvest
+  const double WEYLf = Hp.EconomicYield_W * (1 - sorg_harvest) * WSOrg;
+  // Part of non economic yield removed from the field at harvest
+  const double WRsRm = (1 - Hp.EconomicYield_W) * sorg_harvest * WSOrg;
+  // Part of non economic yield left in the field at harvest
+  const double WRsLf = (1 - Hp.EconomicYield_W) * (1 - sorg_harvest) * WSOrg;
   const double NStem = Prod.NStem;
   const double NLeaf = Prod.NLeaf;
   const double NSOrg = Prod.NSOrg;
   const double NRoot = Prod.NRoot;
   const double NDead = Prod.NDead;
+  // Part of economic yield removed at harvest
+  const double NEYRm = Hp.EconomicYield_N * sorg_harvest * NSOrg;
+  // Part of economic yield left in the field at harvest
+  const double NEYLf = Hp.EconomicYield_N * (1 - sorg_harvest) * NSOrg;
+  // Part of non economic yield removed from the field at harvest
+  const double NRsRm = (1 - Hp.EconomicYield_N) * sorg_harvest * NSOrg;
+  // Part of non economic yield left in the field at harvest
+  const double NRsLf = (1 - Hp.EconomicYield_N) * (1 - sorg_harvest) * NSOrg;
   const double C_Stem = Hp.C_Stem;
   const double C_Leaf = Hp.C_Leaf;
   const double C_SOrg = Hp.C_SOrg;
@@ -2510,6 +2556,16 @@ CropStandard::harvest (const string& column_name,
       assert (approximate (CropHeight (), var.Canopy.Height));
       var.Canopy.CAI = CropCAI ();
       CanopyStructure ();
+
+      // Residuals left in the field
+      const double C = C_SOrg * WRsRm;
+      const double N = NRsRm;
+      AM& am = AM::create (geometry, time, SOrg, name, "sorg");
+      assert (C == 0.0 || N > 0.0);
+      am.add ( C * m2_per_cm2, N * m2_per_cm2);
+      organic_matter.add (am);
+      Prod.C_AM += C;
+      Prod.N_AM += N;
     }
   else
     {
@@ -2542,8 +2598,8 @@ CropStandard::harvest (const string& column_name,
 	}
       if (sorg_harvest < 1.0 && WSOrg > 0.0)
 	{
-          const double C = WSOrg * C_SOrg * (1.0 - sorg_harvest);
-          const double N = NSOrg * (1.0 - sorg_harvest);
+          const double C = C_SOrg * (WEYLf + WRsLf + WRsRm);
+          const double N = NEYLf + NRsLf + NRsRm;
 	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
 	  assert (C == 0.0 || N > 0.0);
 	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
@@ -2581,8 +2637,7 @@ CropStandard::harvest (const string& column_name,
   return *new Harvest (column_name, time, name,
 		       WStem * stem_harvest, NStem * stem_harvest,
 		       WLeaf * leaf_harvest, NLeaf * leaf_harvest,
-		       WSOrg * sorg_harvest, NSOrg * sorg_harvest,
-		       chemicals);
+		       WEYRm, NEYRm, chemicals);
 }
 
 void
