@@ -1239,7 +1239,7 @@ static struct CropStandardSyntax
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule_sequence<OM>;
-template class add_submodule<RootSystem>;
+template class add_submodule<CropStandard::RootSystem>;
 #endif
 
 CropStandardSyntax::CropStandardSyntax ()

@@ -104,12 +104,17 @@ static double IM_get_NH4 (const AttributeList& al)
 	}
       // Mineral fertilizer.
       assert (al.name ("syntax") == "mineral");
+      const double volatilization 
+	= al.check ("NH4_evaporation") 
+	? al.number ("NH4_evaporation")
+	: al.number ("volatilization");
+      
       return al.number ("weight")
-	* al.number ("NH4_fraction") * (1.0 - al.number ("NH4_evaporation"))
+	* al.number ("NH4_fraction") * (1.0 - volatilization)
 	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
     }
   // Other.
-  assert (!al.check ("NH4_evaporation"));
+  assert (!al.check ("NH4_evaporation") && !al.check ("volatilization"));
   return al.number ("NH4");
 }
 

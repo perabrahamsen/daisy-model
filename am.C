@@ -824,9 +824,11 @@ The remaining nitrogen is assumed to be ammonium or organic.");
 		    "Ammonium fraction of total N in fertilizer.  \
 The remaining nitrogen is assumed to be nitrate or organic.");
 	alist.add ("NH4_fraction", 0.0);
-	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::Const, 
+	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::OptionalConst, 
+		    "Obsolete alias for `volatilization'.");
+	syntax.add ("volatilization", Syntax::None (), Syntax::Const, 
 		    "Fraction of NH4 that evaporates on application.");
-	alist.add ("NH4_evaporation", 0.0);
+	alist.add ("volatilization", 0.0);
 	Librarian<AM>::add_type ("organic", alist, syntax, &make);
       }
       // Mineral fertilizer.
@@ -842,9 +844,11 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 	syntax.add ("NH4_fraction", Syntax::None (), Syntax::Const, 
 		    "Ammonium fraction of total N in fertilizer.  \
 The remaining nitrogen is assumed to be nitrate.");
-	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::Const, 
+	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::OptionalConst, 
+		    "Obsolete alias for `volatilization'.");
+	syntax.add ("volatilization", Syntax::None (), Syntax::Const, 
 		    "Fraction of NH4 that evaporates on application.");
-	alist.add ("NH4_evaporation", 0.0);
+	alist.add ("volatilization", 0.0);
 	alist.add ("syntax", "mineral");
 	Librarian<AM>::add_type ("mineral", alist, syntax, &make);
       }

@@ -43,7 +43,7 @@ SoilChemical::decompose (const Soil& soil,
   bool found = false;
   for (unsigned int i = 0; i < size; i++)
     {
-      lag[i] += lag_increment (C_[i]);
+      lag[i] += lag_increment (C_[i]) * dt;
       
       if (lag[i] >= 1.0)
 	{
@@ -119,7 +119,7 @@ decomposition begins.  It can never be more than 1.0 or less than 0.0.");
     }
   alist.add ("lag_increment", *no_lag);
   syntax.add ("lag", Syntax::None (), Syntax::OptionalState,
-	      "This state variable grows with lag_increment (C) each time step.\n\
+	      "This state variable grows with lag_increment (C) each hour.\n\
 When it reached 1.0, decomposition begins.");
   alist.add ("adsorption", none);
 }

@@ -1598,7 +1598,7 @@ public:
 	double  potential_transpiration_ ;
 // return Lel in mm/hr, i.e. (1/680) 1 W/m**2 = 0.001471 mm/hr
   	double potential_transpiration () const
-  { return potential_transpiration_ /* 0.001471*lel_pot */; }
+  { return /* potential_transpiration_ */ max (0.0, 0.001471*lel_pot); }
 
 void tick (const Weather& weather, const Vegetation& crops,
 	const Surface& surface, const Soil& soil, const SoilHeat& soil_heat,
@@ -2257,6 +2257,8 @@ syntax.add ("f_temp", "NA", Syntax::LogOnly,
 		"Constraint function (Verma) related to air temperature");
 syntax.add ("f_def", "NA", Syntax::LogOnly,
 		"Constraint function (Verma) related to vapor pressure");
+syntax.add ("f_theta", "NA", Syntax::LogOnly,
+		"Constraint function (Steward) related to soil water content");
 syntax.add ("f_etep", "NA", Syntax::LogOnly,
 		"Constraint function defined by crop_ea/crop_ep");
 syntax.add ("r_sc_js", "s/m", Syntax::LogOnly,

@@ -1,6 +1,24 @@
-* Transpiration/Water Uptake component
+* Ny `ridging' operation.
+
+** Nye surface parametre.
+
+** Ny action
+
+** Ret interface mellem soil water og surface.
+
+* Management:
+
+** `repeat' action til brug ved græsning
+
+** Gød efter hvor meget N der mangler i jorden 
+
+** Gød efter hvor meget DM der er høstet fra jorden
 
 * Daisy new user guide.
+
+* Gør det muligt at logge individuelle AM puljer.
+
+* Gør det muligt at logge individuelle kemikalier.
 
 * CVS
 
