@@ -1,5 +1,7 @@
 2001-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* root_system.C (get_PotRtDpt): Workaround for Borland.
+
 	* Version 1.76 released.
 
 2001-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>

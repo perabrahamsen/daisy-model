@@ -488,6 +488,16 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("NO3Upt", "g N/m^2/h", Syntax::LogOnly, "NO3-N uptake.");
 }
 
+static double
+get_PotRtDpt (const AttributeList& al)
+{
+  if (al.check ("PotRtDpt"))
+    return al.number ("PotRtDpt");
+  if (al.check ("Depth"))
+    return al.number ("Depth");
+  return al.number ("DptEmr");
+}
+
 RootSystem::RootSystem (const AttributeList& al)
   : DptEmr (al.number ("DptEmr")),
     PenPar1 (al.number ("PenPar1")),
@@ -500,11 +510,7 @@ RootSystem::RootSystem (const AttributeList& al)
     MxNH4Up (al.number ("MxNH4Up")),
     MxNO3Up (al.number ("MxNO3Up")),
     Rxylem (al.number ("Rxylem")),
-    PotRtDpt (  al.check ("PotRtDpt")
-	      ? al.number ("PotRtDpt")
-	      : (  al.check ("Depth") 
-		 ? al.number ("Depth")
-		 : al.number ("DptEmr"))),
+    PotRtDpt (get_PotRtDpt (al)),
     Depth (al.check ("Depth") ? al.number ("Depth") : al.number ("DptEmr")),
     Density (al.number_sequence ("Density")),
     H2OExtraction (al.number_sequence ("H2OExtraction")),
