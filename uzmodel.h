@@ -6,6 +6,7 @@
 
 #include <std/string.h>
 #include <vector.h>
+#include "common.h"
 
 class Soil;
 class Library;
@@ -19,6 +20,8 @@ class UZtop
 public:
   virtual bool flux_top () const = 0;
   virtual double q () const = 0;
+  double h () const
+  { return q () * dt; }
   virtual void flux_top_on () = 0;
   virtual void flux_top_off () = 0;
   virtual bool accept_top (double) = 0;

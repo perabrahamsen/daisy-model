@@ -6,7 +6,8 @@
 #include <vector.h>
 
 void
-tridia (const unsigned int N,
+tridia (int from,
+	unsigned int size,
 	const vector<double>& a,
 	const vector<double>& b, 
 	const vector<double>& c,

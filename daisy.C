@@ -67,10 +67,9 @@ Daisy::run ()
 	{
 	  (*column)->tick (time, weather, groundwater);
 	}
-
       time.tick ();
-      weather.tick ();
       log.tick (*this);
+      weather.tick ();
     }
 }
 
@@ -85,6 +84,7 @@ Daisy::output (Log& log, const Filter* filter) const
 {
   log.open ();
   log.output ("time", filter, time);
+  weather.output ("weather", log, filter);
   if (filter->check ("field"))
     output_field (log, filter->lookup ("field"));
   log.close ();
@@ -116,7 +116,7 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add ("time", Syntax::Date, Syntax::InOut);
   syntax.add_sequence ("field", Column::library (), Syntax::InOut);
   syntax.add_output ("log", syntax, Syntax::Sparse);
-  syntax.add_object ("weather", Weather::library (), Syntax::Const);
+  syntax.add_object ("weather", Weather::library ());
   syntax.add_object ("groundwater", Groundwater::library (), Syntax::Const);
 }
 

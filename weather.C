@@ -4,11 +4,9 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
+#include "common.h"
 #include <map.h>
 #include <algobase.h>
-#define exception _BUG_EXCPETION
-#include <math.h>
-#undef exception
 
 static Library* Weather_library = NULL;
 typedef map<string, Weather::constructor, less<string> > Weather_map_type;
@@ -48,6 +46,10 @@ Weather::create (const Time& t, const AttributeList& al)
   assert (library ().syntax (name).check (al));
   return (*Weather_constructors)[name] (t, al);
 }
+
+void
+Weather::output (const string, Log&, const Filter*) const
+{ }
 
 double
 Weather::DayLength () const

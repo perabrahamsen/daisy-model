@@ -5,6 +5,7 @@
 #include "alist.h"
 #include "soil_water.h"
 #include "log.h"
+#include "common.h"
 
 extern double abs (double);
 
@@ -17,8 +18,7 @@ Surface::flux_top () const
 double 
 Surface::q () const
 {
-  assert (flux_top ());
-  return -pond / 10;		// mm -> cm.
+  return -pond / 10.0;		// mm -> cm.
 }
   
 void  
@@ -39,11 +39,9 @@ Surface::accept_top (double water)
   if (lake >= 0.0)
     return true;
 
-  water *= 10;			// cm -> mm.
+  water *= 10.0;			// cm -> mm.
 
-  static const double dt = 1.0; // Time step [h].
-
-  if (pond + water * dt >= - max (abs (pond), abs (water)) / 1000)
+  if (pond + water * dt >= - max (abs (pond), abs (water)) / 100)
     {
       pond += water * dt;
       return true;
@@ -69,7 +67,8 @@ Surface::evaporation (double PotSoilEvaporation, double water,
 		      const Soil& soil, const SoilWater& soil_water)
 {
   static const double dt = 1.0; // Time step [h].
-  const double MaxExfiltration = soil_water.MaxExfiltration (soil) / 10; // mm -> cm.
+  const double MaxExfiltration
+    = soil_water.MaxExfiltration (soil) / 10.0; // mm -> cm.
   Eps = PotSoilEvaporation;
 
   if (pond + water * dt < Eps * dt)

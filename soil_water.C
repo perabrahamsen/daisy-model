@@ -46,13 +46,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
     }
 
   // Limit for ponding.
-  int first = 0;
-  if (!surface.flux_top ())
-    {
-      first = 1;
-      h_old[0] = surface.ponding ();
-      h_[0] = surface.ponding ();
-    }
+  const int first = 0;
 
   if (bottom)
     {

@@ -4,6 +4,8 @@
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
+#include "log.h"
+#include "filter.h"
 #include <algobase.h>
 
 class WeatherSimple : public Weather
@@ -12,9 +14,15 @@ class WeatherSimple : public Weather
   const double T2;
   const double precipitation;
   const int interval;
-    // Simulation.
+  
+  // Log.
+  double Prain;
+  double Psnow;
+
+  // Simulation.
 public:
   void tick ();
+  void output (const string, Log&, const Filter*) const;
   double AirTemperature () const;
   double GlobalRadiation () const;
   double ReferenceEvapotranspiration () const;
@@ -22,7 +30,7 @@ public:
   double Rain () const;
   double Snow () const;
 
-    // Create and Destroy.
+  // Create and Destroy.
 private:
   friend class WeatherSimpleSyntax;
   static Weather& make (const Time&, const AttributeList&);
@@ -33,7 +41,33 @@ public:
 
 void
 WeatherSimple::tick ()
-{ }
+{ 
+  if (AirTemperature () < T1)
+    Psnow = Precipitation ();
+  else if (T2 < AirTemperature ())
+    Psnow = 0.0;
+  else
+    Psnow = Precipitation () * (T2 - AirTemperature ()) / (T2 - T1);
+
+  Prain = Precipitation () - Snow ();
+}
+
+void
+WeatherSimple::output (const string name, Log& log, const Filter* filter) const
+{
+  if (filter->check (name))
+    {
+      filter = filter->lookup (name);
+      if (filter->check ("simple"))
+	{
+	  filter = filter->lookup ("simple");
+	  log.open (name, "simple");
+	  log.output ("Prain", filter, Prain, true);	
+	  log.output ("Psnow", filter, Psnow, true);
+	  log.close ();
+	}
+    }
+}
 
 double
 WeatherSimple::AirTemperature (void) const // [C]
@@ -87,18 +121,13 @@ WeatherSimple::Precipitation () const
 double
 WeatherSimple::Rain () const
 {
-  return Precipitation () - Snow ();
+  return Prain;
 }
 
 double
 WeatherSimple::Snow () const
 {
-  if (AirTemperature () < T1)
-    return Precipitation ();
-  else if (T2 < AirTemperature ())
-    return 0.0;
-  else
-    return Precipitation () * (T2 - AirTemperature ()) / (T2 - T1);
+  return Psnow;
 }
 
 WeatherSimple::WeatherSimple (const Time& t, const AttributeList& al)
@@ -106,7 +135,9 @@ WeatherSimple::WeatherSimple (const Time& t, const AttributeList& al)
     T1 (al.number ("T1")),
     T2 (al.number ("T2")),
     precipitation (al.number ("precipitation")),
-    interval (al.integer ("interval"))
+    interval (al.integer ("interval")),
+    Prain (0.0),
+    Psnow (0.0)
 { }
 
 WeatherSimple::~WeatherSimple ()
@@ -138,5 +169,7 @@ WeatherSimpleSyntax::WeatherSimpleSyntax ()
   alist.add ("precipitation", 0.0);
   syntax.add ("interval", Syntax::Integer, Syntax::Const);
   alist.add ("interval", 1);
+  syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
   Weather::add_type ("simple", alist, syntax, &WeatherSimple::make);
 }

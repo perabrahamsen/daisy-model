@@ -9,6 +9,8 @@ class AttributeList;
 class Input;
 class Library;
 class Syntax;
+class Log;
+class Filter;
 
 class Weather
 {
@@ -20,6 +22,7 @@ protected:
   // Simulation.
 public:
   virtual void tick () = 0;
+  virtual void output (const string, Log&, const Filter*) const;
 
   // Communication with Biocliamte.
 public:

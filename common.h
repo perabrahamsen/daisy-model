@@ -1,6 +1,7 @@
 // common.h
 //
-// This file should contain compiler specific workarounds for bugs.
+// This file should contain compiler specific workarounds for bugs and
+// global constants.
 
 #ifndef COMMON_H
 #define COMMON_H
@@ -27,5 +28,7 @@
 #else
 #define BUG_DYNAMIC_CAST(T, V) (T) V
 #endif
+
+static const double dt = 1.0;	// time step.
 
 #endif COMMON_H

@@ -18,8 +18,7 @@ HEAD = $(OBJECTS:.o=.h) common.h
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = crop.dai old_crop.chp old_crop.log \
-	water.dai old_water.log water.gen water.plot
+REMOVE = template.C
 
 
 .SUFFIXES:	.C .o .h
@@ -53,14 +52,20 @@ print:
 
 test:	crop-test water-test evapo-test
 
+bless:
+	(cd test; make bless )
+
 water-test:	daisy 
-	(cd test/water; make test )
+	(cd test; make water-test )
 
 crop-test:	daisy 
-	(cd test/crop; make test )
+	(cd test; make crop-test )
 
 evapo-test:	daisy 
-	(cd test/evapo; make test )
+	(cd test; make evapo-test )
+
+balance:	daisy
+	(cd test; make balance)
 
 check:	daisy
 	(cd exp; make test )
@@ -78,6 +83,7 @@ depend: $(SRC)
 cvs: $(TEXT)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
 	-cvs add $(TEXT)
+	(cd test ; make cvs )
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"

@@ -8,6 +8,8 @@
 
 class HorizonYolo : public Horizon
 {
+  int M_intervals;
+
 public:
   double Theta (double h) const;
   double K (double h) const;
@@ -28,7 +30,7 @@ double
 HorizonYolo::Theta (const double h) const
 {
   if (h < -1.0)
-    return 0.124 + 274.2 / (739.0 + pow (log (-h), 4));
+    return min (0.495, 0.124 + 274.2 / (739.0 + pow (log (-h), 4)));
   else
     return 0.495;
 }
@@ -69,13 +71,14 @@ HorizonYolo::M (double h) const
   static bool initialized = false;
   if (!initialized)
     {
-      K_to_M (csmp, 500);
+      K_to_M (csmp, M_intervals);
       initialized = true;
     }
   return csmp (h);
 }
 
-HorizonYolo::HorizonYolo (const AttributeList&)
+HorizonYolo::HorizonYolo (const AttributeList& al)
+  : M_intervals (al.integer ("M_intervals"))
 { }
 
 HorizonYolo::~HorizonYolo ()
@@ -96,7 +99,9 @@ static struct HorizonYoloSyntax
 
 HorizonYoloSyntax::HorizonYoloSyntax ()
 { 
-  Syntax* syntax = new Syntax ();
-  AttributeList* alist = new AttributeList ();
-  Horizon::add_type ("yolo", *alist, *syntax, &HorizonYolo::make);
+  Syntax& syntax = *new Syntax ();
+  AttributeList& alist = *new AttributeList ();
+  syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
+  alist.add ("M_intervals", 500);
+  Horizon::add_type ("yolo", alist, syntax, &HorizonYolo::make);
 }
