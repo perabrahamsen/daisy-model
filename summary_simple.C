@@ -66,8 +66,11 @@ struct SummarySimple : public Summary
       switch (type)
 	{
 	case NewContent:
+          type = Content;
+          initial = last = 0.0;
+          break;
 	case Content:
-	  type = Error;
+          last = 0.0;
 	  break;
 	case Flux:
 	  break;
@@ -87,6 +90,7 @@ struct SummarySimple : public Summary
 	  break;
 	case Content:
 	  last = value;
+          break;
 	case Flux:
 	  sum += value;
 	  break;

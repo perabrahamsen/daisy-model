@@ -1,3 +1,15 @@
+2003-10-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.08 released.
+
+2003-10-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Nitrogen Balance"): New summary.
+	("N Balance"): Use it, and add a few entries to make it possible. 
+
+	* summary_simple.C (missing): Missing datais 0.0.
+	(add): Inserting missing break.
+
 2003-09-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.07 released.
