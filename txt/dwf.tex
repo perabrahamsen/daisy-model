@@ -57,8 +57,12 @@ for them:
   will calculate with 12 mm precipitation for that day.
 \item[Begin] First data point, given in the format
   \texttt{yyyy-mm-dd} or \texttt{yyyy-mm-dd:hh}.
-\item[End] Last data point, given in the format
-  \texttt{yyyy-mm-dd} or \texttt{yyyy-mm-dd:hh}.
+\item[End] Last data point, given in the format \texttt{yyyy-mm-dd} or
+  \texttt{yyyy-mm-dd:hh}.  Note that the date specified by
+  \texttt{End} should be a few days before the actual end of the
+  weather data, to prevent \daisy{} from reading past the end of the
+  file.  Also, make sure the simulation ends before the weather data,
+  or the results may be lost.
 \item[Timestep] Time between data points, given in \texttt{[hours]}.
   You can leave out this keyword, in that case the time for each data
   point must be specified.  Leaving it out allows for varying

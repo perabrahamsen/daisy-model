@@ -23,9 +23,14 @@ Surface: reference
 ScreenHeight: 2.0 m
 
 # General information about the available data.
+#
+# Note that End should be a few days before the actual end of the
+# weather data, to prevent Daisy from reading past the end of the
+# file.  Also, make sure the simulation ends before the weather data,
+# or the results may be lost.
 
 Begin: 1962-04-01
-End:   2001-10-07
+End:   2001-10-05
 Timestep: 24 hours
 
 Note: These data are only for test purposes.
