@@ -1,4 +1,16 @@
+1998-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.44 released.
+
+1998-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* options.C, options.h, main.C:  Moved option parsing from main.C
+	to options.h.
+
 1998-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (CropStandardSyntax): Default SpRtLength was integer,
+	should be floating point.
 
 	* Version 0.43 released.
 

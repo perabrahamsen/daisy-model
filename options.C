@@ -1,9 +1,15 @@
-// options.C --- handle options from the system ebvironment.
+// options.C --- handle options from the system environment.
 
 #include "options.h"
+#include "parser_file.h"
+#include "syntax.h"
+#include "alist.h"
+#include "version.h"
 #include <vector>
 #include <fcntl.h>
 #include <iostream>
+
+extern "C" int chdir (const char *path);
 
 ostream& 
 Options::message ()
@@ -64,4 +70,94 @@ Options::find_file (const string& name)
     CERR << " `" << path[i] << "'";
   CERR << "\n";
   return -1;
+}
+
+
+static string
+get_arg (int& argc, char**& argv)
+{
+  assert (argc > 1);
+  const string arg = argv[1];
+
+  // Update argc and argv.
+  for (int i = 2; i < argc; i++)
+    argv[i - 1] = argv[i];
+  argv[argc - 1] = NULL;
+  argc--;
+
+  return arg;
+}
+
+void
+Options::usage () const
+{
+  CERR << "Usage: " << program_name << " [-p] [-v] [-d dir] file...\n";
+}
+
+Options::Options (int& argc, char**& argv,
+		  Syntax& syntax, AttributeList& alist)
+  : program_name (argv[0])
+{
+  if (argc < 2)
+    {
+      // Usage.
+      argc = -1;
+      return;
+    }
+  bool file_found = false;
+  bool options_finished = false;
+  int errors_found = 0;
+  while (argc > 1)
+    {
+      const string arg = get_arg (argc, argv);
+
+      if (options_finished || arg[0] != '-')
+	{
+	  // Parse the file.
+	  ParserFile parser (syntax, arg);
+	  parser.load (alist);
+	  file_found = true;
+	  errors_found += parser.error_count ();
+	}
+      else
+	{ 
+	  // Parse options.
+	  switch (arg[1])
+	    {
+	    case 'd':
+	      if (argc > 1)
+		// Change directory.
+		{
+		  const string dir = get_arg (argc, argv);
+		  if (chdir (dir.c_str ()) != 0)
+		    CERR << program_name << ":chdir (" << dir << ") failed";
+		}
+	      else
+		// Usage.
+		argc = -1;
+	    case 'p':
+	      // Dump syntax.
+	      syntax.dump ();
+	      break;
+	    case 'v':
+	      // Print version.
+	      COUT << "Daisy crop/soil simulation version "
+		   << version << ". (" __DATE__ ")\n"
+		"Copyright 1996 - 1998 Per Abrahamsen\n"
+		"Copyright 1996 Søren Hansen\n";
+	      break;
+	    case '-':
+	      // Finish option list.
+	      options_finished = true;
+	      break;
+	    default:
+	      // Usage.
+	      argc = -1;
+	      break;
+	    }
+	}
+    }
+  if (!file_found)
+    // Done.
+    argc = 0;
 }
