@@ -199,6 +199,7 @@ USEUNIT("pedo.C");
 USEUNIT("pedo_linear.C");
 USEUNIT("transform.C");
 USEUNIT("units.C");
+USEUNIT("hydraulic_Cosby.C");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 
