@@ -1,4 +1,22 @@
+2000-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.25 released.
+
+2000-05-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_std.C, canopy_std.h: New submodule.
+	* Makefile (SUBMODELS): Add it.
+	* crop_std.C: Use it.
+	
+	* crop_std.C: Fixed spelling errors.
+
 2000-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C, root_system.h: New submodel.
+	* Makefile (SUBMODELS): Added it.
+	* crop_std.C): Use it.
+
+	* document_LaTeX.C (print_entry_type): Removed dead code.
 
 	* Version 1.24 released.
 

@@ -240,7 +240,8 @@ COMPONENTS = select.C average.C mactrans.C macro.C \
 
 # Submodels are combined models and components.
 #
-SUBMODELS = ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
+SUBMODELS = canopy_std.C root_system.C \
+	ridge.C soil.C surface.C soil_water.C soil_NH4.C soil_NO3.C \
 	organic_matter.C nitrification.C denitrification.C soil_heat.C \
 	snow.C im.C om.C harvest.C vegetation.C chemicals.C field.C \
 	soil_chemical.C soil_chemicals.C bioincorporation.C
@@ -541,6 +542,12 @@ pet${OBJ}: pet.C pet.h librarian.h library.h common.h alist.h syntax.h \
 net_radiation${OBJ}: net_radiation.C net_radiation.h librarian.h library.h \
  common.h alist.h syntax.h log.h weather.h im.h
 pt${OBJ}: pt.C pt.h librarian.h library.h common.h alist.h syntax.h log.h
+canopy_std${OBJ}: canopy_std.C canopy_std.h plf.h submodel.h log.h \
+ librarian.h library.h common.h alist.h syntax.h mathlib.h
+root_system${OBJ}: root_system.C root_system.h submodel.h soil_heat.h \
+ soil_NH4.h solute.h adsorption.h librarian.h library.h common.h \
+ alist.h syntax.h transport.h mactrans.h soil_NO3.h soil_water.h \
+ macro.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h log.h
 ridge${OBJ}: ridge.C ridge.h soil.h horizon.h librarian.h library.h \
  common.h alist.h syntax.h hydraulic.h tortuosity.h geometry.h plf.h \
  submodel.h mathlib.h log.h soil_water.h macro.h
@@ -550,7 +557,7 @@ soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
  common.h alist.h syntax.h soil_water.h macro.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h log.h am.h im.h mathlib.h \
- submodel.h chemicals.h soil_chemicals.h plf.h
+ submodel.h chemicals.h soil_chemicals.h plf.h ridge.h
 soil_water${OBJ}: soil_water.C soil_water.h macro.h librarian.h library.h \
  common.h alist.h syntax.h log.h uzmodel.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h surface.h groundwater.h mathlib.h \
@@ -749,10 +756,11 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
 horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
  alist.h syntax.h
 crop_std${OBJ}: crop_std.C crop.h time.h librarian.h library.h common.h \
- alist.h syntax.h log.h bioclimate.h plf.h soil_water.h macro.h soil.h \
- horizon.h hydraulic.h tortuosity.h geometry.h om.h organic_matter.h \
- soil_heat.h soil_NH4.h solute.h adsorption.h transport.h mactrans.h \
- soil_NO3.h am.h harvest.h chemicals.h mathlib.h
+ alist.h syntax.h root_system.h canopy_std.h plf.h log.h bioclimate.h \
+ soil_water.h macro.h soil.h horizon.h hydraulic.h tortuosity.h \
+ geometry.h om.h organic_matter.h soil_heat.h soil_NH4.h solute.h \
+ adsorption.h transport.h mactrans.h soil_NO3.h am.h harvest.h \
+ chemicals.h mathlib.h
 action_sow${OBJ}: action_sow.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h crop.h
 action_stop${OBJ}: action_stop.C action.h librarian.h library.h common.h \

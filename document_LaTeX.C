@@ -206,8 +206,6 @@ DocumentLaTeX::print_entry_type (ostream& out,
 	out << "$]$}";
       }
       break;
-      out << "plf (see section~\\ref{type:plf})";
-      break;
     case Syntax::Boolean:
       out << "boolean (see section~\\ref{type:boolean})";
       break;
