@@ -1,9 +1,5 @@
 * Brug soil_water.last_unsatirated_node to limit om, den, nit heat, m.m.
 
-* LogTable bug
-
-"from" ser ikke ud til at blive respekteret.
-
 * Kig på groundwater_pipe.C
 
 * ElectricFence (eller C++ udgave (www.andreasen.com?)

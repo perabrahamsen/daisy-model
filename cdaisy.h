@@ -640,7 +640,7 @@ daisy_log_get_number (const char* log, const char* tag);
 const char*			/* Get name for TAG in LOG. */
 daisy_log_get_name (const char* log, const char* tag);
 
-const vector<double>&		/* Get array for TAG in LOG. */
+void				/* Get array for TAG in LOG. */
 daisy_log_get_array (const char* log, const char* tag, double value[]);
 
 /* @ Miscellaneous.

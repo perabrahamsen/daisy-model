@@ -13,7 +13,6 @@ class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
-class Groundwater;
 class SoilNO3;
 class SoilNH4;
 
@@ -28,7 +27,7 @@ private:
 public:
   void monthly (const Geometry& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
-	     const Groundwater&, SoilNO3&, SoilNH4&);
+	     SoilNO3&, SoilNH4&);
   void output (Log&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
   void mix (const Geometry&, double from, double to, double penetration = 1.0);

@@ -32,8 +32,12 @@ SoilChemical::decompose (const Soil& soil,
   assert (decomposed.size () == soil.size ());
 
   const double decompose_rate = chemical.decompose_rate ();
-  
-  for (unsigned int i = 0; i < soil.size (); i++)
+
+  unsigned int size = soil.size ();
+  if (!chemical.active_groundwater ())
+    size = soil_water.first_groundwater_node ();
+
+  for (unsigned int i = 0; i < size; i++)
     {
       const double heat_factor 
 	= chemical.decompose_heat_factor (soil_heat.T (i));
@@ -45,6 +49,9 @@ SoilChemical::decompose (const Soil& soil,
 	= decompose_rate * heat_factor * water_factor * CO2_factor;
       decomposed[i] = M_left (i) * rate;
     }
+  for (unsigned int i = size; i < soil.size (); i++)
+    decomposed[i] = 0.0;
+
   add_to_sink (decomposed);
 }
 

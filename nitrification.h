@@ -10,7 +10,6 @@ class SoilWater;
 class SoilHeat;
 class SoilNO3;
 class SoilNH4;
-class Groundwater;
 
 class Nitrification
 {
@@ -22,7 +21,7 @@ public:
   // Simulation.
 public:
   virtual void tick (const Soil&, const SoilWater&, const SoilHeat&,
-		     SoilNO3&, SoilNH4&, const Groundwater&) = 0;
+		     SoilNO3&, SoilNH4&) = 0;
   virtual void output (Log&) const = 0;
 
   // Create and Destroy.

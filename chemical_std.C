@@ -49,6 +49,7 @@ private:
   CSMP decompose_heat_factor_;
   CSMP decompose_water_factor_;
   CSMP decompose_CO2_factor_;
+  bool active_groundwater_;
 
   // Queries.
 public:
@@ -80,6 +81,8 @@ public:
     }
   double decompose_CO2_factor (double CO2) const
     { return decompose_CO2_factor_ (CO2); }
+  bool active_groundwater () const 
+    { return active_groundwater_; }
 
   // Create.
 public:
@@ -99,7 +102,8 @@ canopy_dissipation_rate_coefficient")),
     decompose_rate_ (al.number ("decompose_rate")),
     decompose_heat_factor_ (al.csmp ("decompose_heat_factor")),
     decompose_water_factor_ (al.csmp ("decompose_water_factor")),
-    decompose_CO2_factor_ (al.csmp ("decompose_CO2_factor"))
+    decompose_CO2_factor_ (al.csmp ("decompose_CO2_factor")),
+    active_groundwater_ (al.flag ("active_groundwater"))
 { }
 
 #ifdef BORLAND_TEMPLATES
@@ -144,6 +148,9 @@ Read chemical properties as normal Daisy parameters.");
       CO2_factor.add (0.0, 1.0);
       CO2_factor.add (1.0, 1.0);
       alist.add ("decompose_CO2_factor", CO2_factor);
+      syntax.add ("active_groundwater", Syntax::Boolean, Syntax::Const, "\
+Clear this flag to turn off decomposition in groundwater.");
+      alist.add ("active_groundwater", true);
       Librarian<Chemical>::add_type ("default", alist, syntax, &make);
     }
 } ChemicalStandard_syntax;

@@ -53,6 +53,15 @@ SoilWater::pF (int i) const
     return 0.0;
 }
 
+unsigned int 
+SoilWater::first_groundwater_node () const
+{ 
+  for (unsigned int i = h_.size (); i > 0u; i--)
+    if (h_[i-1] < 0.0)
+      return i;
+  return 0u;
+}
+
 double 
 SoilWater::Theta (const Soil& soil, int i, double h) const
 { return soil.Theta (i, h, h_ice_[i]); }

@@ -13,7 +13,6 @@ class Bioclimate;
 class Syntax;
 class Soil;
 class SoilWater;
-class Groundwater;
 class Weather;
 class Time;
 
@@ -25,7 +24,7 @@ class SoilHeat
 public:
   double top_flux (const Soil&, const SoilWater&) const; // [W/m^2]
   void tick (const Time&, const Soil&, SoilWater&, 
-	     const Surface&, const Groundwater&, const Weather& weather);
+	     const Surface&, const Weather& weather);
   double energy (const Soil&, const SoilWater&, double from, double to) const;
   void set_energy (const Soil&, const SoilWater&, 
 		   double from, double to, double energy);

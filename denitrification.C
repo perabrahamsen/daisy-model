@@ -8,7 +8,6 @@
 #include "soil_heat.h"
 #include "organic_matter.h"
 #include "soil_NO3.h"
-#include "groundwater.h"
 #include "csmp.h"
 #include "log.h"
 #include "submodel.h"
@@ -47,16 +46,15 @@ Denitrification::output (Log& log) const
 void Denitrification::tick (const Soil& soil, const SoilWater& soil_water,
 			    const SoilHeat& soil_heat,
 			    SoilNO3& soil_NO3, 
-			    const OrganicMatter& organic_matter,
-			    const Groundwater& groundwater)
+			    const OrganicMatter& organic_matter)
 {
   converted.erase (converted.begin (), converted.end ());
 
   unsigned int size = soil.size ();
   if (!active_underground)
     size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
-  if (!active_groundwater && !groundwater.flux_bottom ())
-    size = min (size, soil.interval_plus (groundwater.table ()));
+  if (!active_groundwater)
+    size = soil_water.first_groundwater_node ();
 
   for (unsigned int i = 0; i < size; i++)
     {

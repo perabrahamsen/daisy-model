@@ -8,7 +8,6 @@
 #include "soil_NO3.h"
 #include "log.h"
 #include "mathlib.h"
-#include "groundwater.h"
 
 class NitrificationSolute : public Nitrification
 {
@@ -27,7 +26,7 @@ private:
 public:
   void output (Log&) const;
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
-	     SoilNO3&, SoilNH4&, const Groundwater&);
+	     SoilNO3&, SoilNH4&);
 
   // Create.
 public:
@@ -87,16 +86,15 @@ NitrificationSolute::output (Log& log) const
 void 
 NitrificationSolute::tick (const Soil& soil, const SoilWater& soil_water,
 			   const SoilHeat& soil_heat,
-			   SoilNO3& soil_NO3, SoilNH4& soil_NH4,
-			   const Groundwater& groundwater)
+			   SoilNO3& soil_NO3, SoilNH4& soil_NH4)
 {
   converted.erase (converted.begin (), converted.end ());
 
   unsigned int size = soil.size ();
   if (!active_underground)
     size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
-  if (!active_groundwater && !groundwater.flux_bottom ())
-    size = min (size, soil.interval_plus (groundwater.table ()));
+  if (!active_groundwater)
+    size = soil_water.first_groundwater_node ();
 
   for (unsigned int i = 0; i < size; i++)
     {

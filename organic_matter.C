@@ -11,7 +11,6 @@
 #include "soil_NH4.h"
 #include "soil_NO3.h"
 #include "soil_heat.h"
-#include "groundwater.h"
 #include "mathlib.h"
 #include "csmp.h"
 #include "common.h"
@@ -60,7 +59,6 @@ struct OrganicMatter::Implementation
   { am.push_back (&om); }
   void monthly (const Geometry& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
-	     const Groundwater&,
 	     SoilNO3&, SoilNH4&);
   void mix (const Geometry&, double from, double to, double penetration);
   void swap (const Geometry&, double from, double middle, double to);
@@ -343,7 +341,6 @@ void
 OrganicMatter::Implementation::tick (const Soil& soil, 
 				     const SoilWater& soil_water, 
 				     const SoilHeat& soil_heat,
-				     const Groundwater& groundwater,
 				     SoilNO3& soil_NO3,
 				     SoilNH4& soil_NH4)
 {
@@ -366,8 +363,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   unsigned int size = soil.size ();
   if (!active_underground)
     size = min (size, soil.interval_plus (soil.MaxRootingDepth ()));
-  if (!active_groundwater && !groundwater.flux_bottom ())
-    size = min (size, soil.interval_plus (groundwater.table ()));
+  if (!active_groundwater)
+    size = soil_water.first_groundwater_node ();
 
   vector<double> N_soil (size);
   vector<double> N_used (size);
@@ -646,11 +643,10 @@ void
 OrganicMatter::tick (const Soil& soil, 
 		     const SoilWater& soil_water, 
 		     const SoilHeat& soil_heat,
-		     const Groundwater& groundwater,
 		     SoilNO3& soil_NO3,
 		     SoilNH4& soil_NH4)
 {
-  impl.tick (soil, soil_water, soil_heat, groundwater, soil_NO3, soil_NH4);
+  impl.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
 }
 
 void 

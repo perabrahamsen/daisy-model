@@ -292,16 +292,15 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
 		   vegetation, soil, soil_water, soil_heat);
   vegetation.tick (time, bioclimate, soil, organic_matter, 
 		   soil_heat, soil_water, soil_NH4, soil_NO3);
-  organic_matter.tick (soil, soil_water, soil_heat, groundwater, 
+  organic_matter.tick (soil, soil_water, soil_heat, 
 		       soil_NO3, soil_NH4);
-  nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4,
-		      groundwater);
+  nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
   denitrification.tick (soil, soil_water, soil_heat, soil_NO3, 
-			organic_matter, groundwater);
+			organic_matter);
   groundwater.tick (time);
 
   // Transport.
-  soil_heat.tick (time, soil, soil_water, surface, groundwater, weather);
+  soil_heat.tick (time, soil, soil_water, surface, weather);
   soil_water.tick (surface, groundwater, soil);
   soil_chemicals.tick (soil, soil_water, soil_heat, organic_matter,
 		       bioclimate.chemicals_down ());

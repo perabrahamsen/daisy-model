@@ -72,6 +72,8 @@ public:
   double X_ice_total (int i) const
   { return X_ice_[i] + X_ice_buffer[i]; }
 
+  unsigned int first_groundwater_node () const;
+    
   // Ice modified lookups.
   double Theta (const Soil&, int i, double h) const;
  

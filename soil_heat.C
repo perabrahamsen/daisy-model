@@ -3,7 +3,6 @@
 #include "soil_heat.h"
 #include "alist.h"
 #include "surface.h"
-#include "groundwater.h"
 #include "weather.h"
 #include "soil_water.h"
 #include "soil.h"
@@ -14,7 +13,6 @@
 #include "submodel.h"
 
 #define WATER_FLUX_HEAT
-#define GROUND_WATER_LIMIT
 
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
 
@@ -47,7 +45,7 @@ struct SoilHeat::Implementation
 
   // Simulation.
   void tick (const Time&, const Soil&, SoilWater&, 
-	     const Surface&, const Groundwater&, const Weather&);
+	     const Surface&, const Weather&);
   void update_freezing_points (const Soil& soil,
 			       const SoilWater& soil_water);
   bool update_state (const Soil& soil, const SoilWater& soil_water);
@@ -57,7 +55,7 @@ struct SoilHeat::Implementation
   bool check_state (const Soil& soil) const;
   void force_state (const Geometry& geometry);
   void solve (const Time&, const Soil&, const SoilWater&, 
-	      const Surface&, const Groundwater&, const Weather&);
+	      const Surface&, const Weather&);
   void calculate_heat_flux (const Soil&, const SoilWater&);
   double energy (const Soil&, const SoilWater&, double from, double to) const;
   void set_energy (const Soil&, const SoilWater&, 
@@ -79,8 +77,6 @@ SoilHeat::Implementation::tick (const Time& time,
 				const Soil& soil,
 				SoilWater& soil_water,
 				const Surface& surface,
-				const Groundwater& 
-				groundwater,
 				const Weather& weather)
 {
   // Update freezing and melting points.
@@ -88,7 +84,7 @@ SoilHeat::Implementation::tick (const Time& time,
 
   // Solve with old state.
   T_old = T;
-  solve (time, soil, soil_water, surface, groundwater, weather);
+  solve (time, soil, soil_water, surface, weather);
 
   // Check if ice is enabled.
   if (!enable_ice)
@@ -101,7 +97,7 @@ SoilHeat::Implementation::tick (const Time& time,
     {
       // Solve again with new state.
       T = T_old;
-      solve (time, soil, soil_water, surface, groundwater, weather);
+      solve (time, soil, soil_water, surface, weather);
 
       // Check if state match new temperatures.
       const bool changed_again = check_state (soil);
@@ -330,11 +326,6 @@ SoilHeat::Implementation::solve (const Time& time,
 				 const Soil& soil,
 				 const SoilWater& soil_water,
 				 const Surface& surface,
-#ifdef GROUND_WATER_LIMIT
-				 const Groundwater& groundwater,
-#else
-				 const Groundwater&,
-#endif
 				 const Weather& weather)
 {
   // Border conditions.
@@ -346,18 +337,6 @@ SoilHeat::Implementation::solve (const Time& time,
     T_top = T_top_new;
 
   int size = soil.size ();
-#ifdef GROUND_WATER_LIMIT
-  // Limit for groundwater table.
-  if (!groundwater.flux_bottom ())
-    {
-      if (groundwater.table () < soil.z (size - 1))
-	throw ("Groundwater table below lowest node.");
-      size = soil.interval_plus (groundwater.table ());
-    }
-  // Maybe the groundwater module lied...
-  while (size > 0 && soil_water.h (size - 1) >= 0)
-    size--;
-#endif
 
   // Tridiagonal matrix.
   vector<double> a (size, 0.0);
@@ -473,10 +452,6 @@ SoilHeat::Implementation::solve (const Time& time,
   T_top_old = T_top;
   T_top = T_top_new;
   assert (T[0] < 50.0);
-
-  // Temperature is constant in the groundwater.
-  for (unsigned int i = size; i < soil.size (); i++)
-    T[i] = T_bottom;
 
   calculate_heat_flux (soil, soil_water);
 }
@@ -669,10 +644,9 @@ SoilHeat::tick (const Time& time,
 		const Soil& soil,
 		SoilWater& soil_water,
 		const Surface& surface,
-		const Groundwater& groundwater,
 		const Weather& weather)
 {
-  impl.tick (time, soil, soil_water, surface, groundwater, weather);
+  impl.tick (time, soil, soil_water, surface, weather);
 }
 
 double 

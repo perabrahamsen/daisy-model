@@ -14,7 +14,6 @@ class SoilNO3;
 class OrganicMatter;
 class CSMP;
 class Log;
-class Groundwater;
 
 class Denitrification
 {
@@ -33,7 +32,7 @@ private:
 public:
   void output (Log&) const;
   void tick (const Soil&, const SoilWater&, const SoilHeat&, SoilNO3&,
-	     const OrganicMatter&, const Groundwater&);
+	     const OrganicMatter&);
 
   // Create.
 public:

@@ -53,10 +53,13 @@ struct SelectInterval : public Select
 	from = default_from;
       if (default_to <= 0.0 && to > 0.0)
 	to = default_to;
+
+      if (from > 0.0)
+	from = 0.0;
     }
   SelectInterval (const AttributeList& al)
     : Select (al),
-      from (al.number ("from")),
+      from (al.number ("from") ? al.number ("from") : 1.0),
       to (al.check ("to") ? al.number ("to") : 1.0),
       value (al.number ("value"))
     { }
@@ -75,8 +78,8 @@ static struct SelectIntervalSyntax
       alist.add ("description", "Summarize specified interval.");
 
       syntax.add ("from", "cm", Syntax::Const,
-		  "Specify height (negative) to measure from.");
-      alist.add ("from", 0.0);
+		  "Specify height (negative) to measure from.\n\
+By default, measure from the top.");
       syntax.add ("to", "cm", Syntax::OptionalConst,
 		  "Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.");

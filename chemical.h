@@ -23,6 +23,7 @@ public:
   virtual double decompose_heat_factor (double T) const = 0; // [dg C ->]
   virtual double decompose_water_factor (double h) const = 0 ; // [cm ->]
   virtual double decompose_CO2_factor (double CO2) const = 0; // [g C/cm^3 ->]
+  virtual bool active_groundwater () const = 0;
 
   // Create and Destroy.
 protected:

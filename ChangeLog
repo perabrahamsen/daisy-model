@@ -1,4 +1,35 @@
+1999-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.89 released.
+
+1999-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.h (first_groundwater_node): New
+	function. 
+	* denitrification.C (tick): Call it.
+	* soil_heat.C:  Call it.
+	* organic_matter.C (tick):  Call it.
+	* nitrification_solute.C (tick):  Call it.
+	* nitrification_soil.C (tick):  Call it.
+	* organic_matter.C, organic_matter.h (tick): Remove groundwater
+	parameter. 
+	* soil_heat.C, soil_heat.h (tick): Ditto.
+	* soil_heat.C (solve): Ditto.
+	* denitrification.C, denitrification.h (tick): Ditto.
+	* nitrification.h (tick): Ditto.
+	* nitrification_solute.C (tick): Ditto.
+	* nitrification_soil.C (tick): Ditto.
+	* column_std.C (tick): Updated caller.
+	* chemical_std.C, chemical.h (active_groundwater): New query
+	function. 
+	* soil_chemical.C (decompose): Use it.
+
+	* cdaisy.h (daisy_log_get_array): Return void.
+
 1999-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_interval.C (initialize): Make sure `default_from'
+	overwrites `from' when unspecified.
 
 	* Version 0.88 released.
 
