@@ -9,7 +9,7 @@ struct Syntax::Implementation
 {
   list<string> order;
   typedef map<string, type, less<string> > type_map;
-  typedef map<string, required, less<string> > status_map;
+  typedef map<string, category, less<string> > status_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   typedef map<string, const FTable*, less<string> > ftable_map;
   typedef map<string, int, less<string> > size_map;
@@ -36,7 +36,7 @@ Syntax::Implementation::check (const AttributeList& vl, string name)
        i++)
     {
       string key = (*i).first;
-      if(status[key] != Const && status[key] != InOut)
+      if(status[key] != Const && status[key] != State)
 	/* Do nothing */;
       else if (!vl.check (key))
 	{
@@ -119,11 +119,11 @@ Syntax::lookup (string key) const
   return impl.lookup (key);
 }
 
-Syntax::required
-Syntax::status (string key) const
+bool
+Syntax::is_const (string key) const
 {
   assert (impl.status.find (key) != impl.status.end ());
-  return impl.status[key];
+  return impl.status[key] == Const;
 }
 
 const Syntax&
@@ -178,7 +178,7 @@ Syntax::order () const
 }
 
 void
-Syntax::add (string key, type t, required req, int s)
+Syntax::add (string key, type t, category req, int s)
 {
   impl.size[key] = s;
   impl.types[key] = t;
@@ -186,28 +186,28 @@ Syntax::add (string key, type t, required req, int s)
 }
 
 void
-Syntax::add (string key, const Syntax& s, required req, int sz)
+Syntax::add (string key, const Syntax& s, category req, int sz)
 {
   add (key, List, req, sz);
   impl.syntax[key] = &s;
 }
 
 void
-Syntax::add (string key, const FTable* f, required req, int s)
+Syntax::add (string key, const FTable* f, category req, int s)
 {
   add (key, Function, req, s);
   impl.ftables[key] = f;
 }
 
 void 
-Syntax::add (string key, const Library& l, required req, int s)
+Syntax::add (string key, const Library& l, category req, int s)
 {
   add (key, Object, req, s);
   impl.libraries[key] = &l;
 }
 
 void
-Syntax::add_filter (string key, const Syntax& s, required req)
+Syntax::add_filter (string key, const Syntax& s, category req)
 {
   add (key, Filter, req);
   impl.syntax[key] = &s;

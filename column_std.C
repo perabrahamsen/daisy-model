@@ -169,7 +169,7 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
 
-  syntax.add ("crops", Crop::library (), Syntax::InOut, Syntax::Sequence);
+  syntax.add ("crops", Crop::library (), Syntax::State, Syntax::Sequence);
   
   add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
   add_submodule<Surface> ("Surface", syntax, alist);

@@ -27,7 +27,7 @@ SoilHeat::check (unsigned n) const
 void
 SoilHeat::load_syntax (Syntax& syntax, AttributeList&)
 { 
-  syntax.add ("T", Syntax::Number, Syntax::InOut, Syntax::Sequence);
+  syntax.add ("T", Syntax::Number, Syntax::State, Syntax::Sequence);
 }
 
 SoilHeat::SoilHeat (const AttributeList& al)

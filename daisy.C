@@ -115,8 +115,8 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add ("output", Log::library (), Syntax::Const, Syntax::Sequence);
   syntax.add ("input", Parser::library (), Syntax::Optional, Syntax::Sequence);
   syntax.add ("chief", Manager::library (), Syntax::Const);
-  syntax.add ("time", Syntax::Date, Syntax::InOut);
-  syntax.add ("field", Column::library (), Syntax::InOut, Syntax::Sequence);
+  syntax.add ("time", Syntax::Date, Syntax::State);
+  syntax.add ("field", Column::library (), Syntax::State, Syntax::Sequence);
   syntax.add ("weather", Weather::library ());
   syntax.add ("groundwater", Groundwater::library (), Syntax::Const);
 }

@@ -558,7 +558,7 @@ ParserFile::Implementation::get_filter (const Syntax& syntax)
 	      error (string ("Unknown attribute `") + name + "'");
 	      skip_to_end ();  
 	    }
-	  else if (syntax.status (name) == Syntax::Const)
+	  else if (syntax.is_const (name))
 	    {
 	      error (string ("Constant attribute `") + name + "'");
 	      skip_to_end ();  
@@ -586,7 +586,7 @@ ParserFile::Implementation::get_filter (const Syntax& syntax)
 	  string name = get_id ();
 	  if (syntax.lookup (name) == Syntax::Error)
 	    error (string ("Attribute `") + name + "' not known");
-	  else if (syntax.status (name) == Syntax::Const)
+	  else if (syntax.is_const (name))
 	    error (string ("Attribute `") + name + "' is const");
 	  else
 	    filter.add (name);

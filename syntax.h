@@ -32,14 +32,14 @@ public:
 
   // The requirements with regard to input and output varies with each
   // syntax entry.
-  enum required
+  enum category
   {
     // This is a parameter, i.e. its value doesn't change during the
     // compilation, and it cannot be written to the log.
     Const,
     // This a state variable, it must be provided at initialization
     // and can be written to the log.
-    InOut,
+    State,
     // This is a state variable that can be computer from other state
     // variables, and therefore does not need to be specified before
     // the simulation starts. 
@@ -55,7 +55,7 @@ public:
 
   // These functions will allow you to lookup information about a
   // specific syntax entry. 
-  required status (string) const;
+  bool is_const (string) const;
   type lookup (string) const;
   const Syntax& syntax (string) const;
   const FTable* function (string) const;
@@ -66,11 +66,11 @@ public:
   const list<string>& order () const;
 
   // Add syntax entries
-  void add (string, type, required, int size = Singleton);
-  void add (string, const Syntax&, required = InOut, int size = Singleton);
-  void add (string, const FTable*, required, int size = Singleton);
-  void add (string, const Library&, required = InOut, int size = Singleton);
-  void add_filter (string, const Syntax&, required);
+  void add (string, type, category, int size = Singleton);
+  void add (string, const Syntax&, category = State, int size = Singleton);
+  void add (string, const FTable*, category, int size = Singleton);
+  void add (string, const Library&, category = State, int size = Singleton);
+  void add_filter (string, const Syntax&, category);
   void add_class (string, const Library&, derive_fun);
 
   // It is possible to impose an order on the syntax entries, which

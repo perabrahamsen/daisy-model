@@ -656,7 +656,7 @@ CropStandardSyntax::CropStandardSyntax ()
 
     // Canopy
   Syntax& Canopy = *new Syntax ();
-  syntax.add ("Canopy", Canopy, Syntax::InOut);
+  syntax.add ("Canopy", Canopy, Syntax::State);
 
   // CropPar
 
@@ -774,10 +774,10 @@ CropStandardSyntax::CropStandardSyntax ()
   // Phenology
   Syntax& Phenology = *new Syntax ();
   AttributeList& vPhenology = *new AttributeList ();
-  syntax.add ("Phenology", Phenology, Syntax::InOut);
+  syntax.add ("Phenology", Phenology, Syntax::State);
   alist.add ("Phenology", vPhenology);
 
-  Phenology.add ("DS", Syntax::Number, Syntax::InOut);
+  Phenology.add ("DS", Syntax::Number, Syntax::State);
   vPhenology.add ("DS", -1.0);
   Phenology.add ("Vern", Syntax::Number, Syntax::Optional);
 
@@ -785,31 +785,31 @@ CropStandardSyntax::CropStandardSyntax ()
   AttributeList& vCanopy = *new AttributeList ();
   alist.add ("Canopy", vCanopy);
 
-  Canopy.add ("Height", Syntax::Number, Syntax::InOut);
+  Canopy.add ("Height", Syntax::Number, Syntax::State);
   vCanopy.add ("Height", 0.0);
-  Canopy.add ("LAI", Syntax::Number, Syntax::InOut);
+  Canopy.add ("LAI", Syntax::Number, Syntax::State);
   vCanopy.add ("LAI", 0.0);
-  Canopy.add ("LADm", Syntax::Number, Syntax::InOut);
+  Canopy.add ("LADm", Syntax::Number, Syntax::State);
   vCanopy.add ("LADm", -9999.99);
-  Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::InOut);
+  Canopy.add ("LAIvsH", Syntax::CSMP, Syntax::State);
   vCanopy.add ("LAIvsH", empty_csmp);
 
     // RootSys
   Syntax& RootSys = *new Syntax ();
   AttributeList& vRootSys = *new AttributeList ();
-  syntax.add ("RootSys", RootSys, Syntax::InOut);
+  syntax.add ("RootSys", RootSys, Syntax::State);
   alist.add ("RootSys", vRootSys);
 
   RootSys.add ("Depth", Syntax::Number, Syntax::Optional);
-  RootSys.add ("Density", Syntax::Number, Syntax::InOut, Syntax::Sequence);
+  RootSys.add ("Density", Syntax::Number, Syntax::State, Syntax::Sequence);
   vRootSys.add ("Density", empty_array);
-  RootSys.add ("H2OExtraction", Syntax::Number, Syntax::InOut, Syntax::Sequence);
+  RootSys.add ("H2OExtraction", Syntax::Number, Syntax::State, Syntax::Sequence);
   vRootSys.add ("H2OExtraction", empty_array);
-  RootSys.add ("NH4Extraction", Syntax::Number, Syntax::InOut, Syntax::Sequence);
+  RootSys.add ("NH4Extraction", Syntax::Number, Syntax::State, Syntax::Sequence);
   vRootSys.add ("NH4Extraction", empty_array);
-  RootSys.add ("NO3Extraction", Syntax::Number, Syntax::InOut, Syntax::Sequence);
+  RootSys.add ("NO3Extraction", Syntax::Number, Syntax::State, Syntax::Sequence);
   vRootSys.add ("NO3Extraction", empty_array);
-  RootSys.add ("h_x", Syntax::Number, Syntax::InOut);
+  RootSys.add ("h_x", Syntax::Number, Syntax::State);
   vRootSys.add ("h_x", 0.0);
   RootSys.add ("water_stress", Syntax::Number, Syntax::LogOnly);
   RootSys.add ("transpiration", Syntax::Number, Syntax::LogOnly);
@@ -818,52 +818,52 @@ CropStandardSyntax::CropStandardSyntax ()
   // Prod
   Syntax& Prod = *new Syntax ();
   AttributeList& vProd = *new AttributeList ();
-  syntax.add ("Prod", Prod, Syntax::InOut);
+  syntax.add ("Prod", Prod, Syntax::State);
   alist.add ("Prod", vProd);
 
-  Prod.add ("WLeaf", Syntax::Number, Syntax::InOut);
+  Prod.add ("WLeaf", Syntax::Number, Syntax::State);
   vProd.add ("WLeaf", 0.001);
-  Prod.add ("WStem", Syntax::Number, Syntax::InOut);
+  Prod.add ("WStem", Syntax::Number, Syntax::State);
   vProd.add ("WStem", 0.000);
-  Prod.add ("WRoot", Syntax::Number, Syntax::InOut);
+  Prod.add ("WRoot", Syntax::Number, Syntax::State);
   vProd.add ("WRoot", 0.001);
-  Prod.add ("WSOrg", Syntax::Number, Syntax::InOut);
+  Prod.add ("WSOrg", Syntax::Number, Syntax::State);
   vProd.add ("WSOrg", 0.000);
-  Prod.add ("WLDrd", Syntax::Number, Syntax::InOut);
+  Prod.add ("WLDrd", Syntax::Number, Syntax::State);
   vProd.add ("WLDrd", 0.000);
   Prod.add ("NCrop", Syntax::Number, Syntax::Optional);
 
   // CrpAux
   Syntax& CrpAux = *new Syntax ();
   AttributeList& vCrpAux = *new AttributeList ();
-  syntax.add ("CrpAux", CrpAux, Syntax::InOut);
+  syntax.add ("CrpAux", CrpAux, Syntax::State);
   alist.add ("CrpAux", vCrpAux);
 
-  CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::InOut);
+  CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::State);
   vCrpAux.add ("InitLAI", true);
   CrpAux.add ("PotRtDpt", Syntax::Number, Syntax::Optional);
   CrpAux.add ("PtNCnt", Syntax::Number, Syntax::Optional);
-  CrpAux.add ("CrNCnt", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("CrNCnt", Syntax::Number, Syntax::State);
   vCrpAux.add ("CrNCnt", 0.0);
-  CrpAux.add ("PotTransp", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("PotTransp", Syntax::Number, Syntax::State);
   vCrpAux.add ("PotTransp", 0.0);
-  CrpAux.add ("PotCanopyAss", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("PotCanopyAss", Syntax::Number, Syntax::State);
   vCrpAux.add ("PotCanopyAss", 0.0);
-  CrpAux.add ("CanopyAss", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("CanopyAss", Syntax::Number, Syntax::State);
   vCrpAux.add ("CanopyAss", 0.0);
-  CrpAux.add ("IncWLeaf", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("IncWLeaf", Syntax::Number, Syntax::State);
   vCrpAux.add ("IncWLeaf", 0.0);
-  CrpAux.add ("IncWStem", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("IncWStem", Syntax::Number, Syntax::State);
   vCrpAux.add ("IncWStem", 0.0);
-  CrpAux.add ("IncWSOrg", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("IncWSOrg", Syntax::Number, Syntax::State);
   vCrpAux.add ("IncWSOrg", 0.0);
-  CrpAux.add ("IncWRoot", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("IncWRoot", Syntax::Number, Syntax::State);
   vCrpAux.add ("IncWRoot", 0.0);
-  CrpAux.add ("H2OUpt", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("H2OUpt", Syntax::Number, Syntax::State);
   vCrpAux.add ("H2OUpt", 0.0);
-  CrpAux.add ("NH4Upt", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("NH4Upt", Syntax::Number, Syntax::State);
   vCrpAux.add ("NH4Upt", 0.0);
-  CrpAux.add ("NO3Upt", Syntax::Number, Syntax::InOut);
+  CrpAux.add ("NO3Upt", Syntax::Number, Syntax::State);
   vCrpAux.add ("NO3Upt", 0.0);
 
   Crop::add_type ("crop", alist, syntax, &CropStandard::make);

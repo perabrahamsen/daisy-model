@@ -83,9 +83,9 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   Syntax& layer = *new Syntax ();
   layer.add ("end", Syntax::Number, Syntax::Const);
-  layer.add ("horizon", Horizon::library (), Syntax::InOut);
+  layer.add ("horizon", Horizon::library (), Syntax::State);
   layer.order ("end", "horizon");
-  syntax.add ("horizons", layer, Syntax::InOut, Syntax::Sequence);
+  syntax.add ("horizons", layer, Syntax::State, Syntax::Sequence);
   syntax.add ("zplus", Syntax::Number, Syntax::Const, Syntax::Sequence);
   syntax.add ("EpFactor", Syntax::Number, Syntax::Const);
   alist.add ("EpFactor", 0.8);

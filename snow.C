@@ -246,13 +246,13 @@ Snow::load_syntax (Syntax& syntax, AttributeList& alist)
   
   syntax.add ("EvapSnowPack", Syntax::Number, Syntax::LogOnly);
   syntax.add ("q_s", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("Ssnow", Syntax::Number, Syntax::InOut);
+  syntax.add ("Ssnow", Syntax::Number, Syntax::State);
   alist.add ("Ssnow", 0.0);
-  syntax.add ("Swater", Syntax::Number, Syntax::InOut);
+  syntax.add ("Swater", Syntax::Number, Syntax::State);
   alist.add ("Swater", 0.0);
-  syntax.add ("age", Syntax::Number, Syntax::InOut);
+  syntax.add ("age", Syntax::Number, Syntax::State);
   alist.add ("age", 0.0);
-  syntax.add ("dZs", Syntax::Number, Syntax::InOut);
+  syntax.add ("dZs", Syntax::Number, Syntax::State);
   alist.add ("dZs", 0.0);
   syntax.add ("mf", Syntax::Number, Syntax::Const);
   alist.add ("mf", 10.0);

@@ -97,9 +97,9 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("lake", Syntax::Number, Syntax::Const);
   alist.add ("lake", -1.0);
-  syntax.add ("pond", Syntax::Number, Syntax::InOut);
+  syntax.add ("pond", Syntax::Number, Syntax::State);
   alist.add ("pond", 0.0);
-  syntax.add ("flux", Syntax::Boolean, Syntax::InOut);
+  syntax.add ("flux", Syntax::Boolean, Syntax::State);
   alist.add ("flux", true);
   syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
