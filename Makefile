@@ -99,12 +99,32 @@ ifeq ($(USE_OPTIMIZE),true)
 	endif
 endif
 
+# Do we want to create a dynamic library?
+#
+ifeq ($(HOSTTYPE),sun4)
+	USE_DYNLIB = true
+endif
+ifeq ($(HOSTTYPE),hp)
+	USE_DYNLIB = true
+endif
+ifeq ($(HOSTTYPE),win32)
+	USE_DYNLIB = false
+endif
+ifeq ($(HOSTTYPE),cygwin)
+	USE_DYNLIB = false
+endif
+ifeq ($(HOSTTYPE),mingw)
+	USE_DYNLIB = false
+endif
+
 # Create the right compile command.
 #
+ifeq ($(USE_DYNLIB),true)
+	DYNSEARCH = -R`pwd`
+endif
 
 ifeq ($(COMPILER),gcc)
 	ifeq ($(HOSTTYPE),sun4)
-		DYNSEARCH = -R`pwd`
 		OSFLAGS = 
 		DEBUG = -g
 	endif
@@ -123,7 +143,6 @@ ifeq ($(COMPILER),gcc)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)
-	DYNSEARCH = -R`pwd`
 	COMPILE = /pack/devpro/SUNWspro/bin/CC
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
@@ -329,8 +348,15 @@ all:	$(EXECUTABLES)
 
 # Create the main executable.
 #
-daisy${EXT}:	main${OBJ} daisy.so
+ifeq ($(USE_DYNLIB),true)
+	DAISYSO = daisy.so
+else
+	DAISYSO = $(LIBOBJ)
+endif
+
+daisy${EXT}:	main${OBJ} $(DAISYSO)
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
+endif
 
 # Create manager test executable.
 #
