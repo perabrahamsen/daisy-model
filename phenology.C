@@ -38,9 +38,6 @@ Phenology::output (Log& log) const
   log.output ("DS", DS);
   log.output ("partial_day_length", partial_day_length);
   log.output ("day_length", day_length);
-  log.output ("partial_soil_temperature", partial_soil_temperature);
-  log.output ("soil_temperature", soil_temperature);
-  log.output ("soil_h", soil_h);
 }
 
 void 
@@ -56,15 +53,6 @@ Phenology::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("day_length", "h", Syntax::State,
 	      "Number of light hours yesterday.");
   alist.add ("day_length", 0.0);
-  syntax.add ("partial_soil_temperature", "dg C h", Syntax::State,
-	      "Soil temperature hours this day, so far.");
-  alist.add ("partial_soil_temperature", 0.0);
-  syntax.add ("soil_temperature", "dg C", Syntax::State,
-	      "Average soil temperature yesterday.");
-  alist.add ("soil_temperature", 0.0);
-  syntax.add ("soil_h", "cm", Syntax::State,
-	      "Soil pressure potential.");
-  alist.add ("soil_h", -100.0);
 }
 
 Phenology::Phenology (const AttributeList& al)
@@ -72,10 +60,7 @@ Phenology::Phenology (const AttributeList& al)
     // State.
     DS (al.number ("DS")),
     partial_day_length (al.number ("partial_day_length")),
-    day_length (al.number ("day_length")),
-    partial_soil_temperature (al.number ("partial_soil_temperature")),
-    soil_temperature (al.number ("soil_temperature")),
-    soil_h (al.number ("soil_h"))
+    day_length (al.number ("day_length"))
 { }
 
 Phenology::~Phenology ()

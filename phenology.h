@@ -42,9 +42,6 @@ public:
   double DS;	        	// Development Stage
   double partial_day_length;	// Light hours this day until now [0-24 h]
   double day_length;		// Light hours previous day. [0-24 h]
-  double partial_soil_temperature; // Accumaleted soil temperature. [°C]
-  double soil_temperature;	// Soil temperature previous day. [°C]
-  double soil_h;		// Soil potential [cm]
 
   // Simulation.
 public:
@@ -52,7 +49,7 @@ public:
   virtual void tick_daily (double Ta, double WLeaf, 
 			   Production&, Vernalization&, 
 			   double cut_stress, Treelog&) = 0;
-  virtual void emergence () = 0;
+  virtual void emergence (double h, double T) = 0;
   void output (Log& log) const;
 
   // Create and Destroy.

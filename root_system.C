@@ -305,18 +305,27 @@ RootSystem::nitrogen_uptake (const Soil& soil,
 }
 
 void
-RootSystem::tick (Treelog& msg, const Soil& soil, 
-		  const double Ts, 
-		  const double WRoot,
-		  const double IncWRoot,
-		  const double DS)
+RootSystem::tick_hourly (int hour, double T)
+{
+  partial_soil_temperature += T;
+  if (hour == 0)
+    {
+      soil_temperature = partial_soil_temperature / 24.0;
+      partial_soil_temperature = 0.0;
+    }
+}
+
+void
+RootSystem::tick_daily (Treelog& msg, const Soil& soil, 
+			const double WRoot, const double IncWRoot,
+			const double DS)
 {
   // Penetration.
   if (IncWRoot > 0)
     {
       const double i = soil.interval_plus (-Depth);
       double clay_fac = PenClayFac (soil.clay (i));
-      double dp = PenPar1 * clay_fac * max (0.0, Ts - PenPar2);
+      double dp = PenPar1 * clay_fac * max (0.0, soil_temperature - PenPar2);
       PotRtDpt = min (PotRtDpt + dp, MaxPen);
       /*max depth determined by crop*/
       Depth = min (Depth + dp, MaxPen);
@@ -351,6 +360,8 @@ RootSystem::output (Log& log) const
   log.output ("NH4Extraction", NH4Extraction);
   log.output ("NO3Extraction", NO3Extraction);
   log.output ("h_x", h_x);
+  log.output ("partial_soil_temperature", partial_soil_temperature);
+  log.output ("soil_temperature", soil_temperature);
   log.output ("water_stress", water_stress);
   log.output ("water_stress_days", water_stress_days);
   log.output ("nitrogen_stress", nitrogen_stress);
@@ -444,6 +455,12 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("h_x", "cm", Check::none (), Syntax::State,
 	       "Root extraction at surface.");
   alist.add ("h_x", 0.0);
+  syntax.add ("partial_soil_temperature", "dg C h", Syntax::State,
+	      "Soil temperature hours this day, so far.");
+  alist.add ("partial_soil_temperature", 0.0);
+  syntax.add ("soil_temperature", "dg C", Syntax::State,
+	      "Average soil temperature yesterday.");
+  alist.add ("soil_temperature", 0.0);
   syntax.add ("water_stress", Syntax::None (), Check::fraction (),
 	      Syntax::LogOnly,
 	       "Fraction of requested water we got.");
@@ -497,6 +514,8 @@ RootSystem::RootSystem (const AttributeList& al)
     NH4Extraction (al.number_sequence ("NH4Extraction")),
     NO3Extraction (al.number_sequence ("NO3Extraction")),
     h_x (al.number ("h_x")),
+    partial_soil_temperature (al.number ("partial_soil_temperature")),
+    soil_temperature (al.number ("soil_temperature")),
     water_stress (0.0),
     water_stress_days (al.number ("water_stress_days")),
     nitrogen_stress (0.0),

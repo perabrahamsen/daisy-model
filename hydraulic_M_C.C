@@ -31,7 +31,6 @@ class HydraulicM_C : public Hydraulic
   // Content.
   const double h_b;
   const double b;
-  const double K_sat;
 
   // Use.
 public:
@@ -100,8 +99,7 @@ HydraulicM_C::Sr (double h) const
 HydraulicM_C::HydraulicM_C (const AttributeList& al)
   : Hydraulic (al),
     h_b (al.number ("h_b")),
-    b (al.number ("b")),
-    K_sat (al.number ("K_sat"))
+    b (al.number ("b"))
 { }
 
 HydraulicM_C::~HydraulicM_C ()
@@ -119,18 +117,15 @@ static struct HydraulicM_CSyntax
   HydraulicM_CSyntax ()
   { 
     Syntax& syntax = *new Syntax ();
-    syntax.add_check (Hydraulic::zero_Theta_res);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", 
-	       "Campbell retention curve model with Mualem theory.\n\
-Note:  Theta_res must be zero for this model.");
-    Hydraulic::load_syntax (syntax, alist);
+	       "Campbell retention curve model with Mualem theory.");
+    Hydraulic::load_Theta_sat (syntax, alist);
+    Hydraulic::load_K_sat (syntax, alist);
     syntax.add ("h_b", "cm", Check::negative (), Syntax::Const,
 		"Bubbling pressure.");
     syntax.add ("b", Syntax::None (), Check::positive (), Syntax::Const,
 		"Campbell parameter.");
-    syntax.add ("K_sat", "cm/h", Check::positive (), Syntax::Const,
-		"Water conductivity of saturated soil.");
 
     Librarian<Hydraulic>::add_type ("M_C", alist, syntax, &make);
   }

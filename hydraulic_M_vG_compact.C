@@ -43,7 +43,6 @@ class HydraulicM_vG_compact : public Hydraulic
   double a;		// - alpha
   double n;
   double m;		// 1 - 1/n
-  double K_sat;
   void set_porosity (double Theta);
   mutable PLF M_;
 
@@ -168,7 +167,7 @@ static struct HydraulicM_vG_compactSyntax
     alist.add ("description", 
 	       "van Genuchten retention curve model with Mualem theory\n\
 and compaction.");
-    Hydraulic::load_syntax (syntax, alist);
+    Hydraulic::load_Theta_res (syntax, alist);
     syntax.add ("ref_alpha", "cm^-1", Syntax::Const,
 		"Reference van Genuchten alpha.");
     syntax.add ("ref_n", Syntax::None (), Syntax::Const,

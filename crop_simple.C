@@ -176,7 +176,7 @@ CropSimple::tick (const Time& time,
 		  const Bioclimate& bioclimate,
 		  const Soil& soil,
 		  OrganicMatter* /* organic_matter */,
-		  const SoilHeat& /* soil_heat */,
+		  const SoilHeat& soil_heat,
 		  const SoilWater& soil_water,
 		  SoilNH4* soil_NH4, SoilNO3* soil_NO3, 
 		  double&, double&, double&, vector<double>&, vector<double>&,
@@ -203,6 +203,11 @@ CropSimple::tick (const Time& time,
       forced_LAI = spring_LAI;
     }
 
+  // Update average soil temperature.
+  const double T_soil = soil_heat.T (soil.interval_plus (-root_system.Depth));
+  root_system.tick_hourly (time.hour (), T_soil);
+  
+  // Air temperature based growth.
   const double T_air = bioclimate.daily_air_temperature ();
   if (time.hour () == 0.0  && T_air > 0.0)
     {
@@ -234,15 +239,15 @@ CropSimple::tick (const Time& time,
 	  const double this_far = (T - T_emergence) / T_growth;
 	  
 	  canopy.Height = height_max * this_far;
-	  root_system.tick (msg, soil, T_air,
-			    WRoot * this_far, WRoot * step, 
-			    DS ());
+	  root_system.tick_daily (msg, soil, 
+				  WRoot * this_far, WRoot * step, 
+				  DS ());
 	}
       else if (old_T < T_flowering)
 	{
 	  msg.message ("==> flowering");
-	  root_system.tick (msg, soil, T_air, WRoot,
-			    WRoot * (1.0 - old_T / T_flowering), DS ());
+	  root_system.tick_daily (msg, soil, WRoot,
+				  WRoot * (1.0 - old_T / T_flowering), DS ());
 	}
       else if (T < T_ripe)
 	/* do nothing */;

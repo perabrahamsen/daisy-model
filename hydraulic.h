@@ -34,11 +34,16 @@ class Hydraulic
 public:
   const string name;
   static const char *const description;
+  //
+private:
+  struct K_at_h;
+  const K_at_h* K_init;
 
   // Standard parameters.
 public:
   double Theta_sat;
   const double Theta_res;
+  /*const*/ double K_sat;
   inline double porosity () const
   { return Theta_sat; }
   virtual void set_porosity (double Theta);
@@ -61,8 +66,9 @@ protected:
 
   // Create and Destroy.
 public:
-  static bool zero_Theta_res (const AttributeList& al, Treelog& err);
-  static void load_syntax (Syntax&, AttributeList&);
+  static void load_Theta_res (Syntax&, AttributeList&);
+  static void load_Theta_sat (Syntax&, AttributeList&);
+  static void load_K_sat (Syntax&, AttributeList&);
   virtual void initialize (double clay, double silt, double sand,
 			   double humus, double rho_b, bool top_soil,
 			   Treelog&);

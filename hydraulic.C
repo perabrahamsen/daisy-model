@@ -27,6 +27,27 @@
 #include "check_range.h"
 #include "mathlib.h"
 
+struct Hydraulic::K_at_h
+{
+  // Parameters.
+  const double h;
+  const double K;
+
+  // Create and Destroy.
+  static void load_syntax (Syntax& syntax, AttributeList&)
+  {
+    syntax.add ("h", "cm", Check::non_positive (), Syntax::Const, 
+		"Soil water pressure.");
+    syntax.add ("K", "cm/h", Check::positive (), Syntax::Const, 
+		"Water conductivity.");
+    syntax.order ("h", "K");
+  }
+  K_at_h (const AttributeList& al)
+    : h (al.number ("h")),
+      K (al.number ("K"))
+  { }
+};
+
 void 
 Hydraulic::set_porosity (double Theta)
 { 
@@ -78,24 +99,12 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
   plf.add (h, sum);
 }
 
-bool 
-Hydraulic::zero_Theta_res (const AttributeList& al, Treelog& err)
-{
-  bool ok = true;
-  
-  if (al.number ("Theta_res") != 0.0)
-    {
-      err.error ("Theta_res should be zero for this model");
-      ok = false;
-    }
-  return ok;
-}
-
 static bool
-check_alist (const AttributeList& al, Treelog& err)
+check_Theta_res (const AttributeList& al, Treelog& err)
 {
   bool ok = true;
 
+  daisy_assert (al.check ("Theta_res") && al.check ("Theta_sat"));
   const double Theta_res = al.number ("Theta_res");
   const double Theta_sat = al.number ("Theta_sat");
 
@@ -107,29 +116,70 @@ check_alist (const AttributeList& al, Treelog& err)
   return ok;
 }  
 
+void
+Hydraulic::load_Theta_sat (Syntax& syntax, AttributeList&)
+{ 
+  static RangeEI Theta_sat_range (0.0, 0.9);
+  syntax.add ("Theta_sat", "cm^3 H2O/cm^3", Theta_sat_range, Syntax::State,
+	      "Saturation point.");
+}
 
 void
-Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
+Hydraulic::load_Theta_res (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add_check (check_alist);
-  static RangeEI K_sat_range (0.0, 0.9);
-  syntax.add ("Theta_sat", "cm^3 H2O/cm^3", K_sat_range, Syntax::State,
-	      "Saturation point.");
+  load_Theta_sat (syntax, alist);
+  syntax.add_check (check_Theta_res);
   syntax.add ("Theta_res", "cm^3 H2O/cm^3", Check::fraction (), Syntax::Const,
 	      "Soil residual water.");
   alist.add ("Theta_res", 0.0);
+}
+
+static bool
+check_K_sat (const AttributeList& al, Treelog& err)
+{
+  bool ok = true;
+
+  if (al.check ("K_sat") == al.check ("K_at_h"))
+    {
+      err.error ("You must specify either 'K_sat' or 'K_at_h' but not both.");
+      ok = false;
+    }
+  return ok;
+}  
+
+void
+Hydraulic::load_K_sat (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add_check (check_K_sat);
+  syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::OptionalConst,
+	      "Water conductivity of saturated soil.");
+  syntax.add_submodule ("K_at_h", alist, Syntax::OptionalConst, "\
+Water conductivity as specified pressure.", K_at_h::load_syntax);
 }
 
 void
 Hydraulic::initialize (double /* clay */, double /* silt */, double /* sand */,
 		       double /* humus */, double /* rho_b */,
 		       bool /* top_soil */, Treelog&)
-{ }
+{
+  if (K_init)
+    {
+      K_sat = 1.0;
+      const double K_one = K (K_init->h);
+      daisy_assert (K_one > 0.0);
+      K_sat = K_init->K / K_one;
+      daisy_assert (approximate (K (K_init->h), K_init->K));
+    }
+}
 
 Hydraulic::Hydraulic (const AttributeList& al)
   : name (al.name ("type")),
-    Theta_sat (al.number ("Theta_sat")),
-    Theta_res (al.number ("Theta_res"))
+    K_init (al.check ("K_at_h")
+	    ? new K_at_h (al.alist ("K_at_h"))
+	    : NULL),
+    Theta_sat (al.check ("Theta_sat") ? al.number ("Theta_sat") : -42.42e42),
+    Theta_res (al.check ("Theta_res") ? al.number ("Theta_res") : -42.42e42),
+    K_sat (al.check ("K_sat") ? al.number ("K_sat") : -42.42e42)
 { }
 
 Hydraulic::~Hydraulic ()

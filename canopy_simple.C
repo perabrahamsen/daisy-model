@@ -57,7 +57,7 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("IntcpCap", 0.5);
   syntax.add ("EpFac", Syntax::None (), Syntax::Const,
 	      "Potential evapotranspiration factor.");
-  alist.add ("EpFac", 1.0);
+  alist.add ("EpFac", 1.15);
   syntax.add ("EpFacDS", "DS", Syntax::None (), Syntax::Const,
 	      "DS dependent potential evapotranspiration factor.");
   PLF EpFacDS;

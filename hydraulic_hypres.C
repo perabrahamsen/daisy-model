@@ -24,7 +24,6 @@
 
 #include "hydraulic.h"
 #include "plf.h"
-#include "check.h"
 #include "treelog.h"
 #include "tmpstream.h"
 #include "mathlib.h"
@@ -37,7 +36,6 @@ class HydraulicHypres : public Hydraulic
   /* const */ double n;
   /* const */ double m;		// 1 - 1/n
   /* const */ double l;         // tortuosity parameter
-  /* const */ double K_sat;
   mutable PLF M_;
 
   // Prevent changing Theta_sat.
@@ -212,12 +210,13 @@ pedotransfer function");
 
   // Debug messages.
   TmpStream tmp;
-  tmp () << "l = " << l << "\n";
-  tmp () << "m = " << m << "\n";
-  tmp () << "n = " << n << "\n";
-  tmp () << "alpha = " << alpha << "\n";
-  tmp () << "K_sat = " << K_sat << "\n";
-  tmp () << "Theta_sat = " << Theta_sat;
+  tmp () << "M_vG\n";
+  tmp () << "(l " << l << ")\n";
+  tmp () << "(m " << m << ")\n";
+  tmp () << "(n " << n << ")\n";
+  tmp () << "(alpha " << alpha << ")\n";
+  tmp () << "(K_sat " << K_sat << ")\n";
+  tmp () << "(Theta_sat " << Theta_sat << ")";
   msg.debug (tmp.str ());
 }
 
@@ -229,7 +228,6 @@ HydraulicHypres::HydraulicHypres (const AttributeList& al)
     n (-42.42e42),
     m (-42.42e42),
     l (-42.42e42),
-    K_sat (-42.42e42),
     M_ ()
 { }
 
@@ -264,12 +262,7 @@ static struct HydraulicHypresSyntax
     alist.add ("description", 
 	       "van Genuchten retention curve model with Mualem theory.\n\
 Parameters specified by the HYPRES transfer function.\n\
-See <http://mluri.sari.ac.uk/hypres.html>.\n\
-Don't specify 'Theta_sat' or 'Theta_res'.");
-    Hydraulic::load_syntax (syntax, alist);
-    alist.add ("Theta_sat", 0.9);
-    alist.add ("There_res", 0.01);
-
+See <http://mluri.sari.ac.uk/hypres.html>.");
     Librarian<Hydraulic>::add_type ("hypres", alist, syntax, 
 				    &HydraulicHypres::make);
   }

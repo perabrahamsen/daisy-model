@@ -131,7 +131,7 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
       line++;
 
       if (Theta_sat < 0.0)
-	const_cast<double&> (Theta_sat) = Theta;
+	Theta_sat = Theta;
       
       if (i != double2int (pF * 100))
 	cerr << name << ":" << line << ": i " << i << " != "
@@ -185,11 +185,9 @@ that pressure [m/s].\n\
 \n\
 There must be exactly 501 lines, with pF starting at 0 and ending at 5,\n\
 increasing with 0.01 on each line.");
-  Hydraulic::load_syntax (syntax, alist);
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const,
 	      "Number of intervals for numeric integration of K.");
   alist.add ("M_intervals", 500);
-  alist.add ("Theta_sat", -42.42e42);
   syntax.add ("file", Syntax::String, Syntax::Const, "The file to read.");
   syntax.order ("file");
   Librarian<Hydraulic>::add_type ("old2", alist, syntax, &HydraulicOld2::make);

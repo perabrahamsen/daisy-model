@@ -1,12 +1,12 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* EpFac 1.15 alle afgrøder
+* Ny hydraulisk parameter "K_at_h".
 
-* dk-horizon.dai med Sørens tal for Jb jorde.
+Den kan erstatte K_sat.  Alle de hydrauliske modeller har formen 
 
-* soil_h & soil_temperature
+  K (h) = K_sat * f (h)
 
-Flyt fra phenology til root_system (slet evt. soil_h).
+så hvis vi kender K (h) for et vilkårligt h kan vi regne K_sat ud.  
 
 * OrganicMatter
 
@@ -27,6 +27,8 @@ Til referencemanual?
 ** Lav en "fast CO2" pulje.
 
 Den skal indeholde CO2 fra puljer med end turnover_rate > XXX.
+
+* dk-horizon.dai med Sørens tal for Jb jorde.
 
 * april: ekstra linie i output
 

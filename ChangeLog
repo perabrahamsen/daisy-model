@@ -1,4 +1,43 @@
+2003-04-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.67 released.
+
+2003-04-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic.C (K_at_h): New paramemter.
+	(initialize): Use it.
+	(check_K_sat): New function.
+	(load_K_sat): Use it.
+
 2003-04-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic.h, hydraulic.C (zero_Theta_res): Removed.
+	(K_sat): Moved here from subclasses.
+	* hydraulic.C (Hydraulic): Made 'Theta_res' and 'Theta_sat'
+	optional. 
+	(load_syntax): Renamed to 'load_Theta_res'.
+	(load_Theta_sat): New function.
+	(load_K_sat): New function.
+	* hydraulic_*.C: Updated.	
+
+	* hydraulic_hypres.C (initialize): Use parentheses in debug
+	messages. 
+	* hydraulic_Cosby.C (initialize): Ditto.
+	* hydraulic.C (load_syntax): Renamed 'K_sat_range' to
+	'Theta_sat_range'. 
+
+	* root_system.C (tick_day): Renamed from 'tick'.
+	(tick_hour): New function.
+	* phephenology.h, phephenology.C (soil_h): Removed parameter.
+	(soil_temperature, partial_soil_temperature): Moved to root system.
+	* root_system.h, root_system.C: Moved from phenology.
+	(tick_day): Renamed from 'tick'.
+	(tick_hour): New function.
+	* phephenology.h, phephenology.C, phenology_std.C,
+	phenology_TSum.C (emergence): Take h and T parameters.
+	* crop_std.C, crop_simple.C (tick): Update caller.
+
+	* canopy_simple.C (EpFac): Changed default to 1.15.
 
 	* Version 2.66 released.
 

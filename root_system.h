@@ -68,6 +68,9 @@ private:
   vector<double> NH4Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
   vector<double> NO3Extraction; // Extraction of NH4-N in soil [gN/cm³/h]
   double h_x;			// Root extraction at surface.
+public:
+  double partial_soil_temperature; // Accumaleted soil temperature. [°C]
+  double soil_temperature;	// Soil temperature previous day. [°C]
 
   // Log.
 public:
@@ -109,8 +112,9 @@ public:
 private:
   static double density_distribution_parameter (double a);
 public:
-  void tick (Treelog&, const Soil&, const double T, 
-	     double WRoot, double IncWRoot, double DS);
+  void tick_hourly (int hour, double T);
+  void tick_daily (Treelog&, const Soil&, 
+		   double WRoot, double IncWRoot, double DS);
   void set_density (Treelog&,
 		    const Geometry& geometry, double WRoot, double DS);
   void full_grown (Treelog&, const Soil& soil, double WRoot);

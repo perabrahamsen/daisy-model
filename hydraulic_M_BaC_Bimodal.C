@@ -24,6 +24,7 @@
 // Bimodal hydraulic conductivity curve.
 
 #include "hydraulic.h"
+#include "check.h"
 #include "mathlib.h"
 
 class HydraulicM_BaC_Bimodal : public Hydraulic
@@ -33,7 +34,6 @@ class HydraulicM_BaC_Bimodal : public Hydraulic
   const double h_b;
   const double Theta_b;
   const double K_b;
-  const double K_sat;
 
   // Use.
 public:
@@ -120,8 +120,7 @@ HydraulicM_BaC_Bimodal::HydraulicM_BaC_Bimodal (const AttributeList& al)
     lambda (al.number ("lambda")),
     h_b (al.number ("h_b")),
     Theta_b (al.number ("Theta_b")),
-    K_b (al.number ("K_b")),
-    K_sat (al.number ("K_sat"))
+    K_b (al.number ("K_b"))
 { }
 
 HydraulicM_BaC_Bimodal::~HydraulicM_BaC_Bimodal ()
@@ -147,7 +146,9 @@ HydraulicM_BaC_BimodalSyntax::HydraulicM_BaC_BimodalSyntax ()
   alist.add ("description", 
 	     "Brooks and Corey retention curve model with Mualem theory.\n\
 Bimodal hydraulic conductivity curve.");
-  Hydraulic::load_syntax (syntax, alist);
+  Hydraulic::load_Theta_res (syntax, alist);
+  syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::OptionalConst,
+	      "Water conductivity of saturated soil.");
   syntax.add ("lambda", Syntax::None (), Syntax::Const,
 	      "Pore size index.");
   syntax.add ("h_b", "cm", Syntax::Const,
@@ -156,8 +157,6 @@ Bimodal hydraulic conductivity curve.");
 	      "Water content at 'h_b'.");
   syntax.add ("K_b", "cm/h", Syntax::Const,
 	      "Water conductivity at 'h_b'.");
-  syntax.add ("K_sat", "cm/h", Syntax::Const,
-	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("M_BaC_Bimodal", alist, syntax,
 				  &HydraulicM_BaC_Bimodal::make);

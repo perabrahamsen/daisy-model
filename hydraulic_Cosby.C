@@ -32,7 +32,6 @@ class Hydraulic_Cosby : public Hydraulic
   // Content.
   /* const */ double h_b;
   /* const */ double b;
-  /* const */ double K_sat;
 
   // Prevent changing Theta_sat.
 public:
@@ -141,18 +140,18 @@ Hydraulic_Cosby::initialize (double clay, double silt, double sand,
 
   // Debug messages.
   TmpStream tmp;
-  tmp () << "b = " << b << "\n";
-  tmp () << "h_b = " << h_b << "\n";
-  tmp () << "K_sat = " << K_sat << "\n";
-  tmp () << "Theta_sat = " << Theta_sat;
+  tmp () << "mod_C\n";
+  tmp () << "(b " << b << ")\n";
+  tmp () << "(h_b " << h_b << ")\n";
+  tmp () << "(K_sat " << K_sat << ")\n";
+  tmp () << "(Theta_sat " << Theta_sat << ")";
   msg.debug (tmp.str ());
 }
 
 Hydraulic_Cosby::Hydraulic_Cosby (const AttributeList& al)
   : Hydraulic (al),
     h_b (-42.42e42),
-    b (-42.42e42),
-    K_sat (-42.42e42)
+    b (-42.42e42)
 { }
 
 Hydraulic_Cosby::~Hydraulic_Cosby ()
@@ -164,33 +163,13 @@ static struct Hydraulic_CosbySyntax
   static Hydraulic& make (const AttributeList& al)
   { return *new Hydraulic_Cosby (al); }
 
-  static bool check_alist (const AttributeList& al, Treelog& err)
-  {
-    bool ok = true;
-    if (al.number ("Theta_res") != 0.0)
-      {
-	err.entry ("Theta_res should be 0.0");
-	ok = false;
-      }
-    if (al.number ("Theta_sat") != 0.9)
-      {
-	err.entry ("Theta_sat should be unspecified");
-	ok = false;
-      }
-    return ok;
-  }
   Hydraulic_CosbySyntax ()
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add_check (check_alist);
     alist.add ("description", "\
 Modified Campbell retention curve model with Burdine theory.\n\
-Parameters estimated from soil texture as specified by Cosby et at.\n\
-Don't specify 'Theta_sat' or 'Theta_res'.");
-    Hydraulic::load_syntax (syntax, alist);
-    alist.add ("Theta_sat", 0.9);
-    
+Parameters estimated from soil texture as specified by Cosby et at.");
     Librarian<Hydraulic>::add_type ("Cosby_et_al", alist, syntax, &make);
   }
 } hydraulic_Cosby_syntax;

@@ -40,7 +40,7 @@ private:
 private:
   void tick_daily (double Ta, double WLeaf, 
 		   Production&, Vernalization&, double cut_stress, Treelog&);
-  void emergence ();
+  void emergence (double h, double T);
 
   // Create.
 public:
@@ -84,10 +84,10 @@ PhenologyTSum::tick_daily (const double Ta, const double /*WLeaf*/,
 }
 
 void
-PhenologyTSum::emergence ()
+PhenologyTSum::emergence (double /*h*/, double T)
 {
-  if (soil_temperature > EmrThrs)
-    DS += soil_temperature / EmrTSum;
+  if (T > EmrThrs)
+    DS += T / EmrTSum;
 
   if (DS > 0.0)
     DS = 0.01;

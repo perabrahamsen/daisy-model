@@ -30,7 +30,6 @@ class HydraulicB_BaC : public Hydraulic
   // Content.
   const double lambda;
   const double h_b;
-  const double K_sat;
 
   // Use.
 public:
@@ -103,8 +102,7 @@ HydraulicB_BaC::Se (double h) const
 HydraulicB_BaC::HydraulicB_BaC (const AttributeList& al)
   : Hydraulic (al),
     lambda (al.number ("lambda")),
-    h_b (al.number ("h_b")),
-    K_sat (al.number ("K_sat"))
+    h_b (al.number ("h_b"))
 { }
 
 HydraulicB_BaC::~HydraulicB_BaC ()
@@ -129,13 +127,12 @@ HydraulicB_BaCSyntax::HydraulicB_BaCSyntax ()
   AttributeList& alist = *new AttributeList ();
   alist.add ("description",
 	     "Brooks and Corey retention curve model with Burdine theory.");
-  Hydraulic::load_syntax (syntax, alist);
+  Hydraulic::load_Theta_res (syntax, alist);
+  Hydraulic::load_K_sat (syntax, alist);
   syntax.add ("lambda", Syntax::None (), Syntax::Const,
 	      "Pore size index.");
   syntax.add ("h_b", "cm", Syntax::Const,
 	      "Bubbling pressure.");
-  syntax.add ("K_sat", "cm/h", Syntax::Const,
-	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("B_BaC", alist, syntax, 
 				  &HydraulicB_BaC::make);

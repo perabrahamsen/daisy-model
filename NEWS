@@ -12,6 +12,33 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.67
+
+** New K_at_h hydraulic parameter in most models.
+
+This is an alternative way of specifying K_sat.
+
+  (K_at_h 2 [pF] 3 [cm/h])
+
+will mean the hydraulic conductivity have been measured to 3 cm/h at
+pF 2.  From this, Daisy will find K_sat automatically.
+
+** Changed EpFac for the simple and default crop models to 1.15.
+
+Expect significant changes in simulation results.
+
+You can change it back to 1.0 with
+
+    (sow "Spring Barley" (Canopy (EpFac 1.0)))
+
+in order to reproduce older results.
+
+** 'soil_h' state variable removed from phenology models.
+** 'soil_temperature' and 'partial_soil_temperature' state variables moved.
+
+From phenology models to root_system submodel.  This will not affect
+most people.
+
 * 2.66
 
 ** The `weekly' condition should work now.

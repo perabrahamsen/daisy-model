@@ -34,7 +34,6 @@ class HydraulicB_vG : public Hydraulic
   const double n;
   const double m;		// 1 - 2/n
   const double l;               // tortuosity parameter
-  const double K_sat;
   mutable PLF M_;
 
   // Use.
@@ -118,7 +117,6 @@ HydraulicB_vG::HydraulicB_vG (const AttributeList& al)
     n (al.number ("n")),
     m (1.0 - 2.0 / n),
     l (al.number ("l")),
-    K_sat (al.number ("K_sat")),
     M_ ()
 { }
 
@@ -144,7 +142,8 @@ HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
   AttributeList& alist = *new AttributeList ();
   alist.add ("description", 
 	     "van Genuchten retention curve model with Burdine theory.");
-  Hydraulic::load_syntax (syntax, alist);
+  Hydraulic::load_Theta_res (syntax, alist);
+  Hydraulic::load_K_sat (syntax, alist);
   syntax.add ("alpha", "cm^-1", Syntax::Const,
 	      "van Genuchten alpha.");
   syntax.add ("n", Syntax::None (), Syntax::Const,
@@ -152,8 +151,6 @@ HydraulicB_vGSyntax::HydraulicB_vGSyntax ()
   syntax.add ("l", Syntax::None (), Syntax::Const,
 	      "tortuosity parameter.");
   alist.add ("l", 2.0);
-  syntax.add ("K_sat", "cm/h", Syntax::Const,
-	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("B_vG", alist, syntax, &HydraulicB_vG::make);
 }

@@ -24,7 +24,6 @@
 
 #include "hydraulic.h"
 #include "plf.h"
-#include "check.h"
 #include "mathlib.h"
 
 class HydraulicM_vG : public Hydraulic
@@ -35,7 +34,6 @@ class HydraulicM_vG : public Hydraulic
   const double n;
   const double m;		// 1 - 1/n
   const double l;               // tortuosity parameter
-  const double K_sat;
   mutable PLF M_;
 
   // Use.
@@ -130,7 +128,6 @@ HydraulicM_vG::HydraulicM_vG (const AttributeList& al)
     n (al.number ("n")),
     m (1 - 1 / n),
     l (al.number ("l")),
-    K_sat (al.number ("K_sat")),
     M_ ()
 { }
 
@@ -156,7 +153,8 @@ HydraulicM_vGSyntax::HydraulicM_vGSyntax ()
   AttributeList& alist = *new AttributeList ();
   alist.add ("description", 
 	     "van Genuchten retention curve model with Mualem theory.");
-  Hydraulic::load_syntax (syntax, alist);
+  Hydraulic::load_Theta_res (syntax, alist);
+  Hydraulic::load_K_sat (syntax, alist);
   syntax.add ("alpha", "cm^-1", Syntax::Const,
 	      "van Genuchten alpha.");
   syntax.add ("n", Syntax::None (), Syntax::Const,
@@ -164,8 +162,6 @@ HydraulicM_vGSyntax::HydraulicM_vGSyntax ()
   syntax.add ("l", Syntax::None (), Syntax::Const,
 	      "tortuosity parameter.");
   alist.add ("l", 0.5);
-  syntax.add ("K_sat", "cm/h", Check::non_negative (), Syntax::Const,
-	      "Water conductivity of saturated soil.");
 
   Librarian<Hydraulic>::add_type ("M_vG", alist, syntax, &HydraulicM_vG::make);
 }
