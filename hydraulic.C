@@ -61,7 +61,7 @@ Hydraulic::K_to_M (PLF& plf, const int intervals) const
 	      tmp () << "Hydraulic conductivity changes too fast in " 
 		     << name << "\n";
 	      tmp () << "h = " << h << ", step = " << step 
-		     << " and h + step = " << h + step << "\n";
+		     << " and h + step = " << (h + step) << "\n";
 	      tmp () << "K (h) = " << K (h) << ", K (h + step) = "
 		     << K (h + step) << " and K (0) = " << Ksat << "\n";
 	      tmp () << "Change = " << K (h + step) / K (h) 
