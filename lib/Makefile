@@ -33,7 +33,7 @@ daisy-lib.zip:	$(TEXT)
 #
 dist:
 	$(MAKE) daisy-lib.zip
-	mv -f daisy-lib.zip $(HOME)/.public_ftp/daisy/
+	mv -f daisy-lib.zip $(HOME)/.public_ftp/daisy
 
 # Update the CVS repository.
 #
