@@ -650,7 +650,7 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
    	def=0.001*(esta-e_pa); // vapor deficit in kPa
 	tairk=tair+273.15; // air temperature in K
 	rfpar=0.55*2*srad/(spar*LAI); // cpar coefficient in rf_1
-	rcmin_LAI=200.0/LAI;   // FAO
+	rcmin_LAI=(200.0/LAI);   // FAO: change for rcmin sensitivity
 
 // constraint functions used in Dickinson (1984) / Noilhan et al. (1991)
 	rf_1=(rcmin_LAI/rcmax+rfpar)/(1+rfpar); // related to solar radiation
@@ -1459,6 +1459,32 @@ public:
        acc (al.number ("acc"))
 #endif
    	{
+// matrix definitions for stressed conditions
+	a=matrix(1,NP,1,NP); // a=A in Ax=b
+	ai=matrix(1,NP,1,NP); // inverse matrix
+	um=matrix(1,NP,1,NP); // unitary matrix
+	b=matrix(1,NP,1,MP);  // b vector(s) in Ax=b
+	x=matrix(1,NP,1,MP);  // aux. matrix
+	t=matrix(1,NP,1,MP);  // aux matrix
+// cout << "past matrix_1\n";
+
+// matrix definitions for unstressed conditions
+	a_pot=matrix(1,NP,1,NP); // a=A in Ax=b
+	ai_pot=matrix(1,NP,1,NP); // inverse matrix
+	um_pot=matrix(1,NP,1,NP); // unitary matrix
+	b_pot=matrix(1,NP,1,MP);  // b vector(s) in Ax=b
+	x_pot=matrix(1,NP,1,MP);  // aux. matrix
+	t_pot=matrix(1,NP,1,MP);  // aux matrix
+// cout << "past matrix_2\n";
+
+// matrix definitions for wet conditions
+	a_wet=matrix(1,NP,1,NP); // a=A in Ax=b
+	ai_wet=matrix(1,NP,1,NP); // inverse matrix
+	um_wet=matrix(1,NP,1,NP); // unitary matrix
+	b_wet=matrix(1,NP,1,MP);  // b vector(s) in Ax=b
+	x_wet=matrix(1,NP,1,MP);  // aux. matrix
+	t_wet=matrix(1,NP,1,MP);  // aux matrix
+
       	n_hr=0;  // counter for output files
       	les_tmp=-9999.0; // not in use
 
@@ -1764,31 +1790,6 @@ cout << "past RAASTABWET_1()\n";
         a_31_wet,a_33_wet,a_34_wet,a_35_wet,b_3_wet,a_41_wet,a_42_wet,b_4_wet);
 // cout << "past ACOEFFWET()\n";
 
-// matrix definitions for stressed conditions
-	a=matrix(1,NP,1,NP); // a=A in Ax=b
-	ai=matrix(1,NP,1,NP); // inverse matrix
-	um=matrix(1,NP,1,NP); // unitary matrix
-	b=matrix(1,NP,1,MP);  // b vector(s) in Ax=b
-	x=matrix(1,NP,1,MP);  // aux. matrix
-	t=matrix(1,NP,1,MP);  // aux matrix
-// cout << "past matrix_1\n";
-
-// matrix definitions for unstressed conditions
-	a_pot=matrix(1,NP,1,NP); // a=A in Ax=b
-	ai_pot=matrix(1,NP,1,NP); // inverse matrix
-	um_pot=matrix(1,NP,1,NP); // unitary matrix
-	b_pot=matrix(1,NP,1,MP);  // b vector(s) in Ax=b
-	x_pot=matrix(1,NP,1,MP);  // aux. matrix
-	t_pot=matrix(1,NP,1,MP);  // aux matrix
-// cout << "past matrix_2\n";
-
-// matrix definitions for wet conditions
-	a_wet=matrix(1,NP,1,NP); // a=A in Ax=b
-	ai_wet=matrix(1,NP,1,NP); // inverse matrix
-	um_wet=matrix(1,NP,1,NP); // unitary matrix
-	b_wet=matrix(1,NP,1,MP);  // b vector(s) in Ax=b
-	x_wet=matrix(1,NP,1,MP);  // aux. matrix
-	t_wet=matrix(1,NP,1,MP);  // aux matrix
 // cout << "past matrix_3\n";
 
 // size n of matrix 5 x 5
@@ -2081,27 +2082,8 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
 
 	} else
    		{
-      		if (n_hr % 10000 == 0) printf("nog geen gewas aanwezig....\n");
+      		if (n_hr % 10000 == 0) ;
       		} // end if
- 	free_matrix(a,1,NP,1,NP);
-	free_matrix(ai,1,NP,1,NP);
-	free_matrix(um,1,NP,1,NP);
-	free_matrix(b,1,NP,1,MP);
-	free_matrix(x,1,NP,1,MP);
-	free_matrix(t,1,NP,1,MP);
-	free_matrix(a_pot,1,NP,1,NP);
-	free_matrix(ai_pot,1,NP,1,NP);
-	free_matrix(um_pot,1,NP,1,NP);
-	free_matrix(b_pot,1,NP,1,MP);
-	free_matrix(x_pot,1,NP,1,MP);
-	free_matrix(t_pot,1,NP,1,MP);
-	free_matrix(a_wet,1,NP,1,NP);
-	free_matrix(ai_wet,1,NP,1,NP);
-	free_matrix(um_wet,1,NP,1,NP);
-	free_matrix(b_wet,1,NP,1,MP);
-	free_matrix(x_wet,1,NP,1,MP);
-	free_matrix(t_wet,1,NP,1,MP);
-
          } // end tick()
 
   void output (Log& log) const
@@ -2155,6 +2137,10 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
     log.output ("f_temp", f_temp);                // var 50
     log.output ("f_def", f_def);                  // var 51
     log.output ("f_theta", f_theta);              // var 52
+    log.output ("f_etep", f_etep);                // var 53
+    log.output ("r_sc_js", r_sc_js);              // var 54
+    log.output ("r_sc_min", r_sc_min);            // var 55
+
   }
 
    ~PT_PMSW() // destructor
@@ -2174,7 +2160,19 @@ fprintf(fp_mat_b,"%5d\t%5d\t%5d\t%7.2g\t%7.2g\t%7.2g\t%7.2g\t%7.2g\n",
       free_matrix(um,1,NP,1,NP);
       free_matrix(ai,1,NP,1,NP);
       free_matrix(a,1,NP,1,NP);
-      }                                                
+	free_matrix(a_pot,1,NP,1,NP);
+	free_matrix(ai_pot,1,NP,1,NP);
+	free_matrix(um_pot,1,NP,1,NP);
+	free_matrix(b_pot,1,NP,1,MP);
+	free_matrix(x_pot,1,NP,1,MP);
+	free_matrix(t_pot,1,NP,1,MP);
+	free_matrix(a_wet,1,NP,1,NP);
+	free_matrix(ai_wet,1,NP,1,NP);
+	free_matrix(um_wet,1,NP,1,NP);
+	free_matrix(b_wet,1,NP,1,MP);
+	free_matrix(x_wet,1,NP,1,MP);
+	free_matrix(t_wet,1,NP,1,MP);
+      }
 
 }; // end class PT_PMSW
 
@@ -2285,6 +2283,10 @@ syntax.add ("f_def", "NA", Syntax::LogOnly,
 		"Constraint function (Verma) related to vapor pressure");
 syntax.add ("f_etep", "NA", Syntax::LogOnly,
 		"Constraint function defined by crop_ea/crop_ep");
+syntax.add ("r_sc_js", "s/m", Syntax::LogOnly,
+		"Bulk canopy resistance: f1_dolman*f_def*f3*f4");
+syntax.add ("r_sc_min", "s/m", Syntax::LogOnly,
+		"minimum canopy resistance");
 syntax.add ("albedo", "NA", Syntax::Const,
 		"Bulk albedo");
 alist.add ("albedo", 0.2);

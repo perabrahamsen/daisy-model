@@ -744,7 +744,7 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("h_frozen", -15000.0);
   syntax.add ("enable_ice", Syntax::Boolean, Syntax::Const,
 	      "Disable this to prevent water from freezing.");
-  alist.add ("enable_ice", true);
+  alist.add ("enable_ice", false);
   syntax.add ("T_top", "dg C", Syntax::OptionalState, 
 	      "Surface temperature at previous time step.");
   syntax.add ("T_freezing", "dg C", Syntax::LogOnly, Syntax::Sequence,
