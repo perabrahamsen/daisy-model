@@ -121,7 +121,11 @@ UZRichard::richard (const Soil& soil,
   vector<double> Kplus (size);
 
   // For h bottom.
-  K[size] = soil.K (last + 1, 0.0, h_ice[last + 1]);
+  if (!bottom.flux_bottom ())
+    {
+      assert (last + 1 < soil.size ());
+      K[size] = soil.K (last + 1, 0.0, h_ice[last + 1]);
+    }
 
   // Check if we have already switched top once.
   bool switched_top = false;

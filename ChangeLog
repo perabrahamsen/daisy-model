@@ -1,5 +1,7 @@
 1999-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* uzrichard.C (richard): Fix memory error.
+
 	* lib/log.dai ("Groundwater"): Added `DrainFlow'.
 	* Merged SH changes.
 
