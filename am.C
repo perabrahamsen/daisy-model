@@ -670,7 +670,7 @@ AM::default_root ()
 {
   static AttributeList root;
   
-  if (!root.check ("syntax"))
+  if (!root.check ("type"))
     {
       root.add ("type", "root");
       root.add ("description", "Initialization of old root remains.");

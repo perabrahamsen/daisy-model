@@ -1,3 +1,17 @@
+2001-10-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rootdens.C, rootdens.h: New component.
+	* Makefile (COMPONENTS): Add it.
+	* rootdens_std.C: New model.
+	* Makefile (MODELS): Add it.
+	* root_system.C, root_system.h: Use them.
+	* lib/maize.dai, lib/rye.dai, lib/sbarley.dai, lib/sugarbeet.dai,
+	lib/fodderbeet.dai, lib/srape.dai, lib/swheat.dai,
+	lib/wbarley.dai, lib/wbarley.dai, lib/wrape.dai, lib/wwheat.dai,
+	lib/grass.dai:  Remove old root density parameters.
+
+	* lib/log.dai ("Fertilizer"): Removed Seed_N.
+
 2001-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.88 released.

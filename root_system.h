@@ -20,6 +20,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "rootdens.h"
+
 #include <vector>
 using namespace std;
 
@@ -37,6 +39,10 @@ struct Syntax;
 
 class RootSystem
 {
+  // Components.
+private:
+  Rootdens& rootdens;		// Root density calculation.
+
   // Parameters.
 public:
   double DptEmr;		// Penetration at emergence
@@ -44,8 +50,6 @@ private:
   double PenPar1;		// Penetration rate parameter, coefficient
   double PenPar2;		// Penetration rate parameter, threshold
   double MaxPen;		// Max penetration depth
-  double SpRtLength;		// Specific root length [m/g]
-  double DensRtTip;		// Root density at (pot) penetration depth
   double Rad;			// Root radius [cm]
   double h_wp;			// Matrix potential at wilting
   double MxNH4Up;		// Max NH4 uptake per unit root length

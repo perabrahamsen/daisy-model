@@ -25,8 +25,6 @@
       (PenPar1    0.20)
       (PenPar2     4.0)
       (MaxPen       70)
-      (SpRtLength  100)
-      (DensRtTip  0.10)
       (Rad        0.05)
       (h_wp       -15000)
       (Rxylem     10.0)

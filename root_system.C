@@ -21,6 +21,7 @@
 
 
 #include "root_system.h"
+#include "rootdens.h"
 #include "submodel.h"
 #include "soil_heat.h"
 #include "soil_NH4.h"
@@ -30,9 +31,6 @@
 #include "log.h"
 #include "mathlib.h"
 #include "message.h"
-
-// Dimensional conversion.
-static const double m_per_cm = 0.01;
 
 double 
 RootSystem::potential_water_uptake (const double h_x,
@@ -293,66 +291,6 @@ RootSystem::nitrogen_uptake (const Soil& soil,
   return NH4Upt + NO3Upt;
 }
 
-double
-RootSystem::density_distribution_parameter (double a)
-{
-  double x, y, z, x1, y1, z1, x2, y2, z2;
-
-  if (1 + a > exp (1.0))
-    {
-      x1 = 1.0;
-      y1 = exp (x1);
-      z1 = 1 + a * x1;
-      x2 = 20.0;
-      y2 = exp (x2);
-      z2 = 1 + a * x2;
-      while ((z1 - y1) * (z2 - y2) > 0)
-	{
-	  x1 = x2;
-	  y1 = y2;
-	  z1 = z2;
-	  x2++;
-	  y2 = exp (x2);
-	  z2 = 1 + a * x2;
-	}
-    }
-  else if (a >= 0.3)
-    {
-      x1 = 0.3;
-      y1 = exp (x1);
- //     z1 = 1 + a * x1;
-      x2 = 1.0;
-      y2 = exp (x2);
- //     z2 = 1 + a * x2;
-    }
-  else
-    {
-      assert (false /* Invalid Root Distribution */);
-    }
-  x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
-  y = exp (x);
-  z = 1 + a * x;
-  while (fabs (2 * (z - y) / (z + y)) > 1.0e-5)
-    {
-      if (z - y > 0)
-	{
-	  x1 = x;
-	  y1 = y;
-	  // z1 = z;
-	}
-      else
-	{
-	  x2 = x;
-	  y2 = y;
-	  // z2 = z;
-	}
-      x = (y2 * (x2 - 1) - y1 * (x1 - 1)) / (y2 - y1);
-      y = exp (x);
-      z = 1 + a * x;
-    }
-  return x;
-}
-
 void
 RootSystem::tick (const Soil& soil, 
 		  const SoilHeat& soil_heat, 
@@ -377,26 +315,7 @@ RootSystem::tick (const Soil& soil,
 void
 RootSystem::set_density (const Geometry& geometry, 
 			 const double WRoot)
-{
-  const double LengthPrArea
-    = max (m_per_cm * SpRtLength * WRoot, 0.12 * PotRtDpt); /*cm/cm2*/
-  double a = density_distribution_parameter (LengthPrArea / 
-					     (PotRtDpt * DensRtTip));
-  double L0 = DensRtTip * exp (a);
-  a /= PotRtDpt;
-  if (Depth < PotRtDpt)
-    {
-      double Lz = L0 * exp (-a * Depth);
-      a = density_distribution_parameter (LengthPrArea / (Depth * Lz)) / Depth;
-    }
-
-  unsigned int i = 0;
-  for (; i == 0 || -geometry.zplus (i-1) < Depth; i++)
-    Density[i] = L0 * exp (a * geometry.z (i));
-  assert (i < geometry.size ());
-  for (; i < geometry.size (); i++)
-    Density[i] = 0.0;
-}
+{ rootdens.set_density (Density, geometry, Depth, PotRtDpt, WRoot); }
 
 void
 RootSystem::full_grown (const Soil& soil, 
@@ -445,6 +364,10 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("submodel", "RootSystem");
   static const vector<double> empty_array;
 
+  syntax.add ("rootdens", Librarian<Rootdens>::library (),
+	      "Root density model.");
+  alist.add ("rootdens", Rootdens::default_model ());
+
   syntax.add ("DptEmr", "cm", Syntax::Const,
 	    "Penetration at emergence.");
   alist.add ("DptEmr", 10.0);
@@ -457,12 +380,6 @@ RootSystem::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("MaxPen", "cm", Syntax::Const,
 	    "Maximum penetration depth.");
   alist.add ("MaxPen", 100.0);
-  syntax.add ("SpRtLength", "m/g", Syntax::Const,
-	    "Specific root length");
-  alist.add ("SpRtLength", 100.0);
-  syntax.add ("DensRtTip", "cm/cm^3", Syntax::Const,
-	    "Root density at (potential) penetration depth.");
-  alist.add ("DensRtTip", 0.1);
   syntax.add ("Rad", "cm", Syntax::Const,
 	    "Root radius.");
   alist.add ("Rad", 0.005);
@@ -521,12 +438,11 @@ get_PotRtDpt (const AttributeList& al)
 }
 
 RootSystem::RootSystem (const AttributeList& al)
-  : DptEmr (al.number ("DptEmr")),
+  : rootdens (Librarian<Rootdens>::create (al.alist ("rootdens"))),
+    DptEmr (al.number ("DptEmr")),
     PenPar1 (al.number ("PenPar1")),
     PenPar2 (al.number ("PenPar2")),
     MaxPen (al.number ("MaxPen")),
-    SpRtLength (al.number ("SpRtLength")),
-    DensRtTip (al.number ("DensRtTip")),
     Rad (al.number ("Rad")),
     h_wp (al.number ("h_wp")),
     MxNH4Up (al.number ("MxNH4Up")),
