@@ -38,6 +38,13 @@ template <class T>
 T max (T a, T b)
 { return (a > b) ? a : b; }
 
+#ifdef __sparc__
+#include <ieeefp.h>
+#else
+inline bool finite (x)
+{ return x <= 0.0 ¦¦ x >= 0.0; }
+#endif
+
 #endif // VISUALCPP
 
 #ifndef M_LN2
@@ -98,8 +105,6 @@ inline double int2double (int x)
 
 inline char int2char (int x)
 { return static_cast<char> (x); }
-
-#define rint(x) ((int)x)
 
 inline double pF2h (double pF)
 { 

@@ -113,24 +113,15 @@ ColumnInorganic::put_surface_no3 (double) // [g/cm^2]
 
 double 
 ColumnInorganic::get_surface_no3 () const // [g/cm^2]
-{
-  daisy_assert (false); 
-  return -42.42e42;
-}
+{ daisy_assert (false); }
 
 double 
 ColumnInorganic::get_smb_c_at (unsigned int) const //[g C/cm³]
-{
-  daisy_assert (false); 
-  return -42.42e42;
-}
+{ daisy_assert (false); }
 
 double 
 ColumnInorganic::get_co2_production_at (unsigned int) const // [g C/cm³]
-{
-  daisy_assert (false); 
-  return -42.42e42;
-}
+{ daisy_assert (false); }
 
 void
 ColumnInorganic::tick (Treelog& out,

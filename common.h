@@ -58,13 +58,6 @@
 #undef exception
 #endif
 
-#ifdef __sparc__
-#include <ieeefp.h>
-#else
-#define finite(x) 1
-// ((x) <= 0.0 ¦¦ (x) >= 0.0)
-#endif
-
 #ifdef __GNUC__
 
 #include <unistd.h>

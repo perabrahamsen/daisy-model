@@ -392,8 +392,8 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 		 {
 		   Treelog::Open nest (out, "Groundwater pipe");
 		   TmpStream tmp;
-		   tmp () << "BUG: percolation[" << j - 1 
-			  << "] = " << def / dt << " (dw < def)";
+		   tmp () << "BUG: percolation[" << (j - 1) 
+			  << "] = " << (def / dt) << " (dw < def)";
 		   out.error (tmp.str ());
 		 }
                if (def<=0.0) break;
@@ -426,8 +426,8 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
 		 {
 		   Treelog::Open nest (out, "Groundwater pipe");
 		   TmpStream tmp;
-		   tmp () << "BUG: percolation[" << j - 1 
-			  << "] = " << def / dt << " (dw < def)";
+		   tmp () << "BUG: percolation[" << (j - 1) 
+			  << "] = " << (def / dt) << " (dw < def)";
 		   out.error (tmp.str ());
 		 }
                if (def<=0.0) break;

@@ -480,7 +480,7 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	  case Syntax::Object:
 	    {
 	      const AttributeList& object = alist.alist (name);
-	      assert (object.check ("type"));
+	      daisy_assert (object.check ("type"));
 	      const string& type = object.name ("type");
 	      out << " (default `";
 	      print_quoted (out, type);
