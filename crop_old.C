@@ -113,6 +113,7 @@ public:
 
   double DS () const;
   double DM () const;
+  double total_N () const;
 
   // Create and Destroy.
 public:
@@ -1971,6 +1972,14 @@ CropOld::DS () const
 double
 CropOld::DM () const	// [g/m² -> kg/ha]
 { return (var.Prod.WLeaf) * 10; }
+
+double
+CropOld::total_N () const
+{
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+  return var.Prod.NCrop / conv;
+}
 
 CropOld::CropOld (const AttributeList& al)
   : Crop (al),

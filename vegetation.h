@@ -89,8 +89,8 @@ public:
 			double sorg_harvest,
 			vector<const Harvest*>& harvest,
 			vector<AM*>& residuals) = 0;
-  virtual void sow (const AttributeList& al,
-		    const Geometry&, OrganicMatter&) = 0;
+  virtual double sow (const AttributeList& al, // Return kg N/ha in seed.
+		      const Geometry&, OrganicMatter&) = 0;
   virtual void sow (const AttributeList& al,
 		    const Geometry&) = 0;
   virtual void output (Log&) const;

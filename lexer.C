@@ -105,13 +105,19 @@ Lexer::good ()
 { return impl.good (); }
 
 void 
-Lexer::error (const string& str)
+Lexer::warning (const string& str)
 {
-  error_count++;
   TmpStream tmp;
   tmp () << file << ":" << impl.line << ":"
 	 << (impl.column + 1) << ": " << str;
   err.entry (tmp.str ());
+}
+
+void 
+Lexer::error (const string& str)
+{
+  error_count++;
+  warning (str);
 }
 
 void

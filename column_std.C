@@ -42,6 +42,7 @@ private:
 
   // Log variables.
 private:
+  double log_seed_N;
   double log_fertilized_NO3;
   double log_fertilized_NH4;
   double log_volatilization;
@@ -49,6 +50,7 @@ private:
   double log_fertilized_Org_C;
   double log_fertilized_DM;
   double log_first_year_utilization;
+  double seed_N;
   double fertilized_NO3;
   double fertilized_NH4;
   double volatilization;
@@ -112,7 +114,7 @@ public:
 
 void 
 ColumnStandard::sow (const AttributeList& al)
-{ vegetation.sow (al, soil, organic_matter); }
+{ seed_N += vegetation.sow (al, soil, organic_matter); }
 
 // We need to convert from mm * mg N / liter to g N/m^2.
 // mm / liter = 1/m^2
@@ -340,6 +342,7 @@ ColumnStandard::tick (const Time& time, const Weather* global_weather)
   const Weather& my_weather = *(weather ? weather : global_weather);
 
   // Save logs.
+  log_seed_N = seed_N;
   log_fertilized_NO3 = fertilized_NO3;
   log_fertilized_NH4 = fertilized_NH4;
   log_fertilized_Org_N = fertilized_Org_N;
@@ -347,6 +350,7 @@ ColumnStandard::tick (const Time& time, const Weather* global_weather)
   log_fertilized_DM = fertilized_DM;
   log_first_year_utilization = first_year_utilization;
   log_volatilization = volatilization;
+  seed_N = 0.0;
   fertilized_NO3 = 0.0;
   fertilized_NH4 = 0.0;
   fertilized_Org_N = 0.0;
@@ -401,6 +405,7 @@ ColumnStandard::output_inner (Log& log) const
   output_derived (nitrification, "Nitrification", log);
   output_submodule (denitrification, "Denitrification", log);
   log.output ("second_year_utilization", second_year_utilization_);
+  log.output ("seed_N", log_seed_N);
   log.output ("fertilized_NO3", log_fertilized_NO3);
   log.output ("fertilized_NH4", log_fertilized_NH4);
   log.output ("volatilization", log_volatilization);
@@ -450,6 +455,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
 		   (al.alist ("Nitrification"))),
     denitrification (al.alist ("Denitrification")),
     second_year_utilization_ (al.number ("second_year_utilization")),
+    log_seed_N (0.0),
     log_fertilized_NO3 (0.0),
     log_fertilized_NH4 (0.0),
     log_volatilization (0.0),
@@ -457,6 +463,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     log_fertilized_Org_C (0.0),
     log_fertilized_DM (0.0),
     log_first_year_utilization (0.0),
+    seed_N (0.0),
     fertilized_NO3 (0.0),
     fertilized_NH4 (0.0),
     volatilization (0.0),
@@ -533,6 +540,8 @@ The denitrification process.");
     syntax.add ("second_year_utilization", "kg N/ha", Syntax::State,
 		"Estimated accumulated second year fertilizer effect.");
     alist.add ("second_year_utilization", 0.0);
+    syntax.add ("seed_N", "kg N/ha", Syntax::LogOnly,
+		"Amount of nitrogen in seed applied this time step.");
     syntax.add ("fertilized_NO3", "kg N/ha", Syntax::LogOnly,
 		"Amount of nitrate applied this time step.");
     syntax.add ("fertilized_NH4", "kg N/ha", Syntax::LogOnly,

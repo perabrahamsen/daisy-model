@@ -46,6 +46,8 @@ struct ParserFile::Implementation
   { return lexer->good (); }
   void error (const string& str)
   { lexer->error (str); }
+  void warning (const string& str)
+  { lexer->warning (str); }
   void eof ()
   { lexer->eof (); }
 
@@ -429,6 +431,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		    error (string ("Error for member '") + obj 
 			   + "' in library '" + name + "'\n--- details:\n"
 			   + tmp.str () + "---");
+		  else if (treelog.count)
+		    warning (string ("Warning for member '") + obj 
+			     + "' in library '" + name + "'\n--- details:\n"
+			     + tmp.str () + "---");
 		  atts.add (name, al);
 		  delete &al;
 		}

@@ -12,6 +12,19 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.87
+
+** Mark "CrpN SeedN" as obsolete in default crop model.
+
+Use "Prod NCrop" instead.  You will need to update the crop library to
+get rid of the warnings.
+
+** Make it possible to log nitrogen added with seeds.
+
+It has been added to the "Fertilizer" log parameterization.
+
+** Lots of updates to the log parameterizations.
+
 * 1.86
 
 ** Count initial AOM when estimating initial SMB.

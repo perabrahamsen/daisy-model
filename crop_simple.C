@@ -130,6 +130,7 @@ public:
 
   double DS () const;
   double DM () const;
+  double total_N () const;
 
   // Create and Destroy.
 public:
@@ -316,6 +317,14 @@ CropSimple::DS () const
 double
 CropSimple::DM () const	
 { throw ("Can't take DM of simple crop model"); }
+
+double
+CropSimple::total_N () const
+{
+  // kg/ha -> g/cm^2
+  const double conv = (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0)));
+  return N_actual / conv;
+}
 
 void
 CropSimple::initialize (const Geometry& geometry)

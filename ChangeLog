@@ -1,3 +1,31 @@
+2001-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.87 released.
+
+2001-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai: Merged SH changes.
+
+2001-10-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_sold.C, crop_old.C, crop_std.C, crop_simple.C, crop.h
+	(total_N): New function.
+	* vegetation.h, vegetation_crops.C, vegetation_permanent.C (sow):
+	Return amount of N in seed.
+	* column_std.C (seed_N): New log variable.
+	* lib/log.dai ("Fertilizer"): Log seed N.
+	
+	* crop_std.C (CrpNPar::check_alist): New function.
+	(CropStandardSyntax): Use it.
+	(SeedN): Make it optional.
+	* parser_file.C, lexer.C, lexer.h (warning): New function.
+	* parser_file.C (load_list): Use it.
+
+	* lib/sbarley.dai, lib/grass.dai, fodderbeet.dai, lib/grass2.dai,
+	lib/maize.dai, lib/pea.dai, lib/rye.dai, lib/srape.dai,
+	lib/sugarbeet.dai, lib/swheat.dai, lib/wbarley.dai, lib/wrape.dai,
+	lib/wwheat.dai: Use "Prod CropN" instead of "CrpN SeedN". 
+
 2001-10-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.86 released.

@@ -98,7 +98,7 @@ struct VegetationCrops : public Vegetation
 		double stub_length,
 		double stem_harvest, double leaf_harvest, double sorg_harvest,
 		vector<const Harvest*>& harvest, vector<AM*>& residuals);
-  void sow (const AttributeList& al, const Geometry&, OrganicMatter&);
+  double sow (const AttributeList& al, const Geometry&, OrganicMatter&);
   void sow (const AttributeList& al, const Geometry&);
   void output (Log&) const;
 
@@ -393,7 +393,7 @@ VegetationCrops::harvest (const string& column_name,
   reset_canopy_structure ();
 }
 
-void
+double
 VegetationCrops::sow (const AttributeList& al,
 		      const Geometry& geometry,
 		      OrganicMatter& organic_matter)
@@ -401,6 +401,7 @@ VegetationCrops::sow (const AttributeList& al,
   Crop& crop = Librarian<Crop>::create (al);
   crop.initialize (geometry, organic_matter);
   crops.push_back (&crop);
+  return crop.total_N ();
 }
 
 void

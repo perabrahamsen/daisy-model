@@ -143,6 +143,7 @@ public:
 
   double DS () const;
   double DM () const;
+  double total_N () const;
 
   // Create and Destroy.
 public:
@@ -247,6 +248,7 @@ struct CropStandard::Parameters
     const PLF& NfSOrgCnc;	// Non-func lim f. N-conc in stor org
     const PLF& TLLeafEff;	// Translocation effiency, Leaf.
     const PLF& TLRootEff;	// Translocation effiency, Root.
+    static bool check_alist (const AttributeList& al, Treelog&);
   private:
     friend struct CropStandard::Parameters;
     CrpNPar (const AttributeList&);
@@ -435,8 +437,21 @@ CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
     LfRtRelRtRes (vl.number ("LfRtRelRtRes"))
 { }
 
+bool 
+CropStandard::Parameters::CrpNPar::check_alist (const AttributeList& al, 
+						Treelog& err)
+{
+  static bool warned = false;
+  if (al.check ("SeedN") && !warned)
+    {
+      err.entry ("OBSOLETE: Use 'Prod NCrop' instead of 'CrpN SeedN'");
+      warned = true;
+    }
+  return true;
+}
+
 CropStandard::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
-  : SeedN (vl.number ("SeedN")),
+  : SeedN (vl.check ("SeedN") ? vl.number ("SeedN") : -42.42e42),
     DS_fixate (vl.number ("DS_fixate")),
     DS_cut_fixate (vl.number ("DS_cut_fixate")),
     fixate_factor (vl.number ("fixate_factor")),
@@ -541,7 +556,9 @@ CropStandard::Variables::RecProd::RecProd (const Parameters& par,
     N_AM  (vl.number ("N_AM")),
     AM_root (NULL),
     AM_leaf (NULL)
-{ }
+{ 
+  assert (NCrop >= 0.0);
+}
 
 void
 CropStandard::Variables::RecProd::output (Log& log) const
@@ -709,6 +726,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& Prod = *new Syntax ();
   AttributeList& vProd = *new AttributeList ();
   Syntax& CrpN = *new Syntax ();
+  CrpN.add_check (CropStandard::Parameters::CrpNPar::check_alist);
   AttributeList& CrpNList = *new AttributeList ();
   Syntax& Harvest = *new Syntax ();
   AttributeList& HarvestList = *new AttributeList ();
@@ -859,9 +877,9 @@ This parameterization is only valid until the specified development state.");
   vProd.add ("LfRtRelRtRes", 0.80);
 
   // CrpNPar
-  CrpN.add ("SeedN", "g N/m^2", Syntax::Const,
-	    "N-content in seed.");
-  CrpNList.add ("SeedN", 0.5);
+  CrpN.add ("SeedN", "g N/m^2", Syntax::OptionalConst,
+	    "N-content in seed.\n\
+Obsolete: Use 'Prod NCrop' instead.");
   CrpN.add ("DS_fixate", Syntax::None (), Syntax::Const,
             "DS at which to start fixation of atmospheric N.");
   CrpNList.add ("DS_fixate", 42000.0);
@@ -999,7 +1017,8 @@ Maximal development stage for which the crop survives harvest.");
 	    "Nitrogen stored in dead leaves.");
   vProd.add ("NDead", 0.000);
   Prod.add ("NCrop", "g N/m^2", Syntax::OptionalState,
-	    "Total crop nitrogen content.");
+	    "Total crop nitrogen content.\n\
+For initialization, set this to the amount of N in the seed.");
   Prod.add ("C_AM", "g C/m^2", Syntax::State,
 	    "Added C in plant material.");
   vProd.add ("C_AM", 0.000);
@@ -2102,6 +2121,14 @@ CropStandard::DM () const
 {
   return (var.Prod.WSOrg + var.Prod.WStem + var.Prod.WLeaf + var.Prod.WDead)
     * 10; // [g/m^2 -> kg/ha]
+}
+
+double
+CropStandard::total_N () const
+{
+  // kg/ha -> g/m^2
+  const double conv = 1000.0 / (100.0 * 100.0);
+  return var.Prod.NCrop / conv;
 }
 
 CropStandard::CropStandard (const AttributeList& al)

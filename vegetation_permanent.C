@@ -95,7 +95,7 @@ struct VegetationPermanent : public Vegetation
 		vector<const Harvest*>&,
 		vector<AM*>&)
   { }
-  void sow (const AttributeList&, const Geometry&, OrganicMatter&)
+  double sow (const AttributeList&, const Geometry&, OrganicMatter&)
   { throw "Can't sow on permanent vegetation"; }
   void sow (const AttributeList&, const Geometry&)
   { throw "Can't sow on permanent vegetation"; }

@@ -57,6 +57,7 @@ Treelog::null ()
 { return nulllog; }
 
 Treelog::Treelog ()
+  : count (0)  
 { }
 
 Treelog::~Treelog ()
