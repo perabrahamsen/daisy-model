@@ -1,3 +1,24 @@
+1999-01-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.63 released.
+
+1999-01-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* event.C: Give crop a name.
+
+	* eventqueue.C: Merged JRI changes.
+
+	* event.C: Merged with JRI version.
+
+	* action_irrigate.C (ActionIrrigateSyntax): Add dimensions and
+	descriptions. 
+
+1999-01-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Assume working exception handling.
+
+	* Makefile: Removed support for gcc 2.7.2.
+
 1999-01-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.62 released.

@@ -43,8 +43,10 @@ FertilizeEvent* FertilizeEvent::create(AttributeList &al){
 void FertilizeEvent::Do_It(Daisy& daisy,const Time&, EventQueue&)
 {
   // Fertilize the WORLD
-  const AttributeList& am = Librarian<AM>::library ().lookup ("mineral");
-  
+  // const AttributeList& am = AM::library ().lookup ("mineral");
+  AttributeList am = AttributeList(Librarian<AM>::library ().lookup ("mineral"));
+  am.add("NO3", 50.0e-5);
+  am.add("NH4", 50.0e-5);
     // Add inorganic matter.
 #if 0
     if (to < from)
@@ -82,17 +84,18 @@ IrrigateEvent* IrrigateEvent::create(AttributeList &al){
 void IrrigateEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
 
    IM sm;
-
    double t = (useairtemperature)?
                daisy.weather.hourly_air_temperature () :
                temperature;
 
-	if (overheadirrigation)
-	  daisy.field.irrigate_top (howmuch, t, sm);
-	else
-	  daisy.field.irrigate_surface (howmuch, t, sm);
-	  
-	COUT << "[(really) Irrigating]\n";
+	COUT << "[Irrigating]\n";
+   if (howmuch != 0) {
+   	if (overheadirrigation)
+	      daisy.field.irrigate_top (howmuch, t, sm);
+	   else
+	      daisy.field.irrigate_surface (howmuch, t, sm);
+   }
+
 }
 
 bool IrrigateEvent::KanUdfoeres(Daisy&,const Time&){
@@ -113,7 +116,7 @@ void TillageEvent::Do_It(Daisy& daisy,const Time&, EventQueue& ){
 
    if (how == string("Seed Bed Preparation")){
       depth  = -8.0;
-   } else if (how == string("Stubbel Cultivation")) {
+   } else if (how == string("Stubble Cultivation")) {
       penetration = 0.6;
    } else if (how == string("Plowing")) {
       mix_it = false;
@@ -150,6 +153,8 @@ HarvestEvent* HarvestEvent::create(AttributeList &al){
 }
 
 void HarvestEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
+      const double DS = daisy.field.crop_ds(CropName);
+      COUT << "[" << CropName << ": developmentstage = "<< DS << "\n";
       vector<const Harvest*> entry = daisy.field.harvest (daisy.time, CropName, Stub, Stem, Leaf, StorageOrgans);
       daisy.harvest.insert (daisy.harvest.end (), entry.begin (), entry.end ());
       COUT << "[Harvesting "<<CropName<<"]\n";
@@ -171,22 +176,34 @@ FuncHarvestEvent* FuncHarvestEvent::create(AttributeList &al) {
 void FuncHarvestEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
    HarvestEvent::Do_It(daisy,dato,EQ);
 }
-bool FuncHarvestEvent::KanUdfoeres(Daisy& ,const Time& ){
+bool FuncHarvestEvent::KanUdfoeres(Daisy& d,const Time& ){
    // Er developmentstage opnået ?
-   return true;
+   const double DS = d.field.crop_ds(CropName);
+   if (Stage > DS)
+      return true;
+   return false;
 }
 
 
 SowEvent* SowEvent::create(AttributeList &al){
    const Library& library = Librarian<struct Crop>::library ();
    if (al.check("What") /* && al.check("Model")*/&& library.check (al.name("What"))){
+
       string m(""/*al.name("Model")*/), w(al.name("What"));
+#if 0
+      // JRI code:
       return new SowEvent(m, w,library.lookup(al.name("What")));
+#else
+      // PA code:
+      AttributeList& cal = *new AttributeList (library.lookup (w));
+      cal.add ("type", w);
+      return new SowEvent (m, w, cal);
+#endif      
    }
    return 0;
 }
 void SowEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
-	daisy.field.sow (CropAttributes); 
+	daisy.field.sow (CropAttributes);
 	COUT << "[Sowing]\n";
 
        if (harvest)

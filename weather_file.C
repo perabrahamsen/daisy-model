@@ -68,7 +68,7 @@ WeatherFile::tick (const Time& time)
   if (!file.good ())
     {
       CERR << file_name << ":" << line << ": file error";
-      THROW ("read error");
+      throw ("read error");
     }
   int year;
   int month; 
@@ -88,7 +88,7 @@ WeatherFile::tick (const Time& time)
 	end = file.get ();
       
       if (!file.good ())
-	THROW ("No more climate data.");
+	throw ("No more climate data.");
 
       if (end == '\n')
 	reference_evapotranspiration_ = -42.42e42;

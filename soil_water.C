@@ -55,7 +55,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   if (!groundwater.flux_bottom ())
     {
       if (groundwater.table () < soil.z (last))
-	THROW ("Groundwater table below lowest node.");
+	throw ("Groundwater table below lowest node.");
       last = soil.interval (groundwater.table ());
       // Presure at the last node is equal to the water above it.
       for (unsigned int i = last; i < soil.size (); i++)
@@ -68,11 +68,8 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
   // Limit for ponding.
   const int first = 0;
 
-#ifdef HANDLE_EXCEPTIONS
-
   try
     {
-#endif
       if (bottom)
 	{
 	  // We have two UZ models.
@@ -96,7 +93,6 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 		     S, h_old, Theta_old_,
 		     h_, Theta_, q_);
 	}
-#ifdef HANDLE_EXCEPTIONS
     }
   catch (const char* error)
     {
@@ -108,7 +104,6 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
                      S, h_old, Theta_old_,
                      h_, Theta_, q_);
     }
-#endif
 
   // Update flux in groundwater.
   for (unsigned int i = last + 1; i < soil.size (); i++)

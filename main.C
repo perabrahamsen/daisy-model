@@ -8,10 +8,8 @@
 int
 main (int argc, char* argv[])
 {
-#ifdef HANDLE_EXCEPTIONS
   try
     {
-#endif
       // Initialize syntax and attribute list.
       Syntax syntax;
       AttributeList alist;
@@ -50,7 +48,6 @@ main (int argc, char* argv[])
 
       // All is well.
       return 0;
-#ifdef HANDLE_EXCEPTIONS
     }
   catch (const char* error)
     {
@@ -61,5 +58,4 @@ main (int argc, char* argv[])
       CERR << "Unhandled exception\n";
     }
   exit (1);
-#endif
 }

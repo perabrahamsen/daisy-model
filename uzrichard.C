@@ -329,7 +329,7 @@ UZRichard::richard (const Soil& soil,
 		// We don't have more water in the pressure top.
 		{
 		  if (switched_top)
-		    THROW ("Couldn't accept top flux");
+		    throw ("Couldn't accept top flux");
 		  else
 		    {
 		      top.flux_top_on ();
@@ -349,7 +349,7 @@ UZRichard::richard (const Soil& soil,
 	      accepted = false;
 	    }
 	  else
-	    THROW ("Couldn't drain top flux");
+	    throw ("Couldn't drain top flux");
 
 	  if (accepted)
 	    {
@@ -385,7 +385,7 @@ UZRichard::richard (const Soil& soil,
 		      }
 		  }
 		if (error_found)
-		  THROW ("\
+		  throw ("\
 Richard eq. mass balance flux is different than darcy flux");
 	      }
 #endif
@@ -503,10 +503,10 @@ UZRichard::q_darcy (const Soil& soil,
   const double start_pos = (soil.z (first) + soil.z (last) * 3.0) / 4.0;
   int start = soil.interval (start_pos) - 1;
   if (!(start < last - 2))
-    THROW ("We need at least 2 numeric nodess below 3/4 depth for \
+    throw ("We need at least 2 numeric nodess below 3/4 depth for \
 calculating flow with pressure top.");
   if (!(start > first + 1))
-    THROW ("We need at least 1 numeric node above 3/4 depth for \
+    throw ("We need at least 1 numeric node above 3/4 depth for \
 calculating flow with pressure top.");
 
   for (; start > 0; start--)
@@ -515,7 +515,7 @@ calculating flow with pressure top.");
 	break;
     }
   if (start == 0)
-    THROW ("We couldn't find an unsaturated area.");
+    throw ("We couldn't find an unsaturated area.");
   // Use Darcy equation to find flux here.
   q[start + 1] = -Kplus[start - first] 
     * (  (  (h[start - first] - h[start + 1 - first])
@@ -548,7 +548,7 @@ UZRichard::tick (const Soil& soil,
   iterations = 0;
   if (!richard (soil, first, top, last, bottom, 
 		S, h_old, Theta_old, h, Theta, q))
-    THROW ("Richard's Equation doesn't converge.");
+    throw ("Richard's Equation doesn't converge.");
     
   const bool accepted = bottom.accept_bottom (q[last + 1]);
   assert (accepted);

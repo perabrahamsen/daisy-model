@@ -142,7 +142,7 @@ Solute::initialize (const AttributeList& al,
       if (C_.size () < soil.size ())
 	C_.insert (C_.end (), soil.size () - C_.size (), C_[C_.size () - 1]);
       else if (C_.size () > soil.size ())
-	THROW ("To many members of C sequence");
+	throw ("To many members of C sequence");
     }
   if (M_.size () > 0)
     {
@@ -150,7 +150,7 @@ Solute::initialize (const AttributeList& al,
       if (M_.size () < soil.size () + 0U)
 	M_.insert (M_.end (), soil.size () - M_.size (), M_[M_.size () - 1]);
       else if (M_.size () > soil.size ())
-	THROW ("To many members of M sequence");
+	throw ("To many members of M sequence");
     }
   if (ppm.size () > 0)
     {
@@ -159,7 +159,7 @@ Solute::initialize (const AttributeList& al,
 	ppm.insert (ppm.end (), soil.size () - ppm.size (), 
 		    ppm[ppm.size () - 1]);
       else if (ppm.size () > soil.size ())
-	THROW ("To many members of M sequence");
+	throw ("To many members of M sequence");
     }
   if (M_.size () == 0 && C_.size () == 0)
     {
@@ -190,13 +190,13 @@ Solute::initialize (const AttributeList& al,
       if (C_[i] == 0.0)
 	{
 	  if (M_[i] != 0.0)
-	    THROW ("C & M mismatch in solute");
+	    throw ("C & M mismatch in solute");
 	}
       else
 	{
 	  if (fabs (M_[i] / C_to_M (soil, soil_water.Theta (i), i, C_[i]) 
 		   - 1.0) >= 0.001)
-	    THROW ("Solute C does not match M");
+	    throw ("Solute C does not match M");
 	}
     }
 

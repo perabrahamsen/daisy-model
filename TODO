@@ -46,14 +46,6 @@
 
 ** Brug tab (per default) til at skelne array entries.
 
-* Drop gcc 2.7.2 support.
-
-** Ryd op i Makefile.
-
-** Ryd op i common.h
-
-** Fjern HANDLE_EXCEPTIONS.
-
 * Check field abstraction for flere søjler.
 
 * Check om AM root/initial initializering virker.

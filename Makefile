@@ -34,16 +34,14 @@ USE_PROFILE = false
 
 # Set COMPILER according to which compiler you use.
 #	sun		Use the unbundled sun compiler.
-#	gnu		Use the standard GNU compiler.
 #	egcs		Use the experimental GNU compiler.
 #	borland		Use the Borland compiler.
 ifeq ($(HOSTTYPE),sun4)
 	COMPILER = egcs
-#	COMPILER = gnu
 #	COMPILER = sun	
 endif
 ifeq ($(HOSTTYPE),hp)
-	COMPILER = gnu
+	COMPILER = egcs
 endif
 ifeq ($(HOSTTYPE),i386)
 	COMPILER = borland
@@ -75,27 +73,12 @@ ifeq ($(USE_OPTIMIZE),true)
 			OPTIMIZE = -O3 -ffast-math 
 		endif
 	endif
-	ifeq ($(COMPILER),gnu)
-		ifeq ($(HOSTTYPE),sun4)
-			OPTIMIZE = -O3 -ffast-math -mv8
-		else
-			OPTIMIZE = -O2
-		endif
-	endif
 endif
 
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
 	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wno-sign-compare -Wstrict-prototypes -Wconversion -Wno-uninitialized -DEGCS -g -pipe -frepo
-	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
-endif
-ifeq ($(COMPILER),gnu)
-	ifeq ($(HOSTTYPE),hp)
-		COMPILE = c++ -Wall -pipe	#No repo, no debug.  So sad.
-	else
-		COMPILE = c++ -Wall -g -frepo -pipe
-	endif
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 endif
 ifeq ($(COMPILER),sun)

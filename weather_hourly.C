@@ -76,7 +76,7 @@ WeatherHourly::tick (const Time& time)
   if (!file.good ())
     {
       CERR << file_name << ":" << line << ": file error";
-      THROW ("read error");
+      throw ("read error");
     }
   int year;
   int month; 
@@ -94,7 +94,7 @@ WeatherHourly::tick (const Time& time)
 	/* do nothing */;
 
       if (!file.good ())
-	THROW ("No more climate data.");
+	throw ("No more climate data.");
 
       date = Time (year, month, day, hour);
 

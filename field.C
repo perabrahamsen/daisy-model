@@ -69,11 +69,11 @@ void
 Field::Implementation::restrict (const string& name)
 {
   if (selected)
-    THROW ("Cannot restrict already restrcited field");
+    throw ("Cannot restrict already restrcited field");
   selected = find (name);
 
   if (!selected)
-    THROW (string ("Restricting to non-existing column `") + name + "'");
+    throw (string ("Restricting to non-existing column `") + name + "'");
 }
 
 void 
@@ -231,7 +231,7 @@ Field::Implementation::soil_temperature (double height) const  // [ cm -> dg C]
   if (selected)
     return selected->soil_temperature (height); 
   if (columns.size () != 1)
-    THROW ("Cannot take soil temperature of multiple columns");
+    throw ("Cannot take soil temperature of multiple columns");
 
   return columns[0]->soil_temperature (height);
 }
@@ -242,7 +242,7 @@ Field::Implementation::soil_water_potential (double height) const // [cm -> cm]
   if (selected)
     return selected->soil_water_potential (height); 
   if (columns.size () != 1)
-    THROW ("Cannot take soil water potential of multiple columns");
+    throw ("Cannot take soil water potential of multiple columns");
 
   return columns[0]->soil_water_potential (height);
 }
@@ -253,7 +253,7 @@ Field::Implementation::crop_ds (const string& crop) const
   if (selected)
     return selected->crop_ds (crop);
   if (columns.size () != 1)
-    THROW ("Cannot find crop development state of multiple columns");
+    throw ("Cannot find crop development state of multiple columns");
 
   return columns[0]->crop_ds (crop); 
 } 
@@ -319,7 +319,7 @@ Field::Implementation::divide (const string& original, const string& copy,
 { 
   Column* old = find (original);
   if (!old)
-    THROW ("Attempt to clone non-existing column"); 
+    throw ("Attempt to clone non-existing column"); 
   const Library& library = Librarian<Column>::library ();
   const Syntax& syntax = library.syntax (old->alist.name ("type"));
   LogClone log_clone ("column", syntax, old->alist);
@@ -340,7 +340,7 @@ Field::Implementation::divide (const string& original, const string& copy,
 void
 Field::Implementation::merge (const string& /*combine*/,
 			      const string& /*remove*/, double /*weight*/)
-{ THROW ("Merge is not yet implemented"); } 
+{ throw ("Merge is not yet implemented"); } 
 
 bool 
 Field::Implementation::check () const

@@ -155,16 +155,21 @@ void EventQueue::TilfoejEvent(const Time& dato ,TidsType tid ,EventList* el){
 }
 
 bool EventQueue::DoTick(Daisy& d) {
-   if (TheQueue.empty())
+   // cout << "[eventqueue] enter\n";
+   if (TheQueue.empty()) {
+      // cout << "[eventqueue] empty! leave\n";
       return false;
+   }
    EventsOfDate *E = TheQueue.top();
    Nu = d.time;
 
    if (Nu == E->GetDato()) { // har første elemente i køen samme dato så udfør
+      // cout << "[eventqueue] action\n";
       E->Udfoer(d,*this);
       TheQueue.pop(); // Fjern første element
       delete E;       // Og frigiv hukommelse
    }
+   // cout << "[eventqueue] leave\n";
    return true;
 }
 

@@ -12,9 +12,9 @@
 #include <string>
 
 #define HANDLE_NAMESPACES
-#define HANDLE_EXCEPTIONS
 
 #ifdef EGCS
+// Only egcs has a C++ safe <math.h>.
 #include <math.h>
 #else
 #define exception _BUG_EXCPETION
@@ -42,9 +42,6 @@
 #ifdef EGCS
 // Egcs can initialize a vector from two list iterators.
 #define HAS_TEMPLATE_MEMBERS
-#else
-// The g++ 2.7.2 find template doesn't work.
-#define BUGGY_FIND
 #endif
 
 #include <unistd.h>
@@ -93,27 +90,10 @@
 
 #endif
 
-#ifdef HANDLE_EXCEPTIONS
 #include <stdexcept>
-#define THROW(x) throw x
-#define throw1(x) throw (x)
-#define throw2(x, y) throw (x, y)
-#define throw0() throw ()
-#else HANDLE_EXCEPTIONS
-#define THROW(x) do { assert ("error" == #x); abort (); } while (0)
-#define throw1(x)
-#define throw2(x, y)
-#define throw0()
-#endif  HANDLE_EXCEPTIONS
 
 #ifdef HANDLE_NAMESPACES
 using namespace std;
-#endif
-
-#if 0
-#define BUG_DYNAMIC_CAST(T, V) dynamic_cast<T> (V)
-#else
-#define BUG_DYNAMIC_CAST(T, V) (T) V
 #endif
 
 // Shared code.
