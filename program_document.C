@@ -55,7 +55,8 @@ struct ProgramDocument : public Program
   void print_entry_submodel (const std::string& name, 
 			     int level,
 			     const Syntax& syntax,
-			     const AttributeList& alist);
+			     const AttributeList& alist,
+			     const std::string& aref);
   void print_entry_category (const std::string& name, 
 			     const Syntax& syntax,
 			     const AttributeList& alist);
@@ -91,14 +92,17 @@ struct ProgramDocument : public Program
 			     bool top_level);
   void print_submodel (const std::string& name, int level,
 		       const Syntax& syntax,
-		       const AttributeList& alist);
+		       const AttributeList& alist, 
+		       const std::string& aref);
   void print_submodel_entries (const std::string& name, int level,
                                const Syntax& syntax, 
                                const AttributeList& alist,
-                               const std::vector<std::string>& entries);
+                               const std::vector<std::string>& entries, 
+			       const std::string& aref);
   void print_submodel_entry (const std::string&, int level,
                              const Syntax& syntax,
-                             const AttributeList& alist, bool& first);
+                             const AttributeList& alist, bool& first, 
+			     const std::string& aref);
   void print_model (symbol name, const Library& library);
   void print_fixed (const std::string& name, 
 		    const Syntax& syntax,
@@ -226,7 +230,8 @@ void
 ProgramDocument::print_entry_submodel (const std::string& name, 
 				       const int level,
 				       const Syntax& syntax,
-				       const AttributeList& alist)
+				       const AttributeList& alist,
+				       const std::string& aref)
 {
   const Syntax::type type = syntax.lookup (name);
   const int size = syntax.size (name);
@@ -241,7 +246,7 @@ ProgramDocument::print_entry_submodel (const std::string& name,
       if (!nested.check ("submodel"))
 	{
 	  print_sample (name, child, nested, false);
-	  print_submodel (name, level, child, nested);
+	  print_submodel (name, level, child, nested, aref);
 	}
     }
 }
@@ -909,11 +914,12 @@ ProgramDocument::print_sample_entries (const std::string& name,
 void 
 ProgramDocument::print_submodel (const std::string& name, int level,
 				 const Syntax& syntax,
-				 const AttributeList& alist)
+				 const AttributeList& alist, 
+				 const std::string& aref)
 {
   std::vector<std::string> entries;
   syntax.entries (entries);
-  print_submodel_entries (name, level, syntax, alist, entries);
+  print_submodel_entries (name, level, syntax, alist, entries, aref);
 }
 
 void 
@@ -921,8 +927,10 @@ ProgramDocument::print_submodel_entries (const std::string& name, int level,
 					 const Syntax& syntax,
 					 const AttributeList& alist,
 					 const std::vector<std::string>&
-					 /**/ entries)
+					 /**/ entries, 
+					 const std::string& aref)
 {
+  const std::string bref = aref + "-" + name;
   const std::vector<std::string>& order = syntax.order ();
   int log_count = 0;
   for (unsigned int i = 0; i < entries.size (); i++)
@@ -944,14 +952,13 @@ ProgramDocument::print_submodel_entries (const std::string& name, int level,
 	  bool first = true;
 	  // Ordered members first.
 	  for (unsigned int i = 0; i < order.size (); i++)
-	    {
-	      print_submodel_entry (order[i], level, syntax, alist, first);
-	    }
+	    print_submodel_entry (order[i], level, syntax, alist, first, bref);
       
 	  // Then the remaining members, except log variables.
 	  for (unsigned int i = 0; i < entries.size (); i++)
 	    if (syntax.order (entries[i]) < 0 && !syntax.is_log (entries[i]))
-	      print_submodel_entry (entries[i], level, syntax, alist, first);
+	      print_submodel_entry (entries[i], level, syntax, alist, first, 
+				    bref);
 	}
 
       if (log_count < entries.size () && log_count > 0)
@@ -971,7 +978,8 @@ ProgramDocument::print_submodel_entries (const std::string& name, int level,
 	  bool first = true;
 	  for (unsigned int i = 0; i < entries.size (); i++)
 	    if (syntax.is_log (entries[i]))
-	      print_submodel_entry (entries[i], level, syntax, alist, first);
+	      print_submodel_entry (entries[i], level, syntax, alist, first,
+				    bref);
 	}
     }
 }
@@ -979,7 +987,8 @@ ProgramDocument::print_submodel_entries (const std::string& name, int level,
 void 
 ProgramDocument::print_submodel_entry (const std::string& name, int level,
 				       const Syntax& syntax,
-				       const AttributeList& alist, bool& first)
+				       const AttributeList& alist, bool& first,
+				       const std::string& aref)
 {
   if (first)
     first = false;
@@ -996,8 +1005,9 @@ ProgramDocument::print_submodel_entry (const std::string& name, int level,
 
   // Print name.
   Format::Item dummy (*format, name);
+  format->label ("parameter", aref);
   format->index (name);
-
+  
   // Print type.
   print_entry_type (name, syntax, alist);
 
@@ -1033,7 +1043,7 @@ ProgramDocument::print_submodel_entry (const std::string& name, int level,
     }
 
   // print submodel entries, if applicable
-  print_entry_submodel (name, level + 1, syntax, alist);
+  print_entry_submodel (name, level + 1, syntax, alist, aref);
 }
 
 
@@ -1102,7 +1112,8 @@ ProgramDocument::print_model (const symbol name, const Library& library)
       // Print own entries.
       std::vector<std::string> entries;
       own_entries (library, name, entries);
-      print_submodel_entries (name.name (), 0, syntax, alist, entries);
+      print_submodel_entries (name.name (), 0, syntax, alist, entries, 
+			      library.name ().name ());
     }
 }
 
@@ -1122,7 +1133,7 @@ ProgramDocument::print_fixed (const std::string& name,
   print_users (xref.submodels[name]);
 
   print_sample (name, syntax, alist, true);
-  print_submodel (name, 0, syntax, alist);
+  print_submodel (name, 0, syntax, alist, "fixed");
 }
 
 class ModelCompare

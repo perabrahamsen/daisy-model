@@ -154,29 +154,33 @@ void
 Select::Implementation::Spec::refer (Format& format) const
 {
   format.text (" ");
-  if (library_name != symbol ("fixed"))
+  const bool is_fixed = library_name == symbol ("fixed");
+  if (!is_fixed)
     {
       format.text (library_name.name ());
       format.special ("nbsp");
     }
   format.text (model_name.name ());
   format.text (" ");
+  string aref = library_name.name () + "-" + model_name.name ();
   format.text ("(section");
   format.special ("nbsp");
-  format.ref (library_name.name (), model_name.name ());
+  if (is_fixed)
+    format.ref ("fixed", model_name.name ());
+  else
+    format.ref ("model", aref);
   format.text (")");
-  string aref = model_name.name ();
   for (unsigned int i = 0; i < submodels_and_attribute.size () - 1; i++)
     {
       const string name = submodels_and_attribute[i].name ();
-      aref += "+" + name;
+      aref += "-" + name;
       format.text (" ");
       format.text (name);
     }
   format.text (" ");
   format.text ("(page");
   format.special ("nbsp");
-  format.pageref (library_name.name (), aref);
+  format.pageref ("parameter", aref);
   format.text (")");
 }
 

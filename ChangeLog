@@ -1,3 +1,8 @@
+2005-04-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* symbol.C: Added assertions.
+	* summary_balance.C (period): New parameter.
+
 2005-03-31  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* select.C (Spec::description, Spec::refer): New member function.

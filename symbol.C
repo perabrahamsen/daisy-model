@@ -45,7 +45,10 @@ struct symbol::DB
   { return name2id (string (s)); }
   int int2id (const int i);
   const string& id2name (const int id)
-  { return reverse_map[id]; }
+  { 
+    daisy_assert (reverse_map.find (id) != reverse_map.end ());
+    return reverse_map[id]; 
+  }
 
   DB ();
   ~DB ();
@@ -83,6 +86,7 @@ symbol::DB::name2id (const string& name)
       daisy_assert (name_map.size () == counter);
       daisy_assert (reverse_map.size () == counter);
       name_map[name] = counter;
+      daisy_assert (reverse_map.find (counter) == reverse_map.end ());
       reverse_map[counter] = name;
       counter++;
       daisy_assert (name_map.size () == counter);
@@ -104,7 +108,9 @@ symbol::DB::int2id (const int value)
       TmpStream tmp;
       tmp () << value;
       const string name (tmp.str ());
+      daisy_assert (name_map.find (name) == name_map.end ());
       name_map[name] = counter;
+      daisy_assert (reverse_map.find (counter) == reverse_map.end ());
       reverse_map[counter] = name;
       int_map[value] = counter;
       counter++;

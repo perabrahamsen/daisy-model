@@ -65,6 +65,7 @@ struct FormatLaTeX : public Format
   void hard_linebreak ();
   void new_paragraph ();
   void index (const std::string& name);
+  void label (const std::string& scope, const std::string& id);
   void pageref (const std::string& scope, const std::string& id);
   void ref (const std::string& scope, const std::string& id);
   void see (const std::string& type,
@@ -344,6 +345,10 @@ FormatLaTeX::index (const std::string& name)
   text (name);
   out () << "}";
 }
+
+void
+FormatLaTeX::label (const std::string& scope, const std::string& id)
+{ out () << "\\label{" << scope << ":" << id << "}"; }
 
 void
 FormatLaTeX::pageref (const std::string& scope, const std::string& id)
