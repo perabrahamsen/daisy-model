@@ -24,10 +24,13 @@ public:
   CSMP inverse () const;
   double integrate (double from, double to) const;
   CSMP integrate_stupidly () const;
+  void offset (double offset);	// Add `offset' to all y values.
 
+  // Utilities.
   static double find (const vector<double>& x, const vector<double>& y,
 		      double value);
 
+  // Simulation.
   void output (Log&) const;
 
   // Print

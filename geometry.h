@@ -26,7 +26,6 @@ public:
   inline double dz (unsigned int i) const
   { return dz_[i]; }
   unsigned int interval_plus (double z) const;
-  unsigned int interval (double z) const;
   unsigned int interval_border (double z) const;
 
   // Vector operations.

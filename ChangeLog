@@ -1,4 +1,21 @@
+2000-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.20 released.
+
+2000-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* csmp.h, csmp.C (offset): New function.
+
+	* geometry.h, geometry.C (interval): Removed.
+	* geometry.C (swap): Use `interval_plus' instead of `interval'.
+	* uzlr.C (tick): Ditto.
+	* uzrichard.C (q_darcy): Ditto.
+	* column_std.C (soil_temperature): Ditto.
+	(soil_water_potential): Ditto.
+
 2000-03-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.C (Options): Check for arg size.
 
 	* Version 1.19 released.
 

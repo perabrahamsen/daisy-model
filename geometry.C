@@ -19,19 +19,6 @@ Geometry::interval_plus (double z) const
   return i;
 }
 
-unsigned int 
-Geometry::interval (double z) const
-{
-  unsigned int i;
-  for (i = 0; i < size_; i++)
-    {
-      if (z_[i] <= z)
-	return i;
-    }
-  assert (false);
-  return i;
-}
-
 unsigned int
 Geometry::interval_border (double z) const
 {
@@ -193,7 +180,7 @@ Geometry::swap (vector<double>& v, double from, double middle, double to) const
   double bottom_content = extract (v, middle, to);
   // We want to extract 100% of the interval containing middle, since
   // we already extracted the rest into top_content.
-  const int middle_interval = interval (middle);
+  const int middle_interval = interval_plus (middle);
   bottom_content += v[middle_interval] * dz (middle_interval);
   v[middle_interval] = 0.0;
   const double new_middle = from + to - middle;

@@ -478,7 +478,7 @@ UZRichard::q_darcy (const Soil& soil,
   // Find an unsaturated area.
   // Start looking 3/4 towards the bottom.
   const double start_pos = (soil.z (first) + soil.z (last) * 3.0) / 4.0;
-  int start = soil.interval (start_pos) - 1;
+  int start = soil.interval_plus (start_pos) - 1;
   if (!(start < last - 2))
     throw ("We need at least 2 numeric nodess below 3/4 depth for \
 calculating flow with pressure top.");

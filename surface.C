@@ -15,31 +15,6 @@
 #include "soil_chemicals.h"
 #include "csmp.h"
 
-#ifdef RIDGING
-struct Ridge
-{
-  // State.
-  CSMP y;			// Ridge geometry function. [->cm]
-  double dz_bottom;		// Size from surface to bottom ridge layer [cm]
-  double R_crust;		// Resistance in crust. [???]
-  unsigned int node_below;	// First node below ridge.
-
-  // Manipulators.
-  void set_geometry (const CSMP& value);
-  void set_R_crust (const double R_crust_);
-
-  // Create and Destroy.
-  static void load_syntax (Syntax&, AttributeList&);
-  Ridge (const AttributeList&);
-  ~Ridge ();
-};
-
-void
-Ridge::set_R_crust (const double value)
-{ R_crust = value; }
-
-#endif
-
 struct Surface::Implementation
 {
   // Content.

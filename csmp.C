@@ -175,11 +175,18 @@ CSMP::integrate_stupidly () const
   return impl.integrate_stupidly ();
 }
 
+void
+CSMP::offset (double offset)	// Add `offset' to all y values.
+{
+  for (unsigned int i = 0; i < impl.y.size(); i++)
+    impl.y[i] += offset;
+}
+
 double 
 CSMP::find (const vector<double>& x, const vector<double>& y, double value)
 {
   assert (x.size () == y.size ());
-    
+
   for (unsigned int i = 0; i < x.size(); i++)
     {
       if (value < x[i])

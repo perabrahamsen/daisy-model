@@ -73,7 +73,7 @@ UZlr::tick (const Soil& soil,
 
   // Use darcy for upward movement in the top.
   const bool use_darcy = (h_old[0] < h_fc) && (q_up > 0.0);
-  const int to_darcy = soil.interval (z_top);
+  const int to_darcy = soil.interval_plus (z_top);
 
   // Intermediate nodes.
   for (int i = first; i <= last; i++)

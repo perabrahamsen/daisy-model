@@ -650,6 +650,10 @@ common${OBJ}: common.C common.h parser_file.h parser.h librarian.h \
  library.h alist.h syntax.h document.h version.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h
+groundwater_fixed${OBJ}: groundwater_fixed.C groundwater.h uzmodel.h \
+ librarian.h library.h common.h alist.h syntax.h
+groundwater_deep${OBJ}: groundwater_deep.C groundwater.h uzmodel.h \
+ librarian.h library.h common.h alist.h syntax.h
 action_heat${OBJ}: action_heat.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h
 hydraulic_M_vG_compact${OBJ}: hydraulic_M_vG_compact.C hydraulic.h \

@@ -213,7 +213,7 @@ Options::Options (int& argc, char**& argv,
   if (argc < 2)
     {
       // Usage.
-      argc = -1;
+      argc = -2;
       return;
     }
   bool file_found = false;
@@ -223,13 +223,23 @@ Options::Options (int& argc, char**& argv,
     {
       const string arg = get_arg (argc, argv);
 
-      if (options_finished || arg[0] != '-')
+      if (arg.size () < 1)
+	{
+	  argc = -2;
+	  return;
+	}
+      else if (options_finished || arg[0] != '-')
 	{
 	  // Parse the file.
 	  ParserFile parser (syntax, arg);
 	  parser.load (alist);
 	  file_found = true;
 	  errors_found += parser.error_count ();
+	}
+      else if (arg.size () != 1)
+	{
+	  argc = -2;
+	  return;
 	}
       else
 	{ 
@@ -246,7 +256,7 @@ Options::Options (int& argc, char**& argv,
 		}
 	      else
 		// Usage.
-		argc = -1;
+		argc = -2;
               break;
 	    case 'p':
 	      if (argc > 1)
@@ -271,11 +281,11 @@ Options::Options (int& argc, char**& argv,
 		    {
 		      CERR << program_name << ": `" << name 
 			   << "' unknown document type\n";
-		      argc = -1;
+		      argc = -2;
 		    }
 		}
 	      else
-		argc = -1;
+		argc = -2;
 
 	      break;
 	    case 'v':
@@ -291,7 +301,7 @@ Options::Options (int& argc, char**& argv,
 	      break;
 	    default:
 	      // Usage.
-	      argc = -1;
+	      argc = -2;
 	      break;
 	    }
 	}

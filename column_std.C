@@ -262,15 +262,15 @@ ColumnStandard::soil_temperature (double height) const
 {
   assert (height < 0);
   assert (height > soil.z (soil.size () - 1));
-  return soil_heat.T (soil.interval (height));
-  }
+  return soil_heat.T (soil.interval_plus (height));
+}
 
 double 
 ColumnStandard::soil_water_potential (double height) const
 {
   assert (height < 0);
   assert (height > soil.z (soil.size () - 1));
-  return soil_water.h (soil.interval (height));
+  return soil_water.h (soil.interval_plus (height));
 }
 
 bool
