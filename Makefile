@@ -724,7 +724,7 @@ condition${OBJ}: condition.C condition.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h
 horizon${OBJ}: horizon.C horizon.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h plf.h hydraulic.h mathlib.h \
-  tortuosity.h texture.h log.h check_range.h check.h vcheck.h
+  tortuosity.h texture.h log.h check_range.h check.h vcheck.h tmpstream.h
 uzmodel${OBJ}: uzmodel.C uzmodel.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h
 hydraulic${OBJ}: hydraulic.C hydraulic.h librarian.h common.h library.h \
@@ -905,7 +905,7 @@ column_base${OBJ}: column_base.C column_base.h column.h librarian.h common.h \
   soil_chemicals.h soil_chemical.h solute.h adsorption.h transport.h \
   mactrans.h plf.h transform.h groundwater.h log.h weather.h im.h \
   vegetation.h
-texture${OBJ}: texture.C texture.h
+texture${OBJ}: texture.C texture.h plf.h assertion.h mathlib.h
 destination${OBJ}: destination.C destination.h symbol.h
 symbol${OBJ}: symbol.C symbol.h assertion.h tmpstream.h
 fao${OBJ}: fao.C fao.h net_radiation.h librarian.h common.h library.h \
@@ -960,6 +960,10 @@ cdaisy${OBJ}: cdaisy.C syntax.h treelog.h symbol.h alist.h daisy.h \
 common${OBJ}: common.C common.h
 nrutil${OBJ}: nrutil.C
 submodel${OBJ}: submodel.C submodel.h common.h assertion.h
+pet_FAO_PM${OBJ}: pet_FAO_PM.C pet.h librarian.h common.h library.h symbol.h \
+  alist.h syntax.h treelog.h assertion.h fao.h weather.h im.h soil.h \
+  geometry.h surface.h uzmodel.h soil_heat.h net_radiation.h vegetation.h \
+  log.h tmpstream.h
 pet_Hargreaves${OBJ}: pet_Hargreaves.C pet.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h weather.h im.h fao.h \
   log.h mathlib.h
@@ -1027,7 +1031,8 @@ column_inorganic${OBJ}: column_inorganic.C column_base.h column.h librarian.h \
 vegetation_permanent${OBJ}: vegetation_permanent.C vegetation.h librarian.h \
   common.h library.h symbol.h alist.h syntax.h treelog.h assertion.h \
   plf.h mathlib.h log.h root_system.h rootdens.h canopy_simple.h soil.h \
-  geometry.h crop.h am.h aom.h om.h organic_matter.h clayom.h tmpstream.h
+  geometry.h crop.h am.h aom.h om.h organic_matter.h clayom.h check.h \
+  tmpstream.h
 vegetation_crops${OBJ}: vegetation_crops.C vegetation.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h crop.h \
   organic_matter.h clayom.h soil.h geometry.h plf.h mathlib.h harvest.h \
@@ -1164,8 +1169,8 @@ groundwater_static${OBJ}: groundwater_static.C groundwater.h uzmodel.h \
   librarian.h common.h library.h symbol.h alist.h syntax.h treelog.h \
   assertion.h
 horizon_std${OBJ}: horizon_std.C horizon.h librarian.h common.h library.h \
-  symbol.h alist.h syntax.h treelog.h assertion.h texture.h check.h \
-  mathlib.h
+  symbol.h alist.h syntax.h treelog.h assertion.h texture.h plf.h \
+  hydraulic.h check.h mathlib.h
 crop_std${OBJ}: crop_std.C crop.h time.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h chemicals.h \
   root_system.h rootdens.h plf.h canopy_std.h canopy_simple.h \
@@ -1255,7 +1260,7 @@ adsorption_langmuir${OBJ}: adsorption_langmuir.C adsorption.h librarian.h \
 bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h surface.h \
   uzmodel.h weather.h im.h plf.h soil.h geometry.h soil_heat.h snow.h \
-  log.h mathlib.h pet.h svat.h vegetation.h chemicals.h
+  log.h mathlib.h pet.h svat.h vegetation.h chemicals.h tmpstream.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h crop.h \
   field.h daisy.h check_range.h check.h

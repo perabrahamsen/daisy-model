@@ -16,11 +16,14 @@ release.
 
 ** Interception capacity for permanent vegetation now depends on LAI.
 
-** The rs_min canopy parameter now affects the the PM pet model.
+** The rs_min canopy parameter now affects the PM pet model.
+
+The default value for rs_min is now 100.
 
 ** New FAO_PM pet model.
 
-This model calculates PM on a reference surface.  
+This model calculates Penman-Monteith on a reference surface, use the
+old PM model if you have weather data measured at the field.
 
 * 3.17
 
