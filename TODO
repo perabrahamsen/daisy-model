@@ -1,10 +1,21 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* log per bulk
+
+Hvis can_convert (Fraction, want)
+     can_convert (has, "g/cm^2")
+     has_bulk_density ()
+Så
+     convert = conv (conv (value, has, "g/cm^2") / rho_b, Fraction, want)  
+
+
 * Organic Matter Article
 
 ** SH referencer til udbredte modeller.
 
 * Fertorganic
+
+Hjemmeside.
 
 ** PL: Venter på data.
 

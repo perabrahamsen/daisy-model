@@ -1,5 +1,9 @@
 2004-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* select.h, select.C, select_interval.C (special_convert): New
+	function.
+	* select.C (initialize): Call it.
+	
 	* log_table.C (check): Call LogSelect::check.
 
 	* log.C, log.h, log_all.C, log_table.C:

@@ -34,6 +34,8 @@ class Soil;
 class Daisy;
 class Time;
 class Treelog;
+class Units;
+class Units::Convert;
 
 class Select
 {
@@ -115,6 +117,8 @@ public:
 protected:
   virtual const std::string 
   /**/ default_dimension (const std::string& spec_dim) const;
+  virtual Units::Convert& 
+  /**/ special_convert (const string& has, const string& want);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (const std::map<symbol, symbol>& conv, 

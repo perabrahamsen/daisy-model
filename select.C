@@ -221,8 +221,11 @@ Select::Implementation::initialize (vector<symbol>& path,
     dimension = spec_dim;
 
   // Attempt to find convertion with original dimension.
-  if (spec && Units::can_convert (spec_dim, dimension))
-    spec_conv = &Units::get_convertion (spec_dim, dimension);
+  if (spec)
+    if (Units::can_convert (spec_dim, dimension))
+      spec_conv = &Units::get_convertion (spec_dim, dimension);
+    else
+      spec_conv = special_convert (spec_dim, dimension);
 
   // Replace '&' with timestep.
   string new_dim;
@@ -446,6 +449,10 @@ Number of times the path has matched a variable since the last log entry.");
 const string
 Select::default_dimension (const string& spec_dim) const
 { return spec_dim; }
+
+const Units::Convert*
+Select::special_convert (const string& has, const string& want)
+{ return NULL; }
 
 void 
 Select::add_dest (Destination* d)

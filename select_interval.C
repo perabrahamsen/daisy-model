@@ -33,6 +33,59 @@ struct SelectInterval : public Select
   double to;
   double value;	
 
+  // Bulk density convertions.
+  class BD_convert : public Units::Convert
+  {
+    const Units::Convert& in;
+    const Units::Convert& out;
+    double bulk;
+
+    // Use.
+    double operator()(double value) const
+    { 
+      daisy_assert (bulk > 0.0);
+      return out (in (value) / bulk); 
+    }
+    bool valid (double value) const
+    {
+      daisy_assert (bulk > 0.0);
+      return in.valid (value) && out.valid (in (value) / bulk);
+    }
+    void set_bulk (const Soil& soil, const double from, double to)
+    {
+      if (to > 0.0)
+	to = soil->zplus (soil->size () - 1);
+      bulk = 0.0;
+      double old = 0.0;
+
+      for (unsigned i = 0; i < soil.size () && old > to ; i++)
+	{
+	  const double zplus = soil.zplus (i);
+	  if (zplus < from)
+	    {
+	      const double height = (min (old, from) - max (zplus, to));
+	      amount += soil.dry_bulk_density (i) * height;
+	    }
+	  old = zplus;
+	}
+      bulk /= (from - to);
+    }
+    // Create and destroy.
+    BD_convert (const string& has, const string& want)
+      : in (Units::get_convertion (has, "g/cm^2")),
+	out (Units::get_convertion (Syntax::Fraction (), want)),
+	bulk (-42.42e42)
+    { }
+  } *bd_convert;
+  Units::Convert& special_convert (const string& has, const string& want)
+  {
+    daisy_assert (!bd_convert);
+    if (Units::can_convert (has, "g/cm^2")
+	&& Units::can_convert (Syntax::Fraction (), want))
+      bd_convert = new BD_convert (has, want);
+    return bd_convert;
+  }
+
   // Output routines.
 
   void output_array (const std::vector<double>& array, 
@@ -52,8 +105,12 @@ struct SelectInterval : public Select
     else 
       result = soil->total (array, from, to);
 
-    if (count == 0)	 
-      value = result;
+    if (count == 0)
+      {
+	if (bd_convert)
+	  bd_convert->set_bulk (soil, from, to);
+	value = result;
+      }
     else
       value += result;
     count++;
@@ -102,8 +159,11 @@ struct SelectInterval : public Select
       density (al.flag ("density")),
       from (al.number ("from", 1.0)),
       to (al.number ("to", 1.0)),
-      value (al.number ("value"))
+      value (al.number ("value")),
+      bd_convert (NULL)
   { }
+  ~SelectInterval ()
+  { delete bd_convert; }
 };
 
 static struct SelectIntervalSyntax
