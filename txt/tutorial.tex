@@ -166,6 +166,7 @@ horizons.
     (coarse_sand 63.4 [])
     (fine_sand 16.5 [])
     (humus 1.12 [])
+    (dry_bulk_density 1.5 [g/cm^3])
     (SOM_fractions 0.66 0.34 []))
 \end{verbatim}
 
@@ -183,11 +184,26 @@ if not otherwise specified, the hydraulic parameters such as soil
 water retention characteristics are also estimated from the texture, a
 sandy soil is less capable of storing water than a clay soil.
 
-The fifth soil constituent is the humus, which among other thing
+The fifth soil constituent is the \texttt{humus}, which among other thing
 creates the background mineralization, thus providing the soil with
 nitrogen.  The numbers given for the five soil constituents are
 relative, that is they are weighted to the total.  So you can specify
 them as fractions or percentage or whatever, as you wish.
+
+The \texttt{dry\_bulk\_density} is, as the name implies, the densisty
+of the dry soil.  It affects the hydraulic properties of the soil and
+the total humus content.  If you haven't measured this value, you can
+use a different function for estimating the hydraulic properties, by
+replacing it with
+\begin{verbatim}
+  (hydraulic Cosby_at_al)
+\end{verbatim}
+This pedotransfer function has been developed in America, and does not
+require knowledge of the dry bulk density.  Even if you know the dry
+bulk density, using \texttt{Cosby\_at\_al} might be a better choise
+for simulation in that continent.  The default pedotransfer function,
+\texttt{hypres}, has been developed based on European (especially
+German) soil measurements.
 
 The last parameter, \texttt{SOM\_fractions}, divides the humus into a
 slow and a fast pool.  This affects background mineralization.  For a
@@ -203,9 +219,9 @@ in the second (fast) pool.  For farms where the amount of humus is
 decreasing, slow first (slow) fraction will be larger.  New farmland
 and farmland using mineral fertilizer tend to have decreasing humus,
 and thus a larger fraction of humus in the slow pool.  Note that we
-are talking changes over decades and centuries, if you switched to
-organic fertilizer five years ago, that is unlikely to have a
-measurable effect on the SOM partitioning.
+are talking changes over decades and centuries or even millennia, if
+you switched to organic fertilizer five years ago, that is unlikely to
+have a measurable effect on the SOM partitioning.
 
 For horizons below the root zone, if there is any significant amount
 of humus may be leftover from old tree roots, and slowly decreasing.

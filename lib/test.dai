@@ -17,6 +17,7 @@
   (coarse_sand 63.4 [])
   (fine_sand 16.5 [])
   (humus 1.12 [])
+  (dry_bulk_density 1.5 [g/cm^3])
   (SOM_fractions 0.66 0.34 []))
 
 (defhorizon C Ap
