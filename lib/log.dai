@@ -1,7 +1,7 @@
 ;;; log.dai --- standard log files
 
 (deflog "Total Soil Content" table
-  (where "soil_content.tab")
+  (where "soil_content.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -61,57 +61,57 @@
 	   ))
 
 (deflog "Soil Content 0-10 cm" "Total Soil Content"
-  (where "soil_content_00-10.tab")
+  (where "soil_content_00-10.dlf")
   (from   0)
   (to   -10))
 
 (deflog "Soil Content 10-20 cm" "Total Soil Content"
-  (where "soil_content_10-20.tab")
+  (where "soil_content_10-20.dlf")
   (from -10)
   (to   -20))
 
 (deflog "Soil Content 20-30 cm" "Total Soil Content"
-  (where "soil_content_20-30.tab")
+  (where "soil_content_20-30.dlf")
   (from -20)
   (to   -30))
 
 (deflog "Soil Content 30-40 cm" "Total Soil Content"
-  (where "soil_content_30-40.tab")
+  (where "soil_content_30-40.dlf")
   (from -30)
   (to   -40))
 
 (deflog "Soil Content 40-50 cm" "Total Soil Content"
-  (where "soil_content_40-50.tab")
+  (where "soil_content_40-50.dlf")
   (from -40)
   (to   -50))
 
 (deflog "Soil Content 50-60 cm" "Total Soil Content"
-  (where "soil_content_50-60.tab")
+  (where "soil_content_50-60.dlf")
   (from -50)
   (to   -60))
 
 (deflog "Soil Content 60-70 cm" "Total Soil Content"
-  (where "soil_content_60-70.tab")
+  (where "soil_content_60-70.dlf")
   (from -60)
   (to   -70))
 
 (deflog "Soil Content 70-80 cm" "Total Soil Content"
-  (where "soil_content_70-80.tab")
+  (where "soil_content_70-80.dlf")
   (from -70)
   (to   -80))
 
 (deflog "Soil Content 80-90 cm" "Total Soil Content"
-  (where "soil_content_80-90.tab")
+  (where "soil_content_80-90.dlf")
   (from -80)
   (to   -90))
 
 (deflog "Soil Content 90-100 cm" "Total Soil Content"
-  (where "soil_content_90-100.tab")
+  (where "soil_content_90-100.dlf")
   (from -90)
   (to  -100))
 
 (deflog "Soil Nitrate Concentration" table
-  (where "soil_nitrate_conc.tab")
+  (where "soil_nitrate_conc.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -121,7 +121,7 @@
 		  (factor 1.0e6))))		;g/cm³ -> mg/l
 
 (deflog "Soil Temperature" table
-  (where "soil_temperature.tab")
+  (where "soil_temperature.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -130,7 +130,7 @@
 		  (dimension "dg C"))))
 
 (deflog "Soil Water Potential" table
-  (where "soil_water_potential.tab")
+  (where "soil_water_potential.dlf")
   (when hourly)
   (entries (year (path time))
 	     (month (path time))
@@ -140,7 +140,7 @@
 	            (dimension "cm"))))
 
 (deflog "Soil Water Sink" table
-  (where "soil_water_sink.tab")
+  (where "soil_water_sink.dlf")
   (when hourly)
   (entries (year (path time))
 	     (month (path time))
@@ -150,7 +150,7 @@
 	            (dimension "cm^3/cm^3/h"))))
 
 (deflog "Preferential Water Flux" table
-  (where "pref_flux.tab")
+  (where "pref_flux.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
@@ -161,7 +161,7 @@
 		  (dimension "cm"))))
   
 (deflog "Hourly Water Flux" table
-  (where "hourly_water_flux.tab")
+  (where "hourly_water_flux.dlf")
   (when (hourly))
 ;  (array_separator " ")
   (entries (year (path time))
@@ -173,7 +173,7 @@
  	          (dimension "mm/h"))))
 
 (deflog "Daily Water Flux" table
-  (where "daily_water_flux.tab")
+  (where "daily_water_flux.dlf")
   (when daily)
 ;  (array_separator " ")
   (entries (year (path time))
@@ -185,7 +185,7 @@
  	          (dimension "mm/d"))))
 
 (deflog "Preferential NO3 Transport" table
-  (where "pref_NO3.tab")
+  (where "pref_NO3.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
@@ -198,7 +198,7 @@
 	   ))
 
 (deflog "Preferential NH4 Transport" table
-  (where "pref_NH4.tab")
+  (where "pref_NH4.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
@@ -211,7 +211,7 @@
 	   ))
 
 (deflog "Surface Water Balance" table
-  (where "surface_water_balance.tab")
+  (where "surface_water_balance.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -270,7 +270,7 @@
 		   (dimension "mm"))))
 
 (deflog "Ridge" table
-  (where "ridge.tab")
+  (where "ridge.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
@@ -299,7 +299,7 @@
 		   (dimension "cm/h"))))
 
 (deflog "Root Zone Water Balance" table
-  (where "root_zone_water_balance.tab")
+  (where "root_zone_water_balance.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -381,12 +381,12 @@
 		     (factor 10))))	;cm -> mm
 
 (deflog "Root Zone Water Balance 0-100 cm" "Root Zone Water Balance"
-  (where "root_zone_water_balance_000-100.tab")
+  (where "root_zone_water_balance_000-100.dlf")
   (from   0)
   (to   -100))
 
 (deflog "N Balance" table
-  (where "N_balance.tab")
+  (where "N_balance.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -508,12 +508,12 @@
 	   ))
 
 (deflog "N Balance 0-100 cm" "N Balance"
-  (where "N_balance_000-100.tab")
+  (where "N_balance_000-100.dlf")
   (from   0)
   (to   -100))
 
 (deflog "Soil Heat Balance" table
-  (where "soil_heat_balance.tab")
+  (where "soil_heat_balance.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
@@ -664,7 +664,7 @@
 		  (factor 2.7777777777777776e-07))))
 
 (deflog "Snow" table
-  (where "snow.tab")
+  (where "snow.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
@@ -685,7 +685,7 @@
 		   (factor 1000))))
 
 (deflog "Soil Chemicals" table
-  (where "soil_chemicals.tab")
+  (where "soil_chemicals.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -733,12 +733,12 @@
 		     (factor 1e8))))	;g/cm² -> g/ha
 
 (deflog "Soil Chemicals 0-100 cm" "Soil Chemicals"
-  (where "soil_chemicals_000-100.tab")
+  (where "soil_chemicals_000-100.dlf")
   (from   0)
   (to   -100))
 
 (deflog "Weather" table
-  (where "weather.tab")
+  (where "weather.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -770,7 +770,7 @@
 		   (dimension "dg C"))))
 
 (deflog "Crop Photosynthesis" table
-  (where "crop_phot.tab")
+  (where "crop_phot.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
@@ -798,7 +798,7 @@
 	   ))
 
 (deflog "Crop Production" table
-  (where "crop_prod.tab")
+  (where "crop_prod.dlf")
   (when (hour 12))			;When the stress is highest.
   (entries (year (path time))
 	   (month (path time))
@@ -890,7 +890,7 @@
 	   ))
 
 (deflog "Simple Crop Production" table
-  (where "simple_crop_prod.tab")
+  (where "simple_crop_prod.dlf")
   (when (hour 12))
   (entries (year (path time))
 	   (month (path time))
@@ -920,7 +920,7 @@
 			 Root water_stress))))
 
 (deflog "Old Crop Production" table
-  (where "old_crop_prod.tab")
+  (where "old_crop_prod.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -961,7 +961,7 @@
 	   ))
 
 (deflog "Vegetation" table
-  (where "vegetation.tab")
+  (where "vegetation.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -986,7 +986,7 @@
 		   (dimension "mm"))))
 
 (deflog "Permanent Vegetation" table
-  (where "vegetation.tab")
+  (where "vegetation.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -1010,7 +1010,7 @@
 
 
 (deflog "Surface Chemicals" table
-  (where "surface_chemicals.tab")
+  (where "surface_chemicals.dlf")
   (when (hourly))
   (entries (year (path time))
 	   (month (path time))
@@ -1058,7 +1058,7 @@
 		   (dimension "g/m^2/h"))))
 
 (deflog "Bioclimate" table
-  (where "bioclimate.tab")
+  (where "bioclimate.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
@@ -1259,7 +1259,7 @@
 	    (dimension "NA"))))
 
 (deflog "Groundwater" table
-  (where "groundwater.tab")
+  (where "groundwater.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -1298,7 +1298,7 @@
 	   ))
 
 (deflog Bioincorporation table
-  (where "bioincorporation.tab")
+  (where "bioincorporation.dlf")
   (when (hourly))
   (entries (year (path time))
 	   (month (path time))
@@ -1337,7 +1337,7 @@
 	   ))
 
 (deflog AOM table
-  (where "aom.tab")
+  (where "aom.dlf")
   (when daily)
   (entries (year (path time))
 	   (month (path time))
@@ -1365,7 +1365,7 @@
 
 
 (deflog "Hourly Groundwater" table
-  (where "hourly_groundwater.tab")
+  (where "hourly_groundwater.dlf")
   (when (hourly))
   (entries (year (path time))
 	   (month (path time))
@@ -1384,7 +1384,7 @@
 		     (dimension "cm"))))
 	 
 (deflog "Drain Sink" table
-  (where "drain_sink.tab")
+  (where "drain_sink.dlf")
   (when (hourly))
   (entries (year (path time))
 	   (month (path time))
@@ -1394,7 +1394,7 @@
  	          (dimension "cm3/cm3/h"))))
 
 (deflog "Drain Sink Water" table
-  (where "drain_sink_water.tab")
+  (where "drain_sink_water.dlf")
   (when (hourly))
   (entries (year (path time))
 	   (month (path time))
@@ -1404,7 +1404,7 @@
  	          (dimension "g/cm3/h"))))
 
 (deflog "Drain Sink NO3" table
-  (where "drain_sink_NO3.tab")
+  (where "drain_sink_NO3.dlf")
   (when (hourly))
   (entries (year (path time))
 	   (month (path time))
@@ -1414,7 +1414,7 @@
  	          (dimension "g/cm3/h"))))
 
 (deflog "Drain Sink NH4" table
-  (where "drain_sink_NH4.tab")
+  (where "drain_sink_NH4.dlf")
   (when (hourly))
   (entries (year (path time))
 	   (month (path time))
@@ -1424,7 +1424,7 @@
  	          (dimension "cm3/cm3/h"))))
 
 (deflog "Soil Water Content" table
-  (where "soil_water_content.tab")
+  (where "soil_water_content.dlf")
   (when hourly)
   (entries (year (path time))
 	   (month (path time))
