@@ -25,7 +25,6 @@
 #include "harvesting.h"
 #include "production.h"
 #include "development.h"
-#include "crpaux.h"
 #include "partition.h"
 #include "vernalization.h"
 #include "photosynthesis.h"
@@ -55,13 +54,6 @@ static double DM_to_C_factor (double E)
 {
    return 12.0/30.0 * (1.0 - (0.5673 - 0.5327 * E)) / E;
 }
-// Based on Penning de Vries et al. 1989, page 63
-// Simple biochemical analysis
-static const double GrowthRespCoef (double E)
-{
-   return  0.5673 - 0.5327 * E;
-}
-
 // Chemical constants affecting the crop.
 const double molWeightCH2O = 30.0; // [gCH2O/mol]
 const double molWeightCO2 = 44.0; // [gCO2/mol]
@@ -75,7 +67,6 @@ public:
   Harvesting& harvesting;
   Production& production;
   Development& development;
-  CrpAux& auxiliary;
   const Partition& partition;
   Vernalization& vernalization;
   const Photosynthesis& photosynthesis;
@@ -117,12 +108,6 @@ public:
   { return root_system.water_uptake (Ept, soil, soil_water, EvapInterception);}
   void force_production_stress  (double pstress)
   { root_system.production_stress = pstress; }
-
-  // Internal functions.
-protected:
-  // Sugar production [gCH2O/m2/h] by canopy photosynthesis.
-  double MaintenanceRespiration (double r, double w, double T);
-  void NetProduction (const Bioclimate&, const Geometry&, const SoilHeat&);
 
   // Simulation.
 public:
@@ -186,241 +171,6 @@ CropStandard::initialize (const Geometry& geometry)
 
   if (development.DS >= 0)
     nitrogen.content (development.DS, production);
-}
-
-double
-CropStandard::MaintenanceRespiration (double r, double w, double T)
-{
-  if (w <= 0.0)
-    return 0.0;
-
-  return (molWeightCH2O / molWeightCO2)
-    * r / 24. * max (0.0, 0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
-			      - exp (0.57 - 0.042 * T - 0.0051 * T * T))) * w;
-}
-
-void
-CropStandard::NetProduction (const Bioclimate& bioclimate,
-			     const Geometry& geometry,
-			     const SoilHeat& soil_heat)
-{
-  const double LeafGrowthRespCoef = GrowthRespCoef (production.E_Leaf);
-  const double StemGrowthRespCoef = GrowthRespCoef (production.E_Stem);
-  const double SOrgGrowthRespCoef = GrowthRespCoef (production.E_SOrg);
-  const double RootGrowthRespCoef = GrowthRespCoef (production.E_Root);
-  const double DS = development.DS;
-  const double DS1 = fmod (development.DS, 2.0);
-  const double Depth = root_system.Depth;
-  bool ReleaseOfRootReserves = false;
-
-  // Remobilization
-  const double ReMobil = production.remobilization (development.DS);
-  const double CH2OReMobil = ReMobil * DM_to_C_factor (production.E_Stem) * 30.0/12.0;
-  const double ReMobilResp = CH2OReMobil - ReMobil;
-  production.CH2OPool += CH2OReMobil;
-
-  // Release of root reserves
-  if (DS1 > production.IntDSRelRtRes && DS1 < production.EndDSRelRtRes)
-    {
-       if (production.WLeaf < production.LfRtRelRtRes * production.WRoot)
-         {
-            double RootRelease = production.RelRateRtRes * production.WRoot / 24.;
-            production.CH2OPool += RootRelease;
-            production.WRoot -= RootRelease;
-            ReleaseOfRootReserves = true;
-            CERR << "Extra CH2O: " << RootRelease << "\n";
-         }
-    }
-  double NetAss = auxiliary.CanopyAss;
-
-  const double AirT = bioclimate.daily_air_temperature ();
-  const double SoilT = soil_heat.T (geometry.interval_plus (-Depth / 3));
-  double RMLeaf
-    = MaintenanceRespiration (production.r_Leaf, production.WLeaf, AirT);
-  const double RMStem
-    = MaintenanceRespiration (production.r_Stem, production.WStem, AirT);
-  const double RMSOrg
-    = MaintenanceRespiration (production.r_SOrg, production.WSOrg, AirT);
-  const double RMRoot
-    = MaintenanceRespiration (production.r_Root, production.WRoot, SoilT);
-
-  RMLeaf = max (0.0, RMLeaf - auxiliary.PotCanopyAss + auxiliary.CanopyAss);
-  const double RM = RMLeaf + RMStem + RMSOrg + RMRoot + ReMobilResp;
-  auxiliary.Respiration += RM;
-  auxiliary.MaintRespiration = RM;
-  NetAss -= RM;
-  double RootResp = RMRoot;
-
-  if (production.CH2OPool >= RM)
-    {
-      production.CH2OPool -= RM;
-      double f_Leaf, f_Stem, f_SOrg, f_Root;
-      partition (DS, production.RSR (), f_Leaf, f_Stem, f_Root, f_SOrg);
-      if (ReleaseOfRootReserves)
-        {
-          f_Leaf += f_Root;
-          f_Root = 0.0;
-        }
-      const double AssG = production.CH2OReleaseRate * production.CH2OPool;
-      auxiliary.IncWLeaf = production.E_Leaf * f_Leaf * AssG;
-      auxiliary.IncWStem = production.E_Stem * f_Stem * AssG - ReMobil;
-      auxiliary.IncWSOrg = production.E_SOrg * f_SOrg * AssG;
-      auxiliary.IncWRoot = production.E_Root * f_Root * AssG;
-      production.CH2OPool -= AssG;
-      NetAss -= LeafGrowthRespCoef * f_Leaf * AssG
-        + StemGrowthRespCoef * f_Stem * AssG
-        + SOrgGrowthRespCoef * f_SOrg * AssG
-        + RootGrowthRespCoef * f_Root * AssG;
-      RootResp += RootGrowthRespCoef * f_Root * AssG;
-      auxiliary.GrowthRespiration = LeafGrowthRespCoef * f_Leaf * AssG
-        + StemGrowthRespCoef * f_Stem * AssG
-        + SOrgGrowthRespCoef * f_SOrg * AssG
-        + RootGrowthRespCoef * f_Root * AssG;
-      auxiliary.Respiration += auxiliary.GrowthRespiration;
-    }
-  else
-    {
-      if (RMLeaf <= production.CH2OPool)
-	{
-	  auxiliary.IncWLeaf = 0.0;
-	  production.CH2OPool -= RMLeaf;
-	}
-      else
-	{
-	  auxiliary.IncWLeaf = production.CH2OPool - RMLeaf;
-	  production.CH2OPool = 0.0;
-	}
-      if (RMSOrg <= production.CH2OPool)
-	{
-	  auxiliary.IncWSOrg = 0.0;
-	  production.CH2OPool -= RMSOrg;
-	}
-      else
-	{
-	  auxiliary.IncWSOrg = (production.CH2OPool - RMSOrg) * 12.0/30.0
-             / DM_to_C_factor (production.E_SOrg) - ReMobil;
-	  production.CH2OPool = 0.0;
-	}
-      if (RMStem <= production.CH2OPool)
-	{
-	  auxiliary.IncWStem = -ReMobil;
-	  production.CH2OPool -= RMStem;
-	}
-      else
-	{
-	  auxiliary.IncWStem = (production.CH2OPool - RMStem) * 12.0/30.0
-             / DM_to_C_factor (production.E_Stem) - ReMobil;
-          if (production.WStem + auxiliary.IncWStem + auxiliary.IncWSOrg >= 0.0
-	      && production.WStem > production.WSOrg)
-            {
-	      auxiliary.IncWStem += auxiliary.IncWSOrg;
-	      auxiliary.IncWSOrg  = 0.0;
-            }
-	  production.CH2OPool = 0.0;
-	}
-      if (RMRoot <= production.CH2OPool)
-	{
-	  auxiliary.IncWRoot = 0.0;
-	  production.CH2OPool -= RMRoot;
-	}
-      else
-	{
-	  auxiliary.IncWRoot = production.CH2OPool - RMRoot;
-	  production.CH2OPool = 0.0;
-	}
-      if (production.CH2OPool > 0.0)
-	CERR << "BUG: Extra CH2O: " << production.CH2OPool << "\n";
-    }
-  auxiliary.NetPhotosynthesis = molWeightCO2 / molWeightCH2O * NetAss;
-  auxiliary.AccNetPhotosynthesis += auxiliary.NetPhotosynthesis;
-
-  auxiliary.RootRespiration = molWeightCO2 / molWeightCH2O * RootResp;
-
-  // Update dead leafs
-  auxiliary.DeadWLeaf = production.LfDR (DS) / 24.0 * production.WLeaf;
-  auxiliary.DeadWLeaf += production.WLeaf * 0.333 * canopy.CAImRat / 24.0;
-  assert (auxiliary.DeadWLeaf >= 0.0);
-  double DdLeafCnc;
-  assert (production.WLeaf >= 0.0);
-  if (production.NCrop > 1.05 * nitrogen.PtNCnt)
-    {
-      if (production.WLeaf > 0.0)
-        DdLeafCnc = production.NLeaf/production.WLeaf;
-      else
-        DdLeafCnc = production.NStem/production.WStem;
-    }
-  else
-    {
-      if (production.WLeaf > 0.0)
-        DdLeafCnc = (production.NLeaf / production.WLeaf 
-		     - nitrogen.NfLeafCnc (DS))
-         * ( 1.0 - nitrogen.TLLeafEff (DS)) +  nitrogen.NfLeafCnc (DS);
-      else
-        DdLeafCnc = production.NStem/production.WStem;
-    }
-
-  assert (DdLeafCnc >= 0.0);
-  assert (auxiliary.DeadWLeaf >= 0.0);
-  auxiliary.DeadNLeaf = DdLeafCnc * auxiliary.DeadWLeaf;
-  assert (auxiliary.DeadNLeaf >= 0.0);
-  auxiliary.IncWLeaf -= auxiliary.DeadWLeaf;
-  assert (auxiliary.DeadWLeaf >= 0.0);
-  production.WDead += (1.0 - production.ExfoliationFac) * auxiliary.DeadWLeaf;
-  production.NDead += (1.0 - production.ExfoliationFac) * auxiliary.DeadNLeaf;
-  assert (production.NDead >= 0.0);
-
-  const double C_foli = DM_to_C_factor (production.E_Leaf) *
-                        production.ExfoliationFac * auxiliary.DeadWLeaf;
-  auxiliary.C_Loss = C_foli;
-  const double N_foli = production.ExfoliationFac * auxiliary.DeadNLeaf;
-  assert (N_foli >= 0.0);
-  if (C_foli < 1e-50)
-    assert (N_foli < 1e-40);
-  else
-    {
-      assert (N_foli > 0.0);
-      production.AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
-      production.C_AM += C_foli;
-      production.N_AM += N_foli;
-    }
-
-  // Update dead roots.
-  double RtDR = production.RtDR (DS);
-  if (production.RSR () > 1.1 * partition.RSR (DS))
-    RtDR += production.Large_RtDR;
-
-  auxiliary.DeadWRoot = RtDR / 24.0 * production.WRoot;
-  double DdRootCnc;
-  if (production.NCrop > 1.05 * nitrogen.PtNCnt)
-    DdRootCnc = production.NRoot/production.WRoot;
-  else
-    DdRootCnc = (production.NRoot/production.WRoot - nitrogen.NfRootCnc (DS))
-      * ( 1.0 - nitrogen.TLRootEff (DS)) +  nitrogen.NfRootCnc (DS);
-  auxiliary.DeadNRoot = DdRootCnc * auxiliary.DeadWRoot;
-  auxiliary.IncWRoot -= auxiliary.DeadWRoot;
-  const double C_Root = DM_to_C_factor (production.E_Root) * auxiliary.DeadWRoot;
-  auxiliary.C_Loss += C_Root;
-  production.AM_root->add (geometry, C_Root * m2_per_cm2,
-		      auxiliary.DeadNRoot * m2_per_cm2,
-		      root_system.Density);
-  assert (C_Root == 0.0 || auxiliary.DeadNRoot > 0.0);
-  production.C_AM += C_Root;
-  production.N_AM += auxiliary.DeadNRoot;
-
-  // Update production.
-  production.NCrop -= (auxiliary.DeadNLeaf + auxiliary.DeadNRoot);
-  assert (production.NCrop > 0.0);
-  production.WLeaf += auxiliary.IncWLeaf;
-  production.WStem += auxiliary.IncWStem;
-  production.WSOrg += auxiliary.IncWSOrg;
-  production.WRoot += auxiliary.IncWRoot;
-  production.CLeaf = production.WLeaf * DM_to_C_factor (production.E_Leaf);
-  production.CStem = production.WStem * DM_to_C_factor (production.E_Stem);
-  production.CSOrg = production.WSOrg * DM_to_C_factor (production.E_SOrg);
-  production.CRoot = production.WRoot * DM_to_C_factor (production.E_Root);
-  production.CDead = production.WDead * DM_to_C_factor (production.E_Leaf);
-  production.CCrop = production.CLeaf + production.CStem + production.CSOrg +
-                production.CRoot + production.CDead + production.CH2OPool * 12./30.;
 }
 
 void
@@ -506,21 +256,24 @@ CropStandard::tick (const Time& time,
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
       double Ass = photosynthesis (bioclimate, canopy, development);
-      auxiliary.PotCanopyAss = Ass;
+      production.PotCanopyAss = Ass;
       if (root_system.production_stress >= 0.0)
 	Ass *= (1.0 - root_system.production_stress);
       else if (enable_water_stress)
 	Ass *= (1.0 - water_stress);
       if (enable_N_stress)
 	Ass *= (1.0 - nitrogen_stress);
-      auxiliary.CanopyAss = Ass;
+      production.CanopyAss = Ass;
       const double ProdLim = (1.0 - production.GrowthRateRedFac);
       production.CH2OPool += ProdLim * Ass;
     }
   else
-      auxiliary.CanopyAss = 0.0;
+      production.CanopyAss = 0.0;
 
-  NetProduction (bioclimate, soil, soil_heat);
+  production.tick (bioclimate.daily_air_temperature (),
+		   soil_heat.T (soil.interval_plus (-root_system.Depth / 3.0)),
+		   root_system.Density, soil, development.DS, 
+		   canopy.CAImRat, nitrogen, partition);
   nitrogen.content (development.DS, production);
   if (time.hour () != 0)
     return;
@@ -529,8 +282,8 @@ CropStandard::tick (const Time& time,
 	       production.WStem, development.DS);
 
   development.tick_daily (name, bioclimate.daily_air_temperature (), 
-			  production.WLeaf, auxiliary, vernalization);
-  root_system.tick (soil, soil_heat, production.WRoot, auxiliary.IncWRoot);
+			  production.WLeaf, production, vernalization);
+  root_system.tick (soil, soil_heat, production.WRoot, production.IncWRoot);
 }
 
 const Harvest&
@@ -855,7 +608,6 @@ CropStandard::output (Log& log) const
   output_submodule (harvesting, "Harvest", log);
   output_submodule (production, "Prod", log);
   output_submodule (development, "Devel", log);
-  output_submodule (auxiliary, "CrpAux", log);
   output_submodule (vernalization, "Vernal", log);
   output_submodule (nitrogen, "CrpN", log);
 }
@@ -867,7 +619,6 @@ CropStandard::CropStandard (const AttributeList& al)
     harvesting (*new Harvesting (al.alist ("Harvest"))),
     production (*new Production (al.alist ("Prod"))),
     development (*new Development (al.alist ("Devel"))),
-    auxiliary (*new CrpAux (al.alist ("CrpAux"))),
     partition (*new Partition (al.alist ("Partit"))),
     vernalization (*new Vernalization (al.check ("Vernal") 
 				       ? al.alist ("Vernal")
@@ -885,7 +636,6 @@ CropStandard::~CropStandard ()
   delete &harvesting;
   delete &production;
   delete &development;
-  delete &auxiliary;
   delete &partition;
   delete &vernalization;
   delete &photosynthesis;
@@ -918,8 +668,6 @@ CropStandardSyntax::CropStandardSyntax ()
   syntax.add_submodule ("Devel", alist, Syntax::State, Syntax::Singleton,
 			"Development and phenology.", 
 			Development::load_syntax);
-  syntax.add_submodule ("CrpAux", alist, Syntax::State, Syntax::Singleton,
-			"Auxiliary state.", CrpAux::load_syntax);
   syntax.add_submodule ("Partit", alist, Syntax::Const, Syntax::Singleton,
 			"Assimilate partitioning.", Partition::load_syntax);
   syntax.add_submodule ("Vernal", alist,

@@ -337,7 +337,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = rootdens_std.C
+REMOVE = crpaux.C crpaux.h
 
 # These are the file extensions we deal with.
 # 
@@ -640,8 +640,10 @@ svat${OBJ}: svat.C svat.h librarian.h library.h common.h alist.h syntax.h \
  treelog.h log.h
 vegetation${OBJ}: vegetation.C vegetation.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h log.h
-photosynthesis${OBJ}: photosynthesis.C photosynthesis.h plf.h submodel.h \
- alist.h common.h syntax.h treelog.h
+photosynthesis${OBJ}: photosynthesis.C photosynthesis.h bioclimate.h \
+ librarian.h library.h common.h alist.h syntax.h treelog.h \
+ canopy_std.h canopy_simple.h plf.h development.h message.h submodel.h \
+ mathlib.h
 crpn${OBJ}: crpn.C crpn.h production.h root_system.h rootdens.h \
  librarian.h library.h common.h alist.h syntax.h treelog.h log.h plf.h \
  mathlib.h submodel.h
@@ -651,12 +653,12 @@ partition${OBJ}: partition.C partition.h plf.h submodel.h syntax.h \
  common.h treelog.h alist.h
 crpaux${OBJ}: crpaux.C crpaux.h log.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h submodel.h
-development${OBJ}: development.C development.h crpaux.h vernalization.h \
- plf.h log.h librarian.h library.h common.h alist.h syntax.h treelog.h \
- message.h submodel.h
-production${OBJ}: production.C production.h organic_matter.h common.h am.h \
- librarian.h library.h alist.h syntax.h treelog.h geometry.h log.h \
- submodel.h
+development${OBJ}: development.C development.h production.h \
+ vernalization.h plf.h log.h librarian.h library.h common.h alist.h \
+ syntax.h treelog.h message.h submodel.h
+production${OBJ}: production.C production.h crpn.h partition.h \
+ organic_matter.h common.h am.h librarian.h library.h alist.h syntax.h \
+ treelog.h log.h plf.h message.h submodel.h
 harvesting${OBJ}: harvesting.C harvesting.h am.h librarian.h library.h \
  common.h alist.h syntax.h treelog.h om.h submodel.h
 canopy_simple${OBJ}: canopy_simple.C canopy_simple.h plf.h submodel.h \
@@ -944,7 +946,7 @@ horizon_std${OBJ}: horizon_std.C horizon.h librarian.h library.h common.h \
 crop_std${OBJ}: crop_std.C crop.h time.h librarian.h library.h common.h \
  alist.h syntax.h treelog.h root_system.h rootdens.h canopy_std.h \
  canopy_simple.h plf.h harvesting.h production.h development.h \
- crpaux.h partition.h vernalization.h photosynthesis.h crpn.h log.h \
+ partition.h vernalization.h photosynthesis.h crpn.h log.h \
  bioclimate.h soil_water.h macro.h soil.h horizon.h hydraulic.h \
  tortuosity.h geometry.h om.h organic_matter.h soil_heat.h soil_NH4.h \
  solute.h adsorption.h transport.h mactrans.h soil_NO3.h am.h \

@@ -20,7 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "development.h"
-#include "crpaux.h"
+#include "production.h"
 #include "vernalization.h"
 #include "plf.h"
 #include "log.h"
@@ -34,7 +34,7 @@ Development::light_hour ()
 void
 Development::tick_daily (const string& name, 
 			 const double Ta, const double WLeaf, 
-			 CrpAux& auxiliary, Vernalization& vernalization)
+			 Production& production, Vernalization& vernalization)
 {
   // Update final day length.
   day_length = partial_day_length;
@@ -44,7 +44,7 @@ Development::tick_daily (const string& name,
   if (fmod (DS, 2.0) < 1.0)
     {
       // Only increase DS if assimilate production covers leaf respiration.
-      if (auxiliary.IncWLeaf +  auxiliary.DeadWLeaf
+      if (production.IncWLeaf +  production.DeadWLeaf
 	  >  -WLeaf /1000.0) // It lost 0.1% of its leafs to resp.
 	DS += (DSRate1 * TempEff1 (Ta) * PhotEff1 (day_length + 1.0));
       vernalization (Ta, DS);
@@ -63,7 +63,7 @@ Development::tick_daily (const string& name,
        {
 	 COUT << " [" << name << " is ripe]\n";
 	 DS = DSMature;
-	 auxiliary.no_production ();
+	 production.none ();
        }
     }
 

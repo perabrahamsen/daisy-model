@@ -27,6 +27,8 @@
 using namespace std;
 
 class OrganicMatter;
+class CrpN;
+class Partition;
 class Geometry;
 class AttributeList;
 class Syntax;
@@ -42,22 +44,25 @@ private:
   const double ReMobilDS;	// Remobilization, Initial DS
   const double ReMobilRt;	// Remobilization, release rate
   double StemRes;		// Shielded Reserves in Stems
-public:
   double remobilization (const double DS);
 
   // Parameters.
-public:
+private:
   const double CH2OReleaseRate;	// CH2O Release Rate [h-1]
+public:
   const double E_Root;		// Conversion efficiency, root
   const double E_Leaf;		// Conversion efficiency, leaf
   const double E_Stem;		// Conversion efficiency, stem
   const double E_SOrg;		// Conversion efficiency, stor. org.
+private:
   const double r_Root;		// Maint. resp. coeff., root
   const double r_Leaf;		// Maint. resp. coeff., leaf
   const double r_Stem;		// Maint. resp. coeff., stem
   const double r_SOrg;		// Maint. resp. coeff., stor. org.
   const double ExfoliationFac;	// Exfoliation factor, 0-1
+public:
   const double GrowthRateRedFac; // Growth rate reduction factor, 0-1
+private:
   const PLF& LfDR;		// Death rate of Leafs
   const PLF& RtDR;		// Death rate of Roots
   const double Large_RtDR;	// Extra death rate for large root/shoot.
@@ -91,14 +96,50 @@ public:
   AM* AM_root;			// Dead organic root matter.
   AM* AM_leaf;			// Dead organic leaf matter.
 
-  // Queries.
+  // Auxiliary.
 public:
+  double PotCanopyAss;		// Potential Canopy Assimilation [g CH2O/m2/h]
+  double CanopyAss;	        // Canopy Assimilation [g CH2O/m2/h]
+  double NetPhotosynthesis;	// Net Photosynthesis [g CO2/m2/h]
+  double AccNetPhotosynthesis;	// Accunulated Net Photosynthesis [g CO2/m2]
+private:
+  double Respiration;		// Crop Respiration [g CO2/m2/h]
+  double MaintRespiration;	// Maintenance Respiration [g CO2/m2/h]
+  double GrowthRespiration;	// Growth Respiration [g CO2/m2/h]
+  double RootRespiration;	// Root Respiration [g CO2/m2/h]
+public:
+  double IncWLeaf;		// Leaf growth [g DM/m2/d]
+private:
+  double IncWStem;		// Stem growth [g DM/m2/d]
+  double IncWSOrg;		// Storage organ growth [g DM/m2/d]
+public:
+  double IncWRoot;		// Root growth [g DM/m2/d]
+  double DeadWLeaf;		// Leaf DM removed [g DM/m2/d]
+private:
+  double DeadNLeaf;		// Leaf N removed [g N/m2/d]
+  double DeadWRoot;		// Root DM removed [g DM/m2/d]
+  double DeadNRoot;		// Root N removed [g N/m2/d]
+  double C_Loss;		// C lost from the plant. [g/m2]
+
+  // Queries.
+private:
   double RSR () const;		// Root / Shoot ratio.
+public:
   double DM () const;		// Shoot dry matter, [kg DM/ha].
   double total_N () const;	// N content [kg N/ha]
 
   // Simulation.
+private:
+  static double maintenance_respiration (double r, double w, double T);
+  static const double GrowthRespCoef (double E);
 public:
+  void tick (double AirT, double SoilT,
+	     const vector<double>& Density,
+	     const Geometry& geometry,
+	     double DS, double CAImRat,
+	     const CrpN& nitrogen,
+	     const Partition& partition);
+  void none ();
   void output (Log& log) const;
 
   // Create and Destroy.

@@ -29,7 +29,7 @@ class AttributeList;
 class Syntax;
 class Log;
 class PLF;
-class CrpAux;
+class Production;
 class Vernalization;
 
 class Development 
@@ -65,7 +65,7 @@ public:
 public:
   void light_hour ();
   void tick_daily (const string& name, double Ta, double WLeaf, 
-		   CrpAux&, Vernalization&);
+		   Production&, Vernalization&);
   void emergence ();
   void output (Log& log) const;
 

@@ -1,5 +1,15 @@
 2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.94 released.
+
+2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crpaux.C, crpaux.h: Removed submodel.
+	* Makefile (SUBMODELS): Removed.
+	(REMOVE): Added it here.
+	* production.C, production.h: Merged it here.
+	* lib/log.dai: Updated.
+
 	* Version 1.93 released.
 
 2001-11-08  Per Abrahamsen  <abraham@dina.kvl.dk>

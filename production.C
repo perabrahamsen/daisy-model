@@ -20,12 +20,27 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "production.h"
+#include "crpn.h"
+#include "partition.h"
 #include "organic_matter.h"
 #include "am.h"
-#include "geometry.h"
 #include "log.h"
 #include "time.h"
+#include "plf.h"
+#include "message.h"
 #include "submodel.h"
+
+// Dimensional conversion.
+static const double m2_per_cm2 = 0.0001;
+// Based on Penning de Vries et al. 1989, page 63
+// E is the assimilate conversion effiency
+static double DM_to_C_factor (double E)
+{
+   return 12.0/30.0 * (1.0 - (0.5673 - 0.5327 * E)) / E;
+}
+// Chemical constants affecting the crop.
+const double molWeightCH2O = 30.0; // [gCH2O/mol]
+const double molWeightCO2 = 44.0; // [gCO2/mol]
 
 double
 Production::remobilization (const double DS)
@@ -72,6 +87,267 @@ Production::total_N () const
   return NCrop / conv;
 }
 
+double
+Production::maintenance_respiration (double r, double w, double T)
+{
+  if (w <= 0.0)
+    return 0.0;
+
+  return (molWeightCH2O / molWeightCO2)
+    * r / 24. 
+    * max (0.0, 
+	   0.4281 * (exp (0.57 - 0.024 * T + 0.0020 * T * T)
+			       - exp (0.57 - 0.042 * T - 0.0051 * T * T))) * w;
+}
+
+// Based on Penning de Vries et al. 1989, page 63
+// Simple biochemical analysis
+const double
+Production::GrowthRespCoef (double E)
+{ return  0.5673 - 0.5327 * E; }
+
+void
+Production::tick (const double AirT, const double SoilT,
+		  const vector<double>& Density,
+		  const Geometry& geometry,
+		  const double DS, const double CAImRat,
+		  const CrpN& nitrogen,
+		  const Partition& partition)
+{
+  const double LeafGrowthRespCoef = GrowthRespCoef (E_Leaf);
+  const double StemGrowthRespCoef = GrowthRespCoef (E_Stem);
+  const double SOrgGrowthRespCoef = GrowthRespCoef (E_SOrg);
+  const double RootGrowthRespCoef = GrowthRespCoef (E_Root);
+  const double DS1 = fmod (DS, 2.0);
+
+  // Remobilization
+  const double ReMobil = remobilization (DS);
+  const double CH2OReMobil = ReMobil * DM_to_C_factor (E_Stem) * 30.0/12.0;
+  const double ReMobilResp = CH2OReMobil - ReMobil;
+  CH2OPool += CH2OReMobil;
+
+  // Release of root reserves
+  bool ReleaseOfRootReserves = false;
+  if (DS1 > IntDSRelRtRes && DS1 < EndDSRelRtRes)
+    {
+       if (WLeaf < LfRtRelRtRes * WRoot)
+         {
+            double RootRelease = RelRateRtRes * WRoot / 24.;
+            CH2OPool += RootRelease;
+            WRoot -= RootRelease;
+            ReleaseOfRootReserves = true;
+            CERR << "Extra CH2O: " << RootRelease << "\n";
+         }
+    }
+  double NetAss = CanopyAss;
+
+  double RMLeaf
+    = maintenance_respiration (r_Leaf, WLeaf, AirT);
+  const double RMStem
+    = maintenance_respiration (r_Stem, WStem, AirT);
+  const double RMSOrg
+    = maintenance_respiration (r_SOrg, WSOrg, AirT);
+  const double RMRoot
+    = maintenance_respiration (r_Root, WRoot, SoilT);
+
+  RMLeaf = max (0.0, RMLeaf - PotCanopyAss + CanopyAss);
+  const double RM = RMLeaf + RMStem + RMSOrg + RMRoot + ReMobilResp;
+  Respiration += RM;
+  MaintRespiration = RM;
+  NetAss -= RM;
+  double RootResp = RMRoot;
+
+  if (CH2OPool >= RM)
+    {
+      CH2OPool -= RM;
+      double f_Leaf, f_Stem, f_SOrg, f_Root;
+      partition (DS, RSR (), f_Leaf, f_Stem, f_Root, f_SOrg);
+      if (ReleaseOfRootReserves)
+        {
+          f_Leaf += f_Root;
+          f_Root = 0.0;
+        }
+      const double AssG = CH2OReleaseRate * CH2OPool;
+      IncWLeaf = E_Leaf * f_Leaf * AssG;
+      IncWStem = E_Stem * f_Stem * AssG - ReMobil;
+      IncWSOrg = E_SOrg * f_SOrg * AssG;
+      IncWRoot = E_Root * f_Root * AssG;
+      CH2OPool -= AssG;
+      NetAss -= LeafGrowthRespCoef * f_Leaf * AssG
+        + StemGrowthRespCoef * f_Stem * AssG
+        + SOrgGrowthRespCoef * f_SOrg * AssG
+        + RootGrowthRespCoef * f_Root * AssG;
+      RootResp += RootGrowthRespCoef * f_Root * AssG;
+      GrowthRespiration = LeafGrowthRespCoef * f_Leaf * AssG
+        + StemGrowthRespCoef * f_Stem * AssG
+        + SOrgGrowthRespCoef * f_SOrg * AssG
+        + RootGrowthRespCoef * f_Root * AssG;
+      Respiration += GrowthRespiration;
+    }
+  else
+    {
+      if (RMLeaf <= CH2OPool)
+	{
+	  IncWLeaf = 0.0;
+	  CH2OPool -= RMLeaf;
+	}
+      else
+	{
+	  IncWLeaf = CH2OPool - RMLeaf;
+	  CH2OPool = 0.0;
+	}
+      if (RMSOrg <= CH2OPool)
+	{
+	  IncWSOrg = 0.0;
+	  CH2OPool -= RMSOrg;
+	}
+      else
+	{
+	  IncWSOrg = (CH2OPool - RMSOrg) * 12.0/30.0
+             / DM_to_C_factor (E_SOrg) - ReMobil;
+	  CH2OPool = 0.0;
+	}
+      if (RMStem <= CH2OPool)
+	{
+	  IncWStem = -ReMobil;
+	  CH2OPool -= RMStem;
+	}
+      else
+	{
+	  IncWStem = (CH2OPool - RMStem) * 12.0/30.0
+             / DM_to_C_factor (E_Stem) - ReMobil;
+          if (WStem + IncWStem + IncWSOrg >= 0.0
+	      && WStem > WSOrg)
+            {
+	      IncWStem += IncWSOrg;
+	      IncWSOrg  = 0.0;
+            }
+	  CH2OPool = 0.0;
+	}
+      if (RMRoot <= CH2OPool)
+	{
+	  IncWRoot = 0.0;
+	  CH2OPool -= RMRoot;
+	}
+      else
+	{
+	  IncWRoot = CH2OPool - RMRoot;
+	  CH2OPool = 0.0;
+	}
+      if (CH2OPool > 0.0)
+	CERR << "BUG: Extra CH2O: " << CH2OPool << "\n";
+    }
+  NetPhotosynthesis = molWeightCO2 / molWeightCH2O * NetAss;
+  AccNetPhotosynthesis += NetPhotosynthesis;
+
+  RootRespiration = molWeightCO2 / molWeightCH2O * RootResp;
+
+  // Update dead leafs
+  DeadWLeaf = LfDR (DS) / 24.0 * WLeaf;
+  DeadWLeaf += WLeaf * 0.333 * CAImRat / 24.0;
+  assert (DeadWLeaf >= 0.0);
+  double DdLeafCnc;
+  assert (WLeaf >= 0.0);
+  if (NCrop > 1.05 * nitrogen.PtNCnt)
+    {
+      if (WLeaf > 0.0)
+        DdLeafCnc = NLeaf/WLeaf;
+      else
+        DdLeafCnc = NStem/WStem;
+    }
+  else
+    {
+      if (WLeaf > 0.0)
+        DdLeafCnc = (NLeaf / WLeaf 
+		     - nitrogen.NfLeafCnc (DS))
+         * ( 1.0 - nitrogen.TLLeafEff (DS)) +  nitrogen.NfLeafCnc (DS);
+      else
+        DdLeafCnc = NStem/WStem;
+    }
+
+  assert (DdLeafCnc >= 0.0);
+  assert (DeadWLeaf >= 0.0);
+  DeadNLeaf = DdLeafCnc * DeadWLeaf;
+  assert (DeadNLeaf >= 0.0);
+  IncWLeaf -= DeadWLeaf;
+  assert (DeadWLeaf >= 0.0);
+  WDead += (1.0 - ExfoliationFac) * DeadWLeaf;
+  NDead += (1.0 - ExfoliationFac) * DeadNLeaf;
+  assert (NDead >= 0.0);
+
+  const double C_foli = DM_to_C_factor (E_Leaf) *
+                        ExfoliationFac * DeadWLeaf;
+  C_Loss = C_foli;
+  const double N_foli = ExfoliationFac * DeadNLeaf;
+  assert (N_foli >= 0.0);
+  if (C_foli < 1e-50)
+    assert (N_foli < 1e-40);
+  else
+    {
+      assert (N_foli > 0.0);
+      AM_leaf->add ( C_foli * m2_per_cm2, N_foli * m2_per_cm2);
+      C_AM += C_foli;
+      N_AM += N_foli;
+    }
+
+  // Update dead roots.
+  double root_death_rate = RtDR (DS);
+  if (RSR () > 1.1 * partition.RSR (DS))
+    root_death_rate += Large_RtDR;
+
+  DeadWRoot = root_death_rate / 24.0 * WRoot;
+  double DdRootCnc;
+  if (NCrop > 1.05 * nitrogen.PtNCnt)
+    DdRootCnc = NRoot/WRoot;
+  else
+    DdRootCnc = (NRoot/WRoot - nitrogen.NfRootCnc (DS))
+      * ( 1.0 - nitrogen.TLRootEff (DS)) +  nitrogen.NfRootCnc (DS);
+  DeadNRoot = DdRootCnc * DeadWRoot;
+  IncWRoot -= DeadWRoot;
+  const double C_Root = DM_to_C_factor (E_Root) * DeadWRoot;
+  C_Loss += C_Root;
+  AM_root->add (geometry, C_Root * m2_per_cm2,
+		DeadNRoot * m2_per_cm2,
+		Density);
+  assert (C_Root == 0.0 || DeadNRoot > 0.0);
+  C_AM += C_Root;
+  N_AM += DeadNRoot;
+
+  // Update production.
+  NCrop -= (DeadNLeaf + DeadNRoot);
+  assert (NCrop > 0.0);
+  WLeaf += IncWLeaf;
+  WStem += IncWStem;
+  WSOrg += IncWSOrg;
+  WRoot += IncWRoot;
+  CLeaf = WLeaf * DM_to_C_factor (E_Leaf);
+  CStem = WStem * DM_to_C_factor (E_Stem);
+  CSOrg = WSOrg * DM_to_C_factor (E_SOrg);
+  CRoot = WRoot * DM_to_C_factor (E_Root);
+  CDead = WDead * DM_to_C_factor (E_Leaf);
+  CCrop = CLeaf + CStem + CSOrg + CRoot + CDead + CH2OPool * 12./30.;
+}
+
+void
+Production::none ()
+{
+  IncWLeaf = 0.0;
+  IncWStem = 0.0;
+  IncWSOrg = 0.0;
+  IncWRoot = 0.0;
+  NetPhotosynthesis = 0.0;
+  AccNetPhotosynthesis = 0.0;
+  Respiration = 0.0;
+  MaintRespiration = 0.0;
+  GrowthRespiration = 0.0;
+  RootRespiration = 0.0;
+  DeadWLeaf = 0.0;
+  DeadNLeaf = 0.0;
+  DeadWRoot = 0.0;
+  DeadNRoot = 0.0;
+  C_Loss = 0.0;
+}
+
 void 
 Production::output (Log& log) const
 {
@@ -96,6 +372,23 @@ Production::output (Log& log) const
   log.output ("NCrop", NCrop);
   log.output ("C_AM", C_AM);
   log.output ("N_AM", N_AM);
+  log.output ("PotCanopyAss", PotCanopyAss);
+  log.output ("CanopyAss", CanopyAss);
+  log.output ("NetPhotosynthesis", NetPhotosynthesis);
+  log.output ("AccNetPhotosynthesis", AccNetPhotosynthesis);
+  log.output ("Respiration", Respiration);
+  log.output ("MaintRespiration", MaintRespiration);
+  log.output ("GrowthRespiration", GrowthRespiration);
+  log.output ("RootRespiration", RootRespiration);
+  log.output ("IncWLeaf", IncWLeaf);
+  log.output ("IncWStem", IncWStem);
+  log.output ("IncWSOrg", IncWSOrg);
+  log.output ("IncWRoot", IncWRoot);
+  log.output ("DeadWLeaf", DeadWLeaf);
+  log.output ("DeadNLeaf", DeadNLeaf);
+  log.output ("DeadWRoot", DeadWRoot);
+  log.output ("DeadNRoot", DeadNRoot);
+  log.output ("C_Loss", C_Loss);
 }
 
 void 
@@ -214,6 +507,43 @@ For initialization, set this to the amount of N in the seed.");
   syntax.add ("N_AM", "g N/m^2", Syntax::State,
 	      "Added N in plant material.");
   alist.add ("N_AM", 0.000);
+  
+  // Auxiliary.
+  syntax.add ("PotCanopyAss", "g CH2O/m^2", Syntax::State,
+	      "Potential canopy assimilation this day until now.");
+  alist.add ("PotCanopyAss", 0.0);
+  syntax.add ("CanopyAss", "g CH2O/m^2", Syntax::State,
+	      "Canopy assimilation this day until now.");
+  alist.add ("CanopyAss", 0.0);
+  syntax.add ("NetPhotosynthesis", "g CO2/m^2/h", Syntax::LogOnly,
+	      "Net Photosynthesis.");
+  syntax.add ("AccNetPhotosynthesis", "g CO2/m^2", Syntax::LogOnly,
+	      "Accumulated Net Photosynthesis.");
+  syntax.add ("Respiration", "g CH2O/m^2/h", Syntax::LogOnly,
+	      "Crop Respiration.");
+  syntax.add ("MaintRespiration", "g CH2O/m^2/h", Syntax::LogOnly,
+	      "Maintenance Respiration.");
+  syntax.add ("GrowthRespiration", "g CH2O/m^2/h", Syntax::LogOnly,
+	      "Growth Respiration.");
+  syntax.add ("RootRespiration", "g CH2O/m^2/h", Syntax::LogOnly,
+	      "Root Respiration.");
+  syntax.add ("IncWLeaf", "g DM/m^2/d", Syntax::LogOnly,
+	      "Leaf growth.");
+  syntax.add ("IncWStem", "g DM/m^2/d", Syntax::LogOnly,
+	      "Stem growth.");
+  syntax.add ("IncWSOrg", "g DM/m^2/d", Syntax::LogOnly,
+	      "Storage organ growth.");
+  syntax.add ("IncWRoot", "g DM/m^2/d", Syntax::LogOnly,
+	      "Root growth.");
+  syntax.add ("DeadWLeaf", "g DM/m^2/d", Syntax::LogOnly,
+	      "Leaf DM removed.");
+  syntax.add ("DeadNLeaf", "g N/m2/d", Syntax::LogOnly,
+	      "Leaf N removed.");
+  syntax.add ("DeadWRoot", "g DM/m^2/d", Syntax::LogOnly,
+	      "Root DM removed.");
+  syntax.add ("DeadNRoot", "g N/m2/d", Syntax::LogOnly,
+	      "Root N removed.");
+  syntax.add ("C_Loss", "g C/m^2", Syntax::LogOnly,"C lost from the crop");
 }
 
 void
@@ -296,7 +626,25 @@ Production::Production (const AttributeList& al)
     C_AM  (al.number ("C_AM")),
     N_AM  (al.number ("N_AM")),
     AM_root (NULL),
-    AM_leaf (NULL)
+    AM_leaf (NULL),
+    // Auxiliary.
+    PotCanopyAss (al.number ("PotCanopyAss")),
+    CanopyAss (al.number ("CanopyAss")),
+    NetPhotosynthesis (0.0),
+    AccNetPhotosynthesis (0.0),
+    Respiration (0.0),
+    MaintRespiration (0.0),
+    GrowthRespiration (0.0),
+    RootRespiration (0.0),
+    IncWLeaf (0.0),
+    IncWStem (0.0),
+    IncWSOrg (0.0),
+    IncWRoot (0.0),
+    DeadWLeaf (0.0),
+    DeadNLeaf (0.0),
+    DeadWRoot (0.0),
+    DeadNRoot (0.0),
+    C_Loss (0.0)
 { }
 
 Production::~Production ()

@@ -12,6 +12,13 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.94
+
+** Log file change.  
+
+Moved remaining CrpAux variables to Prod in the standard crop model.
+The log.dai file has been updated.
+
 * 1.93
 
 ** Log file change.  
