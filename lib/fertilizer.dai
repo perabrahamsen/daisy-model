@@ -1,21 +1,24 @@
 ;; fertilizer.dai -*- lisp -*-
 
 (defam Ammonia mineral
+  (description "Pure NH4.")
   (NH4_fraction 1.000))
 
 (defam AmmoniumNitrate mineral
+  (description "A 50-50 mix of NH4 and NO3.")
   (NH4_fraction 0.500))
 
 (defam Nitrate mineral
-  (NH4_fraction 0.000))
-
-(defam NPK mineral
+  (description "Pure NO3.")
   (NH4_fraction 0.000))
 
 (defam N25S mineral
+  (description "From _Kemira '97_.")
   (NH4_fraction 0.508))
 
 (defam slurry organic
+  (description "Average based on numbers provided by Torben Bonde, Danish
+Environmental Protection Agency, approximately 1991.")
   (volatilization 0.15)
   (om ((initial_fraction 0.72)
        (C_per_N 100)
@@ -32,18 +35,21 @@
        (fractions 0.0 0.0 1.0))))
 
 (defam pig_slurry slurry
+  ;; Slurry description applies.
   (dry_matter_fraction 0.073)
   (total_N_fraction 0.0863)
   (total_C_fraction 0.323)
   (NH4_fraction 0.7))
 
 (defam cattle_slurry slurry
+  ;; Slurry description applies.
   (dry_matter_fraction 0.093)
   (total_N_fraction 0.0495)
   (total_C_fraction 0.445)
   (NH4_fraction 0.58))
 
 (defam Foulum_slurry slurry
+  (description "Parameters provided by DJF in Foulum, 1998.")
   (dry_matter_fraction 0.0341)
   (total_N_fraction 0.0615)
   (total_C_fraction 0.323)
