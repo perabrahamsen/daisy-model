@@ -396,10 +396,21 @@
 	    (accumulate true)
 	    (dimension "kg N/ha")
 	    (factor 10.0))
-	   ((path column "*" crops "*"Prod NCrop)
+	   ((path column "*" crops "*" Prod NLeaf)
+	    (dimension "kg N/ha")
+	    (factor 10.0))
+	   ((path column "*" crops "*" Prod NStem)
+	    (dimension "kg N/ha")
+	    (factor 10.0))
+	   ((path column "*" crops "*" Prod NSOrg)
+	    (dimension "kg N/ha")
+	    (factor 10.0))
+	   ((path column "*" crops "*" Prod NRoot)
 	    (dimension "kg N/ha")
 	    (factor 10.0))
 	   ))
 
 (deflog "Harvest" file "harvest.log" (not (running))
   (some (harvest)))
+
+;;; log.dai ends here
