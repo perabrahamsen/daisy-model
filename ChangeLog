@@ -1,3 +1,20 @@
+2001-04-09  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.72 released.
+
+2001-04-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_std.C (load_syntax): Fix dimensions.
+
+	* crop_std.C (harvest): Fixed WBal and NBal declarations.
+
+	* action_fertilize.C (doIt): Fix dimension in output message.
+
+	* lib/log.dai ("Fertilizer"): Fixed dimension for 
+
+	* horizon.C (load_syntax): Fixed description for `SOM_fractions'.
+	Reported by Anders Pedersen.
+
 2001-02-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.71 released.

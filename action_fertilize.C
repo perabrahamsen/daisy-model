@@ -136,7 +136,7 @@ ActionFertilize::doIt (Daisy& daisy)
 	 << " kg "<< am.name ("type") << "-N/ha]\n";
   else if (syntax == "organic")
     COUT << " [Fertilizing " << am.number ("weight") 
-	 << " ton "<< am.name ("type") << " DM/ha]\n";
+	 << " ton "<< am.name ("type") << " ww/ha]\n";
   else
     COUT << " [Fertilizing " << am.name ("type") << "]\n";
 

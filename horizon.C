@@ -448,7 +448,7 @@ By default, this is calculated from the soil constituents.");
 	      "C/N ratio for each SOM pool in this soil.");
   syntax.add ("SOM_fractions",
 	      Syntax::Fraction (), Syntax::Const, Syntax::Sequence,
-	      "Fraction of humus in each SOM pool, from fastest to slowest.");
+	      "Fraction of humus in each SOM pool, from slowest to fastest.");
   syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("quarts_form_factor", 2.0);

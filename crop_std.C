@@ -1746,10 +1746,10 @@ CropStandard::harvest (const string& column_name,
       SOrg_N_Loss = 0.0;
     }
 
-  const WBal = WCrop - (Prod.WStem+Prod.WLeaf+Prod.WDead+Prod.WSOrg+Prod.WRoot)
+  const double WBal = WCrop - (Prod.WStem+Prod.WLeaf+Prod.WDead+Prod.WSOrg+Prod.WRoot)
                      - (Stem_W_Yield+Leaf_W_Yield+WEYRm+Dead_W_Yield)
                      - (Stem_W_Loss+Leaf_W_Loss+SOrg_W_Loss+Dead_W_Loss );
-  const NBal = NCrop - (Prod.NStem+Prod.NLeaf+Prod.NDead+Prod.NSOrg+Prod.NRoot)
+  const double NBal = NCrop - (Prod.NStem+Prod.NLeaf+Prod.NDead+Prod.NSOrg+Prod.NRoot)
                      - (Stem_N_Yield+Leaf_N_Yield+NEYRm+Dead_N_Yield)
                      - (Stem_N_Loss +Leaf_N_Loss +SOrg_N_Loss +Dead_N_Loss );
 
