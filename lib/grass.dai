@@ -117,12 +117,7 @@
 		  (turnover_rate 2.917e-3)
 		  (fractions 0.0 1.0 0.0)))
 	   (DSmax 0.99)
-	   (DSnew 0.2)
-	   (C_Stem 0.420)
-	   (C_Leaf 0.420)
-	   (C_SOrg 0.420)
-	   (C_Dead 0.420)
-	   (C_Root 0.420))
+	   (DSnew 0.2))
 )
 
 (defcrop Grass "Grass to grain"
