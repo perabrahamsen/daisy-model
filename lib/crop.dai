@@ -12,12 +12,4 @@
 (input file "wwheat.dai")
 (input file "grass2.dai")
 
-;; Compatibility, remove.
-(defcrop SpringBarley "S.Barley"
-  (Canopy (WLfInit 30)))
-(defcrop WinterWheat "W.Wheat"
-  (Canopy (WLfInit 30)))
-(defcrop Grass "Grass, DS=2"
-  (Canopy (WLfInit 30)))
-
 ;;; crop.dai ends here
