@@ -603,6 +603,7 @@ dist:	cvs
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip $(FTPDIR)
 	(cd lib && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
+	(cd sample && $(MAKE) FTPDIR=$(FTPDIR) TAG=$(TAG) dist)
 	(cd txt && $(MAKE) FTPDIR=$(FTPDIR) dist)
 	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
 	rm -f $(FTPDIR)/$(HOSTTYPE)/daisy-$(TAG)
@@ -634,6 +635,7 @@ cvs: $(TEXT)
 	echo >> ChangeLog
 	cat ChangeLog.old >> ChangeLog
 	(cd lib; $(MAKE) cvs);
+	(cd sample; $(MAKE) cvs);
 	(cd txt; $(MAKE) cvs);
 	-cvs add $(TEXT)
 	rm -f $(REMOVE) 

@@ -1,6 +1,26 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* Check ckeckpoint
+* workshop
+
+** sample files
+
+*** irrigation strategy
+
+tensiometer
+
+soil water content
+
+*** pedotransfer
+
+cosby & hypres
+
+** Skal det blive til en test suite?
+
+* crop simple med nit
+
+* Tove
+
+denit og nit parametre.
 
 * Advarsel hvis "from" eller "to" ikke ligger ved et interval.
 
@@ -42,6 +62,8 @@ Update hydraulic models.
 * Ny phenology model 
 
 En liste af stages, hver med sit eget navn og egne parametre.
+
+* SOM equilibrium (bgj)
 
 * Irrigation
 

@@ -50,7 +50,7 @@ OM::output (Log& log) const
       daisy_assert (C.size () >= size);
       for (int i = 0; i < size; i++)
 	{
-	  if (N[i] == 0.0)
+	  if (N[i] < 1e-51)
 	    C_per_N.push_back (Unspecified);
 	  else
 	    C_per_N.push_back (C[i] / N[i]);

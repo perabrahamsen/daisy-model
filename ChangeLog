@@ -1,4 +1,18 @@
+2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/: New directory.
+	* sample/Makefile: New file.
+	* sample/dk-management.dai: New file.
+	* Makefile (dist, cvs): Use it.
+
+2004-07-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/Makefile (DAISY): Added it.
+	* lib/dk-soil.dai: New file.
+
 2004-06-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (output): Don't log C/N for small N.
 
 	* Version 3.45 released.
 
