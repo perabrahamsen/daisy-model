@@ -1,3 +1,7 @@
+2002-05-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.28 released.
+
 2002-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* action_tillage.C (ActionMixSyntax): Fix default value for
