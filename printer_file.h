@@ -51,7 +51,8 @@ public:
   void print_entry (const AttributeList&, const Syntax&,
 		    const std::string& key);
   // Print specific parameterization.
-  void print_parameterization (symbol library_name, symbol name);
+  void print_parameterization (symbol library_name, symbol name, 
+                               bool print_description = true);
   // Print all elements in all libraries associated with 'filename'.
   void print_library_file (const std::string& filename);
   // Print a parser input.

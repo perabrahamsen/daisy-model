@@ -69,7 +69,8 @@ struct PrinterFile::Implementation
                      const AttributeList&, int indent);
 
   // Top level print functions.
-  void print_parameterization (symbol library_name, symbol name);
+  void print_parameterization (symbol library_name, symbol name,
+                               bool print_description);
   void print_library_file (const string& filename);
   
   // Testing.
@@ -535,10 +536,14 @@ PrinterFile::Implementation::print_object (const AttributeList& value,
 
 void 
 PrinterFile::Implementation
-/**/::print_parameterization (const symbol library_name, const symbol name)
+/**/::print_parameterization (const symbol library_name, const symbol name,
+                              bool print_description)
 {
   Library& library = Library::find (library_name);
-  const AttributeList& alist = library.lookup (name);
+  AttributeList alist (library.lookup (name));
+  if (!print_description)
+    alist.remove ("description");
+  const AttributeList empty_alist;
 
   out << "(def" << library_name << " ";
   print_symbol (name);
@@ -634,7 +639,7 @@ PrinterFile::Implementation::print_library_file (const string& filename)
       else
 	out << "\n";
 
-      print_parameterization (found[i].library_name, found[i].element);
+      print_parameterization (found[i].library_name, found[i].element, true);
     }
 }
 
@@ -710,11 +715,14 @@ PrinterFile::print_entry (const AttributeList& alist, const Syntax& syntax,
     }
 }
 
+void 
+PrinterFile::print_parameterization (const symbol library_name, 
+                                     const symbol name, bool print_description)
+{ impl.print_parameterization (library_name, name, print_description); }
+
 void
 PrinterFile::print_library_file (const string& filename)
-{
-  impl.print_library_file (filename);
-}
+{ impl.print_library_file (filename); }
 
 void
 PrinterFile::print_input (const AttributeList& alist)

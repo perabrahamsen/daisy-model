@@ -1,3 +1,11 @@
+2004-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* printer_file.h, printer_file.C (print_parameterization): New
+	member. 
+	* document.h, document_LaTeX.C (print_parameterization_content):
+	New member function.
+	* document.C (print_model): Call it.
+
 2004-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* select_min.C, select_max.C, select_average.C, FILES: Removed.

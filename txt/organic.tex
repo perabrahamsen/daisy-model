@@ -39,7 +39,6 @@
 \end{abstract}
 
 \tableofcontents
-\pagebreak
 
 \section{Soil organic matter modelling}
 
@@ -60,23 +59,24 @@ In numeric models, these fractions may be further divided into smaller
 pools, the content of each pool assumed by the model to have uniform
 properties, e.g.\ similar turnover rate and C/N ratio.  Having two
 \textsc{som} and two \textsc{smb} pools allows a well calibrated model
-to capture both the short term (see XXX) and long term (XXX) dynamics
-of the system.  If you are only interested in accuracy on a single
-time scale, less pools may be needed.  The number of \textsc{aom}
-pools needed also depends on what you are simulating.  For batch
-experiments and some long time scenarios, a single pool may be enough.
-To simulate input sources from real farming, two pools per source are
-in general needed.
+to capture both the short term (see SHORT-TERM-NEED-2-POOLS-PAPER) and
+long term (LONG-TERM-NEED-2-POOLS-PAPER) dynamics of the system.  If
+you are only interested in accuracy on a single time scale, less pools
+may be needed.  The number of \textsc{aom} pools needed also depends
+on what you are simulating.  For batch experiments and some long time
+scenarios, a single pool may be enough.  To simulate input sources
+from real farming, two pools per source are in general needed.
 
 \section{\Daisy{}}
 
-In several comparisons (see XXX, YYY, ZZZ), \daisy{} (see XYZZY) has
-been among the best models for both short and long term predictions of
-soil matter, and \daisy{} will be the reference for the rest of this
-article.  Apart from soil organic matter, \daisy{} also simulates a
-number of other processes outside the scope of this article, such as
-water, heat and nitrogen dynamics in the soil, as well as bioclimate,
-crop development and management.
+In several comparisons \cite{vereecken91-compar, willigen91-compar,
+  diekkruger95-compar, smith97-compar} \daisy{} \cite{daisy-def,
+  daisy-fertilizer, daisy-ems} has been among the best models for both
+short and long term predictions of soil matter, and \daisy{} will be
+the reference for the rest of this article.  Apart from soil organic
+matter, \daisy{} also simulates a number of other processes outside
+the scope of this article, such as water, heat and nitrogen dynamics
+in the soil, as well as bioclimate, crop development and management.
 
 The purpose of the \daisy{} model is to simulate real farming
 practice, both on the short and the long term.  Thus, we get a system
@@ -88,7 +88,7 @@ field.  The original model is depicted in figure~\ref{fig:om1}.
   \centering
   \includegraphics[width=0.8\hsize]{om1}
 
-  \caption{The original Daisy OM parameterization.}
+  \caption{The original \daisy{} OM parameterization.}
   \label{fig:om1}
 \end{figure}
 
@@ -133,11 +133,11 @@ fertilizer application and each crop residual type.  It thus provides
 a good basis for experimentation.
 
 The first such experimental change that made it back into \daisy{} was
-made by Torsten Müller (see XXX 19??), who adjusted the turnover rates
+made by Torsten Müller \cite{mueller-smb}, who adjusted the turnover rates
 of the \textsc{smb} pools so the biomass content of the soil better
 matched the levels measured at the fields.  The change did not affect
 the long time dynamics of the systen.  The second such change was made
-by Anders Sanders (see XXX 19??).  The was a complete recalibration
+by Anders Sanders \cite{daisy-somnew}.  The was a complete recalibration
 that took into account the carbon input from rhizodepositions.  This
 change was more radical, involving both turnover rates and directions
 of flow, and made the system much more adaptable to new levels of
@@ -145,7 +145,7 @@ input, another effect which has also been observed emperically (see
 DJF repport on humus levels).
 
 The current model is depicted in~\ref{fig:om2}.  The purpose of the
-SOM3 pool in that figure will be explained later.
+\textsc{som3} pool in that figure will be explained later.
 
 \begin{figure}[htbp]
   \centering
@@ -230,15 +230,15 @@ also shows the simulated\footnote{Simulated values are on the dotted
   line.  The $\Diamond$'s and $+$'s indicate the initialization values
   for the current humus level chosen by two variants of the proposed
   quasi-equilibrium.} \textsc{som1} fraction of total \textsc{som}.
-Finally, figure~\ref{fig:sandom} shows the a simulation on a coarse
-sandy soil going from a low to high input equilibrium.
+Finally, figure~\ref{fig:sandom} shows the a simulation on a COARSE
+SANDY SOIL going from a low to high input equilibrium.
 
 \begin{figure}[htbp]
   \centering
   \input{clayh2l.tex}
   \caption{Long term simulation of organic matter content (left axis)
     and \textsc{som1} fraction (right axis) from changing from high to
-    low input on a clayish loam.}
+    low input on a CLAYISH LOAM.}
   \label{fig:clayom}
 \end{figure}
 
@@ -247,7 +247,7 @@ sandy soil going from a low to high input equilibrium.
   
   \caption{Long term simulation of organic matter content (left axis)
     and \textsc{som1} fraction (right axis) from changing from low to
-    high input on a sandy soil.}
+    high input on a SANDY SOIL.}
   \label{fig:sandom}
 \end{figure}
 

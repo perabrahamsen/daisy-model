@@ -137,7 +137,7 @@ Document::print_model (ostream& out, const symbol name,
 	    print_parameterization_description (out, description);
 	}
       print_users (out, xref.models[used]);
-      print_parameterization_content (out, library.name () name);
+      print_parameterization_content (out, library.name (), name);
       print_parameterization_trailer (out, name);
     }
   else

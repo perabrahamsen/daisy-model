@@ -901,12 +901,12 @@ DocumentLaTeX::print_parameterization_description (std::ostream& out,
 
 void 
 DocumentLaTeX::print_parameterization_content (std::ostream& out, 
-					       const symbol library_nme, 
+					       const symbol library_name, 
 					       const symbol name)
 {
   out << "\n\\begin{verbatim}\n";
   PrinterFile printer (out);
-  printer.print_parameterization (library_name, name);
+  printer.print_parameterization (library_name, name, false);
   out << "\\end{verbatim}\n";
 }
 

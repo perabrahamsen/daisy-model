@@ -1,11 +1,10 @@
-emacs.font: -*-courier-medium-r-normal--18-*-*-*-*-*-*-*
-emacs.toolBar: 0
-
 TODO --- things that needs done with Daisy -*- outline -*-
 
 * Organic Matter Article
 
 ** Find ud af hvorfor eq ikke finder rette humus for ler!
+
+*** check input.
 
 ** Plot initialisering med background_mineralization = 0.
 
