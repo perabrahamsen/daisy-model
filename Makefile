@@ -613,8 +613,6 @@ dist:	cvs
 	$(CROSSSTRIP) -o $(FTPDIR)/$(TARGETTYPE)/daisy-$(TAG).exe \
 		$(OBJHOME)/$(TARGETTYPE)/daisy
 	(cd $(FTPDIR); ln -s $(TARGETTYPE)/daisy-$(TAG).exe daisy.exe)
-
-foo:
 	(cd exercises && $(MAKE) FTPDIR=$(FTPDIR) dist)
 
 version.C:
