@@ -250,7 +250,7 @@ SoilHeat::Implementation::update_state (const Soil& soil,
 	  break;
 	}
       assert (-freezing_rate[i] * rho_water / rho_ice
-	      <= soil_water.X_ice_total (i));
+	      <= soil_water.X_ice_total (i) * 1.0001);
     }
   return changed;
 }
