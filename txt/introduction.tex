@@ -387,14 +387,14 @@ the attributes of the main model are documented, as described in
 section~\ref{sec:alist-doc}.  You can even have submodels nested
 inside submodels, ad infinitum.
 
-\section{The Daisy Component and Named Parameterizations}
+\section{The Daisy Model and Named Parameterizations}
 \label{sec:daisy}
 
-Try to look at section~\ref{fixed:Daisy}, which describes a fixed
-component named `Daisy'.  That component is actually the top level
-description of the simulation.  All you need to do in a setup file, is
-to specify values for the six attributes.  Then you will be ready to
-run it.
+Try to look at section~\ref{model:Daisy}, which describes a program
+model named `Daisy'.  That model is actually the top level description
+of the simulation.  All you need to do in a setup file, is to specify
+values for the specified attributes.  Then you will be ready to run
+it.
 
 The main attribute is `column', which describes the physical model
 itself.  To run the model, you also need to specify `time', which is
@@ -446,7 +446,7 @@ described in the rest of this section.
 The file parser will search for files in the directories specified by
 the \texttt{DAISYPATH} environment variable
 (see~\ref{sec:distribution}), or by the `path' attribute
-(section~\ref{fixed:Daisy}. 
+(section~\ref{model:Daisy}. 
 
 \subsection{Simulation Time}
 
@@ -714,7 +714,7 @@ dimension string to print in the second row.
 The most important log entry parameter is `path', which specifies the
 state or log variable we want to include in the log file.  The value
 is a sequence of attribute names, which should be read as follows:
-Start with the Daisy fixed component (section~\ref{fixed:Daisy}), and
+Start with the Daisy model (section~\ref{model:Daisy}), and
 select an attribute in that model.  That should be the first name
 listed in the path sequence.
 \begin{itemize}
