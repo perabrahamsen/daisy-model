@@ -52,7 +52,7 @@ struct ActionProgn : public Action
   bool check (const Daisy& daisy, Treelog& err) const
     { 
       bool ok = true;
-      for (vector<const Action*>::const_iterator i = actions.begin ();
+      for (vector<Action*>::const_iterator i = actions.begin ();
 	   i != actions.end ();
 	   i++)
 	{

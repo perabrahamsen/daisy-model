@@ -5,7 +5,9 @@
 
 #include "common.h"
 
-#ifdef MISSING_OSTREAM
+#if 1
+#include <iosfwd>
+#elif definded (MISSING_OSTREAM)
 #include <iostream.h>
 #elif defined (BROKEN_HEADERS)
 #include <ostream.h>

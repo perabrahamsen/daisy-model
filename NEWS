@@ -14,8 +14,11 @@ release.
 
 * 1.77
 
-You can now plant emerged crops.  Define the crop like below, and use
-the normal "sow" command.
+** Ported to GCC 3.0
+
+** You can now plant emerged crops.  
+
+Define the crop like below, and use the normal "sow" command.
 
 (defcrop "Maize for Planting" "Maize"
  (Phenology (DS 0.269081))

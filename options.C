@@ -7,6 +7,7 @@
 #include "alist.h"
 #include "treelog_stream.h"
 #include "version.h"
+#include "message.h"
 
 const char *const Options::log_name = "DAISY_LOG";
 const char *const Options::path_name = "DAISYPATH";

@@ -6,6 +6,7 @@
 #include "time.h"
 #include "tmpstream.h"
 #include "treelog_stream.h"
+#include "message.h"
 
 struct ParserFile::Implementation
 {

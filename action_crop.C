@@ -10,6 +10,7 @@
 #include "harvest.h"
 #include "im.h"
 #include "tmpstream.h"
+#include "message.h"
 
 struct ActionCrop : public Action
 {

@@ -9,6 +9,7 @@
 #include "soil.h"
 #include "log.h"
 #include "mathlib.h"
+#include "message.h"
 
 // Dimensional conversion.
 static const double m_per_cm = 0.01;

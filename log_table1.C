@@ -4,6 +4,7 @@
 #include "condition.h"
 #include "time.h"
 #include "geometry.h"
+#include "message.h"
 #include <fstream.h>
 #include <numeric>
 #include <set>

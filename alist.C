@@ -8,6 +8,7 @@
 #include "common.h"
 #include <assert.h>
 #include <map>
+#include "message.h"
 
 // @ Value
 //

@@ -4,13 +4,17 @@
 #include "tmpstream.h"
 #include "treelog.h"
 #include "options.h"
+#include "message.h"
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <iostream>
+
 using namespace std;
 
-bool
-Lexer::open_file (ifstream& in, const string& name)
+istream& 
+Lexer::open_file (const string& name)
 {
   // Absolute filename.
   if (name[0] == '.' || name[0] == '/'
@@ -19,8 +23,7 @@ Lexer::open_file (ifstream& in, const string& name)
 #endif
       )
     {
-      in.open (name.c_str ());
-      return in.good ();
+      return *new ifstream (name.c_str ());
     }
 
   // Relative filename, use path.
@@ -42,14 +45,18 @@ Lexer::open_file (ifstream& in, const string& name)
       path.push_back (colon_path.substr (last));
     }
   assert (path.size () > 0);
+  ifstream* in = NULL;
   for (unsigned int i = 0; i < path.size (); i++)
     {
       const string file = path[i] + DIRECTORY_SEPARATOR + name;
-      in.open (file.c_str ());
-      if (in.good ())
-	return true;
+      CERR << "Trying " << file << "...\n";
+      delete in;
+      in = new ifstream (file.c_str ());
+      if (in->good ())
+	return *in;
+      CERR << "Failed.\n";
     }
-  return false;
+  return *in;
 }
 
 int
@@ -81,8 +88,9 @@ Lexer::peek ()
 bool
 Lexer::good ()
 {
-#ifdef BORLAND_EOF  
-// BCC requires that you try to read beyond the eof to detect eof.
+#if 1 
+  // BCC and GCC 3.0 requires that you try to read beyond the eof
+  // to detect eof.
   char c;
   in.get (c);
   bool ok = in.good ();
@@ -111,13 +119,14 @@ Lexer::eof ()
 }
     
 Lexer::Lexer (const string& name, Treelog& out)
-  : err (out),
+  : in (open_file (name)),
+    err (out),
     line (1),
     column (0),
     file (name),
     error_count (0)
 {  
-  if (!open_file (in, name))
+  if (&in == &cin || in.bad ())
     err.entry (string ("Open '") + file + "' failed");
 }
 
@@ -125,4 +134,6 @@ Lexer::~Lexer ()
 {
   if (in.bad ())
     err.entry (string ("There were trouble parsing '") + file  + "'");
+  if (&in != &cin)
+    delete &in;
 }

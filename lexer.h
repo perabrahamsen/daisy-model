@@ -4,7 +4,7 @@
 #define LEXER_H
 
 #include "common.h"
-#include <fstream>
+#include <iosfwd>
 using namespace std;
 
 class Treelog;
@@ -13,8 +13,8 @@ class Lexer
 {
   // State.
 private:
-  static bool open_file (ifstream& in, const string& name);
-  ifstream in;
+  static istream& open_file (const string& name);
+  istream& in;
 public:
   Treelog& err;
 private:

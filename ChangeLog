@@ -1,3 +1,33 @@
+2001-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.77 released.
+
+2001-07-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (richard): Check for darcy == 0.0.
+
+	* all: Ported to GCC 3.0.
+	
+2001-06-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* message.C, message.h: Split from common.C.
+	* Makefile (OTHER): Added it.
+
+2001-06-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* svat_pmsw.C (RSCSTAR): Use fabs, not abs.
+
+2001-06-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* weather_std.C (data_description): Unconst to make GCC 3.0 happy.
+	(keyword_description): Ditto.
+
+	* action_activity.C (ActionActivity::check): Remove const
+	* action_lisp.C (struct ActionProgn::check): Ditto.
+	* action_with.C (ActionWithColumn::check): Ditto.
+
+	* mathlib.C (set_exceptions): Declare varargs.
+
 2001-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* root_system.C (get_PotRtDpt): Workaround for Borland.

@@ -9,6 +9,7 @@
 #include "net_radiation.h"
 #include "vegetation.h"
 #include "log.h"
+#include "message.h"
 
 class PetPM : public Pet
 {
@@ -152,21 +153,21 @@ PetPM::RefPenmanMonteith (double Rn, double G, double Temp, double ea,
     (Weather::SaturationVapourPressure (Temp) - ea);
   E3 /= Weather::SlopeVapourPressureCurve (Temp) +
     Weather::PsychrometricConstant (AtmPressure, Temp) * (1 + 0.34 * U2);
- #if 1
+#if 1
   if (Rn>750.0)
     {
-      cout << "Rn          " << Rn << "\n";
-      cout << "G           " << G << "\n";
-      cout << "Temp        " << Temp << "\n";
-      cout << "es          " << Weather::SaturationVapourPressure (Temp) << "\n";
-      cout << "ea          " << ea << "\n";
-      cout << "U2          " << U2 << "\n";
-      cout << "AtmPressure " << AtmPressure << "\n";
-      cout << "Delta       " << Weather::SlopeVapourPressureCurve (Temp) << "\n";
-      cout << "Gamma       " << Weather::PsychrometricConstant (AtmPressure, Temp) << "\n";
-      cout << "Ep (mm/d)   " << E3 << "\n";
+      COUT << "Rn          " << Rn << "\n";
+      COUT << "G           " << G << "\n";
+      COUT << "Temp        " << Temp << "\n";
+      COUT << "es          " << Weather::SaturationVapourPressure (Temp) << "\n";
+      COUT << "ea          " << ea << "\n";
+      COUT << "U2          " << U2 << "\n";
+      COUT << "AtmPressure " << AtmPressure << "\n";
+      COUT << "Delta       " << Weather::SlopeVapourPressureCurve (Temp) << "\n";
+      COUT << "Gamma       " << Weather::PsychrometricConstant (AtmPressure, Temp) << "\n";
+      COUT << "Ep (mm/d)   " << E3 << "\n";
     }
- #endif
+#endif
   return E3 / 86400.0; // [kg/m2/s]
 }
 

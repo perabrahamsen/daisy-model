@@ -6,6 +6,7 @@
 #include "solute.h"
 #include "log.h"
 #include "mathlib.h"
+#include "message.h"
 
 class TransportCD : public Transport
 {

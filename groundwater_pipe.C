@@ -6,6 +6,7 @@
 #include "tmpstream.h"
 #include "treelog.h"
 #include "mathlib.h"
+#include "message.h"
 
 class GroundwaterPipe : public Groundwater
 {

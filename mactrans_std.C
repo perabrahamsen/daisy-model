@@ -5,6 +5,7 @@
 #include "soil.h"
 #include "plf.h"
 #include "mathlib.h"
+#include "message.h"
 
 struct MactransStandard : public Mactrans
 {

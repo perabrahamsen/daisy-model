@@ -6,6 +6,7 @@
 #include "am.h"
 #include "im.h"
 #include "tmpstream.h"
+#include "message.h"
 
 struct ActionFertilize : public Action
 {

@@ -8,6 +8,7 @@
 #include "common.h"
 #include "log.h"
 #include "average.h"
+#include "message.h"
 
 class UZRichard : public UZmodel
 {
@@ -409,7 +410,8 @@ UZRichard::richard (const Soil& soil,
 		      * ((  (h[i - first] - h[i + 1 - first])
 			  / (soil.z (i) - soil.z (i + 1)))
 			 + 1);
-		    if (fabs (q[i+1] / darcy - 1.0) > 0.10
+		    if ((fabs (darcy) > 1.0e-30
+			 && fabs (q[i+1] / darcy - 1.0) > 0.10)
                         && fabs (q[i+1] - darcy) > 0.01 / ddt
                         && i<2)
 		      {

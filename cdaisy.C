@@ -18,6 +18,7 @@
 #include "chemical.h"
 #include "log_extern.h"
 #include "treelog_stream.h"
+#include "message.h"
 #include <fstream.h>
 
 typedef int daisy_bool;

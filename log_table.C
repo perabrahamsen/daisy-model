@@ -5,6 +5,7 @@
 #include "geometry.h"
 #include "version.h"
 #include "daisy.h"
+#include "message.h"
 #include <fstream.h>
 #include <time.h>
 

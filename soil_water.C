@@ -12,6 +12,8 @@
 #include "tmpstream.h"
 #include "submodel.h"
 
+#include "message.h"
+
 void
 SoilWater::clear (const Geometry&)
 {

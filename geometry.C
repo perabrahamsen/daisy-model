@@ -5,6 +5,7 @@
 #include "alist.h"
 #include "tmpstream.h"
 #include "mathlib.h"
+#include "message.h"
 #include <assert.h>
 
 unsigned int 

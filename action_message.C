@@ -4,6 +4,7 @@
 #include "condition.h"
 #include "log.h"
 #include "daisy.h"
+#include "message.h"
 
 struct ActionAssert : public Action
 {

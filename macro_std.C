@@ -6,6 +6,7 @@
 #include "mathlib.h"
 #include "log.h"
 #include "uzmodel.h"
+#include "message.h"
 
 struct MacroStandard : public Macro
 {

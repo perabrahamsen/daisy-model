@@ -9,6 +9,7 @@
 #include "harvest.h"
 #include "log.h"
 #include <deque>
+#include "message.h"
 
 struct VegetationCrops : public Vegetation
 {

@@ -50,7 +50,7 @@ struct NetRadiationParent : public NetRadiation
       const double Ln
 	= NetLongwaveRadiation (Cloudiness, Temp, VapourPressure);
       net_radiation_ = (1.0 - Albedo) * Si - Ln;
-#if 1
+#if 0
       if (net_radiation_>750)
       {
         cout << "Albedo     " << Albedo << "\n";

@@ -4,6 +4,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "crop.h"
+#include "message.h"
 
 struct ActionSow : public Action
 {

@@ -20,6 +20,7 @@
 #include "common.h"
 #include "column.h"
 #include "submodel.h"
+#include "message.h"
 
 const char *const Daisy::default_description = "\
 The Daisy Crop/Soil/Atmosphere Model.";

@@ -4,6 +4,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "im.h"
+#include "message.h"
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<IM>;

@@ -36,8 +36,8 @@ endif
 
 # Set USE_OPTIMIZE to `true' if you want a fast executable.
 #
-#USE_OPTIMIZE = true
-USE_OPTIMIZE = false
+USE_OPTIMIZE = true
+#USE_OPTIMIZE = false
 
 # Set USE_PROFILE if you want to profile the executable
 #
@@ -85,16 +85,16 @@ endif
 #
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),gcc)
-		OPTIMIZE = -O3 -ffast-math 
+		OPTIMIZE = -O2 -ffast-math 
 		ifeq ($(HOSTTYPE),sun4)
-			OPTIMIZE = -O3 -ffast-math -fno-inline
+			OPTIMIZE = -O2 -ffast-math -mcpu=v8 -mtune=ultrasparc
 #`-mcpu=ultrasparc' breaks `IM::IM ()' with gcc 2.95.1.
 		endif
 		ifeq ($(HOSTTYPE),cygwin)
-		  OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
+		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
 		endif
 		ifeq ($(HOSTTYPE),mingw)
-		  OPTIMIZE = -O3 -ffast-math -mcpu=pentiumpro -march=pentium
+		  OPTIMIZE = -O2 -ffast-math -mcpu=pentiumpro -march=pentium
 		endif
 	endif
 endif
@@ -102,7 +102,7 @@ endif
 # Do we want to create a dynamic library?
 #
 ifeq ($(HOSTTYPE),sun4)
-	USE_DYNLIB = true
+	USE_DYNLIB = false
 endif
 ifeq ($(HOSTTYPE),hp)
 	USE_DYNLIB = true
@@ -292,7 +292,7 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = options.C traverse_delete.C \
+OTHER = message.C options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
@@ -348,7 +348,7 @@ all:	#(EXECUTABLES)
 daisy.exe:	main${OBJ} $(LIBOBJ)
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
-daisy:	main${OBJ} daisy.so
+daisy:	main${OBJ} $(LIBOBJ) #daisy.so
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.

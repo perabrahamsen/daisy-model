@@ -6,6 +6,7 @@
 #include "solute.h"
 #include "log.h"
 #include "mathlib.h"
+#include "message.h"
 
 class TransportNone : public Transport
 {

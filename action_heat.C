@@ -3,6 +3,7 @@
 #include "action.h"
 #include "daisy.h"
 #include "field.h"
+#include "message.h"
 
 struct ActionSetHeatSource : public Action
 {

@@ -19,6 +19,7 @@
 #include "submodel.h"
 #include <algorithm>
 #include <numeric>
+#include "message.h"
 
 struct OrganicMatter::Implementation
 {

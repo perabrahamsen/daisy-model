@@ -6,6 +6,7 @@
 #include "mathlib.h"
 #include "submodel.h"
 #include "log.h"
+#include "message.h"
 #include <assert.h>
 #include <iomanip.h>
 

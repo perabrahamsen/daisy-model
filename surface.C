@@ -16,6 +16,8 @@
 #include "plf.h"
 #include "ridge.h"
 
+#include "message.h"
+
 struct Surface::Implementation
 {
   // Content.

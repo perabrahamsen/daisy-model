@@ -11,6 +11,7 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 #include <numeric>
+#include "message.h"
 
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
 

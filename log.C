@@ -2,6 +2,7 @@
 
 #include "log.h"
 #include "daisy.h"
+#include "message.h"
 
 Librarian<Log>::Content* Librarian<Log>::content = NULL;
 

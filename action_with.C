@@ -32,7 +32,7 @@ public:
     { 
       Treelog::Open nest (err, string ("with") + column);
       bool ok = true;
-      for (vector<const Action*>::const_iterator i = actions.begin ();
+      for (vector<Action*>::const_iterator i = actions.begin ();
 	   i != actions.end ();
 	   i++)
 	{

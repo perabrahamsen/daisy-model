@@ -38,7 +38,7 @@ struct WeatherStandard : public Weather
     double max;
     bool required;
   };
-  static const keyword_description_type keyword_description[];
+  static keyword_description_type keyword_description[];
   static const int keyword_description_size;
   int timestep;
   Time begin;
@@ -55,7 +55,7 @@ struct WeatherStandard : public Weather
     double max;
     bool required;
   };
-  static const data_description_type data_description[];
+  static data_description_type data_description[];
   static const int data_description_size;
   vector<int> data_index;
   bool has_data (const string& name);
@@ -209,7 +209,7 @@ WeatherStandard::convert_unit (const string& from, const string& to)
   return -42.42e42;
 }
 
-const WeatherStandard::keyword_description_type 
+WeatherStandard::keyword_description_type 
 WeatherStandard::keyword_description[] =
 { { "Latitude", "dgNorth", &WeatherStandard::latitude, -90, 90, true },
   { "Longitude", "dgEast", &WeatherStandard::longitude, -360, 360, true },
@@ -225,7 +225,7 @@ WeatherStandard::keyword_description_size
 /**/ = sizeof (WeatherStandard::keyword_description) 
   /**/ / sizeof (keyword_description_type);
 
-const WeatherStandard::data_description_type 
+WeatherStandard::data_description_type 
 WeatherStandard::data_description[] =
 { { "Year", "year", &WeatherStandard::next_year, NULL,
     1, 9999, false },

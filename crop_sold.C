@@ -16,6 +16,7 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
+#include "message.h"
 
 class CropSold : public Crop
 {

@@ -4,6 +4,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "ridge.h"
+#include "message.h"
 
 struct ActionRidge : public Action
 {

@@ -10,6 +10,8 @@
 #include "submodel.h"
 #include "mathlib.h"
 
+#include "message.h"
+
 struct Snow::Implementation
 { 
   // Flux variables.

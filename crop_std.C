@@ -18,6 +18,7 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
+#include "message.h"
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;

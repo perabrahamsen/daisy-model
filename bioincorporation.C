@@ -12,6 +12,7 @@
 #include "om.h"
 #include "mathlib.h"
 #include <algorithm>
+#include "message.h"
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule_sequence<OM>;

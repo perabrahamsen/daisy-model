@@ -7,6 +7,14 @@
 
 #include "common.h"
 
+#if defined (MISSING_OSTREAM)
+#include <iostream.h>
+#elif defined (BROKEN_HEADERS)
+#include <ostream.h>
+#else
+#include <ostream>
+#endif
+
 class TmpStream
 {
   // Content.

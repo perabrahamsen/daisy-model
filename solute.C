@@ -7,6 +7,7 @@
 #include "soil.h"
 #include "soil_water.h"
 #include "mathlib.h"
+#include "message.h"
 
 double
 Solute::total (const Geometry& geometry, double from, double to) const

@@ -4,6 +4,7 @@
 #include "daisy.h"
 #include "field.h"
 #include "chemical.h"
+#include "message.h"
 
 struct ActionSpray : public Action
 {

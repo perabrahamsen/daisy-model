@@ -5,7 +5,6 @@
 
 // description of functions
 # include "surface.h"
-# include <iostream.h>
 # include <math.h>
 # include <fstream.h>
 # include <stdio.h>
@@ -429,7 +428,7 @@ int RAS(double u, double h, double LAI, double z_0s, double alpha_k, double c_d,
 // rcmin could be passed as a parameter through RS measurements
 
 int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
-         double esta, double theta_w, double theta_c, double rcmin,
+         double esta, double theta_w, double theta_c, double /*rcmin*/,
          double rcmax, double zeta, double f3const, double tref, double spar,
          double tmin, double tmax, double nu_1, double nu_2, double nu_3,
          double crop_ea_w, double crop_ep_w, double rcmin_star,
@@ -607,7 +606,7 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   assert (r_sc != 0.0);
   // Assume 2 criteria: lel > 25.0 & abs(crop_ea-lel) > 50.0 (noise reduction)
   // when incepted water evaporates rpstress = 0 (no stress)
-  if (canopy_ea > 0.0 || lel < 25.0 || abs(crop_ea_w-lel) < 50.0) rpstress = 0.0;
+  if (canopy_ea > 0.0 || lel < 25.0 || fabs(crop_ea_w-lel) < 50.0) rpstress = 0.0;
   		else rpstress=1.0-min(1.0,rrcmin_star/r_sc);
 /*
 	rpstress=0.0;
@@ -667,7 +666,7 @@ int GFLUX(double tskin, double kh, double temp_0, double &rgflux)
 // calculation of energy fluxes using SW and SG: stressed conditions
 
 int LEHFLUX(double tair,double tskin,double tcan,double tleaf,double r_aastab1,
-            double r_ac,double r_as,double r_sc,double r_sc_js, double e_c_abs,
+            double r_ac,double r_as,double r_sc,double /*r_sc_js*/, double e_c_abs,
             double e_sl_abs, double e_abs,double les,double crop_ea_w,
             double canopy_ea_w,double &rhl,double &rha, double &rhs,double &rlea,
             double &rlel,double &rhclos,double &rleclos, double &rdtcta,
@@ -1274,7 +1273,7 @@ SVAT_PMSW::production_stress () const
 
 void
 SVAT_PMSW::tick (const Weather& weather, const Vegetation& crops,
-                 const Surface& surface, const Soil& soil, const SoilHeat& soil_heat,
+                 const Surface& , const Soil& soil, const SoilHeat& soil_heat,
                  const SoilWater& soil_water, const Pet& pet, double canopy_ea ,
                  double snow_ea, double pond_ea, double soil_ea, double crop_ea,
                  double crop_ep)

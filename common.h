@@ -15,7 +15,7 @@
 #define BORLAND
 #endif
 
-#if defined (__GNUC__) || defined (BORLAND)
+#if (defined (__GNUC__) && __GNUC__ < 3) || defined (BORLAND)
 #define BROKEN_HEADERS
 #endif
 
@@ -135,26 +135,5 @@ void sequence_delete (ForwardIterator first, ForwardIterator last) {
     delete *first++;
 }
 
-#ifdef MISSING_OSTREAM
-#include <iostream.h>
-#elif defined (BROKEN_HEADERS)
-#include <ostream.h>
-#else
-#include <ostream>
-#endif
-
-#define CERR (DebugMessages::error ())
-#define CWAR (DebugMessages::warning ())
-#define COUT (DebugMessages::message ()) 
-
-class DebugMessages
-{
-public: 
-  static ostream& message ();
-  static ostream& warning ();
-  static ostream& error ();
-private:
-  DebugMessages ();
-};
 
 #endif // COMMON_H
