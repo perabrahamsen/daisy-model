@@ -29,6 +29,7 @@ public:
   void set_energy (const Soil&, const SoilWater&, 
 		   double from, double to, double energy);
   void swap (const Soil&, double from, double middle, double to);
+  void set_source (unsigned int i, double value); // [erg/cm^3/h]
   double T (unsigned int i) const; // [dg C]
   void output (Log&) const;
   bool check (unsigned n) const;

@@ -36,6 +36,7 @@ struct SoilHeat::Implementation
   vector<double> q;
   vector<double> capacity;
   vector<double> C_apparent;
+  vector<double> S;
 
   /* const */ double delay;	// Period delay [ cm/rad ??? ]
 
@@ -439,6 +440,9 @@ SoilHeat::Implementation::solve (const Time& time,
       if (state[i] == freezing || state[i] == thawing)
 	d[i] -= latent_heat_of_fussion * rho_water
 	  * (soil_water.q (i) - soil_water.q (next)) / soil.dz (i) / dt;
+
+      // External heat source.
+      d[i] += S[i];
     }
   d[size - 1] = d[size - 1] - c[size - 1] * T_bottom;
   tridia (0, size, a, b, c, d, T.begin ());
@@ -568,7 +572,10 @@ SoilHeat::Implementation::Implementation (const AttributeList& al)
   : h_frozen (al.number ("h_frozen")),
     enable_ice (al.flag ("enable_ice")),
     T_top (al.check ("T_top") ? al.number ("T_top") : -500.0)
-{ }
+{ 
+  if (al.check ("S"))
+    S = al.number_sequence ("S");
+}
 
 void
 SoilHeat::Implementation::initialize (const AttributeList& al, 
@@ -584,6 +591,8 @@ SoilHeat::Implementation::initialize (const AttributeList& al,
   q.insert (q.end (), soil.size () + 1U, 0.0);
   capacity.insert (capacity.end (), soil.size (), 0.0);
   C_apparent.insert (C_apparent.end (), soil.size (), 0.0);
+  while (S.size () < soil.size ())
+    S.push_back (0.0);
 
   // Fetch average temperatur.
   const double rad_per_day = 2.0 * M_PI / 365.0;
@@ -659,6 +668,11 @@ SoilHeat::swap (const Soil& soil, double from, double middle, double to)
   soil.swap (impl.T, from, middle, to);
 }
   
+void
+SoilHeat::set_source (unsigned int i, double value)
+{ impl.S[i] = value; }
+
+
 double
 SoilHeat::T (unsigned int i) const
 {
@@ -717,6 +731,8 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Soil heat capacity (exclusing freezing/melting).");
   syntax.add ("state", Syntax::Unknown (), Syntax::LogOnly, Syntax::Sequence,
 	      "Current freezing/melting state.");
+  syntax.add ("S", "erg/cm^3/h", Syntax::OptionalState, 
+	      "External heat source, by default zero.");
 }
 
 SoilHeat::SoilHeat (const AttributeList& al)

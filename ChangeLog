@@ -1,10 +1,24 @@
 2000-02-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 1.18 released.
+
+2000-02-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* event.C, eventqueue.C, minimanager.C: Removed files.
+
+	* soil_heat.C (S): New data member.
+	* soil_heat.h, soil_heat.C (set_source): Set it.
+	* column_std.C, column.h (set_heat_source): New function.
+	* field.h, field.C (set_heat_source): New function.
+	* action_heat.C: New model.
+	* Makefile (MODELS): Added it.
+
 	* Version 1.17 released.
 
 2000-02-29  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* hydraulic_M_vG_compact.C: New model.
+	* Makefile (MODELS): Added it.
 	* hydraulic.C, hydraulic.h (set_porosity): New function.
 	* soil.h (set_porosity): New function.
 	* column.h, column_std.C (set_porosity): New function.

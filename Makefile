@@ -198,7 +198,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = hydraulic_M_vG_compact.C \
+MODELS = action_heat.C hydraulic_M_vG_compact.C \
 	action_crop.C groundwater_lysimeter.C select_min.C \
 	select_max.C select_average.C action_message.C weather_std.C \
 	select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
@@ -258,11 +258,9 @@ OTHER = lexer_data.C lexer.C daisy.C alist.C syntax.C library.C csmp.C \
 
 # Support for Jeppe and Rino's GUI frontend.
 #
-JRI = event.C eventqueue.C minimanager.C 
-
 # Everything that has an interface.
 #
-INTERFACES = $(COMPONENTS) $(SUBMODELS) $(SPECIALS) $(OTHER) $(JRI)
+INTERFACES = $(COMPONENTS) $(SUBMODELS) $(SPECIALS) $(OTHER)
 
 # Select the C files that are not part of the library.
 #
@@ -288,8 +286,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = log_file.C filter_array.C filter_all.C filter_none.C filter_some.C \
-	filter_checkpoint.C filter.C 
+REMOVE = event.C eventqueue.C minimanager.C 
 
 # These are the file extensions we deal with.
 # 
@@ -367,7 +364,6 @@ wc-split: $(MODELS) $(INTERFACES)
 	cat $(SUBMODELS) $(SUBMODELS:.C=.h) | wc 
 	cat $(SPECIALS) $(SPECIALS:.C=.h) | wc
 	cat $(OTHER) $(OTHER:.C=.h) | wc
-	cat $(JRI) $(JRI:.C=.h) | wc
 
 filecount: $(HEADERS) $(SOURCES) 
 	ls $(TEXT) | wc

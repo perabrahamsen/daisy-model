@@ -33,6 +33,7 @@ struct Field::Implementation
 		    double from, double to, double penetration);
   void swap (const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
+  void set_heat_source (double at, double value);
   void spray (const string& chemical, double amount); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 
@@ -240,6 +241,17 @@ Field::Implementation::set_porosity (double at, double Theta)
 	    i != columns.end ();
 	    i++)
     (*i)->set_porosity (at, Theta);
+}
+
+void 
+Field::Implementation::set_heat_source (double at, double value)
+{
+  if (selected)
+    selected->set_heat_source (at, value);
+  else for (ColumnList::iterator i = columns.begin ();
+	    i != columns.end ();
+	    i++)
+    (*i)->set_heat_source (at, value);
 }
 
 void 
@@ -493,6 +505,10 @@ Field::swap (const Time& time, double from, double middle, double to)
 void 
 Field::set_porosity (double at, double Theta)
 { impl.set_porosity (at, Theta); }
+
+void 
+Field::set_heat_source (double at, double value)
+{ impl.set_heat_source (at, value); }
 
 void 
 Field::spray (const string& chemical, double amount) // [g/ha]

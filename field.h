@@ -50,6 +50,7 @@ public:
 		    double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
+  void set_heat_source (double at, double value); // [W/m^2]
   void spray (const string& chemical, double amount); // [g/ha]
   void set_surface_detention_capacity (double height); // [mm]
 

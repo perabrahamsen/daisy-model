@@ -64,6 +64,7 @@ public:
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
+  void set_heat_source (double at, double value); // [W/m^2]
   void spray (const string& chemical, double amount) // [g/ha]
   { bioclimate.spray (chemical, amount / (100.0 * 100.0) /* ha->m^2 */); }
   void set_surface_detention_capacity (double height) // [mm]
@@ -242,6 +243,19 @@ ColumnStandard::swap (const Time& time, double from, double middle, double to)
 void 
 ColumnStandard::set_porosity (double at, double Theta)
 { soil.set_porosity (soil.interval_plus (at), Theta); }
+
+void 
+ColumnStandard::set_heat_source (double at, double value) // [W/m^2]
+{
+  const unsigned i = soil.interval_plus (at);
+  const double dz = soil.dz (i);
+
+  value *= 10^3;		// [W/m^2] -> [erg/cm^2/s]
+  value *= 3600;		// [erg/cm^2/s] -> [erg/cm^2/h]
+  value /= dz;			// [erg/cm^2/h] -> [erg/cm^3/h]
+  
+  soil_heat.set_source (i, value);
+}
 
 double 
 ColumnStandard::soil_temperature (double height) const
