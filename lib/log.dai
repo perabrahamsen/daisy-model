@@ -1170,15 +1170,15 @@
 		   (dimension "kg C/ha")
 		   (factor 10))		;g/m^2 -> kg/ha
 	   (interval (path column "$col" OrganicMatter am "*"
-			   "?bio/incorporation" om C)
+			   "?bio/incorporation" om N)
 		     (tag "SOIL2_N")
 		     (dimension "kg N/ha")
-		     (factor 42e5))		;g/cm^2 -> kg/ha
+		     (factor 1e5))		;g/cm^2 -> kg/ha
 	   (interval (path column "$col" OrganicMatter am "*"
-			   "?bio/incorporation" om N) 
+			   "?bio/incorporation" om C) 
 		     (tag "SOIL2_C")
 		     (dimension "kg C/ha")
-		     (factor 42e5))		;g/cm^2 -> kg/ha
+		     (factor 1e5))		;g/cm^2 -> kg/ha
 	   (number (path column "$col" OrganicMatter am "*" om top_N)
 		   (tag "TOP_N")
 		   (dimension "kg N/ha")
@@ -1211,6 +1211,34 @@
 		   (factor 4.2))		;g DM/m^2 -> kg C/ha
 	   ))
 
+(deflog AM table
+  (where "am.tab")
+  (when (hour 0))
+  (entries (year (path time))
+	   (month (path time))
+	   (mday (path time))
+	   (interval (path column "$col" OrganicMatter am "*"
+			   "$am" om N)
+		     (tag "SOIL2_N")
+		     (dimension "kg N/ha")
+		     (factor 1e5))		;g/cm^2 -> kg/ha
+	   (interval (path column "$col" OrganicMatter am "*"
+			   "$am" om C) 
+		     (tag "SOIL2_C")
+		     (dimension "kg C/ha")
+		     (factor 1e5))		;g/cm^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter am "*"
+			 "$am" om top_N)
+		   (tag "TOP2_N")
+		   (dimension "kg N/ha")
+		   (factor 1e5))	;g/cm^2 -> kg/ha
+	   (number (path column "$col" OrganicMatter am "*"
+			 "$am" om top_C)
+		   (tag "TOP2_C")
+		   (dimension "kg C/ha")
+		   (factor 1e5))))	;g/cm^2 -> kg/ha
+
+
 (deflog "Hourly Groundwater" table
   (where "hourly_groundwater.tab")
   (when (hourly))
@@ -1230,7 +1258,6 @@
 	   (interval (path column "$col" SoilWater Theta)
 		     (dimension "cm"))))
 	 
-
 (deflog "Drain Sink" table
   (where "drain_sink.tab")
   (when (hourly))
