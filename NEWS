@@ -12,6 +12,12 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.13
+
+** Fixed bug introduced in previous version that disabled macropores.
+
+** Made check for mass balance more robust.
+
 * 2.12
 
 ** Fixed error with extra CH2O in the default crop model.

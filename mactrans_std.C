@@ -53,6 +53,8 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 			vector<double>& S_p,
 			vector<double>& J_p)
 { 
+  double max_delta_matter = 0.0; // [g/cm^2]
+
   for (unsigned int i = 0; i < soil.size (); i++)
     {
       // Amount of water entering this layer through macropores.
@@ -62,26 +64,33 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
       
       // Amount of matter entering this layer through macropores.
       const double matter_in_above = -J_p[i]; // [g/cm^2]
+      assert (matter_in_above >= 0.0);
       double delta_matter;	// [g/cm^2]
 
-      if (delta_water < -1.0e-60)
-	// Water leaves the layer.
+      if (water_out_below < 1.0e-60)
 	{
-	  // Water leaves with the concentration in this layer.
-	  delta_matter = C[i] * delta_water;
-	  assert (delta_water <= 0.0);
+	  // No outgoing water, leave matter here.
+	  delta_matter = -matter_in_above;
+	}
+      else if (delta_water < -1.0e-60)
+	{
+	  // More is going out below of the pore than comming in above.  
+	  // Water enter here from the matrix with the local concentration.
+	  delta_matter = -C[i] * delta_water;
 	}
       else if (delta_water > 1.0e-60)
-	// Water enters the layer.
 	{
-	  // Fraction of water entering the layer through the
-	  // macropore, which also stayes here.
+	  // More water is comming in above than leaving below.
+	  // Water leave the pore here and enters the matrix. 
+
 	  if (water_in_above > 0.0)
 	    {
+	      // Fraction of water entering the layer through the
+	      // macropore, which also stayes here.
 	      /*const*/ double water_fraction 
-		= approximate (delta_water, water_in_above) 
-		? 1.0
-		: delta_water / water_in_above;
+			  = approximate (delta_water, water_in_above) 
+			  ? 1.0
+			  : delta_water / water_in_above;
 	      if (water_fraction < 0.0 || water_fraction > 1.0)
 		{
 		  CERR << __FILE__ << ":" <<  __LINE__
@@ -91,8 +100,8 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 		}
 
 	      // Matter stayes with the water.
-	      delta_matter = matter_in_above * water_fraction;
-	      assert (delta_matter >= 0.0);
+	      delta_matter = -matter_in_above * water_fraction;
+	      assert (delta_matter <= 0.0);
 	    }
 	  else
 	    {
@@ -102,35 +111,43 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	}
       else
 	delta_matter = 0.0;
+      
+      const double abs_delta_matter = fabs (delta_matter);
+      if (abs_delta_matter > max_delta_matter)
+	max_delta_matter = abs_delta_matter;
+      if (matter_in_above > max_delta_matter)
+	max_delta_matter = max_delta_matter;
 
       // Find amount of stuff leaving the layer.
-      if (delta_matter < 1e-60)
+      if (abs_delta_matter < 1e-60)
 	{
 	  // Everything go to the bottom.
 	  J_p[i+1] = J_p[i];
 	  S_p[i] = 0.0;
 	}
-      else if (approximate (matter_in_above, delta_matter))
+      else if (approximate (matter_in_above, -delta_matter))
 	{
 	  // Everything go to the layer.
 	  J_p[i+1] = 0.0;
+	  assert (matter_in_above > 0.0);
 	  S_p[i] = matter_in_above / soil.dz (i) / dt;
-	  S_m[i] += S_p[i];
 	}
       else
 	{
 	  // We split between layer and bottom.
-	  J_p[i+1] = -(matter_in_above - delta_matter);
+	  J_p[i+1] = -(matter_in_above + delta_matter);
 	  assert (J_p[i+1] < 0.0);
-	  S_p[i] = delta_matter / soil.dz (i) / dt;
-	  S_m[i] += S_p[i];
+	  S_p[i] = -delta_matter / soil.dz (i) / dt;
 	}
+      S_m[i] += S_p[i];
     }
   
-    // Check that the sink terms add up.
-  if (fabs (soil.total (S_p) + J_p[0] - J_p[soil.size ()]) > 1.0e-21)
+  // Check that the sink terms add up.
+  if (fabs (soil.total (S_p) + J_p[0] - J_p[soil.size ()])
+      > max_delta_matter * 1e-8)
     CERR << __FILE__ << ":" <<  __LINE__
-	 << ": BUG: mactrans Total S_p = '" << (soil.total (S_p) + J_p[0])
+	 << ": BUG: mactrans Total S_p = '"
+	 << soil.total (S_p) + J_p[0]  - J_p[soil.size ()]
 	 << "' solute\n";
 }
 

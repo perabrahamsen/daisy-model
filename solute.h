@@ -37,6 +37,8 @@ struct SoilWater;
 
 class Solute
 {
+  const string submodel;	// Derived submodel.
+
   // State variables.
 protected:
   vector<double> M_;		// Concentration in soil [g / cm³]

@@ -1,3 +1,20 @@
+2002-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.14 released.
+
+2002-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (tick): Fix check for mass balance.
+
+2002-02-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.C (tick): Don't give mass balance errors if transported
+	mass is 10 orders of magnitude smaller than total mass.
+
+	* mactrans_std.C (tick): Fix bug that prevented macropores from
+	being activated. 
+	Made mass balance check work for low conetrations as well.
+
 2002-02-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.12 released.
