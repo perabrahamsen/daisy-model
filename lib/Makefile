@@ -40,7 +40,7 @@ dist:
 #
 cvs: $(DAISY) $(TEXT) $(MSHE) $(CLIMATE)
 	@if [ "X$(TAG)" = "X" ]; then echo "*** No tag ***"; exit 1; fi
-	-cvs add $(DAISY) $(TEXT) $(MSHE)
+	-cvs add $(DAISY) $(TEXT) $(MSHE) $(CLIMATE)
 	rm -f $(REMOVE) 
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
