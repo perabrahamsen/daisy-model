@@ -320,23 +320,23 @@ OM::tock (unsigned int end, const double* factor,
   // Maintenance.
   for (unsigned int i = 0; i < size; i++)
     {
+      const double N_avail = N_soil[i] - N_used[i];
       double rate = min (factor[i] * fraction, 0.1);
       assert (C[i] >= 0.0);
       assert (finite (rate));
       assert (rate >=0);
-      // assert (N_soil * 1.001 >= N_used);
+      assert (N_soil[i] * 1.001 >= N_used[i]);
       assert (C_per_N[i] > 0.0);
       assert (om.C_per_N[i] > 0.0);
       double N_produce = C[i] * rate / C_per_N[i];
       double N_consume = C[i] * rate * efficiency / om.C_per_N[i];
       assert (finite (N_produce));
       assert (finite (N_consume));
-      if (N_consume - N_produce > N_soil - N_used
-	  // && N_soil * 1.001 >= N_used
-	  && ((N_consume - N_produce) - (N_soil[i] - N_used[i])
-	      > 1.0e-10) // Lose 1 g / ha / year
-	  && rate > 0.0)
+      if (N_consume - N_produce > N_avail)
 	{
+	  if (N_avail < 1e-12) // Less than 1 [ug/l] to use...
+	    continue;
+
 	  // Lower rate to force 
 	  //   N_consume - N_produce == N_soil - N_used 
 	  // This is what calc tell me:
@@ -358,15 +358,16 @@ OM::tock (unsigned int end, const double* factor,
 	  assert (finite (N_produce));
 	  assert (finite (N_consume));
 	  // Check that we calculated the right rate.
-	  assert ((rate == 0)
-		  ? true 
-		  : ((N_soil[i] == N_used[i])
-		     ? (fabs (N_consume - N_produce) < 1e-10)
-		     : (fabs (1.0 - (N_consume - N_produce) 
-			      / (N_soil[i] - N_used[i]))
-			< 0.01)));
+	  assert (approximate (N_consume - N_produce, N_avail));
+
+	  // Upddate N.
+	  N_used[i] = N_soil[i];
 	}
-      // Update.
+      else
+	// Upddate N.
+	N_used[i] += (N_consume - N_produce);
+	
+      // Update C.
       assert (om.C[i] >= 0.0);
       const double C_use = C[i] * rate;
       CO2[i] += C_use * (1.0 - efficiency);
@@ -374,13 +375,12 @@ OM::tock (unsigned int end, const double* factor,
       C[i] -= C_use;
       assert (om.C[i] >= 0.0);
       assert (C[i] >= 0.0);
-      N_used[i] += (N_consume - N_produce);
 
       // Check for NaN.
       assert (finite (N_used[i]));
       assert (finite (rate));
       assert (finite (efficiency));
-      // assert (N_soil * 1.001 >= N_used);
+      assert (N_soil[i] * 1.001 >= N_used[i]);
       assert (C[i] >= 0.0);
     }
 }
@@ -399,13 +399,13 @@ OM::tick (unsigned int end, const double* abiotic_factor,
       for (unsigned int i = 0; i < size; i++)
 	{
 	  assert (C[i] >= 0.0);
-	  // assert (N_soil * 1.001 >= N_used);
+	  assert (N_soil[i] * 1.001 >= N_used[i]);
 	  // Maintenance.
 	  const double C_use = C[i] * maintenance * abiotic_factor[i];
 	  CO2[i] += C_use;
 	  C[i] -= C_use;
 	  N_used[i] -= C_use / C_per_N[i];
-	  // assert (N_soil * 1.001 >= N_used);
+	  assert (N_soil[i] * 1.001 >= N_used[i]);
 	}
     }
 
@@ -428,9 +428,11 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 	tock (size, abiotic_factor, turnover_rate * fraction, 1.0,
 	      N_soil, N_used, CO2, *som[j]);
     }
-  // assert (N_soil * 1.001 >= N_used);
   for (unsigned int i = 0; i < size; i++)
-    assert (C[i] >= 0.0);
+    {
+      assert (N_soil[i] * 1.001 >= N_used[i]);
+      assert (C[i] >= 0.0);
+    }
 }
 
 void 
