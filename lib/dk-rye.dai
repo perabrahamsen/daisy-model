@@ -2,7 +2,7 @@
 
 (defcrop "Rug" default
   "Rug med årsudbytter der svarer til gennemsnittet for dansk landbrug.
-Skabt af Christian Thirup for Daisy standardiseringsprjektet."
+Skabt af Christian Thirup for Daisy standardiseringsprojektet."
   (Devel default (EmrTSum  100)
       (DS_Emr   0.01)
       (DSRate1  0.020)

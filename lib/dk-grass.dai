@@ -1,6 +1,8 @@
 ;;; grass.dai
 
-(defcrop "Grass to grain" default
+(defcrop "Graes" default
+  "Græs med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+Skabt af Christian Thirup for Daisy standardiseringsprojektet."
   (Devel default (EmrTSum 125)
 	 (DS_Emr 0.01)
 	 (DSRate1 0.022)
@@ -13,12 +15,13 @@
   (Vernal (DSLim 0.9)
 	  (TaLim  5.0)
 	  (TaSum  -50.0))
-  (LeafPhot (Qeff 0.050)		; (g/m²/h) / (W/m²)
-	    (Fm   2.16)	      		; g/m²/h
+  (LeafPhot (Qeff 0.050); (g/m²/h) / (W/m²)
+            (DSEff (0.0 0.52) (0.3 0.52) (1.0 0.52)(2.0 0.52));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
+	    (Fm   2.0)	;oprindelig 2.16      		; g/m²/h
 	    (TempEff (-20 0.0001) (05 0.0001) (10 0.90)
 		     (25 1.00) (35 0.01) (50 0.0))) ;°C
   (Canopy (DSLAI05 0.2)
-	  (SpLAI 0.025)		; (m²/m²) / (g/m²)  ~0.02
+	  (SpLAI 0.022);oprindelig 0.025		; (m²/m²) / (g/m²)  ~0.02
 	  (HvsDS (0 001) (1 30) (2 30))
 	  (LeafAIMod (0.0 1.) (2.0 1.0))
 	  (SpStemAI 0.005)
@@ -33,12 +36,15 @@
   (Root (DptEmr 10)
 	(PenPar1 0.20)
 	(PenPar2 4.0)
-	(MaxPen 70)
+	(MaxPen 60)
 	(Rad 0.005)
 	(h_wp -15000)
 	(Rxylem 10)
-	(MxNH4Up 2.5e-7)
-	(MxNO3Up 2.5e-8))
+	(MxNH4Up 9.0e-8)
+	(MxNO3Up 9.0e-9))
+;oprindelig:	(MxNH4Up 2.5e-7)
+;oprindelig:	(MxNO3Up 2.5e-8))
+	
   (Partit (RSR  (0.00 0.50) (1.00 0.25) (2.00 0.25))
 	  (Root (0.00 0.50) (0.33 0.25) (0.53 0.20) (1.00 0.00) (2.00 0.00))
 	  (Leaf (0.00 0.90) (0.33 0.85)	(0.43 0.83) (0.53 0.56) (0.95 0.36) (1.14 0.00))
@@ -60,18 +66,35 @@
 	(RtDR (0.00 0.00) (0.60 0.00) (1.20 0.01) (2.00 0.01))
 	(Large_RtDR 0.05)
         (IntDSRelRtRes 0.2))
+
   (CrpN (PtRootCnc (0.00 0.020) (1.00 0.012) (2.00 0.010))
 	(CrRootCnc (0.00 0.010) (1.00 0.008) (2.00 0.008))
 	(NfRootCnc (0.00 0.007) (2.00 0.007))
-	(PtLeafCnc (0.00 0.060) (1.00 0.030) (2.00 0.020))
-	(CrLeafCnc (0.00 0.030) (1.00 0.020) (2.00 0.015))
-	(NfLeafCnc (0.00 0.004) (2.00 0.004))
-	(PtStemCnc (0.00 0.020) (1.00 0.020) (2.00 0.010))
-	(CrStemCnc (0.00 0.010) (1.00 0.010) (2.00 0.006))
+
+	(PtLeafCnc (0.00 0.060) (0.60 0.060) (1.00 0.040) (2.00 0.020))
+	(CrLeafCnc (0.00 0.040) (0.60 0.040) (1.00 0.030) (2.00 0.015))
+	(NfLeafCnc (0.00 0.004) (0.60 0.004) (2.00 0.004))
+
+	(PtStemCnc (0.00 0.025) (1.00 0.020) (2.00 0.010))
+	(CrStemCnc (0.00 0.020) (1.00 0.012) (2.00 0.006))
 	(NfStemCnc (0.00 0.004) (2.00 0.004))
+
         (PtSOrgCnc (0.00 0.024) (1.00 0.024) (2.00 0.024))
 	(CrSOrgCnc (0.00 0.016) (1.00 0.016) (2.00 0.016))
 	(NfSOrgCnc (0.00 0.014) (2.00 0.014))
+
+;oprindelig:	(PtLeafCnc (0.00 0.060) (1.00 0.030) (2.00 0.020))
+;oprindelig:	(CrLeafCnc (0.00 0.030) (1.00 0.020) (2.00 0.015))
+;oprindelig:	(NfLeafCnc (0.00 0.004) (2.00 0.004))
+
+;oprindelig:	(PtStemCnc (0.00 0.020) (1.00 0.020) (2.00 0.010))
+;oprindelig:	(CrStemCnc (0.00 0.010) (1.00 0.010) (2.00 0.006))
+;oprindelig:	(NfStemCnc (0.00 0.004) (2.00 0.004))
+
+;oprindelig:    (PtSOrgCnc (0.00 0.024) (1.00 0.024) (2.00 0.024))
+;oprindelig:	(CrSOrgCnc (0.00 0.016) (1.00 0.016) (2.00 0.016))
+;oprindelig:	(NfSOrgCnc (0.00 0.014) (2.00 0.014))
+
 	(TLLeafEff (0.00 0.900) (2.00 0.900))
 	(TLRootEff (0.00 0.100) (2.00 0.100)))
   (Harvest (Dead ((initial_fraction 0.8)
@@ -118,10 +141,3 @@
 	   (DSnew 0.2)
 	   )
 )
-
-(defcrop Grass "Grass to grain"
-  (Devel original 
-         ;; We change the parameterization to make lay work (don't
-         ;; grow when shaddowed by the main crop).
-	 (PhotEff1 (00 0.10) (10 0.00) (11 0.00) (12 0.75) (13 0.89) (14 1.00)
-		   (15 1.08) (16 1.14) (17 1.18) (24 1.18))))

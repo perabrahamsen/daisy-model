@@ -1,0 +1,102 @@
+(defcrop "Majs" default
+  "Majs med årsudbytter der svarer til gennemsnittet for dansk landbrug.
+Skabt af Christian Thirup for Daisy standardiseringsprojektet.
+Baseret på Roskilde 74-76 ukendt varietet."
+  (Devel default
+      (EmrTSum  300)
+      (DS_Emr   0.01)
+      (DSRate1  0.0240)
+     (TempEff1 (0. 0.00) (6. 0.0) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20))
+     (PhotEff1 (0. 0.90) (12. 1.00) (14. 0.95) (16. 0.90) (24.  0.90))
+      (DSRate2  0.015)
+      (TempEff2 (0. 0.30) (10. 0.30) (15. 0.75) (25. 1.00) (35.  1.20)))
+
+  (LeafPhot
+      (Fm 5.00); oprindelig 6.00
+      (DSEff (0.0 1.0) (0.3 1.0) (1.0 1.00)(2.0 1.00));N-udbytteniveau korrigeres ved forholdsmæssig op eller nedjustering af værdierne ved DS 1.0 og 2.0
+      (Qeff   0.0400)
+    (TempEff (-20.0 0.001) (6.0 0.10) (10.0 1.00) (15.0 1.00) (20.0 1.00)))
+
+  (Canopy
+      (DSLAI05   0.25)
+      (SpLAI     0.010)
+      (LeafAIMod (0.0 1.0) (2.0 1.0))
+      (SpStemAI 0.005)
+      (StemAIMod (0.0 1.0) (1.6 0.0) (2.0 0.0))
+      (StemPhotEff 0.20)
+      (SpSOrgAI 0.005)
+      (SOrgAIMod (0.0 1.0) (1.6 0.0) (2.0 0.0))
+      (SOrgPhotEff 0.20)
+      (LAIDist0 0.00 1.00 1.00)
+      (LAIDist1 0.10 0.80 1.00)
+      (PARref   0.06)
+      (PARext   0.80)
+      (EPext    0.50)
+      (HvsDS   (0.00 1) (0.20 50) (0.50 150) (1.00  200) (2.00  200)))
+
+  (Root
+      (DptEmr     10)
+      (PenPar1    0.25)
+      (PenPar2     4.0)
+      (MaxPen      100)
+      (Rad        0.05)
+      (h_wp       -15000)
+      (Rxylem     10.0)
+      (MxNH4Up     9.0E-0009)
+      (MxNO3Up     9.0E-0009))
+
+  (Partit
+      (Root (0.00 0.60) (0.67 0.35) (1.37 0.10) (1.60 0.10) (2.00 0.05))
+      (Leaf (0.35 0.70) (0.67 0.50) (1.00 0.15) (1.18 0.05)(1.85 0.05) (2.00 0.05)) 
+      (Stem (0.35 0.30) (0.67 0.50) (1.00 0.85) (1.18 0.05)(1.80 0.00)(2.00 0.00))
+      (RSR  (0.00 0.50) (1.00 0.25) (2.00 0.25)))
+
+  (Prod
+       (NCrop     0.20)
+       (E_Root     0.69)
+       (E_Leaf     0.68)
+       (E_Stem     0.66)
+       (E_SOrg     0.68)
+       (r_Root     0.015)
+       (r_Leaf     0.025)
+       (r_Stem     0.010)
+       (r_SOrg     0.030)
+       (ShldResC   0.35)
+       (ReMobilDS  1.40)
+       (ReMobilRt  0.02)
+       (Large_RtDR 0.05)
+       (ExfoliationFac 0.5)
+       (LfDR (0.00 0.00) (0.10 0.00) (1.50 0.005) (2.00 0.005))
+       (RtDR (0.00 0.00) (0.20 0.00) (1.20 0.010) (2.00 0.01)))
+ 
+ (CrpN 
+      (PtRootCnc (0.00 0.0200)    (1.00 0.0200)    (2.00 0.0100))
+      (CrRootCnc (0.00 0.0100)    (1.00 0.0100)    (2.00 0.0050))
+      (NfRootCnc (0.00 0.0070)    (1.00 0.0070)    (2.00 0.0070))
+
+      (PtLeafCnc (0.000 0.044) (0.367 0.044) (0.500 0.040) (1.00 0.030) (1.500 0.020)(1.800 0.018))
+      (CrLeafCnc (0.000 0.010) (0.367 0.010) (0.500 0.009) (1.00 0.008) (1.500 0.008) (1.800 0.008))
+      (NfLeafCnc (0.000 0.004) (1.00 0.004) (2.00 0.004))
+
+      (PtStemCnc (0.838 0.020)    (1.057 0.015)  (1.244 0.014))
+      (CrStemCnc (0.838 0.010)    (1.057 0.010)  (1.244 0.008))
+      (NfStemCnc (0.838 0.004)    (1.057 0.004)  (1.244 0.004))
+
+      (PtSOrgCnc (1.057 0.0200)  (1.244 0.018) (2.00 0.018))
+      (CrSOrgCnc (1.057 0.0160)  (1.244 0.012) (2.00 0.012))
+      (NfSOrgCnc (1.057 0.0140)  (1.244 0.010) (2.00 0.010))
+ 
+;original       (PtLeafCnc (0.000 0.044) (0.367 0.044) (0.500 0.040) (1.00 0.030) (1.500 0.018)(1.800 0.015))
+;original       (CrLeafCnc (0.000 0.010) (0.367 0.010) (0.500 0.009) (1.00 0.008) (1.500 0.008) (1.800 0.008))
+;original       (NfLeafCnc (0.000 0.004) (1.00 0.004) (2.00 0.004))
+ 
+;original       (PtStemCnc (0.838 0.020)    (1.057 0.014)  (1.244 0.011))
+;original       (CrStemCnc (0.838 0.010)    (1.057 0.010)  (1.244 0.008))
+;original       (NfStemCnc (0.838 0.004)    (1.057 0.004)  (1.244 0.004))
+ 
+;original       (PtSOrgCnc (1.057 0.0200)  (1.244 0.015) (2.00 0.015))
+;original       (CrSOrgCnc (1.057 0.0160)  (1.244 0.012) (2.00 0.012))
+;original       (NfSOrgCnc (1.057 0.0140)  (1.244 0.010) (2.00 0.010))
+
+      ))
+
