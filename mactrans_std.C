@@ -43,14 +43,14 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
       const double matter_in_above = -J_p[i]; // [g/cm^2]
       double delta_matter;	// [g/cm^2]
 
-      if (delta_water < 0.0)
+      if (delta_water < -1.0e-30)
 	// Water leaves the layer.
 	{
 	  // Water leaves with the concentration in this layer.
 	  delta_matter = C[i] * delta_water;
 	  assert (delta_water <= 0.0);
 	}
-      else if (delta_water > 0.0)
+      else if (delta_water > 1.0e30)
 	// Water enters the layer.
 	{
 	  // Fraction of water entering the layer through the
