@@ -57,40 +57,15 @@
 	       -200 -225 -250)
 	(MaxRootingDepth 60.0)
 	(dispersivity 8.0))
-  (SoilWater (h -100.0)
-	     (Xi 0.0 ))
-  (Nitrification soil
-  		 (k_10 2.08333333333e-7) ; 5e-5/24 [1/h]
-  		 (k 5.0e-5))		 ; [gN/cm³]
-  (Denitrification (K 0.0417)
-		   (alpha 0.1))
+  (SoilWater (h -100.0))
   (SoilNH4 (M 0.5e-6))
   (SoilNO3 (M 3.0e-6))
-  (OrganicMatter (som ((turnover_rate 1.125e-7)
-		       (efficiency 0.60 0.60)
-		       (fractions 1.0 0.0 0.0 0.0))
-		      ((turnover_rate 5.83333333333e-6)
-		       (efficiency 0.60 0.60)
-		       (fractions 0.9 0.0 0.1 0.0)))
-                 (initial_SOM   (-20  4.86)
+  (OrganicMatter (initial_SOM   (-20  4.86)
                                 (-40  2.92)
                                 (-60  1.46)
                                 (-80  0.49)
                                 (-100 0.16)
-                                (-120 0.03))
-		 (smb ((C_per_N 6)
-		       (turnover_rate 4.16666666667e-5)
-		       (efficiency 0.60 0.60)
-		       (maintenance 4.16666666667e-4) ;0.01/24h
-		       (fractions 0.0 0.6 0.0 0.4))
-		      ((C_per_N 10)
-		       (turnover_rate 4.16666666667e-4)
-		       (efficiency 0.60 0.60)
-		       (maintenance 4.16666666667e-4) ;0.01/24h
-		       (fractions 0.0 0.4 0.0 0.6)))
-		 (K_NH4 0.020833)	;0.5 / 24.
-		 (K_NO3 0.020833)	;0.5 / 24.
-		 (am)))
+                                (-120 0.03))))
 
 
 
