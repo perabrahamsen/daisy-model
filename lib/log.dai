@@ -29,27 +29,27 @@
                      (tag "ORG_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter som N)
+           (interval (path column "$col" OrganicMatter som "*" N)
                      (tag "SOM_N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter som C)
+           (interval (path column "$col" OrganicMatter som "*" C)
                      (tag "SOM_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter smb N)
+           (interval (path column "$col" OrganicMatter smb "*" N)
                      (tag "SMB_N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter smb C)
+           (interval (path column "$col" OrganicMatter smb "*" C)
                      (tag "SMB_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter am "*" om N)
+           (interval (path column "$col" OrganicMatter am "*" om "*" N)
                      (tag "AOM_N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter am "*" om C)
+           (interval (path column "$col" OrganicMatter am "*" om "*" C)
                      (tag "AOM_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
@@ -513,15 +513,15 @@ flow to drain pipes, and subsoil irrigation."
 		   (factor 10); g/m^2 -> kg/ha
                    (dimension "kg N/ha/&"))
            (interval (tag "AOM")
-                     (path column "$col" OrganicMatter am "*" om N)
+                     (path column "$col" OrganicMatter am "*" om "*" N)
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (tag "SOM")
-                     (path column "$col" OrganicMatter som N)
+                     (path column "$col" OrganicMatter som "*" N)
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
            (interval (tag "SMB")
-                     (path column "$col" OrganicMatter smb N)
+                     (path column "$col" OrganicMatter smb "*" N)
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
 	   (interval (tag "Buffer")
@@ -707,67 +707,73 @@ flow to drain pipes, and subsoil irrigation."
                    (dimension "mm")
                    (factor 1000))))
 
-(deflog "Soil Chemicals" table
-  "Summary information about all soil chemicals.
-You cannot log individual chemicals with this model."
-  (where "soil_chemicals.dlf")
-  (when hourly)
+(deflog "Surface Chemicals" table
+  "Summary information about a specific chemical on the soil surface.
+Use like (\"Surface Chemicals\" (set \"$chem\" Atrazine)) to log the 
+content of 'Atrazine' on the soil.  If you don't specify $chem, the sum
+of all chemicals will be logged."
+  (where "surface_chemicals.dlf")
+  (when (hourly))
   (entries (year (path time))
            (month (path time))
            (mday (path time))
-	   (hour (path time))
-           (flux_top (path column "$col" SoilChemicals solutes
-			   solute J)
-                     (tag "In")
-                     (when hourly)
-                     (dimension "g/ha/&")
-                     (factor -1e8))     ;g/cm^2 -> g/ha
-           (flux_bottom (path column "$col" SoilChemicals solutes
-			      solute J)
-                        (tag "Leak-Matrix")
-                        (when hourly)
-                        (dimension "g/ha/&")
-                        (factor -1e8))  ;g/cm^2 -> g/ha
-           (flux_bottom (path column "$col" SoilChemicals solutes
-			      solute J_p)
-                        (tag "Leak-Macro")
-                        (when hourly)
-                        (dimension "g/ha/&")
-                        (factor -1e8))  ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes
-			   solute S_drain)
-                     (tag "Drain")
-                     (when hourly)
-                     (dimension "g/ha/&")
-                     (factor -1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes
-			   solute S_external)
-                     (tag "External")
-                     (when hourly)
-                     (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes
-			   solute uptaken)
-                     (tag "Uptake")
-                     (when hourly)
-                     (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes
-                           solute decomposed)
-                     (tag "Decompose")
-                     (when hourly)
-                     (dimension "g/ha/&")
-                     (factor 1e8))      ;g/cm^2 -> g/ha
-           (interval (path column "$col" SoilChemicals solutes
-			   solute M)
-                     (tag "Content")
-                     (dimension "g/ha")
-                     (factor 1e8))))    ;g/cm^2 -> g/ha
+           (hour (path time))
+           (number (path column "$col" Bioclimate "*" snow_chemicals_in "$chem"
+			 amount)
+                   (tag snow_chemicals_in)
+		   (when hourly)
+                   (dimension "g/m^2/&"))
+           (number (path column "$col" Bioclimate "*"
+                         snow_chemicals_storage "$chem" amount)
+                   (tag snow_chemicals_storage)
+                   (dimension "g/m^2"))
+           (number (path column "$col" Bioclimate "*"
+                         snow_chemicals_out "$chem" amount)
+                   (tag snow_chemicals_out)
+		   (when hourly)
+                   (dimension "g/m^2/&"))
+           (number (path column "$col" Bioclimate "*"
+                         canopy_chemicals_in "$chem" amount)
+                   (tag canopy_chemicals_in)
+		   (when hourly)
+                   (dimension "g/m^2/&"))
+           (number (path column "$col" Bioclimate "*"
+                         canopy_chemicals_storage "$chem" amount)
+                   (tag canopy_chemicals_storage)
+                   (dimension "g/m^2"))
+           (number (path column "$col" Bioclimate "*"
+                         canopy_chemicals_dissipate "$chem" amount)
+                   (tag canopy_chemicals_dissipate)
+		   (when hourly)
+                   (dimension "g/m^2/&"))
+           (number (path column "$col" Bioclimate "*"
+                         canopy_chemicals_out "$chem" amount)
+                   (tag canopy_chemicals_out)
+		   (when hourly)
+                   (dimension "g/m^2/&"))
+           (number (path column "$col" Bioclimate "*"
+                         surface_chemicals_in "$chem" amount)
+                   (tag surface_chemicals_in)
+		   (when hourly)
+                   (dimension "g/m^2/&"))
+           (number (path column "$col" Surface chemicals_storage "$chem" 
+			 amount)
+                   (tag surface_chemicals_storage)
+                   (dimension "g/m^2"))
+           (number (path column "$col" Surface chemicals_out "$chem" amount)
+                   (tag surface_chemicals_out)
+		   (when hourly)
+                   (dimension "g/m^2/&"))
+           (number (path column "$col" Surface chemicals_runoff "$chem" amount)
+                   (tag surface_chemicals_runoff)
+		   (when hourly)
+                   (dimension "g/m^2/&"))))
 
-(deflog "Soil Chemical" table
-  "Summary information about a specific chemical in the soil.
-Use like (\"Soil Chemical\" (set \"$chem\" Atrazine)) to log the content of
-'Atrazine' in the soil."
+(deflog "Soil Chemicals" table
+  "Summary information about chemicals in the soil.
+Use like (\"Soil Chemicals\" (set \"$chem\" Atrazine)) to log the content of
+'Atrazine' in the soil.  If you don't specify $chem, the sum of all chemicals
+will be logged."
   (where "soil_chemical.dlf")
   (when hourly)
   (entries (year (path time))
@@ -823,23 +829,11 @@ Use like (\"Soil Chemical\" (set \"$chem\" Atrazine)) to log the content of
                      (factor 1e8))))    ;g/cm^2 -> g/ha
 
 (deflog "Chemicals" table
-  "Combined amount of chemicals in each numeric soil layer."
+  "Amount of chemicals in each numeric soil layer.  
+You can specify a single chemical with (set \"$chem\" \"<name>\"), 
+where <name> is the name of the chemical to log.  Otherwise, you will get 
+the sum of all chemicals."
   (where "chemicals.dlf")
-  (when hourly)
-  (entries (year (path time))
-           (month (path time))
-           (mday (path time))
-           (hour (path time))
-           (array (path column "$col" SoilChemicals solutes solute M)
-		  (when hourly)
-                  (dimension "g/cm^3"))
-           ))
-
-(deflog "Chemical" table
-  "Amount of specified chemical in each numeric soil layer.
-You specify the chemical with (set \"$chem\" \"?<name>\"), where <name> is the 
-name of the chemical to log."
-  (where "chemical.dlf")
   (when hourly)
   (entries (year (path time))
            (month (path time))
@@ -1203,62 +1197,6 @@ name of the chemical to log."
 			Root Density)
                   (dimension "cm/cm^3"))))
 
-(deflog "Surface Chemicals" table
-  (where "surface_chemicals.dlf")
-  (when (hourly))
-  (entries (year (path time))
-           (month (path time))
-           (mday (path time))
-           (hour (path time))
-           (number (path column "$col" Bioclimate "*" snow_chemicals_in amount)
-                   (tag snow_chemicals_in)
-		   (when hourly)
-                   (dimension "g/m^2/&"))
-           (number (path column "$col" Bioclimate "*"
-                         snow_chemicals_storage amount)
-                   (tag snow_chemicals_storage)
-                   (dimension "g/m^2"))
-           (number (path column "$col" Bioclimate "*"
-                         snow_chemicals_out amount)
-                   (tag snow_chemicals_out)
-		   (when hourly)
-                   (dimension "g/m^2/&"))
-           (number (path column "$col" Bioclimate "*"
-                         canopy_chemicals_in amount)
-                   (tag canopy_chemicals_in)
-		   (when hourly)
-                   (dimension "g/m^2/&"))
-           (number (path column "$col" Bioclimate "*"
-                         canopy_chemicals_storage amount)
-                   (tag canopy_chemicals_storage)
-                   (dimension "g/m^2"))
-           (number (path column "$col" Bioclimate "*"
-                         canopy_chemicals_dissipate amount)
-                   (tag canopy_chemicals_dissipate)
-		   (when hourly)
-                   (dimension "g/m^2/&"))
-           (number (path column "$col" Bioclimate "*"
-                         canopy_chemicals_out amount)
-                   (tag canopy_chemicals_out)
-		   (when hourly)
-                   (dimension "g/m^2/&"))
-           (number (path column "$col" Bioclimate "*"
-                         surface_chemicals_in amount)
-                   (tag surface_chemicals_in)
-		   (when hourly)
-                   (dimension "g/m^2/&"))
-           (number (path column "$col" Surface chemicals_storage amount)
-                   (tag surface_chemicals_storage)
-                   (dimension "g/m^2"))
-           (number (path column "$col" Surface chemicals_out amount)
-                   (tag surface_chemicals_out)
-		   (when hourly)
-                   (dimension "g/m^2/&"))
-           (number (path column "$col" Surface chemicals_runoff amount)
-                   (tag surface_chemicals_runoff)
-		   (when hourly)
-                   (dimension "g/m^2/&"))))
-
 (deflog "Bioclimate" table
   (where "bioclimate.dlf")
   (when hourly)
@@ -1542,21 +1480,21 @@ name of the chemical to log."
            (month (path time))
            (mday (path time))
            (hour (path time))
-           (interval (path column "$col" OrganicMatter am "*"
-                           "?bio/incorporation" om N)
+           (interval (path column "$col" OrganicMatter am 
+			   "bio/incorporation" om "*" N)
                      (tag "SOIL_N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter am "*"
-                           "?bio/incorporation" om C) 
+           (interval (path column "$col" OrganicMatter am 
+                           "bio/incorporation" om "*" C) 
                      (tag "SOIL_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (number (path column "$col" OrganicMatter am "*" om top_N)
+           (number (path column "$col" OrganicMatter am "*" om "*" top_N)
                    (tag "TOP_N")
                    (dimension "kg N/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "$col" OrganicMatter am "*" om top_C)
+           (number (path column "$col" OrganicMatter am "*" om "*" top_C)
                    (tag "TOP_C")
                    (dimension "kg C/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
@@ -1583,32 +1521,163 @@ name of the chemical to log."
            ))
 
 (deflog AOM table
+  "Log content of specific added organic matter, such as fertilizer.
+To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
   (where "aom.dlf")
-  (when daily)
+  (when hourly)
   (entries (year (path time))
            (month (path time))
            (mday (path time))
-           (interval (path column "$col" OrganicMatter am "*"
-                           "$am" om N)
+           (hour (path time))
+           (interval (path column "$col" OrganicMatter am "$am" om "*" N)
                      (tag "SOIL_N")
                      (dimension "kg N/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter am "*"
-                           "$am" om C) 
+           (interval (path column "$col" OrganicMatter am "$am" om "*" C) 
                      (tag "SOIL_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (number (path column "$col" OrganicMatter am "*"
-                         "$am" om top_N)
+           (number (path column "$col" OrganicMatter am "$am" om "*" top_N)
                    (tag "TOP_N")
                    (dimension "kg N/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
-           (number (path column "$col" OrganicMatter am "*"
-                         "$am" om top_C)
+           (number (path column "$col" OrganicMatter am "$am" om "*" top_C)
                    (tag "TOP_C")
                    (dimension "kg C/ha")
                    (factor 1e5))))      ;g/cm^2 -> kg/ha
 
+(deflog "AOM Pools" table
+  "Log content of all pools in specific added organic matter.
+To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
+  (where "aom-pools.dlf")
+  (when hourly)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+	   (hour (path time))
+           (interval (path column "$col" OrganicMatter am "$am" om "0" N)
+                     (tag "SOIL1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "$am" om "0" C) 
+                     (tag "SOIL1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "$col" OrganicMatter am "$am" om "0" top_N)
+                   (tag "TOP1-N")
+                   (dimension "kg N/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "$col" OrganicMatter am "$am" om "0" top_C)
+                   (tag "TOP1-C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))	;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "$am" om "1" N)
+                     (tag "SOIL2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "$am" om "1" C) 
+                     (tag "SOIL2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "$col" OrganicMatter am "$am" om "1" top_N)
+                   (tag "TOP2-N")
+                   (dimension "kg N/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "$col" OrganicMatter am "$am" om "1" top_C)
+                   (tag "TOP2-C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))	;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "$am" om "2" N)
+                     (tag "SOIL3-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "$am" om "2" C) 
+                     (tag "SOIL3-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (number (path column "$col" OrganicMatter am "$am" om "2" top_N)
+                   (tag "TOP3-N")
+                   (dimension "kg N/ha")
+                   (factor 1e5))        ;g/cm^2 -> kg/ha
+           (number (path column "$col" OrganicMatter am "$am" om "2" top_C)
+                   (tag "TOP3-C")
+                   (dimension "kg C/ha")
+                   (factor 1e5))	;g/cm^2 -> kg/ha
+	   ))
+
+(deflog "Organic Matter" table
+  "Information about all organic matter pools."
+  (where "organic-matter.dlf")
+  (when hourly)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+	   (hour (path time))
+           (interval (path column "$col" OrganicMatter som "0" N)
+                     (tag "SOM1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter som "0" C)
+                     (tag "SOM1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter som "1" N)
+                     (tag "SOM2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter som "1" C)
+                     (tag "SOM2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter smb "0" N)
+                     (tag "SMB1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter smb "0" C)
+                     (tag "SMB1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter smb "1" N)
+                     (tag "SMB2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter smb "1" C)
+                     (tag "SMB2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "*" om "0" N)
+                     (tag "AOM1-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "*" om "0" C)
+                     (tag "AOM1-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "*" om "1" N)
+                     (tag "AOM2-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "*" om "1" C)
+                     (tag "AOM2-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "*" om "2" N)
+                     (tag "AOM3-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter am "*" om "2" C)
+                     (tag "AOM3-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter buffer N)
+                     (tag "BUFFER-N")
+                     (dimension "kg N/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           (interval (path column "$col" OrganicMatter buffer C)
+                     (tag "BUFFER-C")
+                     (dimension "kg C/ha")
+                     (factor 1e5))      ;g/cm^2 -> kg/ha
+           ))
 
 (deflog "Hourly Groundwater" table
   (where "hourly_groundwater.dlf")
@@ -1744,15 +1813,15 @@ name of the chemical to log."
                      (tag "Soil_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter som C)
+           (interval (path column "$col" OrganicMatter som "*" C)
                      (tag "SOM_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter smb C)
+           (interval (path column "$col" OrganicMatter smb "*" C)
                      (tag "SMB_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
-           (interval (path column "$col" OrganicMatter am "*" om C)
+           (interval (path column "$col" OrganicMatter am "*" om "*" C)
                      (tag "AOM_C")
                      (dimension "kg C/ha")
                      (factor 1e5))      ;g/cm^2 -> kg/ha
@@ -1765,7 +1834,7 @@ name of the chemical to log."
                      (dimension "kg CO2-C/ha/&")
 	               (when hourly)
                      (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
-           (number (path column "$col" OrganicMatter am "*" om top_C)
+           (number (path column "$col" OrganicMatter am "*" om "*" top_C)
                    (tag "Surface_C")
                    (dimension "kg C/ha")
                    (factor 1e5))        ;g/cm^2 -> kg/ha
