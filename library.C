@@ -50,6 +50,7 @@ struct Library::Implementation
   typedef map<symbol, const Syntax*> syntax_map;
   alist_map alists;
   syntax_map syntaxen;
+  vector<doc_fun> doc_funs;
   static void all_entries (vector<symbol>& libraries);
   AttributeList& lookup (symbol) const;
   bool check (symbol) const;
@@ -342,6 +343,14 @@ Library::base_model (const symbol parameterization) const
   return parameterization;
 }
 
+
+void
+Library::add_doc_fun (doc_fun fun) 
+{ impl.doc_funs.push_back (fun); }
+
+vector<doc_fun>& 
+Library::doc_funs ()
+{ return impl.doc_funs; }
 
 void
 Library::remove (const symbol key)

@@ -30,8 +30,10 @@
 class Syntax;
 class AttributeList;
 class Treelog;
+class Format;
 
 typedef void (*derive_fun) (symbol name, AttributeList& al, symbol super);
+typedef void (*doc_fun) (Format&, const AttributeList& al);
 
 class Library
 {
@@ -61,7 +63,8 @@ public:
   void entries (std::vector<symbol>&) const;
   bool is_derived_from (symbol a, symbol b) const;
   const symbol base_model (symbol parameterization) const;
-
+  void add_doc_fun (doc_fun);
+  std::vector<doc_fun>& doc_funs ();
   // Dependencies.
   void remove (symbol);
 

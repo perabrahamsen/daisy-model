@@ -240,9 +240,9 @@ LogSelect::document_entries (Format& format, const AttributeList& alist)
   for (size_t i = 0; i < entries.size (); i++)
     {
       const AttributeList& entry = *entries[i];
-      Format::Item d2 (format, Select::select_get_tag (alist));
-      format->text (alist.name ("description"));
-      format->soft_linebreak ();
+      Format::Item d2 (format, Select::select_get_tag (entry).name ());
+      format.text (alist.name ("description"));
+      format.soft_linebreak ();
     }
 }
 

@@ -1,6 +1,8 @@
 // program_document.C -- Create reference documentation for Daisy.
 // 
-// Copyright 2005 Per Abrahamsen and KVL.
+// Copyright 2002, 2005 Per Abrahamsen and KVL.
+// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
+// Copyright 2000-2001 KVL
 //
 // This file is part of Daisy.
 // 
@@ -32,9 +34,12 @@
 
 struct ProgramDocument : public Program
 {
+  
+
   // Content.
   XRef xref;
   std::auto_ptr<Format> format;
+  const bool print_parameterizations;
   // remember this for models.
   symbol current_component;
   bool submodel;
@@ -120,7 +125,8 @@ struct ProgramDocument : public Program
   { return true; }
   ProgramDocument (const AttributeList& al)
     : Program (al),
-       format (Librarian<Format>::create (al.alist ("format")))
+       format (Librarian<Format>::create (al.alist ("format"))),
+       print_parameterizations (al.flag ("print_parameterizations"))
   { }
   ~ProgramDocument ()
   { }
@@ -1103,13 +1109,18 @@ ProgramDocument::print_model (const symbol name, const Library& library)
 	    print_description (description);
 	}
       print_users (xref.models[used]);
-      {
-	TmpStream tmp;
-	PrinterFile printer (tmp ());
-	printer.print_parameterization (library.name (), name, false);
-	format->soft_linebreak ();
-	format->verbatim (tmp.str ());
-      }
+      const std::vector<doc_fun>& doc_funs 
+	= library.doc_funs ();
+      for (size_t i = 0; i < doc.funs.size ();i++)
+	doc_funs[i](format, alist);
+      if (print_parameterizations)
+	{
+	  TmpStream tmp;
+	  PrinterFile printer (tmp ());
+	  printer.print_parameterization (library.name (), name, false);
+	  format->soft_linebreak ();
+	  format->verbatim (tmp.str ());
+	}
     }
   else
     {
@@ -1277,6 +1288,10 @@ Generate the components part of the reference manual.");
     AttributeList LaTeX_alist;
     LaTeX_alist.add ("type", "LaTeX");
     alist.add ("format", LaTeX_alist);
+    syntax.add ("print_parameterizations", Syntax::Boolean, Syntax::Const,
+		"Include a copy of all loaded parameterizations in document.");
+    alist.add ("print_parameterizations", false);
+
     Librarian<Program>::add_type ("document", alist, syntax, &make);
   }
 } ProgramDocument_syntax;
