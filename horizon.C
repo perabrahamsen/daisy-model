@@ -423,15 +423,16 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 	      "Relative fraction of coarse sand in soil.");
   syntax.add ("humus", Syntax::None (), Syntax::Const,
 	      "Relative fraction of humus in soil.");
+// Data adopted from Møberg et al. 1988 (Tinglev & Roskilde Soil)
   syntax.add ("quarts_in_clay", Syntax::None (), Syntax::Const,
 	      "Quarts fraction in clay.");
-  alist.add ("quarts_in_clay", 0.05);
+  alist.add ("quarts_in_clay", 0.10);
   syntax.add ("quarts_in_silt", Syntax::None (), Syntax::Const,
 	      "Quarts fraction in silt.");
-  alist.add ("quarts_in_silt", 0.20);
+  alist.add ("quarts_in_silt", 0.60);
   syntax.add ("quarts_in_sand", Syntax::None (), Syntax::Const,
 	      "Quarts fraction in sand.");
-  alist.add ("quarts_in_sand", 0.60);
+  alist.add ("quarts_in_sand", 0.75);
   syntax.add ("dry_bulk_density", "g/cm^3", Syntax::OptionalConst,
 	      "The soils dry bulk density.\n\
 By default, this is calculated from the soil constituents.");

@@ -31,7 +31,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Time& time);
+  void initialize (const Time& time, const Soil&);
   GroundwaterFile (const AttributeList&);
   ~GroundwaterFile ();
 };
@@ -42,7 +42,7 @@ GroundwaterFile::flux_bottom () const
   return depth > 0;		// Positive numbers indicate flux bottom.
 }
 
-bool 
+bool
 GroundwaterFile::accept_bottom (double)
 {
   return true;
@@ -50,7 +50,7 @@ GroundwaterFile::accept_bottom (double)
 
 void
 GroundwaterFile::tick (const Time& time)
-{ 
+{
   while (next_time < time)
     {
       // Remember old value.
@@ -59,7 +59,7 @@ GroundwaterFile::tick (const Time& time)
 
       // Read in new value.
       int year;
-      int month; 
+      int month;
       int day;
       int end;
 
@@ -69,7 +69,7 @@ GroundwaterFile::tick (const Time& time)
 	year += 1900;
       while (file.good () && strchr (" \t", end))
 	end = file.get ();
-      
+
       if (!file.good ())
 	{
 	  throw ("groundwater read error");
@@ -97,7 +97,7 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Time& time)
+GroundwaterFile::initialize (const Time& time, const Soil&)
 { tick (time); }
 
 GroundwaterFile::GroundwaterFile (const AttributeList& al)

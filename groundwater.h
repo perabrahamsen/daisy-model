@@ -27,7 +27,7 @@ public:
     // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const Time& time);
+  virtual void initialize (const Time& time, const Soil&);
 protected:
   Groundwater (const AttributeList& al);
 public:

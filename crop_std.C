@@ -830,10 +830,10 @@ CropStandardSyntax::CropStandardSyntax ()
   Devel.add ("EmrSMF", Syntax::CSMP, Syntax::Const,
 	     "Soil moisture (h-function) effect on emergense.");
   CSMP SMF;
-  SMF.add (-15000.0, 0.00);
-  SMF.add (-200.00, 1.00);
+  SMF.add (-1000.0, 0.00);
+  SMF.add (-150.0, 1.00);
   SMF.add (-50.00, 1.00);
-  SMF.add (-0.00, 0.00);
+  SMF.add (-30.00, 0.00);
   vDevel.add("EmrSMF",SMF);
   Devel.add ("DS_Emr", Syntax::None (), Syntax::Const,
 	     "Development stage at emergence.");
@@ -2488,6 +2488,7 @@ CropStandard::tick (const Time& time,
       var.Prod.CH2OPool += ProdLim * Ass;
     }
   NetProduction (bioclimate, soil, soil_heat);
+  NitContent ();
 #ifdef LOG_AT_23
   if (time.hour () != 23)
     return;
@@ -2507,7 +2508,6 @@ CropStandard::tick (const Time& time,
   DevelopmentStage (bioclimate);
   RootPenetration (soil, soil_heat);
   RootDensity (soil);
-  NitContent ();
 }
 
 const Harvest&

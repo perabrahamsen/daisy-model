@@ -361,7 +361,7 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
 
 void ColumnStandard::initialize (const Time& time, const Weather& weather)
 {
-  groundwater.initialize (time);
+  groundwater.initialize (time, soil);
   soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, weather);
   soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water);
