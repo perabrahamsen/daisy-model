@@ -107,6 +107,19 @@ struct add_submodule
   }
 };
 
+template <class T> 
+struct add_sequence
+{
+  add_sequence(const char* name, Syntax& syntax, AttributeList& alist)
+  {
+    Syntax& s = *new Syntax ();
+    AttributeList& a = *new AttributeList ();
+    T::load_syntax (s, a);
+    syntax.add (name, s, Syntax::State, Syntax::Sequence);
+    alist.add (name, a);
+  }
+};
+
 void check (const AttributeList& al, string s, bool& ok);
 void non_negative (double v, string s, bool& ok, int index = -1);
 void is_fraction (double v, string s, bool& ok, int index = -1);

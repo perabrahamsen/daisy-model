@@ -19,7 +19,8 @@
 #include "filter.h"
 #include "crop.h"
 #include "im.h"
-#include "aom.h"
+#include "am.h"
+#include <algo.h>
 
 class Groundwater;
 
@@ -44,10 +45,16 @@ public:
   void sow (const AttributeList& crop);
   void irrigate (double flux, double temp, 
 		 const SoluteMatter&, irrigation_from);
-  void fertilize (AOM&, double from, double to);
+  void fertilize (AM&);
+  void fertilize (AM&, double from, double to);
+  void fertilize (const InorganicMatter&);
   void fertilize (const InorganicMatter&, double from, double to);
-  void mix (double from, double to, double penetration = 1.0);
-  void swap (double from, double middle, double to);
+  vector<AM*> harvest (const Time&, const string name,
+			double stub_length,
+			double stem_harvest, double leaf_harvest, 
+			double sorg_harvest, double dead_harvest);
+  void mix (const Time&, double from, double to, double penetration = 1.0);
+  void swap (const Time&, double from, double middle, double to);
 
   // Simulation.
 public:
@@ -89,34 +96,63 @@ ColumnStandard::irrigate (double flux, double temp,
 }
 
 void 
-ColumnStandard::fertilize (AOM& aom, 
-			   double from, double to)
+ColumnStandard::fertilize (AM& am)
 {
-  aom.initialize (soil);
-  if (to < from)
-    aom.mix (soil, from, to);
-  organic_matter.add (aom);
+  am.initialize (soil);
+  organic_matter.add (am);
+}
+
+void 
+ColumnStandard::fertilize (AM& am, double from, double to)
+{
+  assert (to < from);
+  am.initialize (soil);
+  am.mix (soil, from, to);
+  organic_matter.add (am);
+}
+
+void 
+ColumnStandard::fertilize (const InorganicMatter& im)
+{
+  surface.fertilize (im);
 }
 
 void 
 ColumnStandard::fertilize (const InorganicMatter& im, 
 			   double from, double to)
 {
-  if (to < from )
-    {
-      soil_NO3.add (soil, soil_water, im.im.NO3, from, to);
-      soil_NH4.add (soil, soil_water, im.im.NH4, from, to);
-    }
-  else
-    surface.fertilize (im);
+  assert (to < from );
+  soil_NO3.add (soil, soil_water, im.im.NO3, from, to);
+  soil_NH4.add (soil, soil_water, im.im.NH4, from, to);
+}
+
+vector<AM*>
+ColumnStandard::harvest (const Time& time, const string name,
+			 double stub_length,
+			 double stem_harvest, double leaf_harvest, 
+			 double sorg_harvest, double dead_harvest)
+{
+  vector<AM*> harvest;
+  for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
+    if ((*crop)->name == name)
+      {
+	const vector<AM*> entry
+	  = (*crop)->harvest (time, *this, 
+			      stub_length, 
+			      stem_harvest, leaf_harvest,
+			      sorg_harvest, dead_harvest);
+	harvest.insert (harvest.end (), entry.begin (), entry.end ());
+      }
+  remove_if (crops.begin (), crops.end (), Crop::ds_remove);
+
+  return harvest;
 }
 
 void 
-ColumnStandard::mix (double from, double to, double penetration)
+ColumnStandard::mix (const Time& time,
+		     double from, double to, double penetration)
 {
-#ifdef TODO
-  crops.kill ()
-#endif
+  harvest (time, "all", 0.0, 0.0, 0.0, 0.0, 0.0);
   soil_NO3.mix (soil, soil_water, from, to);
   soil_NH4.mix (soil, soil_water, from, to);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
@@ -126,10 +162,10 @@ ColumnStandard::mix (double from, double to, double penetration)
 }
 
 void 
-ColumnStandard::swap (double from, double middle, double to)
+ColumnStandard::swap (const Time& time, double from, double middle, double to)
 {
-  mix (from, middle, 1.0);
-  mix (middle, to, 0.0);
+  mix (time, from, middle, 1.0);
+  mix (time, middle, to, 0.0);
   soil_water.swap (soil, from, middle, to);
   soil_NO3.swap (soil, soil_water, from, middle, to);
   soil_NH4.swap (soil, soil_water, from, middle, to);

@@ -1,4 +1,4 @@
-// crop.C
+ // crop.C
 
 #include "crop.h"
 #include "library.h"
@@ -46,6 +46,12 @@ Crop::create (const AttributeList& al, int layers)
   return (*Crop_constructors)[name] (al, layers);
 }
 
+void
+Crop::kill (const Time& time, Column& column)
+{
+  harvest (time, column, 0.0, 0.0, 0.0, 0.0, 0.0);
+}
+
 Crop::Crop (const string n)
   : name (n)
 { }
@@ -90,3 +96,10 @@ Crop_init::~Crop_init ()
     }
   assert (count >= 0);
 }
+
+const double Crop::DSremove;
+
+bool
+Crop::ds_remove (const Crop* crop)
+{ return crop->DS () == Crop::DSremove; }
+

@@ -405,7 +405,8 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      else
 		{
 		  const string obj = al.name ("type");
-		  lib.syntax (obj).check (al, obj);
+		  if (!lib.syntax (obj).check (al, obj))
+		    error (string ("Syntax error in `") + name + "'");
 		  atts.add (name, al);
 		}
 	    }
@@ -453,7 +454,11 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      while (!looking_at (')') && good ())
 		{
 		  skip ("(");
-		  AttributeList& al = *new AttributeList ();
+		  // AttributeList& al = *new AttributeList ();
+		  AttributeList& al = (atts.check (name) 
+				       ? *new AttributeList (atts.list (name))
+				       : *new AttributeList ());
+
 		  load_list (al, syn);
 		  sequence.push_back (&al);
 		  skip (")");

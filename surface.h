@@ -8,7 +8,6 @@ struct Log;
 struct Filter;
 struct SoilWater;
 struct Soil;
-struct AOM;
 
 class Surface : public UZtop
 {
@@ -19,7 +18,6 @@ class Surface : public UZtop
   double EvapSoilSurface;
   double Eps;
   double T;
-  vector <const AOM*> am;
   InorganicMatter im;
   InorganicMatter im_flux;
 
@@ -41,7 +39,6 @@ public:
   void clear ();
 
   // Manager.
-  void fertilize (const AOM&);
   void fertilize (const InorganicMatter&);
 
   void output (Log&, const Filter&) const;

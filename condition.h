@@ -14,8 +14,7 @@ class Condition
 {  
   // Simulation.
 public:
-  virtual bool match (const Daisy&) const;
-  static Condition null;
+  virtual bool match (const Daisy&) const = 0;
 
   // Library.
 public:

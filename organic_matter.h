@@ -7,7 +7,7 @@ class AttributeList;
 class Syntax;
 class Log;
 class Filter;
-class AOM;
+class AM;
 class Soil;
 class SoilWater;
 class SoilHeat;
@@ -33,7 +33,7 @@ public:
   static bool check (const AttributeList&);
   bool check () const;
   bool check_am (const AttributeList& am) const;
-  void add (AOM&);
+  void add (AM&);
 
   // Create & Destroy.
 public:

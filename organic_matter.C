@@ -5,7 +5,7 @@
 #include "alist.h"
 #include "log.h"
 #include "filter.h"
-#include "aom.h"
+#include "am.h"
 #include "soil.h"
 #include "soil_water.h"
 #include "soil_NH4.h"
@@ -21,7 +21,7 @@ struct OrganicMatter::Implementation
   const double K_NH4;		// Absorption rate of NH4 from soil.
   const double K_NO3;		// Absorption rate of NO3 from soil.
   vector<double> CO2;		// CO2 produced per time step.
-  vector <AOM*> aom;		// Added Organic Matter.
+  vector <AM*> am;		// Added Organic Matter.
   const vector<OM*> smb;	// Living Organic Matter.
   const vector<OM*> som;	// Soil Organic Matter.
   struct Buffer
@@ -41,8 +41,8 @@ struct OrganicMatter::Implementation
   } buffer;
 
   // Simulation.
-  void add (AOM& om)
-  { aom.push_back (&om); }
+  void add (AM& om)
+  { am.push_back (&om); }
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     SoilNO3&, SoilNH4&);
   void mix (const Soil&, double from, double to, double penetration);
@@ -181,7 +181,7 @@ void
 OrganicMatter::Implementation::output (Log& log, const Filter& filter) const
 {
   log.output ("CO2", filter, CO2, true);
-  output_list (aom, "am", log, filter);
+  output_list (am, "am", log, filter);
   output_vector (smb, "smb", log, filter);
   output_vector (som, "som", log, filter);
   output_submodule (buffer, "buffer", log, filter);
@@ -191,8 +191,8 @@ bool
 OrganicMatter::Implementation::check () const
 {
   bool ok = true;
-  for (unsigned int i = 0; i < aom.size (); i++)
-    if (!aom[i]->check ())
+  for (unsigned int i = 0; i < am.size (); i++)
+    if (!am[i]->check ())
       ok = false;
   if (!ok)
     cerr << "in OrganicMatter\n";
@@ -211,14 +211,14 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 				     SoilNO3& soil_NO3,
 				     SoilNH4& soil_NH4)
 {
-  // Create an array of all AOM dk:puljer, sorted by their C_per_N.
-  const int all_aom_size = aom.size ();
+  // Create an array of all AM dk:puljer, sorted by their C_per_N.
+  const int all_am_size = am.size ();
   vector<OM*> added;
-  for (int i = 0; i < all_aom_size; i++)
+  for (int i = 0; i < all_am_size; i++)
     {
-      int aom_size = aom[i]->om.size ();
-      for (int j = 0; j < aom_size; j++)
-	added.push_back (aom[i]->om[j]);
+      int am_size = am[i]->om.size ();
+      for (int j = 0; j < am_size; j++)
+	added.push_back (am[i]->om[j]);
     }
   sort (added.begin (), added.end (), om_compare);
   
@@ -281,8 +281,8 @@ OrganicMatter::Implementation::mix (const Soil& soil,
 				    double from, double to, double penetration)
 {
   buffer.mix (soil, from, to);
-  for (unsigned int i = 0; i < aom.size (); i++)
-    aom[i]->mix (soil, from, to, penetration);
+  for (unsigned int i = 0; i < am.size (); i++)
+    am[i]->mix (soil, from, to, penetration);
   for (unsigned int i = 1; i < smb.size (); i++)
     smb[i]->mix (soil, from, to, penetration);
   for (unsigned int i = 0; i < som.size (); i++)
@@ -295,8 +295,8 @@ OrganicMatter::Implementation::swap (const Soil& soil,
 				     double from, double middle, double to)
 {
   buffer.swap (soil, from, middle, to);
-  for (unsigned int i = 0; i < aom.size (); i++)
-    aom[i]->swap (soil, from, middle, to);
+  for (unsigned int i = 0; i < am.size (); i++)
+    am[i]->swap (soil, from, middle, to);
   for (unsigned int i = 1; i < smb.size (); i++)
     smb[i]->swap (soil, from, middle, to);
   for (unsigned int i = 0; i < som.size (); i++)
@@ -308,8 +308,8 @@ void
 OrganicMatter::Implementation::initialize (const Soil& soil)
 {
   buffer.initialize (soil);
-  for (int i = 0; i +0U < aom.size (); i++)
-    aom[i]->initialize (soil);
+  for (int i = 0; i +0U < am.size (); i++)
+    am[i]->initialize (soil);
   for (int i = 0; i +0U < smb.size (); i++)
     smb[i]->initialize (soil);
   for (int i = 0; i +0U < som.size (); i++)
@@ -328,7 +328,7 @@ OrganicMatter::Implementation::initialize (const Soil& soil)
 OrganicMatter::Implementation::Implementation (const AttributeList& al)
   : K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
-    aom (map_construct <AOM> (al.list_sequence ("am"))),
+    am (map_create <AM> (al.list_sequence ("am"))),
     smb (map_construct <OM> (al.list_sequence ("smb"))),
     som (map_construct <OM> (al.list_sequence ("som"))),
     buffer (al.list ("buffer"))
@@ -380,9 +380,9 @@ OrganicMatter::check (const AttributeList& al)
 
   for (unsigned int j = 0; j < am_alist.size(); j++)
     {
-      bool aom_ok = true;
-      ::check (*am_alist[j], "om", aom_ok);
-      if (aom_ok)
+      bool am_ok = true;
+      ::check (*am_alist[j], "om", am_ok);
+      if (am_ok)
 	{
 	  bool om_ok = true;
 	  const vector<const AttributeList*>& om_alist
@@ -413,11 +413,11 @@ OrganicMatter::check (const AttributeList& al)
 	      if (!om_ok)
 		{
 		  cerr << "in om[" << i << "]\n";
-		  aom_ok = false;
+		  am_ok = false;
 		}
 	    }
 	}
-      if (!aom_ok)
+      if (!am_ok)
 	{
 	  cerr << "in am[" << j << "]\n";
 	  ok = false;
@@ -553,9 +553,9 @@ OrganicMatter::check () const
 }
 
 void 
-OrganicMatter::add (AOM& aom)
+OrganicMatter::add (AM& am)
 {
-  impl.add (aom);
+  impl.add (am);
 }
 
 void 
@@ -579,10 +579,10 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("K_NH4", Syntax::Number, Syntax::Const);
   syntax.add ("K_NO3", Syntax::Number, Syntax::Const);
   syntax.add ("CO2", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  syntax.add ("am", AOM::library (), Syntax::State, Syntax::Sequence);
-  syntax.add ("smb", OM::syntax (), Syntax::State, Syntax::Sequence);
-  syntax.add ("som", OM::syntax (), Syntax::State, Syntax::Sequence);
+  syntax.add ("am", AM::library (), Syntax::State, Syntax::Sequence);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
+  add_sequence<OM> ("smb", syntax, alist);
+  add_sequence<OM> ("som", syntax, alist);
   syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);
   syntax.add ("water_turnover_factor", Syntax::CSMP, Syntax::Const);
 }

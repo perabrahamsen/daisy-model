@@ -2,28 +2,29 @@
 
 SHELL = /bin/sh
 MAKEFLAGS =
-CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo -pipe # -fhandle-exceptions -pipe -fno-implicit-templates
+CC = /pack/gcc-2.7.1/bin/c++ -Wall -Wcast-qual -g -frepo -pipe -O2 # -fhandle-exceptions -pipe -fno-implicit-templates
 SRCONLY = column_std.o  weather_simple.o uzrichard.o \
 	hydraulic_yolo.o hydraulic_M_vG.o hydraulic_B_vG.o hydraulic_M_C.o \
 	hydraulic_B_C.o hydraulic_M_BaC.o hydraulic_B_BaC.o \
 	groundwater_static.o horizon_std.o \
 	crop_std.o action_sow.o action_stop.o condition_time.o \
 	condition_logic.o log_file.o action_irrigate.o action_lisp.o \
-	weather_none.o action_fertilize.o weather_file.o action_tillage.o
+	weather_none.o action_fertilize.o weather_file.o action_tillage.o \
+	action_harvest.o hydraulic_old.o
 OBJECTS = main.o daisy.o parser.o log.o weather.o column.o crop.o \
 	alist.o syntax.o library.o action.o condition.o horizon.o ftable.o \
 	filter.o csmp.o time.o uzmodel.o parser_file.o hydraulic.o \
 	soil.o mathlib.o bioclimate.o surface.o soil_water.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
 	denitrification.o soil_heat.o groundwater.o snow.o solute.o \
-	inorganic_matter.o aom.o im.o
+	inorganic_matter.o am.o im.o om.o
 OBJ = $(OBJECTS) $(SRCONLY)
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJECTS:.o=.h) common.h 
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = none 
+REMOVE = aom.h aom.C
 
 .SUFFIXES:	.C .o .h
 
@@ -96,7 +97,7 @@ cvs: $(TEXT)
 main.o: main.C daisy.h time.h parser_file.h parser.h syntax.h alist.h \
  common.h
 daisy.o: daisy.C daisy.h time.h weather.h groundwater.h uzmodel.h \
- common.h horizon.h log.h parser.h aom.h inorganic_matter.h \
+ common.h horizon.h log.h parser.h am.h inorganic_matter.h \
  hydraulic.h crop.h column.h action.h filter.h library.h syntax.h \
  condition.h alist.h
 parser.o: parser.C parser.h alist.h common.h library.h syntax.h
@@ -128,7 +129,7 @@ bioclimate.o: bioclimate.C bioclimate.h column.h surface.h uzmodel.h \
  common.h inorganic_matter.h weather.h time.h crop.h csmp.h alist.h \
  soil.h horizon.h hydraulic.h syntax.h snow.h log.h filter.h
 surface.o: surface.C surface.h uzmodel.h common.h inorganic_matter.h \
- syntax.h alist.h soil_water.h log.h filter.h aom.h time.h
+ syntax.h alist.h soil_water.h log.h filter.h am.h time.h
 soil_water.o: soil_water.C soil_water.h log.h alist.h common.h \
  uzmodel.h soil.h horizon.h hydraulic.h surface.h inorganic_matter.h \
  groundwater.h time.h syntax.h mathlib.h
@@ -136,7 +137,7 @@ soil_NH4.o: soil_NH4.C soil_NH4.h solute.h common.h soil_water.h \
  soil.h horizon.h hydraulic.h mathlib.h
 soil_NO3.o: soil_NO3.C soil_NO3.h solute.h common.h soil_water.h
 organic_matter.o: organic_matter.C organic_matter.h syntax.h alist.h \
- common.h log.h filter.h aom.h time.h inorganic_matter.h soil.h \
+ common.h log.h filter.h am.h time.h inorganic_matter.h soil.h \
  horizon.h hydraulic.h soil_water.h soil_NH4.h solute.h soil_NO3.h \
  soil_heat.h mathlib.h csmp.h
 nitrification.o: nitrification.C nitrification.h alist.h common.h \
@@ -156,14 +157,14 @@ solute.o: solute.C solute.h common.h log.h filter.h syntax.h alist.h \
  soil.h horizon.h hydraulic.h soil_water.h mathlib.h
 inorganic_matter.o: inorganic_matter.C inorganic_matter.h syntax.h \
  alist.h common.h log.h im.h
-aom.o: aom.C aom.h time.h inorganic_matter.h library.h alist.h \
+am.o: am.C am.h time.h inorganic_matter.h library.h alist.h \
  common.h syntax.h log.h soil.h horizon.h hydraulic.h mathlib.h
 im.o: im.C im.h log.h alist.h common.h syntax.h
 column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h common.h inorganic_matter.h soil.h horizon.h hydraulic.h \
  soil_water.h soil_heat.h soil_NH4.h solute.h soil_NO3.h \
  organic_matter.h nitrification.h denitrification.h alist.h syntax.h \
- library.h log.h filter.h im.h aom.h time.h
+ library.h log.h filter.h im.h am.h time.h
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
  common.h log.h filter.h
 uzrichard.o: uzrichard.C uzmodel.h common.h soil.h horizon.h \
@@ -186,7 +187,7 @@ horizon_std.o: horizon_std.C horizon.h syntax.h alist.h common.h
 crop_std.o: crop_std.C crop.h log.h time.h csmp.h bioclimate.h \
  column.h common.h ftable.h ftable.t syntax.h alist.h filter.h \
  soil_water.h soil.h horizon.h hydraulic.h soil_heat.h soil_NH4.h \
- solute.h soil_NO3.h
+ solute.h soil_NO3.h am.h inorganic_matter.h mathlib.h
 action_sow.o: action_sow.C action.h daisy.h time.h column.h crop.h \
  syntax.h alist.h common.h
 action_stop.o: action_stop.C action.h syntax.h alist.h common.h \
@@ -198,13 +199,13 @@ condition_logic.o: condition_logic.C condition.h syntax.h alist.h \
 log_file.o: log_file.C log.h condition.h filter.h csmp.h time.h \
  alist.h common.h syntax.h
 action_irrigate.o: action_irrigate.C action.h daisy.h time.h weather.h \
- column.h syntax.h alist.h common.h aom.h inorganic_matter.h
+ column.h syntax.h alist.h common.h am.h inorganic_matter.h
 action_lisp.o: action_lisp.C action.h daisy.h time.h column.h \
  condition.h syntax.h alist.h common.h
 weather_none.o: weather_none.C weather.h time.h syntax.h alist.h \
  common.h
 action_fertilize.o: action_fertilize.C action.h daisy.h time.h \
- weather.h column.h syntax.h alist.h common.h aom.h inorganic_matter.h \
+ weather.h column.h syntax.h alist.h common.h am.h inorganic_matter.h \
  library.h
 weather_file.o: weather_file.C weather.h time.h syntax.h alist.h \
  common.h log.h filter.h

@@ -46,14 +46,6 @@ Condition::create (const AttributeList& al)
   return (*Condition_constructors)[name] (al);
 }
 
-bool
-Condition::match (const Daisy&) const
-{
-  return true;
-}
-
-Condition Condition::null;
-
 Condition::Condition ()
 { }
 

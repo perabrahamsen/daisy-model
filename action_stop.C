@@ -8,7 +8,7 @@
 class ActionStop : public Action
 {
 public:
-    void doIt (Daisy&) const;
+    void doIt (Daisy&);
 
   // Create and Destroy.
 private:
@@ -20,7 +20,7 @@ public:
 };
 
 void 
-ActionStop::doIt (Daisy& daisy) const
+ActionStop::doIt (Daisy& daisy)
 {
   daisy.running = false;
 }

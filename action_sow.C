@@ -14,7 +14,7 @@ class ActionSow : public Action
   const AttributeList& crop;
 
 public:
-  void doIt (Daisy&) const;
+  void doIt (Daisy&);
 
   // Create and Destroy.
 private:
@@ -26,7 +26,7 @@ public:
 };
 
 void 
-ActionSow::doIt (Daisy& daisy) const
+ActionSow::doIt (Daisy& daisy)
 {
   cout << " [Sowing " << crop.name ("type") << "]";
 

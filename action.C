@@ -46,12 +46,6 @@ Action::create (const AttributeList& al)
   return (*Action_constructors)[name] (al);
 }
 
-void 
-Action::doIt (Daisy&) const
-{ }
-
-Action Action::null;
-
 bool
 Action::check (Daisy&) const
 { 

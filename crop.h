@@ -20,6 +20,8 @@ struct Soil;
 struct SoilHeat;
 struct SoilNH4;
 struct SoilNO3;
+struct Column;
+struct AM;
 
 class Crop 
 {
@@ -46,7 +48,19 @@ public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&,
 		     const SoilHeat&, const SoilWater&,
 		     SoilNH4&, SoilNO3&) = 0;
+  virtual vector<AM*> harvest (const Time&, Column&, 
+				double stub_length,
+				double stem_harvest, double leaf_harvest, 
+				double sorg_harvest, double dead_harvest) = 0;
+  void kill (const Time&, Column&);
   virtual void output (Log&, const Filter&) const = 0;
+  
+  // Queries.
+public:
+  virtual double DS () const = 0;
+  static bool ds_remove (const Crop*);
+protected:
+  static const double DSremove = -5001.0;
 
   // Library.
 public:

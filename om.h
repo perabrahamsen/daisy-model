@@ -1,25 +1,21 @@
-// aom.h
+// om.h
 
-#ifndef AOM_H
-#define AOM_H
+#ifndef OM_H
+#define OM_H
 
 #include <string>
 #include <vector>
-#include "time.h"
-#include "inorganic_matter.h"
 
 class AttributeList;
-class Library;
 class Syntax;
 class Log;
 class Filter;
 class Soil;
-class Time;
-class OrganicMatter;
 
-struct OM
+class OM
 { 
   // Content.
+public:
   double top_C;			// Carbon on the ground.
   vector<double> C;		// Carbon in each node.
   /* const */ vector<double> C_per_N;	// Ratio of carbon per nitrogen.
@@ -29,8 +25,10 @@ struct OM
   const vector<double> fractions;	// How much is turned into SMB and SOM?
 
   // Simulation.
+public:
   void output (Log&, const Filter&) const;
   void mix (const Soil&, double from, double to, double penetration = 1.0);
+  void distribute (const vector<double>& density);
   void swap (const Soil&, double from, double middle, double to);
   void tick (int i, double turnover_factor, double N_soil, double& N_used,
 	     double& CO2, const vector<OM*>& smb, const vector<OM*>&som);
@@ -43,53 +41,10 @@ private:
   
   // Create & Destroy.
 public:
-  static const Syntax& syntax ();
+  static void load_syntax (Syntax&, AttributeList&);
   void initialize (const Soil& soil);
   OM (const AttributeList& al);
   OM (const AttributeList& al, double C, double N);
 };
 
-class AOM
-{
-  // Content.
-public:
-  const Time creation;		// When it was created.
-  const string name;		// Name of this kind of aom.
-  vector<OM*> om;		// Organic matter pool.
-
-  // Simulation.
-public:
-  void output (Log&, const Filter&) const;
-  static bool check (const AttributeList&);
-  bool check () const;
-  void mix (const Soil&, double from, double to, double penetration = 1.0);
-  void swap (const Soil&, double from, double middle, double to);
-
-  // Library.
-public:
-  static const Library& library ();
-  static void derive_type (const string, const AttributeList&, string super);
-  static AOM& create (const Time&, const AttributeList&);
-
-  // Create and Destroy.
-private: 
-  static vector<OM*>& create_om (const AttributeList&);
-public:
-  static InorganicMatter im (const AttributeList&);
-  void initialize (const Soil& soil);
-  AOM (const Time&, const AttributeList&);
-  AOM (const AttributeList&);
-  virtual ~AOM ();
-};
-
-// Ensure the AOM library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class AOM_init
-{
-  static int count;
-public:
-  AOM_init ();
-  ~AOM_init ();
-} AOM_init;
-
-#endif AOM_H
+#endif OM_H

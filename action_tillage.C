@@ -16,12 +16,12 @@ class ActionMix : public Action
   const double penetration;
 
   // Simulation.
-  void doIt (Daisy& daisy) const
+  void doIt (Daisy& daisy)
   {
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
       {
-	(*i)->mix (0.0, depth, penetration);
+	(*i)->mix (daisy.time, 0.0, depth, penetration);
       }
   }
 
@@ -72,12 +72,12 @@ class ActionSwap : public Action
   const double depth;
 
   // Simulation.
-  void doIt (Daisy& daisy) const
+  void doIt (Daisy& daisy)
   {
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
       {
-	(*i)->swap (0.0, middle, depth);
+	(*i)->swap (daisy.time, 0.0, middle, depth);
       }
   }
 

@@ -12,7 +12,7 @@
 class ActionNil : public Action
 {
 public:
-  void doIt (Daisy&) const
+  void doIt (Daisy&)
   { }
 
   // Create and Destroy.
@@ -29,12 +29,12 @@ public:
 
 class ActionProgn : public Action
 {
-  const vector<const Action*>& actions;
+  vector<Action*>& actions;
 
 public:
-  void doIt (Daisy& daisy) const
+  void doIt (Daisy& daisy)
   { 
-    for (vector<const Action*>::const_iterator i = actions.begin ();
+    for (vector<Action*>::iterator i = actions.begin ();
 	 i != actions.end ();
 	 i++)
       {
@@ -61,7 +61,7 @@ private:
   static Action& make (const AttributeList& al)
   { return *new ActionProgn (al); }
   ActionProgn (const AttributeList& al)
-    : actions (map_create<const Action> (al.list_sequence ("actions")))
+    : actions (map_create<Action> (al.list_sequence ("actions")))
   { }
 public:
   ~ActionProgn ()
@@ -73,8 +73,8 @@ public:
 
 class ActionCond : public Action
 {
-  typedef vector<pair<const Condition*, const Action*>/**/> clause_t;
-  const clause_t& make_clauses (const vector<const AttributeList*>& s)
+  typedef vector<pair<const Condition*, Action*>/**/> clause_t;
+  clause_t& make_clauses (const vector<const AttributeList*>& s)
   {
     clause_t& c = *new clause_t;
 
@@ -82,19 +82,19 @@ class ActionCond : public Action
 	 i != s.end ();
 	 i++)
       {
-	c.push_back (pair<const Condition*, const Action*>
+	c.push_back (pair<const Condition*, Action*>
 		     (&Condition::create ((*i)->list ("condition")),
 		      &Action::create ((*i)->list ("action"))));
       }
     return c;
   }
     
-  const clause_t& clauses;
+  clause_t& clauses;
 
 public:
-  void doIt (Daisy& daisy) const
+  void doIt (Daisy& daisy)
   { 
-    for (clause_t::const_iterator i = clauses.begin (); 
+    for (clause_t::iterator i = clauses.begin (); 
 	 i != clauses.end ();
 	 i++)
       {
@@ -144,11 +144,11 @@ public:
 class ActionIf : public Action
 {
   const Condition& if_c;
-  const Action& then_a;
-  const Action& else_a;
+  Action& then_a;
+  Action& else_a;
 
 public:
-  void doIt (Daisy& daisy) const
+  void doIt (Daisy& daisy)
   { 
     if (if_c.match (daisy))
       then_a.doIt (daisy);

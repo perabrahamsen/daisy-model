@@ -9,9 +9,6 @@
 double 
 SoilNH4::beta (const Soil& soil, const SoilWater&, int i, double C) const
 {
-
-
-
   return soil.v_planar (i) * soil.K_planar (i) / pow (soil.K_planar (i) + C, 2)
        + soil.v_edge (i)   * soil.K_edge (i)   / pow (soil.K_edge (i) + C, 2);
 }

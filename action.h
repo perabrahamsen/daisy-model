@@ -14,8 +14,7 @@ class Action
 {
   // Simulation.
 public:
-  virtual void doIt (Daisy&) const;
-  static Action null;
+  virtual void doIt (Daisy&) = 0;
 
   // Library.
 public:

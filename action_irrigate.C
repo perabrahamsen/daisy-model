@@ -8,7 +8,7 @@
 #include "alist.h"
 #include "common.h"
 #include <iostream.h>
-#include "aom.h"
+#include "am.h"
 #include "inorganic_matter.h"
 
 class ActionIrrigate : public Action
@@ -22,7 +22,7 @@ private:
   const SoluteMatter& sm;
 
 public:
-  void doIt (Daisy&) const;
+  void doIt (Daisy&);
 
   // Create and Destroy.
 private:
@@ -36,7 +36,7 @@ public:
 const double ActionIrrigate::at_air_temperature;
 
 void 
-ActionIrrigate::doIt (Daisy& daisy) const
+ActionIrrigate::doIt (Daisy& daisy)
 {
   double t = temp;
 

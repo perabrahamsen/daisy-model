@@ -18,7 +18,8 @@ class Syntax;
 class OrganicMatter;
 class InorganicMatter;
 class SoluteMatter;
-class AOM;
+class AM;
+class Crop;
 
 class Column
 {
@@ -31,10 +32,18 @@ public:
   virtual void sow (const AttributeList& crop) = 0;
   virtual void irrigate (double flux, double temp, 
 			 const SoluteMatter&, irrigation_from) = 0;
-  virtual void fertilize (AOM&, double from, double to) = 0;
+  virtual void fertilize (AM&, double from, double to) = 0;
+  virtual void fertilize (AM&) = 0;
   virtual void fertilize (const InorganicMatter&, double from, double to) = 0;
-  virtual void mix (double from, double to, double penetration = 1.0) = 0;
-  virtual void swap (double from, double middle, double to) = 0;
+  virtual void fertilize (const InorganicMatter&) = 0;
+
+  virtual vector<AM*> harvest (const Time&, const string name,
+				double stub_length,
+				double stem_harvest, double leaf_harvest, 
+				double sorg_harvest, double dead_harvest) = 0;
+  virtual void mix (const Time&,
+		    double from, double to, double penetration = 1.0) = 0;
+  virtual void swap (const Time&, double from, double middle, double to) = 0;
   
   // Simulation.
   virtual void tick (const Time&, const Weather&, Groundwater&) = 0;

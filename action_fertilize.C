@@ -2,13 +2,12 @@
 
 #include "action.h"
 #include "daisy.h"
-#include "weather.h"
 #include "column.h"
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
 #include <iostream.h>
-#include "aom.h"
+#include "am.h"
 #include "library.h"
 
 class ActionFertilize : public Action
@@ -19,7 +18,7 @@ private:
   const double to;
 
 public:
-  void doIt (Daisy&) const;
+  void doIt (Daisy&);
 
   // Create and Destroy.
 public:
@@ -33,21 +32,26 @@ public:
 };
 
 void 
-ActionFertilize::doIt (Daisy& daisy) const
+ActionFertilize::doIt (Daisy& daisy)
 {
   ColumnList& cl = daisy.columns;
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {
       // Add inorganic matter.
-      (*i)->fertilize (AOM::im (am), from, to);
+      (*i)->fertilize (AM::im (am), from, to);
       // Add organic matter, if any.
       if (am.number ("total_C_fraction") > 0.0)
 	{
 	  if ((*i)->check_am (am))
 	    {
-	      AOM& aom = *new AOM (daisy.time, am);
+	      AM& aom =  AM::create (daisy.time, am);
 	      if (aom.check ())
-		(*i)->fertilize (aom, from, to);
+		{
+		  if (to < from)
+		    (*i)->fertilize (aom, from, to);
+		  else
+		    (*i)->fertilize (aom);
+		}
 	      else
 		cerr << "Not fertilizing.\n";
 	    }
@@ -62,7 +66,7 @@ ActionFertilize::check (Daisy&) const
 { 
   bool ok = true;
 
-  if (!AOM::check (am))
+  if (!AM::check (am))
     ok = false;
   if (from > 0.0 || to > 0.0)
     {
@@ -105,11 +109,11 @@ ActionFertilizeSyntax::ActionFertilizeSyntax ()
 { 
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
-  syntax.add ("am", AOM::library ());
-  alist.add ("am", AOM::library ().lookup ("am"));
+  syntax.add ("am", AM::library ());
   syntax.add ("from", Syntax::Number, Syntax::Const);
   alist.add ("from", 0.0);
   syntax.add ("to", Syntax::Number, Syntax::Const);
   alist.add ("to", 0.0);
+  syntax.order ("am");
   Action::add_type ("fertilize", alist, syntax, &ActionFertilize::make);
 }

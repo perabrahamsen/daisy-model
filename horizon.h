@@ -18,6 +18,8 @@ private:
   Implementation& impl;
 public:
   double clay () const;
+  double C () const;
+  double C_per_N () const;
 
   // Water.
 public:

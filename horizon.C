@@ -9,6 +9,8 @@
 #include <vector>
 #include <map>
 
+static const double rho_soil = 2.65;	// Weigth of soil. [g / cm^3]
+
 static Library* Horizon_library = NULL;
 typedef map<string, Horizon::constructor, less<string> > Horizon_map_type;
 static Horizon_map_type* Horizon_constructors;
@@ -24,6 +26,7 @@ struct Horizon::Implementation
   const double quarts_in_clay;
   const double quarts_in_silt;
   const double quarts_in_sand;
+  const double C_per_N;
 
   // Strange things.
   const double quarts_form_factor;
@@ -273,6 +276,7 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     quarts_in_clay (al.number ("quarts_in_clay")),
     quarts_in_silt (al.number ("quarts_in_silt")),
     quarts_in_sand (al.number ("quarts_in_sand")),
+    C_per_N (al.number ("C_per_N")),
     quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
     intervals (al.integer ("intervals"))
@@ -288,6 +292,15 @@ Horizon::Implementation::Implementation (const AttributeList& al)
 double 
 Horizon::clay () const 
 { return impl.clay; }
+
+double
+Horizon::C () const
+{ return rho_soil * impl.humus * (1 - hydraulic.porosity ()) * 0.587; }
+
+double
+Horizon::C_per_N () const
+{ return impl.clay; }
+
 
 double
 Horizon::heat_conductivity (double Theta, double Ice) const
@@ -322,8 +335,6 @@ Horizon::K_edge () const
 {
   return 1.372e-5;
 }
-
-static const double rho_soil = 2.65;	// Weigth of soil. [g / cm^3]
 
 double 
 Horizon::v_planar () const
@@ -389,6 +400,7 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("quarts_in_silt", 0.20);
   syntax.add ("quarts_in_sand", Syntax::Number, Syntax::Const);
   alist.add ("quarts_in_sand", 0.60);
+  syntax.add ("C_per_N", Syntax::Number, Syntax::Const);
   syntax.add ("quarts_form_factor", Syntax::Number, Syntax::Const);
   alist.add ("quarts_form_factor", 3.5);
   syntax.add ("mineral_form_factor", Syntax::Number, Syntax::Const);

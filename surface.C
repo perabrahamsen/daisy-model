@@ -7,7 +7,7 @@
 #include "log.h"
 #include "common.h"
 #include "filter.h"
-#include "aom.h"
+#include "am.h"
 
 extern double abs (double);
 
@@ -115,12 +115,6 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
   return EvapSoilSurface;
 }
 
-void
-Surface::fertilize (const AOM& om)
-{ 
-  am.push_back (&om);
-}
-
 void 
 Surface::fertilize (const InorganicMatter& n)
 { 
@@ -151,8 +145,6 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
   syntax.add ("T", Syntax::Number, Syntax::LogOnly);
-  syntax.add ("am", AOM::library (), Syntax::State, Syntax::Sequence);
-  alist.add ("am", *new vector<const AttributeList*> ());
   add_submodule<InorganicMatter> ("InorganicMatter", syntax, alist);
 }
 
@@ -164,7 +156,6 @@ Surface::Surface (const AttributeList& al)
     EvapSoilSurface (0.0),
     Eps (0.0),
     T (0.0),
-    am (map_construct_const <AOM> (al.list_sequence ("am"))),
     im (al.list ("InorganicMatter")),
     im_flux ()
 { }

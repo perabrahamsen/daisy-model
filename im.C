@@ -70,10 +70,8 @@ IM::~IM ()
 { }
 
 void 
-IM::load_syntax (Syntax& syntax, AttributeList& alist)
+IM::load_syntax (Syntax& syntax, AttributeList&)
 {
   syntax.add ("NO3", Syntax::Number, Syntax::State);
-  alist.add ("NO3", 0.0);
   syntax.add ("NH4", Syntax::Number, Syntax::State);
-  alist.add ("NH4", 0.0);
 }
