@@ -196,7 +196,7 @@ void
 ParserFile::Implementation::error (string str)
 {
   error_count++;
-  cerr << file << ":" << line << ":" << (column + 1) << ": " << str << "\n";
+  CERR << file << ":" << line << ":" << (column + 1) << ": " << str << "\n";
 }
 
 void
@@ -456,6 +456,8 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      else
 		{
 		  const string obj = al.name ("type");
+		  if (obj == "error")
+		    break;
 		  if (!lib.syntax (obj).check (al, obj))
 		    error (string ("Error for member `") + obj 
 			   + "' in library `" + name + "'");
@@ -665,13 +667,13 @@ ParserFile::Implementation::Implementation (const string& name)
     error_count (0)
 {  
   if (!in.good ())
-    cerr << "Open `" << file << "' failed\n";
+    CERR << "Open `" << file << "' failed\n";
 }
 
 ParserFile::Implementation::~Implementation ()
 {
   if (in.bad ())
-    cerr << "There were trouble parsing `" << file << "'\n";
+    CERR << "There were trouble parsing `" << file << "'\n";
   close (in.rdbuf ()->fd ());
 }
 

@@ -194,7 +194,7 @@ INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
 	am.C im.C om.C harvest.C options.C geometry.C transport.C \
 	librarian.C cdaisy.C adsorption.C tortuosity.C event.C eventqueue.C \
-	minimanager.C printer.C printer_file.C frame.C chemical.C
+	minimanager.C printer.C printer_file.C frame.C chemical.C common.C
 
 # Select the C files that are not part of the library.
 #
@@ -208,7 +208,7 @@ LIBOBJ = $(COMPONENTS:.C=${OBJ}) $(INTERFACES:.C=${OBJ}) $(SPARCOBJ)
 #
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(COMPONENTS) $(INTERFACES) $(SPARCSRC) $(MAIN) cmain.c bugmain.c
-HEADERS = $(INTERFACES:.C=.h) common.h version.h
+HEADERS = $(INTERFACES:.C=.h) version.h
 
 # Find all printable files.
 #

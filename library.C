@@ -3,6 +3,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
+#include "options.h"
 #include <map>
 
 struct Library::Implementation
@@ -105,15 +106,15 @@ Library::Implementation::dump (int indent) const
     {
       if (i != syntaxen.begin ())
 	{
-	  cout << "\n";
+	  COUT << "\n";
 	  for (int j = 0; j < indent; j++)
-	    cout << " ";
+	    COUT << " ";
 	}
       const string& name = (*i).first;
       const Syntax* syntax = (*i).second;
-      cout << "(" << name << " ";
+      COUT << "(" << name << " ";
       syntax->dump (indent + name.length () + 2);
-      cout << ")";
+      COUT << ")";
     }
 }
 

@@ -39,6 +39,7 @@ public:
   bool operator == (const CSMP&) const;
 
   // Create and Destroy.
+  void clear ();
   void add (double, double);
   void operator += (const CSMP&);
   void operator = (const CSMP&);

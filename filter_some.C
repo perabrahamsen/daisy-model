@@ -1,6 +1,7 @@
 // filter_some.C
 
 #include "filter.h"
+#include "options.h"
 #include <map>
 
 class FilterSome : public Filter
@@ -68,17 +69,17 @@ FilterSome::check (const Library& library, int /* size */) const
 
       if (!library.check (name))
 	{
-	  cerr << "Unknown";
+	  CERR << "Unknown";
 	  ok = false;
 	}
       else if (!filter->check (library.syntax (name), Syntax::Singleton))
 	{
-	  cerr << "- in";
+	  CERR << "- in";
 	  ok = false;
 	}
       if (!ok)
 	{
-	  cerr << " object `" << name << "'\n";
+	  CERR << " object `" << name << "'\n";
 	  all_ok = false;
 	}
     }
@@ -102,12 +103,12 @@ FilterSome::check (const Syntax& syntax, int /* size */) const
 	
       if (type == Syntax::Error)
 	{
-	  cerr << "Unknown";
+	  CERR << "Unknown";
 	  ok = false;
 	}
       else if (syntax.is_const (name))
 	{
-	  cerr << "Constant";
+	  CERR << "Constant";
 	  ok = false;
 	}
       else switch (type)
@@ -120,26 +121,26 @@ FilterSome::check (const Syntax& syntax, int /* size */) const
 	case Syntax::Integer:
 	  if (!filter->check (type, size))
 	    {
-	      cerr << "- in";
+	      CERR << "- in";
 	      ok = false;
 	    }
 	  break;
 	case Syntax::AList:
 	  if (!filter->check (syntax.syntax (name), size))
 	    {
-	      cerr << "- in";
+	      CERR << "- in";
 	      ok = false;
 	    }
 	  break;
 	case Syntax::Object:
 	  if (!filter->check (syntax.library (name), size))
 	    {
-	      cerr << "- in";
+	      CERR << "- in";
 	      ok = false;
 	    }
 	  break;
 	case Syntax::Library:
-	  cerr << "Class";
+	  CERR << "Class";
 	  ok = false;
 	  break;
 	case Syntax::Error:
@@ -148,7 +149,7 @@ FilterSome::check (const Syntax& syntax, int /* size */) const
 	}
       if (!ok)
 	{
-	  cerr << " entry `" << name << "'\n";
+	  CERR << " entry `" << name << "'\n";
 	  all_ok = false;
 	}
     }
@@ -158,7 +159,7 @@ FilterSome::check (const Syntax& syntax, int /* size */) const
 bool
 FilterSome::check (const Syntax::type type, int /* size */) const
 { 
-  cerr << "Cannot use `some' filter on `" 
+  CERR << "Cannot use `some' filter on `" 
        << Syntax::type_name (type) << "'\n";
   return false;
 }

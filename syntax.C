@@ -3,6 +3,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
+#include "options.h"
 #include <map>
 #include <algorithm>
 
@@ -57,7 +58,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
       if ((status[key] == Const || status[key] == State)
 	       && !vl.check (key))
 	{
-	  cerr << "Attributte " << key << " missing\n";
+	  CERR << "Attributte " << key << " missing\n";
 	  error = true;
 	}
       else if (!(status[key] == Const || status[key] == State)
@@ -75,12 +76,12 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 		const AttributeList& al = **j;
 		if (!al.check ("type"))
 		  {
-		    cerr << "Non object found \n";
+		    CERR << "Non object found \n";
 		    error = true;
 		  }
 		else if (al.name ("type") == "error")
 		  {
-		    cerr << "Error node found \n";
+		    CERR << "Error node found \n";
 		    error = true;
 		  }
 		else if (!lib.syntax (al.name ("type")) .check (al, key))
@@ -93,7 +94,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 	    const AttributeList& al = vl.alist (key);
 	    if (!al.check ("type"))
 	      {
-		cerr << "Non object found \n";
+		CERR << "Non object found \n";
 		error = true;
 	      }
 	    else if (!lib.syntax (al.name ("type")).check (al))
@@ -108,7 +109,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 	      if (!syntax[key]->impl.list_checker (seq))
 		{
 		  error = true;
-		  cerr << "in " << key << "\n";
+		  CERR << "in " << key << "\n";
 		}
 		
 	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
@@ -127,7 +128,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
     error = true;
 
   if (error)
-    cerr << "in " << name << "\n";
+    CERR << "in " << name << "\n";
 
   return !error;
 }
@@ -157,14 +158,14 @@ Syntax::Implementation::dump (int indent) const
 {
   if (order.size ())
     {
-      cout << "[order";
+      COUT << "[order";
       for (vector<string>::const_iterator i = order.begin ();
 	   i != order.end ();
 	   i++)
-	cout << " " << *i;
-      cout << "]\n";
+	COUT << " " << *i;
+      COUT << "]\n";
       for (int j = 0; j < indent; j++)
-	cout << " ";
+	COUT << " ";
     }
   for (type_map::const_iterator i = types.begin ();
        i != types.end ();
@@ -172,50 +173,50 @@ Syntax::Implementation::dump (int indent) const
     {
       if (i != types.begin ())
 	{
-	  cout << "\n";
+	  COUT << "\n";
 	  for (int j = 0; j < indent; j++)
-	    cout << " ";
+	    COUT << " ";
 	}
       const string name = (*i).first;
       const type t = (*i).second;
-      cout << "(" << name << " " << type_name (t) << " " 
+      COUT << "(" << name << " " << type_name (t) << " " 
 	   << category_name ((*status.find (name)).second) << " ";
       switch ((*size.find (name)).second)
 	{
 	case Singleton:
-	  cout << "Singleton";
+	  COUT << "Singleton";
 	  break;
 	case Sequence:
-	  cout << "Sequence";
+	  COUT << "Sequence";
 	  break;
 	default:
-	  cout << "[" << (*size.find (name)).second << "]";
+	  COUT << "[" << (*size.find (name)).second << "]";
 	}
       switch (t)
 	{
 	case AList:
 	  {
-	    cout << "\n";
+	    COUT << "\n";
 	    for (unsigned int j = 0; j < indent + name.length () + 2; j++)
-	      cout << " ";
+	      COUT << " ";
 	    (*syntax.find (name)).second->dump (indent + name.length () + 2);
 	    break;
 	  }
 	case Library: 
 	  {
-	    cout << "\n";
+	    COUT << "\n";
 	    for (unsigned int j = 0; j < indent + name.length () + 2; j++)
-	      cout << " ";
+	      COUT << " ";
 	    (*libraries.find (name)).second->dump (indent + name.length () + 2);
 	    break;
 	  }
 	case Object:
-	  cout << " " << (*libraries.find (name)).second->name ();
+	  COUT << " " << (*libraries.find (name)).second->name ();
 	  break;
 	default:
 	  break;
 	}
-      cout << ")";
+      COUT << ")";
     }
 }
 
@@ -531,7 +532,7 @@ check (const AttributeList& al, const string& s, bool& ok)
 {
   if (!al.check (s))
     {
-      cerr << "Missing " << s << "\n";
+      CERR << "Missing " << s << "\n";
       ok = false;
     }
 }
@@ -541,10 +542,10 @@ non_negative (double v, const string& s, bool& ok, int index)
 {
   if (v < 0.0)
     {
-      cerr << "Negative " << s;
+      CERR << "Negative " << s;
       if (index >= 0)
-	cerr << "[" << index << "]";
-      cerr << "\n";
+	CERR << "[" << index << "]";
+      CERR << "\n";
       ok = false;
     }
 }
@@ -554,10 +555,10 @@ non_positive (double v, const string& s, bool& ok, int index)
 {
   if (v > 0.0)
     {
-      cerr << "Positive " << s;
+      CERR << "Positive " << s;
       if (index >= 0)
-	cerr << "[" << index << "]";
-      cerr << "\n";
+	CERR << "[" << index << "]";
+      CERR << "\n";
       ok = false;
     }
 }
@@ -567,10 +568,10 @@ is_fraction (double v, const string& s, bool& ok, int index)
 {
   if (v < 0.0 || v > 1.0)
     {
-      cerr << "fraction " << s << " must be between 0 and 1";
+      CERR << "fraction " << s << " must be between 0 and 1";
       if (index >= 0)
-	cerr << "[" << index << "]";
-      cerr << "\n";
+	CERR << "[" << index << "]";
+      CERR << "\n";
       ok = false;
     }
 }

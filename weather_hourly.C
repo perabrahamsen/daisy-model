@@ -76,7 +76,7 @@ WeatherHourly::tick (const Time& time)
 
   if (!file.good ())
     {
-      cerr << file_name << ":" << line << ": file error";
+      CERR << file_name << ":" << line << ": file error";
       THROW ("read error");
     }
   int year;

@@ -13,6 +13,7 @@
 #include "log.h"
 #include "filter.h"
 #include "mathlib.h"
+#include "options.h"
 
 class BioclimateStandard : public Bioclimate
 { 
@@ -176,7 +177,7 @@ BioclimateStandard::RadiationDistribution (const Weather& weather,
   CSMP HvsLAI = LAIvsH.inverse ();
   // Check that the end points still match.
   if (!approximate (MxH, HvsLAI (LAI_)))
-    cerr << "BUG: MxH = " << MxH 
+    CERR << "BUG: MxH = " << MxH 
 	 << ", but HvsLAI (LAI) = " << HvsLAI (LAI_) << "\n"; 
 
   assert (HvsLAI (0.0) == 0.0);
@@ -267,7 +268,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
   if (Through_fall < 0.0)
     {
       if (Through_fall < -1e-9)
-	cerr << "BUG: Through_fall = " << Through_fall << "\n";
+	CERR << "BUG: Through_fall = " << Through_fall << "\n";
       Through_fall = 0.0;
     }
 
@@ -330,6 +331,8 @@ BioclimateStandard::WaterDistribution (Surface& surface,
     }
   ActualEvapotranspiration = TotalCropUptake + EvapInterception 
     + EvapSoilSurface + snow.evaporation ();
+
+  irrigation = 0.0;
 }
 
 void 
@@ -374,6 +377,8 @@ void
 BioclimateStandard::irrigate (double flux, double temp, 
 		      Column::irrigation_from type)
 {
+  if (irrigation != 0.0)
+    THROW ("Can't handle multiple irrigations");
   irrigation = flux;
   irrigation_temperature = temp;
   irrigation_type = type;

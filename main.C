@@ -5,7 +5,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "version.h"
-#include <iostream.h>
+#include "options.h"
 
 int 
 main (int argc, char* argv[])
@@ -17,7 +17,7 @@ main (int argc, char* argv[])
       // We need exactly one argument.
       if (argc != 2)
 	{
-	  cerr << "Usage: " << argv[0] << " file\n";
+	  CERR << "Usage: " << argv[0] << " file\n";
 	  return 2;
 	}
       // Initialize syntax and attribute list.
@@ -36,12 +36,14 @@ main (int argc, char* argv[])
       // print version, if specified.
       if (strcmp (argv[1], "-v") == 0)
 	{
-	  cerr << "Daisy crop/soil simulation version "
+	  CERR << "Daisy crop/soil simulation version "
 	       << version << ". (" __DATE__ ")\n"
 	    "Copyright 1996 - 1998 Per Abrahamsen\n"
 	    "Copyright 1996 Søren Hansen\n";
 	  return 2;
 	}
+
+assert (1 == 2);
 
       // Parse the file.
       ParserFile parser (syntax, argv[1]);
@@ -65,11 +67,11 @@ main (int argc, char* argv[])
     }
   catch (const char* error)
     {
-      cerr << "Exception: " << error << "\n";
+      CERR << "Exception: " << error << "\n";
     }
   catch (...)
     {
-      cerr << "Unhandled exception\n";
+      CERR << "Unhandled exception\n";
     }
   exit (1);
 #endif

@@ -74,7 +74,7 @@ HydraulicOld::HydraulicOld (const AttributeList& al)
   ifstream file (Options::find_file (name));
   if (!file.good ())
     {
-      cerr << name << ": file open error";
+      CERR << name << ": file open error";
       THROW ("read error");
     }
   while (file.good () && file.get () != '\n')
@@ -102,7 +102,7 @@ HydraulicOld::HydraulicOld (const AttributeList& al)
   
   if (!file.eof ())
     {
-      cerr << name << ":" << line << ": file error";
+      CERR << name << ":" << line << ": file error";
       THROW ("read error");
     }
   hm_ = Thetam_.inverse ();

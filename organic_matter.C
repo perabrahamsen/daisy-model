@@ -16,6 +16,8 @@
 #include "mathlib.h"
 #include "csmp.h"
 #include "common.h"
+#include "options.h"
+
 // G++ 2.7.2 has `accumulate' here.
 #include <algorithm>
 // Borland 5.01 has `accumulate' here.
@@ -272,7 +274,7 @@ OrganicMatter::Implementation::check () const
     if (!am[i]->check ())
       ok = false;
   if (!ok)
-    cerr << "in OrganicMatter\n";
+    CERR << "in OrganicMatter\n";
   return ok;
 }
 
@@ -363,7 +365,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       const double NO3 = soil_NO3.M_left (i) * K_NO3;
 
       if (!(NH4 >= 0.0))
-	  cerr << "BUG: NH4[" << i << "] = " << NH4 << "\n";
+	  CERR << "BUG: NH4[" << i << "] = " << NH4 << "\n";
       assert (NH4 >= 0.0);
       assert (NO3 >= 0.0);
 
@@ -398,7 +400,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 
       if (N_used[i] > N_soil[i])
 	{
-	  // cerr << "\nBUG: Adding " << N_used - N_soil << " mystery N\n";
+	  // CERR << "\nBUG: Adding " << N_used - N_soil << " mystery N\n";
 	  N_used[i] = N_soil[i];
 	}
 
@@ -494,7 +496,7 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
     }
 
   // Initialize SOM.
-  if (al.check ("initial_SOM") && al.size ("initial_SOM") != Syntax::Singleton)
+  if (al.check ("initial_SOM"))
     {
       const vector<AttributeList*>& layers
 	= al.alist_sequence ("initial_SOM");
@@ -676,7 +678,7 @@ OrganicMatter::check_alist (const AttributeList& al)
 		= om_alist[i]->number_sequence ("fractions");
 	      if (fractions.size () != smb_alist.size () + 1)
 		{
-		  cerr << "You have " << fractions.size ()
+		  CERR << "You have " << fractions.size ()
 		       << " fractions but " << smb_alist.size ()
 		       << " smb and one buffer.\n";
 		  om_ok = false;
@@ -685,19 +687,19 @@ OrganicMatter::check_alist (const AttributeList& al)
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
 	      if (fabs (sum - 1.0) > 0.0001)
 		{
-		  cerr << "The sum of all fractions is " << sum << "\n";
+		  CERR << "The sum of all fractions is " << sum << "\n";
 		  om_ok = false;
 		}
 	      if (!om_ok)
 		{
-		  cerr << "in om[" << i << "]\n";
+		  CERR << "in om[" << i << "]\n";
 		  am_ok = false;
 		}
 	    }
 	}
       if (!am_ok)
 	{
-	  cerr << "in am[" << j << "]\n";
+	  CERR << "in am[" << j << "]\n";
 	  ok = false;
 	}
     }
@@ -713,7 +715,7 @@ OrganicMatter::check_alist (const AttributeList& al)
       vector<double> fractions = smb_alist[i]->number_sequence ("fractions");
       if (fractions.size () != smb_alist.size () + som_alist.size ())
 	{
-	  cerr << "You have " << fractions.size () << " fractions but " 
+	  CERR << "You have " << fractions.size () << " fractions but " 
 	       << smb_alist.size () << " smb and " << som_alist.size ()
 	       << " som.\n";
 	  om_ok = false;
@@ -721,19 +723,19 @@ OrganicMatter::check_alist (const AttributeList& al)
       vector<double> efficiency = smb_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  cerr << "You have " << efficiency.size () << " efficiency but " 
+	  CERR << "You have " << efficiency.size () << " efficiency but " 
 	       << smb_alist.size () << " smb.\n";
 	  om_ok = false;
 	}
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  cerr << "The sum of all fractions is " << sum << "\n";
+	  CERR << "The sum of all fractions is " << sum << "\n";
 	  om_ok = false;
 	}
       if (!om_ok)
 	{
-	  cerr << "in smb[" << i << "]\n";
+	  CERR << "in smb[" << i << "]\n";
 	  ok = false;
 	}
     }
@@ -748,14 +750,14 @@ OrganicMatter::check_alist (const AttributeList& al)
       vector<double> efficiency = som_alist[i]->number_sequence ("efficiency");
       if (efficiency.size () != smb_alist.size ())
 	{
-	  cerr << "You have " << efficiency.size () << " efficiency but " 
+	  CERR << "You have " << efficiency.size () << " efficiency but " 
 	       << smb_alist.size () << " smb.\n";
 	  om_ok = false;
 	}
       vector<double> fractions = som_alist[i]->number_sequence ("fractions");
       if (fractions.size () != smb_alist.size () + som_alist.size ())
 	{
-	  cerr << "You have " << fractions.size () << " fractions but " 
+	  CERR << "You have " << fractions.size () << " fractions but " 
 	       << smb_alist.size () << " smb and " << som_alist.size ()
 	       << " som.\n";
 	  om_ok = false;
@@ -763,18 +765,18 @@ OrganicMatter::check_alist (const AttributeList& al)
       double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
       if (fabs (sum - 1.0) > 0.0001)
 	{
-	  cerr << "The sum of all fractions is " << sum << "\n";
+	  CERR << "The sum of all fractions is " << sum << "\n";
 	  om_ok = false;
 	}
       if (!om_ok)
 	{
-	  cerr << "in som[" << i << "]\n";
+	  CERR << "in som[" << i << "]\n";
 	  ok = false;
 	}
     }
 
   if (!ok)
-    cerr << "in OrganicMatter\n";
+    CERR << "in OrganicMatter\n";
 
   return ok;
 }
@@ -799,7 +801,7 @@ OrganicMatter::check_am (const AttributeList& am) const
 		= om_alist[i]->number_sequence ("fractions");
 	      if (fractions.size () != impl.smb.size () + 1)
 		{
-		  cerr << "You have " << fractions.size ()
+		  CERR << "You have " << fractions.size ()
 		       << " fractions but " << impl.smb.size ()
 		       << " smb and one buffer.\n";
 		  om_ok = false;
@@ -808,19 +810,19 @@ OrganicMatter::check_am (const AttributeList& am) const
 		= accumulate (fractions.begin (), fractions.end (), 0.0);
 	      if (fabs (sum - 1.0) > 0.0001)
 		{
-		  cerr << "The sum of all fractions is " << sum << "\n";
+		  CERR << "The sum of all fractions is " << sum << "\n";
 		  om_ok = false;
 		}
 	    }
 	  if (!om_ok)
 	    {
-	      cerr << "in om[" << i << "]\n";
+	      CERR << "in om[" << i << "]\n";
 	      ok = false;
 	    }
 	}
     }
   if (!ok)
-    cerr << "in added matter `" << am.name ("type") << "'\n";
+    CERR << "in added matter `" << am.name ("type") << "'\n";
   return ok;
 }
 
@@ -873,8 +875,8 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   layer_syntax.add ("end", Syntax::Number, Syntax::Const);
   layer_syntax.add ("weight", Syntax::Number, Syntax::Const); // Kg C/m²
   layer_syntax.order ("end", "weight");
-  syntax.add ("initial_SOM", layer_syntax, Syntax::Optional, Syntax::Sequence);
-  alist.add ("initial_SOM", layer_alist);
+  syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::Optional,
+	      "Layered initialization of soil SOM content.");
 #if 0
   // It should be possible to overwrite the default by specifying these.
   syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);

@@ -11,6 +11,7 @@
 #include "time.h"
 #include "mathlib.h"
 #include "log.h"
+#include "options.h"
 
 struct SoilHeat::Implementation
 {
@@ -242,7 +243,7 @@ SoilHeat::Implementation::check (unsigned n) const
   bool ok = true;
   if (T.size () > n)
     {
-      cerr << "You have " << n << " intervals but " 
+      CERR << "You have " << n << " intervals but " 
 	   << T.size () << " T values\n";
       ok = false;
     }

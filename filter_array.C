@@ -2,6 +2,7 @@
 
 #include "filter.h"
 #include "geometry.h"
+#include "options.h"
 
 class FilterArray : public Filter
 {
@@ -173,14 +174,14 @@ FilterArray::select (const Geometry& geometry, const vector<double>& value)
 bool 
 FilterArray::check (const Library&, int /* size */) const
 {
-  cerr << "This filter works only array of numbers\n";
+  CERR << "This filter works only array of numbers\n";
   return false;
 }
 
 bool 
 FilterArray::check (const Syntax&, int /* size */) const
 {
-  cerr << "This filter works only array of numbers\n";
+  CERR << "This filter works only array of numbers\n";
   return false;
 }
 
@@ -189,7 +190,7 @@ FilterArray::check (const Syntax::type type, int size) const
 {
   if (type != Syntax::Number || size != Syntax::Sequence)
     {
-      cerr << "This filter works only array of numbers\n";
+      CERR << "This filter works only array of numbers\n";
       return false;
     }
   return true;
@@ -222,20 +223,20 @@ FilterArray::FilterArray (const AttributeList& al)
 	acc = Accumulate;
       else
 	{
-	  cerr << "Unknown accumulator `" << acc_name << "'";
+	  CERR << "Unknown accumulator `" << acc_name << "'";
 	  error = true;
 	}
 
       if (from > 0.0)
 	{
-	  cerr << "Positive depth";
+	  CERR << "Positive depth";
 	  error = true;
 	}
       else if (sel_name == "at")
 	sel = At;
       else if (to > from)
 	{
-	  cerr << "Region should end below start";
+	  CERR << "Region should end below start";
 	  error = true;
 	}
       else if (sel_name == "density")
@@ -244,12 +245,12 @@ FilterArray::FilterArray (const AttributeList& al)
 	sel = Content;
       else
 	{
-	  cerr << "Unknown selector `" << sel_name << "'";
+	  CERR << "Unknown selector `" << sel_name << "'";
 	  error = true;
 	}
 
       if (error)
-	cerr << " in output filter `" << al.name ("type") << "' ["
+	CERR << " in output filter `" << al.name ("type") << "' ["
 	     << i << "]\n";
       else
 	selections.push_back (selection (acc, sel, from, to));

@@ -1,14 +1,46 @@
+1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.35 released.
+
+1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.35 released.
+
+1998-11-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/grass2.dai ("Grass, DS=2"): New file.
+
+	* lib/Makefile (NEWCROPS): Added `crass2.dai'
+
+	* Makefile (INTERFACES): Add `common.C' here.
+	(HEADERS): Remove `common.h' here.
+
+	* common.C: New file.
+	(_assert): New function.
+
+1998-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): Reset irrogation.
+
+	* action_irrigate.C: Split into `irrogate_top' and
+	`irrigate_surface'. 
+
+	* organic_matter.C (load_syntax): Use new form for default alist
+	in sequence.
+
+	* crop_std.C: Merged SH's cleanup changes.
+
+	* options.h, options.C (Options::message, Options::warning,
+	Options::error): New static member functions.
+	* all: Use them.
+
 1998-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.34 released.
 
 1998-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* Version 0.34 released.
-
-1998-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
-
-	* crop_std.C: Merged SH's changed for continues calculation of N
+	* crop_std.C: Merged SH's changes for continues calculation of N
 	in crop parts.
 
 1998-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>

@@ -7,6 +7,7 @@
 #include "column.h"
 #include "am.h"
 #include "im.h"
+#include "options.h"
 
 struct ActionIrrigate : public Action
 {
@@ -15,10 +16,12 @@ struct ActionIrrigate : public Action
   const double flux;
   const double temp;
   const IM& sm;
+  
+  virtual Column::irrigation_from irrigation_type () const = 0;
 
   void doIt (const Frame& frame, Daisy& daisy)
   {
-    cout << " [Irrigating]";
+    COUT << " [Irrigating]\n";
     double t = temp;
 
     if (temp == at_air_temperature) 
@@ -28,7 +31,7 @@ struct ActionIrrigate : public Action
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
       {
 	if (frame.match_column (**i))
-	  (*i)->irrigate (flux, t, sm, Column::top_irrigation);
+	  (*i)->irrigate (flux, t, sm, irrigation_type ());
       }
   }
 
@@ -43,6 +46,25 @@ public:
   { }
 };
 
+struct ActionIrrigateTop : public ActionIrrigate
+{
+  Column::irrigation_from irrigation_type () const
+    { return Column::top_irrigation; }
+  ActionIrrigateTop (const AttributeList& al)
+    : ActionIrrigate (al)
+    { }
+};
+
+struct ActionIrrigateSurface : public ActionIrrigate
+{
+  Column::irrigation_from irrigation_type () const
+    { return Column::surface_irrigation; }
+  ActionIrrigateSurface (const AttributeList& al)
+    : ActionIrrigate (al)
+    { }
+};
+
+
 const double ActionIrrigate::at_air_temperature = -500;
 
 #ifdef BORLAND_TEMPLATES
@@ -51,18 +73,22 @@ template class add_submodule<IM>;
 
 static struct ActionIrrigateSyntax
 {
-  static Action& make (const AttributeList& al)
-    { return *new ActionIrrigate (al); }
+  static Action& make_top (const AttributeList& al)
+    { return *new ActionIrrigateTop (al); }
+  static Action& make_surface (const AttributeList& al)
+    { return *new ActionIrrigateSurface (al); }
   ActionIrrigateSyntax ()
     { 
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       syntax.add ("flux", Syntax::Number, Syntax::Const);
-      syntax.order ("flux", "solute");
+      syntax.order ("flux");
       syntax.add ("temperature", Syntax::Number, Syntax::Const);
       alist.add ("temperature", ActionIrrigate::at_air_temperature);
       add_submodule<IM> ("solute", syntax, alist);
-      Librarian<Action>::add_type ("irrigate", alist, syntax, &make);
+      Librarian<Action>::add_type ("irrigate_top", alist, syntax, &make_top);
+      Librarian<Action>::add_type ("irrigate_surface", alist, syntax,
+				   &make_surface);
     }
 } ActionIrrigate_syntax;
 

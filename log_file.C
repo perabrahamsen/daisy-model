@@ -8,6 +8,7 @@
 #include "alist.h"
 #include "syntax.h"
 #include "common.h"
+#include "options.h"
 #include <list>
 #include <fstream.h>
 
@@ -157,7 +158,7 @@ LogFile::print (const string& s)
       stream = new ofstream (name.c_str ());
 #endif
       if (!*stream)
-	cerr << "Failed to open `" << name << "'\n";
+	CERR << "Failed to open `" << name << "'\n";
     }
   if (compact && !opening)
     {
@@ -386,7 +387,7 @@ LogFile::check (const Syntax& syntax) const
   bool ok = filter.check (syntax, Syntax::Singleton);
   
   if (!ok)
-    cerr << "in log file `" << name << "'\n";
+    CERR << "in log file `" << name << "'\n";
   
   return ok;
 }
@@ -416,7 +417,7 @@ LogFile::~LogFile ()
     {
       *stream << "\n";
       if (stream->bad ())
-	cerr << "There were problems writing to `" << name << "'\n";
+	CERR << "There were problems writing to `" << name << "'\n";
       delete stream;
     }
 }

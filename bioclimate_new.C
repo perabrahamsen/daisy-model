@@ -13,24 +13,32 @@
 #include "log.h"
 #include "filter.h"
 #include "mathlib.h"
+#include "options.h"
 
-class BioclimateNew : public Bioclimate
+struct BioclimateNew : public Bioclimate
 { 
   // Canopy.
   const long No;		// No of intervals in canopy discretation.
+  double MxH;			// Max crop Hieght in canopy [cm].
   double LAI_;			// Total LAI of all crops on this column.
   vector<double> Height;	// Height in cm of each endpoint in c.d.
   vector<double> PAR_;		// PAR of each interval of c.d.
+  CSMP LAIvsH;			// LAI below given height [f: cm -> R]
+  CSMP HvsLAI;			// Height with LAI below [f: R -> cm]
+
+  // Utilities.
+  double CanopySum (const CropList& crops, double (Crop::*fun) () const);
+  double CanopyAverage (const CropList& crops, double (Crop::*fun) () const);
+
+  // Tick.
+  void CanopyStructure (const CropList&);
   void RadiationDistribution (const Weather&, const CropList&);
-private:
   void IntensityDistribution (double Rad0, double Ext, 
-			      vector <double>& Rad) const;
-public:
+				     vector <double>& Rad) const;
   void WaterDistribution (Surface& surface, const Weather& weather, 
 			  const CropList& crops, const Soil& soil, 
 			  SoilWater& soil_water, const SoilHeat&);
   // Weather.
-public:
   double daily_air_temperature_; // Air temperature in canopy.
   double day_length_;		// From weather (does not really belong here).
   double daily_global_radiation_; // From weather.
@@ -51,7 +59,6 @@ public:
   double EvapInterception;
   double net_throughfall;
 
-public:
   // Simulation
   void tick (Surface&, const Weather&, const Time&, 
 	     const CropList&, 
@@ -59,7 +66,6 @@ public:
   void output (Log&, Filter&) const;
 
   // Canopy.
-public:
   int NumberOfIntervals () const
     { return No; }
   double height (int i) const
@@ -70,7 +76,6 @@ public:
     { return LAI_; }
 
   // Weather.
-public:
   double daily_air_temperature () const
     { return daily_air_temperature_; }
   double day_length () const
@@ -79,7 +84,6 @@ public:
     { return daily_global_radiation_; }
 
   // Manager.
-public:
   void irrigate (double flux, double temp, 
 		 Column::irrigation_from from);
   
@@ -94,7 +98,6 @@ public:
     { return snow.get_storage (); }
 
   // Create.
-public:
   BioclimateNew (const AttributeList&);
   ~BioclimateNew ()
     { }
@@ -115,25 +118,46 @@ BioclimateNew::BioclimateNew (const AttributeList& al)
     net_throughfall (0.0)
 { }
 
-void 
-BioclimateNew::RadiationDistribution (const Weather& weather, 
-					   const CropList& crops)
+double
+BioclimateNew::CanopySum (const CropList& crops, double (Crop::*fun) () const)
 {
-  // Fraction of Photosynthetically Active Radiation in Shortware
-  // incomming radiation. 
-  static const double PARinSi = 0.50;	
+  if (LAI_ == 0.0)
+    return 0.0;
 
-  double MxH = 0.0;		// Max crop Hieght in canopy [cm].
-  double ACExt = 0.0;		// Average Canopy Extinction coefficient
-  // (how fast the light dim as a
-  //  function of LAI passed).
-  double ACRef = 0.0;		// Average Canopy Reflection coefficient 
-  double ARExt = 0.0;		// Average Radiation Extinction coefficient
-  // (like ACExt, but for all radiation,
-  //  not just light).
+  double value = 0.0;
+  
+  for (CropList::const_iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    {
+      value += ((*crop)->*fun) () * (*crop)->LAI ();
+    }
+  return value;
+}
 
+double
+BioclimateNew::CanopyAverage (const CropList& crops,
+			      double (Crop::*fun) () const)
+{
+  if (LAI_ == 0.0)
+    return 0.0;
+
+  return CanopySum (crops, fun) / LAI_;
+}
+
+void
+BioclimateNew::CanopyStructure (const CropList& crops)
   // Calculate values for the total crop canopy.
+{
+
+  // Clear old values.
+  LAIvsH.clear ();		
+  HvsLAI.clear ();
   LAI_ = 0.0;
+  MxH = 0.0;
+  fill (Height.begin (), Height.end (), 0.0);
+
+  // Calculate LAI and MxH.
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
@@ -141,23 +165,14 @@ BioclimateNew::RadiationDistribution (const Weather& weather,
       if ((*crop)->height () > MxH)
 	MxH = (*crop)->height ();
       LAI_ += (*crop)->LAI ();
-      ACExt += (*crop)->PARext () * (*crop)->LAI ();
-      ACRef += (*crop)->PARref () * (*crop)->LAI ();
-      ARExt += (*crop)->EPext ()  * (*crop)->LAI ();
     }
 
-  // If we haven't got a canopy, there is nothing more to calculate.
+  // Only calculate LAI distribution, if there is any.
   if (LAI_ == 0.0)
     return;
 
-  // Calculate averages.
-  ACExt /= LAI_;
-  ACRef /= LAI_;
-  // ARExt /= LAI_;
-
   // Calculate the total Leaf Area Density as a function of the height
   // above the ground.
-  CSMP LAIvsH;		
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)
@@ -172,10 +187,10 @@ BioclimateNew::RadiationDistribution (const Weather& weather,
   assert (approximate (LAI_, LAIvsH (MxH)));
 
   // Find H as a function of LAI.
-  CSMP HvsLAI = LAIvsH.inverse ();
+  HvsLAI = LAIvsH.inverse ();
   // Check that the end points still match.
   if (!approximate (MxH, HvsLAI (LAI_)))
-    cerr << "BUG: MxH = " << MxH 
+    CERR << "BUG: MxH = " << MxH 
 	 << ", but HvsLAI (LAI) = " << HvsLAI (LAI_) << "\n"; 
 
   assert (HvsLAI (0.0) == 0.0);
@@ -189,15 +204,44 @@ BioclimateNew::RadiationDistribution (const Weather& weather,
   assert (Height[No] == 0.0);
   //  assert (approximate (Height[0], MxH));
   Height[0] = MxH;
+}
 
-  double PAR0 = (1 - ACRef) * PARinSi * weather.hourly_global_radiation ();
+void 
+BioclimateNew::RadiationDistribution (const Weather& weather, 
+				      const CropList& crops)
+{
+  if (LAI () == 0.0)
+    {
+      fill (&PAR_[0], &PAR_[No+1], 0.0);
+      return;
+    }
+
+  // Fraction of Photosynthetically Active Radiation in Shortware
+  // incomming radiation. 
+  static const double PARinSi = 0.50;	
+
+  // Average Canopy Extinction coefficient
+  // (how fast the light dim as a  function of LAI passed).
+  const double ACExt = CanopyAverage (crops, &Crop::PARext);
+
+  // Average Canopy Reflection coefficient 
+  const double ACRef =  CanopyAverage (crops, &Crop::PARref);
+
+#if 0
+  // Average Radiation Extinction coefficient
+  // (like ACExt, but for all radiation, not just light).
+  const double ARExt = CanopyAverage (crops, &Crop::EPext);
+#endif 
+
+  const double PAR0 
+    = (1 - ACRef) * PARinSi * weather.hourly_global_radiation ();
   IntensityDistribution (PAR0, ACExt, PAR_);
 }
 
 void
 BioclimateNew::IntensityDistribution (const double Rad0,
-					   const double Ext,
-					   vector <double>& Rad) const
+				      const double Ext,
+				      vector <double>& Rad) const
 {
   assert (Rad.size () == No + 1);
   const double dLAI = (LAI_ / No);
@@ -217,28 +261,13 @@ BioclimateNew::WaterDistribution (Surface& surface,
   static const double dt = 1.0;
 
   // Calculate total interception.
-  double InterceptionCapacity = 0.0;
-  double EpExtinction = 0.0;
-  double EpFactor = 0.0;
-
-  if (LAI_ > 0.0)
-    {
-      for (CropList::const_iterator crop = crops.begin();
-	   crop != crops.end();
-	   crop++)
-	{
-	  InterceptionCapacity += (*crop)->IntcpCap () * (*crop)->LAI ();
-	  EpExtinction += (*crop)->EPext () * (*crop)->LAI ();
-	  EpFactor += (*crop)->EpFac () * (*crop)->LAI ();
-	}
-      EpExtinction /= LAI_;
-      if (LAI_ > 1.0)
-	EpFactor /= LAI_;
-      else
-	EpFactor += (1 - LAI_) * soil.EpFactor ();
-    }
+  const double InterceptionCapacity = CanopySum (crops, &Crop::IntcpCap);
+  const double EpExtinction = CanopyAverage (crops, &Crop::EPext);
+  double EpFactor = CanopySum (crops, &Crop::EpFac);
+  if (LAI_ > 1.0)
+    EpFactor /= LAI_;
   else
-    EpFactor = soil.EpFactor ();
+    EpFactor += (1 - LAI_) * soil.EpFactor ();
 
   const double ref_evapo = max (0.0, weather.reference_evapotranspiration ());
   
@@ -256,7 +285,8 @@ BioclimateNew::WaterDistribution (Surface& surface,
     WaterFromAbove += irrigation;
 
   EvapInterception
-    = min (WaterFromAbove + intercepted_water / dt, PotCanopyEvapotranspiration);
+    = min (WaterFromAbove + intercepted_water / dt,
+	   PotCanopyEvapotranspiration);
   PotCanopyEvapotranspiration -= EvapInterception;
 
   double Through_fall = WaterFromAbove - EvapInterception
@@ -266,7 +296,7 @@ BioclimateNew::WaterDistribution (Surface& surface,
   if (Through_fall < 0.0)
     {
       if (Through_fall < -1e-9)
-	cerr << "BUG: Through_fall = " << Through_fall << "\n";
+	CERR << "BUG: Through_fall = " << Through_fall << "\n";
       Through_fall = 0.0;
     }
 
@@ -329,6 +359,8 @@ BioclimateNew::WaterDistribution (Surface& surface,
     }
   ActualEvapotranspiration = TotalCropUptake + EvapInterception 
     + EvapSoilSurface + snow.evaporation ();
+
+  irrigation = 0.0;
 }
 
 void 
@@ -346,12 +378,15 @@ BioclimateNew::tick (Surface& surface, const Weather& weather,
   // Add nitrogen deposit. 
   surface.fertilize (weather.deposit ());
 
+  // Update canopy structure.
+  CanopyStructure (crops);
+
   // Calculate total canopy, divide it intervalsm, and distribute PAR.
   RadiationDistribution (weather, crops);
 
   // Distribute water among canopy, snow, and soil.
   WaterDistribution (surface, weather, crops,
-			  soil, soil_water, soil_heat);
+		     soil, soil_water, soil_heat);
 
 }
 
@@ -361,7 +396,10 @@ BioclimateNew::output (Log& log, Filter& filter) const
   log.output ("intercepted_water", filter, intercepted_water);
   log.output ("EvapInterception", filter, EvapInterception, true);
   log.output ("net_throughfall", filter, net_throughfall, true);
+  log.output ("MxH", filter, MxH, true);
   log.output ("LAI", filter, LAI_, true);
+  log.output ("LAIvsH", filter, LAIvsH, true);
+  log.output ("HvsLAI", filter, HvsLAI, true);
   log.output ("PotEvapotranspiration", filter,
 	      PotEvapotranspiration, true);
   log.output ("ActualEvapotranspiration", filter,
@@ -392,16 +430,29 @@ static struct BioclimateNewSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
   
-      syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const);
+      syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const, "\
+Number of vertical intervals in which we partition the canopy");
       alist.add ("NoOfIntervals", 30);
-      syntax.add ("intercepted_water", Syntax::Number, Syntax::State);
-      syntax.add ("EvapInterception", Syntax::Number, Syntax::LogOnly);
-      syntax.add ("net_throughfall", Syntax::Number, Syntax::LogOnly);
-      syntax.add ("LAI", Syntax::Number, Syntax::LogOnly);
-      syntax.add ("PotEvapotranspiration", Syntax::Number, Syntax::LogOnly);
-      syntax.add ("ActualEvapotranspiration", Syntax::Number, Syntax::LogOnly);
+      syntax.add ("intercepted_water", "mm", Syntax::State, 
+		  "Water intercepted by the canopy");
       alist.add ("intercepted_water", 0.0);
-      add_submodule<Snow> ("Snow", syntax, alist);
+      syntax.add ("EvapInterception", "mm", Syntax::LogOnly,
+		  "Intercepted water evaporated from the canopy");
+      syntax.add ("net_throughfall", Syntax::Number, Syntax::LogOnly);
+      syntax.add ("MxH", "cm", Syntax::LogOnly,
+		  "Canopy height");
+      syntax.add ("LAI", Syntax::None (), Syntax::LogOnly,
+		  "Leaf area index for total canopy");
+      syntax.add ("LAIvsH", Syntax::CSMP, Syntax::LogOnly,
+		  "Total canopy LAI below given height (cm)");
+      syntax.add ("HvsLAI", Syntax::CSMP, Syntax::LogOnly, "\
+Height (cm) in which there is a given LAI below in total canopy");
+      syntax.add ("PotEvapotranspiration", "mm", Syntax::LogOnly,
+		  "Potential evaoptranspiration");
+      syntax.add ("ActualEvapotranspiration", "mm", Syntax::LogOnly,
+		  "Actual evapotranspiration");
+      add_submodule<Snow> ("Snow", syntax, alist, Syntax::State, 
+			   "Surface snow pack");
 
       Librarian<Bioclimate>::add_type ("new", alist, syntax, &make);
     }

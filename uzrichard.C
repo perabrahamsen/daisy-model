@@ -385,7 +385,7 @@ UZRichard::richard (const Soil& soil,
 			  / (soil.z (i) - soil.z (i + 1)))
 			 + 1);
 		    if (fabs (q[i+1] / darcy - 1.0) > 0.01)
-		      cerr << "q[" << i + 1 << "] = " << q[i+1] 
+		      CERR << "q[" << i + 1 << "] = " << q[i+1] 
 			   << ", darcy = " << darcy << "\n";
 		  }
 	      }

@@ -4,6 +4,7 @@
 #include "daisy.h"
 #include "frame.h"
 #include "column.h"
+#include "options.h"
 
 struct ActionMix : public Action
 {
@@ -14,7 +15,7 @@ struct ActionMix : public Action
   // Simulation.
   void doIt (const Frame& frame, Daisy& daisy)
     {
-      cout << " [Tillage]\n";
+      COUT << " [Tillage]\n";
       ColumnList& cl = daisy.columns;
       for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
 	{
@@ -43,7 +44,7 @@ static struct ActionMixSyntax
       is_fraction (penetration, "penetration", ok);
       non_positive (depth, "depth", ok);
       if (!ok)
-	cerr << "in mix action\n";
+	CERR << "in mix action\n";
       return ok;
     }
   ActionMixSyntax ()
@@ -67,7 +68,7 @@ struct ActionSwap : public Action
   // Simulation.
   void doIt (const Frame& frame, Daisy& daisy)
   {
-    cout << " [Plowing]\n";
+    COUT << " [Plowing]\n";
 
     ColumnList& cl = daisy.columns;
     for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
@@ -98,11 +99,11 @@ static struct ActionSwapSyntax
       non_positive (depth, "depth", ok);
       if (middle <= depth)
 	{
-	  cerr << "swap middle should be above the depth\n";
+	  CERR << "swap middle should be above the depth\n";
 	  ok = false;
 	}
       if (!ok)
-	cerr << "in swap action\n";
+	CERR << "in swap action\n";
       return ok;
     }
 

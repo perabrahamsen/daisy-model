@@ -6,6 +6,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "column.h"
+#include "options.h"
 
 struct FrameWith : public Frame 
 {
@@ -49,7 +50,7 @@ public:
 	}
       if (!daisy.columns.find (column))
 	{
-	  cerr << "No column `" << column << "'\n";
+	  CERR << "No column `" << column << "'\n";
 	  ok = false;
 	}
       return ok;

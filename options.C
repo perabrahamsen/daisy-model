@@ -3,14 +3,25 @@
 #include "options.h"
 #include <vector>
 #include <fcntl.h>
+#include <iostream>
 
-#ifdef __unix
-#define PATH_SEPARATOR ":"
-#define DIRECTORY_SEPARATOR "/"
+ostream& 
+Options::message ()
+{ return cout; }
+
+ostream& 
+Options::warning ()
+{ return error (); }
+
+ostream& 
+Options::error ()
+{ 
+#ifdef USELESS_STDERR
+  return cout;
 #else
-#define PATH_SEPARATOR ";"
-#define DIRECTORY_SEPARATOR "\\"
+  return cerr; 
 #endif
+}
 
 int
 Options::find_file (const string& name)
@@ -48,9 +59,9 @@ Options::find_file (const string& name)
       if (fd >= 0)
 	return fd;
     }
-  cerr << "Could not find `" << name << "' in";
+  CERR << "Could not find `" << name << "' in";
   for (unsigned int i = 0; i < path.size (); i++)
-    cerr << " `" << path[i] << "'";
-  cerr << "\n";
+    CERR << " `" << path[i] << "'";
+  CERR << "\n";
   return -1;
 }

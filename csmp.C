@@ -13,6 +13,11 @@ struct CSMP::Implementation
   double operator () (const double pos) const;
   CSMP inverse () const;
   CSMP integrate_stupidly () const;
+  void clear () 
+    { 
+      x.erase (x.begin (), x.end ());
+      y.erase (y.begin (), y.end ());
+    }
   void operator = (CSMP::Implementation& impl)
   { 
     x = impl.x;
@@ -230,11 +235,13 @@ CSMP::operator += (const CSMP& csmp)
   impl = result.impl;
 }
 
+void
+CSMP::clear ()
+{ impl.clear (); }
+
 void 
 CSMP::operator = (const CSMP& csmp)
-{
-  impl = csmp.impl;
-}
+{ impl = csmp.impl; }
 
 
 CSMP::CSMP (const CSMP& csmp)

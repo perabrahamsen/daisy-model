@@ -17,6 +17,7 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
+#include "options.h"
 
 // Dimensional conversion.
 static const double m2_per_cm2 = 0.0001;
@@ -163,6 +164,8 @@ struct CropStandard::Parameters
     double PARref;		// PAR reflectance
     double PARext;		// PAR extinction coefficient
     double EPext;		// EP extinction coefficient
+    double IntcpCap;
+    double EpFac;
     double rs_max;		// max transpiration resistance
     double rs_min;		// min transpiration resistance
   private:
@@ -254,9 +257,6 @@ struct CropStandard::Parameters
     friend struct CropStandard::Parameters;
     HarvestPar (const AttributeList&);
   } Harvest;
-  // Dunno where these belongs...
-  double IntcpCap;
-  double EpFac;
   bool enable_water_stress;
   bool enable_N_stress;
 private:
@@ -383,8 +383,6 @@ CropStandard::Parameters::Parameters (const AttributeList& vl)
     Prod (vl.alist ("Prod")),
     CrpN (vl.alist ("CrpN")),
     Harvest (vl.alist ("Harvest")),
-    IntcpCap (vl.number ("IntcpCap")),
-    EpFac (vl.number ("EpFac")),
     enable_water_stress (vl.flag ("enable_water_stress")),
     enable_N_stress (vl.flag ("enable_N_stress"))
 { }
@@ -424,6 +422,8 @@ CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
     PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
     EPext (vl.number ("EPext")),
+    IntcpCap (vl.number ("IntcpCap")),
+    EpFac (vl.number ("EpFac")),
     rs_max (vl.number ("rs_max")),
     rs_min (vl.number ("rs_min"))
 { }
@@ -537,7 +537,7 @@ CropStandard::Variables::RecPhenology::RecPhenology (const Parameters& par,
     day_length (vl.number ("day_length")),
     partial_soil_temperature (vl.number ("partial_soil_temperature")),
     soil_temperature (vl.number ("soil_temperature"))
-  
+
 { }
 
 void 
@@ -798,6 +798,10 @@ CropStandardSyntax::CropStandardSyntax ()
   Canopy.add ("PARref", Syntax::Number, Syntax::Const);
   Canopy.add ("PARext", Syntax::Number, Syntax::Const);
   Canopy.add ("EPext", Syntax::Number, Syntax::Const);
+  Canopy.add ("IntcpCap", Syntax::Number, Syntax::Const);
+  vCanopy.add ("IntcpCap", 0.5);
+  Canopy.add ("EpFac", Syntax::Number, Syntax::Const);
+  vCanopy.add ("EpFac", 1.0);
   Canopy.add ("rs_max", Syntax::Number, Syntax::Const);
   vCanopy.add ("rs_max", 1.0e5);
   Canopy.add ("rs_min", Syntax::Number, Syntax::Const);
@@ -805,6 +809,7 @@ CropStandardSyntax::CropStandardSyntax ()
 
   // RootPar
   Syntax& Root = *new Syntax ();
+  AttributeList& vRoot = *new AttributeList ();
 
   Root.add ("DptEmr", Syntax::Number, Syntax::Const);
   Root.add ("PenPar1", Syntax::Number, Syntax::Const);
@@ -812,14 +817,20 @@ CropStandardSyntax::CropStandardSyntax ()
   Root.add ("MaxPen", Syntax::Number, Syntax::Const);
   Root.add ("SpRtLength", Syntax::Number, Syntax::Const);
   Root.add ("DensRtTip", Syntax::Number, Syntax::Const);
+  vRoot.add ("DensRtTip", 0.1);
   Root.add ("Rad", Syntax::Number, Syntax::Const);
   Root.add ("h_wp", Syntax::Number, Syntax::Const);
+  vRoot.add ("h_wp",-15000.0);
   Root.add ("MxNH4Up", Syntax::Number, Syntax::Const);
+  vRoot.add ("MxNH4Up", 2.5e-7);
   Root.add ("MxNO3Up", Syntax::Number, Syntax::Const);
+  vRoot.add ("MxNO3Up", 2.5e-8);
   Root.add ("Rxylem", Syntax::Number, Syntax::Const);
+  vRoot.add ("Rxylem", 10.0);
 
   syntax.add ("Root", Root, Syntax::Const);
-  
+  alist.add ("Root", vRoot);
+
   // PartitPar
   Syntax& Partit = *new Syntax ();
 
@@ -848,7 +859,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Prod.add ("LfDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("RtDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("Large_RtDR", Syntax::Number, Syntax::Const);
-  
+
   // CrpNPar
   Syntax& CrpN = *new Syntax ();
   AttributeList& CrpNList = *new AttributeList ();
@@ -874,7 +885,15 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpN.add ("CrSOrgCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("NfSOrgCnc", Syntax::CSMP, Syntax::Const);
   CrpN.add ("TLLeafEff", Syntax::CSMP, Syntax::Const);
+  CSMP TLLeafEff;
+  TLLeafEff.add (0.00, 0.90);
+  TLLeafEff.add (2.00, 0.90);
+  CrpNList.add ("TLLeafEff", TLLeafEff);
   CrpN.add ("TLRootEff", Syntax::CSMP, Syntax::Const);
+  CSMP TLRootEff;
+  TLRootEff.add (0.00, 0.10);
+  TLRootEff.add (2.00, 0.10);
+  CrpNList.add ("TLRootEff", TLRootEff);
 
   syntax.add ("CrpN", CrpN, Syntax::Const);
   alist.add ("CrpN", CrpNList);
@@ -889,10 +908,15 @@ CropStandardSyntax::CropStandardSyntax ()
   add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const);
   add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const);
   Harvest.add ("C_Stem", Syntax::Number, Syntax::Const);
+  HarvestList.add ("C_Stem", 0.420);
   Harvest.add ("C_Leaf", Syntax::Number, Syntax::Const);
+  HarvestList.add ("C_Leaf", 0.420);
   Harvest.add ("C_Dead", Syntax::Number, Syntax::Const);
+  HarvestList.add ("C_Dead", 0.420);
   Harvest.add ("C_SOrg", Syntax::Number, Syntax::Const);
+  HarvestList.add ("C_SOrg", 0.420);
   Harvest.add ("C_Root", Syntax::Number, Syntax::Const);
+  HarvestList.add ("C_Root", 0.420);
   Harvest.add ("DSmax", Syntax::Number, Syntax::Const);
   HarvestList.add ("DSmax", 0.0);
   Harvest.add ("DSnew", Syntax::Number, Syntax::Const);
@@ -901,9 +925,6 @@ CropStandardSyntax::CropStandardSyntax ()
   syntax.add ("Harvest", Harvest, Syntax::Const);
   alist.add ("Harvest", HarvestList);
 
-   // I don't know where these belong.
-  syntax.add ("IntcpCap", Syntax::Number, Syntax::Const);
-  syntax.add ("EpFac", Syntax::Number, Syntax::Const);
   syntax.add ("enable_water_stress", Syntax::Boolean, Syntax::Const);
   alist.add ("enable_water_stress", true);
   syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::Const);
@@ -1064,10 +1085,10 @@ double CropStandard::EPext () const
 { return par.Canopy.EPext; }
 
 double CropStandard::IntcpCap () const // Interception Capacity.
-{ return par.IntcpCap; }
+{ return par.Canopy.IntcpCap; }
 
 double CropStandard::EpFac () const // Convertion to potential evapotransp.
-{ return par.EpFac; }
+{ return par.Canopy.EpFac; }
 
 double
 CropStandard::SoluteUptake (const Soil& soil,
@@ -1173,7 +1194,7 @@ CropStandard::Emergence ()
     DS = Devel.DS_Emr;
 }
 
-void 
+void
 CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 {
   const Parameters::DevelPar& Devel = par.Devel;
@@ -1366,7 +1387,7 @@ CropStandard::ActualWaterUptake (double Ept,
 {
   if (Ept < 0)
     {
-      cerr << "\nBUG: Negative EPT (" << Ept << ")\n";
+      CERR << "\nBUG: Negative EPT (" << Ept << ")\n";
       Ept = 0.0;
     }
   assert (EvapInterception >= 0);
@@ -1591,7 +1612,7 @@ CropStandard::RootDensDistPar (double a)
   return x;
 }
 
-void 
+void
 CropStandard::RootDensity (const Soil& soil)
 {
   const Parameters::RootPar& Root = par.Root;
@@ -1729,10 +1750,10 @@ CropStandard::CanopyPhotosynthesis (const Bioclimate& bioclimate)
   // One crop: assert (approximate (var.Canopy.LAI, bioclimate.LAI ()));
   if (!approximate (LAIvsH (var.Canopy.Height), var.Canopy.LAI))
     {
-      cerr << "Bug: LAI below top: " << LAIvsH (var.Canopy.Height)
+      CERR << "Bug: LAI below top: " << LAIvsH (var.Canopy.Height)
 	   << " Total LAI: " << var.Canopy.LAI << "\n";
       CanopyStructure ();
-      cerr << "Adjusted: LAI below top: " << LAIvsH (var.Canopy.Height)
+      CERR << "Adjusted: LAI below top: " << LAIvsH (var.Canopy.Height)
 	   << " Total LAI: " << var.Canopy.LAI << "\n";
     }
 
@@ -1936,16 +1957,17 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 	  AssG = 0.0;
 	}
       if (AssG > 0.0)
-	cerr << "BUG: Extra AssG: " << AssG << "\n";
+	CERR << "BUG: Extra AssG: " << AssG << "\n";
     }
 
   // Update dead leafs
   CrpAux.DeadWLeaf = pProd.LfDR (DS) * vProd.WLeaf;
   CrpAux.DeadWLeaf += vProd.WLeaf * (1.0 / 3.0) * CrpAux.LAImRat;
   const double DdLeafCnc = (vProd.NLeaf/vProd.WLeaf - par.CrpN.NfLeafCnc (DS))
-    * ( 1 - par.CrpN.TLLeafEff (DS)) +  par.CrpN.NfLeafCnc (DS);
+    * ( 1.0 - par.CrpN.TLLeafEff (DS)) +  par.CrpN.NfLeafCnc (DS);
   CrpAux.DeadNLeaf = DdLeafCnc * CrpAux.DeadWLeaf;
   CrpAux.IncWLeaf -= CrpAux.DeadWLeaf;
+  assert (CrpAux.DeadWLeaf >= 0.0);
   vProd.AM_leaf->add (par.Harvest.C_Dead * CrpAux.DeadWLeaf * m2_per_cm2,
 		      CrpAux.DeadNLeaf * m2_per_cm2);
 
@@ -1956,7 +1978,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   CrpAux.DeadWRoot = RtDR * vProd.WRoot;
   const double DdRootCnc = (vProd.NRoot/vProd.WRoot - par.CrpN.NfRootCnc (DS))
-    * ( 1 - par.CrpN.TLRootEff (DS)) +  par.CrpN.NfRootCnc (DS);
+    * ( 1.0 - par.CrpN.TLRootEff (DS)) +  par.CrpN.NfRootCnc (DS);
   CrpAux.DeadNRoot = DdRootCnc * CrpAux.DeadWRoot;
   CrpAux.IncWRoot -= CrpAux.DeadWRoot;
   vProd.AM_root->add (geometry,
@@ -1973,7 +1995,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   vProd.WRoot += CrpAux.IncWRoot;
 }
 
-double 
+double
 CropStandard::RSR () const
 {
   const double shoot = var.Prod.WStem + var.Prod.WSOrg + var.Prod.WLeaf;
@@ -2123,10 +2145,10 @@ CropStandard::harvest (const string& column_name,
 	}
     }
 
-  cerr << "Got (stem_harvest " << stem_harvest << ")\n";
-  cerr << "Got (leaf_harvest " << leaf_harvest << ")\n";
-  cerr << "Got (total_LAI " << LAI () << ")\n";
-  cerr << "Got (stub_LAI " << LAIvsH ()(stub_length) << ")\n";
+  CERR << "Got (stem_harvest " << stem_harvest << ")\n";
+  CERR << "Got (leaf_harvest " << leaf_harvest << ")\n";
+  CERR << "Got (total_LAI " << LAI () << ")\n";
+  CERR << "Got (stub_LAI " << LAIvsH ()(stub_length) << ")\n";
 
   if (!kill_off && DS < DSmax)
     {
@@ -2233,7 +2255,7 @@ CropStandard::CropStandard (const AttributeList& al)
 { }
 
 CropStandard::~CropStandard ()
-{ 
+{
   delete &var;
   delete &par;
 }

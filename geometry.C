@@ -4,6 +4,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "mathlib.h"
+#include "options.h"
 #include <assert.h>
 
 unsigned int 
@@ -38,14 +39,14 @@ Geometry::check () const
   bool ok = true;
   if (zplus_.size () < 1)
     {
-      cerr << "You need at least one interval\n";
+      CERR << "You need at least one interval\n";
       ok = false;
     }
   double last = 0.0;
   for (unsigned int i = 0; i < size_; i++)
     if (zplus_[i] > last)
       {
-	cerr << "Intervals should be monotonically decreasing, but "
+	CERR << "Intervals should be monotonically decreasing, but "
 	     << zplus_[i] << " > " << last << "\n";
 	ok = false;
 	break;
@@ -190,7 +191,7 @@ check_layers (const vector<AttributeList*>& layers)
 	last = next;
       else
 	{
-	  cerr << "Layer ending at " << next 
+	  CERR << "Layer ending at " << next 
 	       << " should be below " << last << "\n";
 	  return false;
 	}

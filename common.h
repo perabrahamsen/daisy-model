@@ -49,10 +49,13 @@
 
 #include <unistd.h>
 #include <strstream.h>
-#include <iostream.h>
 
 // GNU doesn't mind unused global constants.
 #define GLOBAL_CONSTANT
+
+// Unix path names.
+#define PATH_SEPARATOR ":"
+#define DIRECTORY_SEPARATOR "/"
 
 #else
 
@@ -64,6 +67,7 @@
 #define BORLAND_TEMPLATES
 #define BORLAND_EOF
 #define BORLAND_PRAGMA
+#define BORLAND_ASSERT
 
 // #define BORLAND_PERMISSIONS
 
@@ -71,9 +75,21 @@
 #include <io.h>
 // Borland C++ 5.01 doesn't spell stream with an m.
 #include <strstrea.h>
+// Needed in BCC for `chdir'.
+#include <dir.h>
 
 // Borland complains about unused global constants unless "extern".
 #define GLOBAL_CONSTANT extern
+
+// BC++ 5.01 hasn't <ostream.h>
+#define MISSING_OSTREAM
+
+// WinDOS doesn't have a useful stderr.
+#define USELESS_STDERR
+
+// WinDOS path names.
+#define PATH_SEPARATOR ";"
+#define DIRECTORY_SEPARATOR "\\"
 
 #endif
 

@@ -9,6 +9,7 @@
 #include "log.h"
 #include "geometry.h"
 #include "mathlib.h"
+#include "options.h"
 #include <numeric>
 
 static Library* AM_library = NULL;
@@ -294,12 +295,12 @@ AM::Implementation::check () const
 
       if (!om_ok)
 	{
-	  cerr << "in om[" << i << "]\n";
+	  CERR << "in om[" << i << "]\n";
 	  ok = false;
 	}
       }
   if (!ok)
-    cerr << "in am\n";
+    CERR << "in am\n";
   
   return ok;
 }
@@ -527,22 +528,22 @@ AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
 		}
 	      else if (missing_number != -1)
 		// Should be catched by syntax check.
-		cerr << "Missing initial fraction in initial am.\n";
+		CERR << "Missing initial fraction in initial am.\n";
 	      else
 		missing_number = j;
 	    }
 	  if (missing_number > -1)
 	    {
 	      if (missing_fraction < -0.1e-10)
-		cerr << "Specified over 100% C in om in initial am.\n";
+		CERR << "Specified over 100% C in om in initial am.\n";
 	      else if (missing_fraction > 0.0)
 		geometry.add (om[missing_number]->C, 
 			  last, end, C * missing_fraction);
 	    }
 	  else if (missing_fraction < -0.1e-10)
-	    cerr << "Specified more than all C in om in initial am.\n";
+	    CERR << "Specified more than all C in om in initial am.\n";
 	  else if (missing_fraction > 0.1e-10)
-	    cerr << "Specified less than all C in om in initial am.\n";
+	    CERR << "Specified less than all C in om in initial am.\n";
 	  
 	  last = end;
 	}
@@ -588,7 +589,7 @@ static bool check_organic (const AttributeList& al)
 { 
   if (!al.check ("syntax"))
     {
-      cerr << "no syntax";
+      CERR << "no syntax";
       return false;
     }
 
@@ -623,23 +624,23 @@ static bool check_organic (const AttributeList& al)
       ::check (*om_alist[i], "efficiency", om_ok);
       if (!om_ok)
 	{
-	  cerr << "in om[" << i << "]\n";
+	  CERR << "in om[" << i << "]\n";
 	  ok = false;
 	}
       }
   if (has_all_initial_fraction)
     {
-      cerr << "you should leave initial_fraction in one om unspecified\n";
+      CERR << "you should leave initial_fraction in one om unspecified\n";
       ok = false;
     }
   if (has_all_C_per_N)
     {
-      cerr << "you should leave C_per_N in one om unspecified\n";
+      CERR << "you should leave C_per_N in one om unspecified\n";
       ok = false;
     }
   ::check (al, "weight", ok);
   if (!ok)
-    cerr << "in am\n";
+    CERR << "in am\n";
   
   return ok;
 }

@@ -17,6 +17,7 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
+#include "options.h"
 
 class CropOld : public Crop
 {
@@ -1211,7 +1212,7 @@ CropOld::ActualWaterUptake (double Ept,
 {
   if (Ept < 0)
     {
-      cerr << "\nBUG: Negative EPT (" << Ept << ")\n";
+      CERR << "\nBUG: Negative EPT (" << Ept << ")\n";
       Ept = 0.0;
     }
   assert (EvapInterception >= 0);
@@ -1827,7 +1828,7 @@ CropOld::harvest (const string& column_name,
 
   if (!kill_off && DS < DSmax)
     {
-      cout << "(survived)";
+      COUT << "(survived)";
       // Cut back development stage and production.
       const double DSnew = Hp.DSnew;
 
@@ -1877,7 +1878,7 @@ CropOld::harvest (const string& column_name,
 	}
     }
 
-  cerr << "Harvest: " << name 
+  CERR << "Harvest: " << name 
        << "\n\tStub N = " << NStub << " W = " << WStub
        << "\n\tStraw N = " << NStraw << " W = " << WStraw
        << "\n\tSOrg N = " << NSOrg << " W = " << WSOrg

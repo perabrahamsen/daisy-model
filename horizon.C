@@ -7,6 +7,7 @@
 #include "csmp.h"
 #include "hydraulic.h"
 #include "mathlib.h"
+#include "options.h"
 #include <vector>
 #include <map>
 // G++ 2.7.2 has `accumulate' here.
@@ -88,7 +89,7 @@ Horizon::Implementation::initialize (const Hydraulic& hydro)
   if (C_divisor > 0.0)
     C_factor /= C_divisor;
   else
-    cerr << "Horizon: No C fractions given.\n";
+    CERR << "Horizon: No C fractions given.\n";
 
   // The particles are not in a real continuous medium.  Try to correct.
   const double continuum_correction_factor = 1.25;
@@ -357,7 +358,7 @@ Horizon::SOM_C_per_N (unsigned int pool) const
     // Used last specified number.
     return impl.SOM_C_per_N[impl.SOM_C_per_N.size () - 1];
   // Give up.  Guess.
-  cerr << "Horizon: SOM: no C_per_N\n";
+  CERR << "Horizon: SOM: no C_per_N\n";
   return 11.0;
 }
 

@@ -1,6 +1,8 @@
 * Ændr bioclimate så PM bliver et separat energi-modul.
 
-* Examine win32 CVS client
+  Udskriv `bioclimate_new.C'
+  Snak med SH om ændringer.
+  Design mere robust irrigation.
 
 * Plot retentionskurve fra gdaisy.
 

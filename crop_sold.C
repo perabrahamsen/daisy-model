@@ -17,6 +17,7 @@
 #include "am.h"
 #include "harvest.h"
 #include "mathlib.h"
+#include "options.h"
 
 class CropSold : public Crop
 {
@@ -1216,7 +1217,7 @@ CropSold::ActualWaterUptake (double Ept,
 {
   if (Ept < 0)
     {
-      cerr << "\nBUG: Negative EPT (" << Ept << ")\n";
+      CERR << "\nBUG: Negative EPT (" << Ept << ")\n";
       Ept = 0.0;
     }
   assert (EvapInterception >= 0);

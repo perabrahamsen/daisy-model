@@ -9,6 +9,7 @@
 #include "filter.h"
 #include "am.h"
 #include "mathlib.h"
+#include "options.h"
 
 bool 
 Surface::flux_top () const
@@ -54,12 +55,12 @@ Surface::accept_top (double water)
     {
       if (im.NO3 < 0.0)
 	{
-	  cerr << "BUG: Added " << -im.NO3 << " NO3 to surface\n";
+	  CERR << "BUG: Added " << -im.NO3 << " NO3 to surface\n";
 	  im.NO3 = 0.0;
 	}
       if (im.NH4 < 0.0)
 	{
-	  cerr << "BUG: Added " << -im.NH4 << " NH4 to surface\n";
+	  CERR << "BUG: Added " << -im.NH4 << " NH4 to surface\n";
 	  im.NH4 = 0.0;
 	}
       if (total_matter_flux)

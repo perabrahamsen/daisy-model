@@ -6,6 +6,7 @@
 #include "column.h"
 // We need to initialize the Crop library.
 #include "crop.h"
+#include "options.h"
 
 struct ActionSow : public Action
 {
@@ -13,7 +14,7 @@ struct ActionSow : public Action
 
   void doIt (const Frame& frame, Daisy& daisy)
     {
-      cout << " [Sowing " << crop.name ("type") << " at";
+      COUT << " [Sowing " << crop.name ("type") << " at";
 
       ColumnList& cl = daisy.columns;
       for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
@@ -21,10 +22,10 @@ struct ActionSow : public Action
 	  if (frame.match_column (**i))
 	    {
 	      (*i)->sow (crop); 
-	      cout << " " << (*i)->name;
+	      COUT << " " << (*i)->name;
 	    }
 	}
-      cout << "]\n";
+      COUT << "]\n";
     }
 
   bool check (Daisy&) const
@@ -35,7 +36,7 @@ struct ActionSow : public Action
       const Library& library = Librarian<Crop>::library ();
       if (!library.check (name))
 	{
-	  cerr << "Cannot sow unknown crop `" << name << "'\n";
+	  CERR << "Cannot sow unknown crop `" << name << "'\n";
 	  return false;
 	}
 
@@ -43,7 +44,7 @@ struct ActionSow : public Action
       const Syntax& syntax = library.syntax (name);
       if (!syntax.check (crop, name))
 	{
-	  cerr << "Cannot sow incomplete crop `" << name << "'\n";
+	  CERR << "Cannot sow incomplete crop `" << name << "'\n";
 	  return false;
 	}
 

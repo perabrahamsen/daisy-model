@@ -82,12 +82,12 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
   const int M_intervals (al.integer ("M_intervals"));
   const string name (al.name ("file"));
   
-  // cerr << "\n" << name << ": opening\n";
+  // CERR << "\n" << name << ": opening\n";
 
   ifstream file (Options::find_file (name));
   if (!file.good ())
     {
-      cerr << "\n" << name << ": file open error";
+      CERR << "\n" << name << ": file open error";
       THROW ("read error");
     }
   while (file.good () && file.get () != '\n')
@@ -104,7 +104,7 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
   for (int i = 0; i <= 500; i++)
     {
       if (!file.good ())
-	cerr << "\n" << name << ":" << line << ": no good";
+	CERR << "\n" << name << ":" << line << ": no good";
 
       file >> pF >> Theta >> Cw2 >> K;
       line++;
@@ -113,7 +113,7 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
 	const_cast<double&> (Theta_sat) = Theta;
       
       if (i != int (rint (pF * 100)))
-	cerr << "\n" << name << ":" << line << ": i " << i << " != "
+	CERR << "\n" << name << ":" << line << ": i " << i << " != "
 	     << pF * 100 << "(" << int (rint (pF * 100)) << ")";
       
       Theta_[i] = Theta;
@@ -128,11 +128,11 @@ HydraulicOld2::HydraulicOld2 (const AttributeList& al)
 #if 0
   if (!file.eof ())
     {
-      cerr << name << ":" << line << ": end of file expected\nGot:";
+      CERR << name << ":" << line << ": end of file expected\nGot:";
 
       while (file.good () && !file.eof ())
-	cerr << " `" << file.get () << "'";
-      cerr << "\n";
+	CERR << " `" << file.get () << "'";
+      CERR << "\n";
       // THROW ("read error");
     }
 #endif

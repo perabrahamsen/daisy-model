@@ -6,6 +6,7 @@
 #include "column.h"
 #include "daisy.h"
 #include "frame.h"
+#include "options.h"
 
 struct ConditionSoilTemperature : public Condition
 {
@@ -71,7 +72,7 @@ static struct ConditionSoilSyntax
       non_positive (height, "height", ok);
 
       if (!ok)
-	cerr << "in soil condition\n";
+	CERR << "in soil condition\n";
       return ok;
     }
 

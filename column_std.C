@@ -21,7 +21,7 @@
 #include "crop.h"
 #include "im.h"
 #include "am.h"
-
+#include "options.h"
 #include "weather.h"
 
 class Groundwater;
@@ -318,7 +318,7 @@ ColumnStandard::check () const
     ok = false;
 
   if (!ok)
-    cerr << "in column `" << name << "'\n";
+    CERR << "in column `" << name << "'\n";
 
   return ok;
 }

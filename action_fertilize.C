@@ -6,6 +6,7 @@
 #include "column.h"
 #include "am.h"
 #include "im.h"
+#include "options.h"
 
 struct ActionFertilize : public Action
 {
@@ -15,7 +16,7 @@ struct ActionFertilize : public Action
 
   void doIt (const Frame& frame, Daisy& daisy)
     {
-      cout << " [Fertilizing " << am.name ("type") << "]\n";
+      COUT << " [Fertilizing " << am.name ("type") << "]\n";
 
       for (ColumnList::iterator i = daisy.columns.begin (); 
 	   i != daisy.columns.end (); 
@@ -74,12 +75,12 @@ static struct ActionFertilizeSyntax
 
       if (from > 0.0 || to > 0.0)
 	{
-	  cerr << "You can only fertilize on or below the ground.\n";
+	  CERR << "You can only fertilize on or below the ground.\n";
 	  ok = false;
 	}
       if (from < to)
 	{
-	  cerr << "`from' must be higher than `to' in"
+	  CERR << "`from' must be higher than `to' in"
 	       << " the fertilization area.\n";
 	  ok = false;
 	}

@@ -6,6 +6,7 @@
 #include "solute.h"
 #include "log.h"
 #include "mathlib.h"
+#include "options.h"
 
 class TransportCD : public Transport
 {
@@ -134,7 +135,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
   double S_top = 0.0;
   if (J_in > 0.0)
     {
-      cerr << "\nBug: Positive J_in (" << J_in << ")\n";
+      CERR << "\nBug: Positive J_in (" << J_in << ")\n";
       J_in = 0.0;
     }
   if (J_in != 0.0)
@@ -288,7 +289,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 
 	  if (M[j] < 0.0)
 	    { 
-	      cerr << "\nBUG: M[" << j << "] = " << M[j] 
+	      CERR << "\nBUG: M[" << j << "] = " << M[j] 
 		   << " after transport\n";
 	      M[j] = 0.0;
 	    }

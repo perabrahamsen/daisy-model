@@ -10,6 +10,7 @@
 #include "groundwater.h"
 #include "syntax.h"
 #include "mathlib.h"
+#include "options.h"
 
 void
 SoilWater::clear (const Geometry&)
@@ -99,7 +100,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
     }
   catch (const char* error)
     {
-      cerr << "UZ problem: " << error << "\n"
+      CERR << "UZ problem: " << error << "\n"
 	   << "Using reserve uz model.\n";
       reserve->tick (soil, 
 		     first, surface, 
@@ -132,7 +133,7 @@ SoilWater::swap (const Soil& soil, double from, double middle, double to)
       const double Theta_sat = soil.Theta (i, 0.0);
       if (Theta_[i] > Theta_sat)
 	{
-	  cerr << "\nBUG: Theta[ " << i << "] (" << Theta_[i]
+	  CERR << "\nBUG: Theta[ " << i << "] (" << Theta_[i]
 	       << ") > Theta_sat (" << Theta_sat << ")\n";
 	  Theta_[i] = Theta_sat;
 	}
@@ -147,19 +148,19 @@ SoilWater::check (unsigned n) const
 
   if (Theta_.size () != n)
     {
-      cerr << "You have " << n 
+      CERR << "You have " << n 
 	   << " intervals but " << Theta_.size () << " Theta values\n";
       ok = false;
     }
   if (h_.size () != n)
     {
-      cerr << "You have " << n 
+      CERR << "You have " << n 
 	   << " intervals but " << h_.size () << " h values\n";
       ok = false;
     }
   if (Xi.size () != n)
     {
-      cerr << "You have " << n 
+      CERR << "You have " << n 
 	   << " intervals but " << Xi.size () << " Xi values\n";
       ok = false;
     }

@@ -10,6 +10,7 @@
 #include "weather.h"
 #include "crop.h"
 #include "library.h"
+#include "options.h"
 
 void Event::Udfoer(Daisy& daisy,const Time& dato, EventQueue& EQ) {
    // Wrapper to make sure Visit is done
@@ -67,7 +68,7 @@ void FertilizeEvent::Do_It(Daisy& daisy,const Time&, EventQueue&)
 	(*i)->fertilize (am, daisy.time);
     }
   }
-  cout << "[ (Not really) Fertilizing with " <<fertilizer<<"]\n";
+  COUT << "[ (Not really) Fertilizing with " <<fertilizer<<"]\n";
 }
 
 bool FertilizeEvent::KanUdfoeres(Daisy& ,const Time& ){
@@ -98,7 +99,7 @@ void IrrigateEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
       if (match (**i)) {
 	      (*i)->irrigate (howmuch, t, sm, from);
-         cout << "[(not really) Irrigating]\n";
+         COUT << "[(not really) Irrigating]\n";
       }
    }
 }
@@ -142,7 +143,7 @@ void TillageEvent::Do_It(Daisy& daisy,const Time&, EventQueue& ){
             (*i)->mix (daisy.time, 0.0, depth, penetration);
 	      else
             (*i)->swap (daisy.time, 0.0, middle, depth);
-         cout << "[Tilling]\n";
+         COUT << "[Tilling]\n";
 
       }
    }
@@ -169,7 +170,7 @@ void HarvestEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
 	      continue;
       vector<const Harvest*> entry = (*i)->harvest (daisy.time, CropName, Stub, Stem, Leaf, StorageOrgans);
       daisy.harvest.insert (daisy.harvest.end (), entry.begin (), entry.end ());
-      cout << "[Harvesting "<<CropName<<"]\n";
+      COUT << "[Harvesting "<<CropName<<"]\n";
 
    }
 }
@@ -208,7 +209,7 @@ void SowEvent::Do_It(Daisy& daisy,const Time& dato, EventQueue& EQ){
    for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++){
       if (match (**i)) {
 	(*i)->sow (CropAttributes); 
-	cout << "[Sowing]\n";
+	COUT << "[Sowing]\n";
 
        if (harvest)
           harvest->SetCropName(Crop);
@@ -230,7 +231,7 @@ StartEvent* StartEvent::create(AttributeList &){
 }
 
 void StartEvent::Do_It(Daisy& ,const Time& , EventQueue& ){
-         cout << "[Start]\n";
+         COUT << "[Start]\n";
 
 }
 bool StartEvent::KanUdfoeres(Daisy& ,const Time& ){
@@ -241,7 +242,7 @@ EndEvent* EndEvent::create(AttributeList &){
    return new EndEvent();
 }
 void EndEvent::Do_It(Daisy& daisy,const Time& , EventQueue& ){
-         cout << "[Stopping]\n";
+         COUT << "[Stopping]\n";
    daisy.running = false;
 }
 bool EndEvent::KanUdfoeres(Daisy& ,const Time& ){

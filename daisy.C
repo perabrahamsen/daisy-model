@@ -21,7 +21,7 @@
 #include "alist.h"
 #include "frame.h"
 #include "common.h"
-#include <iostream.h>
+#include "options.h"
 
 Daisy::Daisy (const AttributeList& al)
   : syntax (NULL),
@@ -55,7 +55,7 @@ Daisy::check ()
       }
     if (!ok)
       {
-	cerr << "Malformed column(s)\n";
+	CERR << "Malformed column(s)\n";
 	all_ok = false;
       }
   }
@@ -71,14 +71,14 @@ Daisy::check ()
       }
     if (!ok)
       {
-	cerr << "Malformed log(s)\n";
+	CERR << "Malformed log(s)\n";
 	all_ok = false;
       }
   }
   // Check actions.
   if (!action.check (*this))
     {
-      cerr << "Malformed action(s)\n";
+      CERR << "Malformed action(s)\n";
       all_ok = false;
     }
 
@@ -127,7 +127,7 @@ Daisy::run ()
   while (running)
     {
       if (time.hour () == 0)
-	cout << time.year () << "-" << time.month () << "-" 
+	COUT << time.year () << "-" << time.month () << "-" 
 	     << time.mday () << "\n";
       tick ();
     }

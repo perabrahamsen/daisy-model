@@ -5,6 +5,7 @@
 #include "time.h"
 #include "frame.h"
 #include "geometry.h"
+#include "options.h"
 #include <fstream.h>
 #include <numeric>
 #include <algorithm>
@@ -453,7 +454,7 @@ struct LogTable : public Log, public Filter
     {
 #ifdef CONST_DELETE
       if (!out.good ())
-	cerr << "Problems writing to `" << file << "'\n";
+	CERR << "Problems writing to `" << file << "'\n";
       delete &condition;
       sequence_delete (entries.begin (), entries.end ());
 #endif

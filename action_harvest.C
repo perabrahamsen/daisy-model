@@ -4,6 +4,7 @@
 #include "daisy.h"
 #include "frame.h"
 #include "column.h"
+#include "options.h"
 
 struct ActionHarvest : public Action
 {
@@ -15,7 +16,7 @@ struct ActionHarvest : public Action
 
   void doIt (const Frame& frame, Daisy& daisy)
     {
-      cout << " [Harvesting " << name << "at";
+      COUT << " [Harvesting " << name << "at";
       ColumnList& cl = daisy.columns;
       for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
 	{ 
@@ -25,10 +26,10 @@ struct ActionHarvest : public Action
 	    = (*i)->harvest (daisy.time, name, stub, stem, leaf, sorg);
 	  daisy.harvest.insert (daisy.harvest.end (),
 				entry.begin (), entry.end ());
-	  cout << " " << (*i)->name;
+	  COUT << " " << (*i)->name;
 
 	}
-	cout << "]\n";
+	COUT << "]\n";
     }
 
   ActionHarvest (const AttributeList& al)
