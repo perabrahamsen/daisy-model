@@ -1,8 +1,15 @@
 2005-03-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* library.C, library.h (has_interesting_description): New member
+	function. 
+	* program_document.C (has_interesting_description): Removed.
+	* log_select.C (has_interesting_description): Removed.
+
 	* select.C (check_alist): Fix warning.
 	(load_syntax): Fix typo in desctiption string.
-	* select.C, select.h (document): Newmember function.
+
+	* select.C, select.h (log_name): Removed.
+	(document): New member function.
 	* log_select.C (document_entries): Call it.
 
 2005-03-18  Per Abrahamsen  <abraham@dina.kvl.dk>

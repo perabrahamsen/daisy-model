@@ -343,6 +343,32 @@ Library::base_model (const symbol parameterization) const
   return parameterization;
 }
 
+bool 
+Library::has_interesting_description (const AttributeList& alist)
+{
+  // A missing description is boring.
+  if (!alist.check ("description"))
+    return false;
+  
+  // The description of models are always interesting.
+  if (!alist.check ("type"))
+    return true;
+  
+  // If the model has no description, this one is interesting.
+  const symbol type = alist.identifier ("type");
+  if (!check (type))
+    {
+      daisy_bug (name () + " does not have " + type.name ());
+      return false;
+    }
+  daisy_assert (check (type));
+  const AttributeList& super = lookup (type);
+  if (!super.check ("description"))
+    return true;
+  
+  // If the model description is different, this one is interesting.
+  return alist.name ("description") != super.name ("description");
+}
 
 void
 Library::add_doc_fun (doc_fun fun) 

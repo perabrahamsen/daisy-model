@@ -63,8 +63,10 @@ public:
   void entries (std::vector<symbol>&) const;
   bool is_derived_from (symbol a, symbol b) const;
   const symbol base_model (symbol parameterization) const;
+  bool has_interesting_description (const AttributeList& alist) const;
   void add_doc_fun (doc_fun);
   std::vector<doc_fun>& doc_funs () const;
+
   // Dependencies.
   void remove (symbol);
 

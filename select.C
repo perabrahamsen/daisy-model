@@ -88,9 +88,11 @@ struct Select::Implementation
   double convert (double) const; // - || -
   const symbol tag;		// Name of this entry.
   string dimension;		// Physical dimension of this entry.
+  const string description;
 
   // Create and Destroy.
-  bool check (const string& spec_dim, Treelog& err) const;
+  bool check (const string& spec_tdim, Treelog& err) const;
+  static string find_description (const AttributeList& al);
   Implementation (const AttributeList& al);
   ~Implementation ();
 };
@@ -218,6 +220,15 @@ Select::Implementation::check (const string& spec_dim, Treelog& err) const
   return ok;
 }
   
+static string 
+Select::Implementation::find_description (const AttributeList& al)
+{
+  const Library& library = Librarian<Select>::library ();
+  if (library.has_interesting_description (al))
+    return al.name ("description");
+  return string ("");
+}
+
 Select::Implementation::Implementation (const AttributeList& al)
   : spec (al.check ("spec") ? new Spec (al.alist ("spec")) : NULL),
     spec_conv (NULL),
@@ -226,7 +237,8 @@ Select::Implementation::Implementation (const AttributeList& al)
     negate (al.flag ("negate")),
     tag (Select::select_get_tag (al)),
     dimension (al.check ("dimension")
-	       ? al.name ("dimension") : Syntax::Unknown ())
+	       ? al.name ("dimension") : Syntax::Unknown ()),
+    description (find_description (al))
 { }
   
 Select::Implementation::~Implementation ()
@@ -246,13 +258,6 @@ Select::dimension () const
 symbol
 Select::tag () const
 { return impl.tag; }
-
-symbol 
-Select::log_name () const
-{ 
-  daisy_assert (path.size () > 0);
-  return path[path.size () - 1];
-}
 
 const Soil* 
 Select::soil () const
@@ -328,10 +333,15 @@ void
 Select::document (Format& format) const
 {
   Format::Item item (format, tag ().name ());  
+  format.special ("nbsp");
   format.text ("[");
   format.bold (dimension ());
   format.text ("]");
-  format.soft_linebreak ();
+  if (impl.description != "")
+    {
+      format.soft_linebreak ();
+      format.text (impl.description);
+    }
 }
 
 void 

@@ -33,29 +33,6 @@
 #include <memory>
 #include <algorithm>
 
-static bool 
-has_interesting_description (const Library& library, 
-                             const AttributeList& alist)
-{
-  // A missing description is boring.
-  if (!alist.check ("description"))
-    return false;
-  
-  // The description of models are always interesting.
-  if (!alist.check ("type"))
-    return true;
-  
-  // If the model has no description, this one is interesting.
-  const symbol type = alist.identifier ("type");
-  daisy_assert (library.check (type));
-  const AttributeList& super = library.lookup (type);
-  if (!super.check ("description"))
-    return true;
-  
-  // If the model description is different, this one is interesting.
-  return alist.name ("description") != super.name ("description");
-}
-
 struct ProgramDocument : public Program
 {
   
@@ -1088,7 +1065,7 @@ ProgramDocument::print_model (const symbol name, const Library& library)
 	  format->text (".\n");
 	}
 
-      if (has_interesting_description (library, alist))
+      if (library.has_interesting_description (alist))
         print_description (alist.name ("description"));
 
       print_users (xref.models[used]);
