@@ -7,11 +7,11 @@
 #include "version.h"
 #include "options.h"
 
-int 
+int
 main (int argc, char* argv[])
 {
 #ifdef HANDLE_EXCEPTIONS
-  try 
+  try
     {
 #endif
       // We need exactly one argument.

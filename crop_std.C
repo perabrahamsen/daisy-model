@@ -2028,9 +2028,13 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 
   // Update dead leafs
   CrpAux.DeadWLeaf = pProd.LfDR (DS) * vProd.WLeaf;
-  CrpAux.DeadWLeaf += vProd.WLeaf * (1.0 / 3.0) * CrpAux.LAImRat;
-  const double DdLeafCnc = (vProd.NLeaf/vProd.WLeaf - par.CrpN.NfLeafCnc (DS))
-    * ( 1.0 - par.CrpN.TLLeafEff (DS)) +  par.CrpN.NfLeafCnc (DS);
+  CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * CrpAux.LAImRat;
+  double DdLeafCnc;
+  if (vProd.NCrop > CrpAux.PtNCnt)
+    DdLeafCnc = vProd.NLeaf/vProd.WLeaf;
+  else
+    DdLeafCnc = (vProd.NLeaf/vProd.WLeaf - par.CrpN.NfLeafCnc (DS))
+      * ( 1.0 - par.CrpN.TLLeafEff (DS)) +  par.CrpN.NfLeafCnc (DS);
   CrpAux.DeadNLeaf = DdLeafCnc * CrpAux.DeadWLeaf;
   CrpAux.IncWLeaf -= CrpAux.DeadWLeaf;
   assert (CrpAux.DeadWLeaf >= 0.0);
@@ -2043,8 +2047,12 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
     RtDR += pProd.Large_RtDR;
 
   CrpAux.DeadWRoot = RtDR * vProd.WRoot;
-  const double DdRootCnc = (vProd.NRoot/vProd.WRoot - par.CrpN.NfRootCnc (DS))
-    * ( 1.0 - par.CrpN.TLRootEff (DS)) +  par.CrpN.NfRootCnc (DS);
+  double DdRootCnc;
+  if (vProd.NCrop > CrpAux.PtNCnt)
+    DdRootCnc = vProd.NRoot/vProd.WRoot;
+  else
+    DdRootCnc = (vProd.NRoot/vProd.WRoot - par.CrpN.NfRootCnc (DS))
+      * ( 1.0 - par.CrpN.TLRootEff (DS)) +  par.CrpN.NfRootCnc (DS);
   CrpAux.DeadNRoot = DdRootCnc * CrpAux.DeadWRoot;
   CrpAux.IncWRoot -= CrpAux.DeadWRoot;
   vProd.AM_root->add (geometry,
