@@ -1,5 +1,10 @@
 2001-10-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* printer.h, printer_file.h, printer_file.C (print_entry): New
+	member function.
+
+	* log_checkpoint.C (done): Use it.
+
 	* path.h, path.C: New utility.
 	* options.h, option.C, common.h: Use it.
 	* lexer.h, lexer.C: Use it.

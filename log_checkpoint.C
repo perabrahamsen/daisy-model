@@ -90,6 +90,12 @@ LogCheckpoint::done ()
       PrinterFile printer (filename);
       printer.print_comment (description);
 
+      // Print "directory" and "path" before inputs.
+      printer.print_entry (alist (), syntax (), "directory");
+      printer.print_entry (alist (), syntax (), "path");
+      alist ().remove ("directory"); // Avoid printing them twice.
+      alist ().remove ("path"); 
+      
       // Print input files.
       if (alist ().check ("parser_inputs"))
 	{

@@ -37,7 +37,9 @@ public:
   // Print comment.
   void print_comment (const string& comment);
   // Print content of alist.
-  void print_alist (const AttributeList& alist, const Syntax&);
+  void print_alist (const AttributeList&, const Syntax&);
+  // Print entry in alist.
+  void print_entry (const AttributeList&, const Syntax&, const string& key);
   // Print all elements in all libraries associated with 'filename'.
   void print_library_file (const string& filename);
   // Print a parser input.

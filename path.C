@@ -1,6 +1,7 @@
 // path.C -- Handle Unix and WinDOS style paths.
 
 #include "path.h"
+#include "common.h"
 
 // Get chdir.
 #ifdef __BORLANDC__

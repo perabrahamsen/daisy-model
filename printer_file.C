@@ -632,6 +632,18 @@ PrinterFile::print_alist (const AttributeList& alist, const Syntax& syntax)
   impl.out << "\n";
 }
 
+void 
+PrinterFile::print_entry (const AttributeList& alist, const Syntax& syntax,
+			  const string& key)
+{ 
+  if (alist.check ("key"))
+    {
+      const AttributeList empty_alist;
+      impl.print_entry (alist, syntax, empty_alist, key, 0, false);
+      impl.out << "\n";
+    }
+}
+
 void
 PrinterFile::print_library_file (const string& filename)
 {
