@@ -1,4 +1,4 @@
-// alist.h attribute list
+// alist.h -- attribute list
 
 #ifndef ALIST_H
 #define ALIST_H
@@ -7,12 +7,14 @@
 #include "time.h"
 #include <std/stdexcept.h>
 #include <vector.h>
+#include <list.h>
 
 struct Rules;
 struct CSMP;
 struct HorizonList;
+struct AttributeList;
 
-// A map from attribute names to attribute values.
+typedef list <const AttributeList*> Sequence;
 
 class AttributeList
 {
@@ -60,11 +62,13 @@ public:
        throw2 (Invalid, Uninitialized);
   HorizonList& horizons (string) const
        throw2 (Invalid, Uninitialized);
-  const Time& time (string) const
-       throw2 (Invalid, Uninitialized);
   int integer (string) const
        throw2 (Invalid, Uninitialized);
-
+  const Time& time (string) const
+       throw2 (Invalid, Uninitialized);
+  const Sequence& sequence (string) const
+       throw2 (Invalid, Uninitialized);
+       
     // Create and Destroy.
   void add (string, double);
   void add (string, CropList*);
@@ -78,6 +82,8 @@ public:
   void add (string, bool);
   void add (string, int);
   void add (string, const Time&);
+  void add (string, const Sequence&);
+
   AttributeList (const AttributeList& old);
   AttributeList ();
   ~AttributeList ();

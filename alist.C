@@ -26,6 +26,7 @@ public:
     virtual ColumnList& columns () const throw (AttributeList::Invalid);
     virtual HorizonList& horizons () const throw (AttributeList::Invalid);
     virtual const Time& time () const throw (AttributeList::Invalid);
+    virtual const Sequence& sequence () const throw (AttributeList::Invalid);
 protected:
     Value ();
     virtual ~Value ();
@@ -71,6 +72,14 @@ class ValueTime : public Value
 public:
     const Time& time () const;
     ValueTime (const Time&);
+};
+
+class ValueSequence : public Value
+{
+    Sequence value;
+public:
+    const Sequence& sequence () const;
+    ValueSequence (const Sequence&);
 };
 
 class ValueArray : public Value
@@ -162,6 +171,13 @@ Value::time () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
     return *((Time*) 0); // SHUT UP.
+}
+
+const Sequence&
+Value::sequence () const throw (AttributeList::Invalid)
+{ 
+    THROW (AttributeList::Invalid ());
+    return *((Sequence*) 0); // SHUT UP.
 }
 
 const
@@ -260,6 +276,15 @@ ValueTime::time () const
 }
 
 ValueTime::ValueTime (const Time& t) : value (t)
+{ }
+
+const Sequence&
+ValueSequence::sequence () const
+{
+    return value;
+}
+
+ValueSequence::ValueSequence (const Sequence& t) : value (t)
 { }
 
 const vector<double>&
@@ -416,6 +441,12 @@ AttributeList::time (string key) const throw2 (Invalid, Uninitialized)
     return impl.lookup (key)->time ();
 }
 
+const Sequence&
+AttributeList::sequence (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->sequence ();
+}
+
 const vector<double>& 
 AttributeList::array (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -486,6 +517,12 @@ void
 AttributeList::add (string key, const Time& v)
 {
     impl.add (key, new ValueTime (v));
+}
+
+void 
+AttributeList::add (string key, const Sequence& v)
+{
+    impl.add (key, new ValueSequence (v));
 }
 
 void 

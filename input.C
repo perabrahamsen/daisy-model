@@ -29,12 +29,13 @@ Usage::what () const
 struct Input::Implementation
 {
   Log& log;
+  AttributeList alist;
   const AttributeList* weather;
   const AttributeList* groundwater;
   const AttributeList* chief;
   Time time;
   ColumnList field;
-  Syntax filter_syntax;
+  Syntax syntax;
   void load ();
   int get ();
   int peek ();
@@ -55,7 +56,6 @@ struct Input::Implementation
   void load_columns (ColumnList&);
   void load_crops (CropList&);
   void load_library (Library& lib);
-  typedef void (*derive_fun) (string, const AttributeList&, string);
   void add_derived (const Library&, derive_fun);
   const AttributeList* load_derived (const Library& lib);
   void load_list (AttributeList*, const Syntax&);
@@ -65,6 +65,8 @@ struct Input::Implementation
   const Filter* get_filter (const Syntax&);
   const Filter* get_filter_columns ();
   const Filter* get_filter_crops ();
+  const Filter* get_filter_object (const Library&);
+  const Filter* get_filter_sequence (const Library&);
   istream* in;
   ostream& err;
   string file;
@@ -114,7 +116,8 @@ Input::Input (int& argc, char**& argv, ostream& e)
 { }
 
 void 
-Input::Implementation::load (){
+Input::Implementation::load ()
+{
   skip ("(");
   while (!looking_at (')') && good ())
     {
@@ -360,7 +363,7 @@ Input::Implementation::load_log (Log& l)
       skip ("(");
       string s = get_string ();
       const Condition* c = get_condition ();
-      const Filter* f = get_filter (filter_syntax);
+      const Filter* f = get_filter (syntax);
       l.add (s, c, f);
       skip (")");
     }
@@ -674,6 +677,20 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax& syntax)
 	      atts->add (name, list);
 	    break;
 	  }
+	case Syntax::Class:
+	  add_derived (syntax.library (name), syntax.derive (name));
+	  break;
+	case Syntax::Object:
+	  atts->add (name, load_derived (syntax.library (name)));
+	  break;
+	case Syntax::Sequence:
+	  {
+	    Sequence& sequence = *new Sequence ();
+	    while (!looking_at (')') && good ())
+	      sequence.push_back (load_derived (syntax.library (name)));
+	    atts->add (name, sequence);
+	    break;
+	  }
 	case Syntax::Error:
 	  error (string("Unknown attribute `") + name + "'");
 	  skip_to_end ();
@@ -794,24 +811,20 @@ Input::Implementation::get_filter (const Syntax& syntax)
 	  switch (syntax.lookup (name))
 	    {
 	    case Syntax::List:
-	      {
-		const Filter* f
-		  = get_filter (syntax.syntax (name));
-		filter->add (name, f);
-		break;
-	      }
+	      filter->add (name, get_filter (syntax.syntax (name)));
+	      break;
 	    case Syntax::Columns:
-	      {
-		const Filter* f = get_filter_columns ();
-		filter->add (name, f);
-		break;
-	      }
+	      filter->add (name, get_filter_columns ());
+	      break;
 	    case Syntax::Crops:
-	      {
-		const Filter* f = get_filter_crops ();
-		filter->add (name, f);
-		break;
-	      }
+	      filter->add (name, get_filter_crops ());
+	      break;
+	    case Syntax::Object:
+	      filter->add (name, get_filter_object (syntax.library (name)));
+	      break;
+	    case Syntax::Sequence:
+	      filter->add (name, get_filter_sequence (syntax.library (name)));
+	      break;
 	    case Syntax::Error:
 	      error (string ("Unknown attribute `")
 		     + name + "'");
@@ -878,6 +891,38 @@ Input::Implementation::get_filter_crops ()
   return filter;
 }
 
+const Filter*
+Input::Implementation::get_filter_object (const Library& library)
+{
+  const Filter* filter = Filter::all;
+  skip ("(");
+  string name = get_id ();
+  if (library.check (name))
+    filter = get_filter (library.syntax (name));
+  else 
+    error (string ("Unknown object `") + name + "' in filter");
+  skip (")");
+  return filter;
+}
+
+const Filter*
+Input::Implementation::get_filter_sequence (const Library& library)
+{
+  FilterSome* filter = new FilterSome ();
+
+  while (!looking_at (')') && good ())
+    {	
+      skip ("(");
+      string name = get_id ();
+      if (library.check (name))
+	filter->add (name, get_filter (library.syntax (name)));
+      else 
+	error (string ("Unknown object `") + name + "' in filter sequence");
+      skip (")");
+    }
+  return filter;
+}
+
 Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
   : log (*new Log ()),
     chief (NULL),
@@ -890,8 +935,17 @@ Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
     THROW (Usage ());
   file = argv[1];
   in = new ifstream (file.data ());
-  filter_syntax.add ("columns", Syntax::Columns);
-  filter_syntax.add ("time", Syntax::Date);
+  syntax.add_class ("crop", Crop::par_library (), &Crop::derive_type);
+  syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
+  syntax.add_class ("column", Column::par_library (), &Column::derive_type);
+  syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
+  syntax.add_object ("chief", Manager::library ());
+  syntax.add ("date", Syntax::Date);
+  syntax.add ("time", Syntax::Date);
+  syntax.add_sequence ("field", Column::var_library ());
+  syntax.add ("log", &syntax, Syntax::Sparse);
+  syntax.add_object ("weather", Weather::library ());
+  syntax.add_object ("groundwater", Groundwater::library ());
   load ();
   delete in;
   in = NULL;

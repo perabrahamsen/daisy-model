@@ -124,7 +124,7 @@
 		   (sow SpringBarley)))))
  (log ("crop.log" (daily 1)
        time
-       (columns (c1 (crops (SpringBarley (Prod WLeaf WStem WSOrg WRoot WLDrd)
+       (field (c1 (crops (SpringBarley (Prod WLeaf WStem WSOrg WRoot WLDrd)
 					 (Phenology DS)
 					 (CrpAux CanopyAss)
 					 (Canopy LAI))))))

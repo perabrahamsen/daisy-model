@@ -2,39 +2,53 @@
 
 #include "syntax.h"
 #include "alist.h"
+#include <map.h>
 
 struct Syntax::Implementation
 {
-  // BUG: This should be replaced with STL maps.
-  const int UGLY_MAX_SIZE = 1024;
-  string UGLY_key[UGLY_MAX_SIZE];
-  type UGLY_type[UGLY_MAX_SIZE];
-  required UGLY_status[UGLY_MAX_SIZE];
-  const Syntax* UGLY_syntax[UGLY_MAX_SIZE];
-  const FTable* UGLY_function[UGLY_MAX_SIZE];
-  int UGLY_size[UGLY_MAX_SIZE];
-  int size;
+  
+  typedef map<string, type, less<string> > type_map;
+  typedef map<string, required, less<string> > status_map;
+  typedef map<string, const Syntax*, less<string> > syntax_map;
+  typedef map<string, const FTable*, less<string> > ftable_map;
+  typedef map<string, int, less<string> > size_map;
+  typedef map<string, const Library*, less<string> > library_map;
+  typedef map<string, derive_fun, less<string> > derive_map;
+  type_map types;
+  status_map status;
+  syntax_map syntax;
+  ftable_map ftables;
+  size_map size;
+  library_map libraries;
+  derive_map derived;
+  bool check (string name, const AttributeList& vl, const Log& log,
+	      bool sparse);
+  Syntax::type lookup (string key) const;
 };    
 
 bool 
-Syntax::check (string name, const AttributeList& vl, const Log& log) const
+Syntax::Implementation::check (string name, const AttributeList& vl,
+			       const Log& log, bool sparse)
 {
+
   bool error = false;
 
-  for (int i = 0; i < impl.size; i++)
+  for (status_map::const_iterator i = status.begin ();
+       i != status.end ();
+       i++)
     {
-      string key = impl.UGLY_key[i];
-      if (impl.UGLY_status[i] == Mandatory && !vl.check (key))
+      string key = (*i).first;
+      required state = status[key];
+      if (!sparse && status[key] == Mandatory && !vl.check (key))
 	{
 	  cerr << "Attributte " << key << "\n";
 	  error = true;
 	}
-      else if (impl.UGLY_type[i] == List && vl.check (key))
-	{
-	  error |= !impl.UGLY_syntax[i]->check (key, 
-						vl.list (key),
-						log);
-	}
+      else if (   types[key] == List 
+	       && vl.check (key)
+	       && !syntax[key]->check (key, vl.list (key), log,
+				       sparse || (state == Sparse)))
+	error = true;
     }
   if (error)
     cerr << "missing from " << name << "\n";
@@ -43,82 +57,118 @@ Syntax::check (string name, const AttributeList& vl, const Log& log) const
 }
 
 Syntax::type 
+Syntax::Implementation::lookup (string key) const
+{
+  type_map::const_iterator i = types.find (key);
+
+  if (i == types.end ())
+    return Syntax::Error;
+  else
+    return (*i).second;
+}
+
+bool
+Syntax::check (string name, const AttributeList& vl,
+	       const Log& log, bool sparse) const
+{
+  return impl.check (name, vl, log, sparse);
+}
+
+Syntax::type 
 Syntax::lookup (string key) const
 {
-  for (int i = 0; i < impl.size; i++)
-    if (impl.UGLY_key[i] == key)
-      return impl.UGLY_type[i];
-  return Error;
+  return impl.lookup (key);
 }
 
 Syntax::required
 Syntax::status (string key) const
 {
-  for (int i = 0; i < impl.size; i++)
-    if (impl.UGLY_key[i] == key)
-      return impl.UGLY_status[i];
-  assert (false);
+  return impl.status[key];
 }
 
 const Syntax&
 Syntax::syntax (string key) const
 {
-  for (int i = 0; i < impl.size; i++)
-    if (impl.UGLY_key[i] == key)
-      return *impl.UGLY_syntax[i];
-  assert (false);
+  return *impl.syntax[key];
 }
 
 const FTable*
 Syntax::function (string key) const
 {
-  for (int i = 0; i < impl.size; i++)
-    if (impl.UGLY_key[i] == key)
-      return impl.UGLY_function[i];
-  assert (false);
+  return impl.ftables[key];
+}
+
+const Library&
+Syntax::library (string key) const
+{
+  return *impl.libraries[key];
+}
+
+derive_fun
+Syntax::derive (string key) const
+{
+  return impl.derived[key];
 }
 
 int
 Syntax::size (string key) const
 {
-  for (int i = 0; i < impl.size; i++)
-    if (impl.UGLY_key[i] == key)
-      return impl.UGLY_size[i];
-  assert (false);
+  Implementation::size_map::const_iterator i = impl.size.find (key);
+
+  if (i == impl.size.end ())
+    return -1;
+  else
+    return (*i).second;
 }
 
 void
 Syntax::add (string key, type t, required req)
 {
-  assert (impl.size < impl.UGLY_MAX_SIZE);
-  impl.UGLY_key[impl.size] = key;
-  impl.UGLY_syntax[impl.size] = NULL;
-  impl.UGLY_type[impl.size] = t;
-  impl.UGLY_status[impl.size] = req;
-  impl.UGLY_function[impl.size] = NULL;
-  impl.UGLY_size[impl.size] = -1;
-  impl.size++;
+  impl.types[key] = t;
+  impl.status[key] = req;
 }
 
 void
 Syntax::add (string key, const Syntax* s, required req)
 {
   add (key, List, req);
-  impl.UGLY_syntax[impl.size - 1] = s;
+  impl.syntax[key] = s;
 }
 
 void
 Syntax::add (string key, const FTable* f, required req)
 {
   add (key, Function, req);
-  impl.UGLY_function[impl.size - 1] = f;
+  impl.ftables[key] = f;
 }
 
 void
 Syntax::add (string key, int s, required req)
 {
   add (key, Array, req);
-  impl.UGLY_size[impl.size - 1] = s;
+  impl.size[key] = s;
+}
+
+void 
+Syntax::add_class (string key, const Library& l, derive_fun fun)
+{
+  add (key, Class, Optional);
+  impl.libraries[key] = &l;
+  impl.derived[key] = fun;
+}
+
+void 
+Syntax::add_object (string key, const Library& l, required req)
+{
+  add (key, Object, req);
+  impl.libraries[key] = &l;
+}
+
+void 
+Syntax::add_sequence (string key, const Library& l, required req)
+{
+  add (key, Sequence, req);
+  impl.libraries[key] = &l;
 }
 
 Syntax::Syntax () : impl (*new Implementation ())

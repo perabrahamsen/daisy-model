@@ -27,7 +27,7 @@
 		   (stop)))))
  (log ("water.log" (hourly 1)
        time
-       (columns (c1 (SoilWater Theta q)))))
+       (field (c1 (SoilWater Theta q)))))
  (weather simple)
  (time 1990 4 11)
  (field (c1 (crops)

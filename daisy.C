@@ -67,8 +67,8 @@ Daisy::output (Log& log, const Filter* filter) const
 {
   log.open ();
   log.output ("time", filter, time);
-  if (filter->check ("columns"))
-    output_field (log, filter->lookup ("columns"));
+  if (filter->check ("field"))
+    output_field (log, filter->lookup ("field"));
   log.close ();
 }
 
