@@ -620,6 +620,49 @@ soil increases."
                      (factor 1e5))      ;g/cm^2 -> kg/ha
            ))
 
+(deflog "Denitrification" table
+  "Detailed information about denitrification."
+  (where "denit.dlf")
+  (summary (simple (print_sum false)
+		   (fetch ("CO2 production")
+			  ("CO2 production from fast pools")
+			  ("Denitrification")
+			  ("Denitrification from fast pools")
+			  ("Potential denitrification")
+			  ("Potential denitrification from fast pools"))))
+  (when hourly)
+  (entries (interval (path column "$col" OrganicMatter CO2)
+                     (tag "CO2 production")
+                     (dimension "kg CO2-C/ha/&")
+                     (flux true)
+                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
+           (interval (path column "$col" OrganicMatter CO2_fast)
+                     (tag "CO2 production from fast pools") 
+                     (dimension "kg CO2-C/ha/&")
+                     (flux true)
+                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
+	   (interval (path column "$col" Denitrification converted)
+                     (tag "Denitrification")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+	   (interval (path column "$col" Denitrification converted_fast)
+                     (tag "Denitrification from fast pools")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+	   (interval (path column "$col" Denitrification potential)
+                     (tag "Potential denitrification")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+	   (interval (path column "$col" Denitrification potential_fast)
+                     (tag "Potential denitrification from fast pools")
+                     (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           ))
+
 (deflog "Soil Heat Balance" table
   "All available information about the soil heat subsystem."
   (where "soil_heat_balance.dlf")
@@ -2090,11 +2133,6 @@ submodel.  The amount printed under 'Total C Input' corresponds to the
                      (tag "SMB-CO2-total") 
                      (dimension "kg CO2-C/ha/&")
                        (flux true)
-                     (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
-           (interval (path column "$col" OrganicMatter CO2_fast)
-                     (tag "SMB-CO2-fast") 
-                     (dimension "kg CO2-C/ha/&")
-                     (flux true)
                      (factor 1e5)) ;g CO2-C/cm^2 -> kg CO2/ha
            (number (path column "$col" OrganicMatter am "*" om "*" top_C)
                    (tag "Surface_C")
