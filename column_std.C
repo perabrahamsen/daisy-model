@@ -59,8 +59,9 @@ public:
   void swap (const Time&, double from, double middle, double to);
 
   // Conditions.
-  double soil_temperature (double height); // [ cm -> dg C]
-  double soil_water_potential (double height); // [cm -> cm]
+  double soil_temperature (double height) const; // [ cm -> dg C]
+  double soil_water_potential (double height) const; // [cm -> cm]
+  double crop_ds (const string& crop) const; // {[-1:2], Crop::DSremove}
 
   // Simulation.
 public:
@@ -207,7 +208,7 @@ ColumnStandard::swap (const Time& time, double from, double middle, double to)
 }
 
 double 
-ColumnStandard::soil_temperature (double height)
+ColumnStandard::soil_temperature (double height) const
 {
   assert (height < 0);
   assert (height > soil.z (soil.size () - 1));
@@ -215,11 +216,22 @@ ColumnStandard::soil_temperature (double height)
   }
 
 double 
-ColumnStandard::soil_water_potential (double height)
+ColumnStandard::soil_water_potential (double height) const
 {
   assert (height < 0);
   assert (height > soil.z (soil.size () - 1));
   return soil_water.h (soil.interval (height));
+}
+
+double 
+ColumnStandard::crop_ds (const string& name) const
+{
+  for (CropList::const_iterator crop = crops.begin();
+       crop != crops.end();
+       crop++)
+    if ((*crop)->name == name)
+      return (*crop)->DS ();
+  return Crop::DSremove;
 }
 
 bool

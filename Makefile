@@ -169,7 +169,8 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	transport_none.C transport_convection.C adsorbtion_vS_S.C \
 	adsorbtion_none.C tortuosity_M_Q.C tortuosity_linear.C \
 	adsorbtion_freundlich.C adsorbtion_linear.C adsorbtion_langmuir.C \
-	filter_checkpoint.C bioclimate_std.C
+	filter_checkpoint.C bioclimate_std.C condition_crop.C \
+	condition_soil.C
 
 # Select the C files with a corresponding header file from the library.
 #

@@ -1,5 +1,14 @@
 1998-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 0.010 released.
+
+1998-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* column_std.C, column.h (crop_ds): New function.
+	* crop.h (Crop): Make `DS' and `DSremove' public.
+	* condition_crop.C: New file.
+	* condition_soil.C: New file.
+
 	* Version 0.009 released.
 
 1998-03-21  Per Abrahamsen  <abraham@dina.kvl.dk>

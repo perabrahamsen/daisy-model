@@ -44,8 +44,11 @@ public:
 
   // Conditions.
 public:
-  virtual double soil_temperature (double height) = 0; // [ cm -> dg C]
-  virtual double soil_water_potential (double height) = 0; // [cm -> cm]
+  virtual double soil_temperature (double height) const = 0; // [ cm -> dg C]
+  virtual double soil_water_potential (double height) const = 0; // [cm -> cm]
+  // Current development stage for the crop named "crop", or
+  // Crop::DSremove if no such crop is present.
+  virtual double crop_ds (const string& crop) const = 0; 
   
   // Simulation.
   virtual void tick (const Time&, const Weather&) = 0;

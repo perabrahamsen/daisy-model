@@ -2013,6 +2013,10 @@ CropStandard::harvest (const string& column_name,
 
       if (DS > DSnew)
 	var.Phenology.DS = DSnew;
+
+      // Adjust canopy for the sake of bioclimate.
+      CropHeight ();
+      CanopyStructure ();
       
       // Stop fixation after cut.
       if (DS > var.CrpAux.DS_start_fixate)
