@@ -56,6 +56,7 @@ private:
   // Turnover.
 public:
   /* const */ PLF heat_factor;
+  /* const */ PLF water_factor;
   const double turnover_rate;	// How fast this is it turned over?
   const vector<double> efficiency;	// How digestible is this?
   const vector<double> fractions;	// Where does it end up?

@@ -1,3 +1,20 @@
+2004-03-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.36 released.
+
+2004-03-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+	
+	* dom.h (water_factor): New parameter.
+
+	* organic_matter.C (find_abiotic): Removed DOM version, changed
+	AOM version to accept any OM.
+	(tick): Call new DOM with new `find_abiotic' version.
+
+2004-03-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("NO3 Root Uptake", "NH4 Root Uptake"): New
+	parameterizations. 
+
 2004-03-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.35 released.

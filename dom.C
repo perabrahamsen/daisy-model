@@ -419,6 +419,8 @@ A single Dissolved Organic Matter pool.");
   // Turnover.
   syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::OptionalConst,
 	      "Heat factor.  If empty, use default from 'OrganicMatter'.");
+  syntax.add ("water_factor", "cm", Syntax::None (), Syntax::OptionalConst, "\
+Water potential factor.  If empty, use default from 'OrganicMatter'.");
   syntax.add ("turnover_rate", "h^-1", Check::fraction (), 
 	      Syntax::OptionalConst,
 	      "Fraction converted to other pools each hour.\n\
@@ -457,7 +459,9 @@ DOM::DOM (const AttributeList& al)
 {
   if (al.check ("heat_factor"))
     heat_factor = al.plf ("heat_factor");
-}
+  if (al.check ("water_factor"))
+    water_factor = al.plf ("water_factor");
+ }
 
 DOM::~DOM ()
 { 

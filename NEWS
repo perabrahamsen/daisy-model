@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.36
+
+** "NO3 Root Uptake" and "NH4 Root Uptake" new log parameterizations.
+
+** DOM turnover is now affected by water.
+
 * 3.35
 
 ** New information in the top summary.

@@ -152,12 +152,8 @@ struct OrganicMatter::Implementation
   // Simulation.
   void add (AM&);
   void monthly (const Geometry&);
-  const double* find_abiotic (const DOM& om,
-			      const int size, 
-			      const SoilHeat& soil_heat,
-			      const vector<double>& default_value,
-			      vector<double>& scratch) const;
-  const double* find_abiotic (const AOM& om,
+  template<class DAOM>
+  const double* find_abiotic (const DAOM& om, // AOM & DOM
 			      const int size, 
 			      const SoilWater& soil_water, 
 			      const SoilHeat& soil_heat,
@@ -883,29 +879,9 @@ OrganicMatter::Implementation::monthly (const Geometry& geometry)
   am = new_am;
 }
 
+template <class DAOM>
 const double*
-OrganicMatter::Implementation::find_abiotic (const DOM& dom,
-					     const int size, 
-					     const SoilHeat& soil_heat,
-					     const vector<double>& 
-					     /**/ default_value,
-					     vector<double>& scratch) const
-{
-  const bool use_dom_heat = (dom.heat_factor.size () > 0);
-  
-  if (!use_dom_heat)
-    return &default_value[0];
-  
-  for (unsigned int i = 0; i < size; i++)
-    {
-      const double T = soil_heat.T (i);
-      scratch[i] = dom.heat_factor (T);
-    }
-  return &scratch[0];
-}
-
-const double*
-OrganicMatter::Implementation::find_abiotic (const AOM& om,
+OrganicMatter::Implementation::find_abiotic (const DAOM& om,
 					     const int size, 
 					     const SoilWater& soil_water, 
 					     const SoilHeat& soil_heat,
@@ -1026,7 +1002,6 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   vector<double> N_soil (size);
   vector<double> N_used (size);
-  vector<double> temp_factor (size);
   vector<double> abiotic_factor (size);
   vector<double> clay_factor (size);
   vector<double> soil_factor (size);
@@ -1049,7 +1024,6 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       const double T = soil_heat.T (i);
       const double heat = heat_turnover_factor (T);
       const double water = water_turnover_factor (h);
-      temp_factor[i] = heat * soil_turnover_factor [i];
       abiotic_factor[i] = heat * water;
       clay_factor[i] = abiotic_factor[i] * clay_turnover_factor [i];
       soil_factor[i] = abiotic_factor[i] * soil_turnover_factor [i];
@@ -1059,7 +1033,8 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   for (unsigned int j = 0; j < dom.size (); j++)
     {
       const double *const abiotic 
-	= find_abiotic (*dom[j], size, soil_heat, temp_factor, tillage_factor);
+	= find_abiotic (*dom[j], size, soil_water, soil_heat, soil_factor, 
+                        tillage_factor);
       double *const CO2 = dom[j]->turnover_rate > CO2_threshold 
 	? &CO2_fast[0] 
 	: &CO2_slow[0];
