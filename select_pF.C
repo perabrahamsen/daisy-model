@@ -22,6 +22,8 @@
 
 #include "select.h"
 #include "mathlib.h"
+#include "check.h"
+#include "vcheck.h"
 
 using namespace std;
 
@@ -107,11 +109,13 @@ static struct SelectPFSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
     Select::load_syntax (syntax, alist);
+    static VCheck::Enum current_only ("current");
+    syntax.add_check ("handle", current_only);
     syntax.add_check (check_alist);
     alist.add ("description", "Extract pF for all array points.\n\
 The original dimension is assumed to be in cm, no matter what is specified.");
 
-    syntax.add ("max_h", "cm", Syntax::Const, 
+    syntax.add ("max_h", "cm", Check::negative (), Syntax::Const, 
                 "Maximum water pressure in log.\n\
 Pressure above this value will be represented as this value.");
     alist.add ("max_h", -0.1);

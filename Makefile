@@ -298,8 +298,7 @@ MODELS = rootdens_AP.C number_const.C equil_goal.C pedo_arit.C \
 	action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
-	action_crop.C groundwater_lysimeter.C select_min.C \
-	select_max.C select_average.C action_message.C weather_std.C \
+	action_crop.C groundwater_lysimeter.C action_message.C weather_std.C \
 	select_flux_top.C select_flux_bottom.C groundwater_pipe.C \
 	select_index.C select_content.C select_interval.C \
 	select_number.C select_array.C log_table.C \
@@ -396,7 +395,7 @@ HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h)
 # Find all printable files.
 #
 TEXT =  ChangeLog.2 ChangeLog.1 \
-	Makefile ChangeLog TODO NEWS FILES COPYING COPYING.LIB \
+	Makefile ChangeLog TODO NEWS COPYING COPYING.LIB \
 	$(HEADERS) $(SOURCES) tlink32.ini daisy.bpr daisy.bpf daisy.bpg \
 	Daisy.vcproj
 
@@ -406,7 +405,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = pedo_linear.C
+REMOVE = select_min.C select_max.C select_average.C FILES 
 
 # These are the file extensions we deal with.
 # 

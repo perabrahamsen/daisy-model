@@ -30,6 +30,30 @@
 
 using namespace std;
 
+Handle::handle_t
+Handle::symbol2handle (symbol s)
+{
+  static struct sym_set_t : map<symbol,handle_t>
+  {
+    sym_set_t ()
+    {
+      static symbol min_symbol ("min");
+      insert (pair<symbol,handle_t> (min_symbol, min));
+      static symbol max_symbol ("max");
+      insert (pair<symbol,handle_t> (max_symbol, max));
+      static symbol average_symbol ("average");
+      insert (pair<symbol,handle_t> (average_symbol, average));
+      static symbol sum_symbol ("sum");
+      insert (pair<symbol,handle_t> (sum_symbol, sum));
+      static symbol current_symbol ("current");
+      insert (pair<symbol,handle_t> (current_symbol, current));
+    } 
+  } sym_set;
+  sym_set_t::const_iterator i = sym_set.find (s);
+  daisy_assert (i != sym_set.end ());
+  return (*i).second;
+}  
+
 EMPTY_TEMPLATE
 Librarian<Select>::Content* Librarian<Select>::content = NULL;
 
@@ -357,15 +381,27 @@ attribute.", Select::Implementation::Spec::load_syntax);
 OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
 This overwrites any direct setting of 'flux'.");
   syntax.add ("flux", Syntax::Boolean, Syntax::OptionalConst, "\
-Set this to true for flux variables and false for content variables.\n\
+OBSOLTE.  This value will be used if 'handle' is not specified.\
+A value of true then means 'sum', and false means 'current'.");
+  syntax.add ("handle", Syntax::String, Syntax::OptionalConst, "\
+This option determine how the specified variable should be logged.  \n\
 \n\
-If the time step for logging is larger than the time step for the\n\
-simulation, log system will accumulate flux variables between log\n\
-steps.  For example, if you log daily values for nitrogen leaching,\n\
-the log system will need to accumulate the hourly leaching to\n\
-calculate the daily values.  For content variables, no accumulation is\n\
-needed (or desired).  If you log nitrogen content on a daily basis, the\n\
-log will contain the value present at the end of the day.");
+min: Log the smallest value seen since last time the variable was logged.\n\
+If 'accumulate' is true, use the smallest value ever.\n\
+\n\
+max: Log the largest value seen since last time the variable was logged.\n\
+If 'accumulate' is true, use the largest value ever.\n\
+\n\
+average: Log the average value seen since last time the variable was logged.\n\
+If 'accumulate' is true, use the average of all values.\n\
+\n\
+sum: Accumulate value since last time the variable was logged.\n\
+If 'accumulate' is true, accumulate since the start of the log.\n\
+\n\
+current: Log the current value for the variable.\n\
+If 'accumulate' is true, the printed values will be accumulated..");
+  static VCheck::Enum handle_check ("min", "max", "average", "sum", "current");
+  syntax.add_check ("handle", handle_check);
   syntax.add ("interesting_content", Syntax::Boolean, Syntax::Const, "\
 True if the content of this column is interesting enough to warrent an\n\
 initial line in the log file.  This only affects non-flux variables.");
@@ -474,7 +510,11 @@ Select::Select (const AttributeList& al)
   : name (al.name ("type")),
     impl (*new Implementation (al)),
     accumulate (al.flag ("accumulate")),
-    flux (al.check ("when") ||  (al.check ("flux") && al.flag ("flux"))),
+    handle (al.check ("handle")
+            ? Handle (al.identifier ("handle"))
+            : Handle ((al.check ("when") 
+                       ||  (al.check ("flux") && al.flag ("flux")))
+                      ? Handle::sum : Handle::current)),
     interesting_content (al.flag ("interesting_content")),
     count (al.integer ("count")),
     path (al.identifier_sequence ("path")),

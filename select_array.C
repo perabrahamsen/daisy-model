@@ -43,10 +43,27 @@ struct SelectArray : public Select
 		    0.0);
     if (count == 0)
       for (unsigned int i = 0; i < array.size (); i++)
-	value[i] = convert (array[i]);
-    else
-      for (unsigned int i = 0; i < array.size (); i++)
-	value[i] += convert (array[i]);
+	value[i] = array[i];
+    else switch (handle)
+      {
+      case Handle::min:
+        for (unsigned int i = 0; i < array.size (); i++)
+          value[i] = std::min (value[i], array[i]);
+        break;
+      case Handle::max:
+        for (unsigned int i = 0; i < array.size (); i++)
+          value[i] = std::max (value[i], array[i]);
+        break;
+      case Handle::current:    
+        // We may have count > 0 && Handle::current when selecting
+        // multiple items with "*", e.g. multiple SOM pools.  
+        // In that case, we use the sum.
+      case Handle::average:
+      case Handle::sum:
+        for (unsigned int i = 0; i < array.size (); i++)
+          value[i] += array[i];
+        break;
+      }
     count++;
   }
 
@@ -55,9 +72,20 @@ struct SelectArray : public Select
   {
     if (count == 0)
       dest.missing ();
-    else 
-      dest.add (value);
-
+    else if (handle == Handle::average)
+      {
+        vector<double> result;
+        for (size_t i = 0; i < value.size (); i++)
+          result.push_back (convert (value[i] / count));
+        dest.add (result);
+      }
+    else
+      {
+        vector<double> result;
+        for (size_t i = 0; i < value.size (); i++)
+          result.push_back (convert (value[i]));
+        dest.add (result);
+      }
     if (!accumulate)
       count = 0;
   }

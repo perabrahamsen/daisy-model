@@ -26,13 +26,7 @@ struct SelectNumber : public SelectValue
 {
   // Output routines.
   void output_number (double number)
-  { 
-    if (count == 0)
-      value = number;
-    else
-      value += number;
-    count++;
-  }
+  { add_result (number); }
   void output_integer (int integer)
   { output_number (integer); }
 

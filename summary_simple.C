@@ -288,7 +288,8 @@ SummarySimple::initialize (vector<Select*>& select, Treelog& msg)
 	      {	
 		select[j]->add_dest (fetch[i]);
 		fetch[i]->select_dimension = select[j]->dimension ();
-		fetch[i]->type = (select[j]->flux && !select[j]->accumulate)
+		fetch[i]->type = ((select[j]->handle != Handle::current)
+                                  && !select[j]->accumulate)
 		  ? Fetch::Flux 
 		  : Fetch::NewContent;
 		found = true;

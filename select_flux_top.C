@@ -38,7 +38,7 @@ struct SelectFluxTop : public SelectValue
   // Output routines.
   void output_array (const vector<double>& array, 
 		     const Soil* soil, Treelog& msg)
-    { 
+  { 
     if (soil != last)
       {
         last = soil;
@@ -58,46 +58,42 @@ struct SelectFluxTop : public SelectValue
         daisy_assert (array.size () > index);
       }
 
-      if (count == 0)	 
-	value = array[index];	
-      else
-	value += array[index];	
-      count++;
-    }
+    add_result (array[index]);
+  }
 
   // Create and Destroy.
   void initialize (const map<symbol, symbol>& conv, 
 		   double default_from, double default_to,
 		   const string& timestep)
-    {
-      Select::initialize (conv, default_from, default_to, timestep);
+  {
+    Select::initialize (conv, default_from, default_to, timestep);
 
-      // Overwrite default height.
-      if (default_from < 0.0)
-	height = default_from;
-    }
+    // Overwrite default height.
+    if (default_from < 0.0)
+      height = default_from;
+  }
   SelectFluxTop (const AttributeList& al)
     : SelectValue (al),
       height (0.0),
       last (NULL),
       index (-1)
-    { }
+  { }
 };
 
 static struct SelectFluxTopSyntax
 {
   static Select& make (const AttributeList& al)
-    { return *new SelectFluxTop (al); }
+  { return *new SelectFluxTop (al); }
 
   SelectFluxTopSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      SelectValue::load_syntax (syntax, alist);
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    SelectValue::load_syntax (syntax, alist);
 
-      alist.add ("description", "Extract flux at top of specified interval.\n\
+    alist.add ("description", "Extract flux at top of specified interval.\n\
 By default, log the first member of the sequence.");
 
-      Librarian<Select>::add_type ("flux_top", alist, syntax, &make);
-    }
+    Librarian<Select>::add_type ("flux_top", alist, syntax, &make);
+  }
 } Select_syntax;

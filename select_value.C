@@ -22,15 +22,45 @@
 
 #include "select_value.h"
 
-  // Print result at end of time step.
+void 
+SelectValue::add_result (double result)
+{
+    if (count == 0)
+      value = result;
+    else switch (handle)
+      {
+      case Handle::min:
+        value = std::min (value, result);
+        break;
+      case Handle::max:
+        value = std::max (value, result);
+        break;
+      case Handle::current:    
+        // We may have count > 0 && Handle::current when selecting
+        // multiple items with "*", e.g. multiple SOM pools.  
+        // In that case, we use the sum.
+      case Handle::average:
+      case Handle::sum:
+        value += result;
+        break;
+      }
+    count++;
+}
+
+
+// Print result at end of time step.
 void 
 SelectValue::done ()
 {
   if (count == 0)
     dest.missing ();
   else 
-    dest.add (convert (value));
-
+    {
+      double result = value;
+      if (handle == Handle::average)
+        result /= count;
+      dest.add (convert (value));
+    }
   if (!accumulate)
     count = 0;
 }

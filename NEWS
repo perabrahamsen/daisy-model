@@ -12,6 +12,34 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.64
+
+** Almost all select models now handle average, min and max values.
+
+The new 'handle' parameter to the select models take five values,
+'average', 'min', 'max', 'sum' and 'current'.
+
+The two later curresponds to '(flux true)' and '(flux false)', which mean
+the 'flux' parameter is now obsolete.  Use 'handle' instead.
+
+The 'pF' and the (obsolete) date related models do not obey the new
+'handle' parameter.
+
+The 'max', 'min' and 'average' select models have been removed, use
+'number' instead with the relevant handle.
+
+** The 'select' can now log as "fraction of bulk mass".
+
+You need to specify both the 'spec' parameter and the 'dimension'.  If
+Daisy knows how to convert the units of the variable found with 'spec'
+to 'g/cm^3', and how to convert a fraction into the dimension
+specified by 'dimension' (e.g. [%]), it will do so.
+
+** New abiotic_factor log variable in OrganicMatter.
+
+This log the product of the water and heat factors, but ignore the
+clay factor. 
+
 * 3.63
 
 Bug fixes.

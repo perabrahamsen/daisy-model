@@ -36,6 +36,24 @@ class Daisy;
 class Time;
 class Treelog;
 
+struct Handle 
+{
+  // Enum in a namespace.
+  enum handle_t { min, max, average, sum, current };
+private:
+  handle_t value;
+  static handle_t symbol2handle (symbol s);
+public:
+  operator handle_t ()
+  { return value; }
+  Handle (handle_t v)
+    : value (v)
+  { }
+  Handle (symbol s)
+    : value (symbol2handle (s))
+  { }
+};
+
 class Select
 {
   // Content.
@@ -48,7 +66,7 @@ protected:
   MultiDest dest;
 public:
   const bool accumulate;	// Accumulate numbers over time.
-  const bool flux;		// Is this a flux variable?
+  Handle handle;
 protected:
   const bool interesting_content; // Is this worth an initial line?
   double convert (double) const; // Convert value.
@@ -100,12 +118,12 @@ public:
   bool is_active;		// Use by log_all.C.
   bool match (bool is_printing)
   { 
-    is_active = flux || is_printing;
+    is_active = (handle != Handle::current) || is_printing;
     return is_active;
   }
   bool initial_match ()
   { 
-    is_active = !flux;
+    is_active = (handle == Handle::current);
     return is_active;
   }
   // Print result at end of time step.

@@ -37,12 +37,10 @@ using namespace std;
 struct TmpStream::Implementation
 {
   ostrstream out;
-  bool done;
   char* str;
 
   Implementation ()
-    : done (false),
-      str (NULL)
+    : str (NULL)
   { }
   ~Implementation ()
   { 
@@ -54,16 +52,15 @@ struct TmpStream::Implementation
 std::ostream& 
 TmpStream::operator () ()
 {
-  daisy_assert (!impl.done);
+  daisy_assert (!impl.str);
   return impl.out;
 }
 
 const char* 
 TmpStream::str ()
 {
-  if (!impl.done)
+  if (!impl.str)
     {
-      impl.done = true;
       impl.out << '\0';
       impl.str = impl.out.str ();
     }

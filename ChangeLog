@@ -1,3 +1,27 @@
+2004-11-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_min.C, select_max.C, select_average.C, FILES: Removed.
+	* Makefile (MODELS, TEXT): Remove them.
+	(REMOVE): Add them.
+
+	* select.h, select.C, summary_simple.C (flux, handle): Replaced
+	'flux' with more general 'handle' parameter.
+	* select_value.C, select_value.h, select_interval.C:
+	* select_flux_top.C, select_flux_bottom.C, select_index.C: 
+	* select_content.C, select_number.C: Update caller.
+
+	* lib/log.dai ("Old Crop Production"): Fixated is a flux.
+
+	* organic_matter.C (abiotic_factor): New log variable.
+
+2004-11-24  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (partition): Don't add to a closed stream.
+
+	* tmpstream.C (done): Removed.
+
+	* organic_matter.C (humus): New log variable.
+
 2004-11-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* select.h, select.C, select_interval.C (special_convert): New

@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 class AttributeList;
 class Syntax;
@@ -65,8 +66,12 @@ public:
   class FixedPoint;
 
   // String.
+protected:
+  class String;
+public:
   class Compatible;
   static const VCheck& fraction ();
+  class Enum;
 
   // Logic.
 public:
@@ -92,8 +97,8 @@ private:
   // Use.
 private:
   void validate (int value) const throw (std::string);
-  virtual void check (const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string);
+  void check (const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -110,8 +115,8 @@ private:
 private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
-  virtual void check (const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string);
+  void check (const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -128,8 +133,8 @@ private:
 private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
-  virtual void check (const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string);
+  void check (const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -146,8 +151,8 @@ private:
 private:
   void validate (double value) const throw (std::string);
   void validate (const PLF& value) const throw (std::string);
-  virtual void check (const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string);
+  void check (const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -164,8 +169,8 @@ private:
   // Use.
 private:
   void validate (const PLF& value) const throw (std::string);
-  virtual void check (const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string);
+  void check (const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:
@@ -180,15 +185,25 @@ private:
 
   // Use.
 private:
-  virtual void check (const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string);
+  void check (const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:
   MinSize (unsigned int siz);
 };
 
-class VCheck::Compatible : public VCheck
+class VCheck::String : public VCheck
+{
+  // Use.
+private:
+  virtual void validate (const std::string& value) 
+    const throw (std::string) = 0;
+  void check (const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
+};
+
+class VCheck::Compatible : public VCheck::String
 {
   // Parameters.
 private:
@@ -197,12 +212,31 @@ private:
   // Use.
 private:
   void validate (const std::string& value) const throw (std::string);
-  virtual void check (const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:
   Compatible (const std::string& dim);
+};
+
+class VCheck::Enum : public VCheck::String
+{
+  // Parameters.
+private:
+  /*const*/ std::set<std::string> ids;
+
+  // Use.
+private:
+  void validate (const std::string& value) const throw (std::string);
+
+  // Create and Destroy.
+public:
+  Enum (const std::string& a);
+  Enum (const std::string& a, const std::string& b);
+  Enum (const std::string& a, const std::string& b, const std::string& c);
+  Enum (const std::string& a, const std::string& b, const std::string& c,
+        const std::string& d);
+  Enum (const std::string& a, const std::string& b, const std::string& c,
+        const std::string& d, const std::string& e);
 };
 
 class VCheck::All : public VCheck
@@ -213,8 +247,8 @@ private:
 
   // Use.
 private:
-  virtual void check (const Syntax&, const AttributeList&,
-                      const std::string& key) const throw (std::string);
+  void check (const Syntax&, const AttributeList&,
+              const std::string& key) const throw (std::string);
 
   // Create and Destroy.
 public:

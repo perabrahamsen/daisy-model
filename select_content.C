@@ -22,6 +22,7 @@
 
 #include "select_value.h"
 #include "soil.h"
+#include "check.h"
 
 struct SelectContent : public SelectValue
 {
@@ -31,13 +32,7 @@ struct SelectContent : public SelectValue
   // Output routines.
   void output_array (const std::vector<double>& array, 
 		     const Soil* soil, Treelog&)
-    { 
-      if (count == 0)	 
-	value = array[soil->interval_plus (height)];	
-      else
-	value += array[soil->interval_plus (height)];	
-      count++;
-    }
+  { add_result (array[soil->interval_plus (height)]); }
 
   // Create and Destroy.
   SelectContent (const AttributeList& al)
@@ -58,7 +53,7 @@ static struct SelectContentSyntax
       SelectValue::load_syntax (syntax, alist);
 
       alist.add ("description", "Extract content at specified height.");
-      syntax.add ("height", "cm", Syntax::Const,
+      syntax.add ("height", "cm", Check::non_positive (), Syntax::Const,
 		  "Specify height (negative) to measure content.");
 
       Librarian<Select>::add_type ("content", alist, syntax, &make);

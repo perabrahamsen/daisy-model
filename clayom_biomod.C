@@ -134,7 +134,11 @@ ClayOMBiomod::factor (const double clay) const
 
 bool 
 ClayOMBiomod::smb_use_clay (unsigned int /*pool*/) const
-{ return true; }
+{
+  // BUG? How can this be true when clay effect already incorporated?
+  // Maybe because there are two clay effects?
+  return true; 
+}
 
 bool 
 ClayOMBiomod::som_use_clay (unsigned int /*pool*/) const

@@ -30,13 +30,7 @@ struct SelectIndex : public SelectValue
   // Output routines.
   void output_array (const std::vector<double>& array,
                      const Soil*, Treelog&)
-  { 
-    if (count == 0)	 
-      value = array[index];	
-    else
-      value += array[index];	
-    count++;
-  }
+  { add_result (array[index]); }
 
   // Create and Destroy.
   SelectIndex (const AttributeList& al)

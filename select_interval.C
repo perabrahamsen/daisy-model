@@ -20,18 +20,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "select.h"
+#include "select_value.h"
 #include "soil.h"
 #include "units.h"
 #include "mathlib.h"
 
-struct SelectInterval : public Select
+struct SelectInterval : public SelectValue
 {
   // Content.
   const bool density;
   double from;
   double to;
-  double value;	
 
   // Bulk density convertions.
   struct BD_convert : public Units::Convert
@@ -69,7 +68,6 @@ struct SelectInterval : public Select
 	    }
 	  old = zplus;
 	}
-      bulk /= (from - to);
     }
     // Create and destroy.
     BD_convert (const std::string& has, const std::string& want)
@@ -107,15 +105,10 @@ struct SelectInterval : public Select
     else 
       result = soil->total (array, from, to);
 
-    if (count == 0)
-      {
-	if (bd_convert)
-	  bd_convert->set_bulk (*soil, from, to);
-	value = result;
-      }
-    else
-      value += result;
-    count++;
+    if (count == 0 && bd_convert)
+      bd_convert->set_bulk (*soil, from, to);
+
+    add_result (result);
   }
 
   // Print result at end of time step.
@@ -123,11 +116,15 @@ struct SelectInterval : public Select
   {
     if (count == 0)
       dest.missing ();
-    else if (density)
-      dest.add (convert (value / (from - to)));
-    else
-      dest.add (convert (value));
-
+    else 
+      {
+        double result = value;
+        if (density)
+          result /= (from - to);
+        if (handle == Handle::average)
+          result /= count;
+        dest.add (convert (result));
+      }
     if (!accumulate)
       count = 0;
   }
@@ -157,11 +154,10 @@ struct SelectInterval : public Select
       from = 0.0;
   }
   SelectInterval (const AttributeList& al)
-    : Select (al),
+    : SelectValue (al),
       density (al.flag ("density")),
       from (al.number ("from", 1.0)),
       to (al.number ("to", 1.0)),
-      value (al.number ("value")),
       bd_convert (NULL)
   { }
   ~SelectInterval ()
@@ -177,7 +173,7 @@ static struct SelectIntervalSyntax
   { 
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    Select::load_syntax (syntax, alist);
+    SelectValue::load_syntax (syntax, alist);
     alist.add ("description", "Summarize specified interval.");
 
     syntax.add ("density", Syntax::Boolean, Syntax::Const, 
@@ -189,9 +185,6 @@ By default, measure from the top.");
     syntax.add ("to", "cm", Syntax::OptionalConst,
 		"Specify height (negative) to measure interval.\n\
 By default, measure to the bottom.");
-    syntax.add ("value", Syntax::Unknown (), Syntax::State,
-		"The current accumulated value.");
-    alist.add ("value", 0.0);
 
     Librarian<Select>::add_type ("interval", alist, syntax, &make);
   }

@@ -2316,6 +2316,9 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   NO3_source.insert (NO3_source.end (), soil.size (), 0.0);
   NH4_source.insert (NH4_source.end (), soil.size (), 0.0);
   
+  // Clay affect of SMB turnover and mantenance.
+  clayom->set_rates (soil, smb);
+
   // Clay and soil.
   for (unsigned int i = 0; i < soil.size (); i++)
     {
@@ -2486,9 +2489,6 @@ An 'initial_SOM' layer in OrganicMatter ends below the last node");
     else
       err.debug (total.str ());  
   }
-
-  // Clay affect or SMB turnover and mantenance.
-  clayom->set_rates (soil, smb);
 
   // Initialize DOM.
   for (unsigned int pool = 0; pool < dom_size; pool++)

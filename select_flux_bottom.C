@@ -61,12 +61,7 @@ struct SelectFluxBottom : public SelectValue
           }
         daisy_assert (array.size () > index);
       }
-
-    if (count == 0)	 
-      value = array[index];	
-    else
-      value += array[index];	
-    count++;
+    add_result (array[index]);
   }
 
   // Create and Destroy.

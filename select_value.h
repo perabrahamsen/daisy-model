@@ -29,6 +29,7 @@ class SelectValue : public Select
   // Content.
 protected:
   double value;	
+  void add_result (double result);
 
   // Output routines.
 public:

@@ -281,6 +281,7 @@ UZRichard::richard (Treelog& msg,
                       daisy_assert (approximate (h_above, 
                                                  top.h () - soil.z (first)
                                                  + top_water));
+#if 0
 		      if (top.h () < 0.0)
 			{
 			  TmpStream tmp;
@@ -288,9 +289,11 @@ UZRichard::richard (Treelog& msg,
 				 << h_above;
 			  msg.error (tmp.str ());
 			}
+#endif
 		    }
 		  b[i] = Cw2
-		    + (ddt / dz) * (Kplus[i - 1] / dz_minus + Kplus[i] / dz_plus);
+		    + (ddt / dz) * (Kplus[i - 1] / dz_minus
+                                    + Kplus[i] / dz_plus);
 		  d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 		    + (ddt / dz)
 		    * (Kplus[i - 1] * (1 + h_above / dz_minus) - Kplus[i]);

@@ -518,27 +518,9 @@ VCheck::MinSize::MinSize (unsigned int size)
   : min_size (size)
 { }
 
-void 
-VCheck::Compatible::validate (const string& value) const throw (string)
-{
-  if (!Units::can_convert (dimension, value))
-    {
-      TmpStream tmp;
-      tmp () << "Cannot convert [" << dimension << "] to [" << value << "]";
-      throw string (tmp.str ());
-    }
-}
-
-const VCheck& 
-VCheck::fraction ()
-{
-  static Compatible fraction (Syntax::Fraction ());
-  return fraction;
-}
-
 void
-VCheck::Compatible::check (const Syntax& syntax, const AttributeList& alist, 
-			const string& key) const throw (string)
+VCheck::String::check (const Syntax& syntax, const AttributeList& alist, 
+                       const string& key) const throw (string)
 {
   daisy_assert (alist.check (key));
   daisy_assert (!syntax.is_log (key));
@@ -552,9 +534,71 @@ VCheck::Compatible::check (const Syntax& syntax, const AttributeList& alist,
     }
 }
 
+void 
+VCheck::Compatible::validate (const string& value) const throw (string)
+{
+  if (!Units::can_convert (dimension, value))
+    {
+      TmpStream tmp;
+      tmp () << "Cannot convert [" << dimension << "] to [" << value << "]";
+      throw string (tmp.str ());
+    }
+}
+
 VCheck::Compatible::Compatible (const string& dim)
   : dimension (dim)
 { }
+
+const VCheck& 
+VCheck::fraction ()
+{
+  static Compatible fraction (Syntax::Fraction ());
+  return fraction;
+}
+
+void 
+VCheck::Enum::validate (const string& value) const throw (string)
+{
+  if (ids.find (value) == ids.end ())
+    throw string ("Invalid value '" + value + "'");
+}
+
+VCheck::Enum::Enum (const string& a)
+{
+  ids.insert (a);
+}
+
+VCheck::Enum::Enum (const string& a, const string& b)
+{
+  ids.insert (a);
+  ids.insert (b);
+}
+
+VCheck::Enum::Enum (const string& a, const string& b, const string& c)
+{
+  ids.insert (a);
+  ids.insert (b);
+  ids.insert (c);
+}
+
+VCheck::Enum::Enum (const string& a, const string& b, const string& c, 
+		  const string& d)
+{
+  ids.insert (a);
+  ids.insert (b);
+  ids.insert (c);
+  ids.insert (d);
+}
+
+VCheck::Enum::Enum (const string& a, const string& b, const string& c,
+		  const string& d, const string& e)
+{
+  ids.insert (a);
+  ids.insert (b);
+  ids.insert (c);
+  ids.insert (d);
+  ids.insert (e);
+}
 
 void
 VCheck::All::check (const Syntax& syntax, const AttributeList& alist, 
