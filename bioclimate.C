@@ -322,6 +322,7 @@ Bioclimate::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   
   syntax.add ("NoOfIntervals", Syntax::Integer, Syntax::Const);
+  alist.add ("NoOfIntervals", 30);
   syntax.add ("intercepted_water", Syntax::Number, Syntax::State);
   syntax.add ("EvapInterception", Syntax::Number, Syntax::LogOnly);
   syntax.add ("PotEvapotranspiration", Syntax::Number, Syntax::LogOnly);

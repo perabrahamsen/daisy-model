@@ -49,6 +49,9 @@ SoilHeat::Implementation::tick (const Time& time,
   // Border conditions.
   const double T_bottom = bottom (time);// BUGLET: Should be time - 1 hour.
   const double T_top_new = surface.temperature ();
+  
+  if (T_top < -400.0)
+    T_top = T_top_new;
 
   // Limit for groundwater table.
   int size = soil.size ();
@@ -314,6 +317,7 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("T", Syntax::Number, Syntax::State, Syntax::Sequence);
   syntax.add ("T_top", Syntax::Number, Syntax::State);
+  alist.add ("T_top", -500.0);	// Use surface temperature.
   syntax.add ("average", Syntax::Number, Syntax::Const);
   alist.add ("average", 7.8);
   syntax.add ("amplitude", Syntax::Number, Syntax::Const);

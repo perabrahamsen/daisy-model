@@ -16,8 +16,7 @@ class Groundwater;
 class AttributeList;
 class Syntax;
 class OrganicMatter;
-class InorganicMatter;
-class SoluteMatter;
+class IM;
 class AM;
 class Crop;
 
@@ -31,11 +30,11 @@ public:
   enum irrigation_from { top_irrigation, surface_irrigation };
   virtual void sow (const AttributeList& crop) = 0;
   virtual void irrigate (double flux, double temp, 
-			 const SoluteMatter&, irrigation_from) = 0;
+			 const IM&, irrigation_from) = 0;
   virtual void fertilize (AM&, double from, double to) = 0;
   virtual void fertilize (AM&) = 0;
-  virtual void fertilize (const InorganicMatter&, double from, double to) = 0;
-  virtual void fertilize (const InorganicMatter&) = 0;
+  virtual void fertilize (const IM&, double from, double to) = 0;
+  virtual void fertilize (const IM&) = 0;
 
   virtual vector<AM*> harvest (const Time&, const string name,
 				double stub_length,

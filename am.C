@@ -165,34 +165,63 @@ AM::create (const Time& t, const AttributeList& al,
   AM::create (t, al, name, part, C, N, density);
 }
 
-InorganicMatter AM::im (const AttributeList& al)
-{
-  return InorganicMatter (SoluteMatter (al.list ("im")), 
-			  al.number ("weight"));
-}
-
 vector<OM*>& 
 AM::create_om (const AttributeList& al)
 {
-  const vector<double> density;
-  return create_om (al, 0.0, 0.0, density);
+  const string syntax = al.name ("syntax");
+  
+  if (syntax == "state")
+    assert (0);
+  else if (syntax == "organic")
+    {
+      // Get initialization parameters.
+      const double weight = al.number ("weight") 
+	* al.number ("dry_matter_fraction") 
+	* 0.1;			// kg / m^2 --> g / cm^2
+      const double C = weight * al.number ("total_C_fraction");
+      const double N = weight * IM::N_left (al);
+      
+      return create_om (al, C, N);
+    }
+  else if (syntax == "mineral")
+    assert (0);
+  else if (syntax == "crop")
+    assert (0);
+  else if (syntax == "initial")
+    {
+      vector<OM*>& om = map_construct<OM> (al.list_sequence ("om"));
+      // BUG: Handle layers.
+      return om;
+    }
+  else if (syntax == "root")
+    {
+      vector<OM*>& om = map_construct<OM> (al.list_sequence ("om"));
+      // Fixed C/N
+      // BUG: Handle density.
+      return om;
+    }
+  assert (0);
 }
 
 vector<OM*>& 
 AM::create_om (const AttributeList& al, 
-		double crop_C, double crop_N, const vector<double>& density)
+	       const double C, const double N, const vector<double>& density)
+{
+  vector<OM*>& om = create_om (al, C, N);
+  const int size = om.size();
+
+  for (int i = 0; i < size; i++)
+    om[i]->distribute (density);
+
+  return om;
+}
+  
+vector<OM*>& 
+AM::create_om (const AttributeList& al, const double C, const double N)
 {
   // Get initialization parameters.
   const vector<const AttributeList*>& om_alist = al.list_sequence ("om");
   const int size = om_alist.size();
-  const double weight = al.number ("weight")
-    * al.number ("dry_matter_fraction");
-  const AttributeList& im = al.list ("im");
-  const double C = weight * al.number ("total_C_fraction") + crop_C;
-  const double N = weight * (al.number ("total_N_fraction")
-			     - (im.check ("NH4") ? im.number ("NH4") : 0.0)
-			     - (im.check ("NO3") ? im.number ("NO3") : 0.0))
-    + crop_N;
 
   // Fill out the blanks.
   int missing_fraction = -1;
@@ -241,10 +270,6 @@ AM::create_om (const AttributeList& al,
   for (int i = 0; i < size; i++)
     om.push_back (new OM (*om_alist[i], om_C[i], om_N[i]));
 
-  if (density.size () > 0)
-    for (int i = 0; i < size; i++)
-      om[i]->distribute (density);
-
   return om;
 }
 
@@ -270,7 +295,7 @@ AM::AM (const Time& t, const AttributeList& al)
 { }
 
 AM::AM (const AttributeList& al)
-  : creation (al.time ("time")),
+  : creation (al.time ("creation")),
     name (al.name ("type")),
     om (map_construct<OM> (al.list_sequence ("om")))
 { }
@@ -292,7 +317,8 @@ AM_init::AM_init ()
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
 
-	syntax.add ("time", Syntax::Date, Syntax::State);
+	syntax.add ("creation", Syntax::Date, Syntax::Const);
+	alist.add ("syntax", "state");
 	add_sequence<OM> ("om", syntax, alist);
 	AM_library->add ("state", alist, syntax);
       }
@@ -300,6 +326,9 @@ AM_init::AM_init ()
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
+	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("creation", Time (1, 1, 1, 1));
+	alist.add ("syntax", "organic");
 	syntax.add ("weight", Syntax::Number, Syntax::Const);
 	syntax.add ("dry_matter_fraction",
 		    Syntax::Number, Syntax::Const);
@@ -308,13 +337,16 @@ AM_init::AM_init ()
 	syntax.add ("total_N_fraction",
 		    Syntax::Number, Syntax::Const);
 	add_sequence<OM> ("om", syntax, alist);
-	add_submodule<SoluteMatter> ("im", syntax, alist);
+	add_submodule<IM> ("im", syntax, alist);
 	AM_library->add ("organic", alist, syntax);
       }
       // Mineral fertilizer.
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
+	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("creation", Time (1, 1, 1, 1));
+	alist.add ("syntax", "mineral");
 	IM::load_syntax (syntax, alist);
 	AM_library->add ("mineral", alist, syntax);
       }
@@ -322,6 +354,9 @@ AM_init::AM_init ()
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
+	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("creation", Time (1, 1, 1, 1));
+	alist.add ("syntax", "crop");
 	add_sequence<OM> ("om", syntax, alist);
 	AM_library->add ("crop", alist, syntax);
       }	
@@ -329,6 +364,9 @@ AM_init::AM_init ()
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
+	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("creation", Time (1, 1, 1, 1));
+	alist.add ("syntax", "initial");
 	Syntax& layer_syntax = *new Syntax ();
 	AttributeList& layer_alist = *new AttributeList ();
 	layer_syntax.add ("end", Syntax::Number, Syntax::Const);
@@ -343,6 +381,9 @@ AM_init::AM_init ()
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
+	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("creation", Time (1, 1, 1, 1));
+	alist.add ("syntax", "root");
 	syntax.add ("depth", Syntax::Number, Syntax::Const);
 	syntax.add ("dist", Syntax::Number, Syntax::Const);
 	syntax.add ("weight", Syntax::Number, Syntax::Const); // Tons DM / ha

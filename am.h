@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include "time.h"
-#include "inorganic_matter.h"
 #include "om.h"
 
 class AttributeList;
@@ -53,8 +52,9 @@ private:
   static vector<OM*>& create_om (const AttributeList& al, 
 				 double crop_C, double crop_N,
 				 const vector<double>& density);
+  static vector<OM*>& create_om (const AttributeList& al, 
+				 double crop_C, double crop_N);
 public:
-  static InorganicMatter im (const AttributeList&);
   void initialize (const Soil& soil);
 private:
   AM (const Time&, const AttributeList&, 

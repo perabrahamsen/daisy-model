@@ -1,7 +1,7 @@
 // surface.h
 
 #include "uzmodel.h"
-#include "inorganic_matter.h"
+#include "im.h"
 
 struct AttributeList;
 struct Log;
@@ -18,8 +18,8 @@ class Surface : public UZtop
   double EvapSoilSurface;
   double Eps;
   double T;
-  InorganicMatter im;
-  InorganicMatter im_flux;
+  IM im;
+  IM im_flux;
 
 public:
 
@@ -32,14 +32,14 @@ public:
   double ponding() const;
   double temperature () const;
 
-  const InorganicMatter& matter_flux ();
+  const IM& matter_flux ();
 
   void SoilSurfaceConditions (double Theta, double h);
 
   void clear ();
 
   // Manager.
-  void fertilize (const InorganicMatter&);
+  void fertilize (const IM&);
 
   void output (Log&, const Filter&) const;
 

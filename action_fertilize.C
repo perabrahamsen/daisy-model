@@ -6,9 +6,10 @@
 #include "syntax.h"
 #include "alist.h"
 #include "common.h"
-#include <iostream.h>
 #include "am.h"
+#include "im.h"
 #include "library.h"
+#include <iostream.h>
 
 class ActionFertilize : public Action
 {
@@ -38,7 +39,7 @@ ActionFertilize::doIt (Daisy& daisy)
   for (ColumnList::iterator i = cl.begin (); i != cl.end (); i++)
     {
       // Add inorganic matter.
-      (*i)->fertilize (AM::im (am), from, to);
+      (*i)->fertilize (IM (am), from, to);
       // Add organic matter, if any.
       if (am.number ("total_C_fraction") > 0.0)
 	{

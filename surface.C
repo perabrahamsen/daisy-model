@@ -47,7 +47,7 @@ Surface::accept_top (double water)
     {
       if (-water > minimal_matter_flux)
 	{
-	  InorganicMatter delta_matter (im, (-water * dt) / pond);
+	  IM delta_matter (im, (-water * dt) / pond);
 	  im -= delta_matter;
 	  delta_matter /= dt;
 	  im_flux -= delta_matter;
@@ -83,7 +83,7 @@ Surface::clear ()
   im_flux.clear ();
 }
 
-const InorganicMatter& 
+const IM& 
 Surface::matter_flux ()
 {
   return im_flux;
@@ -116,7 +116,7 @@ Surface::evaporation (double PotSoilEvaporation, double water, double temp,
 }
 
 void 
-Surface::fertilize (const InorganicMatter& n)
+Surface::fertilize (const IM& n)
 { 
   im += n;
 }
@@ -128,7 +128,7 @@ Surface::output (Log& log, const Filter& filter) const
   log.output ("flux", filter, flux);
   log.output ("EvapSoilSurface", filter, EvapSoilSurface, true);
   log.output ("Eps", filter, Eps, true);
-  output_submodule (im, "InorganicMatter", log, filter);
+  output_submodule (im, "IM", log, filter);
 }
 
 void
@@ -145,7 +145,7 @@ Surface::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("EvapSoilSurface", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Eps", Syntax::Number, Syntax::LogOnly);
   syntax.add ("T", Syntax::Number, Syntax::LogOnly);
-  add_submodule<InorganicMatter> ("InorganicMatter", syntax, alist);
+  add_submodule<IM> ("IM", syntax, alist);
 }
 
 Surface::Surface (const AttributeList& al)
@@ -156,6 +156,6 @@ Surface::Surface (const AttributeList& al)
     EvapSoilSurface (0.0),
     Eps (0.0),
     T (0.0),
-    im (al.list ("InorganicMatter")),
+    im (al.list ("IM")),
     im_flux ()
 { }

@@ -10,7 +10,7 @@
 class HydraulicOld : public Hydraulic
 {
   // We cheat and use h_minus instead of h in all the CSMP except M_.
-  CSMP Theta_;
+  CSMP Thetam_;
   CSMP hm_;
   CSMP Cw2_;
   CSMP K_;
@@ -35,7 +35,7 @@ public:
 double 
 HydraulicOld::Theta (const double h) const
 {
-  return Theta_ (-h);
+  return -Thetam_ (-h);
 }
 
 double 
@@ -53,7 +53,7 @@ HydraulicOld::Cw2 (const double h) const
 double 
 HydraulicOld::h (const double Theta) const
 {
-  return -hm_ (Theta);
+  return -hm_ (-Theta);
 }
 
 double 
@@ -92,7 +92,7 @@ HydraulicOld::HydraulicOld (const AttributeList& al)
       
       const double h_minus = exp (pF);
 
-      Theta_.add (h_minus, Theta);
+      Thetam_.add (h_minus, -Theta);
       Cw2_.add (h_minus, Cw2);
       K_.add (h_minus, K);
     }
@@ -102,7 +102,7 @@ HydraulicOld::HydraulicOld (const AttributeList& al)
       cerr << name << ":" << line << ": file error";
       THROW ("read error");
     }
-  hm_ = Theta_.inverse ();
+  hm_ = Thetam_.inverse ();
   K_to_M (M_, M_intervals);
 }
 

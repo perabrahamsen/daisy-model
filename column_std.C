@@ -44,11 +44,11 @@ private:
 public:
   void sow (const AttributeList& crop);
   void irrigate (double flux, double temp, 
-		 const SoluteMatter&, irrigation_from);
+		 const IM&, irrigation_from);
   void fertilize (AM&);
   void fertilize (AM&, double from, double to);
-  void fertilize (const InorganicMatter&);
-  void fertilize (const InorganicMatter&, double from, double to);
+  void fertilize (const IM&);
+  void fertilize (const IM&, double from, double to);
   vector<AM*> harvest (const Time&, const string name,
 			double stub_length,
 			double stem_harvest, double leaf_harvest, 
@@ -89,7 +89,7 @@ ColumnStandard::sow (const AttributeList& crop)
 
 void 
 ColumnStandard::irrigate (double flux, double temp, 
-		 const SoluteMatter& sm, irrigation_from from)
+		 const IM& sm, irrigation_from from)
 {
   surface.fertilize (sm * (flux / 10.0)); // [mm to cm]
   bioclimate.irrigate (flux, temp, from);
@@ -112,18 +112,18 @@ ColumnStandard::fertilize (AM& am, double from, double to)
 }
 
 void 
-ColumnStandard::fertilize (const InorganicMatter& im)
+ColumnStandard::fertilize (const IM& im)
 {
   surface.fertilize (im);
 }
 
 void 
-ColumnStandard::fertilize (const InorganicMatter& im, 
+ColumnStandard::fertilize (const IM& im, 
 			   double from, double to)
 {
   assert (to < from );
-  soil_NO3.add (soil, soil_water, im.im.NO3, from, to);
-  soil_NH4.add (soil, soil_water, im.im.NH4, from, to);
+  soil_NO3.add (soil, soil_water, im.NO3, from, to);
+  soil_NH4.add (soil, soil_water, im.NH4, from, to);
 }
 
 vector<AM*>
@@ -234,8 +234,8 @@ ColumnStandard::tick (const Time& time,
   // Transport.
   soil_water.tick (surface, groundwater, soil);
   soil_heat.tick (time, soil, soil_water, surface, groundwater);
-  soil_NO3.tick (soil, soil_water, surface.matter_flux ().im.NO3);
-  soil_NH4.tick (soil, soil_water, surface.matter_flux ().im.NH4);
+  soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
+  soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4);
 }
 
 void
@@ -301,7 +301,8 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   AttributeList& alist = *new AttributeList ();
 
   syntax.add ("crops", Crop::library (), Syntax::State, Syntax::Sequence);
-  
+  alist.add ("crops", *new vector<const AttributeList*>);
+
   add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
   add_submodule<Surface> ("Surface", syntax, alist);
   add_submodule<Soil> ("Soil", syntax, alist);

@@ -17,7 +17,7 @@ public:
 
   // Operations.
 public:
-  void output (Log& log, const Filter& filter) const;
+  void output (Log&, const Filter&) const;
   void clear ();
   void operator += (const IM&);
   void operator -= (const IM&);
@@ -25,8 +25,14 @@ public:
   void operator /= (double);
   bool empty () const;
 
+  // Utilities.
+public:
+  static double N_left (const AttributeList&);
+
   // Create. 
-  static void load_syntax (Syntax& syntax, AttributeList& alist);
+public:
+  IM operator* (double flux) const;
+  static void load_syntax (Syntax&, AttributeList&);
   IM ();
   IM (const AttributeList&);
   IM (const IM&, double flux);

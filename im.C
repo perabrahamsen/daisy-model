@@ -51,14 +51,68 @@ IM::empty () const
   return NO3 < 1e-20 && NH4 < 1e-20;
 }
 
+IM
+IM::operator* (double flux) const
+{
+  return IM (*this, flux);
+}
+
+double 
+IM::N_left (const AttributeList& al)
+{
+  const double weight = al.number ("weight") 
+    * al.number ("dry_matter_fraction") ;
+  const double N = weight * al.number ("total_N_fraction");
+  const IM im (al.list ("im"));
+  return N * (1.0 - im.NO3 - im.NH4);
+}
+
+static double IM_get_NO3 (const AttributeList& al)
+{
+  if (al.check ("weight"))
+    {
+      assert (al.name ("syntax") == "organic");
+
+      const double weight = al.number ("weight") 
+	* al.number ("dry_matter_fraction") 
+	* 0.1;			// kg / m^2 --> g / cm^2
+      const double N = weight * al.number ("total_N_fraction");
+
+      IM im (al.list ("im"));
+      
+      return N * im.NO3;
+    }
+  else 
+    return al.number ("NO3");
+}
+
+static double IM_get_NH4 (const AttributeList& al)
+{
+  if (al.check ("weight"))
+    {
+      assert (al.name ("syntax") == "organic");
+
+      const double weight = al.number ("weight") 
+	* al.number ("dry_matter_fraction") 
+	* 0.1;			// kg / m^2 --> g / cm^2
+      const double N = weight * al.number ("total_N_fraction");
+
+      IM im (al.list ("im"));
+      
+      return N * im.NH4;
+    }
+  else 
+    return al.number ("NH4");
+}
+
 IM::IM ()
   : NO3 (0.0),
     NH4 (0.0)
 { }
 
 IM::IM (const AttributeList& al)
-  : NO3 (al.number ("NO3")),
-    NH4 (al.number ("NH4"))
+  : NO3 (IM_get_NO3 (al)),
+    NH4 (IM_get_NH4 (al))
 { }
 
 IM::IM (const IM& n, double flux)
@@ -70,8 +124,10 @@ IM::~IM ()
 { }
 
 void 
-IM::load_syntax (Syntax& syntax, AttributeList&)
+IM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add ("NO3", Syntax::Number, Syntax::State);
+  alist.add ("NO3", 0.0);
   syntax.add ("NH4", Syntax::Number, Syntax::State);
+  alist.add ("NH4", 0.0);
 }
