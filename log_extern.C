@@ -57,7 +57,10 @@ LogExternSource::~LogExternSource ()
   assert (log_extern_count > 0);
   log_extern_count--;
   if (log_extern_count == 0)
-    delete log_extern_map;
+    {
+      map_delete (log_extern_map->begin (), log_extern_map->end ());
+      delete log_extern_map;
+    }
 }
 
 

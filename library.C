@@ -31,6 +31,7 @@ struct Library::Implementation
 {
   typedef map<string, Library*, less<string>/**/> library_map;
   static library_map* all;
+  static int all_count;
 
   // We give each parsed object an increasing sequence number.
   static int sequence;
@@ -52,17 +53,14 @@ struct Library::Implementation
   void clear_parsed ();
   void refile_parsed (const string& from, const string& to);
   static void load_syntax (Syntax&, AttributeList&);
-  Implementation (const char* n, derive_fun d, const char* des) 
-    : name (n),
-      derive (d),
-      description (des)
-  { }
-  ~Implementation ()
-  { all->erase (all->find (name)); }
+  Implementation (const char* n, derive_fun d, const char* des);
+  ~Implementation ();
 };
 
-map<string, Library*, less<string> >* Library::Implementation::all;
-int Library::Implementation::sequence;
+// map<string, Library*, less<string> >* Library::Implementation::all;
+Library::Implementation::library_map* Library::Implementation::all = NULL;
+int Library::Implementation::all_count = 0;
+int Library::Implementation::sequence = 0;
 
 void
 Library::Implementation::all_entries (vector<string>& libraries)
@@ -179,6 +177,30 @@ Library::Implementation::load_syntax (Syntax& syntax, AttributeList&)
       Library& library = *((*i).second);
       syntax.add_library (def + name, library);
     }
+}
+
+Library::Implementation::Implementation (const char* n, derive_fun d,
+					 const char* des) 
+  : name (n),
+    derive (d),
+    description (des)
+{
+  if (all == NULL)
+    {
+      assert (all_count == 0);
+      all = new library_map ();
+    }
+  all_count++;
+}
+
+Library::Implementation::~Implementation ()
+{ 
+  all->erase (all->find (name)); 
+  all_count--;
+  if (all_count == 0)
+    delete all;
+  else
+    assert (all_count > 0);
 }
 
 bool
@@ -313,16 +335,10 @@ Library::Library (const char* name, derive_fun derive,
 		  const char* description) 
   : impl (*new Implementation (name, derive, description))
 { 
-  if (Implementation::all == NULL)
-    // Buglet: we never delete this.
-    Implementation::all = new map<string, Library*, less<string> >;
   (*Implementation::all)[name] = this; 
 }
 
 Library::~Library ()
 { 
-#if 1
-  // BCC doesn't like this.
   delete &impl; 
-#endif
 }

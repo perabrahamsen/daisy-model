@@ -65,10 +65,7 @@ struct Syntax::Implementation
   Implementation ()
   { }
   ~Implementation ()
-  { 
-    for (alist_map::iterator i = alists.begin (); i != alists.end (); i++)
-      delete (*i).second;
-  }
+  { map_delete (alists.begin (), alists.end ()); }
 };    
 
 bool 

@@ -1,5 +1,17 @@
 2002-03-11  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* library.C (Implementation::all_count): New variable.
+	(Implementation) Increment.
+	(~Implementation) Decrement and delete all when zero.
+
+	* common.h (map_delete): New template.
+	* syntax.C (~Implementation): Use it.
+	* soil_chemicals.C (~Implementation): Use it.
+	* log_extern.C (~LogExternSource): Use it.
+	* units.C (~Content): Use it.
+
+	* log_extern.C (LogExternSource): Delete log_extern_map members.
+
 	* root_system.C (~RootSystem): Delete rootdens.
 
 	* svat_pmsw.C (tick): Commented out some code that used unused

@@ -102,11 +102,7 @@ Units::Content::~Content ()
     for (to_type::iterator j = (*i).second.begin ();
 	 j != (*i).second.end ();
 	 j++)
-      {
-	assert ((*j).second);
-	delete (*j).second;
-	(*j).second = NULL;
-      }
+      map_delete ((*i).second.begin (), (*i).second.begin ());
 }
 
 Units::Content* Units::content = NULL;
