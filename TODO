@@ -1,5 +1,3 @@
-* Brug soil_water.last_unsatirated_node to limit om, den, nit heat, m.m.
-
 * Kig på groundwater_pipe.C
 
 * ElectricFence (eller C++ udgave (www.andreasen.com?)

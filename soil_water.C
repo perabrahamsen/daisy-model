@@ -176,6 +176,8 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
     }
 
   // Update flux in groundwater.
+  groundwater.update_water (soil, *this);
+
   for (unsigned int i = last + 1; i <= soil.size (); i++)
     {
       q_[i] = q_[i-1];

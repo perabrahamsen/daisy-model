@@ -10,6 +10,10 @@ The `groundwater' component is responsible for specifying the\n\
 groundwater table at each timestep.";
 
 void
+Groundwater::update_water (const Soil&, const SoilWater&)
+{ }
+
+void
 Groundwater::output (Log& log) const
 { 
   log.output ("height", table ());

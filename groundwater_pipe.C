@@ -41,8 +41,10 @@ public:
 public:
   void tick (const Time&)
     { }
-  void update (const Soil&, const SoilWater&);
+  void update_water (const Soil&, const SoilWater&);
   void output (Log& log) const;
+
+private:
   double DeepPercolation (const Soil&);
   double EquilibriumDrainFlow (const Soil&);
   void RaisingGWT (const Soil&);
@@ -56,8 +58,17 @@ public:
 public:
   void initialize (const Time&, const Soil& soil)
     {
-      i_bottom = soil.size () - 1;
+      unsigned int size = soil.size ();
+
+      i_bottom = size - 1;
       i_drain = soil.interval_plus (pipe_position);
+
+      S.insert (S.end (), size, 0.0);
+      h.insert (h.end (), size, 0.0);
+      Theta.insert (Theta.end (), size, 0.0);
+      q.insert (q.end (), size+1u, 0.0);
+      q_p.insert (q_p.end (), size+1u, 0.0);
+      Percolation.insert (Percolation.end (), size+1u, 0.0);
     }
   GroundwaterPipe (const AttributeList& al)
     : Groundwater (al),
@@ -74,7 +85,7 @@ public:
 };
 
 void
-GroundwaterPipe::update (const Soil& soil, const SoilWater& soil_water)
+GroundwaterPipe::update_water (const Soil& soil, const SoilWater& soil_water)
 {
   for (unsigned int i = 0; i <= i_bottom; i++)
     {
