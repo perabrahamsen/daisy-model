@@ -421,7 +421,7 @@ soil increases."
 	 ("NH4-Leak-Macro" (name "Macropores leak") (factor -1.0))
 	 ("NH4-Drain" (name "Drain pipes leak") (factor -1.0))
 	 (NH4Upt (name "Root uptake") (factor -1.0))
-	 ("Nitrification" (factor -1.0))
+	 ("NH4-Nit" (name "Nitrification") (factor -1.0))
 	 ("NH4-mineralization" (name "Mineralization"))
 	 ("NH4-Total" (name "Content") (factor -1.0))))
 	 
@@ -438,7 +438,7 @@ soil increases."
 	 ("NO3-Leak-Macro" (name "Macropores leak") (factor -1.0))
 	 ("NO3-Drain" (name "Drain pipes leak") (factor -1.0))
 	 (NO3Upt (name "Root uptake") (factor -1.0))
-	 ("Nitrification")
+	 ("NO3-Nit" (name "Nitrification"))
 	 ("Denit" (name Denitrification) (factor -1.0))
 	 ("NO3-immobilization" (name "Immobilization") (factor -1.0))
 	 ("NO3-Total" (name "Content") (factor -1.0))))
@@ -500,9 +500,19 @@ soil increases."
                    (flux true)
                    (dimension "kg N/ha/&")
                    (factor 10.0))       ;g/m^2 -> kg N/ha
-           (interval (path column "$col" Nitrification "*" converted)
+           (interval (path column "$col" Nitrification "*" NH4)
                      (flux true)
-                     (tag "Nitrification")
+                     (tag "NH4-Nit")
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "$col" Nitrification "*" NO3)
+                     (flux true)
+                     (tag "NO3-Nit")
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "$col" Nitrification "*" N2O)
+                     (flux true)
+                     (tag "N2O-Nit")
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
            (interval (path column "$col" OrganicMatter NH4_source)
@@ -630,7 +640,8 @@ soil increases."
 			  ("Denitrification from fast pools")
 			  ("Redox denitrification")
 			  ("Potential denitrification")
-			  ("Potential denitrification from fast pools"))))
+			  ("Potential denitrification from fast pools")
+                          ("N2O from Nitrification"))))
   (when hourly)
   (entries (interval (path column "$col" OrganicMatter CO2)
                      (tag "CO2 production")
@@ -665,6 +676,11 @@ soil increases."
 	   (interval (path column "$col" Denitrification potential_fast)
                      (tag "Potential denitrification from fast pools")
                      (flux true)
+                     (dimension "kg N/ha/&")
+                     (factor 1e5))      ;g/cm^2 -> kg N/ha
+           (interval (path column "$col" Nitrification "*" N2O)
+                     (flux true)
+                     (tag "N2O from Nitrification")
                      (dimension "kg N/ha/&")
                      (factor 1e5))      ;g/cm^2 -> kg N/ha
            ))
