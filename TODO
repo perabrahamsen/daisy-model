@@ -2,17 +2,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * QDaisy.
 
-** Menu -> File -> Save as
-
-libraries.rename (old, new)
-if (!save_as.good ())
-{
-  libraries.rename (new, old)
-  QMessageBox.critical ("brok brok brok");
-}
-else
-  tree.repopulate ()
-
 ** Feedback during menu -> file -> new/open/save/save_as ...
 
 ** Menu -> Edit -> Raw (Parameter)
@@ -56,6 +45,12 @@ view og loading files.
 ** Redirect error messages
 
 for weather std, file, hourly, and for hydraulic old, old2
+
+** Beskriv fordele ved min GUI implementation.
+
+- Virker med næsten alle `.dai' filer.
+
+- Automatisk up-to-date med seneste daisy version.
 
 * Checkpoint
 

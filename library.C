@@ -28,6 +28,7 @@ struct Library::Implementation
   const Syntax& syntax (const string&) const;
   void entries (vector<string>&) const;
   void clear_parsed ();
+  void refile_parsed (const string& from, const string& to);
   static void load_syntax (Syntax&, AttributeList&);
   Implementation (const char* n, derive_fun d, const char* des) 
     : name (n),
@@ -123,7 +124,23 @@ Library::Implementation::clear_parsed ()
 	  assert (j != syntaxen.end ());
 	  syntaxen.erase (j);
 	  alists.erase (i);
+	  delete &alist;
 	  goto retry;
+	}
+    }
+}
+
+void
+Library::Implementation::refile_parsed (const string& from, const string& to)
+{
+  assert (from != to);
+  for (alist_map::iterator i = alists.begin (); i != alists.end (); i++)
+    {
+      AttributeList& alist = *((*i).second);
+      if (alist.check ("parsed_from_file")
+	  && alist.name ("parsed_from_file") == from)
+	{
+	  alist.add ("parsed_from_file", to);
 	}
     }
 }
@@ -213,6 +230,21 @@ Library::clear_all_parsed ()
       const Library& library = Library::find (component);
       
       library.impl.clear_parsed ();
+    }
+}
+
+void 
+Library::refile_parsed (const string& from, const string& to)
+{
+  vector<string> components;
+  Library::all (components);
+
+  for (unsigned int i = 0; i < components.size (); i++)
+    {
+      const string& component = components[i];
+      const Library& library = Library::find (component);
+      
+      library.impl.refile_parsed (from, to);
     }
 }
 

@@ -75,7 +75,7 @@ MainWindow::MainWindow ()
   menu_file->insertItem ("&Open...", this, SLOT (file_open ()));
   menu_file_save_id 
     = menu_file->insertItem ("&Save", this, SLOT (file_save ()));
-  menu_file->insertItem ("S&ave as...", this, SLOT (menu_action ()));
+  menu_file->insertItem ("S&ave as...", this, SLOT (file_save_as ()));
   menu_file->insertSeparator ();
   menu_file->insertItem ("&Run", this, SLOT (menu_action ()));
   menu_file->insertItem ("&Check", this, SLOT (menu_action ()));
@@ -173,7 +173,6 @@ MainWindow::new_file ()
 
   // Make it official.
   set_nofile ();
-  tree->clear ();
   populate_tree ();
 }
 
@@ -185,8 +184,9 @@ MainWindow::open_file (QString name)
 
   // Load new content.
   ostrstream errors;
-  ParserFile parser (daisy_syntax, name.ascii (), errors);
+  ParserFile parser (daisy_syntax, name.latin1 (), errors);
   parser.load (daisy_alist);
+  errors << '\0';
   const char* s = errors.str ();
   if (parser.error_count ())
     QMessageBox::critical (this, "QDaisy: Load errors", s);
@@ -196,7 +196,6 @@ MainWindow::open_file (QString name)
 
   // In any case:  Make it official.
   set_filename (name);
-  tree->clear ();
   populate_tree ();
 }
 
@@ -204,7 +203,7 @@ void
 MainWindow::save_file ()
 { 
   // Open log file.
-  PrinterFile printer (file_name.ascii ());
+  PrinterFile printer (file_name.latin1 ());
   printer.print_comment ("Created by QDaisy");
 
   // Print input files.
@@ -219,7 +218,7 @@ MainWindow::save_file ()
 
   // Print included files.
   printer.print_comment ("Parameterizations");
-  printer.print_library_file (file_name.ascii ());
+  printer.print_library_file (file_name.latin1 ());
 
   // Print content.
   printer.print_comment ("Content");
@@ -253,6 +252,10 @@ MainWindow::set_selection_copyable (bool copyable)
 void
 MainWindow::populate_tree ()
 {
+  // Clear old content.
+  tree->clear ();
+
+  // Add new content.
   vector<string> components;
   Library::all (components);
   for (unsigned int i = 0; i < components.size (); i++)
@@ -272,6 +275,7 @@ MainWindow::populate_tree ()
 	  const AttributeList& alist = library.lookup (model);
 	  ostrstream str;
 	  const bool has_errors = !syntax.check (alist, str, model);
+	  str << '\0';
 	  const char* errors = str.str ();
 	  QString value =  has_errors ? "" : "Full";
 	  QString description = "no description";
@@ -397,6 +401,7 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 	    ostrstream str;
 	    has_errors = !syntax.syntax (entry).check (alist.alist (entry), 
 						       str, entry);
+	    str << '\0';
 	    const char* tmp = str.str ();
 	    errors = tmp;
 	    delete [] tmp;
@@ -422,6 +427,7 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 	  has_errors 
 	    = !syntax.library (entry).syntax (type).check (alist.alist (entry),
 							   str, entry);
+	  str << '\0';
 	  const char* tmp = str.str ();
 	  errors = tmp;
 	  delete [] tmp;
@@ -554,6 +560,27 @@ MainWindow::file_save ()
 {
   save_file ();
 }
+
+void 
+MainWindow::file_save_as ()
+{
+  QString file (QFileDialog::getSaveFileName (QString::null,
+					      "Daisy setup files (*.dai)", 
+					      this));
+  if (!file.isEmpty())
+    {
+      if (file == file_name)
+	save_file ();
+      else
+	{
+	  Library::refile_parsed (file_name.latin1 (), file.latin1 ());
+	  set_filename (file);
+	  save_file ();
+	  populate_tree ();
+	}
+    }
+}
+
 void 
 MainWindow::view_check ()
 { 
@@ -571,7 +598,6 @@ MainWindow::toggle_view_logonly ()
 {
   view_logonly = !view_logonly;
   menu_view->setItemChecked (menu_view_logonly_id, view_logonly);
-  tree->clear ();
   populate_tree ();
 }
 
@@ -580,7 +606,6 @@ MainWindow::toggle_view_parameters ()
 {
   view_parameters = !view_parameters;
   menu_view->setItemChecked (menu_view_parameters_id, view_parameters);
-  tree->clear ();
   populate_tree ();
 }
 

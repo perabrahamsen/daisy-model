@@ -1,3 +1,17 @@
+2000-09-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.52 released.
+
+2000-09-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai: Merged PvdK changes.
+
+	* svat_pmsw.C: Merged PvdK changes.
+
+	* library.C, library.h (refile_parsed): New static member function.
+	* qmain.C, qmain.h (file_save_as): New signal.
+	(MainWindow): Slot it. 
+
 2000-09-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.51 released.
@@ -22,7 +36,7 @@
 	sequence. 
 	* all: Update callers.
 
-	* bioincorporation.C (&Bioincorporation): Delete impl.
+	* bioincorporation.C (~Bioincorporation): Delete impl.
 
 2000-09-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
