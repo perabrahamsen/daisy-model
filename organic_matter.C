@@ -1505,7 +1505,7 @@ OrganicMatter::Implementation::partition (const vector<double>& am_input,
 
       TmpStream tmp;
       tmp () << "Can't initialize organic matter from input in layer " << lay;
-      throw (tmp.str ());
+      throw (string (tmp.str ()));
     }
 
 
