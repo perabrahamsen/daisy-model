@@ -15,12 +15,6 @@ struct Rules;
 struct CSMP;
 struct AttributeList;
 
-class Sequence : public list <const AttributeList*>
-{ };
-
-class Layers : public list <pair <double, const AttributeList*> >
-{ };
-
 class AttributeList
 {
   // Content.
@@ -53,8 +47,6 @@ public:
        throw2 (Invalid, Uninitialized);
   bool flag (string) const
        throw2 (Invalid, Uninitialized);
-  const vector<double>& array (string) const
-       throw2 (Invalid, Uninitialized);
   const Rules& rules (string) const
        throw2 (Invalid, Uninitialized);
   const CSMP& csmp (string) const 
@@ -65,23 +57,40 @@ public:
        throw2 (Invalid, Uninitialized);
   const Time& time (string) const
        throw2 (Invalid, Uninitialized);
-  const Sequence& sequence (string) const
+  const vector<double>& number_sequence (string) const
        throw2 (Invalid, Uninitialized);
-  const Layers& layers (string) const
+  const vector<string>& name_sequence (string key) const
+       throw2 (Invalid, Uninitialized);
+  const vector<bool>& flag_sequence (string key) const
+       throw2 (Invalid, Uninitialized);
+  const vector<int>& integer_sequence (string key) const
+       throw2 (Invalid, Uninitialized);
+  const vector<const Time*>& time_sequence (string key) const
+       throw2 (Invalid, Uninitialized);
+  const vector<const Rules*>& rules_sequence (string key) const
+       throw2 (Invalid, Uninitialized);
+  const vector<const CSMP*>& csmp_sequence (string key) const
+       throw2 (Invalid, Uninitialized);
+  const vector<const AttributeList*>& list_sequence (string key) const
        throw2 (Invalid, Uninitialized);
        
     // Create and Destroy.
   void add (string, double);
+  void add (string, string);
+  void add (string, bool);
+  void add (string, int);
   void add (string, AttributeList&);
   void add (string, const Rules*);
   void add (string, const CSMP*);
-  void add (string, string);
-  void add (string, const vector<double>&);
-  void add (string, bool);
-  void add (string, int);
   void add (string, const Time&);
-  void add (string, const Sequence&);
-  void add (string, const Layers&);
+  void add (string, const vector<double>&);
+  void add (string, const vector<string>&);
+  void add (string, const vector<bool>&);
+  void add (string, const vector<int>&);
+  void add (string, const vector<const AttributeList*>&);
+  void add (string, const vector<const Rules*>&);
+  void add (string, const vector<const CSMP*>&);
+  void add (string, const vector<const Time*>&);
 
   void operator += (const AttributeList&);
   AttributeList (const AttributeList& old);

@@ -8,7 +8,7 @@
 
 struct Syntax::Implementation
 {
-  
+  list<string> order;
   typedef map<string, type, less<string> > type_map;
   typedef map<string, required, less<string> > status_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
@@ -33,7 +33,6 @@ bool
 Syntax::Implementation::check (string name, const AttributeList& vl,
 			       const Log& log, bool sparse)
 {
-
   bool error = false;
 
   for (status_map::const_iterator i = status.begin ();
@@ -42,48 +41,63 @@ Syntax::Implementation::check (string name, const AttributeList& vl,
     {
       string key = (*i).first;
       required state = status[key];
-      if (!sparse
-	  && (state == InOut || state == Const || state == Mixed)
-	  && !vl.check (key))
+      if (!vl.check (key))
 	{
-	  log.err () << "Attributte " << key << " missing\n";
-	  error = true;
-	}
-      else if (types[key] == Sequence && vl.check (key))
-	{
-	  const Library& lib = *libraries[key];
-	  const ::Sequence& seq = vl.sequence (key);
-	  for (::Sequence::const_iterator j = seq.begin ();
-	       j != seq.end ();
-	       j++)
+	  if (!sparse && (state == InOut || state == Const || state == Mixed))
 	    {
-	      const AttributeList& al = **j;
-	      if (!al.check ("type"))
-		{
-		  log.err () << "Non object found \n";
-		  error = true;
-		}
-	      else if (!lib.syntax (al.name ("type")).check (key, al, 
-							     log, sparse))
-		error = true;
-	    }
-	}
-      else if (types[key] == Object && vl.check (key))
-	{
-	  const Library& lib = *libraries[key];
-	  const AttributeList& al = vl.list (key);
-	  if (!al.check ("type"))
-	    {
-	      log.err () << "Non object found \n";
+	      log.err () << "Attributte " << key << " missing\n";
 	      error = true;
 	    }
-	  else if (!lib.syntax (al.name ("type")).check (al))
-	    error = true;
 	}
-      else if (types[key] == List && vl.check (key)
-	       && !syntax[key]->check (key, vl.list (key), log,
-				       sparse || (state == Sparse)))
-	error = true;
+      else if (types[key] == Object)
+	if (size[key] != Singleton)
+	  {
+	    const Library& lib = *libraries[key];
+	    const vector<const AttributeList*>& seq = vl.list_sequence (key);
+	    for (vector<const AttributeList*>::const_iterator j = seq.begin ();
+		 j != seq.end ();
+		 j++)
+	      {
+		const AttributeList& al = **j;
+		if (!al.check ("type"))
+		  {
+		    log.err () << "Non object found \n";
+		    error = true;
+		  }
+		else if (!lib.syntax (al.name ("type")) .check
+			 (key, al, log, sparse  || (state == Sparse)))
+		  error = true;
+	      }
+	  }
+	else 
+	  {
+	    const Library& lib = *libraries[key];
+	    const AttributeList& al = vl.list (key);
+	    if (!al.check ("type"))
+	      {
+		log.err () << "Non object found \n";
+		error = true;
+	      }
+	    else if (!lib.syntax (al.name ("type")).check (al))
+	      error = true;
+	  }
+      else if (types[key] == List)
+	if (size[key] != Singleton)
+	  {
+	    const vector<const AttributeList*>& seq = vl.list_sequence (key);
+	    for (vector<const AttributeList*>::const_iterator j = seq.begin ();
+		 j != seq.end ();
+		 j++)
+	      {
+		const AttributeList& al = **j;
+		if (!syntax[key]->check (key, al, log, 
+					 sparse || (state == Sparse)))
+		  error = true;
+	      }
+	  }
+	else if (!syntax[key]->check (key, vl.list (key), log,
+				      sparse || (state == Sparse)))
+	  error = true;
     }
   if (error)
     log.err () << "in " << name << "\n";
@@ -99,43 +113,52 @@ Syntax::Implementation::check (const AttributeList& vl)
        i++)
     {
       string key = (*i).first;
-      if ((status[key] == InOut|| status[key] == Const || status[key] == Mixed)
-	  && !vl.check (key))
-	return false;
-      else if (types[key] == Sequence && vl.check (key))
+      required state = status[key];
+      if (!vl.check (key))
 	{
-	  const ::Sequence& seq = vl.sequence (key);
-	  for (::Sequence::const_iterator j = seq.begin ();
-	       j != seq.end ();
-	       i++)
-	    if (!syntax[key]->check (**j))
-	      return false;
-	}
-      else if (types[key] == Sequence && vl.check (key))
-	{
-	  const Library& lib = *libraries[key];
-	  const ::Sequence& seq = vl.sequence (key);
-	  for (::Sequence::const_iterator j = seq.begin ();
-	       j != seq.end ();
-	       j++)
-	    {
-	      const AttributeList& al = **j;
-	      if (!al.check ("type")
-		  || !lib.syntax (al.name ("type")).check (al))
-		return false;
-	    }
-	}
-      else if (types[key] == Object && vl.check (key))
-	{
-	  const Library& lib = *libraries[key];
-	  const AttributeList& al = vl.list (key);
-	  if (!al.check ("type") || !lib.syntax (al.name ("type")).check (al))
+	  if (state == InOut || state == Const || state == Mixed)
 	    return false;
 	}
-      else if (types[key] == List
-	       && vl.check (key)
-	       && !syntax[key]->check (vl.list (key)))
-	return false;
+      else if (types[key] == Object)
+	if (size[key] != Singleton)
+	  {
+	    const Library& lib = *libraries[key];
+	    const vector<const AttributeList*>& seq = vl.list_sequence (key);
+	    for (vector<const AttributeList*>::const_iterator j = seq.begin ();
+		 j != seq.end ();
+		 j++)
+	      {
+		const AttributeList& al = **j;
+		if (!al.check ("type"))
+		  return false;
+		else if (!lib.syntax (al.name ("type")) .check (al))
+		  return false;
+	      }
+	  }
+	else 
+	  {
+	    const Library& lib = *libraries[key];
+	    const AttributeList& al = vl.list (key);
+	    if (!al.check ("type"))
+	      return false;
+	    else if (!lib.syntax (al.name ("type")).check (al))
+	      return false;
+	  }
+      else if (types[key] == List)
+	if (size[key] != Singleton)
+	  {
+	    const vector<const AttributeList*>& seq = vl.list_sequence (key);
+	    for (vector<const AttributeList*>::const_iterator j = seq.begin ();
+		 j != seq.end ();
+		 j++)
+	      {
+		const AttributeList& al = **j;
+		if (!syntax[key]->check (al))
+		  return false;
+	      }
+	  }
+	else if (!syntax[key]->check (vl.list (key)))
+	  return false;
     }
   return true;
 }
@@ -216,32 +239,45 @@ Syntax::size (string key) const
     return (*i).second;
 }
 
-void
-Syntax::add (string key, type t, required req)
+bool 
+Syntax::ordered () const
 {
+  return impl.order.size () > 0;
+}
+
+const list<string>& 
+Syntax::order () const
+{
+  return impl.order;
+}
+
+void
+Syntax::add (string key, type t, required req, int s)
+{
+  impl.size[key] = s;
   impl.types[key] = t;
   impl.status[key] = req;
 }
 
 void
-Syntax::add (string key, const Syntax& s, required req)
+Syntax::add (string key, const Syntax& s, required req, int sz)
 {
-  add (key, List, req);
+  add (key, List, req, sz);
   impl.syntax[key] = &s;
 }
 
 void
-Syntax::add (string key, const FTable* f, required req)
+Syntax::add (string key, const FTable* f, required req, int s)
 {
-  add (key, Function, req);
+  add (key, Function, req, s);
   impl.ftables[key] = f;
 }
 
-void
-Syntax::add (string key, int s, required req)
+void 
+Syntax::add (string key, const Library& l, required req, int s)
 {
-  add (key, Array, req);
-  impl.size[key] = s;
+  add (key, Object, req, s);
+  impl.libraries[key] = &l;
 }
 
 void
@@ -260,24 +296,47 @@ Syntax::add_class (string key, const Library& l, derive_fun fun)
 }
 
 void 
-Syntax::add_object (string key, const Library& l, required req)
+Syntax::order (const list<string>& order)
 {
-  add (key, Object, req);
-  impl.libraries[key] = &l;
+  impl.order = order;
 }
 
 void 
-Syntax::add_sequence (string key, const Library& l, required req)
+Syntax::order (string one, string two)
 {
-  add (key, Sequence, req);
-  impl.libraries[key] = &l;
+  assert (impl.order.size () == 0);
+  impl.order.push_back (one);
+  impl.order.push_back (two);
 }
 
 void 
-Syntax::add_layers (string key, const Library& l, required req)
+Syntax::order (string one, string two, string three)
 {
-  add (key, Layers, req);
-  impl.libraries[key] = &l;
+  assert (impl.order.size () == 0);
+  impl.order.push_back (one);
+  impl.order.push_back (two);
+  impl.order.push_back (three);
+}
+
+void 
+Syntax::order (string one, string two, string three, string four)
+{
+  assert (impl.order.size () == 0);
+  impl.order.push_back (one);
+  impl.order.push_back (two);
+  impl.order.push_back (three);
+  impl.order.push_back (four);
+}
+
+void 
+Syntax::order (string one, string two, string three, string four, string five)
+{
+  assert (impl.order.size () == 0);
+  impl.order.push_back (one);
+  impl.order.push_back (two);
+  impl.order.push_back (three);
+  impl.order.push_back (four);
+  impl.order.push_back (five);
 }
 
 Syntax::Syntax () : impl (*new Implementation ())

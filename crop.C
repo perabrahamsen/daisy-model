@@ -53,9 +53,9 @@ Crop::Crop (const string n)
 Crop::~Crop ()
 { }
 
-CropList::CropList (const Sequence& sequence)
+CropList::CropList (const vector<const AttributeList*>& sequence)
 {
-  for (Sequence::const_iterator i = sequence.begin ();
+  for (vector<const AttributeList*>::const_iterator i = sequence.begin ();
        i != sequence.end ();
        i++)
     push_back (Crop::create (**i, -1));

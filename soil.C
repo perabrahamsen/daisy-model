@@ -58,6 +58,11 @@ Soil::check (Log& /* log */) const
       cerr << "You need at least one interval\n";
       ok = false;
     }
+  if (horizon_.size () < 1)
+    {
+      cerr << "You need at least one horizon\n";
+      ok = false;
+    }
   double last = 0.0;
   for (int i = 0; i < size_; i++)
     if (zplus_[i] > last)
@@ -76,8 +81,12 @@ Soil::check (Log& /* log */) const
 void
 Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
-  syntax.add_layers ("horizons", Horizon::library (), Syntax::Mixed);
-  syntax.add ("zplus", Syntax::Array, Syntax::Const);
+  Syntax& layer = *new Syntax ();
+  layer.add ("end", Syntax::Number, Syntax::Const);
+  layer.add ("horizon", Horizon::library (), Syntax::Mixed);
+  layer.order ("end", "horizon");
+  syntax.add ("horizons", layer, Syntax::Mixed, Syntax::Sequence);
+  syntax.add ("zplus", Syntax::Number, Syntax::Const, Syntax::Sequence);
   syntax.add ("EpFactor", Syntax::Number, Syntax::Const);
   alist.add ("EpFactor", 0.8);
   syntax.add ("EpInterchange", Syntax::Number, Syntax::Const);
@@ -85,33 +94,38 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 }
   
 Soil::Soil (const AttributeList& al)
-  : zplus_ (al.array ("zplus")),
+  : zplus_ (al.number_sequence ("zplus")),
     size_ (zplus_.size ()),
     EpFactor_ (al.number ("EpFactor")),
     EpInterchange_ (al.number ("EpInterchange"))
 {
-  Layers::const_iterator layer = al.layers ("horizons").begin ();
-  Layers::const_iterator end = al.layers ("horizons").end ();
-  assert (layer != end);
-  const Horizon* hor = &Horizon::create (*(*layer).second);
-  double last = 0.0;
-  for (int i = 0; i < size_; i++)
+  vector<const AttributeList*>::const_iterator layer
+    = al.list_sequence ("horizons").begin ();
+  const vector<const AttributeList*>::const_iterator end 
+    = al.list_sequence ("horizons").end ();
+
+  if (layer != end)
     {
-      double zplus = zplus_[i];
-      double dz = last - zplus;
-      dz_.push_back (dz);
-      double z = last - dz / 2;
-      z_.push_back (z);
-      if (zplus < (*layer).first)
+      const Horizon* hor = &Horizon::create ((*layer)->list ("horizon"));
+      double last = 0.0;
+      for (int i = 0; i < size_; i++)
 	{
-	  layer++;
-	  assert (layer != end);
-	  hor = &Horizon::create (*(*layer).second);
+	  double zplus = zplus_[i];
+	  double dz = last - zplus;
+	  dz_.push_back (dz);
+	  double z = last - dz / 2;
+	  z_.push_back (z);
+	  if (zplus < (*layer)->number ("end"))
+	    {
+	      layer++;
+	      assert (layer != end);
+	      hor = &Horizon::create ((*layer)->list ("horizon"));
+	    }
+	  horizon_.push_back (hor);
+	  last = zplus;
 	}
       horizon_.push_back (hor);
-      last = zplus;
     }
-  horizon_.push_back (hor);
 };
 
 Soil::~Soil ()

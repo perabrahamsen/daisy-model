@@ -53,9 +53,9 @@ Column::Column (string n)
 Column::~Column ()
 { }
 
-ColumnList::ColumnList (const Sequence& sequence)
+ColumnList::ColumnList (const vector<const AttributeList*>& sequence)
 {
-  for (Sequence::const_iterator i = sequence.begin ();
+  for (vector<const AttributeList*>::const_iterator i = sequence.begin ();
        i != sequence.end ();
        i++)
     push_back (Column::create (**i));

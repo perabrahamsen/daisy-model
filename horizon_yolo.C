@@ -106,4 +106,5 @@ HorizonYoloSyntax::HorizonYoloSyntax ()
   syntax.add ("M_intervals", Syntax::Integer, Syntax::Const);
   alist.add ("M_intervals", 500);
   Horizon::add_type ("yolo", alist, syntax, &HorizonYolo::make);
+  alist.add ("lambda", 4.0);
 }

@@ -5,12 +5,12 @@
 
 #include <std/string.h>
 #include <list.h>
+#include <vector.h>
 
 struct Log;
 struct Filter;
 struct Time;
 struct AttributeList;
-struct Sequence;
 struct Bioclimate;
 struct CSMP;
 struct Library;
@@ -64,7 +64,7 @@ public:
 class CropList : public list <Crop*> 
 { 
 public:
-  CropList (const Sequence&);
+  CropList (const vector<const AttributeList*>&);
   ~CropList ();
 };
 

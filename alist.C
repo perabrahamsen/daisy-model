@@ -1,8 +1,7 @@
 // alist.C
 
 #include "alist.h"
-#include "action.h"
-#include "condition.h"
+#include "time.h"
 #include <assert.h>
 #include <map.h>
 
@@ -13,18 +12,43 @@
 class Value
 {
 public:
+  // True if we could successfully merge values.
   virtual bool merge (const Value*);
-  virtual double number () const throw (AttributeList::Invalid);
-  virtual string name () const throw (AttributeList::Invalid);
-  virtual bool flag () const throw (AttributeList::Invalid);
-  virtual int integer () const throw (AttributeList::Invalid);
-  virtual const vector<double>& array () const throw (AttributeList::Invalid);
-  virtual const Rules& rules () const throw (AttributeList::Invalid);
-  virtual const CSMP& csmp () const throw (AttributeList::Invalid);
-  virtual const AttributeList& list () const throw (AttributeList::Invalid);
-  virtual const Time& time () const throw (AttributeList::Invalid);
-  virtual const Sequence& sequence () const throw (AttributeList::Invalid);
-  virtual const Layers& layers () const throw (AttributeList::Invalid);
+  
+  // Retrieve data (Singletons).
+  virtual operator double () const
+       throw (AttributeList::Invalid);
+  virtual operator string () const
+       throw (AttributeList::Invalid);
+  virtual operator bool () const
+       throw (AttributeList::Invalid);
+  virtual operator int () const
+       throw (AttributeList::Invalid);
+  virtual operator const Rules& () const
+       throw (AttributeList::Invalid);
+  virtual operator const CSMP& () const
+       throw (AttributeList::Invalid);
+  virtual operator const AttributeList& () const
+       throw (AttributeList::Invalid);
+  virtual operator const Time& () const throw (AttributeList::Invalid);
+
+  // Retrieve data (Sequences).
+  virtual operator const vector<double>& () const
+       throw (AttributeList::Invalid);
+  virtual operator const vector<string>& () const
+       throw (AttributeList::Invalid);
+  virtual operator const vector<bool>& () const
+       throw (AttributeList::Invalid);
+  virtual operator const vector<int>& () const
+       throw (AttributeList::Invalid);
+  virtual operator const vector<const Rules*>& () const
+       throw (AttributeList::Invalid);
+  virtual operator const vector<const CSMP*>& () const
+       throw (AttributeList::Invalid);
+  virtual operator const vector<const AttributeList*>& () const
+       throw (AttributeList::Invalid);
+  virtual operator const vector<const Time*>& () const
+       throw (AttributeList::Invalid);
 protected:
   Value ();
 public:
@@ -33,93 +57,91 @@ public:
 
 // Specific attribute values.
 
-class ValueNumber : public Value
+// We store most values as references.
+template <class T>
+class dValue : public Value
 {
-  const double value;
+  const T& value;
 public:
-  double number () const;
-  ValueNumber (double);
+  operator const T& () const
+  { return value; }
+  dValue (const T& v)
+    : value (v)
+  { };
 };
 
-class ValueString : public Value
+// Primitive types are stored directly, though.
+class dValue<double> : public Value
 {
-  string value;
+  double value;
 public:
-  string name () const;
-  ValueString (string);
+  operator double () const
+  { return value; }
+  dValue (double v)
+    : value (v)
+  { };
 };
 
-class ValueBool : public Value
-{
-  bool value;
-public:
-  bool flag () const;
-  ValueBool (bool);
-};
-
-class ValueInteger : public Value
+class dValue<int> : public Value
 {
   int value;
 public:
-  int integer () const;
-  ValueInteger (int);
+  operator int () const
+  { return value; }
+  dValue (int v)
+    : value (v)
+  { };
 };
 
-class ValueTime : public Value
+class dValue<bool> : public Value
 {
-  Time value;
+  bool value;
 public:
-  const Time& time () const;
-  ValueTime (const Time&);
+  operator bool () const
+  { return value; }
+  dValue (bool v)
+    : value (v)
+  { };
 };
 
-class ValueSequence : public Value
+class dValue<string> : public Value
 {
-  Sequence value;
+  string value;
 public:
-  const Sequence& sequence () const;
-  ValueSequence (const Sequence&);
+  operator string () const
+  { return value; }
+  dValue (string v)
+    : value (v)
+  { };
 };
 
-class ValueLayers : public Value
+class dValue<Time> : public Value
 {
-  Layers value;
+  const Time& value;
 public:
-  const Layers& layers () const;
-  ValueLayers (const Layers&);
+  operator const Time& () const
+  { return value; }
+  dValue (const Time& v)
+    : value (*new Time (v))
+  { };
 };
 
-class ValueArray : public Value
-{
-  vector<double> value;
-public:
-  const vector<double>& array () const;
-  ValueArray (const vector<double>&);
-};
-
-class ValueList : public Value
+// AttributeList is special, because further definitions are merged
+// rather than overwritten.
+class dValue<AttributeList> : public Value
 {
   AttributeList& value;
 public:
-  bool merge (const Value*);
-  const AttributeList& list () const;
-  ValueList (AttributeList&);
-};
-
-class ValueRules : public Value
-{
-  const Rules& value;
-public:
-  const Rules& rules () const;
-  ValueRules (const Rules&);
-};
-
-class ValueCSMP : public Value
-{
-  const CSMP& value;
-public:
-  const CSMP& csmp () const;
-  ValueCSMP (const CSMP&);
+  bool merge (const Value* other)
+  {
+    value += *other;
+    return true;
+  }
+  operator const AttributeList& () const
+  { return value; }
+  dValue (AttributeList& v)
+    : value (v)
+  { };
 };
 
 bool 
@@ -128,193 +150,122 @@ Value::merge (const Value*)
   return false;
 }
 
-double
-Value::number () const throw (AttributeList::Invalid)
+Value::operator double () const
+     throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
   return -1.0; // SHUT UP.
 }
 
-string
-Value::name () const throw (AttributeList::Invalid)
+Value::operator string () const
+     throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
   return "BUG"; // SHUT UP.
 }
 
-bool
-Value::flag () const throw (AttributeList::Invalid)
+Value::operator bool () const
+     throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
   return false; // SHUT UP.
 }
 
-int
-Value::integer () const throw (AttributeList::Invalid)
+Value::operator int () const
+     throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
   return false; // SHUT UP.
 }
 
-const Time&
-Value::time () const throw (AttributeList::Invalid)
+Value::operator const Time& () const
+     throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
   return *((Time*) 0); // SHUT UP.
 }
 
-const Sequence&
-Value::sequence () const throw (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-  return *((Sequence*) 0); // SHUT UP.
-}
-
-const Layers&
-Value::layers () const throw (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-  return *((Layers*) 0); // SHUT UP.
-}
-
-const
-vector<double>& Value::array () const throw (AttributeList::Invalid)
-{ 
-  THROW (AttributeList::Invalid ());
-  return *((vector<double>*) 0);
-}
-
-const
-Rules& Value::rules () const throw (AttributeList::Invalid)
+Value::operator const Rules& () const
+     throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
   return *((Rules*) 0); // SHUT UP.
 }
 
-const
-CSMP& Value::csmp () const throw (AttributeList::Invalid)
+Value::operator const CSMP& () const
+     throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
   return *((CSMP*) 0); // SHUT UP.
 }
 
-const
-AttributeList& Value::list () const throw (AttributeList::Invalid)
+Value::operator const AttributeList& () const
+     throw (AttributeList::Invalid)
 { 
   THROW (AttributeList::Invalid ());
   return *((AttributeList*) 0); // SHUT UP.
+}
+
+Value::operator const vector<double>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<double>*) 0);
+}
+
+Value::operator const vector<string>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<string>*) 0);
+}
+
+Value::operator const vector<bool>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<bool>*) 0);
+}
+
+Value::operator const vector<int>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<int>*) 0);
+}
+
+Value::operator const vector<const Rules*>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<const Rules*>*) 0);
+}
+
+Value::operator const vector<const CSMP*>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<const CSMP*>*) 0);
+}
+
+Value::operator const vector<const AttributeList*>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<const AttributeList*>*) 0);
+}
+
+Value::operator const vector<const Time*>& () const
+     throw (AttributeList::Invalid)
+{ 
+  THROW (AttributeList::Invalid ());
+  return *((vector<const Time*>*) 0);
 }
 
 Value::Value ()
 { }
 
 Value::~Value ()
-{ }
-
-double 
-ValueNumber::number () const
-{
-  return value;
-}
-
-ValueNumber::ValueNumber (double n) : value (n)
-{ }
-
-string
-ValueString::name () const
-{
-  return value;
-}
-
-ValueString::ValueString (string s) : value (s)
-{ }
-
-bool
-ValueBool::flag () const
-{
-  return value;
-}
-
-ValueBool::ValueBool (bool b) : value (b)
-{ }
-
-int
-ValueInteger::integer () const
-{
-  return value;
-}
-
-ValueInteger::ValueInteger (int i) : value (i)
-{ }
-
-const Time&
-ValueTime::time () const
-{
-  return value;
-}
-
-ValueTime::ValueTime (const Time& t) : value (t)
-{ }
-
-const Sequence&
-ValueSequence::sequence () const
-{
-  return value;
-}
-
-ValueSequence::ValueSequence (const Sequence& t) : value (t)
-{ }
-
-const Layers&
-ValueLayers::layers () const
-{
-  return value;
-}
-
-ValueLayers::ValueLayers (const Layers& t) : value (t)
-{ }
-
-const vector<double>&
-ValueArray::array () const
-{
-  return value;
-}
-
-ValueArray::ValueArray (const vector<double>& v) : value (v)
-{ }
-
-const Rules& 
-ValueRules::rules () const
-{
-  return value;
-}
-
-ValueRules::ValueRules (const Rules& v) : value (v)
-{ }
-
-const CSMP& 
-ValueCSMP::csmp () const
-{
-  return value;
-}
-
-ValueCSMP::ValueCSMP (const CSMP& v) : value (v)
-{ }
-
-bool
-ValueList::merge (const Value* other)
-{
-  value += other->list ();
-  return true;
-}
-
-const AttributeList& 
-ValueList::list () const
-{
-  return value;
-}
-
-ValueList::ValueList (AttributeList& v) : value (v)
 { }
 
 // @ AttributeList
@@ -383,133 +334,201 @@ AttributeList::check (string key) const throw0 ()
 double 
 AttributeList::number (string key) const throw2 (Invalid, Uninitialized)
 {
-  return impl.lookup (key)->number ();
+  return *impl.lookup (key);
 }
 
 string 
 AttributeList::name (string key) const throw2 (Invalid, Uninitialized)
 {
-  return impl.lookup (key)->name ();
+  return *impl.lookup (key);
 }
 
 bool 
 AttributeList::flag (string key) const throw2 (Invalid, Uninitialized)
 {
-  return impl.lookup (key)->flag ();
+  return *impl.lookup (key);
 }
 
 int
 AttributeList::integer (string key) const throw2 (Invalid, Uninitialized)
 {
-  return impl.lookup (key)->integer ();
+  return *impl.lookup (key);
 }
 
 const Time&
 AttributeList::time (string key) const throw2 (Invalid, Uninitialized)
 {
-  return impl.lookup (key)->time ();
-}
-
-const Sequence&
-AttributeList::sequence (string key) const throw2 (Invalid, Uninitialized)
-{
-  return impl.lookup (key)->sequence ();
-}
-
-const Layers&
-AttributeList::layers (string key) const throw2 (Invalid, Uninitialized)
-{
-  return impl.lookup (key)->layers ();
-}
-
-const vector<double>& 
-AttributeList::array (string key) const throw2 (Invalid, Uninitialized)
-{
-  return impl.lookup (key)->array ();
+  return *impl.lookup (key);
 }
 
 const Rules& 
 AttributeList::rules (string key) const throw2 (Invalid, Uninitialized)
 {
-  return impl.lookup (key)->rules ();
+  return *impl.lookup (key);
 }
 
 const CSMP& 
 AttributeList::csmp (string key) const throw2 (Invalid, Uninitialized)
 {
-  return impl.lookup (key)->csmp ();
+  return *impl.lookup (key);
 }
 
 const AttributeList& 
 AttributeList::list (string key) const throw2 (Invalid, Uninitialized)
 {
-  return impl.lookup (key)->list ();
+  return *impl.lookup (key);
+}
+
+const vector<double>& 
+AttributeList::number_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
+const vector<string>& 
+AttributeList::name_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
+const vector<bool>& 
+AttributeList::flag_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
+const vector<int>& 
+AttributeList::integer_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
+const vector<const Time*>& 
+AttributeList::time_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
+const vector<const Rules*>& 
+AttributeList::rules_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
+const vector<const CSMP*>& 
+AttributeList::csmp_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
+}
+
+const vector<const AttributeList*>& 
+AttributeList::list_sequence (string key) const
+     throw2 (Invalid, Uninitialized)
+{
+  return *impl.lookup (key);
 }
 
 void 
 AttributeList::add (string key, double v)
 {
-  impl.add (key, new ValueNumber (v));
+  impl.add (key, new dValue<double> (v));
 }
 
 void 
 AttributeList::add (string key, string v)
 {
-  impl.add (key, new ValueString (v));
+  impl.add (key, new dValue<string> (v));
 }
 
 void 
 AttributeList::add (string key, bool v)
 {
-  impl.add (key, new ValueBool (v));
+  impl.add (key, new dValue<bool> (v));
 }
 
 void 
 AttributeList::add (string key, int v)
 {
-  impl.add (key, new ValueInteger (v));
+  impl.add (key, new dValue<int> (v));
 }
 
 void 
 AttributeList::add (string key, const Time& v)
 {
-  impl.add (key, new ValueTime (v));
-}
-
-void 
-AttributeList::add (string key, const Sequence& v)
-{
-  impl.add (key, new ValueSequence (v));
-}
-
-void 
-AttributeList::add (string key, const Layers& v)
-{
-  impl.add (key, new ValueLayers (v));
+  impl.add (key, new dValue<Time> (v));
 }
 
 void 
 AttributeList::add (string key, AttributeList& v)
 {
-  impl.add (key, new ValueList (v));
+  impl.add (key, new dValue<AttributeList> (v));
 }
 
 void 
 AttributeList::add (string key, const Rules* v)
 {
-  impl.add (key, new ValueRules (*v));
+  impl.add (key, new dValue<Rules> (*v));
 }
 
 void 
 AttributeList::add (string key, const CSMP* v)
 {
-  impl.add (key, new ValueCSMP (*v));
+  impl.add (key, new dValue<CSMP> (*v));
 }
 
 void 
 AttributeList::add (string key, const vector<double>& v)
 {
-  impl.add (key, new ValueArray (v));
+  impl.add (key, new dValue<vector<double>/**/> (v));
+}
+
+void 
+AttributeList::add (string key, const vector<string>& v)
+{
+  impl.add (key, new dValue<vector<string>/**/> (v));
+}
+
+void 
+AttributeList::add (string key, const vector<bool>& v)
+{
+  impl.add (key, new dValue<vector<bool>/**/> (v));
+}
+
+void 
+AttributeList::add (string key, const vector<int>& v)
+{
+  impl.add (key, new dValue<vector<int>/**/> (v));
+}
+
+void 
+AttributeList::add (string key, const vector<const AttributeList*>& v)
+{
+  impl.add (key, new dValue<vector<const AttributeList*>/**/> (v));
+}
+
+void 
+AttributeList::add (string key, const vector<const Rules*>& v)
+{
+  impl.add (key, new dValue<vector<const Rules*>/**/> (v));
+}
+
+void 
+AttributeList::add (string key, const vector<const CSMP*>& v)
+{
+  impl.add (key, new dValue<vector<const CSMP*>/**/> (v));
+}
+
+void 
+AttributeList::add (string key, const vector<const Time*>& v)
+{
+  impl.add (key, new dValue<vector<const Time*>/**/> (v));
 }
 
 void

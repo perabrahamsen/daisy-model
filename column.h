@@ -5,6 +5,7 @@
 
 #include <std/string.h>
 #include <list.h>
+#include <vector.h>
 
 class Library;
 class Filter;
@@ -13,7 +14,6 @@ class Log;
 class Weather;
 class Groundwater;
 class AttributeList;
-class Sequence;
 class Syntax;
 
 class Column
@@ -51,7 +51,7 @@ public:
 class ColumnList : public list <Column*>
 { 
 public:
-  ColumnList (const Sequence&);
+  ColumnList (const vector<const AttributeList*>&);
   ~ColumnList ();
 };
 

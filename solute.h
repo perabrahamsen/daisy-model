@@ -37,19 +37,20 @@ protected:
   // Sink.
 public:
   void clear ();
-  void add_to_sink (const vector<double>&);
+  void add_to_source (const vector<double>&);
 
   // Simulation.
 public:
-  void tick (const Soil&, const SoilWater&r, double J_in);
+  void tick (const Soil&, const SoilWater&, double J_in);
   bool check (Log&, unsigned n) const;
   void output (Log&, const Filter*) const;
 
   // Create and destroy.
-public:
+protected:
   static void load_syntax (Syntax&, AttributeList&);
   Solute ();
-  void initialize (const Soil&, const SoilWater, const AttributeList&);
+  void initialize (const Soil&, const SoilWater&, const AttributeList&);
+public:
   virtual ~Solute ();
 };
 

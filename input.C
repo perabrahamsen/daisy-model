@@ -38,7 +38,6 @@ struct Parser
   void skip_token ();
   bool looking_at (char);
   void eof ();
-  const Layers& load_layers (const Library& lib);
   void load_library (Library& lib);
   void add_derived (const Library&, derive_fun);
   AttributeList& load_derived (const Library& lib);
@@ -253,36 +252,6 @@ Parser::eof ()
     error ("Expected end of file");
 }
     
-const Layers&
-Parser::load_layers (const Library& lib)
-{
-  Layers& layers = *new Layers ();
-  double last = 0.0;
-
-  while (!looking_at (')') && good ())
-    {
-      skip ("(");
-      double zplus = get_number ();
-
-      if (zplus == last)
-	error ("Ignoring empty layer");
-      else if (zplus >= last)
-	error ("Ignoring negative layer");
-      else
-	{
-	  const AttributeList& al = load_derived (lib);
-	  const string name = al.name ("type");
-	  lib.syntax (name).check (name, al, log);
-	  layers.push_back (make_pair (zplus, &al));
-	  last = zplus;
-	}
-      skip (")");
-    }
-  if (last == 0.0)
-    error ("Zero depth soil");
-  return layers;
-}
-
 void
 Parser::load_library (Library& lib)
 { 
@@ -339,183 +308,226 @@ Parser::load_derived (const Library& lib)
 void
 Parser::load_list (AttributeList& atts, const Syntax& syntax)
 { 
+  list<string>::const_iterator current = syntax.order ().begin ();
+  const list<string>::const_iterator end = syntax.order ().end ();
+
   while (!looking_at (')') && good ())
     {
-      skip ("(");
-      string name = get_id ();
-      switch (syntax.lookup (name))
+      string name;
+      if (current == end)
+	// Unordered association list, get name.
 	{
-	case Syntax::Number:
-	  atts.add (name, get_number ());
-	  break;
-	case Syntax::List: 
+	  skip ("(");
+	  name = get_id ();
+	}
+      else
+	// Ordered tupple, name know.
+	name = *current;
+	
+      if (syntax.size (name) == Syntax::Singleton)
+	switch (syntax.lookup (name))
 	  {
-	    AttributeList& list = *new AttributeList ();
-	    load_list (list, syntax.syntax (name));
-	    atts.add (name, list);
+	  case Syntax::Number:
+	    atts.add (name, get_number ());
 	    break;
-	  }
-	case Syntax::Rules:
-	  {
-	    Rules* rules = atts.check (name) 
-	      ? new Rules (&atts.rules (name))
-	      : new Rules ();
-	    skip ("(");
-	    while (!looking_at (')') && good ())
-	      {
-		skip ("(");
-		const Condition* c = get_condition ();
-		const Action* a = get_action ();
-		rules->add (c, a);
-		skip (")");
-	      }
-	    atts.add (name, rules);
-	    skip (")");
-	    break;
-	  }
-	case Syntax::CSMP:
-	  {
-	    CSMP* csmp = new CSMP ();
-	    double last_x = -42;
-	    int count = 0;
-	    while (!looking_at (')') && good ())
-	      {
-		skip ("(");
-		double x = get_number ();
+	  case Syntax::List: 
+	    {
+	      AttributeList& list = *new AttributeList ();
+	      load_list (list, syntax.syntax (name));
+	      atts.add (name, list);
+	      break;
+	    }
+	  case Syntax::Rules:
+	    {
+	      Rules* rules = atts.check (name) 
+		? new Rules (&atts.rules (name))
+		: new Rules ();
+	      skip ("(");
+	      while (!looking_at (')') && good ())
 		{
-		  if (count > 0 && x <= last_x)
-		    error ("Non increasing x value");
-		  last_x = x;
-		  count++;
+		  skip ("(");
+		  const Condition* c = get_condition ();
+		  const Action* a = get_action ();
+		  rules->add (c, a);
+		  skip (")");
 		}
-		double y = get_number ();
-		skip (")");
-		csmp->add (x, y);
-	      }
-	    if (count < 2)
-	      error ("Need at least 2 points");
-	    atts.add (name, csmp);
-	    break;
-	  }
-	case Syntax::Function:
-	  atts.add (name, get_id ());
-	  break;
-	case Syntax::String:
-	  atts.add (name, get_string ());
-	  break;
-	case Syntax::Array:
-	  {
-	    vector<double> array;
-	    int count = 0;
-	    int size = syntax.size (name);
-	    double last = 0.0;
-	    while (!looking_at (')') && good ())
-	      {
-		if (looking_at ('*'))
+	      atts.add (name, rules);
+	      skip (")");
+	      break;
+	    }
+	  case Syntax::CSMP:
+	    {
+	      CSMP* csmp = new CSMP ();
+	      double last_x = -42;
+	      int count = 0;
+	      while (!looking_at (')') && good ())
+		{
+		  skip ("(");
+		  double x = get_number ();
 		  {
-		    skip ("*");
-		    int same = get_integer ();
-		    // Append same - 1 copies of last value.
-		    for (int i = 1; i < same; i++)
-		      {
-			array.push_back (last);
-			count++;
-		      }
-		  }
-		else
-		  {
-		    last = get_number ();
-		    array.push_back (last);
+		    if (count > 0 && x <= last_x)
+		      error ("Non increasing x value");
+		    last_x = x;
 		    count++;
 		  }
-	      }
-	    if (size >= 0 && count != size)
-	      {
-		ostrstream str;
-		str << "Got " << count 
-		    << " array members, expected " << size;
-		error (str.str ());
+		  double y = get_number ();
+		  skip (")");
+		  csmp->add (x, y);
+		}
+	      if (count < 2)
+		error ("Need at least 2 points");
+	      atts.add (name, csmp);
+	      break;
+	    }
+	  case Syntax::Function:
+	    atts.add (name, get_id ());
+	    break;
+	  case Syntax::String:
+	    atts.add (name, get_string ());
+	    break;
+	  case Syntax::Boolean:
+	    {
+	      string flag = get_id ();
 
-		for (;count < size; count++)
-		  array.push_back (-1.0);
-	      }
-	    atts.add (name, array);
+	      if (flag == "true")
+		atts.add (name, true);
+	      else
+		{
+		  atts.add (name, false);
+		  if (flag != "false")
+		    error ("Expected `true' or `false'");
+		}
+	      break;
+	    }
+	  case Syntax::Integer:
+	    atts.add (name, get_integer ());
 	    break;
+	  case Syntax::Date:
+	    atts.add (name, get_time ());
+	    break;
+	  case Syntax::Output:
+	    // Handled specially: Put directly in log.
+	    {
+	      while (!looking_at (')') && good ())
+		{
+		  skip ("(");
+		  string s = get_string ();
+		  const Condition* c = get_condition ();
+		  const Filter* f = get_filter (syntax.syntax (name));
+		  log.add (s, c, f);
+		  skip (")");
+		}
+	      break;
+	    }
+	  case Syntax::Class:
+	    // Handled specially: Put directly in global library.
+	    add_derived (syntax.library (name), syntax.derive (name));
+	    break;
+	  case Syntax::Object:
+	    {
+	      const Library& lib = syntax.library (name);
+	      AttributeList& al = load_derived (lib);
+	      const string obj = al.name ("type");
+	      lib.syntax (obj).check (obj, al, log);
+	      atts.add (name, al);
+	    }
+	    break;
+	  case Syntax::Error:
+	    error (string("Unknown attribute `") + name + "'");
+	    skip_to_end ();
+	    break;
+	  default:
+	    assert (false);
 	  }
-	case Syntax::Boolean:
+      else
+	// Support for sequences not really finished yet.
+	switch (syntax.lookup (name))
 	  {
-	    string flag = get_id ();
+	  case Syntax::Object:
+	    {
+	      // We don't support fixed sized object arrays yet.
+	      assert (syntax.size (name) == Syntax::Sequence);
+	      const Library& lib = syntax.library (name);
+	      vector<const AttributeList*>& sequence
+		= *new vector<const AttributeList*> ();
+	      while (!looking_at (')') && good ())
+		{
+		  skip ("(");
+		  const AttributeList& al = load_derived (lib);
+		  const string obj = al.name ("type");
+		  lib.syntax (obj).check (obj, al, log);
+		  sequence.push_back (&al);
+		  skip (")");
+		}
+	      atts.add (name, sequence);
+	      break;
+	    }
+	  case Syntax::List:
+	    {
+	      // We don't support fixed sized object arrays yet.
+	      assert (syntax.size (name) == Syntax::Sequence);
+	      const Syntax& syn = syntax.syntax (name);
+	      vector<const AttributeList*>& sequence
+		= *new vector<const AttributeList*> ();
+	      skip ("(");
+	      while (!looking_at (')') && good ())
+		{
+		  AttributeList& al = *new AttributeList ();
+		  load_list (al, syn);
+		  sequence.push_back (&al);
+		}
+	      skip (")");
+	      atts.add (name, sequence);
+	      break;
+	    }
+	  case Syntax::Number:
+	    {
+	      vector<double>& array = *new vector<double> ();
+	      int count = 0;
+	      int size = syntax.size (name);
+	      double last = 0.0;
+	      while (!looking_at (')') && good ())
+		{
+		  if (looking_at ('*'))
+		    {
+		      skip ("*");
+		      int same = get_integer ();
+		      // Append same - 1 copies of last value.
+		      for (int i = 1; i < same; i++)
+			{
+			  array.push_back (last);
+			  count++;
+			}
+		    }
+		  else
+		    {
+		      last = get_number ();
+		      array.push_back (last);
+		      count++;
+		    }
+		}
+	      if (size != Syntax::Sequence && count != size)
+		{
+		  ostrstream str;
+		  str << "Got " << count 
+		      << " array members, expected " << size;
+		  error (str.str ());
 
-	    if (flag == "true")
-	      atts.add (name, true);
-	    else
-	      {
-		atts.add (name, false);
-		if (flag != "false")
-		  error ("Expected `true' or `false'");
-	      }
-	    break;
+		  for (;count < size; count++)
+		    array.push_back (-1.0);
+		}
+	      atts.add (name, array);
+	      break;
+	    }
+	  default:
+	    // Only numbers and objects supported yet.
+	    cerr << name << "()";
+	    assert (false);
 	  }
-	case Syntax::Integer:
-	  atts.add (name, get_integer ());
-	  break;
-	case Syntax::Date:
-	  atts.add (name, get_time ());
-	  break;
-	case Syntax::Layers:
-	  atts.add (name, load_layers (syntax.library (name)));
-	  break;
-	case Syntax::Output:
-	  // Handled specially: Put directly in log.
-	  {
-	    while (!looking_at (')') && good ())
-	      {
-		skip ("(");
-		string s = get_string ();
-		const Condition* c = get_condition ();
-		const Filter* f = get_filter (syntax.syntax (name));
-		log.add (s, c, f);
-		skip (")");
-	      }
-	    break;
-	  }
-	case Syntax::Class:
-	  // Handled specially: Put directly in global library.
-	  add_derived (syntax.library (name), syntax.derive (name));
-	  break;
-	case Syntax::Object:
-	  {
-	    const Library& lib = syntax.library (name);
-	    AttributeList& al = load_derived (lib);
-	    const string obj = al.name ("type");
-	    lib.syntax (obj).check (obj, al, log);
-	    atts.add (name, al);
-	  }
-	  break;
-	case Syntax::Sequence:
-	  {
-	    const Library& lib = syntax.library (name);
-	    Sequence& sequence = *new Sequence ();
-	    while (!looking_at (')') && good ())
-	      {
-		skip ("(");
-		const AttributeList& al = load_derived (lib);
-		const string obj = al.name ("type");
-		lib.syntax (obj).check (obj, al, log);
-		sequence.push_back (&al);
-		skip (")");
-	      }
-	    atts.add (name, sequence);
-	    break;
-	  }
-	case Syntax::Error:
-	  error (string("Unknown attribute `") + name + "'");
-	  skip_to_end ();
-	  break;
-	default:
-	  assert (false);
-	}
-      skip (")");
+      if (current == end)
+	skip (")");
+      else
+	current++;
     }
 }
 
@@ -642,10 +654,11 @@ Parser::get_filter (const Syntax& syntax)
 	      filter->add (name, get_filter (syntax.syntax (name)));
 	      break;
 	    case Syntax::Object:
-	      filter->add (name, get_filter_object (syntax.library (name)));
-	      break;
-	    case Syntax::Sequence:
-	      filter->add (name, get_filter_sequence (syntax.library (name)));
+	      if (syntax.size (name) == Syntax::Sequence)
+		filter->add (name,
+			     get_filter_sequence (syntax.library (name)));
+	      else
+		filter->add (name, get_filter_object (syntax.library (name)));
 	      break;
 	    default:
 	      error (string ("Atomic attribute `") + name + "'");

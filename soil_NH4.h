@@ -3,14 +3,13 @@
 #ifndef SOIL_NH4_H
 #define SOIL_NH4_H
 
-class AttributeList;
-class Syntax;
+#include "solute.h"
 
 class SoilNH4
 {
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  SoilNH4 (const AttributeList&);
+  SoilNH4 (const Soil&, const SoilWater&, const AttributeList&);
 };
 
 

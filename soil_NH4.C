@@ -6,5 +6,5 @@ void
 SoilNH4::load_syntax (Syntax&, AttributeList&)
 { }
 
-SoilNH4::SoilNH4 (const AttributeList&)
+SoilNH4::SoilNH4 (const Soil&, const SoilWater&, const AttributeList&)
 { }

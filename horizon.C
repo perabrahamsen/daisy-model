@@ -84,7 +84,7 @@ Horizon::create (const AttributeList& al)
 void
 Horizon::load_syntax (Syntax& syntax, AttributeList&)
 { 
-  syntax.add ("lambda", Syntax::Array, Syntax::Const);
+  syntax.add ("lambda", Syntax::Number, Syntax::Const);
 }
 
 Horizon::Horizon (const AttributeList& al)

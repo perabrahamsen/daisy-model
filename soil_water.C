@@ -122,14 +122,14 @@ SoilWater::MaxExfiltration (const Soil& soil) const
 void
 SoilWater::load_syntax (Syntax& syntax, AttributeList&)
 { 
-  syntax.add_object ("UZtop", UZmodel::library ());
-  syntax.add_object ("UZbottom", UZmodel::library (), Syntax::Optional);
+  syntax.add ("UZtop", UZmodel::library ());
+  syntax.add ("UZbottom", UZmodel::library (), Syntax::Optional);
   syntax.add ("UZborder", Syntax::Integer, Syntax::Optional);
-  syntax.add ("S", Syntax::Array, Syntax::LogOnly);
-  syntax.add ("Theta", Syntax::Array, Syntax::Optional);
-  syntax.add ("h", Syntax::Array, Syntax::Optional);
-  syntax.add ("Xi", Syntax::Array, Syntax::Optional);
-  syntax.add ("q", Syntax::Array, Syntax::LogOnly);
+  syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
+  syntax.add ("Theta", Syntax::Number, Syntax::Optional, Syntax::Sequence);
+  syntax.add ("h", Syntax::Number, Syntax::Optional, Syntax::Sequence);
+  syntax.add ("Xi", Syntax::Number, Syntax::Optional, Syntax::Sequence);
+  syntax.add ("q", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
 }
 
 SoilWater::SoilWater (const Soil& soil, 
@@ -146,12 +146,12 @@ SoilWater::SoilWater (const Soil& soil,
   
   if (al.check ("Theta"))
     {
-      Theta_ = al.array ("Theta");
+      Theta_ = al.number_sequence ("Theta");
       size = Theta_.size ();
     }
   if (al.check ("h"))
     {
-      h_ = al.array ("h");
+      h_ = al.number_sequence ("h");
       size = h_.size ();
     }
   if (!al.check ("Theta"))
@@ -163,7 +163,7 @@ SoilWater::SoilWater (const Soil& soil,
       h_.push_back (soil.h (i, Theta_[i]));
 
   if (al.check ("Xi"))
-    Xi = al.array ("Xi");
+    Xi = al.number_sequence ("Xi");
   else 
     Xi.insert (Xi.begin (), size, 0.0);
 

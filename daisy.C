@@ -15,6 +15,7 @@
 #include "syntax.h"
 #include "condition.h"
 #include "alist.h"
+#include "common.h"
 #include <iostream.h>
 
 struct Daisy::Implementation
@@ -29,8 +30,19 @@ Daisy::Daisy (Log& l, const AttributeList& al)
     manager (Manager::create (al.list ("chief"))),
     weather (Weather::create (time, al.list ("weather"))), 
     groundwater (Groundwater::create (time, al.list ("groundwater"))), 
-    columns (*new ColumnList (al.sequence ("field")))
-{ }
+    columns (*new ColumnList (al.list_sequence ("field")))
+{ 
+  bool ok = true;
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    {
+      if (!(*i)-> check (log))
+	ok = false;
+    }
+  if (!ok)
+    THROW (Initialization ("Malformed column(s)"));
+}
 
 void 
 Daisy::run ()
@@ -112,12 +124,12 @@ Daisy::load_syntax (Syntax& syntax)
   syntax.add_class ("horizon", Horizon::library (), &Horizon::derive_type);
   syntax.add_class ("column", Column::library (), &Column::derive_type);
   syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
-  syntax.add_object ("chief", Manager::library (), Syntax::Const);
+  syntax.add ("chief", Manager::library (), Syntax::Const);
   syntax.add ("time", Syntax::Date, Syntax::InOut);
-  syntax.add_sequence ("field", Column::library (), Syntax::InOut);
+  syntax.add ("field", Column::library (), Syntax::InOut, Syntax::Sequence);
   syntax.add_output ("log", syntax, Syntax::Sparse);
-  syntax.add_object ("weather", Weather::library ());
-  syntax.add_object ("groundwater", Groundwater::library (), Syntax::Const);
+  syntax.add ("weather", Weather::library ());
+  syntax.add ("groundwater", Groundwater::library (), Syntax::Const);
 }
 
 Daisy::~Daisy ()

@@ -107,7 +107,7 @@ weather.o: weather.C weather.h time.h library.h alist.h common.h \
 manager.o: manager.C manager.h library.h alist.h common.h syntax.h
 column.o: column.C column.h library.h alist.h common.h syntax.h
 crop.o: crop.C crop.h library.h alist.h common.h syntax.h
-alist.o: alist.C alist.h common.h action.h condition.h time.h
+alist.o: alist.C alist.h common.h time.h
 syntax.o: syntax.C syntax.h alist.h common.h log.h library.h
 library.o: library.C library.h alist.h common.h
 action.o: action.C action.h column.h alist.h common.h
@@ -129,8 +129,8 @@ surface.o: surface.C surface.h uzmodel.h common.h syntax.h alist.h \
  soil_water.h log.h
 soil_water.o: soil_water.C soil_water.h log.h alist.h common.h \
  uzmodel.h soil.h horizon.h surface.h groundwater.h time.h syntax.h
-soil_NH4.o: soil_NH4.C soil_NH4.h
-soil_NO3.o: soil_NO3.C soil_NO3.h
+soil_NH4.o: soil_NH4.C soil_NH4.h solute.h
+soil_NO3.o: soil_NO3.C soil_NO3.h solute.h soil_water.h
 organic_matter.o: organic_matter.C organic_matter.h
 nitrification.o: nitrification.C nitrification.h
 denitrification.o: denitrification.C denitrification.h
@@ -143,7 +143,7 @@ solute.o: solute.C solute.h log.h filter.h syntax.h alist.h common.h \
  soil.h horizon.h soil_water.h mathlib.h
 column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h common.h soil.h horizon.h soil_water.h soil_heat.h \
- soil_NH4.h soil_NO3.h organic_matter.h nitrification.h \
+ soil_NH4.h solute.h soil_NO3.h organic_matter.h nitrification.h \
  denitrification.h alist.h syntax.h library.h log.h filter.h
 manager_rule.o: manager_rule.C manager.h syntax.h rules.h alist.h \
  common.h

@@ -75,8 +75,9 @@ bool
 ColumnStandard::check (Log& log) const
 {
   int n = soil.size ();
-  bool ok = (   soil.check (log)
-	     && soil_heat.check (log, n));
+  bool ok = (soil.check (log)
+	     && soil_heat.check (log, n)
+	     && soil_NO3.check (log, n));
   return ok;
 }
 
@@ -85,11 +86,13 @@ ColumnStandard::tick (const Time& time,
 		      const Weather& weather, Groundwater& groundwater)
 {
   soil_water.clear ();
+  soil_NO3.clear ();
   bioclimate.tick (surface, weather, crops, soil, soil_water);
   soil_heat.tick (surface, bioclimate);
   soil_water.tick (surface, groundwater, soil);
   for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
     (*crop)->tick (time, bioclimate, soil, soil_heat);
+  soil_NO3.tick (soil, soil_water, 0.0);
 }
 
 void
@@ -105,7 +108,9 @@ ColumnStandard::output (Log& log, const Filter* filter) const
 #if 0
   output_submodule (soil_heat, "SoilHeat", log, filter);
   output_submodule (soil_NH4, "SoilNH4", log, filter);
+#endif
   output_submodule (soil_NO3, "SoilNO3", log, filter);
+#if 0
   output_submodule (organic_matter, "OrganicMatter", log, filter);
   output_submodule (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
@@ -131,14 +136,14 @@ ColumnStandard::output_crops (Log& log, const Filter* filter) const
 
 ColumnStandard::ColumnStandard (const AttributeList& al)
   : Column (al.name ("type")),
-    crops (al.sequence ("crops")),
+    crops (al.list_sequence ("crops")),
     bioclimate (al.list ("Bioclimate")),
     surface (al.list ("Surface")),
     soil (al.list ("Soil")),
     soil_water (soil, al.list ("SoilWater")),
     soil_heat (al.list ("SoilHeat")),
-    soil_NH4 (al.list ("SoilNH4")),
-    soil_NO3 (al.list ("SoilNO3")),
+    soil_NH4 (soil, soil_water, al.list ("SoilNH4")),
+    soil_NO3 (soil, soil_water, al.list ("SoilNO3")),
     organic_matter (al.list ("OrganicMatter")),
     nitrification (al.list ("Nitrification")),
     denitrification (al.list ("Denitrification"))
@@ -164,7 +169,7 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
   Syntax& syntax = *new Syntax ();
   AttributeList& alist = *new AttributeList ();
 
-  syntax.add_sequence ("crops", Crop::library ());
+  syntax.add ("crops", Crop::library (), Syntax::Mixed, Syntax::Sequence);
   
   add_submodule<Bioclimate> ("Bioclimate", syntax, alist);
   add_submodule<Surface> ("Surface", syntax, alist);

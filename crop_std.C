@@ -402,8 +402,8 @@ CropStandard::Parameters::CanopyPar::CanopyPar (const AttributeList& vl)
     WLfInit (vl.number ("WLfInit")),
     SpLAI (vl.number ("SpLAI")),
     HvsDS (vl.csmp ("HvsDS")),
-    LAIDist0 (vl.array ("LAIDist0")),
-    LAIDist1 (vl.array ("LAIDist1")),
+    LAIDist0 (vl.number_sequence ("LAIDist0")),
+    LAIDist1 (vl.number_sequence ("LAIDist1")),
     PARref (vl.number ("PARref")),
     PARext (vl.number ("PARext")),
     EPext (vl.number ("EPext"))
@@ -521,10 +521,10 @@ CropStandard::Variables::RecRootSys::RecRootSys (const Parameters& par,
 						 const AttributeList& vl, 
 						 int layers)
   : Depth (vl.check ("Depth") ? vl.number ("Depth") : par.Root.DptEmr),
-    Density (vl.array ("Density")),
-    H2OExtraction (vl.array ("H2OExtraction")),
-    NH4Extraction (vl.array ("NH4Extraction")),
-    NO3Extraction (vl.array ("NO3Extraction")),
+    Density (vl.number_sequence ("Density")),
+    H2OExtraction (vl.number_sequence ("H2OExtraction")),
+    NH4Extraction (vl.number_sequence ("NH4Extraction")),
+    NO3Extraction (vl.number_sequence ("NO3Extraction")),
     h_x (vl.number ("h_x")),
     water_stress (1.0),
     Ept (0.0),
@@ -705,8 +705,8 @@ CropStandardSyntax::CropStandardSyntax ()
   Canopy.add ("WLfInit", Syntax::Number, Syntax::Const);
   Canopy.add ("SpLAI", Syntax::Number, Syntax::Const);
   Canopy.add ("HvsDS", Syntax::CSMP, Syntax::Const);
-  Canopy.add ("LAIDist0", 3, Syntax::Const);
-  Canopy.add ("LAIDist1", 3, Syntax::Const);
+  Canopy.add ("LAIDist0", Syntax::Number, Syntax::Const, 3);
+  Canopy.add ("LAIDist1", Syntax::Number, Syntax::Const, 3);
   Canopy.add ("PARref", Syntax::Number, Syntax::Const);
   Canopy.add ("PARext", Syntax::Number, Syntax::Const);
   Canopy.add ("EPext", Syntax::Number, Syntax::Const);
@@ -801,13 +801,13 @@ CropStandardSyntax::CropStandardSyntax ()
   alist.add ("RootSys", vRootSys);
 
   RootSys.add ("Depth", Syntax::Number, Syntax::Optional);
-  RootSys.add ("Density", Syntax::Array, Syntax::InOut);
+  RootSys.add ("Density", Syntax::Number, Syntax::InOut, Syntax::Sequence);
   vRootSys.add ("Density", empty_array);
-  RootSys.add ("H2OExtraction", Syntax::Array, Syntax::InOut);
+  RootSys.add ("H2OExtraction", Syntax::Number, Syntax::InOut, Syntax::Sequence);
   vRootSys.add ("H2OExtraction", empty_array);
-  RootSys.add ("NH4Extraction", Syntax::Array, Syntax::InOut);
+  RootSys.add ("NH4Extraction", Syntax::Number, Syntax::InOut, Syntax::Sequence);
   vRootSys.add ("NH4Extraction", empty_array);
-  RootSys.add ("NO3Extraction", Syntax::Array, Syntax::InOut);
+  RootSys.add ("NO3Extraction", Syntax::Number, Syntax::InOut, Syntax::Sequence);
   vRootSys.add ("NO3Extraction", empty_array);
   RootSys.add ("h_x", Syntax::Number, Syntax::InOut);
   vRootSys.add ("h_x", 0.0);
