@@ -74,9 +74,6 @@ struct AM::Implementation
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const vector<double>& density);
-  void add (const Geometry&,	// Add initial dead roots.
-	    double C, /* Fixed C/N */
-	    const vector<double>& density);
   double top_C () const;
   double top_N () const;
   void multiply_top (double fraction);
@@ -302,43 +299,6 @@ AM::Implementation::add (const Geometry& geometry,
 
   daisy_assert (approximate (old_C + C, total_C (geometry)));
   daisy_assert (approximate (old_N + N, total_N (geometry)));
-}
-
-void
-AM::Implementation::add (const Geometry& geometry, 
-			 double C, /* fixed C/N */
-			 const vector<double>& density)
-{
-  daisy_assert (C >= 0);
-  const double old_C = total_C (geometry);
-
-  // Find the missing fraction.
-  vector<double> om_C (om.size (), 0.0);
-  int missing_fraction = -1;
-  for (unsigned int i = 0; i < om.size (); i++)
-    {
-      const double fraction = om[i]->initial_fraction;
-
-      if (fraction != OM::Unspecified)
-	om_C[i] = C * fraction;
-      else
-	{
-	  daisy_assert (missing_fraction < 0);
-	  missing_fraction = i;
-	}
-    }
-  daisy_assert (missing_fraction > -1);
-
-  // Calculate C in missing fraction.
-  om_C[missing_fraction] = C - accumulate (om_C.begin (), om_C.end (), 0.0);
-  daisy_assert (approximate (C, accumulate (om_C.begin (), om_C.end (), 0.0)));
-  
-  // Distribute to OMs.
-  for (unsigned int i = 0; i < om.size (); i++)
-    om[i]->add (geometry, om_C[i], density);
-
-  const double new_C = total_C (geometry);
-  daisy_assert (approximate (new_C, old_C + C));
 }
 
 double
@@ -895,12 +855,13 @@ AM::initialize (const Soil& soil)
 	  
 	  last = end;
 	}
-      // Fill C_per_N to match C.
+      // Fill N to match C.
       for (unsigned int i = 0; i < om.size (); i++)
 	{
-	  daisy_assert (om[i]->C_per_N.size () > 0);
-	  while (om[i]->C_per_N.size () < om[i]->C.size ())
-	    om[i]->C_per_N.push_back(om[i]->C_per_N[om[i]->C_per_N.size ()-1]);
+	  daisy_assert (om[i]->initial_C_per_N > 0);
+	  while (om[i]->N.size () < om[i]->C.size ())
+	    om[i]->N.push_back (om[i]->C[om[i]->N.size ()] 
+			        / om[i]->initial_C_per_N);
 	}
     }
   else if (syntax == "root")
@@ -934,89 +895,6 @@ AM::initialize (const Soil& soil)
 AM::~AM ()
 { delete &impl; }
 
-static bool check_organic (const AttributeList& al, Treelog& err)
-{ 
-  if (!al.check ("syntax"))
-    {
-      err.entry ("no syntax");
-      return false;
-    }
-
-  const string syntax = al.name ("syntax");
-  daisy_assert (syntax == "organic");
-
-  static bool warned = false;
-  if (al.check ("NH4_evaporation") && !warned)
-    {
-      err.entry ("OBSOLETE: Use 'volatilization' instead "
-		 "of 'NH4_evaporation'");
-      warned = true;
-    }
-  
-  bool ok = true;
-  const vector<AttributeList*>& om_alist = al.alist_sequence ("om");
-  int missing_initial_fraction = 0;
-  int missing_C_per_N = 0;
-  double total_fractions = 0.0;
-  for (unsigned int i = 0; i < om_alist.size(); i++)
-    {
-      if (om_alist[i]->number ("initial_fraction") == OM::Unspecified)
-	missing_initial_fraction++;
-      else 
-	total_fractions += om_alist[i]->number ("initial_fraction");
-      if (!om_alist[i]->check ("C_per_N"))
-	missing_C_per_N++;
-    }
-  daisy_assert (total_fractions >= 0.0);
-  if (total_fractions < 1e-10)
-    {
-      err.entry ("you should specify at least one non-zero fraction");
-      ok = false;
-    }
-  if (approximate (total_fractions, 1.0))
-    {
-      err.entry ("sum of specified fractions should be < 1.0");
-      ok = false;
-    }
-  else if (total_fractions > 1.0)
-    {
-      err.entry ("sum of fractions should be < 1.0");
-      ok = false;
-    }
-  if (missing_initial_fraction != 1)
-    {
-      err.entry ("you should leave initial_fraction in one om unspecified");
-      ok = false;
-    }
-  if (missing_C_per_N != 1)
-    {
-      err.entry ("You must leave C/N unspecified in exactly one pool.");
-      ok = false;
-    }
-  return ok;
-}
-
-static bool check_root (const AttributeList& al, Treelog& err)
-{ 
-  daisy_assert (al.name ("syntax") == "root");
-  
-  bool ok = true;
-
-  // We need exactly one pool with unspecified OM.
-  daisy_assert (al.check ("om"));
-  int unspecified = 0;
-  const vector<AttributeList*>& om = al.alist_sequence ("om");
-  for (unsigned int i = 0; i < om.size (); i++)
-    if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
-      unspecified++;
-  if (unspecified != 1)
-    { 
-      err.entry ("You must leave C/N unspecified in exactly one pool.");
-      ok = false;
-    }
-  return ok;
-}
-
 static struct AM_Syntax
 {
   static AM&
@@ -1028,6 +906,111 @@ static struct AM_Syntax
       al2.add ("name", al1.name ("type"));
     return *new AM (al2); 
   }
+
+  static bool check_organic (const AttributeList& al, Treelog& err)
+  { 
+    if (!al.check ("syntax"))
+      {
+	err.entry ("no syntax");
+	return false;
+      }
+
+    const string syntax = al.name ("syntax");
+    daisy_assert (syntax == "organic");
+
+    static bool warned = false;
+    if (al.check ("NH4_evaporation") && !warned)
+      {
+	err.entry ("OBSOLETE: Use 'volatilization' instead "
+		   "of 'NH4_evaporation'");
+	warned = true;
+      }
+  
+    bool ok = true;
+    const vector<AttributeList*>& om_alist = al.alist_sequence ("om");
+    int missing_initial_fraction = 0;
+    int missing_C_per_N = 0;
+    double total_fractions = 0.0;
+    for (unsigned int i = 0; i < om_alist.size(); i++)
+      {
+	if (om_alist[i]->number ("initial_fraction") == OM::Unspecified)
+	  missing_initial_fraction++;
+	else 
+	  total_fractions += om_alist[i]->number ("initial_fraction");
+	if (!om_alist[i]->check ("C_per_N"))
+	  missing_C_per_N++;
+      }
+    daisy_assert (total_fractions >= 0.0);
+    if (total_fractions < 1e-10)
+      {
+	err.entry ("you should specify at least one non-zero fraction");
+	ok = false;
+      }
+    if (approximate (total_fractions, 1.0))
+      {
+	err.entry ("sum of specified fractions should be < 1.0");
+	ok = false;
+      }
+    else if (total_fractions > 1.0)
+      {
+	err.entry ("sum of fractions should be < 1.0");
+	ok = false;
+      }
+    if (missing_initial_fraction != 1)
+      {
+	err.entry ("you should leave initial_fraction in one om unspecified");
+	ok = false;
+      }
+    if (missing_C_per_N != 1)
+      {
+	err.entry ("You must leave C/N unspecified in exactly one pool.");
+	ok = false;
+      }
+    return ok;
+  }
+
+  static bool check_root (const AttributeList& al, Treelog& err)
+  { 
+    daisy_assert (al.name ("syntax") == "root");
+  
+    bool ok = true;
+
+    // We need exactly one pool with unspecified OM.
+    daisy_assert (al.check ("om"));
+    int unspecified = 0;
+    const vector<AttributeList*>& om = al.alist_sequence ("om");
+    for (unsigned int i = 0; i < om.size (); i++)
+      if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
+	unspecified++;
+    if (unspecified != 1)
+      { 
+	err.entry ("You must leave C/N unspecified in exactly one pool.");
+	ok = false;
+      }
+    return ok;
+  }
+
+  static bool check_initial (const AttributeList& al, Treelog& err)
+  { 
+    daisy_assert (al.name ("syntax") == "initial");
+  
+    bool ok = true;
+
+    // We need exactly one pool with unspecified OM.
+    daisy_assert (al.check ("om"));
+    const vector<AttributeList*>& om = al.alist_sequence ("om");
+    for (unsigned int i = 0; i < om.size (); i++)
+      if (OM::get_initial_C_per_N (*om[i]) == OM::Unspecified)
+	{
+	  TmpStream tmp;
+	  tmp () << "om[" << i << "]";
+	  Treelog::Open nest (err, tmp.str ());
+	  err.entry ("You must specify C/N for all pools.");
+	  ok = false;
+	}
+    return ok;
+  }
+
   AM_Syntax ()
     {
       // State.
@@ -1129,6 +1112,7 @@ Fraction of NH4 that evaporates on application.");
       // Initialization.
       {
 	Syntax& syntax = *new Syntax ();
+	syntax.add_check (check_initial);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Initial added organic matter at the start of the simulation.");
@@ -1154,9 +1138,9 @@ uniformly distributed in each layer.");
       // Root initialization,
       {
 	Syntax& syntax = *new Syntax ();
+	syntax.add_check (check_root);
 	AttributeList& alist = *new AttributeList (AM::default_root ());
 	alist.remove ("type");
-	syntax.add_check (check_root);
 	syntax.add ("creation", Syntax::Date, Syntax::State,
 		    "Start of simulation.");
 	syntax.add ("depth", "cm", Check::negative (), 

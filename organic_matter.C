@@ -153,6 +153,7 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
   daisy_assert (som[where]->C[i] >= 0.0);
   daisy_assert (C[i] >= 0.0);
   daisy_assert (N[i] >= 0.0);
+  const double om_C_per_N_goal = som[where]->goal_C_per_N (i);
 
   // daisy_assert (N_soil * 1.001 >= N_used);
   // How much can we process?
@@ -161,17 +162,17 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
     rate = 1.0;
   else 
     rate = min (turnover_rate * abiotic_factor, 0.1);
-  double N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
+  double N_need = C[i] * rate / om_C_per_N_goal  - N[i] * rate;
 
   daisy_assert (finite (rate));
   daisy_assert (finite (N_need));
   
   if (N_need > N_soil - N_used && N[i] > 0.0)
     {
-      rate = (N_soil - N_used) / (C[i] / som[where]->C_per_N[i] - N[i]);
+      rate = (N_soil - N_used) / (C[i] / om_C_per_N_goal - N[i]);
       daisy_assert (finite (rate));
       set_bound (0.0, rate, 1.0);
-      N_need = C[i] * rate / som[where]->C_per_N[i]  - N[i] * rate;
+      N_need = C[i] * rate / om_C_per_N_goal  - N[i] * rate;
       daisy_assert (finite (N_need));
     }
   // Check for NaN.
@@ -184,6 +185,7 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 
       // Update it.
       som[where]->C[i] += C[i] * rate;
+      som[where]->N[i] += C[i] * rate / om_C_per_N_goal;
       C[i] *= (1.0 - rate);
       N[i] *= (1.0 - rate);
     }
@@ -240,8 +242,16 @@ is numbered '1'.");
 bool 
 OrganicMatter::Implementation::om_compare (const OM* a, const OM* b)
 {
-  return (a->C_per_N.size () == 0 ? a->initial_C_per_N : a->C_per_N[0])
-    < (b->C_per_N.size () == 0 ? b->initial_C_per_N : b->C_per_N[0]);
+  double A = a->initial_C_per_N;
+  if (A == OM::Unspecified
+      && a->N.size () > 0 && a->C.size () > 0 && a->N[0] > 0)
+    A = a->C[0] / a->N[0];
+  double B = b->initial_C_per_N;
+  if (B == OM::Unspecified 
+      && b->N.size () > 0 && b->C.size () > 0 && b->N[0] > 0)
+    B = b->C[0] / b->N[0];
+
+  return A < B;
 }
 
 double 
@@ -347,12 +357,12 @@ OrganicMatter::Implementation::output (Log& log,
 	  for (unsigned int j = 0; j < smb.size (); j++)
 	    {
 	      total_C[i] += smb[j]->C[i];
-	      total_N[i] += smb[j]->C[i] / smb[j]->C_per_N[i];
+	      total_N[i] += smb[j]->N[i];
 	    }
 	  for (unsigned int j = 0; j < som.size (); j++)
 	    {
 	      total_C[i] += som[j]->C[i];
-	      total_N[i] += som[j]->C[i] / som[j]->C_per_N[i];
+	      total_N[i] += som[j]->N[i];
 	    }
 	  for (int j = 0; j < am.size (); j++)
 	    {
@@ -782,20 +792,6 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   tillage_age.insert (tillage_age.end (), 
 		      soil.size () - tillage_age.size (), 1000000.0);
 
-  // Fill SMB C_per_N array with last value.
-  for (unsigned int pool = 0; pool < som_size; pool++)
-    {
-      daisy_assert (smb[pool]->C_per_N.size () > 0);
-      if (smb[pool]->C_per_N.size () > 1 
-	  && smb[pool]->C_per_N.size () < soil.size ())
-	err.entry ("smb C_per_N partially initialized.\n\
-Filling out array with last value");
-      while (smb[pool]->C_per_N.size () < soil.size ())
-	smb[pool]->C_per_N.push_back 
-	  (smb[pool]->C_per_N[smb[pool]->C_per_N.size () - 1]);
-      daisy_assert (smb[pool]->C_per_N.size () == soil.size ());
-    }
-
   // Initialize AM.
   for (unsigned int i = 0; i < am.size (); i++)
     am[i]->initialize (soil);
@@ -844,39 +840,58 @@ initial_SOM layer in OrganicMatter ends below the last node");
 	      const double fraction = soil.SOM_C (lay, pool) / total_C;
 	      if (som[pool]->C.size () == lay)
 		som[pool]->C.push_back (total[lay] * fraction);
-	      if (som[pool]->C_per_N.size () == lay)
-		som[pool]->C_per_N.push_back (soil.SOM_C_per_N (lay, pool));
+	      if (som[pool]->N.size () == lay)
+		som[pool]->N.push_back (som[pool]->C[lay]
+					/ soil.SOM_C_per_N (lay, pool));
 	    }
 	}
     }
-  else
+
+  // Initialize SOM from humus in horizons.
+  for (unsigned int pool = 0; pool < som_size; pool++)
+    {
+      TmpStream tmp;
+      tmp () << "som[" << pool << "]";
+      Treelog::Open nest (err, tmp.str ());
+      if (som[pool]->C.size () > 0 && som[pool]->C.size () < soil.size ())
+	err.entry ("C partially initialized.\n\
+Using humus for remaining entries");
+      if (som[pool]->N.size () > 0 && som[pool]->N.size () < soil.size ())
+	err.entry ("N partially initialized.\n\
+Using humus for remaining entries");
+    }
+	  
+  for (unsigned int lay = 0; lay < soil.size (); lay++)
     {
       for (unsigned int pool = 0; pool < som_size; pool++)
-	if (som[pool]->C.size () > 0 && som[pool]->C.size () < soil.size ())
-	  err.entry ("som C partially initialized.\n\
-Using humus for remaining entries");
-	  
-      // Initialize SOM from humus in horizons.
-      for (unsigned int lay = 0; lay < soil.size (); lay++)
 	{
-	  for (unsigned int pool = 0; pool < som_size; pool++)
-	    {
-	      if (som[pool]->C.size () == lay)
-		som[pool]->C.push_back (soil.SOM_C (lay, pool));
-	      if (som[pool]->C_per_N.size () == lay)
-		som[pool]->C_per_N.push_back (soil.SOM_C_per_N (lay, pool));
-	    }
+	  if (som[pool]->C.size () == lay)
+	    som[pool]->C.push_back (soil.SOM_C (lay, pool));
+	  if (som[pool]->N.size () == lay)
+	    som[pool]->N.push_back (som[pool]->C[lay]
+				    / soil.SOM_C_per_N (lay, pool));
 	}
     }
+
+  // Initialize SMB from equilibrium.
   for (unsigned int pool = 0; pool < smb_size; pool++)
-    if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < soil.size ())
-      err.entry ("smb C partially initialized.\n\
+    {
+      TmpStream tmp;
+      tmp () << "smb[" << pool << "]";
+      Treelog::Open nest (err, tmp.str ());
+      if (smb[pool]->C.size () > 0 && smb[pool]->C.size () < soil.size ())
+	err.entry ("C partially initialized.\n\
 Using equilibrium for remaining entries");
+      if (smb[pool]->N.size () > 0 && smb[pool]->N.size () < soil.size ())
+	err.entry ("N partially initialized.\n\
+Using initial C per N for remaining entries");
+    }
+
 
   for (unsigned int lay = 0; lay < soil.size (); lay++)
     {
       double stolen = 0.0; // How much C was stolen by the SMB pools?
- 
+
       // SMB C should be calculated from equilibrium.
       for (unsigned int pool = 0; pool < smb_size; pool++)
 	{
@@ -930,9 +945,32 @@ Using equilibrium for remaining entries");
 	      
 	      stolen += in / out_rate;
 	    }
+	  if (smb[pool]->N.size () == lay)
+	    {
+	      daisy_assert (smb[pool]->initial_C_per_N > 0);
+	      const double N_content = smb[pool]->C[lay]
+		/ smb[pool]->initial_C_per_N;
+	      smb[pool]->N.push_back (N_content);
+	    }
+
 	}
+      // This will keep C/N for SOM1, but change the total N content.
+      daisy_assert (som[0]->C[lay] >= 0.0);
+      const double old_C_per_N = (som[0]->N[lay] != 0)
+	? som[0]->C[lay] / som[0]->N[lay] : OM::Unspecified;
+      if (som[0]->N[lay] > 0.0)
+	{
+	  const double lost_fraction = stolen / som[0]->C[lay];
+	  som[0]->N[lay] *= (1.0 - lost_fraction);
+	  daisy_assert (som[0]->N[lay] > 0.0);
+	}
+
       som[0]->C[lay] -= stolen;
       daisy_assert (som[0]->C[lay] >= 0.0);
+
+      daisy_assert (old_C_per_N == OM::Unspecified ||
+		    approximate (som[0]->C[lay] / som[0]->N[lay], 
+				 old_C_per_N));
     }
   buffer.initialize (soil);
   
@@ -1185,6 +1223,12 @@ check_alist (const AttributeList& al, Treelog& err)
 	  err.entry (tmp.str ());
 	  om_ok = false;
 	}
+      if (!(OM::get_initial_C_per_N (*smb_alist[i]) > 0))
+	{
+	  err.entry ("C/N unspecified");
+	  om_ok = false;
+	}
+
       if (!om_ok)
 	ok = false;
     }

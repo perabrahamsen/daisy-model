@@ -1,4 +1,25 @@
+2002-05-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.32 released.
+
+2002-05-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C, om.h (goal_C_per_N): New public member function.
+	(tock): Use it.
+	* organic_matter.C (tick): Use it.
+
 2002-05-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C, om.h (add): Removed unused function.
+	* am.C (add): Remove unused caller.
+
+	* organic_matter.C (tick): Update caller.
+	(om_compare): Ditto.
+	(initialize): Ditto.
+
+	* om.h, om.C (N, C_per_N): Use N instead of C_per_N.
+	Update callers.
+	* am.C (initialize): Ditto.
 
 	* options.h, options.C (timestamp): Removed.
 	* main.C (main): Update caller.

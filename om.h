@@ -1,7 +1,7 @@
-// om.h
+// om.h --- A single organic matter pool.
 // 
 // Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2000-2002 Per Abrahamsen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -47,15 +47,11 @@ public:
   double top_C;			// Carbon on the ground.
   double top_N;			// Nitrogen on the ground;
   vector<double> C;		// Carbon in each node.
-  vector<double> C_per_N;	// Ratio of carbon per nitrogen.
+  vector<double> N;		// Nitrogen in each node.
   const double turnover_rate;	// How fast this is it turned over?
   const vector <double> efficiency;	// How digestible is this?
   const double maintenance;	// How fast does it eat itself?
   const vector<double> fractions;	// How much is turned into SMB and SOM?
-private:
-  vector<double> get_N () const;
-  void set_N (vector<double>&);
-
   // Simulation.
 public:
   void output (Log&) const;
@@ -65,13 +61,10 @@ public:
   double total_N (const Geometry& geometry) const;
   double C_at (unsigned int at) const;
   double N_at (unsigned int at) const;
+  double goal_C_per_N (unsigned int at) const; // Desired C/N ratio.
   void pour (vector<double>& cc, vector<double>& nn);
   void add (double C, double N);// Add dead leafs.
-  void add (unsigned int at, double C); // Merge specified.
   void add (unsigned int at, double C, double N); // Merge unspecified.
-  void add (const Geometry&,	// Add dead roots.
-	    double C, /* Fixed C/N */
-	    const vector<double>& density);
   void add (const Geometry&,	// Add dead roots.
 	    double C, double N, 
 	    const vector<double>& density);
