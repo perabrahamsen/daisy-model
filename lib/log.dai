@@ -855,7 +855,6 @@
 	    (tag "table")
 	    (dimension "cm"))))
 
-(deflog "Harvest" file "harvest.log" (not (running))
-  (some (harvest)))
+(deflog "Harvest" harvest)
 
 ;;; log.dai ends here
