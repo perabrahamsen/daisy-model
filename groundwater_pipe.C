@@ -114,7 +114,7 @@ public:
 	  largest = soil.dz (i);
       if (largest > 10.0)
 	{
-	  Treelog::Open (treelog, "Groundwater pipe");
+	  Treelog::Open nest (treelog, "Groundwater pipe");
 	  TmpStream tmp;
 	  tmp () << "WARNING: drained soil needs soil intervals < 10.0 cm; "
 		 << "largest is " << largest << "";
@@ -164,6 +164,7 @@ GroundwaterPipe::update_water (const Soil& soil,
        if (h[i]<=0.0) break;
        i_sat = i;
     }
+  assert (i_sat > 0);
   const double GWT_UZ = soil.zplus (i_sat-1);
   if (height<GWT_UZ) height = GWT_UZ;
   Percolation[i_bottom] = DeepPercolation(soil);
@@ -250,7 +251,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
 	}
       Ka /= Ha;
 
-      // GWT located belove drain
+      // GWT located below drain
       double Hb = 0;
       double Kb = 0;
       for (unsigned int i = i_drain+1; i <= i_bottom; i++)
@@ -277,7 +278,10 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
   else
     {
       for (unsigned int i = i_bottom; i >= i_GWT; i--)
-	Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);
+	{
+	  assert (S[i] == 0.0);
+	  Percolation[i-1] = Percolation[i] + S[i] * soil.dz (i);
+	}
     }
   return 0.0;
 }

@@ -1,5 +1,8 @@
 2002-02-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* groundwater_pipe.C (initialize): Fix 'Treelog::Open' nesting
+	bug. 
+
 	* vernalization.C (output): Don't output if not required (need for
 	checkpoints).
 
