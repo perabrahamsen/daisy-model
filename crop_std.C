@@ -2300,8 +2300,8 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
     }
 
   // Update dead leafs
-  CrpAux.DeadWLeaf = pProd.LfDR (DS) * vProd.WLeaf;
-  CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * CrpAux.CAImRat;
+  CrpAux.DeadWLeaf = pProd.LfDR (DS) / 24.0 * vProd.WLeaf;
+  CrpAux.DeadWLeaf += vProd.WLeaf * 0.333 * CrpAux.CAImRat / 24.0;
   double DdLeafCnc;
   if (vProd.NCrop > 1.05 * CrpAux.PtNCnt)
     DdLeafCnc = vProd.NLeaf/vProd.WLeaf;
@@ -2326,7 +2326,7 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   if (RSR () > par.Partit.RSR (DS))
     RtDR += pProd.Large_RtDR;
 
-  CrpAux.DeadWRoot = RtDR * vProd.WRoot;
+  CrpAux.DeadWRoot = RtDR / 24.0 * vProd.WRoot;
   double DdRootCnc;
   if (vProd.NCrop > 1.05 * CrpAux.PtNCnt)
     DdRootCnc = vProd.NRoot/vProd.WRoot;
