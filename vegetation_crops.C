@@ -166,6 +166,18 @@ VegetationCrops::DS_by_name (const string& name) const
 double 
 VegetationCrops::DM_by_name (const string& name) const
 {
+  if (name == "all")
+    {
+      double sum = 0.0;
+
+      for (CropList::const_iterator crop = crops.begin();
+	   crop != crops.end();
+	   crop++)
+	sum += (*crop)->DM ();
+
+      return sum;
+    }
+  
   for (CropList::const_iterator crop = crops.begin();
        crop != crops.end();
        crop++)

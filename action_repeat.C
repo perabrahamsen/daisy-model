@@ -94,7 +94,7 @@ static struct ActionRepeatSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
-Perform all the specified action.  When done, repeat the action.\n\
+Perform all of the specified action.  When done, repeat the action.\n\
 The action may take several timesteps.");
       syntax.add ("repeat", Librarian<Action>::library (),
 		  Syntax::Const, Syntax::Singleton,

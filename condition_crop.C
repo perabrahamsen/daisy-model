@@ -81,7 +81,8 @@ static struct ConditionCropSyntax
 	alist.add ("description", "\
 True iff the crop has reached development stage 'ds'.");
 	syntax.add ("crop", Syntax::String, Syntax::Const,
-		    "Name of crop on the field to test.");
+		    "Name of crop on the field to test.\n\
+Specify \"all\" to use combined weight of all crops on the field in test.");
 	syntax.add ("ds", Syntax::None (), Syntax::Const,
 		    "Development stage [-1.0:2.0].");
 	syntax.order ("crop", "ds");

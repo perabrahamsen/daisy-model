@@ -33,7 +33,7 @@ class SMB : public OM
 public:
   const double maintenance;	// How fast does it eat itself?
   vector<double> clay_turnover;	// Clay dependent turnover rate.
-  vector<double> clay_maintenance; // Clay dependent turnover rate.
+  vector<double> clay_maintenance; // Clay dependent maintenance rate.
 
   // Simulation.
 public:

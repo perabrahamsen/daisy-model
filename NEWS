@@ -12,6 +12,13 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.38
+
+** You can now use "all" as crop argument to the crop_DM_over condition.
+
+This will include the combined  weight of all crops on the field in
+the test. 
+
 * 2.37
 
 ** (OrganicMatter (clay_factor ...)) renamed.
