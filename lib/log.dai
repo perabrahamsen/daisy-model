@@ -1476,9 +1476,11 @@ This does *not* include deposition or irrigation!")
                    (dimension "kg N/ha"))
            (number (path column "$col" second_year_utilization)
                    (tag "2ndYear")
-                   (dimension "kg N/ha"))))
-
-(deflog "Fertilizer Monthly" "Fertilizer"
+                   (dimension "kg N/ha"))
+           (number (path column "$col" volatilization)
+                   (when hourly)
+                   (tag "vol")
+                   (dimension "kg N/ha")))
   (where "fertilizer_monthly.dlf")
   (when monthly))
 
