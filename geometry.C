@@ -227,7 +227,8 @@ void
 Geometry::add_layer (Syntax& syntax, const string& name,
 		     const string& dimension, const string& description)
 {
-  Syntax& layer = *new Syntax (check_layers);
+  Syntax& layer = *new Syntax ();
+  layer.add_check (check_layers);
   if (!layer.ordered ())
     {
       // Initialize as first call.

@@ -85,7 +85,8 @@ static struct AdsorptionLangmuirSyntax
     }
   AdsorptionLangmuirSyntax ()
   {
-    Syntax& syntax = *new Syntax (check_alist);
+    Syntax& syntax = *new Syntax ();
+    syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "M = rho (my_max C) / (K + C) + Theta C");
     syntax.add ("K", "g/cm^3", Syntax::Const, "Half saturation constant.");

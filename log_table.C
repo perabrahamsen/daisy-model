@@ -560,7 +560,8 @@ Each selected variable is represented by a column in the log file.");
       syntax.add ("when", Librarian<Condition>::library (), 
 		  "Add entries to the log file when this condition is true.");
       
-      Syntax& entry_syntax = *new Syntax (check_alist);
+      Syntax& entry_syntax = *new Syntax ();
+      entry_syntax.add_check (check_alist);
       AttributeList& entry_alist = *new AttributeList ();
       entry_syntax.add ("tag", Syntax::String, Syntax::OptionalConst,
 			"Tag to identify the column.\n\

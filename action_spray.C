@@ -58,7 +58,8 @@ static struct ActionSpraySyntax
     }
   ActionSpraySyntax ()
   { 
-    Syntax& syntax = *new Syntax (check_alist);
+    Syntax& syntax = *new Syntax ();
+    syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "\
 Spray a chemical (typically a pesticid) on the field.");

@@ -335,6 +335,7 @@ SoilHeat::swap (const Soil& soil, double from, double middle, double to)
 double
 SoilHeat::T (unsigned int i) const
 {
+  assert (i < impl.T.size ());
   return impl.T[i]; 
 }
 

@@ -162,8 +162,6 @@ public:
   void add_check (check_list_fun);
 
   Syntax ();
-  Syntax (check_fun);
-  Syntax (check_list_fun);
   ~Syntax ();
 private:
   Syntax (Syntax&);
@@ -174,8 +172,7 @@ template <class T>
 struct add_submodule
 {
   add_submodule (const char* name, Syntax& syntax, AttributeList& alist,
-		 Syntax::category cat = Syntax::State, 
-		 const string& description = Syntax::Unknown ())
+		 Syntax::category cat, const string& description)
   {
     Syntax& s = *new Syntax ();
     AttributeList a;
@@ -189,8 +186,7 @@ template <class T>
 struct add_submodule_sequence
 {
   add_submodule_sequence (const char* name, Syntax& syntax, 
-			  Syntax::category cat = Syntax::State, 
-			  const string& description = Syntax::Unknown ())
+			  Syntax::category cat, const string& description)
   {
     Syntax& s = *new Syntax ();
     AttributeList a;

@@ -1,4 +1,23 @@
+1999-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.71 released.
+
+1999-02-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* daisy.C, daisy.h (activate_output): New member.
+	(tick_logs): Use it.
+
+	* condition_logic.C (ConditionFalse, ConditionTrue): New conditions.
+
+1999-02-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (Implementation::Implementation): Fix index
+	error in smb initialization.
+
 1999-02-18  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.h (Syntax::Syntax): Don't take `check_fun' argument.
+	* all: Updated callers.
 
 	* Version 0.70 released.
 

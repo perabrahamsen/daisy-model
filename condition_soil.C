@@ -59,7 +59,8 @@ static struct ConditionSoilSyntax
   ConditionSoilSyntax ()
     {
       {
-	Syntax& syntax = *new Syntax (&check);
+	Syntax& syntax = *new Syntax ();
+	syntax.add_check (check);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Test if the soil is warmer than the specified temperature.");
@@ -71,7 +72,8 @@ Soil depth in which to test the temperature (a negative number).");
 					alist, syntax, &make_temperature);
       }
       {
-	Syntax& syntax = *new Syntax (&check);
+	Syntax& syntax = *new Syntax ();
+	syntax.add_check (check);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Test if the soil is wetter than the specified pressure potential.");

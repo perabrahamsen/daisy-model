@@ -334,9 +334,9 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
-	cp cdaisy.h cmain.c $(HOME)/.public_ftp/daisy/
+	cp cdaisy.h cmain.c $(HOME)/.public_ftp/daisy
 	$(MAKE) daisy-src.zip
-	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy/
+	mv -f daisy-src.zip $(HOME)/.public_ftp/daisy
 	(cd lib; $(MAKE) dist);
 
 # Update the CVS repository.
@@ -409,7 +409,8 @@ document${OBJ}: document.C document.h librarian.h library.h common.h \
 daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
  log.h filter.h parser.h am.h nitrification.h bioclimate.h hydraulic.h \
- crop.h field.h harvest.h chemicals.h action.h condition.h column.h
+ crop.h field.h harvest.h chemicals.h action.h condition.h column.h \
+ submodel.h
 parser${OBJ}: parser.C parser.h librarian.h library.h common.h alist.h \
  syntax.h
 log${OBJ}: log.C log.h filter.h librarian.h library.h common.h alist.h \
@@ -440,41 +441,42 @@ parser_file${OBJ}: parser_file.C parser_file.h parser.h librarian.h \
 hydraulic${OBJ}: hydraulic.C hydraulic.h librarian.h library.h common.h \
  alist.h syntax.h csmp.h
 soil${OBJ}: soil.C soil.h horizon.h librarian.h library.h common.h alist.h \
- syntax.h hydraulic.h tortuosity.h geometry.h mathlib.h
+ syntax.h hydraulic.h tortuosity.h geometry.h mathlib.h submodel.h
 mathlib${OBJ}: mathlib.C mathlib.h common.h
 bioclimate${OBJ}: bioclimate.C bioclimate.h librarian.h library.h common.h \
  alist.h syntax.h weather.h im.h
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
  common.h alist.h syntax.h soil_water.h soil.h horizon.h hydraulic.h \
- tortuosity.h geometry.h log.h filter.h am.h im.h mathlib.h
+ tortuosity.h geometry.h log.h filter.h am.h im.h mathlib.h submodel.h
 soil_water${OBJ}: soil_water.C soil_water.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h uzmodel.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h surface.h groundwater.h mathlib.h
+ hydraulic.h tortuosity.h geometry.h surface.h groundwater.h mathlib.h \
+ submodel.h
 soil_NH4${OBJ}: soil_NH4.C soil_NH4.h solute.h adsorption.h librarian.h \
- library.h common.h alist.h syntax.h transport.h
+ library.h common.h alist.h syntax.h transport.h submodel.h
 soil_NO3${OBJ}: soil_NO3.C soil_NO3.h solute.h adsorption.h librarian.h \
- library.h common.h alist.h syntax.h transport.h
+ library.h common.h alist.h syntax.h transport.h submodel.h
 organic_matter${OBJ}: organic_matter.C organic_matter.h common.h syntax.h \
  alist.h log.h filter.h librarian.h library.h am.h om.h soil.h \
  horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h soil_NH4.h \
  solute.h adsorption.h transport.h soil_NO3.h soil_heat.h \
- groundwater.h uzmodel.h mathlib.h csmp.h
+ groundwater.h uzmodel.h mathlib.h csmp.h submodel.h
 nitrification${OBJ}: nitrification.C nitrification.h librarian.h library.h \
  common.h alist.h syntax.h
 denitrification${OBJ}: denitrification.C denitrification.h common.h \
  alist.h syntax.h soil.h horizon.h librarian.h library.h hydraulic.h \
  tortuosity.h geometry.h soil_water.h soil_heat.h organic_matter.h \
  soil_NO3.h solute.h adsorption.h transport.h groundwater.h uzmodel.h \
- csmp.h log.h filter.h
+ csmp.h log.h filter.h submodel.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h common.h surface.h \
  uzmodel.h librarian.h library.h syntax.h groundwater.h weather.h im.h \
  soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
- mathlib.h log.h filter.h
+ mathlib.h log.h filter.h submodel.h
 groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h \
  library.h common.h alist.h syntax.h log.h filter.h
 snow${OBJ}: snow.C snow.h alist.h common.h syntax.h log.h filter.h \
  librarian.h library.h soil.h horizon.h hydraulic.h tortuosity.h \
- geometry.h soil_water.h soil_heat.h mathlib.h
+ geometry.h soil_water.h soil_heat.h submodel.h mathlib.h
 solute${OBJ}: solute.C solute.h adsorption.h librarian.h library.h \
  common.h alist.h syntax.h transport.h log.h filter.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h soil_water.h mathlib.h
@@ -483,9 +485,9 @@ am${OBJ}: am.C am.h librarian.h library.h common.h alist.h syntax.h om.h \
 im${OBJ}: im.C im.h log.h filter.h librarian.h library.h common.h alist.h \
  syntax.h submodel.h
 om${OBJ}: om.C om.h common.h syntax.h alist.h geometry.h log.h filter.h \
- librarian.h library.h mathlib.h
+ librarian.h library.h mathlib.h submodel.h
 harvest${OBJ}: harvest.C harvest.h chemicals.h syntax.h common.h log.h \
- filter.h librarian.h library.h alist.h
+ filter.h librarian.h library.h alist.h submodel.h
 geometry${OBJ}: geometry.C geometry.h common.h syntax.h alist.h mathlib.h
 transport${OBJ}: transport.C transport.h librarian.h library.h common.h \
  alist.h syntax.h
@@ -521,9 +523,9 @@ pt${OBJ}: pt.C pt.h librarian.h library.h common.h alist.h syntax.h log.h \
  filter.h
 vegetation${OBJ}: vegetation.C vegetation.h common.h crop.h librarian.h \
  library.h alist.h syntax.h csmp.h mathlib.h harvest.h chemicals.h \
- log.h filter.h
+ log.h filter.h submodel.h
 chemicals${OBJ}: chemicals.C chemicals.h syntax.h common.h log.h filter.h \
- librarian.h library.h alist.h chemical.h
+ librarian.h library.h alist.h chemical.h submodel.h
 nrutil${OBJ}: nrutil.C
 field${OBJ}: field.C field.h common.h column.h librarian.h library.h \
  alist.h syntax.h log.h filter.h log_clone.h log_alist.h
@@ -534,15 +536,15 @@ log_clone${OBJ}: log_clone.C log_clone.h log_alist.h log.h filter.h \
 soil_chemical${OBJ}: soil_chemical.C soil_chemical.h solute.h adsorption.h \
  librarian.h library.h common.h alist.h syntax.h transport.h \
  chemical.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
- soil_heat.h soil_water.h organic_matter.h log.h filter.h
+ soil_heat.h soil_water.h organic_matter.h log.h filter.h submodel.h
 soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  librarian.h library.h common.h alist.h syntax.h hydraulic.h \
  tortuosity.h geometry.h soil_water.h soil_heat.h organic_matter.h \
  chemical.h chemicals.h log.h filter.h soil_chemical.h solute.h \
- adsorption.h transport.h
-submodel${OBJ}: submodel.C submodel.h
+ adsorption.h transport.h submodel.h
+submodel${OBJ}: submodel.C submodel.h common.h
 document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h library.h \
- common.h alist.h syntax.h
+ common.h alist.h syntax.h version.h
 filter_array${OBJ}: filter_array.C filter.h librarian.h library.h common.h \
  alist.h syntax.h geometry.h
 filter_all${OBJ}: filter_all.C filter.h librarian.h library.h common.h \

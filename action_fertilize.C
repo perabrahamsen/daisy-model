@@ -77,7 +77,8 @@ static struct ActionFertilizeSyntax
 
   ActionFertilizeSyntax ()
   { 
-    Syntax& syntax = *new Syntax (check);
+    Syntax& syntax = *new Syntax ();
+    syntax.add_check (check);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "Apply fertilizer to the soil.\n\
 If you want to incoorperate the fertilizer directly in the soil, specify\n\

@@ -14,6 +14,7 @@ class Filter;
 class Field;
 class Syntax;
 class AttributeList;
+class Condition;
 
 class Daisy
 {
@@ -26,6 +27,7 @@ public:
 public:
   bool running;
   const vector<Log*>& logs;
+  Condition& activate_output;
   Time time;
   Action& action;
   Weather& weather;

@@ -111,7 +111,8 @@ static struct AdsorptionFreundlichSyntax
 
   AdsorptionFreundlichSyntax ()
   {
-    Syntax& syntax = *new Syntax (check_alist);
+    Syntax& syntax = *new Syntax ();
+    syntax.add_check (check_alist);
     AttributeList& alist = *new AttributeList ();
     alist.add ("description", "M = rho K C^m + Theta C");
     syntax.add ("K_clay", "(g/cm^3)^-m", Syntax::OptionalConst, 

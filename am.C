@@ -684,7 +684,8 @@ This AM belongs to a still living plant");
       }
       // Organic fertilizer.
       {
-	Syntax& syntax = *new Syntax (check_organic);
+	Syntax& syntax = *new Syntax ();
+	syntax.add_check (check_organic);
 	AttributeList& alist = *new AttributeList ();
 	alist.add ("description", "\
 Organic fertilizer, typically slurry or manure from animals.");

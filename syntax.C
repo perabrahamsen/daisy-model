@@ -488,14 +488,6 @@ Syntax::Syntax ()
   : impl (*new Implementation ())
 { }
 
-Syntax::Syntax (check_fun fun) 
-  : impl (*new Implementation ())
-{ add_check (fun); }
-
-Syntax::Syntax (check_list_fun fun) 
-  : impl (*new Implementation ())
-{ add_check (fun); }
-
 Syntax::~Syntax ()
 { delete &impl; }
 

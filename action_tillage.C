@@ -42,7 +42,8 @@ static struct ActionMixSyntax
     }
   ActionMixSyntax ()
     { 
-      Syntax& syntax = *new Syntax (&check);
+      Syntax& syntax = *new Syntax ();
+      syntax.add_check (check);
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Mix soil content down to the specified depth.\n\
@@ -103,7 +104,8 @@ static struct ActionSwapSyntax
 
   ActionSwapSyntax ()
     {
-      Syntax& syntax = *new Syntax (&check);
+      Syntax& syntax = *new Syntax ();
+      syntax.add_check (check);
       AttributeList& alist = *new AttributeList ();
       alist.add ("description", "\
 Swap two soil layers.  The top layer start at the surface and goes down to\n\

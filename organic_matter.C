@@ -79,7 +79,7 @@ struct OrganicMatter::Implementation
       for (unsigned int j = 0; j < smb.size (); j++)
 	{
 	  if (smb[j]->C.size () > i)
-	    total += smb[i]->C[i];
+	    total += smb[j]->C[i];
 	}
       return total;
     }
@@ -667,6 +667,7 @@ OrganicMatter::swap (const Geometry& geometry, double from, double middle, doubl
 double
 OrganicMatter::CO2 (unsigned int i) const
 {
+  assert (impl.CO2.size () > i);
   return impl.CO2[i];
 }
 
@@ -934,7 +935,7 @@ Mineralization this time step (negative numbers mean immobilization).");
   OM::load_syntax (om_syntax, om_alist);
 
   add_submodule_sequence<OM> ("smb", syntax, Syntax::State,
-			      "Soil microbiomass pools.");
+			      "Soil MicroBiomass pools.");
   vector<AttributeList*> SMB;
   AttributeList& SMB1 = *new AttributeList (om_alist);
   vector<double> SMB1_C_per_N;
@@ -972,7 +973,8 @@ Mineralization this time step (negative numbers mean immobilization).");
   SMB.push_back (&SMB2);
   alist.add ("smb", SMB);
 
-  add_submodule_sequence<OM> ("som", syntax, Syntax::State);
+  add_submodule_sequence<OM> ("som", syntax, Syntax::State, 
+			      "Soil Organic Matter pools.");
   vector<AttributeList*> SOM;
   AttributeList& SOM1 = *new AttributeList (om_alist);
   SOM1.add ("turnover_rate", 1.125e-7);

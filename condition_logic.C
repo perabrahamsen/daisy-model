@@ -4,6 +4,30 @@
 
 #include "condition.h"
 
+struct ConditionFalse : public Condition
+{
+  bool match (const Daisy&) const
+    { return false; }
+
+  ConditionFalse (const AttributeList&)
+    { }
+
+  ~ConditionFalse ()
+    { }
+};
+
+struct ConditionTrue : public Condition
+{
+  bool match (const Daisy&) const
+    { return true; }
+
+  ConditionTrue (const AttributeList&)
+    { }
+
+  ~ConditionTrue ()
+    { }
+};
+
 struct ConditionOr : public Condition
 {
   const vector<const Condition*>& conditions;
@@ -113,6 +137,10 @@ struct ConditionIf : public Condition
 
 static struct ConditionLogicSyntax
 {
+  static Condition& make_false (const AttributeList& al)
+    { return *new ConditionFalse (al); }
+  static Condition& make_true (const AttributeList& al)
+    { return *new ConditionTrue (al); }
   static Condition& make_or (const AttributeList& al)
     { return *new ConditionOr (al); }
   static Condition& make_and (const AttributeList& al)
@@ -126,6 +154,17 @@ static struct ConditionLogicSyntax
 
 ConditionLogicSyntax::ConditionLogicSyntax ()
 {
+  // "false", "true".
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist_false = *new AttributeList ();
+    alist_false.add ("description", "Always false.");
+    AttributeList& alist_true = *new AttributeList ();
+    alist_true.add ("description", "Always true.");
+    Librarian<Condition>::add_type ("false", alist_false, syntax, &make_false);
+    Librarian<Condition>::add_type ("true", alist_true, syntax, &make_true);
+  }
+
   // "or", "and".
   {
     Syntax& syntax = *new Syntax ();
@@ -135,7 +174,7 @@ True iff any of the listed conditions are true.\n\
 The conditions are tested in the sequence listed, until a true is found,\n\
 or the end of the list is reached.");
     AttributeList& alist_and = *new AttributeList ();
-    alist_or.add ("description", "\
+    alist_and.add ("description", "\
 True iff all the listed conditions are true.\n\
 The conditions are tested in the sequence listed, until a false is found,\n\
 or the end of the list is reached.");
