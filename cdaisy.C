@@ -188,7 +188,13 @@ daisy_alist_size_number (const AttributeList* alist, const char* name)
 
 extern "C" unsigned int EXPORT
 daisy_alist_size_alist (const AttributeList* alist, const char* name)
-{ return alist->alist_sequence (name).size (); }
+{
+  // KLUDGE: Work around the use of non-sequence value as the default
+  // for each element in the sequence.
+  if (alist->size (name) == Syntax::Singleton)
+    return 0;
+  
+  return alist->alist_sequence (name).size (); }
 
 #ifdef UNINPLEMENTED
 extern "C" int EXPORT
@@ -378,6 +384,10 @@ extern "C" void EXPORT
 daisy_parser_load (Parser* parser, AttributeList* alist)
 { parser->load (*alist); }
 
+extern "C" int EXPORT
+daisy_parser_error_count (Parser* parser)
+{ return parser->error_count (); }
+
 // @ The daisy_printer Type.
 
 extern "C" Printer* EXPORT
@@ -523,13 +533,16 @@ daisy_time_get_year (Time* time)
 // @ The daisy_weather Type.
 
 extern "C" void EXPORT
-daisy_weather_put_precipitation (Weather* column, double prec);
+daisy_weather_put_precipitation (Weather* weather, double prec)
+{ weather->put_precipitation (prec); }
 
 extern "C" void EXPORT
-daisy_weather_put_air_temperature (Weather* column, double T);
+daisy_weather_put_air_temperature (Weather* weather, double T)
+{ weather->put_air_temperature (T); }
 
 extern "C" void EXPORT
-daisy_weather_put_reference_evapotranspiration (Weather* column, double ref);
+daisy_weather_put_reference_evapotranspiration (Weather* weather, double ref)
+{ weather->put_reference_evapotranspiration (ref); }
 
 // @ The daisy_column Type.
 
@@ -570,10 +583,10 @@ daisy_column_get_water_sink (const Column* column, double sink[]);
 // Nitrate solution in the soil.
 
 extern "C" void EXPORT		// [g/cm^3]
-daisy_column_put_no3_m (const double M[]);
+daisy_column_put_no3_m (Column* column, const double M[]);
 
 extern "C" void EXPORT		// [g/cm^3]
-daisy_column_get_no3_m (double M[]);
+daisy_column_get_no3_m (Column* column, double M[]);
 
 // @@@ Bioclimate. 
 //

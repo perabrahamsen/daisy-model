@@ -19,9 +19,11 @@ struct LogEntry
   const string missing_value;	// What to print on missing values.
 
   // Calculation parameters.
-  const int start_year;	// For gnuplot time.
-  const double factor;	// Convert value.
-  const double offset;	// - || -
+  const int start_year;		// For gnuplot time.
+  const double factor;		// Convert value.
+  const double offset;		// - || -
+  const double from;		// Restrict interval of array.
+  const double to;
 
   // Permanent state.
   double value;		// Total accumulated value.
@@ -136,7 +138,12 @@ struct LogEntry
       if (current_path_index == last_valid_path_index)
 	{
 	  if (geometry)
-	    value += geometry->total (array);
+	    {
+	      if (to > from)
+		value += geometry->total (array);
+	      else
+		value += geometry->total (array, from, to);
+	    }
 	  else
 	    {
 #ifdef BORLAND_TEMPLATES
@@ -172,7 +179,7 @@ struct LogEntry
 
       if (error)
 	out << "!";
-      else if (!count)
+      else if (count == 0)
 	out << missing_value;
       else
 	out << (value * factor + offset);
@@ -191,6 +198,8 @@ struct LogEntry
       start_year (al.integer ("start_year")),
       factor (al.number ("factor")),
       offset (al.number ("offset")),
+      from (al.number ("from")),
+      to (al.number ("to")),
       value (al.number ("value")),
       count (al.integer ("count")),
       error (false),
@@ -399,7 +408,11 @@ static struct LogTableSyntax
       entry_alist.add ("factor", 1.0);
       entry_syntax.add ("offset", Syntax::Number, Syntax::Const);
       entry_alist.add ("offset", 0.0);
-	
+      entry_syntax.add ("from", Syntax::Number, Syntax::Const);
+      entry_alist.add ("from", 0.0);
+      entry_syntax.add ("to", Syntax::Number, Syntax::Const);
+      entry_alist.add ("to", 1.0);
+      
       entry_syntax.add ("value", Syntax::Number, Syntax::State);
       entry_alist.add ("value", 0.0);
       entry_syntax.add ("count", Syntax::Integer, Syntax::State);

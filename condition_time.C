@@ -110,6 +110,71 @@ public:
   { return *new ConditionYearly (al); }
 };
 
+struct ConditionHour : public Condition
+{
+  const int at;
+public:
+  bool match (const Frame&, const Daisy& daisy) const
+    { return daisy.time.hour () == at; }
+  ConditionHour (const AttributeList& al)
+    : at (al.integer ("at"))
+    { }
+  static Condition& make (const AttributeList& al)
+    { return *new ConditionHour (al); }
+};
+
+struct ConditionMDay : public Condition
+{
+  const int at;
+public:
+  bool match (const Frame&, const Daisy& daisy) const
+    { return daisy.time.mday () == at; }
+  ConditionMDay (const AttributeList& al)
+    : at (al.integer ("at"))
+    { }
+  static Condition& make (const AttributeList& al)
+    { return *new ConditionMDay (al); }
+};
+
+struct ConditionYDay : public Condition
+{
+  const int at;
+public:
+  bool match (const Frame&, const Daisy& daisy) const
+    { return daisy.time.yday () == at; }
+  ConditionYDay (const AttributeList& al)
+    : at (al.integer ("at"))
+    { }
+  static Condition& make (const AttributeList& al)
+    { return *new ConditionYDay (al); }
+};
+
+struct ConditionMonth : public Condition
+{
+  const int at;
+public:
+  bool match (const Frame&, const Daisy& daisy) const
+    { return daisy.time.month () == at; }
+  ConditionMonth (const AttributeList& al)
+    : at (al.integer ("at"))
+    { }
+  static Condition& make (const AttributeList& al)
+    { return *new ConditionMonth (al); }
+};
+
+struct ConditionYear : public Condition
+{
+  const int at;
+public:
+  bool match (const Frame&, const Daisy& daisy) const
+    { return daisy.time.year () == at; }
+  ConditionYear (const AttributeList& al)
+    : at (al.integer ("at"))
+    { }
+  static Condition& make (const AttributeList& al)
+    { return *new ConditionYear (al); }
+};
+
 static struct ConditionTimeSyntax
 {
   ConditionTimeSyntax ();
@@ -147,5 +212,22 @@ ConditionTimeSyntax::ConditionTimeSyntax ()
 				    &ConditionMonthly::make);
     Librarian<Condition>::add_type ("yearly", alist, syntax,
 				    &ConditionYearly::make);
+  }
+  // At a specific hour/mday/yday/year.
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    syntax.add ("at", Syntax::Integer, Syntax::Const);
+    syntax.order ("at");
+    Librarian<Condition>::add_type ("hour", alist, syntax,
+				    &ConditionHour::make);
+    Librarian<Condition>::add_type ("mday", alist, syntax,
+				    &ConditionMDay::make);
+    Librarian<Condition>::add_type ("yday", alist, syntax,
+				    &ConditionYDay::make);
+    Librarian<Condition>::add_type ("month", alist, syntax,
+				    &ConditionMonth::make);
+    Librarian<Condition>::add_type ("year", alist, syntax,
+				    &ConditionYear::make);
   }
 }

@@ -56,12 +56,16 @@ Soil::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   Geometry::load_syntax (syntax, alist);
   Syntax& layer_syntax = *new Syntax ();
+#if 0
   AttributeList& layer_alist = *new AttributeList ();
+#endif
   layer_syntax.add ("end", Syntax::Number, Syntax::Const);
   layer_syntax.add ("horizon", Librarian<Horizon>::library (), Syntax::State);
   layer_syntax.order ("end", "horizon");
   syntax.add ("horizons", layer_syntax, Syntax::State, Syntax::Sequence);
+#if 0
   alist.add ("horizons", layer_alist);
+#endif
   syntax.add ("EpFactor", Syntax::Number, Syntax::Const);
   alist.add ("EpFactor", 0.8);
   syntax.add ("EpInterchange", Syntax::Number, Syntax::Const);

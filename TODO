@@ -1,11 +1,3 @@
-* LogTable
-
-Clear value også når der ikke er nogen match.
-
-* Ændr Geometry::layers 
-
-Brug `end' i hvert lag i stedet for `size'.
-
 * Standard filtre
 
 ** Generaliser Frame.

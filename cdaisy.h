@@ -301,6 +301,9 @@ daisy_parser_delete (daisy_parser* parser);
 void				/* Load file. */
 daisy_parser_load (daisy_parser* parser, daisy_alist* alist);
 
+int				/* Return number of errors encountered. */
+daisy_parser_error_count (daisy_parser* parser);
+
 /* @ The daisy_printer Type.
  *
  * A printer pretty print the content of alists and library objects.
@@ -431,13 +434,13 @@ daisy_time_get_year (const daisy_time* time);
 /* @ The daisy_weather Type. */
 
 void				/* [mm/d] */
-daisy_weather_put_precipitation (daisy_weather* column, double prec);
+daisy_weather_put_precipitation (daisy_weather* weather, double prec);
 
 void				/* [degree C] */
-daisy_weather_put_air_temperature (daisy_weather* column, double T);
+daisy_weather_put_air_temperature (daisy_weather* weather, double T);
 
 void				/* [mm/d] */
-daisy_weather_put_reference_evapotranspiration (daisy_weather* column,
+daisy_weather_put_reference_evapotranspiration (daisy_weather* weather,
 						double ref);
 
 /* @ The daisy_column Type.
@@ -505,10 +508,10 @@ daisy_column_get_water_sink (const daisy_column* column, double sink[]);
  */
 
 void				/* [g/cm^3] */
-daisy_column_put_no3_m (const double M[]);
+daisy_column_put_no3_m (daisy_column* column, const double M[]);
 
 void				/* [g/cm^3] */
-daisy_column_get_no3_m (double M[]);
+daisy_column_get_no3_m (daisy_column* column, double M[]);
 
 /* @@@ Bioclimate. 
  *

@@ -1,3 +1,56 @@
+1998-04-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.019 released.
+
+1998-04-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C (daisy_alist_size_alist): Workaround for non-sequence
+	alist value of an alist sequence kludge.
+
+	* soil.C (load_syntax): Don't add alist element.
+
+	* parser_file.C (Implementation::error_count): New member.
+	(Implementation::error): Update it.
+	(Implementation::Implementation): Initialize it.
+	* parser.C, parser.h (Parser::error_count): New virtual function.
+	* parser_file.C, parser_file.h (ParserFile::error_count): Define it.
+
+1998-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* condition_time.C (struct ConditionHour): New condition.
+	(struct ConditionMDay): Ditto.
+	(struct ConditionYDay): Ditto.
+	(struct ConditionMonth): Ditto.
+	(struct ConditionYear): Ditto.
+	(ConditionTimeSyntax::ConditionTimeSyntax) Add them.
+
+1998-04-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* cdaisy.C, cdaisy.h (daisy_weather_put_precipitation):
+	Implement.  Fix formal parameter name.
+	(daisy_weather_put_air_temperature): Ditto.
+	(daisy_weather_put_precipitation): Ditto.
+
+1998-04-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (tick): Move call to `DevelopmentStage' to after
+	`NetProduction'. 
+	(DevelopmentStage): No developmend when DS < 1 and there is no
+	netto production of leafs.
+
+	* crop_std.C (harvest): Don't harvest leafs on stub.
+
+	* crop_std.C (Vernalization): Replace `DSLim1' and `DSLim2' with a
+	single `DSLim' parameter.
+	Made `Vernal' optional.
+	(NetProduction): New parameter `Large_RtDR'.
+	(RSR): New function and parameter.
+	(AssimilatePartitioning): Use it.
+
+	* lib/wwheat.dai (WinterWheat): Adjust.
+	* lib/sbarley.dai (SpringBarley): Ditto.
+	* lib/grass.dai (Grass): Ditto.
+
 1998-04-02  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.018 released.

@@ -88,6 +88,7 @@ protected:
 			       double& f_Root, double& f_SOrg);
   double MaintenanceRespiration (double r, double w, double T);
   void NetProduction (const Bioclimate&, const Geometry&, const SoilHeat&);
+  double RSR () const;
 
   // Simulation.
 public:
@@ -137,10 +138,10 @@ struct CropStandard::Parameters
   } Devel;
   const struct VernalPar {
     bool required;
-    double DSLim1;		// DS at beginning of vernalization
-    double DSLim2;		// DS at end of vernalization
+    double DSLim;		// Max DS without vernalization
     double TaLim;		// Vernalization temp threshold
     double TaSum;		// Vernalization T-sum requirement
+    static const AttributeList* none;
   private:
     friend struct CropStandard::Parameters;
     VernalPar (const AttributeList&);
@@ -187,9 +188,10 @@ struct CropStandard::Parameters
     RootPar (const AttributeList&);
   } Root;
   const struct PartitPar {
-    const CSMP& Root;	// Partitioning functions for root
-    const CSMP& Leaf;	//   leaf, and stem as function of DS
+    const CSMP& Root;		// Partitioning functions for root
+    const CSMP& Leaf;		//   leaf, and stem as function of DS
     const CSMP& Stem;
+    const CSMP& RSR;		// Root/Shoot ratio.
   private:
     friend struct CropStandard::Parameters;
     PartitPar (const AttributeList&);
@@ -208,6 +210,7 @@ struct CropStandard::Parameters
     double ReMobilRt;		// Remobilization, release rate
     const CSMP& LfDR;		// Death rate of Leafs
     const CSMP& RtDR;		// Death rate of Roots
+    const double Large_RtDR;	// Extra death rate for large root/shoot.
   private:
     friend struct CropStandard::Parameters;
     ProdPar (const AttributeList&);
@@ -266,6 +269,8 @@ private:
 public:
   ~Parameters ();
 };
+
+const AttributeList* CropStandard::Parameters::VernalPar::none;
 
 struct CropStandard::Variables
 { 
@@ -364,7 +369,7 @@ public:
 
 CropStandard::Parameters::Parameters (const AttributeList& vl) 
   : Devel (vl.alist ("Devel")),
-    Vernal (vl.alist ("Vernal")),
+    Vernal (vl.check ("Vernal") ? vl.alist ("Vernal") : *VernalPar::none),
     LeafPhot (vl.alist ("LeafPhot")),
     Canopy (vl.alist ("Canopy")),
     Root (vl.alist ("Root")),
@@ -390,9 +395,8 @@ CropStandard::Parameters::DevelPar::DevelPar (const AttributeList& vl)
 { }
 
 CropStandard::Parameters::VernalPar::VernalPar (const AttributeList& vl)
-  : required (vl.flag ("required")),
-    DSLim1 (vl.number ("DSLim1")),
-    DSLim2 (vl.number ("DSLim2")),
+  : required (vl.check ("required") ? vl.flag ("required") : true),
+    DSLim (vl.number ("DSLim")),
     TaLim (vl.number ("TaLim")),
     TaSum (vl.number ("TaSum"))
 { }
@@ -435,7 +439,8 @@ CropStandard::Parameters::RootPar::RootPar (const AttributeList& vl)
 CropStandard::Parameters::PartitPar::PartitPar (const AttributeList& vl)
   : Root (vl.csmp ("Root")),
     Leaf (vl.csmp ("Leaf")),
-    Stem (vl.csmp ("Stem"))
+    Stem (vl.csmp ("Stem")),
+    RSR (vl.csmp ("RSR"))
 { }
 
 CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
@@ -451,7 +456,8 @@ CropStandard::Parameters::ProdPar::ProdPar (const AttributeList& vl)
     ReMobilDS (vl.number ("ReMobilDS")),
     ReMobilRt (vl.number ("ReMobilRt")),
     LfDR (vl.csmp ("LfDR")),
-    RtDR (vl.csmp ("RtDR"))     
+    RtDR (vl.csmp ("RtDR")),
+    Large_RtDR (vl.number ("Large_RtDR"))
 { }
 
 CropStandard::Parameters::CrpNPar::CrpNPar (const AttributeList& vl)
@@ -734,13 +740,21 @@ CropStandardSyntax::CropStandardSyntax ()
     
   // VernalPar
   Syntax& Vernal = *new Syntax ();
-  syntax.add ("Vernal", Vernal, Syntax::Const);
+  syntax.add ("Vernal", Vernal, Syntax::Optional);
+  // WARNING: Don't add an alist here, or the `Optional' idea is lost.
 
-  Vernal.add ("required", Syntax::Boolean, Syntax::Const);
-  Vernal.add ("DSLim1", Syntax::Number, Syntax::Const);
-  Vernal.add ("DSLim2", Syntax::Number, Syntax::Const);
+  Vernal.add ("required", Syntax::Boolean, Syntax::Optional);
+  Vernal.add ("DSLim", Syntax::Number, Syntax::Const);
   Vernal.add ("TaLim", Syntax::Number, Syntax::Const);
   Vernal.add ("TaSum", Syntax::Number, Syntax::Const);
+
+  // Initialize "no vernalization"
+  AttributeList& noVernal = *new AttributeList ();
+  noVernal.add ("required", false);
+  noVernal.add ("DSLim", -42.42e42);
+  noVernal.add ("TaLim", -42.42e42);
+  noVernal.add ("TaSum", -42.42e42);
+  CropStandard::Parameters::VernalPar::none = &noVernal;
 
   // LeafPhotPar
   Syntax& LeafPhot = *new Syntax ();
@@ -788,6 +802,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Partit.add ("Root", Syntax::CSMP, Syntax::Const);
   Partit.add ("Leaf", Syntax::CSMP, Syntax::Const);
   Partit.add ("Stem", Syntax::CSMP, Syntax::Const);
+  Partit.add ("RSR", Syntax::CSMP, Syntax::Const);
 
   // ProdPar
   Syntax& Prod = *new Syntax ();
@@ -806,7 +821,8 @@ CropStandardSyntax::CropStandardSyntax ()
   Prod.add ("ReMobilRt", Syntax::Number, Syntax::Const);
   Prod.add ("LfDR", Syntax::CSMP, Syntax::Const);
   Prod.add ("RtDR", Syntax::CSMP, Syntax::Const);
-
+  Prod.add ("Large_RtDR", Syntax::Number, Syntax::Const);
+  
   // CrpNPar
   Syntax& CrpN = *new Syntax ();
   AttributeList& CrpNList = *new AttributeList ();
@@ -1096,11 +1112,9 @@ CropStandard::Vernalization (double Ta)
   double& Vern = var.Phenology.Vern;
   double& DS = var.Phenology.DS;
 
-  if (DS < Vernal.DSLim1)
-    return;
   Vern -= min (Ta - Vernal.TaLim, 0.0);
-  if (DS > Vernal.DSLim2)
-    DS = Vernal.DSLim2;
+  if (DS > Vernal.DSLim)
+    DS = Vernal.DSLim;
 }
 
 void 
@@ -1125,9 +1139,12 @@ CropStandard::DevelopmentStage (const Bioclimate& bioclimate)
 
   if (Phenology.DS < 1)
     {
-      Phenology.DS += (Devel.DSRate1
-		       * Devel.TempEff1 (Ta)
-		       * Devel.PhotEff1 (bioclimate.day_length ()));
+      // Only increase DS if assimilate production covers leaf respiration.
+      if (var.CrpAux.IncWLeaf +  var.CrpAux.DeadWLeaf 
+	  >  -var.Prod.WLeaf /1000.0) // It lost 0.1% of its leafs to resp.
+	Phenology.DS += (Devel.DSRate1
+			 * Devel.TempEff1 (Ta)
+			 * Devel.PhotEff1 (bioclimate.day_length ()));
       if (par.Vernal.required && Phenology.Vern < 0)
 	Vernalization (Ta);
     }
@@ -1699,7 +1716,10 @@ CropStandard::AssimilatePartitioning (double DS,
 {
   const Parameters::PartitPar& Partit = par.Partit;
     
-  f_Root = Partit.Root (DS);
+  if (RSR () > Partit.RSR (DS))
+    f_Root = 0.0;
+  else
+    f_Root = Partit.Root (DS);
   f_Leaf = (1 - f_Root) * Partit.Leaf (DS);
   f_Stem = (1 - f_Root) * Partit.Stem (DS);
   f_SOrg = max (0.0, 1 - f_Root - f_Leaf - f_Stem);
@@ -1820,7 +1840,11 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
 		      CrpAux.DeadNLeaf * m2_per_cm2);
 
   // Update dead roots.
-  CrpAux.DeadWRoot = pProd.RtDR (DS) * vProd.WRoot;
+  double RtDR = pProd.RtDR (DS);
+  if (RSR () > par.Partit.RSR (DS))
+    RtDR += pProd.Large_RtDR;
+
+  CrpAux.DeadWRoot = RtDR * vProd.WRoot;
   CrpAux.DeadNRoot = par.CrpN.DdRootCnc (DS) * CrpAux.DeadWRoot;
   CrpAux.IncWRoot -= CrpAux.DeadWRoot;
   vProd.AM_root->add (geometry, 
@@ -1835,6 +1859,16 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   vProd.WStem += CrpAux.IncWStem;
   vProd.WSOrg += CrpAux.IncWSOrg;
   vProd.WRoot += CrpAux.IncWRoot;
+}
+
+double 
+CropStandard::RSR () const
+{
+  const double shoot = var.Prod.WStem + var.Prod.WSOrg + var.Prod.WLeaf;
+  const double root = var.Prod.WRoot;
+  if (shoot < 20.0 || root < 20.0)
+    return 0.33333;
+  return root/shoot;
 }
 
 void 
@@ -1895,16 +1929,17 @@ CropStandard::tick (const Time& time,
     }
   if (time.hour () != 0)
     return;
-  DevelopmentStage (bioclimate);
   var.Canopy.Height = CropHeight ();
   if (var.CrpAux.InitLAI)
     InitialLAI ();
   else
     var.Canopy.LAI = CropLAI ();
   NetProduction (bioclimate, soil, soil_heat);
+  DevelopmentStage (bioclimate);
   RootPenetration (soil, soil_heat);
   RootDensity (soil);
   NitContent ();
+
   var.CrpAux.LogPotCanopyAss = var.CrpAux.PotCanopyAss;
   var.CrpAux.LogCanopyAss = var.CrpAux.CanopyAss;
   var.CrpAux.PotCanopyAss = 0.0;
@@ -2011,8 +2046,23 @@ CropStandard::harvest (const string& column_name,
   const vector<double>& density = var.RootSys.Density;
   const double length = height ();
 
+  // Leave stem and leaf below stub alone.
   if (stub_length < length)
-    stem_harvest *= (1.0 - stub_length / length);
+    {
+      stem_harvest *= (1.0 - stub_length / length);
+      
+      const double total_LAI = LAI ();
+      if (total_LAI > 0.0)
+	{
+	  const double stub_LAI = LAIvsH ()(stub_length);
+	  leaf_harvest *= (1.0 - stub_LAI / total_LAI);
+	}
+    }
+
+  cerr << "Got (stem_harvest " << stem_harvest << ")\n";
+  cerr << "Got (leaf_harvest " << leaf_harvest << ")\n";
+  cerr << "Got (total_LAI " << LAI () << ")\n";
+  cerr << "Got (stub_LAI " << LAIvsH ()(stub_length) << ")\n";
 
   if (!kill_off && DS < DSmax)
     {
@@ -2022,10 +2072,6 @@ CropStandard::harvest (const string& column_name,
       if (DS > DSnew)
 	var.Phenology.DS = DSnew;
 
-      // Adjust canopy for the sake of bioclimate.
-      CropHeight ();
-      CanopyStructure ();
-      
       // Stop fixation after cut.
       if (DS > var.CrpAux.DS_start_fixate)
 	var.CrpAux.DS_start_fixate = par.CrpN.DS_cut_fixate;
@@ -2036,6 +2082,11 @@ CropStandard::harvest (const string& column_name,
       Prod.NCrop -= (  NStem * stem_harvest
 		     + NLeaf * leaf_harvest
 		     + NSOrg * sorg_harvest);
+
+      // Adjust canopy for the sake of bioclimate.
+      CropHeight ();
+      CropLAI ();
+      CanopyStructure ();
     }
   else
     {

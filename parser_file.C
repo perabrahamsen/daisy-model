@@ -34,6 +34,7 @@ struct ParserFile::Implementation
   string file;
   int line;
   int column;
+  int error_count;
   const Syntax* global_syntax_table;
   void initialize (const Syntax&);
   Implementation (const string&);
@@ -173,6 +174,7 @@ ParserFile::Implementation::get_integer ()
 void 
 ParserFile::Implementation::error (string str)
 {
+  error_count++;
   cerr << file << ":" << line << ":" << (column + 1) << ": " << str << "\n";
 }
 
@@ -652,7 +654,8 @@ ParserFile::Implementation::Implementation (const string& name)
   : in (Options::find_file (name)),
     file (name),
     line (1),
-    column (0)
+    column (0),
+    error_count (0)
 {  
   if (!in.good ())
     cerr << "Open `" << file << "' failed\n";
@@ -672,6 +675,10 @@ ParserFile::load (AttributeList& alist)
   impl.load_list (alist, *impl.global_syntax_table);
   impl.eof ();
 }
+
+int
+ParserFile::error_count () const
+{ return impl.error_count; }
 
 void
 ParserFile::initialize (const Syntax& syntax)

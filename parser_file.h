@@ -15,6 +15,7 @@ private:
   // Use.
 public:
   void load (AttributeList&);
+  int error_count () const;
 
   // Create and Destroy.
 public:
