@@ -1,0 +1,5 @@
+;;; crop.dai -*- lisp -*-
+
+(input file "wwheat.dai")
+(input file "sbarley.dai")
+(input file "grass.dai")

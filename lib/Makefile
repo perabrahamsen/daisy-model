@@ -1,7 +1,7 @@
 DAISY = beet-old.dai crop-old.dai fertilizer.dai grass-old.dai \
 	pea-old.dai potato-old.dai sbarley-old.dai sbarley.dai \
 	srape-old.dai tillage.dai wbarley-old.dai wrape-old.dai \
-	wwheat-old.dai 
+	wwheat-old.dai crop.dai wwheat.dai grass.dai
 CLIMATE = weather.clm
 REMOVE = none
 
