@@ -12,6 +12,13 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.48
+
+** Log summaries can now be redirected to files.
+
+There is a new "where" summary parameter.   It is mostly intended to
+help me create a test suite.
+
 * 3.47
 
 ** Description string for activity action allowed.
@@ -23,6 +30,7 @@ The form
 
 is now allowed.  It has been used in examples for some time, but
 rejected by Daisy. 
+
 
 * 3.46
 

@@ -26,6 +26,7 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 
+#include <fstream>
 #include <string>
 using namespace std;
 
@@ -33,6 +34,7 @@ struct SummarySimple : public Summary
 {
   static const symbol default_description;
   const symbol description;
+  const string file;
   const symbol title;
   const bool print_sum;
   const symbol sum_name;
@@ -300,6 +302,7 @@ SummarySimple::initialize (vector<Select*>& select, Treelog& msg)
 SummarySimple::SummarySimple (const AttributeList& al)
   : Summary (al),
     description (al.identifier ("description")),
+    file (al.name ("where", "")),
     title (al.check ("title") ? al.identifier ("title") : name),
     print_sum (al.flag ("print_sum")),
     sum_name (al.identifier ("sum_name")),
@@ -353,7 +356,15 @@ SummarySimple::summarize (const int hours, Treelog& msg)
       tmp () << " [" << last_dim << "]";
     tmp () << "\n" << string (max_size + 3, ' ') << string (width, '=');
   }
-  msg.message (tmp.str ());
+  if (file == "")
+    msg.message (tmp.str ());
+  else
+    { 
+      ofstream out (file.c_str ());
+      out << tmp.str ();
+      if (! out.good ())
+        msg.error ("Could not write to '" + file + "'");
+    } 
 }
 
 static struct SummarySimpleSyntax
@@ -367,6 +378,9 @@ static struct SummarySimpleSyntax
       syntax.add ("description", Syntax::String, Syntax::Const,
 		  "Description of this summary format.");
       alist.add ("description", SummarySimple::default_description);
+      syntax.add ("where", Syntax::String, Syntax::OptionalConst,
+                  "File name to store the summary.\n\
+By default, the summary will be stored in daisy.log and the screen.");
       syntax.add ("title", Syntax::String, Syntax::OptionalConst,
 		  "Title of this summary.\n\
 By default, use the name of the parameterization.");

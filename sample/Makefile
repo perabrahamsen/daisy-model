@@ -3,6 +3,8 @@ SETUPS  = sample.dai
 TEXT	= Makefile README $(SETUPS) $(LIBS)
 REMOVE 	=  NOTHING
 
+DAISY   = /usr/local/daisy/$(HOSTTYPE)/daisy
+
 all:
 	echo Nothing to do here.
 
@@ -30,3 +32,13 @@ cvs: $(TEXT)
 	-cvs remove $(REMOVE) 
 	cvs commit -m "$(TAG)" # "Version $(TAG)"
 
+# Check
+#
+check: new/Cosby-Nitrogen-Balance.sum
+	-@if cmp new/Cosby-Nitrogen-Balance.sum old/Cosby-Nitrogen-Balance.sum ; then echo Cosby Nitrogen Balance unchanged; else echo Cosby Nitrogen Balance changed; wdiff new/Cosby-Nitrogen-Balance.sum old/Cosby-Nitrogen-Balance.sum; fi
+
+new/Cosby-Nitrogen-Balance.sum: $(DAISY) test-Cosby.dai
+	$(DAISY) test-Cosby.dai
+
+accept: 
+	cp new/Cosby-Nitrogen-Balance.sum old

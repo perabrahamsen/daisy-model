@@ -1,5 +1,7 @@
 2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* summary_simple.C (where): New parameter.
+
 	* Version 3.47 released.
 
 2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
