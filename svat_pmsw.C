@@ -552,7 +552,7 @@ int RSC (double LAI, double tair, double srad, double e_pa, double theta_0_20,
 // Modified *****************************************************************
 int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_20,
              double esta, double theta_w, double theta_c, double rcmin,
-             double rcmax, double zeta, double f3const, double tref, double spar,
+             double rcmax, double /*zeta*/, double f3const, double tref, double spar,
              double tmin, double tmax, double nu_1, double nu_2, double nu_3,
              double crop_ea_w,double crop_ep_w,double canopy_ea,double r_sc,
              double lel, double &rf1_dolman,double &rf_def,double &rf_3,
@@ -562,7 +562,11 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   daisy_assert (LAI > 0.0);
   double tairk,def;
   double rcmin_LAI;
-  double fpar,f_1,f_2,f_4,f_temp,bf_temp,f_theta;
+  double fpar,bf_temp,f_theta;
+#ifdef UNUSED
+  //Commented out unused code. -- abraham 2003-02-03
+  double f_1, f_2, f_4, f_temp;
+#endif
 
   const double a4=700.0; // parameter in f1_dolman (for oats)
 
@@ -576,17 +580,20 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   // constraint functions used in Dickinson (1984) / Noilhan et al. (1991)
   daisy_assert (rcmax > 0.0);
   daisy_assert (1+fpar != 0.0);
+#ifdef UNUSED
   f_1=(rcmin_LAI/rcmax+fpar)/(1+fpar); // related to solar radiation
   f_2=1-zeta*(esta-e_pa); // related to vapour pressure deficit
+#endif
   // tref-tairk > 0
   if (tref-tairk <= 0.0) tref=tairk+1.0;
   daisy_assert (tref > tairk);
   rf_3=1-f3const*pow(tref-tairk,2.0); // related to air temperature
   daisy_assert (theta_c != theta_w);
+#ifdef UNUSED
   f_4=(theta_0_20-theta_w)/(theta_c-theta_w); // related to soil moisture
-
+#endif
   // rf_4 should not be zero
-  if (f_4==0.0) f_4=0.01;
+  //if (f_4==0.0) f_4=0.01;
 
   // f1 function Dolman (1991) referenced in Dolman (1993)
   if (srad==0.0) srad=srad+1.0;
@@ -600,8 +607,10 @@ int RSCSTAR (double LAI, double tair, double srad, double e_pa, double theta_0_2
   daisy_assert (tmax > tair);
   daisy_assert (tmax > nu_1);
   daisy_assert (nu_1 != tmin);
+#ifdef UNUSED
   f_temp=(tair-tmin)*pow(tmax-tair,bf_temp)/
     ((nu_1-tmin)*pow(tmax-nu_1,bf_temp));  // Jarvis (1976)
+#endif
   daisy_assert (1.0 + nu_2 * def != 0.0);
   rf_def=1.0/(1.0+nu_2*def); // Lohammar (1980)
 
