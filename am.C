@@ -718,6 +718,36 @@ AM::get_NH4 (const AttributeList& al)
   return al.number ("NH4");
 }
 
+double
+AM::get_volatilization (const AttributeList& al)
+{
+  if (al.check ("weight"))
+    {
+      const double volatilization 
+	= al.check ("NH4_evaporation") 
+	? al.number ("NH4_evaporation")
+	: al.number ("volatilization");
+
+      if (al.name ("syntax") == "organic")
+	{
+	  // Organic fertilizer.
+	  const double weight = al.number ("weight") 
+	    * al.number ("dry_matter_fraction") 
+	    * 1000;			// T w.w. / ha --> kg DM / ha
+	  const double N = weight * al.number ("total_N_fraction");
+	  return N * al.number ("NH4_fraction") * volatilization;
+	}
+      // Mineral fertilizer.
+      assert (al.name ("syntax") == "mineral");
+      
+      return al.number ("weight")
+	* al.number ("NH4_fraction") * volatilization; 
+    }
+  // Other.
+  assert (!al.check ("NH4_evaporation") && !al.check ("volatilization"));
+  return 0.0;
+}
+
 void
 AM::set_utilized_weight (AttributeList& am, const double weight)
 {

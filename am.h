@@ -62,6 +62,7 @@ public:
   static const vector<AttributeList*>& default_AOM ();
   static double get_NO3 (const AttributeList&);	// [g N/cm^2]
   static double get_NH4 (const AttributeList&);	// [g N/cm^2]
+  static double get_volatilization (const AttributeList&);	// [kg N/ha]
   static void set_utilized_weight (AttributeList& am,
 				   const double weight /* [kg N/ha] */);
   static double utilized_weight (const AttributeList& am); // [kg N/ha]

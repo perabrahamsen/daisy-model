@@ -24,12 +24,14 @@ private:
 private:
   double log_fertilized_NO3;
   double log_fertilized_NH4;
+  double log_volatilization;
   double log_fertilized_Org_N;
   double log_fertilized_Org_C;
   double log_fertilized_DM;
   double log_first_year_utilization;
   double fertilized_NO3;
   double fertilized_NH4;
+  double volatilization;
   double fertilized_Org_N;
   double fertilized_Org_C;
   double fertilized_DM;
@@ -169,6 +171,7 @@ ColumnStandard::fertilize (const AttributeList& al)
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
   second_year_utilization_ += AM::second_year_utilization (al);
+  volatilization += AM::get_volatilization (al);
 
   // Add inorganic matter.
   IM im (al);
@@ -200,6 +203,7 @@ ColumnStandard::fertilize (const AttributeList& al, double from, double to)
   // Utilization log.
   first_year_utilization += AM::utilized_weight (al);
   second_year_utilization_ += AM::second_year_utilization (al);
+  volatilization += AM::get_volatilization (al);
 
   // Add inorganic matter.
   IM im (al);
@@ -319,12 +323,14 @@ ColumnStandard::tick (const Time& time, const Weather* global_weather)
   log_fertilized_Org_C = fertilized_Org_C;
   log_fertilized_DM = fertilized_DM;
   log_first_year_utilization = first_year_utilization;
+  log_volatilization = volatilization;
   fertilized_NO3 = 0.0;
   fertilized_NH4 = 0.0;
   fertilized_Org_N = 0.0;
   fertilized_Org_C = 0.0;
   fertilized_DM = 0.0;
   first_year_utilization = 0.0;
+  volatilization = 0.0;
 
   // Early calculation.
   IM soil_top_conc;
@@ -374,6 +380,7 @@ ColumnStandard::output_inner (Log& log) const
   log.output ("second_year_utilization", second_year_utilization_);
   log.output ("fertilized_NO3", log_fertilized_NO3);
   log.output ("fertilized_NH4", log_fertilized_NH4);
+  log.output ("volatilization", log_volatilization);
   log.output ("fertilized_Org_N", log_fertilized_Org_N);
   log.output ("fertilized_Org_C", log_fertilized_Org_C);
   log.output ("fertilized_DM", log_fertilized_DM);
@@ -422,12 +429,14 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     second_year_utilization_ (al.number ("second_year_utilization")),
     log_fertilized_NO3 (0.0),
     log_fertilized_NH4 (0.0),
+    log_volatilization (0.0),
     log_fertilized_Org_N (0.0),
     log_fertilized_Org_C (0.0),
     log_fertilized_DM (0.0),
     log_first_year_utilization (0.0),
     fertilized_NO3 (0.0),
     fertilized_NH4 (0.0),
+    volatilization (0.0),
     fertilized_Org_N (0.0),
     fertilized_Org_C (0.0),
     fertilized_DM (0.0),
@@ -513,5 +522,7 @@ The denitrification process.");
 		"Amount of dry matter applied this time step.");
     syntax.add ("first_year_utilization", "kg N/ha", Syntax::LogOnly,
 		"Estimated first year fertilizer effect.");
+    syntax.add ("volatilization", "kg N/ha", Syntax::LogOnly,
+		"Amount of NH4 volatilization.");
   }
 } column_syntax;

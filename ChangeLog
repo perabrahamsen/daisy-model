@@ -1,3 +1,13 @@
+2000-12-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.68 released.
+
+2000-12-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* am.C (get_volatilization): New function.
+	* column_std.C: Support it.
+	* lib/log.dai ("Fertilizer"): Added it.
+
 2000-12-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.67 released.
