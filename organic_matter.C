@@ -460,10 +460,10 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   
   for (unsigned int i = 0; i < size; i++)
     {
-      assert (soil_NH4.M_left (i) > 0);
+      assert (soil_NH4.M_left (i) >= 0);
       const double NH4 = (soil_NH4.M_left (i) < 1e-9) // 1 mg/l
 	? 0.0 : soil_NH4.M_left (i) * K_NH4;
-      assert (soil_NO3.M_left (i) > 0);
+      assert (soil_NO3.M_left (i) >= 0);
       const double NO3 = (soil_NO3.M_left (i) < 1e-9) // 1 mg/l
 	? 0.0 : soil_NO3.M_left (i) * K_NO3;
 
