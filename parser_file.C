@@ -396,7 +396,11 @@ ParserFile::Implementation::add_derived (Library& lib)
   atts.add ("parsed_from_file", file);
   atts.add ("parsed_sequence", Library::get_sequence ());
   // Doc string.
-  if (!syntax.ordered () && looking_at ('"'))
+  daisy_assert (!syntax.ordered () 
+                || syntax.order ().begin () != syntax.order ().end ());
+  if ((!syntax.ordered () 
+       || syntax.lookup (*(syntax.order ().begin ())) != Syntax::String) 
+      && looking_at ('"'))
     atts.add ("description", get_string ());
   // Add separate attributes for this object.
   load_list (atts, syntax);

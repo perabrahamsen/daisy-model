@@ -14,6 +14,18 @@ release.
 
 * 3.47
 
+** Description string for activity action allowed.
+
+The form 
+
+  (defaction foo activity
+     "Description of the foo activity.")
+
+is now allowed.  It has been used in examples for some time, but
+rejected by Daisy. 
+
+* 3.46
+
 ** New top level stop command.
 
 If set, this force the simulation to stop when the simulated time

@@ -1,5 +1,19 @@
 2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.47 released.
+
+2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* sample/sample.dai: New file.
+	* sample/Makefile (SETUPS): Add it.
+
+	* parser_file.C (add_derived): Allow description strings even for
+	ordered items, as long as the first member itself is not a string.
+
+	* sample/pedo-soil.dai: New file.
+	* sample/irrigation.dai: New file.
+	* sample/Makefile (DAISY): Added them
+
 	* Version 3.46 released.
 
 2004-07-08  Per Abrahamsen  <abraham@dina.kvl.dk>

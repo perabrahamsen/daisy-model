@@ -1,20 +1,7 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* workshop
 
-** sample files
-
-*** irrigation strategy
-
-tensiometer
-
-soil water content
-
-*** pedotransfer
-
-cosby & hypres
-
-** Skal det blive til en test suite?
+* Brug "stop" til at checke mod weather.
 
 * crop simple med nit
 
