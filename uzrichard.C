@@ -126,6 +126,12 @@ UZRichard::richard (const Soil& soil,
       assert (last + 1 < soil.size ());
       K[size] = soil.K (last + 1, 0.0, h_ice[last + 1]);
     }
+  
+  // For lysimeter bottom.
+  assert (q.size () > last);
+  const double q_last = min (0.0, q[last]); // Flux up from bottom node.
+  const double h_lim = soil.zplus (last) - soil.z (last);
+  assert (h_lim < 0.0);
 
   // Check if we have already switched top once.
   bool switched_top = false;
@@ -231,7 +237,9 @@ UZRichard::richard (const Soil& soil,
 
 		  if (bottom.flux_bottom ())
 		    {
-		      double q_bottom = - Kold[i];
+		      const double q_bottom = bottom.is_lysimeter () 
+			? (h[i] > h_lim ? q_last : 0.0)
+			: - Kold[i];
 		      b[i] = Cw2 + (ddt / dz) * (Kplus[i - 1] / dz_minus);
 		      d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 			+ (ddt / dz) * (Kplus[i - 1] + q_bottom);

@@ -13,7 +13,7 @@
 
 #if !defined (__CYGWIN__)
 // Doesn't work under cygwin
-#define pow(x, y) (assert (x > 0), (pow)(x, y))
+#define pow(x, y) (assert (x >= 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))
 #define log(x) (assert (x > 0), (log)(x))
 #endif

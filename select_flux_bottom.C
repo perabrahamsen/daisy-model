@@ -19,9 +19,9 @@ struct SelectFluxBottom : public Select
       if (valid (name))
 	{
 	  int index = ((height > 0.0) 
-		       ? (geometry->size () - 1U)
+		       ? geometry->size ()
 		       : geometry->interval_border (height));
-
+	  assert (array.size () > index);
 	  if (count == 0)	 
 	    value = array[index];	
 	  else

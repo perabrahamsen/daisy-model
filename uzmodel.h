@@ -29,6 +29,7 @@ class UZbottom
 public:
   virtual bool flux_bottom () const = 0;
   virtual bool accept_bottom (double) = 0;
+  virtual bool is_lysimeter () const;
   virtual ~UZbottom ();
 };
 

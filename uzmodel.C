@@ -5,6 +5,10 @@
 UZtop::~UZtop ()
 { }
 
+bool 
+UZbottom::is_lysimeter () const
+{ return false; }
+
 UZbottom::~UZbottom ()
 { }
 

@@ -32,7 +32,7 @@ struct Syntax::Implementation
   string_map descriptions;
   alist_map alists;
 
-  bool check (const AttributeList& vl, const string& name);
+  bool check (const AttributeList& vl, const string& name, unsigned int level);
   Syntax::type lookup (const string& key) const;
   int order_number (const string& name) const;
   void entries (vector<string>& result) const;
@@ -46,7 +46,8 @@ struct Syntax::Implementation
 };    
 
 bool 
-Syntax::Implementation::check (const AttributeList& vl, const string& name)
+Syntax::Implementation::check (const AttributeList& vl, const string& name,
+			       unsigned int level)
 {
   bool error = false;
 
@@ -55,7 +56,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
        i++)
     {
       string key = (*i).first;
-
+      bool key_error = false;
       if ((status[key] == Const || status[key] == State)
 	       && !vl.check (key))
 	{
@@ -78,21 +79,22 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 		if (!al.check ("type"))
 		  {
 		    CERR << "Non object found\n";
-		    error = true;
+		    key_error = true;
 		  }
 		else if (al.name ("type") == "error")
 		  {
 		    CERR << "Error node found\n";
-		    error = true;
+		    key_error = true;
 		  }
 		else if (!lib.check (al.name ("type")))
 		  {
 		    CERR << "Unknown library member `" << al.name ("type")
 			 << "'\n";
-		    error = true;
+		    key_error = true;
 		  }
-		else if (!lib.syntax (al.name ("type")) .check (al, key))
-		  error = true;
+		else if (!lib.syntax (al.name ("type")).impl.check (al, key,
+								    level + 1))
+		  key_error = true;
 	      }
 	  }
 	else 
@@ -102,10 +104,10 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 	    if (!al.check ("type"))
 	      {
 		CERR << "Non object found \n";
-		error = true;
+		key_error = true;
 	      }
 	    else if (!lib.syntax (al.name ("type")).check (al))
-	      error = true;
+	      key_error = true;
 	  }
       else if (types[key] == AList)
 	if (size[key] != Singleton)
@@ -118,8 +120,7 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 	      {
 		if (!syntax[key]->impl.list_checker[j] (seq))
 		  {
-		    error = true;
-		    CERR << "in " << key << "\n";
+		    key_error = true;
 		    break;
 		  }
 	      }
@@ -128,12 +129,19 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 		 j++)
 	      {
 		const AttributeList& al = **j;
-		if (!syntax[key]->check (al, key))
-		  error = true;
+		if (!syntax[key]->impl.check (al, key, level + 1))
+		  key_error = true;
 	      }
 	  }
-	else if (!syntax[key]->check (vl.alist (key), key))
+	else if (!syntax[key]->impl.check (vl.alist (key), key, level + 1))
+	  key_error = true;
+      if (key_error)
+	{
 	  error = true;
+	  for (unsigned l = 0; l < level; l++)
+	    CERR << "* ";
+	  CERR << "with key " << key << "\n";
+	}
     }
   if (!error)
     {
@@ -147,7 +155,11 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
 	}
     }
   if (error)
-    CERR << "in " << name << "\n";
+    {
+      for (unsigned l = 0; l < level; l++)
+	CERR << "* ";
+      CERR << "in " << name << "\n";
+    }
 
   return !error;
 }
@@ -243,7 +255,7 @@ Syntax::category_number (const char* name)
 bool
 Syntax::check (const AttributeList& vl, const string& name) const
 {
-  return impl.check (vl, name);
+  return impl.check (vl, name, 0U);
 }
 
 Syntax::type 

@@ -125,11 +125,13 @@ OM::mix (const Geometry& geometry, double from, double to, double penetration)
   geometry.add (C, from, to, top_C * penetration);
   geometry.mix (C, from, to);
   top_C *= (1.0 - penetration);
+  assert (top_C >= 0.0);
 
   // Mix N.
   geometry.add (N, from, to, top_N * penetration);
   geometry.mix (N, from, to);
   top_N *= (1.0 - penetration);
+  assert (top_N >= 0.0);
 
   // Calculate C/N.
   set_N (N);
@@ -244,6 +246,8 @@ OM::pour (vector<double>& cc, vector<double>& nn)
 void 
 OM::add (double C, double N)
 {
+  assert (C >= 0.0);
+  assert (N >= 0.0);
   top_C += C;
   top_N += N;
 }
@@ -517,9 +521,62 @@ OM::tick (unsigned int end, const double* abiotic_factor,
 
 const double OM::Unspecified = -1042.42e42;
 
+static bool check_alist (const AttributeList& al)
+{
+  bool ok = true;
+
+  non_negative (al.number ("top_C"), "top_C", ok);
+  non_negative (al.number ("top_N"), "top_N", ok);
+  non_negative (al.number ("turnover_rate"), "turnover_rate", ok);
+  if (al.check ("C"))
+    {
+      const vector<double>& C = al.number_sequence ("C");
+      for (unsigned int i = 0; i < C.size (); i++)
+	non_negative (C[i], "C", ok, i);
+    }
+  if (al.check ("C_per_N"))
+    {
+      const vector<double>& C_per_N = al.number_sequence ("C_per_N");
+      for (unsigned int i = 0; i < C_per_N.size (); i++)
+	if (C_per_N[i] <= 0.0)
+	  {
+	    CERR << "C_per_N[" << i << "] is not positive\n";
+	    ok = false;
+	  }
+    }
+  const vector<double>& efficiency = al.number_sequence ("efficiency");
+  for (unsigned int i = 0; i < efficiency.size (); i++)
+    is_fraction (efficiency[i], "efficiency", ok, i);
+  non_negative (al.number ("maintenance"), "maintenance", ok);
+  const vector<double>& fractions = al.number_sequence ("fractions");
+  for (unsigned int i = 0; i < fractions.size (); i++)
+    is_fraction (fractions[i], "fractions", ok, i);
+  if (!approximate (accumulate (fractions.begin (), fractions.end (), 0.0),
+		    1.0))
+    {
+      CERR << "Sum of `fractions' must be 1.0\n";
+      ok = false;
+    }
+  if (al.check ("initial_C_per_N"))
+    if (al.number ("initial_C_per_N") <= 0.0)
+      {
+	CERR << "`initial_C_per_N' must be positive\n";
+	ok = false;
+      }
+  const double initial_fraction = al.number ("initial_fraction");
+  if (initial_fraction != OM::Unspecified
+      && initial_fraction < 0.0 || initial_fraction > 1.0)
+    {
+      CERR << "Initial fraction should be unspecified, or between 0 and 1\n";
+      ok = false;
+    }
+  return ok;
+}
+
 void
 OM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
+  syntax.add_check (check_alist);
   alist.add ("submodel", "OM");
   alist.add ("description", "\
 Organic matter.  This is a common abstraction for the SMB (Soil\n\

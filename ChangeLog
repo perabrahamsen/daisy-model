@@ -1,3 +1,30 @@
+1999-12-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.04 released.
+
+1999-12-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select_flux_bottom.C (output_array): Fix off-by-one error.
+
+1999-12-02  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_lysimeter.C: New model.
+	* Makefile (COMPONENTS): Added it.
+	* uzrichard.C (richard): Added lysimeter support.
+	* uzmodel.C, uzmodel.h (UZbottom::is_lysimeter): New member
+	function. 
+
+1999-12-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.h (pow): First argument to pow can be 0.
+
+	* syntax.C (check): Add level indicator.
+
+1999-11-30  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (check_alist): New function.
+	(load_syntax): Add it.
+
 1999-11-26  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.03 released.
