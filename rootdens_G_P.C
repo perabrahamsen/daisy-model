@@ -116,7 +116,7 @@ static struct Rootdens_G_PSyntax
 		"Minimal root density\n\
 Root density will never be below this, as long as there is enough root mass.\n\
 Extra root mass will be distributed according to Gerwitz and Page.\n\
-If there are too little root mass, the root will have the same density
+If there are too little root mass, the root will have the same density\n\
 all the way down.");
     Librarian<Rootdens>::add_type (alist.name ("type"), alist, syntax, &make);
   }
