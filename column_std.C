@@ -30,13 +30,8 @@ public:
   void fertilize (const AttributeList&, double from, double to);
   void fertilize (const IM&);
   void fertilize (const IM&, double from, double to);
-  vector<const Harvest*> harvest (const Time& time, const string& crop_name,
-				  double stub_length,
-				  double stem_harvest,
-				  double leaf_harvest, 
-				  double sorg_harvest);
+  void add_residuals (vector<AM*>& residuals);
   void mix (const Time&, double from, double to, double penetration = 1.0);
-  void kill_all (const Time& time);
   void swap (const Time&, double from, double middle, double to);
 
   // Communication with external model.
@@ -147,16 +142,15 @@ ColumnStandard::fertilize (const IM& im, double from, double to)
   soil_NH4.add_external (soil, soil_water, im.NH4, from, to);
 }
 
-vector<const Harvest*> 
-ColumnStandard::harvest (const Time& time, const string& crop_name,
-			 double stub_length,
-			 double stem_harvest,
-			 double leaf_harvest, 
-			 double sorg_harvest)
-{ return vegetation.harvest (name, crop_name, time, soil, organic_matter,
-			     bioclimate,
-			     stub_length, 
-			     stem_harvest, leaf_harvest, sorg_harvest); }
+void
+ColumnStandard::add_residuals (vector<AM*>& residuals)
+{
+  // Put the residuals in the soil.
+  for (vector<AM*>::iterator residual = residuals.begin ();
+       residual != residuals.end ();
+       residual++)
+    organic_matter.add (*(*residual));
+}
 
 void 
 ColumnStandard::mix (const Time& time,
@@ -167,10 +161,6 @@ ColumnStandard::mix (const Time& time,
   soil_NH4.mix (soil, soil_water, from, to);
   organic_matter.mix (soil, from, to, penetration);
 }
-
-void 
-ColumnStandard::kill_all (const Time& time)
-{ vegetation.kill_all (name, time, soil, organic_matter, bioclimate); }
 
 void 
 ColumnStandard::swap (const Time& time, double from, double middle, double to)
@@ -229,7 +219,8 @@ ColumnStandard::tick (const Time& time, const Weather* global_weather)
   IM soil_top_conc;
   soil_top_conc.NO3 = soil_NO3.C (0) / 10.0; // [g/cm^3] -> [g/cm^2/mm]
   soil_top_conc.NH4 = soil_NH4.C (0) / 10.0; // [g/cm^3] -> [g/cm^2/mm]
-  surface.mixture (soil_top_conc, soil_chemicals);
+  surface.mixture (soil_top_conc);
+  surface.mixture (soil_chemicals);
   soil_water.macro_tick (soil, surface);
 
   bioclimate.tick (surface, my_weather, 
@@ -246,7 +237,7 @@ ColumnStandard::tick (const Time& time, const Weather* global_weather)
   // Transport.
   soil_heat.tick (time, soil, soil_water, surface, my_weather);
   soil_water.tick (soil, surface, groundwater);
-  soil_chemicals.tick (soil, soil_water, soil_heat, organic_matter,
+  soil_chemicals.tick (soil, soil_water, soil_heat, &organic_matter,
 		       surface.chemicals_down ());
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().NO3);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().NH4);

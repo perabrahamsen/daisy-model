@@ -5,6 +5,7 @@
 
 #include "time.h"
 #include "librarian.h"
+#include <vector>
 
 struct Log;
 struct Time;
@@ -22,6 +23,7 @@ struct SoilNH4;
 struct SoilNO3;
 struct Column;
 struct Harvest;
+struct AM;
 
 class Crop 
 {
@@ -54,19 +56,19 @@ public:
   // Simulation.
 public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&,
-		     OrganicMatter&, const SoilHeat&, const SoilWater&,
-		     SoilNH4&, SoilNO3&) = 0;
+		     OrganicMatter*, const SoilHeat&, const SoilWater&,
+		     SoilNH4*, SoilNO3*) = 0;
   virtual const Harvest& harvest (const string& column_name,
 				  const Time&, const Geometry&, 
-				  OrganicMatter&,
 				  Bioclimate& bioclimate,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
 				  double sorg_harvest,
-				  bool kill_off) = 0;
-  void kill (const string&, const Time&, const Geometry&, OrganicMatter&,
-	     Bioclimate&);
+				  bool kill_off,
+				  vector<AM*>& residuals) = 0;
+  void kill (const string&, const Time&, const Geometry&, Bioclimate&,
+	     vector<AM*>&);
   virtual void output (Log&) const = 0;
   
   // Queries.
@@ -81,7 +83,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual void initialize (const Geometry&, const OrganicMatter&) = 0;
+  virtual void initialize (const Geometry&, const OrganicMatter&);
+  virtual void initialize (const Geometry&) = 0;
 protected:
   Crop (const AttributeList& al);
 public:

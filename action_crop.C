@@ -314,16 +314,9 @@ ActionCrop::Annual::doIt (Daisy& daisy, const string& name)
       const double stem = remove_residuals ? 1.0 : 0.0;
       const double leaf = remove_residuals ? 1.0 : 0.0;
       const double sorg = (1.0 - loss);
-      vector<const Harvest*> entry
-	= daisy.field.harvest (daisy.time, "all", stub, stem, leaf, sorg);
-      daisy.harvest.insert (daisy.harvest.end (),
-			    entry.begin (), entry.end ());
-      for (unsigned int i = 0; i < entry.size (); i++)
-	COUT << " [Annual harvest of " << entry[i]->crop << " at "
-	     << entry[i]->column << " (" 
-	     << (entry[i]->stem_DM + entry[i]->leaf_DM 
-		 + entry[i]->sorg_DM) * 0.01
-	     << " ton DM/ha)]\n";
+      daisy.field.harvest (daisy.time, "all", stub, stem, leaf, sorg, 
+			   daisy.harvest);
+      COUT << " [Annual harvest of " << name << "]\n";
       done = true;
       return true;
     }
@@ -376,16 +369,9 @@ ActionCrop::Perennial::harvest (Daisy& daisy)
   const double stem = 1.0;
   const double leaf = 1.0;
   const double sorg = 1.0;
-  vector<const Harvest*> entry
-    = daisy.field.harvest (daisy.time, "all", stub, stem, leaf, sorg);
-  daisy.harvest.insert (daisy.harvest.end (),
-			entry.begin (), entry.end ());
-  for (unsigned int i = 0; i < entry.size (); i++)
-    COUT << " [Perennial harvest of " << entry[i]->crop << " at " 
-	 << entry[i]->column << " (" 
-	 << (entry[i]->stem_DM + entry[i]->leaf_DM
-	     + entry[i]->sorg_DM) * 0.01
-	 << " ton DM/ha)]\n";
+  daisy.field.harvest (daisy.time, "all", stub, stem, leaf, sorg, 
+		       daisy.harvest);
+  COUT << " [Perennial harvest]\n";
 }
 
 bool

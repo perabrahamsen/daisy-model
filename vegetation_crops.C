@@ -2,6 +2,7 @@
 
 #include "vegetation.h"
 #include "crop.h"
+#include "organic_matter.h"
 #include "soil.h"
 #include "plf.h"
 #include "mathlib.h"
@@ -79,23 +80,25 @@ struct VegetationCrops : public Vegetation
 	     const SoilWater& soil_water,
 	     SoilNH4& soil_NH4,
 	     SoilNO3& soil_NO3);
+  void tick (const Time& time,
+	     const Bioclimate& bioclimate,
+	     const Soil& soil,
+	     const SoilHeat& soil_heat,
+	     const SoilWater& soil_water);
   void reset_canopy_structure ();
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water);
   void force_production_stress  (double pstress);
-  void kill_all (const string&, const Time&, const Geometry&, OrganicMatter&,
-		 Bioclimate&);
-  vector<const Harvest*> harvest (const string& column_name,
-				  const string& crop_name,
-				  const Time&, const Geometry&, 
-				  OrganicMatter&,
-				  Bioclimate&,
-				  double stub_length,
-				  double stem_harvest,
-				  double leaf_harvest, 
-				  double sorg_harvest);
+  void kill_all (const string&, const Time&, const Geometry&, 
+		 Bioclimate&, vector<AM*>& residuals);
+  void harvest (const string& column_name, const string& crop_name,
+		const Time&, const Geometry&, Bioclimate&,
+		double stub_length,
+		double stem_harvest, double leaf_harvest, double sorg_harvest,
+		vector<const Harvest*>& harvest, vector<AM*>& residuals);
   void sow (const AttributeList& al, const Geometry&, const OrganicMatter&);
+  void sow (const AttributeList& al, const Geometry&);
   void output (Log&) const;
 
   // Create and destroy.
@@ -163,8 +166,8 @@ VegetationCrops::tick (const Time& time,
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->tick (time, bioclimate, soil, organic_matter, 
-		     soil_heat, soil_water, soil_NH4, soil_NO3);
+      (*crop)->tick (time, bioclimate, soil, &organic_matter, 
+		     soil_heat, soil_water, &soil_NH4, &soil_NO3);
     }
 
   // Make sure the crop which took first this time will be last next.
@@ -178,6 +181,32 @@ VegetationCrops::tick (const Time& time,
   reset_canopy_structure ();
 }
 
+void 
+VegetationCrops::tick (const Time& time,
+		       const Bioclimate& bioclimate,
+		       const Soil& soil,
+		       const SoilHeat& soil_heat,
+		       const SoilWater& soil_water)
+{
+  // Uptake and convertion of matter.
+  for (CropList::iterator crop = crops.begin(); 
+       crop != crops.end(); 
+       crop++)
+    {
+      (*crop)->tick (time, bioclimate, soil, NULL, 
+		     soil_heat, soil_water, NULL, NULL);
+    }
+
+  // Make sure the crop which took first this time will be last next.
+  if (crops.size () > 1U)
+    {
+      crops.push_back (crops.front ());
+      crops.pop_front ();
+    }
+
+  // Reset canopy structure.
+  reset_canopy_structure ();
+}
 
 void 
 VegetationCrops::reset_canopy_structure ()
@@ -297,14 +326,13 @@ VegetationCrops::force_production_stress (double pstress)
 void
 VegetationCrops::kill_all (const string& name, const Time& time, 
 			   const Geometry& geometry, 
-			   OrganicMatter& organic_matter,
-			   Bioclimate& bioclimate)
+			   Bioclimate& bioclimate, vector<AM*>& residuals)
 {
   for (CropList::iterator crop = crops.begin(); 
        crop != crops.end(); 
        crop++)
     {
-      (*crop)->kill (name, time, geometry, organic_matter, bioclimate);
+      (*crop)->kill (name, time, geometry, bioclimate, residuals);
       delete *crop;
     }
   crops.erase (crops.begin (), crops.end ());
@@ -312,31 +340,31 @@ VegetationCrops::kill_all (const string& name, const Time& time,
   reset_canopy_structure ();
 }
 
-vector<const Harvest*>
+void
 VegetationCrops::harvest (const string& column_name,
 			  const string& crop_name,
 			  const Time& time, 
 			  const Geometry& geometry, 
-			  OrganicMatter& organic_matter,
 			  Bioclimate& bioclimate,
 			  double stub_length,
 			  double stem_harvest, double leaf_harvest, 
-			  double sorg_harvest)
+			  double sorg_harvest, 
+			  vector<const Harvest*>& harvest,
+			  vector<AM*>& residuals)
 {
   const bool all = (crop_name == "all");
-  vector<const Harvest*> harvest;
-  
+
   // Harvest all crops of this type.
   for (CropList::iterator crop = crops.begin();
        crop != crops.end();
        crop++)
     if (all || (*crop)->name == crop_name)
       harvest.push_back (&(*crop)->harvest (column_name, time, 
-					    geometry, organic_matter,
+					    geometry, 
 					    bioclimate,
 					    stub_length, stem_harvest,
 					    leaf_harvest, sorg_harvest, 
-					    false));
+					    false, residuals));
 
   // Remove all dead crops.  There has to be a better way.
   bool removed;
@@ -362,9 +390,6 @@ VegetationCrops::harvest (const string& column_name,
 
   // Notify the vegetation.
   reset_canopy_structure ();
-
-  // Return the result.
-  return harvest;
 }
 
 void
@@ -374,6 +399,15 @@ VegetationCrops::sow (const AttributeList& al,
 {
   Crop& crop = Librarian<Crop>::create (al);
   crop.initialize (geometry, organic_matter);
+  crops.push_back (&crop);
+}
+
+void
+VegetationCrops::sow (const AttributeList& al,
+		      const Geometry& geometry)
+{
+  Crop& crop = Librarian<Crop>::create (al);
+  crop.initialize (geometry);
   crops.push_back (&crop);
 }
 

@@ -29,7 +29,7 @@ void
 SoilChemical::decompose (const Soil& soil, 
 			 const SoilWater& soil_water,
 			 const SoilHeat& soil_heat,
-			 const OrganicMatter& organic_matter)
+			 const OrganicMatter* organic_matter)
 {
   assert (decomposed.size () == soil.size ());
 
@@ -67,7 +67,9 @@ SoilChemical::decompose (const Soil& soil,
       const double water_factor 
 	= chemical.decompose_water_factor (soil_water.h (i));
       const double CO2_factor 
-	= chemical.decompose_CO2_factor (organic_matter.CO2 (i));
+	= organic_matter
+	? chemical.decompose_CO2_factor (organic_matter->CO2 (i))
+	: 1.0;
       const double conc_factor
 	= chemical.decompose_conc_factor (C_[i]);
       const double rate

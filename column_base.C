@@ -34,11 +34,31 @@ ColumnBase::irrigate_surface (double flux, const IM&)
   bioclimate.irrigate_surface (flux);
 }
 
+void
+ColumnBase::harvest (const Time& time, const string& crop_name,
+		     double stub_length,
+		     double stem_harvest,
+		     double leaf_harvest, 
+		     double sorg_harvest,
+		     vector<const Harvest*>& harvest)
+{ 
+  vector<AM*> residuals;
+  vegetation.harvest (name, crop_name, time, soil, 
+		      bioclimate,
+		      stub_length, 
+		      stem_harvest, leaf_harvest, sorg_harvest,
+		      harvest, residuals); 
+  add_residuals (residuals);
+}
+
+
 void 
 ColumnBase::mix (const Time& time,
 		 double from, double to, double)
 {
-  kill_all (time);
+  vector<AM*> residuals;
+  vegetation.kill_all (name, time, soil, bioclimate, residuals);
+  add_residuals (residuals);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
   soil_heat.set_energy (soil, soil_water, from, to, energy);

@@ -94,17 +94,18 @@ protected:
   // Simulation.
 public:
   void tick (const Time& time, const Bioclimate&, const Soil&,
-	     OrganicMatter&,
+	     OrganicMatter*,
 	     const SoilHeat&,
 	     const SoilWater&,
-	     SoilNH4&,
-	     SoilNO3&);
+	     SoilNH4*,
+	     SoilNO3*);
   const Harvest& harvest (const string& column_name,
-			  const Time&, const Geometry&, OrganicMatter&,
+			  const Time&, const Geometry&,
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
-			  bool kill_off);
+			  bool kill_off,
+			  vector<AM*>& residuals);
   void output (Log&) const;
 
   double DS () const;
@@ -113,6 +114,7 @@ public:
   // Create and Destroy.
 public:
   void initialize (const Geometry& geometry, const OrganicMatter&);
+  void initialize (const Geometry& geometry);
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
@@ -577,6 +579,15 @@ CropStandard::initialize (const Geometry& geometry,
       assert (var.Prod.AM_root);
       NitContent ();
     }
+}
+
+void
+CropStandard::initialize (const Geometry& geometry)
+{
+  root_system.initialize (geometry.size ());
+
+  if (var.Phenology.DS >= 0)
+    NitContent ();
 }
 
 static struct CropStandardSyntax
@@ -1442,11 +1453,11 @@ void
 CropStandard::tick (const Time& time,
 		    const Bioclimate& bioclimate,
 		    const Soil& soil,
-		    OrganicMatter& organic_matter,
+		    OrganicMatter* organic_matter,
 		    const SoilHeat& soil_heat,
 		    const SoilWater& soil_water,
-		    SoilNH4& soil_NH4,
-		    SoilNO3& soil_NO3)
+		    SoilNH4* soil_NH4,
+		    SoilNO3* soil_NO3)
 {
   // Update partial_soil_temperature and pressure potential.
   var.Phenology.partial_soil_temperature +=
@@ -1472,27 +1483,50 @@ CropStandard::tick (const Time& time,
 	  NitContent ();
 	  root_system.tick (soil, soil_heat, var.Prod.WRoot, 0.0);
 
-	  if (!var.Prod.AM_root)
-	    var.Prod.AM_root
-	      = &AM::create (soil, time, par.Harvest.Root,
-			     name, "root", AM::Locked);
-	  if (!var.Prod.AM_leaf)
-	    var.Prod.AM_leaf
-	      = &AM::create (soil, time, par.Harvest.Dead,
-			     name, "dead", AM::Locked);
+	  if (organic_matter)
+	    {
+	      if (!var.Prod.AM_root)
+		var.Prod.AM_root
+		  = &AM::create (soil, time, par.Harvest.Root,
+				 name, "root", AM::Locked);
+	      if (!var.Prod.AM_leaf)
+		var.Prod.AM_leaf
+		  = &AM::create (soil, time, par.Harvest.Dead,
+				 name, "dead", AM::Locked);
 
-	  organic_matter.add (*var.Prod.AM_root);
-	  organic_matter.add (*var.Prod.AM_leaf);
+	      organic_matter->add (*var.Prod.AM_root);
+	      organic_matter->add (*var.Prod.AM_leaf);
+	    }
+	  else
+	    {
+	      if (!var.Prod.AM_root)
+		var.Prod.AM_root
+		  = &AM::create (soil, time, par.Harvest.Root,
+				 name, "root", AM::Unlocked);
+	      if (!var.Prod.AM_leaf)
+		var.Prod.AM_leaf
+		  = &AM::create (soil, time, par.Harvest.Dead,
+				 name, "dead", AM::Unlocked);
+	    }
 	}
       return;
     }
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
 
-  const double water_stress = root_system.water_stress;
-  NitrogenUptake (time.hour (),
-		  soil, soil_water, soil_NH4,soil_NO3);
+  if (soil_NO3)
+    {
+      assert (soil_NH4);
+      NitrogenUptake (time.hour (),
+		      soil, soil_water, *soil_NH4, *soil_NO3);
+    }
+  else
+    {
+      assert (!soil_NH4);
+      var.Prod.NCrop = var.CrpAux.PtNCnt;
+    }  
   const double nitrogen_stress = root_system.nitrogen_stress;
+  const double water_stress = root_system.water_stress;
 
   if (bioclimate.PAR (bioclimate.NumberOfIntervals () - 1) > 0)
     {
@@ -1527,13 +1561,13 @@ const Harvest&
 CropStandard::harvest (const string& column_name,
 		       const Time& time,
 		       const Geometry& geometry,
-		       OrganicMatter& organic_matter,
 		       Bioclimate& bioclimate,
 		       double stub_length,
 		       double stem_harvest,
 		       double leaf_harvest,
 		       double sorg_harvest,
-		       bool kill_off)
+		       bool kill_off,
+		       vector<AM*>& residuals)
 {
   NitContent();
   const Parameters::HarvestPar& Hp = par.Harvest;
@@ -1642,7 +1676,7 @@ CropStandard::harvest (const string& column_name,
 	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
 	  assert (C == 0.0 || N > 0.0);
 	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
-	  organic_matter.add (am);
+	  residuals.push_back (&am);
 	  Prod.C_AM += C;
 	  Prod.N_AM += N;
 	}
@@ -1659,7 +1693,7 @@ CropStandard::harvest (const string& column_name,
 	  AM& am = AM::create (geometry, time, Stem, name, "stem");
 	  am.add (C * m2_per_cm2, N * m2_per_cm2);
 	  assert (C == 0.0 || N > 0.0);
-	  organic_matter.add (am);
+	  residuals.push_back (&am);
 	}
       if (stem_harvest < 1.0 && WDead > 0.0)
 	{
@@ -1667,7 +1701,7 @@ CropStandard::harvest (const string& column_name,
           const double N = NDead * (1.0 - stem_harvest);
 	  if (!var.Prod.AM_leaf)
 	    var.Prod.AM_leaf
-	      = &AM::create (geometry, time, Dead, name, "dead", AM::Locked);
+	      = &AM::create (geometry, time, Dead, name, "dead", AM::Unlocked);
 	  var.Prod.AM_leaf->add (C * m2_per_cm2, N * m2_per_cm2);
 	  assert (C == 0.0 || N > 0.0);
 	}
@@ -1678,7 +1712,7 @@ CropStandard::harvest (const string& column_name,
 	  AM& am = AM::create (geometry, time, Leaf, name, "leaf");
 	  assert (C == 0.0 || N > 0.0);
 	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
-	  organic_matter.add (am);
+	  residuals.push_back (&am);
 	}
       if (sorg_harvest < 1.0 && WSOrg > 0.0)
 	{
@@ -1687,14 +1721,13 @@ CropStandard::harvest (const string& column_name,
 	  AM& am = AM::create (geometry, time, SOrg, name, "sorg");
 	  assert (C == 0.0 || N > 0.0);
 	  am.add ( C * m2_per_cm2, N * m2_per_cm2);
-	  organic_matter.add (am);
+	  residuals.push_back (&am);
 	}
 
       // Update and unlock locked AMs.
       if (!var.Prod.AM_root)
 	var.Prod.AM_root = &AM::create (geometry, time, par.Harvest.Root,
-					name, "root", AM::Locked);
-
+					name, "root", AM::Unlocked);
       if (geometry.total (density) > 0.0)
 	var.Prod.AM_root->add (geometry,
 			       WRoot * C_Root * m2_per_cm2,
@@ -1704,12 +1737,18 @@ CropStandard::harvest (const string& column_name,
 	var.Prod.AM_root->add (WRoot * C_Root * m2_per_cm2,
 			       NRoot * m2_per_cm2);
       assert (WRoot == 0.0 || NRoot > 0.0);
-      var.Prod.AM_root->unlock ();
+      if (var.Prod.AM_root->locked ())
+	var.Prod.AM_root->unlock (); // Stored in organic matter.
+      else
+	residuals.push_back (var.Prod.AM_root);	// No organic matter.
       var.Prod.AM_root = NULL;
 
       if (var.Prod.AM_leaf)
 	{
-	  var.Prod.AM_leaf->unlock ();
+	  if (var.Prod.AM_leaf->locked ()) 
+	    var.Prod.AM_leaf->unlock (); // Stored in organic matter.
+	  else 
+	    residuals.push_back (var.Prod.AM_leaf);// No organic matter.
 	  var.Prod.AM_leaf = NULL;
 	}
     }

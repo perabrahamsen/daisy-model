@@ -31,8 +31,8 @@ public:
   const IM& matter_flux ();
   const Chemicals&  chemicals_down () const;
 
-  void mixture (const IM& soil_im /* g/cm^2/mm */,
-		const SoilChemicals& soil_chemicals);
+  void mixture (const IM& soil_im /* g/cm^2/mm */);
+  void mixture (const SoilChemicals& soil_chemicals);
   void update_water (const Soil&, const vector<double>& S_,
 		     vector<double>& h_, vector<double>& Theta_,
 		     vector<double>& q, const vector<double>& q_p);

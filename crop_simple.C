@@ -94,17 +94,17 @@ public:
   // Simulation.
 public:
   void tick (const Time& time, const Bioclimate&, const Soil&,
-	     OrganicMatter&,
+	     OrganicMatter*,
 	     const SoilHeat&,
 	     const SoilWater&,
-	     SoilNH4&,
-	     SoilNO3&);
+	     SoilNH4*,
+	     SoilNO3*);
   const Harvest& harvest (const string& column_name,
-			  const Time&, const Geometry&, OrganicMatter&,
+			  const Time&, const Geometry&, 
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
-			  bool kill_off);
+			  bool kill_off, vector<AM*>& residuals);
   void output (Log&) const;
 
   double DS () const;
@@ -112,7 +112,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry, const OrganicMatter&);
+  void initialize (const Geometry& geometry);
   CropSimple (const AttributeList& vl);
   ~CropSimple ();
 };
@@ -142,11 +142,11 @@ void
 CropSimple::tick (const Time& time,
 		  const Bioclimate& bioclimate,
 		  const Soil& soil,
-		  OrganicMatter& /* organic_matter */,
+		  OrganicMatter* /* organic_matter */,
 		  const SoilHeat& soil_heat,
 		  const SoilWater& soil_water,
-		  SoilNH4& soil_NH4,
-		  SoilNO3& soil_NO3)
+		  SoilNH4* soil_NH4,
+		  SoilNO3* soil_NO3)
 {
   // Growth
   if (time.month () == spring_mm
@@ -209,9 +209,18 @@ CropSimple::tick (const Time& time,
     {
       N_demand = N_potential / (1.0 + ((N_potential - N_b) / N_b)
 				* exp (- N_c * (T - T_emergence)));
-      N_actual += root_system.nitrogen_uptake (soil, soil_water, 
-					       soil_NH4, soil_NO3,
-					       N_demand - N_actual);
+      if (soil_NO3)
+	{
+	  assert (soil_NH4);
+	  N_actual += root_system.nitrogen_uptake (soil, soil_water, 
+						   *soil_NH4, *soil_NO3,
+						   N_demand - N_actual);
+	}
+      else
+	{
+	  assert (!soil_NH4);
+	  N_actual = N_demand;
+	}
     }
 }
 
@@ -219,13 +228,13 @@ const Harvest&
 CropSimple::harvest (const string& column_name,
 		     const Time& time,
 		     const Geometry& geometry,
-		     OrganicMatter& organic_matter,
 		     Bioclimate& bioclimate,
 		     double /* stub_length */,
 		     double /* stem_harvest */,
 		     double /* leaf_harvest */,
 		     double /* sorg_harvest */,
-		     bool /* kill_off */)
+		     bool /* kill_off */,
+		     vector<AM*>& residuals)
 {
   dead = true;
 
@@ -241,7 +250,7 @@ CropSimple::harvest (const string& column_name,
 	      this_far * WRoot * 0.420 * m2_per_cm2,
 	      this_far * NRoot * m2_per_cm2,
 	      root_system.Density);
-      organic_matter.add (am);
+      residuals.push_back (&am);
     }
 
   // Yield.
@@ -285,7 +294,7 @@ CropSimple::DM () const
 { throw ("Can't take DM of simple crop model"); }
 
 void
-CropSimple::initialize (const Geometry& geometry, const OrganicMatter&)
+CropSimple::initialize (const Geometry& geometry)
 {
   root_system.initialize (geometry.size ());
 }

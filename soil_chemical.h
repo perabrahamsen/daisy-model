@@ -31,7 +31,7 @@ private:
 public:
   void uptake (const Soil&, const SoilWater&);
   void decompose (const Soil&, const SoilWater&, const SoilHeat&, 
-		  const OrganicMatter&);
+		  const OrganicMatter*);
   void output (Log&) const;
   
 public:

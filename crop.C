@@ -37,11 +37,10 @@ Crop::albedo () const
 
 void
 Crop::kill (const string& name, const Time& time, const Geometry& geometry,
-	    OrganicMatter& organic_matter, Bioclimate& bioclimate)
+	    Bioclimate& bioclimate, vector<AM*>& residuals)
 { 
-  Chemicals chemicals;
-  harvest (name, time, geometry, organic_matter, bioclimate,
-	   0.0, 0.0, 0.0, 0.0, true); 
+  harvest (name, time, geometry, bioclimate,
+	   0.0, 0.0, 0.0, 0.0, true, residuals); 
 }
 
 void 
@@ -95,6 +94,10 @@ Crop::default_AOM ()
   return *AOM;
 }
 
+
+void
+Crop::initialize (const Geometry& geometry, const OrganicMatter&)
+{ initialize (geometry); }
 
 Crop::Crop (const AttributeList& al)
   : alist (al),

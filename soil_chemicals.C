@@ -30,7 +30,7 @@ struct SoilChemicals::Implementation
 
   // Simulation
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
-	     const OrganicMatter&, const Chemicals& flux_in);
+	     const OrganicMatter*, const Chemicals& flux_in);
   void mixture (Chemicals& storage, Chemicals& down, 
 		double pond, double rate) const;
   void output (Log&) const;
@@ -71,7 +71,7 @@ void
 SoilChemicals::Implementation::tick (const Soil& soil, 
 				     const SoilWater& soil_water,
 				     const SoilHeat& soil_heat,
-				     const OrganicMatter& organic_matter,
+				     const OrganicMatter* organic_matter,
 				     const Chemicals& flux_in)
 { 
   // Allow `flux_in' to create new solutes.
@@ -247,7 +247,7 @@ SoilChemicals::Implementation::~Implementation ()
 void 
 SoilChemicals::tick (const Soil& soil, const SoilWater& soil_water,
 		     const SoilHeat& soil_heat, 
-		     const OrganicMatter& organic_matter,
+		     const OrganicMatter* organic_matter,
 		     const Chemicals& flux_in)
 { impl.tick (soil, soil_water, soil_heat, organic_matter, flux_in); }
 

@@ -47,8 +47,8 @@ struct Surface::Implementation
   // Functions.
   void ridge (const Soil& soil, const SoilWater& soil_water,
 	      const AttributeList&);
-  void mixture (const IM& soil_im /* g/cm^2/mm */,
-		const SoilChemicals& soil_chemicals);
+  void mixture (const IM& soil_im /* g/cm^2/mm */);
+  void mixture (const SoilChemicals& soil_chemicals);
   bool flux_top () const;
   void  flux_top_on () const;
   bool exfiltrate (double water);
@@ -96,17 +96,20 @@ Surface::unridge ()
 }
 
 void
-Surface::mixture (const IM& soil_im /* g/cm^2/mm */,
-		  const SoilChemicals& soil_chemicals)
+Surface::mixture (const IM& soil_im /* g/cm^2/mm */)
 {
-  impl.mixture (soil_im, soil_chemicals);
+  impl.mixture (soil_im);
 }
 
 void
-Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */,
-				  const SoilChemicals& soil_chemicals)
+Surface::mixture (const SoilChemicals& soil_chemicals)
 {
-  // Nitrogen.
+  impl.mixture (soil_chemicals);
+}
+
+void
+Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */)
+{
   if (!total_matter_flux && pond > 1e-6 && R_mixing > 0.0)
     {
       // [g/cm^2/h] = ([g/cm^2/mm] - [g/cm^2] / [mm]) / [h/mm]
@@ -118,8 +121,11 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */,
     }
   else
     im_flux.clear ();
+}
 
-  // Chemicals.
+void
+Surface::Implementation::mixture (const SoilChemicals& soil_chemicals)
+{
   if (chemicals_can_enter_soil)
     {
       chemicals_out.clear ();

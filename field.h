@@ -44,13 +44,14 @@ public:
   void fertilize (const AttributeList&);
   void fertilize (const IM&, double from, double to); // Mineral.
   void fertilize (const IM&);
-  vector<const Harvest*> harvest (const Time&, const string& name,
-					  double stub_length, 
-					  double stem_harvest, 
-					  double leaf_harvest, 
-					  double sorg_harvest);
+  void harvest (const Time&, const string& name,
+		double stub_length, 
+		double stem_harvest, 
+		double leaf_harvest, 
+		double sorg_harvest,
+		vector<const Harvest*>&);
   void mix (const Time&,
-		    double from, double to, double penetration = 1.0);
+	    double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]

@@ -27,11 +27,12 @@ struct Field::Implementation
   void fertilize (const AttributeList&);
   void fertilize (const IM&, double from, double to); // Mineral.
   void fertilize (const IM&);
-  vector<const Harvest*> harvest (const Time&, const string& name,
-					  double stub_length, 
-					  double stem_harvest, 
-					  double leaf_harvest, 
-					  double sorg_harvest);
+  void harvest (const Time&, const string& name,
+		double stub_length, 
+		double stem_harvest, 
+		double leaf_harvest, 
+		double sorg_harvest,
+		vector<const Harvest*>&);
   void mix (const Time&,
 		    double from, double to, double penetration);
   void swap (const Time&, double from, double middle, double to);
@@ -219,32 +220,26 @@ Field::Implementation::fertilize (const IM& im)
     (*i)->fertilize (im);
 }
 
-vector<const Harvest*> 
+void
 Field::Implementation::harvest (const Time& time, const string& name,
 				double stub_length, 
 				double stem_harvest, 
 				double leaf_harvest, 
-				double sorg_harvest)
+				double sorg_harvest,
+				vector<const Harvest*>& total)
 {
   if (selected)
-    return selected->harvest (time, name,
-			      stub_length,
-			      stem_harvest, leaf_harvest, sorg_harvest);
+    selected->harvest (time, name,
+		       stub_length,
+		       stem_harvest, leaf_harvest, sorg_harvest, total);
   else
     {
-      vector<const Harvest*> total;
       for (ColumnList::iterator i = columns.begin ();
 	   i != columns.end ();
 	   i++)
-	{
-	  vector<const Harvest*> entry 
-	    = (*i)->harvest (time, name,
-			     stub_length,
-			     stem_harvest, leaf_harvest, sorg_harvest);
-	  
-	  total.insert (total.end (), entry.begin (), entry.end ());
-	}
-      return total;
+	(*i)->harvest (time, name,
+		       stub_length,
+		       stem_harvest, leaf_harvest, sorg_harvest, total);
     }
 }
 
@@ -535,15 +530,16 @@ void
 Field::fertilize (const IM& im)
 { impl.fertilize (im); }
 
-vector<const Harvest*> 
+void
 Field::harvest (const Time& time, const string& name,
 		double stub_length, 
 		double stem_harvest, 
 		double leaf_harvest, 
-		double sorg_harvest)
-{ return impl.harvest (time, name,
-		       stub_length,
-		       stem_harvest, leaf_harvest, sorg_harvest); }
+		double sorg_harvest,
+		vector<const Harvest*>& total)
+{ impl.harvest (time, name,
+		stub_length,
+		stem_harvest, leaf_harvest, sorg_harvest, total); }
 
 void 
 Field::mix (const Time& time,

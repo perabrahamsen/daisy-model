@@ -32,11 +32,12 @@ public:
   virtual void fertilize (const AttributeList&) = 0;
   virtual void fertilize (const IM&, double from, double to) = 0; // Mineral.
   virtual void fertilize (const IM&) = 0;
-  virtual vector<const Harvest*> harvest (const Time&, const string& name,
-					  double stub_length, 
-					  double stem_harvest, 
-					  double leaf_harvest, 
-					  double sorg_harvest) = 0;
+  virtual void harvest (const Time&, const string& name,
+			double stub_length, 
+			double stem_harvest, 
+			double leaf_harvest, 
+			double sorg_harvest, 
+			vector<const Harvest*>& harvest) = 0;
   virtual void mix (const Time&,
 		    double from, double to, double penetration = 1.0) = 0;
   virtual void swap (const Time&, double from, double middle, double to) = 0;

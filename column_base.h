@@ -17,6 +17,7 @@
 #include "time.h"
 
 struct IM;
+struct AM;
 
 class ColumnBase : public Column
 {
@@ -39,8 +40,14 @@ public:
   void irrigate_surface (double flux, double temp, const IM&);
   void irrigate_top (double flux, const IM&);
   void irrigate_surface (double flux, const IM&);
+  void harvest (const Time& time, const string& crop_name,
+		double stub_length,
+		double stem_harvest,
+		double leaf_harvest, 
+		double sorg_harvest,
+		vector<const Harvest*>& harvest);
+  virtual void add_residuals (vector<AM*>&) = 0;
   void mix (const Time&, double from, double to, double penetration = 1.0);
-  virtual void kill_all (const Time& time) = 0;
   void swap (const Time&, double from, double middle, double to);
   void set_porosity (double at, double Theta);
   void set_heat_source (double at, double value); // [W/m^2]

@@ -17,6 +17,7 @@ class SoilNH4;
 class SoilNO3;
 class PLF;
 class Harvest;
+class AM;
 
 class Vegetation
 { 
@@ -49,24 +50,29 @@ public:
   virtual void tick (const Time&, const Bioclimate&, const Soil&,
 		     OrganicMatter&, const SoilHeat&, const SoilWater&,
 		     SoilNH4&, SoilNO3&) = 0; // Allow plants to grow (hourly).
+  virtual void tick (const Time&, const Bioclimate&, const Soil&,
+		     const SoilHeat&, const SoilWater&) = 0;
   virtual double transpiration (// Actual trans. [mm/h]
 				double potential_transpiration,	
 				double canopy_evaporation,
 				const Soil& soil, SoilWater& soil_water) = 0;
   virtual void force_production_stress  (double pstress);
   virtual void kill_all (const string&, const Time&, const Geometry&,
-			 OrganicMatter&, Bioclimate&) = 0;
-  virtual vector<const Harvest*> harvest (const string& column_name,
-					  const string& crop_name,
-					  const Time&, const Geometry&, 
-					  OrganicMatter&,
-					  Bioclimate& bioclimate,
-					  double stub_length,
-					  double stem_harvest,
-					  double leaf_harvest, 
-					  double sorg_harvest) = 0;
+			 Bioclimate&, vector<AM*>& residuals) = 0;
+  virtual void harvest (const string& column_name,
+			const string& crop_name,
+			const Time&, const Geometry&, 
+			Bioclimate& bioclimate,
+			double stub_length,
+			double stem_harvest,
+			double leaf_harvest, 
+			double sorg_harvest,
+			vector<const Harvest*>& harvest,
+			vector<AM*>& residuals) = 0;
   virtual void sow (const AttributeList& al,
 		    const Geometry&, const OrganicMatter&) = 0;
+  virtual void sow (const AttributeList& al,
+		    const Geometry&) = 0;
   virtual void output (Log&) const;
 
   // Create and Destroy.

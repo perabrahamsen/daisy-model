@@ -1,4 +1,42 @@
+2000-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.38 released.
+
+2000-09-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_chemical.C (decompose): Made `organic_matter' optional.
+	* soil_chemicals.C (tick): Ditto.
+
+	* crop_sold.C, crop_old.C, crop_simple.C, crop_std.C, crop.h
+	(tick): Made organic matter and nitrogen optional. 
+	* vegetation_permanent.C, vegetation_crops.C, vegetation.h (tick):
+	Version without organic matter or nitrogen.
+
+	* crop_std.C (harvest): Make dead leafs and dead root residuals if
+	crop hasn't emerged.
+
 2000-08-31  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* field.C, field.h, column_base.C, column.h, action_harvest.C,
+	action_crop.C (harvest):  Take harvest as argument, instead of
+	returning it.
+
+	* crop.h, crop.C, crop_std.C, crop_old.C, crop_sold.C,
+	crop_simple.C (harvest): Take `residuals' argument instead of
+	`organic_matter'. 
+	* vegetation_crops.C (harvest): Update caller.
+	* crop.h, crop.C (kill): Update caller.
+	* vegetation_crops.C (kill_all): Update caller.
+
+	* surface.C, surface.h (mixture): Split into two.
+
+	* crop.h, crop.C, crop_std.C, crop_old.C, crop_sold.C,
+	crop_simple.C (initialize): Version without `organic_matter'
+	parameter. 
+	* vegetation_permanent.C, vegetation_crops, vegetation.h (sow):
+	Version without `organic_matter' parameter.
+
+	* lib/log.dai ("Surface Water Balance"): Log `production_stress'.
 
 	* Version 1.37 released.
 

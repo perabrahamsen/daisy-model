@@ -78,18 +78,26 @@ struct VegetationPermanent : public Vegetation
 	     const SoilWater& soil_water,
 	     SoilNH4& soil_NH4,
 	     SoilNO3& soil_NO3);
+  void tick (const Time& time,
+	     const Bioclimate& bioclimate,
+	     const Soil& soil,
+	     const SoilHeat& soil_heat,
+	     const SoilWater& soil_water);
   double transpiration (double potential_transpiration,
 			double canopy_evaporation,
 			const Soil& soil, SoilWater& soil_water);
-  void kill_all (const string&, const Time&, const Geometry&, OrganicMatter&,
-		 Bioclimate&)
+  void kill_all (const string&, const Time&, const Geometry&, Bioclimate&,
+		 vector<AM*>&)
   { }
-  vector<const Harvest*> harvest (const string&, const string&,
-				  const Time&, const Geometry&, 
-				  OrganicMatter&, Bioclimate&,
-				  double, double, double, double)
-  { return vector<const Harvest*> (); }
+  void harvest (const string&, const string&,
+		const Time&, const Geometry&, Bioclimate&,
+		double, double, double, double, 
+		vector<const Harvest*>&,
+		vector<AM*>&)
+  { }
   void sow (const AttributeList&, const Geometry&, const OrganicMatter&)
+  { throw "Can't sow on permanent vegetation"; }
+  void sow (const AttributeList&, const Geometry&)
   { throw "Can't sow on permanent vegetation"; }
   void output (Log&) const;
 
@@ -104,7 +112,7 @@ VegetationPermanent::tick (const Time& time,
 			   const Bioclimate&,
 			   const Soil& soil,
 			   OrganicMatter&,
-			   const SoilHeat&,
+			   const SoilHeat&x,
 			   const SoilWater& soil_water,
 			   SoilNH4& soil_NH4,
 			   SoilNO3& soil_NO3)
@@ -117,7 +125,7 @@ VegetationPermanent::tick (const Time& time,
   canopy.LAIvsH.add (0.0, 0.0);
   canopy.LAIvsH.add (canopy.Height, canopy.CAI);
   HvsLAI_ = canopy.LAIvsH.inverse ();
-  
+
   // Nitrogen uptake.
   N_demand = canopy.CAI * N_per_LAI;
   if (N_actual < -1e10)
@@ -148,6 +156,21 @@ VegetationPermanent::tick (const Time& time,
   N_actual += N_uptake - N_litter;
 }
 
+void
+VegetationPermanent::tick (const Time& time,
+			   const Bioclimate&,
+			   const Soil&,
+			   const SoilHeat&,
+			   const SoilWater&)
+{
+  canopy.CAI = LAIvsDAY (time.yday ());
+  cover_ =  1.0 - exp (-(canopy.EPext * canopy.CAI));
+  canopy.LAIvsH.clear ();
+  canopy.LAIvsH.add (0.0, 0.0);
+  canopy.LAIvsH.add (canopy.Height, canopy.CAI);
+  HvsLAI_ = canopy.LAIvsH.inverse ();
+}
+  
 double
 VegetationPermanent::transpiration (double potential_transpiration,
 				    double canopy_evaporation,

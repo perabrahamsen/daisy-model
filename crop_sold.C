@@ -77,17 +77,18 @@ protected:
   // Simulation.
 public:
   void tick (const Time& time, const Bioclimate&, const Soil&,
-	     OrganicMatter&,
+	     OrganicMatter*,
 	     const SoilHeat&,
 	     const SoilWater&, 
-	     SoilNH4&,
-	     SoilNO3&);
+	     SoilNH4*,
+	     SoilNO3*);
   const Harvest& harvest (const string& column_name, const Time&,
-			  const Geometry& geometry, OrganicMatter&,
+			  const Geometry& geometry, 
 			  Bioclimate& bioclimate,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
-			  bool kill_off);
+			  bool kill_off,
+			  vector<AM*>& residuals);
   void output (Log&) const;
 
   double DS () const;
@@ -95,7 +96,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Geometry& geometry, const OrganicMatter&);
+  void initialize (const Geometry& geometry);
   CropSold (const AttributeList& vl);
   ~CropSold ();
 };
@@ -585,7 +586,7 @@ CropSold::Variables::~Variables ()
 { }
 
 void
-CropSold::initialize (const Geometry& geometry, const OrganicMatter&)
+CropSold::initialize (const Geometry& geometry)
 {
   unsigned int size = geometry.size ();
 
@@ -1675,11 +1676,11 @@ void
 CropSold::tick (const Time& time,
 		const Bioclimate& bioclimate,
 		const Soil& soil,
-		OrganicMatter&,
+		OrganicMatter*,
 		const SoilHeat& soil_heat,
 		const SoilWater& soil_water, 
-		SoilNH4& soil_NH4,
-		SoilNO3& soil_NO3)
+		SoilNH4* soil_NH4,
+		SoilNO3* soil_NO3)
 {
   // Clear log.
   fill (var.RootSys.NO3Extraction.begin (), 
@@ -1714,8 +1715,17 @@ CropSold::tick (const Time& time,
     }
   if (var.Phenology.DS <= 0 || var.Phenology.DS >= 2)
     return;
-  NitrogenUptake (time.hour (), 
-		  soil, soil_water, soil_NH4,soil_NO3);
+  if (soil_NO3)
+    {
+      assert (soil_NH4);
+      NitrogenUptake (time.hour (), 
+		      soil, soil_water, *soil_NH4, *soil_NO3);
+    }
+  else
+    {
+      assert (!soil_NH4);
+      var.Prod.NCrop = var.CrpAux.PtNCnt;
+    }
   if (time.hour () != 0)
     return;
   double& water_stress = var.RootSys.water_stress;
@@ -1784,11 +1794,10 @@ CropSold::tick (const Time& time,
 const Harvest&
 CropSold::harvest (const string& column_name,
 		   const Time& time, const Geometry& geometry,
-		   OrganicMatter& organic_matter,
 		   Bioclimate&,
 		   double,
 		   double, double leaf_harvest, double sorg_harvest, 
-		   bool)
+		   bool, vector<AM*>& residuals)
 {
   const Parameters::HarvestPar& Hp = par.Harvest;
   Variables::RecProd& Prod = var.Prod;
@@ -1846,14 +1855,14 @@ CropSold::harvest (const string& column_name,
       AM& am = AM::create (geometry, time, Leaf, name, "leaf");
       am.add (WLeaf * C_Leaf * (1.0 - leaf_harvest) * m2_per_cm2, 
 	      NLeaf * (1.0 - leaf_harvest) * m2_per_cm2);
-      organic_matter.add (am);
+      residuals.push_back (&am);
     }
   if (sorg_harvest < 1.0 && WSOrg > 0.0)
     {
       AM& am = AM::create (geometry, time, SOrg, name, "sorg");
       am.add (WSOrg * C_SOrg * (1.0 - sorg_harvest) * m2_per_cm2,
 	      NSOrg * (1.0 - sorg_harvest) * m2_per_cm2);
-      organic_matter.add (am);
+      residuals.push_back (&am);
     }
   if (WRoot > 0.0)
     {
@@ -1866,7 +1875,7 @@ CropSold::harvest (const string& column_name,
       else
 	am.add (WRoot * C_Root * m2_per_cm2,
 		NRoot * m2_per_cm2);
-      organic_matter.add (am);
+      residuals.push_back (&am);
     }
   Chemicals chemicals;
   return *new Harvest (column_name, time, name, 
