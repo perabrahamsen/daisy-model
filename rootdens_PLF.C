@@ -24,11 +24,20 @@
 #include "geometry.h"
 #include "plf.h"
 #include "check.h"
+#include "vcheck.h"
 #include "mathlib.h"
 
 struct Rootdens_PLF : public Rootdens
 {
   // Parameters.
+  // Check.
+  struct Check_Indexes : public VCheck
+  {
+    // Check that the indexes are monotonically increasing.
+    void check (const Syntax& syntax, const AttributeList& alist, 
+		const string& key) const throw (string);
+  };
+
   struct Entry
   {
     // Parameters.
@@ -37,7 +46,6 @@ struct Rootdens_PLF : public Rootdens
     
     // Create and Destroy.
     static void load_syntax (Syntax&, AttributeList&);
-    static bool check_alists (const vector<AttributeList*>&, Treelog& err);
     Entry (const AttributeList&);
     ~Entry ();
   };
@@ -54,10 +62,11 @@ struct Rootdens_PLF : public Rootdens
   ~Rootdens_PLF ();
 };
 
+static Rootdens_PLF::Check_Indexes check_indexes;
+
 void 
 Rootdens_PLF::Entry::load_syntax (Syntax& syntax, AttributeList&)
 {
-  syntax.add_checks (check_alists);
   syntax.add ("index", Syntax::Unknown (), Check::none (), Syntax::Const, 
 	      "Index for specifying root density.");
   syntax.add ("density", Syntax::Unknown (), Syntax::None (), Syntax::Const, "\
@@ -65,34 +74,35 @@ Relative root density as a function of root depth .");
   syntax.order ("index", "density");
 }
 
-bool 
-Rootdens_PLF::Entry::check_alists (const vector<AttributeList*>& alists,
-				   Treelog& err)
+void
+Rootdens_PLF::Check_Indexes::check (const Syntax& syntax, 
+				    const AttributeList& alist, 
+				    const string& key) const throw (string)
 { 
-  bool ok = true;
+  daisy_assert (alist.check (key));
+  daisy_assert (syntax.lookup (key) == Syntax::AList);
+  daisy_assert (!syntax.is_log (key));
+  daisy_assert (syntax.size (key) == Syntax::Sequence);
+
+  const vector<AttributeList*>& alists = alist.alist_sequence (key);
 
   if (alists.size () < 1)
-    {
-      err.entry ("You must specify at least one entry");
-      ok = false;
-    }
+    throw string ("You must specify at least one entry");
   else
     {
       double last_index = alists[0]->number ("index");
       
       for (unsigned int i = 1; i < alists.size (); i++)
 	{
+	  if (!alists[i]->check ("index"))
+	    continue;
 	  const double new_index = alists[i]->number ("index");
 	  
 	  if (new_index <= last_index)
-	    {
-	      err.entry ("Index should be monotonically increasing");
-	      ok = false;
-	    }
+	    throw string ("Index should be monotonically increasing");
 	  last_index = new_index;
 	}
     }
-  return ok;
 }
 
 Rootdens_PLF::Entry::Entry (const AttributeList& al)
@@ -224,7 +234,7 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
-
+    syntax.add_check ("entries", check_indexes);
     Librarian<Rootdens>::add_type ("DS_Depth", alist, syntax, make);
   }
 } Rootdens_DS_Depth_syntax;
@@ -274,6 +284,7 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
+    syntax.add_check ("entries", check_indexes);
 
     Librarian<Rootdens>::add_type ("DS_Rel", alist, syntax, make);
   }
@@ -322,6 +333,7 @@ root density distribution specified for the entries before and after\n\
 the current development stage, and scale them to match the current\n\
 total root mass.",
 				  Rootdens_PLF::Entry::load_syntax);
+    syntax.add_check ("entries", check_indexes);
 
     Librarian<Rootdens>::add_type ("Depth_Depth", alist, syntax, make);
   }

@@ -250,7 +250,6 @@ public:
   typedef bool (*check_list_fun)(const std::vector<AttributeList*>&,
 				 Treelog& err);
   void add_check (check_fun);
-  void add_checks (check_list_fun);
 
   Syntax ();
   ~Syntax ();

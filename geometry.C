@@ -26,6 +26,7 @@
 #include "tmpstream.h"
 #include "mathlib.h"
 #include "check.h"
+#include "vcheck.h"
 #include "groundwater.h"
 #include "assertion.h"
 
@@ -64,34 +65,9 @@ Geometry::check (Treelog&) const
 }
 
 static bool 
-check_alist (const AttributeList& al, Treelog& err)
+check_alist (const AttributeList&, Treelog&)
 {
   bool ok = true;
-  if (al.check ("zplus"))
-    {
-      const vector<double> zplus = al.number_sequence ("zplus");
-  
-      if (zplus.size () < 1)
-	{
-	  err.entry ("You need at least one interval");
-	  ok = false;
-	}
-      double last = 0.0;
-      for (unsigned int i = 0; i < zplus.size (); i++)
-	{
-	  if (zplus[i] >= last)
-	    {
-	      TmpStream tmp;
-	      tmp () << "Intervals should be monotonically decreasing, but "
-		     << zplus[i] << " > " << last;
-	      err.entry (tmp.str ());
-	      ok = false;
-	      break;
-	    }
-	  else 
-	    last = zplus[i];
-	}
-    }
   return ok;
 }
 
@@ -243,33 +219,43 @@ Geometry::swap (vector<double>& v, double from, double middle, double to) const
   daisy_assert (approximate (old_total, total (v)));
 }
 
-static bool 
-check_layers (const vector<AttributeList*>& layers, Treelog& err)
+static struct CheckLayers : public VCheck
 {
-  double last = 0.0;
-  for (unsigned int i = 0; i < layers.size (); i++)
-    {
-      const double next = layers[i]->number ("end");
-      if (next < last)
-	last = next;
-      else
-	{
-	  TmpStream tmp;
-	  tmp () << "Layer ending at " << next 
-		 << " should be below " << last;
-	  err.entry (tmp.str ());
-	  return false;
-	}
-    }
-  return true;
-}
+  void check (const Syntax& syntax, const AttributeList& alist, 
+	      const string& key) const throw (string)
+  {
+    daisy_assert (alist.check (key));
+    daisy_assert (syntax.lookup (key) == Syntax::AList);
+    daisy_assert (!syntax.is_log (key));
+    daisy_assert (syntax.size (key) == Syntax::Sequence);
+
+    const vector<AttributeList*>& layers = alist.alist_sequence (key);
+
+    double last = 0.0;
+    for (unsigned int i = 0; i < layers.size (); i++)
+      {
+	if (!layers[i]->check ("end"))
+	  continue;
+
+	const double next = layers[i]->number ("end");
+	if (next < last)
+	  last = next;
+	else
+	  {
+	    TmpStream tmp;
+	    tmp () << "Layer ending at " << next 
+		   << " should be below " << last;
+	    throw string (tmp.str ());
+	  }
+      }
+  }
+} check_layers;
 
 void 
 Geometry::add_layer (Syntax& syntax, const string& name,
 		     const string& dimension, const string& description)
 {
   Syntax& layer = *new Syntax ();
-  layer.add_checks (check_layers);
   if (!layer.ordered ())
     {
       // Initialize as first call.
@@ -278,12 +264,14 @@ Geometry::add_layer (Syntax& syntax, const string& name,
       layer.add ("value", dimension, Syntax::Const, description);
       layer.order ("end", "value");
     }
-  syntax.add (string ("initial_") + name, layer,
+  const string iname = "initial_" + name;
+  syntax.add (iname, layer,
 	      Syntax::OptionalConst, Syntax::Sequence, 
 	      string ("Initial value of the '") + name + "' parameter.\n\
 The initial value is given as a sequence of (END VALUE) pairs, starting\n\
 from the top and going down.  The parameter will be initialized to\n\
 VALUE from the END of the previous layer, to the END of the current layer.");
+  syntax.add_check (iname, check_layers);
   syntax.add (name, dimension, Syntax::OptionalState, Syntax::Sequence, 
 	      description);
 }
@@ -331,6 +319,9 @@ Geometry::load_syntax (Syntax& syntax, AttributeList&)
 	      Syntax::OptionalConst, Syntax::Sequence,
 	      "Depth of each numeric layer (a negative number).\n\
 The end points are listed descending from the surface to the bottom.");
+  static VCheck::All zplus_check (VCheck::decreasing (), 
+				  VCheck::min_size_1 ());
+  syntax.add_check ("zplus", zplus_check);
 }
   
 Geometry::Geometry (const AttributeList& al)

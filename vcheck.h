@@ -49,10 +49,13 @@ public:
   static const VCheck& decreasing ();
   static const VCheck& sum_equal_0 ();
   static const VCheck& sum_equal_1 ();
+  static const VCheck& min_size_1 ();
+
   class SumEqual;
   class StartValue;
   class EndValue;
-  
+  class MinSize;
+
   // PLF.
 public:
   class FixedPoint;
@@ -140,6 +143,22 @@ private:
   // Create and Destroy.
 public:
   FixedPoint (double x, double y);
+};
+
+class VCheck::MinSize : public VCheck
+{
+  // Parameters.
+private:
+  const unsigned int min_size;
+
+  // Use.
+private:
+  virtual void check (const Syntax&, const AttributeList&, const string& key)
+    const throw (string);
+
+  // Create and Destroy.
+public:
+  MinSize (unsigned int siz);
 };
 
 class VCheck::All : public VCheck

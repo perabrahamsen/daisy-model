@@ -40,7 +40,6 @@ const int Syntax::Unspecified = -666;
 struct Syntax::Implementation
 {
   vector<check_fun> checker;
-  vector<check_list_fun> list_checker;
   vector<string> order;
   typedef map<string, type, less<string> > type_map;
   typedef map<string, category, less<string> > status_map;
@@ -201,19 +200,6 @@ Syntax::Implementation::check (const AttributeList& vl, Treelog& err)
 	  {
 	    daisy_assert (vl.size (key) != Syntax::Singleton);
 	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
-	    {
-	      Treelog::Open nest (err, key);
-	      for (unsigned int j = 0;
-		   j < syntax[key]->impl.list_checker.size ();
-		   j++)
-		{
-		  if (!syntax[key]->impl.list_checker[j] (seq, err))
-		    {
-		      error = true;
-		      break;
-		    }
-		}
-	    }
 	    int j_index = 0;
 	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
 		 j != seq.end ();
@@ -742,10 +728,6 @@ Syntax::entries () const
 void 
 Syntax::add_check (check_fun fun)
 { impl.checker.push_back (fun); }
-
-void 
-Syntax::add_checks (check_list_fun fun)
-{ impl.list_checker.push_back (fun); }
 
 Syntax::Syntax ()
   : impl (*new Implementation ())

@@ -172,8 +172,8 @@ ifeq ($(COMPILER),gcc)
 	endif
 	WARNING = -W -Wall -Wno-sign-compare -Wstrict-prototypes \
 		  -Wconversion -Wmissing-prototypes -Woverloaded-virtual \
-		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings \
-		  -Wold-style-cast
+		  -Wsign-promo -Wundef -Wpointer-arith -Wwrite-strings 
+#  -Wold-style-cast: triggered by header files for 2.95/woody
 #  -Wmissing-noreturn: triggered by some virtual functions.
 	COMPILE = $(GCC) -ansi -pedantic $(WARNING) $(DEBUG) $(OSFLAGS)
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall

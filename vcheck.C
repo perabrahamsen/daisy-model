@@ -219,6 +219,13 @@ VCheck::sum_equal_1 ()
   return sum_equal;
 }
 
+const VCheck& 
+VCheck::min_size_1 ()
+{
+  static MinSize min_size (1);
+  return min_size;
+}
+
 VCheck::VCheck ()
 { }
 
@@ -427,6 +434,26 @@ VCheck::FixedPoint::check (const Syntax& syntax, const AttributeList& alist,
 VCheck::FixedPoint::FixedPoint (double x, double y)
   : fixed_x (x),
     fixed_y (y)
+{ }
+
+void
+VCheck::MinSize::check (const Syntax& syntax, const AttributeList& alist, 
+			const string& key) const throw (string)
+{
+  daisy_assert (alist.check (key));
+  daisy_assert (!syntax.is_log (key));
+  daisy_assert (syntax.size (key) == Syntax::Sequence);
+  if (alist.size (key) < min_size)
+    {
+      TmpStream tmp;
+      tmp () << "Need at least " << min_size << " elements, got " 
+	     << alist.size (key);
+      throw string (tmp.str ());
+    }
+}
+
+VCheck::MinSize::MinSize (unsigned int size)
+  : min_size (size)
 { }
 
 void

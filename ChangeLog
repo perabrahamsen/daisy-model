@@ -1,5 +1,28 @@
 2003-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.61 released.
+
+2003-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* syntax.h (check_list_fun): Removed.
+	* syntax.C, syntax.h (add_checks): Removed.
+	* syntax.C (list_checker): Removed.
+	(check): Updated caller.
+
+	* rootdens_PLF.C (Check_Indexes): New member class.
+	(check_alists): Removed.
+	(updated): Use it.
+	(Rootdens_DS_Depth_Syntax): Update.
+
+	* vcheck.h, vcheck.C (MinSize): New member class.
+	(min_size_1): New static member function.
+	
+	* geometry.C (CheckLayers): New class.
+	(initialize_layer): use it.
+	(check_layers): Removed.
+	(load_syntax): Use VCheck.
+	(check_alist): Emptied.
+
 	* Version 2.60 released.
 
 2003-03-06  Per Abrahamsen  <abraham@dina.kvl.dk>
