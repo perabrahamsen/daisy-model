@@ -62,7 +62,7 @@ items:
   will also need a program to unzip the file, download it from a place
   like \url{http://www.tucows.com/} if you haven't already got it.
   Search for unzip.
-\item[weather file] The weather file contain observations from the KVL
+\item[weather file] The weather file contains observations from the KVL
   research station in Taastrup, Denmark.  Most likely, you will
   eventually want weather data from closer to home, but this file will
   get you started.
@@ -82,7 +82,7 @@ to see the output again.
 
 \section{Example}
 
-The \texttt{test.dai} file contain all the information about the
+The \texttt{test.dai} file contains all the information about the
 simulation.  We call such a file a \daisy{} setup file, or a
 \texttt{.dai} file for short.  By convention, we give such files the
 \texttt{.dai} extension, even though \daisy{} doesn't care.  Teaching
@@ -162,34 +162,41 @@ horizons.
 \begin{verbatim}
   ;; We have some very sandy soil.
   (defhorizon Ap default
+    "Andeby top soil."
     (clay 8.0 [])
     (silt 10.5 [])
-    (coarse_sand 63.4 [])
-    (fine_sand 16.5 [])
+    (sand 79.9 [])
     (humus 1.12 [])
-    (dry_bulk_density 1.5 [g/cm^3])
-    (SOM_fractions 0.66 0.34 []))
+    (C_per_N 11.0 [g C/g N])
+    (dry_bulk_density 1.5 [g/cm^3]))
 \end{verbatim}
 
 Here, we define a horizon named \texttt{Ap} (\texttt{defhorizon} is
 short for ``define horizon'').  Like the place where we specified the
 weather, the \texttt{default} keyword means that we use the default
 model for specifying horizons.  At this point it is our only choice,
-but that will soon change.
+but that will soon change.  The string \texttt{"Andeby top soil."} is
+a description of the horizon, and is a good place to put information
+about the source of data.
 
-The first four parameters, \texttt{clay}, \texttt{silt},
-\texttt{coarse\_sand}, and \texttt{fine\_sand} together define the
-soil texture.  The texture affects many aspects of the simulation, for
-example will the ammonium adsorption depend on the clay content, and
-if not otherwise specified, the hydraulic parameters such as soil
-water retention characteristics are also estimated from the texture, a
-sandy soil is less capable of storing water than a clay soil.
+The first three parameters, \texttt{clay}, \texttt{silt},
+\texttt{sand} together define the soil texture.  The texture affects
+many aspects of the simulation, for example will the ammonium
+adsorption depend on the clay content, and if not otherwise specified,
+the hydraulic parameters such as soil water retention characteristics
+are also estimated from the texture, a sandy soil is less capable of
+storing water than a clay soil.
 
-The fifth soil constituent is the \texttt{humus}, which among other thing
+The fourth soil constituent is the \texttt{humus}, which among other thing
 creates the background mineralization, thus providing the soil with
 nitrogen.  The numbers given for the five soil constituents are
 relative, that is they are weighted to the total.  So you can specify
 them as fractions or percentage or whatever, as you wish.
+
+The \texttt{C\_per\_N} parameter is the C/N ratio of the humus.  This
+affects the background mineralization, a high C/N ratio will lead to
+lowr mineralization.  If you do not have any idea what the C/N ration
+for your soil is, leave out this parameter.
 
 The \texttt{dry\_bulk\_density} is, as the name implies, the densisty
 of the dry soil.  It affects the hydraulic properties of the soil and
@@ -204,42 +211,21 @@ require knowledge of the dry bulk density.  Even if you know the dry
 bulk density, using \texttt{Cosby\_et\_al} might be a better choise
 for simulation in that continent.  The default pedotransfer function,
 \texttt{hypres}, has been developed based on European (especially
-German) soil measurements.
+North German) soil measurements.
 
-The last parameter, \texttt{SOM\_fractions}, divides the humus into a
-slow and a fast pool.  This affects background mineralization.  For a
-system in perfect equilibrium (input of organic matter equal
-tuinover), the value will be
-
-\begin{verbatim}
-  (SOM_fractions 0.49 0.51)
-\end{verbatim}
-
-For farms with a long term humus build-up, more of the humus will be
-in the second (fast) pool.  For farms where the amount of humus is
-decreasing, slow first (slow) fraction will be larger.  New farmland
-and farmland using mineral fertilizer tend to have decreasing humus,
-and thus a larger fraction of humus in the slow pool.  Note that we
-are talking changes over decades and centuries or even millennia, if
-you switched to organic fertilizer five years ago, that is unlikely to
-have a measurable effect on the SOM partitioning.
-
-For horizons below the root zone, if there is any significant amount
-of humus may be leftover from old tree roots, and slowly decreasing.
-In that case, the vast majority (maybe 95\%) is in the first, slow
-pool.
-
-Note that all the parameters end with a \verb|[]|.  This is the
+The texture parameters all end with a \verb|[]|.  This is the
 dimension surrounded by square brackets.  Since fractions are
-dimnesionsless, there is nothing in the brackets.  More interesting
-dimensions will occur later.
-
-The next horizon is simpler.
+dimnesionsless, there is nothing in the brackets.  The two last
+parameters have the dimension $g C/g N$ and $g/cm^3$.  It is good idea
+always to specify the dimension, as this will allow \daisy{} to check
+that dimension really is what you think it is.  Misunderstandings
+about dimensions are a very common source of errors.  The next horizon
+is simpler.
 
 \begin{verbatim}
-  (defhorizon C Ap
-    (humus 0.12 [])                     ;Less humus.
-    (SOM_fractions 0.80 0.20 []))       ;Slower background mineralization.
+(defhorizon C Ap
+  "Andeby C horizon."
+  (humus 0.12 []))
 \end{verbatim}
 
 Here, instead of \texttt{default}, we write \texttt{Ap}.  This is the
@@ -247,9 +233,7 @@ name of the horizon we just defined, and will cause \daisy{} to reuse
 the parameter values in the new horizon named \texttt{C} we
 define here.  In particular, we give it the same texture as the
 \texttt{Ap} horizon.  However, since the horizon is intended to
-describe lower soil, we specify less humus, and put more of the humus
-in the slow pool.  This will cause a much lower background
-mineralization.
+describe lower soil, we specify less humus.
 
 \subsection{Column}
 \label{ex:column}
@@ -262,6 +246,9 @@ Now we have described two horizons, we can describe a column.
     "Data collected by F.Guf at the B.And farm, Andeby, 2002."
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
           (MaxRootingDepth 60.0 [cm]))
+    (OrganicMatter  (init (input 1400 [kg C/ha/y])
+                          (root 480 [kg C/ha/y])
+                          (end -20 [cm])))
     (Groundwater deep))
 \end{verbatim}
 
@@ -269,15 +256,19 @@ Here, we name the column \texttt{Andeby}, and use the \texttt{default}
 model for \daisy{} columns\footnote{An alternative at this point would
   be to use the \texttt{inorganic} column model, which does not
   perform any calculations regarding organic matter, thus saving
-  time.}.  The string following the \texttt{default} serves as a
-description, it is a good place to note who collected the date, from
-where, and when.
+  time.}.  The string following the \texttt{default} again serves as a
+description, and this timw we use it to note who collected the data,
+from where, and when.
 
-In \daisy{}, a column consist of many separate subsystems.  Most of
+In \daisy{}, a column consists of many separate subsystems.  Most of
 these have default values, and does thus not need to be specified.
-However, we need a description of the soil, and we need to tell
-\daisy{} where the groundwater is.  See section~\ref{sec:column} for
-other examples of other subsystems.
+However, we need a description of the soil, we need an estimate of the
+quality (lability) of the humus, and we need to tell \daisy{} where
+the groundwater is.  See section~\ref{sec:column} for examples of
+other subsystems.
+
+\subsubsection{Soil}
+\label{ex:soil}
 
 \begin{verbatim}
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
@@ -298,10 +289,7 @@ meter.
 You may note that we specify the depth in \verb|[cm]| for the first
 depth, and \verb|[m]| for the next.  If you don't specify a dimension,
 \daisy{} will expect numbers to be in centimeters, however if you
-specify the dimension as \verb|[m]| knows how to convert.  It is good
-idea always to specify the dimension, as this will allow \daisy{} to
-check that dimension really is what you think it is.
-Misunderstandings about dimensions are a very common source of errors.
+specify the dimension as \verb|[m]| knows how to convert.  
 
 The other mandatory soil parameter is \texttt{MaxRootingDepth}.  This
 is a soil imposed barrier for the roots, they will not penetrate below
@@ -310,14 +298,62 @@ keep you alert, this number is specified as positive depth, unlike the
 layer endpoints which were specified as negative heights.  \Daisy{}
 will tell you if you get it wrong.
 
-After specifying the Soil, we must tell \daisy{} the location of the
-groundwater.  Here, we specify that the groundwater is located so deep
-that it does not directly affect the simulation.  Other options
-include a constant groundwater table, field drainage, and a variable
-groundwater table specified in a file.  See
-section~\ref{sec:groundwater} for examples.  Apart from soil and
-groundwater, there are many more submodels you can specify here,
-see section~\ref{sec:column} for more examples.
+\subsubsection{Organic Matter}
+\label{ex:om}
+
+Knowing the humus content of the soil is not enough, \daisy{} need know
+the quality of the organic matter as well.  The quality (or lability)
+of the organic matter affect how much background mineralization you
+can expect, which is an important part of the total nitrogen balance.
+
+We can estimate the quality of the soil organic matter by comparing
+the humus content with the typical level of carbon input in the
+decades before the beginning of the simulation.  If the carbon input
+in the period before the was high compared the general level of humus,
+we expect that the humus content has been growing, and much of the
+humus will then be fresh and labile.  On the other hand, if the input
+level is low compared to the humus content, the humus level will be
+shrinking, and the most labile humus will already be gone.
+
+It is important to understand that we are trying to estimate the
+quality of the humus that exists in the system at the beginning of the
+simulation period.  Therefore we are interested in how the carbon
+input levels were before the simulation, not the levels during the
+period we are simulating.  We specify the past input level with the
+following lines.
+
+\begin{verbatim}
+    (OrganicMatter (init (input 1400 [kg C/ha/y])
+                         (root 480 [kg C/ha/y])
+                         (end -20 [cm])))
+\end{verbatim}
+
+Here we specify that we want to initialize the organic matter
+subsystem from the carbon input.  The first line tells \daisy{} that the
+total yearly carbon input is 1400 kg/ha.  The second line specify that
+out of these 1400 kg, the 480 kg are dead roots.  The third line gives
+the depth of the plowing layer, here 20 cm.  The reason we need the
+two later values (\texttt{root} and \texttt{end}) is that we need to
+know how the carbon input is distributed vertically.  \Daisy{} will
+assume most input is distributed evenly in the plowing layer, but that
+some of the roots will reach all the way down to the depth specified
+by \texttt{MaxRootingDepth}.
+
+In section~\ref{sec:om} we describe how to estimate the carbon input,
+and in section~\ref{sec:background} how to improve the initialization
+of the organic matter further.
+
+\subsubsection{Groundwater}
+\label{ex:groundwater}
+
+After specifying the soil and organic matter composition, we must tell
+\daisy{} the location of the groundwater.  Here, we specify that the
+groundwater is located so deep that it does not directly affect the
+simulation.  Other options include a constant groundwater table, field
+drainage, and a variable groundwater table specified in a file.  See
+section~\ref{sec:groundwater} for examples.  
+
+\subsubsection{Using it}
 
 We have now specified a column, and given it the name \texttt{Andeby}.
 Now we just need to tell \daisy{} to use this column for the
@@ -575,6 +611,113 @@ See section~\ref{sec:output} for more information about log models.
 In this section we give examples of common customization of the
 various subsystems of the column.
 
+\subsection{Carbon Input}
+\label{sec:om}
+
+You can use \daisy{} to estimate the carbon input used daisy{} for
+organic matter initialization (see section~\ref{ex:om}) with the
+following steps.
+\begin{enumerate}
+\item Create a crop rotation you believe is typical for the period
+  before the simulation start.
+\item You use the same \texttt{Soil} and \texttt{Groundwater}
+  parameters as you will for the real simulation, but omit the
+  \texttt{OrganicMatter} initialization.
+\item Add \texttt{"Carbon Balance"} to the output.
+\item Run a simulation with that rotation repeated a couple of times,
+  using meteorological data from the location.
+\end{enumerate}
+The \texttt{daisy.log} file will now contain lines that looks like
+these near the end.
+
+\begin{verbatim}
+     Fertilizer =    0 [kg C/ha/y]
+      Residuals = 1454 [kg C/ha/y]
+          Roots =  651 [kg C/ha/y]
+     Bioinc_CO2 = -727 [kg C/ha/y]
+  --------------------------------
+  Total C input = 1378 [kg C/ha/y]
+                  ====
+\end{verbatim}
+
+The two values you need are ``Total C input'', which should be used
+for the \texttt{input} parameter, and ``Roots'', which should be used
+for the \texttt{root} parameter.  You can now add an
+\texttt{OrganicMatter} initialization section, as in
+section~\ref{ex:om}, and run the setup again.  The total C input
+should now be slightly different in the second run.  Use this number
+for the real simulation.
+
+\subsection{Background mineralization}
+\label{sec:background}
+
+Having \daisy{} estimate the organic matter quality is a poor
+substitution for measuring it.  While measuring it directly is hard,
+it is possible to measure the background mineralization indirectly. 
+
+The background mineralization is here defined as the difference
+between the netto mineralization and the amount of added organically
+bound nitrogen.  The number can be both positive and negative.  A
+positive number means that we get more nitrogen from mineralization
+than we add to the system.  This nitrogen must come from the humus
+content, which must then be decreasing for the balance to add up.
+Similarly, a negative background mineralization means that some
+surplus nitrogen is stored in a growing humus content.
+
+If you look in the \texttt{daisy.log} file, you will find a line like
+this
+\begin{verbatim}
+  Background mineralization: 4.8127 [kg N/ha/y].
+\end{verbatim}
+near the beginning.  This specifies that \daisy{} expects 5 kg N/ha to
+be released from the humus every year for the current setup.  By
+adding the parameter \texttt{background\_mineralization} to the
+organic matter initialization, we tell \daisy{} to attempt to
+initialize the system differently, to produce the specified level of
+background mineralization.
+
+\begin{verbatim}
+    (OrganicMatter (init (input 2400 [kg C/ha/y])
+                         (root 800 [kg C/ha/y))
+                         (background_mineralization 30 [kg N/ha/y]) 
+                         (end -20.0 [cm])))
+\end{verbatim}
+
+Here, we specify that with the given input levels, we want 30 kg N/ha
+to be released from the humus every year.  It is not certain \daisy{}
+will be able to fulfil that though, there are a number of sanity
+checks build in which will limit the background mineralization can be
+generated.  You can find the expected background mineralization in the
+beginning of the \texttt{daisy.log} file as before.  And the
+\emph{actual} background mineralization may be very different from
+this, for two reasons.
+\begin{enumerate}
+\item The actual input levels in the simulation period can be
+  different from the input levels used for the organic matter
+  initialization.
+\item The expected background mineralization is calculated by assuming
+  the soil moisture and temperature are constant, while the simulated
+  background mineralization depends on the variable simulated soil
+  moisture and temperature.
+\end{enumerate}
+The simulated background mineralization can be found by looking at the
+change in the organic nitrogen content (the \texttt{SOM} column in the
+\texttt{"N Balance"} log).
+
+If you measure how much nitrogen is removed by harvest, you can adjust
+the \texttt{background\_mineralization} parameter until the simulation
+gives you the same results.  However, this only works if the
+background mineralization really is the only unknown.  Specifically,
+you must be sure that the water balance is correct, otherwise the
+amount of nitrogen lost in leaching will also be an unknown.  And you
+must be sure that the crop is never nitrogen saturated.  Preferably,
+you should have an unfertilized field, but if you do fertilize it must
+be less than the crop is capable of taking up.
+
+It is possible to calibrate the background mineralization from dry
+matter harvest nubers, but only if you are sure the crop growth has
+been nitrogen limited.
+
 \subsection{Hydraulic properties}
 \label{sec:hydraulic}
 
@@ -685,37 +828,10 @@ towards the pipe.
 \label{sec:aquitard}
 
 For some soils the groundwater table can fall into the aquitard on dry
-years.  When this happens, \daisy{} will stop with an error.  In order
-to proceed, you need to make the top of the aquitard part of the soil
-profile.  You do this by defining an ``aquitard'' horizon, and place
-that below your lowest horizon.  The only important parameter for the
-aquitard horizon is \texttt{K\_sat}, which must be identical to
-\texttt{\texttt{K\_aquitard}}.  You also need to \texttt{Z\_aquitard}
-corresponding to the thickness of your new aquitard horizon.
-
-\begin{verbatim}
-  (defhorizon aquitard C
-    (hydraulic M_vG
-       ;; These parameters are not important.
-       (Theta_res 0.05 [cm^3 H2O/cm^3])
-       (Theta_sat 0.424 [cm^3 H2O/cm^3])
-       (alpha 0.069 [cm^-1])
-       (n 1.527)
-       ;; Note: same as K_aquitard
-       (K_sat 1e-4 [cm/h])))
-
-  (defcolumn Andeby default
-    (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C) 
-                    ;; Top 50 cm of aquitard.
-                    (-3.0 [m] aquitard))
-          (MaxRootingDepth 60.0 [cm]))
-    (Groundwater pipe
-                 ;; Use same K_sat as the aquitard horizon.
-                 (K_aquitard 1e-4 [cm/h])
-                 ;; Decrease thickness with 50 cm from default 
-                 ;; of 2.0 m to compensate for aquitard horizon.
-                 (Z_aquitard 1.5 [m]))) 
-\end{verbatim}
+years.  For this reason, \daisy{} will automatically add an extra
+horizon below the bottom horizon you specified.  This will affect
+logging, if you don't want to log the aquitard horizon you must
+explicitly set the \texttt{to} parameter.
 
 \subsection{Macropores}
 \label{sec:macro}
@@ -1095,7 +1211,7 @@ Therefore, we start by defining two simpler actions.
 \begin{verbatim}
   (defaction cut_grass activity
     (wait (or (crop_ds_after "Grass" 0.7 [])
-              (crop_dm_over "Grass" 4000 [kg DM/ha])))
+              (crop_dm_over "Grass" 4000 [kg DM/ha] (height 10.0 [cm]))))
     (harvest "Grass"
              (stub 10.0 [cm])))
 \end{verbatim}
@@ -1706,6 +1822,8 @@ Here are some useful log models, you can find more in the
   \texttt{root\_zone\_water\_balance.dlf}. 
 \item[\texttt{N Balance}] Enough information to create a balance for
   the soil nitrogen.  File: \texttt{N\_balance.dlf}.
+\item[\texttt{Carbon Balance}] Enough information to create a balance for
+  the soil carbon.  File: \texttt{C\_bal.dlf}.
 \item[\texttt{Soil Heat Balance}] All available information about the
   soil heat subsystem.  File: \texttt{soil\_heat\_balance.dlf}.
 \item[\texttt{Snow}] All available information about the snow
@@ -1976,43 +2094,47 @@ to log a particular crop alone as below:
 
 \begin{verbatim}
   ;;; test.dai -- Sample file using the Daisy libraries.
-
+  
   (description "Simulation for use in tutorial.")
-
+  
   ;; Use standard parameterizations.
   (input file "tillage.dai")
   (input file "crop.dai")
   (input file "log.dai")
-
+  
   ;; Weather data.
   (weather default "weather.dwf")
-
+  
   ;; We have some very sandy soil.
   (defhorizon Ap default
+    "Andeby top soil."
     (clay 8.0 [])
     (silt 10.5 [])
-    (coarse_sand 63.4 [])
-    (fine_sand 16.5 [])
+    (sand 79.9 [])
     (humus 1.12 [])
-    (SOM_fractions 0.66 0.34 []))
-
+    (C_per_N 11.0 [g C/g N])
+    (dry_bulk_density 1.5 [g/cm^3]))
+  
   (defhorizon C Ap
-    (humus 0.12 [])                     ;Less humus.
-    (SOM_fractions 0.80 0.20 []))       ;Slower background mineralization.
-
+    "Andeby C horizon."
+    (humus 0.12 []))
+  
   ;; We build the column from the horizons.
   (defcolumn Andeby default
     "The B.And farm, Andeby, 2002."
     (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
           (MaxRootingDepth 60.0 [cm]))
+    (OrganicMatter (init (input 1400 [kg C/ha/y])
+                         (root 480 [kg C/ha/y])
+                         (end -20 [cm])))
     (Groundwater deep))
-
+  
   ;; Use it.
   (column Andeby)
-
+  
   ;; Simulation start date.
   (time 1986 12 1 1)
-
+  
   (manager activity
     (wait (at 1987 3 20 1))
     (plowing)
@@ -2035,7 +2157,7 @@ to log a particular crop alone as below:
              (stem 1.00 []))             ;Harvest everything above stub.
     (wait (at 1988 4 1 1))
     (stop))
-
+  
   ;; Create these log files.
   (output harvest
           ("N Balance" (when monthly)
@@ -2044,7 +2166,7 @@ to log a particular crop alone as below:
            (set "$crop" "Spring Barley")
            (where "sbarley.dlf"))
           (checkpoint (when (at 1987 8 7 6))))
-
+  
   ;;; test.dai ends here.
 \end{verbatim}
 %$

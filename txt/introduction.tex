@@ -518,19 +518,19 @@ by whitespace.
   (defcolumn JB1_Andeby default
     "Data for the farm of B.And, Andeby, as collected by F.Guf, 2002."
     (Groundwater static)
-    (Soil (horizons (-20 top_soil) (-250 bottom_soil))
+    (Soil (horizons (-20 [cm] top_soil) (-250 [cm] bottom_soil))
           (zplus -2.5 -5 -10 -15 -20
                  -25 -30 -40 -50 -60 -70
                  -80 -90 -100 -125 -150 -175
-                 -200 -225 -250)
-          (MaxRootingDepth 60.0)
-          (dispersivity 8.0))
-    (OrganicMatter (initial_SOM (-20  4.86)
-                                (-40  2.92)
-                                (-60  1.46)
-                                (-80  0.49)
-                                (-100 0.16)
-                                (-120 0.03))))
+                 -200 -225 -250 [cm])
+          (MaxRootingDepth 60.0 [cm])
+          (dispersivity 8.0 [cm]))
+    (OrganicMatter (initial_SOM (-20  [cm] 4.86 [kg C/m^2])
+                                (-40  [cm] 2.92 [kg C/m^2])
+                                (-60  [cm] 1.46 [kg C/m^2])
+                                (-80  [cm] 0.49 [kg C/m^2])
+                                (-100 [cm] 0.16 [kg C/m^2])
+                                (-120 [cm] 0.03 [kg C/m^2]))))
 \end{verbatim}
 
 You can define named parameterizations for all components this way.
@@ -631,8 +631,8 @@ fulfilled once.
   (plowing)
   (wait (at 1987 4 4 1))
   (fertilize (mineral 
-              (weight 100.0)             ;kg N/ha
-              (NH4_fraction 0.5)))
+              (weight 100.0 [kg N/ha])
+              (NH4_fraction 0.5 [])))
   (wait (at 1987 4 5 1))
   (progn 
     (sow "Grass")
@@ -641,16 +641,16 @@ fulfilled once.
   (harvest "Spring Barley")
   (wait (at 1987 10 10 1))
   (harvest "Grass"
-           (stub 15)                    ;Leave 15 cm stub.
-           (stem 1.00))                 ;Harvest everything above stub.
+           (stub 15 [cm])                    ;Leave 15 cm stub.
+           (stem 1.00 []))                 ;Harvest everything above stub.
   (wait (at 1987 9 8 1))
   (fertilize (mineral
-              (weight 80.0)
-              (NH4_fraction 0.5)))
+              (weight 80.0 [kg N/ha])
+              (NH4_fraction 0.5 [])))
   (wait (at 1987 10 10 1))
   (harvest "Grass"
-           (stub 8.)                    ;Leave 08 cm stub.
-           (stem 1.00))                 ;Harvest everything above stub.
+           (stub 8. [cm])                    ;Leave 08 cm stub.
+           (stem 1.00 []))                 ;Harvest everything above stub.
   (wait (at 1988 4 1 1))
   (stop))
 \end{verbatim}

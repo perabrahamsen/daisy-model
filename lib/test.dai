@@ -12,23 +12,26 @@
 
 ;; We have some very sandy soil.
 (defhorizon Ap default
+  "Andeby top soil."
   (clay 8.0 [])
   (silt 10.5 [])
-  (coarse_sand 63.4 [])
-  (fine_sand 16.5 [])
+  (sand 79.9 [])
   (humus 1.12 [])
-  (dry_bulk_density 1.5 [g/cm^3])
-  (SOM_fractions 0.66 0.34 []))
+  (C_per_N 11.0 [g C/g N])
+  (dry_bulk_density 1.5 [g/cm^3]))
 
 (defhorizon C Ap
-  (humus 0.12 [])                     ;Less humus.
-  (SOM_fractions 0.80 0.20 []))       ;Slower background mineralization.
+  "Andeby C horizon."
+  (humus 0.12 []))
 
 ;; We build the column from the horizons.
 (defcolumn Andeby default
   "The B.And farm, Andeby, 2002."
   (Soil (horizons (-20 [cm] Ap) (-2.5 [m] C))
         (MaxRootingDepth 60.0 [cm]))
+  (OrganicMatter (init (input 1400 [kg C/ha/y])
+                       (root 480 [kg C/ha/y])
+                       (end -20 [cm])))
   (Groundwater deep))
 
 ;; Use it.
