@@ -16,7 +16,7 @@ Skabt af Christian Thirup for Daisy standardiseringsprojektet."
   )
 
   (Vernal
-      (DSLim 0.33)
+      (DSLim 0.25)
       (TaLim 5.00)
       (TaSum -50.0)
   )
