@@ -103,6 +103,7 @@ public:
   static double RelativeSunEarthDistance (const Time& time);
   static double SunsetHourAngle (double Dec, double Lat); // [rad]
   double ExtraterrestrialRadiation (const Time& time) const; // [MJ/m2/d]
+  double HourlyExtraterrestrialRadiation (const Time& time) const; // [MJ/m2/h]
 
   // Create and Destroy.
 private:

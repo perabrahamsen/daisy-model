@@ -155,6 +155,28 @@ Weather::ExtraterrestrialRadiation (const Time& time) const // [MJ/m2/d]
   return (37.6 * RelativeSunEarthDistance (time) * (x1 + x2));
 }
 
+double
+Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [MJ/m2/h]
+{
+  static const double EQT0   = 0.002733;
+  static const double EQT1[] = {-7.343,-9.470,-0.3289,-0.1955};
+  static const double EQT2[] = {0.5519,-3.020,-0.07581,-0.1245};
+  const double Dec = SolarDeclination (time);
+  const double Lat = M_PI / 180 * latitude;
+  const double timelag = (timezone - longitude) / 15.0;
+  double EQT = EQT0;
+  for (unsigned int i = 0; i < 3; i++)
+    {
+       const double P = 2.0 * M_PI / 365.0 * (i+1) * time.yday();
+       EQT += EQT1[i] * sin(P) + EQT2[i] * cos(P);
+    }
+  EQT /= 60.0;
+  const double SunHourAngle = M_PI / 12.0 * (time.hour() + 1 + EQT - timelag);
+  const double SolarConstant = 37.6 / 24.0 * RelativeSunEarthDistance (time);
+  return ( SolarConstant *
+            (sin(Lat)*sin(Dec) + cos(Lat)*cos(Dec)*cos(SunHourAngle)));
+}
+
 Weather::Weather (const AttributeList& al)
   : name (al.name ("type")),
     latitude (-42.42e42),
@@ -195,7 +217,7 @@ Weather::load_syntax (Syntax& syntax, AttributeList&)
   syntax.add ("wind", "m/s", Syntax::LogOnly, "Wind speed.");
   syntax.add ("day_length", "h", Syntax::LogOnly,
 	      "Number of light hours this day.");
-  syntax.add ("day_cycle", Syntax::None (), Syntax::LogOnly, 
+  syntax.add ("day_cycle", Syntax::None (), Syntax::LogOnly,
 	      "Fraction of daily radiation received this hour.");
 }
 
