@@ -4,7 +4,7 @@ OLDCROPS = beet-old.dai grass-old.dai pea-old.dai potato-old.dai \
 NEWCROPS = maize.dai pea.dai rye.dai sbarley.dai sugarbeet.dai srape.dai \
 	swheat.dai wbarley.dai wrape.dai wwheat.dai grass.dai cutgrass.dai
 
-DAISY = crop.dai fertilizer.dai tillage.dai log.dai mini.dai \
+DAISY = crop.dai fertilizer.dai tillage.dai log.dai mini.dai chemistry.dai \
 	$(OLDCROPS) $(NEWCROPS)
 TEXT	= Makefile test.dai
 CLIMATE = weather.clm
