@@ -11,6 +11,7 @@ class OrganicMatter;
 class IM;
 class Crop;
 class Harvest;
+class Treelog;
 
 class Column
 {
@@ -99,7 +100,7 @@ protected:
 public:
   static void load_syntax (Syntax&, AttributeList&);
   virtual Column& clone (const string& name) const = 0;
-  virtual void initialize (const Time&, const Weather*) = 0;
+  virtual void initialize (const Time&, Treelog& err, const Weather*) = 0;
 
   virtual ~Column ();
 };

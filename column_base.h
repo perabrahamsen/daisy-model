@@ -92,7 +92,7 @@ public:
   // Create and Destroy.
 public:
   ColumnBase (const AttributeList&);
-  void initialize (const Time&, const Weather*);
+  void initialize (const Time&, Treelog&, const Weather*);
   ~ColumnBase ();
   static void load_syntax (Syntax&, AttributeList&);
 };

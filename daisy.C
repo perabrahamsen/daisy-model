@@ -132,12 +132,12 @@ Daisy::run ()
 }
 
 void
-Daisy::initialize (const Syntax& s)
+Daisy::initialize (const Syntax& s, Treelog& err)
 { 
   syntax = &s; 
   if (weather)
-    weather->initialize (time);
-  field.initialize (time, weather);
+    weather->initialize (time, err);
+  field.initialize (time, err, weather);
 }
 
 #ifdef BORLAND_TEMPLATES

@@ -379,7 +379,11 @@ daisy_library_remove (Library* library, const char* name)
 
 extern "C" Parser* EXPORT
 daisy_parser_create_file (const Syntax* syntax, const char* filename)
-{ return new ParserFile (*syntax, filename, CERR); }
+{ 
+  static TreelogStream treelog (CERR);
+  static Treelog::Open nest (treelog, "parser");
+  return new ParserFile (*syntax, filename, treelog); 
+}
 
 extern "C" void EXPORT
 daisy_parser_delete (Parser* parser)
@@ -425,8 +429,10 @@ daisy_printer_good (Printer* printer)
 extern "C" Daisy* EXPORT
 daisy_daisy_create (const Syntax* syntax, const AttributeList* alist)
 { 
+  static TreelogStream treelog (CERR);
+  static Treelog::Open nest (treelog, "daisy");
   Daisy* daisy =  new Daisy (*alist); 
-  daisy->initialize (*syntax);
+  daisy->initialize (*syntax, treelog);
   return daisy;
 }
 

@@ -11,7 +11,15 @@
 #include <assert.h>
 #include <string>
 
-#if !defined (__CYGWIN__) && !defined (MINGW)
+#if !defined (__GNUC__) && !defined (VISUALCPP)
+#define BORLAND
+#endif
+
+#if defined (__GNUC__) || defined (BORLAND)
+#define BROKEN_HEADERS
+#endif
+
+#if !defined (__CYGWIN__) && !defined (MINGW) && !defined (VISUALCPP)
 // Doesn't work under cygwin
 #define pow(x, y) (assert (x >= 0), (pow)(x, y))
 #define sqrt(x) (assert (x >= 0), (sqrt)(x))
@@ -55,7 +63,14 @@
 // GNU doesn't mind unused global constants.
 #define GLOBAL_CONSTANT
 
-#else
+#elif defined (VISUALCPP)
+
+#pragma warning (disable: 4099 4786)
+#define CONST_DELETE
+#define HAS_TEMPLATE_MEMBERS
+#define GLOBAL_CONSTANT
+
+#else /* BORLAND */
 
 // WIN32 DLL keywords.
 #define EXPORT _export
@@ -117,28 +132,24 @@ void sequence_delete (ForwardIterator first, ForwardIterator last) {
 
 #ifdef MISSING_OSTREAM
 #include <iostream.h>
-#else 
+#elif defined (BROKEN_HEADERS)
 #include <ostream.h>
+#else
+#include <ostream>
 #endif
 
-struct Syntax;
-struct AttributeList;
+#define CERR (DebugMessages::error ())
+#define CWAR (DebugMessages::warning ())
+#define COUT (DebugMessages::message ()) 
 
-#define CERR (Options::error ())
-#define CWAR (Options::warning ())
-#define COUT (Options::message ()) 
-
-class Options
+class DebugMessages
 {
 public: 
-  const string program_name;
   static ostream& message ();
   static ostream& warning ();
   static ostream& error ();
-  static int find_file (const string& name);
-  void usage () const;
-  Options (int& argc, char**& argv, 
-	   Syntax& syntax, AttributeList& alist);
+private:
+  DebugMessages ();
 };
 
 #endif // COMMON_H

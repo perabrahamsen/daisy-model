@@ -45,7 +45,7 @@ struct ParserFile::Implementation
   const Syntax* global_syntax_table;
 
   // Create and destroy.
-  void initialize (const Syntax&, ostream&);
+  void initialize (const Syntax&, Treelog&);
   Implementation (const string&);
   ~Implementation ();
 };
@@ -658,7 +658,7 @@ ParserFile::Implementation::get_time ()
 }
 
 void
-ParserFile::Implementation::initialize (const Syntax& syntax, ostream& out)
+ParserFile::Implementation::initialize (const Syntax& syntax, Treelog& out)
 { 
   global_syntax_table = &syntax; 
   lexer = new Lexer (file, out);
@@ -708,10 +708,10 @@ ParserFile::error_count () const
 }
 
 void
-ParserFile::initialize (const Syntax& syntax, ostream& out)
+ParserFile::initialize (const Syntax& syntax, Treelog& out)
 { impl.initialize (syntax, out); }
 
-ParserFile::ParserFile (const Syntax& syntax, const string& name, ostream& out)
+ParserFile::ParserFile (const Syntax& syntax, const string& name, Treelog& out)
   : Parser ("file"),
     impl (*new Implementation (name))
 { initialize (syntax, out); }

@@ -89,7 +89,7 @@ public:
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
-  void initialize (const Time&, const Weather*);
+  void initialize (const Time&, Treelog& err, const Weather*);
   Field (const vector<AttributeList*>&);
   ~Field ();
 };

@@ -1,6 +1,7 @@
 // groundwater_file.C
 
 #include "groundwater.h"
+#include "lexer_data.h"
 #include "time.h"
 #include <fstream.h>
 
@@ -16,8 +17,7 @@ private:
 
   // File.
   const string file_name;
-  ifstream file;
-  int line;			// Current line number in weather file.
+  LexerData* lex;
   
   // UZbottom.
 public:
@@ -31,7 +31,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Time& time, const Soil&);
+  void initialize (const Time& time, const Soil&, Treelog&);
   GroundwaterFile (const AttributeList&);
   ~GroundwaterFile ();
 };
@@ -51,8 +51,12 @@ GroundwaterFile::accept_bottom (double)
 void
 GroundwaterFile::tick (const Time& time)
 {
+  assert (lex);
   while (next_time < time)
     {
+      if (!lex->good ())
+	throw ("groundwater file read error");
+
       // Remember old value.
       previous_time = next_time;
       previous_depth = next_depth;
@@ -61,21 +65,35 @@ GroundwaterFile::tick (const Time& time)
       int year;
       int month;
       int day;
-      int end;
 
-      file >> year >> month >> day >> next_depth;
-      end = file.get ();
+      year = lex->get_cardinal ();
+      if (year < 0 || year > 9999)
+	lex->error ("Bad year");
       if (year < 100)
 	year += 1900;
-      while (file.good () && strchr (" \t", end))
-	end = file.get ();
-
-      if (!file.good ())
+      lex->skip_space ();
+      month = lex->get_cardinal ();
+      if (month < 1 || month > 12)
+	lex->error ("Bad month");
+      lex->skip_space ();
+      day = lex->get_cardinal ();
+      if (day < 1 || day > 31)
+	lex->error ("Bad day");
+      lex->skip_space ();
+      next_depth = lex->get_number ();
+      if (next_depth > 0.0)
+	lex->error ("positive depth");
+      if (!Time::valid (year, month, day, 23))
 	{
-	  throw ("groundwater read error");
+	  lex->error ("Bad date");
+	  lex->skip_line ();
+	  lex->next_line ();
+	  next_time = previous_time;
+	  next_depth = previous_depth;
+	  continue;
 	}
 
-      assert (month > 0 && month < 13);
+      lex->next_line ();
       next_time = Time (year, month, day, 23);
     }
   // We should be somewhere in the interval.
@@ -97,8 +115,12 @@ GroundwaterFile::table () const
 }
 
 void
-GroundwaterFile::initialize (const Time& time, const Soil&)
-{ tick (time); }
+GroundwaterFile::initialize (const Time& time, const Soil&, Treelog& err)
+{
+  assert (lex == NULL);
+  lex = new LexerData (file_name, err);
+  tick (time); 
+}
 
 GroundwaterFile::GroundwaterFile (const AttributeList& al)
   : Groundwater (al),
@@ -108,16 +130,12 @@ GroundwaterFile::GroundwaterFile (const AttributeList& al)
     next_depth (-42.42e42),
     depth (-42.42e42),
     file_name (al.name ("file")),
-    file (Options::find_file (al.name ("file"))),
-    line (0)
+    lex (NULL)
 { }
 
 GroundwaterFile::~GroundwaterFile ()
 { 
-#if 0
-      // Code guard claims the file handle is bad.
-      close (file.rdbuf ()->fd ()); 
-#endif
+  delete lex;
 }
 
 static struct GroundwaterFileSyntax

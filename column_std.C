@@ -83,7 +83,7 @@ public:
     return *new ColumnStandard (new_alist); 
   }
   ColumnStandard (const AttributeList& al);
-  void initialize (const Time&, const Weather*);
+  void initialize (const Time&, Treelog&, const Weather*);
   ~ColumnStandard ();
 };
 
@@ -435,11 +435,12 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
 { }
 
 void 
-ColumnStandard::initialize (const Time& time, const Weather* global_weather)
+ColumnStandard::initialize (const Time& time, Treelog& err, 
+			    const Weather* global_weather)
 {
   if (!global_weather && !weather)
     return;
-  ColumnBase::initialize (time, global_weather);
+  ColumnBase::initialize (time, err, global_weather);
   soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water);
   soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water);
   organic_matter.initialize (alist.alist ("OrganicMatter"), soil);

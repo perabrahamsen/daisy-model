@@ -1,3 +1,29 @@
+2000-11-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.66 released.
+
+2000-11-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* groundwater_pipe.C, groundwater_file.C, groundwater.C,
+	groundwater.h (initialize): Use treelog.
+	* column_base.C (initialize): Update caller.
+	* groundwater_file.C:  Use lexer.
+	
+	* common.h (DebugMessages): Renamed from `Options'.
+	* options.C, options.h: New files.
+	* Makefile (OTHER): Added them.
+	* cdaisy.C, column.h, column_base.C, column_base.h, column_std.C,
+	common.C, common.h, daisy.C, daisy.h, field.C, field.h, lexer.C,
+	lexer.h, lexer_data.C, lexer_data.h, main.C, parser.h,
+	parser_file.C, parser_file.h, treelog_stream.C, weather.C,
+	weather.h, weather_std.C:  Updated.
+	* Makefile (DISABLED): New macro.
+	More Visual C++ support.
+	
+2000-11-21  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* common.h: Some Visual C++ support.
+
 2000-11-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.65 released.

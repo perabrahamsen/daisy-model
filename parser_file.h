@@ -20,9 +20,9 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Syntax&, ostream&);
+  void initialize (const Syntax&, Treelog&);
   ParserFile (const AttributeList&);
-  ParserFile (const Syntax& syntax, const string& n, ostream&);
+  ParserFile (const Syntax& syntax, const string& n, Treelog&);
   ~ParserFile ();
 };
 

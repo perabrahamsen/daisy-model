@@ -7,6 +7,7 @@
 #include "im.h"
 
 class Time;
+class Treelog;
 
 class Weather
 {
@@ -122,7 +123,7 @@ public:
 private:
   Weather (const Weather&);
 public:
-  virtual void initialize (const Time& time);
+  virtual void initialize (const Time& time, Treelog& err);
 protected:
   Weather (const AttributeList&);
 public:

@@ -3,6 +3,8 @@
 #include "groundwater.h"
 #include "log.h"
 #include "soil.h"
+#include "tmpstream.h"
+#include "treelog.h"
 #include "mathlib.h"
 
 class GroundwaterPipe : public Groundwater
@@ -82,7 +84,7 @@ private:
 
   // Create and Destroy.
 public:
-  void initialize (const Time&, const Soil& soil)
+  void initialize (const Time&, const Soil& soil, Treelog& treelog)
     {
       unsigned int size = soil.size ();
       double largest = 0.0;
@@ -90,8 +92,13 @@ public:
 	if (soil.dz (i) > largest)
 	  largest = soil.dz (i);
       if (largest > 10.0)
-	CERR << "WARNING: drained soil needs soil intervals < 10.0 cm; "
-	     << "largest is " << largest << ".\n";
+	{
+	  Treelog::Open (treelog, "Groundwater pipe");
+	  TmpStream tmp;
+	  tmp () << "WARNING: drained soil needs soil intervals < 10.0 cm; "
+		 << "largest is " << largest << "";
+	  treelog.entry (tmp.str ());
+	}
 
       i_bottom = size - 1;
       i_drain = soil.interval_plus (pipe_position);

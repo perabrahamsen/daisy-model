@@ -278,7 +278,7 @@ Weather::HourlyExtraterrestrialRadiation (const Time& time) const // [W/m2]
 }
 
 void
-Weather::initialize (const Time&)
+Weather::initialize (const Time&, Treelog &)
 { }
 
 Weather::Weather (const AttributeList& al)

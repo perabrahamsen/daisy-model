@@ -231,7 +231,7 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all models of some componet.
 #
-MODELS = action_fertilize.C \
+MODELS = groundwater_file.C action_fertilize.C \
 	action_repeat.C column_inorganic.C  vegetation_permanent.C \
 	vegetation_crops.C crop_simple.C action_ridge.C groundwater_fixed.C \
 	groundwater_deep.C action_heat.C hydraulic_M_vG_compact.C \
@@ -249,20 +249,23 @@ MODELS = action_fertilize.C \
 	groundwater_static.C horizon_std.C \
 	crop_std.C action_sow.C action_stop.C condition_time.C \
 	condition_logic.C action_irrigate.C action_lisp.C \
-	weather_none.C weather_file.C action_tillage.C \
-	action_harvest.C hydraulic_old.C crop_old.C crop_sold.C \
-	action_with.C hydraulic_old2.C nitrification_soil.C \
+	weather_none.C action_tillage.C \
+	action_harvest.C crop_old.C crop_sold.C \
+	action_with.C nitrification_soil.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
 	transport_none.C transport_convection.C adsorption_vS_S.C \
 	adsorption_none.C tortuosity_M_Q.C tortuosity_linear.C \
 	adsorption_freundlich.C adsorption_linear.C adsorption_langmuir.C \
 	bioclimate_std.C condition_crop.C \
-	condition_soil.C log_table1.C log_checkpoint.C weather_hourly.C \
+	condition_soil.C log_table1.C log_checkpoint.C \
 	uznone.C condition_daisy.C chemical_std.C \
 	hydraulic_M_BaC_Bimodal.C hydraulic_B_BaC_Bimodal.C \
 	pet_makkink.C pet_weather.C svat_none.C action_spray.C pet_PM.C \
-	svat_pmsw.C action_merge.C action_divide.C groundwater_file.C \
+	svat_pmsw.C action_merge.C action_divide.C \
 	action_surface.C
+
+DISABLED = weather_file.C hydraulic_old.C hydraulic_old2.C weather_hourly.C
+
 
 # A component isa common interface to a number of models.
 #
@@ -289,18 +292,11 @@ SPECIALS = weather_old.C log_extern.C log_select.C parser_file.C solute.C \
 
 # Various utility code that are neither a component or a (sub)model.
 #
-OTHER = traverse_delete.C \
+OTHER = options.C traverse_delete.C \
 	depend.C traverse.C treelog.C treelog_stream.C tmpstream.C \
 	lexer_data.C lexer.C daisy.C alist.C syntax.C library.C plf.C \
 	time.C mathlib.C librarian.C cdaisy.C common.C nrutil.C \
 	submodel.C
-
-MSOURCES = common.C submodel.C mathlib.C librarian.C alist.C syntax.C \
-	library.C plf.C time.C traverse.C treelog.C treelog_stream.C \
-	tmpstream.C lexer_data.C lexer.C parser_file.C parser.C \
-	printer_file.C printer.C document_LaTeX.C document.C mmain.C
-
-MOBJECTS = $(MSOURCES:.C=${OBJ}) $(SPARCOBJ)
 
 # Everything that has an interface.
 #
@@ -323,7 +319,7 @@ LIBOBJ = $(INTERFACES:.C=${OBJ}) $(MODELS:.C=${OBJ}) $(SPARCOBJ)
 #
 OBJECTS = $(LIBOBJ) $(MAIN:.C=${OBJ}) cmain${OBJ} bugmain.o
 SOURCES = $(INTERFACES) $(MODELS) $(SPARCSRC) $(MAIN) $(QTSOURCES) \
-	cmain.c bugmain.c
+	cmain.c bugmain.c $(DISABLED)
 HEADERS = $(INTERFACES:.C=.h) $(QTSOURCES:.C.h) version.h
 
 # Find all printable files.

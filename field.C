@@ -71,7 +71,7 @@ public:
   bool check (bool require_weather, const Time& from, const Time& to, 
 	      Treelog& err) const;
   bool check_am (const AttributeList& am, Treelog& err) const;
-  void initialize (const Time&, const Weather*);
+  void initialize (const Time&, Treelog& err, const Weather*);
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
 };
@@ -447,7 +447,7 @@ Field::Implementation::divide (const string& original, const string& copy,
   copy_alist.add ("type", copy);
   copy_alist.add ("size", copy_size);
   Column* result = &Librarian<Column>::create (copy_alist);
-  result->initialize (time, weather);
+  result->initialize (time, Treelog::null (), weather);
   columns.push_back (result);
 }
   
@@ -491,12 +491,13 @@ Field::Implementation::check_am (const AttributeList& am, Treelog& err) const
 }
 
 void 
-Field::Implementation::initialize (const Time& time, const Weather* weather)
+Field::Implementation::initialize (const Time& time, Treelog& err, 
+				   const Weather* weather)
 {
   for (ColumnList::const_iterator i = columns.begin ();
        i != columns.end ();
        i++)
-    (*i)->initialize (time, weather);
+    (*i)->initialize (time, err, weather);
 }
 
 Field::Implementation::Implementation (const vector<AttributeList*>& sequence)
@@ -659,8 +660,8 @@ Field::check_am (const AttributeList& am, Treelog& err) const
 { return impl.check_am (am, err); }
 
 void 
-Field::initialize (const Time& time, const Weather* weather)
-{ impl.initialize (time, weather); }
+Field::initialize (const Time& time, Treelog& err, const Weather* weather)
+{ impl.initialize (time, err, weather); }
 
 Field::Field (const vector<AttributeList*>& sequence)
   : impl (*new Implementation (sequence))

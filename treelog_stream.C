@@ -42,8 +42,6 @@ void
 TreelogStream::entry (const string& text)
 {
   Treelog::entry (text);
-  assert (impl.path.size () > 0);
-
   for (unsigned int i = 0; i < impl.touched.size (); i++)
     {
       if (!impl.touched[i])

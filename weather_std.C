@@ -77,7 +77,8 @@ struct WeatherStandard : public Weather
   double reference_evapotranspiration_factor;
 
   // Parsing.
-  LexerData lex;
+  const string where;
+  LexerData* lex;
 
   // These are the last read values for today.
   Time last_time;
@@ -164,7 +165,7 @@ struct WeatherStandard : public Weather
     }
 
   // Create and Destroy.
-  void initialize (const Time& time);
+  void initialize (const Time& time, Treelog& err);
   WeatherStandard (const AttributeList&);
   ~WeatherStandard ();
   bool check (const Time& from, const Time& to, Treelog& err) const;
@@ -310,6 +311,8 @@ WeatherStandard::tick (const Time& time)
 void 
 WeatherStandard::read_line ()
 {
+  assert (lex);
+
   // Remember old values.
   last_time = next_time;
   last_air_temperature = next_air_temperature;
@@ -325,21 +328,21 @@ WeatherStandard::read_line ()
       // Read new values.
       for (unsigned int i = 0; i < data_index.size (); i++)
 	{
-	  lex.skip_space ();
+	  lex->skip_space ();
 	  const int index = data_index[i];
 	  if (index < 0)
 	    continue;
 	  const double factor = data_description[index].factor
 	    ? this->*(data_description[index].factor) : 1.0;
-	  const double value =  factor * lex.get_number ();
+	  const double value =  factor * lex->get_number ();
 	  this->*(data_description[index].value) = value;
 	  if (value < data_description[index].min)
-	    lex.error (string ("Column ") 
+	    lex->error (string ("Column ") 
 		       + data_description[index].name + " value too low");
 	  else if (value > data_description[index].max)
-	    lex.error (string ("Column ") 
+	    lex->error (string ("Column ") 
 		       + data_description[index].name + " value too hight");
-	  if (!lex.good ())
+	  if (!lex->good ())
 	    throw ("no more climate data");
 	  if (next_precipitation < 0.0)
 	    next_precipitation = 0.0;
@@ -358,19 +361,19 @@ WeatherStandard::read_line ()
 
 	  if (!Time::valid (year, month, mday, hour))
 	    {
-	      lex.error ("Invalid date");
-	      lex.next_line ();
+	      lex->error ("Invalid date");
+	      lex->next_line ();
 	      continue;
 	    }
 	  if (timestep > 0 && !(next_time == Time (year, month, mday, hour)))
 	    {
-	      lex.error ("Bad timestep");
+	      lex->error ("Bad timestep");
 	      next_time = Time (year, month, mday, hour);
 	    }
 	}
       break;
     }
-  lex.next_line ();
+  lex->next_line ();
 }
 void 
 WeatherStandard::read_new_day (const Time& time)
@@ -447,8 +450,245 @@ WeatherStandard::read_new_day (const Time& time)
 }
 
 void
-WeatherStandard::initialize (const Time& time)
+WeatherStandard::initialize (const Time& time, Treelog& err)
 { 
+  assert (lex == NULL);
+  lex = new LexerData (where, err);
+  // Open errors?
+  if (!lex->good ())
+    return;
+
+  // Read first line.
+  const string type = lex->get_word ();
+  if (type != "dwf-0.0")
+    lex->error ("Wrong file type");
+  lex->skip_line ();
+  lex->next_line ();
+
+  set<string, less<string>/**/> keywords;
+
+  // Read keywords.
+  bool last_was_note = false;
+  while (lex->good () && lex->peek () != '-')
+    {
+      string key = lex->get_word ();
+
+      assert (key.size () > 0);
+      if (key[key.size () - 1] != ':')
+	{
+	  lex->error ("Keywords should end in :");
+	  lex->skip_line ();
+	  lex->next_line ();
+	  continue;
+	}
+      key = key.substr (0, key.size () - 1);
+
+      if (keywords.find (key) == keywords.end ())
+	keywords.insert (key);
+      else if (key != "Note")
+	lex->error (string ("Duplicate keyword `") + key + "'");
+      else if (!last_was_note)
+	lex->error ("Only one Note: block allowed");
+      
+      last_was_note = false;
+		   
+      if (key == "Station")
+	lex->skip_line ();
+      else if (key == "Note")
+	{
+	  lex->skip_line ();
+	  last_was_note = true;
+	}
+      else if (key == "Surface")
+	{
+	  lex->skip_space ();
+	  const string type = lex->get_word ();
+	  if (type == "reference")
+	    surface = Surface::reference;
+	  else if (type == "field")
+	    surface = Surface::field;
+	  else
+	    lex->error ("Uknown surface type");
+	}
+      else if (key == "Begin")
+	{
+	  lex->skip_space ();
+	  lex->read_date (begin);
+	}
+      else if (key == "End")
+	{
+	  lex->skip_space ();
+	  lex->read_date (end);
+	}
+      else
+	{
+	  lex->skip_space ();
+	  double val = lex->get_number ();
+	  lex->skip_space ();
+	  string dim = lex->get_word ();
+	      
+	  if (key == "NH4WetDep")
+	    {
+	      if (has_conversion (dim, "ppm"))
+		val *= convert_unit (dim, "ppm");
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex->error ("Unreasonable value");
+	      WetDeposit.NH4 = val;
+	    }
+	  else if (key == "NH4DryDep")
+	    {
+	      if (has_conversion (dim, "kgN/year"))
+		val *= convert_unit (dim, "kgN/year");
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex->error ("Unreasonable value");
+	      DryDeposit.NH4 = val;
+	    }
+	  else if (key == "NO3WetDep")
+	    {
+	      if (has_conversion (dim, "ppm"))
+		val *= convert_unit (dim, "ppm");
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex->error ("Unreasonable value");
+	      WetDeposit.NO3 = val;
+	    }
+	  else if (key == "NO3DryDep")
+	    {
+	      if (has_conversion (dim, "kgN/year"))
+		val *= convert_unit (dim, "kgN/year");
+	      else
+		lex->error ("Unknown dimension");
+	      if (val < 0.0 || val > 100.0)
+		lex->error ("Unreasonable value");
+	      DryDeposit.NO3 = val;
+	    }
+	  else if (key == "Timestep")
+	    {
+	      if (has_conversion (dim, "hours"))
+		val *= convert_unit (dim, "hours");
+	      else
+		lex->error ("Unknown dimension");
+	      timestep = static_cast<int> (val);
+	      if (timestep != val || timestep < 0.0)
+		lex->error ("Timestep should be a cardinal number");
+	    }
+	  else
+	    {
+	      bool found = false;
+	      for (unsigned int i = 0; i < keyword_description_size; i++)
+		{
+		  if (key == keyword_description[i].name)
+		    {
+		      if (has_conversion (dim, keyword_description[i].dim))
+			val *= convert_unit (dim, keyword_description[i].dim);
+		      else
+			lex->error ("Unknown dimension");
+		      if (val < keyword_description[i].min)
+			lex->error (key + " value too low");
+		      else if (val > keyword_description[i].max)
+			lex->error (key + " value too high");
+		      this->*(keyword_description[i].value) = val;
+		      found = true;
+		    }
+		}
+	      if (!found)
+		lex->error (string ("Unknown keyword: `") + key + "'");
+	    }
+	}
+      lex->next_line ();
+    }
+
+  // Check keywords.
+  for (unsigned int i = 0; i < keyword_description_size; i++)
+    if (keyword_description[i].required 
+	&& keywords.find (keyword_description[i].name) == keywords.end ())
+      lex->error (string ("Keyword ") 
+		 + keyword_description[i].name + " missing");
+
+  static const string required[] = 
+  { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep", "Station",
+    "Surface", "Begin", "End" };
+  static const int required_size = sizeof (required) / sizeof (string);
+  
+  for (unsigned int i = 0; i < required_size; i++)
+    if (keywords.find (required[i]) == keywords.end ())
+      lex->error (string ("Missing keyword `") + required[i] + "'");
+
+  // BC5 sucks // if (begin >= end)
+  if (!(begin < end))
+    lex->error ("Weather data ends before they begin");
+
+  lex->skip_hyphens ();
+
+  // Columns
+  do
+    {
+      const string column = lex->get_word ();
+      bool found = false;
+      for (unsigned int j = 0; j < data_description_size; j++)
+	if (column == data_description[j].name)
+	  {
+	    data_index.push_back (j);
+	    found = true;
+	    break;
+	  }
+      if (!found)
+	{
+	  data_index.push_back (-1);
+	  lex->error (string ("Unknown column ") + column);
+	}
+      lex->skip_space ();
+    }
+  while (lex->good () && lex->peek () != '\n');
+  lex->next_line ();
+
+  has_date = (has_data ("Year") && has_data ("Month") && has_data ("Day"));
+  has_hour = (has_date && has_data ("Hour"));
+  if (!has_date && (has_data ("Year")
+		    || has_data ("Month")
+		    || has_data ("Day")))
+    lex->error ("You should specify all of Year, Month and Day, or none");
+  if (timestep < 1 && !has_date)
+    lex->error ("You must specify either a timestep or date");
+  has_temperature = has_data ("AirTemp");
+  has_vapor_pressure = has_data ("VapPres");
+  has_relative_humidity = has_data ("RelHum");
+  if (has_relative_humidity && has_vapor_pressure)
+    lex->error ("You should only specify one of VapPres or RelHum");
+  has_wind_speed = has_data ("Wind");
+  has_reference_evapotranspiration = has_data ("RefEvap");
+  for (unsigned int j = 0; j < data_description_size; j++)
+    if (data_description[j].required && !has_data (data_description[j].name))
+      lex->error (string ("Required data column `") 
+		 + data_description[j].name + "' missing");
+
+  // Dimensions.
+  for (unsigned int i = 0; i < data_index.size (); i++)
+    {
+      const string dimension = lex->get_word ();
+      const int index = data_index[i];
+      if (has_conversion (dimension, data_description[index].dim))
+	{
+	  if (data_description[index].factor)
+	    this->*(data_description[index].factor) 
+	      = convert_unit (dimension, data_description[index].dim);
+	}
+      else
+	lex->error ("Bad unit");
+
+      lex->skip_space ();
+    }
+  lex->next_line ();
+
+  // Time.
+  next_time = begin;
+  next_time.tick_hour (-timestep);
+
   if (time.hour () == 0)
     return;
   Time midnight (time.year (), time.month (), time.mday (), 0);
@@ -476,7 +716,8 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     relative_humidity_factor (1.0),
     wind_speed_factor (1.0),
     reference_evapotranspiration_factor (1.0),
-    lex (al.name ("where"), CERR),
+    where (al.name ("where")),
+    lex (NULL),
     last_time (end),
     last_air_temperature (-42.42e42),
     last_global_radiation (-42.42e42),
@@ -502,254 +743,20 @@ WeatherStandard::WeatherStandard (const AttributeList& al)
     daily_global_radiation_ (-42.42e42),
     snow_fraction (-42.42e42),
     rain_fraction (-42.42e42)
-{  
-  // Open errors?
-  if (!lex.good ())
-    return;
-
-  // Read first line.
-  const string type = lex.get_word ();
-  if (type != "dwf-0.0")
-    lex.error ("Wrong file type");
-  lex.skip_line ();
-  lex.next_line ();
-
-  set<string, less<string>/**/> keywords;
-
-  // Read keywords.
-  bool last_was_note = false;
-  while (lex.good () && lex.peek () != '-')
-    {
-      string key = lex.get_word ();
-
-      assert (key.size () > 0);
-      if (key[key.size () - 1] != ':')
-	{
-	  lex.error ("Keywords should end in :");
-	  lex.skip_line ();
-	  lex.next_line ();
-	  continue;
-	}
-      key = key.substr (0, key.size () - 1);
-
-      if (keywords.find (key) == keywords.end ())
-	keywords.insert (key);
-      else if (key != "Note")
-	lex.error (string ("Duplicate keyword `") + key + "'");
-      else if (!last_was_note)
-	lex.error ("Only one Note: block allowed");
-      
-      last_was_note = false;
-		   
-      if (key == "Station")
-	lex.skip_line ();
-      else if (key == "Note")
-	{
-	  lex.skip_line ();
-	  last_was_note = true;
-	}
-      else if (key == "Surface")
-	{
-	  lex.skip_space ();
-	  const string type = lex.get_word ();
-	  if (type == "reference")
-	    surface = Surface::reference;
-	  else if (type == "field")
-	    surface = Surface::field;
-	  else
-	    lex.error ("Uknown surface type");
-	}
-      else if (key == "Begin")
-	{
-	  lex.skip_space ();
-	  lex.read_date (begin);
-	}
-      else if (key == "End")
-	{
-	  lex.skip_space ();
-	  lex.read_date (end);
-	}
-      else
-	{
-	  lex.skip_space ();
-	  double val = lex.get_number ();
-	  lex.skip_space ();
-	  string dim = lex.get_word ();
-	      
-	  if (key == "NH4WetDep")
-	    {
-	      if (has_conversion (dim, "ppm"))
-		val *= convert_unit (dim, "ppm");
-	      else
-		lex.error ("Unknown dimension");
-	      if (val < 0.0 || val > 100.0)
-		lex.error ("Unreasonable value");
-	      WetDeposit.NH4 = val;
-	    }
-	  else if (key == "NH4DryDep")
-	    {
-	      if (has_conversion (dim, "kgN/year"))
-		val *= convert_unit (dim, "kgN/year");
-	      else
-		lex.error ("Unknown dimension");
-	      if (val < 0.0 || val > 100.0)
-		lex.error ("Unreasonable value");
-	      DryDeposit.NH4 = val;
-	    }
-	  else if (key == "NO3WetDep")
-	    {
-	      if (has_conversion (dim, "ppm"))
-		val *= convert_unit (dim, "ppm");
-	      else
-		lex.error ("Unknown dimension");
-	      if (val < 0.0 || val > 100.0)
-		lex.error ("Unreasonable value");
-	      WetDeposit.NO3 = val;
-	    }
-	  else if (key == "NO3DryDep")
-	    {
-	      if (has_conversion (dim, "kgN/year"))
-		val *= convert_unit (dim, "kgN/year");
-	      else
-		lex.error ("Unknown dimension");
-	      if (val < 0.0 || val > 100.0)
-		lex.error ("Unreasonable value");
-	      DryDeposit.NO3 = val;
-	    }
-	  else if (key == "Timestep")
-	    {
-	      if (has_conversion (dim, "hours"))
-		val *= convert_unit (dim, "hours");
-	      else
-		lex.error ("Unknown dimension");
-	      timestep = static_cast<int> (val);
-	      if (timestep != val || timestep < 0.0)
-		lex.error ("Timestep should be a cardinal number");
-	    }
-	  else
-	    {
-	      bool found = false;
-	      for (unsigned int i = 0; i < keyword_description_size; i++)
-		{
-		  if (key == keyword_description[i].name)
-		    {
-		      if (has_conversion (dim, keyword_description[i].dim))
-			val *= convert_unit (dim, keyword_description[i].dim);
-		      else
-			lex.error ("Unknown dimension");
-		      if (val < keyword_description[i].min)
-			lex.error (key + " value too low");
-		      else if (val > keyword_description[i].max)
-			lex.error (key + " value too high");
-		      this->*(keyword_description[i].value) = val;
-		      found = true;
-		    }
-		}
-	      if (!found)
-		lex.error (string ("Unknown keyword: `") + key + "'");
-	    }
-	}
-      lex.next_line ();
-    }
-
-  // Check keywords.
-  for (unsigned int i = 0; i < keyword_description_size; i++)
-    if (keyword_description[i].required 
-	&& keywords.find (keyword_description[i].name) == keywords.end ())
-      lex.error (string ("Keyword ") 
-		 + keyword_description[i].name + " missing");
-
-  static const string required[] = 
-  { "NH4WetDep", "NO3WetDep", "NH4DryDep", "NO3DryDep", "Station",
-    "Surface", "Begin", "End" };
-  static const int required_size = sizeof (required) / sizeof (string);
-  
-  for (unsigned int i = 0; i < required_size; i++)
-    if (keywords.find (required[i]) == keywords.end ())
-      lex.error (string ("Missing keyword `") + required[i] + "'");
-
-  // BC5 sucks // if (begin >= end)
-  if (!(begin < end))
-    lex.error ("Weather data ends before they begin");
-
-  lex.skip_hyphens ();
-
-  // Columns
-  do
-    {
-      const string column = lex.get_word ();
-      bool found = false;
-      for (unsigned int j = 0; j < data_description_size; j++)
-	if (column == data_description[j].name)
-	  {
-	    data_index.push_back (j);
-	    found = true;
-	    break;
-	  }
-      if (!found)
-	{
-	  data_index.push_back (-1);
-	  lex.error (string ("Unknown column ") + column);
-	}
-      lex.skip_space ();
-    }
-  while (lex.good () && lex.peek () != '\n');
-  lex.next_line ();
-
-  has_date = (has_data ("Year") && has_data ("Month") && has_data ("Day"));
-  has_hour = (has_date && has_data ("Hour"));
-  if (!has_date && (has_data ("Year")
-		    || has_data ("Month")
-		    || has_data ("Day")))
-    lex.error ("You should specify all of Year, Month and Day, or none");
-  if (timestep < 1 && !has_date)
-    lex.error ("You must specify either a timestep or date");
-  has_temperature = has_data ("AirTemp");
-  has_vapor_pressure = has_data ("VapPres");
-  has_relative_humidity = has_data ("RelHum");
-  if (has_relative_humidity && has_vapor_pressure)
-    lex.error ("You should only specify one of VapPres or RelHum");
-  has_wind_speed = has_data ("Wind");
-  has_reference_evapotranspiration = has_data ("RefEvap");
-  for (unsigned int j = 0; j < data_description_size; j++)
-    if (data_description[j].required && !has_data (data_description[j].name))
-      lex.error (string ("Required data column `") 
-		 + data_description[j].name + "' missing");
-
-  // Dimensions.
-  for (unsigned int i = 0; i < data_index.size (); i++)
-    {
-      const string dimension = lex.get_word ();
-      const int index = data_index[i];
-      if (has_conversion (dimension, data_description[index].dim))
-	{
-	  if (data_description[index].factor)
-	    this->*(data_description[index].factor) 
-	      = convert_unit (dimension, data_description[index].dim);
-	}
-      else
-	lex.error ("Bad unit");
-
-      lex.skip_space ();
-    }
-  lex.next_line ();
-
-  // Time.
-  next_time = begin;
-  next_time.tick_hour (-timestep);
-}
+{ }
 
 WeatherStandard::~WeatherStandard ()
-{ }
+{ delete lex; }
 
 bool
 WeatherStandard::check (const Time& from, const Time& to, Treelog& err) const
 { 
+  assert (lex);
   bool ok = true;
-  if (lex.error_count > 0)
+  if (lex->error_count > 0)
     {
       TmpStream tmp;
-      tmp () << lex.error_count << " parser errors encountered";
+      tmp () << lex->error_count << " parser errors encountered";
       err.entry (tmp.str ());
       ok = false;
     }

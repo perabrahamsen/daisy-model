@@ -5,6 +5,7 @@
 #include "alist.h"
 #include "library.h"
 #include "treelog_stream.h"
+#include "options.h"
 #include <stdexcept>
 #include <typeinfo>
 
@@ -45,7 +46,7 @@ main (int argc, char* argv[])
 
       // Create, check and run the simulation.
       Daisy daisy (alist);
-      daisy.initialize (syntax);
+      daisy.initialize (syntax, treelog);
 
       if (!daisy.check (treelog))
 	return 1;

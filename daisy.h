@@ -45,7 +45,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize (const Syntax&);
+  void initialize (const Syntax&, Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
   Daisy (const AttributeList&);
   ~Daisy ();

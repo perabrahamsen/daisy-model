@@ -146,7 +146,7 @@ LexerData::next_line ()
     }
 }
 
-LexerData::LexerData (const string& name, ostream& out)
+LexerData::LexerData (const string& name, Treelog& out)
   : Lexer (name, out)
 { }
 

@@ -289,14 +289,15 @@ ColumnBase::ColumnBase (const AttributeList& al)
 { }
 
 void 
-ColumnBase::initialize (const Time& time, const Weather* global_weather)
+ColumnBase::initialize (const Time& time, Treelog& err, 
+			const Weather* global_weather)
 {
   if (weather)
-    weather->initialize (time);
+    weather->initialize (time, err);
   if (!global_weather && !weather)
     return;
   const Weather& my_weather = *(weather ? weather : global_weather);
-  groundwater.initialize (time, soil);
+  groundwater.initialize (time, soil, err);
   soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, my_weather);
   soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater);
   soil_chemicals.initialize (alist.alist ("SoilChemicals"), soil, soil_water);

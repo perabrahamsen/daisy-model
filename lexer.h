@@ -6,13 +6,16 @@
 #include "common.h"
 #include <fstream.h>
 
+class Treelog;
+
 class Lexer
 {
   // State.
 private:
+  static bool open_file (ifstream& in, const string& name);
   ifstream in;
 public:
-  ostream& err;
+  Treelog& err;
 private:
   int line;
   int column;
@@ -30,7 +33,7 @@ public:
 
   // Create and destroy.
 public:
-  Lexer (const string&, ostream&);
+  Lexer (const string&, Treelog&);
   ~Lexer ();
 };
 
