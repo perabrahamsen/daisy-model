@@ -23,7 +23,6 @@
 // Parameters specified by Cosby et al.
 
 #include "hydraulic.h"
-#include "horizon.h"
 
 class Hydraulic_Cosby : public Hydraulic
 {
@@ -44,7 +43,7 @@ private:
   
   // Create and Destroy.
 public:
-  void initialize (const Horizon& horizon);
+  void initialize (double clay, double silt, double sand);
   Hydraulic_Cosby (const AttributeList&);
   ~Hydraulic_Cosby ();
 };
@@ -108,15 +107,14 @@ Hydraulic_Cosby::Sr (double h) const
 }
 
 void
-Hydraulic_Cosby::initialize (const Horizon& horizon)
+Hydraulic_Cosby::initialize (double clay, double silt, double sand)
 {
   const double cm_per_inch = 2.54;
-  const double clay = horizon.clay () * 100.0; // [%]
-  const double silt = horizon.silt () * 100.0; // [%]
-  const double sand = horizon.sand () * 100.0; // [%]
+  clay *= 100.0;		// [%]
+  silt *= 100.0;		// [%]
+  sand *= 100.0;		// [%]
   b = 3.10 + 0.157 * clay - 0.003 * sand; // []
   assert (b > 0.0);
-  // assert (b <= 1.0);
   h_b   = -exp ( 1.54 - 0.0095 * sand + 0.0063 * silt); // [cm]
   assert (h_b < 0.0);
   K_sat = exp (-0.60 + 0.0126 * sand - 0.0064 * clay) * cm_per_inch; // [cm/h]

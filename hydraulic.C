@@ -91,7 +91,7 @@ Hydraulic::load_syntax (Syntax& syntax, AttributeList& alist)
 }
 
 void
-Hydraulic::initialize (const Horizon&)
+Hydraulic::initialize (double /* clay */, double /* silt */, double /* sand */)
 { }
 
 Hydraulic::Hydraulic (const AttributeList& al)

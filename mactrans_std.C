@@ -96,8 +96,11 @@ MactransStandard::tick (const Soil& soil, const SoilWater& soil_water,
 	  else
 	    {
 	      // Water through macropores from below... too weird.
-	      CERR << "Weirdness: Got " << -water_out_below * 10 
-		   << " mm water from below through macropores\n";
+	      if (-water_out_below * 10 > 1e-10)
+		{
+		  CERR << "Weirdness: Got " << -water_out_below * 10 
+		       << " mm water from below through macropores\n";
+		}
 	      delta_matter = 0.0; // Just assume pure water.
 	    }
 	}

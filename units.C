@@ -192,6 +192,7 @@ Units::standard_conversions ()
   add ("m", "cm", 100.0);
   add ("pF", "cm", *new Convert_pF_cm ());
   add ("cm", "pF", *new Convert_cm_pF ());
+  add ("d^-1", "h^-1", 1.0/24.0);
 }
 
 Units::Units ()

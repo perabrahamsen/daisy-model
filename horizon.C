@@ -544,7 +544,7 @@ Horizon::Horizon (const AttributeList& al)
     hydraulic (Librarian<Hydraulic>::create (al.alist ("hydraulic"))),
     tortuosity (Librarian<Tortuosity>::create (al.alist ("tortuosity")))
 { 
-  hydraulic.initialize (*this);
+  hydraulic.initialize (clay (), silt (), sand ());
   if (impl.K_water.size () == 0)
     { 
       impl.initialize (hydraulic);

@@ -16,11 +16,15 @@ release.
 
 ** Fix checkpoints.
 
+** You can now specify [d^-1] instead of [h^-1].
+
+** You can now specify fractions with [%].
+
 * 2.07 
 
 ** New "Cosby_et_al" hydraulic model.
 
-This is a modied Bruce Campell model with parameters derived by
+This is a modified Bruce Campell model with parameters derived by
 pedotransfer functions as specified by Cosby et al.
 
 This model is now default, so you don't have to specify hydraulic

@@ -1,7 +1,25 @@
+2002-02-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.08 released.
+
 2002-02-07  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* hydraulic.C, hydraulic.h, hydraulic_Cosby.C (initialize): Take
+	clay, sand and silt parameters instead of horizon.
+	* horizon.C (Horizon): Update caller.
+
+	* transport_cd.C (tick): Only complain if the error is above mg/ha
+	in the root zone.
+
+	* parser_file.C (convert): Added support for [%].
+	(check_dimension): Ditto.
+
+	* units.C (standard_conversions): Added "[d^-1]" -> "[h^-1]"
+	conversion. 
+
 	* groundwater_pipe.C (initialize): Fix 'Treelog::Open' nesting
-	bug.  Added some assertions.
+	bug.  
+	Added some assertions.
 
 	* vernalization.C (output): Don't output if not required (need for
 	checkpoints).

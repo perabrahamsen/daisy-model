@@ -233,6 +233,8 @@ ParserFile::Implementation::check_dimension (const string& syntax,
 	  if (read.length () == 0 || read[0] != '?')
 	    warning ("you must use [?<dim>] for entries with unknown syntax");
 	}
+      else if (syntax == Syntax::Fraction () && read == "%")
+	return true;
       else if (syntax == Syntax::None ()
 	  || syntax == Syntax::Fraction ())
 	{
@@ -262,6 +264,8 @@ ParserFile::Implementation::convert (double value,
     return value; 
   if (syntax == read)
     return value;
+  if (syntax == Syntax::Fraction () && read == "%")
+    return value * 0.01;
   
   try
     {

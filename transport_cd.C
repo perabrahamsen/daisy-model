@@ -318,7 +318,7 @@ TransportCD::tick (const Soil& soil, const SoilWater& soil_water,
 
 	  if (M[j] < 0.0)
 	    { 
-	      if (M[j] < -1e-18)
+	      if (M[j] < -1e-13) // 1 mg/ha
 		CERR << "\nBUG: M[" << j << "] = " << M[j] 
 		     << " after transport\n";
 	      M[j] = 0.0;

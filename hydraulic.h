@@ -26,7 +26,6 @@
 #include "librarian.h"
 
 class PLF;
-class Horizon;
 
 class Hydraulic 
 {
@@ -62,7 +61,7 @@ protected:
   // Create and Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
-  virtual void initialize (const Horizon&);
+  virtual void initialize (double clay, double silt, double sand);
   Hydraulic (const AttributeList&);
   virtual ~Hydraulic ();
 };

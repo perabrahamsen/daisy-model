@@ -198,25 +198,18 @@ GroundwaterPipe::update_water (const Soil& soil,
     }
   for (unsigned int i = 1; i <= i_bottom+1; i++)
     {
-       if (-q_p[i]>0)
-         {
-           if (-q[i]>0)
-             {
-               const double x_p = q_p[i]/(q[i] + q_p[i]);
-               q_p[i] = - x_p * Percolation[i-1];
-               q[i] = -Percolation[i-1] - q_p[i];
-             }
-           else
-             {
-               q[i] = -Percolation[i-1] - q_p[i];
-             }
-         }
+       if (-q_p[i]>0 && -q[i]>0)
+	 {
+	   const double x_p = q_p[i]/(q[i] + q_p[i]);
+	   q_p[i] = - x_p * Percolation[i-1];
+	   q[i] = -Percolation[i-1] - q_p[i];
+	 }
        else
-         {
-           assert (q_p[i] == 0.0);
-           q[i] = - Percolation[i-1];
-         }
+	 {
+	   q[i] = -Percolation[i-1] - q_p[i];
+	 }
        assert (finite (q[i]));
+       assert (finite (q_p[i]));
     }
   assert(DrainFlow>=0.0);
   height = GWT_new;
