@@ -1051,6 +1051,8 @@ CropStandardSyntax::CropStandardSyntax ()
   syntax.add ("CrpAux", CrpAux, Syntax::State);
   alist.add ("CrpAux", vCrpAux);
 
+  syntax.add ("description", Syntax::String, Syntax::Optional); 
+
   Librarian<Crop>::add_type ("default", alist, syntax, &make);
 }
 

@@ -43,8 +43,6 @@ main (int argc, char* argv[])
 	  return 2;
 	}
 
-assert (1 == 2);
-
       // Parse the file.
       ParserFile parser (syntax, argv[1]);
       parser.load (alist);
