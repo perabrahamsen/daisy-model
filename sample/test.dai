@@ -11,18 +11,18 @@
 (weather default "weather.dwf")
 
 ;; We have some very sandy soil.
-(defhorizon Ap default
+(defhorizon Ap FAO3
   "Andeby top soil."
-  (clay 8.0 [])
-  (silt 10.5 [])
-  (sand 79.9 [])
-  (humus 1.12 [])
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 81.5 [%])
+  (humus 1.12 [%])
   (C_per_N 11.0 [g C/g N])
   (dry_bulk_density 1.5 [g/cm^3]))
 
 (defhorizon C Ap
   "Andeby C horizon."
-  (humus 0.12 []))
+  (humus 0.12 [%]))
 
 ;; We build the column from the horizons.
 (defcolumn Andeby default
