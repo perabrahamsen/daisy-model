@@ -357,7 +357,6 @@ Select::match (const Daisy& daisy, Treelog& out, bool is_printing)
   else
     is_active = is_printing;
 
-  valid_level = is_active;
   return is_active;
 }
 
@@ -491,7 +490,6 @@ Select::Select (const AttributeList& al)
     current_path_index (0U),
     last_valid_path_index (0U),
     current_name (path[0]),
-    valid_level (false),
     is_active (false)
 { }
 

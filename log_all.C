@@ -39,10 +39,7 @@ LogAll::match (const Daisy& daisy, Treelog& msg)
 
       for (unsigned int i = 0; i < entries.size (); i++)
 	if (entries[i]->is_active)
-	  {
-	    daisy_assert (entries[i]->valid_level);
-	    current.push_back (entries[i]);
-	  }
+	  current.push_back (entries[i]);
     }
 
   return is_active;

@@ -81,20 +81,11 @@ private:
   
 public:
   bool valid (symbol name) const
-  {
-    daisy_assert (valid_level);
-    // Is the next path index valid?
-    return current_name == wildcard || name == current_name; 
-  }
-  bool valid_level;
+  { return current_name == wildcard || name == current_name; }
   bool valid_leaf ()
-  { 
-    daisy_assert (valid_level);
-    return last_index == current_path_index; 
-  }
+  { return last_index == current_path_index; }
   bool open (symbol name)	// Open one leaf level.
   { 
-    daisy_assert (valid_level);
     // Check if next level is also in path.
     if (!valid (name))
 	return false;
@@ -109,12 +100,10 @@ public:
     last_valid_path_index++;
     // Direct acces to new head of path.
     current_name = path[current_path_index];
-    daisy_assert (valid_level);
     return true;
   }
   void close ()		// Close one level.
   { 
-    daisy_assert (valid_level);
     // Decrease nesting.
     current_path_index--;
 
@@ -122,8 +111,6 @@ public:
     last_valid_path_index--;
     // And restore direct access to current path.
     current_name = path[current_path_index];
-
-    daisy_assert (valid_level);
   }
 
   // Output routines.
