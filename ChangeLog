@@ -1,3 +1,7 @@
+2002-10-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.38 released.
+
 2002-09-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* vegetation_crops.C (DM_by_name): Support crop name "all".
