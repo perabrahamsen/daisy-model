@@ -1859,6 +1859,30 @@ To use, set \"$am\" to the name of the AOM, e.g. (set \"$am\" pig_slurry)."
 			(dimension "kg C/ha/&"))
            ))
 
+(deflog "DOM-N" table
+  "Information about nitrogen in disolved organic matter pools."
+  (where "dom-N.dlf")
+  (when hourly)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+	   (hour (path time))
+           (array (path column "$col" OrganicMatter dom "$pool" N M)
+		  (tag "D1-N")
+		  (spec column default OrganicMatter dom N M))))
+
+(deflog "DOM-C" table
+  "Information about carbon in disolved organic matter pools."
+  (where "dom-C.dlf")
+  (when hourly)
+  (entries (year (path time))
+           (month (path time))
+           (mday (path time))
+	   (hour (path time))
+           (array (path column "$col" OrganicMatter dom "$pool" C M)
+		  (tag "D1-N")
+		  (spec column default OrganicMatter dom C M))))
+
 (deflog "Hourly Groundwater" table
   (where "hourly_groundwater.dlf")
   (when (hourly))
