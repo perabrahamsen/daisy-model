@@ -12,6 +12,13 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.92
+
+** New anisotropy Soil parameter.
+
+Set this to a number larger than 1.0 to make water flow faster towards
+drain pipes.  
+
 * 2.91
 
 ** Daisy now only print the date on the screen when something happens.

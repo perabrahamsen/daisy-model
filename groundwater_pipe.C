@@ -264,7 +264,9 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
       for (unsigned int i = i_GWT; i <= i_drain; i++)
 	{
 	  Ha += soil.dz (i);
-	  Ka += soil.dz (i) * soil.K (i, 0.0, 0.0, soil_heat.T (i));
+	  Ka += soil.dz (i) 
+	    * soil.K (i, 0.0, 0.0, soil_heat.T (i))
+	    * soil.anisotropy (i);
 	}
       Ka /= Ha;
 
@@ -274,7 +276,9 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil,
       for (unsigned int i = i_drain+1; i <= i_bottom; i++)
 	{
 	  Hb += soil.dz (i);
-	  Kb += soil.dz (i) * soil.K (i, 0.0, 0.0, soil_heat.T (i));
+	  Kb += soil.dz (i) 
+	    * soil.K (i, 0.0, 0.0, soil_heat.T (i))
+	    * soil.anisotropy (i);
 	}
       Kb /= Hb;
       const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);

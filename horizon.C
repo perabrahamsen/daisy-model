@@ -66,6 +66,7 @@ struct Horizon::Implementation
   // Strange things.
   const double quarts_form_factor;
   const double mineral_form_factor;
+  const double anisotropy;
 
   // Heat Capacity and Conductivity.
   double C_soil;
@@ -348,7 +349,7 @@ Horizon::Implementation::weight (const AttributeList& al, string name)
 
   if (name == "coarse_sand" && !al.check (name))
     return -42.42e42;
-
+  
   return al.number (name) / total;
 }
 
@@ -372,6 +373,7 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     turnover_factor (al.number ("turnover_factor")),
     quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
+    anisotropy (al.number ("anisotropy")),
     intervals (al.integer ("intervals"))
 { 
   if (al.check ("C_soil"))
@@ -425,6 +427,10 @@ Horizon::C_per_N () const
 double
 Horizon::turnover_factor () const
 { return impl.turnover_factor; }
+
+double
+Horizon::anisotropy () const
+{ return impl.anisotropy; }
 
 double
 Horizon::heat_conductivity (double Theta, double Ice) const
@@ -535,6 +541,12 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   AttributeList tortuosity;
   tortuosity.add ("type", "M_Q");
   alist.add ("tortuosity", tortuosity);
+  syntax.add ("anisotropy", Syntax::None (),
+	      Check::non_negative (), Syntax::Const, "\
+Horizontal saturated water conductivity relative to vertical saturated\n\
+water conductivity.  The higher this value, the faster the water will\n\
+move towards drain pipes.");
+  alist.add ("anisotropy", 1.0);
   syntax.add ("clay", Syntax::None (), Check::non_negative (), Syntax::Const,
 	      "Relative fraction of clay in soil.");
   syntax.add ("silt", Syntax::None (), Check::non_negative (), Syntax::Const,

@@ -1,3 +1,13 @@
+2003-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 2.92 released.
+
+2003-05-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C, horizon.h (anisotropy): New parameter.
+	* soil.C, soil.h (anisotropy): Distribute it.
+	* groundwater_pipe.C (EquilibriumDrainFlow): Use it.
+
 2003-05-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.91 released.

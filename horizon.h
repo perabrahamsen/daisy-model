@@ -43,6 +43,7 @@ public:
   // Water.
 public:
   Hydraulic& hydraulic;
+  double anisotropy () const;
   double heat_conductivity (double Theta, double Ice) const; // [erg/cm/h/dg C]
   double heat_capacity (double Theta, double Ice) const; // [erg/cm^3/dg C]
   

@@ -51,6 +51,7 @@ public:
   
   // Texture.
   double tortuosity_factor (int i, double Theta) const;
+  double anisotropy (int i) const;
   double dry_bulk_density (int i) const;
   double clay (int i) const;
   double humus (int i) const;

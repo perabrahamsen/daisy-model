@@ -172,6 +172,10 @@ Soil::tortuosity_factor (int i, double Theta) const
 { return horizon_[i]->tortuosity.factor (horizon_[i]->hydraulic, Theta); }
 
 double 
+Soil::anisotropy (int i) const
+{ return horizon_[i]->anisotropy (); }
+
+double 
 Soil::dry_bulk_density (int i) const
 { return horizon_[i]->dry_bulk_density (); }
 
@@ -200,7 +204,7 @@ Soil::C_per_N (int i) const
 { return horizon_[i]->C_per_N (); }
 
 double 
-Soil::turnover_factor(int i) const
+Soil::turnover_factor (int i) const
 { return horizon_[i]->turnover_factor (); }
 
 double 
