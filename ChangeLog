@@ -1,4 +1,16 @@
+1998-05-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.023 released.
+
+1998-05-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* bioclimate_std.C (WaterDistribution): Check that `Through_fall'
+	is non-negative.
+
 1998-05-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (struct LogEntry): Support `at' parameter.
+	(LogTableSyntax): Define it.
 
 	* Version 0.022 released.
 

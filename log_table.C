@@ -24,6 +24,7 @@ struct LogEntry
   const double offset;		// - || -
   const double from;		// Restrict interval of array.
   const double to;
+  const double at;		// Specific position in array.
 
   // Permanent state.
   double value;		// Total accumulated value.
@@ -139,7 +140,9 @@ struct LogEntry
 	{
 	  if (geometry)
 	    {
-	      if (to > from)
+	      if (at <= 0)
+		value += array[geometry->interval_plus (at)];
+	      else if (to > from)
 		value += geometry->total (array);
 	      else
 		value += geometry->total (array, from, to);
@@ -154,6 +157,7 @@ struct LogEntry
 	      value += ::accumulate (array.begin (), array.end (), 0.0);
 #endif
 	    }
+	  count++;
 	}
       close ();
     }
@@ -200,6 +204,7 @@ struct LogEntry
       offset (al.number ("offset")),
       from (al.number ("from")),
       to (al.number ("to")),
+      at (al.number ("at")),
       value (al.number ("value")),
       count (al.integer ("count")),
       error (false),
@@ -412,7 +417,8 @@ static struct LogTableSyntax
       entry_alist.add ("from", 0.0);
       entry_syntax.add ("to", Syntax::Number, Syntax::Const);
       entry_alist.add ("to", 1.0);
-      
+      entry_syntax.add ("at", Syntax::Number, Syntax::Const);
+      entry_alist.add ("at", 1.0);
       entry_syntax.add ("value", Syntax::Number, Syntax::State);
       entry_alist.add ("value", 0.0);
       entry_syntax.add ("count", Syntax::Integer, Syntax::State);

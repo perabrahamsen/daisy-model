@@ -261,6 +261,12 @@ BioclimateStandard::WaterDistribution (Surface& surface,
     - min (WaterFromAbove - EvapInterception, 
 	   InterceptionCapacity - intercepted_water);
 
+  if (Through_fall < 0.0)
+    {
+      cerr << "BUG: Through_fall = " << Through_fall << "\n";
+      Through_fall = 0.0;
+    }
+
   intercepted_water += WaterFromAbove - EvapInterception - Through_fall;
 
   double Total_through_fall = Through_fall;
