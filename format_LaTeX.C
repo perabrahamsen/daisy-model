@@ -32,8 +32,13 @@ struct FormatLaTeX : public Format
   void list_close ();
   void item_open (const std::string& name);
   void item_close ();
+  std::stack<bool> table_first_column;
   void table_open (const std::string& format);
   void table_close ();
+  void table_row_open ();
+  void table_row_close ();
+  void table_cell_open ();
+  void table_cell_close ();
   void typewriter_open ();
   void typewriter_close ();
   void section_open (const std::string& type, const std::string& title,
@@ -70,9 +75,9 @@ FormatLaTeX::list_open ()
 { 
   list_level++;
   if (list_level > 3)
-    out () << "\n\\begin{enumerate}";
+    out () << "\\begin{enumerate}\n";
   else
-    out () << "\n\\begin{itemize}";
+    out () << "\\begin{itemize}\n";
 }
 
 void
@@ -100,25 +105,52 @@ FormatLaTeX::item_close ()
 void 
 FormatLaTeX::table_open (const std::string& format)
 {
-  out () << "\n\\begin{tabular}{" << format << "}";
+  out () << "\\begin{tabular}{" << format << "}\n";
 }
 
 void 
 FormatLaTeX::table_close ()
 {
-  out () << "\n\\end{tabular}";
+  out () << "\\end{tabular}\n";
 }
+
+void 
+FormatLaTeX::table_row_open ()
+{ 
+  table_first_column.push (true);
+}
+
+void 
+FormatLaTeX::table_row_close ()
+{
+  daisy_assert (!table_first_column.empty ());
+  table_first_column.pop ();
+  out () << "\\\\\n";
+}
+
+void 
+FormatLaTeX::table_cell_open ()
+{
+  if (table_first_column.top ())
+    table_first_column.top () = false;
+  else
+    out () << " & ";
+}
+
+void 
+FormatLaTeX::table_cell_close ()
+{ }
 
 void
 FormatLaTeX::typewriter_open ()
 { 
-  out () << "\n\\begin{tt}";
+  out () << "\\begin{tt}\n";
 }
 
 void
 FormatLaTeX::typewriter_close ()
 { 
-  out () << "\n\\end{tt}";
+  out () << "\\end{tt}\n";
 }
 
 void 

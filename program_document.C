@@ -837,10 +837,10 @@ ProgramDocument::print_sample (std::ostream& out, const symbol name,
 			       const Library& library)
 {
   daisy_assert (ordered == false);
+  format->soft_linebreak ();
   format->raw ("LaTeX", "\\noindent\n");
   Format::Typewriter dummy (*format);
   Format::Table d2 (*format, "lll");
-  format->soft_linebreak ();
   format->text ("<");
   format->special ("nbsp");
   if (!submodel)

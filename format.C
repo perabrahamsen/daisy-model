@@ -88,6 +88,32 @@ Format::Table::~Table ()
   format.table_close (); 
 }
 
+Format::TableRow::TableRow (Format& f)
+  : format (f)
+{ 
+  format.push ("typewriter");
+  format.typewriter_open ();
+}
+
+Format::TableRow::~TableRow ()
+{ 
+  format.pop ("typewriter");
+  format.typewriter_close (); 
+}
+
+Format::TableCell::TableCell (Format& f)
+  : format (f)
+{ 
+  format.push ("typewriter");
+  format.typewriter_open ();
+}
+
+Format::TableCell::~TableCell ()
+{ 
+  format.pop ("typewriter");
+  format.typewriter_close (); 
+}
+
 Format::Typewriter::Typewriter (Format& f)
   : format (f)
 { 

@@ -86,6 +86,36 @@ public:
     ~Table ();  
   };
 
+  // TableRow.
+private:
+  virtual void table_row_open () = 0;
+  virtual void table_row_close () = 0;
+public:
+  class TableRow
+  {
+  private:
+    Format& format;
+    TableRow (const TableRow&);
+  public:
+    TableRow (Format&);
+    ~TableRow ();  
+  };
+
+  // TableCell.
+private:
+  virtual void table_cell_open () = 0;
+  virtual void table_cell_close () = 0;
+public:
+  class TableCell
+  {
+  private:
+    Format& format;
+    TableCell (const TableCell&);
+  public:
+    TableCell (Format&);
+    ~TableCell ();  
+  };
+
   // Typewriter.
 private:
   virtual void typewriter_open () = 0;
