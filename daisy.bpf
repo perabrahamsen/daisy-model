@@ -178,7 +178,6 @@ USEUNIT("weather_none.C");
 USEUNIT("weather_old.C");
 USEUNIT("weather_simple.C");
 USEUNIT("weather_std.C");
-USEUNIT("path.C");
 //---------------------------------------------------------------------------
 This file is used by the project manager only and should be treated like the project file
 
