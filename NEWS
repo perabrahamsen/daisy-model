@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.52
+
+** No changes.
+
 * 2.51
 
 ** Fixed bug in organic matter initialization.
@@ -36,7 +40,7 @@ You can disable macropores like done in this example:
 
 The macropores will be initiated when the presure go above -3 cm.
 
-** Automatic generated disretition now limited by dispersivity.
+** Automatic generated discretion now limited by dispersivity.
 
 No interval size will be more than twice the dispersivity.
 
