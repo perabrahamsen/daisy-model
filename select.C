@@ -21,7 +21,7 @@ struct Select::Implementation
   unsigned int current_path_index;// How nested in open's we are.
   unsigned int last_valid_path_index;	// Remember the last valid level.
   bool is_active;		// Should we be accumulating now?
-  stack<bool, vector<bool>/**/> maybies; // Keep track of which maybies 
+  vector<bool> maybies;		// Keep track of which maybies 
                                          // have matched.
   bool valid ()		// If the current path index is valid.
   { 
@@ -43,24 +43,24 @@ struct Select::Implementation
 	&& path[current_path_index][0] == '?'
 	&& question_mark + value == path[current_path_index])
       {
-	maybies.push (true);
+	maybies.push_back (true);
 	last_valid_path_index++;
 	current_path_index++;
       }
     else
-      maybies.push (false);
+      maybies.push_back (false);
   }
 
   void close_maybe ()		// Close one level.
   {
     assert (!maybies.empty ());
-    if (maybies.top ())
+    if (maybies.back ())
       {
 	assert (current_path_index == last_valid_path_index);
 	last_valid_path_index--;
 	current_path_index--;
       }
-    maybies.pop ();
+    maybies.pop_back ();
   }
 
   void open_group (const string& name) // Open one group level.
