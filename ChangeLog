@@ -1,3 +1,19 @@
+2001-09-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.79 released.
+
+2001-09-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* pet.C (load_syntax): Added 'reference_evaporation' log variable. 
+	* pet_weather.C, pet_makkink.C, pet_PM.C (output): Log it.
+	* lib/log.dai ("Weather", "Bioclimate"): Use it.
+
+2001-07-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* organic_matter.C (tick): Make sure we calculate the last root
+	node, even when 'active_underground' is false (fixed off-by-one
+	error). 
+
 2001-07-03  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.78 released.

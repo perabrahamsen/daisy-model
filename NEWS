@@ -12,9 +12,21 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.79
+
+** Log the evapotranspiration used, not just the one in the weather file.
+
+** Bug fix: ignored last root node in some circumstances.
+
 * 1.78
 
 ** Keep track of C in crop.
+
+Note: This means the CStem, CDead, CSOrg, CRoot and CLeaf harvest
+parameters of the standard crop module can no longer be set.  Instead
+set the E_Leaf, E_Stem, E_SOrg, E_Root production parameters.  You can
+also log the C content with the CStem, CSOrg, CRoot and CLeaf in
+production. 
 
 * 1.77
 
