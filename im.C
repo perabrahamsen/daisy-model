@@ -112,23 +112,23 @@ static double IM_get_NH4 (const AttributeList& al)
 }
 
 IM::IM ()
-  : NO3 (0.0),
-    NH4 (0.0)
+  : NH4 (0.0),
+    NO3 (0.0)
 { }
 
 IM::IM (const IM& im)
-  : NO3 (im.NO3),
-    NH4 (im.NH4)
+  : NH4 (im.NH4),
+    NO3 (im.NO3)
 { }
 
 IM::IM (const AttributeList& al)
-  : NO3 (IM_get_NO3 (al)),
-    NH4 (IM_get_NH4 (al))
+  : NH4 (IM_get_NH4 (al)),
+    NO3 (IM_get_NO3 (al))
 { }
 
 IM::IM (const IM& n, double flux)
-  : NO3 (n.NO3 * flux),
-    NH4 (n.NH4 * flux)
+  : NH4 (n.NH4 * flux),
+    NO3 (n.NO3 * flux)
 { }
 
 IM::~IM ()
@@ -137,10 +137,10 @@ IM::~IM ()
 void 
 IM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("NO3", Syntax::Number, Syntax::State);
-  alist.add ("NO3", 0.0);
   syntax.add ("NH4", Syntax::Number, Syntax::State);
   alist.add ("NH4", 0.0);
+  syntax.add ("NO3", Syntax::Number, Syntax::State);
+  alist.add ("NO3", 0.0);
   syntax.add ("NH4_evaporation", Syntax::Number, Syntax::Const);
   alist.add ("NH4_evaporation", 0.0);
 }

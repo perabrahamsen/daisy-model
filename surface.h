@@ -1,8 +1,8 @@
 // surface.h
 
 #include "uzmodel.h"
-#include "im.h"
 
+struct IM;
 struct AttributeList;
 struct Log;
 struct Filter;
@@ -11,20 +11,8 @@ struct Soil;
 
 class Surface : public UZtop
 {
-  const double minimal_matter_flux;
-  const bool total_matter_flux;
-  const double EpFactor_;
-  const double EpInterchange_;
-  const double albedo_wet;
-  const double albedo_dry;
-  const double lake;
-  double pond;
-  bool flux;
-  double EvapSoilSurface;
-  double Eps;
-  double T;
-  IM im;
-  IM im_flux;
+  struct Implementation;
+  Implementation& impl;
 
 public:
 
@@ -67,5 +55,6 @@ public:
   // Create.
   static void load_syntax (Syntax&, AttributeList&);
   Surface (const AttributeList& par);
+  ~Surface ();
 };
 

@@ -73,6 +73,7 @@ struct Vegetation::Implementation
   void output (Log&, Filter&) const;
 
   // Create and destroy.
+  void initialize (const Geometry& geometry);
   Implementation (const AttributeList&);
   ~Implementation ();
 };
@@ -339,8 +340,16 @@ Vegetation::Implementation::output (Log& log, Filter& filter) const
   log.output ("interception_capacity", filter, interception_capacity, true);
 }
 
+void
+Vegetation::Implementation::initialize (const Geometry& geometry)
+{
+  for (unsigned int i = 0; i < crops.size (); i++)
+    crops[i]->initialize (geometry);
+  reset_canopy_structure ();
+}
+
 Vegetation::Implementation::Implementation (const AttributeList& al)
-  : crops (),
+  : crops (),			// deque, so we can't use map_create.
     LAI (0.0),
     height (0.0),
     cover (0.0),
@@ -357,7 +366,9 @@ Vegetation::Implementation::Implementation (const AttributeList& al)
   for (vector<AttributeList*>::const_iterator i = sequence.begin ();
        i != sequence.end ();
        i++)
-    crops.push_back (&Librarian<Crop>::create (**i));
+    {
+      crops.push_back (&Librarian<Crop>::create (**i));
+    }
 }
 
 Vegetation::Implementation::~Implementation ()
@@ -463,6 +474,10 @@ Vegetation::sow (const AttributeList& al, const Geometry& geometry)
 void
 Vegetation::output (Log& log, Filter& filter) const
 { impl.output (log, filter); }
+
+void
+Vegetation::initialize (const Geometry& geometry)
+{ impl.initialize (geometry); }
 
 void
 Vegetation::load_syntax (Syntax& syntax, AttributeList& alist)

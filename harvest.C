@@ -16,7 +16,7 @@ Harvest::output (Log& log, Filter& filter) const
   log.output ("leaf_N", filter, leaf_N, true);
   log.output ("sorg_DM", filter, sorg_DM, true);
   log.output ("sorg_N", filter, sorg_N, true);
-  output_submodule (chemicals, "chemicals", log, filter, true);
+  output_submodule_log_only (chemicals, "chemicals", log, filter);
 }
 
 void 

@@ -55,7 +55,7 @@ public:
   void close_derived ();
 
   // Open derived items in list.
-  void open_entry (const string& type);
+  void open_entry (const string& type, const AttributeList&);
   void close_entry ();
 
   void output (const string&, Filter&, const Time&, bool log_only = false);
@@ -214,7 +214,7 @@ LogFile::close_derived ()
 }
 
 void 
-LogFile::open_entry (const string& type)
+LogFile::open_entry (const string& type, const AttributeList&)
 {
   force_open (type);
 }

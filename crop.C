@@ -40,8 +40,9 @@ bool
 Crop::ds_remove (const Crop* crop)
 { return crop->DS () == Crop::DSremove; }
 
-Crop::Crop (const string& n)
-  : name (n)
+Crop::Crop (const AttributeList& al)
+  : alist (al),
+    name (al.name ("type"))
 { }
 
 Crop::~Crop ()

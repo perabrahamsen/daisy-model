@@ -533,27 +533,28 @@ BioclimateStandard::output (Log& log, Filter& filter) const
 
   // Note: We use snow_chemicals_in instead of spray, since the former
   // is reset after each time step.
-  output_submodule (snow_chemicals_in, "spray", log, filter, true);
+  output_submodule_log_only (snow_chemicals_in, "spray", log, filter);
   output_submodule (snow_chemicals_storage, "snow_chemicals_storage",
 		    log, filter);
-  output_submodule (snow_chemicals_in, "snow_chemicals_in",
-		    log, filter, true);
-  output_submodule (snow_chemicals_out, "snow_chemicals_out",
-		    log, filter, true);
+  output_submodule_log_only (snow_chemicals_in, "snow_chemicals_in",
+			     log, filter);
+  output_submodule_log_only (snow_chemicals_out, "snow_chemicals_out",
+			     log, filter);
   output_submodule (canopy_chemicals_storage, "canopy_chemicals_storage",
 		    log, filter);
-  output_submodule (canopy_chemicals_in, "canopy_chemicals_in",
-		    log, filter, true);
-  output_submodule (canopy_chemicals_dissipate, "canopy_chemicals_dissipate",
-		    log, filter, true);
-  output_submodule (canopy_chemicals_out, "canopy_chemicals_out",
-		    log, filter, true);
+  output_submodule_log_only (canopy_chemicals_in, "canopy_chemicals_in",
+			     log, filter);
+  output_submodule_log_only (canopy_chemicals_dissipate,
+			     "canopy_chemicals_dissipate",
+			     log, filter);
+  output_submodule_log_only(canopy_chemicals_out, "canopy_chemicals_out",
+			     log, filter);
   output_submodule (surface_chemicals_storage, "surface_chemicals_storage",
 		    log, filter);
-  output_submodule (surface_chemicals_in, "surface_chemicals_in",
-		    log, filter, true);
-  output_submodule (surface_chemicals_out, "surface_chemicals_out",
-		    log, filter, true);
+  output_submodule_log_only (surface_chemicals_in, "surface_chemicals_in",
+			     log, filter);
+  output_submodule_log_only (surface_chemicals_out, "surface_chemicals_out",
+			     log, filter);
 }
 
 void

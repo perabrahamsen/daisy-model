@@ -38,9 +38,8 @@ public:
   void sow (const AttributeList& crop);
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
-  void fertilize (const AttributeList&, const Time&, // Organic.
-			  double from, double to);
-  void fertilize (const AttributeList&, const Time&);
+  void fertilize (const AttributeList&, double from, double to); // Organic.
+  void fertilize (const AttributeList&);
   void fertilize (const IM&, double from, double to); // Mineral.
   void fertilize (const IM&);
   vector<const Harvest*> harvest (const Time&, const string& name,
@@ -78,7 +77,7 @@ public:
 
   bool check () const;
   bool check_am (const AttributeList& am) const;
-  void initialize (const vector<AttributeList*>&, const Time&, const Weather&);
+  void initialize (const Time&, const Weather&);
   Field (const vector<AttributeList*>&);
   ~Field ();
 };

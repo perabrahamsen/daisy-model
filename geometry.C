@@ -235,8 +235,8 @@ Geometry::add_layer (Syntax& syntax, const string& name)
       layer.order ("end", "value");
     }
   syntax.add (string ("initial_") + name, layer,
-	      Syntax::Optional, Syntax::Sequence);
-  syntax.add (name, Syntax::Number, Syntax::Optional, Syntax::Sequence);
+	      Syntax::OptionalConst, Syntax::Sequence);
+  syntax.add (name, Syntax::Number, Syntax::OptionalState, Syntax::Sequence);
 }
 
 void 

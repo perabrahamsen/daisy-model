@@ -732,6 +732,9 @@ CropStandard::initialize (const Geometry& geometry)
   var.RootSys.NO3Extraction.insert (var.RootSys.NO3Extraction.end (),
 				    size - var.RootSys.NO3Extraction.size (),
 				    0.0);
+
+  // Update nitrate state.
+  NitContent ();
 }
 
 static struct CropStandardSyntax
@@ -774,12 +777,12 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& Vernal = *new Syntax ();
   // WARNING: Don't add an alist here, or the `Optional' idea is lost.
 
-  Vernal.add ("required", Syntax::Boolean, Syntax::Optional);
+  Vernal.add ("required", Syntax::Boolean, Syntax::OptionalConst);
   Vernal.add ("DSLim", Syntax::Number, Syntax::Const);
   Vernal.add ("TaLim", Syntax::Number, Syntax::Const);
   Vernal.add ("TaSum", Syntax::Number, Syntax::Const);
 
-  syntax.add ("Vernal", Vernal, Syntax::Optional);
+  syntax.add ("Vernal", Vernal, Syntax::OptionalConst);
 
   // Initialize "no vernalization"
   AttributeList& noVernal = *new AttributeList ();
@@ -1001,7 +1004,7 @@ CropStandardSyntax::CropStandardSyntax ()
 
   Phenology.add ("DS", Syntax::Number, Syntax::State);
   vPhenology.add ("DS", -1.0);
-  Phenology.add ("Vern", Syntax::Number, Syntax::Optional);
+  Phenology.add ("Vern", Syntax::Number, Syntax::OptionalState);
   Phenology.add ("partial_day_length", Syntax::Number, Syntax::State);
   vPhenology.add ("partial_day_length", 0.0);
   Phenology.add ("day_length", Syntax::Number, Syntax::State);
@@ -1033,7 +1036,7 @@ CropStandardSyntax::CropStandardSyntax ()
   Syntax& RootSys = *new Syntax ();
   AttributeList& vRootSys = *new AttributeList ();
 
-  RootSys.add ("Depth", Syntax::Number, Syntax::Optional);
+  RootSys.add ("Depth", Syntax::Number, Syntax::OptionalState);
   RootSys.add ("Density", Syntax::Number, Syntax::State, Syntax::Sequence);
   vRootSys.add ("Density", empty_array);
   RootSys.add ("H2OExtraction", Syntax::Number,
@@ -1076,7 +1079,7 @@ CropStandardSyntax::CropStandardSyntax ()
   vProd.add ("NSOrg", 0.000);
   Prod.add ("NDead", Syntax::Number, Syntax::State);
   vProd.add ("NDead", 0.000);
-  Prod.add ("NCrop", Syntax::Number, Syntax::Optional);
+  Prod.add ("NCrop", Syntax::Number, Syntax::OptionalState);
   Prod.add ("C_AM", Syntax::Number, Syntax::State);
   vProd.add ("C_AM", 0.000);
   Prod.add ("N_AM", Syntax::Number, Syntax::State);
@@ -1091,7 +1094,7 @@ CropStandardSyntax::CropStandardSyntax ()
 
   CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::State);
   vCrpAux.add ("InitLAI", true);
-  CrpAux.add ("PotRtDpt", Syntax::Number, Syntax::Optional);
+  CrpAux.add ("PotRtDpt", Syntax::Number, Syntax::OptionalState);
   CrpAux.add ("StemRes", Syntax::Number, Syntax::State);
   vCrpAux.add ("StemRes", 0.0);
   CrpAux.add ("PtNCnt", Syntax::Number, Syntax::LogOnly);
@@ -1109,6 +1112,7 @@ CropStandardSyntax::CropStandardSyntax ()
   CrpAux.add ("IncWStem", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWSOrg", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWRoot", Syntax::Number, Syntax::LogOnly);
+  CrpAux.add ("LAImRat", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("DeadWLeaf", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("DeadNLeaf", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("DeadWRoot", Syntax::Number, Syntax::LogOnly);
@@ -1122,7 +1126,7 @@ CropStandardSyntax::CropStandardSyntax ()
   syntax.add ("CrpAux", CrpAux, Syntax::State);
   alist.add ("CrpAux", vCrpAux);
 
-  syntax.add ("description", Syntax::String, Syntax::Optional); 
+  syntax.add ("description", Syntax::String, Syntax::OptionalConst); 
 
   Librarian<Crop>::add_type ("default", alist, syntax, &make);
 }
@@ -2386,7 +2390,7 @@ CropStandard::DM () const	// [g/m² -> kg/ha]
 { return (var.Prod.WSOrg + var.Prod.WStem + var.Prod.WLeaf) * 10; }
 
 CropStandard::CropStandard (const AttributeList& al)
-  : Crop (al.name ("type")),
+  : Crop (al),
     par (*new Parameters (al)),
     var (*new Variables (par, al))
 { }

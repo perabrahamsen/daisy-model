@@ -25,10 +25,12 @@ struct ActionFertilize : public Action
 	  // Add organic matter, if any.
       if (am.name ("syntax") != "mineral")
 	{
+	  AttributeList am_creation (am);
+	  am_creation.add ("creation", daisy.time);
 	  if (to < from)
-	    daisy.field.fertilize (am, daisy.time, from, to);
+	    daisy.field.fertilize (am, from, to);
 	  else
-	    daisy.field.fertilize (am, daisy.time);
+	    daisy.field.fertilize (am);
 	}
     }
 
@@ -77,7 +79,7 @@ static struct ActionFertilizeSyntax
   { 
     Syntax& syntax = *new Syntax (check);
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("am", AM::library ());
+    syntax.add ("am", Librarian<AM>::library ());
     syntax.add ("from", Syntax::Number, Syntax::Const);
     alist.add ("from", 0.0);
     syntax.add ("to", Syntax::Number, Syntax::Const);

@@ -42,10 +42,11 @@ struct OrganicMatter::Implementation
     void output (Log& log, Filter& filter) const;
     void tick (int i, double abiotic_factor, double N_soil, double& N_used,
 	       const vector<OM*>&);
-    void mix (const Soil&, double from, double to);
-    void swap (const Soil&, double from, double middle, double to);
+    void mix (const Geometry&, double from, double to);
+    void swap (const Geometry&, double from, double middle, double to);
     static void load_syntax (Syntax& syntax, AttributeList& alist);
-    Buffer (const Soil&, const AttributeList& al);
+    void initialize (const Geometry& geometry);
+    Buffer (const AttributeList& al);
   } buffer;
   const double min_AM_C;	// Minimal amount of C in an AM. [g/m²]
   const double min_AM_N;	// Minimal amount of N in an AM. [g/m²]
@@ -57,12 +58,12 @@ struct OrganicMatter::Implementation
   // Simulation.
   void add (AM& om)
   { am.push_back (&om); }
-  void monthly (const Soil& soil);
+  void monthly (const Geometry& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&,
 	     const Groundwater&,
 	     SoilNO3&, SoilNH4&);
-  void mix (const Soil&, double from, double to, double penetration);
-  void swap (const Soil& soil, double from, double middle, double to);
+  void mix (const Geometry&, double from, double to, double penetration);
+  void swap (const Geometry&, double from, double middle, double to);
   void output (Log&, Filter&, const Geometry&) const;
   bool check () const;
 
@@ -82,7 +83,8 @@ struct OrganicMatter::Implementation
       return total;
     }
   // Create & Destroy.
-  Implementation (const Soil&, const AttributeList& al);
+  void initialize (const AttributeList&, const Soil&);
+  Implementation (const AttributeList&);
 };
 
 void
@@ -139,21 +141,21 @@ OrganicMatter::Implementation::Buffer::tick (int i, double abiotic_factor,
 }
 
 void 
-OrganicMatter::Implementation::Buffer::mix (const Soil& soil, 
+OrganicMatter::Implementation::Buffer::mix (const Geometry& geometry, 
 					    double from, double to)
 {
-  soil.mix (C, from, to);
-  soil.mix (N, from, to);
+  geometry.mix (C, from, to);
+  geometry.mix (N, from, to);
 }
 
 void
-OrganicMatter::Implementation::Buffer::swap (const Soil& soil,
+OrganicMatter::Implementation::Buffer::swap (const Geometry& geometry,
 					     double from,
 					     double middle, 
 					     double to)
 {
-  soil.swap (C, from, middle, to);
-  soil.swap (N, from, middle, to);
+  geometry.swap (C, from, middle, to);
+  geometry.swap (N, from, middle, to);
 }
 
 void
@@ -201,20 +203,23 @@ OrganicMatter::Implementation::water_turnover_factor (double h) const
   return 0;
 }
 
-OrganicMatter::Implementation::Buffer::Buffer (const Soil& soil, 
-					       const AttributeList& al)
-  : C (al.number_sequence ("C")),
-    N (al.number_sequence ("N")),
-    turnover_rate (al.number ("turnover_rate")),
-    where (al.integer ("where"))
+void
+OrganicMatter::Implementation::Buffer::initialize (const Geometry& geometry)
 { 
-  const unsigned int size = soil.size ();
+  const unsigned int size = geometry.size ();
   // Make sure the vectors are large enough.
   while (N.size () < size)
     N.push_back (0.0);
   while (C.size () < size)
     C.push_back (0.0);
 }
+
+OrganicMatter::Implementation::Buffer::Buffer (const AttributeList& al)
+  : C (al.number_sequence ("C")),
+    N (al.number_sequence ("N")),
+    turnover_rate (al.number ("turnover_rate")),
+    where (al.integer ("where"))
+{ }
 
 void
 OrganicMatter::Implementation::output (Log& log, Filter& filter,
@@ -257,7 +262,7 @@ OrganicMatter::Implementation::output (Log& log, Filter& filter,
       log.output ("total_N", filter, total_N, true);
       log.output ("total_C", filter, total_C, true);
     }
-  output_list (am, "am", log, filter, AM::library ());
+  output_list (am, "am", log, filter, Librarian<AM>::library ());
   output_vector (smb, "smb", log, filter);
   output_vector (som, "som", log, filter);
   output_submodule (buffer, "buffer", log, filter);
@@ -284,7 +289,7 @@ static bool om_compare (const OM* a, const OM* b)
 }
 
 void
-OrganicMatter::Implementation::monthly (const Soil& soil)
+OrganicMatter::Implementation::monthly (const Geometry& geometry)
 {
   const int am_size = am.size ();
   vector<AM*> new_am;
@@ -301,15 +306,15 @@ OrganicMatter::Implementation::monthly (const Soil& soil)
 	  keep = true;
 	else
 	  // Only require N.
-	  keep = (am[i]->total_N (soil) * (100.0 * 100.0) > min_AM_N);
+	  keep = (am[i]->total_N (geometry) * (100.0 * 100.0) > min_AM_N);
       else
 	if (min_AM_N == 0.0)
 	  // Only require C.
-	  keep = (am[i]->total_C (soil) * (100.0 * 100.0) > min_AM_C);
+	  keep = (am[i]->total_C (geometry) * (100.0 * 100.0) > min_AM_C);
 	else 
 	  // Require either N or C.
-	  keep = (am[i]->total_N (soil) * (100.0 * 100.0) > min_AM_N
-		  || am[i]->total_C (soil) * (100.0 * 100.0) > min_AM_C);
+	  keep = (am[i]->total_N (geometry) * (100.0 * 100.0) > min_AM_N
+		  || am[i]->total_C (geometry) * (100.0 * 100.0) > min_AM_C);
       
       if (keep)
 	new_am.push_back (am[i]);
@@ -422,56 +427,45 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 }
       
 void 
-OrganicMatter::Implementation::mix (const Soil& soil,
+OrganicMatter::Implementation::mix (const Geometry& geometry,
 				    double from, double to, double penetration)
 {
-  buffer.mix (soil, from, to);
+  buffer.mix (geometry, from, to);
   for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->mix (soil, from, to, penetration);
+    am[i]->mix (geometry, from, to, penetration);
   for (unsigned int i = 1; i < smb.size (); i++)
-    smb[i]->mix (soil, from, to, penetration);
+    smb[i]->mix (geometry, from, to, penetration);
   for (unsigned int i = 0; i < som.size (); i++)
-    som[i]->mix (soil, from, to, penetration);
+    som[i]->mix (geometry, from, to, penetration);
   // Leave CO2 alone.
 }
 
 void 
-OrganicMatter::Implementation::swap (const Soil& soil,
+OrganicMatter::Implementation::swap (const Geometry& geometry,
 				     double from, double middle, double to)
 {
-  buffer.swap (soil, from, middle, to);
+  buffer.swap (geometry, from, middle, to);
   for (unsigned int i = 0; i < am.size (); i++)
-    am[i]->swap (soil, from, middle, to);
+    am[i]->swap (geometry, from, middle, to);
   for (unsigned int i = 1; i < smb.size (); i++)
-    smb[i]->swap (soil, from, middle, to);
+    smb[i]->swap (geometry, from, middle, to);
   for (unsigned int i = 0; i < som.size (); i++)
-    som[i]->swap (soil, from, middle, to);
+    som[i]->swap (geometry, from, middle, to);
   // Leave CO2 alone.
 }
 
-OrganicMatter::Implementation::Implementation (const Soil& soil, 
-					       const AttributeList& al)
-  : active_underground (al.flag ("active_underground")),
-    active_groundwater (al.flag ("active_groundwater")),
-    K_NH4 (al.number ("K_NH4")),
-    K_NO3 (al.number ("K_NO3")),
-    am (map_create1 <AM, const Soil&> (al.alist_sequence ("am"), soil)),
-    smb (map_construct<OM> (al.alist_sequence ("smb"))),
-    som (map_construct<OM> (al.alist_sequence ("som"))),
-    buffer (soil, al.alist ("buffer")),
-    min_AM_C (al.number ("min_AM_C")),
-    min_AM_N (al.number ("min_AM_N"))
-
+void
+OrganicMatter::Implementation::initialize (const AttributeList& al,
+					   const Soil& soil)
 { 
   // Sizes.
   const unsigned int smb_size = smb.size ();
   const unsigned int som_size = smb.size ();
-  
 
   // Production.
-  CO2.insert (CO2.end(), soil.size(), 0.0);
-  NO3_source.insert (NO3_source.end (), soil.size(), 0.0);
-  NH4_source.insert (NH4_source.end (), soil.size(), 0.0);
+  CO2.insert (CO2.end (), soil.size (), 0.0);
+  NO3_source.insert (NO3_source.end (), soil.size (), 0.0);
+  NH4_source.insert (NH4_source.end (), soil.size (), 0.0);
 
   // Clay.
   for (unsigned int i = 0; i < soil.size (); i++)
@@ -600,12 +594,27 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
 	  // TODO: Take the stolen C from the SOM pools.
 	}
     }
+  buffer.initialize (soil);
 }
 
+OrganicMatter::Implementation::Implementation (const AttributeList& al)
+  : active_underground (al.flag ("active_underground")),
+    active_groundwater (al.flag ("active_groundwater")),
+    K_NH4 (al.number ("K_NH4")),
+    K_NO3 (al.number ("K_NO3")),
+    am (map_create <AM> (al.alist_sequence ("am"))),
+    smb (map_construct<OM> (al.alist_sequence ("smb"))),
+    som (map_construct<OM> (al.alist_sequence ("som"))),
+    buffer (al.alist ("buffer")),
+    min_AM_C (al.number ("min_AM_C")),
+    min_AM_N (al.number ("min_AM_N"))
+
+{ }
+
 void 
-OrganicMatter::monthly (const Soil& soil)
+OrganicMatter::monthly (const Geometry& geometry)
 {
-  impl.monthly (soil); 
+  impl.monthly (geometry); 
 }
 
 void 
@@ -620,16 +629,16 @@ OrganicMatter::tick (const Soil& soil,
 }
 
 void 
-OrganicMatter::mix (const Soil& soil,
+OrganicMatter::mix (const Geometry& geometry,
 		    double from, double to, double penetration)
 {
-  impl.mix (soil, from, to, penetration);
+  impl.mix (geometry, from, to, penetration);
 }
 
 void 
-OrganicMatter::swap (const Soil& soil, double from, double middle, double to)
+OrganicMatter::swap (const Geometry& geometry, double from, double middle, double to)
 {
-  impl.swap (soil, from, middle, to);
+  impl.swap (geometry, from, middle, to);
 }
 
 double
@@ -643,9 +652,9 @@ OrganicMatter::get_smb_c_at (unsigned int i) const
 { return impl.get_smb_c_at (i); }
 
 void 
-OrganicMatter::output (Log& log, Filter& filter, const Soil& soil) const
+OrganicMatter::output (Log& log, Filter& filter, const Geometry& geometry) const
 {
-  impl.output (log, filter, soil);
+  impl.output (log, filter, geometry);
 }
 
 bool
@@ -705,8 +714,12 @@ OrganicMatter::add (AM& am)
   impl.add (am);
 }
 
-OrganicMatter::OrganicMatter (const Soil& soil, const AttributeList& al)
-  : impl (*new Implementation (soil, al))
+void
+OrganicMatter::initialize (const AttributeList& al, const Soil& soil)
+{ impl.initialize (al, soil); }
+
+OrganicMatter::OrganicMatter (const AttributeList& al)
+  : impl (*new Implementation (al))
 { }
 
 OrganicMatter::~OrganicMatter ()
@@ -866,7 +879,8 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("total_C", Syntax::Number, Syntax::LogOnly);
   syntax.add ("total_N", Syntax::Number, Syntax::LogOnly);
   syntax.add ("CO2", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
-  syntax.add ("am", AM::library (), Syntax::State, Syntax::Sequence);
+  syntax.add ("am", Librarian<AM>::library (),
+	      Syntax::State, Syntax::Sequence);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
   add_submodule_sequence<OM> ("smb", syntax, Syntax::State);
   add_submodule_sequence<OM> ("som", syntax, Syntax::State);
@@ -875,7 +889,7 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   layer_syntax.add ("end", Syntax::Number, Syntax::Const);
   layer_syntax.add ("weight", Syntax::Number, Syntax::Const); // Kg C/m²
   layer_syntax.order ("end", "weight");
-  syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::Optional,
+  syntax.add ("initial_SOM", layer_syntax, layer_alist, Syntax::OptionalConst,
 	      "Layered initialization of soil SOM content.");
 #if 0
   // It should be possible to overwrite the default by specifying these.

@@ -1,12 +1,66 @@
+1998-12-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.54 released.
+
+1998-12-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* field.C (Implementation): Use `map_create'.
+
+	* vegetation.C, vegetation.h (initialize): New function.
+	* column_std.C (initialize): Call it.
+
+	* log.h (open_entry): Take alist argument.
+	* log_checkpoint.C, log_file.C, log_table.C, field.C: Update callers.
+
+	* log_checkpoint.C: Implemented.
+
+1998-12-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+	
+	* am.C, am.h: Use `Librarian'.
+	* organic_matter.C: Update caller.
+	* action_fertilize.C: Ditto.
+	* event.C (Do_It): Ditto.
+
+	* am.C, am.h (AM, create, initialize).  Split `AM::initialize'
+	from `AM::AM', and update `AM::create' to call it.
+
+	* crop_std.C (CropStandardSyntax): Added missing `LAImRat'
+	parameter to syntax. 
+
+	* am.C (AM::Implementation::Lock::load_syntax): New function.
+	(AM_init): Use it.
+
+	* am.C, am.h (AM, create): Remove `Time' argument.
+	* column_std.C, column.h (fertilize): Update callers.
+	* field.C, field.h (fertilize): Ditto.
+	* action_fertilize.C: Ditto.
+	* event.C (Do_It): Ditto.
+
+	* am.C (AM_init): Converted some `Syntax::Const' to
+	`Syntax::State' in order to allow logging them.
+
+	* surface.h, surface.C (Implementation): Store internal details
+	here. 
+
+	* nrutil.C: Cleanup unused argument warnings.
+
 1998-12-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Checpoint related changes.
+
+	* syntax.h (Syntax::category): Split `Syntax::Optional' into
+	`Syntax::OptionalState' and `Syntax::OptionalConst'.
+	* all: Updated callers.
+	
+	* condition_daisy.C (struct ConditionFinished): New condition.
 
 	* Version 0.53 released.
 
+	* field.C: Various Borland C fixes.
+	
 1998-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.52 released.
-
-1998-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* frame.h, frame.C: Removed.
 	* field.h, field.C: Added.

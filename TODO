@@ -1,4 +1,25 @@
-* Check field abstraction for flere søjler.
+* Ryd op i Log struktur.
+
+** LogCheckpoint
+
+*** log _efter_ tick.
+
+*** Sørg for at inkludere `def*' og `input' automatisk.
+
+*** Få AM_leaf og AM_root i CropStandard til at blive initializeret ordentligt
+
+*** Sørg for at harvest giver det samme med og uden checkpoint.
+
+** Split LogCheckpoint i LogCheckpoint og LogAList.
+    LogCheckpoint skal være implementeret ovenpå LogAList.  
+
+** Column::clone  skal bruge LogAList.
+
+** LogHarvest (måske: LogSequence)
+
+** Fjern `Filter' samt `LogFile'.
+
+** Hutig måde at skippe log på i Daisy::output, hvis condition er falsk.
 
 * Indfør kemikalier i jorden.
 
@@ -15,6 +36,12 @@
 ** Ryd op i common.h
 
 ** Fjern HANDLE_EXCEPTIONS.
+
+* Check field abstraction for flere søjler.
+
+* Check om AM root/initial initializering virker.
+
+* Virker flere chemicals?
 
 ======================================================================
 

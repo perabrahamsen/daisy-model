@@ -396,7 +396,7 @@ void
 Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   syntax.add_check (check_alist);
-  syntax.add ("description", Syntax::String, Syntax::Optional);
+  syntax.add ("description", Syntax::String, Syntax::OptionalConst);
   syntax.add ("hydraulic", Librarian<Hydraulic>::library (), Syntax::Const);
   syntax.add ("tortuosity", Librarian<Tortuosity>::library (), Syntax::Const);
   AttributeList& tortuosity = *new AttributeList ();
@@ -413,7 +413,7 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("quarts_in_silt", 0.20);
   syntax.add ("quarts_in_sand", Syntax::Number, Syntax::Const);
   alist.add ("quarts_in_sand", 0.60);
-  syntax.add ("dry_bulk_density", Syntax::Number, Syntax::Optional);
+  syntax.add ("dry_bulk_density", Syntax::Number, Syntax::OptionalConst);
   syntax.add ("SOM_C_per_N", Syntax::Number, Syntax::Const, Syntax::Sequence);
   syntax.add ("SOM_fractions",
 	      Syntax::Number, Syntax::Const, Syntax::Sequence);
@@ -423,9 +423,9 @@ Horizon::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("mineral_form_factor", 3.5);
   syntax.add ("intervals", Syntax::Integer, Syntax::Const);
   alist.add ("intervals", 100);
-  syntax.add ("C_soil", Syntax::Number, Syntax::Optional);
-  syntax.add ("K_water", Syntax::Number, Syntax::Optional, Syntax::Sequence);
-  syntax.add ("K_ice", Syntax::Number, Syntax::Optional, Syntax::Sequence);
+  syntax.add ("C_soil", Syntax::Number, Syntax::OptionalConst);
+  syntax.add ("K_water", Syntax::Number, Syntax::OptionalConst, Syntax::Sequence);
+  syntax.add ("K_ice", Syntax::Number, Syntax::OptionalConst, Syntax::Sequence);
 }
 
 Horizon::Horizon (const AttributeList& al)

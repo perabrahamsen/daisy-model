@@ -242,45 +242,45 @@ MiniManagerSyntax::MiniManagerSyntax ()
   Syntax& time = *new Syntax ();
   time.add("Type", Syntax::String, Syntax::Const, Syntax::Singleton);
   time.order("Type");
-  time.add("Dato", Syntax::Date, Syntax::Optional, Syntax::Singleton);
-  time.add("Id", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  time.add("Days", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  time.add("NoInYear", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  time.add("Year", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  time.add("DevelopmentStage", Syntax::Number, Syntax::Optional, Syntax::Singleton);
+  time.add("Dato", Syntax::Date, Syntax::OptionalConst, Syntax::Singleton);
+  time.add("Id", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  time.add("Days", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  time.add("NoInYear", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  time.add("Year", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  time.add("DevelopmentStage", Syntax::Number, Syntax::OptionalConst, Syntax::Singleton);
 
   // Action Parameters
   Syntax& params = *new Syntax ();
 
   // Irrigate parameters
-  params.add("Temp", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  params.add("HowMuch", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  params.add("UseAir", Syntax::Boolean, Syntax::Optional, Syntax::Singleton);
-  params.add("OverheadIrr", Syntax::Boolean, Syntax::Optional, Syntax::Singleton);
+  params.add("Temp", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("HowMuch", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("UseAir", Syntax::Boolean, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("OverheadIrr", Syntax::Boolean, Syntax::OptionalConst, Syntax::Singleton);
 
   // Tillage parameters
-  params.add("How", Syntax::String, Syntax::Optional, Syntax::Singleton);
+  params.add("How", Syntax::String, Syntax::OptionalConst, Syntax::Singleton);
 
   // Sowing parameters
-  params.add("What", Syntax::String, Syntax::Optional, Syntax::Singleton);
-  params.add("Model", Syntax::String, Syntax::Optional, Syntax::Singleton);
-  params.add("No", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  params.add("Years", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
+  params.add("What", Syntax::String, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("Model", Syntax::String, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("No", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("Years", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
 
   // Fertilize parameters
-  params.add("WithWhat", Syntax::String, Syntax::Optional, Syntax::Singleton);
-  params.add("Ammount", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
+  params.add("WithWhat", Syntax::String, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("Ammount", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
 
   // FuncHarvest action
   // Id of sowing action
-  params.add("Id", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
+  params.add("Id", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
 
   // Harvest action (Also params for FuncHarvest)
-  params.add("SO", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  params.add("Stem", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  params.add("DM", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  params.add("Leaf", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
-  params.add("Stub", Syntax::Integer, Syntax::Optional, Syntax::Singleton);
+  params.add("SO", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("Stem", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("DM", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("Leaf", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
+  params.add("Stub", Syntax::Integer, Syntax::OptionalConst, Syntax::Singleton);
 
   // Action
   Syntax& action = *new Syntax ();
@@ -288,7 +288,7 @@ MiniManagerSyntax::MiniManagerSyntax ()
   action.add("Type", Syntax::String, Syntax::Const, Syntax::Singleton);
   action.order("Id", "Type");
   action.add("Params", params, Syntax::Const, Syntax::Singleton);
-  action.add("Time", time, Syntax::Optional, Syntax::Singleton);
+  action.add("Time", time, Syntax::OptionalConst,Syntax::Singleton);
 
   // Manage a sequence of Action(s)
   Syntax& actions = *new Syntax ();

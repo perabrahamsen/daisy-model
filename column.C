@@ -8,8 +8,9 @@
 
 Librarian<Column>::Content* Librarian<Column>::content = NULL;
 
-Column::Column (const string& n)
-  : name (n)
+Column::Column (const AttributeList& al)
+  : alist (al),
+    name (al.name ("type"))
 { }
 
 Column::~Column ()

@@ -288,7 +288,7 @@ Syntax::type_number (const char* name)
 }
 
 static const char * const category_names[] = 
-{ "Const", "State", "Optional", "LogOnly", NULL };
+{ "Const", "State", "OptionalState", "OptionalConst", "LogOnly", NULL };
 
 const char* Syntax::category_name (category c)
 { return category_names[c]; }
@@ -318,14 +318,31 @@ bool
 Syntax::is_const (const string& key) const
 {
   assert (impl.status.find (key) != impl.status.end ());
-  return impl.status[key] == Const;
+  return (impl.status[key] == Const
+	  || impl.status[key] == OptionalConst);
+}
+
+bool
+Syntax::is_state (const string& key) const
+{
+  assert (impl.status.find (key) != impl.status.end ());
+  return (impl.status[key] == State
+	  || impl.status[key] == OptionalState);
 }
 
 bool
 Syntax::is_optional (const string& key) const
 {
   assert (impl.status.find (key) != impl.status.end ());
-  return impl.status[key] == Optional;
+  return (impl.status[key] == OptionalState 
+	  || impl.status[key] == OptionalConst);
+}
+
+bool
+Syntax::is_log (const string& key) const
+{
+  assert (impl.status.find (key) != impl.status.end ());
+  return impl.status[key] == LogOnly;
 }
 
 const Syntax&
@@ -454,7 +471,7 @@ Syntax::add (const string& key, ::Library& l, category req, int s,
 void 
 Syntax::add_library (const string& key, ::Library& l)
 {
-  add (key, Library, Optional);
+  add (key, Library, OptionalConst);
   impl.libraries[key] = &l;
 }
 

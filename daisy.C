@@ -126,7 +126,7 @@ void
 Daisy::initialize (const Syntax& s)
 { 
   syntax = & s; 
-  field.initialize (alist.alist_sequence ("column"), time, weather);
+  field.initialize (time, weather);
 }
 
 #ifdef BORLAND_TEMPLATES
@@ -138,12 +138,12 @@ Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Library::load_syntax (syntax, alist);
 
-  syntax.add ("description", Syntax::String, Syntax::Optional,
+  syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 	      "Description of this simulation setup.");
   syntax.add ("output", Librarian<Log>::library (),
 	      Syntax::Const, Syntax::Sequence,
 	      "List of logs for output during the simulation.");
-  syntax.add ("input", Librarian<Parser>::library (), Syntax::Optional, 
+  syntax.add ("input", Librarian<Parser>::library (), Syntax::OptionalConst, 
 	      Syntax::Singleton,
 	      "Command to add more information about the simulation.");
   syntax.add ("manager", Librarian<Action>::library (), Syntax::Const,

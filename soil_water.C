@@ -205,8 +205,9 @@ void
 SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
 { 
   syntax.add ("UZtop", Librarian<UZmodel>::library ());
-  syntax.add ("UZbottom", Librarian<UZmodel>::library (), Syntax::Optional);
-  syntax.add ("UZborder", Syntax::Integer, Syntax::Optional);
+  syntax.add ("UZbottom", Librarian<UZmodel>::library (),
+	      Syntax::OptionalState);
+  syntax.add ("UZborder", Syntax::Integer, Syntax::OptionalConst);
   syntax.add ("UZreserve", Librarian<UZmodel>::library ());
   // Use lr as UZreserve by default.
   AttributeList lr (Librarian<UZmodel>::library ().lookup ("lr"));
@@ -215,7 +216,7 @@ SoilWater::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   Geometry::add_layer (syntax, "Theta");
   Geometry::add_layer (syntax, "h");
-  syntax.add ("Xi", Syntax::Number, Syntax::Optional, Syntax::Sequence);
+  syntax.add ("Xi", Syntax::Number, Syntax::OptionalState, Syntax::Sequence);
   syntax.add ("q", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
 }
 
@@ -243,7 +244,7 @@ SoilWater::initialize (const AttributeList& al,
     {
       while (Theta_.size () < size)
 	Theta_.push_back (Theta_[Theta_.size () - 1]);
-      if (!h_.size () == 0)
+      if (h_.size () == 0)
 	for (unsigned int i = 0; i < size; i++)
 	  h_.push_back (soil.h (i, Theta_[i]));
     }
@@ -293,6 +294,10 @@ SoilWater::initialize (const AttributeList& al,
 	}
     }
   assert (h_.size () == soil.size ());
+
+  // We just assume no changes.
+  Theta_old_ = Theta_;
+  h_old = h_;
 }
 
 SoilWater::~SoilWater ()

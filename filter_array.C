@@ -266,7 +266,7 @@ static struct FilterArraySyntax
     entry_syntax.add ("accumulator", Syntax::String, Syntax::Const);
     entry_syntax.add ("selector", Syntax::String, Syntax::Const);
     entry_syntax.add ("pos", Syntax::Number, Syntax::Const);
-    entry_syntax.add ("end", Syntax::Number, Syntax::Optional);
+    entry_syntax.add ("end", Syntax::Number, Syntax::OptionalConst);
     entry_syntax.order ("accumulator", "selector", "pos", "end");
     syntax.add ("members", entry_syntax, Syntax::Const, Syntax::Sequence);
     syntax.order ("members");

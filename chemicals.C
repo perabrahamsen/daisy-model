@@ -191,7 +191,12 @@ Chemicals::Implementation::output (Log& log, Filter& filter) const
       const string& name = (*i).first->name;
       const double amount = (*i).second;
       if (amount > 0.0)
-	log.output (name, filter, amount);
+	{
+	  log.open_unnamed ();
+	  log.output ("chemical", filter, name);
+	  log.output ("amount", filter, amount);
+	  log.close_unnamed ();
+	}
     }
 }
 
@@ -328,7 +333,7 @@ Chemicals::add_syntax (const char* name,
 		       const string& description)
 {
   Syntax& entry_syntax = *new Syntax (check_alist_entry);
-  entry_syntax.add ("chemical", Syntax::String, Syntax::Const, 
+  entry_syntax.add ("chemical", Syntax::String, Syntax::State, 
 		    "Name of chemical.");
   entry_syntax.add ("amount", "g/m^2", cat,
 		    "Amount of chemical compound");

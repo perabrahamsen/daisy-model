@@ -17,7 +17,10 @@ OM::OM (const AttributeList& al)
     maintenance (al.number ("maintenance")),
     fractions (al.number_sequence ("fractions"))
 {
+#if 0
+  // This one is only present at checkpoints.
   assert (!al.check ("C"));
+#endif
 
   if (al.check ("C_per_N"))
     {
@@ -491,8 +494,8 @@ OM::load_syntax (Syntax& syntax, AttributeList& alist)
   alist.add ("top_C", 0.0);
   syntax.add ("top_N", Syntax::Number, Syntax::State);
   alist.add ("top_N", 0.0);
-  syntax.add ("C", Syntax::Number, Syntax::Optional, Syntax::Sequence);
-  syntax.add ("C_per_N", Syntax::Number, Syntax::Optional,
+  syntax.add ("C", Syntax::Number, Syntax::OptionalState, Syntax::Sequence);
+  syntax.add ("C_per_N", Syntax::Number, Syntax::OptionalState,
 	       Syntax::Sequence);
   syntax.add ("N", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("turnover_rate", Syntax::Number, Syntax::Const);

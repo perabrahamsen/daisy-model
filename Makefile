@@ -68,14 +68,15 @@ endif
 #
 ifeq ($(USE_OPTIMIZE),true)
 	ifeq ($(COMPILER),egcs)
-		ifeq (($HOSTTYPE),sun4)
-			OPTIMIZE = -O3 -ffast-math -mcpu=ultrasparc
+		ifeq ($(HOSTTYPE),sun4)
+			OPTIMIZE = -O3 -ffast-math 
+#`-mcpu=ultrasparc' breaks `IM::IM ()' with egcs 1.1.
 		else
 			OPTIMIZE = -O3 -ffast-math 
 		endif
 	endif
 	ifeq ($(COMPILER),gnu)
-		ifeq (($HOSTTYPE),sun4)
+		ifeq ($(HOSTTYPE),sun4)
 			OPTIMIZE = -O3 -ffast-math -mv8
 		else
 			OPTIMIZE = -O2
@@ -438,11 +439,11 @@ filter_none${OBJ}: filter_none.C filter.h librarian.h library.h common.h \
 filter_some${OBJ}: filter_some.C filter.h librarian.h library.h common.h \
  alist.h syntax.h
 column_std${OBJ}: column_std.C column.h librarian.h library.h common.h \
- alist.h syntax.h bioclimate.h surface.h uzmodel.h im.h soil.h \
- horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h \
- soil_heat.h soil_NH4.h solute.h adsorption.h soil_NO3.h \
- organic_matter.h nitrification.h denitrification.h groundwater.h \
- log.h filter.h am.h weather.h vegetation.h
+ alist.h syntax.h bioclimate.h surface.h uzmodel.h soil.h horizon.h \
+ hydraulic.h tortuosity.h geometry.h soil_water.h soil_heat.h \
+ soil_NH4.h solute.h adsorption.h soil_NO3.h organic_matter.h \
+ nitrification.h denitrification.h groundwater.h log.h filter.h im.h \
+ am.h weather.h vegetation.h
 weather_simple${OBJ}: weather_simple.C weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h log.h filter.h
 uzrichard${OBJ}: uzrichard.C uzmodel.h librarian.h library.h common.h \
@@ -559,7 +560,7 @@ adsorption_langmuir${OBJ}: adsorption_langmuir.C adsorption.h librarian.h \
 filter_checkpoint${OBJ}: filter_checkpoint.C filter.h librarian.h \
  library.h common.h alist.h syntax.h
 bioclimate_std${OBJ}: bioclimate_std.C bioclimate.h librarian.h library.h \
- common.h alist.h syntax.h surface.h uzmodel.h im.h weather.h csmp.h \
+ common.h alist.h syntax.h surface.h uzmodel.h weather.h im.h csmp.h \
  soil.h horizon.h hydraulic.h tortuosity.h geometry.h snow.h log.h \
  filter.h mathlib.h pet.h pt.h vegetation.h chemicals.h
 condition_crop${OBJ}: condition_crop.C condition.h librarian.h library.h \
@@ -593,7 +594,7 @@ pet_PM${OBJ}: pet_PM.C pet.h librarian.h library.h common.h alist.h \
  geometry.h surface.h uzmodel.h soil_heat.h bioclimate.h \
  net_radiation.h vegetation.h log.h filter.h
 pt_std${OBJ}: pt_std.C pt.h librarian.h library.h common.h alist.h \
- syntax.h pet.h vegetation.h surface.h uzmodel.h im.h log.h filter.h
+ syntax.h pet.h vegetation.h surface.h uzmodel.h log.h filter.h
 action_spray${OBJ}: action_spray.C action.h librarian.h library.h common.h \
  alist.h syntax.h daisy.h field.h chemical.h
 pt_pmsw${OBJ}: pt_pmsw.C weather.h librarian.h library.h common.h alist.h \
@@ -638,12 +639,11 @@ mathlib${OBJ}: mathlib.C mathlib.h common.h
 bioclimate${OBJ}: bioclimate.C bioclimate.h librarian.h library.h common.h \
  alist.h syntax.h weather.h im.h
 surface${OBJ}: surface.C surface.h uzmodel.h librarian.h library.h \
- common.h alist.h syntax.h im.h soil_water.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h log.h filter.h am.h mathlib.h
+ common.h alist.h syntax.h soil_water.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h log.h filter.h am.h im.h mathlib.h
 soil_water${OBJ}: soil_water.C soil_water.h common.h log.h filter.h \
  librarian.h library.h alist.h syntax.h uzmodel.h soil.h horizon.h \
- hydraulic.h tortuosity.h geometry.h surface.h im.h groundwater.h \
- mathlib.h
+ hydraulic.h tortuosity.h geometry.h surface.h groundwater.h mathlib.h
 soil_NH4${OBJ}: soil_NH4.C soil_NH4.h solute.h adsorption.h librarian.h \
  library.h common.h alist.h syntax.h soil_water.h soil.h horizon.h \
  hydraulic.h tortuosity.h geometry.h mathlib.h
@@ -663,7 +663,7 @@ denitrification${OBJ}: denitrification.C denitrification.h common.h \
  soil_NO3.h solute.h adsorption.h groundwater.h uzmodel.h csmp.h log.h \
  filter.h
 soil_heat${OBJ}: soil_heat.C soil_heat.h alist.h common.h surface.h \
- uzmodel.h librarian.h library.h syntax.h im.h groundwater.h weather.h \
+ uzmodel.h librarian.h library.h syntax.h groundwater.h weather.h im.h \
  soil_water.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
  mathlib.h log.h filter.h
 groundwater${OBJ}: groundwater.C groundwater.h uzmodel.h librarian.h \
@@ -710,7 +710,7 @@ chemical${OBJ}: chemical.C chemical.h librarian.h library.h common.h \
 common${OBJ}: common.C common.h parser_file.h parser.h librarian.h \
  library.h alist.h syntax.h version.h
 pet${OBJ}: pet.C pet.h librarian.h library.h common.h alist.h syntax.h \
- log.h filter.h vegetation.h surface.h uzmodel.h im.h
+ log.h filter.h vegetation.h surface.h uzmodel.h
 net_radiation${OBJ}: net_radiation.C net_radiation.h librarian.h library.h \
  common.h alist.h syntax.h log.h filter.h weather.h im.h
 pt${OBJ}: pt.C pt.h librarian.h library.h common.h alist.h syntax.h log.h \

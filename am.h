@@ -3,17 +3,11 @@
 #ifndef AM_H
 #define AM_H
 
-#include "common.h"
+#include "librarian.h"
 #include <vector>
 
-class AttributeList;
-class Library;
-class Syntax;
-class Log;
-class Filter;
 class Geometry;
 class Time;
-class OrganicMatter;
 class OM;
 
 class AM
@@ -22,6 +16,7 @@ class AM
   struct Implementation;
   Implementation& impl;
 public:
+  const AttributeList alist;	// Remember attributes for checkpoint.
   const string name;
   void append_to (vector<OM*>& added);
   
@@ -46,36 +41,20 @@ public:
   const string crop_name () const;	// Name of locked crop.
   const string crop_part_name () const; // Name of locked crop part.
 
-  // Library.
+  // Create and Destroy.
 public:
-  static Library& library ();
-  static void derive_type (const string&, AttributeList&, const string& super);
-  // Initialization.
+  // Initialization & Fertilizer.
   static AM& create (const AttributeList&, const Geometry&);
-  // Fertilizer.
-  static AM& create (const AttributeList&, const Geometry&, const Time&);
   // Crop part.
   static AM& create (const Geometry&, const Time&,
-		     vector<AttributeList*>,
-		     const string name, const string part,
+		     const vector<AttributeList*>&,
+		     const string& sort, const string& part,
 		     lock_type lock = Unlocked);
-  
-private:
-  AM (const Geometry&, const Time&, vector<AttributeList*>,
-      const string name, const string part);
-  AM (const AttributeList&, const Geometry&, const Time&);
-public:
+  void initialize (const Geometry&);
+  AM (const AttributeList&);
   virtual ~AM ();
 };
 
-// Ensure the AM library is initialized.
-// See TC++PL, 2ed, 10.5.1, for an explanation.
-static class AM_init
-{
-  static int count;
-public:
-  AM_init ();
-  ~AM_init ();
-} AM_init;
+static Librarian<AM> AM_init ("am");
 
 #endif AM_H

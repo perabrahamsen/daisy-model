@@ -208,7 +208,7 @@ static struct FilterSomeSyntax
     entry_syntax.add ("name", Syntax::String, Syntax::Const);
     entry_syntax.add ("filter", 
 		      Librarian<Filter>::library (), 
-		      Syntax::Optional);
+		      Syntax::OptionalConst);
     entry_syntax.order ("name", "filter");
     syntax.add ("members", entry_syntax, Syntax::Const, Syntax::Sequence);
     syntax.order ("members");

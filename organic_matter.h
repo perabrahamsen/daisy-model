@@ -8,6 +8,7 @@ class Syntax;
 class Log;
 class Filter;
 class AM;
+class Geometry;
 class Soil;
 class SoilWater;
 class SoilHeat;
@@ -24,13 +25,13 @@ private:
   
   // Simulation.
 public:
-  void monthly (const Soil& soil);
+  void monthly (const Geometry& soil);
   void tick (const Soil&, const SoilWater&, const SoilHeat&, 
 	     const Groundwater&, SoilNO3&, SoilNH4&);
-  void output (Log&, Filter&, const Soil&) const;
+  void output (Log&, Filter&, const Geometry&) const;
   double CO2 (unsigned int i) const;	// [g C/cm³]
-  void mix (const Soil&, double from, double to, double penetration = 1.0);
-  void swap (const Soil&, double from, double middle, double to);
+  void mix (const Geometry&, double from, double to, double penetration = 1.0);
+  void swap (const Geometry&, double from, double middle, double to);
 
   // Communication with external model.
   double get_smb_c_at (unsigned int i) const; // [g C/cm³]
@@ -42,8 +43,9 @@ public:
 
   // Create & Destroy.
 public:
+  void initialize (const AttributeList&, const Soil&);
   static void load_syntax (Syntax&, AttributeList&);
-  OrganicMatter (const Soil&, const AttributeList&);
+  OrganicMatter (const AttributeList&);
   ~OrganicMatter ();
 };
 

@@ -9,10 +9,52 @@
 #include "common.h"
 #include "filter.h"
 #include "am.h"
+#include "im.h"
 #include "mathlib.h"
+
+struct Surface::Implementation
+{
+  // Content.
+  const double minimal_matter_flux;
+  const bool total_matter_flux;
+  const double EpFactor;
+  const double EpInterchange;
+  const double albedo_wet;
+  const double albedo_dry;
+  const double lake;
+  double pond;
+  bool flux;
+  IM im_flux;
+  double EvapSoilSurface;
+  double Eps;
+  double T;
+  IM im;
+
+  // Functions.
+  bool flux_top () const;
+  void  flux_top_on ();
+  bool accept_top (double water);
+  double ponding () const;
+  void tick (double PotSoilEvaporation, double water, double temp,
+	     const Soil& soil, const SoilWater& soil_water);
+  double albedo (const Soil& soil, const SoilWater& soil_water) const;
+  void fertilize (const IM& n);
+  void output (Log& log, Filter& filter) const;
+  double exfiltration () const; // [mm/h]
+  
+
+  // Create and Destroy.
+  Implementation (const AttributeList& al);
+  ~Implementation ();
+};
+
 
 bool 
 Surface::flux_top () const
+{ return impl.flux_top (); }
+
+bool 
+Surface::Implementation::flux_top () const
 {
   return lake < 0.0 && flux;
 }
@@ -20,11 +62,15 @@ Surface::flux_top () const
 double 
 Surface::q () const
 {
-  return -pond / 10.0;		// mm -> cm.
+  return -impl.pond / 10.0;		// mm -> cm.
 }
   
 void  
 Surface::flux_top_on ()
+{ impl.flux_top_on (); }
+
+void  
+Surface::Implementation::flux_top_on ()
 { 
   flux = true;
 }
@@ -32,12 +78,19 @@ Surface::flux_top_on ()
 void  
 Surface::flux_top_off ()
 { 
-  flux = false;
+  impl.flux = false;
 }
 
 bool  
 Surface::accept_top (double water)
+{ return impl.accept_top (water); }
+
+bool  
+Surface::Implementation::accept_top (double water)
 {
+  assert (im_flux.NO3 == 0.0);
+  assert (im_flux.NH4 == 0.0);
+
   if (lake >= 0.0)
     return true;
 
@@ -88,6 +141,10 @@ Surface::accept_top (double water)
 
 double
 Surface::ponding () const
+{ return impl.ponding (); }
+
+double
+Surface::Implementation::ponding () const
 {
   if (lake < 0.0)
     {
@@ -100,25 +157,25 @@ Surface::ponding () const
 
 double
 Surface::temperature () const
-{
-  return T;
-}
+{ return impl.T; }
 
 void
 Surface::clear ()
-{
-  im_flux.clear ();
-}
+{ impl.im_flux.clear (); }
 
 const IM& 
 Surface::matter_flux ()
-{
-  return im_flux;
-}
+{ return impl.im_flux; }
 
 void
 Surface::tick (double PotSoilEvaporation, double water, double temp,
 	       const Soil& soil, const SoilWater& soil_water)
+{ impl.tick (PotSoilEvaporation, water, temp, soil, soil_water); }
+
+void
+Surface::Implementation::tick (double PotSoilEvaporation,
+			       double water, double temp,
+			       const Soil& soil, const SoilWater& soil_water)
 {
   static const double dt = 1.0; // Time step [h].
   const double MaxExfiltration
@@ -146,14 +203,19 @@ Surface::tick (double PotSoilEvaporation, double water, double temp,
 
 double 
 Surface::EpFactor () const
-{ return EpFactor_; }
+{ return impl.EpFactor; }
 
 double
 Surface::EpInterchange () const
-{ return EpInterchange_; }
+{ return impl.EpInterchange; }
 
 double
 Surface::albedo (const Soil& soil, const SoilWater& soil_water) const
+{ return impl.albedo (soil, soil_water); }
+
+double
+Surface::Implementation::albedo (const Soil& soil,
+				 const SoilWater& soil_water) const
 { 
   const double Theta_pf_3 = soil.Theta (0, pF2h (3.0));
   const double Theta_pf_1_7 = soil.Theta (0, pF2h (1.7));
@@ -170,6 +232,10 @@ Surface::albedo (const Soil& soil, const SoilWater& soil_water) const
 
 void 
 Surface::fertilize (const IM& n)
+{ impl.fertilize (n); }
+
+void 
+Surface::Implementation::fertilize (const IM& n)
 { 
   assert (n.NO3 >= 0.0);
   assert (n.NH4 >= 0.0);
@@ -179,6 +245,10 @@ Surface::fertilize (const IM& n)
 
 void
 Surface::output (Log& log, Filter& filter) const
+{ impl.output (log, filter); }
+
+void
+Surface::Implementation::output (Log& log, Filter& filter) const
 {
   log.output ("pond", filter, pond);
   log.output ("flux", filter, flux);
@@ -189,6 +259,10 @@ Surface::output (Log& log, Filter& filter) const
 
 double
 Surface::exfiltration () const // [mm/h]
+{ return impl.exfiltration (); }
+
+double
+Surface::Implementation::exfiltration () const // [mm/h]
 {
   // Negative pond == amount extracted from soil.
   if (pond < 0.0)
@@ -199,7 +273,7 @@ Surface::exfiltration () const // [mm/h]
 
 double
 Surface::evap_soil_surface () const // [mm/h]
-{ return EvapSoilSurface; }
+{ return impl.EvapSoilSurface; }
 
 double 
 Surface::evap_pond () const	// [mm/h]
@@ -207,15 +281,15 @@ Surface::evap_pond () const	// [mm/h]
 
 void
 Surface::put_ponding (double p)	// [mm]
-{ pond = p; }
+{ impl.pond = p; }
   
 void
 Surface::put_no3 (double no3) // [g/cm^2]
-{ im.NO3 = no3; }
+{ impl.im.NO3 = no3; }
 
 double
 Surface::get_no3 () const // [g/cm^2]
-{ return im.NO3; }
+{ return impl.im.NO3; }
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<IM>;
@@ -255,18 +329,31 @@ Canopy adsorbtion fraction of unreached potential soil evaporation.");
 }
 
 Surface::Surface (const AttributeList& al)
+  : impl (*new Implementation (al))
+{ }
+
+Surface::Implementation::Implementation (const AttributeList& al)
   : minimal_matter_flux (al.number ("minimal_matter_flux")),
     total_matter_flux (al.flag ("total_matter_flux")),
-    EpFactor_ (al.number ("EpFactor")),
-    EpInterchange_ (al.number ("EpInterchange")),
+    EpFactor (al.number ("EpFactor")),
+    EpInterchange (al.number ("EpInterchange")),
     albedo_wet (al.number ("albedo_wet")),
     albedo_dry (al.number ("albedo_dry")),
     lake (al.number ("lake")),
     pond (al.number ("pond")),
     flux (al.flag ("flux")),
+    im_flux (),
     EvapSoilSurface (0.0),
     Eps (0.0),
     T (0.0),
-    im (al.alist ("IM")),
-    im_flux ()
+    im (al.alist ("IM"))
+{
+  assert (im_flux.NO3 == 0.0);
+  assert (im_flux.NH4 == 0.0);
+}
+
+Surface::~Surface ()
+{ delete &impl; }
+
+Surface::Implementation::~Implementation ()
 { }

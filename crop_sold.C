@@ -781,7 +781,7 @@ CropSoldSyntax::CropSoldSyntax ()
 
   Phenology.add ("DS", Syntax::Number, Syntax::State);
   vPhenology.add ("DS", -1.0);
-  Phenology.add ("Vern", Syntax::Number, Syntax::Optional);
+  Phenology.add ("Vern", Syntax::Number, Syntax::OptionalState);
 
   syntax.add ("Phenology", Phenology, Syntax::State);
   alist.add ("Phenology", vPhenology);
@@ -803,7 +803,7 @@ CropSoldSyntax::CropSoldSyntax ()
   Syntax& RootSys = *new Syntax ();
   AttributeList& vRootSys = *new AttributeList ();
 
-  RootSys.add ("Depth", Syntax::Number, Syntax::Optional);
+  RootSys.add ("Depth", Syntax::Number, Syntax::OptionalState);
   RootSys.add ("Density", Syntax::Number, Syntax::State, Syntax::Sequence);
   vRootSys.add ("Density", empty_array);
   RootSys.add ("H2OExtraction", Syntax::Number, Syntax::State, Syntax::Sequence);
@@ -833,7 +833,7 @@ CropSoldSyntax::CropSoldSyntax ()
   vProd.add ("WSOrg", 0.0);
   Prod.add ("WRoot", Syntax::Number, Syntax::State);
   vProd.add ("WRoot", 0.001);
-  Prod.add ("NCrop", Syntax::Number, Syntax::Optional);
+  Prod.add ("NCrop", Syntax::Number, Syntax::OptionalState);
 
   syntax.add ("Prod", Prod, Syntax::State);
   alist.add ("Prod", vProd);
@@ -844,8 +844,8 @@ CropSoldSyntax::CropSoldSyntax ()
 
   CrpAux.add ("InitLAI", Syntax::Boolean, Syntax::State);
   vCrpAux.add ("InitLAI", true);
-  CrpAux.add ("PotRtDpt", Syntax::Number, Syntax::Optional);
-  CrpAux.add ("PtNCnt", Syntax::Number, Syntax::Optional);
+  CrpAux.add ("PotRtDpt", Syntax::Number, Syntax::OptionalState);
+  CrpAux.add ("PtNCnt", Syntax::Number, Syntax::OptionalState);
   CrpAux.add ("CrNCnt", Syntax::Number, Syntax::State);
   vCrpAux.add ("CrNCnt", 0.0);
   CrpAux.add ("NfNCnt", Syntax::Number, Syntax::State);
@@ -1890,7 +1890,7 @@ CropSold::DM () const	// [g/m² -> kg/ha]
 { return (var.Prod.WSOrg + var.Prod.WLeaf) * 10; }
 
 CropSold::CropSold (const AttributeList& al)
-  : Crop (al.name ("type")),
+  : Crop (al),
     par (*new Parameters (al)),
     var (*new Variables (par, al))
 { }

@@ -404,7 +404,7 @@ struct LogTable : public Log, public Filter
     { close (); close (); }
 
   // Open derived items in list normally.
-  void open_entry (const string& type)
+  void open_entry (const string& type, const AttributeList&)
     { open (type); }
   void close_entry ()
     { close (); }
@@ -558,7 +558,7 @@ static struct LogTableSyntax
       
       Syntax& entry_syntax = *new Syntax (check_alist);
       AttributeList& entry_alist = *new AttributeList ();
-      entry_syntax.add ("tag", Syntax::String, Syntax::Optional);
+      entry_syntax.add ("tag", Syntax::String, Syntax::OptionalConst);
       entry_syntax.add ("dimension", Syntax::String, Syntax::Const);
       entry_alist.add ("dimension", "");
       entry_syntax.add ("description", Syntax::String, Syntax::Const);
@@ -568,7 +568,8 @@ static struct LogTableSyntax
       entry_syntax.add ("missing_value", Syntax::String, Syntax::Const);
       entry_alist.add ("missing_value", "00.00");
       entry_syntax.add ("when", 
-			Librarian<Condition>::library (), Syntax::Optional);
+			Librarian<Condition>::library (),
+			Syntax::OptionalConst);
       entry_syntax.add ("start_year", Syntax::Integer, Syntax::Const);
       entry_alist.add ("start_year", 0);
       entry_syntax.add ("factor", Syntax::Number, Syntax::Const);

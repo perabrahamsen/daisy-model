@@ -81,8 +81,6 @@ public:
 };
 
 // This cutie will create a vector of objects from a vector of alists.
-// I'd like it to be a member of AttributeList, but template members
-// wasn't implemented in G++ 2.7.2.
 template <class T> 
 struct map_create
 {
@@ -115,22 +113,6 @@ struct map_create_const
   { return t; }
 };
 
-template <class T, class U> 
-struct map_create1
-{
-  vector<T*>& t;
-  map_create1 (const vector<AttributeList*>& f, U u)
-    : t (*new vector<T*> ())
-  { 
-    for (vector<AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (&T::create (**i, u));
-  }
-  operator vector<T*>& ()
-  { return t; }
-};
-
 template <class T> 
 struct map_construct
 {
@@ -142,22 +124,6 @@ struct map_construct
 	 i != f.end ();
 	 i++)
       t.push_back (new T (**i));
-  }
-  operator vector<T*>& ()
-  { return t; }
-};
-
-template <class T, class U> 
-struct map_construct1
-{
-  vector<T*>& t;
-  map_construct1 (const vector<AttributeList*>& f, U u)
-    : t (*new vector<T*> ())
-  { 
-    for (vector<AttributeList*>::const_iterator i = f.begin ();
-	 i != f.end ();
-	 i++)
-      t.push_back (new T (**i, u));
   }
   operator vector<T*>& ()
   { return t; }

@@ -73,6 +73,7 @@ public:
 
   // Create and Destroy.
 public:
+  void initialize (const Geometry& geometry);
   static void load_syntax (Syntax&, AttributeList&);
   Vegetation (const AttributeList&);
   ~Vegetation ();

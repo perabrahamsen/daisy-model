@@ -28,6 +28,7 @@ class Crop
 {
   // Content.
 public:
+  const AttributeList alist;	// Remember attributes for checkpoint.
   const string name;
 
   // Communication with Bioclimate.
@@ -78,7 +79,7 @@ public:
 public:
   virtual void initialize (const Geometry&) = 0;
 protected:
-  Crop (const string& );
+  Crop (const AttributeList& al);
 public:
   virtual ~Crop ();
 };

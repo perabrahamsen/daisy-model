@@ -12,8 +12,8 @@ class IM
 {
   // Content.
 public:
-  double NO3;
   double NH4;
+  double NO3;
 
   // Operations.
 public:
@@ -34,10 +34,10 @@ public:
   IM operator* (double flux) const;
   IM operator+ (const IM&) const;
   static void load_syntax (Syntax&, AttributeList&);
-  IM ();
   IM (const IM& im);
   IM (const AttributeList&);
   IM (const IM&, double flux);
+  IM ();
   ~IM ();
 };
 

@@ -5,13 +5,8 @@
 
 #include "librarian.h"
 
-class Library;
-class Filter;
 class Time;
-class Log;
 class Weather;
-class AttributeList;
-class Syntax;
 class OrganicMatter;
 class IM;
 class Crop;
@@ -20,6 +15,7 @@ class Harvest;
 class Column
 {
 public:
+  const AttributeList alist;	// Remember attributes for checkpoint.
   string name;
 
   // Actions.
@@ -27,9 +23,8 @@ public:
   virtual void sow (const AttributeList& crop) = 0;
   virtual void irrigate_top (double flux, double temp, const IM&) = 0;
   virtual void irrigate_surface (double flux, double temp, const IM&) = 0;
-  virtual void fertilize (const AttributeList&, const Time&, // Organic.
-			  double from, double to) = 0;
-  virtual void fertilize (const AttributeList&, const Time&) = 0;
+  virtual void fertilize (const AttributeList&, double from, double to) = 0;
+  virtual void fertilize (const AttributeList&) = 0;
   virtual void fertilize (const IM&, double from, double to) = 0; // Mineral.
   virtual void fertilize (const IM&) = 0;
   virtual vector<const Harvest*> harvest (const Time&, const string& name,
@@ -83,11 +78,10 @@ public:
 
   // Create and Destroy.
 protected:
-  Column (const string& name);
+  Column (const AttributeList&);
 public:
   virtual Column& clone (const string& name) const = 0;
-  virtual void initialize (const AttributeList&, const Time&, 
-			   const Weather&) = 0;
+  virtual void initialize (const Time&, const Weather&) = 0;
 
   virtual ~Column ();
 };

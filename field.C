@@ -20,9 +20,8 @@ struct Field::Implementation
   void sow (const AttributeList& crop);
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
-  void fertilize (const AttributeList&, const Time&, // Organic.
-			  double from, double to);
-  void fertilize (const AttributeList&, const Time&);
+  void fertilize (const AttributeList&, double from, double to);  // Organic.
+  void fertilize (const AttributeList&);
   void fertilize (const IM&, double from, double to); // Mineral.
   void fertilize (const IM&);
   vector<const Harvest*> harvest (const Time&, const string& name,
@@ -55,7 +54,7 @@ public:
   // Create and destroy.
   bool check () const;
   bool check_am (const AttributeList& am) const;
-  void initialize (const vector<AttributeList*>&, const Time&, const Weather&);
+  void initialize (const Time&, const Weather&);
   Implementation (const vector<AttributeList*>&);
   ~Implementation ();
 };
@@ -112,26 +111,26 @@ Field::Implementation::irrigate_surface (double flux, double temp, const IM& im)
 }
 
 void 
-Field::Implementation::fertilize (const AttributeList& al, const Time& time,
+Field::Implementation::fertilize (const AttributeList& al, 
 				  double from, double to)
 {
   if (selected)
-    selected->fertilize (al, time, from, to);
+    selected->fertilize (al, from, to);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->fertilize (al, time, from, to);
+    (*i)->fertilize (al, from, to);
 }
 
 void 
-Field::Implementation::fertilize (const AttributeList& al, const Time& time)
+Field::Implementation::fertilize (const AttributeList& al)
 {
   if (selected)
-    selected->fertilize (al, time);
+    selected->fertilize (al);
   else for (ColumnList::iterator i = columns.begin ();
 	    i != columns.end ();
 	    i++)
-    (*i)->fertilize (al, time);
+    (*i)->fertilize (al);
 }
 
 void 
@@ -158,10 +157,10 @@ Field::Implementation::fertilize (const IM& im)
 
 vector<const Harvest*> 
 Field::Implementation::harvest (const Time& time, const string& name,
-		double stub_length, 
-		double stem_harvest, 
-		double leaf_harvest, 
-		double sorg_harvest)
+				double stub_length, 
+				double stem_harvest, 
+				double leaf_harvest, 
+				double sorg_harvest)
 {
   if (selected)
     return selected->harvest (time, name,
@@ -187,7 +186,7 @@ Field::Implementation::harvest (const Time& time, const string& name,
 
 void 
 Field::Implementation::mix (const Time& time,
-	    double from, double to, double penetration)
+			    double from, double to, double penetration)
 {
   if (selected)
     selected->mix (time, from, to, penetration);
@@ -288,7 +287,7 @@ Field::Implementation::output (Log& log, Filter& filter) const
     {
       if (filter.check_derived ((*i)->name, library))
 	{
-	  log.open_entry ((*i)->name);
+	  log.open_entry ((*i)->name, (*i)->alist);
 	  (*i)->output (log, filter.lookup_derived ((*i)->name, library));
 	  log.close_entry ();
 	}
@@ -337,22 +336,18 @@ Field::Implementation::check_am (const AttributeList& am) const
 }
 
 void 
-Field::Implementation::initialize (const vector<AttributeList*>& als,
-				   const Time& time, const Weather& weather)
+Field::Implementation::initialize (const Time& time, const Weather& weather)
 {
-  assert (als.size () == columns.size ());
-  for (unsigned int i = 0; i < columns.size (); i++)
-    columns[i]->initialize (*als[i], time, weather);
+  for (ColumnList::const_iterator i = columns.begin ();
+       i != columns.end ();
+       i++)
+    (*i)->initialize (time, weather);
 }
 
 Field::Implementation::Implementation (const vector<AttributeList*>& sequence)
-  : selected (NULL)
-{
-  for (vector<AttributeList*>::const_iterator i = sequence.begin ();
-       i != sequence.end ();
-       i++)
-    columns.push_back (&Librarian<Column>::create (**i));
-}
+  : columns (map_create<Column> (sequence)),
+    selected (NULL)
+{ }
 
 Field::Implementation::~Implementation ()
 {
@@ -382,13 +377,12 @@ Field::irrigate_surface (double flux, double temp, const IM& im)
 { impl.irrigate_surface (flux, temp, im); }
 
 void 
-Field::fertilize (const AttributeList& al, const Time& time, // Organic.
-		  double from, double to)
-{ impl.fertilize (al, time, from, to); }
+Field::fertilize (const AttributeList& al, double from, double to)
+{ impl.fertilize (al, from, to); }
 
 void 
-Field::fertilize (const AttributeList& al, const Time& time)
-{ impl.fertilize (al, time); }
+Field::fertilize (const AttributeList& al)
+{ impl.fertilize (al); }
 
 void 
 Field::fertilize (const IM& im, double from, double to) // Mineral.
@@ -466,9 +460,8 @@ Field::check_am (const AttributeList& am) const
 { return impl.check_am (am); }
 
 void 
-Field::initialize (const vector<AttributeList*>& als,
-		   const Time& time, const Weather& weather)
-{ impl.initialize (als, time, weather); }
+Field::initialize (const Time& time, const Weather& weather)
+{ impl.initialize (time, weather); }
 
 Field::Field (const vector<AttributeList*>& sequence)
   : impl (*new Implementation (sequence))

@@ -38,7 +38,7 @@ public:
   virtual void close_derived () = 0;
 
   // Derived objects in a variable length list.
-  virtual void open_entry (const string& type) = 0;
+  virtual void open_entry (const string& type, const AttributeList&) = 0;
   virtual void close_entry () = 0;
 
   virtual void output (const string&, Filter&, const Time&,
@@ -73,11 +73,22 @@ static Librarian<Log> Log_init ("log");
 // Output an alist.
 
 template <class T> void
-output_submodule (const T& submodule,
-                  const char* name, Log& log, Filter& filter, 
-		  bool log_only = false)
+output_submodule (const T& submodule, 
+		  const char* name, Log& log, Filter& filter)
 {
-  if (filter.check (name, log_only))
+  if (filter.check (name, false))
+    {
+      log.open (name);
+      submodule.output (log, filter.lookup (name));
+      log.close ();
+    }
+}
+
+template <class T> void
+output_submodule_log_only (const T& submodule,
+			   const char* name, Log& log, Filter& filter)
+{
+  if (filter.check (name, true))
     {
       log.open (name);
       submodule.output (log, filter.lookup (name));
@@ -123,7 +134,7 @@ output_list (T const& items,
 	{
 	  if (f.check_derived ((*item)->name, library))
 	    {
-	      log.open_entry ((*item)->name);
+	      log.open_entry ((*item)->name, (*item)->alist);
 	      (*item)->output (log, f.lookup_derived ((*item)->name, library));
 	      log.close_entry ();
 	    }

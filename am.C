@@ -11,7 +11,7 @@
 #include "mathlib.h"
 #include <numeric>
 
-static Library* AM_library = NULL;
+Librarian<AM>::Content* Librarian<AM>::content = NULL;
 
 struct AM::Implementation
 {
@@ -69,6 +69,7 @@ struct AM::Implementation::Lock
   void output (Log&, Filter&) const;
     
   // Create and Destroy.
+  static void load_syntax (Syntax& syntax, AttributeList&);
   Lock (string c, string p);
   Lock (const AttributeList& al);
 };
@@ -79,7 +80,17 @@ AM::Implementation::Lock::output (Log& log, Filter& filter) const
   log.output ("crop", filter, crop);
   log.output ("part", filter, part);
 }  
-  
+
+
+void
+AM::Implementation::Lock::load_syntax (Syntax& syntax, AttributeList&)
+{
+  syntax.add ("crop", Syntax::String, Syntax::State, 
+	      "Crop to which this am is locked");
+  syntax.add ("part", Syntax::String, Syntax::State, 
+	      "Crop part to which this am is locked");
+}
+
 AM::Implementation::Lock::Lock (string c, string p)
   : crop (c),
     part (p)
@@ -423,77 +434,59 @@ const string
 AM:: crop_part_name () const
 { return impl.crop_part_name (); }
 
-Library&
-AM::library ()
-{
-  assert (AM_library);
-  return *AM_library;
-}
-
-void 
-AM::derive_type (const string& name, AttributeList& al, const string& super)
-{
-  assert (AM_library);
-  AM_library->add (name, al, AM_library->syntax (super));
-}
-
 AM& 
 AM::create (const AttributeList& al , const Geometry& geometry)
-{
-  return create (al, geometry, Time (1, 1, 1, 1));
-}
-
-AM& 
-AM::create (const AttributeList& al, const Geometry& geometry, const Time& time)
-{
-  return *new AM (al, geometry, time);
+{ 
+  AM& am = *new AM (al); 
+  am.initialize (geometry);
+  return am;
 }
 
 // Crop part.
 AM& 
-AM::create (const Geometry& geometry, const Time& time,
-	    vector<AttributeList*> ol,
-	    const string name, const string part,
+AM::create (const Geometry& /*geometry*/, const Time& time,
+	    const vector<AttributeList*>& ol,
+	    const string& sort, const string& part,
 	    AM::lock_type lock)
 {
-  AM* am = new AM (geometry, time, ol, name, part);
-  
+  AttributeList al;
+  al.add ("type", "state");
+  al.add ("creation", time);
+  al.add ("name", sort + "/" + part);
+  al.add ("om", ol);
+  AM& am = *new AM (al);
   if (lock == AM::Locked)
-    am->impl.lock = new AM::Implementation::Lock (name, part);
-  return *am;
+    am.impl.lock = new AM::Implementation::Lock (sort, part);
+  return am;
 }
 
-AM::AM (const Geometry& /* geometry */, const Time& t, 
-	vector<AttributeList*> ol,
-	const string sort, const string part)
-  : impl (*new Implementation (t, 
-			       sort + "/" + part,
-			       map_construct<OM> (ol))),
+AM::AM (const AttributeList& al)
+  : impl (*new Implementation 
+	  (al.time ("creation"),
+	   al.name (al.check ("name") ? "name" : "type"),
+	   map_construct<OM> (al.alist_sequence ("om")))),
+    alist (al),
     name ("state")
 { }
 
-AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
-  : impl (*new Implementation 
-	  (al.check ("creation") ? al.time ("creation") : time,
-	    al.name (al.check ("name") ? "name" : "type"),
-	    map_construct<OM> (al.alist_sequence ("om")))),
-    name ("state")
+void
+AM::initialize (const Geometry& geometry)
 {
-  const string syntax = al.name ("syntax");
+  const string syntax = alist.name ("syntax");
   
   if (syntax == "state")
     {
-      if (al.check ("lock"))
-	impl.lock = new Implementation::Lock (al.alist ("lock"));
+      if (alist.check ("lock"))
+	impl.lock = new Implementation::Lock (alist.alist ("lock"));
     }
   else if (syntax == "organic")
     {
       // Get initialization parameters.
-      const double weight = al.number ("weight") 
-	* al.number ("dry_matter_fraction") 
+      const double weight = alist.number ("weight") 
+	* alist.number ("dry_matter_fraction") 
 	* 0.1;			// kg / m² --> g / cm²
-      const double C = weight * al.number ("total_C_fraction");
-      const double N = weight * IM::N_left (al);
+      const double C = weight * alist.number ("total_C_fraction");
+      const double N = weight * IM::N_left (alist);
       
       add (C, N);
     }
@@ -503,11 +496,11 @@ AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
     assert (false);
   else if (syntax == "initial")
     {
-      const vector<AttributeList*>& oms = al.alist_sequence ("om");
+      const vector<AttributeList*>& oms = alist.alist_sequence ("om");
       const vector<OM*>& om = impl.om;
       
       const vector<AttributeList*>& layers
-	= al.alist_sequence ("layers");
+	= alist.alist_sequence ("layers");
       
       double last = 0.0;
       for (unsigned int i = 0; i < layers.size (); i++)
@@ -557,12 +550,12 @@ AM::AM (const AttributeList& al, const Geometry& geometry, const Time& time)
   else if (syntax == "root")
     {
       // Get paramters.
-      const double weight = al.number ("weight"); // Kg DM /m²
-      const double total_C_fraction = al.number ("total_C_fraction");
+      const double weight = alist.number ("weight"); // Kg DM /m²
+      const double total_C_fraction = alist.number ("total_C_fraction");
       const double C = weight * 1000.0 / (100.0 * 100.0)
 	* total_C_fraction; // g C / cm²;
-      const double k = M_LN2 / al.number ("dist");
-      const double depth = al.number ("depth");
+      const double k = M_LN2 / alist.number ("dist");
+      const double depth = alist.number ("depth");
 
       // Calculate density.
       vector<double> density (geometry.size (), 0.0);
@@ -644,34 +637,31 @@ static bool check_organic (const AttributeList& al)
   return ok;
 }
 
-int AM_init::count;
-
 #ifdef BORLAND_TEMPLATES
 template class add_submodule_sequence<OM>;
 template class add_submodule<IM>;
 #endif
 
-AM_init::AM_init ()
-{ 
-  if (count++ == 0)
+static struct AM_Syntax
+{
+  static AM&
+  make (const AttributeList& al)
+    { return *new AM (al); }
+  AM_Syntax ()
     {
-      // Library.
-      AM_library = new Library ("am", &AM::derive_type);
-
       // State.
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
 
-	syntax.add ("creation", Syntax::Date, Syntax::Const);
+	syntax.add ("creation", Syntax::Date, Syntax::State);
 	alist.add ("syntax", "state");
-	syntax.add ("name", Syntax::String, Syntax::Const);
-	Syntax& syntax_lock = *new Syntax ();
-	syntax_lock.add ("crop", Syntax::String, Syntax::Const);
-	syntax_lock.add ("name", Syntax::String, Syntax::Const);
-	syntax.add ("lock", syntax_lock, Syntax::Optional);
-	add_submodule_sequence<OM> ("om", syntax, Syntax::Const);
-	AM_library->add ("state", alist, syntax);
+	syntax.add ("name", Syntax::String, Syntax::State);
+	add_submodule<AM::Implementation::Lock> ("lock", syntax, alist,
+						 Syntax::OptionalState, "\
+This AM belongs to a still living plant");
+	add_submodule_sequence<OM> ("om", syntax, Syntax::State);
+	Librarian<AM>::add_type ("state", alist, syntax, &make);
       }
       // Organic fertilizer.
       {
@@ -687,9 +677,9 @@ AM_init::AM_init ()
 		    Syntax::Number, Syntax::Const);
 	syntax.add ("total_N_fraction",
 		    Syntax::Number, Syntax::Const);
-	add_submodule_sequence<OM> ("om", syntax, Syntax::Const);
+	add_submodule_sequence<OM> ("om", syntax, Syntax::State);
 	add_submodule<IM> ("im", syntax, alist);
-	AM_library->add ("organic", alist, syntax);
+	Librarian<AM>::add_type ("organic", alist, syntax, &make);
       }
       // Mineral fertilizer.
       {
@@ -699,7 +689,7 @@ AM_init::AM_init ()
 	alist.add ("creation", Time (1, 1, 1, 1));
 	alist.add ("syntax", "mineral");
 	IM::load_syntax (syntax, alist);
-	AM_library->add ("mineral", alist, syntax);
+	Librarian<AM>::add_type ("mineral", alist, syntax, &make);
       }
       // Initialization.
       {
@@ -715,8 +705,8 @@ AM_init::AM_init ()
 	layer_syntax.order ("end", "weight");
 	syntax.add ("layers", layer_syntax, Syntax::Const, Syntax::Sequence);
 	alist.add ("layers", layer_alist);
-	add_submodule_sequence<OM> ("om", syntax, Syntax::Const);
-	AM_library->add ("initial", alist, syntax);
+	add_submodule_sequence<OM> ("om", syntax, Syntax::State);
+	Librarian<AM>::add_type ("initial", alist, syntax, &make);
       }
       // Root initialization,
       {
@@ -729,20 +719,8 @@ AM_init::AM_init ()
 	syntax.add ("dist", Syntax::Number, Syntax::Const);
 	syntax.add ("weight", Syntax::Number, Syntax::Const); // Tons DM / ha
 	syntax.add ("total_C_fraction", Syntax::Number, Syntax::Const);
-	add_submodule_sequence<OM> ("om", syntax, Syntax::Const);
-	AM_library->add ("root", alist, syntax);
+	add_submodule_sequence<OM> ("om", syntax, Syntax::State);
+	Librarian<AM>::add_type ("root", alist, syntax, &make);
       }
     }
-  assert (count > 0);
-}
-
-AM_init::~AM_init ()
-{ 
-  if (--count == 0)
-    {
-      assert (AM_library);
-      delete AM_library;
-      AM_library = NULL;
-    }
-  assert (count >= 0);
-}
+} am_syntax;

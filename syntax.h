@@ -45,10 +45,14 @@ public:
     // This a state variable, it must be provided at initialization
     // and can be written to the log.
     State,
-    // This is a state variable that can be computer from other state
-    // variables, and therefore does not need to be specified before
+    // This is a state variable that can be computed from other
+    // parameters or state variables, and therefore does not need to
+    // be specified before the simulation starts. 
+    OptionalState, 
+    // This is a paramter that can be computer from other parameters,
+    // and therefore does not need to be specified before 
     // the simulation starts. 
-    Optional, 
+    OptionalConst, 
     // This is a variable that is only computed for logging purposes
     // and not a part of the simulation state. 
     LogOnly
@@ -63,6 +67,9 @@ public:
   // specific syntax entry. 
   bool is_const (const string&) const;
   bool is_optional (const string&) const;
+  bool is_log (const string&) const;
+  bool is_state (const string&) const;
+
   type lookup (const string&) const;
   const Syntax& syntax (const string&) const;
 public:

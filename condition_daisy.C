@@ -13,10 +13,21 @@ struct ConditionRunning : public Condition
     { }
 };
 
+struct ConditionFinished : public Condition
+{
+  bool match (const Daisy& daisy) const
+    { return !daisy.running; }
+  ConditionFinished (const AttributeList&)
+    { }
+};
+
 static struct ConditionDaisySyntax
 {
   static Condition& make_running (const AttributeList& al)
     { return *new ConditionRunning (al); }
+
+  static Condition& make_finished (const AttributeList& al)
+    { return *new ConditionFinished (al); }
 
   ConditionDaisySyntax ()
     {
@@ -24,5 +35,7 @@ static struct ConditionDaisySyntax
       AttributeList& alist = *new AttributeList ();
       Librarian<Condition>::add_type ("running",
 				      alist, syntax, &make_running);
+      Librarian<Condition>::add_type ("finished",
+				      alist, syntax, &make_finished);
     }
 } ConditionDaisy_syntax;

@@ -46,8 +46,8 @@ public:
     { vegetation.sow (al, soil); }
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
-  void fertilize (const AttributeList&, const Time&);
-  void fertilize (const AttributeList&, const Time&, double from, double to);
+  void fertilize (const AttributeList&);
+  void fertilize (const AttributeList&, double from, double to);
   void fertilize (const IM&);
   void fertilize (const IM&, double from, double to);
   vector<const Harvest*> harvest (const Time& time, const string& crop_name,
@@ -137,12 +137,14 @@ public:
   // Create and Destroy.
 public:
   Column& clone (const string& name) const
-    { return *new ColumnStandard (*this, name); }
-
+    { 
+      AttributeList new_alist (alist);
+      // BUG: TODO: Log state of `this' to new_alist.
+      new_alist.add ("type", name);
+      return *new ColumnStandard (new_alist); 
+    }
   ColumnStandard (const AttributeList&);
-  ColumnStandard (const ColumnStandard& column, const string& name);
-  void initialize (const AttributeList& al, const Time& time, 
-		   const Weather& weather);
+  void initialize (const Time& time, const Weather& weather);
   ~ColumnStandard ();
 };
 
@@ -161,18 +163,18 @@ ColumnStandard::irrigate_surface (double flux, double temp, const IM& sm)
 }
 
 void
-ColumnStandard::fertilize (const AttributeList& al, const Time& time)
+ColumnStandard::fertilize (const AttributeList& al)
 {
-  AM& am = AM::create (al, soil, time);
+  AM& am = AM::create (al, soil);
   organic_matter.add (am);
 }
 
 void 
-ColumnStandard::fertilize (const AttributeList& al, const Time& time,
+ColumnStandard::fertilize (const AttributeList& al,
 			   double from, double to)
 {
   assert (to < from);
-  AM& am = AM::create (al, soil, time);
+  AM& am = AM::create (al, soil);
   am.mix (soil, from, to);
   organic_matter.add (am);
 }
@@ -314,27 +316,8 @@ ColumnStandard::output (Log& log, Filter& filter) const
   log.close_geometry ();
 }
 
-ColumnStandard::ColumnStandard (const ColumnStandard& column, 
-				const string& name)
-  : Column (name),
-    // BUG: None of the constructors below have been implemented.
-    vegetation (column.vegetation),
-    bioclimate (column.bioclimate),
-    surface (column.surface),
-    soil (column.soil),
-    soil_water (column.soil_water),
-    soil_heat (column.soil_heat),
-    soil_NH4 (column.soil_NH4),
-    soil_NO3 (column.soil_NO3),
-    organic_matter (column.organic_matter),
-    nitrification (column.nitrification),
-    denitrification (column.denitrification),
-    groundwater (column.groundwater)
-{ }
-    
-
 ColumnStandard::ColumnStandard (const AttributeList& al)
-  : Column (al.name ("type")),
+  : Column (al),
     vegetation (al.alist ("Vegetation")),
     bioclimate (Librarian<Bioclimate>::create (al.alist ("Bioclimate"))),
     surface (al.alist ("Surface")),
@@ -343,20 +326,21 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     soil_heat (al.alist ("SoilHeat")),
     soil_NH4 (al.alist ("SoilNH4")),
     soil_NO3 (al.alist ("SoilNO3")),
-    organic_matter (soil, al.alist ("OrganicMatter")),
+    organic_matter (al.alist ("OrganicMatter")),
     nitrification (Librarian<Nitrification>::create 
 		   (al.alist ("Nitrification"))),
     denitrification (al.alist ("Denitrification")),
     groundwater (Librarian<Groundwater>::create (al.alist ("Groundwater")))
 { }
 
-void ColumnStandard::initialize (const AttributeList& al, const Time& time,
-				 const Weather& weather)
+void ColumnStandard::initialize (const Time& time, const Weather& weather)
 {
-  soil_heat.initialize (al.alist ("SoilHeat"), soil, time, weather);
-  soil_water.initialize (al.alist ("SoilWater"), soil, groundwater);
-  soil_NH4.initialize (al.alist ("SoilNH4"), soil, soil_water);
-  soil_NO3.initialize (al.alist ("SoilNO3"), soil, soil_water);
+  vegetation.initialize (soil);
+  soil_heat.initialize (alist.alist ("SoilHeat"), soil, time, weather);
+  soil_water.initialize (alist.alist ("SoilWater"), soil, groundwater);
+  soil_NH4.initialize (alist.alist ("SoilNH4"), soil, soil_water);
+  soil_NO3.initialize (alist.alist ("SoilNO3"), soil, soil_water);
+  organic_matter.initialize (alist.alist ("OrganicMatter"), soil);
 }
 
 ColumnStandard::~ColumnStandard ()
@@ -388,7 +372,7 @@ static struct ColumnStandardSyntax
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
 
-    syntax.add ("description", Syntax::String, Syntax::Optional); 
+    syntax.add ("description", Syntax::String, Syntax::OptionalConst); 
     add_submodule<Vegetation> ("Vegetation", syntax, alist);
     syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
 		Syntax::State);

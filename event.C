@@ -43,7 +43,7 @@ FertilizeEvent* FertilizeEvent::create(AttributeList &al){
 void FertilizeEvent::Do_It(Daisy& daisy,const Time&, EventQueue&)
 {
   // Fertilize the WORLD
-  const AttributeList& am = AM::library ().lookup ("mineral");
+  const AttributeList& am = Librarian<AM>::library ().lookup ("mineral");
   
     // Add inorganic matter.
 #if 0
@@ -55,12 +55,14 @@ void FertilizeEvent::Do_It(Daisy& daisy,const Time&, EventQueue&)
 
     // Add organic matter, if any.
     if (am.name ("syntax") != "mineral"){
+      AttributeList am_creation (am);
+      am_creation.add ("creation", daisy.time);
 #if 0
       if (to < from)
-	daisy.field.fertilize (am, daisy.time, from, to);
+	daisy.field.fertilize (am_creation, from, to);
       else
 #endif
-	daisy.field.fertilize (am, daisy.time);
+	daisy.field.fertilize (am_creation);
     }
   COUT << "[ (Not really) Fertilizing with " <<fertilizer<<"]\n";
 }

@@ -358,8 +358,8 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("Elevation", "m", Syntax::Const,
 	      "Heigh above sea level.");
   alist.add ("Elevation", 0.0);
-  syntax.add ("UTM_x", Syntax::Number, Syntax::Optional); // Unused.
-  syntax.add ("UTM_y", Syntax::Number, Syntax::Optional); // Unused.
+  syntax.add ("UTM_x", Syntax::Number, Syntax::OptionalConst); // Unused.
+  syntax.add ("UTM_y", Syntax::Number, Syntax::OptionalConst); // Unused.
 
   // DryDeposit
   {
@@ -407,6 +407,8 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("hourly_global_radiation", Syntax::Number, Syntax::LogOnly);
   syntax.add ("daily_global_radiation", Syntax::Number, Syntax::LogOnly);
   syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("daily_extraterrastial_radiation",
+	      Syntax::Number, Syntax::LogOnly);
   syntax.add ("rain", Syntax::Number, Syntax::LogOnly);
   syntax.add ("snow", Syntax::Number, Syntax::LogOnly);
   syntax.add ("cloudiness", Syntax::Number, Syntax::LogOnly);
