@@ -1,7 +1,10 @@
 \documentclass[a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
 \usepackage{verbatim}
 \input{macro}
-\usepackage[latin1]{inputenc}
+\bibliographystyle{apalike}
+\usepackage{graphicx}
 
 \begin{document}
 
@@ -16,21 +19,21 @@
 \maketitle
 
 \begin{abstract}
-Organic matter models using multiple pools for soil biomass and soil
-organic matter have proved able to simulate both short term and long
-term change in humus content of agricultural soil.  However, these
-pools do not correspond to measurable physical quantities, and are
-therefore difficult for a non-expert to understand and use, and
-fragile with respect to changes in the model.  An alternative
-sometimes used is to assume the organic matter is in a state of
-equilibrium.  Unfortunately, the time to reach equilibrium is best
-measured in centuries, so this assumptions is unlikely to hold true.
-For the same reason, the use of a warmup period cannot replace the
-need for a good initial partitioning.  In this paper we propose a
-milder assumption, namely a quasi-equilibrium where all but the
-slowest pool is in equilibrium with the amount of carbon input.  This
-assumption allows the non-expert user to initialize the model, and is
-robust with regard to model changes.
+  Organic matter models using multiple pools for soil biomass and soil
+  organic matter have proved able to simulate both short term and long
+  term change in humus content of agricultural soil.  However, these
+  pools do not correspond to measurable physical quantities, and are
+  therefore difficult for a non-expert to understand and use, and
+  fragile with respect to changes in the model.  An alternative
+  sometimes used is to assume the organic matter is in a state of
+  equilibrium.  Unfortunately, the time to reach equilibrium is often
+  measured in centuries, so this assumptions is unlikely to hold true.
+  For the same reason, the use of a warmup period cannot replace the
+  need for a good initial partitioning.  In this paper we propose a
+  milder assumption, namely a quasi-equilibrium where all but the
+  slowest pool is in equilibrium with the amount of carbon input.
+  This assumption allows the non-expert user to initialize the model,
+  and is robust with regard to model changes.
 \end{abstract}
 
 \tableofcontents
@@ -56,15 +59,15 @@ biomass eating the other matter (and itself).
 
 In numeric models, these fractions may be further divided into smaller
 pools, the content of each pool assumed by the model to have uniform
-properties, e.g.\ similar turnover rate and the same C/N ratio.
-Having two \textsc{som} and two \textsc{smb} pools allows a well
-calibrated model to capture both the short term (see XXX) and long
-term (XXX) dynamics of the system.  If you are only interested in
-accuracy on a single time scale, less pools may be needed.  The number
-of \textsc{aom} pools needed also depends on what you are simulating.
-For batch experiments and some long time scenarios, a single pool may
-be enough.  To simulate input sources from real farming, two pools per
-source are in general needed per source.
+properties, e.g.\ similar turnover rate and C/N ratio.  Having two
+\textsc{som} and two \textsc{smb} pools allows a well calibrated model
+to capture both the short term (see XXX) and long term (XXX) dynamics
+of the system.  If you are only interested in accuracy on a single
+time scale, less pools may be needed.  The number of \textsc{aom}
+pools needed also depends on what you are simulating.  For batch
+experiments and some long time scenarios, a single pool may be enough.
+To simulate input sources from real farming, two pools per source are
+in general needed per source.
 
 In several comparisons (see XXX, YYY, ZZZ), \daisy{} (see XYZZY) has
 been among the best models for both short and long term predictions of
@@ -77,9 +80,9 @@ in the soil, as well as biocliamte, crop development and management.
 
 The purpose of the \daisy{} model is to simulate real farming
 practice, both on the short and the long term.  Thus, we get a system
-with two pools for each of \textsc{som} and \textsc{smb}, and two pools for
-each type fertilizer applied or crop residual left on the field.  The
-original model is depicted in figure~\ref{fig:om1}.
+with two pools for each of \textsc{som} and \textsc{smb}, and two
+pools for each type of fertilizer applied and crop residual left on the
+field.  The original model is depicted in figure~\ref{fig:om1}.
 \begin{figure}[htbp]
   \centering
   
@@ -107,11 +110,11 @@ of flow, and made the system much more adaptable to new levels of
 input, another effect which has also been observed emperically (see
 DJF repport on humus levels).
 
-The current calibration is depicted in~\ref{fig:om2}.  The purpose of
-the SOM3 pool in that figure will be explained later.
-
+The current model is depicted in~\ref{fig:om2}.  The purpose of the
+SOM3 pool in that figure will be explained later.
 \begin{figure}[htbp]
   \centering
+  \includegraphics[width=1.0\hsize]{om1}
   
   \caption{New parameterization.}
   \label{fig:om2}
@@ -128,18 +131,19 @@ continue to change in the future.
 
 \section{Expanding user base}
 
-The original development of \daisy{} was founded by the national
-environmental agency, and the first non-research use was made by
-expert users who evaluated the national environmental plans for
-limiting nitrogen contamination of groundwater and surface water (see
-VMPuse).  Since then, \daisy{} has been used in other parts of the
-environmental and agricultural agencies (see NORVANA XXX), as well as
-increasingly by local authorities for evaluating regional plans (see
-Århus Amt og XXX), and recently also for evaluation of applications
-for changed farm practice at an individual farm level (see VVM,
-PLANTINFO).  For the last case, \daisy{} has also been used by
-consulting agencies representing the other side, namely farmers
-seeking permission to change farming practice.
+The original development of \daisy{} was founded by the Danish
+environmental protection agency \cite{daisy-def}, and the first
+non-research use was made by expert users who evaluated the national
+environmental plans for limiting nitrogen contamination of groundwater
+and surface water (see VMPuse).  Since then, \daisy{} has been used in
+other parts of the environmental and agricultural agencies (see
+NORVANA XXX), as well as increasingly by local authorities for
+evaluating regional plans (see Århus Amt og XXX), and recently also
+for evaluation of applications for changed farm practice at an
+individual farm level (see VVM, PLANTINFO).  For the last case,
+\daisy{} has also been used by consulting agencies representing ``the
+other side'', namely farmers seeking permission to change farming
+practice.
 
 The effect of this increased use has been that we no longer can rely
 on the users being experts.  Therefore, a project was started in order
@@ -150,13 +154,15 @@ initialized automatically from default values, or from other
 parameters.  These parameters and submodels are still available to the
 expert user, but will be hidden for the user who do not have the
 expertice or data available.  The result is that the software now
-appears much simpler to the user, even if the substantial changes to
-the model have been made.
+appears much simpler to the user, even though no substantial changes
+to the model have been made.
 
 The partition of the organic matter into the various soil pools have
 been a particular stumbling block for most users, partly because it
 does not reflect an easily identificable property of the system being
-modellen.  It is, to a large degree, a modelling artifact.
+modellen.  
+
+\section{The equilibrium assumption}
 
 It is common to use an equilibrium assumption for initialising models
 where measurements are not available.  For example, in \daisy{} we
@@ -211,7 +217,7 @@ sandy soil going from a low to high input equilibrium.
 \end{figure}
 
 As can be seen, the time to reach a new equilibirum after a change in
-farming practice is measured in centuries, which makes it safe to
+farming practice can be several centuries, which makes it safe to
 assume that no Danish farming land is in equilibrium.  At such a time
 scale, not only farming practice but also climate is going to change.
 
@@ -250,57 +256,128 @@ fertilizer.  The other pools are described by content (\textsc{smb1},
 ($\Delta\mbox{\textsc{smb1}}$, $\Delta\mbox{\textsc{smb2}}$,
 $\Delta\mbox{\textsc{som1}}$, $\Delta\mbox{\textsc{som2}}$).
 
-The factors $a$ to $t$ depend on the base calibration of the model, so
-the factors are different for the original calibration
-(figure~\ref{fig:om1}) and the Sander calibration
-(figure~\ref{fig:om2}).  They also depend on the clay content of the
-soil, the temperature, and the water potential.  
+The factors $a$ to $t$ depend on the model, so the factors are
+different for the original model (figure~\ref{fig:om1}) and the Sander
+recalibration (figure~\ref{fig:om2}).  They also depend on site and
+time specific factors, namely the clay content of the soil, the
+temperature, and the water potential.
 
 Some of these factors may be zero, in none of the calibrations
 mentioned we have any carbon going directly from the \textsc{aom}
 pools to \textsc{som1}, so $o$ will always be zero.  The reason we
 include these, is that we are trying to solve the initialization
 problem in a way that is robust with regard to changes in the model.
-The description is also robust with regard to the number of pools,
-adding a new pool will just add another equation, and another term in
-all the existing equations.  The general form is:
+The description is also robust with regard to the number of
+pools\footnote{The generalized form is: 
+  \begin{displaymath}
+    \begin{array}{rclcr}
+      \Delta\mbox{\textsc{smb}}i &=& \displaystyle
+      \sum_{k=1}^{\mbox{\tiny\#\textsc{smb}}} a_{i,k}\,\mbox{\textsc{smb}}k + 
+      \sum_{l=1}^{\mbox{\tiny\#\textsc{som}}} b_{i,l}\,\mbox{\textsc{som}}l +
+      c_i \Delta\mbox{\textsc{aom}} 
+      &;&i = 1\ldots\mbox{\#\textsc{smb}}\nonumber\\
+      \Delta\mbox{\textsc{som}}j &=& \displaystyle
+      \sum_{k=1}^{\mbox{\tiny\#\textsc{smb}}} d_{j,k}\,\mbox{\textsc{smb}}k +
+      \sum_{l=1}^{\mbox{\tiny\#\textsc{som}}} e_{j,l}\,\mbox{\textsc{som}}l +
+      f_j \Delta\mbox{\textsc{aom}} 
+      &;&j = 1\ldots\mbox{\#\textsc{som}}\nonumber
+    \end{array}
+  \end{displaymath}
+}, adding a new pool will just one more equation, and two new unknowns.
+
+Back to the two pool example.  We have four equations and nine
+unknowns.  We need more information.  The first piece of information
+we can add is the total organic matter content in the field, which can
+be directly measured.  This give is one new equation, and two new
+variables.
+\begin{equation}
+  \label{eq:total}
+  \mbox{\textsc{total}} = \mbox{\textsc{smb1}} + \mbox{\textsc{smb2}}
+  + \mbox{\textsc{som1}} + \mbox{\textsc{som2}} + \mbox{\textsc{aom}}
+\end{equation}
+\textsc{total} is measured.  \mbox{\textsc{aom}}, the initial content
+of added organic matter, is given a default value corresponding to
+typical root residuals left from a crop.  We now miss four equations,
+one for each pool.
+
+The equilibrium assumption corresponds to adding these four equations: 
+\begin{displaymath}
+  \Delta\mbox{\textsc{smb1}} = \Delta\mbox{\textsc{smb2}} 
+  = \Delta\mbox{\textsc{som1}} = \Delta\mbox{\textsc{som2}} = 0
+\end{displaymath}
+Even though we earlier argued that it was not good for initializing
+the system, we can use it to obtain an estimate of
+$\Delta\mbox{\textsc{aom}}$, the carbon input level required to
+maintain the measured amount of organic matter in the soil.
+
+The initializing procedude we ended up using was to allow the slowest
+pool (which happens to be \textsc{som1}) to change, but require the
+user specify the carbon input to the system ($u$).  We then get:
 \begin{eqnarray}
-  \Delta\mbox{\textsc{smb}}i &=& 
-  \Sigma_{k=1}^{\mbox{\#\textsc{smb}}} a_{i,k}\mbox{\textsc{smb}}k + 
-  \Sigma_{l=1}^{\mbox{\#\textsc{som}}} b_{i,l}\mbox{\textsc{som}}l +
-  c_i\, \Delta\mbox{\textsc{aom}} 
-  \hspace{1cm};i = 1\ldots\mbox{\#\textsc{smb}}\nonumber\\
-  \Delta\mbox{\textsc{som}}j &=& 
-  \Sigma_{k=1}^{\mbox{\#\textsc{smb}}} d_{j,k}\> \mbox{\textsc{smb}}k + 
-  \Sigma_{l=1}^{\mbox{\#\textsc{som}}} e_{j,l}\> \mbox{\textsc{som}}l +
-  f_j\, \Delta\mbox{\textsc{aom}} 
-  \hspace{1cm};j = 1\ldots\mbox{\#\textsc{som}}\nonumber
+  \Delta\mbox{\textsc{smb1}} &=& 0\\
+  \Delta\mbox{\textsc{smb2}} &=& 0\\
+  \Delta\mbox{\textsc{som2}} &=& 0\\\label{eq:fastpooleq}
+  \Delta\mbox{\textsc{aom}} &=& u
 \end{eqnarray}
 
+We now have nine equations with nine unknowns, and can initialize the
+system.  The physical interpretation of this initialization is that
+all but the slowest pool has reach a quasi-equilibrium with respect to
+the input, and the size of the slowest pool.  Since the slowest pool
+is still changing (and the other pools will have to change to reflect
+that), this is not a true equilibrium.
 
+We also have a model independent knob for users who want to calibrate
+the system.  If the user can estimate the total rate of change in
+carbon content, i.e.\ is the soil gaining or losing organic matter
+with the specified input, we can substitute
+equation~\ref{eq:fastpooleq} with
+\begin{displaymath}
+  \Delta\mbox{\textsc{smb1}} + \Delta\mbox{\textsc{smb2}} 
+  + \Delta\mbox{\textsc{som1}} + \Delta\mbox{\textsc{som2}} = v
+\end{displaymath}
+where $v$ is the user specified change in carbon content.  Since out
+users are generally more concerned with nitrogen than with carbon, we
+ask them to specify the \emph{background mineralization} ($w$), which
+is the amount of nitrogen the rest of the system gets or loses from
+the soil.  The equation is then
+\begin{displaymath}
+  \frac{\Delta\mbox{\textsc{smb1}}}{{C/N}_{\mbox{\small\textsc{smb1}}}}
+  + \frac{\Delta\mbox{\textsc{smb2}}}{{C/N}_{\mbox{\small\textsc{smb2}}}}
+  + \frac{\Delta\mbox{\textsc{som1}}}{{C/N}_{\mbox{\small\textsc{som1}}}}
+  + \frac{\Delta\mbox{\textsc{som2}}}{{C/N}_{\mbox{\small\textsc{som2}}}}
+  = w
+\end{displaymath}
+The simulated background mineralization will only be the specified
+value ($w$) if the simlated carbon input also corresponds to the
+specified value ($u$).
 
-\begin{verbatim}
-SH: Genereliseret udtryk? 
-SH: dSMBi = Sigma (a_i,j * SMBj) + Sigma (b_i,k * SOMk) + c_i dAOM
-SH: dSOMi = Sigma (d_i,j * SMBj) + Sigma (e_i,k * SOMk) + f_i dAOM
-\end{verbatim}
+In conclusion, we can now initialize the soil organic matter system
+from two or three numbers supplied by the user.  The two mandatory
+numbers are the total content of organic matter, and an estimate of
+how much carbon has been added to the system per year in the recent
+decades.  The third, optional, number is the estimated background
+mineralization.  The first number is directly measurable, the two
+other can at least be understood by people who have no intimate
+knowledge of the model, and can be estimated by the user from \daisy{}
+simulations.  None of the numbers will have to be changed when the
+model itself is changed.
 
-The reason we have included all the factors are 
+\section{Assumptions and limitations}
 
-The the sytem of equations.
+In the equations we used a large number of constants, without
+indicating how we calculate them.  Here is the formula for calculating
+$a$ from the first equation.
+\begin{displaymath}
+  a = t_{\mbox{\tiny\textsc{smb1}}}\,
+  (X_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb1}}}}\,
+  E_{\mbox{\tiny\textsc{smb1}}\rightarrow{\mbox{\tiny\textsc{smb1}}}}
+  - 1) - m_{\mbox{\tiny\textsc{smb1}}})\,
+  F_{\mbox{\tiny\textsc{smb1}}}^T (T)\,
+  F_{\mbox{\tiny\textsc{smb1}}}^\psi (\psi)\,
+  F_{\mbox{\tiny\textsc{smb1}}}^C (X_c)
+\end{displaymath}
 
-4 equations, nine unknown.
-
-total humus known, 5 equations (still nine unknowns)
-
-assume equilibrium, 5 eq, 5 unknown 
-
-
-Assume quasi-equilibrium with input.
-
-Attempt to provoke background mineralization.
-
-Assumptions and limitations.
 
 -- clay, T og h
 
@@ -319,6 +396,9 @@ sand
 lim 70\%
 
 Brug i standardisering.
+
+\section{Bibliography}
+\bibliography{daisy}
 
 \end{document}
 
