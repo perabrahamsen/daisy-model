@@ -34,6 +34,7 @@
 class Soil;
 class Time;
 class Treelog;
+class Format;
 
 struct Handle 
 {
@@ -131,13 +132,15 @@ public:
   virtual bool prevent_printing ();
 
   // Create and Destroy.
+public:
+  void document (Format&) const;
+  static void load_syntax (Syntax&, AttributeList&);
 protected:
   virtual const std::string 
   /**/ default_dimension (const std::string& spec_dim) const;
   virtual const Units::Convert* 
   /**/ special_convert (const std::string& has, const std::string& want);
 public:
-  static void load_syntax (Syntax&, AttributeList&);
   virtual void initialize (const std::map<symbol, symbol>& conv, 
 			   double from, double to,
                            const std::string& timestep);

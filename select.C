@@ -25,6 +25,7 @@
 #include "vcheck.h"
 #include "units.h"
 #include "symbol.h"
+#include "format.h"
 #include <numeric>
 #include <set>
 
@@ -317,10 +318,20 @@ static bool check_alist (const AttributeList& al, Treelog& err)
   if (!has_warned_about_when && al.check ("when"))
     {
       err.warning ("The 'when' select parametere is obsolete.\n\
-Set the 'flux' parameter instead.");
+Set the 'handle' parameter instead.");
       has_warned_about_when = true;
     }
   return ok;
+}
+
+void 
+Select::document (Format& format) const
+{
+  Format::Item item (format, tag ().name ());  
+  format.text ("[");
+  format.bold (dimension ());
+  format.text ("]");
+  format.soft_linebreak ();
 }
 
 void 
@@ -383,7 +394,7 @@ attribute.", Select::Implementation::Spec::load_syntax);
 OBSOLETE.  If you set this variable, 'flux' will be set to true.\n\
 This overwrites any direct setting of 'flux'.");
   syntax.add ("flux", Syntax::Boolean, Syntax::OptionalConst, "\
-OBSOLTE.  This value will be used if 'handle' is not specified.\
+OBSOLETE.  This value will be used if 'handle' is not specified.\
 A value of true then means 'sum', and false means 'current'.");
   syntax.add ("handle", Syntax::String, Syntax::OptionalConst, "\
 This option determine how the specified variable should be logged.  \n\

@@ -259,33 +259,57 @@ has_interesting_description (const Library& library,
 void
 LogSelect::document_entries (Format& format, const AttributeList& alist)
 {
-  if (!alist.check ("entries"))
-    return;
+  Syntax syntax;
+  AttributeList dummy_alist;
+  LogSelect::load_syntax (syntax, dummy_alist);
+  if (!syntax.check (alist, Treelog::null ()))
+    {
+      // Incomplete log.
+      if (!alist.check ("entries"))
+	return;
 
-  const vector<AttributeList*>& entries = alist.alist_sequence ("entries");
-  if (entries.size () < 1)
-    return;
+      const vector<AttributeList*>& entries = alist.alist_sequence ("entries");
+      if (entries.size () < 1)
+	return;
 
-  // At least one interesting description required.
-  const Library& library = Librarian<Select>::library ();
-  int interesting = 0;
-  for (size_t i = 0; i < entries.size (); i++)
-    if (has_interesting_description (library, *entries[i]))
-      interesting++;
-  if (interesting < 1)
-    return;
+      // At least one interesting description required.
+      const Library& library = Librarian<Select>::library ();
+      int interesting = 0;
+      for (size_t i = 0; i < entries.size (); i++)
+	if (has_interesting_description (library, *entries[i]))
+	  interesting++;
+      if (interesting < 1)
+	return;
 
-  format.bold ("Table columns include:");
+      format.bold ("Table columns include:");
+      Format::List dummy (format);
+
+      for (size_t i = 0; i < entries.size (); i++)
+	{
+	  const AttributeList& entry = *entries[i];
+	  Format::Item d2 (format, Select::select_get_tag (entry).name ());
+	  if (has_interesting_description (library, entry))
+	    format.text (entry.name ("description"));
+	  format.soft_linebreak ();
+	}
+      return;
+    }
+  // Complete log.
+  struct DocSelect : public LogSelect 
+  {
+    void initialize (Treelog&)
+    { }
+    DocSelect (const AttributeList& al)
+      : LogSelect (al)
+    { }
+  };
+  DocSelect select (alist);
+
+  format.bold ("Table columns:");
   Format::List dummy (format);
 
-  for (size_t i = 0; i < entries.size (); i++)
-    {
-      const AttributeList& entry = *entries[i];
-      Format::Item d2 (format, Select::select_get_tag (entry).name ());
-      if (has_interesting_description (library, entry))
-        format.text (entry.name ("description"));
-      format.soft_linebreak ();
-    }
+  for (size_t i = 0; i < select.entries.size (); i++)
+    select.entries[i]->document (format);
 }
 
 void 

@@ -67,6 +67,8 @@ symbol::DB::DB ()
       int_map[i] = i;
       counter++;
     }
+  daisy_assert (name_map.size () == counter);
+  daisy_assert (reverse_map.size () == counter);
 }
 
 symbol::DB* symbol::data = NULL;
@@ -78,6 +80,8 @@ symbol::DB::name2id (const string& name)
   name_map_t::const_iterator i = name_map.find (name);
   if (i == name_map.end ())
     {
+      daisy_assert (name_map.size () == counter);
+      daisy_assert (reverse_map.size () == counter);
       name_map[name] = counter;
       reverse_map[counter] = name;
       counter++;
@@ -154,8 +158,7 @@ symbol::Init::~Init ()
     }
 }
 
-std::string
-operator+ (const symbol sym, const char *const str)
+std::string operator+ (const symbol sym, const char *const str)
 { return sym.name () + str; }
 
 std::string operator+ (const char *const str, const symbol sym)
