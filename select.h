@@ -3,6 +3,7 @@
 #ifndef SELECT_H
 #define SELECT_H
 
+#include "condition.h"		// Needed for proper initialization.
 #include "librarian.h"
 #include <map>
 

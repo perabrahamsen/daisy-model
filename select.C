@@ -1,7 +1,6 @@
 // select.C --- Select a state variable.
 
 #include "select.h"
-#include "condition.h"
 #include "time.h"
 #include "geometry.h"
 #include <numeric>

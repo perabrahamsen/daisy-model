@@ -189,7 +189,7 @@ Snow::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
     }
   if (Swater_new > Ssnow_new)
     {
-      CERR << "Removed " << Swater_new - Ssnow_new << " mm water.\n";
+      CERR << "Removed " << (Swater_new - Ssnow_new) << " mm water.\n";
       Swater_new = Ssnow_new;
     }
 
