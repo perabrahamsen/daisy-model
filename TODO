@@ -1,21 +1,17 @@
-* Test daisy under DOS.
-
-* ElectricFence (eller C++ udgave (www.andreasen.com?)
+* Brug soil_water.last_unsatirated_node to limit om, den, nit heat, m.m.
 
 * LogTable bug
 
 "from" ser ikke ud til at blive respekteret.
 
-* Is
+* Kig på groundwater_pipe.C
 
-- Jeg har disabled darcy check.  Spørg Søren om det er ok.
-- Skal vi checke om der er plads til at fryse vandet?
+* ElectricFence (eller C++ udgave (www.andreasen.com?)
 
 * LogExtern
 
 - test api
 - konverter log.dai til ny table log model.
-- opdater manual.
 
 * En `forever' aktivitet.  Eller en `until CONDITION activity'.
 

@@ -9,7 +9,7 @@
 struct LogAList : public Log
 {
   // Filter functions.
-  bool check (const string&, bool) const;
+  bool check (const string&) const = 0;
   bool check_entry (const string&, const Library&) const;
   bool check_derived (const string&, const string&, const Library&) const;
 

@@ -56,12 +56,12 @@ public:
   void close ();		// Close one level.
 
   // Output routines.
-  virtual void output (const string& name, const Time& time);
-  virtual void output (const string& name, const double number);
-  virtual void output (const string& name, const int integer);
-  virtual void output (const string& name, const string& a_name);
-  virtual void output (const string& name, const vector<double>& array,
-		       const Geometry* geometry);
+  virtual void output_time (const string& name, const Time& time);
+  virtual void output_number (const string& name, const double number);
+  virtual void output_integer (const string& name, const int integer);
+  virtual void output_name (const string& name, const string& a_name);
+  virtual void output_array (const string& name, const vector<double>& array,
+			     const Geometry* geometry);
 
   // Reset at start of time step.
   bool match (const Daisy& daisy, bool is_printing);

@@ -12,8 +12,8 @@ struct SelectInterval : public Select
 
   // Output routines.
 
-  void output (const string& name, const vector<double>& array, 
-	       const Geometry* geometry)
+  void output_array (const string& name, const vector<double>& array, 
+		     const Geometry* geometry)
     { 
       if (!is_active ())
 	return;

@@ -136,35 +136,35 @@ Select::close ()		// Close one level.
 
   // Output routines.
 void 
-Select::output (const string& name, const Time&)
+Select::output_time (const string& name, const Time&)
 { 
   if (is_active () && valid (name))
     throw ("This log selection can't log dates."); 
 }
 
 void 
-Select::output (const string& name, const double)
+Select::output_number (const string& name, const double)
 { 
   if (is_active () && valid (name))
     throw ("This log selection can't log numbers."); 
 }
 
 void 
-Select::output (const string& name, const int)
+Select::output_integer (const string& name, const int)
 { 
   if (is_active () && valid (name))
     throw ("This log selection can't log integers."); 
 }
 
 void 
-Select::output (const string& name, const string&)
+Select::output_name (const string& name, const string&)
 { 
   if (is_active () && valid (name))
     throw ("This log selection can't log names.");
 }
 
 void 
-Select::output (const string& name, const vector<double>&,
+Select::output_array (const string& name, const vector<double>&,
 		const Geometry*)
 { 
   if (is_active () && valid (name))

@@ -14,7 +14,7 @@
 #include "submodel.h"
 
 #define WATER_FLUX_HEAT
-// #define GROUND_WATER_LIMIT
+#define GROUND_WATER_LIMIT
 
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
 
@@ -352,7 +352,7 @@ SoilHeat::Implementation::solve (const Time& time,
     {
       if (groundwater.table () < soil.z (size - 1))
 	throw ("Groundwater table below lowest node.");
-      size = soil.interval (groundwater.table ()) + 1;
+      size = soil.interval_plus (groundwater.table ());
     }
   // Maybe the groundwater module lied...
   while (size > 0 && soil_water.h (size - 1) >= 0)

@@ -9,7 +9,7 @@ struct SelectDate : public Select
   Time value;			// Date.
 
   // Output routines.
-  void output (const string& name, const Time& time)
+  void output_time (const string& name, const Time& time)
     { 
       if (!is_active ())
 	return;

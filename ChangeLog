@@ -1,3 +1,30 @@
+1999-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.88 released.
+
+1999-08-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* select.C (output_time): Renamed from `output'.
+	(output_number): Ditto.
+	(output_integer): Ditto.
+	(output_name): Ditto.
+	(output_array): Ditto.
+	* select_array.C, select_content.C, select_date.C, select_flux.C,
+	select_index.C, select_interval.C, select_number.C: Ditto.
+	* log_select.C (output): Updated called.
+
+	* log_alist.C, log_alist.h (check): Removed.
+
+	* Merged PvdK changes.
+	* Merged SH changes.
+
+	* soil_heat.C (GROUND_WATER_LIMIT): Enable.
+
+1999-08-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* txt/reference/introduction.tex (Log File Generation): Use
+	`table' instead of `table1'. 
+
 1999-08-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.87 released.

@@ -149,7 +149,7 @@ GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
        const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
 
        // Distribution of drain flow among numeric soil layers
-       const a = Flow / (Ka*Ha + Kb*Hb);
+       const double a = Flow / (Ka*Ha + Kb*Hb);
        for (unsigned int i = 0; i < i_bottom; i++)
          {
             if (i >= i_GWT)
@@ -238,7 +238,7 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil)
              {
                h[i] = h2;
                Theta[i] = Theta2;
-               const W = (ThetaS - Theta2) * soil.dz (i) / dt + qi - qo;
+               const double W = (ThetaS - Theta2) * soil.dz (i) / dt + qi - qo;
                S[i] = W / soil.dz (i);
                GWT_new = soil.zplus (i);
                break;

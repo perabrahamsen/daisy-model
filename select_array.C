@@ -8,8 +8,8 @@ struct SelectArray : public Select
   vector<double> value;		// Total array.
 
   // Output routines.
-  void output (const string& name, const vector<double>& array, 
-	       const Geometry*)
+  void output_array (const string& name, const vector<double>& array, 
+		     const Geometry*)
     { 
       if (!is_active ())
 	return;

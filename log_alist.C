@@ -5,10 +5,6 @@
 #include "log_alist.h"
 
 bool
-LogAList::check (const string&, bool) const
-{ return is_active; }
-
-bool
 LogAList::check_entry (const string&, const Library&) const
 { return is_active; }
 

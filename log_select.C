@@ -88,7 +88,7 @@ LogSelect::output (const string& name, const Time& value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output (name, value);
+      entries[i]->output_time (name, value);
 }
 
 void 
@@ -100,7 +100,7 @@ LogSelect::output (const string& name, const double value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output (name, value);
+      entries[i]->output_number (name, value);
 }
 
 void 
@@ -108,7 +108,7 @@ LogSelect::output (const string& name, const int value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output (name, value);
+      entries[i]->output_integer (name, value);
 }
 
 void 
@@ -116,7 +116,7 @@ LogSelect::output (const string& name, const string& value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output (name, value);
+      entries[i]->output_name (name, value);
 }
 
 void 
@@ -124,7 +124,7 @@ LogSelect::output (const string& name, const vector<double>& value)
 { 
   if (is_active)
     for (unsigned int i = 0; i < entries.size (); i++)
-      entries[i]->output (name, value, geometry ());
+      entries[i]->output_array (name, value, geometry ());
 }
 
 void 

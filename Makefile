@@ -417,8 +417,8 @@ log_extern${OBJ}: log_extern.C log_select.h log.h librarian.h library.h \
  common.h alist.h syntax.h select.h condition.h log_extern.h
 log_select${OBJ}: log_select.C log_select.h log.h librarian.h library.h \
  common.h alist.h syntax.h select.h condition.h
-select${OBJ}: select.C select.h librarian.h library.h common.h alist.h \
- syntax.h condition.h geometry.h
+select${OBJ}: select.C select.h condition.h librarian.h library.h common.h \
+ alist.h syntax.h geometry.h
 average${OBJ}: average.C average.h librarian.h library.h common.h alist.h \
  syntax.h
 mactrans${OBJ}: mactrans.C mactrans.h librarian.h library.h common.h \
@@ -564,20 +564,24 @@ soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  organic_matter.h chemical.h chemicals.h log.h soil_chemical.h \
  solute.h adsorption.h transport.h mactrans.h submodel.h
 submodel${OBJ}: submodel.C submodel.h common.h
-select_index${OBJ}: select_index.C select.h librarian.h library.h common.h \
- alist.h syntax.h
-select_content${OBJ}: select_content.C select.h librarian.h library.h \
- common.h alist.h syntax.h geometry.h
-select_interval${OBJ}: select_interval.C select.h librarian.h library.h \
- common.h alist.h syntax.h geometry.h
-select_flux${OBJ}: select_flux.C select.h librarian.h library.h common.h \
- alist.h syntax.h geometry.h
-select_number${OBJ}: select_number.C select.h librarian.h library.h \
- common.h alist.h syntax.h
-select_date${OBJ}: select_date.C select.h librarian.h library.h common.h \
- alist.h syntax.h
-select_array${OBJ}: select_array.C select.h librarian.h library.h common.h \
- alist.h syntax.h
+groundwater_pipe${OBJ}: groundwater_pipe.C groundwater.h uzmodel.h \
+ librarian.h library.h common.h alist.h syntax.h log.h soil.h \
+ horizon.h hydraulic.h tortuosity.h geometry.h soil_water.h macro.h \
+ mathlib.h
+select_index${OBJ}: select_index.C select.h condition.h librarian.h \
+ library.h common.h alist.h syntax.h
+select_content${OBJ}: select_content.C select.h condition.h librarian.h \
+ library.h common.h alist.h syntax.h geometry.h
+select_interval${OBJ}: select_interval.C select.h condition.h librarian.h \
+ library.h common.h alist.h syntax.h geometry.h
+select_flux${OBJ}: select_flux.C select.h condition.h librarian.h \
+ library.h common.h alist.h syntax.h geometry.h
+select_number${OBJ}: select_number.C select.h condition.h librarian.h \
+ library.h common.h alist.h syntax.h
+select_date${OBJ}: select_date.C select.h condition.h librarian.h \
+ library.h common.h alist.h syntax.h
+select_array${OBJ}: select_array.C select.h condition.h librarian.h \
+ library.h common.h alist.h syntax.h
 log_table${OBJ}: log_table.C log_select.h log.h librarian.h library.h \
  common.h alist.h syntax.h select.h condition.h
 log_harvest${OBJ}: log_harvest.C log.h librarian.h library.h common.h \

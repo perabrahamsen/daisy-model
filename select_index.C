@@ -9,8 +9,8 @@ struct SelectIndex : public Select
   double value;	
 
   // Output routines.
-  void output (const string& name, const vector<double>& array, 
-	       const Geometry*)
+  void output_array (const string& name, const vector<double>& array, 
+		     const Geometry*)
     { output (name, array); }
   void output (const string& name, const vector<double>& array)
     { 
