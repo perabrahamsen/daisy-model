@@ -154,6 +154,18 @@
 	    (factor -10)		;cm->mm
 	    (dimension "cm"))))
 
+(deflog "Water Flux" table1
+  (where "water_flux.tab")
+  (when hourly)
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path time hour))
+	   ((path column "$col" SoilWater q)
+	    (full true)			;show value in all nodes.
+	    (factor -10)		;cm->mm
+	    (dimension "cm"))))
+
 (deflog "Preferential NO3 Transport" table1
   (where "pref_NO3.tab")
   (when hourly)
@@ -1051,7 +1063,9 @@
 	   ((path time mday))
 	   ((path column "$col" Groundwater "*" height)
 	    (tag "table")
-	    (dimension "cm"))))
+	    (dimension "cm"))
+	   ((path column "$col" Groundwater "*" DrainFlow)
+	    (dimension "cm/h"))))
 
 (deflog "Harvest" harvest)
 

@@ -1,3 +1,8 @@
+1999-08-25  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/log.dai ("Groundwater"): Added `DrainFlow'.
+	* Merged SH changes.
+
 1999-08-24  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.89 released.

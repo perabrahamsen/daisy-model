@@ -130,6 +130,7 @@ GroundwaterPipe::update_water (const Soil& soil,
            assert (q_p[i] == 0.0);
            q[i] = - Percolation[i];
          }
+       assert (finite (q[i]));
     }
   height = GWT_new;
 }
@@ -148,48 +149,49 @@ double
 GroundwaterPipe::EquilibriumDrainFlow (const Soil& soil)
 {
   const int i_GWT = soil.interval_plus (height) + 1;
-  if (height > soil.zplus(i_drain))
+  if (height >= soil.zplus(i_drain-1))
     {
-    // GWT located above drain
-       double Ha = 0;
-       double Ka = 0;
-       for (unsigned int i = i_GWT; i <= i_drain; i++)
-         {
-            Ha += soil.dz (i);
-            Ka += soil.dz (i) * soil.K (i, 0.0, 0.0);
-         }
-       Ka /= Ha;
+      // GWT located above drain
+      double Ha = 0;
+      double Ka = 0;
+      for (unsigned int i = i_GWT; i <= i_drain; i++)
+	{
+	  Ha += soil.dz (i);
+	  Ka += soil.dz (i) * soil.K (i, 0.0, 0.0);
+	}
+      Ka /= Ha;
 
-       // GWT located belove drain
-       double Hb = 0;
-       double Kb = 0;
-       for (unsigned int i = i_drain+1; i <= i_bottom; i++)
-         {
-            Hb += soil.dz (i);
-            Kb += soil.dz (i) * soil.K (i, 0.0, 0.0);
-         }
-       Kb /= Hb;
-       const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
+      // GWT located belove drain
+      double Hb = 0;
+      double Kb = 0;
+      for (unsigned int i = i_drain+1; i <= i_bottom; i++)
+	{
+	  Hb += soil.dz (i);
+	  Kb += soil.dz (i) * soil.K (i, 0.0, 0.0);
+	}
+      Kb /= Hb;
+      const double Flow = (4*Ka*Ha*Ha + 2*Kb*Hb*Ha) / (L*x - x*x);
 
-       // Distribution of drain flow among numeric soil layers
-       const double a = Flow / (Ka*Ha + Kb*Hb);
-       for (unsigned int i = 0; i < i_bottom; i++)
-         {
-            if (i >= i_GWT)
-               S[i] = a * soil.K (i, 0.0, 0.0);
-         }
-       Percolation[i_bottom+1] = Flow;
-       for (unsigned int i = i_bottom; i > i_GWT; i--)
-         {
-            Percolation[i] = Percolation[i+1] + S[i] * soil.dz (i);
-         }
-       return Flow;
+      // Distribution of drain flow among numeric soil layers
+      const double a = Flow / (Ka*Ha + Kb*Hb);
+      for (unsigned int i = 0; i < i_bottom; i++)
+	{
+	  if (i >= i_GWT)
+	    S[i] = a * soil.K (i, 0.0, 0.0);
+	}
+      assert (finite (Flow));
+      Percolation[i_bottom+1] = Flow;
+      for (unsigned int i = i_bottom; i > i_GWT; i--)
+	{
+	  Percolation[i] = Percolation[i+1] + S[i] * soil.dz (i);
+	}
+      return Flow;
     }
   else
     {
-       for (unsigned int i = i_bottom; i > i_GWT; i--)
-         Percolation[i] = Percolation[i+1] + S[i] * soil.dz (i);
-       return 0.0;
+      for (unsigned int i = i_bottom; i > i_GWT; i--)
+	Percolation[i] = Percolation[i+1] + S[i] * soil.dz (i);
+      return 0.0;
     }
 }
 
@@ -229,7 +231,7 @@ GroundwaterPipe::RaisingGWT (const Soil& soil,
          }
        else
          {
-           Percolation[i] -= (ThetaS-Theta[i]) * soil. dz (i) / dt;
+           Percolation[i] -= (ThetaS-Theta[i]) * soil.dz (i) / dt;
            Theta[i] = ThetaS;
            if (i>0)
              GWT_new = soil.zplus (i-1);
@@ -295,7 +297,7 @@ GroundwaterPipe::FallingGWT1 (const Soil& soil,
            // and flow to the drains ceases
            S[i] = 0.0;
            if (i<i_bottom)
-           Percolation[i+1] = Percolation[i];
+	     Percolation[i+1] = Percolation[i];
            GWT_new = z_drain;
          }
     }
@@ -372,7 +374,7 @@ By default, this is 1/2 L.");
       syntax.add ("pipe_position", "cm", Syntax::Const,
 		  "Height pipes are placed in the soil (a negative number).");
       alist.add ("pipe_position", -110.0);
-      syntax.add ("K_aquitard", " cm h^-1", Syntax::Const,
+      syntax.add ("K_aquitard", " cm/h", Syntax::Const,
 		  "Conductivity of the aquitard.");
       alist.add ("K_aquitard", 1.0E-5);
       syntax.add ("Z_aquitard", " cm", Syntax::Const,
