@@ -28,7 +28,10 @@
 void
 Vernalization::operator () (double Ta, double& DS)
 {
-  if (required && TaSum < 0)
+  if (!required)
+    return;
+
+  if (TaSum < 0)
     {
       TaSum -= min (Ta - TaLim, 0.0);
       if (DS > DSLim)
@@ -39,6 +42,9 @@ Vernalization::operator () (double Ta, double& DS)
 void
 Vernalization::output (Log& log) const
 {
+  if (!required)
+    return;
+
   log.output ("TaSum", TaSum);
 }
 

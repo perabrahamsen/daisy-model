@@ -1,3 +1,11 @@
+2002-02-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* vernalization.C (output): Don't output if not required (need for
+	checkpoints).
+
+	* hydraulic_Cosby.C (check_alist): Don't complain if 'Theta_sat'
+	is speciefied, it will be after a checkpoint.
+
 2002-02-06  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.07 released.

@@ -12,6 +12,10 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 2.08
+
+** Fix checkpoints.
+
 * 2.07 
 
 ** New "Cosby_et_al" hydraulic model.

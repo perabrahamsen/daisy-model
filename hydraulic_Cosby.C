@@ -150,11 +150,6 @@ static struct Hydraulic_CosbySyntax
 	err.entry ("Theta_res should be 0.0");
 	ok = false;
       }
-    if (al.number ("Theta_sat") != 0.9)
-      {
-	err.entry ("Theta_sat should be left unspecified");
-	ok = false;
-      }
     return ok;
   }
   Hydraulic_CosbySyntax ()
@@ -165,7 +160,7 @@ static struct Hydraulic_CosbySyntax
     alist.add ("description", "\
 Modified Campbell retention curve model with Burdine theory.\n\
 Parameters estimated from soil texture as specified by Cosby et at.\n\
-Don't specify Theta_sat or Theta_res.");
+Don't specify 'Theta_sat' or 'Theta_res'.");
     Hydraulic::load_syntax (syntax, alist);
     alist.add ("Theta_sat", 0.9);
     
