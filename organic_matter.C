@@ -75,7 +75,7 @@ struct OrganicMatter::Implementation
   } buffer;
   const PLF heat_factor;
   const PLF water_factor;
-  const ClayOM& clayom;
+  ClayOM& clayom;
   vector<double> tillage_age;
   const vector<const PLF*> smb_tillage_factor;
   const vector<const PLF*> som_tillage_factor;
