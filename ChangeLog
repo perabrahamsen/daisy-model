@@ -1,3 +1,8 @@
+2004-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* hydraulic_hypres.C (initialize): Give error message instead of
+	assertion failure for zero clay, silt, or humus.
+
 2004-11-09  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.63 released.

@@ -1,12 +1,22 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
-* X40
+* Fertorganic
 
-** Virus scan
+** PL: Venter på data.
 
-** cygwin setup, std emacs
+** DK: Toves opsætning for det andet forsøg.
 
-* Tove eksempelopsætning.
+** SK: Josef opsætning fra Februar.
+
+** IT: Bed om seneste opsætninger...
+
+** PT: Brev til joao not jose kommer tilbage
+
+** CZ: ?
+
+* ny vandstressmodel.
+
+stress = a + b * Ea/Ep (a og b forskellige for veg & rep fase)
 
 * (Soil (borders -35 -45))
 
@@ -30,7 +40,7 @@ udskrivning af tid i excell format.
 
 * Tillad [%] for Theta_sat
 
-* Agronomy for Daisy User  / Model overview
+* Agronomy for Daisy Users  / Model overview
 
 New chapter for reference manual?  
 
@@ -102,12 +112,6 @@ Start ved specifik dato.
 * Partit komponent
 
 Skal kunne være afhængig af kvælstof og temperatur.
-
-* biomod: G+P74 rootdens model hvor a er en parameter
-
-Og Lz (DensRtTip) er en fri variabel.
-
-plus lineær fra LZ til 0, hvor MaxRootDepth er 70% af total root depth.
 
 * Lav superklimafil
 

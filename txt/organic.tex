@@ -46,9 +46,9 @@ can still be traced back to its origin.  For a cultivated soil, this
 might include organic fertilizer, crop residuals, including
 rhizodeposition and dead leaves incorporated to the soil by
 earthworms.  This fraction is conventionally called \emph(added
-organic matter), or \sc(aom).  Then we have the soil microbial
-biomass, or \sc(smb), the living part of the organic matter, excluding
-roots.  Finally we have the humus, the soil organic matter (\sc{som}),
+organic matter), or \textsc(aom).  Then we have the soil microbial
+biomass, or \textsc(smb), the living part of the organic matter, excluding
+roots.  Finally we have the humus, the soil organic matter (\textsc{som}),
 which can no longer be traced back to its origin.  The dynamics of the
 system consist of input in the form of new added organic matter, and
 turnover in the form the soil biomass eating the other matter (and
@@ -57,11 +57,11 @@ itself) and dying.
 In numeric models, these fractions may be further divided into smaller
 pools, the content of each pool assumed by the model to have uniform
 properties, e.g.\ similar turnover rate and the same C/N ratio for
-models that are concern with nitrogen.  Having two \sc{som} and two
-\sc{smb} pools allows a well calibrated model to capture both the
+models that are concern with nitrogen.  Having two \textsc{som} and two
+\textsc{smb} pools allows a well calibrated model to capture both the
 short term (see XXX) and long term (XXX) dynamics of the system.  If
 you are only interested in accuracy on a single time scale, less pools
-may be needed.  The number \sc{aom} pools needed also depends on what
+may be needed.  The number \textsc{aom} pools needed also depends on what
 you are simulating.  For batch experiments and some long time
 scenarios, a single pool may be enough.  To simulate input sources
 from real farming, two pools per source are in general needed for each
@@ -78,7 +78,7 @@ in the soil, as well as biocliamte, crop development and management.
 
 The purpose of the \daisy{} model is to simulate real farming
 practice, both on the short and the long term.  Thus, we get a system
-with two pools for each of \sc{som} and \sc{smb}, and two pools for
+with two pools for each of \textsc{som} and \textsc{smb}, and two pools for
 each type fertilizer applied or crop residual left on the field.  The
 original model is depicted in figure~\ref{fig:om1}.
 
@@ -87,13 +87,13 @@ FIG{om1}: The original Daisy OM parameterization.
 PA: turnover rates, fractions, efficiency, maintenance, (abiotic factors).
 
 The \daisy{} software allows the user to adjust all of these
-parameters.  It also allows the user to specify the number of \sc{som}
-and \sc{smb} pools, as well as the number of \sc{aom} pools for each
+parameters.  It also allows the user to specify the number of \textsc{som}
+and \textsc{smb} pools, as well as the number of \textsc{aom} pools for each
 fertilizer application and each crop residual type.  It thus provides
 a good basis for experimentation.
 
 The first such experimental change that made it back into \daisy{} wasmade by Torsten Müller (see XXX 19??), who adjusted the turnover rates
-of the \sc{smb} pools so the biomass content of the soil better
+of the \textsc{smb} pools so the biomass content of the soil better
 matched the levels measured at the fields.  The change did not affect
 the long time dynamics of the systen.  The second such change was made
 by Anders Sanders (see XXX 19??).  The was a complete recalibration
@@ -160,17 +160,12 @@ condition, so an equilibrium is good for giving a reasonable initial
 state.
 
 As part of Sander's recalibration work, he also found that the ratio
-between the \sc{som1} and \sc{som2} for a system in equilibrium will
+between the \textsc{som1} and \textsc{som2} for a system in equilibrium will
 49\% vs 51\%.  Since \daisy{} after his recalibration required users
-to readjust the partitioning between \sc{som1} and \sc{som2}, there
+to readjust the partitioning between \textsc{som1} and \textsc{som2}, there
 was a strong tendency that users just picked the equilibrium values.
-Unfortunately, soil organic dynamics is not one of the cases where
-equilibrium is an good assumption.  The quality of the soil in general
-adjust slower than both the changes in farming practice, and the
-warmup periods used for such simulations.  Thus, in the common case
-the initial state wil \emph{not} be an equilibrium, and the result of
-the simulation \emph{will} be dominated by the choice of initial
-state.   
+
+\section{Long term simulations}
 
 As part of the standardization project mentioned earlier (see XXX),
 Henrik Svendsen used \daisy{} to simulate the effect on soil organic
@@ -178,8 +173,8 @@ matter of changing farming practice.  Figure~\ref{fig:clayom} shows a
 system that goes from equilibrium at a high level of carbon input, to
 equilibirum at a low level of carbon input.  Danish farming practice
 has been used, as well as Danish climate and soil.  The soil has a for
-Danish conditions high clay content (10 \percent{}).
-Figure~\ref{fig:clayration} shows the \sc{som1}/\sc{som2} ratio, which
+Danish conditions high clay content (10\%).
+Figure~\ref{fig:clayration} shows the \textsc{som1}/\textsc{som2} ratio, which
 is can be used for initializing \daisy{}.  Finally,
 figure~\ref{fig:sandratio} shows the ration for simulation on a coarse
 sandy soil going from a low to high input equilibrium.
@@ -187,10 +182,10 @@ sandy soil going from a low to high input equilibrium.
 FIG{fig:clayom}: Long term simulation of organic matter content from
 changing from high to low input on a clayish loam.
 
-FIG{fig:clayratio}: Long term simulation of \sc{som1}/\sc{som2} ratio
+FIG{fig:clayratio}: Long term simulation of \textsc{som1}/\textsc{som2} ratio
 from changing from high to low input on a clayish loam.
 
-FIG{fig:sandratio}: Long term simulation of \sc{som1}/\sc{som2} ratio
+FIG{fig:sandratio}: Long term simulation of \textsc{som1}/\textsc{som2} ratio
 from changing from low to high input on a coarse sandy soil
 
 As can be seen, the time to reach a new equilibirum after a change in

@@ -6,7 +6,7 @@
 (input file "pedo-soil.dai")
 
 ;; Use them.
-(weather default "weather.dwf")
+(weather default "taastrup.dwf")
 
 (time 1990 3 1 1)
 (stop 1994 4 1 1)

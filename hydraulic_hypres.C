@@ -148,10 +148,10 @@ HydraulicHypres::initialize (const Texture& texture,
   daisy_assert (silt_lim >= clay_lim);
   daisy_assert (silt_lim <= 1.0);
   const double mineral = texture.mineral ();
-  const double clay = mineral * clay_lim * 100 /* [%] */;
-  const double silt = mineral * (silt_lim - clay_lim) * 100 /* [%] */;
+  /* const */ double clay = mineral * clay_lim * 100 /* [%] */;
+  /* const */ double silt = mineral * (silt_lim - clay_lim) * 100 /* [%] */;
   const double sand = mineral * (1.0 - silt_lim) * 100 /* [%] */;
-  const double humus = texture.humus * 100 /* [%] */;
+  /* const */ double humus = texture.humus * 100 /* [%] */;
 
   if (soil_type == top)
     top_soil = true;
@@ -161,9 +161,21 @@ HydraulicHypres::initialize (const Texture& texture,
     daisy_assert (soil_type == unknown);
 
   // We should check for these earlier.
-  daisy_assert (clay > 0);
-  daisy_assert (humus > 0);
-  daisy_assert (silt > 0);
+  if (!(clay > 0))
+    {
+      msg.error ("clay must be present when using hypres, assuming 1%");
+      clay = 1.0;
+    }
+  if (!(silt > 0))
+    {
+      msg.error ("silt must be present when using hypres, assuming 1%");
+      silt = 1.0;
+    }
+  if (!(humus > 0))
+    {
+      msg.error ("humus must be present when using hypres, assuming 1%");
+      humus = 1.0;
+    }
 
   if (rho_b <= 0.0)
     {
@@ -172,7 +184,13 @@ You must specify dry_bulk_density in order to use the hypres \
 pedotransfer function");
       rho_b = 1.5;
     }
-  daisy_assert (approximate (clay + silt + sand + humus, 100.0));
+  if (!approximate (clay + silt + sand + humus, 100.0))
+    {
+      TmpStream tmp;
+      tmp () << "The sum of all fractions should be 100%, it is "
+             << clay + silt + sand + humus;
+      msg.error (tmp.str ());
+    }
   
 
   Theta_sat = 0.7919 + 0.001691 * clay - 0.29619 * rho_b 

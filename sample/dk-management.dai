@@ -14,7 +14,7 @@
 ;; fertilizer.dai) or organic fertilizer  (pig_slurry, the parameters 
 ;; of which are also defined in the library-file fertilizer.dai)
 ;; The two management practices are saved under names "SBarley w. MF" and
-;; "SBarley w. MF" respectively
+;; "SBarley w. OF" respectively
 ;; The management information is a list of activities:
 ;;    1) wait until a certain date (March 5)
 ;;    2) apply fertilizer (type and amount of fertilizer is defined)
