@@ -2024,6 +2024,8 @@ the sum of all chemicals."
            (number (path column "$col" Groundwater "*" height)
                    (tag "table")
                    (dimension "cm"))
+           (number (path column "$col" Groundwater "*" h_aquifer)
+                   (dimension "cm"))
            (number (path column "$col" Groundwater "*" DeepPercolation)
                    (handle sum)
                    (dimension "mm/&")

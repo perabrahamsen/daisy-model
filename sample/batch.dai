@@ -1,0 +1,40 @@
+;;; batch.dai --- This demonstrate how to do batch processing with Daisy.
+
+;; Get out sample management, irrigation, and soil.
+(input file "dk-management.dai")
+(input file "irrigation.dai")
+(input file "pedo-soil.dai")
+
+(defprogram "Andeby" Daisy
+  "Shared parameters for two scenarios."
+  ;; We want to test the same management on the same soil, but with
+  ;; hydraulic parameters estimated with two different methods.
+  (time 1990 3 1 1)
+  (stop 1994 4 1 1)
+  (weather default "taastrup.dwf")
+  (manager activity 
+    (while "SBarley w. MF" (repeat irrigate_30_tensiometer_overhead))
+    "WBarley w. OF"
+    (while "WRape w. MF"
+      (activity irrigate_30_content_overhead irrigate_30_content_overhead))
+    "SBarley & Pea")
+  (output harvest))
+
+(defprogram "Andeby Cosby" "Andeby"
+  "The Andeby soil with Cosby et.al. hydraulic parameters."
+  (column JB1_Cosby))
+
+(defprogram "Andeby HYPRES" "Andeby"
+  "The Andeby soil with HYPRES hydraulic parameters."
+  (column JB1_hypres))
+
+(defprogram "Cosby et.al. vs. HYPRES" batch
+  "Run the same scenario with Cosby et.al. and HYPRES."
+  (run (batch (run "Andeby Cosby")
+              (directory "Cosby"))
+       (batch (run "Andeby HYPRES")
+              (directory "HYPRES"))))
+
+(run "Cosby et.al. vs. HYPRES")
+
+;;; sample.dai ends here
