@@ -83,6 +83,57 @@ public:
 };
 
 // This cutie will create a vector of objects from a vector of alists.
+#if 1
+template <class T> 
+vector<T*>&
+map_create (const vector<AttributeList*>& f)
+{ 
+  vector<T*>& t = *new vector<T*> ();
+  for (vector<AttributeList*>::const_iterator i = f.begin ();
+       i != f.end ();
+       i++)
+    t.push_back (&Librarian<T>::create (**i));
+  return t;
+}
+
+template <class T> 
+vector<const T*>&
+map_create_const (const vector<AttributeList*>& f)
+{ 
+  vector<const T*>& t = *new vector<const T*> ();
+  for (vector<AttributeList*>::const_iterator i = f.begin ();
+       i != f.end ();
+       i++)
+    t.push_back (&Librarian<T>::create (**i));
+  return t;
+}
+
+template <class T> 
+vector<T*>& 
+map_construct (const vector<AttributeList*>& f)
+{ 
+  vector<T*>& t = *new vector<T*> ();
+  for (vector<AttributeList*>::const_iterator i = f.begin ();
+       i != f.end ();
+       i++)
+    t.push_back (new T (**i));
+  return t;
+}
+
+template <class T> 
+vector<const T*>&
+map_construct_const (const vector<AttributeList*>& f)
+{ 
+  vector<const T*>& t = *new vector<const T*> ();
+  for (vector<AttributeList*>::const_iterator i = f.begin ();
+       i != f.end ();
+       i++)
+    t.push_back (new T (**i));
+  return t;
+}
+
+#else
+
 template <class T> 
 struct map_create
 {
@@ -146,5 +197,6 @@ struct map_construct_const
   operator vector<const T*>& ()
   { return t; }
 };
+#endif
 
 #endif // LIBRARIAN_H
