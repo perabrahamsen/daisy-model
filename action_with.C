@@ -5,6 +5,7 @@
 #include "syntax.h"
 #include "alist.h"
 #include "field.h"
+#include "log.h"
 
 struct ActionWithColumn : public Action
 {
@@ -22,6 +23,11 @@ public:
 	  (*i)->doIt (daisy);
 	}
     }
+  void output (Log& log) const
+    { 
+      output_list (actions, "actions", log, Librarian<Action>::library ());
+    }
+
   bool check (const Daisy& daisy, Treelog& err) const
     { 
       Treelog::Open nest (err, string ("with") + column);

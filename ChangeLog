@@ -1,3 +1,16 @@
+2001-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.76 released.
+
+2001-05-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C (RootSystem::RootSystem): Let `PotRtDpt' default
+	to `Depth'.
+
+	* crop_std.C (initialize): More support for planting.
+
+	* action_with.C (output): New member function.
+
 2001-05-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.75 released.

@@ -12,9 +12,23 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the `ChangeLog' file from the source
 release.
 
+* 1.77
+
+You can now plant emerged crops.  Define the crop like below, and use
+the normal "sow" command.
+
+(defcrop "Maize for Planting" "Maize"
+ (Phenology (DS 0.269081))
+ (Prod (CH2OPool 12.6672)
+       (NCrop 1.41396)
+       (WLeaf 15.7116)
+       (WRoot 26.4654)
+       (WStem 10.9263))
+ (Root (Depth 51.9679)))
+
 * 1.76
 
-No user visible changes.
+Fix logging state for `with-column'.
 
 * 1.75
 

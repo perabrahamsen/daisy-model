@@ -597,7 +597,10 @@ CropStandard::initialize (const Geometry& geometry,
 	  organic_matter.add (*var.Prod.AM_leaf);
 	}
       
-      // Update nitrogen content.
+      // Update derived state content.
+      canopy.tick (var.Prod.WLeaf, var.Prod.WSOrg, 
+		   var.Prod.WStem, var.Phenology.DS);
+      root_system.set_density (geometry, var.Prod.WRoot);
       NitContent ();
     }
 }
@@ -1764,19 +1767,20 @@ CropStandard::harvest (const string& column_name,
       SOrg_N_Loss = 0.0;
     }
 
+#if 0
   const double WBal = WCrop - (Prod.WStem+Prod.WLeaf+Prod.WDead+Prod.WSOrg+Prod.WRoot)
                      - (Stem_W_Yield+Leaf_W_Yield+WEYRm+Dead_W_Yield)
                      - (Stem_W_Loss+Leaf_W_Loss+SOrg_W_Loss+Dead_W_Loss );
   const double NBal = NCrop - (Prod.NStem+Prod.NLeaf+Prod.NDead+Prod.NSOrg+Prod.NRoot)
                      - (Stem_N_Yield+Leaf_N_Yield+NEYRm+Dead_N_Yield)
                      - (Stem_N_Loss +Leaf_N_Loss +SOrg_N_Loss +Dead_N_Loss );
-
+  double New_Crop_Conc;
+#endif
   double New_Stem_Conc;
   double New_Leaf_Conc;
   double New_SOrg_Conc;
   double New_Dead_Conc;
   double New_Root_Conc;
-  double New_Crop_Conc;
   if (Prod.WStem > 0.0) New_Stem_Conc = Prod.NStem / Prod.WStem;
     else New_Stem_Conc = 0.0;
   if (Prod.WLeaf > 0.0) New_Leaf_Conc = Prod.NLeaf / Prod.WLeaf;

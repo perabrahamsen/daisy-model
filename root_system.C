@@ -502,7 +502,9 @@ RootSystem::RootSystem (const AttributeList& al)
     Rxylem (al.number ("Rxylem")),
     PotRtDpt (  al.check ("PotRtDpt")
 	      ? al.number ("PotRtDpt")
-	      : al.number ("DptEmr")),
+	      : (  al.check ("Depth") 
+		 ? al.number ("Depth")
+		 : al.number ("DptEmr"))),
     Depth (al.check ("Depth") ? al.number ("Depth") : al.number ("DptEmr")),
     Density (al.number_sequence ("Density")),
     H2OExtraction (al.number_sequence ("H2OExtraction")),
