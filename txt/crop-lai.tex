@@ -44,4 +44,34 @@ calibration parameter for this phase is \texttt{DSLAI05}.  The smaller
 you mae this number, the fast LAI will grow towards 0.5.
 
 The crop will leave this phase when the LAI
+
+I den initialiseringsfasen gælder
+
+  Exit LAI = SpLAI * WLeaf
+
+  Max LAI = SpLAIfac (DS) * SpLAI * WLeaf
+
+  Fun LAI = 1.0/(1.0+exp(-15.0*(DS-DSLAI05)))
+
+  Hvis DS < 0.07
+   
+    LAI = Fun LAI
+
+  Ellers 
+
+    LAI = min (Max LAI, Fun LAI)
+
+  CAI = LAI
+
+  Hvis LAI > Exit LAI så forlader vi initialiseringsfasen
+
+Når vi er ude af inititaliseringsfasen, så er
+
+  LAI = LeafAIMod (DS) * SpLAI * WLeaf
+  SOrgAI = SpSOrgAI * SOrgAIMod (DS) * WSOrg;
+  StemAI = SpStemAI * StemAIMod (DS) * WStem;
+
+  CAI = LeafAI + StemPhotEff * StemAI + SOrgPhotEff * SOrgAI;
+
+
 \end{document}
