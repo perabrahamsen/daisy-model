@@ -1,8 +1,8 @@
-Hvad, virker det her?
-
 * Ændr bioclimate så PM bliver et separat energi-modul.
 
-* Fix `alist sequence default element'.
+* Examine win32 CVS client
+
+* Plot retentionskurve fra gdaisy.
 
 ======================================================================
 * Log of flux at specific depth gives problems, since flux only

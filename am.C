@@ -647,7 +647,7 @@ static bool check_organic (const AttributeList& al)
 int AM_init::count;
 
 #ifdef BORLAND_TEMPLATES
-template class add_submodule<OM>;
+template class add_submodule_sequence<OM>;
 template class add_submodule<IM>;
 #endif
 
@@ -670,8 +670,7 @@ AM_init::AM_init ()
 	syntax_lock.add ("crop", Syntax::String, Syntax::Const);
 	syntax_lock.add ("name", Syntax::String, Syntax::Const);
 	syntax.add ("lock", syntax_lock, Syntax::Optional);
-	add_submodule<OM> ("om", syntax, alist,
-			   Syntax::Const, Syntax::Sequence);
+	add_submodule_sequence<OM> ("om", syntax, Syntax::Const);
 	AM_library->add ("state", alist, syntax);
       }
       // Organic fertilizer.
@@ -688,8 +687,7 @@ AM_init::AM_init ()
 		    Syntax::Number, Syntax::Const);
 	syntax.add ("total_N_fraction",
 		    Syntax::Number, Syntax::Const);
-	add_submodule<OM> ("om", syntax, alist,
-			  Syntax::Const, Syntax::Sequence);
+	add_submodule_sequence<OM> ("om", syntax, Syntax::Const);
 	add_submodule<IM> ("im", syntax, alist);
 	AM_library->add ("organic", alist, syntax);
       }
@@ -717,8 +715,7 @@ AM_init::AM_init ()
 	layer_syntax.order ("end", "weight");
 	syntax.add ("layers", layer_syntax, Syntax::Const, Syntax::Sequence);
 	alist.add ("layers", layer_alist);
-	add_submodule<OM> ("om", syntax, alist,
-			   Syntax::Const, Syntax::Sequence);
+	add_submodule_sequence<OM> ("om", syntax, Syntax::Const);
 	AM_library->add ("initial", alist, syntax);
       }
       // Root initialization,
@@ -732,8 +729,7 @@ AM_init::AM_init ()
 	syntax.add ("dist", Syntax::Number, Syntax::Const);
 	syntax.add ("weight", Syntax::Number, Syntax::Const); // Tons DM / ha
 	syntax.add ("total_C_fraction", Syntax::Number, Syntax::Const);
-	add_submodule<OM> ("om", syntax, alist,
-			   Syntax::Const, Syntax::Sequence);
+	add_submodule_sequence<OM> ("om", syntax, Syntax::Const);
 	AM_library->add ("root", alist, syntax);
       }
     }

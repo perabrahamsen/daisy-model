@@ -63,6 +63,8 @@
 // Define these for Borland C++ 5.0.1
 #define BORLAND_TEMPLATES
 #define BORLAND_EOF
+#define BORLAND_PRAGMA
+
 // #define BORLAND_PERMISSIONS
 
 // Needed in BCC for `close'.

@@ -146,7 +146,7 @@ Daisy::initialize (const Syntax& s)
 }
 
 #ifdef BORLAND_TEMPLATES
-template class add_submodule<Harvest>;
+template class add_submodule_sequence<Harvest>;
 #endif
 
 void
@@ -176,9 +176,8 @@ the simulation.");
 	      Syntax::State, Syntax::Singleton,
 	      "Weather model for probiding climate information during \
 the simulation.");
-  add_submodule<Harvest> ("harvest", syntax, alist,
-			  Syntax::LogOnly, Syntax::Sequence, 
-			  "Total list of all crop yields.");
+  add_submodule_sequence<Harvest> ("harvest", syntax, Syntax::LogOnly, 
+				   "Total list of all crop yields.");
 }
 
 Daisy::~Daisy ()

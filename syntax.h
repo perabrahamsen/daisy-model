@@ -56,7 +56,7 @@ public:
   static const char* category_name (category);
   static int category_number (const char* name);
 
-  // These functions will check that an alist conform to the syntax.
+  // This function will check that an alist conform to the syntax.
   bool check (const AttributeList&, const string& = "<unknown>") const;
 
   // These functions will allow you to lookup information about a
@@ -74,6 +74,7 @@ public:
   const vector<string>& order () const;
   int order (const string& name) const;	// Return index in order, or -1.
   bool total_order () const;	// True iff all members are ordered.
+  const AttributeList& default_alist (const string&) const;
   
   // Print whole syntax table.
   void dump (int indent = 0) const;
@@ -120,6 +121,9 @@ public:
   void add (const string&, const Syntax&, // Compatibility, remove.
 	    category = State, int size = Singleton, 
 	    const string& description = Unknown ());
+  void add (const string&, const Syntax&, const AttributeList&,	
+	    // Alist sequence with default element.
+	    category = State, const string& description = Unknown ());
 
   void add (const string& key, // Object
 	    ::Library& lib, 
@@ -169,18 +173,27 @@ struct add_submodule
 {
   add_submodule (const char* name, Syntax& syntax, AttributeList& alist,
 		 Syntax::category cat = Syntax::State, 
-		 int size = Syntax::Singleton, 
 		 const string& description = Syntax::Unknown ())
   {
     Syntax& s = *new Syntax ();
     AttributeList& a = *new AttributeList ();
     T::load_syntax (s, a);
-    syntax.add (name, s, cat, size, description);
-    // KLUDGE: This is *incorrect* for sequences.  The specified alist
-    // currently works as a _default_ for each member of a derived
-    // object.  However, both the parser and the pretty printer must
-    // know this kludge.
+    syntax.add (name, s, cat, Syntax::Singleton, description);
     alist.add (name, a);
+  }
+};
+
+template <class T> 
+struct add_submodule_sequence
+{
+  add_submodule_sequence (const char* name, Syntax& syntax, 
+			  Syntax::category cat = Syntax::State, 
+			  const string& description = Syntax::Unknown ())
+  {
+    Syntax& s = *new Syntax ();
+    AttributeList& a = *new AttributeList ();
+    T::load_syntax (s, a);
+    syntax.add (name, s, a, cat, description);
   }
 };
 

@@ -1,6 +1,17 @@
 #include "cdaisy.h"
 #include <stdio.h>
 
+union 
+{
+  int a;
+  
+  struct 
+  {
+    double b;
+    char c;
+  } d;
+} u;
+
 int main (int argc, char* argv[]) 
 {
 #if 0

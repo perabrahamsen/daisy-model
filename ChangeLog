@@ -1,4 +1,20 @@
+1998-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.34 released.
+
+1998-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.34 released.
+
+1998-11-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C: Merged SH's changed for continues calculation of N
+	in crop parts.
+
 1998-11-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* all: Put default values for members of the alist sequence in the
+	syntax. 
 
 	* Version 0.33 released.
 

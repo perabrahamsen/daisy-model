@@ -56,7 +56,9 @@ public:
   ~FilterArray () { }
 };
 
+#ifdef BORLAND_PRAGMA
 #pragma warn -rvl
+#endif
 bool 
 FilterArray::check (const string&, bool) const
 { 
@@ -68,8 +70,10 @@ FilterArray::lookup (const string&) const
 { 
   assert (false); 
 }
-#pragma warn +rvl
 
+#ifdef BORLAND_PRAGMA
+#pragma warn +rvl
+#endif
 bool
 FilterArray::accumulating () const
 {

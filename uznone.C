@@ -39,9 +39,7 @@ public:
     {
       // We need to call this to get stuff incorporated from surface.
       const bool ok = top.accept_top (0.0);
-#if 0
-      assert (ok);		// It will fail on exfiltration.
-#endif 
+      assert (ok);
 
       for (int i = first; i <= last; i++)
 	{

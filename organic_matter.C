@@ -847,7 +847,7 @@ OrganicMatter::~OrganicMatter ()
 
 #ifdef BORLAND_TEMPLATES
 template class add_submodule<OrganicMatter::Implementation::Buffer>;
-template class add_submodule<OM>;
+template class add_submodule_sequence<OM>;
 #endif
 
 void
@@ -866,8 +866,8 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("CO2", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("am", AM::library (), Syntax::State, Syntax::Sequence);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
-  add_submodule<OM> ("smb", syntax, alist, Syntax::State, Syntax::Sequence);
-  add_submodule<OM> ("som", syntax, alist, Syntax::State, Syntax::Sequence);
+  add_submodule_sequence<OM> ("smb", syntax, Syntax::State);
+  add_submodule_sequence<OM> ("som", syntax, Syntax::State);
   Syntax& layer_syntax = *new Syntax ();
   AttributeList& layer_alist = *new AttributeList ();
   layer_syntax.add ("end", Syntax::Number, Syntax::Const);

@@ -507,8 +507,7 @@ static struct LogTableSyntax
       entry_alist.add ("value", 0.0);
       entry_syntax.add ("count", Syntax::Integer, Syntax::State);
       entry_alist.add ("count", 0);
-      syntax.add ("entries", entry_syntax, Syntax::Const, Syntax::Sequence);
-      alist.add ("entries", entry_alist);
+      syntax.add ("entries", entry_syntax, entry_alist, Syntax::Const);
       
       syntax.add ("print_tags", Syntax::Boolean, Syntax::Const);
       alist.add ("print_tags", true);

@@ -536,28 +536,8 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 		while (!looking_at (')') && good ())
 		  {
 		    skip ("(");
-		    // Design bug: This is a bit weird.  I want to
-		    // provide a default value for each member of the
-		    // sequence.  This is done by specifying a single
-		    // alist in the superclass, and use that as a
-		    // default for each alist in the derived objects
-		    // alist_sequence.  This has two problems: 
-		    // 1) If an alist is specified in the superclass,
-		    // the derived object _must_ overwrite it.  2) If an
-		    // alist is not specified, the derived object
-		    // _must_not_ overwrite it.
-		    //
-		    // The correct way to solve the problem is to as the
-		    // alist whether the superclass specified a
-		    // singleton or a sequence.  But the alist API does
-		    // not currently allow that.
-		    AttributeList& al = ((atts.check (name) 
-					  && (atts.size (name)
-					      == Syntax::Singleton))
-					 ? *new AttributeList (atts.alist
-							       (name))
-					 : *new AttributeList ());
-
+		    AttributeList& al
+		      = *new AttributeList (syntax.default_alist (name));
 		    load_list (al, syn);
 		    sequence.push_back (&al);
 		    skip (")");

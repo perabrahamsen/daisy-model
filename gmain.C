@@ -384,7 +384,7 @@ AList_Item::daisy_label (const string& entry,
       {
 	const int elements = alist.size (entry);
 	if (type == Syntax::AList && elements == Syntax::Singleton)
-	  label << "unset, has template";
+	  label << "unset, has old style template";
 	else if (elements == 1)
 	  label << "one element";
 	else

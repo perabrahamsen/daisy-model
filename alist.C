@@ -145,9 +145,7 @@ Value::subset (const Value& v, const Syntax& syntax,
 	       const string& key) const
 {
   assert (type == v.type);
-  // Design bug: An alist can be used as default for an alist sequence.
-  if (type != Syntax::AList)
-    assert (is_sequence == v.is_sequence);
+  assert (is_sequence == v.is_sequence);
 
   if (!is_sequence)
     switch (type)
@@ -160,9 +158,6 @@ Value::subset (const Value& v, const Syntax& syntax,
 	return integer == v.integer;
       case Syntax::AList:
 	{
-	  // Design bug: An alist can be used as default for an alist sequence.
-	  if (v.is_sequence)
-	    return true;
 	  const AttributeList& value = *alist;
 	  const AttributeList& other = *v.alist;
 	  const Syntax::type type = syntax.lookup (key);
@@ -204,11 +199,6 @@ Value::subset (const Value& v, const Syntax& syntax,
 	return *integer_sequence == *v.integer_sequence;
       case Syntax::AList:
 	{
-	  // Design Bug: `add_submodule' adds an alist instead of an
-	  // alist_sequence. 
-	  if (!v.is_sequence)
-	    return false;
-
 	  const vector<AttributeList*>& value = *alist_sequence;
 	  const vector<AttributeList*>& other = *v.alist_sequence;
 
@@ -477,14 +467,6 @@ AttributeList::subset (const AttributeList& other, const Syntax& syntax,
 {
   if (check (key))
     {
-      // Design Bug: `add_submodule' adds an alist instead of an
-      // alist_sequence. 
-      if (syntax.lookup (key) == Syntax::AList
-	  && syntax.size (key) != Syntax::Singleton
-	  && size (key) != Syntax::Singleton)
-	// This has not been overwritten from the default value.
-	return true;
-
       if (other.check (key))
 	{
 	  if (!impl.values[key].subset (other.impl.values[key], syntax, key))

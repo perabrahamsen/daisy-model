@@ -21,6 +21,7 @@ struct Syntax::Implementation
   typedef map<string, int, less<string> > size_map;
   typedef map<string, ::Library*, less<string> > library_map;
   typedef map<string, string, less<string> > string_map;
+  typedef map<string, const AttributeList*, less<string> > alist_map;
 
   type_map types;
   status_map status;
@@ -29,6 +30,7 @@ struct Syntax::Implementation
   library_map libraries;
   string_map dimensions;
   string_map descriptions;
+  alist_map alists;
 
   bool check (const AttributeList& vl, const string& name);
   Syntax::type lookup (const string& key) const;
@@ -100,36 +102,22 @@ Syntax::Implementation::check (const AttributeList& vl, const string& name)
       else if (types[key] == AList)
 	if (size[key] != Singleton)
 	  {
-	    if (vl.size (key) == Syntax::Singleton)
-	      // Design bug:  An single alist where a sequence is
-	      // expected means the sequence is empty.  The alist is
-	      // intended to work as a "default" for the individual
-	      // members of the sequence.
-	      {
-		if (status[key] == Const || status[key] == State)
-		  {
-		    cerr << "AList sequence " << key << " missing\n";
-		    error = true;
-		  }
-	      }
-	    else 
-	      {
-		const vector<AttributeList*>& seq = vl.alist_sequence (key);
-		if (syntax[key]->impl.list_checker)
-		  if (!syntax[key]->impl.list_checker (seq))
-		    {
-		      error = true;
-		      cerr << "in " << key << "\n";
-		    }
+	    assert (vl.size (key) != Syntax::Singleton);
+	    const vector<AttributeList*>& seq = vl.alist_sequence (key);
+	    if (syntax[key]->impl.list_checker)
+	      if (!syntax[key]->impl.list_checker (seq))
+		{
+		  error = true;
+		  cerr << "in " << key << "\n";
+		}
 		
-		for (vector<AttributeList*>::const_iterator j = seq.begin ();
-		     j != seq.end ();
-		     j++)
-		  {
-		    const AttributeList& al = **j;
-		    if (!syntax[key]->check (al, key))
-		      error = true;
-		  }
+	    for (vector<AttributeList*>::const_iterator j = seq.begin ();
+		 j != seq.end ();
+		 j++)
+	      {
+		const AttributeList& al = **j;
+		if (!syntax[key]->check (al, key))
+		  error = true;
 	      }
 	  }
 	else if (!syntax[key]->check (vl.alist (key), key))
@@ -394,6 +382,17 @@ bool
 Syntax::total_order () const
 { return impl.order.size () == impl.types.size (); }
 
+const AttributeList& 
+Syntax::default_alist (const string& key) const
+{
+  Implementation::alist_map::const_iterator i = impl.alists.find (key);
+
+  if (i == impl.alists.end ())
+    return AttributeList::empty;
+  else
+    return *((*i).second);
+}
+
 void
 Syntax::add (const string& key, type t, category req, int s, const string& d)
 {
@@ -419,6 +418,14 @@ Syntax::add (const string& key, const Syntax& s, category req, int sz,
 {
   add (key, AList, req, sz, d);
   impl.syntax[key] = &s;
+}
+
+void
+Syntax::add (const string& key, const Syntax& s, const AttributeList& al,
+	     category req, const string& d)
+{
+  add (key, s, req, Sequence, d);
+  impl.alists[key] = &al;
 }
 
 void 

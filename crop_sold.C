@@ -629,7 +629,7 @@ static struct CropSoldSyntax
 } old_crop_syntax;
 
 #ifdef BORLAND_TEMPLATES
-template class add_submodule<OM>;
+template class add_submodule_sequence<OM>;
 #endif
 
 CropSoldSyntax::CropSoldSyntax ()
@@ -754,12 +754,9 @@ CropSoldSyntax::CropSoldSyntax ()
   Harvest.add ("beta", Syntax::Number, Syntax::Const);
   Harvest.add ("At", Syntax::Number, Syntax::Const);
   Harvest.add ("Bt", Syntax::Number, Syntax::Const);
-  add_submodule<OM> ("Leaf", Harvest, HarvestList,
-		     Syntax::Const, Syntax::Sequence);
-  add_submodule<OM> ("SOrg", Harvest, HarvestList,
-		     Syntax::Const, Syntax::Sequence);
-  add_submodule<OM> ("Root", Harvest, HarvestList,
-		     Syntax::Const, Syntax::Sequence);
+  add_submodule_sequence<OM> ("Leaf", Harvest, Syntax::Const);
+  add_submodule_sequence<OM> ("SOrg", Harvest, Syntax::Const);
+  add_submodule_sequence<OM> ("Root", Harvest, Syntax::Const);
   Harvest.add ("C_Leaf", Syntax::Number, Syntax::Const);
   Harvest.add ("C_SOrg", Syntax::Number, Syntax::Const);
   Harvest.add ("C_Root", Syntax::Number, Syntax::Const);

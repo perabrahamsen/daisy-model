@@ -40,7 +40,11 @@ SoilHeat::Implementation::tick (const Time& time,
 				const Soil& soil,
 				const SoilWater& soil_water,
 				const Surface& surface,
-				const Groundwater& groundwater,
+				const Groundwater& 
+#ifdef WATER_FLUX_HEAT
+				groundwater
+#endif
+				,
 				const Weather& weather)
 {
 #ifdef WATER_FLUX_HEAT

@@ -583,6 +583,14 @@ condition_daisy${OBJ}: condition_daisy.C condition.h librarian.h library.h \
  common.h alist.h syntax.h daisy.h frame.h
 chemical_std${OBJ}: chemical_std.C chemical.h librarian.h library.h \
  common.h alist.h syntax.h
+hydraulic_M_BaC_Bimodal${OBJ}: hydraulic_M_BaC_Bimodal.C hydraulic.h \
+ librarian.h library.h common.h alist.h syntax.h
+hydraulic_B_BaC_Bimodal${OBJ}: hydraulic_B_BaC_Bimodal.C hydraulic.h \
+ librarian.h library.h common.h alist.h syntax.h
+bioclimate_new${OBJ}: bioclimate_new.C bioclimate.h librarian.h library.h \
+ common.h alist.h syntax.h column.h surface.h uzmodel.h im.h weather.h \
+ crop.h csmp.h soil.h horizon.h hydraulic.h tortuosity.h geometry.h \
+ snow.h log.h filter.h mathlib.h
 daisy${OBJ}: daisy.C daisy.h frame.h time.h weather.h librarian.h \
  library.h common.h alist.h syntax.h im.h groundwater.h uzmodel.h \
  horizon.h log.h filter.h parser.h am.h nitrification.h bioclimate.h \
