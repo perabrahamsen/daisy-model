@@ -15,7 +15,7 @@
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
 
 const char *const AM::description = "\
-The `am' component describes various kinds of fertilizer and other\n\
+The 'am' component describes various kinds of fertilizer and other\n\
 added matter such as crop residues.  In particular, it describes how\n\
 they decompose.";
 
@@ -45,7 +45,7 @@ struct AM::Implementation
   double N_at (unsigned int at) const;
   void pour (vector<double>& cc, vector<double>& nn); // Move content to cc&nn.
   void append_to (vector<OM*>& added); // Add OM's to added.
-  void distribute (double C, vector<double>& om_C, // Helper for `add' fns.
+  void distribute (double C, vector<double>& om_C, // Helper for 'add' fns.
 		   double N, vector<double>& om_N);
   void add (double C, double N);// Add dead leafs.
   void add (const Geometry& geometry, AM::Implementation& other);
@@ -692,6 +692,11 @@ AM::get_NH4 (const AttributeList& al)
 {
   if (al.check ("weight"))
     {
+      const double volatilization 
+	= al.check ("NH4_evaporation") 
+	? al.number ("NH4_evaporation")
+	: al.number ("volatilization");
+
       if (al.name ("syntax") == "organic")
 	{
 	  // Organic fertilizer.
@@ -699,14 +704,10 @@ AM::get_NH4 (const AttributeList& al)
 	    * al.number ("dry_matter_fraction") 
 	    * 0.01;			// T w.w. / ha --> g / cm²
 	  const double N = weight * al.number ("total_N_fraction");
-	  return N * al.number ("NH4_fraction");
+	  return N * al.number ("NH4_fraction") * (1.0 - volatilization);
 	}
       // Mineral fertilizer.
       assert (al.name ("syntax") == "mineral");
-      const double volatilization 
-	= al.check ("NH4_evaporation") 
-	? al.number ("NH4_evaporation")
-	: al.number ("volatilization");
       
       return al.number ("weight")
 	* al.number ("NH4_fraction") * (1.0 - volatilization)
@@ -913,8 +914,8 @@ static bool check_organic (const AttributeList& al, Treelog& err)
   static bool warned = false;
   if (al.check ("NH4_evaporation") && !warned)
     {
-      err.entry ("OBSOLETE: Use `volatilization' instead "
-		 "of `NH4_evaporation'");
+      err.entry ("OBSOLETE: Use 'volatilization' instead "
+		 "of 'NH4_evaporation'");
       warned = true;
     }
   
@@ -1056,7 +1057,7 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 	alist.add ("NH4_fraction", 0.0);
 	syntax.add ("NH4_evaporation",
 		    Syntax::Fraction (), Syntax::OptionalConst, 
-		    "Obsolete alias for `volatilization'.");
+		    "Obsolete alias for 'volatilization'.");
 	syntax.add ("volatilization", Syntax::Fraction (), Syntax::Const, 
 		    "Fraction of NH4 that evaporates on application.");
 	alist.add ("volatilization", 0.0);
@@ -1078,7 +1079,7 @@ The remaining nitrogen is assumed to be nitrate or organic.");
 The remaining nitrogen is assumed to be nitrate.");
 	syntax.add ("NH4_evaporation",
 		    Syntax::Fraction (), Syntax::OptionalConst, 
-		    "Obsolete alias for `volatilization'.");
+		    "Obsolete alias for 'volatilization'.");
 	syntax.add ("volatilization", Syntax::Fraction (), Syntax::Const, 
 		    "Fraction of NH4 that evaporates on application.");
 	alist.add ("volatilization", 0.0);
