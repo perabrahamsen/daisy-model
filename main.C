@@ -39,7 +39,13 @@ main (int argc, char* argv[])
   ios::sync_with_stdio(false);
 
   time_t start_time = time (NULL);
+#if defined (__unix) || defined (__CYGWIN__)
   TreelogDual treelog ("daisy.log", cerr);
+#else // MSDOS
+  // stderr can't be redirected under MSDOS
+  TreelogDual treelog ("daisy.log", cout);
+#endif // MSDOS
+
   Assertion::Register reg (treelog);
 
   try

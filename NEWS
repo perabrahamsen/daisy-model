@@ -12,6 +12,12 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.21
+
+** Added "Evapotranspiration" summary to "Surface Water Balance" log.
+
+** Error messages can again be redirected under WinDOS.
+
 * 3.20
 
 ** Bug fixes.

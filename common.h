@@ -66,11 +66,6 @@
 
 #endif
 
-#if !defined (__unix) && !defined (__CYGWIN__)
-// When running a pure DOS, don't use stderr.
-#define USELESS_STDERR
-#endif
-
 // Shared code.
 
 GLOBAL_CONSTANT const double dt = 1.0;	// time step.
