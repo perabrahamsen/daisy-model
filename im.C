@@ -113,7 +113,6 @@ IM::~IM ()
 void 
 IM::define_syntax (Syntax& syntax, AttributeList& alist, const string& dim)
 {
-  alist.add ("submodel", "IM");
   alist.add ("description", "\
 Inorganic matter, or more precisely, mineral nitrogen.");
   syntax.add ("NH4", dim, Syntax::State, "Ammonium content.");
@@ -124,19 +123,31 @@ Inorganic matter, or more precisely, mineral nitrogen.");
 
 void 
 IM::load_ppm (Syntax& syntax, AttributeList& alist)
-{ define_syntax (syntax, alist, "mg N/l"); }
+{
+  alist.add ("submodel", "IM_ppm");
+  define_syntax (syntax, alist, "mg N/l"); 
+}
 
 void 
 IM::load_soil (Syntax& syntax, AttributeList& alist)
-{ define_syntax (syntax, alist, "g N/cm^2"); }
+{ 
+  alist.add ("submodel", "IM_soil");
+  define_syntax (syntax, alist, "g N/cm^2"); 
+}
 
 void 
 IM::load_soil_flux (Syntax& syntax, AttributeList& alist)
-{ define_syntax (syntax, alist, "g N/cm^2/h"); }
+{ 
+  alist.add ("submodel", "IM_soil_flux");
+  define_syntax (syntax, alist, "g N/cm^2/h"); 
+}
 
 void 
 IM::load_field_flux (Syntax& syntax, AttributeList& alist)
-{ define_syntax (syntax, alist, "kg N/ha/y"); }
+{ 
+  alist.add ("submodel", "IM_field_flux");
+  define_syntax (syntax, alist, "kg N/ha/y"); 
+}
 
 static Submodel::Register im_ppm_submodel ("IM_ppm", IM::load_ppm);
 static Submodel::Register im_field_flux_submodel ("IM_field_flux",

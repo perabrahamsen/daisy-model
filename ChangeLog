@@ -1,5 +1,11 @@
 2003-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 3.15 released.
+
+2003-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* im.C (define_syntax): Fix 
+
 	* Version 3.14 released.
 
 2003-11-20  Per Abrahamsen  <abraham@dina.kvl.dk>
