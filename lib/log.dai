@@ -412,6 +412,44 @@
 	    (factor 10.0))
 	   ))
 
+(deflog "Old Crop Production" table1
+  (where "old_crop_prod.tab")
+  (when (hour 0))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "*" Vegetation crops "*")
+	    (tag "Name"))		;Crop name.
+	   ((path column "*" Vegetation crops "*" Phenology DS)
+	    (dimension "none")
+	    (factor 1.0))		;Development stage [-1:2]
+	   ((path column "*" Vegetation crops "*" Phenology day_length)
+	    (dimension "h")
+	    (factor 1.0))		;Light hours previous day.
+	   ((path column "*" Vegetation crops "*" Canopy LAI)
+	    (dimension "none")
+	    (factor 1.0))		;Leaf Area Index [0:inf]
+	   ((path column "*" Vegetation crops "*" RootSys Depth)
+	    (dimension "cm")
+	    (factor 1.0))		;cm [-inf:0]
+	   ((path column "*" Vegetation crops "*" Prod WLeaf)
+	    (dimension "Ton DM/ha")	;Actually stem + leaf + grain
+	    (factor 0.01))
+	   ((path column "*" Vegetation crops "*" Prod WSOrg)
+	    (dimension "Ton DM/ha")	;Beet & Potatoes only
+	    (factor 0.01))
+	   ((path column "*" Vegetation crops "*" Prod WRoot)
+	    (dimension "Ton DM/ha")
+	    (factor 0.01))
+	   ((path column "*" Vegetation crops "*" CrpAux Fixated)
+	    (accumulate true)
+	    (dimension "kg N/ha")
+	    (factor 10.0))
+	   ((path column "*" Vegetation crops "*" Prod NCrop)
+	    (dimension "kg N/ha")
+	    (factor 10.0))
+	   ))
+
 (deflog "Vegetation" table1
   (where "vegetation.tab")
   (when (hour 0))
@@ -668,6 +706,16 @@
 	    (dimension "NA"))
 	   ((path column "*" Bioclimate "*" pt PMSW f_theta)
 	    (dimension "NA"))))
+
+(deflog "Groundwater" table1
+  (where "groundwater.tab")
+  (when (hour 12))
+  (entries ((path time year))
+	   ((path time month))
+	   ((path time mday))
+	   ((path column "*" Groundwater "*" height)
+	    (tag "table")
+	    (dimension "cm"))))
 
 (deflog "Harvest" file "harvest.log" (not (running))
   (some (harvest)))
