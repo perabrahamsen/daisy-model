@@ -1024,10 +1024,13 @@ Using initial C per N for remaining entries");
 		out_rate *= clay_turnover_factor[lay];
 		
 	      // content * out_rate = in  =>  content = in / out_rate;
+#if 0
               // introduction of smb correction factor
               double smb_factor = 2.0;
               smb[pool]->C.push_back (smb_factor * in / out_rate);
-	      
+#else
+              smb[pool]->C.push_back (in / out_rate);
+#endif	      
 	      stolen += in / out_rate;
 	    }
 	  if (smb[pool]->N.size () == lay)
