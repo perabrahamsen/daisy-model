@@ -13,6 +13,11 @@
 
 Librarian<AM>::Content* Librarian<AM>::content = NULL;
 
+const char *const AM::description = "\
+The `AM' component describes various kinds of fertilizer and other added \
+matter such as crop remains.  In particular, it describes how they \
+decompose.";
+
 struct AM::Implementation
 {
   // Content.
@@ -487,10 +492,12 @@ AM::initialize (const Geometry& geometry)
       // Get initialization parameters.
       const double weight = alist.number ("weight") 
 	* alist.number ("dry_matter_fraction") 
-	* 0.1;			// kg / m² --> g / cm²
+	* 0.01;			// T / ha --> g / cm²
+
       const double C = weight * alist.number ("total_C_fraction");
-      const double N = weight * IM::N_left (alist);
-      
+      const double N = weight * alist.number ("total_N_fraction")
+	* (1.0 - (alist.number ("NO3_fraction") 
+		  + alist.number ("NH4_fraction")));
       add (C, N);
     }
   else if (syntax == "mineral")
@@ -657,73 +664,119 @@ static struct AM_Syntax
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
+	alist.add ("description", "\
+Most AM models are only used for initializaing, they will be comnverted \
+to this generic model after creation, so this is what you will see in a \
+checkpoint.  This model contains a number (typically 2) of separate \
+pools, each of which have their own turnover rate.");
 
-	syntax.add ("creation", Syntax::Date, Syntax::State);
+	syntax.add ("creation", Syntax::Date, Syntax::State, 
+		    "Time this AM was created.");
 	alist.add ("syntax", "state");
 	syntax.add ("name", Syntax::String, Syntax::State);
 	add_submodule<AM::Implementation::Lock> ("lock", syntax, alist,
 						 Syntax::OptionalState, "\
 This AM belongs to a still living plant");
-	add_submodule_sequence<OM> ("om", syntax, Syntax::State);
+	add_submodule_sequence<OM> ("om", syntax, Syntax::State, 
+				    "The individual AOM pools.");
 	Librarian<AM>::add_type ("state", alist, syntax, &make);
       }
       // Organic fertilizer.
       {
 	Syntax& syntax = *new Syntax (check_organic);
 	AttributeList& alist = *new AttributeList ();
-	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("description", "\
+Organic fertilizer, typically slurry or manure from animals.");
+	syntax.add ("creation", Syntax::Date, Syntax::State, 
+		    "Time of application.");
 	alist.add ("creation", Time (1, 1, 1, 1));
 	alist.add ("syntax", "organic");
-	syntax.add ("weight", Syntax::Number, Syntax::Const);
-	syntax.add ("dry_matter_fraction",
-		    Syntax::Number, Syntax::Const);
-	syntax.add ("total_C_fraction",
-		    Syntax::Number, Syntax::Const);
-	syntax.add ("total_N_fraction",
-		    Syntax::Number, Syntax::Const);
-	add_submodule_sequence<OM> ("om", syntax, Syntax::State);
-	add_submodule<IM> ("im", syntax, alist);
+	syntax.add ("weight", "T w.w./ha", Syntax::Const,
+		    "Amount of fertilizer applied.");
+	syntax.add ("dry_matter_fraction", Syntax::None (), Syntax::Const,
+		    "Dry matter fraction of total weight.");
+	syntax.add ("total_C_fraction", Syntax::None (), Syntax::Const,
+		    "Carbon fraction of dry matter.");
+	syntax.add ("total_N_fraction", Syntax::None (), Syntax::Const,
+		    "Nitrogen fraction of dry matter");
+	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
+				    "The individual AOM pools.");
+	syntax.add ("NO3_fraction", Syntax::None (), Syntax::Const, 
+		    "Nitrate fraction of total N in fertilizer.  \
+The remaining nitrogen is assumed to be ammonium or organic.");
+	alist.add ("NO3_fraction", 0.0);
+	syntax.add ("NH4_fraction", Syntax::None (), Syntax::Const, 
+		    "Ammonium fraction of total N in fertilizer.  \
+The remaining nitrogen is assumed to be nitrate or organic.");
+	alist.add ("NH4_fraction", 0.0);
+	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::Const, 
+		    "Fraction of NH4 that evaporate on application.");
+	alist.add ("NH4_evaporation", 0.0);
 	Librarian<AM>::add_type ("organic", alist, syntax, &make);
       }
       // Mineral fertilizer.
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
-	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("description", "Mineral fertilizer.");
+	syntax.add ("creation", Syntax::Date, Syntax::State, 
+		    "Time of application.");
 	alist.add ("creation", Time (1, 1, 1, 1));
+	syntax.add ("weight", "kg N/ha", Syntax::Const,
+		    "Amount of fertilizer applied.");
+	syntax.add ("NH4_fraction", Syntax::None (), Syntax::Const, 
+		    "Ammonium fraction of total N in fertilized.  \
+The remaining nitrogen is assumed to be nitrate.");
+	syntax.add ("NH4_evaporation", Syntax::None (), Syntax::Const, 
+		    "Fraction of NH4 that evaporate on application.");
+	alist.add ("NH4_evaporation", 0.0);
 	alist.add ("syntax", "mineral");
-	IM::load_syntax (syntax, alist);
 	Librarian<AM>::add_type ("mineral", alist, syntax, &make);
       }
       // Initialization.
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
-	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("description", "\
+Initial added organic matter at the start of the simulation.");
+	syntax.add ("creation", Syntax::Date, Syntax::State,
+		    "Start of simulation.");
 	alist.add ("creation", Time (1, 1, 1, 1));
 	alist.add ("syntax", "initial");
 	Syntax& layer_syntax = *new Syntax ();
-	AttributeList& layer_alist = *new AttributeList ();
-	layer_syntax.add ("end", Syntax::Number, Syntax::Const);
-	layer_syntax.add ("weight", Syntax::Number, Syntax::Const); // Kg C/m²
+	layer_syntax.add ("end", "cm", Syntax::Const,
+			  "\
+Height where this layer ends (a negative number).");
+	layer_syntax.add ("weight", "kg C/m^2", Syntax::Const,
+			  "Carbin in this layer.");
 	layer_syntax.order ("end", "weight");
-	syntax.add ("layers", layer_syntax, Syntax::Const, Syntax::Sequence);
-	alist.add ("layers", layer_alist);
-	add_submodule_sequence<OM> ("om", syntax, Syntax::State);
+	syntax.add ("layers", layer_syntax, Syntax::Sequence, "\
+Carbon content in different soil layers.  The carbon is assumed to be \
+uniformly distributed in each layer.");
+	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
+				    "The individual AOM pools.");
 	Librarian<AM>::add_type ("initial", alist, syntax, &make);
       }
       // Root initialization,
       {
 	Syntax& syntax = *new Syntax ();
 	AttributeList& alist = *new AttributeList ();
-	syntax.add ("creation", Syntax::Date, Syntax::State);
+	alist.add ("description", "Initializaition of old root remains.");
+	syntax.add ("creation", Syntax::Date, Syntax::State,
+		    "Start of simulation.");
 	alist.add ("creation", Time (1, 1, 1, 1));
 	alist.add ("syntax", "root");
-	syntax.add ("depth", Syntax::Number, Syntax::Const);
-	syntax.add ("dist", Syntax::Number, Syntax::Const);
-	syntax.add ("weight", Syntax::Number, Syntax::Const); // Tons DM / ha
-	syntax.add ("total_C_fraction", Syntax::Number, Syntax::Const);
-	add_submodule_sequence<OM> ("om", syntax, Syntax::State);
+	syntax.add ("depth", "cm", Syntax::Const, "\
+How far down does the old root reach? (a negative number)");
+	syntax.add ("dist", "cm", Syntax::Const, "\
+Distance to go down in order to decrate the root density to half the \
+original.");
+	syntax.add ("weight", "T DM/ha", Syntax::Const, 
+		    "Total weight of old root dry matter.");
+	syntax.add ("total_C_fraction", Syntax::None (), Syntax::Const, 
+		    "Carbon fraction of total root dry matter");
+	add_submodule_sequence<OM> ("om", syntax, Syntax::State,
+				    "The individual AOM pools.");
 	Librarian<AM>::add_type ("root", alist, syntax, &make);
       }
     }

@@ -58,14 +58,13 @@ struct ActionProgn : public Action
 struct clause
 {
   const Condition* condition;
-  Action* action;
-  clause (const Condition *const c, Action *const a) 
+  vector<Action*> actions;
+  clause (const Condition* c, vector<Action*>& a) 
     : condition (c),
-      action (a)
+      actions (a)
     { }
   clause ()
-    : condition (NULL),
-      action (NULL)
+    : condition (NULL)
     { }
 };
 
@@ -81,10 +80,11 @@ vector<clause>& make_clauses (const vector<AttributeList*>& s)
        i != s.end ();
        i++)
     {
-      const AttributeList& condition = (*i)->alist ("condition");
-      const AttributeList& action = (*i)->alist ("action");
-      c.push_back (clause (&Librarian<Condition>::create (condition),
-			   &Librarian<Action>::create (action)));
+      const Condition& condition 
+	= Librarian<Condition>::create ((*i)->alist ("condition"));
+      vector<Action*> actions 
+	= map_create<Action> ((*i)->alist_sequence ("actions"));
+      c.push_back (clause (&condition, actions));
     }
   return c;
 }
@@ -101,7 +101,9 @@ struct ActionCond : public Action
 	{
 	  if ((*i).condition->match (daisy))
 	    {
-	      (*i).action->doIt (daisy);
+	      vector<Action*>& actions = (*i).actions;
+	      for (unsigned int j = 0; j < actions.size (); j++)
+		actions[j]->doIt (daisy);
 	      break;
 	    }
 	}
@@ -114,8 +116,10 @@ struct ActionCond : public Action
 	   i != clauses.end ();
 	   i++)
 	{
-	  if (!(*i).action->check (daisy))
-	    ok = false;
+	  const vector<Action*>& actions = (*i).actions;
+	  for (unsigned int j = 0; j < actions.size (); j++)
+	    if (!actions[j]->check (daisy))
+	      ok = false;
 	}
       return ok;
     }
@@ -133,7 +137,6 @@ struct ActionCond : public Action
 	{
 #ifdef CONST_DELETE
 	  delete (*i).condition;
-	  delete (*i).action;
 #endif
 	}
       delete &clauses;
@@ -200,14 +203,17 @@ ActionLispSyntax::ActionLispSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "This action does nothing.");
     Librarian<Action>::add_type ("nil", alist, syntax, &make_nil);
   }
   // "progn"
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("actions", Librarian<Action>::library (), Syntax::Const,
-		Syntax::Sequence);
+    alist.add ("description", "\
+Perform all the specified actions in the sequence listed.");
+    syntax.add ("actions", Librarian<Action>::library (), Syntax::Sequence,
+		"List of actions to perform.");
     syntax.order ("actions");
     Librarian<Action>::add_type ("progn", alist, syntax, &make_progn);
   }
@@ -215,12 +221,20 @@ ActionLispSyntax::ActionLispSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "\
+Perform the actions associated with the first true condition in the list.");
     Syntax& clauseSyntax = *new Syntax ();
     clauseSyntax.add ("condition",
-		      Librarian<Condition>::library (), Syntax::Const);
-    clauseSyntax.add ("action", Librarian<Action>::library (), Syntax::Const);
-    clauseSyntax.order ("condition", "action");
-    syntax.add ("clauses", clauseSyntax, Syntax::Const, Syntax::Sequence);
+		      Librarian<Condition>::library (), 
+		      "Condition for performing the actions.");
+    clauseSyntax.add ("actions", 
+		      Librarian<Action>::library (), Syntax::Sequence, 
+		      "Actions to perform when condition is meet.");
+    clauseSyntax.order ("condition", "actions");
+    syntax.add ("clauses", clauseSyntax, Syntax::Sequence,
+		"\
+Each clause consist of a condition and a sequence of actions.  \
+The first clause whose condition is true, will have its actions activated.");
     syntax.order ("clauses");
     Librarian<Action>::add_type ("cond", alist, syntax, &make_cond);
   }
@@ -228,9 +242,15 @@ ActionLispSyntax::ActionLispSyntax ()
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
-    syntax.add ("if", Librarian<Condition>::library (), Syntax::Const);
-    syntax.add ("then", Librarian<Action>::library (), Syntax::Const);
-    syntax.add ("else", Librarian<Action>::library (), Syntax::Const);
+    alist.add ("description", "\
+If the condition is true, perform the first action, otherwise perform the \
+second action.");
+    syntax.add ("if", Librarian<Condition>::library (), 
+		"Condition determining which action to perform.");
+    syntax.add ("then", Librarian<Action>::library (), 
+		"Action to perform if the condition is true.");
+    syntax.add ("else", Librarian<Action>::library (), 
+		"Action to perform if the condition is false.");
     syntax.order ("if", "then", "else");
     AttributeList& nilAlist = *new AttributeList ();
     nilAlist.add ("type", "nil");

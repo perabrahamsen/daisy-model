@@ -26,6 +26,7 @@ public:
   static int get_sequence ();
 
   const string& name () const;
+  const char* description () const;
   AttributeList& lookup (const string&) const;
   bool check (const string&) const;
   void add (const string&, AttributeList&, const Syntax&);
@@ -34,13 +35,12 @@ public:
   void remove (const string&);
   const Syntax& syntax (const string&) const;
 
-  void dump (int indent) const;
   void entries (vector<string>&) const;
   static void load_syntax (Syntax&, AttributeList&);
 private: 
   Library (const Library&);
 public:
-  Library (const char*, derive_fun derive);
+  Library (const char* name, derive_fun derive, const char* description);
   ~Library ();
 };
 

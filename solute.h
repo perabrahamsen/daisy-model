@@ -54,7 +54,7 @@ protected:
 public:
   void tick (const Soil&, const SoilWater&, double J_in);
   bool check (unsigned n) const;
-  void output (Log&, Filter&) const;
+  virtual void output (Log&, Filter&) const;
   void add (const Soil&, const SoilWater&,
 	    double amount, double from, double to);
   void mix (const Soil&, const SoilWater&, double from, double to);
@@ -69,7 +69,8 @@ protected:
   static void load_syntax (Syntax&, AttributeList&);
   Solute (const AttributeList& al);
 public:
-  void initialize (const AttributeList&, const Soil&, const SoilWater&);
+  virtual void initialize (const AttributeList&,
+			   const Soil&, const SoilWater&);
 public:
   virtual ~Solute ();
 };

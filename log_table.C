@@ -473,11 +473,11 @@ struct LogTable : public Log, public Filter
 	  if (to <= 0.0 && entries[i]->to > 0.0)
 	    entries[i]->to = to;
 	}
-      
+#if 0      
       if (description.size () > 0)
 	// Print description in start of file.
 	out << description << "\n";
-
+#endif
       if (print_tags)
 	{
 	  // Print the entry names in the first line of the log file..
@@ -552,7 +552,8 @@ static struct LogTableSyntax
       Syntax& syntax = *new Syntax ();
       AttributeList& alist = *new AttributeList ();
       syntax.add ("description", Syntax::String, Syntax::Const);
-      alist.add ("description", "");
+      alist.add ("description", "\
+Each selected variable is represented by a column in the log file.");
       syntax.add ("where", Syntax::String, Syntax::Const);
       syntax.add ("when", Librarian<Condition>::library (), Syntax::Const);
       
@@ -562,7 +563,8 @@ static struct LogTableSyntax
       entry_syntax.add ("dimension", Syntax::String, Syntax::Const);
       entry_alist.add ("dimension", "");
       entry_syntax.add ("description", Syntax::String, Syntax::Const);
-      entry_alist.add ("description", "");
+      entry_alist.add ("description", "\
+Each entry represents one column in the log file.");
       entry_syntax.add ("path", Syntax::String, Syntax::Const, 
 			Syntax::Sequence);
       entry_syntax.add ("missing_value", Syntax::String, Syntax::Const);

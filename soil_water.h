@@ -19,7 +19,7 @@ class Geometry;
 class SoilWater
 {
   // Content.
-  vector<double> S;
+  vector<double> S_;
   vector<double> Theta_old_;
   vector<double> h_old;
   vector<double> Theta_;
@@ -45,11 +45,13 @@ public:
   double Theta (int i) const
   { return Theta_[i]; }
   double Theta_left (int i) const
-  { return Theta_[i] - S[i]; }
+  { return Theta_[i] - S_[i]; }
   double Theta_old (int i) const
   { return Theta_old_[i]; }
   double q (int i) const
   { return q_[i]; }
+  double S (int i) const
+  { return S_[i]; }
 
   // Simulation.
 public:
@@ -65,7 +67,7 @@ public:
   // Communication with external model.
   void put_h (const Soil& soil, const vector<double>& v); // [cm]
   void get_sink (vector<double>& v) const // [cm^3/cm^3/h]
-    { v = S; }
+    { v = S_; }
 
   // Creation.
   static void load_syntax (Syntax&, AttributeList&);

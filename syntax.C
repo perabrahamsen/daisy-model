@@ -35,7 +35,6 @@ struct Syntax::Implementation
   bool check (const AttributeList& vl, const string& name);
   Syntax::type lookup (const string& key) const;
   int order_number (const string& name) const;
-  void dump (int indent) const;
   void entries (vector<string>& result) const;
   Implementation ()
   { }
@@ -171,73 +170,6 @@ Syntax::Implementation::order_number (const string& name) const
     if (order[j] == name)
       return j;
   return -1;
-}
-
-void 
-Syntax::Implementation::dump (int indent) const
-{
-  if (order.size ())
-    {
-      COUT << "[order";
-      for (vector<string>::const_iterator i = order.begin ();
-	   i != order.end ();
-	   i++)
-	COUT << " " << *i;
-      COUT << "]\n";
-      for (int j = 0; j < indent; j++)
-	COUT << " ";
-    }
-  for (type_map::const_iterator i = types.begin ();
-       i != types.end ();
-       i++)
-    {
-      if (i != types.begin ())
-	{
-	  COUT << "\n";
-	  for (int j = 0; j < indent; j++)
-	    COUT << " ";
-	}
-      const string name = (*i).first;
-      const type t = (*i).second;
-      COUT << "(" << name << " " << type_name (t) << " " 
-	   << category_name ((*status.find (name)).second) << " ";
-      switch ((*size.find (name)).second)
-	{
-	case Singleton:
-	  COUT << "Singleton";
-	  break;
-	case Sequence:
-	  COUT << "Sequence";
-	  break;
-	default:
-	  COUT << "[" << (*size.find (name)).second << "]";
-	}
-      switch (t)
-	{
-	case AList:
-	  {
-	    COUT << "\n";
-	    for (unsigned int j = 0; j < indent + name.length () + 2; j++)
-	      COUT << " ";
-	    (*syntax.find (name)).second->dump (indent + name.length () + 2);
-	    break;
-	  }
-	case Library: 
-	  {
-	    COUT << "\n";
-	    for (unsigned int j = 0; j < indent + name.length () + 2; j++)
-	      COUT << " ";
-	    (*libraries.find (name)).second->dump (indent + name.length () + 2);
-	    break;
-	  }
-	case Object:
-	  COUT << " " << (*libraries.find (name)).second->name ();
-	  break;
-	default:
-	  break;
-	}
-      COUT << ")";
-    }
 }
 
 void
@@ -532,12 +464,6 @@ Syntax::order (const string& one, const string& two, const string& three,
   impl.order.push_back (three);
   impl.order.push_back (four);
   impl.order.push_back (five);
-}
-
-void 
-Syntax::dump (int indent) const
-{
-  impl.dump (indent);
 }
 
 void

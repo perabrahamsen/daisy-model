@@ -63,6 +63,12 @@ SoilChemicals::Implementation::tick (const Soil& soil,
       all.insert (name);
     }
 
+  // Crop Uptake.
+  for (SoluteMap::const_iterator i = solutes.begin ();
+       i != solutes.end ();
+       i++)
+    (*i).second->uptake (soil, soil_water); 
+
   // Decompose.
   for (SoluteMap::const_iterator i = solutes.begin ();
        i != solutes.end ();

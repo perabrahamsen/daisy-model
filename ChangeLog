@@ -1,4 +1,48 @@
+1999-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.67 released.
+
+1999-02-01  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* solute.h (output): Made virtual.
+	* soil_chemical.h, soil_chemical.C (output): New function.
+	* solute.h (initialize): Made virtual.
+	* soil_chemical.h, soil_chemical.C (initialize): New function.
+	* soil_water.h, soil_water.C (S): New public member function.
+	(S_) Renamed from `S'.
+	* soil_chemical.h, soil_chemical.C (uptake): New function.
+	(uptaken) New member.
+	* soil_chemicals.C (tick): Call it.
+
+	* lib/log.dai ("Soil Chemicals"): New log model.
+	("Surface Chemicals"): Log amount, not "*".
+
+	* printer_file.C (print_entry): Use Syntax::default_alist instead
+	og old kludge with singleton alist.
+
+	* am.C, im.C, im.h: Add descriptions.
+	Changed syntax for `organic' and `mineral' fertilizer.
+	* lib/fertilizer.dai: Updated to new syntax.
+
+1999-01-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* librarian.h, library.C, library.h (descriptions): Add option to 
+	describe libraries. 
+
+	* action_lisp.C (ActionCond, clauses, ActionLispSyntax): Allow
+	list of actions in `cond'.
+
+	* syntax.C, syntax.h (dump): Removed.
+	* library.C, library.h (dump): Removed.
+	* common.C: Don't call them.
+	
 1999-01-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (CropStandardSyntax): `10.0' instead of `10'.
+
+	* document.C, document.h: New component.
+	* docuemnt_LaTeX.C, document_LaTeX.h: New model.
+	* common.C: Use it.
 
 	* Version 0.66 released.
 

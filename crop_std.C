@@ -839,7 +839,7 @@ CropStandardSyntax::CropStandardSyntax ()
   AttributeList& vRoot = *new AttributeList ();
 
   Root.add ("DptEmr", Syntax::Number, Syntax::Const);
-  vRoot.add ("DptEmr", 10);
+  vRoot.add ("DptEmr", 10.0);
   Root.add ("PenPar1", Syntax::Number, Syntax::Const);
   vRoot.add ("PenPar1", 0.25);
   Root.add ("PenPar2", Syntax::Number, Syntax::Const);

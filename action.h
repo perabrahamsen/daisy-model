@@ -19,12 +19,13 @@ public:
   // Create and Destroy.
 public: 
   virtual bool check (Daisy&) const;
+  static const char *const description;
 protected:
   Action (const string& name);
 public:
   virtual ~Action ();
 };
 
-static Librarian<Action> Action_init ("action");
+static Librarian<Action> Action_init ("action", Action::description);
 
 #endif ACTION_H

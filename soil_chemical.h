@@ -21,11 +21,14 @@ public:
   const Chemical& chemical;
 private:
   vector<double> decomposed;
-
+  vector<double> uptaken;
+  
   // Simulation.
 public:
+  void uptake (const Soil&, const SoilWater&);
   void decompose (const Soil&, const SoilWater&, const SoilHeat&, 
 		  const OrganicMatter&);
+  void output (Log&, Filter&) const;
   
 public:
   // Substance specific constants.
@@ -34,6 +37,7 @@ public:
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
+  void initialize (const AttributeList&, const Soil&, const SoilWater&);
   SoilChemical (const Chemical&, const AttributeList&);	// From parser.
   SoilChemical (const Chemical&); // From influx.
 private:

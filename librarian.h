@@ -25,8 +25,9 @@ private:
     Library lib;
     map_type constructors;
     int count;
-    Content (const char *const name, derive_fun derive)
-      : lib (name, derive),
+    Content (const char *const name, derive_fun derive, 
+	     const char *const description)
+      : lib (name, derive, description),
 	constructors (),
 	count (1)
     { }
@@ -63,12 +64,12 @@ public:
 
   // Create and Destroy.
 public:
-  Librarian (const char *const name)
+  Librarian (const char *const name, const char *const description = NULL)
   { 
     if (content)
       content->count++;
     else 
-      content = new Content (name, &derive_type);
+      content = new Content (name, &derive_type, description);
   }
   ~Librarian ()
   { 

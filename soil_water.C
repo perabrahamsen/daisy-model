@@ -14,23 +14,23 @@
 void
 SoilWater::clear (const Geometry&)
 {
-  fill (S.begin (), S.end (), 0.0);
+  fill (S_.begin (), S_.end (), 0.0);
 }
 
 void
 SoilWater::add_to_sink (const vector<double>& v)
 {
-  assert (S.size () == v.size ());
-  for (unsigned i = 0; i < S.size (); i++)
-    S[i] += v[i];
+  assert (S_.size () == v.size ());
+  for (unsigned i = 0; i < S_.size (); i++)
+    S_[i] += v[i];
 }
 
 void
 SoilWater::add_to_sink (const vector<double>& v, const Soil& soil)
 {
-  assert (S.size () == v.size ());
-  for (unsigned i = 0; i < S.size (); i++)
-    S[i] += v[i] / soil.z (i);
+  assert (S_.size () == v.size ());
+  for (unsigned i = 0; i < S_.size (); i++)
+    S_[i] += v[i] / soil.z (i);
 }
 
 
@@ -78,12 +78,12 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 	  top->tick (soil,
 		     first, surface,
 		     bottom_start - 1, *bottom,
-		     S, h_old, Theta_old_,
+		     S_, h_old, Theta_old_,
 		     h_, Theta_, q_);
 	  bottom->tick (soil,
 			bottom_start, *top,
 			last, groundwater,
-			S, h_old, Theta_old_,
+			S_, h_old, Theta_old_,
 			h_, Theta_, q_);
 	}
       else
@@ -92,7 +92,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
 	  top->tick (soil,
 		     first, surface,
 		     last, groundwater,
-		     S, h_old, Theta_old_,
+		     S_, h_old, Theta_old_,
 		     h_, Theta_, q_);
 	}
     }
@@ -103,7 +103,7 @@ SoilWater::tick (Surface& surface, Groundwater& groundwater,
       reserve->tick (soil,
                      first, surface,
                      last, groundwater,
-                     S, h_old, Theta_old_,
+                     S_, h_old, Theta_old_,
                      h_, Theta_, q_);
     }
 
@@ -180,7 +180,7 @@ SoilWater::check (unsigned n) const
 void 
 SoilWater::output (Log& log, Filter& filter) const
 {
-  log.output ("S", filter, S, true);
+  log.output ("S", filter, S_, true);
   log.output ("Theta", filter, Theta_);
   log.output ("h", filter, h_);
   log.output ("Xi", filter, Xi);
@@ -288,7 +288,7 @@ SoilWater::initialize (const AttributeList& al,
   else 
     Xi.insert (Xi.begin (), size, 0.0);
 
-  S.insert (S.begin (), size, 0.0);
+  S_.insert (S_.begin (), size, 0.0);
   q_.insert (q_.begin (), size + 1, 0.0);
 
   assert (h_.size () == Theta_.size ());

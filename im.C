@@ -65,50 +65,51 @@ IM::operator+ (const IM& im) const
   return result;
 }
 
-double 
-IM::N_left (const AttributeList& al)
-{
-  const double N = al.number ("total_N_fraction");
-  const AttributeList& im  = al.alist ("im");
-  return N * (1.0 - im.number ("NO3") - im.number ("NH4"));
-}
-
 static double IM_get_NO3 (const AttributeList& al)
 {
   if (al.check ("weight"))
     {
-      assert (al.name ("syntax") == "organic");
-
-      const double weight = al.number ("weight") 
-	* al.number ("dry_matter_fraction") 
-	* 0.1;			// kg / m² --> g / cm²
-      const double N = weight * al.number ("total_N_fraction");
-
-      IM im (al.alist ("im"));
-      
-      return N * im.NO3;
+      if (al.name ("syntax") == "organic")
+	{
+	  // Organic fertilizer.
+	  const double weight = al.number ("weight") 
+	    * al.number ("dry_matter_fraction") 
+	    * 0.01;			// T w.w. / ha --> g / cm²
+	  const double N = weight * al.number ("total_N_fraction");
+	  return N * al.number ("NO3_fraction");
+	}
+      // Mineral fertilizer.
+      assert (al.name ("syntax") == "mineral");
+      return al.number ("weight")
+	* (1.0 - al.number ("NH4_fraction"))
+	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
     }
-  else 
-    return al.number ("NO3");
+  // Other.
+  return al.number ("NO3");
 }
 
 static double IM_get_NH4 (const AttributeList& al)
 {
   if (al.check ("weight"))
     {
-      assert (al.name ("syntax") == "organic");
-
-      const double weight = al.number ("weight") 
-	* al.number ("dry_matter_fraction") 
-	* 0.1;			// kg / m² --> g / cm²
-      const double N = weight * al.number ("total_N_fraction");
-
-      IM im (al.alist ("im"));	// This extract NH4 evaporation.
-      
-      return N * im.NH4;
+      if (al.name ("syntax") == "organic")
+	{
+	  // Organic fertilizer.
+	  const double weight = al.number ("weight") 
+	    * al.number ("dry_matter_fraction") 
+	    * 0.01;			// T w.w. / ha --> g / cm²
+	  const double N = weight * al.number ("total_N_fraction");
+	  return N * al.number ("NH4_fraction");
+	}
+      // Mineral fertilizer.
+      assert (al.name ("syntax") == "mineral");
+      return al.number ("weight")
+	* al.number ("NH4_fraction") * (1.0 - al.number ("NH4_evaporation"))
+	* (1000.0 / ((100.0 * 100.0) * (100.0 * 100.0))); // kg/ha -> g/cm^2
     }
-  else 
-    return al.number ("NH4") * (1.0 - al.number ("NH4_evaporation"));
+  // Other.
+  assert (!al.check ("NH4_evaporation"));
+  return al.number ("NH4");
 }
 
 IM::IM ()
@@ -137,10 +138,10 @@ IM::~IM ()
 void 
 IM::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  syntax.add ("NH4", Syntax::Number, Syntax::State);
+  syntax.add ("NH4", Syntax::Unknown (), Syntax::State,
+	      "Ammonium content.");
   alist.add ("NH4", 0.0);
-  syntax.add ("NO3", Syntax::Number, Syntax::State);
+  syntax.add ("NO3", Syntax::Unknown (), Syntax::State,
+	      "Nitrate content.");
   alist.add ("NO3", 0.0);
-  syntax.add ("NH4_evaporation", Syntax::Number, Syntax::Const);
-  alist.add ("NH4_evaporation", 0.0);
 }

@@ -15,6 +15,7 @@ struct Library::Implementation
 
   const string name;
   derive_fun derive;
+  const char *const description;
   typedef map<string, AttributeList*, less<string> > alist_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   alist_map alists;
@@ -25,12 +26,12 @@ struct Library::Implementation
   void add (const string&, AttributeList&, const Syntax&);
   void remove (const string&);
   const Syntax& syntax (const string&) const;
-  void dump (int indent) const;
   void entries (vector<string>&) const;
   static void load_syntax (Syntax&, AttributeList&);
-  Implementation (const char* n, derive_fun d) 
+  Implementation (const char* n, derive_fun d, const char* des) 
     : name (n),
-      derive (d)
+      derive (d),
+      description (des)
     { }
   ~Implementation ()
     { all->erase (all->find (name)); }
@@ -97,27 +98,6 @@ Library::Implementation::syntax (const string& key) const
 }
 
 void
-Library::Implementation::dump (int indent) const
-{
-  for (syntax_map::const_iterator i = syntaxen.begin ();
-       i != syntaxen.end ();
-       i++)
-    {
-      if (i != syntaxen.begin ())
-	{
-	  COUT << "\n";
-	  for (int j = 0; j < indent; j++)
-	    COUT << " ";
-	}
-      const string& name = (*i).first;
-      const Syntax* syntax = (*i).second;
-      COUT << "(" << name << " ";
-      syntax->dump (indent + name.length () + 2);
-      COUT << ")";
-    }
-}
-
-void
 Library::Implementation::entries (vector<string>& result) const
 {
   for (syntax_map::const_iterator i = syntaxen.begin ();
@@ -162,8 +142,12 @@ Library::get_sequence ()
 }
 
 const string&
-Library:: name () const
+Library::name () const
 { return impl.name; }
+
+const char*
+Library::description () const
+{ return impl.description; }
 
 AttributeList&
 Library::lookup (const string& key) const
@@ -191,10 +175,6 @@ Library::syntax (const string& key) const
 { return impl.syntax (key); }
 
 void
-Library::dump (int indent) const
-{ impl.dump (indent); }
-
-void
 Library::entries (vector<string>& result) const
 { impl.entries (result); }
 
@@ -202,8 +182,9 @@ void
 Library::load_syntax (Syntax& syntax, AttributeList& alist)
 { Implementation::load_syntax (syntax, alist); }
 
-Library::Library (const char *const name, derive_fun derive) 
-  : impl (*new Implementation (name, derive))
+Library::Library (const char* name, derive_fun derive, 
+		  const char* description) 
+  : impl (*new Implementation (name, derive, description))
 { 
   if (Implementation::all == NULL)
     // Buglet: we never delete this.

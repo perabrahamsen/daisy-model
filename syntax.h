@@ -82,9 +82,6 @@ public:
   int order (const string& name) const;	// Return index in order, or -1.
   bool total_order () const;	// True iff all members are ordered.
   const AttributeList& default_alist (const string&) const;
-  
-  // Print whole syntax table.
-  void dump (int indent = 0) const;
 
   // Get a list of all entries.
   void entries (vector<string>&) const;

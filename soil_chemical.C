@@ -6,6 +6,21 @@
 #include "soil_heat.h"
 #include "soil_water.h"
 #include "organic_matter.h"
+#include "log.h"
+
+void 
+SoilChemical::uptake (const Soil& soil, 
+		      const SoilWater& soil_water)
+{
+  assert (uptaken.size () == soil.size ());
+
+  const double rate = 1.0 - chemical.crop_uptake_reflection_factor ();
+  
+  for (unsigned int i = 0; i < soil.size (); i++)
+      uptaken[i] = C (i) * soil_water.S (i) * rate;
+  
+  add_to_sink (uptaken);
+}
 
 void 
 SoilChemical::decompose (const Soil& soil, 
@@ -13,7 +28,7 @@ SoilChemical::decompose (const Soil& soil,
 			 const SoilHeat& soil_heat,
 			 const OrganicMatter& organic_matter)
 {
-  decomposed.erase (decomposed.begin (), decomposed.end ());
+  assert (decomposed.size () == soil.size ());
 
   const double decompose_rate = chemical.decompose_rate ();
   
@@ -27,10 +42,17 @@ SoilChemical::decompose (const Soil& soil,
 	= chemical.decompose_CO2_factor (organic_matter.CO2 (i));
       const double rate
 	= decompose_rate * heat_factor * water_factor * CO2_factor;
-      const double M = M_left (i) * rate;
-      decomposed.push_back (M);
+      decomposed[i] = M_left (i) * rate;
     }
   add_to_sink (decomposed);
+}
+
+void
+SoilChemical::output (Log& log, Filter& filter) const
+{
+  Solute::output (log, filter);
+  log.output ("uptaken", filter, uptaken);
+  log.output ("decomposed", filter, decomposed);
 }
 
 double 
@@ -41,10 +63,23 @@ void
 SoilChemical::load_syntax (Syntax& syntax, AttributeList& alist)
 {
   Solute::load_syntax (syntax, alist); 
+  syntax.add ("uptaken", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Amount uptaken by crops in this time step.");
+  syntax.add ("decomposed", "g/cm^3/h", Syntax::LogOnly, Syntax::Sequence,
+	      "Amount decomposed in this time step.");
   // Use "none" adsorption by default.
   AttributeList& none = *new AttributeList ();
   none.add ("type", "none");
   alist.add ("adsorption", none);
+}
+
+void
+SoilChemical::initialize (const AttributeList& al, 
+		    const Soil& soil, const SoilWater& soil_water)
+{
+  Solute::initialize (al, soil, soil_water);
+  uptaken.insert (uptaken.begin (), soil.size (), 0.0);
+  decomposed.insert (decomposed.begin (), soil.size (), 0.0);
 }
 
 SoilChemical::SoilChemical (const Chemical& chem, const AttributeList& al)

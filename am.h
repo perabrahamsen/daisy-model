@@ -18,6 +18,7 @@ class AM
 public:
   const AttributeList alist;	// Remember attributes for checkpoint.
   const string name;
+  static const char *const description;
   void append_to (vector<OM*>& added);
   
   // Simulation.
@@ -55,6 +56,6 @@ public:
   virtual ~AM ();
 };
 
-static Librarian<AM> AM_init ("am");
+static Librarian<AM> AM_init ("am", AM::description);
 
 #endif AM_H

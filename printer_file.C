@@ -232,12 +232,16 @@ PrinterFile::Implementation::print_entry (const AttributeList& alist,
 	  break;
 	case Syntax::AList:
 	  {
+#if 0
 	    // Kludge: An _alist_ value in the superclass where an
 	    // _alist_sequence_ is expected works as a default for each of
 	    // the sequence members in the derived object.
 	    const AttributeList& other =
 	      (super.check (key) && super.size (key) == Syntax::Singleton)
 	      ? super.alist (key) : AttributeList::empty;
+#else
+	    const AttributeList& other = syntax.default_alist (key);
+#endif
 	    const Syntax& nested = syntax.syntax (key);
 	    const vector<AttributeList*>& value = alist.alist_sequence (key);
 	    
@@ -410,7 +414,7 @@ PrinterFile::Implementation::print_alist (const AttributeList& alist,
 	{
 	  // Design bug: We usually need to put parentheses around
 	  // ordered complex values.  However, the parser doesn't
-	  // expect these for alist sequences, so we don'tprint them
+	  // expect these for alist sequences, so we don't print them
 	  // either. 
 	  if (syntax.lookup (key) == Syntax::AList
 	      && syntax.size (key) != Syntax::Singleton)

@@ -149,7 +149,8 @@ endif
 # Select the C files that doesn't have a corresponding header file.
 # These are all components of some library.
 #
-COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
+COMPONENTS = document_LaTeX.C \
+	filter_array.C filter_all.C filter_none.C filter_some.C \
 	column_std.C  weather_simple.C uzrichard.C \
 	hydraulic_yolo.C hydraulic_M_vG.C hydraulic_B_vG.C hydraulic_M_C.C \
 	hydraulic_B_C.C hydraulic_M_BaC.C hydraulic_B_BaC.C \
@@ -172,7 +173,7 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 
 # Select the C files with a corresponding header file from the library.
 #
-INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
+INTERFACES = document.C daisy.C parser.C log.C weather.C column.C crop.C \
 	alist.C syntax.C library.C action.C condition.C horizon.C \
 	filter.C csmp.C time.C uzmodel.C parser_file.C hydraulic.C \
 	soil.C mathlib.C bioclimate.C surface.C soil_water.C \
@@ -414,6 +415,8 @@ pmain${OBJ}: pmain.C
 
 ############################################################
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
+document${OBJ}: document.C document.h librarian.h library.h common.h \
+ alist.h syntax.h
 daisy${OBJ}: daisy.C daisy.h time.h weather.h librarian.h library.h \
  common.h alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h \
  log.h filter.h parser.h am.h nitrification.h bioclimate.h hydraulic.h \
@@ -520,7 +523,7 @@ printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
 chemical${OBJ}: chemical.C chemical.h librarian.h library.h common.h \
  alist.h syntax.h
 common${OBJ}: common.C common.h parser_file.h parser.h librarian.h \
- library.h alist.h syntax.h version.h
+ library.h alist.h syntax.h document.h version.h
 pet${OBJ}: pet.C pet.h librarian.h library.h common.h alist.h syntax.h \
  log.h filter.h vegetation.h surface.h uzmodel.h
 net_radiation${OBJ}: net_radiation.C net_radiation.h librarian.h library.h \
@@ -548,6 +551,8 @@ soil_chemicals${OBJ}: soil_chemicals.C soil_chemicals.h soil.h horizon.h \
  tortuosity.h geometry.h soil_water.h soil_heat.h organic_matter.h \
  chemical.h chemicals.h log.h filter.h soil_chemical.h solute.h \
  adsorption.h transport.h
+document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h library.h \
+ common.h alist.h syntax.h
 filter_array${OBJ}: filter_array.C filter.h librarian.h library.h common.h \
  alist.h syntax.h geometry.h
 filter_all${OBJ}: filter_all.C filter.h librarian.h library.h common.h \

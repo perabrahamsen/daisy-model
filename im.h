@@ -25,10 +25,6 @@ public:
   void operator/= (double);
   bool empty () const;
 
-  // Utilities.
-public:
-  static double N_left (const AttributeList&);
-
   // Create. 
 public:
   IM operator* (double flux) const;

@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "parser_file.h"
+#include "document.h"
 #include "syntax.h"
 #include "alist.h"
 #include "version.h"
@@ -104,7 +105,7 @@ get_arg (int& argc, char**& argv)
 void
 Options::usage () const
 {
-  CERR << "Usage: " << program_name << " [-p] [-v] [-d dir] file...\n";
+  CERR << "Usage: " << program_name << " [-p type] [-v] [-d dir] file...\n";
 }
 
 Options::Options (int& argc, char**& argv,
@@ -143,15 +144,41 @@ Options::Options (int& argc, char**& argv,
 		{
 		  const string dir = get_arg (argc, argv);
 		  if (chdir (dir.c_str ()) != 0)
-		    CERR << program_name << ":chdir (" << dir << ") failed";
+		    CERR << program_name << ":chdir (" << dir << ") failed\n";
 		}
 	      else
 		// Usage.
 		argc = -1;
               break;
 	    case 'p':
-	      // Dump syntax.
-	      syntax.dump ();
+	      if (argc > 1)
+		{
+		  const Library& library 
+		    = Librarian<Document>::library ();
+		  const string name = get_arg (argc, argv);
+		  if (library.check (name))
+		    {
+		      const Syntax& syntax = library.syntax (name);
+		      AttributeList alist;
+		      alist.add ("type", name);
+		      if (syntax.check (alist, name))
+			{
+			  Document& document = 
+			    Librarian<Document>::create (alist);
+			  document.print_document (COUT);
+			  delete &document;
+			}
+		    }
+		  else
+		    {
+		      CERR << program_name << ": `" << name 
+			   << "' unknown document type\n";
+		      argc = -1;
+		    }
+		}
+	      else
+		argc = -1;
+
 	      break;
 	    case 'v':
 	      // Print version.
