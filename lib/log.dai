@@ -1751,6 +1751,23 @@ the sum of all chemicals."
                         Root Density)
                   (dimension "cm/cm^3"))))
 
+(deflog "Root form parameter" table
+  (where "rootform.dlf")
+  (when daily)
+  (entries ;; Year Month MDay
+           (number (path column "$col" Vegetation crops crops "$crop" 
+                         Phenology DS)
+                   (spec phenology default DS))
+           (number (path column "$col" Vegetation crops crops "$crop" 
+                         Root Depth)
+                   (spec crop default Root Depth))
+           (number (path column "$col" Vegetation crops crops "$crop" 
+                         Root rootdens "*" a)
+                   (spec rootdens "Gerwitz+Page74" a))
+           (number (path column "$col" Vegetation crops crops "$crop" 
+                         Root rootdens "*" L0)
+                   (spec rootdens "Gerwitz+Page74" L0))))
+
 (deflog "Bioclimate" table
   (where "bioclimate.dlf")
   (when hourly)
