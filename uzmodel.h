@@ -21,6 +21,7 @@ public:
   virtual void flux_top_on () const = 0;
   virtual void flux_top_off () const = 0;
   virtual bool accept_top (double) = 0;
+  virtual bool soil_top () const;
   virtual ~UZtop ();
 };
 

@@ -122,7 +122,7 @@ struct ActionCrop : public Action
   const bool fertilize_incorporate;
   void fertilize (Daisy& daisy, const AttributeList& am) const;
 
-  struct Tillage		// Tillage oprerations.
+  struct Tillage		// Tillage operations.
   {
     // Content.
     const int month;
@@ -140,6 +140,26 @@ struct ActionCrop : public Action
   };
   const vector<const Tillage*> tillage;
   int tillage_index;
+
+  struct Spray		// Spray operations.
+  {
+    // Content.
+    const int month;
+    const int day;
+    const string name;
+    const double amount;
+    
+    // Simulation.
+    void output (Log&) const;
+
+    // Create and Destroy.
+    static bool check_alist (const AttributeList& al);
+    static void load_syntax (Syntax&, AttributeList&);
+    Spray (const AttributeList&);
+    ~Spray ();
+  };
+  const vector<const Spray*> spray;
+  int spray_index;
 
   struct Irrigation		// Irrigation.
   {
@@ -180,6 +200,7 @@ template class add_submodule<ActionCrop::Annual>;
 template class add_submodule<ActionCrop::Perennial>;
 template class add_submodule_sequence<ActionCrop::Fertilize>;
 template class add_submodule_sequence<ActionCrop::Tillage>;
+template class add_submodule_sequence<ActionCrop::Spray>;
 template class add_submodule<ActionCrop::Irrigation>;
 #endif
 
@@ -614,6 +635,59 @@ ActionCrop::Tillage::Tillage (const AttributeList& al)
 ActionCrop::Tillage::~Tillage ()
 { delete &operation; }
 
+void 
+ActionCrop::Spray::output (Log&) const
+{ }
+
+bool 
+ActionCrop::Spray::check_alist (const AttributeList& al)
+{
+  bool ok = true;
+  const int mm = al.integer ("month");
+  const int dd = al.integer ("day");
+
+  if (mm < 1 || mm > 12)
+    {
+      CERR << "month should be between 1 and 12\n";
+      ok = false;
+    }
+  // don't test for bad month.
+  else if (dd < 1 || dd > Time::month_length (1 /* not a leap year */, mm))
+    {
+      CERR << "day should be between 1 and " 
+	   << Time::month_length (1, mm) << "\n";
+      ok = false;
+    }
+  non_negative (al.number ("amount"), "amount", ok);
+
+  return ok;
+}
+
+void 
+ActionCrop::Spray::load_syntax (Syntax& syntax, AttributeList&)
+{ 
+  syntax.add_check (check_alist);
+  syntax.add ("month", Syntax::Integer, Syntax::Const, 
+	      "Month in the year.");
+  syntax.add ("day", Syntax::Integer, Syntax::Const, 
+	      "Day in the month.");
+  syntax.add ("name", Syntax::String, Syntax::Const,
+	      "Name of chemichal to spray.");
+  syntax.add ("amount", "g/ha", Syntax::Const,
+	      "Amount of chemichal to spray.");
+  syntax.order ("month", "day", "name", "amount");
+}
+
+ActionCrop::Spray::Spray (const AttributeList& al)
+  : month (al.integer ("month")),
+    day (al.integer ("day")),
+    name (al.name ("name")),
+    amount (al.number ("amount"))
+{ }
+
+ActionCrop::Spray::~Spray ()
+{ }
+
 bool
 ActionCrop::Irrigation::doIt (Daisy& daisy) const
 {
@@ -785,6 +859,20 @@ ActionCrop::doIt (Daisy& daisy)
       tillage_index++;
     }
 
+  // Spray.
+  if (spray_index < spray.size ()
+      && daisy.time.hour () == 8
+      && daisy.time.month () == spray[spray_index]->month
+      && daisy.time.mday () == spray[spray_index]->day)
+    {
+      const string& chemical = spray[spray_index]->name;
+      const double amount = spray[spray_index]->amount;
+      COUT << " [Spraying " << chemical << "]\n";
+      daisy.field.spray (chemical, amount); 
+
+      spray_index++;
+    }
+
   // Irrigation.
   if (irrigation_year < 0)
     irrigation_year = daisy.time.year ();
@@ -820,6 +908,8 @@ ActionCrop::output (Log& log) const
   log.output ("fertilize_at_index", fertilize_at_index);
   output_vector (tillage, "tillage", log);
   log.output ("tillage_index", tillage_index);
+  output_vector (spray, "spray", log);
+  log.output ("spray_index", spray_index);
   log.output ("irrigation_year", irrigation_year);
   log.output ("irrigation_delay", irrigation_delay);
 }
@@ -842,6 +932,8 @@ ActionCrop::ActionCrop (const AttributeList& al)
     fertilize_incorporate (al.flag ("fertilize_incorporate")),
     tillage (map_construct_const<Tillage> (al.alist_sequence ("tillage"))),
     tillage_index (al.integer ("tillage_index")),
+    spray (map_construct_const<Spray> (al.alist_sequence ("spray"))),
+    spray_index (al.integer ("spray_index")),
     irrigation (al.check ("irrigation") 
 	       ? new Irrigation (al.alist ("irrigation"))
 	       : NULL),
@@ -860,6 +952,7 @@ ActionCrop::~ActionCrop ()
   delete harvest_perennial;
   sequence_delete (fertilize_at.begin (), fertilize_at.end ());
   sequence_delete (tillage.begin (), tillage.end ());
+  sequence_delete (spray.begin (), spray.end ());
   delete irrigation;
   delete irrigation_rest;
 }
@@ -927,6 +1020,12 @@ List of tillage operations to apply.");
     syntax.add ("tillage_index", Syntax::Integer, Syntax::State,
 		"Next entry in `tillage' to execute.");
     alist.add ("tillage_index", 0);
+    add_submodule_sequence<ActionCrop::Spray> ("spray", syntax, 
+						 Syntax::State, "\
+List of chemicals to apply.");
+    syntax.add ("spray_index", Syntax::Integer, Syntax::State,
+		"Next entry in `spray' to execute.");
+    alist.add ("spray_index", 0);
     add_submodule<ActionCrop::Irrigation>("irrigation", syntax, alist,
 					  Syntax::OptionalConst, "\
 Irrigation model for first season.  If missing, don't irrigate.");

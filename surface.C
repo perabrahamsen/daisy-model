@@ -51,7 +51,7 @@ struct Surface::Implementation
 		const SoilChemicals& soil_chemicals);
   bool flux_top () const;
   void  flux_top_on () const;
-  bool accept_top (double water);
+  bool exfiltrate (double water);
   double ponding () const;
   void tick (double PotSoilEvaporation, double water, double temp,
 	     const Soil& soil, const SoilWater& soil_water);
@@ -76,8 +76,14 @@ void
 Surface::Implementation::ridge (const Soil& soil, const SoilWater& soil_water,
 				const AttributeList& al)
 {
+  // No permanent ponding.
+  assert (lake < 0.0);
+
+  // Get rid of old ridge system.
   if (ridge_)
     delete ridge_;
+
+  // Create new ridge system.
   ridge_ = new Ridge (al);
   ridge_->initialize (soil, soil_water);
 }
@@ -123,6 +129,18 @@ Surface::Implementation::mixture (const IM& soil_im /* g/cm^2/mm */,
     }
 }
 
+void
+Surface::update_water (const Soil& soil,
+		       const vector<double>& S_,
+		       vector<double>& h_,
+		       vector<double>& Theta_,
+		       vector<double>& q,
+		       const vector<double>& q_p)
+{
+  if (impl.ridge_)
+    impl.ridge_->update_water (soil, S_, h_, Theta_, q, q_p); 
+}
+
 bool 
 Surface::flux_top () const
 { return impl.flux_top (); }
@@ -159,19 +177,26 @@ Surface::flux_top_off () const
 }
 
 bool  
-Surface::accept_top (double water)
-{ return impl.accept_top (water); }
+Surface::accept_top (double water /* cm */)
+{ 
+  if (impl.ridge_)
+    return true;		// Handled by ridge based on flux.
+  else
+    return impl.exfiltrate (water * 10.0); 
+}
+
+bool
+Surface::soil_top () const
+{ return impl.ridge_ != NULL; }
 
 bool  
-Surface::Implementation::accept_top (double water)
+Surface::Implementation::exfiltrate (double water /* mm */)
 {
   if (lake >= 0.0)
     return true;
 
   if (fabs (water) < 1e-99)
     return true;
-
-  water *= 10.0;		// cm -> mm.
 
   // Exfiltration.
   if (water >= 0)
@@ -243,12 +268,12 @@ double
 Surface::temperature () const
 { return impl.T; }
 
-unsigned int 
-Surface::node_below () const 
+int 
+Surface::last_node () const 
 { 
   if (impl.ridge_)
-    return impl.ridge_->node_below ();
-  return 0; 
+    return impl.ridge_->last_node ();
+  return -1; 
 }
 
 const IM& 
@@ -312,13 +337,12 @@ Surface::Implementation::tick (double PotSoilEvaporation,
   assert (T > -100.0 && T < 50.0);
   pond = pond - EvapSoilSurface * dt + water * dt;
   assert (EvapSoilSurface < 1000.0);
-}
 
-void 
-Surface::tick_soil (const Soil& soil, const SoilWater& soil_water)
-{ 
-  if (impl.ridge_)
-    impl.ridge_->update_water (soil, soil_water); 
+  if (ridge_)
+    {
+      ridge_->tick (soil, soil_water, pond);
+      exfiltrate (ridge_->exfiltration ());
+    }
 }
 
 double 
@@ -397,6 +421,8 @@ Surface::Implementation::output (Log& log) const
   output_submodule (chemicals_storage, "chemicals_storage", log);
   output_submodule (chemicals_out, "chemicals_out", log);
   output_submodule (chemicals_runoff, "chemicals_runoff", log);
+  if (ridge_)
+    output_submodule (*ridge_, "ridge", log);
 }
 
 double

@@ -2,6 +2,10 @@
 
 #include "uzmodel.h"
 
+bool
+UZtop::soil_top () const
+{ return false; }
+
 UZtop::~UZtop ()
 { }
 

@@ -92,7 +92,7 @@ public:
 
 bool
 UZRichard::richard (const Soil& soil,
-		    const int first, const UZtop& top,
+		    int first, const UZtop& top,
 		    const int last, const UZbottom& bottom,
 		    const vector<double>& S,
 		    const vector<double>& h_old,
@@ -138,12 +138,24 @@ UZRichard::richard (const Soil& soil,
 
   // Keep track of water going to the top.
   double top_water = 0.0;
-  double available_water = top.h ();
+  double available_water;
 
-  if (available_water
-      > soil.K (first, 0.0, h_ice[first]) * dt
-      + (soil.Theta (first, 0.0, h_ice[first]) - Theta_old[first]) * soil.dz (first))
-    top.flux_top_off ();
+  if (top.soil_top ())
+    {
+      available_water
+	= (Theta_old[first] 
+	   - soil.Theta (first, -20000.0, h_ice[first])) * soil.dz (first);
+    }
+  else
+    {
+      available_water = top.h ();
+
+      if (available_water
+	  > soil.K (first, 0.0, h_ice[first]) * dt
+	  + (soil.Theta (first, 0.0, h_ice[first]) - Theta_old[first]) * soil.dz (first))
+	top.flux_top_off ();
+    }
+
 
   // First guess is the old value.
   copy (h_old.begin () + first, h_old.begin () + last + 1, h.begin ());
@@ -170,7 +182,7 @@ UZRichard::richard (const Soil& soil,
       h_previous = h;
       Theta_previous = Theta;
 
-      if (!top.flux_top ())
+      if (!top.flux_top () && !top.soil_top ())
 	h[first] = 0.0;
 
       do
@@ -222,11 +234,26 @@ UZRichard::richard (const Soil& soil,
 		  // Calculate upper boundary.
 		  const double dz_plus = z - soil.z (first + i + 1);
 		  const double dz_minus = soil.z (first + i - 1) - z;
+
+		  double h_above;
+		  if (top.soil_top ())
+		    {
+		      const double Theta_ddt = Theta_old[first]
+			+ top_water / soil.dz (first);
+		      h_above = soil.h (first, Theta_ddt);
+		    }
+		  else
+		    {
+		      h_above = top.h () - soil.z (first) + top_water;
+		      if (top.h () <= 0.0)
+			CERR << "TOP H = " << top.h () << ", H ABOVE = " 
+			     << h_above << "\n";
+		    }
 		  b[i] = Cw2
 		    + (ddt / dz) * (Kplus[i - 1] / dz_minus + Kplus[i] / dz_plus);
 		  d[i] = Theta[i] - Cw1 - ddt * S[first + i]
 		    + (ddt / dz)
-		    * (Kplus[i - 1] * (1 + h[i - 1] / dz_minus) - Kplus[i]);
+		    * (Kplus[i - 1] * (1 + h_above / dz_minus) - Kplus[i]);
 		  a[i] = 0.0;
 		  c[i] = - (ddt / dz) * (Kplus[i] / dz_plus);
 		}
@@ -330,8 +357,11 @@ UZRichard::richard (const Soil& soil,
 	    {
               delta_top_water = -(available_water / time_left) * ddt;
 	    }
+	  else if (top.q () > 0.0)
+	    // We have a saturated soil, with an upward flux.
+	    throw ("Saturated soil with an upward flux");
 	  else if (!switched_top)
-	    // We have satured soil, make it a pressure top.
+	    // We have saturated soil, make it a pressure top.
 	    {
 	      top.flux_top_off ();
 	      accepted = false;
@@ -342,7 +372,7 @@ UZRichard::richard (const Soil& soil,
 	  if (accepted)
 	    {
 
-#if 0
+#if 1
 	      // This code checks that darcy and the mass preservation
 	      // code gives the same results.
 	      {
@@ -406,7 +436,8 @@ Richard eq. mass balance flux is different than darcy flux");
   copy (Theta.begin (), Theta.end (), Theta_new.begin () + first);
 
   // Check upper boundary.
-  assert (approximate (top.h (), available_water - top_water));
+  assert (top.soil_top () 
+	  || approximate (top.h (), available_water - top_water));
 
 #if 0
   q_darcy (soil, first, last, h_old, h_new, Theta_old, Theta_new,
@@ -414,6 +445,10 @@ Richard eq. mass balance flux is different than darcy flux");
 #else
   // We know flux on upper border, use mass preservation to
   // calculate flux below given the change in water content.
+
+  if (top.soil_top ())
+    first++;
+
   q[first] = top_water / dt;
   for (int i = first; i <= last; i++)
     {
@@ -526,7 +561,7 @@ UZRichard::tick (const Soil& soil,
   iterations = 0;
   if (!richard (soil, first, top, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q))
-    throw ("Richard's Equation doesn't converge.");
+    throw ("Richard's Equation doesn't converge");
     
   q_up = q[first];
   q_down = q[last + 1];

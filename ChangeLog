@@ -1,3 +1,49 @@
+2000-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.24 released.
+
+2000-05-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/chemistry.dai (Bentazon, IPU, MCPP): New models.
+
+2000-05-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (richard): Don't switch to pressure top with upward
+	flux. 
+
+	* action_crop.C: Added support for spraying.
+
+	* soil_chemicals.C (mixture): Fix sign error.
+
+2000-05-03  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (richard): Updated for ridge top.
+	* uzlr.C (tick): Ditto.
+
+	* lib/log.dai ("Ridge"): New model.
+	("Soil Water Sink"): Ditto.
+
+2000-04-12  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzmodel.h, uzmodel.C, surface.h, surface.C (ridge_top): New
+	virtual member function. 
+
+2000-04-11  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* lib/wwheat.dai ("Winter Wheat"): Change `MxNH4Up' to match
+	`MxNO3Up'. 
+
+2000-04-05  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* crop_std.C (AccFixated): New data member.
+
+	* lib/log.dai ("Crop Production"): Use `AccFixated' instead of
+	`Fixated'. 
+
+2000-03-28  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* soil_water.C, soil_water.h (set_h): New function.
+
 2000-03-20  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.23 released.

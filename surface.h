@@ -23,17 +23,19 @@ public:
   void flux_top_on () const;
   void flux_top_off () const;
   bool accept_top (double);
+  bool soil_top () const;
   double ponding () const;
   double temperature () const;
-  unsigned int node_below () const;
+  int last_node () const;
 
   const IM& matter_flux ();
   const Chemicals&  chemicals_down () const;
 
-  void SoilSurfaceConditions (double Theta, double h);
-
   void mixture (const IM& soil_im /* g/cm^2/mm */,
 		const SoilChemicals& soil_chemicals);
+  void update_water (const Soil&, const vector<double>& S_,
+		     vector<double>& h_, vector<double>& Theta_,
+		     vector<double>& q, const vector<double>& q_p);
 
   // Manager.
   void fertilize (const IM&);
@@ -47,7 +49,6 @@ public:
   void output (Log&) const;
   void tick (double PotSoilEvaporation, double Water, double temp,
 	     const Soil&, const SoilWater&);
-  void tick_soil (const Soil&, const SoilWater&);
 
   // Communication with bioclimate.
   double EpFactor () const;

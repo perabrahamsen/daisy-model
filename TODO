@@ -1,10 +1,12 @@
 * Ny `ridging' operation.
 
-** Nye surface parametre.
+** Kør "rigtig" setup.
 
-** Ny action
+* Action Crop += sprøjtning.
 
-** Ret interface mellem soil water og surface.
+* CropSimple
+
+* Organic/N switch-off
 
 * Management:
 

@@ -68,21 +68,20 @@ PLF::Implementation::inverse () const
   const int size = x.size ();
   PLF plf;
 
-  double last = -1.0;
+  double last = y[0] - 1.0;
   for (int i = 0; i < size; i++)
-    if (last != y[i])
-      {
-	assert (last <= y[i]);
-	plf.add (y[i], x[i]);
-	last = y[i];
-      }
+    {
+      assert (last <= y[i]);
+      plf.add (y[i], x[i]);
+      last = y[i];
+    }
   return plf;
 }
 
 double
 PLF::Implementation::integrate (const double from, const double to) const
 {
-  assert (from < to);
+  assert (from <= to);
   const int size = x.size ();
 
   // First point.
@@ -101,7 +100,7 @@ PLF::Implementation::integrate (const double from, const double to) const
       last_x = x[i];
       last_y = y[i];
     }
-  assert (last_x < to);
+  assert (last_x <= to);
   
   // Last point.
   total += (to - last_x) * (operator ()(to) + last_y) / 2.0;

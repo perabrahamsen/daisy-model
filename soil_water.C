@@ -144,7 +144,8 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
     }
 
   // Limit for ridging.
-  const int first = surface.node_below ();
+  const int first = surface.soil_top () ? surface.last_node () : 0;
+  assert (first >= 0);
 
   // Calculate matrix flow next.
   try
@@ -204,7 +205,8 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
     = groundwater.accept_bottom ((q_[last + 1] + q_p_[last + 1]) * dt);
   assert (bottom_accepted);
 
-  // Update flux in groundwater.
+  // Update flux in surface and groundwater.
+  surface.update_water (soil, S_sum_, h_, Theta_, q_, q_p_);
   groundwater.update_water (soil,
 			    S_sum_, S_drain_, h_, h_ice_, Theta_, q_, q_p_);
 }

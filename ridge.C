@@ -22,13 +22,14 @@ struct Ridge::Implementation
   const double z_switch;	// Height where we switch between regimes. [cm]
   const double x_switch;	// Location where we switch between regimes. []
   const double R_crust;		// Resistance in crust. [h]
-  /*const*/ unsigned int last_node ; // Last node in ridge system.
+  /*const*/ int last_node ; // Last node in ridge system.
   /*const*/ double dz;		// Depth of first node below ridge. [cm]
   /*const*/ double K_sat_below; // Saturated conductivity below ridge. [cm/h]
   // Variables.
   double Theta;			// Water in ridge. [cm^3/cm^3]
+  double Theta_pre;             // Water in ridge before transport. [cm^3/cm^3]
   double h;			// Pressure in ridge. [cm]
-  double K;			// Conductivity in ridge [cm/h]
+  double K;			// Saturated conductivity in ridge [cm/h]
   double z_pond;		// Internal free water level. [cm]
   double x_pond;		// Water to soil point. []
   double internal_ponding;	// Distance from ridge bot. to water surf [cm]
@@ -41,7 +42,9 @@ struct Ridge::Implementation
   // Simulation.
   void tick (const Soil&, const SoilWater&, 
 	     double external_ponding /* [cm] */);
-  void update_water (const Soil& soil, const SoilWater& soil_water);
+  void update_water (const Soil&, const vector<double>& S_,
+		     vector<double>& h_, vector<double>& Theta_,
+		     vector<double>& q, const vector<double>& q_p);
   void output (Log& log) const;
 
   // Create and Destroy.
@@ -71,7 +74,7 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
     {
       // No ponding.
       x_pond = 0.0;
-      z_pond = 0.0;
+      z_pond = lowest;
     }
   else if (external_ponding > highest - 1.0e-5)
     {
@@ -208,55 +211,130 @@ Ridge::Implementation::tick (const Soil& soil, const SoilWater& soil_water,
     }
   internal_ponding = z_pond - lowest;
 
-  // Find resistance and infiltration for bottom regime.
-  const double x_bottom = min (x_pond, x_switch);
-  const double bottom_width = x_bottom - 0.0;
-  const double K_bottom = min (K, K_sat_below);
-  const double dz_bottom = z.integrate (0.0, x_bottom) / bottom_width + dz;
-  R_bottom = (x_width / bottom_width) * (dz_bottom /  K_bottom) + R_crust;
-  I_bottom = internal_ponding / R_bottom;
-
-  // Find resistance and infiltration for wall regime.
-  if (z_pond > z_switch + 1e-5)
+  if (external_ponding < 0.0)
+    // Exfiltration
     {
-      const double wall_width = x_pond - x_switch;
-      assert (wall_width > 0.0);
-      const double dz_wall = z.integrate (x_switch, x_pond) / wall_width + dz;
-      R_wall = (x_width / wall_width) * (dz_wall / K);
-      I_wall = (z_pond - z_switch) / R_wall;
-    }
-  else
-    {
+      R_bottom = -42.42e42;
+      I_bottom = external_ponding;
       // R_wall meaningless.
       I_wall = 0.0;
       R_wall = -42.42e42;
     }
+  else
+    {
+      // Find maximal infiltration.
+      const double Theta_sat = soil.Theta (0, 0.0, 0.0);
+      const double available_space = (Theta_sat - Theta) * dz;
+      assert (available_space > 0.0);
+      const double I_max = min (external_ponding, 
+				available_space - 1.0e-8) / dt;
+
+      // Find resistance and infiltration for bottom regime.
+      const double x_bottom = min (x_pond, x_switch);
+      const double bottom_width = x_bottom - 0.0;
+      if (bottom_width > 0.0)
+	{
+	  const double K_bottom = min (K, K_sat_below);
+	  const double dz_bottom
+	    = z.integrate (0.0, x_bottom) / bottom_width + dz;
+#if 0
+	  CERR << "dz_bottom = " << dz_bottom << ", x_bottom = " 
+	       << x_bottom << ", bottom_width = " << bottom_width
+	       << ", dz = " << dz << "\n";
+#endif
+	  R_bottom
+	    = (x_width / bottom_width) * (dz_bottom /  K_bottom + R_crust);
+	  I_bottom = min (internal_ponding / R_bottom, I_max);
+	}
+      else
+	{
+	  R_bottom = -42.42e42;
+	  I_bottom = 0.0;
+	}
+
+      // Find resistance and infiltration for wall regime.
+      if (z_pond > z_switch + 1e-5)
+	{
+	  const double wall_width = x_pond - x_switch;
+	  assert (wall_width > 0.0);
+	  const double dz_wall
+	    = z.integrate (x_switch, x_pond) / wall_width + dz;
+#if 0 
+	  CERR << "dz_wall = " << dz_wall << ", wall_with = " 
+	       << wall_width << "\n";
+#endif
+	  R_wall = (x_width / wall_width) * (dz_wall / K);
+#if 0
+	  CERR << "R_wall = " << R_wall << ", x_width = " <<x_width
+	       << ", dz_wall = " <<dz_wall << ", K = " << K << "\n";
+#endif
+	  I_wall = min ((z_pond - z_switch) / R_wall, I_max - I_bottom);
+	}
+      else
+	{
+	  // R_wall meaningless.
+	  I_wall = 0.0;
+	  R_wall = -42.42e42;
+	}
+    }
   // Total infiltration.
   I = I_bottom + I_wall;
+  assert (I < external_ponding + 1.0e-8);
+
+#if 0
+  CERR << "switch = (" << x_switch << ", " << z_switch << "), pond = ("
+       << x_pond << ", " << z_pond << ") I = " << I 
+       << " (bottom = " << I_bottom << ", wall = " << I_wall 
+       << "), internal ponding = " << internal_ponding 
+       << ",external ponding = " << external_ponding << "\n";
+#endif
 
   // Update water.
-  Theta = I;
-  for (unsigned int i = 0; i <= last_node; i++)
+  Theta = I * dt;
+  for (int i = 0; i <= last_node; i++)
     Theta += soil_water.Theta (i) * soil.dz (i);
   Theta /= dz;
+  Theta_pre = Theta;
+  assert (Theta < soil.Theta (0, 0.0, 0.0));
   h = soil.h (0, Theta);
-  K = soil.K (0, h, 0.0);
 }
 
 void
-Ridge::update_water (const Soil& soil, const SoilWater& soil_water)
-{ update_water (soil, soil_water); }
+Ridge::update_water (const Soil& soil,
+		     const vector<double>& S_,
+		     vector<double>& h_,
+		     vector<double>& Theta_,
+		     vector<double>& q,
+		     const vector<double>& q_p)
+{ impl.update_water (soil, S_, h_, Theta_, q, q_p); }
 
 void
 Ridge::Implementation::update_water (const Soil& soil,
-				     const SoilWater& soil_water)
+				     const vector<double>& S_,
+				     vector<double>& h_,
+				     vector<double>& Theta_,
+				     vector<double>& q,
+				     const vector<double>& q_p)
 {
-  Theta = 0.0;
-  for (unsigned int i = 0; i <= last_node; i++)
-    Theta += soil_water.Theta (i) * soil.dz (i);
+  const double E = -(q[last_node + 1] + q_p[last_node + 1]);
+  Theta = (I - E) * dt;
+  for (int i = 0; i <= last_node; i++)
+    Theta += (Theta_[i] - S_[i] * dt) * soil.dz (i);
   Theta /= dz;
+  const double Theta_sat = soil.Theta (0, 0.0, 0.0);
+  assert (Theta < Theta_sat);
   h = soil.h (0, Theta);
-  K = soil.K (0, h, 0.0);
+
+  q[0] = -I;
+  for (int i = 0; i <= last_node; i++)
+    {
+      q[i+1] = q[i] + soil.dz (i) * (S_[i] + (Theta - Theta_[i]) / dt ) 
+	- q_p[i+1];
+      Theta_[i] = Theta;
+      h_[i] = h;
+      assert (approximate (soil.h (i, Theta), h));
+    }
+  assert (approximate (E, -(q[last_node + 1] + q_p[last_node + 1])));
 }
 
 void 
@@ -267,11 +345,12 @@ void
 Ridge::Implementation::output (Log& log) const
 {
   log.output ("Theta", Theta);
+  log.output ("Theta_pre", Theta_pre);
   log.output ("h", h);
-  log.output ("K", K);
   log.output ("z_pond", z_pond);
   log.output ("x_pond", x_pond);
   log.output ("internal_ponding", internal_ponding);
+  if (R_bottom >= 0.0)
   log.output ("R_bottom", R_bottom);
   if (R_wall >= 0.0)
     log.output ("R_wall", R_wall);
@@ -280,13 +359,17 @@ Ridge::Implementation::output (Log& log) const
   log.output ("I", I);
 }
 
-unsigned int 
-Ridge::node_below () const
-{ return impl.last_node + 1U; }
+int 
+Ridge::last_node () const
+{ return impl.last_node; }
 
 double
 Ridge::h () const
 { return impl.h; }
+
+double 
+Ridge::exfiltration () const
+{ return -impl.I * 10; }
 
 void 
 Ridge::initialize (const Soil& soil, const SoilWater& soil_water)
@@ -298,11 +381,18 @@ Ridge::Implementation::initialize (const Soil& soil, const SoilWater& soil_water
   // Find values depending on soil numerics.
   last_node = soil.interval_plus (lowest);
   assert (last_node+1 < soil.size ());
-  dz = soil.zplus (last_node);
+  dz = 0 - soil.zplus (last_node);
   K_sat_below = soil.K (last_node+1, 0.0, 0.0);
 
   // Initialize water content.
-  update_water (soil, soil_water);
+  Theta = 0.0;
+  for (int i = 0; i <= last_node; i++)
+    Theta += soil_water.Theta (i) * soil.dz (i);
+  Theta /= dz;
+  Theta_pre = Theta;
+  assert (Theta < soil.Theta (0, 0.0, 0.0));
+  h = soil.h (0, Theta);
+  K = soil.K (0, 0.0, 0.0);
 }
 
 void
@@ -327,8 +417,9 @@ Fraction of ridge height where we switch from bottom regime to wall regime.");
 
   // Content.
   syntax.add ("Theta", "cm^3/cm^3", Syntax::LogOnly, "Soil water content.");
+  syntax.add ("Theta_pre", "cm^3/cm^3", Syntax::LogOnly, 
+	      "Soil water content before transport.");
   syntax.add ("h", "cm", Syntax::LogOnly, "Soil water pressure.");
-  syntax.add ("K", "cm/h", Syntax::LogOnly, "Soil water conductivity");
   syntax.add ("z_pond", "cm", Syntax::LogOnly, "Internal free water height.");
   syntax.add ("x_pond", "", Syntax::LogOnly, "Water to soil point.");
   syntax.add ("internal_ponding", "cm", Syntax::LogOnly, 

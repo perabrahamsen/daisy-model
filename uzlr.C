@@ -66,14 +66,39 @@ UZlr::tick (const Soil& soil,
 	    vector<double>& Theta,
 	    vector<double>& q)
 {
-  // Upper border.
-  const double K_sat = soil.K (0, 0.0, h_ice[0]);
-  assert (K_sat > 0.0);
-  q_up = q[first] = max (top.q (), -K_sat);
+  if (top.soil_top ())
+    {
+      assert (!top.flux_top ());
+      // We have a forced pressure top, in the form of a ridge system.
+      // Since LR only works with flux top, we use Darcy to simulate a
+      // flux top between the first node (with a forced pressure) and
+      // the second node, and then continue calculating with a flux
+      // top from the second node.
+      const double dz = soil.z (first) - soil.z (first+1);
+      const double dh = (h_old[first] - h_old[first+1]);
+      const double K = min (soil.K (first, h_old[first], h_ice[first]),
+			    soil.K (first, h_old[first+1], h_ice[first+1]));
+      q_up = -K * (dh/dz + 1.0);
 
-  // Use darcy for upward movement in the top.
-  const bool use_darcy = (h_old[0] < h_fc) && (q_up > 0.0);
-  const int to_darcy = soil.interval_plus (z_top);
+      // We can safely ignore S[first], since the ridge system has
+      // already incorporated it.
+      first++;
+
+      // New upper limit.
+      q[first] = q_up;
+    }
+  else
+    {
+      // Limit flux by soil capacity.
+      const double K_sat = soil.K (first, 0.0, h_ice[first]);
+      assert (K_sat > 0.0);
+      q_up = q[first] = max (top.q (), -K_sat);
+
+    }
+
+  //  Use darcy for upward movement in the top.
+  const bool use_darcy = (h_old[first] < h_fc) && (q_up > 0.0);
+  const int to_darcy = max (soil.interval_plus (z_top), first + 5);
 
   // Intermediate nodes.
   for (int i = first; i <= last; i++)
@@ -160,10 +185,19 @@ UZlr::tick (const Soil& soil,
   q_down = q[last + 1];
 
   // Check mass conservation.
-  assert (approximate (soil.total (Theta_old)
-		       - q_up * dt + q_down * dt
-		       - soil.total (S), 
-		       soil.total (Theta)));
+#ifndef _NDEBUG
+  double total_old = 0.0;
+  double total_new = 0.0;
+  double total_S = 0.0;
+  for (unsigned int i = first; i <= last; i++)
+    {
+      total_old += soil.dz (i) * Theta_old[i];
+      total_new += soil.dz (i) * Theta[i];
+      total_S += soil.dz (i) * S[i] * dt;
+    }
+  assert (approximate (total_old - q_up * dt + q_down * dt - total_S * dt, 
+		       total_new));
+#endif
 }
 
 void

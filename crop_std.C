@@ -896,6 +896,7 @@ struct CropStandard::Variables
     double DeadWRoot;		// Root DM removed [g DM/m2/d]
     double DeadNRoot;		// Root N removed [g N/m2/d]
     double Fixated;		// N fixation from air. [g/m2/h]
+    double AccFixated;		// Accumulated N fixation from air. [g/m2]
     double DS_start_fixate;	// Start fixation at this DS.
   private:
     friend struct CropStandard::Variables;
@@ -1177,6 +1178,7 @@ CropStandard::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     DeadWRoot (0.0),
     DeadNRoot (0.0),
     Fixated (0.0),
+    AccFixated (vl.number ("AccFixated")),
     DS_start_fixate (vl.check ("DS_start_fixate")
 		     ? vl.number ("DS_start_fixate")
 		     : par.CrpN.DS_fixate)
@@ -1206,6 +1208,7 @@ CropStandard::Variables::RecCrpAux::output (Log& log) const
   log.output ("DeadWRoot", DeadWRoot);
   log.output ("DeadNRoot", DeadNRoot);
   log.output ("Fixated", Fixated);
+  log.output ("AccFixated", AccFixated);
   log.output ("DS_start_fixate", DS_start_fixate);
   log.close();
 }
@@ -1691,7 +1694,11 @@ Maximal development stage for which the crop survives harvest.");
 	      "Root DM removed.");
   CrpAux.add ("DeadNRoot", "g N/m2/d", Syntax::LogOnly,
 	      "Root N removed.");
-  CrpAux.add ("Fixated", "g N/m^2/h", Syntax::LogOnly, " fixation from air.");
+  CrpAux.add ("Fixated", "g N/m^2/h", Syntax::LogOnly, 
+	      "N fixation from air.");
+  CrpAux.add ("AccFixated", "g N/m^2", Syntax::LogOnly, 
+	      "Accumuated N fixation from air.");
+  vCrpAux.add ("AccFixated", 0.0);
   CrpAux.add ("DS_start_fixate", Syntax::None (), Syntax::OptionalState,
 	      "Development stage at which to restart fixation after a cut.");
 
@@ -2099,6 +2106,7 @@ CropStandard::NitrogenUptake (int Hour,
   if (PotNUpt > 0 && var.Phenology.DS > var.CrpAux.DS_start_fixate)
     {
       var.CrpAux.Fixated = par.CrpN.fixate_factor * PotNUpt;
+      var.CrpAux.AccFixated += var.CrpAux.Fixated;
       NCrop += var.CrpAux.Fixated;
       // PotNUpt -= var.CrpAux.Fixated;
     }

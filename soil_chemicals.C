@@ -127,8 +127,7 @@ SoilChemicals::Implementation::mixture (Chemicals& storage, // [g/m^2]
       const double storage_amount = storage.amount (name); // [g/cm^2]
       const double storage_conc = storage_amount / pond;// [g/cm^2/mm]
       const double up_amount  // [g/cm^2/h]
-	= max (storage_amount / dt, (soil_conc - storage_conc) / rate);
-
+	= max (-storage_amount / dt, (soil_conc - storage_conc) / rate);
       up.set_to (name, up_amount);
       storage.add (name, up_amount * dt);
     }
