@@ -1,7 +1,10 @@
 * Ændr bioclimate så PM bliver et separat energi-modul.
 
-  Udskriv `bioclimate_new.C'
-  Snak med SH om ændringer.
+  PET component (wet, dry) (weather, crops, soil, soil_heat, netto_stråling)
+  - weather
+  - Makkink
+  - PM dry   
+
   Design mere robust irrigation.
 
 * Plot retentionskurve fra gdaisy.
