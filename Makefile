@@ -348,13 +348,10 @@ all:	$(EXECUTABLES)
 
 # Create the main executable.
 #
-ifeq ($(USE_DYNLIB),true)
-	DAISYSO = daisy.so
-else
-	DAISYSO = $(LIBOBJ)
-endif
+daisy.exe:	main${OBJ} $(LIBOBJ)
+	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
-daisy${EXT}:	main${OBJ} $(DAISYSO)
+daisy:	main${OBJ} daisy.so
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.
