@@ -171,7 +171,8 @@ COMPONENTS = filter_array.C filter_all.C filter_none.C filter_some.C \
 	nitrification_solute.C hydraulic_mod_C.C uzlr.C transport_cd.C \
 	transport_none.C transport_convection.C adsorbtion_vS_S.C \
 	adsorbtion_none.C tortuosity_M_Q.C tortuosity_linear.C \
-	adsorbtion_freundlich.C adsorbtion_linear.C adsorbtion_langmuir.C
+	adsorbtion_freundlich.C adsorbtion_linear.C adsorbtion_langmuir.C \
+	filter_checkpoint.C
 
 # Select the C files with a corresponding header file from the library.
 #
@@ -322,11 +323,13 @@ depend: $(SOURCES)
 # Create a ZIP file with all the sources.
 #
 daisy.zip:	$(TEXT)
+	rm -f daisy.zip
 	zip daisy.zip $(TEXT) daisy.ide
 
 # Move it to ftp.
 #
-dist:	daisy.zip
+dist:	cvs
+	$(MAKE) daisy.zip
 	mv -f daisy.zip $(HOME)/.public_ftp/daisy/
 
 # Update the CVS repository.
@@ -493,6 +496,17 @@ adsorbtion_none${OBJ}: adsorbtion_none.C adsorbtion.h librarian.h \
  library.h common.h alist.h syntax.h
 tortuosity_M_Q${OBJ}: tortuosity_M_Q.C tortuosity.h librarian.h library.h \
  common.h alist.h syntax.h hydraulic.h
+tortuosity_linear${OBJ}: tortuosity_linear.C tortuosity.h librarian.h \
+ library.h common.h alist.h syntax.h hydraulic.h
+adsorbtion_freundlich${OBJ}: adsorbtion_freundlich.C adsorbtion.h \
+ librarian.h library.h common.h alist.h syntax.h soil.h horizon.h \
+ hydraulic.h tortuosity.h geometry.h mathlib.h
+adsorbtion_linear${OBJ}: adsorbtion_linear.C adsorbtion.h librarian.h \
+ library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h
+adsorbtion_langmuir${OBJ}: adsorbtion_langmuir.C adsorbtion.h librarian.h \
+ library.h common.h alist.h syntax.h soil.h horizon.h hydraulic.h \
+ tortuosity.h geometry.h mathlib.h
 daisy${OBJ}: daisy.C daisy.h common.h weather.h librarian.h library.h \
  alist.h syntax.h im.h groundwater.h uzmodel.h horizon.h log.h \
  filter.h parser.h am.h nitrification.h hydraulic.h crop.h column.h \
@@ -591,6 +605,6 @@ tortuosity${OBJ}: tortuosity.C tortuosity.h librarian.h library.h common.h \
  alist.h syntax.h
 set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h common.h parser_file.h parser.h syntax.h \
- alist.h
+ alist.h version.h
 tkmain${OBJ}: tkmain.C daisy.h common.h syntax.h alist.h library.h
 cmain${OBJ}: cmain.c cdaisy.h

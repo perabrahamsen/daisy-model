@@ -202,55 +202,69 @@ extern "C" void EXPORT
 daisy_alist_set_integer_at (AttributeList* alist, const char* name,
 			    int value, unsigned int index)
 { 
-  vector<int> v = alist->integer_sequence (name);
+  vector<int> v = alist->check (name)
+    ? alist->integer_sequence (name)
+    : *new vector<int>;
   if (v.size () < index)
     while (v.size () < index)
       v.push_back (value);
   else
     v[index] = value;
+  alist->add (name, v);
 }
 
 extern "C" void EXPORT
 daisy_alist_set_number_at (AttributeList* alist, const char* name,
 			   double value, unsigned int index)
 {
-  vector<double> v = alist->number_sequence (name);
+  vector<double> v = alist->check (name)
+    ? alist->number_sequence (name)
+    : *new vector<double>;
   if (v.size () < index)
     while (v.size () < index)
       v.push_back (value);
   else
     v[index] = value;
+  alist->add (name, v);
 }
 
 extern "C" void EXPORT
 daisy_alist_set_string_at (AttributeList* alist, const char* name,
 			   const char* value, unsigned int index)
 {
-  vector<string> v = alist->name_sequence (name);
+  vector<string> v = alist->check (name)
+    ? alist->name_sequence (name)
+    : *new vector<string>;
   if (v.size () < index)
     while (v.size () < index)
       v.push_back (value);
   else
     v[index] = value;
+  alist->add (name, v);
 }
 
 extern "C" void EXPORT
 daisy_alist_set_flag_at (AttributeList* alist, const char* name,
 			 daisy_bool value, unsigned int index)
 { 
-  vector<bool> v = alist->flag_sequence (name);
+  vector<bool> v = alist->check (name)
+    ? alist->flag_sequence (name)
+    : *new vector<bool>;
   if (v.size () < index)
     while (v.size () < index)
       v.push_back (value);
   else
     v[index] = value;
+  alist->add (name, v);
 }
 
 extern "C" void EXPORT
 daisy_alist_set_alist_at (AttributeList* alist, const char* name,
 			  AttributeList* value, unsigned int index)
 { 
-  vector<AttributeList*> v = alist->alist_sequence (name);
+  vector<AttributeList*> v = alist->check (name)
+    ? alist->alist_sequence (name)
+    : *new vector<AttributeList*>;
   if (v.size () < index)
     while (v.size () < index)
       v.push_back (value);
@@ -258,10 +272,11 @@ daisy_alist_set_alist_at (AttributeList* alist, const char* name,
     {
 #if 0
       // BUG: Might be duplicate, so we can't delete.
-#endif
       delete v[index];
+#endif
       v[index] = value;
     }
+  alist->add (name, v);
 }
 
 /* @ The daisy_library Type.
