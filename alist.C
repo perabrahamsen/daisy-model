@@ -591,6 +591,15 @@ AttributeList::number (const string& key) const
   return value.number;
 }
 
+double 
+AttributeList::number (const char* key) const
+{
+  const Value& value = impl.lookup (key);
+  assert (value.type == Syntax::Number);
+  assert (!value.is_sequence);
+  return value.number;
+}
+
 const string& 
 AttributeList::name (const string& key) const
 {

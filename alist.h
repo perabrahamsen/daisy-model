@@ -54,6 +54,7 @@ public:
 
   // Extract values.
   double number (const string&) const;
+  double number (const char*) const;
   const string& name (const string&) const;
   bool flag (const string&) const;
   const PLF& plf (const string&) const;
