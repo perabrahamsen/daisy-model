@@ -9,8 +9,11 @@
   (fine_sand 68.8)
   (coarse_sand 11.5)
   (humus 2.60)
+  (C_per_N 14.2)
   ;; Total = 93.9.
-  (dry_bulk_density 1.45 [g/cm^3])
+  (dry_bulk_density 1.45 [g/cm^3]))
+
+(defhorizon Ap_JB1_CDB Ap_JB1
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.40)
@@ -26,8 +29,11 @@
   (fine_sand 69.7)
   (coarse_sand 2.2)
   (humus 2.50)
+  (C_per_N 12.8)
   ;; Total = 94.2.
-  (dry_bulk_density 1.42 [g/cm^3])
+  (dry_bulk_density 1.42 [g/cm^3]))
+
+(defhorizon Ap_JB2_CDB Ap_JB2
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.39)
@@ -43,8 +49,11 @@
   (fine_sand 60.1)
   (coarse_sand 11.5)
   (humus 2.70)
+  (C_per_N 13.3)
   ;; Total = 96.8.
-  (dry_bulk_density 1.44 [g/cm^3])
+  (dry_bulk_density 1.44 [g/cm^3]))
+
+(defhorizon Ap_JB3_CDB Ap_JB3
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.39)
@@ -60,8 +69,11 @@
   (fine_sand 54.9)
   (coarse_sand 6.8)
   (humus 2.60)
+  (C_per_N 11.6)
   ;; Total = 97.8.
-  (dry_bulk_density 1.41 [g/cm^3])
+  (dry_bulk_density 1.41 [g/cm^3]))
+
+(defhorizon Ap_JB4_CDB Ap_JB4
   (hydraulic M_vG
             (Theta_res 0.03)
             (Theta_sat 0.40)
@@ -77,8 +89,11 @@
   (fine_sand 49.5)
   (coarse_sand 8.8)
   (humus 2.50)
+  (C_per_N 12.8)
   ;; Total = 98.9.
-  (dry_bulk_density 1.51 [g/cm^3])
+  (dry_bulk_density 1.51 [g/cm^3]))
+
+(defhorizon Ap_JB5_CDB Ap_JB5
   (hydraulic M_vG
             (Theta_res 0.03)
             (Theta_sat 0.38)
@@ -94,8 +109,11 @@
   (fine_sand 48)
   (coarse_sand 6.8)
   (humus 2.50)
+  (C_per_N 11.0)
   ;; Total = 99.2.
-  (dry_bulk_density 1.53 [g/cm^3])
+  (dry_bulk_density 1.53 [g/cm^3]))
+
+(defhorizon Ap_JB6_CDB Ap_JB6
   (hydraulic M_vG
             (Theta_res 0.03)
             (Theta_sat 0.37)
@@ -111,8 +129,11 @@
   (fine_sand 42.6)
   (coarse_sand 6.1)
   (humus 2.40)
+  (C_per_N 10.4)
   ;; Total = 98.3.
-  (dry_bulk_density 1.54 [g/cm^3])
+  (dry_bulk_density 1.54 [g/cm^3]))
+
+(defhorizon Ap_JB7_CDB Ap_JB7
   (hydraulic M_vG
             (Theta_res 0.04)
             (Theta_sat 0.38)
@@ -128,8 +149,11 @@
   (fine_sand 71)
   (coarse_sand 11.8)
   (humus 0.80)
+  (C_per_N 12.2)
   ;; Total = 91.
-  (dry_bulk_density 1.5 [g/cm^3])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+(defhorizon B_JB1_CDB B_JB1
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.39)
@@ -145,8 +169,11 @@
   (fine_sand 74.8)
   (coarse_sand 2.2)
   (humus 0.90)
+  (C_per_N 12.5)
   ;; Total = 93.8.
-  (dry_bulk_density 1.45 [g/cm^3])
+  (dry_bulk_density 1.45 [g/cm^3]))
+
+(defhorizon B_JB2_CDB B_JB2
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.39)
@@ -162,8 +189,11 @@
   (fine_sand 62.3)
   (coarse_sand 12.8)
   (humus 1.00)
+  (C_per_N 11.0)
   ;; Total = 96.1.
-  (dry_bulk_density 1.44 [g/cm^3])
+  (dry_bulk_density 1.44 [g/cm^3]))
+
+(defhorizon B_JB3_CDB B_JB3
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.40)
@@ -179,8 +209,11 @@
   (fine_sand 59)
   (coarse_sand 6.0)
   (humus 0.80)
+  (C_per_N 12.2)
   ;; Total = 95.7.
-  (dry_bulk_density 1.51 [g/cm^3])
+  (dry_bulk_density 1.51 [g/cm^3]))
+
+(defhorizon B_JB4_CDB B_JB4
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.37)
@@ -196,8 +229,11 @@
   (fine_sand 55)
   (coarse_sand 11.0)
   (humus 0.50)
+  (C_per_N 9.9)
   ;; Total = 97.8.
-  (dry_bulk_density 1.62 [g/cm^3])
+  (dry_bulk_density 1.62 [g/cm^3]))
+
+(defhorizon B_JB5_CDB B_JB5
   (hydraulic M_vG
             (Theta_res 0.03)
             (Theta_sat 0.36)
@@ -213,8 +249,11 @@
   (fine_sand 51.9)
   (coarse_sand 6.5)
   (humus 0.50)
+  (C_per_N 8.1)
   ;; Total = 97.
-  (dry_bulk_density 1.64 [g/cm^3])
+  (dry_bulk_density 1.64 [g/cm^3]))
+
+(defhorizon B_JB6_CDB B_JB6
   (hydraulic M_vG
             (Theta_res 0.03)
             (Theta_sat 0.35)
@@ -230,8 +269,11 @@
   (fine_sand 44.9)
   (coarse_sand 7.0)
   (humus 0.40)
+  (C_per_N 7.5)
   ;; Total = 97.6.
-  (dry_bulk_density 1.68 [g/cm^3])
+  (dry_bulk_density 1.68 [g/cm^3]))
+
+(defhorizon B_JB7_CDB B_JB7
   (hydraulic M_vG
             (Theta_res 0.04)
             (Theta_sat 0.35)
@@ -248,7 +290,9 @@
   (coarse_sand 12.4)
   (humus 0.20)
   ;; Total = 89.4.
-  (dry_bulk_density 1.56 [g/cm^3])
+  (dry_bulk_density 1.56 [g/cm^3]))
+
+(defhorizon C_JB1_CDB C_JB1
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.37)
@@ -265,7 +309,9 @@
   (coarse_sand 0.7)
   (humus 0.20)
   ;; Total = 92.2.
-  (dry_bulk_density 1.55 [g/cm^3])
+  (dry_bulk_density 1.55 [g/cm^3]))
+
+(defhorizon C_JB2_CDB C_JB2
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.37)
@@ -282,7 +328,9 @@
   (coarse_sand 12.1)
   (humus 0.20)
   ;; Total = 93.2.
-  (dry_bulk_density 1.63 [g/cm^3])
+  (dry_bulk_density 1.63 [g/cm^3]))
+
+(defhorizon C_JB3_CDB C_JB3
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.35)
@@ -299,7 +347,9 @@
   (coarse_sand 4.6)
   (humus 0.30)
   ;; Total = 91.1.
-  (dry_bulk_density 1.65 [g/cm^3])
+  (dry_bulk_density 1.65 [g/cm^3]))
+
+(defhorizon C_JB4_CDB C_JB4
   (hydraulic M_vG
             (Theta_res 0.02)
             (Theta_sat 0.34)
@@ -316,7 +366,9 @@
   (coarse_sand 7.4)
   (humus 0.20)
   ;; Total = 82.8.
-  (dry_bulk_density 1.79 [g/cm^3])
+  (dry_bulk_density 1.79 [g/cm^3]))
+
+(defhorizon C_JB5_CDB C_JB5
   (hydraulic M_vG
             (Theta_res 0.03)
             (Theta_sat 0.32)
@@ -333,7 +385,9 @@
   (coarse_sand 5.2)
   (humus 0.20)
   ;; Total = 89.7.
-  (dry_bulk_density 1.72 [g/cm^3])
+  (dry_bulk_density 1.72 [g/cm^3]))
+
+(defhorizon C_JB6_CDB C_JB6
   (hydraulic M_vG
             (Theta_res 0.03)
             (Theta_sat 0.33)
@@ -350,7 +404,9 @@
   (coarse_sand 6.2)
   (humus 0.20)
   ;; Total = 93.5.
-  (dry_bulk_density 1.73 [g/cm^3])
+  (dry_bulk_density 1.73 [g/cm^3]))
+
+(defhorizon C_JB7_CDB C_JB7
   (hydraulic M_vG
             (Theta_res 0.04)
             (Theta_sat 0.34)

@@ -7,6 +7,7 @@
 (input file "tillage.dai")
 (input file "chemistry.dai")
 (input file "vegetation.dai")
+(input file "dk-horizon.dai")
 
 ;;; all.dai ends here.
 
