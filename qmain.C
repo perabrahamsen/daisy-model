@@ -10,6 +10,8 @@
 #include "plf.h"
 #include "parser_file.h"
 #include "printer_file.h"
+#include "tmpstream.h"
+#include "treelog_stream.h"
 
 #include <qapplication.h>
 #include <qmenubar.h>
@@ -18,12 +20,16 @@
 #include <qhgroupbox.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
+#include <qstatusbar.h>
+
+QApplication* global_app = NULL;
 
 int 
 main (int argc, char** argv)
 {
   // Application.
   QApplication app (argc, argv);
+  global_app = &app;
   MainWindow main_window;
   
   // Initialize it.
@@ -40,10 +46,43 @@ main (int argc, char** argv)
   return app.exec ();
 }
 
+class Busy
+{
+  QMainWindow* widget;
+  QString message;
+
+public:
+  Busy (QMainWindow* w, const QString& m)
+    : widget (w),
+      message (m)
+  { 
+    QApplication::setOverrideCursor (Qt::waitCursor);
+    widget->statusBar ()->message (message);
+    assert (global_app);
+    global_app->processEvents ();
+  }
+  ~Busy ()
+  {
+    widget->statusBar ()->message (message + "done", 2000);
+    QApplication::restoreOverrideCursor();
+  }
+};
+
+class NotBusy
+{
+public:
+  NotBusy ()
+  { QApplication::setOverrideCursor (Qt::arrowCursor); }
+  ~NotBusy ()
+  { QApplication::restoreOverrideCursor(); }
+};
+
 MainWindow::MainWindow ()
   : QMainWindow (),
     view_logonly (true),
     view_parameters (true),
+    view_filter (0),
+    view_empty (false),
     errors (NULL)
 {
   // Daisy.
@@ -103,31 +142,40 @@ MainWindow::MainWindow ()
   // - View menu.
   menu_view = new QPopupMenu (this);
   menu->insertItem ("&View", menu_view);
+  menu_view->setCheckable (true);
   menu_view_selected_id
-    = menu_view->insertItem ("View &selected...", this, SLOT (menu_action ()));
+    = menu_view->insertItem ("&Selected...", this, SLOT (menu_action ()));
   menu_view_check_id
     = menu_view->insertItem ("&Check model...", this, SLOT (view_check ()));
+  menu_view_dependencies_id
+    = menu_view->insertItem ("&Dependencies...", 
+			     this, SLOT (view_dependencies ()));
+  menu_view->setItemEnabled (menu_view_dependencies_id, false);
   menu_view->insertSeparator ();
   menu_view_logonly_id
     = menu_view->insertItem ("Include L&og variables",
 			     this, SLOT (toggle_view_logonly ()));
   menu_view->setItemChecked (menu_view_logonly_id, view_logonly);
   menu_view_parameters_id
-    = menu_view->insertItem ("Include &Parameters", 
+    = menu_view->insertItem ("Include &parameters", 
 			     this, SLOT (toggle_view_parameters ()));
   menu_view->setItemChecked (menu_view_parameters_id, view_parameters);
   menu_view->insertSeparator ();
-  menu_view_current_id 
-    = menu_view->insertItem ("C&urrent file", this, SLOT (menu_action ()));
-  menu_view_buildin_id
-    = menu_view->insertItem ("&Buildin models", this, SLOT (menu_action ()));
-  menu_view_library_id 
-    = menu_view->insertItem ("&Library parameterizations",
-			     this, SLOT (menu_action ()));
-  menu_view_all_id 
-    = menu_view->insertItem ("&Everything", this, SLOT (menu_action ()));
-  menu_view->setCheckable (true);
-  menu_view->setItemChecked (menu_view_buildin_id, true);
+  for (unsigned int i = 0; i != Filter::filters.size (); i++)
+    {
+      Filter::filters[i]->menu_id
+	= menu_view->insertItem (Filter::filters[i]->menu_entry (), 
+				 Filter::filters[i],
+				 SLOT (select_filter ()));
+      Filter::filters[i]->view_filter = i;
+      Filter::filters[i]->main = this;
+    }
+  menu_view->setItemChecked (Filter::filters[view_filter]->menu_id, true);
+  menu_view->insertSeparator ();
+  menu_view_empty_id 
+    = menu_view->insertItem ("Include e&mpty libraries", 
+			     this, SLOT (toggle_view_empty ()));
+  menu_view->setItemChecked (menu_view_empty_id, view_empty);
 
   // - Help menu.
   menu->insertSeparator ();
@@ -140,6 +188,7 @@ MainWindow::MainWindow ()
 void
 MainWindow::daisy_clear ()
 { 
+  Busy busy (this, "Daisy cleanup...");
   // Clear simulation.
   daisy_alist.clear ();
   Syntax dummy;
@@ -183,16 +232,15 @@ MainWindow::open_file (QString name)
   daisy_clear ();
 
   // Load new content.
-  ostrstream errors;
-  ParserFile parser (daisy_syntax, name.latin1 (), errors);
+  Busy busy (this, "Parsing file...");
+  TmpStream errors;
+  ParserFile parser (daisy_syntax, name.latin1 (), errors ());
   parser.load (daisy_alist);
-  errors << '\0';
-  const char* s = errors.str ();
+  NotBusy notbusy;
   if (parser.error_count ())
-    QMessageBox::critical (this, "QDaisy: Load errors", s);
-  else if (strlen (s) > 0)
-    QMessageBox::warning (this, "QDaisy: Load warnings", s);
-  delete [] s;
+    QMessageBox::critical (this, "QDaisy: Load errors", errors.str ());
+  else if (strlen (errors.str ()) > 0)
+    QMessageBox::warning (this, "QDaisy: Load warnings", errors.str ());
 
   // In any case:  Make it official.
   set_filename (name);
@@ -202,6 +250,7 @@ MainWindow::open_file (QString name)
 void
 MainWindow::save_file ()
 { 
+  Busy busy (this, "Saving file...");
   // Open log file.
   PrinterFile printer (file_name.latin1 ());
   printer.print_comment ("Created by QDaisy");
@@ -220,12 +269,14 @@ MainWindow::save_file ()
   printer.print_comment ("Parameterizations");
   printer.print_library_file (file_name.latin1 ());
 
-  // Print content.
+    // Print content.
   printer.print_comment ("Content");
   printer.print_alist (daisy_alist, daisy_syntax);
-
   if (!printer.good ())
-    QMessageBox::critical (this, "QDaisy: Save errors", "Save failed.");   
+    {
+      NotBusy notbusy;
+      QMessageBox::critical (this, "QDaisy: Save errors", "Save failed.");   
+    }
 }
 
 void
@@ -250,8 +301,24 @@ MainWindow::set_selection_copyable (bool copyable)
 }
 
 void
+MainWindow::set_selection_depable (bool depable)
+{
+  menu_view->setItemEnabled (menu_view_dependencies_id, depable);
+}
+
+void 
+MainWindow::set_view_filter (unsigned int filter)
+{
+  view_filter = filter;
+  for (unsigned int i = 0; i < Filter::filters.size (); i++)
+    menu_view->setItemChecked (Filter::filters[i]->menu_id, i == filter);
+}
+
+void
 MainWindow::populate_tree ()
 {
+  Busy busy (this, "Populating tree...");
+  repaint ();
   // Clear old content.
   tree->clear ();
 
@@ -261,22 +328,33 @@ MainWindow::populate_tree ()
   for (unsigned int i = 0; i < components.size (); i++)
     {
       const string& component = components[i];
+      if (!Filter::filters[view_filter]->check (component))
+	continue;
       const Library& library = Library::find (component);
+      vector<string> models;
+      library.entries (models);
+
+      if (!view_empty)
+	{
+	  for (unsigned int i = 0; i < models.size (); i++)
+	    if (Filter::filters[view_filter]->check (component, models[i]))
+	      goto found;
+	  continue;
+	found:;
+	}
       MyListViewItem* qcomponent 
 	= new MyListViewItem (this, library.description (), tree,
 			      component.c_str ());
 
-      vector<string> models;
-      library.entries (models);
       for (unsigned int i = 0; i < models.size (); i++)
 	{
 	  const string& model = models[i];
+	  if (!Filter::filters[view_filter]->check (component, model))
+	    continue;
 	  const Syntax& syntax = library.syntax (model);
 	  const AttributeList& alist = library.lookup (model);
-	  ostrstream str;
-	  const bool has_errors = !syntax.check (alist, str, model);
-	  str << '\0';
-	  const char* errors = str.str ();
+	  TmpStream str;
+	  const bool has_errors = !syntax.check (alist, str (), model);
 	  QString value =  has_errors ? "" : "Full";
 	  QString description = "no description";
 	  if (alist.check ("description"))
@@ -287,9 +365,8 @@ MainWindow::populate_tree ()
 	      + alist.name ("parsed_from_file").c_str () + "\"";
 	  MyListViewItem* qmodel 
 	    = new MyListViewItem (this, description,
-				  has_errors ? new QString (errors) : NULL,
+				  has_errors ? new QString (str.str ()) : NULL,
 				  qcomponent, model.c_str (), type, value, "");
-	  delete [] errors;
 
 	  add_alist_children (qmodel, syntax, alist);
 	}
@@ -398,13 +475,10 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 	  }
 	if (has_value && size == Syntax::Singleton)
 	  {
-	    ostrstream str;
+	    TmpStream str;
 	    has_errors = !syntax.syntax (entry).check (alist.alist (entry), 
-						       str, entry);
-	    str << '\0';
-	    const char* tmp = str.str ();
-	    errors = tmp;
-	    delete [] tmp;
+						       str (), entry);
+	    errors = str.str ();
 	    if (has_errors)
 	      value_name = "Partial";
 	    else
@@ -423,14 +497,11 @@ MainWindow::add_alist_entry (MyListViewItem* node,
 	  value_name = "`";
 	  value_name += type.c_str ();
 	  value_name += "'";
-	  ostrstream str;
+	  TmpStream str;
 	  has_errors 
 	    = !syntax.library (entry).syntax (type).check (alist.alist (entry),
-							   str, entry);
-	  str << '\0';
-	  const char* tmp = str.str ();
-	  errors = tmp;
-	  delete [] tmp;
+							   str (), entry);
+	  errors = str.str ();
 	  if (has_errors)
 	    value_name += " partial";
 	  else
@@ -552,7 +623,10 @@ MainWindow::file_open ()
 					      "Daisy setup files (*.dai)", 
 					      this));
   if (!file.isEmpty())
-    open_file (file);
+    {
+      set_view_filter (1);
+      open_file (file);
+    }
 }
 
 void 
@@ -594,6 +668,43 @@ MainWindow::view_check ()
 }
 
 void 
+MainWindow::view_dependencies ()
+{ 
+  const QListViewItem* current = tree->currentItem ();
+  assert (current);
+  const MyListViewItem* mine = dynamic_cast<const MyListViewItem*> (current);
+  assert (mine);
+  vector<string> path;
+  mine->find_path (path);
+  assert (path.size () == 2);
+
+  Library& library = Library::find (path[0]);
+  TmpStream errors;
+  TreelogStream treelog (errors ());
+  QString title = QString ("QDaisy: ") + mine->entry + " dependencies";
+
+  bool found = false;
+  
+  // Check Libraries.
+  {
+    Treelog::Open nest (treelog, "Libraries");
+    if (library.check_dependencies (path[1], treelog))
+      found = true;
+  }
+  // Check simulation.
+  {
+    Treelog::Open nest (treelog, "Daisy");
+    if (library.check_dependencies (path[1], 
+				    daisy_syntax, daisy_alist, treelog))
+      found = true;
+  }
+  if (found)
+    QMessageBox::information (this, title, errors.str ());
+  else
+    QMessageBox::information (this, title, "No dependencies found.");
+}
+
+void 
 MainWindow::toggle_view_logonly ()
 {
   view_logonly = !view_logonly;
@@ -606,6 +717,24 @@ MainWindow::toggle_view_parameters ()
 {
   view_parameters = !view_parameters;
   menu_view->setItemChecked (menu_view_parameters_id, view_parameters);
+  populate_tree ();
+}
+
+void 
+MainWindow::select_view_filter (unsigned int filter)
+{
+  if (filter != view_filter)
+    {
+      set_view_filter (filter);
+      populate_tree ();
+    }
+}
+
+void 
+MainWindow::toggle_view_empty ()
+{
+  view_empty = !view_empty;
+  menu_view->setItemChecked (menu_view_empty_id, view_empty);
   populate_tree ();
 }
 
@@ -636,11 +765,30 @@ MyListViewItem::key (int column, bool ascending) const
 }
 
 void
+MyListViewItem::find_path (vector<string>& path) const
+{
+  if (parent ())
+    {
+      const MyListViewItem* myParent
+	= dynamic_cast<const MyListViewItem*> (parent ());
+      assert (myParent);
+
+      myParent->find_path (path);
+    }
+  path.push_back (entry.latin1 ());
+}
+
+
+void
 MyListViewItem::setSelected (bool s)
 {
   main->set_selection_editable (false);
   main->set_selection_copyable (false);
   main->set_selection_viewable (false);
+  
+  vector<string> path;
+  find_path (path);
+  main->set_selection_depable (path.size () == 2);
 
   if (s)
     main->set_description (description, errors);
@@ -678,3 +826,80 @@ MyListViewItem::~MyListViewItem ()
   if (errors)
     delete errors;
 }
+
+vector<Filter*> Filter::filters;
+
+bool 
+Filter::check (const string& /*comp*/) const
+{ return true; }
+
+bool 
+Filter::check (const string& /*comp*/, const string& /*model*/) const
+{ return true; }
+
+Filter::~Filter ()
+{ }
+
+Filter::Filter ()
+{ filters.push_back (this); }
+
+void
+Filter::select_filter ()
+{ main->select_view_filter (view_filter); }
+
+class FilterBuildin : public Filter
+{
+  const QString& menu_entry () const
+  {
+    static const QString name = "&Buildin models";
+    return name;
+  }
+  bool check (const string& comp, const string& model) const
+  {
+    const Library& library = Library::find (comp);
+    const AttributeList& alist = library.lookup (model);
+    return !alist.check ("parsed_from_file");
+  }
+} filter_buildin;  
+
+class FilterFile : public Filter
+{
+  const QString& menu_entry () const
+  {
+    static const QString name = "Current &file";
+    return name;
+  }
+  bool check (const string& comp, const string& model) const
+  {
+    const Library& library = Library::find (comp);
+    const AttributeList& alist = library.lookup (model);
+    return alist.check ("parsed_from_file")
+      && alist.name ("parsed_from_file") == main->file_name.latin1 ();
+  }
+} filter_current_file;  
+
+class FilterLibraries : public Filter
+{
+  const QString& menu_entry () const
+  {
+    static const QString name = "&Libraries";
+    return name;
+  }
+  bool check (const string& comp, const string& model) const
+  {
+    const Library& library = Library::find (comp);
+    const AttributeList& alist = library.lookup (model);
+    return alist.check ("parsed_from_file")
+      && alist.name ("parsed_from_file") != main->file_name.latin1 ();
+  }
+} filter_libraries;  
+
+class FilterEverything : public Filter
+{
+  const QString& menu_entry () const
+  {
+    static const QString name = "&Everything";
+    return name;
+  }
+} filter_everything;  
+

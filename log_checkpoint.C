@@ -4,6 +4,7 @@
 #include "condition.h"
 #include "daisy.h"
 #include "printer_file.h"
+#include "tmpstream.h"
 
 struct LogCheckpoint : public LogAList
 {
@@ -51,15 +52,13 @@ LogCheckpoint::done ()
       assert (library_stack.size () == 1U);
 
       // Create file name.
-      ostrstream scratch;
-      scratch.fill (0);
-      scratch.width (2);
-      scratch << file.c_str () 
-	      << "-" << time.year () << "-" << time.month () << "-" 
-	      << time.mday () << "+" << time.hour () << ".dai" << '\0';
-      const char* s = scratch.str ();
-      const string filename (s);
-      delete [] s;
+      TmpStream scratch;
+      scratch ().fill (0);
+      scratch ().width (2);
+      scratch () << file.c_str () 
+		 << "-" << time.year () << "-" << time.month () << "-" 
+	      << time.mday () << "+" << time.hour () << ".dai";
+      const string filename (scratch.str ());
       
       // Open log file.
       PrinterFile printer (filename);

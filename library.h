@@ -8,6 +8,7 @@
 
 struct Syntax;
 struct AttributeList;
+struct Treelog;
 
 typedef void (*derive_fun) (const string& name, AttributeList& al,
 			    const string& super);
@@ -21,10 +22,10 @@ class Library
 public:
   // Find a specific library.
   static Library& find (const string& name);
-
   static void all (vector<string>& libraries);
   static int get_sequence ();
 
+  // Use.
   const string& name () const;
   const char* description () const;
   AttributeList& lookup (const string&) const;
@@ -32,12 +33,22 @@ public:
   void add (const string&, AttributeList&, const Syntax&);
   void add_derived (const string& name, AttributeList& al,
 		    const string& super);
-  void remove (const string&);
   const Syntax& syntax (const string&) const;
-
   void entries (vector<string>&) const;
+
+  // Dependencies.
+  bool check_dependencies (const string& parameterization,
+			   Treelog& treelog) const;
+  bool check_dependencies (const string& parameterization,
+			   const Syntax& syntax, const AttributeList& alist,
+			   Treelog& treelog) const;
+  void remove (const string&);
+
+  // File handling.
   static void clear_all_parsed ();
   static void refile_parsed (const string& from, const string& to);
+
+  // Create and destroy.
   static void load_syntax (Syntax&, AttributeList&);
 private: 
   Library (const Library&);

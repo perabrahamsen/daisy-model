@@ -50,7 +50,6 @@
 #define HAS_TEMPLATE_MEMBERS
 
 #include <unistd.h>
-#include <strstream.h>
 
 // GNU doesn't mind unused global constants.
 #define GLOBAL_CONSTANT
@@ -71,8 +70,6 @@
 
 // Needed in BCC for `close'.
 #include <io.h>
-// Borland C++ 5.01 doesn't spell stream with an m.
-#include <strstrea.h>
 // Needed in BCC for `chdir'.
 #include <dir.h>
 

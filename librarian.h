@@ -6,6 +6,7 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
+#include "tmpstream.h"
 #include <map>
 
 class Log;
@@ -39,8 +40,8 @@ public:
     assert (al.check ("type"));
     const string name = al.name ("type");
     assert (library ().check (name));
-    ostrstream dummy_stream;
-    assert (library ().syntax (name).check (al, dummy_stream));
+    TmpStream dummy_stream;
+    assert (library ().syntax (name).check (al, dummy_stream ()));
     return (content->constructors)[name] (al);
   }
   static void add_type (const string& name, AttributeList& al,

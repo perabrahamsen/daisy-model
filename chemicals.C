@@ -6,6 +6,7 @@
 #include "alist.h"
 #include "chemical.h"
 #include "submodel.h"
+#include "tmpstream.h"
 #include <map>
 
 struct Chemicals::Implementation
@@ -86,8 +87,8 @@ Chemicals::Implementation::lookup (const string& name)
   assert (library.check (name));
   const Syntax& syntax = library.syntax (name);
   const AttributeList& alist = library.lookup (name);
-  ostrstream dummy_stream;
-  assert (syntax.check (alist, dummy_stream));
+  TmpStream dummy_stream;
+  assert (syntax.check (alist, dummy_stream ()));
   AttributeList child (alist);
   child.add ("type", name);
 

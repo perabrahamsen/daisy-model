@@ -1,3 +1,29 @@
+2000-09-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 1.53 released.
+
+2000-09-27  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* FILES: New file.
+	* Makefile (TEXT): Added it.
+
+	* treelog.h, treelog.C: New utility.
+	* treelog_stream.h, treelog_stream.C: New utility.
+	* Makefile (OTHER): Added them.
+	* library.C, library.h (check_dependencies): New functions.
+	* qmain.C, qmain.h (view_dependencies): New signal.
+	
+2000-09-26  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* tmpstream.C, tmpstream.h: New utility.
+	* Makefile (OTHER): Added it.
+	* librarian.h (class Librarian): Use it.
+	* parser_file.C (load_list): Use it.
+	* log_checkpoint.C (done): Use it.
+	* document_LaTeX.C (print_submodel_entry): Use it.
+	* chemicals.C (lookup): Use it.
+	* common.h: No longer provide strstreams.
+
 2000-09-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 1.52 released.
@@ -5,8 +31,7 @@
 2000-09-25  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* lib/log.dai: Merged PvdK changes.
-
-	* svat_pmsw.C: Merged PvdK changes.
+	* svat_pmsw.C: Ditto.
 
 	* library.C, library.h (refile_parsed): New static member function.
 	* qmain.C, qmain.h (file_save_as): New signal.

@@ -3,6 +3,8 @@
 #include "library.h"
 #include "alist.h"
 #include "syntax.h"
+#include "treelog.h"
+#include "tmpstream.h"
 #include <map>
 
 struct Library::Implementation
@@ -24,9 +26,9 @@ struct Library::Implementation
   AttributeList& lookup (const string&) const;
   bool check (const string&) const;
   void add (const string&, AttributeList&, const Syntax&);
-  void remove (const string&);
   const Syntax& syntax (const string&) const;
   void entries (vector<string>&) const;
+  void remove (const string&);
   void clear_parsed ();
   void refile_parsed (const string& from, const string& to);
   static void load_syntax (Syntax&, AttributeList&);
@@ -81,13 +83,6 @@ Library::Implementation::add (const string& key, AttributeList& value,
   syntaxen[key] = &syntax;
 }
 
-void
-Library::Implementation::remove (const string& key)
-{
-  alists.erase (alists.find (key));
-  syntaxen.erase (syntaxen.find (key));
-}
-
 const Syntax& 
 Library::Implementation::syntax (const string& key) const
 { 
@@ -108,6 +103,13 @@ Library::Implementation::entries (vector<string>& result) const
     {
       result.push_back ((*i).first);
     }
+}
+
+void
+Library::Implementation::remove (const string& key)
+{
+  alists.erase (alists.find (key));
+  syntaxen.erase (syntaxen.find (key));
 }
 
 void
@@ -206,10 +208,6 @@ Library::add_derived (const string& name, AttributeList& al,
   impl.derive (name, al, super); 
 }
 
-void
-Library::remove (const string& key)
-{ impl.remove (key); }
-
 const Syntax& 
 Library::syntax (const string& key) const
 { return impl.syntax (key); }
@@ -217,6 +215,137 @@ Library::syntax (const string& key) const
 void
 Library::entries (vector<string>& result) const
 { impl.entries (result); }
+
+bool
+Library::check_dependencies (const string& parameterization,
+			     Treelog& treelog) const
+{
+  bool found = false;
+
+  vector<string> components;
+  Library::all (components);
+  for (unsigned int i = 0; i < components.size (); i++)
+    {
+      const string& component = components[i];
+      const Library& library = Library::find (component);
+      Treelog::Open nest (treelog, component);
+
+      vector<string> models;
+      library.entries (models);
+      for (unsigned int i = 0; i < models.size (); i++)
+	{
+	  const string& model = models[i];
+	  Treelog::Open nest (treelog, model);
+
+	  const Syntax& syntax = library.syntax (model);
+	  const AttributeList& alist = library.lookup (model);
+	  
+	  if (&library == this
+	      && alist.check ("type") 
+	      && alist.name ("type") == parameterization)
+	    { 
+	      treelog.entry (parameterization + " inherited by " + model);
+	      found = true;
+	      library.check_dependencies (model, treelog);
+	    }
+	  else if (check_dependencies (parameterization,
+				       syntax, alist, treelog))
+	    {
+	      treelog.entry (parameterization + " used in " + model);
+	      found = true;
+	      library.check_dependencies (model, treelog);
+	    }
+	}
+    }
+  return found;
+}
+
+bool
+Library::check_dependencies (const string& parameterization,
+			     const Syntax& syntax, const AttributeList& alist,
+			     Treelog& treelog) const
+{
+  bool found = false;
+
+  vector<string> parameters;
+  syntax.entries (parameters);
+  for (unsigned int i = 0; i < parameters.size (); i++)
+    {
+      const string& parameter = parameters[i];
+      // No value, nothing to check.
+      if (!alist.check (parameter))
+	continue;
+
+      Syntax::type type = syntax.lookup (parameter);
+      int size = syntax.size (parameter);
+
+      if (type == Syntax::Object || type == Syntax::AList)
+	{
+	  if (size == Syntax::Singleton)
+	    {
+	      Treelog::Open nest (treelog, parameter);
+	      const AttributeList& nested_alist = alist.alist (parameter);
+	      const Syntax& nested_syntax 
+		= (type == Syntax::Object)
+		? (syntax.library (parameter).syntax 
+		   (nested_alist.name ("type")))
+		: syntax.syntax (parameter);
+	      if (type == Syntax::Object
+		  && &syntax.library (parameter) == this
+		  && nested_alist.name ("type") == parameterization)
+		{
+		  treelog.entry (parameter + " inherits from " 
+				 + parameterization);
+		  found = true;
+		}
+	      else if (check_dependencies (parameterization, 
+					   nested_syntax, nested_alist,
+					   treelog))
+		found = true;
+	    }
+	  else
+	    {
+	      vector<AttributeList*> alists = alist.alist_sequence (parameter);
+	      for (unsigned int i = 0; i < alists.size (); i++)
+		{
+		  const AttributeList& nested_alist = *alists[i];
+		  const Syntax& nested_syntax 
+		    = (type == Syntax::Object)
+		    ? (syntax.library (parameter).syntax 
+		       (nested_alist.name ("type")))
+		    : syntax.syntax (parameter);
+	    
+		  TmpStream str;
+		  str () << parameter << "[" << i << "]";
+		  
+		  if (type == Syntax::Object)
+		    str () << " (" << nested_alist.name ("type") << ")";
+		  Treelog::Open nest (treelog, str.str ());
+		  
+		  if (type == Syntax::Object
+		      && &syntax.library (parameter) == this
+		      && nested_alist.name ("type") == parameterization)
+		    {
+		      TmpStream text;
+		      text () << str.str () << " inherits from "
+			      << parameterization;
+		      treelog.entry (text.str ());
+		      found = true;
+		    }
+		  else if (check_dependencies (parameterization, 
+					       nested_syntax, nested_alist,
+					       treelog))
+		    found = true;
+		}
+	    }
+	}
+    }
+  return found;
+}
+
+void
+Library::remove (const string& key)
+{ impl.remove (key); }
 
 void 
 Library::clear_all_parsed ()

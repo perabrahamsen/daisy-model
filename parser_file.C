@@ -5,7 +5,7 @@
 #include "plf.h"
 #include "time.h"
 #include "log.h"
-
+#include "tmpstream.h"
 
 struct ParserFile::Implementation
 {
@@ -489,12 +489,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		if (size != Syntax::Sequence 
 		    && (int) sequence.size () != size)
 		  {
-		    ostrstream str;
-		    str << "Got " << sequence.size ()
-			<< " array members, expected " << size << '\0';
-		    const char* s = str.str ();
-		    error (s);
-		    delete [] s;
+		    TmpStream str;
+		    str () << "Got " << sequence.size ()
+			   << " array members, expected " << size;
+		    error (str.str ());
 		  }
 		atts.add (name, sequence);
 		sequence_delete (sequence.begin (), sequence.end ());
@@ -531,12 +529,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {
-		    ostrstream str;
-		    str << "Got " << count 
-			<< " array members, expected " << size << '\0';
-		    const char* s = str.str ();
-		    error (s);
-		    delete [] s;
+		    TmpStream str;
+		    str () << "Got " << count 
+			   << " array members, expected " << size;
+		    error (str.str ());
 
 		    for (;count < size; count++)
 		      array.push_back (-1.0);
@@ -557,12 +553,10 @@ ParserFile::Implementation::load_list (AttributeList& atts,
 		  }
 		if (size != Syntax::Sequence && count != size)
 		  {
-		    ostrstream str;
-		    str << "Got " << count 
-			<< " array members, expected " << size << '\0';
-		    const char* s = str.str ();
-		    error (s);
-		    delete [] s;
+		    TmpStream str;
+		    str () << "Got " << count 
+			   << " array members, expected " << size;
+		    error (str.str ());
 
 		    for (;count < size; count++)
 		      array.push_back ("<error>");

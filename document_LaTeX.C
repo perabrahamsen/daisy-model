@@ -3,6 +3,7 @@
 #include "document.h"
 #include "time.h"
 #include "plf.h"
+#include "tmpstream.h"
 #include "version.h"
 #include <ctype.h>
 #include <time.h>
@@ -348,10 +349,10 @@ DocumentLaTeX::print_entry_value (ostream& out,
 	    break;
 	  case Syntax::AList:
 	    {
-	      ostrstream tmp;
+	      TmpStream dummy_stream;
 	      const bool has_errors
 		= !syntax.syntax (name).check (alist.alist (name), 
-					       tmp, name);
+					       dummy_stream (), name);
 	      if (has_errors)
 		out << " (has partially specified default value)";
 	      else 

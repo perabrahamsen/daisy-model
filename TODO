@@ -2,13 +2,38 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 * QDaisy.
 
-** Feedback during menu -> file -> new/open/save/save_as ...
+** Tree
 
-** Menu -> Edit -> Raw (Parameter)
+*** show alist and object sequences
 
-** Menu -> View -> *
+*** show object content in tree when different from superclass
 
-** Menu -> Edit -> Raw (Model)
+*** command to show all object content in tree for specific object
+
+*** show object superclass in library -> model
+
+*** show number of parametrizations in library
+
+*** shorten filenames.
+
+** Treelog_Qt
+
+** Menu -> Edit -> Delete
+
+*** Library::undepend_dependencies (lib, model)
+
+For alle alister hvor "type" == "model"
+   Sæt "type" til "model".type
+
+Hydr.  Simulationen vil fortsat kunne køre!
+
+** Menu -> Edit -> Parameters
+
+** Library::resequence_with_dependencies (lib, model)
+
+Giv model nyt sequence number
+
+Giv alt der afhænger af model nyt sequence number (rekursivt).
 
 ** Menu -> Edit -> Copy
 
@@ -18,15 +43,13 @@ TODO --- things that needs done with Daisy -*- outline -*-
 
 ** Specialiced model view.
 
-** Menu -> Edit -> Inherit
+** View model as text.
 
-** Menu -> Edit -> Delete
+** Menu -> Edit -> Inherit
 
 ** Menu -> File -> Run
 
 Maybe show events in tree, like BCC?
-
-** Alle andre views.
 
 ** Interest groups
 
@@ -40,11 +63,15 @@ view og loading files.
 
 ** Make drag and drop and "qdaisy file" work.
 
-** Use "parsed_sequence" for dependency tracking.
+** Use radio buttons for filters in menu.
+
+** Move Filters from QDaisy to Daisy.
 
 ** Redirect error messages
 
 for weather std, file, hourly, and for hydraulic old, old2
+
+** Convert Syntax::check og Daisy::check to use Treelog.
 
 ** Beskriv fordele ved min GUI implementation.
 
