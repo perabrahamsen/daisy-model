@@ -25,6 +25,7 @@ struct LogEntry
   const double from;		// Restrict interval of array.
   const double to;
   const double at;		// Specific position in array.
+  const bool accumulate;	// Accumulate numbers over time.
 
   // Permanent state.
   double value;		// Total accumulated value.
@@ -188,7 +189,8 @@ struct LogEntry
       else
 	out << (value * factor + offset);
 
-      value = 0.0;
+      if (!accumulate)
+	value = 0.0;
       count = 0;
       error = false;
     }
@@ -205,6 +207,7 @@ struct LogEntry
       from (al.number ("from")),
       to (al.number ("to")),
       at (al.number ("at")),
+      accumulate (al.flag ("accumulate")),
       value (al.number ("value")),
       count (al.integer ("count")),
       error (false),
@@ -419,6 +422,8 @@ static struct LogTableSyntax
       entry_alist.add ("to", 1.0);
       entry_syntax.add ("at", Syntax::Number, Syntax::Const);
       entry_alist.add ("at", 1.0);
+      entry_syntax.add ("accumulate", Syntax::Boolean, Syntax::Const);
+      entry_alist.add ("accumulate", false);
       entry_syntax.add ("value", Syntax::Number, Syntax::State);
       entry_alist.add ("value", 0.0);
       entry_syntax.add ("count", Syntax::Integer, Syntax::State);

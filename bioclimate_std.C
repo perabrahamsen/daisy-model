@@ -257,7 +257,7 @@ BioclimateStandard::WaterDistribution (Surface& surface,
     = min (WaterFromAbove + intercepted_water / dt, PotCanopyEvapotranspiration);
   PotCanopyEvapotranspiration -= EvapInterception;
 
-  const double Through_fall = WaterFromAbove - EvapInterception
+  double Through_fall = WaterFromAbove - EvapInterception
     - min (WaterFromAbove - EvapInterception, 
 	   InterceptionCapacity - intercepted_water);
 

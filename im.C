@@ -103,7 +103,7 @@ static double IM_get_NH4 (const AttributeList& al)
 	* 0.1;			// kg / m² --> g / cm²
       const double N = weight * al.number ("total_N_fraction");
 
-      IM im (al.alist ("im"));
+      IM im (al.alist ("im"));	// This extract NH4 evaporation.
       
       return N * im.NH4;
     }

@@ -24,8 +24,7 @@ public:
   { return horizon_[i]->hydraulic.K (h); }
   inline double Cw1 (int i, double h) const
   { return Theta (i, h) - Cw2 (i, h) * h; }
-  inline double Cw2 (int i, double h) const
-  { return horizon_[i]->hydraulic.Cw2 (h); }
+  double Cw2 (int i, double h) const;
   inline double Theta (int i, double h) const
   { return horizon_[i]->hydraulic.Theta (h); }
   inline double Theta_res (int i) const

@@ -8,6 +8,16 @@
 #include <iomanip.h>
 
 double
+Soil::Cw2 (int i, double h) const
+{ 
+  const double answer = horizon_[i]->hydraulic.Cw2 (h); 
+  if (answer > 0.0)
+    return answer;
+  // We divide with this.
+  return 1.0e-8;
+}
+
+double
 Soil::MaxRootingDepth () const
 {
   return max (-MaxRootingDepth_, z (size () - 1));

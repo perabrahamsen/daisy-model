@@ -48,7 +48,7 @@ HydraulicYolo::Cw2 (const double h) const
     return - (  (-4 * 274.2 * pow (log (-h), 3))
 	      / (-h * pow (739.0 + pow (log (-h), 4), 2)));
   else
-    return 0.0;
+    return 1.0e-8;
 }
 
 double 

@@ -310,7 +310,7 @@ struct CropOld::Variables
     double LogCanopyAss;	// over the day.  This is last days total.
     double IncWLeaf;	// Leaf growth [g DM/m2/d]
     double IncWRoot;	// Root growth [g DM/m2/d]
-    // double H2OUpt;		// H2O uptake [mm/h]
+    double H2OUpt;		// H2O uptake [mm/h]
     double NH4Upt;		// NH4-N uptake [g/m2/h]
     double NO3Upt;		// NO3-N uptake [g/m2/h]
     double Fixated;		// N fixation from air. [g/m2/h]
@@ -563,7 +563,7 @@ CropOld::Variables::RecCrpAux::RecCrpAux (const Parameters& par,
     LogCanopyAss (0.0),
     IncWLeaf (0.0),
     IncWRoot (0.0),
-    // H2OUpt (vl.number ("H2OUpt")),
+    H2OUpt (vl.number ("H2OUpt")),
     NH4Upt (0.0),
     NO3Upt (0.0),
     Fixated (0.0)
@@ -585,7 +585,7 @@ CropOld::Variables::RecCrpAux::output (Log& log, Filter& filter) const
   log.output ("LogCanopyAss", filter, LogCanopyAss, true);
   log.output ("IncWLeaf", filter, IncWLeaf, true);
   log.output ("IncWRoot", filter, IncWRoot, true);
-  // log.output ("H2OUpt", filter, H2OUpt);
+  log.output ("H2OUpt", filter, H2OUpt, true);
   log.output ("NH4Upt", filter, NH4Upt, true);
   log.output ("NO3Upt", filter, NO3Upt, true);
   log.output ("Fixated", filter, Fixated, true);
@@ -853,8 +853,8 @@ CropOldSyntax::CropOldSyntax ()
   CrpAux.add ("LogCanopyAss", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWLeaf", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("IncWRoot", Syntax::Number, Syntax::LogOnly);
-  // CrpAux.add ("H2OUpt", Syntax::Number, Syntax::State);
-  // vCrpAux.add ("H2OUpt", 0.0);
+  CrpAux.add ("H2OUpt", Syntax::Number, Syntax::State);
+  vCrpAux.add ("H2OUpt", 0.0);
   CrpAux.add ("NH4Upt", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("NO3Upt", Syntax::Number, Syntax::LogOnly);
   CrpAux.add ("Fixated", Syntax::Number, Syntax::LogOnly);
@@ -1297,6 +1297,8 @@ CropOld::ActualWaterUptake (double Ept,
     }
   // Update soil water sink term.
   soil_water.add_to_sink (H2OExtraction);
+  var.CrpAux.H2OUpt = total;
+
   // Update water stress factor
   if (Ept >= 0.010)
     {
@@ -1326,9 +1328,11 @@ CropOld::PotentialWaterUptake (const double h_x,
   for (unsigned int i = 0; i < soil.size () && L[i] > 0.0; i++)
     {
       const double h = h_x - (1 + Rxylem) * soil.z (i);
-      const double uptake = max (L[i] * (soil.Theta (i, h) / soil.Theta (i, 0.0))
-				      * (soil.M (i, soil_water.h (i)) - soil.M (i, h))
-                                      / (- 0.5 * log (area * L[i])),
+      const double uptake = max (2 * M_PI * L[i] 
+				 * (soil.Theta (i, h) / soil.Theta (i, 0.0))
+				 * (soil.M (i, soil_water.h (i)) 
+				    - soil.M (i, h))
+				 / (- 0.5 * log (area * L[i])),
                                  0.0);
       assert (L[i] >= 0.0);
       assert (soil.Theta (i, h) > 0.0);

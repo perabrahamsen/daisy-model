@@ -76,7 +76,7 @@ double
 Hydraulic_mod_C::M (double h) const
 {
   if (h < 0.0)
-    return K_sat * (-h_b / (1 + 3 * b)) * pow (h_b / h, 1 + 3 * b);
+    return K_sat * (-h_b / (1 + 3 / b)) * pow (h_b / h, 1 + 3 / b);
   else
     return K_sat * h;
 }

@@ -53,30 +53,23 @@ main (int argc, char* argv[])
 
     while (daisy_daisy_is_running (daisy))
       {
-	daisy_daisy_tick_action (daisy);
-	daisy_daisy_tick_weather (daisy);
-	
-	for (i = 0; i < columns; i++)
-	  {
-	    daisy_column* column = daisy_daisy_get_column (daisy, i);
+        daisy_daisy_tick_action (daisy);
+        daisy_daisy_tick_weather (daisy);
+        
+        for (i = 0; i < columns; i++)
+          {
+            /* daisy_column* column = daisy_daisy_get_column (daisy, i); */
+            daisy_daisy_tick_column (daisy, i);
+          }
 
-	    daisy_weather_put_precipitation (weather, 5.0);
+        daisy_daisy_tick_logs (daisy);
+        daisy_daisy_tick_time (daisy);
 
-	    /* daisy_column* column = daisy_daisy_get_column (daisy, i); */
-	    daisy_daisy_tick_column (daisy, i);
-
-	    fprintf (stdout, "%d: %g\n", i, 
-		     daisy_column_get_net_precipitation (column));
-	    
-	  }
-
-	daisy_daisy_tick_logs (daisy);
-	daisy_daisy_tick_time (daisy);
-	if (daisy_time_get_hour (time) == 0)
-	  printf ("%04d-%02d-%02d.\n", 
-		  daisy_time_get_year (time),
-		  daisy_time_get_month (time),
-		  daisy_time_get_mday (time));
+        if (daisy_time_get_hour (time) == 0)
+          printf ("%04d-%02d-%02d.\n", 
+                  daisy_time_get_year (time),
+                  daisy_time_get_month (time),
+                  daisy_time_get_mday (time));
       }
     printf ("Simulation end.\n");
   }

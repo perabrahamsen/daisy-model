@@ -1,3 +1,21 @@
+1998-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.024 released.
+
+1998-05-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log_table.C (struct LogEntry): New flag `accumulate'.
+
+	* hydraulic_mod_C.C (M): Divide by b instead of multiplying by b.
+
+	* soil.C (Cw2): Don't return 0, return a very small
+	number instead.
+
+	* crop_old.C: Add `H2OUpt' log parameter.
+	(PotentialWaterUptake): Multiply with 2 pi.
+	* crop_std.C (PotentialWaterUptake): Multiply with 2 pi.
+	* crop_sold.C (PotentialWaterUptake):  Multiply with 2 pi.
+
 1998-05-13  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 0.023 released.
