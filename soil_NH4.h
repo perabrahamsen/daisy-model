@@ -11,6 +11,8 @@ public:
   // Substance specific constants.
   double diffusion_coefficient () const; // in free solu. [cm² / h]
 
+private:
+  void default_initialize (const Soil& soil, const SoilWater&);
 public:
   static void load_syntax (Syntax&, AttributeList&);
   SoilNH4 (const AttributeList&);

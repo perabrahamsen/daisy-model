@@ -286,7 +286,7 @@ HEADERS = $(INTERFACES:.C=.h) version.h
 
 # Find all printable files.
 #
-TEXT =  Makefile ChangeLog TODO $(HEADERS) $(SOURCES) tlink32.ini
+TEXT =  Makefile ChangeLog TODO NEWS $(HEADERS) $(SOURCES) tlink32.ini
 
 # The executables.
 #
@@ -454,7 +454,7 @@ daisy-src.zip:	$(TEXT)
 # Move it to ftp.
 #
 dist:	cvs
-	cp cdaisy.h cmain.c /home/ftp/pub/daisy
+	cp cdaisy.h cmain.c ChangeLog NEWS /home/ftp/pub/daisy
 	$(MAKE) daisy-src.zip
 	mv -f daisy-src.zip /home/ftp/pub/daisy
 	(cd lib; $(MAKE) dist)

@@ -1,12 +1,12 @@
+* Omdøb top irrigation til overhead irrigation.
+
+* Gød efter hvor meget N der mangler i jorden.
+
+* Incorporering af vand (irrigate_subsoil).
+
 * Test Cygwin compile, specielt høst resultat.
 
 * Test Qt.
-
-* Management:
-
-** Gød efter hvor meget N der mangler i jorden 
-
-** Gød efter hvor meget DM der er høstet fra jorden
 
 * Daisy new user guide.
 

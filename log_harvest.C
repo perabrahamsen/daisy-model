@@ -168,7 +168,7 @@ static struct LogHarvestSyntax
       alist.add ("description", "Create a log of all harvests.");
       syntax.add ("where", Syntax::String, Syntax::Const,
 		  "Name of the log file to create.");
-      alist.add ("where", "harvest.tab");
+      alist.add ("where", "harvest.dlf");
       syntax.add ("print_header", Syntax::Boolean, Syntax::Const,
 		  "Print header section of the file.");
       alist.add ("print_header", true);

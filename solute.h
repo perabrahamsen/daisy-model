@@ -74,6 +74,8 @@ public:
 protected:
   static void load_syntax (Syntax&, AttributeList&);
   Solute (const AttributeList& al);
+private:
+  virtual void default_initialize (const Soil& soil, const SoilWater&);
 public:
   virtual void initialize (const AttributeList&,
 			   const Soil&, const SoilWater&);

@@ -209,6 +209,12 @@ Solute::put_M (const Soil& soil, const SoilWater& soil_water,
     C_[i] = M_to_C (soil, soil_water.Theta (i), i, M_[i]);
 }
 
+void 
+Solute::default_initialize (const Soil& soil, const SoilWater&)
+{ 
+  C_.insert (C_.begin (), soil.size (), 0.0);
+}
+
 void
 Solute::initialize (const AttributeList& al, 
 		    const Soil& soil, const SoilWater& soil_water)
@@ -272,8 +278,7 @@ Solute::initialize (const AttributeList& al,
 	}
       if (M_.size () == 0 && C_.size () == 0)
 	{
-	  C_.insert (C_.begin (), soil.size (), 0.0);
-	  M_.insert (M_.begin (), soil.size (), 0.0);
+	  default_initialize (soil, soil_water);
 	}
     }
   for (unsigned int i = C_.size (); i < M_.size (); i++)
