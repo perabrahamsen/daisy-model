@@ -49,6 +49,8 @@ public:
   // Simulation.
   bool check (Log& log) const;
 
+  // Creation.
+  static const Syntax& parameter_syntax ();
   Soil (const AttributeList&);
   ~Soil ();
 };

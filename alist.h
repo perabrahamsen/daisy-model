@@ -3,18 +3,23 @@
 #ifndef ALIST_H
 #define ALIST_H
 
-#include "daisy.h"
-#include "time.h"
+#include "common.h"
+
 #include <std/stdexcept.h>
+#include <std/string.h>
 #include <vector.h>
 #include <list.h>
 
+struct Time;
 struct Rules;
 struct CSMP;
-struct HorizonList;
 struct AttributeList;
 
-typedef list <const AttributeList*> Sequence;
+class Sequence : public list <const AttributeList*>
+{ };
+
+class Layers : public list <pair <double, const AttributeList*> >
+{ };
 
 class AttributeList
 {
@@ -56,25 +61,18 @@ public:
        throw2 (Invalid, Uninitialized);
   const AttributeList& list (string) const
        throw2 (Invalid, Uninitialized);
-  CropList& crops (string) const
-       throw2 (Invalid, Uninitialized);
-  ColumnList& columns (string) const
-       throw2 (Invalid, Uninitialized);
-  HorizonList& horizons (string) const
-       throw2 (Invalid, Uninitialized);
   int integer (string) const
        throw2 (Invalid, Uninitialized);
   const Time& time (string) const
        throw2 (Invalid, Uninitialized);
   const Sequence& sequence (string) const
        throw2 (Invalid, Uninitialized);
+  const Layers& layers (string) const
+       throw2 (Invalid, Uninitialized);
        
     // Create and Destroy.
   void add (string, double);
-  void add (string, CropList*);
-  void add (string, ColumnList*);
-  void add (string, HorizonList*);
-  void add (string, const AttributeList*);
+  void add (string, const AttributeList&);
   void add (string, const Rules*);
   void add (string, const CSMP*);
   void add (string, string);
@@ -83,6 +81,7 @@ public:
   void add (string, int);
   void add (string, const Time&);
   void add (string, const Sequence&);
+  void add (string, const Layers&);
 
   AttributeList (const AttributeList& old);
   AttributeList ();

@@ -2,6 +2,7 @@
 
 #include "column.h"
 #include "library.h"
+#include "alist.h"
 #include <map.h>
 
 static Library* Column_par_library = NULL;
@@ -48,8 +49,9 @@ Column::derive_type (string name, const AttributeList& al, string super)
 }
 
 Column*
-Column::create (const string name, const AttributeList& var)
+Column::create (const AttributeList& var)
 {
+  string name = var.name ("type");
   assert (par_library ().check (name));
   return (*Column_constructors)[name]
     (name, par_library ().lookup (name), var);
@@ -61,6 +63,20 @@ Column::Column (string n)
 
 Column::~Column ()
 { }
+
+ColumnList::ColumnList (const Sequence& sequence)
+{
+  for (Sequence::const_iterator i = sequence.begin ();
+       i != sequence.end ();
+       i++)
+    push_back (Column::create (**i));
+}
+
+ColumnList::~ColumnList ()
+{
+  for (const_iterator i = begin (); i != end (); i++)
+    delete *i;
+}
 
 int Column_init::count;
 

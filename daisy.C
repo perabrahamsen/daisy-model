@@ -92,6 +92,7 @@ Daisy::~Daisy ()
   delete &manager;
   delete &weather;
   delete &log;
+  delete &time;
   delete &impl;
   for (ColumnList::iterator column = columns.begin();
        column != columns.end();

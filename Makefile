@@ -9,7 +9,7 @@ OBJ = main.o daisy.o input.o log.o weather.o manager.o column.o crop.o \
 	soil_NH4.o soil_NO3.o organic_matter.o nitrification.o \
 	denitrification.o soil_heat.o groundwater.o uzrichard.o \
 	horizon_yolo.o crop_std.o manager_rule.o weather_simple.o \
-	groundwater_static.o
+	groundwater_static.o common.o
 SRC = $(OBJ:.o=.C)
 HEAD = $(OBJ:.o=.h)
 TEST = crop.dai old_crop.chp old_crop.log \

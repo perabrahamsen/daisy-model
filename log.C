@@ -4,6 +4,7 @@
 #include "condition.h"
 #include "filter.h"
 #include "csmp.h"
+#include "daisy.h"
 #include <list.h>
 #include <fstream.h>
 #include <strstream.h>

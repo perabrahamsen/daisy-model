@@ -4,12 +4,14 @@
 #define CROP_H
 
 #include <std/string.h>
+#include <list.h>
 
 struct Log;
 struct Filter;
 struct Time;
 struct Column;
 struct AttributeList;
+struct Sequence;
 struct Bioclimate;
 struct CSMP;
 struct Library;
@@ -48,13 +50,20 @@ public:
 			const AttributeList& varList, const Syntax& varSyntax,
 			constructor);
   static void derive_type (string name, const AttributeList& par, string super);
-  static Crop* create (string, const AttributeList& var);
+  static Crop* create (const AttributeList& var);
 
   // Create and Destroy.
 protected:
   Crop (const string);
 public:
   virtual ~Crop ();
+};
+
+class CropList : public list <Crop*> 
+{ 
+public:
+  CropList (const Sequence&);
+  ~CropList ();
 };
 
 // Ensure the Crop library is initialized.

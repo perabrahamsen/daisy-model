@@ -19,8 +19,7 @@ class Syntax
 public:
   enum type 
   { Number, List, Rules, CSMP, Function, Array, Boolean, String,
-    Date, Crops, Columns, Integer, Soil, UZmodel, 
-    Class, Object, Sequence, Error };
+    Date, Integer, Output, Class, Object, Sequence, Layers, Error };
   enum required
   { Mandatory, Sparse, Optional, LogOnly };
   bool check (string, const AttributeList&, const Log&, 
@@ -33,12 +32,14 @@ public:
   derive_fun derive (string) const;
   int  size (string) const;
   void add (string, type, required = Mandatory);
-  void add (string, const Syntax*, required = Mandatory);
+  void add (string, const Syntax&, required = Mandatory);
   void add (string, const FTable*, required = Mandatory);
   void add (string, const int, required = Mandatory);
+  void add_output (string, const Syntax&, required = Sparse);
   void add_class (string, const Library&, derive_fun);
   void add_object (string, const Library&, required = Mandatory);
   void add_sequence (string, const Library&, required = Mandatory);
+  void add_layers (string, const Library&, required = Mandatory);
   Syntax ();
   ~Syntax ();
 };

@@ -3,7 +3,12 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include "daisy.h"
+#include <std/string.h>
+
+struct ColumnList;
+struct Weather;
+struct Log;
+struct AttributeList;
 
 class Action
 {
@@ -19,10 +24,10 @@ public:
 
 class ActionSow : public Action
 {
-    const string crop;
+    const AttributeList& crop;
 public:
     void doIt (ColumnList&, const Weather&, Log&) const;
-    ActionSow (string);
+    ActionSow (const AttributeList&);
 };
 
 class ActionStop : public Action

@@ -129,10 +129,10 @@ Syntax::add (string key, type t, required req)
 }
 
 void
-Syntax::add (string key, const Syntax* s, required req)
+Syntax::add (string key, const Syntax& s, required req)
 {
   add (key, List, req);
-  impl.syntax[key] = s;
+  impl.syntax[key] = &s;
 }
 
 void
@@ -148,6 +148,13 @@ Syntax::add (string key, int s, required req)
   add (key, Array, req);
   impl.size[key] = s;
 }
+
+void
+Syntax::add_output (string key, const Syntax& s, required req)
+{
+  add (key, Output, req);
+  impl.syntax[key] = &s;
+}  
 
 void 
 Syntax::add_class (string key, const Library& l, derive_fun fun)
@@ -168,6 +175,13 @@ void
 Syntax::add_sequence (string key, const Library& l, required req)
 {
   add (key, Sequence, req);
+  impl.libraries[key] = &l;
+}
+
+void 
+Syntax::add_layers (string key, const Library& l, required req)
+{
+  add (key, Layers, req);
   impl.libraries[key] = &l;
 }
 

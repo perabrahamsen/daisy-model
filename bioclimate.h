@@ -3,12 +3,13 @@
 #ifndef BIOCLIMATE_H
 #define BIOCLIMATE_H
 
-#include "daisy.h"
+#include <std/string.h>
 #include <vector.h>
 
 struct Surface;
 struct Weather;
 struct AttributeList;
+struct CropList;
 
 class Bioclimate
 { 

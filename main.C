@@ -3,6 +3,8 @@
 #include "daisy.h"
 #include "input.h"
 
+#include <iostream.h>
+
 int 
 main (int argc, char* argv[])
 {

@@ -4,6 +4,7 @@
 #define COLUMN_H
 
 #include <std/string.h>
+#include <list.h>
 
 class Library;
 class Filter;
@@ -12,6 +13,7 @@ class Log;
 class Weather;
 class Groundwater;
 class AttributeList;
+class Sequence;
 class Syntax;
 
 class Column
@@ -21,7 +23,7 @@ public:
 
   // Actions.
 public:
-  virtual void sow (string crop, Log&) = 0;
+  virtual void sow (const AttributeList& crop, Log&) = 0;
 
   virtual bool check (Log&) const = 0;
   virtual void output (Log&, const Filter*) const = 0;
@@ -44,14 +46,21 @@ public:
 			const AttributeList& parList, const Syntax& parSyntax,
 			const AttributeList& varList, const Syntax& varSyntax,
 			constructor);
-  static void derive_type (string name, const AttributeList& par, string super);
-  static Column* create (string, const AttributeList& var);
+  static void derive_type (string name, const AttributeList&, string super);
+  static Column* create (const AttributeList& var);
 
   // Create and Destroy.
 protected:
   Column (string name);
 public:
   virtual ~Column ();
+};
+
+class ColumnList : public list <Column*>
+{ 
+public:
+  ColumnList (const Sequence&);
+  ~ColumnList ();
 };
 
 // Ensure the Column library is initialized.

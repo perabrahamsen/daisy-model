@@ -9,19 +9,9 @@
 #include "crop.h"
 
 void
-ColumnStandard::sow (string crop, Log& log)
+ColumnStandard::sow (const AttributeList& crop, Log&)
 {
-  if (Crop::par_library ().check (crop))
-    {
-      const AttributeList& values = Crop::var_library ().lookup (crop);
-	
-      if (Crop::var_library ().syntax (crop).check (crop, values, log))
-	crops.push_back (Crop::create (crop, values));
-      else
-	cerr << "Cannot sow incomplete crop `" << crop << "'\n";
-    }
-  else
-    cerr << "Cannot sow unknow crop `" << crop << "'\n";
+  crops.push_back (Crop::create (crop));
 }
 
 bool
@@ -109,6 +99,7 @@ ColumnStandard::ColumnStandard (string n,
 				const AttributeList& par, 
 				const AttributeList& var)
   : Column (n),
+    crops (var.sequence ("crops")),
     bioclimate (par.list ("Bioclimate"), var.list ("Bioclimate")),
     surface (par.list ("Surface"), var.list ("Surface")),
     soil (par.list ("Soil")),
@@ -120,9 +111,7 @@ ColumnStandard::ColumnStandard (string n,
     nitrification (par.list ("Nitrification"), var.list ("Nitrification")),
     denitrification (par.list ("Denitrification"), 
 		     var.list ("Denitrification"))
-{ 
-  // Crops.
-}
+{ }
 
 ColumnStandard::~ColumnStandard ()
 { }
@@ -154,60 +143,57 @@ ColumnStandardSyntax::ColumnStandardSyntax ()
 const Syntax&
 ColumnStandardSyntax::parameters ()
 { 
-  Syntax* par = new Syntax ();
+  Syntax& par = *new Syntax ();
 
-  Syntax* bioclimate = new Syntax ();
-  bioclimate->add ("NoOfIntervals", Syntax::Integer);
-  par->add ("Bioclimate", bioclimate);
-  Syntax* surface = new Syntax ();
-  par->add ("Surface", surface);
-  Syntax* soil = new Syntax ();
-  soil->add ("horizons", Syntax::Soil);
-  soil->add ("zplus", Syntax::Array);
-  par->add ("Soil", soil);
-  par->add ("SoilWater", &SoilWater::parameter_syntax ());
-  Syntax* soil_heat = new Syntax ();
-  par->add ("SoilHeat", soil_heat);
-  Syntax* soil_NH4 = new Syntax ();
-  par->add ("SoilNH4", soil_NH4);
-  Syntax* soil_NO3 = new Syntax ();
-  par->add ("SoilNO3", soil_NO3);
-  Syntax* organic_matter = new Syntax ();
-  par->add ("OrganicMatter", organic_matter);
-  Syntax* nitrification = new Syntax ();
-  par->add ("Nitrification", nitrification);
-  Syntax* denitrification = new Syntax ();
-  par->add ("Denitrification", denitrification);
+  par.add_sequence ("crops", Crop::par_library ());
+  Syntax& bioclimate = *new Syntax ();
+  bioclimate.add ("NoOfIntervals", Syntax::Integer);
+  par.add ("Bioclimate", bioclimate);
+  Syntax& surface = *new Syntax ();
+  par.add ("Surface", surface);
+  par.add ("Soil", Soil::parameter_syntax ());
+  par.add ("SoilWater", SoilWater::parameter_syntax ());
+  Syntax& soil_heat = *new Syntax ();
+  par.add ("SoilHeat", soil_heat);
+  Syntax& soil_NH4 = *new Syntax ();
+  par.add ("SoilNH4", soil_NH4);
+  Syntax& soil_NO3 = *new Syntax ();
+  par.add ("SoilNO3", soil_NO3);
+  Syntax& organic_matter = *new Syntax ();
+  par.add ("OrganicMatter", organic_matter);
+  Syntax& nitrification = *new Syntax ();
+  par.add ("Nitrification", nitrification);
+  Syntax& denitrification = *new Syntax ();
+  par.add ("Denitrification", denitrification);
 
-  return *par;
+  return par;
 }
 
 const Syntax&
 ColumnStandardSyntax::variables ()
 { 
-  Syntax* var = new Syntax ();
+  Syntax& var = *new Syntax ();
+  var.add_sequence ("crops", Crop::var_library ());
+  Syntax& bioclimate = *new Syntax ();
+  var.add ("Bioclimate", bioclimate);
+  Syntax& surface = *new Syntax ();
+  var.add ("Surface", surface);
+  Syntax& soil = *new Syntax ();
+  var.add ("Soil", soil);
+  var.add ("SoilWater", SoilWater::variable_syntax ());
+  Syntax& soil_heat = *new Syntax ();
+  soil_heat.add ("T", Syntax::Array);
+  var.add ("SoilHeat", soil_heat);
+  Syntax& soil_NH4 = *new Syntax ();
+  var.add ("SoilNH4", soil_NH4);
+  Syntax& soil_NO3 = *new Syntax ();
+  var.add ("SoilNO3", soil_NO3);
+  Syntax& organic_matter = *new Syntax ();
+  var.add ("OrganicMatter", organic_matter);
+  Syntax& nitrification = *new Syntax ();
+  var.add ("Nitrification", nitrification);
+  Syntax& denitrification = *new Syntax ();
+  var.add ("Denitrification", denitrification);
 
-  Syntax* bioclimate = new Syntax ();
-  var->add ("Bioclimate", bioclimate);
-  Syntax* surface = new Syntax ();
-  var->add ("Surface", surface);
-  Syntax* soil = new Syntax ();
-  var->add ("Soil", soil);
-  var->add ("SoilWater", &SoilWater::variable_syntax ());
-  Syntax* soil_heat = new Syntax ();
-  soil_heat->add ("T", Syntax::Array);
-  var->add ("SoilHeat", soil_heat);
-  Syntax* soil_NH4 = new Syntax ();
-  var->add ("SoilNH4", soil_NH4);
-  Syntax* soil_NO3 = new Syntax ();
-  var->add ("SoilNO3", soil_NO3);
-  Syntax* organic_matter = new Syntax ();
-  var->add ("OrganicMatter", organic_matter);
-  Syntax* nitrification = new Syntax ();
-  var->add ("Nitrification", nitrification);
-  Syntax* denitrification = new Syntax ();
-  var->add ("Denitrification", denitrification);
-  var->add ("crops", Syntax::Crops);
-
-  return *var;
+  return var;
 }

@@ -360,34 +360,34 @@ CropStandardSyntax::CropStandardSyntax ()
   static const CSMP empty_csmp;
 
   // CropPar
-  Syntax* parSyntax = new Syntax ();
-  AttributeList* parList = new AttributeList ();
+  Syntax& parSyntax = *new Syntax ();
+  AttributeList& parList = *new AttributeList ();
   {
     // DevelPar
     CropStandard::Parameters::DevelPar::models.add("m1", &devel_m1);
     CropStandard::Parameters::DevelPar::models.add("m2", &devel_m2);
     CropStandard::Parameters::DevelPar::models.add("m3", &devel_m3);
-    Syntax* Devel = new Syntax ();
-    parSyntax->add ("Devel", Devel);
+    Syntax& Devel = *new Syntax ();
+    parSyntax.add ("Devel", Devel);
 
-    Devel->add ("Model", &CropStandard::Parameters::DevelPar::models);
-    Devel->add ("EmrTSum", Syntax::Number);
-    Devel->add ("DS_Emr", Syntax::Number);
-    Devel->add ("DSRate1", Syntax::Number);
-    Devel->add ("DSRate2", Syntax::Number);
-    Devel->add ("TempEff1", Syntax::CSMP);
-    Devel->add ("TempEff2", Syntax::CSMP);
-    Devel->add ("PhotEff1", Syntax::CSMP);
+    Devel.add ("Model", &CropStandard::Parameters::DevelPar::models);
+    Devel.add ("EmrTSum", Syntax::Number);
+    Devel.add ("DS_Emr", Syntax::Number);
+    Devel.add ("DSRate1", Syntax::Number);
+    Devel.add ("DSRate2", Syntax::Number);
+    Devel.add ("TempEff1", Syntax::CSMP);
+    Devel.add ("TempEff2", Syntax::CSMP);
+    Devel.add ("PhotEff1", Syntax::CSMP);
     
     // VernalPar
-    Syntax* Vernal = new Syntax ();
-    parSyntax->add ("Vernal", Vernal);
+    Syntax& Vernal = *new Syntax ();
+    parSyntax.add ("Vernal", Vernal);
 
-    Vernal->add ("required", Syntax::Boolean);
-    Vernal->add ("DSLim1", Syntax::Number);
-    Vernal->add ("DSLim2", Syntax::Number);
-    Vernal->add ("TaLim", Syntax::Number);
-    Vernal->add ("TaSum", Syntax::Number);
+    Vernal.add ("required", Syntax::Boolean);
+    Vernal.add ("DSLim1", Syntax::Number);
+    Vernal.add ("DSLim2", Syntax::Number);
+    Vernal.add ("TaLim", Syntax::Number);
+    Vernal.add ("TaSum", Syntax::Number);
 
     // LeafPhotPar
     CropStandard::Parameters::LeafPhotPar::models.add("exponential",
@@ -395,180 +395,179 @@ CropStandardSyntax::CropStandardSyntax ()
     CropStandard::Parameters::LeafPhotPar::models.add("parabolic",
 						      &NullCropFun);
 
-    Syntax* LeafPhot = new Syntax ();
-    parSyntax->add ("LeafPhot", LeafPhot);
+    Syntax& LeafPhot = *new Syntax ();
+    parSyntax.add ("LeafPhot", LeafPhot);
 
-    LeafPhot->add ("Model", &CropStandard::Parameters::LeafPhotPar::models);
-    LeafPhot->add ("Qeff", Syntax::Number);
-    LeafPhot->add ("Fm", Syntax::Number);
-    LeafPhot->add ("TLim1", Syntax::Number);
-    LeafPhot->add ("TLim2", Syntax::Number);
+    LeafPhot.add ("Model", &CropStandard::Parameters::LeafPhotPar::models);
+    LeafPhot.add ("Qeff", Syntax::Number);
+    LeafPhot.add ("Fm", Syntax::Number);
+    LeafPhot.add ("TLim1", Syntax::Number);
+    LeafPhot.add ("TLim2", Syntax::Number);
 
     // CanopyPar
-    Syntax* Canopy = new Syntax ();
-    parSyntax->add ("Canopy", Canopy);
+    Syntax& Canopy = *new Syntax ();
+    parSyntax.add ("Canopy", Canopy);
 
-    Canopy->add ("DSinit", Syntax::Number);
-    Canopy->add ("WLfInit", Syntax::Number);
-    Canopy->add ("SpLAI", Syntax::Number);
-    Canopy->add ("HvsDS", Syntax::CSMP);
-    Canopy->add ("LAIDist0", 3);
-    Canopy->add ("LAIDist1", 3);
-    Canopy->add ("PARref", Syntax::Number);
-    Canopy->add ("PARext", Syntax::Number);
-    Canopy->add ("EPext", Syntax::Number);
+    Canopy.add ("DSinit", Syntax::Number);
+    Canopy.add ("WLfInit", Syntax::Number);
+    Canopy.add ("SpLAI", Syntax::Number);
+    Canopy.add ("HvsDS", Syntax::CSMP);
+    Canopy.add ("LAIDist0", 3);
+    Canopy.add ("LAIDist1", 3);
+    Canopy.add ("PARref", Syntax::Number);
+    Canopy.add ("PARext", Syntax::Number);
+    Canopy.add ("EPext", Syntax::Number);
 
     // RootPar
-    Syntax* Root = new Syntax ();
-    parSyntax->add ("Root", Root);
+    Syntax& Root = *new Syntax ();
+    parSyntax.add ("Root", Root);
 
-    Root->add ("DptEmr", Syntax::Number);
-    Root->add ("PenPar1", Syntax::Number);
-    Root->add ("PenPar2", Syntax::Number);
-    Root->add ("MaxPen", Syntax::Number);
-    Root->add ("SpRtLength", Syntax::Number);
-    Root->add ("DensRtTip", Syntax::Number);
-    Root->add ("Rad", Syntax::Number);
-    Root->add ("h_wp", Syntax::Number);
-    Root->add ("MxNH4Up", Syntax::Number);
-    Root->add ("MxNO3Up", Syntax::Number);
+    Root.add ("DptEmr", Syntax::Number);
+    Root.add ("PenPar1", Syntax::Number);
+    Root.add ("PenPar2", Syntax::Number);
+    Root.add ("MaxPen", Syntax::Number);
+    Root.add ("SpRtLength", Syntax::Number);
+    Root.add ("DensRtTip", Syntax::Number);
+    Root.add ("Rad", Syntax::Number);
+    Root.add ("h_wp", Syntax::Number);
+    Root.add ("MxNH4Up", Syntax::Number);
+    Root.add ("MxNO3Up", Syntax::Number);
 
     // PartitPar
-    Syntax* Partit = new Syntax ();
-    parSyntax->add ("Partit", Partit);
+    Syntax& Partit = *new Syntax ();
+    parSyntax.add ("Partit", Partit);
 
-    Partit->add ("Root", Syntax::CSMP);
-    Partit->add ("Leaf", Syntax::CSMP);
-    Partit->add ("Stem", Syntax::CSMP);
-    Partit->add ("LfDR", Syntax::CSMP);
-    Partit->add ("RtDR", Syntax::CSMP);
+    Partit.add ("Root", Syntax::CSMP);
+    Partit.add ("Leaf", Syntax::CSMP);
+    Partit.add ("Stem", Syntax::CSMP);
+    Partit.add ("LfDR", Syntax::CSMP);
+    Partit.add ("RtDR", Syntax::CSMP);
 
     // RespPar
-    Syntax* Resp = new Syntax ();
-    parSyntax->add ("Resp", Resp);
+    Syntax& Resp = *new Syntax ();
+    parSyntax.add ("Resp", Resp);
 
-    Resp->add ("E_Root", Syntax::Number);
-    Resp->add ("E_Leaf", Syntax::Number);
-    Resp->add ("E_Stem", Syntax::Number);
-    Resp->add ("E_SOrg", Syntax::Number);
-    Resp->add ("r_Root", Syntax::Number);
-    Resp->add ("r_Leaf", Syntax::Number);
-    Resp->add ("r_Stem", Syntax::Number);
-    Resp->add ("r_SOrg", Syntax::Number);
-    Resp->add ("Q10", Syntax::Number);
+    Resp.add ("E_Root", Syntax::Number);
+    Resp.add ("E_Leaf", Syntax::Number);
+    Resp.add ("E_Stem", Syntax::Number);
+    Resp.add ("E_SOrg", Syntax::Number);
+    Resp.add ("r_Root", Syntax::Number);
+    Resp.add ("r_Leaf", Syntax::Number);
+    Resp.add ("r_Stem", Syntax::Number);
+    Resp.add ("r_SOrg", Syntax::Number);
+    Resp.add ("Q10", Syntax::Number);
 
     // CrpNPar
-    Syntax* CrpN = new Syntax ();
-    parSyntax->add ("CrpN", CrpN);
+    Syntax& CrpN = *new Syntax ();
+    parSyntax.add ("CrpN", CrpN);
 
-    CrpN->add ("SeedN", Syntax::Number);
-    CrpN->add ("PtLeafCnc", Syntax::CSMP);
-    CrpN->add ("CrLeafCnc", Syntax::CSMP);
-    CrpN->add ("PtStemCnc", Syntax::CSMP);
-    CrpN->add ("CrStemCnc", Syntax::CSMP);
-    CrpN->add ("PtRootCnc", Syntax::CSMP);
-    CrpN->add ("CrRootCnc", Syntax::CSMP);
-    CrpN->add ("PtSOrgCnc", Syntax::CSMP);
-    CrpN->add ("CrSOrgCnc", Syntax::CSMP);
+    CrpN.add ("SeedN", Syntax::Number);
+    CrpN.add ("PtLeafCnc", Syntax::CSMP);
+    CrpN.add ("CrLeafCnc", Syntax::CSMP);
+    CrpN.add ("PtStemCnc", Syntax::CSMP);
+    CrpN.add ("CrStemCnc", Syntax::CSMP);
+    CrpN.add ("PtRootCnc", Syntax::CSMP);
+    CrpN.add ("CrRootCnc", Syntax::CSMP);
+    CrpN.add ("PtSOrgCnc", Syntax::CSMP);
+    CrpN.add ("CrSOrgCnc", Syntax::CSMP);
   }
 
   // Variables
-  Syntax* varSyntax = new Syntax ();
-  AttributeList* varList = new AttributeList ();
-  AttributeList* al;
+  Syntax& varSyntax = *new Syntax ();
+  AttributeList& varList = *new AttributeList ();
   {
     // Phenology
-    Syntax* Phenology = new Syntax ();
-    al = new AttributeList ();
-    varSyntax->add ("Phenology", Phenology);
-    varList->add ("Phenology", al);
+    Syntax& Phenology = *new Syntax ();
+    AttributeList& vPhenology = *new AttributeList ();
+    varSyntax.add ("Phenology", Phenology);
+    varList.add ("Phenology", vPhenology);
 
-    Phenology->add ("DS", Syntax::Number);
-    al->add ("DS", -1.0);
-    Phenology->add ("Vern", Syntax::Number, Syntax::Optional);
+    Phenology.add ("DS", Syntax::Number);
+    vPhenology.add ("DS", -1.0);
+    Phenology.add ("Vern", Syntax::Number, Syntax::Optional);
 
     // Canopy
-    Syntax* Canopy = new Syntax (); 
-    al = new AttributeList ();
-    varSyntax->add ("Canopy", Canopy);
-    varList->add ("Canopy", al);
+    Syntax& Canopy = *new Syntax (); 
+    AttributeList& vCanopy = *new AttributeList ();
+    varSyntax.add ("Canopy", Canopy);
+    varList.add ("Canopy", vCanopy);
 
-    Canopy->add ("Height", Syntax::Number);
-    al->add ("Height", 0.0);
-    Canopy->add ("LAI", Syntax::Number);
-    al->add ("LAI", 0.0);
-    Canopy->add ("LADm", Syntax::Number);
-    al->add ("LADm", -9999.99);
-    Canopy->add ("LAIvsH", Syntax::CSMP);
-    al->add ("LAIvsH", &empty_csmp);
+    Canopy.add ("Height", Syntax::Number);
+    vCanopy.add ("Height", 0.0);
+    Canopy.add ("LAI", Syntax::Number);
+    vCanopy.add ("LAI", 0.0);
+    Canopy.add ("LADm", Syntax::Number);
+    vCanopy.add ("LADm", -9999.99);
+    Canopy.add ("LAIvsH", Syntax::CSMP);
+    vCanopy.add ("LAIvsH", &empty_csmp);
 
     // RootSys
-    Syntax* RootSys = new Syntax ();
-    al = new AttributeList ();
-    varSyntax->add ("RootSys", RootSys);
-    varList->add ("RootSys", al);
+    Syntax& RootSys = *new Syntax ();
+    AttributeList& vRootSys = *new AttributeList ();
+    varSyntax.add ("RootSys", RootSys);
+    varList.add ("RootSys", vRootSys);
 
-    RootSys->add ("Depth", Syntax::Number, Syntax::Optional);
-    RootSys->add ("Density", Syntax::Array);
-    al->add ("Density", empty_array);
-    RootSys->add ("H2OExtraction", Syntax::Array);
-    al->add ("H2OExtraction", empty_array);
-    RootSys->add ("NH4Extraction", Syntax::Array);
-    al->add ("NH4Extraction", empty_array);
-    RootSys->add ("NO3Extraction", Syntax::Array);
-    al->add ("NO3Extraction", empty_array);
+    RootSys.add ("Depth", Syntax::Number, Syntax::Optional);
+    RootSys.add ("Density", Syntax::Array);
+    vRootSys.add ("Density", empty_array);
+    RootSys.add ("H2OExtraction", Syntax::Array);
+    vRootSys.add ("H2OExtraction", empty_array);
+    RootSys.add ("NH4Extraction", Syntax::Array);
+    vRootSys.add ("NH4Extraction", empty_array);
+    RootSys.add ("NO3Extraction", Syntax::Array);
+    vRootSys.add ("NO3Extraction", empty_array);
 
     // Prod
-    Syntax* Prod = new Syntax ();
-    al = new AttributeList ();
-    varSyntax->add ("Prod", Prod);
-    varList->add ("Prod", al);
+    Syntax& Prod = *new Syntax ();
+    AttributeList& vProd = *new AttributeList ();
+    varSyntax.add ("Prod", Prod);
+    varList.add ("Prod", vProd);
 
-    Prod->add ("WLeaf", Syntax::Number);
-    al->add ("WLeaf", 0.001);
-    Prod->add ("WStem", Syntax::Number);
-    al->add ("WStem", 0.000);
-    Prod->add ("WRoot", Syntax::Number);
-    al->add ("WRoot", 0.001);
-    Prod->add ("WSOrg", Syntax::Number);
-    al->add ("WSOrg", 0.000);
-    Prod->add ("WLDrd", Syntax::Number);
-    al->add ("WLDrd", 0.000);
-    Prod->add ("NCrop", Syntax::Number, Syntax::Optional);
+    Prod.add ("WLeaf", Syntax::Number);
+    vProd.add ("WLeaf", 0.001);
+    Prod.add ("WStem", Syntax::Number);
+    vProd.add ("WStem", 0.000);
+    Prod.add ("WRoot", Syntax::Number);
+    vProd.add ("WRoot", 0.001);
+    Prod.add ("WSOrg", Syntax::Number);
+    vProd.add ("WSOrg", 0.000);
+    Prod.add ("WLDrd", Syntax::Number);
+    vProd.add ("WLDrd", 0.000);
+    Prod.add ("NCrop", Syntax::Number, Syntax::Optional);
 
     // CrpAux
-    Syntax* CrpAux = new Syntax ();
-    al = new AttributeList ();
-    varSyntax->add ("CrpAux", CrpAux);
-    varList->add ("CrpAux", al);
+    Syntax& CrpAux = *new Syntax ();
+    AttributeList& vCrpAux = *new AttributeList ();
+    varSyntax.add ("CrpAux", CrpAux);
+    varList.add ("CrpAux", vCrpAux);
 
-    CrpAux->add ("InitLAI", Syntax::Boolean);
-    al->add ("InitLAI", true);
-    CrpAux->add ("PotRtDpt", Syntax::Number, Syntax::Optional);
-    CrpAux->add ("PtNCnt", Syntax::Number, Syntax::Optional);
-    CrpAux->add ("CrNCnt", Syntax::Number);
-    al->add ("CrNCnt", 0.0);
-    CrpAux->add ("PotTransp", Syntax::Number);
-    al->add ("PotTransp", 0.0);
-    CrpAux->add ("PotCanopyAss", Syntax::Number);
-    al->add ("PotCanopyAss", 0.0);
-    CrpAux->add ("CanopyAss", Syntax::Number);
-    al->add ("CanopyAss", 0.0);
-    CrpAux->add ("IncWLeaf", Syntax::Number);
-    al->add ("IncWLeaf", 0.0);
-    CrpAux->add ("IncWStem", Syntax::Number);
-    al->add ("IncWStem", 0.0);
-    CrpAux->add ("IncWSOrg", Syntax::Number);
-    al->add ("IncWSOrg", 0.0);
-    CrpAux->add ("IncWRoot", Syntax::Number);
-    al->add ("IncWRoot", 0.0);
-    CrpAux->add ("H2OUpt", Syntax::Number);
-    al->add ("H2OUpt", 0.0);
-    CrpAux->add ("NH4Upt", Syntax::Number);
-    al->add ("NH4Upt", 0.0);
-    CrpAux->add ("NO3Upt", Syntax::Number);
-    al->add ("NO3Upt", 0.0);
+    CrpAux.add ("InitLAI", Syntax::Boolean);
+    vCrpAux.add ("InitLAI", true);
+    CrpAux.add ("PotRtDpt", Syntax::Number, Syntax::Optional);
+    CrpAux.add ("PtNCnt", Syntax::Number, Syntax::Optional);
+    CrpAux.add ("CrNCnt", Syntax::Number);
+    vCrpAux.add ("CrNCnt", 0.0);
+    CrpAux.add ("PotTransp", Syntax::Number);
+    vCrpAux.add ("PotTransp", 0.0);
+    CrpAux.add ("PotCanopyAss", Syntax::Number);
+    vCrpAux.add ("PotCanopyAss", 0.0);
+    CrpAux.add ("CanopyAss", Syntax::Number);
+    vCrpAux.add ("CanopyAss", 0.0);
+    CrpAux.add ("IncWLeaf", Syntax::Number);
+    vCrpAux.add ("IncWLeaf", 0.0);
+    CrpAux.add ("IncWStem", Syntax::Number);
+    vCrpAux.add ("IncWStem", 0.0);
+    CrpAux.add ("IncWSOrg", Syntax::Number);
+    vCrpAux.add ("IncWSOrg", 0.0);
+    CrpAux.add ("IncWRoot", Syntax::Number);
+    vCrpAux.add ("IncWRoot", 0.0);
+    CrpAux.add ("H2OUpt", Syntax::Number);
+    vCrpAux.add ("H2OUpt", 0.0);
+    CrpAux.add ("NH4Upt", Syntax::Number);
+    vCrpAux.add ("NH4Upt", 0.0);
+    CrpAux.add ("NO3Upt", Syntax::Number);
+    vCrpAux.add ("NO3Upt", 0.0);
   }
-  Crop::add_type ("crop", *parList, *parSyntax, *varList, *varSyntax, 
+  Crop::add_type ("crop", parList, parSyntax, varList, varSyntax, 
 		  &CropStandard::make);
 }

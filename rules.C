@@ -4,6 +4,8 @@
 #include "daisy.h"
 #include "action.h"
 
+#include <list.h>
+
 struct Rules::Implementation
 {
     struct Rule

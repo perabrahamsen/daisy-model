@@ -22,11 +22,9 @@ public:
     virtual const Rules& rules () const throw (AttributeList::Invalid);
     virtual const CSMP& csmp () const throw (AttributeList::Invalid);
     virtual const AttributeList& list () const throw (AttributeList::Invalid);
-    virtual CropList& crops () const throw (AttributeList::Invalid);
-    virtual ColumnList& columns () const throw (AttributeList::Invalid);
-    virtual HorizonList& horizons () const throw (AttributeList::Invalid);
     virtual const Time& time () const throw (AttributeList::Invalid);
     virtual const Sequence& sequence () const throw (AttributeList::Invalid);
+    virtual const Layers& layers () const throw (AttributeList::Invalid);
 protected:
     Value ();
     virtual ~Value ();
@@ -82,6 +80,14 @@ public:
     ValueSequence (const Sequence&);
 };
 
+class ValueLayers : public Value
+{
+    Layers value;
+public:
+    const Layers& layers () const;
+    ValueLayers (const Layers&);
+};
+
 class ValueArray : public Value
 {
     vector<double> value;
@@ -112,30 +118,6 @@ class ValueCSMP : public Value
 public:
     const CSMP& csmp () const;
     ValueCSMP (const CSMP&);
-};
-
-class ValueColumns : public Value
-{
-    ColumnList& value;
-public:
-    ColumnList& columns () const;
-    ValueColumns (ColumnList&);
-};
-
-class ValueHorizons : public Value
-{
-    HorizonList& value;
-public:
-    HorizonList& horizons () const;
-    ValueHorizons (HorizonList&);
-};
-
-class ValueCrops : public Value
-{
-    CropList& value;
-public:
-    CropList& crops () const;
-    ValueCrops (CropList&);
 };
 
 double
@@ -180,6 +162,13 @@ Value::sequence () const throw (AttributeList::Invalid)
     return *((Sequence*) 0); // SHUT UP.
 }
 
+const Layers&
+Value::layers () const throw (AttributeList::Invalid)
+{ 
+    THROW (AttributeList::Invalid ());
+    return *((Layers*) 0); // SHUT UP.
+}
+
 const
 vector<double>& Value::array () const throw (AttributeList::Invalid)
 { 
@@ -199,25 +188,6 @@ CSMP& Value::csmp () const throw (AttributeList::Invalid)
 { 
     THROW (AttributeList::Invalid ());
     return *((CSMP*) 0); // SHUT UP.
-}
-
-
-ColumnList& Value::columns () const throw (AttributeList::Invalid)
-{ 
-    THROW (AttributeList::Invalid ());
-    return *((ColumnList*) 0); // SHUT UP.
-}
-
-HorizonList& Value::horizons () const throw (AttributeList::Invalid)
-{ 
-    THROW (AttributeList::Invalid ());
-    return *((HorizonList*) 0); // SHUT UP.
-}
-
-CropList& Value::crops () const throw (AttributeList::Invalid)
-{ 
-    THROW (AttributeList::Invalid ());
-    return *((CropList*) 0); // SHUT UP.
 }
 
 const
@@ -287,6 +257,15 @@ ValueSequence::sequence () const
 ValueSequence::ValueSequence (const Sequence& t) : value (t)
 { }
 
+const Layers&
+ValueLayers::layers () const
+{
+    return value;
+}
+
+ValueLayers::ValueLayers (const Layers& t) : value (t)
+{ }
+
 const vector<double>&
 ValueArray::array () const
 {
@@ -312,33 +291,6 @@ ValueCSMP::csmp () const
 }
 
 ValueCSMP::ValueCSMP (const CSMP& v) : value (v)
-{ }
-
-ColumnList& 
-ValueColumns::columns () const
-{
-    return value;
-}
-
-ValueColumns::ValueColumns (ColumnList& v) : value (v)
-{ }
-
-HorizonList& 
-ValueHorizons::horizons () const
-{
-    return value;
-}
-
-ValueHorizons::ValueHorizons (HorizonList& v) : value (v)
-{ }
-
-CropList& 
-ValueCrops::crops () const
-{
-    return value;
-}
-
-ValueCrops::ValueCrops (CropList& v) : value (v)
 { }
 
 const AttributeList& 
@@ -447,6 +399,12 @@ AttributeList::sequence (string key) const throw2 (Invalid, Uninitialized)
     return impl.lookup (key)->sequence ();
 }
 
+const Layers&
+AttributeList::layers (string key) const throw2 (Invalid, Uninitialized)
+{
+    return impl.lookup (key)->layers ();
+}
+
 const vector<double>& 
 AttributeList::array (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -465,24 +423,6 @@ AttributeList::csmp (string key) const throw2 (Invalid, Uninitialized)
     return impl.lookup (key)->csmp ();
 }
 
-ColumnList& 
-AttributeList::columns (string key) const throw2 (Invalid, Uninitialized)
-{
-    return impl.lookup (key)->columns ();
-}
-
-HorizonList& 
-AttributeList::horizons (string key) const throw2 (Invalid, Uninitialized)
-{
-    return impl.lookup (key)->horizons ();
-}
-
-CropList& 
-AttributeList::crops (string key) const throw2 (Invalid, Uninitialized)
-{
-    return impl.lookup (key)->crops ();
-}
-
 const AttributeList& 
 AttributeList::list (string key) const throw2 (Invalid, Uninitialized)
 {
@@ -490,7 +430,7 @@ AttributeList::list (string key) const throw2 (Invalid, Uninitialized)
 }
 
 void 
-AttributeList::add (string key , double v)
+AttributeList::add (string key, double v)
 {
     impl.add (key, new ValueNumber (v));
 }
@@ -526,9 +466,15 @@ AttributeList::add (string key, const Sequence& v)
 }
 
 void 
-AttributeList::add (string key, const AttributeList* v)
+AttributeList::add (string key, const Layers& v)
 {
-    impl.add (key, new ValueList (*v));
+    impl.add (key, new ValueLayers (v));
+}
+
+void 
+AttributeList::add (string key, const AttributeList& v)
+{
+    impl.add (key, new ValueList (v));
 }
 
 void 
@@ -541,24 +487,6 @@ void
 AttributeList::add (string key, const CSMP* v)
 {
     impl.add (key, new ValueCSMP (*v));
-}
-
-void 
-AttributeList::add (string key, ColumnList* v)
-{
-    impl.add (key, new ValueColumns (*v));
-}
-
-void 
-AttributeList::add (string key, HorizonList* v)
-{
-    impl.add (key, new ValueHorizons (*v));
-}
-
-void 
-AttributeList::add (string key, CropList* v)
-{
-    impl.add (key, new ValueCrops (*v));
 }
 
 void 

@@ -2,6 +2,7 @@
 
 #include "horizon.h"
 #include "library.h"
+#include "alist.h"
 #include <vector.h>
 #include <map.h>
 
@@ -49,8 +50,9 @@ Horizon::derive_type (string name, const AttributeList& al, string super)
 }
 
 Horizon&
-Horizon::create (const string name)
+Horizon::create (const AttributeList& al)
 {
+  const string name = al.name ("type");
   assert (library ().check (name));
   return (*Horizon_constructors)[name] (library ().lookup (name));
 }
@@ -60,40 +62,6 @@ Horizon::Horizon (const AttributeList& al)
 { }
 
 Horizon::~Horizon ()
-{ }
-
-struct HorizonList::Implementation
-{
-  vector<double> zplus;
-  vector<const Horizon*> horizons;
-  Implementation ();
-};
-
-HorizonList::Implementation::Implementation ()
-{ }
-
-const Horizon& 
-HorizonList::horizon (double z) const
-{
-  unsigned i;
-  for (i= 1; i < impl.zplus.size (); i++)
-    if (z > impl.zplus[i])
-      return *impl.horizons[i];
-  return *impl.horizons[i - 1];
-}
-
-void 
-HorizonList::add (double zplus, const Horizon& horizon)
-{
-  impl.zplus.push_back (zplus);
-  impl.horizons.push_back (&horizon);
-}
-
-HorizonList::HorizonList ()
-  : impl (*new Implementation)
-{ }
-
-HorizonList::~HorizonList ()
 { }
 
 int Horizon_init::count;

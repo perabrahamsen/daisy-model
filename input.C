@@ -5,7 +5,6 @@
 #include "weather.h"
 #include "groundwater.h"
 #include "log.h"
-#include "uzmodel.h"
 #include "horizon.h"
 #include "column.h"
 #include "crop.h"
@@ -30,11 +29,7 @@ struct Input::Implementation
 {
   Log& log;
   AttributeList alist;
-  const AttributeList* weather;
-  const AttributeList* groundwater;
-  const AttributeList* chief;
   Time time;
-  ColumnList field;
   Syntax syntax;
   void load ();
   int get ();
@@ -51,20 +46,15 @@ struct Input::Implementation
   void skip_token ();
   bool looking_at (char);
   void eof ();
-  void load_log (Log&);
-  void load_soil (HorizonList&);
-  void load_columns (ColumnList&);
-  void load_crops (CropList&);
+  const Layers& load_layers (const Library& lib);
   void load_library (Library& lib);
   void add_derived (const Library&, derive_fun);
-  const AttributeList* load_derived (const Library& lib);
-  void load_list (AttributeList*, const Syntax&);
+  const AttributeList& load_derived (const Library& lib);
+  void load_list (AttributeList&, const Syntax&);
   Time get_time ();
   const Condition* get_condition ();
   const Action* get_action ();
   const Filter* get_filter (const Syntax&);
-  const Filter* get_filter_columns ();
-  const Filter* get_filter_crops ();
   const Filter* get_filter_object (const Library&);
   const Filter* get_filter_sequence (const Library&);
   istream* in;
@@ -75,28 +65,29 @@ struct Input::Implementation
   Implementation (int& argc, char**& argv, ostream&);
 };
 
-const Time& 
+Time& 
 Input::makeTime () const
 {
+  impl.time = impl.alist.time ("time");
   return impl.time;
 }
 Manager& 
 Input::makeManager () const
 { 
-  assert (impl.chief);
-  return Manager::create (*impl.chief);
+  
+  return Manager::create (impl.alist.list ("chief"));
 }
 
 Weather& 
 Input::makeWeather () const 
 {     
-  return Weather::create (impl.time, *impl.weather);
+  return Weather::create (impl.time, impl.alist.list ("weather"));
 }
 
 Groundwater& 
 Input::makeGroundwater () const 
 {     
-  return Groundwater::create (impl.time, *impl.groundwater);
+  return Groundwater::create (impl.time, impl.alist.list ("groundwater"));
 }
 
 Log& 
@@ -108,7 +99,7 @@ Input::makeLog () const
 ColumnList&
 Input::makeColumns () const
 {
-  return impl.field;
+  return *new ColumnList (impl.alist.sequence ("field"));
 }
 
 Input::Input (int& argc, char**& argv, ostream& e)
@@ -119,57 +110,10 @@ void
 Input::Implementation::load ()
 {
   skip ("(");
-  while (!looking_at (')') && good ())
-    {
-      skip ("(");
-      string item = get_id ();
-      if (item == "crop")
-	add_derived (Crop::par_library (), &Crop::derive_type);
-      else if (item == "horizon")
-	add_derived (Horizon::library (), &Horizon::derive_type);
-      else if (item == "column")
-	add_derived (Column::par_library (), &Column::derive_type);
-      else if (item == "manager")
-	add_derived (Manager::library (), &Manager::derive_type);
-      else if (item == "chief")
-	{
-	  if (chief)
-	    delete chief;
-	  chief = load_derived (Manager::library ());
-	}
-      else if (item == "time")
-	time = get_time ();
-      else if (item == "field")
-	load_columns (field);
-      else if (item == "log")
-	load_log (log);
-      else if (item == "weather")
-	{
-	  if (weather)
-	    delete weather;
-	  weather = load_derived (Weather::library ());
-	}
-      else if (item == "groundwater")
-	{
-	  if (groundwater)
-	    delete groundwater;
-	  groundwater = load_derived (Groundwater::library ());
-	}
-      else
-	{
-	  error (string ("Unknown item `") + item + "'");
-	  skip_to_end ();
-	}
-      skip (")");
-    }
+  load_list (alist, syntax);
   skip (")");
   eof ();
-  if (chief == NULL)
-    error ("No chief specified");
-  if (weather == NULL)
-    error ("No weather specified");
-  if (groundwater == NULL)
-    error ("No groundwater specified");
+  syntax.check ("daisy", alist, log);
 }
 
 int
@@ -355,121 +299,31 @@ Input::Implementation::eof ()
     error ("Expected end of file");
 }
     
-void
-Input::Implementation::load_log (Log& l)
+const Layers&
+Input::Implementation::load_layers (const Library& lib)
 {
-  while (!looking_at (')') && good ())
-    {
-      skip ("(");
-      string s = get_string ();
-      const Condition* c = get_condition ();
-      const Filter* f = get_filter (syntax);
-      l.add (s, c, f);
-      skip (")");
-    }
-}
-
-void
-Input::Implementation::load_soil (HorizonList& sl)
-{
+  Layers& layers = *new Layers ();
   double last = 0.0;
 
   while (!looking_at (')') && good ())
     {
       skip ("(");
       double zplus = get_number ();
-      skip ();
-      string name = get_id ();
 
       if (zplus == last)
-	error (string ("Ignoring empty horizon `" + name + "'") );
+	error ("Ignoring empty layer");
       else if (zplus >= last)
-	error (string ("Ignoring negative horizon `" + name + "'") );
-      else if (!Horizon::library ().check (name))
-	error (string ("Unknown horizon `") + name + "'");
+	error ("Ignoring negative layer");
       else
 	{
-	  sl.add (zplus, Horizon::create (name));
+	  layers.push_back (make_pair (zplus, &load_derived (lib)));
 	  last = zplus;
 	}
       skip (")");
     }
   if (last == 0.0)
     error ("Zero depth soil");
-}
-
-void
-Input::Implementation::load_columns (ColumnList& cl)
-{
-  while (!looking_at (')') && good ())
-    {
-      skip ("(");
-      string name = get_id ();
-
-      if (Column::par_library ().check (name))
-	{
-	  const Syntax& parSyntax = Column::par_library ().syntax (name);
-	  const AttributeList& parList = Column::par_library ().lookup (name);
-	  const Syntax& varSyntax = Column::var_library ().syntax (name);
-	  AttributeList varList (Column::var_library ().lookup (name));
-	  load_list (&varList, varSyntax);
-	  if (   parSyntax.check (name, parList, log) 
-	      && varSyntax.check (name, varList, log))
-	    {
-	      Column* column = Column::create (name, varList);
-	      if (column->check (log))
-		cl.push_back (column);
-	      else
-		{
-		  error (string ("Ignoring malformed  column `") 
-			 + name + "'");
-		  delete column;
-		}
-	    }
-	  else
-	    error (string ("Ignoring incomplete column `") 
-		   + name + "'");
-	}
-      else
-	{
-	  error (string ("Unknown column `") + name + "'");
-	  skip_to_end ();
-	}
-      skip (")");
-    }
-}
-
-void
-Input::Implementation::load_crops (CropList& cl)
-{
-  while (!looking_at (')') && good ())
-    {
-      skip ("(");
-      string name = get_id ();
-
-      if (Crop::par_library ().check (name))
-	{
-	  const Syntax& parSyntax = Crop::par_library ().syntax (name);
-	  const AttributeList& parList = Crop::par_library ().lookup (name);
-	  const Syntax& varSyntax = Crop::var_library ().syntax (name);
-	  AttributeList varList (Crop::var_library ().lookup (name));
-	  load_list (&varList, varSyntax);
-	  if (   parSyntax.check (name, parList, log) 
-	      && varSyntax.check (name, varList, log))
-	    {
-	      cl.push_back (Crop::create (name, varList));
-	    }
-	  else
-	    error (string ("Ignoring incomplete crop `") 
-		   + name + "'");
-	}
-      else
-	{
-	  error (string ("Unknown crop `") + name + "'");
-	  skip_to_end ();
-	}
-      skip (")");
-    }
+  return layers;
 }
 
 void
@@ -484,9 +338,9 @@ Input::Implementation::load_library (Library& lib)
       return;
     }
   const AttributeList& sl = lib.lookup (super);
-  AttributeList* atts = new AttributeList (sl);
+  AttributeList& atts = *new AttributeList (sl);
   load_list (atts, lib.syntax (super));
-  lib.add (name, *atts, lib.syntax (super));
+  lib.add (name, atts, lib.syntax (super));
 }
 
 void
@@ -502,29 +356,31 @@ Input::Implementation::add_derived (const Library& lib, derive_fun derive)
       return;
     }
   const AttributeList& sl = lib.lookup (super);
-  AttributeList* atts = new AttributeList (sl);
+  AttributeList& atts = *new AttributeList (sl);
   load_list (atts, lib.syntax (super));
-  derive (name, *atts, super);
+  derive (name, atts, super);
 }
 
-const AttributeList* 
+const AttributeList&
 Input::Implementation::load_derived (const Library& lib)
 {
   const string type = get_id ();
   if (lib.check (type))
     {
-      AttributeList* alist = new AttributeList (lib.lookup (type));
-      alist->add ("type", type);
+      AttributeList& alist = *new AttributeList (lib.lookup (type));
+      alist.add ("type", type);
       load_list (alist, lib.syntax (type));
       return alist;
     }
   else
-    error (string ("Unknown chief `") + type + "'");
-  return NULL;
+    {
+      error (string ("Unknown chief `") + type + "'");
+      return *new AttributeList ();
+    }
 }
 
 void
-Input::Implementation::load_list (AttributeList* atts, const Syntax& syntax)
+Input::Implementation::load_list (AttributeList& atts, const Syntax& syntax)
 { 
   while (!looking_at (')') && good ())
     {
@@ -533,19 +389,19 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax& syntax)
       switch (syntax.lookup (name))
 	{
 	case Syntax::Number:
-	  atts->add (name, get_number ());
+	  atts.add (name, get_number ());
 	  break;
 	case Syntax::List: 
 	  {
-	    AttributeList* list = new AttributeList ();
+	    AttributeList& list = *new AttributeList ();
 	    load_list (list, syntax.syntax (name));
-	    atts->add (name, list);
+	    atts.add (name, list);
 	    break;
 	  }
 	case Syntax::Rules:
 	  {
-	    Rules* rules = atts->check (name) 
-	      ? new Rules (&atts->rules (name))
+	    Rules* rules = atts.check (name) 
+	      ? new Rules (&atts.rules (name))
 	      : new Rules ();
 	    skip ("(");
 	    while (!looking_at (')') && good ())
@@ -556,7 +412,7 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax& syntax)
 		rules->add (c, a);
 		skip (")");
 	      }
-	    atts->add (name, rules);
+	    atts.add (name, rules);
 	    skip (")");
 	    break;
 	  }
@@ -581,14 +437,14 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax& syntax)
 	      }
 	    if (count < 2)
 	      error ("Need at least 2 points");
-	    atts->add (name, csmp);
+	    atts.add (name, csmp);
 	    break;
 	  }
 	case Syntax::Function:
-	  atts->add (name, get_id ());
+	  atts.add (name, get_id ());
 	  break;
 	case Syntax::String:
-	  atts->add (name, get_string ());
+	  atts.add (name, get_string ());
 	  break;
 	case Syntax::Array:
 	  {
@@ -626,21 +482,7 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax& syntax)
 		for (;count < size; count++)
 		  array.push_back (-1.0);
 	      }
-	    atts->add (name, array);
-	    break;
-	  }
-	case Syntax::Columns:
-	  {
-	    ColumnList* cl = new ColumnList ();
-	    load_columns (*cl);
-	    atts->add (name, cl);
-	    break;
-	  }
-	case Syntax::Crops:
-	  {
-	    CropList* cl = new CropList ();
-	    load_crops (*cl);
-	    atts->add (name, cl);
+	    atts.add (name, array);
 	    break;
 	  }
 	case Syntax::Boolean:
@@ -648,47 +490,55 @@ Input::Implementation::load_list (AttributeList* atts, const Syntax& syntax)
 	    string flag = get_id ();
 
 	    if (flag == "true")
-	      atts->add (name, true);
+	      atts.add (name, true);
 	    else
 	      {
-		atts->add (name, false);
+		atts.add (name, false);
 		if (flag != "false")
 		  error ("Expected `true' or `false'");
 	      }
 	    break;
 	  }
 	case Syntax::Integer:
-	  atts->add (name, get_integer ());
+	  atts.add (name, get_integer ());
 	  break;
 	case Syntax::Date:
-	  atts->add (name, get_time ());
+	  atts.add (name, get_time ());
 	  break;
-	case Syntax::Soil:
+	case Syntax::Layers:
+	  atts.add (name, load_layers (syntax.library (name)));
+	  break;
+	case Syntax::Output:
+	  // Handled specially: Put directly in log.
 	  {
-	    HorizonList* sl = new HorizonList ();
-	    load_soil (*sl);
-	    atts->add (name, sl);
-	    break;
-	  }
-	case Syntax::UZmodel:
-	  {
-	    const AttributeList* list = load_derived (UZmodel::library ());
-	    if (list)
-	      atts->add (name, list);
+	    while (!looking_at (')') && good ())
+	      {
+		skip ("(");
+		string s = get_string ();
+		const Condition* c = get_condition ();
+		const Filter* f = get_filter (syntax.syntax (name));
+		log.add (s, c, f);
+		skip (")");
+	      }
 	    break;
 	  }
 	case Syntax::Class:
+	  // Handled specially: Put directly in global library.
 	  add_derived (syntax.library (name), syntax.derive (name));
 	  break;
 	case Syntax::Object:
-	  atts->add (name, load_derived (syntax.library (name)));
+	  atts.add (name, load_derived (syntax.library (name)));
 	  break;
 	case Syntax::Sequence:
 	  {
 	    Sequence& sequence = *new Sequence ();
 	    while (!looking_at (')') && good ())
-	      sequence.push_back (load_derived (syntax.library (name)));
-	    atts->add (name, sequence);
+	      {
+		skip ("(");
+		sequence.push_back (&load_derived (syntax.library (name)));
+		skip (")");
+	      }
+	    atts.add (name, sequence);
 	    break;
 	  }
 	case Syntax::Error:
@@ -781,7 +631,7 @@ Input::Implementation::get_action ()
   skip ("(");
   string name = get_id ();
   if (name == "sow")
-    action = new ActionSow (get_id ());
+    action = new ActionSow (load_derived (Crop::var_library ()));
   else if (name == "stop")
     action = new ActionStop ();
   else
@@ -813,12 +663,6 @@ Input::Implementation::get_filter (const Syntax& syntax)
 	    case Syntax::List:
 	      filter->add (name, get_filter (syntax.syntax (name)));
 	      break;
-	    case Syntax::Columns:
-	      filter->add (name, get_filter_columns ());
-	      break;
-	    case Syntax::Crops:
-	      filter->add (name, get_filter_crops ());
-	      break;
 	    case Syntax::Object:
 	      filter->add (name, get_filter_object (syntax.library (name)));
 	      break;
@@ -845,48 +689,6 @@ Input::Implementation::get_filter (const Syntax& syntax)
 	  else
 	    error (string ("Attribute `") + name + "' not known");
 	}
-    }
-  return filter;
-}
-
-const Filter*
-Input::Implementation::get_filter_columns ()
-{
-  FilterSome* filter = new FilterSome ();
-
-  while (!looking_at (')') && good ())
-    {	
-      skip ("(");
-      string name = get_id ();
-      if (Column::par_library ().check (name))
-	{
-	  const Syntax& syntax = Column::var_library ().syntax (name);
-	  filter->add (name, get_filter (syntax));
-	}
-      else 
-	error (string ("Unknown column `") + name + "' in filter");
-      skip (")");
-    }
-  return filter;
-}
-
-const Filter*
-Input::Implementation::get_filter_crops ()
-{
-  FilterSome* filter = new FilterSome ();
-
-  while (!looking_at (')') && good ())
-    {	
-      skip ("(");
-      string name = get_id ();
-      if (Crop::par_library ().check (name))
-	{
-	  const Syntax& syntax = Crop::var_library ().syntax (name);
-	  filter->add (name, get_filter (syntax));
-	}
-      else 
-	error (string ("Unknown crop `") + name + "' in filter");
-      skip (")");
     }
   return filter;
 }
@@ -925,7 +727,6 @@ Input::Implementation::get_filter_sequence (const Library& library)
 
 Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
   : log (*new Log ()),
-    chief (NULL),
     time (0, 1, 1, 0),
     err (e),
     line (1),
@@ -940,10 +741,9 @@ Input::Implementation::Implementation (int& argc, char**& argv, ostream& e)
   syntax.add_class ("column", Column::par_library (), &Column::derive_type);
   syntax.add_class ("manager", Manager::library (), &Manager::derive_type);
   syntax.add_object ("chief", Manager::library ());
-  syntax.add ("date", Syntax::Date);
   syntax.add ("time", Syntax::Date);
   syntax.add_sequence ("field", Column::var_library ());
-  syntax.add ("log", &syntax, Syntax::Sparse);
+  syntax.add_output ("log", syntax, Syntax::Sparse);
   syntax.add_object ("weather", Weather::library ());
   syntax.add_object ("groundwater", Groundwater::library ());
   load ();

@@ -105,7 +105,9 @@ SoilWater::SoilWater (const Soil& soil,
 		      const AttributeList& par, 
 		      const AttributeList& var)
   : top (UZmodel::create (par.list ("UZtop"))),
-    bottom (par.check ("UZbottom") ? UZmodel::create (par.list ("UZbottom")) : 0),
+    bottom (  par.check ("UZbottom") 
+	    ? UZmodel::create (par.list ("UZbottom"))
+	    : 0),
     bottom_start (  par.check ("UZborder") 
 		  ? par.integer ("UZborder")
 		  : -1)
@@ -148,9 +150,9 @@ const Syntax&
 SoilWater::parameter_syntax ()
 {
   Syntax* syntax = new Syntax (); 
-  syntax->add ("UZtop", Syntax::UZmodel);
-  syntax->add ("UZbottom", Syntax::UZmodel, Syntax::Optional);
-  syntax->add ("UZborder", Syntax::UZmodel, Syntax::Optional);
+  syntax->add_object ("UZtop", UZmodel::library ());
+  syntax->add_object ("UZbottom", UZmodel::library (), Syntax::Optional);
+  syntax->add ("UZborder", Syntax::Integer, Syntax::Optional);
   return *syntax;
 }
 

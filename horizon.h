@@ -31,30 +31,13 @@ public:
   static void add_type (string name, const AttributeList&, const Syntax&,
 			constructor);
   static void derive_type (string name, const AttributeList&, string super);
-  static Horizon& create (string);
+  static Horizon& create (const AttributeList&);
 
   // Create and Destroy.
 protected:
   Horizon (const AttributeList&);
 public:
   virtual ~Horizon ();
-};
-
-class HorizonList
-{
-  // Content.
-  struct Implementation;
-  Implementation& impl;
-
-  // Examine.
-public:
-  const Horizon& horizon (double z) const;
-
-  // Create and Destroy.
-public:
-  void add (double zplus, const Horizon&);
-  HorizonList ();
-  ~HorizonList ();
 };
 
 // Ensure the Horizon library is initialized.

@@ -3,8 +3,8 @@
 #ifndef COLUMN_STD_H
 #define COLUMN_STD_H
 
-#include "daisy.h"
 #include "column.h"
+#include "crop.h"
 #include "bioclimate.h"
 #include "surface.h"
 #include "soil.h"
@@ -17,7 +17,6 @@
 #include "denitrification.h"
 
 class Groundwater;
-
 class ColumnStandard : public Column
 {
   // Content.
@@ -36,7 +35,7 @@ private:
 
   // Actions.
 public:
-  void sow (string crop, Log&);
+  void sow (const AttributeList& crop, Log&);
 
   bool check (Log&) const;
   void output (Log&, const Filter*) const;

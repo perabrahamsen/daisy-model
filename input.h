@@ -3,8 +3,15 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include "daisy.h"
 #include <std/stdexcept.h>
+
+struct Manager;
+struct Weather;
+struct Groundwater;
+struct Log;
+struct ColumnList;
+struct Time;
+struct ostream;
 
 struct Usage : runtime_error
 { 
@@ -20,7 +27,7 @@ private:
     
     // Extract.
 public:
-  const Time& makeTime () const;
+  Time& makeTime () const;
   Manager& makeManager () const;
   Weather& makeWeather () const;
   Groundwater& makeGroundwater () const;

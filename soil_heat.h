@@ -3,7 +3,7 @@
 #ifndef SOIL_HEAT_H
 #define SOIL_HEAT_H
 
-#include "daisy.h"
+#include <std/string.h>
 #include <vector.h>
 
 class AttributeList;

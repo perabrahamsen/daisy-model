@@ -5,41 +5,14 @@
 
 #include "time.h"
 
-#include <std/typeinfo.h>
-#include <std/string.h>
-#include <list.h>
-
-class Column;
-class Crop;
-class Daisy;
 class Manager;
 class Weather;
 class Groundwater;
 class Log;
 class Input;
-class Library;
 class Condition;
 class Filter;
-
-typedef list <Column*> ColumnList;
-typedef list <Crop*> CropList;
-
-#ifdef HANDLE_EXCEPTIONS
-#define THROW(x) throw x
-#define throw2(x, y) throw (x, y)
-#define throw0() throw ()
-#else HANDLE_EXCEPTIONS
-#define THROW(x) assert ("error" == #x)
-#define throw(x)
-#define throw2(x, y)
-#define throw0()
-#endif  HANDLE_EXCEPTIONS
-
-#if 0
-#define BUG_DYNAMIC_CAST(T, V) dynamic_cast<T> (V)
-#else
-#define BUG_DYNAMIC_CAST(T, V) (T) V
-#endif
+class ColumnList;
 
 class Daisy
 {
@@ -48,7 +21,7 @@ class Daisy
     Implementation& impl;
 public:
     Log& log;
-    Time time;
+    Time& time;
     Manager& manager;
     Weather& weather;
     Groundwater& groundwater;

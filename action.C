@@ -2,6 +2,9 @@
 
 #include "action.h"
 #include "column.h"
+#include "alist.h"
+
+#include <iostream.h>
 
 void 
 Action::doIt (ColumnList&, const Weather&, Log&) const
@@ -26,7 +29,7 @@ Action::~Action ()
 void 
 ActionSow::doIt (ColumnList& cl, const Weather&, Log& log) const
 {
-  cout << "Sowing " << crop << "\n";
+  cout << "Sowing " << crop.name ("type") << "\n";
 
   for (ColumnList::iterator i = cl.begin ();
        i != cl.end ();
@@ -36,7 +39,7 @@ ActionSow::doIt (ColumnList& cl, const Weather&, Log& log) const
     }
 }
 
-ActionSow::ActionSow (string c) : crop (c)
+ActionSow::ActionSow (const AttributeList& al) : crop (al)
 { }
 
 void 

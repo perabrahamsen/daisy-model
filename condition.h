@@ -1,7 +1,10 @@
 // condition.h -- Logic expressions
 
-#include "daisy.h"
 #include "time.h"
+
+struct ColumnList;
+struct Weather;
+struct Time;
 
 class Condition
 {  

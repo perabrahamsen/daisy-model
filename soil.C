@@ -2,6 +2,7 @@
 
 #include "soil.h"
 #include "alist.h"
+#include "syntax.h"
 #include <assert.h>
 
 int 
@@ -63,7 +64,10 @@ Soil::check (Log& /* log */) const
 Soil::Soil (const AttributeList& al)
   : zplus_ (al.array ("zplus"))
 {
-  const HorizonList& horizons = al.horizons ("horizons");
+  Layers::const_iterator layer = al.layers ("horizons").begin ();
+  Layers::const_iterator end = al.layers ("horizons").end ();
+  assert (layer != end);
+  const Horizon* hor = &Horizon::create (*(*layer).second);
   size_ = zplus_.size ();
   double last = 0.0;
   for (int i = 0; i < size_; i++)
@@ -73,11 +77,28 @@ Soil::Soil (const AttributeList& al)
       dz_.push_back (dz);
       double z = last - dz / 2;
       z_.push_back (z);
-      horizon_.push_back (&horizons.horizon (z));
+      if (zplus < (*layer).first)
+	{
+	  layer++;
+	  assert (layer != end);
+	  hor = &Horizon::create (*(*layer).second);
+	}
+      horizon_.push_back (hor);
       last = zplus;
     }
-  horizon_.push_back (horizon_[size_ - 1]);
+  horizon_.push_back (hor);
 };
 
 Soil::~Soil ()
 { }
+
+const Syntax&
+Soil::parameter_syntax ()
+{
+  Syntax& syntax = *new Syntax ();
+  syntax.add_layers ("horizons", Horizon::library ());
+  syntax.add ("zplus", Syntax::Array);
+  return syntax;
+}
+
+  
