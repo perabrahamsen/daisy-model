@@ -408,6 +408,7 @@ Document::print_component (ostream& out, const Library& library)
 void
 Document::print_document (ostream& out)
 {
+  format->initialize (out);
   print_document_header (out);
 
   // For all components...
@@ -435,7 +436,19 @@ Document::print_document (ostream& out)
   print_document_trailer (out);
 }
 
-Document::Document (const AttributeList&)
+void 
+Document::load_syntax (Syntax& syntax, AttributeList& alist)
+{
+  syntax.add ("format", Librarian<Format>::library (), 
+	      Syntax::Const, Syntax::Singleton,
+	      "Text format used for the document.");
+  AttributeList LaTeX_alist;
+  LaTeX_alist.add ("type", "LaTeX");
+  alist.add ("format", LaTeX_alist);
+}
+
+Document::Document (const AttributeList& al)
+  : format (Librarian<Format>::create (al.alist ("format")))
 { }
 
 Document::~Document ()

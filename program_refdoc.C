@@ -34,7 +34,7 @@ struct ProgramRefdoc : public Program
     static const symbol name ("LaTeX");
     daisy_assert (library.check (name));
     const Syntax& syntax = library.syntax (name);
-    AttributeList alist;
+    AttributeList alist (library.lookup (name));
     alist.add ("type", name);
     if (syntax.check (alist, msg))
       {

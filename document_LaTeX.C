@@ -979,6 +979,7 @@ static struct DocumentLaTeXSyntax
   {
     Syntax& syntax = *new Syntax ();
     AttributeList& alist = *new AttributeList ();
+    Document::load_syntax (syntax, alist);
     alist.add ("description", "Output Daisy components as LaTeX chapters.");
     Librarian<Document>::add_type ("LaTeX", alist, syntax, &make);
   }

@@ -1,3 +1,14 @@
+2005-01-23  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* format.C, format.h: New component.
+	* Makefile (COMPONENTS): Add it.
+	* format_LaTeX.C: New model.
+	* Makefile (MODELS): Add it.
+	* document.C, document.h (format): New parameter.
+	* program_refdoc.C (run): Update caller.
+
+	* xref.C (enter_parameter): Removed bogus assertions.
+
 2005-01-21  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* txt/Makefile (DOCS): Add it.

@@ -300,13 +300,11 @@ TraverseXRef::leave_object_sequence ()
 bool
 TraverseXRef::enter_parameter (const Syntax& syntax, AttributeList& alist, 
 			       const AttributeList& default_alist, 
-			       const string& model, const string& name)
+			       const string&, const string& name)
 { 
   if (type == is_parameterization)
     {
       // Ignore inherited values.
-      daisy_assert (alist.check ("type"));
-      daisy_assert (model == current_model.name ());
       if (alist.subset (default_alist, syntax, name))
         return false;
     }

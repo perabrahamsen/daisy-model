@@ -25,6 +25,8 @@
 
 #include "librarian.h"
 #include "xref.h"
+#include "format.h"
+#include <memory>
 
 class Document
 {
@@ -33,6 +35,8 @@ public:
   static const char *const description;
 private:
   XRef xref;
+protected:
+  std::auto_ptr<Format> format;
 
   // Typeset parts of it.
 protected:
@@ -158,6 +162,7 @@ public:
 
   // Create and destroy.
 public: 
+  static void load_syntax (Syntax&, AttributeList&);
   Document (const AttributeList&);
   virtual ~Document ();
 };
