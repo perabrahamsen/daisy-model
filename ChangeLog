@@ -1,3 +1,15 @@
+2004-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.29 released.
+
+2004-01-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* root_system.C (tick_hourly): Clear 'NH4Upt' and 'NO3Upt' log
+	variable. 
+
+	* crpn.C (clear): New function.
+	* crop_std.C (tick): Call it.
+	
 2004-01-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.28 released.

@@ -86,6 +86,7 @@ private:
 public:
   void cut (double DS);
   void content (const double DS, Production& production);
+  void clear ();
   void update (int Hour, double& NCrop, double DS,
 	       bool enable_N_stress,
 	       const Soil& soil, const SoilWater& soil_water,

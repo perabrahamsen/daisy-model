@@ -85,6 +85,12 @@ CrpN::content (const double DS, Production& production)
 }
 
 void
+CrpN::clear ()
+{
+  Fixated = 0.0;
+}
+
+void
 CrpN::update (const int Hour, double& NCrop, const double DS,
 	      const bool enable_N_stress,
 	      const Soil& soil, const SoilWater& soil_water,

@@ -12,6 +12,14 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.29
+
+** Logged Crop N uptake was larger than simulated Crop N uptake.
+
+Basically, the log file would claim the crop kept taking up nitrogen,
+even after the crop was ripe.  This only affected the log file, not
+the simulation itself.
+
 * 3.28
 
 ** Fixed minor bug in weather initialization.

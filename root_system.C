@@ -313,6 +313,9 @@ RootSystem::tick_hourly (int hour, double T)
       soil_temperature = partial_soil_temperature / 24.0;
       partial_soil_temperature = 0.0;
     }
+
+  // Clear nitrogen.
+  NH4Upt = NO3Upt =0.0;
 }
 
 void

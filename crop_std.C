@@ -221,6 +221,9 @@ CropStandard::tick (const Time& time,
   const double T_soil = soil_heat.T (soil.interval_plus (-root_system.Depth));
   root_system.tick_hourly (time.hour (), T_soil);
 
+  // Clear nitrogen.
+  nitrogen.clear ();
+
   // Emergence.
   if (time.hour () == 0 && development.DS <= 0)
     {
