@@ -30,14 +30,6 @@ class Hydraulic;
 class Tortuosity;
 class Treelog;
 
-// Weigth of mineral particles. [g / cm³]
-GLOBAL_CONSTANT const double rho_mineral = 2.65;	
-// Weight of humus. [g / cm³]
-GLOBAL_CONSTANT const double rho_humus = 1.3; 
-GLOBAL_CONSTANT const double rho_water = 1.0; // [g/cm^3]
-GLOBAL_CONSTANT const double rho_ice = 0.917; // [g/cm^3]
-GLOBAL_CONSTANT const double c_fraction_in_humus = 0.587;
-
 class Horizon 
 {
   // Content.
@@ -65,6 +57,7 @@ public:
   double humus_C () const;
   const std::vector<double>& SOM_fractions () const;
   const std::vector<double>& SOM_C_per_N () const;
+  double turnover_factor () const;
 
   // Chemistry.
 public:

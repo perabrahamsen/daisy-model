@@ -35,6 +35,9 @@
 
 using namespace std;
 
+static const double rho_water = 1.0; // [g/cm^3]
+static const double rho_ice = 0.917; // [g/cm^3]
+
 struct SoilWater::Implementation
 {
   // Content.

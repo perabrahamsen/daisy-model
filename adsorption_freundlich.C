@@ -25,6 +25,8 @@
 #include "check.h"
 #include "mathlib.h"
 
+static const double c_fraction_in_humus = 0.587;
+
 class AdsorptionFreundlich : public Adsorption
 {
   // Parameters.

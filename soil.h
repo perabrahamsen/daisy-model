@@ -23,12 +23,11 @@
 #ifndef SOIL_H
 #define SOIL_H
 
-#include "horizon.h"
-#include "hydraulic.h"
-#include "tortuosity.h"
 #include "geometry.h"
 
 struct AttributeList;
+struct Horizon;
+struct Log;
 
 class Soil : public Geometry
 {
@@ -41,48 +40,33 @@ class Soil : public Geometry
 public:
   // Water.
   double K (int i, double h, double h_ice, double T) const;
-  inline double Cw1 (int i, double h, double h_ice) const
-  { return Theta (i, h, h_ice) - Cw2 (i, h) * h; }
+  double Cw1 (int i, double h, double h_ice) const;
   double Cw2 (int i, double h) const;
   double Theta (int i, double h, double h_ice) const;
-  inline double Theta_res (int i) const
-  { return horizon_[i]->hydraulic.Theta_res; }
-  inline double h (int i, double Theta) const
-  { return horizon_[i]->hydraulic.h (Theta); }
-  inline double M (int i, double h) const
-  { return horizon_[i]->hydraulic.M (h); }
+  double Theta_res (int i) const;
+  double h (int i, double Theta) const;
+  double M (int i, double h) const;
   double dispersivity (int) const;
-  void set_porosity (int i, double Theta)
-  { horizon_[i]->hydraulic.set_porosity (Theta); }
+  void set_porosity (int i, double Theta);
   
   // Texture.
-  inline double tortuosity_factor (int i, double Theta) const
-  { return horizon_[i]->tortuosity.factor (horizon_[i]->hydraulic, Theta); }
-  inline double dry_bulk_density (int i) const
-  { return horizon_[i]->dry_bulk_density (); }
-  inline double clay (int i) const
-  { return horizon_[i]->clay (); }
-  inline double humus (int i) const
-  { return horizon_[i]->humus (); }
-  inline double humus_C (int i) const
-  { return horizon_[i]->humus_C (); }
-  inline const std::vector<double>& SOM_fractions (int i) const
-  { return horizon_[i]->SOM_fractions (); }
-  inline const std::vector<double>& SOM_C_per_N (int i) const
-  { return horizon_[i]->SOM_C_per_N (); }
+  double tortuosity_factor (int i, double Theta) const;
+  double dry_bulk_density (int i) const;
+  double clay (int i) const;
+  double humus (int i) const;
+  double humus_C (int i) const;
+  const std::vector<double>& SOM_fractions (int i) const;
+  const std::vector<double>& SOM_C_per_N (int i) const;
+  double turnover_factor (int i) const;
 
   // Thermic.
-  double heat_conductivity (int i, double Theta, double Ice) const
-  { return horizon_[i]->heat_conductivity (Theta, Ice); }
-  double heat_capacity (int i, double Theta, double Ice) const
-  { return horizon_[i]->heat_capacity (Theta, Ice); }
+  double heat_conductivity (int i, double Theta, double Ice) const;
+  double heat_capacity (int i, double Theta, double Ice) const;
   
   // Chemistry.
   bool has_attribute (const std::string& name) const;
-  bool has_attribute (int i, const std::string& name) const
-  { return horizon_[i]->has_attribute (name); }
-  double get_attribute (int i, const std::string& name) const
-  { return horizon_[i]->get_attribute (name); }
+  bool has_attribute (int i, const std::string& name) const;
+  double get_attribute (int i, const std::string& name) const;
 
   // Simulation.
 public:

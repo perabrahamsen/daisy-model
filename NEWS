@@ -12,6 +12,25 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.70
+
+** New turnover_factor horizon parameter.
+
+This parameter affects the turnover of all organic matter pools, in
+effect making th whole system go slower (or faster if you set it
+larger than 1).  Use it like this
+
+(defhorizon C default
+  ;; Insert other parameters here.
+  (turnover_factor 0.1 []))
+
+to make the organic matter system move 10 times as slow in the "C"
+horizon. 
+
+* 2.69
+
+** Fixed bug that prevented B_C hydraulic model from being used.
+
 * 2.68
 
 ** SOM1 now limited to be between 0.3 and 0.7.
@@ -36,6 +55,10 @@ Check the reference manual for a description of each.
 If you do so, that value will be used instead of the value predicted
 by the HYPRES model.  All other hydraulic parameters will still be
 calculated by HYPRES.
+
+(defhorizon Ap default
+  ;; Insert other parameters here.
+  (hydraulic hypres (K_sat 3 [cm/h])))
 
 ** Allow automatic partitioning for subsoil with low humus content.
 

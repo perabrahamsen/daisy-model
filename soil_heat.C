@@ -34,7 +34,8 @@
 #include "submodel.h"
 
 static const double water_heat_capacity = 4.2e7; // [erg/cm^3/dg C]
-
+static const double rho_water = 1.0; // [g/cm^3]
+static const double rho_ice = 0.917; // [g/cm^3]
 
 struct SoilHeat::Implementation
 {

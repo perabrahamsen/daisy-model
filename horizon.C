@@ -35,6 +35,14 @@
 #include <map>
 #include <numeric>
 
+// Weigth of mineral particles. [g/cm^3]
+static const double rho_mineral = 2.65;	
+// Weight of humus. [g/cm^3]
+static const double rho_humus = 1.3; 
+static const double rho_water = 1.0; // [g/cm^3]
+static const double rho_ice = 0.917; // [g/cm^3]
+static const double c_fraction_in_humus = 0.587;
+
 struct Horizon::Implementation
 {
   // Content.
@@ -52,6 +60,7 @@ struct Horizon::Implementation
   // Organic matter.
   /* const */ vector<double> SOM_C_per_N;
   /* const */ vector<double> SOM_fractions;
+  const double turnover_factor;
 
   // Strange things.
   const double quarts_form_factor;
@@ -358,6 +367,7 @@ Horizon::Implementation::Implementation (const AttributeList& al)
     SOM_fractions (al.check ("SOM_fractions") 
 		   ? al.number_sequence ("SOM_fractions")
 		   : empty_sequence),
+    turnover_factor (al.number ("turnover_factor")),
     quarts_form_factor (al.number ("quarts_form_factor")),
     mineral_form_factor (al.number ("mineral_form_factor")),
     intervals (al.integer ("intervals"))
@@ -398,43 +408,6 @@ double
 Horizon::humus_C () const
 { return impl.dry_bulk_density * impl.humus * c_fraction_in_humus; }
 
-#if 0
-double 
-Horizon::SOM_C (unsigned int pool) const
-{
-  // C factor is the specific C content in horizon [g C/cm³]
-  const double C_divisor 
-    = accumulate (SOM_fractions.begin (), SOM_fractions.end (), 0.0);
-  
-  double C_factor = dry_bulk_density * humus * c_fraction_in_humus;
-  if (C_divisor > 0.0)
-    C_factor /= C_divisor;
-  else
-    throw ("Horizon: No C fractions given");
-  if (pool < impl.SOM_fractions.size ())
-    // Specified, cool.
-    return impl.SOM_fractions[pool] * impl.C_factor;
-  else if (pool == 0)
-    // Else, everything in the first (slow) pool.
-    return  impl.C_factor;
-    
-  return 0.0;
-}
-
-double 
-Horizon::SOM_C_per_N (unsigned int pool) const
-{
-  if (pool < impl.SOM_C_per_N.size ())
-    // Specied, fine.
-    return impl.SOM_C_per_N[pool];
-  else if (impl.SOM_C_per_N.size () > 0)
-    // Used last specified number.
-    return impl.SOM_C_per_N[impl.SOM_C_per_N.size () - 1];
-  // Give up.  Guess.
-  throw ("Horizon: SOM: no C_per_N");
-}
-#endif
-
 const std::vector<double>& 
 Horizon::SOM_fractions () const
 { return impl.SOM_fractions; }
@@ -442,6 +415,10 @@ Horizon::SOM_fractions () const
 const std::vector<double>& 
 Horizon::SOM_C_per_N () const
 { return impl.SOM_C_per_N; }
+
+double
+Horizon::turnover_factor () const
+{ return impl.turnover_factor; }
 
 double
 Horizon::heat_conductivity (double Theta, double Ice) const
@@ -595,6 +572,11 @@ By default, this is calculated from the soil constituents.");
 		       Syntax::OptionalConst, Syntax::Sequence, "\
 Fraction of humus in each SOM pool, from slowest to fastest.");
   syntax.add_check ("SOM_fractions", VCheck::sum_equal_1 ());
+  syntax.add ("turnover_factor", Syntax::None (), Check::non_negative (),
+	      Syntax::Const, "\
+Factor multiplied to the turnover rate for all organic matter pools in\n\
+this horizon.");
+  alist.add ("turnover_factor", 1.0);
   syntax.add ("quarts_form_factor", Syntax::None (), Syntax::Const,
 	      "Gemetry factor used for conductivity calculation.");
   alist.add ("quarts_form_factor", 2.0);

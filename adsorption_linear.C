@@ -19,10 +19,11 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #include "adsorption.h"
 #include "check.h"
 #include "soil.h"
+
+static const double c_fraction_in_humus = 0.587;
 
 class AdsorptionLinear : public Adsorption
 {

@@ -180,6 +180,7 @@ struct OrganicMatter::Implementation
   double heat_turnover_factor (double T) const;
   double water_turnover_factor (double h) const;
   vector<double> clay_turnover_factor;
+  vector<double> soil_turnover_factor;
 
   // Communication with external model.
   double get_smb_c_at (unsigned int i) const // g C/cm³]
@@ -898,7 +899,7 @@ OrganicMatter::Implementation::find_abiotic (const OM& om,
 	  if (use_clay)
 	    scratch[i] = clay_turnover_factor[i];
 	  else
-	    scratch[i] = 1.0;
+	    scratch[i] = soil_turnover_factor[i];
 
 	  const double T = soil_heat.T (i);
 	  if (use_om_heat)
@@ -962,6 +963,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   vector<double> temp_factor (size);
   vector<double> abiotic_factor (size);
   vector<double> clay_factor (size);
+  vector<double> soil_factor (size);
   vector<double> tillage_factor (size);
   
   for (unsigned int i = 0; i < size; i++)
@@ -981,9 +983,10 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       const double T = soil_heat.T (i);
       const double heat = heat_turnover_factor (T);
       const double water = water_turnover_factor (h);
-      temp_factor[i] = heat;
+      temp_factor[i] = heat * soil_turnover_factor [i];
       abiotic_factor[i] = heat * water;
       clay_factor[i] = abiotic_factor[i] * clay_turnover_factor [i];
+      soil_factor[i] = abiotic_factor[i] * soil_turnover_factor [i];
     }
   
   // Main processing.
@@ -997,7 +1000,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     {
       const bool use_clay = clayom.smb_use_clay (j);
       const vector<double>& default_factor = 
-	use_clay ? clay_factor : abiotic_factor;
+	use_clay ? clay_factor : soil_factor;
       const double *const abiotic 
 	= find_abiotic (*smb[j], size, soil_water, soil_heat,
 			smb_tillage_factor, j,
@@ -1010,7 +1013,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
     {
       const bool use_clay = clayom.som_use_clay (j);
       const vector<double>& default_factor = 
-	use_clay ? clay_factor : abiotic_factor;
+	use_clay ? clay_factor : soil_factor;
       som[j]->tick (size, find_abiotic (*som[j], size, soil_water, soil_heat,
 					som_tillage_factor, j,
 					default_factor, use_clay, 
@@ -1021,13 +1024,13 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   for (unsigned int j = 0; j < added.size (); j++)
     added[j]->tick (size, find_abiotic (*added[j],
 					size, soil_water, soil_heat,
-					abiotic_factor, tillage_factor),
+					soil_factor, tillage_factor),
 		    &N_soil[0], &N_used[0], &CO2[0],
 		    smb, &buffer.C[0], &buffer.N[0], dom);
 
   // Update buffer.
   for (unsigned int i = 0; i < size; i++)
-      buffer.tick (i, abiotic_factor[i], N_soil[i], N_used[i], som);
+      buffer.tick (i, soil_factor[i], N_soil[i], N_used[i], som);
 
   // Update source.
   for (unsigned int i = 0; i < size; i++)
@@ -1226,7 +1229,7 @@ OrganicMatter::Implementation::abiotic (const OM& om, double T, double h,
     * ((om.water_factor.size () > 0)
        ? om.water_factor (h)
        : water_turnover_factor (h))
-    * (use_clay ? clay_turnover_factor[lay] : 1.0);
+    * (use_clay ? clay_turnover_factor[lay] : soil_turnover_factor[lay]);
 }
 				     
 void
@@ -1861,9 +1864,14 @@ OrganicMatter::Implementation::initialize (const AttributeList& al,
   NO3_source.insert (NO3_source.end (), soil.size (), 0.0);
   NH4_source.insert (NH4_source.end (), soil.size (), 0.0);
   
-  // Clay.
+  // Clay and soil.
   for (unsigned int i = 0; i < soil.size (); i++)
-    clay_turnover_factor.push_back (clayom.factor (soil.clay (i)));
+    {
+      const double soil_factor = soil.turnover_factor (i);
+      const double clay_factor = clayom.factor (soil.clay (i));
+      soil_turnover_factor.push_back (soil_factor);
+      clay_turnover_factor.push_back (soil_factor * clay_factor);
+    }
 
   // Tillage.
   tillage_age.insert (tillage_age.end (), 

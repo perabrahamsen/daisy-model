@@ -1,5 +1,24 @@
 2003-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.70 released.
+
+2003-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon.C, horizon.h (turnover_factor): New parameter.
+	* soil.C, soil.h (turnover_factor): New member function.
+	* organic_matter.C: Use it.
+
+	* horizon.C (rho_mineral, rho_humus, rho_water, rho_ice)
+	(c_fraction_in_humus): Added.
+	* horizon.h (rho_mineral, rho_humus, rho_water, rho_ice)
+	(c_fraction_in_humus): Removed.
+	* soil_heat.C (rho_water, rho_ice): Added constants.
+	* soil_water.C: Ditto.
+	* adsorption_freundlich.C (c_fraction_in_humus): Added.
+	* adsorption_linear.C: Ditto.
+	* soil.C, soil.h: Moved all member function definition to source
+	file. 
+
 	* Version 2.69 released.
 
 2003-04-16  Per Abrahamsen  <abraham@dina.kvl.dk>

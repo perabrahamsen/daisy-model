@@ -21,6 +21,9 @@
 
 
 #include "soil.h"
+#include "horizon.h"
+#include "hydraulic.h"
+#include "tortuosity.h"
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
@@ -116,13 +119,9 @@ Soil::K (int i, double h, double h_ice, double T) const
     return horizon_[i]->hydraulic.K (h_ice) * T_factor; 
 }
 
-double Soil::Theta (int i, double h, double h_ice) const
-{ 
-  if (h < h_ice)
-    return horizon_[i]->hydraulic.Theta (h);
-  else
-    return horizon_[i]->hydraulic.Theta (h_ice);
-}
+double 
+Soil::Cw1 (int i, double h, double h_ice) const
+{ return Theta (i, h, h_ice) - Cw2 (i, h) * h; }
 
 double
 Soil::Cw2 (int i, double h) const
@@ -134,13 +133,85 @@ Soil::Cw2 (int i, double h) const
   return 1.0e-8;
 }
 
+double Soil::Theta (int i, double h, double h_ice) const
+{ 
+  if (h < h_ice)
+    return horizon_[i]->hydraulic.Theta (h);
+  else
+    return horizon_[i]->hydraulic.Theta (h_ice);
+}
+
+double 
+Soil::Theta_res (int i) const
+{ return horizon_[i]->hydraulic.Theta_res; }
+
+double 
+Soil::h (int i, double Theta) const
+{ return horizon_[i]->hydraulic.h (Theta); }
+
+double 
+Soil::M (int i, double h) const
+{ return horizon_[i]->hydraulic.M (h); }
+
 double 
 Soil::dispersivity (int) const
 { return impl.dispersivity; }
 
+void
+Soil::set_porosity (int i, double Theta)
+{ horizon_[i]->hydraulic.set_porosity (Theta); }
+
+double 
+Soil::tortuosity_factor (int i, double Theta) const
+{ return horizon_[i]->tortuosity.factor (horizon_[i]->hydraulic, Theta); }
+
+double 
+Soil::dry_bulk_density (int i) const
+{ return horizon_[i]->dry_bulk_density (); }
+
+double 
+Soil::clay (int i) const
+{ return horizon_[i]->clay (); }
+
+double 
+Soil::humus (int i) const
+{ return horizon_[i]->humus (); }
+
+double 
+Soil::humus_C (int i) const
+{ return horizon_[i]->humus_C (); }
+
+const std::vector<double>& 
+Soil::SOM_fractions (int i) const
+{ return horizon_[i]->SOM_fractions (); }
+
+const std::vector<double>& 
+Soil::SOM_C_per_N (int i) const
+{ return horizon_[i]->SOM_C_per_N (); }
+
+double 
+Soil::turnover_factor(int i) const
+{ return horizon_[i]->turnover_factor (); }
+
+double 
+Soil::heat_conductivity (int i, double Theta, double Ice) const
+{ return horizon_[i]->heat_conductivity (Theta, Ice); }
+
+double 
+Soil::heat_capacity (int i, double Theta, double Ice) const
+{ return horizon_[i]->heat_capacity (Theta, Ice); }
+
 bool
 Soil::has_attribute (const string& name) const
 { return impl.has_attribute (name); }
+
+bool 
+Soil::has_attribute (int i, const std::string& name) const
+{ return horizon_[i]->has_attribute (name); }
+
+double 
+Soil::get_attribute (int i, const std::string& name) const
+{ return horizon_[i]->get_attribute (name); }
 
 void
 Soil::output (Log& log) const
