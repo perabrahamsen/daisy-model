@@ -983,13 +983,31 @@ static bool check_organic (const AttributeList& al, Treelog& err)
   const vector<AttributeList*>& om_alist = al.alist_sequence ("om");
   int missing_initial_fraction = 0;
   int missing_C_per_N = 0;
-
+  double total_fractions = 0.0;
   for (unsigned int i = 0; i < om_alist.size(); i++)
     {
       if (om_alist[i]->number ("initial_fraction") == OM::Unspecified)
 	missing_initial_fraction++;
+      else 
+	total_fractions += om_alist[i]->number ("initial_fraction");
       if (!om_alist[i]->check ("C_per_N"))
 	missing_C_per_N++;
+    }
+  assert (total_fractions >= 0.0);
+  if (total_fractions < 1e-10)
+    {
+      err.entry ("you should specify at least one non-zero fraction");
+      ok = false;
+    }
+  if (approximate (total_fractions, 1.0))
+    {
+      err.entry ("sum of specified fractions should be < 1.0");
+      ok = false;
+    }
+  else if (total_fractions > 1.0)
+    {
+      err.entry ("sum of fractions should be < 1.0");
+      ok = false;
     }
   if (missing_initial_fraction != 1)
     {

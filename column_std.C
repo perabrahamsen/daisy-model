@@ -523,7 +523,7 @@ The organic matter in the soil and on the surface.",
     AttributeList nitrification_alist;
     nitrification_alist.add ("type", "soil");
     nitrification_alist.add ("k_10", 2.08333333333e-7); // 5e-5/24 [1/h]
-    nitrification_alist.add ("k", 5.0e-5); // [gN/cm³]
+    nitrification_alist.add ("k", 5.0e-5); // [g N/cm^3]
     nitrification_alist.add ("active_underground", false);
     nitrification_alist.add ("active_groundwater", false);
     PLF empty;

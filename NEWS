@@ -12,6 +12,20 @@ headlines af the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 2.17 
+
+** Fixed many (small) memory leaks.
+
+Also added workaround for a memory bug in Grounwater pipe, and fixed
+some uninitialized variables in svat PMSW.
+
+** More cleanup in log.dai.
+
+As usual, look in log-old.dai for missing log parameterizations, and
+remember to use an explicit "when" if you don't want hourly values.
+
+** New warnings and errors on invalid input.
+
 * 2.16
 
 ** New "Prod RtDR_T_factor" parameter to the default crop model.

@@ -188,9 +188,9 @@ Set this to true to enable nitrification in the groundwater.");
       syntax.add ("converted", 
 		  "g N/cm^3/h", Syntax::LogOnly, Syntax::Sequence, 
 		  "Amount of ammonium converted this hour.");
-      syntax.add ("k", "g/cm^3", Check::positive (), Syntax::Const, 
+      syntax.add ("k", "g N/cm^3", Check::positive (), Syntax::Const, 
 		  "Half saturation constant.");
-      syntax.add ("k_10", "h^-1", Check::non_negative (), Syntax::Const,
+      syntax.add ("k_10", "g N/cm^3/h", Check::non_negative (), Syntax::Const,
 		  "Max rate.");
       PLF empty;
       syntax.add ("heat_factor", "dg C", Syntax::None (), Syntax::Const,

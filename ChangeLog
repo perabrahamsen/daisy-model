@@ -1,5 +1,9 @@
 2002-03-14  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* Version 2.17 released.
+
+2002-03-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
 	* lib/log.dai ("Chemical"): Fix dimension.
 	("Chemicals"): New parameterization.
 
