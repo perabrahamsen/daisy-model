@@ -349,7 +349,7 @@ Library::add_doc_fun (doc_fun fun)
 { impl.doc_funs.push_back (fun); }
 
 vector<doc_fun>& 
-Library::doc_funs ()
+Library::doc_funs () const
 { return impl.doc_funs; }
 
 void

@@ -64,7 +64,7 @@ public:
   bool is_derived_from (symbol a, symbol b) const;
   const symbol base_model (symbol parameterization) const;
   void add_doc_fun (doc_fun);
-  std::vector<doc_fun>& doc_funs ();
+  std::vector<doc_fun>& doc_funs () const;
   // Dependencies.
   void remove (symbol);
 
