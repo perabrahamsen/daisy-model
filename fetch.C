@@ -24,7 +24,8 @@
 #include "alist.h"
 #include "syntax.h"
 #include "mathlib.h"
-#include <ostream>
+// GCC 2.95 lack ostream.
+#include <iostream>
 
 using namespace std;
 

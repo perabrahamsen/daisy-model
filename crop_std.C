@@ -30,6 +30,7 @@
 #include "vernalization.h"
 #include "photosynthesis.h"
 #include "crpn.h"
+#include "wse.h"
 #include "log.h"
 #include "time.h"
 #include "bioclimate.h"
@@ -57,7 +58,7 @@ public:
   Vernalization vernalization;
   const Photosynthesis photosynthesis;
   CrpN nitrogen;
-  const bool enable_water_stress;
+  const auto_ptr<WSE> water_stress_effect;
   const bool enable_N_stress;
   const double min_light_fraction;
 
@@ -326,8 +327,8 @@ CropStandard::tick (const Time& time,
       production.PotCanopyAss = Ass;
       if (root_system.production_stress >= 0.0)
 	Ass *= (1.0 - root_system.production_stress);
-      else if (enable_water_stress)
-	Ass *= (1.0 - water_stress);
+      else 
+	Ass *= water_stress_effect->factor (water_stress);
       if (enable_N_stress)
 	Ass *= (1.0 - nitrogen_stress);
       Ass *= (1.0 - harvesting.cut_stress);
@@ -493,7 +494,10 @@ CropStandard::CropStandard (const AttributeList& al)
                    : Vernalization::no_vernalization ()),
     photosynthesis (al.alist ("LeafPhot")),
     nitrogen (al.alist ("CrpN")),
-    enable_water_stress (al.flag ("enable_water_stress")),
+    water_stress_effect (Librarian<WSE>::create 
+                         (!al.flag ("enable_water_stress")
+                          ? WSE::none_model ()
+                          : al.alist ("water_stress_effect"))),
     enable_N_stress (al.flag ("enable_N_stress")),
     min_light_fraction (al.number ("min_light_fraction"))
 { }
@@ -536,8 +540,13 @@ CropStandardSyntax::CropStandardSyntax ()
 			"Nitrogen parameters.", CrpN::load_syntax);
 
   syntax.add ("enable_water_stress", Syntax::Boolean, Syntax::Const,
-	      "Set this to true to let water stress limit production.");
+	      "Set this to true to let water stress limit production.\n\
+OBSOLETE: Use water_stress_effect none instead.");
   alist.add ("enable_water_stress", true);
+  syntax.add ("water_stress_effect", Librarian<WSE>::library (), 
+              Syntax::Const, Syntax::Singleton,
+	      "Effect of water stress on production.");
+  alist.add ("water_stress_effect", WSE::default_model ());
   syntax.add ("enable_N_stress", Syntax::Boolean, Syntax::Const,
 	      "Set this true to let nitrogen stress limit production.");
   alist.add ("enable_N_stress", true);

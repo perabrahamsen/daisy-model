@@ -1,7 +1,7 @@
-// daisy.C -- Main module
+// daisy.C -- A soil-crop-atmosphere simulation model.
 //
-// Copyright 1996-2001 Per Abrahamsen.
-// Copyright 2000-2001 KVL.
+// Copyright 1996-2001, 2004 Per Abrahamsen.
+// Copyright 2000-2001, 2004 KVL.
 //
 // This file is part of Daisy.
 // 
@@ -37,13 +37,12 @@
 #include "alist.h"
 #include "common.h"
 #include "column.h"
-#include "submodel.h"
 #include "tmpstream.h"
 
 using namespace std;
 
 const char *const Daisy::default_description = "\
-The Daisy Crop/Soil/Atmosphere Model.";
+The Daisy crop/soil/atmosphere model.";
 
 const vector<Log*> 
 Daisy::find_active_logs (const vector<Log*>& logs, LogAll& log_all)
@@ -60,8 +59,9 @@ Daisy::find_active_logs (const vector<Log*>& logs, LogAll& log_all)
 }
 
 Daisy::Daisy (const AttributeList& al)
-  : syntax (NULL),
-    alist (al),
+  : Program (al),
+    global_syntax (NULL),
+    global_alist (NULL),
     running (false),
     logging (false),
     logs (map_create<Log> (al.alist_sequence ("output"))),
@@ -84,7 +84,8 @@ Daisy::Daisy (const AttributeList& al)
 bool
 Daisy::check (Treelog& err)
 {
-  daisy_assert (syntax);
+  daisy_assert (global_syntax);
+  daisy_assert (global_alist);
   bool ok = true;
 
   // Check weather.
@@ -107,7 +108,7 @@ Daisy::check (Treelog& err)
 	 i != logs.end ();
 	 i++)
       {
-	if (*i == NULL || !(*i)-> check (*syntax, err))
+	if (*i == NULL || !(*i)-> check (err))
 	  ok = false;
       }
   }
@@ -248,9 +249,11 @@ Daisy::run (Treelog& out)
 }
 
 void
-Daisy::initialize (const Syntax& s, Treelog& err)
+Daisy::initialize (const Syntax* glob_syn, const AttributeList* glob_al,
+                   Treelog& err)
 { 
-  syntax = &s; 
+  global_syntax = glob_syn; 
+  global_alist = glob_al;
   if (weather)
     weather->initialize (time, err);
   field.initialize (time, err, weather);
@@ -264,11 +267,9 @@ Daisy::initialize (const Syntax& s, Treelog& err)
 void
 Daisy::load_syntax (Syntax& syntax, AttributeList& alist)
 {
-  alist.add ("submodel", "Daisy");
-  alist.add ("description", Daisy::default_description);
-
   syntax.add ("description", Syntax::String, Syntax::OptionalConst,
 	      "Description of this simulation setup.");
+  alist.add ("description", default_description);
   syntax.add ("output", Librarian<Log>::library (),
 	      Syntax::Const, Syntax::Sequence,
 	      "List of logs for output during the simulation.");
@@ -288,16 +289,6 @@ Good values for this parameter would be hourly, daily or monthly.");
   false_alist.add ("type", "false");
   alist.add ("print_time", false_alist);
 
-  syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
-	      "Run simulation in this directory.\n\
-This can affect both where input files are found and where log files\n\
-are generated.");
-  syntax.add ("path", Syntax::String, Syntax::OptionalConst, Syntax::Sequence,
-	      "List of directories to search for input files in.\n\
-The special value \".\" means the current directory.");
-  syntax.add ("input", Librarian<Parser>::library (), Syntax::OptionalConst, 
-	      Syntax::Singleton,
-	      "Command to add more information about the simulation.");
   syntax.add ("manager", Librarian<Action>::library (), Syntax::State,
 	      Syntax::Singleton,
 	      "Specify the management operations to perform during\n\
@@ -332,5 +323,17 @@ Daisy::~Daisy ()
   sequence_delete (harvest.begin (), harvest.end ());
 }
 
-static Submodel::Register 
-daisy_submodel ("Daisy", Daisy::load_syntax);
+static struct ProgramDaisySyntax
+{
+  static Program&
+  make (const AttributeList& al)
+  { return *new Daisy (al); }
+  ProgramDaisySyntax ()
+  {
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    Daisy::load_syntax (syntax, alist);
+    alist.add ("description", "A soil-crop-atmosphere simulation model.");
+    Librarian<Program>::add_type ("Daisy", alist, syntax, &make);
+  }
+} ProgramDaisy_syntax;

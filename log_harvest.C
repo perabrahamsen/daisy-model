@@ -163,7 +163,10 @@ struct LogHarvest : public Log
   { }
 
   // Create and Destroy.
-  bool check (const Syntax&, Treelog& msg) const
+  void initialize (Treelog&)
+  { }
+
+  bool check (Treelog& msg) const
   { 
     Treelog::Open nest (msg, name);
     bool ok = true;

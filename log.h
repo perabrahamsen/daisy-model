@@ -268,8 +268,8 @@ public:
 
   // Create and Destroy.
 public:
-  virtual bool check (const Syntax&, Treelog& err) const = 0;
-  virtual void initialize (Treelog& out);
+  virtual bool check (Treelog& err) const = 0;
+  virtual void initialize (Treelog& out) = 0;
 protected:
   Log (const AttributeList& al);
 public:

@@ -141,10 +141,6 @@ Log::print_dlf_header (std::ostream& out, const AttributeList& al)
   out << "\n--------------------\n";
 }
 
-void
-Log::initialize (Treelog&)
-{ }
-
 Log::Log (const AttributeList& al)
   : impl (*new Implementation ()),
     name (al.identifier ("type"))

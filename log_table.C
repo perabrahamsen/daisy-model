@@ -80,7 +80,7 @@ struct LogTable : public LogSelect, public Destination
   void add (const symbol value);
 
   // Create and destroy.
-  bool check (const Syntax&, Treelog& msg) const;
+  bool check (Treelog& msg) const;
   static bool contain_time_columns (const vector<Select*>& entries);
   void initialize (Treelog&);
   LogTable (const AttributeList& al);
@@ -333,10 +333,10 @@ LogTable::add (const symbol value)
   dest_name = value;
 }
 
-bool LogTable::check (const Syntax& syntax, Treelog& msg) const
+bool LogTable::check (Treelog& msg) const
 { 
   Treelog::Open nest (msg, name);
-  bool ok = LogSelect::check (syntax, msg);
+  bool ok = LogSelect::check (msg);
   if (!out.good ())
     {
       TmpStream tmp;

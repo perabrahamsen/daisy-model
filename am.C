@@ -1269,6 +1269,10 @@ struct ProgramAM_table : public Program
   }
 
   // Create and Destroy.
+  void initialize (const Syntax*, const AttributeList*, Treelog&)
+  { };
+  bool check (Treelog&)
+  { return true; }
   ProgramAM_table (const AttributeList& al)
     : Program (al)
   { }

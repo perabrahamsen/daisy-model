@@ -1,3 +1,32 @@
+2004-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.67 released.
+
+2004-12-22  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* wse.C, wse.h: New component.
+	* Makefile (COMPONENTS): Add it.
+	* crop_std.C: Use it.
+
+2004-12-19  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* log.h, log.C  (initialize): Made it a pure virtual member.
+	* log_clone.C, log_table.C, log_harvest.C, log_alist.C
+	(initialize): Implement. 
+
+	* program_file.C: New model.
+	* Makefile (MODELS): Add it.
+	* program_batch.C: New model.
+	* Makefile (MODELS): Add it.
+
+	* log_table.C, log_alist.h, log_alist.C, log_select.C:
+	* log.h, log_harvest.C (check): Removed 'Syntax' argument.
+
+	* program.h, program_refdoc.C, am.C (initialize, check): New
+	virtual member functions. 
+	* daisy.C, daisy.h: Made it a program model.
+	* main.C (main): Update caller.
+
 2004-12-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 3.66 released.

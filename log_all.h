@@ -62,6 +62,7 @@ public:
   void output (symbol name, const Time&); // Obsolete.
 
   // Create and destroy.
+  void initialize (Treelog&);
 private:
   static const AttributeList& get_alist ();
 public:

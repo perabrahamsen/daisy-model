@@ -12,6 +12,60 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.67
+
+** You can now control the effect of water stress on crop growth.
+
+In the default crop mode, the new "water_stress_effect" controls how
+the assimilate production is affected by water stress.  There are
+thress different "wse" models that can be used:
+
+none: No effect, similar to setting the now obsolete
+  "enable_water_stress" flag to false.
+
+full: Full linear effect between no stres = full production and no
+   water = no production, which is what Daisy has always use.  This is
+   the default value.
+
+partial:  When water stress is 0.5, the production effect is specified
+  by the y_half parameter, which should be a number between 0 (no
+  production) and 1 (full production).
+
+You can the wse model when define or sow the crop, like this:
+
+  (sow (Grass (water_stress_effect partial (y_half 0.67 []))))
+
+To see a table linking the water stress with the effect on assimilate
+production without running a simulation, you can add this to your
+setup file (at top level):
+
+(run wse (partial (y_half 0.67)))
+
+** Daisy can now run multiple simulations sequentially.
+
+See the new file "batch.dai" in the sample directory for an example. 
+
+** New top level "run" parameter.
+
+You can now seect among build-in programs to run.
+
+If you specify the "run" parameter, the normal Daisy specific
+parameters are disregarded, and the specified program is run.  Daisy
+has the following build-in programs:
+
+Daisy: Run a Daisy simulation.  If you use this, you must specify a
+  Daisy parameterisation, as top level parameters will be ignored.
+
+batch: Run mupltiple program in sequence.
+
+LaTeX: Produce the "components" part of the reference manual in LaTeX
+  format. 
+
+AM_table: Produce a table with the know fertilizer types.
+
+wse: Produce a table shoping the water stress effect with for a
+  specified model parameterisation.
+
 * 3.66
 
 ** Shorter reference manual.

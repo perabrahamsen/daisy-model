@@ -101,6 +101,7 @@ struct LogExtern : public LogSelect,
   const vector<double>& array (symbol tag) const;
 
   // Create and destroy.
+  void initialize (Treelog&);
   LogExtern (const AttributeList& al);
   ~LogExtern ();
 };
@@ -190,6 +191,10 @@ LogExtern::array (symbol tag) const
   daisy_assert (i != arrays.end ());
   return *(*i).second;
 }
+
+void 
+LogExtern::initialize (Treelog&)
+{ }
 
 LogExtern::LogExtern (const AttributeList& al)
   : LogSelect (al),

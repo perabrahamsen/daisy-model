@@ -1,7 +1,6 @@
-// log_clone.C
+// wse.h -- Water Stress Effect on yield.
 // 
-// Copyright 1996-2001 Per Abrahamsen and Søren Hansen
-// Copyright 2000-2001 KVL.
+// Copyright 2004 Per Abrahamsen, Søren Hansen and KVL.
 //
 // This file is part of Daisy.
 // 
@@ -19,33 +18,37 @@
 // along with Daisy; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-//
-// Clone an object by using its log function.
 
-#ifndef LOG_CLONE_H
-#define LOG_CLONE_H
+#ifndef WSE_H
+#define WSE_H
 
-#include "log_alist.h"
+#include "librarian.h"
 
-class LogClone : public LogAList
+
+class WSE
 {
-
-  // Don't use this as a real log.
-private:
-  bool check_leaf (symbol) const;
-  bool check_interior (symbol) const;
-  bool match (const Daisy& daisy, Treelog&);
-  void done (const Time&);
-
-  // Get result.
+  // Content.
 public:
-  const AttributeList& result ();
+  const symbol name;
+  static const char *const description;
+
+  // Simulation.
+public:
+  virtual double factor(const double water_stress) const = 0;
 
   // Create and Destroy.
 public:
-  void initialize (Treelog&);
-  LogClone (const std::string& name, const Syntax&, const AttributeList&);
-  ~LogClone ();
+  static const AttributeList& default_model ();
+  static const AttributeList& none_model ();
+  WSE (const AttributeList& al);
+  virtual ~WSE ();
 };
 
-#endif // LOG_CLONE_H
+#ifdef FORWARD_TEMPLATES
+EMPTY_TEMPLATE
+Librarian<WSE>::Content* Librarian<WSE>::content;
+#endif
+
+static Librarian<WSE> WSE_init ("wse");
+
+#endif // WSE_H

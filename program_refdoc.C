@@ -1,4 +1,4 @@
-// program_refdoc.C -- Refdoc program.
+// program_refdoc.C -- Create reference documentation for Daisy..
 // 
 // Copyright 2004 Per Abrahamsen and KVL.
 //
@@ -44,6 +44,10 @@ struct ProgramRefdoc : public Program
   }
 
   // Create and Destroy.
+  void initialize (const Syntax*, const AttributeList*, Treelog&)
+  { };
+  bool check (Treelog&)
+  { return true; }
   ProgramRefdoc (const AttributeList& al)
     : Program (al)
   { }

@@ -23,6 +23,7 @@
 #ifndef DAISY_H
 #define DAISY_H
 
+#include "program.h"
 #include "time.h"
 #include <vector>
 #include <memory>
@@ -38,13 +39,13 @@ class Condition;
 class Treelog;
 class LogAll;
 
-class Daisy
+class Daisy : public Program
 {
   // Initial content.
 public:
   static const char *const default_description;
-  const Syntax* syntax;
-  const AttributeList& alist;
+  const Syntax* global_syntax;
+  const AttributeList* global_alist;
 
   // Content.
 public:
@@ -73,11 +74,12 @@ public:
   void tick_logs (Treelog&);
   void tick (Treelog&);
   void run (Treelog&);
-  bool check (Treelog& err);
 
   // Create and Destroy.
 public:
-  void initialize (const Syntax&, Treelog& err);
+  void initialize (const Syntax* glob_syn, const AttributeList* glob_al,
+                   Treelog& err);
+  bool check (Treelog& err);
   static void load_syntax (Syntax&, AttributeList&);
   Daisy (const AttributeList&);
   ~Daisy ();

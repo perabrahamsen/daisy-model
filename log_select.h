@@ -103,7 +103,7 @@ struct LogSelect : public Log
   void output (symbol name, const Time&); // Obsolete.
 
   // Create and Destroy.
-  bool check (const Syntax&, Treelog& err) const;
+  bool check (Treelog& err) const;
   static void load_syntax (Syntax&, AttributeList&);
   LogSelect (const AttributeList& al);
   ~LogSelect ();

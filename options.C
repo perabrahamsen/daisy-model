@@ -197,9 +197,9 @@ Options::Options (int& argc, char**& argv,
                 Treelog::Open nest (out, name);
                 if (syntax.check (alist, out))
                   {
-                    auto_ptr<Program> document 
+                    auto_ptr<Program> program
                       (Librarian<Program>::create (alist));
-                    document->run (out);
+                    program->run (out);
                   }
                 prevent_run = true;
               }

@@ -22,7 +22,7 @@
 
 #include "treelog_dual.h"
 #include "assertion.h"
-// BCC5.01 lack ostream.
+// GCC 2.95 lack ostream.
 #include <iostream>
 #include <fstream>
 #include <deque>

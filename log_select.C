@@ -173,7 +173,7 @@ LogSelect::output (symbol, const Time&)
 { daisy_assert (false); }
 
 bool 
-LogSelect::check (const Syntax&, Treelog& err) const
+LogSelect::check (Treelog& err) const
 {
   bool ok = true;
   for (unsigned int i = 0; i < entries.size (); i++)

@@ -28,7 +28,8 @@ const char *const Program::description = "\
 Run a program.";
 
 Program::Program (const AttributeList& al)
-  : name (al.identifier ("type"))
+  : alist (al),
+    name (al.identifier ("type"))
 { }
 
 Program::~Program ()

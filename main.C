@@ -20,6 +20,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "daisy.h"
+#include "parser.h"
 #include "syntax.h"
 #include "alist.h"
 #include "library.h"
@@ -56,8 +57,27 @@ main (int argc, char* argv[])
       Syntax syntax;
       AttributeList alist;
       Daisy::load_syntax (syntax, alist);
+      alist.add ("type", "Daisy");
       Library::load_syntax (syntax, alist);
-
+      
+      syntax.add ("directory", Syntax::String, Syntax::OptionalConst,
+                  "Run program in this directory.\n\
+This can affect both where input files are found and where log files\n\
+are generated.");
+      syntax.add ("path", Syntax::String,
+                  Syntax::OptionalConst, Syntax::Sequence,
+                  "List of directories to search for input files in.\n\
+The special value \".\" means the current directory.");
+      syntax.add ("input", Librarian<Parser>::library (),
+                  Syntax::OptionalConst, Syntax::Singleton,
+                  "Command to add more information about the simulation.");
+      syntax.add ("run", Librarian<Program>::library (), 
+                  Syntax::OptionalState, Syntax::Singleton, 
+                  "Program to run.\n\
+\n\
+If this option is specified, all the 'Daisy' specific top-level attributes\n\
+will be ignored.  If unspecified, run 'Daisy' on the current top-level\n\
+attributes.");
       Options options (argc, argv, syntax, alist, treelog);
 
       switch (argc)
@@ -76,20 +96,33 @@ main (int argc, char* argv[])
 	  daisy_assert (false);
 	}
 
-      // Check the result.
-      { 
-	Treelog::Open nest (treelog, "Daisy");
-	if (!syntax.check (alist, treelog))
-	  return 1;
-      }
-      // Create, check and run the simulation.
+      // Explicit or implicit program?
+      const Library& library = Librarian<Program>::library ();
+      const Syntax* run_syntax;
+      const AttributeList* run_alist;
+
+      if (alist.check ("run"))
+        {
+          run_alist = &alist.alist ("run");
+          daisy_assert (run_alist->check ("type"));
+          run_syntax = &library.syntax (run_alist->identifier ("type"));
+        }
+      else
+        {
+          run_alist = &alist;
+          run_syntax = &syntax;
+        }
+
+      // Create, check and run the program.
       options.copyright (treelog);
-      Daisy daisy (alist);
-      daisy.initialize (syntax, treelog);
-      if (!daisy.check (treelog))
+      if (!run_syntax->check (*run_alist, treelog))
+        return 1;
+      auto_ptr<Program> program (Librarian<Program>::create (*run_alist));
+      program->initialize (&syntax, &alist, treelog);
+      if (!program->check (treelog))
 	return 1;
 
-      const string when = string ("Simulation started ") + ctime (&start_time);
+      const string when = string ("Program started ") + ctime (&start_time);
       TmpStream start_msg;
       start_msg () << when.substr (0, when.size () - 1);
       const time_t time_ago = time (NULL) - start_time;
@@ -101,14 +134,14 @@ main (int argc, char* argv[])
 	start_msg () << ", " << time_ago << " seconds ago.";
       treelog.message (start_msg.str ());
 
-      daisy.run (treelog);
+      program->run (treelog);
 
       const time_t time_used = time (NULL) - start_time;
       const int hours = time_used / 3600;
       const int minutes = (time_used % 3600) / 60;
       const int seconds = time_used % 60;
       TmpStream end_msg;
-      end_msg () << "Simulation done after ";
+      end_msg () << "Program finished after ";
       if (hours == 1)
 	end_msg () << "1 hour, ";
       else if (hours > 0)

@@ -276,6 +276,10 @@ LogAll::get_alist ()
   return alist;
 }
 
+void
+LogAll::initialize (Treelog&)
+{ }
+
 LogAll::LogAll (const vector<Log*>& logs)
   : LogSelect (get_alist ()),
     msg (NULL)

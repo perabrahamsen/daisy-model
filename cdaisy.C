@@ -451,8 +451,8 @@ daisy_daisy_create (const Syntax* syntax, const AttributeList* alist)
 { 
   static TreelogStream treelog (cerr);
   static Treelog::Open nest (treelog, "daisy");
-  Daisy* daisy =  new Daisy (*alist); 
-  daisy->initialize (*syntax, treelog);
+  Daisy* daisy = new Daisy (*alist); 
+  daisy->initialize (syntax, alist, treelog);
   return daisy;
 }
 

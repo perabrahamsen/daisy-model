@@ -30,6 +30,7 @@ class Program
 {
   // Content.
 public:
+  const AttributeList& alist;  	// Remember attributes for checkpoint.
   const symbol name;
   static const char *const description;
 
@@ -38,6 +39,11 @@ public:
   virtual void run (Treelog&) = 0;
 
   // Create and Destroy.
+public:
+  virtual void initialize (const Syntax* glob_syn,
+                           const AttributeList* glob_al,
+                           Treelog& err) = 0;
+  virtual bool check (Treelog& err) = 0;
 protected:
   Program (const AttributeList& al);
 public:

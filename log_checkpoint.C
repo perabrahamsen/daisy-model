@@ -35,6 +35,7 @@ struct LogCheckpoint : public LogAList
   const string description;	// Comment to go to the start of the file.
   auto_ptr<Condition> condition; // Should we print a log now?
   Time time;			// Time of current checkpoint.
+  const AttributeList* global_alist; // All attributes.
 
   // Start and end of time step.
   bool check_leaf (symbol) const;
@@ -43,6 +44,7 @@ struct LogCheckpoint : public LogAList
   void done (const Time& time);
 
   // Create and Destroy.
+  void initialize (Treelog&);
   LogCheckpoint (const AttributeList& al);
   ~LogCheckpoint ();
 };
@@ -64,7 +66,8 @@ LogCheckpoint::match (const Daisy& daisy, Treelog& out)
   if (is_active)
     {
       static const symbol daisy_symbol ("daisy");
-      push (daisy_symbol, *daisy.syntax, daisy.alist);
+      push (daisy_symbol, *daisy.global_syntax, daisy.alist);
+      global_alist = daisy.global_alist;
       time = daisy.time;
     }
   return is_active;
@@ -89,42 +92,31 @@ LogCheckpoint::done (const Time&)
 	      << time.mday () << "+" << time.hour () << ".dai";
       const string filename (scratch.str ());
 
-      // Start checkpoint from next timestep.
-      daisy_assert (alist ().check ("time"));
-      Time time (alist ().alist ("time"));
-      time.tick_hour ();
-      AttributeList new_time;
-      new_time.add ("year", time.year ());
-      new_time.add ("month", time.month ());
-      new_time.add ("mday", time.mday ());
-      new_time.add ("hour", time.hour ());
-      alist ().add ("time", new_time);
-
       // Open log file.
       PrinterFile printer (filename);
       printer.print_comment (description);
 
       // Print "directory" and "path" before inputs.
-      printer.print_entry (alist (), syntax (), "directory");
-      printer.print_entry (alist (), syntax (), "path");
+      printer.print_entry (*global_alist, syntax (), "directory");
+      printer.print_entry (*global_alist, syntax (), "path");
       alist ().remove ("directory"); // Avoid printing them twice.
       alist ().remove ("path"); 
       
       // Print input files.
-      if (alist ().check ("parser_inputs"))
+      if (global_alist->check ("parser_inputs"))
 	{
 	  const vector<AttributeList*> inputs 
-	    (alist ().alist_sequence ("parser_inputs"));
+	    (global_alist->alist_sequence ("parser_inputs"));
 	  printer.print_comment ("Input files.");
 	  for (unsigned int i = 0; i < inputs.size (); i++)
 	    printer.print_input (*inputs[i]);
 	}
 
       // Print included files.
-      if (alist ().check ("parser_files"))
+      if (global_alist->check ("parser_files"))
 	{
-	  const vector<symbol> files (alist ()
-				      .identifier_sequence ("parser_files"));
+	  const vector<symbol> 
+            files (global_alist->identifier_sequence ("parser_files"));
 	  const string lib_start = "From file '";
 	  const string lib_end = "':";
 	  for (unsigned int i = 0; i < files.size (); i++)
@@ -139,14 +131,25 @@ LogCheckpoint::done (const Time&)
       printer.print_comment ("Cloned objects:");
       printer.print_library_file ("*clone*");
 
+      // Start checkpoint from next timestep.
+      daisy_assert (alist ().check ("time"));
+      Time time (alist ().alist ("time"));
+      time.tick_hour ();
+      AttributeList new_time;
+      new_time.add ("year", time.year ());
+      new_time.add ("month", time.month ());
+      new_time.add ("mday", time.mday ());
+      new_time.add ("hour", time.hour ());
+      alist ().add ("time", new_time);
+
       // Print content.
       printer.print_comment ("Content");
-      static Syntax dummy_syntax;
-      static AttributeList default_alist;
-      if (dummy_syntax.entries () == 0)
-	Daisy::load_syntax (dummy_syntax, default_alist);
+      
+      Syntax daisy_syntax;
+      AttributeList default_alist;
+      Daisy::load_syntax (daisy_syntax, default_alist);
 
-      printer.print_alist (alist (), syntax (), default_alist);
+      printer.print_alist (alist (), daisy_syntax, default_alist);
 
       if (!printer.good ())
 	{
@@ -160,6 +163,10 @@ LogCheckpoint::done (const Time&)
     }
   daisy_assert (nested == 0);
 }
+
+void 
+LogCheckpoint::initialize (Treelog&)
+{ }
 
 LogCheckpoint::LogCheckpoint (const AttributeList& al)
   : LogAList (al),
@@ -175,31 +182,31 @@ LogCheckpoint::~LogCheckpoint ()
 static struct LogCheckpointSyntax
 {
   static Log& make (const AttributeList& al)
-    { return *new LogCheckpoint (al); }
+  { return *new LogCheckpoint (al); }
 
   LogCheckpointSyntax ()
-    { 
-      Syntax& syntax = *new Syntax ();
-      AttributeList& alist = *new AttributeList ();
-      alist.add ("description", "\
+  { 
+    Syntax& syntax = *new Syntax ();
+    AttributeList& alist = *new AttributeList ();
+    alist.add ("description", "\
 Create a checkpoint of the entire simulation state, suitable for later\n\
 hot start.");
-      LogAList::load_syntax (syntax, alist);
-      syntax.add ("where", Syntax::String, Syntax::Const,
-		  "File name prefix for the generated checkpoint.\n\
+    LogAList::load_syntax (syntax, alist);
+    syntax.add ("where", Syntax::String, Syntax::Const,
+                "File name prefix for the generated checkpoint.\n\
 The time will be appended, together with the '.dai' suffix.");
-      alist.add ("where", "checkpoint");
-      syntax.add ("description", Syntax::String, Syntax::Const,
-		  "Description of this particular checkpoint.");
-      alist.add ("description", "\
+    alist.add ("where", "checkpoint");
+    syntax.add ("description", Syntax::String, Syntax::Const,
+                "Description of this particular checkpoint.");
+    alist.add ("description", "\
 Create a checkpoint of the entire simulation state, suitable for later\n\
 hot start.");
-      syntax.add ("when", Librarian<Condition>::library (),
-		  "Make a checkpoint every time this condition is true.");
-      AttributeList finished_alist;
-      finished_alist.add ("type", "finished");
-      alist.add ("when", finished_alist);
-      Librarian<Log>::add_type ("checkpoint", alist, syntax, &make);
-    }
+    syntax.add ("when", Librarian<Condition>::library (),
+                "Make a checkpoint every time this condition is true.");
+    AttributeList finished_alist;
+    finished_alist.add ("type", "finished");
+    alist.add ("when", finished_alist);
+    Librarian<Log>::add_type ("checkpoint", alist, syntax, &make);
+  }
 } LogCheckpoint_syntax;
 
