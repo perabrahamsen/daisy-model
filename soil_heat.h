@@ -14,14 +14,15 @@ class Syntax;
 
 class SoilHeat
 {
-  vector<double> T;
+  struct Implementation;
+  Implementation& impl;
 public:
   void tick (const Surface&, const Bioclimate&);
-  inline double temperature (int i) const
-  { return T[i]; }
+  double temperature (int i) const;
   bool check (unsigned n) const;
   static void load_syntax (Syntax&, AttributeList&);
   SoilHeat (const AttributeList&);
+  ~SoilHeat ();
 };
 
 #endif SOIL_HEAT_H

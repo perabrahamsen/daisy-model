@@ -85,8 +85,8 @@ output_submodule (const T& submodule,
 }
 
 template <class T> void
-output_list (const T items,
-	     const char* name, Log& log, const Filter& filter)
+output_list (T const& items,
+	     const char* name, Log& log, Filter const& filter)
 {
   if (filter.check (name))
     {
@@ -108,8 +108,8 @@ output_list (const T items,
 }
 
 template <class T> void
-output_vector (T items,
-	       const char* name, Log& log, const Filter& filter)
+output_vector (T const& items,
+	       const char* name, Log& log, Filter const& filter)
 {
   if (filter.check (name))
     {

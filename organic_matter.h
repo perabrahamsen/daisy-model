@@ -28,11 +28,13 @@ public:
   void output (Log& log, const Filter& filter) const;
   static bool check (const AttributeList&);
   bool check () const;
+  bool check_am (const AttributeList& am) const;
   void add (AOM&);
 
   // Create & Destroy.
 public:
   static void load_syntax (Syntax&, AttributeList&);
+  void initialize (const Soil& soil);
   OrganicMatter (const AttributeList&);
   ~OrganicMatter ();
 };

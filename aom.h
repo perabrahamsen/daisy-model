@@ -41,6 +41,7 @@ private:
   // Create & Destroy.
 public:
   static const Syntax& syntax ();
+  void initialize (const Soil& soil);
   OM (const AttributeList& al);
   OM (const AttributeList& al, double C, double N);
 };
@@ -71,6 +72,7 @@ private:
   static vector<OM*>& create_om (const AttributeList&);
 public:
   static InorganicMatter im (const AttributeList&);
+  void initialize (const Soil& soil);
   AOM (const Time&, const AttributeList&);
   AOM (const AttributeList&);
   virtual ~AOM ();

@@ -12,8 +12,8 @@
 #include "soil_NO3.h"
 #include "soil_heat.h"
 #include "mathlib.h"
+#include "csmp.h"
 #include <algorithm>
-
 
 struct OrganicMatter::Implementation
 {
@@ -32,8 +32,9 @@ struct OrganicMatter::Implementation
     const int where;		// Which SOM dk:pulje does it end in?
     void output (Log& log, const Filter& filter) const;
     void tick (int i, double turnover_factor, double N_soil, double& N_used,
-	       const vector<OM*>);
+	       const vector<OM*>&);
     static void load_syntax (Syntax& syntax, AttributeList& alist);
+    void initialize (const Soil& soil);
     Buffer (const AttributeList& al);
   } buffer;
 
@@ -45,14 +46,11 @@ struct OrganicMatter::Implementation
   void output (Log& log, const Filter& filter) const;
   bool check () const;
 
-private:
-  double heat_turnover_factor (double /* T */)
-  { return 1.0; }		// TODO
-  double water_turnover_factor (double /* T */)
-  { return 1.0; }		// TODO
+  const CSMP& heat_turnover_factor;
+  const CSMP& water_turnover_factor;
 
   // Create & Destroy.
-public:
+  void initialize (const Soil& soil);
   Implementation (const AttributeList& al);
 };
 
@@ -68,14 +66,8 @@ OrganicMatter::Implementation::Buffer::output (Log& log,
 void
 OrganicMatter::Implementation::Buffer::tick (int i, double turnover_factor,
 					     double N_soil, double& N_used,
-					     const vector<OM*> som)
+					     const vector<OM*>& som)
 {
-  // Make sure the vectors are large enough.
-  while (N.size () < i + 0U)
-    N.push_back (0.0);
-  while (C.size () < i + 0U)
-    C.push_back (0.0);
-
   // How much can we process?
   double rate = turnover_rate * turnover_factor;
   double N_need = C[i] * rate / som[where]->C_per_N  - N[i] * rate;
@@ -111,6 +103,15 @@ OrganicMatter::Implementation::Buffer::load_syntax (Syntax& syntax,
   alist.add ("where", 1);
 }
 
+void
+OrganicMatter::Implementation::Buffer::initialize (const Soil& soil)
+{
+  // Make sure the vectors are large enough.
+  while (N.size () < soil.size () +0U)
+    N.push_back (0.0);
+  while (C.size () < soil.size () +0U)
+    C.push_back (0.0);
+}
 OrganicMatter::Implementation::Buffer::Buffer (const AttributeList& al)
   : C (al.number_sequence ("C")),
     N (al.number_sequence ("N")),
@@ -182,7 +183,7 @@ OrganicMatter::Implementation::tick (const Soil& soil,
 
       const double turnover_factor 
 	= heat_turnover_factor (soil_heat.temperature (i))
-	* water_turnover_factor (soil_water.h (i));
+	* water_turnover_factor (soil_water.pF (i));
 
       // Handle all the OM dk:puljer
       for (unsigned int j = 0; j < smb.size (); j++)
@@ -214,6 +215,18 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   soil_NH4.add_to_source (NH4_source);
 }
       
+void 
+OrganicMatter::Implementation::initialize (const Soil& soil)
+{
+  buffer.initialize (soil);
+  for (int i = 0; i +0U < aom.size (); i++)
+    aom[i]->initialize (soil);
+  for (int i = 0; i +0U < smb.size (); i++)
+    smb[i]->initialize (soil);
+  for (int i = 0; i +0U < som.size (); i++)
+    som[i]->initialize (soil);
+}
+
 OrganicMatter::Implementation::Implementation (const AttributeList& al)
   : K_NH4 (al.number ("K_NH4")),
     K_NO3 (al.number ("K_NO3")),
@@ -221,7 +234,9 @@ OrganicMatter::Implementation::Implementation (const AttributeList& al)
     aom (map_construct <AOM> (al.list_sequence ("am"))),
     smb (map_construct <OM> (al.list_sequence ("smb"))),
     som (map_construct <OM> (al.list_sequence ("som"))),
-    buffer (al.list ("buffer"))
+    buffer (al.list ("buffer")),
+    heat_turnover_factor (al.csmp ("heat_turnover_factor")),
+    water_turnover_factor (al.csmp ("water_turnover_factor"))
 { }
 
 void 
@@ -245,7 +260,54 @@ OrganicMatter::check (const AttributeList& al)
 {
   bool ok = true;
 
+  const vector<const AttributeList*>& am_alist = al.list_sequence ("am");
   const vector<const AttributeList*>& smb_alist = al.list_sequence ("smb");
+  const vector<const AttributeList*>& som_alist = al.list_sequence ("som");
+
+  for (unsigned int j = 0; j < am_alist.size(); j++)
+    {
+      bool aom_ok = true;
+      ::check (*am_alist[j], "om", aom_ok);
+      if (aom_ok)
+	{
+	  bool om_ok = true;
+	  const vector<const AttributeList*>& om_alist
+	    = am_alist[j]->list_sequence ("om");
+	  for (unsigned int i = 0; i < smb_alist.size(); i++)
+	    {
+	      ::check (*om_alist[i], "C_per_N", om_ok);
+	      ::check (*om_alist[i], "turnover_rate", om_ok);
+	      ::check (*om_alist[i], "efficiency", om_ok);
+	      vector<double> fractions
+		= om_alist[i]->number_sequence ("fractions");
+	      if (fractions.size () != smb_alist.size () + 1)
+		{
+		  cerr << "You have " << fractions.size ()
+		       << " fractions but " << smb_alist.size ()
+		       << " smb and one buffer.\n";
+		  om_ok = false;
+		}
+	      double sum
+		= accumulate (fractions.begin (), fractions.end (), 0.0);
+	      if (abs (sum - 1.0) > 0.0001)
+		{
+		  cerr << "The sum of all fractions is " << sum << "\n";
+		  om_ok = false;
+		}
+	      if (!om_ok)
+		{
+		  cerr << "in om[" << i << "]\n";
+		  aom_ok = false;
+		}
+	    }
+	}
+      if (!aom_ok)
+	{
+	  cerr << "in am[" << j << "]\n";
+	  ok = false;
+	}
+    }
+
   for (unsigned int i = 0; i < smb_alist.size(); i++)
     {
       bool om_ok = true;
@@ -253,6 +315,20 @@ OrganicMatter::check (const AttributeList& al)
       ::check (*smb_alist[i], "turnover_rate", om_ok);
       ::check (*smb_alist[i], "efficiency", om_ok);
       ::check (*smb_alist[i], "maintenance", om_ok);
+      vector<double> fractions = smb_alist[i]->number_sequence ("fractions");
+      if (fractions.size () != smb_alist.size () + som_alist.size ())
+	{
+	  cerr << "You have " << fractions.size () << " fractions but " 
+	       << smb_alist.size () << " smb and " << som_alist.size ()
+	       << " som.\n";
+	  om_ok = false;
+	}
+      double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
+      if (abs (sum - 1.0) > 0.0001)
+	{
+	  cerr << "The sum of all fractions is " << sum << "\n";
+	  om_ok = false;
+	}
       if (!om_ok)
 	{
 	  cerr << "in smb[" << i << "]\n";
@@ -260,13 +336,26 @@ OrganicMatter::check (const AttributeList& al)
 	}
     }
 
-  const vector<const AttributeList*>& som_alist = al.list_sequence ("som");
   for (unsigned int i = 0; i < som_alist.size(); i++)
     {
       bool om_ok = true;
       ::check (*som_alist[i], "C_per_N", om_ok);
       ::check (*som_alist[i], "turnover_rate", om_ok);
       ::check (*som_alist[i], "efficiency", om_ok);
+      vector<double> fractions = som_alist[i]->number_sequence ("fractions");
+      if (fractions.size () != smb_alist.size () + som_alist.size ())
+	{
+	  cerr << "You have " << fractions.size () << " fractions but " 
+	       << smb_alist.size () << " smb and " << som_alist.size ()
+	       << " som.\n";
+	  om_ok = false;
+	}
+      double sum = accumulate (fractions.begin (), fractions.end (), 0.0);
+      if (abs (sum - 1.0) > 0.0001)
+	{
+	  cerr << "The sum of all fractions is " << sum << "\n";
+	  om_ok = false;
+	}
       if (!om_ok)
 	{
 	  cerr << "in som[" << i << "]\n";
@@ -281,6 +370,51 @@ OrganicMatter::check (const AttributeList& al)
 }
 
 bool
+OrganicMatter::check_am (const AttributeList& am) const
+{
+  bool ok = true;
+  ::check (am, "om", ok);
+  if (ok)
+    {
+      const vector<const AttributeList*>& om_alist
+	= am.list_sequence ("om");
+      
+      for (unsigned int i = 0; i < om_alist.size(); i++)
+	{
+	  bool om_ok = true;
+	  ::check (*om_alist[i], "fractions", ok);
+	  if (om_ok)
+	    {
+	      vector<double> fractions
+		= om_alist[i]->number_sequence ("fractions");
+	      if (fractions.size () != impl.smb.size () + 1)
+		{
+		  cerr << "You have " << fractions.size ()
+		       << " fractions but " << impl.smb.size ()
+		       << " smb and one buffer.\n";
+		  om_ok = false;
+		}
+	      double sum
+		= accumulate (fractions.begin (), fractions.end (), 0.0);
+	      if (abs (sum - 1.0) > 0.0001)
+		{
+		  cerr << "The sum of all fractions is " << sum << "\n";
+		  om_ok = false;
+		}
+	    }
+	  if (!om_ok)
+	    {
+	      cerr << "in om[" << i << "]\n";
+	      ok = false;
+	    }
+	}
+    }
+  if (!ok)
+    cerr << "in added matter `" << am.name ("type") << "'\n";
+  return ok;
+}
+
+bool
 OrganicMatter::check () const
 {
   return impl.check ();
@@ -290,6 +424,12 @@ void
 OrganicMatter::add (AOM& aom)
 {
   impl.add (aom);
+}
+
+void 
+OrganicMatter::initialize (const Soil& soil)
+{
+  impl.initialize (soil);
 }
 
 OrganicMatter::OrganicMatter (const AttributeList& al)
@@ -308,7 +448,9 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("K_NO3", Syntax::Number, Syntax::Const);
   syntax.add ("CO2", Syntax::Number, Syntax::LogOnly);
   syntax.add ("am", AOM::library (), Syntax::State, Syntax::Sequence);
-  syntax.add ("smb", OM::syntax (), Syntax::State, 2);
-  syntax.add ("som", OM::syntax (), Syntax::State, 2);
+  syntax.add ("smb", OM::syntax (), Syntax::State, Syntax::Sequence);
+  syntax.add ("som", OM::syntax (), Syntax::State, Syntax::Sequence);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);
+  syntax.add ("heat_turnover_factor", Syntax::CSMP, Syntax::Const);
+  syntax.add ("water_turnover_factor", Syntax::CSMP, Syntax::Const);
 }

@@ -22,27 +22,35 @@ const Syntax& OM::syntax ()
 
 OM::OM (const AttributeList& al)
   : top_C (al.check ("top_C") ? al.number ("top_C") : 0.0),
-    C (al.check ("C") ? al.number_sequence ("C") : *new vector<double> ()),
     C_per_N (al.number ("C_per_N")),
     turnover_rate (al.number ("turnover_rate")),
     efficiency (al.number ("efficiency")),
     maintenance (al.check ("maintenance") ? al.number ("maintenance") : 0.0),
-    fractions (al.check ("fractions") 
-	       ? al.number_sequence ("fractions")
-	       : *new vector<double> ())
-{ }
+    fractions (al.number_sequence ("fractions"))
+{
+  if (al.check ("C"))
+    C = al.number_sequence ("C");
+}
 
-OM::OM (const AttributeList& al, const double C, const double N)
-  : top_C (C),
-    C (*new vector<double> ()),
-    C_per_N (C/N),
+OM::OM (const AttributeList& al, const double carbon, const double N)
+  : top_C (carbon),
+    C_per_N (carbon/N),
     turnover_rate (al.number ("turnover_rate")),
     efficiency (al.number ("efficiency")),
     maintenance (al.check ("maintenance") ? al.number ("maintenance") : 0.0),
-    fractions (al.check ("fractions") 
-	       ? al.number_sequence ("fractions")
-	       : *new vector<double> ())
-{ }
+    fractions (al.number_sequence ("fractions"))
+{
+  if (al.check ("C"))
+    C = al.number_sequence ("C");
+}
+
+void 
+OM::initialize (const Soil& soil)
+{
+  // Create initial C.
+  while (C.size () < soil.size () +0U)
+    C.push_back (0.0);
+}
 
 void
 OM::output (Log& log, const Filter& filter) const
@@ -209,12 +217,10 @@ AOM::check () const
       bool om_ok = true;
       
       non_negative (om[i]->top_C, "top_C", om_ok);
-      // TODO: [om[i]->C]
       non_negative (om[i]->C_per_N, "C_per_N", om_ok);
       non_negative (om[i]->turnover_rate, "turnover_rate", om_ok);
       non_negative (om[i]->efficiency, "efficiency", om_ok);
       non_negative (om[i]->maintenance, "maintenance", om_ok);
-      // TODO: [om[i]->fractions]
       if (!om_ok)
 	{
 	  cerr << "in om[" << i << "]\n";
@@ -326,6 +332,13 @@ AOM::create_om (const AttributeList& al)
   return om;
 }
 
+void 
+AOM::initialize (const Soil& soil)
+{
+  for (int i = 0; i +0U < om.size (); i++)
+    om[i]->initialize (soil);
+}
+
 AOM::AOM (const Time& t, const AttributeList& al)
   : creation (t),
     name (al.name ("type")),
@@ -355,7 +368,7 @@ AOM_init::AOM_init ()
       OM_syntax->add ("turnover_rate", Syntax::Number, Syntax::Optional);
       OM_syntax->add ("efficiency", Syntax::Number, Syntax::Optional);
       OM_syntax->add ("maintenance", Syntax::Number, Syntax::Optional);
-      OM_syntax->add ("fractions", Syntax::Number, Syntax::Optional, 
+      OM_syntax->add ("fractions", Syntax::Number, Syntax::Const, 
 		      Syntax::Sequence);
 
       // AOM Library.

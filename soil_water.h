@@ -38,6 +38,7 @@ public:
 public:
   double h (int i) const
   { return h_[i]; }
+  double pF (int i) const;
   double Theta (int i) const
   { return Theta_[i]; }
   double Theta_old (int i) const

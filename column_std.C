@@ -56,6 +56,8 @@ public:
 
   bool check () const;
   static bool check (const AttributeList&);
+  bool check_am (const AttributeList& am) const 
+  { return organic_matter.check_am (am); }
   void output (Log&, const Filter&) const;
 
   // Create and Destroy.
@@ -178,6 +180,7 @@ ColumnStandard::tick (const Time& time,
     (*crop)->tick (time, bioclimate, soil, soil_heat);
   soil_NO3.tick (soil, soil_water, surface.matter_flux ().im.NO3);
   soil_NH4.tick (soil, soil_water, surface.matter_flux ().im.NH4);
+  organic_matter.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4);
 }
 
 void
@@ -217,7 +220,9 @@ ColumnStandard::ColumnStandard (const AttributeList& al)
     organic_matter (al.list ("OrganicMatter")),
     nitrification (al.list ("Nitrification")),
     denitrification (al.list ("Denitrification"))
-{ }
+{ 
+  organic_matter.initialize (soil);
+}
 
 ColumnStandard::~ColumnStandard ()
 { }

@@ -341,7 +341,10 @@ Solute::initialize (const Soil& soil, const SoilWater& soil_water,
       M = al.number_sequence ("M");
       size = M.size ();
     }
-  assert (size > 0);
+  if (size == 0)
+    // This is an initialization error.  It will be catched when the
+    // `check' member function is called.
+    return;
 
   if (!al.check ("C"))
     for (int i = 0; i < size; i++)

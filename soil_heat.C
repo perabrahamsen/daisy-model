@@ -5,14 +5,19 @@
 #include "bioclimate.h"
 #include "syntax.h"
 
-void 
-SoilHeat::tick (const Surface&, const Bioclimate& bioclimate)
+struct SoilHeat::Implementation
 {
-  fill (T.begin (), T.end (), bioclimate.AirTemperature ());
-}
+  vector<double> T;
+  void tick (const Surface&, const Bioclimate& bioclimate)
+  { fill (T.begin (), T.end (), bioclimate.AirTemperature ()); }
+  bool check (unsigned n) const;
+  Implementation (const AttributeList& al)
+    : T (al.number_sequence ("T"))
+  { }
+};
 
 bool
-SoilHeat::check (unsigned n) const
+SoilHeat::Implementation::check (unsigned n) const
 {
   bool ok = true;
   if (T.size () != n)
@@ -24,6 +29,24 @@ SoilHeat::check (unsigned n) const
   return ok;
 }
 
+void 
+SoilHeat::tick (const Surface& surface, const Bioclimate& bioclimate)
+{
+  impl.tick (surface, bioclimate);
+}
+
+double
+SoilHeat::temperature (int i) const
+{
+  return impl.T[i]; 
+}
+
+bool
+SoilHeat::check (unsigned n) const
+{
+  return impl.check (n);
+}
+
 void
 SoilHeat::load_syntax (Syntax& syntax, AttributeList&)
 { 
@@ -31,5 +54,10 @@ SoilHeat::load_syntax (Syntax& syntax, AttributeList&)
 }
 
 SoilHeat::SoilHeat (const AttributeList& al)
-  : T (al.number_sequence ("T"))
+  : impl (*new Implementation (al))
 { }
+
+SoilHeat::~SoilHeat ()
+{
+  delete &impl;
+}

@@ -102,7 +102,10 @@ HorizonM_vG::M (double h) const
 double 
 HorizonM_vG::Se (double h) const
 {
-  return pow (1 / (1 + pow (a * h, n)), m);
+  if (h < 0)
+    return pow (1 / (1 + pow (a * h, n)), m);
+  else
+    return 1.0;
 }
 
 HorizonM_vG::HorizonM_vG (const AttributeList& al)

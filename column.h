@@ -41,6 +41,7 @@ public:
   virtual void tick (const Time&, const Weather&, Groundwater&) = 0;
 
   virtual bool check () const = 0;
+  virtual bool check_am (const AttributeList& am) const = 0;
   virtual void output (Log&, const Filter&) const = 0;
 
   // Library.

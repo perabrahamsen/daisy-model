@@ -23,8 +23,7 @@ public:
 
   // Create and Destroy.
 public:
-  bool check (Daisy&) const
-  { return AOM::check (am); }
+  bool check (Daisy&) const;
 private:
   friend class ActionFertilizeSyntax;
   static Action& make (const AttributeList&);
@@ -44,13 +43,41 @@ ActionFertilize::doIt (Daisy& daisy) const
       // Add organic matter, if any.
       if (am.number ("total_C_fraction") > 0.0)
 	{
-	  AOM& aom = *new AOM (daisy.time, am);
-	  if (aom.check ())
-	    (*i)->fertilize (aom, from, to);
+	  if ((*i)->check_am (am))
+	    {
+	      AOM& aom = *new AOM (daisy.time, am);
+	      if (aom.check ())
+		(*i)->fertilize (aom, from, to);
+	      else
+		cerr << "Not fertilizing.\n";
+	    }
 	  else
-	    cerr << "Not fertilizing.\n";
+	    cerr << "Ignoring malformed fertilizer\n";
 	}
     }
+}
+
+bool
+ActionFertilize::check (Daisy&) const
+{ 
+  bool ok = true;
+
+  if (!AOM::check (am))
+    ok = false;
+  if (from > 0.0 || to > 0.0)
+    {
+      cerr << "You can only fertilize on or below the ground.\n";
+      ok = false;
+    }
+  if (from < to)
+    {
+      cerr << "from must be higher than to in the fertilization area.\n";
+      ok = false;
+    }
+  if (!ok)
+    cerr << "in fertilize action\n";
+
+  return ok;
 }
 
 ActionFertilize::ActionFertilize (const AttributeList& al)
