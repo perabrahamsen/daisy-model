@@ -78,6 +78,7 @@ public:
   symbol log_name () const;
   virtual const Soil* soil () const; // For array tags.
   virtual int size () const;	// For array tags.
+  static symbol select_get_tag (const AttributeList& al);
 
   // Nesting.
 public:

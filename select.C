@@ -89,7 +89,6 @@ struct Select::Implementation
   string dimension;		// Physical dimension of this entry.
 
   // Create and Destroy.
-  static symbol select_get_tag (const AttributeList& al);
   bool check (const string& spec_dim, Treelog& err) const;
   Implementation (const AttributeList& al);
   ~Implementation ();
@@ -207,21 +206,6 @@ Select::Implementation::convert (double value) const
   return negate ? -result : result;
 }
 
-symbol
-Select::Implementation::select_get_tag (const AttributeList& al)
-{
-  if (al.check ("tag"))
-    return al.identifier ("tag");
-
-  vector<symbol> path  = al.identifier_sequence ("path");
-  
-  if (path.size () > 0)
-    return path[path.size () - 1];
-
-  static const symbol none_symbol ("<none>");
-  return none_symbol;
-}
-
 // Create and Destroy.
 bool 
 Select::Implementation::check (const string& spec_dim, Treelog& err) const
@@ -239,7 +223,7 @@ Select::Implementation::Implementation (const AttributeList& al)
     factor (al.number ("factor")),
     offset (al.number ("offset")),
     negate (al.flag ("negate")),
-    tag (select_get_tag (al)),
+    tag (Select::select_get_tag (al)),
     dimension (al.check ("dimension")
 	       ? al.name ("dimension") : Syntax::Unknown ())
 { }
@@ -277,6 +261,20 @@ int
 Select::size () const
 { return -1; }
 
+symbol
+Select::select_get_tag (const AttributeList& al)
+{
+  if (al.check ("tag"))
+    return al.identifier ("tag");
+
+  vector<symbol> path  = al.identifier_sequence ("path");
+  
+  if (path.size () > 0)
+    return path[path.size () - 1];
+
+  static const symbol none_symbol ("<none>");
+  return none_symbol;
+}
 
 const symbol Select::wildcard ("*");
 

@@ -752,8 +752,6 @@ mactrans${OBJ}: mactrans.C mactrans.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h
 macro${OBJ}: macro.C macro.h librarian.h common.h library.h symbol.h alist.h \
   syntax.h treelog.h assertion.h
-document${OBJ}: document.C document.h librarian.h common.h library.h symbol.h \
-  alist.h syntax.h treelog.h assertion.h xref.h format.h submodel.h
 parser${OBJ}: parser.C parser.h librarian.h common.h library.h symbol.h \
   alist.h syntax.h treelog.h assertion.h
 log${OBJ}: log.C log.h librarian.h common.h library.h symbol.h alist.h \
@@ -1027,9 +1025,6 @@ format_LaTeX${OBJ}: format_LaTeX.C format.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h version.h
 program_batch${OBJ}: program_batch.C program.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h path.h
-program_refdoc${OBJ}: program_refdoc.C program.h librarian.h common.h \
-  library.h symbol.h alist.h syntax.h treelog.h assertion.h document.h \
-  xref.h format.h
 summary_balance${OBJ}: summary_balance.C summary.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h fetch.h \
   destination.h select.h condition.h units.h tmpstream.h
@@ -1227,10 +1222,6 @@ macro_std${OBJ}: macro_std.C macro.h librarian.h common.h library.h symbol.h \
   plf.h mathlib.h log.h uzmodel.h check.h vcheck.h tmpstream.h
 macro_none${OBJ}: macro_none.C macro.h librarian.h common.h library.h \
   symbol.h alist.h syntax.h treelog.h assertion.h
-document_LaTeX${OBJ}: document_LaTeX.C document.h librarian.h common.h \
-  library.h symbol.h alist.h syntax.h treelog.h assertion.h xref.h \
-  format.h plf.h tmpstream.h version.h printer_file.h printer.h \
-  submodel.h
 column_std${OBJ}: column_std.C column_base.h column.h librarian.h common.h \
   library.h symbol.h alist.h syntax.h treelog.h assertion.h bioclimate.h \
   surface.h uzmodel.h soil.h geometry.h horizon.h soil_water.h macro.h \
