@@ -26,7 +26,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Transport (const string name);
+  Transport (const string& name);
 public:
   virtual ~Transport ();
 };

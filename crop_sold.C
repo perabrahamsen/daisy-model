@@ -21,8 +21,6 @@
 #include "harvest.h"
 #include "mathlib.h"
 #include <list>
-// Not in BCC
-// #include <algo.h>
 
 class CropSold : public Crop
 {
@@ -91,7 +89,7 @@ public:
 	     const SoilWater&, 
 	     SoilNH4&,
 	     SoilNO3&);
-  const Harvest& harvest (const string column_name, const Time&,
+  const Harvest& harvest (const string& column_name, const Time&,
 			  const Geometry& geometry, OrganicMatter&,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
@@ -1780,7 +1778,7 @@ CropSold::tick (const Time& time,
 }
 
 const Harvest&
-CropSold::harvest (const string column_name,
+CropSold::harvest (const string& column_name,
 		   const Time& time, const Geometry& geometry,
 		   OrganicMatter& organic_matter,
 		   double,

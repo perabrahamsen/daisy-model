@@ -269,6 +269,13 @@ Syntax::is_const (const string& key) const
   return impl.status[key] == Const;
 }
 
+bool
+Syntax::is_optional (const string& key) const
+{
+  assert (impl.status.find (key) != impl.status.end ());
+  return impl.status[key] == Optional;
+}
+
 const Syntax&
 Syntax::syntax (const string& key) const
 {

@@ -52,7 +52,7 @@ public:
   virtual void tick (const Time& time, const Bioclimate&, const Soil&,
 		     OrganicMatter&, const SoilHeat&, const SoilWater&,
 		     SoilNH4&, SoilNO3&) = 0;
-  virtual const Harvest& harvest (const string column_name,
+  virtual const Harvest& harvest (const string& column_name,
 				  const Time&, const Geometry&, 
 				  OrganicMatter&,
 				  double stub_length,
@@ -60,7 +60,7 @@ public:
 				  double leaf_harvest, 
 				  double sorg_harvest,
 				  bool kill_off) = 0;
-  void kill (string, const Time&, const Geometry&, OrganicMatter&);
+  void kill (const string&, const Time&, const Geometry&, OrganicMatter&);
   virtual void output (Log&, Filter&) const = 0;
   
   // Queries.
@@ -83,7 +83,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Crop (const string);
+  Crop (const string& );
 public:
   virtual ~Crop ();
 };

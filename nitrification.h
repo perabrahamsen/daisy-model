@@ -26,7 +26,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Nitrification (const string name);
+  Nitrification (const string& name);
 public:
   virtual ~Nitrification ();
 };

@@ -25,7 +25,7 @@ public:
 
     // Create and Destroy.
 protected:
-  Groundwater (const string);
+  Groundwater (const string&);
 public:
   virtual ~Groundwater ();
 };

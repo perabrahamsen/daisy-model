@@ -146,6 +146,11 @@ Weather::load_syntax (Syntax& syntax, AttributeList& alist)
   // Where in the world are we?
   syntax.add ("Latitude", Syntax::Number, Syntax::Const);
   alist.add ("Latitude", 56.0);
+
+  syntax.add ("Elevation", Syntax::Number, Syntax::Optional); // Unused.
+  syntax.add ("UTM_x", Syntax::Number, Syntax::Optional); // Unused.
+  syntax.add ("UTM_y", Syntax::Number, Syntax::Optional); // Unused.
+
   // DryDeposit
   {
     Syntax& s = *new Syntax ();

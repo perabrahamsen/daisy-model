@@ -9,17 +9,20 @@ struct Library::Implementation
 {
   static map<string, Library*, less<string>/**/>* all;
 
+  // We give each parsed object an increasing sequence number.
+  static int sequence;
+
   const string name;
   typedef map<string, AttributeList*, less<string> > alist_map;
   typedef map<string, const Syntax*, less<string> > syntax_map;
   alist_map alists;
   syntax_map syntaxen;
   static void all_entries (vector<string>& libraries);
-  AttributeList& lookup (string) const;
-  bool check (string) const;
-  void add (string, AttributeList&, const Syntax&);
-  void remove (string);
-  const Syntax& syntax (string) const;
+  AttributeList& lookup (const string&) const;
+  bool check (const string&) const;
+  void add (const string&, AttributeList&, const Syntax&);
+  void remove (const string&);
+  const Syntax& syntax (const string&) const;
   void dump (int indent) const;
   void entries (vector<string>&) const;
   Implementation (const char* n) 
@@ -30,6 +33,7 @@ struct Library::Implementation
 };
 
 map<string, Library*, less<string> >* Library::Implementation::all;
+int Library::Implementation::sequence;
 
 void
 Library::Implementation::all_entries (vector<string>& libraries)
@@ -41,7 +45,7 @@ Library::Implementation::all_entries (vector<string>& libraries)
 }
 
 AttributeList&
-Library::Implementation::lookup (string key) const
+Library::Implementation::lookup (const string& key) const
 { 
   alist_map::const_iterator i = alists.find (key);
 
@@ -52,7 +56,7 @@ Library::Implementation::lookup (string key) const
 }
 
 bool
-Library::Implementation::check (string key) const
+Library::Implementation::check (const string& key) const
 { 
   alist_map::const_iterator i = alists.find (key);
 
@@ -63,7 +67,7 @@ Library::Implementation::check (string key) const
 }
 
 void
-Library::Implementation::add (string key, AttributeList& value,
+Library::Implementation::add (const string& key, AttributeList& value,
 			      const Syntax& syntax)
 {
   alists[key] = &value;
@@ -71,14 +75,14 @@ Library::Implementation::add (string key, AttributeList& value,
 }
 
 void
-Library::Implementation::remove (string key)
+Library::Implementation::remove (const string& key)
 {
   alists.erase (alists.find (key));
   syntaxen.erase (syntaxen.find (key));
 }
 
 const Syntax& 
-Library::Implementation::syntax (string key) const
+Library::Implementation::syntax (const string& key) const
 { 
   syntax_map::const_iterator i = syntaxen.find (key);
 
@@ -101,7 +105,7 @@ Library::Implementation::dump (int indent) const
 	  for (int j = 0; j < indent; j++)
 	    cout << " ";
 	}
-      const string name = (*i).first;
+      const string& name = (*i).first;
       const Syntax* syntax = (*i).second;
       cout << "(" << name << " ";
       syntax->dump (indent + name.length () + 2);
@@ -121,7 +125,7 @@ Library::Implementation::entries (vector<string>& result) const
 }
 
 Library& 
-Library::find (string name)
+Library::find (const string& name)
 { return *(*Implementation::all)[name]; }
 
 void
@@ -130,28 +134,37 @@ Library::all (vector<string>& libraries)
   Implementation::all_entries (libraries);
 }
 
+int
+Library::get_sequence ()
+{ 
+  Implementation::sequence++;
+  // Nobody will ever need more than two billion objects --- Per 1998.
+  assert (Implementation::sequence > 0);
+  return Implementation::sequence;
+}
+
 const string&
 Library:: name () const
 { return impl.name; }
 
 AttributeList&
-Library::lookup (string key) const
+Library::lookup (const string& key) const
 { return impl.lookup (key); }
 
 bool
-Library::check (string key) const
+Library::check (const string& key) const
 { return impl.check (key); }
 
 void
-Library::add (string key, AttributeList& value, const Syntax& syntax)
+Library::add (const string& key, AttributeList& value, const Syntax& syntax)
 { impl.add (key, value, syntax); }
 
 void
-Library::remove (string key)
+Library::remove (const string& key)
 { impl.remove (key); }
 
 const Syntax& 
-Library::syntax (string key) const
+Library::syntax (const string& key) const
 { return impl.syntax (key); }
 
 void

@@ -90,7 +90,7 @@ endif
 # Create the right compile command.
 #
 ifeq ($(COMPILER),egcs)
-	COMPILE = /pack/egcs/bin/c++ -W -Wall -fno-exceptions -DEGCS -g -pipe -frepo
+	COMPILE = /pack/egcs/bin/c++ -W -Wall -Wstrict-prototypes -Wconversion -fno-exceptions -DEGCS -g -pipe -frepo
 	CCOMPILE = gcc -I/pack/f2c/include -g -Wall
 
 endif
@@ -184,7 +184,7 @@ INTERFACES = daisy.C parser.C log.C weather.C column.C crop.C \
 	denitrification.C soil_heat.C groundwater.C snow.C solute.C \
 	am.C im.C om.C harvest.C options.C geometry.C transport.C \
 	librarian.C cdaisy.C adsorbtion.C tortuosity.C event.C eventqueue.C \
-	minimanager.C
+	minimanager.C printer.C printer_file.C
 
 # Select the C files that are not part of the library.
 #
@@ -259,7 +259,7 @@ dlldaisy${EXT}:	cmain${OBJ} daisy.dll
 # Count the size of daisy.
 #
 wc: $(TEXT)
-	wc -l $(TEXT)
+	wc -l $(TEXT) | sort -nr
 
 wc-h: $(HEADERS)
 	wc -l $(HEADERS)
@@ -528,7 +528,7 @@ weather${OBJ}: weather.C weather.h librarian.h library.h common.h alist.h \
 column${OBJ}: column.C column.h librarian.h library.h common.h alist.h \
  syntax.h
 crop${OBJ}: crop.C crop.h time.h common.h syntax.h alist.h library.h
-alist${OBJ}: alist.C alist.h common.h syntax.h
+alist${OBJ}: alist.C csmp.h common.h library.h alist.h syntax.h
 syntax${OBJ}: syntax.C syntax.h common.h alist.h library.h
 library${OBJ}: library.C library.h common.h alist.h syntax.h
 action${OBJ}: action.C action.h common.h syntax.h alist.h library.h
@@ -607,7 +607,7 @@ librarian${OBJ}: librarian.C librarian.h library.h common.h alist.h \
  syntax.h
 cdaisy${OBJ}: cdaisy.C syntax.h common.h alist.h daisy.h parser_file.h \
  parser.h column.h librarian.h library.h weather.h im.h action.h \
- horizon.h
+ horizon.h printer_file.h printer.h
 adsorbtion${OBJ}: adsorbtion.C adsorbtion.h librarian.h library.h common.h \
  alist.h syntax.h
 tortuosity${OBJ}: tortuosity.C tortuosity.h librarian.h library.h common.h \
@@ -619,6 +619,10 @@ eventqueue${OBJ}: eventqueue.C common.h event.h alist.h am.h library.h \
  eventqueue.h daisy.h
 minimanager${OBJ}: minimanager.C syntax.h common.h minimanager.h action.h \
  event.h alist.h am.h library.h eventqueue.h
+printer${OBJ}: printer.C printer.h librarian.h library.h common.h alist.h \
+ syntax.h
+printer_file${OBJ}: printer_file.C printer_file.h printer.h librarian.h \
+ library.h common.h alist.h syntax.h options.h
 set_exceptions${OBJ}: set_exceptions.S
 main${OBJ}: main.C daisy.h common.h parser_file.h parser.h syntax.h \
  alist.h version.h

@@ -4,7 +4,7 @@
 
 Librarian<Tortuosity>::Content* Librarian<Tortuosity>::content = NULL;
 
-Tortuosity::Tortuosity (const string n)
+Tortuosity::Tortuosity (const string& n)
   : name (n)
 { }
 

@@ -91,7 +91,7 @@ public:
 	     const SoilWater&, 
 	     SoilNH4&,
 	     SoilNO3&);
-  const Harvest& harvest (const string column_name,
+  const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&, OrganicMatter&,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest,
@@ -1855,7 +1855,7 @@ CropStandard::tick (const Time& time,
 }
 
 const Harvest&
-CropStandard::harvest (const string column_name,
+CropStandard::harvest (const string& column_name,
 		       const Time& time, 
 		       const Geometry& geometry, 
 		       OrganicMatter& organic_matter,

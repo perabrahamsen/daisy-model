@@ -26,7 +26,9 @@ struct ParserFile::Implementation
   void skip_token ();
   bool looking_at (char);
   void eof ();
+#ifdef DEADCODE
   void load_library (Library& lib);
+#endif
   void add_derived (const Library&, derive_fun);
   AttributeList& load_derived (const Library& lib, bool in_sequence = false);
   void load_list (AttributeList&, const Syntax&);
@@ -235,6 +237,7 @@ ParserFile::Implementation::eof ()
     error ("Expected end of file");
 }
     
+#ifdef DEADCODE
 void
 ParserFile::Implementation::load_library (Library& lib)
 { 
@@ -251,6 +254,7 @@ ParserFile::Implementation::load_library (Library& lib)
   load_list (atts, lib.syntax (super));
   lib.add (name, atts, lib.syntax (super));
 }
+#endif
 
 void
 ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
@@ -267,8 +271,11 @@ ParserFile::Implementation::add_derived (const Library& lib, derive_fun derive)
   // Create new attribute derived from its superclass.
   const AttributeList& sl = lib.lookup (super);
   AttributeList& atts = *new AttributeList (sl);
-  // Remember where we god this object.
+  // Remember where we got this object.
   atts.add ("parsed_from_file", file);
+  atts.add ("parsed_sequence", Library::get_sequence ());
+  // Remember the superclass.
+  atts.add ("type", super);
   // Add separate attributes for this object.
   load_list (atts, lib.syntax (super));
   // Add new object to library.
@@ -451,6 +458,19 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      vector<AttributeList*>& sequence
 		= *new vector<AttributeList*> ();
 	      bool skipped = false;
+	      // Design bug:  We do not force parentheses around the
+	      // alist if it is the last member of an ordered list.
+	      // The consequences of this is that there must be *no*
+	      // ordered or unordered elements after the alist.
+	      //
+	      // The correct way to solve this would be to check that
+	      // these requirements are really fulfilled, and require
+	      // the parentheses otherwise.
+	      //
+	      // The purpose of this kludge seems to be to allow a
+	      // library object to -- in effect -- have an alist
+	      // sequence as its syntax.  Maybe I should support that
+	      // directly instead.
 	      if (current != end)
 		{
 		  skip ("(");
@@ -459,7 +479,21 @@ ParserFile::Implementation::load_list (AttributeList& atts, const Syntax& syntax
 	      while (!looking_at (')') && good ())
 		{
 		  skip ("(");
-		  // AttributeList& al = *new AttributeList ();
+		  // Design bug: This is a bit weird.  I want to
+		  // provide a default value for each member of the
+		  // sequence.  This is done by specifying a single
+		  // alist in the superclass, and use that as a
+		  // default for each alist in the derived objects
+		  // alist_sequence.  This has two problems: 
+		  // 1) If an alist is specified in the superclass,
+		  // the derived object _must_ overwrite it.  2) If an
+		  // alist is not specified, the derived object
+		  // _must_not_ overwrite it.
+		  //
+		  // The correct way to solve the problem is to as the
+		  // alist whether the superclass specified a
+		  // singleton or a sequence.  But the alist API does
+		  // not currently allow that.
 		  AttributeList& al = (atts.check (name) 
 				       ? *new AttributeList (atts.alist (name))
 				       : *new AttributeList ());

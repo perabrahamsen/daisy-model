@@ -8,7 +8,7 @@ void
 Groundwater::output (Log&, Filter&) const
 { }
 
-Groundwater::Groundwater (const string n)
+Groundwater::Groundwater (const string& n)
   : name (n)
 { }
 

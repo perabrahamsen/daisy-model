@@ -155,6 +155,22 @@ CSMP::output (Log& log) const
     }
 }
 
+unsigned int 
+CSMP::size () const
+{ return impl.x.size (); }
+double 
+CSMP::x (unsigned int i) const
+{ return impl.x[i]; }
+  
+
+double 
+CSMP::y (unsigned int i) const
+{ return impl.y[i]; }
+
+bool 
+CSMP::operator == (const CSMP& other) const
+{ return impl.x == other.impl.x && impl.y == other.impl.y; }
+
 void 
 CSMP::add (double x, double y)
 {

@@ -12,6 +12,7 @@
 #include "common.h"
 #include "action.h"
 #include "horizon.h"
+#include "printer_file.h"
 
 #include <fstream.h>
 
@@ -81,9 +82,10 @@ extern "C" int EXPORT
 daisy_alist_save (const AttributeList* alist, const Syntax* syntax,
 		  const char* file)
 { 
-  ofstream out (file);
-  alist->dump (out, *syntax);
-  return out.good ();
+  PrinterFile printer (file);
+  printer.print_comment ("Automatic dump of Daisy alist.");
+  printer.print_alist (*alist, *syntax);
+  return printer.good () ? 0 : -1;
 }
 
 extern "C" daisy_bool EXPORT
@@ -352,7 +354,10 @@ daisy_library_derive (Library* library,
 		      const char* name, const char* filename)
 { 
   if (filename)
-    alist->add ("parsed_from_file", filename);
+    {
+      alist->add ("parsed_from_file", filename);
+      alist->add ("parsed_sequence", Library::get_sequence ());
+    }
 
   if (library == &Librarian<Horizon>::library ())
     Librarian<Horizon>::derive_type (name, *alist, super);
@@ -373,41 +378,11 @@ daisy_library_remove (Library* library, const char* name)
 extern "C" int EXPORT
 daisy_library_save_file (const char* filename)
 {
-  ofstream out (filename);
-
-  if (!out.good ())
-    return -1;
-  
-  out << ";; Automated dump of daisy libraries to " << filename << "\n";
-
-  vector<string> all;
-  Library::all (all);
-  const string def ("def");
-
-  for (unsigned int i = 0; i < all.size (); i++)
-    {
-      Library& library = Library::find (all[i]);
-      vector<string> elements;
-      library.entries (elements);
-      
-      for (unsigned int j = 0; j < elements.size (); j++)
-	{
-	  const AttributeList& alist = library.lookup (elements[j]);
-
-	  if (alist.check ("parsed_from_file") 
-	      && alist.name ("parsed_from_file") == filename)
-	    {
-	      out << "\n(def" << all[i] << " " << elements[j] << "\n  ";
-	      alist.dump (out, library.syntax (elements[j]), 2);
-	      out << ")\n";
-	    }
-	}
-    }
-
-  if (!out.good ())
-    return -1;
-
-  return 0;
+  PrinterFile printer (filename);
+  printer.print_comment (string ("Automated dump of daisy libraries to `")
+			 + filename + "'.");
+  printer.print_library_file (filename);
+  return printer.good () ? 0 : -1;
 }
 
 // @ The daisy_parser Type.

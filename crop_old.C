@@ -92,7 +92,7 @@ public:
 	     const SoilWater&, 
 	     SoilNH4&,
 	     SoilNO3&);
-  const Harvest& harvest (const string column_name,
+  const Harvest& harvest (const string& column_name,
 			  const Time&, const Geometry&, OrganicMatter&,
 			  double stub_length, double stem_harvest,
 			  double leaf_harvest, double sorg_harvest, 
@@ -1010,7 +1010,7 @@ CropOld::Emergence (const Soil& soil, const SoilHeat& soil_heat)
   double& DS = var.Phenology.DS;
 
   DS += soil_heat.T (soil.interval_plus (-EmrDpt)) / Devel.EmrTSum;
-  if (DS > 0)
+  if (DS > 0.0)
     DS = Devel.DS_Emr;
 }
 
@@ -1033,7 +1033,7 @@ CropOld::DevelopmentStage (const Bioclimate& bioclimate)
   else
     {
       Phenology.DS += Devel.DSRate2 * Devel.TempEff2 (Ta);
-      if (Phenology.DS > 2)
+      if (Phenology.DS > 2.0)
 	Phenology.DS = 2.0;
     }
 }
@@ -1757,7 +1757,7 @@ CropOld::tick (const Time& time,
 }
 
 const Harvest&
-CropOld::harvest (const string column_name,
+CropOld::harvest (const string& column_name,
 		  const Time& time, const Geometry& geometry, 
 		  OrganicMatter& organic_matter,
 		  double stub_length,

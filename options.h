@@ -8,7 +8,7 @@
 class Options
 {
 public: 
-  static int find_file (const string name);
+  static int find_file (const string& name);
 };
 
 #endif OPTIONS_H

@@ -59,6 +59,7 @@ public:
   // These functions will allow you to lookup information about a
   // specific syntax entry. 
   bool is_const (const string&) const;
+  bool is_optional (const string&) const;
   type lookup (const string&) const;
   const Syntax& syntax (const string&) const;
 public:
@@ -119,6 +120,10 @@ struct add_submodule
     AttributeList& a = *new AttributeList ();
     T::load_syntax (s, a);
     syntax.add (name, s, cat, size);
+    // KLUDGE: This is *incorrect* for sequences.  The specified alist
+    // currently works as a _default_ for each member of a derived
+    // object.  However, both the parser and the pretty printer must
+    // know this kludge.
     alist.add (name, a);
   }
 };

@@ -1,5 +1,7 @@
 // alist.C
 
+#include "csmp.h"
+#include "library.h"
 #include "alist.h"
 #include "syntax.h"
 #include "time.h"
@@ -14,9 +16,9 @@
 class Value
 {
 public:
-  // Utilities.
-  virtual void dump (ostream&, const Syntax&, 
-		     const string& key, int indent) = 0;
+  // BAD KLUDGE.
+  virtual bool is_alist_sequence () const
+    { return false; }
 
   // Retrieve data (Singletons).
   virtual operator double () const
@@ -62,6 +64,10 @@ public:
   virtual operator const vector<const Time*>& () const
        throw1 (AttributeList::Invalid)
     { THROW (AttributeList::Invalid ()); }
+
+  // Compare data.
+  virtual bool subset (const Value&, const Syntax&, const string&) const = 0;
+
 protected:
   Value ()
     { }
@@ -78,11 +84,10 @@ class dValue : public Value
 {
   const T& value;
 public:
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int)
-    { out << "<" << Syntax::type_name (syntax.lookup (key)) << ">"; }
   operator const T& () const throw1 (AttributeList::Invalid)
   { return value; }
+  bool subset (const Value& v, const Syntax&, const string&) const
+    { return value == T (v); }
   dValue (const T& v)
     : value (v)
   { };
@@ -93,10 +98,10 @@ class dValue<double> : public Value
 {
   double value;
 public:
-  void dump (ostream& out, const Syntax&, const string&, int)
-    { out << value; }
   operator double () const throw1 (AttributeList::Invalid)
   { return value; }
+  bool subset (const Value& v, const Syntax&, const string&) const
+    { return value == double (v); }
   dValue (double v)
     : value (v)
   { };
@@ -106,11 +111,11 @@ class dValue<int> : public Value
 {
   int value;
 public:
-  void dump (ostream& out, const Syntax&, const string&, int)
-    { out << value; }
   operator int () const
     throw1 (AttributeList::Invalid)
   { return value; }
+  bool subset (const Value& v, const Syntax&, const string&) const
+    { return value == int (v); }
   dValue (int v)
     : value (v)
   { };
@@ -120,10 +125,10 @@ class dValue<bool> : public Value
 {
   bool value;
 public:
-  void dump (ostream& out, const Syntax&, const string&, int)
-    { out << (value ? "true" : "false"); }
   operator bool () const throw1 (AttributeList::Invalid)
   { return value; }
+  bool subset (const Value& v, const Syntax&, const string&) const
+    { return value == bool (v); }
   dValue (bool v)
     : value (v)
   { };
@@ -133,49 +138,10 @@ class dValue<string> : public Value
 {
   string value;
 public:
-  static bool is_identifier (const string& name)
-    {
-      if (name.size () < 1)
-	return false;
-
-      const char c = name[0];
-      if (c != '_' && c != '-' && !isalpha (c))
-	return false;
-      
-      for (unsigned int i = 1; i < name.size (); i++)
-	{
-	  const char c = name[i];
-	  if (c != '_' && c != '-' && !isalnum (c))
-	    return false;
-	}
-      return true;
-    }
-  static void print_string (ostream& out, const string& name)
-    {
-      out << "\"";
-      for (unsigned int i = 0; i < name.size (); i++)
-	switch (name[i])
-	  {
-	  case '\"':
-	    out << "\\\"";
-	    break;
-	  case '\\':
-	    out << "\\\\";
-	    break;
-	  default:
-	    out << name[i];
-	  }
-      out << "\"";
-    }
-  void dump (ostream& out, const Syntax&, const string&, int)
-    { 
-      if (is_identifier (value))
-	out << value; 
-      else
-	print_string (out, value);
-    }
   operator const string& () const throw1 (AttributeList::Invalid)
   { return value; }
+  bool subset (const Value& v, const Syntax&, const string&) const
+    { return value == string (v); }
   dValue (const string& v)
     : value (v)
   { };
@@ -185,11 +151,10 @@ class dValue<Time> : public Value
 {
   const Time& value;
 public:
-  void dump (ostream& out, const Syntax&, const string&, int)
-    { out << value.year () << " " << value.month () << " " 
-	  << value.mday () << " " << value.hour (); }
   operator const Time& () const throw1 (AttributeList::Invalid)
   { return value; }
+  bool subset (const Value& v, const Syntax&, const string&) const
+    { return v == value; }
   dValue (const Time& v)
     : value (*new Time (v))
   { };
@@ -199,17 +164,27 @@ class dValue<AttributeList> : public Value
 {
   AttributeList& value;
 public:
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
-    { 
-      const Syntax::type type = syntax.lookup (key);
-      if (type == Syntax::AList)
-	value.dump (out, syntax.syntax (key), indent); 
-      else 
-	out << "<obj " << Syntax::type_name (type) << ">";
-    }
   operator AttributeList& () const throw1 (AttributeList::Invalid)
   { return value; }
+  bool subset (const Value& v, const Syntax& syntax, const string& key) const
+    {
+      const AttributeList& other = v;
+      const Syntax::type type = syntax.lookup (key);
+      if (type == Syntax::AList)
+	return value.subset (other, syntax.syntax (key));
+      assert (type == Syntax::Object);
+      const Library& library = syntax.library (key);
+
+      assert (value.check ("type"));
+      if (!other.check ("type"))
+	return false;
+      const string element = value.name ("type");
+      if (element != other.name ("type"))
+	return false;
+      if (!library.check (element))
+	return false;
+      return value.subset (other, library.syntax (element));
+    }
   dValue (AttributeList& v)
     : value (v)
   { };
@@ -220,17 +195,11 @@ class dValue<vector<double>/**/> : public Value
 {
   const vector<double> value;
 public:
-  void dump (ostream& out, const Syntax&, const string&, int)
-    { 
-      for (unsigned int i = 0; i < value.size (); i++)
-	{
-	  if (i > 0) 
-	    out << " ";
-	  out << value[i]; 
-	}
-    }
   operator const vector<double>& () const throw1 (AttributeList::Invalid)
   { return value; }
+  bool subset (const Value& v, const Syntax&, 
+	      const string&) const
+    { return value == vector<double> (v); }
   dValue (const vector<double>& v)
     : value (v)
   { };
@@ -240,28 +209,52 @@ class dValue<vector<AttributeList*>/**/> : public Value
 {
   const vector<AttributeList*> value;
 public:
-  void dump (ostream& out, const Syntax& syntax,
-	     const string& key, int indent)
-    { 
-      if (syntax.lookup (key) != Syntax::AList)
-	{
-	  out << "[" << key << ": AList != " 
-	      << Syntax::type_name (syntax.lookup (key)) << "]";
-	  return;
-	}
-      
-      const Syntax& child = syntax.syntax (key);
-      for (unsigned int i = 0; i < value.size (); i++)
-	{
-	  if (i > 0) 
-	    out << "\n" << string (indent, ' ');
-	  out << "(";
-	  value[i]->dump (out, child, indent + 1); 
-	  out << ")";
-	}
-    }
-  operator const vector<AttributeList*>& () const throw1 (AttributeList::Invalid)
+  operator const vector<AttributeList*>& () const
+    throw1 (AttributeList::Invalid)
   { return value; }
+  // BAD KLUDGE.
+  bool is_alist_sequence () const
+    { return true; }
+  bool subset (const Value& v , const Syntax& syntax, const string& key) const
+    {
+      // Design Bug: `add_submodule' adds an alist instead of an
+      // alist_sequence. 
+      if (!v.is_alist_sequence ())
+	return false;
+
+      const vector<AttributeList*>& other = v;
+
+
+      const unsigned int size = value.size ();
+      if (other.size () != size)
+	return false;
+      const Syntax::type type = syntax.lookup (key);
+      if (type == Syntax::AList)
+	{
+	  const Syntax& nested = syntax.syntax (key);
+	  for (unsigned int i = 0; i < size; i++)
+	    if (!value[i]->subset (*other[i], nested))
+	      return false;
+	  return true;
+		
+	}
+      assert (type == Syntax::Object);
+      const Library& library = syntax.library (key);
+      for (unsigned int i = 0; i < size; i++)
+	{
+	  assert (value[i]->check ("type"));
+	  if (!other[i]->check ("type"))
+	    return false;
+	  const string element = value[i]->name ("type");
+	  if (element != other[i]->name ("type"))
+	    return false;
+	  if (!library.check (element))
+	    return false;
+	  if (!value[i]->subset (*other[i], library.syntax (element)))
+	    return false;
+	}
+      return true;
+    }
   dValue (const vector<AttributeList*>& v)
     : value (v)
   { };
@@ -276,7 +269,6 @@ struct AttributeList::Implementation
   value_map values;
   bool check (const string& key) const throw0 ();
   Value* lookup (const string& key) const throw1 (Uninitialized);
-  void dump (ostream& out, const Syntax& syntax, int indent) const;
   void add (const string& key, Value* value);
 };    
 
@@ -295,48 +287,6 @@ AttributeList::Implementation::lookup (const string& key) const throw1 (Attribut
     return (*i).second;
   else
     THROW (Uninitialized ());
-}
-
-void
-AttributeList::Implementation::dump (ostream& out, const Syntax& syntax, 
-				     int indent) const
-{
-  vector<string> entries;
-  syntax.entries (entries);
-  const vector<string>& order = syntax.order ();
-
-  bool first = true;
-  for (unsigned int i = 0; i < order.size (); i++)
-    {
-      if (first) 
-	first = false;
-      else
-	out << " ";
-
-      const string& key = order[i];
-
-      if (check (key))
-	lookup (key)->dump (out, syntax, key, indent);
-      else
-	out << " <missing " << key << ">";
-    }
-  
-  for (value_map::const_iterator i = values.begin (); i != values.end (); i++)
-    {
-      const string key = (*i).first;
-
-      if (syntax.order (key) < 0)
-	{
-	  if (first)
-	    first = false;
-	  else
-	    out << "\n" << string (indent, ' ');
-
-	  out << "(" << key << " ";
-	  (*i).second->dump (out, syntax, key, indent + key.length () + 2);
-	  out << ")";
-	}
-    }
 }
 
 void
@@ -363,10 +313,57 @@ AttributeList::check (const string& key) const throw0 ()
   return impl.check (key);
 }
 
-void
-AttributeList::dump (ostream& out, const Syntax& syntax, int indent) const
+bool
+AttributeList::subset (const AttributeList& other, const Syntax& syntax) const
+{ 
+  // Find syntax entries.
+  vector<string> entries;
+  syntax.entries (entries);
+  const unsigned int size = entries.size ();
+
+  // Loop over them.
+  for (unsigned int i = 0; i < size; i++)
+    {
+      const string& key = entries[i];
+      if (!subset (other, syntax, key))
+	return false;
+    }
+  return true;
+}
+
+bool 
+AttributeList::subset (const AttributeList& other, const Syntax& syntax,
+		       const string& key) const
 {
-  impl.dump (out, syntax, indent);
+  if (check (key))
+    {
+      // Design Bug: `add_submodule' adds an alist instead of an
+      // alist_sequence. 
+      if (syntax.lookup (key) == Syntax::AList
+	  && syntax.size (key) != Syntax::Singleton
+	  && !impl.values[key]->is_alist_sequence ())
+	// This has not been overwritten from the default value.
+	return true;
+
+      if (other.check (key))
+	{
+	  if (!impl.values[key]->subset (*other.impl.values[key],
+					 syntax, key))
+	    return false;
+	}
+      else
+	return false;
+    }
+  return true;
+}
+
+int
+AttributeList::size (const string& key)	const // BUG: UNIMPLEMENTED.
+{
+  if (impl.values[key]->is_alist_sequence ())
+    return Syntax::Sequence;
+  
+  return Syntax::Singleton;
 }
 
 double 

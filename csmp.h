@@ -30,6 +30,14 @@ public:
 
   void output (Log&) const;
 
+  // Print
+  unsigned int size () const;
+  double x (unsigned int i) const;
+  double y (unsigned int i) const;
+
+  // Compare.
+  bool operator == (const CSMP&) const;
+
   // Create and Destroy.
   void add (double, double);
   void operator += (const CSMP&);

@@ -71,6 +71,20 @@ Solute::load_syntax (Syntax& syntax, AttributeList& alist)
   Geometry::add_layer (syntax, "C");
   Geometry::add_layer (syntax, "M");
   syntax.add ("S", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
+
+  // Kludge to allow M to be initialized based on "ppm".
+  {
+    Syntax& layer = *new Syntax ();
+    if (!layer.ordered ())
+      {
+	// Initialize as first call.
+	layer.add ("size", Syntax::Number, Syntax::Const);
+	layer.add ("value", Syntax::Number, Syntax::Const);
+	layer.order ("size", "value");
+      }
+    syntax.add (string ("initial_ppm"), layer,
+		Syntax::Optional, Syntax::Sequence);
+  }
 }
 
 Solute::Solute (const AttributeList& al)
@@ -133,6 +147,7 @@ Solute::initialize (const AttributeList& al,
       else if (M_.size () > soil.size ())
 	THROW ("To many members of M sequence");
     }
+  // TODO: Initalize M based on "ppm".
   if (M_.size () == 0 && C_.size () == 0)
     {
       C_.insert (C_.begin (), soil.size (), 0.0);

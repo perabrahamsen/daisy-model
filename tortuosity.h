@@ -19,7 +19,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Tortuosity (const string name);
+  Tortuosity (const string& name);
 public:
   virtual ~Tortuosity ();
 };

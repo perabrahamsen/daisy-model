@@ -4,7 +4,7 @@
 
 Librarian<Nitrification>::Content* Librarian<Nitrification>::content = NULL;
 
-Nitrification::Nitrification (const string n)
+Nitrification::Nitrification (const string& n)
   : name (n)
 { }
 

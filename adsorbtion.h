@@ -20,7 +20,7 @@ public:
 
   // Create and Destroy.
 protected:
-  Adsorbtion (const string name);
+  Adsorbtion (const string& name);
 public:
   virtual ~Adsorbtion ();
 };

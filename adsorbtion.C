@@ -4,7 +4,7 @@
 
 Librarian<Adsorbtion>::Content* Librarian<Adsorbtion>::content = NULL;
 
-Adsorbtion::Adsorbtion (const string n)
+Adsorbtion::Adsorbtion (const string& n)
   : name (n)
 { }
 

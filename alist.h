@@ -19,7 +19,9 @@ class AttributeList
 {
   // Content.
   struct Implementation;
+public:				// EGCS require this to be public...
   Implementation& impl;
+
 public:
   static const AttributeList empty;
 
@@ -40,10 +42,15 @@ public:
   };
 #endif HANDLE_EXCEPTIONS
 
-  // Use.
-  bool check (const string&) const 
+  // Is `key' an element of this alist?
+  bool check (const string& key) const 
        throw0 ();
-  void dump (ostream&, const Syntax&, int indent = 0) const;
+  // Is this alist a subset of `other'?
+  bool subset (const AttributeList& other, const Syntax& syntax) const;
+  // Is the element `key' in this alist a subset of the correspi
+  bool subset (const AttributeList& other, const Syntax& syntax,
+	       const string& key) const;
+  int size (const string& key) const; // BUG: UNIMPLEMENTED.
 
   double number (string) const
        throw2 (Invalid, Uninitialized);

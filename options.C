@@ -13,7 +13,7 @@
 #endif
 
 int
-Options::find_file (const string name)
+Options::find_file (const string& name)
 {
   static vector<string> path;
   if (path.size () == 0)
