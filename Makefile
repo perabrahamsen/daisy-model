@@ -19,7 +19,7 @@ HEAD = $(OBJECTS:.o=.h) common.h
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
 # To be removed by the next cvs update.
-REMOVE = input.C input.h manager_rule.o manager.o 
+REMOVE = manager_rule.C manager.C manager.h
 
 .SUFFIXES:	.C .o .h
 
@@ -88,14 +88,13 @@ cvs: $(TEXT)
 # AUTOMATIC -- DO NOT CHANGE THIS LINE OR ANYTHING BELOW IT!
 main.o: main.C daisy.h time.h parser_file.h parser.h syntax.h alist.h \
  common.h
-daisy.o: daisy.C daisy.h time.h manager.h weather.h groundwater.h \
- uzmodel.h common.h horizon.h log.h parser.h crop.h column.h action.h \
- filter.h library.h syntax.h condition.h alist.h
+daisy.o: daisy.C daisy.h time.h weather.h groundwater.h uzmodel.h \
+ common.h horizon.h log.h parser.h crop.h column.h action.h filter.h \
+ library.h syntax.h condition.h alist.h
 parser.o: parser.C parser.h alist.h common.h library.h syntax.h
 log.o: log.C log.h alist.h common.h library.h syntax.h
 weather.o: weather.C weather.h time.h library.h alist.h common.h \
  syntax.h
-manager.o: manager.C manager.h library.h alist.h common.h syntax.h
 column.o: column.C column.h library.h alist.h common.h syntax.h
 crop.o: crop.C crop.h library.h alist.h common.h syntax.h
 alist.o: alist.C alist.h common.h time.h
@@ -138,8 +137,6 @@ column_std.o: column_std.C column.h crop.h bioclimate.h surface.h \
  uzmodel.h common.h soil.h horizon.h soil_water.h soil_heat.h \
  soil_NH4.h solute.h soil_NO3.h organic_matter.h nitrification.h \
  denitrification.h alist.h syntax.h library.h log.h filter.h
-manager_rule.o: manager_rule.C manager.h syntax.h alist.h common.h \
- action.h condition.h
 weather_simple.o: weather_simple.C weather.h time.h syntax.h alist.h \
  common.h log.h filter.h
 uzrichard.o: uzrichard.C uzmodel.h common.h soil.h horizon.h mathlib.h \
