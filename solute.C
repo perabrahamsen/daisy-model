@@ -266,6 +266,7 @@ Solute::tick (const Soil& soil, const SoilWater& soil_water, const double J_in)
 #endif
 
     }
+  assert (J_in == 0.0);
   // Calculate flux with mass conservation.
   J[0] = J_in;
   for (int i = 0; i < size; i++)

@@ -239,7 +239,7 @@ SoilHeat::Implementation::Implementation (const Soil& soil,
     omega_offset (al.number ("omega_offset"))
 { 
   const double depth = - soil.zplus (soil.size () - 1);
-  const double pF_2_0 = log (-100.0 * -2);
+  const double pF_2_0 = -100.0;
   double k = 0;
   double C = 0;
   

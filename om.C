@@ -86,14 +86,14 @@ OM::mix (const Soil& soil, double from, double to, double penetration)
 }
 
 void 
-OM::distribute (const vector<double>& density)
+OM::distribute (const Soil& soil, const vector<double>& content)
 {
-  const double total = accumulate (density.begin (), density.end (), 0.0);
+  const double total = accumulate (content.begin (), content.end (), 0.0);
 
-  assert (C.size () == density.size ());
+  assert (C.size () == content.size ());
 
-  for (unsigned int i = 0; i < density.size (); i++)
-    C[i] += top_C * density[i] / total;
+  for (unsigned int i = 0; i < content.size (); i++)
+    C[i] += top_C * content[i] / total / soil.dz (i);
   top_C = 0;
 }
 
@@ -112,7 +112,7 @@ OM::tick (int i, double abiotic_factor, double N_soil, double& N_used,
   // Maintenance.
   const double C_use = C[i] * maintenance * abiotic_factor;
   CO2 += C_use;
-  C[i] *= (1.0 - maintenance * abiotic_factor);
+  C[i] -= C_use;
   N_used -= C_use / C_per_N[i];
   // assert (N_soil * 1.001 >= N_used);
 
@@ -122,6 +122,7 @@ OM::tick (int i, double abiotic_factor, double N_soil, double& N_used,
   for (int j = 0; j < smb_size; j++)
     tock (i, turnover_rate * abiotic_factor * fractions[j], efficiency[j],
 	  N_soil, N_used, CO2, *smb[j]);
+return;
   // Distribute to all soil dk:puljer.
   const int som_size = som.size ();
   for (int j = 0; j < som_size; j++)
@@ -201,10 +202,11 @@ OM::tock (int i, double rate, double efficiency,
 		 < 0.01));
     }
   // Update.
-  CO2 += C[i] * rate * (1.0 - efficiency);
+  const double C_use = C[i] * rate;
+  CO2 += C_use * (1.0 - efficiency);
+  om.C[i] += C_use * efficiency;
+  C[i] -= C_use;
   N_used += (N_consume - N_produce);
-  om.C[i] += C[i] * rate * efficiency;
-  C[i] *= (1.0 - rate * efficiency);
 
   // Check for NaN.
   assert (finite (N_used));

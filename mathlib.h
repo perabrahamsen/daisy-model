@@ -18,7 +18,8 @@ double
 single_positive_root_of_cubic_equation 
 (double a, double b, double c, double d);
 
-int abs (int);
-double abs (double);
+extern bool approximate (double a, double b, double noise = 0.0001);
+
+extern double abs (double);
 
 #endif MATHLIB_H

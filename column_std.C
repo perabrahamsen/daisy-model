@@ -123,7 +123,7 @@ ColumnStandard::fertilize (const Time& time,
 {
   vector<double> content;
   for (unsigned int i = 0; i < density.size (); i++)
-    content.push_back (density[i] * soil.z (i));
+    content.push_back (density[i] * soil.dz (i));
 		       
   organic_matter.add (AM::create (soil, time, om, name, "root",
 				  // g/m² -> g/cm²

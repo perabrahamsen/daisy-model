@@ -9,7 +9,7 @@
 #include <vector>
 #include <map>
 
-static const double rho_soil = 2.65;	// Weigth of soil. [g / cm³]
+static const double rho_particle = 2.65;	// Weigth of soil. [g / cm³]
 
 static Library* Horizon_library = NULL;
 typedef map<string, Horizon::constructor, less<string> > Horizon_map_type;
@@ -295,7 +295,7 @@ Horizon::clay () const
 
 double
 Horizon::C () const
-{ return rho_soil * impl.humus * (1 - hydraulic.porosity ()) * 0.587; }
+{ return rho_particle * impl.humus * (1 - hydraulic.porosity ()) * 0.587; }
 
 double
 Horizon::N () const
@@ -345,14 +345,14 @@ double
 Horizon::v_planar () const
 { 
   const double S_planar = 5.964; // Maximum specific absorbtion [g / g clay]
-  return S_planar * impl.clay * rho_soil; 
+  return S_planar * impl.clay * rho_particle; 
 }
 
 double 
 Horizon::v_edge () const
 {
   const double S_edge = 0.308;	// Same for edges.
-  return S_edge * impl.clay * rho_soil; 
+  return S_edge * impl.clay * rho_particle; 
 }
 
 const Library&

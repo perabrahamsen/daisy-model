@@ -15,7 +15,7 @@
 
 static double f_h (double h)
 {
-  const double pF = log (-h);
+  const double pF = log10 (-h);
 
   if (pF <= 0.0)
     return 0.0;

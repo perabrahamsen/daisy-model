@@ -43,6 +43,8 @@ struct OrganicMatter::Implementation
   // Log.
   vector<double> NO3_source;
   vector<double> NH4_source;
+  double total_N;
+  double total_C;
 
   // Simulation.
   void add (AM& om)
@@ -145,7 +147,7 @@ OrganicMatter::Implementation::heat_turnover_factor (double T) const
   if (T < 0.0)
     return 0.0;
   if (T < 20.0)
-    return 0.01 * T;
+    return 0.1 * T;
 
   return exp (0.47 - 0.027 * T + 0.00193 * T *T);
 }
@@ -153,7 +155,7 @@ OrganicMatter::Implementation::heat_turnover_factor (double T) const
 double
 OrganicMatter::Implementation::water_turnover_factor (double h) const
 {
-  const double pF = log (-h);
+  const double pF = log10 (-h);
 
   if (pF <= 0.0)
     return 0.6;
@@ -185,6 +187,8 @@ void
 OrganicMatter::Implementation::output (Log& log, const Filter& filter) const
 {
   log.output ("CO2", filter, CO2, true);
+  log.output ("total_N", filter, total_N, true);
+  log.output ("total_C", filter, total_C, true);
   output_list (am, "am", log, filter);
   output_vector (smb, "smb", log, filter);
   output_vector (som, "som", log, filter);
@@ -232,9 +236,33 @@ OrganicMatter::Implementation::tick (const Soil& soil,
   NO3_source.erase (NO3_source.begin (), NO3_source.end ());
   NH4_source.erase (NH4_source.begin (), NH4_source.end ());
 
+  total_N = 0.0;
+  total_C = 0.0;
   // Main processing,
   for (int i = 0; i < soil.size (); i++)
     {
+#ifdef CHECK_MASS_CONSERVATION
+      double old_total_C = 0.0;
+      double old_total_N = 0.0;
+
+      for (unsigned int j = 0; j < smb.size (); j++)
+	{
+	  old_total_C += smb[j]->C[i];
+	  old_total_N += smb[j]->C[i] / smb[j]->C_per_N[i];
+	}
+      for (unsigned int j = 0; j < som.size (); j++)
+	{
+	  old_total_C += som[j]->C[i];
+	  old_total_N += som[j]->C[i] / som[j]->C_per_N[i];
+	}
+      for (unsigned int j = 0; j < added.size (); j++)
+	{
+	  old_total_C += added[j]->C[i];
+	  old_total_N += added[j]->C[i] / added[j]->C_per_N[i];
+	}
+      old_total_C += buffer.C[i];
+      old_total_N += buffer.N[i];
+#endif
       CO2[i] = 0.0;		// Initialize for this time step.
       
       const double NH4 = soil_NH4.M_left (i) * K_NH4;
@@ -267,7 +295,43 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       // Handle the buffer.
       buffer.tick (i, abiotic_factor, N_soil, N_used, som);
 
-#if 0      
+      double new_total_C = 0.0;
+      double new_total_N = 0.0;
+
+      for (unsigned int j = 0; j < smb.size (); j++)
+	{
+	  new_total_C += smb[j]->C[i];
+	  new_total_N += smb[j]->C[i] / smb[j]->C_per_N[i];
+	}
+      for (unsigned int j = 0; j < som.size (); j++)
+	{
+	  new_total_C += som[j]->C[i];
+	  new_total_N += som[j]->C[i] / som[j]->C_per_N[i];
+	}
+      for (unsigned int j = 0; j < added.size (); j++)
+	{
+	  new_total_C += added[j]->C[i];
+	  new_total_N += added[j]->C[i] / added[j]->C_per_N[i];
+	}
+      new_total_C += buffer.C[i];
+      new_total_N += buffer.N[i];
+
+      total_C += new_total_C * soil.dz (i);
+      total_N += new_total_N * soil.dz (i);
+
+#ifdef CHECK_MASS_CONSERVATION
+      const double N_lost = old_total_N - new_total_N;
+      const double C_lost = old_total_C - new_total_C;
+
+      if (abs (N_lost / -N_used - 1.0) > 0.0001)
+	cerr << "N[" << i << "] Produced:" << -N_used << ", Lost: "
+	     << N_lost << "\n";
+      if (abs (C_lost / CO2[i] - 1.0) > 0.0001)
+	cerr << "C[" << i << "] Produced:" << CO2[i] << ", Lost: "
+	     << C_lost << "\n";
+#endif
+
+#ifdef CHECK_N_USAGE 
       if (N_used > N_soil)
 	{
 	  cerr << "\nBUG: Adding " << N_used - N_soil << " mystery N\n";
@@ -278,12 +342,12 @@ OrganicMatter::Implementation::tick (const Soil& soil,
       // Update soil solutes.
       if (N_used > NH4)
 	{
-	  NH4_source.push_back (- NH4);
-	  NO3_source.push_back (NH4 - N_used);
+	  NH4_source.push_back (- NH4 / dt);
+	  NO3_source.push_back ((NH4 - N_used) / dt);
 	}
       else
 	{
-	  NH4_source.push_back (- N_used);
+	  NH4_source.push_back (- N_used / dt);
 	  NO3_source.push_back (0.0);
 	}
     }
@@ -328,7 +392,9 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
     am (map_create1 <AM, const Soil&> (al.list_sequence ("am"), soil)),
     smb (map_construct1 <OM, const Soil&> (al.list_sequence ("smb"), soil)),
     som (map_construct1 <OM, const Soil&> (al.list_sequence ("som"), soil)),
-    buffer (soil, al.list ("buffer"))
+    buffer (soil, al.list ("buffer")),
+    total_N (-42.42e42),
+    total_C (-42.42e42)
 { 
   // CO2.
   CO2.insert (CO2.end(), soil.size(), 0.0);
@@ -337,7 +403,7 @@ OrganicMatter::Implementation::Implementation (const Soil& soil,
   for (int i = 0; i < soil.size (); i++)
     {
       const double a = 2.0;
-      const double X_c_prime = 0.025;
+      const double X_c_prime = 0.25;
       const double X_c = soil.clay (i);
       clay_turnover_factor.push_back (1.0 - a * (min (X_c, X_c_prime)));
     }
@@ -654,6 +720,8 @@ OrganicMatter::load_syntax (Syntax& syntax, AttributeList& alist)
   syntax.add ("K_NO3", Syntax::Number, Syntax::Const);
   syntax.add ("NO3_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("NH4_source", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
+  syntax.add ("total_C", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("total_N", Syntax::Number, Syntax::LogOnly);
   syntax.add ("CO2", Syntax::Number, Syntax::LogOnly, Syntax::Sequence);
   syntax.add ("am", AM::library (), Syntax::State, Syntax::Sequence);
   add_submodule<Implementation::Buffer> ("buffer", syntax, alist);

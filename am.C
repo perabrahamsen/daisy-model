@@ -79,7 +79,7 @@ create_om (const vector<const AttributeList*>& om_alist,
 
   if (content.size ())
     for (int i = 0; i < size; i++)
-      om[i]->distribute (content);
+      om[i]->distribute (soil, content);
 
   return om;
 }

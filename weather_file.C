@@ -106,6 +106,7 @@ WeatherFile::output (const string name, Log& log, const Filter& filter) const
 	  log.open (name, "file");
 	  log.output ("Prain", f2, Prain, true);	
 	  log.output ("Psnow", f2, Psnow, true);
+	  log.output ("air_temperature", f2, air_temperature, true);
 	  log.output ("global_radiation", f2, global_radiation, true);
 	  log.output ("hourly_global_radiation", f2, 
 		      hourly_global_radiation, true);
@@ -271,6 +272,7 @@ WeatherFileSyntax::WeatherFileSyntax ()
   alist.add ("B", b);
   syntax.add ("Prain", Syntax::Number, Syntax::LogOnly);
   syntax.add ("Psnow", Syntax::Number, Syntax::LogOnly);
+  syntax.add ("air_temperature", Syntax::Number, Syntax::LogOnly);
   syntax.add ("global_radiation", Syntax::Number, Syntax::LogOnly);
   syntax.add ("hourly_global_radiation", Syntax::Number, Syntax::LogOnly);
   syntax.add ("reference_evapotranspiration", Syntax::Number, Syntax::LogOnly);

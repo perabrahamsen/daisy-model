@@ -37,7 +37,7 @@ double
 SoilWater::pF (int i) const
 {
   if (h (i) < 0.0)
-    return log (-h (i));
+    return log10 (-h (i));
   else
     return 0.0;
 }

@@ -3,6 +3,7 @@
 #include "soil.h"
 #include "alist.h"
 #include "syntax.h"
+#include "mathlib.h"
 #include <assert.h>
 
 int 
@@ -78,9 +79,22 @@ Soil::check () const
   return ok;
 }
 
+double
+Soil::total (vector<double>& v) const
+{
+  while (v.size () < size () + 0U)
+    v.push_back (0.0);
+  double sum = 0.0;
+  for (int i = 0; i < size (); i++)
+    sum += v[i] * dz (i);
+  return sum;
+}
+
 void
 Soil::add (vector<double>& v, double from, double to, double amount) const
 {
+  const double old_total = total (v);
+
   while (v.size () < size () + 0U)
     v.push_back (0.0);
   const double density = amount / (from - to);
@@ -92,17 +106,22 @@ Soil::add (vector<double>& v, double from, double to, double amount) const
 	v[i] += density * (min (old, from) - max (zplus_[i], to)) / dz_[i];
       old = zplus_[i];
     }
+
+  assert (approximate (old_total + amount, total (v)));
 }
 
 void
 Soil::mix (vector<double>& v, double from, double to) const
 {
+  const double old_total = total (v);
   add (v, from, to, extract (v, from, to));
+  assert (approximate (old_total, total (v)));
 }
 
 double
 Soil::extract (vector<double>& v, double from, double to) const
 {
+  const double old_total = total (v);
   while (v.size () < size () + 0U)
     v.push_back (0.0);
   double amount = 0.0;
@@ -118,6 +137,7 @@ Soil::extract (vector<double>& v, double from, double to) const
 	}
       old = zplus_[i];
     }
+  assert (approximate (old_total, total (v) + amount));
   return amount;
 }
 
@@ -144,13 +164,15 @@ Soil::set (vector<double>& v, double from, double to, double amount) const
 void
 Soil::swap (vector<double>& v, double from, double middle, double to) const
 {
+  
+  const double old_total = total (v);
   const double top_content = extract (v, from, middle);
   const double bottom_content = extract (v, middle, to);
   const double new_middle = from + to - middle;
 
-  set (v, from, to, 0.0);
   add (v, from, new_middle, bottom_content);
   add (v, new_middle, to, top_content);
+  assert (approximate (old_total, total (v)));
 }
 
 

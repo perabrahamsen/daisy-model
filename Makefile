@@ -19,7 +19,7 @@ OBJECTS = main.o daisy.o parser.o log.o weather.o column.o crop.o \
 	denitrification.o soil_heat.o groundwater.o snow.o solute.o \
 	am.o im.o om.o
 OBJ = $(OBJECTS) $(SRCONLY)
-SRC = $(OBJ:.o=.C)
+SRC = $(OBJ:.o=.C) set_exceptions.S
 HEAD = $(OBJECTS:.o=.h) common.h 
 TEXT =  Makefile $(HEAD) $(SRC) ftable.t
 
@@ -29,7 +29,10 @@ REMOVE = none
 .SUFFIXES:	.C .o .h
 
 daisy:	$(OBJ)
-	$(CC) -o daisy $(OBJ) -lm
+	$(CC) -o daisy $(OBJ) set_exceptions.o -lm
+
+set_exceptions.o: set_exceptions.S
+	as set_exceptions.S
 
 wc: $(TEXT)
 	wc -l $(TEXT)

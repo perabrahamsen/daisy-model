@@ -21,6 +21,7 @@
 #include "mathlib.h"
 #include <list>
 #include <algo.h>
+#include <ieeefp.h>
 
 class CropStandard : public Crop
 {
@@ -174,7 +175,7 @@ struct CropStandard::Parameters
     double MaxPen;		// Max penetration depth
     double SpRtLength;		// Specific root length
     double DensRtTip;		// Root density at (pot) penetration depth
-    double Rad;			// Root radius
+    double Rad;			// Root radius [ cm ]
     double h_wp;		// Matrix potential at wilting
     double MxNH4Up;		// Max NH4 uptake per unit root length
     double MxNO3Up;		// Max NO3 uptake per unit root length
@@ -208,7 +209,7 @@ struct CropStandard::Parameters
     RespPar (const AttributeList&);
   } Resp;
   struct CrpNPar {
-    double SeedN;		// N-content in seed
+    double SeedN;		// N-content in seed [ g N/m² ]
     const CSMP& PtLeafCnc;	// Upper limit for N-conc in leaves
     const CSMP& CrLeafCnc;	// Critical lim f. N-conc in leaves
     const CSMP& NfLeafCnc;	// Non-func lim f. N-conc in leaves
@@ -286,11 +287,11 @@ struct CropStandard::Variables
     double Depth;		// Rooting Depth [cm]
     vector<double> Density;	// Root density [cm/cm3] in soil layers
     vector<double> H2OExtraction; // Extraction of H2O in soil layers
-    // [cm/h]
+    // [cm³/cm³/h]
     vector<double> NH4Extraction; // Extraction of NH4-N in soil layers
-    // [mg/m2/h]
+    // [gN/cm³/h]
     vector<double> NO3Extraction; // Extraction of NH4-N in soil layers
-    // [mg/m2/h]
+    // [gN/cm³/h]
     double h_x;			// Root extraction at surface.
     double water_stress;	// Fraction of requested water we got.
     double Ept;			// Potential evapotranspiration.
@@ -1028,8 +1029,7 @@ CropStandard::SoluteUptake (const Soil& soil,
 			    vector<double>& uptake,
 			    double I_max, double r_root)
 {
-  return PotNUpt;
-
+  PotNUpt /= 1.0e4;		// gN/m²/h -> gN/cm²/h
   const vector<double>& root_density = var.RootSys.Density;
   const vector<double>& S = var.RootSys.H2OExtraction;
   const int size = soil.size ();
@@ -1075,9 +1075,9 @@ CropStandard::SoluteUptake (const Soil& soil,
 		/ ((beta_squared - 1.0) * (1.0 - 0.5 * alpha)
 		   - (pow (beta, 2.0 - alpha) - 1.0));
 	    }
-	  assert (I_zero[i] <= 0.0 || I_zero[i] >= 0.0);
-	  assert (B_zero[i] <= 0.0 || B_zero[i] >= 0.0);
-	  B += B_zero[i];
+	  assert (finite (I_zero[i]));
+	  assert (finite (B_zero[i]));
+	  B += L * soil.dz (i) * B_zero[i];
 	  U_zero += L * soil.dz (i) * min (I_zero[i], I_max);
 	}
     }
@@ -1088,14 +1088,18 @@ CropStandard::SoluteUptake (const Soil& soil,
     {
       const double L = root_density[i];
       if (L > 0)
-	uptake[i] = min (L * (min (I_zero[i], I_max) - B_zero[i] * c_root),
-			 solute.M_left (i));
+	uptake[i] = max (0.0, 
+			 min (L * (min (I_zero[i], I_max)
+				   - B_zero[i] * c_root),
+			      solute.M_left (i)));
       else
 	uptake[i] = 0.0;
-      assert (uptake[i] <= 0.0 || uptake[i] >= 0.0);
+      assert (uptake[i] >= 0.0);
     }
   solute.add_to_sink (uptake);
-  return accumulate (uptake.begin (), uptake.end (), 0.0);
+
+  // gN/cm³/h -> gN/m²/h
+  return soil.total (uptake) * 1.0e4; 
 }
 
 void
@@ -1569,6 +1573,8 @@ CropStandard::NitrogenUptake (int Hour,
       CrpAux.NH4Upt
 	= SoluteUptake (soil, soil_water, soil_NH4, PotNUpt, 
 			RootSys.NH4Extraction, Root.MxNH4Up, Root.Rad);
+      assert (CrpAux.NH4Upt >= 0.0);
+
       NCrop += CrpAux.NH4Upt;
       PotNUpt -= CrpAux.NH4Upt;
     }
@@ -1579,6 +1585,7 @@ CropStandard::NitrogenUptake (int Hour,
       CrpAux.NO3Upt
 	= SoluteUptake (soil, soil_water, soil_NO3, PotNUpt,
 			RootSys.NO3Extraction, Root.MxNO3Up, Root.Rad); 
+      assert (CrpAux.NO3Upt >= 0.0);
       NCrop += CrpAux.NO3Upt;
     }
   else
@@ -1676,8 +1683,8 @@ CropStandard::NetProduction (const Bioclimate& bioclimate,
   if (CrpAux.CanopyAss >= RM)
     {
       AssG = CrpAux.CanopyAss - RM;
-      Stress = min (1.0, (  (Prod.NCrop - CrpAux.NfNCnt) 
-			  / (CrpAux.CrNCnt - CrpAux.NfNCnt)));
+      Stress = max (0.0, min (1.0, (  (Prod.NCrop - CrpAux.NfNCnt) 
+				      / (CrpAux.CrNCnt - CrpAux.NfNCnt))));
       AssimilatePartitioning (DS, f_Leaf, f_Stem, f_Root, f_SOrg);
       CrpAux.IncWLeaf = Stress * Resp.E_Leaf * f_Leaf * AssG;
       CrpAux.IncWStem = Stress * Resp.E_Stem * f_Stem * AssG;

@@ -90,10 +90,27 @@ single_positive_root_of_cubic_equation
     }
 }
 
+bool approximate (const double a, const double b, const double noise)
+{
+  return ((b == 0.0) ? (a == 0.0) : fabs (a / b - 1.0) < noise);
+}
+
+
 extern "C" int matherr () 
 {
   abort ();
 }
+
+extern "C" set_exceptions ();
+
+struct set_sparc_exceptions
+{
+  set_sparc_exceptions ()
+  {
+    set_exceptions(FSR_TEM_DZ);
+    1.0 / 0.0;
+  }
+}  set_sparc_exceptions_dummy;
 
 /*
 
