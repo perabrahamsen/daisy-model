@@ -26,13 +26,16 @@
 #include "treelog_dual.h"
 #include "options.h"
 #include "assertion.h"
+#include "tmpstream.h"
 #include <stdexcept>
 #include <typeinfo>
 #include <iostream>
+#include <time.h>
 
 int
 main (int argc, char* argv[])
 {
+  time_t start_time = time (NULL);
   TreelogDual treelog ("daisy.log", cerr);
   Assertion::Register reg (treelog);
 
@@ -70,15 +73,27 @@ main (int argc, char* argv[])
       }
       // Create, check and run the simulation.
       Options::copyright (treelog);
-      Options::timestamp (treelog);
+      const string when = string ("Simulation started ") + ctime (&start_time);
+      TmpStream start_msg;
+      start_msg () << when.substr (0, when.size () - 1);
+      start_msg () << ", " << (time (NULL) - start_time) << " seconds ago";
+      treelog.message (start_msg.str ());
       Daisy daisy (alist);
       daisy.initialize (syntax, treelog);
       if (!daisy.check (treelog))
 	return 1;
       daisy.run (treelog);
 
-      Options::timestamp (treelog);
-
+      const int time_used = time (NULL) - start_time;
+      TmpStream end_msg;
+      end_msg () << "Simulation lasted ";
+      if (time_used >= 3600)
+	end_msg () << (time_used / 3600) << " hours, ";
+      if (time_used >= 60)
+	end_msg () << ((time_used % 3600) / 60) << " minutes and ";
+      end_msg () << (time_used % 60) << " seconds.";
+      treelog.message (end_msg.str ());
+      
       // All is well.
       return 0;
     }

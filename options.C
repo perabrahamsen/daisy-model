@@ -28,7 +28,6 @@
 #include "treelog_stream.h"
 #include "version.h"
 #include "path.h"
-#include <time.h>
 
 #if defined (__unix) 
 #define PATH_SEPARATOR ":"
@@ -67,14 +66,6 @@ Options::copyright (Treelog& out)
 	       + version + ". (" __DATE__ ")\n"
 	       "Copyright 1996 - 2002 Per Abrahamsen, "
 	       "Søren Hansen and KVL.");
-}
-
-void
-Options::timestamp (Treelog& out)
-{
-  time_t now = time (NULL);
-  string when = string ("Time: ") + ctime (&now);
-  out.message (when.substr (0, when.size () - 1));
 }
 
 void 
