@@ -165,6 +165,11 @@ GTKMMDRAWINCLUDE = -I$(HOME)/gtk/include/gtk--draw \
 		   $(GTKMMINCLUDE)
 GTKMMDRAWLIB	= -L$(HOME)/gtk/lib -lgtkmmdraw ${GTKMMLIB}
 
+QTINCLUDE	= -I/pack/qt/include -I/usr/openwin/include
+QTLIB		= -L/pack/qt/lib -R/pack/qt/lib -lqt \
+		  -L/usr/openwin/lib -R/usr/openwin/lib \
+		  -lXext -lX11 -lsocket -lnsl -lm
+
 # Find the right file extension.
 #
 ifeq ($(HOSTTYPE),win32)
@@ -191,7 +196,7 @@ ifeq ($(COMPILER),borland)
 	NOLINK = -c
 	CRTLIB = C:\BC5\LIB\c0x32.obj
 else
-	LINK = $(CC) -g -o
+	LINK = $(CC) -R`pwd` -g -o
 	NOLINK = -c
 endif
 
@@ -267,7 +272,7 @@ INTERFACES = $(COMPONENTS) $(SUBMODELS) $(SPECIALS) $(OTHER)
 
 # Select the C files that are not part of the library.
 #
-MAIN = main.C tkmain.C gmain.C
+MAIN = main.C tkmain.C gmain.C qmain.C
 
 # The object files used in the daisy library.
 #
@@ -301,37 +306,42 @@ all:	$(EXECUTABLES)
 
 # Create the main executable.
 #
-daisy${EXT}:	main${OBJ} $(FORLIB) $(LIBOBJ) # $(INTERFACES:.C=${OBJ})
+daisy${EXT}:	main${OBJ} daisy.so
 	$(LINK)daisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create manager test executable.
 #
-mandaisy${EXT}:	manmain${OBJ} $(FORLIB) $(LIBOBJ)
+mandaisy${EXT}:	manmain${OBJ} daisy.so
 	$(LINK)mandaisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create bug test executable.
 #
-bugdaisy${EXT}:	bugmain${OBJ} $(FORLIB) $(LIBOBJ)
+bugdaisy${EXT}:	bugmain${OBJ} daisy.so
 	$(LINK)bugdaisy $(CRTLIB) $^ $(MATHLIB)
 
 # Create executable with embedded tcl/tk.
 #
-tkdaisy${EXT}:	tkmain${OBJ} $(FORLIB) $(LIBOBJ)
+tkdaisy${EXT}:	tkmain${OBJ} daisy.so
 	$(LINK)tkdaisy $^ $(TKLIB) $(MATHLIB)
 
 # Create executable with Gtk--.
 #
-gdaisy${EXT}:	gmain${OBJ} $(FORLIB) $(LIBOBJ)
-	$(LINK)gdaisy $^ $(GTKMMLIB) $(MATHLIB)
+gdaisy${EXT}:	gmain${OBJ} daisy.so
+	$(LINK)gdaisy $^ $(GTKMMLIB)
+
+# Create executable with Qt.
+#
+qdaisy${EXT}:	qmain${OBJ} daisy.so
+	$(LINK)qdaisy $^ $(QTLIB)
 
 # Create the C main executable.
 #
-cdaisy${EXT}:  cmain${OBJ} $(FORLIB) $(LIBOBJ)
+cdaisy${EXT}:  cmain${OBJ} daisy.so
 	$(LINK)cdaisy $^ $(MATHLIB)
 
 # Create the C main executable for testing.
 #
-cdaisy_test${EXT}:  cmain_test${OBJ} $(FORLIB) $(LIBOBJ)
+cdaisy_test${EXT}:  cmain_test${OBJ} daisy.so
 	$(LINK)cdaisy_test $^ $(MATHLIB)
 
 # Create a DLL.
@@ -339,6 +349,11 @@ cdaisy_test${EXT}:  cmain_test${OBJ} $(FORLIB) $(LIBOBJ)
 daisy.dll:	$(LIBOBJ)
 #	/bc5/bin/tlink32 /Tpd /v $^, daisy.dll,, cw32i.lib
 	$(DLLLINK)daisy.dll $^ $(MATHLIB)
+
+# Create a shared library.
+#
+daisy.so: $(LIBOBJ)
+	$(CC) -shared -o daisy.so $^ $(MATHLIB)
 
 # Create daisy plot executable.
 #
@@ -506,6 +521,11 @@ tkmain${OBJ}: tkmain.C
 #
 gmain${OBJ}: gmain.C
 	$(CC) $(GTKMMINCLUDE) $(NOLINK) $<
+
+# Special rule for gmain.o
+#
+qmain${OBJ}: qmain.C
+	$(CC) $(QTINCLUDE) $(NOLINK) $<
 
 # Special rule for pmain.o
 #

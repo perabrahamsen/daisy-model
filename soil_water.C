@@ -146,6 +146,7 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
   // Limit for ridging.
   const int first = surface.soil_top () ? surface.last_node () : 0;
   assert (first >= 0);
+  bool ok = true;
 
   // Calculate matrix flow next.
   try
@@ -153,28 +154,33 @@ SoilWater::tick (const Soil& soil, Surface& surface, Groundwater& groundwater)
       if (bottom)
 	{
 	  // We have two UZ models.
-	  top->tick (soil,
-		     first, surface,
-		     bottom_start - 1, *bottom,
-		     S_sum_, h_old, Theta_old_, h_ice_,
-		     h_, Theta_, q_);
-	  bottom->tick (soil,
-			bottom_start, *top,
-			last, groundwater,
-			S_sum_, h_old, Theta_old_, h_ice_,
-			h_, Theta_, q_);
+	  ok = top->tick (soil,
+			  first, surface,
+			  bottom_start - 1, *bottom,
+			  S_sum_, h_old, Theta_old_, h_ice_,
+			  h_, Theta_, q_);
+	  if (ok)
+	    ok = bottom->tick (soil,
+			       bottom_start, *top,
+			       last, groundwater,
+			       S_sum_, h_old, Theta_old_, h_ice_,
+			       h_, Theta_, q_);
 	}
       else
 	{
 	  // We have only one UZ model.
-	  top->tick (soil,
-		     first, surface,
-		     last, groundwater,
-		     S_sum_, h_old, Theta_old_, h_ice_,
-		     h_, Theta_, q_);
+	  ok = top->tick (soil,
+			  first, surface,
+			  last, groundwater,
+			  S_sum_, h_old, Theta_old_, h_ice_,
+			  h_, Theta_, q_);
 	}
     }
   catch (const char* error)
+    {
+      ok = false;
+    }
+  if (!ok)
     {
       CERR << "UZ problem: " << error << "\n"
            << "Using reserve uz model.\n";

@@ -18,9 +18,8 @@
 #define log(x) (assert (x > 0), (log)(x))
 #define acos(x) (assert (x >= -1 && x <= 1), (acos(x)))
 #define asin(x) (assert (x >= -1 && x <= 1), (asin(x)))
+#define WORKING_EXCEPTIONS
 #endif
-
-#define HANDLE_NAMESPACES
 
 #ifdef __GNUC__
 // Only gcc has a C++ safe <math.h>.
@@ -105,9 +104,7 @@
 
 #include <stdexcept>
 
-#ifdef HANDLE_NAMESPACES
 using namespace std;
-#endif
 
 // Shared code.
 

@@ -37,7 +37,7 @@ public:
 
   // Simulate.
 public:
-  void tick (const Soil& soil,
+  bool tick (const Soil& soil,
 	     unsigned int first, const UZtop& top, 
 	     unsigned int last, const UZbottom& bottom, 
 	     const vector<double>& S,
@@ -54,7 +54,7 @@ public:
   ~UZlr ();
 };
 
-void 
+bool
 UZlr::tick (const Soil& soil,
 	    unsigned int first, const UZtop& top, 
 	    unsigned int last, const UZbottom& /* bottom */, 
@@ -198,6 +198,7 @@ UZlr::tick (const Soil& soil,
   assert (approximate (total_old - q_up * dt + q_down * dt - total_S * dt, 
 		       total_new));
 #endif
+  return true;
 }
 
 void

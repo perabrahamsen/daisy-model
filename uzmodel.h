@@ -56,7 +56,7 @@ public:
   
   // Simulate.
 public:
-  virtual void tick (const Soil& soil,
+  virtual bool tick (const Soil& soil,
 		     unsigned int first, const UZtop& top, 
 		     unsigned int last, const UZbottom& bottom, 
 		     const vector<double>& S,

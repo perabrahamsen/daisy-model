@@ -27,7 +27,7 @@ public:
     { }
 
 public:
-  void tick (const Soil& /* soil */,
+  bool tick (const Soil& /* soil */,
 	     unsigned int first, const UZtop& /* top */, 
 	     unsigned int last, const UZbottom& /* bottom */, 
 	     const vector<double>& /* S */,
@@ -45,6 +45,7 @@ public:
 	  h[i] = h_old[i];
 	}
       q[last + 1] = 0.0;
+      return true;
     }
   // Create and Destroy.
 public:

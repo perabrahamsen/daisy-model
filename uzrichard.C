@@ -72,7 +72,7 @@ private:
 		double ddt,
 		vector<double>& q);
 public:
-  void tick (const Soil& soil,
+  bool tick (const Soil& soil,
 	     unsigned int first, const UZtop& top,
 	     unsigned int last, const UZbottom& bottom,
 	     const vector<double>& S,
@@ -344,7 +344,14 @@ UZRichard::richard (const Soil& soil,
 		// We don't have more water in the pressure top.
 		{
 		  if (switched_top)
-		    throw ("Couldn't accept top flux");
+		    {
+#ifdef WORKING_EXCEPTIONS
+		      throw ("Couldn't accept top flux");
+#else
+#error "accept no exceptions!"
+		      return false;
+#endif
+		    }
 		  else
 		    {
 		      top.flux_top_on ();
@@ -358,8 +365,14 @@ UZRichard::richard (const Soil& soil,
               delta_top_water = -(available_water / time_left) * ddt;
 	    }
 	  else if (top.q () > 0.0)
-	    // We have a saturated soil, with an upward flux.
-	    throw ("Saturated soil with an upward flux");
+	    {
+	      // We have a saturated soil, with an upward flux.
+#ifdef WORKING_EXCEPTIONS
+	      throw ("Saturated soil with an upward flux");
+#else
+	      return false;
+#endif
+	    }
 	  else if (!switched_top)
 	    // We have saturated soil, make it a pressure top.
 	    {
@@ -367,7 +380,13 @@ UZRichard::richard (const Soil& soil,
 	      accepted = false;
 	    }
 	  else
-	    throw ("Couldn't drain top flux");
+	    {
+#ifdef WORKING_EXCEPTIONS
+	      throw ("Couldn't drain top flux");
+#else
+	      return false;
+#endif
+	    }
 
 	  if (accepted)
 	    {
@@ -403,8 +422,14 @@ UZRichard::richard (const Soil& soil,
 		      }
 		  }
 		if (error_found)
-		  throw ("\
+		  {
+#ifdef WORKING_EXCEPTIONS
+		    throw ("\
 Richard eq. mass balance flux is different than darcy flux");
+#else
+		    return false;
+#endif
+		  }
 	      }
 #endif
 	      top_water += delta_top_water;
@@ -455,8 +480,8 @@ Richard eq. mass balance flux is different than darcy flux");
       q[i + 1] = (((Theta_new[i] - Theta_old[i]) / dt) + S[i])
 	* soil.dz (i) + q[i];
     }
-  return true;
 #endif
+  return true;
 }
 
 bool
@@ -546,7 +571,7 @@ calculating flow with pressure top.");
     }
 }
 
-void 
+bool
 UZRichard::tick (const Soil& soil,
 		 unsigned int first, const UZtop& top, 
 		 unsigned int last, const UZbottom& bottom, 
@@ -561,10 +586,16 @@ UZRichard::tick (const Soil& soil,
   iterations = 0;
   if (!richard (soil, first, top, last, bottom, 
 		S, h_old, Theta_old, h_ice, h, Theta, q))
-    throw ("Richard's Equation doesn't converge");
-    
+    {
+#ifdef WORKING_EXCEPTIONS
+      throw ("Richard's Equation doesn't converge");
+#else
+      return false;
+#endif
+    }
   q_up = q[first];
   q_down = q[last + 1];
+  return true;
 }
 
 void

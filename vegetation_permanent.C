@@ -112,7 +112,7 @@ VegetationPermanent::tick (const Time& time,
 			   const Bioclimate&,
 			   const Soil& soil,
 			   OrganicMatter&,
-			   const SoilHeat&x,
+			   const SoilHeat&,
 			   const SoilWater& soil_water,
 			   SoilNH4& soil_NH4,
 			   SoilNO3& soil_NO3)
