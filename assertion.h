@@ -38,8 +38,14 @@ namespace Assertion
   };
 }
 
+#ifdef __FUNCTION__
 #define daisy_assert(condition) \
   if (!(condition)) \
     Assertion::failure (__FILE__, __LINE__, __FUNC__, #condition)
+#else
+#define daisy_assert(condition) \
+  if (!(condition)) \
+    Assertion::failure (__FILE__, __LINE__, NULL, #condition)
+#endif
 
 #endif // ASSERTION_H
