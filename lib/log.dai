@@ -1076,10 +1076,10 @@
 	    (tag "table")
 	    (dimension "cm"))
 	   ((path column "$col" Groundwater "*" DeepPercolation)
-          (when hourly)
+	    (when hourly)
 	    (dimension "cm/d"))
 	   ((path column "$col" Groundwater "*" DrainFlow)
-          (when hourly)
+	    (when hourly)
 	    (dimension "cm/d"))))
 
 (deflog "Hourly Groundwater" table1
@@ -1104,6 +1104,7 @@
           (from 0)
           (to -190)  
 	    (dimension "cm"))))
+	 
 
 (deflog "Drain Sink" table
   (where "Drain_Sink.tab")
