@@ -120,6 +120,16 @@
 )
 
 (defcrop Grass "Grass to grain"
-  (Devel original (PhotEff1 (00 0.10) (10 0.00) (11 0.00) (12 0.75) (13 0.89) (14 1.00)
+  (Devel original 
+	 (PhotEff1 (00 0.10) (10 0.00) (11 0.00) (12 0.75) (13 0.89) (14 1.00)
 		   (15 1.08) (16 1.14) (17 1.18) (24 1.18)))
-)
+
+  ;; This will allow the grass to regrow after removing the entire shoot.
+  (Prod (IntDSRelRtRes 0.2))
+  ;; WARNING: This also affects regrowth after a "normal" cut, ans the
+  ;; paramterization is no longer backed by observations.  I.e. it
+  ;; produce bogus results!  Use only when bogus results are better
+  ;; than no results.  Otherwise, use the "Grass" parameterization.
+
+  ;; This will allow the grass to regrow af a cut after it is ripe.
+  (Harvest (DSmax 3.0)))
