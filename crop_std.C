@@ -145,8 +145,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize_organic (Treelog&, const Geometry& geometry, OrganicMatter&);
-  void initialize_inorganic (Treelog&, const Geometry& geometry);
+  void initialize (Treelog&, const Geometry& geometry, OrganicMatter *const);
   CropStandard (const AttributeList& vl);
   ~CropStandard ();
 };
@@ -170,8 +169,8 @@ CropStandard::DM (double height) const
 }
 
 void
-CropStandard::initialize_organic (Treelog& msg, const Geometry& geometry,
-				  OrganicMatter& organic_matter)
+CropStandard::initialize (Treelog& msg, const Geometry& geometry,
+                          OrganicMatter *const organic_matter)
 {
   root_system.initialize (geometry.size ());
   production.initialize (nitrogen.SeedN);
@@ -179,8 +178,9 @@ CropStandard::initialize_organic (Treelog& msg, const Geometry& geometry,
   if (development.DS >= 0)
     {
       // Dead organic matter.
-      production.initialize (name, harvesting.Root, harvesting.Dead,
-			     geometry, organic_matter);
+      if (organic_matter)
+        production.initialize (name, harvesting.Root, harvesting.Dead,
+                               geometry, *organic_matter);
       
       // Update derived state content.
       canopy.tick (production.WLeaf, production.WSOrg, 
@@ -192,16 +192,6 @@ CropStandard::initialize_organic (Treelog& msg, const Geometry& geometry,
 			       geometry, production.WRoot, development.DS);
       nitrogen.content (development.DS, production);
     }
-}
-
-void
-CropStandard::initialize_inorganic (Treelog&, const Geometry& geometry)
-{
-  root_system.initialize (geometry.size ());
-  production.initialize (nitrogen.SeedN);
-
-  if (development.DS >= 0)
-    nitrogen.content (development.DS, production);
 }
 
 void

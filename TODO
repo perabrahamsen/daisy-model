@@ -1,5 +1,7 @@
 TODO --- things that needs done with Daisy -*- outline -*-
 
+* Tilføj øvrige textursystemer.
+
 * Øvelser til PC.
 
 * Birgitte + SH EU ark
@@ -25,16 +27,6 @@ TODO --- things that needs done with Daisy -*- outline -*-
 ** Slovakiske data
 
 * spec + dimension giver ikke fejl hvis der ikke kan konverteres
-
-* Make it possible to specify texture using different systems
-
-** New "default" horizon
-
-???
-
-** USDA. FAO, DIN, DS horizon
-
-** numeric horizon
 
 * Ny phenology model 
 

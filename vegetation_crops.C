@@ -596,7 +596,7 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop.initialize_organic (msg, geometry, organic_matter);
+  crop.initialize (msg, geometry, &organic_matter);
   crops.push_back (&crop);
   seed_N += crop.total_N ();
   seed_C += crop.total_C ();
@@ -615,7 +615,7 @@ VegetationCrops::sow (Treelog& msg, const AttributeList& al,
     if ((*i)->name == name)
       msg.error ("There is already an " + name + " on the field.\n\
 If you want two " + name + " you should rename one of them");
-  crop.initialize_inorganic (msg, geometry);
+  crop.initialize (msg, geometry, NULL);
   crops.push_back (&crop);
 }
 
@@ -631,10 +631,8 @@ VegetationCrops::initialize (const Time&, const Soil& soil,
 			     OrganicMatter *const organic_matter, Treelog& msg)
 {
   for (unsigned int i = 0; i < crops.size (); i++)
-    if (organic_matter)
-      crops[i]->initialize_organic (msg, soil, *organic_matter);
-    else
-      crops[i]->initialize_inorganic (msg, soil);
+    crops[i]->initialize (msg, soil, organic_matter);
+
   reset_canopy_structure (msg);
 }
 

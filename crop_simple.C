@@ -110,6 +110,7 @@ public:
   double EpFac () const		// Convertion to potential evapotransp.
   { return canopy.EpFactor (DS ()); }
   void CanopyStructure ();
+  void CropCAI ();
   double ActualWaterUptake (double Ept, const Soil&, SoilWater&,
 			    double EvapInterception, double day_fraction, 
 			    Treelog&);
@@ -146,7 +147,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize_inorganic (Treelog&, const Geometry& geometry);
+  void initialize (Treelog&, const Geometry& geometry, OrganicMatter*);
   CropSimple (const AttributeList& vl);
   ~CropSimple ();
 };
@@ -158,6 +159,23 @@ CropSimple::CanopyStructure ()
   canopy.LAIvsH.clear ();
   canopy.LAIvsH.add (0.0, 0.0);
   canopy.LAIvsH.add (canopy.Height, canopy.CAI);
+}
+
+void
+CropSimple::CropCAI ()
+{
+  double T;
+  if (use_T_sum)
+    T = T_sum;
+  else
+    T = day;
+
+  canopy.CAI = LAIvsT (T);
+
+  if (canopy.CAI < forced_LAI)
+    canopy.CAI = forced_LAI;
+  else if (canopy.CAI > forced_LAI)
+    forced_LAI = 0.0;
 }
 
 double
@@ -218,17 +236,7 @@ CropSimple::tick (const Time& time,
 
       T_sum += T_air;
       day += 1.0;
-      if (use_T_sum)
-	T = T_sum;
-      else
-	T = day;
-
-      canopy.CAI = LAIvsT (T);
-
-      if (canopy.CAI < forced_LAI)
-	canopy.CAI = forced_LAI;
-      else if (canopy.CAI > forced_LAI)
-	forced_LAI = 0.0;
+      CropCAI ();
       
       if (T < T_emergence)
 	/* do nothing */;
@@ -377,9 +385,10 @@ CropSimple::total_C () const
   return 0.0; 
 }
 void
-CropSimple::initialize_inorganic (Treelog&, const Geometry& geometry)
+CropSimple::initialize (Treelog&, const Geometry& geometry, OrganicMatter*)
 {
   root_system.initialize (geometry.size ());
+  CropCAI ();
 }
 
 CropSimple::CropSimple (const AttributeList& al)

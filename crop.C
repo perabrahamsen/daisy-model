@@ -72,11 +72,6 @@ bool
 Crop::ds_remove (const Crop* crop)
 { return crop->DS () == Crop::DSremove; }
 
-void
-Crop::initialize_organic (Treelog& msg, const Geometry& geometry, 
-			  OrganicMatter&)
-{ initialize_inorganic (msg, geometry); }
-
 Crop::Crop (const AttributeList& al)
   : alist (al),
     name (al.identifier ("type"))

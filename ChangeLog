@@ -1,4 +1,23 @@
+2004-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 3.53 released.
+
+2004-09-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* horizon_numeric.C: New model.
+	* Makefile (MODELS): Add it.
+
 2004-09-10  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* canopy_simple.C (CAI): Made it log only.
+
+	* crop.h, crop.C, crop_simple.C, crop_old.C, crop_sold.C:
+	* crop_std.C (initialize_organic, initialize_inorganic): Removed. 
+	(initialize): New function.
+	* vegetation_crops.C (initialize, sow): Update caller.
+
+	* crop_simple.C (CropCAI): New function.
+	(tick, initialize_inorganic): Use it.
 
 	* Version 3.52 released.
 

@@ -127,7 +127,7 @@ public:
 
   // Create and Destroy.
 public:
-  void initialize_inorganic (Treelog&, const Geometry& geometry);
+  void initialize (Treelog&, const Geometry& geometry, OrganicMatter*);
   CropOld (const AttributeList& vl);
   ~CropOld ();
 };
@@ -610,7 +610,7 @@ CropOld::Variables::~Variables ()
 { }
 
 void
-CropOld::initialize_inorganic (Treelog&, const Geometry& geometry)
+CropOld::initialize (Treelog&, const Geometry& geometry, OrganicMatter*)
 {
   unsigned int size = geometry.size ();
 

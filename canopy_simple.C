@@ -73,8 +73,7 @@ CanopySimple::load_syntax (Syntax& syntax, AttributeList& alist)
   // Variables.
   syntax.add ("Height", "cm", Syntax::State, "Crop height.");
   alist.add ("Height", 0.0);
-  syntax.add ("CAI", "m^2/m^2", Syntax::State, "Crop Area Index.");
-  alist.add ("CAI", 0.0);
+  syntax.add ("CAI", "m^2/m^2", Syntax::LogOnly, "Crop Area Index.");
   syntax.add ("LAIvsH", "cm", "m^2/m^2", Syntax::LogOnly,
 	      "Accumulated Leaf Area Index at Height.");
 }
@@ -89,7 +88,7 @@ CanopySimple::CanopySimple (const AttributeList& vl)
     rs_max (vl.number ("rs_max")),
     rs_min (vl.number ("rs_min")),
     Height (vl.number ("Height")),
-    CAI    (vl.number ("CAI"))
+    CAI    (0.0)
 { }
 
 CanopySimple::~CanopySimple ()

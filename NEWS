@@ -12,6 +12,65 @@ headlines of the changes since the last version.  For more detailed
 information on changes, read the 'ChangeLog' file from the source
 release.
 
+* 3.53
+
+** New Horizon models.
+
+We now have horizons corresponding to the most common texture
+classification systems.
+
+(defhorizon AnExample USDA3
+  "An horizon defined using the USDA texture classification system."
+  (humus 1.6 [%])
+  (dry_bulk_density 1.5 [g/cm^3])
+  (clay 8.0 [%])
+  (silt 10.5 [%])
+  (sand 79.9 [%]))
+
+Note that the horizon models all require the sum of the soil
+constituents should be 1.0 (or 100%).  This may or may not include the
+humus part. 
+
+The old "default" horizon model is still available, and will normalize
+the constitituents.  It used the USDA (United States Department of
+Agriculture) classification system.  We suggest that you start using
+the new models, in order to be explicit about the classification
+system.
+
+Other supported texture systems are:
+
+USDA7: Same as USDA3, but the sand is further divided into very fine,
+fine, medium, coarse and very coarse sand.
+
+FAO3 and FAO7:  The Food and Agriculture Organization within the UN
+use the same classification systems as USDA.
+
+USPRA3 and USPRA4: The United States Public Road Administration are
+unique in that their limit for clay is 5 rather than the 2 [um]
+everybody else uses.  Sand may be devided into fine and coarse.
+
+ISSS3 and ISSS4: The International Soil Science Society, their
+classification is common in Denmark. Sand may be devided into fine and
+coarse.
+
+BSI3 and BSI7: The British Standards Institute classification is also
+used by Massachusetts Institute of Technologu, (also knows as MIT3 and
+MIT7) Both sand and silt may be divided into fine, medium and coarse.
+
+DIN3 and DIN5: German standards, DIN3 is identitical to BSI3, DIN5 is
+like BSI7 except that the silt isn't divided.
+
+You can also specify the texture with your own limits, like this.
+
+(defhorizon Ap numeric
+  "A horizon with explicit texture classification."
+  (limits 2 50 2000 [um])
+  (fractions 8 10.5 79.9 [%])
+  (humus 1.6 [%])
+  (dry_bulk_density 1.5 [g/cm^3]))
+
+The horizon here is identical to the one specified with USDA3 before.
+
 * 3.52
 
 Bug fixes.
