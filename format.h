@@ -55,6 +55,7 @@ public:
     List (Format&);
     ~List ();  
   };
+  friend class List;
 
   // Item.
 private:
@@ -70,6 +71,7 @@ public:
     Item (Format&, const std::string& name);
     ~Item ();  
   };
+  friend class Item;
 
   // Table.
 private:
@@ -85,6 +87,7 @@ public:
     Table (Format&, const std::string& format);
     ~Table ();  
   };
+  friend class Table;
 
   // TableRow.
 private:
@@ -100,6 +103,7 @@ public:
     TableRow (Format&);
     ~TableRow ();  
   };
+  friend class TableRow;
 
   // TableCell.
 private:
@@ -115,6 +119,7 @@ public:
     TableCell (Format&);
     ~TableCell ();  
   };
+  friend class TableCell;
 
   // MultiCell
 private:
@@ -131,6 +136,7 @@ public:
     TableMultiCell (Format&, int cells, const std::string& format);
     ~TableMultiCell ();  
   };
+  friend class TableMultiCell;
 
   // Typewriter.
 private:
@@ -146,6 +152,7 @@ public:
     Typewriter (Format&);
     ~Typewriter ();  
   };
+  friend class Typewriter;
 
   // Section.
 private:
@@ -164,6 +171,7 @@ public:
 	     const std::string& scope, const std::string& label);
     ~Section ();  
   };
+  friend class Section;
 
   // Document.
 private:
@@ -179,6 +187,7 @@ public:
     Document (Format&);
     ~Document ();  
   };
+  friend class Document;
 
   // Use.
 public:

@@ -21,8 +21,10 @@
 
 #include "format.h"
 #include "version.h"
-#include <ostream>
+// GCC 2.95 lack ostream.
+#include <iostream>
 #include <map>
+#include <time.h>
 
 struct FormatLaTeX : public Format
 {

@@ -405,7 +405,7 @@ EXECUTABLES = daisy${EXT} tkdaisy${EXT} cdaisy${EXT} gdaisy${EXT}
 
 # Select files to be removed by the next cvs update.
 #
-REMOVE = document_LaTeX.C document.C program_refdoc.C 
+REMOVE = document_LaTeX.C document.C program_refdoc.C document.h
 
 # These are the file extensions we deal with.
 # 

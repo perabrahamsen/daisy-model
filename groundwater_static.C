@@ -41,6 +41,8 @@ public:
 
   // Create and Destroy.
 public:
+  void initialize (const Soil&, const Time&, Treelog&)
+  { }
   GroundwaterStatic (const AttributeList&);
   ~GroundwaterStatic ();
 };

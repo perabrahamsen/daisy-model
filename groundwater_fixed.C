@@ -46,6 +46,8 @@ public:
 
   // Create and Destroy.
 public:
+  void initialize (const Soil&, const Time&, Treelog&)
+  { }
   GroundwaterFixed (const AttributeList& al)
     : Groundwater (al),
       depth (al.number ("table"))

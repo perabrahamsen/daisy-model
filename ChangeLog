@@ -4,6 +4,12 @@
 
 2005-02-23  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+
+	* groundwater.h, groundwater.C (initialize): Made it a pure virtual.
+	* groundwater_lysimeter.C (initialize): Implement it.
+	(location): New member variable.
+	(table): Use it.
+
 	* uzrichard.C (richard): Use a fake pressure bottom when the
 	lysimeter is active.
 

@@ -31,7 +31,7 @@
 #include "tmpstream.h"
 #include <iostream>
 #include <memory>
-
+#include <algorithm>
 static bool 
 has_interesting_description (const Library& library, 
                              const AttributeList& alist)

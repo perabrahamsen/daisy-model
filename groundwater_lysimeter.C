@@ -21,9 +21,13 @@
 
 
 #include "groundwater.h"
+#include "soil.h"
 
 class GroundwaterLysimeter : public Groundwater
 {
+  // Content.
+  double location;                // Location of lysimeter.
+
   // UZbottom.
 public:
   bottom_t bottom_type () const
@@ -39,12 +43,16 @@ public:
 	     const SoilHeat&, const Time&, Treelog&)
   { }
   double table () const
-  { return 1.0; }
+  { return location; }
 
   // Create and Destroy.
 public:
+  void initialize (const Soil& soil, const Time&, Treelog&)
+  { location = soil.zplus (soil.size () - 1); }
+
   GroundwaterLysimeter (const AttributeList& al)
-    : Groundwater (al)
+    : Groundwater (al),
+      location (-42.42e42)
   { }
   ~GroundwaterLysimeter ()
   { }
