@@ -21,7 +21,8 @@
 
 
 #include "submodel.h"
-#include "common.h"
+#include "syntax.h"
+#include "alist.h"
 #include "assertion.h"
 #include <map>
 
@@ -30,6 +31,45 @@ using namespace std;
 typedef map<string, Submodel::load_fun, less<string>/**/> submodel_map_type;
 
 static submodel_map_type* submodel_map = NULL;
+
+bool 
+Submodel::is_submodel (const Syntax& syntax, const AttributeList& alist,
+		       const std::string& name)
+{
+  if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
+    {
+      const AttributeList& nested = syntax.default_alist (name);
+      if (nested.check ("submodel"))
+	return true;
+    }
+  else
+    {
+      const AttributeList& nested = alist.alist (name);
+      if (nested.check ("submodel"))
+	return true;
+    }
+  return false;
+}
+
+std::string
+Submodel::find_submodel (const Syntax& syntax, 
+			 const AttributeList& alist,
+			 const std::string& name)
+{
+  if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
+    {
+      const AttributeList& nested = syntax.default_alist (name);
+      if (nested.check ("submodel"))
+	return nested.name ("submodel");
+    }
+  else
+    {
+      const AttributeList& nested = alist.alist (name);
+      if (nested.check ("submodel"))
+	return nested.name ("submodel");
+    }
+  daisy_assert (false);
+}
 
 void
 Submodel::all (vector<string>& entries)

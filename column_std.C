@@ -628,10 +628,10 @@ The denitrification process.",
     syntax.add ("seed_C", "kg C/ha/h", Syntax::LogOnly,
 		"Amount of carbon in seed applied this time step.");
     syntax.add ("fertilized_NO3", "kg N/ha/h", Syntax::LogOnly,
-		"Amount of nitrate applied to surface this time step.\n\
+		"Amount of nitrate applied this time step.\n\
 This does include nitrate incorporated in the soil.");
     syntax.add ("fertilized_NH4", "kg N/ha/h", Syntax::LogOnly,
-		"Amount of ammonium applied to surface this time step.\n\
+		"Amount of ammonium applied this time step.\n\
 This includes both ammonium lost due to volatilization, and ammonium\n\
 incorporated in the soil.");
     syntax.add ("fertilized_NO3_surface", "kg N/ha/h", Syntax::LogOnly,

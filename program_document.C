@@ -73,9 +73,6 @@ struct ProgramDocument : public Program
 
   // Private functions.
   void print_string (const std::string&);
-  bool is_submodel (const Syntax&, const AttributeList&, const std::string&);
-  std::string find_submodel (const Syntax&, const AttributeList&, 
-			     const std::string&);
 
   // Document functions.
   void print_entry_type (const std::string& name,
@@ -172,45 +169,6 @@ ProgramDocument::print_description (const std::string& description)
   format->soft_linebreak ();
 }
 
-bool 
-ProgramDocument::is_submodel (const Syntax& syntax, const AttributeList& alist,
-			      const std::string& name)
-{
-  if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
-    {
-      const AttributeList& nested = syntax.default_alist (name);
-      if (nested.check ("submodel"))
-	return true;
-    }
-  else
-    {
-      const AttributeList& nested = alist.alist (name);
-      if (nested.check ("submodel"))
-	return true;
-    }
-  return false;
-}
-
-std::string
-ProgramDocument::find_submodel (const Syntax& syntax, 
-				const AttributeList& alist,
-				const std::string& name)
-{
-  if (syntax.size (name) != Syntax::Singleton || !alist.check (name))
-    {
-      const AttributeList& nested = syntax.default_alist (name);
-      if (nested.check ("submodel"))
-	return nested.name ("submodel");
-    }
-  else
-    {
-      const AttributeList& nested = alist.alist (name);
-      if (nested.check ("submodel"))
-	return nested.name ("submodel");
-    }
-  daisy_assert (false);
-}
-
 void 
 ProgramDocument::print_entry_type (const std::string& name,
 				   const Syntax& syntax,
@@ -234,12 +192,12 @@ ProgramDocument::print_entry_type (const std::string& name,
       break;
     case Syntax::AList:
       {
-	if (is_submodel (syntax, alist, name))
+	if (Submodel::is_submodel (syntax, alist, name))
 	  {
-	    format->bold (find_submodel (syntax, alist, name));
+	    format->bold (Submodel::find_submodel (syntax, alist, name));
 	    format->text (" fixed component ");
 	    format->see ("section", "fixed", 
-			 find_submodel (syntax, alist, name));
+			 Submodel::find_submodel (syntax, alist, name));
 	  }
 	else
 	  {
@@ -421,11 +379,11 @@ ProgramDocument::print_entry_value (const std::string& name,
 		format->text (" (has partially specified default value)");
 	      else 
 		format->text (" (has fully specified default value)");
-	      if (is_submodel (syntax, alist, name))
+	      if (Submodel::is_submodel (syntax, alist, name))
 		{
 		  const AttributeList& nested = alist.alist (name);
-		  const std::string submodel = find_submodel (syntax, alist,
-							      name);
+		  const std::string submodel
+		    = Submodel::find_submodel (syntax, alist, name);
 		  Syntax nested_syntax;
 		  AttributeList default_alist;
 		  Submodel::load_syntax (submodel, 

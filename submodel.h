@@ -34,6 +34,10 @@ class Submodel
 public:
   typedef void (*load_fun) (Syntax&, AttributeList&);
   
+  static bool is_submodel (const Syntax&, const AttributeList&, 
+			   const std::string&);
+  static std::string find_submodel (const Syntax&, const AttributeList&, 
+				    const std::string&);
   static void all (std::vector<std::string>& entries);
   static void load_syntax (const std::string& model, Syntax&, AttributeList&);
   static bool registered (const std::string& submodel);
