@@ -1,0 +1,47 @@
+\documentclass[a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+\usepackage{a4}
+\usepackage{verbatim}
+\input{macro}
+\usepackage{natbib}
+%\bibliographystyle{plainnat}
+\bibliographystyle{apalike}
+\usepackage{graphicx}
+\usepackage{latexsym}
+
+\begin{document}
+
+\section*{Crop \lai{} parameterization}
+
+The \emph{leaf area index}, or \lai{} for short, is the total area of
+all leafs on a field or plot, divided by the area of the field or plot
+itself.  The \lai{} is important for photosynthesis and transpiration.
+The larger the \lai{} is, the more sunlight will be caught.  This is
+true even for \lai{} larger than 1, because the leafs are not
+uniformly distributed over the field so there is some overlap
+However, it is of course a case of dimishing returns.  A \lai{} of 5
+is commong for fully developed crops.
+
+The \textsc{default} crop model has three different mechanisms for
+calculating \lai{}.  These are used during different development
+phases of the crop.
+
+The first phase used right after emergence is is a forced curve, which
+is unique in that it depend solely on the development stage of the
+crop.  In the two other phases, the \lai{} is a function of the leaf
+dry matter.  But when the crop just emerge, it has no leaf dry
+matter.  In order to create keaf dry matter, it needs assimilate.  In
+order to create assimilate, it needs to catch sunligt.  Which again
+require a leaf area.  In order to escape this catch-22, the \lai{} is
+initialy calculated based on age alone.  The function is
+\begin{displaymath}
+\frac{1}{1+e^{-15 (\mbox{\sc ds}-\mbox{\sc dslai05})}}
+\end{displaymath}
+This function will be close to zero at DS = 0, 0.5 at DS =
+\texttt{DSLAI05}, and grow towards one from there.  The only
+calibration parameter for this phase is \texttt{DSLAI05}.  The smaller
+you mae this number, the fast LAI will grow towards 0.5.
+
+The crop will leave this phase when the LAI
+\end{document}

@@ -9,7 +9,7 @@ DOCS = requirements.tex exercises.tex \
 
 PRESENTATIONS = esa-2004.tex 
 NOTES = 2DDaisy.txt forced_LAI.txt
-FUTURE = organic.tex
+FUTURE = crop-lai.tex organic.tex
 
 TEXT = $(LIBS) $(FIGS) $(DOCS) $(PRESENTATIONS) $(NOTES) $(FUTURE) Makefile
 
