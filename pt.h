@@ -9,7 +9,7 @@ class Soil;
 class SoilHeat;
 class SoilWater;
 class Weather;
-class CropList;
+class Vegetation;
 class Surface;
 class Pet;
 
@@ -21,7 +21,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (const Weather&, const CropList&,
+  virtual void tick (const Weather&, const Vegetation&,
 		     const Surface&, const Soil&, const SoilHeat&, 
 		     const SoilWater&, const Pet&, 
 		     double canopy_ea, double snow_ea,

@@ -1,7 +1,6 @@
 // column_std.C
 
 #include "column.h"
-#include "crop.h"
 #include "bioclimate.h"
 #include "surface.h"
 #include "soil.h"
@@ -18,18 +17,17 @@
 #include "library.h"
 #include "log.h"
 #include "filter.h"
-#include "crop.h"
 #include "im.h"
 #include "am.h"
 #include "weather.h"
-
-class Groundwater;
+#include "vegetation.h"
+#include "time.h"
 
 class ColumnStandard : public Column
 {
   // Content.
 private:
-  CropList crops;
+  Vegetation vegetation;
   Bioclimate& bioclimate;
   Surface surface;
   Soil soil;
@@ -44,26 +42,32 @@ private:
 
   // Actions.
 public:
-  void sow (const AttributeList& crop);
+  void sow (const AttributeList& al)
+    { vegetation.sow (al, soil); }
   void irrigate_top (double flux, double temp, const IM&);
   void irrigate_surface (double flux, double temp, const IM&);
   void fertilize (const AttributeList&, const Time&);
   void fertilize (const AttributeList&, const Time&, double from, double to);
   void fertilize (const IM&);
   void fertilize (const IM&, double from, double to);
-  vector<const Harvest*> harvest (const Time&, const string& name,
+  vector<const Harvest*> harvest (const Time& time, const string& crop_name,
 				  double stub_length,
 				  double stem_harvest,
 				  double leaf_harvest, 
-				  double sorg_harvest);
+				  double sorg_harvest)
+    { return vegetation.harvest (name, crop_name, time, soil, organic_matter,
+				 stub_length, 
+				 stem_harvest, leaf_harvest, sorg_harvest); }
   void mix (const Time&, double from, double to, double penetration = 1.0);
   void swap (const Time&, double from, double middle, double to);
 
   // Conditions.
   double soil_temperature (double height) const; // [ cm -> dg C]
   double soil_water_potential (double height) const; // [cm -> cm]
-  double crop_ds (const string& crop) const; // {[-1:2], Crop::DSremove}
-  double crop_dm (const string& crop) const; // [kg/ha], negative when no crop
+  double  crop_ds (const string& name) const // {[-1:2], Crop::DSremove}
+    { return vegetation.DS_by_name (name); }
+  double crop_dm (const string& name) const // [kg/ha], negative when no crop
+    { return vegetation.DM_by_name (name); }
 
   // Simulation.
 public:
@@ -139,14 +143,6 @@ public:
   ~ColumnStandard ();
 };
 
-void
-ColumnStandard::sow (const AttributeList& al)
-{
-  Crop& crop = Librarian<Crop>::create (al);
-  crop.initialize (soil);
-  crops.push_back (&crop);
-}
-
 void 
 ColumnStandard::irrigate_top (double flux, double temp, const IM& sm)
 {
@@ -193,60 +189,11 @@ ColumnStandard::fertilize (const IM& im,
   soil_NH4.add (soil, soil_water, im.NH4, from, to);
 }
 
-vector<const Harvest*>
-ColumnStandard::harvest (const Time& time, const string& crop_name,
-			 double stub_length,
-			 double stem_harvest, double leaf_harvest, 
-			 double sorg_harvest)
-{
-  vector<const Harvest*> harvest;
-  
-  // Harvest all crops of this type.
-  for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
-    if ((*crop)->name == crop_name)
-      harvest.push_back (&(*crop)->harvest (name, time, 
-					    soil, organic_matter,
-					    stub_length, stem_harvest,
-					    leaf_harvest, sorg_harvest, 
-					    false));
-
-  // Remove all dead crops.  There has to be a better way.
-  bool removed;
-  do
-    {
-      removed = false;
-      for (CropList::iterator crop = crops.begin();
-	   crop != crops.end();
-	   crop++)
-	if ((*crop)->name == crop_name)
-	  {
-	    if (Crop::ds_remove (*crop))
-	      {
-		delete *crop;
-		crops.erase (crop); // This invalidates the iterator.
-		// Restart the loop.
-		removed = true;
-		break;
-	      }
-	  }
-    }
-  while (removed);
-  
-  // Return the result.
-  return harvest;
-}
-
 void 
 ColumnStandard::mix (const Time& time,
 		     double from, double to, double penetration)
 {
-  for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
-    {
-      (*crop)->kill (name, time, soil, organic_matter);
-      delete *crop;
-    }
-  crops.erase (crops.begin (), crops.end ());
-  assert (crops.size () == 0);
+  vegetation.kill_all (name, time, soil, organic_matter);
   const double energy = soil_heat.energy (soil, soil_water, from, to);
   soil_water.mix (soil, from, to);
   soil_heat.set_energy (soil, soil_water, from, to, energy);
@@ -283,28 +230,6 @@ ColumnStandard::soil_water_potential (double height) const
   return soil_water.h (soil.interval (height));
 }
 
-double 
-ColumnStandard::crop_ds (const string& name) const
-{
-  for (CropList::const_iterator crop = crops.begin();
-       crop != crops.end();
-       crop++)
-    if ((*crop)->name == name)
-      return (*crop)->DS ();
-  return Crop::DSremove;
-}
-
-double 
-ColumnStandard::crop_dm (const string& name) const
-{
-  for (CropList::const_iterator crop = crops.begin();
-       crop != crops.end();
-       crop++)
-    if ((*crop)->name == name)
-      return (*crop)->DM ();
-  return -42.42e42;
-}
-
 bool
 ColumnStandard::check () const
 {
@@ -337,19 +262,10 @@ ColumnStandard::tick (const Time& time, const Weather& weather)
   soil_NH4.clear ();
   surface.clear ();
   
-  bioclimate.tick (surface, weather, time, crops, soil, soil_water, soil_heat);
-
-  // Uptake and convertion of matter.
-  for (CropList::iterator crop = crops.begin(); crop != crops.end(); crop++)
-    (*crop)->tick (time, bioclimate, soil, organic_matter, 
+  bioclimate.tick (surface, weather, time,
+		   vegetation, soil, soil_water, soil_heat);
+  vegetation.tick (time, bioclimate, soil, organic_matter, 
 		   soil_heat, soil_water, soil_NH4, soil_NO3);
-  if (crops.size () > 1U)
-    {
-      // Make sure the crop which took first this time will be last next.
-      crops.push_back (crops.front ());
-      crops.pop_front ();
-    }
-
   organic_matter.tick (soil, soil_water, soil_heat, groundwater, 
 		       soil_NO3, soil_NH4);
   nitrification.tick (soil, soil_water, soil_heat, soil_NO3, soil_NH4,
@@ -391,7 +307,7 @@ ColumnStandard::output (Log& log, Filter& filter) const
   output_derived (nitrification, "Nitrification", log, filter);
   output_submodule (denitrification, "Denitrification", log, filter);
   output_derived (groundwater, "Groundwater", log, filter);
-  output_list (crops, "crops", log, filter, Librarian<Crop>::library ());
+  output_submodule (vegetation, "Vegetation", log, filter);
   log.close_geometry ();
 }
 
@@ -399,7 +315,7 @@ ColumnStandard::ColumnStandard (const ColumnStandard& column,
 				const string& name)
   : Column (name),
     // BUG: None of the constructors below have been implemented.
-    crops (column.crops),
+    vegetation (column.vegetation),
     bioclimate (column.bioclimate),
     surface (column.surface),
     soil (column.soil),
@@ -416,7 +332,7 @@ ColumnStandard::ColumnStandard (const ColumnStandard& column,
 
 ColumnStandard::ColumnStandard (const AttributeList& al)
   : Column (al.name ("type")),
-    crops (al.alist_sequence ("crops")),
+    vegetation (al.alist ("Vegetation")),
     bioclimate (Librarian<Bioclimate>::create (al.alist ("Bioclimate"))),
     surface (al.alist ("Surface")),
     soil (al.alist ("Soil")),
@@ -446,6 +362,7 @@ ColumnStandard::~ColumnStandard ()
 }
 
 #ifdef BORLAND_TEMPLATES
+template class add_submodule<Vegetation>;
 template class add_submodule<Surface>;
 template class add_submodule<Soil>;
 template class add_submodule<SoilWater>;
@@ -469,9 +386,7 @@ static struct ColumnStandardSyntax
     AttributeList& alist = *new AttributeList ();
 
     syntax.add ("description", Syntax::String, Syntax::Optional); 
-    syntax.add ("crops", Librarian<Crop>::library (), 
-		Syntax::State, Syntax::Sequence);
-    alist.add ("crops", *new vector<AttributeList*>);
+    add_submodule<Vegetation> ("Vegetation", syntax, alist);
     syntax.add ("Bioclimate", Librarian<Bioclimate>::library (), 
 		Syntax::State);
     add_submodule<Surface> ("Surface", syntax, alist);

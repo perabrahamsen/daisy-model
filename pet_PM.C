@@ -7,7 +7,7 @@
 #include "soil_heat.h"
 #include "bioclimate.h"
 #include "net_radiation.h"
-#include "crop.h"
+#include "vegetation.h"
 #include "log.h"
 
 class PetPM : public Pet
@@ -61,7 +61,7 @@ public:
   NetRadiation& net_radiation;
 
   // Simulation.
-  void tick (const Weather& weather, const CropList& crops,
+  void tick (const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil& soil, 
 	     const SoilHeat& soil_heat, const SoilWater& soil_water);
 
@@ -166,7 +166,7 @@ PetPM::RefPenmanMonteithWet (double Rn, double G, double Temp, double ea,
 }
 
 void 
-PetPM::tick (const Weather& weather, const CropList& crops,
+PetPM::tick (const Weather& weather, const Vegetation& crops,
 	     const Surface& surface, const Soil& soil, 
 	     const SoilHeat& soil_heat, const SoilWater& soil_water)
 {
@@ -184,9 +184,8 @@ PetPM::tick (const Weather& weather, const CropList& crops,
   double Albedo;
   if (LAI > 0.0)
     {
-      const double EpExtinction = crops.CanopySum (&Crop::EPext) / LAI;
-      const double crop_cover = (1.0 - exp (-EpExtinction * LAI));
-      Albedo = (crops.CanopySum (&Crop::albedo) / LAI) * crop_cover
+      const double crop_cover = crops.cover ();
+      Albedo = crops.albedo () * crop_cover
 	+ surface.albedo (soil, soil_water) * (1.0 - crop_cover);
     }
   else

@@ -9,7 +9,7 @@
 struct Surface;
 struct Weather;
 struct AttributeList;
-struct CropList;
+struct Vegetation;
 struct Soil;
 struct Syntax;
 struct SoilWater;
@@ -36,8 +36,7 @@ public:
 
   // Simulation.
 public:
-  virtual void tick (Surface&, const Weather&, const Time&, 
-		     const CropList&, 
+  virtual void tick (Surface&, const Weather&, const Time&, Vegetation&, 
 		     const Soil&, SoilWater&, const SoilHeat&) = 0;
   virtual void output (Log&, Filter&) const = 0;
 

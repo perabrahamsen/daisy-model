@@ -101,21 +101,7 @@ HydraulicB_BaC_Bimodal::HydraulicB_BaC_Bimodal (const AttributeList& al)
     Theta_b (al.number ("Theta_b")),
     K_b (al.number ("K_b")),
     K_sat (al.number ("K_sat"))
-{
-CERR << "pF\th\tTheta\tK\tCw2\tM\n";
-for (double pF = 0; pF < 4.5; pF+=0.1)
-{
-   double h = pF2h (pF);
-   CERR << pF << "\t" << h << "\t" << Theta (h) << "\t" << K (h)
-        << "\t" << Cw2 (h) << "\t" << M (h) << "\n";
-}
-CERR << "Th\th\n";
-for (double Th = Theta_res+0.001; Th < Theta_sat; Th+=0.01)
-{
-   CERR << Th << "\t" << h (Th) << "\n";
-}
-
-}
+{ }
 
 HydraulicB_BaC_Bimodal::~HydraulicB_BaC_Bimodal ()
 { }

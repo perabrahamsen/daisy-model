@@ -1557,6 +1557,7 @@ CropStandard::ActualWaterUptake (double Ept,
   // We need this to make sure H2OExtraction corresponds to `h_x'.
   const double total2 = PotentialWaterUptake (h_x, soil, soil_water);
   assert (total == total2);
+  assert (h_x >= h_wp);
 
   vector<double>& H2OExtraction = var.RootSys.H2OExtraction;
   if (total > Ept)
@@ -1610,6 +1611,7 @@ CropStandard::PotentialWaterUptake (const double h_x,
 		    / (- 0.5 * log (area * L[i])),
 		    max_uptake),
 	       0.0);
+      assert (soil_water.h (i) > h_wp || uptake == 0.0);
       assert (soil_water.Theta_left (i) - uptake > soil.Theta_res (i));
       assert (L[i] >= 0.0);
       assert (soil.Theta (i, h) > 0.0);

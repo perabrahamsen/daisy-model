@@ -169,9 +169,6 @@ UZRichard::richard (const Soil& soil,
   int number_of_time_step_reductions = 0;
   int iterations_with_this_time_step = 0;
 
-  double inf = 0;
-  if (top.q()<-2.0) inf = -top.q();
-
   while (time_left > 0.0)
     {
       // Initialization for each small time step.
@@ -289,6 +286,15 @@ UZRichard::richard (const Soil& soil,
 	  tridia (top.flux_top () ? 0 : 1,
 		  (bottom.flux_bottom () ? size : size - 1),
 		  a, b, c, d, h.begin ());
+
+	  if (h[0] < -1e9 || h[1] < -1e9 || h[size-1] < -1e9)
+	    {
+	      CERR << "ABSURD: h[0] = " << h[0] << " h[1] = " << h[1] 
+		   << " h[" << (size-1) << "] = " << h[size-1]
+		   << " stepping down\n";
+	      iterations_used = max_iterations + 42;
+	      break;
+	    }
 	}
       while (   !converges (h_conv, h)
 	     && iterations_used <= max_iterations);
@@ -312,30 +318,10 @@ UZRichard::richard (const Soil& soil,
 	  bool accepted = true;	// Could the top accept the results?
 	  // Amount of water we put into the top this small time step.
 	  double delta_top_water = 88.0e88;
-#if 1
-          if (inf>0)
-            {
-		      CERR << " ddt = " << ddt
-                           << " time_left = " << time_left
-                           << " h[0] = " << h[0]
-                           << " h[1] = " << h[1]
-                           << " Infl = " << top.q()
-                           << " delta_top_water = " << delta_top_water
-                           << " top.flux() = " << top.flux_top() << "\n";
-            }
-#endif
 	  if (!top.flux_top ())
 	    {
 	      q_darcy (soil, first, last, h_previous, h, Theta_previous, Theta,
 		       Kplus, S, ddt, q);
-#if 1
-		      CERR << " ddt = " << ddt
-                           << " time_left = " << time_left
-                           << " q[0] = " << q[0]
-                           << " q[1] = " << q[1]
-                           << " delta_top_water = " << delta_top_water
-                           << " top.flux() = " << top.flux_top() << "\n";
-#endif
 	      // We take water from flux pond first.
 	      delta_top_water = q[first] * ddt;
 
@@ -354,11 +340,6 @@ UZRichard::richard (const Soil& soil,
 	  else if (h[first] <= 0)
 	    // We have a flux top, and unsaturated soil.
 	    {
-//	      flux_pond = 0.0;
-//	      delta_top_water = top.q () * ddt;
-//	      delta_top_water = top.q () * (ddt / time_left);
-//              const bool ok = top.accept_top (delta_top_water);
-//              assert (ok);
               delta_top_water = -(available_water / time_left) * ddt;
 	    }
 	  else if (!switched_top)

@@ -1,10 +1,32 @@
+1998-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* Version 0.46 released.
+
+1998-12-14  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* uzrichard.C (richard): Don't try for convergence if tridia gives
+	absurds results.  Set down the time step instead.
+
+	* lib/log.dai: Update logs for new bioclimate and vegetation
+	models. 
+
+1998-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* csmp.C (operator): Added assertions.
+
 1998-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* vegetation.C, vegetation.h: New files.  Class `Vegetation'
+	replaces `CropList' from `crop.h'.
+	* bioclimate.h, bioclimate_std.C, column_std.C, pet.h, pet.C,
+	pet_PM.C, pet_makkink.C, pet_weather.C, pt.h, pt_std.C:
+	Update callers.  
+	
 	* Version 0.45 released.
 
 1998-12-12  Per Abrahamsen  <abraham@dina.kvl.dk>
 
-	* log_table.C: Import Filter::check functions.
+	* log_table.C: Import `Filter::check' functions.
 	* filter_none.C: Ditto.
 	* filter_all.C: Ditto.
 

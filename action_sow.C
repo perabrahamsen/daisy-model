@@ -4,7 +4,6 @@
 #include "daisy.h"
 #include "frame.h"
 #include "column.h"
-// We need to initialize the Crop library.
 #include "crop.h"
 
 struct ActionSow : public Action
@@ -28,27 +27,7 @@ struct ActionSow : public Action
     }
 
   bool check (Daisy&) const
-    { 
-      const string name = crop.name ("type");
-
-      // Does it exists?
-      const Library& library = Librarian<Crop>::library ();
-      if (!library.check (name))
-	{
-	  CERR << "Cannot sow unknown crop `" << name << "'\n";
-	  return false;
-	}
-
-      // Is it complete?
-      const Syntax& syntax = library.syntax (name);
-      if (!syntax.check (crop, name))
-	{
-	  CERR << "Cannot sow incomplete crop `" << name << "'\n";
-	  return false;
-	}
-
-      return true;
-    }
+    { return true; }
 
   ActionSow (const AttributeList& al)
     : Action (al.name ("type")),

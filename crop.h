@@ -5,7 +5,6 @@
 
 #include "time.h"
 #include "librarian.h"
-#include <deque>
 
 struct Log;
 struct Filter;
@@ -83,16 +82,5 @@ public:
 };
 
 static Librarian<Crop> Crop_init ("crop");
-
-class CropList : public deque <Crop*> 
-{ 
-public:
-  double CanopySum (double (Crop::*fun) () const) const;
-  double LAI () const;
-  double height () const;
-  double cover () const;
-  CropList (const vector<AttributeList*>&);
-  ~CropList ();
-};
 
 #endif CROP_H

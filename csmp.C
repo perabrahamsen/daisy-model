@@ -30,6 +30,9 @@ struct CSMP::Implementation
 double 
 CSMP::Implementation::operator () (const double pos) const
 {
+  assert (x.size () > 0);
+  assert (x.size () == y.size ());
+
   int min = 0;
   int max = x.size () - 1;
 

@@ -9,7 +9,7 @@ class Soil;
 class SoilHeat;
 class SoilWater;
 class Weather;
-class CropList;
+class Vegetation;
 class Surface;
 
 class Pet
@@ -20,12 +20,12 @@ public:
 
   // Utilities.
 public:
-  static double reference_to_potential (const CropList&, const Surface&, 
+  static double reference_to_potential (const Vegetation&, const Surface&, 
 					double ref);
 
   // Simulation.
 public:
-  virtual void tick (const Weather&, const CropList&,
+  virtual void tick (const Weather&, const Vegetation&,
 		     const Surface&, const Soil&, const SoilHeat&, 
 		     const SoilWater&) = 0;
   virtual double wet () const = 0; // [mm/h]

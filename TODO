@@ -1,10 +1,12 @@
-* Flyt "BioclimateNew::CanopyStructure" til "CropList::tick".
+* Make it possibile to add (multiple) checker functions to a Syntax.
 
-* Opdater BioclimateNew::WaterDistribution til at bruge dem.
+* horizon:humus skal være > 0.0
 
 * PT model til PvdK.
 
-* Infør stof på overfladen.
+* Indfør stof på overfladen.
+
+* Indfør Geometry::flux og en log.table.entry.flux for log af flux værdier.
 
 ======================================================================
 

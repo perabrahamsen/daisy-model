@@ -2,7 +2,7 @@
 
 #include "pt.h"
 #include "pet.h"
-#include "crop.h"
+#include "vegetation.h"
 #include "surface.h"
 #include "log.h"
 
@@ -14,7 +14,7 @@ struct PT_standard : public PT
   double potential_soil_transpiration;
 
   // Simulation.
-  void tick (const Weather&, const CropList& crops,
+  void tick (const Weather&, const Vegetation& crops,
 	     const Surface& surface, const Soil&, const SoilHeat&,
 	     const SoilWater&, const Pet& pet, 
 	     double canopy_ea, double snow_ea,
