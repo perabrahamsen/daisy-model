@@ -1,3 +1,7 @@
+2002-02-20  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* om.C (tick): Really fix the mass balance bug.
+
 2002-02-19  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* Version 2.10 released.

@@ -115,9 +115,10 @@ Hydraulic_Cosby::initialize (double clay, double silt, double sand)
   sand *= 100.0;		// [%]
   b = 3.10 + 0.157 * clay - 0.003 * sand; // []
   assert (b > 0.0);
-  h_b   = -exp ( 1.54 - 0.0095 * sand + 0.0063 * silt); // [cm]
+  h_b   = -pow (10.0, 1.54 - 0.0095 * sand + 0.0063 * silt); // [cm]
   assert (h_b < 0.0);
-  K_sat = exp (-0.60 + 0.0126 * sand - 0.0064 * clay) * cm_per_inch; // [cm/h]
+  K_sat = pow (10.0, -0.60 + 0.0126 * sand - 0.0064 * clay)
+    * cm_per_inch; // [cm/h]
   assert (K_sat > 0.0);
   Theta_sat = (50.50 - 0.1420 * sand - 0.0370 * clay) * 0.01; // [%]
   assert (Theta_sat > 0.0);

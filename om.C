@@ -477,12 +477,12 @@ OM::tick (unsigned int end, const double* abiotic_factor,
       som_N[i] += N_use;
       som_C[i] += C_use;
       C[i] -= C_use;
-      N_used[i] -= N_use;
 #if 0      
       if (C[i] < 1e-9)
 	{
 	  assert (C[i] > -1e9);
 	  som_C[i] += C[i];
+	  som_N[i] += C[i] / C_per_N[i];
 	  C[i] = 0.0;
 	}
 #endif
