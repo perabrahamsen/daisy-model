@@ -49,4 +49,12 @@
   (diffusion_coefficient 4.6e-6 [cm^2/s])
   (solute (adsorption linear (K_OC 16000 [cm^3/g]))))
 
+(defchemical Ioxynil default
+  (canopy_dissipation_rate 0.0083 [h^-1])
+  (canopy_washoff_coefficient 1.0 [])
+  (crop_uptake_reflection_factor 1 [])
+  (decompose_halftime 10 [d])		; at 10 dg C
+  (diffusion_coefficient 4.6e-6 [cm^2/s])
+  (solute (adsorption linear (K_OC 350 [cm^3/g]))))
+
 ;;; chemestry.dai ends here.

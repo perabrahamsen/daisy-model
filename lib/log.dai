@@ -336,7 +336,7 @@ Note that negative deltas means the amount of water increases."
                    (tag "Surface Irrigation")
                    (flux true)
                    (dimension "mm/&"))
-           (interval (path column "$col" SoilWater S_permanent)
+           (interval (path column "$col" SoilWater S_incorp)
                      (tag "Subsoil Irrigation")
                      (flux true)
                      (dimension "mm/&")
