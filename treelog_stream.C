@@ -30,11 +30,11 @@ using namespace std;
 
 struct TreelogStream::Implementation
 {
-  tmp::ostream& out;
+  stream& out;
   deque<string> path;
   deque<bool> touched;
 
-  Implementation (tmp::ostream& o)
+  Implementation (ostream& o)
     : out (o)
   { }
   ~Implementation ()

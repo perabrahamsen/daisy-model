@@ -24,7 +24,7 @@ using namespace std;
 #define DIRECTORY_SEPARATOR "\\"
 #endif
 
-ostream& Path::Output::stream () const
+std::ostream& Path::Output::stream () const
 { return out; }
 
 bool Path::Output::good () const

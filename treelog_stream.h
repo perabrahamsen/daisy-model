@@ -50,7 +50,7 @@ public:
 
   // Create and Destroy.
 public:
-  TreelogStream (std::ostream&);
+  TreelogStream (ostream&);
   ~TreelogStream ();
 };
 
